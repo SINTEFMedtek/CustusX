@@ -45,7 +45,6 @@ public:
 	void setFilePath(const QString& filePath);///< Set current file path to file
 	void setAcquisitionTime(QDateTime time);
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
-	//virtual void set_rMd(Transform3D rMd); ///< set the transformation from data to reference space
   virtual RegistrationHistoryPtr get_rMd_History();
 
 	virtual QString getUid() const; ///< \return unique id for this instance
@@ -58,8 +57,8 @@ public:
   virtual QDateTime getAcquisitionTime() const;
   virtual QString getType() const { return "unknown"; }
 
-  virtual QString getParentFrame();
-//  virtual void setParentFrame(QString uid);
+  virtual QString getSpace();
+  virtual QString getParentSpace();
   virtual DoubleBoundingBox3D boundingBox() const = 0;
 
 	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
@@ -79,10 +78,8 @@ protected:
 	QString mName;
 	QString mFilePath;
 	QDateTime mAcquisitionTime;
-//	QString mParentFrame;
 
 	REGISTRATION_STATUS mRegistrationStatus;
-	//Transform3D m_rMd; ///< the transform from data to reference space
 	RegistrationHistoryPtr m_rMd_History;
 
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.

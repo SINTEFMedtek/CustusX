@@ -7,6 +7,37 @@
 namespace ssc
 {
 
+// --------------------------------------------------------
+RegistrationHistoryPtr RegistrationHistory::mNull; ///< static member
+// --------------------------------------------------------
+
+
+/**NULL implementation of a registration transform
+ */
+class RegistrationHistoryNull : public RegistrationHistory
+{
+public:
+  virtual void addXml(QDomNode& parentNode) const {}
+  virtual void parseXml(QDomNode& dataNode) {}
+
+  virtual void addRegistration(const RegistrationTransform& transform) {}
+  virtual void setRegistration(const Transform3D& transform) {}
+  virtual void updateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform) {}
+
+  virtual void setParentSpace(const QString& newParent) {}
+  virtual void addParentSpace(const QString& newParent) {}
+  virtual void addParentSpace(const ParentSpace& newParent) {}
+  virtual void updateParentSpace(const QDateTime& oldTime, const ParentSpace& newParent) {}
+
+  virtual std::vector<RegistrationTransform> getData() const { return std::vector<RegistrationTransform>(); }
+  virtual std::vector<ParentSpace> getParentSpaces() const { return std::vector<ParentSpace>(); }
+  virtual void removeNewerThan(const QDateTime& timestamp) {}
+  virtual void setActiveTime(const QDateTime& timestamp) {}
+  virtual QDateTime getActiveTime() const { return QDateTime(); }
+  virtual RegistrationTransform getCurrentRegistration() const { return RegistrationTransform(); }
+  virtual ParentSpace getCurrentParentSpace() { return ParentSpace(); }
+  virtual void clear() {}
+};
 
 
 //---------------------------------------------------------
@@ -15,7 +46,6 @@ namespace ssc
 
 RegistrationTransform::RegistrationTransform() : mValue(Transform3D::Identity())
 {
-
 }
 
 RegistrationTransform::RegistrationTransform(const Transform3D& value, const QDateTime& timestamp, const QString& type)
@@ -70,19 +100,19 @@ bool operator==(const RegistrationTransform& lhs, const RegistrationTransform& r
 //-------  RegistrationTransform  -------------------------
 //---------------------------------------------------------
 
-ParentFrame::ParentFrame()
+ParentSpace::ParentSpace()
 {
 
 }
 
-ParentFrame::ParentFrame(const QString& uid, const QDateTime& timestamp, const QString& type)
+ParentSpace::ParentSpace(const QString& uid, const QDateTime& timestamp, const QString& type)
 {
   mValue = uid;
   mTimestamp = timestamp;
   mType = type;
 }
 
-void ParentFrame::addXml(QDomNode& parentNode) const ///< write internal state to node
+void ParentSpace::addXml(QDomNode& parentNode) const ///< write internal state to node
 {
   QDomDocument doc = parentNode.ownerDocument();
   QDomElement base = doc.createElement("parentFrame");
@@ -93,7 +123,7 @@ void ParentFrame::addXml(QDomNode& parentNode) const ///< write internal state t
   base.setAttribute("type", mType);
 }
 
-void ParentFrame::parseXml(QDomNode& dataNode)///< read internal state from node
+void ParentSpace::parseXml(QDomNode& dataNode)///< read internal state from node
 {
   if (dataNode.isNull())
     return;
@@ -105,12 +135,12 @@ void ParentFrame::parseXml(QDomNode& dataNode)///< read internal state from node
   mValue = base.attribute("value");
 }
 
-bool operator<(const ParentFrame& lhs, const ParentFrame& rhs)
+bool operator<(const ParentSpace& lhs, const ParentSpace& rhs)
 {
   return lhs.mTimestamp < rhs.mTimestamp;
 }
 
-bool operator==(const ParentFrame& lhs, const ParentFrame& rhs)
+bool operator==(const ParentSpace& lhs, const ParentSpace& rhs)
 {
   return (lhs.mValue==rhs.mValue) && (lhs.mTimestamp==rhs.mTimestamp) && (lhs.mType==rhs.mType);
 }
@@ -119,7 +149,12 @@ bool operator==(const ParentFrame& lhs, const ParentFrame& rhs)
 //-------  RegistrationHistory    -------------------------
 //---------------------------------------------------------
 
-
+RegistrationHistoryPtr RegistrationHistory::getNullObject()
+{
+	if (!mNull)
+		mNull.reset(new RegistrationHistoryNull);
+	return mNull;
+}
 
 void RegistrationHistory::addXml(QDomNode& parentNode) const ///< write internal state to node
 {
@@ -135,9 +170,9 @@ void RegistrationHistory::addXml(QDomNode& parentNode) const ///< write internal
   {
     mData[i].addXml(base);
   }
-  for (unsigned i=0; i<mParentFrames.size(); ++i)
+  for (unsigned i=0; i<mParentSpaces.size(); ++i)
   {
-    mParentFrames[i].addXml(base);
+    mParentSpaces[i].addXml(base);
   }
 }
 
@@ -163,13 +198,13 @@ void RegistrationHistory::parseXml(QDomNode& dataNode)///< read internal state f
   currentElem = dataNode.firstChildElement("parentFrame");
   for ( ; !currentElem.isNull(); currentElem = currentElem.nextSiblingElement("parentFrame"))
   {
-    ParentFrame transform;
+    ParentSpace transform;
     transform.parseXml(currentElem);
-    mParentFrames.push_back(transform);
+    mParentSpaces.push_back(transform);
   }
 
   std::sort(mData.begin(), mData.end());
-  std::sort(mParentFrames.begin(), mParentFrames.end());
+  std::sort(mParentSpaces.begin(), mParentSpaces.end());
   setActiveTime(currentTime); // update cache
 }
 
@@ -220,42 +255,42 @@ void RegistrationHistory::setRegistration(const Transform3D& transform)
 /**Set a parent fram, overwriting all history.
  * Use this when registration history is not needed, or when defining a relationship for the first time.
  */
-void RegistrationHistory::setParentFrame(const QString& newParent)
+void RegistrationHistory::setParentSpace(const QString& newParent)
 {
-  mParentFrames.clear();
-  this->addParentFrame(ParentFrame(newParent));
+  mParentSpaces.clear();
+  this->addParentSpace(ParentSpace(newParent));
 }
 
-void RegistrationHistory::addParentFrame(const QString& newParent)
+void RegistrationHistory::addParentSpace(const QString& newParent)
 {
-  this->addParentFrame(ParentFrame(newParent, QDateTime::currentDateTime(), "Set Parent Frame"));
+  this->addParentSpace(ParentSpace(newParent, QDateTime::currentDateTime(), "Set Parent Frame"));
 }
 
-void RegistrationHistory::addParentFrame(const ParentFrame& newParent)
+void RegistrationHistory::addParentSpace(const ParentSpace& newParent)
 {
-  if (std::count(mParentFrames.begin(), mParentFrames.end(), newParent)) // ignore if already present
+  if (std::count(mParentSpaces.begin(), mParentSpaces.end(), newParent)) // ignore if already present
     return;
 
-  mParentFrames.push_back(newParent);
-  std::sort(mParentFrames.begin(), mParentFrames.end());
+  mParentSpaces.push_back(newParent);
+  std::sort(mParentSpaces.begin(), mParentSpaces.end());
   setActiveTime(QDateTime()); // reset to last registration when reregistering.
 }
 
-void RegistrationHistory::updateParentFrame(const QDateTime& oldTime, const ParentFrame& newParent)
+void RegistrationHistory::updateParentSpace(const QDateTime& oldTime, const ParentSpace& newParent)
 {
-  for (std::vector<ParentFrame>::iterator iter=mParentFrames.begin(); iter!=mParentFrames.end(); ++iter)
+  for (std::vector<ParentSpace>::iterator iter=mParentSpaces.begin(); iter!=mParentSpaces.end(); ++iter)
   {
     if (iter->mTimestamp != oldTime)
       continue;
-    mParentFrames.erase(iter);
+    mParentSpaces.erase(iter);
     break;
   }
-  this->addParentFrame(newParent);
+  this->addParentSpace(newParent);
 }
 
-ParentFrame RegistrationHistory::getCurrentParentFrame()
+ParentSpace RegistrationHistory::getCurrentParentSpace()
 {
-  return mParentFrameCache;
+  return mParentSpaceCache;
 }
 
 std::vector<RegistrationTransform> RegistrationHistory::getData() const
@@ -263,9 +298,9 @@ std::vector<RegistrationTransform> RegistrationHistory::getData() const
   return mData;
 }
 
-std::vector<ParentFrame> RegistrationHistory::getParentFrames() const
+std::vector<ParentSpace> RegistrationHistory::getParentSpaces() const
 {
-  return mParentFrames;
+  return mParentSpaces;
 }
 
 void RegistrationHistory::removeNewerThan(const QDateTime& timestamp)
@@ -286,12 +321,12 @@ void RegistrationHistory::removeNewerThan(const QDateTime& timestamp)
     }
   }
 
-  for (std::vector<ParentFrame>::iterator iter=mParentFrames.begin(); iter!=mParentFrames.end(); )
+  for (std::vector<ParentSpace>::iterator iter=mParentSpaces.begin(); iter!=mParentSpaces.end(); )
   {
     if (iter->mTimestamp > timestamp)
     {
       std::cout << "RegistrationHistory::removeNewerThan("<< timestamp.toString(timestampSecondsFormatNice()) <<"): removed parent frame [" << iter->mTimestamp.toString(timestampSecondsFormatNice()) << ", " << iter->mType << "]" << std::endl;
-      iter = mParentFrames.erase(iter);
+      iter = mParentSpaces.erase(iter);
     }
     else
     {
@@ -302,14 +337,14 @@ void RegistrationHistory::removeNewerThan(const QDateTime& timestamp)
   setActiveTime(QDateTime());
 }
 
-void RegistrationHistory::setCache(const RegistrationTransform& val, const ParentFrame& parent, const QDateTime& timestamp)
+void RegistrationHistory::setCache(const RegistrationTransform& val, const ParentSpace& parent, const QDateTime& timestamp)
 {
-  if ((mTransformCache==val) && (mParentFrameCache==parent) && (mCurrentTime==timestamp))
+  if ((mTransformCache==val) && (mParentSpaceCache==parent) && (mCurrentTime==timestamp))
     return;
 
   mCurrentTime = timestamp;
   mTransformCache = val;
-  mParentFrameCache = parent;
+  mParentSpaceCache = parent;
 
   emit currentChanged();
 }
@@ -320,7 +355,7 @@ void RegistrationHistory::setCache(const RegistrationTransform& val, const Paren
 void RegistrationHistory::setActiveTime(const QDateTime& timestamp)
 {
   RegistrationTransform val;
-  ParentFrame parent;
+  ParentSpace parent;
   // set to specified time
   if (timestamp.isValid())
   {
@@ -329,7 +364,7 @@ void RegistrationHistory::setActiveTime(const QDateTime& timestamp)
       if (iter->mTimestamp <= timestamp)
         val = *iter;
     }
-    for (std::vector<ParentFrame>::iterator iter=mParentFrames.begin(); iter!=mParentFrames.end(); ++iter)
+    for (std::vector<ParentSpace>::iterator iter=mParentSpaces.begin(); iter!=mParentSpaces.end(); ++iter)
     {
       if (iter->mTimestamp <= timestamp)
         parent = *iter;
@@ -339,8 +374,8 @@ void RegistrationHistory::setActiveTime(const QDateTime& timestamp)
   {
     if (!mData.empty())
       val = mData.back();
-    if (!mParentFrames.empty())
-      parent = mParentFrames.back();
+    if (!mParentSpaces.empty())
+      parent = mParentSpaces.back();
   }
 
   setCache(val, parent, timestamp);

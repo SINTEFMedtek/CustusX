@@ -24,12 +24,7 @@ Data::Data(const QString& uid, const QString& name) :
   connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SIGNAL(transformChanged()));
   connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SLOT(transformChangedSlot()));
 }
-/*
-Data::Data(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) : 
-	mUID(uid), mName(name), mVtkPolyData(polyData)
-{
-}
-*/
+
 Data::~Data()
 {}
 void Data::setUid(const QString& uid)
@@ -51,22 +46,6 @@ void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
 {
 	mRegistrationStatus = regStat;
 }
-
-/**
- * Set the transform that brings a point from local data space to (data-)ref space
- * Emits the transformChanged() signal.
- * @param rMd the transformation from data to ref
- */
-/*void Data::set_rMd(Transform3D rMd)
-{
-  m_rMd_History->setRegistration(rMd);
-//	if (similar(rMd, m_rMd))
-//	{
-//		return;
-//	}
-//	m_rMd = rMd;
-//	emit transformChanged();
-}*/
 
 QString Data::getUid() const
 {
@@ -116,23 +95,15 @@ bool Data::getShading() const
   return false;
 }
 
-QString Data::getParentFrame()
+QString Data::getSpace()
 {
-  return m_rMd_History->getCurrentParentFrame().mValue;
-//  return mParentFrame;
+	return mUid;
 }
 
-//void Data::setParentFrame(QString uid)
-//{
-//  RegistrationTransform transform = m_rMd_History->getCurrentRegistration();
-//  transform.mParentFrame = uid;
-//  transform.mType = "Set Parent Frame";
-//  transform.mTimestamp = QDateTime::currentDateTime();
-//  m_rMd_History->addRegistration(transform);
-//
-//  //mParentFrame = uid;
-//  //emit transformChanged();
-//}
+QString Data::getParentSpace()
+{
+  return m_rMd_History->getCurrentParentSpace().mValue;
+}
 
 void Data::addXml(QDomNode& dataNode)
 {
@@ -140,16 +111,9 @@ void Data::addXml(QDomNode& dataNode)
 
   m_rMd_History->addXml(dataNode);
 
-//  QDomElement uidNode = doc.createElement("uid");
-//  uidNode.appendChild(doc.createTextNode(mUid));
-//  dataNode.appendChild(uidNode);
-
   dataNode.toElement().setAttribute("uid", mUid);
   dataNode.toElement().setAttribute("name", mName);
   dataNode.toElement().setAttribute("type", this->getType());
-//  QDomElement nameNode = doc.createElement("name");
-//  nameNode.appendChild(doc.createTextNode(mName));
-//  dataNode.appendChild(nameNode);
 
   QDomElement filePathNode = doc.createElement("filePath");
   filePathNode.appendChild(doc.createTextNode(mFilePath));
@@ -158,10 +122,6 @@ void Data::addXml(QDomNode& dataNode)
   QDomElement acqTimeNode = doc.createElement("acqusitionTime");
   acqTimeNode.appendChild(doc.createTextNode(mAcquisitionTime.toString(timestampMilliSecondsFormat())));
   dataNode.appendChild(acqTimeNode);
-
-//  QDomElement parentFrameNode = doc.createElement("parentFrame");
-//  parentFrameNode.appendChild(doc.createTextNode(mParentFrame));
-//  dataNode.appendChild(parentFrameNode);
 }
 
 void Data::parseXml(QDomNode& dataNode)
@@ -169,22 +129,11 @@ void Data::parseXml(QDomNode& dataNode)
   if (dataNode.isNull())
     return;
 
-//  // backward compatibility per 20101117: remove sometime in 2011
-//  QString parentFrame;
-//  if(!dataNode.namedItem("parentFrame").isNull())
-//    parentFrame = dataNode.namedItem("parentFrame").toElement().text();
-
   QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
   m_rMd_History->parseXml(registrationHistory);
 
   if (!dataNode.namedItem("acqusitionTime").toElement().isNull())
     mAcquisitionTime = QDateTime::fromString(dataNode.namedItem("acqusitionTime").toElement().text(), timestampMilliSecondsFormat());
-
-//  if (!parentFrame.isEmpty())
-//  {
-//    m_rMd_History->addParentFrame(parentFrame);
-////    this->setParentFrame(parentFrame);
-//  }
 }
 
 /**Get the time the data was created from a data source.
@@ -202,8 +151,6 @@ QDateTime Data::getAcquisitionTime() const
   {
     QDateTime datetime = QDateTime::fromString(tsReg.cap(0), timestampSecondsFormat());
     return datetime;
-//    QString timestamp = datetime.toString("hh:mm");
-//    return prefix + " " + counter + " " + timestamp;
   }
   return QDateTime();
 }

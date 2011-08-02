@@ -39,21 +39,23 @@ bool operator==(const RegistrationTransform& lhs, const RegistrationTransform& r
 /**Encapsulation of a transform and the registration event,
  * i.e the time and kind of registration.
  */
-class ParentFrame
+class ParentSpace
 {
 public:
   QString mValue;///< parent frame uid
   QDateTime mTimestamp; ///< time the transform was registrated.
   QString mType; ///< description of the kind if registration (manual, patient, landmark, coregistration etc)
 
-  ParentFrame();
-  explicit ParentFrame(const QString& parentFrame, const QDateTime& timestamp=QDateTime(), const QString& type="");
+  ParentSpace();
+  explicit ParentSpace(const QString& parentFrame, const QDateTime& timestamp=QDateTime(), const QString& type="");
   void addXml(QDomNode& parentNode) const; ///< write internal state to node
   void parseXml(QDomNode& dataNode);///< read internal state from node
 };
 
-bool operator<(const ParentFrame& lhs, const ParentFrame& rhs);
-bool operator==(const ParentFrame& lhs, const ParentFrame& rhs);
+bool operator<(const ParentSpace& lhs, const ParentSpace& rhs);
+bool operator==(const ParentSpace& lhs, const ParentSpace& rhs);
+
+typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
 /**A RegistrationHistory describes the registration history of one
  * transform. Normally only the newest transform is used, but it is
@@ -63,38 +65,43 @@ class RegistrationHistory : public QObject
 {
   Q_OBJECT
 public:
-  void addXml(QDomNode& parentNode) const; ///< write internal state to node
-  void parseXml(QDomNode& dataNode);///< read internal state from node
+  virtual void addXml(QDomNode& parentNode) const; ///< write internal state to node
+  virtual void parseXml(QDomNode& dataNode);///< read internal state from node
 
-  void addRegistration(const RegistrationTransform& transform);
-  void setRegistration(const Transform3D& transform);
-  void updateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform);
+  virtual void addRegistration(const RegistrationTransform& transform);
+  virtual void setRegistration(const Transform3D& transform);
+  virtual void updateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 
-  void setParentFrame(const QString& newParent);
-  void addParentFrame(const QString& newParent);
-  void addParentFrame(const ParentFrame& newParent);
-  void updateParentFrame(const QDateTime& oldTime, const ParentFrame& newParent);
+  virtual void setParentSpace(const QString& newParent);
+  virtual void addParentSpace(const QString& newParent);
+  virtual void addParentSpace(const ParentSpace& newParent);
+  virtual void updateParentSpace(const QDateTime& oldTime, const ParentSpace& newParent);
 
-  std::vector<RegistrationTransform> getData() const;
-  std::vector<ParentFrame> getParentFrames() const;
-  void removeNewerThan(const QDateTime& timestamp);
-  void setActiveTime(const QDateTime& timestamp);
-  QDateTime getActiveTime() const;
-  RegistrationTransform getCurrentRegistration() const;
-  ParentFrame getCurrentParentFrame();
-  void clear(); ///< reset all data loaded from xml
+  virtual std::vector<RegistrationTransform> getData() const;
+  virtual std::vector<ParentSpace> getParentSpaces() const;
+  virtual void removeNewerThan(const QDateTime& timestamp);
+  virtual void setActiveTime(const QDateTime& timestamp);
+  virtual QDateTime getActiveTime() const;
+  virtual RegistrationTransform getCurrentRegistration() const;
+  virtual ParentSpace getCurrentParentSpace();
+  virtual void clear(); ///< reset all data loaded from xml
+
+  static RegistrationHistoryPtr getNullObject();
+
 signals:
   void currentChanged();
 private:
-  void setCache(const RegistrationTransform& val, const ParentFrame& parent, const QDateTime& timestamp);
-
+  void setCache(const RegistrationTransform& val, const ParentSpace& parent, const QDateTime& timestamp);
+  static RegistrationHistoryPtr mNull;
   std::vector<RegistrationTransform> mData; ///< time-sorted list of all registration events.
-  std::vector<ParentFrame> mParentFrames; ///< time-sorted list of all registration events.
+  std::vector<ParentSpace> mParentSpaces; ///< time-sorted list of all registration events.
   QDateTime mCurrentTime; ///< disregard registrations later than this time. Invalid means use running time.
   RegistrationTransform mTransformCache; ///< cache for the currently active transform
-  ParentFrame mParentFrameCache; ///< cache for the currently active parent frame
+  ParentSpace mParentSpaceCache; ///< cache for the currently active parent frame
 };
-typedef boost::shared_ptr<RegistrationHistory> RegistrationHistoryPtr;
+
+
+
 
 } // end namespace ssc
 

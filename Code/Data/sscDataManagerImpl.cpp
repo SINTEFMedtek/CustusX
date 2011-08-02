@@ -466,20 +466,20 @@ DataPtr DataManagerImpl::getData(const QString& uid) const
 
 void DataManagerImpl::verifyParentFrame(DataPtr data)
 {
-  if(data->getParentFrame().isEmpty())
+  if(data->getParentSpace().isEmpty())
   {
     int max = 0;
     std::map<QString, DataPtr>::iterator iter;
     for (iter = mData.begin(); iter != mData.end(); ++iter)
     {
       //max = std::max(max, qstring_cast(iter->first).toInt());
-      QStringList parentList = qstring_cast(iter->second->getParentFrame()).split("_");
+      QStringList parentList = qstring_cast(iter->second->getParentSpace()).split("_");
       if (parentList.size()<2)
         continue;
       max = std::max(max, parentList[1].toInt());
     }
     QString parentFrame = "frame_" + qstring_cast(max + 1);
-    data->get_rMd_History()->setParentFrame(parentFrame);
+    data->get_rMd_History()->setParentSpace(parentFrame);
   }
 }
 

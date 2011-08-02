@@ -44,8 +44,8 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces()
 	std::map<QString, DataPtr> data = dataManager()->getData();
 	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
-		dataSpaces.insert(iter->second->getUid());
-		dataSpaces.insert(iter->second->getParentFrame());
+		dataSpaces.insert(iter->second->getSpace());
+//		dataSpaces.insert(iter->second->getParentSpace()); // system only handle spaces identical to data.
 	}
 	dataSpaces.erase("");
 	for (std::set<QString>::iterator iter=dataSpaces.begin(); iter!=dataSpaces.end(); ++iter)
