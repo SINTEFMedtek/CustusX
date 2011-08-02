@@ -35,6 +35,8 @@ public:
 
   void setColor(ssc::Vector3D color); ///< sets the reps color
   void showLandmarks(bool on); ///< turn on or off showing landmarks
+  void setGraphicsSize(double size);
+  void setLabelSize(double size);
 
 public slots:
   virtual void landmarkAddedSlot(QString);
@@ -63,6 +65,8 @@ protected:
   int             mTextScale[3];  ///< the textscale
   bool mShowLabel; ///< show text label
   bool mShowLine;  //< show line from master to target point
+  double mGraphicsSize;
+  double mLabelSize;
 
   struct LandmarkGraphics
   {
@@ -72,6 +76,8 @@ protected:
   };
   typedef std::map<QString, LandmarkGraphics> LandmarkGraphicsMapType;
   LandmarkGraphicsMapType mGraphics;
+  ssc::ViewportListenerPtr mViewportListener;
+  void rescale();
 
 private:
   LandmarkRep(); ///< not implemented
