@@ -57,7 +57,7 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
 
   //update the ssc::Images registration history
   mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
-  mOutput->get_rMd_History()->setParentFrame(mInput->getUid());
+  mOutput->get_rMd_History()->setParentSpace(mInput->getUid());
 
   //load the image into CustusX for visualization
   ssc::dataManager()->loadData(mOutput);

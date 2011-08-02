@@ -38,8 +38,11 @@ QDomDocument FrameForest::getDocument()
  */
 void FrameForest::insertFrame(ssc::DataPtr data)
 {
-    QString parentFrame = qstring_cast(data->getParentFrame());
-    QString currentFrame = qstring_cast(data->getUid());
+    QString parentFrame = data->getParentSpace();
+    QString currentFrame = data->getSpace();
+
+//    if (parentFrame.isEmpty() || currentFrame.isEmpty())
+//    	return;
 
     QDomNode parentNode = this->getNodeAnyway(parentFrame);
     QDomNode currentNode = this->getNodeAnyway(currentFrame);
