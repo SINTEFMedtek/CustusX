@@ -8,7 +8,7 @@
 #ifndef CXPOINTMETRIC_H_
 #define CXPOINTMETRIC_H_
 
-#include "sscData.h"
+#include "cxDataMetric.h"
 #include "sscCoordinateSystemHelpers.h"
 #include "sscDataManagerImpl.h"
 
@@ -56,7 +56,7 @@ public:
  * The point is attached to a specific coordinate system / frame.
  *
  */
-class PointMetric : public ssc::Data
+class PointMetric : public DataMetric
 {
 	Q_OBJECT
 public:

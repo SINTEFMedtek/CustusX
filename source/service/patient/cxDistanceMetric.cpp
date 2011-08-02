@@ -25,7 +25,7 @@ ssc::DataPtr DistanceMetricReader::load(const QString& uid, const QString& filen
 
 
 DistanceMetric::DistanceMetric(const QString& uid, const QString& name) :
-			ssc::Data(uid, name)
+		DataMetric(uid, name)
 {
 }
 

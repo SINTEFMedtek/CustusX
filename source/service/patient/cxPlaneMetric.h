@@ -9,7 +9,7 @@
 #define CXPLANEMETRIC_H_
 
 
-#include "sscData.h"
+#include "cxDataMetric.h"
 #include "sscCoordinateSystemHelpers.h"
 #include "sscDataManagerImpl.h"
 
@@ -35,7 +35,7 @@ public:
  *
  * The point is attached to a specific coordinate system / frame.
  */
-class PlaneMetric : public ssc::Data
+class PlaneMetric : public DataMetric
 {
   Q_OBJECT
 public:
