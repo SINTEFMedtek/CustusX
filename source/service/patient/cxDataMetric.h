@@ -21,6 +21,8 @@ class DataMetric : public ssc::Data
 public:
 	DataMetric(const QString& uid, const QString& name="");
 	virtual ~DataMetric();
+
+  virtual QString getSpace();
 };
 
 }
