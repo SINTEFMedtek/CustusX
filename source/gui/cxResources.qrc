@@ -48,7 +48,8 @@
     <file>icons/metric_distance.png</file>
     <file>icons/metric_angle.png</file>
     <file>icons/metric_plane.png</file>
- 
+    <file>icons/metric_reference.png</file>
+    <file>icons/metric_remove.png</file>
  
     <file>icons/volume.png</file>
     <file>icons/surface.png</file>
