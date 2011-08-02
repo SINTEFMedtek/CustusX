@@ -16,6 +16,7 @@
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
+#include "boost/bind.hpp"
 
 namespace cx
 {
@@ -25,11 +26,15 @@ LandmarkRep::LandmarkRep(const QString& uid, const QString& name) :
   mColor(0,1,0),
   mShowLandmarks(true),
   mShowLabel(true),
-  mShowLine(false)
-
+  mShowLine(false),
+  mGraphicsSize(1),
+  mLabelSize(2.5)
 {
   mTextScale[0] = mTextScale[1] = mTextScale[2] = 20;
   connect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(internalUpdate()));
+
+  mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener->setCallback(boost::bind(&LandmarkRep::rescale, this));
 }
 
 LandmarkRep::~LandmarkRep()
@@ -38,6 +43,18 @@ LandmarkRep::~LandmarkRep()
 void LandmarkRep::setColor(ssc::Vector3D color)
 {
   mColor = color;
+}
+
+void LandmarkRep::setGraphicsSize(double size)
+{
+  mGraphicsSize = size;
+  internalUpdate();
+}
+
+void LandmarkRep::setLabelSize(double size)
+{
+  mLabelSize = size;
+  internalUpdate();
 }
 
 void LandmarkRep::showLandmarks(bool on)
@@ -60,6 +77,7 @@ void LandmarkRep::landmarkAddedSlot(QString uid)
 {
   this->addPoint(uid);
   this->setPosition(uid);
+  this->internalUpdate();
 }
 
 void LandmarkRep::landmarkRemovedSlot(QString uid)
@@ -91,6 +109,7 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
     if (iter->second.mLine)
       iter->second.mLine->setRenderer(view->getRenderer());
   }
+	mViewportListener->startListen(view->getRenderer());
 }
 
 void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
@@ -103,6 +122,7 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
     if (iter->second.mLine)
       iter->second.mLine->setRenderer(NULL);
   }
+	mViewportListener->stopListen();
 }
 
 /**
@@ -152,13 +172,37 @@ void LandmarkRep::internalUpdate()
   {
     QString uid = iter->first;
     QString name = props[uid].getName();
-    iter->second.mPoint->setColor(mColor);
     if (iter->second.mText)
     {
       iter->second.mText->setColor(mColor);
       iter->second.mText->setText(name);
+      iter->second.mText->setSize(mLabelSize/100);
+    }
+    if (iter->second.mPoint)
+    {
+      iter->second.mPoint->setColor(mColor);
+//      iter->second.mPoint->setRadius(mGraphicsSize);
     }
   }
+  this->rescale();
 }
+
+void LandmarkRep::rescale()
+{
+	if (!mViewportListener->isListening())
+		return;
+	double size = mViewportListener->getVpnZoom();
+  double sphereSize = mGraphicsSize/100/size;
+
+  for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
+  {
+    if (iter->second.mPoint)
+    {
+      iter->second.mPoint->setRadius(sphereSize);
+    }
+  }
+
+}
+
 
 }//namespace cx
