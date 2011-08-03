@@ -56,6 +56,7 @@ void MousePadWidgetInternal::mousePressEvent(QMouseEvent* event)
   this->fixPos();
   this->update();
 }
+
 void MousePadWidgetInternal::mouseMoveEvent(QMouseEvent* event)
 {
   QPoint delta = event->pos() - mLastPos;
@@ -68,6 +69,7 @@ void MousePadWidgetInternal::mouseMoveEvent(QMouseEvent* event)
   this->fixPos();
   this->update();
 }
+
 void MousePadWidgetInternal::mouseReleaseEvent(QMouseEvent* event)
 {
   mLastPos = QPoint(this->width()/2, this->height()/2);
@@ -87,19 +89,13 @@ void MousePadWidgetInternal::paintEvent(QPaintEvent *)
     QPainter p(this);
 
     Vector3D center(this->width()/2, this->height()/2, 0);
-    Vector3D delta = Vector3D(mLastPos.x(), mLastPos.y(), 0) - center;
     double radius = center.length();
     QPoint qcenter(this->width()/2, this->height()/2);
 
-    //QRadialGradient radialGrad(mLastPos, radius, qcenter);
     QRadialGradient radialGrad(qcenter, radius, mLastPos);
-    //radialGrad.setColorAt(0, QColor("ivory"));
     radialGrad.setColorAt(0.0, QColor("khaki"));
     radialGrad.setColorAt(0.4, QColor("lightgrey"));
     radialGrad.setColorAt(1, QColor("dimgrey"));
-//    radialGrad.setColorAt(0, Qt::red);
-//    radialGrad.setColorAt(0.5, Qt::blue);
-//    radialGrad.setColorAt(1, Qt::green);
 
     QColor color(146, 0, 146);
     QBrush brush(radialGrad);
