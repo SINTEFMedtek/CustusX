@@ -176,7 +176,9 @@ void LandmarkRep::internalUpdate()
     {
       iter->second.mText->setColor(mColor);
       iter->second.mText->setText(name);
-      iter->second.mText->setSize(mLabelSize/100);
+      // a bit smaller than the corresponding vtkCaptionActor2D, because the sizes
+      // are set differently.
+      iter->second.mText->setSize(mLabelSize/100*0.75);
     }
     if (iter->second.mPoint)
     {
