@@ -121,7 +121,7 @@ private:
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
-  vtkSmartPointer<class InteractionCallback> mInteractorCallback;
+//  vtkSmartPointer<class InteractionCallback> mInteractorCallback;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 
