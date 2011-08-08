@@ -154,6 +154,10 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->toolsAvailableSlot();
 
   mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
+//  mAnnotationMarker->setMarkerFilename("/home/christiana/Dropbox/stl/woman_dec99_2254.stl");
+//  mAnnotationMarker->setSize(0.2); ///< fraction of viewport to use
+
+
   mView->addRep(mAnnotationMarker);
 //  mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
 
