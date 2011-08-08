@@ -33,6 +33,8 @@ public:
 
   bool getVisible() const;
   void setVisible(bool on);
+  void setMarkerFilename(const QString filename); ///< empty and default means a cube
+  void setSize(double size); ///< fraction of viewport to use
 
 private slots:
 protected:
@@ -43,6 +45,12 @@ private:
   void createAnnotation();
   vtkOrientationMarkerWidgetPtr mMarker;
   vtkAnnotatedCubeActorPtr mCube;
+  vtkAxesActorPtr createAxes();
+  vtkAnnotatedCubeActorPtr createCube();
+  vtkActorPtr readMarkerFromFile(const QString filename);
+  void reduceSTLFile(const QString source, const QString dest, double reduction);
+
+  static std::pair<QString, vtkActorPtr> mMarkerCache; ///< cache all loaded markers in order to save load time.
 };
 
 }
