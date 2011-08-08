@@ -154,6 +154,10 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->toolsAvailableSlot();
 
   mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
+//  mAnnotationMarker->setMarkerFilename("/home/christiana/Dropbox/stl/woman_dec99_2254.stl");
+//  mAnnotationMarker->setSize(0.2); ///< fraction of viewport to use
+
+
   mView->addRep(mAnnotationMarker);
 //  mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
 
@@ -202,6 +206,12 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
     {
       this->readDataRepSettings(iter->second);
     }
+
+    mImageLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+    mImageLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+
   }
 }
 
@@ -436,22 +446,6 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
   mSlicePlanes3DRep->getProxy()->setDrawPlanes(checked);
 }
 
-//void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
-//{
-//  if (!mVolumetricReps.count(image->getUid()))
-//  {
-//    ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(image);
-//
-//    mVolumetricReps[image->getUid()] = rep;
-//    mView->addRep(rep);
-//  }
-//
-//  this->activeImageChangedSlot();
-//
-//  updateView();
-//
-//}
-
 void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 {
   if (!mDataReps.count(data->getUid()))
@@ -507,7 +501,6 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
   {
   	DistanceMetricRepPtr rep = DistanceMetricRep::New(data->getUid()+"_3D_rep");
     this->readDataRepSettings(rep);
-//    rep->setShowLabel(settings()->value("View/showLabels").toBool());
     rep->setDistanceMetric(boost::shared_dynamic_cast<DistanceMetric>(data));
     return rep;
   }
@@ -515,7 +508,6 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
   {
     AngleMetricRepPtr rep = AngleMetricRep::New(data->getUid()+"_3D_rep");
     this->readDataRepSettings(rep);
-//    rep->setShowLabel(settings()->value("View/showLabels").toBool());
     rep->setMetric(boost::shared_dynamic_cast<AngleMetric>(data));
     return rep;
   }
@@ -523,8 +515,6 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
   {
     PlaneMetricRepPtr rep = PlaneMetricRep::New(data->getUid()+"_3D_rep");
     this->readDataRepSettings(rep);
-//    rep->setShowLabel(settings()->value("View/showLabels").toBool());
-//    rep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
     rep->setMetric(boost::shared_dynamic_cast<PlaneMetric>(data));
     return rep;
   }
