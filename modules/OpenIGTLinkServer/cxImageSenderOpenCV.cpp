@@ -50,6 +50,12 @@ ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, QString imageFileDir, Q
     mImageFileDir( imageFileDir)
 {
   std::string arg = imageFileDir.toStdString();
+
+  std::cout << "setting capture size on OpenCV" << std::endl;
+//  mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, 1024);
+//  mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, 768);
+  std::cout << "completed setting capture size on OpenCV" << std::endl;
+
   mVideoCapture.open(arg);
 //  cv::VideoCapture capture(arg); //try to open string, this will attempt to open it as a video file
   if (!mVideoCapture.isOpened()) //if this fails, try to open as a video camera, through the use of an integer param
@@ -63,7 +69,14 @@ ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, QString imageFileDir, Q
   }
   else
   {
-    std::cout << "started streaming from openCV device " << imageFileDir.toStdString() << std::endl;
+//	  mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, 320);
+//	  mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
+	  std::cout << "setting capture size on OpenCV" << std::endl;
+	  mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, 1024);
+	  mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, 768);
+	  std::cout << "completed setting capture size on OpenCV" << std::endl;
+
+	  std::cout << "started streaming from openCV device " << imageFileDir.toStdString() << std::endl;
     this->dumpProperties();
   }
 
@@ -100,7 +113,9 @@ void ImageSenderOpenCV::dumpProperties()
 
 void ImageSenderOpenCV::dumpProperty(int val, QString name)
 {
-  std::cout << "Property " << name.toStdString() << " : " << mVideoCapture.get(val) << std::endl;
+	double value = mVideoCapture.get(val);
+	if (value!=-1)
+		std::cout << "Property " << name.toStdString() << " : " << mVideoCapture.get(val) << std::endl;
 }
 
 void ImageSenderOpenCV::tick()
