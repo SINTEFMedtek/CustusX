@@ -43,41 +43,56 @@ void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
 namespace cx
 {
 
-ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, QString imageFileDir, QObject* parent) :
+QString ImageSenderOpenCV::getType()
+{
+	return "OpenCV";
+}
+
+QStringList ImageSenderOpenCV::getArgumentDescription()
+{
+	QStringList retval;
+	retval << "--videoport:  video id,     default=0";
+	retval << "--height:     image height, default=1024";
+	retval << "--width:      image width,  default=768";
+	retval << "--properties: dump image properties";
+	return retval;
+}
+
+
+ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QObject* parent) :
     QObject(parent),
     mSocket(socket),
-//    mCounter(0),
-    mImageFileDir( imageFileDir)
+    mArguments(arguments)
 {
-  std::string arg = imageFileDir.toStdString();
+	if (!mArguments.count("videoport"))
+		mArguments["videoport"] = "0";
+	if (!mArguments.count("width"))
+		mArguments["width"] = "1024";
+	if (!mArguments.count("height"))
+		mArguments["height"] = "768";
 
-  std::cout << "setting capture size on OpenCV" << std::endl;
-//  mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, 1024);
-//  mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, 768);
-  std::cout << "completed setting capture size on OpenCV" << std::endl;
+	QString videoSource = mArguments["videoport"];
+	int videoport = convertStringWithDefault(mArguments["videoport"], 0);
+	int height = convertStringWithDefault(mArguments["height"], 768);
+	int width = convertStringWithDefault(mArguments["width"], 1024);
 
-  mVideoCapture.open(arg);
-//  cv::VideoCapture capture(arg); //try to open string, this will attempt to open it as a video file
+  mVideoCapture.open(videoSource.toStdString().c_str());
   if (!mVideoCapture.isOpened()) //if this fails, try to open as a video camera, through the use of an integer param
-    mVideoCapture.open(atoi(arg.c_str()));
+    mVideoCapture.open(videoport);
   if (!mVideoCapture.isOpened())
   {
     cerr << "Failed to open a video device or video file!\n" << endl;
-    //help( av);
-//    return 1;
     return;
   }
   else
   {
-//	  mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, 320);
-//	  mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
-	  std::cout << "setting capture size on OpenCV" << std::endl;
-	  mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, 1024);
-	  mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, 768);
-	  std::cout << "completed setting capture size on OpenCV" << std::endl;
+	  mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, width);
+	  mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, height);
 
-	  std::cout << "started streaming from openCV device " << imageFileDir.toStdString() << std::endl;
-    this->dumpProperties();
+	  if (mArguments.count("properties"))
+	  	this->dumpProperties();
+
+	  std::cout << "started streaming from openCV device " << videoSource.toStdString() << ", size=(" << width << "," << height << ")" << std::endl;
   }
 
 //  mImageData = loadImage(mImageFileDir);
@@ -140,8 +155,8 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 
   cv::Mat frame;
   mVideoCapture >> frame;
-//  std::cout << "grab " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 
+//  std::cout << "grab " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 //  std::cout << "WH=("<< frame.cols << "," << frame.rows << ")" << ", Channels,Depth=("<< frame.channels() << "," << frame.depth() << ")" << std::endl;
 
   if (!frame.isContinuous())
@@ -162,7 +177,6 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   if (frame.channels()==3 || frame.channels()==4)
   {
       scalarType = igtl::ImageMessage::TYPE_UINT32;// scalar type
-//      std::cout << "creating uint32" << std::endl;
   }
   else if (frame.channels()==1)
   {
@@ -181,7 +195,6 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
     std::cerr << "unknown image type" << std::endl;
     exit(0);
   }
-//  scalarType = igtl::ImageMessage::TYPE_UINT8;// scalar type
   //------------------------------------------------------------
   // Create a new IMAGE type message
   igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
@@ -207,33 +220,14 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
         *destPtr++ = src[0];
         src+=3;
     }
-
-
-//    cv::MatConstIterator_<cv::Vec3b> src = frame.begin<cv::Vec3b>();
-//
-//    for (; src!=frame.end<cv::Vec3b>(); ++src)
-//    {
-//      // get data in BGR --- ??
-//      *destPtr++ = 255;
-//      *destPtr++ = (*src)[2];
-//      *destPtr++ = (*src)[1];
-//      *destPtr++ = (*src)[0];
-//    }
   }
-//  std::cout << "post copy " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
   if (frame.channels()==1)
   { // BW camera
     for (int i=0; i<N; ++i)
     {
         *destPtr++ = *src++;
     }
-
-//    cv::MatConstIterator_<unsigned char> src = frame.begin<unsigned char>();
-//    for (; src!=frame.end<unsigned char>(); ++src)
-//      *destPtr++ = *src;
   }
-
-
 
   //------------------------------------------------------------
   // Get randome orientation matrix and set it.
