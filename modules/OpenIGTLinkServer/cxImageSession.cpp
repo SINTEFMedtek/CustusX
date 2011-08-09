@@ -18,6 +18,7 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
+#include <QCoreApplication>
 
 typedef vtkSmartPointer<vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<vtkImageMapToColors> vtkImageMapToColorsPtr;
@@ -37,11 +38,11 @@ namespace cx
 //------------------------------------------------------------
 
 
-ImageSession::ImageSession(int socketDescriptor, QString imageFileDir, QObject* parent) :
+ImageSession::ImageSession(int socketDescriptor, QObject* parent) :
     QThread(parent),
-    mSocketDescriptor(socketDescriptor),
-    mImageFileDir(imageFileDir)
+    mSocketDescriptor(socketDescriptor)
 {
+	mArguments = cx::extractCommandlineOptions(QCoreApplication::arguments());
 }
 
 ImageSession::~ImageSession()
@@ -55,12 +56,16 @@ void ImageSession::run()
   mSocket->setSocketDescriptor(mSocketDescriptor);
   QString clientName = mSocket->localAddress().toString();
   std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
-#ifdef USE_OpenCV
-  ImageSenderOpenCV* sender = new ImageSenderOpenCV(mSocket, mImageFileDir);
-#else
-  ImageSender* sender = new ImageSender(mSocket, mImageFileDir);
-#endif
-  // socket should now be connected....?
+
+  std::cout << "Creating sender type=" << mArguments["type"].toStdString() << std::endl;
+  QObject* sender = ImageSenderFactory().createSender(mArguments["type"], mSocket, mArguments);
+
+//#ifdef USE_OpenCV
+//  ImageSenderOpenCV* sender = new ImageSenderOpenCV(mSocket, mImageFileDir);
+//#else
+//  MHDImageSender* sender = new MHDImageSender(mSocket, mImageFileDir);
+//#endif
+//  // socket should now be connected....?
 
   this->exec();
 
