@@ -13,6 +13,7 @@
 #include <QThread>
 class QTimer;
 #include "igtlImageMessage.h"
+#include "cxImageSenderFactory.h"
 
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
@@ -27,20 +28,24 @@ namespace cx
  * it must be created within the run() method
  * of a qthread.
  */
-class ImageSender : public QObject
+class MHDImageSender : public QObject
 {
   Q_OBJECT
 
 public:
-  ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* parent = NULL);
-  virtual ~ImageSender() {}
+  MHDImageSender(QTcpSocket* socket, StringMap arguments, QObject* parent = NULL);
+  virtual ~MHDImageSender() {}
+
+  static QString getType();
+  static QStringList getArgumentDescription();
+
 protected:
 private:
   QTcpSocket* mSocket;
   QTimer* mTimer;
   int mCounter;
   vtkImageDataPtr mImageData;
-  QString mImageFileDir;
+  StringMap mArguments;
   std::vector<unsigned char> mTestData;
   vtkImageImportPtr mImageImport;
   void setTestImage();

@@ -54,6 +54,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxImageSession.h
     cxImageSenderFile.h
     cxImageSenderOpenCV.h
+    cxImageSenderFactory.h
 )
 
 include_directories(${Boost_INCLUDE_DIRS})
@@ -64,6 +65,8 @@ SET ( cxOpenIGTLinkServer_FILES
     cxImageServer.cpp
     cxImageSession.h
     cxImageSession.cpp 
+    cxImageSenderFactory.h
+    cxImageSenderFactory.cpp
     cxImageSenderFile.h
     cxImageSenderFile.cpp
     cxImageSenderOpenCV.h

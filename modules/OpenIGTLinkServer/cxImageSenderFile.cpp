@@ -199,14 +199,26 @@ void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
 //------------------------------------------------------------
 //------------------------------------------------------------
 
+QString MHDImageSender::getType()
+{
+	return "MHDFile";
+}
 
-ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* parent) :
+QStringList MHDImageSender::getArgumentDescription()
+{
+	QStringList retval;
+	retval << "--filename: Full name of mhd file";
+	return retval;
+}
+
+MHDImageSender::MHDImageSender(QTcpSocket* socket, StringMap arguments, QObject* parent) :
     QObject(parent),
     mSocket(socket),
     mCounter(0),
-    mImageFileDir(imageFileDir)
+    mArguments(arguments)
 {
-  mImageData = loadImage(mImageFileDir);
+	QString filename = mArguments["filename"];
+  mImageData = loadImage(filename);
  mImageData = convertToTestColorImage(mImageData);
 
   mTimer = new QTimer(this);
@@ -215,7 +227,7 @@ ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* pare
 //  mTimer->start(1200); // for test of the timeout feature
 }
 
-void ImageSender::tick()
+void MHDImageSender::tick()
 {
 //  std::cout << "tick" << std::endl;
   igtl::ImageMessage::Pointer imgMsg = getVtkImageMessage(mImageData);

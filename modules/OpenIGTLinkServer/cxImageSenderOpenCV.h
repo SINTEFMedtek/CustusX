@@ -16,6 +16,8 @@
 class QTimer;
 #include "igtlImageMessage.h"
 #include <opencv2/highgui/highgui.hpp>
+#include <QStringList>
+#include "cxImageSenderFactory.h"
 
 namespace cx
 {
@@ -32,13 +34,17 @@ class ImageSenderOpenCV : public QObject
   Q_OBJECT
 
 public:
-  ImageSenderOpenCV(QTcpSocket* socket, QString imageFileDir, QObject* parent = NULL);
+  ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QObject* parent = NULL);
   virtual ~ImageSenderOpenCV() {}
+
+  static QString getType();
+  static QStringList getArgumentDescription();
+
 protected:
 private:
   QTcpSocket* mSocket;
   QTimer* mTimer;
-  QString mImageFileDir;
+  StringMap mArguments;
   void dumpProperties();
   igtl::ImageMessage::Pointer getImageMessage();
   void dumpProperty(int val, QString name);
