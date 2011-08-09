@@ -266,17 +266,17 @@ bool vtkSonixVideoSource::vtkSonixVideoSourceNewFrameCallback(void * data, int t
 // vtkVideoSource framebuffer (don't do the unpacking yet)
 void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, bool cine, int frmnum)
 {
-	int missedFrames = frmnum - lastFrameNum +1;
-	if (missedFrames < 0)
-		{
-			std::cout << "Missed frames:    " << missedFrames << " " << std::endl;
-			//totalMissedFrames =+ missedFrames;
-			//std::cout << "Total missed frames: " << totalMissedFrames << std::endl;
-		}
-	else
-		{
-			std::cout << "No missed frames" << std::endl;
-		}
+//	int missedFrames = frmnum - lastFrameNum +1;
+//	if (missedFrames < 0)
+//		{
+//			std::cout << "Missed frames:    " << missedFrames << " " << std::endl;
+//			//totalMissedFrames =+ missedFrames;
+//			//std::cout << "Total missed frames: " << totalMissedFrames << std::endl;
+//		}
+//	else
+//		{
+//			//std::cout << "No missed frames" << std::endl;
+//		}
 
 
 	//to do
@@ -316,6 +316,9 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	// error ??
 	// std::cout << "Frame goes missing"<< std::endl;
 	// what is to be done in this case??
+
+    int missedFrames = frmnum - index +1;
+    std::cout << "Missed frames:    " << missedFrames << " " << std::endl;
     }
 
   // 2) Do the time stamping
@@ -409,6 +412,9 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   // OpenIGTLinkSender::convertFrame() and by the OpenIGTLink client
   frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;//Find correct value. TYPE_UINT8 = 3 in igtlImageMessage.h
   frame.mFirstPixel = frameBufferPtr;
+
+  //TODO: Calculate spacing/origin for each frame?
+  this->calculateSpacingAndOrigin();
 
   frame.mSpacing[0] = this->DataSpacing[0];
   frame.mSpacing[1] = this->DataSpacing[1];
@@ -1146,48 +1152,52 @@ void vtkSonixVideoSource::DoFormatSetup()
 		break;
     }
 
-  //Start - Added old modified code
-  
-  int xO, yO;
-  if(//this->RequestGetParamValue(VARID_ORIGINX,xO) &&
-     //this->RequestGetParamValue(VARID_ORIGINY,yO))
-	 this->ult->getParamValue("origin x", xO) &&
-	 this->ult->getParamValue("origin y", yO))
-  {
-    std::cout << "xO=" << xO << std::endl;
-    std::cout << "yO=" << yO << std::endl;
-  }
-  else
-  {
-    vtkErrorMacro("Couldn't request the origin.");
-  }
-  this->DataOrigin[0] = xO;
-  this->DataOrigin[1] = yO;
-  //this->DataOrigin[2] =
 
-  int xM, yM;
-  if(//this->RequestGetParamValue(VARID_MICRONSX,xM) &&
-     //this->RequestGetParamValue(VARID_MICRONSY,yM))
-	 this->ult->getParamValue("microns x", xM) &&
-	 this->ult->getParamValue("microns y", yM))
-  {
-    std::cout << "xM=" << xM << std::endl;
-    std::cout << "yM=" << yM << std::endl;
-  }
-  else
-  {
-    vtkErrorMacro("Couldn't request the microns (spacing?).");
-  }
-  this->DataSpacing[0] = xM/1000.0;
-  this->DataSpacing[1] = yM/1000.0;
-  //this->DataSpacing[2] = 
-  //EndAdd
-
-
+  this->calculateSpacingAndOrigin();
 
 	this->Modified();
     this->UpdateFrameBuffer();
 
+}
+
+void vtkSonixVideoSource::calculateSpacingAndOrigin()
+{
+  //Start - Added old modified code
+
+   int xO, yO;
+   if(//this->RequestGetParamValue(VARID_ORIGINX,xO) &&
+      //this->RequestGetParamValue(VARID_ORIGINY,yO))
+    this->ult->getParamValue("origin x", xO) &&
+    this->ult->getParamValue("origin y", yO))
+   {
+     std::cout << "xO=" << xO << std::endl;
+     std::cout << "yO=" << yO << std::endl;
+   }
+   else
+   {
+     vtkErrorMacro("Couldn't request the origin.");
+   }
+   this->DataOrigin[0] = xO;
+   this->DataOrigin[1] = yO;
+   //this->DataOrigin[2] =
+
+   int xM, yM;
+   if(//this->RequestGetParamValue(VARID_MICRONSX,xM) &&
+      //this->RequestGetParamValue(VARID_MICRONSY,yM))
+    this->ult->getParamValue("microns x", xM) &&
+    this->ult->getParamValue("microns y", yM))
+   {
+     std::cout << "xM=" << xM << std::endl;
+     std::cout << "yM=" << yM << std::endl;
+   }
+   else
+   {
+     vtkErrorMacro("Couldn't request the microns (spacing?).");
+   }
+   this->DataSpacing[0] = xM/1000.0;
+   this->DataSpacing[1] = yM/1000.0;
+   //this->DataSpacing[2] =
+   //EndAdd
 }
 
 void vtkSonixVideoSource::SetSonixIP(const char *SonixIP)
