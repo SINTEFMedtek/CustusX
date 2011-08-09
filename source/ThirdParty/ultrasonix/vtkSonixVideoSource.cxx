@@ -562,6 +562,8 @@ void vtkSonixVideoSource::Initialize()
   // 8)update framebuffer 
   this->UpdateFrameBuffer();
 
+  ult->setSharedMemoryStatus(1);
+
   this->Initialized = 1;
 }
 
