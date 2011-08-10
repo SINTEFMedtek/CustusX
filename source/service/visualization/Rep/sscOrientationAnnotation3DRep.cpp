@@ -15,7 +15,7 @@
 #include <vtkCaptionActor2D.h>
 #include <vtkPropAssembly.h>
 #include <vtkRenderWindow.h>
-
+#include <QFileInfo>
 #include "vtkSTLReader.h"
 #include "vtkSTLWriter.h"
 #include "vtkPolyDataMapper.h"
@@ -44,14 +44,17 @@ typedef vtkSmartPointer<vtkQuadricDecimation> vtkQuadricDecimationPtr;
 namespace ssc
 {
 
-std::pair<QString, vtkActorPtr> OrientationAnnotation3DRep::mMarkerCache;
-
+//---------------------------------------------------------
+std::pair<QString, vtkPropPtr> OrientationAnnotation3DRep::mMarkerCache;
+//---------------------------------------------------------
 
 
 OrientationAnnotation3DRep::OrientationAnnotation3DRep( const QString& uid, const QString& name) :
-RepImpl(uid, name)
+RepImpl(uid, name),
+  mSize(0.2),
+  mColor(1, 0.5, 0.5)
 {
-  this->createAnnotation();
+  this->rebuild(NULL);
 }
 
 OrientationAnnotation3DRepPtr OrientationAnnotation3DRep::New(const QString& uid,const QString& name)
@@ -68,9 +71,7 @@ OrientationAnnotation3DRep::~OrientationAnnotation3DRep()
 
 void OrientationAnnotation3DRep::addRepActorsToViewRenderer(ssc::View* view)
 {
-  mMarker->SetInteractor(view->getRenderWindow()->GetInteractor());
-  mMarker->SetEnabled(1);
-  mMarker->InteractiveOff();
+  this->rebuild(view->getRenderWindow()->GetInteractor());
 }
 
 void OrientationAnnotation3DRep::removeRepActorsFromViewRenderer(ssc::View* view)
@@ -88,74 +89,53 @@ void OrientationAnnotation3DRep::setVisible(bool on)
   mMarker->SetEnabled(on);
 }
 
-
-void OrientationAnnotation3DRep::createAnnotation()
-{
-//  vtkAxesActorPtr axes = this->createAxes();
-//  mCube = this-> createCube();
-
-  // Combine the two actors into one with vtkPropAssembly ...
-//  vtkPropAssemblyPtr assembly = vtkPropAssemblyPtr::New();
-//  assembly->AddPart(axes);
-//  assembly->AddPart(cube);
-
-  mMarker = vtkOrientationMarkerWidgetPtr::New();
-
-//  marker->SetOutlineColor( 0.93, 0.57, 0.13);
-  mMarker->SetOutlineColor( 1, 0.5, 0.5);
-//  marker->SetOrientationMarker(assembly);
-  double size = 0.25;
-//  size = 1;
-  mMarker->SetViewport( 0.0, 1.0-size, size, 1.0);
-
-  this->setMarkerFilename(mMarkerCache.first);
-//  marker->SetInteractor(mView->getRenderWindow()->GetInteractor());
-//  marker->SetEnabled(1);
-//  marker->InteractiveOff();
-//  std::cout << "marker: " << mMarker->GetOrientationMarker() << std::endl;
-}
-
 void OrientationAnnotation3DRep::setSize(double size)
 {
-  mMarker->SetViewport( 0.0, 1.0-size, size, 1.0);
+  mSize = size;
+  this->rebuild(mMarker->GetInteractor());
+}
+
+void OrientationAnnotation3DRep::rebuild(vtkRenderWindowInteractorPtr interactor)
+{
+  if (mMarker)
+  {
+    mMarker->SetInteractor(NULL);
+  }
+
+  mMarker = vtkOrientationMarkerWidgetPtr::New();
+  mMarker->SetOutlineColor(mColor[0],mColor[1],mColor[2]);
+  mMarker->SetViewport( 0.0, 1.0-mSize, mSize, 1.0);
+  mMarker->SetOrientationMarker(mMarkerCache.second);
+
+  if (interactor)
+  {
+    mMarker->SetInteractor(interactor);
+    mMarker->SetEnabled(1);
+    mMarker->InteractiveOff();
+  }
 }
 
 void OrientationAnnotation3DRep::setMarkerFilename(const QString filename)
 {
-//  std::cout << "beg OrientationAnnotation3DRep::setMarkerFilename " << mMarkerCache.first << " " << filename  << " " << mMarker->GetOrientationMarker() << std::endl;
 
   if (!mMarkerCache.second || (mMarkerCache.first != filename))
   {
     mMarkerCache.first = filename;;
-
-    if (filename.isEmpty())
-    {
-      mMarkerCache.second = 0;
-    }
-    else
-    {
-      mMarkerCache.second = this->readMarkerFromFile(filename);
-//      std::cout << "  OrientationAnnotation3DRep::readMarkerFromFile " << filename << std::endl;
-    }
+    mMarkerCache.second = this->readMarkerFromFile(filename);
   }
 
-  if (mMarker)
-  {
-    if (mMarkerCache.second)
-      mMarker->SetOrientationMarker(mMarkerCache.second);
-    else
-      mMarker->SetOrientationMarker(this->createCube());
-  }
-
-//  std::cout << "end OrientationAnnotation3DRep::setMarkerFilename " << filename  << " " << mMarker->GetOrientationMarker() << std::endl;
+  this->rebuild(mMarker->GetInteractor());
 }
 
-vtkActorPtr OrientationAnnotation3DRep::readMarkerFromFile(const QString filename)
+vtkPropPtr OrientationAnnotation3DRep::readMarkerFromFile(const QString filename)
 {
+  if (filename.isEmpty() || !QFileInfo(filename).exists())
+  {
+    return this->createCube();
+  }
+
   vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
   STLReader->SetFileName(cstring_cast(filename));
-//  STLReader->SetFileName("/home/christiana/Dropbox/woman.stl");
-//    STLReader->SetFileName("/home/christiana/Dropbox/man.stl");
 
   vtkPolyDataPtr person = STLReader->GetOutput();
 
@@ -227,7 +207,6 @@ void OrientationAnnotation3DRep::reduceSTLFile(const QString source, const QStri
 vtkAnnotatedCubeActorPtr OrientationAnnotation3DRep::createCube()
 {
   vtkAnnotatedCubeActorPtr cube = vtkAnnotatedCubeActorPtr::New();
-//  mCube = cube;
 
   cube->SetXPlusFaceText("L");
   cube->SetXMinusFaceText("R");
