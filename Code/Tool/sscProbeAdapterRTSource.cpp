@@ -65,7 +65,7 @@ void ProbeAdapterRTSource::probeChangedSlot()
   }
 
   // Don't change spacing if it have an existing spacing from the OpenIGTLink message
-  if (mBase->getVtkImageData()->GetSpacing()[0] == 0)
+//  if (mBase->getVtkImageData()->GetSpacing()[0] == 0)
   {
     mRedirecter->SetOutputSpacing(mProbe->getData().mImage.mSpacing.begin());
   }
