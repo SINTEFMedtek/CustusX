@@ -120,7 +120,7 @@ endif(APPLE)
 #------------------------------------------------------------------------------
 add_subdirectory( externals )
 add_subdirectory( doc )
-add_subdirectory( modules/OpenIGTLinkServer )
+#add_subdirectory( modules/OpenIGTLinkServer )
 add_subdirectory( source )
 
 #------------------------------------------------------------------------------
