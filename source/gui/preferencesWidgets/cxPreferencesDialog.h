@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "sscDoubleDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
+#include "sscStringDataAdapterXml.h"
 
 class QTabWidget;
 class QToolBox;
@@ -135,6 +136,8 @@ protected:
   ssc::DoubleDataAdapterXmlPtr mLabelSize;
   ssc::BoolDataAdapterXmlPtr mShowDataText;
   ssc::BoolDataAdapterXmlPtr mShowLabels;
+  ssc::StringDataAdapterXmlPtr mAnnotationModel;
+  ssc::DoubleDataAdapterXmlPtr mAnnotationModelSize;
 
   //Stereo
   QComboBox* mStereoTypeComboBox;

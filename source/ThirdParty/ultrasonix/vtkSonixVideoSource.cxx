@@ -266,17 +266,17 @@ bool vtkSonixVideoSource::vtkSonixVideoSourceNewFrameCallback(void * data, int t
 // vtkVideoSource framebuffer (don't do the unpacking yet)
 void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, bool cine, int frmnum)
 {
-//	int missedFrames = frmnum - lastFrameNum +1;
-//	if (missedFrames < 0)
-//		{
-//			std::cout << "Missed frames:    " << missedFrames << " " << std::endl;
-//			//totalMissedFrames =+ missedFrames;
-//			//std::cout << "Total missed frames: " << totalMissedFrames << std::endl;
-//		}
-//	else
-//		{
-//			//std::cout << "No missed frames" << std::endl;
-//		}
+	int missedFrames = frmnum - lastFrameNum +1;
+	if (missedFrames < 0)
+		{
+			std::cout << "Missed frames:    " << missedFrames << " " << std::endl;
+			//totalMissedFrames =+ missedFrames;
+			//std::cout << "Total missed frames: " << totalMissedFrames << std::endl;
+		}
+	else
+		{
+			//std::cout << "No missed frames" << std::endl;
+		}
 
 
 	//to do
@@ -311,15 +311,12 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   int index = this->FrameBufferIndex;
 
   // error check, if the frame indices mismatch, then it indicates, we have missed the frame?
-  if ( frmnum != index+1)
-    {
+  //if ( frmnum != index+1)
+  //  {
 	// error ??
 	// std::cout << "Frame goes missing"<< std::endl;
 	// what is to be done in this case??
-
-    int missedFrames = frmnum - index +1;
-    std::cout << "Missed frames:    " << missedFrames << " " << std::endl;
-    }
+  //  }
 
   // 2) Do the time stamping
   this->FrameBufferTimeStamps[index] = vtkTimerLog::GetUniversalTime();
@@ -561,6 +558,8 @@ void vtkSonixVideoSource::Initialize()
 
   // 8)update framebuffer 
   this->UpdateFrameBuffer();
+
+  ult->setSharedMemoryStatus(1);
 
   this->Initialized = 1;
 }
@@ -1170,8 +1169,8 @@ void vtkSonixVideoSource::calculateSpacingAndOrigin()
     this->ult->getParamValue("origin x", xO) &&
     this->ult->getParamValue("origin y", yO))
    {
-     std::cout << "xO=" << xO << std::endl;
-     std::cout << "yO=" << yO << std::endl;
+     //std::cout << "xO=" << xO << std::endl;
+     //std::cout << "yO=" << yO << std::endl;
    }
    else
    {
@@ -1187,8 +1186,8 @@ void vtkSonixVideoSource::calculateSpacingAndOrigin()
     this->ult->getParamValue("microns x", xM) &&
     this->ult->getParamValue("microns y", yM))
    {
-     std::cout << "xM=" << xM << std::endl;
-     std::cout << "yM=" << yM << std::endl;
+     //std::cout << "xM=" << xM << std::endl;
+     //std::cout << "yM=" << yM << std::endl;
    }
    else
    {
