@@ -46,6 +46,7 @@
 #include "cxAngleMetricRep.h"
 #include "cxPlaneMetricRep.h"
 #include "cxDataMetricRep.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -154,9 +155,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->toolsAvailableSlot();
 
   mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
-//  mAnnotationMarker->setMarkerFilename("/home/christiana/Dropbox/stl/woman_dec99_2254.stl");
-//  mAnnotationMarker->setSize(0.2); ///< fraction of viewport to use
-
+  mAnnotationMarker->setMarkerFilename(DataLocations::getRootConfigPath()+"/models/"+settings()->value("View3D/annotationModel").toString());
+  mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 
   mView->addRep(mAnnotationMarker);
 //  mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
@@ -199,6 +199,11 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	if (key=="View/showDataText")
 	{
 	  this->updateView();
+	}
+	if (key=="View3D/annotationModelSize" || key=="View3D/annotationModel")
+	{
+	  mAnnotationMarker->setMarkerFilename(DataLocations::getRootConfigPath()+"/models/"+settings()->value("View3D/annotationModel").toString());
+    mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 	}
   if (key=="View3D/sphereRadius" || key=="View3D/labelSize" || key=="View/showLabels")
   {
