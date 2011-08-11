@@ -307,18 +307,18 @@ bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointe
 
   if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
-//    std::cout << "ok" << std::endl;
-    // Retrive the image data
-    int size[3]; // image dimension
-    float spacing[3]; // spacing (mm/pixel)
-    int svsize[3]; // sub-volume size
-    int svoffset[3]; // sub-volume offset
-    int scalarType; // scalar type
-
-    scalarType = imgMsg->GetScalarType();
-    imgMsg->GetDimensions(size);
-    imgMsg->GetSpacing(spacing);
-    imgMsg->GetSubVolume(svsize, svoffset);
+////    std::cout << "ok" << std::endl;
+//    // Retrive the image data
+//    int size[3]; // image dimension
+//    float spacing[3]; // spacing (mm/pixel)
+//    int svsize[3]; // sub-volume size
+//    int svoffset[3]; // sub-volume offset
+//    int scalarType; // scalar type
+//
+//    scalarType = imgMsg->GetScalarType();
+//    imgMsg->GetDimensions(size);
+//    imgMsg->GetSpacing(spacing);
+//    imgMsg->GetSubVolume(svsize, svoffset);
 
 //    std::cerr << "Device Name           : " << imgMsg->GetDeviceName() << std::endl;
 //    std::cerr << "Scalar Type           : " << scalarType << std::endl;
