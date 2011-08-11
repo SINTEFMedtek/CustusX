@@ -248,7 +248,13 @@ void VisualizationTab::init()
                                                  showLabels);
 //  connect(mAngioAdapter.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
 
-
+  double annotationModelSize = settings()->value("View3D/annotationModelSize").toDouble();
+  mAnnotationModelSize = ssc::DoubleDataAdapterXml::initialize("AnnotationModelSize", "Annotation Model Size", "Size (0..1) of the annotation model in the 3D scene.", annotationModelSize, ssc::DoubleRange(0.01,1,0.01), 2, QDomNode());
+  QStringList annotationModelRange;
+  annotationModelRange = QDir(DataLocations::getRootConfigPath()+"/models/").entryList(QStringList()<<"*.stl");
+  annotationModelRange.prepend("<default>");
+  QString annotationModel = settings()->value("View3D/annotationModel").toString();
+  mAnnotationModel = ssc::StringDataAdapterXml::initialize("AnnotationModel", "Annotation Model", "Name of annotation model in the 3D scene.", annotationModel, annotationModelRange, QDomNode());
 
   //Stereoscopic visualization (3D view)
   QGroupBox* stereoGroupBox = new QGroupBox("Stereoscopic visualization");
@@ -273,6 +279,8 @@ void VisualizationTab::init()
   mMainLayout->addWidget(ssc::createDataWidget(this, mShowDataText));
   mMainLayout->addWidget(ssc::createDataWidget(this, mShowLabels));
   mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mLabelSize));
+  mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mAnnotationModelSize));
+  mMainLayout->addWidget(ssc::createDataWidget(this, mAnnotationModel));
 
   mMainLayout->addWidget(stereoGroupBox);
 
@@ -349,6 +357,8 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View/showDataText", mShowDataText->getValue());
   settings()->setValue("View/showLabels", mShowLabels->getValue());
   settings()->setValue("View3D/labelSize", mLabelSize->getValue());
+  settings()->setValue("View3D/annotationModelSize", mAnnotationModelSize->getValue());
+  settings()->setValue("View3D/annotationModel", mAnnotationModel->getValue());
 }
 
 void VisualizationTab::setBackgroundColorSlot(QColor color)
