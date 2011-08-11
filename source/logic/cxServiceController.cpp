@@ -107,17 +107,8 @@ void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
   if (!source->isConnected())
     return;
 
-//  if (mProbe)
-//    return;
-
-//  ssc::ToolPtr probe = this->findSuitableProbe();
   if (!probe)
     return;
-
-  if (!probe->getProbe()->getRTSource())
-  	return;
-
-//  mProbe = probe;
 
   if (probe)
   {
@@ -128,10 +119,9 @@ void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
       return;
     }
     probeInterface->setRTSource(source);
-//    ssc::toolManager()->setDominantTool(mProbe->getUid());
-//    std::cout << "VideoConnection::connectSourceToTool() " << probe->getUid() << " " << probeInterface->getVideoSource()->getName() << " completed" << std::endl;
   }
 }
+
 /**Find a probe that can be connected to a rt source.
  *
  */
