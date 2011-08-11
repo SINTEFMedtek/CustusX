@@ -303,6 +303,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   message->GetSpacing(spacing);
   message->GetSubVolume(svsize, svoffset);
   mDeviceName = message->GetDeviceName();
+//  std::cout << "size : " << ssc::Vector3D(size[0], size[1], size[2]) << std::endl;
 
   mImageImport->SetNumberOfScalarComponents(1);
 
