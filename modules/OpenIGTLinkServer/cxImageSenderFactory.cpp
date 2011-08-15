@@ -45,30 +45,45 @@ StringMap extractCommandlineOptions(QStringList cmdline)
 QStringList ImageSenderFactory::getSenderTypes() const
 {
 	QStringList retval;
+
+#ifdef USE_OpenCV
 	retval << ImageSenderOpenCV::getType();
+#endif
+
 	retval << MHDImageSender::getType();
+
 	return retval;
 }
 
 QStringList ImageSenderFactory::getArgumentDescription(QString type) const
 {
+#ifdef USE_OpenCV
 	if (type==ImageSenderOpenCV::getType())
 		return ImageSenderOpenCV::getArgumentDescription();
+#endif
+
 	if (type==MHDImageSender::getType())
 		return MHDImageSender::getArgumentDescription();
+
 	return QStringList();
 }
 
 QObject* ImageSenderFactory::createSender(QString type, QTcpSocket* socket, StringMap arguments) const
 {
+#ifdef USE_OpenCV
 	if (type==ImageSenderOpenCV::getType())
 		return new ImageSenderOpenCV(socket, arguments);
+#endif
+
 	if (type==MHDImageSender::getType())
 		return new MHDImageSender(socket, arguments);
 
-
 	// default:
+#ifdef USE_OpenCV
 	return new ImageSenderOpenCV(socket, arguments);
+#else
+	return NULL;
+#endif
 }
 
 
