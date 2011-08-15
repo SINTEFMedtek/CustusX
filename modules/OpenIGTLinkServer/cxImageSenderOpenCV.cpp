@@ -9,6 +9,7 @@
 
 #ifdef USE_OpenCV
 
+#include <QCoreApplication>
 #include <QTimer>
 #include <QTime>
 #include <QHostAddress>
@@ -22,6 +23,9 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
+
+#include <opencv2/imgproc/imgproc.hpp>
+
 
 namespace
 {
@@ -64,6 +68,10 @@ ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QO
     mSocket(socket),
     mArguments(arguments)
 {
+	// if in main thread only (debug)
+	if (this->thread()==QCoreApplication::instance()->thread() && !mSocket)
+		cv::namedWindow("ImageSenderOpenCV", CV_WINDOW_KEEPRATIO); //resizable window;
+
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
 	if (!mArguments.count("width"))
@@ -99,8 +107,10 @@ ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QO
 
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-  mTimer->start(40);
+//  mTimer->start(40);
+  mTimer->start(0);
 //  mTimer->start(1200); // for test of the timeout feature
+//  mTimer->start(100);
 }
 
 void ImageSenderOpenCV::dumpProperties()
@@ -139,11 +149,14 @@ void ImageSenderOpenCV::tick()
 //  QTime start = QTime::currentTime();
   igtl::ImageMessage::Pointer imgMsg = this->getImageMessage();
 
+  if (mSocket)
+  {
   //------------------------------------------------------------
   // Pack (serialize) and send
   imgMsg->Pack();
-  mSocket->write(reinterpret_cast<const char*>(imgMsg->GetPackPointer()), imgMsg->GetPackSize());
+  	mSocket->write(reinterpret_cast<const char*>(imgMsg->GetPackPointer()), imgMsg->GetPackSize());
 //  std::cout << "tick " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+  }
 }
 
 igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
@@ -151,10 +164,27 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   if (!mVideoCapture.isOpened())
     return igtl::ImageMessage::Pointer();
 
-//  QTime start = QTime::currentTime();
+  QTime start = QTime::currentTime();
+
+  cv::Mat frame_source;
+  mVideoCapture >> frame_source;
+
+	if (this->thread()==QCoreApplication::instance()->thread() && !mSocket)
+	{
+		cv::imshow("ImageSenderOpenCV", frame_source);
+	}
+
+	//  std::cout << "grab" << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//  return igtl::ImageMessage::Pointer();
+
+  igtl::TimeStamp::Pointer timestamp;
+  timestamp = igtl::TimeStamp::New();
+  double now = 1.0/1000*(double)QDateTime::currentDateTime().toMSecsSinceEpoch();
+  timestamp->SetTime(now);
 
   cv::Mat frame;
-  mVideoCapture >> frame;
+  // temporary HACK: all the old probe defs are for 800x600, continue this line for now:
+  cv::resize(frame_source, frame, cv::Size(800,600), 0,0, CV_INTER_LINEAR);
 
 //  std::cout << "grab " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 //  std::cout << "WH=("<< frame.cols << "," << frame.rows << ")" << ", Channels,Depth=("<< frame.channels() << "," << frame.depth() << ")" << std::endl;
@@ -204,6 +234,7 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   imgMsg->SetDeviceName("cxOpenCVGrabber");
   imgMsg->SetSubVolume(svsize, svoffset);
   imgMsg->AllocateScalars();
+  imgMsg->SetTimeStamp(timestamp);
 
   unsigned char* destPtr = reinterpret_cast<unsigned char*>(imgMsg->GetScalarPointer());
   uchar* src = frame.data;
@@ -235,7 +266,7 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   GetRandomTestMatrix(matrix);
   imgMsg->SetMatrix(matrix);
 
-//  std::cout << "grab+process " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//  std::cout << "   grab+process " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 
   return imgMsg;
 }
