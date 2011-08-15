@@ -54,7 +54,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxImageSession.h
     cxImageSenderFile.h
     cxImageSenderOpenCV.h
-    cxImageSenderFactory.h
+#    cxImageSenderFactory.h
 )
 
 include_directories(${Boost_INCLUDE_DIRS})
