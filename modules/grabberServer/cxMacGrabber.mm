@@ -81,8 +81,8 @@
   frame.mFirstPixel = reinterpret_cast<unsigned char*>(CVPixelBufferGetBaseAddress(videoFrame));
 	
   //Just initialize these with dummy values
-  frame.mSpacing[0] = 1;
-  frame.mSpacing[1] = 1;
+	frame.mSpacing[0] = 0;//1;
+	frame.mSpacing[1] = 0;//1;
   frame.mOrigin[0] = 0;
   frame.mOrigin[1] = 0;
   
