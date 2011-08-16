@@ -47,7 +47,7 @@ VideoGraphics::VideoGraphics(bool useMaskFilter) :
   mDataRedirecter = vtkImageChangeInformationPtr::New();
   mUseMask = useMaskFilter;
   mShowInToolSpace = true;
-  mUSSource = UltrasoundSectorSource::New();
+  mUSSource = UltrasoundSectorSourcePtr::New();
   mUSSource->setProbeSector(mProbeData.getSector());
 
   this->setLookupTable();

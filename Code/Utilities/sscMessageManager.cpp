@@ -164,7 +164,10 @@ MessageManager::MessageManager() :
 
 MessageManager::~MessageManager()
 {
+  mCout.reset();
+  mCerr.reset();
   mConsoleFile->close();
+  delete mConsoleFile;
   delete mConsoleStream;
 }
 

@@ -23,7 +23,7 @@ typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkTextureMapToPlane> vtkTextureMapToPlanePtr;
 typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
 
-class UltrasoundSectorSource;
+typedef vtkSmartPointer<class UltrasoundSectorSource> UltrasoundSectorSourcePtr;
 
 namespace ssc
 {
@@ -70,7 +70,7 @@ private:
   vtkActorPtr mPlaneActor;
   vtkPlaneSourcePtr mPlaneSource;
   vtkTexturePtr mTexture;
-  UltrasoundSectorSource* mUSSource;
+  UltrasoundSectorSourcePtr mUSSource;
   vtkDataSetMapperPtr mDataSetMapper;
   vtkTransformTextureCoordsPtr mTransformTextureCoords;
   vtkTextureMapToPlanePtr mTextureMapToPlane;

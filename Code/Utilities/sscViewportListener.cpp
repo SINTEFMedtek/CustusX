@@ -46,7 +46,7 @@ void ViewportListener::startListen(vtkRendererPtr renderer)
 	// turn on observer
 	if (!mObserver)
 	{
-		mObserver = ViewportObserverPrivate::New();
+		mObserver = ViewportObserverPrivatePtr::New();
 		mObserver->SetBase(this);
 		mRenderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent, mObserver); // needed during startup
 	  mRenderer->AddObserver(vtkCommand::ModifiedEvent, mObserver); // camera changes, viewport changes
