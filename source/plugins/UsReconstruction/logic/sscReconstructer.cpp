@@ -706,7 +706,8 @@ void Reconstructer::updateFromOriginalFileData()
     return;
 
   mFileData = mOriginalFileData;
-  mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
+//  mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
+  mFileData.mUsRaw->reinitialize();
 
   // Only use this if the time stamps have different formatsh
   // The function assumes that both lists of time stamps start at the same time,
