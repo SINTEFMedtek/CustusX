@@ -186,14 +186,13 @@ bool UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
 /** Merge all us frames into one vtkImageData
  *
  */
-vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
+std::vector<vtkImageDataPtr> UsReconstructionFileMaker::getFrames()
 {
-  vtkImageAppendPtr filter = vtkImageAppendPtr::New();
-  filter->SetAppendAxis(2); // append along z-axis
+	std::vector<vtkImageDataPtr> retval;
 
   bool bw = settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 
-  int i=0;
+//  int i=0;
   for(ssc::VideoRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
   {
     vtkImageDataPtr input = it->second;
@@ -207,52 +206,134 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
       }
     }
 
-    filter->SetInput(i++, input);
+    input->Update();
+    retval.push_back(input);
   }
 
-  filter->Update();
-  return filter->GetOutput();
+  return retval;
 }
 
+///** Merge all us frames into one vtkImageData
+// *
+// */
+//vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
+//{
+//  vtkImageAppendPtr filter = vtkImageAppendPtr::New();
+//  filter->SetAppendAxis(2); // append along z-axis
+//
+//  bool bw = settings()->value("Ultrasound/8bitAcquisitionData").toBool();
+//
+//  int i=0;
+//  for(ssc::VideoRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
+//  {
+//    vtkImageDataPtr input = it->second;
+//    if (bw)
+//    {
+//      if (it->second->GetNumberOfScalarComponents()>2) // color
+//      {
+//        vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+//        luminance->SetInput(input);
+//        input = luminance->GetOutput();
+//      }
+//    }
+//
+//    filter->SetInput(i++, input);
+//  }
+//
+//  filter->Update();
+//  return filter->GetOutput();
+//}
+
+/**write us images to disk.
+ *
+ * The images are handled as an array of 2D frames, but written into
+ * one 3D image mhd file. Due to memory limitations (one large mem block
+ * causes bit trouble), this is done by writing a single frame, and then
+ * appending the other frames manually, and then hacking the mhd file to
+ * incorporate the correct dimensions.
+ *
+ */
 bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QString calibrationFile)
 {
-  bool success = false;
+	ssc::messageManager()->sendInfo("USAcq Start write");
 
-  QString mhdFilename = this->getMhdFilename(reconstructionFolder);
-  vtkImageDataPtr usData = this->mergeFrames();
+  QString baseMhdFilename = this->getMhdFilename(reconstructionFolder);
+  std::vector<vtkImageDataPtr> frames = this->getFrames();
+
+  if (frames.empty())
+  	return true;
+
+	QString mhdName = baseMhdFilename;
 
   vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-  writer->SetInput(usData);
-  writer->SetFileName(cstring_cast(mhdFilename));
+  writer->SetInput(frames[0]);
+  writer->SetFileName(cstring_cast(mhdName));
   writer->SetCompression(false);
   writer->Write();
 
-  //mhd - custom fields
-  QFile mhdFile(mhdFilename);
-  if(!mhdFile.open(QIODevice::WriteOnly | QIODevice::Append))
-  {
-    ssc::messageManager()->sendError("Cannot open "+mhdFile.fileName());
-    return success;
-  }
-  QTextStream mhdStream(&mhdFile);
-  if (mTool)
-  {
-    mhdStream << "ConfigurationID = " << mTool->getProbe()->getConfigurationPath() << '\n';
-    mhdStream << "ProbeCalibration = " << calibrationFile << '\n';
-  }
-  mhdFile.close();
-  success = true;
+	//mhd - custom fields
+	QFile mhdFile(mhdName);
+	if(!mhdFile.open(QIODevice::ReadWrite))
+	{
+		ssc::messageManager()->sendError("Cannot open "+mhdFile.fileName());
+		return false;
+	}
+
+	QString fileData(mhdFile.readAll());
+	fileData += "\n";
+	fileData += QString("ConfigurationID = %1\n").arg(mTool->getProbe()->getConfigurationPath());
+	fileData += QString("ProbeCalibration = %1\n").arg(calibrationFile);
+	QStringList fileLines = fileData.split("\n");
+	for (int j=0; j<fileLines.size(); ++j)
+	{
+		if (fileLines[j].startsWith("DimSize"))
+		{
+			fileLines[j] += QString(" %1").arg(frames.size());
+		}
+	}
+
+	fileData = fileLines.join("\n");
+
+	mhdFile.resize(0);
+	mhdFile.write(fileData.toAscii());
+
+//	QTextStream mhdStream(&mhdFile);
+//	if (mTool)
+//	{
+//		mhdStream << "ConfigurationID = " << mTool->getProbe()->getConfigurationPath() << '\n';
+//		mhdStream << "ProbeCalibration = " << calibrationFile << '\n';
+//	}
+	mhdFile.close();
+
+	QString rawFileName = QString(mhdName).replace(".mhd", ".raw");
+
+	QFile rawFile(rawFileName);
+	if(!rawFile.open(QIODevice::WriteOnly | QIODevice::Append))
+	{
+		ssc::messageManager()->sendError("Cannot open "+rawFile.fileName());
+		return false;
+	}
+
+//	std::cout << "write frames: " << frames.size() << std::endl;
+	for (unsigned i=1; i<frames.size(); ++i)
+	{
+		const char* ptr = reinterpret_cast<const char*>(frames[i]->GetScalarPointer());
+//		frames[i]->GetScalarSize();
+		unsigned N = frames[i]->GetDimensions()[0] * frames[i]->GetDimensions()[1] * frames[i]->GetScalarSize();
+//		std::cout << "dims " << frames[i]->GetDimensions()[0] << ", " << frames[i]->GetDimensions()[1] << ", " << frames[i]->GetScalarSize() << std::endl;
+//		std::cout << "write frame " << i << ", s=" << N << std::endl;
+		rawFile.write(ptr, N);
+	}
 
   QFileInfo mhdInfo(mhdFile);
   mReport << mhdInfo.fileName()+", "+qstring_cast(mhdInfo.size())+" bytes";
 
-  QString rawFileName = mhdFilename.replace(QString(".mhd"), QString(".raw"));
-  QFile rawFile(rawFileName);
   QFileInfo info(rawFile);
   mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mStreamRecordedData.size())+" frames.";
 
-  writer = NULL; // ensure file is closed (might not be necessary)
-  return success;
+//  writer = NULL; // ensure file is closed (might not be necessary)
+	ssc::messageManager()->sendInfo(QString("completed write of %1 frames").arg( frames.size() ));
+  return true;;
 
 }
 
