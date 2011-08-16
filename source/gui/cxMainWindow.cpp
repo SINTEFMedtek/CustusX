@@ -37,6 +37,7 @@
 #include "cxVideoService.h"
 #include "cxLogicManager.h"
 
+#include "sscGPUImageBuffer.h"
 #include "sscData.h"
 #include "sscConsoleWidget.h"
 #include "cxViewManager.h"
@@ -225,6 +226,9 @@ void MainWindow::shutdown()
   cx::ToolManager::shutdown();
   cx::DataManager::shutdown();
   cx::VideoService::shutdown();
+
+  ssc::GPUImageBufferRepository::shutdown();
+  ssc::MessageManager::destroyInstance();
 }
 
 QMenu* MainWindow::createPopupMenu()
