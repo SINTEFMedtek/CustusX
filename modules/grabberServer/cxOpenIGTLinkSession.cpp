@@ -53,6 +53,9 @@ OpenIGTLinkSender::~OpenIGTLinkSender()
 
 void OpenIGTLinkSender::receiveFrameSlot(Frame& frame)
 {
+  //TODO: Get info like origin from frame and create a IGTLinkSonixStatusMessage
+  //IGTLinkSonixStatusMessage::Pointer statMsg = getStatus(frame);
+
   IGTLinkImageMessage::Pointer imgMsg = convertFrame(frame);
 //  std::cout << "Socket bytesToWrite: " << mSocket->bytesToWrite() << std::endl;
 //  std::cout << "Socket readBufferSize: " << mSocket->readBufferSize() << std::endl;
@@ -70,7 +73,7 @@ IGTLinkImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
   // Create a new IMAGE type message
   retval->SetDimensions(size);
   //retval->SetSpacing(1,1,1); // TODO
-  retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);// Testcode
+  retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   //std::cout << "Frame spacing: " << frame.mSpacing[0] << " " << frame.mSpacing[1] << std::endl;
   //retval->SetScalarType(igtl::ImageMessage::TYPE_UINT32);
   retval->SetScalarType(frame.mPixelFormat); //Use frame.mPixelFormat directly
