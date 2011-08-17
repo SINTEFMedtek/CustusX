@@ -310,8 +310,8 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 	{
 		const char* ptr = reinterpret_cast<const char*>(frames[i]->GetScalarPointer());
 //		frames[i]->GetScalarSize();
-		unsigned N = frames[i]->GetDimensions()[0] * frames[i]->GetDimensions()[1] * frames[i]->GetScalarSize();
-		std::cout << "dims " << frames[i]->GetDimensions()[0] << ", " << frames[i]->GetDimensions()[1] << ", " << frames[i]->GetScalarSize() << std::endl;
+		unsigned N = frames[i]->GetDimensions()[0] * frames[i]->GetDimensions()[1] * frames[i]->GetScalarSize() * frames[i]->GetNumberOfScalarComponents();
+		std::cout << "dims " << frames[i]->GetDimensions()[0] << ", " << frames[i]->GetDimensions()[1] << ", " << frames[i]->GetScalarSize() << ", " <<  frames[i]->GetNumberOfScalarComponents() << std::endl;
 		std::cout << "  write frame " << i << ", s=" << N << std::endl;
 		rawFile.write(ptr, N);
 	}
