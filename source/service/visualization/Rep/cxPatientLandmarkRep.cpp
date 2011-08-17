@@ -87,7 +87,7 @@ void PatientLandmarkRep::setPosition(QString uid)
     ssc::Landmark landmark = mImage->getLandmarks()[uid];
     ssc::Vector3D img_r = mImage->get_rMd().coord(landmark.getCoord()); // p_r = point in ref space
     mGraphics[uid].mLine->setValue(p_r, img_r);
-    std::cout << "set line:" << p_r << "  to  " << img_r << std::endl;
+//    std::cout << "set line:" << p_r << "  to  " << img_r << std::endl;
   }
 
 }
