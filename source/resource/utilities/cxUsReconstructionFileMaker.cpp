@@ -274,7 +274,10 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 	{
 		if (fileLines[j].startsWith("DimSize"))
 		{
-			fileLines[j] += QString(" %1").arg(frames.size());
+		  QStringList dimline = fileLines[j].split(" ");
+		  dimline.back() = QString(" %1").arg(frames.size());;
+//			fileLines[j] += QString(" %1").arg(frames.size());
+		  fileLines[j] = dimline.join(" ");
 		}
 	}
 
@@ -300,7 +303,7 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 		return false;
 	}
 
-//	std::cout << "write frames: " << frames.size() << std::endl;
+	std::cout << "write frames: " << frames.size() << std::endl;
 
 	// write all frames except the first two.
 	for (unsigned i=2; i<frames.size(); ++i)
@@ -308,8 +311,8 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 		const char* ptr = reinterpret_cast<const char*>(frames[i]->GetScalarPointer());
 //		frames[i]->GetScalarSize();
 		unsigned N = frames[i]->GetDimensions()[0] * frames[i]->GetDimensions()[1] * frames[i]->GetScalarSize();
-//		std::cout << "dims " << frames[i]->GetDimensions()[0] << ", " << frames[i]->GetDimensions()[1] << ", " << frames[i]->GetScalarSize() << std::endl;
-//		std::cout << "write frame " << i << ", s=" << N << std::endl;
+		std::cout << "dims " << frames[i]->GetDimensions()[0] << ", " << frames[i]->GetDimensions()[1] << ", " << frames[i]->GetScalarSize() << std::endl;
+		std::cout << "  write frame " << i << ", s=" << N << std::endl;
 		rawFile.write(ptr, N);
 	}
 
