@@ -276,7 +276,6 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 		{
 		  QStringList dimline = fileLines[j].split(" ");
 		  dimline.back() = QString(" %1").arg(frames.size());;
-//			fileLines[j] += QString(" %1").arg(frames.size());
 		  fileLines[j] = dimline.join(" ");
 		}
 	}
@@ -285,13 +284,6 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 
 	mhdFile.resize(0);
 	mhdFile.write(fileData.toAscii());
-
-//	QTextStream mhdStream(&mhdFile);
-//	if (mTool)
-//	{
-//		mhdStream << "ConfigurationID = " << mTool->getProbe()->getConfigurationPath() << '\n';
-//		mhdStream << "ProbeCalibration = " << calibrationFile << '\n';
-//	}
 	mhdFile.close();
 
 	QString rawFileName = QString(mhdName).replace(".mhd", ".raw");
@@ -303,16 +295,12 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 		return false;
 	}
 
-	std::cout << "write frames: " << frames.size() << std::endl;
-
 	// write all frames except the first two.
 	for (unsigned i=2; i<frames.size(); ++i)
 	{
 		const char* ptr = reinterpret_cast<const char*>(frames[i]->GetScalarPointer());
 //		frames[i]->GetScalarSize();
 		unsigned N = frames[i]->GetDimensions()[0] * frames[i]->GetDimensions()[1] * frames[i]->GetScalarSize() * frames[i]->GetNumberOfScalarComponents();
-		std::cout << "dims " << frames[i]->GetDimensions()[0] << ", " << frames[i]->GetDimensions()[1] << ", " << frames[i]->GetScalarSize() << ", " <<  frames[i]->GetNumberOfScalarComponents() << std::endl;
-		std::cout << "  write frame " << i << ", s=" << N << std::endl;
 		rawFile.write(ptr, N);
 	}
 
@@ -330,11 +318,6 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 
 QString UsReconstructionFileMaker::copyCalibrationFile(QString reconstructionFolder)
 {
-//  ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(mTool);
-//  if (!mTool)
-//    return "";
-//
-//  QString calibFileName = cxTool->getCalibrationFileName();
   QString calibFileName = mCalibFilename;
   QFile calibFile(calibFileName);
   QFileInfo info(calibFile);

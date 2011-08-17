@@ -29,6 +29,7 @@ protected:
   PatientLandmarkRep(const QString& uid, const QString& name=""); ///< sets default text scaling to 20
   virtual void addAll();
   virtual void setPosition(QString uid);
+  virtual bool exists(QString uid) const;
 
   ssc::ImagePtr   mImage;         ///< the image which this rep is linked to
 
