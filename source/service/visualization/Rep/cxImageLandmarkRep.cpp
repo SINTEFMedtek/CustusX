@@ -67,6 +67,11 @@ void ImageLandmarkRep::addAll()
   }
 }
 
+bool ImageLandmarkRep::exists(QString uid) const
+{
+  return mImage && mImage->getLandmarks().count(uid);
+}
+
 void ImageLandmarkRep::setPosition(QString uid)
 {
   ssc::Landmark landmark = mImage->getLandmarks()[uid];

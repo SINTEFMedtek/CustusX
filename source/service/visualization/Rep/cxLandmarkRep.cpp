@@ -130,6 +130,9 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
  */
 void LandmarkRep::addPoint(QString uid)
 {
+  if (!this->exists(uid))
+    return;
+
   vtkRendererPtr renderer;
   if (!mViews.empty())
     renderer = (*mViews.begin())->getRenderer();
