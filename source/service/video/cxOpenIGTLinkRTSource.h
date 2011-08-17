@@ -72,6 +72,8 @@ private:
   vtkImageDataPtr createFilterARGB2RGBA(vtkImageDataPtr input);
   void updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message);
 
+  double mDebug_orgTime;
+
   boost::array<unsigned char, 100> mZero;
   vtkImageImportPtr mImageImport;
   vtkImageDataPtr mFilter_ARGB_RGBA;
