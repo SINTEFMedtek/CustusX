@@ -190,6 +190,7 @@ void MessageManager::initialize()
 void MessageManager::destroyInstance()
 {
   delete mTheInstance;
+  mTheInstance = NULL;
 }
 
 void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
@@ -275,11 +276,14 @@ void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int t
 {
   Message message(text, messageLevel, timeout);
 
-  // send text to cout if it not already comes from that stream (or cerr)
-  mCout->setEnableRedirect(false);
-  if (messageLevel!=mlCOUT && messageLevel!=mlCERR)
-    std::cout << message.getPrintableMessage() << std::endl;
-  mCout->setEnableRedirect(true);
+  if (mCout)
+  {
+    // send text to cout if it not already comes from that stream (or cerr)
+    mCout->setEnableRedirect(false);
+    if (messageLevel!=mlCOUT && messageLevel!=mlCERR)
+      std::cout << message.getPrintableMessage() << std::endl;
+    mCout->setEnableRedirect(true);
+  }
 
   QMutexLocker sentry(&mConsoleMutex);
   if(mConsoleStream->device())

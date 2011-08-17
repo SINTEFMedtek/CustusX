@@ -336,10 +336,10 @@ FollowerText3D::FollowerText3D( vtkRendererPtr renderer)
 //  if (!mRenderer)
 //  	return;
 
-  mText = vtkVectorText::New();
+  mText = vtkVectorTextPtr::New();
   vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
   mapper->SetInput(mText->GetOutput());
-  mFollower = vtkFollower::New();
+  mFollower = vtkFollowerPtr::New();
   mFollower->SetMapper(mapper);
 //  mFollower->SetCamera(mRenderer->GetActiveCamera());
   ssc::Vector3D mTextScale(2,2,2);
