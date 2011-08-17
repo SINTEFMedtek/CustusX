@@ -303,6 +303,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   message->GetSpacing(spacing);
   message->GetSubVolume(svsize, svoffset);
   mDeviceName = message->GetDeviceName();
+//  std::cout << "size : " << ssc::Vector3D(size[0], size[1], size[2]) << std::endl;
 
   mImageImport->SetNumberOfScalarComponents(1);
 
@@ -353,6 +354,10 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   mLastTimestamp = timestamp->GetTimeStamp() * 1000;
   mLastTimestamp += mTimestampCalibration;
 
+  mDebug_orgTime = timestamp->GetTimeStamp() * 1000; // ms
+//  double now = (double)QDateTime::currentDateTime().toMSecsSinceEpoch();
+//  std::cout << QString("cv+cx delay: %1").arg((int)(now - mDebug_orgTime)) << " ms" << std::endl;
+
   mImageImport->SetDataOrigin(0,0,0);
 
   //for linear probes used in other substance than the scanner is calibrated for we want to compensate
@@ -387,20 +392,18 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   mTimeout = false;
   mTimeoutTimer->start();
 
+  // this seems to add 3ms per update()
   // insert a ARGB->RBGA filter. TODO: need to check the input more thoroughly here, this applies only to the internal CustusX US pipeline.
   if (mImageImport->GetOutput()->GetNumberOfScalarComponents()==4 && !mFilter_ARGB_RGBA)
   {
-//    vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
-//    flipper->SetFilteredAxes(0); //flipp around X axis
-//    flipper->SetInput(mImageImport->GetOutput());
-//    mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(flipper->GetOutput());
     mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
-//    std::cout << "filters scalar type: " << mFilter_ARGB_RGBA->GetScalarTypeAsString() << std::endl;
-//    std::cout << "fileters scalar size:" << mFilter_ARGB_RGBA->GetScalarSize() << std::endl;
     mRedirecter->SetInput(mFilter_ARGB_RGBA);
   }
 
   emit newFrame();
+
+//  double now = (double)QDateTime::currentDateTime().toMSecsSinceEpoch();
+//  std::cout << QString("cv+cx delay: %1").arg((int)(now - mDebug_orgTime)) << " ms" << std::endl;
 }
 
 /**Create a pipeline that convert the input 4-component ARGB image (from QuickTime-Mac)
