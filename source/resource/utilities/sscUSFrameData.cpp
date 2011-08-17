@@ -13,15 +13,27 @@
 
 namespace ssc
 {
-USFrameData::USFrameData(ImagePtr inputFrameData, bool angio)
+USFrameData::USFrameData(ImagePtr inputFrameData, bool angio) :
+		mUseAngio(angio)
 {
   mImage = inputFrameData;
+
+  this->reinitialize();
+}
+
+//mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
+
+/** reset the internal state of the oobject to that of the initialization,
+ * i.e. no removed frames.
+ */
+void USFrameData::reinitialize()
+{
   vtkImageDataPtr input;
-  if (angio)
+  if (mUseAngio)
   {
     //input = mImage->getBaseVtkImageData();
     //TODO: Use only color information
-    input = this->useAngio(inputFrameData);
+    input = this->useAngio(mImage);
   }
   else
   {
@@ -40,7 +52,6 @@ USFrameData::USFrameData(ImagePtr inputFrameData, bool angio)
   {
     mFrames[record] = inputPointer + record*recordSize;
   }
-  
 }
 
 vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)

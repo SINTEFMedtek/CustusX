@@ -4,9 +4,11 @@
 #include <cstdio>
 
 #include <QApplication>
+#include <QString>
 #include "cxImageServer.h"
 #include "cxImageSenderFactory.h"
 //
+#include "cxImageSenderOpenCV.h"
 
 int main(int argc, char* argv[])
 {
@@ -59,6 +61,8 @@ int main(int argc, char* argv[])
 
   cx::ImageServer server;
   server.startListen(port);
+
+//	new cx::ImageSenderOpenCV(NULL, cx::StringMap());
 
   int retVal = app.exec();
   return retVal;
