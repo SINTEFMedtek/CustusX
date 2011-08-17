@@ -154,12 +154,6 @@ void USAcquisition::saveSession(QString sessionId)
 	if (cxTool)
 		calibFileName = cxTool->getCalibrationFileName();
 
-//	//DEBUG
-//  mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
-//  std::cout << "clear recorder DB" << std::endl;
-//  return;
-//  //END
-
   mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), patientService()->getPatientData()->getActivePatientFolder(), probe, calibFileName));
 
   mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
@@ -170,7 +164,6 @@ void USAcquisition::fileMakerWriteFinished()
 {
   QString targetFolder = mFileMakerFutureWatcher.future().result();
   mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
-  std::cout << "clear recorder" << std::endl;
   emit saveDataCompleted(mFileMaker->getMhdFilename(targetFolder));
 }
 
