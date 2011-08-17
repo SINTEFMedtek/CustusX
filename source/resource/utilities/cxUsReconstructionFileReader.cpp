@@ -207,11 +207,16 @@ ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileNa
     fileName = list.join("");
   }
 
+  std::cout << "raw " << mhdFileName<< std::endl;
   //Use file name as uid
   ssc::ImagePtr UsRaw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(fileName, mhdFileName));
   UsRaw->setFilePath(filePath);
   ssc::USFrameDataPtr retval;
   retval.reset(new ssc::USFrameData(UsRaw, angio));
+
+  std::cout << "raw " << mhdFileName << ", " << Eigen::Array3i(retval->getDimensions()) << std::endl;
+
+
   return retval;
 }
 
