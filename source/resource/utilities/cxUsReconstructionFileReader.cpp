@@ -143,7 +143,8 @@ void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringL
     {
       QStringList tempList = line.split("=", QString::SkipEmptyParts);
       configList = tempList[1].trimmed().split(":", QString::SkipEmptyParts);
-      configList[3] = configList[3].trimmed();
+      if (configList.size()>=3)
+      	configList[3] = configList[3].trimmed();
       foundConfig = true;
     }
     else if(line.startsWith("ProbeCalibration", Qt::CaseInsensitive))

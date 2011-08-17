@@ -33,7 +33,7 @@ class USFrameData
 {
 public:
   explicit USFrameData(ImagePtr inputFrameData, bool angio = false);
-  vtkImageDataPtr useAngio(ImagePtr inputFrameData);/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
+  void reinitialize();
   void removeFrame(unsigned int index);
   unsigned char* getFrame(unsigned int index);
   int* getDimensions();
@@ -41,12 +41,15 @@ public:
   QString getName();
   QString getUid();
   QString getFilePath();
-  ImagePtr getBase();
+
 private:
+  ImagePtr getBase();
+  vtkImageDataPtr useAngio(ImagePtr inputFrameData);/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
   ImagePtr mImage;
   std::vector<unsigned char*> mFrames;
   int* mDimensions;
   Vector3D mSpacing;
+  bool mUseAngio;
 };
   
   typedef boost::shared_ptr<USFrameData> USFrameDataPtr;
