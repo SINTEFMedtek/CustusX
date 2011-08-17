@@ -213,36 +213,20 @@ std::vector<vtkImageDataPtr> UsReconstructionFileMaker::getFrames()
   return retval;
 }
 
-///** Merge all us frames into one vtkImageData
-// *
-// */
-//vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
-//{
-//  vtkImageAppendPtr filter = vtkImageAppendPtr::New();
-//  filter->SetAppendAxis(2); // append along z-axis
-//
-//  bool bw = settings()->value("Ultrasound/8bitAcquisitionData").toBool();
-//
-//  int i=0;
-//  for(ssc::VideoRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
-//  {
-//    vtkImageDataPtr input = it->second;
-//    if (bw)
-//    {
-//      if (it->second->GetNumberOfScalarComponents()>2) // color
-//      {
-//        vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-//        luminance->SetInput(input);
-//        input = luminance->GetOutput();
-//      }
-//    }
-//
-//    filter->SetInput(i++, input);
-//  }
-//
-//  filter->Update();
-//  return filter->GetOutput();
-//}
+/** Merge all us frames into one vtkImageData
+ *
+ */
+vtkImageDataPtr UsReconstructionFileMaker::mergeFrames(std::vector<vtkImageDataPtr> input)
+{
+  vtkImageAppendPtr filter = vtkImageAppendPtr::New();
+  filter->SetAppendAxis(2); // append along z-axis
+
+  for (unsigned i=0; i<input.size(); ++i)
+    filter->SetInput(i, input[i]);
+
+  filter->Update();
+  return filter->GetOutput();
+}
 
 /**write us images to disk.
  *
@@ -260,13 +244,15 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
   QString baseMhdFilename = this->getMhdFilename(reconstructionFolder);
   std::vector<vtkImageDataPtr> frames = this->getFrames();
 
-  if (frames.empty())
+  if (frames.size()<2)
   	return true;
+
+  vtkImageDataPtr firstPair = this->mergeFrames(std::vector<vtkImageDataPtr>(frames.begin(), frames.begin()+2));
 
 	QString mhdName = baseMhdFilename;
 
   vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-  writer->SetInput(frames[0]);
+  writer->SetInput(firstPair);
   writer->SetFileName(cstring_cast(mhdName));
   writer->SetCompression(false);
   writer->Write();
@@ -315,7 +301,9 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 	}
 
 //	std::cout << "write frames: " << frames.size() << std::endl;
-	for (unsigned i=1; i<frames.size(); ++i)
+
+	// write all frames except the first two.
+	for (unsigned i=2; i<frames.size(); ++i)
 	{
 		const char* ptr = reinterpret_cast<const char*>(frames[i]->GetScalarPointer());
 //		frames[i]->GetScalarSize();

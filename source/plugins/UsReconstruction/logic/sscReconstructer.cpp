@@ -530,7 +530,8 @@ void Reconstructer::findExtentAndOutputTransform()
 
   //mOutputVolumeParams.constrainVolumeSize(256*256*256*2);
   ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
-  mOutputVolumeParams.constrainVolumeSize(maxVol.readValue(QString::number(1024*1024*16)).toDouble());
+  double maxVolVal = maxVol.readValue(QString::number(1024*1024*16)).toDouble();
+  mOutputVolumeParams.constrainVolumeSize(std::max(1024.0, maxVolVal));
 }
   
 
@@ -661,6 +662,7 @@ void Reconstructer::readCoreFiles(QString fileName, QString calFilesPath)
 //  if (QFileInfo(fileName).suffix()!="mhd")
 //    return;
 //
+
   mOriginalFileData = temp;
 
 //  QString mhdFileName = changeExtension(fileName, "mhd");

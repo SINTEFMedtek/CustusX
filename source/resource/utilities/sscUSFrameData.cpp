@@ -40,6 +40,7 @@ void USFrameData::reinitialize()
     input = mImage->getGrayScaleBaseVtkImageData(); // remove color, if any
   }
   mDimensions = input->GetDimensions();
+//  std::cout << "dims " << Eigen::Vector3i(mDimensions) << std::endl;
   mSpacing = Vector3D(input->GetSpacing());
   
   // Raw data pointer
@@ -144,6 +145,7 @@ vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
  */
 void USFrameData::removeFrame(unsigned int index)
 {
+//	std::cout << "USFrameData::removeFrame " << index << std::endl;
   mFrames.erase(mFrames.begin() + index);
   mDimensions[2]--;
 }
