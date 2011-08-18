@@ -6,7 +6,7 @@
 # Qt - MOC
 #------------------------------------------------------------------------------
 set(${LIBNAME}_MOC_HDRS
-    SonixHelper.h
+    #SonixHelper.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...

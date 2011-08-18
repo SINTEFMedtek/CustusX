@@ -57,6 +57,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxImageSenderOpenCV.h
     cxImageSenderSonix.h
 #    cxImageSenderFactory.h
+    ../grabberCommon/SonixHelper.h
 )
 
 include_directories(
