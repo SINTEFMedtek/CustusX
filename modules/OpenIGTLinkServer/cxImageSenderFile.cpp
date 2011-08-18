@@ -23,6 +23,7 @@
 typedef vtkSmartPointer<vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<vtkImageMapToColors> vtkImageMapToColorsPtr;
 typedef vtkSmartPointer<vtkLookupTable> vtkLookupTablePtr;
+typedef vtkSmartPointer<vtkMetaImageReader> vtkMetaImageReaderPtr;
 
 
 
@@ -41,7 +42,7 @@ vtkImageDataPtr loadImage(QString filename)
 {
   std::cout << "reading image " << filename.toStdString() << std::endl;
   //load the image from file
-  vtkMetaImageReader* reader = vtkMetaImageReader::New();
+  vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
   reader->SetFileName(filename.toStdString().c_str());
   reader->ReleaseDataFlagOn();
   reader->Update();

@@ -67,6 +67,8 @@ private:
   QString mWhatsMissing;
 
   virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session);
+  void connectVideoSource(ssc::VideoSourcePtr source);
+  void connectToPureVideo();
 
 };
 typedef boost::shared_ptr<USAcquisition> USAcquisitionPtr;

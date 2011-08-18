@@ -338,8 +338,6 @@ void ViewWrapper3D::showToolPathSlot(bool checked)
   }
 
   settings()->setValue("showToolPath", checked);
-//  showToolPath->setChecked(settings()->value("showToolPath"));
-//  ssc::toolManager()->getDominantTool()->setShowPath(checked);
 }
 
 
@@ -362,7 +360,6 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 			  mView->addRep(mRefSpaceAxisRep);
 		}
 
-//	  ssc::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
 	  std::vector<ssc::DataPtr> data = mViewGroup->getData();
 	  for (unsigned i=0; i<data.size(); ++i)
 	  {
@@ -416,7 +413,6 @@ void ViewWrapper3D::showManualToolSlot(bool visible)
 void ViewWrapper3D::showOrientationSlot(bool visible)
 {
   settings()->setValue("View/showOrientationAnnotation", visible);
-//  mAnnotationMarker->setVisible(visible);
   this->updateView();
 }
 
@@ -477,7 +473,6 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
   this->activeImageChangedSlot();
   this->updateView();
 }
-
 
 /**Construct a 3D standard rep for a given data.
  *
@@ -547,7 +542,6 @@ void ViewWrapper3D::updateView()
   QString text;
   bool show = settings()->value("View/showDataText").value<bool>();
 
-//  QStringList text = this->getAllDataNames();
   if (show)
   	text = this->getAllDataNames().join("\n");
   mDataNameText->setText(0, text);
@@ -555,21 +549,6 @@ void ViewWrapper3D::updateView()
 
   mAnnotationMarker->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 }
-
-
-//void ViewWrapper3D::imageRemoved(const QString& uid)
-//{
-//  if (!mVolumetricReps.count(uid))
-//    return;
-//
-//  //ssc::messageManager()->sendDebug("Remove image from view group 3d: "+uid);
-//  mView->removeRep(mVolumetricReps[uid]);
-//  mVolumetricReps.erase(uid);
-//
-//  this->activeImageChangedSlot();
-//
-//  this->updateView();
-//}
 
 void ViewWrapper3D::activeImageChangedSlot()
 {
@@ -603,26 +582,6 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
     mView->removeRep(refRep);
 }
 
-//void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
-//{
-//  ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid()+"_geom_rep");
-//  rep->setMesh(data);
-//  mGeometricReps[data->getUid()] = rep;
-//  mView->addRep(rep);
-//  this->updateView();
-//
-//}
-
-//void ViewWrapper3D::meshRemoved(const QString& uid)
-//{
-//  if (!mGeometricReps.count(uid))
-//    return;
-//
-//  mView->removeRep(mGeometricReps[uid]);
-//  mGeometricReps.erase(uid);
-//  this->updateView();
-//}
-//
 ssc::View* ViewWrapper3D::getView()
 {
   return mView;
@@ -690,23 +649,7 @@ void ViewWrapper3D::showLandmarks(bool on)
 
 void ViewWrapper3D::showPointPickerProbe(bool on)
 {
-//  if (mProbeRep->isConnectedToView(mView) == on)
-//    return;
-
   mProbeRep->setEnabled(on);
-
-//  if (on)
-//  {
-//    mProbeRep->setEnabled(true);
-//    mView->addRep(mProbeRep);
-//    connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-//    this->dominantToolChangedSlot();
-//  }
-//  else
-//  {
-//    mView->removeRep(mProbeRep);
-//    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-//  }
 }
 
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
