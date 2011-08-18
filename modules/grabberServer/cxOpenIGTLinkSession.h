@@ -6,7 +6,7 @@
 #include <QMutex>
 #include <QTcpSocket>
 //#include "igtlImageMessage.h"
-#include "cxIGTLinkImageMessage.h"
+#include "../grabberCommon/cxIGTLinkImageMessage.h"
 #include "cxGrabber.h"
 
 namespace cx

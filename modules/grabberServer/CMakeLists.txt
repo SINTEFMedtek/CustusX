@@ -95,7 +95,7 @@ set(${LIBNAME}_MOC_HDRS
     cxServer.h
     cxGrabberServer.h
     cxOpenIGTLinkSession.h
-    cxIGTLinkImageMessage.h
+    ../grabberCommon/cxIGTLinkImageMessage.h
     cxWinGrabberServer.h
 )
 
@@ -127,7 +127,7 @@ set(SOURCES
     cxMacGrabberServer.h
     cxMacGrabberServer.cpp
     cxOpenIGTLinkSession.cpp
-    cxIGTLinkImageMessage.cpp
+    ../grabberCommon/cxIGTLinkImageMessage.cpp
     ${${LIBNAME}_MOC_HDRS}
     ${${LIBNAME}_MOC_SRCS}
 )
