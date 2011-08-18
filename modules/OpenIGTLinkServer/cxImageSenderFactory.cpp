@@ -8,6 +8,7 @@
 #include "cxImageSenderFactory.h"
 #include "cxImageSenderOpenCV.h"
 #include "cxImageSenderFile.h"
+#include "cxImageSenderSonix.h"
 
 namespace cx
 {
@@ -49,9 +50,11 @@ QStringList ImageSenderFactory::getSenderTypes() const
 #ifdef USE_OpenCV
 	retval << ImageSenderOpenCV::getType();
 #endif
+#ifdef WIN32
+  retval << ImageSenderSonix::getType();
+#endif
 
 	retval << MHDImageSender::getType();
-
 	return retval;
 }
 
@@ -61,9 +64,14 @@ QStringList ImageSenderFactory::getArgumentDescription(QString type) const
 	if (type==ImageSenderOpenCV::getType())
 		return ImageSenderOpenCV::getArgumentDescription();
 #endif
+#ifdef WIN32
+  if (type==ImageSenderSonix::getType())
+    return ImageSenderSonix::getArgumentDescription();
+#endif
 
 	if (type==MHDImageSender::getType())
 		return MHDImageSender::getArgumentDescription();
+
 
 	return QStringList();
 }
@@ -74,13 +82,20 @@ QObject* ImageSenderFactory::createSender(QString type, QTcpSocket* socket, Stri
 	if (type==ImageSenderOpenCV::getType())
 		return new ImageSenderOpenCV(socket, arguments);
 #endif
+#ifdef WIN32
+  if (type==ImageSenderSonix::getType())
+    return new ImageSenderSonix(socket, arguments);
+#endif
 
 	if (type==MHDImageSender::getType())
 		return new MHDImageSender(socket, arguments);
 
+
 	// default:
-#ifdef USE_OpenCV
-	return new ImageSenderOpenCV(socket, arguments);
+#ifdef WIN32
+  return new ImageSenderSonix(socket, arguments);
+#elif USE_OpenCV
+  return new ImageSenderOpenCV(socket, arguments);
 #else
 	return NULL;
 #endif

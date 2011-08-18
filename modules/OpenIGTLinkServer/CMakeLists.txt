@@ -54,6 +54,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxImageSession.h
     cxImageSenderFile.h
     cxImageSenderOpenCV.h
+    cxImageSenderSonix.h
 #    cxImageSenderFactory.h
 )
 
@@ -71,6 +72,10 @@ SET ( cxOpenIGTLinkServer_FILES
     cxImageSenderFile.cpp
     cxImageSenderOpenCV.h
     cxImageSenderOpenCV.cpp
+    cxImageSenderSonix.h
+    cxImageSenderSonix.cpp
+    cxIGTLinkSonixStatusMessage.h
+    cxIGTLinkSonixStatusMessage.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
