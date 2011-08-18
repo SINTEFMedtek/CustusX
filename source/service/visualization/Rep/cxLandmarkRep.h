@@ -78,6 +78,7 @@ protected:
   LandmarkGraphicsMapType mGraphics;
   ssc::ViewportListenerPtr mViewportListener;
   void rescale();
+  virtual bool exists(QString uid) const = 0;
 
 private:
   LandmarkRep(); ///< not implemented

@@ -15,6 +15,7 @@
 #include "sscMessageManager.h"
 #include "cxTool.h"
 #include "cxPatientService.h"
+#include "cxVideoService.h"
 
 namespace cx
 {
@@ -31,6 +32,7 @@ USAcquisition::USAcquisition(AcquisitionDataPtr pluginData, QObject* parent) : Q
 
   this->probeChangedSlot();
   this->checkIfReadySlot();
+  this->connectToPureVideo();
 }
 
 void USAcquisition::checkIfReadySlot()
@@ -84,24 +86,43 @@ void USAcquisition::probeChangedSlot()
   ssc::ToolPtr tool = this->getTool();
   if(!tool)
     return;
-
   ssc::ProbePtr probe = tool->getProbe();
   if(!probe)
     return;
+  if(!probe->getRTSource())
+    return;
 
+	this->connectVideoSource(probe->getRTSource());
+}
+
+
+void USAcquisition::connectToPureVideo()
+{
+	if (mRTSource)
+		return;
+
+	this->connectVideoSource(videoService()->getVideoConnection()->getVideoSource());
+}
+
+
+void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
+{
   if(mRTSource)
   {
     disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
   }
-  mRTSource = probe->getRTSource();
+
+  mRTSource = source;
 
   if(mRTSource)
   {
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
     mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
   }
+
   this->checkIfReadySlot();
 }
+
 
 ssc::TimedTransformMap USAcquisition::getRecording(RecordSessionPtr session)
 {
