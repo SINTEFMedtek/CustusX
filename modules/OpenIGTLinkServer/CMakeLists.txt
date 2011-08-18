@@ -58,7 +58,10 @@ SET( CX_QT_MOC_HEADER_FILES
 #    cxImageSenderFactory.h
 )
 
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(
+    ${Boost_INCLUDE_DIRS}
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
+    )
 #link_directories(${Boost_INCLUDE_DIRS})
 
 SET ( cxOpenIGTLinkServer_FILES
@@ -74,8 +77,8 @@ SET ( cxOpenIGTLinkServer_FILES
     cxImageSenderOpenCV.cpp
     cxImageSenderSonix.h
     cxImageSenderSonix.cpp
-    cxIGTLinkSonixStatusMessage.h
-    cxIGTLinkSonixStatusMessage.cpp
+    ../grabberCommon/cxIGTLinkSonixStatusMessage.h
+    ../grabberCommon/cxIGTLinkSonixStatusMessage.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
