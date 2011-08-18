@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QMetaType>
 #include <boost/shared_ptr.hpp>
-#include "../grabberCommon/cxFrame.h"
+#include "cxFrame.h"
 
 namespace cx
 {
