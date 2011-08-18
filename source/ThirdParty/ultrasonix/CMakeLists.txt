@@ -6,7 +6,7 @@
 # Qt - MOC
 #------------------------------------------------------------------------------
 set(${LIBNAME}_MOC_HDRS
-    #SonixHelper.h
+    SonixHelper.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -22,6 +22,7 @@ SET (Ultrasound_SRCS
   vtkSonixVideoSource.h
   vtkSonixVideoSource.cxx
   vtkUltrasoundWin32Header.h
+  cxFrame.h
   ${${LIBNAME}_MOC_HDRS}
   ${${LIBNAME}_MOC_SRCS}
 )

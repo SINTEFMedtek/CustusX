@@ -97,7 +97,6 @@ set(${LIBNAME}_MOC_HDRS
     cxOpenIGTLinkSession.h
     cxIGTLinkImageMessage.h
     cxWinGrabberServer.h
-    ../grabberCommon/SonixHelper.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
