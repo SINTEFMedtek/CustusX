@@ -1161,6 +1161,18 @@ void vtkSonixVideoSource::DoFormatSetup()
 
 void vtkSonixVideoSource::calculateSpacingAndOrigin()
 {
+  int angle;
+  if(!this->ult->getParamValue("cw-tx angle", angle))
+    vtkErrorMacro("Couldn't request the angle.");
+  std::cout << "cx-tx angle =" << angle << std::endl;
+
+  this->ult->getDataDescriptor((uData)AcquisitionDataType, *this->DataDescriptor);
+  uROI roi = this->DataDescriptor->roi;
+  //std::cout << "bottom left" << this->DataDescriptor->roi.blx << std::endl;
+  //std::cout << "bottom right" << this->DataDescriptor->roi.brx << std::endl;
+  std::cout << "ulx: " << roi.ulx << "uly: " << roi.uly << "urx: "  << roi.urx << "ury: " << roi.ury << std::endl;
+  std::cout << "blx: " << roi.blx << "bly: " << roi.bly << "brx: "  << roi.brx << "bry: " << roi.bry << std::endl;
+
   //Start - Added old modified code
 
    int xO, yO;
