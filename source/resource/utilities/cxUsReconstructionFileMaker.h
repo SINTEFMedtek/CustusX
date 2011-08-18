@@ -37,7 +37,9 @@ public:
 private:
   QString makeFolder(QString patientFolder, QString sessionDescription);
   bool createSubfolder(QString subfolderAbsolutePath);
-  vtkImageDataPtr mergeFrames();
+//  vtkImageDataPtr mergeFrames();
+  vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
+  std::vector<vtkImageDataPtr> getFrames();
 
   bool writeTrackerTimestamps(QString reconstructionFolder);
   bool writeTrackerTransforms(QString reconstructionFolder);
