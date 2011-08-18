@@ -25,25 +25,25 @@ IGTLinkSonixStatusMessage::IGTLinkSonixStatusMessage():
 IGTLinkSonixStatusMessage::~IGTLinkSonixStatusMessage()
 {}
 
-void SetOrigin(double o[3])
+void IGTLinkSonixStatusMessage::SetOrigin(double o[3])
 {
   mDataOrigin[0] = o[0];
   mDataOrigin[1] = o[1];
   mDataOrigin[2] = o[2];
 }
-void SetOrigin(double oi, double oj, double ok)
+void IGTLinkSonixStatusMessage::SetOrigin(double oi, double oj, double ok)
 {
   mDataOrigin[0] = oi;
   mDataOrigin[1] = oj;
   mDataOrigin[2] = ok;
 }
-void GetOrigin(double o[3])
+void IGTLinkSonixStatusMessage::GetOrigin(double o[3])
 {
   o[0] = mDataOrigin[0];
   o[1] = mDataOrigin[1];
   o[2] = mDataOrigin[2];
 }
-void GetOrigin(double &oi, double &oj, double &ok)
+void IGTLinkSonixStatusMessage::GetOrigin(double &oi, double &oj, double &ok)
 {
   oi = mDataOrigin[0];
   oj = mDataOrigin[1];
