@@ -30,9 +30,9 @@ public:
   igtlTypeMacro(IGTLinkSonixStatusMessage, igtl::MessageBase)
   igtlNewMacro(IGTLinkSonixStatusMessage);
 
-  void SetOrigin(double o[3])
+  void SetOrigin(double o[3]);
   void SetOrigin(double oi, double oj, double ok);
-  void GetOrigin(double o[3])
+  void GetOrigin(double o[3]);
   void GetOrigin(double &oi, double &oj, double &ok);
 
 public:
