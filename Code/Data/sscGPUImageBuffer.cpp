@@ -459,7 +459,6 @@ GPUImageBufferRepository* GPUImageBufferRepository::getInstance()
 	}
 	return mInstance;
 }
-
 void GPUImageBufferRepository::shutdown()
 {
 	if(mInstance)
@@ -486,4 +485,15 @@ ssc::GPUImageLutBufferPtr GPUImageBufferRepository::getGPUImageLutBuffer(vtkUnsi
 }
 
 }
+#else
+namespace ssc
+{
+void GPUImageBufferRepository::shutdown() {;}
+void GPUImageBufferRepository::tearDown() {;}
+}//namespace ssc
 #endif //WIN32
+
+namespace ssc
+{
+
+}
