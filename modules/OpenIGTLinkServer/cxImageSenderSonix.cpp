@@ -103,7 +103,7 @@ ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObj
 //	int height = convertStringWithDefault(mArguments["height"], 768);
 //	int width = convertStringWithDefault(mArguments["width"], 1024);
 
-//  mVideoCapture.open(videoSource.toStdString().c_str());
+//  newstatus.open(videoSource.toStdString().c_str());
 //  if (!mVideoCapture.isOpened()) //if this fails, try to open as a video camera, through the use of an integer param
 //    mVideoCapture.open(videoport);
 //  if (!mVideoCapture.isOpened())
@@ -130,14 +130,14 @@ ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObj
 //  mTimer->start(1200); // for test of the timeout feature
 }
 
-ImageSenderSoni:~ImageSenderSonix()
+ImageSenderSonix::~ImageSenderSonix()
 {
   mSonixGrabber->Stop();
   mSonixGrabber->ReleaseSystemResources();
   mSonixGrabber->Delete();
 }
 
-void ImageSenderSonix::dumpProperties()
+/*void ImageSenderSonix::dumpProperties()
 {
   this->dumpProperty(CV_CAP_PROP_POS_MSEC, "CV_CAP_PROP_POS_MSEC");
   this->dumpProperty(CV_CAP_PROP_POS_FRAMES, "CV_CAP_PROP_POS_FRAMES");
@@ -158,14 +158,14 @@ void ImageSenderSonix::dumpProperties()
   this->dumpProperty(CV_CAP_PROP_CONVERT_RGB, "CV_CAP_PROP_CONVERT_RGB");
 //  this->dumpProperty(CV_CAP_PROP_WHITE_BALANCE, "CV_CAP_PROP_WHITE_BALANCE");
   this->dumpProperty(CV_CAP_PROP_RECTIFICATION, "CV_CAP_PROP_RECTIFICATION");
-}
+}*/
 
-void ImageSenderSonix::dumpProperty(int val, QString name)
+/*void ImageSenderSonix::dumpProperty(int val, QString name)
 {
 	double value = mVideoCapture.get(val);
 	if (value!=-1)
 		std::cout << "Property " << name.toStdString() << " : " << mVideoCapture.get(val) << std::endl;
-}
+}*/
 
 /*void ImageSenderSonix::tick()
 {
@@ -207,8 +207,8 @@ IGTLinkSonixStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame
 {
   IGTLinkSonixStatusMessage::Pointer retval = IGTLinkSonixStatusMessage::New();
   //retval->SetOrigin(); //Origin is set in IGTLinkImageMessage
-  retval->SetWidth();
-  retval->SetType();
+//  retval->SetWidth();
+//  retval->SetType();
   return retval;
 }
 

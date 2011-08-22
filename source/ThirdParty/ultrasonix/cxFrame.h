@@ -1,3 +1,6 @@
+#ifndef CXFRAME_H_
+#define CXFRAME_H_
+
 namespace cx
 {
 class Frame
@@ -20,3 +23,5 @@ public:
     mPixelFormat(0) {};
 };
 }//namespace cx
+
+#endif //CXFRAME_H_
