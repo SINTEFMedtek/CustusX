@@ -52,7 +52,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <ctype.h>
 
 #include "sscTime.h"
-#include "cxGrabber.h"
 #include <igtlImageMessage.h>
 
 // because of warnings in windows header push and pop the warning level
