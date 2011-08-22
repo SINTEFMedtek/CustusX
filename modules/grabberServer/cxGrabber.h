@@ -5,7 +5,6 @@
 #include <QMetaType>
 #include <boost/shared_ptr.hpp>
 #include "cxFrame.h"
-
 namespace cx
 {
 /**

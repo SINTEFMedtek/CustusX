@@ -43,12 +43,34 @@ ENDIF(QT_USE_FILE)
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})
 
+include_directories(
+    ${Boost_INCLUDE_DIRS}
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
+    )
 
-SET ( LINK_LIBRARIES
+SET (WIN_LINK_LIBRARIES
+  ${ULTERIUS_LIBRARY}
+  vtkOpenIGTUltrasound
+)
+
+SET ( ALL_LINK_LIBRARIES
+  SSC
   ${BOOST_LIBRARIES}
   ${QT_LIBRARIES}
   OpenIGTLink
   )
+
+if(WIN32)
+SET (LINK_LIBRARIES
+  ${WIN_LINK_LIBRARIES}
+  ${ALL_LINK_LIBRARIES}
+)
+else(WIN32)
+SET (LINK_LIBRARIES
+  ${ALL_LINK_LIBRARIES}
+)
+endif(WIN32)
+
 
 SET( CX_QT_MOC_HEADER_FILES
     cxImageServer.h
@@ -59,10 +81,6 @@ SET( CX_QT_MOC_HEADER_FILES
 #    cxImageSenderFactory.h
 )
 
-include_directories(
-    ${Boost_INCLUDE_DIRS}
-    ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
-    )
 #link_directories(${Boost_INCLUDE_DIRS})
 
 SET ( cxOpenIGTLinkServer_FILES
@@ -80,6 +98,8 @@ SET ( cxOpenIGTLinkServer_FILES
     cxImageSenderSonix.cpp
     ../grabberCommon/cxIGTLinkSonixStatusMessage.h
     ../grabberCommon/cxIGTLinkSonixStatusMessage.cpp
+    ../grabberCommon/cxIGTLinkImageMessage.h
+    ../grabberCommon/cxIGTLinkImageMessage.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
