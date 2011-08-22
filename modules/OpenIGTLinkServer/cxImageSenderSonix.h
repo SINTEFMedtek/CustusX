@@ -14,11 +14,12 @@
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
 class QTimer;
-#include "igtlImageMessage.h"
-#include <opencv2/highgui/highgui.hpp>
 #include <QStringList>
 #include "cxImageSenderFactory.h"
 
+#include "../grabberCommon/cxIGTLinkImageMessage.h"
+#include "../grabberCommon/cxIGTLinkSonixStatusMessage.h"
+#include "vtkSonixVideoSource.h"
 #include "SonixHelper.h"
 
 namespace cx
@@ -37,7 +38,7 @@ class ImageSenderSonix : public QObject
 
 public:
   ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObject* parent = NULL);
-  virtual ~ImageSenderSonix() {}
+  ~ImageSenderSonix();
 
   static QString getType();
   static QStringList getArgumentDescription();
@@ -51,14 +52,15 @@ private:
   vtkSonixVideoSource*  mSonixGrabber; ///< Ultrasonix video grabber
   SonixHelper*          mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
 
-  void dumpProperties();
+//  void dumpProperties();
 //  igtl::ImageMessage::Pointer getImageMessage();
-  void dumpProperty(int val, QString name);
+//  void dumpProperty(int val, QString name);
 
   //cv::VideoCapture mVideoCapture; // OpenCV video grabber
 
 
   IGTLinkImageMessage::Pointer convertFrame(Frame& frame);
+  IGTLinkSonixStatusMessage::Pointer getFrameStatus(Frame& frame);
 
 private slots:
   //void tick();
