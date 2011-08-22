@@ -93,7 +93,7 @@ ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObj
 
   this->mSonixHelper = new SonixHelper;
   mSonixGrabber->setSonixHelper(this->mSonixHelper);
-  connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SIGNAL(receiveFrameSlot(Frame&)));
+  connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 
   mSonixGrabber->Record();
   std::cout << "Started streaming from sonix device" << std::endl;
