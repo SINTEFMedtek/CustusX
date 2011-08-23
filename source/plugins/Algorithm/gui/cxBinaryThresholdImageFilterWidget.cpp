@@ -133,7 +133,7 @@ void BinaryThresholdImageFilterWidget::generateSurface()
     return;
 
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
-  double decimation = 0.8;
+  double decimation = 0.0;//0.8; //Usually we don't want to remove triangles in this situation
   double threshold = 1;/// because the segmented image is 0..1
   bool reduceResolution = false;
   bool smoothing = true;
