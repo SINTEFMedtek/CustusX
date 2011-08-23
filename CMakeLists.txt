@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 2.6)
 #------------------------------------------------------------------------------
 set(CustusX3_VERSION_MAJOR  3)
 set(CustusX3_VERSION_MINOR  1)
-set(CustusX3_VERSION_PATCH  5)
+set(CustusX3_VERSION_PATCH  6)
 set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 
