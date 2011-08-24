@@ -110,7 +110,7 @@ vtkPolyDataPtr Contour::calculate()
     trifilt->Update();
     deci->SetInput(trifilt->GetOutput());
     deci->SetTargetReduction(mDecimation);
-    deci->PreserveTopologyOff();
+    deci->PreserveTopologyOn();
     deci->Update();
     cubesPolyData = deci->GetOutput();
   }
