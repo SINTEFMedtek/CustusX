@@ -15,6 +15,7 @@
 #include <QTcpSocket>
 class QTimer;
 #include <QStringList>
+#include <QMetaType>
 #include "cxImageSenderFactory.h"
 
 #include "../grabberCommon/cxIGTLinkImageMessage.h"
@@ -68,7 +69,11 @@ private slots:
 
 };
 
-}
+}//namespace cx
+
+//Declaration of a frame metatype needed to be able to send frame as a signal.
+typedef cx::Frame Frame;
+Q_DECLARE_METATYPE(Frame)
 
 #endif // WIN32
 
