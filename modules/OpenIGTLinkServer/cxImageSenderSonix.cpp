@@ -68,6 +68,9 @@ ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObj
     mSocket(socket),
     mArguments(arguments)
 {
+  typedef cx::Frame Frame;
+  qRegisterMetaType<Frame>("Frame");
+
 	if (!mArguments.count("ipaddress"))
 		mArguments["ipaddress"] = "127.0.0.1";
 	if (!mArguments.count("imagingmode"))
