@@ -44,6 +44,13 @@ public:
   static QString getType();
   static QStringList getArgumentDescription();
 
+public slots:
+  void sendOpenIGTLinkImageSlot(int sendNumberOfMessages); ///< Gets the oldest frame from the internal queue and sends it to the socket.
+
+signals:
+    void imageOnQueue(int); ///< Emitted when there is a new igtl::ImageMessage is in the message queue
+    void queueInfo(int size, int dropped); ///< Emitted whenever the queue size changes
+
 protected:
 private:
   QTcpSocket* mSocket;
@@ -62,6 +69,12 @@ private:
 
   IGTLinkImageMessage::Pointer convertFrame(Frame& frame);
   IGTLinkSonixStatusMessage::Pointer getFrameStatus(Frame& frame);
+
+
+  void addMessageToQueue(igtl::MessageBase::Pointer msg); ///< Adds a OpenIGTLink ImageMessage to the queue
+  igtl::MessageBase::Pointer getLastMessageFromQueue(); ///< Gets the oldest message from the queue-
+
+  std::list<igtl::MessageBase::Pointer> mMutexedMessageQueue; ///< A threasafe internal queue
 
 private slots:
   //void tick();
