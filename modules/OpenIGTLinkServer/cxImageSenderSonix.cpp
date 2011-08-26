@@ -26,23 +26,6 @@
 
 #include "vtkSonixVideoSource.h"
 
-namespace
-{
-//------------------------------------------------------------
-// Function to generate random matrix.
-//void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
-//{
-//  //float position[3];
-//  //float orientation[4];
-//
-//  matrix[0][0] = 1.0;  matrix[1][0] = 0.0;  matrix[2][0] = 0.0; matrix[3][0] = 0.0;
-//  matrix[0][1] = 0.0;  matrix[1][1] = -1.0;  matrix[2][1] = 0.0; matrix[3][1] = 0.0;
-//  matrix[0][2] = 0.0;  matrix[1][2] = 0.0;  matrix[2][2] = 1.0; matrix[3][2] = 0.0;
-//  matrix[0][3] = 0.0;  matrix[1][3] = 0.0;  matrix[2][3] = 0.0; matrix[3][3] = 1.0;
-//}
-
-}
-
 namespace cx
 {
 
@@ -66,10 +49,13 @@ QStringList ImageSenderSonix::getArgumentDescription()
 ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObject* parent) :
     QObject(parent),
     mSocket(socket),
-    mArguments(arguments)
+    mArguments(arguments),
+	mMaxqueueInfo(20),
+	mMaxBufferSize(19200000), //800(width)*600(height)*4(bytes)*10(images)
+	mDroppedImages(0)
 {
-  typedef cx::Frame Frame;
-  qRegisterMetaType<Frame>("Frame");
+  //typedef cx::Frame Frame;
+  //qRegisterMetaType<Frame>("Frame");
 
   connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
 
@@ -117,7 +103,7 @@ void ImageSenderSonix::receiveFrameSlot(Frame& frame)
   if (frame.mNewStatus)
   {
     IGTLinkSonixStatusMessage::Pointer statMsg = getFrameStatus(frame);
-    this->addMessageToQueue(statMsg);
+    //this->addMessageToQueue(statMsg);//TODO: create message queue
     // Pack (serialize) and send
 //    statMsg->Pack();
 //    mSocket->write(reinterpret_cast<const char*>(statMsg->GetPackPointer()), statMsg->GetPackSize());
@@ -126,7 +112,7 @@ void ImageSenderSonix::receiveFrameSlot(Frame& frame)
   IGTLinkImageMessage::Pointer imgMsg = convertFrame(frame);
 //  std::cout << "Socket bytesToWrite: " << mSocket->bytesToWrite() << std::endl;
 //  std::cout << "Socket readBufferSize: " << mSocket->readBufferSize() << std::endl;
-  this->addMessageToQueue(imgMsg);
+  this->addImageToQueue(imgMsg);
 
 
   //------------------------------------------------------------
@@ -186,28 +172,28 @@ void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
   if(mSocket->bytesToWrite() > mMaxBufferSize)
     return;
 
-  for(int i=0; i<sendNumberOfImages; ++i)
+  for(int i=0; i<sendNumberOfMessages; ++i)
   {
-    igtl::MessageBase::Pointer message = this->getLastImageMessageFromQueue();
+    IGTLinkImageMessage::Pointer message = this->getLastImageMessageFromQueue();
     if(!message)
       break;
     message->Pack();
     mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
-/** Add the message to a thread-safe queue
+/** Add the image message to a thread-safe queue
  */
-void ImageSenderSonix::addMessageToQueue(igtl::MessageBase::Pointer msg)
+void ImageSenderSonix::addImageToQueue(IGTLinkImageMessage::Pointer msg)
 {
   QMutexLocker sentry(&mImageMutex);
-  if(mMutexedMessageQueue.size() > mMaxqueueInfo)
+  if(mMutexedImageMessageQueue.size() > mMaxqueueInfo)
   {
-    mMutexedMessageQueue.pop_front();
+    mMutexedImageMessageQueue.pop_front();
     mDroppedImages++;
   }
 
-  mMutexedMessageQueue.push_back(msg);
-  int size = mMutexedMessageQueue.size();
+  mMutexedImageMessageQueue.push_back(msg);
+  int size = mMutexedImageMessageQueue.size();
   sentry.unlock();
 
   emit queueInfo(size, mDroppedImages);
@@ -216,13 +202,13 @@ void ImageSenderSonix::addMessageToQueue(igtl::MessageBase::Pointer msg)
 
 /** Threadsafe retrieval of last image message.
  */
-igtl::MessageBase::Pointer ImageSenderSonix::getLastMessageFromQueue()
+IGTLinkImageMessage::Pointer ImageSenderSonix::getLastImageMessageFromQueue()
 {
   QMutexLocker sentry(&mImageMutex);
-  if (mMutexedMessageQueue.empty())
-    return igtl::MessageBase::Pointer();
-  igtl::MessageBase::Pointer retval = mMutexedMessageQueue.front();
-  mMutexedMessageQueue.pop_front();
+  if (mMutexedImageMessageQueue.empty())
+    return IGTLinkImageMessage::Pointer();
+  IGTLinkImageMessage::Pointer retval = mMutexedImageMessageQueue.front();
+  mMutexedImageMessageQueue.pop_front();
   return retval;
 }
 
