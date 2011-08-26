@@ -16,6 +16,7 @@
 class QTimer;
 #include <QStringList>
 #include <QMetaType>
+#include <QMutex>
 #include "cxImageSenderFactory.h"
 
 #include "../grabberCommon/cxIGTLinkImageMessage.h"
@@ -71,10 +72,14 @@ private:
   IGTLinkSonixStatusMessage::Pointer getFrameStatus(Frame& frame);
 
 
-  void addMessageToQueue(igtl::MessageBase::Pointer msg); ///< Adds a OpenIGTLink ImageMessage to the queue
-  igtl::MessageBase::Pointer getLastMessageFromQueue(); ///< Gets the oldest message from the queue-
+  void addImageToQueue(IGTLinkImageMessage::Pointer msg); ///< Adds a OpenIGTLink ImageMessage to the queue
+  IGTLinkImageMessage::Pointer getLastImageMessageFromQueue(); ///< Gets the oldest message from the queue-
 
-  std::list<igtl::MessageBase::Pointer> mMutexedMessageQueue; ///< A threasafe internal queue
+  QMutex mImageMutex; ///< A lock for making the class threadsafe
+  int mMaxqueueInfo;
+  int mMaxBufferSize;
+  std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue
+  int mDroppedImages;
 
 private slots:
   //void tick();
@@ -85,8 +90,8 @@ private slots:
 }//namespace cx
 
 //Declaration of a frame metatype needed to be able to send frame as a signal.
-typedef cx::Frame Frame;
-Q_DECLARE_METATYPE(Frame)
+//typedef cx::Frame Frame;
+//Q_DECLARE_METATYPE(Frame)
 
 #endif // WIN32
 
