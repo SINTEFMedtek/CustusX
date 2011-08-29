@@ -1,5 +1,18 @@
 CustusX - Change Log
 
+CustusX - 3.1.6 alpha (Released 2011-08-29) [ View Issues ]
+===========================================
+- 0000257: [User story] Run CustusX on Linux (cas) - resolved.
+- 0000266: [Bug] Sampling functionality in calibration widget: move (cas) - resolved.
+- 0000350: [Bug] Tracking system not robust (jbake) - resolved.
+- 0000352: [Bug] Preferences settings must take effect immediately (cas) - resolved.
+- 0000357: [Bug] Tracking system deconfigured if change patient (jbake) - resolved.
+- 0000359: [Bug] vtkOutpugWindow when entering workflow Acq with Kaisa loaded. (olevs) - resolved.
+- 0000360: [Bug] Ambigous definition of reference tool. (jbake) - resolved.
+- 0000362: [Bug] Stereo error message when changing layout (olevs) - resolved.
+- 0000367: [Bug] The surfaces created during vessel to vessel registration are to crude (olevs) - resolved.
+[9 issues]
+
 CustusX - 3.1.5 alpha (Released 2011-05-19) [ View Issues ]
 ===========================================
 - 0000259: [User story] Pituitary gland procedure with 3D ultrasound - neuro (cas) - resolved.
