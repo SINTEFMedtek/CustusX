@@ -182,14 +182,14 @@ void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
     mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
-void OpenIGTLinkSender::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
+void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
 {
 //  if(mSocket->bytesToWrite() > mMaxBufferSize)
 //    return;
 
   for(int i=0; i<sendNumberOfMessage; ++i)
   {
-    IGTLinkStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
+    IGTLinkSonixStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
     if(!message)
       break;
     message->Pack();
@@ -227,9 +227,9 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::getLastImageMessageFromQueue()
   return retval;
 }
 
-** Add the status message to a thread-safe queue
+/** Add the status message to a thread-safe queue
  */
-void OpenIGTLinkSender::addStatusMessageToQueue(IGTLinkSonixStatusMessage::Pointer msg)
+void ImageSenderSonix::addStatusMessageToQueue(IGTLinkSonixStatusMessage::Pointer msg)
 {
   QMutexLocker sentry(&mStatusMutex);
   if(mMutexedStatusMessageQueue.size() > mMaxqueueInfo)
@@ -245,11 +245,11 @@ void OpenIGTLinkSender::addStatusMessageToQueue(IGTLinkSonixStatusMessage::Point
 
 /** Threadsafe retrieval of last image message.
  */
-IGTLinkSonixStatusMessage::Pointer OpenIGTLinkSender::getLastImageMessageFromQueue()
+IGTLinkSonixStatusMessage::Pointer ImageSenderSonix::getLastStatusMessageFromQueue()
 {
   QMutexLocker sentry(&mStatusMutex);
   if (mMutexedStatusMessageQueue.empty())
-    return IGTLinkImageMessage::Pointer();
+    return IGTLinkSonixStatusMessage::Pointer();
   IGTLinkSonixStatusMessage::Pointer retval = mMutexedStatusMessageQueue.front();
   mMutexedStatusMessageQueue.pop_front();
   return retval;
