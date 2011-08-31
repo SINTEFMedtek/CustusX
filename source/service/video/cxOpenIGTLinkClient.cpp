@@ -204,6 +204,16 @@ void IGTLinkClient::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
   emit imageReceived(); // emit signal outside lock, catch possibly in another thread
 }
 
+/** add the message to a thread-safe queue
+ */
+void IGTLinkClient::addSonixStatusToQueue(IGTLinkSonixStatusMessage::Pointer msg)
+{
+  QMutexLocker sentry(&mSonixStatusMutex);
+  mMutexedSonixStatusMessageQueue.push_back(msg);
+  sentry.unlock();
+  emit sonixStatusReceived(); // emit signal outside lock, catch possibly in another thread
+}
+
 /** Threadsafe retrieval of last image message.
  *
  */
@@ -217,6 +227,18 @@ igtl::ImageMessage::Pointer IGTLinkClient::getLastImageMessage()
   return retval;
 }
 
+/** Threadsafe retrieval of last image message.
+ *
+ */
+IGTLinkSonixStatusMessage::Pointer IGTLinkClient::getLastSonixStatusMessage()
+{
+  QMutexLocker sentry(&mSonixStatusMutex);
+  if (mMutexedSonixStatusMessageQueue.empty())
+    return IGTLinkSonixStatusMessage::Pointer();
+  IGTLinkSonixStatusMessage::Pointer retval = mMutexedSonixStatusMessageQueue.front();
+  mMutexedSonixStatusMessageQueue.pop_front();
+  return retval;
+}
 
 void IGTLinkClient::readyReadSlot()
 {
@@ -262,6 +284,10 @@ void IGTLinkClient::readyReadSlot()
     {
       success = this->ReceiveImage(mSocket, mHeaderMsg);
     }
+    else if (strcmp(mHeaderMsg->GetDeviceType(), "SONIX_STATUS") == 0)
+    {
+      success = this->ReceiveSonixStatus(mSocket, mHeaderMsg);
+    }
 //    else if (strcmp(mHeaderMsg->GetDeviceType(), "STATUS") == 0)
 //    {
 //      ReceiveStatus(mSocket, mHeaderMsg);
@@ -276,6 +302,34 @@ void IGTLinkClient::readyReadSlot()
       mHeadingReceived = false; // restart
   }
 //  std::cout << "  tock " << std::endl;
+}
+
+bool IGTLinkClient::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
+{
+  IGTLinkSonixStatusMessage::Pointer msg;
+  msg = IGTLinkSonixStatusMessage::New();
+  msg->SetMessageHeader(header);
+  msg->AllocatePack();
+
+  if (socket->bytesAvailable()<msg->GetPackBodySize())
+  {
+    //std::cout << "Incomplete body received, ignoring. " << std::endl;
+    return false;
+  }
+  socket->read(reinterpret_cast<char*>(msg->GetPackBodyPointer()), msg->GetPackBodySize());
+  // Deserialize the transform data
+  // If you want to do a CRC check, call Unpack(1).
+  // If you want to skip CRC check, call Unpack() without argument.
+  int c = msg->Unpack();
+  if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+  {
+    this->addSonixStatusToQueue(msg);
+
+    return true;
+  }
+
+  std::cout << "body crc failed!" << std::endl;
+  return true;
 }
 
 bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
