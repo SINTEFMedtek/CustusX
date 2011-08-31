@@ -409,13 +409,28 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;//Find correct value. TYPE_UINT8 = 3 in igtlImageMessage.h
   frame.mFirstPixel = frameBufferPtr;
 
-  //TODO: Calculate spacing/origin for each frame?
+  //This also updates the data descriptor
   this->calculateSpacingAndOrigin();
 
   frame.mSpacing[0] = this->DataSpacing[0];
   frame.mSpacing[1] = this->DataSpacing[1];
   frame.mOrigin[0] = this->DataOrigin[0];
   frame.mOrigin[1] = this->DataOrigin[1];
+
+  //Read probe angle (0 = linear probe)
+  int angle;
+  if(!this->ult->getParamValue("cw-tx angle", angle))
+    vtkErrorMacro("Couldn't request the angle.");
+  std::cout << "cx-tx angle =" << angle << std::endl;
+
+  uROI roi = this->DataDescriptor->roi;
+  //std::cout << "bottom left" << this->DataDescriptor->roi.blx << std::endl;
+  //std::cout << "bottom right" << this->DataDescriptor->roi.brx << std::endl;
+  std::cout << "ulx: " << roi.ulx << "uly: " << roi.uly << "urx: "  << roi.urx << "ury: " << roi.ury << std::endl;
+  std::cout << "blx: " << roi.blx << "bly: " << roi.bly << "brx: "  << roi.brx << "bry: " << roi.bry << std::endl;
+
+  // Test if the sonix status message is sent
+  frame.mNewStatus = true;
 
 //  emit newFrame(frame);
   if (this->mSonixHelper)
@@ -1160,17 +1175,18 @@ void vtkSonixVideoSource::DoFormatSetup()
 
 void vtkSonixVideoSource::calculateSpacingAndOrigin()
 {
-  int angle;
-  if(!this->ult->getParamValue("cw-tx angle", angle))
-    vtkErrorMacro("Couldn't request the angle.");
-  std::cout << "cx-tx angle =" << angle << std::endl;
+//  int angle;
+//  if(!this->ult->getParamValue("cw-tx angle", angle))
+//    vtkErrorMacro("Couldn't request the angle.");
+//  std::cout << "cx-tx angle =" << angle << std::endl;
 
+  // Update data descriptor (and region of interest descriptor)
   this->ult->getDataDescriptor((uData)AcquisitionDataType, *this->DataDescriptor);
-  uROI roi = this->DataDescriptor->roi;
+//  uROI roi = this->DataDescriptor->roi;
   //std::cout << "bottom left" << this->DataDescriptor->roi.blx << std::endl;
   //std::cout << "bottom right" << this->DataDescriptor->roi.brx << std::endl;
-  std::cout << "ulx: " << roi.ulx << "uly: " << roi.uly << "urx: "  << roi.urx << "ury: " << roi.ury << std::endl;
-  std::cout << "blx: " << roi.blx << "bly: " << roi.bly << "brx: "  << roi.brx << "bry: " << roi.bry << std::endl;
+//  std::cout << "ulx: " << roi.ulx << "uly: " << roi.uly << "urx: "  << roi.urx << "ury: " << roi.ury << std::endl;
+//  std::cout << "blx: " << roi.blx << "bly: " << roi.bly << "brx: "  << roi.brx << "bry: " << roi.bry << std::endl;
 
   //Start - Added old modified code
 
