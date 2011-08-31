@@ -19,6 +19,8 @@ IGTLinkSonixStatusMessage::IGTLinkSonixStatusMessage():
   {
     mDataOrigin[i] = 0.0;
   }
+
+  m_DefaultBodyType  = "SONIX_STATUS";
 }
 
 
