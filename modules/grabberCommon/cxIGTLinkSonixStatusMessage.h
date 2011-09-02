@@ -38,7 +38,7 @@ public:
 public:
   // Pack() serializes the header and body based on the member variables.
   // PackBody() must be implemented in the child class.
-  //int Pack();
+  int Pack();
 
 protected:
   IGTLinkSonixStatusMessage();
