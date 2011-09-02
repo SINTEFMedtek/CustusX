@@ -54,7 +54,7 @@ void IGTLinkSonixStatusMessage::GetOrigin(double &oi, double &oj, double &ok)
 
 
 
-/*int IGTLinkSonixStatusMessage::Pack()
+int IGTLinkSonixStatusMessage::Pack()
 {
   PackBody();
   igtl::MessageBase::m_IsBodyUnpacked   = 0;
@@ -84,6 +84,6 @@ void IGTLinkSonixStatusMessage::GetOrigin(double &oi, double &oj, double &ok)
   igtl::MessageBase::m_IsHeaderUnpacked = 0;
 
   return 1;
-}*/
+}
 
 }//namespace cx
