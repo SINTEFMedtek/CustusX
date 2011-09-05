@@ -1,6 +1,7 @@
 #include "cxIGTLinkImageMessage.h"
 #include "igtlMessageBase.h"
 #include "igtl_header.h"
+#include <string.h>
 
 namespace cx
 {
