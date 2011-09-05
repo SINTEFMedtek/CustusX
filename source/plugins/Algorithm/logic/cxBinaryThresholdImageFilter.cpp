@@ -43,7 +43,7 @@ void BinaryThresholdImageFilter::postProcessingSlot()
   }
 
   mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
-  mOutput->get_rMd_History()->setParentFrame(mInput->getUid());
+  mOutput->get_rMd_History()->setParentSpace(mInput->getUid());
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 

@@ -477,7 +477,7 @@ void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
     ssc::dataManager()->parseXml(dataManagerNode, patientFolder);
   }
 
-	std::cout << "PatientData::readLoadDoc" << std::endl;
+//	std::cout << "PatientData::readLoadDoc" << std::endl;
   emit isLoading();
 
   mWorkingDocument = QDomDocument();

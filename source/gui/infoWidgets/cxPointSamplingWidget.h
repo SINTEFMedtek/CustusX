@@ -42,7 +42,6 @@ protected slots:
   void removeButtonClickedSlot();
   void gotoButtonClickedSlot();
   void loadReferencePointsSlot();
-  void testSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -61,7 +60,6 @@ protected:
   QPushButton* mAddButton; ///< the Add Landmark button
   QPushButton* mEditButton; ///< the Edit Landmark button
   QPushButton* mRemoveButton; ///< the Remove Landmark button
-  QPushButton* mTestButton;
   QPushButton* mLoadReferencePointsButton; ///< button for loading a reference tools reference points
 
 //private:

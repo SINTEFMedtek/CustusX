@@ -11,7 +11,7 @@
 namespace cx
 {
 
-ImageServer::ImageServer(QString imageFileDir, QObject* parent) : QTcpServer(parent), mImageFileDir(imageFileDir)
+ImageServer::ImageServer(QObject* parent) : QTcpServer(parent)
 {
 }
 
@@ -33,7 +33,7 @@ void ImageServer::incomingConnection(int socketDescriptor)
 {
   std::cout << "Server: Incoming connection..." << std::endl;
 
-  ImageSession* session = new ImageSession(socketDescriptor, mImageFileDir);
+  ImageSession* session = new ImageSession(socketDescriptor);
   connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
   session->start();
 }

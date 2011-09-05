@@ -192,6 +192,7 @@ void OpenIGTLinkRTSource::connectServer(QString address, int port)
   mClient.reset(new IGTLinkClient(address, port, this));
   connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
   connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
+  connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
   connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
   //connect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
   connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
@@ -210,6 +211,13 @@ void OpenIGTLinkRTSource::imageReceivedSlot()
   this->updateImage(mClient->getLastImageMessage());
 }
 
+void OpenIGTLinkRTSource::sonixStatusReceivedSlot()
+{
+  if (!mClient)
+    return;
+  this->updateSonixStatus(mClient->getLastSonixStatusMessage());
+}
+
 void OpenIGTLinkRTSource::disconnectServer()
 {
 //  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
@@ -220,6 +228,7 @@ void OpenIGTLinkRTSource::disconnectServer()
 
     disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
     disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
+    disconnect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
     disconnect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
     //disconnect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
     disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
@@ -303,6 +312,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   message->GetSpacing(spacing);
   message->GetSubVolume(svsize, svoffset);
   mDeviceName = message->GetDeviceName();
+//  std::cout << "size : " << ssc::Vector3D(size[0], size[1], size[2]) << std::endl;
 
   mImageImport->SetNumberOfScalarComponents(1);
 
@@ -353,6 +363,10 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   mLastTimestamp = timestamp->GetTimeStamp() * 1000;
   mLastTimestamp += mTimestampCalibration;
 
+  mDebug_orgTime = timestamp->GetTimeStamp() * 1000; // ms
+//  double now = (double)QDateTime::currentDateTime().toMSecsSinceEpoch();
+//  std::cout << QString("cv+cx delay: %1").arg((int)(now - mDebug_orgTime)) << " ms" << std::endl;
+
   mImageImport->SetDataOrigin(0,0,0);
 
   //for linear probes used in other substance than the scanner is calibrated for we want to compensate
@@ -365,6 +379,14 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   mImageImport->SetImportVoidPointer(mImageMessage->GetScalarPointer());
 
   mImageImport->Modified();
+}
+
+
+void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer message)
+{
+  std::cout << "void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer message)" << std::endl;
+  //TODO: Use the status information
+  std::cout <<"**********TODO***********" << std::endl;
 }
 
 void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
@@ -387,20 +409,18 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   mTimeout = false;
   mTimeoutTimer->start();
 
+  // this seems to add 3ms per update()
   // insert a ARGB->RBGA filter. TODO: need to check the input more thoroughly here, this applies only to the internal CustusX US pipeline.
   if (mImageImport->GetOutput()->GetNumberOfScalarComponents()==4 && !mFilter_ARGB_RGBA)
   {
-//    vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
-//    flipper->SetFilteredAxes(0); //flipp around X axis
-//    flipper->SetInput(mImageImport->GetOutput());
-//    mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(flipper->GetOutput());
     mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
-//    std::cout << "filters scalar type: " << mFilter_ARGB_RGBA->GetScalarTypeAsString() << std::endl;
-//    std::cout << "fileters scalar size:" << mFilter_ARGB_RGBA->GetScalarSize() << std::endl;
     mRedirecter->SetInput(mFilter_ARGB_RGBA);
   }
 
   emit newFrame();
+
+//  double now = (double)QDateTime::currentDateTime().toMSecsSinceEpoch();
+//  std::cout << QString("cv+cx delay: %1").arg((int)(now - mDebug_orgTime)) << " ms" << std::endl;
 }
 
 /**Create a pipeline that convert the input 4-component ARGB image (from QuickTime-Mac)

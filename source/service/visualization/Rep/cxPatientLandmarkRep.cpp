@@ -17,13 +17,14 @@ PatientLandmarkRep::PatientLandmarkRep(const QString& uid, const QString& name) 
   LandmarkRep(uid, name)
 {
   mType = "cxPatientLandmarkRep";
+  this->setColor(ssc::Vector3D(0,0.6,0.8));
+  this->setShowLabel(false);
+  this->setShowLine(true);
 
   ToolManager* toolmanager = ToolManager::getInstance();
   connect(toolmanager, SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkAddedSlot(QString)));
   connect(toolmanager, SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkRemovedSlot(QString)));
   connect(toolmanager, SIGNAL(rMprChanged()), this, SLOT(transformChangedSlot()));
-
-  this->setTextScale(10,10,10);
 }
 
 PatientLandmarkRep::~PatientLandmarkRep()
@@ -34,63 +35,70 @@ QString PatientLandmarkRep::getType() const
   return mType;
 }
 
-void PatientLandmarkRep::landmarkAddedSlot(QString uid)
+void PatientLandmarkRep::setImage(ssc::ImagePtr image)
 {
-  ToolManager* toolmanager = ToolManager::getInstance();
-  ssc::Landmark landmark_pr = toolmanager->getLandmarks()[uid];
-  ssc::Vector3D p_r = toolmanager->get_rMpr()->coord(landmark_pr.getCoord());// p_r = point in ref space
-  this->addPoint(p_r, uid);
-  //std::cout << "LandmarkRep::landmarkAddedSlot(" << uid << ") " << this->getUid() << std::endl;
-}
+  if(image == mImage)
+    return;
 
-void PatientLandmarkRep::transformChangedSlot()
-{
-  //std::cout << "LandmarkRep::transformChangedSlot()" << std::endl;
-
-  ToolManager* toolmanager = ToolManager::getInstance();
-  ssc::LandmarkMap landmarksMap = toolmanager->getLandmarks();
-  ssc::LandmarkMap::iterator it = landmarksMap.begin();
-  for(;it != landmarksMap.end();++it)
+  if(mImage)
   {
-    //this->landmarkAddedSlot(it->first);
-    ssc::Landmark landmark_pr = it->second;
-    ssc::Vector3D p_r = toolmanager->get_rMpr()->coord(landmark_pr.getCoord()); // p_r = point in ref space
-    this->addPoint(p_r, it->first);
-//    std::cout << "LandmarkRep::landmarkAddedSlot(" << uid << ") " << this->getUid() << std::endl;
+    mImage->disconnectFromRep(mSelf);
+    disconnect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkAddedSlot(QString)));
+    disconnect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkRemovedSlot(QString)));
+    disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+    this->clearAll();
+  }
+
+  mImage = image;
+
+  if(mImage)
+  {
+    mImage->connectToRep(mSelf);
+    connect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkAddedSlot(QString)));
+    connect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkRemovedSlot(QString)));
+    connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+    this->addAll();
   }
 }
 
-void PatientLandmarkRep::clearAll()
-{
-  ToolManager* toolmanager = ToolManager::getInstance();
-  ssc::LandmarkMap landmarksMap = toolmanager->getLandmarks();
-  ssc::LandmarkMap::iterator it = landmarksMap.begin();
-  for(;it != landmarksMap.end();++it)
-  {
-    this->landmarkRemovedSlot(it->first);
-  }
-
-  mSkinPointActors.clear();
-  mTextFollowerActors.clear();
-}
 
 void PatientLandmarkRep::addAll()
 {
-  ToolManager* toolmanager = ToolManager::getInstance();
-  ssc::LandmarkMap landmarksMap = toolmanager->getLandmarks();
-  ssc::LandmarkMap::iterator it = landmarksMap.begin();
-  for(;it != landmarksMap.end();++it)
+  ssc::LandmarkMap landmarksMap = ToolManager::getInstance()->getLandmarks();
+
+  for(ssc::LandmarkMap::iterator it=landmarksMap.begin(); it!=landmarksMap.end(); ++it)
   {
     this->landmarkAddedSlot(it->first);
   }
 }
 
-void PatientLandmarkRep::setPosition(ssc::Vector3D coord, QString uid)
+bool PatientLandmarkRep::exists(QString uid) const
 {
-  ssc::Vector3D numberPosition = coord;
+  return ToolManager::getInstance()->getLandmarks().count(uid);
+}
 
-  mTextFollowerActors[uid].second->SetPosition(numberPosition.begin());
-  mSkinPointActors[uid]->SetPosition(coord.begin());
+void PatientLandmarkRep::setPosition(QString uid)
+{
+  if (!this->exists(uid))
+    return;
+
+  ssc::Landmark landmark_pr = ToolManager::getInstance()->getLandmarks()[uid];
+  ssc::Vector3D p_r = ToolManager::getInstance()->get_rMpr()->coord(landmark_pr.getCoord());// p_r = point in ref space
+
+  if (mGraphics[uid].mPoint)
+    mGraphics[uid].mPoint->setValue(p_r);
+
+  if (mGraphics[uid].mText)
+    mGraphics[uid].mText->setPosition(p_r);
+
+  if (mImage && mGraphics[uid].mLine)
+  {
+    ssc::Landmark landmark = mImage->getLandmarks()[uid];
+    ssc::Vector3D img_r = mImage->get_rMd().coord(landmark.getCoord()); // p_r = point in ref space
+    mGraphics[uid].mLine->setValue(p_r, img_r);
+//    std::cout << "set line:" << p_r << "  to  " << img_r << std::endl;
+  }
+
 }
 
 }//namespace cx
