@@ -143,7 +143,8 @@ void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringL
     {
       QStringList tempList = line.split("=", QString::SkipEmptyParts);
       configList = tempList[1].trimmed().split(":", QString::SkipEmptyParts);
-      configList[3] = configList[3].trimmed();
+      if (configList.size()>=3)
+      	configList[3] = configList[3].trimmed();
       foundConfig = true;
     }
     else if(line.startsWith("ProbeCalibration", Qt::CaseInsensitive))
@@ -206,11 +207,16 @@ ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileNa
     fileName = list.join("");
   }
 
+  std::cout << "raw " << mhdFileName<< std::endl;
   //Use file name as uid
   ssc::ImagePtr UsRaw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(fileName, mhdFileName));
   UsRaw->setFilePath(filePath);
   ssc::USFrameDataPtr retval;
   retval.reset(new ssc::USFrameData(UsRaw, angio));
+
+  std::cout << "raw " << mhdFileName << ", " << Eigen::Array3i(retval->getDimensions()) << std::endl;
+
+
   return retval;
 }
 

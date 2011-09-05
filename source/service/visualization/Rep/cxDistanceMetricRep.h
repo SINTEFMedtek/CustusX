@@ -8,9 +8,13 @@
 #ifndef CXDISTANCEMETRICREP_H_
 #define CXDISTANCEMETRICREP_H_
 
-#include <sscRepImpl.h>
+#include "cxDataMetricRep.h"
 #include "sscGraphicalPrimitives.h"
 #include "cxDistanceMetric.h"
+#include "vtkForwardDeclarations.h"
+
+#include "vtkTextActor.h"
+typedef vtkSmartPointer<vtkTextActor> vtkTextActorPtr;
 
 namespace cx
 {
@@ -20,7 +24,7 @@ typedef boost::shared_ptr<class DistanceMetricRep> DistanceMetricRepPtr;
 /**Rep for visualizing a DistanceMetric.
  *
  */
-class DistanceMetricRep : public ssc::RepImpl
+class DistanceMetricRep : public DataMetricRep
 {
 	Q_OBJECT
 public:
@@ -35,17 +39,17 @@ protected:
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 
 protected slots:
-	void changedSlot();
+	virtual void changedSlot();
 
 private:
 	DistanceMetricRep(const QString& uid, const QString& name="");
 	DistanceMetricRep(); ///< not implemented
 
   ssc::GraphicalLine3DPtr mGraphicalLine;
-  DistanceMetricPtr mDistanceMetric;
+  ssc::CaptionText3DPtr mText;
+  DistanceMetricPtr mMetric;
 	ssc::View* mView;
 };
-
 
 }
 

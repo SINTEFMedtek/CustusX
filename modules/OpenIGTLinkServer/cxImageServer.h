@@ -19,15 +19,13 @@ class ImageServer : public QTcpServer
   Q_OBJECT
 
 public:
-  ImageServer(QString imageFileDir, QObject* parent = NULL);
+  ImageServer(QObject* parent = NULL);
   virtual ~ImageServer();
   void startListen(int port);
 protected:
   void incomingConnection(int socketDescriptor);
 private slots:
 private:
-  QString mImageFileDir;
-
 };
 
 } // namespace cx

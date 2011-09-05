@@ -69,6 +69,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUltrasoundWin32Header.h"
 #include "vtkVideoSource.h"
 #include "SonixHelper.h"
+//#include "SonixHelper.h"
 
 //BTX
 
@@ -222,6 +223,7 @@ protected:
                         int start, int count);
 
   void DoFormatSetup();
+  void calculateSpacingAndOrigin();///< Calculate spacing and origin when needed (for each frame?)
 
   // Description:
   // For internal use only

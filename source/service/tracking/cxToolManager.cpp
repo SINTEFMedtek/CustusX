@@ -135,6 +135,13 @@ void ToolManager::configure()
   ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
 
   std::vector<IgstkTracker::InternalStructure> trackers = configParser.getTrackers();
+
+  if (trackers.empty())
+  {
+    ssc::messageManager()->sendWarning("Failed to configure tracking.");
+    return;
+  }
+
   IgstkTracker::InternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
 
   IgstkTool::InternalStructure referenceToolStructure;
@@ -483,6 +490,9 @@ ssc::ToolManager::ToolMapPtr ToolManager::getTools()
 
 ssc::ToolPtr ToolManager::getTool(const QString& uid)
 {
+  if (uid=="active")
+    return this->getDominantTool();
+
   ssc::ToolPtr retval;
   ssc::ToolManager::ToolMap::iterator it = mTools.find(uid);
   if (it != mTools.end())

@@ -8,17 +8,30 @@
 #ifndef CXDISTANCEMETRIC_H_
 #define CXDISTANCEMETRIC_H_
 
-#include "sscData.h"
-#include "cxPointMetric.h"
+#include "cxDataMetric.h"
+#include "sscDataManagerImpl.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class DistanceMetric> DistanceMetricPtr;
 
-/**Data class that represents a distance between two points.
+
+class DistanceMetricReader: public ssc::DataReader
+{
+public:
+  virtual ~DistanceMetricReader() {}
+  virtual bool canLoad(const QString& type, const QString& filename)
+  {
+    return type=="distanceMetric";
+  }
+  virtual ssc::DataPtr load(const QString& uid, const QString& filename);
+};
+
+/**Data class that represents a distance between two points,
+ * or a point and a plane
  *
  */
-class DistanceMetric : public ssc::Data
+class DistanceMetric : public DataMetric
 {
 	Q_OBJECT
 public:
@@ -26,16 +39,23 @@ public:
 	virtual ~DistanceMetric();
 
 	double getDistance() const;
+	std::vector<ssc::Vector3D> getEndpoints() const;
 
-	void setPoint(int index, PointMetricPtr p);
-	PointMetricPtr getPoint(int index);
+	unsigned getArgumentCount() const;
+	void setArgument(int index, ssc::DataPtr p);
+	ssc::DataPtr getArgument(int index);
+	bool validArgument(ssc::DataPtr p) const;
+
+//	void setPoint(int index, PointMetricPtr p);
+//	PointMetricPtr getPoint(int index);
 
   virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
   virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
   virtual ssc::DoubleBoundingBox3D boundingBox() const;
+  virtual QString getType() const { return "distanceMetric"; }
 
 private:
-  boost::array<PointMetricPtr,2> mPoint;
+  boost::array<ssc::DataPtr,2> mArgument;
 };
 
 }

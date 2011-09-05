@@ -80,7 +80,7 @@ private slots:
   void activeImageChangedSlot();
   void showRefToolSlot(bool checked);
   void showToolPathSlot(bool checked);
-  void probeRepPointPickedSlot(double x,double y,double z);
+  void probeRepPointPickedSlot(ssc::Vector3D p_r);
   void centerImageActionSlot();
   void centerToolActionSlot();
   void optionChangedSlot();
@@ -92,6 +92,7 @@ private slots:
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
   void updateView();
+  void readDataRepSettings(ssc::RepPtr rep);
 
   void showLandmarks(bool on);
   void showPointPickerProbe(bool on);
@@ -120,7 +121,7 @@ private:
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
-  vtkSmartPointer<class InteractionCallback> mInteractorCallback;
+//  vtkSmartPointer<class InteractionCallback> mInteractorCallback;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 

@@ -56,6 +56,8 @@ int main(int argc, char *argv[])
   mainWin->raise();
 
   int retVal = app.exec();
+
+  plugins.clear();
   delete mainWin;
   cx::MainWindow::shutdown(); // shutdown all global resources, _after_ gui is deleted.
   return retVal;

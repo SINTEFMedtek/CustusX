@@ -171,7 +171,7 @@ std::map<QDateTime,QString> RegistrationHistoryWidget::getRegistrationTimes()
     {
       retval[current[j].mTimestamp] = current[j].mType;
     }
-    std::vector<ssc::ParentFrame> frames = allHistories[i]->getParentFrames();
+    std::vector<ssc::ParentSpace> frames = allHistories[i]->getParentSpaces();
     for (unsigned j=0; j<frames.size(); ++j)
     {
       retval[frames[j].mTimestamp] = frames[j].mType;

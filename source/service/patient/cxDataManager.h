@@ -8,6 +8,7 @@ class QDomDocument;
 
 namespace cx
 {
+
 /**
  * \class cxDataManager
  *

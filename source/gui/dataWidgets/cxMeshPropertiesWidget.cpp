@@ -85,7 +85,7 @@ void MeshPropertiesWidget::importTransformSlot()
 {
   if(!mMesh)
     return;
-  ssc::DataPtr parent = ssc::dataManager()->getData(mMesh->getParentFrame());
+  ssc::DataPtr parent = ssc::dataManager()->getData(mMesh->getParentSpace());
   if (!parent)
     return;
   mMesh->get_rMd_History()->setRegistration(parent->get_rMd());
