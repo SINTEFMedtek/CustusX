@@ -7,6 +7,7 @@
 
 #include "cxIGTLinkSonixStatusMessage.h"
 #include "igtl_header.h"
+#include <string.h>
 
 namespace cx
 {
