@@ -4,6 +4,7 @@
 
 namespace cx
 {
+
 ImageLandmarkRepPtr ImageLandmarkRep::New(const QString& uid, const QString& name)
 {
   ImageLandmarkRepPtr retval(new ImageLandmarkRep(uid, name));
@@ -32,7 +33,6 @@ void ImageLandmarkRep::setImage(ssc::ImagePtr image)
 
   if(mImage)
   {
-    //std::cout << "Landmark disconnect: (" << mImage->getName() << ") - " << this->getUid() << std::endl;
     mImage->disconnectFromRep(mSelf);
     disconnect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkAddedSlot(QString)));
     disconnect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkRemovedSlot(QString)));
@@ -57,64 +57,32 @@ ssc::ImagePtr ImageLandmarkRep::getImage() const
   return mImage;
 }
 
-void ImageLandmarkRep::landmarkAddedSlot(QString uid)
-{
-  ssc::Landmark landmark = mImage->getLandmarks()[uid];
-  ssc::Vector3D p_r = mImage->get_rMd().coord(landmark.getCoord()); // p_r = point in ref space
-  this->addPoint(p_r, uid);
-  //std::cout << "LandmarkRep::landmarkAddedSlot(" << uid << ") " << this->getUid() << std::endl;
-}
-
-void ImageLandmarkRep::transformChangedSlot()
-{
-  //std::cout << "LandmarkRep::transformChangedSlot()" << std::endl;
-
-  ssc::LandmarkMap landmarksMap = mImage->getLandmarks();
-  ssc::LandmarkMap::iterator it = landmarksMap.begin();
-  for(;it != landmarksMap.end();++it)
-  {
-    //this->landmarkAddedSlot(it->first);
-    ssc::Landmark landmark = it->second;
-    ssc::Vector3D p_r = mImage->get_rMd().coord(landmark.getCoord()); // p_r = point in ref space
-    this->addPoint(p_r, it->first);
-//    std::cout << "LandmarkRep::landmarkAddedSlot(" << uid << ") " << this->getUid() << std::endl;
-  }
-}
-
-void ImageLandmarkRep::clearAll()
-{
-  ssc::LandmarkMap landmarksMap = mImage->getLandmarks();
-  ssc::LandmarkMap::iterator it = landmarksMap.begin();
-  for(;it != landmarksMap.end();++it)
-  {
-    this->landmarkRemovedSlot(it->first);
-  }
-
-  mSkinPointActors.clear();
-  mTextFollowerActors.clear();
-}
-
 void ImageLandmarkRep::addAll()
 {
   ssc::LandmarkMap landmarksMap = mImage->getLandmarks();
-  ssc::LandmarkMap::iterator it = landmarksMap.begin();
-  for(;it != landmarksMap.end();++it)
+
+  for(ssc::LandmarkMap::iterator it=landmarksMap.begin(); it!=landmarksMap.end(); ++it)
   {
     this->landmarkAddedSlot(it->first);
   }
 }
 
-void ImageLandmarkRep::setPosition(ssc::Vector3D coord, QString uid)
+bool ImageLandmarkRep::exists(QString uid) const
 {
+  return mImage && mImage->getLandmarks().count(uid);
+}
+
+void ImageLandmarkRep::setPosition(QString uid)
+{
+  ssc::Landmark landmark = mImage->getLandmarks()[uid];
+  ssc::Vector3D p_r = mImage->get_rMd().coord(landmark.getCoord()); // p_r = point in ref space
+
   ssc::Vector3D imageCenter = mImage->get_rMd().coord(mImage->boundingBox().center());
-//  vtkImageDataPtr imageData = mImage->getRefVtkImageData();
-//  ssc::Vector3D imageCenter(imageData->GetCenter());
-  ssc::Vector3D centerToSkinVector = (coord - imageCenter).normal();
+  ssc::Vector3D centerToSkinVector = (p_r - imageCenter).normal();
+  ssc::Vector3D numberPosition = p_r + 10.0*centerToSkinVector;
 
-  ssc::Vector3D numberPosition = coord + 10.0*centerToSkinVector;
-
-  mTextFollowerActors[uid].second->SetPosition(numberPosition.begin());
-  mSkinPointActors[uid]->SetPosition(coord.begin());
+  mGraphics[uid].mPoint->setValue(p_r);
+  mGraphics[uid].mText->setPosition(numberPosition);
 }
 
 }//namespace cx

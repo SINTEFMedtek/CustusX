@@ -18,6 +18,8 @@ SET (cxVideoService_SOURCE
     cxOpenIGTLinkClient.cpp
     cxOpenIGTLinkRTSource.h
     cxOpenIGTLinkRTSource.cpp
+    ../../../modules/grabberCommon/cxIGTLinkSonixStatusMessage.h
+    ../../../modules/grabberCommon/cxIGTLinkSonixStatusMessage.cpp
 )
 
 include_directories(

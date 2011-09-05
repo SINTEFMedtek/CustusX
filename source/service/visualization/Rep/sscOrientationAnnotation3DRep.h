@@ -11,9 +11,11 @@
 #include "sscDefinitions.h"
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
+#include "sscVector3D.h"
 
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
+typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 
 namespace ssc
 {
@@ -33,16 +35,26 @@ public:
 
   bool getVisible() const;
   void setVisible(bool on);
+  void setMarkerFilename(const QString filename); ///< empty and default means a cube
+  void setSize(double size); ///< fraction of viewport to use
 
 private slots:
 protected:
   OrientationAnnotation3DRep(const QString& uid, const QString& name);
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+
 private:
-  void createAnnotation();
   vtkOrientationMarkerWidgetPtr mMarker;
-  vtkAnnotatedCubeActorPtr mCube;
+  double mSize;
+  Vector3D mColor;
+  static std::pair<QString, vtkPropPtr> mMarkerCache; ///< cache all loaded markers in order to save load time.
+
+  void rebuild(vtkRenderWindowInteractorPtr interactor);
+  vtkAxesActorPtr createAxes();
+  vtkAnnotatedCubeActorPtr createCube();
+  vtkPropPtr readMarkerFromFile(const QString filename);
+  void reduceSTLFile(const QString source, const QString dest, double reduction);
 };
 
 }

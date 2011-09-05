@@ -52,7 +52,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <ctype.h>
 
 #include "sscTime.h"
-#include "cxGrabber.h"
 #include <igtlImageMessage.h>
 
 // because of warnings in windows header push and pop the warning level
@@ -275,7 +274,7 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 		}
 	else
 		{
-			std::cout << "No missed frames" << std::endl;
+			//std::cout << "No missed frames" << std::endl;
 		}
 
 
@@ -311,12 +310,12 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   int index = this->FrameBufferIndex;
 
   // error check, if the frame indices mismatch, then it indicates, we have missed the frame?
-  if ( frmnum != index+1)
-    {
+  //if ( frmnum != index+1)
+  //  {
 	// error ??
 	// std::cout << "Frame goes missing"<< std::endl;
 	// what is to be done in this case??
-    }
+  //  }
 
   // 2) Do the time stamping
   this->FrameBufferTimeStamps[index] = vtkTimerLog::GetUniversalTime();
@@ -410,10 +409,29 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;//Find correct value. TYPE_UINT8 = 3 in igtlImageMessage.h
   frame.mFirstPixel = frameBufferPtr;
 
+  //This also updates the data descriptor
+  this->calculateSpacingAndOrigin();
+
   frame.mSpacing[0] = this->DataSpacing[0];
   frame.mSpacing[1] = this->DataSpacing[1];
   frame.mOrigin[0] = this->DataOrigin[0];
   frame.mOrigin[1] = this->DataOrigin[1];
+
+  //Don't seem to be the correct parameter
+  //Read probe angle (0 = linear probe)
+//  int angle;
+//  if(!this->ult->getParamValue("cw-tx angle", angle))
+//    vtkErrorMacro("Couldn't request the angle.");
+//  std::cout << "cx-tx angle =" << angle << std::endl;
+
+  uROI roi = this->DataDescriptor->roi;
+  //std::cout << "bottom left" << this->DataDescriptor->roi.blx << std::endl;
+  //std::cout << "bottom right" << this->DataDescriptor->roi.brx << std::endl;
+//  std::cout << "ulx: " << roi.ulx << " uly: " << roi.uly << " urx: "  << roi.urx << " ury: " << roi.ury << std::endl;
+//  std::cout << "blx: " << roi.blx << " bly: " << roi.bly << " brx: "  << roi.brx << " bry: " << roi.bry << std::endl;
+
+  // Test if the sonix status message is sent
+  frame.mNewStatus = true;
 
 //  emit newFrame(frame);
   if (this->mSonixHelper)
@@ -555,6 +573,8 @@ void vtkSonixVideoSource::Initialize()
 
   // 8)update framebuffer 
   this->UpdateFrameBuffer();
+
+  ult->setSharedMemoryStatus(1);
 
   this->Initialized = 1;
 }
@@ -1146,48 +1166,65 @@ void vtkSonixVideoSource::DoFormatSetup()
 		break;
     }
 
-  //Start - Added old modified code
-  
-  int xO, yO;
-  if(//this->RequestGetParamValue(VARID_ORIGINX,xO) &&
-     //this->RequestGetParamValue(VARID_ORIGINY,yO))
-	 this->ult->getParamValue("origin x", xO) &&
-	 this->ult->getParamValue("origin y", yO))
-  {
-    std::cout << "xO=" << xO << std::endl;
-    std::cout << "yO=" << yO << std::endl;
-  }
-  else
-  {
-    vtkErrorMacro("Couldn't request the origin.");
-  }
-  this->DataOrigin[0] = xO;
-  this->DataOrigin[1] = yO;
-  //this->DataOrigin[2] =
 
-  int xM, yM;
-  if(//this->RequestGetParamValue(VARID_MICRONSX,xM) &&
-     //this->RequestGetParamValue(VARID_MICRONSY,yM))
-	 this->ult->getParamValue("microns x", xM) &&
-	 this->ult->getParamValue("microns y", yM))
-  {
-    std::cout << "xM=" << xM << std::endl;
-    std::cout << "yM=" << yM << std::endl;
-  }
-  else
-  {
-    vtkErrorMacro("Couldn't request the microns (spacing?).");
-  }
-  this->DataSpacing[0] = xM/1000.0;
-  this->DataSpacing[1] = yM/1000.0;
-  //this->DataSpacing[2] = 
-  //EndAdd
-
-
+  this->calculateSpacingAndOrigin();
 
 	this->Modified();
     this->UpdateFrameBuffer();
 
+}
+
+void vtkSonixVideoSource::calculateSpacingAndOrigin()
+{
+//  int angle;
+//  if(!this->ult->getParamValue("cw-tx angle", angle))
+//    vtkErrorMacro("Couldn't request the angle.");
+//  std::cout << "cx-tx angle =" << angle << std::endl;
+
+  // Update data descriptor (and region of interest descriptor)
+  this->ult->getDataDescriptor((uData)AcquisitionDataType, *this->DataDescriptor);
+//  uROI roi = this->DataDescriptor->roi;
+  //std::cout << "bottom left" << this->DataDescriptor->roi.blx << std::endl;
+  //std::cout << "bottom right" << this->DataDescriptor->roi.brx << std::endl;
+//  std::cout << "ulx: " << roi.ulx << "uly: " << roi.uly << "urx: "  << roi.urx << "ury: " << roi.ury << std::endl;
+//  std::cout << "blx: " << roi.blx << "bly: " << roi.bly << "brx: "  << roi.brx << "bry: " << roi.bry << std::endl;
+
+  //Start - Added old modified code
+
+   int xO, yO;
+   if(//this->RequestGetParamValue(VARID_ORIGINX,xO) &&
+      //this->RequestGetParamValue(VARID_ORIGINY,yO))
+    this->ult->getParamValue("origin x", xO) &&
+    this->ult->getParamValue("origin y", yO))
+   {
+     //std::cout << "xO=" << xO << std::endl;
+     //std::cout << "yO=" << yO << std::endl;
+   }
+   else
+   {
+     vtkErrorMacro("Couldn't request the origin.");
+   }
+   this->DataOrigin[0] = xO;
+   this->DataOrigin[1] = yO;
+   //this->DataOrigin[2] =
+
+   int xM, yM;
+   if(//this->RequestGetParamValue(VARID_MICRONSX,xM) &&
+      //this->RequestGetParamValue(VARID_MICRONSY,yM))
+    this->ult->getParamValue("microns x", xM) &&
+    this->ult->getParamValue("microns y", yM))
+   {
+     //std::cout << "xM=" << xM << std::endl;
+     //std::cout << "yM=" << yM << std::endl;
+   }
+   else
+   {
+     vtkErrorMacro("Couldn't request the microns (spacing?).");
+   }
+   this->DataSpacing[0] = xM/1000.0;
+   this->DataSpacing[1] = yM/1000.0;
+   //this->DataSpacing[2] =
+   //EndAdd
 }
 
 void vtkSonixVideoSource::SetSonixIP(const char *SonixIP)

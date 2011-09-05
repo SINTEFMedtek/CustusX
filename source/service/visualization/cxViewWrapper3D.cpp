@@ -43,7 +43,10 @@
 #include "cxPatientLandmarkRep.h"
 #include "cxPointMetricRep.h"
 #include "cxDistanceMetricRep.h"
-
+#include "cxAngleMetricRep.h"
+#include "cxPlaneMetricRep.h"
+#include "cxDataMetricRep.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -64,13 +67,13 @@ ToolAxisConnector::ToolAxisConnector(ssc::ToolPtr tool)
 	mAxis_s = ssc::AxesRep::New(tool->getUid()+"_axis_s");
 	mAxis_t = ssc::AxesRep::New(tool->getUid()+"_axis_t");
 
-	mAxis_t->setAxisLength(40);
+	mAxis_t->setAxisLength(0.08);
 	mAxis_t->setShowAxesLabels(false);
 	//mAxis_t->setCaption(tool->getName()+"_t", ssc::Vector3D(1,1,0.7));
 	mAxis_t->setCaption("t", ssc::Vector3D(0.7,1,0.7));
 	mAxis_t->setFontSize(0.03);
 
-	mAxis_s->setAxisLength(30);
+	mAxis_s->setAxisLength(0.05);
 	mAxis_s->setShowAxesLabels(false);
 	mAxis_s->setCaption("s", ssc::Vector3D(1,1,0));
 	mAxis_s->setFontSize(0.03);
@@ -120,10 +123,16 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
   mImageLandmarkRep = ImageLandmarkRep::New("ImageLandmarkRep_"+index);
+  mImageLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+  mImageLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+
   mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
+  mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+  mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+
   mProbeRep = ssc::ProbeRep::New("ProbeRep_"+index, "ProbeRep_"+index);
 
-  connect(mProbeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
+  connect(mProbeRep.get(), SIGNAL(pointPicked(ssc::Vector3D)),this, SLOT(probeRepPointPickedSlot(ssc::Vector3D)));
   mProbeRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
   mProbeRep->setEnabled(false);
   mView->addRep(mProbeRep);
@@ -146,6 +155,9 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->toolsAvailableSlot();
 
   mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
+  mAnnotationMarker->setMarkerFilename(DataLocations::getRootConfigPath()+"/models/"+settings()->value("View3D/annotationModel").toString());
+  mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
+
   mView->addRep(mAnnotationMarker);
 //  mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
 
@@ -188,17 +200,44 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	{
 	  this->updateView();
 	}
+	if (key=="View3D/annotationModelSize" || key=="View3D/annotationModel")
+	{
+	  mAnnotationMarker->setMarkerFilename(DataLocations::getRootConfigPath()+"/models/"+settings()->value("View3D/annotationModel").toString());
+    mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
+	}
+  if (key=="View3D/sphereRadius" || key=="View3D/labelSize" || key=="View/showLabels")
+  {
+    for (RepMap::iterator iter=mDataReps.begin(); iter!=mDataReps.end(); ++iter)
+    {
+      this->readDataRepSettings(iter->second);
+    }
+
+    mImageLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+    mImageLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+
+  }
 }
 
 
-void ViewWrapper3D::probeRepPointPickedSlot(double x,double y,double z)
+void ViewWrapper3D::probeRepPointPickedSlot(ssc::Vector3D p_r)
 {
-  //TODO check spaces....
-  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
-  ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->inv().coord(p_r);
+	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+//  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
+  ssc::Vector3D p_pr = rMpr.inv().coord(p_r);
+
+  // set the picked point as offset tip
+  ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+  ssc::Vector3D offset = tool->get_prMt().vector(ssc::Vector3D(0,0,tool->getTooltipOffset()));
+  p_pr -= offset;
+  p_r = rMpr.coord(p_pr);
+
+//	std::cout << "ViewWrapper3D::probeRepPointPickedSlot " << p_r << p_r<< std::endl;
+
   // TODO set center here will not do: must handle
   ssc::dataManager()->setCenter(p_r);
-  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+  tool->set_prMt(ssc::createTransformTranslate(p_pr));
 }
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
@@ -299,8 +338,6 @@ void ViewWrapper3D::showToolPathSlot(bool checked)
   }
 
   settings()->setValue("showToolPath", checked);
-//  showToolPath->setChecked(settings()->value("showToolPath"));
-//  ssc::toolManager()->getDominantTool()->setShowPath(checked);
 }
 
 
@@ -318,17 +355,18 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 			  mRefSpaceAxisRep = ssc::AxesRep::New("refspace_axis");
 			  mRefSpaceAxisRep->setCaption("ref", ssc::Vector3D(1,0,0));
 			  mRefSpaceAxisRep->setFontSize(0.03);
+			  mRefSpaceAxisRep->setAxisLength(0.12);
 
 			  mView->addRep(mRefSpaceAxisRep);
 		}
 
-//	  ssc::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
 	  std::vector<ssc::DataPtr> data = mViewGroup->getData();
 	  for (unsigned i=0; i<data.size(); ++i)
 	  {
 	    ssc::AxesRepPtr rep = ssc::AxesRep::New(data[i]->getName()+"_axis");
       rep->setCaption(data[i]->getName(), ssc::Vector3D(1,0,0));
       rep->setFontSize(0.03);
+      rep->setAxisLength(0.08);
       rep->setTransform(data[i]->get_rMd());
       mDataSpaceAxisRep[data[i]->getUid()] = rep;
       mView->addRep(rep);
@@ -375,7 +413,6 @@ void ViewWrapper3D::showManualToolSlot(bool visible)
 void ViewWrapper3D::showOrientationSlot(bool visible)
 {
   settings()->setValue("View/showOrientationAnnotation", visible);
-//  mAnnotationMarker->setVisible(visible);
   this->updateView();
 }
 
@@ -410,27 +447,13 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
   mSlicePlanes3DRep->getProxy()->setDrawPlanes(checked);
 }
 
-//void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
-//{
-//  if (!mVolumetricReps.count(image->getUid()))
-//  {
-//    ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(image);
-//
-//    mVolumetricReps[image->getUid()] = rep;
-//    mView->addRep(rep);
-//  }
-//
-//  this->activeImageChangedSlot();
-//
-//  updateView();
-//
-//}
-
 void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 {
   if (!mDataReps.count(data->getUid()))
   {
     ssc::RepPtr rep = this->createDataRep3D(data);
+    if (!rep)
+      return;
     mDataReps[data->getUid()] = rep;
     mView->addRep(rep);
   }
@@ -451,7 +474,6 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
   this->updateView();
 }
 
-
 /**Construct a 3D standard rep for a given data.
  *
  */
@@ -471,17 +493,47 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
   else if (boost::shared_dynamic_cast<PointMetric>(data))
   {
     PointMetricRepPtr rep = PointMetricRep::New(data->getUid()+"_3D_rep");
+    this->readDataRepSettings(rep);
     rep->setPointMetric(boost::shared_dynamic_cast<PointMetric>(data));
     return rep;
   }
   else if (boost::shared_dynamic_cast<DistanceMetric>(data))
   {
   	DistanceMetricRepPtr rep = DistanceMetricRep::New(data->getUid()+"_3D_rep");
+    this->readDataRepSettings(rep);
     rep->setDistanceMetric(boost::shared_dynamic_cast<DistanceMetric>(data));
+    return rep;
+  }
+  else if (boost::shared_dynamic_cast<AngleMetric>(data))
+  {
+    AngleMetricRepPtr rep = AngleMetricRep::New(data->getUid()+"_3D_rep");
+    this->readDataRepSettings(rep);
+    rep->setMetric(boost::shared_dynamic_cast<AngleMetric>(data));
+    return rep;
+  }
+  else if (boost::shared_dynamic_cast<PlaneMetric>(data))
+  {
+    PlaneMetricRepPtr rep = PlaneMetricRep::New(data->getUid()+"_3D_rep");
+    this->readDataRepSettings(rep);
+    rep->setMetric(boost::shared_dynamic_cast<PlaneMetric>(data));
     return rep;
   }
 
   return ssc::RepPtr();
+}
+
+/**helper. Read settings common for all data metric reps.
+ *
+ */
+void ViewWrapper3D::readDataRepSettings(ssc::RepPtr rep)
+{
+  cx::DataMetricRepPtr val = boost::shared_dynamic_cast<DataMetricRep>(rep);
+  if (!val)
+    return;
+
+  val->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+  val->setShowLabel(settings()->value("View/showLabels").toBool());
+  val->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 }
 
 
@@ -490,7 +542,6 @@ void ViewWrapper3D::updateView()
   QString text;
   bool show = settings()->value("View/showDataText").value<bool>();
 
-//  QStringList text = this->getAllDataNames();
   if (show)
   	text = this->getAllDataNames().join("\n");
   mDataNameText->setText(0, text);
@@ -498,21 +549,6 @@ void ViewWrapper3D::updateView()
 
   mAnnotationMarker->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 }
-
-
-//void ViewWrapper3D::imageRemoved(const QString& uid)
-//{
-//  if (!mVolumetricReps.count(uid))
-//    return;
-//
-//  //ssc::messageManager()->sendDebug("Remove image from view group 3d: "+uid);
-//  mView->removeRep(mVolumetricReps[uid]);
-//  mVolumetricReps.erase(uid);
-//
-//  this->activeImageChangedSlot();
-//
-//  this->updateView();
-//}
 
 void ViewWrapper3D::activeImageChangedSlot()
 {
@@ -525,6 +561,7 @@ void ViewWrapper3D::activeImageChangedSlot()
 
   mProbeRep->setImage(image);
   mImageLandmarkRep->setImage(image);
+  mPatientLandmarkRep->setImage(image);
 }
 
 void ViewWrapper3D::showRefToolSlot(bool checked)
@@ -545,26 +582,6 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
     mView->removeRep(refRep);
 }
 
-//void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
-//{
-//  ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid()+"_geom_rep");
-//  rep->setMesh(data);
-//  mGeometricReps[data->getUid()] = rep;
-//  mView->addRep(rep);
-//  this->updateView();
-//
-//}
-
-//void ViewWrapper3D::meshRemoved(const QString& uid)
-//{
-//  if (!mGeometricReps.count(uid))
-//    return;
-//
-//  mView->removeRep(mGeometricReps[uid]);
-//  mGeometricReps.erase(uid);
-//  this->updateView();
-//}
-//
 ssc::View* ViewWrapper3D::getView()
 {
   return mView;
@@ -595,21 +612,12 @@ void ViewWrapper3D::toolsAvailableSlot()
         toolRep->getTracer()->start();
     }
 
-//    QString uid = tool->getUid()+"_rep3d_"+this->mView->getUid();
-//    if (!mToolReps.count(uid))
-//    {
-//      mToolReps[uid] = repManager()->getDynamicToolRep3DRep(uid);
-//    }
-//    ssc::ToolRep3DPtr toolRep = mToolReps[uid];
-
-//    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
-
-    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
+    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble()*2/3); // use fraction of set size
+    toolRep->setSphereRadiusInNormalizedViewport(true);
 
     toolRep->setTool(tool);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
     mView->addRep(toolRep);
-
   }
 }
 
@@ -641,23 +649,7 @@ void ViewWrapper3D::showLandmarks(bool on)
 
 void ViewWrapper3D::showPointPickerProbe(bool on)
 {
-//  if (mProbeRep->isConnectedToView(mView) == on)
-//    return;
-
   mProbeRep->setEnabled(on);
-
-//  if (on)
-//  {
-//    mProbeRep->setEnabled(true);
-//    mView->addRep(mProbeRep);
-//    connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-//    this->dominantToolChangedSlot();
-//  }
-//  else
-//  {
-//    mView->removeRep(mProbeRep);
-//    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-//  }
 }
 
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
