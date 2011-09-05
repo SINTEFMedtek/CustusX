@@ -34,6 +34,7 @@ public:
   typedef std::map<double, vtkImageDataPtr> DataType; ///<  <timestamp, frame>
 public:
   VideoRecorder(VideoSourcePtr source, bool sync = true);
+  virtual ~VideoRecorder();
 
   virtual void startRecord();
   virtual void stopRecord();

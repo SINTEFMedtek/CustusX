@@ -37,6 +37,7 @@ public:
   virtual RegistrationTransform getCurrentRegistration() const { return RegistrationTransform(); }
   virtual ParentSpace getCurrentParentSpace() { return ParentSpace(); }
   virtual void clear() {}
+  virtual bool isNull() const { return true; }
 };
 
 

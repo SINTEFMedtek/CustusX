@@ -86,6 +86,7 @@ public:
   virtual ParentSpace getCurrentParentSpace();
   virtual void clear(); ///< reset all data loaded from xml
 
+  virtual bool isNull() const { return false; }
   static RegistrationHistoryPtr getNullObject();
 
 signals:

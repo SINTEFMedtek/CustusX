@@ -19,6 +19,19 @@ VideoRecorder::VideoRecorder(VideoSourcePtr source, bool sync) :
   mSyncShift = 0;
 }
 
+VideoRecorder::~VideoRecorder()
+{
+//	std::cout << "deleting VideoRecorder " << mData.size() << std::endl;
+//
+//  for (DataType::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
+//  {
+//  	if (iter->second->GetReferenceCount()>1)
+//  	{
+//  		std::cout << "WARNING found ref count " << iter->second->GetReferenceCount() << std::endl;
+//  	}
+//  }
+}
+
 void VideoRecorder::startRecord()
 {
   connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
@@ -49,8 +62,19 @@ void VideoRecorder::newFrameSlot()
 //  std::cout << "timestamp " << timestamp << ", " << diff << std::endl;
 
   vtkImageDataPtr frame = vtkImageDataPtr::New();
+//  std::cout << " RC after construct " << frame->GetReferenceCount() << std::endl;
   frame->DeepCopy(mSource->getVtkImageData());
+//  std::cout << " RC after fill " << frame->GetReferenceCount() << std::endl;
   mData[timestamp] = frame;
+//  std::cout << " RC after assign " << frame->GetReferenceCount() << std::endl;
+//  if (frame->GetReferenceCount()>2)
+//  	frame->SetReferenceCount(2);
+//  std::cout << " RC after explicit set " << frame->GetReferenceCount() << std::endl;
+//  mData.clear();
+//  std::cout << " RC after clear map " << frame->GetReferenceCount() << std::endl;
+  frame = NULL;
+//  std::cout << " RC after construct+clear temp " << mData.find(timestamp)->second->GetReferenceCount() << std::endl;
+//  std::cout << "============================" << std::endl << std::endl;
 }
 
 VideoRecorder::DataType VideoRecorder::getRecording(double start, double stop)
