@@ -320,9 +320,11 @@ vtkAbstractTransformPtr SeansVesselReg::linearRegistration(vtkPointsPtr sortedSo
   lmt->Modified();
   lmt->Update();
 
+
 //  *myCurrentTransform = lmt;
   return lmt;
 }
+
 
 vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPolyDataPtr tpsSourcePolyData, vtkPolyDataPtr tpsTargetPolyData,
     int numPoints/*, vtkAbstractTransform** myCurrentTransform*/)
@@ -458,7 +460,10 @@ bool SeansVesselReg::doItRight(ssc::DataPtr source, ssc::DataPtr target, QString
     return false;
   }
 
-  if (sourcePolyData->GetNumberOfPoints() < targetPolyData->GetNumberOfPoints())
+
+  mInvertedTransform = false;
+
+  if (sourcePolyData->GetNumberOfPoints() > targetPolyData->GetNumberOfPoints())
   {
     //INVERT
     std::cout << "inverted vessel reg" << std::endl;
@@ -702,6 +707,6 @@ ssc::Transform3D SeansVesselReg::getLinearTransform(vtkGeneralTransformPtr myCon
 
   }
 
-  return ssc::Transform3D(l_resultMatrix);
+  return ssc::Transform3D(l_resultMatrix).inverse();
 }
 } //namespace cx
