@@ -120,7 +120,7 @@ void ImportDataDialog::setInitialGuessForParentFrame()
     QString current = qstring_cast(iter->second->getName()).split(".")[0];
     if (base.indexOf(current)>=0)
     {
-      mData->get_rMd_History()->setParentFrame(iter->first);
+      mData->get_rMd_History()->setParentSpace(iter->first);
       break;
     }
   }
@@ -168,7 +168,7 @@ void ImportDataDialog::importParentTransform()
     return;
   if(!mData)
     return;
-  ssc::DataPtr parent = ssc::dataManager()->getData(mData->getParentFrame());
+  ssc::DataPtr parent = ssc::dataManager()->getData(mData->getParentSpace());
   if (!parent)
     return;
   mData->get_rMd_History()->setRegistration(parent->get_rMd());

@@ -156,7 +156,7 @@ void Transform3DWidget::addAngleControls(QString uid, QString name, int index, Q
   hLayout->addWidget(new ssc::SpinBoxGroupWidget(this, adapter));
 
   QSize mMinBarSize = QSize(20,20);
-  MousePadWidget* pad = new MousePadWidget(this, mMinBarSize);
+  ssc::MousePadWidget* pad = new ssc::MousePadWidget(this, mMinBarSize);
   pad->setFixedYPos(true);
   hLayout->addWidget(pad);
 
@@ -178,7 +178,7 @@ void Transform3DWidget::addTranslationControls(QString uid, QString name, int in
   hLayout->addWidget(new ssc::SpinBoxGroupWidget(this, adapter));
 
   QSize mMinBarSize = QSize(20,20);
-  MousePadWidget* pad = new MousePadWidget(this, mMinBarSize);
+  ssc::MousePadWidget* pad = new ssc::MousePadWidget(this, mMinBarSize);
   pad->setFixedYPos(true);
   hLayout->addWidget(pad);
 

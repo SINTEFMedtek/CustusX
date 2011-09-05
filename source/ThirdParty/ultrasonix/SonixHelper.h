@@ -3,7 +3,7 @@
 
 
 #include <QObject>
-#include "cxGrabber.h"
+#include "cxFrame.h"
 
 typedef cx::Frame Frame;
 

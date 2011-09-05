@@ -13,21 +13,34 @@
 
 namespace ssc
 {
-USFrameData::USFrameData(ImagePtr inputFrameData, bool angio)
+USFrameData::USFrameData(ImagePtr inputFrameData, bool angio) :
+		mUseAngio(angio)
 {
   mImage = inputFrameData;
+
+  this->reinitialize();
+}
+
+//mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
+
+/** reset the internal state of the oobject to that of the initialization,
+ * i.e. no removed frames.
+ */
+void USFrameData::reinitialize()
+{
   vtkImageDataPtr input;
-  if (angio)
+  if (mUseAngio)
   {
     //input = mImage->getBaseVtkImageData();
     //TODO: Use only color information
-    input = this->useAngio(inputFrameData);
+    input = this->useAngio(mImage);
   }
   else
   {
     input = mImage->getGrayScaleBaseVtkImageData(); // remove color, if any
   }
   mDimensions = input->GetDimensions();
+//  std::cout << "dims " << Eigen::Vector3i(mDimensions) << std::endl;
   mSpacing = Vector3D(input->GetSpacing());
   
   // Raw data pointer
@@ -40,7 +53,6 @@ USFrameData::USFrameData(ImagePtr inputFrameData, bool angio)
   {
     mFrames[record] = inputPointer + record*recordSize;
   }
-  
 }
 
 vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
@@ -133,6 +145,7 @@ vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
  */
 void USFrameData::removeFrame(unsigned int index)
 {
+//	std::cout << "USFrameData::removeFrame " << index << std::endl;
   mFrames.erase(mFrames.begin() + index);
   mDimensions[2]--;
 }

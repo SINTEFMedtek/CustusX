@@ -19,7 +19,8 @@ ELSE( OpenCV_FOUND )
 ENDIF( OpenCV_FOUND )
 
 if (USE_OpenCV)
-  ADD_DEFINITIONS(-DUSE_OpenCV="${USE_OpenCV}")
+#  ADD_DEFINITIONS(-DUSE_OpenCV="${USE_OpenCV}")
+  ADD_DEFINITIONS(-DUSE_OpenCV)
 endif(USE_OpenCV)
 
 # VTK
@@ -42,21 +43,44 @@ ENDIF(QT_USE_FILE)
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})
 
+include_directories(
+    ${Boost_INCLUDE_DIRS}
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
+    )
 
-SET ( LINK_LIBRARIES
+SET (WIN_LINK_LIBRARIES
+  ${ULTERIUS_LIBRARY}
+  vtkOpenIGTUltrasound
+)
+
+SET ( ALL_LINK_LIBRARIES
+  SSC
   ${BOOST_LIBRARIES}
   ${QT_LIBRARIES}
   OpenIGTLink
   )
+
+if(WIN32)
+SET (LINK_LIBRARIES
+  ${WIN_LINK_LIBRARIES}
+  ${ALL_LINK_LIBRARIES}
+)
+else(WIN32)
+SET (LINK_LIBRARIES
+  ${ALL_LINK_LIBRARIES}
+)
+endif(WIN32)
+
 
 SET( CX_QT_MOC_HEADER_FILES
     cxImageServer.h
     cxImageSession.h
     cxImageSenderFile.h
     cxImageSenderOpenCV.h
+    cxImageSenderSonix.h
+#    cxImageSenderFactory.h
 )
 
-include_directories(${Boost_INCLUDE_DIRS})
 #link_directories(${Boost_INCLUDE_DIRS})
 
 SET ( cxOpenIGTLinkServer_FILES
@@ -64,10 +88,18 @@ SET ( cxOpenIGTLinkServer_FILES
     cxImageServer.cpp
     cxImageSession.h
     cxImageSession.cpp 
+    cxImageSenderFactory.h
+    cxImageSenderFactory.cpp
     cxImageSenderFile.h
     cxImageSenderFile.cpp
     cxImageSenderOpenCV.h
     cxImageSenderOpenCV.cpp
+    cxImageSenderSonix.h
+    cxImageSenderSonix.cpp
+    ../grabberCommon/cxIGTLinkSonixStatusMessage.h
+    ../grabberCommon/cxIGTLinkSonixStatusMessage.cpp
+    ../grabberCommon/cxIGTLinkImageMessage.h
+    ../grabberCommon/cxIGTLinkImageMessage.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

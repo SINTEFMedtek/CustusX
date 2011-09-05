@@ -8,6 +8,15 @@
 #include <cxDistanceMetricRep.h>
 #include "sscView.h"
 
+#include <vtkVectorText.h>
+#include <vtkFollower.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
+#include <vtkRenderer.h>
+#include <vtkCamera.h>
+#include <vtkRenderWindow.h>
+#include "sscTypeConversions.h"
+
 namespace cx
 {
 
@@ -18,23 +27,23 @@ DistanceMetricRepPtr DistanceMetricRep::New(const QString& uid, const QString& n
 }
 
 DistanceMetricRep::DistanceMetricRep(const QString& uid, const QString& name) :
-		ssc::RepImpl(uid,name),
+    DataMetricRep(uid,name),
 		mView(NULL)
 {
 }
 
-
 void DistanceMetricRep::setDistanceMetric(DistanceMetricPtr point)
 {
-	if (mDistanceMetric)
-		disconnect(mDistanceMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+	if (mMetric)
+		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
 
-	mDistanceMetric = point;
+	mMetric = point;
 
-	if (mDistanceMetric)
-		connect(mDistanceMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+	if (mMetric)
+		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
 
 	mGraphicalLine.reset();
+	mText.reset();
 	this->changedSlot();
 }
 
@@ -42,6 +51,8 @@ void DistanceMetricRep::addRepActorsToViewRenderer(ssc::View* view)
 {
 	mView = view;
 	mGraphicalLine.reset();
+	mText.reset();
+
 	this->changedSlot();
 }
 
@@ -49,26 +60,41 @@ void DistanceMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
 	mView = NULL;
 	mGraphicalLine.reset();
+	mText.reset();
 }
 
 void DistanceMetricRep::changedSlot()
 {
-	if (!mGraphicalLine && mView && mDistanceMetric)
+  if (!mMetric)
+    return;
+
+	std::vector<ssc::Vector3D> p = mMetric->getEndpoints();
+	if (p.size()!=2)
+		return;
+
+  if (!mGraphicalLine && mView && mMetric)
+  {
 		mGraphicalLine.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
+    mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+  }
 
 	if (!mGraphicalLine)
 		return;
 
-	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mDistanceMetric->getPoint(0)->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-	ssc::Vector3D p0_r = rM0.coord(mDistanceMetric->getPoint(0)->getCoordinate());
-
-	ssc::Transform3D rM1 = ssc::SpaceHelpers::get_toMfrom(mDistanceMetric->getPoint(1)->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-	ssc::Vector3D p1_r = rM1.coord(mDistanceMetric->getPoint(1)->getCoordinate());
-
-	mGraphicalLine->setColor(ssc::Vector3D(1,0,0));
-	mGraphicalLine->setValue(p0_r, p1_r);
+	mGraphicalLine->setColor(mColor);
+	mGraphicalLine->setValue(p[0], p[1]);
 	mGraphicalLine->setStipple(0xF0FF);
-}
 
+	QString text = QString("%1 mm").arg(mMetric->getDistance(), 0, 'f', 1);
+  if (mShowLabel)
+    text = mMetric->getName() + " = " + text;
+	ssc::Vector3D p_mean = (p[0]+p[1])/2;
+
+  mText->setColor(mColor);
+  mText->setText(text);
+  mText->setPosition(p_mean);
+  mText->setSize(mLabelSize/100);
+//  mText->setSizeInNormalizedViewport(true, mLabelSize/100);
+}
 
 }

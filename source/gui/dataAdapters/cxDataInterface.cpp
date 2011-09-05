@@ -636,7 +636,7 @@ bool ParentFrameStringDataAdapter::setValue(const QString& value)
 {
   if (!mData)
     return false;
-  mData->get_rMd_History()->addParentFrame(value);
+  mData->get_rMd_History()->addParentSpace(value);
   return true;
 }
 
@@ -644,7 +644,7 @@ QString ParentFrameStringDataAdapter::getValue() const
 {
   if (!mData)
     return "";
-  return qstring_cast(mData->getParentFrame());
+  return qstring_cast(mData->getParentSpace());
 }
 
 QString ParentFrameStringDataAdapter::getHelp() const
@@ -687,7 +687,7 @@ bool SetParentFrameStringDataAdapter::setValue(const QString& value)
 {
   if (!mData)
     return false;
-  mData->get_rMd_History()->setParentFrame(value);
+  mData->get_rMd_History()->setParentSpace(value);
   return true;
 }
 

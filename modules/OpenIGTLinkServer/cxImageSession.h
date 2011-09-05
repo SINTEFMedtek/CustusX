@@ -13,7 +13,7 @@
 #include <QThread>
 class QTimer;
 #include "igtlImageMessage.h"
-
+#include "cxImageSenderFactory.h"
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
@@ -26,14 +26,14 @@ class ImageSession : public QThread
   Q_OBJECT
 
 public:
-  ImageSession(int socketDescriptor, QString imageFileDir, QObject* parent = NULL);
+  ImageSession(int socketDescriptor, QObject* parent = NULL);
   virtual ~ImageSession();
 protected:
   void run();
 private:
   QTcpSocket* mSocket;
   int mSocketDescriptor;
-  QString mImageFileDir;
+	StringMap mArguments;
 
 private slots:
 

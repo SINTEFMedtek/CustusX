@@ -24,152 +24,72 @@
 #include "cxDistanceMetric.h"
 #include "sscDataManager.h"
 #include "sscLabeledComboBoxWidget.h"
+#include "cxVector3DWidget.h"
+#include "sscRegistrationTransform.h"
 
 namespace cx
 {
 
-PointMetricWrapper::PointMetricWrapper(PointMetricPtr data) : mData(data)
-{
-}
-
-QWidget* PointMetricWrapper::createWidget()
-{
-	QWidget* widget = new QWidget;
-	QHBoxLayout* topLayout = new QHBoxLayout(widget);
-
-	QString value;
-	std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces();
-	QStringList range;
-	for (unsigned i=0; i<spaces.size(); ++i)
-		range << spaces[i].toString();
-
-	mFrameSelector = ssc::StringDataAdapterXml::initialize("selectFrame",
-			"Frame",
-			"Select coordinate system to store position in.",
-      value,
-      range,
-      QDomNode());
-	topLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mFrameSelector));
-
-	QPushButton* sampleButton = new QPushButton("Sample");
-	sampleButton->setToolTip("Set the position equal to the current tool tip position.");
-	topLayout->addWidget(sampleButton);
-
-	return widget;
-}
-
-QString PointMetricWrapper::getValue() const
-{
-	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mData->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-	ssc::Vector3D p0_r = rM0.coord(mData->getCoordinate());
-	return "pt_r="+qstring_cast(p0_r);
-}
-ssc::DataPtr PointMetricWrapper::getData() const
-{
-	return mData;
-}
-QString PointMetricWrapper::getType() const
-{
-	return "point";
-}
-
-void PointMetricWrapper::moveToToolPosition()
-{
-
-}
-
-void PointMetricWrapper::frameSelected(QString id)
-{
-
-}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
-
-DistanceMetricWrapper::DistanceMetricWrapper(DistanceMetricPtr data) : mData(data)
-{
-}
-QWidget* DistanceMetricWrapper::createWidget()
-{
-	QWidget* widget = new QWidget;
-	QVBoxLayout* topLayout = new QVBoxLayout(widget);
-	topLayout->addWidget(new QPushButton("dist"));
-	return widget;
-}
-
-QString DistanceMetricWrapper::getValue() const
-{
-	return "d= "+qstring_cast(mData->getDistance())+" mm";
-}
-ssc::DataPtr DistanceMetricWrapper::getData() const
-{
-	return mData;
-}
-QString DistanceMetricWrapper::getType() const
-{
-	return "distance";
-}
-
-
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
 
 MetricWidget::MetricWidget(QWidget* parent) :
   BaseWidget(parent, "MetricWidget", "Metrics/3D ruler"),
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this)),
-  mActiveLandmark(""),
-//  mAddButton(new QPushButton("Add", this)),
-  mAddPointButton(new QPushButton("New Pt", this)),
-  mAddDistButton(new QPushButton("New Dist", this)),
-  mEditButton(new QPushButton("Resample", this)),
-  mRemoveButton(new QPushButton("Remove", this)),
-  mTestButton(new QPushButton("Test", this)),
-  mLoadReferencePointsButton(new QPushButton("Load reference points", this))
+  mActiveLandmark("")
 {
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
   connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(updateSlot()));
 
   //table widget
   connect(mTable, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
+  connect(mTable, SIGNAL(cellChanged(int, int)), this, SLOT(cellChangedSlot(int, int)));
 
   this->setLayout(mVerticalLayout);
 
-  connect(mAddPointButton, SIGNAL(clicked()), this, SLOT(addPointButtonClickedSlot()));
-  connect(mAddDistButton, SIGNAL(clicked()), this, SLOT(addDistanceButtonClickedSlot()));
-
   mEditWidgets = new QStackedWidget;
 
-  //pushbuttons
-//  connect(mAddButton, SIGNAL(clicked()), this, SLOT(addButtonClickedSlot()));
-  mEditButton->setDisabled(true);
-  connect(mEditButton, SIGNAL(clicked()), this, SLOT(editButtonClickedSlot()));
-  mRemoveButton->setDisabled(true);
-  connect(mRemoveButton, SIGNAL(clicked()), this, SLOT(removeButtonClickedSlot()));
-  connect(mTestButton, SIGNAL(clicked()), this, SLOT(testSlot()));
-  connect(mLoadReferencePointsButton, SIGNAL(clicked()), this, SLOT(loadReferencePointsSlot()));
+  QHBoxLayout* buttonLayout = new QHBoxLayout;
+  QActionGroup* group = new QActionGroup(this);
+  this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Point Metric",      SLOT(addPointButtonClickedSlot()));
+  this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
+  this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
+  this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
+  this->createAction(group, "", "", "", NULL)->setSeparator(true);
+  mRemoveAction = this->createAction(group, ":/icons/metric_remove.png", "Remove", "Remove currently selected metric",   SLOT(removeButtonClickedSlot()));
+  mRemoveAction->setDisabled(true);
+  mLoadReferencePointsAction = this->createAction(group, ":/icons/metric_reference.png", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
+  mLoadReferencePointsAction->setDisabled(true);
+
+  QToolBar* toolBar = new QToolBar("actions", this);
+  toolBar->addActions(group->actions());
+  buttonLayout->addWidget(toolBar);
+  buttonLayout->addStretch();
 
   //layout
+  mVerticalLayout->addLayout(buttonLayout);
   mVerticalLayout->addWidget(mTable, 1);
   mVerticalLayout->addWidget(mEditWidgets, 0);
-
-  QHBoxLayout* buttonLayout = new QHBoxLayout;
-  mVerticalLayout->addLayout(buttonLayout);
-
-  buttonLayout->addWidget(mAddPointButton);
-  buttonLayout->addWidget(mAddDistButton);
-  buttonLayout->addWidget(mEditButton);
-  buttonLayout->addWidget(mRemoveButton);
-  buttonLayout->addWidget(mTestButton);
-  mVerticalLayout->addWidget(mLoadReferencePointsButton);
 }
 
 MetricWidget::~MetricWidget()
 {}
+
+//template<class T>
+QAction* MetricWidget::createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot)
+{
+  QAction* action = new QAction(QIcon(iconName), text, group);
+  action->setStatusTip(tip);
+  action->setToolTip(tip);
+  if (slot)
+  {
+  	connect(action, SIGNAL(triggered()), this, slot);
+  }
+  return action;
+}
 
 QString MetricWidget::defaultWhatsThis() const
 {
@@ -180,46 +100,23 @@ QString MetricWidget::defaultWhatsThis() const
       "</html>";
 }
 
-void MetricWidget::testSlot()
+void MetricWidget::cellChangedSlot(int row, int col)
 {
-	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csPATIENTREF, ""));
-//	PointMetricPtr p0(new PointMetric("point%1","point%1"));
-//	p0->setFrame(ssc::CoordinateSystem(ssc::csPATIENTREF, ""));
-//	p0->setCoordinate(ssc::Vector3D(0,0,0));
-//	ssc::dataManager()->loadData(p0);
-
-	PointMetricPtr p1 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csTOOL, "ManualTool"));
-//	PointMetricPtr p1(new PointMetric("point%1","point%1"));
-//	p1->setFrame(ssc::CoordinateSystem(ssc::csTOOL, "ManualTool"));
-//	p1->setCoordinate(ssc::Vector3D(0,0,0));
-//	ssc::dataManager()->loadData(p1);
-
-	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
-	d0->setPoint(0, p0);
-	d0->setPoint(1, p1);
-	ssc::dataManager()->loadData(d0);
-
-	d0->getDistance();
+  if (col==0) // data name changed
+  {
+    QTableWidgetItem* item = mTable->item(row,col);
+    ssc::DataPtr data = ssc::dataManager()->getData(item->data(Qt::UserRole).toString());
+    if (data)
+      data->setName(item->text());
+  }
 }
-
 
 void MetricWidget::itemSelectionChanged()
 {
-  //std::cout << "pling" << std::endl;
-
   QTableWidgetItem* item = mTable->currentItem();
 
   mActiveLandmark = item->data(Qt::UserRole).toString();
   mEditWidgets->setCurrentIndex(mTable->currentRow());
-
-//  for (unsigned i=0; i<mSamples.size(); ++i)
-//  {
-//    if (mSamples[i].getUid()!=mActiveLandmark)
-//      continue;
-//    setManualTool(mSamples[i].getCoord());
-//    break;
-//  }
-
   enablebuttons();
 }
 
@@ -251,68 +148,140 @@ MetricBasePtr MetricWidget::createMetricWrapper(ssc::DataPtr data)
   {
     return MetricBasePtr(new DistanceMetricWrapper(boost::shared_dynamic_cast<DistanceMetric>(data)));
   }
+  else if (boost::shared_dynamic_cast<PlaneMetric>(data))
+  {
+    return MetricBasePtr(new PlaneMetricWrapper(boost::shared_dynamic_cast<PlaneMetric>(data)));
+  }
+  else if (boost::shared_dynamic_cast<AngleMetric>(data))
+  {
+    return MetricBasePtr(new AngleMetricWrapper(boost::shared_dynamic_cast<AngleMetric>(data)));
+  }
 
 	return MetricBasePtr();
 }
 
-void MetricWidget::updateSlot()
+/** create new metric wrappers for all metrics in PaSM
+ *
+ */
+std::vector<MetricBasePtr> MetricWidget::createMetricWrappers()
 {
-  mTable->blockSignals(true);
-  mTable->clear();
-
-  while (mEditWidgets->count())
-  {
-  	mEditWidgets->removeWidget(mEditWidgets->widget(0));
-  }
-
-  for (unsigned i=0; i<mMetrics.size(); ++i)
-  {
-  	disconnect(mMetrics[i]->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
-  }
-
-  mMetrics.clear();
+	std::vector<MetricBasePtr> retval;
   std::map<QString, ssc::DataPtr> all = ssc::dataManager()->getData();
   for (std::map<QString, ssc::DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
   {
   	MetricBasePtr wrapper = this->createMetricWrapper(iter->second);
   	if (wrapper)
   	{
-  		mMetrics.push_back(wrapper);
-  		connect(wrapper->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
-  		mEditWidgets->addWidget(wrapper->createWidget());
+  		retval.push_back(wrapper);
+  	}
+  }
+  return retval;
+}
+
+/**update contents of table.
+ * rebuild table only if necessary
+ *
+ */
+void MetricWidget::updateSlot()
+{
+//  std::cout << "update " << std::endl;
+
+  mTable->blockSignals(true);
+
+  std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers();
+
+  bool rebuild = newMetrics.size()!=mMetrics.size();
+
+  // check if we need to rebuild the table from scratch:
+  if (!rebuild)
+  {
+  	for (unsigned i=0; i<mMetrics.size(); ++i)
+  	{
+  		rebuild = rebuild || mMetrics[i]->getData()!=newMetrics[i]->getData();
   	}
   }
 
-  mEditWidgets->setCurrentIndex(-1);
+  // rebuild all:
+  if (rebuild)
+  {
+//    std::cout << "rebuild " << newMetrics.size() << std::endl;
+    mTable->clear();
 
-  //ready the table widget
-  mTable->setRowCount(mMetrics.size());
-  mTable->setColumnCount(4);
-  QStringList headerItems(QStringList() << "Name" << "Value" << "Arguments" << "Type");
-  mTable->setHorizontalHeaderLabels(headerItems);
-  mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-  mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    while (mEditWidgets->count())
+    {
+    	mEditWidgets->removeWidget(mEditWidgets->widget(0));
+    }
 
+    for (unsigned i=0; i<mMetrics.size(); ++i)
+    {
+    	disconnect(mMetrics[i]->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
+    }
+
+    mMetrics = newMetrics;
+
+    for (unsigned i=0; i<mMetrics.size(); ++i)
+    {
+    	MetricBasePtr wrapper = mMetrics[i];
+  		connect(wrapper->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
+//  		mEditWidgets->addWidget(wrapper->createWidget());
+
+  		QGroupBox* groupBox = new QGroupBox(wrapper->getData()->getName(), this);
+  		groupBox->setFlat(true);
+//  	  QFrame* groupBox = new QFrame(this);
+  	  QVBoxLayout* gbLayout = new QVBoxLayout(groupBox);
+//  	  groupBox->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+//  	  groupBox->setLineWidth(3);
+  	  gbLayout->setMargin(4);
+  	  gbLayout->addWidget(wrapper->createWidget());
+  	  mEditWidgets->addWidget(groupBox);
+    }
+
+    mEditWidgets->setCurrentIndex(-1);
+
+    //ready the table widget
+    mTable->setRowCount(mMetrics.size());
+    mTable->setColumnCount(4);
+    QStringList headerItems(QStringList() << "Name" << "Value" << "Arguments" << "Type");
+    mTable->setHorizontalHeaderLabels(headerItems);
+    mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    mTable->verticalHeader()->hide();
+
+    for (unsigned i = 0; i < mMetrics.size(); ++i)
+    {
+    	MetricBasePtr current = mMetrics[i];
+
+      for (unsigned j = 0; j < 4; ++j)
+      {
+      	QTableWidgetItem* item = new QTableWidgetItem("empty");
+        item->setData(Qt::UserRole, current->getData()->getUid());
+//        item->setFlags(item->flags() & (~Qt::ItemFlags(Qt::ItemIsEditable))); // turn off editable (also turned off ability to select+copy text - removed)
+        mTable->setItem(i, j, item);
+//        std::cout << "set item " << i << " " << j << std::endl;
+      }
+    }
+//    std::cout << "rebuild end"  << std::endl;
+  }
+
+  // update contents:
   for (unsigned i = 0; i < mMetrics.size(); ++i)
   {
   	MetricBasePtr current = mMetrics[i];
-    std::vector<QTableWidgetItem*> items(4); // name,val,args,type
-
-    items[0] = new QTableWidgetItem(current->getData()->getName());
-    items[1] = new QTableWidgetItem(current->getValue());
-    items[2] = new QTableWidgetItem("args");
-    items[3] = new QTableWidgetItem(current->getType());
-
-    for (unsigned j = 0; j < items.size(); ++j)
+    if (!mTable->item(i,0))
     {
-      items[j]->setData(Qt::UserRole, current->getData()->getUid());
-      mTable->setItem(i, j, items[j]);
+      std::cout << "no qitem for:: " << i << " " << current->getData()->getName() << std::endl;
+      continue;
     }
+  	mTable->item(i,0)->setText(current->getData()->getName());
+    mTable->item(i,1)->setText(current->getValue());
+    mTable->item(i,2)->setText(current->getArguments());
+    mTable->item(i,3)->setText(current->getType());
 
     //highlight selected row
     if (current->getData()->getUid() == mActiveLandmark)
     {
-      mTable->setCurrentItem(items[1]);
+      mTable->setCurrentCell(i,1);
+      mEditWidgets->setCurrentIndex(i);
     }
   }
 
@@ -323,119 +292,181 @@ void MetricWidget::updateSlot()
 
 void MetricWidget::enablebuttons()
 {
-//  mAddButton->setEnabled(true);
-  mEditButton->setEnabled(mActiveLandmark!="");
-  mRemoveButton->setEnabled(mActiveLandmark!="");
-  mLoadReferencePointsButton->setEnabled(ssc::toolManager()->getReferenceTool());
+  mRemoveAction->setEnabled(mActiveLandmark!="");
+  mLoadReferencePointsAction->setEnabled(ssc::toolManager()->getReferenceTool());
 }
 
-PointMetricPtr MetricWidget::addPoint(ssc::Vector3D point, ssc::CoordinateSystem frame)
+PointMetricPtr MetricWidget::addPoint(ssc::Vector3D point, ssc::CoordinateSystem space, QString name)
 {
 	PointMetricPtr p1(new PointMetric("point%1","point%1"));
-	p1->setFrame(frame);
+  p1->get_rMd_History()->setParentSpace("reference");
+	p1->setSpace(space);
 	p1->setCoordinate(point);
 	ssc::dataManager()->loadData(p1);
 
 	viewManager()->getViewGroups()[0]->getData()->addData(p1);
+	this->setActiveUid(p1->getUid());
 
 	return p1;
 }
 
-void MetricWidget::setManualTool(const ssc::Vector3D& p_r)
+void MetricWidget::setActiveUid(QString uid)
 {
-  ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
-
-  //ssc::Transform3D sMr = mSliceProxy->get_sMr();
-  ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
-  ssc::Transform3D prMt = tool->get_prMt();
-
-  // find tool position in r
-  ssc::Vector3D tool_t(0,0,tool->getTooltipOffset());
-  ssc::Vector3D tool_r = (rMpr*prMt).coord(tool_t);
-
-  // find click position in s.
-  //ssc::Vector3D click_s = get_vpMs().inv().coord(click_vp);
-
-  // compute the new tool position in slice space as a synthesis of the plane part of click and the z part of original.
-  //ssc::Vector3D cross_s(click_s[0], click_s[1], tool_s[2]);
-  // compute the position change and transform to patient.
-  ssc::Vector3D delta_r = p_r - tool_r;
-  ssc::Vector3D delta_pr = rMpr.inv().vector(delta_r);
-
-  // MD is the actual tool movement in patient space, matrix form
-  ssc::Transform3D MD = ssc::createTransformTranslate(delta_pr);
-  // set new tool position to old modified by MD:
-  tool->set_prMt(MD*prMt);
+	mActiveLandmark = uid;
+	this->updateSlot();
 }
 
 void MetricWidget::addPointButtonClickedSlot()
 {
-	this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csPATIENTREF, ""));
+  ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
+  ssc::Vector3D p_ref = ssc::SpaceHelpers::getDominantToolTipPoint(ref, true);
+
+	this->addPoint(p_ref, ref);
 }
+
+void MetricWidget::addPlaneButtonClickedSlot()
+{
+  ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
+  ssc::Vector3D p_ref = ssc::SpaceHelpers::getDominantToolTipPoint(ref, true);
+
+  PlaneMetricPtr p1(new PlaneMetric("plane%1","plane%1"));
+  p1->get_rMd_History()->setParentSpace("reference");
+  p1->setSpace(ref);
+  p1->setCoordinate(p_ref);
+  p1->setNormal(ssc::Vector3D(1,0,0));
+  ssc::dataManager()->loadData(p1);
+	this->setActiveUid(p1->getUid());
+
+  viewManager()->getViewGroups()[0]->getData()->addData(p1);
+}
+
+/**Starting with a selection of allowed arguments for a new metric,
+ * refine them by removing nonselected items, and adding more point
+ * metrics if there are too few arguments.
+ */
+std::vector<ssc::DataPtr> MetricWidget::refinePointArguments(std::vector<ssc::DataPtr> args, unsigned argNo)
+{
+  // erase non-selected arguments if we have more than enough
+  QList<QTableWidgetItem*> selection = mTable->selectedItems();
+  std::set<QString> selectedUids;
+  for (int i=0; i<selection.size(); ++i)
+  {
+  	selectedUids.insert(selection[i]->data(Qt::UserRole).toString());
+  }
+  for (unsigned i=0; i<args.size();)
+  {
+  	if (args.size() <= argNo)
+  		break;
+  	if (!selectedUids.count(args[i]->getUid()))
+  		args.erase(args.begin()+i);
+  	else
+  		++i;
+  }
+
+  while (args.size() > argNo)
+  	args.erase(args.begin());
+
+  while (args.size() < argNo)
+  {
+  	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
+  	args.push_back(p0);
+  }
+
+  return args;
+}
+
 
 void MetricWidget::addDistanceButtonClickedSlot()
 {
+	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
+  d0->get_rMd_History()->setParentSpace("reference");
 	// first try to reuse existing points as distance arguments, otherwise create new ones.
-  std::vector<PointMetricPtr> points;
+  std::vector<ssc::DataPtr> args;
 
   for (unsigned i=0; i<mMetrics.size(); ++i)
-  	if (mMetrics[i]->getType()=="point")
-  		points.push_back(boost::shared_dynamic_cast<PointMetric>(mMetrics[i]->getData()));
-
-  while (points.size()>2)
-  	points.erase(points.begin());
-
-  while (points.size()<2)
   {
-  	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csPATIENTREF, ""));
-  	points.push_back(p0);
+  	if (d0->validArgument(mMetrics[i]->getData()))
+  		args.push_back(mMetrics[i]->getData());
   }
 
-	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
-	d0->setPoint(0, points[0]);
-	d0->setPoint(1, points[1]);
+  args = this->refinePointArguments(args, d0->getArgumentCount());
+
+//  // erase non-selected arguments if we have more than enough
+//  QList<QTableWidgetItem*> selection = mTable->selectedItems();
+//  std::set<QString> selectedUids;
+//  for (int i=0; i<selection.size(); ++i)
+//  {
+//  	selectedUids.insert(selection[i]->data(Qt::UserRole).toString());
+//  }
+//  for (unsigned i=0; i<args.size();)
+//  {
+//  	if (args.size()<=d0->getArgumentCount())
+//  		break;
+//  	if (!selectedUids.count(args[i]->getUid()))
+//  		args.erase(args.begin()+i);
+//  	else
+//  		++i;
+//  }
+//
+//  while (args.size() > d0->getArgumentCount())
+//  	args.erase(args.begin());
+//
+//  while (args.size() < d0->getArgumentCount())
+//  {
+//  	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
+//  	args.push_back(p0);
+//  }
+
+  for (unsigned i=0; i<args.size(); ++i)
+    d0->setArgument(i, args[i]);
+
 	ssc::dataManager()->loadData(d0);
 
+	this->setActiveUid(d0->getUid());
 	viewManager()->getViewGroups()[0]->getData()->addData(d0);
 }
 
-
-
-ssc::Vector3D MetricWidget::getSample() const
+void MetricWidget::addAngleButtonClickedSlot()
 {
-// find current tool position:
-//  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
-//  if (!tool)
-//    return ssc::Vector3D(0,0,0);
-//  ssc::Transform3D prMt = tool->get_prMt();
-//  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
-//  ssc::Vector3D pos = (rMpr*prMt).coord(ssc::Vector3D(0,0,tool->getTooltipOffset()));
+  AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
+  d0->get_rMd_History()->setParentSpace("reference");
+	// first try to reuse existing points as distance arguments, otherwise create new ones.
+  std::vector<ssc::DataPtr> args;
 
-  ssc::CoordinateSystem ref = ssc::CoordinateSystemHelpers::getR();
-  ssc::Vector3D P_ref = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
+  for (unsigned i=0; i<mMetrics.size(); ++i)
+  {
+  	if (d0->validArgument(mMetrics[i]->getData()))
+  		args.push_back(mMetrics[i]->getData());
+  }
 
-  return P_ref;
-}
-
-void MetricWidget::editButtonClickedSlot()
-{
-//  for (unsigned i=0; i<mSamples.size(); ++i)
+  args = this->refinePointArguments(args, 3);
+//
+//  while (args.size() > 3)
+//  	args.erase(args.begin());
+//
+//  while (args.size() < 3)
 //  {
-//    if (mSamples[i].getUid()!=mActiveLandmark)
-//      continue;
-//    mSamples[i] = ssc::Landmark(mActiveLandmark, getSample());
+//  	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
+//  	args.push_back(p0);
 //  }
-//  updateSlot();
+
+//  for (unsigned i=0; i<args.size(); ++i)
+//    d0->setArgument(i, args[i]);
+
+  d0->setArgument(0, args[0]);
+  d0->setArgument(1, args[1]);
+  d0->setArgument(2, args[1]);
+  d0->setArgument(3, args[2]);
+
+  ssc::dataManager()->loadData(d0);
+
+	this->setActiveUid(d0->getUid());
+  viewManager()->getViewGroups()[0]->getData()->addData(d0);
 }
 
 void MetricWidget::removeButtonClickedSlot()
 {
 	ssc::dataManager()->removeData(mActiveLandmark);
-}
-
-void MetricWidget::gotoButtonClickedSlot()
-{
-
 }
 
 void MetricWidget::loadReferencePointsSlot()
@@ -461,7 +492,8 @@ void MetricWidget::loadReferencePointsSlot()
   for(; it != referencePoints_s.end(); ++it)
   {
     ssc::Vector3D P_ref = ssc::CoordinateSystemHelpers::get_toMfrom(sensor, ref).coord(it->second);
-    this->addPoint(P_ref);
+//    this->addPoint(P_ref);
+    this->addPoint(P_ref, ssc::CoordinateSystem(ssc::csREF), "ref%1");
   }
 }
 

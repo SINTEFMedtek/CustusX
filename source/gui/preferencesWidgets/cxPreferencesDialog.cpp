@@ -230,6 +230,9 @@ void VisualizationTab::init()
   double sphereRadius = settings()->value("View3D/sphereRadius").toDouble();
   mSphereRadius = ssc::DoubleDataAdapterXml::initialize("SphereRadius", "Sphere Radius", "Radius of sphere markers in the 3D scene.", sphereRadius, ssc::DoubleRange(0.1,10,0.1), 1, QDomNode());
 
+  double labelSize = settings()->value("View3D/labelSize").toDouble();
+  mLabelSize = ssc::DoubleDataAdapterXml::initialize("LabelSize", "Label Size", "Size of text labels in the 3D scene.", labelSize, ssc::DoubleRange(0.1,100,0.1), 1, QDomNode());
+
   ColorSelectButton* backgroundColorButton = new ColorSelectButton("Background Color");
   backgroundColorButton->setColor(settings()->value("backgroundColor").value<QColor>());
 
@@ -239,9 +242,19 @@ void VisualizationTab::init()
   mShowDataText = ssc::BoolDataAdapterXml::initialize("Show Data Text", "",
                                                  "Show the name of each data set in the views.",
                                                  showDataText);
+  bool showLabels = settings()->value("View/showLabels").value<bool>();
+  mShowLabels = ssc::BoolDataAdapterXml::initialize("Show Labels", "",
+                                                 "Attach name labels to entities in the views.",
+                                                 showLabels);
 //  connect(mAngioAdapter.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
 
-
+  double annotationModelSize = settings()->value("View3D/annotationModelSize").toDouble();
+  mAnnotationModelSize = ssc::DoubleDataAdapterXml::initialize("AnnotationModelSize", "Annotation Model Size", "Size (0..1) of the annotation model in the 3D scene.", annotationModelSize, ssc::DoubleRange(0.01,1,0.01), 2, QDomNode());
+  QStringList annotationModelRange;
+  annotationModelRange = QDir(DataLocations::getRootConfigPath()+"/models/").entryList(QStringList()<<"*.stl");
+  annotationModelRange.prepend("<default>");
+  QString annotationModel = settings()->value("View3D/annotationModel").toString();
+  mAnnotationModel = ssc::StringDataAdapterXml::initialize("AnnotationModel", "Annotation Model", "Name of annotation model in the 3D scene.", annotationModel, annotationModelRange, QDomNode());
 
   //Stereoscopic visualization (3D view)
   QGroupBox* stereoGroupBox = new QGroupBox("Stereoscopic visualization");
@@ -264,6 +277,10 @@ void VisualizationTab::init()
   mMainLayout->addWidget(backgroundColorButton, 0, 0);
   mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mSphereRadius));
   mMainLayout->addWidget(ssc::createDataWidget(this, mShowDataText));
+  mMainLayout->addWidget(ssc::createDataWidget(this, mShowLabels));
+  mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mLabelSize));
+  mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mAnnotationModelSize));
+  mMainLayout->addWidget(ssc::createDataWidget(this, mAnnotationModel));
 
   mMainLayout->addWidget(stereoGroupBox);
 
@@ -338,6 +355,10 @@ void VisualizationTab::saveParametersSlot()
 {
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
   settings()->setValue("View/showDataText", mShowDataText->getValue());
+  settings()->setValue("View/showLabels", mShowLabels->getValue());
+  settings()->setValue("View3D/labelSize", mLabelSize->getValue());
+  settings()->setValue("View3D/annotationModelSize", mAnnotationModelSize->getValue());
+  settings()->setValue("View3D/annotationModel", mAnnotationModel->getValue());
 }
 
 void VisualizationTab::setBackgroundColorSlot(QColor color)
