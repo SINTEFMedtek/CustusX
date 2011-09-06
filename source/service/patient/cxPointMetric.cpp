@@ -55,12 +55,13 @@ void CoordinateSystemListener::doConnect()
     }
   }
 
-  if (mSpace.mId==ssc::csSENSOR || mSpace.mId==ssc::csTOOL)
+  if (mSpace.mId==ssc::csSENSOR || mSpace.mId==ssc::csTOOL || mSpace.mId==ssc::csTOOL_OFFSET)
   {
     ssc::ToolPtr tool = ssc::toolManager()->getTool(mSpace.mRefObject);
     if (tool)
     {
       connect(tool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
+      connect(tool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
 
       if (mSpace.mRefObject=="active")
       {
@@ -89,12 +90,13 @@ void CoordinateSystemListener::doDisconnect()
     }
   }
 
-  if (mSpace.mId==ssc::csSENSOR || mSpace.mId==ssc::csTOOL)
+  if (mSpace.mId==ssc::csSENSOR || mSpace.mId==ssc::csTOOL || mSpace.mId==ssc::csTOOL)
   {
     ssc::ToolPtr tool = ssc::toolManager()->getTool(mSpace.mRefObject);
     if (tool)
     {
       disconnect(tool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
+      disconnect(tool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
 
       if (mSpace.mRefObject=="active")
       {
