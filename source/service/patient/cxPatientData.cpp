@@ -221,26 +221,6 @@ void PatientData::savePatient()
   mWorkingDocument = QDomDocument();
 }
 
-vtkPolyDataPtr PatientData::mergeTransformIntoPolyData(vtkPolyDataPtr polyBase, ssc::Transform3D rMd)
-{
-    // if transform elements exists, create a copy with entire position inside the polydata:
-    if (ssc::similar(rMd, ssc::Transform3D::Identity()))
-      return polyBase;
-
-    vtkPolyDataPtr poly = vtkPolyDataPtr::New();
-    poly->DeepCopy(polyBase);
-    vtkPointsPtr points = poly->GetPoints();
-
-    for (int i=0; i<poly->GetNumberOfPoints(); ++i)
-    {
-      ssc::Vector3D p(points->GetPoint(i));
-      p = rMd.coord(p);
-      points->SetPoint(i, p.begin());
-    }
-
-    return poly;
-}
-
 void PatientData::exportPatient()
 {
   QString targetFolder = mActivePatientFolder+"/Export/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
@@ -255,7 +235,7 @@ void PatientData::exportPatient()
   for (ssc::DataManager::MeshMap::iterator iter=meshes.begin(); iter!=meshes.end(); ++iter)
   {
     ssc::MeshPtr mesh = iter->second;
-    vtkPolyDataPtr poly = this->mergeTransformIntoPolyData(mesh->getVtkPolyData(), mesh->get_rMd());
+    vtkPolyDataPtr poly = mesh->getTransformedPolyData(mesh->get_rMd());
     // create a copy with the SAME UID as the original. Do not load this one into the datamanager!
     mesh = ssc::dataManager()->createMesh(poly, mesh->getUid(), mesh->getName(), "Images");
     ssc::dataManager()->saveMesh(mesh, targetFolder);
