@@ -135,5 +135,25 @@ DoubleBoundingBox3D Mesh::boundingBox() const
   return bounds;
 }
 
+vtkPolyDataPtr Mesh::getTransformedPolyData(ssc::Transform3D transform)
+{
+    // if transform elements exists, create a copy with entire position inside the polydata:
+    if (ssc::similar(transform, ssc::Transform3D::Identity()))
+      return mVtkPolyData;
+
+    vtkPolyDataPtr poly = vtkPolyDataPtr::New();
+    poly->DeepCopy(mVtkPolyData);
+    vtkPointsPtr points = poly->GetPoints();
+
+    for (int i=0; i<poly->GetNumberOfPoints(); ++i)
+    {
+      ssc::Vector3D p(points->GetPoint(i));
+      p = transform.coord(p);
+      points->SetPoint(i, p.begin());
+    }
+
+    return poly;
+}
+
 
 } // namespace ssc

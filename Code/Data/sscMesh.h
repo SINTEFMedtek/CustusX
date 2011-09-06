@@ -37,6 +37,7 @@ public:
 	virtual DoubleBoundingBox3D boundingBox() const;
   void setColor(const QColor& color);///< Set the color of the mesh
   QColor getColor();///< Get the color of the mesh (Values are range 0 - 255)
+  vtkPolyDataPtr getTransformedPolyData(ssc::Transform3D tranform);///< Create a new transformed polydata
   
 signals:
   void meshChanged();
