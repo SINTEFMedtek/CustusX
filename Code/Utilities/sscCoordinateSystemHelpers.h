@@ -41,6 +41,7 @@ public:
 
   static ssc::CoordinateSystem getS(ssc::ToolPtr tool); ///<tools sensor coordinate system
   static ssc::CoordinateSystem getT(ssc::ToolPtr tool); ///<tools coordinate system
+  static ssc::CoordinateSystem getTO(ssc::ToolPtr tool); ///<tool offset coordinate system
   static ssc::CoordinateSystem getD(ssc::DataPtr data);///<datas coordinate system
   static ssc::CoordinateSystem getPr(); ///<patient references coordinate system
   static ssc::CoordinateSystem getR(); ///<data references coordinate system
@@ -54,6 +55,7 @@ private:
   Transform3D get_rMd(QString uid) const; ///< ref_M_d
   Transform3D get_rMpr() const; ///< ref_M_pr
   Transform3D get_rMt(QString uid) const; ///< ref_M_t
+  Transform3D get_rMto(QString uid) const; ///< t_M_to
   Transform3D get_rMs(QString uid) const; ///< ref_M_s
 };
 typedef CoordinateSystemHelpers SpaceHelpers;

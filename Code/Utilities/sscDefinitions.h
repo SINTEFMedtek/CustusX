@@ -28,7 +28,7 @@ namespace ssc
 		ftCOUNT
 	};
 	/**Determines the clinical application where the system is to be used.
-	 * Use this to adapt components to that clinical application« terminology/habits.
+	 * Use this to adapt components to that clinical applicationï¿½ terminology/habits.
 	 */
 	enum CLINICAL_APPLICATION
 	{
@@ -59,6 +59,7 @@ namespace ssc
 	  csPATIENTREF, ///< the patient/tool reference space (pr)
 	  csTOOL, ///< a tools rspace (t)
 	  csSENSOR, ///< a tools sensor space (s)
+	  csTOOL_OFFSET, ///< the tool space t with a virtual offset added along the z axis.
 	  csCOUNT
 	};
 

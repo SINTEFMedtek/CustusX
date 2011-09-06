@@ -56,6 +56,7 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces()
 	// alias for the currently active tool:
   retval.push_back(CoordinateSystem(csTOOL, "active"));
   retval.push_back(CoordinateSystem(csSENSOR, "active"));
+  retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
 
 	std::map<QString, ToolPtr> tools = *toolManager()->getTools();
 	for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
@@ -65,6 +66,10 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces()
 	for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		retval.push_back(CoordinateSystem(csSENSOR, iter->first));
+	}
+	for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	{
+		retval.push_back(CoordinateSystem(csTOOL_OFFSET, iter->first));
 	}
 
 	return retval;
@@ -121,6 +126,9 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from) const
   case csSENSOR:
     rMfrom = this->get_rMs(from.mRefObject);
     break;
+  case csTOOL_OFFSET:
+    rMfrom = this->get_rMto(from.mRefObject);
+    break;
   default:
 
     break;
@@ -159,6 +167,26 @@ ssc::CoordinateSystem CoordinateSystemHelpers::getT(ssc::ToolPtr tool)
 
   return retval;
 }
+
+ssc::CoordinateSystem CoordinateSystemHelpers::getTO(ssc::ToolPtr tool)
+{
+  ssc::CoordinateSystem retval;
+  if(!tool)
+    return retval;
+
+  ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+  if(refTool && (tool == refTool))
+  {
+    retval.mId = ssc::csPATIENTREF;
+  }
+  else
+    retval.mId = ssc::csTOOL_OFFSET;
+
+  retval.mRefObject = tool->getUid();
+
+  return retval;
+}
+
 
 ssc::CoordinateSystem CoordinateSystemHelpers::getD(ssc::DataPtr data)
 {
@@ -224,6 +252,24 @@ Transform3D CoordinateSystemHelpers::get_rMt(QString uid) const
    return Transform3D::Identity();
   }
   return this->get_rMpr() * tool->get_prMt(); // ref_M_t
+}
+
+Transform3D CoordinateSystemHelpers::get_rMto(QString uid) const
+{
+  ToolPtr tool = toolManager()->getTool(uid);
+
+  if (!tool && uid=="active")
+    tool = toolManager()->getDominantTool();
+
+  if(!tool)
+  {
+   messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+   return Transform3D::Identity();
+  }
+
+  double offset = tool->getTooltipOffset();
+  Transform3D tMto = createTransformTranslate(Vector3D(0,0,offset));
+  return this->get_rMpr() * tool->get_prMt() * tMto; // ref_M_to
 }
 
 Transform3D CoordinateSystemHelpers::get_rMs(QString uid) const
