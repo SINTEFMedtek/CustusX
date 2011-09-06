@@ -204,9 +204,15 @@ RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findCurr
 QDateTime RegistrationHistoryWidget::getActiveTime()
 {
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-  if (raw.empty())
-    return QDateTime();
-  return raw.back()->getActiveTime();
+
+  for (unsigned i=0; i<raw.size(); ++i)
+  {
+  	if (raw[i]->isNull())
+  		continue;
+    return raw[i]->getActiveTime();
+  }
+
+  return QDateTime();
 }
 
 /**set a new active time
@@ -214,11 +220,11 @@ QDateTime RegistrationHistoryWidget::getActiveTime()
  */
 void RegistrationHistoryWidget::setActiveTime(QDateTime active)
 {
-//  ssc::messageManager()->sendInfo("setting active registration time " + active.toString(ssc::timestampSecondsFormatNice()) + ".");
-
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   for (unsigned i=0; i<raw.size(); ++i)
   {
+//  	std::cout << "RegistrationHistoryWidget::setActiveTime() " << i << "/" << raw.size() << " - " << active.toString(ssc::timestampSecondsFormatNice()) << std::endl;
+
     raw[i]->setActiveTime(active);
   }
 }
@@ -302,6 +308,8 @@ void RegistrationHistoryWidget::rewindSlot()
 
 QString RegistrationHistoryWidget::debugDump()
 {
+//	std::cout << "RegistrationHistoryWidget::debugDump() " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << std::endl;
+
   TimeMap times = this->getRegistrationTimes();
   bool addedBreak = false;
   std::stringstream ss;
@@ -384,6 +392,8 @@ void RegistrationHistoryWidget::showDetailsSlot()
 
 void RegistrationHistoryWidget::updateSlot()
 {
+//	std::cout << "RegistrationHistoryWidget::updateSlot()" << std::endl;
+
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   std::vector<ssc::RegistrationTransform> history = mergeHistory(raw);
 
