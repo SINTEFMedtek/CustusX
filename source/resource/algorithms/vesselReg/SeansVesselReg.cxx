@@ -366,7 +366,7 @@ vtkPolyDataPtr SeansVesselReg::convertToPolyData(ssc::DataPtr data)
   }
   else if (mesh)
   {
-    return mesh->getVtkPolyData();
+    return mesh->getTransformedPolyData(mesh->get_rMd());
   }
 
   return vtkPolyDataPtr();
@@ -382,6 +382,7 @@ void printPoly(vtkPolyDataPtr data)
   }
 }
 
+//source is moving and target is fixed
 bool SeansVesselReg::doItRight(ssc::DataPtr source, ssc::DataPtr target, QString logPath)
 {
   ssc::messageManager()->sendDebug("SOURCE: "+source->getUid());
