@@ -1,7 +1,7 @@
-#ifndef CXIMAGEREGISTRATIONWIDGET_H_
-#define CXIMAGEREGISTRATIONWIDGET_H_
+#ifndef CXLANDMARKIMAGEREGISTRATIONWIDGET_H_
+#define CXLANDMARKIMAGEREGISTRATIONWIDGET_H_
 
-#include "cxRegistrationWidget.h"
+#include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationDataAdapters.h"
 
 class QVBoxLayout;
@@ -14,21 +14,21 @@ class QSlider;
 namespace cx
 {
 /**
- * \class ImageRegistrationWidget
+ * \class LandmarkImageRegistrationWidget
  *
  * \brief Widget for performing landmark based image registration
  *
  * \date Jan 27, 2009
  * \author: Janne Beate Bakeng, SINTEF
  */
-class ImageRegistrationWidget : public RegistrationWidget
+class LandmarkImageRegistrationWidget : public LandmarkRegistrationWidget
 {
   Q_OBJECT
 
 public:
 
-  ImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle); ///< sets up layout and connects signals and slots
-  virtual ~ImageRegistrationWidget(); ///< empty
+  LandmarkImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle); ///< sets up layout and connects signals and slots
+  virtual ~LandmarkImageRegistrationWidget(); ///< empty
   virtual QString defaultWhatsThis() const;
 
 signals:
@@ -42,22 +42,22 @@ protected slots:
   virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
   void thresholdChangedSlot(const int value); ///< reemits the valueChanged signal from the slider
 
-  void registerSlot();
-  void autoRegisterSlot(bool checked);
+//  void registerSlot();
+//  void autoRegisterSlot(bool checked);
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
   virtual ssc::LandmarkMap getTargetLandmarks() const;
-  virtual void performRegistration();
-  virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
+  virtual void performRegistration() {}
+  virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
   QString getLandmarkName(QString uid);
   virtual ssc::Transform3D getTargetTransform() const;
-  void internalPerformRegistration(bool doIt);
+//  void internalPerformRegistration(bool doIt);
   ssc::ProbeRepPtr getProbeRep();
 
   //gui
-  RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
+//  RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
   ssc::StringDataAdapterPtr mActiveImageAdapter;
 
   QPushButton* mAddLandmarkButton; ///< the Add Landmark button
@@ -66,12 +66,12 @@ protected:
   QLabel*      mThresholdLabel; ///< label for the tresholdslider
   QSlider*     mThresholdSlider; ///< slider for setting the probing treshold
 
-  QPushButton* mRegisterButton;
-  QCheckBox* mAutoRegisterCheckBox;
+//  QPushButton* mRegisterButton;
+//  QCheckBox* mAutoRegisterCheckBox;
 
 private:
-  ImageRegistrationWidget(); ///< not implemented
+  LandmarkImageRegistrationWidget(); ///< not implemented
 };
 }//namespace cx
 
-#endif /* CXIMAGEREGISTRATIONWIDGET_H_ */
+#endif /* CXLANDMARKIMAGEREGISTRATIONWIDGET_H_ */

@@ -1,7 +1,8 @@
-#ifndef CXPATIENTREGISTRATIONWIDGET_H_
-#define CXPATIENTREGISTRATIONWIDGET_H_
+#ifndef CXLANDMARKPATIENTREGISTRATIONWIDGET_H_
+#define CXLANDMARKPATIENTREGISTRATIONWIDGET_H_
 
-#include "cxRegistrationWidget.h"
+#include "cxLandmarkRegistrationWidget.h"
+#include "cxRegistrationDataAdapters.h"
 
 #include <sscImage.h>
 #include <sscTransform3D.h>
@@ -23,48 +24,54 @@ typedef ssc::Transform3D Transform3D;
 typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
 
 /**
- * \class PatientRegistrationWidget
+ * \class LandmarkPatientRegistrationWidget
  *
  * \brief Widget used as a tab in the ContexDockWidget for patient registration.
  *
  * \date Feb 3, 2009
  * \author: Janne Beate Bakeng, SINTEF
  */
-class PatientRegistrationWidget : public RegistrationWidget
+class LandmarkPatientRegistrationWidget : public LandmarkRegistrationWidget
 {
   Q_OBJECT
 
 public:
-  PatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle); ///< sets up layout and connects signals and slots
-  virtual ~PatientRegistrationWidget(); ///< empty
+  LandmarkPatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle); ///< sets up layout and connects signals and slots
+  virtual ~LandmarkPatientRegistrationWidget(); ///< empty
   virtual QString defaultWhatsThis() const;
 
 protected slots:
 
+	void registerSlot();
   virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
   void toolVisibleSlot(bool visible); ///< enables/disables the Sample Tool button
   void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
   void dominantToolChangedSlot(const QString& uid); ///< set which tool to sample from
   void enableToolSampleButton();
+  virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
+  void removeLandmarkButtonClickedSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
-  virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
+  virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
   virtual ssc::LandmarkMap getTargetLandmarks() const;
   virtual ssc::Transform3D getTargetTransform() const;
   virtual void performRegistration();
 
   //gui
   QPushButton* mToolSampleButton; ///< the Sample Tool button
+  QPushButton* mRemoveLandmarkButton;
 
   //data
   ssc::ToolPtr mToolToSample; ///< tool to be sampled from
+  RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
+  QPushButton* mRegisterButton;
 
 private:
-  PatientRegistrationWidget(); ///< not implemented
+  LandmarkPatientRegistrationWidget(); ///< not implemented
 
 };
 }//namespace cx
 
-#endif /* CXPATIENTREGISTRATIONWIDGET_H_ */
+#endif /* CXLANDMARKPATIENTREGISTRATIONWIDGET_H_ */
