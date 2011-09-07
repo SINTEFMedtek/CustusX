@@ -1,5 +1,5 @@
 /**
- *\class RegistrationWidget
+ *\class LandmarkRegistrationWidget
  *
  *\brief
  *
@@ -7,8 +7,8 @@
  *      Author: dev
  */
 
-#ifndef CXREGISTRATIONWIDGET_H_
-#define CXREGISTRATIONWIDGET_H_
+#ifndef CXLANDMARKREGISTRATIONWIDGET_H_
+#define CXLANDMARKREGISTRATIONWIDGET_H_
 
 
 #include <map>
@@ -29,16 +29,16 @@ namespace cx
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 /**
- * \class RegistrationWidget
+ * \class LandmarkRegistrationWidget
  * Superclass for Image Registration and Patient Registration
  */
-class RegistrationWidget : public RegistrationBaseWidget
+class LandmarkRegistrationWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
 
 public:
-  RegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~RegistrationWidget();
+  LandmarkRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle);
+  virtual ~LandmarkRegistrationWidget();
 
   virtual QString defaultWhatsThis() const;
 
@@ -53,7 +53,7 @@ protected slots:
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
-  virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
+  virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
   virtual ssc::LandmarkMap getTargetLandmarks() const = 0;
   virtual void performRegistration() = 0;
   virtual ssc::Transform3D getTargetTransform() const = 0;
@@ -64,8 +64,6 @@ protected:
   double getAccuracy(QString uid);
   double getAvarageAccuracy();
 
-
-
   //gui
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
   QTableWidget* mLandmarkTableWidget; ///< the table widget presenting the landmarks
@@ -73,12 +71,12 @@ protected:
 
   //data
   QString mActiveLandmark; ///< uid of surrently selected landmark.
-  ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
 
 private:
-  RegistrationWidget(); ///< not implemented
+  LandmarkRegistrationWidget(); ///< not implemented
+  ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
 };
 }//namespace cx
 
 
-#endif /* CXREGISTRATIONWIDGET_H_ */
+#endif /* CXLANDMARKREGISTRATIONWIDGET_H_ */

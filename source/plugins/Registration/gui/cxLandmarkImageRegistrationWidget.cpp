@@ -1,4 +1,4 @@
-#include "cxImageRegistrationWidget.h"
+#include "cxLandmarkImageRegistrationWidget.h"
 
 #include <sstream>
 #include <QVBoxLayout>
@@ -22,12 +22,11 @@
 
 namespace cx
 {
-ImageRegistrationWidget::ImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
-  RegistrationWidget(regManager, parent, objectName, windowTitle),
+LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
+  LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle),
   mThresholdLabel(new QLabel("Probing treshold:", this)),
   mThresholdSlider(new QSlider(Qt::Horizontal, this))
 {
-  mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
   mActiveImageAdapter = ActiveImageStringDataAdapter::New();
 
   //pushbuttons
@@ -41,28 +40,15 @@ ImageRegistrationWidget::ImageRegistrationWidget(RegistrationManagerPtr regManag
   mEditLandmarkButton->setDisabled(true);
   connect(mEditLandmarkButton, SIGNAL(clicked()), this, SLOT(editLandmarkButtonClickedSlot()));
 
-  mRemoveLandmarkButton = new QPushButton("Remove", this);
-  mRemoveLandmarkButton->setToolTip("Remove landmark");
+  mRemoveLandmarkButton = new QPushButton("Clear", this);
+  mRemoveLandmarkButton->setToolTip("Clear selected landmark");
   mRemoveLandmarkButton->setDisabled(true);
   connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
-
-  bool autoReg = settings()->value("autoLandmarkRegistration").toBool();
-  mRegisterButton = new QPushButton("Register", this);
-  mRegisterButton->setToolTip("Perform registration");
-  mRegisterButton->setEnabled(!autoReg);
-  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
-
-  mAutoRegisterCheckBox = new QCheckBox("Auto", this);
-  mAutoRegisterCheckBox->setToolTip("Automatic registration whenever a landmark has changed");
-  connect(mAutoRegisterCheckBox, SIGNAL(clicked(bool)), this, SLOT(autoRegisterSlot(bool)));
-  mAutoRegisterCheckBox->setChecked(autoReg);
 
   //slider
   connect(mThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(thresholdChangedSlot(int)));
 
   //layout
-  //moved to help text   mVerticalLayout->addWidget(new QLabel("Landmark image registration will move the active image to the fixed image."));
-  mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFixedDataAdapter));
   mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mActiveImageAdapter));
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mAvarageAccuracyLabel);
@@ -73,31 +59,15 @@ ImageRegistrationWidget::ImageRegistrationWidget(RegistrationManagerPtr regManag
   landmarkButtonsLayout->addWidget(mRemoveLandmarkButton);
   mVerticalLayout->addLayout(landmarkButtonsLayout);
 
-  QHBoxLayout* regLayout = new QHBoxLayout;
-  regLayout->addWidget(mAutoRegisterCheckBox);
-  regLayout->addWidget(mRegisterButton);
-  mVerticalLayout->addLayout(regLayout);
-
   mVerticalLayout->addWidget(mThresholdLabel);
   mVerticalLayout->addWidget(mThresholdSlider);
 }
 
-void ImageRegistrationWidget::registerSlot()
-{
-  this->internalPerformRegistration(true);
-}
-
-void ImageRegistrationWidget::autoRegisterSlot(bool checked)
-{
-  settings()->setValue("autoLandmarkRegistration", checked);
-  mRegisterButton->setEnabled(!checked);
-}
-
-ImageRegistrationWidget::~ImageRegistrationWidget()
+LandmarkImageRegistrationWidget::~LandmarkImageRegistrationWidget()
 {
 }
 
-QString ImageRegistrationWidget::defaultWhatsThis() const
+QString LandmarkImageRegistrationWidget::defaultWhatsThis() const
 {
   return "<html>"
       "<h3>Landmark based image registration.</h3>"
@@ -107,27 +77,29 @@ QString ImageRegistrationWidget::defaultWhatsThis() const
       "</html>";
 }
 
-void ImageRegistrationWidget::activeImageChangedSlot()
+void LandmarkImageRegistrationWidget::activeImageChangedSlot()
 {
-  RegistrationWidget::activeImageChangedSlot();
+  LandmarkRegistrationWidget::activeImageChangedSlot();
 
-  if(mCurrentImage)
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+
+  if(image)
   {
     //set a default treshold
-    mThresholdSlider->setRange(mCurrentImage->getMin(), mCurrentImage->getMax());
+    mThresholdSlider->setRange(image->getMin(), image->getMax());
     ssc::ProbeRepPtr probe = this->getProbeRep();
     if (probe)
       mThresholdSlider->setValue(probe->getThreshold());
 
     if(!mManager->getFixedData())
-    	mManager->setFixedData(mCurrentImage);
+    	mManager->setFixedData(image);
   }
 
   //enable the add point button
-  mAddLandmarkButton->setEnabled(mCurrentImage!=0);
+  mAddLandmarkButton->setEnabled(image!=0);
 }
 
-ssc::ProbeRepPtr ImageRegistrationWidget::getProbeRep()
+ssc::ProbeRepPtr LandmarkImageRegistrationWidget::getProbeRep()
 {
   if (!viewManager()->get3DView(0,0))
     return ssc::ProbeRepPtr();
@@ -135,7 +107,7 @@ ssc::ProbeRepPtr ImageRegistrationWidget::getProbeRep()
   return RepManager::findFirstRep<ssc::ProbeRep>(viewManager()->get3DView(0,0)->getReps());
 }
 
-void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
+void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {
   ssc::ProbeRepPtr probeRep = this->getProbeRep();
   if(!probeRep)
@@ -144,16 +116,20 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
     return;
   }
 
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (!image)
+  	return;
+
   QString uid = ssc::dataManager()->addLandmark();
   ssc::Vector3D pos_r = probeRep->getPosition();
-  ssc::Vector3D pos_d = mCurrentImage->get_rMd().inv().coord(pos_r);
-  //std::cout << "ImageRegistrationWidget::addLandmarkButtonClickedSlot()" << uid << ", " << pos_r << "ci=" << mCurrentImage.get() << std::endl;
-  mCurrentImage->setLandmark(ssc::Landmark(uid, pos_d));
+  ssc::Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
+  //std::cout << "LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()" << uid << ", " << pos_r << "ci=" << mCurrentImage.get() << std::endl;
+  image->setLandmark(ssc::Landmark(uid, pos_d));
 
   this->nextRow();
 }
 
-void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
+void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
   ssc::ProbeRepPtr probeRep = this->getProbeRep();
   if(!probeRep)
@@ -161,33 +137,42 @@ void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
     ssc::messageManager()->sendError("Could not find a rep to edit the landmark for.");
     return;
   }
+
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (!image)
+  	return;
+
+
   QString uid = mActiveLandmark;
   ssc::Vector3D pos_r = probeRep->getPosition();
-  ssc::Vector3D pos_d = mCurrentImage->get_rMd().inv().coord(pos_r);
-  mCurrentImage->setLandmark(ssc::Landmark(uid, pos_d));
+  ssc::Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
+  image->setLandmark(ssc::Landmark(uid, pos_d));
 
   this->nextRow();
 }
 
-void ImageRegistrationWidget::removeLandmarkButtonClickedSlot()
+void LandmarkImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
-  if(mCurrentImage)
-    mCurrentImage->removeLandmark(mActiveLandmark);
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (!image)
+  	return;
+
+  image->removeLandmark(mActiveLandmark);
 
   this->nextRow();
 }
 
-void ImageRegistrationWidget::cellClickedSlot(int row, int column)
+void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
 {
-  RegistrationWidget::cellClickedSlot(row, column);
+  LandmarkRegistrationWidget::cellClickedSlot(row, column);
 
   mEditLandmarkButton->setEnabled(true);
   mRemoveLandmarkButton->setEnabled(true);
 }
 
-void ImageRegistrationWidget::showEvent(QShowEvent* event)
+void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 {
-  RegistrationWidget::showEvent(event);
+  LandmarkRegistrationWidget::showEvent(event);
 
   ssc::ProbeRepPtr probeRep = this->getProbeRep();
   if(probeRep)
@@ -198,9 +183,9 @@ void ImageRegistrationWidget::showEvent(QShowEvent* event)
   viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
 }
 
-void ImageRegistrationWidget::hideEvent(QHideEvent* event)
+void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
-  RegistrationWidget::hideEvent(event);
+  LandmarkRegistrationWidget::hideEvent(event);
 
 //  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
   ssc::ProbeRepPtr probeRep = this->getProbeRep();
@@ -209,9 +194,9 @@ void ImageRegistrationWidget::hideEvent(QHideEvent* event)
   viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 
-void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
+void LandmarkImageRegistrationWidget::populateTheLandmarkTableWidget()
 {
-  RegistrationWidget::populateTheLandmarkTableWidget(image);
+  LandmarkRegistrationWidget::populateTheLandmarkTableWidget();
 
   std::vector<ssc::Landmark> landmarks =  this->getAllLandmarks();
 
@@ -220,15 +205,16 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
   mEditLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
 }
 
-ssc::LandmarkMap ImageRegistrationWidget::getTargetLandmarks() const
+ssc::LandmarkMap LandmarkImageRegistrationWidget::getTargetLandmarks() const
 {
-  if(mCurrentImage)
-    return mCurrentImage->getLandmarks();
-  else
-    return ssc::LandmarkMap();
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (!image)
+  	return ssc::LandmarkMap();
+
+  return image->getLandmarks();
 }
 
-void ImageRegistrationWidget::thresholdChangedSlot(const int value)
+void LandmarkImageRegistrationWidget::thresholdChangedSlot(const int value)
 {
   emit thresholdChanged(value);
 
@@ -239,35 +225,15 @@ void ImageRegistrationWidget::thresholdChangedSlot(const int value)
   mThresholdLabel->setText(text);
 }
 
-void ImageRegistrationWidget::performRegistration()
-{
-  bool autoReg = settings()->value("autoLandmarkRegistration").toBool();
-  this->internalPerformRegistration(autoReg);
-}
-
-void ImageRegistrationWidget::internalPerformRegistration(bool doIt)
-{
-  if (doIt && mCurrentImage)
-  {
-    //make sure the fixedData is set
-    ssc::DataPtr fixedData = mManager->getFixedData();
-    if(!fixedData)
-    	mManager->setFixedData(mCurrentImage);
-
-    mManager->doImageRegistration(mCurrentImage);
-  }
-
-  this->updateAvarageAccuracyLabel();
-}
-
 /** Return transform from target space to reference space
  *
  */
-ssc::Transform3D ImageRegistrationWidget::getTargetTransform() const
+ssc::Transform3D LandmarkImageRegistrationWidget::getTargetTransform() const
 {
-  if (!mCurrentImage)
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (!image)
     return ssc::Transform3D::Identity();
-  return mCurrentImage->get_rMd();
+  return image->get_rMd();
 }
 
 
