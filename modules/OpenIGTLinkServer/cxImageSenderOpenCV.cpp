@@ -147,7 +147,7 @@ void ImageSenderOpenCV::tick()
 {
 //  std::cout << "tick" << std::endl;
 //  QTime start = QTime::currentTime();
-  igtl::ImageMessage::Pointer imgMsg = this->getImageMessage();
+	IGTLinkImageMessage::Pointer imgMsg = this->getImageMessage();
 
   if (mSocket)
   {
@@ -159,10 +159,10 @@ void ImageSenderOpenCV::tick()
   }
 }
 
-igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
+IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 {
   if (!mVideoCapture.isOpened())
-    return igtl::ImageMessage::Pointer();
+    return IGTLinkImageMessage::Pointer();
 
   QTime start = QTime::currentTime();
 
@@ -192,7 +192,7 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   if (!frame.isContinuous())
   {
     std::cout << "Error: Non-continous frame data." << std::endl;
-    return igtl::ImageMessage::Pointer();
+    return IGTLinkImageMessage::Pointer();
   }
 
   int size[]  = {1.0, 1.0, 1.0};     // spacing (mm/pixel)
@@ -206,17 +206,17 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 
   if (frame.channels()==3 || frame.channels()==4)
   {
-      scalarType = igtl::ImageMessage::TYPE_UINT32;// scalar type
+      scalarType = IGTLinkImageMessage::TYPE_UINT32;// scalar type
   }
   else if (frame.channels()==1)
   {
     if (frame.depth()==16)
     {
-      scalarType = igtl::ImageMessage::TYPE_UINT16;// scalar type
+      scalarType = IGTLinkImageMessage::TYPE_UINT16;// scalar type
     }
     else if (frame.depth()==8)
     {
-      scalarType = igtl::ImageMessage::TYPE_UINT8;// scalar type
+      scalarType = IGTLinkImageMessage::TYPE_UINT8;// scalar type
     }
   }
 
@@ -227,7 +227,7 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   }
   //------------------------------------------------------------
   // Create a new IMAGE type message
-  igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
+  IGTLinkImageMessage::Pointer imgMsg = IGTLinkImageMessage::New();
   imgMsg->SetDimensions(size);
   imgMsg->SetSpacing(spacingF);
   imgMsg->SetScalarType(scalarType);
