@@ -105,7 +105,7 @@ ViewManager::ViewManager() :
   this->syncOrientationMode(SyncedValue::create(0));
 
   // set start layout
-  this->setActiveLayout("LAYOUT_ORTHOGONAL_3DACS_x1");
+  this->setActiveLayout("LAYOUT_3D_ACS_SINGLE");
 
   this->setRenderingInterval(settings()->value("renderingInterval").toInt());
 
@@ -250,9 +250,9 @@ void ViewManager::addXml(QDomNode& parentNode)
   global2DZoomNode.appendChild(doc.createTextNode(string_cast(mGlobal2DZoom).c_str()));
   viewManagerNode.appendChild(global2DZoomNode);
 
-  QDomElement activeLayoutNode = doc.createElement("activeLayout");
-  activeLayoutNode.appendChild(doc.createTextNode(mActiveLayout));
-  viewManagerNode.appendChild(activeLayoutNode);
+//  QDomElement activeLayoutNode = doc.createElement("activeLayout");
+//  activeLayoutNode.appendChild(doc.createTextNode(mActiveLayout));
+//  viewManagerNode.appendChild(activeLayoutNode);
 
   QDomElement activeViewNode = doc.createElement("activeView");
   activeViewNode.appendChild(doc.createTextNode(mActiveView));
@@ -283,12 +283,14 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
         this->setGlobal2DZoom(false);
       else
         this->setGlobal2DZoom(true);
-    }else if(child.toElement().tagName() == "activeLayout")
-    {
-      const QString activeLayoutString = child.toElement().text();
-      if(!activeLayoutString.isEmpty())
-        this->setActiveLayout(activeLayoutString);
     }
+// removed because the layout is better stored in the global settings file (bug #364)
+//    else if(child.toElement().tagName() == "activeLayout")
+//    {
+//      const QString activeLayoutString = child.toElement().text();
+//      if(!activeLayoutString.isEmpty())
+//        this->setActiveLayout(activeLayoutString);
+//    }
     else if(child.toElement().tagName() == "activeView")
     {
       activeViewString = child.toElement().text();
@@ -528,12 +530,14 @@ Us Acq
   // ------------------------------------------------------
   this->addDefaultLayout(LayoutData::createHeader("LAYOUT_GROUP_3D", "3D"));
   {
+  	// 3D only
     LayoutData layout = LayoutData::create("LAYOUT_3D", "3D", 1, 1);
     layout.setView(0, ssc::View::VIEW_3D, LayoutRegion(0, 0));
     this->addDefaultLayout(layout);
   }
   {
-    LayoutData layout = LayoutData::create("LAYOUT_3D_ACS", "3D ACS", 3, 4);
+  	// 3D ACS in a single view group
+    LayoutData layout = LayoutData::create("LAYOUT_3D_ACS_SINGLE", "3D ACS Single", 3, 4);
     layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 3, 3));
     layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 3));
     layout.setView(0, ssc::ptCORONAL,  LayoutRegion(1, 3));
@@ -541,10 +545,28 @@ Us Acq
     this->addDefaultLayout(layout);
   }
   {
-    LayoutData layout = LayoutData::create("LAYOUT_3D_AD", "3D AnyDual", 2, 4);
+  	// 3D Any in a single view group
+    LayoutData layout = LayoutData::create("LAYOUT_3D_AD_SINGLE", "3D AnyDual Single", 2, 4);
     layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 2, 3));
     layout.setView(0, ssc::ptANYPLANE,    LayoutRegion(0, 3));
     layout.setView(0, ssc::ptSIDEPLANE,  LayoutRegion(1, 3));
+    this->addDefaultLayout(layout);
+  }
+  {
+  	// 3D ACS
+    LayoutData layout = LayoutData::create("LAYOUT_3D_ACS", "3D ACS", 3, 4);
+    layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 3, 3));
+    layout.setView(1, ssc::ptAXIAL,    LayoutRegion(0, 3));
+    layout.setView(1, ssc::ptCORONAL,  LayoutRegion(1, 3));
+    layout.setView(1, ssc::ptSAGITTAL, LayoutRegion(2, 3));
+    this->addDefaultLayout(layout);
+  }
+  {
+  	// 3D Any
+    LayoutData layout = LayoutData::create("LAYOUT_3D_AD", "3D AnyDual", 2, 4);
+    layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 2, 3));
+    layout.setView(1, ssc::ptANYPLANE,    LayoutRegion(0, 3));
+    layout.setView(1, ssc::ptSIDEPLANE,  LayoutRegion(1, 3));
     this->addDefaultLayout(layout);
   }
 
@@ -555,17 +577,17 @@ Us Acq
   {
     LayoutData layout = LayoutData::create("LAYOUT_OBLIQUE_3DAnyDual_x1", "3D Any Dual x1", 1, 3);
     layout.setView(0, ssc::View::VIEW_3D, LayoutRegion(0, 0));
-    layout.setView(0, ssc::ptANYPLANE,    LayoutRegion(0, 1));
-    layout.setView(0, ssc::ptSIDEPLANE,   LayoutRegion(0, 2));
+    layout.setView(1, ssc::ptANYPLANE,    LayoutRegion(0, 1));
+    layout.setView(1, ssc::ptSIDEPLANE,   LayoutRegion(0, 2));
     this->addDefaultLayout(layout);
   }
   {
     LayoutData layout = LayoutData::create("LAYOUT_OBLIQUE_3DAnyDual_x2", "3D Any Dual x2", 2, 3);
     layout.setView(0, ssc::View::VIEW_3D, LayoutRegion(0, 0, 2, 1));
-    layout.setView(0, ssc::ptANYPLANE,    LayoutRegion(0, 1));
-    layout.setView(0, ssc::ptSIDEPLANE,   LayoutRegion(1, 1));
-    layout.setView(1, ssc::ptANYPLANE,    LayoutRegion(0, 2));
-    layout.setView(1, ssc::ptSIDEPLANE,   LayoutRegion(1, 2));
+    layout.setView(1, ssc::ptANYPLANE,    LayoutRegion(0, 1));
+    layout.setView(1, ssc::ptSIDEPLANE,   LayoutRegion(1, 1));
+    layout.setView(2, ssc::ptANYPLANE,    LayoutRegion(0, 2));
+    layout.setView(2, ssc::ptSIDEPLANE,   LayoutRegion(1, 2));
     this->addDefaultLayout(layout);
   }
   {
@@ -586,20 +608,20 @@ Us Acq
   {
     LayoutData layout = LayoutData::create("LAYOUT_ORTHOGONAL_3DACS_x1", "3D ACS x1", 2, 2);
     layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0));
-    layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 1));
-    layout.setView(0, ssc::ptCORONAL,  LayoutRegion(1, 0));
-    layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(1, 1));
+    layout.setView(1, ssc::ptAXIAL,    LayoutRegion(0, 1));
+    layout.setView(1, ssc::ptCORONAL,  LayoutRegion(1, 0));
+    layout.setView(1, ssc::ptSAGITTAL, LayoutRegion(1, 1));
     this->addDefaultLayout(layout);
   }
   {
     LayoutData layout = LayoutData::create("LAYOUT_ORTHOGONAL_3DACS_x2", "3D ACS x2", 3, 3);
     layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 3, 1));
-    layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 1));
-    layout.setView(0, ssc::ptCORONAL,  LayoutRegion(1, 1));
-    layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(2, 1));
-    layout.setView(1, ssc::ptAXIAL,    LayoutRegion(0, 2));
-    layout.setView(1, ssc::ptCORONAL,  LayoutRegion(1, 2));
-    layout.setView(1, ssc::ptSAGITTAL, LayoutRegion(2, 2));
+    layout.setView(1, ssc::ptAXIAL,    LayoutRegion(0, 1));
+    layout.setView(1, ssc::ptCORONAL,  LayoutRegion(1, 1));
+    layout.setView(1, ssc::ptSAGITTAL, LayoutRegion(2, 1));
+    layout.setView(2, ssc::ptAXIAL,    LayoutRegion(0, 2));
+    layout.setView(2, ssc::ptCORONAL,  LayoutRegion(1, 2));
+    layout.setView(2, ssc::ptSAGITTAL, LayoutRegion(2, 2));
     this->addDefaultLayout(layout);
   }
   {
@@ -617,7 +639,7 @@ Us Acq
   }
 
   // ------------------------------------------------------
-  // --- group of RTsource-based layouts ------------------
+  // --- group of RTsource-based layouts - single viewgroup
   // ------------------------------------------------------
   this->addDefaultLayout(LayoutData::createHeader("LAYOUT_GROUP_RT", "Realtime Source"));
   {
