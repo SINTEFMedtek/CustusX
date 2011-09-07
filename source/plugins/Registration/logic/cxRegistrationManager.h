@@ -52,7 +52,7 @@ public:
   ssc::Transform3D getManualPatientRegistrationOffset(); ///< get the offset transform that moves the patient registration
 
   void doPatientRegistration(); ///< registrates the fixed image to the patient
-  void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the fixed image
+  void doImageRegistration(); ///< registrates the image to the fixed image
   void doFastRegistration_Orientation(const ssc::Transform3D& tMtm); ///< use the current dominant tool orientation to find patient orientation
   void doFastRegistration_Translation(); ///< use the landmarks in master image and patient to perform a translation-only landmark registration
   void doVesselRegistration(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample, int single_point_thre, bool verbose, QString logPath);

@@ -6,7 +6,7 @@
 namespace cx
 {
 FastPatientRegistrationWidget::FastPatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-    PatientRegistrationWidget(regManager, parent, "FastPatientRegistrationWidget", "Fast Patient Registration")
+    LandmarkPatientRegistrationWidget(regManager, parent, "FastPatientRegistrationWidget", "Fast Patient Registration")
 {
 }
 
