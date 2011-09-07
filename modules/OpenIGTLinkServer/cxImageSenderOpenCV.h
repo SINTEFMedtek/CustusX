@@ -18,6 +18,7 @@ class QTimer;
 #include <opencv2/highgui/highgui.hpp>
 #include <QStringList>
 #include "cxImageSenderFactory.h"
+#include "../grabberCommon/cxIGTLinkImageMessage.h"
 
 namespace cx
 {
@@ -46,7 +47,7 @@ private:
   QTimer* mTimer;
   StringMap mArguments;
   void dumpProperties();
-  igtl::ImageMessage::Pointer getImageMessage();
+  IGTLinkImageMessage::Pointer getImageMessage();
   void dumpProperty(int val, QString name);
 
   cv::VideoCapture mVideoCapture; // OpenCV video grabber
