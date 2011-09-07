@@ -308,6 +308,9 @@ void ToolRep3D::updateOffsetGraphics()
   {
     mOffsetPoint->getActor()->SetVisibility(visible);
     mTooltipPoint->getActor()->SetVisibility(visible);
+    //Don't show tooltipPoint when in tool view, as this will obscure the offsetPoint
+    if (mStayHiddenAfterVisible)
+      mTooltipPoint->getActor()->SetVisibility(false);
     mOffsetLine->getActor()->SetVisibility(visible);
   }
 
