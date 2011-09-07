@@ -26,7 +26,7 @@ QString RegistrationFixedImageStringDataAdapter::getValueName() const
 
 bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
 {
-  std::cout << "RegistrationFixedImageStringDataAdapter::setImageSlot " << value << std::endl;
+//  std::cout << "RegistrationFixedImageStringDataAdapter::setImageSlot " << value << std::endl;
 
   ssc::DataPtr newImage = ssc::dataManager()->getData(value);
   if (newImage==mManager->getFixedData())

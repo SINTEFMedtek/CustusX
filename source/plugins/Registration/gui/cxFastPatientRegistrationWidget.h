@@ -1,7 +1,7 @@
 #ifndef CXFASTPATIENTREGISTRATIONWIDGET_H_
 #define CXFASTPATIENTREGISTRATIONWIDGET_H_
 
-#include "cxPatientRegistrationWidget.h"
+#include "cxLandmarkPatientRegistrationWidget.h"
 
 namespace cx
 {
@@ -14,7 +14,7 @@ namespace cx
  * \date 27. sep. 2010
  * \author: Janne Beate Bakeng
  */
-class FastPatientRegistrationWidget : public PatientRegistrationWidget
+class FastPatientRegistrationWidget : public LandmarkPatientRegistrationWidget
 {
 public:
   FastPatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent);

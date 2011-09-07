@@ -1,4 +1,4 @@
-#include "cxPatientRegistrationWidget.h"
+#include "cxLandmarkPatientRegistrationWidget.h"
 
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -17,35 +17,56 @@
 #include "cxRegistrationManager.h"
 #include "sscToolManager.h"
 #include "cxDataManager.h"
+#include "sscLabeledComboBoxWidget.h"
 
 namespace cx
 {
-PatientRegistrationWidget::PatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
-  RegistrationWidget(regManager, parent, objectName, windowTitle),
+LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
+  LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle),
   mToolSampleButton(new QPushButton("Sample Tool", this))
 {
+	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
+
   //buttons
   mToolSampleButton->setDisabled(true);
   connect(mToolSampleButton, SIGNAL(clicked()), this, SLOT(toolSampleButtonClickedSlot()));
+
+  mRemoveLandmarkButton = new QPushButton("Clear", this);
+  mRemoveLandmarkButton->setToolTip("Clear selected landmark");
+//  mRemoveLandmarkButton->setDisabled(true);
+  connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
+
+  mRegisterButton = new QPushButton("Register", this);
+  mRegisterButton->setToolTip("Perform registration");
+  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
   //toolmanager
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot(const QString&)));
 
   //layout
+  mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFixedDataAdapter));
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
   mVerticalLayout->addWidget(mAvarageAccuracyLabel);
+//  mVerticalLayout->addWidget(mRegisterButton);
+//  mVerticalLayout->addWidget(mRemoveLandmarkButton);
+
+  QHBoxLayout* buttonsLayout = new QHBoxLayout;
+  buttonsLayout->addWidget(mRegisterButton);
+  buttonsLayout->addWidget(mRemoveLandmarkButton);
+  mVerticalLayout->addLayout(buttonsLayout);
+
 
   ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
   if(dominantTool)
     this->dominantToolChangedSlot(dominantTool->getUid());
 }
 
-PatientRegistrationWidget::~PatientRegistrationWidget()
+LandmarkPatientRegistrationWidget::~LandmarkPatientRegistrationWidget()
 {
 }
 
-QString PatientRegistrationWidget::defaultWhatsThis() const
+QString LandmarkPatientRegistrationWidget::defaultWhatsThis() const
 {
   return "<html>"
       "<h3>Landmark based patient registration.</h3>"
@@ -55,17 +76,22 @@ QString PatientRegistrationWidget::defaultWhatsThis() const
       "</html>";
 }
 
-void PatientRegistrationWidget::activeImageChangedSlot()
+void LandmarkPatientRegistrationWidget::registerSlot()
 {
-  RegistrationWidget::activeImageChangedSlot();
+	this->performRegistration();
 }
 
-void PatientRegistrationWidget::toolVisibleSlot(bool visible)
+void LandmarkPatientRegistrationWidget::activeImageChangedSlot()
+{
+  LandmarkRegistrationWidget::activeImageChangedSlot();
+}
+
+void LandmarkPatientRegistrationWidget::toolVisibleSlot(bool visible)
 {
   enableToolSampleButton();
 }
 
-void PatientRegistrationWidget::enableToolSampleButton()
+void LandmarkPatientRegistrationWidget::enableToolSampleButton()
 {
   bool enabled = false;
   enabled = mToolToSample &&
@@ -74,7 +100,7 @@ void PatientRegistrationWidget::enableToolSampleButton()
   mToolSampleButton->setEnabled(enabled);
 }
 
-void PatientRegistrationWidget::toolSampleButtonClickedSlot()
+void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 {  
   if(!mToolToSample)
   {
@@ -95,7 +121,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
   this->nextRow();
 }
 
-void PatientRegistrationWidget::dominantToolChangedSlot(const QString& uid)
+void LandmarkPatientRegistrationWidget::dominantToolChangedSlot(const QString& uid)
 {
   if(mToolToSample && mToolToSample->getUid() == uid)
     return;
@@ -117,32 +143,48 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const QString& uid)
 }
 
 
-void PatientRegistrationWidget::showEvent(QShowEvent* event)
+void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 {
-  RegistrationWidget::showEvent(event);
+  LandmarkRegistrationWidget::showEvent(event);
   connect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
   connect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
   viewManager()->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
 }
 
-void PatientRegistrationWidget::hideEvent(QHideEvent* event)
+void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 {
-  RegistrationWidget::hideEvent(event);
+  LandmarkRegistrationWidget::hideEvent(event);
   disconnect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
   disconnect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
   viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 
-void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
+void LandmarkPatientRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
-  RegistrationWidget::populateTheLandmarkTableWidget(image);
+	ssc::toolManager()->removeLandmark(mActiveLandmark);
+  this->nextRow();
+}
+
+void LandmarkPatientRegistrationWidget::cellClickedSlot(int row, int column)
+{
+  LandmarkRegistrationWidget::cellClickedSlot(row, column);
+
+  mRemoveLandmarkButton->setEnabled(true);
+}
+
+void LandmarkPatientRegistrationWidget::populateTheLandmarkTableWidget()
+{
+  LandmarkRegistrationWidget::populateTheLandmarkTableWidget();
+
+  std::vector<ssc::Landmark> landmarks =  this->getAllLandmarks();
+  mRemoveLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
 }
 
 /** Return the landmarks associated with the current widget.
  */
-ssc::LandmarkMap PatientRegistrationWidget::getTargetLandmarks() const
+ssc::LandmarkMap LandmarkPatientRegistrationWidget::getTargetLandmarks() const
 {
   return ssc::toolManager()->getLandmarks();
 }
@@ -150,20 +192,21 @@ ssc::LandmarkMap PatientRegistrationWidget::getTargetLandmarks() const
 /** Return transform from target space to reference space
  *
  */
-ssc::Transform3D PatientRegistrationWidget::getTargetTransform() const
+ssc::Transform3D LandmarkPatientRegistrationWidget::getTargetTransform() const
 {
   ssc::Transform3D rMpr = *(ssc::toolManager()->get_rMpr());
   return rMpr;
 }
 
-void PatientRegistrationWidget::performRegistration()
+void LandmarkPatientRegistrationWidget::performRegistration()
 {
   if(!mManager->getFixedData())
-    mManager->setFixedData(mCurrentImage);
+    mManager->setFixedData(ssc::dataManager()->getActiveImage());
 
   mManager->doPatientRegistration();
 
   this->updateAvarageAccuracyLabel();
 }
+
 
 }//namespace cx
