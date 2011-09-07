@@ -342,57 +342,68 @@ void RegistrationManager::doPatientRegistration()
   ssc::messageManager()->sendSuccess("Patient registration has been performed.");
 }
 
-void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
+void RegistrationManager::doImageRegistration()
 {
   //check that the fixed data is set
-  if(!mFixedData)
+  ssc::ImagePtr fixedImage = boost::dynamic_pointer_cast<ssc::Image>(mFixedData);
+  if(!fixedImage)
   {
+    ssc::messageManager()->sendError("The fixed data is not a image, cannot do landmark image registration!");
+    return;
+  }
+
+  //check that the moving data is set
+  ssc::ImagePtr movingImage = boost::dynamic_pointer_cast<ssc::Image>(mMovingData);
+  if(!movingImage)
+  {
+    ssc::messageManager()->sendError("The moving data is not a image, cannot do landmark image registration!");
     return;
   }
 
   // ignore self-registration, this gives no effect bestcase, buggy behaviour worstcase (has been observed)
-  if(image==boost::shared_dynamic_cast<ssc::Image>(mFixedData))
-    return;
-
-  ssc::ImagePtr fixedImage = boost::dynamic_pointer_cast<ssc::Image>(mFixedData);
-  if(!fixedImage)
+  if(movingImage==fixedImage)
   {
-    ssc::messageManager()->sendError("The fixed data is not a image, cannot do image registration!");
+    ssc::messageManager()->sendError("The moving and fixed are equal, ignoring landmark image registration!");
     return;
   }
 
   ssc::LandmarkMap fixedLandmarks = fixedImage->getLandmarks();
-  ssc::LandmarkMap imageLandmarks = image->getLandmarks();
+  ssc::LandmarkMap imageLandmarks = movingImage->getLandmarks();
 
   std::vector<QString> landmarks = getUsableLandmarks(fixedLandmarks, imageLandmarks);
   vtkPointsPtr p_ref = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
   vtkPointsPtr p_data = convertTovtkPoints(landmarks, imageLandmarks, ssc::Transform3D::Identity());
 
-  if (landmarks.empty())
-    return;
+//  if (landmarks.empty())
+//  {
+//    return;
+//  }
   // ignore if too few data.
   if (p_ref->GetNumberOfPoints() < 3)
+  {
+    ssc::messageManager()->sendError(QString("Found %1 corresponding landmarks, need 3, cannot do landmark image registration!").arg(p_ref->GetNumberOfPoints()));
     return;
+  }
 
   bool ok = false;
   ssc::Transform3D rMd = this->performLandmarkRegistration(p_data, p_ref, &ok);
   if (!ok)
   {
-    ssc::messageManager()->sendError("I-I Landmark registration: Failed to register: [" + qstring_cast(p_data->GetNumberOfPoints()) + "p], "+ image->getName());
+    ssc::messageManager()->sendError("I-I Landmark registration: Failed to register: [" + qstring_cast(p_data->GetNumberOfPoints()) + "p], "+ movingImage->getName());
     return;
   }
 
-  ssc::Transform3D delta = rMd * image->get_rMd().inv();
+  ssc::Transform3D delta = rMd * movingImage->get_rMd().inv();
 
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Image to Image");
   regTrans.mFixed = mFixedData->getUid();
-  regTrans.mMoving = image->getUid();
-  this->updateRegistration(mLastRegistrationTime, regTrans, image, qstring_cast(fixedImage->getUid()));
+  regTrans.mMoving = movingImage->getUid();
+  this->updateRegistration(mLastRegistrationTime, regTrans, movingImage, qstring_cast(fixedImage->getUid()));
 
   mLastRegistrationTime = regTrans.mTimestamp;
 
   //emit imageRegistrationPerformed();
-  ssc::messageManager()->sendSuccess("Image registration has been performed for " + image->getName());
+  ssc::messageManager()->sendSuccess("Image registration has been performed for " + movingImage->getName());
 }
 
 /**Perform a fast orientation by setting the patient registration equal to the current dominant

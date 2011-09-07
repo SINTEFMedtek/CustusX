@@ -10,9 +10,10 @@
 SET( MOC_HEADER_FILES
    cxRegistrationPlugin.h
    #cxRegistrationBaseWidget.h
-    cxImageRegistrationWidget.h
-    cxRegistrationWidget.h
-    cxPatientRegistrationWidget.h
+    cxLandmarkImageRegistrationWidget.h
+    cxLandmarkImage2ImageRegistrationWidget.h
+    cxLandmarkRegistrationWidget.h
+    cxLandmarkPatientRegistrationWidget.h
     cxRegistrationHistoryWidget.h
     cxManualRegistrationOffsetWidget.h
     cxFastImageRegistrationWidget.h
@@ -35,12 +36,14 @@ SET( SOURCE_FILES
    cxRegistrationPlugin.cpp
    cxRegistrationBaseWidget.h
    cxRegistrationBaseWidget.cpp
-    cxImageRegistrationWidget.h
-    cxImageRegistrationWidget.cpp
-    cxRegistrationWidget.h
-    cxRegistrationWidget.cpp
-    cxPatientRegistrationWidget.h
-    cxPatientRegistrationWidget.cpp
+    cxLandmarkImageRegistrationWidget.h
+    cxLandmarkImageRegistrationWidget.cpp
+    cxLandmarkRegistrationWidget.h
+    cxLandmarkRegistrationWidget.cpp
+    cxLandmarkPatientRegistrationWidget.h
+    cxLandmarkPatientRegistrationWidget.cpp
+    cxLandmarkImage2ImageRegistrationWidget.h    
+    cxLandmarkImage2ImageRegistrationWidget.cpp
     cxRegistrationHistoryWidget.h
     cxRegistrationHistoryWidget.cpp
     cxManualRegistrationOffsetWidget.h

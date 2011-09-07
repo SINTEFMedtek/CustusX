@@ -8,7 +8,7 @@ namespace cx
 {
 
 FastImageRegistrationWidget::FastImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
-    ImageRegistrationWidget(regManager, parent, objectName, windowTitle)
+    LandmarkImageRegistrationWidget(regManager, parent, objectName, windowTitle)
 {
 }
 
@@ -31,7 +31,7 @@ void FastImageRegistrationWidget::performRegistration()
   //make sure the masterImage is set
   ssc::DataPtr fixedData = mManager->getFixedData();
   if(!fixedData)
-    mManager->setFixedData(mCurrentImage);
+    mManager->setFixedData(ssc::dataManager()->getActiveImage());
 
   this->updateAvarageAccuracyLabel();
 }
@@ -56,7 +56,7 @@ QString PlateImageRegistrationWidget::defaultWhatsThis() const
 void PlateImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
   ssc::dataManager()->setLandmarkActive(mActiveLandmark, true);
-  ImageRegistrationWidget::editLandmarkButtonClickedSlot();
+  LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot();
 }
 
 void PlateImageRegistrationWidget::performRegistration()

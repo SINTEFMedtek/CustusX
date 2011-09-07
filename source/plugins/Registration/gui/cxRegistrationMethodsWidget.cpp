@@ -18,8 +18,9 @@
 //#include "cxBinaryThresholdImageFilterWidget.h"
 
 //registration
-#include "cxImageRegistrationWidget.h"
-#include "cxPatientRegistrationWidget.h"
+#include "cxLandmarkImageRegistrationWidget.h"
+#include "cxLandmarkImage2ImageRegistrationWidget.h"
+#include "cxLandmarkPatientRegistrationWidget.h"
 #include "cxFastImageRegistrationWidget.h"
 #include "cxFastPatientRegistrationWidget.h"
 #include "cxFastOrientationRegistrationWidget.h"
@@ -101,10 +102,12 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
 {
   //landmark
   LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(this, "LandmarkRegistrationWidget", "Landmark Registrations");
-  ImageRegistrationWidget* imageRegistrationWidget = new ImageRegistrationWidget(regManager, landmarkRegistrationsWidget, "ImageRegistrationWidget", "Image Registration");
-  PatientRegistrationWidget* patientRegistrationWidget = new PatientRegistrationWidget(regManager, landmarkRegistrationsWidget, "PatientRegistrationWidget", "Patient Registration");
+  LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(regManager, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
+  LandmarkPatientRegistrationWidget* patientRegistrationWidget = new LandmarkPatientRegistrationWidget(regManager, landmarkRegistrationsWidget, "LMPatientRegistrationWidget", "Patient Registration");
+  LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(regManager, landmarkRegistrationsWidget, "LMImage2ImageRegistrationWidget", "Image2Image Registration");
   landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image");
-  landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Patient");
+  landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Image2Patient");
+  landmarkRegistrationsWidget->addTab(image2imageRegistrationWidget, "Image2Image");
 
   //fast
   FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(this, "FastRegistrationWidget", "Fast Registrations");
@@ -113,7 +116,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(regManager, fastRegistrationsWidget);
   fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
   fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
-  fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Patient");
+  fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Image2Patient");
 
   //vessel based image to image
   Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(this, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
