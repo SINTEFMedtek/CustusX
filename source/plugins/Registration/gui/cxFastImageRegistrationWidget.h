@@ -1,7 +1,7 @@
 #ifndef CXFASTIMAGEREGISTRATIONWIDGET_H_
 #define CXFASTIMAGEREGISTRATIONWIDGET_H_
 
-#include "cxImageRegistrationWidget.h"
+#include "cxLandmarkImageRegistrationWidget.h"
 
 namespace cx
 {
@@ -14,7 +14,7 @@ namespace cx
  * \date 27. sep. 2010
  * \author: Janne Beate Bakeng
  */
-class FastImageRegistrationWidget : public ImageRegistrationWidget
+class FastImageRegistrationWidget : public LandmarkImageRegistrationWidget
 {
 	Q_OBJECT
 public:
