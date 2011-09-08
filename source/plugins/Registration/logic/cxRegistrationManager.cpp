@@ -20,41 +20,7 @@
 
 namespace cx
 {
-//RegistrationManager* RegistrationManager::mCxInstance = NULL;
-//RegistrationManager* registrationManager() { return RegistrationManager::getInstance(); }
-//RegistrationManager* RegistrationManager::getInstance()
-//{
-//  if (mCxInstance == NULL)
-//  {
-//    mCxInstance = new RegistrationManager();
-//  }
-//  return mCxInstance;
-//}
-//
-//void RegistrationManager::shutdown()
-//{
-//  delete mCxInstance;
-//  mCxInstance = NULL;
-//}
-//
-//RegistrationManager::RegistrationManager()
-//{}
-//
-//RegistrationManager::~RegistrationManager()
-//{}
-//
-///** Start a new round of registrations : this collects fex adding several landmarks into one registration session.
-// *
-// */
-//void RegistrationManager::initialize()
-//{
-//  mPatientRegistrationOffset = ssc::Transform3D::Identity();
-//  mLastRegistrationTime = QDateTime::currentDateTime();
-//
-//  connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
-//  connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
-//  connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
-//}
+
 
 RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData) :
 		mAcquisitionData(acquisitionData)
@@ -314,6 +280,9 @@ void RegistrationManager::doPatientRegistration()
   ssc::LandmarkMap fixedLandmarks = fixedImage->getLandmarks();
   ssc::LandmarkMap toolLandmarks = ssc::toolManager()->getLandmarks();
 
+  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks());
+  this->writePreLandmarkRegistration("physical", toolLandmarks);
+
   std::vector<QString> landmarks = this->getUsableLandmarks(fixedLandmarks, toolLandmarks);
 
   vtkPointsPtr p_ref = this->convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
@@ -342,6 +311,19 @@ void RegistrationManager::doPatientRegistration()
   ssc::messageManager()->sendSuccess("Patient registration has been performed.");
 }
 
+void RegistrationManager::writePreLandmarkRegistration(QString name, ssc::LandmarkMap landmarks)
+{
+	QStringList lm;
+	for (ssc::LandmarkMap::iterator iter=landmarks.begin(); iter!=landmarks.end(); ++iter)
+	{
+		lm << ssc::dataManager()->getLandmarkProperties()[iter->second.getUid()].getName();
+	}
+
+	QString msg = QString("Preparing to register [%1] containing the landmarks: [%2]").arg(name).arg(lm.join(","));
+	ssc::messageManager()->sendInfo(msg);
+}
+
+
 void RegistrationManager::doImageRegistration()
 {
   //check that the fixed data is set
@@ -369,6 +351,9 @@ void RegistrationManager::doImageRegistration()
 
   ssc::LandmarkMap fixedLandmarks = fixedImage->getLandmarks();
   ssc::LandmarkMap imageLandmarks = movingImage->getLandmarks();
+
+  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks());
+  this->writePreLandmarkRegistration(movingImage->getName(), movingImage->getLandmarks());
 
   std::vector<QString> landmarks = getUsableLandmarks(fixedLandmarks, imageLandmarks);
   vtkPointsPtr p_ref = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
@@ -449,6 +434,9 @@ void RegistrationManager::doFastRegistration_Translation()
 
   ssc::LandmarkMap fixedLandmarks = fixedImage->getLandmarks();
   ssc::LandmarkMap toolLandmarks = ssc::toolManager()->getLandmarks();
+
+  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks());
+  this->writePreLandmarkRegistration("physical", toolLandmarks);
 
   std::vector<QString> landmarks = this->getUsableLandmarks(fixedLandmarks, toolLandmarks);
 
