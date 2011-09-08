@@ -17,20 +17,90 @@
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "boost/bind.hpp"
+#include "sscToolManager.h"
 
 namespace cx
 {
 
+
+PatientLandmarksSource::PatientLandmarksSource()
+{
+	ssc::ToolManager* toolmanager = ssc::ToolManager::getInstance();
+  connect(toolmanager, SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
+  connect(toolmanager, SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
+  connect(toolmanager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+}
+ssc::LandmarkMap PatientLandmarksSource::getLandmarks() const
+{
+  return ssc::ToolManager::getInstance()->getLandmarks();
+}
+ssc::Transform3D PatientLandmarksSource::get_rMl() const
+{
+  return *ssc::ToolManager::getInstance()->get_rMpr();
+}
+// --------------------------------------------------------
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+
+ImageLandmarksSource::ImageLandmarksSource()
+{
+}
+void ImageLandmarksSource::setImage(ssc::ImagePtr image)
+{
+  if(image == mImage)
+    return;
+
+  if(mImage)
+  {
+    disconnect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
+    disconnect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
+    disconnect(mImage.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
+  }
+
+  mImage = image;
+
+  if(mImage)
+  {
+    connect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
+    connect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
+    connect(mImage.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
+  }
+
+  emit changed();
+}
+ssc::LandmarkMap ImageLandmarksSource::getLandmarks() const
+{
+	if (!mImage)
+		return ssc::LandmarkMap();
+  return mImage->getLandmarks();
+}
+ssc::Transform3D ImageLandmarksSource::get_rMl() const
+{
+	if (!mImage)
+		return ssc::Transform3D::Identity();
+  return mImage->get_rMd();
+}
+
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+
+
 LandmarkRep::LandmarkRep(const QString& uid, const QString& name) :
   RepImpl(uid, name),
   mColor(0,1,0),
+  mSecondaryColor(0,0,1),
   mShowLandmarks(true),
-  mShowLabel(true),
-  mShowLine(false),
+//  mShowLabel(true),
+//  mShowLine(false),
   mGraphicsSize(1),
   mLabelSize(2.5)
 {
-  mTextScale[0] = mTextScale[1] = mTextScale[2] = 20;
   connect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(internalUpdate()));
 
   mViewportListener.reset(new ssc::ViewportListener);
@@ -40,9 +110,32 @@ LandmarkRep::LandmarkRep(const QString& uid, const QString& name) :
 LandmarkRep::~LandmarkRep()
 {}
 
+void LandmarkRep::setPrimarySource(LandmarksSourcePtr primary)
+{
+	if (mPrimary)
+		disconnect(mPrimary.get(), SIGNAL(changed()), this, SLOT(internalUpdate()));
+	mPrimary = primary;
+	if (mPrimary)
+		connect(mPrimary.get(), SIGNAL(changed()), this, SLOT(internalUpdate()));
+}
+
+void LandmarkRep::setSecondarySource(LandmarksSourcePtr secondary)
+{
+	if (mSecondary)
+		disconnect(mSecondary.get(), SIGNAL(changed()), this, SLOT(internalUpdate()));
+	mSecondary = secondary;
+	if (mSecondary)
+		connect(mSecondary.get(), SIGNAL(changed()), this, SLOT(internalUpdate()));
+}
+
 void LandmarkRep::setColor(ssc::Vector3D color)
 {
   mColor = color;
+}
+
+void LandmarkRep::setSecondaryColor(ssc::Vector3D color)
+{
+  mSecondaryColor = color;
 }
 
 void LandmarkRep::setGraphicsSize(double size)
@@ -64,7 +157,10 @@ void LandmarkRep::showLandmarks(bool on)
 
   for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
   {
-    iter->second.mPoint->getActor()->SetVisibility(on);
+    if (iter->second.mPrimaryPoint)
+    	iter->second.mPrimaryPoint->getActor()->SetVisibility(on);
+    if (iter->second.mSecondaryPoint)
+    	iter->second.mSecondaryPoint->getActor()->SetVisibility(on);
     if (iter->second.mText)
     	iter->second.mText->getActor()->SetVisibility(on);
     if (iter->second.mLine)
@@ -73,19 +169,34 @@ void LandmarkRep::showLandmarks(bool on)
   mShowLandmarks = on;
 }
 
-void LandmarkRep::landmarkAddedSlot(QString uid)
+//void LandmarkRep::landmarkAddedSlot(QString uid)
+//{
+//  this->addPoint(uid);
+//  this->setPosition(uid);
+//  this->internalUpdate();
+//}
+
+//void LandmarkRep::landmarkRemovedSlot(QString uid)
+//{
+//  mGraphics.erase(uid);
+//}
+
+//void LandmarkRep::transformChangedSlot()
+//{
+//	this->addAll();
+//}
+
+void LandmarkRep::addAll()
 {
-  this->addPoint(uid);
-  this->setPosition(uid);
-  this->internalUpdate();
+  ssc::LandmarkPropertyMap props = ssc::dataManager()->getLandmarkProperties();
+
+  for(ssc::LandmarkPropertyMap::iterator it=props.begin(); it!=props.end(); ++it)
+  {
+    this->addLandmark(it->first);
+  }
 }
 
-void LandmarkRep::landmarkRemovedSlot(QString uid)
-{
-  mGraphics.erase(uid);
-}
-
-void LandmarkRep::transformChangedSlot()
+void LandmarkRep::internalUpdate()
 {
 	this->addAll();
 }
@@ -101,96 +212,181 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
   if (!view || !view->getRenderer())
     return;
 
-  for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
-  {
-    iter->second.mPoint->setRenderer(view->getRenderer());
-    if (iter->second.mText)
-    	iter->second.mText->setRenderer(view->getRenderer());
-    if (iter->second.mLine)
-      iter->second.mLine->setRenderer(view->getRenderer());
-  }
+  this->addAll();
+
+//  for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
+//  {
+//    if (iter->second.mPrimaryPoint)
+//    	iter->second.mPrimaryPoint->setRenderer(view->getRenderer());
+//    if (iter->second.mSecondaryPoint)
+//    	iter->second.mSecondaryPoint->setRenderer(view->getRenderer());
+//    if (iter->second.mText)
+//    	iter->second.mText->setRenderer(view->getRenderer());
+//    if (iter->second.mLine)
+//      iter->second.mLine->setRenderer(view->getRenderer());
+//  }
 	mViewportListener->startListen(view->getRenderer());
 }
 
 void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
-  for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
-  {
-    iter->second.mPoint->setRenderer(NULL);
-    if (iter->second.mText)
-    	iter->second.mText->setRenderer(NULL);
-    if (iter->second.mLine)
-      iter->second.mLine->setRenderer(NULL);
-  }
+  this->clearAll();
+//  for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
+//  {
+//    if (iter->second.mPrimaryPoint)
+//    	iter->second.mPrimaryPoint->setRenderer(NULL);
+//    if (iter->second.mSecondaryPoint)
+//    	iter->second.mSecondaryPoint->setRenderer(NULL);
+//    if (iter->second.mText)
+//    	iter->second.mText->setRenderer(NULL);
+//    if (iter->second.mLine)
+//      iter->second.mLine->setRenderer(NULL);
+//  }
 	mViewportListener->stopListen();
 }
 
 /**
  * Use the inpup coord in ref space to render a landmark.
  */
-void LandmarkRep::addPoint(QString uid)
+void LandmarkRep::addLandmark(QString uid)
 {
-  if (!this->exists(uid))
-    return;
-
   vtkRendererPtr renderer;
   if (!mViews.empty())
     renderer = (*mViews.begin())->getRenderer();
 
-  LandmarkGraphics current;
-
-  std::map<QString, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
-  QString name = props[uid].getName();
-
-  current.mPoint.reset(new ssc::GraphicalPoint3D(renderer));
-  current.mPoint->setColor(mColor);
-  current.mPoint->setRadius(2);
-
-  if (mShowLabel)
+  ssc::LandmarkProperty property = ssc::dataManager()->getLandmarkProperties()[uid];
+  if (property.getUid().isEmpty())
   {
-    current.mText.reset(new ssc::FollowerText3D(renderer));
-    current.mText->setText(name);
-    current.mText->setSizeInNormalizedViewport(true, 0.025);
-    current.mText->setColor(mColor);
+    mGraphics.erase(uid);
+  	return;
   }
 
-  if (mShowLine)
+  LandmarkGraphics current;
+
+  // primary point
+  ssc::Landmark primary;
+	ssc::Vector3D primary_r;
+	if (mPrimary)
+	{
+		if (!primary.getUid().isEmpty())
+		{
+		  primary = mPrimary->getLandmarks()[uid];
+			primary_r = mPrimary->get_rMl().coord(primary.getCoord());
+
+			current.mPrimaryPoint.reset(new ssc::GraphicalPoint3D(renderer));
+			current.mPrimaryPoint->setColor(mColor);
+			current.mPrimaryPoint->setRadius(2);
+
+			current.mText.reset(new ssc::FollowerText3D(renderer));
+			current.mText->setText(property.getName());
+			current.mText->setSizeInNormalizedViewport(true, 0.025);
+			current.mText->setColor(mColor);
+
+			current.mPrimaryPoint->setValue(primary_r);
+			current.mText->setPosition(primary_r);
+		}
+	}
+
+  // secondary point
+	ssc::Vector3D secondary_r;
+  ssc::Landmark secondary;
+  if (mSecondary)
+  {
+    secondary = mSecondary->getLandmarks()[uid];
+		if (!secondary.getUid().isEmpty())
+		{
+			secondary_r = mSecondary->get_rMl().coord(secondary.getCoord());
+
+			current.mSecondaryPoint.reset(new ssc::GraphicalPoint3D(renderer));
+			current.mSecondaryPoint->setColor(mSecondaryColor);
+			current.mSecondaryPoint->setRadius(2);
+		}
+  }
+
+  // connecting line
+  if (!secondary.getUid().isEmpty() && !secondary.getUid().isEmpty())
   {
     current.mLine.reset(new ssc::GraphicalLine3D(renderer));
     current.mLine->setColor(mColor);
-//    current.mLine->setColor(ssc::Vector3D(1,0,0));
     current.mLine->setStipple(0x0F0F);
-//    current.mLine->setRadius(2);
+
+    current.mLine->setValue(primary_r, secondary_r);
   }
 
   mGraphics[uid] = current;
-//  this->setPosition(coord, uid);
-}
-
-void LandmarkRep::internalUpdate()
-{
-  std::map<QString, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
-
-  for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
-  {
-    QString uid = iter->first;
-    QString name = props[uid].getName();
-    if (iter->second.mText)
-    {
-      iter->second.mText->setColor(mColor);
-      iter->second.mText->setText(name);
-      // a bit smaller than the corresponding vtkCaptionActor2D, because the sizes
-      // are set differently.
-      iter->second.mText->setSize(mLabelSize/100*0.75);
-    }
-    if (iter->second.mPoint)
-    {
-      iter->second.mPoint->setColor(mColor);
-//      iter->second.mPoint->setRadius(mGraphicsSize);
-    }
-  }
   this->rescale();
 }
+
+///**
+// * Use the inpup coord in ref space to render a landmark.
+// */
+//void LandmarkRep::addPoint(QString uid)
+//{
+//  if (!this->exists(uid))
+//    return;
+//
+//  vtkRendererPtr renderer;
+//  if (!mViews.empty())
+//    renderer = (*mViews.begin())->getRenderer();
+//
+//  LandmarkGraphics current;
+//
+//  std::map<QString, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
+//  QString name = props[uid].getName();
+//
+//  current.mPoint.reset(new ssc::GraphicalPoint3D(renderer));
+//  current.mPoint->setColor(mColor);
+//  current.mPoint->setRadius(2);
+//
+//  if (mShowLabel)
+//  {
+//    current.mText.reset(new ssc::FollowerText3D(renderer));
+//    current.mText->setText(name);
+//    current.mText->setSizeInNormalizedViewport(true, 0.025);
+//    current.mText->setColor(mColor);
+//
+//    // a bit smaller than the corresponding vtkCaptionActor2D, because the sizes
+//    // are set differently.
+//    current.mText->setSize(mLabelSize/100*0.75);
+//  }
+//
+//  if (mShowLine)
+//  {
+//    current.mLine.reset(new ssc::GraphicalLine3D(renderer));
+//    current.mLine->setColor(mColor);
+////    current.mLine->setColor(ssc::Vector3D(1,0,0));
+//    current.mLine->setStipple(0x0F0F);
+////    current.mLine->setRadius(2);
+//  }
+//
+//  mGraphics[uid] = current;
+////  this->setPosition(coord, uid);
+//}
+//
+//void LandmarkRep::internalUpdate()
+//{
+//  std::map<QString, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
+//
+//  for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
+//  {
+//    QString uid = iter->first;
+//    QString name = props[uid].getName();
+//    if (iter->second.mText)
+//    {
+//      iter->second.mText->setColor(mColor);
+//      iter->second.mText->setText(name);
+//      // a bit smaller than the corresponding vtkCaptionActor2D, because the sizes
+//      // are set differently.
+//      iter->second.mText->setSize(mLabelSize/100*0.75);
+//    }
+//    if (iter->second.mPoint)
+//    {
+//      iter->second.mPoint->setColor(mColor);
+////      iter->second.mPoint->setRadius(mGraphicsSize);
+//    }
+//  }
+//  this->rescale();
+//}
 
 void LandmarkRep::rescale()
 {
@@ -201,12 +397,11 @@ void LandmarkRep::rescale()
 
   for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
   {
-    if (iter->second.mPoint)
-    {
-      iter->second.mPoint->setRadius(sphereSize);
-    }
+    if (iter->second.mSecondaryPoint)
+      iter->second.mSecondaryPoint->setRadius(sphereSize);
+    if (iter->second.mPrimaryPoint)
+      iter->second.mPrimaryPoint->setRadius(sphereSize);
   }
-
 }
 
 
