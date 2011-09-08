@@ -638,12 +638,12 @@ void ViewWrapper3D::showLandmarks(bool on)
   if (on)
   {
     mView->addRep(mPatientLandmarkRep);
-    mView->addRep(mImageLandmarkRep);
+    //mView->addRep(mImageLandmarkRep);
   }
   else
   {
     mView->removeRep(mPatientLandmarkRep);
-    mView->removeRep(mImageLandmarkRep);
+    //mView->removeRep(mImageLandmarkRep);
   }
 }
 
