@@ -15,74 +15,33 @@ ImageLandmarkRepPtr ImageLandmarkRep::New(const QString& uid, const QString& nam
 ImageLandmarkRep::ImageLandmarkRep(const QString& uid, const QString& name) :
   LandmarkRep(uid, name)
 {
-  mType = "cxImageLandmarkRep";
+//  mType = "cxImageLandmarkRep";
+
+  mImage = ImageLandmarksSourcePtr(new ImageLandmarksSource());
+  this->setPrimarySource(mImage);
+//  this->setSecondarySource(PatientLandmarksSourcePtr(new PatientLandmarksSource()));
+
 }
 
 ImageLandmarkRep::~ImageLandmarkRep()
 {}
 
-QString ImageLandmarkRep::getType() const
-{
-  return mType;
-}
 
 void ImageLandmarkRep::setImage(ssc::ImagePtr image)
 {
-  if(image == mImage)
-    return;
-
-  if(mImage)
-  {
-    mImage->disconnectFromRep(mSelf);
-    disconnect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkAddedSlot(QString)));
-    disconnect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkRemovedSlot(QString)));
-    disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-    this->clearAll();
-  }
-
-  mImage = image;
-
-  if(mImage)
-  {
-    mImage->connectToRep(mSelf);
-    connect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkAddedSlot(QString)));
-    connect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkRemovedSlot(QString)));
-    connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-    this->addAll();
-  }
+	mImage->setImage(image);
 }
-
-ssc::ImagePtr ImageLandmarkRep::getImage() const
-{
-  return mImage;
-}
-
-void ImageLandmarkRep::addAll()
-{
-  ssc::LandmarkMap landmarksMap = mImage->getLandmarks();
-
-  for(ssc::LandmarkMap::iterator it=landmarksMap.begin(); it!=landmarksMap.end(); ++it)
-  {
-    this->landmarkAddedSlot(it->first);
-  }
-}
-
-bool ImageLandmarkRep::exists(QString uid) const
-{
-  return mImage && mImage->getLandmarks().count(uid);
-}
-
-void ImageLandmarkRep::setPosition(QString uid)
-{
-  ssc::Landmark landmark = mImage->getLandmarks()[uid];
-  ssc::Vector3D p_r = mImage->get_rMd().coord(landmark.getCoord()); // p_r = point in ref space
-
-  ssc::Vector3D imageCenter = mImage->get_rMd().coord(mImage->boundingBox().center());
-  ssc::Vector3D centerToSkinVector = (p_r - imageCenter).normal();
-  ssc::Vector3D numberPosition = p_r + 10.0*centerToSkinVector;
-
-  mGraphics[uid].mPoint->setValue(p_r);
-  mGraphics[uid].mText->setPosition(numberPosition);
-}
+//void ImageLandmarkRep::setPosition(QString uid)
+//{
+//  ssc::Landmark landmark = mImage->getLandmarks()[uid];
+//  ssc::Vector3D p_r = mImage->get_rMd().coord(landmark.getCoord()); // p_r = point in ref space
+//
+//  ssc::Vector3D imageCenter = mImage->get_rMd().coord(mImage->boundingBox().center());
+//  ssc::Vector3D centerToSkinVector = (p_r - imageCenter).normal();
+//  ssc::Vector3D numberPosition = p_r + 10.0*centerToSkinVector;
+//
+//  mGraphics[uid].mPoint->setValue(p_r);
+//  mGraphics[uid].mText->setPosition(numberPosition);
+//}
 
 }//namespace cx

@@ -21,18 +21,13 @@ public:
   static PatientLandmarkRepPtr New(const QString& uid, const QString& name=""); ///constructor
   virtual ~PatientLandmarkRep();
 
-  virtual QString getType() const;
-
+//  virtual QString getType() const;
   void setImage(ssc::ImagePtr image); ///< set the master image
+  virtual QString getType() const { return "PatientLandmarkRep"; }
 
 protected:
   PatientLandmarkRep(const QString& uid, const QString& name=""); ///< sets default text scaling to 20
-  virtual void addAll();
-  virtual void setPosition(QString uid);
-  virtual bool exists(QString uid) const;
-
-  ssc::ImagePtr   mImage;         ///< the image which this rep is linked to
-
+  ImageLandmarksSourcePtr mImage;
 };
 
 }//namespace cx
