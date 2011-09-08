@@ -203,6 +203,9 @@ void LandmarkPatientRegistrationWidget::performRegistration()
   if(!mManager->getFixedData())
     mManager->setFixedData(ssc::dataManager()->getActiveImage());
 
+  if (ssc::toolManager()->getLandmarks().size()<3)
+  	return;
+
   mManager->doPatientRegistration();
 
   this->updateAvarageAccuracyLabel();
