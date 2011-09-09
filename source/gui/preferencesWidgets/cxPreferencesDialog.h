@@ -113,6 +113,7 @@ protected:
   QCheckBox* mShadingCheckBox;
   QGridLayout *mMainLayout;
   ssc::DoubleDataAdapterXmlPtr mMaxRenderSize;
+  ssc::DoubleDataAdapterXmlPtr mStillUpdateRate;
 
 private slots:
   void renderingIntervalSlot(int interval);
