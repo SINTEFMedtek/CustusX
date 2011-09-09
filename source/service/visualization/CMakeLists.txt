@@ -62,10 +62,10 @@ SET ( cxVisualizationService_SOURCE
     Rep/cxDataMetricRep.cpp
     Rep/cxLandmarkRep.h
     Rep/cxLandmarkRep.cpp
-    Rep/cxImageLandmarkRep.h
-    Rep/cxImageLandmarkRep.cpp
-    Rep/cxPatientLandmarkRep.h
-    Rep/cxPatientLandmarkRep.cpp
+#    Rep/cxImageLandmarkRep.h
+#    Rep/cxImageLandmarkRep.cpp
+#    Rep/cxPatientLandmarkRep.h
+#    Rep/cxPatientLandmarkRep.cpp
     Rep/sscOrientationAnnotation3DRep.h
     Rep/sscOrientationAnnotation3DRep.cpp
     Rep/cxPointMetricRep.h
