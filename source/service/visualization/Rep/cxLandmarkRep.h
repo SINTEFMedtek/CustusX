@@ -25,34 +25,41 @@ public:
 	virtual ~LandmarksSource() {}
 	virtual ssc::LandmarkMap getLandmarks() const = 0;
 	virtual ssc::Transform3D get_rMl() const = 0;
+  virtual ssc::Vector3D getTextPos(ssc::Vector3D p_l) const = 0;
 signals:
 	void changed();
 };
 typedef boost::shared_ptr<LandmarksSource> LandmarksSourcePtr;
 
+typedef boost::shared_ptr<class PatientLandmarksSource> PatientLandmarksSourcePtr;
+
 class PatientLandmarksSource : public LandmarksSource
 {
 public:
+  static PatientLandmarksSourcePtr New() { return PatientLandmarksSourcePtr(new PatientLandmarksSource()); }
 	PatientLandmarksSource();
 	virtual ~PatientLandmarksSource() {}
 	virtual ssc::LandmarkMap getLandmarks() const;
 	virtual ssc::Transform3D get_rMl() const;
+  virtual ssc::Vector3D getTextPos(ssc::Vector3D p_l) const;
 };
-typedef boost::shared_ptr<PatientLandmarksSource> PatientLandmarksSourcePtr;
+
+typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
 
 class ImageLandmarksSource : public LandmarksSource
 {
 public:
+  static ImageLandmarksSourcePtr New() { return ImageLandmarksSourcePtr(new ImageLandmarksSource()); }
 	ImageLandmarksSource();
 	virtual ~ImageLandmarksSource() {}
 	virtual ssc::LandmarkMap getLandmarks() const;
 	virtual ssc::Transform3D get_rMl() const;
+	virtual ssc::Vector3D getTextPos(ssc::Vector3D p_l) const;
 
 	void setImage(ssc::ImagePtr image);
 private:
 	ssc::ImagePtr mImage;
 };
-typedef boost::shared_ptr<ImageLandmarksSource> ImageLandmarksSourcePtr;
 
 
 
@@ -64,59 +71,46 @@ typedef boost::shared_ptr<ImageLandmarksSource> ImageLandmarksSourcePtr;
  *
  * \date Dec 10, 2008
  * \author: Janne Beate Bakeng, SINTEF
+ * \author: Christian Askeland, SINTEF
  */
 class LandmarkRep : public ssc::RepImpl
 {
   Q_OBJECT
 public:
+  static LandmarkRepPtr New(const QString& uid, const QString& name="");
   virtual ~LandmarkRep();
-
-//  virtual QString getType() const = 0;
 
   void setColor(ssc::Vector3D color); ///< sets the reps color
   void setSecondaryColor(ssc::Vector3D color); ///< sets the reps color
   void showLandmarks(bool on); ///< turn on or off showing landmarks
   void setGraphicsSize(double size);
   void setLabelSize(double size);
+  virtual QString getType() const { return "LandmarkRep"; }
 
-public slots:
-////  virtual void landmarkAddedSlot(QString);
-////  void landmarkRemovedSlot(QString);
-//  virtual void transformChangedSlot();
+  void setPrimarySource(LandmarksSourcePtr primary);
+  void setSecondarySource(LandmarksSourcePtr secondary);
 
 protected:
-	void setPrimarySource(LandmarksSourcePtr primary);
-	void setSecondarySource(LandmarksSourcePtr secondary);
-
 	LandmarkRep(const QString& uid, const QString& name=""); ///< sets default text scaling to 20
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
-//  void addPoint(QString uid);
   void clearAll();
   void addAll();
-//  virtual void setPosition(QString uid) = 0;
-
-//  void setShowLabel(bool on) { mShowLabel = on; }
-//  void setShowLine(bool on) { mShowLine = on; }
   void addLandmark(QString uid);
 
 protected slots:
   void internalUpdate(); ///< updates the text, color, scale etc
 
 protected:
-//  QString         mType;          ///< description of this reps type
   ssc::Vector3D   mColor;         ///< the color of the landmark actors
   ssc::Vector3D   mSecondaryColor; ///< color used on the secondary coordinate
   bool            mShowLandmarks; ///< whether or not the actors should be showed in (all) views
-//  bool mShowLabel; ///< show text label
-//  bool mShowLine;  //< show line from master to target point
   double mGraphicsSize;
   double mLabelSize;
 
   struct LandmarkGraphics
   {
     ssc::GraphicalLine3DPtr mLine; ///< line between primary and secondary point
-//    ssc::GraphicalPoint3DPtr mPoint;
     ssc::GraphicalPoint3DPtr mPrimaryPoint; ///< the primary coordinate of the landmark
     ssc::GraphicalPoint3DPtr mSecondaryPoint; ///< secondary landmark coordinate, accosiated with the primary point
     ssc::FollowerText3DPtr mText; ///< name of landmark, attached to primary point
@@ -125,7 +119,6 @@ protected:
   LandmarkGraphicsMapType mGraphics;
   ssc::ViewportListenerPtr mViewportListener;
   void rescale();
-//  virtual bool exists(QString uid) const = 0;
 
   LandmarksSourcePtr mPrimary;
   LandmarksSourcePtr mSecondary;
@@ -133,5 +126,7 @@ protected:
 private:
   LandmarkRep(); ///< not implemented
 };
+
 }//namespace cx
+
 #endif /* CXLANDMARKREP_H_ */

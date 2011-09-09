@@ -3,6 +3,7 @@
 
 #include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationDataAdapters.h"
+#include "Rep/cxLandmarkRep.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -59,6 +60,7 @@ protected:
   //gui
 //  RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
   ssc::StringDataAdapterPtr mActiveImageAdapter;
+  ImageLandmarksSourcePtr mImageLandmarkSource;
 
   QPushButton* mAddLandmarkButton; ///< the Add Landmark button
   QPushButton* mEditLandmarkButton; ///< the Edit Landmark button

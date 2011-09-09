@@ -122,13 +122,13 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
-  mImageLandmarkRep = ImageLandmarkRep::New("ImageLandmarkRep_"+index);
-  mImageLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-  mImageLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+  mLandmarkRep = LandmarkRep::New("LandmarkRep_"+index);
+  mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+  mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
-  mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
-  mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-  mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+//  mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
+//  mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+//  mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
   mProbeRep = ssc::ProbeRep::New("ProbeRep_"+index, "ProbeRep_"+index);
 
@@ -212,10 +212,10 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
       this->readDataRepSettings(iter->second);
     }
 
-    mImageLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-    mImageLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
-    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+    mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+    mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+//    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+//    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
   }
 }
@@ -560,8 +560,8 @@ void ViewWrapper3D::activeImageChangedSlot()
     image.reset();
 
   mProbeRep->setImage(image);
-  mImageLandmarkRep->setImage(image);
-  mPatientLandmarkRep->setImage(image);
+//  mImageLandmarkRep->setImage(image);
+//  mPatientLandmarkRep->setImage(image);
 }
 
 void ViewWrapper3D::showRefToolSlot(bool checked)
@@ -632,18 +632,18 @@ void ViewWrapper3D::optionChangedSlot()
 
 void ViewWrapper3D::showLandmarks(bool on)
 {
-  if (mImageLandmarkRep->isConnectedToView(mView) == on)
+  if (mLandmarkRep->isConnectedToView(mView) == on)
     return;
 
   if (on)
   {
-    mView->addRep(mPatientLandmarkRep);
-    //mView->addRep(mImageLandmarkRep);
+    //mView->addRep(mPatientLandmarkRep);
+    mView->addRep(mLandmarkRep);
   }
   else
   {
-    mView->removeRep(mPatientLandmarkRep);
-    //mView->removeRep(mImageLandmarkRep);
+    //mView->removeRep(mPatientLandmarkRep);
+    mView->removeRep(mLandmarkRep);
   }
 }
 

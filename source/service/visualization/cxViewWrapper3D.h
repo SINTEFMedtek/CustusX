@@ -102,26 +102,15 @@ private:
   virtual void dataAdded(ssc::DataPtr data);
   virtual void dataRemoved(const QString& uid);
 
-//  virtual void imageAdded(ssc::ImagePtr image);
-//  virtual void meshAdded(ssc::MeshPtr mesh);
-//  virtual void imageRemoved(const QString& uid);
-//  virtual void meshRemoved(const QString& uid);
-
   typedef  std::map<QString, ssc::RepPtr> RepMap;
-//  typedef  std::map<QString, ssc::VolumetricRepPtr> VolumetricRepMap;
-//  typedef  std::map<QString, ssc::GeometricRepPtr> GeometricRepMap;
   RepMap mDataReps;
-//  VolumetricRepMap mVolumetricReps;
-  ImageLandmarkRepPtr mImageLandmarkRep;
-  PatientLandmarkRepPtr mPatientLandmarkRep;
+  LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
-//  GeometricRepMap mGeometricReps;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
-//  vtkSmartPointer<class InteractionCallback> mInteractorCallback;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 

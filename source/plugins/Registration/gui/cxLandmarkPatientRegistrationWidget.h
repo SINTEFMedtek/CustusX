@@ -7,6 +7,7 @@
 #include <sscImage.h>
 #include <sscTransform3D.h>
 #include "cxTool.h"
+#include "Rep/cxLandmarkRep.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -62,11 +63,12 @@ protected:
   //gui
   QPushButton* mToolSampleButton; ///< the Sample Tool button
   QPushButton* mRemoveLandmarkButton;
+  QPushButton* mRegisterButton;
 
   //data
+  ImageLandmarksSourcePtr mImageLandmarkSource;
   ssc::ToolPtr mToolToSample; ///< tool to be sampled from
   RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
-  QPushButton* mRegisterButton;
 
 private:
   LandmarkPatientRegistrationWidget(); ///< not implemented

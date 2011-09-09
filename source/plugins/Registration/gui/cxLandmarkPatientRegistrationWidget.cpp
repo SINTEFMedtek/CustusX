@@ -18,6 +18,8 @@
 #include "sscToolManager.h"
 #include "cxDataManager.h"
 #include "sscLabeledComboBoxWidget.h"
+#include "cxRepManager.h"
+#include "cxView3D.h"
 
 namespace cx
 {
@@ -25,6 +27,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(Registratio
   LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle),
   mToolSampleButton(new QPushButton("Sample Tool", this))
 {
+  mImageLandmarkSource = ImageLandmarksSource::New();
 	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
 
   //buttons
@@ -84,6 +87,8 @@ void LandmarkPatientRegistrationWidget::registerSlot()
 void LandmarkPatientRegistrationWidget::activeImageChangedSlot()
 {
   LandmarkRegistrationWidget::activeImageChangedSlot();
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  mImageLandmarkSource->setImage(image);
 }
 
 void LandmarkPatientRegistrationWidget::toolVisibleSlot(bool visible)
@@ -145,19 +150,37 @@ void LandmarkPatientRegistrationWidget::dominantToolChangedSlot(const QString& u
 
 void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 {
+  std::cout << "LandmarkPatientRegistrationWidget::showEvent" << std::endl;
+
   LandmarkRegistrationWidget::showEvent(event);
   connect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
   connect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
   viewManager()->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
+
+  LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
+  if (rep)
+  {
+    rep->setPrimarySource(mImageLandmarkSource);
+    rep->setSecondarySource(PatientLandmarksSource::New());
+    rep->setSecondaryColor(ssc::Vector3D(0,0.6,0.8));
+  }
 }
 
 void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 {
+  std::cout << "LandmarkPatientRegistrationWidget::showEvent" << std::endl;
+
   LandmarkRegistrationWidget::hideEvent(event);
   disconnect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
   disconnect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
+  LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
+  if (rep)
+  {
+    rep->setPrimarySource(LandmarksSourcePtr());
+    rep->setSecondarySource(LandmarksSourcePtr());
+  }
   viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 
