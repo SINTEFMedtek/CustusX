@@ -207,6 +207,7 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
   LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
   if (rep)
   {
+//    std::cout << "LandmarkImageRegistrationWidget::showEvent" << std::endl;
     rep->setPrimarySource(mImageLandmarkSource);
     rep->setSecondarySource(LandmarksSourcePtr());
   }
