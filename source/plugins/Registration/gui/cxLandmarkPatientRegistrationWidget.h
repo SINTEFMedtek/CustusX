@@ -8,6 +8,7 @@
 #include <sscTransform3D.h>
 #include "cxTool.h"
 #include "Rep/cxLandmarkRep.h"
+#include "cxDominantToolProxy.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -45,12 +46,13 @@ protected slots:
 
 	void registerSlot();
   virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
-  void toolVisibleSlot(bool visible); ///< enables/disables the Sample Tool button
+//  void toolVisibleSlot(bool visible); ///< enables/disables the Sample Tool button
   void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
-  void dominantToolChangedSlot(const QString& uid); ///< set which tool to sample from
-  void enableToolSampleButton();
+//  void dominantToolChangedSlot(const QString& uid); ///< set which tool to sample from
+//  void enableToolSampleButton();
   virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
   void removeLandmarkButtonClickedSlot();
+  void updateToolSampleButton();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -67,8 +69,9 @@ protected:
 
   //data
   ImageLandmarksSourcePtr mImageLandmarkSource;
-  ssc::ToolPtr mToolToSample; ///< tool to be sampled from
+//  ssc::ToolPtr mToolToSample; ///< tool to be sampled from
   RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
+  DominantToolProxyPtr mDominantToolProxy;
 
 private:
   LandmarkPatientRegistrationWidget(); ///< not implemented

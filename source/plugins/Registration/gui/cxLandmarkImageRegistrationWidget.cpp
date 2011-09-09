@@ -19,6 +19,7 @@
 #include "cxViewManager.h"
 #include "cxSettings.h"
 #include "cxView3D.h"
+#include "sscToolManager.h"
 
 namespace cx
 {
@@ -29,6 +30,10 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationMan
 {
   mActiveImageAdapter = ActiveImageStringDataAdapter::New();
   mImageLandmarkSource = ImageLandmarksSource::New();
+
+  mDominantToolProxy = DominantToolProxy::New();
+  connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableButtons()));
+  connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(enableButtons()));
 
   //pushbuttons
   mAddLandmarkButton = new QPushButton("Add", this);
@@ -99,7 +104,8 @@ void LandmarkImageRegistrationWidget::activeImageChangedSlot()
   mImageLandmarkSource->setImage(image);
 
   //enable the add point button
-  mAddLandmarkButton->setEnabled(image!=0);
+//  mAddLandmarkButton->setEnabled(image!=0);
+  this->enableButtons();
 }
 
 ssc::ProbeRepPtr LandmarkImageRegistrationWidget::getProbeRep()
@@ -169,8 +175,22 @@ void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
 {
   LandmarkRegistrationWidget::cellClickedSlot(row, column);
 
-  mEditLandmarkButton->setEnabled(true);
-  mRemoveLandmarkButton->setEnabled(true);
+//  mEditLandmarkButton->setEnabled(true);
+//  mRemoveLandmarkButton->setEnabled(true);
+  this->enableButtons();
+}
+
+void LandmarkImageRegistrationWidget::enableButtons()
+{
+	bool selected = !mLandmarkTableWidget->selectedItems().isEmpty();
+	bool tracking = ssc::toolManager()->getDominantTool()
+			&& ssc::toolManager()->getDominantTool()->getType()!=ssc::Tool::TOOL_MANUAL
+			&& ssc::toolManager()->getDominantTool()->getVisible();
+	bool loaded = ssc::dataManager()->getActiveImage() != 0;
+
+	mEditLandmarkButton->setEnabled(selected && !tracking);
+  mRemoveLandmarkButton->setEnabled(selected && !tracking);
+  mAddLandmarkButton->setEnabled(loaded && !tracking);
 }
 
 void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
