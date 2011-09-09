@@ -536,23 +536,6 @@ Us Acq
     this->addDefaultLayout(layout);
   }
   {
-  	// 3D ACS in a single view group
-    LayoutData layout = LayoutData::create("LAYOUT_3D_ACS_SINGLE", "3D ACS Single", 3, 4);
-    layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 3, 3));
-    layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 3));
-    layout.setView(0, ssc::ptCORONAL,  LayoutRegion(1, 3));
-    layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(2, 3));
-    this->addDefaultLayout(layout);
-  }
-  {
-  	// 3D Any in a single view group
-    LayoutData layout = LayoutData::create("LAYOUT_3D_AD_SINGLE", "3D AnyDual Single", 2, 4);
-    layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 2, 3));
-    layout.setView(0, ssc::ptANYPLANE,    LayoutRegion(0, 3));
-    layout.setView(0, ssc::ptSIDEPLANE,  LayoutRegion(1, 3));
-    this->addDefaultLayout(layout);
-  }
-  {
   	// 3D ACS
     LayoutData layout = LayoutData::create("LAYOUT_3D_ACS", "3D ACS", 3, 4);
     layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 3, 3));
@@ -567,6 +550,23 @@ Us Acq
     layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 2, 3));
     layout.setView(1, ssc::ptANYPLANE,    LayoutRegion(0, 3));
     layout.setView(1, ssc::ptSIDEPLANE,  LayoutRegion(1, 3));
+    this->addDefaultLayout(layout);
+  }
+  {
+  	// 3D ACS in a single view group
+    LayoutData layout = LayoutData::create("LAYOUT_3D_ACS_SINGLE", "3D ACS Connected", 3, 4);
+    layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 3, 3));
+    layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 3));
+    layout.setView(0, ssc::ptCORONAL,  LayoutRegion(1, 3));
+    layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(2, 3));
+    this->addDefaultLayout(layout);
+  }
+  {
+  	// 3D Any in a single view group
+    LayoutData layout = LayoutData::create("LAYOUT_3D_AD_SINGLE", "3D AnyDual Connected", 2, 4);
+    layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 2, 3));
+    layout.setView(0, ssc::ptANYPLANE,    LayoutRegion(0, 3));
+    layout.setView(0, ssc::ptSIDEPLANE,  LayoutRegion(1, 3));
     this->addDefaultLayout(layout);
   }
 

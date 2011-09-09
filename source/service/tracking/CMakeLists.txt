@@ -12,6 +12,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxIgstkTool.h
     cxIgstkToolManager.h
     cxIgstkTrackerThread.h
+    cxDominantToolProxy.h
 )
 
 SET ( cxTrackingService_SOURCE
@@ -34,6 +35,8 @@ SET ( cxTrackingService_SOURCE
     cxIgstkToolManager.cpp
     cxIgstkTrackerThread.h
     cxIgstkTrackerThread.cpp
+    cxDominantToolProxy.h
+    cxDominantToolProxy.cpp
 )
 
 include_directories(
