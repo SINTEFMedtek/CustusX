@@ -619,8 +619,8 @@ void MainWindow::onWorkflowStateChangedSlot()
    // this->DockWidget(*iter); // wrong: removed the dockwidget altogether
   }
 
-  this->restoreState(desktop.mMainWindowState);
   viewManager()->setActiveLayout(desktop.mLayoutUid);
+  this->restoreState(desktop.mMainWindowState);
 }
 
 void MainWindow::saveDesktopSlot()
