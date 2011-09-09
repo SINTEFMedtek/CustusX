@@ -4,6 +4,7 @@
 #include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationDataAdapters.h"
 #include "Rep/cxLandmarkRep.h"
+#include "cxDominantToolProxy.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -14,6 +15,8 @@ class QSlider;
 
 namespace cx
 {
+
+
 /**
  * \class LandmarkImageRegistrationWidget
  *
@@ -42,6 +45,7 @@ protected slots:
   void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
   virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
   void thresholdChangedSlot(const int value); ///< reemits the valueChanged signal from the slider
+  void enableButtons();
 
 //  void registerSlot();
 //  void autoRegisterSlot(bool checked);
@@ -61,6 +65,7 @@ protected:
 //  RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
   ssc::StringDataAdapterPtr mActiveImageAdapter;
   ImageLandmarksSourcePtr mImageLandmarkSource;
+  DominantToolProxyPtr mDominantToolProxy;
 
   QPushButton* mAddLandmarkButton; ///< the Add Landmark button
   QPushButton* mEditLandmarkButton; ///< the Edit Landmark button
@@ -70,6 +75,7 @@ protected:
 
 //  QPushButton* mRegisterButton;
 //  QCheckBox* mAutoRegisterCheckBox;
+  ;
 
 private:
   LandmarkImageRegistrationWidget(); ///< not implemented
