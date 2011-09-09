@@ -12,6 +12,7 @@
 
 namespace cx
 {
+using ssc::Transform3D; // because of signaling
 
 typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
 
@@ -32,7 +33,7 @@ signals:
 	void dominantToolChanged(const QString&);
 
 	// forwarding of dominant tool signals
-	void toolTransformAndTimestamp(ssc::Transform3D matrix, double timestamp);
+	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);
 	void tooltipOffset(double offset);
 	void toolProbeSector();

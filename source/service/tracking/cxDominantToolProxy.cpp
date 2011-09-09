@@ -29,7 +29,6 @@ void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
     disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
     disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
     disconnect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
-    disconnect(mTool.get(), SIGNAL(), this, SIGNAL());
   }
 
   mTool = ssc::toolManager()->getDominantTool();
@@ -41,7 +40,6 @@ void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
     connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
     connect(mTool.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
     connect(mTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
-    connect(mTool.get(), SIGNAL(), this, SIGNAL());
   }
 }
 
