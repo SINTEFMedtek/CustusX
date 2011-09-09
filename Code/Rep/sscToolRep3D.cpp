@@ -4,6 +4,7 @@
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
+#include <vtkPolyDataNormals.h>
 #include <vtkSTLReader.h>
 #include <vtkMatrix4x4.h>
 #include <vtkRenderer.h>
@@ -97,20 +98,28 @@ void ToolRep3D::setTool(ToolPtr tool)
   // setup new
   if (mTool)
   {
+    vtkPolyDataPtr model;
+
     QString filename = mTool->getGraphicsFileName();
     if (!filename.isEmpty() && filename.endsWith("STL"))
     {
       mSTLReader->SetFileName(cstring_cast(filename));
-      mPolyDataMapper->SetInputConnection(mSTLReader->GetOutputPort()); //read a 3D model file of the tool
+      model = mSTLReader->GetOutput(); //read a 3D model file of the tool
     }
     else
     {
-      mPolyDataMapper->SetInput(mTool->getGraphicsPolyData()); // creates a cone, default
+      model = mTool->getGraphicsPolyData(); // creates a cone, default
     }
 
-    if (mPolyDataMapper->GetInput())
+    if (model)
     {
-      mToolActor->SetMapper(mPolyDataMapper);
+        vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
+        normals->SetInput(model);
+        normals->Update();
+        model = normals->GetOutput();
+        mPolyDataMapper->SetInput(model);
+
+        mToolActor->SetMapper(mPolyDataMapper);
     }
 
     //some color to 3D cursor
