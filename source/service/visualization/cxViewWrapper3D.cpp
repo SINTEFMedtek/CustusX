@@ -124,6 +124,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mLandmarkRep = LandmarkRep::New("LandmarkRep_"+index);
   mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
   mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+//  std::cout << this << " created new LandmarkRep " << mLandmarkRep.get() << std::endl;
+
 
 //  mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
 //  mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
