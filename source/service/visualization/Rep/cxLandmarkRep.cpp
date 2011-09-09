@@ -39,6 +39,11 @@ ssc::Transform3D PatientLandmarksSource::get_rMl() const
   return *ssc::ToolManager::getInstance()->get_rMpr();
 }
 // --------------------------------------------------------
+ssc::Vector3D PatientLandmarksSource::getTextPos(ssc::Vector3D p_l) const
+{
+  return p_l;
+}
+// --------------------------------------------------------
 
 // --------------------------------------------------------
 // --------------------------------------------------------
@@ -83,21 +88,31 @@ ssc::Transform3D ImageLandmarksSource::get_rMl() const
 		return ssc::Transform3D::Identity();
   return mImage->get_rMd();
 }
-
+ssc::Vector3D ImageLandmarksSource::getTextPos(ssc::Vector3D p_l) const
+{
+  ssc::Vector3D imageCenter = mImage->boundingBox().center();
+  ssc::Vector3D centerToSkinVector = (p_l - imageCenter).normal();
+  ssc::Vector3D numberPosition = p_l + 10.0*centerToSkinVector;
+  return numberPosition;
+}
 
 // --------------------------------------------------------
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-
+LandmarkRepPtr LandmarkRep::New(const QString& uid, const QString& name)
+{
+  LandmarkRepPtr retval(new LandmarkRep(uid, name));
+  retval->mSelf = retval;
+  return retval;
+}
 
 LandmarkRep::LandmarkRep(const QString& uid, const QString& name) :
   RepImpl(uid, name),
   mColor(0,1,0),
-  mSecondaryColor(0,0,1),
+//  mSecondaryColor(0,0.6,0.8),
+  mSecondaryColor(0,0.9,0.5),
   mShowLandmarks(true),
-//  mShowLabel(true),
-//  mShowLine(false),
   mGraphicsSize(1),
   mLabelSize(2.5)
 {
@@ -112,11 +127,13 @@ LandmarkRep::~LandmarkRep()
 
 void LandmarkRep::setPrimarySource(LandmarksSourcePtr primary)
 {
-	if (mPrimary)
+  if (mPrimary)
 		disconnect(mPrimary.get(), SIGNAL(changed()), this, SLOT(internalUpdate()));
 	mPrimary = primary;
 	if (mPrimary)
 		connect(mPrimary.get(), SIGNAL(changed()), this, SLOT(internalUpdate()));
+
+	this->internalUpdate();
 }
 
 void LandmarkRep::setSecondarySource(LandmarksSourcePtr secondary)
@@ -126,28 +143,32 @@ void LandmarkRep::setSecondarySource(LandmarksSourcePtr secondary)
 	mSecondary = secondary;
 	if (mSecondary)
 		connect(mSecondary.get(), SIGNAL(changed()), this, SLOT(internalUpdate()));
+
+  this->internalUpdate();
 }
 
 void LandmarkRep::setColor(ssc::Vector3D color)
 {
   mColor = color;
+  this->internalUpdate();
 }
 
 void LandmarkRep::setSecondaryColor(ssc::Vector3D color)
 {
   mSecondaryColor = color;
+  this->internalUpdate();
 }
 
 void LandmarkRep::setGraphicsSize(double size)
 {
   mGraphicsSize = size;
-  internalUpdate();
+  this->internalUpdate();
 }
 
 void LandmarkRep::setLabelSize(double size)
 {
   mLabelSize = size;
-  internalUpdate();
+  this->internalUpdate();
 }
 
 void LandmarkRep::showLandmarks(bool on)
@@ -169,23 +190,6 @@ void LandmarkRep::showLandmarks(bool on)
   mShowLandmarks = on;
 }
 
-//void LandmarkRep::landmarkAddedSlot(QString uid)
-//{
-//  this->addPoint(uid);
-//  this->setPosition(uid);
-//  this->internalUpdate();
-//}
-
-//void LandmarkRep::landmarkRemovedSlot(QString uid)
-//{
-//  mGraphics.erase(uid);
-//}
-
-//void LandmarkRep::transformChangedSlot()
-//{
-//	this->addAll();
-//}
-
 void LandmarkRep::addAll()
 {
   ssc::LandmarkPropertyMap props = ssc::dataManager()->getLandmarkProperties();
@@ -198,6 +202,7 @@ void LandmarkRep::addAll()
 
 void LandmarkRep::internalUpdate()
 {
+  this->clearAll();
 	this->addAll();
 }
 
@@ -213,35 +218,12 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
     return;
 
   this->addAll();
-
-//  for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
-//  {
-//    if (iter->second.mPrimaryPoint)
-//    	iter->second.mPrimaryPoint->setRenderer(view->getRenderer());
-//    if (iter->second.mSecondaryPoint)
-//    	iter->second.mSecondaryPoint->setRenderer(view->getRenderer());
-//    if (iter->second.mText)
-//    	iter->second.mText->setRenderer(view->getRenderer());
-//    if (iter->second.mLine)
-//      iter->second.mLine->setRenderer(view->getRenderer());
-//  }
 	mViewportListener->startListen(view->getRenderer());
 }
 
 void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
   this->clearAll();
-//  for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
-//  {
-//    if (iter->second.mPrimaryPoint)
-//    	iter->second.mPrimaryPoint->setRenderer(NULL);
-//    if (iter->second.mSecondaryPoint)
-//    	iter->second.mSecondaryPoint->setRenderer(NULL);
-//    if (iter->second.mText)
-//    	iter->second.mText->setRenderer(NULL);
-//    if (iter->second.mLine)
-//      iter->second.mLine->setRenderer(NULL);
-//  }
 	mViewportListener->stopListen();
 }
 
@@ -268,9 +250,9 @@ void LandmarkRep::addLandmark(QString uid)
 	ssc::Vector3D primary_r;
 	if (mPrimary)
 	{
+    primary = mPrimary->getLandmarks()[uid];
 		if (!primary.getUid().isEmpty())
 		{
-		  primary = mPrimary->getLandmarks()[uid];
 			primary_r = mPrimary->get_rMl().coord(primary.getCoord());
 
 			current.mPrimaryPoint.reset(new ssc::GraphicalPoint3D(renderer));
@@ -282,8 +264,10 @@ void LandmarkRep::addLandmark(QString uid)
 			current.mText->setSizeInNormalizedViewport(true, 0.025);
 			current.mText->setColor(mColor);
 
+      ssc::Vector3D text_r = mPrimary->get_rMl().coord(mPrimary->getTextPos(primary.getCoord()));
+
 			current.mPrimaryPoint->setValue(primary_r);
-			current.mText->setPosition(primary_r);
+			current.mText->setPosition(text_r);
 		}
 	}
 
@@ -300,6 +284,8 @@ void LandmarkRep::addLandmark(QString uid)
 			current.mSecondaryPoint.reset(new ssc::GraphicalPoint3D(renderer));
 			current.mSecondaryPoint->setColor(mSecondaryColor);
 			current.mSecondaryPoint->setRadius(2);
+
+			current.mSecondaryPoint->setValue(secondary_r);
 		}
   }
 
@@ -307,7 +293,7 @@ void LandmarkRep::addLandmark(QString uid)
   if (!secondary.getUid().isEmpty() && !secondary.getUid().isEmpty())
   {
     current.mLine.reset(new ssc::GraphicalLine3D(renderer));
-    current.mLine->setColor(mColor);
+    current.mLine->setColor(mSecondaryColor);
     current.mLine->setStipple(0x0F0F);
 
     current.mLine->setValue(primary_r, secondary_r);
@@ -316,77 +302,6 @@ void LandmarkRep::addLandmark(QString uid)
   mGraphics[uid] = current;
   this->rescale();
 }
-
-///**
-// * Use the inpup coord in ref space to render a landmark.
-// */
-//void LandmarkRep::addPoint(QString uid)
-//{
-//  if (!this->exists(uid))
-//    return;
-//
-//  vtkRendererPtr renderer;
-//  if (!mViews.empty())
-//    renderer = (*mViews.begin())->getRenderer();
-//
-//  LandmarkGraphics current;
-//
-//  std::map<QString, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
-//  QString name = props[uid].getName();
-//
-//  current.mPoint.reset(new ssc::GraphicalPoint3D(renderer));
-//  current.mPoint->setColor(mColor);
-//  current.mPoint->setRadius(2);
-//
-//  if (mShowLabel)
-//  {
-//    current.mText.reset(new ssc::FollowerText3D(renderer));
-//    current.mText->setText(name);
-//    current.mText->setSizeInNormalizedViewport(true, 0.025);
-//    current.mText->setColor(mColor);
-//
-//    // a bit smaller than the corresponding vtkCaptionActor2D, because the sizes
-//    // are set differently.
-//    current.mText->setSize(mLabelSize/100*0.75);
-//  }
-//
-//  if (mShowLine)
-//  {
-//    current.mLine.reset(new ssc::GraphicalLine3D(renderer));
-//    current.mLine->setColor(mColor);
-////    current.mLine->setColor(ssc::Vector3D(1,0,0));
-//    current.mLine->setStipple(0x0F0F);
-////    current.mLine->setRadius(2);
-//  }
-//
-//  mGraphics[uid] = current;
-////  this->setPosition(coord, uid);
-//}
-//
-//void LandmarkRep::internalUpdate()
-//{
-//  std::map<QString, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
-//
-//  for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
-//  {
-//    QString uid = iter->first;
-//    QString name = props[uid].getName();
-//    if (iter->second.mText)
-//    {
-//      iter->second.mText->setColor(mColor);
-//      iter->second.mText->setText(name);
-//      // a bit smaller than the corresponding vtkCaptionActor2D, because the sizes
-//      // are set differently.
-//      iter->second.mText->setSize(mLabelSize/100*0.75);
-//    }
-//    if (iter->second.mPoint)
-//    {
-//      iter->second.mPoint->setColor(mColor);
-////      iter->second.mPoint->setRadius(mGraphicsSize);
-//    }
-//  }
-//  this->rescale();
-//}
 
 void LandmarkRep::rescale()
 {

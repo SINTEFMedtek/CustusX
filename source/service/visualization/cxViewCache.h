@@ -42,7 +42,7 @@ public:
       //Turn off rendering in vtkRenderWindowInteractor
       view->getRenderWindow()->GetInteractor()->EnableRenderOff();
       //Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
-      view->getRenderWindow()->GetInteractor()->SetStillUpdateRate(8.0);
+//      view->getRenderWindow()->GetInteractor()->SetStillUpdateRate(8.0);
       mCached.push_back(view);
     }
 

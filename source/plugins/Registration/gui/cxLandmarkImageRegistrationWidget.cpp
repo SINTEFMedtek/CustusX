@@ -28,6 +28,7 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationMan
   mThresholdSlider(new QSlider(Qt::Horizontal, this))
 {
   mActiveImageAdapter = ActiveImageStringDataAdapter::New();
+  mImageLandmarkSource = ImageLandmarksSource::New();
 
   //pushbuttons
   mAddLandmarkButton = new QPushButton("Add", this);
@@ -94,6 +95,8 @@ void LandmarkImageRegistrationWidget::activeImageChangedSlot()
     if(!mManager->getFixedData())
     	mManager->setFixedData(image);
   }
+
+  mImageLandmarkSource->setImage(image);
 
   //enable the add point button
   mAddLandmarkButton->setEnabled(image!=0);
@@ -181,6 +184,12 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
   }
 
   viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
+  LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
+  if (rep)
+  {
+    rep->setPrimarySource(mImageLandmarkSource);
+    rep->setSecondarySource(LandmarksSourcePtr());
+  }
 }
 
 void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
@@ -191,6 +200,12 @@ void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
   ssc::ProbeRepPtr probeRep = this->getProbeRep();
   if(probeRep)
     disconnect(this, SIGNAL(thresholdChanged(const int)), probeRep.get(), SLOT(setThresholdSlot(const int)));
+  LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
+  if (rep)
+  {
+    rep->setPrimarySource(LandmarksSourcePtr());
+    rep->setSecondarySource(LandmarksSourcePtr());
+  }
   viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 
