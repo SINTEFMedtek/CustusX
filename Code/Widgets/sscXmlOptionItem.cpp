@@ -122,6 +122,13 @@ QDomElement XmlOptionItem::findElemFromUid(const QString& uid, QDomNode root) co
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
+XmlOptionFile XmlOptionFile::createNull()
+{
+	XmlOptionFile retval;
+	retval.mDocument = QDomDocument();
+	retval.mCurrentElement = QDomElement();
+	return retval;
+}
 
 XmlOptionFile::XmlOptionFile()
 {
@@ -200,7 +207,7 @@ XmlOptionFile XmlOptionFile::tryDescend(QString element, QString attributeName, 
 	    }
 	  }
 
-	  return XmlOptionFile();
+	  return XmlOptionFile::createNull();
 }
 
 XmlOptionFile XmlOptionFile::ascend() const
