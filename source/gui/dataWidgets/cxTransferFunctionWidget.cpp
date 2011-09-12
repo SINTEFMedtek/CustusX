@@ -330,8 +330,10 @@ void TransferFunctionPresetWidget::saveSlot()
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   mPresets.save(text, activeImage);
 
+  mPresetsComboBox->blockSignals(true);
   mPresetsComboBox->clear();
   mPresetsComboBox->addItems(mPresets.getPresetList());
+  mPresetsComboBox->blockSignals(false);
 }
 
 //---------------------------------------------------------
