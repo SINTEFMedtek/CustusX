@@ -13,6 +13,7 @@
 
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
+#include <QDateTime>
 class QTimer;
 #include "igtlImageMessage.h"
 #include <opencv2/highgui/highgui.hpp>
@@ -44,16 +45,20 @@ public:
 protected:
 private:
   QTcpSocket* mSocket;
-  QTimer* mTimer;
+  QTimer* mSendTimer;
+  QTimer* mGrabTimer;
   StringMap mArguments;
   void dumpProperties();
   IGTLinkImageMessage::Pointer getImageMessage();
   void dumpProperty(int val, QString name);
 
   cv::VideoCapture mVideoCapture; // OpenCV video grabber
+  QDateTime mLastGrabTime;
 
 private slots:
-  void tick();
+//  void tick();
+  void grab();
+  void send();
 
 };
 

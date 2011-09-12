@@ -105,12 +105,18 @@ ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QO
 
 //  mImageData = loadImage(mImageFileDir);
 
-  mTimer = new QTimer(this);
-  connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+  mGrabTimer = new QTimer(this);
+  connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 //  mTimer->start(40);
-  mTimer->start(0);
+  mGrabTimer->start(0);
 //  mTimer->start(1200); // for test of the timeout feature
 //  mTimer->start(100);
+
+
+  mSendTimer = new QTimer(this);
+  connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+  mSendTimer->start(40);
+
 }
 
 void ImageSenderOpenCV::dumpProperties()
@@ -143,8 +149,18 @@ void ImageSenderOpenCV::dumpProperty(int val, QString name)
 		std::cout << "Property " << name.toStdString() << " : " << mVideoCapture.get(val) << std::endl;
 }
 
-void ImageSenderOpenCV::tick()
+void ImageSenderOpenCV::grab()
 {
+//  QTime start = QTime::currentTime();
+  // grab images from camera to opencv internal buffer, do not process
+  mVideoCapture.grab();
+  mLastGrabTime = QDateTime::currentDateTime();
+//  std::cout << "   grab: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+}
+
+void ImageSenderOpenCV::send()
+{
+//  QTime start = QTime::currentTime();
 //  std::cout << "tick" << std::endl;
 //  QTime start = QTime::currentTime();
 	IGTLinkImageMessage::Pointer imgMsg = this->getImageMessage();
@@ -157,6 +173,7 @@ void ImageSenderOpenCV::tick()
   	mSocket->write(reinterpret_cast<const char*>(imgMsg->GetPackPointer()), imgMsg->GetPackSize());
 //  std::cout << "tick " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
   }
+//  std::cout << "   send: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 }
 
 IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
@@ -167,7 +184,9 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   QTime start = QTime::currentTime();
 
   cv::Mat frame_source;
-  mVideoCapture >> frame_source;
+//  mVideoCapture >> frame_source;
+  if (!mVideoCapture.retrieve(frame_source, 0))
+    return IGTLinkImageMessage::Pointer();
 
 	if (this->thread()==QCoreApplication::instance()->thread() && !mSocket)
 	{
@@ -179,8 +198,9 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 
   igtl::TimeStamp::Pointer timestamp;
   timestamp = igtl::TimeStamp::New();
-  double now = 1.0/1000*(double)QDateTime::currentDateTime().toMSecsSinceEpoch();
-  timestamp->SetTime(now);
+//  double now = 1.0/1000*(double)QDateTime::currentDateTime().toMSecsSinceEpoch();
+  double grabTime = 1.0/1000*(double)mLastGrabTime.toMSecsSinceEpoch();
+  timestamp->SetTime(grabTime);
 
   cv::Mat frame;
   // temporary HACK: all the old probe defs are for 800x600, continue this line for now:
