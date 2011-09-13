@@ -15,7 +15,6 @@ SET( CX_QT_MOC_HEADER_FILES
     cxDistanceMetric.h
     cxPlaneMetric.h
     cxAngleMetric.h
-    cxDataMetric.h
 )
 
 SET ( cxPatientService_SOURCE
