@@ -98,8 +98,7 @@ ViewManager::ViewManager() :
   }
 
   mInteractiveCropper.reset(new InteractiveCropper());
-
-  mInteractiveClipper.reset(new InteractiveClipper(mViewGroups.front()->getSlicePlanesProxy()));
+  mInteractiveClipper.reset(new InteractiveClipper());
   connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 
   this->syncOrientationMode(SyncedValue::create(0));
