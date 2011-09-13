@@ -76,6 +76,8 @@ SET( CX_QT_MOC_HEADER_FILES
     cxImageServer.h
     cxImageSession.h
     cxImageSenderFile.h
+    cxImageSenderSonix.h
+    cxImageSenderOpenCV.h
 #    cxImageSenderFactory.h
 )
 
