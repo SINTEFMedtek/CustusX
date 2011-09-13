@@ -23,7 +23,8 @@ class InteractiveClipper : public QObject
 {
   Q_OBJECT
 public:
-  InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy);
+  explicit InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy);
+  InteractiveClipper();
 
   void setSlicePlane(ssc::PLANE_TYPE plane);
   void saveClipPlaneToVolume(); ///< save the current clip to image
@@ -41,6 +42,7 @@ private slots:
 //  void activeLayoutChangedSlot();
 //  void activeImageChangedSlot();
   void changedSlot();
+  void dominantToolChangedSlot();
 
 private:
   ssc::PLANE_TYPE getPlaneType();
