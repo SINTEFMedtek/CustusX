@@ -48,7 +48,7 @@ private:
   vtkOrientationMarkerWidgetPtr mMarker;
   double mSize;
   Vector3D mColor;
-  static std::pair<QString, vtkPropPtr> mMarkerCache; ///< cache all loaded markers in order to save load time.
+  std::pair<QString, vtkPropPtr> mMarkerCache; ///< cache all loaded markers in order to save load time. (not really necessary, leftover from when this was a static cache.)
 
   void rebuild(vtkRenderWindowInteractorPtr interactor);
   vtkAxesActorPtr createAxes();
