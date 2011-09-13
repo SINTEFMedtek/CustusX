@@ -89,10 +89,13 @@ set(${LIBNAME}_MOC_HDRS
     cxMainWindow.h
     cxGrabberServerWidget.h
     cxMacGrabberServerWidget.h
+    cxWinGrabberServerWidget.h
     cxGrabber.h
+    cxWinGrabber.h
     cxServer.h
     cxGrabberServer.h
     cxOpenIGTLinkSession.h
+    cxWinGrabberServer.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -112,7 +115,6 @@ set(SOURCES
     cxMainWindow.cpp
     cxGrabberServerWidget.cpp
     cxMacGrabberServerWidget.cpp
-    cxWinGrabberServerWidget.h
     cxWinGrabberServerWidget.cpp
     cxGrabber.cpp
     cxMacGrabber.h
