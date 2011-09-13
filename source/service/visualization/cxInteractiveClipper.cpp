@@ -23,6 +23,7 @@
 #include "sscSlicePlanes3DRep.h"
 #include "sscSliceProxy.h"
 #include "sscImage.h"
+#include "sscToolManager.h"
 
 
 namespace cx
@@ -36,6 +37,29 @@ InteractiveClipper::InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy
   connect(this              , SIGNAL(changed()),                       this, SLOT(changedSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
 
+  this->changedSlot();
+}
+
+InteractiveClipper::InteractiveClipper() :
+    mUseClipper(false)
+{
+
+	// create a slice planes proxy containing all slice definitions,
+	// for use with the clipper
+	mSlicePlanesProxy = ssc::SlicePlanesProxyPtr(new ssc::SlicePlanesProxy());
+	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptSAGITTAL);
+	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptCORONAL);
+	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptAXIAL);
+	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptANYPLANE);
+	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptSIDEPLANE);
+	mSlicePlanesProxy->addSimpleSlicePlane(ssc::ptRADIALPLANE);
+
+  mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
+  connect(this              , SIGNAL(changed()),                       this, SLOT(changedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+
+  this->dominantToolChangedSlot();
   this->changedSlot();
 }
 
@@ -149,6 +173,18 @@ std::vector<ssc::PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
   }
   return retval;
 }
+
+void InteractiveClipper::dominantToolChangedSlot()
+{
+  ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
+
+  ssc::SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
+  for (ssc::SlicePlanesProxy::DataMap::iterator iter=data.begin(); iter!=data.end(); ++iter)
+  {
+  	iter->second.mSliceProxy->setTool(dominantTool);
+  }
+}
+
 
 
 } // namespace cx

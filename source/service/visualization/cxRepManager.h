@@ -110,7 +110,7 @@ public:
   	  boost::shared_ptr<REP> retval = boost::shared_dynamic_cast<REP>(iter->second);
   	  if (retval)
   	  {
-  		  std::cout << "reusing cached rep: " << uid << std::endl;
+//  		  std::cout << "reusing cached rep: " << uid << std::endl;
   	  	return retval;
   	  }
   	}
@@ -121,7 +121,7 @@ public:
   	// create new value, store and return:
 	  boost::shared_ptr<REP> retval = REP::New(uid,name);
 	  mRepCache.insert(std::make_pair(uid,retval));
-	  std::cout << "created new cached rep: " << uid << std::endl;
+//	  std::cout << "created new cached rep: " << uid << std::endl;
 
 	  return retval;
   }
