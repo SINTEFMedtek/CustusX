@@ -106,6 +106,15 @@ void SlicePlanesProxy::setViewportData(PLANE_TYPE type, ssc::SliceProxyPtr slice
 	emit changed();
 }
 
+void SlicePlanesProxy::addSimpleSlicePlane(PLANE_TYPE type)
+{
+	SliceProxyPtr slice = SliceProxy::New("sliceproxy_("+ qstring_cast(type) +")");
+  slice->initializeFromPlane(type, false, ssc::Vector3D(0,0,1), true, 1, 0.25);
+
+	this->setViewportData(type, slice, ssc::DoubleBoundingBox3D(0,1,0,1,0,1));
+}
+
+
 SlicePlanesProxy::DataMap SlicePlanesProxy::getData()
 {
 	return mData;

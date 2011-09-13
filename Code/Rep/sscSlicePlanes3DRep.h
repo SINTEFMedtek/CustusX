@@ -46,6 +46,7 @@ public:
 
 	void clearViewports();
 	void setViewportData(PLANE_TYPE type, ssc::SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s);
+	void addSimpleSlicePlane(PLANE_TYPE type);
 	DataMap getData();
 
 	void setVisible(bool visible);
