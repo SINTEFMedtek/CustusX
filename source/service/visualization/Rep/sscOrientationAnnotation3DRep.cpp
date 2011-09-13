@@ -44,9 +44,9 @@ typedef vtkSmartPointer<vtkQuadricDecimation> vtkQuadricDecimationPtr;
 namespace ssc
 {
 
-//---------------------------------------------------------
-std::pair<QString, vtkPropPtr> OrientationAnnotation3DRep::mMarkerCache;
-//---------------------------------------------------------
+////---------------------------------------------------------
+//std::pair<QString, vtkPropPtr> OrientationAnnotation3DRep::mMarkerCache;
+////---------------------------------------------------------
 
 
 OrientationAnnotation3DRep::OrientationAnnotation3DRep( const QString& uid, const QString& name) :

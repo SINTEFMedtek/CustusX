@@ -155,7 +155,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
 
-  mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
+  mAnnotationMarker = RepManager::getInstance()->getCachedRep<ssc::OrientationAnnotation3DRep>("annotation_"+mView->getName());
+//  mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
   mAnnotationMarker->setMarkerFilename(DataLocations::getRootConfigPath()+"/models/"+settings()->value("View3D/annotationModel").toString());
   mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 
