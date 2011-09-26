@@ -241,6 +241,22 @@ void Transform3DWidget::changedSlot()
   recursive = false;
 }
 
+namespace
+{
+	/**Wrap the angle into the interval -M_PI..M_PI
+	 *
+	 */
+	double wrapAngle(double angle)
+	{
+		angle = fmod(angle, M_PI * 2);
+		if (angle > M_PI)
+			angle -= M_PI * 2;
+		if (angle < -M_PI)
+			angle += M_PI * 2;
+		return angle;
+	}
+}
+
 void Transform3DWidget::updateValues()
 {
   QString M = qstring_cast(this->getMatrix());
@@ -250,9 +266,9 @@ void Transform3DWidget::updateValues()
 
   ssc::Vector3D xyz = mDecomposition.getAngles();
 
-  mAngleAdapter[0]->setValue(xyz[0]);
-  mAngleAdapter[1]->setValue(xyz[1]);
-  mAngleAdapter[2]->setValue(xyz[2]);
+  mAngleAdapter[0]->setValue(wrapAngle(xyz[0]));
+  mAngleAdapter[1]->setValue(wrapAngle(xyz[1]));
+  mAngleAdapter[2]->setValue(wrapAngle(xyz[2]));
 
   ssc::Vector3D t = mDecomposition.getPosition();
   mTranslationAdapter[0]->setValue(t[0]);
