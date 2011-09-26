@@ -51,7 +51,8 @@ std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElem
 }
   
 void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
-                                                 ImagePtr frameData,
+                                                 //ImagePtr frameData,
+                                                 USFrameDataPtr frameData,
                                                  ImagePtr outputData,
                                                  ImagePtr frameMask,
                                                  QDomElement settings)
@@ -76,14 +77,21 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
     return;
   }
   
-  reconstruct_data data;
-  vtkImageDataPtr input = frameData->getBaseVtkImageData();
-  data.input = static_cast<unsigned char*>(input->GetScalarPointer());
-  input->GetDimensions(data.input_dim);
-  input->GetSpacing(data.input_spacing);
-  
+  reconstruct_data data;//TODO change
+  //vtkImageDataPtr input = frameData->getBaseVtkImageData();
+//  USFrameDataPtr input = frameData;//TODO: Fix input
+
+  data.frameData = frameData;
+//  data.input = static_cast<unsigned char*>(input->GetScalarPointer());
+  //input->GetDimensions(data.input_dim);
+  //input->GetSpacing(data.input_spacing);
+  //data.input_dim = input->getDimensions();
+  //data.input_spacing = input->GetSpacing();
+
+  int* inputDims = frameData->getDimensions();
   //test
-  long size = data.input_dim[0]*data.input_dim[1]*data.input_dim[2];
+  //long size = data.input_dim[0]*data.input_dim[1]*data.input_dim[2];
+  long size = inputDims[0]*inputDims[1]*inputDims[2];
   ssc::messageManager()->sendDebug("input size: " 
                                    + qstring_cast(size));
   //ssc::messageManager()->sendInfo("input dimensions: " 
@@ -103,9 +111,11 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
   
   vtkImageDataPtr input_mask = frameMask->getBaseVtkImageData();
   data.input_mask = static_cast<unsigned char*>(input_mask->GetScalarPointer());
+//  data.frameMask = frameMask;
   
   vtkImageDataPtr output = outputData->getBaseVtkImageData();
   data.output = static_cast<unsigned char*>(output->GetScalarPointer());
+//  data.outputData = outputData;
   output->GetDimensions(data.output_dim);
   output->GetSpacing(data.output_spacing);
   
