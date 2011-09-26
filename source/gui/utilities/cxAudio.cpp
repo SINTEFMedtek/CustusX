@@ -6,8 +6,29 @@
 namespace cx
 {
 
+AudioInternal::AudioInternal(QObject* parent) : QObject(parent)
+{
+	connect(this, SIGNAL(playSoundInternalSignal(QString)), this, SLOT(playSoundSlot(QString)));
+}
+
+void AudioInternal::playSound(QString file)
+{
+	emit playSoundInternalSignal(file);
+}
+
+void AudioInternal::playSoundSlot(QString file)
+{
+  QSound::play(file);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
 Audio::Audio()
 {
+	mInternal.reset(new AudioInternal());
 }
 
 Audio::~Audio()
@@ -15,42 +36,42 @@ Audio::~Audio()
 
 void Audio::playStartSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Insert.wav");
+	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Insert.wav");
 }
 
 void Audio::playStopSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Remove.wav");
+	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Remove.wav");
 }
 
 void Audio::playCancelSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Fail.wav");
+	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Fail.wav");
 }
 
 void Audio::playSuccessSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Print complete.wav");
+	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Print complete.wav");
 }
 
 void Audio::playWarningSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows xp Navigation.wav");
+	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows xp Navigation.wav");
 }
 
 void Audio::playErrorSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Critical Stop.wav");
+	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Critical Stop.wav");
 }
 
 void Audio::playScreenShotSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"camera_shutter.wav");
+	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"camera_shutter.wav");
 }
 
 void Audio::playSampleSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Information Bar.wav");
+	mInternal->playSound(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Information Bar.wav");
 }
 
 }//namespace cx
