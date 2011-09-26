@@ -140,13 +140,14 @@ void Reconstructer::setSettings()
   this->createAlgorithm();
 
   this->updateFromOriginalFileData();
-  if (!this->validInputData())
-    return;
+  if (this->validInputData())
+  {
 
-  ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
-  maxVol.writeValue(QString::number(mOutputVolumeParams.getMaxVolumeSize()));
+		ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
+		maxVol.writeValue(QString::number(mOutputVolumeParams.getMaxVolumeSize()));
 
-  mSettings.save();
+		mSettings.save();
+  }
 
   emit paramsChanged();
 }
