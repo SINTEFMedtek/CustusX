@@ -214,6 +214,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
       this->readDataRepSettings(iter->second);
     }
 
+    this->toolsAvailableSlot();
     mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
     mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 //    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
@@ -614,7 +615,7 @@ void ViewWrapper3D::toolsAvailableSlot()
         toolRep->getTracer()->start();
     }
 
-    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble()*2/3); // use fraction of set size
+    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble()); // use fraction of set size
     toolRep->setSphereRadiusInNormalizedViewport(true);
 
     toolRep->setTool(tool);
