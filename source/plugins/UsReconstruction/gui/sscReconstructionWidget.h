@@ -47,7 +47,7 @@ private:
   ssc::SpinBoxGroupWidget* mDimZWidget;
   
   QGroupBox* mAlgorithmGroup;
-  QGridLayout* mAlgoLayout;
+  QStackedLayout* mAlgoLayout;
   std::vector<QWidget*> mAlgoWidgets;
   
   QString getCurrentPath();

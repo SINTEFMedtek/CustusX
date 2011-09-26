@@ -67,7 +67,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 
 
   mAlgorithmGroup = new QGroupBox("Algorithm", this);
-  mAlgoLayout = new QGridLayout(mAlgorithmGroup);
+  mAlgoLayout = new QStackedLayout(mAlgorithmGroup);
   this->repopulateAlgorithmGroup();
 
   topLayout->addWidget(mFileSelectWidget);
@@ -97,28 +97,31 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 
 	mAlgorithmGroup->setTitle(algoName);
 
-	while (mAlgoLayout->count())
+	// look for an existing layout in the stack:
+	for (int i=0; i<mAlgoLayout->count(); ++i)
 	{
-		QWidget* child = mAlgoLayout->itemAt(0)->widget();
-		if (!child)
-			break; // ups : found layout inside, bail out
-		child->setVisible(false);
-		mAlgoLayout->removeWidget(child);
-		//delete child;
+		QWidget* current = mAlgoLayout->widget(i);
+		if (current->objectName()==algoName)
+		{
+			mAlgoLayout->setCurrentIndex(i);
+			return;
+		}
 	}
-	 mAlgoLayout->update();
 
-	 // delete widget objects (might be different than the widgets removed from the layout
-	 for (unsigned i=0; i<mAlgoWidgets.size(); ++i)
-		 delete mAlgoWidgets[i];
-	 mAlgoWidgets.clear();
+	 // No existing found,
+	//  create a new stack element for this algo:
+	QWidget* oneAlgoWidget = new QWidget(this);
+	oneAlgoWidget->setObjectName(algoName);
+	mAlgoLayout->addWidget(oneAlgoWidget);
+	QGridLayout* oneAlgoLayout = new QGridLayout(oneAlgoWidget);
 
 	std::vector<DataAdapterPtr> algoOption = mReconstructer->mAlgoOptions;
 	for (unsigned i=0; i<algoOption.size(); ++i)
 	{
-	  QWidget* widget = ssc::createDataWidget(this, algoOption[i], mAlgoLayout, i);
-	  mAlgoWidgets.push_back(widget);
+	  ssc::createDataWidget(oneAlgoWidget, algoOption[i], oneAlgoLayout, i);
 	}
+
+	mAlgoLayout->setCurrentWidget(oneAlgoWidget);
 }
 
 QString ReconstructionWidget::getCurrentPath()
