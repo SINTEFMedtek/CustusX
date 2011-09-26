@@ -56,6 +56,7 @@ SET(cxGui_MOC_HDRS
     toolWidgets/cxActiveToolWidget.h
     toolWidgets/cxToolManagerWidget.h
     #----------------------
+    utilities/cxAudio.h
     utilities/cxDoubleSpanSlider.h
     utilities/cxBaseWidget.h
     utilities/cxTransform3DWidget.h
