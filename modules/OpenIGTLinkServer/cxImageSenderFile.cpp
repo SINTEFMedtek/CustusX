@@ -220,7 +220,7 @@ MHDImageSender::MHDImageSender(QTcpSocket* socket, StringMap arguments, QObject*
 {
 	QString filename = mArguments["filename"];
   mImageData = loadImage(filename);
- mImageData = convertToTestColorImage(mImageData);
+// mImageData = convertToTestColorImage(mImageData);
 
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
