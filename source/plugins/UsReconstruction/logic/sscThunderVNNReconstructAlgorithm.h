@@ -14,7 +14,7 @@
 
 namespace ssc
 {
-class ThunderVNNReconstructAlgorithm// : public ReconstructAlgorithm
+class ThunderVNNReconstructAlgorithm : public ReconstructAlgorithm
 {
 public:
   ThunderVNNReconstructAlgorithm(QString shaderPath);
@@ -22,7 +22,8 @@ public:
   virtual QString getName() const;
   virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
   virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
-                           ImagePtr frameData,
+                           //ImagePtr frameData,
+                           USFrameDataPtr frameData,
                            ImagePtr outputData,
                            ImagePtr frameMask,
                            QDomElement settings);

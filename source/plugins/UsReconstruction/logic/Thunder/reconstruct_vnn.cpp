@@ -18,6 +18,7 @@
 #include "holger_time.h"
 #include "utils.h"
 
+#include <vtkImageData.h>
 
 float3* generate_plane_points(double* pos_matrices, 
                               int bscan_w,
@@ -143,17 +144,30 @@ void call_vnn_kernel(cl_kernel vnn,
   int volume_w = data->output_dim[0];
   int volume_h = data->output_dim[1];
   int volume_n = data->output_dim[2];
-  
+//  int* outputDim;
+//  data->outputData->getBaseVtkImageData()->GetDimensions(outputDim);
+//  int volume_w = outputDim[0];
+//  int volume_h = outputDim[1];
+//  int volume_n = outputDim[2];
+
   float volume_spacing = data->output_spacing[0];
+//  float volume_spacing = data->outputData->getBaseVtkImageData()->GetSpacing()[0];
+
+  int* inputDim = data->frameData->getDimensions();
+//  int bscan_w = data->input_dim[0];
+//  int bscan_h = data->input_dim[1];
+//  int bscan_n = data->input_dim[2];
+  int bscan_w = inputDim[0];
+  int bscan_h = inputDim[1];
+  int bscan_n = inputDim[2];
+
+  ssc::Vector3D inputSpacing = data->frameData->getSpacing();
+//  float bscan_spacing_x = data->input_spacing[0];
+//  float bscan_spacing_y = data->input_spacing[1];
+  float bscan_spacing_x = inputSpacing[0];
+  float bscan_spacing_y = inputSpacing[1];
   
-  int bscan_w = data->input_dim[0];
-  int bscan_h = data->input_dim[1];
-  int bscan_n = data->input_dim[2];
-  
-  float bscan_spacing_x = data->input_spacing[0];
-  float bscan_spacing_y = data->input_spacing[1];
-  
-  unsigned char* bscans = data->input;
+//  unsigned char* bscans = data->input;
   unsigned char* volume = data->output;
   unsigned char* mask = data->input_mask;
   
@@ -184,10 +198,28 @@ void call_vnn_kernel(cl_kernel vnn,
   float * printings = (float *) malloc(printings_size);
   memset(printings, 0, printings_size);
   
-  int bscans_size0 = bscan_n/2 * bscan_h * bscan_w;
-  int bscans_size1 = (bscan_n/2 + bscan_n%2) * bscan_h * bscan_w;
-  cl_mem dev_bscans0 = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, bscans_size0, bscans);
-  cl_mem dev_bscans1 = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, bscans_size1, bscans + bscans_size0);//Make sure we allocate the last byte
+  // Create an array of cl_mem pointers -> This will give us a 2D array in openCL context
+  int frameSize = bscan_h * bscan_w;//assuming 8 bit data
+  //cl_mem = framePointers[bscan_n];//Won't work in all platforms as bscan_n is not a constant
+  //Use a points instead of an array
+  cl_mem* framePointers;
+  int framePointersSize = sizeof(cl_mem)*bscan_n;
+  //Allocate CPU RAM space
+  framePointers = (cl_mem*)malloc(framePointersSize);
+  //Allocate GPU RAM space
+  cl_mem clFramePointers = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, framePointersSize, framePointers);
+  for (int i = 0; i < bscan_n; i++)
+  {
+    //Allocate GPU (cl) memory for each frame
+    cl_mem clFrame = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, frameSize, data->frameData->getFrame(i));
+    framePointers[i] = clFrame;
+    //std::cout << "frame: " << i << " addr: " << framePointers[i] << std::endl;
+  }
+
+//  int bscans_size0 = bscan_n/2 * bscan_h * bscan_w;
+//  int bscans_size1 = (bscan_n/2 + bscan_n%2) * bscan_h * bscan_w;
+//  cl_mem dev_bscans0 = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, bscans_size0, bscans);
+//  cl_mem dev_bscans1 = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, bscans_size1, bscans + bscans_size0);//Make sure we allocate the last byte
   
   ///* // with byte adressable memory:
   cl_mem dev_volume = ocl_create_buffer(context->context, CL_MEM_WRITE_ONLY, volume_size, volume);
@@ -213,31 +245,36 @@ void call_vnn_kernel(cl_kernel vnn,
 
 
   for (int section = 0; section < 1; section++) {
-    clSetKernelArg(vnn, 0, sizeof(cl_mem), &dev_bscans0);
-    clSetKernelArg(vnn, 1, sizeof(cl_mem), &dev_bscans1);
-    clSetKernelArg(vnn, 2, sizeof(cl_mem), &dev_mask);
-    clSetKernelArg(vnn, 3, sizeof(cl_int), &bscan_w);
-    clSetKernelArg(vnn, 4, sizeof(cl_int), &bscan_h);
-    clSetKernelArg(vnn, 5, sizeof(cl_int), &bscan_n);
-    clSetKernelArg(vnn, 6, sizeof(cl_float), &bscan_spacing_x);
-    clSetKernelArg(vnn, 7, sizeof(cl_float), &bscan_spacing_y);
-    clSetKernelArg(vnn, 8, sizeof(cl_mem), &dev_volume);
-    clSetKernelArg(vnn, 9, sizeof(cl_int), &volume_n);
-    clSetKernelArg(vnn, 10, sizeof(cl_int), &volume_h);
-    clSetKernelArg(vnn, 11, sizeof(cl_int), &volume_w);
-    clSetKernelArg(vnn, 12, sizeof(cl_float), &volume_spacing);
-    clSetKernelArg(vnn, 13, sizeof(cl_mem), &dev_plane_eq);
-    clSetKernelArg(vnn, 14, sizeof(cl_mem), &dev_plane_points);
-    clSetKernelArg(vnn, 15, sizeof(cl_mem), &dev_printings);
-    clSetKernelArg(vnn, 16, sizeof(cl_int), &section);
+    int i = 0;
+    //clSetKernelArg(vnn, i++, framePointersSize, &clFramePointers);
+    clSetKernelArg(vnn, i++, sizeof(cl_mem), &clFramePointers);
+//    clSetKernelArg(vnn, 0, sizeof(cl_mem), &dev_bscans0);
+//    clSetKernelArg(vnn, 1, sizeof(cl_mem), &dev_bscans1);
+    clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_mask);
+    clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_w);
+    clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_h);
+    clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_n);
+    clSetKernelArg(vnn, i++, sizeof(cl_float), &bscan_spacing_x);
+    clSetKernelArg(vnn, i++, sizeof(cl_float), &bscan_spacing_y);
+    clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_volume);
+    clSetKernelArg(vnn, i++, sizeof(cl_int), &volume_n);
+    clSetKernelArg(vnn, i++, sizeof(cl_int), &volume_h);
+    clSetKernelArg(vnn, i++, sizeof(cl_int), &volume_w);
+    clSetKernelArg(vnn, i++, sizeof(cl_float), &volume_spacing);
+    clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_plane_eq);
+    clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_plane_points);
+    clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_printings);
+    clSetKernelArg(vnn, i++, sizeof(cl_int), &section);
     
     size_t * global_work_size = (size_t *) malloc(sizeof(size_t)*1);
     global_work_size[0] = (volume_w*volume_n/1/256+1)*256;//TODO: Find better number? 256?
     size_t * local_work_size = (size_t *) malloc(sizeof(size_t)*1);//TODO: Not in use?
     local_work_size[0] = 256;
+    std::cout << "Start openCL code. global_work_size[0]: " << global_work_size[0] << std::endl;
     ocl_check_error(clEnqueueNDRangeKernel(context->cmd_queue, vnn, 1, NULL, global_work_size, NULL, NULL, NULL, NULL));
     //ocl_check_error(clFinish(context->cmd_queue));
   }
+  std::cout << "openCL code finised. Get volume into CPU RAM" << std::endl;
 
   // with byte adressable memory:
   ocl_check_error(clEnqueueReadBuffer(context->cmd_queue, dev_volume, CL_TRUE, 0, volume_size, volume, 0, 0, 0));
@@ -255,8 +292,14 @@ void call_vnn_kernel(cl_kernel vnn,
    printf("%f \n", printings[i]);
    }*/
 
-  clReleaseMemObject(dev_bscans0);
-  clReleaseMemObject(dev_bscans1);
+  //Release GPU memory for all frames
+  for (int i = 0; i < bscan_n; i++)
+  {
+    clReleaseMemObject(framePointers[i]);
+  }
+  clReleaseMemObject(clFramePointers);
+//  clReleaseMemObject(dev_bscans0);
+//  clReleaseMemObject(dev_bscans1);
   clReleaseMemObject(dev_printings);
   clReleaseMemObject(dev_mask);
   clReleaseMemObject(dev_plane_eq);
@@ -269,6 +312,7 @@ void call_vnn_kernel(cl_kernel vnn,
   //holger_time_print(1);
 }
 
+//void reconstruct_vnn(reconstruct_data* data, const char* kernel_path)
 void reconstruct_vnn(reconstruct_data* data, const char* kernel_path)
 {
   const char* program_src = file2string(kernel_path);
@@ -283,16 +327,24 @@ void reconstruct_vnn(reconstruct_data* data, const char* kernel_path)
   //TODO: free program_src
 	
 	cl_kernel vnn	= ocl_kernel_build(program, context->device, "vnn");
+
+//  float3* plane_points = generate_plane_points(data->input_pos_matrices,
+//                                               data->input_dim[0],
+//                                               data->input_dim[1],
+//                                               data->input_dim[2],
+//                                               data->input_spacing[0],
+//                                               data->input_spacing[1]);
+  int* inputDims = data->frameData->getDimensions();
+  ssc::Vector3D inputSpacing = data->frameData->getSpacing();
+  float3* plane_points = generate_plane_points(data->input_pos_matrices,
+      inputDims[0],
+      inputDims[1],
+      inputDims[2],
+      inputSpacing[0],
+      inputSpacing[1]);
   
-  float3* plane_points = generate_plane_points(data->input_pos_matrices, 
-                                               data->input_dim[0],
-                                               data->input_dim[1],
-                                               data->input_dim[2],
-                                               data->input_spacing[0],
-                                               data->input_spacing[1]);
-  
-  plane_eq* bscan_plane_equations = generate_plane_equations(plane_points,
-                                                             data->input_dim[2]);
+  //plane_eq* bscan_plane_equations = generate_plane_equations(plane_points, data->input_dim[2]);
+  plane_eq* bscan_plane_equations = generate_plane_equations(plane_points, inputDims[2]);
 
   call_vnn_kernel(vnn, context, data, plane_points, bscan_plane_equations);
   
