@@ -214,8 +214,11 @@ void ToolManager::trackerConfiguredSlot(bool on)
     {
       if (iter->second == mManualTool)
         continue;
+      if (iter->second->getType()==ssc::Tool::TOOL_REFERENCE)
+        continue;
       mManualTool->setBase(iter->second);
       ssc::messageManager()->sendInfo("Manual tool imbued with properties from " + iter->first);
+      break;
     }
   }
   //debug stop
