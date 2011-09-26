@@ -5,6 +5,8 @@
  *
  */
 
+#include "sscUSFrameData.h"
+
 /**
  * Container struct for input and output data for the reconstruction algorithm
  * input US frames merged in a volume. The 2 first dimesions (in input_dim) 
@@ -18,9 +20,13 @@
  */
 struct reconstruct_data
 {
-  unsigned char* input;
-  int input_dim[3];
-  double input_spacing[3];
+  ssc::USFrameDataPtr frameData;
+  //ssc::ImagePtr frameMask;
+  //ssc::ImagePtr outputData;
+
+  //unsigned char* input;
+  //int input_dim[3];
+  //double input_spacing[3];
   
   double* input_pos_matrices;
   unsigned char* input_mask;
