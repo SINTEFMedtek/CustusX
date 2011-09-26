@@ -95,8 +95,8 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "",
       "Choose algorithm to use for reconstruction",
       "PNN",
-      //QString("ThunderVNN PNN").split(" "),
-      QString("PNN").split(" "),
+      QString("ThunderVNN PNN").split(" "),
+      //QString("PNN").split(" "),
       mSettings.getElement());
   connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()),   this,                    SLOT(setSettings()));
   connect(this,                    SIGNAL(paramsChanged()), mAlgorithmAdapter.get(), SIGNAL(changed()));
@@ -119,7 +119,7 @@ void Reconstructer::createAlgorithm()
   // create new algo
   if (name=="ThunderVNN")
   {
-    //mAlgorithm = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(mShaderPath));
+    mAlgorithm = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(mShaderPath));
   }
   else if (name=="PNN")
     mAlgorithm = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
