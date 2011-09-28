@@ -139,8 +139,10 @@ void call_vnn_kernel(cl_kernel vnn,
                      ocl_context* context,
                      reconstruct_data* data, 
                      float3* plane_points, 
-                     plane_eq* bscan_plane_equations)
+                     plane_eq* bscan_plane_equations,
+                     float distance)
 {
+	//TODO: Use distance (from GUI) = kernel_radius in .ocl code
   int volume_w = data->output_dim[0];
   int volume_h = data->output_dim[1];
   int volume_n = data->output_dim[2];
@@ -198,29 +200,58 @@ void call_vnn_kernel(cl_kernel vnn,
   float * printings = (float *) malloc(printings_size);
   memset(printings, 0, printings_size);
   
-  // Create an array of cl_mem pointers -> This will give us a 2D array in openCL context
+  // The GPU (openCL) can't handle very large memory blocks, and the only pointers that can be used
+  // are the input parameters. Our solution is therefore to split the input data into a set of
+  // data blocks (10)
+
+  int numBlocks = 10;
+  unsigned char** framePointers = new unsigned char*[numBlocks];
+
+//  unsigned char* frames0, frames1, frames2, frames3, frames4, frames5, frames6, frames7, frames8, frames9;
+
   int frameSize = bscan_h * bscan_w;//assuming 8 bit data
-  //cl_mem = framePointers[bscan_n];//Won't work in all platforms as bscan_n is not a constant
-  //Use a points instead of an array
-  cl_mem* framePointers;
-  int framePointersSize = sizeof(cl_mem)*bscan_n;
-  //Allocate CPU RAM space
-  framePointers = (cl_mem*)malloc(framePointersSize);
-  //Allocate GPU RAM space
-  cl_mem clFramePointers = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, framePointersSize, framePointers);
+
+  int blocksize = bscan_n/numBlocks * frameSize;
+  int divRemainder = bscan_n%numBlocks;// The reminder after the integer division
+
+  //Allocate memory for the data blocks
+  for (int i = 0; i < numBlocks; i++)
+  {
+    if (divRemainder != 0)
+    {
+      divRemainder--;
+      framePointers[i] = new unsigned char[blocksize + frameSize];// The first blocks gets an extra image each if the integer division got a reminder
+    } else
+    {
+      framePointers[i] = new unsigned char[blocksize];
+    }
+
+  }
+  //Copy the frames into the data blocks
   for (int i = 0; i < bscan_n; i++)
   {
-    //Allocate GPU (cl) memory for each frame
-    cl_mem clFrame = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, frameSize, data->frameData->getFrame(i));
-    framePointers[i] = clFrame;
-    //std::cout << "frame: " << i << " addr: " << framePointers[i] << std::endl;
+//    std::cout << i << " ";
+//    void* framePtr = (unsigned char*)(framePointers[i%numBlocks][i/numBlocks*frameSize]);
+    unsigned char* framePtr = (framePointers[i%numBlocks]);
+    framePtr += (i/numBlocks*frameSize);
+    memcpy(framePtr, data->frameData->getFrame(i), frameSize);
   }
 
-//  int bscans_size0 = bscan_n/2 * bscan_h * bscan_w;
-//  int bscans_size1 = (bscan_n/2 + bscan_n%2) * bscan_h * bscan_w;
-//  cl_mem dev_bscans0 = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, bscans_size0, bscans);
-//  cl_mem dev_bscans1 = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, bscans_size1, bscans + bscans_size0);//Make sure we allocate the last byte
-  
+  //Allocate GPU (cl) memory for each frame block
+  divRemainder = bscan_n%numBlocks;
+  cl_mem* clFramePointers = new cl_mem[numBlocks];
+  for (int i = 0; i < numBlocks; i++)
+  {
+    int allocSize = blocksize;
+    if (divRemainder != 0)
+    {
+      divRemainder--;
+      allocSize = blocksize + frameSize;
+    }
+    cl_mem clFrameBlock = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, allocSize, framePointers[i]);
+    clFramePointers[i] = clFrameBlock;
+  }
+
   ///* // with byte adressable memory:
   cl_mem dev_volume = ocl_create_buffer(context->context, CL_MEM_WRITE_ONLY, volume_size, volume);
   cl_mem dev_mask = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, mask_byte_size, mask);
@@ -246,10 +277,6 @@ void call_vnn_kernel(cl_kernel vnn,
 
   for (int section = 0; section < 1; section++) {
     int i = 0;
-    //clSetKernelArg(vnn, i++, framePointersSize, &clFramePointers);
-    clSetKernelArg(vnn, i++, sizeof(cl_mem), &clFramePointers);
-//    clSetKernelArg(vnn, 0, sizeof(cl_mem), &dev_bscans0);
-//    clSetKernelArg(vnn, 1, sizeof(cl_mem), &dev_bscans1);
     clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_mask);
     clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_w);
     clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_h);
@@ -265,6 +292,11 @@ void call_vnn_kernel(cl_kernel vnn,
     clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_plane_points);
     clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_printings);
     clSetKernelArg(vnn, i++, sizeof(cl_int), &section);
+    clSetKernelArg(vnn, i++, sizeof(cl_float), &distance);
+
+    // Add the frame memory blocks (10 for now)
+    for (int bn = 0; bn < numBlocks; bn++)
+      clSetKernelArg(vnn, i++, sizeof(cl_mem), &clFramePointers[bn]);
     
     size_t * global_work_size = (size_t *) malloc(sizeof(size_t)*1);
     global_work_size[0] = (volume_w*volume_n/1/256+1)*256;//TODO: Find better number? 256?
@@ -274,7 +306,6 @@ void call_vnn_kernel(cl_kernel vnn,
     ocl_check_error(clEnqueueNDRangeKernel(context->cmd_queue, vnn, 1, NULL, global_work_size, NULL, NULL, NULL, NULL));
     //ocl_check_error(clFinish(context->cmd_queue));
   }
-  std::cout << "openCL code finised. Get volume into CPU RAM" << std::endl;
 
   // with byte adressable memory:
   ocl_check_error(clEnqueueReadBuffer(context->cmd_queue, dev_volume, CL_TRUE, 0, volume_size, volume, 0, 0, 0));
@@ -293,13 +324,10 @@ void call_vnn_kernel(cl_kernel vnn,
    }*/
 
   //Release GPU memory for all frames
-  for (int i = 0; i < bscan_n; i++)
+  for (int i = 0; i < numBlocks; i++)
   {
-    clReleaseMemObject(framePointers[i]);
+    clReleaseMemObject(clFramePointers[i]);
   }
-  clReleaseMemObject(clFramePointers);
-//  clReleaseMemObject(dev_bscans0);
-//  clReleaseMemObject(dev_bscans1);
   clReleaseMemObject(dev_printings);
   clReleaseMemObject(dev_mask);
   clReleaseMemObject(dev_plane_eq);
@@ -313,7 +341,7 @@ void call_vnn_kernel(cl_kernel vnn,
 }
 
 //void reconstruct_vnn(reconstruct_data* data, const char* kernel_path)
-void reconstruct_vnn(reconstruct_data* data, const char* kernel_path)
+void reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString processor, float distance)
 {
   const char* program_src = file2string(kernel_path);
   if (program_src == NULL) {
@@ -321,7 +349,7 @@ void reconstruct_vnn(reconstruct_data* data, const char* kernel_path)
 		exit(-1);
 	}
   
-  ocl_context* context = ocl_init();
+  ocl_context* context = ocl_init(processor);
   
 	cl_program program = ocl_create_program(context->context, context->device, program_src);
   //TODO: free program_src
@@ -346,7 +374,7 @@ void reconstruct_vnn(reconstruct_data* data, const char* kernel_path)
   //plane_eq* bscan_plane_equations = generate_plane_equations(plane_points, data->input_dim[2]);
   plane_eq* bscan_plane_equations = generate_plane_equations(plane_points, inputDims[2]);
 
-  call_vnn_kernel(vnn, context, data, plane_points, bscan_plane_equations);
+  call_vnn_kernel(vnn, context, data, plane_points, bscan_plane_equations, distance);
   
   
   clReleaseKernel(vnn);

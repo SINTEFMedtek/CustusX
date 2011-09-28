@@ -11,6 +11,7 @@
 //#include <stdio.h>
 #include <string.h>
 //#include <math.h>
+#include <QString>
 
 #include "holger_time.h"
 #include "utils.h"
@@ -39,7 +40,7 @@ cl_program ocl_create_program(cl_context context, cl_device_id device, const cha
                           &len);									// on return, the actual size in bytes of the data returned
     
 		printf("%lu %s\n", len, buffer);
-		for (unsigned int i = 0; i < len; i++)
+		for (uint i = 0; i < len; i++)
 			printf("%c", buffer[i]);
 		printf("\n");
 		exit(1);
@@ -48,7 +49,7 @@ cl_program ocl_create_program(cl_context context, cl_device_id device, const cha
 }
 
 
-ocl_context* ocl_init()
+ocl_context* ocl_init(QString processor)
 {
 	cl_int err;
   
@@ -74,14 +75,16 @@ ocl_context* ocl_init()
 	clGetPlatformIDs(numPlatforms, &platform, NULL);
 	cl_context_properties cps[3] = {CL_CONTEXT_PLATFORM, (cl_context_properties)platform, 0};
   
-#define USE_CPU
-#ifdef USE_CPU
-	clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &(retval->device), NULL);
-	retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_CPU, NULL, NULL, &err);
-#else
-	clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &(retval->device), NULL);
-	retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_GPU, NULL, NULL, &err);
-#endif //USE_CPU
+	if (processor == "CPU")
+	{
+		clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &(retval->device), NULL);
+		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_CPU, NULL, NULL, &err);
+	}
+	else // GPU
+	{
+		clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &(retval->device), NULL);
+		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_GPU, NULL, NULL, &err);
+	}
   
 	//printf("device id: %p\n", retval->device);
   

@@ -11,6 +11,8 @@
 #include <CL/cl.h>
 #endif //__APPLE__
 
+class QString;
+
 struct ocl_context
 {
   cl_context context;
@@ -20,6 +22,6 @@ struct ocl_context
 
 cl_program ocl_create_program(cl_context context, cl_device_id device, const char* program_src);
 
-ocl_context* ocl_init();
+ocl_context* ocl_init(QString processor);
 
 void ocl_release(ocl_context* context);
