@@ -135,7 +135,7 @@ cl_mem ocl_create_buffer(cl_context context, cl_mem_flags flags, size_t size, vo
 		printf("ERROR clCreateBuffer of size %lu bytes (%f MB): %d\n", size, size/1024.0f/1024.0f, err);
 		exit(err);
 	}
-	printf("Successfull clCreateBuffer of size %lu bytes (%f MB)\n", size, size/1024.0f/1024.0f);
+	//printf("Successfull clCreateBuffer of size %lu bytes (%f MB)\n", size, size/1024.0f/1024.0f);
 	return dev_mem;
 }
 
