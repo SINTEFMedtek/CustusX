@@ -46,41 +46,41 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
 	mSettings.getElement("algorithms");
 
 	mOrientationAdapter = StringDataAdapterXml::initialize("Orientation", "",
-					"Algorithm to use for output volume orientation", "MiddleFrame", QString(
-									"PatientReference MiddleFrame").split(" "), mSettings.getElement());
+		"Algorithm to use for output volume orientation", "MiddleFrame",
+		QString("PatientReference MiddleFrame").split(" "), mSettings.getElement());
 
 	connect(mOrientationAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
 	connect(this, SIGNAL(paramsChanged()), mOrientationAdapter.get(), SIGNAL(changed()));
 
 	cx::PresetTransferFunctions3D presets;
 	mPresetTFAdapter = StringDataAdapterXml::initialize("Preset", "",
-					"Preset transfer function to apply to the reconstructed volume", "US B-Mode",
-					presets.getPresetList(), mSettings.getElement());
+		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presets.getPresetList(),
+		mSettings.getElement());
 
 	connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
 	connect(this, SIGNAL(paramsChanged()), mPresetTFAdapter.get(), SIGNAL(changed()));
 
 	mMaskReduce = StringDataAdapterXml::initialize("Reduce mask (% in 1D)", "", "Speedup by reducing mask size", "3",
-					QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "), mSettings.getElement());
+		QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "), mSettings.getElement());
 	connect(mMaskReduce.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
 
 	mAlignTimestamps = BoolDataAdapterXml::initialize("Align timestamps", "",
-					"Align the first of tracker and frame timestamps, ignoring lags.", false, mSettings.getElement());
+		"Align the first of tracker and frame timestamps, ignoring lags.", false, mSettings.getElement());
 	connect(mAlignTimestamps.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
 
 	mTimeCalibration = DoubleDataAdapterXml::initialize("Extra Temporal Calib", "",
-					"Set an offset in the frame timestamps, in addition to the one used in acquisition", 0.0,
-					DoubleRange(-1000, 1000, 10), 0, mSettings.getElement());
+		"Set an offset in the frame timestamps, in addition to the one used in acquisition", 0.0, DoubleRange(-1000,
+			1000, 10), 0, mSettings.getElement());
 	connect(mTimeCalibration.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
 
 	mAngioAdapter = BoolDataAdapterXml::initialize("Angio data", "", "Ultrasound angio data is used as input", false,
-					mSettings.getElement());
+		mSettings.getElement());
 	connect(mAngioAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
 
 	mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "", "Choose algorithm to use for reconstruction",
-					"PNN", QString("ThunderVNN PNN").split(" "),
-					//QString("PNN").split(" "),
-					mSettings.getElement());
+		"PNN", QString("ThunderVNN PNN").split(" "),
+		//QString("PNN").split(" "),
+		mSettings.getElement());
 	connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
 	connect(this, SIGNAL(paramsChanged()), mAlgorithmAdapter.get(), SIGNAL(changed()));
 
@@ -227,7 +227,7 @@ void Reconstructer::applyTimeCalibration()
 	//  timeshift = -timeshift;
 	if (!ssc::similar(0.0, timeshift))
 		ssc::messageManager()->sendInfo("Applying reconstruction-time calibration to tracking data: " + qstring_cast(
-						timeshift) + "ms");
+			timeshift) + "ms");
 	this->calibrateTimeStamps(timeshift, 1.0);
 
 	// ignore calibrations
@@ -275,7 +275,7 @@ void Reconstructer::interpolatePositions()
 		// Remove frames too far from the positions
 		// Don't increment frame index since the index now points to the next element
 		if ((fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime) > mMaxTimeDiff) || (fabs(
-						mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos + 1].mTime) > mMaxTimeDiff))
+			mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos + 1].mTime) > mMaxTimeDiff))
 		{
 			mFileData.mFrames.erase(mFileData.mFrames.begin() + i_frame);
 			mFileData.mUsRaw->removeFrame(i_frame);
@@ -284,8 +284,8 @@ void Reconstructer::interpolatePositions()
 			double diff2 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos + 1].mTime);
 			//      ssc::messageManager()->sendInfo("Time difference is too large. Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(diff1) + " or "+ qstring_cast(diff2));
 			ssc::messageManager()->sendInfo("Removed input frame: " + qstring_cast(i_frame) + ", difference is: "
-							+ QString::number(diff1, 'f', 1) + " or " + QString::number(diff2, 'f', 1)
-							+ " Time difference is too large.");
+				+ QString::number(diff1, 'f', 1) + " or " + QString::number(diff2, 'f', 1)
+				+ " Time difference is too large.");
 		}
 		else
 		{
@@ -295,7 +295,7 @@ void Reconstructer::interpolatePositions()
 				t = (mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime) / t_delta_tracking;
 			//    mFrames[i_frame].mPos = mPositions[i_pos].mPos;
 			mFileData.mFrames[i_frame].mPos = interpolate(mFileData.mPositions[i_pos].mPos, mFileData.mPositions[i_pos
-							+ 1].mPos, t);
+				+ 1].mPos, t);
 			i_frame++;// Only increment if we didn't delete the frame
 		}
 	}
@@ -306,10 +306,10 @@ void Reconstructer::interpolatePositions()
 		double percent = removed * 100;
 		if (percent > 1)
 			ssc::messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "
-							+ qstring_cast(startFrames) + " frames.");
+				+ qstring_cast(startFrames) + " frames.");
 		else
 			ssc::messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(
-							startFrames) + " frames.");
+				startFrames) + " frames.");
 	}
 }
 
@@ -636,7 +636,7 @@ void Reconstructer::readCoreFiles(QString fileName, QString calFilesPath)
 	mCalFilesPath = calFilesPath;
 
 	cx::UsReconstructionFileReader::FileData temp = mFileReader->readAllFiles(fileName, calFilesPath,
-					mAngioAdapter->getValue());
+		mAngioAdapter->getValue());
 	if (!temp.mUsRaw)
 		return;
 
