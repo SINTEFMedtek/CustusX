@@ -119,7 +119,7 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
   output->GetDimensions(data.output_dim);
   output->GetSpacing(data.output_spacing);
   
-  reconstruct_vnn(&data, path.absoluteFilePath().toStdString().c_str());
+  reconstruct_vnn(&data, path.absoluteFilePath().toStdString().c_str(), mProcessorOption->getValue(), static_cast<float>(mDistanceOption->getValue()));
   //ssc::messageManager()->sendInfo("ThunderVNNReconstructAlgorithm::reconstruct ***success***");
 #endif // USE_US_RECONSTRUCTION_THUNDER
 }
