@@ -44,28 +44,28 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 
 	QGridLayout* outputVolGridLayout = new QGridLayout;
 	mMaxVolSizeWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(
-					new DoubleDataAdapterMaxUSVolumeSize(mReconstructer)), outputVolGridLayout, 0);
+		new DoubleDataAdapterMaxUSVolumeSize(mReconstructer)), outputVolGridLayout, 0);
 	mSpacingWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterSpacing(
-					mReconstructer)), outputVolGridLayout, 1);
+		mReconstructer)), outputVolGridLayout, 1);
 	mDimXWidget = new ssc::SpinBoxGroupWidget(this,
-					ssc::DoubleDataAdapterPtr(new DoubleDataAdapterXDim(mReconstructer)));
+		ssc::DoubleDataAdapterPtr(new DoubleDataAdapterXDim(mReconstructer)));
 	mDimYWidget = new ssc::SpinBoxGroupWidget(this,
-					ssc::DoubleDataAdapterPtr(new DoubleDataAdapterYDim(mReconstructer)));
+		ssc::DoubleDataAdapterPtr(new DoubleDataAdapterYDim(mReconstructer)));
 	mDimZWidget = new ssc::SpinBoxGroupWidget(this,
-					ssc::DoubleDataAdapterPtr(new DoubleDataAdapterZDim(mReconstructer)));
+		ssc::DoubleDataAdapterPtr(new DoubleDataAdapterZDim(mReconstructer)));
 	QHBoxLayout* outputVolDimLayout = new QHBoxLayout;
 	outputVolDimLayout->addWidget(mDimXWidget);
 	outputVolDimLayout->addWidget(mDimYWidget);
 	outputVolDimLayout->addWidget(mDimZWidget);
 
 	ssc::LabeledComboBoxWidget* orientationWidget = new ssc::LabeledComboBoxWidget(this,
-					mReconstructer->mOrientationAdapter);
+		mReconstructer->mOrientationAdapter);
 	ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mPresetTFAdapter);
 
 	QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->mMaskReduce);
 
 	ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this,
-					mReconstructer->mAlgorithmAdapter);
+		mReconstructer->mAlgorithmAdapter);
 
 	QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->mAlignTimestamps);
 	QWidget* timeCalibrationWidget = ssc::createDataWidget(this, mReconstructer->mTimeCalibration);
@@ -180,7 +180,7 @@ void ReconstructionWidget::paramsChangedSlot()
 	ssc::Vector3D range = mReconstructer->getOutputVolumeParams().mExtent.range();
 
 	QString extText =
-					QString("%1,  %2,  %3").arg(range[0], 0, 'f', 1).arg(range[1], 0, 'f', 1).arg(range[2], 0, 'f', 1);
+		QString("%1,  %2,  %3").arg(range[0], 0, 'f', 1).arg(range[1], 0, 'f', 1).arg(range[2], 0, 'f', 1);
 	mExtentLineEdit->setText(extText);
 
 	mInputSpacingLineEdit->setText(QString("%1").arg(mReconstructer->getOutputVolumeParams().mInputSpacing, 0, 'f', 4));
