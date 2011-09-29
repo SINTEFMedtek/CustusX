@@ -15,11 +15,13 @@ public:
 
 	void testConstructor();
 	void testAngioReconstruction();//Test reconstruction of US angio data (#318)
+	void testThunderGPUReconstruction();//Test Thunder GPU reconstruction
 
 public:
 	CPPUNIT_TEST_SUITE( TestUsReconstruction );
 		CPPUNIT_TEST( testConstructor );
-		//CPPUNIT_TEST( testAngioReconstruction );
+		CPPUNIT_TEST( testAngioReconstruction );
+		CPPUNIT_TEST( testThunderGPUReconstruction );
 	CPPUNIT_TEST_SUITE_END();
 private:
 
