@@ -345,13 +345,23 @@ void reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString pr
 {
   const char* program_src = file2string(kernel_path);
   if (program_src == NULL) {
-		printf("ERROR: did not find kernels.ocl\n");
-		exit(-1);
+	  std::cout << "OpenCL Error: Cannot find file " << kernel_path << std::endl;
+	  return;
+//		printf("ERROR: did not find kernels.ocl\n");
+//		exit(-1);
 	}
   
+  if (!ocl_has_device_type(processor))
+  {
+	  std::cout << "OpenCL Error: Device type " << processor.toStdString() << " not available" <<  std::endl;
+	  return;
+  }
+
   ocl_context* context = ocl_init(processor);
-  
-	cl_program program = ocl_create_program(context->context, context->device, program_src);
+  std::cout << "completed init" << std::endl;
+
+	cl_program program = ocl_create_program(context->context, context->device, program_src, kernel_path);
+	  std::cout << "completed create program" << std::endl;
   //TODO: free program_src
 	
 	cl_kernel vnn	= ocl_kernel_build(program, context->device, "vnn");
