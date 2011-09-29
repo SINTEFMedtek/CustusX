@@ -6,15 +6,26 @@
 #include <CL/cl.h>
 #endif //__APPLE__
 
+#include <QString>
+
 void random_init(float * data, int length);
 void inc_init(float * data, int length);
 char * file2string(const char* filename, size_t * final_length = NULL);
 cl_kernel ocl_kernel_build(cl_program program, cl_device_id device, const char * kernel_name);
 void ocl_program_build(cl_program program, cl_uint num_devices = 0, const cl_device_id * device_list = NULL);
 cl_mem ocl_create_buffer(cl_context context, cl_mem_flags flags, size_t size, void * host_data);
-void ocl_check_error(int err, const char * info = "");
+
+#define ocl_check_error(id) 													\
+	if (id != CL_SUCCESS) 														\
+	{																			\
+		printf("OpenCL ERROR: %d in %s [%d]\n", id, __FILE__, __LINE__);				\
+		throw;																	\
+	}
+//void ocl_check_error(int err, const char * info = "");
+
 void ocl_print_info();
 //void ocl_set_args(cl_kernel kernel, int n, ...);
+bool ocl_has_device_type(QString processor);
 
 typedef struct {
   float x;
