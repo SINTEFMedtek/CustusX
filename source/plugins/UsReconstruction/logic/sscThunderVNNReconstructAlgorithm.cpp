@@ -49,9 +49,14 @@ std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElem
 		      "Max distance from frame to voxel when filling output volume. mm.",
 		      1, ssc::DoubleRange(0.1, 10, 0.01), 0,
 		      root);
+	mPrintOpenCLInfoOption = BoolDataAdapterXml::initialize("Print OpenCL Info", "",
+		      "Query OpenCL and print info about CPU to stdout.",
+		      false,
+		      root);
 
 	retval.push_back(mProcessorOption);
 	retval.push_back(mDistanceOption);
+	retval.push_back(mPrintOpenCLInfoOption);
 #endif
 
 	return retval;
@@ -67,6 +72,12 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 #ifdef USE_US_RECONSTRUCTION_THUNDER
   std::cout << "processor: " << mProcessorOption->getValue() << std::endl;
   std::cout << "distance: " << mDistanceOption->getValue() << std::endl;
+
+  if (mPrintOpenCLInfoOption->getValue())
+  {
+	  std::cout << "Printing OpenCL info to stdout..." << std::endl;
+	  ocl_print_info();
+  }
 
   QStringList paths;
   paths << mShaderPath << THUNDER_KERNEL_PATH << ".";

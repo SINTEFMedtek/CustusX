@@ -303,7 +303,7 @@ void call_vnn_kernel(cl_kernel vnn,
     size_t * local_work_size = (size_t *) malloc(sizeof(size_t)*1);//TODO: Not in use?
     local_work_size[0] = 256;
     std::cout << "Start openCL code. global_work_size[0]: " << global_work_size[0] << std::endl;
-    ocl_check_error(clEnqueueNDRangeKernel(context->cmd_queue, vnn, 1, NULL, global_work_size, NULL, NULL, NULL, NULL));
+    ocl_check_error(clEnqueueNDRangeKernel(context->cmd_queue, vnn, 1, NULL, global_work_size, NULL, 0, NULL, NULL));
     //ocl_check_error(clFinish(context->cmd_queue));
   }
 
@@ -358,10 +358,8 @@ void reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString pr
   }
 
   ocl_context* context = ocl_init(processor);
-  std::cout << "completed init" << std::endl;
 
 	cl_program program = ocl_create_program(context->context, context->device, program_src, kernel_path);
-	  std::cout << "completed create program" << std::endl;
   //TODO: free program_src
 	
 	cl_kernel vnn	= ocl_kernel_build(program, context->device, "vnn");

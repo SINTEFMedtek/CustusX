@@ -11,6 +11,7 @@
 #include "sscReconstructAlgorithm.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
+#include "sscBoolDataAdapterXml.h"
 
 namespace ssc
 {
@@ -30,6 +31,7 @@ public:
 private:
 	StringDataAdapterXmlPtr mProcessorOption;
 	DoubleDataAdapterXmlPtr mDistanceOption;
+	BoolDataAdapterXmlPtr mPrintOpenCLInfoOption;
   QString mShaderPath;
 };
 
