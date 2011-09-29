@@ -38,7 +38,7 @@ std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElem
 		      "Which processor to use when reconstructing",
 		      "CPU", QString("CPU GPU").split(" "),
 		      root);
-	mDistanceOption = DoubleDataAdapterXml::initialize("Distance", "",
+	mDistanceOption = DoubleDataAdapterXml::initialize("Distance (mm)", "",
 		      "Max distance from frame to voxel when filling output volume. mm.",
 		      1, ssc::DoubleRange(0.1, 10, 0.01), 0,
 		      root);
