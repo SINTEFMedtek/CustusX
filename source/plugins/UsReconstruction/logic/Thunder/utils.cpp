@@ -139,14 +139,55 @@ cl_mem ocl_create_buffer(cl_context context, cl_mem_flags flags, size_t size, vo
 	return dev_mem;
 }
 
-void ocl_check_error(int err, const char * info) {
-	if (err != CL_SUCCESS) {
-		printf("ERROR %s: %d\n", info, err);
-		exit(err);
+//void ocl_check_error(int err, const char * info) {
+//	if (err != CL_SUCCESS) {
+//		printf("ERROR %s: %d\n", info, err);
+//		exit(err);
+//	}
+//}
+
+/** use this to check if one of the devices GPU or CPU,
+ *  are available on the system.
+ *
+ * corresponding to cl values
+ *     CL_DEVICE_TYPE_CPU
+ *     CL_DEVICE_TYPE_GPU
+ */
+bool ocl_has_device_type(QString processor)
+{
+	uint device_type = 0;
+	if (processor=="CPU")
+		device_type = CL_DEVICE_TYPE_CPU;
+	if (processor=="GPU")
+		device_type = CL_DEVICE_TYPE_GPU;
+
+	cl_uint platforms_n;
+	cl_uint devices_n;
+	size_t temp_size;
+	cl_platform_id platform;
+	cl_device_id * devices = (cl_device_id *) malloc(sizeof(cl_device_id) * 256);
+
+	clGetPlatformIDs(1, &platform, &platforms_n);
+	if (platforms_n<1)
+		return false;
+
+	clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 256, devices, &devices_n);
+	for (unsigned int j = 0; j < devices_n; j++)
+	{
+		cl_device_type type;
+		clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(type), &type, &temp_size);
+		if (type == device_type)
+			return true;
 	}
+
+	return false;
 }
 
-void ocl_print_info() {
+/**print info on opencl hardware to stdout.
+ *
+ */
+void ocl_print_info()
+{
 	cl_uint platforms_n;
 	cl_uint devices_n;
 	size_t temp_size;
@@ -198,11 +239,11 @@ void ocl_print_info() {
 			clGetDeviceInfo(devices[j], CL_DEVICE_ADDRESS_BITS, sizeof(temp_uint), &temp_uint, &temp_size);
 			printf("\t\t CL_DEVICE_ADDRESS_BITS: %d\n", temp_uint);
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_MEM_ALLOC_SIZE: %llu\n", temp_ulong);
+			printf("\t\t CL_DEVICE_MAX_MEM_ALLOC_SIZE: %lu\n", temp_ulong);
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_PARAMETER_SIZE, sizeof(temp_size_t), &temp_size_t, &temp_size);
 			printf("\t\t CL_DEVICE_MAX_PARAMETER_SIZE: %lu\n", temp_size_t);
 			clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
-			printf("\t\t CL_DEVICE_GLOBAL_MEM_SIZE: %llu\n", temp_ulong);
+			printf("\t\t CL_DEVICE_GLOBAL_MEM_SIZE: %lu\n", temp_ulong);
 			clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 2048, str, &temp_size);
 			printf("\t\t CL_DEVICE_NAME: %s\n", str);
 			clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR, 2048, str, &temp_size);
