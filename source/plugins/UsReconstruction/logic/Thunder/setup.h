@@ -20,7 +20,7 @@ struct ocl_context
   cl_command_queue cmd_queue;
 };
 
-cl_program ocl_create_program(cl_context context, cl_device_id device, const char* program_src);
+cl_program ocl_create_program(cl_context context, cl_device_id device, const char* program_src, QString kernel_path);
 
 ocl_context* ocl_init(QString processor);
 
