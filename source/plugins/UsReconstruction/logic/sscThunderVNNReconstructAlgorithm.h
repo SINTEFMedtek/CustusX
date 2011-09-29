@@ -15,8 +15,6 @@
 
 namespace ssc
 {
-typedef boost::shared_ptr<class ThunderVNNReconstructAlgorithm> ThunderVNNReconstructAlgorithmPtr;
-
 class ThunderVNNReconstructAlgorithm : public ReconstructAlgorithm
 {
 public:

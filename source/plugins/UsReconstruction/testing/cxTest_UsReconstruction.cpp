@@ -43,10 +43,7 @@ void TestUsReconstruction::testThunderGPUReconstruction()
   ssc::ReconstructerPtr reconstructer(new ssc::Reconstructer(ssc::XmlOptionFile(),""));
   QString filename = cx::DataLocations::getTestDataPath() + "/testing/USAngioTest.cx3/US_Acq/US-Acq_01_20110520T121038/US-Acq_01_20110520T121038.mhd";
   reconstructer->mAlgorithmAdapter->setValue("ThunderVNN");
-  //reconstructer->setSettings();
-  reconstructer->mAlgorithm->getSettings(QDomElement());
-
-  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithmPtr>(reconstructer->mAlgorithm));
+  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->mAlgorithm));
   boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->mAlgorithm)->mProcessorOption->setValue("GPU");
   reconstructer->selectData(filename);
   reconstructer->reconstruct();
