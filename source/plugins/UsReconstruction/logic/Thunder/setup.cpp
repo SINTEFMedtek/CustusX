@@ -73,10 +73,7 @@ ocl_context* ocl_init(QString processor)
 	cl_uint numPlatforms = 1;
 	cl_uint foundPlatforms = 0;
 	ocl_check_error(clGetPlatformIDs(numPlatforms, &platform, &foundPlatforms));
-	cl_context_properties cps[3] =
-	{ CL_CONTEXT_PLATFORM, (cl_context_properties) platform, 0 };
-	//	std::cout << "number of openCL platforms: " << foundPlatforms << std::endl;
-	ocl_print_info();
+	cl_context_properties cps[3] = { CL_CONTEXT_PLATFORM, (cl_context_properties) platform, 0 };
 	if (processor == "CPU")
 	{
 		ocl_check_error(clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &(retval->device), NULL));
@@ -88,11 +85,7 @@ ocl_context* ocl_init(QString processor)
 		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_GPU, NULL, NULL, &err);
 	}
 
-	//printf("device id: %p\n", retval->device);
-
-
 	ocl_check_error(err);
-	std::cout << "called first create context" << std::endl;
 	retval->cmd_queue = clCreateCommandQueue(retval->context, retval->device, CL_QUEUE_PROFILING_ENABLE, &err);
 	ocl_check_error(err);
 
