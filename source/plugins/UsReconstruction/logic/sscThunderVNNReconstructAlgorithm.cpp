@@ -11,6 +11,7 @@
 #include "recConfig.h"
 #ifdef USE_US_RECONSTRUCTION_THUNDER
 #include "reconstruct_vnn.h"
+#include "utils.h"
 #endif // USE_US_RECONSTRUCTION_THUNDER
 #include "sscImage.h"
 //#include "sscXmlOptionItem.h"
@@ -34,9 +35,15 @@ std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElem
   std::vector<DataAdapterPtr> retval;
 
 #ifdef USE_US_RECONSTRUCTION_THUNDER
+  QStringList processors;
+  if (ocl_has_device_type("CPU"))
+	  processors << "CPU";
+  if (ocl_has_device_type("GPU"))
+	  processors << "GPU";
+
 	mProcessorOption = StringDataAdapterXml::initialize("Processor", "",
 		      "Which processor to use when reconstructing",
-		      "CPU", QString("CPU GPU").split(" "),
+		      processors[0], processors,
 		      root);
 	mDistanceOption = DoubleDataAdapterXml::initialize("Distance (mm)", "",
 		      "Max distance from frame to voxel when filling output volume. mm.",
