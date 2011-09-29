@@ -1,28 +1,34 @@
-/****************************************************************************
- **
- ** Copyright (C) Qxt Foundation. Some rights reserved.
- **
- ** This file is part of the QxtGui module of the Qxt library.
- **
- ** This library is free software; you can redistribute it and/or modify it
- ** under the terms of the Common Public License, version 1.0, as published
- ** by IBM, and/or under the terms of the GNU Lesser General Public License,
- ** version 2.1, as published by the Free Software Foundation.
- **
- ** This file is provided "AS IS", without WARRANTIES OR CONDITIONS OF ANY
- ** KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT LIMITATION, ANY
- ** WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY OR
- ** FITNESS FOR A PARTICULAR PURPOSE.
- **
- ** You should have received a copy of the CPL and the LGPL along with this
- ** file. See the LICENSE file and the cpl1.0.txt/lgpl-2.1.txt files
- ** included with the source distribution for more information.
- ** If you did not receive a copy of the licenses, contact the Qxt Foundation.
- **
- ** <http://libqxt.org>  <foundation@libqxt.org>
- **
- ****************************************************************************/
 #include "qxtspanslider.h"
+/****************************************************************************
+** Copyright (c) 2006 - 2011, the LibQxt project.
+** See the Qxt AUTHORS file for a list of authors and copyright holders.
+** All rights reserved.
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**     * Redistributions of source code must retain the above copyright
+**       notice, this list of conditions and the following disclaimer.
+**     * Redistributions in binary form must reproduce the above copyright
+**       notice, this list of conditions and the following disclaimer in the
+**       documentation and/or other materials provided with the distribution.
+**     * Neither the name of the LibQxt project nor the
+**       names of its contributors may be used to endorse or promote products
+**       derived from this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+** ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+** WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+** DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+** DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+** (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+** LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+** ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+**
+** <http://libqxt.org>  <foundation@libqxt.org>
+*****************************************************************************/
+
 #include "qxtspanslider_p.h"
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -37,8 +43,8 @@ QxtSpanSliderPrivate::QxtSpanSliderPrivate() :
         upperPos(0),
         offset(0),
         position(0),
-        lastPressed(NoHandle),
-        mainControl(LowerHandle),
+        lastPressed(QxtSpanSlider::NoHandle),
+        mainControl(QxtSpanSlider::LowerHandle),
         lowerPressed(QStyle::SC_None),
         upperPressed(QStyle::SC_None),
         movement(QxtSpanSlider::FreeMovement),
@@ -47,30 +53,12 @@ QxtSpanSliderPrivate::QxtSpanSliderPrivate() :
 {
 }
 
-// TODO: get rid of this in Qt 4.3
-void QxtSpanSliderPrivate::initStyleOption(QStyleOptionSlider* option, SpanHandle handle) const
+void QxtSpanSliderPrivate::initStyleOption(QStyleOptionSlider* option, QxtSpanSlider::SpanHandle handle) const
 {
-    if (!option)
-        return;
-
-    const QSlider* p = &qxt_p();
-    option->initFrom(p);
-    option->subControls = QStyle::SC_None;
-    option->activeSubControls = QStyle::SC_None;
-    option->orientation = p->orientation();
-    option->maximum = p->maximum();
-    option->minimum = p->minimum();
-    option->tickPosition = p->tickPosition();
-    option->tickInterval = p->tickInterval();
-    option->upsideDown = (p->orientation() == Qt::Horizontal) ?
-                         (p->invertedAppearance() != (option->direction == Qt::RightToLeft)) : (!p->invertedAppearance());
-    option->direction = Qt::LeftToRight; // we use the upsideDown option instead
-    option->sliderPosition = (handle == LowerHandle ? lowerPos : upperPos);
-    option->sliderValue = (handle == LowerHandle ? lower : upper);
-    option->singleStep = p->singleStep();
-    option->pageStep = p->pageStep();
-    if (p->orientation() == Qt::Horizontal)
-        option->state |= QStyle::State_Horizontal;
+    const QxtSpanSlider* p = &qxt_p();
+    p->initStyleOption(option);
+    option->sliderPosition = (handle == QxtSpanSlider::LowerHandle ? lowerPos : upperPos);
+    option->sliderValue = (handle == QxtSpanSlider::LowerHandle ? lower : upper);
 }
 
 int QxtSpanSliderPrivate::pixelPosToRangeValue(int pos) const
@@ -100,11 +88,11 @@ int QxtSpanSliderPrivate::pixelPosToRangeValue(int pos) const
                                            sliderMax - sliderMin, opt.upsideDown);
 }
 
-void QxtSpanSliderPrivate::handleMousePress(const QPoint& pos, QStyle::SubControl& control, int value, SpanHandle handle)
+void QxtSpanSliderPrivate::handleMousePress(const QPoint& pos, QStyle::SubControl& control, int value, QxtSpanSlider::SpanHandle handle)
 {
     QStyleOptionSlider opt;
     initStyleOption(&opt, handle);
-    QSlider* p = &qxt_p();
+    QxtSpanSlider* p = &qxt_p();
     const QStyle::SubControl oldControl = control;
     control = p->style()->hitTestComplexControl(QStyle::CC_Slider, &opt, pos, p);
     const QRect sr = p->style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, p);
@@ -114,6 +102,7 @@ void QxtSpanSliderPrivate::handleMousePress(const QPoint& pos, QStyle::SubContro
         offset = pick(pos - sr.topLeft());
         lastPressed = handle;
         p->setSliderDown(true);
+        emit p->sliderPressed(handle);
     }
     if (control != oldControl)
         p->update(sr);
@@ -157,12 +146,12 @@ void QxtSpanSliderPrivate::drawSpan(QStylePainter* painter, const QRect& rect) c
     painter->drawRect(rect.intersected(groove));
 }
 
-void QxtSpanSliderPrivate::drawHandle(QStylePainter* painter, SpanHandle handle) const
+void QxtSpanSliderPrivate::drawHandle(QStylePainter* painter, QxtSpanSlider::SpanHandle handle) const
 {
     QStyleOptionSlider opt;
     initStyleOption(&opt, handle);
     opt.subControls = QStyle::SC_SliderHandle;
-    QStyle::SubControl pressed = (handle == LowerHandle ? lowerPressed : upperPressed);
+    QStyle::SubControl pressed = (handle == QxtSpanSlider::LowerHandle ? lowerPressed : upperPressed);
     if (pressed == QStyle::SC_SliderHandle)
     {
         opt.activeSubControls = pressed;
@@ -178,14 +167,14 @@ void QxtSpanSliderPrivate::triggerAction(QAbstractSlider::SliderAction action, b
     bool up = false;
     const int min = qxt_p().minimum();
     const int max = qxt_p().maximum();
-    const SpanHandle altControl = (mainControl == LowerHandle ? UpperHandle : LowerHandle);
+    const QxtSpanSlider::SpanHandle altControl = (mainControl == QxtSpanSlider::LowerHandle ? QxtSpanSlider::UpperHandle : QxtSpanSlider::LowerHandle);
 
     blockTracking = true;
 
     switch (action)
     {
     case QAbstractSlider::SliderSingleStepAdd:
-        if ((main && mainControl == UpperHandle) || (!main && altControl == UpperHandle))
+        if ((main && mainControl == QxtSpanSlider::UpperHandle) || (!main && altControl == QxtSpanSlider::UpperHandle))
         {
             value = qBound(min, upper + qxt_p().singleStep(), max);
             up = true;
@@ -194,7 +183,7 @@ void QxtSpanSliderPrivate::triggerAction(QAbstractSlider::SliderAction action, b
         value = qBound(min, lower + qxt_p().singleStep(), max);
         break;
     case QAbstractSlider::SliderSingleStepSub:
-        if ((main && mainControl == UpperHandle) || (!main && altControl == UpperHandle))
+        if ((main && mainControl == QxtSpanSlider::UpperHandle) || (!main && altControl == QxtSpanSlider::UpperHandle))
         {
             value = qBound(min, upper - qxt_p().singleStep(), max);
             up = true;
@@ -204,16 +193,16 @@ void QxtSpanSliderPrivate::triggerAction(QAbstractSlider::SliderAction action, b
         break;
     case QAbstractSlider::SliderToMinimum:
         value = min;
-        if ((main && mainControl == UpperHandle) || (!main && altControl == UpperHandle))
+        if ((main && mainControl == QxtSpanSlider::UpperHandle) || (!main && altControl == QxtSpanSlider::UpperHandle))
             up = true;
         break;
     case QAbstractSlider::SliderToMaximum:
         value = max;
-        if ((main && mainControl == UpperHandle) || (!main && altControl == UpperHandle))
+        if ((main && mainControl == QxtSpanSlider::UpperHandle) || (!main && altControl == QxtSpanSlider::UpperHandle))
             up = true;
         break;
     case QAbstractSlider::SliderMove:
-        if ((main && mainControl == UpperHandle) || (!main && altControl == UpperHandle))
+        if ((main && mainControl == QxtSpanSlider::UpperHandle) || (!main && altControl == QxtSpanSlider::UpperHandle))
             up = true;
     case QAbstractSlider::SliderNoAction:
         no = true;
@@ -267,8 +256,8 @@ void QxtSpanSliderPrivate::swapControls()
 {
     qSwap(lower, upper);
     qSwap(lowerPressed, upperPressed);
-    lastPressed = (lastPressed == LowerHandle ? UpperHandle : LowerHandle);
-    mainControl = (mainControl == LowerHandle ? UpperHandle : LowerHandle);
+    lastPressed = (lastPressed == QxtSpanSlider::LowerHandle ? QxtSpanSlider::UpperHandle : QxtSpanSlider::LowerHandle);
+    mainControl = (mainControl == QxtSpanSlider::LowerHandle ? QxtSpanSlider::UpperHandle : QxtSpanSlider::LowerHandle);
 }
 
 void QxtSpanSliderPrivate::updateRange(int min, int max)
@@ -283,17 +272,17 @@ void QxtSpanSliderPrivate::movePressedHandle()
 {
     switch (lastPressed)
     {
-        case QxtSpanSliderPrivate::LowerHandle:
+        case QxtSpanSlider::LowerHandle:
             if (lowerPos != lower)
             {
-                bool main = (mainControl == QxtSpanSliderPrivate::LowerHandle);
+                bool main = (mainControl == QxtSpanSlider::LowerHandle);
                 triggerAction(QAbstractSlider::SliderMove, main);
             }
             break;
-        case QxtSpanSliderPrivate::UpperHandle:
+        case QxtSpanSlider::UpperHandle:
             if (upperPos != upper)
             {
-                bool main = (mainControl == QxtSpanSliderPrivate::UpperHandle);
+                bool main = (mainControl == QxtSpanSlider::UpperHandle);
                 triggerAction(QAbstractSlider::SliderMove, main);
             }
             break;
@@ -364,6 +353,16 @@ void QxtSpanSliderPrivate::movePressedHandle()
  */
 
 /*!
+    \enum QxtSpanSlider::SpanHandle
+
+    This enum describes the available span handles.
+
+    \omitvalue NoHandle \omit Internal only (for now). \endomit
+    \value LowerHandle The lower boundary handle.
+    \value UpperHandle The upper boundary handle.
+ */
+
+/*!
     \fn QxtSpanSlider::lowerValueChanged(int lower)
 
     This signal is emitted whenever the \a lower value has changed.
@@ -392,6 +391,12 @@ void QxtSpanSliderPrivate::movePressedHandle()
     \fn QxtSpanSlider::upperPositionChanged(int upper)
 
     This signal is emitted whenever the \a upper position has changed.
+ */
+
+/*!
+    \fn QxtSpanSlider::sliderPressed(SpanHandle handle)
+
+    This signal is emitted whenever the \a handle has been pressed.
  */
 
 /*!
@@ -509,7 +514,7 @@ void QxtSpanSlider::setLowerPosition(int lower)
             emit lowerPositionChanged(lower);
         if (hasTracking() && !qxt_d().blockTracking)
         {
-            bool main = (qxt_d().mainControl == QxtSpanSliderPrivate::LowerHandle);
+            bool main = (qxt_d().mainControl == QxtSpanSlider::LowerHandle);
             qxt_d().triggerAction(SliderMove, main);
         }
     }
@@ -535,7 +540,7 @@ void QxtSpanSlider::setUpperPosition(int upper)
             emit upperPositionChanged(upper);
         if (hasTracking() && !qxt_d().blockTracking)
         {
-            bool main = (qxt_d().mainControl == QxtSpanSliderPrivate::UpperHandle);
+            bool main = (qxt_d().mainControl == QxtSpanSlider::UpperHandle);
             qxt_d().triggerAction(SliderMove, main);
         }
     }
@@ -569,11 +574,11 @@ void QxtSpanSlider::keyPressEvent(QKeyEvent* event)
         action = invertedControls() ? SliderSingleStepAdd : SliderSingleStepSub;
         break;
     case Qt::Key_Home:
-        main   = (qxt_d().mainControl == QxtSpanSliderPrivate::LowerHandle);
+        main   = (qxt_d().mainControl == QxtSpanSlider::LowerHandle);
         action = SliderToMinimum;
         break;
     case Qt::Key_End:
-        main   = (qxt_d().mainControl == QxtSpanSliderPrivate::UpperHandle);
+        main   = (qxt_d().mainControl == QxtSpanSlider::UpperHandle);
         action = SliderToMaximum;
         break;
     default:
@@ -596,9 +601,9 @@ void QxtSpanSlider::mousePressEvent(QMouseEvent* event)
         return;
     }
 
-    qxt_d().handleMousePress(event->pos(), qxt_d().upperPressed, qxt_d().upper, QxtSpanSliderPrivate::UpperHandle);
+    qxt_d().handleMousePress(event->pos(), qxt_d().upperPressed, qxt_d().upper, QxtSpanSlider::UpperHandle);
     if (qxt_d().upperPressed != QStyle::SC_SliderHandle)
-        qxt_d().handleMousePress(event->pos(), qxt_d().lowerPressed, qxt_d().lower, QxtSpanSliderPrivate::LowerHandle);
+        qxt_d().handleMousePress(event->pos(), qxt_d().lowerPressed, qxt_d().lower, QxtSpanSlider::LowerHandle);
 
     qxt_d().firstMovement = true;
     event->accept();
@@ -699,25 +704,17 @@ void QxtSpanSlider::mouseReleaseEvent(QMouseEvent* event)
  */
 void QxtSpanSlider::paintEvent(QPaintEvent* event)
 {
-#define NONE
     Q_UNUSED(event);
     QStylePainter painter(this);
-    // ticks
+
+    // groove & ticks
     QStyleOptionSlider opt;
     qxt_d().initStyleOption(&opt);
-    opt.subControls = QStyle::SC_SliderTickmarks;
-    opt.sliderPosition = qxt_d().lowerPos; // BUGFIX
-    painter.drawComplexControl(QStyle::CC_Slider, opt);
-    return;
-#ifdef NONE
-    // groove
     opt.sliderValue = 0;
     opt.sliderPosition = 0;
-    opt.subControls = QStyle::SC_SliderGroove;
+    opt.subControls = QStyle::SC_SliderGroove | QStyle::SC_SliderTickmarks;
     painter.drawComplexControl(QStyle::CC_Slider, opt);
-#endif
 
-#ifdef NONE
     // handle rects
     opt.sliderPosition = qxt_d().lowerPos;
     const QRect lr = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
@@ -729,28 +726,25 @@ void QxtSpanSlider::paintEvent(QPaintEvent* event)
     // span
     const int minv = qMin(lrv, urv);
     const int maxv = qMax(lrv, urv);
-    const QPoint c = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, this).center();
+    const QPoint c = QRect(lr.center(), ur.center()).center();
     QRect spanRect;
     if (orientation() == Qt::Horizontal)
         spanRect = QRect(QPoint(minv, c.y() - 2), QPoint(maxv, c.y() + 1));
     else
         spanRect = QRect(QPoint(c.x() - 2, minv), QPoint(c.x() + 1, maxv));
     qxt_d().drawSpan(&painter, spanRect);
-#endif
 
-#ifdef NONE
     // handles
     switch (qxt_d().lastPressed)
     {
-    case QxtSpanSliderPrivate::LowerHandle:
-        qxt_d().drawHandle(&painter, QxtSpanSliderPrivate::UpperHandle);
-        qxt_d().drawHandle(&painter, QxtSpanSliderPrivate::LowerHandle);
+    case QxtSpanSlider::LowerHandle:
+        qxt_d().drawHandle(&painter, QxtSpanSlider::UpperHandle);
+        qxt_d().drawHandle(&painter, QxtSpanSlider::LowerHandle);
         break;
-    case QxtSpanSliderPrivate::UpperHandle:
+    case QxtSpanSlider::UpperHandle:
     default:
-        qxt_d().drawHandle(&painter, QxtSpanSliderPrivate::LowerHandle);
-        qxt_d().drawHandle(&painter, QxtSpanSliderPrivate::UpperHandle);
+        qxt_d().drawHandle(&painter, QxtSpanSlider::LowerHandle);
+        qxt_d().drawHandle(&painter, QxtSpanSlider::UpperHandle);
         break;
     }
-#endif
 }
