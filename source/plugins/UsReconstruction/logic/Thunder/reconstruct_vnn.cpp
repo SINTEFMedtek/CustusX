@@ -251,6 +251,11 @@ void call_vnn_kernel(cl_kernel vnn,
     cl_mem clFrameBlock = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, allocSize, framePointers[i]);
     clFramePointers[i] = clFrameBlock;
   }
+  //free the data blocks memory
+  for (int i = 0; i < numBlocks; i++)
+  {
+  	delete framePointers[i];
+  }
 
   ///* // with byte adressable memory:
   cl_mem dev_volume = ocl_create_buffer(context->context, CL_MEM_WRITE_ONLY, volume_size, volume);
