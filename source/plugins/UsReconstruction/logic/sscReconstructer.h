@@ -67,6 +67,8 @@ public:
 	DoubleDataAdapterXmlPtr mTimeCalibration; ///set a offset in the frame timestamps
 	BoolDataAdapterXmlPtr mAngioAdapter; ///US angio data is used as input
 
+	ReconstructAlgorithmPtr mAlgorithm;///< The used reconstruction algorithm
+
 	OutputVolumeParams getOutputVolumeParams() const;
 	void setOutputVolumeParams(const OutputVolumeParams& par);
 	void setOutputRelativePath(QString path);
@@ -86,7 +88,6 @@ private:
 
 	cx::UsReconstructionFileReaderPtr mFileReader;
 	OutputVolumeParams mOutputVolumeParams;
-	ReconstructAlgorithmPtr mAlgorithm;
 	XmlOptionFile mSettings;
 	//  QString mCalFileName; ///< Name of calibration file
 	QString mCalFilesPath; ///< Path to calibration files
