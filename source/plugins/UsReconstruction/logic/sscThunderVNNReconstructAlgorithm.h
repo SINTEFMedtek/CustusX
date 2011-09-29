@@ -14,6 +14,8 @@
 
 namespace ssc
 {
+typedef boost::shared_ptr<class ThunderVNNReconstructAlgorithm> ThunderVNNReconstructAlgorithmPtr;
+
 class ThunderVNNReconstructAlgorithm : public ReconstructAlgorithm
 {
 public:
@@ -27,8 +29,9 @@ public:
                            ImagePtr outputData,
                            ImagePtr frameMask,
                            QDomElement settings);
+
+	StringDataAdapterXmlPtr mProcessorOption;///< Select the processor to run the ocl code on (CPU/GPU)
 private:
-	StringDataAdapterXmlPtr mProcessorOption;
 	DoubleDataAdapterXmlPtr mDistanceOption;
   QString mShaderPath;
 };
