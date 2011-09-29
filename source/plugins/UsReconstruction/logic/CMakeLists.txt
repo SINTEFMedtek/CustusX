@@ -88,5 +88,3 @@ add_library( cxPluginUSReconstructionLogic ${SOURCE_FILES} )
 target_link_libraries( cxPluginUSReconstructionLogic ${cxPluginUSReconstructionLogic_LIB_FILES} )
 # =========================================================
 
-#ADD_SUBDIRECTORY( testing )
-
