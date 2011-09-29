@@ -265,6 +265,7 @@ __kernel void cast_rays(__global unsigned int * volume,
 	if (n >= bitmap_w*bitmap_h) return;
 
 	int ray_x = n%bitmap_w;
+
 	int ray_y = n/bitmap_w;
 
 	float4 ray_dir = ray_dirs[n];
@@ -353,7 +354,7 @@ typedef struct _pixel_type
 } pixel_type;
 
 // Find pixels coordinates
-__kernel pixel_type findPixel(
+pixel_type findPixel(
 		float bscan_spacing_x,
 		float bscan_spacing_y,
 		__global float4 * plane_eq,
@@ -380,7 +381,7 @@ __kernel pixel_type findPixel(
 	return retval;
 }
 
-__kernel bool valid_pixel(pixel_type p,
+bool valid_pixel(pixel_type p,
 		__global unsigned char * mask,
 		int bscan_w,
 		int bscan_h,
