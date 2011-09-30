@@ -1,0 +1,1 @@
+This folder contains pieces of the qxt library, extracted from bitbucket trunk at 2011/09/30.
