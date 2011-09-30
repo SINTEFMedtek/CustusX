@@ -456,9 +456,7 @@ bool valid_pixel(pixel_type p,
  return min_bscan;
  }*/
 
-__kernel void vnn(//__global unsigned char ** framePointers, // * bscans0,
-		//__global unsigned char * bscans1,
-		__global unsigned char * mask,
+__kernel void vnn(__global unsigned char * mask,
 		int bscan_w,
 		int bscan_h,
 		int bscan_n,
@@ -513,59 +511,15 @@ __kernel void vnn(//__global unsigned char ** framePointers, // * bscans0,
 
 	for (int y = 0; y < volume_h; y++)
 	{
-		//if(x!=230 || y!=185) 
-		//  continue;
-
-		//if(id > 45000)
-		//  printf("id: %d, x: %d, y: %d, z: %d\n", id, x, y, z);
-
 		float4 voxel_coord =
 		{	x*volume_spacing, y*volume_spacing, z*volume_spacing, 0.0f};
 
-		/*if((x == 100) && (y == 100) && (z == 100) )
-		 {
-		 printf("current_bscan: %d, dist: %f\n", current_bscan, dist);
-		 printf("plane_eq: %f, %f, %f, %f\n", plane_eq[current_bscan][0], plane_eq[current_bscan][1], plane_eq[current_bscan][2], plane_eq[current_bscan][3]);
-		 }*/
-		// Find bscan closest to voxel:
-		// Uses modified fast slice selection range (ideally +-1, but bscans are not completely ordered)
-		//		dist = 10000; // inf
-		//float dist = _distance(voxel_coord, plane_eq[current_bscan]);
 		float temp;
 		int done_up = 0;
 		int done_down = 0;
 		int min_bscan = current_bscan;
 		int n;
 
-		//This code don't check if the desired pixel in present in the "closest frame"
-		// Problem with GPU: Don't work if we traverse all the input images
-		/*		for (int i = 1; !done_down || !done_up; i++) {
-		 if (!done_up) {
-		 n = current_bscan + i;
-		 temp = fabs(_distance(voxel_coord, plane_eq[n]));
-		 min_bscan = temp < dist ? n : min_bscan;
-		 dist = min(dist, temp);
-		 //done_up = temp-dist > kernel_radius || n >= bscan_n-1;
-		 done_up = n >= bscan_n-1;
-		 //done_up = n >= bscan_n-50;//test
-		 }
-
-		 if (!done_down) {
-		 n = current_bscan - i;
-		 temp = fabs(_distance(voxel_coord, plane_eq[n]));
-		 min_bscan = temp < dist ? n : min_bscan;
-		 dist = min(dist, temp);
-		 //done_down = temp-dist > kernel_radius || n <= 0;
-		 done_down = n <= 0;
-		 //done_down = n <= 50;//test
-		 }
-		 }*/
-
-		// Find bscan closest to voxel (x,y,z)
-		//current_bscan = -1;
-		//int min_bscan = -1;
-		//int min_bscan = current_bscan;
-		//	dist = 10000; // inf
 		dist = fabs(_distance(voxel_coord, plane_eq[current_bscan]));
 
 		pixel_type p;
@@ -578,8 +532,6 @@ __kernel void vnn(//__global unsigned char ** framePointers, // * bscans0,
 			{
 				n = current_bscan + i;
 				temp_dist = fabs(_distance(voxel_coord, plane_eq[n]));
-				//min_bscan = temp_dist < dist ? n : min_bscan;
-				//dist = min(dist, temp_dist);
 
 				if (temp_dist < dist)
 				{
@@ -599,8 +551,6 @@ __kernel void vnn(//__global unsigned char ** framePointers, // * bscans0,
 			{
 				n = current_bscan - i;
 				temp_dist = fabs(_distance(voxel_coord, plane_eq[n]));
-				//min_bscan = temp_dist < dist ? n : min_bscan;
-				//dist = min(dist, temp_dist);
 
 				if (temp_dist < dist)
 				{
@@ -619,36 +569,8 @@ __kernel void vnn(//__global unsigned char ** framePointers, // * bscans0,
 		current_bscan = min_bscan;
 		dist = _distance(voxel_coord, plane_eq[current_bscan]);
 
-		/*for (int n = 0; n < bscan_n; n++) 
-		 {
-		 float temp_dist = fabs(_distance(voxel_coord, plane_eq[n]));
-		 if (temp_dist < dist)
-		 {
-		 pixel_type p_temp = findPixel(bscan_spacing_x, bscan_spacing_y, plane_eq, plane_points, n, dist, voxel_coord);
-		 if (valid_pixel(p_temp, mask, bscan_w, bscan_h, temp_dist, kernel_radius))
-		 {
-		 p = p_temp;
-		 current_bscan = n;
-		 dist = temp_dist;
-		 }
-		 }
-		 }*/
 		if (current_bscan == -1)
 		continue;
-
-		//  printf("current_bscan: %d, z: %d\n", current_bscan, z);
-		/*if (!valid_pixel(p, mask, bscan_w, bscan_h, dist, kernel_radius))
-		 continue;*/
-
-		/*if (current_bscan < bscan_n/2)
-		 volume_a(x,y,z) = bscans0[p.x + p.y*bscan_w + current_bscan*bscan_w*bscan_h];
-		 else 
-		 volume_a(x,y,z) = bscans1[p.x + p.y*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h];*/
-		//volume_a(x,y,z) = framePointers[current_bscan][p.x + p.y*bscan_w];
-		//}//todo: fix        
-
-		//if(fabs(dist) > kernel_radius)
-		//  continue;
 
 		float4 normal =
 		{	plane_eq[current_bscan].x, plane_eq[current_bscan].y, plane_eq[current_bscan].z, 0.0f};
@@ -663,7 +585,7 @@ __kernel void vnn(//__global unsigned char ** framePointers, // * bscans0,
 		int px = dot(pp, x_vector)/bscan_spacing_x;
 		int py = dot(pp, y_vector)/bscan_spacing_y;
 
-		/*pixel_type*/p = findPixel(bscan_spacing_x, bscan_spacing_y, plane_eq, plane_points, current_bscan, dist, voxel_coord);
+		p = findPixel(bscan_spacing_x, bscan_spacing_y, plane_eq, plane_points, current_bscan, dist, voxel_coord);
 
 		//printf("current_bscan: %d, px: %d, py: %d, z: %d\n", current_bscan, px, py, z);
 		if(valid_pixel(p, mask, bscan_w, bscan_h, dist, kernel_radius))
