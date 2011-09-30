@@ -1,5 +1,6 @@
 //CUSTUSX3 CODING STANDARDS
 -updated 17.04.2009 by Janne Beate Bakeng
+-updated 30.09.2011 by Christian Askeland
 
 //DOCUMENTATION
 
@@ -35,6 +36,8 @@
 	
 	
 //CODE STYLE
+In General: Use the BSD/Allman style as the Eclipse Code style.
+Modifications: 120 lines wrapping, use tabs, chose tab size yourself.
 
 -C++ header files should have the name cxClassName.h
 -C++ source files should have the name cxClassName.cpp
@@ -55,7 +58,6 @@
 -class names are 'UpperCamelCase'
 -files should be included in the order of increasing dependencies
 -use forward declaration in header files where possible
--tab = 2 spaces
 -code should look like this:
 	-------------------------HEADER FILE-----------------------------
 	#ifndef CXPOINT_H_
