@@ -79,6 +79,7 @@ public slots:
 
 signals:
 	void paramsChanged();
+	void algorithmChanged();
 	void inputDataSelected(QString mhdFileName);
 	void reconstructFinished();
 
