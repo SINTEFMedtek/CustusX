@@ -83,6 +83,7 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
 		mSettings.getElement());
 	connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
 	connect(this, SIGNAL(paramsChanged()), mAlgorithmAdapter.get(), SIGNAL(changed()));
+	connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(algorithmChanged()));
 
 	createAlgorithm();
 }
@@ -91,6 +92,8 @@ Reconstructer::~Reconstructer()
 {
 	mSettings.save();
 }
+
+//std::map<QString, ReconstructionAlgorithmPtr> mLoadedAlgorithms;
 
 void Reconstructer::createAlgorithm()
 {

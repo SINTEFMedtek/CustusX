@@ -18,6 +18,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 
 	connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
 	connect(mReconstructer.get(), SIGNAL(inputDataSelected(QString)), this, SLOT(inputDataSelected(QString)));
+	connect(mReconstructer.get(), SIGNAL(algorithmChanged()), this, SLOT(repopulateAlgorithmGroup()));
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -93,8 +94,14 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 	topLayout->addStretch();
 }
 
+/** Add the widgets for the current algorithm to a stacked widget.
+ *  When algo is changed, even back to a previous algo, just hide the old
+ *  and add a new on the stack.
+ *
+ */
 void ReconstructionWidget::repopulateAlgorithmGroup()
 {
+	std::cout << "ReconstructionWidget::repopulateAlgorithmGroup()" << std::endl;
 	QString algoName = mReconstructer->mAlgorithmAdapter->getValue();
 
 	if (algoName == mAlgorithmGroup->title())
@@ -102,21 +109,21 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 
 	mAlgorithmGroup->setTitle(algoName);
 
-	// look for an existing layout in the stack:
-	for (int i = 0; i < mAlgoLayout->count(); ++i)
-	{
-		QWidget* current = mAlgoLayout->widget(i);
-		if (current->objectName() == algoName)
-		{
-			mAlgoLayout->setCurrentIndex(i);
-			return;
-		}
-	}
+//	// look for an existing layout in the stack:
+//	for (int i = 0; i < mAlgoLayout->count(); ++i)
+//	{
+//		QWidget* current = mAlgoLayout->widget(i);
+//		if (current->objectName() == algoName)
+//		{
+//			mAlgoLayout->setCurrentIndex(i);
+//			return;
+//		}
+//	}
 
 	// No existing found,
 	//  create a new stack element for this algo:
 	QWidget* oneAlgoWidget = new QWidget(this);
-	oneAlgoWidget->setObjectName(algoName);
+	oneAlgoWidget->setObjectName(algoName+qstring_cast(mAlgoLayout->count()));
 	mAlgoLayout->addWidget(oneAlgoWidget);
 	QGridLayout* oneAlgoLayout = new QGridLayout(oneAlgoWidget);
 
@@ -175,7 +182,7 @@ void ReconstructionWidget::selectData(QString filename)
  */
 void ReconstructionWidget::paramsChangedSlot()
 {
-	repopulateAlgorithmGroup();
+//	repopulateAlgorithmGroup();
 
 	ssc::Vector3D range = mReconstructer->getOutputVolumeParams().mExtent.range();
 
