@@ -80,7 +80,7 @@ private slots:
   void activeImageChangedSlot();
   void showRefToolSlot(bool checked);
   void showToolPathSlot(bool checked);
-  void probeRepPointPickedSlot(ssc::Vector3D p_r);
+  void PickerRepPointPickedSlot(ssc::Vector3D p_r);
   void centerImageActionSlot();
   void centerToolActionSlot();
   void optionChangedSlot();
@@ -105,7 +105,7 @@ private:
   typedef  std::map<QString, ssc::RepPtr> RepMap;
   RepMap mDataReps;
   LandmarkRepPtr mLandmarkRep;
-  ssc::ProbeRepPtr mProbeRep;
+  ssc::PickerRepPtr mPickerRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
