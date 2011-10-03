@@ -29,7 +29,7 @@ namespace ssc
  */
 ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
 {
-  // provide a resampled volume for algorithms requiring that (such as proberep)
+  // provide a resampled volume for algorithms requiring that (such as PickerRep)
   vtkMatrix4x4Ptr orientatorMatrix = vtkMatrix4x4Ptr::New();
   vtkImageReslicePtr orientator = vtkImageReslicePtr::New();
   orientator->SetInput(image->getBaseVtkImageData());
