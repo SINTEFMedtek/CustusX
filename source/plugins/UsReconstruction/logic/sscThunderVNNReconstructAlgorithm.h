@@ -15,26 +15,28 @@
 
 namespace ssc
 {
-class ThunderVNNReconstructAlgorithm : public ReconstructAlgorithm
+class ThunderVNNReconstructAlgorithm: public ReconstructAlgorithm
 {
 public:
-  ThunderVNNReconstructAlgorithm(QString shaderPath);
-  virtual ~ThunderVNNReconstructAlgorithm() {}
-  virtual QString getName() const;
-  virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
-  virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
-                           //ImagePtr frameData,
-                           USFrameDataPtr frameData,
-                           ImagePtr outputData,
-                           ImagePtr frameMask,
-                           QDomElement settings);
+	ThunderVNNReconstructAlgorithm(QString shaderPath);
+	virtual ~ThunderVNNReconstructAlgorithm()
+	{
+	}
+	virtual QString getName() const;
+	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
+	virtual void reconstruct(std::vector<TimedPosition> frameInfo,
+		USFrameDataPtr frameData,
+		ImagePtr outputData,
+		ImagePtr frameMask,
+		QDomElement settings);
 
 	StringDataAdapterXmlPtr mProcessorOption;///< Select the processor to run the ocl code on (CPU/GPU)
 private:
 	DoubleDataAdapterXmlPtr mDistanceOption;
 	BoolDataAdapterXmlPtr mPrintOpenCLInfoOption;
-  QString mShaderPath;
+	QString mShaderPath;
 };
 
 }//namespace
+
 #endif //SSCTHUNDERVNNRECONSTRUCTALGORITHM_H_
