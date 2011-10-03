@@ -59,7 +59,7 @@ protected:
   QString getLandmarkName(QString uid);
   virtual ssc::Transform3D getTargetTransform() const;
 //  void internalPerformRegistration(bool doIt);
-  ssc::ProbeRepPtr getProbeRep();
+  ssc::PickerRepPtr getPickerRep();
 
   //gui
 //  RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
@@ -71,7 +71,7 @@ protected:
   QPushButton* mEditLandmarkButton; ///< the Edit Landmark button
   QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
   QLabel*      mThresholdLabel; ///< label for the tresholdslider
-  QSlider*     mThresholdSlider; ///< slider for setting the probing treshold
+  QSlider*     mThresholdSlider; ///< slider for setting the picking treshold
 
 //  QPushButton* mRegisterButton;
 //  QCheckBox* mAutoRegisterCheckBox;
