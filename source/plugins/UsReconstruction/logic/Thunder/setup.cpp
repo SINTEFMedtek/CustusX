@@ -94,7 +94,7 @@ ocl_context* ocl_init(QString processor)
 
 void ocl_release(ocl_context* context)
 {
-	printf("Thunder: ocl_release\n");
+//	printf("Thunder: ocl_release\n");
 
 	//TODO release context->device;
 
