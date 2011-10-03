@@ -95,7 +95,10 @@ void LandmarkImageRegistrationWidget::activeImageChangedSlot()
     mThresholdSlider->setRange(image->getMin(), image->getMax());
     ssc::ProbeRepPtr probe = this->getProbeRep();
     if (probe)
+    {
+    	probe->setImage(image);// Need to update image in probeRep
       mThresholdSlider->setValue(probe->getThreshold());
+    }
 
     if(!mManager->getFixedData())
     	mManager->setFixedData(image);
