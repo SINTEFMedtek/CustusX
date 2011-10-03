@@ -73,7 +73,8 @@ ocl_context* ocl_init(QString processor)
 	cl_uint numPlatforms = 1;
 	cl_uint foundPlatforms = 0;
 	ocl_check_error(clGetPlatformIDs(numPlatforms, &platform, &foundPlatforms));
-	cl_context_properties cps[3] = { CL_CONTEXT_PLATFORM, (cl_context_properties) platform, 0 };
+	cl_context_properties cps[3] =
+	{ CL_CONTEXT_PLATFORM, (cl_context_properties) platform, 0 };
 	if (processor == "CPU")
 	{
 		ocl_check_error(clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &(retval->device), NULL));
@@ -94,7 +95,7 @@ ocl_context* ocl_init(QString processor)
 
 void ocl_release(ocl_context* context)
 {
-//	printf("Thunder: ocl_release\n");
+	//	printf("Thunder: ocl_release\n");
 
 	//TODO release context->device;
 
