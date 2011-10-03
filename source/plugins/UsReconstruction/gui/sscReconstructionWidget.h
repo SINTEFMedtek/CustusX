@@ -34,6 +34,7 @@ public slots:
 	void paramsChangedSlot();
 private slots:
 	void inputDataSelected(QString mhdFileName);
+	void repopulateAlgorithmGroup();
 
 private:
 	ReconstructerPtr mReconstructer;
@@ -55,7 +56,6 @@ private:
 
 	QString getCurrentPath();
 	void updateComboBox();
-	void repopulateAlgorithmGroup();
 };
 
 }//namespace
