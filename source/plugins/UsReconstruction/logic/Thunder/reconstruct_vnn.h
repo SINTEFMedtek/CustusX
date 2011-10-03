@@ -20,20 +20,20 @@
  */
 struct reconstruct_data
 {
-  ssc::USFrameDataPtr frameData;
-  //ssc::ImagePtr frameMask;
-  //ssc::ImagePtr outputData;
+	ssc::USFrameDataPtr frameData;
+	//ssc::ImagePtr frameMask;
+	//ssc::ImagePtr outputData;
 
-  //unsigned char* input;
-  //int input_dim[3];
-  //double input_spacing[3];
-  
-  double* input_pos_matrices;
-  unsigned char* input_mask;
-  
-  unsigned char* output;
-  int output_dim[3];
-  double output_spacing[3];
+	//unsigned char* input;
+	//int input_dim[3];
+	//double input_spacing[3];
+
+	double* input_pos_matrices;
+	unsigned char* input_mask;
+
+	unsigned char* output;
+	int output_dim[3];
+	double output_spacing[3];
 };
 
 void reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString processor, float distance);
