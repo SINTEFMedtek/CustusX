@@ -54,7 +54,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscRep.h
     Rep/sscSlicerRepSW.h
     Rep/sscToolRep3D.h
-    Rep/sscProbeRep.h    
+    Rep/sscPickerRep.h
     Rep/sscImageBlenderProxy.h
     Rep/sscVolumetricRep.h    
     Rep/sscSlicePlaneRep.h
@@ -213,8 +213,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscGeometricRep2D.h
     Rep/sscToolRep3D.cpp
     Rep/sscToolRep3D.h
-    Rep/sscProbeRep.cpp
-    Rep/sscProbeRep.h
+    Rep/sscPickerRep.cpp
+    Rep/sscPickerRep.h
     Rep/sscSlicerRepSW.cpp
     Rep/sscSlicerRepSW.h
     Rep/sscSliceProxy.cpp

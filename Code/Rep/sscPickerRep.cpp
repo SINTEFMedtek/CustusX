@@ -1,4 +1,4 @@
-#include "sscProbeRep.h"
+#include "sscPickerRep.h"
 
 #include "boost/bind.hpp"
 #include <vtkActor.h>
@@ -23,13 +23,13 @@
 
 namespace ssc
 {
-ProbeRepPtr ProbeRep::New(const QString& uid, const QString& name)
+PickerRepPtr PickerRep::New(const QString& uid, const QString& name)
 {
-	ProbeRepPtr retval(new ProbeRep(uid, name));
+	PickerRepPtr retval(new PickerRep(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
-ProbeRep::ProbeRep(const QString& uid, const QString& name) :
+PickerRep::PickerRep(const QString& uid, const QString& name) :
 	RepImpl(uid, name),
 	mThreshold(25),
 	mResolution(1000),
@@ -38,14 +38,14 @@ ProbeRep::ProbeRep(const QString& uid, const QString& name) :
 	mConnections(vtkEventQtSlotConnectPtr::New())
 {
   mViewportListener.reset(new ssc::ViewportListener);
-  mViewportListener->setCallback(boost::bind(&ProbeRep::scaleSphere, this));
+  mViewportListener->setCallback(boost::bind(&PickerRep::scaleSphere, this));
 
   mView = NULL;
   mEnabled = false;
   mConnected = false;
 }
 
-void ProbeRep::scaleSphere()
+void PickerRep::scaleSphere()
 {
   if (!mGraphicalPoint)
     return;
@@ -55,29 +55,29 @@ void ProbeRep::scaleSphere()
   mGraphicalPoint->setRadius(sphereSize);
 }
 
-ProbeRep::~ProbeRep()
+PickerRep::~PickerRep()
 {}
-QString ProbeRep::getType() const
+QString PickerRep::getType() const
 {
-	return "ssc::ProbeRep";
+	return "ssc::PickerRep";
 }
-int ProbeRep::getThreshold()
+int PickerRep::getThreshold()
 {
   return mThreshold;
 }
-ImagePtr ProbeRep::getImage()
+ImagePtr PickerRep::getImage()
 {
   return mImage;
 }
 
-void ProbeRep::setSphereRadius(double radius)
+void PickerRep::setSphereRadius(double radius)
 {
   mSphereRadius = radius;
   if (mGraphicalPoint)
     mGraphicalPoint->setRadius(mSphereRadius);
 }
 
-void ProbeRep::setImage(ImagePtr image)
+void PickerRep::setImage(ImagePtr image)
 {
 	if (image==mImage)
 		return;
@@ -86,12 +86,12 @@ void ProbeRep::setImage(ImagePtr image)
 	  mThreshold = mImage->getMin() + (mImage->getMax()-mImage->getMin())/10;
 }
 
-void ProbeRep::setResolution(const int resolution)
+void PickerRep::setResolution(const int resolution)
 {
 	mResolution = resolution;
 }
 
-void ProbeRep::setTool(ToolPtr tool)
+void PickerRep::setTool(ToolPtr tool)
 {
   if (tool==mTool)
     return;
@@ -120,9 +120,9 @@ void ProbeRep::setTool(ToolPtr tool)
  * \param[in] renderer the renderer from which to get the camera
  * \return the point where the ray intersects the image
  */
-Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
+Vector3D PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
-	//std::cout << "ProbeRep::pickLandmark" << std::endl;
+	//std::cout << "PickerRep::pickLandmark" << std::endl;
 	//Get camera position and focal point in world coordinates
 	vtkCamera* camera = renderer->GetActiveCamera();
 	Vector3D cameraPosition(camera->GetPosition());
@@ -147,7 +147,7 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	Vector3D worldClickPoint(worldCoords[0]/worldCoords[3],
 							 worldCoords[1]/worldCoords[3],
 							 worldCoords[2]/worldCoords[3]);
-	//std::cout << "ProbeRep::pickLandmark: click:<"<<clickPosition<<"> world:<"<< worldClickPoint<<">"<< std::endl;
+	//std::cout << "PickerRep::pickLandmark: click:<"<<clickPosition<<"> world:<"<< worldClickPoint<<">"<< std::endl;
 
 	//Compute the direction of the probe ray
 	Vector3D probeRayDirection;
@@ -184,7 +184,7 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 ///**
 // * \param[in] index the index you want to give the landmark
 // */
-//void ProbeRep::makeLandmarkPermanent(unsigned index)
+//void PickerRep::makeLandmarkPermanent(unsigned index)
 //{
 //	emit addPermanentPoint(mPickedPoint[0],
 //						   mPickedPoint[1],
@@ -192,9 +192,9 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 //						   index);
 //}
 
-void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
+void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
-  //std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
+  //std::cout << "PickerRep::pickLandmarkSlot" << std::endl;
 	vtkRenderWindowInteractorPtr iren = vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
 	if(iren == NULL)
@@ -218,7 +218,7 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 // * @param y world coordinat, ref space
 // * @param z world coordinat, ref space
 // */
-//void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
+//void PickerRep::showTemporaryPointSlot(double x, double y, double z)
 //{
 //  mPickedPoint = Vector3D(x,y,z);
 //  if (mGraphicalPoint)
@@ -226,14 +226,14 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 //}
 
 /**
- * @param threshold sets a threshold for the probing ray
+ * @param threshold sets a threshold for the picking ray
  */
-void ProbeRep::setThresholdSlot(const int threshold)
+void PickerRep::setThresholdSlot(const int threshold)
 {
   mThreshold = threshold;
 }
 
-void ProbeRep::receiveTransforms(Transform3D prMt, double timestamp)
+void PickerRep::receiveTransforms(Transform3D prMt, double timestamp)
 {
   Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
   Transform3D rMt = rMpr*prMt;
@@ -247,9 +247,9 @@ void ProbeRep::receiveTransforms(Transform3D prMt, double timestamp)
 
 }
 
-void ProbeRep::setEnabled(bool on)
+void PickerRep::setEnabled(bool on)
 {
-//  std::cout << "ProbeRep::setEnabled " << on << std::endl;
+//  std::cout << "PickerRep::setEnabled " << on << std::endl;
 
   if (mEnabled==on)
     return;
@@ -271,7 +271,7 @@ void ProbeRep::setEnabled(bool on)
 }
 
 
-void ProbeRep::connectInteractor()
+void PickerRep::connectInteractor()
 {
   if (!mView)
     return;
@@ -284,7 +284,7 @@ void ProbeRep::connectInteractor()
   mConnected = true;
 }
 
-void ProbeRep::disconnectInteractor()
+void PickerRep::disconnectInteractor()
 {
   if (!mView)
     return;
@@ -298,7 +298,7 @@ void ProbeRep::disconnectInteractor()
 }
 
 
-void ProbeRep::addRepActorsToViewRenderer(View* view)
+void PickerRep::addRepActorsToViewRenderer(View* view)
 {
   if(view == NULL)
   {
@@ -320,7 +320,7 @@ void ProbeRep::addRepActorsToViewRenderer(View* view)
   this->scaleSphere();
 }
 
-void ProbeRep::removeRepActorsFromViewRenderer(View* view)
+void PickerRep::removeRepActorsFromViewRenderer(View* view)
 {
   if(view == NULL)
     return;
@@ -331,7 +331,7 @@ void ProbeRep::removeRepActorsFromViewRenderer(View* view)
   mView = NULL;
 }
 
-vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
+vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
 	vtkRendererPtr renderer = NULL;
 	std::set<ssc::View*>::const_iterator it = mViews.begin();
@@ -348,9 +348,9 @@ vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& 
  * \param[out] intersection the point where the probeline intersects the image
  * \return whether or not the a intersection point was found
  */
-bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
+bool PickerRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 {
- // std::cout << "ProbeRep::intersectData(p0<"<<p0<<">,p1<"<<p1<<">) image="<<mImage->getName()<<std::endl;
+ // std::cout << "PickerRep::intersectData(p0<"<<p0<<">,p1<"<<p1<<">) image="<<mImage->getName()<<std::endl;
 	//Creating the line from the camera through the picked point into the volume
   ssc::Transform3D dMr = mImage->get_rMd().inv();
   p0 = dMr.coord(p0);
@@ -396,7 +396,7 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 	return true;
 }
 
-Vector3D ProbeRep::getPosition() const
+Vector3D PickerRep::getPosition() const
 {
   return mPickedPoint;
 }

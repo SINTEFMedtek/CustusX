@@ -41,7 +41,7 @@ typedef boost::shared_ptr<class ToolRep2D> ToolRep2DPtr;
 typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class SlicePlaneRep> SlicePlaneRepPtr;
-typedef boost::shared_ptr<class ProbeRep> ProbeRepPtr;
+typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
 typedef boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationRepPtr;
 typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
 typedef boost::shared_ptr<class AxesRep> AxesRepPtr;

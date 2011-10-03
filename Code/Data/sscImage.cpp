@@ -227,7 +227,7 @@ vtkImageDataPtr Image::getRefVtkImageData()
 {
 	if (!mReferenceImageData) // optimized: dont init it if you dont need it.
 	{
-		// provide a resampled volume for algorithms requiring that (such as proberep)
+		// provide a resampled volume for algorithms requiring that (such as PickerRep)
 		mOrientatorMatrix = vtkMatrix4x4Ptr::New();
 		mOrientator = vtkImageReslicePtr::New();
 		mOrientator->SetInput(mBaseImageData);

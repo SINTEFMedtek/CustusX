@@ -1,5 +1,5 @@
-#ifndef SSCPROBEREP_H_
-#define SSCPROBEREP_H_
+#ifndef SSCPICKERREP_H_
+#define SSCPICKERREP_H_
 
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
@@ -10,7 +10,7 @@
 
 namespace ssc
 {
-typedef boost::shared_ptr<class ProbeRep> ProbeRepPtr;
+typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 
@@ -20,17 +20,17 @@ typedef boost::shared_ptr<class Tool> ToolPtr;
  * Used by CustusX.
  * Not used by Sonowand - will be used in a future releasee.
  */
-class ProbeRep : public RepImpl
+class PickerRep : public RepImpl
 {
 	Q_OBJECT
 
 public:
-	static ProbeRepPtr New(const QString& uid, const QString& name=""); ///< for creating new instances
-	virtual ~ProbeRep(); ///<empty
+	static PickerRepPtr New(const QString& uid, const QString& name=""); ///< for creating new instances
+	virtual ~PickerRep(); ///<empty
 
 	virtual QString getType() const; ///< returns a string identifying this class type
 
-	int getThreshold(); ///< gets the probing threshold
+	int getThreshold(); ///< gets the picking threshold
 	void setImage(ImagePtr image); ///< set which image points should be picked from
 	ImagePtr getImage();
 	void setResolution(const int resolution); ///< sets the resolution of the probing ray
@@ -51,12 +51,12 @@ public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
 //	void showTemporaryPointSlot(double x, double y, double z); ///< shows a temp actor at a given position
 	void setThresholdSlot(const int threshold); ///< sets the threshold for picking the point on the volumes surface
-  
+
 protected slots:
   void receiveTransforms(Transform3D prMt, double timestamp); ///< receive transforms from the connected tool
 
 protected:
-	ProbeRep(const QString& uid, const QString& name=""); ///< use New instead
+  PickerRep(const QString& uid, const QString& name=""); ///< use New instead
 	virtual void addRepActorsToViewRenderer(View* view); ///< connects to the renderwindowinteractor
 	virtual void removeRepActorsFromViewRenderer(View* view); ///< disconnects from the renderwindowinteractor
 	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
@@ -80,6 +80,6 @@ protected:
   ssc::ViewportListenerPtr mViewportListener;
 };
 
-typedef boost::shared_ptr<ProbeRep> ProbeRepPtr;
+typedef boost::shared_ptr<PickerRep> PickerRepPtr;
 }//namespace
-#endif /* SSCPROBEREP_H_ */
+#endif /* SSCPICKERREP_H_ */
