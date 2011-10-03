@@ -5,7 +5,6 @@
 #else
 #include <CL/cl.h>
 #endif //__APPLE__
-
 #include <QString>
 
 void random_init(float * data, int length);
@@ -27,19 +26,21 @@ void ocl_print_info();
 //void ocl_set_args(cl_kernel kernel, int n, ...);
 bool ocl_has_device_type(QString processor);
 
-typedef struct {
-  float x;
-  float y;
-  float z;
+typedef struct
+{
+	float x;
+	float y;
+	float z;
 } float3;
 
-typedef struct {
-  float a;
-  float b;
-  float c;
+typedef struct
+{
+	float a;
+	float b;
+	float c;
 	float d;
 } plane_eq;
- 
+
 float3 cross(float3 v, float3 w);
 float3 sub(float3 v, float3 w);
 float3 normalize(float3 v);
