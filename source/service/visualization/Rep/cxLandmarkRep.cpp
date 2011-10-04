@@ -251,7 +251,7 @@ void LandmarkRep::addLandmark(QString uid)
 
   // primary point
   ssc::Landmark primary;
-  ssc::Vector3D primary_r;
+  ssc::Vector3D primary_r(0,0,0);
   if (mPrimary)
   {
 //    std::cout << this << "   LandmarkRep::addLandmark found mPrimary" << uid << std::endl;
@@ -279,7 +279,7 @@ void LandmarkRep::addLandmark(QString uid)
   }
 
   // secondary point
-  ssc::Vector3D secondary_r;
+  ssc::Vector3D secondary_r(0,0,0);
   ssc::Landmark secondary;
   if (mSecondary)
   {
