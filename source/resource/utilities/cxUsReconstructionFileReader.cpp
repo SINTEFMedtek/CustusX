@@ -35,7 +35,7 @@ UsReconstructionFileReader::UsReconstructionFileReader()
  * the mMask var is filled with data from ProbeData, or from file if present.
  *
  */
-UsReconstructionFileReader::FileData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath, bool angio)
+ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath, bool angio)
 {
   if (calFilesPath.isEmpty())
   {
@@ -46,7 +46,7 @@ UsReconstructionFileReader::FileData UsReconstructionFileReader::readAllFiles(QS
 
 //  mFilename = fileName;
 //  mCalFilesPath = calFilesPath;
-  FileData retval;
+  ssc::USReconstructInputData retval;
 
   // ignore if a directory is read - store folder name only
   if (QFileInfo(fileName).suffix()!="mhd")
@@ -86,7 +86,7 @@ UsReconstructionFileReader::FileData UsReconstructionFileReader::readAllFiles(QS
   return retval;
 }
 
-ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(FileData data)
+ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(ssc::USReconstructInputData data)
 {
   vtkImageDataPtr mask = data.mProbeData.getMask();
   ssc::ImagePtr image = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
@@ -109,7 +109,7 @@ ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(FileData da
   return image;
 }
 
-ssc::ImagePtr UsReconstructionFileReader::generateMask(FileData data)
+ssc::ImagePtr UsReconstructionFileReader::generateMask(ssc::USReconstructInputData data)
 {
   Eigen::Array3i dim(data.mUsRaw->getDimensions());
   dim[2] = 1;
@@ -320,6 +320,7 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
     }
 
     ssc::TimedPosition position;
+    position.mTime = 0;
     if (alsoReadTimestamps)
     {
       //old format - timestamps embedded in pos file);

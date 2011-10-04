@@ -132,7 +132,7 @@ ImagePtr ReconstructManager::getOutput()
 
 void ReconstructManager::clearAll()
 {
-	mOriginalFileData = cx::UsReconstructionFileReader::FileData();
+	mOriginalFileData = ssc::USReconstructInputData();
 
 	mReconstructer->clearAll();
 }
@@ -160,7 +160,7 @@ void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 	mOriginalFileData.mFilename = fileName;
 	mCalFilesPath = calFilesPath;
 
-	cx::UsReconstructionFileReader::FileData temp = mFileReader->readAllFiles(fileName, calFilesPath,
+	ssc::USReconstructInputData temp = mFileReader->readAllFiles(fileName, calFilesPath,
 		this->getParams()->mAngioAdapter->getValue());
 	if (!temp.mUsRaw)
 		return;

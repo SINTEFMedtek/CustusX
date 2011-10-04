@@ -84,7 +84,7 @@ private:
 	ReconstructerPtr mReconstructer;
 
 	cx::UsReconstructionFileReaderPtr mFileReader;
-	cx::UsReconstructionFileReader::FileData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
+	ssc::USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 	QString mCalFilesPath; ///< Path to calibration files
 //	QString mFilename; ///< filename used for current data read
 
