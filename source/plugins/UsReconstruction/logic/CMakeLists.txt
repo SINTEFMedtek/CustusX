@@ -14,6 +14,7 @@ endif(COMMAND cmake_policy)
 
 SET( MOC_HEADER_FILES
    sscReconstructer.h
+   sscReconstructManager.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -23,6 +24,9 @@ SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
   matrixInterpolation.cpp
   sscReconstructer.cpp
+  sscReconstructer.h
+  sscReconstructManager.cpp
+  sscReconstructManager.h
   sscReconstructedOutputVolumeParams.h
   sscReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.h

@@ -2,7 +2,7 @@
 #define SSCRECONSTRUCTIONWIDGET_H_
 
 #include <QtGui>
-#include "sscReconstructer.h"
+#include "sscReconstructManager.h"
 #include "sscDoubleWidgets.h"
 #include "sscXmlOptionItem.h"
 #include "sscLabeledComboBoxWidget.h"
@@ -21,8 +21,8 @@ class ReconstructionWidget: public QWidget
 {
 Q_OBJECT
 public:
-	ReconstructionWidget(QWidget* parent, ReconstructerPtr reconstructer);
-	ReconstructerPtr reconstructer()
+	ReconstructionWidget(QWidget* parent, ReconstructManagerPtr reconstructer);
+	ReconstructManagerPtr reconstructer()
 	{
 		return mReconstructer;
 	}
@@ -37,7 +37,7 @@ private slots:
 	void repopulateAlgorithmGroup();
 
 private:
-	ReconstructerPtr mReconstructer;
+	ReconstructManagerPtr mReconstructer;
 
 	FileSelectWidget* mFileSelectWidget;
 	QPushButton* mReconstructButton;

@@ -7,11 +7,12 @@
 #include "sscMessageManager.h"
 #include "sscHelperWidgets.h"
 #include "sscTypeConversions.h"
+#include "sscReconstructer.h"
 
 namespace ssc
 {
 
-ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr reconstructer) :
+ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPtr reconstructer) :
 	QWidget(parent), mReconstructer(reconstructer)
 {
 	this->setWindowTitle("US Reconstruction");
@@ -60,17 +61,17 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 	outputVolDimLayout->addWidget(mDimZWidget);
 
 	ssc::LabeledComboBoxWidget* orientationWidget = new ssc::LabeledComboBoxWidget(this,
-		mReconstructer->mOrientationAdapter);
-	ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mPresetTFAdapter);
+		mReconstructer->getParams()->mOrientationAdapter);
+	ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mPresetTFAdapter);
 
-	QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->mMaskReduce);
+	QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mMaskReduce);
 
 	ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this,
-		mReconstructer->mAlgorithmAdapter);
+		mReconstructer->getParams()->mAlgorithmAdapter);
 
-	QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->mAlignTimestamps);
-	QWidget* timeCalibrationWidget = ssc::createDataWidget(this, mReconstructer->mTimeCalibration);
-	QWidget* angioWidget = ssc::createDataWidget(this, mReconstructer->mAngioAdapter);
+	QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mAlignTimestamps);
+	QWidget* timeCalibrationWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mTimeCalibration);
+	QWidget* angioWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mAngioAdapter);
 
 	mAlgorithmGroup = new QGroupBox("Algorithm", this);
 	mAlgoLayout = new QStackedLayout(mAlgorithmGroup);
@@ -102,7 +103,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 void ReconstructionWidget::repopulateAlgorithmGroup()
 {
 	std::cout << "ReconstructionWidget::repopulateAlgorithmGroup()" << std::endl;
-	QString algoName = mReconstructer->mAlgorithmAdapter->getValue();
+	QString algoName = mReconstructer->getParams()->mAlgorithmAdapter->getValue();
 
 	if (algoName == mAlgorithmGroup->title())
 		return;
@@ -127,7 +128,7 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 	mAlgoLayout->addWidget(oneAlgoWidget);
 	QGridLayout* oneAlgoLayout = new QGridLayout(oneAlgoWidget);
 
-	std::vector<DataAdapterPtr> algoOption = mReconstructer->mAlgoOptions;
+	std::vector<DataAdapterPtr> algoOption = mReconstructer->getAlgoOptions();
 	for (unsigned i = 0; i < algoOption.size(); ++i)
 	{
 		ssc::createDataWidget(oneAlgoWidget, algoOption[i], oneAlgoLayout, i);
