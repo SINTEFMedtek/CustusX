@@ -16,7 +16,6 @@
 #include "vtkInteractorStyleTrackballActor.h"
 #include "vtkInteractorStyleFlight.h"
 
-#include "sscProbeRep.h"
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
 #include "sscXmlOptionItem.h"
