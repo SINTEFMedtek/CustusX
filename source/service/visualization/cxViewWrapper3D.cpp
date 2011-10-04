@@ -26,7 +26,7 @@
 #include "sscSlicePlanes3DRep.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
-#include "sscProbeRep.h"
+#include "sscPickerRep.h"
 #include "sscGeometricRep.h"
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
@@ -131,12 +131,12 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 //  mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 //  mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
-  mProbeRep = ssc::ProbeRep::New("ProbeRep_"+index, "ProbeRep_"+index);
+  mPickerRep = ssc::PickerRep::New("PickerRep_"+index, "PickerRep_"+index);
 
-  connect(mProbeRep.get(), SIGNAL(pointPicked(ssc::Vector3D)),this, SLOT(probeRepPointPickedSlot(ssc::Vector3D)));
-  mProbeRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
-  mProbeRep->setEnabled(false);
-  mView->addRep(mProbeRep);
+  connect(mPickerRep.get(), SIGNAL(pointPicked(ssc::Vector3D)),this, SLOT(PickerRepPointPickedSlot(ssc::Vector3D)));
+  mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
+  mPickerRep->setEnabled(false);
+  mView->addRep(mPickerRep);
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   this->dominantToolChangedSlot();
 
@@ -224,7 +224,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 }
 
 
-void ViewWrapper3D::probeRepPointPickedSlot(ssc::Vector3D p_r)
+void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
 {
 	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
 //  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
@@ -236,7 +236,7 @@ void ViewWrapper3D::probeRepPointPickedSlot(ssc::Vector3D p_r)
   p_pr -= offset;
   p_r = rMpr.coord(p_pr);
 
-//	std::cout << "ViewWrapper3D::probeRepPointPickedSlot " << p_r << p_r<< std::endl;
+//	std::cout << "ViewWrapper3D::PickerRepPointPickedSlot " << p_r << p_r<< std::endl;
 
   // TODO set center here will not do: must handle
   ssc::dataManager()->setCenter(p_r);
@@ -562,7 +562,7 @@ void ViewWrapper3D::activeImageChangedSlot()
   if (!std::count(images.begin(), images.end(), image))
     image.reset();
 
-  mProbeRep->setImage(image);
+  mPickerRep->setImage(image);
 //  mImageLandmarkRep->setImage(image);
 //  mPatientLandmarkRep->setImage(image);
 }
@@ -593,7 +593,7 @@ ssc::View* ViewWrapper3D::getView()
 void ViewWrapper3D::dominantToolChangedSlot()
 {
   ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
-  mProbeRep->setTool(dominantTool);
+  mPickerRep->setTool(dominantTool);
 }
 
 
@@ -652,7 +652,7 @@ void ViewWrapper3D::showLandmarks(bool on)
 
 void ViewWrapper3D::showPointPickerProbe(bool on)
 {
-  mProbeRep->setEnabled(on);
+  mPickerRep->setEnabled(on);
 }
 
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)

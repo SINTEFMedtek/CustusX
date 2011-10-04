@@ -8,7 +8,7 @@
 #include "sscTransform3D.h"
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
-#include "sscProbeRep.h"
+//#include "sscPickerRep.h"
 #include "sscGeometricRep.h"
 #include "sscProgressiveLODVolumetricRep.h"
 #include "cxTool.h"

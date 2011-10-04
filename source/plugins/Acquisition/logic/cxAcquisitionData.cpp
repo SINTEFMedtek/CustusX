@@ -17,7 +17,7 @@
 namespace cx
 {
 
-AcquisitionData::AcquisitionData(ssc::ReconstructerPtr reconstructer) :
+AcquisitionData::AcquisitionData(ssc::ReconstructManagerPtr reconstructer) :
 		mReconstructer(reconstructer)
 {
 
