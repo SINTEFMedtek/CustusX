@@ -1,0 +1,87 @@
+###########################################################
+##               3D US Reconstruction
+##
+##
+###########################################################
+
+
+cmake_minimum_required( VERSION 2.4 )
+
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
+SET( MOC_HEADER_FILES
+   sscReconstructer.h
+    )
+
+QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
+
+# library
+SET( SOURCE_FILES
+  ${MOC_HEADER_FILES}
+  sscReconstructer.cpp
+  sscReconstructer.h
+  sscReconstructedOutputVolumeParams.h
+  sscReconstructAlgorithm.h
+  sscThunderVNNReconstructAlgorithm.h
+  sscThunderVNNReconstructAlgorithm.cpp
+  sscPNNReconstructAlgorithm.h
+  sscPNNReconstructAlgorithm.cpp
+  utils/sscReconstructHelper.h
+  utils/sscReconstructHelper.cpp
+    sscUSFrameData.h
+    sscUSFrameData.cpp
+      )
+
+# =========================================================
+
+SET( cxPluginUSReconstructionLogic_LIB_FILES
+    SSC
+#    cxUtilities 
+#    cxSettings
+#    cxUtilities
+#    cxPatientService
+    #thunder 
+#    cxTrackingService
+#    ITKCommon
+    )
+
+
+include_directories(
+    .
+#    ${CustusX3_SOURCE_DIR}/source/resource
+#    ${CustusX3_SOURCE_DIR}/source/service/patient
+#    ${CustusX3_SOURCE_DIR}/source/service/tracking
+#    ${CustusX3_SOURCE_DIR}/source/resource/settings
+#    ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    )
+
+
+# 
+FIND_LIBRARY(OPENCL_LIBRARIES OpenCL)
+IF( OPENCL_LIBRARIES )
+    option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" ON)
+ELSE( OPENCL_LIBRARIES )
+    option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" OFF)
+ENDIF( OPENCL_LIBRARIES )
+            
+if (USE_US_RECONSTRUCTION_THUNDER)
+    ADD_SUBDIRECTORY(Thunder)
+    include_directories( Thunder )
+    link_directories( ${CMAKE_CURRENT_BINARY_DIR}/Thunder )
+    set( cxPluginUSReconstructionLogic_LIB_FILES thunder ${cxPluginUSReconstructionLogic_LIB_FILES} )
+    set(THUNDER_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Thunder)
+endif (USE_US_RECONSTRUCTION_THUNDER)
+
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h" )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+
+# =========================================================
+# create the target
+add_library( sscUS3DReconstruction ${SOURCE_FILES} )
+target_link_libraries( sscUS3DReconstruction ${cxPluginUSReconstructionLogic_LIB_FILES} )
+# =========================================================
+

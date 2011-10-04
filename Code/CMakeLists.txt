@@ -112,6 +112,7 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/Math/
     ${SSC_SOURCE_DIR}/Code/Widgets/
     ${SSC_SOURCE_DIR}/Code/3rdParty/
+    ${SSC_SOURCE_DIR}/Code/Ultrasound/3DReconstruction
 #    ${SSC_SOURCE_DIR}/Code/3rdParty/cml-1_0_2
     ${SSC_BINARY_DIR}
     ) 
@@ -500,3 +501,5 @@ endif(APPLE)
 # =========================================================
 
 SET_TARGET_PROPERTIES( SSC PROPERTIES COMPILE_FLAGS "${SNW_COMPILE_FLAGS}" LINK_FLAGS "${SNW_LINK_FLAGS}" LINK_LIBS "${SNW_LINK_LIBS}")
+
+add_subdirectory(Ultrasound/3DReconstruction)
