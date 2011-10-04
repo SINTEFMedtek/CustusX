@@ -7,17 +7,19 @@
 #include "sscMessageManager.h"
 #include "sscHelperWidgets.h"
 #include "sscTypeConversions.h"
+#include "sscReconstructer.h"
 
 namespace ssc
 {
 
-ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr reconstructer) :
+ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPtr reconstructer) :
 	QWidget(parent), mReconstructer(reconstructer)
 {
 	this->setWindowTitle("US Reconstruction");
 
 	connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
 	connect(mReconstructer.get(), SIGNAL(inputDataSelected(QString)), this, SLOT(inputDataSelected(QString)));
+	connect(mReconstructer.get(), SIGNAL(algorithmChanged()), this, SLOT(repopulateAlgorithmGroup()));
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -59,17 +61,17 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 	outputVolDimLayout->addWidget(mDimZWidget);
 
 	ssc::LabeledComboBoxWidget* orientationWidget = new ssc::LabeledComboBoxWidget(this,
-		mReconstructer->mOrientationAdapter);
-	ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mPresetTFAdapter);
+		mReconstructer->getParams()->mOrientationAdapter);
+	ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mPresetTFAdapter);
 
-	QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->mMaskReduce);
+	QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mMaskReduce);
 
 	ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this,
-		mReconstructer->mAlgorithmAdapter);
+		mReconstructer->getParams()->mAlgorithmAdapter);
 
-	QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->mAlignTimestamps);
-	QWidget* timeCalibrationWidget = ssc::createDataWidget(this, mReconstructer->mTimeCalibration);
-	QWidget* angioWidget = ssc::createDataWidget(this, mReconstructer->mAngioAdapter);
+	QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mAlignTimestamps);
+	QWidget* timeCalibrationWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mTimeCalibration);
+	QWidget* angioWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mAngioAdapter);
 
 	mAlgorithmGroup = new QGroupBox("Algorithm", this);
 	mAlgoLayout = new QStackedLayout(mAlgorithmGroup);
@@ -93,34 +95,40 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 	topLayout->addStretch();
 }
 
+/** Add the widgets for the current algorithm to a stacked widget.
+ *  When algo is changed, even back to a previous algo, just hide the old
+ *  and add a new on the stack.
+ *
+ */
 void ReconstructionWidget::repopulateAlgorithmGroup()
 {
-	QString algoName = mReconstructer->mAlgorithmAdapter->getValue();
+	std::cout << "ReconstructionWidget::repopulateAlgorithmGroup()" << std::endl;
+	QString algoName = mReconstructer->getParams()->mAlgorithmAdapter->getValue();
 
 	if (algoName == mAlgorithmGroup->title())
 		return;
 
 	mAlgorithmGroup->setTitle(algoName);
 
-	// look for an existing layout in the stack:
-	for (int i = 0; i < mAlgoLayout->count(); ++i)
-	{
-		QWidget* current = mAlgoLayout->widget(i);
-		if (current->objectName() == algoName)
-		{
-			mAlgoLayout->setCurrentIndex(i);
-			return;
-		}
-	}
+//	// look for an existing layout in the stack:
+//	for (int i = 0; i < mAlgoLayout->count(); ++i)
+//	{
+//		QWidget* current = mAlgoLayout->widget(i);
+//		if (current->objectName() == algoName)
+//		{
+//			mAlgoLayout->setCurrentIndex(i);
+//			return;
+//		}
+//	}
 
 	// No existing found,
 	//  create a new stack element for this algo:
 	QWidget* oneAlgoWidget = new QWidget(this);
-	oneAlgoWidget->setObjectName(algoName);
+	oneAlgoWidget->setObjectName(algoName+qstring_cast(mAlgoLayout->count()));
 	mAlgoLayout->addWidget(oneAlgoWidget);
 	QGridLayout* oneAlgoLayout = new QGridLayout(oneAlgoWidget);
 
-	std::vector<DataAdapterPtr> algoOption = mReconstructer->mAlgoOptions;
+	std::vector<DataAdapterPtr> algoOption = mReconstructer->getAlgoOptions();
 	for (unsigned i = 0; i < algoOption.size(); ++i)
 	{
 		ssc::createDataWidget(oneAlgoWidget, algoOption[i], oneAlgoLayout, i);
@@ -175,7 +183,7 @@ void ReconstructionWidget::selectData(QString filename)
  */
 void ReconstructionWidget::paramsChangedSlot()
 {
-	repopulateAlgorithmGroup();
+//	repopulateAlgorithmGroup();
 
 	ssc::Vector3D range = mReconstructer->getOutputVolumeParams().mExtent.range();
 

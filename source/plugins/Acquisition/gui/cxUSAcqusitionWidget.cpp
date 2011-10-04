@@ -13,7 +13,7 @@
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
 #include "cxDoubleDataAdapterTemporalCalibration.h"
-#include "sscReconstructer.h"
+#include "sscReconstructManager.h"
 
 namespace cx
 {

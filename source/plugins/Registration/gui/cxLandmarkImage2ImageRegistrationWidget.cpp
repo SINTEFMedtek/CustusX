@@ -19,7 +19,6 @@
 #include <vtkImageData.h>
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
-#include "sscProbeRep.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
