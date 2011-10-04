@@ -26,6 +26,7 @@ public:
   
   static void initialize();
   bool getDebugMode() const;
+  virtual ssc::PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 signals:
   void currentImageDeleted(ssc::ImagePtr image); ///< emitted when data is deleted

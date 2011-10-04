@@ -8,11 +8,11 @@
 #define SSCRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_
 
 #include "sscDoubleDataAdapter.h"
-#include "sscReconstructer.h"
+#include "sscReconstructManager.h"
 
 namespace ssc
 {
-typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
+typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 class OutputVolumeParams;
 
 /** Abstract interface to setting one of the values in class OutputValueParams.
@@ -22,7 +22,7 @@ class DoubleDataAdapterOutputValueParams : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterOutputValueParams(ReconstructerPtr reconstructer);
+  DoubleDataAdapterOutputValueParams(ReconstructManagerPtr reconstructer);
   virtual ~DoubleDataAdapterOutputValueParams() {}
   virtual double getValue() const;
   virtual bool setValue(double val);
@@ -34,7 +34,7 @@ protected:
   virtual double getValue(OutputVolumeParams* params) const = 0;
   virtual void setValue(OutputVolumeParams* params, double val) = 0;
 
-  ReconstructerPtr mReconstructer;
+  ReconstructManagerPtr mReconstructer;
 };
 
 /** Interface to setting max size for reconstructed us volume.
@@ -43,7 +43,7 @@ class DoubleDataAdapterMaxUSVolumeSize : public DoubleDataAdapterOutputValuePara
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterMaxUSVolumeSize(ReconstructerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer), mFactor(1024*1024) {}
+  DoubleDataAdapterMaxUSVolumeSize(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer), mFactor(1024*1024) {}
   virtual ~DoubleDataAdapterMaxUSVolumeSize() {}
   virtual QString getValueName() const { return "Volume Size"; }
   virtual QString getHelp() const { return "Output Volume Size (Mb)"; }
@@ -63,7 +63,7 @@ class DoubleDataAdapterSpacing : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterSpacing(ReconstructerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
+  DoubleDataAdapterSpacing(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
   virtual ~DoubleDataAdapterSpacing() {}
   virtual QString getValueName() const { return "Output Spacing"; }
   virtual QString getHelp() const { return "Output Volume Spacing (mm)"; }
@@ -81,7 +81,7 @@ class DoubleDataAdapterXDim : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterXDim(ReconstructerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
+  DoubleDataAdapterXDim(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
   virtual ~DoubleDataAdapterXDim() {}
   virtual QString getValueName() const { return "X"; }
   virtual QString getHelp() const { return "X dimension"; }
@@ -96,7 +96,7 @@ class DoubleDataAdapterYDim : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterYDim(ReconstructerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
+  DoubleDataAdapterYDim(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
   virtual ~DoubleDataAdapterYDim() {}
   virtual QString getValueName() const { return "Y"; }
   virtual QString getHelp() const { return "Y dimension"; }
@@ -111,7 +111,7 @@ class DoubleDataAdapterZDim : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataAdapterZDim(ReconstructerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
+  DoubleDataAdapterZDim(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
   virtual ~DoubleDataAdapterZDim() {}
   virtual QString getValueName() const { return "Z"; }
   virtual QString getHelp() const { return "Z dimension"; }

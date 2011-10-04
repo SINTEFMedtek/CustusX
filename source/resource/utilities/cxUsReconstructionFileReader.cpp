@@ -285,7 +285,7 @@ void UsReconstructionFileReader::readTimeStampsFile(QString fileName,
 
 //  if(i!=timedPos->size())
 //  {
-//    ssc::messageManager()->sendWarning(QString("Reconstructer::readTimeStampsFile() ")
+//    ssc::messageManager()->sendWarning(QString("ReconstructManager::readTimeStampsFile() ")
 //                                       + "timedPos->size(): "
 //                                       + qstring_cast(timedPos->size())
 //                                       + ", read number of time stamps: "
@@ -293,7 +293,7 @@ void UsReconstructionFileReader::readTimeStampsFile(QString fileName,
 //  }
 //  else
 //  {
-//    //std::cout << "Reconstructer::readTimeStampsFile() - succes. ";
+//    //std::cout << "ReconstructManager::readTimeStampsFile() - succes. ";
 //    //std::cout << "Number of time stamps: ";
 //    //std::cout << timedPos->size() << std::endl;
 //  }
@@ -359,11 +359,11 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
   //old format
   /*if(i!=numPos)
   {
-    std::cout << "Reconstructer::readPositionFile() - warning. ";
+    std::cout << "ReconstructManager::readPositionFile() - warning. ";
     std::cout << "numPos: " << numPos << ", read number of pos: ";
     std::cout << mPositions.size() << std::endl;
   }*/
-  //std::cout << "Reconstructer::readPositionFile() - succes. ";
+  //std::cout << "ReconstructManager::readPositionFile() - succes. ";
   //std::cout << "Number of positions: ";
   //std::cout << mPositions.size() << std::endl;
   return;

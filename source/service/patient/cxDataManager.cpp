@@ -5,6 +5,9 @@
 #include "cxDistanceMetric.h"
 #include "cxPlaneMetric.h"
 #include "cxAngleMetric.h"
+#include "sscXmlOptionItem.h"
+#include "cxDataLocations.h"
+#include "sscPresetTransferFunctions3D.h"
 
 namespace cx
 {
@@ -23,20 +26,26 @@ void DataManager::initialize()
 DataManager* DataManager::getInstance()
 {
   return dynamic_cast<DataManager*>(ssc::DataManager::getInstance());
-//  if (mCxInstance == NULL)
-//  {
-//    mCxInstance = new DataManager();
-//    ssc::DataManager::setInstance(mCxInstance);
-//  }
-//  return mCxInstance;
 }
+
 DataManager::DataManager() : mDebugMode(false)
-{}
+{
+}
+
 DataManager::~DataManager()
 {
-  //std::cout << "DataManager::~DataManager()" << std::endl;
 }
   
+ssc::PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() const
+{
+	///< create from filename, create trivial document of type name and root node if no file exists.
+	ssc::XmlOptionFile preset = ssc::XmlOptionFile(DataLocations::getRootConfigPath()+"/transferFunctions/presets.xml", "transferFunctions");
+	ssc::XmlOptionFile custom = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("presetTransferFunctions");
+
+	return ssc::PresetTransferFunctions3DPtr(new ssc::PresetTransferFunctions3D(preset, custom));
+}
+
+
 bool DataManager::getDebugMode() const
 {
   return mDebugMode;
@@ -57,8 +66,5 @@ void DataManager::deleteImageSlot(ssc::ImagePtr image)
   mData.erase(image->getUid());
   emit currentImageDeleted(image);
 }
-//DataManager* dataManager()
-//{
-//  return DataManager::getInstance();
-//}
+
 }//namespace cx

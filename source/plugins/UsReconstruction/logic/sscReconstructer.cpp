@@ -25,7 +25,7 @@
 #include "cxCreateProbeDataFromConfiguration.h"
 #include "sscVolumeHelpers.h"
 #include "cxUsReconstructionFileReader.h"
-#include "cxPresetTransferFunctions3D.h"
+#include "sscPresetTransferFunctions3D.h"
 #include "cxToolManager.h"
 #include "sscManualTool.h"
 
@@ -37,67 +37,84 @@
 namespace ssc
 {
 
-Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
-	mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath), mMaxTimeDiff(100)// TODO: Change default value for max allowed time difference between tracking and image time tags
+ReconstructParams::ReconstructParams(XmlOptionFile settings)
 {
-	mFileReader.reset(new cx::UsReconstructionFileReader());
-
 	mSettings = settings;
 	mSettings.getElement("algorithms");
 
 	mOrientationAdapter = StringDataAdapterXml::initialize("Orientation", "",
 		"Algorithm to use for output volume orientation", "MiddleFrame",
-		QString("PatientReference MiddleFrame").split(" "), mSettings.getElement());
+		QString("PatientReference MiddleFrame").split(" "),
+		mSettings.getElement());
+	connect(mOrientationAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 
-	connect(mOrientationAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
-	connect(this, SIGNAL(paramsChanged()), mOrientationAdapter.get(), SIGNAL(changed()));
-
-	cx::PresetTransferFunctions3D presets;
+	ssc::PresetTransferFunctions3DPtr presets = ssc::dataManager()->getPresetTransferFunctions3D();
 	mPresetTFAdapter = StringDataAdapterXml::initialize("Preset", "",
-		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presets.getPresetList(),
+		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presets->getPresetList(),
 		mSettings.getElement());
 
-	connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
-	connect(this, SIGNAL(paramsChanged()), mPresetTFAdapter.get(), SIGNAL(changed()));
+	connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 
-	mMaskReduce = StringDataAdapterXml::initialize("Reduce mask (% in 1D)", "", "Speedup by reducing mask size", "3",
-		QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "), mSettings.getElement());
-	connect(mMaskReduce.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
+	mMaskReduce = StringDataAdapterXml::initialize("Reduce mask (% in 1D)", "",
+		"Speedup by reducing mask size", "3",
+		QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "),
+		mSettings.getElement());
+	connect(mMaskReduce.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 
 	mAlignTimestamps = BoolDataAdapterXml::initialize("Align timestamps", "",
-		"Align the first of tracker and frame timestamps, ignoring lags.", false, mSettings.getElement());
-	connect(mAlignTimestamps.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
+		"Align the first of tracker and frame timestamps, ignoring lags.", false,
+		mSettings.getElement());
+	connect(mAlignTimestamps.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 
 	mTimeCalibration = DoubleDataAdapterXml::initialize("Extra Temporal Calib", "",
-		"Set an offset in the frame timestamps, in addition to the one used in acquisition", 0.0, DoubleRange(-1000,
-			1000, 10), 0, mSettings.getElement());
-	connect(mTimeCalibration.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
-
-	mAngioAdapter = BoolDataAdapterXml::initialize("Angio data", "", "Ultrasound angio data is used as input", false,
+		"Set an offset in the frame timestamps, in addition to the one used in acquisition", 0.0,
+		DoubleRange(-1000, 1000, 10), 0,
 		mSettings.getElement());
-	connect(mAngioAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
+	connect(mTimeCalibration.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+
+	mAngioAdapter = BoolDataAdapterXml::initialize("Angio data", "",
+		"Ultrasound angio data is used as input", false,
+		mSettings.getElement());
+	connect(mAngioAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 
 	mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "", "Choose algorithm to use for reconstruction",
 		"PNN", QString("ThunderVNN PNN").split(" "),
-		//QString("PNN").split(" "),
 		mSettings.getElement());
-	connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(setSettings()));
-	connect(this, SIGNAL(paramsChanged()), mAlgorithmAdapter.get(), SIGNAL(changed()));
-	connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(algorithmChanged()));
+	connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+}
+
+ReconstructParams::~ReconstructParams()
+{
+	mSettings.save();
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
+	mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath), mMaxTimeDiff(100)// TODO: Change default value for max allowed time difference between tracking and image time tags
+{
+//	mFileReader.reset(new cx::UsReconstructionFileReader());
+
+	mSettings = settings;
+	mSettings.getElement("algorithms");
+
+	mParams.reset(new ReconstructParams(settings));
+	connect(mParams.get(), SIGNAL(changedInputSettings()), this, SLOT(setSettings()));
 
 	createAlgorithm();
 }
 
 Reconstructer::~Reconstructer()
 {
-	mSettings.save();
 }
 
 //std::map<QString, ReconstructionAlgorithmPtr> mLoadedAlgorithms;
 
 void Reconstructer::createAlgorithm()
 {
-	QString name = mAlgorithmAdapter->getValue();
+	QString name = mParams->mAlgorithmAdapter->getValue();
 
 	if (mAlgorithm && mAlgorithm->getName() == name)
 		return;
@@ -118,6 +135,8 @@ void Reconstructer::createAlgorithm()
 		QDomElement algo = mSettings.getElement("algorithms", mAlgorithm->getName());
 		mAlgoOptions = mAlgorithm->getSettings(algo);
 		ssc::messageManager()->sendInfo("Using reconstruction algorithm " + mAlgorithm->getName());
+
+		emit algorithmChanged();
 	}
 }
 
@@ -223,7 +242,7 @@ void Reconstructer::alignTimeSeries()
  */
 void Reconstructer::applyTimeCalibration()
 {
-	double timeshift = mTimeCalibration->getValue();
+	double timeshift = mParams->mTimeCalibration->getValue();
 	// The shift is on frames. The calibrate function applies to tracker positions,
 	// hence the positive sign. (real use: subtract from frame data)
 	//  std::cout << "TIMESHIFT " << timeshift << std::endl;
@@ -234,7 +253,7 @@ void Reconstructer::applyTimeCalibration()
 	this->calibrateTimeStamps(timeshift, 1.0);
 
 	// ignore calibrations
-	if (mAlignTimestamps->getValue())
+	if (mParams->mAlignTimestamps->getValue())
 	{
 		this->alignTimeSeries();
 	}
@@ -316,23 +335,6 @@ void Reconstructer::interpolatePositions()
 	}
 }
 
-vnl_matrix_double convertSSC2VNL(const ssc::Transform3D& src)
-{
-	vnl_matrix_double dst(4, 4);
-	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
-			dst[i][j] = src(i, j);
-	return dst;
-}
-
-ssc::Transform3D convertVNL2SSC(const vnl_matrix_double& src)
-{
-	ssc::Transform3D dst;
-	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
-			dst(i, j) = src[i][j];
-	return dst;
-}
 
 /**
  * Pre:  mPos is prMt
@@ -352,31 +354,6 @@ void Reconstructer::transformPositionsTo_prMu()
 	}
 	//mPos is prMu
 }
-
-///**
-// * Pre:  mPos is sMpr
-// * Post: mPos is uMpr
-// */
-//void Reconstructer::calibrate(QString calFilesPath)
-//{
-//  // Calibration from tool space to localizer = sMt
-//  Transform3D sMt = mFileReader->readTransformFromFile(calFilesPath+mCalFileName);
-//
-//  // Transform from image coordinate syst with origin in upper left corner
-//  // to t (tool) space. TODO check is u is ul corner or ll corner.
-//  ssc::Transform3D tMu = mFileData.mProbeData.get_tMu() * mFileData.mProbeData.get_uMv();
-//
-//  ssc::Transform3D sMu = sMt*tMu;
-//
-//  //mPos is prMs
-//  for (unsigned i = 0; i < mFileData.mPositions.size(); i++)
-//  {
-//    ssc::Transform3D prMt = mFileData.mPositions[i].mPos;
-//    ssc::Transform3D prMs = prMt * sMt.inv();
-//    mFileData.mPositions[i].mPos = prMs * sMu;
-//  }
-//  //mPos is prMu
-//}
 
 
 /**
@@ -413,8 +390,9 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
 
 	//Test: reduce the output volume by reducing the mask when determining
 	//      output volume size
-	int reduceX = (xmax - xmin) * (mMaskReduce->getValue().toDouble() / 100);
-	int reduceY = (ymax - ymin) * (mMaskReduce->getValue().toDouble() / 100);
+	double red = mParams->mMaskReduce->getValue().toDouble();
+	int reduceX = (xmax - xmin) * (red / 100);
+	int reduceY = (ymax - ymin) * (red / 100);
 
 	xmin += reduceX;
 	xmax -= reduceX;
@@ -438,7 +416,7 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
 ssc::Transform3D Reconstructer::applyOutputOrientation()
 {
 	//  QString newOrient = mSettings.getStringOption("Orientation").getValue();
-	QString newOrient = mOrientationAdapter->getValue();
+	QString newOrient = mParams->mOrientationAdapter->getValue();
 	ssc::Transform3D prMdd = Transform3D::Identity();
 
 	if (newOrient == "PatientReference")
@@ -528,7 +506,7 @@ void Reconstructer::findExtentAndOutputTransform()
 QString Reconstructer::generateOutputUid()
 {
 	QString base = mFileData.mUsRaw->getUid();
-	QString name = mFilename.split("/").back();
+	QString name = mOriginalFileData.mFilename.split("/").back();
 	name = name.split(".").front();
 
 	QStringList split = name.split("_");
@@ -605,45 +583,23 @@ ImagePtr Reconstructer::generateOutputVolume()
 
 	QString uid = this->generateOutputUid();
 	QString name = this->generateImageName(uid);
+	std::cout << "creating vol " << uid << " with name " << name << std::endl;
 
 	ImagePtr image = dataManager()->createImage(data, uid + "_%1", name + " %1", filePath);
 	image->get_rMd_History()->setRegistration(mOutputVolumeParams.m_rMd);
 
-	cx::PresetTransferFunctions3D presets;
-	presets.load(mPresetTFAdapter->getValue(), image);
+	ssc::PresetTransferFunctions3DPtr presets = ssc::dataManager()->getPresetTransferFunctions3D();
+	presets->load(mParams->mPresetTFAdapter->getValue(), image);
 
 	return image;
 }
 
-void Reconstructer::selectData(QString filename, QString calFilesPath)
+void Reconstructer::setInputData(cx::UsReconstructionFileReader::FileData fileData)
 {
-	if (filename.isEmpty())
-	{
-		ssc::messageManager()->sendWarning("no file selected");
-		return;
-	}
-
 	this->clearAll();
-	this->readCoreFiles(filename, calFilesPath);
+	mOriginalFileData = fileData;
 	this->updateFromOriginalFileData();
-
-	emit inputDataSelected(filename);
-}
-
-/**Read from file into mOriginalFileData.
- * These data are not changed before clearAll() or this method is called again.
- */
-void Reconstructer::readCoreFiles(QString fileName, QString calFilesPath)
-{
-	mFilename = fileName;
-	mCalFilesPath = calFilesPath;
-
-	cx::UsReconstructionFileReader::FileData temp = mFileReader->readAllFiles(fileName, calFilesPath,
-		mAngioAdapter->getValue());
-	if (!temp.mUsRaw)
-		return;
-
-	mOriginalFileData = temp;
+	emit inputDataSelected(fileData.mFilename);
 }
 
 /**Use the mOriginalFileData structure to rebuild all internal data.
@@ -697,7 +653,7 @@ void Reconstructer::reconstruct()
 		ssc::messageManager()->sendError("Reconstruct failed: no data loaded");
 		return;
 	}
-	ssc::messageManager()->sendInfo("Perform reconstruction on: " + mFilename);
+	ssc::messageManager()->sendInfo("Perform reconstruction on: " + mOriginalFileData.mFilename);
 
 	this->threadedPreReconstruct();
 	this->threadedReconstruct();
@@ -732,7 +688,7 @@ void Reconstructer::threadedReconstruct()
 	ssc::messageManager()->sendInfo("Reconstruct time: " + tempTime.toString("hh:mm:ss:zzz"));
 }
 
-/**The reconstruct part that must be fun post-rec in the main thread.
+/**The reconstruct part that must be done post-rec in the main thread.
  *
  */
 void Reconstructer::threadedPostReconstruct()
@@ -751,24 +707,6 @@ ImagePtr Reconstructer::getOutput()
 	return mOutput;
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
 
-
-ThreadedReconstructer::ThreadedReconstructer(ReconstructerPtr reconstructer)
-{
-	mReconstructer = reconstructer;
-	mReconstructer->threadedPreReconstruct();
-	connect(this, SIGNAL(finished()), this, SLOT(postReconstructionSlot())); // ensure this slot is run before all other listeners.
-}
-void ThreadedReconstructer::run()
-{
-	mReconstructer->threadedReconstruct();
-}
-void ThreadedReconstructer::postReconstructionSlot()
-{
-	mReconstructer->threadedPostReconstruct();
-}
 
 }
