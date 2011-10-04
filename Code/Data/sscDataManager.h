@@ -20,6 +20,7 @@ typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 typedef boost::shared_ptr<class Data> DataPtr;
 typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
+typedef boost::shared_ptr<class PresetTransferFunctions3D> PresetTransferFunctions3DPtr;
 
 //-----
 enum READER_TYPE
@@ -96,6 +97,7 @@ public:
 	// state information
 	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
+	  virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const { return PresetTransferFunctions3DPtr(); };
 
   virtual QString addLandmark() { return ""; }
   virtual void setLandmarkNames(std::vector<QString> names) {}

@@ -278,6 +278,8 @@ SET( SSC_SOURCE_FILES
     Data/sscSNW2Volume.h
     Data/sscRegistrationTransform.cpp
     Data/sscRegistrationTransform.h
+    Data/sscPresetTransferFunctions3D.h
+    Data/sscPresetTransferFunctions3D.cpp
     
     Video/sscVideoSource.h
     Video/sscVideoRecorder.h
