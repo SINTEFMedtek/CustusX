@@ -9,11 +9,9 @@
 #include <QFileInfo>
 #include "recConfig.h"
 #include "sscMessageManager.h"
-//#include "utils/sscReconstructHelper.h"�
 #include "sscTypeConversions.h"
 #include "sscVolumeHelpers.h"
 
-//#include "sscReconstructer.h"
 
 namespace ssc 
 {
