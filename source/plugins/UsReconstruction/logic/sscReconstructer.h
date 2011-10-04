@@ -25,6 +25,30 @@
 namespace ssc
 {
 
+class ReconstructParams : public QObject
+{
+	Q_OBJECT
+
+public:
+	ReconstructParams(XmlOptionFile settings);
+	virtual ~ReconstructParams();
+
+	StringDataAdapterXmlPtr mOrientationAdapter;
+	StringDataAdapterXmlPtr mPresetTFAdapter;
+	StringDataAdapterXmlPtr mAlgorithmAdapter;
+	std::vector<DataAdapterPtr> mAlgoOptions;
+	StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction
+	BoolDataAdapterXmlPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
+	DoubleDataAdapterXmlPtr mTimeCalibration; ///set a offset in the frame timestamps
+	BoolDataAdapterXmlPtr mAngioAdapter; ///US angio data is used as input
+
+	XmlOptionFile mSettings;
+
+signals:
+	void changedInputSettings();
+};
+typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
+
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 
 /**
@@ -45,27 +69,28 @@ public:
 	Reconstructer(XmlOptionFile settings, QString shaderPath);
 	virtual ~Reconstructer();
 
-	void selectData(QString filename, QString calFilesPath = "");
+//	void selectData(QString filename, QString calFilesPath = "");
+	void setInputData(cx::UsReconstructionFileReader::FileData fileData);
 	void reconstruct(); // assumes readFiles has already been called
-	QString getSelectedData() const
-	{
-		return mFilename;
-	}
+//	QString getSelectedData() const
+//	{
+//		return mFilename;
+//	}
 
 	ImagePtr getOutput();
-	XmlOptionFile getSettings() const
-	{
-		return mSettings;
-	}
-
-	StringDataAdapterXmlPtr mOrientationAdapter;
-	StringDataAdapterXmlPtr mPresetTFAdapter;
-	StringDataAdapterXmlPtr mAlgorithmAdapter;
+//	XmlOptionFile getSettings() const
+//	{
+//		return mSettings;
+//	}
+	ReconstructParamsPtr mParams;
+//	StringDataAdapterXmlPtr mOrientationAdapter;
+//	StringDataAdapterXmlPtr mPresetTFAdapter;
+//	StringDataAdapterXmlPtr mAlgorithmAdapter;
 	std::vector<DataAdapterPtr> mAlgoOptions;
-	StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction
-	BoolDataAdapterXmlPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
-	DoubleDataAdapterXmlPtr mTimeCalibration; ///set a offset in the frame timestamps
-	BoolDataAdapterXmlPtr mAngioAdapter; ///US angio data is used as input
+//	StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction
+//	BoolDataAdapterXmlPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
+//	DoubleDataAdapterXmlPtr mTimeCalibration; ///set a offset in the frame timestamps
+//	BoolDataAdapterXmlPtr mAngioAdapter; ///US angio data is used as input
 
 	ReconstructAlgorithmPtr mAlgorithm;///< The used reconstruction algorithm
 
@@ -73,6 +98,7 @@ public:
 	void setOutputVolumeParams(const OutputVolumeParams& par);
 	void setOutputRelativePath(QString path);
 	void setOutputBasePath(QString path);
+	void clearAll();
 
 public slots:
 	void setSettings();
@@ -87,19 +113,19 @@ private:
 	cx::UsReconstructionFileReader::FileData mFileData;
 	cx::UsReconstructionFileReader::FileData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 
-	cx::UsReconstructionFileReaderPtr mFileReader;
+//	cx::UsReconstructionFileReaderPtr mFileReader;
 	OutputVolumeParams mOutputVolumeParams;
 	XmlOptionFile mSettings;
 	//  QString mCalFileName; ///< Name of calibration file
-	QString mCalFilesPath; ///< Path to calibration files
-	QString mFilename; ///< filename used for current data read
+//	QString mCalFilesPath; ///< Path to calibration files
+//	QString mFilename; ///< filename used for current data read
 	ImagePtr mOutput;///< Output image from reconstruction
 	QString mOutputRelativePath;///< Relative path to the output image
 	QString mOutputBasePath;///< Global path where the relative path starts, for the output image
 	QString mShaderPath; ///< name of shader folder
 	double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
 
-	void readCoreFiles(QString fileName, QString calFilesPath);
+//	void readCoreFiles(QString fileName, QString calFilesPath);
 	ssc::Transform3D applyOutputOrientation();
 	void findExtentAndOutputTransform();
 	void transformPositionsTo_prMu();
@@ -114,7 +140,6 @@ private:
 	void clearOutput();
 	void createAlgorithm();
 	void updateFromOriginalFileData();
-	void clearAll();
 
 	QString generateOutputUid();
 	QString generateImageName(QString uid) const;
@@ -126,23 +151,6 @@ private:
 	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
 };
 
-/**Execution of a reconstruction in another thread.
- * The class replaces the Reconstructer::reconstruct() method.
- *
- */
-class ThreadedReconstructer: public QThread
-{
-Q_OBJECT
-
-public:
-	ThreadedReconstructer(ReconstructerPtr reconstructer);
-	virtual void run();
-private slots:
-	void postReconstructionSlot();
-private:
-	ReconstructerPtr mReconstructer;
-};
-typedef boost::shared_ptr<class ThreadedReconstructer> ThreadedReconstructerPtr;
 
 }//namespace
 #endif //SSCRECONSTRUCTER_H_
