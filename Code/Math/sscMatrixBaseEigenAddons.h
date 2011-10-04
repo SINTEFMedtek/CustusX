@@ -10,13 +10,12 @@
  *      Author: christiana
  */
 
-
 /**
  * return the vector with length 1.
  */
 inline PlainObject normal() const
 {
-  return this->normalized();
+	return this->normalized();
 }
 
 /**
@@ -24,7 +23,7 @@ inline PlainObject normal() const
  */
 inline RealScalar length() const
 {
-  return this->norm();
+	return this->norm();
 }
 
 /**
@@ -32,9 +31,9 @@ inline RealScalar length() const
  */
 static PlainObject fromString(const QString& text)
 {
-  QStringList v = text.split(QRegExp("\\s+"));
-  if (v.size()!=3)
-    return PlainObject(0,0,0);
-  return PlainObject(v[0].toDouble(), v[1].toDouble(), v[2].toDouble());
+	QStringList v = text.split(QRegExp("\\s+"));
+	if (v.size() != 3)
+		return PlainObject(0, 0, 0);
+	return PlainObject(v[0].toDouble(), v[1].toDouble(), v[2].toDouble());
 }
 

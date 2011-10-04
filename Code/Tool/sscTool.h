@@ -11,7 +11,6 @@
 #include "sscProbeData.h"
 #include "sscIndent.h"
 
-
 namespace ssc
 {
 typedef std::map<double, Transform3D> TimedTransformMap;
@@ -23,30 +22,32 @@ typedef boost::weak_ptr<class Probe> ProbeWeakPtr;
 
 /**Probe interface. Available from Tool when Tool is a Probe.
  */
-class Probe : public QObject
+class Probe: public QObject
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  virtual ~Probe() {}
-  virtual bool isValid() const = 0;
-  virtual ProbeData getData() const = 0;
-  virtual ProbeSectorPtr getSector() = 0;
-  virtual VideoSourcePtr getRTSource() const = 0;
+	virtual ~Probe()
+	{
+	}
+	virtual bool isValid() const = 0;
+	virtual ProbeData getData() const = 0;
+	virtual ProbeSectorPtr getSector() = 0;
+	virtual VideoSourcePtr getRTSource() const = 0;
 
-  virtual void addXml(QDomNode& dataNode) = 0;
-  virtual void parseXml(QDomNode& dataNode) = 0;
+	virtual void addXml(QDomNode& dataNode) = 0;
+	virtual void parseXml(QDomNode& dataNode) = 0;
 
-  virtual QStringList getConfigIdList() const = 0;
-  virtual QString getConfigName(QString uid) = 0;
-  virtual QString getConfigId() const = 0;
-  virtual QString getConfigurationPath() const = 0;
+	virtual QStringList getConfigIdList() const = 0;
+	virtual QString getConfigName(QString uid) = 0;
+	virtual QString getConfigId() const = 0;
+	virtual QString getConfigurationPath() const = 0;
 
-  virtual void setConfigId(QString uid) = 0;
-  virtual void setTemporalCalibration(double val) = 0;
-  virtual void setSoundSpeedCompensationFactor(double val) = 0;
+	virtual void setConfigId(QString uid) = 0;
+	virtual void setTemporalCalibration(double val) = 0;
+	virtual void setSoundSpeedCompensationFactor(double val) = 0;
 
 signals:
-  void sectorChanged();
+	void sectorChanged();
 };
 
 /**Interface to a tool,
@@ -58,32 +59,32 @@ signals:
  * 	- the z axis points in the acting direction (us probe ray dir or pointing dir).
  *  - the y axis points to the left side of the tool.
  */
-class Tool : public QObject
+class Tool: public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	Tool() :
-		mUid(""),
-		mName("")
-	{}
-	 Tool(const QString& uid, const QString& name ="") :
-	    mUid(uid),
-	    mName(name)
-	  {
-	   if(name.isEmpty())
-	     mName = uid;
-	  };
-	virtual ~Tool(){}
+		mUid(""), mName("")
+	{
+	}
+	Tool(const QString& uid, const QString& name = "") :
+		mUid(uid), mName(name)
+	{
+		if (name.isEmpty())
+			mName = uid;
+	}
+	;
+	virtual ~Tool()
+	{
+	}
 
 	/**Enumerates the general type of tool.
 	 */
 	enum Type
 	{
-		TOOL_NONE,
-		TOOL_REFERENCE,
-		TOOL_MANUAL, ///< representation of a mouse/keyboard-controlled virtual tool
-	  TOOL_POINTER,
-	  TOOL_US_PROBE
+		TOOL_NONE, TOOL_REFERENCE, TOOL_MANUAL, ///< representation of a mouse/keyboard-controlled virtual tool
+		TOOL_POINTER,
+		TOOL_US_PROBE
 	};
 	virtual Type getType() const = 0;
 	/**\return a file containing a graphical description of the tool,
@@ -98,18 +99,23 @@ public:
 	 */
 	virtual vtkPolyDataPtr getGraphicsPolyData() const = 0;
 
-
-//	/**Saves the tools internal buffers of transforms and timestamps to file.
-//	 */
-  virtual TimedTransformMapPtr getPositionHistory() {  return TimedTransformMapPtr(); }
-//	virtual void saveTransformsAndTimestamps() = 0;
-//	/**Which file to use when calling saveTransformsAndTimestamps().
-//	 */
-//	virtual void setTransformSaveFile(const QString& filename) = 0;
+	//	/**Saves the tools internal buffers of transforms and timestamps to file.
+	//	 */
+	virtual TimedTransformMapPtr getPositionHistory()
+	{
+		return TimedTransformMapPtr();
+	}
+	//	virtual void saveTransformsAndTimestamps() = 0;
+	//	/**Which file to use when calling saveTransformsAndTimestamps().
+	//	 */
+	//	virtual void setTransformSaveFile(const QString& filename) = 0;
 	virtual Transform3D get_prMt() const = 0; ///< \return transform from tool to patient ref space
 
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
-	virtual bool isInitialized() const {return true;}
+	virtual bool isInitialized() const
+	{
+		return true;
+	}
 
 	virtual QString getUid() const = 0; ///< \return an unique id for this instance
 	virtual QString getName() const = 0; ///< \return a descriptive name for this instance
@@ -117,22 +123,51 @@ public:
 
 	virtual bool isCalibrated() const = 0; ///< a tool may not be calibrated, then no tracking i allowed
 	virtual Transform3D getCalibration_sMt() const = 0; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
-	virtual void setCalibration_sMt(ssc::Transform3D calibration){ Q_UNUSED(calibration); } ///< requests to use the calibration and replaces the tools calibration file
-	
-  virtual ProbePtr getProbe() const { return ProbePtr(); } ///< additional information if the tool represents an US Probe. Extends getProbeSector()
+	virtual void setCalibration_sMt(ssc::Transform3D calibration)
+	{
+		Q_UNUSED(calibration);
+	} ///< requests to use the calibration and replaces the tools calibration file
+
+	virtual ProbePtr getProbe() const
+	{
+		return ProbePtr();
+	} ///< additional information if the tool represents an US Probe. Extends getProbeSector()
 	virtual ProbeData getProbeSector() const = 0; ///< additional information if the tool represents an US Probe. Obsolete - use getProbe()
 	virtual double getTimestamp() const = 0; ///< latest valid timestamp for the position matrix. 0 means indeterminate (for f.ex. manual tools)
-	virtual void printSelf(std::ostream &os, Indent indent) { Q_UNUSED(os); Q_UNUSED(indent); } ///< dump internal debug data
-	
-	virtual double getTooltipOffset() const { return 0; } ///< get a virtual offset extending from the tool tip.
-	virtual void setTooltipOffset(double val) { Q_UNUSED(val); } ///< set a virtual offset extending from the tool tip.
-	virtual std::map<int, Vector3D> getReferencePoints() const { return std::map<int, Vector3D>(); } ///< Get the optional reference points from this tool
-	virtual bool hasReferencePointWithId(int id){ Q_UNUSED(id); return false; }
+	virtual void printSelf(std::ostream &os, Indent indent)
+	{
+		Q_UNUSED(os);
+		Q_UNUSED(indent);
+	} ///< dump internal debug data
 
-	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime){Q_UNUSED(startTime); Q_UNUSED(stopTime); return TimedTransformMap();}; ///< Get a tools transforms from within a given session
+	virtual double getTooltipOffset() const
+	{
+		return 0;
+	} ///< get a virtual offset extending from the tool tip.
+	virtual void setTooltipOffset(double val)
+	{
+		Q_UNUSED(val);
+	} ///< set a virtual offset extending from the tool tip.
+	virtual std::map<int, Vector3D> getReferencePoints() const
+	{
+		return std::map<int, Vector3D>();
+	} ///< Get the optional reference points from this tool
+	virtual bool hasReferencePointWithId(int id)
+	{
+		Q_UNUSED(id);
+		return false;
+	}
+
+	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime)
+	{
+		Q_UNUSED(startTime);
+		Q_UNUSED(stopTime);
+		return TimedTransformMap();
+	}
+	; ///< Get a tools transforms from within a given session
 
 #ifdef WIN32
-  typedef ssc::Transform3D Transform3D;		
+	typedef ssc::Transform3D Transform3D;
 #endif
 
 signals:

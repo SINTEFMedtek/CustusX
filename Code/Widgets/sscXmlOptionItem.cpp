@@ -21,50 +21,49 @@ namespace ssc
 
 SharedDocuments* XmlOptionFile::mSharedDocuments = NULL;
 
-
 /**Helper class for reusing opened documents instead of creating new instances to them.
  *
  */
 class SharedDocuments
 {
 public:
-  QDomDocument getDocument(const QString& filename)
-  {
-    DocumentMap::iterator iter = mDocuments.find(filename);
-    // if filename found, attempt to retrieve document from node.
-    if (iter!=mDocuments.end())
-    {
-      return iter->second.ownerDocument();
-    }
-    return QDomDocument(); // null node
-  }
+	QDomDocument getDocument(const QString& filename)
+	{
+		DocumentMap::iterator iter = mDocuments.find(filename);
+		// if filename found, attempt to retrieve document from node.
+		if (iter != mDocuments.end())
+		{
+			return iter->second.ownerDocument();
+		}
+		return QDomDocument(); // null node
+	}
 
-  void addDocument(const QString& filename, QDomDocument document)
-  {
-    mDocuments[filename] = document.documentElement();
-  }
+	void addDocument(const QString& filename, QDomDocument document)
+	{
+		mDocuments[filename] = document.documentElement();
+	}
 
 private:
-  typedef std::map<QString, QDomElement> DocumentMap;
-  DocumentMap mDocuments; ///< QDomElement points to the documentElement. This acts as a weak_ptr.
+	typedef std::map<QString, QDomElement> DocumentMap;
+	DocumentMap mDocuments; ///< QDomElement points to the documentElement. This acts as a weak_ptr.
 
-//    QDomDocument getDocument(const QString& filename)
-//    {
-//      DocumentMap::iterator iter = mDocuments.find(filename);
-//      QDomDocument retval;
-//      // if filename found, attempt to retrieve document from node.
-//      if (iter!=mDocuments.end())
-//      {
-//        retval = iter->second.ownerDocument();
-//      }
-//      // if document is invalid, load file anew.
-//      if (retval.isNull())
-//      {
-//        retval = this->load(filename);
-//        mDocuments[filename] = retval.documentElement();
-//      }
-//      return retval;
-//    }
+	//    QDomDocument getDocument(const QString& filename)
+	//    {
+	//      DocumentMap::iterator iter = mDocuments.find(filename);
+	//      QDomDocument retval;
+	//      // if filename found, attempt to retrieve document from node.
+	//      if (iter!=mDocuments.end())
+	//      {
+	//        retval = iter->second.ownerDocument();
+	//      }
+	//      // if document is invalid, load file anew.
+	//      if (retval.isNull())
+	//      {
+	//        retval = this->load(filename);
+	//        mDocuments[filename] = retval.documentElement();
+	//      }
+	//      return retval;
+	//    }
 
 };
 
@@ -72,10 +71,8 @@ private:
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-XmlOptionItem::XmlOptionItem(const QString& uid,
-	      QDomElement root) :
-	      mUid(uid),
-	      mRoot(root)
+XmlOptionItem::XmlOptionItem(const QString& uid, QDomElement root) :
+	mUid(uid), mRoot(root)
 {
 
 }
@@ -84,7 +81,7 @@ QString XmlOptionItem::readValue(const QString& defval) const
 {
 	// read value is present
 	QDomElement item = this->findElemFromUid(mUid, mRoot);
-	if (!item.isNull() &&item.hasAttribute("value"))
+	if (!item.isNull() && item.hasAttribute("value"))
 	{
 		return item.attribute("value");
 	}
@@ -93,29 +90,29 @@ QString XmlOptionItem::readValue(const QString& defval) const
 
 void XmlOptionItem::writeValue(const QString& val)
 {
-  if (mRoot.isNull())
-    return;
-  QDomElement item = findElemFromUid(mUid, mRoot);
-  // create option if not present
-  if (item.isNull())
-  {
-    item = mRoot.ownerDocument().createElement("option");
-    item.setAttribute("id", mUid);
-    mRoot.appendChild(item);
-  }
-  item.setAttribute("value", val);
+	if (mRoot.isNull())
+		return;
+	QDomElement item = findElemFromUid(mUid, mRoot);
+	// create option if not present
+	if (item.isNull())
+	{
+		item = mRoot.ownerDocument().createElement("option");
+		item.setAttribute("id", mUid);
+		mRoot.appendChild(item);
+	}
+	item.setAttribute("value", val);
 }
 
 QDomElement XmlOptionItem::findElemFromUid(const QString& uid, QDomNode root) const
 {
-  QDomNodeList settings = root.childNodes();
-  for (int i=0; i<settings.size(); ++i)
-  {
-	QDomElement item = settings.item(i).toElement();
-    if (item.attribute("id")==uid)
-      return item;
-  }
-  return QDomElement();
+	QDomNodeList settings = root.childNodes();
+	for (int i = 0; i < settings.size(); ++i)
+	{
+		QDomElement item = settings.item(i).toElement();
+		if (item.attribute("id") == uid)
+			return item;
+	}
+	return QDomElement();
 }
 
 /// -------------------------------------------------------
@@ -132,37 +129,37 @@ XmlOptionFile XmlOptionFile::createNull()
 
 XmlOptionFile::XmlOptionFile()
 {
-  mDocument.appendChild(mDocument.createElement("root"));
-  mCurrentElement = mDocument.documentElement();
+	mDocument.appendChild(mDocument.createElement("root"));
+	mCurrentElement = mDocument.documentElement();
 }
 
 XmlOptionFile::XmlOptionFile(QString filename, QString name) :
-    mFilename(filename)
+	mFilename(filename)
 {
-  if (!mSharedDocuments)
-  {
-    mSharedDocuments = new SharedDocuments;
-  }
+	if (!mSharedDocuments)
+	{
+		mSharedDocuments = new SharedDocuments;
+	}
 
-  mDocument = mSharedDocuments->getDocument(filename);
-  if (mDocument.isNull())
-  {
-//    std::cout << "    no doc found, creating new. " << std::endl;
-    this->load();
-    mSharedDocuments->addDocument(filename, mDocument);
-  }
-  else
-  {
-//    std::cout << "    reusing cached document" << std::endl;
-  }
+	mDocument = mSharedDocuments->getDocument(filename);
+	if (mDocument.isNull())
+	{
+		//    std::cout << "    no doc found, creating new. " << std::endl;
+		this->load();
+		mSharedDocuments->addDocument(filename, mDocument);
+	}
+	else
+	{
+		//    std::cout << "    reusing cached document" << std::endl;
+	}
 
-  mCurrentElement = mDocument.documentElement();
+	mCurrentElement = mDocument.documentElement();
 
-  if (mCurrentElement.isNull())
-  {
-    mDocument.appendChild(mDocument.createElement("root"));
-    mCurrentElement = mDocument.documentElement();
-  }
+	if (mCurrentElement.isNull())
+	{
+		mDocument.appendChild(mDocument.createElement("root"));
+		mCurrentElement = mDocument.documentElement();
+	}
 }
 
 XmlOptionFile::~XmlOptionFile()
@@ -171,9 +168,9 @@ XmlOptionFile::~XmlOptionFile()
 
 XmlOptionFile XmlOptionFile::descend(QString element) const
 {
-  XmlOptionFile retval = *this;
-  retval.mCurrentElement = retval.getElement(element);
-  return retval;
+	XmlOptionFile retval = *this;
+	retval.mCurrentElement = retval.getElement(element);
+	return retval;
 }
 
 XmlOptionFile XmlOptionFile::descend(QString element, QString attributeName, QString attributeValue) const
@@ -193,63 +190,63 @@ XmlOptionFile XmlOptionFile::descend(QString element, QString attributeName, QSt
 
 XmlOptionFile XmlOptionFile::tryDescend(QString element, QString attributeName, QString attributeValue) const
 {
-	  XmlOptionFile retval = *this;
+	XmlOptionFile retval = *this;
 
-	  QDomNodeList presetNodeList = retval.getElement().elementsByTagName(element);
-	  for(int i=0; i < presetNodeList.count(); ++i)
-	  {
+	QDomNodeList presetNodeList = retval.getElement().elementsByTagName(element);
+	for (int i = 0; i < presetNodeList.count(); ++i)
+	{
 		QDomElement current = presetNodeList.item(i).toElement();
-	    QString name = current.attribute(attributeName);
-	    if(attributeValue == name)
-	    {
-	    	retval.mCurrentElement = current;
-	    	return retval;
-	    }
-	  }
+		QString name = current.attribute(attributeName);
+		if (attributeValue == name)
+		{
+			retval.mCurrentElement = current;
+			return retval;
+		}
+	}
 
-	  return XmlOptionFile::createNull();
+	return XmlOptionFile::createNull();
 }
 
 XmlOptionFile XmlOptionFile::ascend() const
 {
-  XmlOptionFile retval = *this;
-  retval.mCurrentElement = mCurrentElement.parentNode().toElement();
-  if (retval.mCurrentElement.isNull())
-    return *this;
-  return retval;
+	XmlOptionFile retval = *this;
+	retval.mCurrentElement = mCurrentElement.parentNode().toElement();
+	if (retval.mCurrentElement.isNull())
+		return *this;
+	return retval;
 }
 
 /**return an element child of parent. Create if not existing.
  */
 QDomElement XmlOptionFile::safeGetElement(QDomElement parent, QString childName)
 {
-  QDomElement child = parent.namedItem(childName).toElement();
+	QDomElement child = parent.namedItem(childName).toElement();
 
-  if (child.isNull())
-  {
-    child = mDocument.createElement(childName);
-    parent.appendChild(child);
-  }
+	if (child.isNull())
+	{
+		child = mDocument.createElement(childName);
+		parent.appendChild(child);
+	}
 
-  return child;
+	return child;
 }
 
 QDomElement XmlOptionFile::getElement()
 {
-  return mCurrentElement;
+	return mCurrentElement;
 }
 
 QDomElement XmlOptionFile::getElement(QString level1)
 {
-  QDomElement elem1 = this->safeGetElement(mCurrentElement, level1);
-  return elem1;
+	QDomElement elem1 = this->safeGetElement(mCurrentElement, level1);
+	return elem1;
 }
 
 QDomElement XmlOptionFile::getElement(QString level1, QString level2)
 {
-  QDomElement elem1 = this->safeGetElement(mCurrentElement, level1);
-  QDomElement elem2 = this->safeGetElement(elem1, level2);
-  return elem2;
+	QDomElement elem1 = this->safeGetElement(mCurrentElement, level1);
+	QDomElement elem2 = this->safeGetElement(elem1, level2);
+	return elem2;
 }
 
 //void XmlOptionFile::clean(QDomElement elem)
@@ -260,56 +257,53 @@ QDomElement XmlOptionFile::getElement(QString level1, QString level2)
 
 void XmlOptionFile::removeChildren()
 {
-  while (mCurrentElement.hasChildNodes())
-    mCurrentElement.removeChild(mCurrentElement.firstChild());
+	while (mCurrentElement.hasChildNodes())
+		mCurrentElement.removeChild(mCurrentElement.firstChild());
 }
 
 void XmlOptionFile::save()
 {
-  if(mFilename.isEmpty())
-    return; //Don't do anything if on filename isn't supplied
+	if (mFilename.isEmpty())
+		return; //Don't do anything if on filename isn't supplied
 
-  QFile file(mFilename);
-  if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-  {
-    QTextStream stream(&file);
-    stream << mDocument.toString();
-    file.close();
-    ssc::messageManager()->sendInfo("Created "+file.fileName());
-  }
-  else
-  {
-    ssc::messageManager()->sendError("XmlOptionFile::save() Could not open "+file.fileName()
-                               +" Error: "+file.errorString());
-  }
+	QFile file(mFilename);
+	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	{
+		QTextStream stream(&file);
+		stream << mDocument.toString();
+		file.close();
+		ssc::messageManager()->sendInfo("Created " + file.fileName());
+	}
+	else
+	{
+		ssc::messageManager()->sendError("XmlOptionFile::save() Could not open " + file.fileName() + " Error: "
+			+ file.errorString());
+	}
 }
 
 void XmlOptionFile::load()
 {
-  QFile file(mFilename);
-  if (!file.open(QIODevice::ReadOnly))
-  {
-    // ok to not find file - we have nice defaults.
-    //ssc::messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
-  }
-  else
-  {
-    QDomDocument loadedDoc;
-    QString error;
-    int line,col;
-    if (!loadedDoc.setContent(&file, &error,&line,&col))
-    {
-      ssc::messageManager()->sendWarning("error setting xml content ["
-                                         + qstring_cast(line) +  ","
-                                         + qstring_cast(col) + "]"
-                                         + qstring_cast(error) );
-    }
-    file.close();
-    mDocument = loadedDoc;
-    mCurrentElement = mDocument.documentElement();
-  }
+	QFile file(mFilename);
+	if (!file.open(QIODevice::ReadOnly))
+	{
+		// ok to not find file - we have nice defaults.
+		//ssc::messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
+	}
+	else
+	{
+		QDomDocument loadedDoc;
+		QString error;
+		int line, col;
+		if (!loadedDoc.setContent(&file, &error, &line, &col))
+		{
+			ssc::messageManager()->sendWarning("error setting xml content [" + qstring_cast(line) + "," + qstring_cast(
+				col) + "]" + qstring_cast(error));
+		}
+		file.close();
+		mDocument = loadedDoc;
+		mCurrentElement = mDocument.documentElement();
+	}
 
 }
-
 
 } // namespace ssc

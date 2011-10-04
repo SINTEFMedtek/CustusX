@@ -20,18 +20,18 @@ namespace ssc
 class DecomposedTransform3D
 {
 public:
-  DecomposedTransform3D();
-  DecomposedTransform3D(Transform3D m);
-  void reset(Transform3D m); ///< reinitialize with a fresh matrix.
-  void setAngles(Vector3D xyz);
-  void setPosition(Vector3D pos);
-  Vector3D getAngles() const;
-  Vector3D getPosition() const;
-  Transform3D getMatrix() const;
+	DecomposedTransform3D();
+	DecomposedTransform3D(Transform3D m);
+	void reset(Transform3D m); ///< reinitialize with a fresh matrix.
+	void setAngles(Vector3D xyz);
+	void setPosition(Vector3D pos);
+	Vector3D getAngles() const;
+	Vector3D getPosition() const;
+	Transform3D getMatrix() const;
 private:
-  Vector3D mAngle; ///< x,y,z rotation angles
-  Vector3D mPos; ///< x,y,z position
-  Transform3D m_R; ///< 3x3 rotational matrix
+	Vector3D mAngle; ///< x,y,z rotation angles
+	Vector3D mPos; ///< x,y,z position
+	Transform3D m_R; ///< 3x3 rotational matrix
 };
 
 /**
@@ -55,19 +55,19 @@ public:
 	void setRotationAxis(const Vector3D& k);
 	void put(std::ostream& s) const;
 	void test();
-	
+
 	boost::array<double, 6> getCompactAxisAngleRep() const;
-  static Frame3D fromCompactAxisAngleRep(const boost::array<double, 6>& rep);
+	static Frame3D fromCompactAxisAngleRep(const boost::array<double, 6>& rep);
 
 	ssc::Vector3D getEulerXYZ() const;
 	void setEulerXYZ(const ssc::Vector3D& xyz);
 
 	Frame3D();
 	virtual ~Frame3D();
-	
+
 	Eigen::AngleAxisd mAngleAxis; ///< angle-axis representation of rotation
 	Vector3D mPos; ///< position
-	
+
 private:
 };
 

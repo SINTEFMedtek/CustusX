@@ -8,25 +8,23 @@
  *      Author: christiana
  */
 
-
 Scalar* begin()
 {
-  return this->data();
+	return this->data();
 }
 
 const Scalar* begin() const
 {
-  return this->data();
+	return this->data();
 }
 
 Scalar* end()
 {
-  return this->data() + this->size();
+	return this->data() + this->size();
 }
 
 const Scalar* end() const
 {
-  return this->data() + this->size();
+	return this->data() + this->size();
 }
-
 

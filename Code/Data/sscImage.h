@@ -26,28 +26,28 @@ namespace ssc
  * \warning Landmarks are only used by SINTEF atm, so they can change the code
  * at any given point.
  */
-class Image : public Data
+class Image: public Data
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-  struct ShadingStruct
-  {
-    bool on;
-    double ambient;
-    double diffuse;
-    double specular;
-    double specularPower;
+	struct ShadingStruct
+	{
+		bool on;
+		double ambient;
+		double diffuse;
+		double specular;
+		double specularPower;
 
-    ShadingStruct();
-	void addXml(QDomNode dataNode);
-	void parseXml(QDomNode dataNode);
+		ShadingStruct();
+		void addXml(QDomNode dataNode);
+		void parseXml(QDomNode dataNode);
 
-  private:
-	double loadAttribute(QDomNode dataNode, QString name, double defVal);
-  };
+	private:
+		double loadAttribute(QDomNode dataNode, QString name, double defVal);
+	};
 
 	virtual ~Image();
-	Image(const QString& uid, const vtkImageDataPtr& data, const QString& name="");
+	Image(const QString& uid, const vtkImageDataPtr& data, const QString& name = "");
 	void setVtkImageData(const vtkImageDataPtr& data);
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
@@ -66,59 +66,62 @@ public:
 	int getMin();///< \return Min alpha position in the histogram = min key value in map.
 	int getRange();///< For convenience: getMax() - getMin()
 	int getMaxAlphaValue();///<Max alpha value (probably 255)
-  virtual void setShadingOn(bool on);
-  virtual bool getShadingOn() const;
-  void setShadingAmbient(double ambient);             ///<Set shading ambient parmeter
-  void setShadingDiffuse(double diffuse);             ///<Set shading diffuse parmeter
-  void setShadingSpecular(double specular);           ///<Set shading specular parmeter
-  void setShadingSpecularPower(double specularPower); ///<Set shading specular power parmeter
-  double getShadingAmbient();                         ///<Get shading ambient parmeter
-  double getShadingDiffuse();                         ///<Get shading diffuse parmeter
-  double getShadingSpecular();                        ///<Get shading specular parmeter
-  double getShadingSpecularPower();                   ///<Get shading specular power parmeter
-  Image::ShadingStruct getShading();
-  void setShading(Image::ShadingStruct shading );
+	virtual void setShadingOn(bool on);
+	virtual bool getShadingOn() const;
+	void setShadingAmbient(double ambient); ///<Set shading ambient parmeter
+	void setShadingDiffuse(double diffuse); ///<Set shading diffuse parmeter
+	void setShadingSpecular(double specular); ///<Set shading specular parmeter
+	void setShadingSpecularPower(double specularPower); ///<Set shading specular power parmeter
+	double getShadingAmbient(); ///<Get shading ambient parmeter
+	double getShadingDiffuse(); ///<Get shading diffuse parmeter
+	double getShadingSpecular(); ///<Get shading specular parmeter
+	double getShadingSpecularPower(); ///<Get shading specular power parmeter
+	Image::ShadingStruct getShading();
+	void setShading(Image::ShadingStruct shading);
 
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
-  virtual QString getType() const { return "image"; }
+	virtual QString getType() const
+	{
+		return "image";
+	}
 
 	// methods for defining and storing a cropping box. Image does not use these data, this is up to the mapper
-  virtual void setCropping(bool on);
-  virtual bool getCropping() const;
+	virtual void setCropping(bool on);
+	virtual bool getCropping() const;
 	virtual void setCroppingBox(const DoubleBoundingBox3D& bb_d);
 	virtual DoubleBoundingBox3D getCroppingBox() const;
-	
-  // methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
+
+	// methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
 	virtual void addClipPlane(vtkPlanePtr plane);
 	virtual std::vector<vtkPlanePtr> getClipPlanes();
 	virtual void clearClipPlanes();
-  void mergevtkSettingsIntosscTransform();
+	void mergevtkSettingsIntosscTransform();
 
 	void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);
 
 signals:
-  void landmarkRemoved(QString uid);
-  void landmarkAdded(QString uid);
+	void landmarkRemoved(QString uid);
+	void landmarkAdded(QString uid);
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.
 	void clipPlanesChanged();
-  void cropBoxChanged();
+	void cropBoxChanged();
 
 public slots:
-  void setLandmark(Landmark landmark);
-  void removeLandmark(QString uid);
-	
+	void setLandmark(Landmark landmark);
+	void removeLandmark(QString uid);
+
 protected slots:
-//	void transferFunctionsChangedSlot();
-  virtual void transformChangedSlot();
+	//	void transferFunctionsChangedSlot();
+	virtual void transformChangedSlot();
 
 protected:
 
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
-	
+
 	vtkImageDataPtr mBaseImageData; ///< image data in data space
 	vtkImageDataPtr mBaseGrayScaleImageData; ///< image data in data space
 	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata
@@ -127,14 +130,13 @@ protected:
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
 
 	LandmarkMap mLandmarks; ///< map with all landmarks always in space d (data).
-  
-  ShadingStruct mShading;
 
-  bool mUseCropping; ///< image should be cropped using mCroppingBox
-  DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.
-  std::vector<vtkPlanePtr> mClipPlanes;
+	ShadingStruct mShading;
+
+	bool mUseCropping; ///< image should be cropped using mCroppingBox
+	DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.
+	std::vector<vtkPlanePtr> mClipPlanes;
 };
-
 
 } // end namespace ssc
 

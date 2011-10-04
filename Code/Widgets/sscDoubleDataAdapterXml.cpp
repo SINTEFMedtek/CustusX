@@ -13,17 +13,11 @@
 namespace ssc
 {
 
-
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-DoubleDataAdapterXmlPtr DoubleDataAdapterXml::initialize(const QString& uid,
-    QString name,
-    QString help,
-    double value,
-    DoubleRange range,
-    int decimals,
-    QDomNode root)
+DoubleDataAdapterXmlPtr DoubleDataAdapterXml::initialize(const QString& uid, QString name, QString help, double value,
+	DoubleRange range, int decimals, QDomNode root)
 {
 	DoubleDataAdapterXmlPtr retval(new DoubleDataAdapterXml());
 	retval->mUid = uid;
@@ -38,7 +32,7 @@ DoubleDataAdapterXmlPtr DoubleDataAdapterXml::initialize(const QString& uid,
 
 void DoubleDataAdapterXml::setInternal2Display(double factor)
 {
-  mFactor = factor;
+	mFactor = factor;
 }
 
 QString DoubleDataAdapterXml::getUid() const
@@ -58,18 +52,20 @@ QString DoubleDataAdapterXml::getHelp() const
 
 double DoubleDataAdapterXml::getValue() const
 {
-  return mValue;
+	return mValue;
 }
 
 bool DoubleDataAdapterXml::setValue(double val)
 {
-	if (val==mValue)
+	if (val == mValue)
 		return false;
 
 	mValue = val;
 	mStore.writeValue(QString::number(val));
-	emit valueWasSet();
-	emit changed();
+	emit
+	valueWasSet();
+	emit
+	changed();
 	return true;
 }
 
@@ -80,8 +76,8 @@ DoubleRange DoubleDataAdapterXml::getValueRange() const
 
 void DoubleDataAdapterXml::setValueRange(DoubleRange range)
 {
-  mRange = range;
-  emit changed();
+	mRange = range;
+	emit changed();
 }
 
 int DoubleDataAdapterXml::getValueDecimals() const
@@ -91,7 +87,7 @@ int DoubleDataAdapterXml::getValueDecimals() const
 
 DoubleDataAdapterXml::DoubleDataAdapterXml()
 {
-  mFactor = 1.0;
+	mFactor = 1.0;
 }
 
 } // namespace ssc

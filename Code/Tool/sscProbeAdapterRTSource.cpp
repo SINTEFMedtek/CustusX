@@ -16,59 +16,57 @@ namespace ssc
 {
 
 ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ssc::ProbePtr probe, ssc::VideoSourcePtr source) :
-    mUid(uid), mBase(source), mProbe(probe)
+	mUid(uid), mBase(source), mProbe(probe)
 {
-  connect(mProbe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+	connect(mProbe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
 
-  connect(mBase.get(), SIGNAL(streaming(bool)), this, SIGNAL(streaming(bool)));
-  connect(mBase.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
-  connect(mBase.get(), SIGNAL(newFrame()),      this, SIGNAL(newFrame()));
+	connect(mBase.get(), SIGNAL(streaming(bool)), this, SIGNAL(streaming(bool)));
+	connect(mBase.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
+	connect(mBase.get(), SIGNAL(newFrame()), this, SIGNAL(newFrame()));
 
-  mRedirecter = vtkImageChangeInformationPtr::New();
-  mRedirecter->SetInput(mBase->getVtkImageData());
-  this->probeChangedSlot();
+	mRedirecter = vtkImageChangeInformationPtr::New();
+	mRedirecter->SetInput(mBase->getVtkImageData());
+	this->probeChangedSlot();
 }
 
 QString ProbeAdapterRTSource::getUid()
 {
-  return mUid;
+	return mUid;
 }
 
 vtkImageDataPtr ProbeAdapterRTSource::getVtkImageData()
 {
-  return mRedirecter->GetOutput();
+	return mRedirecter->GetOutput();
 }
 
 double ProbeAdapterRTSource::getTimestamp()
 {
-  return mBase->getTimestamp() - mProbe->getData().mTemporalCalibration;
+	return mBase->getTimestamp() - mProbe->getData().mTemporalCalibration;
 }
 
 void ProbeAdapterRTSource::probeChangedSlot()
 {
-//  std::cout << "ProbeAdapterRTSource::probeChangedSlot() validdata: " << validData() << std::endl;
+	//  std::cout << "ProbeAdapterRTSource::probeChangedSlot() validdata: " << validData() << std::endl;
 
-  Eigen::Array3i dimImage(mRedirecter->GetOutput()->GetDimensions());
-//  ssc::Vector3D dimImage(mRedirecter->GetOutput()->GetDimensions());
-  QSize dimProbe = mProbe->getData().mImage.mSize;
+	Eigen::Array3i dimImage(mRedirecter->GetOutput()->GetDimensions());
+	//  ssc::Vector3D dimImage(mRedirecter->GetOutput()->GetDimensions());
+	QSize dimProbe = mProbe->getData().mImage.mSize;
 
-  bool nonZero = ( dimProbe.width()!=0 )&&( dimProbe.height()!=0 )&&
-                 ( dimImage[0]!=0 )&&( dimImage[1]!=0 );
+	bool nonZero = (dimProbe.width() != 0) && (dimProbe.height() != 0) && (dimImage[0] != 0) && (dimImage[1] != 0);
 
-  if (this->validData() &&nonZero && (( dimImage[0]!=dimProbe.width() )||( dimImage[1]!=dimProbe.height() )))
-  {
-    std::stringstream ss;
-    ss << "Mismatch rt stream and probe image size. "
-       << "RT dim=(" << dimImage[0] << ", " << dimImage[1] << "), "
-       << "Probe dim=(" << dimProbe.width() << ", " << dimProbe.height() << ")";
-    messageManager()->sendWarning(qstring_cast(ss.str()));
-  }
+	if (this->validData() && nonZero && ((dimImage[0] != dimProbe.width()) || (dimImage[1] != dimProbe.height())))
+	{
+		std::stringstream ss;
+		ss << "Mismatch rt stream and probe image size. " << "RT dim=(" << dimImage[0] << ", " << dimImage[1] << "), "
+			<< "Probe dim=(" << dimProbe.width() << ", " << dimProbe.height() << ")";
+		messageManager()->sendWarning(qstring_cast(ss.str()));
+	}
 
-  // Don't change spacing if it have an existing spacing from the OpenIGTLink message
-//  if (mBase->getVtkImageData()->GetSpacing()[0] == 0)
-  {
-    mRedirecter->SetOutputSpacing(mProbe->getData().mImage.mSpacing.begin());
-  }
+	// Don't change spacing if it have an existing spacing from the OpenIGTLink message
+	//  if (mBase->getVtkImageData()->GetSpacing()[0] == 0)
+	{
+		mRedirecter->SetOutputSpacing(mProbe->getData().mImage.mSpacing.begin());
+	}
 }
 
 }

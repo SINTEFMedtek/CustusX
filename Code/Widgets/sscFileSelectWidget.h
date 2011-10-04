@@ -27,40 +27,39 @@ namespace ssc
  * Default name filter is .mhdmNameFilters
  *
  */
-class FileSelectWidget : public QWidget
+class FileSelectWidget: public QWidget
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
-  FileSelectWidget(QWidget* parent);
-  QString getFilename() const;
-  void setFilename(QString name);
-  void setNameFilter(QStringList filter);
-  void setPath(QString path);
+	FileSelectWidget(QWidget* parent);
+	QString getFilename() const;
+	void setFilename(QString name);
+	void setNameFilter(QStringList filter);
+	void setPath(QString path);
 
 public slots:
-  void refresh();
+	void refresh();
 
 signals:
-  void fileSelected(QString name);
+	void fileSelected(QString name);
 
 private slots:
-  void selectData();
-  void currentDataComboIndexChanged(int);
-  void updateComboBox();
+	void selectData();
+	void currentDataComboIndexChanged(int);
+	void updateComboBox();
 
 private:
-  QStringList getAllFiles(QString folder);
+	QStringList getAllFiles(QString folder);
 
-  QComboBox* mDataComboBox;
-  QToolButton* mSelectDataButton;
-  QAction* mSelectDataAction;
+	QComboBox* mDataComboBox;
+	QToolButton* mSelectDataButton;
+	QAction* mSelectDataAction;
 
-  QString mFilename;
-  QString mRootPath;
-  QStringList mNameFilters;
+	QString mFilename;
+	QString mRootPath;
+	QStringList mNameFilters;
 };
-
 
 }
 

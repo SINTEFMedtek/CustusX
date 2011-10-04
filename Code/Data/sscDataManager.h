@@ -12,7 +12,6 @@
 #include "sscLandmark.h"
 #include "sscDefinitions.h"
 
-
 namespace ssc
 {
 // forward declarations
@@ -25,14 +24,7 @@ typedef boost::shared_ptr<class PresetTransferFunctions3D> PresetTransferFunctio
 //-----
 enum READER_TYPE
 {
-	rtDICOM,
-	rtSONOWAND_M3D,
-	rtMETAIMAGE,
-	rtMINCIMAGE,
-  rtPOLYDATA,
-  rtSTL,
-	rtAUTO,
-	rtCOUNT
+	rtDICOM, rtSONOWAND_M3D, rtMETAIMAGE, rtMINCIMAGE, rtPOLYDATA, rtSTL, rtAUTO, rtCOUNT
 };
 //-----
 //enum MESH_READER_TYPE
@@ -46,27 +38,35 @@ enum READER_TYPE
  * Simply calling instance() will instantiate the default manager DataManagerImpl.
  * It is also possible to subclass and use setInstance() to set another type.
  */
-class DataManager : public QObject
+class DataManager: public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-  typedef std::map<QString, DataPtr> DataMap;
+	typedef std::map<QString, DataPtr> DataMap;
 	typedef std::map<QString, ImagePtr> ImagesMap;
 	typedef std::map<QString, MeshPtr> MeshMap;
-  typedef std::map<QString, VideoSourcePtr> StreamMap;
+	typedef std::map<QString, VideoSourcePtr> StreamMap;
 
 	static DataManager* getInstance();
-  static void shutdown();
+	static void shutdown();
 
-  // streams
-  virtual VideoSourcePtr getStream(const QString& uid) const { return VideoSourcePtr(); }
-  virtual StreamMap getStreams() const { return StreamMap(); }
-  virtual void loadStream(VideoSourcePtr stream) {}
+	// streams
+	virtual VideoSourcePtr getStream(const QString& uid) const
+	{
+		return VideoSourcePtr();
+	}
+	virtual StreamMap getStreams() const
+	{
+		return StreamMap();
+	}
+	virtual void loadStream(VideoSourcePtr stream)
+	{
+	}
 
 	// images
 	virtual ImagePtr loadImage(const QString& uid, const QString& filename, READER_TYPE type) = 0;
-  //virtual void loadImage(ImagePtr image) = 0; ///< load an image generated outside the manager.
-  virtual void saveImage(ImagePtr image, const QString& basePath) = 0; ///< Save image to file
+	//virtual void loadImage(ImagePtr image) = 0; ///< load an image generated outside the manager.
+	virtual void saveImage(ImagePtr image, const QString& basePath) = 0; ///< Save image to file
 	virtual ImagePtr getImage(const QString& uid) const = 0;
 	virtual std::map<QString, ImagePtr> getImages() const = 0;
 
@@ -75,7 +75,7 @@ public:
 	virtual std::vector<QString> getImageUids() const = 0;
 
 	// meshes
-  virtual void saveMesh(MeshPtr mesh, const QString& basePath) = 0; ///< Save mesh to file
+	virtual void saveMesh(MeshPtr mesh, const QString& basePath) = 0; ///< Save mesh to file
 	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName, READER_TYPE notused) = 0;
 	virtual MeshPtr getMesh(const QString& uid) const = 0;
 	virtual std::map<QString, MeshPtr> getMeshes() const = 0;
@@ -85,10 +85,10 @@ public:
 	virtual std::vector<QString> getMeshNames() const = 0;
 
 	// data
-  virtual void loadData(DataPtr data) = 0;
-  virtual DataPtr loadData(const QString& uid, const QString& path, READER_TYPE notused) = 0;
-  virtual std::map<QString, DataPtr> getData() const = 0;
-  virtual DataPtr getData(const QString& uid) const = 0;
+	virtual void loadData(DataPtr data) = 0;
+	virtual DataPtr loadData(const QString& uid, const QString& path, READER_TYPE notused) = 0;
+	virtual std::map<QString, DataPtr> getData() const = 0;
+	virtual DataPtr getData(const QString& uid) const = 0;
 
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.
@@ -97,24 +97,60 @@ public:
 	// state information
 	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
-	  virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const { return PresetTransferFunctions3DPtr(); };
+	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const
+	{
+		return PresetTransferFunctions3DPtr();
+	}
+	;
 
-  virtual QString addLandmark() { return ""; }
-  virtual void setLandmarkNames(std::vector<QString> names) {}
-  virtual void setLandmarkName(QString uid, QString name) {}
-  virtual void setLandmarkActive(QString uid, bool active) {}
-  virtual LandmarkPropertyMap getLandmarkProperties() const { return LandmarkPropertyMap(); }
-  virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdLABORATORY; }
-  virtual void setClinicalApplication(CLINICAL_APPLICATION application) {}
-  virtual void clear() {}; ///< remove all stuff from manager
-  virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath="Images") { return ImagePtr(); }
-  virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath) { return MeshPtr(); }
-  virtual void removeData(const QString& uid) {} ///< remove data from datamanger, emit signal
+	virtual QString addLandmark()
+	{
+		return "";
+	}
+	virtual void setLandmarkNames(std::vector<QString> names)
+	{
+	}
+	virtual void setLandmarkName(QString uid, QString name)
+	{
+	}
+	virtual void setLandmarkActive(QString uid, bool active)
+	{
+	}
+	virtual LandmarkPropertyMap getLandmarkProperties() const
+	{
+		return LandmarkPropertyMap();
+	}
+	virtual CLINICAL_APPLICATION getClinicalApplication() const
+	{
+		return mdLABORATORY;
+	}
+	virtual void setClinicalApplication(CLINICAL_APPLICATION application)
+	{
+	}
+	virtual void clear()
+	{
+	}
+	; ///< remove all stuff from manager
+	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath = "Images")
+	{
+		return ImagePtr();
+	}
+	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
+	{
+		return MeshPtr();
+	}
+	virtual void removeData(const QString& uid)
+	{
+	} ///< remove data from datamanger, emit signal
 
 	//virtual MeshPtr getActiveMesh() const = 0; ///< used for system state
 	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state
-  virtual void addXml(QDomNode& parentNode) {} ///< adds xml information about the datamanger and its variabels
-  virtual void parseXml(QDomNode& datamangerNode, QString absolutePath = QString()) {} ///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements.
+	virtual void addXml(QDomNode& parentNode)
+	{
+	} ///< adds xml information about the datamanger and its variabels
+	virtual void parseXml(QDomNode& datamangerNode, QString absolutePath = QString())
+	{
+	} ///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements.
 
 signals:
 	void centerChanged(); ///< emitted when center is changed.

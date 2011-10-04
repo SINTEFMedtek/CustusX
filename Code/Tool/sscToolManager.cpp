@@ -3,25 +3,29 @@
 namespace ssc
 {
 
-ToolManager* toolManager() { return ToolManager::getInstance(); }
+ToolManager* toolManager()
+{
+	return ToolManager::getInstance();
+}
 
 ToolManager* ToolManager::mInstance = NULL;
 
 /** not sure if this is needed? we have getInstance in subclasses...*/
 void ToolManager::setInstance(ToolManager* instance)
 {
- mInstance = instance;
-};
+	mInstance = instance;
+}
+;
 
 ToolManager* ToolManager::getInstance()
 {
-  return mInstance;
+	return mInstance;
 }
 
 void ToolManager::shutdown()
 {
- delete mInstance;
- mInstance = NULL;
+	delete mInstance;
+	mInstance = NULL;
 }
 
 }

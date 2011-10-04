@@ -18,15 +18,15 @@ namespace ssc
 typedef std::map<ToolPtr, TimedTransformMap> SessionToolHistoryMap;
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
-class ToolManager : public QObject
+class ToolManager: public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	typedef std::map<QString, ToolPtr> ToolMap;
 	typedef boost::shared_ptr<ToolMap> ToolMapPtr;
 
 	/** not sure if this is needed? we have getInstance in subclasses...*/
-	static void setInstance(ToolManager* instance);  ///< must call this one before calling getInstance()
+	static void setInstance(ToolManager* instance); ///< must call this one before calling getInstance()
 	static ToolManager* getInstance();
 	static void shutdown();
 
@@ -54,22 +54,55 @@ public:
 
 	virtual Transform3DPtr get_rMpr() const = 0; ///< transform from patient ref to ref space
 	virtual void set_rMpr(const Transform3DPtr& val) = 0; ///< set transform from patient ref to ref space
-  virtual RegistrationHistoryPtr get_rMpr_History() { return RegistrationHistoryPtr(); } ///< interface to rMpr history.
-  virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
+	virtual RegistrationHistoryPtr get_rMpr_History()
+	{
+		return RegistrationHistoryPtr();
+	} ///< interface to rMpr history.
+	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
 
-  virtual void savePositionHistory() {}
-  virtual void loadPositionHistory() {}
+	virtual void savePositionHistory()
+	{
+	}
+	virtual void loadPositionHistory()
+	{
+	}
 
-  virtual void addXml(QDomNode& parentNode) { Q_UNUSED(parentNode); } ///< write internal state to node
-  virtual void parseXml(QDomNode& dataNode) { Q_UNUSED(dataNode); } ///< read internal state from node
-  virtual void clear() { } ///< clear everything loaded from xml
+	virtual void addXml(QDomNode& parentNode)
+	{
+		Q_UNUSED(parentNode);
+	} ///< write internal state to node
+	virtual void parseXml(QDomNode& dataNode)
+	{
+		Q_UNUSED(dataNode);
+	} ///< read internal state from node
+	virtual void clear()
+	{
+	} ///< clear everything loaded from xml
 
-  virtual ssc::LandmarkMap getLandmarks() { return ssc::LandmarkMap();}
-  virtual void setLandmark(ssc::Landmark landmark) { Q_UNUSED(landmark); }
-  virtual void removeLandmark(QString uid) { Q_UNUSED(uid); }
-  virtual void removeLandmarks(){};
+	virtual ssc::LandmarkMap getLandmarks()
+	{
+		return ssc::LandmarkMap();
+	}
+	virtual void setLandmark(ssc::Landmark landmark)
+	{
+		Q_UNUSED(landmark);
+	}
+	virtual void removeLandmark(QString uid)
+	{
+		Q_UNUSED(uid);
+	}
+	virtual void removeLandmarks()
+	{
+	}
+	;
 
-  virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) {Q_UNUSED(startTime); Q_UNUSED(stopTime); return SessionToolHistoryMap();};
+	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime)
+	{
+		Q_UNUSED(startTime);
+		Q_UNUSED(stopTime);
+		return SessionToolHistoryMap();
+	}
+	;
 
 signals:
 	void configured(); ///< system is configured
@@ -80,14 +113,18 @@ signals:
 	void trackingStopped(); ///< system stops tracking
 
 	void dominantToolChanged(const QString& uId); ///<signal for change of dominant tool
-  void landmarkRemoved(QString uid);
-  void landmarkAdded(QString uid);
-  void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
-  void tps(int); ///< the dominant tools tps
+	void landmarkRemoved(QString uid);
+	void landmarkAdded(QString uid);
+	void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
+	void tps(int); ///< the dominant tools tps
 
 protected:
-	ToolManager() {} ///< Empty on purpose
-	~ToolManager() {} ///< Empty on purpose
+	ToolManager()
+	{
+	} ///< Empty on purpose
+	~ToolManager()
+	{
+	} ///< Empty on purpose
 
 	static ToolManager* mInstance; ///< The only instance of this class that can exist.
 };

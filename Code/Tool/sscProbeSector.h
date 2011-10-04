@@ -25,27 +25,27 @@ class ProbeSector
 public:
 	ProbeSector();
 	//ProbeData(ProbeSector data);
-  void setData(ProbeData data);
-	
-  vtkImageDataPtr getMask();
-  vtkPolyDataPtr getSector(); ///< get a polydata representation of the us sector
-  vtkPolyDataPtr getSectorLinesOnly(); ///< get a polydata representation of the us sector
-  Transform3D get_tMu() const; ///< get transform from image space u to probe tool space t.
-  Transform3D get_uMv() const; ///< get transform from inverted image space v (origin in ul corner) to image space u.
-  void updateSector();
+	void setData(ProbeData data);
 
-  ProbeData mData;
+	vtkImageDataPtr getMask();
+	vtkPolyDataPtr getSector(); ///< get a polydata representation of the us sector
+	vtkPolyDataPtr getSectorLinesOnly(); ///< get a polydata representation of the us sector
+	Transform3D get_tMu() const; ///< get transform from image space u to probe tool space t.
+	Transform3D get_uMv() const; ///< get transform from inverted image space v (origin in ul corner) to image space u.
+	void updateSector();
 
-  void test();
+	ProbeData mData;
+
+	void test();
 
 private:
-//  vtkPolyLinePtr createClipRectPolyLine();
-  vtkPolyDataPtr generateClipper(vtkPolyDataPtr input);
-  vtkPolyDataPtr getClipRectPolyData();
-  bool clipRectIntersectsSector() const;
+	//  vtkPolyLinePtr createClipRectPolyLine();
+	vtkPolyDataPtr generateClipper(vtkPolyDataPtr input);
+	vtkPolyDataPtr getClipRectPolyData();
+	bool clipRectIntersectsSector() const;
 
-  bool isInside(Vector3D p_u);
-  vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
+	bool isInside(Vector3D p_u);
+	vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
 };
 
 } // namespace ssc

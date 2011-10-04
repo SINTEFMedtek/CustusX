@@ -45,39 +45,63 @@ namespace ssc
  * as a dummy implementation.
  *
  */
-class StringDataAdapter : public DataAdapter
+class StringDataAdapter: public DataAdapter
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  virtual ~StringDataAdapter() {}
+	virtual ~StringDataAdapter()
+	{
+	}
 
-public: // basic methods
-  virtual QString getValueName() const = 0;///< name of data entity. Used for display to user.
-  virtual bool setValue(const QString& value) = 0; ///< set the data value.
-  virtual QString getValue() const = 0; ///< get the data value.
+public:
+	// basic methods
+	virtual QString getValueName() const = 0;///< name of data entity. Used for display to user.
+	virtual bool setValue(const QString& value) = 0; ///< set the data value.
+	virtual QString getValue() const = 0; ///< get the data value.
 
-public: // optional methods
-  virtual QString getHelp() const { return QString(); } ///< return a descriptive help string for the data, used for example as a tool tip.
-  virtual QStringList getValueRange() const { return QStringList(); } /// range of value. Use if data is constrained to a set.
-  virtual QString convertInternal2Display(QString internal) { return internal; } ///< conversion from internal value to display value
+public:
+	// optional methods
+	virtual QString getHelp() const
+	{
+		return QString();
+	} ///< return a descriptive help string for the data, used for example as a tool tip.
+	virtual QStringList getValueRange() const
+	{
+		return QStringList();
+	} /// range of value. Use if data is constrained to a set.
+	virtual QString convertInternal2Display(QString internal)
+	{
+		return internal;
+	} ///< conversion from internal value to display value
 
-  //  virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
+	//  virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
 
-//signals:
-//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
+	//signals:
+	//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 };
 typedef boost::shared_ptr<StringDataAdapter> StringDataAdapterPtr;
 
 /** dummy implementation */
-class StringDataAdapterNull : public StringDataAdapter
+class StringDataAdapterNull: public StringDataAdapter
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  virtual ~StringDataAdapterNull() {}
-  virtual QString getValueName() const { return "dummy"; }
-  virtual bool setValue(const QString& value) { return false; }
-  virtual QString getValue() const { return ""; }
-//  virtual void connectValueSignals(bool on) {}
+	virtual ~StringDataAdapterNull()
+	{
+	}
+	virtual QString getValueName() const
+	{
+		return "dummy";
+	}
+	virtual bool setValue(const QString& value)
+	{
+		return false;
+	}
+	virtual QString getValue() const
+	{
+		return "";
+	}
+	//  virtual void connectValueSignals(bool on) {}
 };
 
 /** Abstract interface for interaction with internal string-valued data.
@@ -86,25 +110,34 @@ public:
  * allowed values: any value will do.
  *
  */
-class EditableStringDataAdapter : public DataAdapter
+class EditableStringDataAdapter: public DataAdapter
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  virtual ~EditableStringDataAdapter() {}
+	virtual ~EditableStringDataAdapter()
+	{
+	}
 
-public: // basic methods
-  virtual QString getValueName() const = 0;///< name of data entity. Used for display to user.
-  virtual bool setValue(const QString& value) = 0; ///< set the data value.
-  virtual QString getValue() const = 0; ///< get the data value.
+public:
+	// basic methods
+	virtual QString getValueName() const = 0;///< name of data entity. Used for display to user.
+	virtual bool setValue(const QString& value) = 0; ///< set the data value.
+	virtual QString getValue() const = 0; ///< get the data value.
 
-public: // optional methods
-  virtual QString getHelp() const { return QString(); } ///< return a descriptive help string for the data, used for example as a tool tip.
-  virtual bool isReadOnly() const { return false; }
+public:
+	// optional methods
+	virtual QString getHelp() const
+	{
+		return QString();
+	} ///< return a descriptive help string for the data, used for example as a tool tip.
+	virtual bool isReadOnly() const
+	{
+		return false;
+	}
 
-  //  virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
+	//  virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
 };
 typedef boost::shared_ptr<EditableStringDataAdapter> EditableStringDataAdapterPtr;
-
 
 } // namespace ssc
 

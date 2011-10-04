@@ -29,15 +29,14 @@ PresetTransferFunctions3D::~PresetTransferFunctions3D()
 
 QStringList PresetTransferFunctions3D::getPresetList()
 {
-  return this->generatePresetList();
+	return this->generatePresetList();
 }
 
 ssc::XmlOptionFile PresetTransferFunctions3D::getCustomFile()
 {
 	return mCustomFile;
-//	return ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("presetTransferFunctions");
+	//	return ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("presetTransferFunctions");
 }
-
 
 void PresetTransferFunctions3D::save(QString name, ssc::ImagePtr image)
 {
@@ -46,13 +45,13 @@ void PresetTransferFunctions3D::save(QString name, ssc::ImagePtr image)
 
 	QDomNode tf3DNode = file.getElement("transferfunctions");
 	while (tf3DNode.hasChildNodes())
-	  tf3DNode.removeChild(tf3DNode.firstChild());
-  QDomNode tf2DNode = file.getElement("lookuptable2D");
-  while (tf2DNode.hasChildNodes())
-    tf2DNode.removeChild(tf2DNode.firstChild());
+		tf3DNode.removeChild(tf3DNode.firstChild());
+	QDomNode tf2DNode = file.getElement("lookuptable2D");
+	while (tf2DNode.hasChildNodes())
+		tf2DNode.removeChild(tf2DNode.firstChild());
 
-  image->getTransferFunctions3D()->addXml(file.getElement("transferfunctions"));
-  image->getLookupTable2D()->addXml(file.getElement("lookuptable2D"));
+	image->getTransferFunctions3D()->addXml(file.getElement("transferfunctions"));
+	image->getLookupTable2D()->addXml(file.getElement("lookuptable2D"));
 	image->getShading().addXml(file.getElement("shading"));
 
 	file.save();
@@ -60,11 +59,11 @@ void PresetTransferFunctions3D::save(QString name, ssc::ImagePtr image)
 
 void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
 {
-  //Make sure transfer functions are reset in case something is missing from the preset
-  image->resetTransferFunctions();
+	//Make sure transfer functions are reset in case something is missing from the preset
+	image->resetTransferFunctions();
 
-  ssc::ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
-  ssc::ImageLUT2DPtr LUT2D = image->getLookupTable2D();
+	ssc::ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
+	ssc::ImageLUT2DPtr LUT2D = image->getLookupTable2D();
 	ssc::XmlOptionFile node = this->getPresetNode(name);
 
 	transferFunctions->parseXml(node.getElement().namedItem("transferfunctions"));
@@ -84,41 +83,40 @@ void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
  */
 ssc::XmlOptionFile PresetTransferFunctions3D::getPresetNode(const QString& presetName)
 {
-  ssc::XmlOptionFile retval = mPresetFile;
-  retval = retval.tryDescend("Preset", "name", presetName);
-  if (!retval.getDocument().isNull())
-    return retval;
+	ssc::XmlOptionFile retval = mPresetFile;
+	retval = retval.tryDescend("Preset", "name", presetName);
+	if (!retval.getDocument().isNull())
+		return retval;
 
-  retval = this->getCustomFile();
-  retval = retval.descend("Preset", "name", presetName);
-  return retval;
+	retval = this->getCustomFile();
+	retval = retval.descend("Preset", "name", presetName);
+	return retval;
 }
-  
+
 QStringList PresetTransferFunctions3D::generatePresetList()
 {
-  QStringList presetList;
-  presetList.append("Transfer function preset...");
+	QStringList presetList;
+	presetList.append("Transfer function preset...");
 
-  QDomNodeList presetNodeList = mPresetFile.getElement().elementsByTagName("Preset");
-  for(int i=0; i < presetNodeList.count(); ++i)
-  {
-    QString presetName = presetNodeList.item(i).toElement().attribute("name");
-    if(presetName == "Default")
-      continue;
-    else
-      presetList << presetName;
-  }
+	QDomNodeList presetNodeList = mPresetFile.getElement().elementsByTagName("Preset");
+	for (int i = 0; i < presetNodeList.count(); ++i)
+	{
+		QString presetName = presetNodeList.item(i).toElement().attribute("name");
+		if (presetName == "Default")
+			continue;
+		else
+			presetList << presetName;
+	}
 
-  ssc::XmlOptionFile customFile = this->getCustomFile();
-  presetNodeList = customFile.getElement().elementsByTagName("Preset");
-  for(int i=0; i < presetNodeList.count(); ++i)
-  {
-    QString presetName = presetNodeList.item(i).toElement().attribute("name");
-    presetList << presetName;
-  }
+	ssc::XmlOptionFile customFile = this->getCustomFile();
+	presetNodeList = customFile.getElement().elementsByTagName("Preset");
+	for (int i = 0; i < presetNodeList.count(); ++i)
+	{
+		QString presetName = presetNodeList.item(i).toElement().attribute("name");
+		presetList << presetName;
+	}
 
-  return presetList;
+	return presetList;
 }
-
 
 }

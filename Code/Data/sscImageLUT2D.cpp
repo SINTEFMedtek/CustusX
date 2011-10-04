@@ -20,58 +20,58 @@ namespace ssc
 ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	ImageTFData(base)
 {
-  mOutputLUT = vtkLookupTablePtr::New();
+	mOutputLUT = vtkLookupTablePtr::New();
 
-  double smin = mBase->GetScalarRange()[0];
-  double smax = mBase->GetScalarRange()[1];
-  double srange = smax - smin;
+	double smin = mBase->GetScalarRange()[0];
+	double smax = mBase->GetScalarRange()[1];
+	double srange = smax - smin;
 
-  // this sets the initial opacity tf to full
-  this->setAlpha(1);
-  this->setLLR(smin);
-  this->buildOpacityMapFromLLRAlpha();
+	// this sets the initial opacity tf to full
+	this->setAlpha(1);
+	this->setLLR(smin);
+	this->buildOpacityMapFromLLRAlpha();
 
-  // this also sets the initial lut to grayscale
-  this->addColorPoint(smin, Qt::black);
-  this->addColorPoint(smax, Qt::white);
+	// this also sets the initial lut to grayscale
+	this->addColorPoint(smin, Qt::black);
+	this->addColorPoint(smax, Qt::white);
 
-  // set values suitable for CT.
-  this->setLevel(srange * 0.15 - smin);
-  this->setWindow(srange * 0.5 - smin);
+	// set values suitable for CT.
+	this->setLevel(srange * 0.15 - smin);
+	this->setWindow(srange * 0.5 - smin);
 
-  connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
-  connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
+	connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
+	connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
 }
 
 ImageLUT2DPtr ImageLUT2D::createCopy()
 {
-  ImageLUT2DPtr retval(new ImageLUT2D(mBase));
+	ImageLUT2DPtr retval(new ImageLUT2D(mBase));
 
-  retval->deepCopy(this);
-  retval->mOutputLUT->DeepCopy(mOutputLUT);
+	retval->deepCopy(this);
+	retval->mOutputLUT->DeepCopy(mOutputLUT);
 
-  return retval;
+	return retval;
 }
 
 void ImageLUT2D::setFullRangeWinLevel()
 {
-  double smin = mBase->GetScalarRange()[0];
-  double smax = mBase->GetScalarRange()[1];
-  double srange = smax - smin;
-  this->setWindow(srange);
-  this->setLevel(smin + srange/2.0);
+	double smin = mBase->GetScalarRange()[0];
+	double smax = mBase->GetScalarRange()[1];
+	double srange = smax - smin;
+	this->setWindow(srange);
+	this->setLevel(smin + srange / 2.0);
 }
 
 void ImageLUT2D::transferFunctionsChangedSlot()
 {
-  this->refreshOutput();
+	this->refreshOutput();
 }
 
 /**set basic lookuptable, to be modified by level/window/llr/alpha
  */
 void ImageLUT2D::setBaseLookupTable(vtkLookupTablePtr lut)
 {
-  this->setLut(lut);
+	this->setLut(lut);
 }
 
 vtkLookupTablePtr ImageLUT2D::getOutputLookupTable()
@@ -80,17 +80,17 @@ vtkLookupTablePtr ImageLUT2D::getOutputLookupTable()
 }
 vtkLookupTablePtr ImageLUT2D::getBaseLookupTable()
 {
-  return this->getLut();
+	return this->getLut();
 }
 
 void ImageLUT2D::LUTChanged()
 {
-  this->refreshOutput();
+	this->refreshOutput();
 }
 
 void ImageLUT2D::alphaLLRChanged()
 {
-  this->buildOpacityMapFromLLRAlpha();
+	this->buildOpacityMapFromLLRAlpha();
 }
 
 /**Rebuild the opacity tf from LLR and alpha.
@@ -98,41 +98,37 @@ void ImageLUT2D::alphaLLRChanged()
  */
 void ImageLUT2D::buildOpacityMapFromLLRAlpha()
 {
-  mOpacityMapPtr->clear();
-  this->addAlphaPoint(this->getScalarMin(),0);
-  if (this->getLLR()>this->getScalarMin())
-    this->addAlphaPoint(this->getLLR()-1,0);
-  this->addAlphaPoint(this->getLLR(),this->getAlpha()*255);
-  this->addAlphaPoint(this->getScalarMax(),this->getAlpha()*255);
+	mOpacityMapPtr->clear();
+	this->addAlphaPoint(this->getScalarMin(), 0);
+	if (this->getLLR() > this->getScalarMin())
+		this->addAlphaPoint(this->getLLR() - 1, 0);
+	this->addAlphaPoint(this->getLLR(), this->getAlpha() * 255);
+	this->addAlphaPoint(this->getScalarMax(), this->getAlpha() * 255);
 }
 
 /**rebuild the output lut from all inputs.
  */
 void ImageLUT2D::refreshOutput()
 {
-  this->fillLUTFromLut(mOutputLUT, mLut);
+	this->fillLUTFromLut(mOutputLUT, mLut);
 	emit transferFunctionsChanged();
 }
 
 void ImageLUT2D::addXml(QDomNode dataNode)
 {
-  ImageTFData::addXml(dataNode);
+	ImageTFData::addXml(dataNode);
 }
 
 void ImageLUT2D::parseXml(QDomNode dataNode)
 {
-  ImageTFData::parseXml(dataNode);
+	ImageTFData::parseXml(dataNode);
 
-  this->buildLUTFromColorMap();
-  this->refreshOutput();
+	this->buildLUTFromColorMap();
+	this->refreshOutput();
 }
-
 
 //---------------------------------------------------------
 } // end namespace
 //---------------------------------------------------------
-
-
-
 
 

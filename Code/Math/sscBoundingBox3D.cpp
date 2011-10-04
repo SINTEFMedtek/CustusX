@@ -13,45 +13,62 @@ namespace ssc
 // --------------------------------------------------------
 // IntBoundingBox3D
 IntBoundingBox3D::IntBoundingBox3D()
-{}
+{
+}
 IntBoundingBox3D::IntBoundingBox3D(int x0, int x1, int y0, int y1, int z0, int z1)
 {
-	elems[0] = x0; elems[1] = x1;
-	elems[2] = y0; elems[3] = y1;
-	elems[4] = z0; elems[5] = z1;
+	elems[0] = x0;
+	elems[1] = x1;
+	elems[2] = y0;
+	elems[3] = y1;
+	elems[4] = z0;
+	elems[5] = z1;
 }
 /**Create a bounding box describing the volume spanned by the two points a and b.
  */
 IntBoundingBox3D::IntBoundingBox3D(const Vector3D& a, const Vector3D& b)
 {
 	Vector3D bl, tr;
-	for (unsigned i=0; i<a.size(); ++i)
+	for (unsigned i = 0; i < a.size(); ++i)
 	{
 		bl[i] = std::min(a[i], b[i]);
 		tr[i] = std::max(a[i], b[i]);
 	}
 
-	elems[0] = static_cast<int>(bl[0]); elems[1] = static_cast<int>(tr[0]);
-	elems[2] = static_cast<int>(bl[1]); elems[3] = static_cast<int>(tr[1]);
-	elems[4] = static_cast<int>(bl[2]); elems[5] = static_cast<int>(tr[2]);
+	elems[0] = static_cast<int> (bl[0]);
+	elems[1] = static_cast<int> (tr[0]);
+	elems[2] = static_cast<int> (bl[1]);
+	elems[3] = static_cast<int> (tr[1]);
+	elems[4] = static_cast<int> (bl[2]);
+	elems[5] = static_cast<int> (tr[2]);
 }
 IntBoundingBox3D::IntBoundingBox3D(const double* data)
 {
-	for (unsigned i=0; i<size(); ++i)
-	elems[i] = static_cast<int>(data[i]);
+	for (unsigned i = 0; i < size(); ++i)
+		elems[i] = static_cast<int> (data[i]);
 	//	std::copy(data, data+size(), elems); 
 }
 IntBoundingBox3D::IntBoundingBox3D(const int* data)
-{	std::copy(data, data+size(), elems);}
+{
+	std::copy(data, data + size(), elems);
+}
 // --------------------------------------------------------
 Vector3D IntBoundingBox3D::bottomLeft() const
-{	return Vector3D(elems[0], elems[2], elems[4]);}
+{
+	return Vector3D(elems[0], elems[2], elems[4]);
+}
 Vector3D IntBoundingBox3D::topRight() const
-{	return Vector3D(elems[1], elems[3], elems[5]);}
+{
+	return Vector3D(elems[1], elems[3], elems[5]);
+}
 Vector3D IntBoundingBox3D::center() const
-{	return (bottomLeft()+topRight())/2.0;}
+{
+	return (bottomLeft() + topRight()) / 2.0;
+}
 Vector3D IntBoundingBox3D::range() const
-{	return topRight()-bottomLeft();}
+{
+	return topRight() - bottomLeft();
+}
 /**Return the coordinate value of a given corner.
  * Insert 0 or 1 for each of the 3 axis in order to get start or 
  * stop corner along that axis.  
@@ -74,35 +91,46 @@ std::ostream& operator<<(std::ostream& s, const IntBoundingBox3D& data)
 // --------------------------------------------------------
 // DoubleBoundingBox3D 
 DoubleBoundingBox3D::DoubleBoundingBox3D()
-{}
+{
+}
 DoubleBoundingBox3D::DoubleBoundingBox3D(double x0, double x1, double y0, double y1, double z0, double z1)
 {
-	elems[0] = x0; elems[1] = x1;
-	elems[2] = y0; elems[3] = y1;
-	elems[4] = z0; elems[5] = z1;
+	elems[0] = x0;
+	elems[1] = x1;
+	elems[2] = y0;
+	elems[3] = y1;
+	elems[4] = z0;
+	elems[5] = z1;
 }
 /**Create a bounding box describing the volume spanned by the two points a and b.
  */
 DoubleBoundingBox3D::DoubleBoundingBox3D(const Vector3D& a, const Vector3D& b)
 {
 	Vector3D bl, tr;
-	for (unsigned i=0; i<a.size(); ++i)
+	for (unsigned i = 0; i < a.size(); ++i)
 	{
 		bl[i] = std::min(a[i], b[i]);
 		tr[i] = std::max(a[i], b[i]);
 	}
 
-	elems[0] = bl[0]; elems[1] = tr[0];
-	elems[2] = bl[1]; elems[3] = tr[1];
-	elems[4] = bl[2]; elems[5] = tr[2];
+	elems[0] = bl[0];
+	elems[1] = tr[0];
+	elems[2] = bl[1];
+	elems[3] = tr[1];
+	elems[4] = bl[2];
+	elems[5] = tr[2];
 }
 DoubleBoundingBox3D::DoubleBoundingBox3D(const double* data)
-{	std::copy(data, data+size(), elems);}
+{
+	std::copy(data, data + size(), elems);
+}
 DoubleBoundingBox3D::DoubleBoundingBox3D(const int* data)
-{	std::copy(data, data+size(), elems);}
+{
+	std::copy(data, data + size(), elems);
+}
 DoubleBoundingBox3D::DoubleBoundingBox3D(const IntBoundingBox3D& bb)
 {
-	for (unsigned i=0; i<size(); ++i)
+	for (unsigned i = 0; i < size(); ++i)
 	{
 		elems[i] = bb.elems[i];
 	}
@@ -118,13 +146,21 @@ DoubleBoundingBox3D DoubleBoundingBox3D::fromViewport(const double* data)
 // --------------------------------------------------------
 
 Vector3D DoubleBoundingBox3D::bottomLeft() const
-{	return Vector3D(elems[0], elems[2], elems[4]);}
+{
+	return Vector3D(elems[0], elems[2], elems[4]);
+}
 Vector3D DoubleBoundingBox3D::topRight() const
-{	return Vector3D(elems[1], elems[3], elems[5]);}
+{
+	return Vector3D(elems[1], elems[3], elems[5]);
+}
 Vector3D DoubleBoundingBox3D::center() const
-{	return (bottomLeft()+topRight())/2.0;}
+{
+	return (bottomLeft() + topRight()) / 2.0;
+}
 Vector3D DoubleBoundingBox3D::range() const
-{	return topRight()-bottomLeft();}
+{
+	return topRight() - bottomLeft();
+}
 /**Return the coordinate value of a given corner.
  * Insert 0 or 1 for each of the 3 axis in order to get start or 
  * stop corner along that axis.  
@@ -144,11 +180,10 @@ Vector3D DoubleBoundingBox3D::corner(int x, int y, int z) const
 bool DoubleBoundingBox3D::contains(const Vector3D& p) const
 {
 	bool inside = true;
-	for (unsigned i=0; i<3; ++i)
-		inside &= ((elems[2*i] <= p[i]) && (p[i] <= elems[2*i+1]));
+	for (unsigned i = 0; i < 3; ++i)
+		inside &= ((elems[2 * i] <= p[i]) && (p[i] <= elems[2 * i + 1]));
 	return inside;
 }
-
 
 bool similar(const DoubleBoundingBox3D& a, const DoubleBoundingBox3D& b, double tol)
 {
@@ -163,31 +198,30 @@ std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data)
 
 DoubleBoundingBox3D DoubleBoundingBox3D::fromCloud(std::vector<Vector3D> cloud)
 {
-  if (cloud.empty())
-    return ssc::DoubleBoundingBox3D(0,0,0,0,0,0);
-  
-  Vector3D a = cloud[0]; // min
-  Vector3D b = cloud[0]; // max
-  
-  for (unsigned int i=0; i<cloud.size(); ++i)
-  {
-    for (unsigned int j=0; j<3; ++j)
-    {
-      a[j] = std::min(a[j], cloud[i][j]);
-      b[j] = std::max(b[j], cloud[i][j]);
-    }
-  }
-  return DoubleBoundingBox3D(a,b);
-}
-  
-DoubleBoundingBox3D DoubleBoundingBox3D::fromString(const QString& text)
-{
-  std::vector<double> raw = convertQString2DoubleVector(text);
-  if (raw.size()!=6)
-    return DoubleBoundingBox3D(0,1,0,1,0,1);
-  return DoubleBoundingBox3D((double*)&(*raw.begin()));
+	if (cloud.empty())
+		return ssc::DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
+
+	Vector3D a = cloud[0]; // min
+	Vector3D b = cloud[0]; // max
+
+	for (unsigned int i = 0; i < cloud.size(); ++i)
+	{
+		for (unsigned int j = 0; j < 3; ++j)
+		{
+			a[j] = std::min(a[j], cloud[i][j]);
+			b[j] = std::max(b[j], cloud[i][j]);
+		}
+	}
+	return DoubleBoundingBox3D(a, b);
 }
 
+DoubleBoundingBox3D DoubleBoundingBox3D::fromString(const QString& text)
+{
+	std::vector<double> raw = convertQString2DoubleVector(text);
+	if (raw.size() != 6)
+		return DoubleBoundingBox3D(0, 1, 0, 1, 0, 1);
+	return DoubleBoundingBox3D((double*) &(*raw.begin()));
+}
 
 // --------------------------------------------------------
 //} // namespace utils

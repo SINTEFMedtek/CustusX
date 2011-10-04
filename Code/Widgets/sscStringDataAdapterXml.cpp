@@ -16,12 +16,8 @@ namespace ssc
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid,
-    QString name,
-    QString help,
-    QString value,
-    QStringList range,
-    QDomNode root)
+StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QString name, QString help, QString value,
+	QStringList range, QDomNode root)
 {
 	StringDataAdapterXmlPtr retval(new StringDataAdapterXml());
 	retval->mUid = uid;
@@ -50,18 +46,20 @@ QString StringDataAdapterXml::getHelp() const
 
 QString StringDataAdapterXml::getValue() const
 {
-  return mValue;
+	return mValue;
 }
 
 bool StringDataAdapterXml::setValue(const QString& val)
 {
-	if (val==mValue)
+	if (val == mValue)
 		return false;
 
 	mValue = val;
 	mStore.writeValue(val);
-	emit valueWasSet();
-	emit changed();
+	emit
+	valueWasSet();
+	emit
+	changed();
 	return true;
 }
 
@@ -75,15 +73,14 @@ QStringList StringDataAdapterXml::getValueRange() const
  */
 QString StringDataAdapterXml::convertInternal2Display(QString internal)
 {
-  if (mDisplayNames.count(internal))
-    return mDisplayNames[internal];
-  return internal;
+	if (mDisplayNames.count(internal))
+		return mDisplayNames[internal];
+	return internal;
 }
 
-void StringDataAdapterXml::setDisplayNames(std::map<QString,QString> names)
+void StringDataAdapterXml::setDisplayNames(std::map<QString, QString> names)
 {
-  mDisplayNames = names;
+	mDisplayNames = names;
 }
-
 
 } // namespace ssc

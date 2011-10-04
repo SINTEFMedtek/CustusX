@@ -9,13 +9,16 @@ namespace ssc
 {
 
 /** A widget that floats above the other windows. Used as basis for the floating controls. */
-class sscFloatingWidget : public QWidget
+class sscFloatingWidget: public QWidget
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
-	virtual ~sscFloatingWidget() {}
-	sscFloatingWidget(QWidget* parent = 0) : QWidget(parent)
+	virtual ~sscFloatingWidget()
+	{
+	}
+	sscFloatingWidget(QWidget* parent = 0) :
+		QWidget(parent)
 	{
 		Qt::WindowFlags flags = Qt::FramelessWindowHint;
 		flags |= Qt::Window;
@@ -29,7 +32,7 @@ public:
  * into a row in that layout
  *
  */
-QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout=0, int row=0);
+QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
 }
 
 #endif

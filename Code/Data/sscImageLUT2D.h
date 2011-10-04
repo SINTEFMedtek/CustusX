@@ -31,9 +31,9 @@ typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
  * The slicer classes will use the data either by getting the LUT+parameters(win/lvl(llr/alpha) and,
  * or by getting OutputLookupTable() which is a merge of the LUT and parameters.
  */
-class ImageLUT2D : public ImageTFData
+class ImageLUT2D: public ImageTFData
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	ImageLUT2D(vtkImageDataPtr base);
 	ImageLUT2DPtr createCopy();
@@ -50,18 +50,16 @@ signals:
 	void transferFunctionsChanged();
 
 private slots:
-  void transferFunctionsChangedSlot();
+	void transferFunctionsChangedSlot();
 
 private:
-  virtual void alphaLLRChanged();
-  void buildOpacityMapFromLLRAlpha();
+	virtual void alphaLLRChanged();
+	void buildOpacityMapFromLLRAlpha();
 	void refreshOutput();
 	void LUTChanged();
 
 	vtkLookupTablePtr mOutputLUT; ///< the sum of all internal values
 };
-
-
 
 }
 

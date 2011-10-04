@@ -22,9 +22,10 @@ namespace ssc
 class XmlOptionItem
 {
 public:
-	XmlOptionItem() {}
-	XmlOptionItem(const QString& uid,
-		      QDomElement root);
+	XmlOptionItem()
+	{
+	}
+	XmlOptionItem(const QString& uid, QDomElement root);
 	QString readValue(const QString& defval) const;
 	void writeValue(const QString& val);
 private:
@@ -52,34 +53,37 @@ class XmlOptionFile
 {
 public:
 	static XmlOptionFile createNull(); ///< create an empty document
-  explicit XmlOptionFile(QString filename, QString name=""); ///< create from filename, create trivial document of type name and root node if no file exists.
-  XmlOptionFile();
-  ~XmlOptionFile();
+	explicit XmlOptionFile(QString filename, QString name = ""); ///< create from filename, create trivial document of type name and root node if no file exists.
+	XmlOptionFile();
+	~XmlOptionFile();
 
-  XmlOptionFile descend(QString element) const; ///< step one level down in the xml tree
-  XmlOptionFile descend(QString element, QString attributeName, QString attributeValue) const; // stepdown to element with given attribute
-  XmlOptionFile ascend() const; ///< step one level up in the xml tree
-  XmlOptionFile tryDescend(QString element, QString attributeName, QString attributeValue) const; // stepdown only if present
+	XmlOptionFile descend(QString element) const; ///< step one level down in the xml tree
+	XmlOptionFile descend(QString element, QString attributeName, QString attributeValue) const; // stepdown to element with given attribute
+	XmlOptionFile ascend() const; ///< step one level up in the xml tree
+	XmlOptionFile tryDescend(QString element, QString attributeName, QString attributeValue) const; // stepdown only if present
 
-  QDomDocument getDocument() { return mDocument; }
-  QDomElement getElement(); ///< return the current element
-  QDomElement getElement(QString level1); ///< return a element below the current element. Guaranteed to exist.
-  QDomElement getElement(QString level1, QString level2);; ///< return a element two levels below the current element. Guaranteed to exist.
-  void save(); ///< save entire document.
+	QDomDocument getDocument()
+	{
+		return mDocument;
+	}
+	QDomElement getElement(); ///< return the current element
+	QDomElement getElement(QString level1); ///< return a element below the current element. Guaranteed to exist.
+	QDomElement getElement(QString level1, QString level2);
+	; ///< return a element two levels below the current element. Guaranteed to exist.
+	void save(); ///< save entire document.
 
-  void removeChildren(); ///< remove all child nodes of the current element.
+	void removeChildren(); ///< remove all child nodes of the current element.
 
 private:
-  void load();
-  QDomElement safeGetElement(QDomElement parent, QString childName);
-  
-  QString mFilename;
-  QDomDocument mDocument;
-  QDomElement mCurrentElement; ///< all getElement() operations are performed relative to this node.
+	void load();
+	QDomElement safeGetElement(QDomElement parent, QString childName);
 
-  static class SharedDocuments* mSharedDocuments;
+	QString mFilename;
+	QDomDocument mDocument;
+	QDomElement mCurrentElement; ///< all getElement() operations are performed relative to this node.
+
+	static class SharedDocuments* mSharedDocuments;
 };
-
 
 } // namespace ssc
 

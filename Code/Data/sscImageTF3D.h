@@ -12,7 +12,6 @@
 #include <QObject>
 #include "vtkForwardDeclarations.h"
 
-
 class QColor;
 class QDomDocument;
 class QDomNode;
@@ -35,9 +34,9 @@ typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
  *
  * The volume rendering classes can use the data by getting OpacityTF and ColorTF.
  */
-class ImageTF3D : public ImageTFData
+class ImageTF3D: public ImageTFData
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	ImageTF3D(vtkImageDataPtr base);
 
@@ -53,12 +52,12 @@ public:
 signals:
 	void transferFunctionsChanged();
 private slots:
-  void transferFunctionsChangedSlot();
+	void transferFunctionsChangedSlot();
 private:
-  virtual void LUTChanged();
-  virtual void alphaLLRChanged();
+	virtual void LUTChanged();
+	virtual void alphaLLRChanged();
 
-  void buildOpacityMapFromLLRAlpha();
+	void buildOpacityMapFromLLRAlpha();
 
 	void refreshColorTF();
 	void refreshOpacityTF();

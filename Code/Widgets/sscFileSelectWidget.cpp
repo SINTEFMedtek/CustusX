@@ -15,136 +15,131 @@ namespace ssc
 
 FileSelectWidget::FileSelectWidget(QWidget* parent)
 {
-  mNameFilters << "*.mhd";
+	mNameFilters << "*.mhd";
 
-  QHBoxLayout* dataLayout = new QHBoxLayout(this);
-  mDataComboBox = new QComboBox(this);
-  connect(mDataComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentDataComboIndexChanged(int)));
+	QHBoxLayout* dataLayout = new QHBoxLayout(this);
+	mDataComboBox = new QComboBox(this);
+	connect(mDataComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentDataComboIndexChanged(int)));
 
-  mSelectDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Select data"), this);
-  connect(mSelectDataAction, SIGNAL(triggered()), this, SLOT(selectData()));
-  mSelectDataButton = new QToolButton(this);
-  mSelectDataButton->setDefaultAction(mSelectDataAction);
+	mSelectDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Select data"), this);
+	connect(mSelectDataAction, SIGNAL(triggered()), this, SLOT(selectData()));
+	mSelectDataButton = new QToolButton(this);
+	mSelectDataButton->setDefaultAction(mSelectDataAction);
 
-  dataLayout->addWidget(mDataComboBox);
-  dataLayout->addWidget(mSelectDataButton);
+	dataLayout->addWidget(mDataComboBox);
+	dataLayout->addWidget(mSelectDataButton);
 }
 
 QString FileSelectWidget::getFilename() const
 {
-  return mFilename;
+	return mFilename;
 }
 
 void FileSelectWidget::setFilename(QString name)
 {
-  mFilename = name;
-//  QString temp = QFileInfo(mFilename).dir().absolutePath();
-//  std::cout << "isdir " << QFileInfo(mFilename).isDir() << std::endl;
-//  std::cout << "FileSelectWidget::setFilename name" << mFilename << '\n' << QFileInfo(mFilename).dir().absolutePath() << std::endl;
+	mFilename = name;
+	//  QString temp = QFileInfo(mFilename).dir().absolutePath();
+	//  std::cout << "isdir " << QFileInfo(mFilename).isDir() << std::endl;
+	//  std::cout << "FileSelectWidget::setFilename name" << mFilename << '\n' << QFileInfo(mFilename).dir().absolutePath() << std::endl;
 
-  if (QFileInfo(mFilename).isDir())
-  {
-    mRootPath = QFileInfo(mFilename).dir().absolutePath();
-//    std::cout << "FileSelectWidget::setFilename root" << mRootPath << std::endl;
-  }
+	if (QFileInfo(mFilename).isDir())
+	{
+		mRootPath = QFileInfo(mFilename).dir().absolutePath();
+		//    std::cout << "FileSelectWidget::setFilename root" << mRootPath << std::endl;
+	}
 
-  this->refresh();
+	this->refresh();
 }
 
 void FileSelectWidget::setNameFilter(QStringList filter)
 {
-  mNameFilters = filter;
+	mNameFilters = filter;
 }
 
 void FileSelectWidget::setPath(QString path)
 {
-  mRootPath = path;
-//  std::cout << "FileSelectWidget::setPath root" << mRootPath << std::endl;
-  this->refresh();
+	mRootPath = path;
+	//  std::cout << "FileSelectWidget::setPath root" << mRootPath << std::endl;
+	this->refresh();
 }
 
 void FileSelectWidget::selectData()
 {
-  QString filename = QFileDialog::getOpenFileName( this,
-                                  QString(tr("Select data file")),
-                                  mRootPath,
-                                  tr("USAcq (*.mhd)"));
+	QString filename = QFileDialog::getOpenFileName(this, QString(tr("Select data file")), mRootPath, tr(
+		"USAcq (*.mhd)"));
 
-  if (filename.isEmpty())
-    return;
+	if (filename.isEmpty())
+		return;
 
-  mFilename = filename;
-//  std::cout << this << " selectData " << mFilename << std::endl;
+	mFilename = filename;
+	//  std::cout << this << " selectData " << mFilename << std::endl;
 
-  this->refresh();
-  emit fileSelected(mFilename);
+	this->refresh();
+	emit fileSelected(mFilename);
 }
 
 QStringList FileSelectWidget::getAllFiles(QString folder)
 {
-  QDir dir(folder);
-  QStringList files = dir.entryList(mNameFilters, QDir::Files);
+	QDir dir(folder);
+	QStringList files = dir.entryList(mNameFilters, QDir::Files);
 
+	QStringList retval;
+	for (int i = 0; i < files.size(); ++i)
+	{
+		retval << (dir.absolutePath() + "/" + files[i]);
+	}
+	QStringList folders = dir.entryList(QStringList(), QDir::AllDirs | QDir::NoDotAndDotDot);
 
-  QStringList retval;
-  for (int i=0; i<files.size(); ++i)
-  {
-    retval << (dir.absolutePath() + "/" + files[i]);
-  }
-  QStringList folders = dir.entryList(QStringList(), QDir::AllDirs | QDir::NoDotAndDotDot);
+	for (int i = 0; i < folders.size(); ++i)
+	{
+		files = this->getAllFiles(folder + "/" + folders[i]);
+		retval.append(files);
+	}
 
-  for (int i=0; i<folders.size(); ++i)
-  {
-    files = this->getAllFiles(folder + "/" + folders[i]);
-    retval.append(files);
-  }
-
-  return retval;
+	return retval;
 }
 
 void FileSelectWidget::refresh()
 {
-  this->updateComboBox();
+	this->updateComboBox();
 }
-
 
 void FileSelectWidget::updateComboBox()
 {
-  mDataComboBox->blockSignals(true);
-  mDataComboBox->clear();
+	mDataComboBox->blockSignals(true);
+	mDataComboBox->clear();
 
-  QStringList files = this->getAllFiles(mRootPath);
+	QStringList files = this->getAllFiles(mRootPath);
 
-  for (int i=0; i<files.size(); ++i)
-  {
-    mDataComboBox->addItem(QFileInfo(files[i]).fileName(), files[i]);
-  }
-  mDataComboBox->setCurrentIndex(-1);
-  for (int i=0; i<mDataComboBox->count(); ++i)
-  {
-    if (mDataComboBox->itemData(i)==mFilename)
-      mDataComboBox->setCurrentIndex(i);
-  }
+	for (int i = 0; i < files.size(); ++i)
+	{
+		mDataComboBox->addItem(QFileInfo(files[i]).fileName(), files[i]);
+	}
+	mDataComboBox->setCurrentIndex(-1);
+	for (int i = 0; i < mDataComboBox->count(); ++i)
+	{
+		if (mDataComboBox->itemData(i) == mFilename)
+			mDataComboBox->setCurrentIndex(i);
+	}
 
-  if (!mFilename.isEmpty() && mDataComboBox->currentIndex()<0 && !files.contains(mFilename))
-  {
-    mDataComboBox->addItem(QFileInfo(mFilename).fileName(), mFilename);
-    mDataComboBox->setCurrentIndex(mDataComboBox->count()-1);
-  }
+	if (!mFilename.isEmpty() && mDataComboBox->currentIndex() < 0 && !files.contains(mFilename))
+	{
+		mDataComboBox->addItem(QFileInfo(mFilename).fileName(), mFilename);
+		mDataComboBox->setCurrentIndex(mDataComboBox->count() - 1);
+	}
 
-  mDataComboBox->setToolTip(mFilename);
+	mDataComboBox->setToolTip(mFilename);
 
-  mDataComboBox->blockSignals(false);
+	mDataComboBox->blockSignals(false);
 }
 
 void FileSelectWidget::currentDataComboIndexChanged(int index)
 {
-  if (index<0)
-    return;
+	if (index < 0)
+		return;
 
-  mFilename = mDataComboBox->itemData(index).toString();
-  emit fileSelected(mFilename);
+	mFilename = mDataComboBox->itemData(index).toString();
+	emit fileSelected(mFilename);
 }
-
 
 }

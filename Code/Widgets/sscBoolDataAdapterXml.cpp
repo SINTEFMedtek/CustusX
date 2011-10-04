@@ -13,53 +13,50 @@ namespace ssc
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
-BoolDataAdapterXmlPtr BoolDataAdapterXml::initialize(const QString& uid,
-    QString name,
-    QString help,
-    bool value,
-    QDomNode root)
+BoolDataAdapterXmlPtr BoolDataAdapterXml::initialize(const QString& uid, QString name, QString help, bool value,
+	QDomNode root)
 {
-  BoolDataAdapterXmlPtr retval(new BoolDataAdapterXml());
-  retval->mUid = uid;
-  retval->mName = name.isEmpty() ? uid : name;
-  retval->mHelp = help;
-  retval->mStore = XmlOptionItem(uid, root.toElement());
-  retval->mValue = retval->mStore.readValue(QString::number(value)).toInt();
-  return retval;
+	BoolDataAdapterXmlPtr retval(new BoolDataAdapterXml());
+	retval->mUid = uid;
+	retval->mName = name.isEmpty() ? uid : name;
+	retval->mHelp = help;
+	retval->mStore = XmlOptionItem(uid, root.toElement());
+	retval->mValue = retval->mStore.readValue(QString::number(value)).toInt();
+	return retval;
 }
-
-
 
 QString BoolDataAdapterXml::getUid() const
 {
-  return mUid;
+	return mUid;
 }
 
 QString BoolDataAdapterXml::getValueName() const
 {
-  return mName;
+	return mName;
 }
 
 QString BoolDataAdapterXml::getHelp() const
 {
-  return mHelp;
+	return mHelp;
 }
 
 bool BoolDataAdapterXml::getValue() const
 {
-  return mValue;
+	return mValue;
 }
 
 bool BoolDataAdapterXml::setValue(bool val)
 {
-  if (val==mValue)
-    return false;
+	if (val == mValue)
+		return false;
 
-  mValue = val;
-  mStore.writeValue(QString(val));
-  emit valueWasSet();
-  emit changed();
-  return true;
+	mValue = val;
+	mStore.writeValue(QString(val));
+	emit
+	valueWasSet();
+	emit
+	changed();
+	return true;
 }
 
 }

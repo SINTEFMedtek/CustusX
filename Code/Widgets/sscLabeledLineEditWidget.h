@@ -15,18 +15,18 @@ namespace ssc
  * Consists of <namelabel, combobox>.
  * Insert a subclass of ssc::StringDataAdStringDataAdapter to connect to data.
  */
-class LabeledLineEditWidget : public QWidget
+class LabeledLineEditWidget: public QWidget
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  LabeledLineEditWidget(QWidget* parent, EditableStringDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
+	LabeledLineEditWidget(QWidget* parent, EditableStringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
 private slots:
-  void dataChanged();
-  void editingFinished();
+	void dataChanged();
+	void editingFinished();
 private:
-  QLabel* mLabel;
-  QLineEdit* mLine;
-  EditableStringDataAdapterPtr mData;
+	QLabel* mLabel;
+	QLineEdit* mLine;
+	EditableStringDataAdapterPtr mData;
 };
 
 } // namespace ssc

@@ -17,18 +17,18 @@
 namespace ssc
 {
 
-class CheckBoxWidget : public QWidget
+class CheckBoxWidget: public QWidget
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  CheckBoxWidget(QWidget* parent, BoolDataAdapterPtr data, QGridLayout* gridLayout=0, int row=0);
+	CheckBoxWidget(QWidget* parent, BoolDataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
 private slots:
-  void dataChanged();
-  void valueChanged(bool val);
+	void dataChanged();
+	void valueChanged(bool val);
 
 private:
-  QCheckBox* mCheckBox;
-  BoolDataAdapterPtr mData;
+	QCheckBox* mCheckBox;
+	BoolDataAdapterPtr mData;
 };
 
 }

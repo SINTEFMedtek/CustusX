@@ -20,7 +20,7 @@ namespace ssc
 class Landmark
 {
 public:
-	explicit Landmark(QString uid="", Vector3D coord=Vector3D(0,0,0));
+	explicit Landmark(QString uid = "", Vector3D coord = Vector3D(0, 0, 0));
 	~Landmark();
 
 	QString getUid() const;
@@ -40,23 +40,22 @@ typedef std::map<QString, Landmark> LandmarkMap;
 class LandmarkProperty
 {
 public:
-  explicit LandmarkProperty(const QString& uid="", const QString& name="", bool active=true);
-  bool getActive() const;
-  QString getName() const;
-  QString getUid() const;
-  void setName(const QString& name);
-  void setActive(bool active);
+	explicit LandmarkProperty(const QString& uid = "", const QString& name = "", bool active = true);
+	bool getActive() const;
+	QString getName() const;
+	QString getUid() const;
+	void setName(const QString& name);
+	void setActive(bool active);
 
-  void addXml(QDomNode& dataNode);
-  void parseXml(QDomNode& dataNode);
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode& dataNode);
 
 private:
-  QString mUid;
-  QString mName;
-  bool mActive;
+	QString mUid;
+	QString mName;
+	bool mActive;
 };
 typedef std::map<QString, LandmarkProperty> LandmarkPropertyMap;
-
 
 } //namespace ssc
 

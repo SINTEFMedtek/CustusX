@@ -25,22 +25,22 @@ typedef boost::shared_ptr<class PresetTransferFunctions3D> PresetTransferFunctio
 class PresetTransferFunctions3D
 {
 public:
-  PresetTransferFunctions3D(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile);
-  ~PresetTransferFunctions3D();
+	PresetTransferFunctions3D(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile);
+	~PresetTransferFunctions3D();
 
-  void save(QString name, ssc::ImagePtr image);
-  void load(QString name, ssc::ImagePtr image);
+	void save(QString name, ssc::ImagePtr image);
+	void load(QString name, ssc::ImagePtr image);
 
-  QStringList getPresetList(); ///< returns a list of the preset names
+	QStringList getPresetList(); ///< returns a list of the preset names
 
 private:
-  QStringList generatePresetList(); ///< internally generate the preset list
-  ssc::XmlOptionFile getPresetNode(const QString& presetName);
-  ssc::XmlOptionFile getCustomFile();
+	QStringList generatePresetList(); ///< internally generate the preset list
+	ssc::XmlOptionFile getPresetNode(const QString& presetName);
+	ssc::XmlOptionFile getCustomFile();
 
-  ssc::XmlOptionFile mPresetFile;
-  ssc::XmlOptionFile mCustomFile;
-  QDomElement mLastReturnedPreset;
+	ssc::XmlOptionFile mPresetFile;
+	ssc::XmlOptionFile mCustomFile;
+	QDomElement mLastReturnedPreset;
 };
 
 }//namespace cx
