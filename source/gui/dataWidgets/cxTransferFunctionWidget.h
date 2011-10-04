@@ -5,7 +5,7 @@
 #include <QCheckBox>
 #include <QDomElement>
 #include <sscImage.h>
-#include "cxPresetTransferFunctions3D.h"
+#include "sscPresetTransferFunctions3D.h"
 #include "sscDoubleDataAdapter.h"
 
 class QVBoxLayout;
@@ -145,7 +145,7 @@ public slots:
 protected:
   QVBoxLayout* mLayout;
   QComboBox* mPresetsComboBox;
-  PresetTransferFunctions3D mPresets;
+  ssc::PresetTransferFunctions3DPtr mPresets;
 };
 
 /**

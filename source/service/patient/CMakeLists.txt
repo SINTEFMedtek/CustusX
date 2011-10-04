@@ -24,8 +24,6 @@ SET ( cxPatientService_SOURCE
     cxDistanceMetric.cpp
 	cxDataManager.h
 	cxDataManager.cpp
-	cxPresetTransferFunctions3D.h
-	cxPresetTransferFunctions3D.cpp
 	cxPatientData.h
     cxPatientData.cpp
     cxFileCopied.h

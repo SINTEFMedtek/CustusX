@@ -8,7 +8,7 @@
 #include <cxUsReconstructionPlugin.h>
 #include "cxDataLocations.h"
 #include "sscXmlOptionItem.h"
-#include "sscReconstructer.h"
+#include "sscReconstructManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 
@@ -21,7 +21,7 @@ namespace cx
 UsReconstructionPlugin::UsReconstructionPlugin()
 {
   ssc::XmlOptionFile xmlFile = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
-  mReconstructer.reset(new ssc::Reconstructer(xmlFile, DataLocations::getShaderPath()));
+  mReconstructer.reset(new ssc::ReconstructManager(xmlFile, DataLocations::getShaderPath()));
 
   connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
