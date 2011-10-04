@@ -28,7 +28,6 @@ class ReconstructAlgorithm
 {
 public:
 	virtual ~ReconstructAlgorithm() {}
-	;
 	/**
 	 *  Return a unique name for this algo.
 	 */

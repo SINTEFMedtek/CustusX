@@ -22,40 +22,38 @@ typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
 class TimedPosition
 {
 public:
-  double mTime;// Should always be in ms
-  Transform3D mPos;
+	double mTime;// Should always be in ms
+	Transform3D mPos;
 };
 inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)
 {
-  return lhs.mTime < rhs.mTime;
+	return lhs.mTime < rhs.mTime;
 }
 
 class USFrameData
 {
 public:
-  explicit USFrameData(ImagePtr inputFrameData, bool angio = false);
-  void reinitialize();
-  void removeFrame(unsigned int index);
-  unsigned char* getFrame(unsigned int index);
-  int* getDimensions();
-  Vector3D getSpacing();
-  QString getName();
-  QString getUid();
-  QString getFilePath();
+	explicit USFrameData(ImagePtr inputFrameData, bool angio = false);
+	void reinitialize();
+	void removeFrame(unsigned int index);
+	unsigned char* getFrame(unsigned int index);
+	int* getDimensions();
+	Vector3D getSpacing();
+	QString getName();
+	QString getUid();
+	QString getFilePath();
 
 private:
-  ImagePtr getBase();
-  vtkImageDataPtr useAngio(ImagePtr inputFrameData);/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
-  ImagePtr mImage;
-  std::vector<unsigned char*> mFrames;
-  int* mDimensions;
-  Vector3D mSpacing;
-  bool mUseAngio;
+	ImagePtr getBase();
+	vtkImageDataPtr useAngio(ImagePtr inputFrameData);/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
+	ImagePtr mImage;
+	std::vector<unsigned char*> mFrames;
+	int* mDimensions;
+	Vector3D mSpacing;
+	bool mUseAngio;
 };
-  
-  typedef boost::shared_ptr<USFrameData> USFrameDataPtr;
 
-
+typedef boost::shared_ptr<USFrameData> USFrameDataPtr;
 
 struct USReconstructInputData
 {
