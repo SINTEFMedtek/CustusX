@@ -275,6 +275,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
   BaseWidget(parent, "TransferFunctionPresetWidget", "Transfer Function Presets"),
   mLayout(new QVBoxLayout(this))
 {
+	mPresets = ssc::dataManager()->getPresetTransferFunctions3D();
   QPushButton* resetButton = new QPushButton("Reset", this);
   connect(resetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
 
@@ -282,7 +283,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
   connect(saveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
 
   mPresetsComboBox = new QComboBox(this);
-  mPresetsComboBox->addItems(mPresets.getPresetList());
+  mPresetsComboBox->addItems(mPresets->getPresetList());
   connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(presetsBoxChangedSlot(const QString&)));
 
   mLayout->addWidget(mPresetsComboBox);
@@ -308,7 +309,7 @@ void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetNa
 {
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   if(activeImage)
-    mPresets.load(presetName, activeImage);
+    mPresets->load(presetName, activeImage);
 }
 
 void TransferFunctionPresetWidget::resetSlot()
@@ -328,11 +329,11 @@ void TransferFunctionPresetWidget::saveSlot()
       return;
 
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-  mPresets.save(text, activeImage);
+  mPresets->save(text, activeImage);
 
   mPresetsComboBox->blockSignals(true);
   mPresetsComboBox->clear();
-  mPresetsComboBox->addItems(mPresets.getPresetList());
+  mPresetsComboBox->addItems(mPresets->getPresetList());
   mPresetsComboBox->blockSignals(false);
 }
 

@@ -12,7 +12,7 @@
 
 namespace ssc
 {
-	typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
+	typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 }
 
 namespace cx
@@ -25,11 +25,11 @@ public:
 	UsReconstructionPlugin();
 	virtual ~UsReconstructionPlugin();
 
-  ssc::ReconstructerPtr getReconstructer() { return mReconstructer; }
+  ssc::ReconstructManagerPtr getReconstructer() { return mReconstructer; }
   std::vector<PluginWidget> createWidgets() const;
 
 private:
-  ssc::ReconstructerPtr mReconstructer;
+  ssc::ReconstructManagerPtr mReconstructer;
 
 private slots:
 	void patientChangedSlot();
