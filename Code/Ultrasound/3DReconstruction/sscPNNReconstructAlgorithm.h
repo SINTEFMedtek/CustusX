@@ -31,9 +31,9 @@ public:
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual void reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData, ImagePtr outputData,
 		ImagePtr frameMask, QDomElement settings);
+	DoubleDataAdapterXmlPtr mInterpolationStepsOption;
 private:
 	//DoubleDataAdapterXmlPtr mInterpolationDistanceOption;
-	DoubleDataAdapterXmlPtr mInterpolationStepsOption;
 	bool validPixel(int x, int y, int* dims, unsigned char* rawPointer)
 	{
 		return (x >= 0) && (x < dims[0]) && (y >= 0) && (y < dims[1]) && (rawPointer[x + y * dims[0]] != 0);
