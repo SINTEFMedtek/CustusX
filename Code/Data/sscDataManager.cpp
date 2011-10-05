@@ -10,6 +10,7 @@
 #include "sscDataManagerImpl.h"
 #include "sscImage.h"
 #include "sscMesh.h"
+#include "sscPresetTransferFunctions3D.h"
 
 namespace ssc
 {
@@ -48,6 +49,11 @@ DataManager::DataManager()
 
 DataManager::~DataManager()
 {
+}
+
+PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() const
+{
+	return ssc::PresetTransferFunctions3DPtr(new ssc::PresetTransferFunctions3D(ssc::XmlOptionFile(), ssc::XmlOptionFile()));
 }
 
 ImagePtr DataManager::getActiveImage() const

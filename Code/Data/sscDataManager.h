@@ -97,11 +97,7 @@ public:
 	// state information
 	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
-	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const
-	{
-		return PresetTransferFunctions3DPtr();
-	}
-	;
+	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual QString addLandmark()
 	{
