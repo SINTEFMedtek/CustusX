@@ -15,6 +15,7 @@
 #include "sscVolumetricRep.h"
 #include "sscProgressiveLODVolumetricRep.h"
 #include "sscTypeConversions.h"
+#include "sscAcceptanceBoxWidget.h"
 
 //namespace ssc
 //{
@@ -92,6 +93,9 @@ int main(int argc, char **argv)
 	std::cout << "Uid       : " << image1->getUid() << std::endl;
 	
 	//QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit())); // terminate app after some seconds - this is an automated test!!
+
+	ssc::AcceptanceBoxWidget* acceptanceBox = new ssc::AcceptanceBoxWidget("OK / not OK", &mainWindow);
+	layout->addWidget(acceptanceBox);
 	
 	app.exec();
 
