@@ -30,8 +30,8 @@ SET( SOURCE_FILES
   sscPNNReconstructAlgorithm.cpp
   utils/sscReconstructHelper.h
   utils/sscReconstructHelper.cpp
-    sscUSFrameData.h
-    sscUSFrameData.cpp
+  sscUSFrameData.h
+  sscUSFrameData.cpp
       )
 
 # =========================================================
@@ -50,11 +50,6 @@ SET( cxPluginUSReconstructionLogic_LIB_FILES
 
 include_directories(
     .
-#    ${CustusX3_SOURCE_DIR}/source/resource
-#    ${CustusX3_SOURCE_DIR}/source/service/patient
-#    ${CustusX3_SOURCE_DIR}/source/service/tracking
-#    ${CustusX3_SOURCE_DIR}/source/resource/settings
-#    ${CustusX3_SOURCE_DIR}/source/resource/utilities
     )
 
 
@@ -65,13 +60,38 @@ IF( OPENCL_LIBRARIES )
 ELSE( OPENCL_LIBRARIES )
     option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" OFF)
 ENDIF( OPENCL_LIBRARIES )
-            
+
+# Thunder requires OpenCL - make it optional            
 if (USE_US_RECONSTRUCTION_THUNDER)
-    ADD_SUBDIRECTORY(Thunder)
     include_directories( Thunder )
-    link_directories( ${CMAKE_CURRENT_BINARY_DIR}/Thunder )
-    set( cxPluginUSReconstructionLogic_LIB_FILES thunder ${cxPluginUSReconstructionLogic_LIB_FILES} )
+    SET( SOURCE_FILES
+      ${SOURCE_FILES}    
+      Thunder/holger_time.h
+      Thunder/holger_time.cpp
+      Thunder/setup.h
+      Thunder/setup.cpp
+      Thunder/utils.h
+      Thunder/utils.cpp
+      Thunder/reconstruct_vnn.h
+      Thunder/reconstruct_vnn.cpp
+      Thunder/kernels.ocl    
+      )
     set(THUNDER_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Thunder)
+    
+    IF (APPLE) # mac
+      FIND_LIBRARY(OPENCL_LIBRARIES OpenCL DOC "OpenCL lib for OSX")
+      FIND_PATH(OPENCL_INCLUDE_DIR OpenCL/cl.h DOC "Include for OpenCL on OSX")
+    ELSEIF (WIN32) # windows
+      FIND_PATH(OPENCL_INCLUDE_DIR CL/cl.h )
+      FIND_LIBRARY(OPENCL_LIBRARIES opencl64 )
+      IF( OPENCL_LIBRARIES )
+          FIND_LIBRARY(OPENCL_LIBRARIES opencl32 )
+      ENDIF( OPENCL_LIBRARIES )
+      INCLUDE_DIRECTORIES( ${OPENCL_INCLUDE_DIR} )
+    ELSE (APPLE) # i.e. linux and similar
+    	FIND_PATH(OPENCL_INCLUDE_DIR CL/cl.h )
+    	FIND_LIBRARY(OPENCL_LIBRARIES OpenCL )
+    ENDIF (APPLE)    
 endif (USE_US_RECONSTRUCTION_THUNDER)
 
 configure_file(
@@ -82,6 +102,6 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 # =========================================================
 # create the target
 add_library( sscUS3DReconstruction ${SOURCE_FILES} )
-target_link_libraries( sscUS3DReconstruction ${cxPluginUSReconstructionLogic_LIB_FILES} )
+target_link_libraries( sscUS3DReconstruction ${cxPluginUSReconstructionLogic_LIB_FILES} ${OPENCL_LIBRARIES})
 # =========================================================
 
