@@ -706,7 +706,7 @@ void MainWindow::layoutChangedSlot()
     delete mLayoutActionGroup;
   mLayoutActionGroup = viewManager()->createLayoutActionGroup();
 
-  mLayoutMenu->clear();
+//  mLayoutMenu->clear(); // Clearing removes too much
   mLayoutMenu->addActions(mLayoutActionGroup->actions());
 
   bool editable = viewManager()->isCustomLayout(viewManager()->getActiveLayout());
