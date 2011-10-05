@@ -614,6 +614,7 @@ void Reconstructer::updateFromOriginalFileData()
 
 	mFileData = mOriginalFileData;
 	//  mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
+	mOriginalFileData.mUsRaw->setAngio(mParams->mAngioAdapter->getValue());
 	mFileData.mUsRaw->reinitialize();
 
 	// Only use this if the time stamps have different formatsh

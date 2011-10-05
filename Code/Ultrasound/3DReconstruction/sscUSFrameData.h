@@ -42,6 +42,7 @@ public:
 	QString getName();
 	QString getUid();
 	QString getFilePath();
+	void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
 
 private:
 	ImagePtr getBase();

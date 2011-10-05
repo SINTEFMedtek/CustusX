@@ -185,5 +185,9 @@ ImagePtr USFrameData::getBase()
 {
 	return mImage;
 }
+void USFrameData::setAngio(bool angio)
+{
+	mUseAngio = angio;
+}
 
 }//namespace ssc
