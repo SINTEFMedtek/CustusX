@@ -4,10 +4,7 @@
 #include <QWidget>
 #include "cxBaseWidget.h"
 #include "sscTool.h"
-//#include "cxDataInterface.h"
 #include "sscVideoRecorder.h"
-//#include "sscReconstructer.h"
-//#include "cxUsReconstructionFileMaker.h"
 #include "cxRecordSession.h"
 #include "cxAcquisitionData.h"
 

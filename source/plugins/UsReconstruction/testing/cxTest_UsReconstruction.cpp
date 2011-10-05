@@ -2,10 +2,12 @@
 
 #include <vtkImageData.h>
 #include "sscReconstructer.h"
+#include "sscReconstructManager.h"
 #include "sscImage.h"
 #include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscPNNReconstructAlgorithm.h"
 #include "cxDataLocations.h"
+#include "sscReconstructer.h"
 
 //#include "cxToolConfigurationParser.h"
 
@@ -21,19 +23,19 @@ void TestUsReconstruction::tearDown()
 
 void TestUsReconstruction::testConstructor()
 {
-  ssc::ReconstructerPtr reconstructer(new ssc::Reconstructer(ssc::XmlOptionFile(),""));
+  ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(ssc::XmlOptionFile(),""));
 }
 
 void TestUsReconstruction::testAngioReconstruction()
 {
 	std::cout << "testAngioReconstruction running" << std::endl;
-  ssc::ReconstructerPtr reconstructer(new ssc::Reconstructer(ssc::XmlOptionFile(),""));
-  QString filename = cx::DataLocations::getTestDataPath() + "/testing/USAngioTest.cx3/US_Acq/US-Acq_01_20110520T121038/US-Acq_01_20110520T121038.mhd";
+  ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(ssc::XmlOptionFile(),""));
+	QString filename = cx::DataLocations::getTestDataPath() + "/testing/USAngioTest.cx3/US_Acq/US-Acq_01_20110520T121038/US-Acq_01_20110520T121038.mhd";
   //reconstructer->mAlgorithmAdapter->setValue("PNN");//default
-  reconstructer->mAngioAdapter->setValue(true);
+  reconstructer->getParams()->mAngioAdapter->setValue(true);
 
-  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->mAlgorithm));// Check if we got the PNN algorithm
-  boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->mAlgorithm)->mInterpolationStepsOption->setValue(1);
+  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getAlgorithm()));// Check if we got the PNN algorithm
+  boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getAlgorithm())->mInterpolationStepsOption->setValue(1);
 
   reconstructer->selectData(filename);
   reconstructer->reconstruct();
@@ -64,12 +66,12 @@ void TestUsReconstruction::testAngioReconstruction()
 
 void TestUsReconstruction::testThunderGPUReconstruction()
 {
-  ssc::ReconstructerPtr reconstructer(new ssc::Reconstructer(ssc::XmlOptionFile(),""));
+  ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(ssc::XmlOptionFile(),""));
   QString filename = cx::DataLocations::getTestDataPath() + "/testing/USAngioTest.cx3/US_Acq/US-Acq_01_20110520T121038/US-Acq_01_20110520T121038.mhd";
-  reconstructer->mAlgorithmAdapter->setValue("ThunderVNN");
-  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->mAlgorithm));
-  boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->mAlgorithm)->mProcessorOption->setValue("GPU"); // Fails for AMD (most macs)
-//  boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->mAlgorithm)->mProcessorOption->setValue("CPU");
+  reconstructer->getParams()->mAlgorithmAdapter->setValue("ThunderVNN");
+  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm()));
+  boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm())->mProcessorOption->setValue("GPU");// Fails for AMD (most macs)
+//  boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm)->mProcessorOption->setValue("CPU");
   reconstructer->selectData(filename);
   reconstructer->reconstruct();
 

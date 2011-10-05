@@ -13,7 +13,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 SET( MOC_HEADER_FILES
-   sscReconstructer.h
+   sscReconstructManager.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -21,29 +21,20 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
-  matrixInterpolation.cpp
-  sscReconstructer.cpp
-  sscReconstructedOutputVolumeParams.h
-  sscReconstructAlgorithm.h
-  sscThunderVNNReconstructAlgorithm.h
-  sscThunderVNNReconstructAlgorithm.cpp
-  sscPNNReconstructAlgorithm.h
-  sscPNNReconstructAlgorithm.cpp
-  utils/sscReconstructHelper.h
-  utils/sscReconstructHelper.cpp
+  sscReconstructManager.cpp
+  sscReconstructManager.h
   )
 
 # =========================================================
 
 SET( cxPluginUSReconstructionLogic_LIB_FILES
     SSC
+    sscUS3DReconstruction
     cxUtilities 
     cxSettings
     cxUtilities
     cxPatientService
-    #thunder 
     cxTrackingService
-    ITKCommon
     )
 
 
@@ -55,32 +46,6 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
     )
-
-
-# 
-FIND_LIBRARY(OPENCL_LIBRARIES OpenCL)
-IF( OPENCL_LIBRARIES )
-    option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" ON)
-ELSE( OPENCL_LIBRARIES )
-    option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" OFF)
-ENDIF( OPENCL_LIBRARIES )
-            
-if (USE_US_RECONSTRUCTION_THUNDER)
-    ADD_SUBDIRECTORY(Thunder)
-    include_directories( Thunder )
-    link_directories( ${CMAKE_CURRENT_BINARY_DIR}/Thunder )
-    set( cxPluginUSReconstructionLogic_LIB_FILES thunder ${cxPluginUSReconstructionLogic_LIB_FILES} )
-    set(THUNDER_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Thunder)
-endif (USE_US_RECONSTRUCTION_THUNDER)
-
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h" )
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-#include_directories( Thunder
-#  ${CMAKE_CURRENT_BINARY_DIR}
-#)
-#link_directories( ${CMAKE_CURRENT_BINARY_DIR}/Thunder )
 
 # =========================================================
 # create the target
