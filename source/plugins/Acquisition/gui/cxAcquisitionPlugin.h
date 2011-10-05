@@ -13,7 +13,7 @@ class QDomNode;
 
 namespace ssc
 {
-typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
+typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 }
 
 namespace cx
@@ -28,7 +28,7 @@ class AcquisitionPlugin: public PluginBase
 {
 Q_OBJECT
 public:
-	AcquisitionPlugin(ssc::ReconstructerPtr reconstructer);
+	AcquisitionPlugin(ssc::ReconstructManagerPtr reconstructer);
 	virtual ~AcquisitionPlugin();
 
 	AcquisitionDataPtr getAcquisitionData()
