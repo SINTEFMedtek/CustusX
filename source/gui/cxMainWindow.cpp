@@ -693,10 +693,20 @@ void MainWindow::patientChangedSlot()
 void MainWindow::layoutChangedSlot()
 {
   // reset list of available layouts
+
+	//Make sure all actions in the group are deleted - possibly removes a few memory leaks
+	if(mLayoutActionGroup)
+	{
+		QList<QAction*> actionList = mLayoutActionGroup->actions();
+		for (int i = 0; i < actionList.size(); i++)
+			delete actionList.at(i);
+	}
+
   //if(mLayoutActionGroup)
     delete mLayoutActionGroup;
   mLayoutActionGroup = viewManager()->createLayoutActionGroup();
 
+  mLayoutMenu->clear();
   mLayoutMenu->addActions(mLayoutActionGroup->actions());
 
   bool editable = viewManager()->isCustomLayout(viewManager()->getActiveLayout());
