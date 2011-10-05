@@ -35,7 +35,7 @@ UsReconstructionFileReader::UsReconstructionFileReader()
  * the mMask var is filled with data from ProbeData, or from file if present.
  *
  */
-UsReconstructionFileReader::FileData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath, bool angio)
+ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath, bool angio)
 {
   if (calFilesPath.isEmpty())
   {
@@ -46,7 +46,7 @@ UsReconstructionFileReader::FileData UsReconstructionFileReader::readAllFiles(QS
 
 //  mFilename = fileName;
 //  mCalFilesPath = calFilesPath;
-  FileData retval;
+  ssc::USReconstructInputData retval;
 
   // ignore if a directory is read - store folder name only
   if (QFileInfo(fileName).suffix()!="mhd")
@@ -86,7 +86,7 @@ UsReconstructionFileReader::FileData UsReconstructionFileReader::readAllFiles(QS
   return retval;
 }
 
-ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(FileData data)
+ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(ssc::USReconstructInputData data)
 {
   vtkImageDataPtr mask = data.mProbeData.getMask();
   ssc::ImagePtr image = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
@@ -109,7 +109,7 @@ ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(FileData da
   return image;
 }
 
-ssc::ImagePtr UsReconstructionFileReader::generateMask(FileData data)
+ssc::ImagePtr UsReconstructionFileReader::generateMask(ssc::USReconstructInputData data)
 {
   Eigen::Array3i dim(data.mUsRaw->getDimensions());
   dim[2] = 1;
@@ -285,7 +285,7 @@ void UsReconstructionFileReader::readTimeStampsFile(QString fileName,
 
 //  if(i!=timedPos->size())
 //  {
-//    ssc::messageManager()->sendWarning(QString("Reconstructer::readTimeStampsFile() ")
+//    ssc::messageManager()->sendWarning(QString("ReconstructManager::readTimeStampsFile() ")
 //                                       + "timedPos->size(): "
 //                                       + qstring_cast(timedPos->size())
 //                                       + ", read number of time stamps: "
@@ -293,7 +293,7 @@ void UsReconstructionFileReader::readTimeStampsFile(QString fileName,
 //  }
 //  else
 //  {
-//    //std::cout << "Reconstructer::readTimeStampsFile() - succes. ";
+//    //std::cout << "ReconstructManager::readTimeStampsFile() - succes. ";
 //    //std::cout << "Number of time stamps: ";
 //    //std::cout << timedPos->size() << std::endl;
 //  }
@@ -320,6 +320,7 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
     }
 
     ssc::TimedPosition position;
+    position.mTime = 0;
     if (alsoReadTimestamps)
     {
       //old format - timestamps embedded in pos file);
@@ -359,11 +360,11 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
   //old format
   /*if(i!=numPos)
   {
-    std::cout << "Reconstructer::readPositionFile() - warning. ";
+    std::cout << "ReconstructManager::readPositionFile() - warning. ";
     std::cout << "numPos: " << numPos << ", read number of pos: ";
     std::cout << mPositions.size() << std::endl;
   }*/
-  //std::cout << "Reconstructer::readPositionFile() - succes. ";
+  //std::cout << "ReconstructManager::readPositionFile() - succes. ";
   //std::cout << "Number of positions: ";
   //std::cout << mPositions.size() << std::endl;
   return;

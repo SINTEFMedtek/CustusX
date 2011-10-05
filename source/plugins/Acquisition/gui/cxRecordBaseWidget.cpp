@@ -12,7 +12,7 @@
 #include "sscDataManager.h"
 #include "sscMesh.h"
 #include "sscTransform3D.h"
-#include "sscReconstructer.h"
+//#include "sscReconstructer.h"
 #include "cxRecordSessionWidget.h"
 #include "cxUsReconstructionFileMaker.h"
 #include "cxVideoConnection.h"

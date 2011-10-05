@@ -251,7 +251,6 @@ void VisualizationTab::init()
   mShowLabels = ssc::BoolDataAdapterXml::initialize("Show Labels", "",
                                                  "Attach name labels to entities in the views.",
                                                  showLabels);
-//  connect(mAngioAdapter.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
 
   double annotationModelSize = settings()->value("View3D/annotationModelSize").toDouble();
   mAnnotationModelSize = ssc::DoubleDataAdapterXml::initialize("AnnotationModelSize", "Annotation Model Size", "Size (0..1) of the annotation model in the 3D scene.", annotationModelSize, ssc::DoubleRange(0.01,1,0.01), 2, QDomNode());
