@@ -304,9 +304,9 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsRadiology() cons
   case ptAXIAL:       return std::make_pair(Vector3D( 1, 0, 0), Vector3D( 0,-1, 0));
   case ptCORONAL:     return std::make_pair(Vector3D( 1, 0, 0), Vector3D( 0, 0, 1));
   case ptSAGITTAL:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0, 1));
-  case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
+  case ptANYPLANE:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0,-1));
   case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
-  case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
+  case ptRADIALPLANE: return std::make_pair(Vector3D( 0, 1, 0), Vector3D(-1, 0, 0));
   default:
     throw std::exception();
   }
