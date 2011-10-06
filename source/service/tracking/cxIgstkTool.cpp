@@ -426,6 +426,9 @@ void IgstkTool::internalTracked(bool value)
     return;
   mTracked = value;
 
+  if(!mTracked && mVisible)
+    this->internalVisible(false); //Make sure tool is invisible when not tracked
+
   emit tracked(mTracked);
 }
 
