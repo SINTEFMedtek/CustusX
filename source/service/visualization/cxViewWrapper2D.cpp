@@ -15,6 +15,7 @@
 #include "sscSlicerRepSW.h"
 #include "sscTool2DRep.h"
 #include "sscOrientationAnnotationRep.h"
+#include "sscOrientationAnnotation2DRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
@@ -129,7 +130,7 @@ void ViewWrapper2D::global2DZoomActionSlot()
 void ViewWrapper2D::addReps()
 {
   // annotation rep
-  mOrientationAnnotationRep = ssc::OrientationAnnotationRep::New("annotationRep_"+mView->getName(), "annotationRep_"+mView->getName());
+  mOrientationAnnotationRep = ssc::OrientationAnnotationSmartRep::New("annotationRep_"+mView->getName(), "annotationRep_"+mView->getName());
   mView->addRep(mOrientationAnnotationRep);
 
   // plane type text rep
@@ -315,10 +316,11 @@ void ViewWrapper2D::showSlot()
 
 void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
 {
-  mOrientationAnnotationRep->setPlaneType(plane);
+//  mOrientationAnnotationRep->setPlaneType(plane);
   mPlaneTypeText->setText(0, qstring_cast(plane));
   double viewHeight = mView->heightMM() / this->getZoomFactor2D();
   mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), true, viewHeight, 0.25);
+  mOrientationAnnotationRep->setSliceProxy(mSliceProxy);
 
   // do this to force sync global and local type - must think on how we want this to work
   this->changeOrientationType(getOrientationType());
@@ -355,7 +357,7 @@ void ViewWrapper2D::orientationModeChanged()
   computer.switchOrientationMode(type);
 
   ssc::PLANE_TYPE plane = computer.getPlaneType();
-  mOrientationAnnotationRep->setPlaneType(plane);
+//  mOrientationAnnotationRep->setPlaneType(plane);
   mPlaneTypeText->setText(0, qstring_cast(plane));
   mSliceProxy->setComputer(computer);
 }
