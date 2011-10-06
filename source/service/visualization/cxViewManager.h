@@ -165,6 +165,7 @@ protected:
   ViewCache<ssc::View> mViewCacheRT;
   InteractiveClipperPtr mInteractiveClipper;
   InteractiveCropperPtr mInteractiveCropper;
+  ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
 
 private:
   ViewManager(ViewManager const&);
