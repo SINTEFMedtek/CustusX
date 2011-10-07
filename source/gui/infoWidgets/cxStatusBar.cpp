@@ -12,154 +12,158 @@
 #include <QPixmap>
 #include <QMetaObject>
 #include "cxVideoService.h"
+#include "boost/bind.hpp"
+#include "libQtSignalAdapters/Qt2Func.h"
+#include "libQtSignalAdapters/ConnectionFactories.h"
 
 namespace cx
 {
 StatusBar::StatusBar() :
-  mRenderingFpsLabel(new QLabel()),
-  mGrabbingInfoLabel(new QLabel()),
-  mTpsLabel(new QLabel())
+	mRenderingFpsLabel(new QLabel()), mGrabbingInfoLabel(new QLabel()), mTpsLabel(new QLabel())
 {
-  connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
+	connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(connectToToolSignals()));
-  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(disconnectFromToolSignals()));
-  connect(ssc::toolManager(), SIGNAL(tps(int)), this, SLOT(tpsSlot(int)));
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(receiveToolDominant()));
+	connect(ssc::toolManager(), SIGNAL(configured()),      this, SLOT(connectToToolSignals()));
+	connect(ssc::toolManager(), SIGNAL(deconfigured()),    this, SLOT(disconnectFromToolSignals()));
+	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateToolButtons()));
+	connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateToolButtons()));
 
-  connect(viewManager(), SIGNAL(fps(int)),this, SLOT(renderingFpsSlot(int)));
-  
-  connect(videoService()->getVideoConnection().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
-  connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
+	connect(ssc::toolManager(), SIGNAL(tps(int)), this, SLOT(tpsSlot(int)));
+	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolButtons()));
 
-  this->addPermanentWidget(mRenderingFpsLabel);
+	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
+
+	connect(videoService()->getVideoConnection().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
+	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
+
+	this->addPermanentWidget(mRenderingFpsLabel);
 }
 
 StatusBar::~StatusBar()
-{}
+{
+}
 
 void StatusBar::connectToToolSignals()
 {
-  this->addPermanentWidget(mTpsLabel);
+	this->addPermanentWidget(mTpsLabel);
 
-  ssc::ToolManager::ToolMapPtr initializedTools = ssc::toolManager()->getInitializedTools();
-  ssc::ToolManager::ToolMap::iterator it = initializedTools->begin();
-  for(;it != initializedTools->end(); ++it)
-  {
-    ssc::ToolPtr tool = it->second;
-    if(tool->getType() == ssc::Tool::TOOL_MANUAL)
-      continue;
-    if(tool == ToolManager::getInstance()->getManualTool())
-      continue;
-    connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveToolVisible()));
+	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
+	for (ssc::ToolManager::ToolMap::iterator it = tools->begin(); it != tools->end(); ++it)
+	{
+		ssc::ToolPtr tool = it->second;
+		if (tool->getType() == ssc::Tool::TOOL_MANUAL)
+			continue;
+		if (tool == ToolManager::getInstance()->getManualTool())
+			continue;
+		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
 
-    QString toolName = tool->getName();
+		ToolData current;
+		current.mTool = tool;
+		current.mAction.reset(new QAction(tool->getName(), NULL));
+		current.mAction->setToolTip("Press to set active");
 
-    QLabel* toolLabel = new QLabel(toolName);
-    this->setToolLabelColor(toolLabel, tool->getVisible(), ssc::toolManager()->getDominantTool()==tool);
-    this->addPermanentWidget(toolLabel);
-    mToolLabels.push_back(toolLabel);
-  }
+		QtSignalAdapters::connect0<void()>(
+			current.mAction.get(),
+			SIGNAL(triggered()),
+			boost::bind(&StatusBar::activateTool, this, tool->getUid()));
+
+		current.mButton.reset(new QToolButton);
+		current.mButton->setDefaultAction(current.mAction.get());
+		this->addPermanentWidget(current.mButton.get());
+		mToolData.push_back(current);
+	}
+
+	this->updateToolButtons();
 }
 
 void StatusBar::disconnectFromToolSignals()
 {
-  this->removeWidget(mTpsLabel);
-  ssc::ToolManager::ToolMapPtr initializedTools = ssc::toolManager()->getInitializedTools();
-  ssc::ToolManager::ToolMap::iterator toolIt = initializedTools->begin();
-  for(;toolIt != initializedTools->end(); ++toolIt)
-  {
-    disconnect(toolIt->second.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveToolVisible()));
-  }
-  for(unsigned i=0; i<mToolLabels.size(); ++i)
-  {
-    QLabel* toolLabel = mToolLabels[i];
-    this->removeWidget(toolLabel);
-    delete toolLabel;
-  }
-  mToolLabels.clear();
+	this->removeWidget(mTpsLabel);
+
+	for (unsigned i = 0; i < mToolData.size(); ++i)
+	{
+		ToolData current = mToolData[i];
+
+		disconnect(current.mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
+		this->removeWidget(current.mButton.get());
+	}
+	mToolData.clear();
 }
 
-void StatusBar::receiveToolVisible()
+
+void StatusBar::activateTool(QString uid)
 {
-  ssc::Tool* tool = dynamic_cast<ssc::Tool*>(this->sender());
-  this->colorTool(tool);
+	ssc::toolManager()->setDominantTool(uid);
 }
 
-void StatusBar::receiveToolDominant()
+void StatusBar::updateToolButtons()
 {
-  ssc::ToolManager::ToolMapPtr initializedTools = ssc::toolManager()->getInitializedTools();
-  ssc::ToolManager::ToolMap::iterator it = initializedTools->begin();
-  for(;it != initializedTools->end(); ++it)
-  {
-    ssc::ToolPtr tool = it->second;
-    this->colorTool(tool.get());
-  }
+	ssc::ToolPtr dominant = ssc::toolManager()->getDominantTool();
+
+	for (unsigned i = 0; i < mToolData.size(); ++i)
+	{
+		ToolData current = mToolData[i];
+		ssc::ToolPtr tool = current.mTool;
+		QString color = this->getToolStyle(tool->getVisible(), tool->isInitialized(), dominant == tool);
+		current.mButton->setStyleSheet(QString("QToolButton { %1; }").arg(color));
+
+		if (!tool->isInitialized())
+			current.mAction->setToolTip("Tool is not Initialized");
+		else if (dominant == tool)
+			current.mAction->setToolTip("Active Tool");
+		else if (tool->getVisible())
+			current.mAction->setToolTip("Tool not visible/not tracking");
+		else
+			current.mAction->setToolTip("Tool visible. Press to set as active");
+	}
 }
 
-void StatusBar::colorTool(ssc::Tool* tool)
+QString StatusBar::getToolStyle(bool visible, bool initialized, bool dominant)
 {
-  if(!tool)
-  {
-    ssc::messageManager()->sendWarning("Could not determine which tool changed visibility.");
-    return;
-  }
+	if (!initialized)
+		return QString("background-color: silver");
 
-  QString name = tool->getName();
-  for(unsigned i=0; i<mToolLabels.size(); ++i)
-  {
-    QLabel* toolLabel = mToolLabels[i];
-    if(toolLabel->text().compare(name, Qt::CaseInsensitive) == 0)
-      this->setToolLabelColor(toolLabel, tool->getVisible(), ssc::toolManager()->getDominantTool().get()==tool);
-  }
-}
+	if (visible)
+	{
+		if (dominant)
+			return QString("background-color: lime");
+		else
+			return QString("background-color: limegreen");
+	}
 
-void StatusBar::setToolLabelColor(QLabel* label, bool visible, bool dominant)
-{
-  QString color;
-  if(visible)
-  {
-    if (dominant)
-      color = QString("QLabel { background-color: lime }");
-    else
-      color = QString("QLabel { background-color: green }");
-  }
-  else
-    color = QString("QLabel { background-color: red }");
-
-  label->setStyleSheet(color);
+	return QString("background-color: orangered");
 }
 
 void StatusBar::renderingFpsSlot(int numFps)
 {
-  QString fpsString = "FPS: "+QString::number(numFps);
-  mRenderingFpsLabel->setText(fpsString);
+	QString fpsString = "FPS: " + QString::number(numFps);
+	mRenderingFpsLabel->setText(fpsString);
 }
 
 void StatusBar::tpsSlot(int numTps)
 {
-  QString tpsString = "TPS: "+QString::number(numTps);
-  mTpsLabel->setText(tpsString);
+	QString tpsString = "TPS: " + QString::number(numTps);
+	mTpsLabel->setText(tpsString);
 }
 
 void StatusBar::grabbingFpsSlot(int numFps)
 {
-  OpenIGTLinkRTSourcePtr grabber = videoService()->getVideoConnection()->getVideoSource();
-  QString infoString = grabber->getName()+"-FPS: "+QString::number(numFps);
-  mGrabbingInfoLabel->setText(infoString);
+	OpenIGTLinkRTSourcePtr grabber = videoService()->getVideoConnection()->getVideoSource();
+	QString infoString = grabber->getName() + "-FPS: " + QString::number(numFps);
+	mGrabbingInfoLabel->setText(infoString);
 }
 
 void StatusBar::grabberConnectedSlot(bool connected)
 {
-  if(connected)
-    this->addPermanentWidget(mGrabbingInfoLabel);
-  else
-    this->removeWidget(mGrabbingInfoLabel);
+	if (connected)
+		this->addPermanentWidget(mGrabbingInfoLabel);
+	else
+		this->removeWidget(mGrabbingInfoLabel);
 }
 
 void StatusBar::showMessageSlot(Message message)
 {
-  this->showMessage(message.getPrintableMessage(), message.getTimeout());
+	this->showMessage(message.getPrintableMessage(), message.getTimeout());
 }
 
 }//namespace cx
