@@ -391,11 +391,16 @@ void AutomationTab::init()
   mAutoReconstructCheckBox = new QCheckBox("Auto Reconstruct");
   mAutoReconstructCheckBox->setChecked(autoReconstruct);
 
+  bool autoSelectDominantTool = settings()->value("Automation/autoSelectDominantTool").toBool();
+  mAutoSelectDominantToolCheckBox = new QCheckBox("Auto Select Active Tool");
+  mAutoSelectDominantToolCheckBox->setChecked(autoSelectDominantTool);
+
   //Layout
   mMainLayout = new QVBoxLayout;
   mMainLayout->addWidget(mAutoStartTrackingCheckBox);
   mMainLayout->addWidget(mAutoStartStreamingCheckBox);
   mMainLayout->addWidget(mAutoReconstructCheckBox);
+  mMainLayout->addWidget(mAutoSelectDominantToolCheckBox);
 
   mTopLayout->addLayout(mMainLayout);
 
@@ -406,6 +411,7 @@ void AutomationTab::saveParametersSlot()
   settings()->setValue("Automation/autoStartTracking", mAutoStartTrackingCheckBox->isChecked());
   settings()->setValue("Automation/autoStartStreaming", mAutoStartStreamingCheckBox->isChecked());
   settings()->setValue("Automation/autoReconstruct", mAutoReconstructCheckBox->isChecked());
+  settings()->setValue("Automation/autoSelectDominantTool", mAutoSelectDominantToolCheckBox->isChecked());
 }
 
 //==============================================================================
