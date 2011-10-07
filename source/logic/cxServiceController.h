@@ -17,15 +17,14 @@
 namespace cx
 {
 
-
 /**ServiceController handles all connections between the existing
  * services, in order to keep them independent of each other.
  *
  * Owned by the LogicManager.
  */
-class ServiceController : public QObject
+class ServiceController: public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
 	ServiceController();

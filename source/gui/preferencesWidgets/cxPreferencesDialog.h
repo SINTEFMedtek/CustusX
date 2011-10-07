@@ -180,6 +180,7 @@ public slots:
 
 
 protected:
+  QCheckBox* mAutoSelectDominantToolCheckBox;
   QCheckBox* mAutoStartTrackingCheckBox;
   QCheckBox* mAutoStartStreamingCheckBox;
   QCheckBox* mAutoReconstructCheckBox;
