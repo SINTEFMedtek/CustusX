@@ -19,81 +19,83 @@ namespace cx
  * \author: Janne Beate Bakeng
  */
 
-class BaseWidget : public QWidget
+class BaseWidget: public QWidget
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
-  BaseWidget(QWidget* parent, QString objectName, QString windowTitle) :
-    QWidget(parent), mObjectName(objectName),mWindowTitle(windowTitle)
-  {
-    this->setObjectName(mObjectName);
-    this->setWindowTitle(mWindowTitle);
-  };
+	BaseWidget(QWidget* parent, QString objectName, QString windowTitle) :
+		QWidget(parent), mObjectName(objectName), mWindowTitle(windowTitle)
+	{
+		this->setObjectName(mObjectName);
+		this->setWindowTitle(mWindowTitle);
+	}
 
-  virtual ~BaseWidget(){};
-  virtual QString defaultWhatsThis() const = 0; ///< Returns a short description of what this widget will do for you.
+	virtual ~BaseWidget() {}
+	virtual QString defaultWhatsThis() const = 0; ///< Returns a short description of what this widget will do for you.
 
-  QWidget* createMethodWidget(QWidget* inputWidget, QWidget* outputWidget, QString methodname, bool inputChecked = false, bool outputVisible = true)
-  {
-    QWidget* retval = new QWidget(this);
-    QVBoxLayout* toplayout = new QVBoxLayout(retval);
-    QGridLayout* layout = new QGridLayout();
-    toplayout->addLayout(layout);
-    toplayout->addStretch();
+	QWidget* createMethodWidget(QWidget* inputWidget, QWidget* outputWidget, QString methodname, bool inputChecked =
+		false, bool outputVisible = true)
+	{
+		QWidget* retval = new QWidget(this);
+		QVBoxLayout* toplayout = new QVBoxLayout(retval);
+		QGridLayout* layout = new QGridLayout();
+		toplayout->addLayout(layout);
+		toplayout->addStretch();
 
-    QLabel* methodLabel = new QLabel("<b>"+methodname+"</b>");
-    QCheckBox* checkBox = new QCheckBox("generate");
+		QLabel* methodLabel = new QLabel("<b>" + methodname + "</b>");
+		QCheckBox* checkBox = new QCheckBox("generate");
 
-    inputWidget->setVisible(inputChecked);
-    outputWidget->setVisible(outputVisible);
-    connect(checkBox, SIGNAL(clicked(bool)), inputWidget, SLOT(setVisible(bool)));
+		inputWidget->setVisible(inputChecked);
+		outputWidget->setVisible(outputVisible);
+		connect(checkBox, SIGNAL(clicked(bool)), inputWidget, SLOT(setVisible(bool)));
 
-    layout->addWidget(methodLabel, 0, 0);
-    layout->addWidget(checkBox, 0, 1);
-    layout->addWidget(inputWidget, 1, 0, 1, 2);
-    layout->addWidget(outputWidget, 2, 0, 1, 2);
+		layout->addWidget(methodLabel, 0, 0);
+		layout->addWidget(checkBox, 0, 1);
+		layout->addWidget(inputWidget, 1, 0, 1, 2);
+		layout->addWidget(outputWidget, 2, 0, 1, 2);
 
-    return retval;
-  }
+		return retval;
+	}
 
-  QGroupBox* createGroupbox(QWidget* widget, QString boxname)
-  {
-    QGroupBox* retval = new QGroupBox(this);
-    QVBoxLayout* toplayout = new QVBoxLayout(retval);
+	QGroupBox* createGroupbox(QWidget* widget, QString boxname)
+	{
+		QGroupBox* retval = new QGroupBox(this);
+		QVBoxLayout* toplayout = new QVBoxLayout(retval);
 
-    QLabel* nameLabel = new QLabel(boxname);
-    toplayout->addWidget(nameLabel);
-    toplayout->addWidget(widget);
+		QLabel* nameLabel = new QLabel(boxname);
+		toplayout->addWidget(nameLabel);
+		toplayout->addWidget(widget);
 
-    return retval;
-  }
+		return retval;
+	}
 
-  QFrame* createHorizontalLine() ///< creates a horizontal line witch can be inserted into widgets
-  {
-    QFrame* retval = new QFrame();
-    retval->setFrameStyle( QFrame::Sunken + QFrame::HLine );
-    retval->setFixedHeight( 12 );
-    return retval;
-  }
+	QFrame* createHorizontalLine() ///< creates a horizontal line witch can be inserted into widgets
+	{
+		QFrame* retval = new QFrame();
+		retval->setFrameStyle(QFrame::Sunken + QFrame::HLine);
+		retval->setFixedHeight(12);
+		return retval;
+	}
 
 public slots:
-  void adjustSizeSlot()
-  {
-    this->parentWidget()->adjustSize();
-    this->adjustSize();
-  }
+	void adjustSizeSlot()
+	{
+		this->parentWidget()->adjustSize();
+		this->adjustSize();
+	}
 
 protected:
-  virtual void showEvent(QShowEvent* event)
-  {
-    this->setWhatsThis(this->defaultWhatsThis());
-    QWidget::showEvent(event);
-  }
+	virtual void showEvent(QShowEvent* event)
+	{
+		this->setWhatsThis(this->defaultWhatsThis());
+		QWidget::showEvent(event);
+	}
 
 private:
-  QString mObjectName;
-  QString mWindowTitle;
+	QString mObjectName;
+	QString mWindowTitle;
 };
+
 }
 #endif /* CXBASEWIDGET_H_ */
