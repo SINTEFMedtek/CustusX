@@ -13,13 +13,15 @@ public:
 	void setUp();
 	void tearDown();
 
-	void testConstructor();
-	void testAngioReconstruction();//Test reconstruction of US angio data (#318)
-	void testThunderGPUReconstruction();//Test Thunder GPU reconstruction
+	void testSlerpInterpolation();///< Test position matrix slerp interpolation
+	void testConstructor();///< Test reconstructer constructor
+	void testAngioReconstruction();///< Test reconstruction of US angio data (#318)
+	void testThunderGPUReconstruction();///< Test Thunder GPU reconstruction
 
 public:
 	CPPUNIT_TEST_SUITE( TestUsReconstruction );
 		CPPUNIT_TEST( testConstructor );
+		CPPUNIT_TEST( testSlerpInterpolation );
 		CPPUNIT_TEST( testAngioReconstruction );
 		CPPUNIT_TEST( testThunderGPUReconstruction );
 	CPPUNIT_TEST_SUITE_END();
