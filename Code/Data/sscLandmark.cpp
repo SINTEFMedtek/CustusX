@@ -58,6 +58,19 @@ void Landmark::parseXml(QDomNode& dataNode)
 	mTimestamp = QDateTime::fromString(dataNode.namedItem("timestamp").toElement().text(), timestampSecondsFormat());
 }
 
+bool operator<(const Landmark& lhs, const Landmark& rhs)
+{
+	// attempts an integer comparison; otherwise revert to lexiographical
+	bool ok = true;
+	int i_lhs = lhs.getUid().toInt(&ok);
+	int i_rhs = rhs.getUid().toInt(&ok);
+	if (ok)
+		return i_lhs < i_rhs;
+
+	return lhs.getUid() < rhs.getUid();
+}
+
+
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
