@@ -130,7 +130,6 @@ private:
   bool mConfigured; ///< whether or not the system is configured
   bool mInitialized; ///< whether or not the system is initialized
   bool mTracking; ///< whether or not the system is tracking
-  bool mDominantToolCheckActive; ///< Automatic selection of dominant tool
 
   ssc::LandmarkMap mLandmarks; ///< in space patient reference.
   double mLastLoadPositionHistory;
