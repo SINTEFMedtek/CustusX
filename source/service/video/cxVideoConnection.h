@@ -9,10 +9,8 @@
 
 #include <vector>
 #include <QtGui>
-//#include "sscDoubleWidgets.h"
 #include "sscView.h"
 #include "cxOpenIGTLinkRTSource.h"
-//#include "cxProbe.h"
 #include "cxRenderTimer.h"
 
 namespace cx
@@ -25,57 +23,55 @@ namespace cx
  * GUI can be found in cxIGTLinkWidget (along with some additional functionality...)
  *
  */
-class VideoConnection : public QObject
+class VideoConnection: public QObject
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  VideoConnection();
-  virtual ~VideoConnection();
+	VideoConnection();
+	virtual ~VideoConnection();
 
-  void setLocalServerCommandLine(QString commandline);
-  QString getLocalServerCommandLine();
-  void setPort(int port);
-  int getPort();
-  QStringList getHostHistory();
-  QString getHost();
-  void setHost(QString host);
+	void setLocalServerCommandLine(QString commandline);
+	QString getLocalServerCommandLine();
+	void setPort(int port);
+	int getPort();
+	QStringList getHostHistory();
+	QString getHost();
+	void setHost(QString host);
 
-  void setUseLocalServer(bool use);
-  bool getUseLocalServer();
+	void setUseLocalServer(bool use);
+	bool getUseLocalServer();
 
-  void launchServer();
+	void launchServer();
 
-  void launchAndConnectServer();
+	void launchAndConnectServer();
 
-  QProcess* getProcess() { return mServer; }
-  OpenIGTLinkRTSourcePtr getVideoSource() { return mRTSource; }
-//  ssc::ToolPtr getStreamingProbe();
-
-//public slots:
-//  void connectVideoToProbe(ssc::ToolPtr tool);
+	QProcess* getProcess()
+	{
+		return mServer;
+	}
+	OpenIGTLinkRTSourcePtr getVideoSource()
+	{
+		return mRTSource;
+	}
 
 signals:
-  void fps(int fps);
-  void connected(bool on);
+	void fps(int fps);
+	void connected(bool on);
 
 public slots:
-  void connectServer();
+	void connectServer();
 
 private slots:
-  void serverProcessStateChanged(QProcess::ProcessState newState);
-  void serverProcessError(QProcess::ProcessError error);
-//  void connectSourceToTool();
-//  void probeChangedSlot();
+	void serverProcessStateChanged(QProcess::ProcessState newState);
+	void serverProcessError(QProcess::ProcessError error);
 
 private:
-  void delayedAutoConnectServer();
-//  ssc::ToolPtr findSuitableProbe();
+	void delayedAutoConnectServer();
 
-//  ssc::ToolPtr mProbe;
-  double mSoundSpeedCompensationFactor;
-  OpenIGTLinkRTSourcePtr mRTSource;
-  QProcess* mServer;
-  int mConnectWhenLocalServerRunning;
+	double mSoundSpeedCompensationFactor;
+	OpenIGTLinkRTSourcePtr mRTSource;
+	QProcess* mServer;
+	int mConnectWhenLocalServerRunning;
 };
 typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 
