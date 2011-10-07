@@ -102,7 +102,6 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPt
  */
 void ReconstructionWidget::repopulateAlgorithmGroup()
 {
-	std::cout << "ReconstructionWidget::repopulateAlgorithmGroup()" << std::endl;
 	QString algoName = mReconstructer->getParams()->mAlgorithmAdapter->getValue();
 
 	if (algoName == mAlgorithmGroup->title())
