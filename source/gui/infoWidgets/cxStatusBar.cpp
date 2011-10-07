@@ -45,6 +45,8 @@ StatusBar::~StatusBar()
 
 void StatusBar::connectToToolSignals()
 {
+	this->disconnectFromToolSignals(); // avoid duplicates
+
 	this->addPermanentWidget(mTpsLabel);
 
 	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
@@ -128,7 +130,7 @@ QString StatusBar::getToolStyle(bool visible, bool initialized, bool dominant)
 		if (dominant)
 			return QString("background-color: lime");
 		else
-			return QString("background-color: limegreen");
+			return QString("background-color: green");
 	}
 
 	return QString("background-color: orangered");
