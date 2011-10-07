@@ -80,6 +80,8 @@ public:
 	void setOutputRelativePath(QString path);
 	void setOutputBasePath(QString path);
 	void clearAll();
+	Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
+	Transform3D slerpInterpolate(const Transform3D& a, const Transform3D& b, double t);
 
 public slots:
 	void setSettings();
@@ -106,7 +108,6 @@ private:
 	void findExtentAndOutputTransform();
 	void transformPositionsTo_prMu();
 
-	Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
 	void alignTimeSeries();
 	void applyTimeCalibration();
 	void calibrateTimeStamps(double timeOffset, double scale);

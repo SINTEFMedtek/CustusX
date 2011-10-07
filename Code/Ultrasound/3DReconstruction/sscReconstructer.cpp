@@ -272,6 +272,30 @@ Transform3D Reconstructer::interpolate(const Transform3D& a, const Transform3D& 
 }
 
 /**
+ * Interpolation between a and b
+ * Spherical interpolation of the rotation, and linear interpolation of the position.
+ * Uses Quaternion Slerp, so the rotational part of the matrix have to be converted to
+ * Quaternion before the interpolation (and back again afterwards).
+ */
+Transform3D Reconstructer::slerpInterpolate(const Transform3D& a, const Transform3D& b, double t)
+{
+	//Convert input transforms to Quaternions
+	Eigen::Quaterniond aq = Eigen::Quaterniond(a.matrix().block<3, 3>(0,0));
+	Eigen::Quaterniond bq = Eigen::Quaterniond(b.matrix().block<3, 3>(0,0));
+
+	Eigen::Quaterniond cq = aq.slerp(t, bq);
+
+	Transform3D c;
+	c.matrix().block<3, 3>(0, 0) = Eigen::Matrix3d(cq);
+
+
+	for (int i = 0; i < 4; i++)
+//		for (int j = 0; j < 4; j++)
+		c(i, 3) = (1 - t) * a(i, 3) + t * b(i, 3);
+	return c;
+}
+
+/**
  * Find interpolated position values for each frame based on the input position
  * data.
  * Current implementation: 
@@ -316,8 +340,8 @@ void Reconstructer::interpolatePositions()
 			if (!similar(t_delta_tracking, 0))
 				t = (mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime) / t_delta_tracking;
 			//    mFrames[i_frame].mPos = mPositions[i_pos].mPos;
-			mFileData.mFrames[i_frame].mPos = interpolate(mFileData.mPositions[i_pos].mPos, mFileData.mPositions[i_pos
-				+ 1].mPos, t);
+//			mFileData.mFrames[i_frame].mPos = interpolate(mFileData.mPositions[i_pos].mPos, mFileData.mPositions[i_pos + 1].mPos, t);
+			mFileData.mFrames[i_frame].mPos = slerpInterpolate(mFileData.mPositions[i_pos].mPos, mFileData.mPositions[i_pos + 1].mPos, t);
 			i_frame++;// Only increment if we didn't delete the frame
 		}
 	}
