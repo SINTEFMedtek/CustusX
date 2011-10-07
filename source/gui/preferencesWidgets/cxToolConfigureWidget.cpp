@@ -103,6 +103,9 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
   if(!mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), sEdited).toBool())
     return retval;
 
+  // deconfigure toolmanager in order to be able to reread config data
+  ToolManager::getInstance()->deconfigure();
+
   ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
   ConfigurationFileParser::saveConfiguration(config);
 
