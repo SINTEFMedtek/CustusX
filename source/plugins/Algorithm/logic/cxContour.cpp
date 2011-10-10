@@ -23,16 +23,18 @@ Contour::Contour() :
 Contour::~Contour()
 {}
 
-void Contour::setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, double decimation, bool reduceResolution, bool smoothing)
+void Contour::setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, double decimation,
+		bool reduceResolution, bool smoothing, bool preserveTopology)
 {
-  mInput = image;
-  mOutputBasePath = outputBasePath;
-  mThreshold = threshold;
-  mDecimation = decimation;
-  mUseReduceResolution = reduceResolution;
-  mUseSmoothing = smoothing;
+	mInput = image;
+	mOutputBasePath = outputBasePath;
+	mThreshold = threshold;
+	mDecimation = decimation;
+	mUseReduceResolution = reduceResolution;
+	mUseSmoothing = smoothing;
+	mPreserveTopology = preserveTopology;
 
-  this->generate();
+	this->generate();
 }
 
 ssc::MeshPtr Contour::getOutput()
@@ -110,7 +112,8 @@ vtkPolyDataPtr Contour::calculate()
     trifilt->Update();
     deci->SetInput(trifilt->GetOutput());
     deci->SetTargetReduction(mDecimation);
-    deci->PreserveTopologyOn();
+    deci->SetPreserveTopology(mPreserveTopology);
+//    deci->PreserveTopologyOn();
     deci->Update();
     cubesPolyData = deci->GetOutput();
   }

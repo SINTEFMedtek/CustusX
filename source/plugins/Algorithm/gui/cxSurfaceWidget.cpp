@@ -23,6 +23,7 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     BaseWidget(parent, "SurfaceWidget", "Surface"),
     mReduceResolution(false),
     mSmoothing(true),
+    mPreserveTopology(true),
     mDefaultColor("red"),
     mStatusLabel(new QLabel(""))
 {
@@ -82,7 +83,8 @@ void SurfaceWidget::surfaceSlot()
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   double decimation = mDecimationAdapter->getValue()/100;
 
-  mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThresholdAdapter->getValue(), decimation, mReduceResolution, mSmoothing);
+  mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThresholdAdapter->getValue(),
+  		decimation, mReduceResolution, mSmoothing, mPreserveTopology);
 
   mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
 }
@@ -108,6 +110,12 @@ void SurfaceWidget::smoothingSlot(bool value)
 {
   mSmoothing = value;
 }
+
+void SurfaceWidget::preserveSlot(bool value)
+{
+	mPreserveTopology = value;
+}
+
 void SurfaceWidget::imageChangedSlot(QString uid)
 {
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
@@ -135,6 +143,10 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
       "Reduce number of triangles in output surface",
       80.0, ssc::DoubleRange(0, 100, 1), 0);
 
+  QCheckBox* preserveCheckBox = new QCheckBox("Preserve mesh topology");
+  preserveCheckBox->setChecked(mPreserveTopology);
+  connect(preserveCheckBox, SIGNAL(toggled(bool)), this, SLOT(preserveSlot(bool)));
+
   QCheckBox* reduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
   reduceResolutionCheckBox->setChecked(mReduceResolution);
   connect(reduceResolutionCheckBox, SIGNAL(toggled(bool)), this, SLOT(reduceResolutionSlot(bool)));
@@ -151,6 +163,7 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
   layout->addWidget(reduceResolutionCheckBox);
   layout->addWidget(outputLabel);
   layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mDecimationAdapter));
+  layout->addWidget(preserveCheckBox);
   layout->addWidget(smoothingCheckBox);
 
   return retval;
