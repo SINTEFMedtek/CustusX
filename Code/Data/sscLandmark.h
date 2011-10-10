@@ -37,6 +37,9 @@ private:
 };
 typedef std::map<QString, Landmark> LandmarkMap;
 
+bool operator<(const Landmark& lhs, const Landmark& rhs);
+
+
 class LandmarkProperty
 {
 public:
