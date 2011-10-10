@@ -17,6 +17,7 @@ namespace cx
 BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* parent) :
   BaseWidget(parent, "BinaryThresholdImageFilterWidget", "Binary Threshold Image Filter"),
   mBinary(false),
+  mSurface(true),
   mUseSmothing(false),
   mDefaultColor("red"),
   mStatusLabel(new QLabel(""))
@@ -121,7 +122,8 @@ void BinaryThresholdImageFilterWidget::handleFinishedSlot()
   if(!segmentedImage)
     return;
 
-  this->generateSurface();
+  if (mSurface)
+  	this->generateSurface();
 //  mStatusLabel->setText("<font color=green> Done. </font>\n");
 //  emit outputImageChanged(segmentedImage->getUid());
 }
@@ -217,6 +219,11 @@ void BinaryThresholdImageFilterWidget::thresholdSlot()
   mRemoveTimer->start(1000);
 }
 
+void BinaryThresholdImageFilterWidget::toogleSurfaceSlot(bool on)
+{
+  mSurface = on;
+}
+
 void BinaryThresholdImageFilterWidget::toogleSmoothingSlot(bool on)
 {
   mUseSmothing = on;
@@ -257,6 +264,11 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
   QLabel* binaryLabel = new QLabel("Binary");
   connect(binaryCheckbox, SIGNAL(toggled(bool)), this, SLOT(toogleBinarySlot(bool)));
 
+  QCheckBox* surfaceCheckBox = new QCheckBox();
+  surfaceCheckBox->setChecked(mSurface);
+  QLabel* surfaceLabel = new QLabel("Generate surface");
+  connect(surfaceCheckBox, SIGNAL(toggled(bool)), this, SLOT(toogleSurfaceSlot(bool)));
+
   QCheckBox* smoothingCheckBox = new QCheckBox();
   smoothingCheckBox->setChecked(mUseSmothing);
   QLabel* smoothingLabel = new QLabel("Smoothing");
@@ -270,10 +282,14 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
   QHBoxLayout* binaryLayout = new QHBoxLayout();
   binaryLayout->addWidget(binaryCheckbox);
   binaryLayout->addWidget(binaryLabel);
+  QHBoxLayout* surfaceLayout = new QHBoxLayout();
+  surfaceLayout->addWidget(surfaceCheckBox);
+  surfaceLayout->addWidget(surfaceLabel);
   QHBoxLayout* smoothingLayout = new QHBoxLayout();
   smoothingLayout->addWidget(smoothingCheckBox);
   smoothingLayout->addWidget(smoothingLabel);
   layout->addLayout(binaryLayout);
+  layout->addLayout(surfaceLayout);
   layout->addLayout(smoothingLayout);
 
   mSmoothingSigmaWidget = ssc::SpinBoxAndSliderGroupWidgetPtr(new ssc::SpinBoxAndSliderGroupWidget(this, mSmoothingSigmaAdapter));
@@ -282,6 +298,7 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
 
   this->toogleBinarySlot(mBinary);
   this->thresholdSlot();
+  this->toogleSurfaceSlot(mSurface);
   this->toogleSmoothingSlot(mUseSmothing);
 
   return retval;

@@ -50,6 +50,7 @@ private slots:
   void segmentSlot();
   void toogleBinarySlot(bool on);
   void thresholdSlot();
+  void toogleSurfaceSlot(bool on);
   void toogleSmoothingSlot(bool on);
   void imageChangedSlot(QString uid);
   void revertTransferFunctions();
@@ -65,6 +66,7 @@ private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
 
   bool mBinary; ///< whether or not the segmentation should create a binary volume
+  bool mSurface; ///< Create a surface of the segmented volume
   bool mUseSmothing; ///< whether or not the volume should be smoothed
 
   ssc::DoubleDataAdapterXmlPtr mSegmentationThresholdAdapter;
