@@ -20,7 +20,8 @@
 #include "sscImage.h"
 
 const unsigned int Dimension = 3;
-typedef unsigned short PixelType;
+//typedef unsigned short PixelType;
+typedef short PixelType; //short will probably work in most cases, but int may be needed
 typedef itk::Image< PixelType, Dimension >  itkImageType;
 typedef itk::ImageToVTKImageFilter<itkImageType> itkToVtkFilterType;
 typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
