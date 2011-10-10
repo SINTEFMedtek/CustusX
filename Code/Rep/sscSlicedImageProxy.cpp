@@ -131,6 +131,7 @@ void SlicedImageProxy::setImage(ImagePtr image)
 		}
 		else // grayscale
 		{
+			mReslicer->SetBackgroundLevel(mImage->getMin());
 		 	mRedirecter->SetInput(mWindowLevel->GetOutput());						
 		}
 
