@@ -15,6 +15,7 @@
 #include "sscSlicerRepSW.h"
 #include "sscTool2DRep.h"
 #include "sscOrientationAnnotationRep.h"
+#include "sscOrientationAnnotation2DRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
@@ -29,6 +30,7 @@
 #include "sscTexture3DSlicerRep.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
+#include "sscGLHelpers.h"
 
 namespace cx
 {
@@ -58,6 +60,8 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
   connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
   connect(mView, SIGNAL(mouseMoveSignal(QMouseEvent*)), this, SLOT(mouseMoveSlot(QMouseEvent*)));
   connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(mouseWheelSlot(QWheelEvent*)));
+
+  this->updateView();
 }
 
 ViewWrapper2D::~ViewWrapper2D()
@@ -129,7 +133,7 @@ void ViewWrapper2D::global2DZoomActionSlot()
 void ViewWrapper2D::addReps()
 {
   // annotation rep
-  mOrientationAnnotationRep = ssc::OrientationAnnotationRep::New("annotationRep_"+mView->getName(), "annotationRep_"+mView->getName());
+  mOrientationAnnotationRep = ssc::OrientationAnnotationSmartRep::New("annotationRep_"+mView->getName(), "annotationRep_"+mView->getName());
   mView->addRep(mOrientationAnnotationRep);
 
   // plane type text rep
@@ -148,11 +152,6 @@ void ViewWrapper2D::addReps()
   // slice rep
 #ifdef USE_2D_GPU_RENDER
 //  this->resetMultiSlicer(); ignore until addimage
-
-//  mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_"+mView->getName());
-//  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
-//  mMultiSliceRep->setSliceProxy(mSliceProxy);
-//  mView->addRep(mMultiSliceRep);
 #else
   mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
   mSliceRep->setSliceProxy(mSliceProxy);
@@ -186,16 +185,15 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
  */
 void ViewWrapper2D::resetMultiSlicer()
 {
-  if (mMultiSliceRep)
-    mView->removeRep(mMultiSliceRep);
-  mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_"+mView->getName());
-//  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
-  mMultiSliceRep->setShaderFile(DataLocations::getShaderPath()+"/Texture3DOverlay.frag");
-  mMultiSliceRep->setSliceProxy(mSliceProxy);
-  mView->addRep(mMultiSliceRep);
-  if (mViewGroup)
-    mMultiSliceRep->setImages(mViewGroup->getImages());
-  this->viewportChanged();
+	if (mMultiSliceRep)
+		mView->removeRep(mMultiSliceRep);
+	mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_" + mView->getName());
+	mMultiSliceRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
+	mMultiSliceRep->setSliceProxy(mSliceProxy);
+	mView->addRep(mMultiSliceRep);
+	if (mViewGroup)
+		mMultiSliceRep->setImages(mViewGroup->getImages());
+	this->viewportChanged();
 }
 #endif //USE_2D_GPU_RENDER
 
@@ -233,23 +231,6 @@ void ViewWrapper2D::viewportChanged()
   mView->getRenderer()->GetActiveCamera()->SetParallelScale(viewHeight/2);
 
   mSliceProxy->setToolViewportHeight(viewHeight);
-//std::cout << "mView->heightMM() " << mView->heightMM() << ", " << mView->height() << "," << mView->physicalDpiY() << std::endl;
-//
-//int width() const { return metric(PdmWidth); }
-//int height() const { return metric(PdmHeight); }
-//int widthMM() const { return metric(PdmWidthMM); }
-//int heightMM() const { return metric(PdmHeightMM); }
-//int logicalDpiX() const { return metric(PdmDpiX); }
-//int logicalDpiY() const { return metric(PdmDpiY); }
-//int physicalDpiX() const { return metric(PdmPhysicalDpiX); }
-//int physicalDpiY() const { return metric(PdmPhysicalDpiY); }
-
-//  vtkCameraPtr camera = mView->getRenderer()->GetActiveCamera();
-//  std::cout << ssc::Vector3D(camera->GetFocalPoint()) << std::endl;
-//  std::cout << camera->GetClippingRange()[0] << ", " << camera->GetClippingRange()[1] << std::endl;
-//  std::cout << camera->GetDistance() << std::endl;
-
-  //std::cout << "ViewWrapper2D::viewportChanged(): zoom:" << mZoomFactor << ", parallelScale:" << parallelScale << ", " << planeToString(mPlaneType) <<  std::endl;
 
   ssc::DoubleBoundingBox3D BB_vp = getViewport();
   ssc::Transform3D vpMs = get_vpMs();
@@ -259,11 +240,6 @@ void ViewWrapper2D::viewportChanged()
   if (mSlicePlanes3DMarker)
   {
     mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
-//    std::cout << "-- " << string_cast(plane) << "-----------------------------------------------------" << std::endl;
-//    std::cout << "BB_vp" << " -- " << BB_vp << std::endl;
-//    std::cout << "vpMs" << " --\n " << vpMs << std::endl;
-//    std::cout << "BB_s" << " -- " << transform(vpMs.inv(), BB_vp) << std::endl;
-//    std::cout << "-----------------------------------------------------" << std::endl;
   }
 }
 
@@ -293,10 +269,6 @@ ssc::Transform3D ViewWrapper2D::get_vpMs() const
   ssc::Vector3D p0_w = displayToWorld(p0_d);
   ssc::Vector3D p1_w = displayToWorld(p1_d);
 
-//  std::cout << " -------------------------------------------- "  << std::endl;
-//  std::cout << "p0: " << p0_d << " --- " << p0_w << std::endl;
-//  std::cout << "p1: " << p1_d << " --- " << p1_w << std::endl;
-
   p0_w[2] = 0;
   p1_w[2] = 1;
 
@@ -315,10 +287,11 @@ void ViewWrapper2D::showSlot()
 
 void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
 {
-  mOrientationAnnotationRep->setPlaneType(plane);
+//  mOrientationAnnotationRep->setPlaneType(plane);
   mPlaneTypeText->setText(0, qstring_cast(plane));
   double viewHeight = mView->heightMM() / this->getZoomFactor2D();
   mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), true, viewHeight, 0.25);
+  mOrientationAnnotationRep->setSliceProxy(mSliceProxy);
 
   // do this to force sync global and local type - must think on how we want this to work
   this->changeOrientationType(getOrientationType());
@@ -355,7 +328,7 @@ void ViewWrapper2D::orientationModeChanged()
   computer.switchOrientationMode(type);
 
   ssc::PLANE_TYPE plane = computer.getPlaneType();
-  mOrientationAnnotationRep->setPlaneType(plane);
+//  mOrientationAnnotationRep->setPlaneType(plane);
   mPlaneTypeText->setText(0, qstring_cast(plane));
   mSliceProxy->setComputer(computer);
 }
@@ -384,48 +357,48 @@ void ViewWrapper2D::imageAdded(ssc::ImagePtr image)
 
 void ViewWrapper2D::updateView()
 {
-  std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
-  ssc::ImagePtr image;
-  //std::cout << "ViewWrapper2D::updateView() " << images.size() << std::endl;
-  if (!images.empty())
-    image = images.back(); // always show last in vector
+	QString text;
+	if (mViewGroup)
+	{
+		std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
+		ssc::ImagePtr image;
+		//std::cout << "ViewWrapper2D::updateView() " << images.size() << std::endl;
+		if (!images.empty())
+			image = images.back(); // always show last in vector
 
-  if (image)
-  {
-    ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
-    mSliceProxy->setDefaultCenter(c);
-  }
+		if (image)
+		{
+			ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
+			mSliceProxy->setDefaultCenter(c);
+		}
 
-  QString text;
-  // slice rep
+		// slice rep
 #ifdef USE_2D_GPU_RENDER
-  this->resetMultiSlicer();
-//  mMultiSliceRep->setImages(images);
-
-  text = this->getAllDataNames().join("\n");
-//  mDataNameText->setText(0, text.join("\n"));
+		this->resetMultiSlicer();
+		text = this->getAllDataNames().join("\n");
 #else
-  QStringList textList;
-  mSliceRep->setImage(image);
+		QStringList textList;
+		mSliceRep->setImage(image);
 
-  // list all meshes and one image.
-  std::vector<ssc::MeshPtr> mesh = mViewGroup->getMeshes();
-  for (unsigned i = 0; i < mesh.size(); ++i)
-  	textList << qstring_cast(mesh[i]->getName());
-  if (image)
-  	textList << image->getName();
-  text = textList.join("\n");
+		// list all meshes and one image.
+		std::vector<ssc::MeshPtr> mesh = mViewGroup->getMeshes();
+		for (unsigned i = 0; i < mesh.size(); ++i)
+		textList << qstring_cast(mesh[i]->getName());
+		if (image)
+		textList << image->getName();
+		text = textList.join("\n");
 #endif
+	}
 
-  bool show = settings()->value("View/showDataText").value<bool>();
-  if (!show)
-  	text = QString();
+	bool show = settings()->value("View/showDataText").value<bool> ();
+	if (!show)
+		text = QString();
 
-  //update data name text rep
-  mDataNameText->setText(0, text);
-  mDataNameText->setFontSize(std::max(12, 22-2*text.size()));
+	//update data name text rep
+	mDataNameText->setText(0, text);
+	mDataNameText->setFontSize(std::max(12, 22 - 2 * text.size()));
 
-  mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
+	mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool> ());
 }
 
 void ViewWrapper2D::imageRemoved(const QString& uid)
@@ -453,8 +426,6 @@ void ViewWrapper2D::dataRemoved(const QString& uid)
 
 void ViewWrapper2D::meshAdded(ssc::MeshPtr mesh)
 {
-//  std::map<QString, ssc::GeometricRep2DPtr> mGeometricRep;
-
   if (!mesh)
     return;
   if (mGeometricRep.count(mesh->getUid()))
@@ -465,14 +436,6 @@ void ViewWrapper2D::meshAdded(ssc::MeshPtr mesh)
   rep->setMesh(mesh);
   mView->addRep(rep);
   mGeometricRep[mesh->getUid()] = rep;
-  //std::cout << "added mesh " << mesh->getName() << std::endl;
-//
-//  std::vector<ssc::MeshPtr> images = mViewGroup->getMeshes();
-//
-//  // slice rep
-//  mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
-//  mSliceRep->setSliceProxy(mSliceProxy);
-//  mView->addRep(mSliceRep);
   this->updateView();
 }
 
@@ -483,7 +446,6 @@ void ViewWrapper2D::meshRemoved(const QString& uid)
 
   mView->removeRep(mGeometricRep[uid]);
   mGeometricRep.erase(uid);
- // std::cout << "removed mesh " << uid << std::endl;
   this->updateView();
 }
 
@@ -647,15 +609,15 @@ void ViewWrapper2D::setAxisPos(ssc::Vector3D click_vp)
 
 void ViewWrapper2D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
-  mSlicePlanes3DMarker = ssc::SlicePlanes3DMarkerIn2DRep::New("uid");
-  ssc::PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
-  mSlicePlanes3DMarker->setProxy(plane, proxy);
+	mSlicePlanes3DMarker = ssc::SlicePlanes3DMarkerIn2DRep::New("uid");
+	ssc::PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	mSlicePlanes3DMarker->setProxy(plane, proxy);
 
-  ssc::DoubleBoundingBox3D BB_vp = getViewport();
-  ssc::Transform3D vpMs = get_vpMs();
-  mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
+	ssc::DoubleBoundingBox3D BB_vp = getViewport();
+	ssc::Transform3D vpMs = get_vpMs();
+	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
 
-  mView->addRep(mSlicePlanes3DMarker);
+	mView->addRep(mSlicePlanes3DMarker);
 }
 
 //------------------------------------------------------------------------------
