@@ -51,6 +51,10 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImageViaFile(ssc::Image
     return itkImageType::ConstPointer();
   }
 
+  if(image->getMax() > SHRT_MAX || image->getMin() < SHRT_MIN)
+  	ssc::messageManager()->sendWarning("Image values out of range. max: " + qstring_cast(image->getMax())
+  			+ " min: " + qstring_cast(image->getMin()) + " See bug #363 if this needs to be fixed");
+
   QString tempFolder = settings()->value("globalPatientDataFolder").toString() + "/NoPatient/temp/";
   QDir().mkpath(tempFolder);
 

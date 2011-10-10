@@ -158,6 +158,7 @@ void StateService::fillDefaultSettings()
   this->fillDefault("Automation/autoStartTracking", true);
   this->fillDefault("Automation/autoStartStreaming", true);
   this->fillDefault("Automation/autoReconstruct", true);
+  this->fillDefault("Automation/autoSelectDominantTool", true);
   this->fillDefault("renderingInterval", 33);
   this->fillDefault("smartRender", false);
   this->fillDefault("stillUpdateRate", 8.0);

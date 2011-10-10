@@ -217,6 +217,8 @@ std::vector<ssc::Landmark> LandmarkRegistrationWidget::getAllLandmarks() const
       retval.push_back(ssc::Landmark(iter->first));
   }
 
+  std::sort(retval.begin(), retval.end());
+
   return retval;
 }
 
