@@ -261,7 +261,7 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
   binaryCheckbox->setChecked(mBinary);
   binaryCheckbox->setChecked(true); // atm we only support binary thresholding
   binaryCheckbox->setEnabled(false); //TODO enable when the segmentation routine supports other than binary thresholding
-  QLabel* binaryLabel = new QLabel("Binary");
+//  QLabel* binaryLabel = new QLabel("Binary");
   connect(binaryCheckbox, SIGNAL(toggled(bool)), this, SLOT(toogleBinarySlot(bool)));
 
   QCheckBox* surfaceCheckBox = new QCheckBox();
@@ -279,16 +279,17 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
       0.5, ssc::DoubleRange(0, 10, 0.1), 1);
 
   layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mSegmentationThresholdAdapter));
-  QHBoxLayout* binaryLayout = new QHBoxLayout();
-  binaryLayout->addWidget(binaryCheckbox);
-  binaryLayout->addWidget(binaryLabel);
+  //We currently only have binary thresholding, so we remove this checkbox for now
+//  QHBoxLayout* binaryLayout = new QHBoxLayout();
+//  binaryLayout->addWidget(binaryCheckbox);
+//  binaryLayout->addWidget(binaryLabel);
   QHBoxLayout* surfaceLayout = new QHBoxLayout();
   surfaceLayout->addWidget(surfaceCheckBox);
   surfaceLayout->addWidget(surfaceLabel);
   QHBoxLayout* smoothingLayout = new QHBoxLayout();
   smoothingLayout->addWidget(smoothingCheckBox);
   smoothingLayout->addWidget(smoothingLabel);
-  layout->addLayout(binaryLayout);
+//  layout->addLayout(binaryLayout);
   layout->addLayout(surfaceLayout);
   layout->addLayout(smoothingLayout);
 
