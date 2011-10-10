@@ -77,6 +77,8 @@ void SurfaceWidget::setImageInputSlot(QString value)
 
 void SurfaceWidget::surfaceSlot()
 {
+	patientService()->getThresholdPreview()->removePreview(this);
+
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   double decimation = mDecimationAdapter->getValue()/100;
 
@@ -127,6 +129,8 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
   mSurfaceThresholdAdapter = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
       "Values from this threshold and above will be included",
       100.0, ssc::DoubleRange(-1000, 1000, 1), 0);
+  connect(mSurfaceThresholdAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(thresholdSlot()));
+
   mDecimationAdapter = ssc::DoubleDataAdapterXml::initialize("Decimation %", "",
       "Reduce number of triangles in output surface",
       80.0, ssc::DoubleRange(0, 100, 1), 0);
@@ -150,6 +154,12 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
   layout->addWidget(smoothingCheckBox);
 
   return retval;
+}
+
+void SurfaceWidget::thresholdSlot()
+{
+	patientService()->getThresholdPreview()->setPreview(this, mSelectedImage->getImage(),
+			mSurfaceThresholdAdapter->getValue());
 }
 //------------------------------------------------------------------------------
 
