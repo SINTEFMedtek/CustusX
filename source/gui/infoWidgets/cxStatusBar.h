@@ -8,6 +8,8 @@
 
 class QLabel;
 class QPixmap;
+class QAction;
+class QToolButton;
 
 namespace cx
 {
@@ -27,27 +29,35 @@ class StatusBar: public QStatusBar
 
 public:
   StatusBar(); ///< connects signals and slots
-  ~StatusBar(); ///< empty
+  virtual ~StatusBar(); ///< empty
 
 private slots:
   void connectToToolSignals(); ///< connect to all available tools
   void disconnectFromToolSignals(); ///< disconnect from all tool
-  void receiveToolVisible(); ///< updates the color label for a tool
-  void receiveToolDominant(); ///< updates the color label for a tool
+//  void receiveToolVisible(); ///< updates the color label for a tool
+//  void receiveToolDominant(); ///< updates the color label for a tool
   void renderingFpsSlot(int numFps); ///< Show rendered frames per seconds
   void grabbingFpsSlot(int numFps); ///< Show grabbed frames per seconds
   void grabberConnectedSlot(bool connected);
   void tpsSlot(int numTps); ///< Show transforms per seconds
   void showMessageSlot(Message message); ///< prints the incomming message to the statusbar
+  void updateToolButtons();
 
 private:
-  void colorTool(ssc::Tool* tool);
-  void setToolLabelColor(QLabel* label, bool visible, bool dominant);
+  void activateTool(QString uid);
+  QString getToolStyle(bool visible, bool initialized, bool dominant);
 
-  std::vector<QLabel*> mToolLabels; ///< labels indicating the tools visibility
   QLabel* mRenderingFpsLabel; ///< Label for showing rendering FPS
   QLabel* mGrabbingInfoLabel; ///< Label for showing info about the grabber
   QLabel* mTpsLabel; ///< Label for showing TPS
+
+  struct ToolData
+  {
+	  boost::shared_ptr<QAction> mAction;
+	  boost::shared_ptr<QToolButton> mButton;
+	  ssc::ToolPtr mTool;
+  };
+  std::vector<ToolData> mToolData;
 };
 }
 
