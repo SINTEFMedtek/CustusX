@@ -49,6 +49,7 @@ private slots:
   void smoothingSlot(bool value);
   void imageChangedSlot(QString uid);
   void handleFinishedSlot();
+  void thresholdSlot();
 
 private:
   SurfaceWidget();

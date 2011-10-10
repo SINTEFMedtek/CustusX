@@ -1,7 +1,5 @@
   #include "cxBinaryThresholdImageFilterWidget.h"
 
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
 #include "sscTypeConversions.h"
 #include "sscImage.h"
 #include "sscDataManager.h"
@@ -52,10 +50,6 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   topLayout->addWidget(segmentationOptionsButton, 1,1);
   topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
   topLayout->addWidget(mStatusLabel);
-
-  //Timer for removing segmentation preview coloring if widget is not visible
-  mRemoveTimer = new QTimer(this);
-  connect(mRemoveTimer, SIGNAL(timeout()), this, SLOT(removeIfNotVisible()));
 }
 
 BinaryThresholdImageFilterWidget::~BinaryThresholdImageFilterWidget()
@@ -75,32 +69,6 @@ QString BinaryThresholdImageFilterWidget::defaultWhatsThis() const
     "</html>";
 }
 
-void BinaryThresholdImageFilterWidget::showEvent(QShowEvent* event)
-{
-  QWidget::showEvent(event);
-
-  if (ssc::dataManager()->getActiveImage())
-  {
-    mSelectedImage->setValue(qstring_cast(ssc::dataManager()->getActiveImage()->getUid()));
-  }
-}
-
-void BinaryThresholdImageFilterWidget::hideEvent(QHideEvent* event)
-{
-  QWidget::hideEvent(event);
-  this->revertTransferFunctions();
-}
-
-void BinaryThresholdImageFilterWidget::removeIfNotVisible()
-{
-  //Revert to original transfer functions when the widget is no longer visible
-  if(this->visibleRegion().isEmpty())
-  {
-    mRemoveTimer->stop();
-    this->revertTransferFunctions();
-  }
-}
-
 void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
 {
   mSelectedImage->setValue(value);
@@ -108,8 +76,9 @@ void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
 
 void BinaryThresholdImageFilterWidget::segmentSlot()
 {
+	patientService()->getThresholdPreview()->removePreview(this);
+
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
-  this->revertTransferFunctions();
 
   mSegmentationAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSegmentationThresholdAdapter->getValue(), mUseSmothing, mSmoothingSigmaAdapter->getValue());
 
@@ -141,12 +110,6 @@ void BinaryThresholdImageFilterWidget::generateSurface()
   bool smoothing = true;
 
   mContourAlgorithm.setInput(segmentedImage, outputBasePath, threshold, decimation, reduceResolution, smoothing);
-//  ssc::MeshPtr outputMesh = mContourAlgorithm.getOutput();
-//  if(outputMesh)
-//  {
-//    outputMesh->setColor(mDefaultColor);
-//  }
-
   mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
 }
 
@@ -172,51 +135,10 @@ void BinaryThresholdImageFilterWidget::toogleBinarySlot(bool on)
   mBinary = on;
 }
 
-void BinaryThresholdImageFilterWidget::revertTransferFunctions()
-{
-  if (!mModifiedImage)
-    return;
-
-  mModifiedImage->resetTransferFunction(mTF3D_original, mTF2D_original);
-  mModifiedImage->setShadingOn(mShadingOn_original);
-
-  mTF3D_original.reset();
-  mTF2D_original.reset();
-  mModifiedImage.reset();
-}
-
 void BinaryThresholdImageFilterWidget::thresholdSlot()
 {
-  ssc::ImagePtr image = mSelectedImage->getImage();
-  if(!image)
-    return;
-  if(this->visibleRegion().isEmpty())
-  	return; // Don't do anything if the widget isn't visible
-
-  if (!mModifiedImage)
-  {
-    mModifiedImage = image;
-    mTF3D_original = image->getTransferFunctions3D()->createCopy();
-    mTF2D_original = image->getLookupTable2D()->createCopy();
-    mShadingOn_original = image->getShadingOn();
-  }
-  image->resetTransferFunctions();
-  ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
-  tf3D->removeInitAlphaPoint();
-  tf3D->addAlphaPoint(mSegmentationThresholdAdapter->getValue()-1 , 0);
-  tf3D->addAlphaPoint(mSegmentationThresholdAdapter->getValue(), image->getMaxAlphaValue());
-  tf3D->addColorPoint(mSegmentationThresholdAdapter->getValue(), Qt::green);
-  tf3D->addColorPoint(image->getMax(), Qt::green);
-  image->setShadingOn(true);
-
-  ssc::ImageLUT2DPtr lut2D = image->getLookupTable2D();
-  lut2D->setFullRangeWinLevel();
-  lut2D->addColorPoint(mSegmentationThresholdAdapter->getValue(), Qt::green);
-  lut2D->addColorPoint(image->getMax(), Qt::green);
-  lut2D->setLLR(mSegmentationThresholdAdapter->getValue());
-
-  //Start timer that reverts transfer functions when widget is no longer visible
-  mRemoveTimer->start(1000);
+	patientService()->getThresholdPreview()->setPreview(this, mSelectedImage->getImage(),
+			mSegmentationThresholdAdapter->getValue());
 }
 
 void BinaryThresholdImageFilterWidget::toogleSurfaceSlot(bool on)
@@ -232,7 +154,7 @@ void BinaryThresholdImageFilterWidget::toogleSmoothingSlot(bool on)
 
 void BinaryThresholdImageFilterWidget::imageChangedSlot(QString uid)
 {
-  this->revertTransferFunctions();
+//	patientService()->getThresholdPreview()->removePreview(this);
 
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
   if(!image)
