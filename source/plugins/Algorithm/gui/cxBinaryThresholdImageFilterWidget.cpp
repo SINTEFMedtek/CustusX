@@ -188,6 +188,8 @@ void BinaryThresholdImageFilterWidget::thresholdSlot()
   ssc::ImagePtr image = mSelectedImage->getImage();
   if(!image)
     return;
+  if(this->visibleRegion().isEmpty())
+  	return; // Don't do anything if the widget isn't visible
 
   if (!mModifiedImage)
   {
