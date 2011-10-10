@@ -7,7 +7,7 @@
 #include <QAction>
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
-
+#include "sscGLHelpers.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -746,7 +746,11 @@ void ViewManager::renderAllViewsSlot()
       if (smart)
         iter->second->render(); // render only changed scenegraph (shaky but smooth)
       else
+      {
         iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
+      }
+
+  	report_gl_error_text(cstring_cast(QString("During rendering of view: ") + iter->first));
     }
   }
   
