@@ -11,19 +11,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void fgl_really_report_gl_errors( const char *file, int line )
+void fgl_really_report_gl_errors( const char *file, int line, const char* text )
 {
 	GLenum error;
 	int i = 0;
 
 	while ( ( error = glGetError () ) != GL_NO_ERROR  && i < 20 )
 	{
-		printf( "Oops, GL error caught: %s %s:%d\n", gluErrorString( error ), file, line );
+		printf( "GL error caught: Code: [%i] %s\n\tLocation:%s:%d\n\tDescription:%s\n", error, gluErrorString( error ), file, line, text );
 		++i;
 	}
 	if ( i != 0 )
 	{
-		abort();
+//		abort(); // removed: why cause even more trouble when a possibly minor error has occured?
 	}
 }
 #endif //WIN32

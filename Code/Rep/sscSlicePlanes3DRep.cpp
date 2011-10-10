@@ -299,7 +299,6 @@ SlicePlanes3DMarkerIn2DRep::~SlicePlanes3DMarkerIn2DRep()
 
 void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View* view)
 {
-	//Logger::log("vm.log", "SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer");
 	SlicePlanesProxy::DataType baseData = mProxy->getData()[mType];
 	
 	mText.reset(new ssc::TextDisplay(baseData.mSymbol, baseData.mColor, mProxy->getProperties().m3DFontSize));

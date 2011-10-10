@@ -54,7 +54,7 @@ private slots:
 	void updateColorAttributeSlot();
 	void viewChanged();
 private:
-	void createCoordinates(int count);
+//	void createCoordinates(int count);
 	void updateCoordinates(int index);
 	QString getTCoordName(int index);
 	void setColorAttributes(int i);

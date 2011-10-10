@@ -28,7 +28,7 @@ protected:
 	
 	std::vector<TextDisplayPtr> mDisplayText;
 
-	TextDisplayPtr mPictString;
+//	TextDisplayPtr mPictString;
 };
 
 

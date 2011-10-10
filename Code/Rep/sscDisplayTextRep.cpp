@@ -6,6 +6,7 @@
 
 #include "sscView.h"
 #include "sscVtkHelperClasses.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {

@@ -42,10 +42,8 @@ namespace ssc
 {
 //---------------------------------------------------------
 
-vtkStandardNewMacro(TextureSlicePainter)
-;
-vtkCxxRevisionMacro(TextureSlicePainter, "$Revision: 647 $")
-;
+vtkStandardNewMacro(TextureSlicePainter);
+vtkCxxRevisionMacro(TextureSlicePainter, "$Revision: 647 $");
 
 class SingleVolumePainterHelper
 {
@@ -84,7 +82,6 @@ public:
 		mLevel = level;
 		mLLR = llr;
 		mAlpha = alpha;
-		//Logger::log("vm.log", " mWindow: "+ string_cast(mWindow)+ ", mLevel: "+ string_cast(mLevel)+ ", mLLR: "+ string_cast(mLLR)+", mAlpha: "+ string_cast(mAlpha)  );
 	}
 	void initializeRendering()
 	{
@@ -182,27 +179,10 @@ TextureSlicePainter::TextureSlicePainter()
 void TextureSlicePainter::setShaderFile(QString shaderFile)
 {
   mShaderFile = shaderFile;
-//  //QFile fp(QString("/Data/Resources/Shaders/Texture3DOverlay.frag"));
-////  QFile fp(QString("/home/chrask/workspace/CustusX/CustusX/externals/ssc/Sandbox/Texture3DOverlay.frag"));
-//  QFile fp(mShaderFile);
-//
-//  if (fp.exists())
-//  {
-//    fp.open(QFile::ReadOnly);
-//    QTextStream shaderfile(&fp);
-//    mSource = shaderfile.readAll();
-//    fp.close();
-//  }
-//  else
-//  {
-//    std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
-//  }
 }
 
 QString TextureSlicePainter::loadShaderFile(QString shaderFile)
 {
-  //QFile fp(QString("/Data/Resources/Shaders/Texture3DOverlay.frag"));
-//  QFile fp(QString("/home/chrask/workspace/CustusX/CustusX/externals/ssc/Sandbox/Texture3DOverlay.frag"));
   QFile fp(shaderFile);
 
   if (fp.exists())
@@ -210,7 +190,6 @@ QString TextureSlicePainter::loadShaderFile(QString shaderFile)
     fp.open(QFile::ReadOnly);
     QTextStream shaderfile(&fp);
     return shaderfile.readAll();
-//    fp.close();
   }
   else
   {
@@ -225,7 +204,6 @@ TextureSlicePainter::~TextureSlicePainter()
 	{
 	    this->ReleaseGraphicsResources(this->LastWindow);
 	}
-	//Logger::log("vm.log", "::~TextureSlicePainter()");
 
 	delete mInternals;
 	mInternals = 0;
@@ -240,10 +218,10 @@ void TextureSlicePainter::ReleaseGraphicsResources(vtkWindow* win)
 
 void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* actor)
 {
+	report_gl_error();
 //  std::cout << this << " TextureSlicePainter::PrepareForRendering" << std::endl;
 	if (!CanRender(renderer, actor))
 	{
-		std::cout << "Can not Render !!!!!!!!!!!." << endl;
 		mInternals->ClearGraphicsResources();
 		mInternals->LastContext = 0;
 		this->Superclass::PrepareForRendering(renderer, actor);
@@ -260,7 +238,6 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 	report_gl_error();
 
 	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(renWin);
-	//std::cout << "Load extension!" << endl;
 	if (!LoadRequiredExtensions(context->GetExtensionManager()))
 	{
 		std::cout << "Missing required EXTENSION!!!!!!!!!!!." << endl;
@@ -307,6 +284,13 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
 		bool forceCompileOnly)
 {
+	report_gl_error();
+
+	if (!CanRender(renderer, actor))
+	{
+//		std::cout << "Can not Render !!!!!!!!!!!." << endl;
+		return;
+	}
 //  std::cout << this << " TextureSlicePainter::RenderInternal" << std::endl;
 
 	// Save context state to be able to restore.
@@ -340,12 +324,14 @@ void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
 
 	glDisable(vtkgl::TEXTURE_3D);
 	glBindTexture(GL_TEXTURE_3D, 0);
+	report_gl_error();
 
 }
 
 bool TextureSlicePainter::CanRender(vtkRenderer*, vtkActor*)
 {
-	return true;
+	return !mInternals->mElement.empty();
+//	return true;
 }
 
 bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id)
