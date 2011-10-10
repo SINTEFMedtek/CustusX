@@ -7,7 +7,7 @@
 #include <QAction>
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
-
+#include "sscGLHelpers.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -74,6 +74,7 @@ ViewManager::ViewManager() :
   mViewCacheRT(mMainWindowsCentralWidget,"ViewRT")
 {
   mRenderTimer.reset(new RenderTimer);
+  mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
 
   connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
   connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
@@ -256,6 +257,11 @@ void ViewManager::addXml(QDomNode& parentNode)
   activeViewNode.appendChild(doc.createTextNode(mActiveView));
   viewManagerNode.appendChild(activeViewNode);
 
+  QDomElement slicePlanes3DNode = doc.createElement("slicePlanes3D");
+  slicePlanes3DNode.setAttribute("use", mSlicePlanesProxy->getVisible());
+  slicePlanes3DNode.setAttribute("opaque", mSlicePlanesProxy->getDrawPlanes());
+  viewManagerNode.appendChild(slicePlanes3DNode);
+
   QDomElement viewGroupsNode = doc.createElement("viewGroups");
   viewManagerNode.appendChild(viewGroupsNode);
   for (unsigned i=0; i<mViewGroups.size(); ++i)
@@ -298,6 +304,10 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
     }
     child = child.nextSibling();
   }
+
+  QDomElement slicePlanes3DNode = viewmanagerNode.namedItem("slicePlanes3D").toElement();
+  mSlicePlanesProxy->setVisible(slicePlanes3DNode.attribute("use").toInt());
+  mSlicePlanesProxy->setDrawPlanes(slicePlanes3DNode.attribute("opaque").toInt());
 
   QDomElement viewgroups = viewmanagerNode.namedItem("viewGroups").toElement();
   QDomNode viewgroup = viewgroups.firstChild();
@@ -370,6 +380,7 @@ void ViewManager::deactivateCurrentLayout()
 
   this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
   this->setActiveView("");
+  mSlicePlanesProxy->clearViewports();
 }
 
 /**Change layout from current to layout.
@@ -405,6 +416,22 @@ void ViewManager::setActiveLayout(const QString& layout)
     {
       this->activate2DView(view.mGroup, view.mPlane, view.mRegion);
     }
+  }
+
+  // Set the same proxy in all wrappers, but stop adding after the
+  // first group with 2D views are found.
+  // This works well _provided_ that the 3D view is in the first group.
+  for (unsigned i=0; i<mViewGroups.size(); ++i)
+  {
+	  bool foundSlice = false;
+	  std::vector<ViewWrapperPtr> wrappers = mViewGroups[i]->getWrappers();
+	  for (unsigned j=0; j<wrappers.size(); ++j)
+	  {
+		  wrappers[j]->setSlicePlanesProxy(mSlicePlanesProxy);
+		  foundSlice = foundSlice || wrappers[j]->getView()->getType() == ssc::View::VIEW_2D;
+	  }
+	  if (foundSlice)
+		  break;
   }
 
   mActiveLayout = layout;
@@ -719,7 +746,11 @@ void ViewManager::renderAllViewsSlot()
       if (smart)
         iter->second->render(); // render only changed scenegraph (shaky but smooth)
       else
+      {
         iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
+      }
+
+  	report_gl_error_text(cstring_cast(QString("During rendering of view: ") + iter->first));
     }
   }
   

@@ -51,7 +51,6 @@ ToolManager::ToolManager() :
   mConfigured(false),
   mInitialized(false),
   mTracking(false),
-  mDominantToolCheckActive(true),
   mLastLoadPositionHistory(0)
 {
   m_rMpr_History.reset(new ssc::RegistrationHistory());
@@ -199,9 +198,7 @@ void ToolManager::trackerConfiguredSlot(bool on)
         mReferenceTool = tool;
 
       mTools[it->first] = tool;
-      // Automatic selection of dominant tool if check is active (Application state other than ENDOVASCULAR)
-      if(mDominantToolCheckActive)
-        connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
+      connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
     }
     else
       ssc::messageManager()->sendWarning("Creation of the cxTool "+it->second->getUid()+" failed.");
@@ -553,11 +550,6 @@ void ToolManager::setDominantTool(const QString& uid)
 void ToolManager::setClinicalApplication(ssc::CLINICAL_APPLICATION application)
 {
   mApplication = application;
-
-  if(mApplication == ssc::mdENDOVASCULAR)
-    mDominantToolCheckActive = false;
-  else 
-    mDominantToolCheckActive = true;
 }
 
 std::map<QString, QString> ToolManager::getToolUidsAndNames() const
@@ -756,6 +748,10 @@ void ToolManager::globalConfigurationFileChangedSlot(QString key)
 
 void ToolManager::dominantCheckSlot()
 {
+	bool use = settings()->value("Automation/autoSelectDominantTool").toBool();
+	if (!use)
+		return;
+
   //make a sorted vector of all visible tools
   std::vector<ssc::ToolPtr> visibleTools;
   ToolMap::iterator it = mTools.begin();

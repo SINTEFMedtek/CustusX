@@ -28,6 +28,8 @@ QString ActiveToolStringDataAdapter::getValueName() const
 bool ActiveToolStringDataAdapter::setValue(const QString& value)
 {
   ssc::ToolPtr newTool = ssc::toolManager()->getTool(value);
+  if (!newTool)
+	  return false;
   if(newTool == ssc::toolManager()->getDominantTool())
     return false;
   ssc::toolManager()->setDominantTool(newTool->getUid());

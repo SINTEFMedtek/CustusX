@@ -12,15 +12,15 @@
 namespace cx
 {
 
-class SecondaryMainWindow : public QMainWindow
+class SecondaryMainWindow: public QMainWindow
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
-  SecondaryMainWindow(QWidget* parent);
-  ~SecondaryMainWindow();
+	SecondaryMainWindow(QWidget* parent);
+	~SecondaryMainWindow();
 private:
-  void addAsDockWidget(QWidget* widget, bool visible);
+	void addAsDockWidget(QWidget* widget, bool visible);
 };
 
 } // namespace cx

@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <QtCore>
 #include <vtkImageData.h>
-#include "matrixInterpolation.h"
+//#include "matrixInterpolation.h"
 #include "sscBoundingBox3D.h"
 #include "sscDataManager.h"
 #include "sscXmlOptionItem.h"
