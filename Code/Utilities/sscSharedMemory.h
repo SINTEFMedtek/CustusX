@@ -2,6 +2,7 @@
 #define SSC_SHARED_MEMORY_H
 
 #include <QSharedMemory>
+#include <QDateTime>
 
 namespace ssc
 {
@@ -37,6 +38,7 @@ private:
 	int mSize;
 	int mBuffers;
 	int mCurrentBuffer;
+	QDateTime mTimestamp; ///< Time of writing of current buffer
 
 public:
 	SharedMemoryClient(QObject *parent = 0);
@@ -47,6 +49,8 @@ public:
 	QString key() { return mBuffer.key(); }
 	const void *buffer(); ///< Grab and lock a read buffer
 	void release();	///< Release our read buffer
+	const void *isNew(); ///< Return new buffer only if new
+	QDateTime timestamp() { return mTimestamp; }
 };
 
 }
