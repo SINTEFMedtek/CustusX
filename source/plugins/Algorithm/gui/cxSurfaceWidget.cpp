@@ -12,6 +12,7 @@
 #include "sscDataManager.h"
 #include "sscDoubleWidgets.h"
 #include "sscLabeledComboBoxWidget.h"
+#include "sscTypeConversions.h"
 #include "cxPatientData.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
@@ -33,6 +34,9 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
   toptopLayout->addStretch();
+
+  // Create this early to make sure it is available when we assign tooltip values
+  mReduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
@@ -123,6 +127,13 @@ void SurfaceWidget::imageChangedSlot(QString uid)
     return;
   mSurfaceThresholdAdapter->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
   mSurfaceThresholdAdapter->setValue(image->getRange() / 2 + image->getMin());
+
+  int extent[6];
+  image->getBaseVtkImageData()->GetExtent(extent);
+  mReduceResolutionCheckBox->setToolTip("Current input resolution: " + qstring_cast(extent[1])
+  		+ " " + qstring_cast(extent[3]) + " " + qstring_cast(extent[5])
+  		+ " (If checked: " + qstring_cast(extent[1]/2)+ " " + qstring_cast(extent[3]/2) + " "
+  		+ qstring_cast(extent[5]/2) + ")");
 }
 void SurfaceWidget::setDefaultColor(QColor color)
 {
@@ -147,9 +158,9 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
   preserveCheckBox->setChecked(mPreserveTopology);
   connect(preserveCheckBox, SIGNAL(toggled(bool)), this, SLOT(preserveSlot(bool)));
 
-  QCheckBox* reduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
-  reduceResolutionCheckBox->setChecked(mReduceResolution);
-  connect(reduceResolutionCheckBox, SIGNAL(toggled(bool)), this, SLOT(reduceResolutionSlot(bool)));
+//  mReduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
+  mReduceResolutionCheckBox->setChecked(mReduceResolution);
+  connect(mReduceResolutionCheckBox, SIGNAL(toggled(bool)), this, SLOT(reduceResolutionSlot(bool)));
 
   QCheckBox* smoothingCheckBox = new QCheckBox("Smoothing");
   smoothingCheckBox->setChecked(mSmoothing);
@@ -160,7 +171,7 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 
   layout->addWidget(inputLabel);
   layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mSurfaceThresholdAdapter));
-  layout->addWidget(reduceResolutionCheckBox);
+  layout->addWidget(mReduceResolutionCheckBox);
   layout->addWidget(outputLabel);
   layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mDecimationAdapter));
   layout->addWidget(preserveCheckBox);
