@@ -90,6 +90,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Widgets/sscVector3DDataAdapterXml.h
     Widgets/sscMousePadWidget.h
     Utilities/sscMessageManager.h
+    Utilities/sscSharedMemory.h
     )
 
 SET( SSC_HEADER_FILES
@@ -192,6 +193,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscCustomMetaImage.cpp
     Utilities/sscViewportListener.h
     Utilities/sscViewportListener.cpp
+    Utilities/sscSharedMemory.cpp
     
     sscView.cpp
     sscView.h
