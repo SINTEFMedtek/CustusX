@@ -279,6 +279,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
 {
 	mPresets = ssc::dataManager()->getPresetTransferFunctions3D();
   QPushButton* resetButton = new QPushButton("Reset", this);
+  resetButton->setToolTip("Reset all transfer function values to the defaults");
   connect(resetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
 
   QPushButton* deleteButton = new QPushButton("Delete", this);
@@ -286,9 +287,11 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
   connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteSlot()));
 
   QPushButton* saveButton = new QPushButton("Save", this);
+  saveButton->setToolTip("Create a new custom preset for both 2D and 3D");
   connect(saveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
 
   mPresetsComboBox = new QComboBox(this);
+  mPresetsComboBox->setToolTip("Select a preset to use for both 2D and 3D");
   mPresetsComboBox->addItems(mPresets->getPresetList());
   connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(presetsBoxChangedSlot(const QString&)));
 
