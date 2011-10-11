@@ -5,21 +5,20 @@
 namespace ssc
 {
 
-#include <stdint.h>
-
 // Shared header kept first in shared memory area
 struct shm_header
 {
-	int32_t lastDone;	// index to last buffer that was written
-	int32_t numBuffers;	// number of buffers
-	int32_t	bufferSize;	// size of each buffer
-	int32_t headerSize;	// size of this header
-	int32_t	buffer[0];	// number of readers currently operating on each buffer
+	qint32 lastDone;	// index to last buffer that was written
+	qint32 numBuffers;	// number of buffers
+	qint32 bufferSize;	// size of each buffer
+	qint32 headerSize;	// size of this header
+	qint64 timestamp;	// timestamp of last buffer that was written
+	qint32 buffer[0];	// number of readers currently operating on each buffer
 };
 
 SharedMemoryServer::SharedMemoryServer(int buffers, int sizeEach, QObject *parent) : mBuffer(parent)
 {
-	int headerSize = sizeof(struct shm_header) + buffers * sizeof(int32_t);
+	int headerSize = sizeof(struct shm_header) + buffers * sizeof(qint32);
 	mSize = sizeEach;
 	mBuffers = buffers;
 	if (!mBuffer.create(buffers * sizeEach + headerSize))
@@ -32,7 +31,8 @@ SharedMemoryServer::SharedMemoryServer(int buffers, int sizeEach, QObject *paren
 	header->numBuffers = mBuffers;
 	header->lastDone = -1;
 	header->headerSize = headerSize;
-	memset(header->buffer, 0, sizeof(int32_t) * buffers);
+	header->timestamp = 0;
+	memset(header->buffer, 0, sizeof(qint32) * buffers);
 	mCurrentBuffer = -1;
 }
 
@@ -79,6 +79,8 @@ void *SharedMemoryServer::buffer()
 }
 
 // Set last finished buffer to current write buffer, then unset current write buffer index.
+// Note that timestamp is only set here, since this is the only place where it can be set 
+// precisely.
 void SharedMemoryServer::release()
 {
 	struct shm_header *header = (struct shm_header *)mBuffer.data();
@@ -86,6 +88,7 @@ void SharedMemoryServer::release()
 	{
 		mBuffer.lock();
 		header->lastDone = mCurrentBuffer;
+		header->timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 		mBuffer.unlock();
 		mCurrentBuffer = -1;
 	}
@@ -128,6 +131,31 @@ const void *SharedMemoryClient::buffer()
 		header->buffer[header->lastDone]++; // Lock new page against writing
 		mCurrentBuffer = header->lastDone;
 		const void *ptr = ((const char *)header) + header->headerSize + header->bufferSize * (header->lastDone + 1);
+		mTimestamp.setMSecsSinceEpoch(header->timestamp);
+		mBuffer.unlock();
+		return ptr;
+	}
+	return NULL;	
+}
+
+const void *SharedMemoryClient::isNew()
+{
+	struct shm_header *header = (struct shm_header *)mBuffer.data();
+	if (header)
+	{
+		if (header->lastDone == -1 || header->lastDone == mCurrentBuffer)
+		{
+			return NULL; // Nothing, or same
+		}
+		mBuffer.lock();
+		if (mCurrentBuffer >= 0 && header->buffer[mCurrentBuffer] > 0)
+		{
+			header->buffer[mCurrentBuffer]--; // Release previous read lock
+		}
+		header->buffer[header->lastDone]++; // Lock new page against writing
+		mCurrentBuffer = header->lastDone;
+		const void *ptr = ((const char *)header) + header->headerSize + header->bufferSize * (header->lastDone + 1);
+		mTimestamp.setMSecsSinceEpoch(header->timestamp);
 		mBuffer.unlock();
 		return ptr;
 	}
