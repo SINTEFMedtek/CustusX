@@ -261,6 +261,13 @@ void XmlOptionFile::removeChildren()
 		mCurrentElement.removeChild(mCurrentElement.firstChild());
 }
 
+void XmlOptionFile::deleteNode()
+{
+	QDomNode parentNode = mCurrentElement.parentNode();
+	parentNode.removeChild(mCurrentElement);
+	mCurrentElement = QDomElement();// Create null element
+}
+
 void XmlOptionFile::save()
 {
 	if (mFilename.isEmpty())

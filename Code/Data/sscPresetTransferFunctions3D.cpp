@@ -62,6 +62,9 @@ void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
 	//Make sure transfer functions are reset in case something is missing from the preset
 	image->resetTransferFunctions();
 
+  if(name == "Transfer function preset...")
+  	return;
+
 	ssc::ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
 	ssc::ImageLUT2DPtr LUT2D = image->getLookupTable2D();
 	ssc::XmlOptionFile node = this->getPresetNode(name);
@@ -117,6 +120,20 @@ QStringList PresetTransferFunctions3D::generatePresetList()
 	}
 
 	return presetList;
+}
+
+bool PresetTransferFunctions3D::isDefaultPreset(QString presetName)
+{
+	ssc::XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
+	if (!testval.getDocument().isNull())
+		return true;
+	return false;
+}
+
+void PresetTransferFunctions3D::deletePresetData(QString name)
+{
+	ssc::XmlOptionFile node = this->getPresetNode(name);
+	node.deleteNode();
 }
 
 }

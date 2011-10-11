@@ -73,6 +73,7 @@ public:
 	void save(); ///< save entire document.
 
 	void removeChildren(); ///< remove all child nodes of the current element.
+	void deleteNode(); ///< Delete the current node
 
 private:
 	void load();

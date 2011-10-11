@@ -32,6 +32,8 @@ public:
 	void load(QString name, ssc::ImagePtr image);
 
 	QStringList getPresetList(); ///< returns a list of the preset names
+	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
+	void deletePresetData(QString name); ///< Delete the preset data node
 
 private:
 	QStringList generatePresetList(); ///< internally generate the preset list
