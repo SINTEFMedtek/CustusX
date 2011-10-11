@@ -16,21 +16,32 @@ struct shm_header
 	qint32 buffer[0];	// number of readers currently operating on each buffer
 };
 
-SharedMemoryServer::SharedMemoryServer(int buffers, int sizeEach, QObject *parent) : mBuffer(parent)
+SharedMemoryServer::SharedMemoryServer(QString key, int buffers, int sizeEach, QObject *parent) : mBuffer(key, parent)
 {
 	int headerSize = sizeof(struct shm_header) + buffers * sizeof(qint32);
 	mSize = sizeEach;
 	mBuffers = buffers;
-	if (!mBuffer.create(buffers * sizeEach + headerSize))
+	int size = buffers * sizeEach + headerSize;
+	if (!mBuffer.create(size))
 	{
-		qWarning("Failed to create shared memory buffer");
-		return;
+		if (mBuffer.error() == QSharedMemory::AlreadyExists)
+		{
+			qWarning("Reusing existing buffer -- this should generally not happen");
+			// reuse and overwrite; hopefully it was made by previous run of same program that crashed
+			mBuffer.attach();
+		}
+		else
+		{
+			qWarning("Failed to create shared memory buffer of size %d: %s",
+			         size, mBuffer.errorString().toAscii().constData());
+			return;
+		}
 	}
 	struct shm_header *header = (struct shm_header *)mBuffer.data();
 	header->bufferSize = mSize;
 	header->numBuffers = mBuffers;
-	header->lastDone = -1;
 	header->headerSize = headerSize;
+	header->lastDone = -1;
 	header->timestamp = 0;
 	memset(header->buffer, 0, sizeof(qint32) * buffers);
 	mCurrentBuffer = -1;
@@ -40,6 +51,7 @@ SharedMemoryServer::~SharedMemoryServer()
 {
 }
 
+// Find and return an available write buffer from the circle
 void *SharedMemoryServer::buffer()
 {
 	struct shm_header *header = (struct shm_header *)mBuffer.data();
