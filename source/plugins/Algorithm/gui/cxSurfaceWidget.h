@@ -64,6 +64,7 @@ private:
   ssc::DoubleDataAdapterXmlPtr mDecimationAdapter;
   QColor mDefaultColor;
   QLabel* mStatusLabel;
+  QCheckBox* mReduceResolutionCheckBox;
 
   Contour mContourAlgorithm;
 };
