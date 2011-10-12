@@ -141,6 +141,7 @@ public slots:
   void presetsBoxChangedSlot(const QString& presetName);
   void resetSlot();
   void saveSlot();
+  void deleteSlot();
 
 protected:
   QVBoxLayout* mLayout;
