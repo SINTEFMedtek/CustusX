@@ -17,16 +17,21 @@ class TestUtilityClasses : public CppUnit::TestFixture
 public:
 	void setUp();
 	void tearDown();
+
+private:
 	void testTransform3DAccess();
 	void testFrame();
 	void testVector3D();
+	void testSharedMemory();
 
 public:
 	CPPUNIT_TEST_SUITE( TestUtilityClasses );
-		CPPUNIT_TEST( testTransform3DAccess );					
-    CPPUNIT_TEST( testVector3D );
-		CPPUNIT_TEST( testFrame );
+	CPPUNIT_TEST( testTransform3DAccess );					
+	CPPUNIT_TEST( testVector3D );
+	CPPUNIT_TEST( testFrame );
+	CPPUNIT_TEST( testSharedMemory );
 	CPPUNIT_TEST_SUITE_END();
+
 private:
 	void singleTestFrameRotationAxis(const Vector3D& k);
 	void singleTestFrame(const Transform3D& transform);

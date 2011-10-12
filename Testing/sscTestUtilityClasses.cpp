@@ -16,6 +16,7 @@
 #include "sscVector3D.h"
 #include "sscTransform3D.h"
 #include "sscFrame3D.h"
+#include "sscSharedMemory.h"
 
 using namespace ssc;
 
@@ -127,4 +128,29 @@ void TestUtilityClasses::testVector3D()
   CPPUNIT_ASSERT( similar( dot(e_x,e_x), 1 ) );
 
   CPPUNIT_ASSERT( a[0]==1 && a[1]==2 && a[2]==3 );
+}
+
+void TestUtilityClasses::testSharedMemory()
+{
+	for (int i = 1; i < 10; i++)
+	{
+		SharedMemoryServer srv("test_", i, 100 * i);
+		SharedMemoryClient cli;
+
+		bool result = cli.attach(srv.key());
+		CPPUNIT_ASSERT( result );
+		CPPUNIT_ASSERT( cli.key() == srv.key() );
+		CPPUNIT_ASSERT( cli.size() == srv.size() );
+		CPPUNIT_ASSERT( cli.buffers() == srv.buffers() );
+		void *dst = srv.buffer();
+		CPPUNIT_ASSERT( dst != NULL );
+		strcpy((char *)dst, "text");
+		srv.release();
+		srv.release();
+		const void *src = cli.buffer();
+		CPPUNIT_ASSERT( src != NULL );
+		CPPUNIT_ASSERT( strncmp((char *)src, "text", 4) == 0 );
+		cli.release();
+		cli.release();
+	}
 }

@@ -13,13 +13,10 @@
 #include "sscTestUtilityClasses.h"
 #include "sscTestSliceComputer.h"
 #include "sscTestVisualRendering.h"
-//#include "sscTestSpaceOrganizer.h"
 #include "sscTestTransform3D.h"
 #include "sscTestBoundingBox3D.h"
 
 #endif
-
-//#include "SonoWand.h"
 
 /**main function for SSC unit tests. 
  * Perform system-wide init/deinit,
@@ -53,8 +50,7 @@ int main(int argc, char **argv)
   runner.addTest(TestTransform3D::suite());
 //  runner.addTest(TestBoundingBox3D::suite());
 #endif
-	
-	
+		
 	bool failed = runner.run();
 	return !failed;
 } 

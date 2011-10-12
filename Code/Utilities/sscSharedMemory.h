@@ -22,13 +22,13 @@ private:
 	int mCurrentBuffer;
 
 public:
-	SharedMemoryServer(int buffers, int sizeEach, QObject *parent = 0);
+	SharedMemoryServer(QString key, int buffers, int sizeEach, QObject *parent = 0);
 	~SharedMemoryServer();
 	int size() { return mSize; }
 	int buffers() { return mBuffers; }
 	QString key() { return mBuffer.key(); }
-	void *buffer(); ///< Grab and lock a write buffer
-	void release(); ///< Release our write buffer. Buffer will not be used before it is released.
+	void *buffer();		///< Grab and lock a write buffer
+	void release();		///< Release our write buffer. Buffer will not be used before it is released.
 };
 
 class SharedMemoryClient
@@ -47,9 +47,9 @@ public:
 	int size() { return mSize; }
 	int buffers() { return mBuffers; }
 	QString key() { return mBuffer.key(); }
-	const void *buffer(); ///< Grab and lock a read buffer
-	void release();	///< Release our read buffer
-	const void *isNew(); ///< Return new buffer only if new
+	const void *buffer();		///< Grab and lock a read buffer
+	void release();			///< Release our read buffer
+	const void *isNew();		///< Return new buffer only if new is available, otherwise return NULL
 	QDateTime timestamp() { return mTimestamp; }
 };
 
