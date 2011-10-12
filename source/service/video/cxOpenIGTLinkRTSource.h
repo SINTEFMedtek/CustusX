@@ -45,6 +45,7 @@ public:
 
   virtual bool validData() const;
   virtual bool isStreaming() const;
+  virtual void release() {};
 
   // non-inherited methods
   void connectServer(QString address, int port);

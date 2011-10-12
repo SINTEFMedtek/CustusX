@@ -5,11 +5,13 @@
 #include <QStringList>
 #include <QInputDialog>
 #include <QPushButton>
+#include <QMessageBox>
 #include "cxTransferFunctionAlphaWidget.h"
 #include "cxTransferFunctionColorWidget.h"
 #include "sscDataManager.h"
 #include "sscImageTF3D.h"
 #include "sscImageLUT2D.h"
+#include "sscMessageManager.h"
 #include "cxShadingWidget.h"
 #include "cxDataViewSelectionWidget.h"
 
@@ -277,12 +279,19 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
 {
 	mPresets = ssc::dataManager()->getPresetTransferFunctions3D();
   QPushButton* resetButton = new QPushButton("Reset", this);
+  resetButton->setToolTip("Reset all transfer function values to the defaults");
   connect(resetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
 
+  QPushButton* deleteButton = new QPushButton("Delete", this);
+  deleteButton->setToolTip("Delete the current preset");
+  connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteSlot()));
+
   QPushButton* saveButton = new QPushButton("Save", this);
+  saveButton->setToolTip("Create a new custom preset for both 2D and 3D");
   connect(saveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
 
   mPresetsComboBox = new QComboBox(this);
+  mPresetsComboBox->setToolTip("Select a preset to use for both 2D and 3D");
   mPresetsComboBox->addItems(mPresets->getPresetList());
   connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(presetsBoxChangedSlot(const QString&)));
 
@@ -291,6 +300,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
   mLayout->addLayout(buttonLayout);
 
   buttonLayout->addWidget(resetButton);
+  buttonLayout->addWidget(deleteButton);
   buttonLayout->addWidget(saveButton);
 
   this->setLayout(mLayout);
@@ -335,6 +345,29 @@ void TransferFunctionPresetWidget::saveSlot()
   mPresetsComboBox->clear();
   mPresetsComboBox->addItems(mPresets->getPresetList());
   mPresetsComboBox->blockSignals(false);
+
+  mPresetsComboBox->setCurrentIndex(mPresetsComboBox->findText(text));
+}
+
+
+void TransferFunctionPresetWidget::deleteSlot()
+{
+	if (mPresets->isDefaultPreset(mPresetsComboBox->currentText()))
+	{
+		ssc::messageManager()->sendWarning("It is not possible to delete one of the default presets");
+		return;
+	}
+	if (QMessageBox::question(this, "Delete current preset", "Do you really want to delete the current preset?",
+			QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
+			return;
+	mPresets->deletePresetData(mPresetsComboBox->currentText());
+
+	// Re-initialize the list
+  mPresetsComboBox->blockSignals(true);
+  mPresetsComboBox->clear();
+  mPresetsComboBox->addItems(mPresets->getPresetList());
+  mPresetsComboBox->blockSignals(false);
+  this->resetSlot();
 }
 
 //---------------------------------------------------------

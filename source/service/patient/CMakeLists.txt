@@ -15,6 +15,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxDistanceMetric.h
     cxPlaneMetric.h
     cxAngleMetric.h
+    cxThresholdPreview.h
 )
 
 SET ( cxPatientService_SOURCE
@@ -38,6 +39,8 @@ SET ( cxPatientService_SOURCE
     cxAngleMetric.cpp
     cxDataMetric.h
     cxDataMetric.cpp
+    cxThresholdPreview.h
+    cxThresholdPreview.cpp
     
 #	../cxForwardDeclarations.h
 )

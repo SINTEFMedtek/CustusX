@@ -12,6 +12,7 @@
 #include "sscDataManager.h"
 #include "sscDoubleWidgets.h"
 #include "sscLabeledComboBoxWidget.h"
+#include "sscTypeConversions.h"
 #include "cxPatientData.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
@@ -23,6 +24,7 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     BaseWidget(parent, "SurfaceWidget", "Surface"),
     mReduceResolution(false),
     mSmoothing(true),
+    mPreserveTopology(true),
     mDefaultColor("red"),
     mStatusLabel(new QLabel(""))
 {
@@ -32,6 +34,9 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
   toptopLayout->addStretch();
+
+  // Create this early to make sure it is available when we assign tooltip values
+  mReduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
@@ -77,10 +82,13 @@ void SurfaceWidget::setImageInputSlot(QString value)
 
 void SurfaceWidget::surfaceSlot()
 {
+	patientService()->getThresholdPreview()->removePreview(this);
+
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   double decimation = mDecimationAdapter->getValue()/100;
 
-  mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThresholdAdapter->getValue(), decimation, mReduceResolution, mSmoothing);
+  mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThresholdAdapter->getValue(),
+  		decimation, mReduceResolution, mSmoothing, mPreserveTopology);
 
   mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
 }
@@ -106,6 +114,12 @@ void SurfaceWidget::smoothingSlot(bool value)
 {
   mSmoothing = value;
 }
+
+void SurfaceWidget::preserveSlot(bool value)
+{
+	mPreserveTopology = value;
+}
+
 void SurfaceWidget::imageChangedSlot(QString uid)
 {
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
@@ -113,6 +127,13 @@ void SurfaceWidget::imageChangedSlot(QString uid)
     return;
   mSurfaceThresholdAdapter->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
   mSurfaceThresholdAdapter->setValue(image->getRange() / 2 + image->getMin());
+
+  int extent[6];
+  image->getBaseVtkImageData()->GetExtent(extent);
+  mReduceResolutionCheckBox->setToolTip("Current input resolution: " + qstring_cast(extent[1])
+  		+ " " + qstring_cast(extent[3]) + " " + qstring_cast(extent[5])
+  		+ " (If checked: " + qstring_cast(extent[1]/2)+ " " + qstring_cast(extent[3]/2) + " "
+  		+ qstring_cast(extent[5]/2) + ")");
 }
 void SurfaceWidget::setDefaultColor(QColor color)
 {
@@ -127,13 +148,19 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
   mSurfaceThresholdAdapter = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
       "Values from this threshold and above will be included",
       100.0, ssc::DoubleRange(-1000, 1000, 1), 0);
+  connect(mSurfaceThresholdAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(thresholdSlot()));
+
   mDecimationAdapter = ssc::DoubleDataAdapterXml::initialize("Decimation %", "",
       "Reduce number of triangles in output surface",
       80.0, ssc::DoubleRange(0, 100, 1), 0);
 
-  QCheckBox* reduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
-  reduceResolutionCheckBox->setChecked(mReduceResolution);
-  connect(reduceResolutionCheckBox, SIGNAL(toggled(bool)), this, SLOT(reduceResolutionSlot(bool)));
+  QCheckBox* preserveCheckBox = new QCheckBox("Preserve mesh topology");
+  preserveCheckBox->setChecked(mPreserveTopology);
+  connect(preserveCheckBox, SIGNAL(toggled(bool)), this, SLOT(preserveSlot(bool)));
+
+//  mReduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
+  mReduceResolutionCheckBox->setChecked(mReduceResolution);
+  connect(mReduceResolutionCheckBox, SIGNAL(toggled(bool)), this, SLOT(reduceResolutionSlot(bool)));
 
   QCheckBox* smoothingCheckBox = new QCheckBox("Smoothing");
   smoothingCheckBox->setChecked(mSmoothing);
@@ -144,12 +171,19 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 
   layout->addWidget(inputLabel);
   layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mSurfaceThresholdAdapter));
-  layout->addWidget(reduceResolutionCheckBox);
+  layout->addWidget(mReduceResolutionCheckBox);
   layout->addWidget(outputLabel);
   layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mDecimationAdapter));
+  layout->addWidget(preserveCheckBox);
   layout->addWidget(smoothingCheckBox);
 
   return retval;
+}
+
+void SurfaceWidget::thresholdSlot()
+{
+	patientService()->getThresholdPreview()->setPreview(this, mSelectedImage->getImage(),
+			mSurfaceThresholdAdapter->getValue());
 }
 //------------------------------------------------------------------------------
 

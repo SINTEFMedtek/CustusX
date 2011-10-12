@@ -6,8 +6,6 @@
 #include "sscDoubleDataAdapterXml.h"
 #include "sscDoubleWidgets.h"
 #include "cxBaseWidget.h"
-//#include "cxCenterline.h"
-//#include "cxResample.h"
 #include "cxContour.h"
 #include "cxBinaryThresholdImageFilter.h"
 
@@ -41,18 +39,13 @@ signals:
 public slots:
   void setImageInputSlot(QString value);
 
-protected:
-  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
-
 private slots:
-  void removeIfNotVisible(); ///<Remove segmentation preview coloring if widget is not visible
   void segmentSlot();
   void toogleBinarySlot(bool on);
   void thresholdSlot();
+  void toogleSurfaceSlot(bool on);
   void toogleSmoothingSlot(bool on);
   void imageChangedSlot(QString uid);
-  void revertTransferFunctions();
   void handleFinishedSlot();
   void handleContourFinishedSlot();
 
@@ -65,6 +58,7 @@ private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
 
   bool mBinary; ///< whether or not the segmentation should create a binary volume
+  bool mSurface; ///< Create a surface of the segmented volume
   bool mUseSmothing; ///< whether or not the volume should be smoothed
 
   ssc::DoubleDataAdapterXmlPtr mSegmentationThresholdAdapter;
@@ -73,12 +67,6 @@ private:
   QLabel* mSmoothingSigmaLabel;
   QColor mDefaultColor;
   QLabel* mStatusLabel;
-
-  ssc::ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
-  ssc::ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
-  ssc::ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
-  bool mShadingOn_original; ///< Was shading originally enabled in image
-  QTimer *mRemoveTimer;///< Timer for removing segmentation preview coloring if widget is not visible
 
   BinaryThresholdImageFilter mSegmentationAlgorithm;
   Contour mContourAlgorithm;
