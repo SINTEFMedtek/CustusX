@@ -218,14 +218,10 @@ void DataManagerImpl::clear()
 	mActiveImage.reset();
 	mLandmarkProperties.clear();
 
-	emit
-	centerChanged();
-	emit
-	activeImageChanged("");
-	emit
-	activeImageTransferFunctionsChanged();
-	emit
-	landmarkPropertiesChanged();
+	emit centerChanged();
+	emit activeImageChanged("");
+	emit activeImageTransferFunctionsChanged();
+	emit landmarkPropertiesChanged();
 	//emit clinicalApplicationChanged();
 	emit dataLoaded();
 }
@@ -312,8 +308,7 @@ QString DataManagerImpl::addLandmark()
 	QString uid = qstring_cast(max + 1);
 	mLandmarkProperties[uid] = LandmarkProperty(uid);
 
-	emit
-	landmarkPropertiesChanged();
+	emit landmarkPropertiesChanged();
 	return uid;
 }
 
@@ -656,8 +651,7 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 	for (std::map<DataPtr, QDomNode>::iterator iter = datanodes.begin(); iter != datanodes.end(); ++iter)
 	{
 		iter->first->parseXml(iter->second);
-	} emit
-	dataLoaded();
+	} emit dataLoaded();
 
 	//we need to make sure all images are loaded before we try to set an active image
 	child = dataManagerNode.firstChild();
@@ -772,8 +766,7 @@ void DataManagerImpl::vtkImageDataChangedSlot()
 	if (mActiveImage)
 		uid = mActiveImage->getUid();
 
-	emit
-	activeImageChanged(uid);
+	emit activeImageChanged(uid);
 	messageManager()->sendInfo("Active image set to " + qstring_cast(uid));
 }
 
@@ -877,15 +870,17 @@ MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uid, QString na
 
 void DataManagerImpl::removeData(const QString& uid)
 {
+
+	std::cout << "DataManagerImpl::removeData()" << std::endl;
 	if (this->getActiveImage() && this->getActiveImage()->getUid() == uid)
 		this->setActiveImage(ImagePtr());
 
 	mData.erase(uid);
 
-	emit
-	dataRemoved(uid);
-	emit
-	dataLoaded(); // this should alert everybody interested in the data as a collection.
+	std::cout << "DataManagerImpl::removeData() 1" << std::endl;
+	emit dataRemoved(uid);
+	std::cout << "DataManagerImpl::removeData() 2" << std::endl;
+	emit dataLoaded(); // this should alert everybody interested in the data as a collection.
 	ssc::messageManager()->sendInfo("Removed data [" + uid + "].");
 }
 
