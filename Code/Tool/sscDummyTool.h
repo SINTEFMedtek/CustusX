@@ -71,7 +71,6 @@ private:
 	Transform3D m_prMt;
 	QString mTransformSaveFileName;
 	QTimerPtr mTimer;
-	double mOffset;
 	std::vector<Transform3D> mTransforms;
 
 	static int mTransformCount;

@@ -46,13 +46,13 @@ public:
 	void setType(const Type& type);
 	void setProbeSector(ssc::ProbeData sector); // for testing
 
+private slots:
+	void read3DCrossHairSlot(double toolTipOffset);
 private:
-	void read3DCrossHair();
 	// constant data
 	ssc::ProbeData mSector;
 	vtkSTLReaderPtr mSTLReader;
 	vtkCursor3DPtr mCrossHair;
-	double mOffset;
 
 	// mutex-protected mutable data
 	Type mType;

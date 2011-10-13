@@ -5,6 +5,7 @@
 #include <vtkCursor3D.h>
 #include "sscDummyTool.h"
 #include "sscMessageManager.h"
+#include "sscToolManager.h"
 
 namespace ssc
 {
@@ -13,17 +14,18 @@ ManualTool::ManualTool(const QString& uid, const QString& name) :
     Tool(uid,name), mMutex(QMutex::Recursive)
 {
   m_prMt = Transform3D::Identity();
-	mOffset = 0;
 	mType = TOOL_MANUAL;
 	mVisible = false;
-	read3DCrossHair();
+	read3DCrossHairSlot(0);
+	connect(toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(toolManager(), SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
 }
 
 ManualTool::~ManualTool()
 {
 }
 
-void ManualTool::read3DCrossHair()
+void ManualTool::read3DCrossHairSlot(double toolTipOffset)
 {
 	if(!mCrossHair)
 	{
@@ -32,8 +34,8 @@ void ManualTool::read3DCrossHair()
 	  mCrossHair->AxesOn();
 	}
 	int s = 60;
-	mCrossHair->SetModelBounds(-s,s,-s,s,-s,s+mOffset);
-	mCrossHair->SetFocalPoint(0,0,mOffset);
+	mCrossHair->SetModelBounds(-s,s,-s,s,-s,s+toolTipOffset);
+	mCrossHair->SetFocalPoint(0,0,toolTipOffset);
 	mCrossHair->Modified();
 }
 
@@ -129,18 +131,16 @@ double ManualTool::getTimestamp() const
 	return 0;
 }
 
+// Just use the tool tip offset from the tool manager
 double ManualTool::getTooltipOffset() const
 {
-	return mOffset;
+	return toolManager()->getTooltipOffset();
 }
 
+// Just use the tool tip offset from the tool manager
 void ManualTool::setTooltipOffset(double val)
 {
-	if (similar(val,mOffset))
-		return;
-	mOffset = val;
-	read3DCrossHair();
-	emit tooltipOffset(mOffset);
+	toolManager()->setTooltipOffset(val);
 }
 
 ssc::Transform3D ManualTool::getCalibration_sMt() const
