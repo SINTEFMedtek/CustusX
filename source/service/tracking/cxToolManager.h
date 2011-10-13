@@ -51,7 +51,7 @@ public:
   virtual ssc::ToolManager::ToolMapPtr getTools(); ///< get all configured and initialized tools
   virtual ssc::ToolPtr getTool(const QString& uid); ///< get a specific tool
 	virtual void setTooltipOffset(double offset); ///< set the tool tip offset
-	virtual double getTooltipOffset(); ///< get the tool tip offset
+	virtual double getTooltipOffset() const; ///< get the tool tip offset
 
   virtual ssc::ToolPtr getDominantTool(); ///< get the dominant tool
   virtual void setDominantTool(const QString& uid); ///< can be set to either a connected or configured tool

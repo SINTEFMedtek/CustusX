@@ -23,8 +23,8 @@ class ManualToolAdapter : public ssc::ManualTool
 {
   Q_OBJECT
 public:
-  explicit ManualToolAdapter(QString uid);
-  explicit ManualToolAdapter(ssc::ToolPtr base);
+  explicit ManualToolAdapter(ssc::ToolManager* manager, QString uid);
+  explicit ManualToolAdapter(ssc::ToolManager* manager, ssc::ToolPtr base);
   virtual ~ManualToolAdapter();
   virtual Type getType() const;
   virtual QString getGraphicsFileName() const;
