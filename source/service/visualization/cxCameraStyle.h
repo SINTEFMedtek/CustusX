@@ -39,7 +39,8 @@ class CameraStyle : public QObject
 public:
   enum Style{
     DEFAULT_STYLE,
-    TOOL_STYLE
+    TOOL_STYLE,
+    ANGLED_TOOL_STYLE
   };
 
   CameraStyle();
@@ -62,6 +63,7 @@ protected:
 
   void activateCameraDefaultStyle();
   void activateCameraToolStyle(int offset=0);
+  void activateCameraAngledToolStyle(int offset = 0);
   void connectTool();
   void disconnectTool();
 
