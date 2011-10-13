@@ -10,15 +10,15 @@
 namespace ssc
 {
 
-ManualTool::ManualTool(const QString& uid, const QString& name) :
+ManualTool::ManualTool(ToolManager* manager, const QString& uid, const QString& name) :
     Tool(uid,name), mMutex(QMutex::Recursive)
 {
   m_prMt = Transform3D::Identity();
 	mType = TOOL_MANUAL;
 	mVisible = false;
 	read3DCrossHairSlot(0);
-	connect(toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-	connect(toolManager(), SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
+	connect(manager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(manager, SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
 }
 
 ManualTool::~ManualTool()

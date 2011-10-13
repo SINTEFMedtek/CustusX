@@ -8,6 +8,8 @@
 namespace ssc
 {
 
+class ToolManager;
+
 /**A manual tool that is unconnected to any hardware.
  * Use this tool by setting the functions setTransform() and setVisible().
  *
@@ -18,7 +20,7 @@ class ManualTool : public ssc::Tool
 	Q_OBJECT
 public:
 
-	explicit ManualTool(const QString& uid, const QString& name ="");
+	explicit ManualTool(ToolManager* manager, const QString& uid, const QString& name ="");
 	virtual ~ManualTool();
 	virtual Type getType() const;
 	virtual QString getGraphicsFileName() const;
