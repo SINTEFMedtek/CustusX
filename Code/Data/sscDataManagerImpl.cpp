@@ -870,16 +870,12 @@ MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uid, QString na
 
 void DataManagerImpl::removeData(const QString& uid)
 {
-
-	std::cout << "DataManagerImpl::removeData()" << std::endl;
 	if (this->getActiveImage() && this->getActiveImage()->getUid() == uid)
 		this->setActiveImage(ImagePtr());
 
 	mData.erase(uid);
 
-	std::cout << "DataManagerImpl::removeData() 1" << std::endl;
 	emit dataRemoved(uid);
-	std::cout << "DataManagerImpl::removeData() 2" << std::endl;
 	emit dataLoaded(); // this should alert everybody interested in the data as a collection.
 	ssc::messageManager()->sendInfo("Removed data [" + uid + "].");
 }

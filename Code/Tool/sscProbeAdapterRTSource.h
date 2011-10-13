@@ -67,6 +67,7 @@ public:
 	{
 		return mBase->isStreaming();
 	}
+  virtual void release() {};
 
 private slots:
 	void probeChangedSlot();
