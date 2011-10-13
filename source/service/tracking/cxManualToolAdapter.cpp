@@ -6,17 +6,18 @@
  */
 
 #include <cxManualToolAdapter.h>
+#include "sscToolManager.h"
 
 namespace cx
 {
 
-ManualToolAdapter::ManualToolAdapter(QString uid) : ssc::ManualTool(uid)
+ManualToolAdapter::ManualToolAdapter(ssc::ToolManager* manager, QString uid) : ssc::ManualTool(manager, uid)
 {
-  mBase.reset(new ssc::ManualTool(uid+"base"));
+  mBase.reset(new ssc::ManualTool(manager, uid+"base"));
   connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 }
 
-ManualToolAdapter::ManualToolAdapter(ssc::ToolPtr base) : ssc::ManualTool(mBase->getUid()+"_manual"), mBase(base)
+ManualToolAdapter::ManualToolAdapter(ssc::ToolManager* manager, ssc::ToolPtr base) : ssc::ManualTool(manager, mBase->getUid()+"_manual"), mBase(base)
 {
 }
 

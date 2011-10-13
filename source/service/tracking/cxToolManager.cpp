@@ -98,7 +98,7 @@ void ToolManager::initializeManualTool()
   if (!mManualTool)
   {
     //adding a manual tool as default
-    mManualTool.reset(new ManualToolAdapter("ManualTool"));
+    mManualTool.reset(new ManualToolAdapter(this, "ManualTool"));
     mTools["ManualTool"] = mManualTool;
     mManualTool->setVisible(settings()->value("showManualTool").toBool());
     connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
@@ -509,7 +509,7 @@ void ToolManager::setTooltipOffset(double offset)
 	mToolTipOffset = offset;
 	emit tooltipOffset(mToolTipOffset);
 }
-double ToolManager::getTooltipOffset()
+double ToolManager::getTooltipOffset() const
 {
 	return mToolTipOffset;
 };
