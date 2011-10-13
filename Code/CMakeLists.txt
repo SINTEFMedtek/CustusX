@@ -126,6 +126,7 @@ set( SSC_INCLUDE_DIRS
 
 
 set(SSC_LIBRARY_DIRS 
+    ${SSC_SOURCE_DIR}/Code/Ultrasound/3DReconstruction
     )    
 
 set( SSC_LIBRARIES QVTK )

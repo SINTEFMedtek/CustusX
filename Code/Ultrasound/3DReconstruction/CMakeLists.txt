@@ -4,7 +4,6 @@
 ##
 ###########################################################
 
-
 cmake_minimum_required( VERSION 2.4 )
 
 if(COMMAND cmake_policy)
@@ -92,11 +91,12 @@ if (USE_US_RECONSTRUCTION_THUNDER)
     	FIND_PATH(OPENCL_INCLUDE_DIR CL/cl.h )
     	FIND_LIBRARY(OPENCL_LIBRARIES OpenCL )
     ENDIF (APPLE)    
-
-    # create the target
-    add_library( sscUS3DReconstruction ${SOURCE_FILES} )
-    target_link_libraries( sscUS3DReconstruction ${cxPluginUSReconstructionLogic_LIB_FILES} ${OPENCL_LIBRARIES})
 endif (USE_US_RECONSTRUCTION_THUNDER)
+
+# create the target
+add_library( sscUS3DReconstruction ${SOURCE_FILES} )
+target_link_libraries( sscUS3DReconstruction SSC ${OPENCL_LIBRARIES})
+
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
