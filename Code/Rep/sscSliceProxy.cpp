@@ -24,7 +24,7 @@ QString SliceProxy::getName() const
 SliceProxy::SliceProxy() :
     mCutplane(new SliceComputer())
 {
-	mAlwaysUseDefaultCenter = true;
+	mAlwaysUseDefaultCenter = false;
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	connect(dataManager(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 	//TODO connect to toolmanager rMpr changed
