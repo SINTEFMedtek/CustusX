@@ -45,6 +45,8 @@
 #include "cxPlaneMetricRep.h"
 #include "cxDataMetricRep.h"
 #include "cxDataLocations.h"
+#include "sscTexture3DSlicerRep.h"
+#include "sscSlices3DRep.h"
 
 namespace cx
 {
@@ -119,6 +121,9 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+
+//  mSliceProxy = ssc::SliceProxy::New("sliceproxy_("+ mView->getName() +")");
+//  mSliceProxy->initializeFromPlane(ssc::ptAXIAL, false, ssc::Vector3D(0,0,1), true, 150, 0.25);
 
   mLandmarkRep = LandmarkRep::New("LandmarkRep_"+index);
   mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
@@ -483,6 +488,18 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 {
   if (boost::shared_dynamic_cast<ssc::Image>(data))
   {
+//		if (mSlices3DRep)
+//			mView->removeRep(mSlices3DRep);
+//		mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
+//		mSlices3DRep->addPlane(ssc::ptAXIAL);
+//		mSlices3DRep->addPlane(ssc::ptSAGITTAL);
+//		mSlices3DRep->addPlane(ssc::ptCORONAL);
+//		mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
+//
+//		if (mViewGroup)
+//			mSlices3DRep->setImages(mViewGroup->getImages());
+//		return mSlices3DRep;
+
     ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(boost::shared_dynamic_cast<ssc::Image>(data));
     return rep;
   }
@@ -593,6 +610,8 @@ void ViewWrapper3D::dominantToolChangedSlot()
 {
   ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
   mPickerRep->setTool(dominantTool);
+  if (mSlices3DRep)
+	  mSlices3DRep->setTool(dominantTool);
 }
 
 
