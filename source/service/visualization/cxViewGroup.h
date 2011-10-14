@@ -4,15 +4,16 @@
 #include <vector>
 #include <QObject>
 #include <QDomDocument>
-#include "sscData.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "cxViewWrapper.h"
+#include "sscVector3D.h"
 class QMenu;
 class QPoint;
 
 namespace cx
 {
+typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 
 /**Helper for functions independent of state.
  * Not sure if we need this - think of better place.

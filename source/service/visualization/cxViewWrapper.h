@@ -1,10 +1,9 @@
 #ifndef CXVIEWWRAPPER_H_
 #define CXVIEWWRAPPER_H_
 
+#include <vector>
 #include <QVariant>
 #include <QObject>
-#include "sscView.h"
-#include "sscImage.h"
 #include "sscDefinitions.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
