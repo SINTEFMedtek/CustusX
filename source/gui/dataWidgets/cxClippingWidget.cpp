@@ -13,109 +13,112 @@
 #include "sscStringDataAdapter.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscDefinitionStrings.h"
+#include "cxInteractiveClipper.h"
+#include "cxViewManager.h"
 
 namespace cx
 {
 
-ClipPlaneStringDataAdapter::ClipPlaneStringDataAdapter(InteractiveClipperPtr clipper) : mInteractiveClipper(clipper)
+ClipPlaneStringDataAdapter::ClipPlaneStringDataAdapter(InteractiveClipperPtr clipper) :
+	mInteractiveClipper(clipper)
 {
-  connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SIGNAL(changed()));
+	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SIGNAL(changed()));
 }
 
 QString ClipPlaneStringDataAdapter::getValueName() const
 {
-  return "Slice Plane";
+	return "Slice Plane";
 }
 bool ClipPlaneStringDataAdapter::setValue(const QString& value)
 {
-  ssc::PLANE_TYPE plane = string2enum<ssc::PLANE_TYPE>(value);
-  if (plane==mInteractiveClipper->getSlicePlane())
-    return false;
-  mInteractiveClipper->setSlicePlane(plane);
-  return true;
+	ssc::PLANE_TYPE plane = string2enum<ssc::PLANE_TYPE> (value);
+	if (plane == mInteractiveClipper->getSlicePlane())
+		return false;
+	mInteractiveClipper->setSlicePlane(plane);
+	return true;
 }
 QString ClipPlaneStringDataAdapter::getValue() const
 {
-  return qstring_cast(mInteractiveClipper->getSlicePlane());
+	return qstring_cast(mInteractiveClipper->getSlicePlane());
 }
 QString ClipPlaneStringDataAdapter::getHelp() const
 {
-  return "chose the slice plane to clip with";
+	return "chose the slice plane to clip with";
 }
 QStringList ClipPlaneStringDataAdapter::getValueRange() const
 {
-  std::vector<ssc::PLANE_TYPE> planes = mInteractiveClipper->getAvailableSlicePlanes();
-  QStringList retval;
-  //retval << ""; // removed this. No idea why we need an empty entry.
-  for (unsigned i=0; i<planes.size(); ++i)
-    retval << qstring_cast(planes[i]);
-  return retval;
+	std::vector<ssc::PLANE_TYPE> planes = mInteractiveClipper->getAvailableSlicePlanes();
+	QStringList retval;
+	//retval << ""; // removed this. No idea why we need an empty entry.
+	for (unsigned i = 0; i < planes.size(); ++i)
+		retval << qstring_cast(planes[i]);
+	return retval;
 }
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-ClippingWidget::ClippingWidget(QWidget* parent) : 
-  BaseWidget(parent, "ClippingWidget", "Clip")
+ClippingWidget::ClippingWidget(QWidget* parent) :
+	BaseWidget(parent, "ClippingWidget", "Clip")
 {
-  mInteractiveClipper = viewManager()->getClipper();
-  connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
+	mInteractiveClipper = viewManager()->getClipper();
+	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
-  QVBoxLayout* layout = new QVBoxLayout(this);
+	QVBoxLayout* layout = new QVBoxLayout(this);
 
-  QGroupBox* activeClipGroupBox = new QGroupBox("Interactive clipper");
-  layout->addWidget(activeClipGroupBox);
-  QVBoxLayout* activeClipLayout = new QVBoxLayout(activeClipGroupBox);
+	QGroupBox* activeClipGroupBox = new QGroupBox("Interactive clipper");
+	layout->addWidget(activeClipGroupBox);
+	QVBoxLayout* activeClipLayout = new QVBoxLayout(activeClipGroupBox);
 
-  mPlaneAdapter = ClipPlaneStringDataAdapter::New(mInteractiveClipper);
-  ssc::LabeledComboBoxWidget* combo = new ssc::LabeledComboBoxWidget(this, mPlaneAdapter);
+	mPlaneAdapter = ClipPlaneStringDataAdapter::New(mInteractiveClipper);
+	ssc::LabeledComboBoxWidget* combo = new ssc::LabeledComboBoxWidget(this, mPlaneAdapter);
 
-  mUseClipperCheckBox = new QCheckBox("Use Clipper");
-  connect(mUseClipperCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(useClipper(bool)));
-  activeClipLayout->addWidget(mUseClipperCheckBox);
-  activeClipLayout->addWidget(combo);
-  mInvertPlaneCheckBox = new QCheckBox("Invert plane");
-  connect(mInvertPlaneCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(invertPlane(bool)));
-  activeClipLayout->addWidget(mInvertPlaneCheckBox);
+	mUseClipperCheckBox = new QCheckBox("Use Clipper");
+	connect(mUseClipperCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(useClipper(bool)));
+	activeClipLayout->addWidget(mUseClipperCheckBox);
+	activeClipLayout->addWidget(combo);
+	mInvertPlaneCheckBox = new QCheckBox("Invert plane");
+	connect(mInvertPlaneCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(invertPlane(bool)));
+	activeClipLayout->addWidget(mInvertPlaneCheckBox);
 
-  QPushButton* saveButton = new QPushButton("Save clip plane");
-  connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClickedSlot()));
-  //saveButton->setEnabled(false);
-  QPushButton* clearButton = new QPushButton("Clear saved planes");
-  connect(clearButton, SIGNAL(clicked()), this, SLOT(clearButtonClickedSlot()));
-  //clearButton->setEnabled(false);
-  activeClipLayout->addWidget(saveButton);
-  layout->addWidget(clearButton);
+	QPushButton* saveButton = new QPushButton("Save clip plane");
+	connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClickedSlot()));
+	//saveButton->setEnabled(false);
+	QPushButton* clearButton = new QPushButton("Clear saved planes");
+	connect(clearButton, SIGNAL(clicked()), this, SLOT(clearButtonClickedSlot()));
+	//clearButton->setEnabled(false);
+	activeClipLayout->addWidget(saveButton);
+	layout->addWidget(clearButton);
 
-  layout->addStretch();
+	layout->addStretch();
 
-  this->clipperChangedSlot();
+	this->clipperChangedSlot();
 }
 
 QString ClippingWidget::defaultWhatsThis() const
 {
-  return "<html>"
-    "<h3>Functonality for clipping a volume</h3>"
-    "<p>Lets you clip in a volume.</p>"
-    "<p><i></i></p>"
-    "</html>";
+	return "<html>"
+		"<h3>Functonality for clipping a volume</h3>"
+		"<p>Lets you clip in a volume.</p>"
+		"<p><i></i></p>"
+		"</html>";
 }
 
 void ClippingWidget::clipperChangedSlot()
 {
-  mUseClipperCheckBox->setChecked(mInteractiveClipper->getUseClipper());
-  mInvertPlaneCheckBox->setChecked(mInteractiveClipper->getInvertPlane());
+	mUseClipperCheckBox->setChecked(mInteractiveClipper->getUseClipper());
+	mInvertPlaneCheckBox->setChecked(mInteractiveClipper->getInvertPlane());
 }
 
 void ClippingWidget::clearButtonClickedSlot()
 {
-  mInteractiveClipper->clearClipPlanesInVolume();
+	mInteractiveClipper->clearClipPlanesInVolume();
 }
 
 void ClippingWidget::saveButtonClickedSlot()
 {
-  mInteractiveClipper->saveClipPlaneToVolume();
+	mInteractiveClipper->saveClipPlaneToVolume();
 }
 
 }

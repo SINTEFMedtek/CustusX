@@ -10,12 +10,13 @@
 #include <vector>
 #include <QPointer>
 #include <QObject>
-#include "sscData.h"
+//#include "sscData.h"
 #include "sscDefinitions.h"
-#include "sscAxesRep.h"
-#include "cxViewGroup.h"
+//#include "sscAxesRep.h"
+//#include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
+#include "sscVector3D.h"
 
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
