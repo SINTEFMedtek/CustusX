@@ -160,8 +160,6 @@ private:
   bool mConfigured;         ///< whether or not the tool is properly configured
   bool mTracked;            ///< whether the tool is being tracked or not
 
-  double mToolTipOffset; ///< distance from tool where point should be shown
-
   ProbePtr mProbe;
 
   QTimer mTpsTimer;
