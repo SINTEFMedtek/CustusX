@@ -1,6 +1,7 @@
 #ifndef SSCVECTOR3D_H_
 #define SSCVECTOR3D_H_
 
+
 #include "sscMathBase.h"
 
 namespace ssc

@@ -5,16 +5,16 @@
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
 #include "vtkForwardDeclarations.h"
-#include "sscGraphicalPrimitives.h"
 
 namespace ssc
 {
 typedef boost::shared_ptr<class AxesRep> AxesRepPtr;
+typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 
 /**Representation for one 3D coordinate axis.
  * Set the position using setTransform().
  */
-class AxesRep : public RepImpl
+class AxesRep: public RepImpl
 {
 public:
 	virtual ~AxesRep();
@@ -42,8 +42,7 @@ protected:
 	std::vector<Vector3D> mCaptionPos;
 	double mSize;
 	double mFontSize;
-  ssc::ViewportListenerPtr mViewportListener;
-
+	ViewportListenerPtr mViewportListener;
 };
 
 } // namespace ssc

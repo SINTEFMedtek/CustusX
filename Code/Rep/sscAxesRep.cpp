@@ -10,6 +10,7 @@
 
 #include "sscTypeConversions.h"
 #include "sscView.h"
+#include "sscGraphicalPrimitives.h"
 
 namespace ssc
 {
