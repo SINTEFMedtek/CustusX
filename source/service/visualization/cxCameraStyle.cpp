@@ -134,6 +134,7 @@ void CameraStyle::activateCameraDefaultStyle()
 
 void CameraStyle::activateCameraToolStyle(int offset)
 {
+  this->disconnectTool();
   this->setCameraOffsetSlot(offset);
   mCameraStyle = TOOL_STYLE;
   this->connectTool();
@@ -142,10 +143,11 @@ void CameraStyle::activateCameraToolStyle(int offset)
 
 void CameraStyle::activateCameraAngledToolStyle(int offset)
 {
+  this->disconnectTool();
   this->setCameraOffsetSlot(offset);
   mCameraStyle = ANGLED_TOOL_STYLE;
   this->connectTool();
-  ssc::messageManager()->sendInfo("Tool camera style activated.");
+  ssc::messageManager()->sendInfo("Angled tool camera style activated.");
 }
 
 void CameraStyle::dominantToolChangedSlot()
@@ -180,7 +182,7 @@ void CameraStyle::connectTool()
   connect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
   rep->setOffsetPointVisibleAtZeroOffset(true);
-  if (mCameraStyle = TOOL_STYLE)
+  if (mCameraStyle == TOOL_STYLE)
   	rep->setStayHiddenAfterVisible(true);
 
   ssc::messageManager()->sendInfo("Camera is following "+mFollowingTool->getName());
