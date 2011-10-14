@@ -12,7 +12,10 @@
 //---------------------------------------------------------
 namespace ssc
 {
+
 typedef vtkSmartPointer<class TextureSlicePainter> TextureSlicePainterPtr;
+typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
+
 /**
  * \class Texture3DSlicerRep
  *
@@ -35,7 +38,7 @@ public:
 	virtual ~Texture3DSlicerRep();
 	virtual QString getType() const
 	{
-		return "vm::Texture3DSlicerRep";
+		return "ssc::Texture3DSlicerRep";
 	}
 	void setShaderFile(QString shaderFile);
 	virtual void printSelf(std::ostream & os, ssc::Indent indent);
@@ -43,31 +46,18 @@ public:
 	void setImages(std::vector<ssc::ImagePtr> images);
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	void update();
+	void setTargetSpaceToR();
+
 protected:
 	Texture3DSlicerRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
-	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
 
 private slots:
-	void transformChangedSlot();
-	void updateColorAttributeSlot();
 	void viewChanged();
 private:
-//	void createCoordinates(int count);
-	void updateCoordinates(int index);
-	QString getTCoordName(int index);
-	void setColorAttributes(int i);
-	DoubleBoundingBox3D mBB_s;
-	std::vector<ssc::ImagePtr> mImages;
-	ssc::SliceProxyPtr mSliceProxy;
 	View* mView;
-
-	TextureSlicePainterPtr mPainter;
-	vtkActorPtr mActor;
-	vtkPolyDataPtr mPolyData;
-	vtkPlaneSourcePtr mPlaneSource;
-	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
+	Texture3DSlicerProxyPtr mProxy;
 };
 //---------------------------------------------------------
 }//end namespace

@@ -24,6 +24,7 @@ QString SliceProxy::getName() const
 SliceProxy::SliceProxy() :
     mCutplane(new SliceComputer())
 {
+	mAlwaysUseDefaultCenter = true;
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	connect(dataManager(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 	//TODO connect to toolmanager rMpr changed
@@ -102,9 +103,19 @@ void SliceProxy::setDefaultCenter(const Vector3D& c)
 	this->centerChangedSlot();
 }
 
+void SliceProxy::setAlwaysUseDefaultCenter(bool on)
+{
+	mAlwaysUseDefaultCenter = on;
+	this->centerChangedSlot();
+}
+
 void SliceProxy::centerChangedSlot()
 {
-	if (mTool)
+	if (mAlwaysUseDefaultCenter)
+	{
+		mCutplane->setFixedCenter(mDefaultCenter);
+	}
+	else if (mTool)
 	{
 		Vector3D c = ssc::DataManager::getInstance()->getCenter();
 		mCutplane->setFixedCenter(c);
@@ -184,18 +195,18 @@ void SliceProxy::setFollowType(FOLLOW_TYPE followType)
 void SliceProxy::setGravity(bool use, const Vector3D& dir)
 {
 	mCutplane->setGravity(use, dir);
-	changed();
+	this->changed();
 }
 void SliceProxy::setToolViewOffset(bool use, double viewportHeight, double toolViewOffset)
 {
 	mCutplane->setToolViewOffset(use, viewportHeight, toolViewOffset);
-	changed();
+	this->changed();
 }
  
 void SliceProxy::setToolViewportHeight(double viewportHeight)
 {
 	mCutplane->setToolViewportHeight(viewportHeight);
-	changed();
+	this->changed();
 }
 
 ToolPtr SliceProxy::getTool()

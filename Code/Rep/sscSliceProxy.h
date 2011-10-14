@@ -41,7 +41,8 @@ public:
 	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset);
 	void setToolViewportHeight(double viewportHeight);
 	void setDefaultCenter(const Vector3D& c);
-	
+	void setAlwaysUseDefaultCenter(bool on);
+
 	SliceComputer getComputer() const;
 	void setComputer(const SliceComputer& val);
 
@@ -71,6 +72,7 @@ private:
 	ToolPtr mTool;
 	boost::scoped_ptr<SliceComputer> mCutplane;
 	Vector3D mDefaultCenter; ///< use this center when no tool is available
+	bool mAlwaysUseDefaultCenter; ///< use def center anyway
 	QString mName; ///< for debug
 };
 
