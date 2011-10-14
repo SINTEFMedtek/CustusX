@@ -4,13 +4,13 @@
 #include <map>
 #include <vector>
 #include <QObject>
-#include "sscImage.h"
+#include "sscData.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
 //#include "cxTreeModelItem.h"
-#include "cxInteractiveClipper.h"
+//#include "cxInteractiveClipper.h"
 
 class QActionGroup;
 class QAction;
@@ -25,6 +25,7 @@ namespace cx
 class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
+typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class RenderTimer> RenderTimerPtr;
 
 /**

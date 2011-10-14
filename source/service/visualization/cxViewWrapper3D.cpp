@@ -43,6 +43,14 @@
 #include "sscTexture3DSlicerRep.h"
 #include "sscSlices3DRep.h"
 
+#include "sscData.h"
+#include "sscAxesRep.h"
+#include "cxViewGroup.h"
+
+#include "cxAngleMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxPointMetric.h"
+
 namespace cx
 {
 
