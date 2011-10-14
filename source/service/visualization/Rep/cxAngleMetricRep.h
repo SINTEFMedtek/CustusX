@@ -9,17 +9,24 @@
 #define CXANGLEMETRICREP_H_
 
 #include "cxDataMetricRep.h"
-#include "sscGraphicalPrimitives.h"
-#include "cxAngleMetric.h"
+//#include "sscGraphicalPrimitives.h"
+//#include "cxAngleMetric.h"
 #include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 
-#include "vtkTextActor.h"
-typedef vtkSmartPointer<vtkTextActor> vtkTextActorPtr;
+typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
+
+namespace ssc
+{
+typedef boost::shared_ptr<class CaptionText3D> CaptionText3DPtr;
+typedef boost::shared_ptr<class GraphicalArc3D> GraphicalArc3DPtr;
+}
 
 namespace cx
 {
 
 typedef boost::shared_ptr<class AngleMetricRep> AngleMetricRepPtr;
+typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
 
 /**Rep for visualizing a DistanceMetric.
  *

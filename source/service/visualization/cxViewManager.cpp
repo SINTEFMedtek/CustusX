@@ -37,6 +37,8 @@
 #include "vtkForwardDeclarations.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
+#include "cxInteractiveClipper.h"
+#include "sscImage.h"
 
 namespace cx
 {

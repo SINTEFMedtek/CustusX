@@ -10,7 +10,7 @@
 
 #include <vector>
 #include "sscVector3D.h"
-#include "sscDoubleWidgets.h"
+//#include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 
