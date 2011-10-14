@@ -70,6 +70,9 @@ void CameraStyle::setCameraStyle(Style style, int offset)
   case TOOL_STYLE:
     this->activateCameraToolStyle(offset);
     break;
+  case ANGLED_TOOL_STYLE:
+    this->activateCameraAngledToolStyle(offset);
+    break;
   default:
     break;
   };
@@ -92,6 +95,11 @@ void CameraStyle::moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestam
   ssc::Vector3D camera_r = rMt.coord(ssc::Vector3D(0,0,offset-mCameraOffset));
   ssc::Vector3D focus_r = rMt.coord(ssc::Vector3D(0,0,offset));
   ssc::Vector3D vup_r = rMt.vector(ssc::Vector3D(-1,0,0));
+  if (mCameraStyle == ANGLED_TOOL_STYLE)
+  {
+  	double height = mCameraOffset * tan(20/180.0*M_PI);
+  	camera_r += vup_r*height;
+  }
 
   vtkCameraPtr camera = this->getCamera();
   if (!camera)
@@ -100,7 +108,7 @@ void CameraStyle::moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestam
   camera->SetFocalPoint(focus_r.begin());
   camera->SetViewUp(vup_r.begin());
 
-  camera->SetClippingRange(1, 2000);
+  camera->SetClippingRange(1, std::max<double>(1000, mCameraOffset*1.5));
 }
 
 /**reset the view connection, this is in case the view, reps or tool has been deleted/recreated in
@@ -126,10 +134,20 @@ void CameraStyle::activateCameraDefaultStyle()
 
 void CameraStyle::activateCameraToolStyle(int offset)
 {
+  this->disconnectTool();
   this->setCameraOffsetSlot(offset);
   mCameraStyle = TOOL_STYLE;
   this->connectTool();
   ssc::messageManager()->sendInfo("Tool camera style activated.");
+}
+
+void CameraStyle::activateCameraAngledToolStyle(int offset)
+{
+  this->disconnectTool();
+  this->setCameraOffsetSlot(offset);
+  mCameraStyle = ANGLED_TOOL_STYLE;
+  this->connectTool();
+  ssc::messageManager()->sendInfo("Angled tool camera style activated.");
 }
 
 void CameraStyle::dominantToolChangedSlot()
@@ -144,7 +162,7 @@ void CameraStyle::dominantToolChangedSlot()
 
 void CameraStyle::connectTool()
 {
-  if (mCameraStyle!=TOOL_STYLE)
+  if (mCameraStyle==DEFAULT_STYLE)
     return;
 
   mFollowingTool = ssc::toolManager()->getDominantTool();
@@ -164,7 +182,8 @@ void CameraStyle::connectTool()
   connect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
   rep->setOffsetPointVisibleAtZeroOffset(true);
-  rep->setStayHiddenAfterVisible(true);
+  if (mCameraStyle == TOOL_STYLE)
+  	rep->setStayHiddenAfterVisible(true);
 
   ssc::messageManager()->sendInfo("Camera is following "+mFollowingTool->getName());
 }

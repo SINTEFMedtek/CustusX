@@ -51,7 +51,8 @@ ToolManager::ToolManager() :
   mConfigured(false),
   mInitialized(false),
   mTracking(false),
-  mLastLoadPositionHistory(0)
+  mLastLoadPositionHistory(0),
+  mToolTipOffset(0)
 {
   m_rMpr_History.reset(new ssc::RegistrationHistory());
   connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
@@ -97,7 +98,7 @@ void ToolManager::initializeManualTool()
   if (!mManualTool)
   {
     //adding a manual tool as default
-    mManualTool.reset(new ManualToolAdapter("ManualTool"));
+    mManualTool.reset(new ManualToolAdapter(this, "ManualTool"));
     mTools["ManualTool"] = mManualTool;
     mManualTool->setVisible(settings()->value("showManualTool").toBool());
     connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
@@ -500,6 +501,18 @@ ssc::ToolPtr ToolManager::getTool(const QString& uid)
 
   return retval;
 }
+
+void ToolManager::setTooltipOffset(double offset)
+{
+	if (ssc::similar(offset,mToolTipOffset))
+		return;
+	mToolTipOffset = offset;
+	emit tooltipOffset(mToolTipOffset);
+}
+double ToolManager::getTooltipOffset() const
+{
+	return mToolTipOffset;
+};
 
 ssc::ToolPtr ToolManager::getDominantTool()
 {
