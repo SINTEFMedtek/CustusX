@@ -10,6 +10,7 @@
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "sscDefinitionStrings.h"
+#include "sscView.h"
 
 namespace cx
 {

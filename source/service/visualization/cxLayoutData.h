@@ -12,6 +12,7 @@
 class QDomNode;
 #include <QString>
 #include "sscDefinitions.h"
+#include "cxForwardDeclarations.h"
 #include "sscView.h"
 
 namespace cx
