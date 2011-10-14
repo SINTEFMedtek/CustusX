@@ -27,6 +27,10 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
 {
   mCameraStyle.reset(new CameraStyle());
 
+  mDefaultCameraStyleRadioButton->setToolTip("Fixed camera (Move it with the mouse");
+  mToolCameraStyleRadioButton->setToolTip("Camera following tool");
+  mAngledToolCameraStyleRadioButton->setToolTip("Camera following tool (Placed at an angle of 20 degrees)");
+
   //camera setttings
   mCameraGroupBox->setLayout(mCameraGroupLayout);
   mDefaultCameraStyleRadioButton->setChecked(true);
