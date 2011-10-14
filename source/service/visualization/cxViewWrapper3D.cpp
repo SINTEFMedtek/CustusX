@@ -244,7 +244,8 @@ void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
 
   // TODO set center here will not do: must handle
   ssc::dataManager()->setCenter(p_r);
-  tool->set_prMt(ssc::createTransformTranslate(p_pr));
+  ssc::Vector3D p0_pr = tool->get_prMt().coord(ssc::Vector3D(0,0,0));
+  tool->set_prMt(ssc::createTransformTranslate(p_pr-p0_pr) * tool->get_prMt());
 }
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
