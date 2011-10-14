@@ -20,6 +20,11 @@
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
 
+namespace ssc
+{
+	typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
+}
+
 namespace cx
 {
 typedef boost::shared_ptr<class ImageLandmarkRep> ImageLandmarkRepPtr;
@@ -113,7 +118,8 @@ private:
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
-
+//  ssc::SliceProxyPtr mSliceProxy;
+  ssc::Slices3DRepPtr mSlices3DRep;
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
   ssc::OrientationAnnotation3DRepPtr mAnnotationMarker;
 
