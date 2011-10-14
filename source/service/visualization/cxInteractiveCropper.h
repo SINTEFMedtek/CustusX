@@ -25,51 +25,50 @@ typedef vtkSmartPointer<class CropBoxEnableCallback> CropBoxEnableCallbackPtr;
  * The bounding box can be set either explicitly or using
  * a vtkBoxWidget.
  */
-class InteractiveCropper : public QObject
+class InteractiveCropper: public QObject
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  InteractiveCropper();
-  void setView(ssc::View* view); ///< adds an interactive box widget to the view. Press 'I' to show
-  ssc::DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
-  void setBoundingBox(const ssc::DoubleBoundingBox3D& bb_d); ///< set BB in reference space
-  void resetBoundingBox(); ///< set bounding box back to initial size (entire volume)
-  ssc::DoubleBoundingBox3D getMaxBoundingBox();
-  bool getUseCropping();
-  bool getShowBoxWidget() const;
+	InteractiveCropper();
+	void setView(ssc::View* view); ///< adds an interactive box widget to the view. Press 'I' to show
+	ssc::DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
+	void setBoundingBox(const ssc::DoubleBoundingBox3D& bb_d); ///< set BB in reference space
+	void resetBoundingBox(); ///< set bounding box back to initial size (entire volume)
+	ssc::DoubleBoundingBox3D getMaxBoundingBox();
+	bool getUseCropping();
+	bool getShowBoxWidget() const;
 signals:
-  void changed();
+	void changed();
 public slots:
-  void showBoxWidget(bool on);
-  void useCropping(bool on);
+	void showBoxWidget(bool on);
+	void useCropping(bool on);
 private slots:
-  void imageCropChangedSlot();
-  void imageChangedSlot();
+	void imageCropChangedSlot();
+	void imageChangedSlot();
 
 private:
-  void boxWasShown(bool val);
-  friend class CropBoxCallback;
-  friend class CropBoxEnableCallback;
-  void setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_d);
-  ssc::DoubleBoundingBox3D getBoxWidgetSize();
-  void setCroppingRegion(ssc::DoubleBoundingBox3D bb_d);
-  void updateBoxWidgetInteractor();
-  void initialize();
+	void boxWasShown(bool val);
+	friend class CropBoxCallback;
+	friend class CropBoxEnableCallback;
+	void setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_d);
+	ssc::DoubleBoundingBox3D getBoxWidgetSize();
+	void setCroppingRegion(ssc::DoubleBoundingBox3D bb_d);
+	void updateBoxWidgetInteractor();
+	void initialize();
 
-  vtkVolumeMapperPtr getMapper();
-  ssc::ImagePtr mImage;
-  QPointer<ssc::View> mView;
-  //vtkBoxRepresentationPtr mBoxRep;
-  //vtkBoxWidget2Ptr mBoxWidget2;
-  vtkBoxWidgetPtr mBoxWidget;
-  CropBoxCallbackPtr mCropBoxCallback;
-  CropBoxEnableCallbackPtr mCropBoxEnableCallback;
-  CropBoxEnableCallbackPtr mCropBoxDisableCallback;
-  bool mShowBoxWidget;
+	vtkVolumeMapperPtr getMapper();
+	ssc::ImagePtr mImage;
+	QPointer<ssc::View> mView;
+	//vtkBoxRepresentationPtr mBoxRep;
+	//vtkBoxWidget2Ptr mBoxWidget2;
+	vtkBoxWidgetPtr mBoxWidget;
+	CropBoxCallbackPtr mCropBoxCallback;
+	CropBoxEnableCallbackPtr mCropBoxEnableCallback;
+	CropBoxEnableCallbackPtr mCropBoxDisableCallback;
+	bool mShowBoxWidget;
 };
 
 typedef boost::shared_ptr<InteractiveCropper> InteractiveCropperPtr;
-
 
 } // namespace cx
 

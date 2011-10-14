@@ -15,6 +15,9 @@
 #include "cxViewWrapper2D.h"
 #include "cxViewManager.h"
 #include "cxCameraControl.h"
+#include "sscData.h"
+#include "cxViewWrapper.h"
+
 
 namespace cx
 {

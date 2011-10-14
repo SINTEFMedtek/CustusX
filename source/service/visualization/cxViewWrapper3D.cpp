@@ -8,13 +8,8 @@
 #include <QAction>
 #include <QMenu>
 
-#include <vtkTransform.h>
-#include <vtkCamera.h>
-#include <vtkAbstractVolumeMapper.h>
-#include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include <vtkInteractorObserver.h>
 
 #include "sscView.h"
 #include "sscSliceProxy.h"
@@ -489,20 +484,20 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 {
   if (boost::shared_dynamic_cast<ssc::Image>(data))
   {
-//		if (mSlices3DRep)
-//			mView->removeRep(mSlices3DRep);
-//		mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
-//		mSlices3DRep->addPlane(ssc::ptAXIAL);
-//		mSlices3DRep->addPlane(ssc::ptSAGITTAL);
-//		mSlices3DRep->addPlane(ssc::ptCORONAL);
-//		mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
-//
-//		if (mViewGroup)
-//			mSlices3DRep->setImages(mViewGroup->getImages());
-//		return mSlices3DRep;
+		if (mSlices3DRep)
+			mView->removeRep(mSlices3DRep);
+		mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
+		mSlices3DRep->addPlane(ssc::ptAXIAL);
+		mSlices3DRep->addPlane(ssc::ptSAGITTAL);
+		mSlices3DRep->addPlane(ssc::ptCORONAL);
+		mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
 
-    ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(boost::shared_dynamic_cast<ssc::Image>(data));
-    return rep;
+		if (mViewGroup)
+			mSlices3DRep->setImages(mViewGroup->getImages());
+		return mSlices3DRep;
+
+//    ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(boost::shared_dynamic_cast<ssc::Image>(data));
+//    return rep;
   }
   else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
   {

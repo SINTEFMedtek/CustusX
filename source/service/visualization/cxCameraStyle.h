@@ -7,10 +7,10 @@
 #ifndef CXCAMERASTYLE_H_
 #define CXCAMERASTYLE_H_
 
-#include "sscView.h"
 #include "sscTransform3D.h"
-#include "sscTool.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
+#include "vtkForwardDeclarations.h"
+
 
 class QWidget;
 class QMenu;
