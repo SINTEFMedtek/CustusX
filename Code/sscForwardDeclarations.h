@@ -31,6 +31,7 @@ typedef boost::weak_ptr<class GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
 typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
 
 // reps
+typedef boost::shared_ptr<class Rep> RepPtr;
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 typedef boost::shared_ptr<class VolumetricBaseRep> VolumetricBaseRepPtr;
 typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
