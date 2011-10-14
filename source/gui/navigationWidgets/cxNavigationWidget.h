@@ -43,6 +43,7 @@ protected:
   QGroupBox*    mCameraGroupBox; ///< widget to put all camera specific settings
   QRadioButton* mDefaultCameraStyleRadioButton; ///< for selecting the default camera style
   QRadioButton* mToolCameraStyleRadioButton; ///< for selecting tool following camera style
+  QRadioButton* mAngledToolCameraStyleRadioButton; ///< for selecting an angled tool following camera style
   QLabel*       mCameraOffsetLabel; ///< camera offset label
   QSlider*      mCameraOffsetSlider; ///< slider for adjusting the camera offset
   QVBoxLayout*  mCameraGroupLayout; ///< layout for the cameragroupbox

@@ -25,8 +25,7 @@ Tool::Tool(IgstkToolPtr igstkTool) :
   m_prMt(new ssc::Transform3D(ssc::Transform3D::Identity())),
   mValid(false),
   mConfigured(false),
-  mTracked(false),
-  mToolTipOffset(0)
+  mTracked(false)
 {
   ssc::Tool::mUid = mTool->getInternalStructure().mUid;
   ssc::Tool::mName = mTool->getInternalStructure().mName;
@@ -42,6 +41,7 @@ Tool::Tool(IgstkToolPtr igstkTool) :
 
   mProbe = Probe::New(mTool->getInternalStructure().mInstrumentId, mTool->getInternalStructure().mInstrumentScannerId);
   connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
+	connect(ssc::toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 
 //  // debug code, used for fixing the rotation z-bug:
 //  ssc::Transform3D sMt = ssc::Transform3D::Identity();
@@ -107,16 +107,12 @@ QString Tool::getName() const
 
 double Tool::getTooltipOffset() const
 {
-  return mToolTipOffset;
+  return ssc::toolManager()->getTooltipOffset();
 }
 
 void Tool::setTooltipOffset(double val)
 {
-  if (ssc::similar(val, mToolTipOffset))
-    return;
-
-  mToolTipOffset = val;
-  emit tooltipOffset(mToolTipOffset);
+	ssc::toolManager()->setTooltipOffset(val);
 }
 
 bool Tool::isValid() const

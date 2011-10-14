@@ -94,7 +94,7 @@ void RepManager::volumeRemovedSlot(QString uid)
   mVolumetricRepByImageMap.erase(uid);
 
   // all reps with ids that contains the volume uid will be cleared from the cache.
-	for (RepMultiMap::iterator iter=mRepCache.begin(); iter!= mRepCache.end(); ++iter)
+	for (RepMultiMap::iterator iter=mRepCache.begin(); iter!= mRepCache.end();)
 	{
 		RepMultiMap::iterator last = iter++;
 
