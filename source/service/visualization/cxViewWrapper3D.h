@@ -17,7 +17,7 @@
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
 #include "sscVector3D.h"
-
+class QAction;
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
 
@@ -76,6 +76,7 @@ public:
   void setStereoType(int type);
 
 private slots:
+	void showSlices();
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void toolsAvailableSlot(); ///< add all tools when configured
   void showSlicePlanesActionSlot(bool checked);
@@ -99,6 +100,9 @@ private:
   virtual void appendToContextMenu(QMenu& contextMenu);
   void updateView();
   void readDataRepSettings(ssc::RepPtr rep);
+  void updateSlices();
+
+  QAction* createSlicesAction(QString title, QWidget* parent);
 
   void showLandmarks(bool on);
   void showPointPickerProbe(bool on);
@@ -117,6 +121,7 @@ private:
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
+  QString mShowSlicesMode;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 //  ssc::SliceProxyPtr mSliceProxy;
