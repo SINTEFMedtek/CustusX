@@ -15,6 +15,7 @@
 #include "cxViewWrapper.h"
 #include "sscBoundingBox3D.h"
 #include "sscTransform3D.h"
+#include "sscConfig.h"
 
 namespace ssc
 {

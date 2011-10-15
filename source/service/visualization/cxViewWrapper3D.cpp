@@ -42,6 +42,7 @@
 #include "cxDataLocations.h"
 #include "sscTexture3DSlicerRep.h"
 #include "sscSlices3DRep.h"
+#include "sscEnumConverter.h"
 
 #include "sscData.h"
 #include "sscAxesRep.h"
@@ -294,6 +295,14 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showToolPath->setChecked(activeRep3D->getTracer()->isRunning());
   connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
+  QMenu* showSlicesMenu = new QMenu("Show Slices", &contextMenu);
+  showSlicesMenu->addAction(this->createSlicesAction("ACS", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Axial", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Sagittal", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Coronal", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Any", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Dual", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Radial", &contextMenu));
 
   QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
   showRefTool->setDisabled(true);
@@ -308,6 +317,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   }
 
   contextMenu.addSeparator();
+  contextMenu.addMenu(showSlicesMenu);
   contextMenu.addAction(resetCameraAction);
   contextMenu.addAction(centerImageAction);
   contextMenu.addAction(centerToolAction);
@@ -320,6 +330,30 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
+}
+
+QAction* ViewWrapper3D::createSlicesAction(QString title, QWidget* parent)
+{
+	QAction* action = new QAction(title, parent);
+	connect(action, SIGNAL(triggered()), this, SLOT(showSlices()));
+	action->setData(title);
+	action->setCheckable(true);
+	action->setChecked(mShowSlicesMode==title);
+	return action;
+}
+
+void ViewWrapper3D::showSlices()
+{
+	QAction* action = dynamic_cast<QAction*>(sender());
+	if (!action)
+		return;
+
+	if (!action->isChecked())
+		mShowSlicesMode = "";
+	else
+		mShowSlicesMode = action->data().toString();
+//	std::cout << "show " << mShowSlicesMode << std::endl;
+	this->updateSlices();
 }
 
 void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
@@ -492,20 +526,8 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 {
   if (boost::shared_dynamic_cast<ssc::Image>(data))
   {
-		if (mSlices3DRep)
-			mView->removeRep(mSlices3DRep);
-		mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
-		mSlices3DRep->addPlane(ssc::ptAXIAL);
-		mSlices3DRep->addPlane(ssc::ptSAGITTAL);
-		mSlices3DRep->addPlane(ssc::ptCORONAL);
-		mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
-
-		if (mViewGroup)
-			mSlices3DRep->setImages(mViewGroup->getImages());
-		return mSlices3DRep;
-
-//    ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(boost::shared_dynamic_cast<ssc::Image>(data));
-//    return rep;
+    ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(boost::shared_dynamic_cast<ssc::Image>(data));
+    return rep;
   }
   else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
   {
@@ -603,6 +625,38 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
     mView->addRep(refRep);
   else//should not show
     mView->removeRep(refRep);
+}
+
+
+void ViewWrapper3D::updateSlices()
+{
+	if (mSlices3DRep)
+		mView->removeRep(mSlices3DRep);
+	mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
+
+	ssc::PLANE_TYPE type = string2enum<ssc::PLANE_TYPE>(mShowSlicesMode);
+	if (type!=ssc::ptCOUNT)
+	{
+		mSlices3DRep->addPlane(type);
+	}
+	else if (mShowSlicesMode=="ACS")
+	{
+		mSlices3DRep->addPlane(ssc::ptAXIAL);
+		mSlices3DRep->addPlane(ssc::ptSAGITTAL);
+		mSlices3DRep->addPlane(ssc::ptCORONAL);
+	}
+	else
+	{
+		mSlices3DRep.reset();
+		return;
+	}
+
+	mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
+	if (mViewGroup)
+		mSlices3DRep->setImages(mViewGroup->getImages());
+	mSlices3DRep->setTool(ssc::toolManager()->getDominantTool());
+//	return mSlices3DRep;
+	mView->addRep(mSlices3DRep);
 }
 
 ssc::View* ViewWrapper3D::getView()
