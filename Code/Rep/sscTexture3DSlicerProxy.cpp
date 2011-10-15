@@ -108,9 +108,21 @@ void Texture3DSlicerProxy::resetGeometryPlane()
 {
 	if (mTargetSpaceIsR)
 	{
-		//TODO evaluate based on image size, only in setters
-		double extent = 150;
-		mBB_s = DoubleBoundingBox3D(-extent, extent, -extent, extent, 0, 0);
+		// use largest bb from all volume box vertices projected onto s:
+		Transform3D rMs = mSliceProxy->get_sMr().inv();
+		DoubleBoundingBox3D bb_d = mImages[0]->boundingBox();
+		Transform3D sMd = rMs.inv()*mImages[0]->get_rMd();
+		std::vector<Vector3D> pp_s;
+		for (unsigned x=0; x<2; ++x)
+			for (unsigned y=0; y<2; ++y)
+				for (unsigned z=0; z<2; ++z)
+					pp_s.push_back(sMd.coord(bb_d.corner(x,y,x)));
+
+		mBB_s = DoubleBoundingBox3D::fromCloud(pp_s);
+		mBB_s[4] = 0;
+		mBB_s[5] = 0;
+//		double extent = 100;
+//		mBB_s = DoubleBoundingBox3D(-extent, extent, -extent, extent, 0, 0);
 	}
 
 	Vector3D origin(mBB_s[0], mBB_s[2], 0);
