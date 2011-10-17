@@ -484,6 +484,55 @@ private:
 };
 
 
+typedef boost::shared_ptr<class DataModalityStringDataAdapter> DataModalityStringDataAdapterPtr;
+/** Adapter that selects the modality of the given ssc::Data.
+ */
+class DataModalityStringDataAdapter : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  static DataModalityStringDataAdapterPtr New() { return DataModalityStringDataAdapterPtr(new DataModalityStringDataAdapter()); }
+  DataModalityStringDataAdapter();
+  void setData(ssc::ImagePtr data);
+  virtual ~DataModalityStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+
+protected:
+  ssc::ImagePtr mData;
+};
+
+typedef boost::shared_ptr<class ImageTypeStringDataAdapter> ImageTypeStringDataAdapterPtr;
+/** Adapter that selects the image type of the given ssc::Data.
+ */
+class ImageTypeStringDataAdapter : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  static ImageTypeStringDataAdapterPtr New() { return ImageTypeStringDataAdapterPtr(new ImageTypeStringDataAdapter()); }
+  ImageTypeStringDataAdapter();
+  void setData(ssc::ImagePtr data);
+  virtual ~ImageTypeStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+
+protected:
+  ssc::ImagePtr mData;
+};
 
 
 } // namespace cx
