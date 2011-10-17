@@ -44,6 +44,8 @@ private:
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   DataNameEditableStringDataAdapterPtr mNameAdapter;
   DataUidEditableStringDataAdapterPtr mUidAdapter;
+  DataModalityStringDataAdapterPtr mModalityAdapter;
+  ImageTypeStringDataAdapterPtr mImageTypeAdapter;
 };
 
 /**
