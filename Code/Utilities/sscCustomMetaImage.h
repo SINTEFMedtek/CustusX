@@ -29,6 +29,12 @@ public:
 
   Transform3D readTransform();
   void setTransform(const Transform3D M);
+
+  QString readModality();
+  QString readImageType();
+
+  QString readKey(QString key);
+
 private:
   QString mFilename;
 };

@@ -23,6 +23,55 @@ CustomMetaImage::CustomMetaImage(QString filename) :
 
 }
 
+QString CustomMetaImage::readKey(QString key)
+{
+	QFile file(mFilename);
+
+	QString line;
+	if (file.open(QIODevice::ReadOnly))
+	{
+		QTextStream t(&file);
+		while (!t.atEnd())
+		{
+			line.clear();
+			line = t.readLine();
+			// do something with the line
+			if (line.startsWith(key, Qt::CaseInsensitive))
+			{
+				QStringList list = line.split("=", QString::SkipEmptyParts);
+				if (list.size() >= 2)
+				{
+					list = list.mid(1);
+					return list.join("=");
+				}
+			}
+		}
+		file.close();
+	}
+
+	return "";
+}
+
+QString CustomMetaImage::readModality()
+{
+	QString mod = this->readKey("Modality");
+
+	if (mod=="MET_MOD_CT")
+		return "CT;";
+	if (mod=="MET_MOD_MR")
+		return "MR;";
+	if (mod=="MET_MOD_US")
+		return "US;";
+	if (mod=="MET_MOD_OTHER")
+		return "OTHER;";
+	return "UNKNOWN";
+}
+
+QString CustomMetaImage::readImageType()
+{
+	return this->readKey("ImageType3");
+}
+
 Transform3D CustomMetaImage::readTransform()
 {
   //messageManager()->sendDebug("load filename: "+string_cast(filename));
@@ -32,7 +81,6 @@ Transform3D CustomMetaImage::readTransform()
   Vector3D e_y(0, 1, 0);
   Vector3D e_z(0, 0, 1);
 
-  QString creator;
   QFile file(mFilename);
 
   QString line;
@@ -62,21 +110,9 @@ Transform3D CustomMetaImage::readTransform()
           e_z = cross(e_x, e_y);
         }
       }
-//      else if (line.startsWith("Creator", Qt::CaseInsensitive))
-//      {
-//        QStringList list = line.split(" ", QString::SkipEmptyParts);
-//        if (list.size()>=3)
-//          creator = list[2];
-//      }
     }
     file.close();
   }
-
-//  // MDH is a volatile format: warn if we dont know the source
-//  if ((creator != "Ingerid") && (creator != "DICOMtoMetadataFilter"))
-//  {
-//    //std::cout << "WARNING: Loading file " + filename + ": unrecognized creator. Position/Orientation cannot be trusted" << std::endl;
-//  }
 
   Transform3D rMd = Transform3D::Identity();
 
@@ -88,40 +124,11 @@ Transform3D CustomMetaImage::readTransform()
     rMd(i,2) = e_z[i];
   }
 
-//  // Special Ingerid Reinertsen fix: Position is stored as p_d instead of p_r: convert here
-//  if (creator == "Ingerid")
-//  {
-//    std::cout << "ingrid fixing" << std::endl;
-//    p_r = rMd.coord(p_r);
-//  }
 
   // add translational part
   rMd(0,3) = p_r[0];
   rMd(1,3) = p_r[1];
   rMd(2,3) = p_r[2];
-
-//  //load the image from file
-//  vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
-//  reader->SetFileName(cstring_cast(filename));
-//  reader->ReleaseDataFlagOn();
-//
-//  if (!ErrorObserver::checkedRead(reader, filename))
-//    return DataPtr();
-//
-//  vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
-//  zeroer->SetInput(reader->GetOutput());
-//  zeroer->SetOutputOrigin(0, 0, 0);
-//
-//  vtkImageDataPtr imageData = zeroer->GetOutput();
-//  imageData->Update();
-//
-//  ImagePtr image(new Image(uid, imageData));
-//
-//  RegistrationTransform regTrans(rMd, QFileInfo(file.fileName()).lastModified(), "From MHD file");
-//  image->get_rMd_History()->addRegistration(regTrans);
-//
-//  //std::cout << "ImagePtr MetaImageReader::load" << std::endl << std::endl;
-//  return image;
   return rMd;
 }
 

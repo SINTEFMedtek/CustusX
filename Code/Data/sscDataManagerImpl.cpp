@@ -30,6 +30,10 @@
 #include "sscVideoSource.h"
 #include "sscCustomMetaImage.h"
 
+#include "sscImageLUT2D.h"
+#include "sscImageTF3D.h"
+
+
 namespace ssc
 {
 
@@ -145,6 +149,25 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 	//  RegistrationTransform regTrans(rMd, QFileInfo(filename).lastModified(), "From MHD file");
 	//  image->get_rMd_History()->addRegistration(regTrans);
 	image->get_rMd_History()->setRegistration(rMd);
+	image->setModality(customReader->readModality());
+	image->setImageType(customReader->readImageType());
+
+	bool ok = true;
+
+	QString levelString = customReader->readKey("Level");
+	double level = levelString.toDouble(&ok);
+	if (ok)
+	{
+		image->getTransferFunctions3D()->setLevel(level);
+		image->getLookupTable2D()->setLevel(level);
+	}
+	QString windowString = customReader->readKey("Window");
+	double window = levelString.toDouble(&ok);
+	if (ok)
+	{
+		image->getTransferFunctions3D()->setWindow(window);
+		image->getLookupTable2D()->setWindow(window);
+	}
 
 	//std::cout << "ImagePtr MetaImageReader::load" << std::endl << std::endl;
 	return image;
