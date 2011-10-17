@@ -95,7 +95,13 @@ endif (USE_US_RECONSTRUCTION_THUNDER)
 
 # create the target
 add_library( sscUS3DReconstruction ${SOURCE_FILES} )
-target_link_libraries( sscUS3DReconstruction SSC ${OPENCL_LIBRARIES})
+
+# Don't try to use OpenCl if we haven't got it
+IF( OPENCL_LIBRARIES )
+    target_link_libraries( sscUS3DReconstruction SSC ${OPENCL_LIBRARIES})
+ELSE( OPENCL_LIBRARIES )
+    target_link_libraries( sscUS3DReconstruction SSC)
+ENDIF( OPENCL_LIBRARIES )
 
 
 configure_file(
