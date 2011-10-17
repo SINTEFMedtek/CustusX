@@ -357,6 +357,14 @@ void Image::addXml(QDomNode& dataNode)
 		clipNode.appendChild(planeNode);
 	}
 	imageNode.appendChild(clipNode);
+
+	QDomElement modalityNode = doc.createElement("modality");
+	modalityNode.appendChild(doc.createTextNode(mModality));
+	imageNode.appendChild(modalityNode);
+
+	QDomElement imageTypeNode = doc.createElement("imageType");
+	imageTypeNode.appendChild(doc.createTextNode(mImageType));
+	imageNode.appendChild(imageTypeNode);
 }
 
 void Image::parseXml(QDomNode& dataNode)
@@ -435,6 +443,8 @@ void Image::parseXml(QDomNode& dataNode)
 		mClipPlanes.push_back(plane);
 	}
 
+	mModality = dataNode.namedItem("modality").toElement().text();
+	mImageType = dataNode.namedItem("imageType").toElement().text();
 }
 
 void Image::setShadingOn(bool on)
@@ -589,13 +599,33 @@ void Image::mergevtkSettingsIntosscTransform()
 	//  std::cout << "REMOVED ORIGIN END:" << std::endl;
 	//  mBaseImageData->Print(std::cout);
 
-	emit
-	vtkImageDataChanged();
-	emit
-	transferFunctionsChanged();
-	emit
-	clipPlanesChanged();
+	emit vtkImageDataChanged();
+	emit transferFunctionsChanged();
+	emit clipPlanesChanged();
 	emit cropBoxChanged();
 }
+
+QString Image::getModality() const
+{
+	return mModality;
+}
+
+void Image::setModality(const QString& val)
+{
+	mModality = val;
+	emit propertiesChanged();
+}
+
+QString Image::getImageType() const
+{
+	return mImageType;
+}
+
+void Image::setImageType(const QString& val)
+{
+	mImageType = val;
+	emit propertiesChanged();
+}
+
 
 } // namespace ssc

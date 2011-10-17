@@ -55,6 +55,11 @@ public:
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	virtual LandmarkMap getLandmarks(); ///< \return all landmarks defined on the image.
 
+	virtual QString getModality() const;
+	virtual void setModality(const QString& val);
+	virtual QString getImageType() const;
+	virtual void setImageType(const QString& val);
+
 	ImageTF3DPtr getTransferFunctions3D();
 	void setTransferFunctions3D(ImageTF3DPtr transferFuntion);
 	ImageLUT2DPtr getLookupTable2D();
@@ -136,6 +141,12 @@ protected:
 	bool mUseCropping; ///< image should be cropped using mCroppingBox
 	DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.
 	std::vector<vtkPlanePtr> mClipPlanes;
+	QString mModality; ///< modality of the image, defined as DICOM tag (0008,0060), Section 3, C.7.3.1.1.1
+	QString mImageType; ///< type of the image, defined as DICOM tag (0008,0008) (mainly value 3, but might be a merge of value 4), Section 3, C.7.6.1.1.2
+
+
+
+
 };
 
 } // end namespace ssc

@@ -70,6 +70,7 @@ public:
 
 signals:
 	void transformChanged(); ///< emitted when transform is changed
+	void propertiesChanged(); ///< emitted when one of the metadata properties (uid, name etc) changes
 
 protected slots:
 	virtual void transformChangedSlot()
