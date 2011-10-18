@@ -16,6 +16,29 @@ namespace ssc
 typedef vtkSmartPointer<class TextureSlicePainter> TextureSlicePainterPtr;
 typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
 
+/**abstract class design to solve windows compile problems.
+ * See Texture3DSlicerProxyImpl for the real implementation
+ *
+ */
+class Texture3DSlicerProxy: public QObject
+{
+Q_OBJECT
+public:
+	static Texture3DSlicerProxyPtr New();
+
+	virtual ~Texture3DSlicerProxy() {}
+	virtual void setShaderFile(QString shaderFile) {}
+	virtual void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp) {}
+	virtual void setImages(std::vector<ssc::ImagePtr> images) {}
+	virtual void setSliceProxy(ssc::SliceProxyPtr slicer) {}
+	virtual ssc::SliceProxyPtr getSliceProxy() { return ssc::SliceProxyPtr(); }
+	virtual void update() {}
+	virtual void setTargetSpaceToR(){}
+	virtual vtkActorPtr getActor() { return vtkActorPtr(); }
+};
+
+#ifndef WIN32
+
 /**
  * \class Texture3DSlicerProxy
  *
@@ -30,12 +53,12 @@ typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
  *  Created on: Oct 13, 2011
  *      Author: christiana
  */
-class Texture3DSlicerProxy: public QObject
+class Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
 {
 Q_OBJECT
 public:
 	static Texture3DSlicerProxyPtr New();
-	virtual ~Texture3DSlicerProxy();
+	virtual ~Texture3DSlicerProxyImpl();
 	void setShaderFile(QString shaderFile);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImages(std::vector<ssc::ImagePtr> images);
@@ -46,7 +69,7 @@ public:
 	vtkActorPtr getActor();
 
 protected:
-	Texture3DSlicerProxy();
+	Texture3DSlicerProxyImpl();
 	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
 
 private slots:
@@ -70,6 +93,10 @@ private:
 	vtkPlaneSourcePtr mPlaneSource;
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 };
+
+#endif // WIN32
+
+
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------

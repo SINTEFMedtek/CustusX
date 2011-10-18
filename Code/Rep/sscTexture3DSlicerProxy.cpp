@@ -1,5 +1,5 @@
 /*
- * sscTexture3DSlicerProxy.cpp
+ * sscTexture3DSlicerProxyImpl.cpp
  *
  *  Created on: Oct 13, 2011
  *      Author: christiana
@@ -30,13 +30,27 @@ namespace ssc
 {
 //---------------------------------------------------------
 
-void Texture3DSlicerProxy::setTargetSpaceToR()
+#ifdef WIN32
+
+Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
+{
+	return Texture3DSlicerProxyPtr(new Texture3DSlicerProxy());
+}
+
+#else
+
+Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
+{
+	return Texture3DSlicerProxyImpl::New();
+}
+
+
+void Texture3DSlicerProxyImpl::setTargetSpaceToR()
 {
 	mTargetSpaceIsR = true;
 }
 
-Texture3DSlicerProxy::Texture3DSlicerProxy() :
-	QObject(NULL)
+Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 {
 	mTargetSpaceIsR = false;
 //	mView = NULL;
@@ -65,27 +79,27 @@ Texture3DSlicerProxy::Texture3DSlicerProxy() :
 	mActor->SetMapper(mPainterPolyDatamapper);
 }
 
-Texture3DSlicerProxy::~Texture3DSlicerProxy()
+Texture3DSlicerProxyImpl::~Texture3DSlicerProxyImpl()
 {
     mImages.clear();
 }
 
-Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
+Texture3DSlicerProxyPtr Texture3DSlicerProxyImpl::New()
 {
-	return Texture3DSlicerProxyPtr(new Texture3DSlicerProxy());
+	return Texture3DSlicerProxyPtr(new Texture3DSlicerProxyImpl());
 }
 
-vtkActorPtr Texture3DSlicerProxy::getActor()
+vtkActorPtr Texture3DSlicerProxyImpl::getActor()
 {
 	return mActor;
 }
 
-void Texture3DSlicerProxy::setShaderFile(QString shaderFile)
+void Texture3DSlicerProxyImpl::setShaderFile(QString shaderFile)
 {
 	mPainter->setShaderFile(shaderFile);
 }
 
-//void Texture3DSlicerProxy::viewChanged()
+//void Texture3DSlicerProxyImpl::viewChanged()
 //{
 //	if (!mView)
 //		return;
@@ -94,7 +108,7 @@ void Texture3DSlicerProxy::setShaderFile(QString shaderFile)
 //	this->setViewportData(mView->get_vpMs(), mView->getViewport());
 //}
 
-void Texture3DSlicerProxy::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
+void Texture3DSlicerProxyImpl::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
 {
 	if (!mTargetSpaceIsR)
 	{
@@ -104,7 +118,7 @@ void Texture3DSlicerProxy::setViewportData(const Transform3D& vpMs, const Double
 	this->resetGeometryPlane();
 }
 
-void Texture3DSlicerProxy::resetGeometryPlane()
+void Texture3DSlicerProxyImpl::resetGeometryPlane()
 {
 	if (mTargetSpaceIsR)
 	{
@@ -146,7 +160,7 @@ void Texture3DSlicerProxy::resetGeometryPlane()
 	createGeometryPlane(p1, p2, origin);
 }
 
-void Texture3DSlicerProxy::createGeometryPlane( Vector3D point1_s,  Vector3D point2_s, Vector3D origin_s )
+void Texture3DSlicerProxyImpl::createGeometryPlane( Vector3D point1_s,  Vector3D point2_s, Vector3D origin_s )
 {
 //  std::cout << "createGeometryPlane " << point1_s << ", " << point2_s << ", " << origin_s << std::endl;
     mPlaneSource->SetPoint1( point1_s.begin() );
@@ -162,7 +176,7 @@ void Texture3DSlicerProxy::createGeometryPlane( Vector3D point1_s,  Vector3D poi
     }
 }
 
-void Texture3DSlicerProxy::setImages(std::vector<ssc::ImagePtr> images)
+void Texture3DSlicerProxyImpl::setImages(std::vector<ssc::ImagePtr> images)
 {
 	if (mImages.size() == images.size())
 	{
@@ -204,7 +218,7 @@ void Texture3DSlicerProxy::setImages(std::vector<ssc::ImagePtr> images)
 }
 
 
-void Texture3DSlicerProxy::setSliceProxy(ssc::SliceProxyPtr slicer)
+void Texture3DSlicerProxyImpl::setSliceProxy(ssc::SliceProxyPtr slicer)
 {
     if (mSliceProxy)
         disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
@@ -213,7 +227,7 @@ void Texture3DSlicerProxy::setSliceProxy(ssc::SliceProxyPtr slicer)
         connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,	SLOT(transformChangedSlot()));
 }
 
-//void Texture3DSlicerProxy::addRepActorsToViewRenderer(ssc::View* view)
+//void Texture3DSlicerProxyImpl::addRepActorsToViewRenderer(ssc::View* view)
 //{
 ////  std::cout << "void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View* view)" << std::endl;
 //    view->getRenderer()->AddActor(mActor);
@@ -222,12 +236,12 @@ void Texture3DSlicerProxy::setSliceProxy(ssc::SliceProxyPtr slicer)
 //    this->viewChanged();
 //}
 
-QString Texture3DSlicerProxy::getTCoordName(int index)
+QString Texture3DSlicerProxyImpl::getTCoordName(int index)
 {
      return  "texture"+qstring_cast(index);
 }
 
-void Texture3DSlicerProxy::updateCoordinates(int index)
+void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 {
 //	std::cout << "Texture3DSlicerRep::updateCoordinates" << std::endl;
 	if (!mPolyData)
@@ -291,19 +305,19 @@ void Texture3DSlicerProxy::updateCoordinates(int index)
 	mPolyData->Modified();
 }
 
-//void Texture3DSlicerProxy::removeRepActorsFromViewRenderer(ssc::View* view)
+//void Texture3DSlicerProxyImpl::removeRepActorsFromViewRenderer(ssc::View* view)
 //{
 //	view->getRenderer()->RemoveActor(mActor);
 //	disconnect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
 //	mView = NULL;
 //}
 
-//void Texture3DSlicerProxy::printSelf(std::ostream & os, ssc::Indent indent)
+//void Texture3DSlicerProxyImpl::printSelf(std::ostream & os, ssc::Indent indent)
 //{
 //    //mImageSlicer->printSelf(os, indent);
 //}
 
-void Texture3DSlicerProxy::updateColorAttributeSlot()
+void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 {
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
@@ -328,7 +342,7 @@ void Texture3DSlicerProxy::updateColorAttributeSlot()
 	mActor->Modified();
 }
 
-void Texture3DSlicerProxy::transformChangedSlot()
+void Texture3DSlicerProxyImpl::transformChangedSlot()
 {
 	if (mTargetSpaceIsR)
 		this->resetGeometryPlane();
@@ -336,7 +350,7 @@ void Texture3DSlicerProxy::transformChangedSlot()
     this->update();
 }
 
-void Texture3DSlicerProxy::update()
+void Texture3DSlicerProxyImpl::update()
 {
     for (unsigned i=0; i<mImages.size(); ++i)
     {
@@ -344,6 +358,10 @@ void Texture3DSlicerProxy::update()
     }
 
 }
+
+#endif // WIN32
+
+
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
