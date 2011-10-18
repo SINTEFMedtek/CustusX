@@ -295,6 +295,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showToolPath->setChecked(activeRep3D->getTracer()->isRunning());
   connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
+#ifdef USE_GLX_SHARED_CONTEXT
   QMenu* showSlicesMenu = new QMenu("Show Slices", &contextMenu);
   showSlicesMenu->addAction(this->createSlicesAction("ACS", &contextMenu));
   showSlicesMenu->addAction(this->createSlicesAction("Axial", &contextMenu));
@@ -303,6 +304,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showSlicesMenu->addAction(this->createSlicesAction("Any", &contextMenu));
   showSlicesMenu->addAction(this->createSlicesAction("Dual", &contextMenu));
   showSlicesMenu->addAction(this->createSlicesAction("Radial", &contextMenu));
+#endif // USE_GLX_SHARED_CONTEXT
 
   QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
   showRefTool->setDisabled(true);
@@ -317,7 +319,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   }
 
   contextMenu.addSeparator();
+#ifdef USE_GLX_SHARED_CONTEXT
   contextMenu.addMenu(showSlicesMenu);
+#endif //USE_GLX_SHARED_CONTEXT
   contextMenu.addAction(resetCameraAction);
   contextMenu.addAction(centerImageAction);
   contextMenu.addAction(centerToolAction);
@@ -630,6 +634,7 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 
 void ViewWrapper3D::updateSlices()
 {
+#ifdef USE_GLX_SHARED_CONTEXT
 	if (mSlices3DRep)
 		mView->removeRep(mSlices3DRep);
 	mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
@@ -657,6 +662,7 @@ void ViewWrapper3D::updateSlices()
 	mSlices3DRep->setTool(ssc::toolManager()->getDominantTool());
 //	return mSlices3DRep;
 	mView->addRep(mSlices3DRep);
+#endif // USE_GLX_SHARED_CONTEXT
 }
 
 ssc::View* ViewWrapper3D::getView()
