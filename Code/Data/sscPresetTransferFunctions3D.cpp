@@ -27,9 +27,9 @@ PresetTransferFunctions3D::~PresetTransferFunctions3D()
 {
 }
 
-QStringList PresetTransferFunctions3D::getPresetList()
+QStringList PresetTransferFunctions3D::getPresetList(QString modality)
 {
-	return this->generatePresetList();
+	return this->generatePresetList(modality);
 }
 
 ssc::XmlOptionFile PresetTransferFunctions3D::getCustomFile()
@@ -54,6 +54,7 @@ void PresetTransferFunctions3D::save(QString name, ssc::ImagePtr image)
 	image->getLookupTable2D()->addXml(file.getElement("lookuptable2D"));
 	image->getShading().addXml(file.getElement("shading"));
 
+	file.getElement().setAttribute("modality", image->getModality());
 	file.save();
 }
 
@@ -76,6 +77,13 @@ void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
 	shading.parseXml(node.getElement().namedItem("shading"));
 	image->setShading(shading);
 
+	// Transfer functions for CT data are signed, so these have to be converted if they are to be used for unsigned CT
+	if ((0 <= image->getMin()) && ("CT" == image->getModality()))
+	{
+		transferFunctions->unsignedCT();
+		LUT2D->unsignedCT();
+	}
+
 	//Make sure the preset transfer functions work correctly
 	transferFunctions->fixTransferFunctions();
 	LUT2D->fixTransferFunctions();
@@ -96,7 +104,7 @@ ssc::XmlOptionFile PresetTransferFunctions3D::getPresetNode(const QString& prese
 	return retval;
 }
 
-QStringList PresetTransferFunctions3D::generatePresetList()
+QStringList PresetTransferFunctions3D::generatePresetList(QString modality)
 {
 	QStringList presetList;
 	presetList.append("Transfer function preset...");
@@ -108,7 +116,11 @@ QStringList PresetTransferFunctions3D::generatePresetList()
 		if (presetName == "Default")
 			continue;
 		else
-			presetList << presetName;
+		{
+			QString sourceModality = presetNodeList.item(i).toElement().attribute("modality");
+			if ( (modality == sourceModality) || ("UNKNOWN" == modality) || modality.isEmpty() )
+				presetList << presetName;
+		}
 	}
 
 	ssc::XmlOptionFile customFile = this->getCustomFile();
@@ -116,7 +128,9 @@ QStringList PresetTransferFunctions3D::generatePresetList()
 	for (int i = 0; i < presetNodeList.count(); ++i)
 	{
 		QString presetName = presetNodeList.item(i).toElement().attribute("name");
-		presetList << presetName;
+		QString presetModality = presetNodeList.item(i).toElement().attribute("modality");
+		if ( (presetModality == modality) || ("UNKNOWN" == modality) || modality.isEmpty() )
+			presetList << presetName;
 	}
 
 	return presetList;

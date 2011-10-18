@@ -184,6 +184,26 @@ void ImageTFData::parseXml(QDomNode dataNode)
 	//  std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
 }
 
+void ImageTFData::unsignedCT()
+{
+	//Signed after all. Don't do anyting
+	if (this->getScalarMin() < 0)
+		return;
+
+	//	ssc::OpacityMapPtr opacityMap = this->getOpacityMap();
+	OpacityMapPtr newOpacipyMap(new IntIntMap());
+	for (ssc::IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); it++)
+		(*newOpacipyMap)[it->first + 1024] = it->second;
+
+	ColorMapPtr newColorMap(new ColorMap());
+	for (ssc::ColorMap::iterator it = this->getColorMap()->begin(); it != this->getColorMap()->end(); it++)
+		(*newColorMap)[it->first + 1024] = it->second;
+
+	mOpacityMapPtr = newOpacipyMap;
+	mColorMapPtr = newColorMap;
+	emit changed();
+}
+
 void ImageTFData::fixTransferFunctions()
 {
 	//Make sure min and max values for transferfunctions are set
