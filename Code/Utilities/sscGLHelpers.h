@@ -6,7 +6,7 @@
 
 
 #ifdef WIN32
-	void fgl_really_report_gl_errors( const char *file, int line, const char* text ) {}
+	static void fgl_really_report_gl_errors( const char *file, int line, const char* text ) {}
 #else
 	void fgl_really_report_gl_errors( const char *file, int line, const char* text );
 #endif //WIN32
