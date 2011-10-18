@@ -82,6 +82,8 @@ public:
 	virtual void addXml(QDomNode dataNode); ///< adds xml information about the transferfunction and its variabels
 	virtual void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
+	void unsignedCT(); ///< Modify transfer function for unsigned CT (this is necessary CT transfer functions are stored as signed).
+
 	void fixTransferFunctions(); ///< Modify/repair transfer function so it matches current image
 	void fillColorTFFromMap(vtkColorTransferFunctionPtr tf);
 
