@@ -1,5 +1,4 @@
 #include "sscTexture3DSlicerRep.h"
-#include "sscTextureSlicePainter.h"
 
 #include <vtkRenderer.h>
 #include <vtkFloatArray.h>

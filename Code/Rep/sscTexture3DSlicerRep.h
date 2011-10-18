@@ -13,7 +13,6 @@
 namespace ssc
 {
 
-typedef vtkSmartPointer<class TextureSlicePainter> TextureSlicePainterPtr;
 typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
 
 /**

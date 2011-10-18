@@ -18,6 +18,9 @@
 //---------------------------------------------------------
 namespace ssc
 {
+
+#ifndef WIN32
+
 /**
  * \class TextureSlicePainter
  *
@@ -54,6 +57,9 @@ protected:
 	QString mSource;
 	QString mShaderFile;
 };
+
+#endif // WIN32
+
 
 //---------------------------------------------------------
 }//end namespace

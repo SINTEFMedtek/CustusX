@@ -187,7 +187,6 @@ typedef vtkSmartPointer<class vtkOpenGLHardwareSupport > vtkOpenGLHardwareSuppor
 typedef vtkSmartPointer<class vtkShaderProgram2 > vtkShaderProgram2Ptr;
 typedef vtkSmartPointer<class vtkGLSLShaderDeviceAdapter2 > vtkGLSLShaderDeviceAdapter2Ptr;
 typedef vtkSmartPointer<class vtkShader2 > vtkShader2Ptr;
-//typedef vtkSmartPointer<class TextureSlicePainter> TextureSlicePainterPtr;
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
