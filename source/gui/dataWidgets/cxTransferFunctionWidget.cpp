@@ -156,8 +156,9 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
   mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
@@ -221,8 +222,9 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
   mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
@@ -292,8 +294,11 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
 
   mPresetsComboBox = new QComboBox(this);
   mPresetsComboBox->setToolTip("Select a preset to use for both 2D and 3D");
-  mPresetsComboBox->addItems(mPresets->getPresetList());
   connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(presetsBoxChangedSlot(const QString&)));
+
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(generatePresetListSlot()));
+  connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this, SLOT(generatePresetListSlot()));
 
   mLayout->addWidget(mPresetsComboBox);
   QHBoxLayout* buttonLayout = new QHBoxLayout;
@@ -313,6 +318,18 @@ QString TransferFunctionPresetWidget::defaultWhatsThis() const
     "<p>Lets you select a predefined transfer function.</p>"
     "<p><i></i></p>"
     "</html>";
+}
+
+void TransferFunctionPresetWidget::generatePresetListSlot()
+{
+	// Re-initialize the list
+  mPresetsComboBox->blockSignals(true);
+  mPresetsComboBox->clear();
+  if (ssc::dataManager()->getActiveImage())
+  	mPresetsComboBox->addItems(mPresets->getPresetList(ssc::dataManager()->getActiveImage()->getModality()));
+  else //No active image, show all available presets for debug/overview purposes
+  	mPresetsComboBox->addItems(mPresets->getPresetList("UNKNOWN"));
+  mPresetsComboBox->blockSignals(false);
 }
 
 void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetName)
@@ -341,11 +358,7 @@ void TransferFunctionPresetWidget::saveSlot()
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   mPresets->save(text, activeImage);
 
-  mPresetsComboBox->blockSignals(true);
-  mPresetsComboBox->clear();
-  mPresetsComboBox->addItems(mPresets->getPresetList());
-  mPresetsComboBox->blockSignals(false);
-
+  this->generatePresetListSlot();
   mPresetsComboBox->setCurrentIndex(mPresetsComboBox->findText(text));
 }
 
@@ -362,11 +375,7 @@ void TransferFunctionPresetWidget::deleteSlot()
 			return;
 	mPresets->deletePresetData(mPresetsComboBox->currentText());
 
-	// Re-initialize the list
-  mPresetsComboBox->blockSignals(true);
-  mPresetsComboBox->clear();
-  mPresetsComboBox->addItems(mPresets->getPresetList());
-  mPresetsComboBox->blockSignals(false);
+  this->generatePresetListSlot();
   this->resetSlot();
 }
 
