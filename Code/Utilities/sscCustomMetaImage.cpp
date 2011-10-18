@@ -56,14 +56,14 @@ QString CustomMetaImage::readModality()
 {
 	QString mod = this->readKey("Modality");
 
-	if (mod=="MET_MOD_CT")
-		return "CT;";
-	if (mod=="MET_MOD_MR")
-		return "MR;";
-	if (mod=="MET_MOD_US")
-		return "US;";
-	if (mod=="MET_MOD_OTHER")
-		return "OTHER;";
+	if (mod.contains("CT", Qt::CaseInsensitive))
+		return "CT";
+	if (mod.contains("MR", Qt::CaseInsensitive))
+		return "MR";
+	if (mod.contains("US", Qt::CaseInsensitive))
+		return "US";
+	if (mod.contains("OTHER", Qt::CaseInsensitive))
+		return "OTHER";
 	return "UNKNOWN";
 }
 
