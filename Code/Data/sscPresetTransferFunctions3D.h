@@ -31,12 +31,12 @@ public:
 	void save(QString name, ssc::ImagePtr image);
 	void load(QString name, ssc::ImagePtr image);
 
-	QStringList getPresetList(); ///< returns a list of the preset names
+	QStringList getPresetList(QString modality); ///< returns a list of the preset names for the given modality
 	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
 	void deletePresetData(QString name); ///< Delete the preset data node
 
 private:
-	QStringList generatePresetList(); ///< internally generate the preset list
+	QStringList generatePresetList(QString modality); ///< internally generate the preset list
 	ssc::XmlOptionFile getPresetNode(const QString& presetName);
 	ssc::XmlOptionFile getCustomFile();
 

@@ -19,10 +19,9 @@
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkgl.h>
 
-//#include "/usr/include/X11/Xlib.h"
-
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
+#include "/usr/include/X11/Xlib.h"
 #else
 #include <GL/glu.h>
 #endif

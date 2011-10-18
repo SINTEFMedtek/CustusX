@@ -50,7 +50,7 @@ ReconstructParams::ReconstructParams(XmlOptionFile settings)
 
 	ssc::PresetTransferFunctions3DPtr presets = ssc::dataManager()->getPresetTransferFunctions3D();
 	mPresetTFAdapter = StringDataAdapterXml::initialize("Preset", "",
-		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presets->getPresetList(),
+		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presets->getPresetList("US"),
 		mSettings.getElement());
 
 	connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));

@@ -79,7 +79,7 @@ void TestTransform3D::testTranslate()
 
 void TestTransform3D::testRotate()
 {
-  Transform3D M1 = createTransformRotateX(M_PI_2);
+  Transform3D M1 = createTransformRotateX(M_PI/2.0);
 //  std::cout << "\n" << M << std::endl;
 
   double data[16] = {1, 0, 0, 0,
@@ -93,7 +93,7 @@ void TestTransform3D::testRotate()
 
 void TestTransform3D::testVtkConvert()
 {
-  Transform3D M1 = createTransformRotateX(M_PI_2)*createTransformTranslate(Vector3D(3,4,5));
+  Transform3D M1 = createTransformRotateX(M_PI/2.0)*createTransformTranslate(Vector3D(3,4,5));
   vtkMatrix4x4Ptr Mvtk = M1.getVtkMatrix();
 
   for (int r=0; r<4; ++r)
@@ -146,7 +146,7 @@ void TestTransform3D::testDoTransform()
   Vector3D offset = Vector3D(3,4,5);
 
   Transform3D T = createTransformTranslate(offset);
-  Transform3D R = createTransformRotateX(M_PI_2);
+  Transform3D R = createTransformRotateX(M_PI/2.0);
   Transform3D S = createTransformScale(Vector3D(2,2,2));
   Transform3D M = T*R;
 
