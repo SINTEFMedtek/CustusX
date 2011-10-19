@@ -188,7 +188,7 @@ void ImageTFData::parseXml(QDomNode dataNode)
  * Modify transfer function for unsigned CT.
  * This is necessary CT transfer functions are stored as signed.
  * \param onLoad true: add 1024 to preset transfer function values (Use after a preset is loaded)
- *               false: subtract 1024 from transfer function values (Use before saving a new preset)
+ *               false: subtract 1024 from transfer function values (Use before saving a new preset, remember to revert back afterwards)
  */
 void ImageTFData::unsignedCT(bool onLoad)
 {
@@ -211,7 +211,10 @@ void ImageTFData::unsignedCT(bool onLoad)
 
 	mOpacityMapPtr = newOpacipyMap;
 	mColorMapPtr = newColorMap;
-	emit changed();
+	mLevel += modify;
+	// Don't emit for now. This function are used also for temporary modifications
+	// Emit is moved to fixTransferFunctions()
+//	emit changed();
 }
 
 void ImageTFData::fixTransferFunctions()
@@ -276,6 +279,7 @@ void ImageTFData::fixTransferFunctions()
 		if (delPoint != 1000000)
 			this->removeColorPoint(delPoint);
 	}
+	emit changed();
 }
 
 double ImageTFData::loadAttribute(QDomNode dataNode, QString name, double defVal)
