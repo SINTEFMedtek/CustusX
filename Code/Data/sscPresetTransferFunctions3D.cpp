@@ -50,9 +50,26 @@ void PresetTransferFunctions3D::save(QString name, ssc::ImagePtr image)
 	while (tf2DNode.hasChildNodes())
 		tf2DNode.removeChild(tf2DNode.firstChild());
 
-	image->getTransferFunctions3D()->addXml(file.getElement("transferfunctions"));
-	image->getLookupTable2D()->addXml(file.getElement("lookuptable2D"));
+	ssc::ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
+	ssc::ImageLUT2DPtr LUT2D = image->getLookupTable2D();
+
+	// For unsigned CT: Modify transfer function values temporarily prior to save
+	if ((0 <= image->getMin()) && ("CT" == image->getModality()))
+	{
+		transferFunctions->unsignedCT(false);
+		LUT2D->unsignedCT(false);
+	}
+
+	transferFunctions->addXml(file.getElement("transferfunctions"));
+	LUT2D->addXml(file.getElement("lookuptable2D"));
 	image->getShading().addXml(file.getElement("shading"));
+
+	// Revert the transfer function values back again
+	if ((0 <= image->getMin()) && ("CT" == image->getModality()))
+	{
+		transferFunctions->unsignedCT(true);
+		LUT2D->unsignedCT(true);
+	}
 
 	file.getElement().setAttribute("modality", image->getModality());
 	file.save();
@@ -80,8 +97,8 @@ void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
 	// Transfer functions for CT data are signed, so these have to be converted if they are to be used for unsigned CT
 	if ((0 <= image->getMin()) && ("CT" == image->getModality()))
 	{
-		transferFunctions->unsignedCT();
-		LUT2D->unsignedCT();
+		transferFunctions->unsignedCT(true);
+		LUT2D->unsignedCT(true);
 	}
 
 	//Make sure the preset transfer functions work correctly

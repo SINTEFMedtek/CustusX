@@ -174,7 +174,7 @@ void ImageTFData::parseXml(QDomNode dataNode)
 	}
 
 	//Repair TF's if faulty
-	this->fixTransferFunctions();
+//	this->fixTransferFunctions();
 
 	mWindow = this->loadAttribute(dataNode, "window", mWindow);
 	mLevel = this->loadAttribute(dataNode, "level", mLevel);
@@ -184,20 +184,30 @@ void ImageTFData::parseXml(QDomNode dataNode)
 	//  std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
 }
 
-void ImageTFData::unsignedCT()
+/**
+ * Modify transfer function for unsigned CT.
+ * This is necessary CT transfer functions are stored as signed.
+ * \param onLoad true: add 1024 to preset transfer function values (Use after a preset is loaded)
+ *               false: subtract 1024 from transfer function values (Use before saving a new preset)
+ */
+void ImageTFData::unsignedCT(bool onLoad)
 {
 	//Signed after all. Don't do anyting
 	if (this->getScalarMin() < 0)
 		return;
 
+	int modify = -1024;
+	if(onLoad)
+		modify = 1024;
+
 	//	ssc::OpacityMapPtr opacityMap = this->getOpacityMap();
 	OpacityMapPtr newOpacipyMap(new IntIntMap());
 	for (ssc::IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); it++)
-		(*newOpacipyMap)[it->first + 1024] = it->second;
+		(*newOpacipyMap)[it->first + modify] = it->second;
 
 	ColorMapPtr newColorMap(new ColorMap());
 	for (ssc::ColorMap::iterator it = this->getColorMap()->begin(); it != this->getColorMap()->end(); it++)
-		(*newColorMap)[it->first + 1024] = it->second;
+		(*newColorMap)[it->first + modify] = it->second;
 
 	mOpacityMapPtr = newOpacipyMap;
 	mColorMapPtr = newColorMap;
