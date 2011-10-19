@@ -5,11 +5,11 @@
 #include <QtGui>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
-#include "sscData.h"
+//#include "sscData.h"
 #include "sscDefinitions.h"
-#include "sscMesh.h"
+//#include "sscMesh.h"
 #include "cxViewWrapper.h"
-#include "sscVideoRep.h"
+//#include "sscVideoRep.h"
 
 namespace cx
 {

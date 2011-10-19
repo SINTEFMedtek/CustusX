@@ -7,6 +7,7 @@
 #include <sscImage.h>
 #include "sscPresetTransferFunctions3D.h"
 #include "sscDoubleDataAdapter.h"
+#include "cxActiveImageProxy.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -107,6 +108,8 @@ protected:
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
   DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
+
+  ActiveImageProxyPtr mActiveImageProxy;
 };
 
 class TransferFunction2DWidget : public BaseWidget
@@ -126,6 +129,8 @@ protected:
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
   DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
+
+  ActiveImageProxyPtr mActiveImageProxy;
 };
 
 class TransferFunctionPresetWidget : public BaseWidget
@@ -138,6 +143,7 @@ public:
   virtual QString defaultWhatsThis() const;
 
 public slots:
+	void generatePresetListSlot(); ///< Fill the preset list with the available presets (matching active images modality)
   void presetsBoxChangedSlot(const QString& presetName);
   void resetSlot();
   void saveSlot();
@@ -147,6 +153,8 @@ protected:
   QVBoxLayout* mLayout;
   QComboBox* mPresetsComboBox;
   ssc::PresetTransferFunctions3DPtr mPresets;
+
+  ActiveImageProxyPtr mActiveImageProxy;
 };
 
 /**
