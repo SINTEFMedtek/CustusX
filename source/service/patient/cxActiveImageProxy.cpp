@@ -6,7 +6,7 @@
  */
 
 #include <cxActiveImageProxy.h>
-#include "cxDatamanager.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
