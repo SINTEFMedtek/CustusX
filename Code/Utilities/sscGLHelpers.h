@@ -4,6 +4,12 @@
 #define report_gl_error() fgl_really_report_gl_errors(__FILE__, __LINE__, 0)
 #define report_gl_error_text(text) fgl_really_report_gl_errors(__FILE__, __LINE__, text)
 
-void fgl_really_report_gl_errors( const char *file, int line, const char* text );
+
+#ifdef WIN32
+	static void fgl_really_report_gl_errors( const char *file, int line, const char* text ) {}
+#else
+	void fgl_really_report_gl_errors( const char *file, int line, const char* text );
+#endif //WIN32
+
 
 #endif /*SSCGLHELPERS_H_*/
