@@ -44,6 +44,8 @@ protected:
 private:
   DataManager(DataManager const&);
   DataManager& operator=(DataManager const&);
+
+  mutable ssc::PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
 };
 }//namespace cx
 #endif /* CXDATAMANAGER_H_ */
