@@ -10,6 +10,9 @@
 #include "cxCameraControl.h"
 #include "sscImageAlgorithms.h"
 #include "cxDataMetric.h"
+#include "sscView.h"
+#include "sscImage.h"
+
 namespace cx
 {
 

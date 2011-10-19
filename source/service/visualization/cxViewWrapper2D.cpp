@@ -31,6 +31,9 @@
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "sscGLHelpers.h"
+#include "sscData.h"
+#include "sscMesh.h"
+#include "sscImage.h"
 
 namespace cx
 {

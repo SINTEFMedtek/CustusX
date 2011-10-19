@@ -20,11 +20,16 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
     mCameraGroupBox(new QGroupBox(tr("Camera Style"), this)),
     mDefaultCameraStyleRadioButton(new QRadioButton(tr("Default"), this)),
     mToolCameraStyleRadioButton(new QRadioButton(tr("Tool"), this)),
+    mAngledToolCameraStyleRadioButton(new QRadioButton(tr("Angled tool"), this)),
     mCameraOffsetLabel(new QLabel(tr("Camera offset: "), this)),
     mCameraOffsetSlider(new QSlider(Qt::Horizontal, this)),
     mCameraGroupLayout(new QVBoxLayout())
 {
   mCameraStyle.reset(new CameraStyle());
+
+  mDefaultCameraStyleRadioButton->setToolTip("Fixed camera (Move it with the mouse");
+  mToolCameraStyleRadioButton->setToolTip("Camera following tool");
+  mAngledToolCameraStyleRadioButton->setToolTip("Camera following tool (Placed at an angle of 20 degrees)");
 
   //camera setttings
   mCameraGroupBox->setLayout(mCameraGroupLayout);
@@ -34,6 +39,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
   mCameraOffsetSlider->setValue(600);
   mCameraGroupLayout->addWidget(mDefaultCameraStyleRadioButton);
   mCameraGroupLayout->addWidget(mToolCameraStyleRadioButton);
+  mCameraGroupLayout->addWidget(mAngledToolCameraStyleRadioButton);
   mCameraGroupLayout->addWidget(mCameraOffsetLabel);
   mCameraGroupLayout->addWidget(mCameraOffsetSlider);
   mCameraGroupBox->setEnabled(false);
@@ -49,6 +55,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
   //connections
   connect(mDefaultCameraStyleRadioButton, SIGNAL(toggled(bool)), this, SLOT(radioButtonToggledSlot(bool)));
   connect(mToolCameraStyleRadioButton, SIGNAL(toggled(bool)), this, SLOT(radioButtonToggledSlot(bool)));
+  connect(mAngledToolCameraStyleRadioButton, SIGNAL(toggled(bool)), this, SLOT(radioButtonToggledSlot(bool)));
 
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(trackingConfiguredSlot()));
 }
@@ -75,17 +82,21 @@ void NavigationWidget::radioButtonToggledSlot(bool checked)
       mCameraStyle->setCameraStyle(CameraStyle::DEFAULT_STYLE);
     }
   }
-  else if(this->sender() == mToolCameraStyleRadioButton)
+  else
   {
-    if(checked)
-    {
-      mCameraOffsetSlider->setEnabled(true);
-      mCameraStyle->setCameraStyle(CameraStyle::TOOL_STYLE, mCameraOffsetSlider->value());
-      connect(mCameraOffsetSlider, SIGNAL(valueChanged(int)), mCameraStyle.get(), SLOT(setCameraOffsetSlot(int)));
-    }
-    else
-      disconnect(mCameraOffsetSlider, SIGNAL(valueChanged(int)), mCameraStyle.get(), SLOT(setCameraOffsetSlot(int)));
-  }
+		if (this->sender() == mToolCameraStyleRadioButton)
+			mCameraStyle->setCameraStyle(CameraStyle::TOOL_STYLE, mCameraOffsetSlider->value());
+		else if (this->sender() == mAngledToolCameraStyleRadioButton)
+			mCameraStyle->setCameraStyle(CameraStyle::ANGLED_TOOL_STYLE, mCameraOffsetSlider->value());
+		if (checked)
+		{
+			mCameraOffsetSlider->setEnabled(true);
+			//mCameraStyle->setCameraStyle(CameraStyle::TOOL_STYLE, mCameraOffsetSlider->value());
+			connect(mCameraOffsetSlider, SIGNAL(valueChanged(int)), mCameraStyle.get(), SLOT(setCameraOffsetSlot(int)));
+		}
+		else
+			disconnect(mCameraOffsetSlider, SIGNAL(valueChanged(int)), mCameraStyle.get(), SLOT(setCameraOffsetSlot(int)));
+	}
 }
 
 void NavigationWidget::trackingConfiguredSlot()
