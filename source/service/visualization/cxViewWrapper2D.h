@@ -11,10 +11,11 @@
 #include <QtGui>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
-#include "sscData.h"
 #include "sscDefinitions.h"
-#include "sscMesh.h"
 #include "cxViewWrapper.h"
+#include "sscBoundingBox3D.h"
+#include "sscTransform3D.h"
+#include "sscConfig.h"
 
 namespace ssc
 {

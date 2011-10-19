@@ -66,10 +66,19 @@ VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
   mUidAdapter = DataUidEditableStringDataAdapter::New();
   ssc::LabeledLineEditWidget*  uidEdit = new ssc::LabeledLineEditWidget(this, mUidAdapter);
 
-  gridLayout->addWidget(uidEdit, 0, 0);
-  gridLayout->addWidget(nameEdit, 1, 0);
-  gridLayout->addWidget(parentFrame, 2, 0);
-  gridLayout->addWidget(deleteButton, 3, 0);
+  mModalityAdapter = DataModalityStringDataAdapter::New();
+  ssc::LabeledComboBoxWidget* modalityCombo = new ssc::LabeledComboBoxWidget(this, mModalityAdapter);
+
+  mImageTypeAdapter = ImageTypeStringDataAdapter::New();
+  ssc::LabeledComboBoxWidget* imageTypeCombo = new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter);
+
+  int i=0;
+  gridLayout->addWidget(uidEdit,        i++, 0);
+  gridLayout->addWidget(nameEdit,       i++, 0);
+  gridLayout->addWidget(modalityCombo,  i++, 0);
+  gridLayout->addWidget(imageTypeCombo, i++, 0);
+  gridLayout->addWidget(parentFrame,    i++, 0);
+  gridLayout->addWidget(deleteButton,   i++, 0);
 
   toptopLayout->addStretch();
 
@@ -100,9 +109,12 @@ void VolumeInfoWidget::deleteDataSlot()
 
 void VolumeInfoWidget::updateSlot()
 {
-  mParentFrameAdapter->setData(ssc::dataManager()->getActiveImage());
-  mNameAdapter->setData(ssc::dataManager()->getActiveImage());
-  mUidAdapter->setData(ssc::dataManager()->getActiveImage());
+	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	mParentFrameAdapter->setData(image);
+	mNameAdapter->setData(image);
+	mUidAdapter->setData(image);
+	mModalityAdapter->setData(image);
+	mImageTypeAdapter->setData(image);
 }
 /// -------------------------------------------------------
 /// -------------------------------------------------------

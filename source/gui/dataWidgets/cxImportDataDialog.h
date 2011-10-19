@@ -37,7 +37,11 @@ private:
   QLabel* mUidLabel;
   QLabel* mNameLabel;
   SetParentFrameStringDataAdapterPtr mParentFrameAdapter;
+  DataModalityStringDataAdapterPtr mModalityAdapter;
+  ImageTypeStringDataAdapterPtr mImageTypeAdapter;
   QWidget* mParentFrameCombo;
+  QWidget* mImageTypeCombo;
+  QWidget* mModalityCombo;
   QPushButton* mOkButton;
   QCheckBox* mNiftiFormatCheckBox;
   QCheckBox* mTransformFromParentFrameCheckBox;

@@ -2,8 +2,8 @@
 #define CXVIEW3D2_H_
 
 #include "sscView.h"
-#include "sscTransform3D.h"
-#include "sscTool.h"
+//#include "sscTransform3D.h"
+//#include "sscTool.h"
 #include "sscForwardDeclarations.h"
 
 class QWidget;

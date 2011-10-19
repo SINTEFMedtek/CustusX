@@ -10,15 +10,21 @@
 #include <vector>
 #include <QPointer>
 #include <QObject>
-#include "sscData.h"
+//#include "sscData.h"
 #include "sscDefinitions.h"
-#include "sscAxesRep.h"
-#include "cxViewGroup.h"
+//#include "sscAxesRep.h"
+//#include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
-
+#include "sscVector3D.h"
+class QAction;
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
+
+namespace ssc
+{
+	typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
+}
 
 namespace cx
 {
@@ -70,6 +76,7 @@ public:
   void setStereoType(int type);
 
 private slots:
+	void showSlices();
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void toolsAvailableSlot(); ///< add all tools when configured
   void showSlicePlanesActionSlot(bool checked);
@@ -93,6 +100,9 @@ private:
   virtual void appendToContextMenu(QMenu& contextMenu);
   void updateView();
   void readDataRepSettings(ssc::RepPtr rep);
+  void updateSlices();
+
+  QAction* createSlicesAction(QString title, QWidget* parent);
 
   void showLandmarks(bool on);
   void showPointPickerProbe(bool on);
@@ -111,9 +121,11 @@ private:
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
+  QString mShowSlicesMode;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
-
+//  ssc::SliceProxyPtr mSliceProxy;
+  ssc::Slices3DRepPtr mSlices3DRep;
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
   ssc::OrientationAnnotation3DRepPtr mAnnotationMarker;
 

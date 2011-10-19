@@ -10,7 +10,7 @@
 
 #include <vector>
 #include "sscVector3D.h"
-#include "sscDoubleWidgets.h"
+//#include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 
@@ -28,58 +28,48 @@ typedef boost::shared_ptr<class CameraData> CameraDataPtr;
 class CameraData
 {
 public:
-  CameraData();
-  static CameraDataPtr create() { return CameraDataPtr(new CameraData()); }
-//  void writeCamera(vtkCameraPtr camera);
-//  void readCamera(vtkCameraPtr camera);
+	CameraData();
+	static CameraDataPtr create()
+	{
+		return CameraDataPtr(new CameraData());
+	}
+	void setCamera(vtkCameraPtr camera);
+	vtkCameraPtr getCamera() const;
 
-  void setCamera(vtkCameraPtr camera);
-  vtkCameraPtr getCamera() const;
+	void addXml(QDomNode dataNode) const; ///< store internal state info in dataNode
+	void parseXml(QDomNode dataNode);///< load internal state info from dataNode
 
-  void addXml(QDomNode dataNode) const; ///< store internal state info in dataNode
-  void parseXml(QDomNode dataNode);///< load internal state info from dataNode
-
-//  ssc::Vector3D mPosition;
-//  ssc::Vector3D mFocalPoint;
-//  ssc::Vector3D mViewUp;
-//  double mNearClip, mFarClip;
-//  double mParallelScale;
 private:
-  mutable vtkCameraPtr mCamera;
-  void addTextElement(QDomNode parentNode, QString name, QString value) const;
+	mutable vtkCameraPtr mCamera;
+	void addTextElement(QDomNode parentNode, QString name, QString value) const;
 };
-
 
 /**Utility class for 3D camera control.
  *
  */
-class CameraControl : public QObject
+class CameraControl: public QObject
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
-  CameraControl(QObject* parent=NULL);
-  virtual ~CameraControl();
+	CameraControl(QObject* parent = NULL);
+	virtual ~CameraControl();
 
-  QActionGroup* createStandard3DViewActions();
-  void translateByFocusTo(ssc::Vector3D p_r);
+	QActionGroup* createStandard3DViewActions();
+	void translateByFocusTo(ssc::Vector3D p_r);
 
 signals:
 
 protected slots:
-//  void dollySlot(QPointF delta);
-//  void panXZSlot(QPointF delta);
-//  void rotateYSlot(QPointF delta);
-//  void rotateXZSlot(QPointF delta);
-  void setStandard3DViewActionSlot();
+	void setStandard3DViewActionSlot();
 
 private:
-  vtkRendererPtr getRenderer() const;
-  vtkCameraPtr getCamera() const;
-  void defineRotateLayout();
-  void definePanLayout();
+	vtkRendererPtr getRenderer() const;
+	vtkCameraPtr getCamera() const;
+	void defineRotateLayout();
+	void definePanLayout();
 
-  QAction* addStandard3DViewAction(QString caption, QString help, ssc::Vector3D viewDirection, QActionGroup* group);
+	QAction* addStandard3DViewAction(QString caption, QString help, ssc::Vector3D viewDirection, QActionGroup* group);
 };
 
 }//end namespace cx

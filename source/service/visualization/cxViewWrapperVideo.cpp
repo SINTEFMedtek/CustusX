@@ -28,6 +28,12 @@
 #include "cxToolManager.h"
 #include "cxViewGroup.h"
 
+#include "sscData.h"
+#include "sscMesh.h"
+#include "cxViewWrapper.h"
+#include "sscVideoRep.h"
+
+
 namespace cx
 {
 
