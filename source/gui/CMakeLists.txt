@@ -9,11 +9,11 @@ if (WIN32)
 endif(WIN32)
 
 # qxt hack for mac:
-if (APPLE)
+if (APPLE OR WIN32)
     set(QXT_FOLDER "../ThirdParty/qxt_mac_compatible")
-else(APPLE)
+else(APPLE OR WIN32)
     set(QXT_FOLDER "../ThirdParty/qxt")
-endif(APPLE)
+endif(APPLE OR WIN32)
 
 # Make VERSION_NUMBER available for c++ files in gui folder
 ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
