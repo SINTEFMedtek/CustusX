@@ -42,6 +42,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
+    Data/sscPresetTransferFunctions3D.h
     Video/sscVideoSource.h
     Video/sscVideoRecorder.h
     Tool/sscToolManager.h

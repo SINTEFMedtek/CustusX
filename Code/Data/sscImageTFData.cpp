@@ -211,7 +211,8 @@ void ImageTFData::unsignedCT(bool onLoad)
 
 	mOpacityMapPtr = newOpacipyMap;
 	mColorMapPtr = newColorMap;
-	mLevel += modify;
+
+	mLevel = mLevel + modify;
 	// Don't emit for now. This function are used also for temporary modifications
 	// Emit is moved to fixTransferFunctions()
 //	emit changed();

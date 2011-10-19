@@ -22,8 +22,9 @@ typedef boost::shared_ptr<class PresetTransferFunctions3D> PresetTransferFunctio
  * \date 11. juni 2010
  * \author: jbake
  */
-class PresetTransferFunctions3D
+class PresetTransferFunctions3D : public QObject
 {
+	Q_OBJECT
 public:
 	PresetTransferFunctions3D(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile);
 	~PresetTransferFunctions3D();
@@ -34,6 +35,9 @@ public:
 	QStringList getPresetList(QString modality); ///< returns a list of the preset names for the given modality
 	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
 	void deletePresetData(QString name); ///< Delete the preset data node
+
+signals:
+	void changed();
 
 private:
 	QStringList generatePresetList(QString modality); ///< internally generate the preset list

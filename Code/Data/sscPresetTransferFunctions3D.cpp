@@ -69,10 +69,13 @@ void PresetTransferFunctions3D::save(QString name, ssc::ImagePtr image)
 	{
 		transferFunctions->unsignedCT(true);
 		LUT2D->unsignedCT(true);
+		transferFunctions->fixTransferFunctions();//test
 	}
 
 	file.getElement().setAttribute("modality", image->getModality());
 	file.save();
+
+//	emit changed();
 }
 
 void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
@@ -104,6 +107,8 @@ void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
 	//Make sure the preset transfer functions work correctly
 	transferFunctions->fixTransferFunctions();
 	LUT2D->fixTransferFunctions();
+
+//	emit changed();
 }
 
 /** look for a preset with the given name. Create one if not found.
@@ -165,6 +170,7 @@ void PresetTransferFunctions3D::deletePresetData(QString name)
 {
 	ssc::XmlOptionFile node = this->getPresetNode(name);
 	node.deleteNode();
+	emit changed();
 }
 
 }
