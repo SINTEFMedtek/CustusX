@@ -36,6 +36,14 @@ ImportDataDialog::ImportDataDialog(QString filename, QWidget* parent) :
   layout->addWidget(mUidLabel);
   layout->addWidget(mNameLabel);
 
+  mModalityAdapter = DataModalityStringDataAdapter::New();
+  mModalityCombo = new ssc::LabeledComboBoxWidget(this, mModalityAdapter);
+  layout->addWidget(mModalityCombo);
+
+  mImageTypeAdapter = ImageTypeStringDataAdapter::New();
+  mImageTypeCombo = new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter);
+  layout->addWidget(mImageTypeCombo);
+
   mParentFrameAdapter = SetParentFrameStringDataAdapter::New();
   mParentFrameCombo = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
   layout->addWidget(mParentFrameCombo);
@@ -91,6 +99,12 @@ void ImportDataDialog::importDataSlot()
 
   mUidLabel->setText("Data uid:  " + qstring_cast(mData->getUid()));
   mNameLabel->setText("Data name: " + qstring_cast(mData->getName()));
+
+  ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mData);
+  mModalityAdapter->setData(image);
+  mModalityCombo->setEnabled(image!=0);
+  mImageTypeAdapter->setData(image);
+  mImageTypeCombo->setEnabled(image!=0);
 
   this->setInitialGuessForParentFrame();
   mParentFrameAdapter->setData(mData);

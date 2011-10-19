@@ -44,6 +44,7 @@
 #include "cxStateService.h"
 #include "cxPatientService.h"
 #include "cxMetricWidget.h"
+#include "cxViewWrapper.h"
 
 namespace cx
 {

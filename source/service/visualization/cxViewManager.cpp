@@ -37,6 +37,8 @@
 #include "vtkForwardDeclarations.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
+#include "cxInteractiveClipper.h"
+#include "sscImage.h"
 
 namespace cx
 {
@@ -389,6 +391,8 @@ void ViewManager::setActiveLayout(const QString& layout)
 {
   if(mActiveLayout==layout)
     return;
+
+	std::cout << "ViewManager::setActiveLayout " << layout << std::endl;
 
   LayoutData next = this->getLayoutData(layout);
   if (next.getUid().isEmpty())

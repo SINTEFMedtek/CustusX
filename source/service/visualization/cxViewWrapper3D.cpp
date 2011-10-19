@@ -8,13 +8,8 @@
 #include <QAction>
 #include <QMenu>
 
-#include <vtkTransform.h>
-#include <vtkCamera.h>
-#include <vtkAbstractVolumeMapper.h>
-#include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include <vtkInteractorObserver.h>
 
 #include "sscView.h"
 #include "sscSliceProxy.h"
@@ -45,6 +40,17 @@
 #include "cxPlaneMetricRep.h"
 #include "cxDataMetricRep.h"
 #include "cxDataLocations.h"
+#include "sscTexture3DSlicerRep.h"
+#include "sscSlices3DRep.h"
+#include "sscEnumConverter.h"
+
+#include "sscData.h"
+#include "sscAxesRep.h"
+#include "cxViewGroup.h"
+
+#include "cxAngleMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxPointMetric.h"
 
 namespace cx
 {
@@ -119,6 +125,9 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+
+//  mSliceProxy = ssc::SliceProxy::New("sliceproxy_("+ mView->getName() +")");
+//  mSliceProxy->initializeFromPlane(ssc::ptAXIAL, false, ssc::Vector3D(0,0,1), true, 150, 0.25);
 
   mLandmarkRep = LandmarkRep::New("LandmarkRep_"+index);
   mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
@@ -239,7 +248,8 @@ void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
 
   // TODO set center here will not do: must handle
   ssc::dataManager()->setCenter(p_r);
-  tool->set_prMt(ssc::createTransformTranslate(p_pr));
+  ssc::Vector3D p0_pr = tool->get_prMt().coord(ssc::Vector3D(0,0,0));
+  tool->set_prMt(ssc::createTransformTranslate(p_pr-p0_pr) * tool->get_prMt());
 }
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
@@ -285,6 +295,16 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showToolPath->setChecked(activeRep3D->getTracer()->isRunning());
   connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
+#ifdef USE_GLX_SHARED_CONTEXT
+  QMenu* showSlicesMenu = new QMenu("Show Slices", &contextMenu);
+  showSlicesMenu->addAction(this->createSlicesAction("ACS", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Axial", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Sagittal", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Coronal", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Any", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Dual", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Radial", &contextMenu));
+#endif // USE_GLX_SHARED_CONTEXT
 
   QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
   showRefTool->setDisabled(true);
@@ -299,6 +319,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   }
 
   contextMenu.addSeparator();
+#ifdef USE_GLX_SHARED_CONTEXT
+  contextMenu.addMenu(showSlicesMenu);
+#endif //USE_GLX_SHARED_CONTEXT
   contextMenu.addAction(resetCameraAction);
   contextMenu.addAction(centerImageAction);
   contextMenu.addAction(centerToolAction);
@@ -311,6 +334,30 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
+}
+
+QAction* ViewWrapper3D::createSlicesAction(QString title, QWidget* parent)
+{
+	QAction* action = new QAction(title, parent);
+	connect(action, SIGNAL(triggered()), this, SLOT(showSlices()));
+	action->setData(title);
+	action->setCheckable(true);
+	action->setChecked(mShowSlicesMode==title);
+	return action;
+}
+
+void ViewWrapper3D::showSlices()
+{
+	QAction* action = dynamic_cast<QAction*>(sender());
+	if (!action)
+		return;
+
+	if (!action->isChecked())
+		mShowSlicesMode = "";
+	else
+		mShowSlicesMode = action->data().toString();
+//	std::cout << "show " << mShowSlicesMode << std::endl;
+	this->updateSlices();
 }
 
 void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
@@ -584,6 +631,40 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
     mView->removeRep(refRep);
 }
 
+
+void ViewWrapper3D::updateSlices()
+{
+#ifdef USE_GLX_SHARED_CONTEXT
+	if (mSlices3DRep)
+		mView->removeRep(mSlices3DRep);
+	mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
+
+	ssc::PLANE_TYPE type = string2enum<ssc::PLANE_TYPE>(mShowSlicesMode);
+	if (type!=ssc::ptCOUNT)
+	{
+		mSlices3DRep->addPlane(type);
+	}
+	else if (mShowSlicesMode=="ACS")
+	{
+		mSlices3DRep->addPlane(ssc::ptAXIAL);
+		mSlices3DRep->addPlane(ssc::ptSAGITTAL);
+		mSlices3DRep->addPlane(ssc::ptCORONAL);
+	}
+	else
+	{
+		mSlices3DRep.reset();
+		return;
+	}
+
+	mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
+	if (mViewGroup)
+		mSlices3DRep->setImages(mViewGroup->getImages());
+	mSlices3DRep->setTool(ssc::toolManager()->getDominantTool());
+//	return mSlices3DRep;
+	mView->addRep(mSlices3DRep);
+#endif // USE_GLX_SHARED_CONTEXT
+}
+
 ssc::View* ViewWrapper3D::getView()
 {
   return mView;
@@ -593,6 +674,8 @@ void ViewWrapper3D::dominantToolChangedSlot()
 {
   ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
   mPickerRep->setTool(dominantTool);
+  if (mSlices3DRep)
+	  mSlices3DRep->setTool(dominantTool);
 }
 
 
