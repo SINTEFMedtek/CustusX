@@ -299,6 +299,7 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
   mActiveImageProxy = ActiveImageProxy::New();
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(generatePresetListSlot()));
   connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this, SLOT(generatePresetListSlot()));
+  connect(mPresets.get(), SIGNAL(changed()), this, SLOT(generatePresetListSlot()));
 
   mLayout->addWidget(mPresetsComboBox);
   QHBoxLayout* buttonLayout = new QHBoxLayout;
