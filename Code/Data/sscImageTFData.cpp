@@ -213,6 +213,7 @@ void ImageTFData::unsignedCT(bool onLoad)
 	mColorMapPtr = newColorMap;
 
 	mLevel = mLevel + modify;
+	mLLR = mLLR + modify;
 	// Don't emit for now. This function are used also for temporary modifications
 	// Emit is moved to fixTransferFunctions()
 //	emit changed();

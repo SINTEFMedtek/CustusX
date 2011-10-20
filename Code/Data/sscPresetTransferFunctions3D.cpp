@@ -69,7 +69,6 @@ void PresetTransferFunctions3D::save(QString name, ssc::ImagePtr image)
 	{
 		transferFunctions->unsignedCT(true);
 		LUT2D->unsignedCT(true);
-		transferFunctions->fixTransferFunctions();//test
 	}
 
 	file.getElement().setAttribute("modality", image->getModality());
