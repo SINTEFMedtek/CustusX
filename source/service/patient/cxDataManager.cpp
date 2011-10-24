@@ -42,7 +42,10 @@ ssc::PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() co
 	ssc::XmlOptionFile preset = ssc::XmlOptionFile(DataLocations::getRootConfigPath()+"/transferFunctions/presets.xml", "transferFunctions");
 	ssc::XmlOptionFile custom = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("presetTransferFunctions");
 
-	return ssc::PresetTransferFunctions3DPtr(new ssc::PresetTransferFunctions3D(preset, custom));
+	if (!mPresetTransferFunctions3D)
+		mPresetTransferFunctions3D.reset(new ssc::PresetTransferFunctions3D(preset, custom));
+
+	return mPresetTransferFunctions3D;
 }
 
 
