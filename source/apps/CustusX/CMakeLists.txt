@@ -125,7 +125,8 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
     )
 
 # install openCL shaders into bundle
-install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/Thunder/kernels.ocl 
+#install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/Thunder/kernels.ocl 
+install(FILES ${CustusX3_SOURCE_DIR}/externals/ssc/Code/Ultrasound/3DReconstruction/Thunder/kernels.ocl 
         DESTINATION ${CONFIG_DIR}/shaders/
         #COMPONENT CustusX
         )

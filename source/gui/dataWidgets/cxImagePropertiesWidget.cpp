@@ -36,8 +36,9 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(QWidget* parent) :
   mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
   mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
   mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
                                               QSizePolicy::Fixed);
@@ -96,8 +97,9 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(QWidget* parent
   mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
