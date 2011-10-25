@@ -28,6 +28,7 @@ public:
   ssc::Transform3D getLinearTransform();
 //  ssc::Transform3D getNonLinearTransform();
   ssc::ImagePtr loadMinc(char* source_file);
+  void setDebugOutput(bool on) { mDebugOutput = on; }
 
   /**
    * Extract polydata from a image.
@@ -41,7 +42,7 @@ private:
   ssc::Transform3D getLinearTransform(vtkGeneralTransformPtr myConcatenation);
 
 protected:
-  void processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCellLocatorPtr myLocator, vtkGeneralTransformPtr myConcatenation);
+  bool processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCellLocatorPtr myLocator, vtkGeneralTransformPtr myConcatenation);
   void printOutResults(QString fileNamePrefix, vtkGeneralTransformPtr myConcatenation);
   vtkAbstractTransformPtr linearRegistration(vtkPointsPtr sortedSourcePoints, vtkPointsPtr sortedTargetPoints, int numPoints/*, vtkAbstractTransform** myCurrentTransform*/);
   vtkAbstractTransformPtr nonLinearRegistration(vtkPolyDataPtr tpsSourcePolyData, vtkPolyDataPtr tpsTargetPolyData, int numPoints);
@@ -64,6 +65,7 @@ protected:
   //TODO non-linear needs to handle this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   bool mInvertedTransform; ///< the calculated registration goes from target to source instead of source to target
   //---------------------------------------------------------------------------
+  bool mDebugOutput;
 };
 }//namespace cx
 #endif
