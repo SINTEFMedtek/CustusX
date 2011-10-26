@@ -517,6 +517,24 @@ void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta,
   //std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
 
 
+	// characterize the input perturbation in angle-axis form:
+	ssc::Vector3D t_delta = linearTransform.matrix().block<3,1>(0, 3);
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3,3>(0, 0));
+	double angle = angleAxis.angle();
+
+	QString qualityText = QString("|t_delta|=%1mm, angle=%2*").arg(t_delta.length(), 6, 'f', 2).arg(angle/M_PI*180.0, 6, 'f', 2);
+
+	if (t_delta.length()>20 || fabs(angle)>10/180.0*M_PI)
+	{
+		ssc::messageManager()->sendWarning(qualityText);
+		QString text = QString("The registration matrix' angle-axis representation shows a large shift. Retry registration.");
+		ssc::messageManager()->sendWarning(text);
+	}
+	else
+	{
+		ssc::messageManager()->sendInfo(qualityText);
+	}
+
 //  ssc::Transform3D delta = fixedData->get_rMd() * linearTransform * movingData->get_rMd().inv();
 
   // The registration is performed in space r. Thus, given an old data position rMd, we find the
