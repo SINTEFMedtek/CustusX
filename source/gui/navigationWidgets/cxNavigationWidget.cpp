@@ -42,7 +42,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
   mCameraGroupLayout->addWidget(mAngledToolCameraStyleRadioButton);
   mCameraGroupLayout->addWidget(mCameraOffsetLabel);
   mCameraGroupLayout->addWidget(mCameraOffsetSlider);
-  mCameraGroupBox->setEnabled(false);
+//  mCameraGroupBox->setEnabled(false);//Allow changing camera style even if tracking isn't configured. Should allow testing with manual tool
 
   QWidget* toolOffsetWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterActiveToolOffset));
 
