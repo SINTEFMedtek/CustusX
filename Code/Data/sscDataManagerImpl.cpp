@@ -848,6 +848,19 @@ ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uid, QString
 	return retval;
 }
 
+/**
+ * Create a new image that inherits parameters from a parent
+ */
+ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath)
+{
+	ImagePtr retval = createImage(data, uid, name, filePath);
+  retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
+  retval->get_rMd_History()->setParentSpace(parentImage->getUid());
+  retval->resetTransferFunction(parentImage->getTransferFunctions3D()->createCopy(), parentImage->getLookupTable2D()->createCopy());
+  retval->setModality(parentImage->getModality());
+	return retval;
+}
+
 /**Insert uid and name containing %1 placeholders for insertion of unique integers.
  * Return unique values.
  * If input does not contain %1, nothing happens.

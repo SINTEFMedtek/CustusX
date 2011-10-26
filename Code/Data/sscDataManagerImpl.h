@@ -160,6 +160,7 @@ public:
 	virtual CLINICAL_APPLICATION getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_APPLICATION application);
 	virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath);
+	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath);
 	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
 
 protected:
