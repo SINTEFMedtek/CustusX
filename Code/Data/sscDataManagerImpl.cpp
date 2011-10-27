@@ -161,7 +161,7 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 		image->getTransferFunctions3D()->setLevel(level);
 		image->getLookupTable2D()->setLevel(level);
 	}
-	QString windowString = customReader->readKey("WindowWindow");
+	QString windowString = customReader->readKey("WindowWidth");
 	double window = windowString.toDouble(&ok);
 	if (ok)
 	{
