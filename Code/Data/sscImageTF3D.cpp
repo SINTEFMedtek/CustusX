@@ -64,12 +64,15 @@ void ImageTF3D::transferFunctionsChangedSlot()
 	this->refreshColorTF();
 }
 
-ImageTF3DPtr ImageTF3D::createCopy()
+ImageTF3DPtr ImageTF3D::createCopy(vtkImageDataPtr newDataBase)
 {
-	ImageTF3DPtr retval(new ImageTF3D(mBase));
+	ImageTF3DPtr retval(new ImageTF3D(newDataBase));
 	retval->deepCopy(this);
+	retval->setVtkImageData(newDataBase);//deepCopy also copies the data base
 	retval->mOpacityTF->DeepCopy(mOpacityTF);
 	retval->mColorTF->DeepCopy(mColorTF);
+
+	retval->transferFunctionsChangedSlot();
 	return retval;
 }
 

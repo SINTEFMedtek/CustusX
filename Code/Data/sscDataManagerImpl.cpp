@@ -856,7 +856,12 @@ ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, 
 	ImagePtr retval = createImage(data, uid, name, filePath);
   retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
   retval->get_rMd_History()->setParentSpace(parentImage->getUid());
-  retval->resetTransferFunction(parentImage->getTransferFunctions3D()->createCopy(), parentImage->getLookupTable2D()->createCopy());
+  ssc::ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
+  ssc::ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
+  //The parent may have a different range of voxel values. Make sure the transfer functions are working
+  transferFunctions->fixTransferFunctions();
+  LUT2D->fixTransferFunctions();
+  retval->resetTransferFunction(transferFunctions, LUT2D);
   retval->setModality(parentImage->getModality());
 	return retval;
 }
