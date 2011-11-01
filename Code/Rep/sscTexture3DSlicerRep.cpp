@@ -95,6 +95,11 @@ void Texture3DSlicerRep::printSelf(std::ostream & os, ssc::Indent indent)
 
 }
 
+void Texture3DSlicerRep::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
+{
+	mProxy->setViewportData(vpMs, vp);
+}
+
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
