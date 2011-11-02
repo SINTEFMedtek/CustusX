@@ -29,6 +29,9 @@ namespace ssc
  */
 ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
 {
+	//TODO: fix error:
+	// There is an error in the transfer functions of the returned image from this function
+
   // provide a resampled volume for algorithms requiring that (such as PickerRep)
   vtkMatrix4x4Ptr orientatorMatrix = vtkMatrix4x4Ptr::New();
   vtkImageReslicePtr orientator = vtkImageReslicePtr::New();
