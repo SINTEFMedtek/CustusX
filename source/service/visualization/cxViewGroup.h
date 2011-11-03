@@ -4,15 +4,16 @@
 #include <vector>
 #include <QObject>
 #include <QDomDocument>
-#include "sscData.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "cxViewWrapper.h"
+#include "sscVector3D.h"
 class QMenu;
 class QPoint;
 
 namespace cx
 {
+typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 
 /**Helper for functions independent of state.
  * Not sure if we need this - think of better place.
@@ -53,6 +54,7 @@ public:
   void addView(ViewWrapperPtr wrapper);
   void removeViews();
   ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
+  std::vector<ViewWrapperPtr> getWrappers() const { return mViewWrappers; }
   std::vector<ssc::View*> getViews() const;
   ViewGroupDataPtr getData() { return mViewGroupData; }
   virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
@@ -60,7 +62,7 @@ public:
   void clearPatientData();
   double getZoom2D();
   std::vector<ssc::ImagePtr> getImages();
-  ssc::SlicePlanesProxyPtr getSlicePlanesProxy() { return mSlicePlanesProxy; }
+//  ssc::SlicePlanesProxyPtr getSlicePlanesProxy() { return mSlicePlanesProxy; }
 
   void setGlobal2DZoom(bool use, SyncedValuePtr val);
   void syncOrientationMode(SyncedValuePtr val);
@@ -74,7 +76,7 @@ private slots:
 protected:
   //zoom2d is the same for all viewwrapper2ds in a viewgroup
   void setZoom2D(double newZoom);
-  void setSlicePlanesProxy();
+//  void setSlicePlanesProxy();
 
   std::vector<ssc::View*> mViews;
 
@@ -95,7 +97,7 @@ protected:
 
   ViewGroupDataPtr mViewGroupData;
   std::vector<ViewWrapperPtr> mViewWrappers;
-  ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
+//  ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
 };
 bool isViewWrapper2D(ViewWrapperPtr wrapper);
 } // namespace cx

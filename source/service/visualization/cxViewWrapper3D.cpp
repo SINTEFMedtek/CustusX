@@ -8,25 +8,19 @@
 #include <QAction>
 #include <QMenu>
 
-#include <vtkTransform.h>
-#include <vtkCamera.h>
-#include <vtkAbstractVolumeMapper.h>
-#include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-#include <vtkInteractorObserver.h>
 
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscTool2DRep.h"
-#include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
-#include "sscProbeRep.h"
+#include "sscPickerRep.h"
 #include "sscGeometricRep.h"
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
@@ -39,14 +33,24 @@
 #include "cxToolManager.h"
 #include "cxRepManager.h"
 #include "cxCameraControl.h"
-#include "cxImageLandmarkRep.h"
-#include "cxPatientLandmarkRep.h"
+#include "cxLandmarkRep.h"
 #include "cxPointMetricRep.h"
 #include "cxDistanceMetricRep.h"
 #include "cxAngleMetricRep.h"
 #include "cxPlaneMetricRep.h"
 #include "cxDataMetricRep.h"
 #include "cxDataLocations.h"
+#include "sscTexture3DSlicerRep.h"
+#include "sscSlices3DRep.h"
+#include "sscEnumConverter.h"
+
+#include "sscData.h"
+#include "sscAxesRep.h"
+#include "cxViewGroup.h"
+
+#include "cxAngleMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxPointMetric.h"
 
 namespace cx
 {
@@ -122,20 +126,25 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
-  mImageLandmarkRep = ImageLandmarkRep::New("ImageLandmarkRep_"+index);
-  mImageLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-  mImageLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+//  mSliceProxy = ssc::SliceProxy::New("sliceproxy_("+ mView->getName() +")");
+//  mSliceProxy->initializeFromPlane(ssc::ptAXIAL, false, ssc::Vector3D(0,0,1), true, 150, 0.25);
 
-  mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
-  mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-  mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+  mLandmarkRep = LandmarkRep::New("LandmarkRep_"+index);
+  mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+  mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+//  std::cout << this << " created new LandmarkRep " << mLandmarkRep.get() << std::endl;
 
-  mProbeRep = ssc::ProbeRep::New("ProbeRep_"+index, "ProbeRep_"+index);
 
-  connect(mProbeRep.get(), SIGNAL(pointPicked(ssc::Vector3D)),this, SLOT(probeRepPointPickedSlot(ssc::Vector3D)));
-  mProbeRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
-  mProbeRep->setEnabled(false);
-  mView->addRep(mProbeRep);
+//  mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
+//  mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+//  mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+
+  mPickerRep = ssc::PickerRep::New("PickerRep_"+index, "PickerRep_"+index);
+
+  connect(mPickerRep.get(), SIGNAL(pointPicked(ssc::Vector3D)),this, SLOT(PickerRepPointPickedSlot(ssc::Vector3D)));
+  mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
+  mPickerRep->setEnabled(false);
+  mView->addRep(mPickerRep);
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   this->dominantToolChangedSlot();
 
@@ -154,7 +163,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
 
-  mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
+  mAnnotationMarker = RepManager::getInstance()->getCachedRep<ssc::OrientationAnnotation3DRep>("annotation_"+mView->getName());
+//  mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
   mAnnotationMarker->setMarkerFilename(DataLocations::getRootConfigPath()+"/models/"+settings()->value("View3D/annotationModel").toString());
   mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 
@@ -212,16 +222,17 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
       this->readDataRepSettings(iter->second);
     }
 
-    mImageLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-    mImageLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
-    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+    this->toolsAvailableSlot();
+    mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+    mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+//    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+//    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
   }
 }
 
 
-void ViewWrapper3D::probeRepPointPickedSlot(ssc::Vector3D p_r)
+void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
 {
 	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
 //  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
@@ -233,11 +244,12 @@ void ViewWrapper3D::probeRepPointPickedSlot(ssc::Vector3D p_r)
   p_pr -= offset;
   p_r = rMpr.coord(p_pr);
 
-//	std::cout << "ViewWrapper3D::probeRepPointPickedSlot " << p_r << p_r<< std::endl;
+//	std::cout << "ViewWrapper3D::PickerRepPointPickedSlot " << p_r << p_r<< std::endl;
 
   // TODO set center here will not do: must handle
   ssc::dataManager()->setCenter(p_r);
-  tool->set_prMt(ssc::createTransformTranslate(p_pr));
+  ssc::Vector3D p0_pr = tool->get_prMt().coord(ssc::Vector3D(0,0,0));
+  tool->set_prMt(ssc::createTransformTranslate(p_pr-p0_pr) * tool->get_prMt());
 }
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
@@ -283,6 +295,16 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showToolPath->setChecked(activeRep3D->getTracer()->isRunning());
   connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
+#ifdef USE_GLX_SHARED_CONTEXT
+  QMenu* showSlicesMenu = new QMenu("Show Slices", &contextMenu);
+  showSlicesMenu->addAction(this->createSlicesAction("ACS", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Axial", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Sagittal", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Coronal", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Any", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Dual", &contextMenu));
+  showSlicesMenu->addAction(this->createSlicesAction("Radial", &contextMenu));
+#endif // USE_GLX_SHARED_CONTEXT
 
   QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
   showRefTool->setDisabled(true);
@@ -297,6 +319,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   }
 
   contextMenu.addSeparator();
+#ifdef USE_GLX_SHARED_CONTEXT
+  contextMenu.addMenu(showSlicesMenu);
+#endif //USE_GLX_SHARED_CONTEXT
   contextMenu.addAction(resetCameraAction);
   contextMenu.addAction(centerImageAction);
   contextMenu.addAction(centerToolAction);
@@ -309,6 +334,30 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
+}
+
+QAction* ViewWrapper3D::createSlicesAction(QString title, QWidget* parent)
+{
+	QAction* action = new QAction(title, parent);
+	connect(action, SIGNAL(triggered()), this, SLOT(showSlices()));
+	action->setData(title);
+	action->setCheckable(true);
+	action->setChecked(mShowSlicesMode==title);
+	return action;
+}
+
+void ViewWrapper3D::showSlices()
+{
+	QAction* action = dynamic_cast<QAction*>(sender());
+	if (!action)
+		return;
+
+	if (!action->isChecked())
+		mShowSlicesMode = "";
+	else
+		mShowSlicesMode = action->data().toString();
+//	std::cout << "show " << mShowSlicesMode << std::endl;
+	this->updateSlices();
 }
 
 void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
@@ -559,9 +608,9 @@ void ViewWrapper3D::activeImageChangedSlot()
   if (!std::count(images.begin(), images.end(), image))
     image.reset();
 
-  mProbeRep->setImage(image);
-  mImageLandmarkRep->setImage(image);
-  mPatientLandmarkRep->setImage(image);
+  mPickerRep->setImage(image);
+//  mImageLandmarkRep->setImage(image);
+//  mPatientLandmarkRep->setImage(image);
 }
 
 void ViewWrapper3D::showRefToolSlot(bool checked)
@@ -582,6 +631,40 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
     mView->removeRep(refRep);
 }
 
+
+void ViewWrapper3D::updateSlices()
+{
+#ifdef USE_GLX_SHARED_CONTEXT
+	if (mSlices3DRep)
+		mView->removeRep(mSlices3DRep);
+	mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
+
+	ssc::PLANE_TYPE type = string2enum<ssc::PLANE_TYPE>(mShowSlicesMode);
+	if (type!=ssc::ptCOUNT)
+	{
+		mSlices3DRep->addPlane(type);
+	}
+	else if (mShowSlicesMode=="ACS")
+	{
+		mSlices3DRep->addPlane(ssc::ptAXIAL);
+		mSlices3DRep->addPlane(ssc::ptSAGITTAL);
+		mSlices3DRep->addPlane(ssc::ptCORONAL);
+	}
+	else
+	{
+		mSlices3DRep.reset();
+		return;
+	}
+
+	mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
+	if (mViewGroup)
+		mSlices3DRep->setImages(mViewGroup->getImages());
+	mSlices3DRep->setTool(ssc::toolManager()->getDominantTool());
+//	return mSlices3DRep;
+	mView->addRep(mSlices3DRep);
+#endif // USE_GLX_SHARED_CONTEXT
+}
+
 ssc::View* ViewWrapper3D::getView()
 {
   return mView;
@@ -590,7 +673,9 @@ ssc::View* ViewWrapper3D::getView()
 void ViewWrapper3D::dominantToolChangedSlot()
 {
   ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
-  mProbeRep->setTool(dominantTool);
+  mPickerRep->setTool(dominantTool);
+  if (mSlices3DRep)
+	  mSlices3DRep->setTool(dominantTool);
 }
 
 
@@ -612,7 +697,7 @@ void ViewWrapper3D::toolsAvailableSlot()
         toolRep->getTracer()->start();
     }
 
-    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble()*2/3); // use fraction of set size
+    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble()); // use fraction of set size
     toolRep->setSphereRadiusInNormalizedViewport(true);
 
     toolRep->setTool(tool);
@@ -632,24 +717,24 @@ void ViewWrapper3D::optionChangedSlot()
 
 void ViewWrapper3D::showLandmarks(bool on)
 {
-  if (mImageLandmarkRep->isConnectedToView(mView) == on)
+  if (mLandmarkRep->isConnectedToView(mView) == on)
     return;
 
   if (on)
   {
-    mView->addRep(mPatientLandmarkRep);
-    mView->addRep(mImageLandmarkRep);
+    //mView->addRep(mPatientLandmarkRep);
+    mView->addRep(mLandmarkRep);
   }
   else
   {
-    mView->removeRep(mPatientLandmarkRep);
-    mView->removeRep(mImageLandmarkRep);
+    //mView->removeRep(mPatientLandmarkRep);
+    mView->removeRep(mLandmarkRep);
   }
 }
 
 void ViewWrapper3D::showPointPickerProbe(bool on)
 {
-  mProbeRep->setEnabled(on);
+  mPickerRep->setEnabled(on);
 }
 
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)

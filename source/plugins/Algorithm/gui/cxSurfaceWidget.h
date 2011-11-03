@@ -47,8 +47,10 @@ private slots:
   void surfaceSlot();
   void reduceResolutionSlot(bool value);
   void smoothingSlot(bool value);
+  void preserveSlot(bool value);
   void imageChangedSlot(QString uid);
   void handleFinishedSlot();
+  void thresholdSlot();
 
 private:
   SurfaceWidget();
@@ -57,10 +59,12 @@ private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   bool mReduceResolution;
   bool mSmoothing;
+  bool mPreserveTopology;
   ssc::DoubleDataAdapterXmlPtr mSurfaceThresholdAdapter;
   ssc::DoubleDataAdapterXmlPtr mDecimationAdapter;
   QColor mDefaultColor;
   QLabel* mStatusLabel;
+  QCheckBox* mReduceResolutionCheckBox;
 
   Contour mContourAlgorithm;
 };

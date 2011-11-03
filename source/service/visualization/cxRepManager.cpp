@@ -8,7 +8,7 @@
 #include "sscTransform3D.h"
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
-#include "sscProbeRep.h"
+//#include "sscPickerRep.h"
 #include "sscGeometricRep.h"
 #include "sscProgressiveLODVolumetricRep.h"
 #include "cxTool.h"
@@ -92,6 +92,15 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 void RepManager::volumeRemovedSlot(QString uid)
 {
   mVolumetricRepByImageMap.erase(uid);
+
+  // all reps with ids that contains the volume uid will be cleared from the cache.
+	for (RepMultiMap::iterator iter=mRepCache.begin(); iter!= mRepCache.end();)
+	{
+		RepMultiMap::iterator last = iter++;
+
+		if (last->first.contains(uid))
+			mRepCache.erase(last);
+	}
 }
 
 

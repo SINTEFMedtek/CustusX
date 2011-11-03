@@ -27,6 +27,7 @@ protected:
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
   DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataLevel;
+  ActiveImageProxyPtr mActiveImageProxy;
 };
 
 class TransferFunction2DOpacityWidget : public BaseWidget
@@ -44,6 +45,7 @@ public slots:
 protected:
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   DoubleDataAdapterImageTFDataBasePtr mDataAlpha, mDataLLR;
+  ActiveImageProxyPtr mActiveImageProxy;
 };
 
 

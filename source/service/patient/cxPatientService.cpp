@@ -47,6 +47,7 @@ void PatientService::setInstance(PatientService* instance)
 PatientService::PatientService()
 {
 	mPatientData.reset(new PatientData());
+	mThresholdPreview.reset(new ThresholdPreview());
 }
 
 PatientService::~PatientService()
@@ -57,6 +58,11 @@ PatientService::~PatientService()
 PatientDataPtr PatientService::getPatientData()
 {
 	return mPatientData;
+}
+
+ThresholdPreviewPtr PatientService::getThresholdPreview()
+{
+	return mThresholdPreview;
 }
 
 //---------------------------------------------------------

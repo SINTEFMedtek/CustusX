@@ -11,10 +11,16 @@
 #include <QtGui>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
-#include "sscData.h"
 #include "sscDefinitions.h"
-#include "sscMesh.h"
 #include "cxViewWrapper.h"
+#include "sscBoundingBox3D.h"
+#include "sscTransform3D.h"
+#include "sscConfig.h"
+
+namespace ssc
+{
+typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
+}
 
 #ifdef USE_GLX_SHARED_CONTEXT
   #define USE_2D_GPU_RENDER
@@ -93,7 +99,8 @@ private:
   ssc::SliceRepSWPtr mSliceRep;
   std::map<QString, ssc::GeometricRep2DPtr> mGeometricRep;
   ssc::ToolRep2DPtr mToolRep2D;
-  ssc::OrientationAnnotationRepPtr mOrientationAnnotationRep;
+//  ssc::OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
+  ssc::OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   ssc::SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;

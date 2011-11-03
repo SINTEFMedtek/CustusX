@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <map>
+#include <set>
 #include <vector>
 #include "sscForwardDeclarations.h"
 #include "sscMessageManager.h"
@@ -86,6 +87,45 @@ public:
    */
   ssc::VolumetricRepPtr getVolumetricRep(ssc::ImagePtr image);
 
+  /**Get a previously cached Rep.
+   *
+   * Optionally, provide an uid that can be used
+   * to cache several different versions of a rep type.
+   *
+   * Name is the name to use IF a new rep is created.
+   *
+   * Not implemented:
+   * If a Rep of the requested type exist but is not used
+   * externally (i.e. has a refcount of 1), it will be reused.
+   * Otherwise, a new rep will be created and returned.
+   */
+  template <class REP>
+  boost::shared_ptr<REP> getCachedRep(QString uid="", QString name="USE_UID")
+  {
+  	// look for existing value:
+  	for (RepMultiMap::iterator iter=mRepCache.begin(); iter!= mRepCache.end(); ++iter)
+  	{
+  		if (iter->first!=uid)
+  			continue;
+  	  boost::shared_ptr<REP> retval = boost::shared_dynamic_cast<REP>(iter->second);
+  	  if (retval)
+  	  {
+//  		  std::cout << "reusing cached rep: " << uid << std::endl;
+  	  	return retval;
+  	  }
+  	}
+
+  	if (name=="USE_UID")
+  		name = uid;
+
+  	// create new value, store and return:
+	  boost::shared_ptr<REP> retval = REP::New(uid,name);
+	  mRepCache.insert(std::make_pair(uid,retval));
+//	  std::cout << "created new cached rep: " << uid << std::endl;
+
+	  return retval;
+  }
+
 protected slots:
   void volumeRemovedSlot(QString uid);
 
@@ -97,6 +137,10 @@ protected:
   bool mIsUsingGPU3DMapper;
   double mMaxRenderSize;
 
+//  ssc::OrientationAnnotation3DRepPtr mAnnotationMarker;
+//  typedef std::multimap<QString, ssc::RepPtr> RepMultiMap;
+  typedef std::multimap<QString, ssc::RepPtr> RepMultiMap;
+  RepMultiMap mRepCache;
 //  RepMap              mRepMap; ///< contains all the reps in the specific maps above. Use for simplified access.
 
 private:
