@@ -17,6 +17,10 @@
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
 #include "sscTypeConversions.h"
+#include "vtkTextActor.h"
+#include "sscGraphicalPrimitives.h"
+#include "cxAngleMetric.h"
+#include "sscGraphicalPrimitives.h"
 
 namespace cx
 {

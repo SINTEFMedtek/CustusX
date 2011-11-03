@@ -19,7 +19,6 @@
 #include <vtkImageData.h>
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
-#include "sscProbeRep.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
@@ -33,6 +32,12 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
   LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle)
 {
 	mLandmarkTableWidget->hide();
+
+  mFixedLandmarkSource = ImageLandmarksSource::New();
+  mMovingLandmarkSource = ImageLandmarksSource::New();
+
+  connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(updateRep()));
+  connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(updateRep()));
 
 	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
   mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(regManager));
@@ -48,6 +53,12 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
   regLayout->addWidget(mRegisterButton);
   mVerticalLayout->addLayout(regLayout);
   mVerticalLayout->addStretch();
+}
+
+void LandmarkImage2ImageRegistrationWidget::updateRep()
+{
+  mFixedLandmarkSource->setImage(boost::shared_dynamic_cast<ssc::Image>(mManager->getFixedData()));
+  mMovingLandmarkSource->setImage(boost::shared_dynamic_cast<ssc::Image>(mManager->getMovingData()));
 }
 
 void LandmarkImage2ImageRegistrationWidget::registerSlot()
@@ -71,11 +82,26 @@ void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 {
   LandmarkRegistrationWidget::showEvent(event);
   viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
+
+  LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
+  if (rep)
+  {
+    rep->setPrimarySource(mFixedLandmarkSource);
+    rep->setSecondarySource(mMovingLandmarkSource);
+    rep->setSecondaryColor(ssc::Vector3D(0,0.9,0.5));
+  }
 }
 
 void LandmarkImage2ImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
   LandmarkRegistrationWidget::hideEvent(event);
+
+  LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
+  if (rep)
+  {
+    rep->setPrimarySource(LandmarksSourcePtr());
+    rep->setSecondarySource(LandmarksSourcePtr());
+  }
   viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 

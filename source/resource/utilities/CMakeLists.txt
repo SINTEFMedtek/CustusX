@@ -50,9 +50,6 @@ add_library(cxUtilities
     cxCreateProbeDataFromConfiguration.cpp
     cxRenderTimer.h
     cxRenderTimer.cpp
-
-    sscUSFrameData.h
-    sscUSFrameData.cpp
     cxUsReconstructionFileMaker.h
     cxUsReconstructionFileMaker.cpp
     cxUsReconstructionFileReader.h
@@ -66,5 +63,5 @@ include_directories(
     )
     
     
-target_link_libraries(cxUtilities SSC ${QT_LIBRARIES} cxSettings )
+target_link_libraries(cxUtilities SSC sscUS3DReconstruction ${QT_LIBRARIES} cxSettings )
 

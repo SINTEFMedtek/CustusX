@@ -49,7 +49,7 @@ private:
 
   void saveDebugFile();
 
-  UsReconstructionFileReader::FileData mFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
+  ssc::USReconstructInputData mFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
   QString mDebugFolder;
   QString mFilename;
   mutable std::stringstream mDebugStream;

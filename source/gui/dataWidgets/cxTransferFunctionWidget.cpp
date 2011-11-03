@@ -5,11 +5,13 @@
 #include <QStringList>
 #include <QInputDialog>
 #include <QPushButton>
+#include <QMessageBox>
 #include "cxTransferFunctionAlphaWidget.h"
 #include "cxTransferFunctionColorWidget.h"
 #include "sscDataManager.h"
 #include "sscImageTF3D.h"
 #include "sscImageLUT2D.h"
+#include "sscMessageManager.h"
 #include "cxShadingWidget.h"
 #include "cxDataViewSelectionWidget.h"
 
@@ -154,8 +156,9 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
   mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
@@ -219,8 +222,9 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
   mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
   mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
@@ -275,21 +279,34 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
   BaseWidget(parent, "TransferFunctionPresetWidget", "Transfer Function Presets"),
   mLayout(new QVBoxLayout(this))
 {
+	mPresets = ssc::dataManager()->getPresetTransferFunctions3D();
   QPushButton* resetButton = new QPushButton("Reset", this);
+  resetButton->setToolTip("Reset all transfer function values to the defaults");
   connect(resetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
 
+  QPushButton* deleteButton = new QPushButton("Delete", this);
+  deleteButton->setToolTip("Delete the current preset");
+  connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteSlot()));
+
   QPushButton* saveButton = new QPushButton("Save", this);
+  saveButton->setToolTip("Create a new custom preset for both 2D and 3D");
   connect(saveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
 
   mPresetsComboBox = new QComboBox(this);
-  mPresetsComboBox->addItems(mPresets.getPresetList());
+  mPresetsComboBox->setToolTip("Select a preset to use for both 2D and 3D");
   connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(presetsBoxChangedSlot(const QString&)));
+
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(generatePresetListSlot()));
+  connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this, SLOT(generatePresetListSlot()));
+  connect(mPresets.get(), SIGNAL(changed()), this, SLOT(generatePresetListSlot()));
 
   mLayout->addWidget(mPresetsComboBox);
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   mLayout->addLayout(buttonLayout);
 
   buttonLayout->addWidget(resetButton);
+  buttonLayout->addWidget(deleteButton);
   buttonLayout->addWidget(saveButton);
 
   this->setLayout(mLayout);
@@ -304,11 +321,23 @@ QString TransferFunctionPresetWidget::defaultWhatsThis() const
     "</html>";
 }
 
+void TransferFunctionPresetWidget::generatePresetListSlot()
+{
+	// Re-initialize the list
+  mPresetsComboBox->blockSignals(true);
+  mPresetsComboBox->clear();
+  if (ssc::dataManager()->getActiveImage())
+  	mPresetsComboBox->addItems(mPresets->getPresetList(ssc::dataManager()->getActiveImage()->getModality()));
+  else //No active image, show all available presets for debug/overview purposes
+  	mPresetsComboBox->addItems(mPresets->getPresetList("UNKNOWN"));
+  mPresetsComboBox->blockSignals(false);
+}
+
 void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetName)
 {
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   if(activeImage)
-    mPresets.load(presetName, activeImage);
+    mPresets->load(presetName, activeImage);
 }
 
 void TransferFunctionPresetWidget::resetSlot()
@@ -328,10 +357,27 @@ void TransferFunctionPresetWidget::saveSlot()
       return;
 
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-  mPresets.save(text, activeImage);
+  mPresets->save(text, activeImage);
 
-  mPresetsComboBox->clear();
-  mPresetsComboBox->addItems(mPresets.getPresetList());
+  this->generatePresetListSlot();
+  mPresetsComboBox->setCurrentIndex(mPresetsComboBox->findText(text));
+}
+
+
+void TransferFunctionPresetWidget::deleteSlot()
+{
+	if (mPresets->isDefaultPreset(mPresetsComboBox->currentText()))
+	{
+		ssc::messageManager()->sendWarning("It is not possible to delete one of the default presets");
+		return;
+	}
+	if (QMessageBox::question(this, "Delete current preset", "Do you really want to delete the current preset?",
+			QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
+			return;
+	mPresets->deletePresetData(mPresetsComboBox->currentText());
+
+  this->generatePresetListSlot();
+  this->resetSlot();
 }
 
 //---------------------------------------------------------

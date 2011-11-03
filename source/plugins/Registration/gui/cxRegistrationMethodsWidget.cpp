@@ -143,7 +143,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   this->addTab(landmarkRegistrationsWidget, "Landmark");
   this->addTab(fastRegistrationsWidget, "Fast");
   this->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
-  this->addTab(image2imageWidget, "Image2Image");
+  this->addTab(image2imageWidget, "Vessel2Vessel");
   this->addTab(imageAndPlateRegistrationWidget, "Plate");
 }
 

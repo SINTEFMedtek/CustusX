@@ -35,15 +35,14 @@ void BinaryThresholdImageFilter::postProcessingSlot()
 
   QString uid = mInput->getUid() + "_seg%1";
   QString name = mInput->getName()+" seg%1";
-  mOutput = ssc::dataManager()->createImage(rawResult,uid, name);
+  mOutput = ssc::dataManager()->createDerivedImage(rawResult,uid, name, mInput);
   if(!mOutput)
   {
     ssc::messageManager()->sendError("Segmentation failed.");
     return;
   }
 
-  mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
-  mOutput->get_rMd_History()->setParentSpace(mInput->getUid());
+  mOutput->resetTransferFunctions();
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 

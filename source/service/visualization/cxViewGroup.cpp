@@ -7,8 +7,6 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscTool2DRep.h"
-#include "sscOrientationAnnotationRep.h"
-#include "sscDisplayTextRep.h"
 #include "sscUtilHelpers.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscMessageManager.h"
@@ -17,6 +15,9 @@
 #include "cxViewWrapper2D.h"
 #include "cxViewManager.h"
 #include "cxCameraControl.h"
+#include "sscData.h"
+#include "cxViewWrapper.h"
+
 
 namespace cx
 {
@@ -164,16 +165,16 @@ ViewGroup::ViewGroup()
 
   mViewGroupData.reset(new ViewGroupData());
 
-  this->setSlicePlanesProxy();
+//  this->setSlicePlanesProxy();
 }
 
 ViewGroup::~ViewGroup()
 {}
 
-void ViewGroup::setSlicePlanesProxy()
-{
-  mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
-}
+//void ViewGroup::setSlicePlanesProxy()
+//{
+//  mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
+//}
 
 /**Add one view wrapper and setup the necessary connections.
  */
@@ -186,7 +187,7 @@ void ViewGroup::addView(ViewWrapperPtr wrapper)
   wrapper->setZoom2D(mZoom2D.mActive);
 
   wrapper->setViewGroup(mViewGroupData);
-  wrapper->setSlicePlanesProxy(mSlicePlanesProxy);
+//  wrapper->setSlicePlanesProxy(mSlicePlanesProxy);
 
   // connect signals
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),this, SLOT(activateManualToolSlot()));
@@ -207,7 +208,7 @@ void ViewGroup::removeViews()
 
   mViews.clear();
   mViewWrappers.clear();
-  mSlicePlanesProxy->clearViewports();
+//  mSlicePlanesProxy->clearViewports();
 }
 
 ViewWrapperPtr ViewGroup::getViewWrapperFromViewUid(QString viewUid)
@@ -298,10 +299,10 @@ void ViewGroup::addXml(QDomNode& dataNode)
   zoom2DNode.appendChild(doc.createTextNode(qstring_cast(this->getZoom2D())));
   dataNode.appendChild(zoom2DNode);
 
-  QDomElement slicePlanes3DNode = doc.createElement("slicePlanes3D");
-  slicePlanes3DNode.setAttribute("use", mSlicePlanesProxy->getVisible());
-  slicePlanes3DNode.setAttribute("opaque", mSlicePlanesProxy->getDrawPlanes());
-  dataNode.appendChild(slicePlanes3DNode);
+//  QDomElement slicePlanes3DNode = doc.createElement("slicePlanes3D");
+//  slicePlanes3DNode.setAttribute("use", mSlicePlanesProxy->getVisible());
+//  slicePlanes3DNode.setAttribute("opaque", mSlicePlanesProxy->getDrawPlanes());
+//  dataNode.appendChild(slicePlanes3DNode);
 
 }
 
@@ -333,10 +334,10 @@ void ViewGroup::parseXml(QDomNode dataNode)
   else
     ssc::messageManager()->sendError("Couldn't convert the zoomfactor to a double: "+qstring_cast(zoom2D)+"");
 
-  QDomElement slicePlanes3DNode = dataNode.namedItem("slicePlanes3D").toElement();
-  mSlicePlanesProxy->setVisible(slicePlanes3DNode.attribute("use").toInt());
-  mSlicePlanesProxy->setDrawPlanes(slicePlanes3DNode.attribute("opaque").toInt());
-  dataNode.appendChild(slicePlanes3DNode);
+//  QDomElement slicePlanes3DNode = dataNode.namedItem("slicePlanes3D").toElement();
+//  mSlicePlanesProxy->setVisible(slicePlanes3DNode.attribute("use").toInt());
+//  mSlicePlanesProxy->setDrawPlanes(slicePlanes3DNode.attribute("opaque").toInt());
+//  dataNode.appendChild(slicePlanes3DNode);
 
 }
 

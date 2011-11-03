@@ -10,6 +10,7 @@
 
 #include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationDataAdapters.h"
+#include "Rep/cxLandmarkRep.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -35,7 +36,7 @@ public:
   virtual QString defaultWhatsThis() const;
 
 protected slots:
-
+  void updateRep();
   void registerSlot();
 
 protected:
@@ -45,6 +46,9 @@ protected:
   virtual void performRegistration();
   virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
   virtual ssc::Transform3D getTargetTransform() const;
+
+  ImageLandmarksSourcePtr mFixedLandmarkSource;
+  ImageLandmarksSourcePtr mMovingLandmarkSource;
 
   //gui
   RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
