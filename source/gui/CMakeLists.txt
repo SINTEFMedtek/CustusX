@@ -8,6 +8,13 @@ if (WIN32)
     add_definitions(-D_USE_MATH_DEFINES)
 endif(WIN32)
 
+# qxt hack for mac:
+if (APPLE OR WIN32)
+    set(QXT_FOLDER "../ThirdParty/qxt_mac_compatible")
+else(APPLE OR WIN32)
+    set(QXT_FOLDER "../ThirdParty/qxt")
+endif(APPLE OR WIN32)
+
 # Make VERSION_NUMBER available for c++ files in gui folder
 ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
 ADD_DEFINITIONS(-DVERSION_NUMBER_VERBOSE="${VERSION_NUMBER_VERBOSE}")
@@ -56,6 +63,7 @@ SET(cxGui_MOC_HDRS
     toolWidgets/cxActiveToolWidget.h
     toolWidgets/cxToolManagerWidget.h
     #----------------------
+    utilities/cxAudio.h
     utilities/cxDoubleSpanSlider.h
     utilities/cxBaseWidget.h
     utilities/cxTransform3DWidget.h
@@ -67,8 +75,8 @@ SET(cxGui_MOC_HDRS
     cxMainWindow.h
     cxSecondaryMainWindow.h
     #----------------------
-    ../ThirdParty/qxt/qxtspanslider_p.h
-    ../ThirdParty/qxt/qxtspanslider.h
+    ${QXT_FOLDER}/qxtspanslider_p.h
+    ${QXT_FOLDER}/qxtspanslider.h
 
 )
 
@@ -188,11 +196,12 @@ SET(cxGui_SRCS
     cxSecondaryMainWindow.h
     cxSecondaryMainWindow.cpp
     #----------------------    
-    ../ThirdParty/qxt/qxtspanslider_p.h
-    ../ThirdParty/qxt/qxtspanslider.h
-    ../ThirdParty/qxt/qxtspanslider.cpp    
+    ${QXT_FOLDER}/qxtspanslider_p.h
+    ${QXT_FOLDER}/qxtspanslider.h
+    ${QXT_FOLDER}/qxtspanslider.cpp    
     #----------------------
     ${cxGui_RCC_SRCS} )
+
 
 
 set(SUB_FOLDERS
@@ -204,7 +213,7 @@ set(SUB_FOLDERS
     streamingWidgets
     toolWidgets
     utilities
-    ../ThirdParty/qxt
+    ${QXT_FOLDER}
     )
 
 # Use the include path and library for Qt that is used by VTK.

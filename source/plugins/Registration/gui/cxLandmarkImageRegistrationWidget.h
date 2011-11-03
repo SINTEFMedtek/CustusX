@@ -3,6 +3,8 @@
 
 #include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationDataAdapters.h"
+#include "Rep/cxLandmarkRep.h"
+#include "cxDominantToolProxy.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -13,6 +15,8 @@ class QSlider;
 
 namespace cx
 {
+
+
 /**
  * \class LandmarkImageRegistrationWidget
  *
@@ -41,6 +45,7 @@ protected slots:
   void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
   virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
   void thresholdChangedSlot(const int value); ///< reemits the valueChanged signal from the slider
+  void enableButtons();
 
 //  void registerSlot();
 //  void autoRegisterSlot(bool checked);
@@ -54,20 +59,23 @@ protected:
   QString getLandmarkName(QString uid);
   virtual ssc::Transform3D getTargetTransform() const;
 //  void internalPerformRegistration(bool doIt);
-  ssc::ProbeRepPtr getProbeRep();
+  ssc::PickerRepPtr getPickerRep();
 
   //gui
 //  RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
   ssc::StringDataAdapterPtr mActiveImageAdapter;
+  ImageLandmarksSourcePtr mImageLandmarkSource;
+  DominantToolProxyPtr mDominantToolProxy;
 
   QPushButton* mAddLandmarkButton; ///< the Add Landmark button
   QPushButton* mEditLandmarkButton; ///< the Edit Landmark button
   QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
   QLabel*      mThresholdLabel; ///< label for the tresholdslider
-  QSlider*     mThresholdSlider; ///< slider for setting the probing treshold
+  QSlider*     mThresholdSlider; ///< slider for setting the picking treshold
 
 //  QPushButton* mRegisterButton;
 //  QCheckBox* mAutoRegisterCheckBox;
+  ;
 
 private:
   LandmarkImageRegistrationWidget(); ///< not implemented

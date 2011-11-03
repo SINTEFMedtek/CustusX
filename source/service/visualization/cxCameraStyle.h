@@ -7,10 +7,10 @@
 #ifndef CXCAMERASTYLE_H_
 #define CXCAMERASTYLE_H_
 
-#include "sscView.h"
 #include "sscTransform3D.h"
-#include "sscTool.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
+#include "vtkForwardDeclarations.h"
+
 
 class QWidget;
 class QMenu;
@@ -39,7 +39,8 @@ class CameraStyle : public QObject
 public:
   enum Style{
     DEFAULT_STYLE,
-    TOOL_STYLE
+    TOOL_STYLE,
+    ANGLED_TOOL_STYLE
   };
 
   CameraStyle();
@@ -62,6 +63,7 @@ protected:
 
   void activateCameraDefaultStyle();
   void activateCameraToolStyle(int offset=0);
+  void activateCameraAngledToolStyle(int offset = 0);
   void connectTool();
   void disconnectTool();
 

@@ -107,7 +107,7 @@ TemporalCalibration::TemporalCalibration()
 void TemporalCalibration::selectData(QString filename)
 {
   mFilename = filename;
-  mFileData = UsReconstructionFileReader::FileData();
+  mFileData = ssc::USReconstructInputData();
 
   if (!QFileInfo(filename).exists())
     return;

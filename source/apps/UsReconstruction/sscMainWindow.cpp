@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget* parent)
 
   ssc::XmlOptionFile settings(qApp->applicationDirPath()+"/usReconstruct.xml", "usReconstruction");
 
-  mReconstructionWidget = new ssc::ReconstructionWidget(this, ssc::ReconstructerPtr(new ssc::Reconstructer(settings, "")));
+  mReconstructionWidget = new ssc::ReconstructionWidget(this, ssc::ReconstructManagerPtr(new ssc::ReconstructManager(settings, "")));
   
 #define CA_DEFS
 #ifdef CA_DEFS

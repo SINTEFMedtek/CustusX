@@ -29,7 +29,10 @@ namespace ssc
  */
 ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
 {
-  // provide a resampled volume for algorithms requiring that (such as proberep)
+	//TODO: fix error:
+	// There is an error in the transfer functions of the returned image from this function
+
+  // provide a resampled volume for algorithms requiring that (such as PickerRep)
   vtkMatrix4x4Ptr orientatorMatrix = vtkMatrix4x4Ptr::New();
   vtkImageReslicePtr orientator = vtkImageReslicePtr::New();
   orientator->SetInput(image->getBaseVtkImageData());
@@ -44,14 +47,12 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
 
   QString uid = image->getUid() + "_or%1";
   QString name = image->getName()+" or%1";
-  ssc::ImagePtr oriented = ssc::dataManager()->createImage(rawResult, uid, name);
+  ssc::ImagePtr oriented = ssc::dataManager()->createDerivedImage(rawResult, uid, name, image);
   //oriented->get_rMd_History()->setRegistration(reference->get_rMd());
   oriented->get_rMd_History()->setRegistration(image->get_rMd() * qMd.inv());
 //  std::cout << "rMd pre merge oriented\n" << oriented->get_rMd() << std::endl;
   oriented->mergevtkSettingsIntosscTransform();
 //  std::cout << "rMd finished oriented\n" << oriented->get_rMd() << std::endl;
-  oriented->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
-  oriented->get_rMd_History()->setParentSpace(image->getUid());
 
   return oriented;
 }
@@ -77,10 +78,7 @@ ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid,
     uid = image->getUid() + "_res%1";
     name = image->getName()+" res%1";
   }
-  ssc::ImagePtr retval = ssc::dataManager()->createImage(rawResult, uid, name);
-  retval->get_rMd_History()->setRegistration(image->get_rMd());
-  retval->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
-  retval->get_rMd_History()->setParentSpace(image->getUid());
+  ssc::ImagePtr retval = ssc::dataManager()->createDerivedImage(rawResult, uid, name, image);
 
   //ssc::dataManager()->loadData(retval);
   //ssc::dataManager()->saveImage(retval, outputBasePath);
@@ -121,11 +119,7 @@ ImagePtr cropImage(ImagePtr image)
 
   QString uid = image->getUid() + "_crop%1";
   QString name = image->getName()+" crop%1";
-  ImagePtr result = dataManager()->createImage(rawResult,uid, name);
-  result->get_rMd_History()->setRegistration(image->get_rMd());
-  result->mergevtkSettingsIntosscTransform();
-  result->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
-  result->get_rMd_History()->setParentSpace(image->getUid());
+  ImagePtr result = dataManager()->createDerivedImage(rawResult,uid, name, image);
   //messageManager()->sendInfo("Created volume " + result->getName());
 
 //  dataManager()->loadData(result);

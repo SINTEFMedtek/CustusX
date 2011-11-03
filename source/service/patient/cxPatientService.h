@@ -10,6 +10,7 @@
 
 #include <QObject>
 #include "boost/shared_ptr.hpp"
+#include "cxThresholdPreview.h"
 
 namespace cx
 {
@@ -36,6 +37,7 @@ public:
   static void shutdown();
 
   PatientDataPtr getPatientData();
+  ThresholdPreviewPtr getThresholdPreview(); ///< Get the ThresholdPreview object
 
 private:
   static PatientService* mInstance;
@@ -48,6 +50,8 @@ private:
 	PatientService& operator=(PatientService const&); // not implemented
 
   PatientDataPtr mPatientData;
+
+  ThresholdPreviewPtr mThresholdPreview; ///< Preview a volume with a selected threshold
 };
 
 PatientService* patientService();

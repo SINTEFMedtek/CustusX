@@ -13,7 +13,7 @@ class QDomNode;
 
 namespace ssc
 {
-	typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
+typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 }
 
 namespace cx
@@ -24,14 +24,17 @@ typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
 /**Rewrite to be a descendant of PluginBase, with generic API for creating plugins...
  *
  */
-class AcquisitionPlugin : public PluginBase
+class AcquisitionPlugin: public PluginBase
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-	AcquisitionPlugin(ssc::ReconstructerPtr reconstructer);
+	AcquisitionPlugin(ssc::ReconstructManagerPtr reconstructer);
 	virtual ~AcquisitionPlugin();
 
-  AcquisitionDataPtr getAcquisitionData() { return mAcquisitionData; }
+	AcquisitionDataPtr getAcquisitionData()
+	{
+		return mAcquisitionData;
+	}
 	virtual std::vector<PluginWidget> createWidgets() const;
 
 signals:
@@ -42,11 +45,11 @@ private slots:
 	void duringLoadPatientSlot();
 
 private:
-  //Interface for saving/loading
-  void addXml(QDomNode& dataNode); ///< adds xml information about the StateService and its variabels
-  void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the StateService.
+	//Interface for saving/loading
+	void addXml(QDomNode& dataNode); ///< adds xml information about the StateService and its variabels
+	void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the StateService.
 
-  AcquisitionDataPtr mAcquisitionData;
+	AcquisitionDataPtr mAcquisitionData;
 };
 
 }

@@ -25,40 +25,41 @@ class UsReconstructionFileReader
 {
 public:
 
-	struct FileData
-	{
-		ssc::USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
-	  std::vector<ssc::TimedPosition> mFrames;
-	  std::vector<ssc::TimedPosition> mPositions;
-	  ssc::ImagePtr mMask;///< Clipping mask for the input data
-	  ssc::ProbeSector mProbeData;
-	};
+//	struct FileData
+//	{
+//		QString mFilename; ///< filename used for current data read
+//
+//		ssc::USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
+//		std::vector<ssc::TimedPosition> mFrames;
+//		std::vector<ssc::TimedPosition> mPositions;
+//		ssc::ImagePtr mMask;///< Clipping mask for the input data
+//		ssc::ProbeSector mProbeData;
+//	};
 
 public:
-  UsReconstructionFileReader();
+	UsReconstructionFileReader();
 
-  FileData readAllFiles(QString fileName, QString calFilesPath="", bool angio = false);
+	ssc::USReconstructInputData readAllFiles(QString fileName, QString calFilesPath = "", bool angio = false);
 
-  ssc::Transform3D readTransformFromFile(QString fileName);
-  bool readMaskFile(QString mhdFileName, ssc::ImagePtr mask);
+	ssc::Transform3D readTransformFromFile(QString fileName);
+	bool readMaskFile(QString mhdFileName, ssc::ImagePtr mask);
 
-  std::vector<ssc::TimedPosition> readFrameTimestamps(QString fileName);
-  std::vector<ssc::TimedPosition> readPositions(QString fileName);
-  ssc::USFrameDataPtr readUsDataFile(QString mhdFileName, bool angio = false);
+	std::vector<ssc::TimedPosition> readFrameTimestamps(QString fileName);
+	std::vector<ssc::TimedPosition> readPositions(QString fileName);
+	ssc::USFrameDataPtr readUsDataFile(QString mhdFileName, bool angio = false);
 
-  void readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName);
-  ProbeXmlConfigParser::Configuration readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath);
+	void readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName);
+	ProbeXmlConfigParser::Configuration readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath);
 
 private:
-  void readPositionFile(QString posFile, bool alsoReadTimestamps, std::vector<ssc::TimedPosition>* timedPos);
-  void readTimeStampsFile(QString fileName, std::vector<ssc::TimedPosition>* timedPos);
+	void readPositionFile(QString posFile, bool alsoReadTimestamps, std::vector<ssc::TimedPosition>* timedPos);
+	void readTimeStampsFile(QString fileName, std::vector<ssc::TimedPosition>* timedPos);
 
-  ssc::ImagePtr createMaskFromConfigParams(FileData data);
-  ssc::ImagePtr generateMask(FileData data);
+	ssc::ImagePtr createMaskFromConfigParams(ssc::USReconstructInputData data);
+	ssc::ImagePtr generateMask(ssc::USReconstructInputData data);
 };
 
 typedef boost::shared_ptr<UsReconstructionFileReader> UsReconstructionFileReaderPtr;
-
 
 } // namespace cx
 

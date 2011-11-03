@@ -6,12 +6,11 @@
  */
 
 #include "sscReconstructOutputValueParamsInterfaces.h"
-#include "sscReconstructer.h"
 
 namespace ssc
 {
 
-DoubleDataAdapterOutputValueParams::DoubleDataAdapterOutputValueParams(ReconstructerPtr reconstructer) :
+DoubleDataAdapterOutputValueParams::DoubleDataAdapterOutputValueParams(ReconstructManagerPtr reconstructer) :
     mReconstructer(reconstructer)
 {
   connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SIGNAL(changed()));

@@ -180,6 +180,9 @@ void PerformanceTab::init()
   mMaxRenderSize = ssc::DoubleDataAdapterXml::initialize("MaxRenderSize", "Max Render Size (Mb)", "Maximum size of volumes used in volume rendering. Applies to new volumes.", maxRenderSize, ssc::DoubleRange(1*Mb,300*Mb,1*Mb), 0, QDomNode());
   mMaxRenderSize->setInternal2Display(1.0/Mb);
 
+  double stillUpdateRate = settings()->value("stillUpdateRate").value<double>();
+  mStillUpdateRate = ssc::DoubleDataAdapterXml::initialize("StillUpdateRate", "Still Update Rate", "Still Update Rate in vtkRenderWindow. Restart needed.", stillUpdateRate, ssc::DoubleRange(0.0001, 20, 0.0001), 4, QDomNode());
+
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
   mSmartRenderCheckBox->setChecked(settings()->value("smartRender", true).toBool());
 
@@ -195,6 +198,7 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
   mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
+  new ssc::SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 4);
 
   mTopLayout->addLayout(mMainLayout);
 }
@@ -210,6 +214,7 @@ void PerformanceTab::saveParametersSlot()
   settings()->setValue("useGPUVolumeRayCastMapper", mGPURenderCheckBox->isChecked());
   settings()->setValue("maxRenderSize", mMaxRenderSize->getValue());
   settings()->setValue("smartRender", mSmartRenderCheckBox->isChecked());
+  settings()->setValue("stillUpdateRate", mStillUpdateRate->getValue());
 }
 
 //==============================================================================
@@ -246,7 +251,6 @@ void VisualizationTab::init()
   mShowLabels = ssc::BoolDataAdapterXml::initialize("Show Labels", "",
                                                  "Attach name labels to entities in the views.",
                                                  showLabels);
-//  connect(mAngioAdapter.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
 
   double annotationModelSize = settings()->value("View3D/annotationModelSize").toDouble();
   mAnnotationModelSize = ssc::DoubleDataAdapterXml::initialize("AnnotationModelSize", "Annotation Model Size", "Size (0..1) of the annotation model in the 3D scene.", annotationModelSize, ssc::DoubleRange(0.01,1,0.01), 2, QDomNode());
@@ -387,11 +391,16 @@ void AutomationTab::init()
   mAutoReconstructCheckBox = new QCheckBox("Auto Reconstruct");
   mAutoReconstructCheckBox->setChecked(autoReconstruct);
 
+  bool autoSelectDominantTool = settings()->value("Automation/autoSelectDominantTool").toBool();
+  mAutoSelectDominantToolCheckBox = new QCheckBox("Auto Select Active Tool");
+  mAutoSelectDominantToolCheckBox->setChecked(autoSelectDominantTool);
+
   //Layout
   mMainLayout = new QVBoxLayout;
   mMainLayout->addWidget(mAutoStartTrackingCheckBox);
   mMainLayout->addWidget(mAutoStartStreamingCheckBox);
   mMainLayout->addWidget(mAutoReconstructCheckBox);
+  mMainLayout->addWidget(mAutoSelectDominantToolCheckBox);
 
   mTopLayout->addLayout(mMainLayout);
 
@@ -402,6 +411,7 @@ void AutomationTab::saveParametersSlot()
   settings()->setValue("Automation/autoStartTracking", mAutoStartTrackingCheckBox->isChecked());
   settings()->setValue("Automation/autoStartStreaming", mAutoStartStreamingCheckBox->isChecked());
   settings()->setValue("Automation/autoReconstruct", mAutoReconstructCheckBox->isChecked());
+  settings()->setValue("Automation/autoSelectDominantTool", mAutoSelectDominantToolCheckBox->isChecked());
 }
 
 //==============================================================================
