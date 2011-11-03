@@ -12,22 +12,28 @@
 #include <vtkImageData.h>
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
-#include "sscProbeRep.h"
+#include "sscPickerRep.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 #include "cxSettings.h"
 #include "cxView3D.h"
+#include "sscToolManager.h"
 
 namespace cx
 {
 LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
   LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle),
-  mThresholdLabel(new QLabel("Probing treshold:", this)),
+  mThresholdLabel(new QLabel("Picking treshold:", this)),
   mThresholdSlider(new QSlider(Qt::Horizontal, this))
 {
   mActiveImageAdapter = ActiveImageStringDataAdapter::New();
+  mImageLandmarkSource = ImageLandmarksSource::New();
+
+  mDominantToolProxy = DominantToolProxy::New();
+  connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableButtons()));
+  connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(enableButtons()));
 
   //pushbuttons
   mAddLandmarkButton = new QPushButton("Add", this);
@@ -87,30 +93,36 @@ void LandmarkImageRegistrationWidget::activeImageChangedSlot()
   {
     //set a default treshold
     mThresholdSlider->setRange(image->getMin(), image->getMax());
-    ssc::ProbeRepPtr probe = this->getProbeRep();
+    ssc::PickerRepPtr probe = this->getPickerRep();
     if (probe)
+    {
+    	probe->setImage(image);// Need to update image in PickerRep
       mThresholdSlider->setValue(probe->getThreshold());
+    }
 
     if(!mManager->getFixedData())
     	mManager->setFixedData(image);
   }
 
+  mImageLandmarkSource->setImage(image);
+
   //enable the add point button
-  mAddLandmarkButton->setEnabled(image!=0);
+//  mAddLandmarkButton->setEnabled(image!=0);
+  this->enableButtons();
 }
 
-ssc::ProbeRepPtr LandmarkImageRegistrationWidget::getProbeRep()
+ssc::PickerRepPtr LandmarkImageRegistrationWidget::getPickerRep()
 {
   if (!viewManager()->get3DView(0,0))
-    return ssc::ProbeRepPtr();
+    return ssc::PickerRepPtr();
 
-  return RepManager::findFirstRep<ssc::ProbeRep>(viewManager()->get3DView(0,0)->getReps());
+  return RepManager::findFirstRep<ssc::PickerRep>(viewManager()->get3DView(0,0)->getReps());
 }
 
 void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {
-  ssc::ProbeRepPtr probeRep = this->getProbeRep();
-  if(!probeRep)
+  ssc::PickerRepPtr PickerRep = this->getPickerRep();
+  if(!PickerRep)
   {
     ssc::messageManager()->sendError("Could not find a rep to add the landmark to.");
     return;
@@ -121,7 +133,7 @@ void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
   	return;
 
   QString uid = ssc::dataManager()->addLandmark();
-  ssc::Vector3D pos_r = probeRep->getPosition();
+  ssc::Vector3D pos_r = PickerRep->getPosition();
   ssc::Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
   //std::cout << "LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()" << uid << ", " << pos_r << "ci=" << mCurrentImage.get() << std::endl;
   image->setLandmark(ssc::Landmark(uid, pos_d));
@@ -131,8 +143,8 @@ void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 
 void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
-  ssc::ProbeRepPtr probeRep = this->getProbeRep();
-  if(!probeRep)
+  ssc::PickerRepPtr PickerRep = this->getPickerRep();
+  if(!PickerRep)
   {
     ssc::messageManager()->sendError("Could not find a rep to edit the landmark for.");
     return;
@@ -144,7 +156,7 @@ void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 
 
   QString uid = mActiveLandmark;
-  ssc::Vector3D pos_r = probeRep->getPosition();
+  ssc::Vector3D pos_r = PickerRep->getPosition();
   ssc::Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
   image->setLandmark(ssc::Landmark(uid, pos_d));
 
@@ -166,31 +178,58 @@ void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
 {
   LandmarkRegistrationWidget::cellClickedSlot(row, column);
 
-  mEditLandmarkButton->setEnabled(true);
-  mRemoveLandmarkButton->setEnabled(true);
+//  mEditLandmarkButton->setEnabled(true);
+//  mRemoveLandmarkButton->setEnabled(true);
+  this->enableButtons();
+}
+
+void LandmarkImageRegistrationWidget::enableButtons()
+{
+	bool selected = !mLandmarkTableWidget->selectedItems().isEmpty();
+	bool tracking = ssc::toolManager()->getDominantTool()
+			&& ssc::toolManager()->getDominantTool()->getType()!=ssc::Tool::TOOL_MANUAL
+			&& ssc::toolManager()->getDominantTool()->getVisible();
+	bool loaded = ssc::dataManager()->getActiveImage() != 0;
+
+	mEditLandmarkButton->setEnabled(selected && !tracking);
+  mRemoveLandmarkButton->setEnabled(selected && !tracking);
+  mAddLandmarkButton->setEnabled(loaded && !tracking);
 }
 
 void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 {
   LandmarkRegistrationWidget::showEvent(event);
 
-  ssc::ProbeRepPtr probeRep = this->getProbeRep();
-  if(probeRep)
+  ssc::PickerRepPtr PickerRep = this->getPickerRep();
+  if(PickerRep)
   {
-    connect(this, SIGNAL(thresholdChanged(int)), probeRep.get(), SLOT(setThresholdSlot(int)));
+    connect(this, SIGNAL(thresholdChanged(int)), PickerRep.get(), SLOT(setThresholdSlot(int)));
   }
 
   viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
+  LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
+  if (rep)
+  {
+//    std::cout << "LandmarkImageRegistrationWidget::showEvent" << std::endl;
+    rep->setPrimarySource(mImageLandmarkSource);
+    rep->setSecondarySource(LandmarksSourcePtr());
+  }
 }
 
 void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
   LandmarkRegistrationWidget::hideEvent(event);
 
-//  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
-  ssc::ProbeRepPtr probeRep = this->getProbeRep();
-  if(probeRep)
-    disconnect(this, SIGNAL(thresholdChanged(const int)), probeRep.get(), SLOT(setThresholdSlot(const int)));
+//  ssc::PickerRepPtr PickerRep = repManager()->getPickerRep("PickerRep_1");
+  ssc::PickerRepPtr PickerRep = this->getPickerRep();
+  if(PickerRep)
+    disconnect(this, SIGNAL(thresholdChanged(const int)), PickerRep.get(), SLOT(setThresholdSlot(const int)));
+  LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
+  if (rep)
+  {
+    rep->setPrimarySource(LandmarksSourcePtr());
+    rep->setSecondarySource(LandmarksSourcePtr());
+  }
   viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 

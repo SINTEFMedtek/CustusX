@@ -2,8 +2,27 @@
 #define CXAUDIO_H_
 
 #include "sscAudio.h"
+#include <QObject>
+#include <QString>
 
 namespace cx {
+
+/**Helper class for playing sounds in the main thread even if calls are made from other threads.
+ *
+ */
+class AudioInternal : public QObject
+{
+	Q_OBJECT
+public:
+	AudioInternal(QObject* parent=NULL);
+	void playSound(QString file);
+signals:
+	void playSoundInternalSignal(QString file);
+private slots:
+	void playSoundSlot(QString file);
+};
+
+
 /**
  * \class Audio
  *
@@ -12,7 +31,6 @@ namespace cx {
  * \date Mar 4, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-
 class Audio : public ssc::Audio
 {
 public:
@@ -29,6 +47,9 @@ public:
 
   virtual void playScreenShotSound();
   virtual void playSampleSound();
+
+private:
+  boost::shared_ptr<AudioInternal> mInternal;
 };
 
 }//namespace cx

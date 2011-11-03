@@ -6,6 +6,7 @@
  */
 #include "cxDataInterface.h"
 #include "sscImage.h"
+#include <QSet>
 #include "sscMesh.h"
 #include "sscMessageManager.h"
 #include "sscImageLUT2D.h"
@@ -757,5 +758,129 @@ void DataUidEditableStringDataAdapter::setData(ssc::DataPtr data)
   emit changed();
 }
 
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+DataModalityStringDataAdapter::DataModalityStringDataAdapter()
+{
+	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+}
+
+void DataModalityStringDataAdapter::setData(ssc::ImagePtr data)
+{
+	if (mData)
+		disconnect(mData.get(), SIGNAL(propertiesChanged()), this, SIGNAL(changed()));
+	mData = data;
+	if (mData)
+		connect(mData.get(), SIGNAL(propertiesChanged()), this, SIGNAL(changed()));
+	emit changed();
+}
+
+QString DataModalityStringDataAdapter::getValueName() const
+{
+	return "Modality";
+}
+
+bool DataModalityStringDataAdapter::setValue(const QString& value)
+{
+	if (!mData)
+		return false;
+	mData->setModality(value);
+	return true;
+}
+
+QString DataModalityStringDataAdapter::getValue() const
+{
+	if (!mData)
+		return "";
+	return mData->getModality();
+}
+
+QString DataModalityStringDataAdapter::getHelp() const
+{
+	if (!mData)
+		return "";
+	return "Select the modality for " + qstring_cast(mData->getName()) + ".";
+}
+
+QStringList DataModalityStringDataAdapter::getValueRange() const
+{
+	QStringList retval;
+	retval << "";
+	if (mData)
+		retval << mData->getModality();
+	retval << "CT" << "MR" << "US";
+	return QStringList::fromSet(QSet<QString>::fromList(retval));
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+
+
+ImageTypeStringDataAdapter::ImageTypeStringDataAdapter()
+{
+	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+}
+
+void ImageTypeStringDataAdapter::setData(ssc::ImagePtr data)
+{
+	if (mData)
+		disconnect(mData.get(), SIGNAL(propertiesChanged()), this, SIGNAL(changed()));
+	mData = data;
+	if (mData)
+		connect(mData.get(), SIGNAL(propertiesChanged()), this, SIGNAL(changed()));
+	emit changed();
+}
+
+QString ImageTypeStringDataAdapter::getValueName() const
+{
+	return "Image Type";
+}
+
+bool ImageTypeStringDataAdapter::setValue(const QString& value)
+{
+	if (!mData)
+		return false;
+	mData->setImageType(value);
+	return true;
+}
+
+QString ImageTypeStringDataAdapter::getValue() const
+{
+	if (!mData)
+		return "";
+	return mData->getImageType();
+}
+
+QString ImageTypeStringDataAdapter::getHelp() const
+{
+	if (!mData)
+		return "";
+	return "Select the image type for " + qstring_cast(mData->getName()) + ".";
+}
+
+QStringList ImageTypeStringDataAdapter::getValueRange() const
+{
+	QStringList retval;
+	retval << "";
+	if (mData)
+	{
+		retval << mData->getImageType();
+		if (mData->getModality()=="CT")
+			retval << "";
+		if (mData->getModality()=="MR")
+			retval << "T1" << "T2" << "ANGIO";
+		if (mData->getModality()=="US")
+			retval << "B-Mode" << "Angio";
+	}
+	return QStringList::fromSet(QSet<QString>::fromList(retval));
+}
 
 } // namespace cx

@@ -106,7 +106,7 @@ vec4 applyLayerN(in vec4 base,in int index,in int lutsize,in samplerBuffer lut,i
 
 void main()
 {	
-	vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
+	vec4 col = vec4(0.0, 0.0, 0.0, 0.0);
 	
 	col = applyLayerN(col,0,lutsize0,lut0,texture0, window0, level0, llr0, alpha0);
 		

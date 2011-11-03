@@ -48,16 +48,13 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
   QString name = mInput->getName()+" seg%1";
 
   //create a ssc::Image
-  mOutput = ssc::dataManager()->createImage(rawResult,uid, name);
+  mOutput = ssc::dataManager()->createDerivedImage(rawResult,uid, name, mInput);
   if(!mOutput)
   {
     ssc::messageManager()->sendError("Segmentation failed.");
     return;
   }
-
-  //update the ssc::Images registration history
-  mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
-  mOutput->get_rMd_History()->setParentSpace(mInput->getUid());
+  mOutput->resetTransferFunctions();
 
   //load the image into CustusX for visualization
   ssc::dataManager()->loadData(mOutput);

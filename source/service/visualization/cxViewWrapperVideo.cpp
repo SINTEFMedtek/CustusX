@@ -14,7 +14,6 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscTool2DRep.h"
-#include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
@@ -28,6 +27,12 @@
 #include "cxViewManager.h"
 #include "cxToolManager.h"
 #include "cxViewGroup.h"
+
+#include "sscData.h"
+#include "sscMesh.h"
+#include "cxViewWrapper.h"
+#include "sscVideoRep.h"
+
 
 namespace cx
 {

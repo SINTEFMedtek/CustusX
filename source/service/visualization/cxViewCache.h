@@ -12,6 +12,10 @@
 #include <QLayout>
 #include <vector>
 #include "sscTypeConversions.h"
+#include "cxSettings.h"
+
+namespace cx
+{
 
 /**Cache for reuse of Views.
  * Use the retrieve*() method to get views that can be used
@@ -42,7 +46,8 @@ public:
       //Turn off rendering in vtkRenderWindowInteractor
       view->getRenderWindow()->GetInteractor()->EnableRenderOff();
       //Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
-      view->getRenderWindow()->GetInteractor()->SetStillUpdateRate(8.0);
+      double rate = settings()->value("stillUpdateRate").value<double>();
+      view->getRenderWindow()->GetInteractor()->SetStillUpdateRate(rate);
       mCached.push_back(view);
     }
 
@@ -73,5 +78,6 @@ private:
   std::vector<VIEW_TYPE*> mUsed;
 };
 
+} // namespace cx
 
 #endif /* CXVIEWCACHE_H_ */

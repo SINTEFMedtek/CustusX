@@ -82,6 +82,7 @@ protected:
   std::vector<ssc::Vector3D> convertAndTransformToPoints(const std::vector<QString>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
   std::vector<QString> getUsableLandmarks(const ssc::LandmarkMap& data_a, const ssc::LandmarkMap& data_b);
   void updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data, QString masterFrame);
+  void writePreLandmarkRegistration(QString name, ssc::LandmarkMap landmarks);
 
 //  static RegistrationManager* mCxInstance; ///< the only instance of this class
 

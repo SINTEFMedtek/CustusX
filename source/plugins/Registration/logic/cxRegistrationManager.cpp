@@ -20,41 +20,7 @@
 
 namespace cx
 {
-//RegistrationManager* RegistrationManager::mCxInstance = NULL;
-//RegistrationManager* registrationManager() { return RegistrationManager::getInstance(); }
-//RegistrationManager* RegistrationManager::getInstance()
-//{
-//  if (mCxInstance == NULL)
-//  {
-//    mCxInstance = new RegistrationManager();
-//  }
-//  return mCxInstance;
-//}
-//
-//void RegistrationManager::shutdown()
-//{
-//  delete mCxInstance;
-//  mCxInstance = NULL;
-//}
-//
-//RegistrationManager::RegistrationManager()
-//{}
-//
-//RegistrationManager::~RegistrationManager()
-//{}
-//
-///** Start a new round of registrations : this collects fex adding several landmarks into one registration session.
-// *
-// */
-//void RegistrationManager::initialize()
-//{
-//  mPatientRegistrationOffset = ssc::Transform3D::Identity();
-//  mLastRegistrationTime = QDateTime::currentDateTime();
-//
-//  connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
-//  connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
-//  connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
-//}
+
 
 RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData) :
 		mAcquisitionData(acquisitionData)
@@ -314,6 +280,9 @@ void RegistrationManager::doPatientRegistration()
   ssc::LandmarkMap fixedLandmarks = fixedImage->getLandmarks();
   ssc::LandmarkMap toolLandmarks = ssc::toolManager()->getLandmarks();
 
+  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks());
+  this->writePreLandmarkRegistration("physical", toolLandmarks);
+
   std::vector<QString> landmarks = this->getUsableLandmarks(fixedLandmarks, toolLandmarks);
 
   vtkPointsPtr p_ref = this->convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
@@ -342,6 +311,19 @@ void RegistrationManager::doPatientRegistration()
   ssc::messageManager()->sendSuccess("Patient registration has been performed.");
 }
 
+void RegistrationManager::writePreLandmarkRegistration(QString name, ssc::LandmarkMap landmarks)
+{
+	QStringList lm;
+	for (ssc::LandmarkMap::iterator iter=landmarks.begin(); iter!=landmarks.end(); ++iter)
+	{
+		lm << ssc::dataManager()->getLandmarkProperties()[iter->second.getUid()].getName();
+	}
+
+	QString msg = QString("Preparing to register [%1] containing the landmarks: [%2]").arg(name).arg(lm.join(","));
+	ssc::messageManager()->sendInfo(msg);
+}
+
+
 void RegistrationManager::doImageRegistration()
 {
   //check that the fixed data is set
@@ -369,6 +351,9 @@ void RegistrationManager::doImageRegistration()
 
   ssc::LandmarkMap fixedLandmarks = fixedImage->getLandmarks();
   ssc::LandmarkMap imageLandmarks = movingImage->getLandmarks();
+
+  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks());
+  this->writePreLandmarkRegistration(movingImage->getName(), movingImage->getLandmarks());
 
   std::vector<QString> landmarks = getUsableLandmarks(fixedLandmarks, imageLandmarks);
   vtkPointsPtr p_ref = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
@@ -450,6 +435,9 @@ void RegistrationManager::doFastRegistration_Translation()
   ssc::LandmarkMap fixedLandmarks = fixedImage->getLandmarks();
   ssc::LandmarkMap toolLandmarks = ssc::toolManager()->getLandmarks();
 
+  this->writePreLandmarkRegistration(fixedImage->getName(), fixedImage->getLandmarks());
+  this->writePreLandmarkRegistration("physical", toolLandmarks);
+
   std::vector<QString> landmarks = this->getUsableLandmarks(fixedLandmarks, toolLandmarks);
 
   ssc::Transform3D rMd = fixedImage->get_rMd();
@@ -528,6 +516,24 @@ void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta,
   std::cout << "v2v linear result:\n" << linearTransform << std::endl;
   //std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
 
+
+	// characterize the input perturbation in angle-axis form:
+	ssc::Vector3D t_delta = linearTransform.matrix().block<3,1>(0, 3);
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3,3>(0, 0));
+	double angle = angleAxis.angle();
+
+	QString qualityText = QString("|t_delta|=%1mm, angle=%2*").arg(t_delta.length(), 6, 'f', 2).arg(angle/M_PI*180.0, 6, 'f', 2);
+
+	if (t_delta.length()>20 || fabs(angle)>10/180.0*M_PI)
+	{
+		ssc::messageManager()->sendWarning(qualityText);
+		QString text = QString("The registration matrix' angle-axis representation shows a large shift. Retry registration.");
+		ssc::messageManager()->sendWarning(text);
+	}
+	else
+	{
+		ssc::messageManager()->sendInfo(qualityText);
+	}
 
 //  ssc::Transform3D delta = fixedData->get_rMd() * linearTransform * movingData->get_rMd().inv();
 

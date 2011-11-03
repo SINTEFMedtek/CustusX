@@ -21,7 +21,8 @@ public:
   Contour();
   virtual ~Contour();
 
-  void setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, double decimation=0.8, bool reduceResolution=false, bool smoothing=true);
+  void setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, double decimation = 0.8,
+			bool reduceResolution = false, bool smoothing = true, bool preserveTopology = true);
   ssc::MeshPtr getOutput();
 
 protected slots:
@@ -36,6 +37,7 @@ private:
   double        mDecimation;
   bool          mUseReduceResolution;
   bool          mUseSmoothing;
+  bool					mPreserveTopology;
   ssc::MeshPtr mOutput;
 };
 

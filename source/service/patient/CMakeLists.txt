@@ -15,7 +15,8 @@ SET( CX_QT_MOC_HEADER_FILES
     cxDistanceMetric.h
     cxPlaneMetric.h
     cxAngleMetric.h
-    cxDataMetric.h
+    cxThresholdPreview.h
+    cxActiveImageProxy.h
 )
 
 SET ( cxPatientService_SOURCE
@@ -25,8 +26,6 @@ SET ( cxPatientService_SOURCE
     cxDistanceMetric.cpp
 	cxDataManager.h
 	cxDataManager.cpp
-	cxPresetTransferFunctions3D.h
-	cxPresetTransferFunctions3D.cpp
 	cxPatientData.h
     cxPatientData.cpp
     cxFileCopied.h
@@ -41,6 +40,10 @@ SET ( cxPatientService_SOURCE
     cxAngleMetric.cpp
     cxDataMetric.h
     cxDataMetric.cpp
+    cxThresholdPreview.h
+    cxThresholdPreview.cpp
+    cxActiveImageProxy.h
+    cxActiveImageProxy.cpp
     
 #	../cxForwardDeclarations.h
 )

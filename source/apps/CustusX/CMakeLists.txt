@@ -23,10 +23,10 @@ include_directories(
 # Set variables
 #-----------------------------------------------------------------------------
 if(APPLE) # For Apple set the icns file containing icons
+  set(MACOSX_BUNDLE_ICON_FILE "application.icns") # set how it shows up in the Info.plist file 
   set_source_files_properties(${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns 
                               PROPERTIES MACOSX_PACKAGE_LOCATION Resources)  # set where in the bundle to put the icns file
   
-  set(MACOSX_BUNDLE_ICON_FILE ${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns) # set how it shows up in the Info.plist file 
   set(SOURCES ${SOURCES} ${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns)  # include the icns file in the target
   set(MACOSX_BUNDLE_INFO_STRING "CustusX")
   set(MACOSX_BUNDLE_BUNDLE_NAME "CustusX")
@@ -125,7 +125,8 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
     )
 
 # install openCL shaders into bundle
-install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/Thunder/kernels.ocl 
+#install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/Thunder/kernels.ocl 
+install(FILES ${CustusX3_SOURCE_DIR}/externals/ssc/Code/Ultrasound/3DReconstruction/Thunder/kernels.ocl 
         DESTINATION ${CONFIG_DIR}/shaders/
         #COMPONENT CustusX
         )
