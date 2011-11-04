@@ -88,7 +88,7 @@ void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsol
   if(currentIndex < 0)
   {
     currentIndex = 0;
-    ssc::messageManager()->sendWarning("Tool configuration don't exist: " + cleanPath);
+    ssc::messageManager()->sendWarning("Tool configuration doesn't exist: " + cleanPath);
   }
   mConfigFilesComboBox->setCurrentIndex(currentIndex);
 }
