@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 2.6)
 #------------------------------------------------------------------------------
 set(CustusX3_VERSION_MAJOR  3)
 set(CustusX3_VERSION_MINOR  2)
-set(CustusX3_VERSION_PATCH  1)
+set(CustusX3_VERSION_PATCH  0)
 set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 
@@ -22,7 +22,7 @@ endif(APPLE)
 #------------------------------------------------------------------------------
 # Set as alpha when not a release
 #------------------------------------------------------------------------------
-set(ALPHA ON)
+set(ALPHA OFF)
   
 if(ALPHA)
   set(VERSION_NUMBER "${VERSION_NUMBER} alpha")
