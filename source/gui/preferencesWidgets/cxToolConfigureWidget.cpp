@@ -83,11 +83,12 @@ ToolConfigureGroupBox::~ToolConfigureGroupBox()
 
 void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsoluteFilePath)
 {
-  int currentIndex = mConfigFilesComboBox->findData(configAbsoluteFilePath, Qt::ToolTipRole);
+	QString cleanPath = QDir(configAbsoluteFilePath).absolutePath();
+  int currentIndex = mConfigFilesComboBox->findData(cleanPath, Qt::ToolTipRole);
   if(currentIndex < 0)
   {
     currentIndex = 0;
-    ssc::messageManager()->sendWarning("Tool configuration doesn't exist: " + configAbsoluteFilePath);
+    ssc::messageManager()->sendWarning("Tool configuration doesn't exist: " + cleanPath);
   }
   mConfigFilesComboBox->setCurrentIndex(currentIndex);
 }
