@@ -77,12 +77,17 @@ class TextDisplay
 		void updateText(const QString& text );
 		vtkTextProperty* textProperty();
 		vtkActor2DPtr getActor();
+		void setMaxWidth( int width, vtkViewport *vp );
+		int getMaxWidth();
+		int getWidth( vtkViewport *vp );
 	private:
 
 
 		vtkTextMapperPtr mapper;
 		vtkActor2DPtr actor;
 		vtkRendererPtr mRenderer;
+		int maxWidth;
+		QString text;
 
 };
 typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;

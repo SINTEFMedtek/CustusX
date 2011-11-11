@@ -227,6 +227,7 @@ class vtkTextProperty;
 class vtkOpenGLExtensionManager;
 class vtkObject;
 class vtkRenderWindowInteractor;
+class vtkViewport;
 
 
 #endif /* VTKFORWARDDECLARATIONS_H_ */

@@ -44,7 +44,7 @@ void DisplayTextRep::removeRepActorsFromViewRenderer(View* view)
 /**Add a text with give RGB color at pos.
  * pos is in normalized view space.
  */
-void DisplayTextRep::addText(const Vector3D& color, const QString& text, const Vector3D& pos)
+TextDisplayPtr DisplayTextRep::addText(const Vector3D& color, const QString& text, const Vector3D& pos, int maxWidth, vtkViewport *vp)
 {
 	Vector3D c = color;
 	TextDisplayPtr textRep;
@@ -59,6 +59,11 @@ void DisplayTextRep::addText(const Vector3D& color, const QString& text, const V
 	//textRep->setCentered();
 	mDisplayText.push_back( textRep );
 
+	if (maxWidth != 0 && vp)
+	{
+		textRep->setMaxWidth(maxWidth, vp);
+	}
+	return textRep;
 }
 
 /**Set a text previously set with addText.
