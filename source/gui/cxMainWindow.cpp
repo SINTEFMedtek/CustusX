@@ -192,7 +192,7 @@ MainWindow::~MainWindow()
 void MainWindow::initialize()
 {
 	// resources layer
-	ssc::MessageManager::getInstance();
+	ssc::MessageManager::initialize();
 
 	// services layer
 	cx::VideoService::initialize();
@@ -228,7 +228,7 @@ void MainWindow::shutdown()
 	cx::VideoService::shutdown();
 
 	ssc::GPUImageBufferRepository::shutdown();
-	ssc::MessageManager::destroyInstance();
+	ssc::MessageManager::shutdown();
 }
 
 QMenu* MainWindow::createPopupMenu()
