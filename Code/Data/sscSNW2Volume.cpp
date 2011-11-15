@@ -74,6 +74,11 @@ bool SNW2VolumeMetaData::DateTime::isValid() const
 	return robustReadTime().isValid();
 }
 
+QDateTime SNW2VolumeMetaData::DateTime::toQDateTime() const
+{
+	return this->convertTimestamp2QDateTime(this->timestamp());
+}
+
 /** defines the format Sonowand uses as its timestamp format  
  *  - in conjunction with QString.
  */

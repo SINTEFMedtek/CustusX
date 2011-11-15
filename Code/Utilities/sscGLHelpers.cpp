@@ -1,5 +1,4 @@
 #include "sscGLHelpers.h"
-//#include "SonoWand.h"
 
 #ifndef WIN32
 #ifdef __APPLE__

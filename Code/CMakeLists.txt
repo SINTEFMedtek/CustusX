@@ -198,6 +198,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscViewportListener.h
     Utilities/sscViewportListener.cpp
     Utilities/sscSharedMemory.cpp
+    Utilities/sscLogger.h
+    Utilities/sscLogger.cpp
     
     sscView.cpp
     sscView.h
