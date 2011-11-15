@@ -17,6 +17,7 @@ public:
 		static DateTime fromDateAndTime(QString date, QString time);
 		static DateTime fromTimestamp(QString ts);
 		QString timestamp() const;
+		QDateTime toQDateTime() const;
 		QString time() const;
 		QString date() const;
 		bool isValid() const;

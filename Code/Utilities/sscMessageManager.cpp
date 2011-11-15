@@ -15,27 +15,36 @@ namespace ssc
 {
 
 
-Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime) :
+Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime, QString sourceLocation) :
   mText(text),
   mMessageLevel(messageLevel),
   mTimeoutTime(timeoutTime),
-  mTimeStamp(QDateTime::currentDateTime())
+  mTimeStamp(QDateTime::currentDateTime()),
+  mSourceLocation(sourceLocation)
 {};
 
 Message::~Message(){};
 
+
 QString Message::getPrintableMessage()
 {
-  QString message("");
-  message.append(QString("["));
-  message.append(mTimeStamp.toString("hh:mm:ss:zzz"));
-  message.append(QString("] "));
-  message.append(QString("["));
-  message.append(qstring_cast(mMessageLevel));
-  message.append(QString("] "));
-  message.append(mText);
+	return QString("[%1] [%2] [%3] %4")
+		.arg(mTimeStamp.toString("hh:mm:ss.zzz"))
+		.arg(mSourceLocation)
+		.arg(qstring_cast(mMessageLevel))
+		.arg(mText);
 
-  return message;
+//  QString message("");
+//  message.append(QString("["));
+//  message.append(mSourceLocation);
+//  message.append(mTimeStamp.toString("hh:mm:ss:zzz"));
+//  message.append(QString("] "));
+//  message.append(QString("["));
+//  message.append(qstring_cast(mMessageLevel));
+//  message.append(QString("] "));
+//  message.append(mText);
+//
+//  return message;
 }
 
 MESSAGE_LEVEL Message::getMessageLevel()
@@ -153,10 +162,7 @@ MessageManager* messageManager() { return MessageManager::getInstance(); }
 
 
 MessageManager::MessageManager() :
-    mConsoleMutex(QMutex::Recursive),
-    mAbsoluteLoggingFolderPath(""),
-    mConsoleFile(new QFile(mAbsoluteLoggingFolderPath, this)),
-    mConsoleStream(new QTextStream())
+	mEnabled(false)
 {
   typedef ssc::Message Message;
   qRegisterMetaType<Message>("Message");
@@ -166,9 +172,6 @@ MessageManager::~MessageManager()
 {
   mCout.reset();
   mCerr.reset();
-  mConsoleFile->close();
-  delete mConsoleFile;
-  delete mConsoleStream;
 }
 
 MessageManager* MessageManager::getInstance()
@@ -176,59 +179,67 @@ MessageManager* MessageManager::getInstance()
   if(mTheInstance == NULL)
   {
     mTheInstance = new MessageManager();
-    mTheInstance->initialize();
   }
   return mTheInstance;
 }
 
 void MessageManager::initialize()
 {
-  mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
-  mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
+	MessageManager::getInstance()->initializeObject();
 }
 
-void MessageManager::destroyInstance()
+void MessageManager::initializeObject()
+{
+  mCout.reset(new SingleStreamerImpl(std::cout, mlCOUT));
+  mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
+  mEnabled = true;
+}
+
+void MessageManager::setFormat(Format format)
+{
+	mFormat = format;
+}
+
+void MessageManager::setEnabled(bool enabled)
+{
+	mEnabled = enabled;
+}
+
+bool MessageManager::isEnabled() const
+{
+	return mEnabled;
+}
+
+
+void MessageManager::shutdown()
 {
   delete mTheInstance;
   mTheInstance = NULL;
 }
 
+bool MessageManager::setLogFile(QString filename)
+{
+	mEnabled = true;
+	mLogFile = filename;
+	QFileInfo(mLogFile).absoluteDir().mkpath(".");
+
+	QString timestamp = QDateTime::currentDateTime().toString(timestampMilliSecondsFormatNice());
+	QString text = QString("-------> Logging initialized %1\n").arg(timestamp);
+	bool success = this->appendToLogfile(text);
+	if (!success)
+	{
+		this->sendError("Failed to open log file " + mLogFile);
+		mLogFile = "";
+	}
+	return success;
+}
+
+/** Backwards compatibility only
+ *
+ */
 void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
-  if(mAbsoluteLoggingFolderPath == absoluteLoggingFolderPath)
-    return;
-
-  QString filename("/ConsoleLog.txt");
-  mAbsoluteLoggingFolderPath = absoluteLoggingFolderPath;
-  QDir().mkdir(absoluteLoggingFolderPath);
-  QString consoleFilePath = mAbsoluteLoggingFolderPath+filename;
-
-  QMutexLocker sentry(&mConsoleMutex);
-  if(mConsoleFile->isOpen())
-  {
-    mConsoleFile->close();
-
-    // cannot delete file: this will delete previous logging of a patient that has
-    // been saved and reopened. Better to keep data in their respective folders.
-
-//    if(QFile::exists(consoleFilePath))
-//      QFile::remove(consoleFilePath);
-//
-//    if(!mConsoleFile->copy(consoleFilePath))
-//    {
-//      sentry.unlock();
-//      ssc::messageManager()->sendWarning("Could not copy to "+consoleFilePath);
-//      sentry.relock();
-//    }
-
-  }
-  else
-  {
-  }
-
-  mConsoleFile->setFileName(consoleFilePath);
-  sentry.unlock();
-  this->openLogging(QFile::Append);
+	this->setLogFile(absoluteLoggingFolderPath + "/ConsoleLog.txt");
 }
 
 void MessageManager::setAudioSource(ssc::AudioPtr audioSource)
@@ -249,22 +260,16 @@ void MessageManager::sendInfo(QString info)
 void MessageManager::sendSuccess(QString success, bool mute)
 {
   this->sendMessage(success, mlSUCCESS, 1500);
-  if(!mute)
-    this->playSuccessSound();
 }
 
 void MessageManager::sendWarning(QString warning, bool mute)
 {
   this->sendMessage(warning, mlWARNING, 3000);
-  if(!mute)
-    this->playWarningSound();
 }
 
 void MessageManager::sendError(QString error, bool mute)
 {
   this->sendMessage(error, mlERROR, 0);
-  if(!mute)
-    this->playErrorSound();
 }
   
 void MessageManager::sendDebug(QString debug)
@@ -272,28 +277,46 @@ void MessageManager::sendDebug(QString debug)
   this->sendMessage(debug, mlDEBUG, 0);
 }
 
-void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout)
+void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute, QString sourceLocation)
 {
-  Message message(text, messageLevel, timeout);
+	if (!this->isEnabled())
+		return;
 
-  if (mCout)
-  {
-    // send text to cout if it not already comes from that stream (or cerr)
-    mCout->setEnableRedirect(false);
-    if (messageLevel!=mlCOUT && messageLevel!=mlCERR)
-      std::cout << message.getPrintableMessage() << std::endl;
-    mCout->setEnableRedirect(true);
-  }
+	Message message(text, messageLevel, timeout, sourceLocation);
 
-  QMutexLocker sentry(&mConsoleMutex);
-  if(mConsoleStream->device())
-  {
-    (*mConsoleStream) << message.getPrintableMessage();
-    (*mConsoleStream) << endl;
-  }
-  sentry.unlock();
+	if (mCout)
+	{
+		// send text to cout if it not already comes from that stream (or cerr)
+		mCout->setEnableRedirect(false);
+		if (messageLevel != mlCOUT && messageLevel != mlCERR)
+			std::cout << message.getPrintableMessage() << std::endl;
+		mCout->setEnableRedirect(true);
+	}
 
-  emit emittedMessage(message);
+	this->appendToLogfile(this->formatMessage(message) + "\n");
+
+	if (!mute)
+		this->playSound(messageLevel);
+
+	emit emittedMessage(message);
+}
+
+void MessageManager::playSound(MESSAGE_LEVEL messageLevel)
+{
+	switch (messageLevel)
+	{
+	case mlSUCCESS:
+		this->playSuccessSound();
+		break;
+	case mlWARNING:
+		this->playWarningSound();
+		break;
+	case mlERROR:
+		this->playErrorSound();
+		break;
+	default:
+		break;
+	}
 }
 
 void MessageManager::playStartSound()
@@ -344,22 +367,64 @@ void MessageManager::playSampleSound()
     mAudioSource->playSampleSound();
 }
 
-bool MessageManager::openLogging(QFile::OpenMode mode)
+QString MessageManager::formatMessage(Message msg)
 {
-  QMutexLocker sentry(&mConsoleMutex);
-  if(mConsoleFile->open(QFile::WriteOnly | mode))
-  {
-    mConsoleStream->setDevice(mConsoleFile);
-    sentry.unlock();
-    ssc::messageManager()->sendInfo("Console log file: "+mConsoleFile->fileName()+".");
-  }
-  else
-  {
-    sentry.unlock();
-    ssc::messageManager()->sendWarning("Could not open "+mConsoleFile->fileName()+" for writing the console log.");
-    return false;
-  }
-  return true;
+	QString retval;
+
+	QString bra = (mFormat.mShowBrackets ? "[" : "");
+	QString ket = (mFormat.mShowBrackets ? "]" : "");
+
+	// timestamp in front
+	retval += bra + msg.mTimeStamp.toString("hh:mm:ss.zzz") + ket;
+
+	// show source location
+	if (!msg.mSourceLocation.isEmpty())
+		retval += " " + bra + msg.mSourceLocation + ket;
+
+	// show level if set, or anyway if one of error/warning/success
+	if (mFormat.mShowLevel
+		|| msg.mMessageLevel == mlERROR
+		|| msg.mMessageLevel == mlWARNING
+		|| msg.mMessageLevel == mlSUCCESS)
+		retval += " " + bra + qstring_cast(msg.mMessageLevel) + ket;
+
+	// add message text at end.
+	retval += " " + msg.mText;
+
+	return retval;
 }
+
+/** Open the logfile and append the input text to it
+ */
+bool MessageManager::appendToLogfile(QString text)
+{
+	if (mLogFile.isEmpty())
+		return false;
+
+	QFile file(mLogFile, this);
+	QTextStream stream;
+
+	if (!file.open(QFile::WriteOnly | QFile::Append))
+	{
+		return false;
+	}
+
+	//note: writing to cout here causes recursion: disable cout redirection first.
+//	std::cout << "writing: " << text << " to " << mLogFile << std::endl;
+
+	stream.setDevice(&file);
+	stream << text;
+	stream << flush;
+
+	return true;
+}
+
+MessageManager::Format::Format() :
+	mShowBrackets(true),
+	mShowLevel(true),
+	mShowSourceLocation(true)
+{
+}
+
 
 } //End namespace ssc

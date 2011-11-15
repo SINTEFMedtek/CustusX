@@ -21,7 +21,7 @@ namespace ssc
 /**
  * \class Message
  *
- * \brief A representation of a message.
+ * \brief A representation of a MessageManager message.
  *
  * \author Janne Beate Lervik Bakeng, SINTEF
  * \date 24.08.2010
@@ -29,7 +29,7 @@ namespace ssc
 class Message
 {
 public:
-  Message(QString text ="", MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0);
+  Message(QString text ="", MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0, QString sourceLocation="");
   ~Message();
 
   QString getPrintableMessage(); ///< Text containing  information appropriate to display
@@ -38,19 +38,24 @@ public:
   QDateTime* getTimeStamp(); ///< The time at which the message was created.
   int getTimeout(); ///< Timout tells the statusbar how long it should be displayed, this depends on the message level
 
-private:
   QString mText;
   MESSAGE_LEVEL mMessageLevel;
   int mTimeoutTime;
   QDateTime mTimeStamp;
+  QString mSourceLocation; ///< file:line/function
 };
 
 /**
  * \class MessageManager
  *
- * \brief This class handles delivering messages from the system.
+ * Logging service for SSC.
+ * Send info in different error levels, and route
+ * them to file, or to a console via qt signals.
+ * Use the class ConsoleWidget for this.
+ * MessageManager also captures cout and cerr.
  *
  * \author Janne Beate Lervik Bakeng, SINTEF
+ * \author Christian Askeland, SINTEF
  * \date 16.10.2008
  *
  *TODO Sender should be added to the message
@@ -62,13 +67,27 @@ class MessageManager : public QObject
   Q_OBJECT
 
 public:
+  static void initialize(); ///< initialize service. must be called before use.
+  static void shutdown(); ///< shutdown service.
+
   static MessageManager* getInstance(); ///< Returns a reference to the only MessageManager that exists.
-  static void destroyInstance(); ///< Should be called by the object that made the MessageManager.
 
-  void setLoggingFolder(QString absoluteLoggingFolderPath);
+  void setLoggingFolder(QString absoluteLoggingFolderPath); // deprecated
+  bool setLogFile(QString filename); ///< set a file to write messages to.
 
-  void setAudioSource(ssc::AudioPtr audioSource);
+  struct Format
+  {
+	  Format();
+	  bool mShowBrackets;
+	  bool mShowLevel;
+	  bool mShowSourceLocation;
+  };
+
+  void setFormat(Format format); ///< fine-tune messaging format
+  void setAudioSource(ssc::AudioPtr audioSource); ///< define sounds to go with the messages.
   bool hasAudioSource() const;
+  void setEnabled(bool enabled); ///< enable/disable messaging.
+  bool isEnabled() const;
 
   //Text
   void sendInfo(QString info); ///< Used to report normal interesting activity, no sound associated
@@ -77,7 +96,7 @@ public:
   void sendError(QString error, bool mute=false); ///< The program (might) need to terminate, default not muted
   void sendDebug(QString debug); ///< Used to output debug info, no sound associated
 
-  void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=0);
+  void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=0, bool mute=false, QString sourceLocation="");
 
   //Audio
   void playStartSound(); ///< plays a sound signaling that something has started
@@ -92,26 +111,26 @@ public:
   void playSampleSound(); ///< plays a sound signaling that something has been sampled
 
 signals:
-  void emittedMessage(Message message); ///< The signal the user should listen to!
+  void emittedMessage(Message message); ///< emitted for each new message, in addition to writing to file.
 
 private:
-  void initialize();
+  void initializeObject();
   MessageManager();
-  ~MessageManager();
+  virtual ~MessageManager();
   MessageManager(const MessageManager&);
   MessageManager& operator=(const MessageManager&);
 
-  bool openLogging(QFile::OpenMode mode);
+  bool appendToLogfile(QString text);
+  void playSound(MESSAGE_LEVEL messageLevel);
+  QString formatMessage(Message msg);
 
   typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
   SingleStreamerImplPtr mCout;
   SingleStreamerImplPtr mCerr;
 
-  QMutex mConsoleMutex;
-  QString mAbsoluteLoggingFolderPath;
-  QFile* mConsoleFile;
-  QTextStream* mConsoleStream;
-
+  bool mEnabled;
+  Format mFormat;
+  QString mLogFile;
   ssc::AudioPtr mAudioSource;
 
   static MessageManager *mTheInstance; ///< The unique MessageManager.
