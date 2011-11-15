@@ -131,6 +131,10 @@ public:
 	{
 		return ImagePtr();
 	}
+	virtual ImagePtr createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath = "Images")
+	{
+		return ImagePtr();
+	}
 	virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
 	{
 		return MeshPtr();

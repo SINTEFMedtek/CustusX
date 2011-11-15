@@ -81,6 +81,7 @@ void *SharedMemoryServer::buffer()
 		if (!found)
 		{
 			qWarning("Could not find an available write buffer");
+			mBuffer.unlock();
 			return NULL;
 		}
 		void *ptr = ((char *)header) + header->headerSize + header->bufferSize * (mCurrentBuffer + 1);

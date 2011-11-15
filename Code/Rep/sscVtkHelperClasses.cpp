@@ -279,6 +279,7 @@ vtkActor2DPtr  CrossHair2D::getActor()
 // --------------------------------------------------------
 TextDisplay::TextDisplay( const QString& text, const Vector3D& color, int fontsize )
 {
+	this->text = text;
 	Vector3D c = color;
 	mapper = vtkTextMapperPtr::New();
 	mapper->SetInput( cstring_cast(text) );
@@ -287,12 +288,48 @@ TextDisplay::TextDisplay( const QString& text, const Vector3D& color, int fontsi
 
 	actor= vtkActor2DPtr::New();
 	actor->SetMapper( mapper );
+	maxWidth = 0;
 }
 
 TextDisplay::~TextDisplay()
 {
 }
 
+void TextDisplay::setMaxWidth( int width, vtkViewport *vp)
+{
+	maxWidth = width;
+	QStringList components = text.split("\n");
+	for (QStringList::iterator it = components.begin(); it != components.end(); ++it)
+	{
+		vtkTextMapperPtr line = vtkTextMapperPtr::New();
+		bool changed = false;
+		line->SetInput( cstring_cast(*it) );
+		line->SetTextProperty(mapper->GetTextProperty());
+		while((*it).length() > 0 && line->GetWidth(vp) > maxWidth)
+		{
+			(*it).chop(1);
+			line->SetInput( cstring_cast(QString("%1...").arg(*it)) );
+			changed = true;
+		}
+		if (changed)
+		{
+			(*it).append("...");
+		}
+	}
+	QString newString = components.join("\n");
+	mapper->SetInput( cstring_cast(newString) );
+}
+	
+int TextDisplay::getMaxWidth()
+{
+	return maxWidth;
+}
+
+int TextDisplay::getWidth( vtkViewport *vp)
+{
+	return mapper->GetWidth( vp );
+}
+	
 void TextDisplay::setPosition( const Vector3D& pos )
 {
 	actor->SetPosition( pos[0], pos[1] );

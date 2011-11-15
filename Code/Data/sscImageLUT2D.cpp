@@ -44,11 +44,12 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
 }
 
-ImageLUT2DPtr ImageLUT2D::createCopy()
+ImageLUT2DPtr ImageLUT2D::createCopy(vtkImageDataPtr newBase)
 {
-	ImageLUT2DPtr retval(new ImageLUT2D(mBase));
+	ImageLUT2DPtr retval(new ImageLUT2D(newBase));
 
 	retval->deepCopy(this);
+	retval->setVtkImageData(newBase);
 	retval->mOutputLUT->DeepCopy(mOutputLUT);
 
 	return retval;

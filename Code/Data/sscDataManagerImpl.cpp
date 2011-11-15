@@ -161,7 +161,7 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 		image->getTransferFunctions3D()->setLevel(level);
 		image->getLookupTable2D()->setLevel(level);
 	}
-	QString windowString = customReader->readKey("WindowWindow");
+	QString windowString = customReader->readKey("WindowWidth");
 	double window = windowString.toDouble(&ok);
 	if (ok)
 	{
@@ -845,6 +845,30 @@ ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uid, QString
 	QString filename = filePath + "/" + uid + ".mhd";
 	retval->setFilePath(filename);
 
+	return retval;
+}
+
+/**
+ * Create a new image that inherits parameters from a parent
+ */
+ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath)
+{
+	ImagePtr retval = createImage(data, uid, name, filePath);
+  retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
+  retval->get_rMd_History()->setParentSpace(parentImage->getUid());
+  ssc::ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
+  ssc::ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
+  //The parent may have a different range of voxel values. Make sure the transfer functions are working
+  if (transferFunctions)
+  	transferFunctions->fixTransferFunctions();
+  else
+  	std::cout << "transferFunctions error" << std::endl;
+  if (LUT2D)
+  	LUT2D->fixTransferFunctions();
+  else
+  	std::cout << "LUT2D error" << std::endl;
+  retval->resetTransferFunction(transferFunctions, LUT2D);
+  retval->setModality(parentImage->getModality());
 	return retval;
 }
 
