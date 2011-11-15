@@ -192,7 +192,7 @@ void CameraStyle::connectTool()
 
 void CameraStyle::disconnectTool()
 {
-	if (mCameraStyle != TOOL_STYLE)
+	if (mCameraStyle == DEFAULT_STYLE)
 		return;
 
 	if (mFollowingTool)
