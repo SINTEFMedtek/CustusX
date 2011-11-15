@@ -612,7 +612,10 @@ ImagePtr Reconstructer::generateOutputVolume()
 	ImagePtr image = dataManager()->createImage(data, uid + "_%1", name + " %1", filePath);
 	image->get_rMd_History()->setRegistration(mOutputVolumeParams.m_rMd);
 	image->setModality("US");
-	image->setImageType("ANGIO");
+	if (mParams->mAngioAdapter->getValue())
+		image->setImageType("Angio");
+	else
+		image->setImageType("B-Mode");
 
 	ssc::PresetTransferFunctions3DPtr presets = ssc::dataManager()->getPresetTransferFunctions3D();
 	presets->load(mParams->mPresetTFAdapter->getValue(), image);
