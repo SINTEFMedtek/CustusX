@@ -3,8 +3,10 @@
 #include <vtkImageData.h>
 #include "sscDataManager.h"
 #include "sscImage.h"
-#include "cxDataLocations.h"
 #include "sscImageAlgorithms.h"
+#include "sscImageTF3D.h"
+#include "sscImageLUT2D.h"
+#include "cxDataLocations.h"
 
 //#include "cxToolConfigurationParser.h"
 
@@ -30,6 +32,7 @@ void TestImageAlgorithms::testResample()
 	/*ssc::DataPtr referenceImage = */ssc::dataManager()->loadData(fname1, fname1, ssc::rtAUTO);
 	ssc::ImagePtr image = ssc::dataManager()->getImage(fname0);
 	ssc::ImagePtr referenceImage = ssc::dataManager()->getImage(fname1);
+//	std::cout << "referenceImage base: " << referenceImage->getBaseVtkImageData() << std::endl;
 	CPPUNIT_ASSERT(image!=0);
 	CPPUNIT_ASSERT(referenceImage!=0);
 
@@ -44,6 +47,13 @@ void TestImageAlgorithms::testResample()
   CPPUNIT_ASSERT(inMin == outMin);
 //    std::cout << "inMax: " << inMax << " outMax: " << outMax << std::endl;
   CPPUNIT_ASSERT(inMax == outMax);
+  CPPUNIT_ASSERT(image->getBaseVtkImageData() != oriented->getBaseVtkImageData());
+  CPPUNIT_ASSERT(image->getTransferFunctions3D()->getVtkImageData() == image->getBaseVtkImageData());
+//  std::cout << "image:    " << image->getBaseVtkImageData() << " oriented:    " << oriented->getBaseVtkImageData() << std::endl;
+//  std::cout << "image tf: " << image->getTransferFunctions3D()->getVtkImageData() << " oriented tf: " << oriented->getTransferFunctions3D()->getVtkImageData() << std::endl;
+  //Make sure the image and tf points to the same vtkImageData
+  CPPUNIT_ASSERT(oriented->getTransferFunctions3D()->getVtkImageData() == oriented->getBaseVtkImageData());
+  CPPUNIT_ASSERT(oriented->getLookupTable2D()->getVtkImageData() == oriented->getBaseVtkImageData());
 
   ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * referenceImage->get_rMd();
   ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, referenceImage->boundingBox());
@@ -66,6 +76,9 @@ void TestImageAlgorithms::testResample()
   CPPUNIT_ASSERT(cropMin == inMin);
   CPPUNIT_ASSERT(cropMax >  inMin);
   CPPUNIT_ASSERT(cropMax <= inMax);
+  CPPUNIT_ASSERT(oriented->getBaseVtkImageData() != cropped->getBaseVtkImageData());
+  CPPUNIT_ASSERT(cropped->getTransferFunctions3D()->getVtkImageData() == cropped->getBaseVtkImageData());
+  CPPUNIT_ASSERT(cropped->getLookupTable2D()->getVtkImageData() == cropped->getBaseVtkImageData());
 
   QString uid = image->getUid() + "_resample%1";
   QString name = image->getName() + " resample%1";
@@ -80,5 +93,8 @@ void TestImageAlgorithms::testResample()
   CPPUNIT_ASSERT(outMax >  cropMin);
   CPPUNIT_ASSERT(outMax <= cropMax);
   CPPUNIT_ASSERT(outMax <= cropMax);
+  CPPUNIT_ASSERT(cropped->getBaseVtkImageData() != resampled->getBaseVtkImageData());
+  CPPUNIT_ASSERT(resampled->getTransferFunctions3D()->getVtkImageData() == resampled->getBaseVtkImageData());
+  CPPUNIT_ASSERT(resampled->getLookupTable2D()->getVtkImageData() == resampled->getBaseVtkImageData());
 
 }
