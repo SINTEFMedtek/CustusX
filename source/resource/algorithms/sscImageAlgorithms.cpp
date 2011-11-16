@@ -41,8 +41,6 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
   orientator->SetResliceAxes(qMd.inv().getVtkMatrix());
   orientator->AutoCropOutputOn();
   vtkImageDataPtr rawResult = orientator->GetOutput();
-//  vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-//  rawResult->DeepCopy(orientator->GetOutput()); //Don't work? Sets spacing to 1 1 1 and max to 1. What else is missing?
 
   rawResult->Update();
 //  rawResult->Print(std::cout);
@@ -64,8 +62,8 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
  */
 ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid, QString name)
 {
-  std::cout << "oldspacing: " << ssc::Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
-  std::cout << "spacing: " << spacing << std::endl;
+//  std::cout << "oldspacing: " << ssc::Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
+//  std::cout << "spacing: " << spacing << std::endl;
   vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
   resampler->SetInput(image->getBaseVtkImageData());
   resampler->SetAxisOutputSpacing(0, spacing[0]);
