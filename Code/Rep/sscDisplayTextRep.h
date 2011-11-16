@@ -4,6 +4,7 @@
 #include <vector>
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {
@@ -16,7 +17,7 @@ class DisplayTextRep : public ssc::RepImpl
 public:
 	static DisplayTextRepPtr New(const QString& uid, const QString& name);
 	virtual QString getType() const{ return "vm::DisplayTextRep";};
-	void addText(const Vector3D& color, const QString& text, const Vector3D& pos);
+	TextDisplayPtr addText(const Vector3D& color, const QString& text, const Vector3D& pos, int maxWidth=0, vtkViewport *vp=NULL);
 	void setText(unsigned i, const QString& text);
 	void setColor(const Vector3D& color );
 	void setFontSize(int size);
