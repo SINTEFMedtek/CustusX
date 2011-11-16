@@ -20,7 +20,7 @@ DummyToolManager::DummyToolManager() :
 	mInitialized(false),
 	mIsTracking(false)
 {
-	DummyToolPtr tool1(new DummyTool());
+	DummyToolPtr tool1(new DummyTool(this));
 
 	mDominantTool = tool1;
 	mReferenceTool = tool1;
