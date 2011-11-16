@@ -599,6 +599,21 @@ void Image::mergevtkSettingsIntosscTransform()
 	//  std::cout << "REMOVED ORIGIN END:" << std::endl;
 	//  mBaseImageData->Print(std::cout);
 
+	//Since this function discards the vtkImageData, the transfer functions must be fixed
+	ssc::ImageTF3DPtr transferFunctions =	this->getTransferFunctions3D()->createCopy(getBaseVtkImageData());
+	ssc::ImageLUT2DPtr LUT2D = this->getLookupTable2D()->createCopy(getBaseVtkImageData());
+	// Make sure the transfer functions are working
+	if (transferFunctions)
+		transferFunctions->fixTransferFunctions();
+	else
+		messageManager()->sendError("Image::mergevtkSettingsIntosscTransform() transferFunctions error");
+	if (LUT2D)
+		LUT2D->fixTransferFunctions();
+	else
+		messageManager()->sendError("Image::mergevtkSettingsIntosscTransform() LUT2D error");
+	this->resetTransferFunction(transferFunctions, LUT2D);
+
+
 	emit vtkImageDataChanged();
 	emit transferFunctionsChanged();
 	emit clipPlanesChanged();

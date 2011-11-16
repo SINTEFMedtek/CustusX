@@ -54,6 +54,7 @@ signals:
 private slots:
 	void transferFunctionsChangedSlot();
 private:
+	ImageTF3D();
 	virtual void LUTChanged();
 	virtual void alphaLLRChanged();
 

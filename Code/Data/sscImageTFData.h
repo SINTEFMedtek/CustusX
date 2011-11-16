@@ -53,6 +53,7 @@ Q_OBJECT
 public:
 	ImageTFData(vtkImageDataPtr base);
 	void setVtkImageData(vtkImageDataPtr base);
+	vtkImageDataPtr getVtkImageData();
 	virtual ~ImageTFData();
 
 	void setAlpha(double val); ///< range [0..1]
