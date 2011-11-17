@@ -101,7 +101,8 @@ void SharedMemoryServer::release()
 	{
 		mBuffer.lock();
 		header->lastDone = mCurrentBuffer;
-		header->timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
+		mLastTimestamp = QDateTime::currentDateTime();
+		header->timestamp = mLastTimestamp.toMSecsSinceEpoch();
 		mBuffer.unlock();
 		mCurrentBuffer = -1;
 	}
