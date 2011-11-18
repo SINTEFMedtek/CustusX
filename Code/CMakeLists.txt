@@ -45,6 +45,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscPresetTransferFunctions3D.h
     Video/sscVideoSource.h
     Video/sscVideoRecorder.h
+    Video/sscVideoSourceSHM.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
@@ -295,7 +296,9 @@ SET( SSC_SOURCE_FILES
     Video/sscVideoSource.h
     Video/sscVideoRecorder.h
     Video/sscVideoRecorder.cpp
-    
+    Video/sscVideoSourceSHM.h
+    Video/sscVideoSourceSHM.cpp
+
     Tool/sscToolManager.cpp
     Tool/sscToolManager.h
     Tool/sscTool.h 
