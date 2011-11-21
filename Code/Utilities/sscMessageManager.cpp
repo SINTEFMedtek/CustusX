@@ -401,7 +401,7 @@ bool MessageManager::appendToLogfile(QString text)
 	if (mLogFile.isEmpty())
 		return false;
 
-	QFile file(mLogFile, this);
+	QFile file(mLogFile);
 	QTextStream stream;
 
 	if (!file.open(QFile::WriteOnly | QFile::Append))

@@ -7,6 +7,7 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscVolumetricRep.h"
+//#include "sscDICOMWidget.h"
 //#include "sscGPURayCastVolumetricRep.h"
 
 
@@ -24,10 +25,13 @@ public:
 	ViewsWindow();
 	virtual ~ViewsWindow();
 	
-	void define3D(const QString& imageFilename, int r, int c);
+//	void define3D(const QString& imageFilename, int r, int c);
 	void defineGPU_3D(const QString& imageFilename, int r, int c);
 	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	
+	void define3D(const QString& imageFilename, int r, int c);
+	void define3D(ssc::ImagePtr image, int r, int c);
+
 	void insertView(ssc::View* view, const QString& uid, const QString& volume, int r, int c);
 private:
 	ssc::View* generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
@@ -38,6 +42,7 @@ private:
 	QGridLayout* mSliceLayout;
 	QTimer* mRenderingTimer;
 	QLineEdit* mSpeedEdit;
+//	ssc::DICOMWidget* mDICOMWidget;
  // ssc::GPURayCastVolumetricRepPtr mVolumetricRep;
 
 public slots:
