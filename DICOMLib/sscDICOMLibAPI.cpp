@@ -6,6 +6,8 @@
  */
 
 #include "sscDICOMLibAPI.h"
+#include <QThread>
+#include <QMutexLocker>
 #include "DICOMLib.h"
 #include <iostream>
 #include "sscTypeConversions.h"
@@ -13,44 +15,74 @@
 #include <vtkImageData.h>
 #include <vtkPointData.h>
 #include <vtkUnsignedShortArray.h>
+#include <vtkShortArray.h>
 #include <vtkUnsignedCharArray.h>
 #include <boost/cstdint.hpp>
 #include "sscTime.h"
 #include "sscRegistrationTransform.h"
 #include "sscImageLUT2D.h"
 #include "sscImageTF3D.h"
+#include "sscLogger.h"
+#include "boost/function.hpp"
+#include "boost/bind.hpp"
 
-Series::Series(struct series_t* base) : mBase(base)
+typedef vtkSmartPointer<vtkShortArray> vtkShortArrayPtr;
+
+namespace ssc
 {
 
+
+Series::Series(struct series_t* base, StudyWeakPtr parent) :
+	mBase(base),
+	mParent(parent)
+{
+	this->getMetaData();
+	mUid = mMetaData->mConversionTime.timestamp()
+		+ "_"
+		+ mMetaData->DICOM.mSeriesID;
+}
+
+ssc::SNW2VolumeMetaDataPtr Series::getMetaData()
+{
+	if (mMetaData)
+		return mMetaData;
+
+	mMetaData.reset(new ssc::SNW2VolumeMetaData());
+	this->rawLoadMetaData(*mMetaData);
+	return mMetaData;
+}
+
+StudyPtr Series::getParentStudy()
+{
+	return mParent.lock();
 }
 
 ssc::ImagePtr Series::getImage()
 {
 //	ssc::ImagePtr retval;
-	ssc::ImagePtr mImage;
+//	ssc::ImagePtr mImage;
 
 	if (!mBase)
 		return mImage;
 
+	if (mImage)
+		return mImage;
+
 	DICOMLib_UseAutoVOI(mBase);
+	QTime t_start = QTime::currentTime();
 	volume_t *data = DICOMLib_GetVolume(mBase, NULL);
-	std::cout << "data: " << data << std::endl;
+	std::cout << "DICOMLib_GetVolume():  " << t_start.msecsTo(QTime::currentTime()) << std::endl; t_start = QTime::currentTime();
+	SSC_LOG("RescaleIntercept: %i", data->rescaleIntercept);
+//	std::cout << "data: " << data << std::endl;
 	//	assert(data);
 	const char *ptr = (const char *) data->volume;
 
-	int lutsize = mBase->VOI.lut.length;
-	std::cout << "lutsize " << lutsize << std::endl;
-
-	vtkImageDataPtr mImageData;
-//	if (mImage) // already loaded?
-//	{
-//		return true;
-//	}
+//	int lutsize = mBase->VOI.lut.length;
+//	std::cout << "lutsize " << lutsize << std::endl;
 
 	bool success = true;
-	mImageData = vtkImageDataPtr::New();
-	mImage = ssc::ImagePtr(new ssc::Image("series_", mImageData));
+	vtkImageDataPtr imageData = vtkImageDataPtr::New();
+	mImage = ssc::ImagePtr(new ssc::Image(this->getUid(), imageData));
 //	mLut = vtkLookupTablePtr::New();
 
 //	TODO:
@@ -58,9 +90,12 @@ ssc::ImagePtr Series::getImage()
 //	- fyll snw metadata fra dicom.
 //	- bruk snwformat-imagelesefunksjonen her også - lag generell.
 
-	ssc::SNW2VolumeMetaData metaData;
-	success = success && this->rawLoadMetaData(metaData);
-	success = success && this->rawLoadVtkImageData(mImageData, metaData, ptr);
+	// force load metadata once more : this is IMPORTANT because some metainfo is read using DICOMLib_GetVolume()
+	this->rawLoadMetaData(*mMetaData);
+	ssc::SNW2VolumeMetaData metaData = *mMetaData;
+//	ssc::SNW2VolumeMetaData metaData;
+//	success = success && this->rawLoadMetaData(metaData);
+	success = success && this->rawLoadVtkImageData(imageData, metaData, ptr, data->rescaleIntercept);
 //	success = success && rawLoadLut(rawLutFileName(), mLut);
 
 	mImage->setFilePath(metaData.mName);
@@ -126,6 +161,7 @@ bool Series::rawLoadMetaData(ssc::SNW2VolumeMetaData &data) const
 	data.Volume.mSpacing[0] = mBase->pixel_spacing[0];
 	data.Volume.mSpacing[1] = mBase->pixel_spacing[1];
 	data.Volume.mSpacing[2] = mBase->slice_thickness;
+	SSC_LOG("slice_thickness: %f, %s", mBase->slice_thickness, qstring_cast(data.Volume.mSpacing).toAscii().constData());
 
 	data.Volume.mDim[0] = mBase->columns;
 	data.Volume.mDim[1] = mBase->rows;
@@ -155,7 +191,7 @@ bool Series::rawLoadMetaData(ssc::SNW2VolumeMetaData &data) const
 	return true;
 }
 
-bool Series::rawLoadVtkImageData(vtkImageDataPtr mImageData, ssc::SNW2VolumeMetaData mMetaData, const char* rawchars)
+bool Series::rawLoadVtkImageData(vtkImageDataPtr mImageData, ssc::SNW2VolumeMetaData mMetaData, const char* rawchars, int rescaleIntercept)
 {
 	mImageData->Initialize();
 	mImageData->SetDimensions(mMetaData.Volume.mDim.begin());
@@ -194,6 +230,28 @@ bool Series::rawLoadVtkImageData(vtkImageDataPtr mImageData, ssc::SNW2VolumeMeta
 		array->SetNumberOfComponents(1);
 		array->SetArray(image, scalarSize, 0); // take ownership
 		mImageData->SetScalarTypeToUnsignedChar();
+		mImageData->GetPointData()->SetScalars(array);
+	}
+	else if (mMetaData.Volume.mSamplesPerPixel == 1 && mMetaData.Volume.mBitsPerSample == 16 && rescaleIntercept!=0)
+	{
+		// this is an originally signed volume that is converted by the DICOMLib.
+		// revert to original state.
+
+		boost::int16_t *image = (boost::int16_t*) (rawchars);
+		boost::uint16_t *uimage = (boost::uint16_t*) (rawchars);
+
+//		SSC_LOG("starting %i", scalarSize);
+		for (int i =0; i<scalarSize; ++i)
+		{
+//			SSC_LOG("  %i, uval=%i", i, uimage[i]);
+			image[i] = boost::int16_t(uimage[i]) - rescaleIntercept;
+//			SSC_LOG("  val=%i", image[i]);
+		}
+
+		vtkShortArrayPtr array = vtkShortArrayPtr::New();
+		array->SetNumberOfComponents(1);
+		array->SetArray(image, scalarSize, 0); // take ownership
+		mImageData->SetScalarTypeToShort();
 		mImageData->GetPointData()->SetScalars(array);
 	}
 	else if (mMetaData.Volume.mSamplesPerPixel == 1 && mMetaData.Volume.mBitsPerSample == 16)
@@ -240,6 +298,25 @@ bool Series::rawLoadVtkImageData(vtkImageDataPtr mImageData, ssc::SNW2VolumeMeta
 // --------------------------------------------------------
 // --------------------------------------------------------
 
+void StudyData::put(std::ostream& s) const
+{
+	s << std::left;
+	int hw = 20;
+	s << setw(hw) << "PatientName" << mPatientName << std::endl;
+	s << setw(hw) << "PatientID" << mPatientID << std::endl;
+	s << setw(hw) << "PatientBirthDate" << mPatientBirthDate.toString("yyyy-MM-dd") << std::endl;
+	s << setw(hw) << "PatientSex" << mPatientSex << std::endl;
+	s << setw(hw) << "StudyDate" << mStudyDate.toString("yyyy-MM-dd hh:mm") << std::endl;
+	s << setw(hw) << "StudyID" << mStudyID << std::endl;
+	s << setw(hw) << "StudyDescription" << mStudyDescription << std::endl;
+}
+
+StudyPtr Study::New(study_t *base)
+{
+	StudyPtr retval(new Study(base));
+	retval->mSelf = retval;
+	return retval;
+}
 
 Study::Study(struct study_t *base) : mBase(base)
 {
@@ -248,17 +325,75 @@ Study::Study(struct study_t *base) : mBase(base)
 
 std::vector<SeriesPtr> Study::getSeries()
 {
-	std::vector<SeriesPtr> retval;
+//	mSeries.clear();
 
-	series_t* iter = DICOMLib_GetSeries(mBase, NULL);
+	if (mSeries.empty())
+		this->buildSeries();
+	return mSeries;
+}
 
-	for ( ; iter!=NULL; iter = iter->next_series )
+void Study::buildSeries()
+{
+	for (series_t* iter = DICOMLib_GetSeries(mBase, NULL); iter!=NULL; iter = iter->next_series )
 	{
-		SeriesPtr current(new Series(iter));
-		retval.push_back(current);
+		SeriesPtr current(new Series(iter, mSelf));
+ 		mSeries.push_back(current);
 	}
+}
+
+StudyData Study::getData()
+{
+	StudyData retval;
+
+	retval.mPatientName = mBase->patientName;
+	retval.mPatientID = mBase->patientID;
+	retval.mPatientBirthDate = QDate::fromString(QString(mBase->patientBirthDate), "yyyyMMdd");
+	retval.mPatientSex = mBase->patientSex;
+	retval.mStudyDate = SNW2VolumeMetaData::DateTime::fromDateAndTime(mBase->studyDate, mBase->studyTime).toQDateTime();
+	retval.mStudyID = mBase->studyID;
+	retval.mStudyDescription = mBase->studyDescription;
 
 	return retval;
+}
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+static RefreshThread* staticRefreshThreadInstance = NULL;
+
+RefreshThread::RefreshThread(QObject* parent, DICOMLibAPI* base) :
+	QThread(parent), mBase(base)
+{
+	staticRefreshThreadInstance = this;
+}
+
+RefreshThread::~RefreshThread()
+{
+	staticRefreshThreadInstance = NULL;
+}
+
+int freeProgressFunc(int value)
+{
+//	SSC_LOG("progress %i", value);
+	staticRefreshThreadInstance->progressFunc(value);
+	return 0;
+}
+
+void RefreshThread::progressFunc(int value)
+{
+	emit progress(value);
+}
+
+void RefreshThread::run()
+{
+//	boost::function<int(int)> func = boost::bind(&RefreshThread::progressFunc, this, _1);
+	emit progress(0);
+	QTime t_start = QTime::currentTime();
+	QMutexLocker sentry(&mBase->mMutex);
+
+	mBase->mData = DICOMLib_StudiesFromPath(cstring_cast(mBase->mRootFolder), freeProgressFunc, DICOMLIB_NO_CACHE);
+	std::cout << "DICOMLib_StudiesFromPath():  " << t_start.msecsTo(QTime::currentTime()) << std::endl; t_start = QTime::currentTime();
 }
 
 // --------------------------------------------------------
@@ -270,7 +405,7 @@ DICOMLibAPIPtr DICOMLibAPI::New()
 	return DICOMLibAPIPtr(new DICOMLibAPI());
 }
 
-DICOMLibAPI::DICOMLibAPI() : mData(NULL)
+DICOMLibAPI::DICOMLibAPI() : mData(NULL), mRefreshThread(NULL), mMutex(QMutex::Recursive)
 {
 	DICOMLib_Init();
 }
@@ -282,27 +417,68 @@ DICOMLibAPI::~DICOMLibAPI()
 
 void DICOMLibAPI::setRootFolder(QString root)
 {
+	QMutexLocker sentry(&mMutex);
+	if (mRootFolder == root)
+		return;
+
+	SSC_LOG("%s", root.toAscii().constData());
+
 	mRootFolder = root;
+	sentry.unlock();
+
 	this->refresh();
 }
 
+QString DICOMLibAPI::getRootFolder() const
+{
+	QMutexLocker sentry(&mMutex);
+	return mRootFolder;
+}
+
+
 void DICOMLibAPI::refresh()
 {
-	struct series_t *series;
-	mData = DICOMLib_StudiesFromPath(cstring_cast(mRootFolder), NULL, DICOMLIB_NO_CACHE);
-//	std::cout << "study: " << study << std::endl;
+	mRefreshThread = new RefreshThread(this, this);
+	connect(mRefreshThread, SIGNAL(started()),     this, SIGNAL(refreshStarted()));
+	connect(mRefreshThread, SIGNAL(progress(int)), this, SIGNAL(refreshProgress(int)));
+	connect(mRefreshThread, SIGNAL(finished()),    this, SLOT(refreshFinishedSlot()));
+	mRefreshThread->start();
+
+//	QTime t_start = QTime::currentTime();
+////	struct series_t *series;
+//	mData = DICOMLib_StudiesFromPath(cstring_cast(mRootFolder), NULL, DICOMLIB_NO_CACHE);
+////	std::cout << "study: " << study << std::endl;
+//	std::cout << "DICOMLib_StudiesFromPath():  " << t_start.msecsTo(QTime::currentTime()) << std::endl; t_start = QTime::currentTime();
+//	SSC_LOG("%s", "hei");
+//	emit changed();
+}
+
+void DICOMLibAPI::refreshFinishedSlot()
+{
+	delete mRefreshThread;
+	mRefreshThread = NULL;
+
+	emit refreshFinished();
+	emit changed();
 }
 
 std::vector<StudyPtr> DICOMLibAPI::getStudies()
 {
-	std::vector<StudyPtr> retval;
-	study_t *iter = mData;
-
-	for ( ; iter!=NULL; iter = iter->next_study )
-	{
-		StudyPtr current(new Study(iter));
-		retval.push_back(current);
-	}
-
-	return retval;
+//	mStudies.clear();
+	if (mStudies.empty())
+		this->buildStudies();
+	return mStudies;
 }
+
+void DICOMLibAPI::buildStudies()
+{
+	QMutexLocker sentry(&mMutex);
+
+	for (study_t *iter = mData; iter!=NULL; iter = iter->next_study )
+	{
+		StudyPtr current = Study::New(iter);
+		mStudies.push_back(current);
+	}
+}
+
+} // namespace ssc

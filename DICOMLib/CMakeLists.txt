@@ -1,10 +1,16 @@
+###########################################################
+##               DICOMLib
+###########################################################
+
 add_subdirectory( tests )
 add_subdirectory( glDicom )
 #add_subdirectory( cyDICOM )
 
 FIND_PACKAGE( Qt4 REQUIRED )
 INCLUDE( ${QT_USE_FILE} )
-#QT4_WRAP_CPP( MOC_HEADER_DICOMLIB file.h )
+QT4_WRAP_CPP( MOC_HEADER_DICOMLIB 
+    sscDICOMLibAPI.h
+    )
 
 #find_package(VTK REQUIRED)
 #include(${VTK_USE_FILE})
@@ -12,6 +18,11 @@ INCLUDE( ${QT_USE_FILE} )
 find_package(SSC REQUIRED)
 include (${SSC_USE_FILE} )
 
+find_package( DCMTK REQUIRED )
+include_directories( ${DCMTK_INCLUDE_DIR})
+
+find_package( TIFF REQUIRED )
+include_directories( ${TIFF_INCLUDE_DIR})
 
 INCLUDE_DIRECTORIES( 
     ${QT_INCLUDES} 
@@ -30,6 +41,7 @@ LINK_DIRECTORIES(
     )
 
 ADD_LIBRARY( DICOMLib SHARED 
+    ${MOC_HEADER_DICOMLIB}
     convert.c 
     DICOMLib.cpp 
     identify.c 
@@ -42,33 +54,16 @@ ADD_LIBRARY( DICOMLib SHARED
 SET_TARGET_PROPERTIES( DICOMLib PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "-Wextra ${SNW_COMPILE_FLAGS}" )
 
 TARGET_LINK_LIBRARIES( DICOMLib 
-#    DataBusLib 
-    pthread 
-    z 
-    m 
-    ofstd 
-    stdc++ 
+#    ofstd 
+#    stdc++ 
     oflog 
-    dcmdata 
-    ofstd 
-    dcmimgle 
-    dcmdata 
-    ofstd 
-    dcmimage
-    dcmdata 
-    dcmnet 
-    dcmdata 
-    dcmjpeg 
-#    CharLS 
     /usr/local/lib/libcharls.so
     dcmjpls 
-    ofstd 
-    ijg12 
-    ijg8 
-    ijg16 
     dcmjpeg 
     ${SNW_LINK_LIBS}
     ${QT_LIBRARIES} 
+    ${DCMTK_LIBRARIES} 
+    ${TIFF_LIBRARIES} 
     -lsqlite3 
     SSC
     )

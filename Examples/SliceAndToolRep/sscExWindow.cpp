@@ -67,9 +67,12 @@ ViewsWindow::ViewsWindow()
   ssc::ToolPtr tool = mToolmanager->getDominantTool();
   connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), this, SLOT( updateRender()));
 
+//  mDICOMWidget = new ssc::DICOMWidget(this);
+
   mSliceLayout = new QGridLayout(this);
   mSpeedEdit = new QLineEdit(this);
   mSliceLayout->addWidget(mSpeedEdit, 1, 0);
+//  mSliceLayout->addWidget(mDICOMWidget, 2, 0);
 
 //  ssc::View* view = new ssc::View(this);
 //  view->getRenderWindow()->GetInteractor()->EnableRenderOff();
@@ -176,28 +179,36 @@ void ViewsWindow::defineGPU_3D(const QString& imageFilename, int r, int c)
 
 void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 {
+	ssc::ImagePtr image = loadImage(imageFilename);
+	this->define3D(image, r, c);
+}
+
+void ViewsWindow::define3D(ssc::ImagePtr image, int r, int c)
+{
 	QString uid = "3D";
 	ssc::View* view = new ssc::View(this);
 	mLayouts.insert(view);
 
-	ssc::ImagePtr image = loadImage(imageFilename);
+//	ssc::ImagePtr image = loadImage(imageFilename);
 
 	// volume rep
 	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New(image->getUid());
+	mRepPtr->setMaxVolumeSize(5 * 1000 * 1000);
+	mRepPtr->setUseGPUVolumeRayCastMapper();
 	//mRepPtr->setResampleFactor(0.2);
 	mRepPtr->setImage(image);
 	mRepPtr->setName(image->getName());
 	view->addRep(mRepPtr);
 	//mVolumetricRep = mRepPtr;
 
-		// Tool 3D rep
-		ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
-		ssc::ToolPtr tool = mToolmanager->getDominantTool();
-		ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
-		toolRep->setTool(tool);
-		view->addRep(toolRep);
+	// Tool 3D rep
+	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+	ssc::ToolPtr tool = mToolmanager->getDominantTool();
+	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New(tool->getUid(), tool->getName());
+	toolRep->setTool(tool);
+	view->addRep(toolRep);
 
-	insertView(view, uid, imageFilename, r, c);
+	insertView(view, uid, image->getFilePath(), r, c);
 
 	view->getRenderer()->ResetCamera();
 }
