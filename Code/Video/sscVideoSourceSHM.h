@@ -67,13 +67,14 @@ public:
 protected:
 	void update();
 
-private:
-
-	SharedMemoryClient	mSource;
-
+protected:
 	int			mImageWidth;
 	int			mImageHeight;
 	int			mImageColorDepth;
+	
+private:
+
+	SharedMemoryClient	mSource;
 
 	vtkImageDataPtr		mImageData;
 	vtkImageImportPtr	mImageImport;
