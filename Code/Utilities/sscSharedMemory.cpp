@@ -84,7 +84,7 @@ void *SharedMemoryServer::buffer()
 			mBuffer.unlock();
 			return NULL;
 		}
-		void *ptr = ((char *)header) + header->headerSize + header->bufferSize * (mCurrentBuffer + 1);
+		void *ptr = ((char *)header) + header->headerSize + header->bufferSize * mCurrentBuffer;
 		mBuffer.unlock();
 		return ptr;
 	}
@@ -144,7 +144,7 @@ const void *SharedMemoryClient::buffer()
 		}
 		header->buffer[header->lastDone]++; // Lock new page against writing
 		mCurrentBuffer = header->lastDone;
-		const void *ptr = ((const char *)header) + header->headerSize + header->bufferSize * (header->lastDone + 1);
+		const void *ptr = ((const char *)header) + header->headerSize + header->bufferSize * header->lastDone;
 		mTimestamp.setMSecsSinceEpoch(header->timestamp);
 		mBuffer.unlock();
 		return ptr;
@@ -168,7 +168,7 @@ const void *SharedMemoryClient::isNew()
 		}
 		header->buffer[header->lastDone]++; // Lock new page against writing
 		mCurrentBuffer = header->lastDone;
-		const void *ptr = ((const char *)header) + header->headerSize + header->bufferSize * (header->lastDone + 1);
+		const void *ptr = ((const char *)header) + header->headerSize + header->bufferSize * header->lastDone;
 		mTimestamp.setMSecsSinceEpoch(header->timestamp);
 		mBuffer.unlock();
 		return ptr;
