@@ -54,41 +54,41 @@ ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObj
 	mMaxBufferSize(19200000), //800(width)*600(height)*4(bytes)*10(images)
 	mDroppedImages(0)
 {
-  typedef cx::Frame Frame;
-  qRegisterMetaType<Frame>("Frame");
-
-  connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
-  connect(this, SIGNAL(statusOnQueue(int)), this, SLOT(sendOpenIGTLinkStatusSlot(int)), Qt::QueuedConnection);
+	typedef cx::Frame Frame;
+	qRegisterMetaType<Frame>("Frame");
+	
+	connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
+	connect(this, SIGNAL(statusOnQueue(int)), this, SLOT(sendOpenIGTLinkStatusSlot(int)), Qt::QueuedConnection);
 
 	if (!mArguments.count("ipaddress"))
 		mArguments["ipaddress"] = "127.0.0.1";
 	if (!mArguments.count("imagingmode"))
 		mArguments["imagingmode"] = "0";
-  if (!mArguments.count("datatype"))
-    mArguments["datatype"] = "0x00000004";
-  if (!mArguments.count("buffersize"))
-    mArguments["buffersize"] = "500";
+	if (!mArguments.count("datatype"))
+		mArguments["datatype"] = "0x00000004";
+	if (!mArguments.count("buffersize"))
+		mArguments["buffersize"] = "500";
 
 	QString ipaddress       = mArguments["ipaddress"];
-  int imagingMode         = convertStringWithDefault(mArguments["imagingmode"], 0);
+	int imagingMode         = convertStringWithDefault(mArguments["imagingmode"], 0);
 	int acquisitionDataType = convertStringWithDefault(mArguments["datatype"], 0x00000004);
-  int bufferSize          = convertStringWithDefault(mArguments["buffersize"], 500);
+	int bufferSize          = convertStringWithDefault(mArguments["buffersize"], 500);
 
 
 
-  mSonixGrabber = vtkSonixVideoSource::New();
-  mSonixGrabber->SetSonixIP(ipaddress.toStdString().c_str());
-  mSonixGrabber->SetImagingMode(imagingMode);
-  mSonixGrabber->SetAcquisitionDataType(acquisitionDataType);
-  mSonixGrabber->SetFrameBufferSize(bufferSize);  // Number of image frames in buffer
-  mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
+	mSonixGrabber = vtkSonixVideoSource::New();
+	mSonixGrabber->SetSonixIP(ipaddress.toStdString().c_str());
+	mSonixGrabber->SetImagingMode(imagingMode);
+	mSonixGrabber->SetAcquisitionDataType(acquisitionDataType);
+	mSonixGrabber->SetFrameBufferSize(bufferSize);  // Number of image frames in buffer
+	mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
 
-  this->mSonixHelper = new SonixHelper;
-  mSonixGrabber->setSonixHelper(this->mSonixHelper);
-  connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
+	this->mSonixHelper = new SonixHelper;
+	mSonixGrabber->setSonixHelper(this->mSonixHelper);
+	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 
-  mSonixGrabber->Record();
-  std::cout << "Started streaming from sonix device" << std::endl;
+	mSonixGrabber->Record();
+	std::cout << "Started streaming from sonix device" << std::endl;
 }
 
 ImageSenderSonix::~ImageSenderSonix()
