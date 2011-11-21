@@ -19,7 +19,6 @@ VideoSourceSHM::VideoSourceSHM(int width, int height, int depth)
 	// this->setEmptyImage();
 	mImageImport->SetDataScalarTypeToUnsignedChar();
 	mImageImport->SetNumberOfScalarComponents(3);
-	this->setTestImage(width, height);
 
 	mConnected = false;
 	mStreaming = false;
@@ -185,34 +184,6 @@ void VideoSourceSHM::setEmptyImage()
 
 	mImageImport->SetImportVoidPointer(zeroData.begin());
 	mImageImport->Modified();
-}
-
-/**
-  * Sets a manually generated RGB test image.
-  */
-void VideoSourceSHM::setTestImage(int width, int height)
-{
-	mImageWidth = width;
-	mImageHeight = height;
-	mImageColorDepth = 24;
-
-	mImageImport->SetWholeExtent(0, width - 1, 0, height - 1, 0, 0);
-	mImageImport->SetDataExtentToWholeExtent();
-
-	unsigned char testData[width*height*3];
-
-	for (int y = 0; y < height; ++y)
-	for (int x = 0; x < width; ++x)
-	{
-		testData[(y*width+x)*3] = ((x*2) % 0xff);
-		testData[(y*width+x)*3+1] = ((x*2) % 0xff);
-		testData[(y*width+x)*3+2] = ((x*2) % 0xff);
-	}
-
-	mImageImport->CopyImportVoidPointer(testData, mImageWidth * mImageHeight* 3);
-	mImageImport->Modified();
-
-	emit newFrame();
 }
 
 /**

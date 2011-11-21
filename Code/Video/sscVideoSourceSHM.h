@@ -88,7 +88,6 @@ private:
 	QTimer*			mPollTimer;
 
 	void setEmptyImage();
-	void setTestImage(int width, int height);
 
 private slots:
 
