@@ -58,7 +58,7 @@ ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObj
 	qRegisterMetaType<Frame>("Frame");
 	
 	connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
-	connect(this, SIGNAL(statusOnQueue(int)), this, SLOT(sendOpenIGTLinkStatusSlot(int)), Qt::QueuedConnection);
+	connect(this, SIGNAL(statusOnQueue(int)), this, SLOT(sendOpenIGTLinkStatusSlot(int)), Qt::QueuedConnection);//Do not work yet
 
 	if (!mArguments.count("ipaddress"))
 		mArguments["ipaddress"] = "127.0.0.1";
@@ -193,8 +193,8 @@ void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
     IGTLinkSonixStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
     if(!message)
       break;
-    message->Pack();
-    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
+    //message->Pack();//Do not work yet
+    //mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
 /** Add the image message to a thread-safe queue
