@@ -54,8 +54,8 @@ void IGTLinkSonixStatusMessage::GetOrigin(double &oi, double &oj, double &ok)
 }
 
 
-
-int IGTLinkSonixStatusMessage::Pack()
+//May not need pack(), but we need PackBody(), UnPackBody() and GetBodyPackSize()
+/*int IGTLinkSonixStatusMessage::Pack()
 {
   PackBody();
   igtl::MessageBase::m_IsBodyUnpacked   = 0;
@@ -85,6 +85,6 @@ int IGTLinkSonixStatusMessage::Pack()
   igtl::MessageBase::m_IsHeaderUnpacked = 0;
 
   return 1;
-}
+}*/
 
 }//namespace cx
