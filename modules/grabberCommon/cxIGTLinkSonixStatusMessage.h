@@ -44,9 +44,14 @@ protected:
   IGTLinkSonixStatusMessage();
   ~IGTLinkSonixStatusMessage();
 
-  bool    mNewStatus;
+  virtual int  PackBody();
+  virtual int  UnpackBody();
+
   double  mDataOrigin[3];
-  double  mWidth;
+  bool    mNewStatus;
+//  double  mWidth;
+
+  unsigned char* m_StatusMessage; //All variables are inserted into this before sending
 
 private:
 };
