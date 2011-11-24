@@ -95,6 +95,10 @@ public:
 		{
 			mLutBuffer->allocate();
 		}
+		if (mVolumeBuffer)
+		{
+			mVolumeBuffer->updateTexture();
+		}
 	}
 	void eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader)
 	{
