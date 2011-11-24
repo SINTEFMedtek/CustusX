@@ -24,6 +24,7 @@ public:
 	 * Call this from inside a PrepareForRendering() methods in vtk.
 	 */
 	virtual void allocate() = 0;
+	virtual void updateTexture() = 0;
 	/**Activate and bind the volume and lut buffers inside the texture units
 	 * GL_TEXTURE<2X> and GL_TEXTURE<2X+1>.
 	 * Use during RenderInternal()

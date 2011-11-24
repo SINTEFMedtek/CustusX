@@ -75,16 +75,22 @@ public:
 
 		vtkgl::ActiveTexture(GL_TEXTURE7);
 
+		glEnable( vtkgl::TEXTURE_3D );
+		glGenTextures(1, &textureId);
+		glDisable(GL_TEXTURE_3D);
+		updateTexture();
+		mAllocated = true;
+	}
+	virtual void updateTexture()
+	{
+		//vtkgl::ActiveTexture(getGLTextureForVolume(textureUnitIndex)); //TODO is this OK?
 		GLenum size,internalType;
 		boost::uint32_t dimx = mTexture ->GetDimensions( )[0];
 		boost::uint32_t dimy = mTexture ->GetDimensions( )[1];
 		boost::uint32_t dimz = mTexture ->GetDimensions( )[2];
 
+
 		glEnable( vtkgl::TEXTURE_3D );
-		glGenTextures(1, &textureId);
-
-		//vtkgl::ActiveTexture(getGLTextureForVolume(textureUnitIndex)); //TODO is this OK?
-
 		glBindTexture(vtkgl::TEXTURE_3D, textureId);
 		glTexParameteri( vtkgl::TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP );
 		glTexParameteri( vtkgl::TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
@@ -128,11 +134,9 @@ public:
 			std::cout << "unsupported number of image components" << std::endl;
 		}
 
-		glBindTexture(GL_TEXTURE_3D, 0);
 		glDisable(GL_TEXTURE_3D);
 
 		report_gl_error();
-		mAllocated = true;
 	}
 
 	/**Activate and bind the volume and lut buffers inside the texture units
