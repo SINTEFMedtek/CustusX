@@ -37,10 +37,12 @@ public:
 	GLuint textureId;
 	vtkImageDataPtr mTexture;
 	bool mAllocated;
+	uint64_t mMTime;
 
 	GPUImageDataBufferImpl()
 	{
 		mAllocated = false;
+		mMTime = 0;
 	}
 	virtual ~GPUImageDataBufferImpl()
 	{
@@ -83,6 +85,11 @@ public:
 	}
 	virtual void updateTexture()
 	{
+		if (mMTime == mTexture->GetMTime())
+		{
+			return;
+		}
+		mMTime = mTexture->GetMTime();
 		//vtkgl::ActiveTexture(getGLTextureForVolume(textureUnitIndex)); //TODO is this OK?
 		GLenum size,internalType;
 		boost::uint32_t dimx = mTexture ->GetDimensions( )[0];
