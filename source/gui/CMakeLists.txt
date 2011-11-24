@@ -38,6 +38,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/cxTransferFunctionWidget.h
     dataWidgets/cxTransferFunctionAlphaWidget.h
     dataWidgets/cxTransferFunctionColorWidget.h
+    dataWidgets/sscDICOMWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
     infoWidgets/cxBrowserWidget.h
@@ -128,6 +129,8 @@ SET(cxGui_SRCS
     dataWidgets/cxImportDataDialog.cpp
     dataWidgets/cxDataViewSelectionWidget.h
     dataWidgets/cxDataViewSelectionWidget.cpp
+    dataWidgets/sscDICOMWidget.h
+    dataWidgets/sscDICOMWidget.cpp
     #----------------------
     infoWidgets/cxBrowserWidget.h
     infoWidgets/cxBrowserWidget.cpp
@@ -226,6 +229,8 @@ INCLUDE_DIRECTORIES(
 
 include_directories(
     .
+    ${SSC_SOURCE_DIR}/DICOMLib/
+
     ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
@@ -243,5 +248,5 @@ include_directories(
 
 
 ADD_LIBRARY ( cxGui ${cxGui_SRCS} ${cxGui_MOC_SRCS} )
-target_link_libraries(cxGui cxLogicManager cxStateService)
+target_link_libraries(cxGui cxLogicManager cxStateService DICOMLib)
 
