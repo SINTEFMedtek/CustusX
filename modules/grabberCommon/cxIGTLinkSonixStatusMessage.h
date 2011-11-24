@@ -36,9 +36,6 @@ public:
   void GetOrigin(double &oi, double &oj, double &ok);
 
 public:
-  // Pack() serializes the header and body based on the member variables.
-  // PackBody() must be implemented in the child class.
-  int Pack();
 
 protected:
   IGTLinkSonixStatusMessage();
@@ -48,8 +45,8 @@ protected:
   virtual int  PackBody();
   virtual int  UnpackBody();
 
-  double  mDataOrigin[3];
-  bool    mNewStatus;
+  double mDataOrigin[3];
+  int mNewStatus;
 //  double  mWidth;
 
   unsigned char* m_StatusMessage; //All variables are inserted into this before sending

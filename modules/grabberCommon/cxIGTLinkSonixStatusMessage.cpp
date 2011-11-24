@@ -14,7 +14,7 @@ namespace cx
 {
 IGTLinkSonixStatusMessage::IGTLinkSonixStatusMessage():
   igtl::MessageBase(),
-  mNewStatus(false)
+  mNewStatus(0)
 //  mWidth(0.0)
 {
 	AllocatePack();
@@ -72,7 +72,7 @@ int IGTLinkSonixStatusMessage::PackBody()
 	statusMessage->oi = static_cast<igtl_float64>(this->mDataOrigin[0]);
 	statusMessage->oj = static_cast<igtl_float64>(this->mDataOrigin[1]);
 	statusMessage->ok = static_cast<igtl_float64>(this->mDataOrigin[2]);
-	statusMessage->status = static_cast<igtl_uint8>(this->mNewStatus);
+	statusMessage->status = static_cast<igtl_uint16>(this->mNewStatus);
 
 	/*int originMemSpace = sizeof(igtl_float64)*3;
 	memcpy((*void)this->m_StatusMessage, (void*) mDataOrigin, originMemSpace);
@@ -103,7 +103,7 @@ int IGTLinkSonixStatusMessage::UnpackBody()
 	this->mDataOrigin[0] = statusMessage->oi;
 	this->mDataOrigin[1] = statusMessage->oj;
 	this->mDataOrigin[2] = statusMessage->ok;
-	this->mNewStatus = statusMessage->status;
+	this->mNewStatus = static_cast<int>(statusMessage->status);
 
 	return 1;
 }
