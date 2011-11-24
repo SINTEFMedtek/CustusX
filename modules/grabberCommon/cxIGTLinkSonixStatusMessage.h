@@ -44,6 +44,7 @@ protected:
   IGTLinkSonixStatusMessage();
   ~IGTLinkSonixStatusMessage();
 
+  virtual int  GetBodyPackSize();
   virtual int  PackBody();
   virtual int  UnpackBody();
 

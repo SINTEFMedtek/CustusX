@@ -84,6 +84,11 @@ int IGTLinkSonixStatusMessage::PackBody()
 	return 1;
 }
 
+int IGTLinkSonixStatusMessage::GetBodyPackSize()
+{
+	return IGTL_SONIX_STATUS_HEADER_SIZE;
+}
+
 int IGTLinkSonixStatusMessage::UnpackBody()
 {
 	m_StatusMessage = this->m_Body;
