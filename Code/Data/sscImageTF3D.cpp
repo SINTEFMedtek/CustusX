@@ -68,11 +68,11 @@ ImageTF3DPtr ImageTF3D::createCopy(vtkImageDataPtr newDataBase)
 {
 	ImageTF3DPtr retval(new ImageTF3D(newDataBase));
 	retval->deepCopy(this);
-	retval->setVtkImageData(newDataBase);//deepCopy also copies the data base
 	retval->mOpacityTF->DeepCopy(mOpacityTF);
 	retval->mColorTF->DeepCopy(mColorTF);
+	retval->setVtkImageData(newDataBase);//deepCopy also copies the data base
 
-	retval->transferFunctionsChangedSlot();
+//	retval->transferFunctionsChangedSlot();//Called through the setVtkImageData() above
 	return retval;
 }
 

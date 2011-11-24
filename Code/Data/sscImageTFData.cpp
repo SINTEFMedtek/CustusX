@@ -15,6 +15,7 @@
 #include <vtkImageData.h>
 
 #include "sscVector3D.h"
+#include "sscImageTF3D.h"
 
 namespace ssc
 {
@@ -40,6 +41,12 @@ ImageTFData::~ImageTFData()
 void ImageTFData::setVtkImageData(vtkImageDataPtr base)
 {
 	mBase = base;
+	emit changed();
+}
+
+vtkImageDataPtr ImageTFData::getVtkImageData()
+{
+	return mBase;
 }
 
 /**Return the maximum intensity value of the underlying dataset.
