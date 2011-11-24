@@ -25,7 +25,11 @@ int main(int argc, char* argv[])
   {
     std::cout << "Usage: " << argv[0] << " (--arg <argval>)*"    << std::endl;
     std::cout << "    --port   : Tcp/IP port # (default=18333)"   << std::endl;
+#ifdef WIN32
+    std::cout << "    --type   : Grabber type  (default=Sonix)"   << std::endl;
+#else
     std::cout << "    --type   : Grabber type  (default=OpenCV)"   << std::endl;
+#endif
     std::cout << std::endl;
     std::cout << "    Select one of the types below:"   << std::endl;
 

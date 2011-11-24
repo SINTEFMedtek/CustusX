@@ -8,14 +8,20 @@
 #include "cxIGTLinkSonixStatusMessage.h"
 #include "igtl_header.h"
 #include <string.h>
+#include "igtl_sonix_status.h"
 
 namespace cx
 {
 IGTLinkSonixStatusMessage::IGTLinkSonixStatusMessage():
   igtl::MessageBase(),
-  mNewStatus(false),
-  mWidth(0.0)
+  mNewStatus(0)
+//  mWidth(0.0)
 {
+	AllocatePack();
+	m_StatusMessage = m_Body;
+
+	m_StatusMessage = NULL;
+
   for (int i = 0; i < 3; i ++)
   {
     mDataOrigin[i] = 0.0;
@@ -53,9 +59,57 @@ void IGTLinkSonixStatusMessage::GetOrigin(double &oi, double &oj, double &ok)
   ok = mDataOrigin[2];
 }
 
+int IGTLinkSonixStatusMessage::PackBody()
+{
+	// Allocate pack
+	AllocatePack();
+	m_StatusMessage = this->m_Body;
 
+	// Set pointers
+	igtl_sonix_status_message* statusMessage = (igtl_sonix_status_message*)this->m_StatusMessage;
 
-int IGTLinkSonixStatusMessage::Pack()
+	//Copy data
+	statusMessage->oi = static_cast<igtl_float64>(this->mDataOrigin[0]);
+	statusMessage->oj = static_cast<igtl_float64>(this->mDataOrigin[1]);
+	statusMessage->ok = static_cast<igtl_float64>(this->mDataOrigin[2]);
+	statusMessage->status = static_cast<igtl_uint16>(this->mNewStatus);
+
+	/*int originMemSpace = sizeof(igtl_float64)*3;
+	memcpy((*void)this->m_StatusMessage, (void*) mDataOrigin, originMemSpace);
+	memcpy((*void)this->m_StatusMessage[originMemSpace], (void*) mNewStatus, sizeof(igtl_uint8));*/
+
+	// Convert byte order from host to network
+	igtl_sonix_status_convert_byte_order(statusMessage);
+
+	return 1;
+}
+
+int IGTLinkSonixStatusMessage::GetBodyPackSize()
+{
+	return IGTL_SONIX_STATUS_HEADER_SIZE;
+}
+
+int IGTLinkSonixStatusMessage::UnpackBody()
+{
+	m_StatusMessage = this->m_Body;
+
+	// Set pointers
+	igtl_sonix_status_message* statusMessage = (igtl_sonix_status_message*)this->m_StatusMessage;
+
+	// Convert byte order from network to host
+	igtl_sonix_status_convert_byte_order(statusMessage);
+
+	//Copy data
+	this->mDataOrigin[0] = statusMessage->oi;
+	this->mDataOrigin[1] = statusMessage->oj;
+	this->mDataOrigin[2] = statusMessage->ok;
+	this->mNewStatus = static_cast<int>(statusMessage->status);
+
+	return 1;
+}
+
+//May not need pack(), but we need PackBody(), UnPackBody() and GetBodyPackSize()
+/*int IGTLinkSonixStatusMessage::Pack()
 {
   PackBody();
   igtl::MessageBase::m_IsBodyUnpacked   = 0;
@@ -85,6 +139,6 @@ int IGTLinkSonixStatusMessage::Pack()
   igtl::MessageBase::m_IsHeaderUnpacked = 0;
 
   return 1;
-}
+}*/
 
 }//namespace cx
