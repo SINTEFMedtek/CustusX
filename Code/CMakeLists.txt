@@ -200,7 +200,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscViewportListener.cpp
     Utilities/sscSharedMemory.cpp
     Utilities/sscLogger.h
-    Utilities/sscLogger.cpp
+    #Utilities/sscLogger.cpp
     
     sscView.cpp
     sscView.h
