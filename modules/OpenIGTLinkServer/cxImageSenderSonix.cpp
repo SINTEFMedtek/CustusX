@@ -193,8 +193,8 @@ void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
     IGTLinkSonixStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
     if(!message)
       break;
-    //message->Pack();//Do not work yet
-    //mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
+    message->Pack();//Do not work yet
+    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
 /** Add the image message to a thread-safe queue
