@@ -20,6 +20,7 @@ private:
 	int mSize;
 	int mBuffers;
 	int mCurrentBuffer;
+	QDateTime mLastTimestamp;
 
 public:
 	SharedMemoryServer(QString key, int buffers, int sizeEach, QObject *parent = 0);
@@ -29,6 +30,14 @@ public:
 	QString key() { return mBuffer.key(); }
 	void *buffer();		///< Grab and lock a write buffer
 	void release();		///< Release our write buffer. Buffer will not be used before it is released.
+	/**
+	 * Return the timestamp of the last buffer written to
+	 */
+	QDateTime lastTimestamp() { return mLastTimestamp; }
+	/**
+	 * Return true if a write buffer is currently held, false otherwise
+	 */
+	bool hasBuffer() { return mCurrentBuffer != -1; }
 };
 
 class SharedMemoryClient

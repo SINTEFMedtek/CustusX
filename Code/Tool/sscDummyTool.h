@@ -18,11 +18,12 @@ typedef boost::shared_ptr<class QTimer> QTimerPtr;
  */
 namespace ssc
 {
+class ToolManager;
 class DummyTool : public Tool
 {
 	Q_OBJECT
 public:
-	explicit DummyTool(const QString& uid="dummytool");
+	explicit DummyTool(ToolManager *manager, const QString& uid="dummytool");
 	~DummyTool();
 	virtual Type getType() const;
 	virtual QString getGraphicsFileName() const;

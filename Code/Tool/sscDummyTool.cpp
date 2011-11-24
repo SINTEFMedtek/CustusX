@@ -18,7 +18,7 @@ namespace ssc
 
 int DummyTool::mTransformCount = 0;
 
-DummyTool::DummyTool(const QString& uid) :
+DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 	mVisible(false),
 	m_prMt(Transform3D::Identity()),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
@@ -35,7 +35,7 @@ DummyTool::DummyTool(const QString& uid) :
     mPolyData = this->createPolyData(150, 15, 4, 2);
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
-	connect(toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(manager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 DummyTool::~DummyTool()
