@@ -14,6 +14,7 @@
 #include "sscImageTFData.h"
 #include "sscMessageManager.h"
 #include "sscUtilHelpers.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {

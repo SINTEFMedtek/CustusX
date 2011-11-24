@@ -20,6 +20,8 @@ SET (cxVideoService_SOURCE
     cxOpenIGTLinkRTSource.cpp
     ../../../modules/grabberCommon/cxIGTLinkSonixStatusMessage.h
     ../../../modules/grabberCommon/cxIGTLinkSonixStatusMessage.cpp
+    ../../../modules/grabberCommon/igtl_sonix_status.h
+    ../../../modules/grabberCommon/igtl_sonix_status.c
 )
 
 include_directories(
