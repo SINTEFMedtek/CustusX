@@ -17,12 +17,15 @@ class QTimer;
 #include <QStringList>
 #include <QMetaType>
 #include <QMutex>
+#include <vtkSmartPointer.h>
 #include "cxImageSenderFactory.h"
 
 #include "../grabberCommon/cxIGTLinkImageMessage.h"
 #include "../grabberCommon/cxIGTLinkSonixStatusMessage.h"
 #include "vtkSonixVideoSource.h"
 #include "SonixHelper.h"
+
+typedef vtkSmartPointer<class vtkSonixVideoSource> vtkSonixVideoSourcePtr;
 
 namespace cx
 {
@@ -60,7 +63,7 @@ private:
   QTimer* mTimer;
   StringMap mArguments;
 
-  vtkSonixVideoSource*  mSonixGrabber; ///< Ultrasonix video grabber
+  vtkSonixVideoSourcePtr  mSonixGrabber; ///< Ultrasonix video grabber
   SonixHelper*          mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
 
 //  void dumpProperties();
