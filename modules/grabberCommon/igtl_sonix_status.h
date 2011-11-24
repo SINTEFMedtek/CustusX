@@ -12,7 +12,7 @@
 #include "igtl_types.h"
 #include "igtl_win32header.h"
 
-#define IGTL_SONIX_STATUS_HEADER_SIZE         25
+#define IGTL_SONIX_STATUS_HEADER_SIZE         28
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,7 +24,7 @@ typedef struct {
 	igtl_float64 oi;//Origin
 	igtl_float64 oj;//Origin
 	igtl_float64 ok;//Origin
-	igtl_uint8 status;// 0 = not changed, 1 = changed
+	igtl_uint16 status;// 0 = not changed, 1 = changed
 } igtl_sonix_status_message;
 
 #pragma pack()
