@@ -102,7 +102,7 @@ void VideoSourceSHM::stop()
 bool VideoSourceSHM::validData() const
 {
 	// return (isConnected() && isStreaming()); // Currently only check available
-	return true;
+	return isConnected();
 }
 
 bool VideoSourceSHM::isConnected() const
@@ -134,6 +134,7 @@ void VideoSourceSHM::update()
 	mImageImport->SetDataExtentToWholeExtent();
 
 	mImageImport->SetImportVoidPointer(buffer, mImageWidth * mImageHeight);
+	mImageImport->Update();
 
 	emit newFrame();
 }
@@ -150,6 +151,7 @@ void VideoSourceSHM::connectServer(const QString& key)
 	{
 		connect(mPollTimer, SIGNAL(timeout()), this, SLOT(serverPollSlot()));
 		mPollTimer->start();
+		serverPollSlot();
 	}
 }
 
