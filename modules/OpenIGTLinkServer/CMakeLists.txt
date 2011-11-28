@@ -100,6 +100,8 @@ SET ( cxOpenIGTLinkServer_FILES
     ../grabberCommon/cxIGTLinkSonixStatusMessage.cpp
     ../grabberCommon/cxIGTLinkImageMessage.h
     ../grabberCommon/cxIGTLinkImageMessage.cpp
+    ../grabberCommon/igtl_sonix_status.h
+    ../grabberCommon/igtl_sonix_status.c
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
