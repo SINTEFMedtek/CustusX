@@ -55,7 +55,8 @@ public:
   void SetOrigin(double oi, double oj, double ok);
   void GetOrigin(double o[3]);
   void GetOrigin(double &oi, double &oj, double &ok);
-  void GetRIO(double o[8]);
+  void SetROI(int ulx, int uly, int urx, int ury, int brx, int bry, int blx, int bly);
+  void GetROI(int o[8]);
 
 public:
 
