@@ -67,8 +67,8 @@ void ThresholdPreview::setPreview(QWidget* fromWidget, ssc::ImagePtr image, doub
   if (!mModifiedImage)
   {
     mModifiedImage = image;
-    mTF3D_original = image->getTransferFunctions3D()->createCopy();
-    mTF2D_original = image->getLookupTable2D()->createCopy();
+    mTF3D_original = image->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData());
+    mTF2D_original = image->getLookupTable2D()->createCopy(image->getBaseVtkImageData());
     mShadingOn_original = image->getShadingOn();
   }
   image->resetTransferFunctions();

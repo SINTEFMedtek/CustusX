@@ -69,7 +69,7 @@ void CustusXController::loadPatientSlot()
 
   ssc::DataManager::getInstance()->setCenter(bb_r.center());
 
-  ssc::DummyToolPtr dummyTool(new ssc::DummyTool());
+  ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
   dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
   cx::ToolManager::getInstance()->runDummyTool(dummyTool);
 }
