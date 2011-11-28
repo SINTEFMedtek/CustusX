@@ -430,6 +430,16 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 //  std::cout << "ulx: " << roi.ulx << " uly: " << roi.uly << " urx: "  << roi.urx << " ury: " << roi.ury << std::endl;
 //  std::cout << "blx: " << roi.blx << " bly: " << roi.bly << " brx: "  << roi.brx << " bry: " << roi.bry << std::endl;
 
+  //Copy ROI info
+  frame.ulx = roi.ulx;
+  frame.uly = roi.uly;
+  frame.urx = roi.urx;
+  frame.ury = roi.ury;
+  frame.brx = roi.brx;
+  frame.bry = roi.bry;
+  frame.blx = roi.blx;
+  frame.bly = roi.bly;
+
   // Test if the sonix status message is sent
   frame.mNewStatus = true;
 
