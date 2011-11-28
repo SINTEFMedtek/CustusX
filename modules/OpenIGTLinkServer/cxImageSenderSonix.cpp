@@ -38,7 +38,7 @@ QStringList ImageSenderSonix::getArgumentDescription()
 {
 	QStringList retval;
 	retval << "--ipaddress:   IP address to connect to, default=127.0.0.1 (localhost)";
-	retval << "--imagingmode: default=0 (0 = B-mode, 12 = RF mode)";
+	retval << "--imagingmode: default=0 (0 = B-mode, 2 = Colour, 6 = Dual, 12 = RF)";
 	retval << "--datatype: Video type, default=0x00000004 (4 = processed, 2 = unprocessed)";
 	retval << "--buffersize:  Grabber buffer size,   default=500";
 	retval << "--properties:  dump image properties";

@@ -27,6 +27,16 @@ IGTLinkSonixStatusMessage::IGTLinkSonixStatusMessage():
     mDataOrigin[i] = 0.0;
   }
 
+ 	mROI.ulx = 0;
+ 	mROI.uly = 0;
+ 	mROI.urx = 0;
+ 	mROI.ury = 0;
+ 	mROI.brx = 0;
+ 	mROI.bry = 0;
+ 	mROI.blx = 0;
+ 	mROI.bly = 0;
+
+
   m_DefaultBodyType  = "SONIX_STATUS";
 }
 
@@ -59,6 +69,18 @@ void IGTLinkSonixStatusMessage::GetOrigin(double &oi, double &oj, double &ok)
   ok = mDataOrigin[2];
 }
 
+void IGTLinkSonixStatusMessage::GetRIO(double o[8])
+{
+  o[0] = mROI.ulx;
+  o[1] = mROI.uly;
+  o[2] = mROI.urx;
+  o[3] = mROI.ury;
+  o[4] = mROI.brx;
+  o[5] = mROI.bry;
+  o[6] = mROI.blx;
+  o[7] = mROI.bly;
+}
+
 int IGTLinkSonixStatusMessage::PackBody()
 {
 	// Allocate pack
@@ -72,6 +94,16 @@ int IGTLinkSonixStatusMessage::PackBody()
 	statusMessage->oi = static_cast<igtl_float64>(this->mDataOrigin[0]);
 	statusMessage->oj = static_cast<igtl_float64>(this->mDataOrigin[1]);
 	statusMessage->ok = static_cast<igtl_float64>(this->mDataOrigin[2]);
+
+	statusMessage->ulx = static_cast<igtl_float64>(this->mROI.ulx);
+	statusMessage->uly = static_cast<igtl_float64>(this->mROI.uly);
+	statusMessage->urx = static_cast<igtl_float64>(this->mROI.urx);
+	statusMessage->ury = static_cast<igtl_float64>(this->mROI.ury);
+	statusMessage->brx = static_cast<igtl_float64>(this->mROI.brx);
+	statusMessage->bry = static_cast<igtl_float64>(this->mROI.bry);
+	statusMessage->blx = static_cast<igtl_float64>(this->mROI.blx);
+	statusMessage->bly = static_cast<igtl_float64>(this->mROI.bly);
+
 	statusMessage->status = static_cast<igtl_uint16>(this->mNewStatus);
 
 	/*int originMemSpace = sizeof(igtl_float64)*3;
@@ -103,6 +135,16 @@ int IGTLinkSonixStatusMessage::UnpackBody()
 	this->mDataOrigin[0] = statusMessage->oi;
 	this->mDataOrigin[1] = statusMessage->oj;
 	this->mDataOrigin[2] = statusMessage->ok;
+
+	this->mROI.ulx = statusMessage->ulx;
+	this->mROI.uly = statusMessage->uly;
+	this->mROI.urx = statusMessage->urx;
+	this->mROI.ury = statusMessage->ury;
+	this->mROI.brx = statusMessage->brx;
+	this->mROI.bry = statusMessage->bry;
+	this->mROI.blx = statusMessage->blx;
+	this->mROI.bly = statusMessage->bly;
+
 	this->mNewStatus = static_cast<int>(statusMessage->status);
 
 	return 1;

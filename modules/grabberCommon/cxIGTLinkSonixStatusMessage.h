@@ -11,6 +11,27 @@
 
 namespace cx
 {
+class ROI
+{
+public:
+    /// roi - upper left (x)
+    int ulx;
+    /// roi - upper left (y)
+    int uly;
+    /// roi - upper right (x)
+    int urx;
+    /// roi - upper right (y)
+    int ury;
+    /// roi - bottom right (x)
+    int brx;
+    /// roi - bottom right (y)
+    int bry;
+    /// roi - bottom left (x)
+    int blx;
+    /// roi - bottom left (y)
+    int bly;
+};
+
 /**
  * \class IGTLinkSonixStatusMessage
  *
@@ -34,6 +55,7 @@ public:
   void SetOrigin(double oi, double oj, double ok);
   void GetOrigin(double o[3]);
   void GetOrigin(double &oi, double &oj, double &ok);
+  void GetRIO(double o[8]);
 
 public:
 
@@ -46,6 +68,7 @@ protected:
   virtual int  UnpackBody();
 
   double mDataOrigin[3];
+  ROI mROI; //Ulterius Region of Interest
   int mNewStatus;
 //  double  mWidth;
 
