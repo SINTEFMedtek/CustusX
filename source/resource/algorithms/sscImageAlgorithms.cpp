@@ -29,6 +29,9 @@ namespace ssc
  */
 ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
 {
+	//TODO: fix error:
+	// There is an error in the transfer functions of the returned image from this function
+
   // provide a resampled volume for algorithms requiring that (such as PickerRep)
   vtkMatrix4x4Ptr orientatorMatrix = vtkMatrix4x4Ptr::New();
   vtkImageReslicePtr orientator = vtkImageReslicePtr::New();
@@ -59,8 +62,8 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
  */
 ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid, QString name)
 {
-  std::cout << "oldspacing: " << ssc::Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
-  std::cout << "spacing: " << spacing << std::endl;
+//  std::cout << "oldspacing: " << ssc::Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
+//  std::cout << "spacing: " << spacing << std::endl;
   vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
   resampler->SetInput(image->getBaseVtkImageData());
   resampler->SetAxisOutputSpacing(0, spacing[0]);
