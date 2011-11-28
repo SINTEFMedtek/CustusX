@@ -55,7 +55,7 @@ ssc::ImagePtr Resample::calculate()
     return ssc::ImagePtr();
 
   ssc::Transform3D refMi = mInputReference->get_rMd().inv() * mInput->get_rMd();
-  ssc::ImagePtr oriented = resampleImage(mInput, refMi);
+  ssc::ImagePtr oriented = resampleImage(mInput, refMi);//There is an error with the transfer functions in this image
 
   ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * mInputReference->get_rMd();
   ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, mInputReference->boundingBox());
