@@ -69,7 +69,18 @@ void IGTLinkSonixStatusMessage::GetOrigin(double &oi, double &oj, double &ok)
   ok = mDataOrigin[2];
 }
 
-void IGTLinkSonixStatusMessage::GetRIO(double o[8])
+void IGTLinkSonixStatusMessage::SetROI(int ulx, int uly, int urx, int ury, int brx, int bry, int blx, int bly)
+{
+	mROI.ulx = ulx;
+	mROI.uly = uly;
+	mROI.urx = urx;
+	mROI.ury = ury;
+	mROI.brx = brx;
+	mROI.bry = bry;
+	mROI.blx = blx;
+	mROI.bly = bly;
+}
+void IGTLinkSonixStatusMessage::GetROI(int o[8])
 {
   o[0] = mROI.ulx;
   o[1] = mROI.uly;

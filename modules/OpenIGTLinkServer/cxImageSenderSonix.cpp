@@ -128,6 +128,8 @@ IGTLinkSonixStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame
   //retval->SetOrigin(); //Origin is set in IGTLinkImageMessage
 //  retval->SetWidth();
 //  retval->SetType();
+
+  retval->SetROI(frame->ulx, frame->uly, frame->urx, frame->ury, frame->brx, frame->bry, frame->blx, frame->bly);
   return retval;
 }
 
