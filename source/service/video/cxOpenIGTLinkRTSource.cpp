@@ -384,8 +384,12 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 
 void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer message)
 {
-  std::cout << "void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer message)" << std::endl;
+  //std::cout << "void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer message)" << std::endl;
   //TODO: Use the status information
+
+  int roi[8];
+  message->GetROI(roi);
+  std::cout << "roi:" << roi[0] << " " << roi[1] << " " << roi[2] << " " << roi[3] << " " << roi[4] << " " << roi[5] << " " << roi[6] << " " << roi[7] << " ";
   std::cout <<"**********TODO***********" << std::endl;
 }
 
