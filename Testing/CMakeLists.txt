@@ -56,6 +56,7 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
     # - ssc::DataManager 
     add_executable(TestDataManager sscTestDataManager.cpp)
     target_link_libraries( TestDataManager SSC )	
+    set_target_properties(TestDataManager PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
     add_test(TestDataManager TestDataManager)
     
     # test rendering of a 3D volume 
@@ -63,16 +64,19 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
     # - ssc::VolumetricRep
     add_executable(TestVolumetricRep sscTestRenderVolumetricRep.cpp)
     target_link_libraries( TestVolumetricRep SSC )	
+    set_target_properties(TestVolumetricRep PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
     add_test(TestVolumetricRep TestVolumetricRep)
     
     # test adding a mesh to the datamanager.
     # - ssc::Mesh
     add_executable(TestMeshAndDataManager sscTestMeshAndDataManager.cpp)
     target_link_libraries( TestMeshAndDataManager SSC )	
+    set_target_properties(TestMeshAndDataManager PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
     add_test(TestMeshAndDataManager TestMeshAndDataManager)
     
     # currently disabled - CustusX uses it?
     add_executable(TestMeshDMGeoRepView MACOSX_BUNDLE sscTestMeshDMGeoRepView.cpp)
+    set_target_properties(TestMeshDMGeoRepView PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
     target_link_libraries( TestMeshDMGeoRepView SSC )	
     #add_test(TestMeshDMGeoRepView TestMeshDMGeoRepView)
     
@@ -112,6 +116,7 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
     
     # link all CppUnit tests to the cisstTestsMain library
     add_executable(testSSC_CppUnit_CTest ${SSC_TEST_SOURCE_FILES} )
+    set_target_properties(testSSC_CppUnit_CTest PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
     target_link_libraries(testSSC_CppUnit_CTest cisstTestsMain SSC ${CPPUNIT_LIBRARIES})
     # Generate a CTest list of tests
     CISST_ADD_TESTS(testSSC_CppUnit_CTest)
