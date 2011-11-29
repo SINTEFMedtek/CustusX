@@ -25,7 +25,7 @@ http://www.cisst.org/cisst/license.txt.
 #include <cppunit/extensions/RepeatedTest.h>
 #include <cppunit/ui/text/TestRunner.h>
 
-#include <QApplication>
+#include <QCoreApplication>
 
 #include <string>
 #include <list>
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 
     if (testParameters.GetTestRunMode() == cisstTestParameters::RUN_TESTS) {
     	
-    	QApplication app(argc, argv); /// added by sonowand - needed to run Qt Code.
+    	QCoreApplication app(argc, argv); /// added by sonowand - needed to run Qt Code.
     	
         CppUnit::RepeatedTest * repeatedTest =
             new CppUnit::RepeatedTest(allTests, testParameters.GetNumIterations());
