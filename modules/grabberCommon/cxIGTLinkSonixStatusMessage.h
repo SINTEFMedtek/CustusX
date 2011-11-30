@@ -11,7 +11,17 @@
 
 namespace cx
 {
-class ROI
+
+// Good idea? Problems? Use a class with access functions instead to give the same functionality?
+// It may be possible to use union to allow both array and name access to the values:
+/*union ROI_t
+{
+	ROIArray array;//struct with array: int a[8]
+	ROINames names;//struct with names: ulx, uly, ...
+} ROI;*/
+
+
+class ROI //ROINames
 {
 public:
     /// roi - upper left (x)

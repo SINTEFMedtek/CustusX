@@ -26,6 +26,9 @@
 #include "sscMessageManager.h"
 #include "sscTime.h"
 #include "sscVector3D.h"
+#include "sscProbeData.h"
+#include "sscToolManager.h"
+#include "cxTool.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -390,7 +393,47 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
   int roi[8];
   message->GetROI(roi);
   std::cout << "roi:" << roi[0] << " " << roi[1] << " " << roi[2] << " " << roi[3] << " " << roi[4] << " " << roi[5] << " " << roi[6] << " " << roi[7] << " ";
-  std::cout <<"**********TODO***********" << std::endl;
+//  std::cout <<"**********TODO***********" << std::endl;
+
+  ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+  if (!tool || tool->getProbeSector().mType==ssc::ProbeData::tNONE)
+  {
+    ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool is not a probe");
+  	return;
+  }
+  ssc::ProbeData probeSector = tool->getProbeSector();
+
+  //Test if x and y values are matching that of a linear probe
+  //x					left									right
+  if ((roi[0] != roi[6]) && (roi[2] != roi[4]) &&
+  //y					top										bottom
+  		(roi[1] != roi[3]) && (roi[5] != roi[7]) )
+  {
+    ssc::messageManager()->sendWarning("ROI x/y values not matching that of a linear probe");
+
+    //TODO: Calculate depthStart, depthEnd and width from the ROI x/y points or send more parameters: uCurce (Ulterius curve definition)
+    //  probeSector = ssc::ProbeData(ssc::ProbeData::tSECTOR, depthStart, depthEnd, width);
+  } else // Linear probe
+  {
+  	int depthStart = roi[1];
+  	int depthEnd = roi[5];
+  	int width = roi[2] - roi[0];
+//  	probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
+  	probeSector.mDepthStart = depthStart;
+  	probeSector.mDepthEnd = depthEnd;
+  	probeSector.mWidth = width;
+  }
+
+  //TODO:
+  	/*ssc::ProbeData::ProbeImageData imageData;
+    imageData.mSpacing = ssc::Vector3D(config.mPixelWidth, config.mPixelHeight, 1);
+    imageData.mSize = QSize(config.mImageWidth, config.mImageHeight);
+    imageData.mOrigin_p = ssc::Vector3D(config.mOriginCol, config.mOriginRow, 0);
+    imageData.mClipRect_p = ssc::DoubleBoundingBox3D(config.mLeftEdge,config.mRightEdge,config.mTopEdge,config.mBottomEdge,0,0);
+
+    probeSector.mImage = imageData;
+    probeSector.mTemporalCalibration = config.mTemporalCalibration;*/
+
 }
 
 void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
