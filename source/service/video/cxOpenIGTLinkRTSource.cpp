@@ -383,6 +383,13 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   mImageImport->SetImportVoidPointer(mImageMessage->GetScalarPointer());
 
   mImageImport->Modified();
+
+  //Update probe sector parameters
+  ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+  if (!tool || tool->getProbeSector().mType==ssc::ProbeData::tNONE)
+    ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateImageImportFromIGTMessage: Dominant tool is not a probe");
+  ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
+  probe->changeProbeSectorSize(size[0], size[1]);
 }
 
 
@@ -393,7 +400,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
 
   int roi[8];
   message->GetROI(roi);
-  std::cout << "roi:" << roi[0] << " " << roi[1] << " " << roi[2] << " " << roi[3] << " " << roi[4] << " " << roi[5] << " " << roi[6] << " " << roi[7] << " ";
+//  std::cout << "roi:" << roi[0] << " " << roi[1] << " " << roi[2] << " " << roi[3] << " " << roi[4] << " " << roi[5] << " " << roi[6] << " " << roi[7] << " ";
 //  std::cout <<"**********TODO***********" << std::endl;
 
   ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
@@ -405,6 +412,9 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
   ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
 
 //  ssc::ProbeData probeSector = tool->getProbeSector();
+
+  double spacing[3]; // spacing (mm/pixel)
+  mImageImport->GetDataSpacing(spacing);
 
   //Test if x and y values are matching that of a linear probe
   //x					left									right
@@ -423,14 +433,14 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
   {
   	if (probe->getData().mType!=ssc::ProbeData::tLINEAR)
       ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Probe not linear, but ROI is from linear probe");
-  	int depthStart = roi[1];
-  	int depthEnd = roi[5];
-  	int width = roi[2] - roi[0];
+  	int depthStart = roi[1];// in pixels
+  	int depthEnd = roi[5];// in pixels
+  	int width = roi[2] - roi[0];// in pixels
 //  	probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
 //  	probeSector.mDepthStart = depthStart;
 //  	probeSector.mDepthEnd = depthEnd;
 //  	probeSector.mWidth = width;
-  	probe->changeProbeSectorParameters(depthStart, depthEnd, width);
+  	probe->changeProbeSectorParameters(depthStart*spacing[1], depthEnd*spacing[1], width*spacing[0]);
   }
 
   //TODO:
