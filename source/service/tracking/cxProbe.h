@@ -41,6 +41,7 @@ public:
   // non-inherited methods
   void setRTSource(ssc::VideoSourcePtr source);
   ProbeXmlConfigParser::Configuration getConfiguration() const;
+  void changeProbeSectorParameters(double depthStart, double depthEnd, double width); ///Update probe sector parameters
 
 private:
   Probe(QString instrumentUid, QString scannerUid);

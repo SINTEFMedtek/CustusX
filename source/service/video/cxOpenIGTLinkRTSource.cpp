@@ -29,6 +29,7 @@
 #include "sscProbeData.h"
 #include "sscToolManager.h"
 #include "cxTool.h"
+#include "cxProbe.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -401,7 +402,9 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
     ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool is not a probe");
   	return;
   }
-  ssc::ProbeData probeSector = tool->getProbeSector();
+  ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
+
+//  ssc::ProbeData probeSector = tool->getProbeSector();
 
   //Test if x and y values are matching that of a linear probe
   //x					left									right
@@ -411,17 +414,23 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
   {
     ssc::messageManager()->sendWarning("ROI x/y values not matching that of a linear probe");
 
+  	if (probe->getData().mType!=ssc::ProbeData::tSECTOR)
+      ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Probe not sector probe, but ROI is from sector probe");
+
     //TODO: Calculate depthStart, depthEnd and width from the ROI x/y points or send more parameters: uCurce (Ulterius curve definition)
     //  probeSector = ssc::ProbeData(ssc::ProbeData::tSECTOR, depthStart, depthEnd, width);
   } else // Linear probe
   {
+  	if (probe->getData().mType!=ssc::ProbeData::tLINEAR)
+      ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Probe not linear, but ROI is from linear probe");
   	int depthStart = roi[1];
   	int depthEnd = roi[5];
   	int width = roi[2] - roi[0];
 //  	probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
-  	probeSector.mDepthStart = depthStart;
-  	probeSector.mDepthEnd = depthEnd;
-  	probeSector.mWidth = width;
+//  	probeSector.mDepthStart = depthStart;
+//  	probeSector.mDepthEnd = depthEnd;
+//  	probeSector.mWidth = width;
+  	probe->changeProbeSectorParameters(depthStart, depthEnd, width);
   }
 
   //TODO:
