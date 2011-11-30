@@ -206,4 +206,10 @@ void Probe::changeProbeSectorSize(int width, int height)
   mData.mImage.mSize.setHeight(height);
   emit sectorChanged();
 }
+void Probe::changeProbeSectorOrigin(ssc::Vector3D origin)
+{
+	mData.mImage.mOrigin_p = origin;
+  emit sectorChanged();
+}
+
 } //namespace cx

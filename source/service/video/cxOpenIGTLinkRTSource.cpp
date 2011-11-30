@@ -308,6 +308,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   int svsize[3]; // sub-volume size
   int svoffset[3]; // sub-volume offset
   int scalarType; // scalar type
+  float origin[3];
 
   // Note: subvolumes is not supported. Implement when needed.
 
@@ -315,6 +316,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   message->GetDimensions(size);
   message->GetSpacing(spacing);
   message->GetSubVolume(svsize, svoffset);
+  message->GetOrigin(origin);
   mDeviceName = message->GetDeviceName();
 //  std::cout << "size : " << ssc::Vector3D(size[0], size[1], size[2]) << std::endl;
 
@@ -390,6 +392,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
     ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateImageImportFromIGTMessage: Dominant tool is not a probe");
   ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
   probe->changeProbeSectorSize(size[0], size[1]);
+  probe->changeProbeSectorOrigin(ssc::Vector3D(origin[0], origin[1], 0));
 }
 
 
@@ -437,10 +440,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
   	int depthEnd = roi[5];// in pixels
   	int width = roi[2] - roi[0];// in pixels
 //  	probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
-//  	probeSector.mDepthStart = depthStart;
-//  	probeSector.mDepthEnd = depthEnd;
-//  	probeSector.mWidth = width;
-  	probe->changeProbeSectorParameters(depthStart*spacing[1], depthEnd*spacing[1], width*spacing[0]);
+  	probe->changeProbeSectorParameters(depthStart*spacing[1], depthEnd*spacing[1], width*spacing[0]);//mm
   }
 
   //TODO:
