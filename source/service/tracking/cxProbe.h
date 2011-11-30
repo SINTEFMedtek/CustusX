@@ -42,6 +42,7 @@ public:
   void setRTSource(ssc::VideoSourcePtr source);
   ProbeXmlConfigParser::Configuration getConfiguration() const;
   void changeProbeSectorParameters(double depthStart, double depthEnd, double width); ///Update probe sector parameters
+  void changeProbeSectorSize(int width, int height); ///Update probe sector parameters
 
 private:
   Probe(QString instrumentUid, QString scannerUid);
