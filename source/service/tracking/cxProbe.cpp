@@ -200,4 +200,10 @@ void Probe::changeProbeSectorParameters(double depthStart, double depthEnd, doub
   emit sectorChanged();
 }
 
+void Probe::changeProbeSectorSize(int width, int height)
+{
+  mData.mImage.mSize.setWidth(width);
+  mData.mImage.mSize.setHeight(height);
+  emit sectorChanged();
+}
 } //namespace cx
