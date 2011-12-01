@@ -192,6 +192,24 @@ QString Probe::getInstrumentScannerId() const
   return mScannerUid;
 }
 
+void Probe::changeProbeSectorParameters(double depthStart, double depthEnd, double width)
+{
+	mData.mDepthStart = depthStart;
+	mData.mDepthEnd = depthEnd;
+	mData.mWidth = width;
+  emit sectorChanged();
+}
 
+void Probe::changeProbeSectorSize(int width, int height)
+{
+  mData.mImage.mSize.setWidth(width);
+  mData.mImage.mSize.setHeight(height);
+  emit sectorChanged();
+}
+void Probe::changeProbeSectorOrigin(ssc::Vector3D origin)
+{
+	mData.mImage.mOrigin_p = origin;
+  emit sectorChanged();
+}
 
 } //namespace cx
