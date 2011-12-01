@@ -186,7 +186,7 @@ void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
 }
 void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
 {
-  std::cout << "ImageSenderSonix::sendOpenIGTLinkStatusSlot" << std::endl;
+  //std::cout << "ImageSenderSonix::sendOpenIGTLinkStatusSlot" << std::endl;
   if(mSocket->bytesToWrite() > mMaxBufferSize)
     return;
 
@@ -195,7 +195,7 @@ void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
     IGTLinkSonixStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
     if(!message)
       break;
-    message->Pack();//Do not work yet
+    message->Pack();
     mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
