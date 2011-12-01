@@ -29,6 +29,7 @@
 #include "sscProbeData.h"
 #include "sscToolManager.h"
 #include "cxTool.h"
+#include "cxProbe.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -307,6 +308,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   int svsize[3]; // sub-volume size
   int svoffset[3]; // sub-volume offset
   int scalarType; // scalar type
+  float origin[3];
 
   // Note: subvolumes is not supported. Implement when needed.
 
@@ -314,6 +316,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   message->GetDimensions(size);
   message->GetSpacing(spacing);
   message->GetSubVolume(svsize, svoffset);
+  message->GetOrigin(origin);
   mDeviceName = message->GetDeviceName();
 //  std::cout << "size : " << ssc::Vector3D(size[0], size[1], size[2]) << std::endl;
 
@@ -382,6 +385,14 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   mImageImport->SetImportVoidPointer(mImageMessage->GetScalarPointer());
 
   mImageImport->Modified();
+
+  //Update probe sector parameters
+  ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+  if (!tool || tool->getProbeSector().mType==ssc::ProbeData::tNONE)
+    ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateImageImportFromIGTMessage: Dominant tool is not a probe");
+  ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
+  probe->changeProbeSectorSize(size[0], size[1]);
+  probe->changeProbeSectorOrigin(ssc::Vector3D(origin[0], origin[1], 0));
 }
 
 
@@ -392,7 +403,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
 
   int roi[8];
   message->GetROI(roi);
-  std::cout << "roi:" << roi[0] << " " << roi[1] << " " << roi[2] << " " << roi[3] << " " << roi[4] << " " << roi[5] << " " << roi[6] << " " << roi[7] << " ";
+//  std::cout << "roi:" << roi[0] << " " << roi[1] << " " << roi[2] << " " << roi[3] << " " << roi[4] << " " << roi[5] << " " << roi[6] << " " << roi[7] << " ";
 //  std::cout <<"**********TODO***********" << std::endl;
 
   ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
@@ -401,7 +412,12 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
     ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool is not a probe");
   	return;
   }
-  ssc::ProbeData probeSector = tool->getProbeSector();
+  ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
+
+//  ssc::ProbeData probeSector = tool->getProbeSector();
+
+  double spacing[3]; // spacing (mm/pixel)
+  mImageImport->GetDataSpacing(spacing);
 
   //Test if x and y values are matching that of a linear probe
   //x					left									right
@@ -411,17 +427,20 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
   {
     ssc::messageManager()->sendWarning("ROI x/y values not matching that of a linear probe");
 
+  	if (probe->getData().mType!=ssc::ProbeData::tSECTOR)
+      ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Probe not sector probe, but ROI is from sector probe");
+
     //TODO: Calculate depthStart, depthEnd and width from the ROI x/y points or send more parameters: uCurce (Ulterius curve definition)
     //  probeSector = ssc::ProbeData(ssc::ProbeData::tSECTOR, depthStart, depthEnd, width);
   } else // Linear probe
   {
-  	int depthStart = roi[1];
-  	int depthEnd = roi[5];
-  	int width = roi[2] - roi[0];
+  	if (probe->getData().mType!=ssc::ProbeData::tLINEAR)
+      ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Probe not linear, but ROI is from linear probe");
+  	int depthStart = roi[1];// in pixels
+  	int depthEnd = roi[5];// in pixels
+  	int width = roi[2] - roi[0];// in pixels
 //  	probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
-  	probeSector.mDepthStart = depthStart;
-  	probeSector.mDepthEnd = depthEnd;
-  	probeSector.mWidth = width;
+  	probe->changeProbeSectorParameters(depthStart*spacing[1], depthEnd*spacing[1], width*spacing[0]);//mm
   }
 
   //TODO:
