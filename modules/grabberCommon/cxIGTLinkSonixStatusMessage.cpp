@@ -25,6 +25,7 @@ IGTLinkSonixStatusMessage::IGTLinkSonixStatusMessage():
   for (int i = 0; i < 3; i ++)
   {
     mDataOrigin[i] = 0.0;
+    mDataSpacing[i] = 0.0;
   }
 
  	mROI.ulx = 0;
@@ -68,7 +69,18 @@ void IGTLinkSonixStatusMessage::GetOrigin(double &oi, double &oj, double &ok)
   oj = mDataOrigin[1];
   ok = mDataOrigin[2];
 }
-
+void IGTLinkSonixStatusMessage::SetSpacing(double si, double sj, double sk)
+{
+  mDataSpacing[0] = si;
+  mDataSpacing[1] = sj;
+  mDataSpacing[2] = sk;
+}
+void IGTLinkSonixStatusMessage::GetSpacing(double s[3])
+{
+  s[0] = mDataSpacing[0];
+  s[1] = mDataSpacing[1];
+  s[2] = mDataSpacing[2];
+}
 void IGTLinkSonixStatusMessage::SetROI(int ulx, int uly, int urx, int ury, int brx, int bry, int blx, int bly)
 {
 	mROI.ulx = ulx;
@@ -102,6 +114,10 @@ int IGTLinkSonixStatusMessage::PackBody()
 	igtl_sonix_status_message* statusMessage = (igtl_sonix_status_message*)this->m_StatusMessage;
 
 	//Copy data
+	statusMessage->spacingX = static_cast<igtl_float64>(this->mDataSpacing[0]);
+	statusMessage->spacingY = static_cast<igtl_float64>(this->mDataSpacing[1]);
+	statusMessage->spacingZ = static_cast<igtl_float64>(this->mDataSpacing[2]);
+
 	statusMessage->oi = static_cast<igtl_float32>(this->mDataOrigin[0]);
 	statusMessage->oj = static_cast<igtl_float32>(this->mDataOrigin[1]);
 	statusMessage->ok = static_cast<igtl_float32>(this->mDataOrigin[2]);
@@ -143,6 +159,10 @@ int IGTLinkSonixStatusMessage::UnpackBody()
 	igtl_sonix_status_convert_byte_order(statusMessage);
 
 	//Copy data
+	this->mDataSpacing[0] = statusMessage->spacingX;
+	this->mDataSpacing[1] = statusMessage->spacingY;
+	this->mDataSpacing[2] = statusMessage->spacingZ;
+
 	this->mDataOrigin[0] = statusMessage->oi;
 	this->mDataOrigin[1] = statusMessage->oj;
 	this->mDataOrigin[2] = statusMessage->ok;

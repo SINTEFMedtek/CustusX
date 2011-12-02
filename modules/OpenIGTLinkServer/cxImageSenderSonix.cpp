@@ -130,6 +130,7 @@ IGTLinkSonixStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame
 //  retval->SetType();
 
   retval->SetROI(frame.ulx, frame.uly, frame.urx, frame.ury, frame.brx, frame.bry, frame.blx, frame.bly);
+  retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   return retval;
 }
 
