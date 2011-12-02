@@ -417,7 +417,8 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
 //  ssc::ProbeData probeSector = tool->getProbeSector();
 
   double spacing[3]; // spacing (mm/pixel)
-  mImageImport->GetDataSpacing(spacing);
+//  mImageImport->GetDataSpacing(spacing);
+  message->GetSpacing(spacing);//Use spacing from message
 
   //Test if x and y values are matching that of a linear probe
   //x					left									right
