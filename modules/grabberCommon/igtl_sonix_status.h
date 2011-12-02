@@ -21,6 +21,9 @@ extern "C" {
 #pragma pack(1)     /* For 1-byte boundary in memroy */
 
 typedef struct {
+	igtl_float64 spacingX;
+	igtl_float64 spacingY;
+	igtl_float64 spacingZ;
 	igtl_float32 oi;//Origin
 	igtl_float32 oj;//Origin
 	igtl_float32 ok;//Origin
