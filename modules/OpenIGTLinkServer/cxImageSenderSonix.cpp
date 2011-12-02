@@ -146,6 +146,7 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
   retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);
   //std::cout << "Frame spacing: " << frame.mSpacing[0] << " " << frame.mSpacing[1] << std::endl;
+  std::cout << "set Frame origin: " << frame.mOrigin[0] << " " << frame.mOrigin[1] << std::endl;
   retval->SetScalarType(frame.mPixelFormat); //Use frame.mPixelFormat directly
   retval->SetDeviceName("ImageSenderSonix"); // TODO write something useful here
   retval->SetSubVolume(size,offset);
