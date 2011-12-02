@@ -13,7 +13,7 @@ public:
   int mPixelFormat; ///< Pixel format in OSType (FourCC)
   unsigned char* mFirstPixel; ///< Pointer to first pixel in frame
   double mSpacing[2];
-  double mOrigin[2];
+  float mOrigin[2];
   int ulx;
   int uly;
   int urx;
