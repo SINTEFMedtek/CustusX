@@ -78,7 +78,7 @@ protected:
   virtual int  PackBody();
   virtual int  UnpackBody();
 
-  double mDataOrigin[3];
+  float mDataOrigin[3];
   ROI mROI; //Ulterius Region of Interest
   int mNewStatus;
 //  double  mWidth;
