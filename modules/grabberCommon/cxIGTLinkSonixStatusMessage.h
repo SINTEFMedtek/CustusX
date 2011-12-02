@@ -65,6 +65,8 @@ public:
   void SetOrigin(double oi, double oj, double ok);
   void GetOrigin(double o[3]);
   void GetOrigin(double &oi, double &oj, double &ok);
+  void SetSpacing(double si, double sj, double sk);
+  void GetSpacing(double s[3]);
   void SetROI(int ulx, int uly, int urx, int ury, int brx, int bry, int blx, int bly);
   void GetROI(int o[8]);
 
@@ -79,6 +81,7 @@ protected:
   virtual int  UnpackBody();
 
   float mDataOrigin[3];
+  double mDataSpacing[3];
   ROI mROI; //Ulterius Region of Interest
   int mNewStatus;
 //  double  mWidth;
