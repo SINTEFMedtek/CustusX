@@ -102,9 +102,9 @@ int IGTLinkSonixStatusMessage::PackBody()
 	igtl_sonix_status_message* statusMessage = (igtl_sonix_status_message*)this->m_StatusMessage;
 
 	//Copy data
-	statusMessage->oi = static_cast<igtl_float64>(this->mDataOrigin[0]);
-	statusMessage->oj = static_cast<igtl_float64>(this->mDataOrigin[1]);
-	statusMessage->ok = static_cast<igtl_float64>(this->mDataOrigin[2]);
+	statusMessage->oi = static_cast<igtl_float32>(this->mDataOrigin[0]);
+	statusMessage->oj = static_cast<igtl_float32>(this->mDataOrigin[1]);
+	statusMessage->ok = static_cast<igtl_float32>(this->mDataOrigin[2]);
 
 	statusMessage->ulx = static_cast<igtl_float64>(this->mROI.ulx);
 	statusMessage->uly = static_cast<igtl_float64>(this->mROI.uly);
