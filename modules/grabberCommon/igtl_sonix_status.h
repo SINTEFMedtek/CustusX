@@ -12,7 +12,7 @@
 #include "igtl_types.h"
 #include "igtl_win32header.h"
 
-#define IGTL_SONIX_STATUS_HEADER_SIZE        46 // 4*3 + 4*8 + 2
+#define IGTL_SONIX_STATUS_HEADER_SIZE        70 // 8*3 + 4*3 + 4*8 + 2
 
 #ifdef __cplusplus
 extern "C" {
