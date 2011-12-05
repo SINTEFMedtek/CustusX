@@ -63,7 +63,7 @@ public:
 
   void SetOrigin(double o[3]);
   void SetOrigin(double oi, double oj, double ok);
-  void GetOrigin(double o[3]);
+  void GetOrigin(float o[3]);
   void GetOrigin(double &oi, double &oj, double &ok);
   void SetSpacing(double si, double sj, double sk);
   void GetSpacing(double s[3]);
