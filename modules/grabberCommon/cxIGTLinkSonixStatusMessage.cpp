@@ -122,14 +122,14 @@ int IGTLinkSonixStatusMessage::PackBody()
 	statusMessage->oj = static_cast<igtl_float32>(this->mDataOrigin[1]);
 	statusMessage->ok = static_cast<igtl_float32>(this->mDataOrigin[2]);
 
-	statusMessage->ulx = static_cast<igtl_float64>(this->mROI.ulx);
-	statusMessage->uly = static_cast<igtl_float64>(this->mROI.uly);
-	statusMessage->urx = static_cast<igtl_float64>(this->mROI.urx);
-	statusMessage->ury = static_cast<igtl_float64>(this->mROI.ury);
-	statusMessage->brx = static_cast<igtl_float64>(this->mROI.brx);
-	statusMessage->bry = static_cast<igtl_float64>(this->mROI.bry);
-	statusMessage->blx = static_cast<igtl_float64>(this->mROI.blx);
-	statusMessage->bly = static_cast<igtl_float64>(this->mROI.bly);
+	statusMessage->ulx = static_cast<igtl_int32>(this->mROI.ulx);
+	statusMessage->uly = static_cast<igtl_int32>(this->mROI.uly);
+	statusMessage->urx = static_cast<igtl_int32>(this->mROI.urx);
+	statusMessage->ury = static_cast<igtl_int32>(this->mROI.ury);
+	statusMessage->brx = static_cast<igtl_int32>(this->mROI.brx);
+	statusMessage->bry = static_cast<igtl_int32>(this->mROI.bry);
+	statusMessage->blx = static_cast<igtl_int32>(this->mROI.blx);
+	statusMessage->bly = static_cast<igtl_int32>(this->mROI.bly);
 
 	statusMessage->status = static_cast<igtl_uint16>(this->mNewStatus);
 
