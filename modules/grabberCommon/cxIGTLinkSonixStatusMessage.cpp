@@ -57,7 +57,7 @@ void IGTLinkSonixStatusMessage::SetOrigin(double oi, double oj, double ok)
   mDataOrigin[1] = oj;
   mDataOrigin[2] = ok;
 }
-void IGTLinkSonixStatusMessage::GetOrigin(double o[3])
+void IGTLinkSonixStatusMessage::GetOrigin(float  o[3])
 {
   o[0] = mDataOrigin[0];
   o[1] = mDataOrigin[1];
