@@ -104,6 +104,9 @@ void ImageSenderSonix::receiveFrameSlot(Frame& frame)
   if (frame.mNewStatus)
   {
     IGTLinkSonixStatusMessage::Pointer statMsg = getFrameStatus(frame);
+	//double spacing[3];
+	//statMsg->GetSpacing(spacing);
+	//std::cout << "Spacing3: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
     this->addStatusMessageToQueue(statMsg);
     // Pack (serialize) and send
 //    statMsg->Pack();
@@ -131,6 +134,12 @@ IGTLinkSonixStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame
 
   retval->SetROI(frame.ulx, frame.uly, frame.urx, frame.ury, frame.brx, frame.bry, frame.blx, frame.bly);
   retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
+  //std::cout << "Spacing: " << frame.mSpacing[0] << ", " << frame.mSpacing[1] << std::endl;
+
+  //double spacing[3];
+  //retval->GetSpacing(spacing);
+  //std::cout << "Spacing2: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
+  retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);
   return retval;
 }
 
@@ -172,7 +181,13 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
   //float origin[3];
   //retval->GetOrigin(origin);
   //std::cout << "origin3: " << origin[0] << " " << origin[1] << " " << origin[2] << " " << std::endl;
+  //float spacing[3];
+  //retval->GetSpacing(spacing);
+  //std::cout << "spacing: " << spacing[0] << " " << spacing[1] << " " << spacing[2] << " " << std::endl;
 
+  //int dimensions[3];
+  //retval->GetDimensions(dimensions);
+  //std::cout << "dimensions: " << dimensions[0] << " " << dimensions[1] << " " << dimensions[2] << " " << std::endl;
   return retval;
 }
 void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
