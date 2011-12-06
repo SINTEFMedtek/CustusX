@@ -18,7 +18,7 @@ void igtl_export igtl_sonix_status_convert_byte_order(igtl_sonix_status_message 
 	{
 		int i;
 		for (i = 0; i < 3; i++)//Update number when adding more variables to message
-			tmp64[i] = BYTE_SWAP_INT32(tmp64[i]);
+			tmp64[i] = BYTE_SWAP_INT64(tmp64[i]);
 
 		for (i = 0; i < 11; i ++)
 			tmp32[6 + i] = BYTE_SWAP_INT32(tmp32[6 + i]);//3*64 bit adressed as 32 bit = 6
