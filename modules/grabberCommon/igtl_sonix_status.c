@@ -10,7 +10,7 @@
 
 void igtl_export igtl_sonix_status_convert_byte_order(igtl_sonix_status_message * message)
 {
-	igtl_uint64* tmp64 = (igtl_uint64*)message;
+	igtl_int64* tmp64 = (igtl_int64*)message;
 	igtl_int32* tmp32 = (igtl_int32*)message;
 	igtl_uint16* tmp16 = (igtl_uint16*)message;
 
