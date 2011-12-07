@@ -63,7 +63,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include "ulterius.h"
 #include "ulterius_def.h"
-//#include "utx_imaging_modes.h"
 #include "ImagingModes.h"
 
 #ifdef _MSC_VER
@@ -160,6 +159,9 @@ vtkSonixVideoSource::vtkSonixVideoSource()
   this->mSonixHelper = NULL;
   lastFrameNum = 0;
   totalMissedFrames = 0;
+
+  lastRoiUlx = 0;
+  lastRoiBry = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -416,6 +418,8 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   frame.mSpacing[1] = this->DataSpacing[1];
   frame.mOrigin[0] = this->DataOrigin[0];
   frame.mOrigin[1] = this->DataOrigin[1];
+  //std::cout << "spacing: " << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl;
+  //std::cout << "origin: " << this->DataOrigin[0] << ", " << this->DataOrigin[1] << std::endl;
 
   //Don't seem to be the correct parameter
   //Read probe angle (0 = linear probe)
@@ -430,8 +434,26 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 //  std::cout << "ulx: " << roi.ulx << " uly: " << roi.uly << " urx: "  << roi.urx << " ury: " << roi.ury << std::endl;
 //  std::cout << "blx: " << roi.blx << " bly: " << roi.bly << " brx: "  << roi.brx << " bry: " << roi.bry << std::endl;
 
+  //Copy ROI info
+  frame.ulx = roi.ulx;
+  frame.uly = roi.uly;
+  frame.urx = roi.urx;
+  frame.ury = roi.ury;
+  frame.brx = roi.brx;
+  frame.bry = roi.bry;
+  frame.blx = roi.blx;
+  frame.bly = roi.bly;
+
   // Test if the sonix status message is sent
-  frame.mNewStatus = true;
+  //Only send status message when info is changed
+  if (lastRoiUlx != roi.ulx || lastRoiBry != roi.bry)//Initially: Check is ROI is changed
+  {
+	frame.mNewStatus = true;
+	lastRoiUlx = roi.ulx;
+	lastRoiBry = roi.bry;
+  }
+  else
+	frame.mNewStatus = false;
 
 //  emit newFrame(frame);
   if (this->mSonixHelper)
@@ -1191,11 +1213,13 @@ void vtkSonixVideoSource::calculateSpacingAndOrigin()
 
   //Start - Added old modified code
 
-   int xO, yO;
+   //int xO, yO;
+   uPoint origin;
    if(//this->RequestGetParamValue(VARID_ORIGINX,xO) &&
       //this->RequestGetParamValue(VARID_ORIGINY,yO))
-    this->ult->getParamValue("origin x", xO) &&
-    this->ult->getParamValue("origin y", yO))
+    //this->ult->getParamValue("origin x", xO) && // Do not work in sonix 5.7.1, return value is still true
+    //this->ult->getParamValue("origin y", yO))
+	this->ult->getParamValue("origin", origin))
    {
      //std::cout << "xO=" << xO << std::endl;
      //std::cout << "yO=" << yO << std::endl;
@@ -1204,25 +1228,28 @@ void vtkSonixVideoSource::calculateSpacingAndOrigin()
    {
      vtkErrorMacro("Couldn't request the origin.");
    }
-   this->DataOrigin[0] = xO;
-   this->DataOrigin[1] = yO;
+   this->DataOrigin[0] = origin.x;//xO;
+   this->DataOrigin[1] = origin.y;//yO;
    //this->DataOrigin[2] =
 
-   int xM, yM;
+   //int xM, yM;
+   uPoint microns;
    if(//this->RequestGetParamValue(VARID_MICRONSX,xM) &&
       //this->RequestGetParamValue(VARID_MICRONSY,yM))
-    this->ult->getParamValue("microns x", xM) &&
-    this->ult->getParamValue("microns y", yM))
+    //this->ult->getParamValue("microns x", xM) && // Do not work in sonix 5.7.1
+    //this->ult->getParamValue("microns y", yM))
+	this->ult->getParamValue("microns", microns))
    {
-     //std::cout << "xM=" << xM << std::endl;
-     //std::cout << "yM=" << yM << std::endl;
+     //std::cout << "xM=" << /*xM*/microns.x << std::endl;
+     //std::cout << "yM=" << /*yM*/microns.y << std::endl;
    }
    else
    {
      vtkErrorMacro("Couldn't request the microns (spacing?).");
    }
-   this->DataSpacing[0] = xM/1000.0;
-   this->DataSpacing[1] = yM/1000.0;
+   this->DataSpacing[0] = /*xM*/microns.x/1000.0;
+   this->DataSpacing[1] = /*yM*/microns.y/1000.0;
+   //std::cout << "Calculate spacing: x: " << xM << " y: " << yM << "result: " << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl;
    //this->DataSpacing[2] =
    //EndAdd
 }
