@@ -38,7 +38,7 @@ QStringList ImageSenderSonix::getArgumentDescription()
 {
 	QStringList retval;
 	retval << "--ipaddress:   IP address to connect to, default=127.0.0.1 (localhost)";
-	retval << "--imagingmode: default=0 (0 = B-mode, 12 = RF mode)";
+	retval << "--imagingmode: default=0 (0 = B-mode, 2 = Colour, 6 = Dual, 12 = RF)";
 	retval << "--datatype: Video type, default=0x00000004 (4 = processed, 2 = unprocessed)";
 	retval << "--buffersize:  Grabber buffer size,   default=500";
 	retval << "--properties:  dump image properties";
@@ -104,6 +104,9 @@ void ImageSenderSonix::receiveFrameSlot(Frame& frame)
   if (frame.mNewStatus)
   {
     IGTLinkSonixStatusMessage::Pointer statMsg = getFrameStatus(frame);
+	//double spacing[3];
+	//statMsg->GetSpacing(spacing);
+	//std::cout << "Spacing3: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
     this->addStatusMessageToQueue(statMsg);
     // Pack (serialize) and send
 //    statMsg->Pack();
@@ -128,6 +131,15 @@ IGTLinkSonixStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame
   //retval->SetOrigin(); //Origin is set in IGTLinkImageMessage
 //  retval->SetWidth();
 //  retval->SetType();
+
+  retval->SetROI(frame.ulx, frame.uly, frame.urx, frame.ury, frame.brx, frame.bry, frame.blx, frame.bly);
+  retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
+  //std::cout << "Spacing: " << frame.mSpacing[0] << ", " << frame.mSpacing[1] << std::endl;
+
+  //double spacing[3];
+  //retval->GetSpacing(spacing);
+  //std::cout << "Spacing2: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
+  retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);
   return retval;
 }
 
@@ -142,7 +154,6 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
   // Create a new IMAGE type message
   retval->SetDimensions(size);
   retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
-  retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);
   //std::cout << "Frame spacing: " << frame.mSpacing[0] << " " << frame.mSpacing[1] << std::endl;
   retval->SetScalarType(frame.mPixelFormat); //Use frame.mPixelFormat directly
   retval->SetDeviceName("ImageSenderSonix"); // TODO write something useful here
@@ -161,11 +172,22 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
   matrix[0][2] = 0.0;  matrix[1][2] = 0.0;  matrix[2][2] = 1.0; matrix[3][2] = 0.0;
   matrix[0][3] = 0.0;  matrix[1][3] = 0.0;  matrix[2][3] = 0.0; matrix[3][3] = 1.0;
   retval->SetMatrix(matrix);
-
+  
+  retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);//Set origin after frame is set
   // Set image data
   int fsize = retval->GetImageSize();
   memcpy(retval->GetScalarPointer(), frame.mFirstPixel, fsize); // not sure if we need to copy
+  
+  //float origin[3];
+  //retval->GetOrigin(origin);
+  //std::cout << "origin3: " << origin[0] << " " << origin[1] << " " << origin[2] << " " << std::endl;
+  //float spacing[3];
+  //retval->GetSpacing(spacing);
+  //std::cout << "spacing: " << spacing[0] << " " << spacing[1] << " " << spacing[2] << " " << std::endl;
 
+  //int dimensions[3];
+  //retval->GetDimensions(dimensions);
+  //std::cout << "dimensions: " << dimensions[0] << " " << dimensions[1] << " " << dimensions[2] << " " << std::endl;
   return retval;
 }
 void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
@@ -184,7 +206,7 @@ void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
 }
 void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
 {
-  std::cout << "ImageSenderSonix::sendOpenIGTLinkStatusSlot" << std::endl;
+  //std::cout << "ImageSenderSonix::sendOpenIGTLinkStatusSlot" << std::endl;
   if(mSocket->bytesToWrite() > mMaxBufferSize)
     return;
 
@@ -193,7 +215,7 @@ void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
     IGTLinkSonixStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
     if(!message)
       break;
-    message->Pack();//Do not work yet
+    message->Pack();
     mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
