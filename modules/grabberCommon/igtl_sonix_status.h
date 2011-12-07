@@ -12,7 +12,7 @@
 #include "igtl_types.h"
 #include "igtl_win32header.h"
 
-#define IGTL_SONIX_STATUS_HEADER_SIZE         28
+#define IGTL_SONIX_STATUS_HEADER_SIZE        70 // 8*3 + 4*3 + 4*8 + 2
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,9 +21,20 @@ extern "C" {
 #pragma pack(1)     /* For 1-byte boundary in memroy */
 
 typedef struct {
-	igtl_float64 oi;//Origin
-	igtl_float64 oj;//Origin
-	igtl_float64 ok;//Origin
+	igtl_float64 spacingX;
+	igtl_float64 spacingY;
+	igtl_float64 spacingZ;
+	igtl_float32 oi;//Origin
+	igtl_float32 oj;//Origin
+	igtl_float32 ok;//Origin
+	igtl_int32 ulx;
+	igtl_int32 uly;
+	igtl_int32 urx;
+	igtl_int32 ury;
+	igtl_int32 brx;
+	igtl_int32 bry;
+	igtl_int32 blx;
+	igtl_int32 bly;
 	igtl_uint16 status;// 0 = not changed, 1 = changed
 } igtl_sonix_status_message;
 
