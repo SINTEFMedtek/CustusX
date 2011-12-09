@@ -28,7 +28,7 @@ UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trac
   if(mTrackerRecordedData.empty())
     ssc::messageManager()->sendWarning("No tracking data for writing to reconstruction file.");
   if(mStreamRecordedData.empty())
-    ssc::messageManager()->sendWarning("No real time streaming data for writing to reconstruction file.");
+    ssc::messageManager()->sendWarning("No real time streaming data for writing to reconstruction file. (Computer clocks not synced?)");
   if(mActivepatientPath.isEmpty())
     ssc::messageManager()->sendWarning("Active patient folder given to reconstruction file maker is empty.");
 }
