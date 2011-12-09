@@ -182,8 +182,8 @@ void USAcquisition::dominantToolChangedSlot()
   if(!probe)
     return;
 
-  if (this->getTool() && this->getTool()->getProbe())
-    disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+//  if (this->getTool() && this->getTool()->getProbe())
+//    disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
 
   //TODO: Check
   //connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));//Is this necessary?
