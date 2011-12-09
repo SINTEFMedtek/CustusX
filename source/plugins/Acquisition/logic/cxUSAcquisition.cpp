@@ -186,7 +186,7 @@ void USAcquisition::dominantToolChangedSlot()
     disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
 
   //TODO: Check
-  connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));//Is this necessary?
+  //connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));//Is this necessary?
 
   this->setTool(tool);
 
