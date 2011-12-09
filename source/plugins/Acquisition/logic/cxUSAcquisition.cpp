@@ -92,6 +92,8 @@ void USAcquisition::probeChangedSlot()
   if(!probe->getRTSource())
     return;
 
+  //TODO: Don't connect if same as before
+
 	this->connectVideoSource(probe->getRTSource());
 }
 
@@ -107,6 +109,7 @@ void USAcquisition::connectToPureVideo()
 
 void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 {
+  //TODO: Don't change source if it is the same as earlier
   if(mRTSource)
   {
     disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
@@ -116,6 +119,7 @@ void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 
   if(mRTSource)
   {
+    std::cout << "USAcquisition::connectVideoSource - connected" << std::endl;
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
     mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
   }
@@ -154,6 +158,7 @@ void USAcquisition::saveSession(QString sessionId)
 	if (cxTool)
 		calibFileName = cxTool->getCalibrationFileName();
 
+	// streamRecordedData is empty for ultrasonix? Incorrect time?
   mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), patientService()->getPatientData()->getActivePatientFolder(), probe, calibFileName));
 
   mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
@@ -169,6 +174,7 @@ void USAcquisition::fileMakerWriteFinished()
 
 void USAcquisition::dominantToolChangedSlot()
 {
+//  std::cout << "USAcquisition::dominantToolChangedSlot()" << std::endl;
   ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
 
   ssc::ProbePtr probe = tool->getProbe();
@@ -178,7 +184,8 @@ void USAcquisition::dominantToolChangedSlot()
   if (this->getTool() && this->getTool()->getProbe())
     disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
 
-  connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+  //TODO: Check
+  connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));//Is this necessary?
 
   this->setTool(tool);
 
