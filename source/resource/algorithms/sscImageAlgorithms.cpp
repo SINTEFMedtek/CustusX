@@ -120,6 +120,17 @@ ImagePtr cropImage(ImagePtr image)
   QString uid = image->getUid() + "_crop%1";
   QString name = image->getName()+" crop%1";
   ImagePtr result = dataManager()->createDerivedImage(rawResult,uid, name, image);
+  result->mergevtkSettingsIntosscTransform();
+
+/////// Old code
+/*  ImagePtr result = dataManager()->createImage(rawResult,uid, name);
+  result->get_rMd_History()->setRegistration(image->get_rMd());
+  result->mergevtkSettingsIntosscTransform();
+  result->resetTransferFunction(image->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData()),
+  image->getLookupTable2D()->createCopy(image->getBaseVtkImageData()));
+  result->get_rMd_History()->setParentSpace(image->getUid());*/
+///////
+
   //messageManager()->sendInfo("Created volume " + result->getName());
 
 //  dataManager()->loadData(result);
