@@ -92,8 +92,6 @@ void USAcquisition::probeChangedSlot()
   if(!probe->getRTSource())
     return;
 
-  //TODO: Don't connect if same as before
-
 	this->connectVideoSource(probe->getRTSource());
 }
 
@@ -109,7 +107,10 @@ void USAcquisition::connectToPureVideo()
 
 void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 {
-  //TODO: Don't change source if it is the same as earlier
+  //Don't change source if it is the same as earlier
+	if (mRTSource == source)
+		return;
+
   if(mRTSource)
   {
     disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
