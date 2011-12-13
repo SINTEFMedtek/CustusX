@@ -5,15 +5,17 @@
 #include "sscVector3D.h"
 #include "vtkRenderWindow.h"
 
-#ifdef USE_GLX_SHARED_CONTEXT
-#include "sscSNWXOpenGLRenderWindow.h"
-typedef SNWXOpenGLRenderWindow ViewRenderWindow;
-typedef vtkSmartPointer<SNWXOpenGLRenderWindow> ViewRenderWindowPtr;
-#else
-#include "vtkRenderWindow.h"
-typedef vtkRenderWindow ViewRenderWindow;
-typedef vtkSmartPointer<ViewRenderWindow> ViewRenderWindowPtr;
-#endif
+#include "sscViewRenderWindow.h"
+
+//#ifdef USE_GLX_SHARED_CONTEXT
+//#include "sscSNWXOpenGLRenderWindow.h"
+//typedef SNWXOpenGLRenderWindow ViewRenderWindow;
+//typedef vtkSmartPointer<SNWXOpenGLRenderWindow> ViewRenderWindowPtr;
+//#else
+//#include "vtkRenderWindow.h"
+//typedef vtkRenderWindow ViewRenderWindow;
+//typedef vtkSmartPointer<ViewRenderWindow> ViewRenderWindowPtr;
+//#endif
 #include "vtkRenderer.h"
 #ifdef check
 #undef check
@@ -43,7 +45,7 @@ namespace ssc
 {
 
 View::View(QWidget *parent, Qt::WFlags f) :
-	ViewParent(parent, f), mZoomFactor(-1.0), mRenderWindow(ViewRenderWindowPtr::New()) // set zoom to negative value to signify invalid.
+		inherited(parent, f), mZoomFactor(-1.0), mRenderWindow(ViewRenderWindowPtr::New()) // set zoom to negative value to signify invalid.
 {
 	mMTimeHash = 0;
 	mBackgroundColor = QColor("black");
@@ -52,7 +54,7 @@ View::View(QWidget *parent, Qt::WFlags f) :
 }
 
 View::View(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
-	ViewParent(parent, f), mZoomFactor(-1.0), mRenderWindow(ViewRenderWindowPtr::New()) // set zoom to negative value to signify invalid.
+		inherited(parent, f), mZoomFactor(-1.0), mRenderWindow(ViewRenderWindowPtr::New()) // set zoom to negative value to signify invalid.
 {
 	mMTimeHash = 0;
 	mBackgroundColor = QColor("black");

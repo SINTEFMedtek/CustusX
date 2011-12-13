@@ -1,5 +1,5 @@
 #ifndef VTK_IMPLEMENT_MESA_CXX
-#include "sscSNWXOpenGLRenderWindow.h" ///-> new sonowand subclass
+#include "sscSNWXOpenGLRenderWindow_5_4.h" ///-> new sonowand subclass
 #include "vtkOpenGLRenderer.h"
 #include "vtkOpenGLProperty.h"
 #include "vtkOpenGLTexture.h"

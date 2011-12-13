@@ -1257,7 +1257,7 @@ const char* qt_key_to_key_sym(Qt::Key i)
 #if defined Q_WS_X11
 #if defined(VTK_USE_OPENGL_LIBRARY)
 //	#include "vtkXOpenGLRenderWindow.h"
-#include "sscSNWXOpenGLRenderWindow.h"
+#include "sscSNWXOpenGLRenderWindow_5_4.h"
 #endif
 #ifdef VTK_USE_MANGLED_MESA
 #include "vtkXMesaRenderWindow.h"
