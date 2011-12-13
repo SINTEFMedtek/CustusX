@@ -496,8 +496,8 @@ set (BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
 # =========================================================
 # create the target
 add_library( SSC ${SSC_GENERATED_SOURCE_FILES} )
-target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} GLU)
-message(STATUS SSC Libs:\n ${SSC_GENERATED_LIBRARIES})
+target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES})
+#message(STATUS SSC Libs:\n ${SSC_GENERATED_LIBRARIES})
 # =========================================================
 
 # =========================================================
