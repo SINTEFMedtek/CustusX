@@ -224,7 +224,13 @@ void Texture3DSlicerProxyImpl::setSliceProxy(ssc::SliceProxyPtr slicer)
         disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
     mSliceProxy = slicer;
     if (mSliceProxy)
+	{
         connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,	SLOT(transformChangedSlot()));
+		for (int i=0; i < mImages.size(); ++i)
+		{
+			updateCoordinates(i);
+		}
+	}
 }
 
 //void Texture3DSlicerProxyImpl::addRepActorsToViewRenderer(ssc::View* view)
@@ -244,7 +250,7 @@ QString Texture3DSlicerProxyImpl::getTCoordName(int index)
 void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 {
 //	std::cout << "Texture3DSlicerRep::updateCoordinates" << std::endl;
-	if (!mPolyData)
+	if (!mPolyData || !mSliceProxy)
 		return;
 
 	vtkImageDataPtr volume = mImages[index]->getBaseVtkImageData();
