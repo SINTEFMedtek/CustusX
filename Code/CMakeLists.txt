@@ -31,6 +31,8 @@ endif(X11_FOUND)
 
 SET( SSC_QT_MOC_HEADER_FILES
     sscView.h
+#    vtkMods/sscViewQVTKWidget.h
+#    vtkMods/sscModified_QVTKWidget_5_8.h
     Utilities/sscAcceptanceBoxWidget.h
     #Data/sscLandmark.h
     Data/sscData.h
@@ -103,9 +105,9 @@ SET( SSC_HEADER_FILES
     sscRepImpl.h 
     sscVolumeRep.h
     )
-if (USE_GLX_SHARED_CONTEXT)
-    SET(SSC_HEADER_FILES ${SSC_HEADER_FILES} vtkMods/sscSNWQVTKWidget.h)
-endif (USE_GLX_SHARED_CONTEXT)
+#if (USE_GLX_SHARED_CONTEXT)
+#    SET(SSC_HEADER_FILES ${SSC_HEADER_FILES} vtkMods/sscSNWQVTKWidget.h)
+#endif (USE_GLX_SHARED_CONTEXT)
 
 set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/  
@@ -119,6 +121,7 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/3rdParty/
     ${SSC_SOURCE_DIR}/Code/Ultrasound/3DReconstruction
 #    ${SSC_SOURCE_DIR}/Code/3rdParty/cml-1_0_2
+    ${SSC_SOURCE_DIR}/Code/vtkMods/
     ${SSC_BINARY_DIR}
     ) 
 
@@ -149,6 +152,13 @@ endif(WIN32)
 SET( SSC_SOURCE_FILES
     sscForwardDeclarations.h
     vtkForwardDeclarations.h
+
+    sscView.cpp
+    sscView.h
+    vtkMods/sscViewRenderWindow.cpp
+    vtkMods/sscViewRenderWindow.h
+    vtkMods/sscViewQVTKWidget.cpp
+    vtkMods/sscViewQVTKWidget.h
 
     Math/sscBoundingBox3D.cpp
     Math/sscBoundingBox3D.h
@@ -201,10 +211,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscSharedMemory.cpp
     Utilities/sscLogger.h
     #Utilities/sscLogger.cpp
-    
-    sscView.cpp
-    sscView.h
-    
+        
     Rep/sscRep.h
     Rep/sscRepImpl.h
     Rep/sscRepImpl.cpp
@@ -371,18 +378,18 @@ find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 	
 if (USE_GLX_SHARED_CONTEXT)
-    SET( SSC_INCLUDE_DIRS
-        ${SSC_INCLUDE_DIRS}
-        ${SSC_SOURCE_DIR}/Code/vtkMods/
-        )
+#    SET( SSC_INCLUDE_DIRS
+#        ${SSC_INCLUDE_DIRS}
+#        ${SSC_SOURCE_DIR}/Code/vtkMods/
+#        )
     SET( SSC_LIBRARIES 
         ${SSC_LIBRARIES}
         GLU
         )
-    SET( SSC_SOURCE_FILES
-        ${SSC_SOURCE_FILES}
-        vtkMods/sscSNWXOpenGLRenderWindow.cpp
-        vtkMods/sscSNWQVTKWidget.cpp
+#    SET( SSC_SOURCE_FILES
+#        ${SSC_SOURCE_FILES}
+#        vtkMods/sscSNWXOpenGLRenderWindow.cpp
+#        vtkMods/sscSNWQVTKWidget.cpp
         # These files and more should probably be moved here
         #Data/sscGPUImageBuffer.cpp
         #Data/sscGPUImageBuffer.h
@@ -392,7 +399,7 @@ if (USE_GLX_SHARED_CONTEXT)
         #Rep/sscTexture3DSlicerRep.cpp
         #Utilities/sscGLHelpers.cpp
         #Utilities/sscGLHelpers.h
-        )
+#        )
 
     #add moc versions of out modified QVTKWidget
     if (VTK_MAJOR_VERSION EQUAL 5)
@@ -408,11 +415,16 @@ if (USE_GLX_SHARED_CONTEXT)
             SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_5.h)
             SET(SUPPORTED_VTK_VERSION_FOUND "5.6")
         endif (VTK_MINOR_VERSION EQUAL 6)
+        if (VTK_MINOR_VERSION EQUAL 8)
+        # no customized qvtkwidget for 5.8+
+ #           SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_5.h)
+            SET(SUPPORTED_VTK_VERSION_FOUND "5.8")
+        endif (VTK_MINOR_VERSION EQUAL 8)
     endif (VTK_MAJOR_VERSION EQUAL 5)
-
-    if (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
-        message(FATAL_ERROR "vtk version not supported (for glx use): " ${VTK_MAJOR_VERSION} "." ${VTK_MINOR_VERSION})
-    endif (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
+#
+#    if (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
+#        message(FATAL_ERROR "vtk version not supported (for glx use): " ${VTK_MAJOR_VERSION} "." ${VTK_MINOR_VERSION})
+#    endif (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
 
 endif (USE_GLX_SHARED_CONTEXT)  
 
@@ -477,14 +489,15 @@ set( SSC_GENERATED_LIBRARIES
 # =========================================================
 
 include_directories( ${SSC_INCLUDE_DIRS} ${SSC_BINARY_DIR} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
-link_directories( ${SSC_LIBRARY_DIRS} )
+link_directories( ${SSC_LIBRARY_DIRS})
 
 set (BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
 
 # =========================================================
 # create the target
 add_library( SSC ${SSC_GENERATED_SOURCE_FILES} )
-target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} )
+target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} GLU)
+message(STATUS SSC Libs:\n ${SSC_GENERATED_LIBRARIES})
 # =========================================================
 
 # =========================================================
@@ -494,8 +507,6 @@ target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} )
 #set (SSC_INCLUDE ${PROJECT_BINARY_DIR}/include)
 
 set (SSC_DIR ${SSC_BINARY_DIR} CACHE PATH "where to find the SSC cmake")
-#set (USE_GLX_SHARED_CONTEXT ON CACHE BOOL "use shared glx contexts")
-
 
 configure_file (
 	"${PROJECT_SOURCE_DIR}/CMake/SSCConfig.cmake.in"

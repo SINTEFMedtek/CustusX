@@ -6,13 +6,15 @@
 #include "sscIndent.h"
 class QColor;
 
-#ifdef USE_GLX_SHARED_CONTEXT
-#include "sscSNWQVTKWidget.h"
-typedef SNWQVTKWidget ViewParent;
-#else
-#include "QVTKWidget.h"
-typedef QVTKWidget ViewParent;
-#endif
+#include "sscViewQVTKWidget.h"
+
+//#ifdef USE_GLX_SHARED_CONTEXT
+//#include "sscSNWQVTKWidget.h"
+//typedef SNWQVTKWidget ViewParent;
+//#else
+//#include "QVTKWidget.h"
+//typedef QVTKWidget ViewParent;
+//#endif
 
 #include "sscTransform3D.h"
 
@@ -27,11 +29,11 @@ typedef boost::shared_ptr<class Rep> RepPtr;
  * \brief Base widget for displaying lists of Rep. The View class inherits a
  * QVTKWidget but creates its own vtkRenderer and vtkRenderWindow.
  */
-class View: public ViewParent
+class View: public ViewQVTKWidget
 {
 Q_OBJECT
 
-	typedef ViewParent inherited;
+	typedef ViewQVTKWidget inherited;
 
 public:
 	enum Type
