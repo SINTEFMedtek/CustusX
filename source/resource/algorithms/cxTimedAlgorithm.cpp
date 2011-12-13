@@ -72,7 +72,14 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImageViaFile(ssc::Image
   // read from disk
   typedef itk::ImageFileReader<itkImageType> ReaderType;
   ReaderType::Pointer reader = ReaderType::New();
+#if ITK_VERSION_MAJOR==3
   reader->SetFileName(cstring_cast(filename));
+#else
+  reader->SetFileName(string_cast(filename));
+#endif
+
+////  reader->SetFileName(cstring_cast(filename));
+//  reader->SetFileName(string_cast(filename));
   reader->Update();
   itkImageType::ConstPointer retval = reader->GetOutput();
 
