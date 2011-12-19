@@ -6,6 +6,9 @@
  */
 
 #include <sscDICOMWidget.h>
+
+#ifdef SSC_USE_DCMTK
+
 #include "sscDICOMLibAPI.h"
 #include <sscImage.h>
 #include "sscTypeConversions.h"
@@ -261,3 +264,5 @@ void DICOMWidget::dicomChanged()
 }
 
 }
+
+#endif // SSC_USE_DCMTK
