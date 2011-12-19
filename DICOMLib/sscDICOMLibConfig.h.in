@@ -1,0 +1,8 @@
+#ifndef SSCDICOMLIBCONFIG_H_
+#define SSCDICOMLIBCONFIG_H_
+
+#cmakedefine SSC_USE_DCMTK 
+
+#endif /* SSCDICOMLIBCONFIG_H_ */
+
+
