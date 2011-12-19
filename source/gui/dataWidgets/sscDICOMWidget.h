@@ -4,9 +4,13 @@
  *  Created on: Nov 15, 2011
  *      Author: christiana
  */
-
 #ifndef SSCDICOMWIDGET_H_
 #define SSCDICOMWIDGET_H_
+
+
+#include "sscDICOMLibConfig.h"
+
+#ifdef SSC_USE_DCMTK
 
 #include <QWidget>
 #include <QtGui>
@@ -17,6 +21,9 @@ namespace ssc
 typedef boost::shared_ptr<class DICOMLibAPI> DICOMLibAPIPtr;
 typedef boost::shared_ptr<class Series> SeriesPtr;
 
+/** Widget for import of DICOM images.
+ *
+ */
 class DICOMWidget : public QWidget
 {
 	Q_OBJECT
@@ -55,5 +62,7 @@ private:
 };
 
 }
+
+#endif // SSC_USE_DCMTK
 
 #endif /* SSCDICOMWIDGET_H_ */

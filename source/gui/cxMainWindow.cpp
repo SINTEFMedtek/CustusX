@@ -47,6 +47,8 @@
 #include "cxViewWrapper.h"
 #include "sscDICOMWidget.h"
 
+#include "sscDICOMLibConfig.h"
+
 namespace cx
 {
 
@@ -92,7 +94,9 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->addAsDockWidget(new ImagePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new MeshPropertiesWidget(this), "Properties");
-//	this->addAsDockWidget(new ssc::DICOMWidget(this), "Utility");
+#ifdef SSC_USE_DCMTK
+	this->addAsDockWidget(new ssc::DICOMWidget(this), "Utility");
+#endif // SSC_USE_DCMTK
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
