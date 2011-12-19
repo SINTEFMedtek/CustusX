@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 /**
  * We can use gcc to check things like variadic macros for correctness by using
@@ -20,7 +21,12 @@
 #define RESTRICT
 #endif
 
-/** 
+/** strlcpy and strlcat are available in BSD (Mac). Remove these custom versions
+ *  for Mac.
+ */
+#ifdef __linux__
+
+/**
  *	Copy src to string dst of size size.  At most size-1 characters
  *	will be copied.  Always NUL terminates (unless size == 0).
  *	Returns strlen(src); if retval >= size, truncation occurred.
@@ -35,7 +41,7 @@ static inline size_t strlcpy( char *RESTRICT dst, const char *RESTRICT src, size
 	return strlen(src);
 }
 
-/** 
+/**
  *	Appends src to string dst of size siz (unlike strncat, siz is the
  *	full size of dst, not space left).  At most siz-1 characters
  *	will be copied.  Always NUL terminates (unless siz <= strlen(dst)).
@@ -74,6 +80,8 @@ static inline size_t strlcat( char *RESTRICT dst, const char *RESTRICT src, size
 
 	return ( dlen + ( s - src ) );        /* count does not include NUL */
 }
+
+#endif // __linux__
 
 /* Safe MIN and MAX macros that only evaluate their expressions once. */
 #undef MAX
