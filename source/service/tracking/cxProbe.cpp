@@ -146,6 +146,13 @@ void Probe::setConfigId(QString uid)
   emit sectorChanged();
 }
 
+void Probe::setProbeSector(ssc::ProbeData probeSector)
+{
+  mData = probeSector;
+  emit sectorChanged();
+  emit probeChanged();
+}
+
 ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 {
   ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
