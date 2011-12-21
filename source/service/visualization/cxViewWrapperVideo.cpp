@@ -51,6 +51,10 @@ ViewWrapperVideo::ViewWrapperVideo(ssc::View* view)
   connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(configureSlot()));
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(configureSlot()));
 
+  mDominantToolProxy = DominantToolProxy::New();
+  //This connect stops video streaming?
+  connect(mDominantToolProxy.get(), SIGNAL(probeChanged()), this, SLOT(configureSlot()));
+
   addReps();
 
   this->configureSlot();
@@ -90,6 +94,7 @@ void ViewWrapperVideo::showSectorActionSlot(bool checked)
  */
 void ViewWrapperVideo::configureSlot()
 {
+//  std::cout << "ViewWrapperVideo::configureSlot()" << std::endl;
   // if datamanager stream: connect it to rep
   if (!ssc::dataManager()->getStreams().empty() && !mTool)
   {
@@ -111,12 +116,16 @@ void ViewWrapperVideo::probeChangedSlot()
   if (!mTool)
     return;
 
+//  std::cout << "ViewWrapperVideo::probeChangedSlot()" << std::endl;
   // if probe has a stream, connect stream and probe to rep.
   this->setupRep(mTool->getProbe()->getRTSource(), mTool);
 }
 
 void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 {
+  //Don't do anything is source is the same
+  if (mSource == source)
+    return;
   if (mSource)
   {
     disconnect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
@@ -129,6 +138,7 @@ void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 
   if (!mSource)
     return;
+//  std::cout << "ViewWrapperVideo::setupRep() source:" << source << " id: " << source->getUid() << std::endl;
 
   if (!mStreamRep)
   {
@@ -141,12 +151,13 @@ void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
   mDataNameText->setText(0, "initialized");
   mStreamRep->setShowSector(settings()->value("showSectorInRTView").toBool());
 
-  //ssc::messageManager()->sendInfo("Setup rt rep with source="+source->getName()+" and tool="+(tool?tool->getName():"none"));
+  ssc::messageManager()->sendInfo("Setup rt rep with source="+source->getName()+" and tool="+(tool?tool->getName():"none"));
 }
 
 
 ssc::ToolPtr ViewWrapperVideo::getProbe()
 {
+  std::cout << "ViewWrapperVideo::getProbe()" << std::endl;
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
 
   for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)

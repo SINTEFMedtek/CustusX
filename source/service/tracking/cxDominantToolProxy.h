@@ -38,6 +38,7 @@ signals:
 	void tooltipOffset(double offset);
 	void toolProbeSector();
 	void tps(int);
+	void probeChanged();
 
 private slots:
 	void dominantToolChangedSlot(const QString&);
