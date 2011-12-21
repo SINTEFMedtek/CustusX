@@ -92,6 +92,9 @@ private:
   double mLastTimestamp;
   double mTimestampCalibration;
   double mLinearSoundSpeedCompesation;
+
+  int mSize[3]; // image dimension
+  float mOrigin[3];
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 
