@@ -130,7 +130,6 @@ ImagePtr cropImage(ImagePtr image)
   image->getLookupTable2D()->createCopy(image->getBaseVtkImageData()));
   result->get_rMd_History()->setParentSpace(image->getUid());*/
 ///////
-
   //messageManager()->sendInfo("Created volume " + result->getName());
 
 //  dataManager()->loadData(result);
