@@ -123,7 +123,7 @@ void ViewWrapperVideo::probeChangedSlot()
 
 void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 {
-  //Don't do anything is source is the same
+  //Don't do anything if source is the same
   if (mSource == source)
     return;
   if (mSource)

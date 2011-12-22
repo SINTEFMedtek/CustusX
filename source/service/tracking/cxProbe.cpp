@@ -152,7 +152,11 @@ void Probe::setProbeSector(ssc::ProbeData probeSector)
   emit sectorChanged();
   emit probeChanged();
 }
-
+void Probe::setProbeImageData(ssc::ProbeData::ProbeImageData imageData)
+{
+  mData.mImage = imageData;
+  emit sectorChanged();
+}
 ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 {
   ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
