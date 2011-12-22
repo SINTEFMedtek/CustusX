@@ -31,6 +31,7 @@
 #include "sscDataManager.h"
 #include "cxTool.h"
 #include "cxProbe.h"
+#include "cxVideoService.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -464,8 +465,8 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
     //  probeSector = ssc::ProbeData(ssc::ProbeData::tSECTOR, depthStart, depthEnd, width);
   } else // Linear probe
   {
-  	if (probe->getData().mType!=ssc::ProbeData::tLINEAR)
-      ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Probe not linear, but ROI is from linear probe");
+  	if (probe->getData().mType==ssc::ProbeData::tSECTOR)
+      ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Probe is a sector probe, but ROI is from linear probe");
   	int depthStart = roi[1];// in pixels
   	int depthEnd = roi[5];// in pixels
   	int width = roi[2] - roi[0];// in pixels
@@ -480,8 +481,14 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
   	{
   	  ssc::ProbeData probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, dStart, dEnd, dWidth);
   	  probe->setProbeSector(probeSector);
+  	  //TODO: Give the stream to the probe. Don't work?
+  	  std::cout << "stream uid: " << this->getUid() << std::endl;
+      std::cout << "Datamanager stream uid: " << ssc::dataManager()->getStreams().begin()->second->getUid() << std::endl;
+      std::cout << "videoService stream uid: " << videoService()->getVideoConnection()->getVideoSource()->getUid() << std::endl;
 //  	  probe->setRTSource(ssc::VideoSourcePtr(this));//Don't create another pointer
 //  	  probe->setRTSource(ssc::dataManager()->getStreams().begin()->second);
+//      probe->setRTSource(videoService()->getVideoConnection()->getVideoSource());
+
   	}
   	std::cout << "depth Start/end (pixels): " << depthStart << ", " << depthEnd << "     mm: " << dStart << ", " << dEnd << std::endl;
   }
