@@ -41,7 +41,11 @@ namespace cx
 
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mImageImport(vtkImageImportPtr::New()),
-  mLinearSoundSpeedCompesation(1.0)
+  mLinearSoundSpeedCompesation(1.0),
+  updateSonixParameters(false),
+  mDepthStart(0),
+  mDepthEnd(0),
+  mWidth(0)
 {
   mLastTimestamp = 0;
   mTimestampCalibration = 0;
@@ -54,6 +58,9 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mOrigin[0] = 0.0;
   mOrigin[1] = 0.0;
   mOrigin[2] = 0.0;
+  mSpacing[0] = 0.0;
+  mSpacing[1] = 0.0;
+  mSpacing[2] = 0.0;
 
   //image flip
 //  vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
@@ -394,26 +401,10 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   mImageImport->Modified();
 
   //Only do the following for the digital Ultrasonix interface
-  //Moved to updateSonixStatus()
-/*
-  //Update probe sector parameters
-  ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
-  if (!tool || tool->getProbeSector().mType==ssc::ProbeData::tNONE)
+  if (updateSonixParameters)
   {
-    ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateImageImportFromIGTMessage: Dominant tool is not a probe");
-    return;
+    this->updateSonix();
   }
-  ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
-  probe->changeProbeSectorSize(size[0], size[1]);
-  probe->changeProbeSectorOrigin(ssc::Vector3D(origin[0], origin[1], 0));
-//  std::cout << "origin: " << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
-//  std::cout << "spacing1: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
-//  std::cout << "size: " << size[0] << ", " << size[1] << ", " << size[2] << std::endl;
-
-//  double spacing2[3]; // spacing (mm/pixel)
-//  mImageImport->GetDataSpacing(spacing2);
-//  std::cout << "spacing2: " << spacing2[0] << ", " << spacing2[1] << ", " << spacing2[2] << std::endl;
-  */
 }
 
 
@@ -441,10 +432,8 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
 //  	return;
   }
 
-  double spacing[3]; // spacing (mm/pixel)
 //  mImageImport->GetDataSpacing(spacing);
-  message->GetSpacing(spacing);//Use spacing from message
-  std::cout << "spacing3: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
+  message->GetSpacing(mSpacing);//Use spacing from message
 
 //  float origin[3];
 //  message->GetOrigin(origin);
@@ -467,46 +456,56 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
   {
   	if (probe->getData().mType==ssc::ProbeData::tSECTOR)
       ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Probe is a sector probe, but ROI is from linear probe");
-  	int depthStart = roi[1];// in pixels
-  	int depthEnd = roi[5];// in pixels
-  	int width = roi[2] - roi[0];// in pixels
-//  	probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
-  	double dStart = depthStart*spacing[1]; //mm
-  	double dEnd = depthEnd*spacing[1]; //mm
-  	double dWidth = width*spacing[0]; //mm
-
-  	if (tool->getProbeSector().mType!=ssc::ProbeData::tNONE)
-  	  probe->changeProbeSectorParameters(dStart, dEnd, dWidth);//mm
-  	else // No probe sector. Create one.
-  	{
-  	  ssc::ProbeData probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, dStart, dEnd, dWidth);
-  	  probe->setProbeSector(probeSector);
-  	  //TODO: Give the stream to the probe. Don't work?
-  	  std::cout << "stream uid: " << this->getUid() << std::endl;
-      std::cout << "Datamanager stream uid: " << ssc::dataManager()->getStreams().begin()->second->getUid() << std::endl;
-      std::cout << "videoService stream uid: " << videoService()->getVideoConnection()->getVideoSource()->getUid() << std::endl;
-//  	  probe->setRTSource(ssc::VideoSourcePtr(this));//Don't create another pointer
-//  	  probe->setRTSource(ssc::dataManager()->getStreams().begin()->second);
-//      probe->setRTSource(videoService()->getVideoConnection()->getVideoSource());
-
-  	}
-  	std::cout << "depth Start/end (pixels): " << depthStart << ", " << depthEnd << "     mm: " << dStart << ", " << dEnd << std::endl;
+  	mDepthStart = roi[1];// in pixels
+  	mDepthEnd = roi[5];// in pixels
+  	mWidth = roi[2] - roi[0];// in pixels
   }
 
-  //Apply data from igtl::ImageMessage (Only works if we got ImageMessage before IGTLinkSonixStatusMessage)
-//  probe->changeProbeSectorSize(mSize[0], mSize[1]);
-//  probe->changeProbeSectorOrigin(ssc::Vector3D(mOrigin[0], mOrigin[1], 0));
+  updateSonixParameters = true;
+}
 
-  //TODO:
-  	ssc::ProbeData::ProbeImageData imageData;
-    imageData.mSpacing = ssc::Vector3D(spacing[0], spacing[1], 1);
-    imageData.mSize = QSize(mSize[0], mSize[1]);
-    imageData.mOrigin_p = ssc::Vector3D(mOrigin[0], mOrigin[1], 0);
-//    imageData.mClipRect_p = ssc::DoubleBoundingBox3D(config.mLeftEdge,config.mRightEdge,config.mTopEdge,config.mBottomEdge,0,0);
+//Update probe sector parameters
+void OpenIGTLinkRTSource::updateSonix()
+{
+  ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+  if (!tool)
+    return;
+  ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
+  if (!probe)
+  {
+    ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool is not a probe");
+    return;
+  }
+  if (tool->getProbeSector().mType==ssc::ProbeData::tNONE)
+  {
+    ssc::messageManager()->sendInfo("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool have no sector information. This will be created.");
+//    return;
+  }
 
-    tool->getProbeSector().mImage = imageData;
-//    tool->getProbeSector()->mTemporalCalibration = config.mTemporalCalibration;
 
+  double dStart = (mDepthStart-mOrigin[1])*mSpacing[1]; //mm
+  double dEnd = (mDepthEnd-mOrigin[1])*mSpacing[1]; //mm
+  double dWidth = mWidth*mSpacing[0]; //mm
+  if (tool->getProbeSector().mType!=ssc::ProbeData::tNONE)
+    probe->changeProbeSectorParameters(dStart, dEnd, dWidth);//mm
+  else // No probe sector. Create one.
+  {
+    ssc::ProbeData probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, dStart, dEnd, dWidth);
+    probe->setProbeSector(probeSector);
+    probe->setRTSource(videoService()->getVideoConnection()->getVideoSource());
+  }
+//  std::cout << "depth Start/end (pixels): " << depthStart << ", " << depthEnd << "     mm: " << dStart << ", " << dEnd << std::endl;
+
+//  std::cout << "set spacing: " << mSpacing[0] << " " << mSpacing[1] << std::endl;
+//  std::cout << "set size: " << mSize[0] << " " << mSize[1] << std::endl;
+//  std::cout << "set origin: " << mOrigin[0] << " " << mOrigin[1] << std::endl;
+
+  ssc::ProbeData::ProbeImageData imageData;
+  imageData.mSpacing = ssc::Vector3D(mSpacing[0], mSpacing[1], 1);
+  imageData.mSize = QSize(mSize[0], mSize[1]);
+  imageData.mOrigin_p = ssc::Vector3D(mOrigin[0], mOrigin[1], 0);
+
+  probe->setProbeImageData(imageData);
 }
 
 void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
