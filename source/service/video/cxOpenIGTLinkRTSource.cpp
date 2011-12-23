@@ -403,6 +403,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   //Only do the following for the digital Ultrasonix interface
   if (updateSonixParameters)
   {
+    //TODO: Send all necessary parameters (origin + size) in IGTLinkSonixStatusMessage and only update from there.
     this->updateSonix();
   }
 }
