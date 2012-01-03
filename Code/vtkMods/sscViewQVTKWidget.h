@@ -26,19 +26,19 @@
 			#include "sscSNWQVTKWidget5_4.h"
 			namespace ssc
 			{
-				typedef QVTKWidget ViewQVTKWidget;
+				typedef SNWQVTKWidget ViewQVTKWidget;
 			}
 		#elif VTK_MINOR_VERSION == 5
 			#include "sscSNWQVTKWidget5_5.h"
 			namespace ssc
 			{
-				typedef QVTKWidget ViewQVTKWidget;
+				typedef SNWQVTKWidget ViewQVTKWidget;
 			}
 		#elif VTK_MINOR_VERSION == 6
 			#include "sscSNWQVTKWidget5_5.h"
 			namespace ssc
 			{
-				typedef QVTKWidget ViewQVTKWidget;
+				typedef SNWQVTKWidget ViewQVTKWidget;
 			}
 		#elif VTK_MINOR_VERSION == 8
 			// typedef to default

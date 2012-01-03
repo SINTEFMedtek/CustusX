@@ -239,6 +239,9 @@ void VideoGraphics::setLookupTable()
 
 void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 {
+  //Don't do anything if data is unchanged
+  if (mData == data)
+    return;
   if (mData)
   {
     disconnect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
