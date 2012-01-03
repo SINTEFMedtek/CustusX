@@ -75,6 +75,7 @@ private:
   void setTestImage();
   vtkImageDataPtr createFilterARGB2RGBA(vtkImageDataPtr input);
   void updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message);
+  void updateSonix();
 
   double mDebug_orgTime;
 
@@ -92,6 +93,14 @@ private:
   double mLastTimestamp;
   double mTimestampCalibration;
   double mLinearSoundSpeedCompesation;
+
+  int mSize[3]; // image dimension
+  float mOrigin[3];
+  double mSpacing[3]; // spacing (mm/pixel)
+  bool updateSonixParameters;
+  int mDepthStart; //mm
+  int mDepthEnd;   //mm
+  int mWidth;      //mm
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 
