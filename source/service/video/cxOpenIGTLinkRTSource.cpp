@@ -28,8 +28,10 @@
 #include "sscVector3D.h"
 #include "sscProbeData.h"
 #include "sscToolManager.h"
+#include "sscDataManager.h"
 #include "cxTool.h"
 #include "cxProbe.h"
+#include "cxVideoService.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -39,12 +41,26 @@ namespace cx
 
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mImageImport(vtkImageImportPtr::New()),
-  mLinearSoundSpeedCompesation(1.0)
+  mLinearSoundSpeedCompesation(1.0),
+  updateSonixParameters(false),
+  mDepthStart(0),
+  mDepthEnd(0),
+  mWidth(0)
 {
   mLastTimestamp = 0;
   mTimestampCalibration = 0;
   mConnected = false;
   mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
+
+  mSize[0] = 0;
+  mSize[1] = 0;
+  mSize[2] = 0;
+  mOrigin[0] = 0.0;
+  mOrigin[1] = 0.0;
+  mOrigin[2] = 0.0;
+  mSpacing[0] = 0.0;
+  mSpacing[1] = 0.0;
+  mSpacing[2] = 0.0;
 
   //image flip
 //  vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
@@ -303,20 +319,18 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 {
   mImageMessage = message;
   // Retrive the image data
-  int size[3]; // image dimension
   float spacing[3]; // spacing (mm/pixel)
   int svsize[3]; // sub-volume size
   int svoffset[3]; // sub-volume offset
   int scalarType; // scalar type
-  float origin[3];
 
   // Note: subvolumes is not supported. Implement when needed.
 
   scalarType = message->GetScalarType();
-  message->GetDimensions(size);
+  message->GetDimensions(mSize);
   message->GetSpacing(spacing);
   message->GetSubVolume(svsize, svoffset);
-  message->GetOrigin(origin);
+  message->GetOrigin(mOrigin);
   mDeviceName = message->GetDeviceName();
 //  std::cout << "size : " << ssc::Vector3D(size[0], size[1], size[2]) << std::endl;
 
@@ -380,29 +394,18 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   //this is only valid for linear probes
   mImageImport->SetDataSpacing(spacing[0], spacing[1]*mLinearSoundSpeedCompesation, spacing[2]);
 
-  mImageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2]-1);
+  mImageImport->SetWholeExtent(0, mSize[0] - 1, 0, mSize[1] - 1, 0, mSize[2]-1);
   mImageImport->SetDataExtentToWholeExtent();
   mImageImport->SetImportVoidPointer(mImageMessage->GetScalarPointer());
 
   mImageImport->Modified();
 
-  //Update probe sector parameters
-  ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
-  if (!tool || tool->getProbeSector().mType==ssc::ProbeData::tNONE)
+  //Only do the following for the digital Ultrasonix interface
+  if (updateSonixParameters)
   {
-    ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateImageImportFromIGTMessage: Dominant tool is not a probe");
-    return;
+    //TODO: Send all necessary parameters (origin + size) in IGTLinkSonixStatusMessage and only update from there.
+    this->updateSonix();
   }
-  ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
-  probe->changeProbeSectorSize(size[0], size[1]);
-  probe->changeProbeSectorOrigin(ssc::Vector3D(origin[0], origin[1], 0));
-//  std::cout << "origin: " << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
-//  std::cout << "spacing1: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
-//  std::cout << "size: " << size[0] << ", " << size[1] << ", " << size[2] << std::endl;
-
-//  double spacing2[3]; // spacing (mm/pixel)
-//  mImageImport->GetDataSpacing(spacing2);
-//  std::cout << "spacing2: " << spacing2[0] << ", " << spacing2[1] << ", " << spacing2[2] << std::endl;
 }
 
 
@@ -416,23 +419,26 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
   std::cout << "Ultrasonix roi (x,y)*4: " << roi[0] << " " << roi[1] << " " << roi[2] << " " << roi[3] << " " << roi[4] << " " << roi[5] << " " << roi[6] << " " << roi[7] << " " << std::endl;
 
   ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
-  if (!tool || tool->getProbeSector().mType==ssc::ProbeData::tNONE)
+  if (!tool)
+    return;
+  ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
+  if (!probe)
   {
     ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool is not a probe");
-  	return;
+    return;
   }
-  ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
+  if (tool->getProbeSector().mType==ssc::ProbeData::tNONE)
+  {
+    ssc::messageManager()->sendInfo("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool have no sector information. This will be created.");
+//  	return;
+  }
 
-//  ssc::ProbeData probeSector = tool->getProbeSector();
-
-  double spacing[3]; // spacing (mm/pixel)
 //  mImageImport->GetDataSpacing(spacing);
-  message->GetSpacing(spacing);//Use spacing from message
-  std::cout << "spacing3: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
+  message->GetSpacing(mSpacing);//Use spacing from message
 
-  float origin[3];
-  message->GetOrigin(origin);
-  std::cout << "origin3: " << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
+//  float origin[3];
+//  message->GetOrigin(origin);
+//  std::cout << "origin3: " << origin[0] << ", " << origin[1] << ", " << origin[2] << std::endl;
 
   //Test if x and y values are matching that of a linear probe
   //x					left									right
@@ -449,29 +455,58 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
     //  probeSector = ssc::ProbeData(ssc::ProbeData::tSECTOR, depthStart, depthEnd, width);
   } else // Linear probe
   {
-  	if (probe->getData().mType!=ssc::ProbeData::tLINEAR)
-      ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Probe not linear, but ROI is from linear probe");
-  	int depthStart = roi[1];// in pixels
-  	int depthEnd = roi[5];// in pixels
-  	int width = roi[2] - roi[0];// in pixels
-//  	probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
-  	double dStart = depthStart*spacing[1]; //mm
-  	double dEnd = depthEnd*spacing[1]; //mm
-  	double dWidth = width*spacing[0]; //mm
-  	probe->changeProbeSectorParameters(dStart, dEnd, dWidth);//mm
-  	std::cout << "depth Start/end (pixels): " << depthStart << ", " << depthEnd << "     mm: " << dStart << ", " << dEnd << std::endl;
+  	if (probe->getData().mType==ssc::ProbeData::tSECTOR)
+      ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Probe is a sector probe, but ROI is from linear probe");
+  	mDepthStart = roi[1];// in pixels
+  	mDepthEnd = roi[5];// in pixels
+  	mWidth = roi[2] - roi[0];// in pixels
   }
 
-  //TODO:
-  	/*ssc::ProbeData::ProbeImageData imageData;
-    imageData.mSpacing = ssc::Vector3D(config.mPixelWidth, config.mPixelHeight, 1);
-    imageData.mSize = QSize(config.mImageWidth, config.mImageHeight);
-    imageData.mOrigin_p = ssc::Vector3D(config.mOriginCol, config.mOriginRow, 0);
-    imageData.mClipRect_p = ssc::DoubleBoundingBox3D(config.mLeftEdge,config.mRightEdge,config.mTopEdge,config.mBottomEdge,0,0);
+  updateSonixParameters = true;
+}
 
-    probeSector.mImage = imageData;
-    probeSector.mTemporalCalibration = config.mTemporalCalibration;*/
+//Update probe sector parameters
+void OpenIGTLinkRTSource::updateSonix()
+{
+  ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+  if (!tool)
+    return;
+  ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
+  if (!probe)
+  {
+    ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool is not a probe");
+    return;
+  }
+  if (tool->getProbeSector().mType==ssc::ProbeData::tNONE)
+  {
+    ssc::messageManager()->sendInfo("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool have no sector information. This will be created.");
+//    return;
+  }
 
+
+  double dStart = (mDepthStart-mOrigin[1])*mSpacing[1]; //mm
+  double dEnd = (mDepthEnd-mOrigin[1])*mSpacing[1]; //mm
+  double dWidth = mWidth*mSpacing[0]; //mm
+  if (tool->getProbeSector().mType!=ssc::ProbeData::tNONE)
+    probe->changeProbeSectorParameters(dStart, dEnd, dWidth);//mm
+  else // No probe sector. Create one.
+  {
+    ssc::ProbeData probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, dStart, dEnd, dWidth);
+    probe->setProbeSector(probeSector);
+    probe->setRTSource(videoService()->getVideoConnection()->getVideoSource());
+  }
+//  std::cout << "depth Start/end (pixels): " << depthStart << ", " << depthEnd << "     mm: " << dStart << ", " << dEnd << std::endl;
+
+//  std::cout << "set spacing: " << mSpacing[0] << " " << mSpacing[1] << std::endl;
+//  std::cout << "set size: " << mSize[0] << " " << mSize[1] << std::endl;
+//  std::cout << "set origin: " << mOrigin[0] << " " << mOrigin[1] << std::endl;
+
+  ssc::ProbeData::ProbeImageData imageData;
+  imageData.mSpacing = ssc::Vector3D(mSpacing[0], mSpacing[1], 1);
+  imageData.mSize = QSize(mSize[0], mSize[1]);
+  imageData.mOrigin_p = ssc::Vector3D(mOrigin[0], mOrigin[1], 0);
+
+  probe->setProbeImageData(imageData);
 }
 
 void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)

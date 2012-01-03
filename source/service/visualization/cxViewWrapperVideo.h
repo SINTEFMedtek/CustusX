@@ -10,6 +10,7 @@
 //#include "sscMesh.h"
 #include "cxViewWrapper.h"
 //#include "sscVideoRep.h"
+#include "cxDominantToolProxy.h"
 
 namespace cx
 {
@@ -54,6 +55,7 @@ private:
   ssc::DisplayTextRepPtr mDataNameText;
   QPointer<ssc::View> mView;
   ssc::ToolPtr mTool;
+  DominantToolProxyPtr mDominantToolProxy;
 };
 typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 
