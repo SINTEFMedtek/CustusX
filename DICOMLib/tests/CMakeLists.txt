@@ -13,9 +13,12 @@ LINK_DIRECTORIES(
 #    ../../DataBus 
     )
 
+if (UNIX AND NOT APPLE)
+
 ADD_EXECUTABLE( vectortest vectortest.c )
 SET_TARGET_PROPERTIES( vectortest PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_TEST_FLAGS}" )
 TARGET_LINK_LIBRARIES( vectortest ${SNW_LINK_LIBS} m tiff )
+
 
 ADD_EXECUTABLE( testread testread.cpp )
 SET_TARGET_PROPERTIES( testread PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_TEST_FLAGS} -g -O0" )
@@ -104,3 +107,5 @@ ADD_TEST( DICOM_vector3d vectortest )
 ADD_TEST( DICOM_reexport testexported )
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/zeroAlpha.frag" "${CMAKE_CURRENT_SOURCE_DIR}/zeroAlpha.frag")
+
+endif (UNIX AND NOT APPLE)
