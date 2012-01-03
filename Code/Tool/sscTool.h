@@ -141,6 +141,7 @@ signals:
 	void tooltipOffset(double offset);
 	void toolProbeSector();
 	void tps(int);
+  void probeChanged(); ///< Probe/tool characteristics changed
 
 protected:
 	QString mUid;
