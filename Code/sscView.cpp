@@ -26,7 +26,7 @@
 #include "sscMessageManager.h"
 #include "sscBoundingBox3D.h"
 #include "sscTransform3D.h"
-/*! Copy/pasted from qitemdelegate.cpp
+/* Copy/pasted from qitemdelegate.cpp
  \internal
 
  Note that on Mac, if /usr/include/AssertMacros.h is included prior
@@ -41,6 +41,7 @@
 
  after including AssertMacros.h
  */
+
 namespace ssc
 {
 

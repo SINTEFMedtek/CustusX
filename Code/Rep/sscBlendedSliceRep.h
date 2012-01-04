@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCLAYERSLICEREP_H_
 #define SSCLAYERSLICEREP_H_
 
@@ -14,10 +33,14 @@ typedef boost::shared_ptr<class Image> ImagePtr;
 
 typedef boost::shared_ptr<class BlendedSliceRep> BlendedSliceRepPtr;
 
-/**Slice a list of volumes using a SliceProxy.
+/**\brief Slice a list of volumes using a SliceProxy.
+ *        NOT IN USE.
+ *
  * The volumes are blended together during the slice process.
  * 
  * Used as the slicer for multi-layer slicing in Sonowand 2.1.
+ *
+ * \ingroup sscRep
  */
 class BlendedSliceRep : public RepImpl
 {	
