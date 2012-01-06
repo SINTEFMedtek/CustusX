@@ -65,7 +65,7 @@ void *SharedMemoryServer::buffer()
 			if (header->buffer[i] == 0) // no read locks
 			{
 				found = true;
-				header->lastDone = mCurrentBuffer;
+				internalRelease(false);
 				mCurrentBuffer = i;
 			}
 		}
@@ -74,7 +74,7 @@ void *SharedMemoryServer::buffer()
 			if (header->buffer[i] == 0) // no read locks
 			{
 				found = true;
-				header->lastDone = mCurrentBuffer;
+				internalRelease(false);
 				mCurrentBuffer = i;
 			}
 		}
@@ -94,18 +94,23 @@ void *SharedMemoryServer::buffer()
 // Set last finished buffer to current write buffer, then unset current write buffer index.
 // Note that timestamp is only set here, since this is the only place where it can be set 
 // precisely.
-void SharedMemoryServer::release()
+void SharedMemoryServer::internalRelease(bool lock)
 {
 	struct shm_header *header = (struct shm_header *)mBuffer.data();
 	if (header && mCurrentBuffer >= 0)
 	{
-		mBuffer.lock();
+		if (lock) mBuffer.lock();
 		header->lastDone = mCurrentBuffer;
 		mLastTimestamp = QDateTime::currentDateTime();
 		header->timestamp = mLastTimestamp.toMSecsSinceEpoch();
-		mBuffer.unlock();
+		if (lock) mBuffer.unlock();
 		mCurrentBuffer = -1;
 	}
+}
+
+void SharedMemoryServer::release()
+{
+	internalRelease(true);
 }
 
 SharedMemoryClient::SharedMemoryClient(QObject *parent) : mBuffer(parent)
