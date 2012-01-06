@@ -133,11 +133,12 @@ const void *SharedMemoryClient::buffer(bool onlyNew)
 	struct shm_header *header = (struct shm_header *)mBuffer.data();
 	if (header)
 	{
+		mBuffer.lock();
 		if (header->lastDone == -1 || ( onlyNew && header->lastDone == mCurrentBuffer) )
 		{
+			mBuffer.unlock();
 			return NULL; // Nothing 
 		}
-		mBuffer.lock();
 		if (mCurrentBuffer >= 0 && header->buffer[mCurrentBuffer] > 0)
 		{
 			header->buffer[mCurrentBuffer]--; // Release previous read lock
