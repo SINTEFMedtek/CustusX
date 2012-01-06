@@ -34,6 +34,15 @@ private:
 	QDateTime mLastTimestamp;
 
 public:
+	/**
+	 * Constructor.
+	 * \param key A string identifying this resource. Must be unique system wide
+	 * \param buffers The number of buffers to allocate. This should be set to the maximum number of concurrent readers
+	                  to this resource + 2, allowing one buffer for the writer (this class), one for each reader and a
+					  spare so there is always a buffer for the writer to switch to.
+	 * \param sizeEach The size of each buffer.
+	 * \param parent The Qt parent object
+	 */
 	SharedMemoryServer(QString key, int buffers, int sizeEach, QObject *parent = 0);
 	~SharedMemoryServer();
 	int size() { return mSize; }
