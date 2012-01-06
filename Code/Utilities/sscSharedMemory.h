@@ -58,6 +58,8 @@ public:
 	 * Return true if a write buffer is currently held, false otherwise
 	 */
 	bool hasBuffer() { return mCurrentBuffer != -1; }
+private:
+	void internalRelease(bool lock);
 };
 
 /**\brief Shared Memory Client
