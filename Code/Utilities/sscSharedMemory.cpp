@@ -9,6 +9,7 @@ namespace ssc
 struct shm_header
 {
 	qint32 lastDone;	// index to last buffer that was written
+	qint32 writeBuffer; // index to the currently held write buffer (-1 if no buffer is held)
 	qint32 numBuffers;	// number of buffers
 	qint32 bufferSize;	// size of each buffer
 	qint32 headerSize;	// size of this header
@@ -42,6 +43,7 @@ SharedMemoryServer::SharedMemoryServer(QString key, int buffers, int sizeEach, Q
 	header->numBuffers = mBuffers;
 	header->headerSize = headerSize;
 	header->lastDone = -1;
+	header->writeBuffer = -1;
 	header->timestamp = 0;
 	memset(header->buffer, 0, sizeof(qint32) * buffers);
 	mCurrentBuffer = -1;
@@ -85,6 +87,7 @@ void *SharedMemoryServer::buffer()
 			return NULL;
 		}
 		void *ptr = ((char *)header) + header->headerSize + header->bufferSize * mCurrentBuffer;
+		header->writeBuffer = mCurrentBuffer;
 		mBuffer.unlock();
 		return ptr;
 	}
@@ -101,6 +104,7 @@ void SharedMemoryServer::internalRelease(bool lock)
 	{
 		if (lock) mBuffer.lock();
 		header->lastDone = mCurrentBuffer;
+		header->writeBuffer = -1;
 		mLastTimestamp = QDateTime::currentDateTime();
 		header->timestamp = mLastTimestamp.toMSecsSinceEpoch();
 		if (lock) mBuffer.unlock();
@@ -139,7 +143,8 @@ const void *SharedMemoryClient::buffer(bool onlyNew)
 	if (header)
 	{
 		mBuffer.lock();
-		if (header->lastDone == -1 || ( onlyNew && header->lastDone == mCurrentBuffer) )
+		if (header->lastDone == -1 || header->lastDone == header->writeBuffer ||
+			( onlyNew && header->lastDone == mCurrentBuffer) )
 		{
 			mBuffer.unlock();
 			return NULL; // Nothing 
