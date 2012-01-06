@@ -73,7 +73,7 @@ public:
 	int size() { return mSize; }
 	int buffers() { return mBuffers; }
 	QString key() { return mBuffer.key(); }
-	const void *buffer();		///< Grab and lock a read buffer
+	const void *buffer(bool onlyNew=false);		///< Grab and lock a read buffer
 	void release();			///< Release our read buffer
 	const void *isNew();		///< Return new buffer only if new is available, otherwise return NULL
 	QDateTime timestamp() { return mTimestamp; }
