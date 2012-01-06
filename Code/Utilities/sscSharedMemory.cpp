@@ -128,12 +128,12 @@ bool SharedMemoryClient::attach(const QString &key)
 	return success;
 }
 
-const void *SharedMemoryClient::buffer()
+const void *SharedMemoryClient::buffer(bool onlyNew)
 {
 	struct shm_header *header = (struct shm_header *)mBuffer.data();
 	if (header)
 	{
-		if (header->lastDone == -1)
+		if (header->lastDone == -1 || ( onlyNew && header->lastDone == mCurrentBuffer) )
 		{
 			return NULL; // Nothing 
 		}
@@ -154,26 +154,7 @@ const void *SharedMemoryClient::buffer()
 
 const void *SharedMemoryClient::isNew()
 {
-	struct shm_header *header = (struct shm_header *)mBuffer.data();
-	if (header)
-	{
-		if (header->lastDone == -1 || header->lastDone == mCurrentBuffer)
-		{
-			return NULL; // Nothing, or same
-		}
-		mBuffer.lock();
-		if (mCurrentBuffer >= 0 && header->buffer[mCurrentBuffer] > 0)
-		{
-			header->buffer[mCurrentBuffer]--; // Release previous read lock
-		}
-		header->buffer[header->lastDone]++; // Lock new page against writing
-		mCurrentBuffer = header->lastDone;
-		const void *ptr = ((const char *)header) + header->headerSize + header->bufferSize * header->lastDone;
-		mTimestamp.setMSecsSinceEpoch(header->timestamp);
-		mBuffer.unlock();
-		return ptr;
-	}
-	return NULL;	
+	return buffer(true);
 }
 
 void SharedMemoryClient::release()
