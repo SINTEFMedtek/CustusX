@@ -19,8 +19,6 @@ ENDIF( DCMTK_FOUND )
 if (SSC_USE_DCMTK)
 
     add_subdirectory( tests )
-    add_subdirectory( glDicom )
-    #add_subdirectory( cyDICOM )
     
     FIND_PACKAGE( Qt4 REQUIRED )
     INCLUDE( ${QT_USE_FILE} )
