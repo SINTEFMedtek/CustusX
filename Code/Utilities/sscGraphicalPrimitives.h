@@ -12,7 +12,12 @@ typedef vtkSmartPointer<class vtkArrowSource> vtkArrowSourcePtr;
 namespace ssc
 {
 
-/** Helper for rendering a point in 3D
+/**
+ * \addtogroup sscUtility
+ * @{
+ */
+
+/** \brief Helper for rendering a point in 3D
  */
 class GraphicalPoint3D
 {
@@ -33,7 +38,7 @@ class GraphicalPoint3D
 };
 typedef boost::shared_ptr<GraphicalPoint3D> GraphicalPoint3DPtr;
 
-/** Helper for rendering a line in 3D
+/** \brief Helper for rendering a line in 3D
  */
 class GraphicalLine3D
 {
@@ -54,7 +59,7 @@ class GraphicalLine3D
 };
 typedef boost::shared_ptr<GraphicalLine3D> GraphicalLine3DPtr;
 
-/** Helper for rendering a line in 3D
+/** \brief Helper for rendering a line in 3D
  */
 class GraphicalArc3D
 {
@@ -74,7 +79,7 @@ class GraphicalArc3D
 };
 typedef boost::shared_ptr<GraphicalArc3D> GraphicalArc3DPtr;
 
-/** Helper for rendering an arrow in 3D
+/** \brief Helper for rendering an arrow in 3D
  */
 class GraphicalArrow3D
 {
@@ -92,6 +97,8 @@ class GraphicalArrow3D
 };
 typedef boost::shared_ptr<GraphicalArrow3D> GraphicalArrow3DPtr;
 
+/**\brief Helper for drawing a rectangle in 3D.
+ */
 class Rect3D
 {
 public:
@@ -111,7 +118,7 @@ private:
 };
 typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
 
-/** Helper for rendering 3D text that faces the camera and
+/** \brief Helper for rendering 3D text that faces the camera and
  *  has a constant viewed size.
  */
 class FollowerText3D
@@ -141,7 +148,7 @@ class FollowerText3D
 };
 typedef boost::shared_ptr<FollowerText3D> FollowerText3DPtr;
 
-/** Helper for rendering 3D text that faces the camera and
+/** \brief Helper for rendering 3D text that faces the camera and
  *  has a constant viewed size, always on top.
  */
 class CaptionText3D
@@ -170,6 +177,10 @@ private:
 	//    ssc::ViewportListenerPtr mViewportListener;
 };
 typedef boost::shared_ptr<CaptionText3D> CaptionText3DPtr;
+
+/**
+ * @}
+ */
 
 }
 

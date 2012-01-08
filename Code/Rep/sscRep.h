@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCREP_H_
 #define SSCREP_H_
 
@@ -16,11 +35,15 @@ typedef boost::weak_ptr<class Rep> RepWeakPtr;
 class Indent;
 class View;
 
-/**
+/**\brief Abstract interface for entities that can be added to a View.
+ *
  * Rep (Representation) is the interface that all Representations in ssc must
  * implement.
+ *
  * The default implementation can be found in RepImpl. Inherit from that when
  * implementing concrete classes.
+ *
+ * \ingroup sscRep
  */
 class Rep :public QObject
 {

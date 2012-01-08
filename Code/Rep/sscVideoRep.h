@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 /*
  * sscRT2DRep.h
  *
@@ -30,6 +49,14 @@ namespace ssc
 
 typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
 
+/**\brief Helper class for displaying a VideoSource.
+ *
+ * Used for Video display in VideoFixedPlaneRep and ToolRep3D.
+ *
+ *  Used by CustusX.
+ *
+ * \ingroup sscProxy
+ */
 class VideoGraphics : public QObject
 {
   Q_OBJECT
@@ -79,35 +106,18 @@ private:
   vtkImageMaskPtr mMaskFilter;
 };
 
-
-//typedef boost::shared_ptr<class RealTimeStreamRep> RealTimeStreamRepPtr;
-//
-//class RealTimeStreamRep : public ssc::RepImpl
-//{
-//  Q_OBJECT
-//public:
-//  RealTimeStreamRep(const QString& uid, const QString& name="");
-//  virtual ~RealTimeStreamRep();
-//  virtual QString getType() const { return "ssc::RealTimeStreamRep"; }
-//  void setRealtimeStream(VideoSourcePtr data);
-//  void setTool(ToolPtr tool);
-//
-//protected:
-//  virtual void addRepActorsToViewRenderer(ssc::View* view);
-//  virtual void removeRepActorsFromViewRenderer(ssc::View* view);
-//private slots:
-//
-//private:
-//  VideoGraphicsPtr mRTGraphics;
-//  vtkRendererPtr mRenderer;
-//  View* mView;
-//};
-
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
 
-/**A rep visualizing a RT stream directly into the view plane.
+/**\brief Display a VideoSource in a View.
+ *
+ * A rep visualizing a VideoSource directly into the view plane.
  * It does not follow the tool, but controls the camera in order to
- * fill the entire view.
+ * fill the entire View.
+ *
+ * Used by CustusX.
+ *
+ * \ingroup sscRep
+ * \ingroup sscRepVideo
  */
 class VideoFixedPlaneRep : public ssc::RepImpl
 {

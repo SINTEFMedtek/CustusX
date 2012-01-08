@@ -33,14 +33,18 @@ typedef boost::shared_ptr<class Image> ImagePtr;
 
 typedef boost::shared_ptr<class BlendedSliceRep> BlendedSliceRepPtr;
 
-/**\brief Slice a list of volumes using a SliceProxy.
+/**\brief Slice a list of overlay volumes.
  *        NOT IN USE.
  *
- * The volumes are blended together during the slice process.
+ * The volumes are blended together during the slice process. The
+ * SliceProxy handles the actual slice definition.
  * 
  * Used as the slicer for multi-layer slicing in Sonowand 2.1.
+ * Replaced by Texture3DSlicerRep.
  *
  * \ingroup sscRep
+ * \ingroup sscNotUsed
+ * \ingroup sscRep2D
  */
 class BlendedSliceRep : public RepImpl
 {	

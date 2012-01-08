@@ -8,6 +8,12 @@
 
 namespace ssc
 {
+
+/**\brief Identification of a Coordinate system.
+ *
+ * \sa CoordinateSystemHelpers
+ * \ingroup sscUtility
+ */
 struct CoordinateSystem
 {
 	CoordinateSystem() {}
@@ -22,14 +28,13 @@ struct CoordinateSystem
 bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs);
 typedef CoordinateSystem Space;
 
-/**
- * \class CoordinateSystemHelpers
- *
- * \brief Helper class that gets you from any coordinate system to any
+/**\brief Helper class that gets you from any coordinate system to any
  * other coordinate system in CustusX
  *
  * \date 3. nov. 2010
  * \author: Janne Beate Bakeng
+ *
+ * \ingroup sscUtility
  */
 class CoordinateSystemHelpers
 {

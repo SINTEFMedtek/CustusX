@@ -1,6 +1,23 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 /*
- * sscImageTFData.h
- *
  *  Created on: Mar 15, 2011
  *      Author: christiana
  */
@@ -24,7 +41,9 @@ typedef boost::shared_ptr<ColorMap> ColorMapPtr;
 
 typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
 
-/**Data class for Transfer Function info, either 2D or 3D.
+
+/**\brief Data class for Transfer Function info, either 2D or 3D.
+ *
  * Used as base for ImageTF3D and ImageLUT2D.
  *
  * Alpha transfer function: Set either LLR/alpha or OpacityMap, this updates
@@ -46,6 +65,8 @@ typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
  *                 |
  *                set
  *
+ *
+ * \ingroup sscData
  */
 class ImageTFData: public QObject
 {

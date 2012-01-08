@@ -14,12 +14,16 @@
 namespace ssc
 {
 
-/** Class that listens to changes in the viewport size and camera matrix.
+
+/**\brief Listens to changes in viewport and camera matrix.
+ *
+ *  Class that listens to changes in the viewport size and camera matrix.
  *  A callback function is called when a change is detected.
  *
  *  This can be used to update reps with respect to viewport size, for example
  *  keep a 3D object in constant observed size.
  *
+ * \ingroup sscUtility
  */
 class ViewportListener
 {

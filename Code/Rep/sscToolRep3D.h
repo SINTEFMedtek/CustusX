@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCTOOL3DREP_H_
 #define SSCTOOL3DREP_H_
 
@@ -15,11 +34,22 @@ namespace ssc
 typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
 typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
 
-/**Display a 3D representation of a ssc::Tool.
- * The representation to use is extracted from the tool itself.		
+/**\brief Display a Tool in 3D.
  *
- * Used by Sonowand.
- * Used by CustusX.
+ * ToolRep3D displays a Tool using the supplied graphical
+ * representation from the Tool interface, with points showing
+ * the tooltip and offset point. If the Tool is a Probe,
+ * the probe sector and the prope video can be shown as well.
+ *
+ * Several optional visualizations are available.
+ *
+ * \image html sscArchitecture_tool.png "ToolRep2D, ToolRep3D and surrounding classes."
+ *
+ *
+ * Used by CustusX and Sonowand.
+ *
+ * \ingroup sscRep
+ * \ingroup sscRep3D
  */
 class ToolRep3D : public RepImpl
 {
@@ -43,7 +73,7 @@ public:
 	void setStayHiddenAfterVisible(bool val);
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
 	void setOffsetPointVisibleAtZeroOffset(bool val); ///< if true the sphere is visible even when the offset is zero
-  void setSphereRadiusInNormalizedViewport(bool on);
+	void setSphereRadiusInNormalizedViewport(bool on);
 
 protected:
 	ToolRep3D(const QString& uid, const QString& name="");
@@ -71,7 +101,7 @@ private:
 	void updateOffsetGraphics();
 	void scaleSpheres();
 
-  double mSphereRadius;
+	double mSphereRadius;
 	ToolPtr mTool;
 	vtkActorPtr mToolActor;
 	vtkPolyDataMapperPtr mPolyDataMapper;
@@ -84,7 +114,7 @@ private:
 	bool mOffsetPointVisibleAtZeroOffset;
 	bool mSphereRadiusInNormalizedViewport;
 	ToolTracerPtr mTracer;
-  ssc::ViewportListenerPtr mViewportListener;
+	ssc::ViewportListenerPtr mViewportListener;
 
 	//US Probe sector
 	ProbeSectorPtr mProbeSector;

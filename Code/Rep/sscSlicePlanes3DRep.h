@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef VMSLICEPLANES3DREP_H_
 #define VMSLICEPLANES3DREP_H_
 
@@ -11,8 +30,17 @@
 
 namespace ssc
 {
-/**Helper for the reps displaying slice planes in 3D and
- * markers for the planes in 2D. 
+
+/**\brief Helper class for managing a set of slice planes.
+ *
+ * Use this to manage a set of slice planes
+ * (represented by SliceProxy) that are used as a group.
+ * The attributes are designed to work with SlicePlanes3DRep
+ * and SlicePlanes3DMarkerIn2DRep.
+ *
+ * \sa SlicePlanes3DRep SlicePlanes3DMarkerIn2DRep
+ *
+ * \ingroup sscProxy
  */
 class SlicePlanesProxy : public QObject
 {
@@ -25,13 +53,13 @@ public:
 	 */
 	struct PropertiesType
 	{
-	  std::map<PLANE_TYPE, Vector3D> mColor; /// normalized RGB
-	  std::map<PLANE_TYPE, QString> mSymbol;
-	  int m2DFontSize;
-    int m3DFontSize;
-    Vector3D mPointPos_normvp; ///< position of symbol in normalized space <0..1, 0..1>
-    PLANE_TYPE mClipPlane; ///< what plane to use for 3D clipping
-    int mLineWidth; ///< draw wireframe lines. 0 means no line
+		std::map<PLANE_TYPE, Vector3D> mColor; /// normalized RGB
+		std::map<PLANE_TYPE, QString> mSymbol;
+		int m2DFontSize;
+		int m3DFontSize;
+		Vector3D mPointPos_normvp; ///< position of symbol in normalized space <0..1, 0..1>
+		PLANE_TYPE mClipPlane; ///< what plane to use for 3D clipping
+		int mLineWidth; ///< draw wireframe lines. 0 means no line
 	};
 
 	struct DataType
@@ -62,17 +90,25 @@ signals:
 private:
 	PropertiesType mProperties;
 	bool mVisible;
-  bool mDrawPlane; ///< turn opaque plane drawing on/off
+	bool mDrawPlane; ///< turn opaque plane drawing on/off
 	DataMap mData;
 	bool mConnectedTo3D;
-//	std::vector<Vector3D> mColors;
 };
 typedef boost::shared_ptr<class SlicePlanesProxy> SlicePlanesProxyPtr;
 
 
 typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
 
-/**Helper for displaying the position of 2D slice planes in the 3D view.
+/**\brief Display a set of planes in 3D.
+ *
+ * Draw all the planes defined in a SlicesPlanesProxy using
+ * the settings from SlicePlanesProxy. Only graphical plane
+ * representations are drawn, no image data.
+ *
+ * \sa SlicePlanesProxy SlicePlanes3DMarkerIn2DRep
+ *
+ * \ingroup sscRep
+ * \ingroup sscRep3D
  */
 class SlicePlanes3DRep : public ssc::RepImpl
 {
@@ -82,7 +118,7 @@ public:
 	virtual ~SlicePlanes3DRep();
 	virtual QString getType() const { return "ssc::SlicePlanes3DRep"; }
 	void setProxy(SlicePlanesProxyPtr proxy);
-  SlicePlanesProxyPtr getProxy() { return mProxy; }
+	SlicePlanesProxyPtr getProxy() { return mProxy; }
 
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
@@ -100,16 +136,24 @@ private:
 	typedef std::map<PLANE_TYPE, DataType> DataMap;
 	DataMap mData;
 
-	 SlicePlanes3DRep(const QString& uid, const QString& name="");
-	 void clearActors();
-//	  void setVisibility(DataType data);
-	  SlicePlanesProxyPtr mProxy;
-	  ssc::View* mView;
+	SlicePlanes3DRep(const QString& uid, const QString& name = "");
+	void clearActors();
+	SlicePlanesProxyPtr mProxy;
+	ssc::View* mView;
 };
 
 typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerIn2DRepPtr;
 
-/**Helper for displaying the position of 2D slice planes in the 3D view.
+/**\brief Display annotations for the SlicePlanesProxy planes in 2D.
+ *
+ * When several 2D View are drawn in a 3D View using a SlicePlanes3DRep,
+ * the SlicePlanes3DMarkerIn2DRep can be used to annotate the 2D View with
+ * the same annotation as is shown in the 3D View.
+ *
+ * \sa SlicePlanesProxy SlicePlanes3DRep
+ *
+ * \ingroup sscRep
+ * \ingroup sscRep2D
  */
 class SlicePlanes3DMarkerIn2DRep : public ssc::RepImpl
 {
@@ -129,8 +173,6 @@ private slots:
 private:
 	SlicePlanes3DMarkerIn2DRep(const QString& uid, const QString& name="");
 	SlicePlanesProxyPtr mProxy;
-	//ssc::GraphicalPoint3DPtr mPoint;
-	//OffsetPointPtr mPoint;
 	ssc::TextDisplayPtr mText;
 	PLANE_TYPE mType;
 };

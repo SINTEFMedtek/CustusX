@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCSLICEDIMAGEPROXY_H_
 #define SSCSLICEDIMAGEPROXY_H_
 
@@ -13,10 +32,18 @@ typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 
 typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
 
-/**Helper class for slicing an image given a sliceproxy and an image.
+
+/**\brief Helper class for slicing an image given a SliceProxy and an image.
+ *
+ * The image is sliced in software using the slice definition from
+ * the SliceProxy
+ *
  * Used internally by BlendedSliceRep and SlicerRepSW as the slice engine.
  * 
  * Used by Sonowand 2.1
+ * Used by CustusX
+ *
+ * \ingroup sscProxy
  */
 class SlicedImageProxy : public QObject
 {

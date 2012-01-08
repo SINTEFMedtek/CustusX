@@ -14,8 +14,17 @@
 namespace ssc
 {
 
+/**
+ * \addtogroup sscUtility
+ * \{
+ */
+
 vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim, Vector3D spacing, const unsigned char initValue);
 vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim, Vector3D spacing, double initValue);
+
+/**
+ * \}
+ */
 
 }
 

@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCVOLUMEREP_H_
 #define SSCVOLUMEREP_H_
 
@@ -7,10 +26,13 @@
 #include "sscForwardDeclarations.h"
 namespace ssc
 {
-/**3D representation for one image.
+
+/**\brief Display a volume in 3D
  * 
  * This abstract interface is implemented by VolumetricRep or ProgressiveLODVolumetricRep.
  * 
+ * \ingroup sscRep
+ * \ingroup sscRep3D
  */
 class VolumetricBaseRep : public RepImpl
 {
@@ -30,11 +52,16 @@ protected:
 	VolumetricBaseRep(const QString& uid, const QString& name) : RepImpl(uid,name) {}
 };
 
-/**Representation for one Image.
- * Use this to render volumetric image data in a 3D scene.
+/**\brief Display a volume in 3D
+ *
+ * Use this to render volumetric image data in a 3D scene. Both
+ * texture rendering and GPU raycasting are available.
  * 
  * Used by Sonowand.
  * Used by CustusX.
+ *
+ * \ingroup sscRep
+ * \ingroup sscRep3D
  */
 class VolumetricRep : public VolumetricBaseRep
 {

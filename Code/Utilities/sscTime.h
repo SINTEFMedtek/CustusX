@@ -11,6 +11,12 @@
 
 namespace ssc
 {
+
+/**
+ * \addtogroup sscUtility
+ * \{
+ */
+
 //namespace time {
 
 /** A standard format for use when converting between QDateTime and QString
@@ -35,6 +41,10 @@ double getMicroSecondsSinceEpoch();
 /** Milliseconds since epoch (1970)
  */
 double getMilliSecondsSinceEpoch();
+
+/**
+ * \}
+ */
 
 //} // time
 } // ssc

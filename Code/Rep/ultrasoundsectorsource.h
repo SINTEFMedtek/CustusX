@@ -1,3 +1,23 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
+
 /*=========================================================================
 
 UltrasoundSectorSource creates a polygon matching the utrasound sector.
@@ -22,7 +42,7 @@ mapped onto this polygon.
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<vtkPolyData> vtkPolyDataPtr;
 
-/**Source for an Ultrasound sector.
+/**\brief Source for an Ultrasound sector.
  * The output vtkPolyData contains a polygon plus texture coordinates.
  * The output is given in space u: a xy vtk image space with origin in the lower-left corner,
  *
@@ -32,6 +52,7 @@ typedef vtkSmartPointer<vtkPolyData> vtkPolyDataPtr;
  *
  * Adapted from same-named class in CustusX1
  *
+ * \ingroup sscProxy
  */
 class UltrasoundSectorSource : public vtkPolyDataSource 
 {

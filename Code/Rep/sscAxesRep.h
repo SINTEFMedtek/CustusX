@@ -35,6 +35,7 @@ typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
  * Set the position using setTransform().
  *
  * \ingroup sscRep
+ * \ingroup sscRep3D
  */
 class AxesRep: public RepImpl
 {

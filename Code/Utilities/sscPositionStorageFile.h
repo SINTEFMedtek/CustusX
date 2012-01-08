@@ -10,7 +10,7 @@
 
 namespace ssc {
 
-/**Reader class for the position file.
+/**\brief Reader class for the position file.
  * 
  * Each call to read() gives the next position entry from the file.
  * When atEnd() returns true, all positions have been read. 
@@ -35,6 +35,8 @@ namespace ssc {
  *  The position field is <position> = <thetaXY><thetaZ><phi><x><y><z>
  *  Where the parameters are found from a matrix using the class CGFrame.
  *
+ * \sa PositionStorageWriter
+ * \ingroup sscUtility
  */
 class PositionStorageReader
 {
@@ -42,12 +44,12 @@ public:
 	PositionStorageReader(QString filename);
 	~PositionStorageReader();
 	bool read(Transform3D* matrix, double* timestamp, int* toolIndex); // reads only tool data in integer format.
-  bool read(Transform3D* matrix, double* timestamp, QString* toolUid);
+	bool read(Transform3D* matrix, double* timestamp, QString* toolUid);
 	bool atEnd() const;
 	static QString timestampToString(double timestamp);
 	int version();
 private:
-  QString mCurrentToolUid; ///< the tool currently being written.
+	QString mCurrentToolUid; ///< the tool currently being written.
 	QFile positions;
 	QDataStream stream;
 	quint8 mVersion;
@@ -55,13 +57,16 @@ private:
 	class Frame3D frameFromStream();
 };
 
-/** Writer class for the position file.
+/**\brief Writer class for the position file.
  * 
  * The generated file contains a compact representation
  * of tool position data along with timestamp and tool id.
  * Extract the info with class PositionStorageReader.
  *
  * For a descritpion of the file format, see PositionStorageReader.
+ *
+ * \sa PositionStorageReader
+ * \ingroup sscUtility
  */
 class PositionStorageWriter
 {
@@ -69,9 +74,9 @@ public:
 	PositionStorageWriter(QString filename);
 	~PositionStorageWriter();
 	void write(Transform3D matrix, uint64_t timestamp, int toolIndex);
-  void write(Transform3D matrix, uint64_t timestamp, QString toolUid);
+	void write(Transform3D matrix, uint64_t timestamp, QString toolUid);
 private:
-  QString mCurrentToolUid; ///< the tool currently being written.
+	QString mCurrentToolUid; ///< the tool currently being written.
 	QFile positions;
 	QDataStream stream;
 };

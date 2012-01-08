@@ -18,13 +18,13 @@ class QTextStream;
 
 namespace ssc
 {
-/**
- * \class Message
- *
- * \brief A representation of a MessageManager message.
+/**\brief A representation of a MessageManager message.
  *
  * \author Janne Beate Lervik Bakeng, SINTEF
  * \date 24.08.2010
+ *
+ * \sa MessageManager
+ * \ingroup sscUtility
  */
 class Message
 {
@@ -45,10 +45,8 @@ public:
   QString mSourceLocation; ///< file:line/function
 };
 
-/**
- * \class MessageManager
+/**\brief Logging service for SSC.
  *
- * Logging service for SSC.
  * Send info in different error levels, and route
  * them to file, or to a console via qt signals.
  * Use the class ConsoleWidget for this.
@@ -61,6 +59,7 @@ public:
  *TODO Sender should be added to the message
  *TODO Enable/disable info, warnings and errors
  *
+ * \ingroup sscUtility
  */
 class MessageManager : public QObject
 {

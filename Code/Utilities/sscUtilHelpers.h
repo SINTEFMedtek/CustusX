@@ -8,6 +8,11 @@
 namespace ssc
 {
 
+/**
+ * \addtogroup sscUtility
+ * \{
+ */
+
 
 /**stream the range |begin,end> to the ostream.
  * insert separator between each element..
@@ -34,6 +39,10 @@ template<class ITER> std::ostream& stream_range(std::ostream& s, ITER begin, ITE
 double constrainValue(double val, double min, double max);
 int sign(double x);
 QString changeExtension(QString name, QString ext);
+
+/**
+ * \}
+ */
 
 } // namespace ssc
 

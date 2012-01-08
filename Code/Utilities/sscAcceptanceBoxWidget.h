@@ -6,7 +6,9 @@
 namespace ssc
 {
 
-/**Widget that displays two buttons: accept and reject.
+/**\brief Widget for semi-automatic testing of visuals.
+ *
+ * Widget that displays two buttons: accept and reject.
  * The result will emit a finished(bool) signal. - true=accepted, false=rejected
  *
  * Intended use: During semiautomated tests, the user can accept/reject the graphical
@@ -20,7 +22,7 @@ namespace ssc
  * Automatic/semiautomatic mode is switched in
  *     ssc/Code/Utilities/sscConfig.h.in
  *
- *
+ * \ingroup sscUtility
  */
 class AcceptanceBoxWidget : public QFrame
 {

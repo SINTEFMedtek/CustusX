@@ -6,11 +6,14 @@
 namespace ssc
 {
 
-
-/**Extension of the QSettings class.
+/**\brief Custom ini file for Sonowand.
+ *
+ * Extension of the QSettings class.
  * 
  * -Always of type inifile.
  * -handles the md5 checksum (optional)
+ *
+ * \ingroup sscUtility
  */
 class SonowandInifile : public QSettings
 {

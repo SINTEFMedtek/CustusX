@@ -19,6 +19,13 @@ typedef boost::shared_ptr<class QTimer> QTimerPtr;
 namespace ssc
 {
 class ToolManager;
+
+/**\brief Implementation of a Tool used for testing.
+ *
+ * Can move in a specified path.
+ *
+ * \ingroup sscTool
+ */
 class DummyTool : public Tool
 {
 	Q_OBJECT

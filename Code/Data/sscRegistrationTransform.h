@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCREGISTRATIONTRANSFORM_H_
 #define SSCREGISTRATIONTRANSFORM_H_
 
@@ -14,8 +33,12 @@ class QDomNode;
 namespace ssc
 {
 
-/**Encapsulation of a transform and the registration event,
+/**\brief A registration event and its transform.
+ *
+ * Encapsulation of a transform and the registration event,
  * i.e the time and kind of registration.
+ *
+ * \ingroup sscData
  */
 class RegistrationTransform
 {
@@ -37,8 +60,14 @@ public:
 bool operator<(const RegistrationTransform& lhs, const RegistrationTransform& rhs);
 bool operator==(const RegistrationTransform& lhs, const RegistrationTransform& rhs);
 
-/**Encapsulation of a transform and the registration event,
- * i.e the time and kind of registration.
+/**\brief Definition of a parent space event.
+ *
+ * As RegistrationTransform, but the event is a change in the parent space
+ * of the Data, as opposed to a change in transform.
+ *
+ * \sa RegistrationTransform
+ *
+ * \ingroup sscData
  */
 class ParentSpace
 {
@@ -59,9 +88,13 @@ bool operator==(const ParentSpace& lhs, const ParentSpace& rhs);
 
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
-/**A RegistrationHistory describes the registration history of one
+/**\brief A history of registration events.
+ *
+ * A RegistrationHistory describes the registration history of one
  * transform. Normally only the newest transform is used, but it is
  * possible to roll back in time when needed.
+ *
+ * \ingroup sscData
  */
 class RegistrationHistory: public QObject
 {

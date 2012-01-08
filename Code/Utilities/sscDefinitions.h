@@ -4,6 +4,11 @@
 namespace ssc
 {
 
+/**
+ * \addtogroup sscUtility
+ * @{
+ */
+
 	enum ORIENTATION_TYPE
 	{
 		otOBLIQUE,   ///< orient planes relative to the tool space 
@@ -83,6 +88,11 @@ namespace ssc
     ttUSPROBE,    ///< ultrasound probe
     ttCOUNT
 	};*/
+
+/**
+ * @}
+ */
+
 } //namespace end
 
 //#include "sscDefinitionStrings.h"

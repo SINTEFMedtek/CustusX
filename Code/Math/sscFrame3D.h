@@ -7,7 +7,13 @@
 namespace ssc
 {
 
-/**Helper class for visualizing rotational angles to a human user.
+/**
+ * \addtogroup sscMath
+ * @{
+ */
+
+
+/**\brief Helper class for visualizing rotational angles to a human user.
  *
  * Upon initialization, the angles X,Y,Z are initialized with the Euler XYZ decomposition.
  * Further calls to rotate() will be treated as rotation of that particular unit axis in the
@@ -34,8 +40,8 @@ private:
 	Transform3D m_R; ///< 3x3 rotational matrix
 };
 
-/**
- * Defines an axis-angle representation of a position+orientation in 3D space.
+/**\brief Defines an axis-angle representation of a position+orientation in 3D space.
+ *
  * - ThetaXY+ThetaZ is the axis of rotation
  * - Phi is the amount of rotation
  * - P is the translation
@@ -72,6 +78,10 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& s, const Frame3D& t);
+
+/**
+ * @}
+ */
 
 } // namespace ssc
 // --------------------------------------------------------

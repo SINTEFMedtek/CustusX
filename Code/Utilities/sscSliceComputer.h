@@ -7,32 +7,10 @@
 namespace ssc
 {
 
-///**Container for all data required to control a SliceComputer
-// * along with some utility methods
-// */
-//class SliceData
-//{
-//public:
-//  SliceData();
-//
-//  void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset);
-//  void switchOrientationMode(ORIENTATION_TYPE type);
-//
-//  ORIENTATION_TYPE mOrientType;
-//  PLANE_TYPE mPlaneType;
-//  FOLLOW_TYPE mFollowType;
-//
-//  bool mUseGravity;
-//  Vector3D mGravityDirection;
-//
-//  bool mUseViewOffset;
-//  double mViewportHeight;
-//  double mViewOffset;
-//};
-
-
-/**A 2D slice plane in 3D.
+/**\brief A 2D slice plane in 3D.
  * i,j are perpendicular unit vectors.
+ *
+ * \ingroup sscUtility
  */
 class SlicePlane
 {
@@ -47,7 +25,8 @@ public:
 std::ostream& operator<<(std::ostream& s, const SlicePlane& val);
 bool similar(const SlicePlane& a, const SlicePlane& b);
 
-/**Calculates a slice plane given a definition.
+
+/**\brief Calculates a slice plane given a definition.
  * 
  * SliceComputer is set up with what image to slice and the tool to use,
  * along with what method that defines the slicing. The input produces a 
@@ -55,6 +34,8 @@ bool similar(const SlicePlane& a, const SlicePlane& b);
  * center c defining the center. 
  * 
  * Most methods set the computer state, while getPlane() does all the computing.
+ *
+ * \ingroup sscUtility
  */
 class SliceComputer
 {

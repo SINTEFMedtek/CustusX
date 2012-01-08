@@ -16,10 +16,12 @@ namespace ssc
 
 typedef boost::shared_ptr<class CustomMetaImage> CustomMetaImagePtr;
 
-/**utility class for accessing metaheader files.
+/**\brief utility class for accessing metaheader files.
+ *
  * This is meant as a supplement to vtkMetaImageReader/Writer,
  * extending that interface.
  *
+ * \ingroup sscUtility
  */
 class CustomMetaImage
 {

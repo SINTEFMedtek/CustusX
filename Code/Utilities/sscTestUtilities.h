@@ -8,6 +8,11 @@
 namespace ssc
 {
 
+/**
+ * \addtogroup sscUtility
+ * \{
+ */
+
 struct TestUtilities
 {
 	static inline QString GetDataRoot();
@@ -29,6 +34,9 @@ QString TestUtilities::ExpandDataFileName(QString fileName)
 	return expandedName;
 }
 
+/**
+ * \}
+ */
 
 } // namespace ssc
 

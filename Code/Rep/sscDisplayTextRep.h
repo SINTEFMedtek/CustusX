@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCDISPLAYTEXTREP_H_
 #define SSCDISPLAYTEXTREP_H_
 
@@ -12,6 +31,17 @@ typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 
 typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
 
+/**\brief Display a number of text strings.
+ *
+ * Display a number of text strings at fixed positions in the view.
+ * The positioning is done in normalized view space, i.e. the text
+ * is placed relative to the view and not the world.
+ *
+ * \ingroup sscRep
+ * \ingroup sscRep2D
+ * \ingroup sscRep3D
+ * \ingroup sscRepVideo
+ */
 class DisplayTextRep : public ssc::RepImpl
 {
 public:
@@ -28,8 +58,6 @@ protected:
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 	
 	std::vector<TextDisplayPtr> mDisplayText;
-
-//	TextDisplayPtr mPictString;
 };
 
 
