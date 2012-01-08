@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 /*
  * sscDoubleDataAdapter.h
  *
@@ -16,35 +35,42 @@
 namespace ssc
 {
 
-/** Abstract interface for interaction with internal double-valued data
+/**\brief Abstract interface for interaction with internal double-valued data
  *
  * The class provides a bridge between general user interface code and specific
  * data structures. An implementation connects to a single data value.
  *
  *
  * Minimal implementation:
- *      virtual QString getValueName() const;
- *      virtual bool setValue(double value);
- *      virtual double getValue() const;
- *      void changed();
+   \verbatim
+       virtual QString getValueName() const;
+       virtual bool setValue(double value);
+       virtual double getValue() const;
+       void changed();
+   \endverbatim
  * By implementing these methods you can set and get values, and the data has a name.
  * The changed() signal is used to make sure the user interface is updated even when
  * data is changed by some other source.
  *
  *
  * For more control use the methods:
- *      virtual DoubleRange getValueRange() const;
- *      virtual int getValueDecimals() const;
+   \verbatim
+       virtual DoubleRange getValueRange() const;
+       virtual int getValueDecimals() const;
+   \endverbatim
  *
  *
  * If there is a difference between the internal data representation and
  * how you want to present them, use:
- *      virtual double convertInternal2Display(double internal);
- *      virtual double convertDisplay2Internal(double display);
+   \verbatim
+       virtual double convertInternal2Display(double internal);
+       virtual double convertDisplay2Internal(double display);
+   \endverbatim
  *
  * When testing, or during development, you can use the DoubleDataAdapterNull
  * as a dummy implementation.
  *
+ * \ingroup sscWidget
  */
 class DoubleDataAdapter: public DataAdapter
 {

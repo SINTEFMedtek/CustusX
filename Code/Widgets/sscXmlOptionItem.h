@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 /*
  * sscXmlOptionItem.h
  *
@@ -13,11 +32,12 @@
 namespace ssc
 {
 
-/**Helper class for storing one string value in an xml document.
+/**\brief Helper class for storing one string value in an xml document.
  *
  * Init with the parent (root) node and an uid,
  * then read/write the value.
  *
+ * \ingroup sscWidget
  */
 class XmlOptionItem
 {
@@ -34,7 +54,7 @@ private:
 	QDomElement mRoot;
 };
 
-/**Helper class for xml files used to store ssc/cx data.
+/**\brief Helper class for xml files used to store ssc/cx data.
  *
  * Both the xml document and filename are stored,
  * and save/load are provided.
@@ -48,6 +68,8 @@ private:
  *
  * The getElement() methods are used to retrieve QDomElements relative
  * to the current element.
+ *
+ * \ingroup sscWidget
  */
 class XmlOptionFile
 {

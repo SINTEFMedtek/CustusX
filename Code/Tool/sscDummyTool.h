@@ -8,14 +8,6 @@
 
 typedef boost::shared_ptr<class QTimer> QTimerPtr;
 
-/**
- * \class DummyTool
- *
- * \brief
- *
- * \date Oct 30, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 namespace ssc
 {
 class ToolManager;
@@ -23,6 +15,9 @@ class ToolManager;
 /**\brief Implementation of a Tool used for testing.
  *
  * Can move in a specified path.
+ *
+ * \date Oct 30, 2008
+ * \author: Janne Beate Bakeng, SINTEF
  *
  * \ingroup sscTool
  */

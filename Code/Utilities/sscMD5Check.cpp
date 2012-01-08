@@ -29,6 +29,7 @@ bool CreateFileDigest( unsigned char digest[ MD5_DIGEST_LENGTH ], const char* co
 /**
  * @param digest (out) The digest constructed from the content of the file
  * @param data (in) Data buffer to MD5 to generate checksum from
+ * @param size (in) buffer size
  * @return true if digest created, false otherwise.
  */
 bool CreateArrayDigest( unsigned char digest[ MD5_DIGEST_LENGTH ], const unsigned char* const data, int size );

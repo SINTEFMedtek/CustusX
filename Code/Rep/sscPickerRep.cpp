@@ -200,17 +200,6 @@ Vector3D PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr r
 	return intersection;
 }
 
-///**
-// * \param[in] index the index you want to give the landmark
-// */
-//void PickerRep::makeLandmarkPermanent(unsigned index)
-//{
-//	emit addPermanentPoint(mPickedPoint[0],
-//						   mPickedPoint[1],
-//						   mPickedPoint[2],
-//						   index);
-//}
-
 void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
   //std::cout << "PickerRep::pickLandmarkSlot" << std::endl;
@@ -231,18 +220,6 @@ void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
 	this->pickLandmark(clickPoint, renderer);
 }
-
-///**
-// * @param x world coordinat, ref space
-// * @param y world coordinat, ref space
-// * @param z world coordinat, ref space
-// */
-//void PickerRep::showTemporaryPointSlot(double x, double y, double z)
-//{
-//  mPickedPoint = Vector3D(x,y,z);
-//  if (mGraphicalPoint)
-//    mGraphicalPoint->setValue(mPickedPoint);
-//}
 
 /**
  * @param threshold sets a threshold for the picking ray

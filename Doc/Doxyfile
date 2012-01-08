@@ -638,7 +638,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ../Code
+INPUT                  = ../
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -701,7 +701,11 @@ RECURSIVE              = YES
 # Note that relative paths are relative to directory from which doxygen is run.
 
 EXCLUDE                = ../Code/3rdParty \
-                         ../Code/Ultrasound
+                         ../Code/Ultrasound \
+                         ../Sandbox \
+                         ../Testing \
+                         ../Examples \
+                         ../Data
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix file system feature) are excluded 
@@ -715,7 +719,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = 
+EXCLUDE_PATTERNS       = */.git/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names 
 # (namespaces, classes, functions, etc.) that should be excluded from the 
