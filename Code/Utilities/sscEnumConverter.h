@@ -7,7 +7,12 @@
 #include <QString>
 #include "sscTypeConversions.h"
 
-/**Class for easy conversion between an enum and a QString.
+/**
+ * \addtogroup sscUtility
+ * @{
+ */
+
+/**\brief Class for easy conversion between an enum and a QString.
  * 
  * NOTE: Use the helper macros instead of the description below.
  * 
@@ -168,5 +173,8 @@ namespace NS                                                                \
 }                                                                           \
 // --------------------------------------------------------
 
+/**
+ * @}
+ */
 
 #endif /*ENUMCONVERTER_H_*/

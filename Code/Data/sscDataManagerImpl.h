@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCDATAMANAGERIMPL_H_
 #define SSCDATAMANAGERIMPL_H_
 
@@ -15,6 +34,10 @@ class QDomElement;
 namespace ssc
 {
 
+/**\brief Interface for Data file readers.
+ *
+ * \ingroup sscData
+ */
 class DataReader
 {
 public:
@@ -26,6 +49,10 @@ public:
 };
 typedef boost::shared_ptr<DataReader> DataReaderPtr;
 
+/**\brief Reader for metaheader .mhd files.
+ *
+ * \ingroup sscData
+ */
 class MetaImageReader: public DataReader
 {
 public:
@@ -40,6 +67,10 @@ public:
 	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
+/**\brief Reader for minc files.
+ *
+ * \ingroup sscData
+ */
 class MincImageReader: public DataReader
 {
 public:
@@ -64,6 +95,10 @@ public:
 //typedef boost::shared_ptr<MeshReader> MeshReaderPtr;
 
 
+/**\brief Reader for .vtk files.
+ *
+ * \ingroup sscData
+ */
 class PolyDataMeshReader: public DataReader
 {
 public:
@@ -78,6 +113,10 @@ public:
 	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
+/**\brief Reader for STL files.
+ *
+ * \ingroup sscData
+ */
 class StlMeshReader: public DataReader
 {
 public:
@@ -92,12 +131,16 @@ public:
 	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
-//-----
 /**
- * \class DataManagerImpl
- *
  * \date Jan 6, 2009
  * \author christiana
+ */
+
+/**\brief Default implementation of DataManager.
+ *
+ * Used by CustusX.
+ *
+ * \ingroup sscData
  */
 class DataManagerImpl: public DataManager
 {

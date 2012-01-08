@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCPROGRESSIVELODVOLUMEREP_H_
 #define SSCPROGRESSIVELODVOLUMEREP_H_
 
@@ -13,17 +32,19 @@ typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 
 typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolumetricRepPtr;
 
-/**Volume rendering of one image.
+/**\brief Volume texture rendering of one image.
  *
  * Use this in place of VolumetricRep when the initial render time is high.
  * The rendering will be performed at progressively higher sample rates, thus
  * the user will get immediate feedback at low detail, and when the high-resolution
  * rendering is finished (in another thread) the display will be updated.
- * 
- * Used by Sonowand.  
- * 
+ *
+ * Used by Sonowand.
+ *
  * Not working for Windows and Mac. OK on Fedora.
  *
+ * \ingroup sscRep
+ * \ingroup sscRep3D
  */
 class ProgressiveLODVolumetricRep : public VolumetricBaseRep
 {

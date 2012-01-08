@@ -7,9 +7,15 @@
 namespace ssc
 {
 
+/**
+ * \addtogroup sscMath
+ * @{
+ */
+
+
 bool similar(double a, double b, double tol = 1.0E-6); ///< check for equality with a tolerance: |b-a|<tol
 
-/**Vector3D is a representation of a point or vector in 3D.
+/**\brief Vector3D is a representation of a point or vector in 3D.
  *
  * Vector3D is implemented using the Eigen library type Eigen::Vector3d,
  * and extended with convenience methods using the Eigen plugin system.
@@ -33,6 +39,10 @@ Vector3D round(const Vector3D& a);
 Vector3D ceil(const Vector3D& a);
 
 bool similar(const Eigen::Array3i& a, const Eigen::Array3i& b); ///< identical to the equality operator, exists for symmetry with Vector3D.
+
+/**
+ * @}
+ */
 
 } // namespace ssc
 // --------------------------------------------------------

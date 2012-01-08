@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCDATAMANAGER_H_
 #define SSCDATAMANAGER_H_
 
@@ -26,17 +45,13 @@ enum READER_TYPE
 {
 	rtDICOM, rtSONOWAND_M3D, rtMETAIMAGE, rtMINCIMAGE, rtPOLYDATA, rtSTL, rtAUTO, rtCOUNT
 };
-//-----
-//enum MESH_READER_TYPE
-//{
-//	mrtPOLYDATA,
-//	mrtSTL,
-//};
 
-/**Manager for images, meshes, and associated data.
+/**\brief Interface for a manager of data objects.
  *
  * Simply calling instance() will instantiate the default manager DataManagerImpl.
  * It is also possible to subclass and use setInstance() to set another type.
+ *
+ * \ingroup sscData
  */
 class DataManager: public QObject
 {

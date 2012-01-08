@@ -13,6 +13,17 @@ namespace ssc
 /// you want to write new data. Readers always grab the latest buffer. Things go
 /// more smooth when all users release their buffers as soon as they are done.
 
+/**\brief Shared Memory Server
+ *
+ * Implements a circular buffer in shared memory using a client-server model,
+ * where you have one writer and potentially multiple readers. Note that if you
+ * have more readers than buffers, you can end up with all buffers busy when
+ * you want to write new data. Readers always grab the latest buffer. Things go
+ * more smooth when all users release their buffers as soon as they are done.
+ *
+ * \sa SharedMemoryClient
+ * \ingroup sscUtility
+ */
 class SharedMemoryServer
 {
 private:
@@ -40,6 +51,12 @@ public:
 	bool hasBuffer() { return mCurrentBuffer != -1; }
 };
 
+/**\brief Shared Memory Client
+ *
+ *
+ * \sa SharedMemoryServer
+ * \ingroup sscUtility
+ */
 class SharedMemoryClient
 {
 private:

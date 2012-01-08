@@ -1,14 +1,23 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
 //
-// C++ Interface: vmTool2drep
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
 //
-// Description:
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
 //
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
 //
-// Author:  <>, (C) 2008
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
+// See sscLicense.txt for more information.
+
+
 #ifndef VMVMTOOL2DREP_H
 #define VMVMTOOL2DREP_H
 
@@ -23,11 +32,20 @@ namespace ssc
 {
 class ProbeData;
 
-/**
- *This class will hold all the representation and drawing of 2d tool
- *in navigation and registration.
+/**\brief Display a Tool in 2D.
  *
- * Used by Sonowand.
+ * Toolrep2D displays a Tool as a line, with points showing
+ * the toop tip and the offset point. If the Tool is a Probe,
+ * the probe sector can be shown as well.
+ *
+ * Several optional visualizations are available.
+ *
+ * \image html sscArchitecture_tool.png "ToolRep2D, ToolRep3D and surrounding classes."
+ *
+ * Used by CustusX and Sonowand.
+ *
+ * \ingroup sscRep
+ * \ingroup sscRep2D
  */
 class ToolRep2D : public ssc::RepImpl
 {

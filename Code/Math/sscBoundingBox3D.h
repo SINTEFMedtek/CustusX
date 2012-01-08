@@ -12,7 +12,12 @@ namespace ssc
 //{
 // --------------------------------------------------------
 
-/** Representation of an integer bounding box in 3D.
+/**
+ * \addtogroup sscMath
+ * @{
+ */
+
+/** \brief Representation of an integer bounding box in 3D.
  *  The data are stored as {xmin,xmax,ymin,ymax,zmin,zmax}, 
  *  in order to simplify communication with vtk.  
  */
@@ -35,7 +40,7 @@ public:
 
 std::ostream& operator<<(std::ostream& s, const IntBoundingBox3D& data);
 
-/** Representation of a floating-point bounding box in 3D.
+/** \brief Representation of a floating-point bounding box in 3D.
  *  The data are stored as {xmin,xmax,ymin,ymax,zmin,zmax}, 
  *  in order to simplify communication with vtk.  
  */
@@ -64,6 +69,10 @@ public:
 bool similar(const DoubleBoundingBox3D& a, const DoubleBoundingBox3D& b, double tol = 1.0E-6);
 
 std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data);
+
+/**
+ * @}
+ */
 
 // --------------------------------------------------------
 //} // namespace utils

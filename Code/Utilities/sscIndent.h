@@ -6,8 +6,11 @@
 namespace ssc
 {
 
-/**Formatting class for debug printing of the ssc library.
- * Based on, and inheriting from,  vtkIndent.
+/**\brief Formatting class for debug printing of the ssc library.
+ *
+ * Based on vtkIndent.
+ *
+ * \ingroup sscUtility
  */
 class Indent// : public vtkIndent
 {

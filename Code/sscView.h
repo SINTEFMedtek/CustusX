@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCVIEW_H_
 #define SSCVIEW_H_
 #include "sscConfig.h"
@@ -21,13 +40,21 @@ class QColor;
 namespace ssc
 {
 class DoubleBoundingBox3D;
-//  class Transform3D;
 typedef boost::shared_ptr<class Rep> RepPtr;
 
-/**
- * \class View
- * \brief Base widget for displaying lists of Rep. The View class inherits a
- * QVTKWidget but creates its own vtkRenderer and vtkRenderWindow.
+/**\brief Base widget for displaying lists of Rep.
+ *
+ * View inherits from QWidget and thus can be added to a QLayout.
+ * It wraps vtkRenderer and vtkRenderWindow, and visualizes a scene
+ * with one camera. Add reps to the View in order to visualize them.
+ * Although any Rep can be added to a View, it makes most sense
+ * dedicate each view for either 2D, 3D or Video display. Most Reps
+ * are specialized to one of these three modes.
+ *
+ * Note: Some special hacks has been introduced in order to share
+ * GPU memory between GL contexts (i.e. Views). This is described
+ * in the vtkMods folder.
+ *
  */
 class View: public ViewQVTKWidget
 {

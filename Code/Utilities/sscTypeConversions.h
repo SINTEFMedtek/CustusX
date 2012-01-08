@@ -8,6 +8,11 @@
 #include <QDomDocument>
 #include <boost/lexical_cast.hpp>
 
+/**
+ * \addtogroup sscUtility
+ * \{
+ */
+
 /**Convenience function that converts a type to its 
  * string representation, provided it has defined operator <<.
  */
@@ -71,5 +76,9 @@ QString streamXml2String(const T& val)
   val.addXml(root);
   return doc.toString();
 }
+
+/**
+ * \}
+ */
 
 #endif /*SSCTYPECONVERSIONS_H_*/

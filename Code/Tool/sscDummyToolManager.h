@@ -1,17 +1,37 @@
-	#ifndef SSCDUMMYTOOLMANAGER_H_
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
+#ifndef SSCDUMMYTOOLMANAGER_H_
 #define SSCDUMMYTOOLMANAGER_H_
 
 #include "sscToolManager.h"
 #include "sscDummyTool.h"
-/**
- * sscDummyToolManager.h
- *
- * \brief
- *
+/*
  * \date Oct 29, 2008
  * \author: jbake
  */
 
+
+/**\brief Implementation of a ToolManager used for testing.
+ *
+ * \ingroup sscTool
+ */
 namespace ssc
 {
 class DummyToolManager : public ToolManager

@@ -5,15 +5,14 @@
 
 namespace ssc
 {
-/**
- * \class Audio
- *
- * \brief Class for playing sounds
+
+/**\brief Interface for playing sounds
  *
  * \date Mar 11, 2011
  * \author Janne Beate Bakeng, SINTEF
+ *
+ * \ingroup sscUtility
  */
-
 class Audio
 {
 public:

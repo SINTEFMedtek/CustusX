@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCVTKHELPERCLASSES_H
 #define SSCVTKHELPERCLASSES_H
 
@@ -12,9 +31,11 @@
 namespace ssc
 {
 // --------------------------------------------------------
-/*Wrapper class for adding orientation text
- */
 
+/**\brief RGB color data.
+ *
+ * \ingroup sscProxy
+ */
 class RGBColor : public boost::array<double,3>
 {
 public:
@@ -28,6 +49,10 @@ public:
 	~RGBColor() {}
 };
 
+/**\brief Helper for drawing a point in 2D.
+ *
+ * \ingroup sscProxy
+ */
 class OffsetPoint
 {
 	public:
@@ -46,6 +71,10 @@ class OffsetPoint
 };
 typedef boost::shared_ptr<OffsetPoint> OffsetPointPtr;
 
+/**\brief Helper for drawing a line in 2D.
+ *
+ * \ingroup sscProxy
+ */
 class LineSegment
 {
 	public:
@@ -66,6 +95,10 @@ class LineSegment
 		vtkLineSourcePtr source;
 };
 
+/**\brief Helper for drawing text in 2D.
+ *
+ * \ingroup sscProxy
+ */
 class TextDisplay
 {
 	public:
@@ -81,20 +114,18 @@ class TextDisplay
 		int getMaxWidth();
 		int getWidth( vtkViewport *vp );
 	private:
-
-
 		vtkTextMapperPtr mapper;
 		vtkActor2DPtr actor;
 		vtkRendererPtr mRenderer;
 		int maxWidth;
 		QString text;
-
 };
 typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 
 
-/**
- * Wrapper class for the croos hair in ACS
+/**\brief Helper for drawing a crosshair in 2D.
+ *
+ * \ingroup sscProxy
  */
 class CrossHair2D
 {
@@ -114,8 +145,12 @@ class CrossHair2D
 };
 typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
 
-/**Wrapper class for a vtkAxes. Sets up some nice defaults and draws the
+/**\brief Helper for drawing a coordinate axis in 3D.
+ *
+ * Wrapper class for a vtkAxes. Sets up some nice defaults and draws the
  * axes in the world coordinate system.
+ *
+ * \ingroup sscProxy
  */
 class Axes3D
 {

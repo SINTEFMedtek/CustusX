@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCGPUIMAGEBUFFER_H_
 #define SSCGPUIMAGEBUFFER_H_
 
@@ -10,9 +29,16 @@
 namespace ssc
 {
 
-/**Helper class for sharing GPU memory over several Views (GL contexts).
+/**
+ * \addtogroup sscData
+ * \{
+ */
+
+/**\brief Helper class for sharing GPU memory over several Views (GL contexts).
  *
  * This one stores 3D volume texture in the form of a vtkImageDataPtr
+ *
+ * \ingroup sscData
  */
 class GPUImageDataBuffer
 {
@@ -37,9 +63,11 @@ typedef boost::weak_ptr<GPUImageDataBuffer> GPUImageDataBufferWeakPtr;
 
 GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume);
 
-/**Helper class for sharing GPU memory over several Views (GL contexts).
+/**\brief Helper class for sharing GPU memory over several Views (GL contexts).
+ *
  * This one stores lut in the form of a vtkUnsignedCharArrayPtr
  *
+ * \ingroup sscData
  */
 class GPUImageLutBuffer
 {
@@ -67,7 +95,11 @@ typedef boost::weak_ptr<GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
 GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume);
 GPUImageLutBufferPtr createGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
 
-/**Use this repository for avoiding multiple allocations of buffer data.
+/**\brief Repository for GPU buffers
+ *
+ * Use this repository for avoiding multiple allocations of buffer data. *
+ *
+ * \ingroup sscData
  */
 class GPUImageBufferRepository
 {
@@ -84,6 +116,9 @@ private:
 	void tearDown();
 };
 
+/**
+ * \}
+ */
 
 }
 

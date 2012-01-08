@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCTEXTURE3DSLICERPROXY_H_
 #define SSCTEXTURE3DSLICERPROXY_H_
 
@@ -16,9 +35,16 @@ namespace ssc
 typedef vtkSmartPointer<class TextureSlicePainter> TextureSlicePainterPtr;
 typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
 
-/**abstract class design to solve windows compile problems.
- * See Texture3DSlicerProxyImpl for the real implementation
+/**
+ * \brief Helper class for GPU-based slicing.
  *
+ * This class is a dummy that only provide interface.
+ * For OS that don't implement the GPU slicer, use this dummy.
+ * See Texture3DSlicerProxyImpl for the real implementation.
+ *
+ * \sa Texture3DSlicerProxyImpl for the real implementation.
+ *
+ * \ingroup sscProxy
  */
 class Texture3DSlicerProxy: public QObject
 {
@@ -40,18 +66,18 @@ public:
 #ifndef WIN32
 
 /**
- * \class Texture3DSlicerProxy
- *
- * \brief Slice a volume using a SliceProxy.
+ * \brief Slice volumes using a SliceProxy.
  *
  * The functionality is equal to SlicedImageProxy, but the actual slicing
  * is performed by loading the image into the GPU as a 3D texture and
  * slicing it there, using the GPU.
  *
- * Used by Sonowand and Sintef
+ * Used by Sonowand and Sintef.
  *
  *  Created on: Oct 13, 2011
  *      Author: christiana
+ *
+ * \ingroup sscProxy
  */
 class Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
 {

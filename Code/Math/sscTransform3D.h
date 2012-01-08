@@ -106,7 +106,12 @@ namespace ssc
 {
 class DoubleBoundingBox3D;
 
-/**Transform3D is a representation of an affine 3D transform.
+/**
+ * \addtogroup sscMath
+ * @{
+ */
+
+/**\brief Transform3D is a representation of an affine 3D transform.
  *
  * Transform3D is implemented using the Eigen library type Eigen::Affine3d,
  * and extended with convenience methods using the Eigen plugin system.
@@ -131,6 +136,10 @@ Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const
 
 // --------------------------------------------------------
 typedef boost::shared_ptr<Transform3D> Transform3DPtr;
+
+/**
+ * @}
+ */
 
 } // namespace ssc
 // --------------------------------------------------------

@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 #ifndef SSCGEOMETRICREP_H_
 #define SSCGEOMETRICREP_H_
 
@@ -11,10 +30,14 @@ typedef boost::shared_ptr<class Mesh> MeshPtr;
 
 typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
 
-/**Represenation for one Mesh.
- * Use this to render geometric poly data in a 3D scene.
- * 
+/**\brief Display one Mesh in 3D.
+ *
+ * Use this to render geometric polydata (vtkPolyData) in a 3D scene.
+ *
  * Used by CustusX.
+ *
+ * \ingroup sscRep
+ * \ingroup sscRep3D
  */
 class GeometricRep : public RepImpl
 {
