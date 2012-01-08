@@ -154,7 +154,7 @@ public:
 	virtual void loadStream(VideoSourcePtr stream);
 
 	// images
-	virtual void saveImage(ImagePtr image, const QString& basePath);///< Save image to file \param basePath Absolute path to patient data folder
+	virtual void saveImage(ImagePtr image, const QString& basePath);///< Save image to file \param image Image to save \param basePath Absolute path to patient data folder
 	virtual ImagePtr getImage(const QString& uid) const;
 	virtual std::map<QString, ImagePtr> getImages() const;
 
@@ -169,7 +169,7 @@ public:
 	//  virtual void saveData(DataPtr image, const QString& basePath, bool headerOnly=false);///< Save image to file \param basePath Absolute path to patient data folder
 
 	// meshes
-	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param basePath Absolute path to patient data folder
+	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \mesh mesh to save \param basePath Absolute path to patient data folder
 	virtual MeshPtr getMesh(const QString& uid) const;
 	virtual std::map<QString, MeshPtr> getMeshes() const;
 

@@ -17,23 +17,26 @@ namespace ssc {
  *
  *
  *
+ *
  * Binary file format description
- * Header:
- *   "SNWPOS"<version>
- *
- * Entries, can be one of:
- *
- *  * Change tool. All position entries following this one belongs to the given tool
- *      <type=2><size><toolUid>
- *
- *  * Position. integer-format tool id are appended.
- *     <type=1><size><timestamp><position><int toolid>
- *
- *  * Position. Requires change tool to have been called.
- *     <type=3><size><timestamp><position>
- *
- *  The position field is <position> = <thetaXY><thetaZ><phi><x><y><z>
- *  Where the parameters are found from a matrix using the class CGFrame.
+   \verbatim
+  Header:
+    "SNWPOS"<version>
+
+  Entries, can be one of:
+
+   * Change tool. All position entries following this one belongs to the given tool
+       <type=2><size><toolUid>
+
+   * Position. integer-format tool id are appended.
+      <type=1><size><timestamp><position><int toolid>
+
+   * Position. Requires change tool to have been called.
+      <type=3><size><timestamp><position>
+
+   The position field is <position> = <thetaXY><thetaZ><phi><x><y><z>
+   Where the parameters are found from a matrix using the class CGFrame.
+   \endverbatim
  *
  * \sa PositionStorageWriter
  * \ingroup sscUtility

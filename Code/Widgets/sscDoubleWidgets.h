@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 /*
  * sscDoubleWidgets.h
  *
@@ -25,8 +44,11 @@ namespace ssc
 //typedef boost::shared_ptr<class DoubleDataAdapterDoDoubleDataAdapter
 
 
-/**Custom widget for display of double-valued data
+/**\brief Custom widget for display of double-valued data.
+ *
  * Use the double-named methods instead of qslider's int-based ones.
+ *
+ * \ingroup sscWidget
  */
 class DoubleSlider: public QSlider
 {
@@ -76,7 +98,9 @@ private:
 	DoubleRange mRange;
 };
 
-/**A QLineEdit specialized to deal with double data.
+/**\brief A QLineEdit specialized to deal with double data.
+ *
+ * \ingroup sscWidget
  */
 class DoubleLineEdit: public QLineEdit
 {
@@ -102,13 +126,16 @@ public:
 	}
 };
 
-/**Composite widget for scalar data manipulation.
+/**\brief Composite widget for scalar data manipulation.
+ *
  * Consists of <namelabel, valueedit, slider>.
  * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
  *
  * Before use: enable the widgets you need, then add either to Own layout, in case you wish to
  * use the widget normally, or add to grid, in case you wish to integrate the elements into a
  * larger grid.
+ *
+ * \ingroup sscWidget
  */
 class ScalarInteractionWidget: public QWidget
 {
@@ -145,9 +172,12 @@ private:
 	DoubleDataAdapterPtr mData;
 };
 
-/**Composite widget for scalar data manipulation.
+/**\brief Composite widget for scalar data manipulation.
+ *
  * Consists of <namelabel, valueedit, slider>.
  * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ *
+ * \ingroup sscWidget
  */
 class SliderGroupWidget: public ScalarInteractionWidget
 {
@@ -156,11 +186,14 @@ public:
 	SliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
 };
 
-/**Composite widget for scalar data manipulation.
+/**\brief Composite widget for scalar data manipulation.
+ *
  * Consists of <namelabel, valueedit, slider>.
  * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
  *
  * Uses a QDoubleSpinBox instead of a slider - this gives a more compact widget.
+ *
+ * \ingroup sscWidget
  */
 class SpinBoxGroupWidget: public ScalarInteractionWidget
 {
@@ -169,11 +202,14 @@ public:
 	SpinBoxGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
 };
 
-/**Composite widget for scalar data manipulation.
+/**\brief Composite widget for scalar data manipulation.
+ *
  * Consists of <namelabel, valueedit, slider>.
  * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
  *
  * Uses both a slider and a spin box
+ *
+ * \ingroup sscWidget
  */
 class SpinBoxAndSliderGroupWidget: public ScalarInteractionWidget
 {
@@ -183,11 +219,14 @@ public:
 };
 typedef boost::shared_ptr<SpinBoxAndSliderGroupWidget> SpinBoxAndSliderGroupWidgetPtr;
 
-/**Composite widget for scalar data manipulation.
+/**\brief Composite widget for scalar data manipulation.
+ *
  * Consists of <namelabel, valueedit, slider>.
  * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
  *
  * This slider is custom-made and infinitely long.
+ *
+ * \ingroup sscWidget
  */
 class SpinBoxInfiniteSliderGroupWidget: public ScalarInteractionWidget
 {

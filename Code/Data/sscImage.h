@@ -108,7 +108,7 @@ public:
 	Image::ShadingStruct getShading();
 	void setShading(Image::ShadingStruct shading);
 
-	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
+	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels \param dataNode Data node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual QString getType() const
 	{

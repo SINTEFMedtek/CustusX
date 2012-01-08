@@ -22,18 +22,17 @@
 
 #include "sscToolManager.h"
 #include "sscDummyTool.h"
-/*
- * \date Oct 29, 2008
- * \author: jbake
- */
 
+namespace ssc
+{
 
 /**\brief Implementation of a ToolManager used for testing.
  *
+ * \date Oct 29, 2008
+ * \author: jbake
+ *
  * \ingroup sscTool
  */
-namespace ssc
-{
 class DummyToolManager : public ToolManager
 {
 	Q_OBJECT
