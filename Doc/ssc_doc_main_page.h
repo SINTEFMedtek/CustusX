@@ -69,15 +69,15 @@ namespace ssc
  * \ref sscData, \ref sscTool and \ref sscVideo primarily defines interfaces that
  * can be subclassed to specific implementations. Note that ssc is NOT a
  * standalone library. It is assumed that the client code implements several
- * interfaces in order to get up and running. These also modules contain some
- * functionality build in top of the interfaces.
+ * interfaces in order to get up and running. These modules also contain some
+ * functionality built on top of the interfaces.
  *
  * The \ref sscRep module primarily contains Rep (representation) subclasses.
  * They form the core of ssc. Each Rep is capable of visualizing entities
  * based on information from the data layer.
  *
  * The Reps must be added to a View in order to be shown on screen. A View
- * represents either a 2D or 3D (or Video) scene. A View cab be integrated into
+ * represents either a 2D or 3D (or Video) scene. A View can be integrated into
  * a Qt application like any other QWidget.
  *
  * \image html sscArchitecture_view.png "View structure"
