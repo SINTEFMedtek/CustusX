@@ -18,7 +18,7 @@
 // See sscLicense.txt for more information.
 
 
-#include "sscTool2DRep.h"
+#include "sscToolRep2D.h"
 
 #include <vtkRenderer.h>
 #include <vtkActor2D.h>
