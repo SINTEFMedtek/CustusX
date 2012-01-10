@@ -245,7 +245,7 @@ void Texture3DSlicerProxyImpl::setSliceProxy(ssc::SliceProxyPtr slicer)
     if (mSliceProxy)
 	{
         connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,	SLOT(transformChangedSlot()));
-		for (int i=0; i < mImages.size(); ++i)
+		for (unsigned i=0; i < mImages.size(); ++i)
 		{
 			updateCoordinates(i);
 		}
