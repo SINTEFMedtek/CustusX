@@ -49,21 +49,30 @@ typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
  * Alpha transfer function: Set either LLR/alpha or OpacityMap, this updates
  * the data as shown.
  *
- *     set            set
- *      |              |
- *   LLR/alpha --> OpacityMap --> alphaTF
+ *
+ * \verbatim
+
+      set            set
+       |              |
+    LLR/alpha --> OpacityMap --> alphaTF
+
+  \endverbatim
  *
  *
  * Color transfer function: Set either ColorMap or LUT, plus the Win/Level,
  * this updates the data as shown.
  *
- *     set        set
- *      |          |
- *   ColorMap --> LUT -------> colorTF
- *                         |
- *              Win/Level--|
- *                 |
- *                set
+ * \verbatim
+
+      set        set
+       |          |
+    ColorMap --> LUT -------> colorTF
+                          |
+               Win/Level--|
+                  |
+                 set
+
+  \endverbatim
  *
  *
  * \ingroup sscData
