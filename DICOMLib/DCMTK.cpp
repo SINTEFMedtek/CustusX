@@ -252,7 +252,6 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	DcmItem *sharedFunc = NULL, *perFrameFunc = NULL;
 	DcmSequenceOfItems *perFrameFuncSeq = NULL;
 	DcmItem *sequence = NULL;
-	bool acrnema = false;	// assume not
 	bool success = true;
 
 	/* Modality - required */
@@ -423,30 +422,16 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	LOOKUPSEQ( DCM_PlanePositionSequence );
 	if ( !dicomtag_dv( sequence, instance->image_position, DCM_ImagePositionPatient, 3 ) )
 	{
-		if ( !dicomtag_dv( dset, instance->image_position, DCM_RETIRED_ImagePosition, 3 ) )
-		{
-			seriesError(series, "No valid Image Position Patient tag.");
-			success = false;
-		}
-		else
-		{
-			acrnema = true;
-		}
+		seriesError(series, "No valid Image Position Patient tag.");
+		success = false;
 	}
 
 	/* Image Orientation Patient - required */
 	LOOKUPSEQ( DCM_PlaneOrientationSequence );
 	if ( !dicomtag_dv( sequence, series->image_orientation, DCM_ImageOrientationPatient, 6 ) )
 	{
-		if ( !dicomtag_dv( dset, series->image_orientation, DCM_RETIRED_ImageOrientation, 6 ) )
-		{
-			seriesError(series, "No valid Image Orientation Patient tag.");
-			success = false;
-		}
-		else
-		{
-			acrnema = true;
-		}
+		seriesError(series, "No valid Image Orientation Patient tag.");
+		success = false;
 	}
 
 	/* Pixel Spacing - required */
@@ -464,60 +449,7 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 
 	series->patient_orientation[0][0] = '\0';
 	series->patient_orientation[1][0] = '\0';
-	if ( !dicomtag_stringv( dset, ( char * )series->patient_orientation, DCM_PatientOrientation, 4, 2 ) )
-	{
-		/* Since ACR-NEMA 1 and 2 define a coordinate system relative to the gantry of the scanner, we need
-		 * to know the orientation of the patient in the system to avoid upside down or mirrored images. */
-		if ( acrnema )
-		{
-			sstrcat( series->series_info, "Warning: ACR-NEMA coordinate system without patient orientation defined.\n" );
-		}
-	}
-	else
-	{
-		int i, j;
-
-		/* Safety measure */
-		series->patient_orientation[0][3] = '\0';
-		series->patient_orientation[1][3] = '\0';
-
-		/* Check validity of the patient orientation */
-		if ( series->patient_orientation[0][0] == '\0' || series->patient_orientation[1][0] )
-		{
-			/* Not legal according to standard */
-			sstrcat( series->series_info, "Warning: Patient orientation is defined empty.\n" );
-		}
-		for ( i = 0; i < 2; i++ )
-		{
-			for ( j = 0; j < 3; j++ )
-			{
-				if ( series->patient_orientation[i][j] == '\0' )
-				{
-					break;
-				}
-				if ( strchr( "APRLHF", series->patient_orientation[i][j] ) == NULL )
-				{
-					/* Not legal according to standard */
-					sstrcat( series->series_info, "Warning: Invalid patient orientation defined.\n" );
-				}
-				if ( ( series->patient_orientation[i][j] == 'A' && strchr( series->patient_orientation[i], 'P' ) )
-				        || ( series->patient_orientation[i][j] == 'R' && strchr( series->patient_orientation[i], 'L' ) )
-				        || ( series->patient_orientation[i][j] == 'F' && strchr( series->patient_orientation[i], 'H' ) ) )
-				{
-					/* Be aware: For non-brain acquisitions, this may actually be the valid. Eg axial dental images may
-					 *  have left and right in the same direction. */
-					sstrcat( series->series_info, "Warning: Nonsensical patient orientation defined.\n" );
-				}
-			}
-		}
-		/* TODO: For ACR-NEMA, wrap coordinate system to patient orientation */
-		/* TODO: For now, just check that patient orientation is in DICOM patient orientation. */
-
-		// We can also test patient position tag (0x0018, 0x5100) as a fallback. If value is "HFS" then
-		// this means Head First-Supine, or head first into gantry, with face up.
-
-		// I wonder if we will ever make this a priority. ACR-NEMA is getting more obsolete every year that goes by. - Per
-	}
+	(void)dicomtag_stringv( dset, ( char * )series->patient_orientation, DCM_PatientOrientation, 4, 2 );
 
 	/* Get image metadata. We do this here so that we can give useful error messages and invalid notification
 	 * before we try to import instead of after. */
@@ -548,29 +480,15 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	/* Get samples per pixel - required */
 	if ( !dset->findAndGetUint16( DCM_SamplesPerPixel, series->samples_per_pixel ).good() )
 	{
-		if ( !acrnema )
-		{
-			seriesError(series, "No valid Samples per Pixel tag.");
-			success = false;
-		}
-		else
-		{
-			series->samples_per_pixel = 1;
-		}
+		seriesError(series, "No valid Samples per Pixel tag.");
+		success = false;
 	}
 
 	/* Get bits per sample - required */
 	if ( !dset->findAndGetUint16( DCM_BitsAllocated, series->bits_per_sample ).good() )
 	{
-		if ( !acrnema )
-		{
-			seriesError(series, "No valid bits allocated tag.");
-			success = false;
-		}
-		else
-		{
-			series->bits_per_sample = 16;
-		}
+		seriesError(series, "No valid bits allocated tag.");
+		success = false;
 	}
 
 	// Look for RGB colour LUT
@@ -626,25 +544,6 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	LOOKUPSEQ( DCM_VOILUTSequence );
 	( void ) dicomtag_window( sequence, instance );
 
-	if ( acrnema )
-	{
-		char tmp[DICOMLIB_LONG_STRING];
-
-		if (!dicomtag_string( dset, tmp, DCM_RETIRED_RecognitionCode, DICOMLIB_LONG_STRING)
-		    || strncmp(tmp, "ACR-NEMA", 8) != 0 || (tmp[9] != '1' && tmp[9] != '2'))
-		{
-			seriesError(series, "Identified as ACR-NEMA but no recognition code found.");
-			return EPROTO;
-		}
-		if (tmp[9] == '1')
-		{
-			series->warning = DICOMLIB_WARNING_ACR_NEMA_1;
-		}
-		else
-		{
-			series->warning = DICOMLIB_WARNING_ACR_NEMA_2;
-		}
-	}
 	if (!success)
 	{
 		return EPROTO;
