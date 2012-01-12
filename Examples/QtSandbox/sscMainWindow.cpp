@@ -1,7 +1,5 @@
 #include "sscMainWindow.h"
 
-#include "QVTKPaintEngine.h"
-
 namespace ssc
 {
 
