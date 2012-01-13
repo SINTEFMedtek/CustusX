@@ -25,8 +25,9 @@ endif(APPLE)
 set(ALPHA ON)
   
 if(ALPHA)
-  set(VERSION_NUMBER "${VERSION_NUMBER} alpha")
-  set(VERSION_NUMBER_VERBOSE "${VERSION_NUMBER_VERBOSE} alpha")
+  # no spaces due to linux cmake 2.8.4 troubles...
+  set(VERSION_NUMBER "${VERSION_NUMBER}.alpha")
+  set(VERSION_NUMBER_VERBOSE "${VERSION_NUMBER_VERBOSE}.alpha")
 endif(ALPHA)
 
 #------------------------------------------------------------------------------
@@ -40,10 +41,11 @@ set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
 
-set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}")
+set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME}_${VERSION_NUMBER_VERBOSE}")
 set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
 set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
 set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
+
 
 if (APPLE)
     set(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
@@ -58,7 +60,7 @@ endif(APPLE)
 
 if (UNIX AND NOT APPLE)
     set(CPACK_GENERATOR "TGZ")
-    set(CPACK_PACKAGING_INSTALL_PREFIX "")
+    set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 endif (UNIX AND NOT APPLE)
 
 #------------------------------------------------------------------------------
