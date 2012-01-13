@@ -68,6 +68,7 @@ static GLXContext sscSharedGLXContext = 0;
 
   if (!this->Internal->ContextId)
     {
+	  // SSC modification: glXCreateContext with share list 
 	  if(!test)
 		{
 			this->Internal->ContextId = glXCreateContext(this->DisplayId, v, 0, GL_TRUE);
@@ -75,7 +76,6 @@ static GLXContext sscSharedGLXContext = 0;
 		}
 		else
 		{
-		    // SSC modification: glXCreateContext with share list 
 		    this->Internal->ContextId = glXCreateContext(this->DisplayId, v, sscSharedGLXContext, GL_TRUE);
 		}
     }
