@@ -56,6 +56,9 @@
 #include <X11/Xutil.h>
 #include <X11/cursorfont.h>
 
+// SSC modification: define a shared gl context for all render windows
+static GLXContext sscSharedGLXContext = 0;
+
 class sscModified_vtkXOpenGLRenderWindow;
 class vtkRenderWindow;
 class sscModified_vtkXOpenGLRenderWindowInternal
@@ -443,6 +446,9 @@ sscModified_vtkXOpenGLRenderWindow::~sscModified_vtkXOpenGLRenderWindow()
   // close-down all system-specific drawing resources
   this->Finalize();
   
+   // SSC modification: clear the shared gl context
+   sscSharedGLXContext = 0;
+
   vtkRenderer* ren;
   this->Renderers->InitTraversal();
   for ( ren = vtkOpenGLRenderer::SafeDownCast(this->Renderers->GetNextItemAsObject());
@@ -622,8 +628,18 @@ void sscModified_vtkXOpenGLRenderWindow::CreateAWindow()
 
   if (!this->Internal->ContextId)
     {
-    this->Internal->ContextId = 
-      glXCreateContext(this->DisplayId, v, 0, GL_TRUE);
+//    this->Internal->ContextId = glXCreateContext(this->DisplayId, v, 0, GL_TRUE);
+
+	    // SSC modification: glXCreateContext with share list
+	  if(!test)
+		{
+			this->Internal->ContextId = glXCreateContext(this->DisplayId, v, 0, GL_TRUE);
+			test = this->Internal->ContextId;
+		}
+		else
+		{
+		    this->Internal->ContextId = glXCreateContext(this->DisplayId, v, sscSharedGLXContext, GL_TRUE);
+		}
     }
 
   if(!this->Internal->ContextId)
@@ -859,6 +875,7 @@ void sscModified_vtkXOpenGLRenderWindow::CreateOffScreenWindow(int width, int he
           // Load GLX 1.3
           vtkOpenGLExtensionManager *manager=vtkOpenGLExtensionManager::New();
 //          int loaded = vtkgl::LoadExtension("GLX_VERSION_1_3", manager);
+     	  // SSC modification: Should not be necessary, but we run into a linker problem here.
           int loaded = manager->LoadSupportedExtension("GLX_VERSION_1_3");
           manager->Delete();
 
