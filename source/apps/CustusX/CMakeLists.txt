@@ -210,7 +210,8 @@ if (UNIX AND NOT APPLE)
     #endforeach(next_ITEM ${ITK_LIBRARY_DIRS})
 
   set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX")
-  set(LIBS ${QT_LIBRARY_DIR})
+  #set(LIBS ${QT_LIBRARY_DIR})
+  set(LIBS "")
   set(DIRS 
       ${QT_INCLUDES} 
       ${QT_LIBRARY_DIRS}
