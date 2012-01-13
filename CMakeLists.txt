@@ -56,6 +56,11 @@ if (APPLE)
     option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
 endif(APPLE)
 
+if (UNIX AND NOT APPLE)
+    set(CPACK_GENERATOR "TGZ")
+    set(CPACK_PACKAGING_INSTALL_PREFIX "")
+endif (UNIX AND NOT APPLE)
+
 #------------------------------------------------------------------------------
 # Dart
 #------------------------------------------------------------------------------
