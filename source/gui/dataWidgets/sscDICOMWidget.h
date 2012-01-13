@@ -7,7 +7,6 @@
 #ifndef SSCDICOMWIDGET_H_
 #define SSCDICOMWIDGET_H_
 
-
 #include "sscDICOMLibConfig.h"
 
 #ifdef SSC_USE_DCMTK
