@@ -37,7 +37,7 @@ if(APPLE) # For Apple set the icns file containing icons
 endif(APPLE)
 
 #------------------------------------------------------------------------------
-# Executabel
+# Executable
 #-----------------------------------------------------------------------------
 if (APPLE)
   add_executable(CustusX MACOSX_BUNDLE ${SOURCES} )
@@ -73,6 +73,13 @@ set(RESOURCES_DIR bin)
 set(CONFIG_DIR bin)
 set(SYMLINK_DIR bin)
 
+if (UNIX AND NOT APPLE)
+    set(RESOURCES_DIR res)
+    set(CONFIG_DIR config)
+#    set(SYMLINK_DIR /Library/CustusX)
+    set(SYMLINK_DIR symlink) # nok correct, but works because this is done by fedora installation scripts.
+endif (UNIX AND NOT APPLE)
+
 if(APPLE)
     set(SYMLINK_DIR /Library/CustusX)
 endif(APPLE)
@@ -84,6 +91,8 @@ install(TARGETS CustusX
     RUNTIME DESTINATION bin
     #COMPONENT CustusX
     )
+    
+    
 
 if(WIN32)
   #Installing required run time libs for Windows, msv*.dll
@@ -160,6 +169,20 @@ if(WIN32)
       )
 endif(WIN32)
 
+# Install all files in install/nextToCustusX direcly into the CustusX folder.
+# Use this to add additional stuff to the installation.
+if (UNIX AND NOT APPLE)
+  install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
+      DESTINATION .
+      #COMPONENT CustusX
+      USE_SOURCE_PERMISSIONS
+      PATTERN ".svn" EXCLUDE
+      PATTERN "readme.txt" EXCLUDE
+      PATTERN "GrabberServer.app" EXCLUDE # we don't want mac applications installed on windows
+      PATTERN "ultrasoundVideo.app" EXCLUDE # we don't want mac applications installed on windows
+      )
+endif (UNIX AND NOT APPLE)
+
 if(APPLE)
   install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
       DESTINATION ${CUSTUSX_INSTALL_FOLDER_NAME}
@@ -173,6 +196,66 @@ endif(APPLE)
 #--------------------------------------------------------------------------------
 # Bundle utilities
 #--------------------------------------------------------------------------------
+
+#linux installation:
+if (UNIX AND NOT APPLE)
+
+    #message(STATUS ITK_DIR ${ITK_DIR})
+    #foreach(next_ITEM ${ITK_LIBRARIES})
+    #   message(STATUS "${next_ITEM}")
+    #endforeach(next_ITEM ${ITK_LIBRARIES})
+    #message(STATUS ITK_LIBRARY_DIR ${ITK_USE_FILE})
+    #foreach(next_ITEM ${ITK_LIBRARY_DIRS})
+    #   message(STATUS "${next_ITEM}")
+    #endforeach(next_ITEM ${ITK_LIBRARY_DIRS})
+
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX")
+  set(LIBS ${QT_LIBRARY_DIR})
+  set(DIRS 
+      ${QT_INCLUDES} 
+      ${QT_LIBRARY_DIRS}
+      ${SSC_INCLUDE_DIRS} 
+      ${VTK_LIBRARY_DIRS}
+      ${IGSTK_LIBRARY_DIRS}
+      ${OpenIGTLink_LIBRARY_DIRS}
+      ${ITK_DIR}/lib
+      ${DCMTK_DIR}/lib
+      ${INCLUDE_DIRECTORIES}      
+      ${SSC_BINARY_DIR}/Code
+      ${SSC_BINARY_DIR}/Code/Ultrasound/3DReconstruction
+      ${SSC_BINARY_DIR}/DICOMLib
+      ${CustusX3_BINARY_DIR}
+      ${CustusX3_BINARY_DIR}/source
+      ${CustusX3_BINARY_DIR}/source/service/patient
+      ${CustusX3_BINARY_DIR}/source/service/state
+      ${CustusX3_BINARY_DIR}/source/service/tracking
+      ${CustusX3_BINARY_DIR}/source/service/video
+      ${CustusX3_BINARY_DIR}/source/service/visualization
+      ${CustusX3_BINARY_DIR}/source/resource/algorithms
+      ${CustusX3_BINARY_DIR}/source/resource/settings
+      ${CustusX3_BINARY_DIR}/source/resource/utilities
+      ${CustusX3_BINARY_DIR}/source/plugins/Acquisition/logic
+      ${CustusX3_BINARY_DIR}/source/plugins/Acquisition/gui
+      ${CustusX3_BINARY_DIR}/source/plugins/Algorithm/logic
+      ${CustusX3_BINARY_DIR}/source/plugins/Algorithm/gui
+      ${CustusX3_BINARY_DIR}/source/plugins/Calibration/logic
+      ${CustusX3_BINARY_DIR}/source/plugins/Calibration/gui
+      ${CustusX3_BINARY_DIR}/source/plugins/Registration/logic
+      ${CustusX3_BINARY_DIR}/source/plugins/Registration/gui
+      ${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic
+      ${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/gui
+      ${CustusX3_BINARY_DIR}/source/logic/
+      ${CustusX3_BINARY_DIR}/source/gui
+      )
+      
+  install(CODE "
+     include(BundleUtilities)
+     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
+     #COMPONENT CustusX
+     )      
+      
+endif (UNIX AND NOT APPLE)
+
 if (WIN32)
   set(LIBS ${QT_LIBRARY_DIR})
   set(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
