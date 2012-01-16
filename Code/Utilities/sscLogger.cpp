@@ -5,7 +5,9 @@
 //#include <sys/stat.h>
 //#include <sys/types.h>
 //#include <time.h>
-#include <syslog.h>
+#ifndef WIN32
+	#include <syslog.h>
+#endif
 //#include <unistd.h>
 
 #include <sscMessageManager.h>
@@ -47,7 +49,9 @@ int SSC_Logging_Init(const char *logName, const char* applicationPath)
 	QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd");
 	QString logFile = basePath + "/Logs/" + timestamp + "/" + QString(logName) + ".txt";
 
+	#ifndef WIN32
 	openlog( NULL, LOG_CONS | LOG_PERROR, LOG_USER );
+	#endif
 
 	ssc::MessageManager::initialize(); // initialize
 	ssc::messageManager()->setLogFile(logFile);
@@ -58,7 +62,9 @@ int SSC_Logging_Init(const char *logName, const char* applicationPath)
 void SSC_Logging_Done( void )
 {
 	ssc::MessageManager::shutdown();
-	closelog();
+	#ifndef WIN32
+		closelog();
+	#endif
 }
 
 void SSC_Logging( bool on )
@@ -101,7 +107,10 @@ void SSC_Error( const char *file, int line, const char *function, const char *fo
 	vsnprintf(buf, MAX_LEN_LOG_LINE, format, ap);
 	va_end( ap );
 
+	#ifndef WIN32
 	syslog(LOG_CRIT | LOG_USER, "%s: %s", function, buf);
+	#endif
+	
 	ssc::messageManager()->sendMessage(buf, ssc::mlERROR, 0, false, mergeSourceInfo(file, line, function));
 }
 
@@ -116,7 +125,9 @@ void SSC_Warning( const char *file, int line, const char *function, const char *
 	vsnprintf(buf, MAX_LEN_LOG_LINE, format, ap);
 	va_end( ap );
 
+	#ifndef WIN32
 	syslog(LOG_WARNING | LOG_USER, "%s : %s", function, buf);
+	#endif
 	ssc::messageManager()->sendMessage(buf, ssc::mlWARNING, 0, false, mergeSourceInfo(file, line, function));
 }
 
