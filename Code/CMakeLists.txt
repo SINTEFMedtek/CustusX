@@ -256,8 +256,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscTextureSlicePainter.h
     Rep/sscOrientationAnnotationRep.cpp
     Rep/sscOrientationAnnotationRep.h
-    Rep/sscTool2DRep.cpp
-    Rep/sscTool2DRep.h
+    Rep/sscToolRep2D.cpp
+    Rep/sscToolRep2D.h
     Rep/sscCrossHairRep2D.cpp
     Rep/sscCrossHairRep2D.h
     Rep/sscDisplayTextRep.cpp
