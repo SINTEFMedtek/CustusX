@@ -41,7 +41,7 @@ public:
 
 	ssc::USReconstructInputData readAllFiles(QString fileName, QString calFilesPath = "", bool angio = false);
 
-	ssc::Transform3D readTransformFromFile(QString fileName);
+	static ssc::Transform3D readTransformFromFile(QString fileName, bool* ok=NULL);
 	bool readMaskFile(QString mhdFileName, ssc::ImagePtr mask);
 
 	std::vector<ssc::TimedPosition> readFrameTimestamps(QString fileName);
