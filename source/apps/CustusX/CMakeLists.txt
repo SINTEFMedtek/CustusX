@@ -62,45 +62,43 @@ target_link_libraries( CustusX
 #--------------------------------------------------------------------------------
 # See http://www.itk.org/Wiki/BundleUtilitiesExample for example on how to use bundle utilities
 #
-# On Apple, the bundle is at the root of the
-# install tree, and on other platforms it'll go into the bin directory.
-
+# The installer creates the following file structure:
+#
+# CustusX - bin
+#         - config - tool
+#                  - shader
+#                  - settings 
+#
+# On Apple, the bin folder is replaced by bundles.
+#
 
 # Variables
 #----------
-set(CUSTUSX_INSTALL_FOLDER_NAME "CustusX") # name of folder where all executables, config etc are assembled
-set(RESOURCES_DIR bin)
-set(CONFIG_DIR bin)
-set(CONFIG_RELATIVE_INSTALL_DIR .)
-set(SYMLINK_DIR bin)
 
-if (UNIX AND NOT APPLE)
-    set(RESOURCES_DIR bin/res/)
-    set(CONFIG_DIR config)
-    set(SYMLINK_DIR symlink) # not correct, but works because this is done by fedora installation scripts.
-endif (UNIX AND NOT APPLE)
-
+# Set root folder for entire installation
+set(ROOT_DIR .)
 if(APPLE)
-    set(SYMLINK_DIR /Library/CustusX)
+  set(ROOT_DIR "CustusX")
 endif(APPLE)
 
 # Install files
 #----------
+
+# Install CustusX
 install(TARGETS CustusX
-    BUNDLE DESTINATION ${CUSTUSX_INSTALL_FOLDER_NAME}
-    RUNTIME DESTINATION bin
+    BUNDLE DESTINATION ${ROOT_DIR}
+    RUNTIME DESTINATION ${ROOT_DIR}/bin
     #COMPONENT CustusX
     )
-    
-    
 
+# Installing required run time libs for Windows, msv*.dll
+# TODO: move into the other WIN32 conditional?
 if(WIN32)
-  #Installing required run time libs for Windows, msv*.dll
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include (InstallRequiredSystemLibraries)
   if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
       install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-              DESTINATION bin
+              DESTINATION ${ROOT_DIR}/bin
               PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
               GROUP_EXECUTE WORLD_READ
               #COMPONENT CustusX
@@ -108,20 +106,10 @@ if(WIN32)
   endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 endif(WIN32)
 
-if(APPLE)
-  set(RESOURCES_DIR ${CUSTUSX_INSTALL_FOLDER_NAME}/${BUNDLE_NAME}.app/Contents/Resources)
-  set(CONFIG_DIR ${CUSTUSX_INSTALL_FOLDER_NAME}/config)
-endif(APPLE)
 
-if(WIN32)
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX.exe")
-#  set(CONFIG_DIR bin/config/)
-  set(CONFIG_DIR config)
-endif(WIN32)
-
-# install configuration files to config folder
+# Install configuration files to config folder
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ 
-    DESTINATION ${CONFIG_DIR}
+    DESTINATION ${ROOT_DIR}/config
     FILE_PERMISSIONS
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
@@ -130,21 +118,60 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
         WORLD_READ WORLD_EXECUTE WORLD_WRITE
-    #COMPONENT CustusX
     PATTERN ".svn" EXCLUDE
     )
 
-# install openCL shaders into bundle
-#install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/Thunder/kernels.ocl 
+# Install openCL shaders into bundle
 install(FILES ${CustusX3_SOURCE_DIR}/externals/ssc/Code/Ultrasound/3DReconstruction/Thunder/kernels.ocl 
-        DESTINATION ${CONFIG_DIR}/shaders/
-        #COMPONENT CustusX
+        DESTINATION ${ROOT_DIR}/config/shaders/
         )
 
-# install folder for storage of igstk<->CustusX symlinks
+
+# Install Shared files
+install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Shared/doc 
+  DESTINATION ${ROOT_DIR}/doc
+  #COMPONENT CustusX
+  USE_SOURCE_PERMISSIONS
+  PATTERN ".svn" EXCLUDE
+  PATTERN "readme.txt" EXCLUDE
+  )
+
+# Install Windows-specific files
+if(WIN32)
+  install(FILES ${CustusX3_SOURCE_DIR}/install/Windows/win_install_readme.rtf 
+      DESTINATION ${ROOT_DIR}/doc
+      #COMPONENT CustusX
+      )
+endif(WIN32)
+
+# Install Linux-specific files
+if (UNIX AND NOT APPLE)
+  install(FILES 
+      ${CustusX3_SOURCE_DIR}/install/Linux/linux_install_readme.rtf
+      ${CustusX3_SOURCE_DIR}/install/Linux/runCustusX.sh
+      ${CustusX3_SOURCE_DIR}/install/Linux/runOpenIGTLinkServer.sh 
+      DESTINATION ${ROOT_DIR}
+      #COMPONENT CustusX
+    PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
+      )
+endif (UNIX AND NOT APPLE)
+
+# Install Apple-specific files
 if(APPLE)
-    install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links 
-        DESTINATION ${SYMLINK_DIR} 
+  install(FILES ${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf 
+      DESTINATION ${ROOT_DIR}/doc
+      )
+  install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/GrapperServer.app 
+      DESTINATION ${ROOT_DIR}
+      #COMPONENT CustusX
+      USE_SOURCE_PERMISSIONS
+      )
+      
+    # Install folder for storage of igstk<->CustusX symlinks. 
+    # The symlinks must be in an absolute location.
+    # Apple only (Win uses COM-ports, Linux installs with OS)
+    install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/igstk.links 
+        DESTINATION /Library/CustusX
         FILE_PERMISSIONS
             OWNER_READ OWNER_EXECUTE OWNER_WRITE
             GROUP_READ GROUP_EXECUTE GROUP_WRITE
@@ -153,67 +180,17 @@ if(APPLE)
             OWNER_READ OWNER_EXECUTE OWNER_WRITE
             GROUP_READ GROUP_EXECUTE GROUP_WRITE
             WORLD_READ WORLD_EXECUTE WORLD_WRITE
-        #COMPONENT CustusX
         PATTERN ".svn" EXCLUDE
         )
-endif(APPLE)
-
-# Install all files in install/nextToCustusX direcly into the CustusX folder.
-# Use this to add additional stuff to the installation.
-if(WIN32)
-  install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
-      DESTINATION .
-      #COMPONENT CustusX
-      USE_SOURCE_PERMISSIONS
-      PATTERN ".svn" EXCLUDE
-      PATTERN "readme.txt" EXCLUDE
-      PATTERN "GrabberServer.app" EXCLUDE # we don't want mac applications installed on windows
-      PATTERN "ultrasoundVideo.app" EXCLUDE # we don't want mac applications installed on windows
-      )
-endif(WIN32)
-
-# Install all files in install/nextToCustusX direcly into the CustusX folder.
-# Use this to add additional stuff to the installation.
-if (UNIX AND NOT APPLE)
-  install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
-      DESTINATION .
-      #COMPONENT CustusX
-      USE_SOURCE_PERMISSIONS
-      PATTERN ".svn" EXCLUDE
-      PATTERN "readme.txt" EXCLUDE
-      PATTERN "GrabberServer.app" EXCLUDE # we don't want mac applications installed on windows
-      PATTERN "ultrasoundVideo.app" EXCLUDE # we don't want mac applications installed on windows
-      )
-endif (UNIX AND NOT APPLE)
-
-if(APPLE)
-  install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
-      DESTINATION ${CUSTUSX_INSTALL_FOLDER_NAME}
-      #COMPONENT CustusX
-      USE_SOURCE_PERMISSIONS
-      PATTERN ".svn" EXCLUDE
-      PATTERN "readme.txt" EXCLUDE
-      )
 endif(APPLE)
 
 #--------------------------------------------------------------------------------
 # Bundle utilities
 #--------------------------------------------------------------------------------
 
-#linux installation:
+# Install dependencies on Linux
 if (UNIX AND NOT APPLE)
-
-#    message(STATUS OpenCV_LIB_DIR ${OpenCV_LIB_DIR})
-#    foreach(next_ITEM ${OpenCV_LIB_DIR})
-#       message(STATUS "${next_ITEM}")
-#    endforeach(next_ITEM ${OpenCV_LIB_DIR})
-    #message(STATUS ITK_LIBRARY_DIR ${ITK_USE_FILE})
-    #foreach(next_ITEM ${ITK_LIBRARY_DIRS})
-    #   message(STATUS "${next_ITEM}")
-    #endforeach(next_ITEM ${ITK_LIBRARY_DIRS})
-
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX")
-  #set(LIBS ${QT_LIBRARY_DIR})
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/${ROOT_DIR}/bin/CustusX")
   set(LIBS "")
   set(DIRS 
       ${QT_INCLUDES} 
@@ -258,10 +235,11 @@ if (UNIX AND NOT APPLE)
      fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
      #COMPONENT CustusX
      )      
-      
 endif (UNIX AND NOT APPLE)
 
+# Install dependencies on Windows
 if (WIN32)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX.exe")
   set(LIBS ${QT_LIBRARY_DIR})
   set(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES} ${ULTERIUS_INCLUDE_DIR}/../../bin)
 
