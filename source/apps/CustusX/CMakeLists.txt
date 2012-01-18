@@ -259,7 +259,7 @@ endif (UNIX AND NOT APPLE)
 
 if (WIN32)
   set(LIBS ${QT_LIBRARY_DIR})
-  set(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
+  set(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES} ${ULTERIUS_INCLUDE_DIR}/../../bin)
 
   install(CODE "
      include(BundleUtilities)
