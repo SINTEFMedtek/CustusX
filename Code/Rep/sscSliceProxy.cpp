@@ -44,6 +44,7 @@ SliceProxy::SliceProxy() :
     mCutplane(new SliceComputer())
 {
 	mAlwaysUseDefaultCenter = false;
+	mUseTooltipOffset = true;
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	connect(dataManager(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 	//TODO connect to toolmanager rMpr changed
@@ -98,8 +99,24 @@ void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestam
 
 void SliceProxy::tooltipOffsetSlot(double val)
 {
-	mCutplane->setToolOffset(val);
-	this->changed();
+	if (mUseTooltipOffset)
+	{
+		mCutplane->setToolOffset(val);
+		this->changed();
+	}
+}
+
+void SliceProxy::setUseTooltipOffset(bool use)
+{
+	if (!use)
+	{
+		tooltipOffsetSlot(0);
+	}
+	mUseTooltipOffset = use;
+	if (use)
+	{
+		tooltipOffsetSlot(mTool->getTooltipOffset());
+	}
 }
 
 void SliceProxy::toolVisibleSlot(bool visible)
