@@ -270,8 +270,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscSlicePlaneClipper.cpp
     Rep/sscVideoRep.h
     Rep/sscVideoRep.cpp
-    Rep/ultrasoundsectorsource.h
-    Rep/ultrasoundsectorsource.cpp
+    Rep/sscUltrasoundSectorSource.h
+    Rep/sscUltrasoundSectorSource.cpp
     Rep/sscToolTracer.h
     Rep/sscToolTracer.cpp
     

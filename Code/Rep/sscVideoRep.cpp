@@ -50,7 +50,7 @@
 #include "sscView.h"
 #include "sscTool.h"
 #include "sscTypeConversions.h"
-#include  "ultrasoundsectorsource.h"
+#include  "sscUltrasoundSectorSource.h"
 
 
 namespace ssc
