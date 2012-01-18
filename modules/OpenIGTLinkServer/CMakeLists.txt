@@ -119,9 +119,42 @@ target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES}
     vtkVolumeRendering  )
     
     
-#install(TARGETS cxOpenIGTLinkServer
-#    BUNDLE DESTINATION ${CUSTUSX_INSTALL_FOLDER_NAME}
-#    RUNTIME DESTINATION bin
-#    )
+install(TARGETS cxOpenIGTLinkServer
+    BUNDLE DESTINATION ${CUSTUSX_INSTALL_FOLDER_NAME}
+    RUNTIME DESTINATION bin
+    )
 
+ 
+#linux installation:
+if (UNIX AND NOT APPLE)
+
+    message(STATUS OpenCV_LIB_DIR ${OpenCV_LIB_DIR})
+    foreach(next_ITEM ${OpenCV_LIB_DIR})
+       message(STATUS "${next_ITEM}")
+    endforeach(next_ITEM ${OpenCV_LIB_DIR})
+    #message(STATUS ITK_LIBRARY_DIR ${ITK_USE_FILE})
+    #foreach(next_ITEM ${ITK_LIBRARY_DIRS})
+    #   message(STATUS "${next_ITEM}")
+    #endforeach(next_ITEM ${ITK_LIBRARY_DIRS})
+
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/cxOpenIGTLinkServer")
+  #set(LIBS ${QT_LIBRARY_DIR})
+  set(LIBS "")
+  set(DIRS 
+      ${QT_INCLUDES} 
+      ${QT_LIBRARY_DIRS}
+      ${VTK_LIBRARY_DIRS}
+#      ${SSC_INCLUDE_DIRS} 
+      ${SSC_BINARY_DIR}/Code
+      ${OpenIGTLink_LIBRARY_DIRS}
+      ${OpenCV_LIB_DIR}
+      ${OpenIGTLink_LIBRARY_DIRS}
+      )
       
+  install(CODE "
+     include(BundleUtilities)
+     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
+     #COMPONENT CustusX
+     )      
+      
+endif (UNIX AND NOT APPLE)     
