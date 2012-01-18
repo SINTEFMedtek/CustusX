@@ -127,16 +127,6 @@ install(TARGETS cxOpenIGTLinkServer
  
 #linux installation:
 if (UNIX AND NOT APPLE)
-
-    message(STATUS OpenCV_LIB_DIR ${OpenCV_LIB_DIR})
-    foreach(next_ITEM ${OpenCV_LIB_DIR})
-       message(STATUS "${next_ITEM}")
-    endforeach(next_ITEM ${OpenCV_LIB_DIR})
-    #message(STATUS ITK_LIBRARY_DIR ${ITK_USE_FILE})
-    #foreach(next_ITEM ${ITK_LIBRARY_DIRS})
-    #   message(STATUS "${next_ITEM}")
-    #endforeach(next_ITEM ${ITK_LIBRARY_DIRS})
-
   set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/cxOpenIGTLinkServer")
   #set(LIBS ${QT_LIBRARY_DIR})
   set(LIBS "")
@@ -144,7 +134,6 @@ if (UNIX AND NOT APPLE)
       ${QT_INCLUDES} 
       ${QT_LIBRARY_DIRS}
       ${VTK_LIBRARY_DIRS}
-#      ${SSC_INCLUDE_DIRS} 
       ${SSC_BINARY_DIR}/Code
       ${OpenIGTLink_LIBRARY_DIRS}
       ${OpenCV_LIB_DIR}

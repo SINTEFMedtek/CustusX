@@ -42,12 +42,11 @@ set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
 
 set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME}_${VERSION_NUMBER_VERBOSE}")
-set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
-set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
-set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
-
+set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_welcome.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_license.txt")
 
 if (APPLE)
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
     set(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
     set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
@@ -59,9 +58,14 @@ if (APPLE)
 endif(APPLE)
 
 if (UNIX AND NOT APPLE)
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/linux_install_readme.rtf")
     set(CPACK_GENERATOR "TGZ")
     set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 endif (UNIX AND NOT APPLE)
+
+if (WIN32)
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows/win_install_readme.rtf")
+endif (WIN32)
 
 #------------------------------------------------------------------------------
 # Dart
