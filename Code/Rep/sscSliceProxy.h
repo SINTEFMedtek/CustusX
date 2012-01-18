@@ -73,6 +73,15 @@ public:
 	Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
 	void printSelf(std::ostream & os, Indent indent);
 
+	/**
+	 * \brief Return true if the active tools configured tool tip offset should be used for this slice proxy
+	 */
+	bool getUseTooltipOffset() { return mUseTooltipOffset; }
+	/**x
+	 * \brief Enable or disable usage of the tools tool tip offset for this slice proxy
+	 */
+	void setUseTooltipOffset(bool);
+
 #ifdef WIN32
   typedef ssc::Transform3D Transform3D; 
 #endif
@@ -97,6 +106,7 @@ private:
 	Vector3D mDefaultCenter; ///< use this center when no tool is available
 	bool mAlwaysUseDefaultCenter; ///< use def center anyway
 	QString mName; ///< for debug
+	bool mUseTooltipOffset;
 };
 
 }
