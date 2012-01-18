@@ -395,33 +395,38 @@ bool UsReconstructionFileReader::readMaskFile(QString mhdFileName, ssc::ImagePtr
 /**
  * Reads a whitespace separated 4x4 matrix from file
  * \param fileName Input file
+ * \param fileName success flag. If NULL, logger warnings are emitted instead
  * \return  The matrix
  */
-ssc::Transform3D UsReconstructionFileReader::readTransformFromFile(QString fileName)
+ssc::Transform3D UsReconstructionFileReader::readTransformFromFile(QString fileName, bool* ok)
 {
-  ssc::Transform3D retval = ssc::Transform3D::Identity();
-  QFile file(fileName);
-  if(!file.open(QIODevice::ReadOnly))
-  {
-    ssc::messageManager()->sendWarning("Can't open file: "
-                                       + fileName);
-    return retval;
-  }
-  bool ok = true;
-  QString positionString = file.readLine();
-  positionString += " " + file.readLine();
-  positionString += " " + file.readLine();
-  positionString += " " + file.readLine();
-  retval = ssc::Transform3D::fromString(positionString, &ok);
-  if (!ok)
-  {
-    ssc::messageManager()->sendWarning("Can't read calibration from file: "
-                                       + fileName
-                                       + "values: "
-                                       + qstring_cast(retval(0,0)));
-    return retval;
-  }
-  return retval;
+	if (ok)
+		*ok = false;
+	ssc::Transform3D retval = ssc::Transform3D::Identity();
+	QFile file(fileName);
+	if (!QFileInfo(fileName).exists() || !file.open(QIODevice::ReadOnly))
+	{
+		if (!ok)
+			ssc::messageManager()->sendWarning("Can't open file: " + fileName);
+		return retval;
+	}
+	bool localOk = true;
+	QString positionString = file.readLine();
+	positionString += " " + file.readLine();
+	positionString += " " + file.readLine();
+	positionString += " " + file.readLine();
+	retval = ssc::Transform3D::fromString(positionString, &localOk);
+	if (!localOk)
+	{
+		if (!ok)
+			ssc::messageManager()->sendWarning(
+					"Can't read calibration from file: " + fileName + "values: "
+							+ qstring_cast(retval(0, 0)));
+		return retval;
+	}
+	if (ok)
+		*ok = true;
+	return retval;
 }
 
 
