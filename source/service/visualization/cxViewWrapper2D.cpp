@@ -13,7 +13,7 @@
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
-#include "sscTool2DRep.h"
+#include "sscToolRep2D.h"
 #include "sscOrientationAnnotationRep.h"
 #include "sscOrientationAnnotation2DRep.h"
 #include "sscDisplayTextRep.h"

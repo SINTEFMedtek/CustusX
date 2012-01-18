@@ -13,7 +13,7 @@
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
-#include "sscTool2DRep.h"
+#include "sscToolRep2D.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
