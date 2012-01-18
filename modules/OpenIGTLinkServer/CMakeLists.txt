@@ -117,4 +117,11 @@ target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES}
     vtkWidgets 
     vtkFiltering 
     vtkVolumeRendering  )
+    
+    
+#install(TARGETS cxOpenIGTLinkServer
+#    BUNDLE DESTINATION ${CUSTUSX_INSTALL_FOLDER_NAME}
+#    RUNTIME DESTINATION bin
+#    )
+
       

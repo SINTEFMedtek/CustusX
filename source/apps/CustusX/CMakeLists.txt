@@ -71,13 +71,13 @@ target_link_libraries( CustusX
 set(CUSTUSX_INSTALL_FOLDER_NAME "CustusX") # name of folder where all executables, config etc are assembled
 set(RESOURCES_DIR bin)
 set(CONFIG_DIR bin)
+set(CONFIG_RELATIVE_INSTALL_DIR .)
 set(SYMLINK_DIR bin)
 
 if (UNIX AND NOT APPLE)
-    set(RESOURCES_DIR res)
+    set(RESOURCES_DIR bin/res/)
     set(CONFIG_DIR config)
-#    set(SYMLINK_DIR /Library/CustusX)
-    set(SYMLINK_DIR symlink) # nok correct, but works because this is done by fedora installation scripts.
+    set(SYMLINK_DIR symlink) # not correct, but works because this is done by fedora installation scripts.
 endif (UNIX AND NOT APPLE)
 
 if(APPLE)
@@ -115,7 +115,8 @@ endif(APPLE)
 
 if(WIN32)
   set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX.exe")
-  set(CONFIG_DIR bin/config/)
+#  set(CONFIG_DIR bin/config/)
+  set(CONFIG_DIR config)
 endif(WIN32)
 
 # install configuration files to config folder
@@ -141,19 +142,21 @@ install(FILES ${CustusX3_SOURCE_DIR}/externals/ssc/Code/Ultrasound/3DReconstruct
         )
 
 # install folder for storage of igstk<->CustusX symlinks
-install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links 
-    DESTINATION ${SYMLINK_DIR} 
-    FILE_PERMISSIONS
-        OWNER_READ OWNER_EXECUTE OWNER_WRITE
-        GROUP_READ GROUP_EXECUTE GROUP_WRITE
-        WORLD_READ WORLD_EXECUTE WORLD_WRITE
-    DIRECTORY_PERMISSIONS
-        OWNER_READ OWNER_EXECUTE OWNER_WRITE
-        GROUP_READ GROUP_EXECUTE GROUP_WRITE
-        WORLD_READ WORLD_EXECUTE WORLD_WRITE
-    #COMPONENT CustusX
-    PATTERN ".svn" EXCLUDE
-    )
+if(APPLE)
+    install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links 
+        DESTINATION ${SYMLINK_DIR} 
+        FILE_PERMISSIONS
+            OWNER_READ OWNER_EXECUTE OWNER_WRITE
+            GROUP_READ GROUP_EXECUTE GROUP_WRITE
+            WORLD_READ WORLD_EXECUTE WORLD_WRITE
+        DIRECTORY_PERMISSIONS
+            OWNER_READ OWNER_EXECUTE OWNER_WRITE
+            GROUP_READ GROUP_EXECUTE GROUP_WRITE
+            WORLD_READ WORLD_EXECUTE WORLD_WRITE
+        #COMPONENT CustusX
+        PATTERN ".svn" EXCLUDE
+        )
+endif(APPLE)
 
 # Install all files in install/nextToCustusX direcly into the CustusX folder.
 # Use this to add additional stuff to the installation.
@@ -200,10 +203,10 @@ endif(APPLE)
 #linux installation:
 if (UNIX AND NOT APPLE)
 
-    #message(STATUS ITK_DIR ${ITK_DIR})
-    #foreach(next_ITEM ${ITK_LIBRARIES})
-    #   message(STATUS "${next_ITEM}")
-    #endforeach(next_ITEM ${ITK_LIBRARIES})
+    message(STATUS OpenCV_LIB_DIR ${OpenCV_LIB_DIR})
+    foreach(next_ITEM ${OpenCV_LIB_DIR})
+       message(STATUS "${next_ITEM}")
+    endforeach(next_ITEM ${OpenCV_LIB_DIR})
     #message(STATUS ITK_LIBRARY_DIR ${ITK_USE_FILE})
     #foreach(next_ITEM ${ITK_LIBRARY_DIRS})
     #   message(STATUS "${next_ITEM}")
@@ -217,6 +220,7 @@ if (UNIX AND NOT APPLE)
       ${QT_LIBRARY_DIRS}
       ${SSC_INCLUDE_DIRS} 
       ${VTK_LIBRARY_DIRS}
+      ${OpenCV_LIB_DIR}
       ${IGSTK_LIBRARY_DIRS}
       ${OpenIGTLink_LIBRARY_DIRS}
       ${ITK_DIR}/lib
