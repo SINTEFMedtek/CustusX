@@ -8,6 +8,8 @@
 #include "sscTypeConversions.h"
 #include "sscEnumConverter.h"
 #include "cxDataLocations.h"
+#include "cxUsReconstructionFileReader.h"
+#include "sscFrame3D.h"
 
 namespace cx
 {
@@ -835,59 +837,76 @@ igstk::Transform ToolFileParser::readCalibrationFile(QString absoluteFilePath)
 {
   igstk::Transform retval;
 
-  itk::Matrix<double, 3, 3> calMatrix;
-  itk::Versor<double> rotation;
-  itk::Vector<double, 3> translation;
+//  itk::Matrix<double, 3, 3> calMatrix;
+//  itk::Versor<double> rotation;
+//  itk::Vector<double, 3> translation;
+//
+//  /* File must be in the form
+//   * rot_00 rot_01 rot_02 trans_0
+//   * rot_10 rot_11 rot_12 trans_1
+//   * rot_20 rot_21 rot_22 trans_2
+//   */
+//  std::ifstream inputStream;
+//  inputStream.open(cstring_cast(absoluteFilePath));
+//  if(inputStream.is_open())
+//  {
+//    std::string line;
+//    int lineNumber = 0;
+//    while(!inputStream.eof() && lineNumber<3)
+//    {
+//      getline(inputStream, line);
+//
+//      for(int i = 0; i<4; i++)
+//      {
+//        //Tolerating more than one blank space between numbers
+//        while(line.find(" ") == 0)
+//        {
+//          line.erase(0,1);
+//        }
+//        std::string::size_type pos = line.find(" ");
+//        std::string str;
+//        if(pos != std::string::npos)
+//        {
+//          str = line.substr(0, pos);
+//        }
+//        else
+//        {
+//          str = line;
+//        }
+//        double d = atof(str.c_str());
+//        if(i<3)
+//        {
+//          calMatrix(lineNumber, i) = d;
+//        }
+//        if(i == 3)
+//        {
+//          translation.SetElement(lineNumber, d);
+//        }
+//        line.erase(0, pos);
+//      }
+//      lineNumber++;
+//    }
+//	std::cout << "cf_a" << std::endl;
 
-  /* File must be in the form
-   * rot_00 rot_01 rot_02 trans_0
-   * rot_10 rot_11 rot_12 trans_1
-   * rot_20 rot_21 rot_22 trans_2
-   */
-  std::ifstream inputStream;
-  inputStream.open(cstring_cast(absoluteFilePath));
-  if(inputStream.is_open())
-  {
-    std::string line;
-    int lineNumber = 0;
-    while(!inputStream.eof() && lineNumber<3)
-    {
-      getline(inputStream, line);
+  // replaced old file reader by the one used by reconstruction (same file format)
 
-      for(int i = 0; i<4; i++)
-      {
-        //Tolerating more than one blank space between numbers
-        while(line.find(" ") == 0)
-        {
-          line.erase(0,1);
-        }
-        std::string::size_type pos = line.find(" ");
-        std::string str;
-        if(pos != std::string::npos)
-        {
-          str = line.substr(0, pos);
-        }
-        else
-        {
-          str = line;
-        }
-        double d = atof(str.c_str());
-        if(i<3)
-        {
-          calMatrix(lineNumber, i) = d;
-        }
-        if(i == 3)
-        {
-          translation.SetElement(lineNumber, d);
-        }
-        line.erase(0, pos);
-      }
-      lineNumber++;
-    }
-    rotation.Set(calMatrix);
-    retval.SetTranslationAndRotation(translation, rotation, 1.0, igstk::TimeStamp::GetLongestPossibleTime());
-  }
-  inputStream.close();
+	bool ok = true;
+	ssc::Transform3D M = UsReconstructionFileReader::readTransformFromFile(absoluteFilePath, &ok);
+	if (ok)
+	{
+//		std::cout << M << std::endl;
+		M = ssc::Frame3D::create(M).transform(); // clean rotational parts, transform should now be pure rotation+translation
+		retval.ImportTransform(*M.getVtkMatrix());
+//		std::cout << "-----" << std::endl;
+//		std::cout << M << std::endl;
+	}
+
+//    rotation.Set(calMatrix);
+//	std::cout << "cf_b" << std::endl;
+//    retval.SetTranslationAndRotation(translation, rotation, 1.0, igstk::TimeStamp::GetLongestPossibleTime());
+//	std::cout << "cf_c" << std::endl;
+//  }
+//  inputStream.close();
   return retval;
 }
 
