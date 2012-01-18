@@ -6,7 +6,7 @@
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
-#include "sscTool2DRep.h"
+#include "sscToolRep2D.h"
 #include "sscUtilHelpers.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscMessageManager.h"
