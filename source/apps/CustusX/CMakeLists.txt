@@ -75,11 +75,19 @@ target_link_libraries( CustusX
 # Variables
 #----------
 
+# define LINUX convenience variable
+if (UNIX AND NOT APPLE)
+    set(LINUX 1)
+endif (UNIX AND NOT APPLE)
+
 # Set root folder for entire installation
 set(ROOT_DIR .)
-if(APPLE)
+if(APPLE )
   set(ROOT_DIR "CustusX")
 endif(APPLE)
+if(LINUX)
+  set(ROOT_DIR "CustusX")
+endif(LINUX)
 
 # Install files
 #----------
@@ -132,8 +140,6 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Shared/doc
   DESTINATION ${ROOT_DIR}/doc
   #COMPONENT CustusX
   USE_SOURCE_PERMISSIONS
-  PATTERN ".svn" EXCLUDE
-  PATTERN "readme.txt" EXCLUDE
   )
 
 # Install Windows-specific files
@@ -145,16 +151,16 @@ if(WIN32)
 endif(WIN32)
 
 # Install Linux-specific files
-if (UNIX AND NOT APPLE)
+if (LINUX)
   install(FILES 
-      ${CustusX3_SOURCE_DIR}/install/Linux/linux_install_readme.rtf
+      ${CustusX3_SOURCE_DIR}/install/Linux/linux_install_readme.txt
       ${CustusX3_SOURCE_DIR}/install/Linux/runCustusX.sh
       ${CustusX3_SOURCE_DIR}/install/Linux/runOpenIGTLinkServer.sh 
       DESTINATION ${ROOT_DIR}
       #COMPONENT CustusX
     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
       )
-endif (UNIX AND NOT APPLE)
+endif (LINUX)
 
 # Install Apple-specific files
 if(APPLE)
@@ -189,7 +195,7 @@ endif(APPLE)
 #--------------------------------------------------------------------------------
 
 # Install dependencies on Linux
-if (UNIX AND NOT APPLE)
+if (LINUX)
   set(APPS "\${CMAKE_INSTALL_PREFIX}/${ROOT_DIR}/bin/CustusX")
   set(LIBS "")
   set(DIRS 
@@ -235,7 +241,7 @@ if (UNIX AND NOT APPLE)
      fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
      #COMPONENT CustusX
      )      
-endif (UNIX AND NOT APPLE)
+endif (LINUX)
 
 # Install dependencies on Windows
 if (WIN32)

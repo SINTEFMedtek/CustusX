@@ -30,17 +30,13 @@ typedef vtkSmartPointer<vtkLookupTable> vtkLookupTablePtr;
 namespace cx
 {
 
-
-
-
 //------------------------------------------------------------
 //------------------------------------------------------------
 //------------------------------------------------------------
 
 
 ImageSession::ImageSession(int socketDescriptor, QObject* parent) :
-    QThread(parent),
-    mSocketDescriptor(socketDescriptor)
+	QThread(parent), mSocketDescriptor(socketDescriptor)
 {
 	mArguments = cx::extractCommandlineOptions(QCoreApplication::arguments());
 }
@@ -51,28 +47,26 @@ ImageSession::~ImageSession()
 
 void ImageSession::run()
 {
-  mSocket = new QTcpSocket();
-  connect(mSocket, SIGNAL(disconnected()), this, SLOT(quit()), Qt::DirectConnection); // quit thread when disconnected
-  mSocket->setSocketDescriptor(mSocketDescriptor);
-  QString clientName = mSocket->localAddress().toString();
-  std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
+	mSocket = new QTcpSocket();
+	connect(mSocket, SIGNAL(disconnected()), this, SLOT(quit()), Qt::DirectConnection); // quit thread when disconnected
+	mSocket->setSocketDescriptor(mSocketDescriptor);
+	QString clientName = mSocket->localAddress().toString();
+	std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
 
-  std::cout << "Creating sender type=" << mArguments["type"].toStdString() << std::endl;
-  QObject* sender = ImageSenderFactory().createSender(mArguments["type"], mSocket, mArguments);
+	QObject* sender = ImageSenderFactory().createSender(mArguments["type"], mSocket, mArguments);
 
-//#ifdef USE_OpenCV
-//  ImageSenderOpenCV* sender = new ImageSenderOpenCV(mSocket, mImageFileDir);
-//#else
-//  MHDImageSender* sender = new MHDImageSender(mSocket, mImageFileDir);
-//#endif
-//  // socket should now be connected....?
+	if (sender)
+	{
+		this->exec();
+	}
+	else
+	{
+		std::cout << "Failed to create sender based on arg " << mArguments["type"].toStdString() << std::endl;
+	}
 
-  this->exec();
-
-  std::cout << "Disconnected from " << clientName.toStdString() << ". Session ended." << std::endl;
-  delete sender;
-  delete mSocket;
+	std::cout << "Disconnected from " << clientName.toStdString() << ". Session ended." << std::endl;
+	delete sender;
+	delete mSocket;
 }
-
 
 } // cx
