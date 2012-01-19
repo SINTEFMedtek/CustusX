@@ -218,7 +218,9 @@ MHDImageSender::MHDImageSender(QTcpSocket* socket, StringMap arguments, QObject*
     mCounter(0),
     mArguments(arguments)
 {
-	QString filename = mArguments["filename"];
+	  std::cout << "Creating sender type File" << std::endl;
+
+	  QString filename = mArguments["filename"];
   mImageData = loadImage(filename);
 // mImageData = convertToTestColorImage(mImageData);
 

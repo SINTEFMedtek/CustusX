@@ -121,13 +121,13 @@ target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES}
     
 install(TARGETS cxOpenIGTLinkServer
     BUNDLE DESTINATION ${CUSTUSX_INSTALL_FOLDER_NAME}
-    RUNTIME DESTINATION bin
+    RUNTIME DESTINATION "CustusX/bin"
     )
 
  
 #linux installation:
 if (UNIX AND NOT APPLE)
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/cxOpenIGTLinkServer")
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/CustusX/bin/cxOpenIGTLinkServer")
   #set(LIBS ${QT_LIBRARY_DIR})
   set(LIBS "")
   set(DIRS 

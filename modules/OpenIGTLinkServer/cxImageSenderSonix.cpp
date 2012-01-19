@@ -54,7 +54,9 @@ ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObj
 	mMaxBufferSize(19200000), //800(width)*600(height)*4(bytes)*10(images)
 	mDroppedImages(0)
 {
-	typedef cx::Frame Frame;
+	  std::cout << "Creating sender type Sonix" << std::endl;
+
+	  typedef cx::Frame Frame;
 	qRegisterMetaType<Frame>("Frame");
 	
 	connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
