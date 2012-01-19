@@ -35,7 +35,8 @@ namespace ssc
 VideoSourceSHM::VideoSourceSHM(int width, int height, int depth)
 	: mImageWidth(width), mImageHeight(height), mImageColorDepth(depth), mImageImport(vtkImageImportPtr::New())
 {
-	// this->setEmptyImage();
+	mImportInitialized = false;
+	
 	mImageImport->SetDataScalarTypeToUnsignedChar();
 	mImageImport->SetNumberOfScalarComponents(3);
 
@@ -90,32 +91,37 @@ QString VideoSourceSHM::getStatusString() const
 
 void VideoSourceSHM::start()
 {
-	if (mEnablePolling)
+	if (!isConnected())
+	{
+		return;
+	}
+	if (!mStreaming)
 	{
 		mPollTimer->start();
 		// If all is well - tell the system we're streaming
 		mStreaming = true;
-	}
 
-	emit streaming(mStreaming);
+		emit streaming(mStreaming);
+	}
 }
 
 void VideoSourceSHM::stop()
 {
-	if (mEnablePolling)
+	if (mStreaming)
 	{
 		mPollTimer->stop();
 		// If all is well - tell the system we've stopped streaming
 		mStreaming = false;
+		
+		emit streaming(mStreaming);
 	}
 
-	emit streaming(mStreaming);
 }
 
 bool VideoSourceSHM::validData() const
 {
 	// return (isConnected() && isStreaming()); // Currently only check available
-	return isConnected();
+	return isConnected() && mImportInitialized;
 }
 
 bool VideoSourceSHM::isConnected() const
@@ -148,6 +154,7 @@ void VideoSourceSHM::update()
 
 	mImageImport->SetImportVoidPointer(buffer, mImageWidth * mImageHeight);
 	mImageImport->Update();
+	mImportInitialized = true;
 
 	emit newFrame();
 }
@@ -163,8 +170,7 @@ void VideoSourceSHM::connectServer(const QString& key)
 	if (mConnected)
 	{
 		connect(mPollTimer, SIGNAL(timeout()), this, SLOT(serverPollSlot()));
-		mPollTimer->start();
-		serverPollSlot();
+		serverPollSlot(); // Pull in a new frame here, even if we may no be started yet to initialize the image import
 	}
 }
 
@@ -178,27 +184,11 @@ void VideoSourceSHM::disconnectServer()
 
 	if (mConnected)
 	{
-		mPollTimer->stop();
 		disconnect(mPollTimer, SIGNAL(timeout()), this, SLOT(serverPollSlot()));
 		mSource.release();
 	}
 
 	mConnected = false;
-}
-
-/**
-  * Sets current image import to hold empty content - size 1, 1
-  */
-void VideoSourceSHM::setEmptyImage()
-{
-	mImageImport->SetWholeExtent(0, 1, 0, 1, 0, 0);
-	mImageImport->SetDataExtentToWholeExtent();
-
-	boost::array<unsigned char, 100> zeroData;
-	std::fill(zeroData.begin(), zeroData.end(), 0);
-
-	mImageImport->SetImportVoidPointer(zeroData.begin());
-	mImageImport->Modified();
 }
 
 /**
