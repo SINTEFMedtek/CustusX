@@ -153,9 +153,9 @@ endif(WIN32)
 # Install Linux-specific files
 if (LINUX)
   install(FILES 
-      ${CustusX3_SOURCE_DIR}/install/Linux/linux_install_readme.txt
-      ${CustusX3_SOURCE_DIR}/install/Linux/runCustusX.sh
-      ${CustusX3_SOURCE_DIR}/install/Linux/runOpenIGTLinkServer.sh 
+      ${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt
+      ${CustusX3_SOURCE_DIR}/install/Linux/copy/runCustusX.sh
+      ${CustusX3_SOURCE_DIR}/install/Linux/copy/runOpenIGTLinkServer.sh 
       DESTINATION ${ROOT_DIR}
       #COMPONENT CustusX
     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
