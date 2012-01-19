@@ -10,7 +10,6 @@
 
 #ifdef USE_OpenCV
 
-
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
 #include <QDateTime>
@@ -31,39 +30,38 @@ namespace cx
  *
  * This version uses openCV to grab images from a video file or camera
  */
-class ImageSenderOpenCV : public QObject
+class ImageSenderOpenCV: public QObject
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
-  ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QObject* parent = NULL);
-  virtual ~ImageSenderOpenCV() {}
+	ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QObject* parent = NULL);
+	virtual ~ImageSenderOpenCV() {}
 
-  static QString getType();
-  static QStringList getArgumentDescription();
+	static QString getType();
+	static QStringList getArgumentDescription();
 
 protected:
 private:
-  QTcpSocket* mSocket;
-  QTimer* mSendTimer;
-  QTimer* mGrabTimer;
-  StringMap mArguments;
-  void dumpProperties();
-  IGTLinkImageMessage::Pointer getImageMessage();
-  void dumpProperty(int val, QString name);
+	QTcpSocket* mSocket;
+	QTimer* mSendTimer;
+	QTimer* mGrabTimer;
+	StringMap mArguments;
+	void dumpProperties();
+	IGTLinkImageMessage::Pointer getImageMessage();
+	void dumpProperty(int val, QString name);
 
-  cv::VideoCapture mVideoCapture; // OpenCV video grabber
-  QDateTime mLastGrabTime;
+	cv::VideoCapture mVideoCapture; // OpenCV video grabber
+	QDateTime mLastGrabTime;
 
 private slots:
-//  void tick();
-  void grab();
-  void send();
+	//  void tick();
+	void grab();
+	void send();
 
 };
 
 }
 
 #endif // USE_OpenCV
-
 #endif /* CXIMAGESENDEROPENCV_H_ */

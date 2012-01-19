@@ -33,7 +33,6 @@ endif(ALPHA)
 #------------------------------------------------------------------------------
 # Variables
 #------------------------------------------------------------------------------
-set(BUNDLE_NAME CustusX)
 set(CMAKE_BUILD_TYPE:STRING=Debug)
 
 set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
@@ -41,9 +40,14 @@ set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
 
-set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME}_${VERSION_NUMBER_VERBOSE}")
+set(CPACK_PACKAGE_FILE_NAME "CustusX_${VERSION_NUMBER_VERBOSE}")
 set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_welcome.txt")
 set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_license.txt")
+
+# append build type to name if not Release:
+if    (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
+endif (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
 
 if (APPLE)
     set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
@@ -58,7 +62,16 @@ if (APPLE)
 endif(APPLE)
 
 if (UNIX AND NOT APPLE)
-    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/linux_install_readme.rtf")
+#    message (STATUS "CMAKE_SYSTEM_NAME: " ${CMAKE_SYSTEM_NAME})
+#    message (STATUS "CMAKE_SYSTEM_VERSION: " ${CMAKE_SYSTEM_VERSION})
+#    message (STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR})
+#    message (STATUS "CMAKE_SYSTEM: " ${CMAKE_SYSTEM})
+#    message (STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE})
+#    message (STATUS "CPACK_PACKAGE_FILE_NAME: " ${CPACK_PACKAGE_FILE_NAME})
+
+#    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM_NAME}.${CMAKE_SYSTEM_PROCESSOR})
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/linux_install_readme.txt")
     set(CPACK_GENERATOR "TGZ")
     set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 endif (UNIX AND NOT APPLE)
