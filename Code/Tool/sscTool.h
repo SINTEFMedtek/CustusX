@@ -109,7 +109,8 @@ public:
 	{
 		TOOL_NONE, TOOL_REFERENCE, TOOL_MANUAL, ///< representation of a mouse/keyboard-controlled virtual tool
 		TOOL_POINTER,
-		TOOL_US_PROBE
+		TOOL_US_PROBE,
+		TOOL_MICROSCOPE ///< a tool following the focus point of a microscope
 	};
 	virtual Type getType() const = 0;
 	/**\return a file containing a graphical description of the tool,
