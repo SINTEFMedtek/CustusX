@@ -104,11 +104,9 @@ private:
 
 	bool			mConnected;
 	bool			mStreaming;
-	bool			mEnablePolling;
+	bool mImportInitialized;
 
 	QTimer*			mPollTimer;
-
-	void setEmptyImage();
 
 private slots:
 
