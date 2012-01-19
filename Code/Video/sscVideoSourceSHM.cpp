@@ -76,12 +76,6 @@ double VideoSourceSHM::getTimestamp()
 	return (double) mSource.timestamp().toMSecsSinceEpoch();
 }
 
-/// Releases the currently held shared memory client buffer
-void VideoSourceSHM::release()
-{
-	mSource.release();
-}
-
 /// Returns a short info message
 QString VideoSourceSHM::getInfoString() const
 {
