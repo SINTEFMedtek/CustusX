@@ -207,4 +207,8 @@ void VideoSourceSHM::serverPollSlot()
 	this->update();
 }
 
+void VideoSourceSHM::setResolution(double resolution)
+{
+	mImageImport->SetDataSpacing(resolution, resolution, 1);
+}
 } // end namespace

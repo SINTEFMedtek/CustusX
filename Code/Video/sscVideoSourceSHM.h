@@ -84,6 +84,8 @@ public:
 
 	void connectServer(const QString& key);
 	void disconnectServer();
+public slots:
+	virtual void setResolution(double resolution);
 
 protected:
 	void update();
