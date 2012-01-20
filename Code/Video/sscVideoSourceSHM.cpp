@@ -36,6 +36,7 @@ VideoSourceSHM::VideoSourceSHM(int width, int height, int depth)
 	: mImageWidth(width), mImageHeight(height), mImageColorDepth(depth), mImageImport(vtkImageImportPtr::New())
 {
 	mImportInitialized = false;
+	mStartWhenConnected = false;
 	
 	mImageImport->SetDataScalarTypeToUnsignedChar();
 	mImageImport->SetNumberOfScalarComponents(3);
@@ -93,8 +94,10 @@ void VideoSourceSHM::start()
 {
 	if (!isConnected())
 	{
+		mStartWhenConnected = true;
 		return;
 	}
+	mStartWhenConnected = false;
 	if (!mStreaming)
 	{
 		mPollTimer->start();
@@ -107,6 +110,7 @@ void VideoSourceSHM::start()
 
 void VideoSourceSHM::stop()
 {
+	mStartWhenConnected = false;
 	if (mStreaming)
 	{
 		mPollTimer->stop();
@@ -171,6 +175,10 @@ void VideoSourceSHM::connectServer(const QString& key)
 	{
 		connect(mPollTimer, SIGNAL(timeout()), this, SLOT(serverPollSlot()));
 		serverPollSlot(); // Pull in a new frame here, even if we may no be started yet to initialize the image import
+	}
+	if (mStartWhenConnected)
+	{
+		start();
 	}
 }
 

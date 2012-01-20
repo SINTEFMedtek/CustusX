@@ -105,6 +105,7 @@ private:
 	bool			mConnected;
 	bool			mStreaming;
 	bool mImportInitialized;
+	bool mStartWhenConnected;
 
 	QTimer*			mPollTimer;
 
