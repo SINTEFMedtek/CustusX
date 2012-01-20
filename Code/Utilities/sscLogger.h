@@ -12,7 +12,9 @@ extern "C"
 #include <errno.h>
 #include <limits.h>
 #include <stdint.h>
-//#include <stdbool.h>
+#ifndef __cplusplus
+#include <stdbool.h>
+#endif
 #include <stdio.h>
 
 #include "misc.h"
