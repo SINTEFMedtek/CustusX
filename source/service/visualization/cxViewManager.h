@@ -29,13 +29,58 @@ typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class RenderTimer> RenderTimerPtr;
 
 /**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
+
+/**
  * \class ViewManager
  *
  * \brief Creates a pool of views and offers an interface to them, also handles
  * layouts on a centralwidget.
  *
+ * \image html cxArchitecture_visualization.png "Overview of ViewManager and Views"
+ *
+ * The primitive element is the ssc::View. Various derivations of ViewWrapper
+ * controls each view and fills them with Reps. ViewWrapper2D controls a 2D
+ * slice, ViewWrapper3D controls a full 3D scene, ViewWrapperRTSource shows a
+ * video stream.
+ *
+ * ViewManager handles the visualization of the 3D data. It composes the Views
+ * onto the QWidget using a QGridLayout. This is called a Layout in the GUI.
+ * Available layouts can be found inside ViewManager.  The QWidget is the
+ * centralWidget in the MainWindow.
+ *
+ * The views are divided into several groups. Each group, represented by a
+ * ViewGroup, has some common characteristics, such as which data to display.
+ * These data are stored in a ViewGroupData. The View/ViewWrappers connected
+ * to a group, uses the ViewGroupData to know what they should visualize. Each
+ * ViewWrapper formats the data in their own way (as slices or 3D renderings).
+ *
+ * The right-click menu in the Views are created inside the ViewWrappers. The
+ * data they manipulate are (mostly) stored within ViewGroupData.
+ *
+ * \image html cxArchitecture_view_layout.png "Pipeline from Data to rendering in Views, organization in groups and layout"
+ *
+ *
+ * \section ViewManager_section_layout_example Layout Example
+ *
+ * The Layout uses QGridLayout to organize the views. Each view belong to a
+ * group that show the same data in different ways (for example: 3D+ACS).
+ * The layout and grouping can be reconfigured in the OR.
+ *
+ *  - Group 0 displays A MR volume with an US overlay and segmented vessels.
+ *  - Group 1 displays only the MR volume.
+ *
+ * \image html LayoutExample.png "Layout example, schematic view."
+ * \image html metastase_mr_us_small.png "Layout Example, rendered view."
+ *
+ *
  * \date Dec 9, 2008
+ * \date Jan 19, 2012
  * \author Janne Beate Bakeng, SINTEF
+ * \author Christian Askeland, SINTEF
  */
 class ViewManager : public QObject
 {
@@ -175,5 +220,10 @@ private:
 /**Shortcut for accessing the viewmanager instance.
  */
 ViewManager* viewManager();
+
+
+/**
+* @}
+*/
 }//namespace
 #endif /* CXVIEWMANAGER_H_ */

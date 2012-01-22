@@ -16,6 +16,11 @@ namespace cx
 
 typedef boost::shared_ptr<class CameraData> CameraDataPtr;
 
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
 
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 
@@ -133,5 +138,8 @@ private:
 
 };
 
+/**
+* @}
+*/
 }//namespace cx
 #endif /* CXVIEWWRAPPER_H_ */

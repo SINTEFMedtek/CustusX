@@ -6,6 +6,12 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
+/**
  * \class ConnectedThresholdImageFilter
  *
  * \brief Segmenting using region growing.
@@ -42,6 +48,9 @@ private:
   itkImageType::IndexType mSeed;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXCONNECTEDTHRESHOLDIMAGEFILTER_H_ */

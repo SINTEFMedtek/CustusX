@@ -13,6 +13,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginCalibration
+ * @{
+ */
 
 /**Widget for manually changing the tool calibration matrix sMt.
  *
@@ -37,6 +42,9 @@ private:
 };
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXTOOLMANUALCALIBRATIONWIDGET_H_ */

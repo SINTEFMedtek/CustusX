@@ -10,6 +10,11 @@ class QMenu;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceState
+* @{
+*/
 
 class WorkflowState;
 
@@ -59,5 +64,9 @@ private:
 
 typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
 
+/**
+* @}
+*/
 }
+
 #endif /* CXWORKFLOWSTATEMACHINE_H_ */

@@ -6,6 +6,11 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceState
+* @{
+*/
 
 struct RequestEnterStateEvent : public QEvent
 {
@@ -47,5 +52,9 @@ private:
   QString mStateUid;
 };
 
+
+/**
+* @}
+*/
 }//namespace cx
 #endif /* CXREQUESTENTERSTATETRANSITION_H_ */

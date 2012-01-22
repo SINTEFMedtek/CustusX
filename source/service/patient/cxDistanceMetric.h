@@ -13,6 +13,12 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
+
 typedef boost::shared_ptr<class DistanceMetric> DistanceMetricPtr;
 
 
@@ -27,8 +33,9 @@ public:
   virtual ssc::DataPtr load(const QString& uid, const QString& filename);
 };
 
-/**Data class that represents a distance between two points,
- * or a point and a plane
+/**\brief Data class that represents a distance between two points,
+ * or a point and a plane.
+ * \ingroup cxServicePatient
  *
  */
 class DistanceMetric : public DataMetric
@@ -58,6 +65,9 @@ private:
   boost::array<ssc::DataPtr,2> mArgument;
 };
 
+/**
+* @}
+*/
 }
 
 #endif /* CXDISTANCEMETRIC_H_ */

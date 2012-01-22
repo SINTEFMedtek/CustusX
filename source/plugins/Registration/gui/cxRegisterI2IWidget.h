@@ -21,6 +21,11 @@ namespace cx
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
 class SeansVesselRegistrationWidget;
 
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 /**
  * \class RegisterI2IWidget
@@ -49,6 +54,9 @@ private:
   SeansVesselRegistrationWidget* mSeansVesselRegsitrationWidget;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXREGISTERI2IWIDGET_H_ */

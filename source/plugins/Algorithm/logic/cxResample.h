@@ -6,6 +6,12 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
+/**
  * \class Resample
  *
  * \brief Threaded resampler.
@@ -37,5 +43,8 @@ private:
   ssc::ImagePtr mOutput;
 };
 
+/**
+ * @}
+ */
 }//namespace cx
 #endif /* CXRESAMPLE_H_ */

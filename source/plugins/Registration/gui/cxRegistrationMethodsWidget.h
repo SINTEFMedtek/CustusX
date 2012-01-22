@@ -13,6 +13,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 class LandmarkRegistrationsWidget : public TabbedWidget
 {
@@ -55,6 +60,9 @@ public:
 };
 //------------------------------------------------------------------------------
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXREGISTRATIONMETHODSWIDGET_H_ */

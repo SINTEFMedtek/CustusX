@@ -10,6 +10,11 @@
 
 namespace ssc
 {
+/**
+ * \file
+ * \addtogroup cxPluginUsReconstruction
+ * @{
+ */
 
 /**
  *  sscReconstructionWidget.h
@@ -58,5 +63,8 @@ private:
 	void updateComboBox();
 };
 
+/**
+ * @}
+ */
 }//namespace
 #endif //SSCRECONSTRUCTIONWIDGET_H_

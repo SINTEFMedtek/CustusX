@@ -16,7 +16,9 @@
 namespace cx
 {
 
-/**Custom widget for display of double-valued data
+/**\brief Custom widget for display of double-valued data.
+ * \ingroup cxGUI
+ *
  * Use the double-named methods instead of qslider's int-based ones.
  */
 class DoubleSpanSlider : public QxtSpanSlider
@@ -75,6 +77,10 @@ private:
   ssc::DoubleRange mRange;
 };
 
+/**
+ * \ingroup cxGUI
+ *
+ */
 class SliderRangeGroupWidget : public QWidget
 {
   Q_OBJECT

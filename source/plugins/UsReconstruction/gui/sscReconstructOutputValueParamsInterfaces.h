@@ -15,6 +15,13 @@ namespace ssc
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 class OutputVolumeParams;
 
+/**
+ * \file
+ * \addtogroup cxPluginUsReconstruction
+ * @{
+ */
+
+
 /** Abstract interface to setting one of the values in class OutputValueParams.
  *  Sublass to get a concrete class.
  */
@@ -121,6 +128,9 @@ protected:
   virtual void setValue(OutputVolumeParams* params, double val) { params->setDim(2, val); }
 };
 
+/**
+ * @}
+ */
 } // namespace ssc
 
 #endif /* SSCRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_ */

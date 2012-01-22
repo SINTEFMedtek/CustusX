@@ -23,6 +23,7 @@ typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 
 /**
  * \class MainWindow
+ * \ingroup cxGUI
  *
  * \brief This is the main gui class which controls the workflow.
  *

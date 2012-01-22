@@ -11,6 +11,11 @@ class QMenu;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
 
 /**
  * \class View3D
@@ -33,6 +38,9 @@ protected slots:
 protected:
 };
 
+/**
+* @}
+*/
 }//namespace cx
 #endif /* CXVIEW3D2_H_ */
 

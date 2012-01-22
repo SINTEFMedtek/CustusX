@@ -25,6 +25,12 @@ typedef std::map<QString, ssc::VolumetricRepPtr> VolumetricRepMap;
 
 class MessageManager;
 
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
+
 /**DEPRECATED!! will be removed shortly
  *
  *
@@ -152,6 +158,9 @@ private:
 
 //RepManager* repManager();
 
+/**
+* @}
+*/
 }//namespace cx
 
 #endif /* CXREPMANAGER_H_ */

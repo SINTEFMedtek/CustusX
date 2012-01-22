@@ -18,7 +18,8 @@ namespace cx
 
 typedef boost::shared_ptr<class PlaneMetricRep> PlaneMetricRepPtr;
 
-/**Rep for visualizing a PlaneMetric.
+/**\brief Rep for visualizing a PlaneMetric.
+ * \ingroup cxServiceVisualizationRep
  *
  */
 class PlaneMetricRep : public DataMetricRep

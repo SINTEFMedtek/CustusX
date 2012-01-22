@@ -15,7 +15,8 @@ namespace cx
 {
 
 /**
- * Convenience button for chosing color.
+ * \brief Convenience button for chosing color.
+ * \ingroup cxGUI
  * Will open a color select dialog, and color
  * the button itself in the selected color.
  *

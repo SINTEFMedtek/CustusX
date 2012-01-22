@@ -10,11 +10,26 @@
 
 #include "cxPluginBase.h"
 
+/**
+ * \defgroup cxPluginRegistration Registration Plugin
+ * \ingroup cxPlugins
+ * \brief Registration collection with widgets.
+ *
+ * See \ref cx::RegistrationPlugin.
+ *
+ */
+
 namespace cx
 {
 typedef boost::shared_ptr<class RegistrationPlugin> RegistrationPluginPtr;
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 /**Rewrite to be a descendant of PluginBase, with generic API for creating plugins...
  *
@@ -37,6 +52,9 @@ private:
 	RegistrationManagerPtr mRegistrationManager;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXREGISTRATIONPLUGIN_H_ */

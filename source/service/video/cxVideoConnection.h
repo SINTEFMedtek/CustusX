@@ -15,9 +15,15 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceVideo
+* @{
+*/
 
-/**Class representing a single IGTLink connection,
+/**\brief Class representing a single IGTLink connection,
  * connection facilities and options.
+ * \ingroup cxServiceVideo
  *
  * The connection can either operate on a remote server or a local one.
  * GUI can be found in cxIGTLinkWidget (along with some additional functionality...)
@@ -75,6 +81,9 @@ private:
 };
 typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 
+/**
+* @}
+*/
 }//end namespace cx
 
 #endif /* CXVIDEOCONNECTION_H_ */

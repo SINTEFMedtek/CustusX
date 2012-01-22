@@ -21,7 +21,7 @@ namespace cx
 {
 
 /**
- * \page cx_page_plugins Plugins
+ * \defgroup cxPlugins Plugins
  *
  * \brief Plugins overview
  *

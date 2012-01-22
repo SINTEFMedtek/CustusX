@@ -30,7 +30,10 @@ namespace cx
 {
 
 
-
+/**
+ * \ingroup cxGUI
+ *
+ */
 class MetricWidget : public BaseWidget
 {
   Q_OBJECT

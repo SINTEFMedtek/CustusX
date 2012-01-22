@@ -11,7 +11,16 @@
 #include "sscProbeData.h"
 #include "probeXmlConfigParser.h"
 
+/**
+* \file
+* \addtogroup cxResourceUtilities
+* @{
+*/
+
 ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
 
+/**
+* @}
+*/
 
 #endif /* CXCREATEPROBEDATAFROMCONFIGURATION_H_ */

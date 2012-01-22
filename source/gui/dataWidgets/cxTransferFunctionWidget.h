@@ -18,6 +18,12 @@ namespace cx
 class TransferFunctionAlphaWidget;
 class TransferFunctionColorWidget;
 
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
+
 /** Superclass for all doubles interacting with a ImageTFData.
  */
 class DoubleDataAdapterImageTFDataBase : public ssc::DoubleDataAdapter
@@ -176,6 +182,9 @@ public:
   virtual QString defaultWhatsThis() const;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXTRANSFERFUNCTIONWIDGET_H_ */

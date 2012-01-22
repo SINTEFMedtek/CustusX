@@ -21,6 +21,12 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceTracking
+* @{
+*/
+
 typedef std::map<QString, ssc::ToolPtr> ToolMap;
 typedef boost::shared_ptr<ToolMap> ToolMapPtr;
 
@@ -29,9 +35,8 @@ typedef boost::shared_ptr<IgstkTool> IgstkToolPtr;
 typedef boost::weak_ptr<IgstkTool> IgstkToolWeakPtr;
 
 /**
- * \class Tracker
- *
  * \brief Class representing the navigation system.
+ * \ingroup cxServiceTracking
  *
  * \date Nov 7, 2008
  * \author: Janne Beate Bakeng, SINTEF
@@ -143,6 +148,10 @@ protected:
 };
 typedef boost::shared_ptr<IgstkTracker> TrackerPtr;
 typedef boost::weak_ptr<IgstkTracker> TrackerWeakPtr;
+
+/**
+* @}
+*/
 }//namespace cx
 
 #endif /* CXIGSTKTRACKER_H_ */

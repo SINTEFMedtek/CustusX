@@ -16,11 +16,11 @@ class FilteringToolListWidget;
  * ToolFilterWidget
  *
  * \brief Widget for easily filtering tools based on clinical application and  tracking system.
+ * \ingroup cxGUI
  *
  * \date Mar 30, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-
 class ToolFilterGroupBox : public QGroupBox
 {
   Q_OBJECT

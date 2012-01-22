@@ -12,6 +12,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
 
 class SegmentationMethodsWidget : public TabbedWidget
 {
@@ -23,6 +28,9 @@ public:
 //------------------------------------------------------------------------------
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXSEGMENTATIONMETHODSWIDGET_H_ */

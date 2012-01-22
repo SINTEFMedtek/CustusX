@@ -23,13 +23,14 @@ typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
  * \class TrackPadWidget
  *
  * \brief Widget for controlling the camera in the 3D view.
+ * \ingroup cxGUI
+ *
  *  This widget is designed for use on a touchpad device.
  *  Example is to use iPad/iPhone as a secondary screen with this widget on.
  *
  * \date Oct 7, 2010
  * \author Christian Askeland, SINTEF
  */
-
 class TrackPadWidget : public BaseWidget
 {
   Q_OBJECT

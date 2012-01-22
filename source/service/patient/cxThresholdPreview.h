@@ -13,13 +13,17 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
 
 typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
 
 /**
- * \class ThresholdPreview
- *
  * \brief Use transfer function to preview a threshold in the selected volume. Used by widgets: segmentation and surface generation
+ * \ingroup cxServicePatient
  *
  * \date 12. okt. 2011
  * \author: Ole Vegard Solberg, SINTEF
@@ -46,6 +50,11 @@ private:
   bool mShadingOn_original; ///< Was shading originally enabled in image
   QTimer *mRemoveTimer;///< Timer for removing segmentation preview coloring if widget is not visible
 };
+
+
+/**
+* @}
+*/
 }
 
 #endif /* CXTHRESHOLDPREVIEW_H_ */

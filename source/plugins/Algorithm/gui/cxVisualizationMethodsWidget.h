@@ -12,6 +12,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
 
 class VisualizationMethodsWidget : public TabbedWidget
 {
@@ -23,6 +28,9 @@ public:
 //------------------------------------------------------------------------------
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXVISUALIZATIONMETHODSWIDGET_H_ */

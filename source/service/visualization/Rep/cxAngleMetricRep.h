@@ -29,6 +29,7 @@ typedef boost::shared_ptr<class AngleMetricRep> AngleMetricRepPtr;
 typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
 
 /**Rep for visualizing a DistanceMetric.
+ * \ingroup cxServiceVisualizationRep
  *
  */
 class AngleMetricRep : public DataMetricRep

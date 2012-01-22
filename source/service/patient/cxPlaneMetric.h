@@ -15,8 +15,15 @@
 
 namespace cx
 {
-typedef boost::shared_ptr<class PlaneMetric> PlaneMetricPtr;
 typedef Eigen::Hyperplane<double,3> Plane3D;
+
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
+
+typedef boost::shared_ptr<class PlaneMetric> PlaneMetricPtr;
 
 class PlaneMetricReader: public ssc::DataReader
 {
@@ -29,7 +36,11 @@ public:
   virtual ssc::DataPtr load(const QString& uid, const QString& filename);
 };
 
-/**Data class that represents an infinite plane defined by all pts r in
+/**
+ * \brief Data class representing a plane.
+ * \ingroup cxServicePatient
+ *
+ * Data class that represents an infinite plane defined by all pts r in
  * N*r+c=0, N is the normal, c is a scalar. The plane is defined by setting
  * one of the points r instead of the scalar c.
  *
@@ -62,6 +73,9 @@ private:
   ssc::CoordinateSystem mSpace;
 };
 
+/**
+* @}
+*/
 }
 
 #endif /* CXPLANEMETRIC_H_ */

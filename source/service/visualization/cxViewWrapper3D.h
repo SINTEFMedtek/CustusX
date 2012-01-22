@@ -31,6 +31,12 @@ namespace cx
 typedef boost::shared_ptr<class ImageLandmarkRep> ImageLandmarkRepPtr;
 typedef boost::shared_ptr<class PatientLandmarkRep> PatientLandmarkRepPtr;
 
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
+
 typedef boost::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
 
  enum STEREOTYPE
@@ -133,6 +139,9 @@ private:
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
 
+/**
+* @}
+*/
 } // namespace cx
 
 #endif /* CXVIEWWRAPPER3D_H_ */

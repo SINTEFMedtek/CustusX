@@ -13,11 +13,15 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceTracking
+* @{
+*/
 
 /**
- * cxIgstkTrackerThread.h
- *
  * \brief
+ * \ingroup cxServiceTracking
  *
  * \date Mar 16, 2011
  * \author Janne Beate Bakeng, SINTEF
@@ -59,6 +63,9 @@ private:
 };
 typedef boost::shared_ptr<IgstkTrackerThread> IgstkTrackerThreadPtr;
 
+/**
+* @}
+*/
 }
 
 #endif /* CXIGSTKTRACKERTHREAD_H_ */

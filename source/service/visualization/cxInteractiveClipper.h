@@ -15,6 +15,11 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
 
 /**Helper class for clipping the active volume using a specific slice plane.
  * The visible slice planes are the only ones allowed for clipping.
@@ -50,6 +55,9 @@ private:
 };
 typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
 
+/**
+* @}
+*/
 } // namespace cx
 
 #endif /* CXINTERACTIVECLIPPER_H_ */

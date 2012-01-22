@@ -29,14 +29,12 @@ typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
 namespace cx
 {
 /**
- * \class AlgorithmHelper
- *
  * \brief Class with helper functions for algorithms.
+ * \ingroup cxResourceAlgorithms
  *
- *  * \date Feb 16, 2011
+ * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-
 class AlgorithmHelper
 {
 public:
@@ -48,10 +46,9 @@ private:
 
 
 /**
- * \class TimedAlgorithm
- *
  * \brief Base class for algorithms that wants to time their
  * execution.
+ * \ingroup cxResourceAlgorithms
  *
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
@@ -89,10 +86,9 @@ private:
 };
 
 /**
- * \class ThreadedTimedAlgorithm
- *
  * \brief Base class for algorithms that wants to thread and time their
  * execution. T is the return type of the calculated data in the thread.
+ * \ingroup cxResourceAlgorithms
  *
  * \date Feb 22, 2011
  * \author Janne Beate Bakeng, SINTEF
@@ -122,9 +118,8 @@ private:
 
 //---------------------------------------------------------------------------------------------------------------------
 /**
- * \class Example
- *
  * \brief Implementation of ThreadedTimedAlgorithm that shows the minimum implementation of this class.
+ * \ingroup cxResourceAlgorithms
  *
  * \date Feb 22, 2011
  * \author Janne Beate Bakeng, SINTEF

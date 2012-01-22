@@ -26,6 +26,12 @@ class QPushButton;
 namespace cx
 {
 
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
+
 typedef boost::shared_ptr<class MetricBase> MetricBasePtr;
 
 class MetricBase : public QObject
@@ -134,6 +140,9 @@ private:
 };
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXDATAMETRICWRAPPERS_H_ */

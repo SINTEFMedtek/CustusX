@@ -34,13 +34,18 @@ typedef boost::shared_ptr<DoubleVector> DoubleVectorPtr;
 typedef std::vector<ssc::Transform3DPtr> Transform3DVector;
 typedef boost::shared_ptr<Transform3DVector> Transform3DVectorPtr;
 
+/**
+* \file
+* \addtogroup cxServiceTracking
+* @{
+*/
+
 typedef boost::shared_ptr<class Probe> ProbePtr;
 
 
 /**
- * \class Tool
- *
  * \brief Class representing the tools a navigation system can recognize.
+ * \ingroup cxServiceTracking
  *
  * \date Nov 6, 2008
  * \author: Janne Beate Bakeng, SINTEF
@@ -167,5 +172,8 @@ private:
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 
+/**
+* @}
+*/
 } //namespace cx
 #endif /* CXTOOL_H_ */
