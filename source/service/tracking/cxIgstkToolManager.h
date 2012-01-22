@@ -12,11 +12,15 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceTracking
+* @{
+*/
 
 /**
- * \class IgstkToolManager
- *
  * \brief
+ * \ingroup cxServiceTracking
  *
  * \date Mar 17, 2011
  * \author Janne Beate Bakeng, SINTEF
@@ -71,6 +75,9 @@ private:
 };
 typedef boost::shared_ptr<IgstkToolManager> IgstkToolManagerPtr;
 
+/**
+* @}
+*/
 }
 
 #endif /* CXIGSTKTOOLMANAGER_H_ */

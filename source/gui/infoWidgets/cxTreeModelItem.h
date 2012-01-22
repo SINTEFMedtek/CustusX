@@ -20,6 +20,14 @@ namespace cx
 {
 
 class BrowserItemModel;
+
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
+
+
 class TreeItem;
 typedef boost::weak_ptr<TreeItem> TreeItemWeakPtr;
 typedef boost::shared_ptr<TreeItem> TreeItemPtr;
@@ -111,6 +119,9 @@ private:
   ssc::ToolPtr mTool;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXTREEMODELITEM_H_ */

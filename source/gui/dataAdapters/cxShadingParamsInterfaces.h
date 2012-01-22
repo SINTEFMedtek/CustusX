@@ -16,6 +16,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
 
 /** Superclass for all shading parameters
  */
@@ -90,5 +95,8 @@ public:
   virtual bool setValue(double val);
 };
   
+/**
+ * @}
+ */
 }// namespace cx
 #endif //CXSHADINGPARAMSINTERFACES_H_

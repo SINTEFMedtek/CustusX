@@ -29,6 +29,12 @@ namespace cx
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * \class LandmarkRegistrationWidget
  * Superclass for Image Registration and Patient Registration
  */
@@ -76,6 +82,10 @@ private:
   LandmarkRegistrationWidget(); ///< not implemented
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
 };
+
+/**
+ * @}
+ */
 }//namespace cx
 
 

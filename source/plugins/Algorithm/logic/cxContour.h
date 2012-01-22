@@ -6,6 +6,12 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
+/**
  * \class Contour
  *
  * \brief Threaded contour algorithm.
@@ -42,5 +48,8 @@ private:
 };
 
 
+/**
+ * @}
+ */
 }//namespace cx
 #endif /* CXCONTOUR_H_ */

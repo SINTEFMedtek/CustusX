@@ -21,6 +21,7 @@ typedef boost::shared_ptr<class DICOMLibAPI> DICOMLibAPIPtr;
 typedef boost::shared_ptr<class Series> SeriesPtr;
 
 /** Widget for import of DICOM images.
+ * \ingroup cxGUI
  *
  */
 class DICOMWidget : public QWidget

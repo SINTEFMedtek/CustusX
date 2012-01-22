@@ -24,6 +24,11 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceState
+* @{
+*/
 
 /**
  */
@@ -105,6 +110,9 @@ public:
   virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdENDOVASCULAR; }
 };
 
+/**
+* @}
+*/
 } // namespace cx
 
 

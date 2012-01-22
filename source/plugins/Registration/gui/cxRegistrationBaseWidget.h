@@ -15,6 +15,12 @@ namespace cx
 {
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
 class RegistrationBaseWidget : public BaseWidget
 {
 //  Q_OBJECT
@@ -27,6 +33,9 @@ protected:
   RegistrationManagerPtr mManager;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXREGISTRATIONBASEWIDGET_H_ */

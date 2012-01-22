@@ -19,6 +19,7 @@ namespace cx
 typedef boost::shared_ptr<class PointMetricRep> PointMetricRepPtr;
 
 /**Rep for visualizing a PointMetric.
+ * \ingroup cxServiceVisualizationRep
  *
  */
 class PointMetricRep : public DataMetricRep

@@ -18,6 +18,21 @@ namespace ssc
 namespace cx
 {
 
+/**
+ * \defgroup cxPluginUsReconstruction UsReconstruction Plugin
+ * \ingroup cxPlugins
+ * \brief Us Reconstruction framework with widgets.
+ *
+ * See \ref cx::UsReconstructionPlugin.
+ *
+ */
+
+/**
+ * \file
+ * \addtogroup cxPluginUsReconstruction
+ * @{
+ */
+
 class UsReconstructionPlugin : public PluginBase
 {
 	Q_OBJECT
@@ -38,6 +53,9 @@ private slots:
 
 typedef boost::shared_ptr<UsReconstructionPlugin> UsReconstructionPluginPtr;
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXUSRECONSTRUCTIONPLUGIN_H_ */

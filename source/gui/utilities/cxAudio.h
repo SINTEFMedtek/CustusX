@@ -8,6 +8,7 @@
 namespace cx {
 
 /**Helper class for playing sounds in the main thread even if calls are made from other threads.
+ * \ingroup cxGUI
  *
  */
 class AudioInternal : public QObject

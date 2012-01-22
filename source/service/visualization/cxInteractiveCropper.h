@@ -20,6 +20,12 @@ namespace cx
 typedef vtkSmartPointer<class CropBoxCallback> CropBoxCallbackPtr;
 typedef vtkSmartPointer<class CropBoxEnableCallback> CropBoxEnableCallbackPtr;
 
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
+
 /**Helper class for cropping the active volume using a
  * bounding box.
  * The bounding box can be set either explicitly or using
@@ -70,6 +76,9 @@ private:
 
 typedef boost::shared_ptr<InteractiveCropper> InteractiveCropperPtr;
 
+/**
+* @}
+*/
 } // namespace cx
 
 #endif /* CXINTERACTIVECROPPER_H_ */

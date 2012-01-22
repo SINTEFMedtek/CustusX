@@ -8,12 +8,17 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
 
-/** \class FileCopied
- *
+/**
  * \brief This is a helper class for MainWindow::importDataSlot().
  * Contain a slot that checks if a file is finished copying and updates the
  * ssc:Image object
+ * \ingroup cxServicePatient
  *
  * \date Feb 8, 2010
  * \author Ole Vegard Solberg, SINTEF
@@ -36,6 +41,9 @@ public slots:
   void areFileCopiedSlot();///< Checks if the file is finished copying and updates the ssc::Image
 };
 
+/**
+* @}
+*/
 } // namespace cx
 
 

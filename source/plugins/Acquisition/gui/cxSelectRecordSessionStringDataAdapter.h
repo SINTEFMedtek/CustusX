@@ -14,6 +14,11 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxPluginAcquisition
+* @{
+*/
 
 /** Base class for all DataAdapters that selects a record session.
  */
@@ -70,6 +75,9 @@ private:
 
 };
 
+/**
+* @}
+*/
 }
 
 #endif /* CXSELECTRECORDSESSIONSTRINGDATAADAPTER_H_ */

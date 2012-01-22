@@ -26,6 +26,12 @@ typedef ssc::Transform3D Transform3D;
 typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
 
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * \class LandmarkPatientRegistrationWidget
  *
  * \brief Widget used as a tab in the ContexDockWidget for patient registration.
@@ -77,6 +83,10 @@ private:
   LandmarkPatientRegistrationWidget(); ///< not implemented
 
 };
+
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif /* CXLANDMARKPATIENTREGISTRATIONWIDGET_H_ */

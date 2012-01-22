@@ -19,6 +19,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginCalibration
+ * @{
+ */
 
 /** GUI for performing temporal calibration
  *
@@ -51,6 +56,9 @@ private:
 };
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXTEMPORALCALIBRATIONWIDGET_H_ */

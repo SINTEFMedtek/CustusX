@@ -14,6 +14,12 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
+
 typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
 
 
@@ -28,7 +34,8 @@ public:
   virtual ssc::DataPtr load(const QString& uid, const QString& filename);
 };
 
-/**Data class that represents an angle between two lines.
+/**\brief Data class that represents an angle between two lines.
+ * \ingroup cxServicePatient
  *
  * The lines are defined by four points ABCD. The computed
  * angle is from vector BA to vector CD.
@@ -62,6 +69,9 @@ private:
   boost::array<ssc::DataPtr,4> mArgument;
 };
 
+/**
+* @}
+*/
 }
 
 #endif /* CXANGLEMETRIC_H_ */

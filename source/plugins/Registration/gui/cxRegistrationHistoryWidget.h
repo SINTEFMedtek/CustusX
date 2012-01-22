@@ -8,6 +8,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 /**
  * \class BrowserWidget
@@ -68,6 +73,9 @@ private:
   std::vector<ssc::RegistrationTransform> mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories);
 };
 
+/**
+ * @}
+ */
 }//end namespace cx
 
 #endif /* CXREGISTRATIONHISTORYWIDGET_H_ */

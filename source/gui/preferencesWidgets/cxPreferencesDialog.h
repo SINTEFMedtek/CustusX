@@ -30,6 +30,12 @@ class FilePreviewWidget;
 class ToolFilterGroupBox;
 class ToolConfigureGroupBox;
 
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
+
 class PreferencesTab : public QWidget
 {
   Q_OBJECT
@@ -277,6 +283,9 @@ protected:
   QDialogButtonBox *mButtonBox;
 };
 
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif

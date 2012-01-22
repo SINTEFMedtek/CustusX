@@ -9,6 +9,12 @@ class QLabel;
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * \class PlateRegistrationWidget
  *
  * \brief Widget for performing registration between a (dyna-CT) volume and a
@@ -36,5 +42,9 @@ private:
    QPushButton* mPlateRegistrationButton;
    QLabel*      mReferenceToolInfoLabel;
 };
+
+/**
+ * @}
+ */
 }
 #endif /* CXPLATEREGISTRATIONWIDGET_H_ */

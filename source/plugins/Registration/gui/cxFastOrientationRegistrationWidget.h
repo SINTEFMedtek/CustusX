@@ -10,6 +10,12 @@ class QCheckBox;
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * \class FastOrientationRegistrationWidget
  *
  * \brief Widget for registrating the orientation part of a fast registration
@@ -43,5 +49,9 @@ private:
 
   ssc::ToolPtr mToolToSample; ///< tool to be sampled from
 };
+
+/**
+ * @}
+ */
 }
 #endif /* CXFASTORIENTATIONREGISTRATIONWIDGET_H_ */

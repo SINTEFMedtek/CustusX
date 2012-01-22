@@ -14,9 +14,18 @@ namespace cx
 {
 using ssc::Transform3D; // because of signaling
 
+/**
+* \file
+* \addtogroup cxServiceTracking
+* @{
+*/
+
 typedef boost::shared_ptr<class DominantToolProxy> DominantToolProxyPtr;
 
-/**Helper class for connecting to the dominant tool.
+/**
+ * \brief Helper class for connecting to the dominant tool.
+ * \ingroup cxServiceTracking
+ *
  * By listening to this class, you will always listen
  * to the dominant tool.
  */
@@ -46,9 +55,9 @@ private:
 	ssc::ToolPtr mTool;
 };
 
-
-
-
+/**
+* @}
+*/
 }
 
 #endif /* CXDOMINANTTOOLPROXY_H_ */

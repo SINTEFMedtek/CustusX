@@ -18,6 +18,12 @@ namespace cx
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
 
 /**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
+/**
  * \class CenterlineWidget
  *
  * \brief Widget for extracting the centerline from a segment.
@@ -57,6 +63,10 @@ private:
 
   Centerline  mCenterlineAlgorithm;
 };
+
+/**
+ * @}
+ */
 }
 
 #endif /* CXCENTERLINEWIDGET_H_ */

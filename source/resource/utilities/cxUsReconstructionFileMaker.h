@@ -16,6 +16,12 @@ namespace cx
 typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 
 /**
+* \file
+* \addtogroup cxResourceUtilities
+* @{
+*/
+
+/**
  * UsReconstructionFileMaker
  *
  * \brief Handels writing files in the format the us reconstruction
@@ -61,6 +67,10 @@ private:
 };
 
 typedef boost::shared_ptr<UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
+
+/**
+* @}
+*/
 
 }
 #endif /* CXUSRECONSTRUCTIONFILEMAKER_H_ */

@@ -38,6 +38,8 @@ namespace itk
 * 
 * \sa MorphologyImageFilter
 * \ingroup ImageEnhancement MathematicalMorphologyImageFilters
+* \ingroup cxResourceAlgorithms
+*
 */
 
 template <class TInputImage,class TOutputImage>

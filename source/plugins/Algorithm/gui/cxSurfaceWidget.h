@@ -17,6 +17,11 @@
 namespace cx
 {
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+/**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
 
 /**
  * \class SurfaceWidget
@@ -68,6 +73,10 @@ private:
 
   Contour mContourAlgorithm;
 };
+
+/**
+ * @}
+ */
 }
 
 #endif /* CXSURFACEWIDGET_H_ */

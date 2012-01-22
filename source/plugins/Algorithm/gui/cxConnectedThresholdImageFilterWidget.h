@@ -6,6 +6,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
 
 /**
  * \class ConnectedThresholdImageFilterWidget
@@ -40,6 +45,9 @@ private:
   ConnectedThresholdImageFilter mConnectedThresholdImageFilter;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_ */

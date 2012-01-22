@@ -14,6 +14,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginCalibration
+ * @{
+ */
 
 class CalibrationMethodsWidget : public TabbedWidget
 {
@@ -25,6 +30,9 @@ public:
 };
 //------------------------------------------------------------------------------
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXCALIBRATIONMETHODSWIDGET_H_ */

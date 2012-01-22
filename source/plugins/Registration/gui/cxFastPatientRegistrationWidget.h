@@ -6,6 +6,12 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * \class FastPatientRegistrationWidget
  *
  * \brief Widget for performing a fast and aprox landmark based patient registration,
@@ -24,5 +30,9 @@ public:
 private:
   virtual void performRegistration();
 };
+
+/**
+ * @}
+ */
 }
 #endif /* CXFASTPATIENTREGISTRATIONWIDGET_H_ */

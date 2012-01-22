@@ -15,7 +15,9 @@
 namespace cx
 {
 
-/**Base class for all Data Metric reps.
+/**
+ * \brief Base class for all Data Metric reps.
+ * \ingroup cxServiceVisualizationRep
  *
  * Handles common functionality: labels, size.
  *

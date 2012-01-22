@@ -14,8 +14,19 @@ class QTcpSocket;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceVideo
+* @{
+*/
+
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
 
+/**\brief Client thread for OpenIGTLink messaging.
+ * \ingroup cxServiceVideo
+ *
+ *
+ */
 class IGTLinkClient : public QThread
 {
   Q_OBJECT
@@ -64,6 +75,9 @@ private:
 
 };
 
+/**
+* @}
+*/
 }//end namespace cx
 
 #endif /* CXOPENIGTLINKCLIENT_H_ */
