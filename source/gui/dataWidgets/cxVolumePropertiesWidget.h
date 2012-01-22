@@ -10,6 +10,7 @@ namespace cx
 /**
  * \class ActiveVolumeWidget
  * \brief Widget that contains a select active image combo box.
+ * \ingroup cxGUI
  * \date Aug 20, 2010
  * \author christiana
  */
@@ -23,7 +24,10 @@ public:
   virtual QString defaultWhatsThis() const;
 };
 
-/**Widget for displaying various volume information.
+/**\brief Widget for displaying various volume information.
+ *
+ * \ingroup cxGUI
+ *
  * Part of the VolumePropertiesWidget.
  */
 class VolumeInfoWidget : public BaseWidget
@@ -51,6 +55,8 @@ private:
 /**
  * \class VolumePropertiesWidget
  * \brief Widget for displaying and manipulating various 3D Volume properties.
+ * \ingroup cxGUI
+ *
  * \date Aug 20, 2010
  * \author christiana
  */

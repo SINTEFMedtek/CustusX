@@ -18,6 +18,11 @@ namespace cx
 class MessageManager;
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 
+/**
+* \addtogroup cxServiceVisualizationRep
+* @{
+*/
+
 class LandmarksSource : public QObject
 {
 	Q_OBJECT
@@ -68,6 +73,7 @@ private:
  * \class LandmarkRep
  *
  * \brief
+ * \ingroup cxServiceVisualizationRep
  *
  * \date Dec 10, 2008
  * \author: Janne Beate Bakeng, SINTEF
@@ -127,6 +133,9 @@ private:
   LandmarkRep(); ///< not implemented
 };
 
+/**
+* @}
+*/
 }//namespace cx
 
 #endif /* CXLANDMARKREP_H_ */

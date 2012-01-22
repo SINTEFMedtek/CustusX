@@ -12,6 +12,12 @@ class QLineEdit;
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginCalibration
+ * @{
+ */
+
 ///**
 // * \class ToolTipCalibrationWidget
 // *
@@ -87,5 +93,8 @@ private:
   ssc::Vector3D mP_t; ///< the sampled point we are working on
 };
 
+/**
+ * @}
+ */
 }//namespace cx
 #endif /* CXTOOLTIPCALIBRATIONWIDGET_H_ */

@@ -16,9 +16,15 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxLogic
+* @{
+*/
 
-/**ServiceController handles all connections between the existing
+/**\brief Handles all connections between the existing
  * services, in order to keep them independent of each other.
+ * \inggroup cxLogic
  *
  * Owned by the LogicManager.
  */
@@ -45,6 +51,9 @@ private:
 
 typedef boost::shared_ptr<ServiceController> ServiceControllerPtr;
 
+/**
+* @}
+*/
 }
 
 #endif /* CXSERVICECONTROLLER_H_ */

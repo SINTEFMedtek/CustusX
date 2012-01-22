@@ -15,6 +15,7 @@ namespace cx
  * \class TransferFunctionAlphaWidget
  *
  * \brief
+ * \ingroup cxGUI
  *
  * \date Mar 23, 2009
  * \author: Janne Beate Bakeng, SINTEF

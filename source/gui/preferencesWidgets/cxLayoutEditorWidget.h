@@ -26,6 +26,7 @@ namespace cx
 
 
 /**A QLineEdit
+ * \ingroup cxGUI
  */
 class SmallLineEdit : public QLineEdit
 {
@@ -39,7 +40,10 @@ public:
   }
 };
 
-
+/**
+ * \ingroup cxGUI
+ *
+ */
 class LayoutEditorWidget : public QWidget
 {
   Q_OBJECT

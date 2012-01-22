@@ -13,6 +13,12 @@
 namespace cx
 {
 /**
+* \file
+* \addtogroup cxServiceState
+* @{
+*/
+
+/**
  * \class cxWorkflowState.h
  *
  * \brief
@@ -222,5 +228,8 @@ public:
   virtual bool canEnter() const;
 };
 
+/**
+* @}
+*/
 }
 #endif /* CXWORKFLOWSTATE_H_ */

@@ -15,6 +15,11 @@ class QSlider;
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 
 /**
@@ -80,6 +85,10 @@ protected:
 private:
   LandmarkImageRegistrationWidget(); ///< not implemented
 };
+
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif /* CXLANDMARKIMAGEREGISTRATIONWIDGET_H_ */

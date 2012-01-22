@@ -18,6 +18,7 @@ typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
 /**
  * \class IGTLinkWidget
  * \brief GUI for setup of a IGTLink connection.
+ * \ingroup cxGUI
  *
  * \date 2010.10.27
  * \author: Christian Askeland, SINTEF

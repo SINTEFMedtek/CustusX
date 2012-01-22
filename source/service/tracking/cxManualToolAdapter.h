@@ -12,8 +12,16 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceTracking
+* @{
+*/
 
-/**A ManualToolAdapter inherits from manual tool, but also
+/**
+ * \ingroup cxServiceTracking
+ *
+ * A ManualToolAdapter inherits from manual tool, but also
  * contains a cx::Tool that is requests shape and probe info from.
  *
  * Used for debug - when testing tools without a tracking system.
@@ -47,6 +55,9 @@ private:
 typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;
 
 
+/**
+* @}
+*/
 }
 
 #endif /* CXMANUALTOOLADAPTER_H_ */

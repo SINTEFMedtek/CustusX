@@ -15,6 +15,12 @@ namespace cx
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
+
 /**Helper for functions independent of state.
  * Not sure if we need this - think of better place.
  *
@@ -99,7 +105,12 @@ protected:
   std::vector<ViewWrapperPtr> mViewWrappers;
 //  ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
 };
+
 bool isViewWrapper2D(ViewWrapperPtr wrapper);
+
+/**
+* @}
+*/
 } // namespace cx
 
 #endif /* CXVIEWGROUP_H_ */

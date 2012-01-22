@@ -22,6 +22,7 @@ namespace cx
 {
 
 /**
+ * \ingroup cxGUI
  */
 class ShadingWidget : public QWidget
 {

@@ -17,8 +17,20 @@
 #include "sscTime.h"
 #include "sscTypeConversions.h"
 
+
 namespace ssc
 {
+
+/**
+* \file
+*
+* Various image algorithms. Mostly wrappers around ITK.
+*
+* \addtogroup cxResourceAlgorithms
+*
+*
+* @{
+*/
 
 ImagePtr resampleImage(ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
 ImagePtr resampleImage(ImagePtr image, Transform3D refMi);
@@ -80,8 +92,12 @@ std::vector<T> sortOnGroupsAndAcquisitionTime(std::map<QString, T> input)
 
 //vtkImageDataPtr CropAndClipImageTovtkImageData()
 
+/**
+* @}
+*/
 
 } // namespace ssc
+
 
 
 #endif /* SSCIMAGEALGORITHMS_H_ */

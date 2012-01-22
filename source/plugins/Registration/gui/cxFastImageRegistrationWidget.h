@@ -6,6 +6,12 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * \class FastImageRegistrationWidget
  *
  * \brief Widget for performing landmark based image registration using only the
@@ -41,5 +47,9 @@ protected:
   virtual void performRegistration();
 };
 
+/**
+ * @}
+ */
 }//namespace cx
+
 #endif /* CXFASTIMAGEREGISTRATIONWIDGET_H_ */

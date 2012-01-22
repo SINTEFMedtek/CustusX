@@ -12,10 +12,18 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
+
 
 typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 /**
- * Helper class for connection the active image.
+ * \brief Helper class for connection the active image.
+ * \ingroup cxServicePatient
+ *
  * By listeing to this class, you will always listen
  * to the active tool.
  */
@@ -45,6 +53,9 @@ private:
 	ssc::ImagePtr mImage;
 };
 
+/**
+* @}
+*/
 }
 
 #endif /* CXACTIVEIMAGEPROXY_H_ */

@@ -11,6 +11,12 @@ class QLabel;
 namespace cx
 {
 /**
+* \file
+* \addtogroup cxPluginAcquisition
+* @{
+*/
+
+/**
  * \class RecordSessionWidget
  *
  * \brief
@@ -67,5 +73,8 @@ private:
   bool mPostProcessing;
 };
 
+/**
+* @}
+*/
 }//namespace cx
 #endif /* CXRECORDSESSIONWIDGET_H_ */

@@ -10,6 +10,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
 
 class TransferFunction2DColorWidget : public BaseWidget
 {
@@ -72,6 +77,9 @@ private:
   ImagePropertiesWidget();
 };
 
+/**
+ * @}
+ */
 }//end namespace cx
 
 #endif /* CXIMAGEPROPERTIESWIDGET_H_ */

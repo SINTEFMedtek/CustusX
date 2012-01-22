@@ -24,6 +24,12 @@ typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 using ssc::Transform3D;
 
 /**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
+
+/**
  * \class CameraStyle
  *
  * Controls the current camera style of the 3d view.
@@ -72,6 +78,9 @@ protected:
   ssc::ToolPtr mFollowingTool; ///< the tool the camera is following
 };
 
+/**
+* @}
+*/
 }//namespace cx
 
 #endif /* CXCAMERASTYLE_H_ */

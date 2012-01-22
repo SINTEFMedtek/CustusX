@@ -20,6 +20,11 @@ class QDomDocument;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
 
 /**given a root node, use the /-separated path to descend
  * into the root children recursively. Create elements if
@@ -29,8 +34,11 @@ namespace cx
 QDomElement getElementForced(QDomNode root, QString path);
 
 
-/**Functionality for storing patient data in a folder on the disk
+/**
+ * \brief Functionality for storing patient data in a folder on the disk
  * and access to these data.
+ * \ingroup cxServicePatient
+ *
  * Keeps track of a single active patient (patient folder).
  * Only one such patient can be active at a time, since the
  * global managers are updated by this class.
@@ -87,6 +95,9 @@ private:
 
 typedef boost::shared_ptr<PatientData> PatientDataPtr;
 
+/**
+* @}
+*/
 } // namespace cx
 
 #endif /* CXPATIENTDATA_H_ */

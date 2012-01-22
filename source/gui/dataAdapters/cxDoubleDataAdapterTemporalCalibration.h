@@ -13,6 +13,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
 
 /** Interface to the tool offset of the dominant tool
  */
@@ -36,6 +41,9 @@ private:
   ssc::ToolPtr mTool;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXDOUBLEDATAADAPTERTEMPORALCALIBRATION_H_ */

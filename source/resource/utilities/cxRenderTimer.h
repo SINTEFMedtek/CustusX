@@ -16,6 +16,12 @@
 namespace cx
 {
 
+/**
+* \file
+* \addtogroup cxResourceUtilities
+* @{
+*/
+
 typedef boost::shared_ptr<class RenderTimer> RenderTimerPtr;
 
 /**Helper class for counting time spent by the rendering process
@@ -41,6 +47,10 @@ private:
   QTime mIntervalClock; ///< Time object used to calculate number of renderings per second (FPS)
   int mNumberOfRenderings; ///< Variable used to calculate FPS
 };
+
+/**
+* @}
+*/
 
 } // namespace cx
 

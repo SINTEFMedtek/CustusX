@@ -16,10 +16,27 @@ namespace ssc
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 }
 
+/**
+ * \defgroup cxPluginAcquisition Acquisition Plugin
+ * \ingroup cxPlugins
+ * \brief Handles the us acquisition process.
+ *
+ * See \ref cx::USAcquisition.
+ * See \ref cx::AcquisitionPlugin.
+ *
+ */
+
 namespace cx
 {
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 typedef boost::shared_ptr<class AcquisitionPlugin> AcquisitionPluginPtr;
+
+
+/**
+* \file
+* \addtogroup cxPluginAcquisition
+* @{
+*/
 
 /**Rewrite to be a descendant of PluginBase, with generic API for creating plugins...
  *
@@ -52,6 +69,9 @@ private:
 	AcquisitionDataPtr mAcquisitionData;
 };
 
+/**
+* @}
+*/
 }
 
 #endif /* CXACQUISITIONPLUGIN_H_ */

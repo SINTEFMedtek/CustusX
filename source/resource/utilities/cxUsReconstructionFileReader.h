@@ -21,6 +21,12 @@
 namespace cx
 {
 
+/**
+* \file
+* \addtogroup cxResourceUtilities
+* @{
+*/
+
 class UsReconstructionFileReader
 {
 public:
@@ -60,6 +66,10 @@ private:
 };
 
 typedef boost::shared_ptr<UsReconstructionFileReader> UsReconstructionFileReaderPtr;
+
+/**
+* @}
+*/
 
 } // namespace cx
 

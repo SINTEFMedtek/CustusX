@@ -13,8 +13,17 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceTracking
+* @{
+*/
+
 typedef boost::shared_ptr<class Probe> ProbePtr;
 
+/**
+ * \ingroup cxServiceTracking
+ */
 class Probe : public ssc::Probe
 {
   Q_OBJECT
@@ -71,6 +80,9 @@ private:
 
 };
 
+/**
+* @}
+*/
 } // namespace cx
 
 

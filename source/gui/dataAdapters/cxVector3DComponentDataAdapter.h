@@ -13,6 +13,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
 
 /**A data adapter that links to one component of a Vector3DDataAdapter.
  * Useful for displaying widgets for vector components.
@@ -45,6 +50,9 @@ public: // optional methods
 typedef boost::shared_ptr<Vector3DComponentDataAdapter> Vector3DComponentDataAdapterPtr;
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXVECTOR3DCOMPONENTDATAADAPTER_H_ */

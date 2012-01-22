@@ -22,7 +22,8 @@ namespace ssc
 
 typedef boost::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotation3DRepPtr;
 
-/** Class for display of an orientation annotation cube in 3D.
+/**\brief Class for display of an orientation annotation cube in 3D.
+ * \ingroup cxServiceVisualizationRep
  *
  */
 class OrientationAnnotation3DRep: public ssc::RepImpl

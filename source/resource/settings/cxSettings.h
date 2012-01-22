@@ -7,11 +7,16 @@
 
 namespace cx
 {
+
+/**
+* \file
+* \addtogroup cxResourceSettings
+* @{
+*/
+
 typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 /**
- * Settings
- *
  * \brief Customized interface for setting values in QSettings
  *
  * \date Apr 6, 2011
@@ -50,8 +55,13 @@ private:
   static Settings* mInstance; ///< The only instance of this class that can exist.
 };
 
-/**Shortcut for accessing the settings instance.*/
+/**\brief Shortcut for accessing the settings instance.*/
 Settings* settings();
+
+/**
+* @}
+*/
+
 }
 
 #endif /* CXSETTINGS_H_ */

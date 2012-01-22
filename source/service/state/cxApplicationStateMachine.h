@@ -17,6 +17,11 @@ class QMenu;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceState
+* @{
+*/
 
 class ApplicationState;
 
@@ -54,6 +59,9 @@ private:
 
 typedef boost::shared_ptr<ApplicationStateMachine> ApplicationStateMachinePtr;
 
+/**
+* @}
+*/
 }
 
 

@@ -17,6 +17,7 @@ namespace cx
  *\brief ToolConfigWidget
  *
  * \brief Widget for setting up a tool configuration for Cx3
+ * \ingroup cxGUI
  *
  * \date Mar 22, 2011
  * \author Janne Beate Bakeng, SINTEF

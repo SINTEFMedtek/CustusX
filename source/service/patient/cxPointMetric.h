@@ -14,6 +14,11 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
 
 /**Class that listens to changes in a coordinate system,
  * and emits a signal if that system changes.
@@ -52,7 +57,9 @@ public:
 };
 
 
-/**Data class that represents a single point.
+/**\brief Data class that represents a single point.
+ * \ingroup cxServicePatient
+ *
  * The point is attached to a specific coordinate system / frame.
  *
  */
@@ -84,6 +91,9 @@ private:
   CoordinateSystemListenerPtr mSpaceListener;
 };
 
+/**
+* @}
+*/
 }
 
 #endif /* CXPOINTMETRIC_H_ */

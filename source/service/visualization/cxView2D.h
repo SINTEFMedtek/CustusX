@@ -14,6 +14,12 @@ class MessageManager;
 class ViewManager;
 
 /**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
+
+/**
  * \class View2D
  *
  * \brief Class for displaying 2D representations.
@@ -30,5 +36,9 @@ public:
 
   virtual Type getType() const { return VIEW_2D;}; ///< get the class type
 };
+
+/**
+* @}
+*/
 }//namespace cx
 #endif /* CXVIEW2D2_H_ */

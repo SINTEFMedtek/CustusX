@@ -15,7 +15,8 @@ namespace ssc
 typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
 typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
 
-/**A class that annotated 2D views with otientation information.
+/**\brief A class that annotated 2D views with otientation information.
+ * \ingroup cxServiceVisualizationRep
  *
  * The slice proxy is used to find the orientation of a slice in space r,
  * which is assumed to be a valid DICOM space, and combinations of
