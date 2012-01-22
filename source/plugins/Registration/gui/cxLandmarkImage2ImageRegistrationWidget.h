@@ -22,6 +22,12 @@ class QSlider;
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * Widget for performing image to image registration
  * using landmarks.
  */
@@ -59,6 +65,10 @@ protected:
 private:
   LandmarkImage2ImageRegistrationWidget(); ///< not implemented
 };
+
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif /* CXLANDMARKIMAGE2IMAGEREGISTRATIONWIDGET_H_ */

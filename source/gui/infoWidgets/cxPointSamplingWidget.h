@@ -18,6 +18,8 @@ namespace cx
 /**
  * \class PointSamplingWidget
  *
+ * \ingroup cxGUI
+ *
  * \date 2010.05.05
  * \author: Christian Askeland, SINTEF
  */

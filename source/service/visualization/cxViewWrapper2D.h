@@ -22,12 +22,24 @@ namespace ssc
 typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
 }
 
+/**
+* \addtogroup cxServiceVisualization
+* @{
+*/
 #ifdef USE_GLX_SHARED_CONTEXT
   #define USE_2D_GPU_RENDER
 #endif
+/**
+* @}
+*/
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
 
 /** Wrapper for a View2D.
  *  Handles the connections between specific reps and the view.
@@ -116,7 +128,9 @@ private:
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 
-
+/**
+* @}
+*/
 } // namespace cx
 
 #endif /* CXVIEWWRAPPER2D_H_ */

@@ -21,6 +21,12 @@ namespace cx
 {
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
 
+/**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
 class ResampleWidget : public BaseWidget
 {
   Q_OBJECT
@@ -54,6 +60,9 @@ private:
   QLabel* mStatusLabel;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXRESAMPLEWIDGET_H_ */

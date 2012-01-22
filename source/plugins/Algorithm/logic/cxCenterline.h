@@ -8,6 +8,12 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
+/**
  * \class Centerline
  *
  * \brief Threaded centerline algorithm.
@@ -39,5 +45,8 @@ private:
   QColor mDefaultColor;
 };
 
+/**
+ * @}
+ */
 }//namespace cx
 #endif /* CXCENTERLINE_H_ */

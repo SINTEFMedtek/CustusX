@@ -12,8 +12,14 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
 
-/**Base class for all Data Metrics
+/**+brief Base class for all Data Metrics
+ * \ingroup cxServicePatient
  *
  */
 class DataMetric : public ssc::Data
@@ -25,6 +31,9 @@ public:
   virtual QString getSpace();
 };
 
+/**
+* @}
+*/
 }
 
 #endif /* CXDATAMETRIC_H_ */

@@ -17,6 +17,11 @@ class QDomNode;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
 
 struct LayoutPosition
 {
@@ -102,6 +107,9 @@ private:
 	std::vector<ViewData> mView;
 };
 
+/**
+* @}
+*/
 } // namespace cx
 
 #endif /* CXLAYOUTDATA_H_ */

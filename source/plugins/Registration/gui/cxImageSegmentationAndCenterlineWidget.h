@@ -13,6 +13,12 @@ class QVBoxLayout;
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * \class ImageSegmentationAndCenterlineWidget
  *
  * \brief Widget for extracting a segment from a image and finding a centerline
@@ -53,5 +59,8 @@ protected:
 };
 
 
+/**
+ * @}
+ */
 }//namespace cx
 #endif /* CXIMAGESEGMENTATIONANDCENTERLINEWIDGET_H_ */

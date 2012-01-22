@@ -14,6 +14,12 @@ namespace cx
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
 
 /**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
+/**
  * \class BinaryThresholdImageFilterWidget
  *
  * \brief Widget for segmenting out parts of volumes using a threshold.
@@ -72,6 +78,9 @@ private:
   Contour mContourAlgorithm;
 };
 
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif /* CXSBINARYTHRESHOLDIMAGEFILTERWIDGET_H_ */

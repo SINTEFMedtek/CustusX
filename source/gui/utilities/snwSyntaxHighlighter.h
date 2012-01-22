@@ -6,8 +6,8 @@
 namespace snw
 {
 
-/**Provides syntax highlighting for sonowand log files 
- * in snw::StatusWindow..
+/**\brief Provides syntax highlighting for sonowand log files.
+ * \ingroup cxGUI
  *
  * Adapted for CustusX use: Simple xml highlighter.
  */

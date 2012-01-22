@@ -8,11 +8,15 @@ class QDomDocument;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
 
 /**
- * \class cxDataManager
- *
  * \brief cx implementation of additional functionality for the ssc::DataManager
+ * \ingroup cxServicePatient
  *
  * \date Mar 23, 2009
  * \author Janne Beate Bakeng, SINTEF
@@ -47,5 +51,10 @@ private:
 
   mutable ssc::PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
 };
+
+/**
+* @}
+*/
 }//namespace cx
+
 #endif /* CXDATAMANAGER_H_ */

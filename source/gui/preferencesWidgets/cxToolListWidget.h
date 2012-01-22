@@ -13,11 +13,11 @@ namespace cx
  * ToolListWidget
  *
  * \brief Class for displaying tool files that can be dragged and dropped
+ * \ingroup cxGUI
  *
  * \date Mar 30, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-
 class ToolListWidget : public QListWidget
 {
   Q_OBJECT

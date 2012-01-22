@@ -16,6 +16,11 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
 
 /**Cache for reuse of Views.
  * Use the retrieve*() method to get views that can be used
@@ -78,6 +83,9 @@ private:
   std::vector<VIEW_TYPE*> mUsed;
 };
 
+/**
+* @}
+*/
 } // namespace cx
 
 #endif /* CXVIEWCACHE_H_ */

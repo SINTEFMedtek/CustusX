@@ -13,6 +13,12 @@ class QCheckBox;
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
+
+/**
  * \class CroppingWidget
  *
  * \date  Aug 20, 2010
@@ -42,6 +48,9 @@ private slots:
   ssc::ImagePtr cropClipButtonClickedSlot();///< Crete a new image based on the images crop and clip values
 };
 
+/**
+ * @}
+ */
 }//namespace cx
 
 

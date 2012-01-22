@@ -31,12 +31,20 @@ typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 
 /**
+ * \file
+ * \addtogroup cxPluginUsReconstruction
+ * @{
+ */
+
+/**
+ * \verbatim
  * Used coordinate systems:
  * u  = raw input Ultrasound frames (in x, y. Origin lower left.)
  * t  = Tool space for probe as defined in ssc:Tool (z in ray direction, y to the left)
  * s  = probe localizer Sensor.
  * pr = Patient Reference localizer sensor.
  * d  = Output Data space
+ * \endverbatim
  *
  */
 class ReconstructManager: public QObject
@@ -113,6 +121,9 @@ private:
 typedef boost::shared_ptr<class ThreadedReconstructer> ThreadedReconstructerPtr;
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* SSCRECONSTRUCTMANAGER_H_ */

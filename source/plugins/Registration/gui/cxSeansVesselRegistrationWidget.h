@@ -11,6 +11,12 @@ class QLabel;
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * SeansVesselRegistrationWidget.h
  *
  * \brief Widget for controlling input to
@@ -48,6 +54,9 @@ private:
   ssc::StringDataAdapterPtr mMovingImage;
 };
 
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif /* CXSEANSVESSELREGISTRATIONWIDGET_H_ */

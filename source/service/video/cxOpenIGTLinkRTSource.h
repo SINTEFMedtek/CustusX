@@ -18,10 +18,18 @@ typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceVideo
+* @{
+*/
 
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
 
-/**Synchronize data with source,
+/**\brief Implementation of ssc::VideoSource for the OpenIGTLink protocol.
+ * \ingroup cxServiceVideo
+ *
+ * Synchronize data with source,
  * provide data as a vtkImageData.
  */
 class OpenIGTLinkRTSource : public ssc::VideoSource
@@ -104,6 +112,9 @@ private:
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 
+/**
+* @}
+*/
 } // namespace cx
 
 #endif /* CXOPENIGTLINKRTSOURCE_H_ */

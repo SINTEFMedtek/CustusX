@@ -21,6 +21,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
 
 /** Interface to the tool offset of the dominant tool
  */
@@ -534,7 +539,9 @@ protected:
   ssc::ImagePtr mData;
 };
 
-
+/**
+ * @}
+ */
 } // namespace cx
 
 #endif /* CXDATAINTERFACE_H_ */

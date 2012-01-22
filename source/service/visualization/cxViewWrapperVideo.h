@@ -14,6 +14,11 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
 
 /** Wrapper for a View that displays a RealTimeStream.
  *  Handles the connections between specific reps and the view.
@@ -59,6 +64,9 @@ private:
 };
 typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 
+/**
+* @}
+*/
 } // namespace cx
 
 #endif /* CXVIEWWRAPPERRTSTREAM_H_ */

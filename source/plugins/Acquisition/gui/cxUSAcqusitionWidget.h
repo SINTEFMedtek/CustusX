@@ -11,6 +11,11 @@ namespace ssc
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxPluginAcquisition
+* @{
+*/
 
 
 /**
@@ -45,6 +50,9 @@ private:
 };
 
 
+/**
+* @}
+*/
 }//namespace cx
 
 #endif /* CXUSACQUSITIONWIDGET_H_ */

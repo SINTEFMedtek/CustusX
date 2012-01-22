@@ -20,6 +20,11 @@ class QDomNode;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceVisualization
+* @{
+*/
 
 typedef boost::shared_ptr<class CameraData> CameraDataPtr;
 
@@ -72,6 +77,9 @@ private:
 	QAction* addStandard3DViewAction(QString caption, QString help, ssc::Vector3D viewDirection, QActionGroup* group);
 };
 
+/**
+* @}
+*/
 }//end namespace cx
 
 #endif /* CXCAMERACONTROL_H_ */

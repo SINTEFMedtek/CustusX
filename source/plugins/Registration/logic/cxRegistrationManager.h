@@ -16,6 +16,12 @@ namespace cx
 class MessageManager;
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
 /**\
  * \class RegistrationManager
  *
@@ -104,6 +110,9 @@ private:
  */
 //RegistrationManager* registrationManager();
 
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif /* CXREGISTRATIONMANAGER_H_ */

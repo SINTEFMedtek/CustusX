@@ -20,6 +20,11 @@ namespace ssc
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxPluginAcquisition
+* @{
+*/
 
 /**Shared Data and resources for the Acquisition Plugin
  *
@@ -55,6 +60,10 @@ private:
 };
 
 typedef boost::shared_ptr<AcquisitionData> AcquisitionDataPtr;
+
+/**
+* @}
+*/
 }
 
 #endif /* CXACQUISITIONDATA_H_ */

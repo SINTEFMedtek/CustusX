@@ -14,8 +14,12 @@
 namespace cx
 {
 /**
- * \class ToolConfigurationParser
- *
+* \file
+* \addtogroup cxServiceTracking
+* @{
+*/
+
+/**
  * \brief Class for reading the configuration file that sets up
  * tracking for CustusX3
  *
@@ -60,9 +64,8 @@ private:
 };*/
 
 /**
- * \class ConfigurationFileParser
- *
  * \brief Class for reading the files defining a CustusX3 tool
+ * \ingroup cxServiceTracking
  *
  * \date 21. march 2011
  * \author Janne Beate Bakeng, SINTEF
@@ -109,9 +112,8 @@ private:
 };
 
 /**
- * \class ToolFileParser
- *
  * \brief Class for reading the files defining a CustusX3 tool
+ * \ingroup cxServiceTracking
  *
  * \date 21. march 2011
  * \author Janne Beate Bakeng, SINTEF
@@ -145,5 +147,8 @@ private:
                     ///< names of necessary tags in the tool file
 };
 
+/**
+* @}
+*/
 } //namespace cx
 #endif /* CXTOOLCONFIGURATIONPARSER_H_ */

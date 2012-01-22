@@ -14,6 +14,7 @@ namespace cx
  * \class BaseWidget
  *
  * \brief Interface for QWidget which handles widgets uniformly for the system.
+ * \ingroup cxGUI
  *
  * \date 28. sep. 2010
  * \author: Janne Beate Bakeng

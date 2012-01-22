@@ -14,6 +14,11 @@ class QLabel;
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
 
 /**
  * Base class for displaying ssc::Data items.
@@ -136,6 +141,9 @@ private:
   QLabel* mVisibleLabel;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXDATAVIEWSELECTIONWIDGET_H_ */

@@ -37,9 +37,17 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServicePatient
+* @{
+*/
 
-/**A graph combining frame dependencies between all ssc::Data. The graph
- * consists of several directed acyclic graphs.
+/**
+ * \brief A graph combining frame dependencies between all ssc::Data.
+ * \ingroup cxServicePatient
+ *
+ * The graph consists of several directed acyclic graphs.
  *
  */
 class FrameForest
@@ -61,6 +69,9 @@ private:
   QDomDocument mDocument;
 };
 
+/**
+* @}
+*/
 }
 
 #endif /* CXFRAMEFOREST_H_ */

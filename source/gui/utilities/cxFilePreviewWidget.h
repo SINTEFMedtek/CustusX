@@ -15,6 +15,7 @@ namespace cx
  *\class FilePreviewWidget
  *
  * \brief
+ * \ingroup cxGUI
  *
  * \date Mar 22, 2011
  * \author Janne Beate Bakeng, SINTEF

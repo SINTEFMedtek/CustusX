@@ -21,16 +21,42 @@ class QFileInfo;
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxServiceTracking
+* @{
+*/
+
 typedef boost::shared_ptr<class IgstkTrackerThread> IgstkTrackerThreadPtr;
 
 
 /**
- * \class ToolManager
- *
  * \brief Interface towards the navigation system.
+ * \ingroup cxServiceTracking
+ *
+ * \image html tracking_simple.png "Tracking Service ideal design."
+ *
+ * Links the navigation to the physical world. Devices with a physical position
+ * are realized by tracking hardware.
+ *
+ * The tracking module is an implementation of the ssc::Tool module.
+ * ToolManager and Tool are implemented using IGSTK, and communicates with
+ * the Polaris and Aurora tracking systems. All interaction with the module
+ * should go through the SSC interfaces. The ssc::ToolManager should be
+ * considered equal to the \ref cxServiceTracking.
+ *
+ * \image html cxArchitecture_tracking.png "Tracking Service Implementation."
+ *
+ * Examples of Polaris tracking devices:
+ *
+ * \image html us_probe.png "Ultrasound Probe with Polaris tracking sensors attached."
+ * \image html PolarisTool.jpg "Polaris Navigation Pointer from NDI"
+ *
  *
  * \date Nov 6, 2008
+ * \date Jan 19, 2012
  * \author: Janne Beate Bakeng, SINTEF
+ * \author: Christian Askeland, SINTEF
  */
 class ToolManager: public ssc::ToolManager
 {
@@ -153,5 +179,8 @@ private:
 
 bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2); ///< function for sorting tools by type
 
+/**
+* @}
+*/
 }//namespace cx
 #endif /* CXTOOLMANAGER_H_ */

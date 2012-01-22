@@ -20,6 +20,7 @@ namespace cx
 
 /**
  * \brief Widget for displaying a ssc::Vector3D
+ * \ingroup cxGUI
  *
  */
 class Vector3DWidget : public QWidget

@@ -14,6 +14,7 @@ namespace cx
 {
 
 /**Helper functions for accessing file paths and similar stuff.
+ * \ingroup cxResourceSettings
  *
  */
 class DataLocations

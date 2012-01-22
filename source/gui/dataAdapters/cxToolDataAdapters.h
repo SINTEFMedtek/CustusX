@@ -14,6 +14,12 @@ namespace cx
 {
 typedef boost::shared_ptr<class Tool> ToolPtr;
 
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
+
 /** Adapter that connects to the current active tool.
  */
 class ActiveToolStringDataAdapter : public ssc::StringDataAdapter
@@ -63,6 +69,9 @@ private:
 };
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXTOOLDATAADAPTERS_H_ */

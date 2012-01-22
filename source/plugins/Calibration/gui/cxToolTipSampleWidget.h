@@ -19,6 +19,11 @@ class QLineEdit;
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginCalibration
+ * @{
+ */
 
 /**
  * Class for sampling points in a chosable coordinate system and then saving them to file.
@@ -53,6 +58,9 @@ private:
 };
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXTOOLTIPSAMPLEWIDGET_H_ */
