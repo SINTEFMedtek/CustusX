@@ -71,7 +71,6 @@ public:
 	virtual QString getName();
 	virtual vtkImageDataPtr getVtkImageData();
 	virtual double getTimestamp();
-	virtual void release();
 
 	virtual QString getInfoString() const;
 	virtual QString getStatusString() const;
@@ -85,6 +84,8 @@ public:
 
 	void connectServer(const QString& key);
 	void disconnectServer();
+public slots:
+	virtual void setResolution(double resolution);
 
 protected:
 	void update();
@@ -105,11 +106,10 @@ private:
 
 	bool			mConnected;
 	bool			mStreaming;
-	bool			mEnablePolling;
+	bool mImportInitialized;
+	bool mStartWhenConnected;
 
 	QTimer*			mPollTimer;
-
-	void setEmptyImage();
 
 private slots:
 
