@@ -21,13 +21,18 @@ namespace ssc
 {
 
 /**
- * \mainpage
+ *
+ * \if SSC_INCLUDED_IN_EXTERNAL_PROJECT
+ *   \page ssc_main_page SSC Overview
+ * \else
+ *   \mainpage
+ * \endif
  *
  * \brief An IGT library used by Sonowand and Sintef Medical Technology.
  *
  *
  *
- * \section section_intro Introduction
+ * \section ssc_main_page_section_intro Introduction
  *
  * SSC is short for Sonowand / Sintef Medical Technology Cooperation. The
  * library was created in 2008 as a means to share code between the two
@@ -41,11 +46,11 @@ namespace ssc
  *
  *
  *
- * \section section_doc Documentation
+ * \section ssc_main_page_section_doc Documentation
  *
  * The <a href="modules.html">module list</a> is a recommended starting point.
  * The modules break down the library into manageable chunks. Also read the
- * \ref section_arch section.
+ * \ref ssc_main_page_section_arch section.
  *
  * Both CustusX and Sonowand Invite documentation include ssc
  * documentation to some extent. Seek and find.
@@ -55,7 +60,7 @@ namespace ssc
  * <a href="http://www.midasjournal.org/browse/publication/808">here</a>.
  *
  *
- * \section section_arch Architecture
+ * \section ssc_main_page_section_arch Architecture
  *
  * \image html sscArchitecture_top.png "SSC Structure"
  *
@@ -88,7 +93,7 @@ namespace ssc
  * SSC also contains secondary libraries for DICOM and ultrasound support. TBD.
  *
  *
- * \subsection section_update_policy Update policy
+ * \subsection ssc_main_page_section_update_policy Update policy
  *
  * The vtk rendering pipeline is updated when Render() in the vtkRenderWindow inside
  * View is called. The application using SSC is supposed to contain a QTimer or similar
@@ -99,7 +104,7 @@ namespace ssc
  *
  *
  *
- * \section section_legal Legal stuff
+ * \section ssc_main_page_section_legal Legal stuff
  *
  * SSC is owned by SINTEF MedTech and SonoWand AS. It can be used by both parties in
  * any way. A written agreement exists that regulates the usage.
@@ -108,7 +113,7 @@ namespace ssc
  *
  *
  *
- * \section section_install Installation
+ * \section ssc_main_page_section_install Installation
  *
  * The source can be downloaded from
  * \verbatim git@github.com:SINTEFMedisinskTeknologi/SSC.git \endverbatim
@@ -127,7 +132,7 @@ namespace ssc
  * SSC compiles and runs on Mac, Linux and Windows.
  * Some features are available only one some of the OS.
  *
- * \section section_libs Libraries
+ * \section ssc_main_page_section_libs Libraries
  *
  * SSC is liberal in its use of libraries. They must be installed or
  * compiled on you system in order to make SSC compile.
@@ -202,13 +207,13 @@ namespace ssc
 </TABLE>
  *
  *
- * \section section_style Code style
+ * \section ssc_main_page_section_style Code style
  *
  * This is described in a separate document. TBD: import .odt doc into doxygen
  *
- * \section section_coordinate_systems Coordinate Systems
+ * \section ssc_section_coordinate_systems Coordinate Systems
  *
- * See \ref page_coords.
+ * See \ref ssc_page_coords.
  *
  */
 

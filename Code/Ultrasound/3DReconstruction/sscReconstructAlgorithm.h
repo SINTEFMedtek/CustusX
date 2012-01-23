@@ -42,6 +42,8 @@ public:
 	 * \param frameInfo Timetags and positions for the input frames
 	 * \param frameData The frame data. Assumes that the transfrom is identity.
 	 * \param outputData [Out] The reconstructed volume. Memory must be allocated in advance.
+	 * \param frameMask A mask image for the frame.
+	 * \param settings Reference to settings file containing algorithm-specific settings
 	 */
 	virtual void reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData, ImagePtr outputData,
 		ImagePtr frameMask, QDomElement settings) = 0;

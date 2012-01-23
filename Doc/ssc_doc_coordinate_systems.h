@@ -20,7 +20,7 @@
 namespace ssc
 {
 
-/**\page page_coords Coordinate Systems
+/**\page ssc_page_coords Coordinate Systems
  *
  * This page describes the SSC way of handling coordinate systems. A basic
  * knowledge of linear algebra and geometry is assumed. A coordinate system
@@ -36,7 +36,7 @@ namespace ssc
  *
  *
  *
- * \section section_spaces_notation Notation
+ * \section ssc_section_spaces_notation Notation
  *
  * A point or vector \p p in space \p q are denoted
  *
@@ -58,7 +58,7 @@ namespace ssc
  *
  *
  *
- * \section section_spaces_implementation Implementation
+ * \section ssc_section_spaces_implementation Implementation
  *
  * Points and vectors are implemented using Vector3D. Vector3D only contains
  * [x,y,z], thus it is context-dependent if it is a vector or point, and also
@@ -74,7 +74,7 @@ namespace ssc
  *
  *
  *
- * \section section_specific_spaces Specific Spaces
+ * \section ssc_section_specific_spaces Specific Spaces
  *
  * \image html ssc_coordinate_systems.png "Major SSC Coordinate systems"
  *

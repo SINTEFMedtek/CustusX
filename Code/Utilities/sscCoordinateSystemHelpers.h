@@ -32,7 +32,7 @@ typedef CoordinateSystem Space;
 /**\brief Helper class that gets you from any coordinate system to any
  * other coordinate system in CustusX
  *
- * \sa \ref page_coords
+ * \sa \ref ssc_page_coords
  *
  * \date 3. nov. 2010
  * \author: Janne Beate Bakeng

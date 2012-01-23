@@ -26,14 +26,22 @@ namespace ssc
  */
 
 /**
+ * \defgroup sscGroup SSC
+ * \brief An IGT library used by Sonowand and Sintef Medical Technology.
+ *
+ */
+
+/**
  * \defgroup sscUtility SSC Utility
  * \brief Defines and miscellaneous utilities for the other parts of SSC.
+ * \ingroup sscGroup
  *
  */
 
 /**
  * \defgroup sscWidget SSC Widget
  * \brief Widget collection.
+ * \ingroup sscGroup
  *
  * Much of the \ref sscWidget module is built around DataAdapter. Start there.
  *
@@ -42,6 +50,7 @@ namespace ssc
 /**
  * \defgroup sscMath SSC Math
  * \brief The SSC Math library, based on Eigen.
+ * \ingroup sscGroup
  *
  * The math in SSC should preferrably be done in terms of Eigen, http://eigen.tuxfamily.org/dox/
  *
@@ -53,6 +62,7 @@ namespace ssc
 /**
  * \defgroup sscData SSC Data
  * \brief A model of the patient.
+ * \ingroup sscGroup
  *
  * Data sets of various modalities, fiducials and labels are described in relation to each other.
  *
@@ -63,6 +73,7 @@ namespace ssc
 /**
  * \defgroup sscTool SSC Tool
  * \brief Tool related interfaces and data classes.
+ * \ingroup sscGroup
  *
  * \image html sscArchitecture_tracking.png "Basic relation between the Tool interfaces."
  *
@@ -72,12 +83,14 @@ namespace ssc
 /**
  * \defgroup sscVideo SSC Video
  * \brief Video related interfaces and data classes.
+ * \ingroup sscGroup
  *
  */
 
 /**
  * \defgroup sscRep SSC Rep
  * \brief Representations that visualize Data entities in a View.
+ * \ingroup sscGroup
  *
  * Visualization of underlying structures assembled in Representations that are
  * easily configurable and insertible into views. View widgets that can be added
@@ -133,6 +146,7 @@ namespace ssc
 
 /** \defgroup sscNotUsed SSC Not used
  *  \brief All classes that seem to be unused in real code.
+ *  \ingroup sscGroup
  *
  * Everything in this group are candidates for removal.
  *
