@@ -103,22 +103,6 @@ install(TARGETS CustusX
     #COMPONENT CustusX
     )
 
-# Installing required run time libs for Windows, msv*.dll
-# TODO: move into the other WIN32 conditional?
-if(WIN32)
-  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
-  include (InstallRequiredSystemLibraries)
-  if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-      install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-              DESTINATION ${ROOT_DIR}/bin
-              PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
-              GROUP_EXECUTE WORLD_READ
-              #COMPONENT CustusX
-    )
-  endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-endif(WIN32)
-
-
 # Install configuration files to config folder
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ 
     DESTINATION ${ROOT_DIR}/config
@@ -148,6 +132,20 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Shared/doc
 
 # Install Windows-specific files
 if(WIN32)
+  # Installing required run time libs for Windows, msv*.dll
+  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+  include (InstallRequiredSystemLibraries)
+  if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+      install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+              DESTINATION ${ROOT_DIR}/bin
+              PERMISSIONS 
+              OWNER_WRITE OWNER_READ 
+              OWNER_EXECUTE GROUP_READ
+              GROUP_EXECUTE WORLD_READ
+              #COMPONENT CustusX
+    )
+  endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+
   install(FILES ${CustusX3_SOURCE_DIR}/install/Windows/win_install_readme.rtf 
       DESTINATION ${ROOT_DIR}/doc
       #COMPONENT CustusX
