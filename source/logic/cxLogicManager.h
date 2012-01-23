@@ -22,7 +22,7 @@ namespace cx
 typedef boost::shared_ptr<class ServiceController> ServiceControllerPtr;
 
 /**\brief Responsible for the entire logic layer.
- * \inggroup cxLogic
+ * \ingroup cxLogic
  *
  * All controllers in this layers are embedded in this class.
  * The service layer are managed via the ServiceController aggregate member.

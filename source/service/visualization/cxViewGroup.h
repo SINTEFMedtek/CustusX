@@ -43,8 +43,6 @@ private:
 };
 
 /**
- * \class cxViewGroup.h
- *
  * \brief
  *
  * \date 18. mars 2010
