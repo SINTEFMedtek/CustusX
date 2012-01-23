@@ -106,7 +106,7 @@ SET ( cxOpenIGTLinkServer_FILES
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
-add_executable( cxOpenIGTLinkServer main.cpp ${cxOpenIGTLinkServer_FILES} ${MOC_HEADER_FILES} )
+add_executable( OpenIGTLinkServer main.cpp ${cxOpenIGTLinkServer_FILES} ${MOC_HEADER_FILES} )
 target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES}     
     ${OpenCV_LIBS}
     vtkIO 
@@ -121,7 +121,7 @@ target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES}
     
 install(TARGETS cxOpenIGTLinkServer
     BUNDLE DESTINATION ${CUSTUSX_INSTALL_FOLDER_NAME}
-    RUNTIME DESTINATION "CustusX/bin"
+    RUNTIME DESTINATION "bin"
     )
 
  
