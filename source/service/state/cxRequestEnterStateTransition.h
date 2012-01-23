@@ -22,8 +22,6 @@ struct RequestEnterStateEvent : public QEvent
 };
 
 /**
- * \class cxRequestEnterStateTransition.h
- *
  * \brief
  *
  * \date 5. aug. 2010

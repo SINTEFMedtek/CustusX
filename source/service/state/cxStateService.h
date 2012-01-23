@@ -26,8 +26,6 @@ struct Desktop
 };
 
 /**
- * \class cxStateManager.h
- *
  * \brief Global Application states for CustusX.
  *
  * The StateManager is the main class in \ref cxServiceState , and maintains
