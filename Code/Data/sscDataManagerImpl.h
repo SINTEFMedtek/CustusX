@@ -169,7 +169,7 @@ public:
 	//  virtual void saveData(DataPtr image, const QString& basePath, bool headerOnly=false);///< Save image to file \param basePath Absolute path to patient data folder
 
 	// meshes
-	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \mesh mesh to save \param basePath Absolute path to patient data folder
+	virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param mesh to save \param basePath Absolute path to patient data folder
 	virtual MeshPtr getMesh(const QString& uid) const;
 	virtual std::map<QString, MeshPtr> getMeshes() const;
 
