@@ -42,7 +42,11 @@ endif(APPLE)
 if (APPLE)
   add_executable(CustusX MACOSX_BUNDLE ${SOURCES} )
 else (APPLE)
-  add_executable(CustusX ${SOURCES} )
+  if(WIN32)
+    add_executable(CustusX ${SOURCES} CustusX.rc)
+  else(WIN32)
+    add_executable(CustusX ${SOURCES} )
+  endif(WIN32)
 endif (APPLE)
 
 #------------------------------------------------------------------------------
