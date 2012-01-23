@@ -86,8 +86,6 @@ private:
 };
 
 /**
- * \class cxViewWrapper.h
- *
  * \brief
  *
  * \date 6. apr. 2010

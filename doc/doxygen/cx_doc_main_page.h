@@ -208,7 +208,7 @@ namespace cx
  *
  * \section cx_section_coordinate_systems Coordinate Systems
  *
- * See \ref page_coords.
+ * See \ref ssc_page_coords.
  *
  */
 
