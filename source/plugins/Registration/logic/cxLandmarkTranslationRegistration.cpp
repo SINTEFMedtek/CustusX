@@ -249,6 +249,7 @@ namespace cx
  * Creates a transform that moves target into ref space. (targetMref)
  * @param ref
  * @param target
+ * @param ok
  * @return
  */
 ssc::Transform3D LandmarkTranslationRegistration::registerPoints(std::vector<ssc::Vector3D> ref, std::vector<ssc::Vector3D> target, bool* ok)
