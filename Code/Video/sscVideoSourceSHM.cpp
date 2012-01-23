@@ -156,7 +156,7 @@ void VideoSourceSHM::update()
 	mImageImport->SetWholeExtent(0, mImageWidth - 1, 0, mImageHeight - 1, 0, 0);
 	mImageImport->SetDataExtentToWholeExtent();
 
-	mImageImport->SetImportVoidPointer(buffer, mImageWidth * mImageHeight);
+	mImageImport->SetImportVoidPointer(buffer);
 	mImageImport->Update();
 	mImportInitialized = true;
 
