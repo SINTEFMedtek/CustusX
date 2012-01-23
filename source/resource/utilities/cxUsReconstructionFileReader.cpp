@@ -395,7 +395,7 @@ bool UsReconstructionFileReader::readMaskFile(QString mhdFileName, ssc::ImagePtr
 /**
  * Reads a whitespace separated 4x4 matrix from file
  * \param fileName Input file
- * \param fileName success flag. If NULL, logger warnings are emitted instead
+ * \param ok success flag. If NULL, logger warnings are emitted instead
  * \return  The matrix
  */
 ssc::Transform3D UsReconstructionFileReader::readTransformFromFile(QString fileName, bool* ok)
