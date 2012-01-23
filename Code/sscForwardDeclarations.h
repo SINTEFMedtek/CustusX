@@ -88,6 +88,7 @@ typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
 typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
 typedef boost::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotation3DRepPtr;
 typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
+typedef boost::shared_ptr<class TestVideoSource> TestVideoSourcePtr;
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
 
 class LabeledComboBoxWidget;
