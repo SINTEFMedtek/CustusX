@@ -137,7 +137,7 @@ install(FILES ${CustusX3_SOURCE_DIR}/externals/ssc/Code/Ultrasound/3DReconstruct
 
 # Install Shared files
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Shared/doc 
-  DESTINATION ${ROOT_DIR}/doc
+  DESTINATION ${ROOT_DIR}
   #COMPONENT CustusX
   USE_SOURCE_PERMISSIONS
   )
