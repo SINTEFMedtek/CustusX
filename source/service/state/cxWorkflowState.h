@@ -19,8 +19,6 @@ namespace cx
 */
 
 /**
- * \class cxWorkflowState.h
- *
  * \brief
  *
  * \date 4. aug. 2010
