@@ -72,6 +72,14 @@ endif (UNIX AND NOT APPLE)
 
 if (WIN32)
     set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows/win_install_readme.rtf")
+    set(CPACK_PACKAGE_EXECUTABLES 
+        "CustusX" "CustusX"
+        "OpenIGTLinkServer" "OpenIGTLinkServer"
+        "GrabberServer" "GrabberServer"
+        )
+    set(CPACK_NSIS_MENU_LINKS
+        "doc/win_install_readme.rtf" "README"
+    )
 endif (WIN32)
 
 #------------------------------------------------------------------------------
