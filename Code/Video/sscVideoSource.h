@@ -66,6 +66,11 @@ public:
   virtual bool isConnected() const = 0; ///< return true when a connection to the data source is established.
   virtual bool isStreaming() const = 0; ///< return true when the source is streaming data.
 
+  /**
+   * Set the resolution of the incoming video in mm/pixel
+   */
+  virtual void setResolution(double mmPerPixel) {}
+
 signals:
   void streaming(bool on); ///< emitted when streaming started/stopped
   void connected(bool on); ///< emitted when source is connected/disconnected
