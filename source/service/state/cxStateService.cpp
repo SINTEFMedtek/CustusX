@@ -160,8 +160,6 @@ void StateService::fillDefaultSettings()
   this->fillDefault("Automation/autoReconstruct", true);
   this->fillDefault("Automation/autoSelectDominantTool", true);
   this->fillDefault("renderingInterval", 33);
-  this->fillDefault("smartRender", false);
-  this->fillDefault("stillUpdateRate", 8.0);
   this->fillDefault("backgroundColor", QColor("black"));
   this->fillDefault("globalPatientDataFolder", QDir::homePath()+"/Patients");
   this->fillDefault("globalApplicationName", enum2string(ssc::mdLABORATORY));
@@ -171,7 +169,14 @@ void StateService::fillDefaultSettings()
   this->fillDefault("View3D/sphereRadius", 1.0);
   this->fillDefault("View3D/labelSize", 2.5);
   this->fillDefault("View3D/showOrientationAnnotation", true);
+
+#ifdef __APPLE__
   this->fillDefault("IGTLink/localServer", "GrabberServer.app --auto");
+#elif WIN32
+
+#else
+#endif
+
   this->fillDefault("showSectorInRTView", true);
 //  this->fillDefault("autoLandmarkRegistration", true);
   this->fillDefault("View3D/stereoType", stINTERLACED);
@@ -180,6 +185,17 @@ void StateService::fillDefaultSettings()
 
   this->fillDefault("View3D/annotationModelSize", 0.2);
   this->fillDefault("View3D/annotationModel", "woman.stl");
+
+#ifdef __APPLE__
+  this->fillDefault("useGPUVolumeRayCastMapper", false);
+  this->fillDefault("stillUpdateRate", 8.0);
+#else
+  this->fillDefault("useGPUVolumeRayCastMapper", true);
+  this->fillDefault("stillUpdateRate", 0.001);
+#endif
+
+  this->fillDefault("smartRender", true);
+
 }
 
 void StateService::initialize()

@@ -6,6 +6,7 @@
 #include <QTextStream>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -442,16 +443,20 @@ void IgstkTool::internalVisible(bool value)
 
 void IgstkTool::addLogging()
 {
-  std::ofstream* loggerFile = new std::ofstream();
-  QString logFile = mInternalStructure.mLoggingFolderName + "Tool_" + mInternalStructure.mName +"_Logging.txt";
-  loggerFile->open( cstring_cast(logFile) );
-  mLogger = igstk::Logger::New();
-  mLogOutput = itk::StdStreamLogOutput::New();
-  mLogOutput->SetStream(*loggerFile);
-  mLogger->AddLogOutput(mLogOutput);
-  mLogger->SetPriorityLevel(itk::Logger::DEBUG);
+	bool logging = settings()->value("IGSTKDebugLogging", true).toBool();
+	if (logging)
+	{
+	  std::ofstream* loggerFile = new std::ofstream();
+	  QString logFile = mInternalStructure.mLoggingFolderName + "Tool_" + mInternalStructure.mName +"_Logging.txt";
+	  loggerFile->open( cstring_cast(logFile) );
+	  mLogger = igstk::Logger::New();
+	  mLogOutput = itk::StdStreamLogOutput::New();
+	  mLogOutput->SetStream(*loggerFile);
+	  mLogger->AddLogOutput(mLogOutput);
+	  mLogger->SetPriorityLevel(itk::Logger::DEBUG);
 
-  mTool->SetLogger(mLogger);
+	  mTool->SetLogger(mLogger);
+	}
 }
 
 void IgstkTool::printInternalStructure()
