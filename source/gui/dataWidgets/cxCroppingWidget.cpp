@@ -57,7 +57,7 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
   layout->addWidget(mZRange);
 
 
-  QPushButton* cropClipButton = new QPushButton("Create new cropped and clipped volume)");
+  QPushButton* cropClipButton = new QPushButton("Create new cropped and clipped volume");
   connect(cropClipButton, SIGNAL(clicked()), this, SLOT(cropClipButtonClickedSlot()));
   layout->addWidget(cropClipButton);
 
