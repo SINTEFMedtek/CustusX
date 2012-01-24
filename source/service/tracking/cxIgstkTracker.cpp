@@ -7,6 +7,7 @@
 #include "cxTool.h"
 #include "cxIgstkTool.h"
 #include <time.h>
+#include "cxSettings.h"
 
 
 namespace cx
@@ -43,9 +44,13 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
   mCommunication->SetStopBits( igstk::SerialCommunication::StopBits1 );
   mCommunication->SetHardwareHandshake(igstk::SerialCommunication::HandshakeOff);
 
-  QString comLogging = mInternalStructure.mLoggingFolderName + "RecordedStreamByCustusX3.txt";
-  mCommunication->SetCaptureFileName(cstring_cast(comLogging));
-  mCommunication->SetCapture( true );
+  bool logging = settings()->value("IGSTKDebugLogging", true).toBool();
+  if (logging)
+  {
+	  QString comLogging = mInternalStructure.mLoggingFolderName + "RecordedStreamByCustusX3.txt";
+	  mCommunication->SetCaptureFileName(cstring_cast(comLogging));
+	  mCommunication->SetCapture( true );
+  }
 
   switch (mInternalStructure.mType)
   {
@@ -330,17 +335,21 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
 
 void IgstkTracker::addLogging()
 {
-  std::ofstream* loggerFile = new std::ofstream();
-  QString logFile = mInternalStructure.mLoggingFolderName + "Tracker_Logging.txt";
-  loggerFile->open( cstring_cast(logFile) );
-  mTrackerLogger = igstk::Logger::New();
-  mTrackerLogOutput = itk::StdStreamLogOutput::New();
-  mTrackerLogOutput->SetStream(*loggerFile);
-  mTrackerLogger->AddLogOutput(mTrackerLogOutput);
-  mTrackerLogger->SetPriorityLevel(itk::Logger::DEBUG);
+	bool logging = settings()->value("IGSTKDebugLogging", true).toBool();
+	if (logging)
+	{
+		std::ofstream* loggerFile = new std::ofstream();
+		QString logFile = mInternalStructure.mLoggingFolderName + "Tracker_Logging.txt";
+		loggerFile->open(cstring_cast(logFile));
+		mTrackerLogger = igstk::Logger::New();
+		mTrackerLogOutput = itk::StdStreamLogOutput::New();
+		mTrackerLogOutput->SetStream(*loggerFile);
+		mTrackerLogger->AddLogOutput(mTrackerLogOutput);
+		mTrackerLogger->SetPriorityLevel(itk::Logger::DEBUG);
 
-  mTracker->SetLogger(mTrackerLogger);
-  mCommunication->SetLogger(mTrackerLogger);
+		mTracker->SetLogger(mTrackerLogger);
+		mCommunication->SetLogger(mTrackerLogger);
+	}
 }
 
 void IgstkTracker::internalOpen(bool value)

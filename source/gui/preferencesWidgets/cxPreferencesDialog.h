@@ -284,6 +284,31 @@ protected:
 };
 
 /**
+ * \brief Debug settings
+ *
+ * \date Jan 24, 2012
+ * \author Christian Askeland, SINTEF
+ */
+class DebugTab : public PreferencesTab
+{
+  Q_OBJECT
+
+public:
+  DebugTab(QWidget *parent = 0);
+  void init();
+
+public slots:
+  void saveParametersSlot();
+
+protected:
+  QCheckBox* mIGSTKDebugLoggingCheckBox;
+  QCheckBox* mManualToolPhysicalPropertiesCheckBox;
+  QGridLayout *mMainLayout;
+};
+
+
+
+/**
  * @}
  */
 }//namespace cx
