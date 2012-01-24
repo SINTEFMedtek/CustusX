@@ -185,10 +185,12 @@ void PerformanceTab::init()
 
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
   mSmartRenderCheckBox->setChecked(settings()->value("smartRender", true).toBool());
+  mSmartRenderCheckBox->setToolTip("Render only when scene has changed, plus once per second.");
 
   bool useGPURender = settings()->value("useGPUVolumeRayCastMapper").toBool();
   mGPURenderCheckBox = new QCheckBox("Use GPU 3D Renderer");
   mGPURenderCheckBox->setChecked(useGPURender);
+  mGPURenderCheckBox->setToolTip("Use a GPU-based 3D renderer instead of the texture-based one, if available.");
 
   //Layout
   mMainLayout = new QGridLayout;

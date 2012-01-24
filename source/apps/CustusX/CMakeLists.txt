@@ -130,6 +130,17 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Shared/doc
   USE_SOURCE_PERMISSIONS
   )
 
+install(FILES 
+  ${CustusX3_SOURCE_DIR}/install/Shared/doc/ChangeLog.rtf
+  ${CustusX3_SOURCE_DIR}/install/Shared/doc/CustusX_Tutorial.pdf
+  DESTINATION ${ROOT_DIR}/doc/
+  PERMISSIONS 
+        OWNER_READ OWNER_EXECUTE OWNER_WRITE
+        GROUP_READ GROUP_EXECUTE GROUP_WRITE
+        WORLD_READ WORLD_EXECUTE WORLD_WRITE
+  )
+
+
 # Install Windows-specific files
 if(WIN32)
   # Installing required run time libs for Windows, msv*.dll
