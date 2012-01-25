@@ -781,9 +781,35 @@ void ToolManager::dominantCheckSlot()
     //sort most important tool to the start of the vector:
     sort(visibleTools.begin(), visibleTools.end(), toolTypeSort);
     const QString uid = visibleTools.at(0)->getUid();
+//	std::cout << "sorted:" << std::endl;
+//    for (int i=0; i<visibleTools.size(); ++i)
+//    {
+//    	std::cout << "    " << visibleTools[i]->getUid() << std::endl;
+//    }
     this->setDominantTool(uid);
   }
 }
+
+namespace
+{
+/**
+ * \return a priority of the tool. High means this tool is preferred more.
+ */
+int getPriority(ssc::ToolPtr tool)
+{
+	if (tool->isManual()) // place this first, in case a tool has several attributes.
+		return 2;
+
+	if (tool->isProbe())
+		return 4;
+	if (tool->isPointer())
+		return 3;
+	if (tool->isReference())
+		return 1;
+	return 0;
+}
+}
+
 /**
  * sorts tools in descending order of type
  * @param tool1 the first tool
@@ -792,13 +818,7 @@ void ToolManager::dominantCheckSlot()
  */
 bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2)
 {
-	if (tool2->isProbe() && !tool1->isProbe()) // sort probes first
-		return true;
-	if (tool2->isPointer() && !tool1->isPointer()) // sort pointers next
-		return true;
-
-	return false;
-//  return tool1->getType() > tool2->getType();
+	return getPriority(tool2) < getPriority(tool1);
 }
 
 void ToolManager::addXml(QDomNode& parentNode)
