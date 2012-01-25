@@ -361,7 +361,7 @@ void ToolConfigureGroupBox::populateReference()
     {
       ToolFileParser parser(string);
       IgstkTool::InternalStructure internal = parser.getTool();
-      if(internal.mType == ssc::Tool::TOOL_REFERENCE)
+      if(internal.mIsReference)
       {
 //        std::cout << "Found reference when making new config: " << string << std::endl;
         currentIndex = this->addRefrenceToComboBox(string);

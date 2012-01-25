@@ -130,10 +130,10 @@ ssc::TRACKING_SYSTEM IgstkTool::getTrackerType()
   return mInternalStructure.mTrackerType;
 }
 
-ssc::Tool::Type IgstkTool::getType() const
-{
-  return mInternalStructure.mType;
-}
+//ssc::Tool::Type IgstkTool::getType() const
+//{
+//  return mInternalStructure.mType;
+//}
 
 bool IgstkTool::isValid() const
 {
@@ -305,9 +305,10 @@ bool IgstkTool::verifyInternalStructure()
 {
   bool retval = true;
   QString verificationError("Internal verification of tool "+ mInternalStructure.mUid+" failed! REASON: ");
-  if(mInternalStructure.mType == ssc::Tool::TOOL_NONE)
+  if(!mInternalStructure.mIsPointer && !mInternalStructure.mIsReference && !mInternalStructure.mIsProbe)
   {
-    ssc::messageManager()->sendError(verificationError+" Tag <tool>::<type> is invalid ["+qstring_cast(mInternalStructure.mType)+"]. Valid types: [pointer, usprobe, reference]");
+//    ssc::messageManager()->sendError(verificationError+" Tag <tool>::<type> is invalid ["+qstring_cast(mInternalStructure.mType)+"]. Valid types: [pointer, usprobe, reference]");
+	ssc::messageManager()->sendError(verificationError+" Tag <tool>::<type> is invalid, must be one one of pointer/probe/reference ");
     retval = false;
   }
   if(mInternalStructure.mUid.isEmpty())
@@ -462,7 +463,9 @@ void IgstkTool::addLogging()
 void IgstkTool::printInternalStructure()
 {
   std::cout << "------------------------------------------------------------------" << std::endl;
-  std::cout << "mType: " << mInternalStructure.mType << std::endl;
+  std::cout << "mIsProbe: " << mInternalStructure.mIsProbe << std::endl;
+  std::cout << "mIsReference: " << mInternalStructure.mIsReference << std::endl;
+  std::cout << "mIsPointer: " << mInternalStructure.mIsPointer << std::endl;
   std::cout << "mName: " << mInternalStructure.mName << std::endl;
   std::cout << "mUid: " << mInternalStructure.mUid << std::endl;
   std::cout << "mTrackerType: " << mInternalStructure.mTrackerType << std::endl;

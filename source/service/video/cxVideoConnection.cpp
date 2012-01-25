@@ -123,7 +123,10 @@ void VideoConnection::launchServer()
 	if (mServer->state() != QProcess::NotRunning)
 		return;
 	if (this->getHost().toUpper() != "LOCALHOST")
+	{
+		ssc::messageManager()->sendError("Ignoring Launch local server: Hostname must be Localhost");
 		return;
+	}
 
 	QStringList text = commandline.split(" ");
 	QString program = text[0];

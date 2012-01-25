@@ -170,8 +170,10 @@ void IgstkTracker::attachTools(std::map<QString, IgstkToolPtr> tools)
 
       tool->getPointer()->RequestAttachToTracker(mTracker);
 
-      if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
+      if(tool->isReference())
         mTracker->RequestSetReferenceTool(tool->getPointer());
+//      if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
+//        mTracker->RequestSetReferenceTool(tool->getPointer());
     }
   }
 }
