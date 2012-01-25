@@ -33,7 +33,9 @@ ManualTool::ManualTool(ToolManager* manager, const QString& uid, const QString& 
     Tool(uid,name), mMutex(QMutex::Recursive)
 {
   m_prMt = Transform3D::Identity();
+#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
 	mType = TOOL_MANUAL;
+#endif
 	mVisible = false;
 	read3DCrossHairSlot(0);
 	connect(manager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
@@ -77,10 +79,12 @@ QString ManualTool::getGraphicsFileName() const
 	return "";
 }
 
+#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
 ssc::Tool::Type ManualTool::getType() const
 {
 	return mType;
 }
+#endif
 
 vtkPolyDataPtr ManualTool::getGraphicsPolyData() const
 {
@@ -123,11 +127,14 @@ void ManualTool::setVisible(bool vis)
 	emit toolVisible(mVisible);
 }
 
+
+#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
 void ManualTool::setType(const Type& type)
 {
 	QMutexLocker locker(&mMutex);
 	mType = type;
 }
+#endif
 
 bool ManualTool::isCalibrated() const
 {
@@ -139,11 +146,13 @@ ssc::ProbeData ManualTool::getProbeSector() const
 	return mSector;
 }
 
+#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
 void ManualTool::setProbeSector(ssc::ProbeData sector)
 {
 	mSector = sector;
 	emit toolProbeSector();
 }
+#endif
 
 double ManualTool::getTimestamp() const
 {

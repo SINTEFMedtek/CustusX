@@ -30,6 +30,8 @@
 #include "sscProbeData.h"
 #include "sscIndent.h"
 
+#define SSC_USE_DEPRECATED_TOOL_ENUM
+
 namespace ssc
 {
 typedef std::map<double, Transform3D> TimedTransformMap;
@@ -103,6 +105,7 @@ public:
 	{
 	}
 
+#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
 	/**Enumerates the general type of tool.
 	 */
 	enum Type
@@ -113,6 +116,49 @@ public:
 		TOOL_MICROSCOPE ///< a tool following the focus point of a microscope
 	};
 	virtual Type getType() const = 0;
+
+	/**
+	 * \return true if the tool is a manual tool, i.e. is controlled by software/mouse instead of hardware
+	 */
+	virtual bool isManual() const { return getType()==TOOL_MANUAL; }
+	/**
+	 * \return true if the tool is a reference tool
+	 */
+	virtual bool isReference() const { return getType()==TOOL_REFERENCE; }
+	/**
+	 * \return true if the tool is a navigation pointer
+	 */
+	virtual bool isPointer() const { return getType()==TOOL_POINTER; }
+	/**
+	 * \return true if the tool is an ultrasound probe
+	 */
+	virtual bool isProbe() const { return getType()==TOOL_US_PROBE; }
+	/**
+	 * \return true if the tool is a microscope
+	 */
+	virtual bool isMicroscope() const { return getType()==TOOL_MICROSCOPE; }
+#else
+	/**
+	 * \return true if the tool is a manual tool, i.e. is controlled by software/mouse instead of hardware
+	 */
+	virtual bool isManual() const { return false; }
+	/**
+	 * \return true if the tool is a reference tool
+	 */
+	virtual bool isReference() const { return false; }
+	/**
+	 * \return true if the tool is a navigation pointer
+	 */
+	virtual bool isPointer() const { return false; }
+	/**
+	 * \return true if the tool is an ultrasound probe
+	 */
+	virtual bool isProbe() const { return false; }
+	/**
+	 * \return true if the tool is a microscope
+	 */
+	virtual bool isMicroscope() const { return false; }
+#endif
 	/**\return a file containing a graphical description of the tool,
 	 * if any. The file format is given by the file extension, for example
 	 * usprobe_12L.stl for the SolidWorks format.
