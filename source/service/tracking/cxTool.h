@@ -104,7 +104,26 @@ public:
   Tool(IgstkToolPtr igstkTool);
   virtual ~Tool();
 
-  virtual ssc::Tool::Type getType() const;
+#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
+  virtual ssc::Tool::Type getType() const
+  {
+	  if (this->isReference())
+		  return TOOL_REFERENCE;
+	  if (this->isProbe())
+		  return TOOL_US_PROBE;
+	  if (this->isPointer())
+		  return TOOL_POINTER;
+	  if (this->isManual())
+		  return TOOL_MANUAL;
+	  return TOOL_NONE;
+  }
+#endif
+
+	virtual bool isReference() const;
+	virtual bool isPointer() const;
+	virtual bool isProbe() const;
+
+
   virtual QString getGraphicsFileName() const;
   virtual vtkPolyDataPtr getGraphicsPolyData() const;
   virtual ssc::TimedTransformMapPtr getPositionHistory();
