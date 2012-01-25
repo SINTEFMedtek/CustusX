@@ -27,7 +27,9 @@ class DummyTool : public Tool
 public:
 	explicit DummyTool(ToolManager *manager, const QString& uid="dummytool");
 	~DummyTool();
+#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
 	virtual Type getType() const;
+#endif
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void saveTransformsAndTimestamps();

@@ -143,7 +143,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 
     //some color to 3D cursor
     mToolActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
-    if (mTool->getType() == Tool::TOOL_MANUAL)
+    if (mTool->isManual())
     {
       mToolActor->GetProperty()->SetColor(mTooltipPointColor.begin());
     }
@@ -330,7 +330,7 @@ void ToolRep3D::probeSectorChanged()
 
 void ToolRep3D::updateOffsetGraphics()
 {
-  bool visible = mTool && mTool->getVisible() && mTool->getType() != Tool::TOOL_US_PROBE; // no offset for probes
+  bool visible = mTool && mTool->getVisible() && !mTool->isProbe(); // no offset for probes
 
   if (!mStayVisibleAfterHide || (mOffsetPoint->getActor()->GetVisibility() == false))
   {
@@ -414,7 +414,7 @@ void ToolRep3D::tooltipOffsetSlot(double val)
 
 bool ToolRep3D::showProbe()
 {
-  return mTool && (mTool->getType()==ssc::Tool::TOOL_US_PROBE) && (mTool->getProbeSector().mType!=ssc::ProbeData::tNONE);
+  return mTool && (mTool->isProbe()) && (mTool->getProbeSector().mType!=ssc::ProbeData::tNONE);
 //  return mTool;;
 }
 } // namespace ssc

@@ -61,10 +61,12 @@ void DummyTool::setToolPositionMovement(const std::vector<Transform3D>& position
 	mTransforms = positions;
 }
 
+#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
 Tool::Type DummyTool::getType() const
 {
 	return TOOL_NONE;
 }
+#endif
 
 QString DummyTool::getGraphicsFileName() const
 {
