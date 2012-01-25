@@ -61,6 +61,20 @@ Tool::~Tool()
 //  return mTool->getInternalStructure().mType;
 //}
 
+bool Tool::isReference() const
+{
+	return mTool->getInternalStructure().mIsReference;
+}
+bool Tool::isPointer() const
+{
+	return mTool->getInternalStructure().mIsPointer;
+}
+bool Tool::isProbe() const
+{
+	return mTool->getInternalStructure().mIsProbe;
+}
+
+
 QString Tool::getGraphicsFileName() const
 {
   return mTool->getInternalStructure().mGraphicsFileName;
