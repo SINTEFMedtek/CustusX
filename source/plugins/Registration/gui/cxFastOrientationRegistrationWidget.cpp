@@ -73,7 +73,7 @@ void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
   bool enabled = false;
   enabled = mToolToSample &&
       mToolToSample->getVisible() &&
-      (mToolToSample->getType()!=ssc::Tool::TOOL_MANUAL || DataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+      (!mToolToSample->isManual() || DataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
   mSetOrientationButton->setEnabled(enabled);
 }
 

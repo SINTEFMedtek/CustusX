@@ -277,19 +277,24 @@ IgstkTool::InternalStructure ToolFileParser::getTool()
 
     QDomElement toolTypeElement = toolNode.firstChildElement(mToolTypeTag);
     QString toolTypeText = toolTypeElement.text();
-    if (toolTypeText.contains("reference", Qt::CaseInsensitive))
-    {
-      internalStructure.mType = ssc::Tool::TOOL_REFERENCE;
-    } else if (toolTypeText.contains("pointer", Qt::CaseInsensitive))
-    {
-      internalStructure.mType = ssc::Tool::TOOL_POINTER;
-    } else if (toolTypeText.contains("usprobe", Qt::CaseInsensitive))
-    {
-      internalStructure.mType = ssc::Tool::TOOL_US_PROBE;
-    } else
-    {
-      internalStructure.mType = ssc::Tool::TOOL_NONE;
-    }
+
+	internalStructure.mIsReference = toolTypeText.contains("reference", Qt::CaseInsensitive);
+	internalStructure.mIsPointer = toolTypeText.contains("pointer", Qt::CaseInsensitive);
+	internalStructure.mIsProbe = toolTypeText.contains("usprobe", Qt::CaseInsensitive);
+
+//    if (toolTypeText.contains("reference", Qt::CaseInsensitive))
+//    {
+//      internalStructure.mType = ssc::Tool::TOOL_REFERENCE;
+//    } else if (toolTypeText.contains("pointer", Qt::CaseInsensitive))
+//    {
+//      internalStructure.mType = ssc::Tool::TOOL_POINTER;
+//    } else if (toolTypeText.contains("usprobe", Qt::CaseInsensitive))
+//    {
+//      internalStructure.mType = ssc::Tool::TOOL_US_PROBE;
+//    } else
+//    {
+//      internalStructure.mType = ssc::Tool::TOOL_NONE;
+//    }
 
     QDomElement toolIdElement = toolNode.firstChildElement(mToolIdTag);
     QString toolIdText = toolIdElement.text();

@@ -212,7 +212,7 @@ void ToolManager::trackerConfiguredSlot(bool on)
     {
       if (iter->second == mManualTool)
         continue;
-      if (iter->second->getType()==ssc::Tool::TOOL_REFERENCE)
+      if (iter->second->isReference())
         continue;
       mManualTool->setBase(iter->second);
       ssc::messageManager()->sendInfo("Manual tool imbued with properties from " + iter->first);
@@ -527,7 +527,7 @@ void ToolManager::setDominantTool(const QString& uid)
   if (mDominantTool)
   {
     // make manual tool invisible when other tools are active.
-    if (mDominantTool->getType()==ssc::Tool::TOOL_MANUAL)
+    if (mDominantTool->isManual())
     {
       mManualTool->setVisible(false);
     }
@@ -537,7 +537,7 @@ void ToolManager::setDominantTool(const QString& uid)
   newTool = this->getTool(uid);
 
   // special case for manual tool
-  if(newTool && newTool->getType() == ssc::Tool::TOOL_MANUAL && mManualTool)
+  if(newTool && newTool->isManual() && mManualTool)
   {
     if (mDominantTool)
     {
@@ -553,8 +553,7 @@ void ToolManager::setDominantTool(const QString& uid)
   mDominantTool = newTool;
   connect(mDominantTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
 
-  if(mDominantTool->getType() == ssc::Tool::TOOL_MANUAL ||
-      mDominantTool->getType() == ssc::Tool::TOOL_NONE)
+  if(mDominantTool->isManual())
       emit tps(0);
 
   emit dominantToolChanged(uid);
@@ -773,7 +772,7 @@ void ToolManager::dominantCheckSlot()
     //TODO need to check if init???
     if(it->second->getVisible())
       visibleTools.push_back(it->second);
-    else if(it->second->getType() == ssc::Tool::TOOL_MANUAL)
+    else if(it->second->isManual())
       visibleTools.push_back(it->second);
   }
 
@@ -793,7 +792,13 @@ void ToolManager::dominantCheckSlot()
  */
 bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2)
 {
-  return tool1->getType() > tool2->getType();
+	if (tool2->isProbe() && !tool1->isProbe()) // sort probes first
+		return true;
+	if (tool2->isPointer() && !tool1->isPointer()) // sort pointers next
+		return true;
+
+	return false;
+//  return tool1->getType() > tool2->getType();
 }
 
 void ToolManager::addXml(QDomNode& parentNode)
