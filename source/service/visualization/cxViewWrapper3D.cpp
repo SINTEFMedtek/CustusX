@@ -467,7 +467,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 void ViewWrapper3D::showManualToolSlot(bool visible)
 {
   settings()->setValue("showManualTool", visible);
-  ToolManager::getInstance()->getManualTool()->setVisible(visible);
+//  ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
 
 void ViewWrapper3D::showOrientationSlot(bool visible)
