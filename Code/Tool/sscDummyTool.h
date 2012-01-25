@@ -29,6 +29,7 @@ public:
 	~DummyTool();
 #ifdef SSC_USE_DEPRECATED_TOOL_ENUM
 	virtual Type getType() const;
+	virtual void setType(Type);
 #endif
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
@@ -79,6 +80,7 @@ private:
 	std::vector<Transform3D> mTransforms;
 
 	static int mTransformCount;
+	Type mType;
 };
 typedef boost::shared_ptr<DummyTool> DummyToolPtr;
 }//namespace ssc
