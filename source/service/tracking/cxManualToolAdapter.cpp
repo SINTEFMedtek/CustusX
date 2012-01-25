@@ -32,10 +32,10 @@ void ManualToolAdapter::setBase(ssc::ToolPtr base)
   connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 }
 
-ssc::Tool::Type ManualToolAdapter::getType() const
-{
-  return mBase->getType();
-}
+//ssc::Tool::Type ManualToolAdapter::getType() const
+//{
+//  return mBase->getType();
+//}
 
 QString ManualToolAdapter::getGraphicsFileName() const
 {

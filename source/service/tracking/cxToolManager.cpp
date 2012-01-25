@@ -100,7 +100,8 @@ void ToolManager::initializeManualTool()
     //adding a manual tool as default
     mManualTool.reset(new ManualToolAdapter(this, "ManualTool"));
     mTools["ManualTool"] = mManualTool;
-    mManualTool->setVisible(settings()->value("showManualTool").toBool());
+    mManualTool->setVisible(true);
+//    mManualTool->setVisible(settings()->value("showManualTool").toBool());
     connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
   }
 
@@ -212,7 +213,7 @@ void ToolManager::trackerConfiguredSlot(bool on)
     {
       if (iter->second == mManualTool)
         continue;
-      if (iter->second->getType()==ssc::Tool::TOOL_REFERENCE)
+      if (iter->second->isReference())
         continue;
       mManualTool->setBase(iter->second);
       ssc::messageManager()->sendInfo("Manual tool imbued with properties from " + iter->first);
@@ -527,7 +528,7 @@ void ToolManager::setDominantTool(const QString& uid)
   if (mDominantTool)
   {
     // make manual tool invisible when other tools are active.
-    if (mDominantTool->getType()==ssc::Tool::TOOL_MANUAL)
+    if (mDominantTool->isManual())
     {
       mManualTool->setVisible(false);
     }
@@ -537,7 +538,7 @@ void ToolManager::setDominantTool(const QString& uid)
   newTool = this->getTool(uid);
 
   // special case for manual tool
-  if(newTool && newTool->getType() == ssc::Tool::TOOL_MANUAL && mManualTool)
+  if(newTool && newTool->isManual() && mManualTool)
   {
     if (mDominantTool)
     {
@@ -545,7 +546,8 @@ void ToolManager::setDominantTool(const QString& uid)
       mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
 
     }
-    mManualTool->setVisible(settings()->value("showManualTool").toBool());
+    mManualTool->setVisible(true);
+//    mManualTool->setVisible(settings()->value("showManualTool").toBool());
   }
 
   if(mDominantTool)
@@ -553,8 +555,7 @@ void ToolManager::setDominantTool(const QString& uid)
   mDominantTool = newTool;
   connect(mDominantTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
 
-  if(mDominantTool->getType() == ssc::Tool::TOOL_MANUAL ||
-      mDominantTool->getType() == ssc::Tool::TOOL_NONE)
+  if(mDominantTool->isManual())
       emit tps(0);
 
   emit dominantToolChanged(uid);
@@ -773,7 +774,7 @@ void ToolManager::dominantCheckSlot()
     //TODO need to check if init???
     if(it->second->getVisible())
       visibleTools.push_back(it->second);
-    else if(it->second->getType() == ssc::Tool::TOOL_MANUAL)
+    else if(it->second->isManual())
       visibleTools.push_back(it->second);
   }
 
@@ -782,9 +783,35 @@ void ToolManager::dominantCheckSlot()
     //sort most important tool to the start of the vector:
     sort(visibleTools.begin(), visibleTools.end(), toolTypeSort);
     const QString uid = visibleTools.at(0)->getUid();
+//	std::cout << "sorted:" << std::endl;
+//    for (int i=0; i<visibleTools.size(); ++i)
+//    {
+//    	std::cout << "    " << visibleTools[i]->getUid() << std::endl;
+//    }
     this->setDominantTool(uid);
   }
 }
+
+namespace
+{
+/**
+ * \return a priority of the tool. High means this tool is preferred more.
+ */
+int getPriority(ssc::ToolPtr tool)
+{
+	if (tool->isManual()) // place this first, in case a tool has several attributes.
+		return 2;
+
+	if (tool->isProbe())
+		return 4;
+	if (tool->isPointer())
+		return 3;
+	if (tool->isReference())
+		return 1;
+	return 0;
+}
+}
+
 /**
  * sorts tools in descending order of type
  * @param tool1 the first tool
@@ -793,7 +820,7 @@ void ToolManager::dominantCheckSlot()
  */
 bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2)
 {
-  return tool1->getType() > tool2->getType();
+	return getPriority(tool2) < getPriority(tool1);
 }
 
 void ToolManager::addXml(QDomNode& parentNode)

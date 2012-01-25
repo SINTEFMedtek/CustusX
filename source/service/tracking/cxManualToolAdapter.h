@@ -29,24 +29,28 @@ namespace cx
  */
 class ManualToolAdapter : public ssc::ManualTool
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  explicit ManualToolAdapter(ssc::ToolManager* manager, QString uid);
-  explicit ManualToolAdapter(ssc::ToolManager* manager, ssc::ToolPtr base);
-  virtual ~ManualToolAdapter();
-  virtual Type getType() const;
-  virtual QString getGraphicsFileName() const;
-  virtual vtkPolyDataPtr getGraphicsPolyData() const;
-//  virtual QString getUid() const;
-//  virtual QString getName() const;
-  virtual bool isCalibrated() const;
-  virtual ssc::ProbeData getProbeSector() const;
-  virtual ssc::ProbePtr getProbe() const;
+	explicit ManualToolAdapter(ssc::ToolManager* manager, QString uid);
+	explicit ManualToolAdapter(ssc::ToolManager* manager, ssc::ToolPtr base);
+	virtual ~ManualToolAdapter();
 
-  virtual ssc::Transform3D getCalibration_sMt() const;
-  virtual std::map<int, ssc::Vector3D> getReferencePoints() const;
+	virtual bool isManual()     const { return true; }
+	virtual bool isReference()  const { return mBase->isReference(); }
+	virtual bool isPointer()    const { return mBase->isPointer(); }
+	virtual bool isProbe()      const { return mBase->isProbe(); }
+	virtual bool isMicroscope() const { return mBase->isMicroscope(); }
 
-  void setBase(ssc::ToolPtr base);
+	virtual QString getGraphicsFileName() const;
+	virtual vtkPolyDataPtr getGraphicsPolyData() const;
+	virtual bool isCalibrated() const;
+	virtual ssc::ProbeData getProbeSector() const;
+	virtual ssc::ProbePtr getProbe() const;
+
+	virtual ssc::Transform3D getCalibration_sMt() const;
+	virtual std::map<int, ssc::Vector3D> getReferencePoints() const;
+
+	void setBase(ssc::ToolPtr base);
 
 private:
   ssc::ToolPtr mBase;
