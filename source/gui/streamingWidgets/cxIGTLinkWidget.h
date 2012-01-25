@@ -44,7 +44,7 @@ private slots:
   void serverStatusChangedSlot();
   void browseLocalServerSlot();
 
-  void guiChanged();
+  void useLocalServerChanged();
 
 private:
   void dataChanged();
