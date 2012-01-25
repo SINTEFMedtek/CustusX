@@ -133,6 +133,7 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Shared/doc
 install(FILES 
   ${CustusX3_SOURCE_DIR}/install/Shared/doc/ChangeLog.rtf
   ${CustusX3_SOURCE_DIR}/install/Shared/doc/CustusX_Tutorial.pdf
+  ${CustusX3_SOURCE_DIR}/install/Shared/doc/CustusX_Specifications.pdf
   DESTINATION ${ROOT_DIR}/doc/
   PERMISSIONS 
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
