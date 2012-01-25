@@ -196,6 +196,8 @@ void StateService::fillDefaultSettings()
 
   this->fillDefault("smartRender", true);
 
+  this->fillDefault("IGSTKDebugLogging", false);
+  this->fillDefault("giveManualToolPhysicalProperties", false);
 }
 
 void StateService::initialize()
