@@ -11,6 +11,7 @@
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
 #include "cxViewWrapper3D.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -150,11 +151,81 @@ void StateService::fillDefault(QString name, T value)
     settings()->setValue(name, value);
 }
 
+/** Look for a grabber server with a given name in path.
+ *  If found, return filename with args relative to bundle dir.
+ *
+ */
+QString StateService::checkGrabberServerExist(QString path, QString filename, QString args)
+{
+	std::cout << "checking [" << path << "] [" << filename << "] [" << args << "]" << std::endl;
+	path = QDir::cleanPath(path);
+	std::cout << "  cleaned [" << path << "]" << std::endl;
+	if (QDir(path).exists(filename))
+	{
+		std::cout << "  found [" << filename << "]" << std::endl;
+		return QDir(DataLocations::getBundlePath()).relativeFilePath(path + "/" + filename) + " " + args;
+	}
+
+	return "";
+}
+
+/**Return the location of external video grabber application that
+ * can be used as a local server controlled by CustusX.
+ *
+ */
+QString StateService::getDefaultGrabberServer()
+{
+#ifdef __APPLE__
+
+	QString filename = "GrabberServer.app";
+	QString postfix = " --auto";
+	QString result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), filename, postfix);
+	if (!result.isEmpty())
+		return result;
+	result = this->checkGrabberServerExist(DataLocations::getRootConfigPath() + "/../install/Apple", filename, postfix);
+	if (!result.isEmpty())
+		return result;
+	return "";
+
+#elif WIN32
+
+	return "" // TODO fill in something here...
+
+#else
+
+	QString result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "runOpenIGTLinkServer.sh", "");
+	if (!result.isEmpty())
+		return result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer", "");
+	if (!result.isEmpty())
+		return result;
+	return "";
+
+#endif
+
+
+
+//  QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
+//  if (QDir(path).exists())
+//    return path;
+//
+//  if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
+//    return CX_CONFIG_ROOT;
+//
+//  return "";
+}
+
 /**Enter all default Settings here.
  *
  */
 void StateService::fillDefaultSettings()
 {
+	std::cout << "=============================================================" << std::endl;
+	std::cout << "result: " << this->getDefaultGrabberServer() << std::endl;
+	std::cout << "=============================================================" << std::endl;
+
   this->fillDefault("Automation/autoStartTracking", true);
   this->fillDefault("Automation/autoStartStreaming", true);
   this->fillDefault("Automation/autoReconstruct", true);
@@ -170,12 +241,7 @@ void StateService::fillDefaultSettings()
   this->fillDefault("View3D/labelSize", 2.5);
   this->fillDefault("View3D/showOrientationAnnotation", true);
 
-#ifdef __APPLE__
-  this->fillDefault("IGTLink/localServer", "GrabberServer.app --auto");
-#elif WIN32
-
-#else
-#endif
+  this->fillDefault("IGTLink/localServer", this->getDefaultGrabberServer());
 
   this->fillDefault("showSectorInRTView", true);
 //  this->fillDefault("autoLandmarkRegistration", true);
