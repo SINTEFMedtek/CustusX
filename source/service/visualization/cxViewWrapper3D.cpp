@@ -691,7 +691,7 @@ void ViewWrapper3D::toolsAvailableSlot()
   for (iter=tools->begin(); iter!=tools->end(); ++iter)
   {
     ssc::ToolPtr tool = iter->second;
-    if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
+    if(tool->isReference())
       continue;
 
     ssc::ToolRep3DPtr toolRep = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
