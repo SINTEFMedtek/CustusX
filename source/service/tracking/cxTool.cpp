@@ -56,10 +56,10 @@ Tool::Tool(IgstkToolPtr igstkTool) :
 Tool::~Tool()
 {}
 
-ssc::Tool::Type Tool::getType() const
-{
-  return mTool->getInternalStructure().mType;
-}
+//ssc::Tool::Type Tool::getType() const
+//{
+//  return mTool->getInternalStructure().mType;
+//}
 
 QString Tool::getGraphicsFileName() const
 {

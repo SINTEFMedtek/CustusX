@@ -49,7 +49,10 @@ public:
   	void setCalibration(const ssc::Transform3D& cal);
   	void saveCalibrationToFile();
 
-    ssc::Tool::Type   mType;                  ///< the tools type
+	bool mIsReference;
+	bool mIsPointer;
+	bool mIsProbe;
+//    ssc::Tool::Type   mType;                  ///< the tools type
     QString           mName;                  ///< the tools name
     QString           mUid;                   ///< the tools unique id
     std::vector<ssc::CLINICAL_APPLICATION> mClinicalApplications;       ///< the tools clinical application applications
@@ -68,7 +71,9 @@ public:
     QString           mInstrumentId;          ///< The instruments id
     QString           mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
     InternalStructure() :
-      mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(ssc::tsNONE),
+    	mIsReference(false), mIsPointer(false), mIsProbe(false),
+      //mType(ssc::Tool::TOOL_NONE),
+      mName(""), mUid(""), mTrackerType(ssc::tsNONE),
       mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX), mReferencePoints(),
       mWireless(true), m5DOF(true), mCalibrationFilename(""), mGraphicsFileName(""),
       mTransformSaveFileName(""), mLoggingFolderName(""), mInstrumentId(""),
@@ -84,7 +89,8 @@ public:
 
   igstk::TrackerTool::Pointer getPointer() const; ///< return a pointer to the internal tools base object
   ssc::TRACKING_SYSTEM getTrackerType();
-  ssc::Tool::Type getType() const;
+//  ssc::Tool::Type getType() const;
+  bool isReference() const { return mInternalStructure.mIsReference; }
 
   bool isValid() const; ///< Thread safe, volatile
   bool isInitialized() const; ///< Thread safe, volatile
