@@ -63,7 +63,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 
   mUseLocalServer = new QCheckBox("Use Local Server", this);
   mUseLocalServer->setChecked(getConnection()->getUseLocalServer());
-  connect(mUseLocalServer, SIGNAL(toggled(bool)), this, SLOT(guiChanged()));
+  connect(mUseLocalServer, SIGNAL(toggled(bool)), this, SLOT(useLocalServerChanged()));
   gridLayout->addWidget(mUseLocalServer, 2, 0, 1, 2);
 
   gridLayout->addWidget(new QLabel("Local Server", this), 3, 0);
@@ -119,10 +119,16 @@ IGTLinkWidget::~IGTLinkWidget()
 {
 }
 
-void IGTLinkWidget::guiChanged()
+void IGTLinkWidget::useLocalServerChanged()
 {
-  this->writeSettings();
-  this->dataChanged();
+	if (mUseLocalServer->isChecked())
+	{
+		mAddressEdit->addItem("Localhost");
+		mAddressEdit->setCurrentIndex(mAddressEdit->count()-1);
+	}
+
+	this->writeSettings();
+	this->dataChanged();
 }
 
 void IGTLinkWidget::dataChanged()

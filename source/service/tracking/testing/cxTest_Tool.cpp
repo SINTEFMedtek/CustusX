@@ -8,7 +8,8 @@ void TestTool::setUp()
 {
   QString toolToolPath(cx::DataLocations::getRootConfigPath()+QString("/tool/Tools/"));
 
-  mValidPolarisInternal.mType = ssc::Tool::TOOL_POINTER;
+  mValidPolarisInternal.mIsPointer = true;
+//  mValidPolarisInternal.mType = ssc::Tool::TOOL_POINTER;
   mValidPolarisInternal.mName = "Polaris pointer name";
   mValidPolarisInternal.mUid = "Polaris pointer uid";
   mValidPolarisInternal.mTrackerType = ssc::tsPOLARIS;
@@ -22,7 +23,8 @@ void TestTool::setUp()
   mValidPolarisInternal.mTransformSaveFileName = QDir::currentPath();
   mValidPolarisInternal.mLoggingFolderName = QDir::currentPath();
 
-  mValidAuroraInternal.mType = ssc::Tool::TOOL_POINTER;
+//  mValidAuroraInternal.mType = ssc::Tool::TOOL_POINTER;
+  mValidAuroraInternal.mIsPointer = true;
   mValidAuroraInternal.mName = "Aurora pointer name";
   mValidAuroraInternal.mUid = "Aurora pointer uid";
   mValidAuroraInternal.mTrackerType = ssc::tsAURORA;
