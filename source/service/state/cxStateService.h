@@ -109,6 +109,8 @@ private:
   void fillDefaultSettings();
   template<class T>
   void fillDefault(QString name, T value);
+  QString getDefaultGrabberServer();
+  QString checkGrabberServerExist(QString path, QString filename, QString args);
 
   static StateService* mTheInstance; ///< the only instance of this class
 

@@ -49,7 +49,21 @@ if    (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
 endif (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
 
+# Variables
+#----------
+
+# define LINUX convenience variable
+if (UNIX AND NOT APPLE)
+    set(CX_LINUX 1)
+endif (UNIX AND NOT APPLE)
+
+# Set root folder for entire installation
+set(CX_INSTALL_ROOT_DIR .)
+
+
 if (APPLE)
+    set(CX_INSTALL_ROOT_DIR "CustusX")
+
     set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
     set(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
@@ -61,13 +75,14 @@ if (APPLE)
     option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
 endif(APPLE)
 
-if (UNIX AND NOT APPLE)
+if (CX_LINUX)
+    set(CX_INSTALL_ROOT_DIR "CustusX")
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
     set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
 #    set(CPACK_GENERATOR "TGZ;STGZ")
     set(CPACK_GENERATOR "TGZ")
     set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-endif (UNIX AND NOT APPLE)
+endif (CX_LINUX)
 
 if (WIN32)
     set(CPACK_NSIS_MUI_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\CustusX.ico")
