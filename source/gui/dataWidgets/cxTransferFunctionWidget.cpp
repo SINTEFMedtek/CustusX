@@ -14,7 +14,7 @@
 #include "sscMessageManager.h"
 #include "cxShadingWidget.h"
 #include "cxDataViewSelectionWidget.h"
-
+#include "sscTypeConversions.h"
 #include "cxShadingParamsInterfaces.h"
 
 namespace cx
@@ -326,6 +326,9 @@ void TransferFunctionPresetWidget::generatePresetListSlot()
 	// Re-initialize the list
   mPresetsComboBox->blockSignals(true);
   mPresetsComboBox->clear();
+
+  mPresetsComboBox->addItem("Transfer function preset...");
+
   if (ssc::dataManager()->getActiveImage())
   	mPresetsComboBox->addItems(mPresets->getPresetList(ssc::dataManager()->getActiveImage()->getModality()));
   else //No active image, show all available presets for debug/overview purposes
@@ -349,10 +352,18 @@ void TransferFunctionPresetWidget::resetSlot()
 
 void TransferFunctionPresetWidget::saveSlot()
 {
+	// generate a name suggestion: identical if custom, appended by index if default.
+	QString newName = mPresetsComboBox->currentText();
+//	std::cout << "list:  " << qstring_cast(mPresets->getPresetList("").join("--")) << std::endl;
+	if (!mPresets->getPresetList("").contains(newName))
+		newName = "custom preset";
+	if (mPresets->isDefaultPreset(newName))
+		newName += "(2)";
+
     bool ok;
     QString text = QInputDialog::getText(this, "Save Preset",
                                          "Custom Preset Name", QLineEdit::Normal,
-                                         "custom preset", &ok);
+                                         newName, &ok);
     if (!ok || text.isEmpty())
       return;
 

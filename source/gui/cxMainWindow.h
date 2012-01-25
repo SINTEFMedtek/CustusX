@@ -101,6 +101,8 @@ protected slots:
 	//debug mode
 	void toggleDebugModeSlot(bool checked);
 
+	void startupLoadPatient();
+
 protected:
 	void changeEvent(QEvent * event);
 
@@ -116,7 +118,6 @@ private:
 	void addToWidgetGroupMap(QAction* action, QString groupname);
 
 	LayoutData executeLayoutEditorDialog(QString title, bool createNew);
-	void startupLoadPatient();
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 
