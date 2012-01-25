@@ -118,6 +118,12 @@ public:
 	  return TOOL_NONE;
   }
 #endif
+
+	virtual bool isReference() const;
+	virtual bool isPointer() const;
+	virtual bool isProbe() const;
+
+
   virtual QString getGraphicsFileName() const;
   virtual vtkPolyDataPtr getGraphicsPolyData() const;
   virtual ssc::TimedTransformMapPtr getPositionHistory();
