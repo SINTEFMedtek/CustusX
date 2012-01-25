@@ -18,6 +18,7 @@ class View;
 // data
 typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
+typedef boost::shared_ptr<class DummyTool> DummyToolPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Data> DataPtr;
 typedef boost::shared_ptr<class Mesh> MeshPtr;
@@ -90,6 +91,7 @@ typedef boost::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotatio
 typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
 typedef boost::shared_ptr<class TestVideoSource> TestVideoSourcePtr;
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
+typedef boost::shared_ptr<class View> ViewPtr;
 
 class LabeledComboBoxWidget;
 
