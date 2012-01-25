@@ -191,44 +191,50 @@ ViewWrapper3D::~ViewWrapper3D()
 
 void ViewWrapper3D::settingsChangedSlot(QString key)
 {
-	if (key=="backgroundColor")
+	if (key == "backgroundColor")
 	{
-	  QColor background = settings()->value("backgroundColor").value<QColor>();
-	  mView->setBackgoundColor(background);
+		QColor background = settings()->value("backgroundColor").value<QColor> ();
+		mView->setBackgoundColor(background);
 	}
-	if (key=="useGPUVolumeRayCastMapper" || "maxRenderSize")
+	if (key == "useGPUVolumeRayCastMapper" || "maxRenderSize")
 	{
 		// reload volumes from cache
-	  std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
-	  for (unsigned i=0; i<images.size(); ++i)
-	  {
-	  	this->dataRemoved(images[i]->getUid());
-	  	this->dataAdded(images[i]);
-	  }
+		std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
+		for (unsigned i = 0; i < images.size(); ++i)
+		{
+			this->dataRemoved(images[i]->getUid());
+			this->dataAdded(images[i]);
+		}
 	}
-	if (key=="View/showDataText")
+	if (key == "View/showDataText")
 	{
-	  this->updateView();
+		this->updateView();
 	}
-	if (key=="View3D/annotationModelSize" || key=="View3D/annotationModel")
+	if (key == "View3D/annotationModelSize" || key == "View3D/annotationModel")
 	{
-	  mAnnotationMarker->setMarkerFilename(DataLocations::getRootConfigPath()+"/models/"+settings()->value("View3D/annotationModel").toString());
-    mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
+		mAnnotationMarker->setMarkerFilename(DataLocations::getRootConfigPath() +
+			"/models/" +
+			settings()->value("View3D/annotationModel").toString());
+		mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 	}
-  if (key=="View3D/sphereRadius" || key=="View3D/labelSize" || key=="View/showLabels")
-  {
-    for (RepMap::iterator iter=mDataReps.begin(); iter!=mDataReps.end(); ++iter)
-    {
-      this->readDataRepSettings(iter->second);
-    }
+	if (key == "showManualTool")
+	{
+		this->toolsAvailableSlot();
+	}
+	if (key == "View3D/sphereRadius" || key == "View3D/labelSize" || key == "View/showLabels")
+	{
+		for (RepMap::iterator iter = mDataReps.begin(); iter != mDataReps.end(); ++iter)
+		{
+			this->readDataRepSettings(iter->second);
+		}
 
-    this->toolsAvailableSlot();
-    mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-    mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
-//    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-//    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+		this->toolsAvailableSlot();
+		mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+		mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+		//    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+		//    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
-  }
+	}
 }
 
 
@@ -695,6 +701,15 @@ void ViewWrapper3D::toolsAvailableSlot()
       continue;
 
     ssc::ToolRep3DPtr toolRep = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
+
+    if(tool->isManual() && !settings()->value("showManualTool").toBool())
+    {
+    	if (toolRep)
+    		mView->removeRep(toolRep);
+        continue;
+    }
+    //    mManualTool->setVisible(settings()->value("showManualTool").toBool());
+
     if(!toolRep)
     {
       toolRep = ssc::ToolRep3D::New(tool->getUid()+"_rep3d_"+this->mView->getUid());

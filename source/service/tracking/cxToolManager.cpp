@@ -100,7 +100,7 @@ void ToolManager::initializeManualTool()
     //adding a manual tool as default
     mManualTool.reset(new ManualToolAdapter(this, "ManualTool"));
     mTools["ManualTool"] = mManualTool;
-    mManualTool->setVisible(settings()->value("showManualTool").toBool());
+//    mManualTool->setVisible(settings()->value("showManualTool").toBool());
     connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
   }
 
@@ -545,7 +545,7 @@ void ToolManager::setDominantTool(const QString& uid)
       mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
 
     }
-    mManualTool->setVisible(settings()->value("showManualTool").toBool());
+//    mManualTool->setVisible(settings()->value("showManualTool").toBool());
   }
 
   if(mDominantTool)
