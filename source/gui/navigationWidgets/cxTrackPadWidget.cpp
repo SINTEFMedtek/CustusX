@@ -135,6 +135,7 @@ void TrackPadWidget::rotateXZSlot(QPointF delta)
 
   camera->Azimuth(-scale * delta.x());
   camera->Elevation(scale * delta.y());
+  camera->OrthogonalizeViewUp(); // needed when using azimuth, according to docs (failure to do this causes strange zooming effects)
 }
 
 void TrackPadWidget::dollySlot(QPointF delta)
