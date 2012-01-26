@@ -31,16 +31,15 @@ class MessageManager;
 * @{
 */
 
-/**DEPRECATED!! will be removed shortly
- *
- *
- * \class RepManager
+/**
+ * \brief Rep caching and utilities.
  *
  *  - Utility functions for accessing reps,
  *  - cache for reusing the expensive volumetric reps.
  *
  * \date Dec 10, 2008
  * \author: Janne Beate Bakeng, SINTEF
+ * \author: Christian Askeland, SINTEF
  */
 class RepManager : public QObject
 {
