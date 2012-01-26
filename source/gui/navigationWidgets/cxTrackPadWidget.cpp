@@ -1,8 +1,8 @@
 /*
  * cxTrackPadWidget.cpp
  *
- *  Created on: Oct 7, 2010
- *      Author: christiana
+ *  \date Oct 7, 2010
+ *      \author christiana
  */
 
 #include "cxTrackPadWidget.h"

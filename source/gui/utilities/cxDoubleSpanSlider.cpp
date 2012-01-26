@@ -1,8 +1,8 @@
 /*
  * cxDoubleSpanSlider.cpp
  *
- *  Created on: Aug 26, 2010
- *      Author: christiana
+ *  \date Aug 26, 2010
+ *      \author christiana
  */
 #include "cxDoubleSpanSlider.h"
 

@@ -1,8 +1,8 @@
 /*
  * igtl_sonix_status.h
  *
- *  Created on: Nov 23, 2011
- *      Author: olevs
+ *  \date Nov 23, 2011
+ *      \author olevs
  */
 
 #ifndef IGTL_SONIX_STATUS_H_

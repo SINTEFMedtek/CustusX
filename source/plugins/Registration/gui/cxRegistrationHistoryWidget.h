@@ -21,7 +21,7 @@ namespace cx
  * Might be enhanced to a graphical timeline.
  *
  * \date 2010.03.17
- * \author: Christian Askeland, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class RegistrationHistoryWidget : public QWidget
 {

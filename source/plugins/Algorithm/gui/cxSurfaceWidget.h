@@ -1,8 +1,8 @@
 /*
  * cxSurfaceWidget.h
  *
- *  Created on: Apr 29, 2011
- *      Author: christiana
+ *  \date Apr 29, 2011
+ *      \author christiana
  */
 
 #ifndef CXSURFACEWIDGET_H_
@@ -29,7 +29,7 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * \brief Widget for finding the surface of a binary volume using marching cubes.
  *
  * \date 14. okt. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 class SurfaceWidget : public BaseWidget
 {

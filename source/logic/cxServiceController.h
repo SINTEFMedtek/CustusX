@@ -1,8 +1,8 @@
 /*
  * cxServiceController.h
  *
- *  Created on: Jun 1, 2011
- *      Author: christiana
+ *  \date Jun 1, 2011
+ *      \author christiana
  */
 
 #ifndef CXSERVICECONTROLLER_H_

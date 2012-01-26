@@ -1,3 +1,17 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #ifndef CXVIEWWRAPPERRTSTREAM_H_
 #define CXVIEWWRAPPERRTSTREAM_H_
 
@@ -5,11 +19,8 @@
 #include <QtGui>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
-//#include "sscData.h"
 #include "sscDefinitions.h"
-//#include "sscMesh.h"
 #include "cxViewWrapper.h"
-//#include "sscVideoRep.h"
 #include "cxDominantToolProxy.h"
 
 namespace cx
@@ -27,40 +38,39 @@ namespace cx
  *  whats available.
  *
  */
-class ViewWrapperVideo : public ViewWrapper
+class ViewWrapperVideo: public ViewWrapper
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  ViewWrapperVideo(ssc::View* view);
-  virtual ~ViewWrapperVideo();
-  virtual ssc::View* getView();
-  virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) {}
+	ViewWrapperVideo(ssc::View* view);
+	virtual ~ViewWrapperVideo();
+	virtual ssc::View* getView();
+	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) {}
 
 private slots:
-  void updateSlot();
-//  void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
-  void showSectorActionSlot(bool checked);
-  void probeChangedSlot();
-  void configureSlot();
+	void updateSlot();
+	void showSectorActionSlot(bool checked);
+	void probeChangedSlot();
+	void configureSlot();
 
 protected:
-  virtual void dataAdded(ssc::DataPtr data) {}
-  virtual void dataRemoved(const QString& uid) {}
+	virtual void dataAdded(ssc::DataPtr data) {}
+	virtual void dataRemoved(const QString& uid) {}
 
 private:
-  void loadStream();
-  virtual void appendToContextMenu(QMenu& contextMenu);
-  void addReps();
-  ssc::ToolPtr getProbe();
-  void setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool);
+	void loadStream();
+	virtual void appendToContextMenu(QMenu& contextMenu);
+	void addReps();
+	ssc::ToolPtr getProbe();
+	void setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool);
 
-  ssc::VideoFixedPlaneRepPtr mStreamRep;
-  ssc::VideoSourcePtr mSource;
-  ssc::DisplayTextRepPtr mPlaneTypeText;
-  ssc::DisplayTextRepPtr mDataNameText;
-  QPointer<ssc::View> mView;
-  ssc::ToolPtr mTool;
-  DominantToolProxyPtr mDominantToolProxy;
+	ssc::VideoFixedPlaneRepPtr mStreamRep;
+	ssc::VideoSourcePtr mSource;
+	ssc::DisplayTextRepPtr mPlaneTypeText;
+	ssc::DisplayTextRepPtr mDataNameText;
+	QPointer<ssc::View> mView;
+	ssc::ToolPtr mTool;
+	DominantToolProxyPtr mDominantToolProxy;
 };
 typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 

@@ -1,8 +1,8 @@
 /*
  * cxUSAcquisition.cpp
  *
- *  Created on: May 12, 2011
- *      Author: christiana
+ *  \date May 12, 2011
+ *      \author christiana
  */
 
 #include <cxUSAcquisition.h>
