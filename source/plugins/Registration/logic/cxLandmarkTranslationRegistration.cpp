@@ -1,8 +1,8 @@
 /*
  * cxLandmarkTranslationRegistration.cpp
  *
- *  Created on: Sep 27, 2010
- *      Author: christiana
+ *  \date Sep 27, 2010
+ *      \author christiana
  */
 
 #include "cxLandmarkTranslationRegistration.h"

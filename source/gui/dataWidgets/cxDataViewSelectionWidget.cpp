@@ -1,8 +1,8 @@
 /*
  * sscDataViewSelectionWidget.cpp
  *
- *  Created on: Apr 5, 2011
- *      Author: christiana
+ *  \date Apr 5, 2011
+ *      \author christiana
  */
 
 #include <cxDataViewSelectionWidget.h>

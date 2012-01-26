@@ -1,8 +1,8 @@
 /*
  * cxMetricWidget.cpp
  *
- *  Created on: Jul 5, 2011
- *      Author: christiana
+ *  \date Jul 5, 2011
+ *      \author christiana
  */
 
 #include <cxMetricWidget.h>

@@ -180,8 +180,8 @@ protected:
  * \brief
  *
  * \date Mar 23, 2009
- * \author: Janne Beate Bakeng, SINTEF
- * \author: Ole Vegard Solberg, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
+ * \\author Ole Vegard Solberg, SINTEF
  */
 class TransferFunctionWidget : public BaseWidget
 {

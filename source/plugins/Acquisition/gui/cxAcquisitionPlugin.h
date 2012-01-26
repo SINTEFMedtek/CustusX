@@ -1,8 +1,8 @@
 /*
  * cxAcquisitionPlugin.h
  *
- *  Created on: Jun 15, 2011
- *      Author: christiana
+ *  \date Jun 15, 2011
+ *      \author christiana
  */
 
 #ifndef CXACQUISITIONPLUGIN_H_

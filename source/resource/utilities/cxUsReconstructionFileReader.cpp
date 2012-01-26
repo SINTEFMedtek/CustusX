@@ -1,8 +1,8 @@
 /*
  * cxUsReconstructionFileReader.cpp
  *
- *  Created on: Feb 3, 2011
- *      Author: christiana
+ *  \date Feb 3, 2011
+ *      \author christiana
  */
 #include "cxUsReconstructionFileReader.h"
 

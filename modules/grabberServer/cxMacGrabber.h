@@ -26,7 +26,7 @@ namespace cx
  * \warning QtKit only supports 32 bit drivers for capturing hardware atm.
  *
  * \date 16. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class MacGrabber : public Grabber
 {

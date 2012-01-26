@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Module:    $RCSfile: vtkSonixVideoSource.h,v $
-Author:  Siddharth Vikal, Queens School Of Computing
+\author  Siddharth Vikal, Queens School Of Computing
 
 Copyright (c) 2008, Queen's University, Kingston, Ontario, Canada
 All rights reserved.

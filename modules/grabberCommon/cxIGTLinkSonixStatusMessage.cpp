@@ -1,8 +1,8 @@
 /*
  * cxIGTLinkSonixStatusMessage.cpp
  *
- *  Created on: Aug 12, 2011
- *      Author: olevs
+ *  \date Aug 12, 2011
+ *      \author olevs
  */
 
 #include "cxIGTLinkSonixStatusMessage.h"

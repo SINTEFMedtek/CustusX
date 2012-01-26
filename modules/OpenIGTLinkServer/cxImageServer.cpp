@@ -1,8 +1,8 @@
 /*
  * cxImageServer.cpp
  *
- *  Created on: Oct 30, 2010
- *      Author: christiana
+ *  \date Oct 30, 2010
+ *      \author christiana
  */
 #include "cxImageServer.h"
 #include "cxImageSession.h"

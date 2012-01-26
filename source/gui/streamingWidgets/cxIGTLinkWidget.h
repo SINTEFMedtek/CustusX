@@ -21,7 +21,7 @@ typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
  * \ingroup cxGUI
  *
  * \date 2010.10.27
- * \author: Christian Askeland, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class IGTLinkWidget : public BaseWidget
 {

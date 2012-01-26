@@ -9,10 +9,10 @@ class QDomDocument;
 namespace cx
 {
 /**
-* \file
-* \addtogroup cxServicePatient
-* @{
-*/
+ * \file
+ * \addtogroup cxServicePatient
+ * @{
+ */
 
 /**
  * \brief cx implementation of additional functionality for the ssc::DataManager
@@ -21,40 +21,40 @@ namespace cx
  * \date Mar 23, 2009
  * \author Janne Beate Bakeng, SINTEF
  */
-class DataManager : public ssc::DataManagerImpl
+class DataManager: public ssc::DataManagerImpl
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  static DataManager* getInstance();
-  virtual ~DataManager();
-  
-  static void initialize();
-  bool getDebugMode() const;
-  virtual ssc::PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
+	static DataManager* getInstance();
+	virtual ~DataManager();
+
+	static void initialize();
+	bool getDebugMode() const;
+	virtual ssc::PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 signals:
-  void currentImageDeleted(ssc::ImagePtr image); ///< emitted when data is deleted
-  void debugModeChanged(bool on);
+	void currentImageDeleted(ssc::ImagePtr image); ///< emitted when data is deleted
+	void debugModeChanged(bool on);
 
 public slots:
-  void deleteImageSlot(ssc::ImagePtr image); ///< Deletes image and emits dataDeleted signal
-  void setDebugMode(bool on);
-  
-protected:
-  DataManager(); ///< DataManager is a Singleton. Use getInstance instead
+	void deleteImageSlot(ssc::ImagePtr image); ///< Deletes image and emits dataDeleted signal
+	void setDebugMode(bool on);
 
-  bool mDebugMode; ///< if set: allow lots of weird debug stuff.
+protected:
+	DataManager(); ///< DataManager is a Singleton. Use getInstance instead
+
+	bool mDebugMode; ///< if set: allow lots of weird debug stuff.
 
 private:
-  DataManager(DataManager const&);
-  DataManager& operator=(DataManager const&);
+	DataManager(DataManager const&);
+	DataManager& operator=(DataManager const&);
 
-  mutable ssc::PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
+	mutable ssc::PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
 };
 
 /**
-* @}
-*/
-}//namespace cx
+ * @}
+ */
+} //namespace cx
 
 #endif /* CXDATAMANAGER_H_ */

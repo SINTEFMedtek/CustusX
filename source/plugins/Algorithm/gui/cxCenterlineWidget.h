@@ -1,8 +1,8 @@
 /*
  * cxCenterlineWidget.h
  *
- *  Created on: Apr 29, 2011
- *      Author: christiana
+ *  \date Apr 29, 2011
+ *      \author christiana
  */
 
 #ifndef CXCENTERLINEWIDGET_H_
@@ -29,7 +29,7 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * \brief Widget for extracting the centerline from a segment.
  *
  * \date 12. okt. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 class CenterlineWidget : public BaseWidget
 {

@@ -15,7 +15,7 @@ namespace cx
  * \ingroup cxGUI
  *
  * \date 27. sep. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 
 class TabbedWidget : public BaseWidget
