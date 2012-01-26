@@ -120,7 +120,7 @@ void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 
   if(mRTSource)
   {
-    std::cout << "USAcquisition::connectVideoSource - connected" << std::endl;
+//    std::cout << "USAcquisition::connectVideoSource - connected" << std::endl;
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
     mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
   }
