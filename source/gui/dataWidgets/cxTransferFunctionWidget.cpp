@@ -5,6 +5,9 @@
 #include <QStringList>
 #include <QInputDialog>
 #include <QPushButton>
+#include <QActionGroup>
+#include <QToolButton>
+#include <QAction>
 #include <QMessageBox>
 #include "cxTransferFunctionAlphaWidget.h"
 #include "cxTransferFunctionColorWidget.h"
@@ -16,6 +19,7 @@
 #include "cxDataViewSelectionWidget.h"
 #include "sscTypeConversions.h"
 #include "cxShadingParamsInterfaces.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -275,42 +279,111 @@ void TransferFunction2DWidget::activeImageChangedSlot()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
-  BaseWidget(parent, "TransferFunctionPresetWidget", "Transfer Function Presets"),
-  mLayout(new QVBoxLayout(this))
+TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent, bool is3D) :
+				BaseWidget(parent, "TransferFunctionPresetWidget", "Transfer Function Presets"), mLayout(
+								new QVBoxLayout(this)), mIs3D(is3D)
 {
 	mPresets = ssc::dataManager()->getPresetTransferFunctions3D();
-  QPushButton* resetButton = new QPushButton("Reset", this);
-  resetButton->setToolTip("Reset all transfer function values to the defaults");
-  connect(resetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
+	QActionGroup* group = new QActionGroup(this);
 
-  QPushButton* deleteButton = new QPushButton("Delete", this);
-  deleteButton->setToolTip("Delete the current preset");
-  connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteSlot()));
+	QAction* resetAction = this->addAction(group,
+					"Reset all transfer function values to the defaults",
+					QIcon(":/icons/preset_reset.png"));
+	connect(resetAction, SIGNAL(triggered()), this, SLOT(resetSlot()));
 
-  QPushButton* saveButton = new QPushButton("Save", this);
-  saveButton->setToolTip("Create a new custom preset for both 2D and 3D");
-  connect(saveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
+	QAction* deleteAction = this->addAction(group,
+					"Delete the current preset",
+					QIcon(":/icons/preset_remove.png"));
+	connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteSlot()));
 
-  mPresetsComboBox = new QComboBox(this);
-  mPresetsComboBox->setToolTip("Select a preset to use for both 2D and 3D");
-  connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(presetsBoxChangedSlot(const QString&)));
+	QAction* saveAction = this->addAction(group,
+					"Add the current setting as a preset",
+					QIcon(":/icons/preset_save.png"));
+	connect(saveAction, SIGNAL(triggered()), this, SLOT(saveSlot()));
 
-  mActiveImageProxy = ActiveImageProxy::New();
-  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(generatePresetListSlot()));
-  connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this, SLOT(generatePresetListSlot()));
-  connect(mPresets.get(), SIGNAL(changed()), this, SLOT(generatePresetListSlot()));
+	QString toggleText = "Toggle between apply presets,\neither on %1\nor both 2D and 3D\ntransfer functions.";
+	if (is3D)
+		toggleText = toggleText.arg("3D");
+	else
+		toggleText = toggleText.arg("2D");
 
-  mLayout->addWidget(mPresetsComboBox);
-  QHBoxLayout* buttonLayout = new QHBoxLayout;
-  mLayout->addLayout(buttonLayout);
+	mToggleAction = this->addAction(group,
+					toggleText,
+					QIcon(":/icons/preset_2D_and_3D.png"));
+	connect(mToggleAction, SIGNAL(triggered()), this, SLOT(toggleSlot()));
+	mApplyToAll = settings()->value("applyTransferFunctionPresetsToAll").toBool();
+	this->updateToggles();
 
-  buttonLayout->addWidget(resetButton);
-  buttonLayout->addWidget(deleteButton);
-  buttonLayout->addWidget(saveButton);
+	mPresetsComboBox = new QComboBox(this);
+	mPresetsComboBox->setToolTip("Select a preset transfer function to use");
+	connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this,
+					SLOT(presetsBoxChangedSlot(const QString&)));
 
-  this->setLayout(mLayout);
+	mActiveImageProxy = ActiveImageProxy::New();
+	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(generatePresetListSlot()));
+	connect(mActiveImageProxy.get(), SIGNAL(propertiesChanged()), this, SLOT(generatePresetListSlot()));
+	connect(mPresets.get(), SIGNAL(changed()), this, SLOT(generatePresetListSlot()));
+
+	mLayout->addWidget(mPresetsComboBox);
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
+	mLayout->addLayout(buttonLayout);
+
+	QList<QAction*> actions = group->actions();
+	for (int i=0; i<actions.size(); ++i)
+	{
+		QToolButton* button = new QToolButton(this);
+		button->setDefaultAction(actions[i]);
+		buttonLayout->addWidget(button);
+	}
+
+	buttonLayout->addStretch();
+
+	this->setLayout(mLayout);
 }
+
+void TransferFunctionPresetWidget::toggleSlot()
+{
+	mApplyToAll = !mApplyToAll;
+	settings()->setValue("applyTransferFunctionPresetsToAll", mApplyToAll);
+
+	this->updateToggles();
+}
+
+void TransferFunctionPresetWidget::updateToggles()
+{
+//	QString loadText   = "Select a preset to use for both 2D and 3D";
+//	QString resetText  = "Reset all transfer function values to the defaults";
+//	QString deleteText = "Delete the current preset";
+//	QString saveText   = "Add the current setting as a preset";
+//	QString toggleText = "Toggle apply presets on 2D\n or both 2D and 3D transfer functions.";
+
+	if (mApplyToAll)
+	{
+		mToggleAction->setIcon(QIcon(":/icons/preset_2D_and_3D.png"));
+	}
+	else
+	{
+		if (mIs3D)
+		{
+			mToggleAction->setIcon(QIcon(":/icons/preset_3D.png"));
+		}
+		else
+		{
+			mToggleAction->setIcon(QIcon(":/icons/preset_2D.png"));
+		}
+	}
+}
+
+QAction* TransferFunctionPresetWidget::addAction(QActionGroup* group, QString text, QIcon icon) const
+{
+	QAction* action = new QAction(text, group);
+	action->setStatusTip(text);
+	action->setWhatsThis(text);
+	action->setToolTip(text);
+	action->setIcon(icon);
+	return action;
+}
+
 
 QString TransferFunctionPresetWidget::defaultWhatsThis() const
 {
@@ -340,13 +413,13 @@ void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetNa
 {
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   if(activeImage)
-    mPresets->load(presetName, activeImage);
+    mPresets->load(presetName, activeImage, this->use2D(), this->use3D());
 }
 
 void TransferFunctionPresetWidget::resetSlot()
 {
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-  activeImage->resetTransferFunctions();
+  activeImage->resetTransferFunctions(this->use2D(), this->use3D());
   mPresetsComboBox->setCurrentIndex(0);
 }
 
@@ -368,12 +441,20 @@ void TransferFunctionPresetWidget::saveSlot()
       return;
 
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-  mPresets->save(text, activeImage);
+  mPresets->save(text, activeImage, this->use2D(), this->use3D());
 
   this->generatePresetListSlot();
   mPresetsComboBox->setCurrentIndex(mPresetsComboBox->findText(text));
 }
 
+bool TransferFunctionPresetWidget::use2D() const
+{
+	return !mIs3D || mApplyToAll;
+}
+bool TransferFunctionPresetWidget::use3D() const
+{
+	return mIs3D || mApplyToAll;
+}
 
 void TransferFunctionPresetWidget::deleteSlot()
 {
@@ -385,7 +466,7 @@ void TransferFunctionPresetWidget::deleteSlot()
 	if (QMessageBox::question(this, "Delete current preset", "Do you really want to delete the current preset?",
 			QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
 			return;
-	mPresets->deletePresetData(mPresetsComboBox->currentText());
+	mPresets->deletePresetData(mPresetsComboBox->currentText(), this->use2D(), this->use3D());
 
   this->generatePresetListSlot();
   this->resetSlot();
@@ -402,7 +483,7 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
 
   mLayout->setMargin(0);
   mLayout->addWidget(new TransferFunction3DWidget(this));
-  mLayout->addWidget(new TransferFunctionPresetWidget(this));
+  mLayout->addWidget(new TransferFunctionPresetWidget(this, true));
 
   this->setLayout(mLayout);
 }
