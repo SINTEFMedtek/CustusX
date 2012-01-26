@@ -32,7 +32,7 @@ namespace ssc
 {
 
 MousePadWidgetInternal::MousePadWidgetInternal(QWidget* parent, QSize minimumSize) :
-	QFrame(parent), mFixPosX(false), mMinSize(minimumSize)
+	QFrame(parent), mFixPosX(false), mFixPosY(false), mMinSize(minimumSize)
 {
 }
 

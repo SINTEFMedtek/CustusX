@@ -10,6 +10,7 @@
 #include "sscVector3D.h"
 #include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "sscMessageManager.h"
 
 namespace ssc
 {
@@ -91,6 +92,11 @@ void ViewportListener::callback()
  */
 double ViewportListener::getVpnZoom()
 {
+	if (!mRenderer)
+	{
+		ssc::messageManager()->sendError("No renderer set, using zoom=1");
+		return 1;
+	}
   //  use the focal point and focal point + vup.
   //  Transform both to view space and remove z-coord.
   //  The distance between then in the view plane can
