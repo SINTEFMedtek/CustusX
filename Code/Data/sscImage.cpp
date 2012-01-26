@@ -110,7 +110,7 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	this->resetTransferFunctions();
 }
 
-void Image::resetTransferFunctions()
+void Image::resetTransferFunctions(bool _2D, bool _3D)
 {
 	//messageManager()->sendDebug("Image::reset called");
 
@@ -123,11 +123,46 @@ void Image::resetTransferFunctions()
 	//mBaseImageData->Update();
 	mBaseImageData->GetScalarRange(); // this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 
-	this->resetTransferFunction(ImageTF3DPtr(new ImageTF3D(mBaseImageData)), ImageLUT2DPtr(new ImageLUT2D(
-		mBaseImageData)));
+//	this->resetTransferFunction(ImageTF3DPtr(new ImageTF3D(mBaseImageData)),
+//					ImageLUT2DPtr(new ImageLUT2D(mBaseImageData)));
+	if (_3D)
+		this->resetTransferFunction(ImageTF3DPtr(new ImageTF3D(mBaseImageData)));
+	if (_2D)
+		this->resetTransferFunction(ImageLUT2DPtr(new ImageLUT2D(mBaseImageData)));
 }
 
 void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D)
+{
+	this->resetTransferFunction(imageTransferFunctions3D);
+	this->resetTransferFunction(imageLookupTable2D);
+}
+
+void Image::resetTransferFunction(ImageLUT2DPtr imageLookupTable2D)
+{
+	if (!mBaseImageData)
+	{
+		messageManager()->sendWarning("ssc::Image has no image data");
+		return;
+	}
+
+	if (mImageLookupTable2D)
+	{
+		disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this,
+			SIGNAL(transferFunctionsChanged()));
+	}
+
+	mImageLookupTable2D = imageLookupTable2D;
+
+	if (mImageLookupTable2D)
+	{
+		mImageLookupTable2D->setVtkImageData(mBaseImageData);
+		connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
+	}
+
+	emit transferFunctionsChanged();
+}
+
+void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D)
 {
 	if (!mBaseImageData)
 	{
@@ -140,25 +175,14 @@ void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLU
 		disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this,
 			SIGNAL(transferFunctionsChanged()));
 	}
-	if (mImageLookupTable2D)
-	{
-		disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this,
-			SIGNAL(transferFunctionsChanged()));
-	}
 
 	mImageTransferFunctions3D = imageTransferFunctions3D;
-	mImageLookupTable2D = imageLookupTable2D;
 
 	if (mImageTransferFunctions3D)
 	{
 		mImageTransferFunctions3D->setVtkImageData(mBaseImageData);
 		connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this,
 			SIGNAL(transferFunctionsChanged()));
-	}
-	if (mImageLookupTable2D)
-	{
-		mImageLookupTable2D->setVtkImageData(mBaseImageData);
-		connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
 	}
 
 	emit transferFunctionsChanged();

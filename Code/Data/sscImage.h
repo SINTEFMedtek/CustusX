@@ -127,8 +127,11 @@ public:
 	virtual void clearClipPlanes();
 	void mergevtkSettingsIntosscTransform();
 
-	void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
+//	void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
+	void resetTransferFunctions(bool _2D=true, bool _3D=true); ///< Resets the transfer functions and creates new defaut values.
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);
+	void resetTransferFunction(ImageLUT2DPtr imageLookupTable2D);
+	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D);
 
 signals:
 	void landmarkRemoved(QString uid);
