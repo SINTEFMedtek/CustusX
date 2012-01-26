@@ -1,9 +1,16 @@
-/*
- * cxManualToolAdapter.h
- *
- *  Created on: Feb 14, 2011
- *      Author: christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
 #ifndef CXMANUALTOOLADAPTER_H_
 #define CXMANUALTOOLADAPTER_H_
@@ -19,6 +26,7 @@ namespace cx
 */
 
 /**
+ * \brief Adapter class for ssc::ManualTool.
  * \ingroup cxServiceTracking
  *
  * A ManualToolAdapter inherits from manual tool, but also
@@ -26,6 +34,8 @@ namespace cx
  *
  * Used for debug - when testing tools without a tracking system.
  *
+ *  \date Feb 14, 2011
+ *  \author christiana
  */
 class ManualToolAdapter : public ssc::ManualTool
 {

@@ -1,8 +1,8 @@
 /*
  * cxRegistrationDataAdapters.h
  *
- *  Created on: Jun 16, 2011
- *      Author: christiana
+ *  \date Jun 16, 2011
+ *      \author christiana
  */
 
 #ifndef CXREGISTRATIONDATAADAPTERS_H_

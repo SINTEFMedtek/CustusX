@@ -1,8 +1,8 @@
 /*
  * cxRegistrationMethodsWidget.h
  *
- *  Created on: May 2, 2011
- *      Author: christiana
+ *  \date May 2, 2011
+ *      \author christiana
  */
 
 #ifndef CXREGISTRATIONMETHODSWIDGET_H_

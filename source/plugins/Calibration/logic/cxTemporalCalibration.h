@@ -1,8 +1,8 @@
 /*
  * cxTemporalCalibration.h
  *
- *  Created on: May 9, 2011
- *      Author: christiana
+ *  \date May 9, 2011
+ *      \author christiana
  */
 
 #ifndef CXTEMPORALCALIBRATION_H_

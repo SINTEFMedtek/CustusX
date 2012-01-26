@@ -4,7 +4,7 @@
  * \brief
  *
  * \date Jan 20, 2009
- * \author: jbake
+ * \\author jbake
  */
 
 #include <QApplication>
