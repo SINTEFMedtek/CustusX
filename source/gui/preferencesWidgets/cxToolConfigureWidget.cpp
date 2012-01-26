@@ -130,54 +130,60 @@ void ToolConfigureGroupBox::setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION
 
 void ToolConfigureGroupBox::configChangedSlot()
 {
-  QStringList selectedApplications;
-  QStringList selectedTrackingSystems;
-  QStringList selectedTools;
-  QString absoluteConfigFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
-  bool suggestDefaultNames;
+	QStringList selectedApplications;
+	QStringList selectedTrackingSystems;
+	QStringList selectedTools;
+	QString absoluteConfigFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(),
+					Qt::ToolTipRole).toString();
+	bool suggestDefaultNames;
 
-  if(!mConfigFilesComboBox->currentText().contains("<new config>"))
-  {
-    ConfigurationFileParser parser(absoluteConfigFilePath);
+	if (mConfigFilesComboBox->currentText().contains("<new config>"))
+	{
+		selectedApplications << enum2string(mClinicalApplication); // just want a default
+		selectedTrackingSystems << enum2string(ssc::tsPOLARIS); //just want a default
+		suggestDefaultNames = true;
 
-    ssc::CLINICAL_APPLICATION application = parser.getApplicationapplication();
-    selectedApplications << enum2string(application);
+		absoluteConfigFilePath = DataLocations::getRootConfigPath()
+			+"/tool/"
+			+enum2string(mClinicalApplication)
+			+ "/";
+	}
+	else
+	{
+		ConfigurationFileParser parser(absoluteConfigFilePath);
 
-    std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
-    for(unsigned i=0; i<trackers.size(); ++i)
-    {
-      selectedTrackingSystems << enum2string(trackers[i].mType);
-    }
+		ssc::CLINICAL_APPLICATION application = parser.getApplicationapplication();
+		selectedApplications << enum2string(application);
 
-    std::vector<QString> tools = parser.getAbsoluteToolFilePaths();
-    for(unsigned i=0; i<tools.size(); ++i)
-    {
-      selectedTools << tools[i];
-    }
-    suggestDefaultNames = false;
-  }
-  else
-  {
-    selectedApplications << enum2string(mClinicalApplication); // just want a default
-    selectedTrackingSystems << enum2string(ssc::tsPOLARIS); //just want a default
-    suggestDefaultNames = true;
-  }
+		std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
+		for (unsigned i = 0; i < trackers.size(); ++i)
+		{
+			selectedTrackingSystems << enum2string(trackers[i].mType);
+		}
+
+		std::vector<QString> tools = parser.getAbsoluteToolFilePaths();
+		for (unsigned i = 0; i < tools.size(); ++i)
+		{
+			selectedTools << tools[i];
+		}
+		suggestDefaultNames = false;
+	}
 
 //  std::cout << "absoluteConfigFilePath" << absoluteConfigFilePath << std::endl;
-  QFile file(absoluteConfigFilePath);
-  QFileInfo info(file);
-  QString filePath = info.path();
-  QString fileName = info.fileName();
-  
-  mConfigFilePathLineEdit->setText(filePath);
-  this->setState(mConfigFilePathLineEdit, !suggestDefaultNames);
+	QFile file(absoluteConfigFilePath);
+	QFileInfo info(file);
+	QString filePath = info.path();
+	QString fileName = info.fileName();
 
-  mConfigFileLineEdit->setText(fileName);
-  this->setState(mConfigFileLineEdit, !suggestDefaultNames);
+	mConfigFilePathLineEdit->setText(filePath);
+	this->setState(mConfigFilePathLineEdit, !suggestDefaultNames);
 
-  mApplicationGroupBox->setSelected(selectedApplications);
-  mTrackingSystemGroupBox->setSelected(selectedTrackingSystems);
-  mToolListWidget->configSlot(selectedTools);
+	mConfigFileLineEdit->setText(fileName);
+	this->setState(mConfigFileLineEdit, !suggestDefaultNames);
+
+	mApplicationGroupBox->setSelected(selectedApplications);
+	mTrackingSystemGroupBox->setSelected(selectedTrackingSystems);
+	mToolListWidget->configSlot(selectedTools);
 }
 
 void ToolConfigureGroupBox::configEditedSlot()
