@@ -145,7 +145,7 @@ void MainWindow::startupLoadPatient()
 		return;
 
 	QString folder = QApplication::arguments()[doLoad + 1];
-	std::cout << "Startup Load patient: " << folder << std::endl;
+	ssc::messageManager()->sendInfo("Startup Load patient: " + folder);
 	patientService()->getPatientData()->loadPatient(folder);
 }
 
