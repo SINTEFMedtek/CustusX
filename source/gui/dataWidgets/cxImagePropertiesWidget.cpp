@@ -164,7 +164,7 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
   colorWidgetLayout->setMargin(0);
   colorWidgetLayout->addWidget(new TransferFunction2DColorWidget(this), 0);
   colorWidgetLayout->addStretch(1);
-  colorWidgetLayout->addWidget(new TransferFunctionPresetWidget(this), 0);
+  colorWidgetLayout->addWidget(new TransferFunctionPresetWidget(this, false), 0);
 
   QTabWidget* tabWidget = new QTabWidget(this);
   toptopLayout->addWidget(tabWidget);
