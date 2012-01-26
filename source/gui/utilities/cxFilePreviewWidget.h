@@ -12,10 +12,11 @@ class QFile;
 namespace cx
 {
 /**
- *\class FilePreviewWidget
  *
- * \brief
+ * \brief View a xml document.
  * \ingroup cxGUI
+ *
+ * A viewer widget for a xml file with syntax highlightning.
  *
  * \date Mar 22, 2011
  * \author Janne Beate Bakeng, SINTEF
