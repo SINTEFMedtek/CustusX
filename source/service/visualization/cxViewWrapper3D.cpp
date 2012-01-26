@@ -287,7 +287,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 
   QAction* showManualTool = new QAction("Show Manual Tool", &contextMenu);
   showManualTool->setCheckable(true);
-  showManualTool->setChecked(ToolManager::getInstance()->getManualTool()->getVisible());
+  showManualTool->setChecked(settings()->value("showManualTool").toBool());
   connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
   QAction* showOrientation = new QAction("Show Orientation", &contextMenu);
