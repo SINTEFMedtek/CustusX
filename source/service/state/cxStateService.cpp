@@ -243,6 +243,8 @@ void StateService::fillDefaultSettings()
 
   this->fillDefault("IGSTKDebugLogging", false);
   this->fillDefault("giveManualToolPhysicalProperties", false);
+
+  this->fillDefault("applyTransferFunctionPresetsToAll", true);
 }
 
 void StateService::initialize()
