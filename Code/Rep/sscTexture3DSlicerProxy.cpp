@@ -172,7 +172,7 @@ void Texture3DSlicerProxyImpl::resetGeometryPlane()
 
 	if (similar(mBB_s.range()[0] * mBB_s.range()[1], 0.0))
 	{
-		std::cout << "zero-size bounding box in texture slicer- ignoring" << std::endl;
+//		std::cout << "zero-size bounding box in texture slicer- ignoring" << std::endl;
 		return;
 	}
 

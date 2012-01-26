@@ -259,7 +259,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
     messageManager()->sendInfo("Completed downsampling volume in VolumetricRep: "
         + mImage->getName()
         + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "
-        + "Ratio: " + qstring_cast(mResampleFactor) + ", "
+        + "Ratio: " + QString::number(mResampleFactor, 'g', 2) + ", "
         + "Original size: " + qstring_cast(voxelsOrig/1000/1000) + "M.");
 //    std::cout << "=================== org volume: " << std::endl;
 //    mImage->getGrayScaleBaseVtkImageData()->Print(std::cout);
