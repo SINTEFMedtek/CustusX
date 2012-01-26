@@ -49,12 +49,17 @@ public:
 	PresetTransferFunctions3D(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile);
 	~PresetTransferFunctions3D();
 
-	void save(QString name, ssc::ImagePtr image);
-	void load(QString name, ssc::ImagePtr image);
+	void save(QString name, ssc::ImagePtr image, bool _2D=true, bool _3D=true);
+	void load(QString name, ssc::ImagePtr image, bool _2D=true, bool _3D=true);
 
-	QStringList getPresetList(QString modality); ///< returns a list of the preset names for the given modality
+	void save2D(QString name, ssc::ImagePtr image);
+	void save3D(QString name, ssc::ImagePtr image);
+	void load2D(QString name, ssc::ImagePtr image);
+	void load3D(QString name, ssc::ImagePtr image);
+
+	QStringList getPresetList(QString modality=""); ///< returns a list of the preset names for the given modality
 	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
-	void deletePresetData(QString name); ///< Delete the preset data node
+	void deletePresetData(QString name, bool _2D=true, bool _3D=true); ///< Delete the preset data node
 
 signals:
 	void changed();
