@@ -1,8 +1,8 @@
 /*
  * cxImageSenderSonix.cpp
  *
- *  Created on: Aug 15, 2011
- *      Author: Ole Vegard Solberg
+ *  \date Aug 15, 2011
+ *      \author Ole Vegard Solberg
  */
 
 #include "cxImageSenderSonix.h"

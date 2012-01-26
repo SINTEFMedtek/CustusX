@@ -1,8 +1,8 @@
 /*
  * cxImageSenderFactory.h
  *
- *  Created on: Aug 9, 2011
- *      Author: christiana
+ *  \date Aug 9, 2011
+ *      \author christiana
  */
 
 #ifndef CXIMAGESENDERFACTORY_H_

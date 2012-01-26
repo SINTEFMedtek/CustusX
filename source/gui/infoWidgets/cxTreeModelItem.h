@@ -1,8 +1,8 @@
 /*
  * cxTreeModelItem.h
  *
- *  Created on: Jul 30, 2010
- *      Author: christiana
+ *  \date Jul 30, 2010
+ *      \author christiana
  */
 
 #ifndef CXTREEMODELITEM_H_

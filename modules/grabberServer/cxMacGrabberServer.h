@@ -14,7 +14,7 @@ namespace cx
  * \brief Combines and syns a MacGrabber and a OpenIGTLinkServer
  *
  * \date 2. des. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 
 class MacGrabberServer : public GrabberServer

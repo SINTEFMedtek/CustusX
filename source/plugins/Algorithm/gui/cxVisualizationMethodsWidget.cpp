@@ -1,8 +1,8 @@
 /*
  * cxVisualizationMethodsWidget.cpp
  *
- *  Created on: May 4, 2011
- *      Author: christiana
+ *  \date May 4, 2011
+ *      \author christiana
  */
 
 #include <cxVisualizationMethodsWidget.h>

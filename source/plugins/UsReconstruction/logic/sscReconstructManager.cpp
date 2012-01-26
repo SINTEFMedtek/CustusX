@@ -1,8 +1,8 @@
 /*
  * sscReconstructManager.cpp
  *
- *  Created on: Oct 4, 2011
- *      Author: christiana
+ *  \date Oct 4, 2011
+ *      \author christiana
  */
 
 #include <sscReconstructManager.h>

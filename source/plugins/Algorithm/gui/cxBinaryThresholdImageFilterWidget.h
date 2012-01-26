@@ -25,8 +25,8 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * \brief Widget for segmenting out parts of volumes using a threshold.
  *
  * \date 12. okt. 2010
- * \author: Janne Beate Bakeng, SINTEF
- * \author: Christian Askeland, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class BinaryThresholdImageFilterWidget : public BaseWidget
 {

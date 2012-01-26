@@ -1,8 +1,8 @@
 /*
  * cxCenterlineWidget.cpp
  *
- *  Created on: Apr 29, 2011
- *      Author: christiana
+ *  \date Apr 29, 2011
+ *      \author christiana
  */
 
 #include <cxCenterlineWidget.h>

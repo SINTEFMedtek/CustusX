@@ -21,7 +21,7 @@ namespace cx
  * \brief Widget for registrating the orientation part of a fast registration
  *
  * \date 27. sep. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 
 class FastOrientationRegistrationWidget : public RegistrationBaseWidget
