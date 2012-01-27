@@ -61,13 +61,6 @@ public:
 	void reconstruct(); // assumes readFiles has already been called
 	QString getSelectedData() const;
 
-//	StringDataAdapterXmlPtr mOrientationAdapter;
-//	StringDataAdapterXmlPtr mPresetTFAdapter;
-//	StringDataAdapterXmlPtr mAlgorithmAdapter;
-//	StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction
-//	BoolDataAdapterXmlPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
-//	DoubleDataAdapterXmlPtr mTimeCalibration; ///set a offset in the frame timestamps
-//	BoolDataAdapterXmlPtr mAngioAdapter; ///US angio data is used as input
 	ReconstructParamsPtr getParams();
 
 	ReconstructAlgorithmPtr getAlgorithm();///< The used reconstruction algorithm
@@ -79,9 +72,6 @@ public:
 	void setOutputVolumeParams(const OutputVolumeParams& par);
 	void setOutputRelativePath(QString path);
 	void setOutputBasePath(QString path);
-
-//public slots:
-//	void setSettings();
 
 signals:
 	void paramsChanged();
@@ -95,31 +85,12 @@ private:
 	cx::UsReconstructionFileReaderPtr mFileReader;
 	ssc::USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 	QString mCalFilesPath; ///< Path to calibration files
-//	QString mFilename; ///< filename used for current data read
 
 	void readCoreFiles(QString fileName, QString calFilesPath);
 	void clearAll();
 	void updateFromOriginalFileData();
 	bool validInputData() const;
 };
-
-///**Execution of a reconstruction in another thread.
-// * The class replaces the ReconstructManager::reconstruct() method.
-// *
-// */
-//class ThreadedReconstructer: public QThread
-//{
-//Q_OBJECT
-//
-//public:
-//	ThreadedReconstructer(ReconstructManagerPtr reconstructer);
-//	virtual void run();
-//private slots:
-//	void postReconstructionSlot();
-//private:
-//	ReconstructManagerPtr mReconstructer;
-//};
-//typedef boost::shared_ptr<class ThreadedReconstructer> ThreadedReconstructerPtr;
 
 /**
  * \brief \Threading adapter for the reconstruction algorithm.

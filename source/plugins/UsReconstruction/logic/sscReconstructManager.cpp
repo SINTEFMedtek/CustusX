@@ -148,8 +148,6 @@ void ReconstructManager::selectData(QString filename, QString calFilesPath)
 	this->clearAll();
 	this->readCoreFiles(filename, calFilesPath);
 	mReconstructer->setInputData(mOriginalFileData);
-
-//	emit inputDataSelected(filename);
 }
 
 /**Read from file into mOriginalFileData.
@@ -175,30 +173,9 @@ void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 //---------------------------------------------------------
 
 
-//ThreadedReconstructer::ThreadedReconstructer(ReconstructManagerPtr reconstructer)
-//{
-//	mReconstructer = reconstructer;
-//	mReconstructer->getReconstructer()->threadedPreReconstruct();
-//	connect(this, SIGNAL(finished()), this, SLOT(postReconstructionSlot())); // ensure this slot is run before all other listeners.
-//}
-//void ThreadedReconstructer::run()
-//{
-//	mReconstructer->getReconstructer()->threadedReconstruct();
-//}
-//void ThreadedReconstructer::postReconstructionSlot()
-//{
-//	mReconstructer->getReconstructer()->threadedPostReconstruct();
-//}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
 ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructManagerPtr reconstructer) :
 	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
 {
-	std::cout << "ThreadedTimedReconstructer::ThreadedTimedReconstructer()" << std::endl;
 	mReconstructer = reconstructer;
 }
 
@@ -214,7 +191,6 @@ void ThreadedTimedReconstructer::start()
 
 void ThreadedTimedReconstructer::postProcessingSlot()
 {
-	std::cout << "void ThreadedTimedReconstructer::postProcessingSlot()" << std::endl;
 	mReconstructer->getReconstructer()->threadedPostReconstruct();
 }
 
