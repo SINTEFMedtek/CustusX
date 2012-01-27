@@ -3,6 +3,7 @@
 
 #include "cxRecordBaseWidget.h"
 #include "cxUSAcquisition.h"
+#include "cxDisplayTimerWidget.h"
 
 namespace ssc
 {
@@ -19,22 +20,7 @@ class TimedAlgorithmProgressBar;
 * @{
 */
 
-class DisplayTimerWidget : public QWidget
-{
-	Q_OBJECT
-public:
-	DisplayTimerWidget(QWidget* parent);
 
-	void start();
-	void stop();
-
-private slots:
-	void timeoutSlot();
-private:
-	QTimer* mTimer;
-	QLabel* mLabel;
-	QDateTime mStartTime;
-};
 
 /**
  * USAcqusitionWidget
