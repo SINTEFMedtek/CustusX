@@ -99,6 +99,7 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
         WORLD_READ WORLD_EXECUTE WORLD_WRITE
     PATTERN ".svn" EXCLUDE
+    PATTERN "settings/*" EXCLUDE
     )
 
 # Install openCL shaders into bundle
