@@ -29,6 +29,10 @@ TimedAlgorithmProgressBar::TimedAlgorithmProgressBar(QWidget* parent) :
 	mLabel = new QLabel;
 	layout->addWidget(mLabel);
 
+	mTimerWidget = new DisplayTimerWidget(this);
+	mTimerWidget->setFontSize(3);
+	layout->addWidget(mTimerWidget);
+
 	mProgressBar = new QProgressBar;
 	mProgressBar->hide();
 	layout->addWidget(mProgressBar);
@@ -73,6 +77,9 @@ void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 	mLabel->show();
 	mStartedAlgos++;
 
+	mTimerWidget->show();
+	mTimerWidget->start();
+
 	mProgressBar->setRange(0, maxSteps);
 	mProgressBar->setValue(0);
 	mProgressBar->show();
@@ -94,6 +101,9 @@ void TimedAlgorithmProgressBar::algorithmFinishedSlot()
 	mProgressBar->setValue(0);
 	mProgressBar->hide();
 	mLabel->hide();
+
+	mTimerWidget->hide();
+	mTimerWidget->stop();
 }
 
 }
