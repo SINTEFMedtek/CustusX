@@ -32,7 +32,6 @@ SET( cxPluginUSReconstructionLogic_LIB_FILES
     sscUS3DReconstruction
     cxUtilities 
     cxSettings
-    cxUtilities
     cxAlgorithms_Res
     cxPatientService
     cxTrackingService
