@@ -17,7 +17,7 @@ namespace cx
  * \ingroup cxGUI
  *
  * \date 28. sep. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 
 class BaseWidget: public QWidget

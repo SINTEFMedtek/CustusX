@@ -1,8 +1,8 @@
 /*
  * cxDataMetricWrappers.cpp
  *
- *  Created on: Jul 29, 2011
- *      Author: christiana
+ *  \date Jul 29, 2011
+ *      \author christiana
  */
 
 #include <cxDataMetricWrappers.h>

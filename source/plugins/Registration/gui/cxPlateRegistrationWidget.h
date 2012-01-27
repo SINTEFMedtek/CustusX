@@ -21,7 +21,7 @@ namespace cx
  * predefined aurora tool with ct markers.
  *
  * \date 10. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class PlateRegistrationWidget : public RegistrationBaseWidget
 {

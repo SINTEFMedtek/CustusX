@@ -1,8 +1,8 @@
 /*
  * cxSegmentationMethodsWidget.h
  *
- *  Created on: May 4, 2011
- *      Author: christiana
+ *  \date May 4, 2011
+ *      \author christiana
  */
 
 #ifndef CXSEGMENTATIONMETHODSWIDGET_H_

@@ -16,10 +16,15 @@ class SelectionGroupBox;
 class ConfigToolListWidget;
 
 /**
- * ToolConfigureWidget
- *
- * \brief
+ * \brief Manage tool configurations
  * \ingroup cxGUI
+ *
+ * A widget for creating/modifying tool configurations. The user
+ * can select configs, and set name and which tools that are part
+ * of that config.
+ *
+ * Intended for use with ToolFilterGroupBox, from where the user can
+ * drag and drop tools.
  *
  * \date Mar 30, 2011
  * \author Janne Beate Bakeng, SINTEF

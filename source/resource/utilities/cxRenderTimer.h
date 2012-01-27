@@ -1,8 +1,8 @@
 /*
  * cxRenderTimer.h
  *
- *  Created on: Oct 19, 2010
- *      Author: christiana
+ *  \date Oct 19, 2010
+ *      \author christiana
  */
 
 #ifndef CXRENDERTIMER_H_

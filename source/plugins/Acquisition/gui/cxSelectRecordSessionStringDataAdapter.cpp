@@ -1,8 +1,8 @@
 /*
  * cxSelectRecordSessionStringDataAdapter.cpp
  *
- *  Created on: Jun 14, 2011
- *      Author: christiana
+ *  \date Jun 14, 2011
+ *      \author christiana
  */
 
 #include "cxSelectRecordSessionStringDataAdapter.h"

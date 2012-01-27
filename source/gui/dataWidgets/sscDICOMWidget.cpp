@@ -1,8 +1,8 @@
 /*
  * sscDICOMWidget.cpp
  *
- *  Created on: Nov 15, 2011
- *      Author: christiana
+ *  \date Nov 15, 2011
+ *      \author christiana
  */
 
 #include <sscDICOMWidget.h>

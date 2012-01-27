@@ -18,7 +18,7 @@ namespace cx
  * translation part of the matrix.
  *
  * \date 27. sep. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 class FastImageRegistrationWidget : public LandmarkImageRegistrationWidget
 {

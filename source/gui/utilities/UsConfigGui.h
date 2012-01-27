@@ -13,7 +13,7 @@ class QComboBox;
  * \ingroup cxGUI
  *
  * \date 11. mai 2010
- * \author: jbake
+ * \\author jbake
  */
 class UsConfigGui : public QWidget
 {
