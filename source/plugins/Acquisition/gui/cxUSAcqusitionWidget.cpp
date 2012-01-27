@@ -23,39 +23,6 @@ namespace cx
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DisplayTimerWidget::DisplayTimerWidget(QWidget* parent) : QWidget(parent)
-{
-	mTimer = new QTimer;
-	connect(mTimer, SIGNAL(timeout()), this, SLOT(timeoutSlot()));
-	mTimer->setInterval(1000);
-
-	QHBoxLayout* layout = new QHBoxLayout(this);
-	layout->setMargin(0);
-
-	mLabel = new QLabel;
-	layout->addWidget(mLabel);
-}
-
-void DisplayTimerWidget::start()
-{
-	mStartTime = QDateTime::currentDateTime();
-	mTimer->start();
-	timeoutSlot();
-}
-
-void DisplayTimerWidget::stop()
-{
-	mTimer->stop();
-	int secs = mStartTime.secsTo(QDateTime::currentDateTime());
-	mLabel->setText(QString("<font size=10 color=green><b>%1 s</b></font>").arg(secs));
-}
-
-void DisplayTimerWidget::timeoutSlot()
-{
-	int secs = mStartTime.secsTo(QDateTime::currentDateTime());
-	mLabel->setText(QString("<font size=10 color=black><b>%1 s</b></font>").arg(secs));
-}
-
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -78,6 +45,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	QHBoxLayout* timerLayout = new QHBoxLayout;
 	mLayout->addLayout(timerLayout);
 	mDisplayTimerWidget = new DisplayTimerWidget(this);
+	mDisplayTimerWidget ->setFontSize(10);
 	timerLayout->addStretch();
 	timerLayout->addWidget(mDisplayTimerWidget);
 	timerLayout->addStretch();
