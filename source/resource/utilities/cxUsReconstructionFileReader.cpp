@@ -83,6 +83,12 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   	retval.mMask = this->createMaskFromConfigParams(retval);
   }
 
+  if (!retval.mFrames.empty())
+  {
+	  double msecs = (retval.mFrames.rbegin()->mTime - retval.mFrames.begin()->mTime);
+	  ssc::messageManager()->sendInfo(QString("Read %1 seconds of us data from %1.").arg(msecs/1000, 0, 'g', 3).arg(fileName));
+  }
+
   return retval;
 }
 
