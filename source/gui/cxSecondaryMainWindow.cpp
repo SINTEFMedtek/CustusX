@@ -1,8 +1,8 @@
 /*
  * cxSecondaryMainWindow.cpp
  *
- *  Created on: Oct 18, 2010
- *      Author: christiana
+ *  \date Oct 18, 2010
+ *      \author christiana
  */
 #include "cxSecondaryMainWindow.h"
 

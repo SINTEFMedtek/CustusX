@@ -18,7 +18,7 @@ namespace cx
  * using only the matrix translation part.
  *
  * \date 27. sep. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 class FastPatientRegistrationWidget : public LandmarkPatientRegistrationWidget
 {

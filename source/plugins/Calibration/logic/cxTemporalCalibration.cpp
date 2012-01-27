@@ -1,8 +1,8 @@
 /*
  * cxTemporalCalibration.cpp
  *
- *  Created on: May 9, 2011
- *      Author: christiana
+ *  \date May 9, 2011
+ *      \author christiana
  */
 
 #include <cxTemporalCalibration.h>

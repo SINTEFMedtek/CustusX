@@ -24,7 +24,7 @@ namespace cx
  * \brief
  *
  * \date 22. sep. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 class ManualRegistrationOffsetWidget : public RegistrationBaseWidget
 {

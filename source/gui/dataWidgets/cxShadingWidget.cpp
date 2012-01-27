@@ -1,8 +1,8 @@
 /*
  * cxShadingWidget.cpp
  *
- *  Created on: Aug 20, 2010
- *      Author: christiana
+ *  \date Aug 20, 2010
+ *      \author christiana
  */
 #include "cxShadingWidget.h"
 

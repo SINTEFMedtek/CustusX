@@ -15,7 +15,7 @@
  * \brief Class that works as a interface to a ProbeCalibConfigs.xml
  *
  * \date 11. mai 2010
- * \author: jbake
+ * \\author jbake
  */
 class ProbeXmlConfigParser
 {

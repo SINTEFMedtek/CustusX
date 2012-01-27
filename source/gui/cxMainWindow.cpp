@@ -118,7 +118,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	else
 		this->show();
 
-	this->startupLoadPatient();
+	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 	this->toggleDebugModeSlot(mDebugModeAction->isChecked());
 }
 
@@ -140,12 +140,12 @@ void MainWindow::startupLoadPatient()
 	int doLoad = QApplication::arguments().indexOf("--load");
 	if (doLoad < 0)
 		return;
-	std::cout << "!!!!!!!!!!!!!! load " << doLoad << std::endl;
+//	std::cout << "!!!!!!!!!!!!!! load " << doLoad << std::endl;
 	if (doLoad + 1 >= QApplication::arguments().size())
 		return;
 
 	QString folder = QApplication::arguments()[doLoad + 1];
-	std::cout << "load " << folder << std::endl;
+	ssc::messageManager()->sendInfo("Startup Load patient: " + folder);
 	patientService()->getPatientData()->loadPatient(folder);
 }
 

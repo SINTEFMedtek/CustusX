@@ -13,7 +13,7 @@ namespace cx
  * \brief Abstract interface to a server that is listening to default port 18333.
  *
  * \date 26. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class Server : public QTcpServer
 {
@@ -50,7 +50,7 @@ private:
  * starts sending grabbed images (if available) using the IGTLink protocol.
  *
  * \date 26. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class OpenIGTLinkServer : public Server
 {

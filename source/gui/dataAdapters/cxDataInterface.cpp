@@ -1,8 +1,8 @@
 /*
  * cxDataInterface.cpp
  *
- *  Created on: Apr 13, 2010
- *      Author: christiana
+ *  \date Apr 13, 2010
+ *      \author christiana
  */
 #include "cxDataInterface.h"
 #include "sscImage.h"

@@ -8,6 +8,7 @@
 #include "sscHelperWidgets.h"
 #include "sscTypeConversions.h"
 #include "sscReconstructer.h"
+#include "cxTimedAlgorithmProgressBar.h"
 
 namespace ssc
 {
@@ -16,6 +17,8 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPt
 	QWidget(parent), mReconstructer(reconstructer)
 {
 	this->setWindowTitle("US Reconstruction");
+
+	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mReconstructer));
 
 	connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
 	connect(mReconstructer.get(), SIGNAL(inputDataSelected(QString)), this, SLOT(inputDataSelected(QString)));
@@ -77,6 +80,9 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPt
 	mAlgoLayout = new QStackedLayout(mAlgorithmGroup);
 	this->repopulateAlgorithmGroup();
 
+	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+	mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
+
 	topLayout->addWidget(mFileSelectWidget);
 	topLayout->addLayout(inputSpacingLayout);
 	topLayout->addWidget(angioWidget);
@@ -92,6 +98,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPt
 	topLayout->addWidget(algorithmWidget);
 	topLayout->addWidget(mAlgorithmGroup);
 	topLayout->addWidget(mReconstructButton);
+	topLayout->addWidget(mTimedAlgorithmProgressBar);
 	topLayout->addStretch();
 }
 
@@ -145,7 +152,19 @@ void ReconstructionWidget::reconstruct()
 {
 	ssc::messageManager()->sendInfo("Reconstructing...");
 	qApp->processEvents();
-	mReconstructer->reconstruct();
+
+//	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mReconstructer));
+//	connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+	mThreadedTimedReconstructer->start();
+	mReconstructButton->setEnabled(false);
+//	std::cout << "================reconstruct started" << std::endl;
+
+//	mReconstructer->reconstruct();
+}
+
+void ReconstructionWidget::reconstructFinishedSlot()
+{
+	mReconstructButton->setEnabled(true);
 }
 
 void ReconstructionWidget::reload()

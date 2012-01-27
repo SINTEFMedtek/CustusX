@@ -1,8 +1,8 @@
 /*
  * cxSecondaryMainWindow.h
  *
- *  Created on: Oct 18, 2010
- *      Author: christiana
+ *  \date Oct 18, 2010
+ *      \author christiana
  */
 #ifndef CXSECONDARYMAINWINDOW_H_
 #define CXSECONDARYMAINWINDOW_H_

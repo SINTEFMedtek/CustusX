@@ -1,8 +1,8 @@
 /*
  * sscDICOMWidget.h
  *
- *  Created on: Nov 15, 2011
- *      Author: christiana
+ *  \date Nov 15, 2011
+ *      \author christiana
  */
 #ifndef SSCDICOMWIDGET_H_
 #define SSCDICOMWIDGET_H_

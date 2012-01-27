@@ -1,7 +1,7 @@
 /*
  * cxIGTLinkSonixStatusMessage.h
  *
- *  Created on: Aug 12, 2011
+ *  \date Aug 12, 2011
  */
 
 #ifndef CXIGTLINKSONIXSTATUSMESSAGE_H_

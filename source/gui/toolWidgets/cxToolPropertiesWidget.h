@@ -22,7 +22,7 @@ namespace cx
  * \ingroup cxGUI
  *
  * \date 2010.04.22
- * \author: Christian Askeland, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class ToolPropertiesWidget : public BaseWidget
 {

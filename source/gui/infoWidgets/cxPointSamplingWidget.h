@@ -21,7 +21,7 @@ namespace cx
  * \ingroup cxGUI
  *
  * \date 2010.05.05
- * \author: Christian Askeland, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class PointSamplingWidget : public BaseWidget
 {
