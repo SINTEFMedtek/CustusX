@@ -196,7 +196,7 @@ void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 
 
 ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructManagerPtr reconstructer) :
-	ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
+	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
 {
 	std::cout << "ThreadedTimedReconstructer::ThreadedTimedReconstructer()" << std::endl;
 	mReconstructer = reconstructer;
