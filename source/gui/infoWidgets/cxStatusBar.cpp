@@ -53,7 +53,7 @@ void StatusBar::connectToToolSignals()
 	for (ssc::ToolManager::ToolMap::iterator it = tools->begin(); it != tools->end(); ++it)
 	{
 		ssc::ToolPtr tool = it->second;
-		if (tool->getType() == ssc::Tool::TOOL_MANUAL)
+		if (tool->isManual())
 			continue;
 		if (tool == ToolManager::getInstance()->getManualTool())
 			continue;

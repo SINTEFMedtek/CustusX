@@ -1,8 +1,8 @@
 /*
  * cxDataLocations.h
  *
- *  Created on: Jun 22, 2010
- *      Author: christiana
+ *  \date Jun 22, 2010
+ *      \author christiana
  */
 #ifndef CXDATALOCATIONS_H_
 #define CXDATALOCATIONS_H_

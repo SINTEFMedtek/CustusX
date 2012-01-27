@@ -46,6 +46,8 @@ private:
   bool					mPreserveTopology;
   ssc::MeshPtr mOutput;
 };
+typedef boost::shared_ptr<class Contour> ContourPtr;
+
 
 
 /**

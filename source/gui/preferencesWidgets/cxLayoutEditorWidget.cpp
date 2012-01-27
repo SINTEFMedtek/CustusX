@@ -1,8 +1,8 @@
 /*
  * cxLayoutEditorWidget.cpp
  *
- *  Created on: Jul 27, 2010
- *      Author: christiana
+ *  \date Jul 27, 2010
+ *      \author christiana
  */
 
 #include "cxLayoutEditorWidget.h"

@@ -1,8 +1,8 @@
 /*
  * cxDoubleSpanSlider.h
  *
- *  Created on: Aug 26, 2010
- *      Author: christiana
+ *  \date Aug 26, 2010
+ *      \author christiana
  */
 #ifndef CXDOUBLESPANSLIDER_H_
 #define CXDOUBLESPANSLIDER_H_

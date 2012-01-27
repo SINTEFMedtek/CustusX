@@ -76,36 +76,20 @@ target_link_libraries( CustusX
 # On Apple, the bin folder is replaced by bundles.
 #
 
-# Variables
-#----------
-
-# define LINUX convenience variable
-if (UNIX AND NOT APPLE)
-    set(LINUX 1)
-endif (UNIX AND NOT APPLE)
-
-# Set root folder for entire installation
-set(ROOT_DIR .)
-if(APPLE )
-  set(ROOT_DIR "CustusX")
-endif(APPLE)
-if(LINUX)
-  set(ROOT_DIR "CustusX")
-endif(LINUX)
 
 # Install files
 #----------
 
 # Install CustusX
 install(TARGETS CustusX
-    BUNDLE DESTINATION ${ROOT_DIR}
-    RUNTIME DESTINATION ${ROOT_DIR}/bin
+    BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
+    RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
     #COMPONENT CustusX
     )
 
 # Install configuration files to config folder
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ 
-    DESTINATION ${ROOT_DIR}/config
+    DESTINATION ${CX_INSTALL_ROOT_DIR}/config
     FILE_PERMISSIONS
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
@@ -119,21 +103,16 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
 
 # Install openCL shaders into bundle
 install(FILES ${CustusX3_SOURCE_DIR}/externals/ssc/Code/Ultrasound/3DReconstruction/Thunder/kernels.ocl 
-        DESTINATION ${ROOT_DIR}/config/shaders/
+        DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
         )
 
 
 # Install Shared files
-install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Shared/doc 
-  DESTINATION ${ROOT_DIR}
-  #COMPONENT CustusX
-  USE_SOURCE_PERMISSIONS
-  )
-
 install(FILES 
   ${CustusX3_SOURCE_DIR}/install/Shared/doc/ChangeLog.rtf
   ${CustusX3_SOURCE_DIR}/install/Shared/doc/CustusX_Tutorial.pdf
-  DESTINATION ${ROOT_DIR}/doc/
+  ${CustusX3_SOURCE_DIR}/install/Shared/doc/CustusX_Specifications.pdf
+  DESTINATION ${CX_INSTALL_ROOT_DIR}/doc/
   PERMISSIONS 
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
@@ -148,7 +127,7 @@ if(WIN32)
   include (InstallRequiredSystemLibraries)
   if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
       install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-              DESTINATION ${ROOT_DIR}/bin
+              DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
               PERMISSIONS 
               OWNER_WRITE OWNER_READ 
               OWNER_EXECUTE GROUP_READ
@@ -158,30 +137,30 @@ if(WIN32)
   endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 
   install(FILES ${CustusX3_SOURCE_DIR}/install/Windows/win_install_readme.rtf 
-      DESTINATION ${ROOT_DIR}/doc
+      DESTINATION ${CX_INSTALL_ROOT_DIR}/doc
       #COMPONENT CustusX
       )
 endif(WIN32)
 
 # Install Linux-specific files
-if (LINUX)
+if (CX_LINUX)
   install(FILES 
       ${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt
       ${CustusX3_SOURCE_DIR}/install/Linux/copy/runCustusX.sh
       ${CustusX3_SOURCE_DIR}/install/Linux/copy/runOpenIGTLinkServer.sh 
-      DESTINATION ${ROOT_DIR}
+      DESTINATION ${CX_INSTALL_ROOT_DIR}
       #COMPONENT CustusX
     PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ
       )
-endif (LINUX)
+endif (CX_LINUX)
 
 # Install Apple-specific files
 if(APPLE)
   install(FILES ${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf 
-      DESTINATION ${ROOT_DIR}/doc
+      DESTINATION ${CX_INSTALL_ROOT_DIR}/doc
       )
   install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/GrapperServer.app 
-      DESTINATION ${ROOT_DIR}
+      DESTINATION ${CX_INSTALL_ROOT_DIR}
       #COMPONENT CustusX
       USE_SOURCE_PERMISSIONS
       )
@@ -208,8 +187,8 @@ endif(APPLE)
 #--------------------------------------------------------------------------------
 
 # Install dependencies on Linux
-if (LINUX)
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/${ROOT_DIR}/bin/CustusX")
+if (CX_LINUX)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/CustusX")
   set(LIBS "")
   set(DIRS 
       ${QT_INCLUDES} 
@@ -254,7 +233,7 @@ if (LINUX)
      fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
      #COMPONENT CustusX
      )      
-endif (LINUX)
+endif (CX_LINUX)
 
 # Install dependencies on Windows
 if (WIN32)

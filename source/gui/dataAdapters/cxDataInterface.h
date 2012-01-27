@@ -1,8 +1,8 @@
 /*
  * cxDataInterface.h
  *
- *  Created on: Apr 13, 2010
- *      Author: christiana
+ *  \date Apr 13, 2010
+ *      \author christiana
  */
 #ifndef CXDATAINTERFACE_H_
 #define CXDATAINTERFACE_H_

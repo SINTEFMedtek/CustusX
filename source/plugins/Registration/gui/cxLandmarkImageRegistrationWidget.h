@@ -28,7 +28,7 @@ namespace cx
  * \brief Widget for performing landmark based image registration
  *
  * \date Jan 27, 2009
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class LandmarkImageRegistrationWidget : public LandmarkRegistrationWidget
 {

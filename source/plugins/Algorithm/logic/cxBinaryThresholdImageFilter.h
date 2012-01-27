@@ -43,6 +43,7 @@ private:
   bool          mUseSmoothing;
   double        mSmoothingSigma;
 };
+typedef boost::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
 
 /**
  * @}
