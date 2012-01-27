@@ -44,6 +44,7 @@ private:
   ssc::DataPtr mOutput;
   QColor mDefaultColor;
 };
+typedef boost::shared_ptr<class Centerline> CenterlinePtr;
 
 /**
  * @}
