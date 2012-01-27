@@ -66,7 +66,7 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
   ssc::messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
 
   //let the system know you're finished
-  emit finished();
+//  emit finished();
 }
 
 vtkImageDataPtr ConnectedThresholdImageFilter::calculate()

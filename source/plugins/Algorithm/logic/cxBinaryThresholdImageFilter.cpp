@@ -7,7 +7,7 @@
 namespace cx
 {
 BinaryThresholdImageFilter::BinaryThresholdImageFilter() :
-    ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 10)
+    ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 20)
 {}
 
 BinaryThresholdImageFilter::~BinaryThresholdImageFilter()
@@ -48,7 +48,7 @@ void BinaryThresholdImageFilter::postProcessingSlot()
 
   ssc::messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
 
-  emit finished();
+//  emit finished();
 }
 
 vtkImageDataPtr BinaryThresholdImageFilter::calculate()
