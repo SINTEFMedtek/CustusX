@@ -16,6 +16,7 @@ if (BUILD_TESTING)
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     )
       
   # List of all test units

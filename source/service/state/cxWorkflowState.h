@@ -32,11 +32,10 @@ namespace cx
  * @{
  */
 
-/**
 /**\brief State in a WorkflowStateMachine
  *
  * \date 4. aug. 2010
- * \\author jbake
+ * \author jbake
  */
 class WorkflowState: public QState
 {
