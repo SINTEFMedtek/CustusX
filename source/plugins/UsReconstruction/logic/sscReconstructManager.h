@@ -22,6 +22,7 @@
 #include "sscProbeSector.h"
 //#include "sscStringWidgets.h"
 #include "cxUsReconstructionFileReader.h"
+#include "cxTimedAlgorithm.h"
 
 namespace ssc
 {
@@ -102,23 +103,48 @@ private:
 	bool validInputData() const;
 };
 
-/**Execution of a reconstruction in another thread.
- * The class replaces the ReconstructManager::reconstruct() method.
+///**Execution of a reconstruction in another thread.
+// * The class replaces the ReconstructManager::reconstruct() method.
+// *
+// */
+//class ThreadedReconstructer: public QThread
+//{
+//Q_OBJECT
+//
+//public:
+//	ThreadedReconstructer(ReconstructManagerPtr reconstructer);
+//	virtual void run();
+//private slots:
+//	void postReconstructionSlot();
+//private:
+//	ReconstructManagerPtr mReconstructer;
+//};
+//typedef boost::shared_ptr<class ThreadedReconstructer> ThreadedReconstructerPtr;
+
+/**
+ * \brief \Threading adapter for the reconstruction algorithm.
  *
+ * \date Jan 27, 2012
+ * \author Christian Askeland, SINTEF
  */
-class ThreadedReconstructer: public QThread
+class ThreadedTimedReconstructer: public cx::ThreadedTimedAlgorithm<void>
 {
 Q_OBJECT
-
 public:
-	ThreadedReconstructer(ReconstructManagerPtr reconstructer);
-	virtual void run();
+	ThreadedTimedReconstructer(ReconstructManagerPtr reconstructer);
+	virtual ~ThreadedTimedReconstructer();
+
+	void start();
+
 private slots:
-	void postReconstructionSlot();
+	virtual void postProcessingSlot();
+
 private:
+	virtual void calculate();
 	ReconstructManagerPtr mReconstructer;
 };
-typedef boost::shared_ptr<class ThreadedReconstructer> ThreadedReconstructerPtr;
+
+typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
 
 
 /**

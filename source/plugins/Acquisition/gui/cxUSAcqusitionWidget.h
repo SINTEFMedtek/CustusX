@@ -6,11 +6,13 @@
 
 namespace ssc
 {
-	typedef boost::shared_ptr<class ThreadedReconstructer> ThreadedReconstructerPtr;
+	typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
 }
 
 namespace cx
 {
+class TimedAlgorithmProgressBar;
+
 /**
 * \file
 * \addtogroup cxPluginAcquisition
@@ -46,7 +48,9 @@ private slots:
 
 private:
   USAcquisitionPtr mAcquisition;
-  ssc::ThreadedReconstructerPtr mThreadedReconstructer;
+//  ssc::ThreadedReconstructerPtr mThreadedReconstructer;
+  ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 };
 
 

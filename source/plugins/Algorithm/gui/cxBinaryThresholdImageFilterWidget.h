@@ -12,6 +12,7 @@
 namespace cx
 {
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+class TimedAlgorithmProgressBar;
 
 /**
  * \file
@@ -72,10 +73,11 @@ private:
   ssc::SpinBoxAndSliderGroupWidgetPtr mSmoothingSigmaWidget;
   QLabel* mSmoothingSigmaLabel;
   QColor mDefaultColor;
-  QLabel* mStatusLabel;
+//  QLabel* mStatusLabel;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
-  BinaryThresholdImageFilter mSegmentationAlgorithm;
-  Contour mContourAlgorithm;
+  BinaryThresholdImageFilterPtr mSegmentationAlgorithm;
+  ContourPtr mContourAlgorithm;
 };
 
 /**

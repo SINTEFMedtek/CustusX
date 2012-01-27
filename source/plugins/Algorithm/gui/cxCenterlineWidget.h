@@ -16,6 +16,7 @@
 namespace cx
 {
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+class TimedAlgorithmProgressBar;
 
 /**
  * \file
@@ -59,9 +60,10 @@ private slots:
 private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
-  QLabel* mStatusLabel;
+//  QLabel* mStatusLabel;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
-  Centerline  mCenterlineAlgorithm;
+  CenterlinePtr  mCenterlineAlgorithm;
 };
 
 /**

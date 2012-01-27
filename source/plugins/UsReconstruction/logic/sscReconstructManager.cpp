@@ -175,18 +175,53 @@ void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 //---------------------------------------------------------
 
 
-ThreadedReconstructer::ThreadedReconstructer(ReconstructManagerPtr reconstructer)
+//ThreadedReconstructer::ThreadedReconstructer(ReconstructManagerPtr reconstructer)
+//{
+//	mReconstructer = reconstructer;
+//	mReconstructer->getReconstructer()->threadedPreReconstruct();
+//	connect(this, SIGNAL(finished()), this, SLOT(postReconstructionSlot())); // ensure this slot is run before all other listeners.
+//}
+//void ThreadedReconstructer::run()
+//{
+//	mReconstructer->getReconstructer()->threadedReconstruct();
+//}
+//void ThreadedReconstructer::postReconstructionSlot()
+//{
+//	mReconstructer->getReconstructer()->threadedPostReconstruct();
+//}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructManagerPtr reconstructer) :
+	ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
 {
+	std::cout << "ThreadedTimedReconstructer::ThreadedTimedReconstructer()" << std::endl;
 	mReconstructer = reconstructer;
-	mReconstructer->getReconstructer()->threadedPreReconstruct();
-	connect(this, SIGNAL(finished()), this, SLOT(postReconstructionSlot())); // ensure this slot is run before all other listeners.
 }
-void ThreadedReconstructer::run()
+
+ThreadedTimedReconstructer::~ThreadedTimedReconstructer()
+{
+}
+
+void ThreadedTimedReconstructer::start()
+{
+	mReconstructer->getReconstructer()->threadedPreReconstruct();
+	this->generate();
+}
+
+void ThreadedTimedReconstructer::postProcessingSlot()
+{
+	std::cout << "void ThreadedTimedReconstructer::postProcessingSlot()" << std::endl;
+	mReconstructer->getReconstructer()->threadedPostReconstruct();
+}
+
+void ThreadedTimedReconstructer::calculate()
 {
 	mReconstructer->getReconstructer()->threadedReconstruct();
 }
-void ThreadedReconstructer::postReconstructionSlot()
-{
-	mReconstructer->getReconstructer()->threadedPostReconstruct();
-}
+
+
 }

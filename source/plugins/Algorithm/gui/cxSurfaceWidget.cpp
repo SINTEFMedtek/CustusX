@@ -16,6 +16,7 @@
 #include "cxPatientData.h"
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
+#include "cxTimedAlgorithmProgressBar.h"
 
 namespace cx
 {
@@ -25,10 +26,11 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     mReduceResolution(false),
     mSmoothing(true),
     mPreserveTopology(true),
-    mDefaultColor("red"),
-    mStatusLabel(new QLabel(""))
+    mDefaultColor("red")
+//    mStatusLabel(new QLabel(""))
 {
-  connect(&mContourAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
+	mContourAlgorithm.reset(new Contour());
+  connect(mContourAlgorithm.get(), SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
@@ -54,10 +56,14 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   connect(surfaceOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
   surfaceOptionsWidget->setVisible(surfaceOptionsButton->isChecked());
 
+	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+	mTimedAlgorithmProgressBar->attach(mContourAlgorithm);
+
   topLayout->addWidget(surfaceButton, 1,0);
   topLayout->addWidget(surfaceOptionsButton,1,1);
   topLayout->addWidget(surfaceOptionsWidget, 2, 0, 1, 2);
-  topLayout->addWidget(mStatusLabel);
+//  topLayout->addWidget(mStatusLabel);
+  topLayout->addWidget(mTimedAlgorithmProgressBar);
 
   this->adjustSizeSlot();
   this->reduceResolutionSlot(mReduceResolution);
@@ -87,20 +93,20 @@ void SurfaceWidget::surfaceSlot()
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   double decimation = mDecimationAdapter->getValue()/100;
 
-  mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThresholdAdapter->getValue(),
+  mContourAlgorithm->setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThresholdAdapter->getValue(),
   		decimation, mReduceResolution, mSmoothing, mPreserveTopology);
 
-  mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
+//  mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
 }
 
 void SurfaceWidget::handleFinishedSlot()
 {
-  ssc::MeshPtr outputMesh = mContourAlgorithm.getOutput();
+  ssc::MeshPtr outputMesh = mContourAlgorithm->getOutput();
   if(!outputMesh)
     return;
 
   outputMesh->setColor(mDefaultColor);
-  mStatusLabel->setText("<font color=green> Done. </font>\n");
+//  mStatusLabel->setText("<font color=green> Done. </font>\n");
 
   emit outputMeshChanged(outputMesh->getUid());
 }
