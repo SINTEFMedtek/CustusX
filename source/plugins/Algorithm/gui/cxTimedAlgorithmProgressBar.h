@@ -20,6 +20,7 @@
 #include <QWidget>
 class QProgressBar;
 class QLabel;
+#include "cxDisplayTimerWidget.h"
 
 namespace cx
 {
@@ -67,7 +68,7 @@ private:
 	QProgressBar* mProgressBar;
 	QLabel* mLabel;
 	int mStartedAlgos;
-
+	DisplayTimerWidget* mTimerWidget;
 };
 
 /**

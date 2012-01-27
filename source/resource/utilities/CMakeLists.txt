@@ -25,6 +25,7 @@ include(${QT_USE_FILE})
 include_directories(${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(${LIBNAME}_MOC_HDRS
+    cxDisplayTimerWidget.h
 )
 
 # SSC
@@ -54,6 +55,8 @@ add_library(cxUtilities
     cxUsReconstructionFileMaker.cpp
     cxUsReconstructionFileReader.h
     cxUsReconstructionFileReader.cpp    
+    cxDisplayTimerWidget.h
+    cxDisplayTimerWidget.cpp
     ${cxUtilities_MOC_SRCS}
     )
     
