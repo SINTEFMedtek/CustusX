@@ -225,6 +225,24 @@ protected:
  *
  * \brief Interface for selecting a tool configuration.
  *
+ * The tab has three parts:
+ * \beginverbatim
+ *
+ *  ____________________________________________
+ * |                       |                    |
+ * | ToolConfigureGroupBox | ToolFilterGroupBox |
+ * |_______________________|____________________|
+ * |                                            |
+ * |                FilePreviewWidget           |
+ * |____________________________________________|
+ *
+ * /endverbatim
+ *
+ * Tools are available as a filered list from ToolFilterGroupBox,
+ * and can be added to a configuration in ToolConfigureGroupBox.
+ *
+ * The currently selected tool's file can be viewed in FilePreviewWidget.
+ *
  * \date Mar 22, 2011
  * \author Janne Beate Bakeng, SINTEF
  */

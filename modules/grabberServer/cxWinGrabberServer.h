@@ -12,7 +12,7 @@ namespace cx
  * \brief Combines and syncs a WinGraber and a OpenIGTLinkServer
  *
  * \date  06. jun. 2011
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 
 class WinGrabberServer : public GrabberServer

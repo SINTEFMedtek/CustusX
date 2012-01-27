@@ -1,8 +1,8 @@
 /*
  * cxLandmarkImage2ImageRegistrationWidget.h
  *
- *  Created on: Sep 7, 2011
- *      Author: christiana
+ *  \date Sep 7, 2011
+ *      \author christiana
  */
 
 #ifndef CXLANDMARKIMAGE2IMAGEREGISTRATIONWIDGET_H_

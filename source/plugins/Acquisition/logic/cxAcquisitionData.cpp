@@ -1,8 +1,8 @@
 /*
  * cxAcquisitionData.cpp
  *
- *  Created on: Jun 9, 2011
- *      Author: christiana
+ *  \date Jun 9, 2011
+ *      \author christiana
  */
 
 #include <cxAcquisitionData.h>

@@ -1,8 +1,8 @@
 /*
  * cxUSAcquisition.cpp
  *
- *  Created on: May 12, 2011
- *      Author: christiana
+ *  \date May 12, 2011
+ *      \author christiana
  */
 
 #include <cxUSAcquisition.h>
@@ -120,7 +120,7 @@ void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 
   if(mRTSource)
   {
-    std::cout << "USAcquisition::connectVideoSource - connected" << std::endl;
+//    std::cout << "USAcquisition::connectVideoSource - connected" << std::endl;
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
     mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
   }

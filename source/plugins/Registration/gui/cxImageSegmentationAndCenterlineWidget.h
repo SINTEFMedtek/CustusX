@@ -25,7 +25,7 @@ namespace cx
  * from that segment.
  *
  * \date 12. okt. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 class ImageSegmentationAndCenterlineWidget : public RegistrationBaseWidget
 {

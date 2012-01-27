@@ -1,8 +1,8 @@
 /*
  * cxPluginBase.cpp
  *
- *  Created on: Jun 14, 2011
- *      Author: christiana
+ *  \date Jun 14, 2011
+ *      \author christiana
  */
 
 #include "/home/christiana/christiana/workspace/CustusX3/CustusX3/source/plugins/PluginBase/cxPluginBase.h"

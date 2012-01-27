@@ -1,8 +1,8 @@
 /*
  * cxMetricWidget.cpp
  *
- *  Created on: Jul 5, 2011
- *      Author: christiana
+ *  \date Jul 5, 2011
+ *      \author christiana
  */
 
 #include <cxMetricWidget.h>
@@ -125,10 +125,11 @@ void MetricWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
 
-  ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
-  ViewGroupData::Options options = data->getOptions();
-  options.mShowPointPickerProbe = true;
-  data->setOptions(options);
+// Turned off by request (#420) - too confusing
+//  ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
+//  ViewGroupData::Options options = data->getOptions();
+//  options.mShowPointPickerProbe = true;
+//  data->setOptions(options);
 
   this->updateSlot();
 }

@@ -187,7 +187,7 @@ void LandmarkImageRegistrationWidget::enableButtons()
 {
 	bool selected = !mLandmarkTableWidget->selectedItems().isEmpty();
 	bool tracking = ssc::toolManager()->getDominantTool()
-			&& ssc::toolManager()->getDominantTool()->getType()!=ssc::Tool::TOOL_MANUAL
+			&& !ssc::toolManager()->getDominantTool()->isManual()
 			&& ssc::toolManager()->getDominantTool()->getVisible();
 	bool loaded = ssc::dataManager()->getActiveImage() != 0;
 

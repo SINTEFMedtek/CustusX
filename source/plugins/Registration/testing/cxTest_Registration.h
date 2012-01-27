@@ -1,8 +1,8 @@
 /*
  * cxTestRegistration.h
  *
- *  Created on: Oct 24, 2011
- *      Author: christiana
+ *  \date Oct 24, 2011
+ *      \author christiana
  */
 
 #ifndef CXTEST_REGISTRATION_H_

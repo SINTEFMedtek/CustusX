@@ -12,6 +12,8 @@
 class QVBoxLayout;
 class QComboBox;
 class QStringList;
+class QAction;
+class QActionGroup;
 
 namespace cx
 {
@@ -144,7 +146,7 @@ class TransferFunctionPresetWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TransferFunctionPresetWidget(QWidget* parent);
+  TransferFunctionPresetWidget(QWidget* parent, bool is3D);
   virtual ~TransferFunctionPresetWidget() {}
   virtual QString defaultWhatsThis() const;
 
@@ -154,11 +156,20 @@ public slots:
   void resetSlot();
   void saveSlot();
   void deleteSlot();
+  void toggleSlot();
 
 protected:
+  bool use2D() const;
+  bool use3D() const;
+  void updateToggles();
+  QAction* addAction(QActionGroup* group, QString text, QIcon icon) const;
+
   QVBoxLayout* mLayout;
   QComboBox* mPresetsComboBox;
   ssc::PresetTransferFunctions3DPtr mPresets;
+  QAction* mToggleAction;
+  bool mIs3D; ///< true if 3D, false if 2D
+  bool mApplyToAll; ///< true if presets are to be applied to both 2D and 3D
 
   ActiveImageProxyPtr mActiveImageProxy;
 };
@@ -169,8 +180,8 @@ protected:
  * \brief
  *
  * \date Mar 23, 2009
- * \author: Janne Beate Bakeng, SINTEF
- * \author: Ole Vegard Solberg, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
+ * \\author Ole Vegard Solberg, SINTEF
  */
 class TransferFunctionWidget : public BaseWidget
 {

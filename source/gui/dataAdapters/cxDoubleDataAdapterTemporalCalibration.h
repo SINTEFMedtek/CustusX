@@ -1,8 +1,8 @@
 /*
  * cxDoubleDataAdapterTemporalCalibration.h
  *
- *  Created on: May 5, 2011
- *      Author: christiana
+ *  \date May 5, 2011
+ *      \author christiana
  */
 
 #ifndef CXDOUBLEDATAADAPTERTEMPORALCALIBRATION_H_

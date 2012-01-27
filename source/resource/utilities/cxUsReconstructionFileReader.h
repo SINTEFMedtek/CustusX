@@ -1,8 +1,8 @@
 /*
  * cxUsReconstructionFileReader.h
  *
- *  Created on: Feb 3, 2011
- *      Author: christiana
+ *  \date Feb 3, 2011
+ *      \author christiana
  */
 
 #ifndef CXUSRECONSTRUCTIONFILEREADER_H_

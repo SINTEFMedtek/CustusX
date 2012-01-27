@@ -1,9 +1,16 @@
-/*
- * cxAngleMetric.cpp
- *
- *  Created on: Jul 27, 2011
- *      Author: christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
 #include <cxAngleMetric.h>
 
@@ -18,12 +25,11 @@ namespace cx
 
 ssc::DataPtr AngleMetricReader::load(const QString& uid, const QString& filename)
 {
-  return ssc::DataPtr(new AngleMetric(uid,filename));
+	return ssc::DataPtr(new AngleMetric(uid, filename));
 }
 
-
 AngleMetric::AngleMetric(const QString& uid, const QString& name) :
-      DataMetric(uid, name)
+				DataMetric(uid, name)
 {
 }
 
@@ -33,8 +39,8 @@ AngleMetric::~AngleMetric()
 
 void AngleMetric::setArgument(int index, ssc::DataPtr p)
 {
-  if (mArgument[index]==p)
-    return;
+	if (mArgument[index] == p)
+		return;
 
 	if (mArgument[index])
 		disconnect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
@@ -44,7 +50,7 @@ void AngleMetric::setArgument(int index, ssc::DataPtr p)
 	if (mArgument[index])
 		connect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
 
-  emit transformChanged();
+	emit transformChanged();
 }
 
 ssc::DataPtr AngleMetric::getArgument(int index)
@@ -54,9 +60,8 @@ ssc::DataPtr AngleMetric::getArgument(int index)
 
 bool AngleMetric::validArgument(ssc::DataPtr p) const
 {
-	return p->getType()=="pointMetric";// || p->getType()=="planeMetric";
+	return p->getType() == "pointMetric"; // || p->getType()=="planeMetric";
 }
-
 
 //void AngleMetric::setPoint(int index, PointMetricPtr p)
 //{
@@ -85,24 +90,24 @@ bool AngleMetric::validArgument(ssc::DataPtr p) const
 
 void AngleMetric::addXml(QDomNode& dataNode)
 {
-  Data::addXml(dataNode);
+	Data::addXml(dataNode);
 
-  for (unsigned i=0; i<mArgument.size(); ++i)
-  {
-    if (mArgument[i])
-      dataNode.toElement().setAttribute(QString("p%1").arg(i), mArgument[i]->getUid());
-  }
+	for (unsigned i = 0; i < mArgument.size(); ++i)
+	{
+		if (mArgument[i])
+			dataNode.toElement().setAttribute(QString("p%1").arg(i), mArgument[i]->getUid());
+	}
 }
 
 void AngleMetric::parseXml(QDomNode& dataNode)
 {
-  Data::parseXml(dataNode);
+	Data::parseXml(dataNode);
 
-  for (unsigned i=0; i<mArgument.size(); ++i)
-  {
-    QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
-    this->setArgument(i, ssc::dataManager()->getData(uid));
-  }
+	for (unsigned i = 0; i < mArgument.size(); ++i)
+	{
+		QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
+		this->setArgument(i, ssc::dataManager()->getData(uid));
+	}
 }
 
 bool AngleMetric::isValid() const
@@ -117,33 +122,33 @@ unsigned AngleMetric::getArgumentCount() const
 
 std::vector<ssc::Vector3D> AngleMetric::getEndpoints() const
 {
-  std::vector<ssc::Vector3D> p(this->getArgumentCount());
-  for (unsigned i=0; i<p.size(); ++i)
-  {
-  	if (!mArgument[i])
-  		return std::vector<ssc::Vector3D>();
-    p[i] = boost::shared_dynamic_cast<PointMetric>(mArgument[i])->getRefCoord();
-  }
-  return p;
+	std::vector<ssc::Vector3D> p(this->getArgumentCount());
+	for (unsigned i = 0; i < p.size(); ++i)
+	{
+		if (!mArgument[i])
+			return std::vector<ssc::Vector3D>();
+		p[i] = boost::shared_dynamic_cast<PointMetric>(mArgument[i])->getRefCoord();
+	}
+	return p;
 }
 
 double AngleMetric::getAngle() const
 {
-  std::vector<ssc::Vector3D> p = this->getEndpoints();
+	std::vector<ssc::Vector3D> p = this->getEndpoints();
 
-  if (p.empty())
-  	return -1;
+	if (p.empty())
+		return -1;
 
-  ssc::Vector3D a = (p[0]-p[1]).normalized();
-  ssc::Vector3D b = (p[3]-p[2]).normalized();
+	ssc::Vector3D a = (p[0] - p[1]).normalized();
+	ssc::Vector3D b = (p[3] - p[2]).normalized();
 
-  double angle = acos(ssc::dot(a,b)/a.length()/b.length());
-  return angle;
+	double angle = acos(ssc::dot(a, b) / a.length() / b.length());
+	return angle;
 }
 
 ssc::DoubleBoundingBox3D AngleMetric::boundingBox() const
 {
-  return ssc::DoubleBoundingBox3D::fromCloud(this->getEndpoints());
+	return ssc::DoubleBoundingBox3D::fromCloud(this->getEndpoints());
 }
 
 }

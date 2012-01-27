@@ -1,8 +1,8 @@
 /*
  * sscReconstructOutputValueParamsInterfaces.h
  *
- *  Created on: May 27, 2010
- *      Author: christiana
+ *  \date May 27, 2010
+ *      \author christiana
  */
 #ifndef SSCRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_
 #define SSCRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_

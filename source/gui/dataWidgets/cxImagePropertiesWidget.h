@@ -58,7 +58,7 @@ protected:
  * \class ImagePropertiesWidget
  *
  * \date 2010.04.12
- * \author: Christian Askeland, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class ImagePropertiesWidget : public BaseWidget
 {
