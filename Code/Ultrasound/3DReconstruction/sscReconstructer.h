@@ -61,6 +61,7 @@ class Reconstructer: public QObject
 {
 Q_OBJECT
 	friend class ThreadedReconstructer;
+    friend class ThreadedTimedReconstructer;
 
 public:
 	Reconstructer(XmlOptionFile settings, QString shaderPath);
