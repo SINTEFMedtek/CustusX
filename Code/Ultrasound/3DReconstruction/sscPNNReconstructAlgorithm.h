@@ -1,9 +1,21 @@
-/*
- *  sscPNNReconstructAlgorithm.h
- *
- *  Created by Ole Vegard Solberg on 23/6/10.
- *
- */
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
 
 #ifndef SSCPNNRECONSTRUCTALGORITHM_H_
 #define SSCPNNRECONSTRUCTALGORITHM_H_
@@ -17,6 +29,20 @@
 
 namespace ssc
 {
+
+/**
+ * \addtogroup sscUSReconstruction
+ * \{
+ */
+
+/**\brief PNN US reconstruction.
+ *
+ * A specialization of ReconstructAlgorithm that implements
+ * a simple PNN (pixel-nearest-neighbour) algorithm.
+ *
+ *  \date June 23, 2010
+ *  \author Ole Vegard Solberg
+ */
 class PNNReconstructAlgorithm: public ReconstructAlgorithm
 {
 public:
@@ -46,6 +72,11 @@ private:
 
 	void interpolate(ImagePtr inputData, ImagePtr outputData);
 };
+
+/**
+ * \}
+ */
+
 
 }//namespace ssc
 #endif //SSCPNNRECONSTRUCTALGORITHM_H_

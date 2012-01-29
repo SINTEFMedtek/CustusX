@@ -1,8 +1,21 @@
-/*
- *  sscReconstructer.h
- *  Created by Ole Vegard Solberg on 5/4/10.
- *
- */
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
 
 #ifndef SSCRECONSTRUCTER_H_
 #define SSCRECONSTRUCTER_H_
@@ -22,6 +35,14 @@
 namespace ssc
 {
 
+/**
+ * \addtogroup sscUSReconstruction
+ * \{
+ */
+
+/**\brief Collection of reconstruction parameters.
+ *
+ */
 class ReconstructParams : public QObject
 {
 	Q_OBJECT
@@ -49,13 +70,24 @@ typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 
 /**
- * Used coordinate systems:
- * u  = raw input Ultrasound frames (in x, y. Origin lower left.)
- * t  = Tool space for probe as defined in ssc:Tool (z in ray direction, y to the left)
- * s  = probe localizer Sensor.
- * pr = Patient Reference localizer sensor.
- * d  = Output Data space
+ * \brief Manager for the us reconstruction process.
  *
+ * Create a 3D volume based on a set of 2D images with 3D position.
+ *
+ * \todo The interface is large and fuzzy - tighten it.
+ *
+ * Used coordinate systems:
+ *  - u  = raw input Ultrasound frames (in x, y. Origin lower left.)
+ *  - t  = Tool space for probe as defined in ssc:Tool (z in ray direction, y to the left)
+ *  - s  = probe localizer Sensor.
+ *  - pr = Patient Reference localizer sensor.
+ *  - d  = Output Data space
+ *
+ * \ingroup sscUSReconstruction
+ *
+ * \author Ole Vegard Solberg
+ * \author Christian Askeland
+ * \date May 4, 2010
  */
 class Reconstructer: public QObject
 {
@@ -129,6 +161,9 @@ private:
 	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
 };
 
+/**
+ * \}
+ */
 
 }//namespace
 #endif //SSCRECONSTRUCTER_H_

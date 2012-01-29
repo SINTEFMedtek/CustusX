@@ -17,10 +17,16 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscReconstructedOutputVolumeParams.cpp
+namespace ssc
+{
+
+/** \defgroup sscUSReconstruction SSC US Reconstruction
+ *  \brief Framework and algorithms for Ultrasound 3D Reconstruction.
  *
- *  Created on: May 27, 2010
- *      Author: christiana
+ * \sa Reconstructer
+ * \ingroup sscGroup
+ *
  */
+
+} // namespace ssc
 
