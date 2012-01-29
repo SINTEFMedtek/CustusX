@@ -17,10 +17,24 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscReconstructedOutputVolumeParams.cpp
+namespace ssc
+{
+
+/** \defgroup sscThunder SSC Thunder
+ *  \brief GPU implementation of US 3D Reconstruction algorithms
  *
- *  Created on: May 27, 2010
- *      Author: christiana
+ *  \ingroup sscUSReconstruction
+ *
+ * Created by Holger X, student at NTNU Computer Science in 2010.
+ *
+ * Developed further by Sintef MedTek.
+ *
+ * \todo Give full credit to Holger by including his full name.
+ *
+ *
+ *
  */
+
+
+} // namespace ssc
 

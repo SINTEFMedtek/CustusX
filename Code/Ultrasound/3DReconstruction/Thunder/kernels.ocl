@@ -1,3 +1,22 @@
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
+
 //#define pixel_pos_c(a,i,c) (pixel_pos[(a)/(bscan_n/6)][((a)-(a)/(bscan_n/6)*(bscan_n/6))*3*mask_size + (i)*3 + (c)])
 #define pixel_pos_c(a,i,c) (pixel_pos[(a)/(bscan_n/5)][((a)-((a)/(bscan_n/5))*(bscan_n/6))*3*mask_size + (i)*3 + (c)])
 #define pos_matrices_a(n,x,y) (pos_matrices[(n)*12 + (y)*4 + (x)])
