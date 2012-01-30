@@ -1,9 +1,16 @@
-/*
- * cxDistanceMetric.cpp
- *
- *  Created on: Jul 4, 2011
- *      Author: christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
 #include <cxDistanceMetric.h>
 #include "sscBoundingBox3D.h"
@@ -14,21 +21,18 @@
 //TODO: this inclusion adds an unwanted dependency - must be solved.
 #include "sscDataManager.h"
 
-
 namespace cx
 {
 
 ssc::DataPtr DistanceMetricReader::load(const QString& uid, const QString& filename)
 {
-  return ssc::DataPtr(new DistanceMetric(uid,filename));
+	return ssc::DataPtr(new DistanceMetric(uid, filename));
 }
-
 
 DistanceMetric::DistanceMetric(const QString& uid, const QString& name) :
-		DataMetric(uid, name)
+				DataMetric(uid, name)
 {
 }
-
 
 DistanceMetric::~DistanceMetric()
 {
@@ -41,8 +45,8 @@ unsigned DistanceMetric::getArgumentCount() const
 
 void DistanceMetric::setArgument(int index, ssc::DataPtr p)
 {
-  if (mArgument[index]==p)
-    return;
+	if (mArgument[index] == p)
+		return;
 
 	if (mArgument[index])
 		disconnect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
@@ -52,7 +56,7 @@ void DistanceMetric::setArgument(int index, ssc::DataPtr p)
 	if (mArgument[index])
 		connect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
 
-  emit transformChanged();
+	emit transformChanged();
 }
 
 ssc::DataPtr DistanceMetric::getArgument(int index)
@@ -62,7 +66,7 @@ ssc::DataPtr DistanceMetric::getArgument(int index)
 
 bool DistanceMetric::validArgument(ssc::DataPtr p) const
 {
-	return p->getType()=="pointMetric" || p->getType()=="planeMetric";
+	return p->getType() == "pointMetric" || p->getType() == "planeMetric";
 }
 
 //void DistanceMetric::setPoint(int index, PointMetricPtr p)
@@ -88,26 +92,25 @@ bool DistanceMetric::validArgument(ssc::DataPtr p) const
 
 void DistanceMetric::addXml(QDomNode& dataNode)
 {
-  Data::addXml(dataNode);
+	Data::addXml(dataNode);
 
-  for (unsigned i=0; i<mArgument.size(); ++i)
-  {
-    if (mArgument[i])
-      dataNode.toElement().setAttribute(QString("p%1").arg(i), mArgument[i]->getUid());
-  }
+	for (unsigned i = 0; i < mArgument.size(); ++i)
+	{
+		if (mArgument[i])
+			dataNode.toElement().setAttribute(QString("p%1").arg(i), mArgument[i]->getUid());
+	}
 }
 
 void DistanceMetric::parseXml(QDomNode& dataNode)
 {
-  Data::parseXml(dataNode);
+	Data::parseXml(dataNode);
 
-  for (unsigned i=0; i<mArgument.size(); ++i)
-  {
-    QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
-    this->setArgument(i, ssc::dataManager()->getData(uid));
-  }
+	for (unsigned i = 0; i < mArgument.size(); ++i)
+	{
+		QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
+		this->setArgument(i, ssc::dataManager()->getData(uid));
+	}
 }
-
 
 std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 {
@@ -115,16 +118,16 @@ std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 		return std::vector<ssc::Vector3D>();
 //	PointMetricPtr pt = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(uid));
 	std::vector<ssc::Vector3D> retval(2);
-  // case   I: point-point
-  // case  II: point-plane
-  // case III: plane-plane (not implemented)
+	// case   I: point-point
+	// case  II: point-plane
+	// case III: plane-plane (not implemented)
 
-	if ((mArgument[0]->getType()=="pointMetric") && (mArgument[1]->getType()=="pointMetric"))
+	if ((mArgument[0]->getType() == "pointMetric") && (mArgument[1]->getType() == "pointMetric"))
 	{
 		retval[0] = boost::shared_dynamic_cast<PointMetric>(mArgument[0])->getRefCoord();
 		retval[1] = boost::shared_dynamic_cast<PointMetric>(mArgument[1])->getRefCoord();
 	}
-	else if ((mArgument[0]->getType()=="planeMetric") && (mArgument[1]->getType()=="pointMetric"))
+	else if ((mArgument[0]->getType() == "planeMetric") && (mArgument[1]->getType() == "pointMetric"))
 	{
 		Plane3D plane = boost::shared_dynamic_cast<PlaneMetric>(mArgument[0])->getRefPlane();
 		ssc::Vector3D p = boost::shared_dynamic_cast<PointMetric>(mArgument[1])->getRefCoord();
@@ -132,7 +135,7 @@ std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 		retval[0] = plane.projection(p);
 		retval[1] = p;
 	}
-	else if ((mArgument[0]->getType()=="pointMetric") && (mArgument[1]->getType()=="planeMetric"))
+	else if ((mArgument[0]->getType() == "pointMetric") && (mArgument[1]->getType() == "planeMetric"))
 	{
 		Plane3D plane = boost::shared_dynamic_cast<PlaneMetric>(mArgument[1])->getRefPlane();
 		ssc::Vector3D p = boost::shared_dynamic_cast<PointMetric>(mArgument[0])->getRefCoord();
@@ -160,11 +163,10 @@ std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 	return retval;
 }
 
-
 double DistanceMetric::getDistance() const
 {
 	std::vector<ssc::Vector3D> endpoints = this->getEndpoints();
-	if (endpoints.size()!=2)
+	if (endpoints.size() != 2)
 		return -1;
 
 	return (endpoints[1] - endpoints[0]).length();

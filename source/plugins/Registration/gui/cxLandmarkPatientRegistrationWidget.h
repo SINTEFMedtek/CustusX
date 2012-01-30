@@ -37,7 +37,7 @@ typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
  * \brief Widget used as a tab in the ContexDockWidget for patient registration.
  *
  * \date Feb 3, 2009
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class LandmarkPatientRegistrationWidget : public LandmarkRegistrationWidget
 {

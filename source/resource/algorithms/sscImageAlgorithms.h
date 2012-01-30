@@ -1,8 +1,8 @@
 /*
  * sscImageAlgorithms.h
  *
- *  Created on: Nov 11, 2010
- *      Author: christiana
+ *  \date Nov 11, 2010
+ *      \author christiana
  */
 
 #ifndef SSCIMAGEALGORITHMS_H_

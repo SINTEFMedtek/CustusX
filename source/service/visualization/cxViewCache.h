@@ -1,8 +1,22 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 /*
  * cxViewCache.h
  *
- *  Created on: Jul 29, 2010
- *      Author: christiana
+ *  \date Jul 29, 2010
+ *      \author christiana
  */
 
 #ifndef CXVIEWCACHE_H_
@@ -17,10 +31,10 @@
 namespace cx
 {
 /**
-* \file
-* \addtogroup cxServiceVisualization
-* @{
-*/
+ * \file
+ * \addtogroup cxServiceVisualization
+ * @{
+ */
 
 /**Cache for reuse of Views.
  * Use the retrieve*() method to get views that can be used
@@ -30,62 +44,63 @@ namespace cx
  * are free and ready for reuse.
  *
  */
-template <class VIEW_TYPE>
+template<class VIEW_TYPE>
 class ViewCache
 {
 public:
-  ViewCache(QWidget* widget, QString typeText) : mCentralWidget(widget), mNameGenerator(0), mTypeText(typeText)
-  {
-  }
-  /**Retrieve a view that is unique since the last call to clearUsedViews()
-   */
-  VIEW_TYPE* retrieveView()
-  {
+	ViewCache(QWidget* widget, QString typeText) :
+					mCentralWidget(widget), mNameGenerator(0), mTypeText(typeText)
+	{
+	}
+	/**Retrieve a view that is unique since the last call to clearUsedViews()
+	 */
+	VIEW_TYPE* retrieveView()
+	{
 //    mCached.clear();
-    if (mCached.empty())
-    {
-      QString uid = qstring_cast(mTypeText) + "-" + qstring_cast(mNameGenerator++);
-      VIEW_TYPE* view = new VIEW_TYPE(uid, uid, mCentralWidget);
-      view->setContextMenuPolicy(Qt::CustomContextMenu);
-      view->hide();
-      //Turn off rendering in vtkRenderWindowInteractor
-      view->getRenderWindow()->GetInteractor()->EnableRenderOff();
-      //Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
-      double rate = settings()->value("stillUpdateRate").value<double>();
-      view->getRenderWindow()->GetInteractor()->SetStillUpdateRate(rate);
-      mCached.push_back(view);
-    }
+		if (mCached.empty())
+		{
+			QString uid = qstring_cast(mTypeText) + "-" + qstring_cast(mNameGenerator++);
+			VIEW_TYPE* view = new VIEW_TYPE(uid, uid, mCentralWidget);
+			view->setContextMenuPolicy(Qt::CustomContextMenu);
+			view->hide();
+			//Turn off rendering in vtkRenderWindowInteractor
+			view->getRenderWindow()->GetInteractor()->EnableRenderOff();
+			//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
+			double rate = settings()->value("stillUpdateRate").value<double>();
+			view->getRenderWindow()->GetInteractor()->SetStillUpdateRate(rate);
+			mCached.push_back(view);
+		}
 
-    VIEW_TYPE* retval = mCached.back();
-    mCached.pop_back();
-    mUsed.push_back(retval);
-    return retval;
-  }
-  /**Reset the cache for new use.
-   * Remove all used views from the central widget and hide them.
-   */
-  void clearUsedViews()
-  {
-    for (unsigned i=0; i<mUsed.size(); ++i)
-    {
-      mUsed[i]->hide();
-      mCentralWidget->layout()->removeWidget(mUsed[i]);
-    }
+		VIEW_TYPE* retval = mCached.back();
+		mCached.pop_back();
+		mUsed.push_back(retval);
+		return retval;
+	}
+	/**Reset the cache for new use.
+	 * Remove all used views from the central widget and hide them.
+	 */
+	void clearUsedViews()
+	{
+		for (unsigned i = 0; i < mUsed.size(); ++i)
+		{
+			mUsed[i]->hide();
+			mCentralWidget->layout()->removeWidget(mUsed[i]);
+		}
 
-    std::copy(mUsed.begin(), mUsed.end(), back_inserter(mCached));
-    mUsed.clear();
-  }
+		std::copy(mUsed.begin(), mUsed.end(), back_inserter(mCached));
+		mUsed.clear();
+	}
 private:
-  QWidget* mCentralWidget;  ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
-  int mNameGenerator;
-  QString mTypeText;
-  std::vector<VIEW_TYPE*> mCached;
-  std::vector<VIEW_TYPE*> mUsed;
+	QWidget* mCentralWidget; ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
+	int mNameGenerator;
+	QString mTypeText;
+	std::vector<VIEW_TYPE*> mCached;
+	std::vector<VIEW_TYPE*> mUsed;
 };
 
 /**
-* @}
-*/
+ * @}
+ */
 } // namespace cx
 
 #endif /* CXVIEWCACHE_H_ */

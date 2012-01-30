@@ -13,7 +13,7 @@ namespace cx
  * \brief Abstract interface that combines and syncs a specific grabber and server.
  *
  * \date 2. des. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class GrabberServer : public QObject
 {

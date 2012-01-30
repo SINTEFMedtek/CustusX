@@ -3,8 +3,8 @@
  *
  *\brief
  *
- *  Created on: Apr 21, 2010
- *      Author: dev
+ *  \date Apr 21, 2010
+ *      \author dev
  */
 
 #ifndef CXLANDMARKREGISTRATIONWIDGET_H_

@@ -79,7 +79,6 @@ protected slots:
 
 	//tool menu
 	void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
-	void manualToolPhysicalPropertiesSlot();
 
 	// layout menu
 	void layoutChangedSlot();
@@ -102,6 +101,8 @@ protected slots:
 	//debug mode
 	void toggleDebugModeSlot(bool checked);
 
+	void startupLoadPatient();
+
 protected:
 	void changeEvent(QEvent * event);
 
@@ -115,10 +116,8 @@ private:
 	void addAsDockWidget(QWidget* widget, QString groupname = "");
 	void registerToolBar(QToolBar* toolbar, QString groupname = "");
 	void addToWidgetGroupMap(QAction* action, QString groupname);
-	void updateManualToolPhysicalProperties();
 
 	LayoutData executeLayoutEditorDialog(QString title, bool createNew);
-	void startupLoadPatient();
 
 	void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 
@@ -154,7 +153,6 @@ private:
 	QAction* mImportDataAction; ///< action for loading data into the datamanager
 	QAction* mDeleteDataAction; ///< action for deleting the current volume
 
-	QAction* mManualToolPhysicalProperties;
 	QAction* mConfigureToolsAction; ///< action for configuring the toolmanager
 	QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system
 	QAction* mTrackingToolsAction; ///< action for asking the navigation system to start/stop tracking

@@ -1,8 +1,8 @@
 /*
  * sscImageAlgorithms.cpp
  *
- *  Created on: Nov 11, 2010
- *      Author: christiana
+ *  \date Nov 11, 2010
+ *      \author christiana
  */
 #include "sscImageAlgorithms.h"
 

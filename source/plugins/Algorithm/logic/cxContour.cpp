@@ -17,7 +17,7 @@
 namespace cx
 {
 Contour::Contour() :
-    ThreadedTimedAlgorithm<vtkPolyDataPtr>("surface", 5)
+    ThreadedTimedAlgorithm<vtkPolyDataPtr>("surface", 20)
 {}
 
 Contour::~Contour()
@@ -63,7 +63,7 @@ void Contour::postProcessingSlot()
 
   ssc::messageManager()->sendSuccess("Created contour \"" + mOutput->getName()+"\"");
 
-  emit finished();
+//  emit finished();
 }
 
 vtkPolyDataPtr Contour::calculate()

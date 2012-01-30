@@ -83,8 +83,8 @@
 /*
  * cxPatientData.h
  *
- *  Created on: May 18, 2010
- *      Author: christiana
+ *  \date May 18, 2010
+ *      \author christiana
  */
 
 #ifndef CXPAT__IENTDATA_H_
