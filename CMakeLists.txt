@@ -163,16 +163,15 @@ endif(APPLE)
 #------------------------------------------------------------------------------
 add_subdirectory( externals )
 add_subdirectory( doc )
-add_subdirectory( modules/OpenIGTLinkServer )
 add_subdirectory( source )
 
 #------------------------------------------------------------------------------
 # Optional software
 #------------------------------------------------------------------------------
-#option(BUILD_US_ACQUISITION "build us acquisition module" OFF) #default is off
-#if(BUILD_US_ACQUISITION)
-#    add_subdirectory(modules/ultrasoundAcquisition)
-#endif(BUILD_US_ACQUISITION)
+option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" OFF) #default is off
+if(BUILD_OPEN_IGTLINK_SERVER)
+    add_subdirectory( modules/OpenIGTLinkServer )
+endif(BUILD_OPEN_IGTLINK_SERVER)
 
 option(BUILD_GRABBER_SERVER "build grabber server" OFF) #default is off
 if(BUILD_GRABBER_SERVER)
