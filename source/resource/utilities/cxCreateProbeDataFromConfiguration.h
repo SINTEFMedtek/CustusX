@@ -1,8 +1,8 @@
 /*
  * cxCreateProbeDataFromConfiguration.h
  *
- *  Created on: Nov 26, 2010
- *      Author: christiana
+ *  \date Nov 26, 2010
+ *      \author christiana
  */
 
 #ifndef CXCREATEPROBEDATAFROMCONFIGURATION_H_

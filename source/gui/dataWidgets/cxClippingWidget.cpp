@@ -1,8 +1,8 @@
 /*
  * cxClippingWidget.cpp
  *
- *  Created on: Aug 25, 2010
- *      Author: christiana
+ *  \date Aug 25, 2010
+ *      \author christiana
  */
 #include "cxClippingWidget.h"
 

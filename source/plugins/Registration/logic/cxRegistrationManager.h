@@ -28,7 +28,7 @@ typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
  * \brief This class manages (image- and patient-) registration specific details.
  *
  * \date Feb 4, 2009
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class RegistrationManager : public QObject
 {

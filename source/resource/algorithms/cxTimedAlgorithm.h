@@ -62,9 +62,12 @@ public:
   virtual ~TimedAlgorithm();
 
   virtual void generate() = 0;
+  QString getProduct() const { return mProduct; }
 
 signals:
-  void finished(); ///< should be emitted when at the end of postProcessingSlot
+	void started(int maxSteps); /// < emitted at start of run. \param maxSteps is an input to a QProgressBar, set to zero if unknown.
+	void finished(); ///< should be emitted when at the end of postProcessingSlot
+//	void progress();
 
 protected:
   void startTiming();
@@ -84,6 +87,7 @@ private:
   QDateTime mStartTime;
   QString   mProduct;
 };
+typedef boost::shared_ptr<class TimedAlgorithm> TimedAlgorithmPtr;
 
 /**
  * \brief Base class for algorithms that wants to thread and time their
@@ -97,8 +101,14 @@ template <class T>
 class ThreadedTimedAlgorithm : public TimedAlgorithm
 {
 public:
-  ThreadedTimedAlgorithm(QString product, int secondsBetweenAnnounce);
-  virtual ~ThreadedTimedAlgorithm();
+  ThreadedTimedAlgorithm(QString product, int secondsBetweenAnnounce) :
+	  TimedAlgorithm(product, secondsBetweenAnnounce)
+  {
+	  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
+	  connect(&mWatcher, SIGNAL(finished()), this, SLOT(postProcessingSlot()));
+	  connect(&mWatcher, SIGNAL(finished()), this, SIGNAL(finished()));
+  }
+  virtual ~ThreadedTimedAlgorithm() {}
 
 protected:
   virtual void postProcessingSlot() = 0; ///< This happens when the thread (calculate) is finished, here non-thread safe functions can be called
@@ -106,11 +116,25 @@ protected:
 protected:
   virtual T calculate() = 0; ///< This is the threaded function, should only contain threadsafe function calls
 
-  void generate(); ///< Call generate to execute the algorithm
-  T getResult(); ///< This gets the result calculated in calculate, should only be used after calculate is finished
+  void generate() ///< Call generate to execute the algorithm
+  {
+	  TimedAlgorithm::startTiming();
+	  emit started(0); // TODO move to started signal from qtconcurrent??
+
+	  mFutureResult = QtConcurrent::run(this, &ThreadedTimedAlgorithm<T>::calculate);
+	  mWatcher.setFuture(mFutureResult);
+  }
+  T getResult() ///< This gets the result calculated in calculate, should only be used after calculate is finished
+  {
+	  T result = mWatcher.future().result();
+	  return result;
+  }
 
 private:
-  void finishedSlot();
+  void finishedSlot()
+  {
+	  TimedAlgorithm::stopTiming();
+  }
 
   QFuture<T> mFutureResult;
   QFutureWatcher<T> mWatcher;

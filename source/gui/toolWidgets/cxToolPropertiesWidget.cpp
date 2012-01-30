@@ -157,7 +157,7 @@ void ToolPropertiesWidget::dominantToolChangedSlot()
 
   mActiveTool = ssc::toolManager()->getDominantTool();
 
-  if(mActiveTool && mActiveTool->getType() == ssc::Tool::TOOL_US_PROBE)
+  if(mActiveTool && mActiveTool->isProbe())
   {
     mUSSectorConfigBox->show();
     mToptopLayout->update();

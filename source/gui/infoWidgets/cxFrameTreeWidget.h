@@ -22,7 +22,7 @@ namespace cx
  * \ingroup cxGUI
  *
  *\date Sep 23, 2010
- *\author: Christian Askeland, SINTEF
+ *\\author Christian Askeland, SINTEF
  */
 class FrameTreeWidget : public BaseWidget
 {

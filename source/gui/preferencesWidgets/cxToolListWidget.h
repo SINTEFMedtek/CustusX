@@ -15,6 +15,8 @@ namespace cx
  * \brief Class for displaying tool files that can be dragged and dropped
  * \ingroup cxGUI
  *
+ * Superclass, not used directly.
+ *
  * \date Mar 30, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -44,6 +46,14 @@ private slots:
 
 //---------------------------------------------------------------------------------------------------------------------
 
+/**
+ * \brief Helper class for tool list display
+ *
+ * Helper class.
+ *
+ * Used inside ToolFilterGroupBox.
+ *
+ */
 class FilteringToolListWidget : public ToolListWidget
 {
   Q_OBJECT
@@ -68,6 +78,14 @@ private:
 
 //---------------------------------------------------------------------------------------------------------------------
 
+/**
+ * \brief Helper class for tool config list display
+ *
+ * Helper class.
+ *
+ * Used inside ToolConfigureGroupBox.
+ *
+ */
 class ConfigToolListWidget : public ToolListWidget
 {
   Q_OBJECT

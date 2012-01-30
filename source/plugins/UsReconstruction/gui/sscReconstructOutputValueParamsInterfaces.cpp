@@ -1,8 +1,8 @@
 /*
  * sscReconstructOutputValueParamsInterfaces.cpp
  *
- *  Created on: May 27, 2010
- *      Author: christiana
+ *  \date May 27, 2010
+ *      \author christiana
  */
 
 #include "sscReconstructOutputValueParamsInterfaces.h"

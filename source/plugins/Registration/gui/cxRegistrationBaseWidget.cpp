@@ -1,8 +1,8 @@
 /*
  * cxRegistrationBaseWidget.cpp
  *
- *  Created on: Jun 16, 2011
- *      Author: christiana
+ *  \date Jun 16, 2011
+ *      \author christiana
  */
 
 #include "cxRegistrationBaseWidget.h"

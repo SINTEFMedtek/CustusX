@@ -1,8 +1,8 @@
 /*
  * cxAffineMatrixWidget.h
  *
- *  Created on: Mar 19, 2011
- *      Author: christiana
+ *  \date Mar 19, 2011
+ *      \author christiana
  */
 
 #ifndef CXTRANSFORM3DWIDGET_H_

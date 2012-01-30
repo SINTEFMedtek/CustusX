@@ -118,7 +118,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	else
 		this->show();
 
-	this->startupLoadPatient();
+	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 	this->toggleDebugModeSlot(mDebugModeAction->isChecked());
 }
 
@@ -140,12 +140,12 @@ void MainWindow::startupLoadPatient()
 	int doLoad = QApplication::arguments().indexOf("--load");
 	if (doLoad < 0)
 		return;
-	std::cout << "!!!!!!!!!!!!!! load " << doLoad << std::endl;
+//	std::cout << "!!!!!!!!!!!!!! load " << doLoad << std::endl;
 	if (doLoad + 1 >= QApplication::arguments().size())
 		return;
 
 	QString folder = QApplication::arguments()[doLoad + 1];
-	std::cout << "load " << folder << std::endl;
+	ssc::messageManager()->sendInfo("Startup Load patient: " + folder);
 	patientService()->getPatientData()->loadPatient(folder);
 }
 
@@ -353,12 +353,7 @@ void MainWindow::createActions()
 	mTrackingToolsAction->setShortcut(tr("Ctrl+T"));
 	mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
-	mManualToolPhysicalProperties = new QAction(tr("Debug manual tool"), mToolsActionGroup);
-	mManualToolPhysicalProperties->setToolTip("give manual tool the properties of the first physical tool");
-	mManualToolPhysicalProperties->setCheckable(true);
 	mToolsActionGroup->setExclusive(false); // must turn off to get the checkbox independent.
-	connect(mManualToolPhysicalProperties, SIGNAL(triggered()), this, SLOT(manualToolPhysicalPropertiesSlot()));
-	this->updateManualToolPhysicalProperties();
 
 	mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
 	mStartStreamingAction->setShortcut(tr("Ctrl+V"));
@@ -456,15 +451,6 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 	ssc::messageManager()->playScreenShotSound();
 }
 
-void MainWindow::manualToolPhysicalPropertiesSlot()
-{
-	settings()->setValue("giveManualToolPhysicalProperties", mManualToolPhysicalProperties->isChecked());
-}
-void MainWindow::updateManualToolPhysicalProperties()
-{
-	bool set = settings()->value("giveManualToolPhysicalProperties").toBool();
-	mManualToolPhysicalProperties->setChecked(set);
-}
 
 void MainWindow::toggleStreamingSlot()
 {
@@ -846,7 +832,6 @@ void MainWindow::createMenus()
 	mToolMenu->addSeparator();
 	mToolMenu->addAction(mStartStreamingAction);
 	mToolMenu->addSeparator();
-	mToolMenu->addAction(mManualToolPhysicalProperties);
 
 	//layout
 	this->menuBar()->addMenu(mLayoutMenu);
