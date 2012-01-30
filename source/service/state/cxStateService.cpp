@@ -230,7 +230,7 @@ QString StateService::getDefaultGrabberServer()
 	return result;
 	return "";
 #elif WIN32
-	return "" // TODO fill in something here...
+	return ""; // TODO fill in something here...
 #else
 	QString result;
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "runOpenIGTLinkServer.sh", "");
