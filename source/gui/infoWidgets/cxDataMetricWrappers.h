@@ -1,8 +1,8 @@
 /*
  * cxDataMetricWrappers.h
  *
- *  Created on: Jul 29, 2011
- *      Author: christiana
+ *  \date Jul 29, 2011
+ *      \author christiana
  */
 
 #ifndef CXDATAMETRICWRAPPERS_H_

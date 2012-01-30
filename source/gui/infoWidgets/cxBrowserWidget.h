@@ -71,7 +71,7 @@ private:
  * \ingroup cxGUI
  *
  * \date Feb 11, 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class BrowserWidget : public BaseWidget
 {

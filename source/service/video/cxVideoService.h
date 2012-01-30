@@ -1,8 +1,22 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 /*
  * cxVideoService.h
  *
- *  Created on: May 31, 2011
- *      Author: christiana
+ *  \date May 31, 2011
+ *      \author christiana
  */
 
 #ifndef CXVIDEOSERVICE_H_
@@ -15,10 +29,10 @@
 namespace cx
 {
 /**
-* \file
-* \addtogroup cxServiceVideo
-* @{
-*/
+ * \file
+ * \addtogroup cxServiceVideo
+ * @{
+ */
 
 /**
  * \brief Provides access to all video sources in the
@@ -59,35 +73,35 @@ namespace cx
  *
  *
  */
-class VideoService : public QObject
+class VideoService: public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-  static VideoService* getInstance();
+	static VideoService* getInstance();
 
-  static void initialize();
-  static void shutdown();
+	static void initialize();
+	static void shutdown();
 
-  VideoConnectionPtr getVideoConnection();
+	VideoConnectionPtr getVideoConnection();
 
 private:
-  static VideoService* mInstance;
-  static void setInstance(VideoService* instance);
+	static VideoService* mInstance;
+	static void setInstance(VideoService* instance);
 
-  VideoService();
+	VideoService();
 	virtual ~VideoService();
 
 	VideoService(VideoService const&); // not implemented
 	VideoService& operator=(VideoService const&); // not implemented
 
-  VideoConnectionPtr mIGTLinkConnection;
+	VideoConnectionPtr mIGTLinkConnection;
 };
 
 VideoService* videoService();
 
 /**
-* @}
-*/
+ * @}
+ */
 }
 
 #endif /* CXVIDEOSERVICE_H_ */

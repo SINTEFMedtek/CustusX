@@ -41,7 +41,7 @@ void Resample::postProcessingSlot()
 
   ssc::messageManager()->sendSuccess("Done resampling: \"" + mOutput->getName()+"\"");
 
-  emit finished();
+//  emit finished();
 }
 
 /** Crop the image to the bounding box bb_q.

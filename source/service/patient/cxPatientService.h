@@ -1,9 +1,16 @@
-/*
- * cxPatientService.h
- *
- *  Created on: Jun 14, 2011
- *      Author: christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
 #ifndef CXPATIENTSERVICE_H_
 #define CXPATIENTSERVICE_H_
@@ -15,10 +22,10 @@
 namespace cx
 {
 /**
-* \file
-* \addtogroup cxServicePatient
-* @{
-*/
+ * \file
+ * \addtogroup cxServicePatient
+ * @{
+ */
 
 typedef boost::shared_ptr<class PatientData> PatientDataPtr;
 
@@ -33,39 +40,43 @@ typedef boost::shared_ptr<class PatientData> PatientDataPtr;
  *
  *   At least, this is the goal. Just now, it holds the old
  *   PatientData object, which manages save/load session/patient.
+ *
+ *  \date Jun 14, 2011
+ *  \author christiana
+ *
  */
-class PatientService : public QObject
+class PatientService: public QObject
 {
-	Q_OBJECT
+Q_OBJECT
 public:
-  static PatientService* getInstance();
+	static PatientService* getInstance();
 
-  static void initialize();
-  static void shutdown();
+	static void initialize();
+	static void shutdown();
 
-  PatientDataPtr getPatientData();
-  ThresholdPreviewPtr getThresholdPreview(); ///< Get the ThresholdPreview object
+	PatientDataPtr getPatientData();
+	ThresholdPreviewPtr getThresholdPreview(); ///< Get the ThresholdPreview object
 
 private:
-  static PatientService* mInstance;
-  static void setInstance(PatientService* instance);
+	static PatientService* mInstance;
+	static void setInstance(PatientService* instance);
 
-  PatientService();
+	PatientService();
 	virtual ~PatientService();
 
 	PatientService(PatientService const&); // not implemented
 	PatientService& operator=(PatientService const&); // not implemented
 
-  PatientDataPtr mPatientData;
+	PatientDataPtr mPatientData;
 
-  ThresholdPreviewPtr mThresholdPreview; ///< Preview a volume with a selected threshold
+	ThresholdPreviewPtr mThresholdPreview; ///< Preview a volume with a selected threshold
 };
 
 PatientService* patientService();
 
 /**
-* @}
-*/
+ * @}
+ */
 }
 
 #endif /* CXPATIENTSERVICE_H_ */

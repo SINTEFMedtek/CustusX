@@ -4,7 +4,7 @@
   Module:    $RCSfile: vtkUltrasoundWin32Header.h,v $
   Creator:   David Gobbi <dgobbi@atamai.com>
   Language:  C++
-  Author:    $Author: dgobbi $
+  \author    $\author dgobbi $
   Date:      $Date: 2005/07/01 22:52:05 $
   Version:   $Revision: 1.2 $
 

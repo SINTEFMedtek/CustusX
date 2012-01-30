@@ -19,7 +19,7 @@ namespace cx
  * \brief A grabber that only works on Windows because it uses Ulterius.
  *
  * \date 06. jun. 2011
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class WinGrabber : public Grabber
 {

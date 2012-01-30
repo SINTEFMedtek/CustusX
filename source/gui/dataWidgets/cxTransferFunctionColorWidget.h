@@ -18,7 +18,7 @@ namespace cx
  * \ingroup cxGUI
  *
  * \date Apr 01, 2009
- * \author: Ole Vegard Solberg, SINTEF
+ * \\author Ole Vegard Solberg, SINTEF
  */
 class TransferFunctionColorWidget : public BaseWidget
 {
