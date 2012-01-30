@@ -1,8 +1,8 @@
 /*
  * cxImageSenderFile.cpp
  *
- *  Created on: Jun 21, 2011
- *      Author: christiana
+ *  \date Jun 21, 2011
+ *      \author christiana
  */
 
 #include "cxImageSenderFile.h"

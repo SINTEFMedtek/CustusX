@@ -1,8 +1,8 @@
 /*
  * cxDataLocations.cpp
  *
- *  Created on: Jun 22, 2010
- *      Author: christiana
+ *  \date Jun 22, 2010
+ *      \author christiana
  */
 #include "cxDataLocations.h"
 

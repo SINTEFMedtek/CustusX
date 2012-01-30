@@ -1,8 +1,8 @@
 /*
  * cxUsReconstructionFileReader.cpp
  *
- *  Created on: Feb 3, 2011
- *      Author: christiana
+ *  \date Feb 3, 2011
+ *      \author christiana
  */
 #include "cxUsReconstructionFileReader.h"
 
@@ -81,6 +81,12 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   if (!this->readMaskFile(fileName, retval.mMask))
   {
   	retval.mMask = this->createMaskFromConfigParams(retval);
+  }
+
+  if (!retval.mFrames.empty())
+  {
+	  double msecs = (retval.mFrames.rbegin()->mTime - retval.mFrames.begin()->mTime);
+	  ssc::messageManager()->sendInfo(QString("Read %1 seconds of us data from %2.").arg(msecs/1000, 0, 'g', 3).arg(fileName));
   }
 
   return retval;

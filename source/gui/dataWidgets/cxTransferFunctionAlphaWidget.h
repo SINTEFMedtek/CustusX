@@ -18,8 +18,8 @@ namespace cx
  * \ingroup cxGUI
  *
  * \date Mar 23, 2009
- * \author: Janne Beate Bakeng, SINTEF
- * \author: Ole Vegard Solberg, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
+ * \\author Ole Vegard Solberg, SINTEF
  */
 class TransferFunctionAlphaWidget : public BaseWidget
 {    

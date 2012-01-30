@@ -17,8 +17,8 @@ namespace cx
  * \brief A thread for running the server.
  *
  * \date 26. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
- * \author: Christian Askeland, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class OpenIGTLinkSession : public QThread
 {
@@ -49,8 +49,8 @@ private:
  * of a qthread.
  *
  * \date 26. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
- * \author: Christian Askeland, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class OpenIGTLinkSender : public QObject
 {

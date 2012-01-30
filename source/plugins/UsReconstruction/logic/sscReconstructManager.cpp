@@ -1,8 +1,8 @@
 /*
  * sscReconstructManager.cpp
  *
- *  Created on: Oct 4, 2011
- *      Author: christiana
+ *  \date Oct 4, 2011
+ *      \author christiana
  */
 
 #include <sscReconstructManager.h>
@@ -148,8 +148,6 @@ void ReconstructManager::selectData(QString filename, QString calFilesPath)
 	this->clearAll();
 	this->readCoreFiles(filename, calFilesPath);
 	mReconstructer->setInputData(mOriginalFileData);
-
-//	emit inputDataSelected(filename);
 }
 
 /**Read from file into mOriginalFileData.
@@ -175,18 +173,31 @@ void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 //---------------------------------------------------------
 
 
-ThreadedReconstructer::ThreadedReconstructer(ReconstructManagerPtr reconstructer)
+ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructManagerPtr reconstructer) :
+	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
 {
 	mReconstructer = reconstructer;
-	mReconstructer->getReconstructer()->threadedPreReconstruct();
-	connect(this, SIGNAL(finished()), this, SLOT(postReconstructionSlot())); // ensure this slot is run before all other listeners.
 }
-void ThreadedReconstructer::run()
+
+ThreadedTimedReconstructer::~ThreadedTimedReconstructer()
 {
-	mReconstructer->getReconstructer()->threadedReconstruct();
 }
-void ThreadedReconstructer::postReconstructionSlot()
+
+void ThreadedTimedReconstructer::start()
+{
+	mReconstructer->getReconstructer()->threadedPreReconstruct();
+	this->generate();
+}
+
+void ThreadedTimedReconstructer::postProcessingSlot()
 {
 	mReconstructer->getReconstructer()->threadedPostReconstruct();
 }
+
+void ThreadedTimedReconstructer::calculate()
+{
+	mReconstructer->getReconstructer()->threadedReconstruct();
+}
+
+
 }

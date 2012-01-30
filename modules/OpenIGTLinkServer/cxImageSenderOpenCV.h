@@ -1,8 +1,8 @@
 /*
  * cxImageSenderOpenCV.h
  *
- *  Created on: Jun 21, 2011
- *      Author: christiana
+ *  \date Jun 21, 2011
+ *      \author christiana
  */
 
 #ifndef CXIMAGESENDEROPENCV_H_

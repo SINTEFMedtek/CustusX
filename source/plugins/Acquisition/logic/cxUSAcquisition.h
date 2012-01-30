@@ -1,8 +1,8 @@
 /*
  * cxUSAcquisition.h
  *
- *  Created on: May 12, 2011
- *      Author: christiana
+ *  \date May 12, 2011
+ *      \author christiana
  */
 
 #ifndef CXUSACQUISITION_H_

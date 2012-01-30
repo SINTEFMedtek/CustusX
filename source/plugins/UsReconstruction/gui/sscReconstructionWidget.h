@@ -8,6 +8,11 @@
 #include "sscLabeledComboBoxWidget.h"
 #include "sscFileSelectWidget.h"
 
+namespace cx
+{
+class TimedAlgorithmProgressBar;
+}
+
 namespace ssc
 {
 /**
@@ -40,9 +45,11 @@ public slots:
 private slots:
 	void inputDataSelected(QString mhdFileName);
 	void repopulateAlgorithmGroup();
+	void reconstructFinishedSlot();
 
 private:
 	ReconstructManagerPtr mReconstructer;
+	ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
 
 	FileSelectWidget* mFileSelectWidget;
 	QPushButton* mReconstructButton;
@@ -54,6 +61,7 @@ private:
 	ssc::SpinBoxGroupWidget* mDimXWidget;
 	ssc::SpinBoxGroupWidget* mDimYWidget;
 	ssc::SpinBoxGroupWidget* mDimZWidget;
+	cx::TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
 	QGroupBox* mAlgorithmGroup;
 	QStackedLayout* mAlgoLayout;

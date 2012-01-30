@@ -1,8 +1,8 @@
 /*
  * cxColorSelectButton.cpp
  *
- *  Created on: May 2, 2011
- *      Author: christiana
+ *  \date May 2, 2011
+ *      \author christiana
  */
 
 #include <cxColorSelectButton.h>
