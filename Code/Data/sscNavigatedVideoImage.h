@@ -25,6 +25,14 @@
 namespace ssc
 {
 
+/**
+ * \brief ssc::Image subclass for live updated 2D images tied to a tool
+ *
+ * This class can be used to wrap a ssc::VideoSource in an ssc::Image
+ * that can be used in 2D views to combine the video source with
+ * slices of other images. This image is allways registered in a
+ * particular way to a tool specified using a ssc::SliceProxy.
+ */
 class NavigatedVideoImage: public ssc::Image
 {
 	Q_OBJECT;
