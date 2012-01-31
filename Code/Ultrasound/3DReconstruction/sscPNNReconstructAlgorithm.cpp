@@ -124,7 +124,8 @@ void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
 						* outputDims[1];
 					int inputIndex = beam + sample * inputDims[0];
 					//+ record*inputDims[0]*inputDims[1];//get new pointer for each record
-					outputPointer[outputIndex] = inputPointer[inputIndex];
+//					outputPointer[outputIndex] = inputPointer[inputIndex];
+					outputPointer[outputIndex] = std::max<unsigned char>(inputPointer[inputIndex], 1); //  // set minimum intensity value to 1. This separates "zero intensity" from "no intensity".
 				}//validVoxel
 
 			}//sample
@@ -207,7 +208,15 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, ImagePtr outputDat
 					if (count > 0)
 					{
 						interpolated = true;
-						outputPointer[outputIndex] = static_cast<int> ((tempVal / count) + 0.5);
+						if (tempVal == 0)
+						{
+							// keep noneness of index
+						}
+						else
+						{
+							outputPointer[outputIndex] = static_cast<int> ((tempVal / count) + 0.5);
+							outputPointer[outputIndex] = std::max<unsigned char>(1, outputPointer[outputIndex]);
+						}
 					}
 					localArea++;
 				} while (localArea <= interpolationSteps && !interpolated);
