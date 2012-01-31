@@ -41,6 +41,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscImageLUT2D.h
     Data/sscImageTFData.h
     Data/sscDataManager.h
+	Data/sscNavigatedVideoImage.h
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
@@ -288,6 +289,8 @@ SET( SSC_SOURCE_FILES
     Data/sscImageLUT2D.h
     Data/sscImageTFData.cpp
     Data/sscImageTFData.h
+	Data/sscNavigatedVideoImage.cpp
+	Data/sscNavigatedVideoImage.h
     Data/sscGPUImageBuffer.cpp
     Data/sscGPUImageBuffer.h
     Data/sscMesh.h

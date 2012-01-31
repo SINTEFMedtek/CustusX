@@ -20,6 +20,7 @@ typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
 typedef boost::shared_ptr<class DummyTool> DummyToolPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class NavigatedVideoImage> NavigatedVideoImagePtr;
 typedef boost::shared_ptr<class Data> DataPtr;
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
