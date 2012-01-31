@@ -63,7 +63,7 @@ Transform3D NavigatedVideoImage::get_rMd() const
 }
 
 /**
- * Computes the largest zoom factor that will still fit the entire
+ * \brief Compute the largest zoom factor that will still fit the entire
  * video image in the given viewport
  */
 double NavigatedVideoImage::computeFullViewZoomFactor(DoubleBoundingBox3D viewport) const
