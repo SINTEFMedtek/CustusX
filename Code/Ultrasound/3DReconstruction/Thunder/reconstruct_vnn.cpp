@@ -32,6 +32,13 @@
 
 #include <vtkImageData.h>
 
+/**Generate a triplet of points for each frame.
+ * The triplet is (lower left corner, lower right corner, upper left corner)
+ * alternatively < (0,0) (1,0) (0,1) >
+ *
+ * The points are given in output volume space.
+ *
+ */
 float3* generate_plane_points(double* pos_matrices, int bscan_w, int bscan_h, int bscan_n, double bscan_spacing_x,
 	double bscan_spacing_y)
 {
@@ -112,6 +119,10 @@ float3* generate_plane_points(double* pos_matrices, int bscan_w, int bscan_h, in
 	return plane_points;
 }
 
+/**Generate plane equations describing the planes defined by plane_points,
+ * which is the output of generate_plane_points().
+ *
+ */
 plane_eq* generate_plane_equations(float3* plane_points, int bscan_n)
 {
 	plane_eq * bscan_plane_equations = (plane_eq *) malloc(sizeof(plane_eq) * bscan_n);
