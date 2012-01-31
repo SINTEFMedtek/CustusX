@@ -168,7 +168,11 @@ add_subdirectory( source )
 #------------------------------------------------------------------------------
 # Optional software
 #------------------------------------------------------------------------------
-option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" OFF) #default is off
+if (LINUX)
+    option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" ON) #default is on for linux
+else (LINUX)
+    option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" OFF) #default is off for others
+endif (LINUX)
 if(BUILD_OPEN_IGTLINK_SERVER)
     add_subdirectory( modules/OpenIGTLinkServer )
 endif(BUILD_OPEN_IGTLINK_SERVER)
