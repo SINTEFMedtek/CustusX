@@ -178,23 +178,6 @@ bool MacGrabber::isGrabbing()
 
 bool MacGrabber::findConnectedDevice()
 {
-  /*
-  //read supported grabbers file
-  NSError *fileError = nil;
-  NSString* fileName = @"Supported.rtf";
-  NSString *fileString = [NSString stringWithContentsOfFile:fileName encoding:NSUTF8StringEncoding error:&fileError]; // reads file into memory as an NSString
-  NSArray *lines = [fileString componentsSeparatedByString:@"\n"]; // each line, adjust character for line endings
-
-  NSEnumerator *stringEnumerator = [lines objectEnumerator];
-  NSString* aSupportedGrabber;
-
-  while (aSupportedGrabber = [stringEnumerator nextObject])
-  {
-    std::string grabberString = std::string([aSupportedGrabber UTF8String]);
-    ssc::messageManager()->sendInfo(qstring_cast(grabberString));
-  }
-  */
-
   bool found = false;
   
   //find which grabber is connected to the system
@@ -230,57 +213,6 @@ bool MacGrabber::findConnectedDevice()
     }
   }
   
-  /*
-  NSEnumerator *enumerator = [devices objectEnumerator];
-  QTCaptureDevice* captureDevice;
-
-  while((captureDevice = [enumerator nextObject])) {
-      NSString* grabberName = [captureDevice localizedDisplayName];
-      this->reportString(grabberName);
-      
-      NSComparisonResult compareResult;
-      
-      //buildt in apple i-sight camera
-      compareResult = [grabberName localizedCompare:@"Built-in iSight"];
-      if (compareResult == NSOrderedSame)
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-      }
-
-      //new VGA grabber (Epiphan)
-      compareResult = [grabberName localizedCompare:@"D4U24488"];
-      if (compareResult == NSOrderedSame)
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-      }
-      //even newer VGA grabber (Epiphan)
-      compareResult = [grabberName localizedCompare:@"D4U24942"];
-      if (compareResult == NSOrderedSame)
-      {
-		  mObjectiveC->mSelectedDevice = captureDevice;
-		  found = true;
-      }
-      
-      //old VGA grabber (Epiphan)
-      compareResult = [grabberName localizedCompare:@"V2U10443"];
-      if (compareResult == NSOrderedSame)
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-      }
-      
-      //S-VHS grabber
-      compareResult = [grabberName localizedCompare:@"S-VHS"];
-      if (compareResult == NSOrderedSame) 
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-        mSuperVideo = true;
-      }
-  }
-  */
   return found;
 }
 
