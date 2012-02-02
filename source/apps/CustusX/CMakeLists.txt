@@ -161,7 +161,7 @@ if(APPLE)
   install(FILES ${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf 
       DESTINATION ${CX_INSTALL_ROOT_DIR}/doc
       )
-  install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/GrapperServer.app 
+  install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/GrabberServer.app 
       DESTINATION ${CX_INSTALL_ROOT_DIR}
       #COMPONENT CustusX
       USE_SOURCE_PERMISSIONS
