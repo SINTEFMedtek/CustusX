@@ -6,6 +6,8 @@
 
 int main(int argc, char **argv)
 {
+  ssc::MessageManager::initialize();
+
   typedef ssc::Message Message;
   qRegisterMetaType<Message>("Message");
 
