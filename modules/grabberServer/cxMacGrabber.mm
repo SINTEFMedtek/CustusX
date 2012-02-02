@@ -178,6 +178,23 @@ bool MacGrabber::isGrabbing()
 
 bool MacGrabber::findConnectedDevice()
 {
+  /*
+  //read supported grabbers file
+  NSError *fileError = nil;
+  NSString* fileName = @"Supported.rtf";
+  NSString *fileString = [NSString stringWithContentsOfFile:fileName encoding:NSUTF8StringEncoding error:&fileError]; // reads file into memory as an NSString
+  NSArray *lines = [fileString componentsSeparatedByString:@"\n"]; // each line, adjust character for line endings
+
+  NSEnumerator *stringEnumerator = [lines objectEnumerator];
+  NSString* aSupportedGrabber;
+
+  while (aSupportedGrabber = [stringEnumerator nextObject])
+  {
+    std::string grabberString = std::string([aSupportedGrabber UTF8String]);
+    ssc::messageManager()->sendInfo(qstring_cast(grabberString));
+  }
+  */
+
   bool found = false;
   
   //find which grabber is connected to the system
@@ -185,12 +202,38 @@ bool MacGrabber::findConnectedDevice()
   int i = [devices count];
   ssc::messageManager()->sendInfo("Number of connected grabber devices: "+qstring_cast(i));
   
-  if([devices count] == 0)
-    return found;
-  
   NSEnumerator *enumerator = [devices objectEnumerator];
   QTCaptureDevice* captureDevice;
+  NSUInteger numberOfDevices = [devices count];
+  if(numberOfDevices == 0)
+    return found;
+  else if(numberOfDevices == 1)
+  {
+    captureDevice = [enumerator nextObject];
+    NSString* grabberName = [captureDevice localizedDisplayName];
+    this->reportString(grabberName);
+    mObjectiveC->mSelectedDevice = captureDevice;
+    found = true;
+  } else {
+    //if more than one grabber connected, select one that is not Built-in iSight
+    while((captureDevice = [enumerator nextObject])) {
+        NSString* grabberName = [captureDevice localizedDisplayName];
+        this->reportString(grabberName);
+
+        NSComparisonResult compareResult = [grabberName localizedCompare:@"Built-in iSight"];
+        if (compareResult != NSOrderedSame)
+        {
+          mObjectiveC->mSelectedDevice = captureDevice;
+          found = true;
+          break;
+        }
+    }
+  }
   
+  /*
+  NSEnumerator *enumerator = [devices objectEnumerator];
+  QTCaptureDevice* captureDevice;
+
   while((captureDevice = [enumerator nextObject])) {
       NSString* grabberName = [captureDevice localizedDisplayName];
       this->reportString(grabberName);
@@ -237,6 +280,7 @@ bool MacGrabber::findConnectedDevice()
         mSuperVideo = true;
       }
   }
+  */
   return found;
 }
 
