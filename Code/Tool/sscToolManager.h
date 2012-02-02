@@ -73,7 +73,7 @@ public:
 	virtual ToolMapPtr getInitializedTools() = 0; ///< get all initialized tools
 	virtual ToolMapPtr getTools() = 0; ///< get configured and initialized tools
 	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
-	virtual void setTooltipOffset(double offset) {}; ///< set the tool tip offset
+	virtual void setTooltipOffset(double) {}; ///< set the tool tip offset
 	virtual double getTooltipOffset() const {return 0.0;}; ///< get the tool tip offset
 
 	virtual ToolPtr getDominantTool() = 0; ///< get the tool that has higest priority when tracking
