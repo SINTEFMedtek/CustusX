@@ -185,58 +185,34 @@ bool MacGrabber::findConnectedDevice()
   int i = [devices count];
   ssc::messageManager()->sendInfo("Number of connected grabber devices: "+qstring_cast(i));
   
-  if([devices count] == 0)
-    return found;
-  
   NSEnumerator *enumerator = [devices objectEnumerator];
   QTCaptureDevice* captureDevice;
-  
-  while((captureDevice = [enumerator nextObject])) {
-      NSString* grabberName = [captureDevice localizedDisplayName];
-      this->reportString(grabberName);
-      
-      NSComparisonResult compareResult;
-      
-      //buildt in apple i-sight camera
-      compareResult = [grabberName localizedCompare:@"Built-in iSight"];
-      if (compareResult == NSOrderedSame)
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-      }
+  NSUInteger numberOfDevices = [devices count];
+  if(numberOfDevices == 0)
+    return found;
+  else if(numberOfDevices == 1)
+  {
+    captureDevice = [enumerator nextObject];
+    NSString* grabberName = [captureDevice localizedDisplayName];
+    this->reportString(grabberName);
+    mObjectiveC->mSelectedDevice = captureDevice;
+    found = true;
+  } else {
+    //if more than one grabber connected, select one that is not Built-in iSight
+    while((captureDevice = [enumerator nextObject])) {
+        NSString* grabberName = [captureDevice localizedDisplayName];
+        this->reportString(grabberName);
 
-      //new VGA grabber (Epiphan)
-      compareResult = [grabberName localizedCompare:@"D4U24488"];
-      if (compareResult == NSOrderedSame)
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-      }
-      //even newer VGA grabber (Epiphan)
-      compareResult = [grabberName localizedCompare:@"D4U24942"];
-      if (compareResult == NSOrderedSame)
-      {
-		  mObjectiveC->mSelectedDevice = captureDevice;
-		  found = true;
-      }
-      
-      //old VGA grabber (Epiphan)
-      compareResult = [grabberName localizedCompare:@"V2U10443"];
-      if (compareResult == NSOrderedSame)
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-      }
-      
-      //S-VHS grabber
-      compareResult = [grabberName localizedCompare:@"S-VHS"];
-      if (compareResult == NSOrderedSame) 
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-        mSuperVideo = true;
-      }
+        NSComparisonResult compareResult = [grabberName localizedCompare:@"Built-in iSight"];
+        if (compareResult != NSOrderedSame)
+        {
+          mObjectiveC->mSelectedDevice = captureDevice;
+          found = true;
+          break;
+        }
+    }
   }
+  
   return found;
 }
 
