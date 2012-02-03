@@ -2,7 +2,8 @@
 <xsl:output method="xml" indent="yes"/>
 
 	<xsl:template match="/Site">
-		<testsuite>
+		<testsuite name="Test Suite">
+			<xsl:attribute name="tests"><xsl:value-of select="count(Testing/Test)"/></xsl:attribute>
 			<xsl:variable name="BuildName"><xsl:value-of select="@BuildName"/></xsl:variable>
 			<xsl:variable name="BuildStamp"><xsl:value-of select="@BuildStamp"/></xsl:variable>
 			<xsl:variable name="Name"><xsl:value-of select="@Name"/></xsl:variable>
