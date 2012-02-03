@@ -14,9 +14,14 @@
 #set -x
 USER=`whoami`
 
-echo "Running install script..."
+echo "===== Installing sudo... ====="
 echo "Commands are run with sudo; thus " $USER " is added to the /etc/sudoers file."
 echo "Enter root password:"
-su -c 'echo "$USER       ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers'
-echo "sudo is updated."
 
+set -x
+su -c 'echo "$USER       ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers'
+set +x
+
+echo "===== sudo is updated! ====="
+echo ""
+echo ""
