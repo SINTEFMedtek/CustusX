@@ -26,11 +26,15 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 
+  this->setToolTip(this->defaultWhatsThis());
+
   QGroupBox* activeGroupBox = new QGroupBox("Interactive cropper");
+  activeGroupBox->setToolTip(this->defaultWhatsThis());
   layout->addWidget(activeGroupBox);
   QVBoxLayout* activeLayout = new QVBoxLayout(activeGroupBox);
 
   mUseCropperCheckBox = new QCheckBox("Use Cropper");
+  mUseCropperCheckBox->setToolTip("Turn on cropping for the active volume.");
   connect(mUseCropperCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(useCropping(bool)));
   activeLayout->addWidget(mUseCropperCheckBox);
   mShowBoxCheckBox = new QCheckBox("Show box (i)");
@@ -57,7 +61,8 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
   layout->addWidget(mZRange);
 
 
-  QPushButton* cropClipButton = new QPushButton("Create new cropped and clipped volume");
+  QPushButton* cropClipButton = new QPushButton("Create new cropped volume");
+  cropClipButton->setToolTip("Create a new volume containing only the volume inside the crop box.");
   connect(cropClipButton, SIGNAL(clicked()), this, SLOT(cropClipButtonClickedSlot()));
   layout->addWidget(cropClipButton);
 
@@ -68,11 +73,15 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
 
 QString CroppingWidget::defaultWhatsThis() const
 {
-  return "<html>"
-    "<h3>Functionality for cropping a volume.</h3>"
-    "<p>Lets you crop a volume.</p>"
-    "<p><i></i></p>"
-    "</html>";
+	return "<html>"
+		"<h3>Functionality for cropping a volume.</h3>"
+		"<p>"
+		"Lets you crop a volume by defining a bounding box along the volume "
+		"axis. Everything outside the box is not shown. To make the crop permanent, "
+		"press the button to create a new volume from the crop."
+		"</p>"
+		"<p><i></i></p>"
+		"</html>";
 }
 
 void CroppingWidget::boxValuesChanged()
