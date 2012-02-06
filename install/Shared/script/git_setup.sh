@@ -38,4 +38,8 @@ git config --global core.autocrlf input
 #git config --global core.filemode false # (ONLY FOR WINDOWS)
 git config --global alias.st status
 
+set +x
+
 echo "===== git setup completed! ====="
+echo ""
+echo ""
