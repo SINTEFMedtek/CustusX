@@ -62,7 +62,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisit
   topLayout->addWidget(new QLabel("<b>Acquisition</b>"));
   topLayout->addWidget(mInfoLabel);
   topLayout->addWidget(mRecordSessionWidget);
-  topLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New()));
+  topLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New()));
   topLayout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
 
   topLayout->addWidget(this->createHorizontalLine());

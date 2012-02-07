@@ -127,6 +127,7 @@ public:
 	virtual ssc::SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
 	void runDummyTool(ssc::DummyToolPtr tool);
+	ssc::ToolPtr findFirstProbe();
 
 public slots:
 	void configure(); ///< sets up the software like the xml file suggests

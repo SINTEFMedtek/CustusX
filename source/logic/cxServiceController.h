@@ -45,7 +45,7 @@ private slots:
 	void duringLoadPatientSlot();
 
 private:
-	ssc::ToolPtr findSuitableProbe();
+//	ssc::ToolPtr findSuitableProbe();
 	void connectVideoToProbe(ssc::ToolPtr probe);
 };
 
