@@ -190,14 +190,14 @@ endif(APPLE)
 
 # Variables
 #----------
-set(GRABBERSERVER_INSTALL_FOLDER_NAME "GrabberServer") # name of folder where all executables, config etc are assembled
+set(GRABBERSERVER_INSTALL_FOLDER_NAME "GrabberServer")
 if(WIN32)
     set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/GrabberServer.exe")
 endif(WIN32)
 
 if(APPLE)
+    set(GRABBERSERVER_INSTALL_FOLDER_NAME .)
     set(APPS ${CUSTUSX_INSTALL_FOLDER_NAME}/GrabberServer.app)
-    #set(APPS "\${CMAKE_INSTALL_PREFIX}/${GRABBERSERVER_INSTALL_FOLDER_NAME}/GrabberServer.app")
 endif(APPLE)
 
 set(LIBS ${QT_LIBRARY_DIR})
@@ -209,7 +209,6 @@ set(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
 install(TARGETS GrabberServer
   BUNDLE DESTINATION ${GRABBERSERVER_INSTALL_FOLDER_NAME}
   RUNTIME DESTINATION bin
-  #COMPONENT GrabberServer
   )
 
 if(WIN32)
@@ -222,7 +221,6 @@ if(WIN32)
         DESTINATION bin
         PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
         GROUP_EXECUTE WORLD_READ
-        #COMPONENT GrabberServer
         )
   endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
   
@@ -238,7 +236,6 @@ if(WIN32)
   install(CODE "
      include(BundleUtilities)
      fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
-     #COMPONENT GrabberServer
      )
 
 endif(WIN32)
