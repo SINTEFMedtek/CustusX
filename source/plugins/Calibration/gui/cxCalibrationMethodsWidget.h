@@ -1,8 +1,8 @@
 /*
  * cxCalibrationMethodsWidget.h
  *
- *  Created on: May 4, 2011
- *      Author: christiana
+ *  \date May 4, 2011
+ *      \author christiana
  */
 
 #ifndef CXCALIBRATIONMETHODSWIDGET_H_
@@ -14,6 +14,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginCalibration
+ * @{
+ */
 
 class CalibrationMethodsWidget : public TabbedWidget
 {
@@ -25,6 +30,9 @@ public:
 };
 //------------------------------------------------------------------------------
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXCALIBRATIONMETHODSWIDGET_H_ */

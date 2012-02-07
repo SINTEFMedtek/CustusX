@@ -30,6 +30,12 @@ class FilePreviewWidget;
 class ToolFilterGroupBox;
 class ToolConfigureGroupBox;
 
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
+
 class PreferencesTab : public QWidget
 {
   Q_OBJECT
@@ -219,6 +225,24 @@ protected:
  *
  * \brief Interface for selecting a tool configuration.
  *
+ * The tab has three parts:
+ * \beginverbatim
+ *
+ *  ____________________________________________
+ * |                       |                    |
+ * | ToolConfigureGroupBox | ToolFilterGroupBox |
+ * |_______________________|____________________|
+ * |                                            |
+ * |                FilePreviewWidget           |
+ * |____________________________________________|
+ *
+ * /endverbatim
+ *
+ * Tools are available as a filered list from ToolFilterGroupBox,
+ * and can be added to a configuration in ToolConfigureGroupBox.
+ *
+ * The currently selected tool's file can be viewed in FilePreviewWidget.
+ *
  * \date Mar 22, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -277,6 +301,34 @@ protected:
   QDialogButtonBox *mButtonBox;
 };
 
+/**
+ * \brief Debug settings
+ *
+ * \date Jan 24, 2012
+ * \author Christian Askeland, SINTEF
+ */
+class DebugTab : public PreferencesTab
+{
+  Q_OBJECT
+
+public:
+  DebugTab(QWidget *parent = 0);
+  void init();
+
+public slots:
+  void saveParametersSlot();
+
+protected:
+  QCheckBox* mIGSTKDebugLoggingCheckBox;
+  QCheckBox* mManualToolPhysicalPropertiesCheckBox;
+  QGridLayout *mMainLayout;
+};
+
+
+
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif

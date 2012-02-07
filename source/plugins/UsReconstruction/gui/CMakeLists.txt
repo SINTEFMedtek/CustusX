@@ -33,7 +33,9 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/gui
     ../logic
     )
 
@@ -41,7 +43,7 @@ include_directories(
 # =========================================================
 # create the target
 add_library( cxPluginUSReconstructionGUI ${SOURCE_FILES} )
-target_link_libraries( cxPluginUSReconstructionGUI cxPluginUSReconstructionLogic )
+target_link_libraries( cxPluginUSReconstructionGUI cxPluginUSReconstructionLogic cxPluginAlgorithmGUI)
 # =========================================================
 
 

@@ -1,8 +1,8 @@
 /*
  * cxImageSenderSonix.h
  *
- *  Created on: Aug 15, 2011
- *      Author: Ole Vegard Solberg
+ *  \date Aug 15, 2011
+ *      \author Ole Vegard Solberg
  */
 
 #ifndef CXIMAGESENDERSONIX_H_

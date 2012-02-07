@@ -1,8 +1,8 @@
 /*
  * cxRenderTimer.h
  *
- *  Created on: Oct 19, 2010
- *      Author: christiana
+ *  \date Oct 19, 2010
+ *      \author christiana
  */
 
 #ifndef CXRENDERTIMER_H_
@@ -15,6 +15,12 @@
 
 namespace cx
 {
+
+/**
+* \file
+* \addtogroup cxResourceUtilities
+* @{
+*/
 
 typedef boost::shared_ptr<class RenderTimer> RenderTimerPtr;
 
@@ -41,6 +47,10 @@ private:
   QTime mIntervalClock; ///< Time object used to calculate number of renderings per second (FPS)
   int mNumberOfRenderings; ///< Variable used to calculate FPS
 };
+
+/**
+* @}
+*/
 
 } // namespace cx
 

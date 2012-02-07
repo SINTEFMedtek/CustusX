@@ -8,6 +8,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 /**
  * \class BrowserWidget
@@ -16,7 +21,7 @@ namespace cx
  * Might be enhanced to a graphical timeline.
  *
  * \date 2010.03.17
- * \author: Christian Askeland, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class RegistrationHistoryWidget : public QWidget
 {
@@ -68,6 +73,9 @@ private:
   std::vector<ssc::RegistrationTransform> mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories);
 };
 
+/**
+ * @}
+ */
 }//end namespace cx
 
 #endif /* CXREGISTRATIONHISTORYWIDGET_H_ */

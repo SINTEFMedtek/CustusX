@@ -1,8 +1,8 @@
 /*
  * cxTestRegistration.cpp
  *
- *  Created on: Oct 24, 2011
- *      Author: christiana
+ *  \date Oct 24, 2011
+ *      \author christiana
  */
 
 #include "cxTest_Registration.h"

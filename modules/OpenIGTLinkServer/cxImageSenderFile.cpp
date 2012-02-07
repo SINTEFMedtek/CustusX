@@ -1,8 +1,8 @@
 /*
  * cxImageSenderFile.cpp
  *
- *  Created on: Jun 21, 2011
- *      Author: christiana
+ *  \date Jun 21, 2011
+ *      \author christiana
  */
 
 #include "cxImageSenderFile.h"
@@ -218,7 +218,9 @@ MHDImageSender::MHDImageSender(QTcpSocket* socket, StringMap arguments, QObject*
     mCounter(0),
     mArguments(arguments)
 {
-	QString filename = mArguments["filename"];
+	  std::cout << "Creating sender type File" << std::endl;
+
+	  QString filename = mArguments["filename"];
   mImageData = loadImage(filename);
 // mImageData = convertToTestColorImage(mImageData);
 

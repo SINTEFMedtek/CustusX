@@ -14,6 +14,7 @@ namespace cx
 * \class LayoutEditorTab
 *
 * \brief
+* \ingroup cxGUI
 *
 * \date Apr 29, 2011
 * \author Janne Beate Bakeng, SINTEF

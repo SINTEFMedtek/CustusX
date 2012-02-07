@@ -1,8 +1,8 @@
 /*
  * cxCreateProbeDataFromConfiguration.h
  *
- *  Created on: Nov 26, 2010
- *      Author: christiana
+ *  \date Nov 26, 2010
+ *      \author christiana
  */
 
 #ifndef CXCREATEPROBEDATAFROMCONFIGURATION_H_
@@ -11,7 +11,16 @@
 #include "sscProbeData.h"
 #include "probeXmlConfigParser.h"
 
+/**
+* \file
+* \addtogroup cxResourceUtilities
+* @{
+*/
+
 ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
 
+/**
+* @}
+*/
 
 #endif /* CXCREATEPROBEDATAFROMCONFIGURATION_H_ */

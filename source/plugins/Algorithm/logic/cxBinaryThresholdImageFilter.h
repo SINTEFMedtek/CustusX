@@ -6,6 +6,12 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
+/**
  * \class BinaryThresholdImageFilter
  *
  * \brief Threaded BinaryThresholdImageFilter.
@@ -37,5 +43,11 @@ private:
   bool          mUseSmoothing;
   double        mSmoothingSigma;
 };
+typedef boost::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
+
+/**
+ * @}
+ */
 }//namespace cx
+
 #endif /* CXSBINARYTHRESHOLDIMAGEFILTER_H_ */

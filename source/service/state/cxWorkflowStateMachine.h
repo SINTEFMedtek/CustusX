@@ -1,3 +1,17 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #ifndef CXWORKFLOWSTATEMACHINE_H_
 #define CXWORKFLOWSTATEMACHINE_H_
 
@@ -10,54 +24,61 @@ class QMenu;
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxServiceState
+ * @{
+ */
 
 class WorkflowState;
 
-/**
- * \class WorkflowStateMachine
+/** \brief State Machine for the Workflow Steps
  *
- * \brief
+ *  See StateService for a description.
  *
  * \date 4. aug. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  */
-class WorkflowStateMachine : public QStateMachine
+class WorkflowStateMachine: public QStateMachine
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  WorkflowStateMachine();
-  virtual ~WorkflowStateMachine();
+	WorkflowStateMachine();
+	virtual ~WorkflowStateMachine();
 
-  QActionGroup* getActionGroup();
-  void fillMenu(QMenu* menu);
-  void fillToolBar(QToolBar* toolbar);
+	QActionGroup* getActionGroup();
+	void fillMenu(QMenu* menu);
+	void fillToolBar(QToolBar* toolbar);
 
-  QString getActiveUidState();
-  void setActiveState(QString uid);
+	QString getActiveUidState();
+	void setActiveState(QString uid);
 
 signals:
-  void activeStateChanged();
-  void activeStateAboutToChange();
+	void activeStateChanged();
+	void activeStateAboutToChange();
 
 private slots:
-  void startedSlot();
+	void startedSlot();
 
 private:
-  void fillMenu(QMenu* menu, WorkflowState* current);
-  void fillToolbar(QToolBar* toolbar, WorkflowState* current);
+	void fillMenu(QMenu* menu, WorkflowState* current);
+	void fillToolbar(QToolBar* toolbar, WorkflowState* current);
 
+	QAction* addAction(QString stateUid, QActionGroup* group);
+	WorkflowState* newState(WorkflowState* state);
 
-  QAction* addAction(QString stateUid, QActionGroup* group);
-  WorkflowState* newState(WorkflowState* state);
-
-  typedef std::map<QString, WorkflowState*> WorkflowStateMap;
-  WorkflowStateMap mStates;
-  WorkflowState* mParentState;
-  QActionGroup* mActionGroup;
-  bool mStarted;
+	typedef std::map<QString, WorkflowState*> WorkflowStateMap;
+	WorkflowStateMap mStates;
+	WorkflowState* mParentState;
+	QActionGroup* mActionGroup;
+	bool mStarted;
 };
 
 typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;
 
+/**
+ * @}
+ */
 }
+
 #endif /* CXWORKFLOWSTATEMACHINE_H_ */

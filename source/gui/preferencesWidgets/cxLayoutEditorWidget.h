@@ -1,8 +1,8 @@
 /*
  * cxLayoutEditorWidget.h
  *
- *  Created on: Jul 27, 2010
- *      Author: christiana
+ *  \date Jul 27, 2010
+ *      \author christiana
  */
 
 #ifndef CXLAYOUTEDITORWIDGET_H_
@@ -26,6 +26,7 @@ namespace cx
 
 
 /**A QLineEdit
+ * \ingroup cxGUI
  */
 class SmallLineEdit : public QLineEdit
 {
@@ -39,7 +40,10 @@ public:
   }
 };
 
-
+/**
+ * \ingroup cxGUI
+ *
+ */
 class LayoutEditorWidget : public QWidget
 {
   Q_OBJECT

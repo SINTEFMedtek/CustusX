@@ -1,8 +1,8 @@
 /*
  * cxToolManualCalibrationWidget.h
  *
- *  Created on: May 4, 2011
- *      Author: christiana
+ *  \date May 4, 2011
+ *      \author christiana
  */
 
 #ifndef CXTOOLMANUALCALIBRATIONWIDGET_H_
@@ -13,6 +13,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginCalibration
+ * @{
+ */
 
 /**Widget for manually changing the tool calibration matrix sMt.
  *
@@ -37,6 +42,9 @@ private:
 };
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXTOOLMANUALCALIBRATIONWIDGET_H_ */

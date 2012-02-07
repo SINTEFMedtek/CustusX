@@ -9,6 +9,7 @@
 #include "cxContour.h"
 #include "sscMesh.h"
 #include "cxPatientService.h"
+#include "cxTimedAlgorithmProgressBar.h"
 
 namespace cx
 {
@@ -17,16 +18,19 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   mBinary(false),
   mSurface(true),
   mUseSmothing(false),
-  mDefaultColor("red"),
-  mStatusLabel(new QLabel(""))
+  mDefaultColor("red")//,
+//  mStatusLabel(new QLabel(""))
 {
+	mSegmentationAlgorithm.reset(new BinaryThresholdImageFilter);
+	mContourAlgorithm.reset(new Contour);
+
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
   toptopLayout->addStretch();
 
-  connect(&mSegmentationAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
-  connect(&mContourAlgorithm, SIGNAL(finished()), this, SLOT(handleContourFinishedSlot()));
+  connect(mSegmentationAlgorithm.get(), SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
+  connect(mContourAlgorithm.get(), SIGNAL(finished()), this, SLOT(handleContourFinishedSlot()));
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
@@ -46,10 +50,15 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   connect(segmentationOptionsButton, SIGNAL(clicked(bool)), segmentationOptionsWidget, SLOT(setVisible(bool)));
   segmentationOptionsWidget->setVisible(segmentationOptionsButton->isChecked());
 
+	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+	mTimedAlgorithmProgressBar->attach(mSegmentationAlgorithm);
+	mTimedAlgorithmProgressBar->attach(mContourAlgorithm);
+
   topLayout->addWidget(segmentButton, 1,0);
   topLayout->addWidget(segmentationOptionsButton, 1,1);
   topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
-  topLayout->addWidget(mStatusLabel);
+  topLayout->addWidget(mTimedAlgorithmProgressBar);
+//  topLayout->addWidget(mStatusLabel);
 }
 
 BinaryThresholdImageFilterWidget::~BinaryThresholdImageFilterWidget()
@@ -80,14 +89,14 @@ void BinaryThresholdImageFilterWidget::segmentSlot()
 
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
-  mSegmentationAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSegmentationThresholdAdapter->getValue(), mUseSmothing, mSmoothingSigmaAdapter->getValue());
+  mSegmentationAlgorithm->setInput(mSelectedImage->getImage(), outputBasePath, mSegmentationThresholdAdapter->getValue(), mUseSmothing, mSmoothingSigmaAdapter->getValue());
 
-  mStatusLabel->setText("<font color=orange> Generating segmentation... Please wait!</font>\n");
+//  mStatusLabel->setText("<font color=orange> Generating segmentation... Please wait!</font>\n");
 }
 
 void BinaryThresholdImageFilterWidget::handleFinishedSlot()
 {
-  ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
+  ssc::ImagePtr segmentedImage = mSegmentationAlgorithm->getOutput();
   if(!segmentedImage)
     return;
 
@@ -99,7 +108,7 @@ void BinaryThresholdImageFilterWidget::handleFinishedSlot()
 
 void BinaryThresholdImageFilterWidget::generateSurface()
 {
-  ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
+  ssc::ImagePtr segmentedImage = mSegmentationAlgorithm->getOutput();
   if(!segmentedImage)
     return;
 
@@ -109,23 +118,23 @@ void BinaryThresholdImageFilterWidget::generateSurface()
   bool reduceResolution = false;
   bool smoothing = true;
 
-  mContourAlgorithm.setInput(segmentedImage, outputBasePath, threshold, decimation, reduceResolution, smoothing);
-  mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
+  mContourAlgorithm->setInput(segmentedImage, outputBasePath, threshold, decimation, reduceResolution, smoothing);
+//  mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
 }
 
 void BinaryThresholdImageFilterWidget::handleContourFinishedSlot()
 {
-  ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
+  ssc::ImagePtr segmentedImage = mSegmentationAlgorithm->getOutput();
   if(!segmentedImage)
     return;
 
-  ssc::MeshPtr outputMesh = mContourAlgorithm.getOutput();
+  ssc::MeshPtr outputMesh = mContourAlgorithm->getOutput();
   if(outputMesh)
   {
     outputMesh->setColor(mDefaultColor);
   }
 
-  mStatusLabel->setText("<font color=green> Done. </font>\n");
+//  mStatusLabel->setText("<font color=green> Done. </font>\n");
 
   emit outputImageChanged(segmentedImage->getUid());
 }

@@ -19,9 +19,10 @@ namespace cx
  * \class FrameTreeWidget
  *
  *\brief Widget for displaying the FrameForest object
+ * \ingroup cxGUI
  *
  *\date Sep 23, 2010
- *\author: Christian Askeland, SINTEF
+ *\\author Christian Askeland, SINTEF
  */
 class FrameTreeWidget : public BaseWidget
 {

@@ -1,8 +1,8 @@
 /*
  * cxUSAcquisition.cpp
  *
- *  Created on: May 12, 2011
- *      Author: christiana
+ *  \date May 12, 2011
+ *      \author christiana
  */
 
 #include <cxUSAcquisition.h>
@@ -28,6 +28,7 @@ USAcquisition::USAcquisition(AcquisitionDataPtr pluginData, QObject* parent) : Q
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+//  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
   connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
 
   this->probeChangedSlot();
@@ -45,6 +46,10 @@ void USAcquisition::checkIfReadySlot()
   if(tracking && streaming && mRTRecorder)
   {
   	mWhatsMissing = "<font color=green>Ready to record!</font><br>";
+    if (!mTool || !mTool->getVisible())
+    {
+      	mWhatsMissing += "<font color=orange>Probe not visible</font><br>";
+    }
   }
   else
   {
@@ -107,6 +112,10 @@ void USAcquisition::connectToPureVideo()
 
 void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 {
+  //Don't change source if it is the same as earlier
+	if (mRTSource == source)
+		return;
+
   if(mRTSource)
   {
     disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
@@ -116,6 +125,7 @@ void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 
   if(mRTSource)
   {
+//    std::cout << "USAcquisition::connectVideoSource - connected" << std::endl;
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
     mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
   }
@@ -154,6 +164,7 @@ void USAcquisition::saveSession(QString sessionId)
 	if (cxTool)
 		calibFileName = cxTool->getCalibrationFileName();
 
+	// streamRecordedData is empty for ultrasonix? Incorrect time?
   mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), patientService()->getPatientData()->getActivePatientFolder(), probe, calibFileName));
 
   mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
@@ -169,19 +180,14 @@ void USAcquisition::fileMakerWriteFinished()
 
 void USAcquisition::dominantToolChangedSlot()
 {
+//  std::cout << "USAcquisition::dominantToolChangedSlot()" << std::endl;
   ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
 
   ssc::ProbePtr probe = tool->getProbe();
   if(!probe)
     return;
 
-  if (this->getTool() && this->getTool()->getProbe())
-    disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-
-  connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-
   this->setTool(tool);
-
   this->probeChangedSlot();
 }
 

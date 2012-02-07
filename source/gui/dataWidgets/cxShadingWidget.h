@@ -1,8 +1,8 @@
 /*
  * cxShadingWidget.h
  *
- *  Created on: Aug 20, 2010
- *      Author: christiana
+ *  \date Aug 20, 2010
+ *      \author christiana
  */
 
 #ifndef CXSHADINGWIDGET_H_
@@ -22,6 +22,7 @@ namespace cx
 {
 
 /**
+ * \ingroup cxGUI
  */
 class ShadingWidget : public QWidget
 {

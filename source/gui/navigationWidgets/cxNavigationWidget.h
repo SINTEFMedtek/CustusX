@@ -18,9 +18,10 @@ namespace cx
  * \class NavigationWidget
  *
  * \brief Widget for controlling camera follow style.
+ * \ingroup cxGUI
  *
  * \date 22. feb. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class NavigationWidget : public BaseWidget
 {

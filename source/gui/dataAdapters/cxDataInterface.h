@@ -1,8 +1,8 @@
 /*
  * cxDataInterface.h
  *
- *  Created on: Apr 13, 2010
- *      Author: christiana
+ *  \date Apr 13, 2010
+ *      \author christiana
  */
 #ifndef CXDATAINTERFACE_H_
 #define CXDATAINTERFACE_H_
@@ -21,6 +21,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
 
 /** Interface to the tool offset of the dominant tool
  */
@@ -534,7 +539,9 @@ protected:
   ssc::ImagePtr mData;
 };
 
-
+/**
+ * @}
+ */
 } // namespace cx
 
 #endif /* CXDATAINTERFACE_H_ */

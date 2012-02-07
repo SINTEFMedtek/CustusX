@@ -1,8 +1,8 @@
 /*
  * cxUsReconstructionPlugin.h
  *
- *  Created on: Jun 15, 2011
- *      Author: christiana
+ *  \date Jun 15, 2011
+ *      \author christiana
  */
 
 #ifndef CXUSRECONSTRUCTIONPLUGIN_H_
@@ -17,6 +17,21 @@ namespace ssc
 
 namespace cx
 {
+
+/**
+ * \defgroup cxPluginUsReconstruction UsReconstruction Plugin
+ * \ingroup cxPlugins
+ * \brief Us Reconstruction framework with widgets.
+ *
+ * See \ref cx::UsReconstructionPlugin.
+ *
+ */
+
+/**
+ * \file
+ * \addtogroup cxPluginUsReconstruction
+ * @{
+ */
 
 class UsReconstructionPlugin : public PluginBase
 {
@@ -38,6 +53,9 @@ private slots:
 
 typedef boost::shared_ptr<UsReconstructionPlugin> UsReconstructionPluginPtr;
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXUSRECONSTRUCTIONPLUGIN_H_ */

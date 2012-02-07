@@ -1,8 +1,8 @@
 /*
  * cxMetricWidget.h
  *
- *  Created on: Jul 5, 2011
- *      Author: christiana
+ *  \date Jul 5, 2011
+ *      \author christiana
  */
 
 #ifndef CXMETRICWIDGET_H_
@@ -30,7 +30,10 @@ namespace cx
 {
 
 
-
+/**
+ * \ingroup cxGUI
+ *
+ */
 class MetricWidget : public BaseWidget
 {
   Q_OBJECT

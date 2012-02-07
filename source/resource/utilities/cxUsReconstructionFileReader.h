@@ -1,8 +1,8 @@
 /*
  * cxUsReconstructionFileReader.h
  *
- *  Created on: Feb 3, 2011
- *      Author: christiana
+ *  \date Feb 3, 2011
+ *      \author christiana
  */
 
 #ifndef CXUSRECONSTRUCTIONFILEREADER_H_
@@ -20,6 +20,12 @@
 
 namespace cx
 {
+
+/**
+* \file
+* \addtogroup cxResourceUtilities
+* @{
+*/
 
 class UsReconstructionFileReader
 {
@@ -41,7 +47,7 @@ public:
 
 	ssc::USReconstructInputData readAllFiles(QString fileName, QString calFilesPath = "", bool angio = false);
 
-	ssc::Transform3D readTransformFromFile(QString fileName);
+	static ssc::Transform3D readTransformFromFile(QString fileName, bool* ok=NULL);
 	bool readMaskFile(QString mhdFileName, ssc::ImagePtr mask);
 
 	std::vector<ssc::TimedPosition> readFrameTimestamps(QString fileName);
@@ -60,6 +66,10 @@ private:
 };
 
 typedef boost::shared_ptr<UsReconstructionFileReader> UsReconstructionFileReaderPtr;
+
+/**
+* @}
+*/
 
 } // namespace cx
 

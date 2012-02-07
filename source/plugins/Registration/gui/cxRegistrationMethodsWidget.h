@@ -1,8 +1,8 @@
 /*
  * cxRegistrationMethodsWidget.h
  *
- *  Created on: May 2, 2011
- *      Author: christiana
+ *  \date May 2, 2011
+ *      \author christiana
  */
 
 #ifndef CXREGISTRATIONMETHODSWIDGET_H_
@@ -13,6 +13,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 class LandmarkRegistrationsWidget : public TabbedWidget
 {
@@ -55,6 +60,9 @@ public:
 };
 //------------------------------------------------------------------------------
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXREGISTRATIONMETHODSWIDGET_H_ */

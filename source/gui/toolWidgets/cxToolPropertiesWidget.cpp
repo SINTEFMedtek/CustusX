@@ -77,7 +77,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   //TODO: Add enable/disable US Probe visualization in 2D/3D?
   //TODO: Only show US probe properties if tool is US Probe
 
-  mUSSectorConfigBox = new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New());
+  mUSSectorConfigBox = new ssc::LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New());
   mToptopLayout->addWidget(mUSSectorConfigBox);
   mUSSectorConfigBox->hide();
 
@@ -157,7 +157,7 @@ void ToolPropertiesWidget::dominantToolChangedSlot()
 
   mActiveTool = ssc::toolManager()->getDominantTool();
 
-  if(mActiveTool && mActiveTool->getType() == ssc::Tool::TOOL_US_PROBE)
+  if(mActiveTool && mActiveTool->isProbe())
   {
     mUSSectorConfigBox->show();
     mToptopLayout->update();

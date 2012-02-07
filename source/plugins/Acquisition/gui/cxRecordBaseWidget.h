@@ -15,7 +15,11 @@ class QPushButton;
 
 namespace cx
 {
-
+/**
+* \file
+* \addtogroup cxPluginAcquisition
+* @{
+*/
 
 
 class RecordSessionWidget;
@@ -82,5 +86,8 @@ private:
   ssc::ToolPtr mTool;
 };
 
+/**
+* @}
+*/
 }//namespace cx
 #endif /* CXRECORDBASEWIDGET_H_ */

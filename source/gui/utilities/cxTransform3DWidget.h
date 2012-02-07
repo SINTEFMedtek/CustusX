@@ -1,8 +1,8 @@
 /*
  * cxAffineMatrixWidget.h
  *
- *  Created on: Mar 19, 2011
- *      Author: christiana
+ *  \date Mar 19, 2011
+ *      \author christiana
  */
 
 #ifndef CXTRANSFORM3DWIDGET_H_
@@ -26,6 +26,7 @@ class MatrixTextEdit;
 /**
  * \brief Widget for displaying and manipulating an affine matrix,
  * i.e. a rotation+translation matrix.
+ * \ingroup cxGUI
  *
  */
 class Transform3DWidget : public BaseWidget

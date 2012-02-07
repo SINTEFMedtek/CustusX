@@ -1,8 +1,8 @@
 /*
  * cxTemporalCalibration.h
  *
- *  Created on: May 9, 2011
- *      Author: christiana
+ *  \date May 9, 2011
+ *      \author christiana
  */
 
 #ifndef CXTEMPORALCALIBRATION_H_
@@ -15,6 +15,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginCalibration
+ * @{
+ */
 
 typedef std::map<double,double> TimeSeriesType;
 
@@ -60,6 +65,9 @@ private:
 
 typedef boost::shared_ptr<TemporalCalibration> TemporalCalibrationPtr;
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXTEMPORALCALIBRATION_H_ */

@@ -12,9 +12,10 @@ namespace cx
 /**
  * \class ImagePropertiesWidget
  *
+ * \ingroup cxGUI
  *
  * \date 2010.07.07
- * \author: Ole Vegard Solberg, SINTEF
+ * \\author Ole Vegard Solberg, SINTEF
  */
 class MeshPropertiesWidget : public QWidget
 {

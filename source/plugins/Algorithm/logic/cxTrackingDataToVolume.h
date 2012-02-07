@@ -8,6 +8,12 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
+/**
  * TrackingDataToVolume
  *
  * \brief Algorithm that converts tool points, in pr space, into a binary unsigned char (8bits) image.
@@ -50,6 +56,10 @@ private:
 
   ssc::ImagePtr mImage;
 };
+
+/**
+ * @}
+ */
 }//cx
 
 #endif /* CXTRACKINGDATATOVOLUME_H_ */
