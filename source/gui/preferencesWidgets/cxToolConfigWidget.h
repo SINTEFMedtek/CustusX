@@ -14,9 +14,15 @@ class QLineEdit;
 namespace cx
 {
 /**
- *\brief ToolConfigWidget
  *
  * \brief Widget for setting up a tool configuration for Cx3
+ * \ingroup cxGUI
+ * \ingroup cxNotUsed
+ *
+ * \warning
+ * Not in use!!!
+ * \warning
+ * Might be a test class that should be removed. Probably replaced by ToolConfigTab.
  *
  * \date Mar 22, 2011
  * \author Janne Beate Bakeng, SINTEF

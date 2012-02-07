@@ -12,6 +12,7 @@ namespace cx
  * SelectionGroupBox
  *
  * \brief
+ * \ingroup cxGUI
  *
  * \date Mar 30, 2011
  * \author Janne Beate Bakeng, SINTEF

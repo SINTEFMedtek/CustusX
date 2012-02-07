@@ -16,13 +16,19 @@ namespace cx
 class MessageManager;
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
 /**\
  * \class RegistrationManager
  *
  * \brief This class manages (image- and patient-) registration specific details.
  *
  * \date Feb 4, 2009
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class RegistrationManager : public QObject
 {
@@ -104,6 +110,9 @@ private:
  */
 //RegistrationManager* registrationManager();
 
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif /* CXREGISTRATIONMANAGER_H_ */

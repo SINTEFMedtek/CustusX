@@ -1,8 +1,8 @@
 /*
  * cxRegistrationBaseWidget.h
  *
- *  Created on: Jun 16, 2011
- *      Author: christiana
+ *  \date Jun 16, 2011
+ *      \author christiana
  */
 
 #ifndef CXREGISTRATIONBASEWIDGET_H_
@@ -14,6 +14,12 @@
 namespace cx
 {
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 class RegistrationBaseWidget : public BaseWidget
 {
@@ -27,6 +33,9 @@ protected:
   RegistrationManagerPtr mManager;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXREGISTRATIONBASEWIDGET_H_ */

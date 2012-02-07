@@ -1,8 +1,8 @@
 /*
  * cxDataLocations.cpp
  *
- *  Created on: Jun 22, 2010
- *      Author: christiana
+ *  \date Jun 22, 2010
+ *      \author christiana
  */
 #include "cxDataLocations.h"
 
@@ -33,10 +33,14 @@ QString DataLocations::getBundlePath()
 
 QString DataLocations::getRootConfigPath()
 {
-  QString path = getBundlePath()+"/config";
+  QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
   if (QDir(path).exists())
     return path;
-  return CX_CONFIG_ROOT;
+
+  if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
+    return CX_CONFIG_ROOT;
+
+  return "";
 }
 
 QString DataLocations::getToolsPath()

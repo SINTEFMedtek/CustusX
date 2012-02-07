@@ -1,8 +1,8 @@
 /*
  * cxColorSelectButton.h
  *
- *  Created on: May 2, 2011
- *      Author: christiana
+ *  \date May 2, 2011
+ *      \author christiana
  */
 
 #ifndef CXCOLORSELECTBUTTON_H_
@@ -15,7 +15,8 @@ namespace cx
 {
 
 /**
- * Convenience button for chosing color.
+ * \brief Convenience button for chosing color.
+ * \ingroup cxGUI
  * Will open a color select dialog, and color
  * the button itself in the selected color.
  *

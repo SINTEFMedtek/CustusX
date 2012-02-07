@@ -1,8 +1,8 @@
 /*
  * cxSelectRecordSessionStringDataAdapter.h
  *
- *  Created on: Jun 14, 2011
- *      Author: christiana
+ *  \date Jun 14, 2011
+ *      \author christiana
  */
 
 #ifndef CXSELECTRECORDSESSIONSTRINGDATAADAPTER_H_
@@ -14,6 +14,11 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxPluginAcquisition
+* @{
+*/
 
 /** Base class for all DataAdapters that selects a record session.
  */
@@ -70,6 +75,9 @@ private:
 
 };
 
+/**
+* @}
+*/
 }
 
 #endif /* CXSELECTRECORDSESSIONSTRINGDATAADAPTER_H_ */

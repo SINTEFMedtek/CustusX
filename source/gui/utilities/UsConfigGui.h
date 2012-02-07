@@ -10,9 +10,10 @@ class QComboBox;
  * \class UsConfigGui.h
  *
  * \brief A class that gives a gui for displaying a ProbeCalibConfigs.xml file
+ * \ingroup cxGUI
  *
  * \date 11. mai 2010
- * \author: jbake
+ * \\author jbake
  */
 class UsConfigGui : public QWidget
 {

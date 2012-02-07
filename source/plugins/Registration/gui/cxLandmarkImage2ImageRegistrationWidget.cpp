@@ -1,8 +1,8 @@
 /*
  * cxLandmarkImage2ImageRegistrationWidget.cpp
  *
- *  Created on: Sep 7, 2011
- *      Author: christiana
+ *  \date Sep 7, 2011
+ *      \author christiana
  */
 
 #include "cxLandmarkImage2ImageRegistrationWidget.h"

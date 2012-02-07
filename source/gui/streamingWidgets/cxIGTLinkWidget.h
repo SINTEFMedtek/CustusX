@@ -18,9 +18,10 @@ typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
 /**
  * \class IGTLinkWidget
  * \brief GUI for setup of a IGTLink connection.
+ * \ingroup cxGUI
  *
  * \date 2010.10.27
- * \author: Christian Askeland, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class IGTLinkWidget : public BaseWidget
 {
@@ -43,7 +44,7 @@ private slots:
   void serverStatusChangedSlot();
   void browseLocalServerSlot();
 
-  void guiChanged();
+  void useLocalServerChanged();
 
 private:
   void dataChanged();

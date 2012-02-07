@@ -1,3 +1,17 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #ifndef SSCORIENTATIONANNOTATION2DREP_H_
 #define SSCORIENTATIONANNOTATION2DREP_H_
 
@@ -15,7 +29,8 @@ namespace ssc
 typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
 typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
 
-/**A class that annotated 2D views with otientation information.
+/**\brief A class that annotated 2D views with otientation information.
+ * \ingroup cxServiceVisualizationRep
  *
  * The slice proxy is used to find the orientation of a slice in space r,
  * which is assumed to be a valid DICOM space, and combinations of

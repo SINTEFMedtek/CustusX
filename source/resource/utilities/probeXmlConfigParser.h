@@ -6,12 +6,16 @@
 #include <QDomDocument>
 
 /**
- * \class probeXmlConfigParser.h
- *
+* \file
+* \addtogroup cxResourceUtilities
+* @{
+*/
+
+/**
  * \brief Class that works as a interface to a ProbeCalibConfigs.xml
  *
  * \date 11. mai 2010
- * \author: jbake
+ * \\author jbake
  */
 class ProbeXmlConfigParser
 {
@@ -112,5 +116,10 @@ public:
   }
   ProbeXmlConfigParser::ColRowPair mCenter;
 };
+
+/**
+* @}
+*/
+
 
 #endif /* PROBEXMLCONFIGPARSER_H_ */

@@ -3,8 +3,8 @@
  *
  *\brief
  *
- *  Created on: Apr 21, 2010
- *      Author: dev
+ *  \date Apr 21, 2010
+ *      \author dev
  */
 
 #ifndef CXLANDMARKREGISTRATIONWIDGET_H_
@@ -27,6 +27,12 @@ class QSlider;
 namespace cx
 {
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
+
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 /**
  * \class LandmarkRegistrationWidget
@@ -76,6 +82,10 @@ private:
   LandmarkRegistrationWidget(); ///< not implemented
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
 };
+
+/**
+ * @}
+ */
 }//namespace cx
 
 

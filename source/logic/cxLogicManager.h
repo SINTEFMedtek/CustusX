@@ -1,8 +1,8 @@
 /*
  * cxLogicManager.h
  *
- *  Created on: Jun 1, 2011
- *      Author: christiana
+ *  \date Jun 1, 2011
+ *      \author christiana
  */
 
 #ifndef CXLOGICMANAGER_H_
@@ -13,13 +13,18 @@
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxLogic
+* @{
+*/
+
 typedef boost::shared_ptr<class ServiceController> ServiceControllerPtr;
 
-/**LogicManager
+/**\brief Responsible for the entire logic layer.
+ * \ingroup cxLogic
  *
- * Responsible for the entire logic layer, all controllers
- * in this layers are embedded in this class.
- *
+ * All controllers in this layers are embedded in this class.
  * The service layer are managed via the ServiceController aggregate member.
  *
  */
@@ -49,6 +54,9 @@ private:
 
 //LogicManager* logicManager(); // if necessary
 
+/**
+* @}
+*/
 }
 
 #endif /* CXLOGICMANAGER_H_ */

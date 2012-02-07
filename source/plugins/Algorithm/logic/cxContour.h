@@ -6,6 +6,12 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
+/**
  * \class Contour
  *
  * \brief Threaded contour algorithm.
@@ -40,7 +46,12 @@ private:
   bool					mPreserveTopology;
   ssc::MeshPtr mOutput;
 };
+typedef boost::shared_ptr<class Contour> ContourPtr;
 
 
+
+/**
+ * @}
+ */
 }//namespace cx
 #endif /* CXCONTOUR_H_ */

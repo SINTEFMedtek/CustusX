@@ -178,6 +178,49 @@ bool MacGrabber::isGrabbing()
 
 bool MacGrabber::findConnectedDevice()
 {
+  //Read file with supported grabbers
+  NSString *path = [NSString stringWithString:@"SupportedGrabbers.txt"];
+  NSError *error = nil;
+  NSString *words = [[NSString alloc] initWithContentsOfFile:path
+                                                 encoding:NSUTF8StringEncoding error:&error];
+  NSArray* lines = [words componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
+  //for (NSString *line in lines)
+  //  NSLog(@"Supported grabber: %@", line);
+
+  //Report to user all found grabbers
+  NSArray *devices = [QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo];
+  int i = [devices count];
+  ssc::messageManager()->sendInfo("Number of connected grabber devices: "+qstring_cast(i));
+  for (QTCaptureDevice *device in devices)
+    this->reportString([device localizedDisplayName]);
+
+  //Select the grabber with highest file priority
+  bool found = false;
+  for (NSString *line in lines)
+  {
+    for(QTCaptureDevice *device in devices)
+    {
+      NSString *deviceName = [device localizedDisplayName];
+      NSComparisonResult compareResult = [deviceName localizedCompare:line];
+      if (compareResult == NSOrderedSame)
+      {
+        NSString *foundtext = [NSString stringWithFormat:@"Matched grabber from file: %@", line];
+        this->reportString(foundtext);
+        mObjectiveC->mSelectedDevice = device;
+        found = true;
+        break;
+      }
+    }
+    if(found)
+      break;
+  }
+
+  //Report to user how to change grabber
+  ssc::messageManager()->sendInfo("To change priority of grabbers or add new grabbers, edit the file \"SupportedGrabbers.txt\" that is next to the GrabberServer.");
+
+  return found;
+
+  /*
   bool found = false;
   
   //find which grabber is connected to the system
@@ -185,59 +228,36 @@ bool MacGrabber::findConnectedDevice()
   int i = [devices count];
   ssc::messageManager()->sendInfo("Number of connected grabber devices: "+qstring_cast(i));
   
-  if([devices count] == 0)
-    return found;
-  
   NSEnumerator *enumerator = [devices objectEnumerator];
   QTCaptureDevice* captureDevice;
-  
-  while((captureDevice = [enumerator nextObject])) {
-      NSString* grabberName = [captureDevice localizedDisplayName];
-      this->reportString(grabberName);
-      
-      NSComparisonResult compareResult;
-      
-      //buildt in apple i-sight camera
-      compareResult = [grabberName localizedCompare:@"Built-in iSight"];
-      if (compareResult == NSOrderedSame)
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-      }
+  NSUInteger numberOfDevices = [devices count];
+  if(numberOfDevices == 0)
+    return found;
+  else if(numberOfDevices == 1)
+  {
+    captureDevice = [enumerator nextObject];
+    NSString* grabberName = [captureDevice localizedDisplayName];
+    this->reportString(grabberName);
+    mObjectiveC->mSelectedDevice = captureDevice;
+    found = true;
+  } else {
+    //if more than one grabber connected, select one that is not Built-in iSight
+    while((captureDevice = [enumerator nextObject])) {
+        NSString* grabberName = [captureDevice localizedDisplayName];
+        this->reportString(grabberName);
 
-      //new VGA grabber (Epiphan)
-      compareResult = [grabberName localizedCompare:@"D4U24488"];
-      if (compareResult == NSOrderedSame)
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-      }
-      //even newer VGA grabber (Epiphan)
-      compareResult = [grabberName localizedCompare:@"D4U24942"];
-      if (compareResult == NSOrderedSame)
-      {
-		  mObjectiveC->mSelectedDevice = captureDevice;
-		  found = true;
-      }
-      
-      //old VGA grabber (Epiphan)
-      compareResult = [grabberName localizedCompare:@"V2U10443"];
-      if (compareResult == NSOrderedSame)
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-      }
-      
-      //S-VHS grabber
-      compareResult = [grabberName localizedCompare:@"S-VHS"];
-      if (compareResult == NSOrderedSame) 
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-        mSuperVideo = true;
-      }
+        NSComparisonResult compareResult = [grabberName localizedCompare:@"Built-in iSight"];
+        if (compareResult != NSOrderedSame)
+        {
+          mObjectiveC->mSelectedDevice = captureDevice;
+          found = true;
+          break;
+        }
+    }
   }
+  
   return found;
+  */
 }
 
 bool MacGrabber::openDevice()

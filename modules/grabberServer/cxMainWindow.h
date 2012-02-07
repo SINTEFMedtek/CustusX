@@ -14,7 +14,7 @@ namespace cx
  * \brief Mainwindow for displaying a GrabberServerWidget and a ConsoleWidget.
  *
  * \date 16. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class MainWindow : public QMainWindow
 {

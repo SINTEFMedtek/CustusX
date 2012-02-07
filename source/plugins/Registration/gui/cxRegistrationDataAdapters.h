@@ -1,8 +1,8 @@
 /*
  * cxRegistrationDataAdapters.h
  *
- *  Created on: Jun 16, 2011
- *      Author: christiana
+ *  \date Jun 16, 2011
+ *      \author christiana
  */
 
 #ifndef CXREGISTRATIONDATAADAPTERS_H_
@@ -12,6 +12,12 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
 typedef boost::shared_ptr<class RegistrationManager> RegistrationManagerPtr;
 
 typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
@@ -61,6 +67,9 @@ private:
   RegistrationManagerPtr mManager;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXREGISTRATIONDATAADAPTERS_H_ */

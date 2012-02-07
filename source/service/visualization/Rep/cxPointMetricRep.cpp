@@ -1,8 +1,22 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 /*
  * cxPointMetricRep.cpp
  *
- *  Created on: Jul 5, 2011
- *      Author: christiana
+ *  \date Jul 5, 2011
+ *      \author christiana
  */
 
 #include <cxPointMetricRep.h>
@@ -14,18 +28,17 @@ namespace cx
 
 PointMetricRepPtr PointMetricRep::New(const QString& uid, const QString& name)
 {
-	PointMetricRepPtr retval(new PointMetricRep(uid,name));
+	PointMetricRepPtr retval(new PointMetricRep(uid, name));
 	return retval;
 }
 
 PointMetricRep::PointMetricRep(const QString& uid, const QString& name) :
-		DataMetricRep(uid,name),
-		mView(NULL)
+				DataMetricRep(uid, name), mView(NULL)
 //		mSphereRadius(1),
 //		mShowLabel(false),
 //		mColor(ssc::Vector3D(1,0,0))
 {
-  mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener.reset(new ssc::ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PointMetricRep::rescale, this));
 }
 
@@ -62,7 +75,7 @@ void PointMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
 	mView = NULL;
 	mGraphicalPoint.reset();
-  mText.reset();
+	mText.reset();
 	mViewportListener->stopListen();
 }
 
@@ -74,8 +87,8 @@ void PointMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 
 void PointMetricRep::changedSlot()
 {
-  if (!mMetric)
-    return;
+	if (!mMetric)
+		return;
 
 	if (!mGraphicalPoint && mView && mMetric)
 		mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
@@ -90,19 +103,19 @@ void PointMetricRep::changedSlot()
 	mGraphicalPoint->setRadius(mGraphicsSize);
 	mGraphicalPoint->setColor(mColor);
 
-  if (!mShowLabel)
-    mText.reset();
-  if (!mText && mShowLabel)
-    mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
-  if (mText)
-  {
-    mText->setColor(mColor);
-    mText->setText(mMetric->getName());
-    mText->setPosition(p0_r);
-    mText->setSize(mLabelSize/100);
-  }
+	if (!mShowLabel)
+		mText.reset();
+	if (!mText && mShowLabel)
+		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+	if (mText)
+	{
+		mText->setColor(mColor);
+		mText->setText(mMetric->getName());
+		mText->setPosition(p0_r);
+		mText->setSize(mLabelSize / 100);
+	}
 
-  this->rescale();
+	this->rescale();
 }
 
 /**Note: Internal method!
@@ -113,13 +126,13 @@ void PointMetricRep::changedSlot()
  */
 void PointMetricRep::rescale()
 {
-  if (!mGraphicalPoint)
-    return;
+	if (!mGraphicalPoint)
+		return;
 
 	double size = mViewportListener->getVpnZoom();
 //  double sphereSize = 0.007/size;
-  double sphereSize = mGraphicsSize/100/size;
-  mGraphicalPoint->setRadius(sphereSize);
+	double sphereSize = mGraphicsSize / 100 / size;
+	mGraphicalPoint->setRadius(sphereSize);
 }
 
 }

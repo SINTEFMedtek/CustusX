@@ -1,8 +1,8 @@
 /*
  * cxCalibrationPlugin.h
  *
- *  Created on: Jun 15, 2011
- *      Author: christiana
+ *  \date Jun 15, 2011
+ *      \author christiana
  */
 
 #ifndef CXCALIBRATIONPLUGIN_H_
@@ -10,10 +10,26 @@
 
 #include "cxPluginBase.h"
 
+/**
+ * \defgroup cxPluginCalibration Calibration Plugin
+ * \ingroup cxPlugins
+ * \brief Calibration collection with widgets.
+ *
+ * See \ref cx::CalibrationPlugin.
+ *
+ */
+
+
 namespace cx
 {
 typedef boost::shared_ptr<class CalibrationPlugin> CalibrationPluginPtr;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
+
+/**
+ * \file
+ * \addtogroup cxPluginCalibration
+ * @{
+ */
 
 /**Rewrite to be a descendant of PluginBase, with generic API for creating plugins...
  *
@@ -36,6 +52,9 @@ private:
 	AcquisitionDataPtr mAcquisitionData;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXCALIBRATIONPLUGIN_H_ */

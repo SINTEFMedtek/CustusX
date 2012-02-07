@@ -1,8 +1,8 @@
 /**
  * cxRenderTimer.cpp
  *
- *  Created on: Oct 19, 2010
- *      Author: christiana
+ *  \date Oct 19, 2010
+ *      \author christiana
  */
 
 #include "cxRenderTimer.h"

@@ -72,7 +72,14 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImageViaFile(ssc::Image
   // read from disk
   typedef itk::ImageFileReader<itkImageType> ReaderType;
   ReaderType::Pointer reader = ReaderType::New();
+#if ITK_VERSION_MAJOR==3
   reader->SetFileName(cstring_cast(filename));
+#else
+  reader->SetFileName(string_cast(filename));
+#endif
+
+////  reader->SetFileName(cstring_cast(filename));
+//  reader->SetFileName(string_cast(filename));
   reader->Update();
   itkImageType::ConstPointer retval = reader->GetOutput();
 
@@ -123,38 +130,38 @@ void TimedAlgorithm::timeoutSlot()
   ssc::messageManager()->sendInfo("Still working on generating the "+mProduct+", "+this->getTimePassed().toString()+" has passed.");
 }
 //---------------------------------------------------------------------------------------------------------------------
-template <class T>
-ThreadedTimedAlgorithm<T>::ThreadedTimedAlgorithm(QString product, int secondsBetweenAnnounce) :
-  TimedAlgorithm(product, secondsBetweenAnnounce)
-{
-  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
-  connect(&mWatcher, SIGNAL(finished()), this, SLOT(postProcessingSlot()));
-}
-
-template <class T>
-ThreadedTimedAlgorithm<T>::~ThreadedTimedAlgorithm()
-{}
-
-template <class T>
-void ThreadedTimedAlgorithm<T>::finishedSlot()
-{
-  TimedAlgorithm::stopTiming();
-}
-
-template <class T>
-void ThreadedTimedAlgorithm<T>::generate()
-{
-  TimedAlgorithm::startTiming();
-
-  mFutureResult = QtConcurrent::run(this, &ThreadedTimedAlgorithm<T>::calculate);
-  mWatcher.setFuture(mFutureResult);
-}
-template <class T>
-T ThreadedTimedAlgorithm<T>::getResult()
-{
-  T result = mWatcher.future().result();
-  return result;
-}
+//template <class T>
+//ThreadedTimedAlgorithm<T>::ThreadedTimedAlgorithm(QString product, int secondsBetweenAnnounce) :
+//  TimedAlgorithm(product, secondsBetweenAnnounce)
+//{
+//  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
+//  connect(&mWatcher, SIGNAL(finished()), this, SLOT(postProcessingSlot()));
+//}
+//
+//template <class T>
+//ThreadedTimedAlgorithm<T>::~ThreadedTimedAlgorithm()
+//{}
+//
+//template <class T>
+//void ThreadedTimedAlgorithm<T>::finishedSlot()
+//{
+//  TimedAlgorithm::stopTiming();
+//}
+//
+//template <class T>
+//void ThreadedTimedAlgorithm<T>::generate()
+//{
+//  TimedAlgorithm::startTiming();
+//
+//  mFutureResult = QtConcurrent::run(this, &ThreadedTimedAlgorithm<T>::calculate);
+//  mWatcher.setFuture(mFutureResult);
+//}
+//template <class T>
+//T ThreadedTimedAlgorithm<T>::getResult()
+//{
+//  T result = mWatcher.future().result();
+//  return result;
+//}
 
 
 template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //centerline
@@ -178,6 +185,7 @@ void Example::postProcessingSlot()
 {
   QString result = this->getResult();
   std::cout << "void Test::postProcessingSlot(), result: "<< result.toStdString() << std::endl;
+  emit finished();
 }
 
 QString Example::calculate()
