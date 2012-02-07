@@ -28,6 +28,7 @@ USAcquisition::USAcquisition(AcquisitionDataPtr pluginData, QObject* parent) : Q
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+//  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
   connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
 
   this->probeChangedSlot();
@@ -45,6 +46,10 @@ void USAcquisition::checkIfReadySlot()
   if(tracking && streaming && mRTRecorder)
   {
   	mWhatsMissing = "<font color=green>Ready to record!</font><br>";
+    if (!mTool || !mTool->getVisible())
+    {
+      	mWhatsMissing += "<font color=orange>Probe not visible</font><br>";
+    }
   }
   else
   {
@@ -182,14 +187,7 @@ void USAcquisition::dominantToolChangedSlot()
   if(!probe)
     return;
 
-//  if (this->getTool() && this->getTool()->getProbe())
-//    disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-
-  //TODO: Check
-  //connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));//Is this necessary?
-
   this->setTool(tool);
-
   this->probeChangedSlot();
 }
 

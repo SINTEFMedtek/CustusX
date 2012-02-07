@@ -572,6 +572,8 @@ void ToolManager::setDominantTool(const QString& uid)
 	if (mDominantTool->isManual())
 		emit tps(0);
 
+	ssc::messageManager()->sendInfo("Change active tool to: " + mDominantTool->getName());
+
 	emit dominantToolChanged(uid);
 }
 
@@ -927,5 +929,45 @@ ssc::ManualToolPtr ToolManager::getManualTool()
 {
 	return mManualTool;
 }
+
+/**\brief Find a probe that can be connected to a rt source.
+ *
+ * Priority:
+ *  - active probe
+ *  - visible probe
+ *  - any probe
+ *
+ */
+ssc::ToolPtr ToolManager::findFirstProbe()
+{
+	ssc::ToolPtr active = this->getDominantTool();
+	if (active && active->getProbe() && active->getProbe()->isValid())
+	{
+		return active;
+	}
+
+	ssc::ToolManager::ToolMapPtr tools = this->getTools();
+
+	// look for visible probes
+	for (ssc::ToolManager::ToolMap::iterator iter = tools->begin(); iter != tools->end(); ++iter)
+	{
+		if (iter->second->getProbe() && iter->second->getProbe()->isValid() && iter->second->getVisible())
+		{
+			return iter->second;
+		}
+	}
+
+	// pick the first probe, visible or not.
+	for (ssc::ToolManager::ToolMap::iterator iter = tools->begin(); iter != tools->end(); ++iter)
+	{
+		if (iter->second->getProbe() && iter->second->getProbe()->isValid())
+		{
+			return iter->second;
+		}
+	}
+
+	return ssc::ToolPtr();
+}
+
 
 } //namespace cx
