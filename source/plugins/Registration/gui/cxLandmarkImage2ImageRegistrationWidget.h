@@ -1,8 +1,8 @@
 /*
  * cxLandmarkImage2ImageRegistrationWidget.h
  *
- *  Created on: Sep 7, 2011
- *      Author: christiana
+ *  \date Sep 7, 2011
+ *      \author christiana
  */
 
 #ifndef CXLANDMARKIMAGE2IMAGEREGISTRATIONWIDGET_H_
@@ -21,6 +21,12 @@ class QSlider;
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
 /**
  * Widget for performing image to image registration
  * using landmarks.
@@ -59,6 +65,10 @@ protected:
 private:
   LandmarkImage2ImageRegistrationWidget(); ///< not implemented
 };
+
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif /* CXLANDMARKIMAGE2IMAGEREGISTRATIONWIDGET_H_ */

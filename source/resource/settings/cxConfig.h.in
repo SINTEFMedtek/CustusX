@@ -1,5 +1,9 @@
 // position of test data
 #define CX_DATA_ROOT "@CX_DATA_ROOT@"
 
-// position of configuration folders
+// position of configuration folders during compilation
 #define CX_CONFIG_ROOT "@CX_CONFIG_ROOT@"
+
+// position of configuration folders after install, relative to executable.
+#define CX_CONFIG_ROOT_RELATIVE_INSTALLED "@CX_CONFIG_ROOT_RELATIVE_INSTALLED@"
+

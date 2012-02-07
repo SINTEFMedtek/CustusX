@@ -1,8 +1,8 @@
 /*
  * cxServiceController.cpp
  *
- *  Created on: Jun 1, 2011
- *      Author: christiana
+ *  \date Jun 1, 2011
+ *      \author christiana
  */
 
 #include <cxServiceController.h>
@@ -78,12 +78,12 @@ void ServiceController::duringLoadPatientSlot()
  */
 void ServiceController::updateVideoConnections()
 {
-	ssc::ToolPtr tool = this->findSuitableProbe();
+	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 
 	this->connectVideoToProbe(tool);
 
-	if (tool)
-		ssc::toolManager()->setDominantTool(tool->getUid());
+//	if (tool)
+//		ssc::toolManager()->setDominantTool(tool->getUid());
 }
 
 /**insert the rt source into the (first) probe tool
@@ -122,32 +122,32 @@ void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
 	}
 }
 
-/**Find a probe that can be connected to a rt source.
- *
- */
-ssc::ToolPtr ServiceController::findSuitableProbe()
-{
-	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-
-	// look for visible probes
-	for (ssc::ToolManager::ToolMap::iterator iter = tools->begin(); iter != tools->end(); ++iter)
-	{
-		if (iter->second->getProbe() && iter->second->getProbe()->isValid() && iter->second->getVisible())
-		{
-			return iter->second;
-		}
-	}
-
-	// pick the first probe, visible or not.
-	for (ssc::ToolManager::ToolMap::iterator iter = tools->begin(); iter != tools->end(); ++iter)
-	{
-		if (iter->second->getProbe() && iter->second->getProbe()->isValid())
-		{
-			return iter->second;
-		}
-	}
-
-	return ssc::ToolPtr();
-}
+///**Find a probe that can be connected to a rt source.
+// *
+// */
+//ssc::ToolPtr ServiceController::findSuitableProbe()
+//{
+//	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
+//
+//	// look for visible probes
+//	for (ssc::ToolManager::ToolMap::iterator iter = tools->begin(); iter != tools->end(); ++iter)
+//	{
+//		if (iter->second->getProbe() && iter->second->getProbe()->isValid() && iter->second->getVisible())
+//		{
+//			return iter->second;
+//		}
+//	}
+//
+//	// pick the first probe, visible or not.
+//	for (ssc::ToolManager::ToolMap::iterator iter = tools->begin(); iter != tools->end(); ++iter)
+//	{
+//		if (iter->second->getProbe() && iter->second->getProbe()->isValid())
+//		{
+//			return iter->second;
+//		}
+//	}
+//
+//	return ssc::ToolPtr();
+//}
 
 }

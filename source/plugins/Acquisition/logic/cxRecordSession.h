@@ -10,6 +10,12 @@ class QDomNode;
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginAcquisition
+ * @{
+ */
+
+/**
  * RecordSession
  *
  * \brief
@@ -61,5 +67,9 @@ private:
 
 };
 
+/**
+ * @}
+ */
 }//namespace cx
+
 #endif /* CXRecordSession_H_ */

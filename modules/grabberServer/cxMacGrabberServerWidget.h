@@ -13,7 +13,7 @@ namespace cx
  * \brief Gui for interacting with a MacGrabber and a OpenIGTLinkServer.
  *
  * \date 16. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 
 class MacGrabberServerWidget : public GrabberServerWidget

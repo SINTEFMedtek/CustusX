@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
   QApplication app(argc, argv);
   app.setOrganizationName("SINTEF");
   app.setOrganizationDomain("www.sintef.no");
-  app.setApplicationName("cxOpenIGTLinkServer");
+  app.setApplicationName("OpenIGTLinkServer");
   //------------------------------------------------------------
   // Parse Arguments
 

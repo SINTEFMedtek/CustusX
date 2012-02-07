@@ -1,8 +1,8 @@
 /*
  * matrixInterpolation.h
  *
- *  Created on: May 28, 2010
- *      Author: christiana
+ *  \date May 28, 2010
+ *      \author christiana
  */
 #ifndef MATRIXINTERPOLATION_H_
 #define MATRIXINTERPOLATION_H_
@@ -30,7 +30,7 @@ typedef vnl_matrix<double> vnl_matrix_double;
 //      is found using ordinary linear interpolation.
 //
 // Trondheim, 12.01.09.
-// Lars Eirik Bø  <larseirik.bo@sintef.no>, SINTEF Technology and Society.
+// Lars Eirik Bï¿½  <larseirik.bo@sintef.no>, SINTEF Technology and Society.
 std::vector<vnl_matrix_double> matrixInterpolation(
                        vnl_vector<double> DataPoints,
                        std::vector<vnl_matrix_double> DataValues,

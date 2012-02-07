@@ -1,8 +1,8 @@
 /*
  * cxUsReconstructionFileReader.cpp
  *
- *  Created on: Feb 3, 2011
- *      Author: christiana
+ *  \date Feb 3, 2011
+ *      \author christiana
  */
 #include "cxUsReconstructionFileReader.h"
 
@@ -81,6 +81,12 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   if (!this->readMaskFile(fileName, retval.mMask))
   {
   	retval.mMask = this->createMaskFromConfigParams(retval);
+  }
+
+  if (!retval.mFrames.empty())
+  {
+	  double msecs = (retval.mFrames.rbegin()->mTime - retval.mFrames.begin()->mTime);
+	  ssc::messageManager()->sendInfo(QString("Read %1 seconds of us data from %2.").arg(msecs/1000, 0, 'g', 3).arg(fileName));
   }
 
   return retval;
@@ -395,33 +401,38 @@ bool UsReconstructionFileReader::readMaskFile(QString mhdFileName, ssc::ImagePtr
 /**
  * Reads a whitespace separated 4x4 matrix from file
  * \param fileName Input file
+ * \param ok success flag. If NULL, logger warnings are emitted instead
  * \return  The matrix
  */
-ssc::Transform3D UsReconstructionFileReader::readTransformFromFile(QString fileName)
+ssc::Transform3D UsReconstructionFileReader::readTransformFromFile(QString fileName, bool* ok)
 {
-  ssc::Transform3D retval = ssc::Transform3D::Identity();
-  QFile file(fileName);
-  if(!file.open(QIODevice::ReadOnly))
-  {
-    ssc::messageManager()->sendWarning("Can't open file: "
-                                       + fileName);
-    return retval;
-  }
-  bool ok = true;
-  QString positionString = file.readLine();
-  positionString += " " + file.readLine();
-  positionString += " " + file.readLine();
-  positionString += " " + file.readLine();
-  retval = ssc::Transform3D::fromString(positionString, &ok);
-  if (!ok)
-  {
-    ssc::messageManager()->sendWarning("Can't read calibration from file: "
-                                       + fileName
-                                       + "values: "
-                                       + qstring_cast(retval(0,0)));
-    return retval;
-  }
-  return retval;
+	if (ok)
+		*ok = false;
+	ssc::Transform3D retval = ssc::Transform3D::Identity();
+	QFile file(fileName);
+	if (!QFileInfo(fileName).exists() || !file.open(QIODevice::ReadOnly))
+	{
+		if (!ok)
+			ssc::messageManager()->sendWarning("Can't open file: " + fileName);
+		return retval;
+	}
+	bool localOk = true;
+	QString positionString = file.readLine();
+	positionString += " " + file.readLine();
+	positionString += " " + file.readLine();
+	positionString += " " + file.readLine();
+	retval = ssc::Transform3D::fromString(positionString, &localOk);
+	if (!localOk)
+	{
+		if (!ok)
+			ssc::messageManager()->sendWarning(
+					"Can't read calibration from file: " + fileName + "values: "
+							+ qstring_cast(retval(0, 0)));
+		return retval;
+	}
+	if (ok)
+		*ok = true;
+	return retval;
 }
 
 

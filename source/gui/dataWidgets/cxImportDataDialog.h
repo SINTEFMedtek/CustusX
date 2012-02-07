@@ -13,6 +13,7 @@ namespace cx
  * \class ImportDataDialog
  *
  *\brief
+ * \ingroup cxGUI
  *
  * \date Sep 24, 2010
  *\author christiana

@@ -17,7 +17,7 @@ namespace cx
  * \brief Abstract interface for gui for interacting with a grabber and a server.
  *
  * \date 16. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 
 class GrabberServerWidget : public QWidget

@@ -1,8 +1,8 @@
 /*
  * cxCenterlineWidget.cpp
  *
- *  Created on: Apr 29, 2011
- *      Author: christiana
+ *  \date Apr 29, 2011
+ *      \author christiana
  */
 
 #include <cxCenterlineWidget.h>
@@ -11,17 +11,18 @@
 #include "cxDataInterface.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
-
+#include "cxTimedAlgorithmProgressBar.h"
 
 namespace cx
 {
 
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
   BaseWidget(parent, "CenterlineWidget", "CenterlineWidget"),
-  mFindCenterlineButton(new QPushButton("Find centerline")),
-  mStatusLabel(new QLabel(""))
+  mFindCenterlineButton(new QPushButton("Find centerline"))
+//  mStatusLabel(new QLabel(""))
 {
-  connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
+	mCenterlineAlgorithm.reset(new Centerline);
+  connect(mCenterlineAlgorithm.get(), SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -30,9 +31,13 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
 
+	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+	mTimedAlgorithmProgressBar->attach(mCenterlineAlgorithm);
+
   layout->addWidget(selectImageComboBox);
   layout->addWidget(mFindCenterlineButton);
-  layout->addWidget(mStatusLabel);
+//  layout->addWidget(mStatusLabel);
+  layout->addWidget(mTimedAlgorithmProgressBar);
   layout->addStretch();
 
   connect(mFindCenterlineButton, SIGNAL(clicked()), this, SLOT(findCenterlineSlot()));
@@ -68,30 +73,31 @@ void CenterlineWidget::hideEvent(QCloseEvent* event)
 
 void CenterlineWidget::setDefaultColor(QColor color)
 {
-  mCenterlineAlgorithm.setDefaultColor(color);
+  mCenterlineAlgorithm->setDefaultColor(color);
 }
 
 void CenterlineWidget::findCenterlineSlot()
 {
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
-  if(mCenterlineAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath))
+  if(mCenterlineAlgorithm->setInput(mSelectedImage->getImage(), outputBasePath))
   {
-    //Only print text if the input is in the correct format
-    mStatusLabel->setText("<font color=orange> Generating centerline... Please wait!</font>\n");
+//    //Only print text if the input is in the correct format
+//    mStatusLabel->setText("<font color=orange> Generating centerline... Please wait!</font>\n");
   }
   else
   {
-    mStatusLabel->setText("<font color=red> Incorrect input</font>\n");
+	  ssc::messageManager()->sendWarning("Centerline: Incorrect input");
+//    mStatusLabel->setText("<font color=red> Incorrect input</font>\n");
   }
 }
 
 void CenterlineWidget::handleFinishedSlot()
 {
-  ssc::DataPtr centerlineImage = mCenterlineAlgorithm.getOutput();
+  ssc::DataPtr centerlineImage = mCenterlineAlgorithm->getOutput();
   if(!centerlineImage)
     return;
 
-  mStatusLabel->setText("<font color=green> Done. </font>\n");
+//  mStatusLabel->setText("<font color=green> Done. </font>\n");
 
   emit outputImageChanged(centerlineImage->getUid());
 }

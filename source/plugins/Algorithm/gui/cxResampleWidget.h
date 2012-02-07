@@ -1,8 +1,8 @@
 /*
  * cxResampleWidget.h
  *
- *  Created on: Apr 29, 2011
- *      Author: christiana
+ *  \date Apr 29, 2011
+ *      \author christiana
  */
 
 #ifndef CXRESAMPLEWIDGET_H_
@@ -20,6 +20,12 @@
 namespace cx
 {
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+
+/**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
 
 class ResampleWidget : public BaseWidget
 {
@@ -54,6 +60,9 @@ private:
   QLabel* mStatusLabel;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXRESAMPLEWIDGET_H_ */

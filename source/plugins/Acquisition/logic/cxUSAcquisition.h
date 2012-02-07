@@ -1,8 +1,8 @@
 /*
  * cxUSAcquisition.h
  *
- *  Created on: May 12, 2011
- *      Author: christiana
+ *  \date May 12, 2011
+ *      \author christiana
  */
 
 #ifndef CXUSACQUISITION_H_
@@ -17,14 +17,24 @@
 namespace cx
 {
 
-/**Handles the us acquisition process
+/**
+ * \file
+ * \addtogroup cxPluginAcquisition
+ * @{
+ */
+
+/**
+ * \brief Handles the us acquisition process.
+ * \ingroup cxPluginAcquisition
  *
  * Usage:
- *  ready() is emitted when change in readiness occurs. Use getWhatsMissingText() to display status
- *
- *  start/stop record handles the _streaming_ acquisition, NOT the tracking. This is done externally (yet).
- *  saveSession() gives the id of the tracking recorded data as input, and saves all data to disk.
- *                saveDataCompleted() is emitted when saving is finished.
+ *  - ready() is emitted when change in readiness occurs. Use
+ *    getWhatsMissingText() to display status
+ *  - start/stop record handles the _streaming_ acquisition, NOT the tracking.
+ *    This is done externally (yet).
+ *  - saveSession() gives the id of the tracking recorded data as input, and
+ *    saves all data to disk.
+ *  - saveDataCompleted() is emitted when saving is finished.
  *
  *  TODO: merge the tracking recording into this class
  *
@@ -73,7 +83,9 @@ private:
 };
 typedef boost::shared_ptr<USAcquisition> USAcquisitionPtr;
 
-
+/**
+* @}
+*/
 }
 
 #endif /* CXUSACQUISITION_H_ */

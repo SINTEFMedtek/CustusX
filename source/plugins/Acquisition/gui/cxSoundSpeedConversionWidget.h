@@ -7,7 +7,13 @@
 class QPushButton;
 class QDoubleSpinBox;
 
-namespace cx {
+namespace cx
+{
+/**
+* \file
+* \addtogroup cxPluginAcquisition
+* @{
+*/
 
 /**
  * \class SoundSpeedConversionWidget
@@ -56,6 +62,11 @@ private:
   QDoubleSpinBox* mSoundSpeedSpinBox; //m/s
   QDoubleSpinBox* mWaterDegreeSpinBox; //celsius
 };
+
+
+/**
+* @}
+*/
 }
 
 #endif /* CXSOUNDSPEEDCONVERSIONWIDGET_H_ */

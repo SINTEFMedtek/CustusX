@@ -13,14 +13,19 @@ class QVBoxLayout;
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * \class ManualRegistrationOffsetWidget
  *
  * \brief
  *
  * \date 22. sep. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
-
 class ManualRegistrationOffsetWidget : public RegistrationBaseWidget
 {
   Q_OBJECT
@@ -53,5 +58,9 @@ private:
   int mMinValue, mMaxValue, mDefaultValue; ///< values for the range of the offset
 
 };
+
+/**
+ * @}
+ */
 }//namespace cx
 #endif /* CXMANUALREGISTRATIONOFFSETWIDGET_H_ */

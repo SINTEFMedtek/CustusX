@@ -8,6 +8,12 @@
 namespace cx
 {
 /**
+* \file
+* \addtogroup cxPluginAcquisition
+* @{
+*/
+
+/**
  * TrackedCenterlineWidget
  *
  * \brief
@@ -37,6 +43,10 @@ private:
 
   Centerline  mCenterlineAlgorithm;
 };
+
+/**
+* @}
+*/
 }//namespace cx
 
 #endif /* CXTRACKEDCENTERLINEWIDGET_H_ */

@@ -1,8 +1,8 @@
 /*
  * cxVector3DWidget.cpp
  *
- *  Created on: Jul 25, 2011
- *      Author: christiana
+ *  \date Jul 25, 2011
+ *      \author christiana
  */
 
 #include <cxVector3DWidget.h>

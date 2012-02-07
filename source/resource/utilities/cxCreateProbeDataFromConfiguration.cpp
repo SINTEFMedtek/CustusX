@@ -1,8 +1,8 @@
 /*
  * cxCreateProbeDataFromConfiguration.cpp
  *
- *  Created on: Nov 26, 2010
- *      Author: christiana
+ *  \date Nov 26, 2010
+ *      \author christiana
  */
 
 #include "cxCreateProbeDataFromConfiguration.h"
@@ -10,6 +10,7 @@
 
 ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config)
 {
+	std::cout << "createProbeDataFromConfiguration()" << std::endl;
   if(config.isEmpty())
     return ssc::ProbeData();
 

@@ -1,8 +1,22 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 /*
  * cxDistanceMetricRep.cpp
  *
- *  Created on: Jul 5, 2011
- *      Author: christiana
+ *  \date Jul 5, 2011
+ *      \author christiana
  */
 
 #include <cxDistanceMetricRep.h>
@@ -22,13 +36,12 @@ namespace cx
 
 DistanceMetricRepPtr DistanceMetricRep::New(const QString& uid, const QString& name)
 {
-	DistanceMetricRepPtr retval(new DistanceMetricRep(uid,name));
+	DistanceMetricRepPtr retval(new DistanceMetricRep(uid, name));
 	return retval;
 }
 
 DistanceMetricRep::DistanceMetricRep(const QString& uid, const QString& name) :
-    DataMetricRep(uid,name),
-		mView(NULL)
+				DataMetricRep(uid, name), mView(NULL)
 {
 }
 
@@ -65,18 +78,18 @@ void DistanceMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 
 void DistanceMetricRep::changedSlot()
 {
-  if (!mMetric)
-    return;
-
-	std::vector<ssc::Vector3D> p = mMetric->getEndpoints();
-	if (p.size()!=2)
+	if (!mMetric)
 		return;
 
-  if (!mGraphicalLine && mView && mMetric)
-  {
+	std::vector<ssc::Vector3D> p = mMetric->getEndpoints();
+	if (p.size() != 2)
+		return;
+
+	if (!mGraphicalLine && mView && mMetric)
+	{
 		mGraphicalLine.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
-    mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
-  }
+		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+	}
 
 	if (!mGraphicalLine)
 		return;
@@ -86,14 +99,14 @@ void DistanceMetricRep::changedSlot()
 	mGraphicalLine->setStipple(0xF0FF);
 
 	QString text = QString("%1 mm").arg(mMetric->getDistance(), 0, 'f', 1);
-  if (mShowLabel)
-    text = mMetric->getName() + " = " + text;
-	ssc::Vector3D p_mean = (p[0]+p[1])/2;
+	if (mShowLabel)
+		text = mMetric->getName() + " = " + text;
+	ssc::Vector3D p_mean = (p[0] + p[1]) / 2;
 
-  mText->setColor(mColor);
-  mText->setText(text);
-  mText->setPosition(p_mean);
-  mText->setSize(mLabelSize/100);
+	mText->setColor(mColor);
+	mText->setText(text);
+	mText->setPosition(p_mean);
+	mText->setSize(mLabelSize / 100);
 //  mText->setSizeInNormalizedViewport(true, mLabelSize/100);
 }
 

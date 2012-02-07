@@ -11,6 +11,12 @@ namespace cx
 {
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
+
 /** Adapter that connects to the current active image.
  */
 class ClipPlaneStringDataAdapter: public ssc::StringDataAdapter
@@ -65,6 +71,9 @@ private slots:
 	void saveButtonClickedSlot();
 };
 
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif /* CXCLIPPINGWIDGET_H_ */
