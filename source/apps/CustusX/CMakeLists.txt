@@ -161,6 +161,9 @@ if(APPLE)
   install(FILES ${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf 
       DESTINATION ${CX_INSTALL_ROOT_DIR}/doc
       )
+  install(FILES ${CustusX3_SOURCE_DIR}/install/Apple/SupportedGrabbers.txt
+      DESTINATION ${CX_INSTALL_ROOT_DIR}
+      )
   install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/GrabberServer.app 
       DESTINATION ${CX_INSTALL_ROOT_DIR}
       #COMPONENT CustusX
