@@ -66,8 +66,9 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
 
   mTools = SelectToolStringDataAdapter::New();
   mCalibrateToolComboBox = new ssc::LabeledComboBoxWidget(this, mTools);
+  this->setToolTip(this->defaultWhatsThis());
 
-  toplayout->addWidget(new QLabel("<b>Select a tool with a known referece point:</b>"));
+  toplayout->addWidget(new QLabel("<b>Select a tool with a known reference point:</b>"));
   toplayout->addWidget(mCalibrateToolComboBox);
   toplayout->addWidget(mReferencePointLabel);
   toplayout->addWidget(mCalibrateButton);
