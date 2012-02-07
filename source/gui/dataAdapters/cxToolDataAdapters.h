@@ -42,15 +42,17 @@ public: // optional methods
 };
 
 
-/** Adapter that connects to the current active tool.
+/** Adapter that connects to the current active probe.
+ *  It will stick to the probe as much as possible,
+ *  i.e. ignore hiding and showing of other non-probes.
  */
-class ActiveToolConfigurationStringDataAdapter : public ssc::StringDataAdapter
+class ActiveProbeConfigurationStringDataAdapter : public ssc::StringDataAdapter
 {
   Q_OBJECT
 public:
-  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveToolConfigurationStringDataAdapter()); }
-  ActiveToolConfigurationStringDataAdapter();
-  virtual ~ActiveToolConfigurationStringDataAdapter() {}
+  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveProbeConfigurationStringDataAdapter()); }
+  ActiveProbeConfigurationStringDataAdapter();
+  virtual ~ActiveProbeConfigurationStringDataAdapter() {}
 
 public: // basic methods
   virtual QString getValueName() const;

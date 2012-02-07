@@ -57,7 +57,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	//for testing sound speed converting - END
 
 	RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this,
-		ActiveToolConfigurationStringDataAdapter::New()));
+		ActiveProbeConfigurationStringDataAdapter::New()));
 	mLayout->addStretch();
 	mLayout->addWidget(soundSpeedWidget);
 	RecordBaseWidget::mLayout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
