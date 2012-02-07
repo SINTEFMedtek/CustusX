@@ -208,8 +208,11 @@ bool MacGrabber::findConnectedDevice()
         this->reportString(foundtext);
         mObjectiveC->mSelectedDevice = device;
         found = true;
+        break;
       }
     }
+    if(found)
+      break;
   }
 
   //Report to user how to change grabber
