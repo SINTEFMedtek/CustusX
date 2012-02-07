@@ -1,8 +1,8 @@
 /*
  * cxCenterlineWidget.h
  *
- *  Created on: Apr 29, 2011
- *      Author: christiana
+ *  \date Apr 29, 2011
+ *      \author christiana
  */
 
 #ifndef CXCENTERLINEWIDGET_H_
@@ -16,6 +16,13 @@
 namespace cx
 {
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+class TimedAlgorithmProgressBar;
+
+/**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
 
 /**
  * \class CenterlineWidget
@@ -23,7 +30,7 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * \brief Widget for extracting the centerline from a segment.
  *
  * \date 12. okt. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 class CenterlineWidget : public BaseWidget
 {
@@ -53,10 +60,15 @@ private slots:
 private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
-  QLabel* mStatusLabel;
+//  QLabel* mStatusLabel;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
-  Centerline  mCenterlineAlgorithm;
+  CenterlinePtr  mCenterlineAlgorithm;
 };
+
+/**
+ * @}
+ */
 }
 
 #endif /* CXCENTERLINEWIDGET_H_ */

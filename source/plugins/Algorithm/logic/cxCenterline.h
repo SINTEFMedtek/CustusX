@@ -8,6 +8,12 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
+/**
  * \class Centerline
  *
  * \brief Threaded centerline algorithm.
@@ -38,6 +44,10 @@ private:
   ssc::DataPtr mOutput;
   QColor mDefaultColor;
 };
+typedef boost::shared_ptr<class Centerline> CenterlinePtr;
 
+/**
+ * @}
+ */
 }//namespace cx
 #endif /* CXCENTERLINE_H_ */

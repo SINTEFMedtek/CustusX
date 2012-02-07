@@ -185,10 +185,12 @@ void PerformanceTab::init()
 
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
   mSmartRenderCheckBox->setChecked(settings()->value("smartRender", true).toBool());
+  mSmartRenderCheckBox->setToolTip("Render only when scene has changed, plus once per second.");
 
   bool useGPURender = settings()->value("useGPUVolumeRayCastMapper").toBool();
   mGPURenderCheckBox = new QCheckBox("Use GPU 3D Renderer");
   mGPURenderCheckBox->setChecked(useGPURender);
+  mGPURenderCheckBox->setToolTip("Use a GPU-based 3D renderer instead of the texture-based one, if available.");
 
   //Layout
   mMainLayout = new QGridLayout;
@@ -549,6 +551,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   this->addTab(new VideoTab, tr("Video"));
   this->addTab(new ToolConfigTab, tr("Tool Configuration"));
   this->addTab(new LayoutEditorTab, tr("Layout editor"));
+  this->addTab(new DebugTab, tr("Debug"));
 
   QPushButton* applyButton = mButtonBox->button(QDialogButtonBox::Apply);
 
@@ -613,6 +616,38 @@ void PreferencesDialog::addTab(PreferencesTab* widget, QString name)
   mToolBar->addWidget(button);
 
   mTabWidget->addWidget(widget);
+}
+
+//==============================================================================
+// UltrasoundTab
+//------------------------------------------------------------------------------
+DebugTab::DebugTab(QWidget *parent) :
+    PreferencesTab(parent)
+{}
+
+void DebugTab::init()
+{
+	mIGSTKDebugLoggingCheckBox = new QCheckBox("IGSTK Debug Logging");
+	mIGSTKDebugLoggingCheckBox->setChecked(settings()->value("IGSTKDebugLogging", true).toBool());
+	mIGSTKDebugLoggingCheckBox->setToolTip("Enables a large amount of logging in IGSTK (need restart)");
+
+	mManualToolPhysicalPropertiesCheckBox = new QCheckBox("Debug manual tool");
+	mManualToolPhysicalPropertiesCheckBox->setChecked(settings()->value("giveManualToolPhysicalProperties", true).toBool());
+	mManualToolPhysicalPropertiesCheckBox->setToolTip("give manual tool the properties of the first physical tool. \nUse to simulate f.ex. probes with manual tool. (need restart)");
+
+	//Layout
+	mMainLayout = new QGridLayout;
+	int i=0;
+	mMainLayout->addWidget(mIGSTKDebugLoggingCheckBox, i++, 0);
+	mMainLayout->addWidget(mManualToolPhysicalPropertiesCheckBox, i++, 0);
+
+	mTopLayout->addLayout(mMainLayout);
+}
+
+void DebugTab::saveParametersSlot()
+{
+	settings()->setValue("IGSTKDebugLogging", mIGSTKDebugLoggingCheckBox->isChecked());
+	settings()->setValue("giveManualToolPhysicalProperties", mManualToolPhysicalPropertiesCheckBox->isChecked());
 }
 
 }//namespace cx

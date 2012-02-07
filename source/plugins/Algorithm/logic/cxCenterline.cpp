@@ -11,7 +11,7 @@
 namespace cx
 {
 Centerline::Centerline() :
-    ThreadedTimedAlgorithm<vtkImageDataPtr>("centerline", 10),
+    ThreadedTimedAlgorithm<vtkImageDataPtr>("centerline", 20),
     mDefaultColor("red")
 {}
 

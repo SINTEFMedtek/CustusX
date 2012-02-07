@@ -8,7 +8,6 @@ if (WIN32)
     add_definitions(-D_USE_MATH_DEFINES)
 endif(WIN32)
 
-# qxt hack for mac:
 if (APPLE OR WIN32)
     set(QXT_FOLDER "../ThirdParty/qxt_mac_compatible")
 else(APPLE OR WIN32)
@@ -38,7 +37,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/cxTransferFunctionWidget.h
     dataWidgets/cxTransferFunctionAlphaWidget.h
     dataWidgets/cxTransferFunctionColorWidget.h
-    #dataWidgets/sscDICOMWidget.h
+    dataWidgets/sscDICOMWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
     infoWidgets/cxBrowserWidget.h
@@ -80,6 +79,47 @@ SET(cxGui_MOC_HDRS
     ${QXT_FOLDER}/qxtspanslider.h
 
 )
+
+set(SUB_FOLDERS
+    dataAdapters
+    dataWidgets
+    infoWidgets
+    navigationWidgets
+    preferencesWidgets
+    streamingWidgets
+    toolWidgets
+    utilities
+    ${QXT_FOLDER}
+    )
+
+# Use the include path and library for Qt that is used by VTK.
+INCLUDE_DIRECTORIES(
+  ${SUB_FOLDERS}
+  ${QT_INCLUDE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+include_directories(
+    .
+    ${SSC_SOURCE_DIR}/DICOMLib/
+    ${SSC_BINARY_DIR}/DICOMLib/
+
+    ${CustusX3_SOURCE_DIR}/source/resource
+    ${CustusX3_SOURCE_DIR}/source/resource/settings
+    ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
+
+    ${CustusX3_SOURCE_DIR}/source/service/patient     
+    ${CustusX3_SOURCE_DIR}/source/service/tracking     
+    ${CustusX3_SOURCE_DIR}/source/service/visualization
+    ${CustusX3_SOURCE_DIR}/source/service/video
+    ${CustusX3_SOURCE_DIR}/source/service/state
+    
+    ${CustusX3_SOURCE_DIR}/source/logic
+    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
+    )
+
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
 IF(WIN32)
@@ -129,8 +169,8 @@ SET(cxGui_SRCS
     dataWidgets/cxImportDataDialog.cpp
     dataWidgets/cxDataViewSelectionWidget.h
     dataWidgets/cxDataViewSelectionWidget.cpp
-    #dataWidgets/sscDICOMWidget.h
-    #dataWidgets/sscDICOMWidget.cpp
+    dataWidgets/sscDICOMWidget.h
+    dataWidgets/sscDICOMWidget.cpp
     #----------------------
     infoWidgets/cxBrowserWidget.h
     infoWidgets/cxBrowserWidget.cpp
@@ -204,50 +244,12 @@ SET(cxGui_SRCS
     ${QXT_FOLDER}/qxtspanslider.cpp    
     #----------------------
     ${cxGui_RCC_SRCS} )
-
-
-
-set(SUB_FOLDERS
-    dataAdapters
-    dataWidgets
-    infoWidgets
-    navigationWidgets
-    preferencesWidgets
-    streamingWidgets
-    toolWidgets
-    utilities
-    ${QXT_FOLDER}
-    )
-
-# Use the include path and library for Qt that is used by VTK.
-INCLUDE_DIRECTORIES(
-  ${SUB_FOLDERS}
-  ${QT_INCLUDE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-include_directories(
-    .
-    #${SSC_SOURCE_DIR}/DICOMLib/
-
-    ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
-    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
-
-    ${CustusX3_SOURCE_DIR}/source/service/patient     
-    ${CustusX3_SOURCE_DIR}/source/service/tracking     
-    ${CustusX3_SOURCE_DIR}/source/service/visualization
-    ${CustusX3_SOURCE_DIR}/source/service/video
-    ${CustusX3_SOURCE_DIR}/source/service/state
     
-    ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
-    )
-
-
-ADD_LIBRARY ( cxGui ${cxGui_SRCS} ${cxGui_MOC_SRCS} )
-#target_link_libraries(cxGui cxLogicManager cxStateService DICOMLib)
-target_link_libraries(cxGui cxLogicManager cxStateService)
+set(CX_GUI_LIBRARIES cxLogicManager cxStateService)
+if (SSC_USE_DCMTK)
+    set(CX_GUI_LIBRARIES ${CX_GUI_LIBRARIES} DICOMLib)
+endif (SSC_USE_DCMTK)
+    
+add_library( cxGui ${cxGui_SRCS} ${cxGui_MOC_SRCS} )
+target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )
 

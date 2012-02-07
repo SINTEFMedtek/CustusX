@@ -108,7 +108,7 @@ void LandmarkPatientRegistrationWidget::updateToolSampleButton()
   bool enabled = false;
   enabled = tool &&
   		tool->getVisible() &&
-      (tool->getType()!=ssc::Tool::TOOL_MANUAL || DataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+      (!tool->isManual() || DataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
   mToolSampleButton->setEnabled(enabled);
 
   if (ssc::toolManager()->getDominantTool())

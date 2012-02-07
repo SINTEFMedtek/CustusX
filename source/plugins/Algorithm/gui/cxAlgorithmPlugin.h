@@ -1,8 +1,8 @@
 /*
  * cxAlgorithmPlugin.h
  *
- *  Created on: Jun 15, 2011
- *      Author: christiana
+ *  \date Jun 15, 2011
+ *      \author christiana
  */
 
 #ifndef CXALGORITHMPLUGIN_H_
@@ -12,6 +12,21 @@
 
 namespace cx
 {
+/**
+ * \defgroup cxPluginAlgorithm Algorithm Plugin
+ * \ingroup cxPlugins
+ * \brief Algorithm collection with widgets.
+ *
+ * See \ref cx::AlgorithmPlugin.
+ *
+ */
+
+/**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
+
 typedef boost::shared_ptr<class AlgorithmPlugin> AlgorithmPluginPtr;
 
 /**Rewrite to be a descendant of PluginBase, with generic API for creating plugins...
@@ -34,6 +49,9 @@ private slots:
 private:
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXALGORITHMPLUGIN_H_ */

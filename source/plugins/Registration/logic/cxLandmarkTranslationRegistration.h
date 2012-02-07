@@ -1,8 +1,8 @@
 /*
  * cxLandmarkTranslationRegistration.h
  *
- *  Created on: Sep 27, 2010
- *      Author: christiana
+ *  \date Sep 27, 2010
+ *      \author christiana
  */
 
 #ifndef CXLANDMARKTRANSLATIONREGISTRATION_H_
@@ -13,6 +13,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 /** Use ITK to perform a landmark registration in 3D with translation only.
  *
@@ -25,6 +30,9 @@ public:
   ssc::Transform3D registerPoints(std::vector<ssc::Vector3D> ref, std::vector<ssc::Vector3D> target, bool* ok);
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXLANDMARKTRANSLATIONREGISTRATION_H_ */

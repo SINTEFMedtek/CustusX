@@ -1,9 +1,16 @@
-/*
- * cxPlaneMetric.cpp
- *
- *  Created on: Jul 27, 2011
- *      Author: christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
 #include <cxPlaneMetric.h>
 
@@ -11,19 +18,17 @@
 #include "sscTool.h"
 #include "sscToolManager.h"
 #include "sscTypeConversions.h"
-//#include ""
 
 namespace cx
 {
 
 ssc::DataPtr PlaneMetricReader::load(const QString& uid, const QString& filename)
 {
-  return ssc::DataPtr(new PlaneMetric(uid,filename));
+	return ssc::DataPtr(new PlaneMetric(uid, filename));
 }
 
-
 PlaneMetric::PlaneMetric(const QString& uid, const QString& name) :
-		DataMetric(uid, name)
+				DataMetric(uid, name)
 {
 }
 
@@ -37,82 +42,83 @@ Plane3D PlaneMetric::getRefPlane() const
 	ssc::Vector3D p = rM1.coord(this->getCoordinate());
 	ssc::Vector3D n = rM1.vector(this->getNormal()).normalized();
 
-	return Eigen::Hyperplane<double,3>(n,p);
+	return Eigen::Hyperplane<double, 3>(n, p);
 }
 
 void PlaneMetric::setCoordinate(const ssc::Vector3D& p)
 {
-  if (p==mCoordinate)
-    return;
-  mCoordinate = p;
-  emit transformChanged();
+	if (p == mCoordinate)
+		return;
+	mCoordinate = p;
+	emit transformChanged();
 }
 
 ssc::Vector3D PlaneMetric::getCoordinate() const
 {
-  return mCoordinate;
+	return mCoordinate;
 }
 
 void PlaneMetric::setNormal(const ssc::Vector3D& p)
 {
-  if (p==mNormal)
-    return;
-  mNormal = p;
-  emit transformChanged();
+	if (p == mNormal)
+		return;
+	mNormal = p;
+	emit transformChanged();
 }
 
 ssc::Vector3D PlaneMetric::getNormal() const
 {
-  return mNormal;
+	return mNormal;
 }
 
 void PlaneMetric::setSpace(ssc::CoordinateSystem space)
 {
-  if (space==mSpace)
-    return;
+	if (space == mSpace)
+		return;
 
-  mSpace = space;
+	mSpace = space;
 
-  //TODO connect to the owner of space - data or tool or whatever
-  if (mSpace.mId==ssc::csTOOL)
-  {
-    connect(ssc::toolManager()->getTool(mSpace.mRefObject).get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(transformChanged()));
-  }
+	//TODO connect to the owner of space - data or tool or whatever
+	if (mSpace.mId == ssc::csTOOL)
+	{
+		connect(ssc::toolManager()->getTool(mSpace.mRefObject).get(),
+						SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this,
+						SIGNAL(transformChanged()));
+	}
 
-  emit transformChanged();
+	emit transformChanged();
 }
 
 ssc::CoordinateSystem PlaneMetric::getSpace() const
 {
-  return mSpace;
+	return mSpace;
 }
 
 void PlaneMetric::addXml(QDomNode& dataNode)
 {
-  Data::addXml(dataNode);
+	Data::addXml(dataNode);
 
-  dataNode.toElement().setAttribute("space", mSpace.toString());
-  dataNode.toElement().setAttribute("coord", qstring_cast(mCoordinate));
-  dataNode.toElement().setAttribute("normal", qstring_cast(mNormal));
+	dataNode.toElement().setAttribute("space", mSpace.toString());
+	dataNode.toElement().setAttribute("coord", qstring_cast(mCoordinate));
+	dataNode.toElement().setAttribute("normal", qstring_cast(mNormal));
 }
 
 void PlaneMetric::parseXml(QDomNode& dataNode)
 {
-  Data::parseXml(dataNode);
+	Data::parseXml(dataNode);
 
-  mSpace = ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString()));
-  mCoordinate = ssc::Vector3D::fromString(dataNode.toElement().attribute("coord", qstring_cast(mCoordinate)));
-  mNormal = ssc::Vector3D::fromString(dataNode.toElement().attribute("normal", qstring_cast(mNormal)));
+	mSpace = ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString()));
+	mCoordinate = ssc::Vector3D::fromString(dataNode.toElement().attribute("coord", qstring_cast(mCoordinate)));
+	mNormal = ssc::Vector3D::fromString(dataNode.toElement().attribute("normal", qstring_cast(mNormal)));
 }
 
 ssc::DoubleBoundingBox3D PlaneMetric::boundingBox() const
 {
-  // convert both inputs to r space
-  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-  ssc::Vector3D p0_r = rM0.coord(this->getCoordinate());
+	// convert both inputs to r space
+	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+	ssc::Vector3D p0_r = rM0.coord(this->getCoordinate());
 
-  return ssc::DoubleBoundingBox3D(p0_r, p0_r);
+	return ssc::DoubleBoundingBox3D(p0_r, p0_r);
 }
-
 
 }

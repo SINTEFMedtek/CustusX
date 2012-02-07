@@ -1,8 +1,8 @@
 /*
  * cxSecondaryMainWindow.h
  *
- *  Created on: Oct 18, 2010
- *      Author: christiana
+ *  \date Oct 18, 2010
+ *      \author christiana
  */
 #ifndef CXSECONDARYMAINWINDOW_H_
 #define CXSECONDARYMAINWINDOW_H_
@@ -12,6 +12,15 @@
 namespace cx
 {
 
+/**
+ * \brief Experimental class for IPad usage.
+ * \ingroup cxGUI
+ *
+ * This detached main window can be moved onto a secondary screen.
+ * The use case was a IPad where scrolling etc could control the
+ * CustusX scene.
+ *
+ */
 class SecondaryMainWindow: public QMainWindow
 {
 Q_OBJECT

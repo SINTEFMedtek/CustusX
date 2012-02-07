@@ -106,8 +106,8 @@ SET ( cxOpenIGTLinkServer_FILES
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
-add_executable( cxOpenIGTLinkServer main.cpp ${cxOpenIGTLinkServer_FILES} ${MOC_HEADER_FILES} )
-target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES}     
+add_executable( OpenIGTLinkServer main.cpp ${cxOpenIGTLinkServer_FILES} ${MOC_HEADER_FILES} )
+target_link_libraries(OpenIGTLinkServer  ${LINK_LIBRARIES}     
     ${OpenCV_LIBS}
     vtkIO 
     vtkRendering 
@@ -117,4 +117,31 @@ target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES}
     vtkWidgets 
     vtkFiltering 
     vtkVolumeRendering  )
+    
+    
+install(TARGETS OpenIGTLinkServer
+    BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
+    RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
+    )
+ 
+#linux installation:
+if (CX_LINUX)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/OpenIGTLinkServer")
+  set(LIBS "")
+  set(DIRS 
+      ${QT_INCLUDES} 
+      ${QT_LIBRARY_DIRS}
+      ${VTK_LIBRARY_DIRS}
+      ${SSC_BINARY_DIR}/Code
+      ${OpenIGTLink_LIBRARY_DIRS}
+      ${OpenCV_LIB_DIR}
+      ${OpenIGTLink_LIBRARY_DIRS}
+      )
       
+  install(CODE "
+     include(BundleUtilities)
+     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
+     #COMPONENT CustusX
+     )      
+      
+endif (CX_LINUX)     

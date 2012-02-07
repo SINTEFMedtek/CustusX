@@ -12,7 +12,7 @@ typedef cx::Frame Frame;
  * \brief Support Qt support for vtkSonixVideoSource
  *
  * \date 21. jun. 2011
- * \author: Ole Vegard Solberg, SINTEF
+ * \\author Ole Vegard Solberg, SINTEF
  */
 class SonixHelper : public QObject
 {

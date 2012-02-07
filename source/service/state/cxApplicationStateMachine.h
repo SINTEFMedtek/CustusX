@@ -1,9 +1,16 @@
-/*
- * cxApplicationStateMachine.h
- *
- *  Created on: Aug 17, 2010
- *      Author: christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
 #ifndef CXAPPLICATIONSTATEMACHINE_H_
 #define CXAPPLICATIONSTATEMACHINE_H_
@@ -17,44 +24,56 @@ class QMenu;
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxServiceState
+ * @{
+ */
 
 class ApplicationState;
 
-/**
+/** \brief State Machine for the Clinical Application
+ *
+ *  See StateService for a description.
+ *
+ *  \date Aug 17, 2010
+ *  \author christiana
  */
-class ApplicationStateMachine : public QStateMachine
+class ApplicationStateMachine: public QStateMachine
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  ApplicationStateMachine();
-  virtual ~ApplicationStateMachine();
+	ApplicationStateMachine();
+	virtual ~ApplicationStateMachine();
 
-  QActionGroup* getActionGroup();
+	QActionGroup* getActionGroup();
 
-  QString getActiveUidState();
-  QString getActiveStateName();
+	QString getActiveUidState();
+	QString getActiveStateName();
 
-  QStringList getAllApplicationNames();
+	QStringList getAllApplicationNames();
 
 signals:
-  void activeStateChanged();
+	void activeStateChanged();
 
 private slots:
-  void activeStateChangedSlot();
+	void activeStateChangedSlot();
 
 private:
-  QAction* addAction(QString stateUid, QActionGroup* group);
-  ApplicationState* newState(ApplicationState* state);
+	QAction* addAction(QString stateUid, QActionGroup* group);
+	ApplicationState* newState(ApplicationState* state);
 
-  typedef std::map<QString, ApplicationState*> ApplicationStateMap;
-  ApplicationStateMap mStates;
-  ApplicationState* mParentState;
-  QActionGroup* mActionGroup;
+	typedef std::map<QString, ApplicationState*> ApplicationStateMap;
+	ApplicationStateMap mStates;
+	ApplicationState* mParentState;
+	QActionGroup* mActionGroup;
 };
 
 typedef boost::shared_ptr<ApplicationStateMachine> ApplicationStateMachinePtr;
 
+/**
+ * @}
+ */
 }
-
 
 #endif /* CXAPPLICATIONSTATEMACHINE_H_ */

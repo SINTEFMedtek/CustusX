@@ -19,6 +19,10 @@ class TreeItem;
 typedef boost::weak_ptr<TreeItem> TreeItemWeakPtr;
 typedef boost::shared_ptr<TreeItem> TreeItemPtr;
 
+/**
+ * \ingroup cxGUI
+ *
+ */
 class BrowserItemModel : public QAbstractItemModel
 {
   Q_OBJECT
@@ -63,10 +67,11 @@ private:
  * \class BrowserWidget
  *
  * \brief Shows a treestructure containing the loaded images, meshes
- * and tools
+ * and tools.
+ * \ingroup cxGUI
  *
  * \date Feb 11, 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 class BrowserWidget : public BaseWidget
 {

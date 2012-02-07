@@ -6,13 +6,19 @@
 namespace cx
 {
 /**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
  * \class FastImageRegistrationWidget
  *
  * \brief Widget for performing landmark based image registration using only the
  * translation part of the matrix.
  *
  * \date 27. sep. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 class FastImageRegistrationWidget : public LandmarkImageRegistrationWidget
 {
@@ -41,5 +47,9 @@ protected:
   virtual void performRegistration();
 };
 
+/**
+ * @}
+ */
 }//namespace cx
+
 #endif /* CXFASTIMAGEREGISTRATIONWIDGET_H_ */

@@ -1,8 +1,8 @@
 /*
  * cxClippingWidget.cpp
  *
- *  Created on: Aug 25, 2010
- *      Author: christiana
+ *  \date Aug 25, 2010
+ *      \author christiana
  */
 #include "cxClippingWidget.h"
 
@@ -43,7 +43,7 @@ QString ClipPlaneStringDataAdapter::getValue() const
 }
 QString ClipPlaneStringDataAdapter::getHelp() const
 {
-	return "chose the slice plane to clip with";
+	return "Chose the slice plane to clip with.";
 }
 QStringList ClipPlaneStringDataAdapter::getValueRange() const
 {
@@ -65,9 +65,12 @@ ClippingWidget::ClippingWidget(QWidget* parent) :
 	mInteractiveClipper = viewManager()->getClipper();
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
-	QVBoxLayout* layout = new QVBoxLayout(this);
+	  this->setToolTip(this->defaultWhatsThis());
+
+	  QVBoxLayout* layout = new QVBoxLayout(this);
 
 	QGroupBox* activeClipGroupBox = new QGroupBox("Interactive clipper");
+	activeClipGroupBox->setToolTip(this->defaultWhatsThis());
 	layout->addWidget(activeClipGroupBox);
 	QVBoxLayout* activeClipLayout = new QVBoxLayout(activeClipGroupBox);
 
@@ -75,17 +78,21 @@ ClippingWidget::ClippingWidget(QWidget* parent) :
 	ssc::LabeledComboBoxWidget* combo = new ssc::LabeledComboBoxWidget(this, mPlaneAdapter);
 
 	mUseClipperCheckBox = new QCheckBox("Use Clipper");
+	mUseClipperCheckBox->setToolTip("Turn on interactive clipping for the active volume.");
 	connect(mUseClipperCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(useClipper(bool)));
 	activeClipLayout->addWidget(mUseClipperCheckBox);
 	activeClipLayout->addWidget(combo);
 	mInvertPlaneCheckBox = new QCheckBox("Invert plane");
+	mInvertPlaneCheckBox->setToolTip("Use the inverse (mirror) of the selected slice plane.");
 	connect(mInvertPlaneCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(invertPlane(bool)));
 	activeClipLayout->addWidget(mInvertPlaneCheckBox);
 
 	QPushButton* saveButton = new QPushButton("Save clip plane");
+	saveButton->setToolTip("Save the interactive plane as a clip plane in the active volume.");
 	connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClickedSlot()));
 	//saveButton->setEnabled(false);
 	QPushButton* clearButton = new QPushButton("Clear saved planes");
+	clearButton->setToolTip("Remove all saved clip planes from the active volume");
 	connect(clearButton, SIGNAL(clicked()), this, SLOT(clearButtonClickedSlot()));
 	//clearButton->setEnabled(false);
 	activeClipLayout->addWidget(saveButton);
@@ -100,7 +107,15 @@ QString ClippingWidget::defaultWhatsThis() const
 {
 	return "<html>"
 		"<h3>Functonality for clipping a volume</h3>"
-		"<p>Lets you clip in a volume.</p>"
+		"<p>"
+		"Define clip planes in a volume. The interactive clipper is attached "
+		"to the active tool, and clips the active volume according to a slice "
+		"definition. "
+		"</p>"
+		"<p>"
+		"The current clip can also be saved along with the volume. This can be "
+		"done several times."
+		"</p>"
 		"<p><i></i></p>"
 		"</html>";
 }

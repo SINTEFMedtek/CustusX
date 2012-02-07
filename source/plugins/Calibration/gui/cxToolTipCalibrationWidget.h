@@ -12,13 +12,19 @@ class QLineEdit;
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginCalibration
+ * @{
+ */
+
 ///**
 // * \class ToolTipCalibrationWidget
 // *
 // * \brief
 // *
 // * \date 3. nov. 2010
-// * \author: Janne Beate Bakeng, SINTEF
+// * \\author Janne Beate Bakeng, SINTEF
 // */
 //class ToolTipCalibrationWidget : public BaseWidget
 //{
@@ -87,5 +93,8 @@ private:
   ssc::Vector3D mP_t; ///< the sampled point we are working on
 };
 
+/**
+ * @}
+ */
 }//namespace cx
 #endif /* CXTOOLTIPCALIBRATIONWIDGET_H_ */

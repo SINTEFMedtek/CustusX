@@ -1,8 +1,8 @@
 /*
  * cxTreeModelItem.h
  *
- *  Created on: Jul 30, 2010
- *      Author: christiana
+ *  \date Jul 30, 2010
+ *      \author christiana
  */
 
 #ifndef CXTREEMODELITEM_H_
@@ -20,6 +20,14 @@ namespace cx
 {
 
 class BrowserItemModel;
+
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
+
+
 class TreeItem;
 typedef boost::weak_ptr<TreeItem> TreeItemWeakPtr;
 typedef boost::shared_ptr<TreeItem> TreeItemPtr;
@@ -111,6 +119,9 @@ private:
   ssc::ToolPtr mTool;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXTREEMODELITEM_H_ */

@@ -1,8 +1,8 @@
 /*
  * cxAcquisitionData.h
  *
- *  Created on: Jun 9, 2011
- *      Author: christiana
+ *  \date Jun 9, 2011
+ *      \author christiana
  */
 
 #ifndef CXACQUISITIONDATA_H_
@@ -20,6 +20,11 @@ namespace ssc
 
 namespace cx
 {
+/**
+* \file
+* \addtogroup cxPluginAcquisition
+* @{
+*/
 
 /**Shared Data and resources for the Acquisition Plugin
  *
@@ -55,6 +60,10 @@ private:
 };
 
 typedef boost::shared_ptr<AcquisitionData> AcquisitionDataPtr;
+
+/**
+* @}
+*/
 }
 
 #endif /* CXACQUISITIONDATA_H_ */

@@ -1,11 +1,14 @@
 /*
  * sscDICOMWidget.cpp
  *
- *  Created on: Nov 15, 2011
- *      Author: christiana
+ *  \date Nov 15, 2011
+ *      \author christiana
  */
 
 #include <sscDICOMWidget.h>
+
+#ifdef SSC_USE_DCMTK
+
 #include "sscDICOMLibAPI.h"
 #include <sscImage.h>
 #include "sscTypeConversions.h"
@@ -261,3 +264,5 @@ void DICOMWidget::dicomChanged()
 }
 
 }
+
+#endif // SSC_USE_DCMTK

@@ -12,6 +12,13 @@
 namespace cx
 {
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+class TimedAlgorithmProgressBar;
+
+/**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
 
 /**
  * \class BinaryThresholdImageFilterWidget
@@ -19,8 +26,8 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * \brief Widget for segmenting out parts of volumes using a threshold.
  *
  * \date 12. okt. 2010
- * \author: Janne Beate Bakeng, SINTEF
- * \author: Christian Askeland, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class BinaryThresholdImageFilterWidget : public BaseWidget
 {
@@ -66,12 +73,16 @@ private:
   ssc::SpinBoxAndSliderGroupWidgetPtr mSmoothingSigmaWidget;
   QLabel* mSmoothingSigmaLabel;
   QColor mDefaultColor;
-  QLabel* mStatusLabel;
+//  QLabel* mStatusLabel;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
-  BinaryThresholdImageFilter mSegmentationAlgorithm;
-  Contour mContourAlgorithm;
+  BinaryThresholdImageFilterPtr mSegmentationAlgorithm;
+  ContourPtr mContourAlgorithm;
 };
 
+/**
+ * @}
+ */
 }//namespace cx
 
 #endif /* CXSBINARYTHRESHOLDIMAGEFILTERWIDGET_H_ */

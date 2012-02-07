@@ -10,6 +10,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
 
 class TransferFunction2DColorWidget : public BaseWidget
 {
@@ -53,7 +58,7 @@ protected:
  * \class ImagePropertiesWidget
  *
  * \date 2010.04.12
- * \author: Christian Askeland, SINTEF
+ * \\author Christian Askeland, SINTEF
  */
 class ImagePropertiesWidget : public BaseWidget
 {
@@ -72,6 +77,9 @@ private:
   ImagePropertiesWidget();
 };
 
+/**
+ * @}
+ */
 }//end namespace cx
 
 #endif /* CXIMAGEPROPERTIESWIDGET_H_ */

@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 2.6)
 #------------------------------------------------------------------------------
 set(CustusX3_VERSION_MAJOR  3)
 set(CustusX3_VERSION_MINOR  2)
-set(CustusX3_VERSION_PATCH  1)
+set(CustusX3_VERSION_PATCH  8)
 set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 
@@ -25,14 +25,14 @@ endif(APPLE)
 set(ALPHA ON)
   
 if(ALPHA)
-  set(VERSION_NUMBER "${VERSION_NUMBER} alpha")
-  set(VERSION_NUMBER_VERBOSE "${VERSION_NUMBER_VERBOSE} alpha")
+  # no spaces due to linux cmake 2.8.4 troubles...
+  set(VERSION_NUMBER "${VERSION_NUMBER}.alpha")
+  set(VERSION_NUMBER_VERBOSE "${VERSION_NUMBER_VERBOSE}.alpha")
 endif(ALPHA)
 
 #------------------------------------------------------------------------------
 # Variables
 #------------------------------------------------------------------------------
-set(BUNDLE_NAME CustusX)
 set(CMAKE_BUILD_TYPE:STRING=Debug)
 
 set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
@@ -40,12 +40,31 @@ set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
 
-set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}")
-set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
-set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
-set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
+set(CPACK_PACKAGE_FILE_NAME "CustusX_${VERSION_NUMBER_VERBOSE}")
+set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_welcome.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_license.txt")
+
+# append build type to name if not Release:
+if    (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
+endif (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
+
+# Variables
+#----------
+
+# define LINUX convenience variable
+if (UNIX AND NOT APPLE)
+    set(CX_LINUX 1)
+endif (UNIX AND NOT APPLE)
+
+# Set root folder for entire installation
+set(CX_INSTALL_ROOT_DIR .)
+
 
 if (APPLE)
+    set(CX_INSTALL_ROOT_DIR "CustusX")
+
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
     set(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
     set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
     set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
@@ -55,6 +74,30 @@ if (APPLE)
     option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
     option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
 endif(APPLE)
+
+if (CX_LINUX)
+    set(CX_INSTALL_ROOT_DIR "CustusX")
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
+#    set(CPACK_GENERATOR "TGZ;STGZ")
+    set(CPACK_GENERATOR "TGZ")
+    set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+endif (CX_LINUX)
+
+if (WIN32)
+    set(CPACK_NSIS_MUI_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\CustusX.ico")
+    set(CPACK_PACKAGE_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\CustusX.png")
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows/win_install_readme.rtf")
+    set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\CustusX.exe")
+    set(CPACK_PACKAGE_EXECUTABLES 
+        "CustusX" "CustusX"
+        "OpenIGTLinkServer" "OpenIGTLinkServer"
+        "GrabberServer" "GrabberServer"
+        )
+    set(CPACK_NSIS_MENU_LINKS
+        "doc/win_install_readme.rtf" "README"
+    )
+endif (WIN32)
 
 #------------------------------------------------------------------------------
 # Dart
@@ -120,16 +163,19 @@ endif(APPLE)
 #------------------------------------------------------------------------------
 add_subdirectory( externals )
 add_subdirectory( doc )
-add_subdirectory( modules/OpenIGTLinkServer )
 add_subdirectory( source )
 
 #------------------------------------------------------------------------------
 # Optional software
 #------------------------------------------------------------------------------
-#option(BUILD_US_ACQUISITION "build us acquisition module" OFF) #default is off
-#if(BUILD_US_ACQUISITION)
-#    add_subdirectory(modules/ultrasoundAcquisition)
-#endif(BUILD_US_ACQUISITION)
+if (LINUX)
+    option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" ON) #default is on for linux
+else (LINUX)
+    option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" OFF) #default is off for others
+endif (LINUX)
+if(BUILD_OPEN_IGTLINK_SERVER)
+    add_subdirectory( modules/OpenIGTLinkServer )
+endif(BUILD_OPEN_IGTLINK_SERVER)
 
 option(BUILD_GRABBER_SERVER "build grabber server" OFF) #default is off
 if(BUILD_GRABBER_SERVER)

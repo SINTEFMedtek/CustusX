@@ -1,8 +1,8 @@
 /*
  * cxDataMetricWrappers.h
  *
- *  Created on: Jul 29, 2011
- *      Author: christiana
+ *  \date Jul 29, 2011
+ *      \author christiana
  */
 
 #ifndef CXDATAMETRICWRAPPERS_H_
@@ -25,6 +25,12 @@ class QPushButton;
 
 namespace cx
 {
+
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
 
 typedef boost::shared_ptr<class MetricBase> MetricBasePtr;
 
@@ -134,6 +140,9 @@ private:
 };
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXDATAMETRICWRAPPERS_H_ */

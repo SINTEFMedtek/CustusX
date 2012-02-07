@@ -1,8 +1,8 @@
 /*
  * cxDataLocations.h
  *
- *  Created on: Jun 22, 2010
- *      Author: christiana
+ *  \date Jun 22, 2010
+ *      \author christiana
  */
 #ifndef CXDATALOCATIONS_H_
 #define CXDATALOCATIONS_H_
@@ -14,6 +14,7 @@ namespace cx
 {
 
 /**Helper functions for accessing file paths and similar stuff.
+ * \ingroup cxResourceSettings
  *
  */
 class DataLocations

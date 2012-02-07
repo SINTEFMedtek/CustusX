@@ -17,6 +17,7 @@ namespace cx
  * \class StatusBar
  *
  * \brief Statusbar with extended functionality.
+ * \ingroup cxGUI
  *
  * \date Jan 21, 2009
  * \author Janne Beate Bakeng, SINTEF

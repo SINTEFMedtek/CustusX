@@ -1,8 +1,8 @@
 /*
  * cxToolDataAdapters.h
  *
- *  Created on: May 4, 2011
- *      Author: christiana
+ *  \date May 4, 2011
+ *      \author christiana
  */
 
 #ifndef CXTOOLDATAADAPTERS_H_
@@ -13,6 +13,12 @@
 namespace cx
 {
 typedef boost::shared_ptr<class Tool> ToolPtr;
+
+/**
+ * \file
+ * \addtogroup cxGUI
+ * @{
+ */
 
 /** Adapter that connects to the current active tool.
  */
@@ -36,15 +42,17 @@ public: // optional methods
 };
 
 
-/** Adapter that connects to the current active tool.
+/** Adapter that connects to the current active probe.
+ *  It will stick to the probe as much as possible,
+ *  i.e. ignore hiding and showing of other non-probes.
  */
-class ActiveToolConfigurationStringDataAdapter : public ssc::StringDataAdapter
+class ActiveProbeConfigurationStringDataAdapter : public ssc::StringDataAdapter
 {
   Q_OBJECT
 public:
-  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveToolConfigurationStringDataAdapter()); }
-  ActiveToolConfigurationStringDataAdapter();
-  virtual ~ActiveToolConfigurationStringDataAdapter() {}
+  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveProbeConfigurationStringDataAdapter()); }
+  ActiveProbeConfigurationStringDataAdapter();
+  virtual ~ActiveProbeConfigurationStringDataAdapter() {}
 
 public: // basic methods
   virtual QString getValueName() const;
@@ -63,6 +71,9 @@ private:
 };
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXTOOLDATAADAPTERS_H_ */

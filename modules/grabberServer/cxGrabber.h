@@ -14,7 +14,7 @@ namespace cx
  * to any underlying hardware.
  *
  * \date 16. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
+ * \\author Janne Beate Bakeng, SINTEF
  */
 
 class Grabber : public QObject

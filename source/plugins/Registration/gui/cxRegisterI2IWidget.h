@@ -1,8 +1,8 @@
 /*
  * cxRegisterI2IWidget.h
  *
- *  Created on: Apr 29, 2011
- *      Author: christiana
+ *  \date Apr 29, 2011
+ *      \author christiana
  */
 
 #ifndef CXREGISTERI2IWIDGET_H_
@@ -21,6 +21,11 @@ namespace cx
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
 class SeansVesselRegistrationWidget;
 
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
 
 /**
  * \class RegisterI2IWidget
@@ -28,7 +33,7 @@ class SeansVesselRegistrationWidget;
  * \brief Widget for performing the registration between two vessel segments.
  *
  * \date 13. okt. 2010
- * \author: Janne Beate Bakeng
+ * \\author Janne Beate Bakeng
  */
 class RegisterI2IWidget : public RegistrationBaseWidget
 {
@@ -49,6 +54,9 @@ private:
   SeansVesselRegistrationWidget* mSeansVesselRegsitrationWidget;
 };
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXREGISTERI2IWIDGET_H_ */

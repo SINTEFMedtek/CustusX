@@ -1,8 +1,8 @@
 /*
  * cxToolDataAdapters.cpp
  *
- *  Created on: May 4, 2011
- *      Author: christiana
+ *  \date May 4, 2011
+ *      \author christiana
  */
 
 #include <cxToolDataAdapters.h>
@@ -73,56 +73,65 @@ QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 /// -------------------------------------------------------
 
 
-ActiveToolConfigurationStringDataAdapter::ActiveToolConfigurationStringDataAdapter()
+ActiveProbeConfigurationStringDataAdapter::ActiveProbeConfigurationStringDataAdapter()
 {
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
+  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChanged()));
+  this->dominantToolChanged();
 }
-void ActiveToolConfigurationStringDataAdapter::dominantToolChanged()
+
+void ActiveProbeConfigurationStringDataAdapter::dominantToolChanged()
 {
   // ignore tool changes to something non-probeish.
   // This gives the user a chance to use the widget without having to show the probe.
-  ssc::ToolPtr newTool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+	ToolPtr newTool = boost::shared_dynamic_cast<Tool>(ToolManager::getInstance()->findFirstProbe());
   if (!newTool || newTool->getProbeSector().mType==ssc::ProbeData::tNONE)
     return;
 
   if (mTool)
-    disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+  	disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
 
-  mTool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+  mTool = newTool;
 
   if (mTool)
-    connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+  	connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
 
   emit changed();
 }
-QString ActiveToolConfigurationStringDataAdapter::getValueName() const
+
+QString ActiveProbeConfigurationStringDataAdapter::getValueName() const
 {
   return "Probe Config";
 }
-bool ActiveToolConfigurationStringDataAdapter::setValue(const QString& value)
+
+bool ActiveProbeConfigurationStringDataAdapter::setValue(const QString& value)
 {
   if (!mTool)
     return false;
   mTool->getProbe()->setConfigId(value);
   return true;
 }
-QString ActiveToolConfigurationStringDataAdapter::getValue() const
+
+QString ActiveProbeConfigurationStringDataAdapter::getValue() const
 {
   if (!mTool)
     return "";
   return mTool->getProbe()->getConfigId();
 }
-QString ActiveToolConfigurationStringDataAdapter::getHelp() const
+
+QString ActiveProbeConfigurationStringDataAdapter::getHelp() const
 {
-  return "Select a probe configuration for the active tool.";
+  return "Select a probe configuration for the active probe.";
 }
-QStringList ActiveToolConfigurationStringDataAdapter::getValueRange() const
+
+QStringList ActiveProbeConfigurationStringDataAdapter::getValueRange() const
 {
   if (!mTool)
     return QStringList();
   return mTool->getProbe()->getConfigIdList();
 }
-QString ActiveToolConfigurationStringDataAdapter::convertInternal2Display(QString internal)
+
+QString ActiveProbeConfigurationStringDataAdapter::convertInternal2Display(QString internal)
 {
   if (!mTool)
     return "<no tool>";

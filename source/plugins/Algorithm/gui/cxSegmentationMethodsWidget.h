@@ -1,8 +1,8 @@
 /*
  * cxSegmentationMethodsWidget.h
  *
- *  Created on: May 4, 2011
- *      Author: christiana
+ *  \date May 4, 2011
+ *      \author christiana
  */
 
 #ifndef CXSEGMENTATIONMETHODSWIDGET_H_
@@ -12,6 +12,11 @@
 
 namespace cx
 {
+/**
+ * \file
+ * \addtogroup cxPluginAlgorithm
+ * @{
+ */
 
 class SegmentationMethodsWidget : public TabbedWidget
 {
@@ -23,6 +28,9 @@ public:
 //------------------------------------------------------------------------------
 
 
+/**
+ * @}
+ */
 }
 
 #endif /* CXSEGMENTATIONMETHODSWIDGET_H_ */
