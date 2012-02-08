@@ -163,13 +163,26 @@ void ViewWrapper2D::addReps()
 	mSliceProxy = ssc::SliceProxy::New("sliceproxy_(" + mView->getName() + ")");
 
 	// slice rep
-#ifdef USE_2D_GPU_RENDER
-//  this->resetMultiSlicer(); ignore until addimage
-#else
-	mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
-	mSliceRep->setSliceProxy(mSliceProxy);
-	mView->addRep(mSliceRep);
-#endif
+	//the mul
+	if (settings()->value("useGPU2DRendering").toBool())
+	{
+		//  this->resetMultiSlicer(); ignore until addimage
+	}
+	else
+	{
+//		mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
+//		mSliceRep->setSliceProxy(mSliceProxy);
+//		mView->addRep(mSliceRep);
+	}
+
+
+//#ifdef USE_2D_GPU_RENDER
+////  this->resetMultiSlicer(); ignore until addimage
+//#else
+//	mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
+//	mSliceRep->setSliceProxy(mSliceProxy);
+//	mView->addRep(mSliceRep);
+//#endif
 
 	// tool rep
 	mToolRep2D = ssc::ToolRep2D::New("Tool2D_" + mView->getName());
@@ -189,17 +202,35 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	{
 		this->updateView();
 	}
+	if (key == "useGPU2DRendering")
+	{
+		this->updateView();
+	}
+
 }
 
-#ifdef USE_2D_GPU_RENDER
+bool ViewWrapper2D::overlayIsEnabled()
+{
+	return settings()->value("useGPU2DRendering").toBool();
+}
+
 /**Hack: gpu slicer recreate and fill with images every time,
  * due to internal instabilities.
  *
  */
 void ViewWrapper2D::resetMultiSlicer()
 {
+	if (mSliceRep)
+	{
+		mView->removeRep(mSliceRep);
+		mSliceRep.reset();
+	}
 	if (mMultiSliceRep)
 		mView->removeRep(mMultiSliceRep);
+	if (!settings()->value("useGPU2DRendering").toBool())
+		return;
+
+//	std::cout << "using gpu multislicer" << std::endl;
 	mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_" + mView->getName());
 	mMultiSliceRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
@@ -208,7 +239,7 @@ void ViewWrapper2D::resetMultiSlicer()
 		mMultiSliceRep->setImages(mViewGroup->getImages());
 	this->viewportChanged();
 }
-#endif //USE_2D_GPU_RENDER
+
 ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v) const
 {
 	vtkRendererPtr renderer = mView->getRenderer();
@@ -385,21 +416,53 @@ void ViewWrapper2D::updateView()
 		}
 
 		// slice rep
-#ifdef USE_2D_GPU_RENDER
-		this->resetMultiSlicer();
-		text = this->getAllDataNames().join("\n");
-#else
-		QStringList textList;
-		mSliceRep->setImage(image);
+		if (settings()->value("useGPU2DRendering").toBool())
+		{
+			this->resetMultiSlicer();
+			text = this->getAllDataNames().join("\n");
+		}
+		else
+		{
+			if (mMultiSliceRep)
+			{
+				mView->removeRep(mMultiSliceRep);
+				mMultiSliceRep.reset();
+			}
 
-		// list all meshes and one image.
-		std::vector<ssc::MeshPtr> mesh = mViewGroup->getMeshes();
-		for (unsigned i = 0; i < mesh.size(); ++i)
-		textList << qstring_cast(mesh[i]->getName());
-		if (image)
-		textList << image->getName();
-		text = textList.join("\n");
-#endif
+			if (!mSliceRep)
+			{
+				mSliceRep = ssc::SliceRepSW::New("SliceRep_" + mView->getName());
+				mSliceRep->setSliceProxy(mSliceProxy);
+				mView->addRep(mSliceRep);
+			}
+//			std::cout << "using sw slicer" << std::endl;
+
+			QStringList textList;
+			mSliceRep->setImage(image);
+
+			// list all meshes and one image.
+			std::vector<ssc::MeshPtr> mesh = mViewGroup->getMeshes();
+			for (unsigned i = 0; i < mesh.size(); ++i)
+			textList << qstring_cast(mesh[i]->getName());
+			if (image)
+			textList << image->getName();
+			text = textList.join("\n");
+		}
+//#ifdef USE_2D_GPU_RENDER
+//		this->resetMultiSlicer();
+//		text = this->getAllDataNames().join("\n");
+//#else
+//		QStringList textList;
+//		mSliceRep->setImage(image);
+//
+//		// list all meshes and one image.
+//		std::vector<ssc::MeshPtr> mesh = mViewGroup->getMeshes();
+//		for (unsigned i = 0; i < mesh.size(); ++i)
+//		textList << qstring_cast(mesh[i]->getName());
+//		if (image)
+//		textList << image->getName();
+//		text = textList.join("\n");
+//#endif
 	}
 
 	bool show = settings()->value("View/showDataText").value<bool>();
