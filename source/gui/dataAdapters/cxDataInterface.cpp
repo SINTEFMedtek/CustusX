@@ -468,10 +468,20 @@ void SelectCoordinateSystemStringDataAdapter::setDefaultSlot()
 
 SelectToolStringDataAdapter::SelectToolStringDataAdapter()
 {
+	mValueName = "Select a tool";
+	mHelp = mValueName;
+}
+void SelectToolStringDataAdapter::setHelp(QString help)
+{
+  mHelp = help;
+}
+void SelectToolStringDataAdapter::setValueName(QString name)
+{
+  mValueName = name;
 }
 QString SelectToolStringDataAdapter::getValueName() const
 {
-  return "Select a tool";
+  return mValueName;
 }
 bool SelectToolStringDataAdapter::setValue(const QString& value)
 {
@@ -493,7 +503,7 @@ QString SelectToolStringDataAdapter::getValue() const
 }
 QString SelectToolStringDataAdapter::getHelp() const
 {
-  return "Select a tool";
+  return mHelp;
 }
 ssc::ToolPtr SelectToolStringDataAdapter::getTool() const
 {
