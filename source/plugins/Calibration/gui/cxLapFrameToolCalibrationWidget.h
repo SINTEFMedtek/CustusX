@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTOOLTIPCALIBRATIONWIDGET_H_
-#define CXTOOLTIPCALIBRATIONWIDGET_H_
+#ifndef CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
+#define CXLAPFRAMETOOLCALIBRATIONWIDGET_H_
 
 #include "cxBaseWidget.h"
 #include "sscCoordinateSystemHelpers.h"
@@ -32,25 +32,27 @@ namespace cx
  * @{
  */
 
+
 /**
  * Class that handles the tooltip calibration.
  *
- * \date 3. nov. 2010
- * \author Janne Beate Bakeng, SINTEF
+ * \date Feb 8, 2012
+ * \author Christian Askeland, SINTEF
  */
-class ToolTipCalibrateWidget : public BaseWidget
+class LapFrameToolCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
-  ToolTipCalibrateWidget(QWidget* parent);
-  ~ToolTipCalibrateWidget();
+  LapFrameToolCalibrationWidget(QWidget* parent);
+  virtual ~LapFrameToolCalibrationWidget();
   virtual QString defaultWhatsThis() const;
 
 private slots:
   void calibrateSlot();
   void testCalibrationSlot();
   void toolSelectedSlot();
+  void trackingStartedSlot();
 
 private:
   QPushButton* mCalibrateButton;
@@ -62,32 +64,34 @@ private:
   SelectToolStringDataAdapterPtr mTools;
 };
 
-
 /**
- * Class that calibrates the tool using a reference point in ref.
+ * Class that calibrates the tool using a reference matrix in a calibration tool.
+ *
+ *  - s: sensor on tool to be calibrated
+ *  - t: tool space of tool to be calibrated
+ *  - cr: calibration tool, i.e. the tool where the calibration position exist
+ *  - q: Position (matrix) of calibration position on the calibration frame.
+ *  - pr: patient reference
  */
-class ToolTipCalibrationCalculator
+class LapFrameToolCalibrationCalculator
 {
 public:
-  ToolTipCalibrationCalculator(ssc::ToolPtr tool, ssc::ToolPtr ref, ssc::Vector3D p_t = ssc::Vector3D());
-  ~ToolTipCalibrationCalculator();
+  LapFrameToolCalibrationCalculator(ssc::ToolPtr tool, ssc::ToolPtr calRef);
+  ~LapFrameToolCalibrationCalculator() {}
 
   ssc::Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
-  ssc::Transform3D get_calibration_sMt(); ///<
+  ssc::Transform3D get_calibration_sMt(); ///< new calibration matrix for the input tool.
 
 private:
-  ssc::Vector3D get_sampledPoint_t(); ///< the tools sampled point in tool space
-  ssc::Vector3D get_sampledPoint_ref(); ///< the tools sampled point in ref space
-  ssc::Vector3D get_referencePoint_ref(); ///< the ref tools reference point in ref space
-  ssc::Transform3D get_sMt_new(); ///< the new calibration
-
-  ssc::ToolPtr mTool; ///< the tool the sampled point is taken from
-  ssc::ToolPtr mRef; ///< the tool that contains the reference point we are going to calibrate against
-  ssc::Vector3D mP_t; ///< the sampled point we are working on
+  ssc::ToolPtr mTool; //< the tool the sampled point is taken from
+  ssc::ToolPtr mCalibrationRef; //< the tool that contains the reference point we are going to calibrate against
+  ssc::Transform3D m_sMpr; //< raw tracking position, patient reference to tool sensor.
+  ssc::Transform3D m_qMpr; //< position of calibration position.
+  ssc::Transform3D m_qMcr; //< hardcoded position of calibration point relative to calibration tool cr.
 };
-
 /**
  * @}
  */
-}//namespace cx
-#endif /* CXTOOLTIPCALIBRATIONWIDGET_H_ */
+}
+
+#endif /* CXLAPFRAMETOOLCALIBRATIONWIDGET_H_ */
