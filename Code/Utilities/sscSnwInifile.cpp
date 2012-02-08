@@ -16,7 +16,7 @@ SonowandInifile::SonowandInifile(QString filename, CHECK_TYPE checkType) :
 	if (mCheckType == CHECK_MD5)
 	{
 		QString md5file = filename + ".md5";
-		mCheckSuccess = !QFile::exists(filename) || !!QFile::exists(md5file) || CheckMD5(fileName().toAscii().constData());
+		mCheckSuccess = !QFile::exists(filename) || !QFile::exists(md5file) || CheckMD5(fileName().toAscii().constData());
 	}
 }
 
