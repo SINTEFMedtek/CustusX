@@ -7,6 +7,10 @@
 namespace ssc
 {
 
+/**
+ * \brief Open \p filename as a ini file and check checksums if required
+ * if \p checkType is set to CHECK_MD5 and the file exist and a corresponding .md5 file exist then the md5sum is verified.
+ */
 SonowandInifile::SonowandInifile(QString filename, CHECK_TYPE checkType) : 
 	QSettings(filename, QSettings::IniFormat), 
 	mCheckType(checkType),
