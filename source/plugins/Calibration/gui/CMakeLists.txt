@@ -13,6 +13,7 @@ SET( MOC_HEADER_FILES
    cxToolManualCalibrationWidget.h
    cxTemporalCalibrationWidget.h  
    cxToolTipCalibrationWidget.h
+   cxLapFrameToolCalibrationWidget.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -33,6 +34,8 @@ SET( SOURCE_FILES
    cxCalibrationMethodsWidget.cpp
    cxToolTipCalibrationWidget.h
    cxToolTipCalibrationWidget.cpp
+   cxLapFrameToolCalibrationWidget.h
+   cxLapFrameToolCalibrationWidget.cpp
   )
 
 # =========================================================

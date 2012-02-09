@@ -36,16 +36,6 @@ namespace ssc
 typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
 }
 
-/**
- * \addtogroup cxServiceVisualization
- * @{
- */
-#ifdef USE_GLX_SHARED_CONTEXT
-#define USE_2D_GPU_RENDER
-#endif
-/**
- * @}
- */
 
 namespace cx
 {
@@ -71,11 +61,7 @@ public:
 	virtual void setOrientationMode(SyncedValuePtr value);
 	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
 
-#ifdef USE_2D_GPU_RENDER
-	static bool overlayIsEnabled() { return true; }
-#else
-	static bool overlayIsEnabled() { return false; }
-#endif
+	static bool overlayIsEnabled();
 
 private slots:
 	void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -116,10 +102,8 @@ private:
 	virtual void dataAdded(ssc::DataPtr data);
 	virtual void dataRemoved(const QString& uid);
 
-#ifdef USE_2D_GPU_RENDER
 	void resetMultiSlicer();
 	ssc::Texture3DSlicerRepPtr mMultiSliceRep;
-#endif
 
 	ssc::SliceProxyPtr mSliceProxy;
 	ssc::SliceRepSWPtr mSliceRep;
