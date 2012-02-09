@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-   <Version>4.3.2</Version>
+   <Version>4.3.3</Version>
    <USScanner>
       <Name>Vivid 7 - Karkirurgen</Name>
       <USProbe>
@@ -1569,6 +1569,44 @@
                <PixelSize>
                   <Width>0.18182</Width>
                   <Height>0.18182</Height>
+               </PixelSize>
+            </Config>
+            <Config>
+               <ID>CalWidthMaxDepth4</ID>
+               <Name>Calibration recordings (4 cm)</Name>
+               <WidthDeg>0</WidthDeg>
+               <Depth>354</Depth>
+               <Offset>0</Offset>
+               <Origin>
+                  <Col>428</Col>
+                  <Row>125</Row>
+               </Origin>
+               <NCorners>4</NCorners>
+               <Corner>
+                  <Col>247</Col>
+                  <Row>125</Row>
+               </Corner>
+               <Corner>
+                  <Col>247</Col>
+                  <Row>479</Row>
+               </Corner>
+               <Corner>
+                  <Col>609</Col>
+                  <Row>479</Row>
+               </Corner>
+               <Corner>
+                  <Col>609</Col>
+                  <Row>125</Row>
+               </Corner>
+               <CroppingEdges>
+                  <Left>247</Left>
+                  <Right>609</Right>
+                  <Top>125</Top>
+                  <Bottom>479</Bottom>
+               </CroppingEdges>
+               <PixelSize>
+                  <Width>0.11363</Width>
+                  <Height>0.11363</Height>
                </PixelSize>
             </Config>
          </RTSource>
