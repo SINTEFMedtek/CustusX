@@ -116,6 +116,7 @@ protected:
   QLabel* mRenderingRateLabel;
   QCheckBox* mSmartRenderCheckBox;
   QCheckBox* mGPURenderCheckBox;
+  QCheckBox* mGPU2DRenderCheckBox;
   QCheckBox* mShadingCheckBox;
   QGridLayout *mMainLayout;
   ssc::DoubleDataAdapterXmlPtr mMaxRenderSize;

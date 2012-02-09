@@ -1,3 +1,17 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #include "cxToolTipCalibrationWidget.h"
 
 #include <QPushButton>
@@ -18,40 +32,6 @@
 
 namespace cx
 {
-//ToolTipCalibrationWidget::ToolTipCalibrationWidget(QWidget* parent) :
-//  BaseWidget(parent, "ToolTipCalibrationWidget", "Tool Tip Calibration"),
-//  mCalibrationWidget(new ToolTipCalibrateWidget(this)),
-//  mSampleWidget(new ToolTipSampleWidget(this))
-//{
-//  QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-//  QGridLayout* topLayout = new QGridLayout();
-//
-//  QGroupBox* calibrateGroupBox = new QGroupBox("Calibrate dominant tool", this);
-//  calibrateGroupBox->setLayout(new QVBoxLayout());
-//  calibrateGroupBox->layout()->addWidget(mCalibrationWidget);
-//  QGroupBox* sampleGroupBox = new QGroupBox("Sample dominant tool", this);
-//  sampleGroupBox->setLayout(new QVBoxLayout());
-//  sampleGroupBox->layout()->addWidget(mSampleWidget);
-//
-//  toptopLayout->addLayout(topLayout);
-//  toptopLayout->addStretch();
-//  topLayout->addWidget(calibrateGroupBox, 1, 0);
-//  topLayout->addWidget(sampleGroupBox, 2, 0);
-//}
-//
-//ToolTipCalibrationWidget::~ToolTipCalibrationWidget()
-//{
-//}
-//
-//QString ToolTipCalibrationWidget::defaultWhatsThis() const
-//{
-//  return "<html>"
-//    "<h3>Tool tip calibration.</h3>"
-//    "<p><i>Calibrates a tool by sampling it when pointing at a known point on another frame.</i></br>"
-//    "By using the test button you can test your calibration by pointing at a known reference point.</br>"
-//    "You can sample the dominant(active) tools tooltip in any coordinate system and get the results written to file.</p>"
-//    "</html>";
-//}
 
 //------------------------------------------------------------------------------
 ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
