@@ -161,9 +161,6 @@ SNW2VolumePtr SNW2Volume::create(const QString& filePath)
 		return SNW2VolumePtr();
 	}
 
-	retval->ensureCenterWindowValid(&retval->mMetaData.Volume.mWindowWidth, &retval->mMetaData.Volume.mWindowCenter,
-		&retval->mMetaData.Volume.mLLR);
-
 	return retval;
 }
 
@@ -193,14 +190,6 @@ bool SNW2Volume::loadAll()
 		return false;
 	}
 	//writeStatus("volume["+uid()+"], loaded metadata");
-	// ignore lazy load for now.
-	if (!loadVolumeData())
-	{
-		writeStatus("volume[" + uid() + "], failed - volume/lut");
-		return false;
-	}
-
-	//writeStatus("volume["+uid()+"], loaded volumedata");
 	return true;
 }
 
@@ -394,16 +383,16 @@ bool SNW2Volume::loadVolumeData()
 		mLut = NULL;
 	}
 
+	ensureCenterWindowValid(&mMetaData.Volume.mWindowWidth, &mMetaData.Volume.mWindowCenter, &mMetaData.Volume.mLLR);
+
 	return success;
 }
 
 bool SNW2Volume::rawLoadVtkImageData()
 {
 	mImageData->Initialize();
-	mImageData->SetDimensions(mMetaData.Volume.mDim.begin());
 	mImageData->SetSpacing(mMetaData.Volume.mSpacing.begin());
-	mImageData->SetExtent(0, mMetaData.Volume.mDim[0] - 1, 0, mMetaData.Volume.mDim[1] - 1, 0, mMetaData.Volume.mDim[2]
-		- 1);
+	mImageData->SetExtent(0, mMetaData.Volume.mDim[0] - 1, 0, mMetaData.Volume.mDim[1] - 1, 0, mMetaData.Volume.mDim[2] - 1);
 	int scalarSize = mMetaData.Volume.mDim[0] * mMetaData.Volume.mDim[1] * mMetaData.Volume.mDim[2];
 
 	QTime pre = QTime::currentTime();
@@ -661,7 +650,7 @@ void SNW2Volume::rawSaveLutData(const QString& filename, vtkLookupTablePtr lut) 
 	GenerateMD5(rawLutFileName().toAscii().constData());
 }
 
-/** Insert default vallues for Center/Window if not set by load
+/** Insert default values for Center/Window if not set by load
  */
 void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, double* llrPtr)
 {
@@ -673,12 +662,6 @@ void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, do
 	vtkImageAccumulatePtr histogram = getImage()->getHistogram();
 	range[0] = histogram->GetMin()[0];
 	range[1] = histogram->GetMax()[0];
-
-	//boost::array<double, 2> range = scalarRange();
-
-	//QStringstream ss;
-	//ss << "ensureCenterWindowValid() id: " << uid() <<  std::endl;
-	//ss << "     Pre values:  " << "window " << window << ", level " << level << ", llr " << llr << ", range [" << range[0] << ", " << range[1] << "]" << std::endl;
 
 	if (window <= 0)
 	{
@@ -693,24 +676,35 @@ void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, do
 	// non-us volumes that have a preset get a llr equal to the lower end of the window.
 	if (!mMetaData.mIntraoperative && window > 0 && level > 0)
 	{
-		//llr = level - window/2; this gives the side effect of showing a non-zero llr to the user
-		// in the case when llr is shown absolutely: removed.
 		llr = 0;
 	}
 
 	if (mMetaData.mModalityType.toUpper().contains("ANGIO")) // set a default LLR for angio. //TODO move it to a better place. Tried to move it to vmLayer::createFromSeries
 	{
 		llr = range[0] + 0.2 * (range[1] - range[0]);
-		//llr = Settings::instance()->settingsFile()->value("PersistentData/US_ANGIO_LLR", llr).value<double>();
-		//mLLR = 0.2*scalarMax;
 	}
 	else if (mMetaData.mModality == "US") // set a default LLR for US (0 is defined to be transparent by scanconversion). //TODO move it to a better place.
 	{
 		llr = 1;
 	}
+}
 
-	//ss << "    Post values: " << "window " << window << ", level " << level << ", llr " << llr << ", range [" << range[0] << ", " << range[1] << "]" << std::endl;
-	//Logger::log("pd.log", ss.str());
+vtkImageDataPtr SNW2Volume::getVtkImageData()
+{
+	if (!mImageData)
+	{
+		loadVolumeData();
+	}
+	return mImageData;
+}
+
+ssc::ImagePtr SNW2Volume::getImage()
+{
+	if (!mImageData)
+	{
+		loadVolumeData();
+	}
+	return mImage;
 }
 
 } // namespace ssc
