@@ -108,11 +108,16 @@ void LapFrameToolCalibrationWidget::calibrateSlot()
   ssc::ToolPtr refTool = mCalibRefTool->getTool();
   ssc::ToolPtr tool = mCalibratingTool->getTool();
   double cameraAngle = mCameraAngleAdapter->getValue();
-  //Todo, we only allow the reference point with id 1 to be used to calibrate
-  //this could be done more dynamic.
-  if(!refTool || !tool || !refTool->hasReferencePointWithId(1))
+  if(!refTool || !tool)
+  {
+    ssc::messageManager()->sendError(QString("Calibration prerequisited not met: calref:%1, tool:%2").arg(refTool!=0).arg(tool!=0) );
     return;
-
+  }
+  if(!refTool->getVisible() || !tool->getVisible() || !refTool->hasReferencePointWithId(1))
+  {
+    ssc::messageManager()->sendError(QString("Calibration prerequisited not met: calref vis:%1, tool vis :%2, refpoint:%3").arg(refTool->getVisible()).arg(tool->getVisible()).arg(refTool->hasReferencePointWithId(1)) );
+    return;
+  }
 
   LapFrameToolCalibrationCalculator calc(tool, refTool, cameraAngle);
   ssc::Transform3D calibration = calc.get_calibration_sMt();
