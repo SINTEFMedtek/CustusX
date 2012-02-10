@@ -19,6 +19,7 @@
 #include "sscCoordinateSystemHelpers.h"
 #include "sscForwardDeclarations.h"
 #include "cxDataInterface.h"
+#include "sscDoubleDataAdapterXml.h"
 
 class QPushButton;
 class QGroupBox;
@@ -56,12 +57,14 @@ private slots:
 
 private:
   QPushButton* mCalibrateButton;
-  ssc::LabeledComboBoxWidget* mCalibrateToolComboBox;
+//  ssc::LabeledComboBoxWidget* mCalibrateToolComboBox;
   QLabel* mReferencePointLabel;
   QPushButton* mTestButton;
   QLabel* mCalibrationLabel;
   QLabel* mDeltaLabel;
-  SelectToolStringDataAdapterPtr mTools;
+  SelectToolStringDataAdapterPtr mCalibRefTool;
+  SelectToolStringDataAdapterPtr mCalibratingTool;
+  ssc::DoubleDataAdapterXmlPtr mCameraAngleAdapter;
 };
 
 /**
@@ -76,18 +79,19 @@ private:
 class LapFrameToolCalibrationCalculator
 {
 public:
-  LapFrameToolCalibrationCalculator(ssc::ToolPtr tool, ssc::ToolPtr calRef);
+  LapFrameToolCalibrationCalculator(ssc::ToolPtr tool, ssc::ToolPtr calRef, double cameraAngle);
   ~LapFrameToolCalibrationCalculator() {}
 
   ssc::Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
   ssc::Transform3D get_calibration_sMt(); ///< new calibration matrix for the input tool.
 
 private:
-  ssc::ToolPtr mTool; //< the tool the sampled point is taken from
-  ssc::ToolPtr mCalibrationRef; //< the tool that contains the reference point we are going to calibrate against
-  ssc::Transform3D m_sMpr; //< raw tracking position, patient reference to tool sensor.
-  ssc::Transform3D m_qMpr; //< position of calibration position.
-  ssc::Transform3D m_qMcr; //< hardcoded position of calibration point relative to calibration tool cr.
+  ssc::ToolPtr mTool; ///< the tool the sampled point is taken from
+  ssc::ToolPtr mCalibrationRef; ///< the tool that contains the reference point we are going to calibrate against
+  ssc::Transform3D m_sMpr; ///< raw tracking position, patient reference to tool sensor.
+  ssc::Transform3D m_qMpr; ///< position of calibration position.
+  ssc::Transform3D m_qMcr; ///< hardcoded position of calibration point relative to calibration tool cr.
+  double mCameraAngle; ///< additional y-tilt on the tool side.
 };
 /**
  * @}
