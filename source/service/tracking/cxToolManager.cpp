@@ -572,7 +572,7 @@ void ToolManager::setDominantTool(const QString& uid)
 	if (mDominantTool->isManual())
 		emit tps(0);
 
-	ssc::messageManager()->sendInfo("Change active tool to: " + mDominantTool->getName());
+//	ssc::messageManager()->sendInfo("Change active tool to: " + mDominantTool->getName());
 
 	emit dominantToolChanged(uid);
 }
