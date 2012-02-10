@@ -130,14 +130,10 @@ public:
 	{
 		return mMetaData.DICOM.m_imgMraw;
 	}
-	virtual vtkImageDataPtr getVtkImageData() const
-	{
-		return mImageData;
-	}
-	virtual ssc::ImagePtr getImage() const
-	{
-		return mImage;
-	}
+
+	virtual vtkImageDataPtr getVtkImageData();
+	virtual ssc::ImagePtr getImage();
+
 	QString uid() const
 	{
 		return mUid;
