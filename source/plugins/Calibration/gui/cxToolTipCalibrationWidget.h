@@ -1,3 +1,17 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #ifndef CXTOOLTIPCALIBRATIONWIDGET_H_
 #define CXTOOLTIPCALIBRATIONWIDGET_H_
 
@@ -18,30 +32,11 @@ namespace cx
  * @{
  */
 
-///**
-// * \class ToolTipCalibrationWidget
-// *
-// * \brief
-// *
-// * \date 3. nov. 2010
-// * \\author Janne Beate Bakeng, SINTEF
-// */
-//class ToolTipCalibrationWidget : public BaseWidget
-//{
-//  Q_OBJECT
-//
-//public:
-//  ToolTipCalibrationWidget(QWidget* parent);
-//  ~ToolTipCalibrationWidget();
-//  virtual QString defaultWhatsThis() const;
-//
-//private:
-//  class ToolTipCalibrateWidget* mCalibrationWidget;
-//  class ToolTipSampleWidget*      mSampleWidget;
-//};
-
 /**
  * Class that handles the tooltip calibration.
+ *
+ * \date 3. nov. 2010
+ * \author Janne Beate Bakeng, SINTEF
  */
 class ToolTipCalibrateWidget : public BaseWidget
 {
@@ -65,8 +60,6 @@ private:
   QLabel* mCalibrationLabel;
   QLabel* mDeltaLabel;
   SelectToolStringDataAdapterPtr mTools;
-  ssc::LabeledComboBoxWidget* mCoordinateSystemComboBox;
-  ssc::LabeledComboBoxWidget* mToolComboBox;
 };
 
 
