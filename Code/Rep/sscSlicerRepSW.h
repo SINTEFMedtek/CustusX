@@ -33,9 +33,6 @@ namespace ssc
  * The image is sliced using a SliceProxy. Only a single
  * volume can be used.
  *
- * Used as main slicer for single volume slicing in Sonowand.
- *
- * Used by Sonowand.
  * Used by CustusX.
  *
  * \sa SlicedImageProxy SliceProxy
