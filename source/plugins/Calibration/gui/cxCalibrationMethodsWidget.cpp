@@ -11,6 +11,7 @@
 #include "cxToolTipCalibrationWidget.h"
 #include "cxToolManualCalibrationWidget.h"
 #include "cxTemporalCalibrationWidget.h"
+#include "cxLapFrameToolCalibrationWidget.h"
 
 namespace cx
 {
@@ -19,6 +20,7 @@ CalibrationMethodsWidget::CalibrationMethodsWidget(AcquisitionDataPtr acquisitio
   TabbedWidget(parent, objectName, windowTitle)
 {
   this->addTab(new ToolTipCalibrateWidget(this), "Tool Tip");
+  this->addTab(new LapFrameToolCalibrationWidget(this), "Lap Frame");
   this->addTab(new ToolTipSampleWidget(this), "Sample");
   this->addTab(new TemporalCalibrationWidget(acquisitionData, this), "Temporal");
   this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");

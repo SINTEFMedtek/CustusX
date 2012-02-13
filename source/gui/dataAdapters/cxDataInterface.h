@@ -320,6 +320,9 @@ public:
   SelectToolStringDataAdapter();
   virtual ~SelectToolStringDataAdapter() {}
 
+  void setHelp(QString help);
+  void setValueName(QString name);
+
 public: // basic methods
   virtual QString getValueName() const;
   virtual bool setValue(const QString& value);
@@ -332,6 +335,8 @@ public: // interface extension
   ssc::ToolPtr getTool() const;
 
 private:
+  QString mValueName;
+  QString mHelp;
   ssc::ToolPtr mTool;
 };
 

@@ -277,9 +277,15 @@ void StateService::fillDefaultSettings()
 
 #ifdef __APPLE__
 	this->fillDefault("useGPUVolumeRayCastMapper", false);
+	this->fillDefault("useGPU2DRendering", false);
 	this->fillDefault("stillUpdateRate", 8.0);
+#elif WIN32
+	this->fillDefault("useGPUVolumeRayCastMapper", true);
+	this->fillDefault("useGPU2DRendering", false);
+	this->fillDefault("stillUpdateRate", 0.001);
 #else
 	this->fillDefault("useGPUVolumeRayCastMapper", true);
+	this->fillDefault("useGPU2DRendering", true);
 	this->fillDefault("stillUpdateRate", 0.001);
 #endif
 
