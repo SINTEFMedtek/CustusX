@@ -72,6 +72,7 @@ typedef boost::shared_ptr<class Texture3DSlicerRep> Texture3DSlicerRepPtr;
 typedef boost::shared_ptr<class GPUImageDataBuffer> GPUImageDataBufferPtr;
 typedef boost::shared_ptr<class GPUImageLutBuffer> GPUImageLutBufferPtr;
 typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
+typedef boost::shared_ptr<class CrossHairRep2D> CrossHairRep2DPtr;
 typedef boost::shared_ptr<class LineSegment> LineSegmentPtr;
 typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
