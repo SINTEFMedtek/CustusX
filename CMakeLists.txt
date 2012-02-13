@@ -84,7 +84,7 @@ endif (CX_LINUX)
 if (WIN32)
     set(CPACK_NSIS_MUI_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\CustusX.ico")
     set(CPACK_PACKAGE_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\CustusX.png")
-    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows/win_install_readme.rtf")
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows/Windows_Install_ReadMe.rtf")
     set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\CustusX.exe")
     set(CPACK_PACKAGE_EXECUTABLES 
         "CustusX" "CustusX"
@@ -92,7 +92,7 @@ if (WIN32)
         "GrabberServer" "GrabberServer"
         )
     set(CPACK_NSIS_MENU_LINKS
-        "doc/win_install_readme.rtf" "README"
+        "doc/Windows_Install_ReadMe.rtf" "README"
     )
 endif (WIN32)
 
