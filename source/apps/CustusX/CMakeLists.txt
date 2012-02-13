@@ -137,7 +137,7 @@ if(WIN32)
     )
   endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 
-  install(FILES ${CustusX3_SOURCE_DIR}/install/Windows/win_install_readme.rtf 
+  install(FILES ${CustusX3_SOURCE_DIR}/install/Windows/Windows_Install_ReadMe.rtf 
       DESTINATION ${CX_INSTALL_ROOT_DIR}/doc
       #COMPONENT CustusX
       )
