@@ -187,10 +187,20 @@ void PerformanceTab::init()
   mSmartRenderCheckBox->setChecked(settings()->value("smartRender", true).toBool());
   mSmartRenderCheckBox->setToolTip("Render only when scene has changed, plus once per second.");
 
-  bool useGPURender = settings()->value("useGPUVolumeRayCastMapper").toBool();
+  bool useGPU3DRender = settings()->value("useGPUVolumeRayCastMapper").toBool();
   mGPURenderCheckBox = new QCheckBox("Use GPU 3D Renderer");
-  mGPURenderCheckBox->setChecked(useGPURender);
+  mGPURenderCheckBox->setChecked(useGPU3DRender);
   mGPURenderCheckBox->setToolTip("Use a GPU-based 3D renderer instead of the texture-based one, if available.");
+
+    bool useGPU2DRender = settings()->value("useGPU2DRendering").toBool();
+	mGPU2DRenderCheckBox = new QCheckBox("Use GPU 2D Renderer");
+	mGPU2DRenderCheckBox->setChecked(useGPU2DRender);
+	mGPU2DRenderCheckBox->setToolTip("Use a GPU-based 2D renderer instead of the software-based one, if available.");
+
+#ifndef USE_GLX_SHARED_CONTEXT
+	mGPU2DRenderCheckBox->setChecked(false);
+	mGPU2DRenderCheckBox->setEnabled(false);
+#endif
 
   //Layout
   mMainLayout = new QGridLayout;
@@ -200,7 +210,8 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
   mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
-  new ssc::SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 4);
+  mMainLayout->addWidget(mGPU2DRenderCheckBox, 4, 0);
+  new ssc::SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 5);
 
   mTopLayout->addLayout(mMainLayout);
 }
@@ -214,9 +225,10 @@ void PerformanceTab::saveParametersSlot()
 {
   settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
   settings()->setValue("useGPUVolumeRayCastMapper", mGPURenderCheckBox->isChecked());
-  settings()->setValue("maxRenderSize", mMaxRenderSize->getValue());
-  settings()->setValue("smartRender", mSmartRenderCheckBox->isChecked());
-  settings()->setValue("stillUpdateRate", mStillUpdateRate->getValue());
+  settings()->setValue("useGPU2DRendering", mGPU2DRenderCheckBox->isChecked());
+  settings()->setValue("maxRenderSize",     mMaxRenderSize->getValue());
+  settings()->setValue("smartRender",       mSmartRenderCheckBox->isChecked());
+  settings()->setValue("stillUpdateRate",   mStillUpdateRate->getValue());
 }
 
 //==============================================================================
