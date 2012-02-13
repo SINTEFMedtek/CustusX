@@ -228,6 +228,7 @@ typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
 typedef vtkSmartPointer<class vtkColorTransferFunction> vtkColorTransferFunctionPtr;
 typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
 typedef vtkSmartPointer<class vtkVolumeTextureMapper3D> vtkVolumeTextureMapper3DPtr;
+typedef vtkSmartPointer<class vtkTextureMapToPlane> vtkTextureMapToPlanePtr;
 typedef vtkSmartPointer<class vtkVolume> vtkVolumePtr;
 typedef vtkSmartPointer<class vtkVolume> vtkVolumePtr;
 typedef vtkSmartPointer<class vtkActor2D> vtkActor2DPtr;
