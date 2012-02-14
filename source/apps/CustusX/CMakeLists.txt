@@ -146,6 +146,8 @@ endif(CX_WINDOWS)
 # Install Linux-specific files
 if (CX_LINUX)
   install(FILES 
+      ${CustusX3_SOURCE_DIR}/install/Linux/copy/run_v2u.sh
+      ${CustusX3_SOURCE_DIR}/install/Linux/copy/v2u
       #${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt
       ${CustusX3_SOURCE_DIR}/install/Linux/copy/runCustusX.sh
       ${CustusX3_SOURCE_DIR}/install/Linux/copy/runOpenIGTLinkServer.sh 
