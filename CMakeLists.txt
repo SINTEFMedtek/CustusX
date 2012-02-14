@@ -7,6 +7,37 @@ project(CustusX3)
 cmake_minimum_required(VERSION 2.6)
 
 #------------------------------------------------------------------------------
+# Add some compiler flags (preprocessor definitions)
+#------------------------------------------------------------------------------
+add_definitions(-DCustusX3_VERSION_MAJOR=${CustusX3_VERSION_MAJOR}
+  -DCustusX3_VERSION_MINOR=${CustusX3_VERSION_MINOR}
+  -DCustusX3_VERSION_PATCH=${CustusX3_VERSION_PATCH})
+
+# Use:
+# CX_WINDOWS for all windows
+# CX_WIN32 for 32 bit windows
+# CX_WIN64 for 64 bit windows
+if(WIN32)
+  set(CX_WINDOWS 1) #for cmake
+  add_definitions(-DCX_WINDOWS) #for compiler
+  message( STATUS "This is a Windows build.")
+  add_definitions(-D__WIN32__) #  -because they are needed at moc'ing time
+  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(CX_WIN64 1) #for cmake
+    add_definitions(-DCX_WIN64) #for compiler
+    message( STATUS "This is a 64 bit build.")
+  else()
+    set(CX_WIN32 1) #for cmake
+    add_definitions(-DCX_WIN32) #for compiler
+    message( STATUS "This is a 32 bit build.")
+  endif()
+endif()
+
+if(APPLE)
+  add_definitions(-D__APPLE__)
+endif(APPLE)
+
+#------------------------------------------------------------------------------
 # Set CustusX version
 #------------------------------------------------------------------------------
 set(CustusX3_VERSION_MAJOR  3)
@@ -84,11 +115,11 @@ if (CX_LINUX)
     set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 endif (CX_LINUX)
 
-if (WIN32)
-    set(CPACK_NSIS_MUI_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\CustusX.ico")
-    set(CPACK_PACKAGE_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\CustusX.png")
+if (CX_WINDOWS)
+    set(CPACK_NSIS_MUI_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons/CustusX.ico")
+    set(CPACK_PACKAGE_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons/CustusX.png")
     set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows/Windows_Install_ReadMe.rtf")
-    set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\CustusX.exe")
+    set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/CustusX.exe")
     set(CPACK_PACKAGE_EXECUTABLES 
         "CustusX" "CustusX"
         "OpenIGTLinkServer" "OpenIGTLinkServer"
@@ -97,7 +128,7 @@ if (WIN32)
     set(CPACK_NSIS_MENU_LINKS
         "doc/Windows_Install_ReadMe.rtf" "README"
     )
-endif (WIN32)
+endif (CX_WINDOWS)
 
 #------------------------------------------------------------------------------
 # Dart
@@ -121,7 +152,7 @@ find_path(CPPUNIT_INCLUDE_DIR cppunit/TestCase.h
   /usr/include
 )
 
-if(WIN32)
+if(CX_WINDOWS)
   find_library(CPPUNIT_LIBRARY cppunit
                ${CPPUNIT_INCLUDE_DIR}/../lib
                /usr/local/lib
@@ -130,9 +161,9 @@ if(WIN32)
                ${CPPUNIT_INCLUDE_DIR}/../lib
                /usr/local/lib
                /usr/lib)
-else(WIN32)
+else(CX_WINDOWS)
   find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED)
-endif(WIN32)
+endif(CX_WINDOWS)
 
 if(CPPUNIT_INCLUDE_DIR)
   if(CPPUNIT_LIBRARY)
@@ -141,22 +172,6 @@ if(CPPUNIT_INCLUDE_DIR)
     set(CPPUNIT_DEBUG_LIBRARIES ${CPPUNIT_DEBUG_LIBRARY} ${CMAKE_DL_LIBS})
   endif(CPPUNIT_LIBRARY)
 endif(CPPUNIT_INCLUDE_DIR)
-
-#------------------------------------------------------------------------------
-# Add some definitions
-#  -because they are needed at moc'ing time
-#------------------------------------------------------------------------------
-add_definitions(-DCustusX3_VERSION_MAJOR=${CustusX3_VERSION_MAJOR}
-  -DCustusX3_VERSION_MINOR=${CustusX3_VERSION_MINOR}
-  -DCustusX3_VERSION_PATCH=${CustusX3_VERSION_PATCH})
-
-if(WIN32)
-  add_definitions(-D__WIN32__)
-endif(WIN32)
-
-if(APPLE)
-  add_definitions(-D__APPLE__)
-endif(APPLE)
 
 #------------------------------------------------------------------------------
 # Add subdirectories
