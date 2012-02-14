@@ -76,11 +76,11 @@ endif(APPLE)
 
 # WINDOWS libs
 #----------
-if(WIN32)
+if(CX_WINDOWS)
 
     #TODO
     
-endif(WIN32)
+endif(CX_WINDOWS)
 
 #------------------------------------------------------------------------------
 # Qt - MOC
@@ -103,9 +103,9 @@ if(APPLE)
   QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS})
 endif(APPLE)
 
-if(WIN32)
+if(CX_WINDOWS)
   QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS} OPTIONS "-D_WINDOWS")
-endif(WIN32)
+endif(CX_WINDOWS)
 
 #------------------------------------------------------------------------------
 # Include
@@ -146,9 +146,9 @@ if(APPLE)
   add_executable(GrabberServer MACOSX_BUNDLE ${SOURCES})
 endif(APPLE)
 
-if(WIN32)
+if(CX_WINDOWS)
   add_executable(GrabberServer ${SOURCES})
-endif(WIN32)
+endif(CX_WINDOWS)
 
 #------------------------------------------------------------------------------
 # Link
@@ -170,12 +170,12 @@ set( ALL_LINK_LIBRARIES
   ${QT_LIBRARIES}
 )
 
-if(WIN32)
+if(CX_WINDOWS)
     target_link_libraries( GrabberServer
       ${ALL_LINK_LIBRARIES}
       ${WIN_LINK_LIBRARIES}
     )
-endif(WIN32)
+endif(CX_WINDOWS)
 
 if(APPLE)
     target_link_libraries( GrabberServer
@@ -191,9 +191,9 @@ endif(APPLE)
 # Variables
 #----------
 set(GRABBERSERVER_INSTALL_FOLDER_NAME "GrabberServer")
-if(WIN32)
+if(CX_WINDOWS)
     set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/GrabberServer.exe")
-endif(WIN32)
+endif(CX_WINDOWS)
 
 if(APPLE)
     set(GRABBERSERVER_INSTALL_FOLDER_NAME .)
@@ -211,8 +211,7 @@ install(TARGETS GrabberServer
   RUNTIME DESTINATION bin
   )
 
-if(WIN32)
-
+if(CX_WINDOWS)
   #Installing required run time libs for Windows, msv*.dll
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include (InstallRequiredSystemLibraries)
@@ -222,20 +221,19 @@ if(WIN32)
         PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
         GROUP_EXECUTE WORLD_READ
         )
-  endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-  
-endif(WIN32)
+  endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)  
+endif(CX_WINDOWS)
 
 #------------------------------------------------------------------------------
 # Bundle utilities
 #------------------------------------------------------------------------------
 # See http://www.itk.org/Wiki/BundleUtilitiesExample for example on how to use bundle utilities
 
-if(WIN32)
+if(CX_WINDOWS)
 
   install(CODE "
      include(BundleUtilities)
-     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
-     )
+     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\")
+     ")
 
-endif(WIN32)
+endif(CX_WINDOWS)

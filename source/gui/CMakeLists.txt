@@ -4,15 +4,15 @@
 
 
 # _USE_MATH_DEFINES Must be defined before math.h is included
-if (WIN32)
+if (CX_WINDOWS)
     add_definitions(-D_USE_MATH_DEFINES)
-endif(WIN32)
+endif(CX_WINDOWS)
 
-if (APPLE OR WIN32)
+if (APPLE OR CX_WINDOWS)
     set(QXT_FOLDER "../ThirdParty/qxt_mac_compatible")
-else(APPLE OR WIN32)
+else(APPLE OR CX_WINDOWS)
     set(QXT_FOLDER "../ThirdParty/qxt")
-endif(APPLE OR WIN32)
+endif(APPLE OR CX_WINDOWS)
 
 # Make VERSION_NUMBER available for c++ files in gui folder
 ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
@@ -122,11 +122,11 @@ include_directories(
 
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
-IF(WIN32)
+IF(CX_WINDOWS)
   QT4_WRAP_CPP(cxGui_MOC_SRCS ${cxGui_MOC_HDRS} OPTIONS "-D_WINDOWS")
-ELSE(WIN32)
+ELSE(CX_WINDOWS)
   QT4_WRAP_CPP(cxGui_MOC_SRCS ${cxGui_MOC_HDRS} )
-ENDIF(WIN32)
+ENDIF(CX_WINDOWS)
 
 SET(cxGui_RCCS cxResources.qrc)
 
