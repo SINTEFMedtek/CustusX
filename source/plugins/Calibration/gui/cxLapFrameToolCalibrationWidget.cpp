@@ -49,7 +49,7 @@ LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(QWidget* parent) :
 
   mCameraAngleAdapter = ssc::DoubleDataAdapterXml::initialize("Camera Angle", "",
       "Additional tilt of calibration around tool y-axis,\nfor use with cameras tilted relative to tool direction",
-      0.0, ssc::DoubleRange(-M_PI_2, M_PI_2, M_PI/180), 0);
+      0.0, ssc::DoubleRange(-M_PI/2, M_PI/2, M_PI/180), 0);
   mCameraAngleAdapter->setInternal2Display(180.0/M_PI);
 
   mCalibRefTool = SelectToolStringDataAdapter::New();
