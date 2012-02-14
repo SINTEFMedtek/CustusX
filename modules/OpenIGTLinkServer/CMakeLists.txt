@@ -59,12 +59,17 @@ include_directories(
 #-------------------------------
 # Linking
 #-------------------------------
-SET (WIN_LINK_LIBRARIES
-     ${ULTERIUS_LIBRARY}
-     vtkOpenIGTUltrasound
-)
 
-SET ( ALL_LINK_LIBRARIES
+# link to ulterius only on when building 32 bit
+# - ulterius lib is only available on windows as 32 bit
+if(CX_WIN32)
+  SET(WIN32_LINK_LIBRARIES
+       ${ULTERIUS_LIBRARY}
+       vtkOpenIGTUltrasound
+  )
+endif(CX_WIN32)
+
+SET(ALL_LINK_LIBRARIES
   SSC
   ${BOOST_LIBRARIES}
   ${QT_LIBRARIES}
@@ -72,12 +77,12 @@ SET ( ALL_LINK_LIBRARIES
   )
 
 if(CX_WINDOWS)
-	SET (LINK_LIBRARIES
-		${WIN_LINK_LIBRARIES}
+	SET(LINK_LIBRARIES
+		${WIN32_LINK_LIBRARIES}
 		${ALL_LINK_LIBRARIES}
 	)
 	else(CX_WINDOWS)
-	SET (LINK_LIBRARIES
+	SET(LINK_LIBRARIES
 		${ALL_LINK_LIBRARIES}
 	)
 endif(CX_WINDOWS)
@@ -119,13 +124,18 @@ SET ( cxOpenIGTLinkServer_FILES
     ../grabberCommon/igtl_sonix_status.c
 )
 
-add_executable( OpenIGTLinkServer 
+set(ExecutableName "OpenIGTLinkServer")
+if(CX_WIN32)
+	set(ExecutableName "UltrasonixServer") # windows 32 bit version is made for ultrasonix communication
+endif()
+
+add_executable( ${ExecutableName}
 								main.cpp 
 								${cxOpenIGTLinkServer_FILES} 
 								${MOC_HEADER_FILES} 
 								)
 
-target_link_libraries(OpenIGTLinkServer  
+target_link_libraries(${ExecutableName}  
 	${LINK_LIBRARIES}     
     ${OpenCV_LIBS}
     vtkIO 
@@ -142,7 +152,7 @@ target_link_libraries(OpenIGTLinkServer
 #-------------------------------
 # Install files
 #-------------------------------
-install(TARGETS OpenIGTLinkServer
+install(TARGETS ${ExecutableName}
     BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
     RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
     )
@@ -190,7 +200,7 @@ endif (CX_LINUX)
 # Windows
 #----------
 if (CX_WINDOWS)
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/OpenIGTLinkServer")
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/${ExecutableName}")
   set(LIBS ${OpenCV_LIB_DIR})
   set(DIRS 
       ${QT_INCLUDES} 
@@ -203,7 +213,6 @@ if (CX_WINDOWS)
          
   install(CODE "
      include(BundleUtilities)
-     #set(ENV{VS_UNICODE_OUTPUT})   # <<<< SOMEHOW CREEPS BACK IN >>>>>> http://www.cmake.org/pipermail/cmake/2011-April/044064.html
      fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
      )      
       

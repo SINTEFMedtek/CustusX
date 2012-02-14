@@ -7,7 +7,7 @@
 
 #include "cxImageSenderSonix.h"
 
-#ifdef WIN32
+#ifdef CX_WIN32
 
 #include <QTimer>
 #include <QTime>
@@ -285,5 +285,5 @@ IGTLinkSonixStatusMessage::Pointer ImageSenderSonix::getLastStatusMessageFromQue
 
 }
 
-#endif // WIN32
+#endif // CX_WIN32
 
