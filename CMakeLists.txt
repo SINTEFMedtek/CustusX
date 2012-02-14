@@ -43,23 +43,20 @@ endif(APPLE)
 set(CustusX3_VERSION_MAJOR  3)
 set(CustusX3_VERSION_MINOR  2)
 set(CustusX3_VERSION_PATCH  8)
-set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
-set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
+
+# set alpha when not a release
+set(CustusX3_VERSION_POSTFIX ".alpha")
+# set beta when a quick release
+#set(CustusX3_VERSION_POSTFIX ".beta")
+# set nothing when a normal release
+#set(CustusX3_VERSION_POSTFIX "")
+
+set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
+set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
 
 if(APPLE)
   set(CMAKE_INSTALL_PREFIX "Applications/" ) # used during package installation. Appended to some default which seems to be / , might be able to change using DESTDIR env var.
 endif(APPLE)
-
-#------------------------------------------------------------------------------
-# Set as alpha when not a release
-#------------------------------------------------------------------------------
-set(ALPHA ON)
-  
-if(ALPHA)
-  # no spaces due to linux cmake 2.8.4 troubles...
-  set(VERSION_NUMBER "${VERSION_NUMBER}.alpha")
-  set(VERSION_NUMBER_VERBOSE "${VERSION_NUMBER_VERBOSE}.alpha")
-endif(ALPHA)
 
 #------------------------------------------------------------------------------
 # Variables
