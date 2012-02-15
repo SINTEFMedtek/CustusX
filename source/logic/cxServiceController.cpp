@@ -13,6 +13,7 @@
 #include "sscMessageManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
