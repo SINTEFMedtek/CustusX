@@ -16,6 +16,7 @@ class SyntaxHighlighter : public QSyntaxHighlighter
 public:
 	SyntaxHighlighter(QTextDocument* parent);
 	virtual void highlightBlock(const QString &text);
+	virtual ~SyntaxHighlighter() {}
 private:
 	void highlightTimestamp(const QString &text);
 	void applyFormat(const QString &text, const QTextCharFormat& format, const QString pattern);

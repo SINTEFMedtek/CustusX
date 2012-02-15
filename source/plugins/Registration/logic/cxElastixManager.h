@@ -1,0 +1,65 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+#ifndef CXELASTIXMANAGER_H_
+#define CXELASTIXMANAGER_H_
+
+#include <QObject>
+#include "sscForwardDeclarations.h"
+#include "sscXmlOptionItem.h"
+#include "cxRegistrationManager.h"
+
+namespace cx
+{
+/**
+ * \file
+ * \addtogroup cxPluginRegistration
+ * @{
+ */
+
+/**
+ * \brief Manager for interfacing to the ElastiX registration package.
+ *
+ * \date Feb 4, 2012
+ * \author Christian Askeland, SINTEF
+ */
+
+class ElastixManager : public QObject
+{
+	Q_OBJECT
+public:
+	ElastixManager(RegistrationManagerPtr regManager);
+	virtual ~ElastixManager();
+
+	void setActiveParameterFile(QString filename);
+	QString getActiveParameterFile() const;
+	void setActiveExecutable(QString filename);
+	QString getActiveExecutable() const;
+
+	void execute();
+signals:
+	void elastixChanged();
+
+private:
+	RegistrationManagerPtr mRegistrationManager;
+	QString mActiveExecutable;
+	QString mActiveParameterFile;
+	ssc::XmlOptionFile mOptions;
+};
+typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;
+
+/**
+ * @}
+ */
+} /* namespace cx */
+#endif /* CXELASTIXMANAGER_H_ */
