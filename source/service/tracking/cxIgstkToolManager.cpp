@@ -101,9 +101,12 @@ void IgstkToolManager::createTools(std::vector<IgstkTool::InternalStructure> too
 	{
 		this->addIgstkTools(toolStructures[i]);
 	}
-	IgstkToolPtr refTool = this->addIgstkTools(referenceToolStructure);
-	if (refTool->isValid())
-		mReferenceTool = refTool;
+	if (!referenceToolStructure.mUid.isEmpty())
+	{
+		IgstkToolPtr refTool = this->addIgstkTools(referenceToolStructure);
+		if (refTool->isValid())
+			mReferenceTool = refTool;
+	}
 }
 
 IgstkToolPtr IgstkToolManager::addIgstkTools(IgstkTool::InternalStructure& toolStructure)
