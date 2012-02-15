@@ -25,6 +25,8 @@ SET( MOC_HEADER_FILES
     cxRegisterI2IWidget.h
     #cxRegistrationMethodsWidget.h
     cxRegistrationDataAdapters.h
+    cxElastixWidget.h
+    cxElastixSyntaxHighlighter.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -66,6 +68,10 @@ SET( SOURCE_FILES
     cxRegistrationMethodsWidget.cpp  
     cxRegistrationDataAdapters.h
     cxRegistrationDataAdapters.cpp
+    cxElastixWidget.h
+    cxElastixWidget.cpp
+    cxElastixSyntaxHighlighter.h
+    cxElastixSyntaxHighlighter.cpp
     )
 
 # =========================================================
