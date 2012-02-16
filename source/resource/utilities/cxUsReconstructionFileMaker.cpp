@@ -270,7 +270,7 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 	QString fileData(mhdFile.readAll());
 	fileData += "\n";
 	if (mTool && mTool->getProbe())
-	fileData += QString("ConfigurationID = %1\n").arg(mTool->getProbe()->getConfigurationPath());
+		fileData += QString("ConfigurationID = %1\n").arg(mTool->getProbe()->getConfigurationPath());
 	fileData += QString("ProbeCalibration = %1\n").arg(calibrationFile);
 	QStringList fileLines = fileData.split("\n");
 	for (int j=0; j<fileLines.size(); ++j)

@@ -50,10 +50,13 @@ Tool::Tool(IgstkToolPtr igstkTool) :
 	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
 	connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
 
-	mProbe = Probe::New(mTool->getInternalStructure().mInstrumentId,
-					mTool->getInternalStructure().mInstrumentScannerId);
-	connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
-	connect(mProbe.get(), SIGNAL(probeChanged()), this, SIGNAL(probeChanged()));
+	if (mTool->getInternalStructure().mIsProbe)
+	{
+		mProbe = Probe::New(mTool->getInternalStructure().mInstrumentId,
+						mTool->getInternalStructure().mInstrumentScannerId);
+		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
+		connect(mProbe.get(), SIGNAL(probeChanged()), this, SIGNAL(probeChanged()));
+	}
 	connect(ssc::toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 
 //  // debug code, used for fixing the rotation z-bug:
@@ -222,7 +225,9 @@ void Tool::printInternalStructure()
 
 ssc::ProbeData Tool::getProbeSector() const
 {
-	return mProbe->getData();
+	if (mProbe)
+		return mProbe->getData();
+	return ssc::ProbeData();
 }
 
 std::map<int, ssc::Vector3D> Tool::getReferencePoints() const
