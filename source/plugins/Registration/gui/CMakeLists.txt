@@ -15,7 +15,7 @@ SET( MOC_HEADER_FILES
     cxLandmarkRegistrationWidget.h
     cxLandmarkPatientRegistrationWidget.h
     cxRegistrationHistoryWidget.h
-    cxManualRegistrationOffsetWidget.h
+    cxManualRegistrationWidget.h
     cxFastImageRegistrationWidget.h
     #cxFastPatientRegistrationWidget.h
     cxFastOrientationRegistrationWidget.h
@@ -48,8 +48,8 @@ SET( SOURCE_FILES
     cxLandmarkImage2ImageRegistrationWidget.cpp
     cxRegistrationHistoryWidget.h
     cxRegistrationHistoryWidget.cpp
-    cxManualRegistrationOffsetWidget.h
-    cxManualRegistrationOffsetWidget.cpp
+    cxManualRegistrationWidget.h
+    cxManualRegistrationWidget.cpp
     cxFastImageRegistrationWidget.h
     cxFastImageRegistrationWidget.cpp
     cxFastPatientRegistrationWidget.h
