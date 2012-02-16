@@ -70,6 +70,15 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   ProbeXmlConfigParser::Configuration configuration = this->readProbeConfiguration(calFilesPath, probeConfigPath);
   ssc::ProbeData probeData = createProbeDataFromConfiguration(configuration);
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
+  bool spacingOK = ssc::similar(probeData.mImage.mSpacing, ssc::Vector3D(retval.mUsRaw->getSpacing()), 0.001);
+  if (!spacingOK)
+  {
+      ssc::messageManager()->sendWarning(""
+    	  "Mismatch in spacing values from calibration and recorded image.\n"
+    	  "This might be valid if the sound speed was changed prior to recording.\n"
+    	  "Probe definition: "+ qstring_cast(probeData.mImage.mSpacing) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
+    	  );
+  }
   probeData.mImage.mSpacing = ssc::Vector3D(retval.mUsRaw->getSpacing());
   retval.mProbeData.setData(probeData);
 
@@ -213,14 +222,14 @@ ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileNa
     fileName = list.join("");
   }
 
-  std::cout << "raw " << mhdFileName<< std::endl;
+  //std::cout << "raw " << mhdFileName<< std::endl;
   //Use file name as uid
   ssc::ImagePtr UsRaw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(fileName, mhdFileName));
   UsRaw->setFilePath(filePath);
   ssc::USFrameDataPtr retval;
   retval.reset(new ssc::USFrameData(UsRaw, angio));
 
-  std::cout << "raw " << mhdFileName << ", " << Eigen::Array3i(retval->getDimensions()) << std::endl;
+  //std::cout << "raw " << mhdFileName << ", " << Eigen::Array3i(retval->getDimensions()) << std::endl;
 
 
   return retval;
