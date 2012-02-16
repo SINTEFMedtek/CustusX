@@ -10,7 +10,7 @@
 
 ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config)
 {
-	std::cout << "createProbeDataFromConfiguration()" << std::endl;
+//	std::cout << "createProbeDataFromConfiguration()" << std::endl;
   if(config.isEmpty())
     return ssc::ProbeData();
 
