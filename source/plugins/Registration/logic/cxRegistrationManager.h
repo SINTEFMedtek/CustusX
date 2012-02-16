@@ -52,10 +52,10 @@ public:
   void setMovingData(ssc::DataPtr movingData);
   ssc::DataPtr getMovingData();
 
-  void setManualPatientRegistration(ssc::Transform3D patientRegistration); ///< used for when a user wants to ???
-  ssc::Transform3DPtr getManualPatientRegistration(); ///< get the manually set patient registration
-
-  ssc::Transform3D getManualPatientRegistrationOffset(); ///< get the offset transform that moves the patient registration
+//  void setManualPatientRegistration(ssc::Transform3D patientRegistration); ///< used for when a user wants to ???
+//  ssc::Transform3DPtr getManualPatientRegistration(); ///< get the manually set patient registration
+//
+//  ssc::Transform3D getManualPatientRegistrationOffset(); ///< get the offset transform that moves the patient registration
 
   void doPatientRegistration(); ///< registrates the fixed image to the patient
   void doImageRegistration(); ///< registrates the image to the fixed image
@@ -65,8 +65,11 @@ public:
 
   AcquisitionDataPtr getAcquisitionData() { return mAcquisitionData; }
 
-public slots:
-  void setManualPatientRegistrationOffsetSlot(ssc::Transform3D offset); ///< transform for (slightly) moving a patient registration
+  void applyImage2ImageRegistration(ssc::Transform3D delta_pre_rMd, QString description);
+  void applyPatientRegistration(ssc::Transform3D rMpr_new, QString description);
+
+//public slots:
+//  void setManualPatientRegistrationOffsetSlot(ssc::Transform3D offset); ///< transform for (slightly) moving a patient registration
 
 private slots:
   void clearSlot();
@@ -74,7 +77,7 @@ private slots:
 	void duringLoadPatientSlot();
 
 signals:
-  void patientRegistrationPerformed();
+//  void patientRegistrationPerformed();
   void fixedDataChanged(QString uid);
   void movingDataChanged(QString uid);
 
@@ -97,7 +100,7 @@ protected:
 
   QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
 
-  ssc::Transform3D mPatientRegistrationOffset; ///< manually set offset for that will be added to the patientregistration
+//  ssc::Transform3D mPatientRegistrationOffset; ///< manually set offset for that will be added to the patientregistration
 
 	AcquisitionDataPtr mAcquisitionData;
 

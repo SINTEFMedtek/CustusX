@@ -51,6 +51,16 @@ public:
   virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------
+
+class ManualRegistrationsWidget : public TabbedWidget
+{
+public:
+	ManualRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
+  virtual ~ManualRegistrationsWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
+
 class RegistrationMethodsWidget : public TabbedWidget
 {
 public:
