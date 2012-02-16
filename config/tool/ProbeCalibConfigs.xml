@@ -1366,7 +1366,7 @@
       </USProbe>
    </USScanner>
    <USScanner>
-      <Name>Philips IU22</Name>
+      <Name>Philips_IU22</Name>
       <USProbe>
          <Name>L17-5</Name>
          <Type>LinearArray</Type>
