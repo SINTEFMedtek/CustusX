@@ -40,14 +40,19 @@ Probe::Probe(QString instrumentUid, QString scannerUid) :
 {
 	mOverrideTemporalCalibration = false;
 	mTemporalCalibration = 0;
-
-	// Read ultrasoundImageConfigs.xml file
 	QString xmlFileName = cx::DataLocations::getRootConfigPath() + QString("/tool/ProbeCalibConfigs.xml");
 	mXml.reset(new ProbeXmlConfigParser(xmlFileName));
 
 	QStringList configs = this->getConfigIdList();
 	if (!configs.isEmpty())
 		this->setConfigId(configs[0]);
+	else
+	{
+		ssc::messageManager()->sendWarning(QString("Found no probe configuration for:\n"
+			"scanner=[%1] instrument=[%2].\n"
+			"Check that your %3 file contains entries\n"
+			"<USScanner> <Name>%1</Name> ... <USProbe> <Name>%2</Name>").arg(scannerUid).arg(instrumentUid).arg(xmlFileName));
+	}
 }
 
 ssc::ProbeSectorPtr Probe::getSector()
