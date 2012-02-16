@@ -9,6 +9,8 @@
 
 SET( MOC_HEADER_FILES
    cxRegistrationManager.h
+   cxElastixManager.h
+   cxElastixExecuter.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -19,6 +21,10 @@ SET( SOURCE_FILES
    cxRegistrationManager.h
    cxRegistrationManager.cpp
    cxLandmarkTranslationRegistration.cpp
+   cxElastixManager.h
+   cxElastixManager.cpp
+   cxElastixExecuter.h
+   cxElastixExecuter.cpp
   )
 
 # =========================================================

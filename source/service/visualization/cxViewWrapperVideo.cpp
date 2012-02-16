@@ -165,7 +165,7 @@ void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 
 ssc::ToolPtr ViewWrapperVideo::getProbe()
 {
-	std::cout << "ViewWrapperVideo::getProbe()" << std::endl;
+//	std::cout << "ViewWrapperVideo::getProbe()" << std::endl;
 	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
 
 	for (ssc::ToolManager::ToolMap::iterator iter = tools->begin(); iter != tools->end(); ++iter)

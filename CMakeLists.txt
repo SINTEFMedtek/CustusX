@@ -12,23 +12,20 @@ cmake_minimum_required(VERSION 2.6)
 set(CustusX3_VERSION_MAJOR  3)
 set(CustusX3_VERSION_MINOR  2)
 set(CustusX3_VERSION_PATCH  8)
-set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
-set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
+
+# set alpha when not a release
+set(CustusX3_VERSION_POSTFIX ".alpha")
+# set beta when a quick release
+#set(CustusX3_VERSION_POSTFIX ".beta")
+# set nothing when a normal release
+#set(CustusX3_VERSION_POSTFIX "")
+
+set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
+set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
 
 if(APPLE)
   set(CMAKE_INSTALL_PREFIX "Applications/" ) # used during package installation. Appended to some default which seems to be / , might be able to change using DESTDIR env var.
 endif(APPLE)
-
-#------------------------------------------------------------------------------
-# Set as alpha when not a release
-#------------------------------------------------------------------------------
-set(ALPHA ON)
-  
-if(ALPHA)
-  # no spaces due to linux cmake 2.8.4 troubles...
-  set(VERSION_NUMBER "${VERSION_NUMBER}.alpha")
-  set(VERSION_NUMBER_VERBOSE "${VERSION_NUMBER_VERBOSE}.alpha")
-endif(ALPHA)
 
 #------------------------------------------------------------------------------
 # Variables
@@ -87,7 +84,7 @@ endif (CX_LINUX)
 if (WIN32)
     set(CPACK_NSIS_MUI_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\CustusX.ico")
     set(CPACK_PACKAGE_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\CustusX.png")
-    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows/win_install_readme.rtf")
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows/Windows_Install_ReadMe.rtf")
     set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\CustusX.exe")
     set(CPACK_PACKAGE_EXECUTABLES 
         "CustusX" "CustusX"
@@ -95,7 +92,7 @@ if (WIN32)
         "GrabberServer" "GrabberServer"
         )
     set(CPACK_NSIS_MENU_LINKS
-        "doc/win_install_readme.rtf" "README"
+        "doc/Windows_Install_ReadMe.rtf" "README"
     )
 endif (WIN32)
 

@@ -137,7 +137,7 @@ if(WIN32)
     )
   endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 
-  install(FILES ${CustusX3_SOURCE_DIR}/install/Windows/win_install_readme.rtf 
+  install(FILES ${CustusX3_SOURCE_DIR}/install/Windows/Windows_Install_ReadMe.rtf 
       DESTINATION ${CX_INSTALL_ROOT_DIR}/doc
       #COMPONENT CustusX
       )
@@ -146,6 +146,8 @@ endif(WIN32)
 # Install Linux-specific files
 if (CX_LINUX)
   install(FILES 
+      ${CustusX3_SOURCE_DIR}/install/Linux/copy/run_v2u.sh
+      ${CustusX3_SOURCE_DIR}/install/Linux/copy/v2u
       #${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt
       ${CustusX3_SOURCE_DIR}/install/Linux/copy/runCustusX.sh
       ${CustusX3_SOURCE_DIR}/install/Linux/copy/runOpenIGTLinkServer.sh 

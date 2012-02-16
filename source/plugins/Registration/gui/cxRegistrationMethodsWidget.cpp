@@ -28,6 +28,7 @@
 #include "cxPlateRegistrationWidget.h"
 #include "cxManualRegistrationOffsetWidget.h"
 #include "cxRegisterI2IWidget.h"
+#include "cxElastixWidget.h"
 
 namespace cx
 {
@@ -100,6 +101,8 @@ QString Image2PlateRegistrationWidget::defaultWhatsThis() const
 RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
   TabbedWidget(parent, objectName, windowTitle)
 {
+
+
   //landmark
   LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(this, "LandmarkRegistrationWidget", "Landmark Registrations");
   LandmarkImageRegistrationWidget* imageRegistrationWidget = new LandmarkImageRegistrationWidget(regManager, landmarkRegistrationsWidget, "LMImageRegistrationWidget", "Image Registration");
@@ -140,6 +143,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
   imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
 
+//  this->addTab(new ElastixWidget(regManager), "ElastiX");
   this->addTab(landmarkRegistrationsWidget, "Landmark");
   this->addTab(fastRegistrationsWidget, "Fast");
   this->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
