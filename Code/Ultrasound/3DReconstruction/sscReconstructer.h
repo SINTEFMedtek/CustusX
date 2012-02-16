@@ -128,7 +128,7 @@ signals:
 private:
 	USReconstructInputData mFileData;
 	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
-
+	bool mSuccess;
 	OutputVolumeParams mOutputVolumeParams;
 	XmlOptionFile mSettings;
 	ImagePtr mOutput;///< Output image from reconstruction

@@ -115,6 +115,7 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
 	mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath), mMaxTimeDiff(100)// TODO: Change default value for max allowed time difference between tracking and image time tags
 {
 //	mFileReader.reset(new cx::UsReconstructionFileReader());
+	mSuccess = false;
 
 	mSettings = settings;
 	mSettings.getElement("algorithms");
@@ -730,7 +731,7 @@ void Reconstructer::threadedReconstruct()
 	QDateTime startTime = QDateTime::currentDateTime();
 
 	QDomElement algoSettings = mSettings.getElement("algorithms", mAlgorithm->getName());
-	mAlgorithm->reconstruct(mFileData.mFrames, mFileData.mUsRaw, mOutput, mFileData.mMask, algoSettings);
+	mSuccess = mAlgorithm->reconstruct(mFileData.mFrames, mFileData.mUsRaw, mOutput, mFileData.mMask, algoSettings);
 
 	QTime tempTime = QTime(0, 0);
 	tempTime = tempTime.addMSecs(startTime.time().msecsTo(QDateTime::currentDateTime().time()));
@@ -745,10 +746,17 @@ void Reconstructer::threadedPostReconstruct()
 	if (!this->validInputData())
 		return;
 
-	ssc::messageManager()->sendSuccess("Reconstruction done, " + mOutput->getName());
+	if (mSuccess)
+	{
+		ssc::messageManager()->sendSuccess("Reconstruction done, " + mOutput->getName());
 
-	DataManager::getInstance()->loadData(mOutput);
-	DataManager::getInstance()->saveImage(mOutput, mOutputBasePath);
+		DataManager::getInstance()->loadData(mOutput);
+		DataManager::getInstance()->saveImage(mOutput, mOutputBasePath);
+	}
+	else
+	{
+		ssc::messageManager()->sendError("Reconstruction failed");
+	}
 }
 
 ImagePtr Reconstructer::getOutput()
