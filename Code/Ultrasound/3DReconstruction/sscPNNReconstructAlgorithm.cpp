@@ -62,7 +62,7 @@ void optimizedCoordTransform(ssc::Vector3D* p, boost::array<double, 16> tt)
 	(*p)[2] = t[8] * x + t[9] * y + t[10] * z + t[11];
 }
 
-void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData,
+bool PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData,
 	ImagePtr outputData, ImagePtr frameMask, QDomElement settings)
 {
 	//std::vector<Planes> planes = generate_planes(frameInfo, frameData);
@@ -134,6 +134,8 @@ void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
 
 	// Fill holes
 	this->interpolate(tempOutputData, outputData);
+
+	return true;
 }
 
 void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, ImagePtr outputData)

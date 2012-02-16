@@ -61,6 +61,17 @@ cl_program ocl_create_program(cl_context context, cl_device_id device, const cha
 	return retval;
 }
 
+/**
+ *  See clCreateContextFromType doc for more
+ */
+void  clCreateContextFromType_error_callback(const char *errinfo,
+	const void  *private_info,
+	size_t  cb,
+	void  *user_data)
+{
+	std::cout << "ERROR: From clCreateContextFromType() callback: "<< errinfo << std::endl;
+}
+
 ocl_context* ocl_init(QString processor)
 {
 	cl_int err;
@@ -91,12 +102,12 @@ ocl_context* ocl_init(QString processor)
 	if (processor == "CPU")
 	{
 		ocl_check_error(clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &(retval->device), NULL));
-		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_CPU, NULL, NULL, &err);
+		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_CPU, clCreateContextFromType_error_callback, NULL, &err);
 	}
 	else // GPU
 	{
 		ocl_check_error(clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &(retval->device), NULL));
-		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_GPU, NULL, NULL, &err);
+		retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_GPU, clCreateContextFromType_error_callback, NULL, &err);
 	}
 
 	ocl_check_error(err);

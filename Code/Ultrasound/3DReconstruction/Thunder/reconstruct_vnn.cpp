@@ -156,10 +156,10 @@ plane_eq* generate_plane_equations(float3* plane_points, int bscan_n)
 	return bscan_plane_equations;
 }
 
-void call_vnn_kernel(cl_kernel vnn, ocl_context* context, reconstruct_data* data, float3* plane_points,
+bool call_vnn_kernel(cl_kernel vnn, ocl_context* context, reconstruct_data* data, float3* plane_points,
 	plane_eq* bscan_plane_equations, float distance)
 {
-	//TODO: Use distance (from GUI) = kernel_radius in .ocl code
+	bool success = true;
 	int volume_w = data->output_dim[0];
 	int volume_h = data->output_dim[1];
 	int volume_n = data->output_dim[2];
@@ -175,7 +175,6 @@ void call_vnn_kernel(cl_kernel vnn, ocl_context* context, reconstruct_data* data
 	float bscan_spacing_x = inputSpacing[0];
 	float bscan_spacing_y = inputSpacing[1];
 
-	//  unsigned char* bscans = data->input;
 	unsigned char* volume = data->output;
 	unsigned char* mask = data->input_mask;
 
@@ -288,26 +287,26 @@ void call_vnn_kernel(cl_kernel vnn, ocl_context* context, reconstruct_data* data
 	for (int section = 0; section < 1; section++)
 	{
 		int i = 0;
-		clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_mask);
-		clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_w);
-		clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_h);
-		clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_n);
-		clSetKernelArg(vnn, i++, sizeof(cl_float), &bscan_spacing_x);
-		clSetKernelArg(vnn, i++, sizeof(cl_float), &bscan_spacing_y);
-		clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_volume);
-		clSetKernelArg(vnn, i++, sizeof(cl_int), &volume_n);
-		clSetKernelArg(vnn, i++, sizeof(cl_int), &volume_h);
-		clSetKernelArg(vnn, i++, sizeof(cl_int), &volume_w);
-		clSetKernelArg(vnn, i++, sizeof(cl_float), &volume_spacing);
-		clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_plane_eq);
-		clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_plane_points);
-		clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_printings);
-		clSetKernelArg(vnn, i++, sizeof(cl_int), &section);
-		clSetKernelArg(vnn, i++, sizeof(cl_float), &distance);
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_mask));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_w));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_h));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_int), &bscan_n));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_float), &bscan_spacing_x));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_float), &bscan_spacing_y));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_volume));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_int), &volume_n));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_int), &volume_h));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_int), &volume_w));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_float), &volume_spacing));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_plane_eq));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_plane_points));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_mem), &dev_printings));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_int), &section));
+		ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_float), &distance));
 
 		// Add the frame memory blocks (10 for now)
 		for (int bn = 0; bn < numBlocks; bn++)
-			clSetKernelArg(vnn, i++, sizeof(cl_mem), &clFramePointers[bn]);
+			ocl_check_error(clSetKernelArg(vnn, i++, sizeof(cl_mem), &clFramePointers[bn]));
 
 		// number of work items: defines the work ID used in the kernel to identify the column:
 		size_t * global_work_size = (size_t *) malloc(sizeof(size_t) * 1);
@@ -319,8 +318,17 @@ void call_vnn_kernel(cl_kernel vnn, ocl_context* context, reconstruct_data* data
 		//ocl_check_error(clFinish(context->cmd_queue));
 	}
 
-	// with byte adressable memory:
-	ocl_check_error(clEnqueueReadBuffer(context->cmd_queue, dev_volume, CL_TRUE, 0, volume_size, volume, 0, 0, 0));
+	try
+	{
+		// with byte adressable memory:
+		// add a read output volume to the command queue with blocking, i.e. dont return
+		// until reconstruction has completed.
+		ocl_check_error(clEnqueueReadBuffer(context->cmd_queue, dev_volume, CL_TRUE, 0, volume_size, volume, 0, 0, 0));
+	}
+	catch (std::string& exept)
+	{
+		success = false;
+	}
 
 	// AMD does not have byte adressable memory:
 	/*ocl_check_error(clEnqueueReadBuffer(cmd_queue, dev_volume, CL_TRUE, 0, volume_size*4, int_volume, 0, 0, 0));
@@ -347,21 +355,23 @@ void call_vnn_kernel(cl_kernel vnn, ocl_context* context, reconstruct_data* data
 	clReleaseMemObject(dev_volume);
 
 	ocl_check_error(clFinish(context->cmd_queue));
+
+	return success;
 }
 
-void reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString processor, float distance)
+bool reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString processor, float distance)
 {
 	const char* program_src = file2string(kernel_path);
 	if (program_src == NULL)
 	{
 		std::cout << "OpenCL Error: Cannot find file " << kernel_path << std::endl;
-		return;
+		return false;
 	}
 
 	if (!ocl_has_device_type(processor))
 	{
 		std::cout << "OpenCL Error: Device type " << processor.toStdString() << " not available" << std::endl;
-		return;
+		return false;
 	}
 
 	ocl_context* context = ocl_init(processor);
@@ -379,7 +389,17 @@ void reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString pr
 	//plane_eq* bscan_plane_equations = generate_plane_equations(plane_points, data->input_dim[2]);
 	plane_eq* bscan_plane_equations = generate_plane_equations(plane_points, inputDims[2]);
 
-	call_vnn_kernel(vnn, context, data, plane_points, bscan_plane_equations, distance);
+	bool success = true;
+
+	try
+	{
+		success = call_vnn_kernel(vnn, context, data, plane_points, bscan_plane_equations, distance);
+	}
+	catch (std::string& exept)
+	{
+		success = false;
+	}
+
 
 	clReleaseKernel(vnn);
 
@@ -388,4 +408,6 @@ void reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString pr
 
 	free(plane_points);
 	free(bscan_plane_equations);
+
+	return success;
 }

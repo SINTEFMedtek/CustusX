@@ -54,7 +54,7 @@ struct reconstruct_data
 	double output_spacing[3];
 };
 
-void reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString processor, float distance);
+bool reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString processor, float distance);
 
 /**
  * \}

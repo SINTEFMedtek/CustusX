@@ -75,9 +75,10 @@ std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElem
 	return retval;
 }
 
-void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
+bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
 	USFrameDataPtr frameData, ImagePtr outputData, ImagePtr frameMask, QDomElement settings)
 {
+	bool success = false;
 #ifdef USE_US_RECONSTRUCTION_THUNDER
 	std::cout << "processor: " << mProcessorOption->getValue() << std::endl;
 	std::cout << "distance: " << mDistanceOption->getValue() << std::endl;
@@ -100,7 +101,7 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 	if (!path.exists())
 	{
 		ssc::messageManager()->sendError("Error: Can't find kernels.ocl in any of\n  " + paths.join("  \n"));
-		return;
+		return false;
 	}
 
 	reconstruct_data data;//TODO change
@@ -146,10 +147,11 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 	output->GetDimensions(data.output_dim);
 	output->GetSpacing(data.output_spacing);
 
-	reconstruct_vnn(&data, path.absoluteFilePath().toStdString().c_str(), mProcessorOption->getValue(),
+	success = reconstruct_vnn(&data, path.absoluteFilePath().toStdString().c_str(), mProcessorOption->getValue(),
 		static_cast<float> (mDistanceOption->getValue()));
 	//ssc::messageManager()->sendInfo("ThunderVNNReconstructAlgorithm::reconstruct ***success***");
 #endif // USE_US_RECONSTRUCTION_THUNDER
+	return success;
 }
 
 }//namespace

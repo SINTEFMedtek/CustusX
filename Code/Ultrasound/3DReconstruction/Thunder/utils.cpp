@@ -28,6 +28,29 @@
 #include <string.h>
 #include <math.h>
 #include "utils.h"
+#include <QString>
+#include <iostream>
+
+void generateOpenCLError(cl_int id, const char* file, int line)
+{
+	QString type;
+	switch (id)
+	{
+
+	case CL_INVALID_COMMAND_QUEUE         : type = "CL_INVALID_COMMAND_QUEUE: command_queue is not a valid command-queue.";
+	case CL_INVALID_CONTEXT               : type = "CL_INVALID_CONTEXT: the context associated with command_queue and buffer are not the same or if the context associated with command_queue and events in event_wait_list are not the same.";
+	case CL_INVALID_MEM_OBJECT            : type = "CL_INVALID_MEM_OBJECT: buffer is not a valid buffer object.";
+	case CL_INVALID_VALUE                 : type = "CL_INVALID_VALUE: the region being read specified by (offset, cb) is out of bounds or if ptr is a NULL value.";
+	case CL_INVALID_EVENT_WAIT_LIST       : type = "CL_INVALID_EVENT_WAIT_LIST: event_wait_list is NULL and num_events_in_wait_list greater than 0, or event_wait_list is not NULL and num_events_in_wait_list is 0, or if event objects in event_wait_list are not valid events.";
+	case CL_MEM_OBJECT_ALLOCATION_FAILURE : type = "CL_MEM_OBJECT_ALLOCATION_FAILURE: there is a failure to allocate memory for data store associated with buffer.";
+	case CL_OUT_OF_HOST_MEMORY            : type = "CL_OUT_OF_HOST_MEMORY: there is a failure to allocate resources required by the OpenCL implementation on the host.";
+	default : type = "unknown";
+	}
+
+	QString err = QString("OpenCL ERROR[%1], file=%2[%3], msg=%4").arg(id).arg(file).arg(line).arg(type);
+	std::cerr << err.toStdString() << std::endl;
+	throw err.toStdString();
+}
 
 float3 cross(float3 v, float3 w) {
   float3 c = {

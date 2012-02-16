@@ -55,7 +55,7 @@ public:
 		return "PNN";
 	}
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
-	virtual void reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData, ImagePtr outputData,
+	virtual bool reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData, ImagePtr outputData,
 		ImagePtr frameMask, QDomElement settings);
 	DoubleDataAdapterXmlPtr mInterpolationStepsOption;
 private:

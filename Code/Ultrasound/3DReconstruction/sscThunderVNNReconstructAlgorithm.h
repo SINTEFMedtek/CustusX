@@ -59,7 +59,7 @@ public:
 	}
 	virtual QString getName() const;
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
-	virtual void reconstruct(std::vector<TimedPosition> frameInfo,
+	virtual bool reconstruct(std::vector<TimedPosition> frameInfo,
 		USFrameDataPtr frameData,
 		ImagePtr outputData,
 		ImagePtr frameMask,
