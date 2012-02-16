@@ -26,9 +26,10 @@
 #include "cxFastOrientationRegistrationWidget.h"
 #include "cxImageSegmentationAndCenterlineWidget.h"
 #include "cxPlateRegistrationWidget.h"
-#include "cxManualRegistrationOffsetWidget.h"
+//#include "cxManualRegistrationOffsetWidget.h"
 #include "cxRegisterI2IWidget.h"
 #include "cxElastixWidget.h"
+#include "cxManualRegistrationWidget.h"
 
 namespace cx
 {
@@ -98,6 +99,23 @@ QString Image2PlateRegistrationWidget::defaultWhatsThis() const
 
 //------------------------------------------------------------------------------
 
+ManualRegistrationsWidget::ManualRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
+{
+}
+
+QString ManualRegistrationsWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Manual registration.</h3>"
+      "<p>Directly manipulate the image or patient registrations via either"
+      "the defining matrix, or using sliders.</p>"
+      "<p><i>Chose image or patient</i></p>"
+      "</html>";
+}
+
+//------------------------------------------------------------------------------
+
 RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
   TabbedWidget(parent, objectName, windowTitle)
 {
@@ -121,6 +139,14 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
   fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Image2Patient");
 
+  //fast
+  ManualRegistrationsWidget* manRegWidget = new ManualRegistrationsWidget(this, "ManualRegistrationWidget", "Manual Registrations");
+  ManualImageRegistrationWidget* manImageRegWidget = new ManualImageRegistrationWidget(regManager, manRegWidget);
+  ManualPatientRegistrationWidget* manPatientRegWidget = new ManualPatientRegistrationWidget(regManager, manRegWidget);
+  manRegWidget->addTab(manImageRegWidget, "Image");
+  manRegWidget->addTab(manPatientRegWidget, "Patient");
+
+
   //vessel based image to image
   Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(this, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
 //  FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
@@ -134,7 +160,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   image2imageWidget->addTab(new RegisterI2IWidget(regManager, image2imageWidget),"Register");
 
   //manual offset
-  ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(regManager, this);
+//  ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(regManager, this);
 
   //plate
   Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(this, "PlateRegistrationWidget", "Plate");
@@ -143,10 +169,10 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
   imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
 
-//  this->addTab(new ElastixWidget(regManager), "ElastiX");
+  this->addTab(new ElastixWidget(regManager), "ElastiX");
   this->addTab(landmarkRegistrationsWidget, "Landmark");
   this->addTab(fastRegistrationsWidget, "Fast");
-  this->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
+  this->addTab(manRegWidget, "Manual");
   this->addTab(image2imageWidget, "Vessel2Vessel");
   this->addTab(imageAndPlateRegistrationWidget, "Plate");
 }
