@@ -76,27 +76,32 @@ QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 ActiveProbeConfigurationStringDataAdapter::ActiveProbeConfigurationStringDataAdapter()
 {
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChanged())); // for debugging: if initializing a manual tool with probe properties
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChanged()));
   this->dominantToolChanged();
 }
 
 void ActiveProbeConfigurationStringDataAdapter::dominantToolChanged()
 {
-  // ignore tool changes to something non-probeish.
-  // This gives the user a chance to use the widget without having to show the probe.
-	ToolPtr newTool = boost::shared_dynamic_cast<Tool>(ToolManager::getInstance()->findFirstProbe());
-  if (!newTool || newTool->getProbeSector().mType==ssc::ProbeData::tNONE)
-    return;
+//	std::cout << "ActiveProbeConfigurationStringDataAdapter::dominantToolChanged() "
+//		<< ToolManager::getInstance()->findFirstProbe().get() << std::endl;
+	// ignore tool changes to something non-probeish.
+	// This gives the user a chance to use the widget without having to show the probe.
+	ssc::ToolPtr newTool = ToolManager::getInstance()->findFirstProbe();
+	if (!newTool || !newTool->getProbe())
+		return;
 
-  if (mTool)
-  	disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+//	std::cout << " probe " << newTool->getProbe().get() << std::endl;
 
-  mTool = newTool;
+	if (mTool)
+		disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
 
-  if (mTool)
-  	connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+	mTool = newTool;
 
-  emit changed();
+	if (mTool)
+		connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+
+	emit changed();
 }
 
 QString ActiveProbeConfigurationStringDataAdapter::getValueName() const

@@ -232,10 +232,12 @@ std::map<int, ssc::Vector3D> Tool::getReferencePoints() const
 
 bool Tool::hasReferencePointWithId(int id)
 {
-	bool retval = false;
-	if (!(ssc::similar(this->getReferencePoints()[id], ssc::Vector3D(0.000, 0.000, 0.000))))
-		retval = true;
-	return retval;
+  return this->getReferencePoints().count(id);
+  // buggy impl, will fail arbitrarily and does not handle refpts in zero,
+//	bool retval = false;
+//	if (!(ssc::similar(this->getReferencePoints()[id], ssc::Vector3D(0.000, 0.000, 0.000))))
+//		retval = true;
+//	return retval;
 }
 
 ssc::TimedTransformMap Tool::getSessionHistory(double startTime, double stopTime)

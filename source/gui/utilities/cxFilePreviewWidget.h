@@ -8,6 +8,7 @@ class QTextEdit;
 class QPushButton;
 class QFileSystemWatcher;
 class QFile;
+#include <QSyntaxHighlighter>
 
 namespace cx
 {
@@ -32,6 +33,13 @@ public:
 
   virtual QString defaultWhatsThis() const;
 
+  template<class SYNTAXHIGHLIGHTER>
+	void setSyntaxHighLighter()
+	{
+		delete mSyntaxHighlighter;
+		mSyntaxHighlighter = new SYNTAXHIGHLIGHTER(mTextDocument);
+	}
+
 public slots:
   void previewFileSlot(const QString& absoluteFilePath);
   void editSlot();
@@ -41,6 +49,7 @@ private:
 
   QTextDocument* mTextDocument;
   QTextEdit*     mTextEdit;
+  QSyntaxHighlighter* mSyntaxHighlighter;
 
   QPushButton*   mEditButton;
 
