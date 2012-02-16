@@ -293,39 +293,39 @@ void ToolRep3D::update()
 
 void ToolRep3D::probeSectorChanged()
 {
-  if (!mTool)
-    return;
+	if (!mTool)
+		return;
 
-  Transform3D prMt = mTool->get_prMt();
-  Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D prMt = mTool->get_prMt();
+	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
 
-  if (this->showProbe())
-  {
-    mProbeSector->setData(mTool->getProbeSector());
-    Transform3D tMu = mProbeSector->get_tMu();
+	if (this->showProbe())
+	{
+		mProbeSector->setData(mTool->getProbeSector());
+		Transform3D tMu = mProbeSector->get_tMu();
 
-    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
-    if (mProbeSectorPolyDataMapper->GetInput())
-    {
-      mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
-    }
-    mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).getVtkMatrix());
-    mProbeSectorActor->SetVisibility(mTool->getVisible());
+		mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
+		if (mProbeSectorPolyDataMapper->GetInput())
+		{
+			mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
+		}
+		mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).getVtkMatrix());
+		mProbeSectorActor->SetVisibility(mTool->getVisible());
 
-    if (mRTStream)
-    {
-      mRTStream->setTool(mTool);
-      ProbePtr probe = mTool->getProbe();
-      if (probe)
-      {
-	mRTStream->setRealtimeStream(probe->getRTSource());
-      }
-    }
-  }
-  else
-  {
-    mProbeSectorActor->SetVisibility(false);
-  }
+		if (mRTStream)
+		{
+			mRTStream->setTool(mTool);
+			ProbePtr probe = mTool->getProbe();
+			if (probe)
+			{
+				mRTStream->setRealtimeStream(probe->getRTSource());
+			}
+		}
+	}
+	else
+	{
+		mProbeSectorActor->SetVisibility(false);
+	}
 }
 
 void ToolRep3D::updateOffsetGraphics()

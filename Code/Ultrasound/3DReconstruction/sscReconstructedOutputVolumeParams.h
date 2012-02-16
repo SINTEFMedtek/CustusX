@@ -71,6 +71,7 @@ public:
 		mSpacing = spacing;
 		ssc::Vector3D v = mExtent.range() / mSpacing;
 		mDim << ::ceil(v[0]), ::ceil(v[1]), ::ceil(v[2]);
+//		std::cout << "OutputVolumeParams::setSpacing("<< spacing <<") " << v << " -- " << mDim << std::endl;
 		//    mDim = (mExtent.range() / mSpacing).array().ceil();
 		//    this->roundDim();
 	}
@@ -97,10 +98,16 @@ public:
 		mMaxVolumeSize = maxSize;
 		// Reduce output volume size if optimal volume size is too large
 		unsigned long volumeSize = getVolumeSize();
+//		std::cout << "OutputVolumeParams::constrainVolumeSize "<< mMaxVolumeSize << " vol="<< volumeSize << std::endl;
 		if (volumeSize > mMaxVolumeSize)
 		{
-			double scaleFactor = pow(volumeSize / double(mMaxVolumeSize), 1 / 3.0);
-			this->setSpacing(mSpacing * scaleFactor);
+			ssc::Vector3D ext = mExtent.range();
+			double newSpacing = pow(ext[0]*ext[1]*ext[2] / double(mMaxVolumeSize), 1 / 3.0);
+
+//			double scaleFactor = pow(volumeSize / double(mMaxVolumeSize), 1 / 3.0);
+//			std::cout << "old s: " << mSpacing * scaleFactor << ", new s: " << newSpacing << std::endl;
+//			this->setSpacing(mSpacing * scaleFactor);
+			this->setSpacing(newSpacing);
 		}
 	}
 	unsigned long getMaxVolumeSize() const

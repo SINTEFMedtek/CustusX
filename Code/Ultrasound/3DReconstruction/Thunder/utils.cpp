@@ -36,15 +36,57 @@ void generateOpenCLError(cl_int id, const char* file, int line)
 	QString type;
 	switch (id)
 	{
-
-	case CL_INVALID_COMMAND_QUEUE         : type = "CL_INVALID_COMMAND_QUEUE: command_queue is not a valid command-queue.";
-	case CL_INVALID_CONTEXT               : type = "CL_INVALID_CONTEXT: the context associated with command_queue and buffer are not the same or if the context associated with command_queue and events in event_wait_list are not the same.";
-	case CL_INVALID_MEM_OBJECT            : type = "CL_INVALID_MEM_OBJECT: buffer is not a valid buffer object.";
-	case CL_INVALID_VALUE                 : type = "CL_INVALID_VALUE: the region being read specified by (offset, cb) is out of bounds or if ptr is a NULL value.";
-	case CL_INVALID_EVENT_WAIT_LIST       : type = "CL_INVALID_EVENT_WAIT_LIST: event_wait_list is NULL and num_events_in_wait_list greater than 0, or event_wait_list is not NULL and num_events_in_wait_list is 0, or if event objects in event_wait_list are not valid events.";
-	case CL_MEM_OBJECT_ALLOCATION_FAILURE : type = "CL_MEM_OBJECT_ALLOCATION_FAILURE: there is a failure to allocate memory for data store associated with buffer.";
-	case CL_OUT_OF_HOST_MEMORY            : type = "CL_OUT_OF_HOST_MEMORY: there is a failure to allocate resources required by the OpenCL implementation on the host.";
-	default : type = "unknown";
+	case CL_SUCCESS                        : type = "CL_SUCCESS";
+	case CL_DEVICE_NOT_FOUND               : type = "CL_DEVICE_NOT_FOUND";
+	case CL_DEVICE_NOT_AVAILABLE           : type = "CL_DEVICE_NOT_AVAILABLE";
+	case CL_COMPILER_NOT_AVAILABLE         : type = "CL_COMPILER_NOT_AVAILABLE";
+	case CL_MEM_OBJECT_ALLOCATION_FAILURE  : type = "CL_MEM_OBJECT_ALLOCATION_FAILURE";
+	case CL_OUT_OF_RESOURCES               : type = "CL_OUT_OF_RESOURCES";
+	case CL_OUT_OF_HOST_MEMORY             : type = "CL_OUT_OF_HOST_MEMORY";
+	case CL_PROFILING_INFO_NOT_AVAILABLE   : type = "CL_PROFILING_INFO_NOT_AVAILABLE";
+	case CL_MEM_COPY_OVERLAP               : type = "CL_MEM_COPY_OVERLAP";
+	case CL_IMAGE_FORMAT_MISMATCH          : type = "CL_IMAGE_FORMAT_MISMATCH";
+	case CL_IMAGE_FORMAT_NOT_SUPPORTED     : type = "CL_IMAGE_FORMAT_NOT_SUPPORTED";
+	case CL_BUILD_PROGRAM_FAILURE          : type = "CL_BUILD_PROGRAM_FAILURE";
+	case CL_MAP_FAILURE                    : type = "CL_MAP_FAILURE";
+	case CL_MISALIGNED_SUB_BUFFER_OFFSET   : type = "CL_MISALIGNED_SUB_BUFFER_OFFSET";
+	case CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST : type = "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST";
+	case CL_INVALID_VALUE                  : type = "CL_INVALID_VALUE";
+	case CL_INVALID_DEVICE_TYPE            : type = "CL_INVALID_DEVICE_TYPE";
+	case CL_INVALID_PLATFORM               : type = "CL_INVALID_PLATFORM";
+	case CL_INVALID_DEVICE                 : type = "CL_INVALID_DEVICE";
+	case CL_INVALID_CONTEXT                : type = "CL_INVALID_CONTEXT";
+	case CL_INVALID_QUEUE_PROPERTIES       : type = "CL_INVALID_QUEUE_PROPERTIES";
+	case CL_INVALID_COMMAND_QUEUE          : type = "CL_INVALID_COMMAND_QUEUE";
+	case CL_INVALID_HOST_PTR               : type = "CL_INVALID_HOST_PTR";
+	case CL_INVALID_MEM_OBJECT             : type = "CL_INVALID_MEM_OBJECT";
+	case CL_INVALID_IMAGE_FORMAT_DESCRIPTOR: type = "CL_INVALID_IMAGE_FORMAT_DESCRIPTOR";
+	case CL_INVALID_IMAGE_SIZE             : type = "CL_INVALID_IMAGE_SIZE";
+	case CL_INVALID_SAMPLER                : type = "CL_INVALID_SAMPLER";
+	case CL_INVALID_BINARY                 : type = "CL_INVALID_BINARY";
+	case CL_INVALID_BUILD_OPTIONS          : type = "CL_INVALID_BUILD_OPTIONS";
+	case CL_INVALID_PROGRAM                : type = "CL_INVALID_PROGRAM";
+	case CL_INVALID_PROGRAM_EXECUTABLE     : type = "CL_INVALID_PROGRAM_EXECUTABLE";
+	case CL_INVALID_KERNEL_NAME            : type = "CL_INVALID_KERNEL_NAME";
+	case CL_INVALID_KERNEL_DEFINITION      : type = "CL_INVALID_KERNEL_DEFINITION";
+	case CL_INVALID_KERNEL                 : type = "CL_INVALID_KERNEL";
+	case CL_INVALID_ARG_INDEX              : type = "CL_INVALID_ARG_INDEX";
+	case CL_INVALID_ARG_VALUE              : type = "CL_INVALID_ARG_VALUE";
+	case CL_INVALID_ARG_SIZE               : type = "CL_INVALID_ARG_SIZE";
+	case CL_INVALID_KERNEL_ARGS            : type = "CL_INVALID_KERNEL_ARGS";
+	case CL_INVALID_WORK_DIMENSION         : type = "CL_INVALID_WORK_DIMENSION";
+	case CL_INVALID_WORK_GROUP_SIZE        : type = "CL_INVALID_WORK_GROUP_SIZE";
+	case CL_INVALID_WORK_ITEM_SIZE         : type = "CL_INVALID_WORK_ITEM_SIZE";
+	case CL_INVALID_GLOBAL_OFFSET          : type = "CL_INVALID_GLOBAL_OFFSET";
+	case CL_INVALID_EVENT_WAIT_LIST        : type = "CL_INVALID_EVENT_WAIT_LIST";
+	case CL_INVALID_EVENT                  : type = "CL_INVALID_EVENT";
+	case CL_INVALID_OPERATION              : type = "CL_INVALID_OPERATION";
+	case CL_INVALID_GL_OBJECT              : type = "CL_INVALID_GL_OBJECT";
+	case CL_INVALID_BUFFER_SIZE            : type = "CL_INVALID_BUFFER_SIZE";
+	case CL_INVALID_MIP_LEVEL              : type = "CL_INVALID_MIP_LEVEL";
+	case CL_INVALID_GLOBAL_WORK_SIZE       : type = "CL_INVALID_GLOBAL_WORK_SIZE";
+	case CL_INVALID_PROPERTY               : type = "CL_INVALID_PROPERTY";
+	default                                : type = "unknown";
 	}
 
 	QString err = QString("OpenCL ERROR[%1], file=%2[%3], msg=%4").arg(id).arg(file).arg(line).arg(type);
