@@ -55,12 +55,14 @@ private:
   void addTranslationControls(QString uid, QString name, int index, QVBoxLayout* layout);
   void rotateSlot(QPointF delta, int index);
   void translateSlot(QPointF delta, int index);
+  void updateAdapter(ssc::DoubleDataAdapterXmlPtr adapter, double value);
 
   ssc::Frame3D mFrame;
   MatrixTextEdit* mTextEdit;
   boost::array<ssc::DoubleDataAdapterXmlPtr, 3> mAngleAdapter;
   boost::array<ssc::DoubleDataAdapterXmlPtr, 3> mTranslationAdapter;
   bool recursive;
+  bool mBlockChanges;
   QAction* mEditAction;
   QFrame* aGroupBox;
   QFrame* tGroupBox;

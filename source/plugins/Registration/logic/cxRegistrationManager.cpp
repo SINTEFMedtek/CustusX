@@ -133,7 +133,7 @@ std::vector<QString> RegistrationManager::getUsableLandmarks(const ssc::Landmark
  */
 void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data, QString masterFrameUid)
 {
-	std::cout << "==== RegistrationManager::updateRegistration" << std::endl;
+//	std::cout << "==== RegistrationManager::updateRegistration" << std::endl;
   FrameForest forest;
   QDomNode target = forest.getNode(qstring_cast(data->getUid()));
   QDomNode masterFrame = target;
@@ -160,7 +160,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
     targetData[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
 
     ssc::messageManager()->sendInfo("Updated registration of data " + targetData[i]->getName());
-    //std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
+    std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
   }
 
 //  skriv om update registration:
@@ -204,7 +204,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
   // as we now have mutated the datamanager, forest is now outdated.
 
   FrameForest forest2;
-	std::cout << "    ==== RegistrationManager::updateRegistration" << std::endl;
+//	std::cout << "    ==== RegistrationManager::updateRegistration" << std::endl;
 }
 
 /**Convert the landmarks given by uids to vtk points.

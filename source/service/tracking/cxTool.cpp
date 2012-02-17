@@ -259,7 +259,7 @@ void Tool::addXml(QDomNode& dataNode)
 {
 	QDomDocument doc = dataNode.ownerDocument();
 	dataNode.toElement().setAttribute("uid", qstring_cast(this->getUid()));
-	if (mProbe->isValid())
+	if (mProbe && mProbe->isValid())
 	{
 		QDomElement probeNode = doc.createElement("probe");
 		mProbe->addXml(probeNode);
@@ -271,8 +271,11 @@ void Tool::parseXml(QDomNode& dataNode)
 {
 	if (dataNode.isNull())
 		return;
-	QDomNode probeNode = dataNode.namedItem("probe");
-	mProbe->parseXml(probeNode);
+	if (mProbe)
+	{
+		QDomNode probeNode = dataNode.namedItem("probe");
+		mProbe->parseXml(probeNode);
+	}
 }
 
 void Tool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
