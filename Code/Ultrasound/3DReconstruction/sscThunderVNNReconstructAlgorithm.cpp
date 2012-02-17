@@ -118,9 +118,9 @@ bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 	int* inputDims = frameData->getDimensions();
 	//test
 	//long size = data.input_dim[0]*data.input_dim[1]*data.input_dim[2];
-	long size = inputDims[0] * inputDims[1] * inputDims[2];
-	ssc::messageManager()->sendDebug(QString("Reconstruct data input size: %1 Mb").arg(double(size) / 1000 / 1000, 0,
-		'f', 1));
+	double size = double(inputDims[0] * inputDims[1] * inputDims[2]) / 1024 / 1024;
+	ssc::messageManager()->sendDebug(QString("Reconstruct data input size: %1 Mb (compare to CL_DEVICE_GLOBAL_MEM_SIZE)").arg(size, 0, 'f', 1));
+	ssc::messageManager()->sendDebug(QString("Reconstruct data chunk size: %1 Mb (compare to CL_DEVICE_MAX_MEM_ALLOC_SIZE)").arg(size/10, 0, 'f', 1));
 	//                                   + qstring_cast(double(size)/1000/1000) + "MB");
 	//ssc::messageManager()->sendInfo("input dimensions: "
 	//                                + string_cast(data.input_dim[0]) + " "

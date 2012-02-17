@@ -313,8 +313,22 @@ void ocl_print_info()
 			cl_uint temp_uint;
 			cl_ulong temp_ulong;
 			size_t temp_size_t;
+			cl_bool temp_bool;
 			size_t * size_t_array = (size_t *) malloc(sizeof(size_t)*3);
 			printf("\t\t device id: %p\n", devices[j]);
+			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(temp_uint), &temp_uint, &temp_size);
+			printf("\t\t CL_DEVICE_MAX_CLOCK_FREQUENCY: %d MHz\n", temp_uint);
+
+			printf("\n");
+			printf("\tMemory info:\n");
+			clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
+			printf("\t\t CL_DEVICE_GLOBAL_MEM_SIZE: %lu Mb\n", temp_ulong/1024/1024);
+			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
+			printf("\t\t CL_DEVICE_MAX_MEM_ALLOC_SIZE: %lu Mb\n", temp_ulong/1024/1024);
+			clGetDeviceInfo(devices[j], CL_DEVICE_HOST_UNIFIED_MEMORY, sizeof(cl_bool), &temp_bool, &temp_size);
+			printf("\t\t CL_DEVICE_HOST_UNIFIED_MEMORY: %u \n", temp_bool);
+
+			printf("\n");
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(temp_uint), &temp_uint, &temp_size);
 			printf("\t\t CL_DEVICE_MAX_COMPUTE_UNITS: %d\n", temp_uint);
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(temp_uint), &temp_uint, &temp_size);
@@ -323,26 +337,34 @@ void ocl_print_info()
 			printf("\t\t CL_DEVICE_MAX_WORK_ITEM_SIZES: %lu %lu %lu\n", size_t_array[0], size_t_array[1], size_t_array[2]);
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(temp_size_t), &temp_size_t, &temp_size);
 			printf("\t\t CL_DEVICE_MAX_WORK_GROUP_SIZE: %lu\n", temp_size_t);
-			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(temp_uint), &temp_uint, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_CLOCK_FREQUENCY: %d\n", temp_uint);
 			clGetDeviceInfo(devices[j], CL_DEVICE_ADDRESS_BITS, sizeof(temp_uint), &temp_uint, &temp_size);
 			printf("\t\t CL_DEVICE_ADDRESS_BITS: %d\n", temp_uint);
-			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_MEM_ALLOC_SIZE: %lu\n", temp_ulong);
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_PARAMETER_SIZE, sizeof(temp_size_t), &temp_size_t, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_PARAMETER_SIZE: %lu\n", temp_size_t);
-			clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
-			printf("\t\t CL_DEVICE_GLOBAL_MEM_SIZE: %lu\n", temp_ulong);
+			printf("\t\t CL_DEVICE_MAX_PARAMETER_SIZE: %lu b\n", temp_size_t);
+			clGetDeviceInfo(devices[j], CL_DEVICE_LOCAL_MEM_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
+			printf("\t\t CL_DEVICE_LOCAL_MEM_SIZE: %lu b\n", temp_ulong);
+
+			printf("\n");
+			printf("\tDevice info:\n");
+
 			clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 2048, str, &temp_size);
 			printf("\t\t CL_DEVICE_NAME: %s\n", str);
 			clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR, 2048, str, &temp_size);
 			printf("\t\t CL_DEVICE_VENDOR: %s\n", str);
+			clGetDeviceInfo(devices[j], CL_DEVICE_VERSION, 2048, str, &temp_size);
+			printf("\t\t CL_DEVICE_VERSION: %s\n", str);
+			clGetDeviceInfo(devices[j], CL_DRIVER_VERSION, 2048, str, &temp_size);
+			printf("\t\t CL_DRIVER_VERSION: %s\n", str);
+			clGetDeviceInfo(devices[j], CL_DEVICE_AVAILABLE, sizeof(cl_bool), &temp_bool, &temp_size);
+			printf("\t\t CL_DEVICE_AVAILABLE: %u \n", temp_bool);
 			clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 2048, str, &temp_size);
 			printf("\t\t CL_DEVICE_EXTENSIONS: %s\n", str);
 		}
 	}
 	printf("\n");
 }
+
+
 
 /*void ocl_set_args(cl_kernel kernel, int n, ...) {
 	va_list args;
