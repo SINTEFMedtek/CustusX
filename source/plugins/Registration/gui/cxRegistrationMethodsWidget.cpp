@@ -169,7 +169,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
   imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
 
-  this->addTab(new ElastixWidget(regManager), "ElastiX");
+//  this->addTab(new ElastixWidget(regManager), "ElastiX");
   this->addTab(landmarkRegistrationsWidget, "Landmark");
   this->addTab(fastRegistrationsWidget, "Fast");
   this->addTab(manRegWidget, "Manual");
