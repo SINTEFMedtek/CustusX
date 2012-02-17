@@ -85,6 +85,7 @@ void ManualImageRegistrationWidget::matrixWidgetChanged()
 
 	ssc::Transform3D rMd = mConnectedMovingImage->get_rMd();
 	ssc::Transform3D rMMd = mMatrixWidget->getMatrix();
+
 	ssc::Transform3D delta_pre_rMd = rMMd * rMd.inv(); // gives delta on the r (left) side.
 	mManager->applyImage2ImageRegistration(delta_pre_rMd, "Manual Image");
 }
@@ -96,9 +97,13 @@ void ManualImageRegistrationWidget::imageMatrixChanged()
 {
 	mMatrixWidget->blockSignals(true);
 	if (mConnectedMovingImage)
+	{
 		mMatrixWidget->setMatrix(mConnectedMovingImage->get_rMd());
+	}
 	else
+	{
 		mMatrixWidget->setMatrix(ssc::Transform3D::Identity());
+	}
 	mMatrixWidget->blockSignals(false);
 }
 

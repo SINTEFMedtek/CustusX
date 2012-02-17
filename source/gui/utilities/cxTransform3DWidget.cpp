@@ -55,7 +55,7 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
     BaseWidget(parent, "Transform3DWidget", "Transform 3D")
 {
   recursive = false;
-
+  mBlockChanges = false;
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   toptopLayout->setMargin(4);
@@ -227,7 +227,7 @@ ssc::Transform3D Transform3DWidget::getMatrix() const
 
 void Transform3DWidget::changedSlot()
 {
-  if (recursive)
+  if (recursive || mBlockChanges)
     return;
   recursive = true;
   ssc::Vector3D xyz(mAngleAdapter[0]->getValue(),mAngleAdapter[1]->getValue(),mAngleAdapter[2]->getValue());
@@ -260,11 +260,14 @@ namespace
 void Transform3DWidget::updateValues()
 {
   QString M = qstring_cast(this->getMatrix());
+
   mTextEdit->blockSignals(true);
   mTextEdit->setText(M);
   mTextEdit->blockSignals(false);
 
   ssc::Vector3D xyz = mDecomposition.getAngles();
+
+  mBlockChanges = true;
 
   mAngleAdapter[0]->setValue(wrapAngle(xyz[0]));
   mAngleAdapter[1]->setValue(wrapAngle(xyz[1]));
@@ -274,5 +277,7 @@ void Transform3DWidget::updateValues()
   mTranslationAdapter[0]->setValue(t[0]);
   mTranslationAdapter[1]->setValue(t[1]);
   mTranslationAdapter[2]->setValue(t[2]);
+
+  mBlockChanges = false;
 }
 }
