@@ -888,6 +888,9 @@ ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, 
   	std::cout << "LUT2D error" << std::endl;
   retval->resetTransferFunction(transferFunctions, LUT2D);
   retval->setModality(parentImage->getModality());
+  retval->setImageType(parentImage->getImageType());
+  retval->setShading(parentImage->getShading());
+
 	return retval;
 }
 
