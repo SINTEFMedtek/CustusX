@@ -184,13 +184,7 @@ public:
 
 	virtual void release()
 	{
-		if (glIsTexture(textureId) )
-		{
-			glDisable(GL_TEXTURE_3D);
-			glDisable(GL_TEXTURE_2D);
-		}
 		glDeleteTextures(1, &textureId);
-
 	}
 
 	int getGLTextureForVolume(int textureUnitIndex)
