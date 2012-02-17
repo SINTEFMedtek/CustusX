@@ -62,6 +62,7 @@ public:
 	{
 		mAllocated = false;
 		mMTime = 0;
+		textureId = 0;
 	}
 	virtual ~GPUImageDataBufferImpl()
 	{
@@ -185,11 +186,10 @@ public:
 	{
 		if (glIsTexture(textureId) )
 		{
-			glBindTexture(GL_TEXTURE_3D,0);
 			glDisable(GL_TEXTURE_3D);
 			glDisable(GL_TEXTURE_2D);
-			glDeleteTextures(1, &textureId);
 		}
+		glDeleteTextures(1, &textureId);
 
 	}
 
@@ -225,6 +225,7 @@ public:
 	{
 		mAllocated = false;
 		mLutSize = 0;
+		textureId = 0;
 	}
 	virtual ~GPUImageLutBufferImpl()
 	{
@@ -305,7 +306,7 @@ public:
 
 	virtual void release()
 	{
-		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT,0);
+		glDeleteTextures(1, &textureId);
 		vtkgl::DeleteBuffersARB(1,&lutBuffer);
 	}
 
