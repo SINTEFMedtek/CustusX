@@ -49,8 +49,8 @@ void generateOpenCLError(cl_int id, const char* file, int line)
 	case CL_IMAGE_FORMAT_NOT_SUPPORTED     : type = "CL_IMAGE_FORMAT_NOT_SUPPORTED";
 	case CL_BUILD_PROGRAM_FAILURE          : type = "CL_BUILD_PROGRAM_FAILURE";
 	case CL_MAP_FAILURE                    : type = "CL_MAP_FAILURE";
-	case CL_MISALIGNED_SUB_BUFFER_OFFSET   : type = "CL_MISALIGNED_SUB_BUFFER_OFFSET";
-	case CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST : type = "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST";
+//	case CL_MISALIGNED_SUB_BUFFER_OFFSET   : type = "CL_MISALIGNED_SUB_BUFFER_OFFSET";
+//	case CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST : type = "CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST";
 	case CL_INVALID_VALUE                  : type = "CL_INVALID_VALUE";
 	case CL_INVALID_DEVICE_TYPE            : type = "CL_INVALID_DEVICE_TYPE";
 	case CL_INVALID_PLATFORM               : type = "CL_INVALID_PLATFORM";
@@ -85,7 +85,7 @@ void generateOpenCLError(cl_int id, const char* file, int line)
 	case CL_INVALID_BUFFER_SIZE            : type = "CL_INVALID_BUFFER_SIZE";
 	case CL_INVALID_MIP_LEVEL              : type = "CL_INVALID_MIP_LEVEL";
 	case CL_INVALID_GLOBAL_WORK_SIZE       : type = "CL_INVALID_GLOBAL_WORK_SIZE";
-	case CL_INVALID_PROPERTY               : type = "CL_INVALID_PROPERTY";
+//	case CL_INVALID_PROPERTY               : type = "CL_INVALID_PROPERTY";
 	default                                : type = "unknown";
 	}
 
@@ -325,8 +325,8 @@ void ocl_print_info()
 			printf("\t\t CL_DEVICE_GLOBAL_MEM_SIZE: %lu Mb\n", temp_ulong/1024/1024);
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
 			printf("\t\t CL_DEVICE_MAX_MEM_ALLOC_SIZE: %lu Mb\n", temp_ulong/1024/1024);
-			clGetDeviceInfo(devices[j], CL_DEVICE_HOST_UNIFIED_MEMORY, sizeof(cl_bool), &temp_bool, &temp_size);
-			printf("\t\t CL_DEVICE_HOST_UNIFIED_MEMORY: %u \n", temp_bool);
+//			clGetDeviceInfo(devices[j], CL_DEVICE_HOST_UNIFIED_MEMORY, sizeof(cl_bool), &temp_bool, &temp_size);
+//			printf("\t\t CL_DEVICE_HOST_UNIFIED_MEMORY: %u \n", temp_bool);
 
 			printf("\n");
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(temp_uint), &temp_uint, &temp_size);
