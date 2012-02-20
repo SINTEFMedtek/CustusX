@@ -137,6 +137,11 @@ bool SharedMemoryClient::attach(const QString &key)
 	return success;
 }
 
+bool SharedMemoryClient::detach()
+{
+	return mBuffer.detach();
+}
+
 const void *SharedMemoryClient::buffer(bool onlyNew)
 {
 	struct shm_header *header = (struct shm_header *)mBuffer.data();

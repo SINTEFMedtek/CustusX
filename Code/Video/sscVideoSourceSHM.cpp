@@ -196,6 +196,7 @@ void VideoSourceSHM::disconnectServer()
 		mSource.release();
 	}
 
+	mSource.detach();
 	mConnected = false;
 }
 

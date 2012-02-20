@@ -81,6 +81,7 @@ public:
 	SharedMemoryClient(QObject *parent = 0);
 	~SharedMemoryClient();
 	bool attach(const QString &key);
+	bool detach();
 	int size() { return mSize; }
 	int buffers() { return mBuffers; }
 	QString key() { return mBuffer.key(); }
