@@ -64,13 +64,13 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
   toptopLayout->addLayout(mLayout);
 
   mTextEdit = new MatrixTextEdit;
-  mTextEdit->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Maximum);
+  mTextEdit->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Maximum);
   mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
   mTextEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   mTextEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   connect(mTextEdit, SIGNAL(textChanged()), this, SLOT(textEditChangedSlot()));
 
-  mLayout->addWidget(mTextEdit);
+  mLayout->addWidget(mTextEdit, 1);
 
   mEditAction = this->createAction(mLayout,
       ":/icons/open_icon_library/png/64x64/actions/system-run-5.png",
@@ -78,7 +78,7 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
       "Toggle Edit Matrix",
       SLOT(toggleEditSlot()));
 
-  mLayout->addStretch();
+//  mLayout->addStretch();
 
   aGroupBox = new QFrame(this);
   QVBoxLayout* aLayout = new QVBoxLayout;
