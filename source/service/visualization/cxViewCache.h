@@ -68,6 +68,9 @@ public:
 			//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
 			double rate = settings()->value("stillUpdateRate").value<double>();
 			view->getRenderWindow()->GetInteractor()->SetStillUpdateRate(rate);
+			// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
+			// The real challenge is updating while the tracking is active, and this uses the still update rate.
+			view->getRenderWindow()->GetInteractor()->SetDesiredUpdateRate(rate);
 			mCached.push_back(view);
 		}
 
