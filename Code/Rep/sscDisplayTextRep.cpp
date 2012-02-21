@@ -56,9 +56,9 @@ void DisplayTextRep::addRepActorsToViewRenderer(View* view)
 void DisplayTextRep::removeRepActorsFromViewRenderer(View* view) 
 {
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
-		{
-			view->getRenderer()->RemoveActor(mDisplayText.at(i)->getActor() );
-		}
+	{
+		view->getRenderer()->RemoveActor(mDisplayText.at(i)->getActor() );
+	}
 }
 
 /**Add a text with give RGB color at pos.

@@ -292,8 +292,8 @@ TextDisplay::TextDisplay( const QString& text, const Vector3D& color, int fontsi
 	Vector3D c = color;
 	mapper = vtkTextMapperPtr::New();
 	mapper->SetInput( cstring_cast(text) );
-	mapper->GetTextProperty()-> SetColor( c.begin() );
-	mapper->GetTextProperty()-> SetFontSize( fontsize );
+	mapper->GetTextProperty()->SetColor( c.begin() );
+	mapper->GetTextProperty()->SetFontSize( fontsize );
 
 	actor= vtkActor2DPtr::New();
 	actor->SetMapper( mapper );
