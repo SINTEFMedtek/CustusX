@@ -224,11 +224,9 @@ bool ProbeSector::clipRectIntersectsSector() const
 
 vtkPolyDataPtr ProbeSector::getSectorLinesOnly()
 {
+	this->updateSector();
 	if (mData.mType == ProbeData::tNONE)
 		return mPolyData;
-
-	this->updateSector();
-	//  return mPolyData;
 
 	vtkPolyDataPtr output = vtkPolyDataPtr::New();
 
@@ -341,7 +339,10 @@ vtkPolyDataPtr ProbeSector::getClipRectPolyData()
 void ProbeSector::updateSector()
 {
 	if (mData.mType == ProbeData::tNONE)
+	{
+		mPolyData = vtkPolyDataPtr::New();
 		return;
+	}
 
 	ssc::Vector3D bounds = ssc::Vector3D(mData.mImage.mSize.width() - 1, mData.mImage.mSize.height() - 1, 1);
 	bounds = multiply_elems(bounds, mData.mImage.mSpacing);
