@@ -76,6 +76,11 @@ TextDisplayPtr DisplayTextRep::addText(const Vector3D& color, const QString& tex
 	{
 		textRep->textProperty()->SetJustificationToRight();
 	}
+	textRep->textProperty()->SetVerticalJustificationToBottom();
+	if (pos[1] > 0.5)
+	{
+		textRep->textProperty()->SetVerticalJustificationToTop();
+	}
 	//textRep->setCentered();
 	mDisplayText.push_back( textRep );
 
