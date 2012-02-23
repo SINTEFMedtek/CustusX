@@ -25,6 +25,8 @@
  */
 
 #include <sscBoolDataAdapterXml.h>
+#include <iostream>
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -70,11 +72,9 @@ bool BoolDataAdapterXml::setValue(bool val)
 		return false;
 
 	mValue = val;
-	mStore.writeValue(QString(val));
-	emit
-	valueWasSet();
-	emit
-	changed();
+	mStore.writeValue(QString::number(val));
+	emit valueWasSet();
+	emit changed();
 	return true;
 }
 
