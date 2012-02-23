@@ -64,7 +64,8 @@ public:
 	         ssc::ImagePtr moving,
 	         QString outdir,
 	         QStringList parameterfiles);
-	ssc::Transform3D getAffineResult() const;
+
+	ssc::Transform3D getAffineResult_mMf(bool* ok = 0) ;
 
 private slots:
 	void processStateChanged(QProcess::ProcessState newState);
@@ -73,7 +74,28 @@ private slots:
 	void processReadyRead();
 
 private:
+	QString mLastOutdir;
 	QProcess* mProcess;
+};
+
+
+class ElastixParameterFile
+{
+public:
+	ElastixParameterFile(QString filename);
+
+	bool isValid() const;
+	QString readParameterString(QString key) ;
+	bool readParameterBool(QString key) ;
+	int readParameterInt(QString key) ;
+	std::vector<double> readParameterDoubleVector(QString key) ;
+//	void writeParameter(QString key, QStringList value);
+	ssc::Transform3D readEulerTransform() ;
+
+private:
+	QString readParameterRawValue(QString key);
+	QFile mFile;
+	QString mText;
 };
 
 /**

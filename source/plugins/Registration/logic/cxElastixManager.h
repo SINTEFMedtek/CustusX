@@ -55,6 +55,9 @@ public:
 signals:
 	void elastixChanged();
 
+private slots:
+	void executionFinishedSlot();
+
 private:
 	RegistrationManagerPtr mRegistrationManager;
 	QString mActiveExecutable;
