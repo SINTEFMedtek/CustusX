@@ -53,6 +53,7 @@ void ElastixExecuter::setDisplayProcessMessages(bool on)
 	}
 }
 
+
 void ElastixExecuter::run(QString application,
 				ssc::ImagePtr fixed,
 				ssc::ImagePtr moving,
@@ -73,6 +74,7 @@ void ElastixExecuter::run(QString application,
 
 	QFile initTransformFile(outdir+"/t0.txt");
 
+	mLastOutdir = outdir;
 
 	QStringList cmd;
 	cmd << application;
@@ -93,10 +95,6 @@ void ElastixExecuter::run(QString application,
 //	mProcess->start("elastix");
 }
 
-ssc::Transform3D ElastixExecuter::getAffineResult() const
-{
-	return ssc::Transform3D::Identity();
-}
 
 void ElastixExecuter::processReadyRead()
 {
@@ -138,6 +136,8 @@ void ElastixExecuter::processError(QProcess::ProcessError error)
 void ElastixExecuter::processFinished(int code, QProcess::ExitStatus status)
 {
 	ssc::messageManager()->sendInfo(QString("Registration process exited with code %1 and status %2").arg(code).arg(status));
+
+//	this->getAffineResult();
 }
 
 
@@ -167,6 +167,141 @@ void ElastixExecuter::processStateChanged(QProcess::ProcessState newState)
 //	std::cout << QString(mProcess->readAllStandardError()) << std::endl;
 //	std::cout << QString(mProcess->readAllStandardOutput()) << std::endl;
 //	std::cout << "==============" << std::endl;
+}
+
+
+/** Return the result of the latest registration as a linear transform.
+ *
+ *  Important: The result is according to the ElastiX spec:
+ *  \verbatim
+   In elastix the transformation is defined as a coordinate mapping from
+   the fixed image domain to the moving image domain.
+ *  \endverbatim
+ *
+ *
+ */
+ssc::Transform3D ElastixExecuter::getAffineResult_mMf(bool* ok)
+{
+	QString filename = mLastOutdir + "/TransformParameters.0.txt";
+	ElastixParameterFile file(filename);
+
+	bool useDirectionCosines = file.readParameterBool("UseDirectionCosines");
+	if (useDirectionCosines)
+	{
+		ssc::messageManager()->sendWarning("Elastix UseDirectionCosines is not supported. Result is probably wrong.");
+	}
+
+	QString transformType = file.readParameterString("Transform");
+	if (transformType=="EulerTransform")
+	{
+		if (ok)
+			*ok = true;
+		return file.readEulerTransform();
+	}
+
+	if (ok)
+		*ok = false;
+	ssc::messageManager()->sendWarning(QString("TransformType [%1] is not supported by CustusX. Registration result ignored.").arg(transformType));
+	return ssc::Transform3D::Identity();
+}
+
+
+
+
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+
+
+
+ssc::Transform3D ElastixParameterFile::readEulerTransform()
+{
+	QString transformType = this->readParameterString("Transform");
+	if (transformType!="EulerTransform")
+		ssc::messageManager()->sendError("Assert failure: attempting to read EulerTransform");
+
+	int numberOfParameters = this->readParameterInt("NumberOfParameters");
+	if (numberOfParameters!=6)
+	{
+		ssc::messageManager()->sendWarning(QString("Expected 6 Euler parameters, got %1").arg(numberOfParameters));
+		return ssc::Transform3D::Identity();
+	}
+	std::vector<double> transformParameters = this->readParameterDoubleVector("TransformParameters");
+	std::vector<double> centerOfRotationPoint = this->readParameterDoubleVector("CenterOfRotationPoint");
+
+	// TODO add rotation as well
+	ssc::Vector3D t(transformParameters[3], transformParameters[4], transformParameters[5]);
+	return ssc::createTransformTranslate(t).inv();
+}
+
+ElastixParameterFile::ElastixParameterFile(QString filename) : mFile(filename)
+{
+	if (!mFile.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		ssc::messageManager()->sendWarning(QString("Can't open ElastiX result file %1").arg(filename));
+	}
+	mText = QString(mFile.readAll());
+	std::cout << "Loaded text from " << filename << ":\n" << mText << std::endl;
+}
+
+QString ElastixParameterFile::readParameterRawValue(QString key)
+{
+	QStringList lines = mText.split('\n');
+
+	QString regexpStr = QString(""
+		"\\s*" // match zero or more whitespace
+		"\\("  // match beginning (
+		"\\s*" // match zero or more whitespace
+		"%1"   // key
+		"\\s+" // match one or more whitespace
+		"("    // start grab value
+		"[^\\)]*" // value - anything up to the closing )
+		")"    // end grab value
+		"\\)"  // match ending )
+		"[^\\n]*" // rest of line - ignore
+		).arg(key);
+	QRegExp rx(regexpStr);
+//	std::cout << regexpStr << std::endl;
+
+	if (lines.indexOf(rx)>=0)
+	{
+		std::cout << "FOUND0 " << rx.cap(0) << std::endl;
+		std::cout << "FOUND1 " << rx.cap(1) << std::endl;
+	}
+
+	return rx.cap(1);
+}
+
+QString ElastixParameterFile::readParameterString(QString key)
+{
+	QString retval =  this->readParameterRawValue(key);
+	if (retval.startsWith("\"") && retval.endsWith("\""))
+	{
+		retval = retval.replace(0, 1, "");
+		retval = retval.replace(retval.size()-1, 1, "");
+	}
+
+	return retval;
+}
+
+bool ElastixParameterFile::readParameterBool(QString key)
+{
+	QString text = this->readParameterString(key);
+	return (text=="true") ? true : false;
+}
+
+int ElastixParameterFile::readParameterInt(QString key)
+{
+	QString retval =  this->readParameterRawValue(key);
+	return retval.toInt();
+}
+
+std::vector<double> ElastixParameterFile::readParameterDoubleVector(QString key)
+{
+	QString retval =  this->readParameterRawValue(key);
+	return convertQString2DoubleVector(retval);
 }
 
 } /* namespace cx */
