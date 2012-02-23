@@ -53,15 +53,15 @@ private:
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class TimedAlgorithm : public QObject
+class TimedBaseAlgorithm : public QObject
 {
   Q_OBJECT
 
 public:
-  TimedAlgorithm(QString product, int secondsBetweenAnnounce);
-  virtual ~TimedAlgorithm();
+  TimedBaseAlgorithm(QString product, int secondsBetweenAnnounce);
+  virtual ~TimedBaseAlgorithm();
 
-  virtual void generate() = 0;
+//  virtual void generate() = 0;
   QString getProduct() const { return mProduct; }
 
 signals:
@@ -74,8 +74,8 @@ protected:
   void stopTiming();
 
 protected slots:
-  virtual void finishedSlot() = 0;
-  virtual void postProcessingSlot() = 0;
+  virtual void finishedSlot() {}
+  virtual void postProcessingSlot() {}
 
 private slots:
   void timeoutSlot();
@@ -87,7 +87,7 @@ private:
   QDateTime mStartTime;
   QString   mProduct;
 };
-typedef boost::shared_ptr<class TimedAlgorithm> TimedAlgorithmPtr;
+typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
 
 /**
  * \brief Base class for algorithms that wants to thread and time their
@@ -98,11 +98,11 @@ typedef boost::shared_ptr<class TimedAlgorithm> TimedAlgorithmPtr;
  * \author Janne Beate Bakeng, SINTEF
  */
 template <class T>
-class ThreadedTimedAlgorithm : public TimedAlgorithm
+class ThreadedTimedAlgorithm : public TimedBaseAlgorithm
 {
 public:
   ThreadedTimedAlgorithm(QString product, int secondsBetweenAnnounce) :
-	  TimedAlgorithm(product, secondsBetweenAnnounce)
+	  TimedBaseAlgorithm(product, secondsBetweenAnnounce)
   {
 	  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
 	  connect(&mWatcher, SIGNAL(finished()), this, SLOT(postProcessingSlot()));
@@ -118,7 +118,7 @@ protected:
 
   void generate() ///< Call generate to execute the algorithm
   {
-	  TimedAlgorithm::startTiming();
+	  TimedBaseAlgorithm::startTiming();
 	  emit started(0); // TODO move to started signal from qtconcurrent??
 
 	  mFutureResult = QtConcurrent::run(this, &ThreadedTimedAlgorithm<T>::calculate);
@@ -133,7 +133,7 @@ protected:
 private:
   void finishedSlot()
   {
-	  TimedAlgorithm::stopTiming();
+	  TimedBaseAlgorithm::stopTiming();
   }
 
   QFuture<T> mFutureResult;

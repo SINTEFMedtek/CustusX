@@ -20,6 +20,7 @@
 #include "sscFileSelectWidget.h"
 #include "cxElastixManager.h"
 #include "cxFilePreviewWidget.h"
+#include "sscBoolDataAdapterXml.h"
 
 class QSpinBox;
 class QPushButton;
@@ -28,6 +29,8 @@ class QLineEdit;
 
 namespace cx
 {
+class TimedAlgorithmProgressBar;
+
 /**
  * \file
  * \addtogroup cxPluginRegistration
@@ -40,37 +43,36 @@ namespace cx
  * \date Feb 4, 2012
  * \author Christian Askeland, SINTEF
  */
-class ElastixWidget : public RegistrationBaseWidget
+class ElastixWidget: public RegistrationBaseWidget
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent=NULL);
-  virtual ~ElastixWidget();
-  virtual QString defaultWhatsThis() const;
+	ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent = NULL);
+	virtual ~ElastixWidget();
+	virtual QString defaultWhatsThis() const;
 
 public slots:
 
 private slots:
-  void registerSlot();
-  void userParameterFileSelected(QString filename);
-  void browseExecutableSlot();
-  void elastixChangedSlot();
-  void executableEditFinishedSlot();
+	void registerSlot();
+	void userParameterFileSelected(QString filename);
+	void browseExecutableSlot();
+	void elastixChangedSlot();
+	void executableEditFinishedSlot();
 
 private:
-  QSpinBox* mLTSRatioSpinBox;
-  QCheckBox* mLinearCheckBox;
-  QPushButton* mRegisterButton;
-  ElastixManagerPtr mElastixManager;
+	QSpinBox* mLTSRatioSpinBox;
+	QCheckBox* mLinearCheckBox;
+	QPushButton* mRegisterButton;
+	ElastixManagerPtr mElastixManager;
 
-  ssc::StringDataAdapterPtr mFixedImage;
-  ssc::StringDataAdapterPtr mMovingImage;
-  ssc::FileSelectWidget* mParameterFileWidget;
-  FilePreviewWidget*  mFilePreviewWidget;
-
-  QLineEdit* mExecutableEdit;
-//  QPushButton* mLaunchServerButton;
-
+	ssc::StringDataAdapterPtr mFixedImage;
+	ssc::StringDataAdapterPtr mMovingImage;
+	ssc::FileSelectWidget* mParameterFileWidget;
+	FilePreviewWidget* mFilePreviewWidget;
+	QLineEdit* mExecutableEdit;
+	cx::TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+	//  QPushButton* mLaunchServerButton;
 
 };
 

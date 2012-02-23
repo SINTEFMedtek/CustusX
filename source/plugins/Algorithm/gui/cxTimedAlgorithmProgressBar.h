@@ -24,7 +24,7 @@ class QLabel;
 
 namespace cx
 {
-typedef boost::shared_ptr<class TimedAlgorithm> TimedAlgorithmPtr;
+typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
 
 /**
  * \file
@@ -32,14 +32,14 @@ typedef boost::shared_ptr<class TimedAlgorithm> TimedAlgorithmPtr;
  * @{
  */
 
-/**\brief Show progress for a TimedAlgorithm
+/**\brief Show progress for a TimedBaseAlgorithm
  *
  * The widget contains a QProgressBar and a QLabel, which
- * displays info from a TimedAlgorithm. It listens to
- * the start()/stop() methods of TimedAlgorithm, it shows/hides
+ * displays info from a TimedBaseAlgorithm. It listens to
+ * the start()/stop() methods of TimedBaseAlgorithm, it shows/hides
  * and display progress info.
  *
- * Use the attach method to connect the TimedAlgorithm to
+ * Use the attach method to connect the TimedBaseAlgorithm to
  * the widget. Use detach to clean up.
  *
  * Multiple algorithms can be added. In this case, the assumption

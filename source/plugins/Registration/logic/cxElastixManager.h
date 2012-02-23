@@ -18,6 +18,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscXmlOptionItem.h"
 #include "cxRegistrationManager.h"
+#include "sscBoolDataAdapterXml.h"
 
 namespace cx
 {
@@ -26,6 +27,8 @@ namespace cx
  * \addtogroup cxPluginRegistration
  * @{
  */
+
+typedef boost::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
 
 /**
  * \brief Manager for interfacing to the ElastiX registration package.
@@ -45,6 +48,8 @@ public:
 	QString getActiveParameterFile() const;
 	void setActiveExecutable(QString filename);
 	QString getActiveExecutable() const;
+	ssc::BoolDataAdapterXmlPtr getDisplayProcessMessages() { return mDisplayProcessMessages; }
+	ElastixExecuterPtr getExecuter() { return mExecuter; }
 
 	void execute();
 signals:
@@ -55,6 +60,8 @@ private:
 	QString mActiveExecutable;
 	QString mActiveParameterFile;
 	ssc::XmlOptionFile mOptions;
+	ssc::BoolDataAdapterXmlPtr mDisplayProcessMessages;
+	ElastixExecuterPtr mExecuter;
 };
 typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;
 
