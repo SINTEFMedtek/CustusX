@@ -50,10 +50,14 @@ void DisplayTimerWidget::timeoutSlot()
 
 void DisplayTimerWidget::printText(QString color)
 {
-	int secs = mStartTime.secsTo(QDateTime::currentDateTime());
+	int secs = this->elaspedSeconds(); // SmStartTime.secsTo(QDateTime::currentDateTime());
 	mLabel->setText(QString("<font size=%1 color=%2><b>%3 s</b></font>").arg(mFontSize).arg(color).arg(secs));
 }
 
+int DisplayTimerWidget::elaspedSeconds() const
+{
+	return mStartTime.secsTo(QDateTime::currentDateTime());
+}
 
 
 }

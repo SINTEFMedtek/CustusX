@@ -22,6 +22,7 @@
 #include "cxElastixExecuter.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -30,8 +31,16 @@ ElastixManager::ElastixManager(RegistrationManagerPtr regManager) : mRegistratio
 {
 	mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("elastix");
 
+//	bool showStdOut = settings()->value("elastix/showStdOut").toBool();
+	mDisplayProcessMessages = ssc::BoolDataAdapterXml::initialize("DisplayElastixProcessMessages",
+		"Show Messages",
+		"Display messages from the running registration process in CustusX",
+		false,
+		mOptions.getElement());
+
 	mActiveExecutable = mOptions.getElement().attribute("executable");
 	mActiveParameterFile = mOptions.getElement().attribute("parameterFile");
+	mExecuter.reset(new ElastixExecuter());
 }
 
 ElastixManager::~ElastixManager()
@@ -69,9 +78,8 @@ void ElastixManager::execute()
 //	QDir folder(cx::DataLocations::getRootConfigPath() + "/elastix");
 	QString timestamp = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
 	QDir outDir(patientService()->getPatientData()->getActivePatientFolder()+"/elastix/"+timestamp);
-
-	ElastixExecuter executer;
-	executer.run(mActiveExecutable,
+	mExecuter->setDisplayProcessMessages(mDisplayProcessMessages->getValue());
+	mExecuter->run(mActiveExecutable,
 	         boost::shared_dynamic_cast<ssc::Image>(mRegistrationManager->getFixedData()),
 	         boost::shared_dynamic_cast<ssc::Image>(mRegistrationManager->getMovingData()),
 	         outDir.absolutePath(),
