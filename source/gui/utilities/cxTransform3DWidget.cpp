@@ -215,6 +215,7 @@ void Transform3DWidget::setMatrix(const ssc::Transform3D& M)
 {
   mDecomposition.reset(M);
   this->updateValues();
+  emit changed();
 }
 
 ssc::Transform3D Transform3DWidget::getMatrix() const
@@ -262,7 +263,11 @@ void Transform3DWidget::updateValues()
   QString M = qstring_cast(this->getMatrix());
 
   mTextEdit->blockSignals(true);
+  int textPos = mTextEdit->textCursor().position();
   mTextEdit->setText(M);
+  QTextCursor cursor = mTextEdit->textCursor();
+  cursor.setPosition(textPos);
+  mTextEdit->setTextCursor(cursor);
   mTextEdit->blockSignals(false);
 
   ssc::Vector3D xyz = mDecomposition.getAngles();

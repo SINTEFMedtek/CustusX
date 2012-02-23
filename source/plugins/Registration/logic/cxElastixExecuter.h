@@ -19,6 +19,9 @@
 #include <QString>
 #include "sscForwardDeclarations.h"
 #include "sscTransform3D.h"
+#include <QObject>
+#include <QProcess>
+#include "cxTimedAlgorithm.h"
 
 namespace cx
 {
@@ -47,11 +50,14 @@ namespace cx
  * \author Christian Askeland, SINTEF
  */
 
-class ElastixExecuter
+class ElastixExecuter : public TimedBaseAlgorithm
 {
+	Q_OBJECT
 public:
-	ElastixExecuter();
+	ElastixExecuter(QObject* parent=NULL);
 	virtual ~ElastixExecuter();
+
+	void setDisplayProcessMessages(bool on);
 
 	void run(QString application,
 	         ssc::ImagePtr fixed,
@@ -59,6 +65,15 @@ public:
 	         QString outdir,
 	         QStringList parameterfiles);
 	ssc::Transform3D getAffineResult() const;
+
+private slots:
+	void processStateChanged(QProcess::ProcessState newState);
+	void processError(QProcess::ProcessError error);
+	void processFinished(int, QProcess::ExitStatus);
+	void processReadyRead();
+
+private:
+	QProcess* mProcess;
 };
 
 /**

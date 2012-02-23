@@ -30,6 +30,10 @@
 #include "sscFileSelectWidget.h"
 #include "cxDataLocations.h"
 #include "cxElastixSyntaxHighlighter.h"
+#include "sscCheckBoxWidget.h"
+#include "cxSettings.h"
+#include "cxTimedAlgorithmProgressBar.h"
+#include "cxElastixExecuter.h"
 
 namespace cx
 {
@@ -81,7 +85,13 @@ ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent)
 	button->setDefaultAction(browseExecutableAction);
 	layout->addWidget(button, 5, 2);
 
-	layout->addWidget(mFilePreviewWidget, 6, 0, 1, 3);
+	layout->addWidget(new ssc::CheckBoxWidget(this, mElastixManager->getDisplayProcessMessages()), 6, 0, 1, 3);
+
+	layout->addWidget(mFilePreviewWidget, 7, 0, 1, 3);
+
+	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+	mTimedAlgorithmProgressBar->attach(mElastixManager->getExecuter());
+	layout->addWidget(mTimedAlgorithmProgressBar);
 
 	this->elastixChangedSlot();
 }
