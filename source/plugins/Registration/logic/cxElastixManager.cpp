@@ -41,6 +41,7 @@ ElastixManager::ElastixManager(RegistrationManagerPtr regManager) : mRegistratio
 	mActiveExecutable = mOptions.getElement().attribute("executable");
 	mActiveParameterFile = mOptions.getElement().attribute("parameterFile");
 	mExecuter.reset(new ElastixExecuter());
+	connect(mExecuter.get(), SIGNAL(finished()), this, SLOT(executionFinishedSlot()));
 }
 
 ElastixManager::~ElastixManager()
@@ -87,6 +88,25 @@ void ElastixManager::execute()
 
 }
 
+void ElastixManager::executionFinishedSlot()
+{
+	bool ok = false;
+	ssc::Transform3D mMf = mExecuter->getAffineResult_mMf(&ok);
+
+	if (!ok)
+		return;
+
+//	std::cout << "Linear Result: \n" << mMf << std::endl;
+
+	QString desc = QString("Image2Image [exe=%1][par=%2]")
+		.arg(QFileInfo(this->getActiveExecutable()).fileName())
+		.arg(QFileInfo(this->getActiveParameterFile()).fileName());
+
+	//TODO Delta = mMr * rMf * mMf.inv()
+	//TODO also insert correct input - currently input M is I.
+
+	mRegistrationManager->applyImage2ImageRegistration(mMf.inv(), desc);
+}
 
 
 } /* namespace cx */
