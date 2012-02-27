@@ -8,8 +8,9 @@
 #ifndef CXIMAGESENDEROPENCV_H_
 #define CXIMAGESENDEROPENCV_H_
 
-#ifdef USE_OpenCV
+#include <QObject> //needed for the mocer when OpenCv is not used...
 
+#ifdef USE_OpenCV
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
 #include <QDateTime>
