@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.6)
 
+#-------------------------------
+# External libs
+#-------------------------------
+
 # Boost
 #----------
 find_package( Boost REQUIRED )
@@ -19,7 +23,6 @@ ELSE( OpenCV_FOUND )
 ENDIF( OpenCV_FOUND )
 
 if (USE_OpenCV)
-#  ADD_DEFINITIONS(-DUSE_OpenCV="${USE_OpenCV}")
   ADD_DEFINITIONS(-DUSE_OpenCV)
 endif(USE_OpenCV)
 
@@ -40,49 +43,66 @@ ELSE(QT_USE_FILE)
   SET(QT_LIBRARIES   ${QT_QT_LIBRARY})
 ENDIF(QT_USE_FILE)
 
+# OpenIGTLink
+#----------
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})
 
+#-------------------------------
+# Include directories
+#-------------------------------
 include_directories(
     ${Boost_INCLUDE_DIRS}
     ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
     )
 
-SET (WIN_LINK_LIBRARIES
-  ${ULTERIUS_LIBRARY}
-  vtkOpenIGTUltrasound
-)
+#-------------------------------
+# Linking
+#-------------------------------
 
-SET ( ALL_LINK_LIBRARIES
+# link to ulterius only on when building 32 bit
+# - ulterius lib is only available on windows as 32 bit
+if(CX_WIN32)
+  SET(WIN32_LINK_LIBRARIES
+       ${ULTERIUS_LIBRARY}
+       vtkOpenIGTUltrasound
+  )
+endif(CX_WIN32)
+
+SET(ALL_LINK_LIBRARIES
   SSC
   ${BOOST_LIBRARIES}
   ${QT_LIBRARIES}
   OpenIGTLink
   )
 
-if(WIN32)
-SET (LINK_LIBRARIES
-  ${WIN_LINK_LIBRARIES}
-  ${ALL_LINK_LIBRARIES}
-)
-else(WIN32)
-SET (LINK_LIBRARIES
-  ${ALL_LINK_LIBRARIES}
-)
-endif(WIN32)
+if(CX_WINDOWS)
+	SET(LINK_LIBRARIES
+		${WIN32_LINK_LIBRARIES}
+		${ALL_LINK_LIBRARIES}
+	)
+	else(CX_WINDOWS)
+	SET(LINK_LIBRARIES
+		${ALL_LINK_LIBRARIES}
+	)
+endif(CX_WINDOWS)
 
-
+#-------------------------------
+# Qt -moccing
+#-------------------------------
 SET( CX_QT_MOC_HEADER_FILES
     cxImageServer.h
     cxImageSession.h
     cxImageSenderFile.h
     cxImageSenderSonix.h
     cxImageSenderOpenCV.h
-#    cxImageSenderFactory.h
 )
 
-#link_directories(${Boost_INCLUDE_DIRS})
+QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
+#-------------------------------
+# Creating the executable
+#-------------------------------
 SET ( cxOpenIGTLinkServer_FILES
     cxImageServer.h
     cxImageServer.cpp
@@ -104,10 +124,19 @@ SET ( cxOpenIGTLinkServer_FILES
     ../grabberCommon/igtl_sonix_status.c
 )
 
-QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
+set(ExecutableName "OpenIGTLinkServer")
+if(CX_WIN32)
+	set(ExecutableName "UltrasonixServer") # windows 32 bit version is made for ultrasonix communication
+endif()
 
-add_executable( OpenIGTLinkServer main.cpp ${cxOpenIGTLinkServer_FILES} ${MOC_HEADER_FILES} )
-target_link_libraries(OpenIGTLinkServer  ${LINK_LIBRARIES}     
+add_executable( ${ExecutableName}
+								main.cpp 
+								${cxOpenIGTLinkServer_FILES} 
+								${MOC_HEADER_FILES} 
+								)
+
+target_link_libraries(${ExecutableName}  
+	${LINK_LIBRARIES}     
     ${OpenCV_LIBS}
     vtkIO 
     vtkRendering 
@@ -116,15 +145,39 @@ target_link_libraries(OpenIGTLinkServer  ${LINK_LIBRARIES}
     vtkHybrid 
     vtkWidgets 
     vtkFiltering 
-    vtkVolumeRendering  )
+    vtkVolumeRendering 
+  )
     
     
-install(TARGETS OpenIGTLinkServer
+#-------------------------------
+# Install files
+#-------------------------------
+install(TARGETS ${ExecutableName}
     BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
     RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
     )
- 
-#linux installation:
+
+if(CX_WINDOWS)
+  #Installing required run time libs for Windows, msv*.dll
+  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+  include (InstallRequiredSystemLibraries)
+  if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+      install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+        DESTINATION bin
+        PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
+        GROUP_EXECUTE WORLD_READ
+        )
+  endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+  
+endif(CX_WINDOWS)
+
+#------------------------------------------------------------------------------
+# Bundle utilities
+#------------------------------------------------------------------------------
+# See http://www.itk.org/Wiki/BundleUtilitiesExample for example on how to use bundle utilities
+
+# Linux
+#----------
 if (CX_LINUX)
   set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/OpenIGTLinkServer")
   set(LIBS "")
@@ -135,13 +188,32 @@ if (CX_LINUX)
       ${SSC_BINARY_DIR}/Code
       ${OpenIGTLink_LIBRARY_DIRS}
       ${OpenCV_LIB_DIR}
-      ${OpenIGTLink_LIBRARY_DIRS}
       )
       
   install(CODE "
      include(BundleUtilities)
      fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
-     #COMPONENT CustusX
      )      
       
-endif (CX_LINUX)     
+endif (CX_LINUX)
+
+# Windows
+#----------
+if (CX_WINDOWS)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/${ExecutableName}")
+  set(LIBS ${OpenCV_LIB_DIR})
+  set(DIRS 
+      ${QT_INCLUDES} 
+      ${QT_LIBRARY_DIRS}
+      ${VTK_LIBRARY_DIRS}
+      ${SSC_BINARY_DIR}/Code
+      ${OpenCV_LIB_DIR}
+      ${OpenIGTLink_LIBRARY_DIRS}
+      )
+         
+  install(CODE "
+     include(BundleUtilities)
+     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
+     )      
+      
+endif (CX_WINDOWS)
