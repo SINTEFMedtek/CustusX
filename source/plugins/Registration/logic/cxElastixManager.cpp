@@ -96,16 +96,28 @@ void ElastixManager::executionFinishedSlot()
 	if (!ok)
 		return;
 
-//	std::cout << "Linear Result: \n" << mMf << std::endl;
+	std::cout << "Linear Result: \n" << mMf << std::endl;
 
 	QString desc = QString("Image2Image [exe=%1][par=%2]")
 		.arg(QFileInfo(this->getActiveExecutable()).fileName())
 		.arg(QFileInfo(this->getActiveParameterFile()).fileName());
 
-	//TODO Delta = mMr * rMf * mMf.inv()
-	//TODO also insert correct input - currently input M is I.
+	// Start with fMr * D * rMm = fMm'
+	// where the lhs is the existing data and the delta that is input to regmanager,
+	// and the rhs is the (inverse of the) output from ElastiX.
+	// This gives
+	// D = rMf * fMm' * mMr
+	// as the input to regmanager applyImage2ImageRegistration()
 
-	mRegistrationManager->applyImage2ImageRegistration(mMf.inv(), desc);
+	ssc::Transform3D delta_pre_rMd =
+		mRegistrationManager->getFixedData()->get_rMd()
+		* mMf.inv()
+		* mRegistrationManager->getMovingData()->get_rMd().inv();
+
+	std::cout << "delta_pre_rMd: \n" << delta_pre_rMd << std::endl;
+
+//	mRegistrationManager->applyImage2ImageRegistration(mMf.inv(), desc);
+	mRegistrationManager->applyImage2ImageRegistration(delta_pre_rMd, desc);
 }
 
 
