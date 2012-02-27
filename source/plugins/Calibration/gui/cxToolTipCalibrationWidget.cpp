@@ -129,7 +129,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 {
   QString text("Ref. point: <UNDEFINED POINT>");
   mCalibrateButton->setEnabled(false);
-  mTestButton->setEnabled(false);
+//  mTestButton->setEnabled(false);
 
   if(mTools->getTool())
   {
@@ -138,7 +138,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
     {
       text = "Ref. point: "+qstring_cast(tool->getReferencePoints()[1]);
       mCalibrateButton->setEnabled(true);
-      mTestButton->setEnabled(true);
+//      mTestButton->setEnabled(true);
     }
     if(tool)
     {

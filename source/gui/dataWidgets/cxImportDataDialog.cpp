@@ -54,7 +54,7 @@ ImportDataDialog::ImportDataDialog(QString filename, QWidget* parent) :
   mNiftiFormatCheckBox->setEnabled(false);
   mTransformFromParentFrameCheckBox = new QCheckBox("Import transform from Parent", this);
   mTransformFromParentFrameCheckBox->setToolTip("Replace data transform with that of the parent data.");
-  mTransformFromParentFrameCheckBox->setChecked(true);
+  mTransformFromParentFrameCheckBox->setChecked(false);
   layout->addWidget(mNiftiFormatCheckBox);
   layout->addWidget(mTransformFromParentFrameCheckBox);
 

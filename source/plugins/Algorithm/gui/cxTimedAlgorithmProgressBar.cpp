@@ -68,7 +68,7 @@ void TimedAlgorithmProgressBar::detach(TimedAlgorithmPtr algorithm)
 
 void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 {
-	TimedAlgorithm* algo = dynamic_cast<TimedAlgorithm*>(sender());
+	TimedBaseAlgorithm* algo = dynamic_cast<TimedBaseAlgorithm*>(sender());
 	QString product = "algorithm";
 	if (algo)
 		product = algo->getProduct();
@@ -88,12 +88,12 @@ void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 
 void TimedAlgorithmProgressBar::algorithmFinishedSlot()
 {
-	TimedAlgorithm* algo = dynamic_cast<TimedAlgorithm*>(sender());
+	TimedBaseAlgorithm* algo = dynamic_cast<TimedBaseAlgorithm*>(sender());
 	QString product = "algorithm";
 	if (algo)
 		product = algo->getProduct();
 
-	ssc::messageManager()->sendSuccess(QString("%1 done!").arg(product));
+	ssc::messageManager()->sendSuccess(QString("%1 complete [%2s]").arg(product).arg(mTimerWidget->elaspedSeconds()));
 
 	if (--mStartedAlgos >0) // dont hide before the last algo has completed.
 		return;

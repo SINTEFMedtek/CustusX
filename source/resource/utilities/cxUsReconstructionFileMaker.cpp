@@ -239,14 +239,16 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames(std::vector<vtkImageDataP
  */
 bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QString calibrationFile)
 {
-	ssc::messageManager()->sendInfo("USAcq Start write");
-
   QString baseMhdFilename = this->getMhdFilename(reconstructionFolder);
   std::vector<vtkImageDataPtr> frames = this->getFrames();
 
-  if (frames.size()<2)
-  	return true;
+  ssc::messageManager()->sendInfo(QString("USAcq Start write %1 frames").arg(frames.size()));
 
+  if (frames.size()<2)
+  {
+	  ssc::messageManager()->sendWarning(QString("Found only %1 frames, ignoring volume write").arg(frames.size()));
+  	return true;
+  }
   vtkImageDataPtr firstPair = this->mergeFrames(std::vector<vtkImageDataPtr>(frames.begin(), frames.begin()+2));
 
 	QString mhdName = baseMhdFilename;
@@ -268,7 +270,7 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 	QString fileData(mhdFile.readAll());
 	fileData += "\n";
 	if (mTool && mTool->getProbe())
-	fileData += QString("ConfigurationID = %1\n").arg(mTool->getProbe()->getConfigurationPath());
+		fileData += QString("ConfigurationID = %1\n").arg(mTool->getProbe()->getConfigurationPath());
 	fileData += QString("ProbeCalibration = %1\n").arg(calibrationFile);
 	QStringList fileLines = fileData.split("\n");
 	for (int j=0; j<fileLines.size(); ++j)

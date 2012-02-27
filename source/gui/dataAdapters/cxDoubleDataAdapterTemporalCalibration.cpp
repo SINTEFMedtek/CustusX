@@ -24,7 +24,7 @@ void DoubleDataAdapterTimeCalibration::dominantToolChanged()
   // ignore tool changes to something non-probeish.
   // This gives the user a chance to use the widget without having to show the probe.
   ssc::ToolPtr newTool = ssc::toolManager()->getDominantTool();
-  if (!newTool || newTool->getProbeSector().mType==ssc::ProbeData::tNONE)
+  if (!newTool || !newTool->isProbe())
     return;
 
   if (mTool)

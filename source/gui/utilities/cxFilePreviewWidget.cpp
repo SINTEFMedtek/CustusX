@@ -19,6 +19,7 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
     mEditButton(new QPushButton("Edit")),
     mFileSystemWatcher(new QFileSystemWatcher())
 {
+	mSyntaxHighlighter = NULL;
   connect(mEditButton, SIGNAL(clicked()), this, SLOT(editSlot()));
   mEditButton->setEnabled(false);
   connect(mFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(previewFileSlot(const QString&)));
@@ -35,11 +36,13 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
   mTextEdit->setReadOnly(true);
   mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
 
-  new snw::SyntaxHighlighter(mTextDocument);
+  this->setSyntaxHighLighter<snw::SyntaxHighlighter>();
 }
 
 FilePreviewWidget::~FilePreviewWidget()
 {}
+
+
 
 QString FilePreviewWidget::defaultWhatsThis() const
 {
