@@ -8,7 +8,7 @@
 #ifndef CXIMAGESENDERSONIX_H_
 #define CXIMAGESENDERSONIX_H_
 
-#ifdef WIN32
+#ifdef CX_WIN32
 
 
 #include "boost/shared_ptr.hpp"
@@ -104,6 +104,6 @@ private slots:
 //typedef cx::Frame Frame;
 //Q_DECLARE_METATYPE(Frame)
 
-#endif // WIN32
+#endif // CX_WIN32
 
 #endif /* CXIMAGESENDERSONIX_H_ */
