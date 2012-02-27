@@ -9,10 +9,10 @@
 #define CXTOOLDATAADAPTERS_H_
 
 #include "sscStringDataAdapter.h"
+#include "sscTool.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class Tool> ToolPtr;
 
 /**
  * \file
@@ -67,7 +67,7 @@ public: // optional methods
 private slots:
   void dominantToolChanged();
 private:
-  ToolPtr mTool;
+  ssc::ToolPtr mTool;
 };
 
 

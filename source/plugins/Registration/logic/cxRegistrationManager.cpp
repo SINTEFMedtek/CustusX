@@ -33,7 +33,7 @@ RegistrationManager::RegistrationManager(AcquisitionDataPtr acquisitionData) :
 
 void RegistrationManager::restart()
 {
-  mPatientRegistrationOffset = ssc::Transform3D::Identity();
+//  mPatientRegistrationOffset = ssc::Transform3D::Identity();
   mLastRegistrationTime = QDateTime::currentDateTime();
 }
 
@@ -76,36 +76,36 @@ ssc::DataPtr RegistrationManager::getMovingData()
   return mMovingData;
 }
 
-// used for loading a rMpr directly from file. Not in use. Can be reused in user story intraoperative CT (kar)
-void RegistrationManager::setManualPatientRegistration(ssc::Transform3D patientRegistration)
-{
-  ssc::messageManager()->sendWarning("RegistrationManager::setManualPatientRegistration NEEDS REFACTORING!!!");
-
-  ssc::RegistrationTransform regTrans(patientRegistration, QDateTime::currentDateTime(), "Manual Patient");
-  ssc::toolManager()->get_rMpr_History()->addRegistration(regTrans);
-
-  //if an offset existed, its no longer valid and should be removed
-  mPatientRegistrationOffset = ssc::Transform3D::Identity();
-
-  ssc::messageManager()->sendInfo("Manual patient registration is set.");
-}
-
-void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3D offset)
-{
-  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
-  ssc::Transform3D deltaOffset = offset*mPatientRegistrationOffset.inv();
-
-  ssc::RegistrationTransform regTrans(deltaOffset*rMpr, QDateTime::currentDateTime(), "Manual Patient Offset");
-  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
-  mLastRegistrationTime = regTrans.mTimestamp;
-
-  mPatientRegistrationOffset = offset;
-}
-
-ssc::Transform3D RegistrationManager::getManualPatientRegistrationOffset()
-{
-  return mPatientRegistrationOffset;
-}
+//// used for loading a rMpr directly from file. Not in use. Can be reused in user story intraoperative CT (kar)
+//void RegistrationManager::setManualPatientRegistration(ssc::Transform3D patientRegistration)
+//{
+//  ssc::messageManager()->sendWarning("RegistrationManager::setManualPatientRegistration NEEDS REFACTORING!!!");
+//
+//  ssc::RegistrationTransform regTrans(patientRegistration, QDateTime::currentDateTime(), "Manual Patient");
+//  ssc::toolManager()->get_rMpr_History()->addRegistration(regTrans);
+//
+//  //if an offset existed, its no longer valid and should be removed
+//  mPatientRegistrationOffset = ssc::Transform3D::Identity();
+//
+//  ssc::messageManager()->sendInfo("Manual patient registration is set.");
+//}
+//
+//void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3D offset)
+//{
+//  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+//  ssc::Transform3D deltaOffset = offset*mPatientRegistrationOffset.inv();
+//
+//  ssc::RegistrationTransform regTrans(deltaOffset*rMpr, QDateTime::currentDateTime(), "Manual Patient Offset");
+//  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+//  mLastRegistrationTime = regTrans.mTimestamp;
+//
+//  mPatientRegistrationOffset = offset;
+//}
+//
+//ssc::Transform3D RegistrationManager::getManualPatientRegistrationOffset()
+//{
+//  return mPatientRegistrationOffset;
+//}
 
 /**Inspect the landmarks in data a and b, find landmarks defined in both of them and
  * that also is active.
@@ -133,10 +133,16 @@ std::vector<QString> RegistrationManager::getUsableLandmarks(const ssc::Landmark
  */
 void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data, QString masterFrameUid)
 {
+//	std::cout << "==== RegistrationManager::updateRegistration" << std::endl;
   FrameForest forest;
   QDomNode target = forest.getNode(qstring_cast(data->getUid()));
-  QDomNode masterFrame = forest.getNode(masterFrameUid);
-  QDomNode targetBase = forest.getOldestAncestorNotCommonToRef(target, masterFrame);
+  QDomNode masterFrame = target;
+  QDomNode targetBase = target;
+  if (masterFrameUid!="")
+  {
+	  masterFrame = forest.getNode(masterFrameUid);
+	  targetBase = forest.getOldestAncestorNotCommonToRef(target, masterFrame);
+  }
   std::vector<ssc::DataPtr> targetData = forest.getDataFromDescendantsAndSelf(targetBase);
 
   std::stringstream ss;
@@ -154,7 +160,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
     targetData[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
 
     ssc::messageManager()->sendInfo("Updated registration of data " + targetData[i]->getName());
-    //std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
+    std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
   }
 
 //  skriv om update registration:
@@ -198,6 +204,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
   // as we now have mutated the datamanager, forest is now outdated.
 
   FrameForest forest2;
+//	std::cout << "    ==== RegistrationManager::updateRegistration" << std::endl;
 }
 
 /**Convert the landmarks given by uids to vtk points.
@@ -238,7 +245,6 @@ std::vector<ssc::Vector3D> RegistrationManager::convertAndTransformToPoints(cons
 ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const
 {
   *ok = false;
-
 
   // too few data samples: ignore
   if (source->GetNumberOfPoints() < 3)
@@ -300,15 +306,16 @@ void RegistrationManager::doPatientRegistration()
     return;
   }
 
-  ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
-  regTrans.mFixed = mFixedData->getUid();
-  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
-  mLastRegistrationTime = regTrans.mTimestamp;
+  this->applyPatientRegistration(rMpr, "Patient Landmark");
+//  ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
+//  regTrans.mFixed = mFixedData->getUid();
+//  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+//  mLastRegistrationTime = regTrans.mTimestamp;
 
-  mPatientRegistrationOffset = ssc::Transform3D::Identity();
+//  mPatientRegistrationOffset = ssc::Transform3D::Identity();
 
-  emit patientRegistrationPerformed();
-  ssc::messageManager()->sendSuccess("Patient registration has been performed.");
+//  emit patientRegistrationPerformed();
+//  ssc::messageManager()->sendSuccess("Patient registration has been performed.");
 }
 
 void RegistrationManager::writePreLandmarkRegistration(QString name, ssc::LandmarkMap landmarks)
@@ -359,10 +366,6 @@ void RegistrationManager::doImageRegistration()
   vtkPointsPtr p_ref = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
   vtkPointsPtr p_data = convertTovtkPoints(landmarks, imageLandmarks, ssc::Transform3D::Identity());
 
-//  if (landmarks.empty())
-//  {
-//    return;
-//  }
   // ignore if too few data.
   if (p_ref->GetNumberOfPoints() < 3)
   {
@@ -379,16 +382,17 @@ void RegistrationManager::doImageRegistration()
   }
 
   ssc::Transform3D delta = rMd * movingImage->get_rMd().inv();
-
-  ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Image to Image");
-  regTrans.mFixed = mFixedData->getUid();
-  regTrans.mMoving = movingImage->getUid();
-  this->updateRegistration(mLastRegistrationTime, regTrans, movingImage, qstring_cast(fixedImage->getUid()));
-
-  mLastRegistrationTime = regTrans.mTimestamp;
-
-  //emit imageRegistrationPerformed();
-  ssc::messageManager()->sendSuccess("Image registration has been performed for " + movingImage->getName());
+  this->applyImage2ImageRegistration(delta, "Image to Image Landmark");
+//
+//  ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Image to Image");
+//  regTrans.mFixed = mFixedData->getUid();
+//  regTrans.mMoving = movingImage->getUid();
+//  this->updateRegistration(mLastRegistrationTime, regTrans, movingImage, qstring_cast(fixedImage->getUid()));
+//
+//  mLastRegistrationTime = regTrans.mTimestamp;
+//
+//  //emit imageRegistrationPerformed();
+//  ssc::messageManager()->sendSuccess("Image registration has been performed for " + movingImage->getName());
 }
 
 /**Perform a fast orientation by setting the patient registration equal to the current dominant
@@ -410,11 +414,12 @@ void RegistrationManager::doFastRegistration_Orientation(const ssc::Transform3D&
 
   ssc::Transform3D tmMpr = tMtm * tMpr;
 
-  ssc::RegistrationTransform regTrans(tmMpr, QDateTime::currentDateTime(), "Fast_Orientation");
-  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
-  mLastRegistrationTime = regTrans.mTimestamp;
-
-  ssc::messageManager()->sendSuccess("Fast orientation registration has been performed.");
+  this->applyPatientRegistration(tmMpr, "Fast Orientation");
+//  ssc::RegistrationTransform regTrans(tmMpr, QDateTime::currentDateTime(), "Fast_Orientation");
+//  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+//  mLastRegistrationTime = regTrans.mTimestamp;
+//
+//  ssc::messageManager()->sendSuccess("Fast orientation registration has been performed.");
 
   // also apply the fast translation registration if any (this frees us form doing stuff in a well-defined order.)
   this->doFastRegistration_Translation();
@@ -458,76 +463,57 @@ void RegistrationManager::doFastRegistration_Translation()
     return;
   }
 
-  ssc::RegistrationTransform regTrans(rMpr_old*pr_oldMpr_new, QDateTime::currentDateTime(), "Fast_Translation");
-  regTrans.mFixed = mFixedData->getUid();
-  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
-  mLastRegistrationTime = regTrans.mTimestamp;
-
-  mPatientRegistrationOffset = ssc::Transform3D::Identity();
-
-  //emit fastRegistrationPerformed();
-  ssc::messageManager()->sendSuccess("Fast translation registration has been performed.");
+  this->applyPatientRegistration(rMpr_old*pr_oldMpr_new, "Fast Translation");
+//  ssc::RegistrationTransform regTrans(rMpr_old*pr_oldMpr_new, QDateTime::currentDateTime(), "Fast_Translation");
+//  regTrans.mFixed = mFixedData->getUid();
+//  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+//  mLastRegistrationTime = regTrans.mTimestamp;
+//
+////  mPatientRegistrationOffset = ssc::Transform3D::Identity();
+//
+//  //emit fastRegistrationPerformed();
+//  ssc::messageManager()->sendSuccess("Fast translation registration has been performed.");
 }
 
-void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample, int single_point_thre, bool verbose, QString logPath)
+void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta, double lambda, double sigma,
+				bool lin_flag, int sample, int single_point_thre, bool verbose, QString logPath)
 {
+	//Default values
+	/*int lts_ratio = 80;
+	 double stop_delta = 0.001;
+	 double lambda = 0;
+	 double sigma = 1.0;
+	 bool lin_flag = 1;
+	 int sample = 1;
+	 int single_point_thre = 1;
+	 bool verbose = 1;*/
 
-  //Default values
-  /*int lts_ratio = 80;
-  double stop_delta = 0.001;
-  double lambda = 0;
-  double sigma = 1.0;
-  bool lin_flag = 1;
-  int sample = 1;
-  int single_point_thre = 1;
-  bool verbose = 1;*/
+	SeansVesselReg vesselReg(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose);
 
-  SeansVesselReg vesselReg(lts_ratio,
-        stop_delta,
-        lambda,
-        sigma,
-        lin_flag,
-        sample,
-        single_point_thre,
-        verbose);
+	bool success = vesselReg.doItRight(mMovingData, mFixedData, logPath);
+	if (!success)
+	{
+		ssc::messageManager()->sendWarning("Vessel registration failed.");
+		return;
+	}
 
-//  ssc::ImagePtr fixedData = boost::dynamic_pointer_cast<ssc::Image>(mFixedData);
-//  ssc::ImagePtr movingData = boost::dynamic_pointer_cast<ssc::Image>(mMovingData);
-//
-//  if(!fixedData)
-//  {
-//    ssc::messageManager()->sendError("Could not cast fixeddata to image.");
-//    return;
-//  }
-//  if(!movingData)
-//  {
-//    ssc::messageManager()->sendError("Could not cast moving data to image.");
-//    return;
-//  }
-
-  bool success = vesselReg.doItRight(mMovingData, mFixedData, logPath);
-  if(!success)
-  {
-    ssc::messageManager()->sendWarning("Vessel registration failed.");
-    return;
-  }
-
-  ssc::Transform3D linearTransform = vesselReg.getLinearTransform();
-  std::cout << "v2v linear result:\n" << linearTransform << std::endl;
-  //std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
-
+	ssc::Transform3D linearTransform = vesselReg.getLinearTransform();
+	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
+	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
 
 	// characterize the input perturbation in angle-axis form:
-	ssc::Vector3D t_delta = linearTransform.matrix().block<3,1>(0, 3);
-	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3,3>(0, 0));
+	ssc::Vector3D t_delta = linearTransform.matrix().block<3, 1>(0, 3);
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3, 3>(0, 0));
 	double angle = angleAxis.angle();
 
-	QString qualityText = QString("|t_delta|=%1mm, angle=%2*").arg(t_delta.length(), 6, 'f', 2).arg(angle/M_PI*180.0, 6, 'f', 2);
+	QString qualityText = QString("|t_delta|=%1mm, angle=%2*").arg(t_delta.length(), 6, 'f', 2).arg(
+					angle / M_PI * 180.0, 6, 'f', 2);
 
-	if (t_delta.length()>20 || fabs(angle)>10/180.0*M_PI)
+	if (t_delta.length() > 20 || fabs(angle) > 10 / 180.0 * M_PI)
 	{
 		ssc::messageManager()->sendWarning(qualityText);
-		QString text = QString("The registration matrix' angle-axis representation shows a large shift. Retry registration.");
+		QString text = QString(
+						"The registration matrix' angle-axis representation shows a large shift. Retry registration.");
 		ssc::messageManager()->sendWarning(text);
 	}
 	else
@@ -537,18 +523,58 @@ void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta,
 
 //  ssc::Transform3D delta = fixedData->get_rMd() * linearTransform * movingData->get_rMd().inv();
 
-  // The registration is performed in space r. Thus, given an old data position rMd, we find the
-  // new one as rM'd = Q * rMd, where Q is the inverted registration output.
-  // Delta is thus equal to Q:
-  ssc::Transform3D delta = linearTransform.inv();
-  //std::cout << "delta:\n" << delta << std::endl;
-  ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Vessel based");
-  regTrans.mFixed = mFixedData->getUid();
-  regTrans.mMoving = mMovingData->getUid();
-  this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData, qstring_cast(mFixedData->getUid()));
+	// The registration is performed in space r. Thus, given an old data position rMd, we find the
+	// new one as rM'd = Q * rMd, where Q is the inverted registration output.
+	// Delta is thus equal to Q:
+	ssc::Transform3D delta = linearTransform.inv();
+	//std::cout << "delta:\n" << delta << std::endl;
+//	ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Vessel based");
+//	regTrans.mFixed = mFixedData->getUid();
+//	regTrans.mMoving = mMovingData->getUid();
+//	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData, qstring_cast(mFixedData->getUid()));
+//
+//	ssc::messageManager()->sendSuccess("Vessel based registration has been performed.");
 
-  ssc::messageManager()->sendSuccess("Vessel based registration has been performed.");
+	this->applyImage2ImageRegistration(delta, "Vessel based");
 
+}
+
+/**\brief apply a new image registration
+ *
+ * All image registration techniques should use this method
+ * to apply the found image registration to the system.
+ *
+ * The input delta is the
+ * \code
+ * rM'd = delta * rMd
+ * \endcode
+ *
+ * that updates the existing rMd matrix of the moving image.
+ * All related data are also registered.
+ */
+void RegistrationManager::applyImage2ImageRegistration(ssc::Transform3D delta_pre_rMd, QString description)
+{
+	ssc::RegistrationTransform regTrans(delta_pre_rMd, QDateTime::currentDateTime(), description);
+	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
+	regTrans.mMoving = mMovingData ? mMovingData->getUid() : "";
+	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData, regTrans.mFixed);
+	mLastRegistrationTime = regTrans.mTimestamp;
+	ssc::messageManager()->sendSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
+}
+
+/**\brief apply a new patient registration
+ *
+ * All patient registration techniques should use this method
+ * to apply the found patient registration to the system.
+ *
+ */
+void RegistrationManager::applyPatientRegistration(ssc::Transform3D rMpr_new, QString description)
+{
+	ssc::RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
+	regTrans.mFixed = mFixedData ? mFixedData->getUid() : "";
+	ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+	mLastRegistrationTime = regTrans.mTimestamp;
+	ssc::messageManager()->sendSuccess(QString("Patient registration [%1] has been performed.").arg(description));
 }
 
 void RegistrationManager::addXml(QDomNode& parentNode)
@@ -579,22 +605,6 @@ void RegistrationManager::parseXml(QDomNode& dataNode)
 
   QString movingData = dataNode.namedItem("movingDataUid").toElement().text();
   this->setMovingData(ssc::dataManager()->getData(movingData));
-
-//
-//  QDomNode child = dataNode.firstChild();
-//  while(!child.isNull())
-//  {
-//    if(child.toElement().tagName() == "fixedDataUid")
-//    {
-//      const QString fixedDataString = child.toElement().text();
-//      if(!fixedDataString.isEmpty())
-//      {
-//        ssc::DataPtr data = ssc::dataManager()->getData(fixedDataString);
-//        this->setFixedData(data);
-//      }
-//    }
-//    child = child.nextSibling();
-//  }
 }
 
 void RegistrationManager::clearSlot()

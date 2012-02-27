@@ -74,7 +74,7 @@ public:
   virtual ~DoubleDataAdapterSpacing() {}
   virtual QString getValueName() const { return "Output Spacing"; }
   virtual QString getHelp() const { return "Output Volume Spacing (mm)"; }
-  DoubleRange getValueRange() const {  return ssc::DoubleRange(0.001,1,0.001); }
+  DoubleRange getValueRange() const {  return ssc::DoubleRange(0.001,10,0.001); }
   virtual int getValueDecimals() const { return 3; } ///< number of relevant decimals in value
 
 protected:
