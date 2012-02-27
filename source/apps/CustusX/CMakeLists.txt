@@ -42,11 +42,11 @@ endif(APPLE)
 if (APPLE)
   add_executable(CustusX MACOSX_BUNDLE ${SOURCES} )
 else (APPLE)
-  if(WIN32)
+  if(CX_WINDOWS)
     add_executable(CustusX ${SOURCES} CustusX.rc)
-  else(WIN32)
+  else(CX_WINDOWS)
     add_executable(CustusX ${SOURCES} )
-  endif(WIN32)
+  endif(CX_WINDOWS)
 endif (APPLE)
 
 #------------------------------------------------------------------------------
@@ -122,7 +122,7 @@ install(FILES
 
 
 # Install Windows-specific files
-if(WIN32)
+if(CX_WINDOWS)
   # Installing required run time libs for Windows, msv*.dll
   set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include (InstallRequiredSystemLibraries)
@@ -141,7 +141,7 @@ if(WIN32)
       DESTINATION ${CX_INSTALL_ROOT_DIR}/doc
       #COMPONENT CustusX
       )
-endif(WIN32)
+endif(CX_WINDOWS)
 
 # Install Linux-specific files
 if (CX_LINUX)
@@ -243,14 +243,18 @@ if (CX_LINUX)
 endif (CX_LINUX)
 
 # Install dependencies on Windows
-if (WIN32)
+if (CX_WINDOWS)
   set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX.exe")
   set(LIBS ${QT_LIBRARY_DIR})
-  set(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES} ${ULTERIUS_INCLUDE_DIR}/../../bin)
+  set(DIRS ${QT_INCLUDES} 
+           ${QT_LIBRARY_DIRS} 
+           ${INCLUDE_DIRECTORIES} 
+           ${ULTERIUS_INCLUDE_DIR}/../../bin
+  )
 
   install(CODE "
      include(BundleUtilities)
      fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
      #COMPONENT CustusX
      )
-endif (WIN32)
+endif (CX_WINDOWS)

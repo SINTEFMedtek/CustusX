@@ -14,9 +14,9 @@ if(APPLE)
   QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS})
 endif(APPLE)
 
-if(WIN32)
+if(CX_WINDOWS)
   QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS} OPTIONS "-D_WINDOWS")
-endif(WIN32)
+endif(CX_WINDOWS)
 
 SET (Ultrasound_SRCS
   vtkSonixVideoSource.h

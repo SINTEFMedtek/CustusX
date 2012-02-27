@@ -33,16 +33,16 @@ SET(${LIBNAME}_MOC_HDRS
 find_package (SSC PATHS ${CustusX3_SOURCE_DIR}/externals/ssc/CMake REQUIRED)
 include (${SSC_USE_FILE})
 
-IF(WIN32)
+IF(CX_WINDOWS)
   QT4_WRAP_CPP(cxUtilities_MOC_SRCS ${cxUtilities_MOC_HDRS} ${QTUI_HEADERFILES} OPTIONS "-D_WINDOWS")
-ELSE(WIN32)
+ELSE(CX_WINDOWS)
   QT4_WRAP_CPP(cxUtilities_MOC_SRCS ${cxUtilities_MOC_HDRS})
-ENDIF(WIN32)
+ENDIF(CX_WINDOWS)
 
 # _USE_MATH_DEFINES Must be defined before math.h is included
-if (WIN32)
+if (CX_WINDOWS)
     add_definitions(-D_USE_MATH_DEFINES)
-endif(WIN32)
+endif(CX_WINDOWS)
 
 add_library(cxUtilities
     probeXmlConfigParser.h
