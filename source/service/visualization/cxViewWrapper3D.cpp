@@ -96,6 +96,7 @@ ToolAxisConnector::ToolAxisConnector(ssc::ToolPtr tool)
 	mAxis_s->setCaption("s", ssc::Vector3D(1, 1, 0));
 	mAxis_s->setFontSize(0.03);
 
+	connect(ssc::toolManager(), SIGNAL(rMprChanged()), this, SLOT(transformChangedSlot()));
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(transformChangedSlot()));
 	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(visibleSlot()));
 	visibleSlot();

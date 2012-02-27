@@ -217,7 +217,7 @@ void VideoConnection::launchAndConnectServer()
 void VideoConnection::serverProcessError(QProcess::ProcessError error)
 {
 	QString msg;
-	msg += "RT Source server reported an error: ";
+	msg += "Video server reported an error: ";
 
 	switch (error)
 	{
@@ -250,16 +250,16 @@ void VideoConnection::serverProcessStateChanged(QProcess::ProcessState newState)
 {
 	if (newState == QProcess::Running)
 	{
-		ssc::messageManager()->sendInfo("Local RT Source Server running.");
+		ssc::messageManager()->sendInfo("Video Source Server running.");
 		this->delayedAutoConnectServer();
 	}
 	if (newState == QProcess::NotRunning)
 	{
-		ssc::messageManager()->sendInfo("Local RT Source Server not running.");
+		ssc::messageManager()->sendInfo("Video Source Server not running.");
 	}
 	if (newState == QProcess::Starting)
 	{
-		ssc::messageManager()->sendInfo("Local RT Source Server starting.");
+		ssc::messageManager()->sendInfo("Video Source Server starting.");
 	}
 }
 

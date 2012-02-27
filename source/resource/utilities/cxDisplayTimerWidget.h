@@ -25,6 +25,7 @@ public:
 	void setFontSize(int fontSize);
 	void start();
 	void stop();
+	int elaspedSeconds() const;
 
 private slots:
 	void timeoutSlot();
