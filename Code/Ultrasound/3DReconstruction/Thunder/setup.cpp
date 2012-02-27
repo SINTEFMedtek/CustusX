@@ -64,7 +64,7 @@ cl_program ocl_create_program(cl_context context, cl_device_id device, const cha
 /**
  *  See clCreateContextFromType doc for more
  */
-void  clCreateContextFromType_error_callback(const char *errinfo,
+void CL_CALLBACK clCreateContextFromType_error_callback(const char *errinfo,
 	const void  *private_info,
 	size_t  cb,
 	void  *user_data)
