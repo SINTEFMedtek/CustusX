@@ -55,7 +55,7 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
     BaseWidget(parent, "Transform3DWidget", "Transform 3D")
 {
   recursive = false;
-
+  mBlockChanges = false;
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   toptopLayout->setMargin(4);
@@ -64,13 +64,13 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
   toptopLayout->addLayout(mLayout);
 
   mTextEdit = new MatrixTextEdit;
-  mTextEdit->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Maximum);
+  mTextEdit->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Maximum);
   mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
   mTextEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   mTextEdit->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   connect(mTextEdit, SIGNAL(textChanged()), this, SLOT(textEditChangedSlot()));
 
-  mLayout->addWidget(mTextEdit);
+  mLayout->addWidget(mTextEdit, 1);
 
   mEditAction = this->createAction(mLayout,
       ":/icons/open_icon_library/png/64x64/actions/system-run-5.png",
@@ -78,7 +78,7 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
       "Toggle Edit Matrix",
       SLOT(toggleEditSlot()));
 
-  mLayout->addStretch();
+//  mLayout->addStretch();
 
   aGroupBox = new QFrame(this);
   QVBoxLayout* aLayout = new QVBoxLayout;
@@ -215,6 +215,7 @@ void Transform3DWidget::setMatrix(const ssc::Transform3D& M)
 {
   mDecomposition.reset(M);
   this->updateValues();
+  emit changed();
 }
 
 ssc::Transform3D Transform3DWidget::getMatrix() const
@@ -227,7 +228,7 @@ ssc::Transform3D Transform3DWidget::getMatrix() const
 
 void Transform3DWidget::changedSlot()
 {
-  if (recursive)
+  if (recursive || mBlockChanges)
     return;
   recursive = true;
   ssc::Vector3D xyz(mAngleAdapter[0]->getValue(),mAngleAdapter[1]->getValue(),mAngleAdapter[2]->getValue());
@@ -260,11 +261,18 @@ namespace
 void Transform3DWidget::updateValues()
 {
   QString M = qstring_cast(this->getMatrix());
+
   mTextEdit->blockSignals(true);
+  int textPos = mTextEdit->textCursor().position();
   mTextEdit->setText(M);
+  QTextCursor cursor = mTextEdit->textCursor();
+  cursor.setPosition(textPos);
+  mTextEdit->setTextCursor(cursor);
   mTextEdit->blockSignals(false);
 
   ssc::Vector3D xyz = mDecomposition.getAngles();
+
+  mBlockChanges = true;
 
   mAngleAdapter[0]->setValue(wrapAngle(xyz[0]));
   mAngleAdapter[1]->setValue(wrapAngle(xyz[1]));
@@ -274,5 +282,7 @@ void Transform3DWidget::updateValues()
   mTranslationAdapter[0]->setValue(t[0]);
   mTranslationAdapter[1]->setValue(t[1]);
   mTranslationAdapter[2]->setValue(t[2]);
+
+  mBlockChanges = false;
 }
 }

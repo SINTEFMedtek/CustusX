@@ -8,6 +8,7 @@
 #include "cxImageSenderFile.h"
 
 #include <QTimer>
+#include <QDateTime>
 #include <QHostAddress>
 #include "igtlOSUtil.h"
 #include "igtlImageMessage.h"
@@ -163,6 +164,14 @@ igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
   imgMsg->SetDeviceName("cxTestImage");
   imgMsg->SetSubVolume(svsize, svoffset);
   imgMsg->AllocateScalars();
+
+  QDateTime mLastGrabTime = QDateTime::currentDateTime();
+	igtl::TimeStamp::Pointer timestamp;
+	timestamp = igtl::TimeStamp::New();
+	//  double now = 1.0/1000*(double)QDateTime::currentDateTime().toMSecsSinceEpoch();
+	double grabTime = 1.0 / 1000 * (double) mLastGrabTime.toMSecsSinceEpoch();
+	timestamp->SetTime(grabTime);
+	imgMsg->SetTimeStamp(timestamp);
 
   //------------------------------------------------------------
   // Set image data (See GetTestImage() bellow for the details)

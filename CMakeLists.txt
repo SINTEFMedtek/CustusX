@@ -42,7 +42,7 @@ endif(APPLE)
 #------------------------------------------------------------------------------
 set(CustusX3_VERSION_MAJOR  3)
 set(CustusX3_VERSION_MINOR  2)
-set(CustusX3_VERSION_PATCH  8)
+set(CustusX3_VERSION_PATCH  10)
 
 # set alpha when not a release
 set(CustusX3_VERSION_POSTFIX ".alpha")

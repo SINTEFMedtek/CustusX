@@ -91,7 +91,7 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImageViaFile(ssc::Image
 //---------------------------------------------------------------------------------------------------------------------
 
 
-TimedAlgorithm::TimedAlgorithm(QString product, int secondsBetweenAnnounce) :
+TimedBaseAlgorithm::TimedBaseAlgorithm(QString product, int secondsBetweenAnnounce) :
     QObject(),
     mProduct(product)
 {
@@ -100,16 +100,16 @@ TimedAlgorithm::TimedAlgorithm(QString product, int secondsBetweenAnnounce) :
   mTimer->setInterval(secondsBetweenAnnounce*1000);
 }
 
-TimedAlgorithm::~TimedAlgorithm()
+TimedBaseAlgorithm::~TimedBaseAlgorithm()
 {}
 
-void TimedAlgorithm::startTiming()
+void TimedBaseAlgorithm::startTiming()
 {
   mStartTime = QDateTime::currentDateTime();
   mTimer->start();
 }
 
-void TimedAlgorithm::stopTiming()
+void TimedBaseAlgorithm::stopTiming()
 {
   QTime timePassed = this->getTimePassed();
   ssc::messageManager()->sendInfo("Generating took: " + timePassed.toString("hh:mm:ss:zzz"));
@@ -118,21 +118,21 @@ void TimedAlgorithm::stopTiming()
   mTimer->stop();
 }
 
-QTime TimedAlgorithm::getTimePassed()
+QTime TimedBaseAlgorithm::getTimePassed()
 {
   QTime retval = QTime(0, 0);
   retval = retval.addMSecs(mStartTime.time().msecsTo(QDateTime::currentDateTime().time()));
   return retval;
 }
 
-void TimedAlgorithm::timeoutSlot()
+void TimedBaseAlgorithm::timeoutSlot()
 {
   ssc::messageManager()->sendInfo("Still working on generating the "+mProduct+", "+this->getTimePassed().toString()+" has passed.");
 }
 //---------------------------------------------------------------------------------------------------------------------
 //template <class T>
 //ThreadedTimedAlgorithm<T>::ThreadedTimedAlgorithm(QString product, int secondsBetweenAnnounce) :
-//  TimedAlgorithm(product, secondsBetweenAnnounce)
+//  TimedBaseAlgorithm(product, secondsBetweenAnnounce)
 //{
 //  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
 //  connect(&mWatcher, SIGNAL(finished()), this, SLOT(postProcessingSlot()));
@@ -145,13 +145,13 @@ void TimedAlgorithm::timeoutSlot()
 //template <class T>
 //void ThreadedTimedAlgorithm<T>::finishedSlot()
 //{
-//  TimedAlgorithm::stopTiming();
+//  TimedBaseAlgorithm::stopTiming();
 //}
 //
 //template <class T>
 //void ThreadedTimedAlgorithm<T>::generate()
 //{
-//  TimedAlgorithm::startTiming();
+//  TimedBaseAlgorithm::startTiming();
 //
 //  mFutureResult = QtConcurrent::run(this, &ThreadedTimedAlgorithm<T>::calculate);
 //  mWatcher.setFuture(mFutureResult);
