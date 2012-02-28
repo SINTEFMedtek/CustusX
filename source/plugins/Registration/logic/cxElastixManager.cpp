@@ -75,14 +75,14 @@ QString ElastixManager::getActiveExecutable() const
 
 void ElastixManager::execute()
 {
-	SSC_LOG("exec");
+//	SSC_LOG("exec");
 //	QDir folder(cx::DataLocations::getRootConfigPath() + "/elastix");
 	QString timestamp = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
 	QDir outDir(patientService()->getPatientData()->getActivePatientFolder()+"/elastix/"+timestamp);
 	mExecuter->setDisplayProcessMessages(mDisplayProcessMessages->getValue());
 	mExecuter->run(mActiveExecutable,
-	         boost::shared_dynamic_cast<ssc::Image>(mRegistrationManager->getFixedData()),
-	         boost::shared_dynamic_cast<ssc::Image>(mRegistrationManager->getMovingData()),
+	         mRegistrationManager->getFixedData(),
+	         mRegistrationManager->getMovingData(),
 	         outDir.absolutePath(),
 	         QStringList() << mActiveParameterFile);
 
@@ -96,7 +96,7 @@ void ElastixManager::executionFinishedSlot()
 	if (!ok)
 		return;
 
-	std::cout << "Linear Result: \n" << mMf << std::endl;
+	std::cout << "ElastixManager::executionFinishedSlot(), Linear Result mMf: \n" << mMf << std::endl;
 
 	QString desc = QString("Image2Image [exe=%1][par=%2]")
 		.arg(QFileInfo(this->getActiveExecutable()).fileName())
@@ -114,7 +114,7 @@ void ElastixManager::executionFinishedSlot()
 		* mMf.inv()
 		* mRegistrationManager->getMovingData()->get_rMd().inv();
 
-	std::cout << "delta_pre_rMd: \n" << delta_pre_rMd << std::endl;
+	std::cout << "ElastixManager::executionFinishedSlot(), delta_pre_rMd: \n" << delta_pre_rMd << std::endl;
 
 //	mRegistrationManager->applyImage2ImageRegistration(mMf.inv(), desc);
 	mRegistrationManager->applyImage2ImageRegistration(delta_pre_rMd, desc);

@@ -5,6 +5,8 @@
 #include <QPushButton>
 #include <QTextStream>
 #include <QFileInfo>
+#include <iostream>
+#include "sscTypeConversions.h"
 #include <QFileSystemWatcher>
 #include "sscMessageManager.h"
 #include "snwSyntaxHighlighter.h"
@@ -16,24 +18,25 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
     BaseWidget(parent, "FilePreviewWidget", "File Preview"),
     mTextDocument(new QTextDocument()),
     mTextEdit(new QTextEdit()),
-    mEditButton(new QPushButton("Edit")),
+    mSaveButton(new QPushButton("Save")),
     mFileSystemWatcher(new QFileSystemWatcher())
 {
 	mSyntaxHighlighter = NULL;
-  connect(mEditButton, SIGNAL(clicked()), this, SLOT(editSlot()));
-  mEditButton->setEnabled(false);
+  connect(mSaveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
+  mSaveButton->setEnabled(false);
   connect(mFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(previewFileSlot(const QString&)));
 
   QHBoxLayout* buttonLayout = new QHBoxLayout();
   buttonLayout->addStretch();
-  buttonLayout->addWidget(mEditButton);
+  buttonLayout->addWidget(mSaveButton);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->addWidget(mTextEdit);
   layout->addLayout(buttonLayout);
 
+  connect(mTextEdit, SIGNAL(textChanged()), this, SLOT(textChangedSlot()));
   mTextEdit->setDocument(mTextDocument);
-  mTextEdit->setReadOnly(true);
+//  mTextEdit->setReadOnly(true);
   mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
 
   this->setSyntaxHighLighter<snw::SyntaxHighlighter>();
@@ -53,9 +56,14 @@ QString FilePreviewWidget::defaultWhatsThis() const
       "</html>";
 }
 
+void FilePreviewWidget::textChangedSlot()
+{
+	mSaveButton->setEnabled(mTextDocument->isModified());
+}
+
 void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
-  mEditButton->setEnabled(false);
+  mSaveButton->setEnabled(false);
   if(mCurrentFile)
   {
     if(mCurrentFile->isOpen())
@@ -80,32 +88,52 @@ void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
   }
   QTextStream stream(mCurrentFile.get());
   QString text = stream.readAll();
+  mCurrentFile->close();
 
   mTextDocument->setPlainText(text);
-  mEditButton->setEnabled(true);
+  mTextDocument->setModified(false);
+//  mSaveButton->setEnabled(true);
+  this->textChangedSlot();
 }
 
-void FilePreviewWidget::editSlot()
+void FilePreviewWidget::saveSlot()
 {
   if(!mCurrentFile)
     return;
 
-  QFileInfo info(*mCurrentFile);
-  QUrl url("file:/"+info.absoluteFilePath());
-  QDesktopServices::openUrl(url);
+  if(!mCurrentFile->open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    ssc::messageManager()->sendWarning("Could not open file "+mCurrentFile->fileName());
+    return;
+  }
+
+  mCurrentFile->write(mTextDocument->toPlainText().toLatin1());
+  mCurrentFile->close();
+
+//  QFileInfo info(*mCurrentFile);
+//  QUrl url("file:/"+info.absoluteFilePath());
+//  QDesktopServices::openUrl(url);
+
+  mTextDocument->setModified(false);
+
 }
 
 void FilePreviewWidget::watchFile(bool on)
 {
-  if(!mCurrentFile)
-    return;
+	if (!mCurrentFile)
+		return;
 
-  QFileInfo info(*mCurrentFile);
+	QFileInfo info(*mCurrentFile);
 
-  if(on)
-    mFileSystemWatcher->addPath(info.absoluteFilePath());
-  else
-    mFileSystemWatcher->removePath(info.absoluteFilePath());
+	if (on)
+	{
+		if (!mFileSystemWatcher->files().contains(info.absoluteFilePath()))
+			mFileSystemWatcher->addPath(info.absoluteFilePath());
+	}
+	else
+	{
+		mFileSystemWatcher->removePath(info.absoluteFilePath());
+	}
 }
 
 }//namespace cx
