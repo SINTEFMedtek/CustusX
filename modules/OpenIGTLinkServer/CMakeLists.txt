@@ -11,19 +11,19 @@ find_package( Boost REQUIRED )
 # openCV
 #----------
 if (USE_OpenCV)
-    find_package( OpenCV REQUIRED)
+		find_package( OpenCV REQUIRED)
 else (USE_OpenCV)
-    find_package( OpenCV QUIET)
+		find_package( OpenCV QUIET)
 endif (USE_OpenCV)
 
 IF( OpenCV_FOUND )
-    option(USE_OpenCV "use OpenCV" ON)
+		option(USE_OpenCV "use OpenCV" ON)
 ELSE( OpenCV_FOUND )
-    option(USE_OpenCV "use OpenCV" OFF)
+		option(USE_OpenCV "use OpenCV" OFF)
 ENDIF( OpenCV_FOUND )
 
 if (USE_OpenCV)
-  ADD_DEFINITIONS(-DUSE_OpenCV)
+	ADD_DEFINITIONS(-DUSE_OpenCV)
 endif(USE_OpenCV)
 
 # VTK
@@ -38,9 +38,9 @@ SET (QT_USE_QTXML TRUE)
 find_package(Qt4 REQUIRED)
 set(QT_USE_QTNETWORK 1)
 IF(QT_USE_FILE)
-  INCLUDE(${QT_USE_FILE})
+	INCLUDE(${QT_USE_FILE})
 ELSE(QT_USE_FILE)
-  SET(QT_LIBRARIES   ${QT_QT_LIBRARY})
+	SET(QT_LIBRARIES   ${QT_QT_LIBRARY})
 ENDIF(QT_USE_FILE)
 
 # OpenIGTLink
@@ -48,13 +48,13 @@ ENDIF(QT_USE_FILE)
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})
 
-#-------------------------------
+#---------------------e----------
 # Include directories
 #-------------------------------
 include_directories(
-    ${Boost_INCLUDE_DIRS}
-    ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
-    )
+		${Boost_INCLUDE_DIRS}
+		${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
+		)
 
 #-------------------------------
 # Linking
@@ -63,18 +63,33 @@ include_directories(
 # link to ulterius only on when building 32 bit
 # - ulterius lib is only available on windows as 32 bit
 if(CX_WIN32)
-  SET(WIN32_LINK_LIBRARIES
-       ${ULTERIUS_LIBRARY}
-       vtkOpenIGTUltrasound
-  )
+	SET(WIN32_LINK_LIBRARIES
+			 ${ULTERIUS_LIBRARY}
+			 vtkOpenIGTUltrasound
+	)
 endif(CX_WIN32)
 
 SET(ALL_LINK_LIBRARIES
-  SSC
-  ${BOOST_LIBRARIES}
-  ${QT_LIBRARIES}
-  OpenIGTLink
-  )
+	SSC
+	${BOOST_LIBRARIES}
+	${QT_LIBRARIES}
+	OpenIGTLink
+	vtkIO 
+	vtkRendering 
+	vtkImaging 
+	vtkCommon 
+	vtkHybrid 
+	vtkWidgets 
+	vtkFiltering 
+	vtkVolumeRendering 
+	)
+
+if(USE_OpenCV)
+	set (ALL_LINK_LIBRARIES
+			${ALL_LINK_LIBRARIES}
+			${OpenCV_LIBS}
+			)
+endif()
 
 if(CX_WINDOWS)
 	SET(LINK_LIBRARIES
@@ -82,8 +97,8 @@ if(CX_WINDOWS)
 		${ALL_LINK_LIBRARIES}
 	)
 	else(CX_WINDOWS)
-	SET(LINK_LIBRARIES
-		${ALL_LINK_LIBRARIES}
+		SET(LINK_LIBRARIES
+			${ALL_LINK_LIBRARIES}
 	)
 endif(CX_WINDOWS)
 
@@ -91,42 +106,50 @@ endif(CX_WINDOWS)
 # Qt -moccing
 #-------------------------------
 SET( CX_QT_MOC_HEADER_FILES
-    cxImageServer.h
-    cxImageSession.h
-    cxImageSenderFile.h
-    cxImageSenderSonix.h
-    cxImageSenderOpenCV.h
+		cxImageServer.h
+		cxImageSession.h
+		cxImageSenderFile.h
+		cxImageSenderSonix.h
+		cxImageSenderOpenCV.h
 )
 
-QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
+#QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
+
+if(CX_WINDOWS)
+	QT4_WRAP_CPP(MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} OPTIONS "-D_WINDOWS")
+else()
+	QT4_WRAP_CPP(MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES})
+endif(CX_WINDOWS)
+
 
 #-------------------------------
 # Creating the executable
 #-------------------------------
 SET ( cxOpenIGTLinkServer_FILES
-    cxImageServer.h
-    cxImageServer.cpp
-    cxImageSession.h
-    cxImageSession.cpp 
-    cxImageSenderFactory.h
-    cxImageSenderFactory.cpp
-    cxImageSenderFile.h
-    cxImageSenderFile.cpp
-    cxImageSenderOpenCV.h
-    cxImageSenderOpenCV.cpp
-    cxImageSenderSonix.h
-    cxImageSenderSonix.cpp
-    ../grabberCommon/cxIGTLinkSonixStatusMessage.h
-    ../grabberCommon/cxIGTLinkSonixStatusMessage.cpp
-    ../grabberCommon/cxIGTLinkImageMessage.h
-    ../grabberCommon/cxIGTLinkImageMessage.cpp
-    ../grabberCommon/igtl_sonix_status.h
-    ../grabberCommon/igtl_sonix_status.c
+		cxImageServer.h
+		cxImageServer.cpp
+		cxImageSession.h
+		cxImageSession.cpp 
+		cxImageSenderFactory.h
+		cxImageSenderFactory.cpp
+		cxImageSenderFile.h
+		cxImageSenderFile.cpp
+		cxImageSenderOpenCV.h
+		cxImageSenderOpenCV.cpp
+		cxImageSenderSonix.h
+		cxImageSenderSonix.cpp
+		../grabberCommon/cxIGTLinkSonixStatusMessage.h
+		../grabberCommon/cxIGTLinkSonixStatusMessage.cpp
+		../grabberCommon/cxIGTLinkImageMessage.h
+		../grabberCommon/cxIGTLinkImageMessage.cpp
+		../grabberCommon/igtl_sonix_status.h
+		../grabberCommon/igtl_sonix_status.c
 )
 
-set(ExecutableName "OpenIGTLinkServer")
 if(CX_WIN32)
 	set(ExecutableName "UltrasonixServer") # windows 32 bit version is made for ultrasonix communication
+else()
+	set(ExecutableName "OpenIGTLinkServer")
 endif()
 
 add_executable( ${ExecutableName}
@@ -135,40 +158,31 @@ add_executable( ${ExecutableName}
 								${MOC_HEADER_FILES} 
 								)
 
-target_link_libraries(${ExecutableName}  
-	${LINK_LIBRARIES}     
-    ${OpenCV_LIBS}
-    vtkIO 
-    vtkRendering 
-    vtkImaging 
-    vtkCommon 
-    vtkHybrid 
-    vtkWidgets 
-    vtkFiltering 
-    vtkVolumeRendering 
-  )
-    
-    
+target_link_libraries(${ExecutableName}
+	${LINK_LIBRARIES}
+	)
+		
+		
 #-------------------------------
 # Install files
 #-------------------------------
 install(TARGETS ${ExecutableName}
-    BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
-    RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
-    )
+		BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
+		RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
+		)
 
 if(CX_WINDOWS)
-  #Installing required run time libs for Windows, msv*.dll
-  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
-  include (InstallRequiredSystemLibraries)
-  if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-      install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-        DESTINATION bin
-        PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
-        GROUP_EXECUTE WORLD_READ
-        )
-  endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-  
+	#Installing required run time libs for Windows, msv*.dll
+	set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+	include (InstallRequiredSystemLibraries)
+	if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+			install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+				DESTINATION bin
+				PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
+				GROUP_EXECUTE WORLD_READ
+				)
+	endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+	
 endif(CX_WINDOWS)
 
 #------------------------------------------------------------------------------
@@ -179,41 +193,47 @@ endif(CX_WINDOWS)
 # Linux
 #----------
 if (CX_LINUX)
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/OpenIGTLinkServer")
-  set(LIBS "")
-  set(DIRS 
-      ${QT_INCLUDES} 
-      ${QT_LIBRARY_DIRS}
-      ${VTK_LIBRARY_DIRS}
-      ${SSC_BINARY_DIR}/Code
-      ${OpenIGTLink_LIBRARY_DIRS}
-      ${OpenCV_LIB_DIR}
-      )
-      
-  install(CODE "
-     include(BundleUtilities)
-     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
-     )      
-      
+	set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/OpenIGTLinkServer")
+	set(LIBS "")
+	set(DIRS 
+			${QT_INCLUDES} 
+			${QT_LIBRARY_DIRS}
+			${VTK_LIBRARY_DIRS}
+			${SSC_BINARY_DIR}/Code
+			${OpenIGTLink_LIBRARY_DIRS}
+			${OpenCV_LIB_DIR}
+			)
+			
+	install(CODE "
+		 include(BundleUtilities)
+		 fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
+		 )      
+			
 endif (CX_LINUX)
 
 # Windows
 #----------
 if (CX_WINDOWS)
-  set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/${ExecutableName}")
-  set(LIBS ${OpenCV_LIB_DIR})
-  set(DIRS 
-      ${QT_INCLUDES} 
-      ${QT_LIBRARY_DIRS}
-      ${VTK_LIBRARY_DIRS}
-      ${SSC_BINARY_DIR}/Code
-      ${OpenCV_LIB_DIR}
-      ${OpenIGTLink_LIBRARY_DIRS}
-      )
-         
-  install(CODE "
-     include(BundleUtilities)
-     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
-     )      
-      
+	set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/${ExecutableName}")
+	set(LIBS
+			)
+	set(DIRS 
+			${QT_INCLUDES} 
+			${QT_LIBRARY_DIRS}
+			${VTK_LIBRARY_DIRS}
+			${SSC_BINARY_DIR}/Code
+			${OpenIGTLink_LIBRARY_DIRS}
+			)
+	if(USE_OpenCV)
+		set (DIRS
+				${DIRS}
+				${OpenCV_LIB_DIR}
+				)
+	endif()
+				 
+	install(CODE "
+		 include(BundleUtilities)
+		 fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
+		 )      
+			
 endif (CX_WINDOWS)

@@ -10,31 +10,31 @@ cmake_minimum_required(VERSION 2.6)
 # Add some compiler flags (preprocessor definitions)
 #------------------------------------------------------------------------------
 add_definitions(-DCustusX3_VERSION_MAJOR=${CustusX3_VERSION_MAJOR}
-  -DCustusX3_VERSION_MINOR=${CustusX3_VERSION_MINOR}
-  -DCustusX3_VERSION_PATCH=${CustusX3_VERSION_PATCH})
+	-DCustusX3_VERSION_MINOR=${CustusX3_VERSION_MINOR}
+	-DCustusX3_VERSION_PATCH=${CustusX3_VERSION_PATCH})
 
 # Use:
 # CX_WINDOWS for all windows
 # CX_WIN32 for 32 bit windows
 # CX_WIN64 for 64 bit windows
 if(WIN32)
-  set(CX_WINDOWS 1) #for cmake
-  add_definitions(-DCX_WINDOWS) #for compiler
-  message( STATUS "This is a Windows build.")
-  add_definitions(-D__WIN32__) #  -because they are needed at moc'ing time
-  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(CX_WIN64 1) #for cmake
-    add_definitions(-DCX_WIN64) #for compiler
-    message( STATUS "This is a 64 bit build.")
-  else()
-    set(CX_WIN32 1) #for cmake
-    add_definitions(-DCX_WIN32) #for compiler
-    message( STATUS "This is a 32 bit build.")
-  endif()
+	set(CX_WINDOWS 1) #for cmake
+	add_definitions(-DCX_WINDOWS) #for compiler
+	message( STATUS "This is a Windows build.")
+	add_definitions(-D__WIN32__) #  -because they are needed at moc'ing time
+	if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+		set(CX_WIN64 1) #for cmake
+		add_definitions(-DCX_WIN64) #for compiler
+		message( STATUS "This is a 64 bit build.")
+	else()
+		set(CX_WIN32 1) #for cmake
+		add_definitions(-DCX_WIN32) #for compiler
+		message( STATUS "This is a 32 bit build.")
+	endif()
 endif()
 
 if(APPLE)
-  add_definitions(-D__APPLE__)
+	add_definitions(-D__APPLE__)
 endif(APPLE)
 
 #------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${Custus
 set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
 
 if(APPLE)
-  set(CMAKE_INSTALL_PREFIX "Applications/" ) # used during package installation. Appended to some default which seems to be / , might be able to change using DESTDIR env var.
+	set(CMAKE_INSTALL_PREFIX "Applications/" ) # used during package installation. Appended to some default which seems to be / , might be able to change using DESTDIR env var.
 endif(APPLE)
 
 #------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/Shared/install_t
 
 # append build type to name if not Release:
 if    (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
-    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
+		set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
 endif (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
 
 # Variables
@@ -82,7 +82,7 @@ endif (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
 
 # define LINUX convenience variable
 if (UNIX AND NOT APPLE)
-    set(CX_LINUX 1)
+		set(CX_LINUX 1)
 endif (UNIX AND NOT APPLE)
 
 # Set root folder for entire installation
@@ -90,41 +90,45 @@ set(CX_INSTALL_ROOT_DIR .)
 
 
 if (APPLE)
-    set(CX_INSTALL_ROOT_DIR "CustusX")
+		set(CX_INSTALL_ROOT_DIR "CustusX")
 
-    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
-    set(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
-    set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
-    
-    option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
-    option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
-    option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
-    option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
+		set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
+		set(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
+		set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
+		set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
+		
+		option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
+		option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
+		option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
+		option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
 endif(APPLE)
 
 if (CX_LINUX)
-    set(CX_INSTALL_ROOT_DIR "CustusX")
-    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
-    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
+		set(CX_INSTALL_ROOT_DIR "CustusX")
+		set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
+		set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
 #    set(CPACK_GENERATOR "TGZ;STGZ")
-    set(CPACK_GENERATOR "TGZ")
-    set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+		set(CPACK_GENERATOR "TGZ")
+		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 endif (CX_LINUX)
 
 if (CX_WINDOWS)
-    set(CPACK_NSIS_MUI_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons/CustusX.ico")
-    set(CPACK_PACKAGE_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons/CustusX.png")
-    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows/Windows_Install_ReadMe.rtf")
-    set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/CustusX.exe")
-    set(CPACK_PACKAGE_EXECUTABLES 
-        "CustusX" "CustusX"
-        "OpenIGTLinkServer" "OpenIGTLinkServer"
-        "GrabberServer" "GrabberServer"
-        )
-    set(CPACK_NSIS_MENU_LINKS
-        "doc/Windows_Install_ReadMe.rtf" "README"
-    )
+		set(CPACK_NSIS_MUI_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons/CustusX.ico")
+		set(CPACK_PACKAGE_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons/CustusX.png")
+		set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows/Windows_Install_ReadMe.rtf")
+		set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/CustusX.exe")
+		set(OpenIGTLinkServerName OpenIGTLinkServer)
+		if(CX_WIN32)
+			set(OpenIGTLinkServerName UltrasonixServer)
+		endif()
+		set(CPACK_PACKAGE_EXECUTABLES 
+				"CustusX" "CustusX"
+				"${OpenIGTLinkServerName}" "${OpenIGTLinkServerName}"
+				"GrabberServer" "GrabberServer"
+				)
+		set(CPACK_NSIS_MENU_LINKS
+				"doc/Windows_Install_ReadMe.rtf" "README"
+		)
 endif (CX_WINDOWS)
 
 #------------------------------------------------------------------------------
@@ -145,29 +149,29 @@ include_directories( /opt/local/include )
 # CPPUnit
 #----------
 find_path(CPPUNIT_INCLUDE_DIR cppunit/TestCase.h
-  /usr/local/include
-  /usr/include
+	/usr/local/include
+	/usr/include
 )
 
 if(CX_WINDOWS)
-  find_library(CPPUNIT_LIBRARY cppunit
-               ${CPPUNIT_INCLUDE_DIR}/../lib
-               /usr/local/lib
-               /usr/lib)
-  find_library(CPPUNIT_DEBUG_LIBRARY cppunitd
-               ${CPPUNIT_INCLUDE_DIR}/../lib
-               /usr/local/lib
-               /usr/lib)
+	find_library(CPPUNIT_LIBRARY cppunit
+							 ${CPPUNIT_INCLUDE_DIR}/../lib
+							 /usr/local/lib
+							 /usr/lib)
+	find_library(CPPUNIT_DEBUG_LIBRARY cppunitd
+							 ${CPPUNIT_INCLUDE_DIR}/../lib
+							 /usr/local/lib
+							 /usr/lib)
 else(CX_WINDOWS)
-  find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED)
+	find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED)
 endif(CX_WINDOWS)
 
 if(CPPUNIT_INCLUDE_DIR)
-  if(CPPUNIT_LIBRARY)
-    set(CPPUNIT_FOUND "YES")
-    set(CPPUNIT_LIBRARIES ${CPPUNIT_LIBRARY} ${CMAKE_DL_LIBS})
-    set(CPPUNIT_DEBUG_LIBRARIES ${CPPUNIT_DEBUG_LIBRARY} ${CMAKE_DL_LIBS})
-  endif(CPPUNIT_LIBRARY)
+	if(CPPUNIT_LIBRARY)
+		set(CPPUNIT_FOUND "YES")
+		set(CPPUNIT_LIBRARIES ${CPPUNIT_LIBRARY} ${CMAKE_DL_LIBS})
+		set(CPPUNIT_DEBUG_LIBRARIES ${CPPUNIT_DEBUG_LIBRARY} ${CMAKE_DL_LIBS})
+	endif(CPPUNIT_LIBRARY)
 endif(CPPUNIT_INCLUDE_DIR)
 
 #------------------------------------------------------------------------------
@@ -181,17 +185,17 @@ add_subdirectory( source )
 # Optional software
 #------------------------------------------------------------------------------
 if (LINUX)
-    option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" ON) #default is on for linux
+		option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" ON) #default is on for linux
 else (LINUX)
-    option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" OFF) #default is off for others
+		option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" OFF) #default is off for others
 endif (LINUX)
 if(BUILD_OPEN_IGTLINK_SERVER)
-    add_subdirectory( modules/OpenIGTLinkServer )
+		add_subdirectory( modules/OpenIGTLinkServer )
 endif(BUILD_OPEN_IGTLINK_SERVER)
 
 option(BUILD_GRABBER_SERVER "build grabber server" OFF) #default is off
 if(BUILD_GRABBER_SERVER)
-    add_subdirectory( modules/grabberServer )
+		add_subdirectory( modules/grabberServer )
 endif(BUILD_GRABBER_SERVER)
 
 #------------------------------------------------------------------------------
