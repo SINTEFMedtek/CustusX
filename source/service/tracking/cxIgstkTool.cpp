@@ -21,6 +21,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "cxSettings.h"
+#include "cxTransformFile.h"
 
 namespace cx
 {
@@ -40,38 +41,43 @@ void IgstkTool::InternalStructure::setCalibration(const ssc::Transform3D& cal)
 
 void IgstkTool::InternalStructure::saveCalibrationToFile()
 {
-	QFile calibrationFile;
-	if (!mCalibrationFilename.isEmpty() && QFile::exists(mCalibrationFilename))
+	QString filename = mCalibrationFilename;
+//	QFile calibrationFile;
+	if (!filename.isEmpty() && QFile::exists(filename))
 	{
 		//Calibration file exists, overwrite
-		calibrationFile.setFileName(mCalibrationFilename);
+//		calibrationFile.setFileName(mCalibrationFilename);
 	}
 	else
 	{
 		//Make a new file, use rom file name as base name
-		QString calibrationFileName = mSROMFilename.remove(".rom", Qt::CaseInsensitive);
-		calibrationFileName.append(".cal");
-		calibrationFile.setFileName(calibrationFileName);
-	}
-//  ssc::Transform3D sMt;
-//  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-//  mCalibration.ExportTransform(*(M.GetPointer()));
-//  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
-	ssc::Transform3D sMt = this->getCalibrationAsSSC();
-
-	if (!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-	{
-		ssc::messageManager()->sendError("Could not open " + mUid + "s calibrationfile: " + calibrationFile.fileName());
-		return;
+		filename = mSROMFilename.remove(".rom", Qt::CaseInsensitive);
+		filename.append(".cal");
+//		calibrationFile.setFileName(calibrationFileName);
 	}
 
-	QTextStream streamer(&calibrationFile);
-	streamer << qstring_cast(sMt);
-	streamer << endl;
+	TransformFile file(filename);
+	file.write(this->getCalibrationAsSSC());
+//
+////  ssc::Transform3D sMt;
+////  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+////  mCalibration.ExportTransform(*(M.GetPointer()));
+////  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
+//	ssc::Transform3D sMt = this->getCalibrationAsSSC();
+//
+//	if (!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+//	{
+//		ssc::messageManager()->sendError("Could not open " + mUid + "s calibrationfile: " + calibrationFile.fileName());
+//		return;
+//	}
+//
+//	QTextStream streamer(&calibrationFile);
+//	streamer << qstring_cast(sMt);
+//	streamer << endl;
+//
+//	calibrationFile.close();
 
-	calibrationFile.close();
-
-	ssc::messageManager()->sendInfo("Replaced calibration in " + calibrationFile.fileName());
+	ssc::messageManager()->sendInfo("Replaced calibration in " + filename);
 }
 
 void IgstkTool::updateCalibration(const ssc::Transform3D& cal)
