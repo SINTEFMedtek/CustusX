@@ -23,6 +23,7 @@
 #include "cxPatientData.h"
 #include "sscTypeConversions.h"
 #include "sscTime.h"
+#include "cxTransformFile.h"
 
 namespace cx
 {
@@ -148,13 +149,16 @@ QString ElastixExecuter::writeInitTransformToCalfile(
 {
 	ssc::Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
 
-	QFile initTransformFile(outdir+"/moving_M_fixed_initial.cal");
-	if (!initTransformFile.open(QIODevice::WriteOnly | QIODevice::Text))
-	{
-		ssc::messageManager()->sendWarning(QString("Failed to open file %1 for writing.").arg(initTransformFile.fileName()));
-	}
-	initTransformFile.write(qstring_cast(mMf).toAscii());
-	return initTransformFile.fileName();
+	TransformFile file(outdir+"/moving_M_fixed_initial.cal");
+	file.write(mMf);
+
+//	QFile initTransformFile(outdir+"/moving_M_fixed_initial.cal");
+//	if (!initTransformFile.open(QIODevice::WriteOnly | QIODevice::Text))
+//	{
+//		ssc::messageManager()->sendWarning(QString("Failed to open file %1 for writing.").arg(initTransformFile.fileName()));
+//	}
+//	initTransformFile.write(qstring_cast(mMf).toAscii());
+	return file.fileName();
 }
 
 void ElastixExecuter::processReadyRead()
@@ -261,6 +265,22 @@ ssc::Transform3D ElastixExecuter::getAffineResult_mMf(bool* ok)
 {
 	QString filename = this->findMostRecentTransformOutputFile();
 	ssc::Transform3D mMf = ssc::Transform3D::Identity();
+
+	if (filename.isEmpty())
+	{
+		if (ok)
+			*ok = false;
+
+		TransformFile file(mLastOutdir+"/moving_M_fixed_registered.cal");
+		mMf = file.read(ok);
+
+		if (ok && !*ok)
+		{
+			ssc::messageManager()->sendWarning("Failed to read registration results.");
+		}
+
+		return mMf;
+	}
 
 	while (true)
 	{

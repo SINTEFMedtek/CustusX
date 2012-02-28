@@ -57,6 +57,8 @@ add_library(cxUtilities
     cxUsReconstructionFileReader.cpp    
     cxDisplayTimerWidget.h
     cxDisplayTimerWidget.cpp
+    cxTransformFile.h
+    cxTransformFile.cpp
     ${cxUtilities_MOC_SRCS}
     )
     
