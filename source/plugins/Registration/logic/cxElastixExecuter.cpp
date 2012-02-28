@@ -97,6 +97,81 @@ void ElastixExecuter::run(QString application,
 //	mProcess->start("elastix");
 }
 
+/**Class encapsulating the math conversions
+ * between the ElastiX "EulerTransform" representation
+ * and the ssc::Transform3D representation.
+ */
+class ElastixEulerTransform
+{
+public:
+	ssc::Vector3D mAngles_xyz;
+	ssc::Vector3D mTranslation;
+	ssc::Vector3D mCenterOfRotation;
+
+	static ElastixEulerTransform create(ssc::Vector3D angles_xyz, ssc::Vector3D translation, ssc::Vector3D centerOfRotation)
+	{
+		ElastixEulerTransform retval;
+		retval.mAngles_xyz = angles_xyz;
+		retval.mTranslation = translation;
+		retval.mCenterOfRotation = centerOfRotation;
+		return retval;
+	}
+	static ElastixEulerTransform create(ssc::Transform3D M, ssc::Vector3D centerOfRotation)
+	{
+		ElastixEulerTransform retval;
+		retval.mAngles_xyz = M.matrix().block<3, 3> (0, 0).eulerAngles(0, 1, 2);
+		retval.mTranslation = M.matrix().block<3, 1> (0, 3);
+//		retval.mCenterOfRotation = ssc::Vector3D(0,0,0);
+		retval.mCenterOfRotation = centerOfRotation;
+		return retval;
+	}
+	ssc::Transform3D toMatrix() const
+	{
+		ssc::Transform3D T = ssc::createTransformTranslate(mTranslation);
+		ssc::Transform3D C = ssc::createTransformTranslate(mCenterOfRotation);
+
+		ssc::Transform3D Rx = ssc::createTransformRotateX(mAngles_xyz[0]);
+		ssc::Transform3D Ry = ssc::createTransformRotateY(mAngles_xyz[1]);
+		ssc::Transform3D Rz = ssc::createTransformRotateZ(mAngles_xyz[2]);
+
+		ssc::Transform3D R = Rx*Ry*Rz;
+	//	ssc::Transform3D R = Rz*Ry*Rx;
+
+		ssc::Transform3D Q = T*C*R*C.inv();
+		return Q;
+	}
+private:
+	ElastixEulerTransform() {}
+};
+
+void test_euler()
+{
+	std::cout << "==========TEST==============" << std::endl;
+	ssc::Transform3D M = ssc::createTransformRotateX(M_PI/3)*ssc::createTransformRotateY(M_PI/4)*ssc::createTransformTranslate(ssc::Vector3D(0,2,3));
+
+	ElastixEulerTransform E = ElastixEulerTransform::create(M, ssc::Vector3D(50,40,30));
+//	ssc::Vector3D eulerAngles_xyz = M.matrix().block<3, 3> (0, 0).eulerAngles(0, 1, 2);
+//	ssc::Vector3D translation = M.matrix().block<3, 1> (0, 3);
+//	ssc::Vector3D c(0,0,0);
+//
+//	ssc::Transform3D T = ssc::createTransformTranslate(translation);
+//	ssc::Transform3D C = ssc::createTransformTranslate(c);
+//
+//	ssc::Transform3D Rx = ssc::createTransformRotateX(eulerAngles_xyz[0]);
+//	ssc::Transform3D Ry = ssc::createTransformRotateY(eulerAngles_xyz[1]);
+//	ssc::Transform3D Rz = ssc::createTransformRotateZ(eulerAngles_xyz[2]);
+//
+//	ssc::Transform3D R = Rx*Ry*Rz; // which one??????
+////	ssc::Transform3D R = Rz*Ry*Rx;
+//
+//	ssc::Transform3D Q = T*C*R*C.inv();
+	ssc::Transform3D Q = E.toMatrix();
+
+	std::cout << "M\n" << M << std::endl;
+	std::cout << "Q\n" << Q << std::endl;
+	std::cout << "Q*M.inv\n" << Q*M.inv() << std::endl;
+}
+
 /**Write the initial (pre-registration) mMf transform to
  * disk as required by elastix.
  */
@@ -105,6 +180,7 @@ QString ElastixExecuter::writeInitTransformToElastixfile(
 	ssc::ImagePtr moving,
 	QString outdir)
 {
+	test_euler();
 	ssc::Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
 
 	ssc::Vector3D eulerAngles_xyz = mMf.matrix().block<3, 3> (0, 0).eulerAngles(0, 1, 2);
@@ -350,9 +426,19 @@ ssc::Transform3D ElastixParameterFile::readEulerTransform()
 	std::vector<double> transformParameters = this->readParameterDoubleVector("TransformParameters");
 	std::vector<double> centerOfRotationPoint = this->readParameterDoubleVector("CenterOfRotationPoint");
 
-	// TODO add rotation as well
 	ssc::Vector3D t(transformParameters[3], transformParameters[4], transformParameters[5]);
-	return ssc::createTransformTranslate(t);
+	ssc::Transform3D T = ssc::createTransformTranslate(t);
+	ssc::Vector3D c(centerOfRotationPoint[0], centerOfRotationPoint[1], centerOfRotationPoint[2]);
+	ssc::Transform3D C = ssc::createTransformTranslate(c);
+
+	ssc::Transform3D Rx = ssc::createTransformRotateX(transformParameters[0]);
+	ssc::Transform3D Ry = ssc::createTransformRotateY(transformParameters[1]);
+	ssc::Transform3D Rz = ssc::createTransformRotateZ(transformParameters[2]);
+
+//	ssc::Transform3D R = Rx*Ry*Rz; // which one??????
+	ssc::Transform3D R = Rz*Ry*Rx;
+
+	return T*C*R*C.inv();
 }
 
 ElastixParameterFile::ElastixParameterFile(QString filename) : mFile(filename)
@@ -362,7 +448,7 @@ ElastixParameterFile::ElastixParameterFile(QString filename) : mFile(filename)
 		ssc::messageManager()->sendWarning(QString("Can't open ElastiX result file %1").arg(filename));
 	}
 	mText = QString(mFile.readAll());
-	std::cout << "Loaded text from " << filename << ":\n" << mText << std::endl;
+//	std::cout << "Loaded text from " << filename << ":\n" << mText << std::endl;
 }
 
 QString ElastixParameterFile::readParameterRawValue(QString key)
@@ -384,11 +470,13 @@ QString ElastixParameterFile::readParameterRawValue(QString key)
 	QRegExp rx(regexpStr);
 //	std::cout << regexpStr << std::endl;
 
-	if (lines.indexOf(rx)>=0)
-	{
-		std::cout << "FOUND0 " << rx.cap(0) << std::endl;
-		std::cout << "FOUND1 " << rx.cap(1) << std::endl;
-	}
+	lines.indexOf(rx);
+
+//	if (lines.indexOf(rx)>=0)
+//	{
+//		std::cout << "FOUND0 " << rx.cap(0) << std::endl;
+//		std::cout << "FOUND1 " << rx.cap(1) << std::endl;
+//	}
 
 	return rx.cap(1);
 }
