@@ -42,7 +42,8 @@ public:
 
 public slots:
   void previewFileSlot(const QString& absoluteFilePath);
-  void editSlot();
+  void saveSlot();
+  void textChangedSlot();
 
 private:
   void watchFile(bool on);
@@ -51,7 +52,7 @@ private:
   QTextEdit*     mTextEdit;
   QSyntaxHighlighter* mSyntaxHighlighter;
 
-  QPushButton*   mEditButton;
+  QPushButton*   mSaveButton;
 
   QFileSystemWatcher* mFileSystemWatcher;
   boost::shared_ptr<QFile>  mCurrentFile;
