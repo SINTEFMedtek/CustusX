@@ -296,10 +296,11 @@ void RegistrationHistory::updateRegistration(const QDateTime& oldTime, const Reg
 {
 	for (std::vector<RegistrationTransform>::iterator iter = mData.begin(); iter != mData.end(); ++iter)
 	{
-		if (iter->mTimestamp != oldTime)
-			continue;
-		mData.erase(iter);
-		break;
+		if ((iter->mTimestamp == oldTime) && oldTime.isValid())
+		{
+			mData.erase(iter);
+			break;
+		}
 	}
 	this->addRegistration(newTransform);
 }
