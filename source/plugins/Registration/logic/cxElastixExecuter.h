@@ -56,8 +56,8 @@ public:
 	void setDisplayProcessMessages(bool on);
 
 	void run(QString application,
-	         ssc::ImagePtr fixed,
-	         ssc::ImagePtr moving,
+	         ssc::DataPtr fixed,
+	         ssc::DataPtr moving,
 	         QString outdir,
 	         QStringList parameterfiles);
 
@@ -70,15 +70,17 @@ private slots:
 	void processReadyRead();
 
 private:
-	QString writeInitTransformToElastixfile(ssc::ImagePtr fixed, ssc::ImagePtr moving, QString outdir);
-	QString writeInitTransformToCalfile(ssc::ImagePtr fixed, ssc::ImagePtr moving, QString outdir);
+	QString writeInitTransformToElastixfile(ssc::DataPtr fixed, ssc::DataPtr moving, QString outdir);
+	QString writeInitTransformToCalfile(ssc::DataPtr fixed, ssc::DataPtr moving, QString outdir);
 	QString findMostRecentTransformOutputFile() const;
 
 	QString mLastOutdir;
 	QProcess* mProcess;
 };
 
-
+/**Reader class for an Elastix-style parameter file.
+ *
+ */
 class ElastixParameterFile
 {
 public:
@@ -97,6 +99,80 @@ private:
 	QFile mFile;
 	QString mText;
 };
+
+/**Class encapsulating the math conversions
+ * between the ElastiX "EulerTransform" representation
+ * and the ssc::Transform3D representation.
+ */
+class ElastixEulerTransform
+{
+public:
+	ssc::Vector3D mAngles_xyz;
+	ssc::Vector3D mTranslation;
+	ssc::Vector3D mCenterOfRotation;
+
+	static ElastixEulerTransform create(ssc::Vector3D angles_xyz, ssc::Vector3D translation, ssc::Vector3D centerOfRotation)
+	{
+		ElastixEulerTransform retval;
+		retval.mAngles_xyz = angles_xyz;
+		retval.mTranslation = translation;
+		retval.mCenterOfRotation = centerOfRotation;
+		return retval;
+	}
+	static ElastixEulerTransform create(ssc::Transform3D M, ssc::Vector3D centerOfRotation)
+	{
+		ElastixEulerTransform retval;
+		retval.mAngles_xyz = M.matrix().block<3, 3> (0, 0).eulerAngles(0, 1, 2);
+		retval.mCenterOfRotation = centerOfRotation;
+
+		ssc::Transform3D R = retval.getRotationMatrix();
+		ssc::Transform3D C = ssc::createTransformTranslate(retval.mCenterOfRotation);
+		// solve M = T*Tc*R*Tc.inv() with respect to T:
+		ssc::Transform3D T = M*C*R.inv()*C.inv();
+
+		retval.mTranslation = T.matrix().block<3, 1> (0, 3);
+//		retval.mCenterOfRotation = ssc::Vector3D(0,0,0);
+		return retval;
+	}
+	ssc::Transform3D toMatrix() const
+	{
+		ssc::Transform3D T = ssc::createTransformTranslate(mTranslation);
+		ssc::Transform3D C = ssc::createTransformTranslate(mCenterOfRotation);
+		ssc::Transform3D R = this->getRotationMatrix();
+		ssc::Transform3D Q = T*C*R*C.inv();
+		return Q;
+	}
+	static void test()
+	{
+		std::cout << "==========TEST==============" << std::endl;
+		ssc::Transform3D M = ssc::createTransformRotateX(M_PI/3)*ssc::createTransformRotateY(M_PI/4)*ssc::createTransformTranslate(ssc::Vector3D(0,2,3));
+
+		ElastixEulerTransform E = ElastixEulerTransform::create(M, ssc::Vector3D(30,40,50));
+		ssc::Transform3D Q = E.toMatrix();
+
+		std::cout << "M\n" << M << std::endl;
+		std::cout << "Q\n" << Q << std::endl;
+		ssc::Transform3D diff = Q*M.inv();
+		std::cout << "Q*M.inv\n" << diff << std::endl;
+		if (!ssc::similar(ssc::Transform3D::Identity(), diff))
+			ssc::messageManager()->sendError("assertion failure in ElastixEulerTransform");
+	}
+private:
+	ElastixEulerTransform() {}
+
+	ssc::Transform3D getRotationMatrix() const
+	{
+		Eigen::Matrix3d m;
+		m =	Eigen::AngleAxisd(mAngles_xyz[0], Eigen::Vector3d::UnitX())
+		  * Eigen::AngleAxisd(mAngles_xyz[1], Eigen::Vector3d::UnitY())
+		  * Eigen::AngleAxisd(mAngles_xyz[2], Eigen::Vector3d::UnitZ());
+
+		ssc::Transform3D R = ssc::Transform3D::Identity();
+		R.matrix().block<3, 3> (0, 0) = m;
+		return R;
+	}
+};
+
 
 /**
  * @}
