@@ -14,7 +14,7 @@
 # --- end cisst license ---
 
 # backward compatibility
-CMAKE_MINIMUM_REQUIRED(VERSION 2.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
 PROJECT(cisstTests)
 
 # clipped from cisst/tests/CMakeLists.txt
