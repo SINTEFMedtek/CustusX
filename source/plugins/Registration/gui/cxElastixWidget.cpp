@@ -53,7 +53,7 @@ ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent)
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 	QGridLayout* layout = new QGridLayout();
 	topLayout->addLayout(layout);
-	topLayout->addStretch();
+//	topLayout->addStretch();
 
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
@@ -146,7 +146,7 @@ void ElastixWidget::elastixChangedSlot()
 
 void ElastixWidget::registerSlot()
 {
-	SSC_LOG("register");
+//	SSC_LOG("register");
 	mElastixManager->execute();
 //  int lts_ratio = mLTSRatioSpinBox->value();
 //  double stop_delta = 0.001; //TODO, add user interface
