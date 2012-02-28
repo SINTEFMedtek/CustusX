@@ -38,12 +38,8 @@ namespace cx
  * \ref http://elastix.isi.uu.nl .
  *
  * Call the run method to execute an elastiX registration,
+ * wait for the signal finished(),
  * then get the results using the getters.
- *
- * The class is single-threaded. Wrap it in a threader,
- * because it might use a lot of time!
- *
- * \todo Add feedback from the command line.
  *
  *
  * \date Feb 4, 2012
@@ -74,6 +70,10 @@ private slots:
 	void processReadyRead();
 
 private:
+	QString writeInitTransformToElastixfile(ssc::ImagePtr fixed, ssc::ImagePtr moving, QString outdir);
+	QString writeInitTransformToCalfile(ssc::ImagePtr fixed, ssc::ImagePtr moving, QString outdir);
+	QString findMostRecentTransformOutputFile() const;
+
 	QString mLastOutdir;
 	QProcess* mProcess;
 };
