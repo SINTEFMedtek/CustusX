@@ -193,6 +193,15 @@ endif(APPLE)
 # Bundle utilities
 #--------------------------------------------------------------------------------
 
+# Find the library path of OpenCL - for use with fixup_bundle()
+find_package( OpenCL QUIET)
+#message(STATUS OPENCL_FOUND: ${OPENCL_FOUND})
+#message(STATUS OPENCL_INCLUDE_DIRS: ${OPENCL_INCLUDE_DIRS})
+#message(STATUS OPENCL_LIBRARIES: ${OPENCL_LIBRARIES})
+get_filename_component(OPENCL_LIBRARY_DIRS ${OPENCL_LIBRARIES} PATH)
+#message(STATUS cx: OPENCL_LIBRARY_DIRS: ${OPENCL_LIBRARY_DIRS})
+
+
 # Install dependencies on Linux
 if (CX_LINUX)
   set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/CustusX")
@@ -203,6 +212,7 @@ if (CX_LINUX)
       ${SSC_INCLUDE_DIRS} 
       ${VTK_LIBRARY_DIRS}
       ${OpenCV_LIB_DIR}
+      ${OPENCL_LIBRARY_DIRS}
       ${IGSTK_LIBRARY_DIRS}
       ${OpenIGTLink_LIBRARY_DIRS}
       ${ITK_DIR}/lib
