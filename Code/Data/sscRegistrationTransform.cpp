@@ -129,7 +129,7 @@ void RegistrationTransform::addXml(QDomNode& parentNode) const ///< write intern
 	if (!mFixed.isEmpty())
 		base.setAttribute("fixed", mFixed);
 	if (!mMoving.isEmpty())
-		base.setAttribute("moving", mFixed);
+		base.setAttribute("moving", mMoving);
 
 	base.appendChild(doc.createTextNode("\n" + qstring_cast(mValue)));
 }
@@ -296,7 +296,9 @@ void RegistrationHistory::updateRegistration(const QDateTime& oldTime, const Reg
 {
 	for (std::vector<RegistrationTransform>::iterator iter = mData.begin(); iter != mData.end(); ++iter)
 	{
-		if ((iter->mTimestamp == oldTime) && oldTime.isValid())
+		if ((iter->mTimestamp == oldTime)
+			&& oldTime.isValid()
+			&& (iter->mType == newTransform.mType))
 		{
 			mData.erase(iter);
 			break;
