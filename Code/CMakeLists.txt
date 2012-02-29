@@ -469,7 +469,7 @@ QT4_ADD_RESOURCES( GENERATED_RESOURCES ${SSC_QT_RESOURCE_FILES} )
 FIND_PATH(SSC_DATA_ROOT sscData.readme 
   ${SSC_SOURCE_DIR}/Data
   $ENV{SSC_DATA_ROOT})
-  message(status ${SSC_DATA_ROOT} "  --" ${SSC_SOURCE_DIR})
+ #message(status ${SSC_DATA_ROOT} "  --" ${SSC_SOURCE_DIR})
   
 #set(SSC_THUNDER_KERNEL_PATH ${SSC_SOURCE_DIR}/../../source/UsReconstruction/Thunder)
 
@@ -525,11 +525,11 @@ export_library_dependencies (${SSC_BINARY_DIR}/SSCLibraryDepends.cmake)
 
 
 # =========================================================
-if(APPLE)
-    # do nothing
-else(APPLE)
+# quick fix for removing install from CustusX (which uses fixup_bundle())
+if (NOT CustusX3_SOURCE_DIR)
+    # install lib into lib64 folder
     install( TARGETS SSC DESTINATION lib64 )
-endif(APPLE)
+endif ()
 # =========================================================
 
 SET_TARGET_PROPERTIES( SSC PROPERTIES COMPILE_FLAGS "${SNW_COMPILE_FLAGS}" LINK_FLAGS "${SNW_LINK_FLAGS}" LINK_LIBS "${SNW_LINK_LIBS}")

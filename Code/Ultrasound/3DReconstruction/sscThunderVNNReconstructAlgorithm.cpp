@@ -27,10 +27,10 @@
 #include <QFileInfo>
 #include <vtkImageData.h>
 #include "recConfig.h"
-#ifdef USE_US_RECONSTRUCTION_THUNDER
+#ifdef SSC_USE_OpenCL
 #include "reconstruct_vnn.h"
 #include "utils.h"
-#endif // USE_US_RECONSTRUCTION_THUNDER
+#endif // SSC_USE_OpenCL
 #include "sscImage.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
@@ -51,7 +51,7 @@ std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElem
 {
 	std::vector<DataAdapterPtr> retval;
 
-#ifdef USE_US_RECONSTRUCTION_THUNDER
+#ifdef SSC_USE_OpenCL
 	QStringList processors;
 	if (ocl_has_device_type("CPU"))
 		processors << "CPU";
@@ -79,7 +79,7 @@ bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 	USFrameDataPtr frameData, ImagePtr outputData, ImagePtr frameMask, QDomElement settings)
 {
 	bool success = false;
-#ifdef USE_US_RECONSTRUCTION_THUNDER
+#ifdef SSC_USE_OpenCL
 	std::cout << "processor: " << mProcessorOption->getValue() << std::endl;
 	std::cout << "distance: " << mDistanceOption->getValue() << std::endl;
 
@@ -150,7 +150,7 @@ bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 	success = reconstruct_vnn(&data, path.absoluteFilePath().toStdString().c_str(), mProcessorOption->getValue(),
 		static_cast<float> (mDistanceOption->getValue()));
 	//ssc::messageManager()->sendInfo("ThunderVNNReconstructAlgorithm::reconstruct ***success***");
-#endif // USE_US_RECONSTRUCTION_THUNDER
+#endif // SSC_USE_OpenCL
 	return success;
 }
 
