@@ -214,7 +214,7 @@ endif (CX_LINUX)
 # Windows
 #----------
 if (CX_WINDOWS)
-	set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/${ExecutableName}")
+	set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/${ExecutableName}.exe")
 	set(LIBS
 			)
 	set(DIRS 
@@ -230,7 +230,9 @@ if (CX_WINDOWS)
 				${OpenCV_LIB_DIR}
 				)
 	endif()
-				 
+	#message (status"APPS: "${APPS})
+	#message (status"LIBS: "${LIBS})
+	#message (status"DIRS: "${DIRS})
 	install(CODE "
 		 include(BundleUtilities)
 		 fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
