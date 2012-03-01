@@ -891,6 +891,8 @@ ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, 
   retval->setImageType(parentImage->getImageType());
   retval->setShading(parentImage->getShading());
 
+  retval->setAcquisitionTime(QDateTime::currentDateTime());
+
 	return retval;
 }
 
