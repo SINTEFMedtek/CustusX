@@ -59,6 +59,8 @@ private slots:
 	void executionFinishedSlot();
 
 private:
+	void addNonlinearData();
+
 	RegistrationManagerPtr mRegistrationManager;
 	QString mActiveExecutable;
 	QString mActiveParameterFile;
