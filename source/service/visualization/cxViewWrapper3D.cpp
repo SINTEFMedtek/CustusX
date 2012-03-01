@@ -69,63 +69,58 @@
 namespace cx
 {
 
-ssc::AxesRepPtr ToolAxisConnector::getAxis_t()
+AxisConnector::AxisConnector(ssc::CoordinateSystem space)
 {
-	return mAxis_t;
+	mListener.reset(new CoordinateSystemListener(space));
+	connect(mListener.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
+
+	mRep = ssc::AxesRep::New(space.toString() + "_axis");
+	mRep->setCaption(space.toString(), ssc::Vector3D(1, 0, 0));
+	mRep->setShowAxesLabels(false);
+	mRep->setFontSize(0.08);
+	mRep->setAxisLength(0.03);
+	this->changedSlot();
 }
 
-ssc::AxesRepPtr ToolAxisConnector::getAxis_s()
+void AxisConnector::mergeWith(CoordinateSystemListenerPtr base)
 {
-	return mAxis_s;
+	mBase = base;
+	connect(mBase.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
+	this->changedSlot();
 }
 
-ToolAxisConnector::ToolAxisConnector(ssc::ToolPtr tool)
+void AxisConnector::connectTo(ssc::ToolPtr tool)
 {
 	mTool = tool;
-	mAxis_s = ssc::AxesRep::New(tool->getUid() + "_axis_s");
-	mAxis_t = ssc::AxesRep::New(tool->getUid() + "_axis_t");
-
-	mAxis_t->setAxisLength(0.08);
-	mAxis_t->setShowAxesLabels(false);
-	//mAxis_t->setCaption(tool->getName()+"_t", ssc::Vector3D(1,1,0.7));
-	mAxis_t->setCaption("t", ssc::Vector3D(0.7, 1, 0.7));
-	mAxis_t->setFontSize(0.03);
-
-	mAxis_s->setAxisLength(0.05);
-	mAxis_s->setShowAxesLabels(false);
-	mAxis_s->setCaption("s", ssc::Vector3D(1, 1, 0));
-	mAxis_s->setFontSize(0.03);
-
-	connect(ssc::toolManager(), SIGNAL(rMprChanged()), this, SLOT(transformChangedSlot()));
-	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(transformChangedSlot()));
-	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(visibleSlot()));
-	visibleSlot();
-	transformChangedSlot();
+	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(changedSlot()));
+	this->changedSlot();
 }
 
-void ToolAxisConnector::transformChangedSlot()
+void AxisConnector::changedSlot()
 {
-	ssc::Transform3D rMt = *ssc::toolManager()->get_rMpr() * mTool->get_prMt();
-	ssc::Transform3D sMt = mTool->getCalibration_sMt();
-	mAxis_t->setTransform(rMt);
-	mAxis_s->setTransform(rMt * sMt.inv());
-}
+	ssc::Transform3D  rMs = ssc::SpaceHelpers::get_toMfrom(mListener->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+	mRep->setTransform(rMs);
 
-void ToolAxisConnector::visibleSlot()
-{
-	mAxis_t->setVisible(mTool->getVisible());
-	mAxis_s->setVisible(mTool->getVisible());
-	if (ssc::similar(mTool->getCalibration_sMt(), ssc::Transform3D::Identity()))
+	mRep->setVisible(true);
+
+	// if connected to tool: check visibility
+	if (mTool)
+		mRep->setVisible(mTool->getVisible());
+
+	// Dont show if equal to base
+	if (mBase)
 	{
-		mAxis_s->setVisible(false);
+		ssc::Transform3D rMb = ssc::SpaceHelpers::get_toMfrom(mBase->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+		if (ssc::similar(rMb, rMs))
+			mRep->setVisible(false);
 	}
+
 }
 
-///--------------------------------------------------------
-///--------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
-///--------------------------------------------------------
-///--------------------------------------------------------
 
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 {
@@ -133,24 +128,15 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 	mView = view;
 	this->connectContextMenu(mView);
 	QString index = QString::number(startIndex);
-//  connect(ssc::dataManager(), SIGNAL(centerChanged()), this, SLOT(centerChangedSlot()));
 	QColor background = settings()->value("backgroundColor").value<QColor>();
 	mView->setBackgoundColor(background);
 
 	view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
-//  mSliceProxy = ssc::SliceProxy::New("sliceproxy_("+ mView->getName() +")");
-//  mSliceProxy->initializeFromPlane(ssc::ptAXIAL, false, ssc::Vector3D(0,0,1), true, 150, 0.25);
-
 	mLandmarkRep = LandmarkRep::New("LandmarkRep_" + index);
 	mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 	mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
-//  std::cout << this << " created new LandmarkRep " << mLandmarkRep.get() << std::endl;
-
-//  mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
-//  mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-//  mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 
 	mPickerRep = ssc::PickerRep::New("PickerRep_" + index, "PickerRep_" + index);
 
@@ -422,59 +408,65 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 
 	mShowAxes = checked;
 
+	// clear all
+	for (unsigned i=0; i<mAxis.size(); ++i)
+		mView->removeRep(mAxis[i]->mRep);
+	mAxis.clear();
+
+	// show all
 	if (mShowAxes)
 	{
-		if (!mRefSpaceAxisRep)
-		{
-			mRefSpaceAxisRep = ssc::AxesRep::New("refspace_axis");
-			mRefSpaceAxisRep->setCaption("ref", ssc::Vector3D(1, 0, 0));
-			mRefSpaceAxisRep->setFontSize(0.03);
-			mRefSpaceAxisRep->setAxisLength(0.12);
+		AxisConnectorPtr axis;
 
-			mView->addRep(mRefSpaceAxisRep);
-		}
+		// reference space
+		axis.reset(new AxisConnector(ssc::CoordinateSystem(ssc::csREF)));
+		axis->mRep->setAxisLength(0.12);
+		axis->mRep->setShowAxesLabels(true);
+		axis->mRep->setCaption("ref", ssc::Vector3D(1, 0, 0));
+		axis->mRep->setFontSize(0.03);
+		mAxis.push_back(axis);
 
+		// data spaces
 		std::vector<ssc::DataPtr> data = mViewGroup->getData();
 		for (unsigned i = 0; i < data.size(); ++i)
 		{
-			ssc::AxesRepPtr rep = ssc::AxesRep::New(data[i]->getName() + "_axis");
-			rep->setCaption(data[i]->getName(), ssc::Vector3D(1, 0, 0));
-			rep->setFontSize(0.03);
-			rep->setAxisLength(0.08);
-			rep->setTransform(data[i]->get_rMd());
-			mDataSpaceAxisRep[data[i]->getUid()] = rep;
-			mView->addRep(rep);
+			axis.reset(new AxisConnector(ssc::CoordinateSystem(ssc::csDATA, data[i]->getUid())));
+			axis->mRep->setAxisLength(0.08);
+			axis->mRep->setShowAxesLabels(false);
+			axis->mRep->setCaption(data[i]->getName(), ssc::Vector3D(1, 0, 0));
+			axis->mRep->setFontSize(0.03);
+			mAxis.push_back(axis);
 		}
 
+		// tool spaces
 		ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
 		ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
 		for (iter = tools->begin(); iter != tools->end(); ++iter)
 		{
-			mToolAxis[iter->first].reset(new ToolAxisConnector(iter->second));
-			mToolAxis[iter->first].reset(new ToolAxisConnector(iter->second));
-			mView->addRep(mToolAxis[iter->first]->getAxis_t());
-			mView->addRep(mToolAxis[iter->first]->getAxis_s());
-		}
-	}
-	else
-	{
-		mView->removeRep(mRefSpaceAxisRep);
-		mRefSpaceAxisRep.reset();
+			ssc::ToolPtr tool = iter->second;
 
-		for (std::map<QString, ssc::AxesRepPtr>::iterator iter = mDataSpaceAxisRep.begin();
-						iter != mDataSpaceAxisRep.end(); ++iter)
-		{
-			mView->removeRep(iter->second);
-		}
-		mDataSpaceAxisRep.clear();
+			axis.reset(new AxisConnector(ssc::CoordinateSystem(ssc::csTOOL, tool->getUid())));
+			axis->mRep->setAxisLength(0.08);
+			axis->mRep->setShowAxesLabels(false);
+			axis->mRep->setCaption("t", ssc::Vector3D(0.7, 1, 0.7));
+			axis->mRep->setFontSize(0.03);
+			axis->connectTo(tool);
+			CoordinateSystemListenerPtr mToolListener = axis->mListener;
 
-		std::map<QString, ToolAxisConnectorPtr>::iterator iter;
-		for (iter = mToolAxis.begin(); iter != mToolAxis.end(); ++iter)
-		{
-			mView->removeRep(iter->second->getAxis_t());
-			mView->removeRep(iter->second->getAxis_s());
+			mAxis.push_back(axis);
+
+			axis.reset(new AxisConnector(ssc::CoordinateSystem(ssc::csSENSOR, tool->getUid())));
+			axis->mRep->setAxisLength(0.05);
+			axis->mRep->setShowAxesLabels(false);
+			axis->mRep->setCaption("s", ssc::Vector3D(1, 1, 0));
+			axis->mRep->setFontSize(0.03);
+			axis->connectTo(tool);
+			axis->mergeWith(mToolListener);
+			mAxis.push_back(axis);
 		}
-		mToolAxis.clear();
+
+		for (unsigned i=0; i<mAxis.size(); ++i)
+			mView->addRep(mAxis[i]->mRep);
 	}
 }
 
