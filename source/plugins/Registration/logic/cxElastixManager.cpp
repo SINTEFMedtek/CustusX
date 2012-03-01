@@ -23,6 +23,7 @@
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxSettings.h"
+#include "sscDataManagerImpl.h"
 
 namespace cx
 {
@@ -118,7 +119,43 @@ void ElastixManager::executionFinishedSlot()
 
 //	mRegistrationManager->applyImage2ImageRegistration(mMf.inv(), desc);
 	mRegistrationManager->applyImage2ImageRegistration(delta_pre_rMd, desc);
+
+	// add nonlinear data AFTER registering - we dont want these data to be double-registered!
+	this->addNonlinearData();
 }
 
+/**If the registration is nonlinear, add the (last) volume
+ * to CustusX.
+ *
+ */
+void ElastixManager::addNonlinearData()
+{
+	bool ok = true;
+	QString nonlinearVolumeFilename = mExecuter->getNonlinearResultVolume(&ok);
+
+	if (!ok)
+		return;
+
+	ssc::ImagePtr movingImage = boost::shared_dynamic_cast<ssc::Image>(mRegistrationManager->getMovingData());
+	ssc::ImagePtr raw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
+
+	QString uid = movingImage->getUid() + "_nl%1";
+	QString name = movingImage->getName()+" nl%1";
+	ssc::ImagePtr nlVolume = ssc::dataManager()->createDerivedImage(raw->getBaseVtkImageData(), uid, name, movingImage);
+
+	if (!nlVolume)
+	{
+		ssc::messageManager()->sendInfo(QString("Failed to import nonlinear volume %1").arg(nonlinearVolumeFilename));
+		return;
+	}
+
+	// volume is resampled into the space of the fixed data:
+	nlVolume->get_rMd_History()->setRegistration(mRegistrationManager->getFixedData()->get_rMd());
+
+	ssc::dataManager()->loadData(nlVolume);
+	ssc::dataManager()->saveImage(nlVolume, patientService()->getPatientData()->getActivePatientFolder());
+
+	ssc::messageManager()->sendInfo(QString("Added volume %1, created by a nonlinear transform").arg(nlVolume->getName()));
+}
 
 } /* namespace cx */
