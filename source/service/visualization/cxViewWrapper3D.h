@@ -31,6 +31,7 @@
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
 #include "sscVector3D.h"
+#include "cxPointMetric.h"
 class QAction;
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
@@ -58,23 +59,26 @@ enum STEREOTYPE
 	stFRAME_SEQUENTIAL, stINTERLACED, stDRESDEN, stRED_BLUE
 };
 
-class ToolAxisConnector: public QObject
+
+/**\brief Ac-hoc class for connecting axis reps to coord spaces.
+ */
+class AxisConnector : public QObject
 {
-Q_OBJECT
-public:
-	explicit ToolAxisConnector(ssc::ToolPtr tool);
-	ssc::AxesRepPtr getAxis_t();
-	ssc::AxesRepPtr getAxis_s();
-
-private slots:
-	void transformChangedSlot();
-	void visibleSlot();
-private:
-	ssc::ToolPtr mTool;
-
-	ssc::AxesRepPtr mAxis_t; ///< axis of the tool space
-	ssc::AxesRepPtr mAxis_s; /// axis of the tool sensor space
+	Q_OBJECT
+	public:
+		AxisConnector(ssc::CoordinateSystem space);
+		void connectTo(ssc::ToolPtr tool);
+		void mergeWith(CoordinateSystemListenerPtr base);
+		ssc::AxesRepPtr mRep; ///< axis
+		CoordinateSystemListenerPtr mListener;
+	private slots:
+		void changedSlot();
+	private:
+		CoordinateSystemListenerPtr mBase;
+		ssc::ToolPtr mTool;
 };
+typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
+
 
 /** Wrapper for a View3D.
  *  Handles the connections between specific reps and the view.
@@ -135,13 +139,10 @@ private:
 	ssc::PickerRepPtr mPickerRep;
 	ssc::DisplayTextRepPtr mPlaneTypeText;
 	ssc::DisplayTextRepPtr mDataNameText;
-	std::map<QString, ToolAxisConnectorPtr> mToolAxis;
-	ssc::AxesRepPtr mRefSpaceAxisRep;
-	std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
 	QString mShowSlicesMode;
+	std::vector<AxisConnectorPtr> mAxis;
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space
-//  ssc::SliceProxyPtr mSliceProxy;
 	ssc::Slices3DRepPtr mSlices3DRep;
 	ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
 	ssc::OrientationAnnotation3DRepPtr mAnnotationMarker;
