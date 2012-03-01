@@ -23,7 +23,7 @@ SET( MOC_HEADER_FILES
     cxPlateRegistrationWidget.h
     cxSeansVesselRegistrationWidget.h
     cxRegisterI2IWidget.h
-    #cxRegistrationMethodsWidget.h
+    cxRegistrationMethodsWidget.h
     cxRegistrationDataAdapters.h
     cxElastixWidget.h
     cxElastixSyntaxHighlighter.h
