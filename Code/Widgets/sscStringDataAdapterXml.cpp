@@ -75,16 +75,20 @@ bool StringDataAdapterXml::setValue(const QString& val)
 
 	mValue = val;
 	mStore.writeValue(val);
-	emit
-	valueWasSet();
-	emit
-	changed();
+	emit valueWasSet();
+	emit changed();
 	return true;
 }
 
 QStringList StringDataAdapterXml::getValueRange() const
 {
 	return mRange;
+}
+
+void StringDataAdapterXml::setValueRange(QStringList range)
+{
+	mRange = range;
+	emit changed();
 }
 
 /**If a mapping from internal name to display name has been set, use it.
