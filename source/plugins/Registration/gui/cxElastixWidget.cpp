@@ -41,12 +41,9 @@ namespace cx
 ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent) :
 				RegistrationBaseWidget(regManager, parent, "ElastiXWidget", "ElastiX Registration"), mLTSRatioSpinBox(
 								new QSpinBox()), mLinearCheckBox(new QCheckBox()), mRegisterButton(
-								new QPushButton("Register")),
-								mFilePreviewWidget(new FilePreviewWidget(this))
+								new QPushButton("Register"))
 {
 	mElastixManager.reset(new ElastixManager(regManager));
-
-	mFilePreviewWidget->setSyntaxHighLighter<ElastixSyntaxHighlighter>();
 
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
@@ -54,6 +51,13 @@ ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent)
 	QGridLayout* layout = new QGridLayout();
 	topLayout->addLayout(layout);
 //	topLayout->addStretch();
+
+	QPushButton* optionsButton = new QPushButton("Details", this);
+	optionsButton->setCheckable(true);
+
+	QGroupBox* optionsWidget = this->createGroupbox(this->createOptionsWidget(), "Details");
+	connect(optionsButton, SIGNAL(clicked(bool)), optionsWidget, SLOT(setVisible(bool)));
+	optionsWidget->setVisible(optionsButton->isChecked());
 
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
@@ -65,35 +69,52 @@ ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent)
 
 	layout->addLayout(entryLayout, 0, 0, 2, 2);
 	layout->addWidget(mRegisterButton, 2, 0);
+	layout->addWidget(optionsButton, 3, 0);
+	layout->addWidget(optionsWidget, 4, 0);
 
-	layout->addWidget(new QLabel("Parameter File", this), 4, 0);
-	mParameterFileWidget = new ssc::FileSelectWidget(this);
-	connect(mParameterFileWidget, SIGNAL(fileSelected(QString)), this, SLOT(userParameterFileSelected(QString)));
-	connect(mElastixManager.get(), SIGNAL(elastixChanged()), this, SLOT(elastixChangedSlot()));
-	layout->addWidget(mParameterFileWidget, 4, 1, 1, 2);
-
-
-	layout->addWidget(new QLabel("Executable", this), 5, 0);
-	mExecutableEdit = new QLineEdit(this);
-	connect(mExecutableEdit, SIGNAL(editingFinished()), this, SLOT(executableEditFinishedSlot()));
-	layout->addWidget(mExecutableEdit, 5, 1);
-
-	QAction* browseExecutableAction = new QAction(QIcon(":/icons/open.png"), "Browse", this);
-	browseExecutableAction->setStatusTip("Select the elastiX executable");
-	connect(browseExecutableAction, SIGNAL(triggered()), this, SLOT(browseExecutableSlot()));
-	QToolButton* button = new QToolButton();
-	button->setDefaultAction(browseExecutableAction);
-	layout->addWidget(button, 5, 2);
-
-	layout->addWidget(new ssc::CheckBoxWidget(this, mElastixManager->getDisplayProcessMessages()), 6, 0, 1, 3);
-
-	layout->addWidget(mFilePreviewWidget, 7, 0, 1, 3);
 
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
 	mTimedAlgorithmProgressBar->attach(mElastixManager->getExecuter());
 	layout->addWidget(mTimedAlgorithmProgressBar);
 
 	this->elastixChangedSlot();
+}
+
+QWidget* ElastixWidget::createOptionsWidget()
+{
+	QWidget* retval = new QWidget(this);
+	QGridLayout* layout = new QGridLayout(retval);
+
+	int line = 0;
+	layout->addWidget(new QLabel("Parameter File", this), line, 0);
+	mParameterFileWidget = new ssc::FileSelectWidget(this);
+	connect(mParameterFileWidget, SIGNAL(fileSelected(QString)), this, SLOT(userParameterFileSelected(QString)));
+	connect(mElastixManager.get(), SIGNAL(elastixChanged()), this, SLOT(elastixChangedSlot()));
+	layout->addWidget(mParameterFileWidget, line, 1, 1, 2);
+	++line;
+
+	layout->addWidget(new QLabel("Executable", this), line, 0);
+	mExecutableEdit = new QLineEdit(this);
+	connect(mExecutableEdit, SIGNAL(editingFinished()), this, SLOT(executableEditFinishedSlot()));
+	layout->addWidget(mExecutableEdit, line, 1);
+
+	QAction* browseExecutableAction = new QAction(QIcon(":/icons/open.png"), "Browse", this);
+	browseExecutableAction->setStatusTip("Select the elastiX executable");
+	connect(browseExecutableAction, SIGNAL(triggered()), this, SLOT(browseExecutableSlot()));
+	QToolButton* button = new QToolButton();
+	button->setDefaultAction(browseExecutableAction);
+	layout->addWidget(button, line, 2);
+	++line;
+
+	layout->addWidget(new ssc::CheckBoxWidget(this, mElastixManager->getDisplayProcessMessages()), line, 0, 1, 3);
+	++line;
+
+	mFilePreviewWidget = new FilePreviewWidget(this);
+	mFilePreviewWidget->setSyntaxHighLighter<ElastixSyntaxHighlighter>();
+	layout->addWidget(mFilePreviewWidget, line, 0, 1, 3);
+	++line;
+
+	return retval;
 }
 
 ElastixWidget::~ElastixWidget()
