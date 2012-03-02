@@ -37,6 +37,7 @@ FileSelectWidget::FileSelectWidget(QWidget* parent)
 	mNameFilters << "*.mhd";
 
 	QHBoxLayout* dataLayout = new QHBoxLayout(this);
+	dataLayout->setMargin(0);
 	mDataComboBox = new QComboBox(this);
 	connect(mDataComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentDataComboIndexChanged(int)));
 
