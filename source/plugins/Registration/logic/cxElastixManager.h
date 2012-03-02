@@ -19,6 +19,7 @@
 #include "sscXmlOptionItem.h"
 #include "cxRegistrationManager.h"
 #include "sscBoolDataAdapterXml.h"
+#include "sscStringDataAdapterXml.h"
 
 namespace cx
 {
@@ -44,8 +45,14 @@ public:
 	ElastixManager(RegistrationManagerPtr regManager);
 	virtual ~ElastixManager();
 
-	void setActiveParameterFile(QString filename);
-	QString getActiveParameterFile() const;
+	ssc::StringDataAdapterPtr getCurrentPreset();
+	void removeCurrentPreset();
+	void saveCurrentPreset(QString newName);
+
+	void setActiveParameterFile0(QString filename);
+	QString getActiveParameterFile0() const;
+	void setActiveParameterFile1(QString filename);
+	QString getActiveParameterFile1() const;
 	void setActiveExecutable(QString filename);
 	QString getActiveExecutable() const;
 	ssc::BoolDataAdapterXmlPtr getDisplayProcessMessages() { return mDisplayProcessMessages; }
@@ -57,13 +64,19 @@ signals:
 
 private slots:
 	void executionFinishedSlot();
+	void currentPresetChangedSlot();
 
 private:
+//	void loadCurrentPreset(QString name);
+	void reloadPresets();
 	void addNonlinearData();
+
+	ssc::StringDataAdapterXmlPtr mCurrentPreset;
 
 	RegistrationManagerPtr mRegistrationManager;
 	QString mActiveExecutable;
-	QString mActiveParameterFile;
+	QString mActiveParameterFile0;
+	QString mActiveParameterFile1;
 	ssc::XmlOptionFile mOptions;
 	ssc::BoolDataAdapterXmlPtr mDisplayProcessMessages;
 	ElastixExecuterPtr mExecuter;
