@@ -31,7 +31,7 @@ ProbeData::ProbeData() : mType(tNONE)
 
 ProbeData::ProbeData(TYPE type, double depthStart, double depthEnd, double width) :
 	mType(type), mDepthStart(depthStart), mDepthEnd(depthEnd), mWidth(width),
-  mTemporalCalibration(0)
+	mTemporalCalibration(0), mCenterOffset(0)
 {
 }
 
@@ -69,6 +69,7 @@ void ProbeData::addXml(QDomNode& dataNode) const
   elem.setAttribute("spacing", qstring_cast(mImage.mSpacing));
   elem.setAttribute("size", qstring_cast(mImage.mSize.width())+" "+qstring_cast(mImage.mSize.height()));
   elem.setAttribute("temporalCalibration", qstring_cast(mTemporalCalibration));
+  elem.setAttribute("centerOffset", qstring_cast(mCenterOffset));
 }
 
 }
