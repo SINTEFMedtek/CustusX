@@ -113,6 +113,7 @@ public:
 	double mDepthEnd; ///< end of sector, mm
 	double mWidth; ///< width of sector in radians (SECTOR) or millimeters (LINEAR).
 	double mTemporalCalibration;
+	double mCenterOffset; ///< Offset of center point for sectors, mm
 	ProbeImageData mImage;
 };
 
