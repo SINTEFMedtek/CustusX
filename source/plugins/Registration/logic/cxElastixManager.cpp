@@ -32,40 +32,118 @@ ElastixManager::ElastixManager(RegistrationManagerPtr regManager) : mRegistratio
 {
 	mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("elastix");
 
-//	bool showStdOut = settings()->value("elastix/showStdOut").toBool();
-	mDisplayProcessMessages = ssc::BoolDataAdapterXml::initialize("DisplayElastixProcessMessages",
+	mDisplayProcessMessages = ssc::BoolDataAdapterXml::initialize("displayProcessMessages",
 		"Show Messages",
 		"Display messages from the running registration process in CustusX",
 		false,
 		mOptions.getElement());
 
-	mActiveExecutable = mOptions.getElement().attribute("executable");
-	mActiveParameterFile = mOptions.getElement().attribute("parameterFile");
+	mCurrentPreset = ssc::StringDataAdapterXml::initialize("currentPreset", "Preset", "Current Elastix Preset", "Select Preset...", QStringList(), mOptions.getElement());
+	connect(mCurrentPreset.get(), SIGNAL(changed()), this, SLOT(currentPresetChangedSlot()));
+
 	mExecuter.reset(new ElastixExecuter());
 	connect(mExecuter.get(), SIGNAL(finished()), this, SLOT(executionFinishedSlot()));
+
+	this->currentPresetChangedSlot();
 }
+
+/**Called when the current preset changes. Save to settings and reload dependent values
+ *
+ */
+void ElastixManager::currentPresetChangedSlot()
+{
+	SSC_LOG("ElastixManager::currentPresetChangedSlot()");
+
+	this->reloadPresets();
+
+	QDir dir(cx::DataLocations::getRootConfigPath() + "/elastix");
+	ssc::XmlOptionFile node = mOptions.descend("preset", "name", mCurrentPreset->getValue());
+	mActiveExecutable = node.getElement().attribute("executable");
+	mActiveParameterFile0 = dir.filePath(node.getElement().attribute("parameterFile0"));
+	mActiveParameterFile1 = dir.filePath(node.getElement().attribute("parameterFile1"));
+	emit elastixChanged();
+}
+
+ssc::StringDataAdapterPtr ElastixManager::getCurrentPreset()
+{
+	return mCurrentPreset;
+}
+
+/**Remove the currently selected preset. Reload.
+ *
+ */
+void ElastixManager::removeCurrentPreset()
+{
+	ssc::XmlOptionFile node = mOptions.descend("preset", "name", mCurrentPreset->getValue());
+	node.deleteNode();
+	this->reloadPresets();
+	mCurrentPreset->setValue("Select Preset...");
+}
+
+/**Read presets anew and update the current.
+ *
+ */
+void ElastixManager::reloadPresets()
+{
+	SSC_LOG("ElastixManager::reloadPresets()");
+	QStringList presets;
+	presets << "Select Preset...";
+
+	QDomNodeList presetNodeList = mOptions.getElement().elementsByTagName("preset");
+	for (int i = 0; i < presetNodeList.count(); ++i)
+	{
+		presets << presetNodeList.item(i).toElement().attribute("name");
+	}
+	presets.removeDuplicates();
+
+	mCurrentPreset->blockSignals(true);
+	mCurrentPreset->setValueRange(presets);
+	mCurrentPreset->blockSignals(false);
+}
+
+
+void ElastixManager::saveCurrentPreset(QString name)
+{
+	ssc::XmlOptionFile node = mOptions.descend("preset", "name", name);
+	node.getElement().setAttribute("executable", mActiveExecutable);
+	node.getElement().setAttribute("parameterFile0", QFileInfo(mActiveParameterFile0).fileName());
+	node.getElement().setAttribute("parameterFile1", QFileInfo(mActiveParameterFile1).fileName());
+	mCurrentPreset->setValue(name);
+}
+
 
 ElastixManager::~ElastixManager()
 {
 }
 
-void ElastixManager::setActiveParameterFile(QString filename)
+void ElastixManager::setActiveParameterFile0(QString filename)
 {
-	mActiveParameterFile = filename;
+	mActiveParameterFile0 = filename;
 
-	mOptions.getElement().setAttribute("parameterFile", mActiveParameterFile);
+//	mOptions.getElement().setAttribute("parameterFile", mActiveParameterFile0);
 	emit elastixChanged();
 }
 
-QString ElastixManager::getActiveParameterFile() const
+QString ElastixManager::getActiveParameterFile0() const
 {
-	return mActiveParameterFile;
+	return mActiveParameterFile0;
+}
+
+void ElastixManager::setActiveParameterFile1(QString filename)
+{
+	mActiveParameterFile1 = filename;
+	emit elastixChanged();
+}
+
+QString ElastixManager::getActiveParameterFile1() const
+{
+	return mActiveParameterFile1;
 }
 
 void ElastixManager::setActiveExecutable(QString filename)
 {
 	mActiveExecutable = filename;
-	mOptions.getElement().setAttribute("executable", mActiveExecutable);
+//	mOptions.getElement().setAttribute("executable", mActiveExecutable);
 	emit elastixChanged();
 }
 
@@ -85,7 +163,7 @@ void ElastixManager::execute()
 	         mRegistrationManager->getFixedData(),
 	         mRegistrationManager->getMovingData(),
 	         outDir.absolutePath(),
-	         QStringList() << mActiveParameterFile);
+	         QStringList() << mActiveParameterFile0 << mActiveParameterFile1);
 
 }
 
@@ -101,7 +179,7 @@ void ElastixManager::executionFinishedSlot()
 
 	QString desc = QString("Image2Image [exe=%1][par=%2]")
 		.arg(QFileInfo(this->getActiveExecutable()).fileName())
-		.arg(QFileInfo(this->getActiveParameterFile()).fileName());
+		.arg(QFileInfo(this->getActiveParameterFile0()).fileName());
 
 	// Start with fMr * D * rMm = fMm'
 	// where the lhs is the existing data and the delta that is input to regmanager,

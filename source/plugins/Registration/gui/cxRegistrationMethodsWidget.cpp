@@ -178,12 +178,12 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   this->addTab(imageAndPlateRegistrationWidget, "Plate");
 
   connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChangedSlot(int)));
-  mTabWidget->setCurrentIndex(settings()->value("registrationTabIndex").toInt());
+  mTabWidget->setCurrentIndex(settings()->value("registration/tabIndex").toInt());
 }
 
 void RegistrationMethodsWidget::tabChangedSlot(int value)
 {
-	settings()->setValue("registrationTabIndex", value);
+	settings()->setValue("registration/tabIndex", value);
 }
 
 QString RegistrationMethodsWidget::defaultWhatsThis() const

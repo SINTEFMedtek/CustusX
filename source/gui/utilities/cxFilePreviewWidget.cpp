@@ -31,6 +31,7 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
   buttonLayout->addWidget(mSaveButton);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->setMargin(0);
   layout->addWidget(mTextEdit);
   layout->addLayout(buttonLayout);
 
