@@ -286,20 +286,20 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent, bool
 	mPresets = ssc::dataManager()->getPresetTransferFunctions3D();
 	QActionGroup* group = new QActionGroup(this);
 
-	QAction* resetAction = this->addAction(group,
-					"Reset all transfer function values to the defaults",
-					QIcon(":/icons/preset_reset.png"));
-	connect(resetAction, SIGNAL(triggered()), this, SLOT(resetSlot()));
+	this->createAction(group,
+	                QIcon(":/icons/preset_reset.png"),
+	                "Reset all transfer function values to the defaults", "",
+	                SLOT(resetSlot()));
 
-	QAction* deleteAction = this->addAction(group,
-					"Delete the current preset",
-					QIcon(":/icons/preset_remove.png"));
-	connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteSlot()));
+	this->createAction(group,
+	                QIcon(":/icons/preset_remove.png"),
+					"Delete the current preset", "",
+	                SLOT(deleteSlot()));
 
-	QAction* saveAction = this->addAction(group,
-					"Add the current setting as a preset",
-					QIcon(":/icons/preset_save.png"));
-	connect(saveAction, SIGNAL(triggered()), this, SLOT(saveSlot()));
+	this->createAction(group,
+		            QIcon(":/icons/preset_save.png"),
+					"Add the current setting as a preset", "",
+	                SLOT(saveSlot()));
 
 	QString toggleText = "Toggle between apply presets,\neither on %1\nor both 2D and 3D\ntransfer functions.";
 	if (is3D)
@@ -307,10 +307,12 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent, bool
 	else
 		toggleText = toggleText.arg("2D");
 
-	mToggleAction = this->addAction(group,
-					toggleText,
-					QIcon(":/icons/preset_2D_and_3D.png"));
-	connect(mToggleAction, SIGNAL(triggered()), this, SLOT(toggleSlot()));
+	mToggleAction = this->createAction(group,
+	                QIcon(":/icons/preset_2D_and_3D.png"),
+					toggleText, "",
+					SLOT(toggleSlot())
+					);
+//	connect(mToggleAction, SIGNAL(triggered()), this, SLOT(toggleSlot()));
 	mApplyToAll = settings()->value("applyTransferFunctionPresetsToAll").toBool();
 	this->updateToggles();
 
@@ -374,15 +376,15 @@ void TransferFunctionPresetWidget::updateToggles()
 	}
 }
 
-QAction* TransferFunctionPresetWidget::addAction(QActionGroup* group, QString text, QIcon icon) const
-{
-	QAction* action = new QAction(text, group);
-	action->setStatusTip(text);
-	action->setWhatsThis(text);
-	action->setToolTip(text);
-	action->setIcon(icon);
-	return action;
-}
+//QAction* TransferFunctionPresetWidget::addAction(QActionGroup* group, QString text, QIcon icon) const
+//{
+//	QAction* action = new QAction(text, group);
+//	action->setStatusTip(text);
+//	action->setWhatsThis(text);
+//	action->setToolTip(text);
+//	action->setIcon(icon);
+//	return action;
+//}
 
 
 QString TransferFunctionPresetWidget::defaultWhatsThis() const
