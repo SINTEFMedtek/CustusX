@@ -61,8 +61,8 @@ private slots:
 	void executableEditFinishedSlot();
 
 private:
-	QSpinBox* mLTSRatioSpinBox;
-	QCheckBox* mLinearCheckBox;
+	QWidget* createOptionsWidget();
+
 	QPushButton* mRegisterButton;
 	ElastixManagerPtr mElastixManager;
 
