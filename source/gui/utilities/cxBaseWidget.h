@@ -7,6 +7,8 @@
 #include <QVBoxLayout>
 #include <QCheckBox>
 #include <QLabel>
+#include <QToolButton>
+#include <QAction>
 
 namespace cx
 {
@@ -77,6 +79,29 @@ public:
 		retval->setFrameStyle(QFrame::Sunken + QFrame::HLine);
 		retval->setFixedHeight(12);
 		return retval;
+	}
+
+	/**Shorthand method for action creation.
+	 * If layout is used, a QToolButton is created and added to it.
+	 * If tip is empty, it is set equal to text.
+	 */
+	template<class T>
+	QAction* createAction(QObject* parent, QIcon iconName, QString text, QString tip, T slot, QLayout* layout=NULL)
+	{
+		if (tip.isEmpty())
+			tip = text;
+	  QAction* action = new QAction(iconName, text, parent);
+	  action->setStatusTip(tip);
+	  action->setWhatsThis(tip);
+	  action->setToolTip(tip);
+	  connect(action, SIGNAL(triggered()), this, slot);
+	  if (layout)
+	  {
+		  QToolButton* button = new QToolButton();
+		  button->setDefaultAction(action);
+		  layout->addWidget(button);
+	  }
+	  return action;
 	}
 
 public slots:
