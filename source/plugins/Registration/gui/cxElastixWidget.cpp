@@ -34,26 +34,26 @@
 #include "cxSettings.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxElastixExecuter.h"
+#include "sscStringDataAdapterXml.h"
 
 namespace cx
 {
 
 ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-				RegistrationBaseWidget(regManager, parent, "ElastiXWidget", "ElastiX Registration"), mLTSRatioSpinBox(
-								new QSpinBox()), mLinearCheckBox(new QCheckBox()), mRegisterButton(
-								new QPushButton("Register")),
-								mFilePreviewWidget(new FilePreviewWidget(this))
+				RegistrationBaseWidget(regManager, parent, "ElastiXWidget", "ElastiX Registration")
 {
 	mElastixManager.reset(new ElastixManager(regManager));
 
-	mFilePreviewWidget->setSyntaxHighLighter<ElastixSyntaxHighlighter>();
-
+	mRegisterButton = new QPushButton("Register");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
-	QGridLayout* layout = new QGridLayout();
-	topLayout->addLayout(layout);
-//	topLayout->addStretch();
+
+	mOptionsWidget = this->createOptionsWidget();
+	mOptionsWidget->setVisible(settings()->value("registration/elastixShowDetails").toBool());
+
+	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+	mTimedAlgorithmProgressBar->attach(mElastixManager->getExecuter());
 
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
@@ -63,37 +63,93 @@ ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent)
 	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
 	new ssc::LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
-	layout->addLayout(entryLayout, 0, 0, 2, 2);
-	layout->addWidget(mRegisterButton, 2, 0);
+//	ssc::StringDataAdapterXmlPtr mSettings;
+//	mSettings = ssc::StringDataAdapterXml::initialize("elastixSettings", "Setting", "Current Elastix Settings", "mysettings", QStringList(), QDomNode());
+	new ssc::LabeledComboBoxWidget(this, mElastixManager->getCurrentPreset(), entryLayout, 2);
 
-	layout->addWidget(new QLabel("Parameter File", this), 4, 0);
-	mParameterFileWidget = new ssc::FileSelectWidget(this);
-	connect(mParameterFileWidget, SIGNAL(fileSelected(QString)), this, SLOT(userParameterFileSelected(QString)));
+	QHBoxLayout* buttonsLayout = new QHBoxLayout;
+	buttonsLayout->addWidget(mRegisterButton);
+
+	this->createAction(this,
+	      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+	      "Details", "Show Elastix Settings Details",
+	      SLOT(toggleDetailsSlot()),
+	      buttonsLayout);
+
+	topLayout->addLayout(entryLayout);
+	topLayout->addLayout(buttonsLayout);
+//	topLayout->addSpacing(topLayout->spacing()*2);
+//	topLayout->addWidget(this->createHorizontalLine());
+	topLayout->addWidget(mOptionsWidget, 1);
+	topLayout->addStretch();
+	topLayout->addWidget(mTimedAlgorithmProgressBar);
+
+	this->elastixChangedSlot();
+}
+
+void ElastixWidget::toggleDetailsSlot()
+{
+  mOptionsWidget->setVisible(!mOptionsWidget->isVisible());
+  settings()->setValue("registration/elastixShowDetails", mOptionsWidget->isVisible());
+}
+
+QWidget* ElastixWidget::createOptionsWidget()
+{
+	QWidget* retval = new QWidget(this);
+	QGridLayout* layout = new QGridLayout(retval);
+	layout->setMargin(0);
+
+	int line = 0;
+
+	layout->addWidget(this->createHorizontalLine(), line, 0, 1, 3);
+	++line;
+
+	layout->addWidget(new QLabel("Parameter File", this), line, 0);
+	mParameterFileWidget0 = new ssc::FileSelectWidget(this);
+	connect(mParameterFileWidget0, SIGNAL(fileSelected(QString)), this, SLOT(userParameterFileSelected(QString)));
 	connect(mElastixManager.get(), SIGNAL(elastixChanged()), this, SLOT(elastixChangedSlot()));
-	layout->addWidget(mParameterFileWidget, 4, 1, 1, 2);
+	layout->addWidget(mParameterFileWidget0, line, 1, 1, 2);
+	++line;
 
-
-	layout->addWidget(new QLabel("Executable", this), 5, 0);
+	layout->addWidget(new QLabel("Executable", this), line, 0);
 	mExecutableEdit = new QLineEdit(this);
 	connect(mExecutableEdit, SIGNAL(editingFinished()), this, SLOT(executableEditFinishedSlot()));
-	layout->addWidget(mExecutableEdit, 5, 1);
+	layout->addWidget(mExecutableEdit, line, 1);
 
 	QAction* browseExecutableAction = new QAction(QIcon(":/icons/open.png"), "Browse", this);
 	browseExecutableAction->setStatusTip("Select the elastiX executable");
 	connect(browseExecutableAction, SIGNAL(triggered()), this, SLOT(browseExecutableSlot()));
 	QToolButton* button = new QToolButton();
 	button->setDefaultAction(browseExecutableAction);
-	layout->addWidget(button, 5, 2);
+	layout->addWidget(button, line, 2);
+	++line;
 
-	layout->addWidget(new ssc::CheckBoxWidget(this, mElastixManager->getDisplayProcessMessages()), 6, 0, 1, 3);
+	QHBoxLayout* buttonsLayout = new QHBoxLayout;
+	layout->addLayout(buttonsLayout, line, 0, 1, 3);
 
-	layout->addWidget(mFilePreviewWidget, 7, 0, 1, 3);
+	buttonsLayout->addWidget(new ssc::CheckBoxWidget(this, mElastixManager->getDisplayProcessMessages()));
 
-	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
-	mTimedAlgorithmProgressBar->attach(mElastixManager->getExecuter());
-	layout->addWidget(mTimedAlgorithmProgressBar);
+	this->createAction(this,
+	                QIcon(":/icons/preset_remove.png"),
+					"Delete the current preset", "",
+	                SLOT(deletePresetSlot()),
+	                buttonsLayout);
 
-	this->elastixChangedSlot();
+	this->createAction(this,
+		            QIcon(":/icons/preset_save.png"),
+					"Add the current setting as a preset", "",
+	                SLOT(savePresetSlot()),
+	                buttonsLayout);
+
+	++line;
+
+	mFilePreviewWidget = new FilePreviewWidget(this);
+	mFilePreviewWidget->setSyntaxHighLighter<ElastixSyntaxHighlighter>();
+	mFilePreviewWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	layout->addWidget(mFilePreviewWidget, line, 0, 1, 3);
+	++line;
+
+	return retval;
 }
 
 ElastixWidget::~ElastixWidget()
@@ -103,9 +159,31 @@ QString ElastixWidget::defaultWhatsThis() const
 {
   return "<html>"
       "<h3>ElastiX Registration.</h3>"
-      "<p>Select two datasets you want to register to eachother, and a parameter file</p>"
+      "<p>Select two datasets you want to register to each other, and a parameter file</p>"
       "<p><i>TBD</i></p>"
       "</html>";
+}
+
+void ElastixWidget::savePresetSlot()
+{
+//	QString newName = mElastixManager->getCurrentPreset()->getValue();
+//	if (!mElastixManager->getCurrentPreset()->getValueRange().contains(newName) || newName=="Select Preset...")
+//		newName = "custom preset";
+	QString newName = QString("%1/%2").arg(mElastixManager->getActiveExecutable()).arg(QFileInfo(mElastixManager->getActiveParameterFile0()).baseName());
+
+    bool ok;
+    QString text = QInputDialog::getText(this, "Save Preset",
+                                         "Custom Preset Name", QLineEdit::Normal,
+                                         newName, &ok);
+    if (!ok || text.isEmpty())
+      return;
+
+    mElastixManager->saveCurrentPreset(text);
+}
+
+void ElastixWidget::deletePresetSlot()
+{
+	mElastixManager->removeCurrentPreset();
 }
 
 void ElastixWidget::executableEditFinishedSlot()
@@ -124,20 +202,20 @@ void ElastixWidget::browseExecutableSlot()
 
 void ElastixWidget::userParameterFileSelected(QString filename)
 {
-	mElastixManager->setActiveParameterFile(filename);
+	mElastixManager->setActiveParameterFile0(filename);
 }
 
 void ElastixWidget::elastixChangedSlot()
 {
 	QDir folder(cx::DataLocations::getRootConfigPath() + "/elastix");
 	folder.mkpath(".");
-	mParameterFileWidget->setPath(folder.absolutePath());
+	mParameterFileWidget0->setPath(folder.absolutePath());
 	QStringList nameFilters;
 	nameFilters << "*.txt";
-	mParameterFileWidget->setNameFilter(nameFilters);
-	mParameterFileWidget->setFilename(mElastixManager->getActiveParameterFile());
+	mParameterFileWidget0->setNameFilter(nameFilters);
+	mParameterFileWidget0->setFilename(mElastixManager->getActiveParameterFile0());
 
-	mFilePreviewWidget->previewFileSlot(mElastixManager->getActiveParameterFile());
+	mFilePreviewWidget->previewFileSlot(mElastixManager->getActiveParameterFile0());
 
 	mExecutableEdit->blockSignals(true);
 	mExecutableEdit->setText(mElastixManager->getActiveExecutable());

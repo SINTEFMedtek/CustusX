@@ -62,6 +62,7 @@ public:
 	         QStringList parameterfiles);
 
 	ssc::Transform3D getAffineResult_mMf(bool* ok = 0) ;
+	QString getNonlinearResultVolume(bool* ok = 0);
 
 private slots:
 	void processStateChanged(QProcess::ProcessState newState);

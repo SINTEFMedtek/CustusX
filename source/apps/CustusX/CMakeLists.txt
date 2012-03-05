@@ -193,6 +193,14 @@ endif(APPLE)
 # Bundle utilities
 #--------------------------------------------------------------------------------
 
+# Find the library path of OpenCL - for use with fixup_bundle()
+find_package( OpenCL QUIET)
+#message(STATUS OPENCL_FOUND: ${OPENCL_FOUND})
+#message(STATUS OPENCL_INCLUDE_DIRS: ${OPENCL_INCLUDE_DIRS})
+#message(STATUS OPENCL_LIBRARIES: ${OPENCL_LIBRARIES})
+get_filename_component(OPENCL_LIBRARY_DIRS ${OPENCL_LIBRARIES} PATH)
+#message(STATUS cx: OPENCL_LIBRARY_DIRS: ${OPENCL_LIBRARY_DIRS})
+
 if(CX_LINUX)
 	set( CustusX_Exe_Path "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/CustusX")
 endif()
@@ -201,47 +209,51 @@ if(CX_WINDOWS)
 	set( CustusX_Exe_Path "\${CMAKE_INSTALL_PREFIX}/bin/CustusX.exe")
 endif()
 
-set(APPS ${CustusX_Exe_Path})
-set(LIBS "")
-set(DIRS 
-		${QT_INCLUDES} 
-		${QT_LIBRARY_DIRS}
-		${SSC_INCLUDE_DIRS} 
-		${VTK_LIBRARY_DIRS}
-		${OpenCV_LIB_DIR}
-		${IGSTK_LIBRARY_DIRS}
-		${OpenIGTLink_LIBRARY_DIRS}
-		${ITK_DIR}/lib
-		${DCMTK_DIR}/lib
-		${INCLUDE_DIRECTORIES}      
-		${SSC_BINARY_DIR}/Code
-		${SSC_BINARY_DIR}/Code/Ultrasound/3DReconstruction
-		${SSC_BINARY_DIR}/DICOMLib
-		${CustusX3_BINARY_DIR}
-		${CustusX3_BINARY_DIR}/source
-		${CustusX3_BINARY_DIR}/source/service/patient
-		${CustusX3_BINARY_DIR}/source/service/state
-		${CustusX3_BINARY_DIR}/source/service/tracking
-		${CustusX3_BINARY_DIR}/source/service/video
-		${CustusX3_BINARY_DIR}/source/service/visualization
-		${CustusX3_BINARY_DIR}/source/resource/algorithms
-		${CustusX3_BINARY_DIR}/source/resource/settings
-		${CustusX3_BINARY_DIR}/source/resource/utilities
-		${CustusX3_BINARY_DIR}/source/plugins/Acquisition/logic
-		${CustusX3_BINARY_DIR}/source/plugins/Acquisition/gui
-		${CustusX3_BINARY_DIR}/source/plugins/Algorithm/logic
-		${CustusX3_BINARY_DIR}/source/plugins/Algorithm/gui
-		${CustusX3_BINARY_DIR}/source/plugins/Calibration/logic
-		${CustusX3_BINARY_DIR}/source/plugins/Calibration/gui
-		${CustusX3_BINARY_DIR}/source/plugins/Registration/logic
-		${CustusX3_BINARY_DIR}/source/plugins/Registration/gui
-		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic
-		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/gui
-		${CustusX3_BINARY_DIR}/source/logic/
-		${CustusX3_BINARY_DIR}/source/gui
-		)
-			
-install(CODE "
-		include(BundleUtilities)
-		fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
-		)
+if (CX_LINUX OR CX_WINDOWS)
+    set(APPS ${CustusX_Exe_Path})
+    set(LIBS "")
+    set(DIRS 
+    		${QT_INCLUDES} 
+    		${QT_LIBRARY_DIRS}
+    		${SSC_INCLUDE_DIRS} 
+    		${VTK_LIBRARY_DIRS}
+    		${OpenCV_LIB_DIR}
+    		${OPENCL_LIBRARY_DIRS}
+    		${IGSTK_LIBRARY_DIRS}
+    		${OpenIGTLink_LIBRARY_DIRS}
+    		${ITK_DIR}/lib
+    		${DCMTK_DIR}/lib
+    		${INCLUDE_DIRECTORIES}      
+    		${SSC_BINARY_DIR}/Code
+    		${SSC_BINARY_DIR}/Code/Ultrasound/3DReconstruction
+    		${SSC_BINARY_DIR}/DICOMLib
+    		${CustusX3_BINARY_DIR}
+    		${CustusX3_BINARY_DIR}/source
+    		${CustusX3_BINARY_DIR}/source/service/patient
+    		${CustusX3_BINARY_DIR}/source/service/state
+    		${CustusX3_BINARY_DIR}/source/service/tracking
+    		${CustusX3_BINARY_DIR}/source/service/video
+    		${CustusX3_BINARY_DIR}/source/service/visualization
+    		${CustusX3_BINARY_DIR}/source/resource/algorithms
+    		${CustusX3_BINARY_DIR}/source/resource/settings
+    		${CustusX3_BINARY_DIR}/source/resource/utilities
+    		${CustusX3_BINARY_DIR}/source/plugins/Acquisition/logic
+    		${CustusX3_BINARY_DIR}/source/plugins/Acquisition/gui
+    		${CustusX3_BINARY_DIR}/source/plugins/Algorithm/logic
+    		${CustusX3_BINARY_DIR}/source/plugins/Algorithm/gui
+    		${CustusX3_BINARY_DIR}/source/plugins/Calibration/logic
+    		${CustusX3_BINARY_DIR}/source/plugins/Calibration/gui
+    		${CustusX3_BINARY_DIR}/source/plugins/Registration/logic
+    		${CustusX3_BINARY_DIR}/source/plugins/Registration/gui
+    		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic
+    		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/gui
+    		${CustusX3_BINARY_DIR}/source/logic/
+    		${CustusX3_BINARY_DIR}/source/gui
+    		)
+    			
+    install(CODE "
+    		include(BundleUtilities)
+    		fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
+    		)
+endif (CX_LINUX OR CX_WINDOWS)
+    		
