@@ -6,25 +6,27 @@ cmake_minimum_required(VERSION 2.6)
 
 # Boost
 #----------
+
 find_package( Boost REQUIRED )
 
 # openCV
 #----------
 if (USE_OpenCV)
-		find_package( OpenCV REQUIRED)
-else (USE_OpenCV)
-		find_package( OpenCV QUIET)
-endif (USE_OpenCV)
+    find_package( OpenCV REQUIRED)
+else ()
+    find_package( OpenCV QUIET)
+endif ()
 
 IF( OpenCV_FOUND )
-		option(USE_OpenCV "use OpenCV" ON)
-ELSE( OpenCV_FOUND )
-		option(USE_OpenCV "use OpenCV" OFF)
-ENDIF( OpenCV_FOUND )
+    option(USE_OpenCV "use OpenCV" ON)
+ELSE()
+    option(USE_OpenCV "use OpenCV" OFF)
+ENDIF()
 
 if (USE_OpenCV)
-	ADD_DEFINITIONS(-DUSE_OpenCV)
-endif(USE_OpenCV)
+  ADD_DEFINITIONS(-DUSE_OpenCV)
+endif()
+
 
 # VTK
 #----------

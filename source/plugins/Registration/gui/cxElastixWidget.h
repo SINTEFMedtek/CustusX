@@ -59,21 +59,24 @@ private slots:
 	void browseExecutableSlot();
 	void elastixChangedSlot();
 	void executableEditFinishedSlot();
+	void toggleDetailsSlot();
+	void savePresetSlot();
+	void deletePresetSlot();
 
 private:
-	QSpinBox* mLTSRatioSpinBox;
-	QCheckBox* mLinearCheckBox;
+	QWidget* createOptionsWidget();
+
 	QPushButton* mRegisterButton;
 	ElastixManagerPtr mElastixManager;
 
 	ssc::StringDataAdapterPtr mFixedImage;
 	ssc::StringDataAdapterPtr mMovingImage;
-	ssc::FileSelectWidget* mParameterFileWidget;
+	ssc::FileSelectWidget* mParameterFileWidget0;
 	FilePreviewWidget* mFilePreviewWidget;
 	QLineEdit* mExecutableEdit;
 	cx::TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	//  QPushButton* mLaunchServerButton;
-
+	QWidget* mOptionsWidget;
 };
 
 /**

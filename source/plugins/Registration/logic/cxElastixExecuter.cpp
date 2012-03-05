@@ -247,6 +247,16 @@ QString ElastixExecuter::findMostRecentTransformOutputFile() const
 	return retval;
 }
 
+
+struct ElastixResults
+{
+	ssc::Transform3D m_mMf;
+	bool mValidLinearTransform;
+
+	QString mNonlinearFilename;
+	QString mNonlinearTransform;
+};
+
 /** Return the result of the latest registration as a linear transform mMf.
  *
  *  Important: The result is according to the ElastiX spec:
@@ -318,6 +328,42 @@ ssc::Transform3D ElastixExecuter::getAffineResult_mMf(bool* ok)
 }
 
 
+QString ElastixExecuter::getNonlinearResultVolume(bool* ok)
+{
+	if (ok)
+		*ok = true;
+
+	QString retval;
+	int i=0;
+	for (; ; ++i)
+	{
+		//TODO only mhd supported
+		QString filename = QString(mLastOutdir + "/result.%1.mhd").arg(i);
+		if (!QFileInfo(filename).exists())
+			break;
+		retval = filename;
+	}
+
+	if (retval.isEmpty())
+		return retval;
+
+	QString paramFilename = QString(mLastOutdir + "/TransformParameters.%1.txt").arg(i-1);
+	ElastixParameterFile file(paramFilename);
+	QString transform = file.readParameterString("Transform");
+
+	if ((transform=="BSplineTransform") || (transform=="SplineKernelTransform"))
+	{
+		ssc::messageManager()->sendInfo(QString("Reading result file %1 created with transform %2").arg(retval).arg(transform));
+		return retval;
+	}
+	else
+	{
+		if (ok)
+			*ok = false;
+		return "";
+	}
+
+}
 
 
 // --------------------------------------------------------

@@ -63,10 +63,13 @@ public:
 
 class RegistrationMethodsWidget : public TabbedWidget
 {
+	Q_OBJECT
 public:
   RegistrationMethodsWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle);
   virtual ~RegistrationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;
+private slots:
+  void tabChangedSlot(int value);
 };
 //------------------------------------------------------------------------------
 

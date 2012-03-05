@@ -30,6 +30,7 @@
 #include "cxRegisterI2IWidget.h"
 #include "cxElastixWidget.h"
 #include "cxManualRegistrationWidget.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -169,12 +170,20 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
   imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
 
-  this->addTab(new ElastixWidget(regManager), "ElastiX");
   this->addTab(landmarkRegistrationsWidget, "Landmark");
   this->addTab(fastRegistrationsWidget, "Fast");
   this->addTab(manRegWidget, "Manual");
-  this->addTab(image2imageWidget, "Vessel2Vessel");
+  this->addTab(new ElastixWidget(regManager), "ElastiX");
+  this->addTab(image2imageWidget, "Vessel");
   this->addTab(imageAndPlateRegistrationWidget, "Plate");
+
+  connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChangedSlot(int)));
+  mTabWidget->setCurrentIndex(settings()->value("registration/tabIndex").toInt());
+}
+
+void RegistrationMethodsWidget::tabChangedSlot(int value)
+{
+	settings()->setValue("registration/tabIndex", value);
 }
 
 QString RegistrationMethodsWidget::defaultWhatsThis() const
