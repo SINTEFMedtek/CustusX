@@ -38,7 +38,8 @@ public:
 	CoordinateSystemListener(ssc::CoordinateSystem space = ssc::CoordinateSystem());
 	virtual ~CoordinateSystemListener();
 	void setSpace(ssc::CoordinateSystem space);
-	ssc::CoordinateSystem getSpace() const;signals:
+	ssc::CoordinateSystem getSpace() const;
+signals:
 	void changed();
 private slots:
 	void reconnect();

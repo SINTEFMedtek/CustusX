@@ -162,7 +162,7 @@ protected:
   bool use2D() const;
   bool use3D() const;
   void updateToggles();
-  QAction* addAction(QActionGroup* group, QString text, QIcon icon) const;
+//  QAction* addAction(QActionGroup* group, QString text, QIcon icon) const;
 
   QVBoxLayout* mLayout;
   QComboBox* mPresetsComboBox;
