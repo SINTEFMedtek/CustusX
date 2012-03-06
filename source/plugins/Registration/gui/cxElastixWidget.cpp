@@ -46,6 +46,7 @@ ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent)
 
 	mRegisterButton = new QPushButton("Register");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
+	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -159,8 +160,14 @@ QString ElastixWidget::defaultWhatsThis() const
 {
   return "<html>"
       "<h3>ElastiX Registration.</h3>"
-      "<p>Select two datasets you want to register to each other, and a parameter file</p>"
-      "<p><i>TBD</i></p>"
+      "<p>Select two datasets you want to register to each other, "
+      "and a preset suitable for your images.</p>"
+	  "<p><a http://elastix.isi.uu.nl/> ElastiX </a> is normally used for the registration "
+	  "as an external application, although any program with the same input/output "
+	  "can be used. Add parameter files to the folder config/elastix in order to show "
+	  "them to CustusX.</p>"
+      "<p>If a nonlinear registration is selected, CustusX will attempt to import the "
+      "volume produced by ElastiX.</p>"
       "</html>";
 }
 
