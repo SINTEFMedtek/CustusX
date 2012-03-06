@@ -21,11 +21,10 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 * @{
 */
 
-/**
- * UsReconstructionFileMaker
- *
- * \brief Handels writing files in the format the us reconstruction
+/**\brief Handles writing files in the format the us reconstruction
  * algorithm wants them.
+ *
+ *\sa UsReconstructionFileReader
  *
  * \date Dec 17, 2010
  * \author Janne Beate Bakeng, SINTEF
@@ -43,7 +42,6 @@ public:
 private:
   QString makeFolder(QString patientFolder, QString sessionDescription);
   bool createSubfolder(QString subfolderAbsolutePath);
-//  vtkImageDataPtr mergeFrames();
   vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
   std::vector<vtkImageDataPtr> getFrames();
 
