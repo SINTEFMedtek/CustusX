@@ -138,7 +138,7 @@ ssc::ImagePtr UsReconstructionFileReader::generateMask(ssc::USReconstructInputDa
 
 void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName)
 {
-  //Read XML info from mdh file
+  //Read XML info from mhd file
   //Stored in ConfigurationID tag
   QFile file(mhdFileName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
