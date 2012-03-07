@@ -141,6 +141,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 	mPickerRep = ssc::PickerRep::New("PickerRep_" + index, "PickerRep_" + index);
 
 	connect(mPickerRep.get(), SIGNAL(pointPicked(ssc::Vector3D)), this, SLOT(PickerRepPointPickedSlot(ssc::Vector3D)));
+	connect(mPickerRep.get(), SIGNAL(dataPicked(QString)), this, SLOT(PickerRepDataPickedSlot(QString)));
 	mPickerRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 	mPickerRep->setEnabled(false);
 	mView->addRep(mPickerRep);
@@ -242,7 +243,6 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
 {
 	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
-//  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
 	ssc::Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
@@ -251,12 +251,15 @@ void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
 
-//	std::cout << "ViewWrapper3D::PickerRepPointPickedSlot " << p_r << p_r<< std::endl;
-
 	// TODO set center here will not do: must handle
 	ssc::dataManager()->setCenter(p_r);
 	ssc::Vector3D p0_pr = tool->get_prMt().coord(ssc::Vector3D(0, 0, 0));
 	tool->set_prMt(ssc::createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
+}
+
+void ViewWrapper3D::PickerRepDataPickedSlot(QString uid)
+{
+	std::cout << "picked: " << uid << std::endl;
 }
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
@@ -623,10 +626,6 @@ void ViewWrapper3D::activeImageChangedSlot()
 	std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
 	if (!std::count(images.begin(), images.end(), image))
 		image.reset();
-
-	mPickerRep->setImage(image);
-//  mImageLandmarkRep->setImage(image);
-//  mPatientLandmarkRep->setImage(image);
 }
 
 void ViewWrapper3D::showRefToolSlot(bool checked)
@@ -647,6 +646,7 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 		//should not show
 		mView->removeRep(refRep);
 }
+
 
 void ViewWrapper3D::updateSlices()
 {
