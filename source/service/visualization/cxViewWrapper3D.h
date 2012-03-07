@@ -116,6 +116,7 @@ private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 	void setStereoEyeAngle(double angle);
 	void settingsChangedSlot(QString key);
+	void PickerRepDataPickedSlot(QString);
 
 private:
 	virtual void appendToContextMenu(QMenu& contextMenu);
