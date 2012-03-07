@@ -160,7 +160,8 @@ SNW2VolumePtr SNW2Volume::create(const QString& filePath)
 	{
 		return SNW2VolumePtr();
 	}
-
+	retval->ensureCenterWindowValid(&retval->mMetaData.Volume.mWindowWidth, &retval->mMetaData.Volume.mWindowCenter,
+					&retval->mMetaData.Volume.mLLR);
 	return retval;
 }
 
@@ -382,8 +383,6 @@ bool SNW2Volume::loadVolumeData()
 		mImage.reset();
 		mLut = NULL;
 	}
-
-	ensureCenterWindowValid(&mMetaData.Volume.mWindowWidth, &mMetaData.Volume.mWindowCenter, &mMetaData.Volume.mLLR);
 
 	return success;
 }
@@ -659,13 +658,21 @@ void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, do
 	double& llr = *llrPtr;
 
 	boost::array<double, 2> range;
-	vtkImageAccumulatePtr histogram = getImage()->getHistogram();
-	range[0] = histogram->GetMin()[0];
-	range[1] = histogram->GetMax()[0];
+	if (mMetaData.Volume.mFirstPixel < 0 || mMetaData.Volume.mLastPixel < 0)
+	{
+		// If we lack this data, we are forced to load the image already. Breaks lazy loading.
+		vtkImageAccumulatePtr histogram = getImage()->getHistogram();
+		range[0] = histogram->GetMin()[0];
+		range[1] = histogram->GetMax()[0];
+	}
+	else
+	{
+		range[0] = mMetaData.Volume.mFirstPixel;
+		range[1] = mMetaData.Volume.mLastPixel;
+	}
 
 	if (window <= 0)
 	{
-		//mWindowWidth = (range[1]-range[0])/2.0;
 		window = (range[1] - range[0]);
 	}
 	if (level <= 0)
