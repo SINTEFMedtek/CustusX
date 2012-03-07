@@ -47,9 +47,9 @@ typedef boost::shared_ptr<class Tool> ToolPtr;
  * \ingroup sscRep
  * \ingroup sscRep3D
  */
-class PickerRep : public RepImpl
+class PickerRep: public RepImpl
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
 	static PickerRepPtr New(const QString& uid, const QString& name = ""); ///< for creating new instances
@@ -77,10 +77,10 @@ public slots:
 	void setThresholdSlot(const int threshold); ///< sets the threshold for picking the point on the volumes surface
 
 protected slots:
-  void receiveTransforms(Transform3D prMt, double timestamp); ///< receive transforms from the connected tool
+	void receiveTransforms(Transform3D prMt, double timestamp); ///< receive transforms from the connected tool
 
 protected:
-  PickerRep(const QString& uid, const QString& name=""); ///< use New instead
+	PickerRep(const QString& uid, const QString& name = ""); ///< use New instead
 	virtual void addRepActorsToViewRenderer(View* view); ///< connects to the renderwindowinteractor
 	virtual void removeRepActorsFromViewRenderer(View* view); ///< disconnects from the renderwindowinteractor
 	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor

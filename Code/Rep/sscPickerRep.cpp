@@ -49,60 +49,57 @@ PickerRepPtr PickerRep::New(const QString& uid, const QString& name)
 	return retval;
 }
 PickerRep::PickerRep(const QString& uid, const QString& name) :
-	RepImpl(uid, name),
-	mThreshold(25),
-	mResolution(1000),
-	mPickedPoint(),
-  mSphereRadius(2),
-	mConnections(vtkEventQtSlotConnectPtr::New())
+	RepImpl(uid, name), mThreshold(25), mResolution(1000), mPickedPoint(), mSphereRadius(2), mConnections(
+		vtkEventQtSlotConnectPtr::New())
 {
-  mViewportListener.reset(new ssc::ViewportListener);
-  mViewportListener->setCallback(boost::bind(&PickerRep::scaleSphere, this));
+	mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener->setCallback(boost::bind(&PickerRep::scaleSphere, this));
 
-  mView = NULL;
-  mEnabled = false;
-  mConnected = false;
+	mView = NULL;
+	mEnabled = false;
+	mConnected = false;
 }
 
 void PickerRep::scaleSphere()
 {
-  if (!mGraphicalPoint)
-    return;
+	if (!mGraphicalPoint)
+		return;
 
-  double size = mViewportListener->getVpnZoom();
-  double sphereSize = mSphereRadius/100/size;
-  mGraphicalPoint->setRadius(sphereSize);
+	double size = mViewportListener->getVpnZoom();
+	double sphereSize = mSphereRadius / 100 / size;
+	mGraphicalPoint->setRadius(sphereSize);
 }
 
 PickerRep::~PickerRep()
-{}
+{
+}
 QString PickerRep::getType() const
 {
 	return "ssc::PickerRep";
 }
 int PickerRep::getThreshold()
 {
-  return mThreshold;
+	return mThreshold;
 }
 ImagePtr PickerRep::getImage()
 {
-  return mImage;
+	return mImage;
 }
 
 void PickerRep::setSphereRadius(double radius)
 {
-  mSphereRadius = radius;
-  if (mGraphicalPoint)
-    mGraphicalPoint->setRadius(mSphereRadius);
+	mSphereRadius = radius;
+	if (mGraphicalPoint)
+		mGraphicalPoint->setRadius(mSphereRadius);
 }
 
 void PickerRep::setImage(ImagePtr image)
 {
-	if (image==mImage)
+	if (image == mImage)
 		return;
 	mImage = image;
 	if (mImage)
-	  mThreshold = mImage->getMin() + (mImage->getMax()-mImage->getMin())/10;
+		mThreshold = mImage->getMin() + (mImage->getMax() - mImage->getMin()) / 10;
 }
 
 void PickerRep::setResolution(const int resolution)
@@ -112,26 +109,26 @@ void PickerRep::setResolution(const int resolution)
 
 void PickerRep::setTool(ToolPtr tool)
 {
-  if (tool==mTool)
-    return;
-  
-  if (mTool)
-  {
-    disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
-               this, SLOT(receiveTransforms(Transform3D, double)));
-  }
-  
-  mTool = tool;
-  
-  if (mTool)
-  {
-    receiveTransforms(mTool->get_prMt(), 0);
-    
-    connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
-            this, SLOT(receiveTransforms(Transform3D, double)));     
-  }
+	if (tool == mTool)
+		return;
+
+	if (mTool)
+	{
+		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
+			SLOT(receiveTransforms(Transform3D, double)));
+	}
+
+	mTool = tool;
+
+	if (mTool)
+	{
+		receiveTransforms(mTool->get_prMt(), 0);
+
+		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
+			SLOT(receiveTransforms(Transform3D, double)));
+	}
 }
-  
+
 /**
  * Trace a ray from clickPosition along the camera view direction and intersect
  * the image.
@@ -151,8 +148,7 @@ Vector3D PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr r
 	//Get the cameras focal point in display coordinates.
 	//We need a depth value for the z-buffer.
 	double* displayCoords;
-	renderer->SetWorldPoint(cameraFocalPoint[0], cameraFocalPoint[1],
-			cameraFocalPoint[2], 1);
+	renderer->SetWorldPoint(cameraFocalPoint[0], cameraFocalPoint[1], cameraFocalPoint[2], 1);
 	renderer->WorldToDisplay();
 	displayCoords = renderer->GetDisplayPoint();
 	Vector3D displayClickPosition = clickPosition;
@@ -163,9 +159,8 @@ Vector3D PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr r
 	renderer->SetDisplayPoint(displayClickPosition[0], displayClickPosition[1], displayClickPosition[2]);
 	renderer->DisplayToWorld();
 	worldCoords = renderer->GetWorldPoint();
-	Vector3D worldClickPoint(worldCoords[0]/worldCoords[3],
-							 worldCoords[1]/worldCoords[3],
-							 worldCoords[2]/worldCoords[3]);
+	Vector3D worldClickPoint(worldCoords[0] / worldCoords[3], worldCoords[1] / worldCoords[3], worldCoords[2]
+		/ worldCoords[3]);
 	//std::cout << "PickerRep::pickLandmark: click:<"<<clickPosition<<"> world:<"<< worldClickPoint<<">"<< std::endl;
 
 	//Compute the direction of the probe ray
@@ -185,36 +180,35 @@ Vector3D PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr r
 	Vector3D intersection;
 	if (!this->intersectData(p0, p1, intersection))
 	{
-	  return intersection;
+		return intersection;
 	}
 
-//	//Make an sphere actor to show where the calculated point is
-//	this->showTemporaryPointSlot(intersection[0], intersection[1], intersection[2]);
-  
-  mPickedPoint = intersection;
-  if (mGraphicalPoint)
-    mGraphicalPoint->setValue(mPickedPoint);
+	//	//Make an sphere actor to show where the calculated point is
+	//	this->showTemporaryPointSlot(intersection[0], intersection[1], intersection[2]);
 
+	mPickedPoint = intersection;
+	if (mGraphicalPoint)
+		mGraphicalPoint->setValue(mPickedPoint);
 
-  emit pointPicked(mPickedPoint);
+	emit pointPicked(mPickedPoint);
 	return intersection;
 }
 
 void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
-  //std::cout << "PickerRep::pickLandmarkSlot" << std::endl;
+	//std::cout << "PickerRep::pickLandmarkSlot" << std::endl;
 	vtkRenderWindowInteractorPtr iren = vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
-	if(iren == NULL)
+	if (iren == NULL)
 		return;
 	if (!mImage)
-	  return;
+		return;
 
 	int pickedPoint[2]; //<x,y>
 	iren->GetEventPosition(pickedPoint); //mouse positions are measured in pixels
 
 	vtkRendererPtr renderer = this->getRendererFromRenderWindow(*iren);
-	if(renderer == NULL)
+	if (renderer == NULL)
 		return;
 
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
@@ -226,115 +220,109 @@ void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
  */
 void PickerRep::setThresholdSlot(const int threshold)
 {
-  mThreshold = threshold;
+	mThreshold = threshold;
 }
 
 void PickerRep::receiveTransforms(Transform3D prMt, double timestamp)
 {
-  Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
-  Transform3D rMt = rMpr*prMt;
-  Vector3D p_r = rMt.coord(ssc::Vector3D(0,0,mTool->getTooltipOffset()));
+	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+	Transform3D rMt = rMpr * prMt;
+	Vector3D p_r = rMt.coord(ssc::Vector3D(0, 0, mTool->getTooltipOffset()));
 
-//  this->showTemporaryPointSlot(rMt(0,3), rMt(1,3), rMt(2,3));
+	//  this->showTemporaryPointSlot(rMt(0,3), rMt(1,3), rMt(2,3));
 
-  mPickedPoint = p_r;
-  if (mGraphicalPoint)
-    mGraphicalPoint->setValue(mPickedPoint);
+	mPickedPoint = p_r;
+	if (mGraphicalPoint)
+		mGraphicalPoint->setValue(mPickedPoint);
 
 }
 
 void PickerRep::setEnabled(bool on)
 {
-//  std::cout << "PickerRep::setEnabled " << on << std::endl;
+	//  std::cout << "PickerRep::setEnabled " << on << std::endl;
 
-  if (mEnabled==on)
-    return;
+	if (mEnabled == on)
+		return;
 
-  mEnabled = on;
+	mEnabled = on;
 
-  if (mEnabled)
-  {
-    this->connectInteractor();
-    if (mGraphicalPoint)
-      mGraphicalPoint->getActor()->SetVisibility(true);
-  }
-  else
-  {
-    this->disconnectInteractor();
-    if (mGraphicalPoint)
-      mGraphicalPoint->getActor()->SetVisibility(false);
-  }
+	if (mEnabled)
+	{
+		this->connectInteractor();
+		if (mGraphicalPoint)
+			mGraphicalPoint->getActor()->SetVisibility(true);
+	}
+	else
+	{
+		this->disconnectInteractor();
+		if (mGraphicalPoint)
+			mGraphicalPoint->getActor()->SetVisibility(false);
+	}
 }
-
 
 void PickerRep::connectInteractor()
 {
-  if (!mView)
-    return;
-  if (mConnected)
-    return;
-  mConnections->Connect(mView->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::LeftButtonPressEvent,
-                       this,
-                       SLOT(pickLandmarkSlot(vtkObject*)));
-  mConnected = true;
+	if (!mView)
+		return;
+	if (mConnected)
+		return;
+	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
+		SLOT(pickLandmarkSlot(vtkObject*)));
+	mConnected = true;
 }
 
 void PickerRep::disconnectInteractor()
 {
-  if (!mView)
-    return;
-  if (!mConnected)
-    return;
-  mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::LeftButtonPressEvent,
-                       this,
-                       SLOT(pickLandmarkSlot(vtkObject*)));
-  mConnected = false;
+	if (!mView)
+		return;
+	if (!mConnected)
+		return;
+	mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
+		SLOT(pickLandmarkSlot(vtkObject*)));
+	mConnected = false;
 }
-
 
 void PickerRep::addRepActorsToViewRenderer(View* view)
 {
-  if(view == NULL)
-  {
-    messageManager()->sendDebug("Cannot add rep actor to a NULL view.");
-    return;
-  }
+	if (view == NULL)
+	{
+		messageManager()->sendDebug("Cannot add rep actor to a NULL view.");
+		return;
+	}
 
-  if (mEnabled)
-    this->connectInteractor();
+	if (mEnabled)
+		this->connectInteractor();
 
-  mView = view;
+	mView = view;
 
-  mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
-  mGraphicalPoint->setColor(ssc::Vector3D(0,0,1));
-  mGraphicalPoint->setRadius(mSphereRadius);
-  mGraphicalPoint->getActor()->SetVisibility(false);
+	mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
+	mGraphicalPoint->setColor(ssc::Vector3D(0, 0, 1));
+	mGraphicalPoint->setRadius(mSphereRadius);
+	mGraphicalPoint->getActor()->SetVisibility(false);
 
-  mViewportListener->startListen(mView->getRenderer());
-  this->scaleSphere();
+	mViewportListener->startListen(mView->getRenderer());
+	this->scaleSphere();
 }
 
 void PickerRep::removeRepActorsFromViewRenderer(View* view)
 {
-  if(view == NULL)
-    return;
+	if (view == NULL)
+		return;
 
-  this->disconnectInteractor();
-  mViewportListener->stopListen();
-  mGraphicalPoint.reset();
-  mView = NULL;
+	this->disconnectInteractor();
+	mViewportListener->stopListen();
+	mGraphicalPoint.reset();
+	mView = NULL;
 }
 
 vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
 	vtkRendererPtr renderer = NULL;
 	std::set<ssc::View*>::const_iterator it = mViews.begin();
-	for(; it != mViews.end(); ++it)
+	for (; it != mViews.end(); ++it)
 	{
-		if(iren.GetRenderWindow() == (*it)->getRenderWindow())
-		renderer = (*it)->getRenderer();
+		if (iren.GetRenderWindow() == (*it)->getRenderWindow())
+			renderer = (*it)->getRenderer();
 	}
 	return renderer;
 }
@@ -346,11 +334,11 @@ vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor&
  */
 bool PickerRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 {
- // std::cout << "PickerRep::intersectData(p0<"<<p0<<">,p1<"<<p1<<">) image="<<mImage->getName()<<std::endl;
+	// std::cout << "PickerRep::intersectData(p0<"<<p0<<">,p1<"<<p1<<">) image="<<mImage->getName()<<std::endl;
 	//Creating the line from the camera through the picked point into the volume
-  ssc::Transform3D dMr = mImage->get_rMd().inv();
-  p0 = dMr.coord(p0);
-  p1 = dMr.coord(p1);
+	ssc::Transform3D dMr = mImage->get_rMd().inv();
+	p0 = dMr.coord(p0);
+	p1 = dMr.coord(p1);
 	vtkLineSourcePtr lineSource = vtkLineSourcePtr::New();
 	lineSource->SetPoint1(p0.begin());
 	lineSource->SetPoint2(p1.begin());
@@ -371,19 +359,19 @@ bool PickerRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 	//Aske the probe filter for point data, find the first one above a threshold.
 	//That is the skin point
 	vtkDataSetAttributesPtr dataSetAttribute = vtkDataSetAttributesPtr::New();
-	dataSetAttribute = (vtkDataSetAttributes*)(probeFilterMapper->GetInput()->GetPointData());
+	dataSetAttribute = (vtkDataSetAttributes*) (probeFilterMapper->GetInput()->GetPointData());
 
-  double value = -1000000;
-  int i;
-  for (i=0; i<dataSetAttribute->GetScalars()->GetNumberOfTuples(); i++)
-  {
-    dataSetAttribute->GetScalars()->GetTuple(i, &value);
-    //The VTK structure is padded with zeroes
-    //Ugly fix for signed: Ignore 0
-    if ((value != 0) && (value > mThreshold))
-      break;
-  }
-	if (i==dataSetAttribute->GetScalars()->GetNumberOfTuples())
+	double value = -1000000;
+	int i;
+	for (i = 0; i < dataSetAttribute->GetScalars()->GetNumberOfTuples(); i++)
+	{
+		dataSetAttribute->GetScalars()->GetTuple(i, &value);
+		//The VTK structure is padded with zeroes
+		//Ugly fix for signed: Ignore 0
+		if ((value != 0) && (value > mThreshold))
+			break;
+	}
+	if (i == dataSetAttribute->GetScalars()->GetNumberOfTuples())
 		return false;
 
 	Vector3D retval(probeFilterMapper->GetInput()->GetPoint(i));
@@ -394,8 +382,7 @@ bool PickerRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 
 Vector3D PickerRep::getPosition() const
 {
-  return mPickedPoint;
+	return mPickedPoint;
 }
-
 
 }//namespace ssc
