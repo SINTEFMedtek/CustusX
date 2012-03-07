@@ -57,7 +57,7 @@ Transform3D NavigatedVideoImage::get_rMd() const
 	mBaseImageData->GetSpacing(spacing);
 	double offsetX = computeEffectiveOffset( mToolPositionX, size[0] );
 	double offsetY = computeEffectiveOffset( mToolPositionY, size[1] );
-	Transform3D T = createTransformTranslate(Vector3D(-offsetX*spacing[0], -offsetY*spacing[1], 0));
+	Transform3D T = createTransformTranslate(Vector3D(-(size[0]-offsetX)*spacing[0], -offsetY*spacing[1], 0));
 	Transform3D Flip = createTransformScale(Vector3D(1, -1, 1)); // Video data has inverted Y axis compared to other data
 	return mSliceProxy->get_sMr().inv() * Flip * T;
 }
