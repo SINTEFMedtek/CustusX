@@ -57,10 +57,6 @@ public:
 
 	virtual QString getType() const; ///< returns a string identifying this class type
 
-	int getThreshold(); ///< gets the picking threshold
-	void setImage(ImagePtr image); ///< set which image points should be picked from
-	ImagePtr getImage();
-	void setResolution(const int resolution); ///< sets the resolution of the probing ray
 	void setTool(ToolPtr tool); ///< set the tool to listen to
 
 	void setEnabled(bool on);
@@ -71,10 +67,10 @@ public:
 
 signals:
 	void pointPicked(ssc::Vector3D p_r); /// the rep sends out a signal when the user picks a point on it
+	void dataPicked(QString uid);
 
 public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
-	void setThresholdSlot(const int threshold); ///< sets the threshold for picking the point on the volumes surface
 
 protected slots:
 	void receiveTransforms(Transform3D prMt, double timestamp); ///< receive transforms from the connected tool
@@ -84,7 +80,6 @@ protected:
 	virtual void addRepActorsToViewRenderer(View* view); ///< connects to the renderwindowinteractor
 	virtual void removeRepActorsFromViewRenderer(View* view); ///< disconnects from the renderwindowinteractor
 	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
-	bool intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection); ///< Find the intersection between the probe line and the image.
 	void connectInteractor();
 	void disconnectInteractor();
 	void scaleSphere();
@@ -92,10 +87,7 @@ protected:
 	View* mView;
 	bool mEnabled;
 	bool mConnected;
-	ImagePtr mImage; ///< the image to pick points from
 	ToolPtr mTool; ///< the connected tool
-	int mThreshold; ///< used to picked the point together with the probefilter, default=25
-	int mResolution; ///< used to divide the probing ray into pieces, default=1000
 	Vector3D mPickedPoint; ///< the last point that was successfully sampled from intersection with an image
 	double mSphereRadius;
 	vtkEventQtSlotConnectPtr mConnections; ///< used to sending signals and events between vtk and qt
