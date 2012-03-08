@@ -41,7 +41,8 @@ public:
 	virtual QString getName() const;
 	virtual int getIndex() const{return 0;};
 	virtual bool isCalibrated() const;
-	virtual ProbeData getProbeSector() const { return ProbeData(); }
+	virtual ProbeData getProbeSector() const { return mProbeData; }
+	void setProbeSector( ProbeData probeData ) { mProbeData = probeData; emit toolProbeSector(); }
 	virtual double getTimestamp() const { return 0; }
 
 	void startTracking(int interval=33);
@@ -81,6 +82,7 @@ private:
 
 	static int mTransformCount;
 	Type mType;
+	ProbeData mProbeData;
 };
 typedef boost::shared_ptr<DummyTool> DummyToolPtr;
 }//namespace ssc
