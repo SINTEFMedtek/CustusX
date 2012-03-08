@@ -209,13 +209,20 @@ bool SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
 		delete distance;
 		mean_distance[myNumberOfIterations] = total_distance / numPoints;
 
-		vtkSortDataArrayPtr sort = vtkSortDataArrayPtr::New();
-		sort->Sort(residuals, IdList);
 
 		if (myNumberOfIterations != 1)
 		{
 			difference = mean_distance[myNumberOfIterations] - mean_distance[myNumberOfIterations - 1];
 		}
+
+
+		vtkSortDataArrayPtr sort = vtkSortDataArrayPtr::New();
+		sort->Sort(residuals, IdList);
+
+		//CA: New methods:
+		// sortedSourcePoints = sort(IdList, currentSourcePoints)
+		// sortedTargetPoints = sort(IdList, closesetPoint)
+		//
 
 		vtkPointsPtr sortedSourcePoints = vtkPointsPtr::New();
 		sortedSourcePoints->SetNumberOfPoints(nb_points);
@@ -234,6 +241,7 @@ bool SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
 			sortedSourcePoints->SetPoint(i, lts_point);
 			sortedTargetPoints->SetPoint(i, lts_target_point);
 		}
+		//CA: End New methods
 
 		vtkAbstractTransformPtr myCurrentTransform;
 
@@ -247,6 +255,11 @@ bool SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
 
 			if (fabs(difference) < mt_distanceDeltaStopThreshold)
 			{
+				//CA: New method:
+				// myCurrentTransform = nonLinearRegistration(sortedSourcePoints, sortedTargetPoints, numPoints);
+				// i.e. move type conversion into method.
+				// Also a helper method for converting points to polydata
+
 				vtkCellArrayPtr tps_sourceCellArray = vtkCellArrayPtr::New();
 				vtkCellArrayPtr tps_targetCellArray = vtkCellArrayPtr::New();
 
@@ -268,9 +281,13 @@ bool SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
 				tps_target_poly->SetVerts(tps_targetCellArray);
 
 				myCurrentTransform = nonLinearRegistration(tps_source_poly, tps_target_poly, numPoints);
+				//CA: End New method
 			}
 		}
 
+		//CA: New method:
+		// vtkPointsPtr transformedSourcePoints = transform(currentSourcePoints, myCurrentTransform);
+		// assuming numPoints can be read from currentSourcePoints
 		vtkPointsPtr transformedSourcePoints = vtkPointsPtr::New();
 		transformedSourcePoints->SetNumberOfPoints(numPoints);
 
@@ -281,6 +298,8 @@ bool SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
 			myCurrentTransform->InternalTransformPoint(currentSourcePoints->GetPoint(i), tempPostTransPoint);
 			transformedSourcePoints->SetPoint(i, tempPostTransPoint);
 		}
+		//CA: End New method
+
 		myConcatenation->Concatenate(myCurrentTransform);
 
 		if (fabs(difference) < mt_distanceDeltaStopThreshold)
@@ -288,6 +307,7 @@ bool SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
 			//Stop the running
 			l_keepRunning = 0;
 
+			//CA: The following stuff is not used - delete
 			vtkCellArrayPtr tps_sourceCellArray = vtkCellArrayPtr::New();
 
 			for (int i = 0; i < nb_points; ++i)
@@ -299,8 +319,11 @@ bool SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
 			vtkPolyDataPtr tps_source_poly = vtkPolyDataPtr::New();
 			tps_source_poly->SetPoints(transformedSourcePoints);
 			tps_source_poly->SetVerts(tps_sourceCellArray);
+			//CA: End delete stuff
 		}
 
+		//CA: swap(transformedSourcePoints, currentSourcePoints) ??
+		// really needed: currentSourcePoints = transformedSourcePoints;
 		vtkPointsPtr allTempPoints = currentSourcePoints;
 		currentSourcePoints = transformedSourcePoints;
 		transformedSourcePoints = allTempPoints;
