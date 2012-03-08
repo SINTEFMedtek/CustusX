@@ -71,6 +71,10 @@ public:
 	virtual void saveTransformsAndTimestamps(QString filePathAndName = "");
 
 	static DummyToolManager* getDowncastInstance();
+	/**
+	 * Reset all internal state of the DummyToolMananger instance. Call between tests to avoid state leak.
+	 */
+	static void reset();
 	void addTool(DummyToolPtr tool);	
 	
 private:
