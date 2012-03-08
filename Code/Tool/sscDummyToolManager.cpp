@@ -32,6 +32,13 @@ ToolManager* DummyToolManager::getInstance()
 	}
 	return ToolManager::mInstance;
 }
+
+void DummyToolManager::reset()
+{
+	ToolManager::mInstance = NULL;
+	getInstance();
+}
+
 DummyToolManager::DummyToolManager() :
 	mDummyTools(new DummyToolMap),
 	m_rMpr(new Transform3D(Transform3D::Identity())),
