@@ -42,12 +42,405 @@ SeansVesselReg::SeansVesselReg(int lts_ratio, double stop_delta, double lambda, 
 	int sample, int single_point_thre, bool verbose) :
 	mt_ltsRatio(lts_ratio), mt_distanceDeltaStopThreshold(stop_delta), mt_lambda(lambda), mt_sigma(sigma),
 		mt_doOnlyLinear(lin_flag), mt_sampleRatio(sample), mt_singlePointThreshold(single_point_thre),
-		mt_maximumNumberOfIterations(100), mt_verbose(verbose), mInvertedTransform(false), mDebugOutput(true)
+		mt_maximumNumberOfIterations(100), mt_verbose(verbose), mInvertedTransform(false)
 {
 }
 
 SeansVesselReg::~SeansVesselReg()
 {
+}
+
+/**Execute the vessel to vessel registration.
+ * The result is available via the getLinearTransform().
+ *
+ * source is moving and target is fixed
+ */
+bool SeansVesselReg::execute(ssc::DataPtr source, ssc::DataPtr target, QString logPath)
+{
+	if (mt_verbose)
+	{
+		ssc::messageManager()->sendDebug("SOURCE: " + source->getUid());
+		ssc::messageManager()->sendDebug("TARGET: " + target->getUid());
+
+		std::cout << "stop Threshold:" << mt_distanceDeltaStopThreshold << endl;
+		std::cout << "sigma:" << mt_sigma << endl;
+		std::cout << "lts Ratio:" << mt_ltsRatio << endl;
+		std::cout << "linear flag:" << mt_doOnlyLinear << endl;
+		std::cout << "sample flag:" << mt_sampleRatio << endl;
+		std::cout << "single Point Threshold:" << mt_singlePointThreshold << endl;
+	}
+	time_t sec1 = clock();//time(NULL);
+
+	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target);
+	vtkPolyDataPtr sourcePolyData = this->convertToPolyData(source);
+
+	double margin = 40;
+	sourcePolyData = this->crop(sourcePolyData, targetPolyData, margin);
+
+	//Make sure we have stuff to work with
+	if (!sourcePolyData->GetNumberOfPoints() || !targetPolyData->GetNumberOfPoints())
+	{
+		std::cerr << "Can't execute with empty source or target data" << std::endl;
+		return false;
+	}
+
+	mInvertedTransform = false;
+
+	// Algorithm requires #source < #target
+	// swap if this is not the case
+	if (sourcePolyData->GetNumberOfPoints() > targetPolyData->GetNumberOfPoints())
+	{
+		//INVERT
+		if (mt_verbose)
+			std::cout << "inverted vessel reg" << std::endl;
+		mInvertedTransform = true;
+		std::swap(sourcePolyData, targetPolyData);
+	}
+
+	vtkIdType numPoints = sourcePolyData->GetNumberOfPoints();
+	if (mt_verbose)
+	{
+		std::cout << "total number of source points:" << numPoints << ", target points: " << targetPolyData->GetNumberOfPoints() << endl;
+		std::cout << "number of source points to be sampled:" << ((int) (numPoints * mt_ltsRatio) / 100) << "\n" << endl;
+	}
+
+	//Container for all the transforms
+	vtkGeneralTransformPtr myConcatenation = vtkGeneralTransformPtr::New();
+
+	//Do EVERYTHING
+	if (!this->runAlgorithm(sourcePolyData, targetPolyData, myConcatenation))
+	{
+		return false;
+	}
+
+	printOutResults(logPath + "/Vessel_Based_Registration_", myConcatenation);
+
+	if (mt_verbose)
+		std::cout << "\n\n\nExecution time:" << " " << (clock() - sec1) / (double) CLOCKS_PER_SEC << " " << "seconds"
+			<< endl;
+
+	mLinearTransformResult = this->getLinearTransform(myConcatenation);
+
+	return true;
+}
+
+/**Run the core algorithm
+ *
+ */
+bool SeansVesselReg::runAlgorithm(
+	vtkPolyDataPtr currentSourcePolyData,
+	vtkPolyDataPtr targetPolyData,
+	vtkGeneralTransformPtr myConcatenation)
+{
+	// Create locator for target points
+	vtkCellLocatorPtr targetPointLocator = vtkCellLocatorPtr::New();
+	targetPointLocator->SetDataSet(targetPolyData);
+	targetPointLocator->SetNumberOfCellsPerBucket(1);
+	targetPointLocator->BuildLocator();
+
+	//Since we are going to play with the data, we have to make a copy
+	vtkPointsPtr currentSourcePoints = vtkPointsPtr::New();
+	currentSourcePoints->DeepCopy(currentSourcePolyData->GetPoints());
+	// total number of source points:
+	int numPoints = currentSourcePoints->GetNumberOfPoints();
+	// number of source points used in each iteration (the rest is temporarily rejected from the computation)
+	int nb_points = ((int) (numPoints * mt_ltsRatio) / 100);
+
+	// - closestPoint is used so that the internal state of LandmarkTransform remains
+	//   correct whenever the iteration process is stopped (hence its source
+	//   and landmark points might be used in a vtkThinPlateSplineTransform).
+	vtkPointsPtr closestPoint = vtkPointsPtr::New();
+	closestPoint->SetNumberOfPoints(numPoints);
+
+	std::vector<double> mean_distance(mt_maximumNumberOfIterations);
+	bool l_keepRunning = 1;
+	double difference = 100;
+
+	for (int myNumberOfIterations = 1; l_keepRunning && myNumberOfIterations < mt_maximumNumberOfIterations; ++myNumberOfIterations)
+	{
+		// Fill points with the closest points to each vertex in input
+		vtkFloatArrayPtr residuals = vtkFloatArrayPtr::New();
+		residuals->SetNumberOfValues(numPoints);
+
+		vtkIdListPtr IdList = vtkIdListPtr::New();
+		IdList->SetNumberOfIds(numPoints);
+		double total_distance = 0;
+		double distanceSquared = 0;
+		//Find closest points to all source points
+		for (int i = 0; i < numPoints; ++i)
+		{
+			//Check the distance to neighbouring points (neighbours should be matched to nearby points)
+			vtkIdType cell_id;
+			int sub_id;
+			double outPoint[3];
+			targetPointLocator->FindClosestPoint(currentSourcePoints->GetPoint(i), outPoint, cell_id, sub_id, distanceSquared);
+			closestPoint->SetPoint(i, outPoint);
+			if (boost::math::isnan(distanceSquared))
+			{
+				std::cout << "nan found during findClosestPoint!" << std::endl;
+				return false;
+			}
+			residuals->InsertValue(i, distanceSquared);
+			IdList->InsertId(i, i);
+			total_distance += sqrt(distanceSquared);
+		}
+		mean_distance[myNumberOfIterations] = total_distance / numPoints;
+
+		if (myNumberOfIterations != 1)
+		{
+			difference = mean_distance[myNumberOfIterations] - mean_distance[myNumberOfIterations - 1];
+		}
+
+		vtkSortDataArrayPtr sort = vtkSortDataArrayPtr::New();
+		sort->Sort(residuals, IdList);
+		vtkPointsPtr sortedSourcePoints = this->createSortedPoints(IdList, currentSourcePoints, nb_points);
+		vtkPointsPtr sortedTargetPoints = this->createSortedPoints(IdList, closestPoint, nb_points);
+
+		vtkAbstractTransformPtr myCurrentTransform;
+
+		if (mt_doOnlyLinear)
+		{
+			myCurrentTransform = linearRegistration(sortedSourcePoints, sortedTargetPoints, numPoints);
+		}
+		else
+		{
+			myCurrentTransform = linearRegistration(sortedSourcePoints, sortedTargetPoints, numPoints);
+
+			if (fabs(difference) < mt_distanceDeltaStopThreshold)
+			{
+				myCurrentTransform = nonLinearRegistration(sortedSourcePoints, sortedTargetPoints, numPoints);
+			}
+		}
+
+		// Transform the source points with the transform found during this iteration,
+		// in order to use an updated guess for the next iteration
+		currentSourcePoints = this->transformPoints(currentSourcePoints, myCurrentTransform);
+
+		// add transform from this iteration to the total
+		myConcatenation->Concatenate(myCurrentTransform);
+
+		// Check for convergence
+		if (fabs(difference) < mt_distanceDeltaStopThreshold)
+		{
+			l_keepRunning = 0;
+		}
+
+		if (mt_verbose)
+		{
+//			std::cout << myNumberOfIterations << " ";
+//			std::cout.flush();
+			std::cout << QString("%1\t%2").arg(myNumberOfIterations).arg(mean_distance[myNumberOfIterations]) << std::endl;
+		}
+	}
+
+	if (mt_verbose)
+		std::cout << endl;
+
+	myConcatenation->Update();
+	return true;
+}
+
+/**Using the already sorted list of point ID's, create a sorted list of points
+ * based on the numPoint first of unsortedPoints.
+ *
+ */
+vtkPointsPtr SeansVesselReg::createSortedPoints(vtkIdListPtr sortedIDList, vtkPointsPtr unsortedPoints, int numPoints)
+{
+	vtkPointsPtr retval = vtkPointsPtr::New();
+	retval->SetNumberOfPoints(numPoints);
+
+	double temp_point[3];
+
+	for (int i = 0; i < numPoints; ++i)
+	{
+		vtkIdType index = sortedIDList->GetId(i);
+		unsortedPoints->GetPoint(index, temp_point); // source points to use in tps
+		retval->SetPoint(i, temp_point);
+	}
+
+	return retval;
+}
+
+
+vtkPointsPtr SeansVesselReg::transformPoints(vtkPointsPtr input, vtkAbstractTransformPtr transform)
+{
+	int numPoints = input->GetNumberOfPoints();
+	vtkPointsPtr retval = vtkPointsPtr::New();
+	retval->SetNumberOfPoints(numPoints);
+
+	//Transform ALL source points
+	double tempPostTransPoint[3];
+	for (int i = 0; i < numPoints; ++i)
+	{
+		transform->InternalTransformPoint(input->GetPoint(i), tempPostTransPoint);
+		retval->SetPoint(i, tempPostTransPoint);
+	}
+
+	return retval;
+}
+
+vtkAbstractTransformPtr SeansVesselReg::linearRegistration(vtkPointsPtr sortedSourcePoints,
+	vtkPointsPtr sortedTargetPoints, int numPoints/*, vtkAbstractTransform** myCurrentTransform*/)
+{
+	//Build landmark transform
+	vtkLandmarkTransformPtr lmt = vtkLandmarkTransformPtr::New();
+	lmt->SetSourceLandmarks(sortedSourcePoints);
+	lmt->SetTargetLandmarks(sortedTargetPoints);
+	lmt->SetModeToRigidBody();
+	lmt->Modified();
+	lmt->Update();
+
+	//  *myCurrentTransform = lmt;
+	return lmt;
+}
+
+vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPointsPtr sortedSourcePoints,
+	vtkPointsPtr sortedTargetPoints, int numPoints)
+{
+	vtkPolyDataPtr tpsSourcePolyData = this->convertToPolyData(sortedSourcePoints);
+	vtkPolyDataPtr tpsTargetPolyData = this->convertToPolyData(sortedTargetPoints);
+
+	vtkMaskPointsPtr mask1 = vtkMaskPointsPtr::New();
+	mask1->SetInput(tpsSourcePolyData);
+	mask1->SetOnRatio(mt_sampleRatio);
+	mask1->Update();
+	vtkMaskPointsPtr mask2 = vtkMaskPointsPtr::New();
+	mask2->SetInput(tpsTargetPolyData);
+	mask2->SetOnRatio(mt_sampleRatio);
+	mask2->Update();
+
+	// Build the thin plate spline transform
+	vtkThinPlateSplineTransformPtr tps = vtkThinPlateSplineTransformPtr::New();
+	tps->SetSourceLandmarks(mask1->GetOutput()->GetPoints());
+	tps->SetTargetLandmarks(mask2->GetOutput()->GetPoints());
+	tps->SetBasisToR();
+	tps->SetSigma(mt_sigma);
+
+	//*myCurrentTransform = tps;
+	return tps;
+}
+
+vtkPolyDataPtr SeansVesselReg::convertToPolyData(ssc::DataPtr data)
+{
+	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
+	ssc::MeshPtr mesh = boost::dynamic_pointer_cast<ssc::Mesh>(data);
+
+	if (image)
+	{
+		//Grab the information from the files of target then
+		//filter out points not fit for the threshold
+		return this->extractPolyData(image, mt_singlePointThreshold, 0);
+	}
+	else if (mesh)
+	{
+		return mesh->getTransformedPolyData(mesh->get_rMd());
+	}
+
+	return vtkPolyDataPtr();
+}
+
+vtkPolyDataPtr SeansVesselReg::convertToPolyData(vtkPointsPtr input)
+{
+	vtkCellArrayPtr cellArray = vtkCellArrayPtr::New();
+	int N = input->GetNumberOfPoints();
+
+	for (int i=0; i<N ; ++i)
+	{
+		cellArray->InsertNextCell(1);
+		cellArray->InsertCellPoint(i);
+	}
+
+	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
+	retval->SetPoints(input);
+	retval->SetVerts(cellArray);
+
+	return retval;
+}
+
+void SeansVesselReg::print(vtkPointsPtr points)
+{
+	for (int q = 0; q < points->GetNumberOfPoints(); ++q)
+	{
+		ssc::Vector3D p(points->GetPoint(q));
+		std::cout << q << "\t" << p[0] << " " << p[1] << " " << p[2] << " " << std::endl;
+	}
+}
+
+void SeansVesselReg::print(vtkPolyDataPtr data)
+{
+	print(data->GetPoints());
+}
+
+/**Crop the input data using a bounding box generated from the fixed data.
+ * The margin is used to enlarge the bounding box.
+ *
+ */
+vtkPolyDataPtr SeansVesselReg::crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, double margin)
+{
+	// use the bounding box of target to clip the source data.
+	fixed->GetPoints()->ComputeBounds();
+	double* targetBounds = fixed->GetPoints()->GetBounds();
+	targetBounds[0] -= margin;
+	targetBounds[1] += margin;
+	targetBounds[2] -= margin;
+	targetBounds[3] += margin;
+	targetBounds[4] -= margin;
+	targetBounds[5] += margin;
+
+	// clip the source data with a box
+	vtkPlanesPtr box = vtkPlanesPtr::New();
+	//  std::cout << "bounds" << std::endl;
+	box->SetBounds(targetBounds);
+	if (mt_verbose)
+		std::cout << "bb: " << ssc::DoubleBoundingBox3D(targetBounds) << std::endl;
+	vtkClipPolyDataPtr clipper = vtkClipPolyDataPtr::New();
+	clipper->SetInput(input);
+	clipper->SetClipFunction(box);
+	clipper->SetInsideOut(true);
+	clipper->Update();
+
+	int oldSource = input->GetPoints()->GetNumberOfPoints();
+	int clippedSource = clipper->GetOutput()->GetPoints()->GetNumberOfPoints();
+
+	if (clippedSource < oldSource)
+	{
+		double ratio = double(oldSource - clippedSource) / double(oldSource);
+		if (mt_verbose)
+			std::cout << "Removed " << ratio * 100 << "%" << " of the source data. Outside the target data bounds." << std::endl;
+	}
+
+	return clipper->GetOutput();
+}
+
+ssc::Transform3D SeansVesselReg::getLinearTransform()
+{
+	ssc::Transform3D retval = mLinearTransformResult;
+	if (mInvertedTransform)
+		retval = retval.inv();
+
+	return retval;
+}
+
+/**Convert the linear transform part of myContatenation to a ssc::Transform3D
+ */
+ssc::Transform3D SeansVesselReg::getLinearTransform(vtkGeneralTransformPtr myConcatenation)
+{
+	vtkMatrix4x4Ptr l_tempMatrix = vtkMatrix4x4Ptr::New();
+	vtkMatrix4x4Ptr l_resultMatrix = vtkMatrix4x4Ptr::New();
+
+	if (mt_doOnlyLinear)
+		l_tempMatrix->DeepCopy(((vtkLandmarkTransform*) myConcatenation->GetConcatenatedTransform(0))->GetMatrix());
+
+	l_resultMatrix->Identity();
+	for (int i = 1; i < myConcatenation->GetNumberOfConcatenatedTransforms(); ++i)
+	{
+		vtkMatrix4x4::Multiply4x4(l_tempMatrix,
+			((vtkLandmarkTransform*) myConcatenation->GetConcatenatedTransform(i))->GetMatrix(), l_resultMatrix);
+		l_tempMatrix->DeepCopy(l_resultMatrix);
+
+	}
+
+	return ssc::Transform3D(l_resultMatrix).inverse();
 }
 
 void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransformPtr myConcatenation)
@@ -67,7 +460,7 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
 		l_tempMatrix->DeepCopy(l_resultMatrix);
 
 	}
-	if (mDebugOutput)
+	if (mt_verbose)
 		std::cout << "Filenameprefix: " << fileNamePrefix << std::endl;
 
 	//std::string logsFolder = string_cast(cx::stateService()->getPatientData()->getActivePatientFolder())+"/Logs/";
@@ -80,7 +473,7 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
 	linearFile += "--Linear";
 	linearFile += ".txt";
 
-	if (mDebugOutput)
+	if (mt_verbose)
 		std::cout << "Writing Results to " << nonLinearFile << " and " << linearFile << std::endl;
 
 	if (!mt_doOnlyLinear)
@@ -152,405 +545,6 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
 	}
 	file_out2.close();
 }
-
-bool SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCellLocatorPtr targetPointLocator,
-	vtkGeneralTransformPtr myConcatenation)
-{
-	//Since we are going to play with the data, we have to make a copy
-	vtkPointsPtr currentSourcePoints = vtkPointsPtr::New();
-	currentSourcePoints->DeepCopy(currentSourcePolyData->GetPoints());
-	int numPoints = currentSourcePoints->GetNumberOfPoints();
-	int nb_points = ((int) (numPoints * mt_ltsRatio) / 100);
-	vtkIdType cell_id;
-	int sub_id;
-	double outPoint[3];
-
-	// - closesetPoint is used so that the internal state of LandmarkTransform remains
-	//   correct whenever the iteration process is stopped (hence its source
-	//   and landmark points might be used in a vtkThinPlateSplineTransform).
-	vtkPointsPtr closesetPoint = vtkPointsPtr::New();
-	closesetPoint->SetNumberOfPoints(numPoints);
-
-	//float mean_distance[mt_maximumNumberOfIterations];
-	float* mean_distance = new float[mt_maximumNumberOfIterations];
-	bool l_keepRunning = 1;
-	double difference = 100;
-
-	for (int myNumberOfIterations = 1; l_keepRunning && myNumberOfIterations < mt_maximumNumberOfIterations; ++myNumberOfIterations)
-	{
-		// Fill points with the closest points to each vertex in input
-		vtkFloatArrayPtr residuals = vtkFloatArrayPtr::New();
-		residuals->SetNumberOfValues(numPoints);
-
-		vtkIdListPtr IdList = vtkIdListPtr::New();
-		IdList->SetNumberOfIds(numPoints);
-		double total_distance = 0;
-		double distanceSquared = 0;
-		//double distance[numPoints];
-		double* distance = new double[numPoints];
-		//Find closest points to all source points
-		for (int i = 0; i < numPoints; ++i)
-		{
-			//Check the distance to neighbouring points (neighbours should be matched to nearby points)
-			targetPointLocator->FindClosestPoint(currentSourcePoints->GetPoint(i), outPoint, cell_id, sub_id,
-				distanceSquared);
-			closesetPoint->SetPoint(i, outPoint);
-//			std::cout << "CP " << i << "  " << cell_id << "  " << sub_id << "  " << distanceSquared << std::endl;
-			if (boost::math::isnan(distanceSquared))
-			{
-				std::cout << "nan found during findClosestPoint!" << std::endl;
-				return false;
-			}
-			residuals->InsertValue(i, distanceSquared);
-			IdList->InsertId(i, i);
-			distance[i] = sqrt(distanceSquared);
-			total_distance += distance[i];
-		}
-		delete distance;
-		mean_distance[myNumberOfIterations] = total_distance / numPoints;
-
-
-		if (myNumberOfIterations != 1)
-		{
-			difference = mean_distance[myNumberOfIterations] - mean_distance[myNumberOfIterations - 1];
-		}
-
-
-		vtkSortDataArrayPtr sort = vtkSortDataArrayPtr::New();
-		sort->Sort(residuals, IdList);
-
-		//CA: New methods:
-		// sortedSourcePoints = sort(IdList, currentSourcePoints)
-		// sortedTargetPoints = sort(IdList, closesetPoint)
-		//
-
-		vtkPointsPtr sortedSourcePoints = vtkPointsPtr::New();
-		sortedSourcePoints->SetNumberOfPoints(nb_points);
-
-		vtkPointsPtr sortedTargetPoints = vtkPointsPtr::New();
-		sortedTargetPoints->SetNumberOfPoints(nb_points);
-
-		double lts_point[3], lts_target_point[3];
-		vtkIdType index;
-
-		for (int i = 0; i < nb_points; ++i)
-		{
-			index = IdList->GetId(i);
-			currentSourcePoints->GetPoint(index, lts_point); // source points to use in tps
-			closesetPoint->GetPoint(index, lts_target_point); //target points to use in tps
-			sortedSourcePoints->SetPoint(i, lts_point);
-			sortedTargetPoints->SetPoint(i, lts_target_point);
-		}
-		//CA: End New methods
-
-		vtkAbstractTransformPtr myCurrentTransform;
-
-		if (mt_doOnlyLinear)
-		{
-			myCurrentTransform = linearRegistration(sortedSourcePoints, sortedTargetPoints, numPoints);
-		}
-		else
-		{
-			myCurrentTransform = linearRegistration(sortedSourcePoints, sortedTargetPoints, numPoints);
-
-			if (fabs(difference) < mt_distanceDeltaStopThreshold)
-			{
-				//CA: New method:
-				// myCurrentTransform = nonLinearRegistration(sortedSourcePoints, sortedTargetPoints, numPoints);
-				// i.e. move type conversion into method.
-				// Also a helper method for converting points to polydata
-
-				vtkCellArrayPtr tps_sourceCellArray = vtkCellArrayPtr::New();
-				vtkCellArrayPtr tps_targetCellArray = vtkCellArrayPtr::New();
-
-				for (int i = 0; i < nb_points; ++i)
-				{
-
-					tps_sourceCellArray->InsertNextCell(1);
-					tps_sourceCellArray->InsertCellPoint(i);
-					tps_targetCellArray->InsertNextCell(1);
-					tps_targetCellArray->InsertCellPoint(i);
-				}
-
-				vtkPolyDataPtr tps_source_poly = vtkPolyDataPtr::New();
-				tps_source_poly->SetPoints(sortedSourcePoints);
-				tps_source_poly->SetVerts(tps_sourceCellArray);
-
-				vtkPolyDataPtr tps_target_poly = vtkPolyDataPtr::New();
-				tps_target_poly->SetPoints(sortedTargetPoints);
-				tps_target_poly->SetVerts(tps_targetCellArray);
-
-				myCurrentTransform = nonLinearRegistration(tps_source_poly, tps_target_poly, numPoints);
-				//CA: End New method
-			}
-		}
-
-		//CA: New method:
-		// vtkPointsPtr transformedSourcePoints = transform(currentSourcePoints, myCurrentTransform);
-		// assuming numPoints can be read from currentSourcePoints
-		vtkPointsPtr transformedSourcePoints = vtkPointsPtr::New();
-		transformedSourcePoints->SetNumberOfPoints(numPoints);
-
-		//Transform ALL source points
-		double tempPostTransPoint[3];
-		for (int i = 0; i < numPoints; ++i)
-		{
-			myCurrentTransform->InternalTransformPoint(currentSourcePoints->GetPoint(i), tempPostTransPoint);
-			transformedSourcePoints->SetPoint(i, tempPostTransPoint);
-		}
-		//CA: End New method
-
-		myConcatenation->Concatenate(myCurrentTransform);
-
-		if (fabs(difference) < mt_distanceDeltaStopThreshold)
-		{
-			//Stop the running
-			l_keepRunning = 0;
-
-			//CA: The following stuff is not used - delete
-			vtkCellArrayPtr tps_sourceCellArray = vtkCellArrayPtr::New();
-
-			for (int i = 0; i < nb_points; ++i)
-			{
-				tps_sourceCellArray->InsertNextCell(1);
-				tps_sourceCellArray->InsertCellPoint(i);
-			}
-
-			vtkPolyDataPtr tps_source_poly = vtkPolyDataPtr::New();
-			tps_source_poly->SetPoints(transformedSourcePoints);
-			tps_source_poly->SetVerts(tps_sourceCellArray);
-			//CA: End delete stuff
-		}
-
-		//CA: swap(transformedSourcePoints, currentSourcePoints) ??
-		// really needed: currentSourcePoints = transformedSourcePoints;
-		vtkPointsPtr allTempPoints = currentSourcePoints;
-		currentSourcePoints = transformedSourcePoints;
-		transformedSourcePoints = allTempPoints;
-
-		if (mDebugOutput)
-		{
-			std::cout << myNumberOfIterations << " ";
-			std::cout.flush();
-		}
-	}
-	delete mean_distance;
-
-	if (mDebugOutput)
-		std::cout << endl;
-
-	myConcatenation->Update();
-	return true;
-}
-
-vtkAbstractTransformPtr SeansVesselReg::linearRegistration(vtkPointsPtr sortedSourcePoints,
-	vtkPointsPtr sortedTargetPoints, int numPoints/*, vtkAbstractTransform** myCurrentTransform*/)
-{
-	//Build landmark transform
-	vtkLandmarkTransformPtr lmt = vtkLandmarkTransformPtr::New();
-	lmt->SetSourceLandmarks(sortedSourcePoints);
-	lmt->SetTargetLandmarks(sortedTargetPoints);
-	lmt->SetModeToRigidBody();
-	lmt->Modified();
-	lmt->Update();
-
-	//  *myCurrentTransform = lmt;
-	return lmt;
-}
-
-vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPolyDataPtr tpsSourcePolyData,
-	vtkPolyDataPtr tpsTargetPolyData, int numPoints/*, vtkAbstractTransform** myCurrentTransform*/)
-{
-	vtkMaskPointsPtr mask1 = vtkMaskPointsPtr::New();
-	mask1->SetInput(tpsSourcePolyData);
-	mask1->SetOnRatio(mt_sampleRatio);
-	mask1->Update();
-	vtkMaskPointsPtr mask2 = vtkMaskPointsPtr::New();
-	mask2->SetInput(tpsTargetPolyData);
-	mask2->SetOnRatio(mt_sampleRatio);
-	mask2->Update();
-
-	// Build the thin plate spline transform
-	vtkThinPlateSplineTransformPtr tps = vtkThinPlateSplineTransformPtr::New();
-	tps->SetSourceLandmarks(mask1->GetOutput()->GetPoints());
-	tps->SetTargetLandmarks(mask2->GetOutput()->GetPoints());
-	tps->SetBasisToR();
-	tps->SetSigma(mt_sigma);
-
-	//*myCurrentTransform = tps;
-	return tps;
-}
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
-vtkPolyDataPtr SeansVesselReg::convertToPolyData(ssc::DataPtr data)
-{
-	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
-	ssc::MeshPtr mesh = boost::dynamic_pointer_cast<ssc::Mesh>(data);
-
-	if (image)
-	{
-		//Grab the information from the files of target then
-		//filter out points not fit for the threshold
-		return this->extractPolyData(image, mt_singlePointThreshold, 0);
-	}
-	else if (mesh)
-	{
-		return mesh->getTransformedPolyData(mesh->get_rMd());
-	}
-
-	return vtkPolyDataPtr();
-}
-
-void printPoly(vtkPolyDataPtr data)
-{
-	vtkPointsPtr points = data->GetPoints();
-	for (int q = 0; q < points->GetNumberOfPoints(); ++q)
-	{
-		ssc::Vector3D p(points->GetPoint(q));
-		std::cout << q << "\t" << p[0] << " " << p[1] << " " << p[2] << " " << std::endl;
-	}
-}
-
-//source is moving and target is fixed
-bool SeansVesselReg::doItRight(ssc::DataPtr source, ssc::DataPtr target, QString logPath)
-{
-	if (mDebugOutput)
-	{
-		ssc::messageManager()->sendDebug("SOURCE: " + source->getUid());
-		ssc::messageManager()->sendDebug("TARGET: " + target->getUid());
-
-		std::cout << "stop Threshold:" << mt_distanceDeltaStopThreshold << endl;
-		std::cout << "sigma:" << mt_sigma << endl;
-		std::cout << "lts Ratio:" << mt_ltsRatio << endl;
-		std::cout << "linear flag:" << mt_doOnlyLinear << endl;
-		std::cout << "sample flag:" << mt_sampleRatio << endl;
-		std::cout << "single Point Threshold:" << mt_singlePointThreshold << endl;
-	}
-	time_t sec1 = clock();//time(NULL);
-
-	//  ssc::ImagePtr movingData = boost::dynamic_pointer_cast<ssc::Image>(mMovingData);
-
-	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target);
-
-	//  //Grab the information from the files of target then
-	//  //filter out points not fit for the threshold
-	//  vtkPolyDataPtr targetPolyData = this->extractPolyData(target, mt_singlePointThreshold, 0);
-
-	// use the bounding box of target to clip the source data.
-	targetPolyData->GetPoints()->ComputeBounds();
-	double* targetBounds = targetPolyData->GetPoints()->GetBounds();
-	double searchAround = 40;
-	targetBounds[0] -= searchAround;
-	targetBounds[1] += searchAround;
-	targetBounds[2] -= searchAround;
-	targetBounds[3] += searchAround;
-	targetBounds[4] -= searchAround;
-	targetBounds[5] += searchAround;
-
-	vtkPolyDataPtr sourcePolyData = this->convertToPolyData(source);
-	////  vtkPolyDataPtr sourcePolyData = this->extractPolyData(source, mt_singlePointThreshold, targetBounds);
-	//  std::cout << "source data " << sourcePolyData->GetPoints()->GetNumberOfPoints() << std::endl;
-	////  printPoly(sourcePolyData);
-	//  std::cout << ssc::DoubleBoundingBox3D(sourcePolyData->GetBounds()) << std::endl;
-	//  std::cout << std::endl;
-
-	// clip the source data with a box
-	vtkPlanesPtr box = vtkPlanesPtr::New();
-	//  std::cout << "bounds" << std::endl;
-	box->SetBounds(targetBounds);
-	if (mDebugOutput)
-		std::cout << "bb: " << ssc::DoubleBoundingBox3D(targetBounds) << std::endl;
-	vtkClipPolyDataPtr clipper = vtkClipPolyDataPtr::New();
-	clipper->SetInput(sourcePolyData);
-	clipper->SetClipFunction(box);
-	clipper->SetInsideOut(true);
-	clipper->Update();
-
-	int oldSource = sourcePolyData->GetPoints()->GetNumberOfPoints();
-	int clippedSource = clipper->GetOutput()->GetPoints()->GetNumberOfPoints();
-
-	if (clippedSource < oldSource)
-	{
-		double ratio = double(oldSource - clippedSource) / double(oldSource);
-		if (mDebugOutput)
-			std::cout << "Removed " << ratio * 100 << "%" << " of the source data. Outside the target data bounds."
-				<< std::endl;
-	}
-
-	sourcePolyData = clipper->GetOutput();
-
-	//  std::cout << "\nPreprocess time:" << " " << (clock() - sec1) / (double) CLOCKS_PER_SEC << " seconds\n" << endl;
-
-	//  std::cout << "new source data " << sourcePolyData->GetPoints()->GetNumberOfPoints() << std::endl;
-	////  printPoly(sourcePolyData);
-	//  std::cout << ssc::DoubleBoundingBox3D(sourcePolyData->GetBounds()) << std::endl;
-	//  std::cout << std::endl;
-	//  std::cout << "target data" << std::endl;
-	//  printPoly(targetPolyData);
-
-	//Make sure we have stuff to work with
-	if (!sourcePolyData->GetNumberOfPoints() || !targetPolyData->GetNumberOfPoints())
-	{
-		std::cerr << "Can't execute with empty source or target data" << std::endl;
-		return false;
-	}
-
-	mInvertedTransform = false;
-
-	//TODO check
-	if (sourcePolyData->GetNumberOfPoints() > targetPolyData->GetNumberOfPoints())
-	{
-		//INVERT
-		if (mDebugOutput)
-			std::cout << "inverted vessel reg" << std::endl;
-		mInvertedTransform = true;
-		std::swap(sourcePolyData, targetPolyData);
-	}
-
-	vtkIdType numPoints = sourcePolyData->GetNumberOfPoints();
-	if (mDebugOutput)
-	{
-		std::cout << "total number of source points:" << numPoints << ", target points: " << targetPolyData->GetNumberOfPoints() << endl;
-		std::cout << "number of source points to be sampled:" << ((int) (numPoints * mt_ltsRatio) / 100) << "\n" << endl;
-	}
-	// Create locator for target points
-	vtkCellLocatorPtr targetPointLocator = vtkCellLocatorPtr::New();
-	targetPointLocator->SetDataSet(targetPolyData);
-	targetPointLocator->SetNumberOfCellsPerBucket(1);
-	targetPointLocator->BuildLocator();
-
-	//Container for all the transforms
-	vtkGeneralTransformPtr myConcatenation = vtkGeneralTransformPtr::New();
-
-	//Do EVERYTHING
-	if (!processAllStuff(sourcePolyData, targetPointLocator, myConcatenation))
-	{
-		return false;
-	}
-
-	printOutResults(logPath + "/Vessel_Based_Registration_", myConcatenation);
-
-	if (mDebugOutput)
-		std::cout << "\n\n\nExecution time:" << " " << (clock() - sec1) / (double) CLOCKS_PER_SEC << " " << "seconds"
-			<< endl;
-
-	mLinearTransformResult = this->getLinearTransform(myConcatenation);
-
-	return true;
-}
-
-ssc::Transform3D SeansVesselReg::getLinearTransform()
-{
-	ssc::Transform3D retval = mLinearTransformResult;
-	if (mInvertedTransform)
-		retval = retval.inv();
-
-	return retval;
-}
-
 ssc::ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
 {
 	time_t sec1 = clock();
@@ -735,26 +729,4 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
 	return p_thePolyData;
 }
 
-/**Convert the linear transform part of myContatenation to a ssc::Transform3D
- */
-ssc::Transform3D SeansVesselReg::getLinearTransform(vtkGeneralTransformPtr myConcatenation)
-{
-
-	vtkMatrix4x4Ptr l_tempMatrix = vtkMatrix4x4Ptr::New();
-	vtkMatrix4x4Ptr l_resultMatrix = vtkMatrix4x4Ptr::New();
-
-	if (mt_doOnlyLinear)
-		l_tempMatrix->DeepCopy(((vtkLandmarkTransform*) myConcatenation->GetConcatenatedTransform(0))->GetMatrix());
-
-	l_resultMatrix->Identity();
-	for (int i = 1; i < myConcatenation->GetNumberOfConcatenatedTransforms(); ++i)
-	{
-		vtkMatrix4x4::Multiply4x4(l_tempMatrix,
-			((vtkLandmarkTransform*) myConcatenation->GetConcatenatedTransform(i))->GetMatrix(), l_resultMatrix);
-		l_tempMatrix->DeepCopy(l_resultMatrix);
-
-	}
-
-	return ssc::Transform3D(l_resultMatrix).inverse();
-}
 } //namespace cx

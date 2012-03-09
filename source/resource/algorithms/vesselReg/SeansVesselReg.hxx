@@ -24,11 +24,11 @@ public:
   SeansVesselReg(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample, int single_point_thre, bool verbose);
   ~SeansVesselReg();
 
-  bool doItRight(ssc::DataPtr source, ssc::DataPtr target, QString logPath);
+  bool execute(ssc::DataPtr source, ssc::DataPtr target, QString logPath);
   ssc::Transform3D getLinearTransform();
 //  ssc::Transform3D getNonLinearTransform();
   ssc::ImagePtr loadMinc(char* source_file);
-  void setDebugOutput(bool on) { mDebugOutput = on; }
+  void setDebugOutput(bool on) { mt_verbose = on; }
 
   /**
    * Extract polydata from a image.
@@ -42,11 +42,18 @@ private:
   ssc::Transform3D getLinearTransform(vtkGeneralTransformPtr myConcatenation);
 
 protected:
-  bool processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCellLocatorPtr myLocator, vtkGeneralTransformPtr myConcatenation);
+  bool runAlgorithm(vtkPolyDataPtr currentSourcePolyData, vtkPolyDataPtr targetPolyData, vtkGeneralTransformPtr myConcatenation);
   void printOutResults(QString fileNamePrefix, vtkGeneralTransformPtr myConcatenation);
-  vtkAbstractTransformPtr linearRegistration(vtkPointsPtr sortedSourcePoints, vtkPointsPtr sortedTargetPoints, int numPoints/*, vtkAbstractTransform** myCurrentTransform*/);
-  vtkAbstractTransformPtr nonLinearRegistration(vtkPolyDataPtr tpsSourcePolyData, vtkPolyDataPtr tpsTargetPolyData, int numPoints);
+  vtkAbstractTransformPtr linearRegistration(vtkPointsPtr sortedSourcePoints, vtkPointsPtr sortedTargetPoints, int numPoints);
+  vtkAbstractTransformPtr nonLinearRegistration(vtkPointsPtr sortedSourcePoints, vtkPointsPtr sortedTargetPoints, int numPoints);
   vtkPolyDataPtr convertToPolyData(ssc::DataPtr data);
+  vtkPointsPtr transformPoints(vtkPointsPtr input, vtkAbstractTransformPtr transform);
+  vtkPolyDataPtr convertToPolyData(vtkPointsPtr input);
+  vtkPointsPtr createSortedPoints(vtkIdListPtr sortedIDList, vtkPointsPtr unsortedPoints, int numPoints);
+  vtkPolyDataPtr crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, double margin);
+
+  void print(vtkPointsPtr points);
+  void print(vtkPolyDataPtr data);
 
   int mt_ltsRatio;
   double mt_distanceDeltaStopThreshold;
@@ -65,7 +72,6 @@ protected:
   //TODO non-linear needs to handle this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   bool mInvertedTransform; ///< the calculated registration goes from target to source instead of source to target
   //---------------------------------------------------------------------------
-  bool mDebugOutput;
 };
 }//namespace cx
 #endif
