@@ -39,7 +39,9 @@ private:
 	vtkPolyDataPtr generatePolyData(std::vector<ssc::Vector3D> pts);
 	QStringList generateTestData();
 	void saveVTKFile(vtkPolyDataPtr data, QString filename);
-	void append_line(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a, ssc::Vector3D b, double spacing);
+	QString saveVTKFile(std::vector<ssc::Vector3D>, QString filename);
+	ssc::Vector3D append_line(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a, ssc::Vector3D b, double spacing);
+	ssc::Vector3D append_pt(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a);
 	std::vector<ssc::Transform3D> generateTransforms();
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestRegistration );
