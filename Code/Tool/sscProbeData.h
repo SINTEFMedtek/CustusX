@@ -88,6 +88,7 @@ class ProbeData
 public: 
 	struct ProbeImageData
 	{
+		ProbeImageData();
 //    ssc::Vector3D mOrigin_u; ///< probe origin in image space u. (lower-left corner origin)
 		ssc::Vector3D getOrigin_u() const; ///< probe origin in image space u. (lower-left corner origin)
 		ssc::DoubleBoundingBox3D getClipRect_u() const; ///< sector clipping rect in image space u. (lower-left corner origin)
