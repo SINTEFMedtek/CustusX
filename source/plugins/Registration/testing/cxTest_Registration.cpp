@@ -250,20 +250,20 @@ void TestRegistration::testVessel2VesselRegistration()
 	pert.push_back(T_center * R_xy5 * T_center.inv());
 	pert.push_back(T_center * R_xy5 * T_center.inv() * T_222);
 
-	ssc::Transform3D T_large1 = ssc::createTransformTranslate(ssc::Vector3D(3,3,3));
-	ssc::Transform3D T_large2 = ssc::createTransformTranslate(ssc::Vector3D(0,0,5));
-	pert.push_back(T_large1);
-	pert.push_back(T_large2);
-
-	std::cout << std::endl;
-	this->doTestVessel2VesselRegistration(T_large1, fname1, fname2, tol_dist_hi, tol_ang_hi);
-	this->doTestVessel2VesselRegistration(T_large1, fname2, fname1, tol_dist_hi, tol_ang_hi);
+//	ssc::Transform3D T_large1 = ssc::createTransformTranslate(ssc::Vector3D(3, 3, 3));
+//	ssc::Transform3D T_large2 = ssc::createTransformTranslate(ssc::Vector3D(0, 0, 5));
+//	pert.push_back(T_large1);
+//	pert.push_back(T_large2);
+//
+//	std::cout << std::endl;
+//	this->doTestVessel2VesselRegistration(T_large1, fname1, fname2, tol_dist_hi, tol_ang_hi);
+//	this->doTestVessel2VesselRegistration(T_large1, fname2, fname1, tol_dist_hi, tol_ang_hi);
 
 	// causes failure in findClosestPoint -> nan
 //	pert.push_back(ssc::createTransformRotateY(120 / 180.0 * M_PI) * ssc::createTransformRotateX(90 / 180.0 * M_PI) * ssc::createTransformTranslate(ssc::Vector3D(90, 50, 0)));
 
 	std::cout << std::endl;
-/*
+
 	for (unsigned i = 0; i < pert.size(); ++i)
 	{
 		this->doTestVessel2VesselRegistration(pert[i], fname1, fname1, tol_dist_low, tol_ang_low);
@@ -286,7 +286,7 @@ void TestRegistration::testVessel2VesselRegistration()
 		this->doTestVessel2VesselRegistration(pert[i], fname0, fname1, tol_dist_hi, tol_ang_hi);
 		this->doTestVessel2VesselRegistration(pert[i], fname1, fname0, tol_dist_hi, tol_ang_hi);
 	}
-*/
+
 }
 
 
@@ -301,7 +301,7 @@ void TestRegistration::doTestVessel2VesselRegistration(ssc::Transform3D perturba
 	bool lin_flag = 1;
 	int sample = 1;
 	int single_point_thre = 1;
-	bool verbose = 1;
+	bool verbose = 0;
 
 	if (verbose)
 	{
