@@ -10,6 +10,8 @@ class QLabel;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
+
 /**
  * \file
  * \addtogroup cxPluginRegistration
@@ -40,9 +42,13 @@ public slots:
 
 private slots:
   void registerSlot();
+  void debugInit();
+  void debugRunOneStep();
+  void debugClear();
 
 private:
   QWidget* createOptionsWidget();
+  SeansVesselRegistrationDebuggerPtr mDebugger;
 
   QSpinBox* mLTSRatioSpinBox;
   QCheckBox* mLinearCheckBox;
