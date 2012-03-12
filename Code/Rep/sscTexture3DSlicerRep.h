@@ -91,6 +91,7 @@ public:
 	virtual void printSelf(std::ostream & os, ssc::Indent indent);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImages(std::vector<ssc::ImagePtr> images);
+	std::vector<ssc::ImagePtr> getImages();
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	void update();
 	void setTargetSpaceToR();

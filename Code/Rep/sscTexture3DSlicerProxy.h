@@ -56,6 +56,7 @@ public:
 	virtual void setShaderFile(QString shaderFile) {}
 	virtual void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp) {}
 	virtual void setImages(std::vector<ssc::ImagePtr> images) {}
+	virtual std::vector<ssc::ImagePtr> getImages() { return std::vector<ssc::ImagePtr>(); }
 	virtual void setSliceProxy(ssc::SliceProxyPtr slicer) {}
 	virtual ssc::SliceProxyPtr getSliceProxy() { return ssc::SliceProxyPtr(); }
 	virtual void update() {}
@@ -93,6 +94,7 @@ public:
 	void update();
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkActorPtr getActor();
+	std::vector<ssc::ImagePtr> getImages() { return mImages; };
 
 protected:
 	Texture3DSlicerProxyImpl();
