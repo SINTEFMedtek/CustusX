@@ -10,6 +10,8 @@ class QLabel;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SeansVesselRegistrationDebugger> SeansVesselRegistrationDebuggerPtr;
+
 /**
  * \file
  * \addtogroup cxPluginRegistration
@@ -34,21 +36,20 @@ public:
   virtual ~SeansVesselRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 
-public slots:
-//  void fixedImageSlot(QString uid);
-//  void movingImageSlot(QString uid);
-
 private slots:
   void registerSlot();
+  void debugInit();
+  void debugRunOneLinearStep();
+  void debugRunOneNonlinearStep();
+  void debugClear();
 
 private:
   QWidget* createOptionsWidget();
+  SeansVesselRegistrationDebuggerPtr mDebugger;
 
   QSpinBox* mLTSRatioSpinBox;
   QCheckBox* mLinearCheckBox;
   QPushButton* mRegisterButton;
-//  QLabel* mFixedImageLabel;
-//  QLabel* mMovingImageLabel;
 
   ssc::StringDataAdapterPtr mFixedImage;
   ssc::StringDataAdapterPtr mMovingImage;
