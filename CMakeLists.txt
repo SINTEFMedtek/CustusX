@@ -32,6 +32,7 @@ if(WIN32)
 		message( STATUS "This is a 32 bit build.")
 	endif()
 endif()
+message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 
 if(APPLE)
 	add_definitions(-D__APPLE__)
