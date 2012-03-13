@@ -12,7 +12,13 @@
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxRegistrationDataAdapters.h"
+#include "vesselReg/SeansVesselReg.cxx"
 
+#include "cxViewManager.h"
+#include "cxView3D.h"
+#include "sscGeometricRep.h"
+#include <vtkCellArray.h>
+#include "sscGraphicalPrimitives.h"
 
 namespace cx
 {
@@ -106,6 +112,132 @@ void SeansVesselRegistrationWidget::registerSlot()
   mManager->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose, logPath);
 }
 
+
+/**Utililty class for debugging the SeansVesselRegistration class interactively.
+ *
+ * \sa SeansVesselRegistrationWidget
+ */
+class SeansVesselRegistrationDebugger
+{
+public:
+	SeansVesselRegistrationDebugger(RegistrationManagerPtr manager, double ltsRatio, bool linear) :
+		mRegistrator(ltsRatio, 0.001, 0, 1.0, linear, 1, 1, 1)
+	{
+		mManager = manager;
+		mContext = mRegistrator.createContext(mManager->getMovingData(), mManager->getFixedData());
+
+		mMovingData = mRegistrator.convertToPolyData(mContext->mSourcePoints);
+
+		ssc::MeshPtr moving(new ssc::Mesh("v2vreg_moving", "v2vreg_moving", mMovingData));
+		moving->setColor(QColor("blue"));
+
+		ssc::MeshPtr fixed(new ssc::Mesh("v2vreg_fixed", "v2vreg_fixed", mContext->mTargetPoints));
+		fixed->setColor(QColor("green"));
+
+		mPolyLines = vtkPolyDataPtr::New();
+		ssc::MeshPtr lines(new ssc::Mesh("v2vreg_lines", "v2vreg_lines", mPolyLines));
+		lines->setColor(QColor("red"));
+
+		ssc::View* view = viewManager()->get3DView();
+
+		m_mRep = ssc::GeometricRep::New(moving->getUid(), moving->getName());
+		m_mRep->setMesh(moving);
+		view->addRep(m_mRep);
+
+		m_fRep = ssc::GeometricRep::New(fixed->getUid(), fixed->getName());
+		m_fRep->setMesh(fixed);
+		view->addRep(m_fRep);
+
+		m_lineRep = ssc::GeometricRep::New(lines->getUid(), lines->getName());
+		m_lineRep->setMesh(lines);
+		view->addRep(m_lineRep);
+
+		this->update();
+
+		ssc::messageManager()->sendInfo("Initialized V2V algorithm (debug). Use Step to iterate.");
+	}
+	~SeansVesselRegistrationDebugger()
+	{
+		ssc::View* view = viewManager()->get3DView();
+		view->removeRep(m_mRep);
+		view->removeRep(m_fRep);
+		view->removeRep(m_lineRep);
+		ssc::messageManager()->sendInfo("Closed V2V algorithm (debug).");
+	}
+	void stepL()
+	{
+		mRegistrator.performOneRegistration(mContext, true);
+		this->update();
+		ssc::messageManager()->sendInfo(QString("One Linear V2V iteration, metric=%1").arg(mContext->mMetric));
+	}
+	void stepNL()
+	{
+		mRegistrator.performOneRegistration(mContext, false);
+		this->update();
+		ssc::messageManager()->sendInfo(QString("One Nonlinear V2V iteration, metric=%1").arg(mContext->mMetric));
+	}
+	void update()
+	{
+		mRegistrator.computeDistances(mContext);
+		vtkPolyDataPtr temp = mRegistrator.convertToPolyData(mContext->mSourcePoints);
+		mMovingData->SetPoints(temp->GetPoints());
+		mMovingData->SetVerts(temp->GetVerts());
+
+//		// draw lines: slow but nice
+//		mLines.clear();
+//		ssc::View* view = viewManager()->get3DView();
+//		for (int i=0; i<mContext->mSortedSourcePoints->GetNumberOfPoints(); ++i)
+//		{
+//			ssc::GraphicalLine3DPtr line(new ssc::GraphicalLine3D(view->getRenderer()));
+//			line->setValue(ssc::Vector3D(mContext->mSortedSourcePoints->GetPoint(i)),
+//				ssc::Vector3D(mContext->mSortedTargetPoints->GetPoint(i)));
+//			line->setColor(ssc::Vector3D(1,0,0));
+//			mLines.push_back(line);
+//		}
+
+		// draw lines
+		mPolyLines->Allocate();
+		vtkPointsPtr verts = vtkPointsPtr::New();
+		for (int i=0; i<mContext->mSortedSourcePoints->GetNumberOfPoints(); ++i)
+		{
+			verts->InsertNextPoint(mContext->mSortedSourcePoints->GetPoint(i));
+			verts->InsertNextPoint(mContext->mSortedTargetPoints->GetPoint(i));
+
+			vtkIdType connectivity[2];
+			connectivity[0] = 2*i;
+			connectivity[1] = 2*i+1;
+			mPolyLines->InsertNextCell(VTK_LINE, 2, connectivity);
+		}
+		mPolyLines->SetPoints(verts);
+	}
+
+private:
+	SeansVesselReg mRegistrator;
+	SeansVesselReg::ContextPtr mContext;
+	RegistrationManagerPtr mManager;
+	vtkPolyDataPtr mMovingData;
+	vtkPolyDataPtr mPolyLines;
+	ssc::GeometricRepPtr m_mRep,m_fRep,m_lineRep;
+//	std::vector<ssc::GraphicalLine3DPtr> mLines;
+};
+
+void SeansVesselRegistrationWidget::debugInit()
+{
+	mDebugger.reset(new SeansVesselRegistrationDebugger(mManager, mLTSRatioSpinBox->value(), mLinearCheckBox->isChecked()));
+}
+void SeansVesselRegistrationWidget::debugRunOneLinearStep()
+{
+	mDebugger->stepL();
+}
+void SeansVesselRegistrationWidget::debugRunOneNonlinearStep()
+{
+	mDebugger->stepNL();
+}
+void SeansVesselRegistrationWidget::debugClear()
+{
+	mDebugger.reset();
+}
+
 QWidget* SeansVesselRegistrationWidget::createOptionsWidget()
 {
   QWidget* retval = new QWidget(this);
@@ -115,11 +247,20 @@ QWidget* SeansVesselRegistrationWidget::createOptionsWidget()
   mLTSRatioSpinBox->setValue(80);
 
   mLinearCheckBox->setChecked(true);
-
-  layout->addWidget(new QLabel("LTS Ratio:"), 0 , 0);
-  layout->addWidget(mLTSRatioSpinBox, 0, 1);
-  layout->addWidget(new QLabel("Linear:"), 1 , 0);
-  layout->addWidget(mLinearCheckBox, 1, 1);
+  int line = 0;
+  layout->addWidget(new QLabel("LTS Ratio:"), line , 0);
+  layout->addWidget(mLTSRatioSpinBox, line, 1);
+  ++line;
+  layout->addWidget(new QLabel("Linear:"), line , 0);
+  layout->addWidget(mLinearCheckBox, line, 1);
+  ++line;
+  layout->addWidget(new QLabel("Debug"), line , 0);
+  QHBoxLayout* debugLayout = new QHBoxLayout;
+  layout->addLayout(debugLayout, line, 1, 1, 1);
+  this->createAction(this, QIcon(), "Init", "Initialize the V2V algorithm.\n Display only, registration will not be updated in CustusX (Debug)", SLOT(debugInit()), debugLayout);
+  this->createAction(this, QIcon(), "Lin", "Run one Linear step in the V2V algorithm. (Debug)", SLOT(debugRunOneLinearStep()), debugLayout);
+  this->createAction(this, QIcon(), "NL", "Run one Nonlinear step in the V2V algorithm. (Should be one at the end only)(Debug)", SLOT(debugRunOneNonlinearStep()), debugLayout);
+  this->createAction(this, QIcon(), "Clear", "Clear debugging of the V2V algorithm.", SLOT(debugClear()), debugLayout);
 
   return retval;
 }
