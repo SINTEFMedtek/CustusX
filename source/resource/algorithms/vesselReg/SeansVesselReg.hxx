@@ -33,6 +33,7 @@ public:
 		vtkPointsPtr mSortedSourcePoints; ///< source points sorted according to distance to target, #mSortedSourcePoints==#mSortedTargetPoints
 		vtkPointsPtr mSortedTargetPoints; ///< source points projected onto the target points (closest points) #mSortedSourcePoints==#mSortedTargetPoints
 
+		vtkGeneralTransformPtr mConcatenation; ///< output: concatenation of all transforms so far
 		vtkAbstractTransformPtr mTransform; ///< output: transform from last iteration
 		double mMetric; ///< output: mean least squares from BEFORE last iteration.
 
