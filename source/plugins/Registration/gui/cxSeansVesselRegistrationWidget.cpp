@@ -164,11 +164,17 @@ public:
 		view->removeRep(m_lineRep);
 		ssc::messageManager()->sendInfo("Closed V2V algorithm (debug).");
 	}
-	void step()
+	void stepL()
 	{
 		mRegistrator.performOneRegistration(mContext, true);
 		this->update();
-		ssc::messageManager()->sendInfo(QString("One V2V iteration, metric=%1").arg(mContext->mMetric));
+		ssc::messageManager()->sendInfo(QString("One Linear V2V iteration, metric=%1").arg(mContext->mMetric));
+	}
+	void stepNL()
+	{
+		mRegistrator.performOneRegistration(mContext, false);
+		this->update();
+		ssc::messageManager()->sendInfo(QString("One Nonlinear V2V iteration, metric=%1").arg(mContext->mMetric));
 	}
 	void update()
 	{
@@ -219,9 +225,13 @@ void SeansVesselRegistrationWidget::debugInit()
 {
 	mDebugger.reset(new SeansVesselRegistrationDebugger(mManager, mLTSRatioSpinBox->value(), mLinearCheckBox->isChecked()));
 }
-void SeansVesselRegistrationWidget::debugRunOneStep()
+void SeansVesselRegistrationWidget::debugRunOneLinearStep()
 {
-	mDebugger->step();
+	mDebugger->stepL();
+}
+void SeansVesselRegistrationWidget::debugRunOneNonlinearStep()
+{
+	mDebugger->stepNL();
 }
 void SeansVesselRegistrationWidget::debugClear()
 {
@@ -248,7 +258,8 @@ QWidget* SeansVesselRegistrationWidget::createOptionsWidget()
   QHBoxLayout* debugLayout = new QHBoxLayout;
   layout->addLayout(debugLayout, line, 1, 1, 1);
   this->createAction(this, QIcon(), "Init", "Initialize the V2V algorithm.\n Display only, registration will not be updated in CustusX (Debug)", SLOT(debugInit()), debugLayout);
-  this->createAction(this, QIcon(), "Step", "Run one step in the V2V algorithm. (Debug)", SLOT(debugRunOneStep()), debugLayout);
+  this->createAction(this, QIcon(), "Lin", "Run one Linear step in the V2V algorithm. (Debug)", SLOT(debugRunOneLinearStep()), debugLayout);
+  this->createAction(this, QIcon(), "NL", "Run one Nonlinear step in the V2V algorithm. (Should be one at the end only)(Debug)", SLOT(debugRunOneNonlinearStep()), debugLayout);
   this->createAction(this, QIcon(), "Clear", "Clear debugging of the V2V algorithm.", SLOT(debugClear()), debugLayout);
 
   return retval;
