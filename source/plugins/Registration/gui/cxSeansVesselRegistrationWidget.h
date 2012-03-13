@@ -36,14 +36,11 @@ public:
   virtual ~SeansVesselRegistrationWidget();
   virtual QString defaultWhatsThis() const;
 
-public slots:
-//  void fixedImageSlot(QString uid);
-//  void movingImageSlot(QString uid);
-
 private slots:
   void registerSlot();
   void debugInit();
-  void debugRunOneStep();
+  void debugRunOneLinearStep();
+  void debugRunOneNonlinearStep();
   void debugClear();
 
 private:
@@ -53,8 +50,6 @@ private:
   QSpinBox* mLTSRatioSpinBox;
   QCheckBox* mLinearCheckBox;
   QPushButton* mRegisterButton;
-//  QLabel* mFixedImageLabel;
-//  QLabel* mMovingImageLabel;
 
   ssc::StringDataAdapterPtr mFixedImage;
   ssc::StringDataAdapterPtr mMovingImage;

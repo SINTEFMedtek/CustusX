@@ -69,31 +69,47 @@ bool SeansVesselReg::execute(ssc::DataPtr source, ssc::DataPtr target, QString l
 		std::cout << "sample flag:" << mt_sampleRatio << endl;
 		std::cout << "single Point Threshold:" << mt_singlePointThreshold << endl;
 	}
-	time_t sec1 = clock();//time(NULL);
+	QTime start = QTime::currentTime();
 
-	//Container for all the transforms
-	vtkGeneralTransformPtr myConcatenation = vtkGeneralTransformPtr::New();
-//	vtkGeneralTransformPtr dummyConcatenation = vtkGeneralTransformPtr::New();
-
-//	this->runAlgorithm(sourcePolyData, targetPolyData, dummyConcatenation, 10, 1);
-//	this->runAlgorithm(sourcePolyData, targetPolyData, dummyConcatenation, 10, 0.75);
-//	this->runAlgorithm(sourcePolyData, targetPolyData, dummyConcatenation, 10, 0.5);
-//	this->runAlgorithm(sourcePolyData, targetPolyData, dummyConcatenation, 10, 0.25);
-
+	// create a context containing all input, temporaries and output.
 	ContextPtr context = this->createContext(source, target);
 
 	if (!context)
 		return false;
 
-	if (!this->runAlgorithm(context, myConcatenation, 0, 1))
-		return false;
+	// Perform registrations iteratively until convergence is reached:
+	double previousMetric = 1E6;
+	for (int iteration = 1; iteration < mt_maximumNumberOfIterations; ++iteration)
+	{
+		this->performOneRegistration(context, true);
+		double difference = context->mMetric - previousMetric;
 
-	printOutResults(logPath + "/Vessel_Based_Registration_", myConcatenation);
+		if (mt_verbose)
+		{
+//			std::cout << myNumberOfIterations << " ";
+//			std::cout.flush();
+			std::cout << QString("iteration\t%1\trms:\t%2").arg(iteration).arg(context->mMetric) << std::endl;
+		}
+
+		// Check for convergence
+		if (fabs(difference) < mt_distanceDeltaStopThreshold)
+			break;
+
+		previousMetric = context->mMetric;
+	}
+
+	// add a nonlinear step to the end:
+	if (!mt_doOnlyLinear)
+	{
+		this->performOneRegistration(context, false);
+	}
+
+	printOutResults(logPath + "/Vessel_Based_Registration_", context->mConcatenation);
 
 	if (mt_verbose)
-		std::cout << "\n\n\nExecution time:" << " " << (clock() - sec1) / (double) CLOCKS_PER_SEC << " " << "seconds" << endl;
+		std::cout << QString("\n\nV2V Execution time: %1s").arg(start.secsTo(QTime::currentTime())) << endl;
 
-	mLinearTransformResult = this->getLinearTransform(myConcatenation);
+	mLinearTransformResult = this->getLinearTransform(context->mConcatenation);
 
 	return true;
 }
@@ -138,6 +154,8 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(ssc::DataPtr source, ss
 
 	ContextPtr context = ContextPtr(new Context);
 
+	context->mConcatenation = vtkGeneralTransformPtr::New();
+
 	// Create locator for target points
 	context->mTargetPoints = targetPolyData;
 	context->mTargetPointLocator = vtkCellLocatorPtr::New();
@@ -152,74 +170,6 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(ssc::DataPtr source, ss
 	context->mLtsRatio = mt_ltsRatio; ///< local copy of the lts ratio, can be changed for current iteration.
 
 	return context;
-}
-
-/**Run the core algorithm
- *
- */
-bool SeansVesselReg::runAlgorithm(ContextPtr context,
-	vtkGeneralTransformPtr myConcatenation,
-	int largeSteps,
-	double fraction)
-{
-//	std::cout << QString("=========== steps=%1 frac=%2 ==============").arg(largeSteps).arg(fraction) << std::endl;
-
-	std::vector<double> mean_distance(mt_maximumNumberOfIterations);
-
-	for (int iteration = 1; iteration < mt_maximumNumberOfIterations; ++iteration)
-	{
-//		double lts_ratio = mt_ltsRatio;
-//		if (iteration<=largeSteps)
-//		{
-//			lts_ratio = mt_ltsRatio*fraction;
-//		}
-//		if (iteration==largeSteps+1)
-//		{
-//			std::cout << "end large" << std::endl;
-//		}
-
-//		vtkAbstractTransformPtr myCurrentTransform;
-//		double currentMetric;
-		this->performOneRegistration(context, true);
-		mean_distance[iteration] = context->mMetric;
-
-		// add transform from this iteration to the total
-		myConcatenation->Concatenate(context->mTransform);
-
-		if (mt_verbose)
-		{
-//			std::cout << myNumberOfIterations << " ";
-//			std::cout.flush();
-			std::cout << QString("%1\t%2").arg(iteration).arg(mean_distance[iteration]) << std::endl;
-		}
-
-		// Check for convergence
-		double difference = 100;
-		if (iteration != 1)
-		{
-			difference = mean_distance[iteration] - mean_distance[iteration - 1];
-		}
-		if (fabs(difference) < mt_distanceDeltaStopThreshold)
-		{
-			break;
-		}
-	}
-
-	if (!mt_doOnlyLinear)
-	{
-		// add a nonlinear step to the end:
-//		vtkAbstractTransformPtr nonLinearTransform;
-//		double currentMetric;
-		this->performOneRegistration(context, false);
-		// add transform from this iteration to the total
-		myConcatenation->Concatenate(context->mTransform);
-	}
-
-	if (mt_verbose)
-		std::cout << endl;
-
-	myConcatenation->Update();
-	return true;
 }
 
 /**\brief Compute distances between the two datasets.
@@ -317,6 +267,9 @@ void SeansVesselReg::performOneRegistration(ContextPtr context, bool linear)
 	// clear sorting data - enables us to call iteratively without fuss.
 	context->mSortedSourcePoints = vtkPointsPtr();
 	context->mSortedTargetPoints = vtkPointsPtr();
+
+	// add transform from this iteration to the total
+	context->mConcatenation->Concatenate(context->mTransform);
 }
 
 /**Using the already sorted list of point ID's, create a sorted list of points
@@ -340,27 +293,33 @@ vtkPointsPtr SeansVesselReg::createSortedPoints(vtkIdListPtr sortedIDList, vtkPo
 	return retval;
 }
 
-
+/**Transform input using the transform
+ *
+ */
 vtkPointsPtr SeansVesselReg::transformPoints(vtkPointsPtr input, vtkAbstractTransformPtr transform)
 {
-	int numPoints = input->GetNumberOfPoints();
-	vtkPointsPtr retval = vtkPointsPtr::New();
-	retval->SetNumberOfPoints(numPoints);
+//	QTime start = QTime::currentTime();
 
-	//Transform ALL source points
-	double tempPostTransPoint[3];
-	for (int i = 0; i < numPoints; ++i)
+	int N = input->GetNumberOfPoints();
+	vtkPointsPtr retval = vtkPointsPtr::New();
+	retval->SetNumberOfPoints(N);
+
+		//Transform ALL source points
+	double temp[3];
+	for (int i = 0; i < N; ++i)
 	{
-		transform->InternalTransformPoint(input->GetPoint(i), tempPostTransPoint);
-		retval->SetPoint(i, tempPostTransPoint);
+		transform->InternalTransformPoint(input->GetPoint(i), temp);
+		retval->SetPoint(i, temp);
 	}
 
+//	std::cout << QString("\nV2V Transform time: %1s").arg(start.secsTo(QTime::currentTime())) << endl;
 	return retval;
 }
 
 vtkAbstractTransformPtr SeansVesselReg::linearRegistration(vtkPointsPtr sortedSourcePoints,
 	vtkPointsPtr sortedTargetPoints)
 {
+	std::cout << "linear" << std::endl;
 	//Build landmark transform
 	vtkLandmarkTransformPtr lmt = vtkLandmarkTransformPtr::New();
 	lmt->SetSourceLandmarks(sortedSourcePoints);
@@ -369,13 +328,13 @@ vtkAbstractTransformPtr SeansVesselReg::linearRegistration(vtkPointsPtr sortedSo
 	lmt->Modified();
 	lmt->Update();
 
-	//  *myCurrentTransform = lmt;
 	return lmt;
 }
 
 vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPointsPtr sortedSourcePoints,
 	vtkPointsPtr sortedTargetPoints)
 {
+	std::cout << "nonlinear" << std::endl;
 	vtkPolyDataPtr tpsSourcePolyData = this->convertToPolyData(sortedSourcePoints);
 	vtkPolyDataPtr tpsTargetPolyData = this->convertToPolyData(sortedTargetPoints);
 
@@ -394,8 +353,10 @@ vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPointsPtr sorte
 	tps->SetTargetLandmarks(mask2->GetOutput()->GetPoints());
 	tps->SetBasisToR();
 	tps->SetSigma(mt_sigma);
+	QTime start = QTime::currentTime();
+	tps->Update();
+	std::cout << QString("\nV2V NL time: %1s").arg(start.secsTo(QTime::currentTime())) << endl;
 
-	//*myCurrentTransform = tps;
 	return tps;
 }
 
@@ -624,6 +585,10 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
 	}
 	file_out2.close();
 }
+
+/**Not used and probably buggy
+ *
+ */
 ssc::ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
 {
 	time_t sec1 = clock();
@@ -667,7 +632,7 @@ ssc::ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
 }
 
 /** Input an image representation of centerlines.
- *  Tranform to polydata, reject all data outside bounding box,
+ *  Transform to polydata, reject all data outside bounding box,
  *  unknown parameter: p_neighborhoodFilterThreshold
  *
  */
