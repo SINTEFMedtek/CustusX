@@ -51,7 +51,7 @@ SeansVesselReg::~SeansVesselReg()
 }
 
 /**Execute the vessel to vessel registration.
- * The result is available via the getLinearTransform().
+ * The result is available via the getLinearResult().
  *
  * source is moving and target is fixed
  */
@@ -452,7 +452,7 @@ vtkPolyDataPtr SeansVesselReg::crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, 
 	return clipper->GetOutput();
 }
 
-ssc::Transform3D SeansVesselReg::getLinearTransform()
+ssc::Transform3D SeansVesselReg::getLinearResult()
 {
 	ssc::Transform3D retval = mLinearTransformResult;
 	if (mInvertedTransform)
