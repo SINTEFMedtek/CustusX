@@ -434,7 +434,7 @@ void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta,
 		return;
 	}
 
-	ssc::Transform3D linearTransform = vesselReg.getLinearTransform();
+	ssc::Transform3D linearTransform = vesselReg.getLinearResult();
 	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
 	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
 

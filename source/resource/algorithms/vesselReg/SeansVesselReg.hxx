@@ -45,8 +45,8 @@ public:
   ~SeansVesselReg();
 
   bool execute(ssc::DataPtr source, ssc::DataPtr target, QString logPath);
-  ssc::Transform3D getLinearTransform();
-//  ssc::Transform3D getNonLinearTransform();
+  ssc::Transform3D getLinearResult();
+  ssc::Transform3D getNonLinearTransform();
   ssc::ImagePtr loadMinc(char* source_file);
   void setDebugOutput(bool on) { mt_verbose = on; }
 

@@ -332,7 +332,7 @@ void TestRegistration::doTestVessel2VesselRegistration(ssc::Transform3D perturba
 	bool success = vesselReg.execute(source, target, cx::DataLocations::getTestDataPath() + "/Log");
 	CPPUNIT_ASSERT(success);
 
-	ssc::Transform3D linearTransform = vesselReg.getLinearTransform();
+	ssc::Transform3D linearTransform = vesselReg.getLinearResult();
 
 	// characterize the difference matrix in angle-axis form:
 	ssc::Transform3D diff = linearTransform * perturbation.inv();
