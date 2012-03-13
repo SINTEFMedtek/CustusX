@@ -24,9 +24,7 @@
 namespace cx
 {
 LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
-  LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle),
-  mThresholdLabel(new QLabel("Picking treshold:", this)),
-  mThresholdSlider(new QSlider(Qt::Horizontal, this))
+  LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle)
 {
   mActiveImageAdapter = ActiveImageStringDataAdapter::New();
   mImageLandmarkSource = ImageLandmarksSource::New();
@@ -51,9 +49,6 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationMan
   mRemoveLandmarkButton->setDisabled(true);
   connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
 
-  //slider
-  connect(mThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(thresholdChangedSlot(int)));
-
   //layout
   mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mActiveImageAdapter));
   mVerticalLayout->addWidget(mLandmarkTableWidget);
@@ -64,9 +59,6 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationMan
   landmarkButtonsLayout->addWidget(mEditLandmarkButton);
   landmarkButtonsLayout->addWidget(mRemoveLandmarkButton);
   mVerticalLayout->addLayout(landmarkButtonsLayout);
-
-  mVerticalLayout->addWidget(mThresholdLabel);
-  mVerticalLayout->addWidget(mThresholdSlider);
 }
 
 LandmarkImageRegistrationWidget::~LandmarkImageRegistrationWidget()
@@ -91,15 +83,6 @@ void LandmarkImageRegistrationWidget::activeImageChangedSlot()
 
   if(image)
   {
-    //set a default treshold
-    mThresholdSlider->setRange(image->getMin(), image->getMax());
-    ssc::PickerRepPtr probe = this->getPickerRep();
-    if (probe)
-    {
-    	probe->setImage(image);// Need to update image in PickerRep
-      mThresholdSlider->setValue(probe->getThreshold());
-    }
-
     if(!mManager->getFixedData())
     	mManager->setFixedData(image);
   }
@@ -251,17 +234,6 @@ ssc::LandmarkMap LandmarkImageRegistrationWidget::getTargetLandmarks() const
   	return ssc::LandmarkMap();
 
   return image->getLandmarks();
-}
-
-void LandmarkImageRegistrationWidget::thresholdChangedSlot(const int value)
-{
-  emit thresholdChanged(value);
-
-  QString text = "Probing threshold: ";
-  QString valueText;
-  valueText.setNum(value);
-  text.append(valueText);
-  mThresholdLabel->setText(text);
 }
 
 /** Return transform from target space to reference space

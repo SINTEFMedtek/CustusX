@@ -427,14 +427,14 @@ void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta,
 
 	SeansVesselReg vesselReg(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose);
 
-	bool success = vesselReg.doItRight(mMovingData, mFixedData, logPath);
+	bool success = vesselReg.execute(mMovingData, mFixedData, logPath);
 	if (!success)
 	{
 		ssc::messageManager()->sendWarning("Vessel registration failed.");
 		return;
 	}
 
-	ssc::Transform3D linearTransform = vesselReg.getLinearTransform();
+	ssc::Transform3D linearTransform = vesselReg.getLinearResult();
 	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
 	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
 
