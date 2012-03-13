@@ -93,7 +93,7 @@ private:
 };
 
 /**
- * \brief \Threading adapter for the reconstruction algorithm.
+ * \brief Threading adapter for the reconstruction algorithm.
  *
  * \date Jan 27, 2012
  * \author Christian Askeland, SINTEF
