@@ -12,19 +12,19 @@ find_package( Boost REQUIRED )
 # openCV
 #----------
 if (USE_OpenCV)
-    find_package( OpenCV REQUIRED)
+		find_package( OpenCV REQUIRED)
 else ()
-    find_package( OpenCV QUIET)
+		find_package( OpenCV QUIET)
 endif ()
 
 IF( OpenCV_FOUND )
-    option(USE_OpenCV "use OpenCV" ON)
+		option(USE_OpenCV "use OpenCV" ON)
 ELSE()
-    option(USE_OpenCV "use OpenCV" OFF)
+		option(USE_OpenCV "use OpenCV" OFF)
 ENDIF()
 
 if (USE_OpenCV)
-  ADD_DEFINITIONS(-DUSE_OpenCV)
+	ADD_DEFINITIONS(-DUSE_OpenCV)
 endif()
 
 
@@ -222,6 +222,7 @@ if (CX_WINDOWS)
 	set(DIRS 
 			${QT_INCLUDES} 
 			${QT_LIBRARY_DIRS}
+			${QT_BINARY_DIRS}
 			${VTK_LIBRARY_DIRS}
 			${SSC_BINARY_DIR}/Code
 			${OpenIGTLink_LIBRARY_DIRS}
