@@ -112,6 +112,7 @@ ReconstructParams::~ReconstructParams()
 ///--------------------------------------------------------
 
 Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
+	mOutputVolumeParams(settings),
 	mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath), mMaxTimeDiff(100)// TODO: Change default value for max allowed time difference between tracking and image time tags
 {
 //	mFileReader.reset(new cx::UsReconstructionFileReader());
@@ -165,14 +166,15 @@ void Reconstructer::setSettings()
 	this->createAlgorithm();
 
 	this->updateFromOriginalFileData();
-	if (this->validInputData())
-	{
-
-		ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
-		maxVol.writeValue(QString::number(mOutputVolumeParams.getMaxVolumeSize()));
-
-		mSettings.save();
-	}
+//	if (this->validInputData())
+//	{
+//
+//		ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
+//		maxVol.writeValue(QString::number(mOutputVolumeParams.getMaxVolumeSize()));
+//		std::cout << "save volsize" << std::endl;
+//
+//		mSettings.save();
+//	}
 
 	emit paramsChanged();
 }
@@ -181,7 +183,7 @@ void Reconstructer::clearAll()
 {
 	mFileData = ssc::USReconstructInputData();
 	mOriginalFileData = ssc::USReconstructInputData();
-	mOutputVolumeParams = OutputVolumeParams();
+	mOutputVolumeParams = OutputVolumeParams(mSettings);
 	this->clearOutput();
 }
 
@@ -529,17 +531,14 @@ void Reconstructer::findExtentAndOutputTransform()
 
 	// Calculate optimal output image spacing and dimensions based on US frame spacing
 	double inputSpacing = std::min(mFileData.mUsRaw->getSpacing()[0], mFileData.mUsRaw->getSpacing()[1]);
-	mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, Eigen::Array3i(mFileData.mUsRaw->getDimensions()));
+	mOutputVolumeParams = OutputVolumeParams(mSettings, extent, inputSpacing, Eigen::Array3i(mFileData.mUsRaw->getDimensions()));
 
 	if (ssc::ToolManager::getInstance())
 		mOutputVolumeParams.m_rMd = (*ssc::ToolManager::getInstance()->get_rMpr()) * prMd;
 	else
 		mOutputVolumeParams.m_rMd = prMd;
 
-	//mOutputVolumeParams.constrainVolumeSize(256*256*256*2);
-	ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
-	double maxVolVal = maxVol.readValue(QString::number(1024 * 1024 * 16)).toDouble();
-	mOutputVolumeParams.constrainVolumeSize(std::max(1024.0, maxVolVal));
+	mOutputVolumeParams.constrainVolumeSize();
 }
 
 /** Generate an output uid based on the assumption that input uid

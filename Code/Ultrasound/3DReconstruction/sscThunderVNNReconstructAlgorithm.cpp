@@ -44,7 +44,11 @@ ThunderVNNReconstructAlgorithm::ThunderVNNReconstructAlgorithm(QString shaderPat
 
 QString ThunderVNNReconstructAlgorithm::getName() const
 {
+#ifdef SSC_USE_OpenCL
 	return "ThunderVNN";
+#else
+	return "";
+#endif
 }
 
 std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElement root)
