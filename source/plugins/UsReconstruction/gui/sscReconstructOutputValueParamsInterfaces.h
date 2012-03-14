@@ -58,8 +58,8 @@ public:
   virtual double convertDisplay2Internal(double display) { return display*mFactor; } ///< conversion from internal value to display value
   ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(mFactor,mFactor*500,mFactor); }
 protected:
-  virtual double getValue(OutputVolumeParams* params) const { return params->getVolumeSize(); }
-  virtual void setValue(OutputVolumeParams* params, double val) { params->constrainVolumeSize(val); }
+  virtual double getValue(OutputVolumeParams* params) const { return params->getMaxVolumeSize(); }
+  virtual void setValue(OutputVolumeParams* params, double val) { params->setMaxVolumeSize(val); }
 
   double mFactor;
 };
