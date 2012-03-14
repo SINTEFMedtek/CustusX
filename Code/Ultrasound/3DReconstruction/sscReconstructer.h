@@ -54,7 +54,7 @@ public:
 	StringDataAdapterXmlPtr mOrientationAdapter;
 	StringDataAdapterXmlPtr mPresetTFAdapter;
 	StringDataAdapterXmlPtr mAlgorithmAdapter;
-	std::vector<DataAdapterPtr> mAlgoOptions;
+//	std::vector<DataAdapterPtr> mAlgoOptions;
 	StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction
 	BoolDataAdapterXmlPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
 	DoubleDataAdapterXmlPtr mTimeCalibration; ///set a offset in the frame timestamps
