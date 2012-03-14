@@ -84,6 +84,11 @@ void Texture3DSlicerRep::setImages(std::vector<ssc::ImagePtr> images)
 	mProxy->setImages(images);
 }
 
+std::vector<ssc::ImagePtr> Texture3DSlicerRep::getImages()
+{
+	return mProxy->getImages();
+}
+
 void Texture3DSlicerRep::setSliceProxy(ssc::SliceProxyPtr slicer)
 {
 	mProxy->setSliceProxy(slicer);
