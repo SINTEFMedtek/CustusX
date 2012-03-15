@@ -142,6 +142,8 @@ bool PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
 	return true;
 }
 
+namespace
+{
 /**Used in createMask()
  */
 inline int getIndex_z_last(int x, int y, int z, const Eigen::Array3i& dim)
@@ -161,38 +163,48 @@ inline int getIndex_y_last(int z, int x, int y, const Eigen::Array3i& dim)
 	return x + y*dim[0] + z*dim[0]*dim[1];
 }
 
+
 /**Used in createMask()
+ *
+ * Seach along a given dimension (x,y or z). Mask out
+ * all values outside the first and last nonzero values.
  */
 template <class FUNCTION>
-void maskLine(int a, int b, int c_dim, const Eigen::Array3i& dim, unsigned char *inputPtr, unsigned char *maskPtr, FUNCTION getIndex)
-//void maskLine(int a, int b, const Eigen::Array3i& dim, unsigned char *inputPtr, unsigned char *maskPtr, int(*getIndex)(int x, int y, int z, const Eigen::Array3i& dim))
+void maskAlongDim(int a_dim, int b_dim, int c_dim, const Eigen::Array3i& dim, unsigned char *inputPtr, unsigned char *maskPtr, FUNCTION getIndex)
 {
-	int start = c_dim;
-	int stop = -1;
-	for (int c = 0; c < c_dim; c++)
+	for (int a = 0; a < a_dim; a++)
 	{
-		int index = getIndex(a, b, c, dim);
-		if (inputPtr[index]>0)
+		for (int b = 0; b < b_dim; b++)
 		{
-			start = c;
-			break;
+			int start = c_dim;
+			int stop = -1;
+			for (int c = 0; c < c_dim; c++)
+			{
+				int index = getIndex(a, b, c, dim);
+				if (inputPtr[index]>0)
+				{
+					start = c;
+					break;
+				}
+			}
+			for (int c = c_dim-1; c >=0; c--)
+			{
+				int index = getIndex(a, b, c, dim);
+				if (inputPtr[index]>0)
+				{
+					stop = c;
+					break;
+				}
+			}
+			for (int c = start; c <= stop; c++)
+			{
+				int index = getIndex(a, b, c, dim);
+				maskPtr[index] = 1;
+			}
 		}
-	}
-	for (int c = c_dim-1; c >=0; c--)
-	{
-		int index = getIndex(a, b, c, dim);
-		if (inputPtr[index]>0)
-		{
-			stop = c;
-			break;
-		}
-	}
-	for (int c = start; c <= stop; c++)
-	{
-		int index = getIndex(a, b, c, dim);
-		maskPtr[index] = 1;
 	}
 }
+} // unnamed namespace
 
 /**Create a mask enclosing the data in input,
  * but excluding the outer zeroed parts.
@@ -204,22 +216,17 @@ void maskLine(int a, int b, int c_dim, const Eigen::Array3i& dim, unsigned char 
  */
 vtkImageDataPtr PNNReconstructAlgorithm::createMask(vtkImageDataPtr inputData)
 {
-	QTime startTime = QTime::currentTime();
+//	QTime startTime = QTime::currentTime();
 	Eigen::Array3i dim(inputData->GetDimensions());
 	ssc::Vector3D spacing(inputData->GetSpacing());
 	vtkImageDataPtr mask = generateVtkImageData(dim, spacing, 0);
 	unsigned char *inputPtr = static_cast<unsigned char*> (inputData->GetScalarPointer());
 	unsigned char *maskPtr = static_cast<unsigned char*> (mask->GetScalarPointer());
 
-	for (int x = 0; x < dim[0]; x++)
-		for (int y = 0; y < dim[1]; y++)
-			maskLine(x, y, dim[2], dim, inputPtr, maskPtr, &getIndex_z_last);
-	for (int y = 0; y < dim[1]; y++)
-		for (int z = 0; z < dim[2]; z++)
-			maskLine(y, z, dim[0], dim, inputPtr, maskPtr, &getIndex_x_last);
-	for (int z = 0; z < dim[2]; z++)
-		for (int x = 0; x < dim[0]; x++)
-			maskLine(z, x, dim[1], dim, inputPtr, maskPtr, &getIndex_y_last);
+	// mask along all 3 dimensions
+	maskAlongDim(dim[0], dim[1], dim[2], dim, inputPtr, maskPtr, &getIndex_z_last);
+	maskAlongDim(dim[1], dim[2], dim[0], dim, inputPtr, maskPtr, &getIndex_x_last);
+	maskAlongDim(dim[2], dim[0], dim[1], dim, inputPtr, maskPtr, &getIndex_y_last);
 
 //	std::cout << QString("mask generation: %1ms").arg(startTime.msecsTo(QTime::currentTime())) << std::endl;
 	return mask;
