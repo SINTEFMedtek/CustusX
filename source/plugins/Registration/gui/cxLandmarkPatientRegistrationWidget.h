@@ -39,50 +39,46 @@ typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
  * \date Feb 3, 2009
  * \\author Janne Beate Bakeng, SINTEF
  */
-class LandmarkPatientRegistrationWidget : public LandmarkRegistrationWidget
+class LandmarkPatientRegistrationWidget: public LandmarkRegistrationWidget
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
-  LandmarkPatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle); ///< sets up layout and connects signals and slots
-  virtual ~LandmarkPatientRegistrationWidget(); ///< empty
-  virtual QString defaultWhatsThis() const;
+	LandmarkPatientRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName,
+		QString windowTitle); ///< sets up layout and connects signals and slots
+	virtual ~LandmarkPatientRegistrationWidget(); ///< empty
+	virtual QString defaultWhatsThis() const;
 
 protected slots:
 
 	void registerSlot();
-  virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
-//  void toolVisibleSlot(bool visible); ///< enables/disables the Sample Tool button
-  void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
-//  void dominantToolChangedSlot(const QString& uid); ///< set which tool to sample from
-//  void enableToolSampleButton();
-  virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
-  void removeLandmarkButtonClickedSlot();
-  void updateToolSampleButton();
+	virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
+	void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
+	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
+	void removeLandmarkButtonClickedSlot();
+	void updateToolSampleButton();
 
 protected:
-  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QHideEvent* event);
-  virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
-  virtual ssc::LandmarkMap getTargetLandmarks() const;
-  virtual ssc::Transform3D getTargetTransform() const;
-  virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
-  virtual void performRegistration();
+	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
+	virtual void hideEvent(QHideEvent* event);
+	virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
+	virtual ssc::LandmarkMap getTargetLandmarks() const;
+	virtual ssc::Transform3D getTargetTransform() const;
+	virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
+	virtual void performRegistration();
 
-  //gui
-  QPushButton* mToolSampleButton; ///< the Sample Tool button
-  QPushButton* mRemoveLandmarkButton;
-  QPushButton* mRegisterButton;
+	//gui
+	QPushButton* mToolSampleButton; ///< the Sample Tool button
+	QPushButton* mRemoveLandmarkButton;
+	QPushButton* mRegisterButton;
 
-  //data
-  ImageLandmarksSourcePtr mImageLandmarkSource;
-//  ssc::ToolPtr mToolToSample; ///< tool to be sampled from
-  RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
-  DominantToolProxyPtr mDominantToolProxy;
+	//data
+	ImageLandmarksSourcePtr mImageLandmarkSource;
+	RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
+	DominantToolProxyPtr mDominantToolProxy;
 
 private:
-  LandmarkPatientRegistrationWidget(); ///< not implemented
-
+	LandmarkPatientRegistrationWidget(); ///< not implemented
 };
 
 /**
