@@ -173,9 +173,6 @@ QString ElastixWidget::defaultWhatsThis() const
 
 void ElastixWidget::savePresetSlot()
 {
-//	QString newName = mElastixManager->getCurrentPreset()->getValue();
-//	if (!mElastixManager->getCurrentPreset()->getValueRange().contains(newName) || newName=="Select Preset...")
-//		newName = "custom preset";
 	QString newName = QString("%1/%2").arg(mElastixManager->getActiveExecutable()).arg(QFileInfo(mElastixManager->getActiveParameterFile0()).baseName());
 
     bool ok;
@@ -231,21 +228,7 @@ void ElastixWidget::elastixChangedSlot()
 
 void ElastixWidget::registerSlot()
 {
-//	SSC_LOG("register");
 	mElastixManager->execute();
-//  int lts_ratio = mLTSRatioSpinBox->value();
-//  double stop_delta = 0.001; //TODO, add user interface
-//  double lambda = 0; //TODO, add user interface
-//  double sigma = 1.0; //TODO, add user interface
-//  bool lin_flag = mLinearCheckBox->isChecked(); //TODO, add user interface
-//  int sample = 1; //TODO, add user interface
-//  int single_point_thre = 1; //TODO, add user interface
-//  bool verbose = 1; //TODO, add user interface
-//
-//  ssc::messageManager()->sendDebug("Using lts_ratio: "+qstring_cast(lts_ratio));
-//  QString logPath = patientService()->getPatientData()->getActivePatientFolder()+"/Logs/";
-//
-//  mManager->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose, logPath);
 }
 
 
