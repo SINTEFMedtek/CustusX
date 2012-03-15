@@ -222,21 +222,43 @@ std::vector<ssc::Landmark> LandmarkRegistrationWidget::getAllLandmarks() const
   return retval;
 }
 
-void LandmarkRegistrationWidget::cellChangedSlot(int row,int column)
+void LandmarkRegistrationWidget::cellChangedSlot(int row, int column)
 {
-  QTableWidgetItem* item = mLandmarkTableWidget->item(row, column);
-  QString uid = item->data(Qt::UserRole).toString();
+	QTableWidgetItem* item = mLandmarkTableWidget->item(row, column);
+	QString uid = item->data(Qt::UserRole).toString();
 
-  if(column==0)
-  {
-    QString name = item->text();
-    ssc::dataManager()->setLandmarkName(uid, name);
-  }
-  if(column==1)
-  {
-    Qt::CheckState state = item->checkState();
-    ssc::dataManager()->setLandmarkActive(uid, state==Qt::Checked);
-  }
+	if (column == 0)
+	{
+		QString name = item->text();
+		ssc::dataManager()->setLandmarkName(uid, name);
+	}
+	if (column == 1)
+	{
+		Qt::CheckState state = item->checkState();
+		ssc::dataManager()->setLandmarkActive(uid, state == Qt::Checked);
+	}
+	if (column == 2)
+	{
+		QString val = item->text();
+		// remove formatting stuff:
+		val = val.replace('(', " ");
+		val = val.replace(')', " ");
+		val = val.replace(',', " ");
+//		std::cout << "changed   to " << val << std::endl;
+//
+//		QStringList v = val.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+//		std::cout << "split to " << v.size() << ", split: " << v.join("-") << std::endl;
+
+		ssc::Transform3D rMtarget = this->getTargetTransform();
+
+//		std::cout << "converted to " << ssc::Vector3D::fromString(val) << std::endl;
+
+		ssc::Vector3D p_r = ssc::Vector3D::fromString(val);
+		ssc::Vector3D p_target = rMtarget.inv().coord(p_r);
+		this->setTargetLandmark(uid, p_target);
+
+	}
+
 }
 
 void LandmarkRegistrationWidget::landmarkUpdatedSlot()

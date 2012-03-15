@@ -66,6 +66,7 @@ protected:
   virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
   virtual ssc::LandmarkMap getTargetLandmarks() const;
   virtual ssc::Transform3D getTargetTransform() const;
+  virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
   virtual void performRegistration();
 
   //gui

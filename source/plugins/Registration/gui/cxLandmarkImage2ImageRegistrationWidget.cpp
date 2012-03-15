@@ -146,5 +146,14 @@ ssc::Transform3D LandmarkImage2ImageRegistrationWidget::getTargetTransform() con
   return mManager->getMovingData()->get_rMd();
 }
 
+void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, ssc::Vector3D p_target)
+{
+	  ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mManager->getMovingData());
+	  if (!image)
+	    return;
+	  image->setLandmark(ssc::Landmark(uid, p_target));
+}
+
+
 }//namespace cx
 
