@@ -119,6 +119,7 @@ public:
 
 		glEnable( vtkgl::TEXTURE_3D );
 		glBindTexture(vtkgl::TEXTURE_3D, textureId);
+		report_gl_error();
 		glTexParameteri( vtkgl::TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP );
 		glTexParameteri( vtkgl::TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 		glTexParameteri( vtkgl::TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP );
@@ -274,6 +275,7 @@ public:
 		report_gl_error();
 
 		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT, 0);
+		report_gl_error();
 
 		mAllocated = true;
 	}
@@ -472,8 +474,6 @@ public:
 GPUImageBufferRepository::GPUImageBufferRepository()
 {
 	mInternal = new GPUImageBufferRepositoryInternal();
-//	mMaxVolumes = 7;
-//	mMaxLuts = 7;
 }
 
 GPUImageBufferRepository* GPUImageBufferRepository::getInstance()
@@ -484,6 +484,7 @@ GPUImageBufferRepository* GPUImageBufferRepository::getInstance()
 	}
 	return mInstance;
 }
+
 void GPUImageBufferRepository::shutdown()
 {
 	if(mInstance)
@@ -494,11 +495,13 @@ void GPUImageBufferRepository::shutdown()
 	mInstance = NULL;
 
 }
+
 void GPUImageBufferRepository::tearDown()
 {
 	delete mInternal;
 	mInternal = NULL;
 }
+
 ssc::GPUImageDataBufferPtr GPUImageBufferRepository::getGPUImageDataBuffer(vtkImageDataPtr volume)
 {
 	return mInternal->mVolumeBuffer.get(volume);
@@ -510,12 +513,15 @@ ssc::GPUImageLutBufferPtr GPUImageBufferRepository::getGPUImageLutBuffer(vtkUnsi
 }
 
 }
+
 #else
+
 namespace ssc
 {
 void GPUImageBufferRepository::shutdown() {;}
 void GPUImageBufferRepository::tearDown() {;}
 }//namespace ssc
+
 #endif //WIN32
 
 namespace ssc
