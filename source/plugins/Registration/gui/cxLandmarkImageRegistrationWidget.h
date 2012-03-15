@@ -21,7 +21,6 @@ namespace cx
  * @{
  */
 
-
 /**
  * \class LandmarkImageRegistrationWidget
  *
@@ -30,46 +29,49 @@ namespace cx
  * \date Jan 27, 2009
  * \\author Janne Beate Bakeng, SINTEF
  */
-class LandmarkImageRegistrationWidget : public LandmarkRegistrationWidget
+class LandmarkImageRegistrationWidget: public LandmarkRegistrationWidget
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
 
-  LandmarkImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle); ///< sets up layout and connects signals and slots
-  virtual ~LandmarkImageRegistrationWidget(); ///< empty
-  virtual QString defaultWhatsThis() const;
+	LandmarkImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName,
+		QString windowTitle); ///< sets up layout and connects signals and slots
+	virtual ~LandmarkImageRegistrationWidget(); ///< empty
+	virtual QString defaultWhatsThis() const;
 
 protected slots:
-  virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
-  void addLandmarkButtonClickedSlot(); ///< reacts when the Add Landmark button is clicked
-  virtual void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
-  void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
-  virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
-  void enableButtons();
+	virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
+	void addLandmarkButtonClickedSlot(); ///< reacts when the Add Landmark button is clicked
+	virtual void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
+	void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
+	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
+	void enableButtons();
 
 protected:
-  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QHideEvent* event);
-  virtual ssc::LandmarkMap getTargetLandmarks() const;
-  virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
-  virtual void performRegistration() {}
-  virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
-  QString getLandmarkName(QString uid);
-  virtual ssc::Transform3D getTargetTransform() const;
-  ssc::PickerRepPtr getPickerRep();
+	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
+	virtual void hideEvent(QHideEvent* event);
+	virtual ssc::LandmarkMap getTargetLandmarks() const;
+	virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
+	virtual void performRegistration()
+	{
+	}
+	virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
+	QString getLandmarkName(QString uid);
+	virtual ssc::Transform3D getTargetTransform() const;
+	ssc::PickerRepPtr getPickerRep();
 
-  //gui
-  ssc::StringDataAdapterPtr mActiveImageAdapter;
-  ImageLandmarksSourcePtr mImageLandmarkSource;
-  DominantToolProxyPtr mDominantToolProxy;
+	//gui
+	ssc::StringDataAdapterPtr mActiveImageAdapter;
+	ImageLandmarksSourcePtr mImageLandmarkSource;
+	DominantToolProxyPtr mDominantToolProxy;
 
-  QPushButton* mAddLandmarkButton; ///< the Add Landmark button
-  QPushButton* mEditLandmarkButton; ///< the Edit Landmark button
-  QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
+	QPushButton* mAddLandmarkButton; ///< the Add Landmark button
+	QPushButton* mEditLandmarkButton; ///< the Edit Landmark button
+	QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
 
 private:
-  LandmarkImageRegistrationWidget(); ///< not implemented
+	LandmarkImageRegistrationWidget(); ///< not implemented
 };
 
 /**
