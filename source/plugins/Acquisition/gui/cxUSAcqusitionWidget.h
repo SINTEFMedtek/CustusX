@@ -47,6 +47,7 @@ protected slots:
 private slots:
   void reconstructFinishedSlot();
   void saveDataCompletedSlot(QString mhdFilename);
+  void toggleDetailsSlot();
 
 private:
   USAcquisitionPtr mAcquisition;
@@ -54,6 +55,8 @@ private:
   ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	DisplayTimerWidget* mDisplayTimerWidget;
+	QWidget* mOptionsWidget;
+	QWidget* createOptionsWidget();
 };
 
 
