@@ -28,37 +28,38 @@
 
 namespace cx
 {
-LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent, QString objectName, QString windowTitle) :
-  LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle)
+LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(RegistrationManagerPtr regManager,
+	QWidget* parent, QString objectName, QString windowTitle) :
+	LandmarkRegistrationWidget(regManager, parent, objectName, windowTitle)
 {
 	mLandmarkTableWidget->hide();
 
-  mFixedLandmarkSource = ImageLandmarksSource::New();
-  mMovingLandmarkSource = ImageLandmarksSource::New();
+	mFixedLandmarkSource = ImageLandmarksSource::New();
+	mMovingLandmarkSource = ImageLandmarksSource::New();
 
-  connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(updateRep()));
-  connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(updateRep()));
+	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(updateRep()));
+	connect(mManager.get(), SIGNAL(movingDataChanged(QString)), this, SLOT(updateRep()));
 
 	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
-  mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(regManager));
-  mRegisterButton = new QPushButton("Register", this);
-  mRegisterButton->setToolTip("Perform registration");
-  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
+	mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(regManager));
+	mRegisterButton = new QPushButton("Register", this);
+	mRegisterButton->setToolTip("Perform registration");
+	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
-  mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFixedDataAdapter));
-  mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mMovingDataAdapter));
-  mVerticalLayout->addWidget(mAvarageAccuracyLabel);
+	mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFixedDataAdapter));
+	mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mMovingDataAdapter));
+	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
 
-  QHBoxLayout* regLayout = new QHBoxLayout;
-  regLayout->addWidget(mRegisterButton);
-  mVerticalLayout->addLayout(regLayout);
-  mVerticalLayout->addStretch();
+	QHBoxLayout* regLayout = new QHBoxLayout;
+	regLayout->addWidget(mRegisterButton);
+	mVerticalLayout->addLayout(regLayout);
+	mVerticalLayout->addStretch();
 }
 
 void LandmarkImage2ImageRegistrationWidget::updateRep()
 {
-  mFixedLandmarkSource->setImage(boost::shared_dynamic_cast<ssc::Image>(mManager->getFixedData()));
-  mMovingLandmarkSource->setImage(boost::shared_dynamic_cast<ssc::Image>(mManager->getMovingData()));
+	mFixedLandmarkSource->setImage(boost::shared_dynamic_cast<ssc::Image>(mManager->getFixedData()));
+	mMovingLandmarkSource->setImage(boost::shared_dynamic_cast<ssc::Image>(mManager->getMovingData()));
 }
 
 void LandmarkImage2ImageRegistrationWidget::registerSlot()
@@ -72,37 +73,37 @@ LandmarkImage2ImageRegistrationWidget::~LandmarkImage2ImageRegistrationWidget()
 
 QString LandmarkImage2ImageRegistrationWidget::defaultWhatsThis() const
 {
-  return "<html>"
-      "<h3>Landmark based image to image registration.</h3>"
-      "<p>Register moving image to fixed image. </p>"
-      "</html>";
+	return "<html>"
+		"<h3>Landmark based image to image registration.</h3>"
+		"<p>Register moving image to fixed image. </p>"
+		"</html>";
 }
 
 void LandmarkImage2ImageRegistrationWidget::showEvent(QShowEvent* event)
 {
-  LandmarkRegistrationWidget::showEvent(event);
-  viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
+	LandmarkRegistrationWidget::showEvent(event);
+	viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
 
-  LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
-  if (rep)
-  {
-    rep->setPrimarySource(mFixedLandmarkSource);
-    rep->setSecondarySource(mMovingLandmarkSource);
-    rep->setSecondaryColor(ssc::Vector3D(0,0.9,0.5));
-  }
+	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
+	if (rep)
+	{
+		rep->setPrimarySource(mFixedLandmarkSource);
+		rep->setSecondarySource(mMovingLandmarkSource);
+		rep->setSecondaryColor(ssc::Vector3D(0, 0.9, 0.5));
+	}
 }
 
 void LandmarkImage2ImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
-  LandmarkRegistrationWidget::hideEvent(event);
+	LandmarkRegistrationWidget::hideEvent(event);
 
-  LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
-  if (rep)
-  {
-    rep->setPrimarySource(LandmarksSourcePtr());
-    rep->setSecondarySource(LandmarksSourcePtr());
-  }
-  viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
+	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
+	if (rep)
+	{
+		rep->setPrimarySource(LandmarksSourcePtr());
+		rep->setSecondarySource(LandmarksSourcePtr());
+	}
+	viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 
 void LandmarkImage2ImageRegistrationWidget::populateTheLandmarkTableWidget()
@@ -113,25 +114,14 @@ ssc::LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() con
 {
 	ssc::ImagePtr moving = boost::shared_dynamic_cast<ssc::Image>(mManager->getMovingData());
 
-  if(moving)
-    return moving->getLandmarks();
-  else
-    return ssc::LandmarkMap();
+	if (moving)
+		return moving->getLandmarks();
+	else
+		return ssc::LandmarkMap();
 }
 
 void LandmarkImage2ImageRegistrationWidget::performRegistration()
 {
-//	if (mCurrentImage)
-//	{
-//		//make sure the fixedData is set
-//		if(!mManager->getFixedData())
-//			mManager->setFixedData(mCurrentImage);
-//
-//		//make sure the movingData is set
-//		if(!mManager->getMovingData())
-//			mManager->setFixedData(mCurrentImage);
-//	}
-
 	mManager->doImageRegistration();
 	this->updateAvarageAccuracyLabel();
 }
@@ -141,19 +131,18 @@ void LandmarkImage2ImageRegistrationWidget::performRegistration()
  */
 ssc::Transform3D LandmarkImage2ImageRegistrationWidget::getTargetTransform() const
 {
-  if (!mManager->getMovingData())
-    return ssc::Transform3D::Identity();
-  return mManager->getMovingData()->get_rMd();
+	if (!mManager->getMovingData())
+		return ssc::Transform3D::Identity();
+	return mManager->getMovingData()->get_rMd();
 }
 
 void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, ssc::Vector3D p_target)
 {
-	  ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mManager->getMovingData());
-	  if (!image)
-	    return;
-	  image->setLandmark(ssc::Landmark(uid, p_target));
+	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mManager->getMovingData());
+	if (!image)
+		return;
+	image->setLandmark(ssc::Landmark(uid, p_target));
 }
-
 
 }//namespace cx
 
