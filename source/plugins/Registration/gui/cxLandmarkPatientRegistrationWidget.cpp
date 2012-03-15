@@ -233,6 +233,13 @@ ssc::Transform3D LandmarkPatientRegistrationWidget::getTargetTransform() const
   return rMpr;
 }
 
+void LandmarkPatientRegistrationWidget::setTargetLandmark(QString uid, ssc::Vector3D p_target)
+{
+	  ssc::toolManager()->setLandmark(ssc::Landmark(uid, p_target));
+	  ssc::messageManager()->playSampleSound();
+}
+
+
 void LandmarkPatientRegistrationWidget::performRegistration()
 {
   if(!mManager->getFixedData())

@@ -18,10 +18,15 @@ namespace cx
 /**
  * \class PointSamplingWidget
  *
- * \ingroup cxGUI
+ * Early version of metric/label system.
+ * Replaced by MetricWidget.
  *
+ * \ingroup cxGUI
+ * \ingroup cxNotUsed
+ *
+ * \sa MetricWidget
  * \date 2010.05.05
- * \\author Christian Askeland, SINTEF
+ * \author Christian Askeland, SINTEF
  */
 class PointSamplingWidget : public BaseWidget
 {

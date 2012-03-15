@@ -183,11 +183,11 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 {
   LandmarkRegistrationWidget::showEvent(event);
 
-  ssc::PickerRepPtr PickerRep = this->getPickerRep();
-  if(PickerRep)
-  {
-    connect(this, SIGNAL(thresholdChanged(int)), PickerRep.get(), SLOT(setThresholdSlot(int)));
-  }
+//  ssc::PickerRepPtr PickerRep = this->getPickerRep();
+//  if(PickerRep)
+//  {
+//    connect(this, SIGNAL(thresholdChanged(int)), PickerRep.get(), SLOT(setThresholdSlot(int)));
+//  }
 
   viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
   LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
@@ -204,9 +204,9 @@ void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
   LandmarkRegistrationWidget::hideEvent(event);
 
 //  ssc::PickerRepPtr PickerRep = repManager()->getPickerRep("PickerRep_1");
-  ssc::PickerRepPtr PickerRep = this->getPickerRep();
-  if(PickerRep)
-    disconnect(this, SIGNAL(thresholdChanged(const int)), PickerRep.get(), SLOT(setThresholdSlot(const int)));
+//  ssc::PickerRepPtr PickerRep = this->getPickerRep();
+//  if(PickerRep)
+//    disconnect(this, SIGNAL(thresholdChanged(const int)), PickerRep.get(), SLOT(setThresholdSlot(const int)));
   LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0,0)->getReps());
   if (rep)
   {
@@ -246,6 +246,15 @@ ssc::Transform3D LandmarkImageRegistrationWidget::getTargetTransform() const
     return ssc::Transform3D::Identity();
   return image->get_rMd();
 }
+
+void LandmarkImageRegistrationWidget::setTargetLandmark(QString uid, ssc::Vector3D p_target)
+{
+	  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	  if (!image)
+	    return;
+	  image->setLandmark(ssc::Landmark(uid, p_target));
+}
+
 
 
 }//namespace cx

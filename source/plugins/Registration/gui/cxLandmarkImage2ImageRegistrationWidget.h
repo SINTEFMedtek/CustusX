@@ -52,6 +52,7 @@ protected:
   virtual void performRegistration();
   virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
   virtual ssc::Transform3D getTargetTransform() const;
+  virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
 
   ImageLandmarksSourcePtr mFixedLandmarkSource;
   ImageLandmarksSourcePtr mMovingLandmarkSource;
