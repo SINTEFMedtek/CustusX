@@ -15,18 +15,10 @@
 #include "cxDoubleDataAdapterTemporalCalibration.h"
 #include "sscReconstructManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
+#include "sscReconstructer.h"
 
 namespace cx
 {
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
 
 
 USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* parent) :
@@ -50,19 +42,27 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	timerLayout->addWidget(mDisplayTimerWidget);
 	timerLayout->addStretch();
 
-	//for testing sound speed converting - BEGIN
-	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget,
-		SLOT(setToolSlot(const QString&)));
-	//for testing sound speed converting - END
+	QGridLayout* editsLayout = new QGridLayout(this);
+//	editsLayout->setMargin(0);
+	editsLayout->setColumnStretch(0,0);
+	editsLayout->setColumnStretch(1,1);
+	RecordBaseWidget::mLayout->addLayout(editsLayout);
+	new ssc::LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New(), editsLayout, 0);
+	new ssc::LabeledComboBoxWidget(this, mPluginData->getReconstructer()->getParams()->mPresetTFAdapter, editsLayout, 1);
 
-	RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this,
-		ActiveProbeConfigurationStringDataAdapter::New()));
-	mLayout->addStretch();
-	mLayout->addWidget(soundSpeedWidget);
-	RecordBaseWidget::mLayout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
+	this->createAction(this,
+	      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+	      "Details", "Show Advanced Settings",
+	      SLOT(toggleDetailsSlot()),
+	      mLayout);
+
+	mOptionsWidget = this->createOptionsWidget();
+	mOptionsWidget->setVisible(settings()->value("acquisition/UsAcqShowDetails").toBool());
 
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+	mLayout->addWidget(mOptionsWidget);
+
+	mLayout->addStretch();
 	mLayout->addWidget(mTimedAlgorithmProgressBar);
 
 	mAcquisition->checkIfReadySlot();
@@ -78,6 +78,38 @@ QString USAcqusitionWidget::defaultWhatsThis() const
 		"<h3>US Acquisition.</h3>"
 		"<p><i>Record and reconstruct US data.</i></br>"
 		"</html>";
+}
+
+void USAcqusitionWidget::toggleDetailsSlot()
+{
+  mOptionsWidget->setVisible(!mOptionsWidget->isVisible());
+  settings()->setValue("acquisition/UsAcqShowDetails", mOptionsWidget->isVisible());
+}
+
+QWidget* USAcqusitionWidget::createOptionsWidget()
+{
+	QWidget* retval = new QWidget(this);
+	QGridLayout* layout = new QGridLayout(retval);
+	layout->setMargin(0);
+
+	//for testing sound speed converting - BEGIN
+	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
+	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget,
+		SLOT(setToolSlot(const QString&)));
+	//for testing sound speed converting - END
+
+	int line = 0;
+
+	layout->addWidget(this->createHorizontalLine(), line, 0, 1, 1);
+	++line;
+
+	layout->addWidget(soundSpeedWidget, line, 0);
+	++line;
+	layout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()), line, 0);
+	++line;
+
+
+	return retval;
 }
 
 void USAcqusitionWidget::postProcessingSlot(QString sessionId)
