@@ -18,7 +18,7 @@
 #include "cxViewGroup.h"
 #include "cxPreferencesDialog.h"
 #include "cxImagePropertiesWidget.h"
-#include "cxPointSamplingWidget.h"
+//#include "cxPointSamplingWidget.h"
 #include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxMeshPropertiesWidget.h"
@@ -89,7 +89,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 
 	this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
 	this->addAsDockWidget(new BrowserWidget(this), "Browsing");
-	this->addAsDockWidget(new PointSamplingWidget(this), "Utility");
+//	this->addAsDockWidget(new PointSamplingWidget(this), "Utility");
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
 	this->addAsDockWidget(new ImagePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
