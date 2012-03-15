@@ -200,24 +200,23 @@ TextureSlicePainter::TextureSlicePainter()
 
 void TextureSlicePainter::setShaderFile(QString shaderFile)
 {
-  mShaderFile = shaderFile;
+	mShaderFile = shaderFile;
 }
 
 QString TextureSlicePainter::loadShaderFile(QString shaderFile)
 {
-  QFile fp(shaderFile);
-
-  if (fp.exists())
-  {
-    fp.open(QFile::ReadOnly);
-    QTextStream shaderfile(&fp);
-    return shaderfile.readAll();
-  }
-  else
-  {
-    std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
-  }
-  return "";
+	QFile fp(shaderFile);
+	if (fp.exists())
+	{
+		fp.open(QFile::ReadOnly);
+		QTextStream shaderfile(&fp);
+		return shaderfile.readAll();
+	}
+	else
+	{
+		std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
+	}
+	return "";
 }
 
 TextureSlicePainter::~TextureSlicePainter()
@@ -240,8 +239,6 @@ void TextureSlicePainter::ReleaseGraphicsResources(vtkWindow* win)
 
 void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* actor)
 {
-	report_gl_error();
-//  std::cout << this << " TextureSlicePainter::PrepareForRendering" << std::endl;
 	if (!CanRender(renderer, actor))
 	{
 		mInternals->ClearGraphicsResources();
@@ -268,7 +265,7 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 
 	if (!mInternals->Shader)
 	{
-	  mSource = this->loadShaderFile(mShaderFile);
+		mSource = this->loadShaderFile(mShaderFile);
 
 		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
 		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));
@@ -300,7 +297,6 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 
 	this->Superclass::PrepareForRendering(renderer, actor);
 	report_gl_error();
-
 }
 
 void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
@@ -310,10 +306,8 @@ void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
 
 	if (!CanRender(renderer, actor))
 	{
-//		std::cout << "Can not Render !!!!!!!!!!!." << endl;
 		return;
 	}
-//  std::cout << this << " TextureSlicePainter::RenderInternal" << std::endl;
 
 	// Save context state to be able to restore.
 	mInternals->Shader->Build();
@@ -342,18 +336,15 @@ void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
 
 	mInternals->Shader->Restore();
-	//mInternals->Shader->RestoreFixedPipeline();
 
 	glDisable(vtkgl::TEXTURE_3D);
 	glBindTexture(GL_TEXTURE_3D, 0);
 	report_gl_error();
-
 }
 
 bool TextureSlicePainter::CanRender(vtkRenderer*, vtkActor*)
 {
 	return !mInternals->mElement.empty();
-//	return true;
 }
 
 bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id)
@@ -395,13 +386,12 @@ void TextureSlicePainter::SetColorAttribute(int index, float window, float level
 
 void TextureSlicePainter::releaseGraphicsResources(int index)
 {
-	//mInternals->safeIndex(index).eachRealaseResourses();
 }
 
 void TextureSlicePainter::PrintSelf(ostream& os, vtkIndent indent)
 {
-
 }
+
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
