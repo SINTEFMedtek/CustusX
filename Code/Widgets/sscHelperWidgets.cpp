@@ -43,7 +43,7 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 	DoubleDataAdapterPtr dbl = boost::shared_dynamic_cast<ssc::DoubleDataAdapter>(data);
 	if (dbl)
 	{
-		return new ssc::SliderGroupWidget(parent, dbl, gridLayout, row);
+		return new ssc::SpinBoxGroupWidget(parent, dbl, gridLayout, row);
 	}
 
 	BoolDataAdapterPtr bl = boost::shared_dynamic_cast<ssc::BoolDataAdapter>(data);
