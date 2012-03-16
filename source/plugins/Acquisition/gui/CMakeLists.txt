@@ -58,6 +58,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/algorithms        
     ${CustusX3_SOURCE_DIR}/source/gui/utilities    
     ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters    
+    ${CustusX3_SOURCE_DIR}/source/gui/toolWidgets    
     ../logic
     )
 

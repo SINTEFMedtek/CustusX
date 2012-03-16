@@ -5,7 +5,8 @@
 #include "sscForwardDeclarations.h"
 #include "sscStringDataAdapter.h"
 #include "cxViewManager.h"
-#include "cxDoubleSpanSlider.h"
+
+#include "cxBoundingBoxWidget.h"
 
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 class QCheckBox;
@@ -17,6 +18,9 @@ namespace cx
  * \addtogroup cxGUI
  * @{
  */
+
+
+
 
 /**
  * \class CroppingWidget
@@ -35,12 +39,9 @@ public:
 
 private:
   InteractiveCropperPtr mInteractiveCropper;
-
+  BoundingBoxWidget* mBBWidget;
   QCheckBox* mUseCropperCheckBox;
   QCheckBox* mShowBoxCheckBox;
-  SliderRangeGroupWidget* mXRange;
-  SliderRangeGroupWidget* mYRange;
-  SliderRangeGroupWidget* mZRange;
 
 private slots:
   void boxValuesChanged();
