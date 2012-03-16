@@ -18,6 +18,8 @@
 
 namespace cx
 {
+
+
 CroppingWidget::CroppingWidget(QWidget* parent) : 
   BaseWidget(parent, "CroppingWidget", "Crop")
 {
@@ -42,24 +44,9 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
   connect(mShowBoxCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(showBoxWidget(bool)));
   activeLayout->addWidget(mShowBoxCheckBox);
 
-  mXRange = new SliderRangeGroupWidget(this);
-  mXRange->setName("X");
-  mXRange->setRange(ssc::DoubleRange(-2000, 2000, 1));
-  connect(mXRange, SIGNAL(valueChanged(double,double)), this, SLOT(boxValuesChanged()));
-  layout->addWidget(mXRange);
-
-  mYRange = new SliderRangeGroupWidget(this);
-  mYRange->setName("Y");
-  mYRange->setRange(ssc::DoubleRange(-2000, 2000, 1));
-  connect(mYRange, SIGNAL(valueChanged(double,double)), this, SLOT(boxValuesChanged()));
-  layout->addWidget(mYRange);
-
-  mZRange = new SliderRangeGroupWidget(this);
-  mZRange->setName("Z");
-  mZRange->setRange(ssc::DoubleRange(-2000, 2000, 1));
-  connect(mZRange, SIGNAL(valueChanged(double,double)), this, SLOT(boxValuesChanged()));
-  layout->addWidget(mZRange);
-
+  mBBWidget = new BoundingBoxWidget(this);
+  layout->addWidget(mBBWidget);
+  connect(mBBWidget, SIGNAL(changed()), this, SLOT(boxValuesChanged()));
 
   QPushButton* cropClipButton = new QPushButton("Create new cropped volume");
   cropClipButton->setToolTip("Create a new volume containing only the volume inside the crop box.");
@@ -86,11 +73,7 @@ QString CroppingWidget::defaultWhatsThis() const
 
 void CroppingWidget::boxValuesChanged()
 {
-  std::pair<double,double> x = mXRange->getValue();
-  std::pair<double,double> y = mYRange->getValue();
-  std::pair<double,double> z = mZRange->getValue();
-  ssc::DoubleBoundingBox3D box(x.first, x.second, y.first, y.second, z.first, z.second);
-  mInteractiveCropper->setBoundingBox(box);
+  mInteractiveCropper->setBoundingBox(mBBWidget->getValue());
 }
 
 void CroppingWidget::cropperChangedSlot()
@@ -98,23 +81,7 @@ void CroppingWidget::cropperChangedSlot()
   mUseCropperCheckBox->setChecked(mInteractiveCropper->getUseCropping());
   mShowBoxCheckBox->setChecked(mInteractiveCropper->getShowBoxWidget());
 
-  mXRange->blockSignals(true);
-  mYRange->blockSignals(true);
-  mZRange->blockSignals(true);
-
-  ssc::DoubleBoundingBox3D range =  mInteractiveCropper->getMaxBoundingBox();
-  mXRange->setRange(ssc::DoubleRange(range.begin()[0], range.begin()[1], 1));
-  mYRange->setRange(ssc::DoubleRange(range.begin()[2], range.begin()[3], 1));
-  mZRange->setRange(ssc::DoubleRange(range.begin()[4], range.begin()[5], 1));
-
-  ssc::DoubleBoundingBox3D box =  mInteractiveCropper->getBoundingBox();
-  mXRange->setValue(std::make_pair(box.begin()[0], box.begin()[1]));
-  mYRange->setValue(std::make_pair(box.begin()[2], box.begin()[3]));
-  mZRange->setValue(std::make_pair(box.begin()[4], box.begin()[5]));
-
-  mXRange->blockSignals(false);
-  mYRange->blockSignals(false);
-  mZRange->blockSignals(false);
+  mBBWidget->setValue(mInteractiveCropper->getBoundingBox(), mInteractiveCropper->getMaxBoundingBox());
 }
 
 ssc::ImagePtr CroppingWidget::cropClipButtonClickedSlot()

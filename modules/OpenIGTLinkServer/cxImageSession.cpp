@@ -53,6 +53,7 @@ void ImageSession::run()
 	QString clientName = mSocket->localAddress().toString();
 	std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
 
+	std::cout << mArguments["type"].toStdString().c_str() << std::endl;
 	QObject* sender = ImageSenderFactory().createSender(mArguments["type"], mSocket, mArguments);
 
 	if (sender)

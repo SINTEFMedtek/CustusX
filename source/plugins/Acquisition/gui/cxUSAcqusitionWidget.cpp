@@ -16,6 +16,7 @@
 #include "sscReconstructManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "sscReconstructer.h"
+#include "cxProbeConfigWidget.h"
 
 namespace cx
 {
@@ -106,6 +107,8 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	layout->addWidget(soundSpeedWidget, line, 0);
 	++line;
 	layout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()), line, 0);
+	++line;
+	layout->addWidget(new ProbeConfigWidget(this), line, 0);
 	++line;
 
 
