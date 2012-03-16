@@ -23,95 +23,70 @@
 namespace cx
 {
 
-
 SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-    RegistrationBaseWidget(regManager, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
-    mLTSRatioSpinBox(new QSpinBox()),
-    mLinearCheckBox(new QCheckBox()),
-    mRegisterButton(new QPushButton("Register"))
-//    mFixedImageLabel(new QLabel("Fixed image:")),
-//    mMovingImageLabel(new QLabel("Moving image:"))
+	RegistrationBaseWidget(regManager, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
+		mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()),
+		mRegisterButton(new QPushButton("Register"))
 {
-//  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
-//  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
 
-  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
+	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
-  QVBoxLayout* topLayout = new QVBoxLayout(this);
-  QGridLayout* layout = new QGridLayout();
-  topLayout->addLayout(layout);
+	QVBoxLayout* topLayout = new QVBoxLayout(this);
+	QGridLayout* layout = new QGridLayout();
+	topLayout->addLayout(layout);
 
-  QPushButton* vesselRegOptionsButton = new QPushButton("Options", this);
-  vesselRegOptionsButton->setCheckable(true);
+	QPushButton* vesselRegOptionsButton = new QPushButton("Options", this);
+	vesselRegOptionsButton->setCheckable(true);
 
-  QGroupBox* vesselRegOptionsWidget = this->createGroupbox(this->createOptionsWidget(), "Seans vessel regsistration options");
-  connect(vesselRegOptionsButton, SIGNAL(clicked(bool)), vesselRegOptionsWidget, SLOT(setVisible(bool)));
-  //connect(vesselRegOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
-  vesselRegOptionsWidget->setVisible(vesselRegOptionsButton->isChecked());
+	QGroupBox* vesselRegOptionsWidget = this->createGroupbox(this->createOptionsWidget(),
+		"Seans vessel regsistration options");
+	connect(vesselRegOptionsButton, SIGNAL(clicked(bool)), vesselRegOptionsWidget, SLOT(setVisible(bool)));
+	vesselRegOptionsWidget->setVisible(vesselRegOptionsButton->isChecked());
 
-  QGridLayout* entryLayout = new QGridLayout;
-  entryLayout->setColumnStretch(1,1);
+	QGridLayout* entryLayout = new QGridLayout;
+	entryLayout->setColumnStretch(1, 1);
 
-  mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
-  new ssc::LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-  mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
-  new ssc::LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
+	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
+	new ssc::LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
+	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
+	new ssc::LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
-  layout->addLayout(entryLayout, 0, 0, 2, 2);
-//  layout->addWidget(fixedWidget, 0, 0, 1, 2);
-//  layout->addWidget(movingWidget, 1, 0, 1, 2);
-  layout->addWidget(mRegisterButton, 2, 0);
-  layout->addWidget(vesselRegOptionsButton, 2, 1);
-  layout->addWidget(vesselRegOptionsWidget, 3, 0, 1, 2);
+	layout->addLayout(entryLayout, 0, 0, 2, 2);
+	layout->addWidget(mRegisterButton, 2, 0);
+	layout->addWidget(vesselRegOptionsButton, 2, 1);
+	layout->addWidget(vesselRegOptionsWidget, 3, 0, 1, 2);
 }
 
 SeansVesselRegistrationWidget::~SeansVesselRegistrationWidget()
-{}
+{
+}
 
 QString SeansVesselRegistrationWidget::defaultWhatsThis() const
 {
-  return "<html>"
-      "<h3>Seans Vessel Registration.</h3>"
-      "<p>Select two datasets you want to registere to eachother, adjust the input parameters.</p>"
-      "<p><i>Adjust the parameters and click the register button.</i></p>"
-      "</html>";
+	return "<html>"
+		"<h3>Seans Vessel Registration.</h3>"
+		"<p>Select two datasets you want to registere to eachother, adjust the input parameters.</p>"
+		"<p><i>Adjust the parameters and click the register button.</i></p>"
+		"</html>";
 }
-
-//void SeansVesselRegistrationWidget::fixedImageSlot(QString uid)
-//{
-//  ssc::DataPtr fixedImage = registrationManager()->getFixedData();
-//  if(!fixedImage)
-//    return;
-//  mFixedImageLabel->setText(qstring_cast("Fixed data: <b>"+fixedImage->getName()+"</b>"));
-//  mFixedImageLabel->update();
-//}
-//
-//void SeansVesselRegistrationWidget::movingImageSlot(QString uid)
-//{
-//  ssc::DataPtr movingImage = registrationManager()->getMovingData();
-//  if(!movingImage)
-//    return;
-//  mMovingImageLabel->setText(qstring_cast("Moving data: <b>"+movingImage->getName()+"</b>"));
-//  mMovingImageLabel->update();
-//}
 
 void SeansVesselRegistrationWidget::registerSlot()
 {
-  int lts_ratio = mLTSRatioSpinBox->value();
-  double stop_delta = 0.001; //TODO, add user interface
-  double lambda = 0; //TODO, add user interface
-  double sigma = 1.0; //TODO, add user interface
-  bool lin_flag = mLinearCheckBox->isChecked(); //TODO, add user interface
-  int sample = 1; //TODO, add user interface
-  int single_point_thre = 1; //TODO, add user interface
-  bool verbose = 1; //TODO, add user interface
+	int lts_ratio = mLTSRatioSpinBox->value();
+	double stop_delta = 0.001; //TODO, add user interface
+	double lambda = 0; //TODO, add user interface
+	double sigma = 1.0; //TODO, add user interface
+	bool lin_flag = mLinearCheckBox->isChecked(); //TODO, add user interface
+	int sample = 1; //TODO, add user interface
+	int single_point_thre = 1; //TODO, add user interface
+	bool verbose = 1; //TODO, add user interface
 
-  ssc::messageManager()->sendDebug("Using lts_ratio: "+qstring_cast(lts_ratio));
-  QString logPath = patientService()->getPatientData()->getActivePatientFolder()+"/Logs/";
+	ssc::messageManager()->sendDebug("Using lts_ratio: " + qstring_cast(lts_ratio));
+	QString logPath = patientService()->getPatientData()->getActivePatientFolder() + "/Logs/";
 
-  mManager->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose, logPath);
+	mManager->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose,
+		logPath);
 }
-
 
 /**Utililty class for debugging the SeansVesselRegistration class interactively.
  *
@@ -183,29 +158,29 @@ public:
 		mMovingData->SetPoints(temp->GetPoints());
 		mMovingData->SetVerts(temp->GetVerts());
 
-//		// draw lines: slow but nice
-//		mLines.clear();
-//		ssc::View* view = viewManager()->get3DView();
-//		for (int i=0; i<mContext->mSortedSourcePoints->GetNumberOfPoints(); ++i)
-//		{
-//			ssc::GraphicalLine3DPtr line(new ssc::GraphicalLine3D(view->getRenderer()));
-//			line->setValue(ssc::Vector3D(mContext->mSortedSourcePoints->GetPoint(i)),
-//				ssc::Vector3D(mContext->mSortedTargetPoints->GetPoint(i)));
-//			line->setColor(ssc::Vector3D(1,0,0));
-//			mLines.push_back(line);
-//		}
+		//		// draw lines: slow but nice
+		//		mLines.clear();
+		//		ssc::View* view = viewManager()->get3DView();
+		//		for (int i=0; i<mContext->mSortedSourcePoints->GetNumberOfPoints(); ++i)
+		//		{
+		//			ssc::GraphicalLine3DPtr line(new ssc::GraphicalLine3D(view->getRenderer()));
+		//			line->setValue(ssc::Vector3D(mContext->mSortedSourcePoints->GetPoint(i)),
+		//				ssc::Vector3D(mContext->mSortedTargetPoints->GetPoint(i)));
+		//			line->setColor(ssc::Vector3D(1,0,0));
+		//			mLines.push_back(line);
+		//		}
 
 		// draw lines
 		mPolyLines->Allocate();
 		vtkPointsPtr verts = vtkPointsPtr::New();
-		for (int i=0; i<mContext->mSortedSourcePoints->GetNumberOfPoints(); ++i)
+		for (int i = 0; i < mContext->mSortedSourcePoints->GetNumberOfPoints(); ++i)
 		{
 			verts->InsertNextPoint(mContext->mSortedSourcePoints->GetPoint(i));
 			verts->InsertNextPoint(mContext->mSortedTargetPoints->GetPoint(i));
 
 			vtkIdType connectivity[2];
-			connectivity[0] = 2*i;
-			connectivity[1] = 2*i+1;
+			connectivity[0] = 2 * i;
+			connectivity[1] = 2 * i + 1;
 			mPolyLines->InsertNextCell(VTK_LINE, 2, connectivity);
 		}
 		mPolyLines->SetPoints(verts);
@@ -217,13 +192,14 @@ private:
 	RegistrationManagerPtr mManager;
 	vtkPolyDataPtr mMovingData;
 	vtkPolyDataPtr mPolyLines;
-	ssc::GeometricRepPtr m_mRep,m_fRep,m_lineRep;
-//	std::vector<ssc::GraphicalLine3DPtr> mLines;
+	ssc::GeometricRepPtr m_mRep, m_fRep, m_lineRep;
+	//	std::vector<ssc::GraphicalLine3DPtr> mLines;
 };
 
 void SeansVesselRegistrationWidget::debugInit()
 {
-	mDebugger.reset(new SeansVesselRegistrationDebugger(mManager, mLTSRatioSpinBox->value(), mLinearCheckBox->isChecked()));
+	mDebugger.reset(new SeansVesselRegistrationDebugger(mManager, mLTSRatioSpinBox->value(),
+		mLinearCheckBox->isChecked()));
 }
 void SeansVesselRegistrationWidget::debugRunOneLinearStep()
 {
@@ -240,29 +216,34 @@ void SeansVesselRegistrationWidget::debugClear()
 
 QWidget* SeansVesselRegistrationWidget::createOptionsWidget()
 {
-  QWidget* retval = new QWidget(this);
-  QGridLayout* layout = new QGridLayout(retval);
+	QWidget* retval = new QWidget(this);
+	QGridLayout* layout = new QGridLayout(retval);
 
-  mLTSRatioSpinBox->setSingleStep(1);
-  mLTSRatioSpinBox->setValue(80);
+	mLTSRatioSpinBox->setSingleStep(1);
+	mLTSRatioSpinBox->setValue(80);
 
-  mLinearCheckBox->setChecked(true);
-  int line = 0;
-  layout->addWidget(new QLabel("LTS Ratio:"), line , 0);
-  layout->addWidget(mLTSRatioSpinBox, line, 1);
-  ++line;
-  layout->addWidget(new QLabel("Linear:"), line , 0);
-  layout->addWidget(mLinearCheckBox, line, 1);
-  ++line;
-  layout->addWidget(new QLabel("Debug"), line , 0);
-  QHBoxLayout* debugLayout = new QHBoxLayout;
-  layout->addLayout(debugLayout, line, 1, 1, 1);
-  this->createAction(this, QIcon(), "Init", "Initialize the V2V algorithm.\n Display only, registration will not be updated in CustusX (Debug)", SLOT(debugInit()), debugLayout);
-  this->createAction(this, QIcon(), "Lin", "Run one Linear step in the V2V algorithm. (Debug)", SLOT(debugRunOneLinearStep()), debugLayout);
-  this->createAction(this, QIcon(), "NL", "Run one Nonlinear step in the V2V algorithm. (Should be one at the end only)(Debug)", SLOT(debugRunOneNonlinearStep()), debugLayout);
-  this->createAction(this, QIcon(), "Clear", "Clear debugging of the V2V algorithm.", SLOT(debugClear()), debugLayout);
+	mLinearCheckBox->setChecked(true);
+	int line = 0;
+	layout->addWidget(new QLabel("LTS Ratio:"), line, 0);
+	layout->addWidget(mLTSRatioSpinBox, line, 1);
+	++line;
+	layout->addWidget(new QLabel("Linear:"), line, 0);
+	layout->addWidget(mLinearCheckBox, line, 1);
+	++line;
+	layout->addWidget(new QLabel("Debug"), line, 0);
+	QHBoxLayout* debugLayout = new QHBoxLayout;
+	layout->addLayout(debugLayout, line, 1, 1, 1);
+	this->createAction(this, QIcon(), "Init",
+		"Initialize the V2V algorithm.\n Display only, registration will not be updated in CustusX (Debug)",
+		SLOT(debugInit()), debugLayout);
+	this->createAction(this, QIcon(), "Lin", "Run one Linear step in the V2V algorithm. (Debug)",
+		SLOT(debugRunOneLinearStep()), debugLayout);
+	this->createAction(this, QIcon(), "NL",
+		"Run one Nonlinear step in the V2V algorithm. (Should be one at the end only)(Debug)",
+		SLOT(debugRunOneNonlinearStep()), debugLayout);
+	this->createAction(this, QIcon(), "Clear", "Clear debugging of the V2V algorithm.", SLOT(debugClear()), debugLayout);
 
-  return retval;
+	return retval;
 }
 
 }//namespace cx
