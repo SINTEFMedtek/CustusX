@@ -292,15 +292,6 @@ void TestRegistration::testVessel2VesselRegistration()
 
 void TestRegistration::doTestVessel2VesselRegistration(ssc::Transform3D perturbation, QString filenameSource, QString filenameTarget, double tol_dist, double tol_angle)
 {
-	//Default values
-//	int lts_ratio = 80;
-	int lts_ratio = 80;
-	double stop_delta = 0.001;
-	double lambda = 0;
-	double sigma = 1.0;
-	bool lin_flag = 1;
-	int sample = 1;
-	int single_point_thre = 1;
 	bool verbose = 0;
 
 	if (verbose)
@@ -326,8 +317,9 @@ void TestRegistration::doTestVessel2VesselRegistration(ssc::Transform3D perturba
 		std::cout << info << std::endl;
 	}
 
-	cx::SeansVesselReg vesselReg(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose);
-	vesselReg.setDebugOutput(verbose); // too much information
+	cx::SeansVesselReg vesselReg;
+	vesselReg.setDebugOutput(verbose);
+	vesselReg.mt_doOnlyLinear = true;
 
 	bool success = vesselReg.execute(source, target, cx::DataLocations::getTestDataPath() + "/Log");
 	CPPUNIT_ASSERT(success);

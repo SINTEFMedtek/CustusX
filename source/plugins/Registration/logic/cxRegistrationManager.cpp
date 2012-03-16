@@ -412,61 +412,6 @@ void RegistrationManager::doFastRegistration_Translation()
   this->applyPatientRegistration(rMpr_old*pr_oldMpr_new, "Fast Translation");
 }
 
-void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta, double lambda, double sigma,
-				bool lin_flag, int sample, int single_point_thre, bool verbose, QString logPath)
-{
-	//Default values
-	/*int lts_ratio = 80;
-	 double stop_delta = 0.001;
-	 double lambda = 0;
-	 double sigma = 1.0;
-	 bool lin_flag = 1;
-	 int sample = 1;
-	 int single_point_thre = 1;
-	 bool verbose = 1;*/
-
-	SeansVesselReg vesselReg(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose);
-
-	bool success = vesselReg.execute(mMovingData, mFixedData, logPath);
-	if (!success)
-	{
-		ssc::messageManager()->sendWarning("Vessel registration failed.");
-		return;
-	}
-
-	ssc::Transform3D linearTransform = vesselReg.getLinearResult();
-	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
-	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
-
-	// characterize the input perturbation in angle-axis form:
-	ssc::Vector3D t_delta = linearTransform.matrix().block<3, 1>(0, 3);
-	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3, 3>(0, 0));
-	double angle = angleAxis.angle();
-
-	QString qualityText = QString("|t_delta|=%1mm, angle=%2*").arg(t_delta.length(), 6, 'f', 2).arg(
-					angle / M_PI * 180.0, 6, 'f', 2);
-
-	if (t_delta.length() > 20 || fabs(angle) > 10 / 180.0 * M_PI)
-	{
-		ssc::messageManager()->sendWarning(qualityText);
-		QString text = QString(
-						"The registration matrix' angle-axis representation shows a large shift. Retry registration.");
-		ssc::messageManager()->sendWarning(text);
-	}
-	else
-	{
-		ssc::messageManager()->sendInfo(qualityText);
-	}
-
-	// The registration is performed in space r. Thus, given an old data position rMd, we find the
-	// new one as rM'd = Q * rMd, where Q is the inverted registration output.
-	// Delta is thus equal to Q:
-	ssc::Transform3D delta = linearTransform.inv();
-	//std::cout << "delta:\n" << delta << std::endl;
-	this->applyImage2ImageRegistration(delta, "Vessel based");
-
-}
-
 /**\brief apply a new image registration
  *
  * All image registration techniques should use this method

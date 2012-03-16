@@ -41,8 +41,9 @@ public:
 	};
 	typedef boost::shared_ptr<Context> ContextPtr;
 
-	SeansVesselReg(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample,
-		int single_point_thre, bool verbose);
+	SeansVesselReg();
+//	SeansVesselReg(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample,
+//		int single_point_thre, bool verbose);
 	~SeansVesselReg();
 
 	bool execute(ssc::DataPtr source, ssc::DataPtr target, QString logPath);
@@ -53,6 +54,18 @@ public:
 	{
 		mt_verbose = on;
 	}
+
+	bool mt_auto_lts;
+	int mt_ltsRatio;
+	double mt_distanceDeltaStopThreshold;
+	double mt_lambda;
+	double mt_sigma;
+	bool mt_doOnlyLinear;
+//	bool mt_doStepping;
+	int mt_sampleRatio;
+	int mt_singlePointThreshold;
+	int mt_maximumNumberOfIterations;
+	bool mt_verbose;
 
 	// debug interface:
 	ContextPtr createContext(ssc::DataPtr source, ssc::DataPtr target);
@@ -81,20 +94,14 @@ protected:
 	vtkPointsPtr transformPoints(vtkPointsPtr input, vtkAbstractTransformPtr transform);
 	vtkPointsPtr createSortedPoints(vtkIdListPtr sortedIDList, vtkPointsPtr unsortedPoints, int numPoints);
 	vtkPolyDataPtr crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, double margin);
+	ContextPtr linearRefineAllLTS(ContextPtr context);
+	void linearRefine(ContextPtr context);
+	SeansVesselReg::ContextPtr splitContext(ContextPtr context);
 
 	void print(vtkPointsPtr points);
 	void print(vtkPolyDataPtr data);
 
-	int mt_ltsRatio;
-	double mt_distanceDeltaStopThreshold;
-	double mt_lambda;
-	double mt_sigma;
-	bool mt_doOnlyLinear;
-	bool mt_doStepping;
-	int mt_sampleRatio;
-	int mt_singlePointThreshold;
-	const int mt_maximumNumberOfIterations;
-	bool mt_verbose;
+
 
 	ssc::Transform3D mLinearTransformResult;
 
