@@ -72,7 +72,7 @@ class DoubleDataAdapterSpacing : public DoubleDataAdapterOutputValueParams
 public:
   DoubleDataAdapterSpacing(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
   virtual ~DoubleDataAdapterSpacing() {}
-  virtual QString getValueName() const { return "Output Spacing"; }
+  virtual QString getValueName() const { return "Spacing Out"; }
   virtual QString getHelp() const { return "Output Volume Spacing (mm)"; }
   DoubleRange getValueRange() const {  return ssc::DoubleRange(0.001,10,0.001); }
   virtual int getValueDecimals() const { return 3; } ///< number of relevant decimals in value
