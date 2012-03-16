@@ -9,6 +9,7 @@
 #include <QLabel>
 #include <QToolButton>
 #include <QAction>
+#include <iostream>
 
 namespace cx
 {
@@ -30,6 +31,8 @@ public:
 	BaseWidget(QWidget* parent, QString objectName, QString windowTitle) :
 		QWidget(parent), mObjectName(objectName), mWindowTitle(windowTitle)
 	{
+		if (mObjectName=="US Reconstruction")
+			std::cout << ":: [" <<  this->objectName().toAscii().constData() << "]" << std::endl;
 		this->setObjectName(mObjectName);
 		this->setWindowTitle(mWindowTitle);
 	}

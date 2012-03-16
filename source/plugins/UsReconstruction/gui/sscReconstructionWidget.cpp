@@ -9,15 +9,14 @@
 #include "sscTypeConversions.h"
 #include "sscReconstructer.h"
 #include "cxTimedAlgorithmProgressBar.h"
+#include "cxSettings.h"
 
-namespace ssc
+namespace cx
 {
 
-ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPtr reconstructer) :
-	QWidget(parent), mReconstructer(reconstructer)
+ReconstructionWidget::ReconstructionWidget(QWidget* parent, ssc::ReconstructManagerPtr reconstructer) :
+	BaseWidget(parent, "", "US Reconstruction"), mReconstructer(reconstructer)
 {
-	this->setWindowTitle("US Reconstruction");
-
 	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mReconstructer));
 	connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
 
@@ -27,80 +26,119 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPt
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
-	mFileSelectWidget = new FileSelectWidget(this);
+	mFileSelectWidget = new ssc::FileSelectWidget(this);
 	connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
 
 	QHBoxLayout* extentLayout = new QHBoxLayout;
 	mExtentLineEdit = new QLineEdit(this);
 	mExtentLineEdit->setReadOnly(true);
-	extentLayout->addWidget(new QLabel("Extent(mm)", this));
+	extentLayout->addWidget(new QLabel("Extent", this));
 	extentLayout->addWidget(mExtentLineEdit);
 
 	QHBoxLayout* inputSpacingLayout = new QHBoxLayout;
 	mInputSpacingLineEdit = new QLineEdit(this);
 	mInputSpacingLineEdit->setReadOnly(true);
-	inputSpacingLayout->addWidget(new QLabel("Input Spacing(mm)", this));
+	inputSpacingLayout->addWidget(new QLabel("Spacing In", this));
 	inputSpacingLayout->addWidget(mInputSpacingLineEdit);
 
 	mReconstructButton = new QPushButton("Reconstruct", this);
 	connect(mReconstructButton, SIGNAL(clicked()), this, SLOT(reconstruct()));
 
-	QGroupBox* outputVolGroup = new QGroupBox("Output Volume", this);
-	QVBoxLayout* outputVolLayout = new QVBoxLayout(outputVolGroup);
-
-	QGridLayout* outputVolGridLayout = new QGridLayout;
-	mMaxVolSizeWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(
-		new DoubleDataAdapterMaxUSVolumeSize(mReconstructer)), outputVolGridLayout, 0);
-	mSpacingWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterSpacing(
-		mReconstructer)), outputVolGridLayout, 1);
-	mDimXWidget = new ssc::SpinBoxGroupWidget(this,
-		ssc::DoubleDataAdapterPtr(new DoubleDataAdapterXDim(mReconstructer)));
-	mDimYWidget = new ssc::SpinBoxGroupWidget(this,
-		ssc::DoubleDataAdapterPtr(new DoubleDataAdapterYDim(mReconstructer)));
-	mDimZWidget = new ssc::SpinBoxGroupWidget(this,
-		ssc::DoubleDataAdapterPtr(new DoubleDataAdapterZDim(mReconstructer)));
-	QHBoxLayout* outputVolDimLayout = new QHBoxLayout;
-	outputVolDimLayout->addWidget(mDimXWidget);
-	outputVolDimLayout->addWidget(mDimYWidget);
-	outputVolDimLayout->addWidget(mDimZWidget);
-
-	ssc::LabeledComboBoxWidget* orientationWidget = new ssc::LabeledComboBoxWidget(this,
-		mReconstructer->getParams()->mOrientationAdapter);
 	ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mPresetTFAdapter);
-
-	QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mMaskReduce);
-
-	ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this,
-		mReconstructer->getParams()->mAlgorithmAdapter);
-
-	QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mAlignTimestamps);
-	QWidget* timeCalibrationWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mTimeCalibration);
-	QWidget* angioWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mAngioAdapter);
-
-	mAlgorithmGroup = new QGroupBox("Algorithm", this);
-	mAlgoLayout = new QStackedLayout(mAlgorithmGroup);
-	this->repopulateAlgorithmGroup();
 
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
 	mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
 
+	QGridLayout* sizesLayout = new QGridLayout;
+	mSpacingWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterSpacing(mReconstructer)));
+	mMaxVolSizeWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterMaxUSVolumeSize(mReconstructer)));
+	sizesLayout->addLayout(inputSpacingLayout, 0, 0);
+	sizesLayout->addWidget(mSpacingWidget, 1, 0);
+	sizesLayout->addLayout(extentLayout, 0, 1);
+	sizesLayout->addWidget(mMaxVolSizeWidget, 1, 1);
+
+	QHBoxLayout* runLayout = new QHBoxLayout;
+	topLayout->addLayout(runLayout);
+	runLayout->addWidget(mReconstructButton);
+	this->createAction(this,
+	      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+	      "Details", "Show Advanced Settings",
+	      SLOT(toggleDetailsSlot()),
+	      runLayout);
+
 	topLayout->addWidget(mFileSelectWidget);
-	topLayout->addLayout(inputSpacingLayout);
-	topLayout->addWidget(angioWidget);
-	topLayout->addWidget(outputVolGroup);
-	outputVolLayout->addLayout(extentLayout);
-	outputVolLayout->addLayout(outputVolGridLayout);
-	outputVolLayout->addLayout(outputVolDimLayout);
-	outputVolLayout->addWidget(orientationWidget);
-	outputVolLayout->addWidget(presetTFWidget);
-	outputVolLayout->addWidget(reduceWidget);
-	outputVolLayout->addWidget(alignTimestampsWidget);
-	outputVolLayout->addWidget(timeCalibrationWidget);
-	topLayout->addWidget(algorithmWidget);
-	topLayout->addWidget(mAlgorithmGroup);
-	topLayout->addWidget(mReconstructButton);
+	topLayout->addLayout(sizesLayout);
+	topLayout->addWidget(presetTFWidget);
+
+	mOptionsWidget = this->createOptionsWidget();
+	mOptionsWidget->setVisible(settings()->value("acquisition/UsAcqShowDetails").toBool());
+	topLayout->addWidget(mOptionsWidget);
+
 	topLayout->addWidget(mTimedAlgorithmProgressBar);
 	topLayout->addStretch();
+}
+
+QString ReconstructionWidget::defaultWhatsThis() const
+{
+	return "<html>"
+		"<h3>US 3D Reconstruction.</h3>"
+		"<p><i>Reconstruct 3D US data from acquired a 2D sequence.</i></br>"
+		"</html>";
+}
+
+void ReconstructionWidget::toggleDetailsSlot()
+{
+  mOptionsWidget->setVisible(!mOptionsWidget->isVisible());
+  settings()->setValue("reconstruction/guiShowDetails", mOptionsWidget->isVisible());
+}
+
+QWidget* ReconstructionWidget::createOptionsWidget()
+{
+	QWidget* retval = new QWidget(this);
+	QGridLayout* layout = new QGridLayout(retval);
+	layout->setMargin(0);
+
+	int line = 0;
+
+	layout->addWidget(this->createHorizontalLine(), line, 0, 1, 1);
+	++line;
+
+	mAlgorithmGroup = new QGroupBox("Algorithm", this);
+	QVBoxLayout* algoOuterLayout = new QVBoxLayout(mAlgorithmGroup);
+	ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mAlgorithmAdapter);
+	algoOuterLayout->addWidget(algorithmWidget);
+	mAlgoLayout = new QStackedLayout;
+	this->repopulateAlgorithmGroup();
+	algoOuterLayout->addLayout(mAlgoLayout);
+	layout->addWidget(mAlgorithmGroup, line, 0);
+	++line;
+
+	QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mAlignTimestamps);
+	layout->addWidget(alignTimestampsWidget, line, 0);
+	++line;
+	QWidget* angioWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mAngioAdapter);
+	layout->addWidget(angioWidget, line, 0);
+	++line;
+	QWidget* timeCalibrationWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mTimeCalibration);
+	layout->addWidget(timeCalibrationWidget, line, 0);
+	++line;
+	QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mMaskReduce);
+	layout->addWidget(reduceWidget, line, 0);
+	++line;
+	ssc::LabeledComboBoxWidget* orientationWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mOrientationAdapter);
+	layout->addWidget(orientationWidget, line, 0);
+	++line;
+
+	mDimXWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterXDim(mReconstructer)));
+	mDimYWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterYDim(mReconstructer)));
+	mDimZWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterZDim(mReconstructer)));
+	QHBoxLayout* outputVolDimLayout = new QHBoxLayout;
+	outputVolDimLayout->addWidget(mDimXWidget);
+	outputVolDimLayout->addWidget(mDimYWidget);
+	outputVolDimLayout->addWidget(mDimZWidget);
+	layout->addLayout(outputVolDimLayout, line, 0);
+
+	return retval;
 }
 
 /** Add the widgets for the current algorithm to a stacked widget.

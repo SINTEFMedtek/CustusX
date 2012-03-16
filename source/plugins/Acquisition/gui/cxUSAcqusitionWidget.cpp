@@ -42,7 +42,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	timerLayout->addWidget(mDisplayTimerWidget);
 	timerLayout->addStretch();
 
-	QGridLayout* editsLayout = new QGridLayout(this);
+	QGridLayout* editsLayout = new QGridLayout;
 //	editsLayout->setMargin(0);
 	editsLayout->setColumnStretch(0,0);
 	editsLayout->setColumnStretch(1,1);

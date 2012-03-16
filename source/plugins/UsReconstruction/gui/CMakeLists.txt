@@ -36,6 +36,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     ${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/gui
+    ${CustusX3_SOURCE_DIR}/source/gui/utilities
     ../logic
     )
 
