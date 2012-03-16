@@ -49,7 +49,7 @@ std::vector<PluginBase::PluginWidget> UsReconstructionPlugin::createWidgets() co
 	std::vector<PluginWidget> retval;
 
 	retval.push_back(PluginBase::PluginWidget(
-			new ssc::ReconstructionWidget(NULL, mReconstructer),
+			new ReconstructionWidget(NULL, mReconstructer),
 			"Algorithms"));
 
 	return retval;

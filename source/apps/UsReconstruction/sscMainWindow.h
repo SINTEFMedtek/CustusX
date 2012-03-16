@@ -31,7 +31,7 @@ private slots:
   void showData();
 
 private:
-  ssc::ReconstructionWidget* mReconstructionWidget;
+  cx::ReconstructionWidget* mReconstructionWidget;
   ssc::View* mView;
 
   ssc::VolumetricRepPtr mVolumeRep;
