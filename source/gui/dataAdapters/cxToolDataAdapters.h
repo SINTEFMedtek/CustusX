@@ -42,6 +42,8 @@ public: // optional methods
 };
 
 
+typedef boost::shared_ptr<class ActiveProbeConfigurationStringDataAdapter> ActiveProbeConfigurationStringDataAdapterPtr;
+
 /** Adapter that connects to the current active probe.
  *  It will stick to the probe as much as possible,
  *  i.e. ignore hiding and showing of other non-probes.
@@ -50,7 +52,7 @@ class ActiveProbeConfigurationStringDataAdapter : public ssc::StringDataAdapter
 {
   Q_OBJECT
 public:
-  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveProbeConfigurationStringDataAdapter()); }
+  static ActiveProbeConfigurationStringDataAdapterPtr New() { return ActiveProbeConfigurationStringDataAdapterPtr(new ActiveProbeConfigurationStringDataAdapter()); }
   ActiveProbeConfigurationStringDataAdapter();
   virtual ~ActiveProbeConfigurationStringDataAdapter() {}
 

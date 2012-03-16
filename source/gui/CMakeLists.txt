@@ -62,6 +62,7 @@ SET(cxGui_MOC_HDRS
     toolWidgets/cxToolPropertiesWidget.h
     toolWidgets/cxActiveToolWidget.h
     toolWidgets/cxToolManagerWidget.h
+    toolWidgets/cxProbeConfigWidget.h
     #----------------------
     utilities/cxAudio.h
     utilities/cxDoubleSpanSlider.h
@@ -71,6 +72,7 @@ SET(cxGui_MOC_HDRS
     utilities/cxSelectionGroupBox.h
     utilities/cxColorSelectButton.h
     utilities/cxVector3DWidget.h
+    utilities/cxBoundingBoxWidget.h
     #----------------------    
     cxMainWindow.h
     cxSecondaryMainWindow.h
@@ -214,6 +216,8 @@ SET(cxGui_SRCS
     toolWidgets/cxActiveToolWidget.cpp
     toolWidgets/cxToolManagerWidget.h
     toolWidgets/cxToolManagerWidget.cpp
+    toolWidgets/cxProbeConfigWidget.h
+    toolWidgets/cxProbeConfigWidget.cpp
     #----------------------    
     utilities/cxDoubleSpanSlider.h
     utilities/cxDoubleSpanSlider.cpp
@@ -233,6 +237,8 @@ SET(cxGui_SRCS
     utilities/cxColorSelectButton.cpp
     utilities/cxVector3DWidget.h
     utilities/cxVector3DWidget.cpp    
+    utilities/cxBoundingBoxWidget.h
+    utilities/cxBoundingBoxWidget.cpp
     #----------------------    
     cxMainWindow.h
     cxMainWindow.cpp 
