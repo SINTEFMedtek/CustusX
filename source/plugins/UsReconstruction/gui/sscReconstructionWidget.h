@@ -7,13 +7,14 @@
 #include "sscXmlOptionItem.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscFileSelectWidget.h"
+#include "cxBaseWidget.h"
 
 namespace cx
 {
 class TimedAlgorithmProgressBar;
 }
 
-namespace ssc
+namespace cx
 {
 /**
  * \file
@@ -27,12 +28,12 @@ namespace ssc
  *  Created by Ole Vegard Solberg on 5/4/10.
  *
  */
-class ReconstructionWidget: public QWidget
+class ReconstructionWidget: public BaseWidget
 {
 Q_OBJECT
 public:
-	ReconstructionWidget(QWidget* parent, ReconstructManagerPtr reconstructer);
-	ReconstructManagerPtr reconstructer()
+	ReconstructionWidget(QWidget* parent, ssc::ReconstructManagerPtr reconstructer);
+	ssc::ReconstructManagerPtr reconstructer()
 	{
 		return mReconstructer;
 	}
@@ -46,12 +47,13 @@ private slots:
 	void inputDataSelected(QString mhdFileName);
 	void repopulateAlgorithmGroup();
 	void reconstructFinishedSlot();
+	void toggleDetailsSlot();
 
 private:
-	ReconstructManagerPtr mReconstructer;
-	ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
+	ssc::ReconstructManagerPtr mReconstructer;
+	ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
 
-	FileSelectWidget* mFileSelectWidget;
+	ssc::FileSelectWidget* mFileSelectWidget;
 	QPushButton* mReconstructButton;
 	QPushButton* mReloadButton;
 	QLineEdit* mExtentLineEdit;
@@ -61,14 +63,17 @@ private:
 	ssc::SpinBoxGroupWidget* mDimXWidget;
 	ssc::SpinBoxGroupWidget* mDimYWidget;
 	ssc::SpinBoxGroupWidget* mDimZWidget;
-	cx::TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
 	QGroupBox* mAlgorithmGroup;
 	QStackedLayout* mAlgoLayout;
 	std::vector<QWidget*> mAlgoWidgets;
 
+	QWidget* mOptionsWidget;
+	QWidget* createOptionsWidget();
 	QString getCurrentPath();
 	void updateComboBox();
+	QString defaultWhatsThis() const;
 };
 
 /**
