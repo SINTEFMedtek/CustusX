@@ -250,10 +250,11 @@ void TestRegistration::testVessel2VesselRegistration()
 	pert.push_back(T_center * R_xy5 * T_center.inv());
 	pert.push_back(T_center * R_xy5 * T_center.inv() * T_222);
 
-//	ssc::Transform3D T_large1 = ssc::createTransformTranslate(ssc::Vector3D(3, 3, 3));
-//	ssc::Transform3D T_large2 = ssc::createTransformTranslate(ssc::Vector3D(0, 0, 5));
-//	pert.push_back(T_large1);
-//	pert.push_back(T_large2);
+	// this set causes two failures
+	ssc::Transform3D T_large1 = ssc::createTransformTranslate(ssc::Vector3D(3, 3, 3));
+	ssc::Transform3D T_large2 = ssc::createTransformTranslate(ssc::Vector3D(0, 0, 5));
+	pert.push_back(T_large1);
+	pert.push_back(T_large2);
 //
 //	std::cout << std::endl;
 //	this->doTestVessel2VesselRegistration(T_large1, fname1, fname2, tol_dist_hi, tol_ang_hi);
