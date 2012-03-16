@@ -49,6 +49,7 @@ private:
 
   QSpinBox* mLTSRatioSpinBox;
   QCheckBox* mLinearCheckBox;
+  QCheckBox* mAutoLTSCheckBox;
   QPushButton* mRegisterButton;
 
   ssc::StringDataAdapterPtr mFixedImage;
