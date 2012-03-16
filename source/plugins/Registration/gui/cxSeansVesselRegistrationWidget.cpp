@@ -25,7 +25,7 @@ namespace cx
 
 SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
 	RegistrationBaseWidget(regManager, parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
-		mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()),
+		mLTSRatioSpinBox(new QSpinBox()), mLinearCheckBox(new QCheckBox()), mAutoLTSCheckBox(new QCheckBox()),
 		mRegisterButton(new QPushButton("Register"))
 {
 
@@ -39,7 +39,7 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(RegistrationManager
 	vesselRegOptionsButton->setCheckable(true);
 
 	QGroupBox* vesselRegOptionsWidget = this->createGroupbox(this->createOptionsWidget(),
-		"Seans vessel regsistration options");
+		"Vessel registration options");
 	connect(vesselRegOptionsButton, SIGNAL(clicked(bool)), vesselRegOptionsWidget, SLOT(setVisible(bool)));
 	vesselRegOptionsWidget->setVisible(vesselRegOptionsButton->isChecked());
 
@@ -72,20 +72,68 @@ QString SeansVesselRegistrationWidget::defaultWhatsThis() const
 
 void SeansVesselRegistrationWidget::registerSlot()
 {
-	int lts_ratio = mLTSRatioSpinBox->value();
-	double stop_delta = 0.001; //TODO, add user interface
-	double lambda = 0; //TODO, add user interface
-	double sigma = 1.0; //TODO, add user interface
-	bool lin_flag = mLinearCheckBox->isChecked(); //TODO, add user interface
-	int sample = 1; //TODO, add user interface
-	int single_point_thre = 1; //TODO, add user interface
-	bool verbose = 1; //TODO, add user interface
+//	int lts_ratio = mLTSRatioSpinBox->value();
+//	double stop_delta = 0.001; //TODO, add user interface
+//	double lambda = 0; //TODO, add user interface
+//	double sigma = 1.0; //TODO, add user interface
+//	bool lin_flag = mLinearCheckBox->isChecked(); //TODO, add user interface
+//	int sample = 1; //TODO, add user interface
+//	int single_point_thre = 1; //TODO, add user interface
+//	bool verbose = 1; //TODO, add user interface
 
-	ssc::messageManager()->sendDebug("Using lts_ratio: " + qstring_cast(lts_ratio));
 	QString logPath = patientService()->getPatientData()->getActivePatientFolder() + "/Logs/";
 
-	mManager->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose,
-		logPath);
+//	mManager->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose,
+//		logPath);
+
+	SeansVesselReg vesselReg;
+	vesselReg.mt_auto_lts = true;
+	vesselReg.mt_ltsRatio = mLTSRatioSpinBox->value();
+	vesselReg.mt_doOnlyLinear = mLinearCheckBox->isChecked();
+	vesselReg.mt_auto_lts = mAutoLTSCheckBox->isChecked();
+
+	if (vesselReg.mt_auto_lts)
+		ssc::messageManager()->sendDebug("Using automatic lts_ratio");
+	else
+		ssc::messageManager()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
+
+	bool success = vesselReg.execute(mManager->getMovingData(), mManager->getFixedData(), logPath);
+	if (!success)
+	{
+		ssc::messageManager()->sendWarning("Vessel registration failed.");
+		return;
+	}
+
+	ssc::Transform3D linearTransform = vesselReg.getLinearResult();
+	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
+	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
+
+	// characterize the input perturbation in angle-axis form:
+	ssc::Vector3D t_delta = linearTransform.matrix().block<3, 1>(0, 3);
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3, 3>(0, 0));
+	double angle = angleAxis.angle();
+
+	QString qualityText = QString("|t_delta|=%1mm, angle=%2*").arg(t_delta.length(), 6, 'f', 2).arg(
+					angle / M_PI * 180.0, 6, 'f', 2);
+
+	if (t_delta.length() > 20 || fabs(angle) > 10 / 180.0 * M_PI)
+	{
+		ssc::messageManager()->sendWarning(qualityText);
+		QString text = QString(
+						"The registration matrix' angle-axis representation shows a large shift. Retry registration.");
+		ssc::messageManager()->sendWarning(text);
+	}
+	else
+	{
+		ssc::messageManager()->sendInfo(qualityText);
+	}
+
+	// The registration is performed in space r. Thus, given an old data position rMd, we find the
+	// new one as rM'd = Q * rMd, where Q is the inverted registration output.
+	// Delta is thus equal to Q:
+	ssc::Transform3D delta = linearTransform.inv();
+	//std::cout << "delta:\n" << delta << std::endl;
+	mManager->applyImage2ImageRegistration(delta, "Vessel based");
 }
 
 /**Utililty class for debugging the SeansVesselRegistration class interactively.
@@ -95,9 +143,12 @@ void SeansVesselRegistrationWidget::registerSlot()
 class SeansVesselRegistrationDebugger
 {
 public:
-	SeansVesselRegistrationDebugger(RegistrationManagerPtr manager, double ltsRatio, bool linear) :
-		mRegistrator(ltsRatio, 0.001, 0, 1.0, linear, 1, 1, 1)
+	SeansVesselRegistrationDebugger(RegistrationManagerPtr manager, double ltsRatio, bool linear)
 	{
+		mRegistrator.mt_doOnlyLinear = linear;
+		mRegistrator.mt_ltsRatio = ltsRatio;
+		mRegistrator.mt_auto_lts = false;
+
 		mManager = manager;
 		mContext = mRegistrator.createContext(mManager->getMovingData(), mManager->getFixedData());
 
@@ -223,7 +274,12 @@ QWidget* SeansVesselRegistrationWidget::createOptionsWidget()
 	mLTSRatioSpinBox->setValue(80);
 
 	mLinearCheckBox->setChecked(true);
+	mAutoLTSCheckBox->setChecked(true);
+
 	int line = 0;
+	layout->addWidget(new QLabel("Auto LTS:"), line, 0);
+	layout->addWidget(mAutoLTSCheckBox, line, 1);
+	++line;
 	layout->addWidget(new QLabel("LTS Ratio:"), line, 0);
 	layout->addWidget(mLTSRatioSpinBox, line, 1);
 	++line;

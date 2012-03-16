@@ -38,12 +38,18 @@
 namespace cx
 {
 
-SeansVesselReg::SeansVesselReg(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag,
-	int sample, int single_point_thre, bool verbose) :
-	mt_ltsRatio(lts_ratio), mt_distanceDeltaStopThreshold(stop_delta), mt_lambda(lambda), mt_sigma(sigma),
-		mt_doOnlyLinear(lin_flag), mt_sampleRatio(sample), mt_singlePointThreshold(single_point_thre),
-		mt_maximumNumberOfIterations(100), mt_verbose(verbose), mInvertedTransform(false)
+SeansVesselReg::SeansVesselReg() : mInvertedTransform(false)
 {
+	mt_auto_lts = true;
+	mt_ltsRatio = 80;
+	mt_distanceDeltaStopThreshold = 0.001;
+	mt_lambda = 0;
+	mt_sigma = 1.0;
+	mt_doOnlyLinear = false;
+	mt_sampleRatio = 1;
+	mt_singlePointThreshold = 1;
+	mt_maximumNumberOfIterations = 100;
+	mt_verbose = false;
 }
 
 SeansVesselReg::~SeansVesselReg()
@@ -77,6 +83,80 @@ bool SeansVesselReg::execute(ssc::DataPtr source, ssc::DataPtr target, QString l
 	if (!context)
 		return false;
 
+	if (mt_auto_lts)
+	{
+		context = this->linearRefineAllLTS(context);
+	}
+	else
+	{
+		this->linearRefine(context);
+	}
+
+	// add a nonlinear step to the end:
+	if (!mt_doOnlyLinear)
+	{
+		this->performOneRegistration(context, false);
+	}
+
+	printOutResults(logPath + "/Vessel_Based_Registration_", context->mConcatenation);
+
+	if (mt_verbose)
+		std::cout << QString("\n\nV2V Execution time: %1s").arg(start.secsTo(QTime::currentTime())) << endl;
+
+	mLinearTransformResult = this->getLinearTransform(context->mConcatenation);
+
+	return true;
+}
+
+/**Search along several LTS for the best solution.
+ * Return the completed (linear) registration with
+ * the lowest metric.
+ */
+SeansVesselReg::ContextPtr SeansVesselReg::linearRefineAllLTS(ContextPtr seed)
+{
+	// all lts values to search along:
+	std::vector<int> lts;
+	lts.push_back(40);
+	lts.push_back(50);
+	lts.push_back(60);
+	lts.push_back(70);
+	lts.push_back(75);
+	lts.push_back(80);
+	lts.push_back(85);
+	lts.push_back(90);
+	lts.push_back(95);
+	lts.push_back(100);
+
+	std::vector<ContextPtr> paths;
+
+	// iterate along all paths
+	for (unsigned i=0; i<lts.size(); ++i)
+	{
+		ContextPtr current = this->splitContext(seed);
+		paths.push_back(current);
+		current->mLtsRatio = lts[i];
+		this->linearRefine(current);
+		if (mt_verbose)
+			std::cout << QString("LTS=%1, metric=%2").arg(current->mLtsRatio).arg(current->mMetric) << std::endl;
+	}
+
+	// search for best path
+	int bestPath = 0;
+	for (unsigned i=0; i<paths.size(); ++i)
+	{
+		if (paths[i]->mMetric < paths[bestPath]->mMetric)
+			bestPath = i;
+	}
+
+	// return value
+	return paths[bestPath];
+}
+
+/**iteratetively register linearly on the input context until it converges.
+ *
+ */
+void SeansVesselReg::linearRefine(ContextPtr context)
+{
 	// Perform registrations iteratively until convergence is reached:
 	double previousMetric = 1E6;
 	for (int iteration = 1; iteration < mt_maximumNumberOfIterations; ++iteration)
@@ -97,21 +177,31 @@ bool SeansVesselReg::execute(ssc::DataPtr source, ssc::DataPtr target, QString l
 
 		previousMetric = context->mMetric;
 	}
+}
 
-	// add a nonlinear step to the end:
-	if (!mt_doOnlyLinear)
-	{
-		this->performOneRegistration(context, false);
-	}
+/**Create a copy of context that can be used to start a new iteration.
+ *
+ */
+SeansVesselReg::ContextPtr SeansVesselReg::splitContext(ContextPtr context)
+{
+	ContextPtr retval = ContextPtr(new Context);
 
-	printOutResults(logPath + "/Vessel_Based_Registration_", context->mConcatenation);
+	retval->mLtsRatio = context->mLtsRatio;
 
-	if (mt_verbose)
-		std::cout << QString("\n\nV2V Execution time: %1s").arg(start.secsTo(QTime::currentTime())) << endl;
+	// constant data: shallow copy
+	retval->mTargetPointLocator = context->mTargetPointLocator;
+	retval->mTargetPoints = context->mTargetPoints;
 
-	mLinearTransformResult = this->getLinearTransform(context->mConcatenation);
+	// will be modified: deep copy
+	retval->mSourcePoints = vtkPointsPtr::New();
+	retval->mSourcePoints->DeepCopy(context->mSourcePoints);
 
-	return true;
+	// return value: initialize only
+	retval->mConcatenation = vtkGeneralTransformPtr::New();;
+//	retval->mTransform = context->mTransform;
+	retval->mMetric = 0;
+
+	return retval;
 }
 
 /**Create a context containing data to use during iteration
@@ -319,7 +409,7 @@ vtkPointsPtr SeansVesselReg::transformPoints(vtkPointsPtr input, vtkAbstractTran
 vtkAbstractTransformPtr SeansVesselReg::linearRegistration(vtkPointsPtr sortedSourcePoints,
 	vtkPointsPtr sortedTargetPoints)
 {
-	std::cout << "linear" << std::endl;
+//	std::cout << "linear" << std::endl;
 	//Build landmark transform
 	vtkLandmarkTransformPtr lmt = vtkLandmarkTransformPtr::New();
 	lmt->SetSourceLandmarks(sortedSourcePoints);
@@ -334,7 +424,7 @@ vtkAbstractTransformPtr SeansVesselReg::linearRegistration(vtkPointsPtr sortedSo
 vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPointsPtr sortedSourcePoints,
 	vtkPointsPtr sortedTargetPoints)
 {
-	std::cout << "nonlinear" << std::endl;
+//	std::cout << "nonlinear" << std::endl;
 	vtkPolyDataPtr tpsSourcePolyData = this->convertToPolyData(sortedSourcePoints);
 	vtkPolyDataPtr tpsTargetPolyData = this->convertToPolyData(sortedTargetPoints);
 
