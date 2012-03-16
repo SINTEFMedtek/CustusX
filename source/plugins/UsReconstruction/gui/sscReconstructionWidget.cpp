@@ -35,27 +35,24 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ssc::ReconstructMana
 	extentLayout->addWidget(new QLabel("Extent", this));
 	extentLayout->addWidget(mExtentLineEdit);
 
-	QHBoxLayout* inputSpacingLayout = new QHBoxLayout;
+//	QHBoxLayout* inputSpacingLayout = new QHBoxLayout;
 	mInputSpacingLineEdit = new QLineEdit(this);
 	mInputSpacingLineEdit->setReadOnly(true);
-	inputSpacingLayout->addWidget(new QLabel("Spacing In", this));
-	inputSpacingLayout->addWidget(mInputSpacingLineEdit);
+	QLabel* inputSpacingLabel = new QLabel("Spacing In", this);
 
 	mReconstructButton = new QPushButton("Reconstruct", this);
 	connect(mReconstructButton, SIGNAL(clicked()), this, SLOT(reconstruct()));
-
-	ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mPresetTFAdapter);
 
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
 	mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
 
 	QGridLayout* sizesLayout = new QGridLayout;
-	mSpacingWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterSpacing(mReconstructer)));
 	mMaxVolSizeWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterMaxUSVolumeSize(mReconstructer)));
-	sizesLayout->addLayout(inputSpacingLayout, 0, 0);
-	sizesLayout->addWidget(mSpacingWidget, 1, 0);
-	sizesLayout->addLayout(extentLayout, 0, 1);
-	sizesLayout->addWidget(mMaxVolSizeWidget, 1, 1);
+	sizesLayout->addWidget(inputSpacingLabel, 0, 0);
+	sizesLayout->addWidget(mInputSpacingLineEdit, 0, 1);
+	sizesLayout->addLayout(extentLayout, 0, 2);
+	mSpacingWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterSpacing(mReconstructer)), sizesLayout, 1);
+	sizesLayout->addWidget(mMaxVolSizeWidget, 1, 2);
 
 	QHBoxLayout* runLayout = new QHBoxLayout;
 	topLayout->addLayout(runLayout);
@@ -68,14 +65,16 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ssc::ReconstructMana
 
 	topLayout->addWidget(mFileSelectWidget);
 	topLayout->addLayout(sizesLayout);
+
+	ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mPresetTFAdapter);
 	topLayout->addWidget(presetTFWidget);
 
 	mOptionsWidget = this->createOptionsWidget();
-	mOptionsWidget->setVisible(settings()->value("acquisition/UsAcqShowDetails").toBool());
+	mOptionsWidget->setVisible(settings()->value("reconstruction/guiShowDetails").toBool());
 	topLayout->addWidget(mOptionsWidget);
 
-	topLayout->addWidget(mTimedAlgorithmProgressBar);
 	topLayout->addStretch();
+	topLayout->addWidget(mTimedAlgorithmProgressBar);
 }
 
 QString ReconstructionWidget::defaultWhatsThis() const
@@ -100,34 +99,27 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 
 	int line = 0;
 
-	layout->addWidget(this->createHorizontalLine(), line, 0, 1, 1);
+	layout->addWidget(this->createHorizontalLine(), line, 0, 1, 2);
 	++line;
 
-	mAlgorithmGroup = new QGroupBox("Algorithm", this);
+	mAlgorithmGroup = new QFrame(this);
+	mAlgorithmGroup->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
+
 	QVBoxLayout* algoOuterLayout = new QVBoxLayout(mAlgorithmGroup);
 	ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mAlgorithmAdapter);
 	algoOuterLayout->addWidget(algorithmWidget);
 	mAlgoLayout = new QStackedLayout;
 	this->repopulateAlgorithmGroup();
 	algoOuterLayout->addLayout(mAlgoLayout);
-	layout->addWidget(mAlgorithmGroup, line, 0);
+	algoOuterLayout->addStretch();
+	layout->addWidget(mAlgorithmGroup, line, 0, 1, 2);
 	++line;
 
-	QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mAlignTimestamps);
-	layout->addWidget(alignTimestampsWidget, line, 0);
-	++line;
-	QWidget* angioWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mAngioAdapter);
-	layout->addWidget(angioWidget, line, 0);
-	++line;
-	QWidget* timeCalibrationWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mTimeCalibration);
-	layout->addWidget(timeCalibrationWidget, line, 0);
-	++line;
-	QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->getParams()->mMaskReduce);
-	layout->addWidget(reduceWidget, line, 0);
-	++line;
-	ssc::LabeledComboBoxWidget* orientationWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mOrientationAdapter);
-	layout->addWidget(orientationWidget, line, 0);
-	++line;
+	ssc::createDataWidget(this, mReconstructer->getParams()->mAlignTimestamps, layout, line++);
+	ssc::createDataWidget(this, mReconstructer->getParams()->mAngioAdapter, layout, line++);
+	ssc::createDataWidget(this, mReconstructer->getParams()->mTimeCalibration, layout, line++);
+	ssc::createDataWidget(this, mReconstructer->getParams()->mMaskReduce, layout, line++);
+	ssc::createDataWidget(this, mReconstructer->getParams()->mOrientationAdapter, layout, line++);
 
 	mDimXWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterXDim(mReconstructer)));
 	mDimYWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterYDim(mReconstructer)));
@@ -136,7 +128,7 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	outputVolDimLayout->addWidget(mDimXWidget);
 	outputVolDimLayout->addWidget(mDimYWidget);
 	outputVolDimLayout->addWidget(mDimZWidget);
-	layout->addLayout(outputVolDimLayout, line, 0);
+	layout->addLayout(outputVolDimLayout, line, 0, 1, 2);
 
 	return retval;
 }
@@ -150,28 +142,28 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 {
 	QString algoName = mReconstructer->getParams()->mAlgorithmAdapter->getValue();
 
-	if (algoName == mAlgorithmGroup->title())
+	if (mAlgoLayout->currentWidget() && (algoName == mAlgoLayout->currentWidget()->objectName()))
 		return;
 
-	mAlgorithmGroup->setTitle(algoName);
+//	mAlgorithmGroup->setTitle("<removed>");
+//	mAlgorithmGroup->setTitle(algoName);
 
-//	// look for an existing layout in the stack:
-//	for (int i = 0; i < mAlgoLayout->count(); ++i)
-//	{
-//		QWidget* current = mAlgoLayout->widget(i);
-//		if (current->objectName() == algoName)
-//		{
-//			mAlgoLayout->setCurrentIndex(i);
-//			return;
-//		}
-//	}
+	for (int i=0; i<mAlgoLayout->count(); ++i)
+	{
+		if (algoName==mAlgoLayout->widget(i)->objectName())
+		{
+			mAlgoLayout->setCurrentIndex(i);
+			return;
+		}
+	}
 
 	// No existing found,
 	//  create a new stack element for this algo:
 	QWidget* oneAlgoWidget = new QWidget(this);
-	oneAlgoWidget->setObjectName(algoName+qstring_cast(mAlgoLayout->count()));
+	oneAlgoWidget->setObjectName(algoName);
 	mAlgoLayout->addWidget(oneAlgoWidget);
 	QGridLayout* oneAlgoLayout = new QGridLayout(oneAlgoWidget);
+	oneAlgoLayout->setMargin(0);
 
 	std::vector<DataAdapterPtr> algoOption = mReconstructer->getAlgoOptions();
 	for (unsigned i = 0; i < algoOption.size(); ++i)
