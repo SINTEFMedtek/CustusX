@@ -65,7 +65,7 @@ private:
 	ssc::SpinBoxGroupWidget* mDimZWidget;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
-	QGroupBox* mAlgorithmGroup;
+	QFrame* mAlgorithmGroup;
 	QStackedLayout* mAlgoLayout;
 	std::vector<QWidget*> mAlgoWidgets;
 
