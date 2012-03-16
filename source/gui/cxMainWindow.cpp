@@ -118,6 +118,9 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	else
 		this->show();
 
+	if (settings()->value("gui/fullscreen").toBool())
+		this->setWindowState(this->windowState() | Qt::WindowFullScreen);
+
 	QTimer::singleShot(0, this, SLOT(startupLoadPatient())); // make sure this is called after application state change
 	this->toggleDebugModeSlot(mDebugModeAction->isChecked());
 }
@@ -402,6 +405,8 @@ void MainWindow::createActions()
 void MainWindow::toggleFullScreenSlot()
 {
 	this->setWindowState(this->windowState() ^ Qt::WindowFullScreen);
+
+	settings()->setValue("gui/fullscreen", (this->windowState() & Qt::WindowFullScreen)!=0);
 }
 
 void MainWindow::shootScreen()
