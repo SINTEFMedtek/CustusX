@@ -125,7 +125,11 @@ bool PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
 					int inputIndex = beam + sample * inputDims[0];
 					//+ record*inputDims[0]*inputDims[1];//get new pointer for each record
 //					outputPointer[outputIndex] = inputPointer[inputIndex];
-					outputPointer[outputIndex] = std::max<unsigned char>(inputPointer[inputIndex], 1); //  // set minimum intensity value to 1. This separates "zero intensity" from "no intensity".
+
+					// assign the max value found from all frames hitting this voxel. This removes black areas where (some of) multiple sweeps contains shadows.
+					outputPointer[outputIndex] = std::max<unsigned char>(inputPointer[inputIndex], outputPointer[outputIndex]);
+					// set minimum intensity value to 1. This separates "zero intensity" from "no intensity".
+					outputPointer[outputIndex] = std::max<unsigned char>(inputPointer[inputIndex], 1); //
 				}//validVoxel
 
 			}//sample
@@ -138,12 +142,103 @@ bool PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
 	return true;
 }
 
+namespace
+{
+/**Used in createMask()
+ */
+inline int getIndex_z_last(int x, int y, int z, const Eigen::Array3i& dim)
+{
+	return x + y*dim[0] + z*dim[0]*dim[1];
+}
+/**Used in createMask()
+ */
+inline int getIndex_x_last(int y, int z, int x, const Eigen::Array3i& dim)
+{
+	return x + y*dim[0] + z*dim[0]*dim[1];
+}
+/**Used in createMask()
+ */
+inline int getIndex_y_last(int z, int x, int y, const Eigen::Array3i& dim)
+{
+	return x + y*dim[0] + z*dim[0]*dim[1];
+}
+
+
+/**Used in createMask()
+ *
+ * Seach along a given dimension (x,y or z). Mask out
+ * all values outside the first and last nonzero values.
+ */
+template <class FUNCTION>
+void maskAlongDim(int a_dim, int b_dim, int c_dim, const Eigen::Array3i& dim, unsigned char *inputPtr, unsigned char *maskPtr, FUNCTION getIndex)
+{
+	for (int a = 0; a < a_dim; a++)
+	{
+		for (int b = 0; b < b_dim; b++)
+		{
+			int start = c_dim;
+			int stop = -1;
+			for (int c = 0; c < c_dim; c++)
+			{
+				int index = getIndex(a, b, c, dim);
+				if (inputPtr[index]>0)
+				{
+					start = c;
+					break;
+				}
+			}
+			for (int c = c_dim-1; c >=0; c--)
+			{
+				int index = getIndex(a, b, c, dim);
+				if (inputPtr[index]>0)
+				{
+					stop = c;
+					break;
+				}
+			}
+			for (int c = start; c <= stop; c++)
+			{
+				int index = getIndex(a, b, c, dim);
+				maskPtr[index] = 1;
+			}
+		}
+	}
+}
+} // unnamed namespace
+
+/**Create a mask enclosing the data in input,
+ * but excluding the outer zeroed parts.
+ *
+ * Use to exclude hole filling at the edges.
+ *
+ * Optimized code: Change with care!
+ *
+ */
+vtkImageDataPtr PNNReconstructAlgorithm::createMask(vtkImageDataPtr inputData)
+{
+//	QTime startTime = QTime::currentTime();
+	Eigen::Array3i dim(inputData->GetDimensions());
+	ssc::Vector3D spacing(inputData->GetSpacing());
+	vtkImageDataPtr mask = generateVtkImageData(dim, spacing, 0);
+	unsigned char *inputPtr = static_cast<unsigned char*> (inputData->GetScalarPointer());
+	unsigned char *maskPtr = static_cast<unsigned char*> (mask->GetScalarPointer());
+
+	// mask along all 3 dimensions
+	maskAlongDim(dim[0], dim[1], dim[2], dim, inputPtr, maskPtr, &getIndex_z_last);
+	maskAlongDim(dim[1], dim[2], dim[0], dim, inputPtr, maskPtr, &getIndex_x_last);
+	maskAlongDim(dim[2], dim[0], dim[1], dim, inputPtr, maskPtr, &getIndex_y_last);
+
+//	std::cout << QString("mask generation: %1ms").arg(startTime.msecsTo(QTime::currentTime())) << std::endl;
+	return mask;
+}
+
 void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, ImagePtr outputData)
 {
 	messageManager()->sendInfo("Interpolating...");
 
 	vtkImageDataPtr input = inputData->getBaseVtkImageData();
 	vtkImageDataPtr output = outputData->getBaseVtkImageData();
+	vtkImageDataPtr mask = this->createMask(input);
 
 	//int* inputDims = input->GetDimensions();
 	Eigen::Array3i outputDims(output->GetDimensions());
@@ -154,6 +249,7 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, ImagePtr outputDat
 
 	unsigned char *inputPointer = static_cast<unsigned char*> (input->GetScalarPointer());
 	unsigned char *outputPointer = static_cast<unsigned char*> (output->GetScalarPointer());
+	unsigned char *maskPointer = static_cast<unsigned char*> (mask->GetScalarPointer());
 
 	if ((outputDims[0] != inputDims[0]) || (outputDims[1] != inputDims[1]) || (outputDims[2] != inputDims[2]))
 		messageManager()->sendWarning("outputDims != inputDims. output: " + qstring_cast(outputDims[0]) + " "
@@ -166,6 +262,9 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, ImagePtr outputDat
 	int interpolationSteps = static_cast<int> (mInterpolationStepsOption->getValue());
 	messageManager()->sendInfo("interpolationSteps: " + qstring_cast(interpolationSteps));
 
+	int total = outputDims[0] * outputDims[1] * outputDims[2];
+	int removed = 0;
+	int ignored = 0;
 	// Traverse all voxels
 	for (int x = 0; x < outputDims[0]; x++)
 	{
@@ -175,57 +274,85 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, ImagePtr outputDat
 			for (int z = 0; z < outputDims[2]; z++)
 			{
 				int outputIndex = x + y * outputDims[0] + z * outputDims[0] * outputDims[1];
-				bool interpolated = false;
-				int localArea = 0;
 
-				int count = 0;
-				double tempVal = 0;
-				do
+				// ignore if outside volume of interest
+				if (maskPointer[outputIndex]==0)
 				{
-					for (int i = -localArea; i < localArea + 1; i++)
-						for (int j = -localArea; j < localArea + 1; j++)
-							for (int k = -localArea; k < localArea + 1; k++)
-							{
-								//optimize? - The if is to expensive
-								/*if((i == -localArea || i == localArea ||
-								 j == -localArea || j == localArea ||
-								 k == -localArea || k == localArea))*/
-								//continue;
-								/*if(i != -localArea || i != localArea ||
-								 j != -localArea || j != localArea ||
-								 k != -localArea || k != localArea)*/
-								{
-
-									int localIndex = outputIndex + i + j * outputDims[0] + k * outputDims[0]
-										* outputDims[1];
-
-									if (validVoxel(x + i, y + j, z + k, outputDims.data()) && inputPointer[localIndex]
-										> 0.1)
-									{
-										tempVal += inputPointer[localIndex];
-										count++;
-									}
-								}// if optimize
-							}//local voxel area
-					if (count > 0)
-					{
-						interpolated = true;
-						if (tempVal == 0)
-						{
-							// keep noneness of index
-						}
-						else
-						{
-							outputPointer[outputIndex] = static_cast<int> ((tempVal / count) + 0.5);
-							outputPointer[outputIndex] = std::max<unsigned char>(1, outputPointer[outputIndex]);
-						}
-					}
-					localArea++;
-				} while (localArea <= interpolationSteps && !interpolated);
-
+					removed++;
+				}
+				// copy if value already exists
+				else if (inputPointer[outputIndex]>0)
+				{
+					outputPointer[outputIndex] = inputPointer[outputIndex];
+					ignored++;
+				}
+				// fill hole otherwise (empty space within the volume)
+				else
+				{
+					this->fillHole(inputPointer, outputPointer, x, y, z, outputDims, interpolationSteps);
+				}
 			}//z
 		}//y
+//		std::cout << QString("[%1/%2]").arg(x).arg(outputDims[0]);
+//		std::cout.flush();
 	}//x
+//	std::cout << std::endl;
+	int valid = 100*double(ignored)/double(total);
+	int outside = 100*double(removed)/double(total);
+	int holes = 100*double(total-ignored-removed)/double(total);
+	std::cout << QString("PNN: Size:%1Mb, Valid voxels: %2\%, Outside mask: %3\%  Filled holes: %4\%").arg(total/1024/1024).arg(valid).arg(outside).arg(holes) << std::endl;
+}
+
+/**Fill the empty voxel (x,y,z) with the average value of the surrounding box.
+ * The box is as small a possible, up to a maximum of 2*interpolationSteps+1.
+ *
+ */
+void PNNReconstructAlgorithm::fillHole(unsigned char *inputPointer, unsigned char *outputPointer, int x, int y, int z, const Eigen::Array3i& dim, int interpolationSteps)
+{
+	int outputIndex = x + y * dim[0] + z * dim[0] * dim[1];
+//	this->fillHole(inputPointer, outputPointer, x, y, z, outputDims);
+	bool interpolated = false;
+	int localArea = 0;
+
+	int count = 0;
+	double tempVal = 0;
+
+	do
+	{
+		for (int i = -localArea; i < localArea + 1; i++)
+		{
+			for (int j = -localArea; j < localArea + 1; j++)
+			{
+				for (int k = -localArea; k < localArea + 1; k++)
+				{
+					int localIndex = outputIndex + i + j*dim[0] + k*dim[0]*dim[1];
+
+					if (validVoxel(x + i, y + j, z + k, dim.data()) && inputPointer[localIndex] > 0.1)
+					{
+						tempVal += inputPointer[localIndex];
+						count++;
+					}
+				}//local voxel area
+			}
+		}
+
+		if (count > 0)
+		{
+			interpolated = true;
+			if (tempVal == 0)
+			{
+				// keep noneness of index
+			}
+			else
+			{
+				outputPointer[outputIndex] = static_cast<int> ((tempVal / count) + 0.5);
+				outputPointer[outputIndex] = std::max<unsigned char>(1, outputPointer[outputIndex]);
+			}
+		}
+
+		localArea++;
+
+	} while (localArea <= interpolationSteps && !interpolated);
 }
 
 }//namespace
