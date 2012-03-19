@@ -85,7 +85,7 @@ get_filename_component(OPENCL_LIBRARY_DIRS ${OPENCL_LIBRARIES} PATH)
 # Thunder requires OpenCL - make it optional            
 if (SSC_USE_OpenCL)
     include_directories( Thunder
-												${OPENCL_INCLUDE_DIR}
+												${OPENCL_INCLUDE_DIRS}
 												)
     SET( SOURCE_FILES
       ${SOURCE_FILES}    
