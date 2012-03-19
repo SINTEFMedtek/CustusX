@@ -21,6 +21,8 @@
 #define SSCRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 
 #include "sscMessageManager.h"
+#include "sscXmlOptionItem.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -44,19 +46,19 @@ public:
 	Eigen::Array3i mInputDim;
 	ssc::Transform3D m_rMd; ///< transform from output data space to global ref space r
 
-	OutputVolumeParams() :
+	OutputVolumeParams(ssc::XmlOptionFile settings) :
 		mExtent(0, 0, 0, 0, 0, 0), mInputSpacing(0), mInputDim(0, 0, 0), m_rMd(Transform3D::Identity()),
-			mMaxVolumeSize(0), mDim(0, 0, 0), mSpacing(0)
+			mDim(0, 0, 0), mSpacing(0), mSettings(settings)
 	{
 	}
 	/** Initialize the volue parameters with sensible defaults.
 	 */
-	OutputVolumeParams(ssc::DoubleBoundingBox3D extent, double inputSpacing, Eigen::Array3i inputDim) :
-		mExtent(extent), mInputSpacing(inputSpacing), mInputDim(inputDim), mMaxVolumeSize(1024 * 1024 * 32)
+	OutputVolumeParams(ssc::XmlOptionFile settings, ssc::DoubleBoundingBox3D extent, double inputSpacing, Eigen::Array3i inputDim) :
+		mExtent(extent), mInputSpacing(inputSpacing), mInputDim(inputDim), mSettings(settings)
 	{
 		// Calculate optimal output image spacing and dimensions based on US frame spacing
-		setSpacing(mInputSpacing);
-		constrainVolumeSize(mMaxVolumeSize);
+		this->setSpacing(mInputSpacing);
+		this->constrainVolumeSize();
 	}
 
 	unsigned long getVolumeSize() const
@@ -71,9 +73,6 @@ public:
 		mSpacing = spacing;
 		ssc::Vector3D v = mExtent.range() / mSpacing;
 		mDim << ::ceil(v[0]), ::ceil(v[1]), ::ceil(v[2]);
-//		std::cout << "OutputVolumeParams::setSpacing("<< spacing <<") " << v << " -- " << mDim << std::endl;
-		//    mDim = (mExtent.range() / mSpacing).array().ceil();
-		//    this->roundDim();
 	}
 	double getSpacing() const
 	{
@@ -91,35 +90,43 @@ public:
 	}
 	/** Increase spacing in order to keep size below a max size
 	 */
-	void constrainVolumeSize(double maxSize)
+	void constrainVolumeSize()
 	{
 		this->setSpacing(mInputSpacing); // reset to default values
 
-		mMaxVolumeSize = maxSize;
 		// Reduce output volume size if optimal volume size is too large
 		unsigned long volumeSize = getVolumeSize();
-//		std::cout << "OutputVolumeParams::constrainVolumeSize "<< mMaxVolumeSize << " vol="<< volumeSize << std::endl;
-		if (volumeSize > mMaxVolumeSize)
+		unsigned long maxVolumeSize = this->getMaxVolumeSize();
+		if (volumeSize > maxVolumeSize)
 		{
 			ssc::Vector3D ext = mExtent.range();
-			double newSpacing = pow(ext[0]*ext[1]*ext[2] / double(mMaxVolumeSize), 1 / 3.0);
-
-//			double scaleFactor = pow(volumeSize / double(mMaxVolumeSize), 1 / 3.0);
-//			std::cout << "old s: " << mSpacing * scaleFactor << ", new s: " << newSpacing << std::endl;
-//			this->setSpacing(mSpacing * scaleFactor);
+			double newSpacing = pow(ext[0]*ext[1]*ext[2] / double(maxVolumeSize), 1 / 3.0);
 			this->setSpacing(newSpacing);
 		}
 	}
-	unsigned long getMaxVolumeSize() const
+
+	void setMaxVolumeSize(double maxSize)
 	{
-		return mMaxVolumeSize;
+		ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
+//		std::cout << "file pre write:\n " << mSettings.getDocument().toString(4) << std::endl;
+//		std::cout << "write " << maxSize << std::endl;
+		maxVol.writeValue(QString::number(maxSize));
+	}
+
+	unsigned long getMaxVolumeSize()
+	{
+		ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
+		double maxVolVal = maxVol.readValue(QString::number(1024 * 1024 * 16)).toDouble();
+//		std::cout << "read " << maxVolVal << std::endl;
+//		std::cout << "file:\n " << mSettings.getDocument().toString(4) << std::endl;
+		return maxVolVal;
 	}
 
 private:
 	// controllable data, set only using the setters
-	unsigned long mMaxVolumeSize;
 	Eigen::Array3i mDim;
 	double mSpacing;
+	XmlOptionFile mSettings;
 };
 
 /**

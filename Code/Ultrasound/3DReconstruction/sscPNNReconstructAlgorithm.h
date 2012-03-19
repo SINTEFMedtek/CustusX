@@ -65,12 +65,14 @@ private:
 		return (x >= 0) && (x < dims[0]) && (y >= 0) && (y < dims[1]) && (rawPointer[x + y * dims[0]] != 0);
 	}
 
-	bool validVoxel(int x, int y, int z, int* dims)
+	bool validVoxel(int x, int y, int z, const int* dims)
 	{
 		return (x >= 0) && (x < dims[0]) && (y >= 0) && (y < dims[1]) && (z >= 0) && (z < dims[2]);
 	}
 
 	void interpolate(ImagePtr inputData, ImagePtr outputData);
+	vtkImageDataPtr createMask(vtkImageDataPtr inputData);
+	void fillHole(unsigned char *inputPointer, unsigned char *outputPointer, int x, int y, int z, const Eigen::Array3i& dim, int interpolationSteps);
 };
 
 /**
