@@ -60,7 +60,7 @@ vtkImageDataPtr ProbeAdapterRTSource::getVtkImageData()
 
 double ProbeAdapterRTSource::getTimestamp()
 {
-	return mBase->getTimestamp() - mProbe->getData().mTemporalCalibration;
+	return mBase->getTimestamp() - mProbe->getData().getTemporalCalibration();
 }
 
 void ProbeAdapterRTSource::probeChangedSlot()
@@ -69,7 +69,7 @@ void ProbeAdapterRTSource::probeChangedSlot()
 
 	Eigen::Array3i dimImage(mRedirecter->GetOutput()->GetDimensions());
 	//  ssc::Vector3D dimImage(mRedirecter->GetOutput()->GetDimensions());
-	QSize dimProbe = mProbe->getData().mImage.mSize;
+	QSize dimProbe = mProbe->getData().getImage().mSize;
 
 	bool nonZero = (dimProbe.width() != 0) && (dimProbe.height() != 0) && (dimImage[0] != 0) && (dimImage[1] != 0);
 
@@ -84,7 +84,7 @@ void ProbeAdapterRTSource::probeChangedSlot()
 	// Don't change spacing if it have an existing spacing from the OpenIGTLink message
 	//  if (mBase->getVtkImageData()->GetSpacing()[0] == 0)
 	{
-		mRedirecter->SetOutputSpacing(mProbe->getData().mImage.mSpacing.begin());
+		mRedirecter->SetOutputSpacing(mProbe->getData().getImage().mSpacing.begin());
 	}
 }
 

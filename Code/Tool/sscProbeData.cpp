@@ -25,15 +25,21 @@
 namespace ssc
 {
 
-ProbeData::ProbeData() : mType(tNONE)
-{
-}
+//ProbeData::ProbeData() : mType(tNONE)
+//{
+//}
 
-ProbeData::ProbeData(TYPE type, double depthStart, double depthEnd, double width) :
-	mType(type), mDepthStart(depthStart), mDepthEnd(depthEnd), mWidth(width),
+ProbeData::ProbeData(TYPE type) :
+	mType(type), mDepthStart(0), mDepthEnd(0), mWidth(0),
 	mTemporalCalibration(0), mCenterOffset(0)
 {
 }
+
+//ProbeData::ProbeData(TYPE type, double depthStart, double depthEnd, double width) :
+//	mType(type), mDepthStart(depthStart), mDepthEnd(depthEnd), mWidth(width),
+//	mTemporalCalibration(0), mCenterOffset(0)
+//{
+//}
 
 ProbeData::ProbeImageData::ProbeImageData() :
 	mOrigin_p(0, 0, 0), mSpacing(-1, -1, -1), mClipRect_p(0, 0, 0, 0), mSize(0, 0)

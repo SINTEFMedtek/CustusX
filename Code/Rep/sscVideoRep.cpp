@@ -144,7 +144,7 @@ void VideoGraphics::setTool(ToolPtr tool)
   }
 
   // accept only tool with a probe sector
-  if (tool && tool->getProbeSector().mType!=ssc::ProbeData::tNONE)
+  if (tool && tool->getProbeSector().getType()!=ssc::ProbeData::tNONE)
   {
     mTool = tool;
   }
@@ -483,7 +483,7 @@ bool VideoFixedPlaneRep::getShowSector() const
 
 void VideoFixedPlaneRep::updateSector()
 {
-  bool show = mTool && this->getShowSector() && mTool->getProbeSector().mType!=ssc::ProbeData::tNONE;
+  bool show = mTool && this->getShowSector() && mTool->getProbeSector().getType()!=ssc::ProbeData::tNONE;
 
   mProbeSectorActor->SetVisibility(show);
   if (!show)
