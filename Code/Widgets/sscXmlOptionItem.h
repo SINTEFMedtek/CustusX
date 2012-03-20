@@ -97,9 +97,10 @@ public:
 	void removeChildren(); ///< remove all child nodes of the current element.
 	void deleteNode(); ///< Delete the current node
 
+	QDomElement safeGetElement(QDomElement parent, QString childName);
+
 private:
 	void load();
-	QDomElement safeGetElement(QDomElement parent, QString childName);
 
 	QString mFilename;
 	QDomDocument mDocument;
