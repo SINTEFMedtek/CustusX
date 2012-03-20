@@ -6,6 +6,7 @@
  */
 
 #include "cxCreateProbeDataFromConfiguration.h"
+#include "sscTypeConversions.h"
 #include <iostream>
 
 ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ssc::ProbeData data)
@@ -14,25 +15,25 @@ ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlCon
 //	config.mConfigId = uid;
 //	config.mName = name;
 
-	config.mLeftEdge = data.mImage.mClipRect_p[0];
-	config.mRightEdge = data.mImage.mClipRect_p[1];
-	config.mTopEdge = data.mImage.mClipRect_p[2];
-	config.mBottomEdge = data.mImage.mClipRect_p[3];
+	config.mLeftEdge = data.getImage().mClipRect_p[0];
+	config.mRightEdge = data.getImage().mClipRect_p[1];
+	config.mTopEdge = data.getImage().mClipRect_p[2];
+	config.mBottomEdge = data.getImage().mClipRect_p[3];
 
-	config.mOriginCol = data.mImage.mOrigin_p[0];
-	config.mOriginRow = data.mImage.mOrigin_p[1];
+	config.mOriginCol = data.getImage().mOrigin_p[0];
+	config.mOriginRow = data.getImage().mOrigin_p[1];
 
-	config.mPixelWidth = data.mImage.mSpacing[0];
-	config.mPixelHeight = data.mImage.mSpacing[1];
+	config.mPixelWidth = data.getImage().mSpacing[0];
+	config.mPixelHeight = data.getImage().mSpacing[1];
 
-	config.mImageWidth = data.mImage.mSize.width();
-	config.mImageHeight = data.mImage.mSize.height();
+	config.mImageWidth = data.getImage().mSize.width();
+	config.mImageHeight = data.getImage().mSize.height();
 
-	if (data.mType==ssc::ProbeData::tSECTOR)
+	if (data.getType()==ssc::ProbeData::tSECTOR)
 	{
-		config.mWidthDeg = data.mWidth / M_PI*180.0;
-		config.mOffset = data.mDepthStart / data.mImage.mSpacing[1];
-		config.mDepth = (data.mDepthEnd - data.mDepthStart) / data.mImage.mSpacing[1];
+		config.mWidthDeg = data.getWidth() / M_PI*180.0;
+		config.mOffset = data.getDepthStart() / data.getImage().mSpacing[1];
+		config.mDepth = (data.getDepthEnd() - data.getDepthStart()) / data.getImage().mSpacing[1];
 	}
 	else
 	{
@@ -42,7 +43,7 @@ ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlCon
 		config.mDepth = 0;
 	}
 
-	config.mTemporalCalibration = data.mTemporalCalibration;
+	config.mTemporalCalibration = data.getTemporalCalibration();
 
 	return config;
 }
@@ -52,9 +53,6 @@ ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configurat
 //	std::cout << "createProbeDataFromConfiguration()" << std::endl;
   if(config.isEmpty())
     return ssc::ProbeData();
-
-  double depthStart = config.mOffset * config.mPixelHeight;
-  double depthEnd = config.mDepth * config.mPixelHeight + depthStart;
 
   ssc::ProbeData::ProbeImageData imageData;
   imageData.mSpacing = ssc::Vector3D(config.mPixelWidth, config.mPixelHeight, 1);
@@ -71,30 +69,31 @@ ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configurat
   ssc::ProbeData probeSector;
   if (config.mWidthDeg > 0.1) // Sector probe
   {
-    double width = config.mWidthDeg * M_PI / 180.0;//width in radians
-    probeSector = ssc::ProbeData(ssc::ProbeData::tSECTOR, depthStart, depthEnd, width);
+	double depthStart = config.mOffset * config.mPixelHeight;
+	double depthEnd = config.mDepth * config.mPixelHeight + depthStart;
+
+	double width = config.mWidthDeg * M_PI / 180.0;//width in radians
+	probeSector = ssc::ProbeData(ssc::ProbeData::tSECTOR);
+	probeSector.setSector(depthStart, depthEnd, width);
   }
   else //Linear probe
   {
     int widtInPixels = config.mRightEdge - config.mLeftEdge;
-    double width = config.mPixelWidth * widtInPixels; //width in mm
+    double width = config.mPixelWidth * double(widtInPixels); //width in mm
     // correct for top/bottom edges if applicable
-    depthStart = std::max(depthStart, (config.mTopEdge-config.mOriginRow) * config.mPixelHeight);
-    depthEnd = std::min(depthEnd, (config.mBottomEdge-config.mOriginRow) * config.mPixelHeight);
+    double depthStart = double(config.mTopEdge-config.mOriginRow) * config.mPixelHeight;
+    double depthEnd = double(config.mBottomEdge-config.mOriginRow) * config.mPixelHeight;
 
-    probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
+//    probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
+	probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR);
+	probeSector.setSector(depthStart, depthEnd, width);
   }
 
-  probeSector.mImage = imageData;
-  probeSector.mTemporalCalibration = config.mTemporalCalibration;
+  probeSector.setImage(imageData);
+  probeSector.setTemporalCalibration(config.mTemporalCalibration);
 
-//  std::cout << "DepthStart" << probeSector.mDepthStart << std::endl;
-//  std::cout << "DepthEnd" << probeSector.mDepthEnd << std::endl;
-//  std::cout << "Type" << probeSector.mType << std::endl;
-//  std::cout << "Width" << probeSector.mWidth << std::endl;
-//  std::cout << "Origin_u" << probeSector.mImage.mOrigin_u << std::endl;
-//  std::cout << "Spacing" << probeSector.mImage.mSpacing << std::endl;
-//  std::cout << "Image size" << probeSector.mImage.mSize.width() << "," << probeSector.mImage.mSize.height() << std::endl;
+//  std::cout << "Probe sector for " << config.mConfigId << std::endl;
+//  std::cout << streamXml2String(probeSector) << std::endl;
 
   return probeSector;
 }

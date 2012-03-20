@@ -443,7 +443,7 @@ double TemporalCalibration::findCorrelation(ssc::USFrameDataPtr data, int frame_
 
 //  int N_frames = mFileData.mUsRaw->getDimensions()[2];
 //  int line_index_x = mFileData.mUsRaw->getDimensions()[0]/2;
-  int line_index_x = mFileData.mProbeData.mData.mImage.mOrigin_p[0];
+  int line_index_x = mFileData.mProbeData.mData.getImage().mOrigin_p[0];
 
   int dimY = mFileData.mUsRaw->getDimensions()[1];
 
