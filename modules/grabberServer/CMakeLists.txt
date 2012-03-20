@@ -203,7 +203,7 @@ endif(APPLE)
 set(LIBS ${QT_LIBRARY_DIR})
 set(DIRS ${QT_INCLUDES} 
 				 ${QT_LIBRARY_DIRS}
-				 ${QT_BINARY_DIRS}
+				 ${QT_BINARY_DIR}
 				 ${INCLUDE_DIRECTORIES})
 
 
