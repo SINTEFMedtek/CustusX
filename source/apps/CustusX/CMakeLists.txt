@@ -207,11 +207,11 @@ endif()
 
 if (CX_LINUX OR CX_WINDOWS)
 		set(APPS ${CustusX_Exe_Path})
-		set(LIBS ${OPENCL_LIBRARIES} )
+		set(LIBS )
 		set(DIRS 
 				${QT_INCLUDES} 
 				${QT_LIBRARY_DIRS}
-				${QT_BINARY_DIRS}
+				${QT_BINARY_DIR}
 				${SSC_INCLUDE_DIRS} 
 				${VTK_LIBRARY_DIRS}
 				${OpenCV_LIB_DIR}

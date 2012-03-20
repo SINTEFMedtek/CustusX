@@ -222,7 +222,7 @@ if (CX_WINDOWS)
 	set(DIRS 
 			${QT_INCLUDES} 
 			${QT_LIBRARY_DIRS}
-			${QT_BINARY_DIRS}
+			${QT_BINARY_DIR}
 			${VTK_LIBRARY_DIRS}
 			${SSC_BINARY_DIR}/Code
 			${OpenIGTLink_LIBRARY_DIRS}
@@ -233,9 +233,10 @@ if (CX_WINDOWS)
 				${OpenCV_LIB_DIR}
 				)
 	endif()
-	#message (status"APPS: "${APPS})
-	#message (status"LIBS: "${LIBS})
-	#message (status"DIRS: "${DIRS})
+	#message (status "APPS: "${APPS})
+	#message (status "LIBS: "${LIBS})
+	#message (status "DIRS: "${DIRS})
+	#message (status "QT_BINARY_DIR: "${QT_BINARY_DIR})
 	install(CODE "
 		 include(BundleUtilities)
 		 fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
