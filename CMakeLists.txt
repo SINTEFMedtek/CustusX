@@ -124,9 +124,20 @@ if (CX_WINDOWS)
 		endif()
 		set(CPACK_PACKAGE_EXECUTABLES 
 				"CustusX" "CustusX"
-				"${OpenIGTLinkServerName}" "${OpenIGTLinkServerName}"
-				"GrabberServer" "GrabberServer"
 				)
+		if(BUILD_GRABBER_SERVER)
+			set(CPACK_PACKAGE_EXECUTABLES 
+				${CPACK_PACKAGE_EXECUTABLES}
+				"GrabberServer" "GrabberServer"
+			)
+		endif()
+		if(BUILD_OPEN_IGTLINK_SERVER)
+			set(CPACK_PACKAGE_EXECUTABLES
+				${CPACK_PACKAGE_EXECUTABLES}
+				"${OpenIGTLinkServerName}" "${OpenIGTLinkServerName}"
+			)
+		endif()
+
 		set(CPACK_NSIS_MENU_LINKS
 				"doc/Windows_Install_ReadMe.rtf" "README"
 		)
