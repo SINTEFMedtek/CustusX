@@ -16,11 +16,12 @@
 #define CXBOUNDINGBOXWIDGET_H_
 
 #include "sscForwardDeclarations.h"
-#include "cxDoubleSpanSlider.h"
 #include "sscBoundingBox3D.h"
+#include <QWidget>
 
 namespace cx
 {
+class SliderRangeGroupWidget;
 
 /**
  * \brief Widget displays/edits a ssc::BoundingBox3D
@@ -38,12 +39,12 @@ public:
 //	void setRange(const ssc::DoubleBoundingBox3D& bb);
 	void setValue(const ssc::DoubleBoundingBox3D& value, const ssc::DoubleBoundingBox3D& range);
 	ssc::DoubleBoundingBox3D getValue() const;
+	void showDim(int dim, bool visible);
+
 signals:
 	void changed();
 private:
-	SliderRangeGroupWidget* mXRange;
-	SliderRangeGroupWidget* mYRange;
-	SliderRangeGroupWidget* mZRange;
+	boost::array<SliderRangeGroupWidget*, 3> mRange;
 };
 
 }
