@@ -169,8 +169,7 @@ void Probe::setConfigId(QString uid)
 void Probe::setProbeSector(ssc::ProbeData probeSector)
 {
 	mData = probeSector;
-	emit
-	sectorChanged();
+	emit sectorChanged();
 	emit probeChanged();
 }
 void Probe::setProbeImageData(ssc::ProbeData::ProbeImageData imageData)
@@ -240,5 +239,24 @@ void Probe::changeProbeSectorOrigin(ssc::Vector3D origin)
 	mData.mImage.mOrigin_p = origin;
 	emit sectorChanged();
 }
+
+void Probe::removeCurrentConfig()
+{
+	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
+	mXml->removeConfig(config.mUsScanner, config.mUsProbe, config.mRtSource, config.mConfigId);
+}
+
+void Probe::saveCurrentConfig(QString uid, QString name)
+{
+	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
+	config.mConfigId = uid;
+	config.mName = name;
+	config = createConfigurationFromProbeData(config, mData);
+
+//TODO: possibly fix old hack on storing temporal calibration??
+
+	mXml->saveCurrentConfig(config);
+}
+
 
 } //namespace cx

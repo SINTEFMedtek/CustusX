@@ -66,6 +66,9 @@ public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
 
+  // extensions
+  ssc::ToolPtr getTool() { return mTool; }
+
 private slots:
   void dominantToolChanged();
 private:

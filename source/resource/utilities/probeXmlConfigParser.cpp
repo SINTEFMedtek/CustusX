@@ -4,28 +4,45 @@
 #include <QFile>
 #include <QStringList>
 #include <algorithm>
+#include <qfileinfo.h>
+#include "sscMessageManager.h"
+#include "sscTypeConversions.h"
+
+//class XmlOptionFile
+//{
+//public:
+//	static XmlOptionFile createNull(); ///< create an empty document
+//	explicit XmlOptionFile(QString filename, QString name = ""); ///< create from filename, create trivial document of type name and root node if no file exists.
+//	XmlOptionFile();
+
 
 ProbeXmlConfigParser::ProbeXmlConfigParser(QString& pathToXml)
 {
-  QFile file(pathToXml);
-  if(file.open(QIODevice::ReadOnly))
-  {
-    QString emsg;
-    int eline, ecolumn;
-    if (!mDomDoc.setContent(&file, false, &emsg, &eline, &ecolumn))
-    {
-      std::cout << "Could not parse XML file :";
-      std::cout << file.fileName().toStdString() << " because: ";
-      std::cout << emsg.toStdString() << std::endl;
-      throw "Could not parse XML file :";
-    }
-    file.close();
-  }
-  else
-  {
-    std::cout << "Could not open XML file :";
-    std::cout << file.fileName().toStdString() << std::endl;
-  }
+	if (!QFileInfo(pathToXml).exists())
+	{
+		ssc::messageManager()->sendError(QString("Cannot find probe config file [%1]").arg(pathToXml));
+	}
+
+	mFile = ssc::XmlOptionFile(pathToXml);
+//  QFile file(pathToXml);
+//  if(file.open(QIODevice::ReadOnly))
+//  {
+//    QString emsg;
+//    int eline, ecolumn;
+//    if (!mDomDoc.setContent(&file, false, &emsg, &eline, &ecolumn))
+//    {
+//      std::cout << "Could not parse XML file :";
+//      std::cout << file.fileName().toStdString() << " because: ";
+//      std::cout << emsg.toStdString() << std::endl;
+//      throw "Could not parse XML file :";
+//    }
+//    file.close();
+//  }
+//  else
+//  {
+//    std::cout << "Could not open XML file :";
+//    std::cout << file.fileName().toStdString() << std::endl;
+//  }
   
 }
 
@@ -80,259 +97,180 @@ QStringList ProbeXmlConfigParser::getConfigIdList(QString scanner, QString probe
   return retval;
 }
 
+namespace
+{
+	QDomElement findElement(QDomNode parent, QString name)
+	{
+		QDomNode node = parent.namedItem(name);
+		QDomElement element = node.toElement();
+		if(element.isNull())
+			ssc::messageManager()->sendWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
+		return element;
+	}
+
+
+/**Read a textnode into retval, if textnode is present
+ *
+ */
+	template<class TYPE> bool readTextNode(TYPE* retval, QDomNode parent, QString name);
+
+	template<>
+	bool readTextNode<QString>(QString* retval, QDomNode parent, QString name)
+	{
+		QDomElement element = parent.namedItem(name).toElement();
+		bool found = !element.isNull() && !element.text().isNull();
+		if(found)
+			*retval = element.text();
+		if (!found)
+			ssc::messageManager()->sendWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
+		return found;
+	}
+	template<>
+	bool readTextNode<int>(int* retval, QDomNode parent, QString name)
+	{
+	    bool ok;
+		QDomElement element = parent.namedItem(name).toElement();
+		bool found = !element.isNull() && !element.text().isNull();
+		if(found)
+			*retval = element.text().toInt(&ok);
+		if (!found)
+			ssc::messageManager()->sendWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
+		found = found && ok;
+		if (!found)
+			ssc::messageManager()->sendWarning(QString("Cannot convert node %2/%1 to int").arg(name).arg(parent.toElement().tagName()));
+		return found;
+	}
+	template<>
+	bool readTextNode<double>(double* retval, QDomNode parent, QString name)
+	{
+	    bool ok;
+		QDomElement element = parent.namedItem(name).toElement();
+		bool found = !element.isNull() && !element.text().isNull();
+		if(found)
+			*retval = element.text().toDouble(&ok);
+		if (!found)
+			ssc::messageManager()->sendWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
+		found = found && ok;
+		if (!found)
+			ssc::messageManager()->sendWarning(QString("Cannot convert node %2/%1 to double").arg(name).arg(parent.toElement().tagName()));
+		return found;
+	}
+} // unnamed namespace
+
 ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QString scanner, QString probe, QString rtsource, QString configId)
 {
   Configuration retval;
+//  std::cout << QString("===getConfiguration %1, %2, %3, %4").arg(scanner).arg(probe).arg(rtsource).arg(configId) << std::endl;
   
   retval.mUsScanner = scanner;
   retval.mUsProbe = probe;
   retval.mRtSource = rtsource;
   retval.mConfigId = configId;
+  retval.mNotes = "Found no notes.";
 
-  // replaced with height/width:
-
-//  // set hardcoded image dimensions based on the RT source type:
-//  if (retval.mRtSource=="VGA")
-//  {
-//    retval.mColumns = 800;
-//    retval.mRows = 600;
-//  }
-//  else if ((retval.mRtSource=="SVIDEO")||(retval.mRtSource=="VHS")) //note: VHS is a bug in the xml files.
-//  {
-//    retval.mColumns = 768;
-//    retval.mRows = 576;
-//  }
-//  else
-//  {
-//    retval.mColumns = 0;
-//    retval.mRows = 0;
-//  }
-//  if (retval.mRtSource=="iSight")
-//  {
-//    retval.mColumns = 640;
-//    retval.mRows = 480;
-//  }
-
-  /*
-   *
-   */
   QList<QDomNode> currentScannerNodeList = this->getScannerNodes(scanner);
   if(currentScannerNodeList.isEmpty())
   {
-    std::cout << "currentScannerNodeList found an empty list for: \n";
-    std::cout << scanner.toStdString() << "\n"
-    << std::endl;
-
-    return retval;
+	  ssc::messageManager()->sendWarning(QString("No scanners found [%1]").arg(scanner));
+	  return retval;
   }
   QDomNode scannerNode = currentScannerNodeList.first();
-  QDomElement element = scannerNode.namedItem("Notes").toElement();
-  retval.mNotes = element.text();
-  if(retval.mNotes.isNull())
-    retval.mNotes = "Found no notes.";
 
-  /*
-   *
-   */
+  QList<QDomNode> probeList = this->getProbeNodes(scanner, probe); ///< get a list of all probes for that scanner
+  if(probeList.isEmpty())
+  {
+	  ssc::messageManager()->sendWarning(QString("No probes found [%1/%2]").arg(scanner, probe));
+	  return retval;
+  }
+  QDomNode probeNode = probeList.first();
+
+//  QDomElement element;
+//  readTextNode(&retval.mNotes, probeNode, "Notes");
+//  std::cout << "Notes : " << retval.mNotes << std::endl;
+
   QList<QDomNode> currentRtSourceNodeList = this->getRTSourceNodes(scanner, probe, rtsource);
   if(currentRtSourceNodeList.isEmpty())
   {
-    std::cout << "currentRtSourceNodeList found an empty list for: \n";
-    std::cout << scanner.toStdString() << "\n"
-    << probe.toStdString() << "\n"
-    << rtsource.toStdString() << "\n"
-    << std::endl;
-
+	ssc::messageManager()->sendWarning(QString("No rtsources found [%1/%2/%3]").arg(scanner).arg(probe).arg(rtsource));
     return retval;
   }
   QDomNode rtSourceNode = currentRtSourceNodeList.first();
 
   retval.mTemporalCalibration = 0;
-  QDomNode imageTimestampCalibrationNode = rtSourceNode.namedItem("TemporalCalibration");
-  element = imageTimestampCalibrationNode.toElement();
-  bool ok;
-  if(!element.isNull())
-  {
-    retval.mTemporalCalibration = element.text().toDouble(&ok);
-    if (!ok)
-      retval.mTemporalCalibration = 0;
-//    std::cout << "retval.mTemporalCalibration" << retval.mTemporalCalibration << std::endl;
-  }
+  readTextNode(&retval.mTemporalCalibration, rtSourceNode, "TemporalCalibration");
 
-  try
-  {
-    QDomNode sizeNode = rtSourceNode.namedItem("ImageSize");
-    element = sizeNode.toElement();
-    if(element.isNull())
-      throw "Can't find ImageSize node";
-
-    bool ok;
-    element = sizeNode.namedItem("Width").toElement();
-    if(element.isNull())
-      throw "Can't find ImageSize/Width node";
-    retval.mImageWidth = element.text().toInt(&ok);
-    if(!ok)
-      throw "ImageSize/Width not a number";
-
-    element = sizeNode.namedItem("Height").toElement();
-    if(element.isNull())
-      throw "Can't find  ImageSize/Height node";
-    retval.mImageHeight = element.text().toInt(&ok);
-    if(!ok)
-      throw "ImageSize/Height not a number";
-
-    element = rtSourceNode.namedItem("HorizontalOffset").toElement();
-    retval.mHorizontalOffset = element.text().toDouble(&ok);
-    if(!ok)
-      throw "HorizontalOffset not a number";
-
-  }  catch( char * str ) {
-    std::cout << "EXCEPTION RAISED: " << str << std::endl;
-  }
+    QDomElement sizeNode = findElement(rtSourceNode, "ImageSize");
+    readTextNode(&retval.mImageWidth, sizeNode, "Width");
+    readTextNode(&retval.mImageHeight, sizeNode, "Height");
+    readTextNode(&retval.mHorizontalOffset, rtSourceNode, "HorizontalOffset");
 
   QList<QDomNode> currentConfigNodeList = this->getConfigNodes(scanner, probe, rtsource, configId);
   if(currentConfigNodeList.isEmpty())
   {
-    std::cout << "getCurrentConfiguration found an empty list for: ";
-    std::cout << scanner.toStdString() << " " << probe.toStdString() << " ";
-    std::cout << rtsource.toStdString() << " " <<configId.toStdString() << std::endl;
-    
+	ssc::messageManager()->sendWarning(QString("No nodes found in config [%1/%2/%3/%4]").arg(scanner).arg(probe).arg(rtsource).arg(configId));
     return retval;
   }
   QDomNode configNode = currentConfigNodeList.first();
 
-  try
-  {
-    element = configNode.namedItem("Name").toElement();
-    if(element.isNull())
-      throw "Can't find Name";
-    retval.mName = element.text();
+    readTextNode(&retval.mName, configNode, "Name");
+    readTextNode(&retval.mWidthDeg, configNode, "WidthDeg");
+    readTextNode(&retval.mDepth, configNode, "Depth");
+    readTextNode(&retval.mOffset, configNode, "Offset");
+    QDomElement originElement = findElement(configNode, "Origin");
+    readTextNode(&retval.mOriginCol, originElement, "Col");
+    readTextNode(&retval.mOriginRow, originElement, "Row");
 
-    element = configNode.namedItem("WidthDeg").toElement();
-    if(element.isNull())
-      throw "Can't find WidthDeg";
-    bool ok;
-    retval.mWidthDeg = element.text().toFloat(&ok);
-    if(!ok)
-      throw "WidthDeg not a number";
+//    element = configNode.namedItem("NCorners").toElement();
+//    if(element.isNull())
+//      throw "Can't find NCorners";
+//    retval.mNCorners = element.text().toInt(&ok);
+//    if(!ok)
+//      throw "NCorners not a number";
+//
+//    QDomNode cornerNode = configNode.firstChildElement("Corner");
+//    if(cornerNode.isNull())
+//      throw "Can't find Corner";
+//    retval.mCorners.clear();
+//    for(int i=0; i<retval.mNCorners ; ++i)
+//    {
+//      element = cornerNode.namedItem("Col").toElement();
+//      if(element.isNull())
+//        throw "Can't find Corner.Col";
+//      int col = element.text().toFloat(&ok);
+//      if(!ok)
+//        throw "Corner.Col not a number";
+//
+//      element = cornerNode.namedItem("Row").toElement();
+//      if(element.isNull())
+//        throw "Can't find Corner.Row";
+//      int row = element.text().toFloat(&ok);
+//      if(!ok)
+//        throw "Corner.Row not a number";
+//
+//      retval.mCorners.push_back(ColRowPair(col,row));
+//
+//      cornerNode = cornerNode.nextSibling();
+//    }
+//    //sort the vector
+//    ColRowPair center;
+//    for(unsigned i=0;i<retval.mCorners.size();++i)
+//    {
+//      center.first += retval.mCorners[i].first/retval.mCorners.size();
+//      center.second += retval.mCorners[i].second/retval.mCorners.size();
+//    }
+//    std::sort(retval.mCorners.begin(), retval.mCorners.end(), Angular_less(center));
 
-    element = configNode.namedItem("Depth").toElement();
-    if(element.isNull())
-      throw "Can't find Depth";
-    retval.mDepth = element.text().toFloat(&ok);
-    if(!ok)
-      throw "Depth not a number";
+    QDomElement edgesElement = findElement(configNode, "CroppingEdges");
+    readTextNode(&retval.mLeftEdge, edgesElement, "Left");
+    readTextNode(&retval.mRightEdge, edgesElement, "Right");
+    readTextNode(&retval.mTopEdge, edgesElement, "Top");
+    readTextNode(&retval.mBottomEdge, edgesElement, "Bottom");
 
-    element = configNode.namedItem("Offset").toElement();
-    if(element.isNull())
-      throw "Can't find Offset";
-    retval.mOffset = element.text().toFloat(&ok);
-    if(!ok)
-      throw "Offset not a number";
+    QDomElement pixelSizeElement = findElement(configNode, "PixelSize");
+    readTextNode(&retval.mPixelWidth, pixelSizeElement, "Width");
+    readTextNode(&retval.mPixelHeight, pixelSizeElement, "Height");
 
-    QDomNode originNode = configNode.namedItem("Origin");
-    element = originNode.namedItem("Col").toElement();
-    if(element.isNull())
-      throw "Can't find Origin.Col";
-    retval.mOriginCol = element.text().toFloat(&ok);
-    if(!ok)
-      throw "Origin.Col not a number";
-
-    element = originNode.namedItem("Row").toElement();
-    if(element.isNull())
-      throw "Can't find Origin.Row";
-    retval.mOriginRow = element.text().toFloat(&ok);
-    if(!ok)
-      throw "Origin.Row not a number";
-
-    element = configNode.namedItem("NCorners").toElement();
-    if(element.isNull())
-      throw "Can't find NCorners";
-    retval.mNCorners = element.text().toInt(&ok);
-    if(!ok)
-      throw "NCorners not a number";
-
-    QDomNode cornerNode = configNode.firstChildElement("Corner");
-    if(cornerNode.isNull())
-      throw "Can't find Corner";
-    retval.mCorners.clear();
-    for(int i=0; i<retval.mNCorners ; ++i)
-    {
-      element = cornerNode.namedItem("Col").toElement();
-      if(element.isNull())
-        throw "Can't find Corner.Col";
-      int col = element.text().toFloat(&ok);
-      if(!ok)
-        throw "Corner.Col not a number";
-
-      element = cornerNode.namedItem("Row").toElement();
-      if(element.isNull())
-        throw "Can't find Corner.Row";
-      int row = element.text().toFloat(&ok);
-      if(!ok)
-        throw "Corner.Row not a number";
-
-      retval.mCorners.push_back(ColRowPair(col,row));
-
-      cornerNode = cornerNode.nextSibling();
-    }
-    //sort the vector
-    ColRowPair center;
-    for(unsigned i=0;i<retval.mCorners.size();++i)
-    {
-      center.first += retval.mCorners[i].first/retval.mCorners.size();
-      center.second += retval.mCorners[i].second/retval.mCorners.size();
-    }
-    std::sort(retval.mCorners.begin(), retval.mCorners.end(), Angular_less(center));
-
-    QDomNode edgesNode = configNode.namedItem("CroppingEdges");
-    element = edgesNode.namedItem("Left").toElement();
-    if(element.isNull())
-      throw "Can't find Left";
-    retval.mLeftEdge = element.text().toInt(&ok);
-    if(!ok)
-      throw "Left not a number";
-
-    element = edgesNode.namedItem("Right").toElement();
-    if(element.isNull())
-      throw "Can't find Right";
-    retval.mRightEdge = element.text().toInt(&ok);
-    if(!ok)
-      throw "Right not a number";
-
-    element = edgesNode.namedItem("Top").toElement();
-    if(element.isNull())
-      throw "Can't find Top";
-    retval.mTopEdge = element.text().toInt(&ok);
-    if(!ok)
-      throw "Top not a number";
-
-    element = edgesNode.namedItem("Bottom").toElement();
-    if(element.isNull())
-      throw "Can't find Bottom";
-    retval.mBottomEdge = element.text().toInt(&ok);
-    if(!ok)
-      throw "Bottom not a number";
-
-    QDomNode pixelSizeNode = configNode.namedItem("PixelSize");
-    element = pixelSizeNode.namedItem("Width").toElement();
-    if(element.isNull())
-      throw "Can't find PixelSize.Width";
-    retval.mPixelWidth = element.text().toDouble(&ok);
-    if(!ok)
-      throw "PixelSize.Width not a number";
-
-    element = pixelSizeNode.namedItem("Height").toElement();
-    if(element.isNull())
-      throw "Can't find PixelSize.Height";
-    retval.mPixelHeight = element.text().toDouble(&ok);
-    if(!ok)
-      throw "PixelSize.Height not a number";
-
-  }
-  catch( char * str ) {
-     std::cout << "EXCEPTION RAISED: " << str << std::endl;
-  }
+//  std::cout << "FERDIG" << std::endl;
   retval.mEmpty = false;
   return retval;
 }
@@ -342,11 +280,11 @@ QList<QDomNode> ProbeXmlConfigParser::getScannerNodes(QString scanner)
   QList<QDomNode> retval;
   if(scanner == "ALL")
   {
-    retval = this->nodeListToListOfNodes(mDomDoc.elementsByTagName("USScanner"));
+    retval = this->nodeListToListOfNodes(mFile.getDocument().elementsByTagName("USScanner"));
   }
   else
   {
-    QList<QDomNode> temp = this->nodeListToListOfNodes(mDomDoc.elementsByTagName("USScanner"));
+    QList<QDomNode> temp = this->nodeListToListOfNodes(mFile.getDocument().elementsByTagName("USScanner"));
     QDomNode node;
     foreach(node, temp)
     {
@@ -456,6 +394,93 @@ QList<QDomNode> ProbeXmlConfigParser::nodeListToListOfNodes(QDomNodeList list)
     }
     return retval;
 }
+
+void ProbeXmlConfigParser::removeConfig(QString scanner, QString probe, QString rtsource, QString configId)
+{
+	QList<QDomNode> configNodes = this->getConfigNodes(scanner, probe, rtsource, configId);
+	if (configNodes.empty())
+	{
+		ssc::messageManager()->sendWarning(
+						QString("Failed to remove probe config: No such path %1/%2/%3/%4")
+						.arg(scanner)
+						.arg(probe)
+						.arg(rtsource)
+						.arg(configId));
+		return;
+	}
+	QDomNode victim = configNodes.first();
+
+	QDomNode parentNode = victim.parentNode();
+	parentNode.removeChild(victim);
+	victim = QDomElement();// Create null element (redundant?)
+}
+
+/**Add a trivial QDomElement with a QTextElement, i.e.
+ * <elem> text </elem> .
+ *
+ */
+void ProbeXmlConfigParser::addTextElement(QDomElement parent, QString element, QString text)
+{
+	QDomElement node = mFile.safeGetElement(parent, element);
+
+	while (node.hasChildNodes())
+		node.removeChild(node.firstChild());
+
+	node.appendChild(mFile.getDocument().createTextNode(text));
+	mFile.save();
+}
+
+void ProbeXmlConfigParser::saveCurrentConfig(Configuration config)
+{
+	QList<QDomNode> rtNodes = this->getRTSourceNodes(config.mUsScanner, config.mUsProbe, config.mRtSource);
+	if (rtNodes.empty())
+	{
+		ssc::messageManager()->sendWarning(QString("Failed to save probe config: No such path %1/%2/%3").arg(config.mUsScanner).arg(config.mUsProbe).arg(config.mRtSource));
+		return;
+	}
+	QDomElement rtSourceNode = rtNodes.first().toElement();
+	if (rtSourceNode.isNull())
+		return;
+
+	QList<QDomNode> configNodes = this->getConfigNodes(config.mUsScanner, config.mUsProbe, config.mRtSource, config.mConfigId);
+	QDomElement configNode;
+	if (!configNodes.empty())
+	{
+		configNode = configNodes.first().toElement();
+	}
+	else
+	{
+		configNode = mFile.getDocument().createElement("Config");
+		rtSourceNode.appendChild(configNode);
+	}
+
+	this->addTextElement(configNode, "ID", config.mConfigId);
+	this->addTextElement(configNode, "Name", config.mName);
+
+	this->addTextElement(configNode, "WidthDeg", qstring_cast(config.mWidthDeg));
+	if (config.mWidthDeg>0)
+	{
+		this->addTextElement(configNode, "Depth", qstring_cast(config.mDepth));
+		this->addTextElement(configNode, "Offset", qstring_cast(config.mOffset));
+	}
+
+	QDomElement originNode = mFile.safeGetElement(configNode, "Origin");
+	this->addTextElement(originNode, "Col", qstring_cast(config.mOriginCol));
+	this->addTextElement(originNode, "Row", qstring_cast(config.mOriginRow));
+
+	QDomElement edgesNode = mFile.safeGetElement(configNode, "CroppingEdges");
+	this->addTextElement(edgesNode, "Left", qstring_cast(config.mLeftEdge));
+	this->addTextElement(edgesNode, "Right", qstring_cast(config.mRightEdge));
+	this->addTextElement(edgesNode, "Top", qstring_cast(config.mTopEdge));
+	this->addTextElement(edgesNode, "Bottom", qstring_cast(config.mBottomEdge));
+
+	QDomElement pixelSizeNode = mFile.safeGetElement(configNode, "PixelSize");
+	this->addTextElement(pixelSizeNode, "Width", qstring_cast(config.mPixelWidth));
+	this->addTextElement(pixelSizeNode, "Height", qstring_cast(config.mPixelHeight));
+
+	mFile.save();
+}
+
 
 
 
