@@ -414,7 +414,7 @@ void ToolRep3D::tooltipOffsetSlot(double val)
 
 bool ToolRep3D::showProbe()
 {
-  return mTool && (mTool->isProbe()) && (mTool->getProbeSector().mType!=ssc::ProbeData::tNONE);
+  return mTool && (mTool->isProbe()) && (mTool->getProbeSector().getType()!=ssc::ProbeData::tNONE);
 //  return mTool;;
 }
 } // namespace ssc

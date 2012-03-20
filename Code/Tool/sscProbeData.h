@@ -105,10 +105,23 @@ public:
 				};	
 
 public:
-	ProbeData();
-	ProbeData(TYPE type, double depthStart, double depthEnd, double width);
+	ProbeData(TYPE type = tNONE);
+//	ProbeData(double depthStart, double depthEnd, double width);
 	void addXml(QDomNode& dataNode) const; ///< write internal state to node
 
+	TYPE getType() const { return mType; }
+	double getDepthStart() const { return mDepthStart; }
+	double getDepthEnd() const { return mDepthEnd; }
+	double getWidth() const { return mWidth; }
+	double getTemporalCalibration() const { return mTemporalCalibration; }
+	double getCenterOffset() const { return mCenterOffset; }
+	ProbeImageData getImage() const { return mImage; }
+
+	void setTemporalCalibration(double value) { mTemporalCalibration = value; }
+	void setImage(ProbeImageData value) { mImage = value; }
+	void setSector(double depthStart, double depthEnd, double width) { mDepthStart=depthStart; mDepthEnd=depthEnd; mWidth=width; }
+
+private:
 	TYPE mType; ///< type of probe
 	double mDepthStart; ///< start of sector, mm
 	double mDepthEnd; ///< end of sector, mm
