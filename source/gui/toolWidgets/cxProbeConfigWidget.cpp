@@ -143,12 +143,13 @@ void ProbeConfigWidget::savePresetSlot()
 }
 
 //TODOLIST:
-// - ved save: sørg for at ny config lastes inn i configwidget
-// - test delete
+// V- ved save: sørg for at ny config lastes inn i configwidget
+// V- test delete
 // - sørg for at croprect og depth/width synces for linear.
 // - rydd opp i widget
 // - temporalcalib - sync med gammel måte å lagre på...
 // - speed in water etc - sjekk
+// - sjekk multiple updates - rydd
 
 void ProbeConfigWidget::deletePresetSlot()
 {
@@ -178,20 +179,20 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	ssc::ProbeData data = probe->getData();
 	mUpdating= true;
 
-	ssc::DoubleBoundingBox3D range(0, data.mImage.mSize.width(), 0, data.mImage.mSize.height());
-	mBBWidget->setValue(data.mImage.mClipRect_p, range);
+	ssc::DoubleBoundingBox3D range(0, data.getImage().mSize.width(), 0, data.getImage().mSize.height());
+	mBBWidget->setValue(data.getImage().mClipRect_p, range);
 
-	mOrigin->setValue(data.mImage.mOrigin_p);
+	mOrigin->setValue(data.getImage().mOrigin_p);
 
-	mDepthWidget->setValue(std::make_pair(data.mDepthStart, data.mDepthEnd));
-	mWidth->setValue(data.mWidth);
+	mDepthWidget->setValue(std::make_pair(data.getDepthStart(), data.getDepthEnd()));
+	mWidth->setValue(data.getWidth());
 
-	if (data.mType== ssc::ProbeData::tLINEAR)
+	if (data.getType()== ssc::ProbeData::tLINEAR)
 	{
 		mWidth->setValueRange(ssc::DoubleRange(0, 1000, 1));
 		mWidth->setInternal2Display(1);
 	}
-	if (data.mType== ssc::ProbeData::tSECTOR)
+	if (data.getType()== ssc::ProbeData::tSECTOR)
 	{
 		mWidth->setValueRange(ssc::DoubleRange(0, M_PI, M_PI/180));
 		mWidth->setInternal2Display(180.0/M_PI);
@@ -211,11 +212,14 @@ void ProbeConfigWidget::guiChanged()
 		return;
 	ssc::ProbeData data = probe->getData();
 
-	data.mImage.mOrigin_p = mOrigin->getValue();
-	data.mImage.mClipRect_p = mBBWidget->getValue();
-	data.mDepthStart = mDepthWidget->getValue().first;
-	data.mDepthEnd = mDepthWidget->getValue().second;
-	data.mWidth = mWidth->getValue();
+	ssc::ProbeData::ProbeImageData image = data.getImage();
+	image.mOrigin_p = mOrigin->getValue();
+	image.mClipRect_p = mBBWidget->getValue();
+	data.setImage(image);
+//	data.mDepthStart = mDepthWidget->getValue().first;
+//	data.mDepthEnd = mDepthWidget->getValue().second;
+//	data.mWidth = mWidth->getValue();
+	data.setSector(mDepthWidget->getValue().first, mDepthWidget->getValue().second, mWidth->getValue());
 
 	probe->setProbeSector(data);
 
