@@ -16,8 +16,10 @@
 #define CXPROBECONFIGWIDGET_H_
 
 #include "cxBaseWidget.h"
-//#include "cxBoundingBoxWidget.h"
+#include "cxBoundingBoxWidget.h"
 #include "cxToolDataAdapters.h"
+#include "sscVector3DDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 
 namespace cx
 {
@@ -36,11 +38,22 @@ class ProbeConfigWidget : public BaseWidget
 public:
 	ProbeConfigWidget(QWidget* parent=NULL);
 	virtual ~ProbeConfigWidget();
+private slots:
+	void activeProbeConfigurationChangedSlot();
+	void guiChanged();
+	void savePresetSlot();
+	void deletePresetSlot();
+
 private:
 	virtual QString defaultWhatsThis() const;
 
-//	BoundingBoxWidget* mBBWidget;
+	BoundingBoxWidget* mBBWidget;
+	ssc::Vector3DDataAdapterPtr mOrigin;
+	SliderRangeGroupWidget* mDepthWidget;
+	ssc::DoubleDataAdapterXmlPtr mWidth;
+
 	ActiveProbeConfigurationStringDataAdapterPtr mActiveProbeConfig;
+	bool mUpdating;
 
 //	ssc::Vector3D mOrigin_p; ///< probe origin in pixel space p. (upper-left corner origin)
 //	ssc::Vector3D mSpacing;
