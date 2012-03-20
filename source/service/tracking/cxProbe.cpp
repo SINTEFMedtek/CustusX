@@ -64,7 +64,7 @@ ssc::ProbeSectorPtr Probe::getSector()
 
 bool Probe::isValid() const
 {
-	return mData.mType != ssc::ProbeData::tNONE;
+	return mData.getType() != ssc::ProbeData::tNONE;
 }
 
 void Probe::setTemporalCalibration(double val)
@@ -174,7 +174,7 @@ void Probe::setProbeSector(ssc::ProbeData probeSector)
 }
 void Probe::setProbeImageData(ssc::ProbeData::ProbeImageData imageData)
 {
-	mData.mImage = imageData;
+	mData.setImage(imageData);
 	emit sectorChanged();
 }
 ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
@@ -222,28 +222,47 @@ QString Probe::getInstrumentScannerId() const
 
 void Probe::changeProbeSectorParameters(double depthStart, double depthEnd, double width)
 {
-	mData.mDepthStart = depthStart;
-	mData.mDepthEnd = depthEnd;
-	mData.mWidth = width;
+//	mData.mDepthStart = depthStart;
+//	mData.mDepthEnd = depthEnd;
+//	mData.mWidth = width;
+	mData.setSector(depthStart, depthEnd, width);
 	emit sectorChanged();
 }
 
 void Probe::changeProbeSectorSize(int width, int height)
 {
-	mData.mImage.mSize.setWidth(width);
-	mData.mImage.mSize.setHeight(height);
+//	mData.mImage.mSize.setWidth(width);
+//	mData.mImage.mSize.setHeight(height);
+	ssc::ProbeData::ProbeImageData image = mData.getImage();
+	image.mSize.setWidth(width);
+	image.mSize.setHeight(height);
+	mData.setImage(image);
+
 	emit sectorChanged();
 }
 void Probe::changeProbeSectorOrigin(ssc::Vector3D origin)
 {
-	mData.mImage.mOrigin_p = origin;
+//	mData.mImage.mOrigin_p = origin;
+
+	ssc::ProbeData::ProbeImageData image = mData.getImage();
+	image.mOrigin_p = origin;
+	mData.setImage(image);
+
 	emit sectorChanged();
 }
 
 void Probe::removeCurrentConfig()
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
+
+	int index = this->getConfigIdList().indexOf(config.mConfigId);
+	if (index!=0)
+		--index;
+
 	mXml->removeConfig(config.mUsScanner, config.mUsProbe, config.mRtSource, config.mConfigId);
+	if (index < this->getConfigIdList().size())
+		this->setConfigId(this->getConfigIdList()[index]);
+	emit sectorChanged();
 }
 
 void Probe::saveCurrentConfig(QString uid, QString name)
@@ -256,6 +275,7 @@ void Probe::saveCurrentConfig(QString uid, QString name)
 //TODO: possibly fix old hack on storing temporal calibration??
 
 	mXml->saveCurrentConfig(config);
+	this->setConfigId(uid);
 }
 
 

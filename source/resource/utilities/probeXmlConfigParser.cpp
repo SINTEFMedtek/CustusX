@@ -134,10 +134,15 @@ namespace
 		if(found)
 			*retval = element.text().toInt(&ok);
 		if (!found)
+		{
 			ssc::messageManager()->sendWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
-		found = found && ok;
-		if (!found)
-			ssc::messageManager()->sendWarning(QString("Cannot convert node %2/%1 to int").arg(name).arg(parent.toElement().tagName()));
+		}
+		else
+		{
+			found = found && ok;
+			if (!found)
+				ssc::messageManager()->sendWarning(QString("Cannot convert node %2/%1 to int").arg(name).arg(parent.toElement().tagName()));
+		}
 		return found;
 	}
 	template<>
@@ -149,10 +154,15 @@ namespace
 		if(found)
 			*retval = element.text().toDouble(&ok);
 		if (!found)
+		{
 			ssc::messageManager()->sendWarning(QString("Cannot find node %2/%1").arg(name).arg(parent.toElement().tagName()));
-		found = found && ok;
-		if (!found)
-			ssc::messageManager()->sendWarning(QString("Cannot convert node %2/%1 to double").arg(name).arg(parent.toElement().tagName()));
+		}
+		else
+		{
+			found = found && ok;
+			if (!found)
+				ssc::messageManager()->sendWarning(QString("Cannot convert node %2/%1 to double").arg(name).arg(parent.toElement().tagName()));
+		}
 		return found;
 	}
 } // unnamed namespace
@@ -214,8 +224,11 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
 
     readTextNode(&retval.mName, configNode, "Name");
     readTextNode(&retval.mWidthDeg, configNode, "WidthDeg");
-    readTextNode(&retval.mDepth, configNode, "Depth");
-    readTextNode(&retval.mOffset, configNode, "Offset");
+    if (retval.mWidthDeg > 1.0E-6)
+    {
+		readTextNode(&retval.mDepth, configNode, "Depth");
+		readTextNode(&retval.mOffset, configNode, "Offset");
+    }
     QDomElement originElement = findElement(configNode, "Origin");
     readTextNode(&retval.mOriginCol, originElement, "Col");
     readTextNode(&retval.mOriginRow, originElement, "Row");
