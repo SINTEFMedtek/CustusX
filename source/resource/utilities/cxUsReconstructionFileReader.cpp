@@ -70,16 +70,16 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   ProbeXmlConfigParser::Configuration configuration = this->readProbeConfiguration(calFilesPath, probeConfigPath);
   ssc::ProbeData probeData = createProbeDataFromConfiguration(configuration);
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
-  bool spacingOK = ssc::similar(probeData.mImage.mSpacing, ssc::Vector3D(retval.mUsRaw->getSpacing()), 0.001);
+  bool spacingOK = ssc::similar(probeData.getImage().mSpacing, ssc::Vector3D(retval.mUsRaw->getSpacing()), 0.001);
   if (!spacingOK)
   {
       ssc::messageManager()->sendWarning(""
     	  "Mismatch in spacing values from calibration and recorded image.\n"
     	  "This might be valid if the sound speed was changed prior to recording.\n"
-    	  "Probe definition: "+ qstring_cast(probeData.mImage.mSpacing) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
+    	  "Probe definition: "+ qstring_cast(probeData.getImage().mSpacing) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
     	  );
   }
-  probeData.mImage.mSpacing = ssc::Vector3D(retval.mUsRaw->getSpacing());
+  probeData.getImage().mSpacing = ssc::Vector3D(retval.mUsRaw->getSpacing());
   retval.mProbeData.setData(probeData);
 
   retval.mFrames = this->readFrameTimestamps(fileName);

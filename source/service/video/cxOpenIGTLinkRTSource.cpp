@@ -439,7 +439,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
 		ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool is not a probe");
 		return;
 	}
-	if (tool->getProbeSector().mType == ssc::ProbeData::tNONE)
+	if (tool->getProbeSector().getType() == ssc::ProbeData::tNONE)
 	{
 		ssc::messageManager()->sendInfo(
 						"OpenIGTLinkRTSource::updateSonixStatus: Dominant tool have no sector information. This will be created.");
@@ -461,7 +461,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
 	{
 		ssc::messageManager()->sendWarning("ROI x/y values not matching that of a linear probe");
 
-		if (probe->getData().mType != ssc::ProbeData::tSECTOR)
+		if (probe->getData().getType() != ssc::ProbeData::tSECTOR)
 			ssc::messageManager()->sendWarning(
 							"OpenIGTLinkRTSource::updateSonixStatus: Probe not sector probe, but ROI is from sector probe");
 
@@ -470,7 +470,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
 	}
 	else // Linear probe
 	{
-		if (probe->getData().mType == ssc::ProbeData::tSECTOR)
+		if (probe->getData().getType() == ssc::ProbeData::tSECTOR)
 			ssc::messageManager()->sendWarning(
 							"OpenIGTLinkRTSource::updateSonixStatus: Probe is a sector probe, but ROI is from linear probe");
 		mDepthStart = roi[1]; // in pixels
@@ -493,7 +493,7 @@ void OpenIGTLinkRTSource::updateSonix()
 		ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Dominant tool is not a probe");
 		return;
 	}
-	if (tool->getProbeSector().mType == ssc::ProbeData::tNONE)
+	if (tool->getProbeSector().getType() == ssc::ProbeData::tNONE)
 	{
 		ssc::messageManager()->sendInfo(
 						"OpenIGTLinkRTSource::updateSonixStatus: Dominant tool have no sector information. This will be created.");
@@ -503,11 +503,12 @@ void OpenIGTLinkRTSource::updateSonix()
 	double dStart = (mDepthStart - mOrigin[1]) * mSpacing[1]; //mm
 	double dEnd = (mDepthEnd - mOrigin[1]) * mSpacing[1]; //mm
 	double dWidth = mWidth * mSpacing[0]; //mm
-	if (tool->getProbeSector().mType != ssc::ProbeData::tNONE)
+	if (tool->getProbeSector().getType() != ssc::ProbeData::tNONE)
 		probe->changeProbeSectorParameters(dStart, dEnd, dWidth); //mm
 	else // No probe sector. Create one.
 	{
-		ssc::ProbeData probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, dStart, dEnd, dWidth);
+		ssc::ProbeData probeSector(ssc::ProbeData::tLINEAR);
+		probeSector.setSector(dStart, dEnd, dWidth);
 		probe->setProbeSector(probeSector);
 		probe->setRTSource(videoService()->getVideoConnection()->getVideoSource());
 	}
