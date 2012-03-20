@@ -71,6 +71,8 @@ public:
 	void changeProbeSectorOrigin(ssc::Vector3D origin); ///< Update probe sector origin
 	void setProbeSector(ssc::ProbeData probeSector); ///< Set a new probe sector
 	void setProbeImageData(ssc::ProbeData::ProbeImageData imageData); ///< Set a new probe image data
+	void removeCurrentConfig(); ///< remove the current config from disk
+	void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
 
 signals:
 	void probeChanged(); ///< Probe/tool characteristics changed (Tool may have become a probe)

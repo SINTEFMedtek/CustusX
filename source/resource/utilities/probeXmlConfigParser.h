@@ -4,6 +4,8 @@
 #include <math.h>
 #include <vector>
 #include <QDomDocument>
+#include "sscXmlOptionItem.h"
+
 
 /**
 * \file
@@ -20,7 +22,7 @@
 class ProbeXmlConfigParser
 {
 public:
-  typedef std::pair<float,float> ColRowPair;
+  typedef std::pair<double,double> ColRowPair;
   struct Configuration ///< a easy-to-work-with struct for a specific xml configuration
   {
     QString             mUsScanner;  ///<  scanner
@@ -30,11 +32,11 @@ public:
     QString             mName;       ///<  Name of config set
     int                     mImageWidth;      ///< Width of the used image format (x dim)
     int                     mImageHeight;     ///< Height of the used image format (y dim)
-    float                   mWidthDeg;   ///<  width in degrees
-    float                   mDepth;      ///<  depth
-    float                   mOffset;     ///<  Offset
-    float                   mOriginCol;  ///<  Origin.Col
-    float                   mOriginRow;  ///<  Origin.Row
+    double                   mWidthDeg;   ///<  width in degrees
+    double                   mDepth;      ///<  depth
+    double                   mOffset;     ///<  Offset
+    double                   mOriginCol;  ///<  Origin.Col
+    double                   mOriginRow;  ///<  Origin.Row
     int                     mNCorners;   ///<  number of corners
     std::vector<ColRowPair> mCorners;    ///<  corners <col,row>
     int                     mLeftEdge;   ///<  LeftEdge
@@ -59,6 +61,9 @@ public:
   ProbeXmlConfigParser(QString& pathToXml); ///< opens the file and reads it onto the QDomDocument
   ~ProbeXmlConfigParser();
 
+	void removeConfig(QString scanner, QString probe, QString rtsource, QString configId);
+	void saveCurrentConfig(Configuration config);
+
   QStringList getScannerList(); ///< get a list of all scanner in the xml
   QStringList getProbeList(QString scanner); ///< get a list of all probes for that scanner
   QStringList getRtSourceList(QString scanner, QString probe); ///< get a list of rt sources for that scanner/probe combo
@@ -67,14 +72,20 @@ public:
   Configuration getConfiguration(QString scanner, QString probe, QString rtsource, QString configId); ///< get a easy-to-work-with struct of a specific config
 
 protected:
+//  template<class TYPE> bool readTextNode(TYPE* retval, QDomNode parent, QString name);
+//  template<> bool readTextNode<QString>(QString* retval, QDomNode parent, QString name);
+
+
   QList<QDomNode> getScannerNodes(QString scanner = "ALL"); ///< get a list of ALL scanner nodes or just the one you are looking for
   QList<QDomNode> getProbeNodes(QString scanner, QString probe = "ALL"); ///< get a list of ALL probenodes for that scanner, or just the one you are looking for
   QList<QDomNode> getRTSourceNodes(QString scanner, QString probe, QString rtSource="ALL"); ///< get a list of ALL rtsourcenodes for that scanner/probe combo, or just the one you are looking for
   QList<QDomNode> getConfigNodes(QString scanner, QString probe, QString rtsource, QString config="ALL"); ///< get a list of ALL confignodes for that scanner/probe/rtsource combo, or just the one you are looking for
   
   QList<QDomNode> nodeListToListOfNodes(QDomNodeList list); ///< converts a QDomNodeList to a QList<QDomNode> 
+  void addTextElement(QDomElement parent, QString element, QString text);
 
-  QDomDocument mDomDoc; ///< the dom document to parse
+//  QDomDocument mDomDoc; ///< the dom document to parse
+  ssc::XmlOptionFile mFile;
 };
 
 
