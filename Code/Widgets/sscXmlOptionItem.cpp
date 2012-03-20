@@ -296,7 +296,7 @@ void XmlOptionFile::save()
 	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
 		QTextStream stream(&file);
-		stream << mDocument.toString();
+		stream << mDocument.toString(4);
 		file.close();
 		ssc::messageManager()->sendInfo("Created " + file.fileName());
 	}
