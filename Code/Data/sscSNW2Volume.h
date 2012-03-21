@@ -118,10 +118,8 @@ public:
 		vtkLookupTablePtr lut);
 	virtual ~SNW2Volume();
 
-	virtual vtkLookupTablePtr getLut() const
-	{
-		return mLut;
-	}
+	virtual vtkLookupTablePtr getLut();
+
 	const SNW2VolumeMetaData& getMetaData() const
 	{
 		return mMetaData;
