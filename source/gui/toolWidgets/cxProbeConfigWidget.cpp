@@ -40,7 +40,7 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	mBBWidget = new BoundingBoxWidget(this);
 	mBBWidget->showDim(2, false);
 	topLayout->addWidget(mBBWidget);
-	connect(mBBWidget, SIGNAL(changed()), this, SLOT(guiChanged()));
+	connect(mBBWidget, SIGNAL(changed()), this, SLOT(guiImageSettingsChanged()));
 
 	mOrigin = ssc::Vector3DDataAdapterXml::initialize("Origin",
 		"Origin",
@@ -49,7 +49,7 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 		ssc::DoubleRange(-1000,1000,1),
 		1,
 		QDomNode());
-	connect(mOrigin.get(), SIGNAL(changed()), this, SLOT(guiChanged()));
+	connect(mOrigin.get(), SIGNAL(changed()), this, SLOT(guiImageSettingsChanged()));
 
 	Vector3DWidget* mOriginWidget = Vector3DWidget::createSmallHorizontal(this, mOrigin);
 	mOriginWidget->showDim(2, false);
@@ -58,13 +58,13 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	mDepthWidget = new SliderRangeGroupWidget(this);
 	mDepthWidget->setName("Depth");
 	mDepthWidget->setRange(ssc::DoubleRange(0, 100, 1));
-	connect(mDepthWidget, SIGNAL(valueChanged(double, double)), this, SLOT(guiChanged()));
+	connect(mDepthWidget, SIGNAL(valueChanged(double, double)), this, SLOT(guiProbeSectorChanged()));
 	topLayout->addWidget(mDepthWidget);
 
 	mWidth = ssc::DoubleDataAdapterXml::initialize("width", "Width", "Width of probe sector", 0,
 						ssc::DoubleRange(0, M_PI, M_PI/180), 0);
 	mWidth->setInternal2Display(180.0/M_PI);
-	connect(mWidth.get(), SIGNAL(changed()), this, SLOT(guiChanged()));
+	connect(mWidth.get(), SIGNAL(changed()), this, SLOT(guiProbeSectorChanged()));
 	topLayout->addWidget(ssc::createDataWidget(this, mWidth));
 
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
@@ -145,7 +145,7 @@ void ProbeConfigWidget::savePresetSlot()
 //TODOLIST:
 // V- ved save: sørg for at ny config lastes inn i configwidget
 // V- test delete
-// - sørg for at croprect og depth/width synces for linear.
+// V- sørg for at croprect og depth/width synces for linear.
 // - rydd opp i widget
 // - temporalcalib - sync med gammel måte å lagre på...
 // - speed in water etc - sjekk
@@ -202,7 +202,49 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	mUpdating= false;
 }
 
-void ProbeConfigWidget::guiChanged()
+//void ProbeConfigWidget::guiChanged()
+//{
+//	if (mUpdating)
+//		return;
+//	// need a cx probe here, in order to set data.
+//	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+//	if (!probe)
+//		return;
+//	ssc::ProbeData data = probe->getData();
+//
+//	ssc::ProbeData::ProbeImageData image = data.getImage();
+//	image.mOrigin_p = mOrigin->getValue();
+//	image.mClipRect_p = mBBWidget->getValue();
+//	data.setImage(image);
+////	data.mDepthStart = mDepthWidget->getValue().first;
+////	data.mDepthEnd = mDepthWidget->getValue().second;
+////	data.mWidth = mWidth->getValue();
+//	data.setSector(mDepthWidget->getValue().first, mDepthWidget->getValue().second, mWidth->getValue());
+//
+//	probe->setProbeSector(data);
+//
+//	std::cout << "ProbeConfigWidget::guiChanged()" << std::endl;
+//}
+
+
+void ProbeConfigWidget::guiProbeSectorChanged()
+{
+	if (mUpdating)
+		return;
+	// need a cx probe here, in order to set data.
+	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	if (!probe)
+		return;
+	ssc::ProbeData data = probe->getData();
+
+	data.setSector(mDepthWidget->getValue().first, mDepthWidget->getValue().second, mWidth->getValue());
+
+	probe->setProbeSector(data);
+
+	std::cout << "ProbeConfigWidget::guiProbeSectorChanged()" << std::endl;
+}
+
+void ProbeConfigWidget::guiImageSettingsChanged()
 {
 	if (mUpdating)
 		return;
@@ -216,14 +258,10 @@ void ProbeConfigWidget::guiChanged()
 	image.mOrigin_p = mOrigin->getValue();
 	image.mClipRect_p = mBBWidget->getValue();
 	data.setImage(image);
-//	data.mDepthStart = mDepthWidget->getValue().first;
-//	data.mDepthEnd = mDepthWidget->getValue().second;
-//	data.mWidth = mWidth->getValue();
-	data.setSector(mDepthWidget->getValue().first, mDepthWidget->getValue().second, mWidth->getValue());
 
 	probe->setProbeSector(data);
 
-	std::cout << "ProbeConfigWidget::guiChanged()" << std::endl;
+	std::cout << "ProbeConfigWidget::guiImageSettingsChanged()" << std::endl;
 }
 
 //void ProbeConfigWidget::boxValuesChanged()
