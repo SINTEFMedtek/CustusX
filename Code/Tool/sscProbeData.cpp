@@ -69,6 +69,37 @@ ssc::DoubleBoundingBox3D ProbeData::ProbeImageData::getClipRect_u() const
   return ssc::DoubleBoundingBox3D(p0,p1);
 }
 
+void ProbeData::setImage(ProbeImageData value)
+{
+	mImage = value;
+
+	// cliprect and sector data are connected to linear probes:
+	if (mType==tLINEAR)
+	{
+		mWidth = 2*std::max(fabs(mImage.mClipRect_p[0] - mImage.mOrigin_p[0]), fabs(mImage.mClipRect_p[1] - mImage.mOrigin_p[0])) * mImage.mSpacing[0];
+//		mWidth = mImage.mClipRect_p.range()[0] * mImage.mSpacing[0];
+		mDepthStart = (mImage.mClipRect_p[2] - mImage.mOrigin_p[1]) * mImage.mSpacing[1];
+		mDepthEnd = (mImage.mClipRect_p[3] - mImage.mOrigin_p[1]) * mImage.mSpacing[1];
+	}
+}
+
+void ProbeData::setSector(double depthStart, double depthEnd, double width)
+{
+	mDepthStart=depthStart;
+	mDepthEnd=depthEnd;
+	mWidth=width;
+
+	// cliprect and sector data are connected to linear probes:
+	if (mType==tLINEAR)
+	{
+		mImage.mClipRect_p[0] = mImage.mOrigin_p[0] - mWidth/2/mImage.mSpacing[0];
+		mImage.mClipRect_p[1] = mImage.mOrigin_p[0] + mWidth/2/mImage.mSpacing[0];
+
+		mImage.mClipRect_p[2] = mImage.mOrigin_p[1] + mDepthStart/mImage.mSpacing[1];
+		mImage.mClipRect_p[3] = mImage.mOrigin_p[1] + mDepthEnd/mImage.mSpacing[1];
+	}
+}
+
 void ProbeData::addXml(QDomNode& dataNode) const
 {
   QDomElement elem = dataNode.toElement();
