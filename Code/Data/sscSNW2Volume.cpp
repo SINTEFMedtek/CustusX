@@ -463,6 +463,7 @@ bool SNW2Volume::rawLoadVtkImageData()
 			+ " and bitsPerSample=" + qstring_cast(mMetaData.Volume.mBitsPerSample));
 		return false;
 	}
+	mImageData->UpdateInformation();
 	return true;
 }
 
