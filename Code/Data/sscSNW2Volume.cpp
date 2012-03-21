@@ -714,4 +714,13 @@ ssc::ImagePtr SNW2Volume::getImage()
 	return mImage;
 }
 
+vtkLookupTablePtr SNW2Volume::getLut()
+{
+	if (!mImageData)
+	{
+		loadVolumeData();
+	}
+	return mLut;
+}
+
 } // namespace ssc
