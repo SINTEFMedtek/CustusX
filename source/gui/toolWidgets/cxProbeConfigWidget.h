@@ -40,9 +40,11 @@ public:
 	virtual ~ProbeConfigWidget();
 private slots:
 	void activeProbeConfigurationChangedSlot();
-	void guiChanged();
+//	void guiChanged();
 	void savePresetSlot();
 	void deletePresetSlot();
+	void guiImageSettingsChanged();
+	void guiProbeSectorChanged();
 
 private:
 	virtual QString defaultWhatsThis() const;

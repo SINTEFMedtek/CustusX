@@ -80,6 +80,7 @@ signals:
 
 public slots:
 	void connectServer();
+	void serverProcessReadyRead();
 
 private slots:
 	void serverProcessStateChanged(QProcess::ProcessState newState);

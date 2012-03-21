@@ -39,9 +39,12 @@ VideoConnection::VideoConnection()
 	mConnectWhenLocalServerRunning = 0;
 
 	mServer = new QProcess(this);
-	connect(mServer, SIGNAL(stateChanged(QProcess::ProcessState)), this,
-		SLOT(serverProcessStateChanged(QProcess::ProcessState)));
+	connect(mServer, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 	connect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
+
+	connect(mServer, SIGNAL(readyRead()), this, SLOT(serverProcessReadyRead()));
+	mServer->setProcessChannelMode(QProcess::MergedChannels);
+	mServer->setReadChannel(QProcess::StandardOutput);
 
 	mRTSource.reset(new OpenIGTLinkRTSource());
 	connect(getVideoSource().get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
@@ -263,4 +266,8 @@ void VideoConnection::serverProcessStateChanged(QProcess::ProcessState newState)
 	}
 }
 
+void VideoConnection::serverProcessReadyRead()
+{
+	ssc::messageManager()->sendInfo(QString(mServer->readAllStandardOutput()));
+}
 }//end namespace cx
