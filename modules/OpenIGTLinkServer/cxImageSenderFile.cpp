@@ -179,7 +179,7 @@ igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
 
   int fsize = imgMsg->GetImageSize();
   int frame = (staticCounter++) % image->GetDimensions()[2];
-  std::cout << "emitting frame " << frame << ", image size=" << fsize << ", comp="<< image->GetNumberOfScalarComponents() << ", scalarType="<< scalarType << ", dim=("<< image->GetDimensions()[0] << ", "<< image->GetDimensions()[1] << ")" << std::endl;
+//  std::cout << "emitting frame " << frame << ", image size=" << fsize << ", comp="<< image->GetNumberOfScalarComponents() << ", scalarType="<< scalarType << ", dim=("<< image->GetDimensions()[0] << ", "<< image->GetDimensions()[1] << ")" << std::endl;
   memcpy(imgMsg->GetScalarPointer(), image->GetScalarPointer(0,0,frame), fsize); // not sure if we need to copy
 
   //------------------------------------------------------------
