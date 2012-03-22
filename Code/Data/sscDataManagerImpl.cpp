@@ -117,7 +117,7 @@ public:
 	virtual void Execute(vtkObject* caller, unsigned long, void* text)
 	{
 		mMessage = QString(reinterpret_cast<char*> (text));
-		std::cout << "executing" << std::endl;
+//		std::cout << "executing" << std::endl;
 	}
 	QString mMessage;
 
@@ -684,7 +684,8 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 		if (child.nodeName() == "data")
 		{
 			DataPtr data = this->loadData(child.toElement(), rootPath);
-			datanodes[data] = child.toElement();
+			if (data)
+				datanodes[data] = child.toElement();
 		}
 	}
 
@@ -693,7 +694,9 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 	for (std::map<DataPtr, QDomNode>::iterator iter = datanodes.begin(); iter != datanodes.end(); ++iter)
 	{
 		iter->first->parseXml(iter->second);
-	} emit dataLoaded();
+	}
+
+	emit dataLoaded();
 
 	//we need to make sure all images are loaded before we try to set an active image
 	child = dataManagerNode.firstChild();
