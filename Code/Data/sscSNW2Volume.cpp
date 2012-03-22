@@ -463,6 +463,7 @@ bool SNW2Volume::rawLoadVtkImageData()
 			+ " and bitsPerSample=" + qstring_cast(mMetaData.Volume.mBitsPerSample));
 		return false;
 	}
+	mImageData->UpdateInformation();
 	return true;
 }
 
@@ -712,6 +713,15 @@ ssc::ImagePtr SNW2Volume::getImage()
 		loadVolumeData();
 	}
 	return mImage;
+}
+
+vtkLookupTablePtr SNW2Volume::getLut()
+{
+	if (!mImageData)
+	{
+		loadVolumeData();
+	}
+	return mLut;
 }
 
 } // namespace ssc
