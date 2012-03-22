@@ -47,9 +47,12 @@ private slots:
 	void deletePresetSlot();
 	void guiImageSettingsChanged();
 	void guiProbeSectorChanged();
+	void shiftLeftSlot();
+	void shiftRightSlot();
 
 private:
 	virtual QString defaultWhatsThis() const;
+	void shiftDefinition(ssc::Vector3D shift);
 
 	QWidget* mActiveProbeConfigWidget;
 	BoundingBoxWidget* mBBWidget;
