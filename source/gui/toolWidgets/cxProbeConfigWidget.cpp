@@ -87,6 +87,17 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 	topLayout->addLayout(buttonsLayout);
 
+	this->createAction(this,
+	                QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-left-3.png"),
+					"Shift definition 1 pixel to the left.\nThis will shift the origin, crop box and sector.", "",
+	                SLOT(shiftLeftSlot()),
+	                buttonsLayout);
+	this->createAction(this,
+	                QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
+					"Shift definition 1 pixel to the right.\nThis will shift the origin, crop box and sector.", "",
+	                SLOT(shiftRightSlot()),
+	                buttonsLayout);
+
 	buttonsLayout->addStretch();
 	this->createAction(this,
 	                QIcon(":/icons/preset_remove.png"),
@@ -105,6 +116,36 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 
 ProbeConfigWidget::~ProbeConfigWidget()
 {
+}
+
+void ProbeConfigWidget::shiftDefinition(ssc::Vector3D shift)
+{
+	// need a cx probe here, in order to set data.
+	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	if (!probe)
+		return;
+	ssc::ProbeData data = probe->getData();
+
+	ssc::ProbeData::ProbeImageData image = data.getImage();
+	image.mOrigin_p += shift;
+	for (int i=0; i<3; ++i)
+	{
+		image.mClipRect_p[2*i  ] += shift[i];
+		image.mClipRect_p[2*i+1] += shift[i];
+	}
+	data.setImage(image);
+
+	probe->setProbeSector(data);
+}
+
+void ProbeConfigWidget::shiftLeftSlot()
+{
+	this->shiftDefinition(ssc::Vector3D(-1, 0, 0));
+}
+
+void ProbeConfigWidget::shiftRightSlot()
+{
+	this->shiftDefinition(ssc::Vector3D( 1, 0, 0));
 }
 
 QString ProbeConfigWidget::defaultWhatsThis() const
