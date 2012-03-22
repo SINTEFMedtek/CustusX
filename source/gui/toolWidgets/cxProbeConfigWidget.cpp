@@ -30,43 +30,60 @@ namespace cx
 ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "ProbeConfigWidget", "Probe Configuration")
 {
 	mUpdating = false;
+//	this->setStatusTip(this->defaultWhatsThis());
+	this->setToolTip(this->defaultWhatsThis());
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 //	topLayout->addWidget(new QLabel("Probe!!!!"));
 	mActiveProbeConfig = ActiveProbeConfigurationStringDataAdapter::New();
 	connect(mActiveProbeConfig.get(), SIGNAL(changed()), this, SLOT(activeProbeConfigurationChangedSlot()));
-	topLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mActiveProbeConfig));
-
-	mBBWidget = new BoundingBoxWidget(this);
-	mBBWidget->showDim(2, false);
-	topLayout->addWidget(mBBWidget);
-	connect(mBBWidget, SIGNAL(changed()), this, SLOT(guiImageSettingsChanged()));
+	mActiveProbeConfigWidget = new ssc::LabeledComboBoxWidget(this, mActiveProbeConfig);
+	topLayout->addWidget(mActiveProbeConfigWidget);
 
 	mOrigin = ssc::Vector3DDataAdapterXml::initialize("Origin",
 		"Origin",
-		"Probe Origin in pixels.",
+		"Origin of tool space in the probe image.\nUnits in pixels.",
 		ssc::Vector3D(0,0,0),
 		ssc::DoubleRange(-1000,1000,1),
 		1,
 		QDomNode());
 	connect(mOrigin.get(), SIGNAL(changed()), this, SLOT(guiImageSettingsChanged()));
 
+	// define origin group
 	Vector3DWidget* mOriginWidget = Vector3DWidget::createSmallHorizontal(this, mOrigin);
 	mOriginWidget->showDim(2, false);
 	topLayout->addWidget(mOriginWidget);
+
+	// define cropping group
+	QGroupBox* cropGroupBox = new QGroupBox("Crop Box");
+	cropGroupBox->setToolTip("Define cropping box for the probe image.\nUnits in pixels.");
+	QVBoxLayout* cropLayout = new QVBoxLayout(cropGroupBox);
+	topLayout->addWidget(cropGroupBox);
+
+	mBBWidget = new BoundingBoxWidget(this);
+	mBBWidget->showDim(2, false);
+	cropLayout->addWidget(mBBWidget);
+	connect(mBBWidget, SIGNAL(changed()), this, SLOT(guiImageSettingsChanged()));
+
+	// create sector group
+	QGroupBox* sectorGroupBox = new QGroupBox("Sector");
+	sectorGroupBox->setToolTip("Define probe sector parameters.\nUnits in mm.");
+	QVBoxLayout* sectorLayout = new QVBoxLayout(sectorGroupBox);
+	topLayout->addWidget(sectorGroupBox);
 
 	mDepthWidget = new SliderRangeGroupWidget(this);
 	mDepthWidget->setName("Depth");
 	mDepthWidget->setRange(ssc::DoubleRange(0, 100, 1));
 	connect(mDepthWidget, SIGNAL(valueChanged(double, double)), this, SLOT(guiProbeSectorChanged()));
-	topLayout->addWidget(mDepthWidget);
+	sectorLayout->addWidget(mDepthWidget);
 
 	mWidth = ssc::DoubleDataAdapterXml::initialize("width", "Width", "Width of probe sector", 0,
 						ssc::DoubleRange(0, M_PI, M_PI/180), 0);
 	mWidth->setInternal2Display(180.0/M_PI);
 	connect(mWidth.get(), SIGNAL(changed()), this, SLOT(guiProbeSectorChanged()));
-	topLayout->addWidget(ssc::createDataWidget(this, mWidth));
+	sectorLayout->addWidget(ssc::createDataWidget(this, mWidth));
 
+	// create buttons bar
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 	topLayout->addLayout(buttonsLayout);
 
@@ -83,6 +100,7 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	                SLOT(savePresetSlot()),
 	                buttonsLayout);
 
+	topLayout->addStretch();
 }
 
 ProbeConfigWidget::~ProbeConfigWidget()
@@ -93,8 +111,12 @@ QString ProbeConfigWidget::defaultWhatsThis() const
 {
   return "<html>"
       "<h3>Probe Configuration</h3>"
-      "<p>View and edit the probe configuration.</p>"
-      "<p><i></i></p>"
+      "<p>"
+      "View and edit the probe configuration. "
+      "Use the origin to define the position of the probe image in relation "
+      "to the tool t space. Set the cropping box and the probe sector parameters "
+      "(depth and width). All can be written back to the ProbeCalibConfigs.xml file."
+      "</p>"
       "</html>";
 }
 
@@ -142,15 +164,6 @@ void ProbeConfigWidget::savePresetSlot()
     probe->saveCurrentConfig(newUid, newName);
 }
 
-//TODOLIST:
-// V- ved save: sørg for at ny config lastes inn i configwidget
-// V- test delete
-// V- sørg for at croprect og depth/width synces for linear.
-// - rydd opp i widget
-// - temporalcalib - sync med gammel måte å lagre på...
-// - speed in water etc - sjekk
-// - sjekk multiple updates - rydd
-
 void ProbeConfigWidget::deletePresetSlot()
 {
 	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
@@ -166,7 +179,7 @@ void ProbeConfigWidget::deletePresetSlot()
 		return;
 	}
 
-    std::cout << QString("Delete probe config uid=%1").arg(probe->getConfigId()) << std::endl;
+//    std::cout << QString("Delete probe config uid=%1").arg(probe->getConfigId()) << std::endl;
 	probe->removeCurrentConfig();
 }
 
@@ -198,33 +211,9 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 		mWidth->setInternal2Display(180.0/M_PI);
 	}
 
-	std::cout << "ProbeConfigWidget::activeProbeConfigurationChangedSlot()" << std::endl;
+//	std::cout << "ProbeConfigWidget::activeProbeConfigurationChangedSlot()" << std::endl;
 	mUpdating= false;
 }
-
-//void ProbeConfigWidget::guiChanged()
-//{
-//	if (mUpdating)
-//		return;
-//	// need a cx probe here, in order to set data.
-//	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
-//	if (!probe)
-//		return;
-//	ssc::ProbeData data = probe->getData();
-//
-//	ssc::ProbeData::ProbeImageData image = data.getImage();
-//	image.mOrigin_p = mOrigin->getValue();
-//	image.mClipRect_p = mBBWidget->getValue();
-//	data.setImage(image);
-////	data.mDepthStart = mDepthWidget->getValue().first;
-////	data.mDepthEnd = mDepthWidget->getValue().second;
-////	data.mWidth = mWidth->getValue();
-//	data.setSector(mDepthWidget->getValue().first, mDepthWidget->getValue().second, mWidth->getValue());
-//
-//	probe->setProbeSector(data);
-//
-//	std::cout << "ProbeConfigWidget::guiChanged()" << std::endl;
-//}
 
 
 void ProbeConfigWidget::guiProbeSectorChanged()
@@ -241,7 +230,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 
 	probe->setProbeSector(data);
 
-	std::cout << "ProbeConfigWidget::guiProbeSectorChanged()" << std::endl;
+//	std::cout << "ProbeConfigWidget::guiProbeSectorChanged()" << std::endl;
 }
 
 void ProbeConfigWidget::guiImageSettingsChanged()
@@ -261,21 +250,9 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 
 	probe->setProbeSector(data);
 
-	std::cout << "ProbeConfigWidget::guiImageSettingsChanged()" << std::endl;
+//	std::cout << "ProbeConfigWidget::guiImageSettingsChanged()" << std::endl;
 }
 
-//void ProbeConfigWidget::boxValuesChanged()
-//{
-//	mInteractiveCropper->setBoundingBox(mBBWidget->getValue());
-//}
-//
-//void ProbeConfigWidget::cropperChangedSlot()
-//{
-//	mUseCropperCheckBox->setChecked(mInteractiveCropper->getUseCropping());
-//	mShowBoxCheckBox->setChecked(mInteractiveCropper->getShowBoxWidget());
-//
-//	mBBWidget->setValue(mInteractiveCropper->getBoundingBox(), mInteractiveCropper->getMaxBoundingBox());
-//}
 
 
 

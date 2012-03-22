@@ -55,6 +55,10 @@ namespace cx
 MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	mFullScreenAction(NULL), mStandard3DViewActions(NULL), mControlPanel(NULL)
 {
+	QFile stylesheet(":/cxStyleSheet.ss");
+	stylesheet.open(QIODevice::ReadOnly);
+//	std::cout << QString(stylesheet.readAll()) << std::endl;
+	qApp->setStyleSheet(stylesheet.readAll());
 
 	// insert all widgets from all plugins
 	for (unsigned i = 0; i < plugins.size(); ++i)

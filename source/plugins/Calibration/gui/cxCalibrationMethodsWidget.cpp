@@ -12,6 +12,7 @@
 #include "cxToolManualCalibrationWidget.h"
 #include "cxTemporalCalibrationWidget.h"
 #include "cxLapFrameToolCalibrationWidget.h"
+#include "cxProbeConfigWidget.h"
 
 namespace cx
 {
@@ -24,6 +25,7 @@ CalibrationMethodsWidget::CalibrationMethodsWidget(AcquisitionDataPtr acquisitio
   this->addTab(new ToolTipSampleWidget(this), "Sample");
   this->addTab(new TemporalCalibrationWidget(acquisitionData, this), "Temporal");
   this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");
+  this->addTab(new ProbeConfigWidget(this), "Probe");
 }
 
 QString CalibrationMethodsWidget::defaultWhatsThis() const
