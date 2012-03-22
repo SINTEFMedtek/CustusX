@@ -98,7 +98,7 @@ private slots:
 private:
 	QString mUid;
 	ssc::VideoSourcePtr mBase;
-	ssc::ProbePtr mProbe;
+	ssc::ProbeWeakPtr mProbe;
 	vtkImageChangeInformationPtr mRedirecter;
 };
 

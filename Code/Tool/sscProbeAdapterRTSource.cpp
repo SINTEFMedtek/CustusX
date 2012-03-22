@@ -37,7 +37,7 @@ namespace ssc
 ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ssc::ProbePtr probe, ssc::VideoSourcePtr source) :
 	mUid(uid), mBase(source), mProbe(probe)
 {
-	connect(mProbe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+	connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
 
 	connect(mBase.get(), SIGNAL(streaming(bool)), this, SIGNAL(streaming(bool)));
 	connect(mBase.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
@@ -60,16 +60,23 @@ vtkImageDataPtr ProbeAdapterRTSource::getVtkImageData()
 
 double ProbeAdapterRTSource::getTimestamp()
 {
-	return mBase->getTimestamp() - mProbe->getData().getTemporalCalibration();
+	ProbePtr probe = mProbe.lock();
+	if (probe)
+		return mBase->getTimestamp() - probe->getData().getTemporalCalibration();
+	else
+		return mBase->getTimestamp();
 }
 
 void ProbeAdapterRTSource::probeChangedSlot()
 {
+	ProbePtr probe = mProbe.lock();
+	if (!probe)
+		return;
 	//  std::cout << "ProbeAdapterRTSource::probeChangedSlot() validdata: " << validData() << std::endl;
 
 	Eigen::Array3i dimImage(mRedirecter->GetOutput()->GetDimensions());
 	//  ssc::Vector3D dimImage(mRedirecter->GetOutput()->GetDimensions());
-	QSize dimProbe = mProbe->getData().getImage().mSize;
+	QSize dimProbe = probe->getData().getImage().mSize;
 
 	bool nonZero = (dimProbe.width() != 0) && (dimProbe.height() != 0) && (dimImage[0] != 0) && (dimImage[1] != 0);
 
@@ -84,7 +91,7 @@ void ProbeAdapterRTSource::probeChangedSlot()
 	// Don't change spacing if it have an existing spacing from the OpenIGTLink message
 	//  if (mBase->getVtkImageData()->GetSpacing()[0] == 0)
 	{
-		mRedirecter->SetOutputSpacing(mProbe->getData().getImage().mSpacing.begin());
+		mRedirecter->SetOutputSpacing(probe->getData().getImage().mSpacing.begin());
 	}
 }
 
