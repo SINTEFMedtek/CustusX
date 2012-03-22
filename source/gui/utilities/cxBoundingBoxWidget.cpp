@@ -23,6 +23,7 @@ BoundingBoxWidget::BoundingBoxWidget(QWidget* parent) :
 				QWidget(parent)
 {
 	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->setMargin(0);
 
 	QStringList caption;
 	caption << "X" << "Y" << "Y";

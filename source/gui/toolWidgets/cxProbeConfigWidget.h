@@ -38,6 +38,8 @@ class ProbeConfigWidget : public BaseWidget
 public:
 	ProbeConfigWidget(QWidget* parent=NULL);
 	virtual ~ProbeConfigWidget();
+	QWidget* getActiveProbeConfigWidget() { return mActiveProbeConfigWidget; }
+
 private slots:
 	void activeProbeConfigurationChangedSlot();
 //	void guiChanged();
@@ -49,6 +51,7 @@ private slots:
 private:
 	virtual QString defaultWhatsThis() const;
 
+	QWidget* mActiveProbeConfigWidget;
 	BoundingBoxWidget* mBBWidget;
 	ssc::Vector3DDataAdapterPtr mOrigin;
 	SliderRangeGroupWidget* mDepthWidget;

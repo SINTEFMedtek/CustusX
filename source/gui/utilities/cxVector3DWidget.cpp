@@ -23,6 +23,7 @@ namespace cx
 Vector3DWidget::Vector3DWidget(QWidget* parent, ssc::Vector3DDataAdapterPtr data) :
 				QWidget(parent), mData(data)
 {
+	this->setToolTip(data->getHelp());
 }
 
 Vector3DWidget* Vector3DWidget::createSmallHorizontal(QWidget* parent, ssc::Vector3DDataAdapterPtr data)
