@@ -104,11 +104,20 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	layout->addWidget(this->createHorizontalLine(), line, 0, 1, 1);
 	++line;
 
+	// define cropping group
+	QGroupBox* probeGroupBox = new QGroupBox("Probe");
+	probeGroupBox->setToolTip("Probe Definition");
+	QVBoxLayout* probeLayout = new QVBoxLayout(probeGroupBox);
+	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(this);
+	probeWidget->getActiveProbeConfigWidget()->setVisible(false);
+	probeLayout->addWidget(probeWidget);
+	probeLayout->setMargin(probeLayout->margin()/2);
+//	layout->addWidget(probeWidget, line, 0);
+	layout->addWidget(probeGroupBox, line, 0);
+	++line;
 	layout->addWidget(soundSpeedWidget, line, 0);
 	++line;
 	layout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()), line, 0);
-	++line;
-	layout->addWidget(new ProbeConfigWidget(this), line, 0);
 	++line;
 
 
