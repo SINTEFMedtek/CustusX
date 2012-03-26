@@ -133,6 +133,8 @@ public:
 	void resetTransferFunction(ImageLUT2DPtr imageLookupTable2D);
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D);
 
+	void moveThisAndChildrenToThread(QThread* thread); ///< Move this and all children to thread. Use the thread is generated in a worker thread and the result is to be used in the main thread.
+
 signals:
 	void landmarkRemoved(QString uid);
 	void landmarkAdded(QString uid);
