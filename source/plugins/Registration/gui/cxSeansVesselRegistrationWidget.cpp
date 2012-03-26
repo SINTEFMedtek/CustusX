@@ -108,25 +108,7 @@ void SeansVesselRegistrationWidget::registerSlot()
 	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
 	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
 
-	// characterize the input perturbation in angle-axis form:
-	ssc::Vector3D t_delta = linearTransform.matrix().block<3, 1>(0, 3);
-	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3, 3>(0, 0));
-	double angle = angleAxis.angle();
-
-	QString qualityText = QString("|t_delta|=%1mm, angle=%2*").arg(t_delta.length(), 6, 'f', 2).arg(
-					angle / M_PI * 180.0, 6, 'f', 2);
-
-	if (t_delta.length() > 20 || fabs(angle) > 10 / 180.0 * M_PI)
-	{
-		ssc::messageManager()->sendWarning(qualityText);
-		QString text = QString(
-						"The registration matrix' angle-axis representation shows a large shift. Retry registration.");
-		ssc::messageManager()->sendWarning(text);
-	}
-	else
-	{
-		ssc::messageManager()->sendInfo(qualityText);
-	}
+	vesselReg.checkQuality(linearTransform);
 
 	// The registration is performed in space r. Thus, given an old data position rMd, we find the
 	// new one as rM'd = Q * rMd, where Q is the inverted registration output.
@@ -192,18 +174,38 @@ public:
 	}
 	void stepL()
 	{
+		if (!mContext)
+			return;
 		mRegistrator.performOneRegistration(mContext, true);
 		this->update();
 		ssc::messageManager()->sendInfo(QString("One Linear V2V iteration, metric=%1").arg(mContext->mMetric));
 	}
 	void stepNL()
 	{
+		if (!mContext)
+			return;
 		mRegistrator.performOneRegistration(mContext, false);
 		this->update();
 		ssc::messageManager()->sendInfo(QString("One Nonlinear V2V iteration, metric=%1").arg(mContext->mMetric));
 	}
+	void apply()
+	{
+		if (!mContext)
+			return;
+
+		ssc::Transform3D linearTransform = mRegistrator.getLinearResult(mContext);
+		std::cout << "v2v linear result:\n" << linearTransform << std::endl;
+
+		mRegistrator.checkQuality(linearTransform);
+		ssc::Transform3D delta = linearTransform.inv();
+		mManager->applyImage2ImageRegistration(delta, "Vessel based");
+
+		ssc::messageManager()->sendInfo(QString("Applied linear registration from debug iteration."));
+	}
 	void update()
 	{
+		if (!mContext)
+			return;
 		mRegistrator.computeDistances(mContext);
 		vtkPolyDataPtr temp = mRegistrator.convertToPolyData(mContext->mSourcePoints);
 		mMovingData->SetPoints(temp->GetPoints());
@@ -254,12 +256,21 @@ void SeansVesselRegistrationWidget::debugInit()
 }
 void SeansVesselRegistrationWidget::debugRunOneLinearStep()
 {
-	mDebugger->stepL();
+	if (mDebugger)
+		mDebugger->stepL();
 }
 void SeansVesselRegistrationWidget::debugRunOneNonlinearStep()
 {
-	mDebugger->stepNL();
+	if (mDebugger)
+		mDebugger->stepNL();
 }
+
+void SeansVesselRegistrationWidget::debugApply()
+{
+	if (mDebugger)
+		mDebugger->apply();
+}
+
 void SeansVesselRegistrationWidget::debugClear()
 {
 	mDebugger.reset();
@@ -297,6 +308,7 @@ QWidget* SeansVesselRegistrationWidget::createOptionsWidget()
 	this->createAction(this, QIcon(), "NL",
 		"Run one Nonlinear step in the V2V algorithm. (Should be one at the end only)(Debug)",
 		SLOT(debugRunOneNonlinearStep()), debugLayout);
+	this->createAction(this, QIcon(), "Apply", "Apply results from the debug iteration", SLOT(debugApply()), debugLayout);
 	this->createAction(this, QIcon(), "Clear", "Clear debugging of the V2V algorithm.", SLOT(debugClear()), debugLayout);
 
 	return retval;

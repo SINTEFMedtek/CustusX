@@ -38,6 +38,11 @@ public:
 		double mMetric; ///< output: mean least squares from BEFORE last iteration.
 
 		double mLtsRatio; ///< local copy of the lts ratio, can be changed for current iteration.
+
+		//---------------------------------------------------------------------------
+		//TODO non-linear needs to handle this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		bool mInvertedTransform; ///< the calculated registration goes from target to source instead of source to target
+		//---------------------------------------------------------------------------
 	};
 	typedef boost::shared_ptr<Context> ContextPtr;
 
@@ -47,8 +52,9 @@ public:
 	~SeansVesselReg();
 
 	bool execute(ssc::DataPtr source, ssc::DataPtr target, QString logPath);
-	ssc::Transform3D getLinearResult();
+	ssc::Transform3D getLinearResult(ContextPtr context=ContextPtr());
 	ssc::Transform3D getNonLinearTransform();
+	void checkQuality(ssc::Transform3D linearTransform);
 	ssc::ImagePtr loadMinc(char* source_file);
 	void setDebugOutput(bool on)
 	{
@@ -103,12 +109,13 @@ protected:
 
 
 
-	ssc::Transform3D mLinearTransformResult;
+//	ssc::Transform3D mLinearTransformResult;
+	ContextPtr mLastRun; ///< result from last run of execute()
 
-	//---------------------------------------------------------------------------
-	//TODO non-linear needs to handle this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	bool mInvertedTransform; ///< the calculated registration goes from target to source instead of source to target
-	//---------------------------------------------------------------------------
+//	//---------------------------------------------------------------------------
+//	//TODO non-linear needs to handle this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//	bool mInvertedTransform; ///< the calculated registration goes from target to source instead of source to target
+//	//---------------------------------------------------------------------------
 };
 }//namespace cx
 #endif
