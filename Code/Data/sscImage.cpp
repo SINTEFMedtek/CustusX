@@ -211,6 +211,15 @@ void Image::transformChangedSlot()
 	//std::cout << "Image::transformChangedSlot()\n" << rMd << std::endl;
 }
 
+void Image::moveThisAndChildrenToThread(QThread* thread)
+{
+	  // important! move thread affinity to main thread - ensures signals/slots is still called correctly
+	  this->moveToThread(thread);
+	  this->getTransferFunctions3D()->moveToThread(thread);
+	  this->getLookupTable2D()->moveToThread(thread);
+	  this->get_rMd_History()->moveToThread(thread);
+}
+
 void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
 	//messageManager()->sendDebug("Image::setVtkImageData()");
