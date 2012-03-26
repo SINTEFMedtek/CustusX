@@ -46,18 +46,22 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(Regis
 
   ColorSelectButton* colorButton = new ColorSelectButton("Color");
   colorButton->setColor(QColor("green"));
+  colorButton->setToolTip("Select color to use when generating surfaces and centerlines.");
   connect(colorButton, SIGNAL(colorChanged(QColor)), this, SLOT(setColorSlot(QColor)));
   QPushButton* fixedButton = new QPushButton("Set as Fixed");
+  fixedButton->setToolTip("Set output of centerline generation as the Fixed Volume in Registration");
   connect(fixedButton, SIGNAL(clicked()), this, SLOT(toFixedSlot()));
   QPushButton* movingButton = new QPushButton("Set as Moving");
+  movingButton->setToolTip("Set output of centerline generation as the Moving Volume in Registration");
   connect(movingButton, SIGNAL(clicked()), this, SLOT(toMovingSlot()));
 
   QLayout* buttonsLayout = new QHBoxLayout;
-  buttonsLayout->addWidget(colorButton);
+//  buttonsLayout->addWidget(colorButton);
   buttonsLayout->addWidget(fixedButton);
   buttonsLayout->addWidget(movingButton);
 
 
+  mLayout->addWidget(colorButton);
   mLayout->addWidget(this->createHorizontalLine());
   mLayout->addWidget(this->createMethodWidget(mResampleWidget, new ssc::LabeledComboBoxWidget(this, mResampleOutput), "Resample"));
   mLayout->addWidget(this->createHorizontalLine());
