@@ -77,6 +77,9 @@ ssc::ImagePtr Resample::calculate()
 
   ssc::ImagePtr resampled = resampleImage(cropped, ssc::Vector3D(mInputReference->getBaseVtkImageData()->GetSpacing()), uid, name);
 
+  // important! move thread affinity to main thread - ensures signals/slots is still called correctly
+  resampled->moveThisAndChildrenToThread(QApplication::instance()->thread());
+
   return resampled;
 }
 
