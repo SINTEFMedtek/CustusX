@@ -11,7 +11,6 @@
 #include <QTime>
 #include <vtkPlane.h>
 #include <vtkClipPolyData.h>
-#include "sscToolManager.h"
 
 namespace ssc
 {
@@ -22,7 +21,8 @@ DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 	mVisible(false),
 	m_prMt(Transform3D::Identity()),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
-	mTimer(new QTimer())
+	mTimer(new QTimer()),
+	mOffset(0)
 {
 	mUid = uid;
 	mName = uid;
@@ -36,7 +36,6 @@ DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
     mPolyData = this->createPolyData(150, 15, 4, 2);
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
-	connect(manager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 DummyTool::~DummyTool()
@@ -145,6 +144,7 @@ void DummyTool::sendTransform()
  */
 vtkPolyDataPtr DummyTool::createPolyData(double h1, double h2, double r1, double r2)
 {
+//	mOffset = 5; // debug - show yellow stuff
 		
 //	double r1 = 10;
 //	double r2 = 3;
@@ -321,12 +321,15 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 
 double DummyTool::getTooltipOffset() const 
 {
-	return toolManager()->getTooltipOffset();
+	return mOffset; 
 }
 
 void DummyTool::setTooltipOffset(double val) 
 { 
-	toolManager()->setTooltipOffset(val);
+	if (similar(val,mOffset)) 
+		return; 
+	mOffset = val; 
+	emit tooltipOffset(mOffset); 
 }
 
 ssc::Transform3D DummyTool::getCalibration_sMt() const
