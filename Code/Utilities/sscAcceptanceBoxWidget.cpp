@@ -26,12 +26,25 @@ AcceptanceBoxWidget::AcceptanceBoxWidget(QString text, QWidget* parent) : QFrame
 	mAcceptButton = new QPushButton("Accept");
 	mRejectButton = new QPushButton("Reject");
 	buttons->addWidget(mAcceptButton);
-	//buttons->addStretch();
 	buttons->addWidget(mRejectButton);
 	connect(mAcceptButton, SIGNAL( clicked()), this, SLOT(accept()) );
 	connect(mRejectButton, SIGNAL( clicked()), this, SLOT(reject()) );
 	mAcceptButton->setFocus();
-	//mAcceptButton->setShortcut(Qt::Key_Enter);
+
+#ifdef SSC_AUTOMATIC_TEST_ACCEPT
+	mAutoTest = true;
+#else
+	mAutoTest = false;
+#endif
+	const char *autoEnv = getenv("SSC_TESTMODE");
+	if (autoEnv && strcasecmp("MANUAL", autoEnv) == 0)
+	{
+		mAutoTest = false;
+	}
+	else if (autoEnv && strcasecmp("AUTO", autoEnv) == 0)
+	{
+		mAutoTest = true;
+	}
 }
 
 void AcceptanceBoxWidget::hideAcceptButtons()
@@ -46,12 +59,10 @@ void AcceptanceBoxWidget::setValue(double val)
 
 void AcceptanceBoxWidget::setText(QString text)
 {
-	//text = "Accept the following statement:\n" + text;
-
-#ifdef SSC_AUTOMATIC_TEST_ACCEPT
-	text += "\n[Auto mode: Accepted after " + QString::number(SSC_DEFAULT_TEST_TIMEOUT_SECS) + "s]";
-#endif
-
+	if (mAutoTest)
+	{
+		text += "\n[Auto mode: Accepted after " + QString::number(SSC_DEFAULT_TEST_TIMEOUT_SECS) + "s]";
+	}
 	mText->setText(text);
 }
 
@@ -67,12 +78,12 @@ bool AcceptanceBoxWidget::accepted() const
 void AcceptanceBoxWidget::showEvent ( QShowEvent * event )
 {
 	QWidget::showEvent(event);
-
-	// autofinish if auto (this define lies in ssc/Code/Utilities/sscConfig.h.in)
-	#ifdef SSC_AUTOMATIC_TEST_ACCEPT
-	std::cout << "autofinishing..." << std::endl;
-	QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, this, SLOT(accept())); // terminate app after some seconds - this is an automated test!!
-	#endif
+	if (mAutoTest)
+	{
+		std::cout << "autofinishing..." << std::endl;
+		// terminate app after some seconds - this is an automated test!!
+		QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS * 1000, this, SLOT(accept()));
+	}
 }
 
 void AcceptanceBoxWidget::accept()
