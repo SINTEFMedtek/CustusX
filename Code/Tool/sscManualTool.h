@@ -78,13 +78,13 @@ public:
 	void setProbeSector(ssc::ProbeData sector); // for testing
 #endif
 
-private slots:
-	void read3DCrossHairSlot(double toolTipOffset);
 private:
+	void read3DCrossHair();
 	// constant data
 	ssc::ProbeData mSector;
 	vtkSTLReaderPtr mSTLReader;
 	vtkCursor3DPtr mCrossHair;
+	double mOffset;
 
 	// mutex-protected mutable data
 #ifdef SSC_USE_DEPRECATED_TOOL_ENUM
