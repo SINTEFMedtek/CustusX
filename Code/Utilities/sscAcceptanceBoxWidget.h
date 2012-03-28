@@ -38,6 +38,7 @@ public:
 
 signals:
 	void finished(bool);
+
 private:
 	bool mAccepted;
 	void finish(bool accepted);
@@ -45,8 +46,11 @@ private:
 	QLabel* mValue;
 	QPushButton* mAcceptButton;
 	QPushButton* mRejectButton;
+	bool mAutoTest;
+
 protected:
 	virtual void showEvent(QShowEvent * event);
+
 private slots:
 	void accept();
 	void reject();
