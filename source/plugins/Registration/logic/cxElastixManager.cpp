@@ -52,7 +52,7 @@ ElastixManager::ElastixManager(RegistrationManagerPtr regManager) : mRegistratio
  */
 void ElastixManager::currentPresetChangedSlot()
 {
-	SSC_LOG("ElastixManager::currentPresetChangedSlot()");
+//	SSC_LOG("ElastixManager::currentPresetChangedSlot()");
 
 	this->reloadPresets();
 
@@ -85,7 +85,7 @@ void ElastixManager::removeCurrentPreset()
  */
 void ElastixManager::reloadPresets()
 {
-	SSC_LOG("ElastixManager::reloadPresets()");
+//	SSC_LOG("ElastixManager::reloadPresets()");
 	QStringList presets;
 	presets << "Select Preset...";
 
