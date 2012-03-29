@@ -137,14 +137,14 @@ public:
 		mMovingData = mRegistrator.convertToPolyData(mContext->mSourcePoints);
 
 		ssc::MeshPtr moving(new ssc::Mesh("v2vreg_moving", "v2vreg_moving", mMovingData));
-		moving->setColor(QColor("blue"));
+		moving->setColor(QColor("red"));
 
 		ssc::MeshPtr fixed(new ssc::Mesh("v2vreg_fixed", "v2vreg_fixed", mContext->mTargetPoints));
 		fixed->setColor(QColor("green"));
 
 		mPolyLines = vtkPolyDataPtr::New();
 		ssc::MeshPtr lines(new ssc::Mesh("v2vreg_lines", "v2vreg_lines", mPolyLines));
-		lines->setColor(QColor("red"));
+		lines->setColor(QColor("cornflowerblue"));
 
 		ssc::View* view = viewManager()->get3DView();
 
