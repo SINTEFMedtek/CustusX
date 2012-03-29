@@ -546,12 +546,17 @@ void MainWindow::toggleTrackingSlot()
 		ssc::toolManager()->startTracking();
 }
 
+namespace
+{
+QString timestampFormatFolderFriendly()
+{
+  return QString("yyyy-MM-dd_hh-mm");
+}
+}
+
 void MainWindow::newPatientSlot()
 {
 	QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
-	QString name = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()) + "_";
-	name += settings()->value("globalApplicationName").toString() + "_";
-	name += settings()->value("globalPatientNumber").toString() + ".cx3";
 
 	// Create folders
 	if (!QDir().exists(patientDatafolder))
@@ -560,7 +565,19 @@ void MainWindow::newPatientSlot()
 		ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
 	}
 
-	QString choosenDir = patientDatafolder + "/" + name;
+	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly()) + "_";
+	QString postfix = settings()->value("globalApplicationName").toString() + "_" + settings()->value("globalPatientNumber").toString() + ".cx3";
+
+	QString choosenDir = patientDatafolder + "/" + timestamp + postfix;
+
+	// not necessary:
+//	// if existing, revert to seconds format
+//	if (QDir().exists(choosenDir))
+//	{
+//		timestamp = QDateTime::currentDateTime().toString(timestampSecondsFormatFolderFriendly()) + "_";
+//		choosenDir = patientDatafolder + "/" + timestamp + postfix;
+//	}
+
 	choosenDir = QFileDialog::getSaveFileName(this, tr("Select directory to save patient in"), choosenDir);
 	if (choosenDir == QString::null)
 		return; // On cancel
