@@ -463,7 +463,8 @@ VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) 
 
   mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
   mProbeSectorActor = vtkActorPtr::New();
-  mProbeSectorActor->GetProperty()->SetColor(1, 0.9, 0);
+//  mProbeSectorActor->GetProperty()->SetColor(1, 0.9, 0); // yellow
+  mProbeSectorActor->GetProperty()->SetColor(1, 165.0/255.0, 0); // orange
 }
 
 VideoFixedPlaneRep::~VideoFixedPlaneRep()
