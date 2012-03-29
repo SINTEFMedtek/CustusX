@@ -156,6 +156,13 @@ void ElastixManager::execute()
 {
 //	SSC_LOG("exec");
 //	QDir folder(cx::DataLocations::getRootConfigPath() + "/elastix");
+
+    QStringList parameterFiles;
+    if (QFileInfo(mActiveParameterFile0).exists() && QFileInfo(mActiveParameterFile0).exists())
+    	parameterFiles << mActiveParameterFile0;
+    if (QFileInfo(mActiveParameterFile1).exists() && QFileInfo(mActiveParameterFile1).exists())
+    	parameterFiles  << mActiveParameterFile1;
+
 	QString timestamp = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
 	QDir outDir(patientService()->getPatientData()->getActivePatientFolder()+"/elastix/"+timestamp);
 	mExecuter->setDisplayProcessMessages(mDisplayProcessMessages->getValue());
@@ -163,7 +170,7 @@ void ElastixManager::execute()
 	         mRegistrationManager->getFixedData(),
 	         mRegistrationManager->getMovingData(),
 	         outDir.absolutePath(),
-	         QStringList() << mActiveParameterFile0 << mActiveParameterFile1);
+	         parameterFiles);
 
 }
 
