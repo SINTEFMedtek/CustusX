@@ -200,7 +200,8 @@ OutputVolumeParams Reconstructer::getOutputVolumeParams() const
 void Reconstructer::setOutputVolumeParams(const OutputVolumeParams& par)
 {
 	mOutputVolumeParams = par;
-	emit paramsChanged();
+	  this->setSettings();
+//	emit paramsChanged();
 }
 
 void Reconstructer::setOutputRelativePath(QString path)
@@ -317,6 +318,14 @@ Transform3D Reconstructer::slerpInterpolate(const Transform3D& a, const Transfor
 	return c;
 }
 
+struct RemoveDataType
+{
+	RemoveDataType() : count(0), err(-1) {}
+	void add(double _err) { ++count; err=((err<0)?_err:std::min(_err, err)); }
+	int count;
+	double err;
+};
+
 /**
  * Find interpolated position values for each frame based on the input position
  * data.
@@ -327,6 +336,8 @@ void Reconstructer::interpolatePositions()
 {
 	//TODO: Check if the affine transforms still are affine after the linear interpolation
 	int startFrames = mFileData.mFrames.size();
+
+	std::map<int,RemoveDataType> removedData;
 
 	for (unsigned i_frame = 0; i_frame < mFileData.mFrames.size();)
 	{
@@ -345,15 +356,16 @@ void Reconstructer::interpolatePositions()
 		if ((fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime) > mMaxTimeDiff) || (fabs(
 			mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos + 1].mTime) > mMaxTimeDiff))
 		{
-			mFileData.mFrames.erase(mFileData.mFrames.begin() + i_frame);
-			mFileData.mUsRaw->removeFrame(i_frame);
-
 			double diff1 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime);
 			double diff2 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos + 1].mTime);
-			//      ssc::messageManager()->sendInfo("Time difference is too large. Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(diff1) + " or "+ qstring_cast(diff2));
-			ssc::messageManager()->sendInfo("Removed input frame: " + qstring_cast(i_frame) + ", difference is: "
-				+ QString::number(diff1, 'f', 1) + " or " + QString::number(diff2, 'f', 1)
-				+ " Time difference is too large.");
+//			//      ssc::messageManager()->sendInfo("Time difference is too large. Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(diff1) + " or "+ qstring_cast(diff2));
+//			ssc::messageManager()->sendInfo("Removed input frame: " + qstring_cast(i_frame) + ", difference is: "
+//				+ QString::number(diff1, 'f', 1) + " or " + QString::number(diff2, 'f', 1)
+//				+ " Time difference is too large.");
+			removedData[i_frame].add(std::max(diff1, diff2));
+
+			mFileData.mFrames.erase(mFileData.mFrames.begin() + i_frame);
+			mFileData.mUsRaw->removeFrame(i_frame);
 		}
 		else
 		{
@@ -366,6 +378,19 @@ void Reconstructer::interpolatePositions()
 			mFileData.mFrames[i_frame].mPos = slerpInterpolate(mFileData.mPositions[i_pos].mPos, mFileData.mPositions[i_pos + 1].mPos, t);
 			i_frame++;// Only increment if we didn't delete the frame
 		}
+	}
+
+	int removeCount=0;
+	for (std::map<int,RemoveDataType>::iterator iter=removedData.begin(); iter!=removedData.end(); ++iter)
+	{
+		int first = iter->first+removeCount;
+		int last = first + iter->second.count-1;
+		ssc::messageManager()->sendInfo(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
+		removeCount += iter->second.count;
+//		ssc::messageManager()->sendInfo("Removed input frame: " + qstring_cast(i_frame) + ", difference is: "
+//			+ QString::number(diff1, 'f', 1) + " or " + QString::number(diff2, 'f', 1)
+//			+ " Time difference is too large.");
+//		removedData[i_frame].add(std::min(diff1, diff2));
 	}
 
 	double removed = double(startFrames - mFileData.mFrames.size()) / double(startFrames);
