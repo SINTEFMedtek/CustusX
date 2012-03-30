@@ -28,6 +28,12 @@
     <file>icons/open_icon_library/png/64x64/actions/system-run-5.png</file>
     <file>icons/open_icon_library/png/64x64/actions/edit-delete-2.png</file>
    
+    <file>icons/open_icon_library/png/64x64/actions/media-playback-start-3.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/media-playback-stop-3.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/media-playback-pause-3.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/media-seek-backward-3.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/media-seek-forward-3.png</file>
+      
     <file>icons/open_icon_library/png/64x64/actions/edit-undo-8.png</file>
     <file>icons/open_icon_library/png/64x64/actions/go-down-4.png</file>
         
