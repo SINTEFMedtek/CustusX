@@ -26,6 +26,7 @@ include_directories(${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(${LIBNAME}_MOC_HDRS
     cxDisplayTimerWidget.h
+    cxTimeController.h
 )
 
 # SSC
@@ -59,6 +60,8 @@ add_library(cxUtilities
     cxDisplayTimerWidget.cpp
     cxTransformFile.h
     cxTransformFile.cpp
+    cxTimeController.h
+    cxTimeController.cpp
     ${cxUtilities_MOC_SRCS}
     )
     

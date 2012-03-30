@@ -21,7 +21,7 @@ namespace cx
 {
 /**
  * \file
- * \addtogroup cxServiceTracking
+ * \addtogroup cxResourceUtilities
  * @{
  */
 
