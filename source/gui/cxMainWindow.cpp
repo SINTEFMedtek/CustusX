@@ -46,7 +46,7 @@
 #include "cxMetricWidget.h"
 #include "cxViewWrapper.h"
 #include "sscDICOMWidget.h"
-#include "cxTimeControllerWidget.h"
+//#include "cxTimeControllerWidget.h"
 
 #include "sscDICOMLibConfig.h"
 
