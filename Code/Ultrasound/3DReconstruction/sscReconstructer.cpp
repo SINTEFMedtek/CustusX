@@ -394,7 +394,7 @@ void Reconstructer::interpolatePositions()
 	}
 
 	double removed = double(startFrames - mFileData.mFrames.size()) / double(startFrames);
-	if (!ssc::similar(removed, 0.0))
+	if (removed > 0.02)
 	{
 		double percent = removed * 100;
 		if (percent > 1)
