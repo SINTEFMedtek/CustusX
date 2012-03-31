@@ -70,6 +70,9 @@ public:
 	virtual ToolPtr getReferenceTool() const;
 	virtual void saveTransformsAndTimestamps(QString filePathAndName = "");
 
+	void setTooltipOffset(double offset);
+	double getTooltipOffset() const;
+
 	static DummyToolManager* getDowncastInstance();
 	/**
 	 * Reset all internal state of the DummyToolMananger instance. Call between tests to avoid state leak.
@@ -89,6 +92,7 @@ private:
 	DummyToolPtr mReferenceTool;
 
 	Transform3DPtr m_rMpr;
+	double mToolTipOffset; ///< Common tool tip offset for all tools
 
 	bool mConfigured;
 	bool mInitialized;

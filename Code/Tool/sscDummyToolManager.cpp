@@ -44,7 +44,8 @@ DummyToolManager::DummyToolManager() :
 	m_rMpr(new Transform3D(Transform3D::Identity())),
 	mConfigured(false),
 	mInitialized(false),
-	mIsTracking(false)
+	mIsTracking(false),
+	mToolTipOffset(0)
 {
 	DummyToolPtr tool1(new DummyTool(this));
 
@@ -229,6 +230,17 @@ void DummyToolManager::addTool(DummyToolPtr tool)
 	mDummyTools->insert(std::make_pair(tool->getUid(), tool));
 }
 
+void DummyToolManager::setTooltipOffset(double offset)
+{
+	if (ssc::similar(offset, mToolTipOffset))
+		return;
+	mToolTipOffset = offset;
+	emit tooltipOffset(mToolTipOffset);
+}
+double DummyToolManager::getTooltipOffset() const
+{
+	return mToolTipOffset;
+}
 
 
 } //namespace ssc
