@@ -302,6 +302,10 @@ public:
 
 	virtual void release()
 	{
+		if (!mAllocated)
+		{
+			return;
+		}
 		glDeleteTextures(1, &textureId);
 		vtkgl::DeleteBuffersARB(1,&lutBuffer);
 	}
