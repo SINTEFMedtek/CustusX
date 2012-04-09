@@ -46,7 +46,7 @@
 #include "cxMetricWidget.h"
 #include "cxViewWrapper.h"
 #include "sscDICOMWidget.h"
-//#include "cxTimeControllerWidget.h"
+#include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
 
 #include "sscDICOMLibConfig.h"
@@ -94,7 +94,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
 
-//	this->addAsDockWidget(new TimeControllerWidget(this), "Browsing");
+	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
 	this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
 	this->addAsDockWidget(new BrowserWidget(this), "Browsing");
