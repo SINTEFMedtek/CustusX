@@ -70,8 +70,8 @@ public:
 	virtual ToolPtr getReferenceTool() const;
 	virtual void saveTransformsAndTimestamps(QString filePathAndName = "");
 
-	void setTooltipOffset(double offset);
-	double getTooltipOffset() const;
+	virtual void setTooltipOffset(double offset);
+	virtual double getTooltipOffset() const;
 
 	static DummyToolManager* getDowncastInstance();
 	/**
