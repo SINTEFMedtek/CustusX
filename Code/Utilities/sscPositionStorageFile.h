@@ -60,13 +60,15 @@ private:
 	class Frame3D frameFromStream();
 };
 
+typedef boost::shared_ptr<PositionStorageReader> PositionStorageReaderPtr;
+
 /**\brief Writer class for the position file.
  * 
  * The generated file contains a compact representation
  * of tool position data along with timestamp and tool id.
  * Extract the info with class PositionStorageReader.
  *
- * For a descritpion of the file format, see PositionStorageReader.
+ * For a description of the file format, see PositionStorageReader.
  *
  * \sa PositionStorageReader
  * \ingroup sscUtility
