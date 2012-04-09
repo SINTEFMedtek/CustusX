@@ -50,7 +50,7 @@ SET(cxGui_MOC_HDRS
     #----------------------
     navigationWidgets/cxNavigationWidget.h
     navigationWidgets/cxTrackPadWidget.h
-#    navigationWidgets/cxTimeControllerWidget.h
+    navigationWidgets/cxPlaybackWidget.h
     #----------------------
     preferencesWidgets/cxPreferencesDialog.h
     preferencesWidgets/cxToolFilterWidget.h
@@ -197,8 +197,8 @@ SET(cxGui_SRCS
     navigationWidgets/cxNavigationWidget.cpp
     navigationWidgets/cxTrackPadWidget.cpp
     navigationWidgets/cxTrackPadWidget.h  
-#    navigationWidgets/cxTimeControllerWidget.h
-#    navigationWidgets/cxTimeControllerWidget.cpp
+    navigationWidgets/cxPlaybackWidget.h
+    navigationWidgets/cxPlaybackWidget.cpp
     #----------------------
     preferencesWidgets/cxPreferencesDialog.h
     preferencesWidgets/cxPreferencesDialog.cpp

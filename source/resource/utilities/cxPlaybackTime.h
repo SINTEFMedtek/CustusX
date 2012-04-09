@@ -12,15 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-/*
- * cxTimeController.h
- *
- *  Created on: Mar 29, 2012
- *      Author: christiana
- */
-
-#ifndef CXTIMECONTROLLER_H_
-#define CXTIMECONTROLLER_H_
+#ifndef CXPLAYBACKTIME_H_
+#define CXPLAYBACKTIME_H_
 
 #include <QObject>
 #include <QDateTime>
@@ -42,12 +35,12 @@ namespace cx
  * \date Mar 29, 2012
  * \author Christian Askeland, SINTEF
  */
-class TimeController : public QObject
+class PlaybackTime : public QObject
 {
 	Q_OBJECT
 public:
-	TimeController();
-	virtual ~TimeController();
+	PlaybackTime();
+	virtual ~PlaybackTime();
 
 	void initialize(QDateTime start, int length);
 
@@ -90,7 +83,7 @@ private:
 
 };
 
-typedef boost::shared_ptr<TimeController> TimeControllerPtr;
+typedef boost::shared_ptr<PlaybackTime> PlaybackTimePtr;
 
 } /* namespace cx */
-#endif /* CXTIMECONTROLLER_H_ */
+#endif /* CXPLAYBACKTIME_H_ */
