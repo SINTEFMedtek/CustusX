@@ -12,13 +12,15 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxTimeController.h"
+#include "cxPlaybackTime.h"
 #include <iostream>
+#include "sscTime.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
 
-TimeController::TimeController()
+PlaybackTime::PlaybackTime()
 {
 	mStartTime = QDateTime::currentDateTime();
 	mOffset = 0;
@@ -30,24 +32,27 @@ TimeController::TimeController()
 	mTimer->setInterval(40);
 }
 
-void TimeController::initialize(QDateTime start, int length)
+void PlaybackTime::initialize(QDateTime start, int length)
 {
 	this->stop();
 	mStartTime = start;
 	mLength = length;
+
+	std::cout << "starttime " << mStartTime.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+	std::cout << "endtime " << mStartTime.addMSecs(mLength).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 }
 
-TimeController::~TimeController()
+PlaybackTime::~PlaybackTime()
 {
 	delete mTimer;
 }
 
-bool TimeController::isPlaying() const
+bool PlaybackTime::isPlaying() const
 {
 	return mTimer->isActive();
 }
 
-void TimeController::start()
+void PlaybackTime::start()
 {
 	mPlayStart = QDateTime::currentDateTime();
 	mLastPlayOffset = mOffset;
@@ -56,21 +61,21 @@ void TimeController::start()
 	this->timeoutSlot();
 }
 
-void TimeController::stop()
+void PlaybackTime::stop()
 {
 	mTimer->stop();
 	mOffset = 0;
 	this->timeoutSlot();
 }
 
-void TimeController::pause()
+void PlaybackTime::pause()
 {
 	mOffset = this->getOffset();
 	mTimer->stop();
 	this->timeoutSlot();
 }
 
-int TimeController::getOffset() const
+int PlaybackTime::getOffset() const
 {
 	if (mTimer->isActive())
 	{
@@ -84,7 +89,7 @@ int TimeController::getOffset() const
 	}
 }
 
-void TimeController::timeoutSlot()
+void PlaybackTime::timeoutSlot()
 {
 	// find the offset from the last start to now. Use to update mOffset.
 //	int offset = mPlayStart.msecsTo(QDateTime::currentDateTime());
@@ -96,74 +101,108 @@ void TimeController::timeoutSlot()
 //	QString text = QString("<font size=%1 color=%2><b>%3 ms</b></font>").arg(mFontSize).arg(color).arg(secs);
 //	std::cout << mOffset << std::endl;
 
-	emit changed();
+	if (this->getOffset() > mLength)
+	{
+		// similar to pause(), except dont call timeout recusively
+		mOffset = mLength;
+		mTimer->stop();
+	}
+	else
+		emit changed();
 }
 
 
-void TimeController::forward(int msecs)
+void PlaybackTime::forward(int msecs)
 {
 	this->moveOffset(msecs);
 }
 
-void TimeController::rewind(int msecs)
+void PlaybackTime::rewind(int msecs)
 {
 	this->moveOffset(-msecs);
 }
 
-void TimeController::moveOffset(int delta)
+void PlaybackTime::moveOffset(int delta)
 {
 	this->setOffset(this->getOffset()+delta);
 }
 
-void TimeController::setTime(QDateTime time)
+void PlaybackTime::setTime(QDateTime time)
 {
 	this->setOffset(this->getStartTime().msecsTo(time));
 }
 
-QDateTime TimeController::getTime() const
+QDateTime PlaybackTime::getTime() const
 {
+//	std::cout << "gettime " << this->getStartTime().addMSecs(this->getOffset()).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+
 	return this->getStartTime().addMSecs(this->getOffset());
 }
 
-void TimeController::setOffset(int val)
+/**Sentry object for stopping play during object lifetime
+ *
+ */
+struct TemporaryPausePlay
 {
-	bool playing = this->isPlaying();
-	if (playing)
-		this->stop();
+	TemporaryPausePlay(PlaybackTime* base) : mBase(base)
+	{
+		mPlaying = mBase->isPlaying();
+		if (mPlaying)
+			mBase->pause();
+	}
+	~TemporaryPausePlay()
+	{
+		if (mPlaying)
+			mBase->start();
+	}
+	bool mPlaying;
+	PlaybackTime* mBase;
+};
+
+void PlaybackTime::setOffset(int val)
+{
+	if (val==mOffset)
+		return;
+
+	TemporaryPausePlay sentry(this);
+//	bool playing = this->isPlaying();
+//	if (playing)
+//		this->stop();
 
 	mOffset = std::max(0, val);
 	this->timeoutSlot();
 
-	if (playing)
-		this->start();
+//	if (playing)
+//		this->start();
 }
 
-int TimeController::getLength() const
+int PlaybackTime::getLength() const
 {
 	return mLength;
 }
 
-QDateTime TimeController::getStartTime() const
+QDateTime PlaybackTime::getStartTime() const
 {
 	return mStartTime;
 }
 
-void TimeController::setSpeed(double val)
+void PlaybackTime::setSpeed(double val)
 {
+	TemporaryPausePlay sentry(this);
 	mSpeed = val;
 }
 
-double TimeController::getSpeed() const
+double PlaybackTime::getSpeed() const
 {
 	return mSpeed;
 }
 
-void TimeController::setResolution(int val)
+void PlaybackTime::setResolution(int val)
 {
 	mTimer->setInterval(val);
 }
 
-double TimeController::getResolution(int val)
+double PlaybackTime::getResolution(int val)
 {
 	return mTimer->interval();
 }

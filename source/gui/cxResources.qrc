@@ -37,6 +37,13 @@
     <file>icons/open_icon_library/png/64x64/actions/edit-undo-8.png</file>
     <file>icons/open_icon_library/png/64x64/actions/go-down-4.png</file>
         
+    <file>icons/open_icon_library/png/64x64/actions/tool-animator.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/view-fullscreen-4.png</file>
+	<file>icons/open_icon_library/png/64x64/others/oval_red.png</file>
+	<file>icons/open_icon_library/png/64x64/others/oval_green.png</file>
+	<file>icons/open_icon_library/png/64x64/others/button-red.png</file>
+	<file>icons/open_icon_library/png/64x64/others/button-green.png</file>
+        
     <file>icons/workflow_state_patient_data.png</file>
     <file>icons/workflow_state_planning.png</file>
     <file>icons/workflow_state_registration.png</file>
