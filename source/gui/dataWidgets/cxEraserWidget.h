@@ -12,41 +12,49 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTRANSFORMFILE_H_
-#define CXTRANSFORMFILE_H_
+#ifndef CXERASERWIDGET_H_
+#define CXERASERWIDGET_H_
 
-#include "sscTransform3D.h"
+#include "cxBaseWidget.h"
+
+#include "vtkForwardDeclarations.h"
+typedef vtkSmartPointer<class vtkSphereWidget> vtkSphereWidgetPtr;
 
 namespace cx
 {
+
 /**
  * \file
- * \addtogroup cxResourceUtilities
+ * \addtogroup cxGUI
  * @{
  */
 
-/**
- * \brief File format for storing a 4x4 matrix.
- * \ingroup cxResourceUtilities
+
+
+/**\brief Widget for erasing parts of images/meshes.
  *
- * The read/write methods emit error messages if you
- * dont use the ok flag.
  *
- * \date Feb 28, 2012
+ * \date Mar 30, 2012
  * \author Christian Askeland, SINTEF
  */
-class TransformFile
+class EraserWidget: public BaseWidget
 {
-public:
-	TransformFile(QString fileName ="");
-	QString fileName() const { return mFileName; }
-	ssc::Transform3D read(bool* ok = 0);
-	void write(const ssc::Transform3D& transform);
+Q_OBJECT
 
+public:
+	EraserWidget(QWidget* parent);
+	virtual QString defaultWhatsThis() const;
+
+	virtual ~EraserWidget();
 private:
-	QString mFileName;
+	QCheckBox* mShowSphereCheckBox;
+	vtkSphereWidgetPtr mEraserSphere;
+
+private slots:
+	void testSlot();
+	void removeSlot();
 };
 
 }
 
-#endif /* CXTRANSFORMFILE_H_ */
+#endif /* CXERASERWIDGET_H_ */

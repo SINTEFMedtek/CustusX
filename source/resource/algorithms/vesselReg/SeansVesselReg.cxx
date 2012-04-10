@@ -38,7 +38,7 @@
 namespace cx
 {
 
-SeansVesselReg::SeansVesselReg() : mInvertedTransform(false)
+SeansVesselReg::SeansVesselReg()// : mInvertedTransform(false)
 {
 	mt_auto_lts = true;
 	mt_ltsRatio = 80;
@@ -86,6 +86,7 @@ bool SeansVesselReg::execute(ssc::DataPtr source, ssc::DataPtr target, QString l
 	if (mt_auto_lts)
 	{
 		context = this->linearRefineAllLTS(context);
+		ssc::messageManager()->sendInfo(QString("Auto LTS: Found best match using %1\%.").arg(context->mLtsRatio));
 	}
 	else
 	{
@@ -103,7 +104,8 @@ bool SeansVesselReg::execute(ssc::DataPtr source, ssc::DataPtr target, QString l
 	if (mt_verbose)
 		std::cout << QString("\n\nV2V Execution time: %1s").arg(start.secsTo(QTime::currentTime())) << endl;
 
-	mLinearTransformResult = this->getLinearTransform(context->mConcatenation);
+	mLastRun = context;
+//	mLinearTransformResult = this->getLinearTransform(context->mConcatenation);
 
 	return true;
 }
@@ -222,7 +224,10 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(ssc::DataPtr source, ss
 		return ContextPtr();
 	}
 
-	mInvertedTransform = false;
+	ContextPtr context = ContextPtr(new Context);
+
+	context->mConcatenation = vtkGeneralTransformPtr::New();
+	context->mInvertedTransform = false;
 
 	// Algorithm requires #source < #target
 	// swap if this is not the case
@@ -231,7 +236,7 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(ssc::DataPtr source, ss
 		//INVERT
 		if (mt_verbose)
 			std::cout << "inverted vessel reg" << std::endl;
-		mInvertedTransform = true;
+		context->mInvertedTransform = true;
 		std::swap(sourcePolyData, targetPolyData);
 	}
 
@@ -242,9 +247,6 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(ssc::DataPtr source, ss
 		std::cout << "number of source points to be sampled:" << ((int) (numPoints * mt_ltsRatio) / 100) << "\n" << endl;
 	}
 
-	ContextPtr context = ContextPtr(new Context);
-
-	context->mConcatenation = vtkGeneralTransformPtr::New();
 
 	// Create locator for target points
 	context->mTargetPoints = targetPolyData;
@@ -542,10 +544,13 @@ vtkPolyDataPtr SeansVesselReg::crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, 
 	return clipper->GetOutput();
 }
 
-ssc::Transform3D SeansVesselReg::getLinearResult()
+ssc::Transform3D SeansVesselReg::getLinearResult(ContextPtr context)
 {
-	ssc::Transform3D retval = mLinearTransformResult;
-	if (mInvertedTransform)
+	if (!context)
+		context = mLastRun;
+
+	ssc::Transform3D retval = this->getLinearTransform(context->mConcatenation);
+	if (context->mInvertedTransform)
 		retval = retval.inv();
 
 	return retval;
@@ -863,4 +868,31 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
 	return p_thePolyData;
 }
 
+/** Analyze 'size' of transform. Warn if too far away
+ * from an identity matrix.
+ *
+ */
+void SeansVesselReg::checkQuality(ssc::Transform3D linearTransform)
+{
+	// characterize the input perturbation in angle-axis form:
+	ssc::Vector3D t_delta = linearTransform.matrix().block<3, 1>(0, 3);
+	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3, 3>(0, 0));
+	double angle = angleAxis.angle();
+
+	QString qualityText = QString("|t_delta|=%1mm, angle=%2*")
+		.arg(t_delta.length(), 6, 'f', 2)
+		.arg(angle / M_PI * 180.0, 6, 'f', 2);
+
+	if (t_delta.length() > 20 || fabs(angle) > 10 / 180.0 * M_PI)
+	{
+		ssc::messageManager()->sendWarning(qualityText);
+		QString text = QString(
+						"The registration matrix' angle-axis representation shows a large shift. Retry registration.");
+		ssc::messageManager()->sendWarning(text);
+	}
+	else
+	{
+		ssc::messageManager()->sendInfo(qualityText);
+	}
+}
 } //namespace cx

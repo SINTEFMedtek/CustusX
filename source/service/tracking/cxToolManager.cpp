@@ -38,6 +38,8 @@
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
+#include "cxPlaybackTool.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -61,7 +63,7 @@ QStringList ToolManager::getSupportedTrackingSystems()
 
 ToolManager::ToolManager() :
 				mConfigurationFilePath(""), mLoggingFolder(""), mConfigured(false), mInitialized(false), mTracking(
-								false), mLastLoadPositionHistory(0), mToolTipOffset(0)
+								false), mLastLoadPositionHistory(0), mToolTipOffset(0), mPlayBackMode(false)
 {
 	m_rMpr_History.reset(new ssc::RegistrationHistory());
 	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
@@ -87,6 +89,112 @@ ToolManager::~ToolManager()
 			mTrackerThread->wait(); // forever or until dead thread
 		}
 	}
+}
+
+/**Set playback mode.
+ * Set endpoints into controller.
+ *
+ * The original tools are wrapped by playback tools. The original ones are
+ * not changed, only their movement is ignored.
+ */
+void ToolManager::setPlaybackMode(PlaybackTimePtr controller)
+{
+	if (!this->isConfigured())
+	{
+		ssc::messageManager()->sendWarning("ToolManager must be configured before setting playback");
+		return;
+	}
+
+	QDateTime now = QDateTime::currentDateTime();
+	ssc::ToolPtr test = mTools["Ultrasonix_L14-5"];
+	if (test)
+	{
+		ssc::TimedTransformMapPtr history = test->getPositionHistory();
+		QDateTime start = now.addSecs(-60*60); // 1h back
+		std::cout << "adding test data to probe " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+
+		for (int i=0; i<3000; ++i)
+		{
+			start = start.addMSecs(20);
+			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
+			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
+		}
+
+		start = start.addSecs(1*60); // 10 minutes back
+
+		for (int i=0; i<2000; ++i)
+		{
+			start = start.addMSecs(20);
+			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(100, i*0.1,0));
+			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
+		}
+
+	}
+
+	ssc::ToolPtr test2 = mTools["01-117-0329_Planning-Navigator"];
+	if (test2)
+	{
+		ssc::TimedTransformMapPtr history = test2->getPositionHistory();
+		QDateTime start = now.addSecs(-60*60); // 1h back
+		std::cout << "adding test data to pointer " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+		start = start.addSecs(5);
+
+		for (int i=0; i<2000; ++i)
+		{
+			start = start.addMSecs(20);
+			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
+			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
+		}
+	}
+
+	ssc::ToolManager::ToolMap original = mTools; ///< all tools
+	mTools.clear();
+
+	std::pair<double,double> timeRange(ssc::getMilliSecondsSinceEpoch(), 0);
+
+	for (ssc::ToolManager::ToolMap::iterator iter = original.begin(); iter!=original.end(); ++iter)
+	{
+		if (iter->second==mManualTool)
+			continue; // dont wrap the manual tool
+		cx::PlaybackToolPtr current(new PlaybackTool(iter->second, controller));
+		mTools[current->getUid()] = current;
+
+		ssc::TimedTransformMapPtr history = iter->second->getPositionHistory();
+		if (!history->empty())
+		{
+			timeRange.first = std::min(timeRange.first, history->begin()->first);
+			timeRange.second = std::max(timeRange.second, history->rbegin()->first);
+		}
+	}
+	mTools[mManualTool->getUid()] = mManualTool;
+
+	controller->initialize(QDateTime::fromMSecsSinceEpoch(timeRange.first), timeRange.second - timeRange.first);
+
+	ssc::messageManager()->sendInfo("Opened Playback Mode");
+	mPlayBackMode = true;
+	emit initialized();
+}
+
+/**Close playback mode by removing the playback tools and resetting to the original tools
+ *
+ */
+void ToolManager::closePlayBackMode()
+{
+	ssc::ToolManager::ToolMap original = mTools; ///< all tools
+
+	for (ssc::ToolManager::ToolMap::iterator iter = original.begin(); iter!=original.end(); ++iter)
+	{
+		if (iter->second==mManualTool)
+			continue; // dont unwrap the manual tool
+		PlaybackToolPtr current = boost::shared_dynamic_cast<PlaybackTool>(iter->second);
+		if (current)
+			mTools[current->getBase()->getUid()] = current->getBase();
+	}
+	mTools[mManualTool->getUid()] = mManualTool;
+
+	ssc::messageManager()->sendInfo("Closed Playback Mode");
+	mPlayBackMode = false;
+	emit initialized();
 }
 
 void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
@@ -172,7 +280,9 @@ void ToolManager::configure()
 	connect(mTrackerThread.get(), SIGNAL(configured(bool)), this, SLOT(trackerConfiguredSlot(bool)));
 	connect(mTrackerThread.get(), SIGNAL(initialized(bool)), this, SLOT(initializedSlot(bool)));
 	connect(mTrackerThread.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
-	connect(mTrackerThread.get(), SIGNAL(error()), this, SLOT(deconfigure()));
+// too strong: config is independent of tracker thread errors
+//	connect(mTrackerThread.get(), SIGNAL(error()), this, SLOT(deconfigure()));
+	connect(mTrackerThread.get(), SIGNAL(error()), this, SLOT(uninitialize()));
 
 	//start threads
 	if (mTrackerThread)
@@ -763,7 +873,6 @@ void ToolManager::deconfigureAfterUninitializedSlot()
 
 void ToolManager::configureAfterDeconfigureSlot()
 {
-	std::cout << "void ToolManager::configureAfterDeconfigureSlot()" << std::endl;
 	disconnect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
 	this->configure();
 }

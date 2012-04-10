@@ -152,12 +152,6 @@ QString ElastixExecuter::writeInitTransformToCalfile(
 	TransformFile file(outdir+"/moving_M_fixed_initial.cal");
 	file.write(mMf);
 
-//	QFile initTransformFile(outdir+"/moving_M_fixed_initial.cal");
-//	if (!initTransformFile.open(QIODevice::WriteOnly | QIODevice::Text))
-//	{
-//		ssc::messageManager()->sendWarning(QString("Failed to open file %1 for writing.").arg(initTransformFile.fileName()));
-//	}
-//	initTransformFile.write(qstring_cast(mMf).toAscii());
 	return file.fileName();
 }
 
@@ -200,7 +194,6 @@ void ElastixExecuter::processError(QProcess::ProcessError error)
 
 void ElastixExecuter::processFinished(int code, QProcess::ExitStatus status)
 {
-//	emit finished();
 	if (status == QProcess::CrashExit)
 		ssc::messageManager()->sendError("Registration process crashed");
 }
@@ -248,14 +241,14 @@ QString ElastixExecuter::findMostRecentTransformOutputFile() const
 }
 
 
-struct ElastixResults
-{
-	ssc::Transform3D m_mMf;
-	bool mValidLinearTransform;
-
-	QString mNonlinearFilename;
-	QString mNonlinearTransform;
-};
+//struct ElastixResults
+//{
+//	ssc::Transform3D m_mMf;
+//	bool mValidLinearTransform;
+//
+//	QString mNonlinearFilename;
+//	QString mNonlinearTransform;
+//};
 
 /** Return the result of the latest registration as a linear transform mMf.
  *
