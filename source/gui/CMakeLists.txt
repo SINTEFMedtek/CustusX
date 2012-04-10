@@ -38,6 +38,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/cxTransferFunctionAlphaWidget.h
     dataWidgets/cxTransferFunctionColorWidget.h
     dataWidgets/sscDICOMWidget.h
+    dataWidgets/cxEraserWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
     infoWidgets/cxBrowserWidget.h
@@ -49,6 +50,7 @@ SET(cxGui_MOC_HDRS
     #----------------------
     navigationWidgets/cxNavigationWidget.h
     navigationWidgets/cxTrackPadWidget.h
+    navigationWidgets/cxPlaybackWidget.h
     #----------------------
     preferencesWidgets/cxPreferencesDialog.h
     preferencesWidgets/cxToolFilterWidget.h
@@ -173,6 +175,8 @@ SET(cxGui_SRCS
     dataWidgets/cxDataViewSelectionWidget.cpp
     dataWidgets/sscDICOMWidget.h
     dataWidgets/sscDICOMWidget.cpp
+    dataWidgets/cxEraserWidget.h
+    dataWidgets/cxEraserWidget.cpp
     #----------------------
     infoWidgets/cxBrowserWidget.h
     infoWidgets/cxBrowserWidget.cpp
@@ -193,6 +197,8 @@ SET(cxGui_SRCS
     navigationWidgets/cxNavigationWidget.cpp
     navigationWidgets/cxTrackPadWidget.cpp
     navigationWidgets/cxTrackPadWidget.h  
+    navigationWidgets/cxPlaybackWidget.h
+    navigationWidgets/cxPlaybackWidget.cpp
     #----------------------
     preferencesWidgets/cxPreferencesDialog.h
     preferencesWidgets/cxPreferencesDialog.cpp

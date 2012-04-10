@@ -299,16 +299,10 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	showOrientation->setChecked(mAnnotationMarker->getVisible());
 	connect(showOrientation, SIGNAL(triggered(bool)), this, SLOT(showOrientationSlot(bool)));
 
-	ssc::ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(),
-					ssc::toolManager()->getDominantTool());
-	QAction* showToolPath = NULL;
-	if (activeRep3D)
-	{
-		showToolPath = new QAction("Show Tool Path", &contextMenu);
-		showToolPath->setCheckable(true);
-		showToolPath->setChecked(activeRep3D->getTracer()->isRunning());
-		connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
-	}
+	QAction* showToolPath = new QAction("Show Tool Path", &contextMenu);
+	showToolPath->setCheckable(true);
+	showToolPath->setChecked(settings()->value("showToolPath").toBool());
+	connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
 #ifdef USE_GLX_SHARED_CONTEXT
 	QMenu* showSlicesMenu = new QMenu("Show Slices", &contextMenu);
@@ -391,14 +385,17 @@ void ViewWrapper3D::showToolPathSlot(bool checked)
 {
 	ssc::ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(),
 					ssc::toolManager()->getDominantTool());
-	if (activeRep3D->getTracer()->isRunning())
+	if (activeRep3D)
 	{
-		activeRep3D->getTracer()->stop();
-		activeRep3D->getTracer()->clear();
-	}
-	else
-	{
-		activeRep3D->getTracer()->start();
+		if (activeRep3D->getTracer()->isRunning())
+		{
+			activeRep3D->getTracer()->stop();
+			activeRep3D->getTracer()->clear();
+		}
+		else
+		{
+			activeRep3D->getTracer()->start();
+		}
 	}
 
 	settings()->setValue("showToolPath", checked);

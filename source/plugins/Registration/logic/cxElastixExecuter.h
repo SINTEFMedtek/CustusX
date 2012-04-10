@@ -35,7 +35,7 @@ namespace cx
  * \brief ElastiX command-line wrapper.
  *
  * This class wraps a call to the ElastiX library,
- * \ref http://elastix.isi.uu.nl .
+ * http://elastix.isi.uu.nl .
  *
  * Call the run method to execute an elastiX registration,
  * wait for the signal finished(),

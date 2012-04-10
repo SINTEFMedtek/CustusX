@@ -42,6 +42,7 @@ private slots:
   void debugRunOneLinearStep();
   void debugRunOneNonlinearStep();
   void debugClear();
+  void debugApply();
 
 private:
   QWidget* createOptionsWidget();
