@@ -23,6 +23,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
 #include "sscVector3D.h"
+#include "sscRegistrationTransform.h"
 
 namespace cx
 {
@@ -55,7 +56,7 @@ private slots:
 //	void openSlot();
 //	void closeSlot();
 	void speedChangedSlot();
-	void timeLineSliderValueChangedSlot(int val);
+//	void timeLineSliderValueChangedSlot(int val);
 	void timeLineWidgetValueChangedSlot();
 	void toolManagerInitializedSlot();
 
@@ -64,12 +65,14 @@ private:
 	QString stripLeadingZeros(QString time);
 	std::vector<TimelineWidget::TimelineEvent> convertHistoryToEvents(ssc::ToolPtr tool);
 	std::vector<TimelineWidget::TimelineEvent> createEvents();
+	std::pair<double,double> findTimeRange(std::vector<TimelineWidget::TimelineEvent> events);
+	std::vector<TimelineWidget::TimelineEvent> convertRegistrationHistoryToEvents(ssc::RegistrationHistoryPtr reg);
 
 	QLabel* mLabel;
 	QLabel* mTotalLengthLabel;
 	QLabel* mStartTimeLabel;
 	bool mOpen;
-	QSlider* mTimeLineSlider;
+//	QSlider* mTimeLineSlider;
 	PlaybackTimePtr mTimer;
 	QAction* mPlayAction;
 	QAction* mOpenAction;

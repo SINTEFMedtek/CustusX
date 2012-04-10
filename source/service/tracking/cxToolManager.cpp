@@ -105,47 +105,47 @@ void ToolManager::setPlaybackMode(PlaybackTimePtr controller)
 		return;
 	}
 
-	QDateTime now = QDateTime::currentDateTime();
-	ssc::ToolPtr test = mTools["Ultrasonix_L14-5"];
-	if (test)
-	{
-		ssc::TimedTransformMapPtr history = test->getPositionHistory();
-		QDateTime start = now.addSecs(-60*60); // 1h back
-		std::cout << "adding test data to probe " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-
-		for (int i=0; i<3000; ++i)
-		{
-			start = start.addMSecs(20);
-			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
-			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
-		}
-
-		start = start.addSecs(1*60); // 10 minutes back
-
-		for (int i=0; i<2000; ++i)
-		{
-			start = start.addMSecs(20);
-			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(100, i*0.1,0));
-			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
-		}
-
-	}
-
-	ssc::ToolPtr test2 = mTools["01-117-0329_Planning-Navigator"];
-	if (test2)
-	{
-		ssc::TimedTransformMapPtr history = test2->getPositionHistory();
-		QDateTime start = now.addSecs(-60*60); // 1h back
-		std::cout << "adding test data to pointer " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-		start = start.addSecs(5);
-
-		for (int i=0; i<2000; ++i)
-		{
-			start = start.addMSecs(20);
-			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
-			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
-		}
-	}
+//	QDateTime now = QDateTime::currentDateTime();
+//	ssc::ToolPtr test = mTools["Ultrasonix_L14-5"];
+//	if (test)
+//	{
+//		ssc::TimedTransformMapPtr history = test->getPositionHistory();
+//		QDateTime start = now.addSecs(-60*60); // 1h back
+//		std::cout << "adding test data to probe " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//
+//		for (int i=0; i<3000; ++i)
+//		{
+//			start = start.addMSecs(20);
+//			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
+//			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
+//		}
+//
+//		start = start.addSecs(1*60); // 10 minutes back
+//
+//		for (int i=0; i<2000; ++i)
+//		{
+//			start = start.addMSecs(20);
+//			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(100, i*0.1,0));
+//			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
+//		}
+//
+//	}
+//
+//	ssc::ToolPtr test2 = mTools["01-117-0329_Planning-Navigator"];
+//	if (test2)
+//	{
+//		ssc::TimedTransformMapPtr history = test2->getPositionHistory();
+//		QDateTime start = now.addSecs(-60*60); // 1h back
+//		std::cout << "adding test data to pointer " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//		start = start.addSecs(5);
+//
+//		for (int i=0; i<2000; ++i)
+//		{
+//			start = start.addMSecs(20);
+//			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
+//			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
+//		}
+//	}
 
 	ssc::ToolManager::ToolMap original = mTools; ///< all tools
 	mTools.clear();
@@ -343,6 +343,9 @@ void ToolManager::trackerConfiguredSlot(bool on)
 	this->setDominantTool(this->getManualTool()->getUid());
 
 	mConfigured = true;
+
+	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
+
 	ssc::messageManager()->sendSuccess("ToolManager is configured.", true);
 	emit configured();
 }
@@ -774,6 +777,9 @@ void ToolManager::loadPositionHistory()
 	double timestamp;
 	QString toolUid;
 
+	QStringList missingTools;
+	std::cout << "========= ToolManager::loadPositionHistory() " << filename << "-- " << reader.atEnd() << std::endl;
+
 	while (!reader.atEnd())
 	{
 		if (!reader.read(&matrix, &timestamp, &toolUid))
@@ -784,6 +790,21 @@ void ToolManager::loadPositionHistory()
 		{
 			(*current->getPositionHistory())[timestamp] = matrix;
 		}
+		else
+		{
+			missingTools << toolUid;
+		}
+	}
+
+	missingTools.removeDuplicates();
+	missingTools.removeAll("");
+
+	if (!missingTools.empty())
+	{
+		ssc::messageManager()->sendWarning(
+						QString("Loaded position history.\n"
+								"The following tools were found in the history\n"
+								"but not in the configuration:\n%1").arg(missingTools.join(", ")));
 	}
 
 	mLastLoadPositionHistory = ssc::getMilliSecondsSinceEpoch();
