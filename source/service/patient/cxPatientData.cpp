@@ -93,16 +93,6 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
 
 	mActivePatientFolder = activePatientFolder;
 
-//  QString loggingPath = this->getActivePatientFolder() + "/Logs/";
-//  QDir loggingDir(loggingPath);
-//  if (!loggingDir.exists())
-//  {
-//    loggingDir.mkpath(loggingPath);
-////    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath);
-//  }
-//  ToolManager::getInstance()->setLoggingFolder(loggingPath);
-//  ssc::messageManager()->setLoggingFolder(loggingPath);
-
 	ssc::messageManager()->sendInfo("Set Active Patient: " + mActivePatientFolder);
 
 	emit patientChanged();

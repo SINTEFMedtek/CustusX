@@ -101,7 +101,7 @@ private:
 	QRect mPlotArea; ///< The plot area
 	bool mCloseToGlyph; ///< temporary that is true when mouse cursor is close to glyph and should be highlighted.
 	int mTolerance_p; ///< tolerance in pix, used to pick/show short events.
-	std::vector<QString> mContinousEvents; //< list of all continous events, used for stacked display
+	QStringList mContinousEvents; //< list of all continous events, used for stacked display
 	std::vector<QColor> mEventColors; ///< use to color continous events
 };
 
