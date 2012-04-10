@@ -16,6 +16,7 @@
 #include <iostream>
 #include "sscTime.h"
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -38,8 +39,9 @@ void PlaybackTime::initialize(QDateTime start, int length)
 	mStartTime = start;
 	mLength = length;
 
-	std::cout << "starttime " << mStartTime.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-	std::cout << "endtime " << mStartTime.addMSecs(mLength).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+	ssc::messageManager()->sendInfo(QString("Initialized PlaybackTime with start time [%1] and end time [%2]")
+					.arg(mStartTime.toString(ssc::timestampMilliSecondsFormatNice()))
+					.arg(mStartTime.addMSecs(mLength).toString(ssc::timestampMilliSecondsFormatNice())));
 }
 
 PlaybackTime::~PlaybackTime()

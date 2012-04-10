@@ -62,7 +62,6 @@ void ServiceController::duringSavePatientSlot()
 	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
 
 	ssc::toolManager()->addXml(managerNode);
-
 	ssc::toolManager()->savePositionHistory();
 }
 

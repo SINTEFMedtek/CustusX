@@ -128,30 +128,16 @@ void TimelineWidget::paintEvent(QPaintEvent* event)
   brush.setColor(gray01);
   painter.setBrush(brush);
   painter.drawRoundedRect(this->mPlotArea, 4, 4);
-//  painter.fillRect(this->mFullArea, gray2);
-//  painter.fillRect(this->mPlotArea, gray1);
-//  std::cout << "" << std::endl;
-//  std::cout << this->mFullArea.left() << " " << this->mFullArea.bottom() << " " << this->mFullArea.width() << " " << this->mFullArea.height() << std::endl;
-//  std::cout << this->mPlotArea.left() << " " << this->mPlotArea.bottom() << " " << this->mPlotArea.width() << " " << this->mPlotArea.height() << std::endl;
-
-  // Draw color-background
-
-  //???
-//  painter.setPen(QColor(140, 140, 210));
-
 
   int margin = 1;
-//  areaLeft = mPlotArea.left();
-//  areaRight = mPlotArea.right();
-  // draw all valid regions
+
+  	// draw all continous events
 	for (unsigned i = 0; i < mEvents.size(); ++i)
 	{
-		if (mEvents[i].isSingular())
+		if (!mContinousEvents.contains(mEvents[i].mDescription))
 			continue;
 		int start_p = this->mapTime2PlotX(mEvents[i].mStartTime);
 		int stop_p = this->mapTime2PlotX(mEvents[i].mEndTime);
-//	painter.setPen(QColor("green"));
-//	painter.drawLine(x, mPlotArea.top(), x, mPlotArea.bottom());
 		int level = std::distance(mContinousEvents.begin(), std::find(mContinousEvents.begin(), mContinousEvents.end(), mEvents[i].mDescription));
 		int level_max = mContinousEvents.size();
 		int thisHeight = (mPlotArea.height())/level_max - margin*(level_max-1)/level_max;
@@ -162,9 +148,10 @@ void TimelineWidget::paintEvent(QPaintEvent* event)
 		painter.fillRect(QRect(start_p, thisTop, stop_p - start_p, thisHeight), color);
 	}
 
+  	// draw all singular events
 	for (unsigned i = 0; i < mEvents.size(); ++i)
 	{
-		if (!mEvents[i].isSingular())
+		if (mContinousEvents.contains(mEvents[i].mDescription))
 			continue;
 
 		int start_p = this->mapTime2PlotX(mEvents[i].mStartTime);
