@@ -26,6 +26,7 @@
 #include "cxTool.h"
 #include "vtkForwardDeclarations.h"
 #include "cxManualToolAdapter.h"
+#include "cxPlaybackTime.h"
 
 class QDomNode;
 class QDomDocument;
@@ -85,6 +86,7 @@ public:
 	virtual bool isConfigured() const; ///< checks if the system is configured
 	virtual bool isInitialized() const; ///< checks if the hardware is initialized
 	virtual bool isTracking() const; ///< checks if the system is tracking
+	bool         isPlaybackMode() const { return mPlayBackMode; }
 
 	virtual ssc::ToolManager::ToolMapPtr getConfiguredTools(); ///< get all configured, but not initialized tools
 	virtual ssc::ToolManager::ToolMapPtr getInitializedTools(); ///< get all initialized tools
@@ -128,6 +130,9 @@ public:
 
 	void runDummyTool(ssc::DummyToolPtr tool);
 	ssc::ToolPtr findFirstProbe();
+
+	void closePlayBackMode();
+	void setPlaybackMode(PlaybackTimePtr controller);
 
 public slots:
 	void configure(); ///< sets up the software like the xml file suggests
@@ -173,6 +178,7 @@ private:
 	bool mConfigured; ///< whether or not the system is configured
 	bool mInitialized; ///< whether or not the system is initialized
 	bool mTracking; ///< whether or not the system is tracking
+	bool mPlayBackMode; ///< special mode: all tools are displaying historic positions.
 
 	ssc::LandmarkMap mLandmarks; ///< in space patient reference.
 	double mLastLoadPositionHistory;
