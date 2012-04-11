@@ -294,6 +294,7 @@ void PlaybackWidget::toolManagerInitializedSlot()
 //	std::cout << "===  end " << QDateTime::fromMSecsSinceEpoch(range.second).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 	mTimer->initialize(QDateTime::fromMSecsSinceEpoch(range.first), range.second - range.first);
 
+	//TODO merge into one initializer:
 	mToolTimelineWidget->setRange(range.first, range.second);
 	mToolTimelineWidget->setEvents(events);
 
