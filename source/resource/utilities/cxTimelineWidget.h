@@ -59,6 +59,18 @@ public:
 			return fabs(time - m) < std::max(w, tol_ms)/2;
 		}
 		bool isSingular() const { return ssc::similar(mEndTime,mStartTime); }
+		bool isOverlap(const TimelineEvent& rhs) const
+		{
+			double w0 = mEndTime - mStartTime;
+			double m0 = mStartTime + w0/2;
+			double w1 = rhs.mEndTime - rhs.mStartTime;
+			double m1 = rhs.mStartTime + w1/2;
+			return fabs(m1-m0) < (w1+w0)/2;
+		}
+		bool operator<(const TimelineEvent& rhs) const
+		{
+			return mStartTime < rhs.mStartTime;
+		}
 	};
 
 	TimelineWidget(QWidget* parent);
@@ -92,6 +104,7 @@ private:
 	bool showHelp(QPoint pos);
 
 	void setPositionFromScreenPos(int x, int y);
+	void createCompactingTransforms();
 
 //	std::vector<std::pair<double, double> > mValidRegions;
 	std::vector<TimelineEvent> mEvents;
@@ -102,7 +115,12 @@ private:
 	bool mCloseToGlyph; ///< temporary that is true when mouse cursor is close to glyph and should be highlighted.
 	int mTolerance_p; ///< tolerance in pix, used to pick/show short events.
 	QStringList mContinousEvents; //< list of all continous events, used for stacked display
+	std::vector<TimelineEvent> mNoncompactedIntervals; ///< listing the intervals that are unchanged by the compacting transform.
 	std::vector<QColor> mEventColors; ///< use to color continous events
+
+	vtkPiecewiseFunctionPtr mBackward;
+	vtkPiecewiseFunctionPtr mForward;
+
 };
 
 } /* namespace cx */
