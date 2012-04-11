@@ -30,7 +30,7 @@ TimelineWidget::TimelineWidget(QWidget* parent) : QWidget(parent),
 				mBorder(4),
 				mStart(0), mStop(0), mPos(0),
 				mCloseToGlyph(false),
-				mTolerance_p(3)
+				mTolerance_p(5)
 {
 	int s = 255;
 	int v = 192;
@@ -157,7 +157,8 @@ void TimelineWidget::paintEvent(QPaintEvent* event)
 		int start_p = this->mapTime2PlotX(mEvents[i].mStartTime);
 		int stop_p = this->mapTime2PlotX(mEvents[i].mEndTime);
 
-		QRect rect(start_p - mTolerance_p/2, mPlotArea.top(), mTolerance_p, mPlotArea.height());
+		int glyphWidth = 3;
+		QRect rect(start_p - glyphWidth/2, mPlotArea.top(), glyphWidth, mPlotArea.height());
 
 		  brush.setColor(QColor(50, 50, 50));
 		  painter.setBrush(brush);
