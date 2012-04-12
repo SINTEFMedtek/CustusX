@@ -27,6 +27,8 @@
 #include "sscDataManager.h"
 #include "sscData.h"
 #include "sscRegistrationTransform.h"
+#include "cxVideoService.h"
+#include "cxPlaybackUSAcquisitionVideo.h"
 
 namespace cx
 {
@@ -151,22 +153,25 @@ void PlaybackWidget::toggleOpenSlot()
 {
 	if (cx::ToolManager::getInstance()->isPlaybackMode())
 	{
-		ToolManager::getInstance()->closePlayBackMode();
+//		ToolManager::getInstance()->closePlayBackMode();
+		ToolManager::getInstance()->setPlaybackMode(PlaybackTimePtr());
+		videoService()->setPlaybackMode(PlaybackTimePtr());
 	}
 	else
 	{
 		ToolManager::getInstance()->setPlaybackMode(mTimer);
+		videoService()->setPlaybackMode(mTimer);
 	}
 }
 
-std::vector<TimelineWidget::TimelineEvent> PlaybackWidget::convertHistoryToEvents(ssc::ToolPtr tool)
+std::vector<TimelineEvent> PlaybackWidget::convertHistoryToEvents(ssc::ToolPtr tool)
 {
-	std::vector<TimelineWidget::TimelineEvent> retval;
+	std::vector<TimelineEvent> retval;
 	ssc::TimedTransformMapPtr history = tool->getPositionHistory();
 	if (!history || history->empty())
 		return retval;
 	double timeout = 200;
-	TimelineWidget::TimelineEvent currentEvent(tool->getName() + " visible", history->begin()->first);
+	TimelineEvent currentEvent(tool->getName() + " visible", history->begin()->first);
 //	std::cout << "first event start: " << currentEvent.mDescription << " " << currentEvent.mStartTime << " " << history->size() << std::endl;
 
 	for(ssc::TimedTransformMap::iterator iter=history->begin(); iter!=history->end(); ++iter)
@@ -189,9 +194,9 @@ std::vector<TimelineWidget::TimelineEvent> PlaybackWidget::convertHistoryToEvent
 	return retval;
 }
 
-std::vector<TimelineWidget::TimelineEvent> PlaybackWidget::convertRegistrationHistoryToEvents(ssc::RegistrationHistoryPtr reg)
+std::vector<TimelineEvent> PlaybackWidget::convertRegistrationHistoryToEvents(ssc::RegistrationHistoryPtr reg)
 {
-	std::vector<TimelineWidget::TimelineEvent> events;
+	std::vector<TimelineEvent> events;
 
 	std::vector<ssc::RegistrationTransform> tr = reg->getData();
 	for (unsigned i=0; i<tr.size(); ++i)
@@ -203,7 +208,7 @@ std::vector<TimelineWidget::TimelineEvent> PlaybackWidget::convertRegistrationHi
 		if (!tr[i].mMoving.isEmpty())
 			text = QString("%1, moving=%2").arg(text).arg(tr[i].mMoving);
 
-		events.push_back(TimelineWidget::TimelineEvent(text,
+		events.push_back(TimelineEvent(text,
 						tr[i].mTimestamp.toMSecsSinceEpoch()));
 	}
 
@@ -212,9 +217,9 @@ std::vector<TimelineWidget::TimelineEvent> PlaybackWidget::convertRegistrationHi
 	return events;
 }
 
-std::vector<TimelineWidget::TimelineEvent> PlaybackWidget::createEvents()
+std::vector<TimelineEvent> PlaybackWidget::createEvents()
 {
-	typedef std::vector<TimelineWidget::TimelineEvent> TimelineEventVector;
+	typedef std::vector<TimelineEvent> TimelineEventVector;
 
 	// find all valid regions (i.e. time sequences with tool navigation)
 	TimelineEventVector events;
@@ -230,7 +235,7 @@ std::vector<TimelineWidget::TimelineEvent> PlaybackWidget::createEvents()
 	{
 		QString desc("loaded " + iter->second->getName());
 		double acqTime = iter->second->getAcquisitionTime().toMSecsSinceEpoch();
-		events.push_back(TimelineWidget::TimelineEvent(desc, acqTime));
+		events.push_back(TimelineEvent(desc, acqTime));
 
 		ssc::RegistrationHistoryPtr reg = iter->second->get_rMd_History();
 		TimelineEventVector current = this->convertRegistrationHistoryToEvents(reg);
@@ -241,13 +246,17 @@ std::vector<TimelineWidget::TimelineEvent> PlaybackWidget::createEvents()
 	TimelineEventVector current = this->convertRegistrationHistoryToEvents(reg);
 	copy(current.begin(), current.end(), std::back_inserter(events));
 
+	current = videoService()->getUSAcquisitionVideoPlayback()->getEvents();
+	copy(current.begin(), current.end(), std::back_inserter(events));
+
+
 	return events;
 }
 
 /**Use the events to find the full time range to use.
  *
  */
-std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineWidget::TimelineEvent> events)
+std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent> events)
 {
 	if (events.empty())
 	{
@@ -288,7 +297,7 @@ void PlaybackWidget::toolManagerInitializedSlot()
 		return;
 	}
 
-	std::vector<TimelineWidget::TimelineEvent> events = this->createEvents();
+	std::vector<TimelineEvent> events = this->createEvents();
 	std::pair<double,double> range = this->findTimeRange(events);
 //	std::cout << "===start " << QDateTime::fromMSecsSinceEpoch(range.first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 //	std::cout << "===  end " << QDateTime::fromMSecsSinceEpoch(range.second).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;

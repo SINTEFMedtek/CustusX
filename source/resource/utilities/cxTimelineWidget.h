@@ -40,39 +40,6 @@ class TimelineWidget : public QWidget
 Q_OBJECT
 
 public:
-	class TimelineEvent
-	{
-	public:
-		TimelineEvent() : mStartTime(0), mEndTime(0) {}
-		TimelineEvent(QString description, double start, double end) : mDescription(description), mStartTime(start), mEndTime(end) {}
-		TimelineEvent(QString description, double time) : mDescription(description), mStartTime(time), mEndTime(time) {}
-		QString mDescription;
-		double mStartTime;
-		double mEndTime;
-		/** Return whether time is inside event.
-		 *  The minimum length of the event if set to tol_ms.
-		 */
-		bool isInside(double time, double tol_ms=0) const
-		{
-			double w = mEndTime - mStartTime;
-			double m = mStartTime + w/2;
-			return fabs(time - m) < std::max(w, tol_ms)/2;
-		}
-		bool isSingular() const { return ssc::similar(mEndTime,mStartTime); }
-		bool isOverlap(const TimelineEvent& rhs) const
-		{
-			double w0 = mEndTime - mStartTime;
-			double m0 = mStartTime + w0/2;
-			double w1 = rhs.mEndTime - rhs.mStartTime;
-			double m1 = rhs.mStartTime + w1/2;
-			return fabs(m1-m0) < (w1+w0)/2;
-		}
-		bool operator<(const TimelineEvent& rhs) const
-		{
-			return mStartTime < rhs.mStartTime;
-		}
-	};
-
 	TimelineWidget(QWidget* parent);
 	virtual ~TimelineWidget();
 

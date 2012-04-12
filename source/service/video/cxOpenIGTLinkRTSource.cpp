@@ -510,7 +510,7 @@ void OpenIGTLinkRTSource::updateSonix()
 		ssc::ProbeData probeSector(ssc::ProbeData::tLINEAR);
 		probeSector.setSector(dStart, dEnd, dWidth);
 		probe->setProbeSector(probeSector);
-		probe->setRTSource(videoService()->getVideoConnection()->getVideoSource());
+		probe->setRTSource(videoService()->getActiveVideoSource());
 	}
 //  std::cout << "depth Start/end (pixels): " << depthStart << ", " << depthEnd << "     mm: " << dStart << ", " << dEnd << std::endl;
 

@@ -85,5 +85,26 @@ private:
 
 typedef boost::shared_ptr<PlaybackTime> PlaybackTimePtr;
 
+/**\brief Description of one event in time.
+ *
+ * \sa PlaybackTime
+ */
+class TimelineEvent
+{
+public:
+	TimelineEvent() : mStartTime(0), mEndTime(0) {}
+	TimelineEvent(QString description, double start, double end) : mDescription(description), mStartTime(start), mEndTime(end) {}
+	TimelineEvent(QString description, double time) : mDescription(description), mStartTime(time), mEndTime(time) {}
+	QString mUid;
+	QString mDescription;
+	double mStartTime;
+	double mEndTime;
+	bool isInside(double time, double tol_ms=0) const;
+	bool isSingular() const;
+	bool isOverlap(const TimelineEvent& rhs) const;
+	bool operator<(const TimelineEvent& rhs) const;
+};
+
+
 } /* namespace cx */
 #endif /* CXPLAYBACKTIME_H_ */

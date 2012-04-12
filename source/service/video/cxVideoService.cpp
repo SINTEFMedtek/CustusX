@@ -20,9 +20,12 @@
  */
 
 #include "cxVideoService.h"
+#include "cxPlaybackUSAcquisitionVideo.h"
 
 namespace cx
 {
+
+
 
 // --------------------------------------------------------
 VideoService* VideoService::mInstance = NULL; ///< static member
@@ -60,6 +63,10 @@ void VideoService::setInstance(VideoService* instance)
 VideoService::VideoService()
 {
 	mIGTLinkConnection.reset(new VideoConnection());
+	mActiveVideoSource = mIGTLinkConnection->getVideoSource();
+	mUSAcquisitionVideoPlayback.reset(new USAcquisitionVideoPlayback());
+
+	connect(mIGTLinkConnection.get(), SIGNAL(connected(bool)), this, SIGNAL(activeVideoSourceChanged()));
 }
 
 VideoService::~VideoService()
@@ -67,9 +74,37 @@ VideoService::~VideoService()
 
 }
 
-VideoConnectionPtr VideoService::getVideoConnection()
+USAcquisitionVideoPlaybackPtr VideoService::getUSAcquisitionVideoPlayback()
+{
+	return mUSAcquisitionVideoPlayback;
+}
+
+VideoConnectionPtr VideoService::getIGTLinkVideoConnection()
 {
 	return mIGTLinkConnection;
+}
+
+ssc::VideoSourcePtr VideoService::getActiveVideoSource()
+{
+	return mActiveVideoSource;
+}
+
+void VideoService::setPlaybackMode(PlaybackTimePtr controller)
+{
+	if (controller)
+	{
+		// turn on playback
+		mUSAcquisitionVideoPlayback->setTime(controller);
+		mActiveVideoSource = mUSAcquisitionVideoPlayback->getVideoSource();
+		emit activeVideoSourceChanged();
+	}
+	else
+	{
+		// turn off playback
+		mUSAcquisitionVideoPlayback->setTime(controller);
+		mActiveVideoSource = mIGTLinkConnection->getVideoSource();
+		emit activeVideoSourceChanged();
+	}
 }
 
 //---------------------------------------------------------
