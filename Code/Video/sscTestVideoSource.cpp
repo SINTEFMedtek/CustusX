@@ -34,7 +34,7 @@ ssc::TestVideoSource::TestVideoSource(QString uid, QString name, int width, int 
 	mResolution = 1;
 	mWidth = width;
 	mHeight = height;
-	mImageImport = vtkImageImport::New();
+	mImageImport = vtkImageImportPtr::New();
 	setResolution(mResolution);
 	mImageTimer = new QTimer(this);
 	connect(mImageTimer, SIGNAL(timeout()), this, SLOT(processBuffer()));

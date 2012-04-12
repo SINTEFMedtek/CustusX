@@ -24,6 +24,7 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include <QDateTime>
+#include <boost/array.hpp>
 
 #include "sscVideoSource.h"
 
@@ -58,8 +59,8 @@ public:
 	virtual vtkImageDataPtr getVtkImageData();
 	virtual double getTimestamp();
 
-	virtual QString getInfoString() const { return QString("TestVideo Info"); }
-	virtual QString getStatusString() const { return QString("TestVideo Status"); }
+	virtual QString getInfoString() const { return mInfo; }
+	virtual QString getStatusString() const { return mStatus; }
 
 	virtual void start();
 	virtual void stop();
@@ -74,10 +75,15 @@ public:
 	virtual void setResolution(double resolution);
 
 	// extensions:
-	void setImageImport(vtkImageImportPtr import);
+	vtkImageImportPtr getImageImport();
 	void refresh(double timestamp);
+	void clear();
+	void setInfoString(QString text) { mInfo = text; }
+	void setStatusString(QString text) { mStatus = text; }
 
 private:
+	void setEmptyImage();
+
 	bool mConnected;
 	bool mValidData;
 	QString mUid;
@@ -92,7 +98,11 @@ private:
 //	uint8_t *mBuffer;
 	bool mInitialized;
 	double mTimestamp;
+	boost::array<unsigned char, 100> mZero;
+	QString mInfo;
+	QString mStatus;
 };
+
 typedef boost::shared_ptr<ImageImportVideoSource> ImageImportVideoSourcePtr;
 
 } // namespace ssc
