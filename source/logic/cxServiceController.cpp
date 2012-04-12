@@ -99,7 +99,7 @@ void ServiceController::updateVideoConnections()
 void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
 {
 	ssc::VideoSourcePtr source = videoService()->getActiveVideoSource();
-	std::cout << "ServiceController::connectVideoToProbe " << source.get() << std::endl;
+//	std::cout << "ServiceController::connectVideoToProbe " << source.get() << std::endl;
 	if (!source)
 	{
 		ssc::messageManager()->sendError("no rt source.");

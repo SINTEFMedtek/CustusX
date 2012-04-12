@@ -20,6 +20,8 @@
 #include "cxUsReconstructionFileReader.h"
 #include "sscTestVideoSource.h"
 #include "sscImageImportVideoSource.h"
+#include "cxToolManager.h"
+#include "cxProbe.h"
 
 namespace cx
 {
@@ -28,15 +30,11 @@ USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() : QObject(NULL)
 {
 	mVideoSource.reset(new ssc::ImageImportVideoSource("playbackVideoSource"));
 //	mVideoSource.reset(new ssc::TestVideoSource("testvideosource", "testvideosource", 800,600));
-	std::cout << "USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() " << mVideoSource.get() << std::endl;
+//	std::cout << "USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() " << mVideoSource.get() << std::endl;
+}
 
-	mImageImport = vtkImageImport::New();
-//	mImageImport->SetDataScalarTypeToUnsignedChar();
-//	mImageImport->SetNumberOfScalarComponents(3);
-//	mImageImport->SetWholeExtent(0, mWidth - 1, 0, mHeight - 1, 0, 0);
-//	mImageImport->SetDataExtentToWholeExtent();
-
-	mVideoSource->setImageImport(mImageImport);
+USAcquisitionVideoPlayback::~USAcquisitionVideoPlayback()
+{
 }
 
 ssc::VideoSourcePtr USAcquisitionVideoPlayback::getVideoSource()
@@ -46,7 +44,7 @@ ssc::VideoSourcePtr USAcquisitionVideoPlayback::getVideoSource()
 
 void USAcquisitionVideoPlayback::setTime(PlaybackTimePtr controller)
 {
-	std::cout << "USAcquisitionVideoPlayback::setTime() " << std::endl;
+//	std::cout << "USAcquisitionVideoPlayback::setTime() " << std::endl;
 	if (mTimer)
 		disconnect(mTimer.get(), SIGNAL(changed()), this, SLOT(timerChangedSlot()));
 	mTimer = controller;
@@ -141,23 +139,8 @@ void USAcquisitionVideoPlayback::timerChangedSlot()
 		}
 	}
 
-
 	this->loadFullData(event.mUid);
-
-	this->updateFrame();
-
-	//	mImageImport = vtkImageImport::New();
-//		setResolution(mResolution);
-	//	mImageTimer = new QTimer(this);
-	//	connect(mImageTimer, SIGNAL(timeout()), this, SLOT(processBuffer()));
-	//	mBuffer = (uint8_t*)malloc(width * height * 3);
-	//
-	//	mImageImport->SetDataScalarTypeToUnsignedChar();
-	//	mImageImport->SetNumberOfScalarComponents(3);
-	//	mImageImport->SetWholeExtent(0, mWidth - 1, 0, mHeight - 1, 0, 0);
-	//	mImageImport->SetDataExtentToWholeExtent();
-
-
+	this->updateFrame(event.mUid);
 }
 
 void USAcquisitionVideoPlayback::loadFullData(QString filename)
@@ -166,35 +149,91 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 	if (filename == mCurrentFilename)
 		return;
 
+	mVideoSource->clear();
+	mVideoSource->stop();
+
+	// if no data: ignore but keep the already loaded data
+	if (filename.isEmpty())
+		return;
+
 	// clear data
 	mCurrentFilename = "";
 	mCurrentData = ssc::USReconstructInputData();
+//	mVideoSource->clear();
+	std::cout << QString("USAcquisitionVideoPlayback::loadFullData(%1) clear").arg(filename) << std::endl;
 
 	// if no new data, return
 	if (filename.isEmpty())
 		return;
 
+	mVideoSource->start();
+
+	std::cout << QString("USAcquisitionVideoPlayback::loadFullData(%1) load").arg(filename) << std::endl;
 	// load new data
 	UsReconstructionFileReader reader;
 	mCurrentData = reader.readAllFiles(filename);
 	mCurrentFilename = filename;
+
+	// set the probe sector from file data:
+	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	if (tool)
+	{
+		ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
+		if (probe)
+		{
+			probe->setProbeSector(mCurrentData.mProbeData.mData);
+		}
+	}
+
+	// create a vector to allow for quick search
+	for (unsigned i=0; i<mCurrentData.mFrames.size(); ++i)
+	{
+		mCurrentTimestamps.push_back(mCurrentData.mFrames[i].mTime);
+//		std::cout << i << "\t" << mCurrentTimestamps[i]-mTimer->getStartTime().toMSecsSinceEpoch() << std::endl;
+	}
+
 }
 
-void  USAcquisitionVideoPlayback::updateFrame()
+void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 {
-	int index = 0; // grab first image, for starters
+	if (mCurrentFilename.isEmpty() || !mCurrentData.mUsRaw || filename!=mCurrentFilename)
+	{
+		mVideoSource->setInfoString(QString("No Data"));
+		mVideoSource->setStatusString(QString("No Data"));
+		mVideoSource->refresh(0);
+		return;
+	}
+
+	mVideoSource->start();
+
 	double timestamp = mTimer->getTime().toMSecsSinceEpoch();
-//	unsigned char* getFrame(unsigned int index);
+//	std::cout << "timestamp " << "\t" << timestamp-mTimer->getStartTime().toMSecsSinceEpoch() << std::endl;
+//	std::cout << "ts count: " << mCurrentTimestamps.size() << std::endl;
+
+	// find index of current frame: Use the last frame _before_ the current timestamp.
+	std::vector<double>::iterator iter = std::lower_bound(mCurrentTimestamps.begin(), mCurrentTimestamps.end(), timestamp);
+	if (iter==mCurrentTimestamps.begin())
+		return;
+	--iter; // use the frame before, not after.
+//	std::cout << "USAcquisitionVideoPlayback::updateFrame() pre" << std::endl;
+//	if (iter==mCurrentTimestamps.end())
+//		return;
+	int index = std::distance(mCurrentTimestamps.begin(), iter);
+
+	std::cout << "USAcquisitionVideoPlayback::updateFrame() " << index << std::endl;
+
 	int* dim = mCurrentData.mUsRaw->getDimensions();
-//	int* getDimensions();
-	ssc::Vector3D spacing = mCurrentData.mUsRaw->getSpacing();
+//	ssc::Vector3D spacing = mCurrentData.mUsRaw->getSpacing();
 
-	mImageImport->SetDataScalarTypeToUnsignedChar();
-	mImageImport->SetNumberOfScalarComponents(1);
-	mImageImport->SetWholeExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, 0);
-	mImageImport->SetDataExtentToWholeExtent();
-	mImageImport->SetImportVoidPointer(mCurrentData.mUsRaw->getFrame(index));
+	vtkImageImportPtr import = mVideoSource->getImageImport();
+	import->SetDataScalarTypeToUnsignedChar();
+	import->SetNumberOfScalarComponents(1);
+	import->SetWholeExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, 0);
+	import->SetDataExtentToWholeExtent();
+	import->SetImportVoidPointer(mCurrentData.mUsRaw->getFrame(index));
 
+	mVideoSource->setInfoString(QString("%1 - Frame %2").arg(mCurrentData.mUsRaw->getName()).arg(index));
+	mVideoSource->setStatusString(QString(""));
 	mVideoSource->refresh(timestamp);
 }
 
