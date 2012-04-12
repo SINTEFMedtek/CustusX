@@ -302,7 +302,7 @@ void TimelineWidget::paintEvent(QPaintEvent* event)
 			continue;
 
 		int start_p = this->mapTime2PlotX(mEvents[i].mStartTime);
-		int stop_p = this->mapTime2PlotX(mEvents[i].mEndTime);
+//		int stop_p = this->mapTime2PlotX(mEvents[i].mEndTime);
 
 		int glyphWidth = 3;
 		QRect rect(start_p - glyphWidth / 2, mPlotArea.top(), glyphWidth, mPlotArea.height());
