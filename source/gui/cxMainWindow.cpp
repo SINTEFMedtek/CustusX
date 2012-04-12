@@ -370,7 +370,7 @@ void MainWindow::createActions()
 	mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
 	mStartStreamingAction->setShortcut(tr("Ctrl+V"));
 	connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
-	connect(videoService()->getVideoConnection()->getVideoSource().get(), SIGNAL(streaming(bool)), this,
+	connect(videoService()->getIGTLinkVideoConnection()->getVideoSource().get(), SIGNAL(streaming(bool)), this,
 		SLOT(updateStreamingActionSlot()));
 	this->updateStreamingActionSlot();
 
@@ -468,19 +468,19 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 
 void MainWindow::toggleStreamingSlot()
 {
-	if (videoService()->getVideoConnection()->getVideoSource()->isStreaming())
+	if (videoService()->getIGTLinkVideoConnection()->getVideoSource()->isStreaming())
 	{
-		videoService()->getVideoConnection()->getVideoSource()->disconnectServer();
+		videoService()->getIGTLinkVideoConnection()->getVideoSource()->disconnectServer();
 	}
 	else
 	{
-		videoService()->getVideoConnection()->launchAndConnectServer();
+		videoService()->getIGTLinkVideoConnection()->launchAndConnectServer();
 	}
 }
 
 void MainWindow::updateStreamingActionSlot()
 {
-	if (videoService()->getVideoConnection()->getVideoSource()->isStreaming())
+	if (videoService()->getIGTLinkVideoConnection()->getVideoSource()->isStreaming())
 	{
 		mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
 		mStartStreamingAction->setText("Stop Streaming");

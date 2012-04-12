@@ -84,7 +84,7 @@ void WorkflowState::autoStartHardware()
 	if (settings()->value("Automation/autoStartTracking").toBool())
 		ssc::toolManager()->startTracking();
 	if (settings()->value("Automation/autoStartStreaming").toBool())
-		videoService()->getVideoConnection()->launchAndConnectServer();
+		videoService()->getIGTLinkVideoConnection()->launchAndConnectServer();
 }
 
 // --------------------------------------------------------

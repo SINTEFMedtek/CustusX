@@ -140,7 +140,7 @@ void TimelineWidget::createCompactingTransforms()
 		// find compacting factor c as described above
 		double w = emptyPre/(mStop-mStart);
 		double c = w*compactingFactor1 + (1-w)*compactingFactor0;
-		std::cout << "c\t" << c << std::endl;
+//		std::cout << "c\t" << c << std::endl;
 		y = y + emptyPre * c;
 		mForward->AddPoint(temp[i].mStartTime, y);
 
@@ -155,7 +155,7 @@ void TimelineWidget::createCompactingTransforms()
 	double w = emptyPre/(mStop-mStart);
 	w = std::pow(w, 1.0/2.0); // add more weight to the varying component
 	double c = w*compactingFactor1 + (1-w)*compactingFactor0;
-	std::cout << "c\t" << c << std::endl;
+//	std::cout << "c\t" << c << std::endl;
 	y = y + emptyPre * c;
 	mForward->AddPoint(mStop, y);
 
@@ -170,7 +170,7 @@ void TimelineWidget::createCompactingTransforms()
 		mForward->GetNodeValue(i, val);
 //		std::cout << "pre\t" << val[0] - mStart << "\t" << val[1] - mStart << std::endl;
 		val[1] = (val[1] - y_min) / (y_max - y_min);
-		std::cout << "nor\t"<< val[0] - mStart << "\t" << val[1] << std::endl;
+//		std::cout << "nor\t"<< val[0] - mStart << "\t" << val[1] << std::endl;
 		mForward->SetNodeValue(i, val);
 	}
 
@@ -393,9 +393,9 @@ bool TimelineWidget::event(QEvent *event)
 
 bool TimelineWidget::showHelp(QPoint pos)
 {
-	double tol_ms = this->mapPlotX2Time(mTolerance_p) - this->mapPlotX2Time(0);
-
 	double mouseTimePos = this->mapPlotX2Time(pos.x());
+	double tol_ms = this->mapPlotX2Time(pos.x()+mTolerance_p) - mouseTimePos;
+
 	QStringList text;
 
 	for (unsigned i = 0; i < mEvents.size(); ++i)

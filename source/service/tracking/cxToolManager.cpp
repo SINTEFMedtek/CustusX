@@ -99,6 +99,12 @@ ToolManager::~ToolManager()
  */
 void ToolManager::setPlaybackMode(PlaybackTimePtr controller)
 {
+	if (!controller)
+	{
+		this->closePlayBackMode();
+		return;
+	}
+
 	if (!this->isConfigured())
 	{
 		ssc::messageManager()->sendWarning("ToolManager must be configured before setting playback");
@@ -778,7 +784,7 @@ void ToolManager::loadPositionHistory()
 	QString toolUid;
 
 	QStringList missingTools;
-	std::cout << "========= ToolManager::loadPositionHistory() " << filename << "-- " << reader.atEnd() << std::endl;
+//	std::cout << "========= ToolManager::loadPositionHistory() " << filename << "-- " << reader.atEnd() << std::endl;
 
 	while (!reader.atEnd())
 	{

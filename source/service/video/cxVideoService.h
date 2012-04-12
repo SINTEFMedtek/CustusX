@@ -28,6 +28,9 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
+typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+
 /**
  * \file
  * \addtogroup cxServiceVideo
@@ -82,7 +85,15 @@ public:
 	static void initialize();
 	static void shutdown();
 
-	VideoConnectionPtr getVideoConnection();
+	VideoConnectionPtr getIGTLinkVideoConnection();
+	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
+	ssc::VideoSourcePtr getActiveVideoSource();
+	void setPlaybackMode(PlaybackTimePtr controller);
+
+signals:
+	void activeVideoSourceChanged();
+	void activeVideoSourceStreaming(bool on); ///< emitted when streaming started/stopped
+	void activeVideoSourceConnected(bool on); ///< emitted when source is connected/disconnected
 
 private:
 	static VideoService* mInstance;
@@ -95,6 +106,8 @@ private:
 	VideoService& operator=(VideoService const&); // not implemented
 
 	VideoConnectionPtr mIGTLinkConnection;
+	ssc::VideoSourcePtr mActiveVideoSource;
+	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
 };
 
 VideoService* videoService();
