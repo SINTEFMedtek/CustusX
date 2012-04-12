@@ -50,6 +50,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Video/sscVideoRecorder.h
     Video/sscVideoSourceSHM.h
     Video/sscTestVideoSource.h
+    Video/sscImageImportVideoSource.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
@@ -313,6 +314,8 @@ SET( SSC_SOURCE_FILES
     Video/sscVideoSourceSHM.cpp
     Video/sscTestVideoSource.h
     Video/sscTestVideoSource.cpp	
+    Video/sscImageImportVideoSource.h
+    Video/sscImageImportVideoSource.cpp
 
     Tool/sscToolManager.cpp
     Tool/sscToolManager.h
