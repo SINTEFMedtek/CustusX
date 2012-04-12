@@ -36,26 +36,14 @@ ImageImportVideoSource::ImageImportVideoSource(QString uid, QString name)
 	mStreaming = false;
 	mValidData = true;
 	mInitialized = false;
-//	mFrames = 0;
 	mResolution = 1;
-//	mWidth = width;
-//	mHeight = height;
-//	mImageImport = vtkImageImport::New();
-//	setResolution(mResolution);
-//	mImageTimer = new QTimer(this);
-//	connect(mImageTimer, SIGNAL(timeout()), this, SLOT(processBuffer()));
-//	mBuffer = (uint8_t*)malloc(width * height * 3);
-//
-//	mImageImport->SetDataScalarTypeToUnsignedChar();
-//	mImageImport->SetNumberOfScalarComponents(3);
-//	mImageImport->SetWholeExtent(0, mWidth - 1, 0, mHeight - 1, 0, 0);
-//	mImageImport->SetDataExtentToWholeExtent();
+	mImageImport = vtkImageImportPtr::New();
+	this->setEmptyImage();
 }
 
 ImageImportVideoSource::~ImageImportVideoSource()
 {
 	stop();
-//	free(mBuffer);
 }
 
 void ImageImportVideoSource::setResolution(double resolution)
@@ -80,68 +68,67 @@ void ImageImportVideoSource::start()
 		setConnected(true);
 	}
 	mStreaming = true;
-//	mImageTimer->start(40);
 }
 
 void ImageImportVideoSource::stop()
 {
-//	mImageTimer->stop();
 	mStreaming = false;
 }
-
-//static void TestImage(int width, int height, int frames, uint8_t *image, double mmPerPixel)
-//{
-//	for (int x = 0; x < width; ++x)
-//	{
-//		for (int y = 0; y < height; ++y)
-//		{
-//			uint8_t *pix = &image[(y*width + x) * 3];
-//			pix[0] = (x*255/width)+frames;
-//			pix[1] = (y*255/height)+frames;
-//			pix[2] = 127;
-//			double mmPerPixel = 0.1;
-//			if ( (int)(x * mmPerPixel) % 10 == 0)
-//			{
-//				uint8_t *pix = &image[(y*width + x) * 3];
-//				pix[0] = 0;
-//				pix[1] = 0;
-//				pix[2] = 0;
-//			}
-//		}
-//	}
-//}
-
-//void ImageImportVideoSource::processBuffer()
-//{
-//	TestImage(mWidth, mHeight, mFrames, mBuffer, mResolution);
-//	mFrames++;
-//	mImageImport->SetImportVoidPointer(mBuffer);
-//	mImageImport->Update();
-//	mImageImport->Modified();
-//	mInitialized = true;
-//	emit newFrame();
-//}
 
 double ImageImportVideoSource::getTimestamp()
 {
 	return mTimestamp;
 }
 
-void ImageImportVideoSource::setImageImport(vtkImageImportPtr import)
+/**Return the vtkImageImport source that
+ * is the source to the video.
+ *
+ */
+vtkImageImportPtr ImageImportVideoSource::getImageImport()
 {
-	mImageImport = import;
+	return mImageImport;
 }
 
+/**inform class that the imageimport filter has been
+ * changed externally with the given timestamp.
+ *
+ */
 void ImageImportVideoSource::refresh(double time)
 {
+	std::cout << "ImageImportVideoSource::refresh (" << mStreaming << ") " << this << std::endl;
 	if (!mStreaming)
 		return;
 	mTimestamp = time;
 	mImageImport->Update();
+//	mImageImport->GetOutput()->Update();
 	mImageImport->Modified();
 	mInitialized = true;
+	std::cout << "ImageImportVideoSource::refresh " << this << std::endl;
+
 	emit newFrame();
 }
+
+/** crash-avoiding measure -  for startup
+ */
+void ImageImportVideoSource::setEmptyImage()
+{
+	mImageImport->SetWholeExtent(0, 1, 0, 1, 0, 0);
+	mImageImport->SetDataExtent(0, 1, 0, 1, 0, 0);
+	mImageImport->SetDataScalarTypeToUnsignedChar();
+	std::fill(mZero.begin(), mZero.end(), 0);
+	mImageImport->SetImportVoidPointer(mZero.begin());
+//	mImageImport->GetOutput()->Update();
+	mImageImport->Modified();
+}
+
+/**Clear the image import filter
+ *
+ */
+void ImageImportVideoSource::clear()
+{
+	this->setEmptyImage();
+}
+
 
 
 } /* namespace ssc */
