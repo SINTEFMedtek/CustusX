@@ -112,7 +112,7 @@ OpenIGTLinkRTSourcePtr IGTLinkWidget::getRTSource()
 
 VideoConnectionPtr IGTLinkWidget::getConnection()
 {
-  return videoService()->getVideoConnection();
+  return videoService()->getIGTLinkVideoConnection();
 }
 
 IGTLinkWidget::~IGTLinkWidget()

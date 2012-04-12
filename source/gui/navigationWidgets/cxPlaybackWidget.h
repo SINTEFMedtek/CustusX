@@ -63,10 +63,10 @@ private slots:
 private:
 	virtual QString defaultWhatsThis() const;
 	QString stripLeadingZeros(QString time);
-	std::vector<TimelineWidget::TimelineEvent> convertHistoryToEvents(ssc::ToolPtr tool);
-	std::vector<TimelineWidget::TimelineEvent> createEvents();
-	std::pair<double,double> findTimeRange(std::vector<TimelineWidget::TimelineEvent> events);
-	std::vector<TimelineWidget::TimelineEvent> convertRegistrationHistoryToEvents(ssc::RegistrationHistoryPtr reg);
+	std::vector<TimelineEvent> convertHistoryToEvents(ssc::ToolPtr tool);
+	std::vector<TimelineEvent> createEvents();
+	std::pair<double,double> findTimeRange(std::vector<TimelineEvent> events);
+	std::vector<TimelineEvent> convertRegistrationHistoryToEvents(ssc::RegistrationHistoryPtr reg);
 
 	QLabel* mLabel;
 	QLabel* mTotalLengthLabel;
