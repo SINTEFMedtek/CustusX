@@ -22,6 +22,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscVector3D.h"
 
+
 namespace cx
 {
 
@@ -75,8 +76,8 @@ private:
 
 //	std::vector<std::pair<double, double> > mValidRegions;
 	std::vector<TimelineEvent> mEvents;
-	double mStart, mStop, mPos;
 	int mBorder;
+	double mStart, mStop, mPos;
 	QRect mFullArea; ///< The full widget area
 	QRect mPlotArea; ///< The plot area
 	bool mCloseToGlyph; ///< temporary that is true when mouse cursor is close to glyph and should be highlighted.
