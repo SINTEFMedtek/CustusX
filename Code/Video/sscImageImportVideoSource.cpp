@@ -35,7 +35,6 @@ ImageImportVideoSource::ImageImportVideoSource(QString uid, QString name)
 	mConnected = false;
 	mStreaming = false;
 	mValidData = true;
-	mInitialized = false;
 	mResolution = 1;
 	mImageImport = vtkImageImportPtr::New();
 	this->setEmptyImage();
@@ -60,19 +59,24 @@ vtkImageDataPtr ImageImportVideoSource::getVtkImageData()
 void ImageImportVideoSource::start()
 {
 	if (mStreaming)
-	{
 		return;
-	}
+
 	if (!isConnected())
-	{
 		setConnected(true);
-	}
+
 	mStreaming = true;
 }
 
 void ImageImportVideoSource::stop()
 {
+	if (!mStreaming)
+		return;
+
 	mStreaming = false;
+	std::cout << "ImageImportVideoSource::stop " << this << std::endl;
+
+	this->setEmptyImage();
+	emit newFrame();
 }
 
 double ImageImportVideoSource::getTimestamp()
@@ -100,10 +104,7 @@ void ImageImportVideoSource::refresh(double time)
 		return;
 	mTimestamp = time;
 	mImageImport->Update();
-//	mImageImport->GetOutput()->Update();
 	mImageImport->Modified();
-	mInitialized = true;
-	std::cout << "ImageImportVideoSource::refresh " << this << std::endl;
 
 	emit newFrame();
 }
@@ -117,16 +118,7 @@ void ImageImportVideoSource::setEmptyImage()
 	mImageImport->SetDataScalarTypeToUnsignedChar();
 	std::fill(mZero.begin(), mZero.end(), 0);
 	mImageImport->SetImportVoidPointer(mZero.begin());
-//	mImageImport->GetOutput()->Update();
 	mImageImport->Modified();
-}
-
-/**Clear the image import filter
- *
- */
-void ImageImportVideoSource::clear()
-{
-	this->setEmptyImage();
 }
 
 

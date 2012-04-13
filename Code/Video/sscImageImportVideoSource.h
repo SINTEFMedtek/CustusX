@@ -65,7 +65,7 @@ public:
 	virtual void start();
 	virtual void stop();
 
-	virtual bool validData() const { return isStreaming() && mInitialized && mValidData; }
+	virtual bool validData() const { return isStreaming() && mValidData; }
 	virtual bool isConnected() const { return mConnected; }
 	virtual bool isStreaming() const { return mConnected && mStreaming; }
 
@@ -77,7 +77,6 @@ public:
 	// extensions:
 	vtkImageImportPtr getImageImport();
 	void refresh(double timestamp);
-	void clear();
 	void setInfoString(QString text) { mInfo = text; }
 	void setStatusString(QString text) { mStatus = text; }
 
@@ -88,15 +87,9 @@ private:
 	bool mValidData;
 	QString mUid;
 	QString mName;
-//	int mFrames;
 	double mResolution;
 	vtkImageImportPtr mImageImport;
-//	int mWidth;
-//	int mHeight;
 	bool mStreaming;
-//	QTimer *mImageTimer;
-//	uint8_t *mBuffer;
-	bool mInitialized;
 	double mTimestamp;
 	boost::array<unsigned char, 100> mZero;
 	QString mInfo;
