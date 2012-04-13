@@ -30,7 +30,6 @@ USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() : QObject(NULL)
 {
 	mVideoSource.reset(new ssc::ImageImportVideoSource("playbackVideoSource"));
 //	mVideoSource.reset(new ssc::TestVideoSource("testvideosource", "testvideosource", 800,600));
-//	std::cout << "USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() " << mVideoSource.get() << std::endl;
 }
 
 USAcquisitionVideoPlayback::~USAcquisitionVideoPlayback()
@@ -44,7 +43,6 @@ ssc::VideoSourcePtr USAcquisitionVideoPlayback::getVideoSource()
 
 void USAcquisitionVideoPlayback::setTime(PlaybackTimePtr controller)
 {
-//	std::cout << "USAcquisitionVideoPlayback::setTime() " << std::endl;
 	if (mTimer)
 		disconnect(mTimer.get(), SIGNAL(changed()), this, SLOT(timerChangedSlot()));
 	mTimer = controller;
@@ -53,7 +51,7 @@ void USAcquisitionVideoPlayback::setTime(PlaybackTimePtr controller)
 
 	if (controller)
 	{
-		mVideoSource->start();
+//		mVideoSource->start();
 	}
 	else
 	{
@@ -65,8 +63,6 @@ void USAcquisitionVideoPlayback::setRoot(const QString path)
 {
 	mRoot = path;
 
-//	QStringList all = this->getAllFiles(mRoot);
-//	std::cout << "Found paths: " << all.join("\n") << std::endl;
 	mEvents = this->getEvents();
 }
 
@@ -75,11 +71,9 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
 	std::vector<TimelineEvent> events;
 
 	QStringList allFiles = this->getAllFiles(mRoot);
-	std::cout << "Found paths: " << allFiles.join("\n") << std::endl;
 	for (int i=0; i<allFiles.size(); ++i)
 	{
 		UsReconstructionFileReader reader;
-//		ssc::USReconstructInputData data = reader.readAllFiles(allFiles[i]);
 		std::vector<ssc::TimedPosition> timestamps = reader.readFrameTimestamps(allFiles[i]);
 
 		if (timestamps.empty())
@@ -149,7 +143,6 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 	if (filename == mCurrentFilename)
 		return;
 
-	mVideoSource->clear();
 	mVideoSource->stop();
 
 	// if no data: ignore but keep the already loaded data
@@ -159,8 +152,7 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 	// clear data
 	mCurrentFilename = "";
 	mCurrentData = ssc::USReconstructInputData();
-//	mVideoSource->clear();
-	std::cout << QString("USAcquisitionVideoPlayback::loadFullData(%1) clear").arg(filename) << std::endl;
+//	std::cout << QString("USAcquisitionVideoPlayback::loadFullData(%1) clear").arg(filename) << std::endl;
 
 	// if no new data, return
 	if (filename.isEmpty())
@@ -168,7 +160,7 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 
 	mVideoSource->start();
 
-	std::cout << QString("USAcquisitionVideoPlayback::loadFullData(%1) load").arg(filename) << std::endl;
+//	std::cout << QString("USAcquisitionVideoPlayback::loadFullData(%1) load").arg(filename) << std::endl;
 	// load new data
 	UsReconstructionFileReader reader;
 	mCurrentData = reader.readAllFiles(filename);
@@ -189,7 +181,6 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 	for (unsigned i=0; i<mCurrentData.mFrames.size(); ++i)
 	{
 		mCurrentTimestamps.push_back(mCurrentData.mFrames[i].mTime);
-//		std::cout << i << "\t" << mCurrentTimestamps[i]-mTimer->getStartTime().toMSecsSinceEpoch() << std::endl;
 	}
 
 }
@@ -198,12 +189,13 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 {
 	if (mCurrentFilename.isEmpty() || !mCurrentData.mUsRaw || filename!=mCurrentFilename)
 	{
-		mVideoSource->setInfoString(QString("No Data"));
-		mVideoSource->setStatusString(QString("No Data"));
+		mVideoSource->setInfoString(QString(""));
+		mVideoSource->setStatusString(QString("No US Acquisition"));
 		mVideoSource->refresh(0);
 		return;
 	}
 
+	// if not already started:
 	mVideoSource->start();
 
 	double timestamp = mTimer->getTime().toMSecsSinceEpoch();
@@ -215,12 +207,12 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	if (iter==mCurrentTimestamps.begin())
 		return;
 	--iter; // use the frame before, not after.
-//	std::cout << "USAcquisitionVideoPlayback::updateFrame() pre" << std::endl;
-//	if (iter==mCurrentTimestamps.end())
-//		return;
 	int index = std::distance(mCurrentTimestamps.begin(), iter);
 
-	std::cout << "USAcquisitionVideoPlayback::updateFrame() " << index << std::endl;
+//	int timeout = 1000; // invalidate data if timestamp differ from time too much
+//	mVideoSource->setValidData(fabs(timestamp-*iter)<timeout);
+
+//	std::cout << "USAcquisitionVideoPlayback::updateFrame() " << index << std::endl;
 
 	int* dim = mCurrentData.mUsRaw->getDimensions();
 //	ssc::Vector3D spacing = mCurrentData.mUsRaw->getSpacing();
