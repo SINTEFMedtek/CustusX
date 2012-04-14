@@ -258,7 +258,7 @@ void VideoGraphics::setLookupTable()
 
 void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 {
-	std::cout << this << " VideoGraphics::setRealtimeStream(" << data.get() << ")" << std::endl;
+//	std::cout << this << " VideoGraphics::setRealtimeStream(" << data.get() << ")" << std::endl;
   //Don't do anything if data is unchanged
   if (mData == data)
     return;
@@ -272,7 +272,7 @@ void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 
   if (mData)
   {
-	  std::cout << this << "      connect" << std::endl;
+//	  std::cout << this << "      connect" << std::endl;
     connect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
 
     mDataRedirecter->SetInput(mData->getVtkImageData());
@@ -511,7 +511,7 @@ void VideoFixedPlaneRep::setTool(ToolPtr tool)
 
 void VideoFixedPlaneRep::setRealtimeStream(VideoSourcePtr data)
 {
-	std::cout << this << " VideoFixedPlaneRep::setRealtimeStream(" << data.get() << ")" << std::endl;
+//	std::cout << this << " VideoFixedPlaneRep::setRealtimeStream(" << data.get() << ")" << std::endl;
   mRTGraphics->setRealtimeStream(data);
   mData = data;
 }
@@ -521,7 +521,7 @@ void VideoFixedPlaneRep::newDataSlot()
   if (!mData)
     return;
 
-  std::cout << this << " VideoFixedPlaneRep::newDataSlot() " << mData->validData() << "\t" << mData->getInfoString() << " " << mData->getStatusString() << std::endl;
+//  std::cout << this << " VideoFixedPlaneRep::newDataSlot() " << mData->validData() << "\t" << mData->getInfoString() << " " << mData->getStatusString() << std::endl;
   mInfoText->updateText(mData->getInfoString());
   mStatusText->updateText(mData->getStatusString());
   mStatusText->getActor()->SetVisibility(!mData->validData());
