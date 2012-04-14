@@ -99,7 +99,6 @@ void ServiceController::updateVideoConnections()
 void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
 {
 	ssc::VideoSourcePtr source = videoService()->getActiveVideoSource();
-//	std::cout << "ServiceController::connectVideoToProbe " << source.get() << std::endl;
 	if (!source)
 	{
 		ssc::messageManager()->sendError("no rt source.");
@@ -120,7 +119,7 @@ void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
 		ProbePtr probeInterface = boost::shared_dynamic_cast<Probe>(probe->getProbe());
 		if (!probeInterface)
 		{
-			ssc::messageManager()->sendError("Probe not a cx instance.");
+//			ssc::messageManager()->sendError("Probe not a cx instance.");
 			return;
 		}
 		probeInterface->setRTSource(source);

@@ -52,6 +52,8 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   if (QFileInfo(fileName).suffix()!="mhd")
     return retval;
 
+  retval.mFilename = fileName;
+
   QString mhdFileName = ssc::changeExtension(fileName, "mhd");
 
   if (!QFileInfo(ssc::changeExtension(fileName, "mhd")).exists())

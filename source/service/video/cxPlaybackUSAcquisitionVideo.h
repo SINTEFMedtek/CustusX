@@ -57,13 +57,12 @@ private:
 	QStringList getAllFiles(QString folder);
 	QString mRoot;
 	PlaybackTimePtr mTimer;
-//	ssc::VideoSourcePtr mVideoSource;
 	ssc::ImageImportVideoSourcePtr mVideoSource;
 	std::vector<TimelineEvent> mEvents;
 
-	QString mCurrentFilename;
 	ssc::USReconstructInputData mCurrentData;
 	std::vector<double> mCurrentTimestamps; // copy of time frame timestamps from mCurrentData.
+
 };
 typedef boost::shared_ptr<USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 
