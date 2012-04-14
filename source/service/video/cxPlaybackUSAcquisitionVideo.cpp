@@ -30,6 +30,8 @@ USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() : QObject(NULL)
 {
 	mVideoSource.reset(new ssc::ImageImportVideoSource("playbackVideoSource"));
 //	mVideoSource.reset(new ssc::TestVideoSource("testvideosource", "testvideosource", 800,600));
+	mVideoSource->setConnected(true);
+
 }
 
 USAcquisitionVideoPlayback::~USAcquisitionVideoPlayback()
@@ -51,7 +53,6 @@ void USAcquisitionVideoPlayback::setTime(PlaybackTimePtr controller)
 
 	if (controller)
 	{
-//		mVideoSource->start();
 	}
 	else
 	{
@@ -139,20 +140,21 @@ void USAcquisitionVideoPlayback::timerChangedSlot()
 
 void USAcquisitionVideoPlayback::loadFullData(QString filename)
 {
-	// if same filename, ok and return
-	if (filename == mCurrentFilename)
+	//	 if same filename, ok and return
+	if (filename == mCurrentData.mFilename)
 		return;
 
+	mVideoSource->setInfoString(QString(""));
+	mVideoSource->setStatusString(QString("No US Acquisition"));
 	mVideoSource->stop();
 
 	// if no data: ignore but keep the already loaded data
-	if (filename.isEmpty())
-		return;
+//	if (filename.isEmpty())
+//		return;
 
 	// clear data
-	mCurrentFilename = "";
+	// store old data because of a crash in render() after the second time a data set is loaded. No idea why. (20120414-CA)
 	mCurrentData = ssc::USReconstructInputData();
-//	std::cout << QString("USAcquisitionVideoPlayback::loadFullData(%1) clear").arg(filename) << std::endl;
 
 	// if no new data, return
 	if (filename.isEmpty())
@@ -160,11 +162,9 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 
 	mVideoSource->start();
 
-//	std::cout << QString("USAcquisitionVideoPlayback::loadFullData(%1) load").arg(filename) << std::endl;
 	// load new data
 	UsReconstructionFileReader reader;
 	mCurrentData = reader.readAllFiles(filename);
-	mCurrentFilename = filename;
 
 	// set the probe sector from file data:
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
@@ -174,20 +174,21 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 		if (probe)
 		{
 			probe->setProbeSector(mCurrentData.mProbeData.mData);
+
 		}
 	}
 
 	// create a vector to allow for quick search
+	mCurrentTimestamps.clear();
 	for (unsigned i=0; i<mCurrentData.mFrames.size(); ++i)
 	{
 		mCurrentTimestamps.push_back(mCurrentData.mFrames[i].mTime);
 	}
-
 }
 
 void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 {
-	if (mCurrentFilename.isEmpty() || !mCurrentData.mUsRaw || filename!=mCurrentFilename)
+	if (mCurrentData.mFilename.isEmpty() || !mCurrentData.mUsRaw || filename!=mCurrentData.mFilename)
 	{
 		mVideoSource->setInfoString(QString(""));
 		mVideoSource->setStatusString(QString("No US Acquisition"));
@@ -199,8 +200,6 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	mVideoSource->start();
 
 	double timestamp = mTimer->getTime().toMSecsSinceEpoch();
-//	std::cout << "timestamp " << "\t" << timestamp-mTimer->getStartTime().toMSecsSinceEpoch() << std::endl;
-//	std::cout << "ts count: " << mCurrentTimestamps.size() << std::endl;
 
 	// find index of current frame: Use the last frame _before_ the current timestamp.
 	std::vector<double>::iterator iter = std::lower_bound(mCurrentTimestamps.begin(), mCurrentTimestamps.end(), timestamp);
@@ -209,23 +208,28 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	--iter; // use the frame before, not after.
 	int index = std::distance(mCurrentTimestamps.begin(), iter);
 
-//	int timeout = 1000; // invalidate data if timestamp differ from time too much
-//	mVideoSource->setValidData(fabs(timestamp-*iter)<timeout);
-
-//	std::cout << "USAcquisitionVideoPlayback::updateFrame() " << index << std::endl;
+	int timeout = 1000; // invalidate data if timestamp differ from time too much
+	mVideoSource->setValidData(fabs(timestamp-*iter)<timeout);
 
 	int* dim = mCurrentData.mUsRaw->getDimensions();
-//	ssc::Vector3D spacing = mCurrentData.mUsRaw->getSpacing();
+	ssc::Vector3D spacing = mCurrentData.mUsRaw->getSpacing();
+	mVideoSource->setResolution(spacing[0]);
 
 	vtkImageImportPtr import = mVideoSource->getImageImport();
+	import->SetImportVoidPointer(mCurrentData.mUsRaw->getFrame(index));
 	import->SetDataScalarTypeToUnsignedChar();
 	import->SetNumberOfScalarComponents(1);
 	import->SetWholeExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, 0);
 	import->SetDataExtentToWholeExtent();
-	import->SetImportVoidPointer(mCurrentData.mUsRaw->getFrame(index));
+	import->Modified();
+	import->GetOutput()->Update();
 
 	mVideoSource->setInfoString(QString("%1 - Frame %2").arg(mCurrentData.mUsRaw->getName()).arg(index));
-	mVideoSource->setStatusString(QString(""));
+	if (mVideoSource->validData())
+		mVideoSource->setStatusString(QString(""));
+	else
+		mVideoSource->setStatusString(QString("Timeout"));
+
 	mVideoSource->refresh(timestamp);
 }
 
