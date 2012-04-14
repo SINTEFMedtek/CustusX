@@ -91,6 +91,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
+    ${CustusX3_SOURCE_DIR}/source/service/video
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
