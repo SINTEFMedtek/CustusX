@@ -34,6 +34,7 @@
 #include "cxViewManager.h"
 #include "cxToolManager.h"
 #include "cxViewGroup.h"
+#include "cxVideoService.h"
 
 #include "sscData.h"
 #include "sscMesh.h"
@@ -54,9 +55,9 @@ ViewWrapperVideo::ViewWrapperVideo(ssc::View* view)
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 
-	connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(configureSlot()));
+//	connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(configureSlot()));
 	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(configureSlot()));
-
+	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(configureSlot()));
 	mDominantToolProxy = DominantToolProxy::New();
 	//This connect stops video streaming?
 	connect(mDominantToolProxy.get(), SIGNAL(probeChanged()), this, SLOT(configureSlot()));
@@ -101,20 +102,26 @@ void ViewWrapperVideo::showSectorActionSlot(bool checked)
 void ViewWrapperVideo::configureSlot()
 {
 //  std::cout << "ViewWrapperVideo::configureSlot()" << std::endl;
-	// if datamanager stream: connect it to rep
-	if (!ssc::dataManager()->getStreams().empty() && !mTool)
-	{
-		this->setupRep(ssc::dataManager()->getStreams().begin()->second, ssc::ToolPtr());
-	}
+
+//	// if datamanager stream: connect it to rep
+//	if (!ssc::dataManager()->getStreams().empty() && !mTool)
+//	{
+//		this->setupRep(ssc::dataManager()->getStreams().begin()->second, ssc::ToolPtr());
+//	}
 
 	// if probe tool exist, connect to probeChanged()
 	if (mTool)
 		disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-	mTool = this->getProbe();
+	mTool = ToolManager::getInstance()->findFirstProbe();
+//	if (mTool)
+//		std::cout << "Found probe for video view: " << mTool->getName() << std::endl;
 	if (mTool)
 		connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
 
 	this->probeChangedSlot();
+
+	if (videoService()->getActiveVideoSource() && !mTool)
+			this->setupRep(videoService()->getActiveVideoSource(), ssc::ToolPtr());
 }
 
 void ViewWrapperVideo::probeChangedSlot()
@@ -129,6 +136,7 @@ void ViewWrapperVideo::probeChangedSlot()
 
 void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 {
+//	std::cout << "ViewWrapperVideo::setupRep source=" << source.get()<< std::endl;
 	//Don't do anything if source is the same
 	if (mSource == source)
 		return;
@@ -161,21 +169,6 @@ void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 					"Setup rt rep with source="
 					+ source->getName() + " and tool="
 					+ (tool ? tool->getName() : "none"));
-}
-
-ssc::ToolPtr ViewWrapperVideo::getProbe()
-{
-//	std::cout << "ViewWrapperVideo::getProbe()" << std::endl;
-	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-
-	for (ssc::ToolManager::ToolMap::iterator iter = tools->begin(); iter != tools->end(); ++iter)
-	{
-		if (!iter->second->getProbe() || !iter->second->getProbe()->isValid())
-			continue;
-		return iter->second;
-	}
-
-	return ssc::ToolPtr();
 }
 
 void ViewWrapperVideo::updateSlot()
