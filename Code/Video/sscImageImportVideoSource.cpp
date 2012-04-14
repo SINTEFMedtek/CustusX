@@ -73,7 +73,6 @@ void ImageImportVideoSource::stop()
 		return;
 
 	mStreaming = false;
-	std::cout << "ImageImportVideoSource::stop " << this << std::endl;
 
 	this->setEmptyImage();
 	emit newFrame();
@@ -99,7 +98,6 @@ vtkImageImportPtr ImageImportVideoSource::getImageImport()
  */
 void ImageImportVideoSource::refresh(double time)
 {
-	std::cout << "ImageImportVideoSource::refresh (" << mStreaming << ") " << this << std::endl;
 	if (!mStreaming)
 		return;
 	mTimestamp = time;
@@ -114,13 +112,13 @@ void ImageImportVideoSource::refresh(double time)
 void ImageImportVideoSource::setEmptyImage()
 {
 	mImageImport->SetWholeExtent(0, 1, 0, 1, 0, 0);
-	mImageImport->SetDataExtent(0, 1, 0, 1, 0, 0);
+	mImageImport->SetDataExtentToWholeExtent();
 	mImageImport->SetDataScalarTypeToUnsignedChar();
+	mImageImport->SetNumberOfScalarComponents(1);
 	std::fill(mZero.begin(), mZero.end(), 0);
 	mImageImport->SetImportVoidPointer(mZero.begin());
 	mImageImport->Modified();
 }
-
 
 
 } /* namespace ssc */
