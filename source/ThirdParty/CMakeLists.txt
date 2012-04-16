@@ -2,8 +2,8 @@
 ##               ThirdParty
 ###########################################################
 
-if(BUILD_GRABBER_SERVER)
-  if(WIN32)
+if(BUILD_OPEN_IGTLINK_SERVER)
+  if(CX_WIN32)
     add_subdirectory(ultrasonix)
-  endif(WIN32)
-endif(BUILD_GRABBER_SERVER)
+  endif(CX_WIN32)
+endif(BUILD_OPEN_IGTLINK_SERVER)
