@@ -62,8 +62,14 @@ QStringList ToolManager::getSupportedTrackingSystems()
 }
 
 ToolManager::ToolManager() :
-				mConfigurationFilePath(""), mLoggingFolder(""), mConfigured(false), mInitialized(false), mTracking(
-								false), mLastLoadPositionHistory(0), mToolTipOffset(0), mPlayBackMode(false)
+				mConfigurationFilePath(""),
+				mLoggingFolder(""),
+				mConfigured(false),
+				mInitialized(false),
+				mTracking(false),
+				mPlayBackMode(false),
+				mLastLoadPositionHistory(0),
+				mToolTipOffset(0)
 {
 	m_rMpr_History.reset(new ssc::RegistrationHistory());
 	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
