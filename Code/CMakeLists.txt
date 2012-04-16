@@ -386,6 +386,15 @@ find_package(VTK REQUIRED)
 
 include(${VTK_USE_FILE})
 	
+find_package(GLUT)
+find_package(OpenGL)
+    SET( SSC_LIBRARIES 
+        ${SSC_LIBRARIES}
+        ${OPENGL_LIBRARIES}
+        ${GLUT_LIBRARIES}
+        )
+
+	
 if (USE_GLX_SHARED_CONTEXT)
 #    SET( SSC_INCLUDE_DIRS
 #        ${SSC_INCLUDE_DIRS}
