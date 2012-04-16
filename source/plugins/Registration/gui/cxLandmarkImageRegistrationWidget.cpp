@@ -165,7 +165,7 @@ void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
 void LandmarkImageRegistrationWidget::enableButtons()
 {
 	bool selected = !mLandmarkTableWidget->selectedItems().isEmpty();
-	bool tracking = ssc::toolManager()->getDominantTool() && !ssc::toolManager()->getDominantTool()->isManual()
+	bool tracking = ssc::toolManager()->getDominantTool() && !ssc::toolManager()->getDominantTool()->hasType(ssc::Tool::TOOL_MANUAL)
 		&& ssc::toolManager()->getDominantTool()->getVisible();
 	bool loaded = ssc::dataManager()->getActiveImage() != 0;
 

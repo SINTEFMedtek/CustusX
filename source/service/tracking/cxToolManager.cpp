@@ -343,7 +343,7 @@ void ToolManager::trackerConfiguredSlot(bool on)
 		{
 			if (iter->second == mManualTool)
 				continue;
-			if (iter->second->isReference())
+			if (iter->second->hasType(Tool::TOOL_REFERENCE))
 				continue;
 			mManualTool->setBase(iter->second);
 			ssc::messageManager()->sendInfo("Manual tool imbued with properties from " + iter->first);
@@ -667,7 +667,7 @@ void ToolManager::setDominantTool(const QString& uid)
 	if (mDominantTool)
 	{
 		// make manual tool invisible when other tools are active.
-		if (mDominantTool->isManual())
+		if (mDominantTool->hasType(Tool::TOOL_MANUAL))
 		{
 			mManualTool->setVisible(false);
 		}
@@ -677,7 +677,7 @@ void ToolManager::setDominantTool(const QString& uid)
 	newTool = this->getTool(uid);
 
 	// special case for manual tool
-	if (newTool && newTool->isManual() && mManualTool)
+	if (newTool && newTool->hasType(Tool::TOOL_MANUAL) && mManualTool)
 	{
 		if (mDominantTool)
 		{
@@ -694,7 +694,7 @@ void ToolManager::setDominantTool(const QString& uid)
 	mDominantTool = newTool;
 	connect(mDominantTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
 
-	if (mDominantTool->isManual())
+	if (mDominantTool->hasType(Tool::TOOL_MANUAL))
 		emit tps(0);
 
 //	ssc::messageManager()->sendInfo("Change active tool to: " + mDominantTool->getName());
@@ -930,7 +930,7 @@ void ToolManager::dominantCheckSlot()
 		double bestTime = 0;
 		for (ToolMap::iterator it = mTools.begin(); it != mTools.end(); ++it)
 		{
-			if (it->second->isManual())
+			if (it->second->hasType(Tool::TOOL_MANUAL))
 				continue;
 			bestTime = std::max(bestTime, it->second->getTimestamp());
 		}
@@ -953,7 +953,7 @@ void ToolManager::dominantCheckSlot()
 		//TODO need to check if init???
 		if (it->second->getVisible())
 			visibleTools.push_back(it->second);
-		else if (it->second->isManual())
+		else if (it->second->hasType(Tool::TOOL_MANUAL))
 			visibleTools.push_back(it->second);
 	}
 
@@ -978,14 +978,14 @@ namespace
  */
 int getPriority(ssc::ToolPtr tool)
 {
-	if (tool->isManual()) // place this first, in case a tool has several attributes.
+	if (tool->hasType(Tool::TOOL_MANUAL)) // place this first, in case a tool has several attributes.
 		return 2;
 
-	if (tool->isProbe())
+	if (tool->hasType(Tool::TOOL_US_PROBE))
 		return 4;
-	if (tool->isPointer())
+	if (tool->hasType(Tool::TOOL_POINTER))
 		return 3;
-	if (tool->isReference())
+	if (tool->hasType(Tool::TOOL_REFERENCE))
 		return 1;
 	return 0;
 }

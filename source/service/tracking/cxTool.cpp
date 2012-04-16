@@ -72,22 +72,18 @@ Tool::~Tool()
 {
 }
 
-//ssc::Tool::Type Tool::getType() const
-//{
-//  return mTool->getInternalStructure().mType;
-//}
+std::set<Tool::Type> Tool::getTypes() const
+{
+	std::set<Type> retval;
 
-bool Tool::isReference() const
-{
-	return mTool->getInternalStructure().mIsReference;
-}
-bool Tool::isPointer() const
-{
-	return mTool->getInternalStructure().mIsPointer;
-}
-bool Tool::isProbe() const
-{
-	return mTool->getInternalStructure().mIsProbe;
+	if (mTool->getInternalStructure().mIsReference)
+		retval.insert(Tool::TOOL_REFERENCE);
+	if (mTool->getInternalStructure().mIsPointer)
+		retval.insert(Tool::TOOL_POINTER);
+	if (mTool->getInternalStructure().mIsProbe)
+		retval.insert(Tool::TOOL_US_PROBE);
+
+	return retval;
 }
 
 QString Tool::getGraphicsFileName() const
