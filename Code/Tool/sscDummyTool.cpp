@@ -26,7 +26,6 @@ DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 {
 	mUid = uid;
 	mName = uid;
-	mType = TOOL_NONE;
 
 	DoubleBoundingBox3D bb(Vector3D(0,0,0), Vector3D(512,512,256));
 	setToolPositionMovementBB(bb);
@@ -41,6 +40,11 @@ DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 
 DummyTool::~DummyTool()
 {
+}
+
+std::set<Tool::Type> DummyTool::getTypes() const
+{
+	return mTypes;
 }
 
 void DummyTool::setToolPositionMovementBB(const DoubleBoundingBox3D& bb)
@@ -62,17 +66,11 @@ void DummyTool::setToolPositionMovement(const std::vector<Transform3D>& position
 	mTransforms = positions;
 }
 
-#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
-Tool::Type DummyTool::getType() const
-{
-	return mType;
-}
-
 void DummyTool::setType(Tool::Type type)
 {
-	mType = type;
+	mTypes.clear();
+	mTypes.insert(type);
 }
-#endif
 
 QString DummyTool::getGraphicsFileName() const
 {

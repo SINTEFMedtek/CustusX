@@ -47,10 +47,7 @@ public:
 
 	explicit ManualTool(ToolManager* manager, const QString& uid, const QString& name ="");
 	virtual ~ManualTool();
-#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
-	virtual Type getType() const;
-#endif
-	virtual bool isManual() const { return true; }
+	virtual std::set<Type> getTypes() const;
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void saveTransformsAndTimestamps(){}
@@ -74,10 +71,6 @@ public:
 
 	// extensions:
 	void setVisible(bool vis);
-#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
-	void setType(const Type& type);
-	void setProbeSector(ssc::ProbeData sector); // for testing
-#endif
 
 private slots:
 	void read3DCrossHairSlot(double toolTipOffset);
@@ -88,9 +81,6 @@ private:
 	vtkCursor3DPtr mCrossHair;
 
 	// mutex-protected mutable data
-#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
-	Type mType;
-#endif
 	bool mVisible;
 	Transform3D m_prMt;
 	mutable QMutex mMutex;
