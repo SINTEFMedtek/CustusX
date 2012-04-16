@@ -61,7 +61,6 @@ private:
 	void loadStream();
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();
-	ssc::ToolPtr getProbe();
 	void setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool);
 
 	ssc::VideoFixedPlaneRepPtr mStreamRep;

@@ -16,6 +16,8 @@
 #include <iostream>
 #include "sscTime.h"
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
+#include "sscVector3D.h"
 
 namespace cx
 {
@@ -38,8 +40,9 @@ void PlaybackTime::initialize(QDateTime start, int length)
 	mStartTime = start;
 	mLength = length;
 
-	std::cout << "starttime " << mStartTime.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-	std::cout << "endtime " << mStartTime.addMSecs(mLength).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+	ssc::messageManager()->sendInfo(QString("Initialized PlaybackTime with start time [%1] and end time [%2]")
+					.arg(mStartTime.toString(ssc::timestampMilliSecondsFormatNice()))
+					.arg(mStartTime.addMSecs(mLength).toString(ssc::timestampMilliSecondsFormatNice())));
 }
 
 PlaybackTime::~PlaybackTime()
@@ -207,6 +210,37 @@ double PlaybackTime::getResolution(int val)
 	return mTimer->interval();
 }
 
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+/** Return whether time is inside event.
+ *  The minimum length of the event if set to tol_ms.
+ */
+bool TimelineEvent::isInside(double time, double tol_ms) const
+{
+	double w = mEndTime - mStartTime;
+	double m = mStartTime + w/2;
+	return fabs(time - m) < std::max(w, tol_ms)/2;
+}
+bool TimelineEvent::isSingular() const { return ssc::similar(mEndTime,mStartTime); }
+bool TimelineEvent::isOverlap(const TimelineEvent& rhs) const
+{
+	double w0 = mEndTime - mStartTime;
+	double m0 = mStartTime + w0/2;
+	double w1 = rhs.mEndTime - rhs.mStartTime;
+	double m1 = rhs.mStartTime + w1/2;
+	return fabs(m1-m0) < (w1+w0)/2;
+}
+bool TimelineEvent::operator<(const TimelineEvent& rhs) const
+{
+	return mStartTime < rhs.mStartTime;
+}
 
 
 } /* namespace cx */

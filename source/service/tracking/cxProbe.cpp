@@ -169,6 +169,7 @@ void Probe::setConfigId(QString uid)
 void Probe::setProbeSector(ssc::ProbeData probeSector)
 {
 	mData = probeSector;
+	mConfigurationId = "";
 	emit sectorChanged();
 	emit probeChanged();
 }

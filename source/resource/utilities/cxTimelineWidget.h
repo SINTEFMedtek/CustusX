@@ -22,6 +22,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscVector3D.h"
 
+
 namespace cx
 {
 
@@ -40,27 +41,6 @@ class TimelineWidget : public QWidget
 Q_OBJECT
 
 public:
-	class TimelineEvent
-	{
-	public:
-		TimelineEvent() : mStartTime(0), mEndTime(0) {}
-		TimelineEvent(QString description, double start, double end) : mDescription(description), mStartTime(start), mEndTime(end) {}
-		TimelineEvent(QString description, double time) : mDescription(description), mStartTime(time), mEndTime(time) {}
-		QString mDescription;
-		double mStartTime;
-		double mEndTime;
-		/** Return whether time is inside event.
-		 *  The minimum length of the event if set to tol_ms.
-		 */
-		bool isInside(double time, double tol_ms=0) const
-		{
-			double w = mEndTime - mStartTime;
-			double m = mStartTime + w/2;
-			return fabs(time - m) < std::max(w, tol_ms)/2;
-		}
-		bool isSingular() const { return ssc::similar(mEndTime,mStartTime); }
-	};
-
 	TimelineWidget(QWidget* parent);
 	virtual ~TimelineWidget();
 
@@ -92,17 +72,23 @@ private:
 	bool showHelp(QPoint pos);
 
 	void setPositionFromScreenPos(int x, int y);
+	void createCompactingTransforms();
 
 //	std::vector<std::pair<double, double> > mValidRegions;
 	std::vector<TimelineEvent> mEvents;
-	double mStart, mStop, mPos;
 	int mBorder;
+	double mStart, mStop, mPos;
 	QRect mFullArea; ///< The full widget area
 	QRect mPlotArea; ///< The plot area
 	bool mCloseToGlyph; ///< temporary that is true when mouse cursor is close to glyph and should be highlighted.
 	int mTolerance_p; ///< tolerance in pix, used to pick/show short events.
-	std::vector<QString> mContinousEvents; //< list of all continous events, used for stacked display
+	QStringList mContinousEvents; //< list of all continous events, used for stacked display
+	std::vector<TimelineEvent> mNoncompactedIntervals; ///< listing the intervals that are unchanged by the compacting transform.
 	std::vector<QColor> mEventColors; ///< use to color continous events
+
+	vtkPiecewiseFunctionPtr mBackward;
+	vtkPiecewiseFunctionPtr mForward;
+
 };
 
 } /* namespace cx */
