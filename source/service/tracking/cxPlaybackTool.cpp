@@ -15,6 +15,7 @@
 #include "cxPlaybackTool.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -72,6 +73,8 @@ void PlaybackTool::timeChangedSlot()
 		mTimestamp = lastSample->first;
 		emit toolTransformAndTimestamp(m_rMpr, mTimestamp);
 	}
+
+	ToolManager::getInstance()->dominantCheckSlot();
 }
 
 QString PlaybackTool::getGraphicsFileName() const
