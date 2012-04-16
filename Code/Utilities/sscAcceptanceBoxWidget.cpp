@@ -30,23 +30,15 @@ AcceptanceBoxWidget::AcceptanceBoxWidget(QString text, QWidget* parent) : QFrame
 	connect(mAcceptButton, SIGNAL( clicked()), this, SLOT(accept()) );
 	connect(mRejectButton, SIGNAL( clicked()), this, SLOT(reject()) );
 	mAcceptButton->setFocus();
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-	//mAcceptButton->setShortcut(Qt::Key_Enter);
-=======
->>>>>>> Stashed changes
 
 #ifdef SSC_AUTOMATIC_TEST_ACCEPT
 	mAutoTest = true;
 #else
 	mAutoTest = false;
 #endif
-<<<<<<< Updated upstream
-=======
 
 #ifndef WIN32
->>>>>>> Stashed changes
+
 	const char *autoEnv = getenv("SSC_TESTMODE");
 	if (autoEnv && strcasecmp("MANUAL", autoEnv) == 0)
 	{
@@ -56,11 +48,8 @@ AcceptanceBoxWidget::AcceptanceBoxWidget(QString text, QWidget* parent) : QFrame
 	{
 		mAutoTest = true;
 	}
-<<<<<<< Updated upstream
-=======
+
 #endif
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 }
 
 void AcceptanceBoxWidget::hideAcceptButtons()
