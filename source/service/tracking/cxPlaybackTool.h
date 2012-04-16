@@ -37,9 +37,7 @@ Q_OBJECT
 public:
 	explicit PlaybackTool(ssc::ToolPtr base, PlaybackTimePtr time);
 	virtual ~PlaybackTool();
-#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
-	virtual Type getType() const;
-#endif
+	virtual std::set<Type> getTypes() const;
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void saveTransformsAndTimestamps() {}
@@ -58,22 +56,15 @@ public:
 	virtual ssc::Transform3D getCalibration_sMt() const;
 	virtual std::map<int, ssc::Vector3D> getReferencePoints() const;
 
-	ssc::ToolPtr getBase() { return mBase; }
 
-#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
-#else
-	virtual bool isManual() const { return mBase->isManual(); }
-	virtual bool isReference() const { return mBase->isReference(); }
-	virtual bool isPointer() const { return mBase->isPointer(); }
-	virtual bool isProbe() const { return mBase->isProbe(); }
-	virtual bool isMicroscope() const { return mBase->isMicroscope(); }
-#endif
 	virtual ssc::TimedTransformMapPtr getPositionHistory() { return mBase->getPositionHistory(); }
 	virtual bool isInitialized() const	{ return mBase->isInitialized(); }
 	virtual ssc::ProbePtr getProbe() const { return mBase->getProbe(); }
 	virtual bool hasReferencePointWithId(int id) { return mBase->hasReferencePointWithId(id); }
 	virtual ssc::TimedTransformMap getSessionHistory(double startTime, double stopTime) { return mBase->getSessionHistory(startTime, stopTime); }
 
+	// extensions
+	ssc::ToolPtr getBase() { return mBase; }
 
 private slots:
 	void timeChangedSlot();

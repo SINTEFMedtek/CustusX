@@ -15,6 +15,7 @@
 #include "cxPlaybackTool.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -47,7 +48,6 @@ void PlaybackTool::timeChangedSlot()
 
 	// find last stored time before current time.
 	ssc::TimedTransformMap::iterator lastSample = positions->lower_bound(time_ms);
-//	ssc::TimedTransformMap::iterator lastSample = positions->upper_bound(time_ms);
 	if (lastSample!=positions->begin())
 		--lastSample;
 
@@ -55,23 +55,25 @@ void PlaybackTool::timeChangedSlot()
 	qint64 timeout = 200;
 	bool visible = (lastSample!=positions->end()) && (fabs(time_ms - lastSample->first) < timeout);
 
-//	std::cout << "     last=" << qint64(lastSample->first)-mTime->getStartTime().toMSecsSinceEpoch() << ", time=" << time_ms-mTime->getStartTime().toMSecsSinceEpoch() << ", diff="<< time_ms - lastSample->first << std::endl;
 	// change visibility if applicable
 	if (mVisible!=visible)
 	{
 		mVisible = visible;
-//		std::cout << "== change tool visibility " << mVisible << std::endl;
 		emit toolVisible(mVisible);
 	}
 
 	// emit new position if visible
 	if (this->getVisible())
 	{
-//		std::cout << "PlaybackTool::timeChangedSlot " << this->getUid() << mTime->getTime().toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 		m_rMpr = lastSample->second;
 		mTimestamp = lastSample->first;
 		emit toolTransformAndTimestamp(m_rMpr, mTimestamp);
 	}
+
+	// Overwrite manual tool pos, set timestamp to 1ms previous.
+	// This makes sure manual tool is not picked as dominant.
+	ToolManager::getInstance()->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
+	ToolManager::getInstance()->dominantCheckSlot();
 }
 
 QString PlaybackTool::getGraphicsFileName() const
@@ -79,12 +81,10 @@ QString PlaybackTool::getGraphicsFileName() const
 	return mBase->getGraphicsFileName();
 }
 
-#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
-ssc::Tool::Type PlaybackTool::getType() const
+std::set<Tool::Type> PlaybackTool::getTypes() const
 {
-	return mBase->getType();
+	return mBase->getTypes();
 }
-#endif
 
 vtkPolyDataPtr PlaybackTool::getGraphicsPolyData() const
 {
@@ -101,11 +101,6 @@ bool PlaybackTool::getVisible() const
 	return mVisible;
 }
 
-//int PlaybackTool::getIndex() const
-//{
-//	return mBase->getIndex();
-//}
-
 QString PlaybackTool::getUid() const
 {
 	return mUid;
@@ -115,20 +110,6 @@ QString PlaybackTool::getName() const
 {
 	return mName;
 }
-
-//void PlaybackTool::setVisible(bool vis)
-//{
-//	mBase->setVisible(vis);
-//}
-
-
-//#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
-//void PlaybackTool::setType(const Type& type)
-//{
-//	QMutexLocker locker(&mMutex);
-//	mType = type;
-//}
-//#endif
 
 bool PlaybackTool::isCalibrated() const
 {

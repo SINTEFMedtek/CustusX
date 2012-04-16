@@ -45,12 +45,7 @@ public:
 	explicit ManualToolAdapter(ssc::ToolManager* manager, ssc::ToolPtr base);
 	virtual ~ManualToolAdapter();
 
-	virtual bool isManual()     const { return true; }
-	virtual bool isReference()  const { return mBase->isReference(); }
-	virtual bool isPointer()    const { return mBase->isPointer(); }
-	virtual bool isProbe()      const { return mBase->isProbe(); }
-	virtual bool isMicroscope() const { return mBase->isMicroscope(); }
-
+	virtual std::set<Type> getTypes() const { return mBase->getTypes(); }
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual bool isCalibrated() const;

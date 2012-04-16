@@ -7,6 +7,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxVideoConnection.h
     cxOpenIGTLinkClient.h
     cxOpenIGTLinkRTSource.h
+    cxPlaybackUSAcquisitionVideo.h
 )
 
 SET (cxVideoService_SOURCE
@@ -18,6 +19,8 @@ SET (cxVideoService_SOURCE
     cxOpenIGTLinkClient.cpp
     cxOpenIGTLinkRTSource.h
     cxOpenIGTLinkRTSource.cpp
+    cxPlaybackUSAcquisitionVideo.h
+    cxPlaybackUSAcquisitionVideo.cpp
     ../../../modules/grabberCommon/cxIGTLinkSonixStatusMessage.h
     ../../../modules/grabberCommon/cxIGTLinkSonixStatusMessage.cpp
     ../../../modules/grabberCommon/igtl_sonix_status.h

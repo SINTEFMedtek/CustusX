@@ -62,8 +62,14 @@ QStringList ToolManager::getSupportedTrackingSystems()
 }
 
 ToolManager::ToolManager() :
-				mConfigurationFilePath(""), mLoggingFolder(""), mConfigured(false), mInitialized(false), mTracking(
-								false), mLastLoadPositionHistory(0), mToolTipOffset(0), mPlayBackMode(false)
+				mConfigurationFilePath(""),
+				mLoggingFolder(""),
+				mConfigured(false),
+				mInitialized(false),
+				mTracking(false),
+				mPlayBackMode(false),
+				mLastLoadPositionHistory(0),
+				mToolTipOffset(0)
 {
 	m_rMpr_History.reset(new ssc::RegistrationHistory());
 	connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
@@ -99,53 +105,59 @@ ToolManager::~ToolManager()
  */
 void ToolManager::setPlaybackMode(PlaybackTimePtr controller)
 {
+	if (!controller)
+	{
+		this->closePlayBackMode();
+		return;
+	}
+
 	if (!this->isConfigured())
 	{
 		ssc::messageManager()->sendWarning("ToolManager must be configured before setting playback");
 		return;
 	}
 
-	QDateTime now = QDateTime::currentDateTime();
-	ssc::ToolPtr test = mTools["Ultrasonix_L14-5"];
-	if (test)
-	{
-		ssc::TimedTransformMapPtr history = test->getPositionHistory();
-		QDateTime start = now.addSecs(-60*60); // 1h back
-		std::cout << "adding test data to probe " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-
-		for (int i=0; i<3000; ++i)
-		{
-			start = start.addMSecs(20);
-			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
-			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
-		}
-
-		start = start.addSecs(1*60); // 10 minutes back
-
-		for (int i=0; i<2000; ++i)
-		{
-			start = start.addMSecs(20);
-			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(100, i*0.1,0));
-			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
-		}
-
-	}
-
-	ssc::ToolPtr test2 = mTools["01-117-0329_Planning-Navigator"];
-	if (test2)
-	{
-		ssc::TimedTransformMapPtr history = test2->getPositionHistory();
-		QDateTime start = now.addSecs(-60*60); // 1h back
-		std::cout << "adding test data to pointer " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-		start = start.addSecs(5);
-
-		for (int i=0; i<2000; ++i)
-		{
-			start = start.addMSecs(20);
-			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
-			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
-		}
-	}
+//	QDateTime now = QDateTime::currentDateTime();
+//	ssc::ToolPtr test = mTools["Ultrasonix_L14-5"];
+//	if (test)
+//	{
+//		ssc::TimedTransformMapPtr history = test->getPositionHistory();
+//		QDateTime start = now.addSecs(-60*60); // 1h back
+//		std::cout << "adding test data to probe " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//
+//		for (int i=0; i<3000; ++i)
+//		{
+//			start = start.addMSecs(20);
+//			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
+//			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
+//		}
+//
+//		start = start.addSecs(1*60); // 10 minutes back
+//
+//		for (int i=0; i<2000; ++i)
+//		{
+//			start = start.addMSecs(20);
+//			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(100, i*0.1,0));
+//			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
+//		}
+//
+//	}
+//
+//	ssc::ToolPtr test2 = mTools["01-117-0329_Planning-Navigator"];
+//	if (test2)
+//	{
+//		ssc::TimedTransformMapPtr history = test2->getPositionHistory();
+//		QDateTime start = now.addSecs(-60*60); // 1h back
+//		std::cout << "adding test data to pointer " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//		start = start.addSecs(5);
+//
+//		for (int i=0; i<2000; ++i)
+//		{
+//			start = start.addMSecs(20);
+//			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
+//			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
+//		}
+//	}
 
 	ssc::ToolManager::ToolMap original = mTools; ///< all tools
 	mTools.clear();
@@ -331,7 +343,7 @@ void ToolManager::trackerConfiguredSlot(bool on)
 		{
 			if (iter->second == mManualTool)
 				continue;
-			if (iter->second->isReference())
+			if (iter->second->hasType(Tool::TOOL_REFERENCE))
 				continue;
 			mManualTool->setBase(iter->second);
 			ssc::messageManager()->sendInfo("Manual tool imbued with properties from " + iter->first);
@@ -343,6 +355,9 @@ void ToolManager::trackerConfiguredSlot(bool on)
 	this->setDominantTool(this->getManualTool()->getUid());
 
 	mConfigured = true;
+
+	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
+
 	ssc::messageManager()->sendSuccess("ToolManager is configured.", true);
 	emit configured();
 }
@@ -652,7 +667,7 @@ void ToolManager::setDominantTool(const QString& uid)
 	if (mDominantTool)
 	{
 		// make manual tool invisible when other tools are active.
-		if (mDominantTool->isManual())
+		if (mDominantTool->hasType(Tool::TOOL_MANUAL))
 		{
 			mManualTool->setVisible(false);
 		}
@@ -662,7 +677,7 @@ void ToolManager::setDominantTool(const QString& uid)
 	newTool = this->getTool(uid);
 
 	// special case for manual tool
-	if (newTool && newTool->isManual() && mManualTool)
+	if (newTool && newTool->hasType(Tool::TOOL_MANUAL) && mManualTool)
 	{
 		if (mDominantTool)
 		{
@@ -679,7 +694,7 @@ void ToolManager::setDominantTool(const QString& uid)
 	mDominantTool = newTool;
 	connect(mDominantTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
 
-	if (mDominantTool->isManual())
+	if (mDominantTool->hasType(Tool::TOOL_MANUAL))
 		emit tps(0);
 
 //	ssc::messageManager()->sendInfo("Change active tool to: " + mDominantTool->getName());
@@ -774,6 +789,9 @@ void ToolManager::loadPositionHistory()
 	double timestamp;
 	QString toolUid;
 
+	QStringList missingTools;
+//	std::cout << "========= ToolManager::loadPositionHistory() " << filename << "-- " << reader.atEnd() << std::endl;
+
 	while (!reader.atEnd())
 	{
 		if (!reader.read(&matrix, &timestamp, &toolUid))
@@ -784,6 +802,21 @@ void ToolManager::loadPositionHistory()
 		{
 			(*current->getPositionHistory())[timestamp] = matrix;
 		}
+		else
+		{
+			missingTools << toolUid;
+		}
+	}
+
+	missingTools.removeDuplicates();
+	missingTools.removeAll("");
+
+	if (!missingTools.empty())
+	{
+		ssc::messageManager()->sendWarning(
+						QString("Loaded position history.\n"
+								"The following tools were found in the history\n"
+								"but not in the configuration:\n%1").arg(missingTools.join(", ")));
 	}
 
 	mLastLoadPositionHistory = ssc::getMilliSecondsSinceEpoch();
@@ -887,6 +920,27 @@ void ToolManager::globalConfigurationFileChangedSlot(QString key)
 
 void ToolManager::dominantCheckSlot()
 {
+	if (this->isPlaybackMode())
+	{
+		// In static playback mode, tools does not turn invisible since
+		// time dont move. Here we check whether manual tool has a newer
+		// timestamp than the playback tools. If it has, make it dominant.
+		// This enables automatic change to manual tool if the user
+		// manipulates the manual tool in some way.
+		double bestTime = 0;
+		for (ToolMap::iterator it = mTools.begin(); it != mTools.end(); ++it)
+		{
+			if (it->second->hasType(Tool::TOOL_MANUAL))
+				continue;
+			bestTime = std::max(bestTime, it->second->getTimestamp());
+		}
+		if (bestTime < this->getManualTool()->getTimestamp())
+		{
+			this->setDominantTool(this->getManualTool()->getUid());
+			return;
+		}
+	}
+
 	bool use = settings()->value("Automation/autoSelectDominantTool").toBool();
 	if (!use)
 		return;
@@ -899,7 +953,7 @@ void ToolManager::dominantCheckSlot()
 		//TODO need to check if init???
 		if (it->second->getVisible())
 			visibleTools.push_back(it->second);
-		else if (it->second->isManual())
+		else if (it->second->hasType(Tool::TOOL_MANUAL))
 			visibleTools.push_back(it->second);
 	}
 
@@ -924,14 +978,14 @@ namespace
  */
 int getPriority(ssc::ToolPtr tool)
 {
-	if (tool->isManual()) // place this first, in case a tool has several attributes.
+	if (tool->hasType(Tool::TOOL_MANUAL)) // place this first, in case a tool has several attributes.
 		return 2;
 
-	if (tool->isProbe())
+	if (tool->hasType(Tool::TOOL_US_PROBE))
 		return 4;
-	if (tool->isPointer())
+	if (tool->hasType(Tool::TOOL_POINTER))
 		return 3;
-	if (tool->isReference())
+	if (tool->hasType(Tool::TOOL_REFERENCE))
 		return 1;
 	return 0;
 }
