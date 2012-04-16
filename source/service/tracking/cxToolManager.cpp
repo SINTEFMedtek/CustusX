@@ -914,6 +914,27 @@ void ToolManager::globalConfigurationFileChangedSlot(QString key)
 
 void ToolManager::dominantCheckSlot()
 {
+	if (this->isPlaybackMode())
+	{
+		// In static playback mode, tools does not turn invisible since
+		// time dont move. Here we check whether manual tool has a newer
+		// timestamp than the playback tools. If it has, make it dominant.
+		// This enables automatic change to manual tool if the user
+		// manipulates the manual tool in some way.
+		double bestTime = 0;
+		for (ToolMap::iterator it = mTools.begin(); it != mTools.end(); ++it)
+		{
+			if (it->second->isManual())
+				continue;
+			bestTime = std::max(bestTime, it->second->getTimestamp());
+		}
+		if (bestTime < this->getManualTool()->getTimestamp())
+		{
+			this->setDominantTool(this->getManualTool()->getUid());
+			return;
+		}
+	}
+
 	bool use = settings()->value("Automation/autoSelectDominantTool").toBool();
 	if (!use)
 		return;
