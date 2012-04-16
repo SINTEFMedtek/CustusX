@@ -74,6 +74,9 @@ void PlaybackTool::timeChangedSlot()
 		emit toolTransformAndTimestamp(m_rMpr, mTimestamp);
 	}
 
+	// Overwrite manual tool pos, set timestamp to 1ms previous.
+	// This makes sure manual tool is not picked as dominant.
+	ToolManager::getInstance()->getManualTool()->set_prMt(m_rMpr, mTimestamp-1);
 	ToolManager::getInstance()->dominantCheckSlot();
 }
 
