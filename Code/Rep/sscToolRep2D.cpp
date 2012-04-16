@@ -239,7 +239,7 @@ void ToolRep2D::update()
 
 bool ToolRep2D::showProbe()
 {
-	return mSlicer->getTool() && mSlicer->getTool()->isProbe();
+	return mSlicer->getTool() && mSlicer->getTool()->hasType(Tool::TOOL_US_PROBE);
 }
 bool ToolRep2D::showOffset()
 {
