@@ -430,7 +430,7 @@ void TimelineWidget::mouseMoveEvent(QMouseEvent* event)
 		this->setPositionFromScreenPos(event->x(), event->y());
 	}
 
-	bool newCloseToGlyph = fabs(this->mapTime2PlotX(mPos) - event->x()) < 5;
+	bool newCloseToGlyph = fabs((double)(this->mapTime2PlotX(mPos) - event->x())) < 5;
 	if (mCloseToGlyph != newCloseToGlyph)
 		this->update();
 
