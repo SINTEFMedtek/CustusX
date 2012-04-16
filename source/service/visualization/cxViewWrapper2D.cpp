@@ -579,6 +579,7 @@ void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
 		else
 		{
 			mClickPos = qvp2vp(event->pos());
+			this->shiftAxisPos(ssc::Vector3D(0,0,0)); // signal the maual tool that something is happening (important for playback tool)
 		}
 	}
 }
@@ -603,6 +604,7 @@ void ViewWrapper2D::mouseMoveSlot(QMouseEvent* event)
 		}
 	}
 }
+
 
 /**Part of the mouse interactor:
  * Interpret mouse wheel as a zoom operation.
