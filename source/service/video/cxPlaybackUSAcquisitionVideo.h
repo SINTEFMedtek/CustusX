@@ -15,6 +15,8 @@
 #define CXPLAYBACKUSACQUISITIONVIDEO_H_
 
 #include <QObject>
+#include <QFuture>
+#include <QFutureWatcher>
 #include <vector>
 #include "sscVideoSource.h"
 #include "cxPlaybackTime.h"
@@ -50,6 +52,7 @@ public:
 
 private slots:
 	void timerChangedSlot();
+	void usDataLoadFinishedSlot();
 
 private:
 	void updateFrame(QString filename);
@@ -62,6 +65,10 @@ private:
 
 	ssc::USReconstructInputData mCurrentData;
 	std::vector<double> mCurrentTimestamps; // copy of time frame timestamps from mCurrentData.
+
+	UsReconstructionFileReaderPtr mUSImageDataReader;
+	QFuture<ssc::USReconstructInputData> mUSImageDataFutureResult;
+	QFutureWatcher<ssc::USReconstructInputData> mUSImageDataFutureWatcher;
 
 };
 typedef boost::shared_ptr<USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;

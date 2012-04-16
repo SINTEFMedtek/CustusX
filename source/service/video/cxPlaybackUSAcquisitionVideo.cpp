@@ -15,6 +15,8 @@
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include <QStringList>
 #include <QDir>
+#include <QtCore>
+#include <boost/bind.hpp>
 #include "vtkImageImport.h"
 #include "sscTypeConversions.h"
 #include "cxUsReconstructionFileReader.h"
@@ -31,6 +33,8 @@ USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() : QObject(NULL)
 	mVideoSource.reset(new ssc::ImageImportVideoSource("playbackVideoSource"));
 //	mVideoSource.reset(new ssc::TestVideoSource("testvideosource", "testvideosource", 800,600));
 	mVideoSource->setConnected(true);
+
+	connect(&mUSImageDataFutureWatcher, SIGNAL(finished()), this, SLOT(usDataLoadFinishedSlot()));
 
 }
 
@@ -149,22 +153,36 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 	mVideoSource->stop();
 
 	// if no data: ignore but keep the already loaded data
-//	if (filename.isEmpty())
-//		return;
+	if (filename.isEmpty())
+		return;
 
 	// clear data
-	// store old data because of a crash in render() after the second time a data set is loaded. No idea why. (20120414-CA)
 	mCurrentData = ssc::USReconstructInputData();
 
 	// if no new data, return
 	if (filename.isEmpty())
 		return;
 
-	mVideoSource->start();
-
 	// load new data
-	UsReconstructionFileReader reader;
-	mCurrentData = reader.readAllFiles(filename);
+	// start an asynchronous read of data
+	if (!mUSImageDataReader)
+	{
+//		std::cout << "firing async op" << std::endl;
+		mUSImageDataReader.reset(new UsReconstructionFileReader());
+		mUSImageDataFutureResult = QtConcurrent::run(boost::bind(&UsReconstructionFileReader::readAllFiles, mUSImageDataReader, filename, "", false));
+		mUSImageDataFutureWatcher.setFuture(mUSImageDataFutureResult);
+	}
+}
+
+void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
+{
+//	std::cout << "receiving async op" << std::endl;
+	// file read operation has completed: read and clear
+	mCurrentData = mUSImageDataFutureResult.result();
+	// clear result so we can check for it next run
+	mUSImageDataReader.reset();
+
+	mVideoSource->start();
 
 	// set the probe sector from file data:
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
@@ -172,22 +190,27 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 	{
 		ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
 		if (probe)
-		{
 			probe->setProbeSector(mCurrentData.mProbeData.mData);
-
-		}
 	}
 
 	// create a vector to allow for quick search
 	mCurrentTimestamps.clear();
 	for (unsigned i=0; i<mCurrentData.mFrames.size(); ++i)
-	{
 		mCurrentTimestamps.push_back(mCurrentData.mFrames[i].mTime);
-	}
+
+	this->updateFrame(mCurrentData.mFilename);
 }
 
 void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 {
+	if (mUSImageDataReader)
+	{
+		mVideoSource->setInfoString(QString("Loading US Data..."));
+		mVideoSource->setStatusString(QString("Loading US Data..."));
+		mVideoSource->refresh(0);
+		return;
+	}
+
 	if (mCurrentData.mFilename.isEmpty() || !mCurrentData.mUsRaw || filename!=mCurrentData.mFilename)
 	{
 		mVideoSource->setInfoString(QString(""));
