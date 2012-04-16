@@ -79,6 +79,7 @@ private:
 	virtual void setZoomFactor2D(double zoomFactor);
 	virtual double getZoomFactor2D() const;
 	void updateView();
+	void moveManualTool(QPoint point);
 
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();

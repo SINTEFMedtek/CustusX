@@ -106,7 +106,7 @@ void USAcquisition::connectToPureVideo()
 	if (mRTSource)
 		return;
 
-	this->connectVideoSource(videoService()->getVideoConnection()->getVideoSource());
+	this->connectVideoSource(videoService()->getActiveVideoSource());
 }
 
 

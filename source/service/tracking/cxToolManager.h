@@ -131,7 +131,6 @@ public:
 	void runDummyTool(ssc::DummyToolPtr tool);
 	ssc::ToolPtr findFirstProbe();
 
-	void closePlayBackMode();
 	void setPlaybackMode(PlaybackTimePtr controller);
 
 public slots:
@@ -160,6 +159,7 @@ private:
 	ToolManager(); ///< use getInstance instead
 	virtual ~ToolManager(); ///< destructor
 
+	void closePlayBackMode();
 	void initializeManualTool();
 	void setConfigurationFile(QString configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
 
