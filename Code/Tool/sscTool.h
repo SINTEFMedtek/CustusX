@@ -22,6 +22,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include <QObject>
@@ -29,8 +30,6 @@
 #include "sscTransform3D.h"
 #include "sscProbeData.h"
 #include "sscIndent.h"
-
-#define SSC_USE_DEPRECATED_TOOL_ENUM
 
 namespace ssc
 {
@@ -105,60 +104,40 @@ public:
 	{
 	}
 
-#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
 	/**Enumerates the general type of tool.
 	 */
 	enum Type
 	{
-		TOOL_NONE, TOOL_REFERENCE, TOOL_MANUAL, ///< representation of a mouse/keyboard-controlled virtual tool
-		TOOL_POINTER,
-		TOOL_US_PROBE,
-		TOOL_MICROSCOPE ///< a tool following the focus point of a microscope
+		TOOL_NONE,
+		TOOL_REFERENCE, ///< Reference tool.
+		TOOL_MANUAL,    ///< Representation of a mouse/keyboard-controlled virtual tool
+		TOOL_POINTER,   ///> Navigation pointer. Pointing functionality such as tool offset.
+		TOOL_US_PROBE,  ///< Ultrasond probe. The tool has a Probe subinterface with a sector and a video stream.
+		TOOL_MICROSCOPE ///< A tool following the focus point of a microscope
 	};
-	virtual Type getType() const = 0;
-
 	/**
-	 * \return true if the tool is a manual tool, i.e. is controlled by software/mouse instead of hardware
+	 * \return the type of the tool. Deprecated: Use getTypes() instead,
+	 * in order to support multiple types.
 	 */
-	virtual bool isManual() const { return getType()==TOOL_MANUAL; }
+	virtual Type getType() const
+	{
+		std::set<Type> types = this->getTypes();
+		if (types.empty())
+			return TOOL_NONE;
+		return *types.begin();
+	}
 	/**
-	 * \return true if the tool is a reference tool
+	 * \return the types of the tool.
+	 * Implement this one instead of the deprecated getType()
 	 */
-	virtual bool isReference() const { return getType()==TOOL_REFERENCE; }
+	virtual std::set<Type> getTypes() const = 0;
 	/**
-	 * \return true if the tool is a navigation pointer
+	 * \return true is the tool has properties of the input type.
 	 */
-	virtual bool isPointer() const { return getType()==TOOL_POINTER; }
-	/**
-	 * \return true if the tool is an ultrasound probe
-	 */
-	virtual bool isProbe() const { return getType()==TOOL_US_PROBE; }
-	/**
-	 * \return true if the tool is a microscope
-	 */
-	virtual bool isMicroscope() const { return getType()==TOOL_MICROSCOPE; }
-#else
-	/**
-	 * \return true if the tool is a manual tool, i.e. is controlled by software/mouse instead of hardware
-	 */
-	virtual bool isManual() const { return false; }
-	/**
-	 * \return true if the tool is a reference tool
-	 */
-	virtual bool isReference() const { return false; }
-	/**
-	 * \return true if the tool is a navigation pointer
-	 */
-	virtual bool isPointer() const { return false; }
-	/**
-	 * \return true if the tool is an ultrasound probe
-	 */
-	virtual bool isProbe() const { return false; }
-	/**
-	 * \return true if the tool is a microscope
-	 */
-	virtual bool isMicroscope() const { return false; }
-#endif
+	virtual bool hasType(Type type) const
+	{
+		return this->getTypes().count(type);
+	}
 	/**\return a file containing a graphical description of the tool,
 	 * if any. The file format is given by the file extension, for example
 	 * usprobe_12L.stl for the SolidWorks format.

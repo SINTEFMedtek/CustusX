@@ -27,10 +27,9 @@ class DummyTool : public Tool
 public:
 	explicit DummyTool(ToolManager *manager, const QString& uid="dummytool");
 	~DummyTool();
-#ifdef SSC_USE_DEPRECATED_TOOL_ENUM
-	virtual Type getType() const;
+	virtual std::set<Type> getTypes() const;
 	virtual void setType(Type);
-#endif
+
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void saveTransformsAndTimestamps();
@@ -81,7 +80,8 @@ private:
 	std::vector<Transform3D> mTransforms;
 
 	static int mTransformCount;
-	Type mType;
+//	Type mType;
+	std::set<Type> mTypes;
 	ProbeData mProbeData;
 };
 typedef boost::shared_ptr<DummyTool> DummyToolPtr;
