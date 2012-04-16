@@ -245,7 +245,10 @@ class ITK(CppComponent):
         self.update()
     def update(self):
         self._changeDirToSource()
+        runBash('git checkout master')
+        runBash('git pull')
         #runBash('git checkout v3.20.0')
+        #runBash('git checkout v4.1.0') # needed for gcc 4.6  
         runBash('git checkout v4.0rc03') # needed for gcc 4.6  
     
     def configure(self):
@@ -280,6 +283,8 @@ class VTK(CppComponent):
         self.update()
     def update(self):
         self._changeDirToSource()
+        runBash('git checkout master')
+        runBash('git pull')
         runBash('git checkout v5.8.0')   # needed for gcc 4.6
 
     def configure(self):
@@ -393,11 +398,11 @@ cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/IGSTK logout
 	self._changeDirToSource()
 	# this substitution makes IGSTK 4.4 work with ITK 4.0
 	runBash('''\
-sed -i s/'ITKIO ITKBasicFilters ITKNumerics ITKCommon ITKSpatialObject'/'${ITK_LIBRARIES}'/g Source/CMakeLists.txt
+sed -i "" s/'ITKIO ITKBasicFilters ITKNumerics ITKCommon ITKSpatialObject'/'${ITK_LIBRARIES}'/g Source/CMakeLists.txt
 ''')
 	# this substitution removes compilation of the dysfuct lib that we don't use.
 	runBash('''\
-sed -i s/'SUBDIRS( SceneGraphVisualization )'/'#SUBDIRS( SceneGraphVisualization )'/g Utilities/CMakeLists.txt
+sed -i "" s/'SUBDIRS( SceneGraphVisualization )'/'#SUBDIRS( SceneGraphVisualization )'/g Utilities/CMakeLists.txt
 ''')
     def update(self):
         pass
@@ -459,6 +464,7 @@ class DCMTK(CppComponent):
         self.update()
     def update(self):
         self._changeDirToSource()
+        runBash('git pull')
 #        runBash('git checkout master')   
 #        runBash('git checkout PUBLIC_360')  # 3.6.0 seems to have some issues on fedora 16.  
 
@@ -490,6 +496,7 @@ class SSC(CppComponent):
         runBash('git clone git@github.com:SINTEFMedisinskTeknologi/SSC.git')
     def update(self):
         self._changeDirToSource()
+        runBash('git pull')
         runBash('git checkout')   
 #        runBash('svn up')
     def configure(self):
@@ -526,6 +533,7 @@ class CustusX3(CppComponent):
         #runBash('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/CustusX3' % DATA.mServerUser)
     def update(self):
         self._changeDirToSource()
+        runBash('git checkout master')
         runBash('git pull')
         runBash('git submodule update')
     def configure(self):
