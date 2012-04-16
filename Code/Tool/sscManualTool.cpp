@@ -25,6 +25,7 @@
 #include "sscDummyTool.h"
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
+#include "sscTime.h"
 
 namespace ssc
 {
@@ -32,6 +33,7 @@ namespace ssc
 ManualTool::ManualTool(ToolManager* manager, const QString& uid, const QString& name) :
     Tool(uid,name), mMutex(QMutex::Recursive)
 {
+	mTimestamp = 0;
   m_prMt = Transform3D::Identity();
 #ifdef SSC_USE_DEPRECATED_TOOL_ENUM
 	mType = TOOL_MANUAL;
@@ -64,14 +66,15 @@ void ManualTool::read3DCrossHairSlot(double toolTipOffset)
 //copied into cx::Tool, move to ssc::Tool?
 void ManualTool::set_prMt(const Transform3D& prMt)
 {
-	QDateTime time;
-	double timestamp = (double) time.time().msec();
+//	QDateTime time;
+//	double timestamp = (double) time.time().msec();
+	mTimestamp = ssc::getMilliSecondsSinceEpoch();
 
 	QMutexLocker locker(&mMutex);
 	m_prMt = prMt;
 	locker.unlock();
 
-	emit toolTransformAndTimestamp(prMt, timestamp);
+	emit toolTransformAndTimestamp(prMt, mTimestamp);
 }
 
 QString ManualTool::getGraphicsFileName() const
@@ -156,7 +159,7 @@ void ManualTool::setProbeSector(ssc::ProbeData sector)
 
 double ManualTool::getTimestamp() const
 {
-	return 0;
+	return mTimestamp;
 }
 
 // Just use the tool tip offset from the tool manager

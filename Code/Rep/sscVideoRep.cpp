@@ -258,7 +258,6 @@ void VideoGraphics::setLookupTable()
 
 void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 {
-//	std::cout << this << " VideoGraphics::setRealtimeStream(" << data.get() << ")" << std::endl;
   //Don't do anything if data is unchanged
   if (mData == data)
     return;
@@ -272,7 +271,6 @@ void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 
   if (mData)
   {
-//	  std::cout << this << "      connect" << std::endl;
     connect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
 
     mDataRedirecter->SetInput(mData->getVtkImageData());
@@ -329,13 +327,13 @@ void VideoGraphics::checkDataIntegrity()
 
 void VideoGraphics::newDataSlot()
 {
-//  std::cout << "VideoGraphics::newDataSlot()" << std::endl;
   mPlaneActor->SetVisibility(mData!=NULL);
   if (!mData)
     return;
 
+//  mDataRedirecter->GetOutput()->UpdateInformation();
+  mDataRedirecter->UpdateWholeExtent(); // important! syncs update extent to whole extent
   mDataRedirecter->GetOutput()->Update();
-//  this->checkDataIntegrity();
 
   // apply a lut only if the input data is monochrome
   int numComp = mDataRedirecter->GetOutput()->GetNumberOfScalarComponents();
@@ -354,7 +352,6 @@ void VideoGraphics::newDataSlot()
       mDataRedirecter->GetOutput()->GetScalarRange(srange);
     }
 
-//    std::cout << "srange " << srange[0] << " " << srange[1] << std::endl;
     mTexture->GetLookupTable()->SetRange(srange[0], srange[1]);
     mTexture->MapColorScalarsThroughLookupTableOn();
   }
@@ -376,13 +373,11 @@ void VideoGraphics::newDataSlot()
   }
 
   bool visible = mData->validData();
-//  std::cout << "VideoGraphics::newDataSlot() " << this << " vis=" << visible << std::endl;
   if (mShowInToolSpace)
   {
     visible = visible && mTool && mTool->getVisible();
   }
 
-//  std::cout << "visible " << mTool->getUid() << " " << mData->validData() << " " << mTool->getVisible() << " " << visible << std::endl;
   mPlaneActor->SetVisibility(visible);
   mPlaneActor->Modified();
 
@@ -391,53 +386,6 @@ void VideoGraphics::newDataSlot()
 
 //---------------------------------------------------------
 //---------------------------------------------------------
-
-///////////////////////////////////////////////////////////
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-//
-//RealTimeStreamRep::RealTimeStreamRep(const QString& uid, const QString& name) :
-//  ssc::RepImpl(uid, name)
-//{
-//    mRTGraphics.reset(new VideoGraphics());
-//}
-//
-//RealTimeStreamRep::~RealTimeStreamRep()
-//{
-//}
-//
-//void RealTimeStreamRep::setTool(ToolPtr tool)
-//{
-//  mRTGraphics->setTool(tool);
-//}
-//
-//void RealTimeStreamRep::setRealtimeStream(VideoSourcePtr data)
-//{
-//  mRTGraphics->setRealtimeStream(data);
-//}
-//
-//void RealTimeStreamRep::addRepActorsToViewRenderer(ssc::View* view)
-//{
-//  mView = view;
-//  mRenderer = view->getRenderer();
-//
-//  view->getRenderer()->AddActor(mRTGraphics->getActor());
-//}
-//
-//void RealTimeStreamRep::removeRepActorsFromViewRenderer(ssc::View* view)
-//{
-//  mRenderer = vtkRendererPtr();
-//  view->getRenderer()->RemoveActor(mRTGraphics->getActor());
-//}
-
-
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-///////////////////////////////////////////////////////////
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -511,7 +459,6 @@ void VideoFixedPlaneRep::setTool(ToolPtr tool)
 
 void VideoFixedPlaneRep::setRealtimeStream(VideoSourcePtr data)
 {
-//	std::cout << this << " VideoFixedPlaneRep::setRealtimeStream(" << data.get() << ")" << std::endl;
   mRTGraphics->setRealtimeStream(data);
   mData = data;
 }
@@ -521,7 +468,6 @@ void VideoFixedPlaneRep::newDataSlot()
   if (!mData)
     return;
 
-//  std::cout << this << " VideoFixedPlaneRep::newDataSlot() " << mData->validData() << "\t" << mData->getInfoString() << " " << mData->getStatusString() << std::endl;
   mInfoText->updateText(mData->getInfoString());
   mStatusText->updateText(mData->getStatusString());
   mStatusText->getActor()->SetVisibility(!mData->validData());
@@ -541,12 +487,9 @@ void VideoFixedPlaneRep::setCamera()
   camera->ParallelProjectionOn();
   mRenderer->ResetCamera();
 
-//  DoubleBoundingBox3D bounds(mData->getVtkImageData()->GetBounds());
   DoubleBoundingBox3D bounds(mRTGraphics->getActor()->GetBounds());
   if (ssc::similar(bounds.range()[0], 0.0) || ssc::similar(bounds.range()[1], 0.0))
     return;
-
-//  std::cout << "-------------" << std::endl;
 
   double* vpRange = mRenderer->GetAspect();
 
