@@ -64,6 +64,7 @@ public:
 	virtual ssc::ProbeData getProbeSector() const;
 	virtual double getTimestamp() const;
 	virtual void set_prMt(const Transform3D& prMt);
+	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);

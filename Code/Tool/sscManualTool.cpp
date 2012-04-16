@@ -62,19 +62,24 @@ void ManualTool::read3DCrossHairSlot(double toolTipOffset)
 	mCrossHair->Modified();
 }
 
-//only used now by mouse or touch tool
-//copied into cx::Tool, move to ssc::Tool?
+/**Set tool position, use current time as timestamp
+ */
 void ManualTool::set_prMt(const Transform3D& prMt)
 {
-//	QDateTime time;
-//	double timestamp = (double) time.time().msec();
-	mTimestamp = ssc::getMilliSecondsSinceEpoch();
+	this->set_prMt(prMt, ssc::getMilliSecondsSinceEpoch());
+}
 
+/**Set tool position and timestamp
+ */
+void ManualTool::set_prMt(const Transform3D& prMt, double timestamp)
+{
 	QMutexLocker locker(&mMutex);
+	mTimestamp = timestamp;
 	m_prMt = prMt;
 	locker.unlock();
 
 	emit toolTransformAndTimestamp(prMt, mTimestamp);
+
 }
 
 QString ManualTool::getGraphicsFileName() const
