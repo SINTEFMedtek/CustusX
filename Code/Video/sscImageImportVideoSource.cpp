@@ -21,6 +21,7 @@
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 #include "sscImageImportVideoSource.h"
+#include "sscBoundingBox3D.h"
 
 namespace ssc
 {
@@ -98,8 +99,9 @@ vtkImageImportPtr ImageImportVideoSource::getImageImport()
  */
 void ImageImportVideoSource::refresh(double time)
 {
-	if (!mStreaming)
-		return;
+	// return here causes text fields to be not-updated
+//	if (!mStreaming)
+//		return;
 	mTimestamp = time;
 	mImageImport->Update();
 	mImageImport->Modified();
@@ -117,6 +119,10 @@ void ImageImportVideoSource::setEmptyImage()
 	mImageImport->SetNumberOfScalarComponents(1);
 	std::fill(mZero.begin(), mZero.end(), 0);
 	mImageImport->SetImportVoidPointer(mZero.begin());
+//	mImageImport->GetOutput()->ComputeBounds();
+//	mImageImport->GetOutput()->UpdateInformation();
+//	mImageImport->GetOutput()->UpdateData();
+	mImageImport->GetOutput()->Update();
 	mImageImport->Modified();
 }
 

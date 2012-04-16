@@ -93,6 +93,7 @@ private:
 	bool mVisible;
 	Transform3D m_prMt;
 	mutable QMutex mMutex;
+	double mTimestamp;
 };
 
 typedef boost::shared_ptr<ManualTool> ManualToolPtr;
