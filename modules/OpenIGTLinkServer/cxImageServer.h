@@ -9,23 +9,33 @@
 #define CXIMAGESERVER_H_
 
 #include <QTcpServer>
-
+#include <QTimer>
+#include <QPointer>
+#include "cxImageSender.h"
 
 namespace cx
 {
 
-class ImageServer : public QTcpServer
+class ImageServer: public QTcpServer
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
-  ImageServer(QObject* parent = NULL);
-  virtual ~ImageServer();
-  void startListen(int port);
+	ImageServer(QObject* parent = NULL);
+	virtual ~ImageServer();
+	void startListen(int port);
+	void printHelpText();
+	void initialize();
 protected:
-  void incomingConnection(int socketDescriptor);
+	void incomingConnection(int socketDescriptor);
 private slots:
+	void socketDisconnectedSlot();
+	void tick();
 private:
+	ImageSenderPtr mImageSender;
+
+	QPointer<QTcpSocket> mSocket;
+	QTimer* mTimer;
 };
 
 } // namespace cx
