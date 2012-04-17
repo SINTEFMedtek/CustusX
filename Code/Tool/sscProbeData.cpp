@@ -83,11 +83,12 @@ void ProbeData::setImage(ProbeImageData value)
 	}
 }
 
-void ProbeData::setSector(double depthStart, double depthEnd, double width)
+void ProbeData::setSector(double depthStart, double depthEnd, double width, double centerOffset)
 {
 	mDepthStart=depthStart;
 	mDepthEnd=depthEnd;
 	mWidth=width;
+	mCenterOffset=centerOffset;
 
 	// cliprect and sector data are connected to linear probes:
 	if (mType==tLINEAR)
