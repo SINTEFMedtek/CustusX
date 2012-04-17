@@ -73,14 +73,21 @@ QStringList ImageSenderOpenCV::getArgumentDescription()
 	return retval;
 }
 
-ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QObject* parent) :
-	QObject(parent), mSocket(socket), mArguments(arguments)
+ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
+	ImageSender(parent),
+	mSocket(NULL),
+	mSendTimer(0),
+	mGrabTimer(0)
 {
-	std::cout << "Creating sender type OpenCV" << std::endl;
+}
 
-	// if in main thread only (debug)
-	if (this->thread() == QCoreApplication::instance()->thread() && !mSocket)
-		cv::namedWindow("ImageSenderOpenCV", CV_WINDOW_KEEPRATIO); //resizable window;
+void ImageSenderOpenCV::initialize(StringMap arguments)
+{
+	mArguments = arguments;
+
+//	// if in main thread only (debug)
+//	if (this->thread() == QCoreApplication::instance()->thread() && !mSocket)
+//		cv::namedWindow("ImageSenderOpenCV", CV_WINDOW_KEEPRATIO); //resizable window;
 
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
@@ -99,7 +106,7 @@ ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QO
 		mVideoCapture.open(videoport);
 	if (!mVideoCapture.isOpened())
 	{
-		cerr << "Failed to open a video device or video file!\n" << endl;
+		cerr << "ImageSenderOpenCV: Failed to open a video device or video file!\n" << endl;
 		return;
 	}
 	else
@@ -110,8 +117,9 @@ ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QO
 		if (mArguments.count("properties"))
 			this->dumpProperties();
 
-		std::cout << "started streaming from openCV device " << videoSource.toStdString() << ", size=(" << width << ","
-			<< height << ")" << std::endl;
+		std::cout << "ImageSenderOpenCV: Started streaming from openCV device "
+			<< videoSource.toStdString()
+			<< ", size=(" << width << "," << height << ")" << std::endl;
 	}
 
 	//  mImageData = loadImage(mImageFileDir);
@@ -119,15 +127,36 @@ ImageSenderOpenCV::ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QO
 	mGrabTimer = new QTimer(this);
 	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	//  mTimer->start(40);
-	mGrabTimer->start(0);
+//	mGrabTimer->start(0);
 	//  mTimer->start(1200); // for test of the timeout feature
 	//  mTimer->start(100);
 
 
 	mSendTimer = new QTimer(this);
 	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-	mSendTimer->start(40);
+//	mSendTimer->start(40);
 
+}
+
+void ImageSenderOpenCV::startStreaming(QTcpSocket* socket)
+{
+	if (!mGrabTimer || !mSendTimer)
+	{
+		std::cout << "ImageSenderOpenCV: Failed to start streaming: Not initialized." << std::endl;
+		return;
+	}
+	mSocket = socket;
+	mGrabTimer->start(0);
+	mSendTimer->start(40);
+}
+
+void ImageSenderOpenCV::stopStreaming()
+{
+	if (!mGrabTimer || !mSendTimer)
+		return;
+	mGrabTimer->stop();
+	mSendTimer->stop();
+	mSocket = NULL;
 }
 
 void ImageSenderOpenCV::dumpProperties()

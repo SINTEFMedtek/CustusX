@@ -21,23 +21,28 @@ typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 namespace cx
 {
 
-class ImageSession : public QThread
-{
-  Q_OBJECT
+//class ImageSession : public QObject
+//{
+//  Q_OBJECT
+//
+//public:
+//  ImageSession(int socketDescriptor, ImageSenderPtr imageSender, QObject* parent = NULL);
+//  virtual ~ImageSession();
+//protected:
+//  void run();
+//private:
+//  ImageSenderPtr mImageSender;
+//  QTcpSocket* mSocket;
+//  int mSocketDescriptor;
+//	StringMap mArguments;
+//
+//private slots:
+//
+//};
+//
+//
+//typedef boost::shared_ptr<class ImageSession> ImageSessionPtr;
 
-public:
-  ImageSession(int socketDescriptor, QObject* parent = NULL);
-  virtual ~ImageSession();
-protected:
-  void run();
-private:
-  QTcpSocket* mSocket;
-  int mSocketDescriptor;
-	StringMap mArguments;
-
-private slots:
-
-};
 
 } // namespace cx
 
