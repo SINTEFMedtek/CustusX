@@ -69,42 +69,129 @@ QString EraserWidget::defaultWhatsThis() const
 		"</html>";
 }
 
-void EraserWidget::removeSlot()
+template <class TYPE>
+void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 {
-	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
-	mEraserSphere->GetPolyData(poly);
-
 	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
 	std::cout << "starting" << std::endl;
 
 	Eigen::Array3i dim(img->GetDimensions());
-	ssc::Vector3D targetSpacing(img->GetSpacing());
-	unsigned char *outputPointer = static_cast<unsigned char*> (img->GetScalarPointer());
+	ssc::Vector3D spacing(img->GetSpacing());
 
-	//	ssc::Vector3D c(200,200,200);
 	ssc::Vector3D c(mEraserSphere->GetCenter());
 	double r = mEraserSphere->GetRadius();
 
+	ssc::DoubleBoundingBox3D bb_r(c[0]-r, c[0]+r, c[1]-r, c[1]+r, c[2]-r, c[2]+r);
+
 	ssc::Transform3D dMr = image->get_rMd().inv();
-	ssc::Transform3D rawMd = ssc::createTransformScale(targetSpacing).inv();
+	ssc::Transform3D rawMd = ssc::createTransformScale(spacing).inv();
 	ssc::Transform3D rawMr = rawMd * dMr;
+	ssc::Vector3D c_d = dMr.coord(c);
+	double r_d = dMr.vector(r * ssc::Vector3D::UnitX()).length();
 	c = rawMr.coord(c);
 	r = rawMr.vector(r * ssc::Vector3D::UnitX()).length();
+	ssc::DoubleBoundingBox3D bb0_raw = ssc::transform(rawMr, bb_r);
+	ssc::IntBoundingBox3D bb1_raw(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
 
+	for (int i=0; i<3; ++i)
+	{
+		bb1_raw[2*i] = std::max<double>(bb1_raw[2*i], bb0_raw[2*i]);
+		bb1_raw[2*i+1] = std::min<double>(bb1_raw[2*i+1], bb0_raw[2*i+1]);
+	}
+
+	std::cout << "clip in raw: " << bb1_raw << std::endl;
 	//	double r=50;
 	//	ssc::Vector3D c(200,200,200);
-
-	for (int x = 0; x < dim[0]; ++x)
-		for (int y = 0; y < dim[1]; ++y)
-			for (int z = 0; z < dim[2]; ++z)
+	for (int x = bb1_raw[0]; x < bb1_raw[1]; ++x)
+		for (int y = bb1_raw[2]; y < bb1_raw[3]; ++y)
+			for (int z = bb1_raw[4]; z < bb1_raw[5]; ++z)
 			{
 				int index = x + y * dim[0] + z * dim[0] * dim[1];
+//				volumePointer[index] = replaceVal;
 
-				if ((ssc::Vector3D(x, y, z) - c).length() < r)
-					outputPointer[index] = 255;
+//				if ((ssc::Vector3D(x, y, z) - c).length() < r)
+//					volumePointer[index] = replaceVal;
+				if ((ssc::Vector3D(x*spacing[0], y*spacing[1], z*spacing[2]) - c_d).length() < r_d)
+					volumePointer[index] = replaceVal;
 			}
+
+}
+
+//#define VTK_VOID            0
+//#define VTK_BIT             1
+//#define VTK_CHAR            2
+//#define VTK_SIGNED_CHAR    15
+//#define VTK_UNSIGNED_CHAR   3
+//#define VTK_SHORT           4
+//#define VTK_UNSIGNED_SHORT  5
+//#define VTK_INT             6
+//#define VTK_UNSIGNED_INT    7
+//#define VTK_LONG            8
+//#define VTK_UNSIGNED_LONG   9
+//#define VTK_FLOAT          10
+//#define VTK_DOUBLE         11
+//#define VTK_ID_TYPE        12
+
+void EraserWidget::removeSlot()
+{
+//	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
+//	mEraserSphere->GetPolyData(poly);
+
+	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	vtkImageDataPtr img = image->getBaseVtkImageData();
+
+	if (img->GetScalarType()==VTK_CHAR)
+		this->eraseVolume(static_cast<char*> (img->GetScalarPointer()), VTK_CHAR_MIN);
+	if (img->GetScalarType()==VTK_UNSIGNED_CHAR)
+		this->eraseVolume(static_cast<unsigned char*> (img->GetScalarPointer()), VTK_UNSIGNED_CHAR_MIN);
+	if (img->GetScalarType()==VTK_UNSIGNED_SHORT)
+		this->eraseVolume(static_cast<unsigned short*> (img->GetScalarPointer()), VTK_UNSIGNED_SHORT_MAX);
+
+//	//	ssc::Vector3D c(200,200,200);
+//	ssc::Vector3D c(mEraserSphere->GetCenter());
+//	double r = mEraserSphere->GetRadius();
+//
+//	ssc::DoubleBoundingBox3D bb_r(c[0]-r, c[0]+r, c[1]-r, c[1]+r, c[2]-r, c[2]+r);
+//
+//	ssc::Transform3D dMr = image->get_rMd().inv();
+//	ssc::Transform3D rawMd = ssc::createTransformScale(targetSpacing).inv();
+//	ssc::Transform3D rawMr = rawMd * dMr;
+//	c = rawMr.coord(c);
+//	r = rawMr.vector(r * ssc::Vector3D::UnitX()).length();
+//	ssc::DoubleBoundingBox3D bb0_raw = ssc::transform(rawMr, bb_r);
+//	ssc::IntBoundingBox3D bb1_raw(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
+//
+//	for (int i=0; i<3; ++i)
+//	{
+//		bb1_raw[2*i] = std::max<double>(bb1_raw[2*i], bb0_raw[2*i]);
+//		bb1_raw[2*i+1] = std::max<double>(bb1_raw[2*i+1], bb0_raw[2*i+1]);
+//	}
+//
+//	std::cout << "clip in raw: " << bb1_raw << std::endl;
+//	//	double r=50;
+//	//	ssc::Vector3D c(200,200,200);
+//	for (int x = bb1_raw[0]; x < bb1_raw[1]; ++x)
+//		for (int y = bb1_raw[2]; y < bb1_raw[3]; ++y)
+//			for (int z = bb1_raw[4]; z < bb1_raw[5]; ++z)
+//			{
+//				int index = x + y * dim[0] + z * dim[0] * dim[1];
+//				outputPointer[index] = 255;
+//
+//				if ((ssc::Vector3D(x, y, z) - c).length() < r)
+//					outputPointer[index] = 255;
+//			}
+
+//	for (int x = 0; x < dim[0]; ++x)
+//		for (int y = 0; y < dim[1]; ++y)
+//			for (int z = 0; z < dim[2]; ++z)
+//			{
+//				int index = x + y * dim[0] + z * dim[0] * dim[1];
+//
+//				if ((ssc::Vector3D(x, y, z) - c).length() < r)
+//					outputPointer[index] = 255;
+//			}
 	image->setVtkImageData(img);
 }
 

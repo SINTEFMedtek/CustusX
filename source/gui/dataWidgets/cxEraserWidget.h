@@ -17,6 +17,7 @@
 
 #include "cxBaseWidget.h"
 
+#include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
 typedef vtkSmartPointer<class vtkSphereWidget> vtkSphereWidgetPtr;
 
@@ -49,6 +50,9 @@ public:
 private:
 	QCheckBox* mShowSphereCheckBox;
 	vtkSphereWidgetPtr mEraserSphere;
+
+	template <class TYPE>
+	void eraseVolume(TYPE* volumePointer, TYPE replaceVal);
 
 private slots:
 	void testSlot();
