@@ -56,6 +56,7 @@ public:
 	 * Use during RenderInternal()
 	 */
 	virtual void bind(int textureUnitIndex) = 0;
+	virtual int getMemorySize() = 0;
 };
 
 typedef boost::shared_ptr<GPUImageDataBuffer> GPUImageDataBufferPtr;
@@ -109,6 +110,7 @@ public:
 
 	ssc::GPUImageDataBufferPtr getGPUImageDataBuffer(vtkImageDataPtr volume);
 	ssc::GPUImageLutBufferPtr getGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
+	int getMemoryUsage(int *textures);
 private:
 	GPUImageBufferRepository();
 	class GPUImageBufferRepositoryInternal* mInternal;

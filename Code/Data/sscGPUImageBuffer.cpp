@@ -57,18 +57,25 @@ public:
 	vtkImageDataPtr mTexture;
 	bool mAllocated;
 	uint64_t mMTime;
+	int mMemorySize;
 
 	GPUImageDataBufferImpl()
 	{
 		mAllocated = false;
 		mMTime = 0;
 		textureId = 0;
+		mMemorySize = 0;
 	}
 	virtual ~GPUImageDataBufferImpl()
 	{
 		release();
 	}
 
+	virtual int getMemorySize()
+	{
+		return mMemorySize;
+	}
+	
 	virtual void SetImage (vtkImageDataPtr texture)
 	{
 		if (!texture)
@@ -115,7 +122,7 @@ public:
 		boost::uint32_t dimx = mTexture ->GetDimensions( )[0];
 		boost::uint32_t dimy = mTexture ->GetDimensions( )[1];
 		boost::uint32_t dimz = mTexture ->GetDimensions( )[2];
-
+		mMemorySize = dimx * dimy * dimz;
 
 		glEnable( vtkgl::TEXTURE_3D );
 		glBindTexture(vtkgl::TEXTURE_3D, textureId);
@@ -137,6 +144,7 @@ public:
 		{
 			size = GL_UNSIGNED_SHORT;
 			internalType = GL_LUMINANCE16;
+			mMemorySize *= 2;
 		}
 			break; //16UI_EXT; break;
 		default:
@@ -156,6 +164,7 @@ public:
 			internalType = GL_RGB;
 			void* data = mTexture->GetPointData()->GetScalars()->GetVoidPointer(0);
 			glTexImage3D(vtkgl::TEXTURE_3D, 0, internalType, dimx, dimy, dimz, 0, GL_RGB, size, data);
+			mMemorySize *= 3;
 		}
 		else
 		{
@@ -215,12 +224,14 @@ public:
 	int mLutSize;
 	std::vector<float> mLut;
 	bool mAllocated;
+	int mMemorySize;
 
 	GPUImageLutBufferImpl()
 	{
 		mAllocated = false;
 		mLutSize = 0;
 		textureId = 0;
+		mMemorySize = 0;
 	}
 	virtual ~GPUImageLutBufferImpl()
 	{
@@ -451,7 +462,19 @@ public:
 
 		return retval;
 	}
-
+	int getMemoryUsage(int *textures)
+	{
+		int mem = 0;
+		if (textures)
+		{
+			*textures = mData.size();
+		}
+		for (typename std::list<BufferStore>::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
+		{
+			mem += iter->mBuffer->getMemorySize();
+		}
+		return mem;
+	}
 private:
 	typedef std::map<DATA_PTR, BufferWeakPtr> BufferMap;
 	BufferMap mRemovedData; // those buffers that are removed but still might live outside of the repo.
@@ -504,6 +527,11 @@ void GPUImageBufferRepository::tearDown()
 {
 	delete mInternal;
 	mInternal = NULL;
+}
+
+int GPUImageBufferRepository::getMemoryUsage(int *textures)
+{
+	return mInternal->mVolumeBuffer.getMemoryUsage(textures);
 }
 
 ssc::GPUImageDataBufferPtr GPUImageBufferRepository::getGPUImageDataBuffer(vtkImageDataPtr volume)
