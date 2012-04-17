@@ -386,12 +386,12 @@ find_package(VTK REQUIRED)
 
 include(${VTK_USE_FILE})
 	
-find_package(GLUT)
+#find_package(GLUT)
 find_package(OpenGL)
     SET( SSC_LIBRARIES 
         ${SSC_LIBRARIES}
         ${OPENGL_LIBRARIES}
-        ${GLUT_LIBRARIES}
+#        ${GLUT_LIBRARIES}
         )
 
 	
