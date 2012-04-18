@@ -18,9 +18,6 @@ ImageServer::ImageServer(QObject* parent) :
 	mTimer = new QTimer(this);
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	mTimer->start(500);
-
-	QuitCheck* quitChecker = new QuitCheck();
-	quitChecker->start();
 }
 
 void ImageServer::initialize()
