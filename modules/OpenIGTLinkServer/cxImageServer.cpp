@@ -5,7 +5,7 @@
  *      \author christiana
  */
 #include "cxImageServer.h"
-#include "cxImageSession.h"
+#include "cxImageSenderFactory.h"
 #include <iostream>
 #include <QCoreApplication>
 
