@@ -113,6 +113,7 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxImageSenderFile.h
 		cxImageSenderSonix.h
 		cxImageSenderOpenCV.h
+		cxImageSender.h
 )
 
 #QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
@@ -140,6 +141,7 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxImageSenderOpenCV.cpp
 		cxImageSenderSonix.h
 		cxImageSenderSonix.cpp
+		cxImageSender.h
 		../grabberCommon/cxIGTLinkSonixStatusMessage.h
 		../grabberCommon/cxIGTLinkSonixStatusMessage.cpp
 		../grabberCommon/cxIGTLinkImageMessage.h
