@@ -21,6 +21,15 @@ typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 namespace cx
 {
 
+class QuitCheck : public QThread
+{
+	Q_OBJECT
+public:
+	QuitCheck(QObject* parent = NULL);
+protected:
+	void run();
+};
+
 //class ImageSession : public QObject
 //{
 //  Q_OBJECT
