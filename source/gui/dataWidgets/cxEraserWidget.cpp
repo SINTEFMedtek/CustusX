@@ -20,6 +20,9 @@
 #include "vtkSplineRepresentation.h"
 #include "cxView3D.h"
 #include "vtkRenderWindow.h"
+#include <vtkSphere.h>
+#include <vtkClipPolyData.h>
+#include "sscMesh.h"
 
 #include "sscStringDataAdapter.h"
 #include "sscLabeledComboBoxWidget.h"
@@ -34,6 +37,8 @@
 #include "sscImageAlgorithms.h"
 #include "cxPatientService.h"
 #include "cxViewManager.h"
+#include "sscDoubleWidgets.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -45,14 +50,27 @@ EraserWidget::EraserWidget(QWidget* parent) :
 
 	this->setToolTip(this->defaultWhatsThis());
 
-	layout->addWidget(new QLabel("pang!"));
+	layout->addWidget(new QLabel(QString("<font size=4 color=red><b>%1</b></font><br>Erase parts of active volume using a sphere.").arg("Experimental Widget!!")));
 	layout->addStretch();
 
-	this->createAction(this, QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"), "Test", "Test",
-		SLOT(testSlot()), layout);
-	this->createAction(this, QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"), "Remove", "Remove",
+	mShowEraserCheckBox = new QCheckBox("Show eraser");
+	mShowEraserCheckBox->setToolTip("Show eraser sphere in 3D view.");
+	connect(mShowEraserCheckBox, SIGNAL(toggled(bool)), this, SLOT(toggleShowEraser(bool)));
+	layout->addWidget(mShowEraserCheckBox);
+
+	// QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png")
+//	this->createAction(this, , "Test", "Test",
+//		SLOT(testSlot()), layout);
+	this->createAction(this, QIcon(), "Erase", "Erase everything inside sphere",
 		SLOT(removeSlot()), layout);
 
+	this->createAction(this, QIcon(), "Save", "Save modified image to disk",
+		SLOT(saveSlot()), layout);
+
+	double sphereRadius = 10;
+	mSphereSizeAdapter = ssc::DoubleDataAdapterXml::initialize("SphereSize", "Sphere Size", "Radius of Eraser Sphere", sphereRadius, ssc::DoubleRange(1,200,1), 0, QDomNode());
+	connect(mSphereSizeAdapter.get(), SIGNAL(changed()), this, SLOT(sphereSizeChangedSlot()));
+	layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter));
 }
 
 EraserWidget::~EraserWidget()
@@ -67,6 +85,24 @@ QString EraserWidget::defaultWhatsThis() const
 		"</p>"
 		"<p><i></i></p>"
 		"</html>";
+}
+
+void EraserWidget::sphereSizeChangedSlot()
+{
+	if (mEraserSphere)
+		mEraserSphere->SetRadius(mSphereSizeAdapter->getValue());
+}
+
+/**The image data themselves are not saved during normal file save.
+ * This slot saves the file data to mhd.
+ *
+ */
+void EraserWidget::saveSlot()
+{
+	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
+
+	ssc::dataManager()->saveImage(image, outputBasePath);
 }
 
 template <class TYPE>
@@ -139,6 +175,33 @@ void EraserWidget::removeSlot()
 //	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
 //	mEraserSphere->GetPolyData(poly);
 
+#if 0
+	// experimental clipping of mesh - has no effect...
+	std::map<QString,ssc::MeshPtr> meshes = ssc::dataManager()->getMeshes();
+	if (!meshes.empty())
+	{
+		ssc::MeshPtr mesh = meshes.begin()->second;
+
+		ssc::Vector3D c(mEraserSphere->GetCenter());
+		double r = mEraserSphere->GetRadius();
+		ssc::Transform3D dMr = mesh->get_rMd().inv();
+		ssc::Vector3D c_d = dMr.coord(c);
+		double r_d = dMr.vector(r * ssc::Vector3D::UnitX()).length();
+		vtkSphere* sphere = vtkSphere::New();
+		sphere->SetRadius(r_d);
+		sphere->SetCenter(c_d.data());
+
+
+//		mEraserSphere->GetSphere(sphere);
+		vtkClipPolyData* clipper = vtkClipPolyData::New();
+		clipper->SetInput(mesh->getVtkPolyData());
+		clipper->SetClipFunction(sphere);
+		clipper->Update();
+		mesh->setVtkPolyData(clipper->GetOutput());
+		return;
+	}
+#endif
+
 	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
@@ -147,7 +210,7 @@ void EraserWidget::removeSlot()
 	if (img->GetScalarType()==VTK_UNSIGNED_CHAR)
 		this->eraseVolume(static_cast<unsigned char*> (img->GetScalarPointer()), VTK_UNSIGNED_CHAR_MIN);
 	if (img->GetScalarType()==VTK_UNSIGNED_SHORT)
-		this->eraseVolume(static_cast<unsigned short*> (img->GetScalarPointer()), VTK_UNSIGNED_SHORT_MAX);
+		this->eraseVolume(static_cast<unsigned short*> (img->GetScalarPointer()), VTK_UNSIGNED_SHORT_MIN);
 
 //	//	ssc::Vector3D c(200,200,200);
 //	ssc::Vector3D c(mEraserSphere->GetCenter());
@@ -195,36 +258,66 @@ void EraserWidget::removeSlot()
 	image->setVtkImageData(img);
 }
 
-void EraserWidget::testSlot()
+void EraserWidget::toggleShowEraser(bool on)
 {
-	typedef vtkSmartPointer<vtkSplineWidget> vtkSplineWidgetPtr;
-	typedef vtkSmartPointer<vtkSplineWidget2> vtkSplineWidget2Ptr;
-	typedef vtkSmartPointer<vtkSplineRepresentation> vtkSplineRepresentationPtr;
-
 	ssc::View* view = viewManager()->get3DView();
-	mEraserSphere = vtkSphereWidget::New();
-	mEraserSphere->SetInteractor(view->getRenderWindow()->GetInteractor());
-	mEraserSphere->SetEnabled(true);
-	int a = 50;
-	mEraserSphere->PlaceWidget(-a, a, -a, a, -a, a);
-	mEraserSphere->ScaleOn();
 
-	mEraserSphere->SetThetaResolution(12);
-	mEraserSphere->SetPhiResolution(12);
+	if (on)
+	{
+		mEraserSphere = vtkSphereWidgetPtr::New();
+		mEraserSphere->SetInteractor(view->getRenderWindow()->GetInteractor());
+		mEraserSphere->SetEnabled(true);
+		double a = mSphereSizeAdapter->getValue();
+		mEraserSphere->SetRadius(a);
+		cx::ToolManager* tm = cx::ToolManager::getInstance();
+		ssc::Transform3D rMt =
+						*tm->get_rMpr() *
+						tm->getManualTool()->get_prMt();
+		mEraserSphere->SetCenter(rMt.coord(ssc::Vector3D(0, 0, tm->getTooltipOffset())).data());
+//		mEraserSphere->PlaceWidget(-a, a, -a, a, -a, a);
+		mEraserSphere->ScaleOn();
 
-	////	vtkSplineWidget2Ptr node1 = vtkSplineWidget2Ptr::New();
-	//	vtkSplineWidget2* node1 = vtkSplineWidget2::New();
-	//	vtkSplineRepresentationPtr rep1 = vtkSplineRepresentationPtr::New();
-	//	node1->SetRepresentation(rep1);
-	//	node1->SetInteractor(view->getRenderWindow()->GetInteractor());
-
-	//	mBoxWidget = vtkBoxWidgetPtr::New();
-	//	mBoxWidget->RotationEnabledOff();
-	//
-	//	double bb_hard[6] =
-	//	{ -1, 1, -1, 1, -1, 1 };
-	//	mBoxWidget->PlaceWidget(bb_hard);
-
+		mEraserSphere->SetThetaResolution(12);
+		mEraserSphere->SetPhiResolution(12);
+	}
+	else
+	{
+		mEraserSphere->SetEnabled(false);
+		mEraserSphere->SetInteractor(NULL);
+		mEraserSphere = vtkSphereWidgetPtr();
+	}
 }
+
+//void EraserWidget::testSlot()
+//{
+//	typedef vtkSmartPointer<vtkSplineWidget> vtkSplineWidgetPtr;
+//	typedef vtkSmartPointer<vtkSplineWidget2> vtkSplineWidget2Ptr;
+//	typedef vtkSmartPointer<vtkSplineRepresentation> vtkSplineRepresentationPtr;
+//
+//	ssc::View* view = viewManager()->get3DView();
+//	mEraserSphere = vtkSphereWidget::New();
+//	mEraserSphere->SetInteractor(view->getRenderWindow()->GetInteractor());
+//	mEraserSphere->SetEnabled(true);
+//	int a = 50;
+//	mEraserSphere->PlaceWidget(-a, a, -a, a, -a, a);
+//	mEraserSphere->ScaleOn();
+//
+//	mEraserSphere->SetThetaResolution(12);
+//	mEraserSphere->SetPhiResolution(12);
+//
+//	////	vtkSplineWidget2Ptr node1 = vtkSplineWidget2Ptr::New();
+//	//	vtkSplineWidget2* node1 = vtkSplineWidget2::New();
+//	//	vtkSplineRepresentationPtr rep1 = vtkSplineRepresentationPtr::New();
+//	//	node1->SetRepresentation(rep1);
+//	//	node1->SetInteractor(view->getRenderWindow()->GetInteractor());
+//
+//	//	mBoxWidget = vtkBoxWidgetPtr::New();
+//	//	mBoxWidget->RotationEnabledOff();
+//	//
+//	//	double bb_hard[6] =
+//	//	{ -1, 1, -1, 1, -1, 1 };
+//	//	mBoxWidget->PlaceWidget(bb_hard);
+//
+//}
 
 }
