@@ -21,6 +21,21 @@ class QTimer;
 #include "cxImageSenderFactory.h"
 #include "../grabberCommon/cxIGTLinkImageMessage.h"
 
+//class ImageSender : public QObject
+//{
+//	Q_OBJECT
+//public:
+//	ImageSender(QObject* parent = NULL) : QObject(parent) {}
+//	virtual ~ImageSender() {}
+//
+//	virtual void initialize(StringMap arguments) = 0;
+//	virtual void startStreaming(QTcpSocket* socket) = 0;
+//	virtual void stopStreaming() = 0;
+//
+//	virtual QString getType() = 0;
+//	virtual QStringList getArgumentDescription() = 0;
+//};
+
 namespace cx
 {
 
@@ -31,16 +46,20 @@ namespace cx
  *
  * This version uses openCV to grab images from a video file or camera
  */
-class ImageSenderOpenCV: public QObject
+class ImageSenderOpenCV: public ImageSender
 {
 Q_OBJECT
 
 public:
-	ImageSenderOpenCV(QTcpSocket* socket, StringMap arguments, QObject* parent = NULL);
+	ImageSenderOpenCV(QObject* parent = NULL);
 	virtual ~ImageSenderOpenCV() {}
 
-	static QString getType();
-	static QStringList getArgumentDescription();
+	virtual void initialize(StringMap arguments);
+	virtual void startStreaming(QTcpSocket* socket);
+	virtual void stopStreaming();
+
+	virtual QString getType();
+	virtual QStringList getArgumentDescription();
 
 protected:
 private:

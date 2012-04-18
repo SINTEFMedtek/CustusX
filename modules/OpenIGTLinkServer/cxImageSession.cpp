@@ -35,39 +35,45 @@ namespace cx
 //------------------------------------------------------------
 
 
-ImageSession::ImageSession(int socketDescriptor, QObject* parent) :
-	QThread(parent), mSocketDescriptor(socketDescriptor)
-{
-	mArguments = cx::extractCommandlineOptions(QCoreApplication::arguments());
-}
-
-ImageSession::~ImageSession()
-{
-}
-
-void ImageSession::run()
-{
-	mSocket = new QTcpSocket();
-	connect(mSocket, SIGNAL(disconnected()), this, SLOT(quit()), Qt::DirectConnection); // quit thread when disconnected
-	mSocket->setSocketDescriptor(mSocketDescriptor);
-	QString clientName = mSocket->localAddress().toString();
-	std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
-
-	std::cout << mArguments["type"].toStdString().c_str() << std::endl;
-	QObject* sender = ImageSenderFactory().createSender(mArguments["type"], mSocket, mArguments);
-
-	if (sender)
-	{
-		this->exec();
-	}
-	else
-	{
-		std::cout << "Failed to create sender based on arg " << mArguments["type"].toStdString() << std::endl;
-	}
-
-	std::cout << "Disconnected from " << clientName.toStdString() << ". Session ended." << std::endl;
-	delete sender;
-	delete mSocket;
-}
+//ImageSession::ImageSession(int socketDescriptor, ImageSenderPtr imageSender, QObject* parent) :
+//	QThread(parent), mSocketDescriptor(socketDescriptor), mImageSender(imageSender)
+//{
+////	mArguments = cx::extractCommandlineOptions(QCoreApplication::arguments());
+//}
+//
+//ImageSession::~ImageSession()
+//{
+//}
+//
+//void ImageSession::run()
+//{
+//	mSocket = new QTcpSocket();
+//	connect(mSocket, SIGNAL(disconnected()), this, SLOT(quit()), Qt::DirectConnection); // quit thread when disconnected
+//	mSocket->setSocketDescriptor(mSocketDescriptor);
+//	QString clientName = mSocket->localAddress().toString();
+//	std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
+//
+////	std::cout << mArguments["type"].toStdString().c_str() << std::endl;
+//
+////	ImageSenderPtr sender = ImageSenderFactory().getImageSender(mArguments["type"]);
+////	sender->initialize(mArguments);
+//	mImageSender->startStreaming(mSocket);
+//
+////	QObject* sender = ImageSenderFactory().createSender(mArguments["type"], mSocket, mArguments);
+//
+//	if (mImageSender)
+//	{
+//		this->exec();
+//		mImageSender->stopStreaming();
+//	}
+//	else
+//	{
+//		std::cout << "Failed to create sender based on arg " << mArguments["type"].toStdString() << std::endl;
+//	}
+//
+//	std::cout << "Disconnected from " << clientName.toStdString() << ". Session ended." << std::endl;
+////	delete sender;
+//	delete mSocket;
+//}
 
 } // cx
