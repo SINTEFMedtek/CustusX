@@ -10,8 +10,32 @@
 //
 #include "cxImageSenderOpenCV.h"
 
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#ifndef WIN32
+void my_handler(int s)
+{
+//           printf("Caught signal %d\n",s);
+           qApp->quit();
+}
+#endif
+
 int main(int argc, char* argv[])
 {
+#ifndef WIN32
+	// nice shutdown of app
+	// http://stackoverflow.com/questions/1641182/how-can-i-catch-a-ctrl-c-event-c
+	struct sigaction sigIntHandler;
+
+	sigIntHandler.sa_handler = my_handler;
+	sigemptyset(&sigIntHandler.sa_mask);
+	sigIntHandler.sa_flags = 0;
+
+	sigaction(SIGINT, &sigIntHandler, NULL);
+#endif
+
   QApplication app(argc, argv);
   app.setOrganizationName("SINTEF");
   app.setOrganizationDomain("www.sintef.no");
