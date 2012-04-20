@@ -311,8 +311,6 @@ bool call_vnn_kernel(cl_kernel vnn, ocl_context* context, reconstruct_data* data
 		// number of work items: defines the work ID used in the kernel to identify the column:
 		size_t * global_work_size = (size_t *) malloc(sizeof(size_t) * 1);
 		global_work_size[0] = (volume_w * volume_n / 1 / 256 + 1) * 256;//TODO: Find better number? 256?
-		size_t * local_work_size = (size_t *) malloc(sizeof(size_t) * 1);//TODO: Not in use?
-		local_work_size[0] = 256;
 		std::cout << "Start openCL code. global_work_size[0]: " << global_work_size[0] << std::endl;
 		ocl_check_error(clEnqueueNDRangeKernel(context->cmd_queue, vnn, 1, NULL, global_work_size, NULL, 0, NULL, NULL));
 		//ocl_check_error(clFinish(context->cmd_queue));
