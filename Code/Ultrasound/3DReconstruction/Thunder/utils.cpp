@@ -254,7 +254,10 @@ bool ocl_has_device_type(QString processor)
 
 	clGetPlatformIDs(1, &platform, &platforms_n);
 	if (platforms_n<1)
+	{
+		free(devices);
 		return false;
+	}
 
 	clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 256, devices, &devices_n);
 	for (unsigned int j = 0; j < devices_n; j++)
@@ -263,8 +266,8 @@ bool ocl_has_device_type(QString processor)
 		clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(type), &type, &temp_size);
 		if (type == device_type)
 		{
-			return true;
 			free(devices);
+			return true;
 		}
 	}
 
