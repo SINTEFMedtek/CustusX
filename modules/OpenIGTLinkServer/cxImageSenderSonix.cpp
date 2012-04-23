@@ -54,10 +54,12 @@ ImageSenderSonix::ImageSenderSonix(QObject* parent) :
 
 ImageSenderSonix::~ImageSenderSonix()
 {
-  mSonixGrabber->Stop();
-  std::cout << "Releasing Ultrasonix resources" << std::endl;
-  mSonixGrabber->ReleaseSystemResources();
-  mSonixGrabber->Delete();
+	if (mSonixGrabber)
+		{
+		  mSonixGrabber->Stop();
+		  std::cout << "Releasing Ultrasonix resources" << std::endl;
+		  mSonixGrabber->ReleaseSystemResources();
+		}
 }
 
 
@@ -91,7 +93,6 @@ void ImageSenderSonix::initialize(StringMap arguments)
 	int acquisitionDataType = convertStringWithDefault(mArguments["datatype"], 0x00000004);
 	int bufferSize          = convertStringWithDefault(mArguments["buffersize"], 500);
 
-
 	mSonixGrabber = vtkSonixVideoSource::New();
 	mSonixGrabber->SetSonixIP(ipaddress.toStdString().c_str());
 	mSonixGrabber->SetImagingMode(imagingMode);
@@ -99,7 +100,7 @@ void ImageSenderSonix::initialize(StringMap arguments)
 	mSonixGrabber->SetFrameBufferSize(bufferSize);  // Number of image frames in buffer
 	mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
 
-	this->mSonixHelper = new SonixHelper;
+	this->mSonixHelper = new SonixHelper();
 	mSonixGrabber->setSonixHelper(this->mSonixHelper);
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 }
@@ -114,10 +115,16 @@ void ImageSenderSonix::startStreaming(QTcpSocket* socket)
 void ImageSenderSonix::stopStreaming()
 {
   mSonixGrabber->Stop();
+  mSocket = NULL;
 }
 
 void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 {
+	if(!mSocket)
+	{
+		return;
+	}
+
   //TODO: Get info like origin from frame and create a IGTLinkSonixStatusMessage
   if (frame.mNewStatus)
   {
@@ -210,6 +217,8 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
 }
 void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
 {
+	if(!mSocket)
+		return;
   if(mSocket->bytesToWrite() > mMaxBufferSize)
     return;
 
@@ -224,6 +233,8 @@ void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
 }
 void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
 {
+	if(!mSocket)
+		return;
   //std::cout << "ImageSenderSonix::sendOpenIGTLinkStatusSlot" << std::endl;
   if(mSocket->bytesToWrite() > mMaxBufferSize)
     return;
