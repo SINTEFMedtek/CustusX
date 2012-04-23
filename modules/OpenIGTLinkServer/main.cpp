@@ -10,63 +10,100 @@
 //
 #include "cxImageSenderOpenCV.h"
 
+#ifdef WIN32
+#include <windows.h>
+//#include <tchar.h>
+#endif
+
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+#ifdef WIN32
+// Catch ctrl + c on windows: http://www.cplusplus.com/forum/beginner/1501/
+BOOL WINAPI ConsoleHandler(
+	DWORD dwCtrlType   //  control signal type
+);
+
+BOOL WINAPI ConsoleHandler(DWORD CEvent)
+{
+    char mesg[128];
+
+    switch(CEvent)
+    {
+    case CTRL_C_EVENT:
+        //MessageBox(NULL,_T("CTRL+C received!"),_T("CEvent"),MB_OK);
+        break;
+    case CTRL_BREAK_EVENT:
+        //MessageBox(NULL, _T("CTRL+BREAK received!"),_T("CEvent"),MB_OK);
+        break;
+    case CTRL_CLOSE_EVENT:
+        //MessageBox(NULL,_T("Program being closed!"),_T("CEvent"),MB_OK);
+        break;
+    case CTRL_LOGOFF_EVENT:
+        //MessageBox(NULL,_T("User is logging off!"),_T("CEvent"),MB_OK);
+        break;
+    case CTRL_SHUTDOWN_EVENT:
+        //MessageBox(NULL,_T("User is logging off!"),_T("CEvent"),MB_OK);
+        break;
+
+    }
+	qApp->quit();
+    return TRUE;
+}
+#endif
+
+#ifndef WIN32
+void my_handler(int s)
+{
+//           printf("Caught signal %d\n",s);
+           qApp->quit();
+}
+#endif
+
 int main(int argc, char* argv[])
 {
+#ifdef WIN32
+	if (SetConsoleCtrlHandler( (PHANDLER_ROUTINE)ConsoleHandler,TRUE)==FALSE)
+	{
+		// unable to install handler... 
+		// display message to the user
+		printf("Unable to install handler!\n");
+	//return -1;
+	}
+
+#endif
+#ifndef WIN32
+	// nice shutdown of app
+	// http://stackoverflow.com/questions/1641182/how-can-i-catch-a-ctrl-c-event-c
+	struct sigaction sigIntHandler;
+
+	sigIntHandler.sa_handler = my_handler;
+	sigemptyset(&sigIntHandler.sa_mask);
+	sigIntHandler.sa_flags = 0;
+
+	sigaction(SIGINT, &sigIntHandler, NULL);
+#endif
+
   QApplication app(argc, argv);
   app.setOrganizationName("SINTEF");
   app.setOrganizationDomain("www.sintef.no");
   app.setApplicationName("OpenIGTLinkServer");
   //------------------------------------------------------------
   // Parse Arguments
-
   cx::StringMap args = cx::extractCommandlineOptions(app.arguments());
 
-  if (args.count("help"))
+  cx::ImageServer server;
+  if (args.count("help") || args.count("h"))
   {
-    std::cout << "Usage: " << argv[0] << " (--arg <argval>)*"    << std::endl;
-    std::cout << "    --port   : Tcp/IP port # (default=18333)"   << std::endl;
-#ifdef WIN32
-    std::cout << "    --type   : Grabber type  (default=Sonix)"   << std::endl;
-#else
-    std::cout << "    --type   : Grabber type  (default=OpenCV)"   << std::endl;
-#endif
-    std::cout << std::endl;
-    std::cout << "    Select one of the types below:"   << std::endl;
-
-    cx::ImageSenderFactory factory;
-  	QStringList types = factory.getSenderTypes();
-  	for (int i=0; i<types.size(); ++i)
-  	{
-    	QStringList args = factory.getArgumentDescription(types[i]);
-      std::cout << std::endl;
-      std::cout << "      type = " << types[i].toStdString() << std::endl;
-      for (int j=0; j<args.size(); ++j)
-      	std::cout << "        " << args[j].toStdString() << std::endl;
-  	}
-    std::cout << std::endl;
-
-    return 0;
+	  server.printHelpText();
+	  return 0;
   }
 
   int port = cx::convertStringWithDefault(args["port"], 18333);
 
-//  if (argc != 3) // check number of arguments
-//    {
-//    // If not correct, print usage
-//    std::cerr << "Usage: " << argv[0] << " <port> <fps> <imgdir>"    << std::endl;
-//    std::cerr << "    <port>     : Port # (18333 CustusX default)"   << std::endl;
-//    std::cerr << "    <imgdir>   : file directory, where \"igtlTestImage[1-5].raw\" are placed." << std::endl;
-//    std::cerr << "                 (usually, in the Examples/Imager/img directory.)" << std::endl;
-//    exit(0);
-//    }
-
-//  int    port     = atoi(argv[1]);
-//  char*  filedir  = argv[2];
-
-  cx::ImageServer server;
+  server.initialize();
   server.startListen(port);
-
-//	new cx::ImageSenderOpenCV(NULL, cx::StringMap());
 
   int retVal = app.exec();
   return retVal;
