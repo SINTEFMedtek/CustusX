@@ -17,7 +17,9 @@
 
 #include "cxBaseWidget.h"
 
+#include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
+#include "sscDoubleDataAdapterXml.h"
 typedef vtkSmartPointer<class vtkSphereWidget> vtkSphereWidgetPtr;
 
 namespace cx
@@ -49,10 +51,18 @@ public:
 private:
 	QCheckBox* mShowSphereCheckBox;
 	vtkSphereWidgetPtr mEraserSphere;
+	QCheckBox* mShowEraserCheckBox;
+	ssc::DoubleDataAdapterXmlPtr mSphereSizeAdapter;
+
+	template <class TYPE>
+	void eraseVolume(TYPE* volumePointer, TYPE replaceVal);
 
 private slots:
-	void testSlot();
+	void toggleShowEraser(bool on);
+//	void testSlot();
+	void saveSlot();
 	void removeSlot();
+	void sphereSizeChangedSlot();
 };
 
 }

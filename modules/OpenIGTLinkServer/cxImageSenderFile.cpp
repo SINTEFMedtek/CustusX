@@ -41,7 +41,7 @@ void GetRandomTestMatrix(igtl::Matrix4x4& matrix);
 
 vtkImageDataPtr loadImage(QString filename)
 {
-  std::cout << "reading image " << filename.toStdString() << std::endl;
+//  std::cout << "reading image " << filename.toStdString() << std::endl;
   //load the image from file
   vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
   reader->SetFileName(filename.toStdString().c_str());
@@ -221,27 +221,62 @@ QStringList MHDImageSender::getArgumentDescription()
 	return retval;
 }
 
-MHDImageSender::MHDImageSender(QTcpSocket* socket, StringMap arguments, QObject* parent) :
-    QObject(parent),
-    mSocket(socket),
+MHDImageSender::MHDImageSender(QObject* parent) :
+    ImageSender(parent),
+    mSocket(0),
     mCounter(0),
-    mArguments(arguments)
+    mTimer(0)
 {
-	  std::cout << "Creating sender type File" << std::endl;
+}
 
-	  QString filename = mArguments["filename"];
-  mImageData = loadImage(filename);
-// mImageData = convertToTestColorImage(mImageData);
+void MHDImageSender::initialize(StringMap arguments)
+{
+    mCounter = 0;
+    mArguments = arguments;
 
-  mTimer = new QTimer(this);
-  connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-  mTimer->start(40);
-//  mTimer->start(1200); // for test of the timeout feature
+
+	QString filename = mArguments["filename"];
+	mImageData = loadImage(filename);
+	// mImageData = convertToTestColorImage(mImageData);
+
+	if (mImageData)
+	{
+	    std::cout << "MHDImageSender: Initialized with source file: \n\t" << mArguments["filename"].toStdString() << std::endl;
+	}
+	else
+	{
+	    std::cout << "MHDImageSender: Failed to initialize with source file: \n\t" << mArguments["filename"].toStdString() << std::endl;
+	    return;
+	}
+
+	mTimer = new QTimer(this);
+	connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+	//  mTimer->start(1200); // for test of the timeout feature
+}
+
+void MHDImageSender::startStreaming(QTcpSocket* socket)
+{
+	if (!mTimer)
+	{
+	    std::cout << "MHDImageSender: Failed to start streaming: Not initialized." << std::endl;
+	    return;
+	}
+    mSocket = socket;
+	mTimer->start(40);
+}
+
+void MHDImageSender::stopStreaming()
+{
+	mTimer->stop();
+	mSocket = NULL;
 }
 
 void MHDImageSender::tick()
 {
+	if (!mSocket)
+		std::cout << "MHDImageSender error: no socket" << std::endl;
 //  std::cout << "tick" << std::endl;
+
   igtl::ImageMessage::Pointer imgMsg = getVtkImageMessage(mImageData);
 
   //------------------------------------------------------------
