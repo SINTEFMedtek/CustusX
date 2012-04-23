@@ -24,6 +24,7 @@ class QTimer;
 #include "../grabberCommon/cxIGTLinkSonixStatusMessage.h"
 #include "vtkSonixVideoSource.h"
 #include "SonixHelper.h"
+#include "cxImageSender.h"
 
 typedef vtkSmartPointer<class vtkSonixVideoSource> vtkSonixVideoSourcePtr;
 
@@ -37,16 +38,20 @@ namespace cx
  *
  * This version uses openCV to grab images from the Ultrasonix scanner
  */
-class ImageSenderSonix : public QObject
+class ImageSenderSonix : public ImageSender
 {
   Q_OBJECT
 
 public:
-  ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObject* parent = NULL);
+  ImageSenderSonix(QObject* parent = NULL);
   ~ImageSenderSonix();
+  
+	virtual void initialize(StringMap arguments);
+	virtual void startStreaming(QTcpSocket* socket);
+	virtual void stopStreaming();
 
-  static QString getType();
-  static QStringList getArgumentDescription();
+	virtual QString getType();
+	virtual QStringList getArgumentDescription();
 
 public slots:
   void sendOpenIGTLinkImageSlot(int sendNumberOfMessages); ///< Gets the oldest frame from the internal queue and sends it to the socket.

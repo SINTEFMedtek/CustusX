@@ -42,60 +42,57 @@ StringMap extractCommandlineOptions(QStringList cmdline)
 	return retval;
 }
 
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+ImageSenderFactory::ImageSenderFactory()
+{
+#ifdef CX_WIN32
+	mAvailable.push_back(ImageSenderPtr(new ImageSenderSonix()));
+#endif
+#ifdef USE_OpenCV
+	mAvailable.push_back(ImageSenderPtr(new ImageSenderOpenCV()));
+#endif
+	mAvailable.push_back(ImageSenderPtr(new MHDImageSender()));
+}
+
+QString ImageSenderFactory::getDefaultSenderType() const
+{
+	// use the FIRST sender available
+	return mAvailable.front()->getType();
+}
+
 QStringList ImageSenderFactory::getSenderTypes() const
 {
 	QStringList retval;
-
-#ifdef USE_OpenCV
-	retval << ImageSenderOpenCV::getType();
-#endif
-#ifdef CX_WIN32
-	retval << ImageSenderSonix::getType();
-#endif
-
-	retval << MHDImageSender::getType();
+	for (unsigned i=0; i< mAvailable.size(); ++i)
+		retval << mAvailable[i]->getType();
 	return retval;
 }
 
 QStringList ImageSenderFactory::getArgumentDescription(QString type) const
 {
-#ifdef USE_OpenCV
-	if (type == ImageSenderOpenCV::getType())
-		return ImageSenderOpenCV::getArgumentDescription();
-#endif
-#ifdef CX_WIN32
-	if (type==ImageSenderSonix::getType())
-	return ImageSenderSonix::getArgumentDescription();
-#endif
-
-	if (type == MHDImageSender::getType())
-		return MHDImageSender::getArgumentDescription();
-
-	return QStringList();
+	QStringList retval;
+	for (unsigned i=0; i< mAvailable.size(); ++i)
+	{
+		if (mAvailable[i]->getType()==type)
+			return mAvailable[i]->getArgumentDescription();
+	}
+	return retval;
 }
 
-QObject* ImageSenderFactory::createSender(QString type, QTcpSocket* socket, StringMap arguments) const
+ImageSenderPtr ImageSenderFactory::getImageSender(QString type)
 {
-#ifdef USE_OpenCV
-	if (type == ImageSenderOpenCV::getType())
-		return new ImageSenderOpenCV(socket, arguments);
-#endif
-#ifdef CX_WIN32
-	if (type==ImageSenderSonix::getType())
-	return new ImageSenderSonix(socket, arguments);
-#endif
-
-	if (type == MHDImageSender::getType())
-		return new MHDImageSender(socket, arguments);
-
-	// default:
-#ifdef CX_WIN32
-	return new ImageSenderSonix(socket, arguments);
-#elif USE_OpenCV
-	return new ImageSenderOpenCV(socket, arguments);
-#else
-	return NULL;
-#endif
+	for (unsigned i=0; i< mAvailable.size(); ++i)
+	{
+		if (mAvailable[i]->getType()==type)
+			return mAvailable[i];
+	}
+	return ImageSenderPtr();
 }
+
 
 }

@@ -11,7 +11,9 @@
 #include <QObject>
 #include <QStringList>
 #include <map>
+#include <vector>
 class QTcpSocket;
+#include "cxImageSender.h"
 
 namespace cx
 {
@@ -29,9 +31,14 @@ int convertStringWithDefault(QString text, int def);
 class ImageSenderFactory
 {
 public:
+	ImageSenderFactory();
+	QString getDefaultSenderType() const;
 	QStringList getSenderTypes() const; ///< all available MHDImageSender types
 	QStringList getArgumentDescription(QString type) const; ///< arguments for one Image Sender
-	QObject* createSender(QString type, QTcpSocket* socket, StringMap arguments) const; ///< launch a MHDImageSender.
+	ImageSenderPtr getImageSender(QString type);
+//	QObject* createSender(QString type, QTcpSocket* socket, StringMap arguments) const; ///< launch a MHDImageSender.
+private:
+	std::vector<ImageSenderPtr> mAvailable;
 };
 
 }
