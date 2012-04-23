@@ -62,7 +62,9 @@ ImageSenderFactory::ImageSenderFactory()
 QString ImageSenderFactory::getDefaultSenderType() const
 {
 	// use the FIRST sender available
-	return mAvailable.front()->getType();
+  QString retval = mAvailable.front()->getType();
+  return retval;
+	//return mAvailable.front()->getType();
 }
 
 QStringList ImageSenderFactory::getSenderTypes() const
