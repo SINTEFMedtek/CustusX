@@ -46,17 +46,32 @@ QStringList ImageSenderSonix::getArgumentDescription()
 }
 
 
-ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObject* parent) :
-    QObject(parent),
-    mSocket(socket),
-    mArguments(arguments),
-	mMaxqueueInfo(20),
-	mMaxBufferSize(19200000), //800(width)*600(height)*4(bytes)*10(images)
-	mDroppedImages(0)
+ImageSenderSonix::ImageSenderSonix(QObject* parent) :
+    ImageSender(parent),
+	mSocket(0)
 {
-	  std::cout << "Creating sender type Sonix" << std::endl;
+}
 
-	  typedef cx::Frame Frame;
+ImageSenderSonix::~ImageSenderSonix()
+{
+  mSonixGrabber->Stop();
+  std::cout << "Releasing Ultrasonix resources" << std::endl;
+  mSonixGrabber->ReleaseSystemResources();
+  mSonixGrabber->Delete();
+}
+
+
+void ImageSenderSonix::initialize(StringMap arguments)
+{
+	std::cout << "Creating sender type Sonix" << std::endl;
+		  
+    mArguments = arguments;
+	
+	mMaxqueueInfo = 20;
+	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
+	mDroppedImages = 0;
+
+	typedef cx::Frame Frame;
 	qRegisterMetaType<Frame>("Frame");
 	
 	connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
@@ -77,7 +92,6 @@ ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObj
 	int bufferSize          = convertStringWithDefault(mArguments["buffersize"], 500);
 
 
-
 	mSonixGrabber = vtkSonixVideoSource::New();
 	mSonixGrabber->SetSonixIP(ipaddress.toStdString().c_str());
 	mSonixGrabber->SetImagingMode(imagingMode);
@@ -88,16 +102,18 @@ ImageSenderSonix::ImageSenderSonix(QTcpSocket* socket, StringMap arguments, QObj
 	this->mSonixHelper = new SonixHelper;
 	mSonixGrabber->setSonixHelper(this->mSonixHelper);
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
+}
 
+void ImageSenderSonix::startStreaming(QTcpSocket* socket)
+{
+	mSocket = socket;
 	mSonixGrabber->Record();
 	std::cout << "Started streaming from sonix device" << std::endl;
 }
 
-ImageSenderSonix::~ImageSenderSonix()
+void ImageSenderSonix::stopStreaming()
 {
   mSonixGrabber->Stop();
-  mSonixGrabber->ReleaseSystemResources();
-  mSonixGrabber->Delete();
 }
 
 void ImageSenderSonix::receiveFrameSlot(Frame& frame)
