@@ -23,13 +23,14 @@ ImageServer::ImageServer(QObject* parent) :
 void ImageServer::initialize()
 {
 	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
-
-	QString type = ImageSenderFactory().getDefaultSenderType();
+	
+	ImageSenderFactory factory;
+	QString type = factory.getDefaultSenderType();
 	if (args.count("type"))
 		type = args["type"];
-
-	mImageSender = ImageSenderFactory().getImageSender(type);
-
+	
+	mImageSender = factory.getImageSender(type);
+	
 	if (mImageSender)
 	{
 		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
