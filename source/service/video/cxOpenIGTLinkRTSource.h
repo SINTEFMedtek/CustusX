@@ -26,6 +26,7 @@
 #include "igtlImageMessage.h"
 #include <vector>
 #include "sscProbeData.h"
+#include "cxProbe.h"
 #include "../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h"
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
@@ -102,6 +103,7 @@ private:
 	vtkImageDataPtr createFilterARGB2RGBA(vtkImageDataPtr input);
 	void updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message);
 	void updateSonix();
+	ProbePtr getValidProbe();
 
 	double mDebug_orgTime;
 
