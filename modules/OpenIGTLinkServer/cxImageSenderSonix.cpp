@@ -56,9 +56,9 @@ ImageSenderSonix::~ImageSenderSonix()
 {
 	if (mSonixGrabber)
 		{
-		  mSonixGrabber->Stop();
-		  std::cout << "Releasing Ultrasonix resources" << std::endl;
-		  mSonixGrabber->ReleaseSystemResources();
+			mSonixGrabber->Stop();
+			std::cout << "Releasing Ultrasonix resources" << std::endl;
+			mSonixGrabber->ReleaseSystemResources();
 		}
 }
 
@@ -121,14 +121,14 @@ void ImageSenderSonix::stopStreaming()
 void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 {
 	if(!mSocket)
-	{
-		return;
-	}
+		{
+			return;
+		}
 
-  //TODO: Get info like origin from frame and create a IGTLinkSonixStatusMessage
+  //TODO: Get info like origin from frame and create a IGTLinkUSStatusMessage
   if (frame.mNewStatus)
   {
-    IGTLinkSonixStatusMessage::Pointer statMsg = getFrameStatus(frame);
+    IGTLinkUSStatusMessage::Pointer statMsg = getFrameStatus(frame);
 	//double spacing[3];
 	//statMsg->GetSpacing(spacing);
 	//std::cout << "Spacing3: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
@@ -150,21 +150,34 @@ void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 //  mSocket->write(reinterpret_cast<const char*>(imgMsg->GetPackPointer()), imgMsg->GetPackSize());
 }
 
-IGTLinkSonixStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
+IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
 {
-  IGTLinkSonixStatusMessage::Pointer retval = IGTLinkSonixStatusMessage::New();
+  IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
   //retval->SetOrigin(); //Origin is set in IGTLinkImageMessage
 //  retval->SetWidth();
 //  retval->SetType();
 
-  retval->SetROI(frame.ulx, frame.uly, frame.urx, frame.ury, frame.brx, frame.bry, frame.blx, frame.bly);
-  retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
+//  retval->SetROI(frame.ulx, frame.uly, frame.urx, frame.ury, frame.brx, frame.bry, frame.blx, frame.bly);
+
+  //TODO: Only dummy values. Calculate real values
+  retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);
+  retval->SetProbeType(1); 		// 1 = linear, 2 = sector
+  retval->SetDepthStart(10.0);// Start of sector in mm from origin
+  retval->SetDepthEnd(40.0);	// End of sector in mm from origin
+  retval->SetWidth(30.0);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+
+  std::cout << "Origin: " << frame.mOrigin[0] << " " << frame.mOrigin[1] << " " << std::endl;
+  std::cout << "Probetype: " << retval->GetProbeType() << std::endl;
+  std::cout << "Depth start: " << retval->GetDepthStart();
+  std::cout << " end: " << retval->GetDepthEnd();
+  std::cout << " width: " << retval->GetWidth() << std::endl;
+  //  retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   //std::cout << "Spacing: " << frame.mSpacing[0] << ", " << frame.mSpacing[1] << std::endl;
 
   //double spacing[3];
   //retval->GetSpacing(spacing);
   //std::cout << "Spacing2: " << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << std::endl;
-  retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);
+
   return retval;
 }
 
@@ -241,7 +254,7 @@ void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
 
   for(int i=0; i<sendNumberOfMessage; ++i)
   {
-    IGTLinkSonixStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
+    IGTLinkUSStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
     if(!message)
       break;
     message->Pack();
@@ -281,7 +294,7 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::getLastImageMessageFromQueue()
 
 /** Add the status message to a thread-safe queue
  */
-void ImageSenderSonix::addStatusMessageToQueue(IGTLinkSonixStatusMessage::Pointer msg)
+void ImageSenderSonix::addStatusMessageToQueue(IGTLinkUSStatusMessage::Pointer msg)
 {
   QMutexLocker sentry(&mStatusMutex);
   if(mMutexedStatusMessageQueue.size() > mMaxqueueInfo)
@@ -297,12 +310,12 @@ void ImageSenderSonix::addStatusMessageToQueue(IGTLinkSonixStatusMessage::Pointe
 
 /** Threadsafe retrieval of last image message.
  */
-IGTLinkSonixStatusMessage::Pointer ImageSenderSonix::getLastStatusMessageFromQueue()
+IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getLastStatusMessageFromQueue()
 {
   QMutexLocker sentry(&mStatusMutex);
   if (mMutexedStatusMessageQueue.empty())
-    return IGTLinkSonixStatusMessage::Pointer();
-  IGTLinkSonixStatusMessage::Pointer retval = mMutexedStatusMessageQueue.front();
+    return IGTLinkUSStatusMessage::Pointer();
+  IGTLinkUSStatusMessage::Pointer retval = mMutexedStatusMessageQueue.front();
   mMutexedStatusMessageQueue.pop_front();
   return retval;
 }
