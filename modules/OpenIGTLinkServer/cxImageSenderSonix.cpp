@@ -170,7 +170,7 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
 //  retval->SetWidth(30.0);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
   retval->SetDepthStart(frame.uly * frame.mSpacing[1]);// Start of sector in mm from origin
   retval->SetDepthEnd(frame.bly * frame.mSpacing[1]);	// End of sector in mm from origin
-  retval->SetWidth((frame.urx -  frame.ulx) * frame.mSpacing[2]);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+  retval->SetWidth((frame.urx -  frame.ulx) * frame.mSpacing[0]);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
 
   std::cout << "Origin: " << frame.mOrigin[0] << " " << frame.mOrigin[1] << " " << std::endl;
   std::cout << "Probetype: " << retval->GetProbeType() << std::endl;
