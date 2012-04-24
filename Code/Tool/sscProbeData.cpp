@@ -83,6 +83,11 @@ void ProbeData::setImage(ProbeImageData value)
 	}
 }
 
+void ProbeData::setType(TYPE type)
+{
+	mType = type;
+}
+
 void ProbeData::setSector(double depthStart, double depthEnd, double width, double centerOffset)
 {
 	mDepthStart=depthStart;
