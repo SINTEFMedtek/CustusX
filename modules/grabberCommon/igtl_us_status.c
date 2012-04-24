@@ -21,7 +21,7 @@ void igtl_export igtl_us_status_convert_byte_order(igtl_us_status_message * mess
 			tmp64[i] = BYTE_SWAP_INT64(tmp64[i]);
 
 		for (i = 0; i < 1; i ++)
-			tmp32[6 + i] = BYTE_SWAP_INT32(tmp32[12 + i]);//6*64 bit adressed as 32 bit = 12
+			tmp32[12 + i] = BYTE_SWAP_INT32(tmp32[12 + i]);//6*64 bit adressed as 32 bit = 12
 
 //		tmp16[34] = BYTE_SWAP_INT16(tmp16[34]);//3*64 bit + 8*32 bit (adressed as 16 bit = 28)
 	}
