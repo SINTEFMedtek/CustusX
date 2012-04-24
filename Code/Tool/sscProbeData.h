@@ -124,6 +124,9 @@ public:
 	void setImage(ProbeImageData value);
 	void setSector(double depthStart, double depthEnd, double width, double centerOffset = 0);
 
+	void updateClipRectFromSector();
+	void updateSectorFromClipRect();
+
 private:
 	TYPE mType; ///< type of probe
 	double mDepthStart; ///< start of sector, mm
