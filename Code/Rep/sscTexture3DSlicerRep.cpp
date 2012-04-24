@@ -74,7 +74,7 @@ void Texture3DSlicerRep::viewChanged()
 {
 	if (!mView)
 		return;
-	if (!mView->getZoomFactor() < 0)
+	if (mView->getZoomFactor() < 0)
 		return; // ignore if zoom is invalid
 	mProxy->setViewportData(mView->get_vpMs(), mView->getViewport());
 }
