@@ -26,7 +26,7 @@ IGTLinkUSStatusMessage::IGTLinkUSStatusMessage():
     mDataOrigin[i] = 0.0;
   }
 
-  m_DefaultBodyType  = "ULTRASOUND_STATUS";
+  m_DefaultBodyType  = "CX_US_ST";
 }
 
 IGTLinkUSStatusMessage::~IGTLinkUSStatusMessage()
