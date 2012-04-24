@@ -120,7 +120,7 @@ LandmarkRepPtr LandmarkRep::New(const QString& uid, const QString& name)
 }
 
 LandmarkRep::LandmarkRep(const QString& uid, const QString& name) :
-				RepImpl(uid, name), mColor(0, 1, 0),
+				RepImpl(uid, name), mInactiveColor(0.5,0.5,0.5), mColor(0, 1, 0),
 				//  mSecondaryColor(0,0.6,0.8),
 				mSecondaryColor(0, 0.9, 0.5), mShowLandmarks(true), mGraphicsSize(1), mLabelSize(2.5)
 {
@@ -260,6 +260,17 @@ void LandmarkRep::addLandmark(QString uid)
 		return;
 	}
 
+	double radius = 2;
+	ssc::Vector3D color = mColor;
+	ssc::Vector3D secondaryColor = mSecondaryColor;
+
+	if (!property.getActive())
+	{
+		radius = 1;
+		color = mInactiveColor;
+		secondaryColor = mInactiveColor;
+	}
+
 	LandmarkGraphics current;
 
 	// primary point
@@ -276,13 +287,13 @@ void LandmarkRep::addLandmark(QString uid)
 			primary_r = mPrimary->get_rMl().coord(primary.getCoord());
 
 			current.mPrimaryPoint.reset(new ssc::GraphicalPoint3D(renderer));
-			current.mPrimaryPoint->setColor(mColor);
-			current.mPrimaryPoint->setRadius(2);
+			current.mPrimaryPoint->setColor(color);
+			current.mPrimaryPoint->setRadius(radius);
 
 			current.mText.reset(new ssc::FollowerText3D(renderer));
 			current.mText->setText(property.getName());
 			current.mText->setSizeInNormalizedViewport(true, 0.025);
-			current.mText->setColor(mColor);
+			current.mText->setColor(color);
 
 			ssc::Vector3D text_r = mPrimary->get_rMl().coord(mPrimary->getTextPos(primary.getCoord()));
 
@@ -302,9 +313,8 @@ void LandmarkRep::addLandmark(QString uid)
 			secondary_r = mSecondary->get_rMl().coord(secondary.getCoord());
 
 			current.mSecondaryPoint.reset(new ssc::GraphicalPoint3D(renderer));
-			current.mSecondaryPoint->setColor(mSecondaryColor);
-			current.mSecondaryPoint->setRadius(2);
-
+			current.mSecondaryPoint->setColor(secondaryColor);
+			current.mSecondaryPoint->setRadius(radius);
 			current.mSecondaryPoint->setValue(secondary_r);
 		}
 	}
@@ -313,7 +323,7 @@ void LandmarkRep::addLandmark(QString uid)
 	if (!secondary.getUid().isEmpty() && !secondary.getUid().isEmpty())
 	{
 		current.mLine.reset(new ssc::GraphicalLine3D(renderer));
-		current.mLine->setColor(mSecondaryColor);
+		current.mLine->setColor(secondaryColor);
 		current.mLine->setStipple(0x0F0F);
 
 		current.mLine->setValue(primary_r, secondary_r);
