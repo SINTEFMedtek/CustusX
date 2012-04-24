@@ -144,5 +144,14 @@ void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, ssc::
 	image->setLandmark(ssc::Landmark(uid, p_target));
 }
 
+QString LandmarkImage2ImageRegistrationWidget::getTargetName() const
+{
+	ssc::DataPtr image = mManager->getMovingData();
+	if (!image)
+		return "None";
+	return image->getName();
+}
+
+
 }//namespace cx
 
