@@ -21,7 +21,7 @@ class QTimer;
 #include "cxImageSenderFactory.h"
 
 #include "../grabberCommon/cxIGTLinkImageMessage.h"
-#include "../grabberCommon/cxIGTLinkSonixStatusMessage.h"
+#include "../grabberCommon/cxIGTLinkUSStatusMessage.h"
 #include "vtkSonixVideoSource.h"
 #include "SonixHelper.h"
 #include "cxImageSender.h"
@@ -60,7 +60,7 @@ public slots:
 signals:
     void imageOnQueue(int); ///< Emitted when there is a new igtl::ImageMessage is in the message queue
     void queueInfo(int size, int dropped); ///< Emitted whenever the queue size changes
-    void statusOnQueue(int); ///< Emitted when there is a new IGTLinkSonixStatusMessage is in the message queue
+    void statusOnQueue(int); ///< Emitted when there is a new IGTLinkUSStatusMessage is in the message queue
 
 protected:
 private:
@@ -79,14 +79,14 @@ private:
 
 
   IGTLinkImageMessage::Pointer convertFrame(Frame& frame);
-  IGTLinkSonixStatusMessage::Pointer getFrameStatus(Frame& frame);
+  IGTLinkUSStatusMessage::Pointer getFrameStatus(Frame& frame);
 
 
   void addImageToQueue(IGTLinkImageMessage::Pointer msg); ///< Adds a OpenIGTLink ImageMessage to the queue
   IGTLinkImageMessage::Pointer getLastImageMessageFromQueue(); ///< Gets the oldest message from the queue-
 
-  void addStatusMessageToQueue(IGTLinkSonixStatusMessage::Pointer msg); ///< Adds a OpenIGTLink StatusMessage to the queue
-  IGTLinkSonixStatusMessage::Pointer getLastStatusMessageFromQueue(); ///< Gets the oldest message from the queue-
+  void addStatusMessageToQueue(IGTLinkUSStatusMessage::Pointer msg); ///< Adds a OpenIGTLink StatusMessage to the queue
+  IGTLinkUSStatusMessage::Pointer getLastStatusMessageFromQueue(); ///< Gets the oldest message from the queue-
 
   QMutex mImageMutex; ///< A lock for making the class threadsafe
   int mMaxqueueInfo;
@@ -95,7 +95,7 @@ private:
   int mDroppedImages;
 
   QMutex mStatusMutex; ///< A lock for making the class threadsafe
-  std::list<IGTLinkSonixStatusMessage::Pointer> mMutexedStatusMessageQueue; ///< A threasafe internal queue
+  std::list<IGTLinkUSStatusMessage::Pointer> mMutexedStatusMessageQueue; ///< A threasafe internal queue
 
 private slots:
   //void tick();
