@@ -48,7 +48,8 @@ QStringList ImageSenderSonix::getArgumentDescription()
 
 ImageSenderSonix::ImageSenderSonix(QObject* parent) :
     ImageSender(parent),
-	mSocket(0)
+	mSocket(0),
+	mEmitStatusMessage(false)
 {
 }
 
@@ -109,6 +110,7 @@ void ImageSenderSonix::startStreaming(QTcpSocket* socket)
 {
 	mSocket = socket;
 	mSonixGrabber->Record();
+	mEmitStatusMessage = true;
 	std::cout << "Started streaming from sonix device" << std::endl;
 }
 
@@ -126,7 +128,7 @@ void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 		}
 
   //TODO: Get info like origin from frame and create a IGTLinkUSStatusMessage
-  if (frame.mNewStatus)
+  if (frame.mNewStatus || mEmitStatusMessage)
   {
     IGTLinkUSStatusMessage::Pointer statMsg = getFrameStatus(frame);
 	//double spacing[3];
@@ -136,6 +138,7 @@ void ImageSenderSonix::receiveFrameSlot(Frame& frame)
     // Pack (serialize) and send
 //    statMsg->Pack();
 //    mSocket->write(reinterpret_cast<const char*>(statMsg->GetPackPointer()), statMsg->GetPackSize());
+    mEmitStatusMessage = false;
   }
 
   IGTLinkImageMessage::Pointer imgMsg = convertFrame(frame);
@@ -161,7 +164,7 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
 
   //TODO: Only dummy values. Calculate real values
   retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);
-  retval->SetProbeType(1); 		// 1 = linear, 2 = sector
+  retval->SetProbeType(2); 		// 1 = sector, 2 = linear
   retval->SetDepthStart(10.0);// Start of sector in mm from origin
   retval->SetDepthEnd(40.0);	// End of sector in mm from origin
   retval->SetWidth(30.0);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
