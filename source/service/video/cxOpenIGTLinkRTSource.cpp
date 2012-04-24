@@ -414,8 +414,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 
 	mImageImport->Modified();
 
-
-
+	// Update the parts of the probe data that must be read from the image.
 	ssc::ProbeData::ProbeImageData imageData = mSonixProbeData.getImage();
 	imageData.mSpacing = ssc::Vector3D(spacing[0], spacing[1], spacing[2]);
 	imageData.mSize = QSize(size[0], size[1]);
@@ -431,8 +430,19 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 	}
 }
 
+/**extract information from the IGTLinkUSStatusMessage
+ * and store locally. Also reset the old local info with
+ * information from the probe in toolmanager.
+ *
+ */
 void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer message)
 {
+	// start with getting a valid data object from the probe, in order to keep
+	// existing values (such as temporal calibration).
+	ProbePtr probe = this->getValidProbe();
+	if (probe)
+		mSonixProbeData = probe->getData();
+
 	mSonixProbeData.setType(ssc::ProbeData::TYPE(message->GetProbeType()));
 	mSonixProbeData.setSector(
 		message->GetDepthStart(),
@@ -448,18 +458,29 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer mess
 	updateSonixParameters = true;
 }
 
-//Update probe sector parameters
-void OpenIGTLinkRTSource::updateSonix()
+ProbePtr OpenIGTLinkRTSource::getValidProbe()
 {
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (!tool)
-		return;
+		return ProbePtr();
 	ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
 	if (!probe)
 	{
 		ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Found no Probe");
-		return;
+		return ProbePtr();
 	}
+
+	return probe;
+}
+
+/**Update the probe sector parameters, based on the accumulated information
+ * from incoming IGTLink messages.
+ */
+void OpenIGTLinkRTSource::updateSonix()
+{
+	ProbePtr probe = this->getValidProbe();
+	if (!probe)
+		return;
 
 	std::cout << "Ready to emit Sonix message:\n" << streamXml2String(mSonixProbeData) << std::cout;
 
@@ -469,7 +490,6 @@ void OpenIGTLinkRTSource::updateSonix()
 
 void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 {
-
 //  std::cout << "void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)" << std::endl;
 
 #if 1 // remove to use test image
