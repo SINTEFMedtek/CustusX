@@ -139,12 +139,12 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxImageSenderSonix.h
 		cxImageSenderSonix.cpp
 		cxImageSender.h
-		../grabberCommon/cxIGTLinkSonixStatusMessage.h
-		../grabberCommon/cxIGTLinkSonixStatusMessage.cpp
+		../grabberCommon/cxIGTLinkUSStatusMessage.h
+		../grabberCommon/cxIGTLinkUSStatusMessage.cpp
 		../grabberCommon/cxIGTLinkImageMessage.h
 		../grabberCommon/cxIGTLinkImageMessage.cpp
-		../grabberCommon/igtl_sonix_status.h
-		../grabberCommon/igtl_sonix_status.c
+		../grabberCommon/igtl_us_status.h
+		../grabberCommon/igtl_us_status.c
 )
 
 if(CX_WIN32)

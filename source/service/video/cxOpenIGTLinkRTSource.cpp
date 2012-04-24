@@ -415,20 +415,27 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 	//Only do the following for the digital Ultrasonix interface
 	if (updateSonixParameters)
 	{
-		//TODO: Send all necessary parameters (origin + size) in IGTLinkSonixStatusMessage and only update from there.
+		//TODO: Send all necessary parameters (origin + size) in IGTLinkUSStatusMessage and only update from there.
 		this->updateSonix();
 	}
 }
 
-void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer message)
+void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer message)
 {
-	//std::cout << "void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer message)" << std::endl;
+	//std::cout << "void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer message)" << std::endl;
 	//TODO: Use the status information
 
-	int roi[8];
-	message->GetROI(roi);
-	std::cout << "Ultrasonix roi (x,y)*4: " << roi[0] << " " << roi[1] << " " << roi[2] << " " << roi[3] << " "
-					<< roi[4] << " " << roi[5] << " " << roi[6] << " " << roi[7] << " " << std::endl;
+//	int roi[8];
+//	message->GetROI(roi);
+//	std::cout << "Ultrasonix roi (x,y)*4: " << roi[0] << " " << roi[1] << " " << roi[2] << " " << roi[3] << " "
+//					<< roi[4] << " " << roi[5] << " " << roi[6] << " " << roi[7] << " " << std::endl;
+
+	message->GetOrigin(mOrigin);
+	double depthStart = message->GetDepthStart();
+	double depthEnd = message->GetDepthEnd();
+	double width = message->GetWidth();
+	std::cout << "Origin: " << mOrigin[0] << " " << mOrigin[1] << " " << mOrigin[2] << std::endl;
+	std::cout << "depthStart: " << depthStart << " depthEnd: " << depthEnd << " width: " << width << std::endl;
 
 	ssc::ToolPtr tool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
 	if (!tool)
@@ -447,7 +454,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
 	}
 
 //  mImageImport->GetDataSpacing(spacing);
-	message->GetSpacing(mSpacing); //Use spacing from message
+//	message->GetSpacing(mSpacing); //Use spacing from message
 
 //  float origin[3];
 //  message->GetOrigin(origin);
@@ -455,7 +462,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
 
 	//Test if x and y values are matching that of a linear probe
 	//x					left									right
-	if ((roi[0] != roi[6]) && (roi[2] != roi[4]) &&
+/*	if ((roi[0] != roi[6]) && (roi[2] != roi[4]) &&
 	//y					top										bottom
 					(roi[1] != roi[3]) && (roi[5] != roi[7]))
 	{
@@ -469,14 +476,14 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkSonixStatusMessage::Pointer m
 		//  probeSector = ssc::ProbeData(ssc::ProbeData::tSECTOR, depthStart, depthEnd, width);
 	}
 	else // Linear probe
-	{
-		if (probe->getData().getType() == ssc::ProbeData::tSECTOR)
-			ssc::messageManager()->sendWarning(
-							"OpenIGTLinkRTSource::updateSonixStatus: Probe is a sector probe, but ROI is from linear probe");
-		mDepthStart = roi[1]; // in pixels
-		mDepthEnd = roi[5]; // in pixels
-		mWidth = roi[2] - roi[0]; // in pixels
-	}
+	{*/
+//		if (probe->getData().getType() == ssc::ProbeData::tSECTOR)
+//			ssc::messageManager()->sendWarning(
+//							"OpenIGTLinkRTSource::updateSonixStatus: Probe is a sector probe, but ROI is from linear probe");
+		mDepthStart = depthStart; // in pixels
+		mDepthEnd = depthEnd; // in pixels
+		mWidth = width; // in pixels
+//	}
 
 	updateSonixParameters = true;
 }
