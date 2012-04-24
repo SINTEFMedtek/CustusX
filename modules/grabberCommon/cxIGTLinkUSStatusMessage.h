@@ -21,8 +21,8 @@ namespace cx
 IGTLink Message content:
 
 int Type: Probe Type =
-  1 = linear
-  2 = sector
+  1 = sector
+  2 = linear
 
 double OriginX
 double OriginY : Origin of sector in image coordinates
@@ -50,8 +50,9 @@ public:
   int GetProbeType();
   void SetOrigin(double o[3]);
   void SetOrigin(double oi, double oj, double ok);
-  void GetOrigin(float o[3]);
+  void GetOrigin(double o[3]);
   void GetOrigin(double &oi, double &oj, double &ok);
+  const double* GetOrigin() const;
   void SetDepthStart(double depthStart);
   double GetDepthStart();
   void SetDepthEnd(double depthEnd);

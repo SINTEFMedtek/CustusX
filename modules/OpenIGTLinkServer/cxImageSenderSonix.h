@@ -67,6 +67,7 @@ private:
   QTcpSocket* mSocket;
   QTimer* mTimer;
   StringMap mArguments;
+  bool mEmitStatusMessage; ///< Emit new US status message
 
   vtkSonixVideoSourcePtr  mSonixGrabber; ///< Ultrasonix video grabber
   SonixHelper*          mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
