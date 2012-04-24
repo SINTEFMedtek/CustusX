@@ -128,7 +128,7 @@ void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 		}
 
   //TODO: Get info like origin from frame and create a IGTLinkUSStatusMessage
-  if (frame.mNewStatus || emitStatusMessage)
+  if (frame.mNewStatus || mEmitStatusMessage)
   {
     IGTLinkUSStatusMessage::Pointer statMsg = getFrameStatus(frame);
 	//double spacing[3];
