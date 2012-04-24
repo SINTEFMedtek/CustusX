@@ -434,6 +434,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer mess
 	double depthStart = message->GetDepthStart();
 	double depthEnd = message->GetDepthEnd();
 	double width = message->GetWidth();
+	std::cout << "ProbeType: " << message->GetProbeType() << std::endl;
 	std::cout << "Origin: " << mOrigin[0] << " " << mOrigin[1] << " " << mOrigin[2] << std::endl;
 	std::cout << "depthStart: " << depthStart << " depthEnd: " << depthEnd << " width: " << width << std::endl;
 
