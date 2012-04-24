@@ -21,10 +21,10 @@ SET (cxVideoService_SOURCE
     cxOpenIGTLinkRTSource.cpp
     cxPlaybackUSAcquisitionVideo.h
     cxPlaybackUSAcquisitionVideo.cpp
-    ../../../modules/grabberCommon/cxIGTLinkSonixStatusMessage.h
-    ../../../modules/grabberCommon/cxIGTLinkSonixStatusMessage.cpp
-    ../../../modules/grabberCommon/igtl_sonix_status.h
-    ../../../modules/grabberCommon/igtl_sonix_status.c
+    ../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h
+    ../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.cpp
+    ../../../modules/grabberCommon/igtl_us_status.h
+    ../../../modules/grabberCommon/igtl_us_status.c
 )
 
 include_directories(
