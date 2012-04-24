@@ -120,6 +120,7 @@ public:
 	void setTemporalCalibration(double value) { mTemporalCalibration = value; }
 //	void setImage(ProbeImageData value) { mImage = value; }
 //	void setSector(double depthStart, double depthEnd, double width) { mDepthStart=depthStart; mDepthEnd=depthEnd; mWidth=width; }
+	void setType(TYPE type);
 	void setImage(ProbeImageData value);
 	void setSector(double depthStart, double depthEnd, double width, double centerOffset = 0);
 
