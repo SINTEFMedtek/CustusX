@@ -446,7 +446,7 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 
   // Test if the sonix status message is sent
   //Only send status message when info is changed
-  if (lastRoiUlx != roi.ulx || lastRoiBry != roi.bry)//Initially: Check is ROI is changed
+  if (lastRoiUlx != roi.ulx || lastRoiBry != roi.bry)//Initially: Check if ROI is changed
   {
 	frame.mNewStatus = true;
 	lastRoiUlx = roi.ulx;
