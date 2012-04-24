@@ -215,4 +215,9 @@ void LandmarkPatientRegistrationWidget::performRegistration()
 	this->updateAvarageAccuracyLabel();
 }
 
+QString LandmarkPatientRegistrationWidget::getTargetName() const
+{
+	return "Patient";
+}
+
 }//namespace cx
