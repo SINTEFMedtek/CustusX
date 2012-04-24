@@ -108,13 +108,14 @@ int IGTLinkUSStatusMessage::PackBody()
 	igtl_us_status_message* statusMessage = (igtl_us_status_message*)this->m_StatusMessage;
 
 	//Copy data
-	statusMessage->originX = static_cast<igtl_float64>(this->mDataOrigin[0]);
-	statusMessage->originY = static_cast<igtl_float64>(this->mDataOrigin[1]);
-	statusMessage->originZ = static_cast<igtl_float64>(this->mDataOrigin[2]);
+	statusMessage->originX    = static_cast<igtl_float64>(this->mDataOrigin[0]);
+	statusMessage->originY    = static_cast<igtl_float64>(this->mDataOrigin[1]);
+	statusMessage->originZ    = static_cast<igtl_float64>(this->mDataOrigin[2]);
 	statusMessage->depthStart = static_cast<igtl_float64>(this->mDepthStart);
-	statusMessage->depthEnd = static_cast<igtl_float64>(this->mDepthEnd);
-	statusMessage->width = static_cast<igtl_float64>(this->mWidth);
-	statusMessage->probeType = static_cast<igtl_int32>(this->mProbeType);
+	statusMessage->depthEnd   = static_cast<igtl_float64>(this->mDepthEnd);
+	statusMessage->width      = static_cast<igtl_float64>(this->mWidth);
+
+	statusMessage->probeType  = static_cast<igtl_int32>(this->mProbeType);
 	//TODO: string dataformat
 
 	/*int originMemSpace = sizeof(igtl_float64)*3;
@@ -143,13 +144,13 @@ int IGTLinkUSStatusMessage::UnpackBody()
 	igtl_us_status_convert_byte_order(statusMessage);
 
 	//Copy data
-	this->mDataOrigin[0] = statusMessage->originX;
-	this->mDataOrigin[1] = statusMessage->originY;
-	this->mDataOrigin[2] = statusMessage->originZ;
-	this->mDepthStart = statusMessage->depthStart;
-	this->mDepthEnd = statusMessage->depthEnd;
-	this->mWidth = statusMessage->width;
-	this->mProbeType = statusMessage->probeType;
+	this->mDataOrigin[0]  = statusMessage->originX;
+	this->mDataOrigin[1]  = statusMessage->originY;
+	this->mDataOrigin[2]  = statusMessage->originZ;
+	this->mDepthStart     = statusMessage->depthStart;
+	this->mDepthEnd       = statusMessage->depthEnd;
+	this->mWidth          = statusMessage->width;
+	this->mProbeType      = statusMessage->probeType;
 	//TODO: dataformat
 
 	return 1;
