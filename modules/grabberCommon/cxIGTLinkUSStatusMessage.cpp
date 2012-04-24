@@ -52,12 +52,19 @@ void IGTLinkUSStatusMessage::SetOrigin(double oi, double oj, double ok)
   mDataOrigin[1] = oj;
   mDataOrigin[2] = ok;
 }
-void IGTLinkUSStatusMessage::GetOrigin(float  o[3])
+
+void IGTLinkUSStatusMessage::GetOrigin(double  o[3])
 {
   o[0] = mDataOrigin[0];
   o[1] = mDataOrigin[1];
   o[2] = mDataOrigin[2];
 }
+
+const double* IGTLinkUSStatusMessage::GetOrigin() const
+{
+	return mDataOrigin;
+}
+
 void IGTLinkUSStatusMessage::GetOrigin(double &oi, double &oj, double &ok)
 {
   oi = mDataOrigin[0];
