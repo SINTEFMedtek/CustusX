@@ -24,7 +24,7 @@ class QTcpSocket;
 #include "igtlClientSocket.h"
 #include "igtlImageMessage.h"
 #include "cxRenderTimer.h"
-#include "../../../modules/grabberCommon/cxIGTLinkSonixStatusMessage.h"
+#include "../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h"
 
 namespace cx
 {
@@ -47,7 +47,7 @@ Q_OBJECT
 public:
 	IGTLinkClient(QString address, int port, QObject* parent = NULL);
 	igtl::ImageMessage::Pointer getLastImageMessage(); // threadsafe
-	IGTLinkSonixStatusMessage::Pointer getLastSonixStatusMessage(); // threadsafe
+	IGTLinkUSStatusMessage::Pointer getLastSonixStatusMessage(); // threadsafe
 	QString hostDescription() const; // threadsafe
 
 signals:
@@ -73,7 +73,7 @@ private:
 	bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	void addImageToQueue(igtl::ImageMessage::Pointer imgMsg);
-	void addSonixStatusToQueue(IGTLinkSonixStatusMessage::Pointer msg);
+	void addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg);
 
 	bool mHeadingReceived;
 	QString mAddress;
@@ -85,7 +85,7 @@ private:
 	QMutex mImageMutex;
 	QMutex mSonixStatusMutex;
 	std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue;
-	std::list<IGTLinkSonixStatusMessage::Pointer> mMutexedSonixStatusMessageQueue;
+	std::list<IGTLinkUSStatusMessage::Pointer> mMutexedSonixStatusMessageQueue;
 
 };
 
