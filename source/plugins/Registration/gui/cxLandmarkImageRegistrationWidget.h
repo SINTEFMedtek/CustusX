@@ -51,6 +51,7 @@ protected slots:
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 	virtual void hideEvent(QHideEvent* event);
+	virtual QString getTargetName() const;
 	virtual ssc::LandmarkMap getTargetLandmarks() const;
 	virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
 	virtual void performRegistration()

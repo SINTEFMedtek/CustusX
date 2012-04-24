@@ -239,4 +239,13 @@ void LandmarkImageRegistrationWidget::setTargetLandmark(QString uid, ssc::Vector
 	image->setLandmark(ssc::Landmark(uid, p_target));
 }
 
+QString LandmarkImageRegistrationWidget::getTargetName() const
+{
+	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	if (!image)
+		return "None";
+	return image->getName();
+}
+
+
 }//namespace cx
