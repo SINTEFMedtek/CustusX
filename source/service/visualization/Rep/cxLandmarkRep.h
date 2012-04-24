@@ -121,6 +121,7 @@ protected slots:
 	void internalUpdate(); ///< updates the text, color, scale etc
 
 protected:
+	ssc::Vector3D mInactiveColor; ///< color given to inactive landmarks
 	ssc::Vector3D mColor; ///< the color of the landmark actors
 	ssc::Vector3D mSecondaryColor; ///< color used on the secondary coordinate
 	bool mShowLandmarks; ///< whether or not the actors should be showed in (all) views
