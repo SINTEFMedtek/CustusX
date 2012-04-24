@@ -268,6 +268,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	ssc::ProbeData data = probe->getData();
 
 	data.setSector(mDepthWidget->getValue().first, mDepthWidget->getValue().second, mWidth->getValue());
+	data.updateClipRectFromSector();
 
 	probe->setProbeSector(data);
 
@@ -288,6 +289,7 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	image.mOrigin_p = mOrigin->getValue();
 	image.mClipRect_p = mBBWidget->getValue();
 	data.setImage(image);
+	data.updateSectorFromClipRect();
 
 	probe->setProbeSector(data);
 
