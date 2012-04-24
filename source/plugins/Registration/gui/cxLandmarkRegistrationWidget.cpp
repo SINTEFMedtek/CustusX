@@ -113,10 +113,16 @@ void LandmarkRegistrationWidget::populateTheLandmarkTableWidget()
 	mLandmarkTableWidget->blockSignals(true);
 	mLandmarkTableWidget->clear();
 
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	QString fixedName;
+	ssc::DataPtr fixedData = boost::shared_dynamic_cast<ssc::Data>(mManager->getFixedData());
+	if (fixedData)
+		fixedName = fixedData->getName();
 
-	if (!image) //Image is deleted
-		return;
+	// active image is irrelevant here: remove
+//	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+//
+//	if (!image) //Image is deleted
+//		return;
 
 	std::vector<ssc::Landmark> landmarks = this->getAllLandmarks();
 	ssc::LandmarkMap targetData = this->getTargetLandmarks();
@@ -139,12 +145,15 @@ void LandmarkRegistrationWidget::populateTheLandmarkTableWidget()
 		coord = rMtarget.coord(coord); // display coordinates in space r (in principle, this means all coords should be equal)
 
 		items[0] = new QTableWidgetItem(qstring_cast(prop.getName()));
+		items[0]->setToolTip(QString("Landmark name. Double-click to rename."));
+
 		items[1] = new QTableWidgetItem;
 
 		if (prop.getActive())
 			items[1]->setCheckState(Qt::Checked);
 		else
 			items[1]->setCheckState(Qt::Unchecked);
+		items[1]->setToolTip(QString("Check to use landmark in current registration."));
 
 		QString coordText = "Not sampled";
 		if (targetData.count(prop.getUid()))
@@ -156,8 +165,10 @@ void LandmarkRegistrationWidget::populateTheLandmarkTableWidget()
 		}
 
 		items[2] = new QTableWidgetItem(coordText);
+		items[2]->setToolTip(QString("Landmark coordinates of target [%1] in reference space.").arg(this->getTargetName()));
 
 		items[3] = new QTableWidgetItem(tr("%1").arg(this->getAccuracy(landmarks[i].getUid())));
+		items[3]->setToolTip(QString("Distance from target [%1] to fixed [%2].").arg(this->getTargetName()).arg(fixedName));
 
 		for (unsigned j = 0; j < items.size(); ++j)
 		{
@@ -259,7 +270,13 @@ void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 
 void LandmarkRegistrationWidget::updateAvarageAccuracyLabel()
 {
+	QString fixedName;
+	ssc::DataPtr fixedData = boost::shared_dynamic_cast<ssc::Data>(mManager->getFixedData());
+	if (fixedData)
+		fixedName = fixedData->getName();
+
 	mAvarageAccuracyLabel->setText(tr("Mean accuracy %1 mm").arg(this->getAvarageAccuracy()));
+	mAvarageAccuracyLabel->setToolTip(QString("Average landmark accuracy from target [%1] to fixed [%2].").arg(this->getTargetName()).arg(fixedName));
 }
 
 double LandmarkRegistrationWidget::getAvarageAccuracy()
