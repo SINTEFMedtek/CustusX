@@ -220,7 +220,7 @@ void IGTLinkClient::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
 
 /** add the message to a thread-safe queue
  */
-void IGTLinkClient::addSonixStatusToQueue(IGTLinkSonixStatusMessage::Pointer msg)
+void IGTLinkClient::addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg)
 {
 	QMutexLocker sentry(&mSonixStatusMutex);
 	mMutexedSonixStatusMessageQueue.push_back(msg);
@@ -244,12 +244,12 @@ igtl::ImageMessage::Pointer IGTLinkClient::getLastImageMessage()
 /** Threadsafe retrieval of last image message.
  *
  */
-IGTLinkSonixStatusMessage::Pointer IGTLinkClient::getLastSonixStatusMessage()
+IGTLinkUSStatusMessage::Pointer IGTLinkClient::getLastSonixStatusMessage()
 {
 	QMutexLocker sentry(&mSonixStatusMutex);
 	if (mMutexedSonixStatusMessageQueue.empty())
-		return IGTLinkSonixStatusMessage::Pointer();
-	IGTLinkSonixStatusMessage::Pointer retval = mMutexedSonixStatusMessageQueue.front();
+		return IGTLinkUSStatusMessage::Pointer();
+	IGTLinkUSStatusMessage::Pointer retval = mMutexedSonixStatusMessageQueue.front();
 	mMutexedSonixStatusMessageQueue.pop_front();
 	return retval;
 }
@@ -298,7 +298,7 @@ void IGTLinkClient::readyReadSlot()
 		{
 			success = this->ReceiveImage(mSocket, mHeaderMsg);
 		}
-		else if (strcmp(mHeaderMsg->GetDeviceType(), "SONIX_STATUS") == 0)
+		else if (strcmp(mHeaderMsg->GetDeviceType(), "ULTRASOUND_STATUS") == 0)
 		{
 			success = this->ReceiveSonixStatus(mSocket, mHeaderMsg);
 		}
@@ -320,8 +320,8 @@ void IGTLinkClient::readyReadSlot()
 
 bool IGTLinkClient::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
-	IGTLinkSonixStatusMessage::Pointer msg;
-	msg = IGTLinkSonixStatusMessage::New();
+	IGTLinkUSStatusMessage::Pointer msg;
+	msg = IGTLinkUSStatusMessage::New();
 	msg->SetMessageHeader(header);
 	msg->AllocatePack();
 

@@ -53,8 +53,8 @@ OpenIGTLinkSender::~OpenIGTLinkSender()
 
 void OpenIGTLinkSender::receiveFrameSlot(Frame& frame)
 {
-  //TODO: Get info like origin from frame and create a IGTLinkSonixStatusMessage
-  //IGTLinkSonixStatusMessage::Pointer statMsg = getStatus(frame);
+  //TODO: Get info like origin from frame and create a IGTLinkUSStatusMessage
+  //IGTLinkUSStatusMessage::Pointer statMsg = getStatus(frame);
 
   IGTLinkImageMessage::Pointer imgMsg = convertFrame(frame);
 //  std::cout << "Socket bytesToWrite: " << mSocket->bytesToWrite() << std::endl;
