@@ -25,7 +25,7 @@
 #include <boost/array.hpp>
 #include "igtlImageMessage.h"
 #include <vector>
-#include "../../../modules/grabberCommon/cxIGTLinkSonixStatusMessage.h"
+#include "../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h"
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
@@ -84,7 +84,7 @@ signals:
 
 public:
 	void updateImage(igtl::ImageMessage::Pointer message); // called by receiving thread when new data arrives.
-	void updateSonixStatus(IGTLinkSonixStatusMessage::Pointer message);
+	void updateSonixStatus(IGTLinkUSStatusMessage::Pointer message);
 
 private slots:
 	void clientFinishedSlot();
