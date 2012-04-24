@@ -234,8 +234,11 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 	for (std::map<QString, ssc::DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
 		QString desc("loaded " + iter->second->getName());
-		double acqTime = iter->second->getAcquisitionTime().toMSecsSinceEpoch();
-		events.push_back(TimelineEvent(desc, acqTime));
+		if (iter->second->getAcquisitionTime().isValid())
+		{
+			double acqTime = iter->second->getAcquisitionTime().toMSecsSinceEpoch();
+			events.push_back(TimelineEvent(desc, acqTime));
+		}
 
 		ssc::RegistrationHistoryPtr reg = iter->second->get_rMd_History();
 		TimelineEventVector current = this->convertRegistrationHistoryToEvents(reg);
@@ -274,6 +277,8 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 //		std::cout << events[i].mDescription  << std::endl;
 //		std::cout << "===start " << QDateTime::fromMSecsSinceEpoch(events[i].mStartTime).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 //		std::cout << "===  end " << QDateTime::fromMSecsSinceEpoch(events[i].mEndTime).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//		std::cout << "===start " << events[i].mStartTime << std::endl;
+//		std::cout << "===  end " << events[i].mEndTime << std::endl;
 //		std::cout << "======" << std::endl;
 	}
 //	std::cout << "======" << std::endl;
