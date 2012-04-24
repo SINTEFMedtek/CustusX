@@ -161,7 +161,7 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
 
   //TODO: Only dummy values. Calculate real values
   retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);
-  retval->SetProbeType(1); 		// 1 = linear, 2 = sector
+  retval->SetProbeType(2); 		// 1 = sector, 2 = linear
   retval->SetDepthStart(10.0);// Start of sector in mm from origin
   retval->SetDepthEnd(40.0);	// End of sector in mm from origin
   retval->SetWidth(30.0);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
