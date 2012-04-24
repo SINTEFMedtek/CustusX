@@ -298,7 +298,7 @@ void IGTLinkClient::readyReadSlot()
 		{
 			success = this->ReceiveImage(mSocket, mHeaderMsg);
 		}
-		else if (strcmp(mHeaderMsg->GetDeviceType(), "ULTRASOUND_STATUS") == 0)
+		else if (strcmp(mHeaderMsg->GetDeviceType(), "CX_US_ST") == 0)
 		{
 			success = this->ReceiveSonixStatus(mSocket, mHeaderMsg);
 		}
