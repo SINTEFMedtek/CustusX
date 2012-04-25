@@ -165,9 +165,12 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
   //TODO: Only dummy values. Calculate real values
   retval->SetOrigin(frame.mOrigin[0], frame.mOrigin[1], 0);
   retval->SetProbeType(2); 		// 1 = sector, 2 = linear
-  retval->SetDepthStart(10.0);// Start of sector in mm from origin
-  retval->SetDepthEnd(40.0);	// End of sector in mm from origin
-  retval->SetWidth(30.0);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+//  retval->SetDepthStart(10.0);// Start of sector in mm from origin
+//  retval->SetDepthEnd(40.0);	// End of sector in mm from origin
+//  retval->SetWidth(30.0);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+  retval->SetDepthStart(frame.uly * frame.mSpacing[1]);// Start of sector in mm from origin
+  retval->SetDepthEnd(frame.bly * frame.mSpacing[1]);	// End of sector in mm from origin
+  retval->SetWidth((frame.urx -  frame.ulx) * frame.mSpacing[0]);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
 
   std::cout << "Origin: " << frame.mOrigin[0] << " " << frame.mOrigin[1] << " " << std::endl;
   std::cout << "Probetype: " << retval->GetProbeType() << std::endl;
