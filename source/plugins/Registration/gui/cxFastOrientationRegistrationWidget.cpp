@@ -14,12 +14,24 @@ namespace cx
 FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegistrationManagerPtr regManager, QWidget* parent) :
     RegistrationBaseWidget(regManager, parent, "FastOrientationRegistrationWidget", "Fast Orientation Registration"),
     mSetOrientationButton(new QPushButton("Define Orientation")),
+    mPatientOrientationButton(new QPushButton("Patient Orientation")),
     mInvertButton(new QCheckBox("Back face"))
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->addWidget(mInvertButton);
   layout->addWidget(mSetOrientationButton);
+  layout->addSpacing(6);
+  layout->addWidget(this->createHorizontalLine());
+  layout->addWidget(mPatientOrientationButton);
   layout->addStretch();
+
+  mSetOrientationButton->setToolTip(this->defaultWhatsThis());
+  mPatientOrientationButton->setToolTip(""
+				  "Set orientation to tool orientation, but keep\n"
+				  "the position of the already loaded data objects\n"
+				  "relative to physical space.");
+
+  connect(mPatientOrientationButton, SIGNAL(clicked()), this, SLOT(setPatientOrientationSlot()));
 
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot(const QString&)));
 
@@ -53,18 +65,50 @@ void FastOrientationRegistrationWidget::hideEvent(QHideEvent* event)
 
 void FastOrientationRegistrationWidget::setOrientationSlot()
 {
-  ssc::Transform3D tMtm;
+//  ssc::Transform3D tMtm;
+//
+//  if (mInvertButton->isChecked())
+//  {
+//    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI/2);//-M_PI_2); //?
+//  }
+//  else
+//  {
+//    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI/2);//M_PI_2); //?
+//  }
 
-  if (mInvertButton->isChecked())
-  {
-    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI/2);//-M_PI_2); //?
-  }
-  else
-  {
-    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI/2);//M_PI_2); //?
-  }
+  mManager->doFastRegistration_Orientation(this->get_tMtm());
+}
 
-  mManager->doFastRegistration_Orientation(tMtm);
+ssc::Transform3D FastOrientationRegistrationWidget::get_tMtm() const
+{
+	ssc::Transform3D tMtm;
+
+	if (mInvertButton->isChecked())
+	{
+		tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI / 2); //-M_PI_2); //?
+	}
+	else
+	{
+		tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI / 2); //M_PI_2); //?
+	}
+
+	return tMtm;
+}
+
+void FastOrientationRegistrationWidget::setPatientOrientationSlot()
+{
+//  ssc::Transform3D tMtm;
+//
+//  if (mInvertButton->isChecked())
+//  {
+//    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI/2);//-M_PI_2); //?
+//  }
+//  else
+//  {
+//    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI/2);//M_PI_2); //?
+//  }
+
+  mManager->applyPatientOrientation(this->get_tMtm());
 }
 
 void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
@@ -74,7 +118,9 @@ void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
   enabled = mToolToSample &&
       mToolToSample->getVisible() &&
       (!mToolToSample->hasType(ssc::Tool::TOOL_MANUAL) || DataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+
   mSetOrientationButton->setEnabled(enabled);
+  mPatientOrientationButton->setEnabled(enabled);
 }
 
 void FastOrientationRegistrationWidget::dominantToolChangedSlot(const QString& uid)

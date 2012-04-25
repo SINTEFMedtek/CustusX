@@ -412,6 +412,60 @@ void RegistrationManager::doFastRegistration_Translation()
   this->applyPatientRegistration(rMpr_old*pr_oldMpr_new, "Fast Translation");
 }
 
+/**\brief Identical to doFastRegistration_Orientation(), except data does not move.
+ *
+ * When applying a new transform to the patient orientation, all data is moved
+ * the the inverse of that value, thus giving a net zero change along the path
+ * pr...d_i.
+ *
+ */
+void RegistrationManager::applyPatientOrientation(const ssc::Transform3D& tMtm)
+{
+	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+	ssc::Transform3D prMt = ssc::toolManager()->getDominantTool()->get_prMt();
+
+	//create a marked(m) space tm, which is related to tool space (t) as follows:
+	//the tool is defined in DICOM space such that
+	//the tool points toward the patients feet and the spheres faces the same
+	//direction as the nose
+	ssc::Transform3D tMpr = prMt.inv();
+
+	// this is the new patient registration:
+	ssc::Transform3D tmMpr = tMtm * tMpr;
+	// the change in pat reg becomes:
+	ssc::Transform3D F = tmMpr * rMpr.inv();
+
+	QString description("Patient Orientation");
+
+	QDateTime oldTime = mLastRegistrationTime; // time of previous reg
+	this->applyPatientRegistration(tmMpr, description);
+
+	// now apply the inverse of F to all data,
+	// thus ensuring the total path from pr to d_i is unchanged:
+	ssc::Transform3D delta_pre_rMd = F;
+
+
+	// use the same registration time as generated in the applyPatientRegistration() above:
+	ssc::RegistrationTransform regTrans(delta_pre_rMd, mLastRegistrationTime, description);
+
+	std::map<QString,ssc::DataPtr> data = ssc::dataManager()->getData();
+	// update the transform on all target data:
+	for (std::map<QString,ssc::DataPtr>::iterator iter = data.begin(); iter!=data.end(); ++iter)
+	{
+		ssc::DataPtr current = iter->second;
+		ssc::RegistrationTransform newTransform = regTrans;
+		newTransform.mValue = regTrans.mValue * current->get_rMd();
+		current->get_rMd_History()->updateRegistration(oldTime, newTransform);
+
+		ssc::messageManager()->sendInfo("Updated registration of data " + current->getName());
+		std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
+	}
+
+	mLastRegistrationTime = regTrans.mTimestamp;
+
+	ssc::messageManager()->sendSuccess("Patient Orientation has been performed");
+}
+
 /**\brief apply a new image registration
  *
  * All image registration techniques should use this method
