@@ -46,9 +46,11 @@ private:
   QPushButton* mOkButton;
   QCheckBox* mNiftiFormatCheckBox;
   QCheckBox* mTransformFromParentFrameCheckBox;
+  QCheckBox* mConvertToUnsignedCheckBox;
 
   void convertFromNifti1Coordinates();
   void importParentTransform();
+  void convertToUnsigned();
 };
 }//namespace cx
 
