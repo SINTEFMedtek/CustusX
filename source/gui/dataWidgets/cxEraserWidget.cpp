@@ -211,51 +211,21 @@ void EraserWidget::removeSlot()
 		this->eraseVolume(static_cast<unsigned char*> (img->GetScalarPointer()), VTK_UNSIGNED_CHAR_MIN);
 	if (img->GetScalarType()==VTK_UNSIGNED_SHORT)
 		this->eraseVolume(static_cast<unsigned short*> (img->GetScalarPointer()), VTK_UNSIGNED_SHORT_MIN);
+	if (img->GetScalarType()==VTK_SHORT)
+		this->eraseVolume(static_cast<short*> (img->GetScalarPointer()), VTK_SHORT_MIN);
+	if (img->GetScalarType()==VTK_UNSIGNED_INT)
+		this->eraseVolume(static_cast<unsigned int*> (img->GetScalarPointer()), VTK_UNSIGNED_INT_MIN);
+	if (img->GetScalarType()==VTK_INT)
+		this->eraseVolume(static_cast<int*> (img->GetScalarPointer()), VTK_INT_MIN);
 
-//	//	ssc::Vector3D c(200,200,200);
-//	ssc::Vector3D c(mEraserSphere->GetCenter());
-//	double r = mEraserSphere->GetRadius();
-//
-//	ssc::DoubleBoundingBox3D bb_r(c[0]-r, c[0]+r, c[1]-r, c[1]+r, c[2]-r, c[2]+r);
-//
-//	ssc::Transform3D dMr = image->get_rMd().inv();
-//	ssc::Transform3D rawMd = ssc::createTransformScale(targetSpacing).inv();
-//	ssc::Transform3D rawMr = rawMd * dMr;
-//	c = rawMr.coord(c);
-//	r = rawMr.vector(r * ssc::Vector3D::UnitX()).length();
-//	ssc::DoubleBoundingBox3D bb0_raw = ssc::transform(rawMr, bb_r);
-//	ssc::IntBoundingBox3D bb1_raw(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
-//
-//	for (int i=0; i<3; ++i)
-//	{
-//		bb1_raw[2*i] = std::max<double>(bb1_raw[2*i], bb0_raw[2*i]);
-//		bb1_raw[2*i+1] = std::max<double>(bb1_raw[2*i+1], bb0_raw[2*i+1]);
-//	}
-//
-//	std::cout << "clip in raw: " << bb1_raw << std::endl;
-//	//	double r=50;
-//	//	ssc::Vector3D c(200,200,200);
-//	for (int x = bb1_raw[0]; x < bb1_raw[1]; ++x)
-//		for (int y = bb1_raw[2]; y < bb1_raw[3]; ++y)
-//			for (int z = bb1_raw[4]; z < bb1_raw[5]; ++z)
-//			{
-//				int index = x + y * dim[0] + z * dim[0] * dim[1];
-//				outputPointer[index] = 255;
-//
-//				if ((ssc::Vector3D(x, y, z) - c).length() < r)
-//					outputPointer[index] = 255;
-//			}
+	ssc::ImageLUT2DPtr tf2D = image->getLookupTable2D();
+	ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
 
-//	for (int x = 0; x < dim[0]; ++x)
-//		for (int y = 0; y < dim[1]; ++y)
-//			for (int z = 0; z < dim[2]; ++z)
-//			{
-//				int index = x + y * dim[0] + z * dim[0] * dim[1];
-//
-//				if ((ssc::Vector3D(x, y, z) - c).length() < r)
-//					outputPointer[index] = 255;
-//			}
 	image->setVtkImageData(img);
+
+	// keep existing transfer functions
+	image->resetTransferFunction(tf2D);
+	image->resetTransferFunction(tf3D);
 }
 
 void EraserWidget::toggleShowEraser(bool on)
