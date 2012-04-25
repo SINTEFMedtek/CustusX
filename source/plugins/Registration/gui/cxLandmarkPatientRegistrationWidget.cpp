@@ -30,6 +30,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(Registratio
 {
 	mImageLandmarkSource = ImageLandmarksSource::New();
 	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
+	connect(mManager.get(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedDataChanged()));
 
 	//buttons
 	mToolSampleButton->setDisabled(true);
@@ -83,10 +84,11 @@ void LandmarkPatientRegistrationWidget::registerSlot()
 	this->performRegistration();
 }
 
-void LandmarkPatientRegistrationWidget::activeImageChangedSlot()
+void LandmarkPatientRegistrationWidget::fixedDataChanged()
 {
 	LandmarkRegistrationWidget::activeImageChangedSlot();
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+//	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mManager->getFixedData());
 	mImageLandmarkSource->setImage(image);
 }
 
@@ -129,6 +131,7 @@ void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 
 void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 {
+//	std::cout << "LandmarkPatientRegistrationWidget::showEvent" << std::endl;
 	LandmarkRegistrationWidget::showEvent(event);
 	connect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
 	connect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
@@ -146,6 +149,7 @@ void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
 
 void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 {
+//	std::cout << "LandmarkPatientRegistrationWidget::hideEvent" << std::endl;
 	LandmarkRegistrationWidget::hideEvent(event);
 	disconnect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
 	disconnect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));

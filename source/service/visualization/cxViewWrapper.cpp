@@ -290,7 +290,18 @@ QStringList ViewWrapper::getAllDataNames() const
 	QStringList text;
 	for (unsigned i = 0; i < data.size(); ++i)
 	{
-		text << qstring_cast(data[i]->getName());
+		QString line = data[i]->getName();
+
+		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data[i]);
+		if (image)
+		{
+			if (image->getCropping())
+				line += " (cropped)";
+			if (!image->getClipPlanes().empty())
+				line += " (clipped)";
+		}
+
+		text << line;
 	}
 	std::reverse(text.begin(), text.end());
 	return text;
