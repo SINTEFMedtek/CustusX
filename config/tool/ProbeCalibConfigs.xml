@@ -991,7 +991,7 @@
                     </Corner>
                     <CroppingEdges>
                         <Left>180</Left>
-                        <Right>527</Right>
+                        <Right>523</Right>
                         <Top>60</Top>
                         <Bottom>519</Bottom>
                     </CroppingEdges>
@@ -1039,46 +1039,27 @@
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>WidthMaxDepth3cm2</ID>
-                    <Name>Width: Max, Depth: 3 cm (2)</Name>
+                    <ID>WidthMaxDepth7cmelasto</ID>
+                    <Name>Width: Max, Depth: 7 cm elasto</Name>
                     <WidthDeg>0</WidthDeg>
                     <Origin>
-                        <Col>353</Col>
-                        <Row>60</Row>
+                        <Col>353.5</Col>
+                        <Row>61</Row>
                     </Origin>
                     <CroppingEdges>
-                        <Left>64</Left>
-                        <Right>642</Right>
-                        <Top>60</Top>
-                        <Bottom>519</Bottom>
+                        <Left>230</Left>
+                        <Right>474</Right>
+                        <Top>61</Top>
+                        <Bottom>520</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.065359</Width>
-                        <Height>0.065359</Height>
+                        <Width>0.15251000000000001</Width>
+                        <Height>0.15251000000000001</Height>
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>WidthMaxDepth3cm3</ID>
-                    <Name>Width: Max, Depth: 3 cm (3)</Name>
-                    <WidthDeg>0</WidthDeg>
-                    <Origin>
-                        <Col>353</Col>
-                        <Row>60</Row>
-                    </Origin>
-                    <CroppingEdges>
-                        <Left>64</Left>
-                        <Right>642</Right>
-                        <Top>60</Top>
-                        <Bottom>519</Bottom>
-                    </CroppingEdges>
-                    <PixelSize>
-                        <Width>0.065359</Width>
-                        <Height>0.065359</Height>
-                    </PixelSize>
-                </Config>
-                <Config>
-                    <ID>WidthMaxDepth4cm2</ID>
-                    <Name>Width: Max, Depth: 4 cm (2)</Name>
+                    <ID>WidthMaxDepth4cmelasto</ID>
+                    <Name>Width: Max, Depth: 4 cm elasto</Name>
                     <WidthDeg>0</WidthDeg>
                     <Origin>
                         <Col>353.5</Col>
@@ -1086,13 +1067,32 @@
                     </Origin>
                     <CroppingEdges>
                         <Left>133</Left>
-                        <Right>574</Right>
+                        <Right>569</Right>
                         <Top>58</Top>
                         <Bottom>523</Bottom>
                     </CroppingEdges>
                     <PixelSize>
                         <Width>0.086022000000000001</Width>
                         <Height>0.086022000000000001</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>WidthMaxDepth3cmelasto</ID>
+                    <Name>Width: Max, Depth: 3 cm elasto</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>353</Col>
+                        <Row>60</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>66</Left>
+                        <Right>638</Right>
+                        <Top>60</Top>
+                        <Bottom>519</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.065359</Width>
+                        <Height>0.065359</Height>
                     </PixelSize>
                 </Config>
             </RTSource>
@@ -1416,6 +1416,63 @@
                     <PixelSize>
                         <Width>0.16997</Width>
                         <Height>0.16997</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>AngioWidthMaxDepth4cm2</ID>
+                    <Name>Angio, Width: Max, Depth: 4 cm (2)</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>321</Col>
+                        <Row>65</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>153</Left>
+                        <Right>487</Right>
+                        <Top>65</Top>
+                        <Bottom>415</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.11330999999999999</Width>
+                        <Height>0.11330999999999999</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>AngioWidthMaxDepth6cm2</ID>
+                    <Name>Angio, Width: Max, Depth: 6cm (2)</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>321</Col>
+                        <Row>65</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>211</Left>
+                        <Right>430</Right>
+                        <Top>67</Top>
+                        <Bottom>413</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.16997000000000001</Width>
+                        <Height>0.16997000000000001</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>AngioWidthMaxDepth5cm2</ID>
+                    <Name>Angio, Width: Max, Depth: 5 cm (2)</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>321</Col>
+                        <Row>65</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>189</Left>
+                        <Right>451</Right>
+                        <Top>67</Top>
+                        <Bottom>415</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.14204</Width>
+                        <Height>0.14204</Height>
                     </PixelSize>
                 </Config>
             </RTSource>
