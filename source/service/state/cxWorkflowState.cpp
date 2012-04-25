@@ -118,13 +118,17 @@ bool NavigationWorkflowState::canEnter() const
 RegistrationWorkflowState::RegistrationWorkflowState(QState* parent) :
 				WorkflowState(parent, "RegistrationUid", "Registration")
 {
-	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+//	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 ;
 
 bool RegistrationWorkflowState::canEnter() const
 {
-	return !ssc::dataManager()->getImages().empty();
+// We need to perform patient orientation prior to
+// running and us acq. Thus we need access to the reg mode.
+//	return !ssc::dataManager()->getImages().empty();
+	return patientService()->getPatientData()->isPatientValid();
 }
 ;
 

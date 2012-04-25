@@ -3,6 +3,7 @@
 
 #include "cxRegistrationBaseWidget.h"
 #include "sscForwardDeclarations.h"
+#include "sscTransform3D.h"
 
 class QPushButton;
 class QCheckBox;
@@ -42,9 +43,12 @@ private slots:
   void dominantToolChangedSlot(const QString& uid);
   void enableToolSampleButtonSlot();
   void toolVisibleSlot(bool visible);
+  void setPatientOrientationSlot();
 
 private:
+  ssc::Transform3D get_tMtm() const;
   QPushButton* mSetOrientationButton;
+  QPushButton* mPatientOrientationButton;
   QCheckBox* mInvertButton;
 
   ssc::ToolPtr mToolToSample; ///< tool to be sampled from
