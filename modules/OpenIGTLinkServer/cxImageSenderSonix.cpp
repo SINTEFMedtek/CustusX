@@ -168,10 +168,13 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
 //  retval->SetDepthStart(10.0);// Start of sector in mm from origin
 //  retval->SetDepthEnd(40.0);	// End of sector in mm from origin
 //  retval->SetWidth(30.0);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
-  retval->SetDepthStart(frame.uly * frame.mSpacing[1]);// Start of sector in mm from origin
-  retval->SetDepthEnd(frame.bly * frame.mSpacing[1]);	// End of sector in mm from origin
-  retval->SetWidth((frame.urx -  frame.ulx) * frame.mSpacing[0]);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+  retval->SetDepthStart((frame.uly-frame.mOrigin[1]) * frame.mSpacing[1]);// Start of sector in mm from origin
+  retval->SetDepthEnd((frame.bly-frame.mOrigin[1]) * frame.mSpacing[1]);	// End of sector in mm from origin
+  //As ROI is a bit wide we subtract the width by 0.3 mm
+  retval->SetWidth((frame.urx -  frame.ulx ) * frame.mSpacing[0] - 0.3);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
 
+  //std::cout << "uly: " << frame.uly << " bly: " << frame.bly << std::endl;
+  //std::cout << "spacing: " << frame.mSpacing[0] << "  " << frame.mSpacing[1] << std::endl;
   std::cout << "Origin: " << frame.mOrigin[0] << " " << frame.mOrigin[1] << " " << std::endl;
   std::cout << "Probetype: " << retval->GetProbeType() << std::endl;
   std::cout << "Depth start: " << retval->GetDepthStart();
