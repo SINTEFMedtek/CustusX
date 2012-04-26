@@ -74,6 +74,7 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	mDepthWidget = new SliderRangeGroupWidget(this);
 	mDepthWidget->setName("Depth");
 	mDepthWidget->setRange(ssc::DoubleRange(0, 100, 1));
+	mDepthWidget->setDecimals(1);
 	connect(mDepthWidget, SIGNAL(valueChanged(double, double)), this, SLOT(guiProbeSectorChanged()));
 	sectorLayout->addWidget(mDepthWidget);
 
