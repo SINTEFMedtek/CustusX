@@ -26,6 +26,8 @@
 #include "cxDataMetric.h"
 #include "sscView.h"
 #include "sscImage.h"
+#include "cxViewManager.h"
+#include "cxInteractiveClipper.h"
 
 namespace cx
 {
@@ -297,7 +299,7 @@ QStringList ViewWrapper::getAllDataNames() const
 		{
 			if (image->getCropping())
 				line += " (cropped)";
-			if (!image->getClipPlanes().empty())
+			if (!image->getClipPlanes().empty() || (viewManager()->getClipper()->getImage() == image))
 				line += " (clipped)";
 		}
 
