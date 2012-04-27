@@ -35,15 +35,15 @@
 namespace cx
 {
 
-InteractiveClipper::InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy) :
-	mSlicePlanesProxy(slicePlanesProxy), mUseClipper(false)
-{
-	mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
-	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-	connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
-
-	this->changedSlot();
-}
+//InteractiveClipper::InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy) :
+//	mSlicePlanesProxy(slicePlanesProxy), mUseClipper(false)
+//{
+//	mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
+//	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
+////	connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
+//
+//	this->changedSlot();
+//}
 
 InteractiveClipper::InteractiveClipper() :
 	mUseClipper(false)
@@ -61,12 +61,13 @@ InteractiveClipper::InteractiveClipper() :
 
 	mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
 	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-	connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
+//	connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
 	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
 	this->dominantToolChangedSlot();
 	this->changedSlot();
 }
+
 
 void InteractiveClipper::setSlicePlane(ssc::PLANE_TYPE plane)
 {
@@ -83,18 +84,18 @@ void InteractiveClipper::setSlicePlane(ssc::PLANE_TYPE plane)
 
 void InteractiveClipper::saveClipPlaneToVolume()
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-	if (!image)
+//	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	if (!mImage)
 		return;
 
-	image->addClipPlane(mSlicePlaneClipper->getClipPlaneCopy());
+	mImage->addClipPlane(mSlicePlaneClipper->getClipPlaneCopy());
 }
 void InteractiveClipper::clearClipPlanesInVolume()
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-	if (!image)
+//	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	if (!mImage)
 		return;
-	image->clearClipPlanes();
+	mImage->clearClipPlanes();
 }
 
 ssc::PLANE_TYPE InteractiveClipper::getSlicePlane()
@@ -130,15 +131,27 @@ ssc::PLANE_TYPE InteractiveClipper::getPlaneType()
 	return mSlicePlaneClipper->getSlicer()->getComputer().getPlaneType();
 }
 
+ssc::ImagePtr InteractiveClipper::getImage() const
+{
+	return mImage;
+}
+
+void InteractiveClipper::setImage(ssc::ImagePtr image)
+{
+	std::cout << "InteractiveClipper::setImage " << image.get() << std::endl;
+	mImage = image;
+//	this->changedSlot(); // auto by changed()
+	emit changed();
+}
+
 void InteractiveClipper::changedSlot()
 {
 	//  std::cout << "InteractiveClipper::changedSlot()" << std::endl;
 
 	if (mUseClipper)
 	{
-		ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
 		mSlicePlaneClipper->clearVolumes();
-		mSlicePlaneClipper->addVolume(RepManager::getInstance()->getVolumetricRep(image));
+		mSlicePlaneClipper->addVolume(RepManager::getInstance()->getVolumetricRep(mImage));
 
 		ssc::PLANE_TYPE currentPlane = this->getPlaneType();
 
