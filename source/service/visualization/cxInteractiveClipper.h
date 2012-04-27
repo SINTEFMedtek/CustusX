@@ -42,7 +42,7 @@ class InteractiveClipper: public QObject
 {
 Q_OBJECT
 public:
-	explicit InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy);
+//	explicit InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy);
 	InteractiveClipper();
 
 	void setSlicePlane(ssc::PLANE_TYPE plane);
@@ -52,6 +52,9 @@ public:
 	bool getUseClipper() const;
 	bool getInvertPlane() const;
 	std::vector<ssc::PLANE_TYPE> getAvailableSlicePlanes() const;
+	ssc::ImagePtr getImage() const;
+	void setImage(ssc::ImagePtr image);
+
 signals:
 	void changed();
 public slots:
@@ -66,6 +69,7 @@ private:
 	ssc::SlicePlaneClipperPtr mSlicePlaneClipper;
 	ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
 	bool mUseClipper;
+	ssc::ImagePtr mImage;
 };
 typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
 
