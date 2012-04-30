@@ -408,7 +408,8 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   //TODO: Create an enum value that identifies the pixel format
   // Must also be implementd in cxMacGrabber.mm captureOutput() and the different formats handed by
   // OpenIGTLinkSender::convertFrame() and by the OpenIGTLink client
-  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;//Find correct value. TYPE_UINT8 = 3 in igtlImageMessage.h
+//  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;//Find correct value. TYPE_UINT8 = 3, TYPE_UINT32  = 7 in igtlImageMessage.h
+  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT32;//Find correct value. TYPE_UINT8 = 3, TYPE_UINT32  = 7 in igtlImageMessage.h
   frame.mFirstPixel = frameBufferPtr;
 
   //This also updates the data descriptor
