@@ -488,7 +488,7 @@ void vtkSonixVideoSource::Initialize()
 	int sz = 256;
 	this->ult->getLastError(err,sz);
 //	vtkErrorMacro(<< "Initialize: couldn't connect to Sonix RP"<<" (" << err << ")");
-		std::cout << "Initialize: couldn't connect to Sonix RP"<<" (" << err << ")";
+		std::cout << "Initialize: couldn't connect to Sonix RP"<<" (" << err << ")" << std::endl;
     this->ReleaseSystemResources();
     return;
     }
@@ -500,7 +500,7 @@ void vtkSonixVideoSource::Initialize()
 	int sz = 256;
 	this->ult->getLastError(err,sz);
 //    vtkErrorMacro(<< "Initialize: couldn't select imaging mode (" << err << ")");
-  	std::cout << "Initialize: couldn't select imaging mode (" << err << ")";
+  	std::cout << "Initialize: couldn't select imaging mode (" << err << ")" << std::endl;
     this->ReleaseSystemResources();
     return;
     }
@@ -517,7 +517,7 @@ void vtkSonixVideoSource::Initialize()
 	int sz = 256;
 	this->ult->getLastError(err,sz);
 //    vtkErrorMacro(<< "Initialize: Requested imaging mode could not be selected(" << err << ")");
-  	std::cout << "Initialize: Requested imaging mode could not be selected(" << err << ")";
+  	std::cout << "Initialize: Requested imaging mode could not be selected(" << err << ")" << std::endl;
     this->ReleaseSystemResources();
     return;
 	}
@@ -530,7 +530,7 @@ void vtkSonixVideoSource::Initialize()
 	int sz = 256;
 	this->ult->getLastError(err,sz);
 //    vtkErrorMacro(<< "Initialize: Requested the data aquisition type not available for selected imaging mode(" << err << ")");
-  	std::cout << "Initialize: Requested the data aquisition type not available for selected imaging mode(" << err << ")";
+  	std::cout << "Initialize: Requested the data aquisition type not available for selected imaging mode(" << err << ")" << std::endl;
     this->ReleaseSystemResources();
     return;
     }
@@ -541,7 +541,7 @@ void vtkSonixVideoSource::Initialize()
 	int sz = 256;
 	this->ult->getLastError(err,sz);
 //    vtkErrorMacro(<< "Initialize: couldn't request the data aquisition type (" << err << ")");
-  std::cout << "Initialize: couldn't request the data aquisition type (" << err << ")";
+  std::cout << "Initialize: couldn't request the data aquisition type (" << err << ")" << std::endl;
     this->ReleaseSystemResources();
     return;
     }
@@ -553,7 +553,7 @@ void vtkSonixVideoSource::Initialize()
 	int sz = 256;
 	this->ult->getLastError(err,sz);
 //    vtkErrorMacro(<< "Initialize: couldn't retrieve data descriptor (" << err << ")");
-  	std::cout << "Initialize: couldn't retrieve data descriptor (" << err << ")";
+  	std::cout << "Initialize: couldn't retrieve data descriptor (" << err << ")" << std::endl;
     this->ReleaseSystemResources();
     return;
     }
