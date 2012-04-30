@@ -328,7 +328,9 @@ class OpenCV(CppComponent):
     def _rawCheckout(self):
         self._changeDirToBase()
 #    	runBash('svn co https://code.ros.org/svn/opencv/trunk/opencv OpenCV')
-        runBash('svn co https://code.ros.org/svn/opencv/branches/2.3/opencv OpenCV')
+#        runBash('svn co https://code.ros.org/svn/opencv/branches/2.3/opencv OpenCV') #old location
+        runBash('svn co http://code.opencv.org/svn/opencv/branches/2.3/opencv OpenCV')
+
     def update(self):
         pass
     def configure(self):
