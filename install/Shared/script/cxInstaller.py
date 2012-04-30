@@ -247,9 +247,9 @@ class ITK(CppComponent):
         self._changeDirToSource()
         runBash('git checkout master')
         runBash('git pull')
-        #runBash('git checkout v3.20.0')
-        #runBash('git checkout v4.1.0') # needed for gcc 4.6  
-        runBash('git checkout v4.0rc03') # needed for gcc 4.6  
+        runBash('git checkout v3.20.0') # version working ok with IGSTK 4.2
+        #runBash('git checkout v4.0rc03') # needed for gcc 4.6  
+        #runBash('git checkout v4.1.0') # needed for gcc 4.6, but not ok with igstk.
     
     def configure(self):
         self._changeDirToBuild()
@@ -285,7 +285,8 @@ class VTK(CppComponent):
         self._changeDirToSource()
         runBash('git checkout master')
         runBash('git pull')
-        runBash('git checkout v5.8.0')   # needed for gcc 4.6
+        runBash('git checkout v5.6.1')   # working with IGSTK 4.2
+        #runBash('git checkout v5.8.0')   # needed for gcc 4.6, not goot on non-linux
 
     def configure(self):
         '''
@@ -593,7 +594,7 @@ initialize and run the controller
 					 OpenCV(),
                      OpenIGTLink(),
                      IGSTK(),
-                     DCMTK(),
+                     #DCMTK(),
                      #SSC(),
                      CustusX3()
                      #CustusX3Data()
