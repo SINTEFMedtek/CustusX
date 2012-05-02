@@ -42,10 +42,10 @@ void DummyToolManager::reset()
 DummyToolManager::DummyToolManager() :
 	mDummyTools(new DummyToolMap),
 	m_rMpr(new Transform3D(Transform3D::Identity())),
+	mToolTipOffset(0),
 	mConfigured(false),
 	mInitialized(false),
-	mIsTracking(false),
-	mToolTipOffset(0)
+	mIsTracking(false)
 {
 	DummyToolPtr tool1(new DummyTool(this));
 
