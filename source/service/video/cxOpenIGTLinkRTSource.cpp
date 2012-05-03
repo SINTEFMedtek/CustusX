@@ -373,7 +373,9 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 		break;
 	case igtl::ImageMessage::TYPE_UINT16:
 //    std::cout << "SetDataScalarTypeToUnsignedShort." << std::endl;
-		mImageImport->SetDataScalarTypeToUnsignedShort();
+//		mImageImport->SetDataScalarTypeToUnsignedShort();
+    mImageImport->SetNumberOfScalarComponents(2);
+    mImageImport->SetDataScalarTypeToUnsignedChar();
 		break;
 	case igtl::ImageMessage::TYPE_INT32:
 	case igtl::ImageMessage::TYPE_UINT32:
