@@ -138,7 +138,7 @@ ssc::ImagePtr InteractiveClipper::getImage() const
 
 void InteractiveClipper::setImage(ssc::ImagePtr image)
 {
-	std::cout << "InteractiveClipper::setImage " << image.get() << std::endl;
+//	std::cout << "InteractiveClipper::setImage " << image.get() << std::endl;
 	mImage = image;
 //	this->changedSlot(); // auto by changed()
 	emit changed();
