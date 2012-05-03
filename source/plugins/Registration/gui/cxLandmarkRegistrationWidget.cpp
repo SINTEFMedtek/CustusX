@@ -17,6 +17,8 @@
 #include "cxView2D.h"
 #include "cxRegistrationHistoryWidget.h"
 #include "sscTypeConversions.h"
+#include "sscManualTool.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -81,6 +83,34 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 		ssc::messageManager()->sendDebug("mLandmarkTableWidget is null");
 
 	mActiveLandmark = mLandmarkTableWidget->item(row, column)->data(Qt::UserRole).toString();
+
+
+	ssc::LandmarkMap targetData = this->getTargetLandmarks();
+	if (targetData.count(mActiveLandmark))
+	{
+		ssc::Vector3D p_d = targetData[mActiveLandmark].getCoord();
+		ssc::Vector3D p_r = this->getTargetTransform().coord(p_d);
+		ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->coord(p_r);;
+		this->setManualToolPosition(p_r);
+	}
+
+}
+
+void LandmarkRegistrationWidget::setManualToolPosition(ssc::Vector3D p_r)
+{
+	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+	ssc::Vector3D p_pr = rMpr.inv().coord(p_r);
+
+	// set the picked point as offset tip
+	ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+	ssc::Vector3D offset = tool->get_prMt().vector(ssc::Vector3D(0, 0, tool->getTooltipOffset()));
+	p_pr -= offset;
+	p_r = rMpr.coord(p_pr);
+
+	// TODO set center here will not do: must handle
+	ssc::dataManager()->setCenter(p_r);
+	ssc::Vector3D p0_pr = tool->get_prMt().coord(ssc::Vector3D(0, 0, 0));
+	tool->set_prMt(ssc::createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
 
 void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
