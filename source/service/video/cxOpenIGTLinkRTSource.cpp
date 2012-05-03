@@ -57,7 +57,8 @@ namespace cx
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
 				mImageImport(vtkImageImportPtr::New()),
 				mLinearSoundSpeedCompesation(1.0),
-				updateSonixParameters(false)//,
+				updateSonixParameters(false),
+				sonixVideo(false)//,
 //				mDepthStart(0), mDepthEnd(0), mWidth(0)
 {
 	mLastTimestamp = 0;
@@ -455,6 +456,8 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer mess
 
 	std::cout << "Received Sonix message:\n" << streamXml2String(mSonixProbeData) << std::cout;
 
+	sonixVideo = true; // Temporary hack to turn off ARGB_RGBA for sonix
+
 	updateSonixParameters = true;
 }
 
@@ -509,9 +512,12 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 
 	// this seems to add 3ms per update()
 	// insert a ARGB->RBGA filter. TODO: need to check the input more thoroughly here, this applies only to the internal CustusX US pipeline.
-	if (mImageImport->GetOutput()->GetNumberOfScalarComponents() == 4 && !mFilter_ARGB_RGBA)
+	 if (mImageImport->GetOutput()->GetNumberOfScalarComponents() == 4 && !mFilter_ARGB_RGBA)
 	{
-		mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
+	  if (sonixVideo) //temporary hack
+	    mFilter_ARGB_RGBA = this->createFilterRGBA2RGB(mImageImport->GetOutput());
+	  else
+	    mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
 		mRedirecter->SetInput(mFilter_ARGB_RGBA);
 	}
 
@@ -543,6 +549,21 @@ vtkImageDataPtr OpenIGTLinkRTSource::createFilterARGB2RGBA(vtkImageDataPtr input
 //  merger->SetInput(1, splitterA->GetOutput());
 
 	return merger->GetOutput();
+}
+
+//temporary hack
+vtkImageDataPtr OpenIGTLinkRTSource::createFilterRGBA2RGB(vtkImageDataPtr input)
+{
+  vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
+
+  /// extract the RGB part of input (1,2,3) and insert as (0,1,2) in output
+  vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
+  splitterRGB->SetInput(input);
+  splitterRGB->SetComponents(2, 1, 0);//hack convert from BGRA to RGB
+  merger->SetInput(0, splitterRGB->GetOutput());
+
+
+  return merger->GetOutput();
 }
 
 vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
