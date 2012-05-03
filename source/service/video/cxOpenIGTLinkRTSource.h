@@ -126,6 +126,7 @@ private:
 //	float mOrigin[3];
 //	double mSpacing[3]; // spacing (mm/pixel)
 	bool updateSonixParameters;
+	bool sonixVideo;
 //	int mDepthStart; //mm
 //	int mDepthEnd; //mm
 //	int mWidth; //mm
