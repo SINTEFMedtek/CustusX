@@ -55,7 +55,7 @@ static inline void setnewbuf( struct conv_global *global, uint_fast32_t i, uint_
 {
 	const int offset = offsetIdx * global->dstbytes;
 	const int wmul = global->dstbytes * global->samples;
-	char *dst = global->buffer + i * wmul + j * global->size_new[0] * wmul + k * global->slice_size + offset;
+	void *dst = global->buffer + i * wmul + j * global->size_new[0] * wmul + k * global->slice_size + offset;
 
 	if (val > highval) highval = val;
 	if (val < lowval) lowval = val;
@@ -65,10 +65,10 @@ static inline void setnewbuf( struct conv_global *global, uint_fast32_t i, uint_
 	assert( j < global->size_new[1] );
 	switch (global->dstbytes)
 	{
-	case 1: *dst = val; break;
+	case 1: *((char *)dst) = val; break;
 	case 2: *((unsigned short *)dst) = val; break;
 	case 4: *((unsigned int *)dst) = val; break;
-	default: *dst = 0; break;	// should absolutely never happen!
+	default: *((char *)dst) = 0; break;	// should absolutely never happen!
 	}
 }
 
@@ -151,8 +151,8 @@ struct volume_t *DICOMLib_GetVolume( struct series_t *series, progress_func_t *c
 	global.slice_size =  global.size_new[0] * global.size_new[1] * global.dstbytes * global.samples;
 	global.buffer = calloc( global.count, global.slice_size );
 	global.rescale = 0;	// set later when we have read the first slice... bit of a hack since that's only when we know
-	SSC_LOG( "Converting volume with pixel shift (%.4f, %.4f), new size (%d, %d, %d)", global.pixel_xshift, global.pixel_yshift,
-		(int)global.size_new[0], (int)global.size_new[1], (int)global.size_new[2] );
+	SSC_LOG( "Converting volume with pixel shift (%.4f, %.4f), new size (%d, %d, %d), voxel_size (%f,%f,%f)", global.pixel_xshift, global.pixel_yshift,
+		 (int)global.size_new[0], (int)global.size_new[1], (int)global.size_new[2], global.voxel_size[0], global.voxel_size[1], global.voxel_size[2] );
 	if ( !global.buffer )
 	{
 		errno = ENOMEM;
@@ -171,6 +171,7 @@ struct volume_t *DICOMLib_GetVolume( struct series_t *series, progress_func_t *c
 		{
 			SSC_LOG( "DICOMLib_Conversion_Buffering: Error in internal buffering grabbing image %d", (int)global.index );
 			errno = -1;
+			free(global.buffer);
 			return NULL;
 		}
 		if (global.index == 0 && instance->isSigned)	// hack
@@ -231,6 +232,7 @@ struct volume_t *DICOMLib_GetVolume( struct series_t *series, progress_func_t *c
 
 	if ( do_abort )
 	{
+		free(global.buffer);
 		return NULL;
 	}
 
@@ -250,4 +252,10 @@ struct volume_t *DICOMLib_GetVolume( struct series_t *series, progress_func_t *c
 	memcpy( volume->pixel_spacing, global.voxel_size, sizeof( volume->pixel_spacing ) );
 
 	return volume;
+}
+
+void DICOMLib_FreeVolume( struct volume_t *volume )
+{
+	free(volume->volume);
+	free(volume);
 }
