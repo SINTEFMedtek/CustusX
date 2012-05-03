@@ -40,18 +40,8 @@ if (SSC_USE_DCMTK)
     
     INCLUDE_DIRECTORIES( 
         ${QT_INCLUDES} 
-    #    ../DataBus 
-    #    /usr/lib64/dbus-1.0/include/ 
-    #    /usr/include/dbus-1.0 
-    #    /usr/local/include 
-     #   ${SSC_SOURCE_DIR}/Code/
-     #   ${SSC_SOURCE_DIR}/Code/Utilities/
-     #   ${SSC_SOURCE_DIR}/Code/Data/
-     #   ${SSC_SOURCE_DIR}/Code/Math/
         )
     LINK_DIRECTORIES( 
-    #    . 
-    #    ../DataBus 
         )
     
     ADD_LIBRARY( DICOMLib SHARED 
@@ -68,8 +58,6 @@ if (SSC_USE_DCMTK)
     SET_TARGET_PROPERTIES( DICOMLib PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "-Wextra ${SNW_COMPILE_FLAGS}" )
     
     TARGET_LINK_LIBRARIES( DICOMLib 
-    #    ofstd 
-    #    stdc++ 
         oflog 
         /usr/local/lib/libcharls.so
         dcmjpls 
@@ -90,4 +78,3 @@ configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/sscDICOMLibConfig.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/sscDICOMLibConfig.h" )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-    
