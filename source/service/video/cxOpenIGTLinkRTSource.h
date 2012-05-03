@@ -101,6 +101,7 @@ private:
 	std::vector<unsigned char> mTestData;
 	void setTestImage();
 	vtkImageDataPtr createFilterARGB2RGBA(vtkImageDataPtr input);
+  vtkImageDataPtr createFilterRGBA2RGB(vtkImageDataPtr input);//temporary hack
 	void updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message);
 	void updateSonix();
 	ProbePtr getValidProbe();
