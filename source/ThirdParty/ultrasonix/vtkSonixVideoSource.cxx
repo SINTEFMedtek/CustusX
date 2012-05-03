@@ -414,6 +414,11 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	  //std::cout << "8 bit" << std::endl;
 	  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;
   }
+  else if (this->OutputFormat == VTK_LUMINANCE_ALPHA)
+  {
+	  //std::cout << "16 bit" << std::endl;
+	  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT16;
+  }
   else if (this->OutputFormat == VTK_RGBA)
   {
 	  //std::cout << "32 bit" << std::endl;
@@ -976,6 +981,7 @@ int vtkSonixVideoSource::RequestData(
 
 
 //----------------------------------------------------------------------------
+// never run?
 void vtkSonixVideoSource::UnpackRasterLine(char *outptr, char *inptr, 
                                            int start, int count)
 {
@@ -1041,6 +1047,7 @@ void vtkSonixVideoSource::UnpackRasterLine(char *outptr, char *inptr,
 	case udtBPost32:
 	//case udtColorPost:
 	case udtElastoCombined:
+	case udtColorCombined:
 		inptr += 4*start;
         { // must do BGRX to RGBA conversion
 		outptr += 4;
@@ -1086,6 +1093,9 @@ void vtkSonixVideoSource::SetOutputFormat(int format)
     case VTK_RGB:
       numComponents = 3;
       break;
+	case VTK_LUMINANCE_ALPHA:
+		numComponents = 2;
+		break;
     case VTK_LUMINANCE:
       numComponents = 1;
       break;
@@ -1195,7 +1205,9 @@ void vtkSonixVideoSource::DoFormatSetup()
 	// 16-bit vector data, but two components
 	// don't know how to handle it as yet
 	case udtColorVelocityVariance:
-		this->OutputFormat = VTK_RGB;
+		//this->OutputFormat = VTK_RGB;
+        //this->NumberOfScalarComponents = 2;
+		this->OutputFormat = VTK_LUMINANCE_ALPHA;
         this->NumberOfScalarComponents = 2;
         break;
 
@@ -1204,6 +1216,7 @@ void vtkSonixVideoSource::DoFormatSetup()
 	case udtBPost32:
 	//case udtColorPost:
 	case udtElastoCombined:
+		case udtColorCombined:
 		this->OutputFormat = VTK_RGBA;
         this->NumberOfScalarComponents = 4;        
 		break;
