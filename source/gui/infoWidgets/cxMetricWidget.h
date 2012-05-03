@@ -58,6 +58,7 @@ protected slots:
   void addAngleButtonClickedSlot();
   void addDistanceButtonClickedSlot();
   void cellChangedSlot(int row, int col);
+  virtual void cellClickedSlot(int row, int column);
 
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -68,6 +69,7 @@ private:
   MetricBasePtr createMetricWrapper(ssc::DataPtr data);
   std::vector<MetricBasePtr> createMetricWrappers();
   std::vector<ssc::DataPtr> refinePointArguments(std::vector<ssc::DataPtr> args, unsigned argNo);
+  void setManualToolPosition(ssc::Vector3D p_r);
 
 //  template<class T>
   QAction* createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot);
