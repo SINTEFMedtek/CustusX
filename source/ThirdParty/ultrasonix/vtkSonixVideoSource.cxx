@@ -1041,6 +1041,7 @@ void vtkSonixVideoSource::UnpackRasterLine(char *outptr, char *inptr,
 	case udtBPost32:
 	//case udtColorPost:
 	case udtElastoCombined:
+	case udtColorCombined:
 		inptr += 4*start;
         { // must do BGRX to RGBA conversion
 		outptr += 4;
@@ -1204,6 +1205,7 @@ void vtkSonixVideoSource::DoFormatSetup()
 	case udtBPost32:
 	//case udtColorPost:
 	case udtElastoCombined:
+	case udtColorCombined:
 		this->OutputFormat = VTK_RGBA;
         this->NumberOfScalarComponents = 4;        
 		break;
