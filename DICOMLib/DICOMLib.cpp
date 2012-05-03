@@ -42,7 +42,6 @@ static const char *sqlinit =
 
 static bool dbquery(sqlite3 *db, const char *statement, int (*callback)(void*,int,char**,char**), void *cbdata);
 static struct study_t *studiesFromNodes( struct study_t *root, struct filenode *node, progress_func_t *callback, int progress, bool keepRoot, int flags, const char *rootdir );
-static int DICOMLib_Verify( struct series_t *series );
 
 int DICOMLib_Init()
 {
@@ -60,6 +59,7 @@ int DICOMLib_Init()
 
 	config[DICOMLIB_CONF_SPLIT_ACQUISITION] = false;
 	config[DICOMLIB_CONF_SPLIT_SERIES_DESCR] = false;
+	config[DICOMLIB_CONF_SPLIT_SEQUENCE_NAME] = false;
 	config[DICOMLIB_CONF_MIN_NUM_SLICES] = 6;
 	config[DICOMLIB_CONF_MIN_DIST_SLICES] = 0.0001;
 	config[DICOMLIB_CONF_MAX_ORIENT_DIFF] = 0.001;
@@ -115,6 +115,7 @@ static int setupSeries( struct study_t *study )
 					series->VOI.range.center, series->VOI.range.width );
 			}
 		}
+		study->initialized = true;
 	}
 	return 0;
 }
@@ -131,6 +132,18 @@ static void freeInstances( struct series_t *s )
 	}
 }
 
+static void freeSerie( struct series_t *s )
+{
+	if ( s->VOI.lut.table )
+	{
+		free( s->VOI.lut.table );
+	}
+	if ( s->volume )
+	{
+		DICOMLib_FreeVolume(s->volume);
+	}
+}
+
 static void freeSeries( struct study_t *p )
 {
 	struct series_t *s = p->first_series, *next;
@@ -139,15 +152,7 @@ static void freeSeries( struct study_t *p )
 	{
 		freeInstances( s );
 		next = s->next_series;
-		if ( s->VOI.lut.table )
-		{
-			free( s->VOI.lut.table );
-		}
-		if ( s->volume )
-		{
-			free( s->volume->volume );
-			free( s->volume );
-		}
+		freeSerie( s );
 		free( s );
 		s = next;
 	}
@@ -211,11 +216,15 @@ static void add_instance( struct series_t *series, const struct instance_t *inst
 }
 
 /// Add single series to study list
-static void add_series( struct study_t *iter, const struct series_t *series, const struct instance_t *instance )
+static void add_series( struct study_t *iter, struct series_t *series, const struct instance_t *instance )
 {
 	struct series_t *addition = (struct series_t *)calloc( 1, sizeof( *addition ) );
 
 	memcpy( addition, series, sizeof( *series ) );
+	series->VOI.lut.table = NULL;
+	series->volume = NULL;
+	
+	assert(series->next_series == NULL);
 	if ( iter->first_series == NULL )
 	{
 		/* Create beginning of list */
@@ -230,7 +239,7 @@ static void add_series( struct study_t *iter, const struct series_t *series, con
 }
 
 /// Add single series to study list
-static void add_study( struct study_t *studyList, const struct study_t *study, const struct series_t *series, const struct instance_t *instance )
+static void add_study( struct study_t *studyList, struct study_t *study, struct series_t *series, const struct instance_t *instance )
 {
 	if ( studyList->studyID[0] == '\0' )	// we have only the first, empty study
 	{
@@ -253,7 +262,7 @@ static void add_study( struct study_t *studyList, const struct study_t *study, c
 
 /** See if this new file fits into an existing study or series, or requires a new series */
 #define SPLITBY(_reason) { sstrcpy(series->splitReason, _reason); continue; }
-static void insert_into_studylist( struct study_t *studyList, const struct study_t *study, struct series_t *series, const struct instance_t *instance )
+static void insert_into_studylist( struct study_t *studyList, struct study_t *study, struct series_t *series, const struct instance_t *instance )
 {
 	struct study_t *firstStudy = studyList;
 
@@ -281,8 +290,16 @@ static void insert_into_studylist( struct study_t *studyList, const struct study
 			if ( config[DICOMLIB_CONF_SPLIT_ACQUISITION] && sstrcmp( seriesList->acquisition, series->acquisition ) != 0 ) SPLITBY("acq");
 			if ( sstrcmp( seriesList->echo_number, series->echo_number ) != 0 ) SPLITBY("echo");
 			if ( sstrcmp( seriesList->modality, series->modality ) != 0 ) SPLITBY("modality");
-			if ( sstrcmp( seriesList->sequenceName, series->sequenceName ) != 0 ) SPLITBY("seq");
-
+			if ( config[DICOMLIB_CONF_SPLIT_SEQUENCE_NAME] && sstrcmp( seriesList->sequenceName, series->sequenceName ) != 0 ) SPLITBY("seq");
+			/* if DTI && different bvectors -> split
+			(there is for each bvector one volume) */
+			if ( seriesList->DTI.isDTI && series->DTI.isDTI )
+			{
+				double bvecDiff[3];
+				vector3d_subtract(bvecDiff,seriesList->DTI.bvec,series->DTI.bvec);
+				if ( ( fabs(vector3d_length(bvecDiff)) > 0.00001 ) || ( strcmp( seriesList->DTI.bval, series->DTI.bval)!=0))
+					SPLITBY("bvec");
+			}
 			/* Check image orientation */
 			if ( fabs( series->image_orientation[0] - seriesList->image_orientation[0] ) > config[DICOMLIB_CONF_MAX_ORIENT_DIFF] ||
 			     fabs( series->image_orientation[1] - seriesList->image_orientation[1] ) > config[DICOMLIB_CONF_MAX_ORIENT_DIFF] ||
@@ -292,6 +309,29 @@ static void insert_into_studylist( struct study_t *studyList, const struct study
 			     fabs( series->image_orientation[5] - seriesList->image_orientation[5] ) > config[DICOMLIB_CONF_MAX_ORIENT_DIFF] )
 			{
 				SPLITBY("orientation");
+			}
+
+
+			/* If DTI: check if same image position in instance list -> split
+			(usually there are multiple volumes which we want to split each in to one series) */
+			if ( seriesList->DTI.isDTI )
+			{
+				struct instance_t *instanceList = seriesList->first_instance;
+				double distance[3];
+				float dist=0;
+				bool split=false;
+				for ( ;	 instanceList; instanceList = instanceList->next_instance )
+				{
+					vector3d_subtract(distance, instance->image_position,instanceList->image_position );
+					dist=fabs(vector3d_length(distance));
+					if ( dist < config[DICOMLIB_CONF_MIN_DIST_SLICES] )
+					{
+						split=true;
+						break;
+					}
+				}
+
+				if ( split) SPLITBY("volume")
 			}
 
 			// TODO: Split by Image Type also
@@ -393,8 +433,6 @@ static void readSeriesFromDICOMDIR( struct study_t *study, progress_func_t *call
 
 	/* Set indexing values */
 	index_objects( study, study->study_id, false );
-
-	setupSeries( study );
 }
 
 struct study_t *DICOMLib_GetStudies( struct study_t *studyList, const char *path, progress_func_t *callback, int flags )
@@ -497,25 +535,6 @@ static int dbstudycallback(void *userdata, int cols, char **data, char **colname
 	return 0;
 }
 
-static int dbcleanupcallback(void *userdata, int cols, char **data, char **colnames)
-{
-	struct stat st;
-	char rbuf[PATH_MAX];
-
-	if (stat(data[0], &st) < 0)
-	{
-		if (errno == ENOENT)
-		{
-			SSC_LOG("%s is gone - removing cache entry", data[0]);
-			sprintf(rbuf, "DELETE FROM studies WHERE path=\"%s\"", data[0]);
-			dbquery((sqlite3 *)userdata, rbuf, NULL, NULL);
-		}
-	}
-	(void)cols;
-	(void)colnames;
-	return 0;
-}
-
 static int dbstrcallback(void *userdata, int cols, char **data, char **colnames)
 {
 	(void)cols;
@@ -608,9 +627,13 @@ static int scan_dir( struct filenode **first, const char *path, struct timeval *
 				{
 					dtype = DT_DIR;
 				}
+				else if (S_ISREG(sb.st_mode))
+				{
+					dtype = DT_REG;
+				}
 				else
 				{
-					SSC_LOG("%s is unknown and not dir - hence file", dp->d_name);
+					SSC_LOG("[%s] is unknown and not dir, type %d - hence file", dp->d_name, (int)sb.st_mode);
 					dtype = DT_REG;
 				}
 			}
@@ -787,20 +810,16 @@ static struct study_t *studiesFromNodes( struct study_t *root, struct filenode *
 				{
 					temp_i.frame = curFrame;
 					status = parse_DICOM( dset, &temp_study, &temp_s, &temp_i, curFrame );
-					if ( status == 0 || status == EPROTO )	// EPROTO indicates invalid but correctly identified series found
+					if (!hasDuplicate(study, &temp_i))
 					{
-						// Check for duplicate SOPInstanceUID
-						if ( !hasDuplicate( study, &temp_i ) )
+						temp_s.valid = (status == 0);
+						if ( keepRoot )
 						{
-							temp_s.valid = (status == 0);
-							if ( keepRoot )
-							{
-								insert_into_studylist( study, root, &temp_s, &temp_i ); // be sure we do not create another study
-							}
-							else
-							{
-								insert_into_studylist( study, &temp_study, &temp_s, &temp_i );
-							}
+							insert_into_studylist( study, root, &temp_s, &temp_i ); // be sure we do not create another study
+						}
+						else
+						{
+							insert_into_studylist( study, &temp_study, &temp_s, &temp_i );
 						}
 					}
 					curFrame++;
@@ -812,6 +831,7 @@ static struct study_t *studiesFromNodes( struct study_t *root, struct filenode *
 				SSC_LOG( "Could not load file: %s", temp_i.path );
 			}
 		}
+		freeSerie( &temp_s );
 
 		progress = MAX( progress, (double)recount / (double)count * SLICE_PARSE_FILES + SLICE_COUNT_FILES );
 		if ( !cancel && callback )
@@ -838,6 +858,10 @@ static struct study_t *studiesFromNodes( struct study_t *root, struct filenode *
 
 	if ( study->studyID[0] == '\0' || cancel )
 	{
+		if (!root)
+		{
+			DICOMLib_CloseStudies( study );
+		}
 		// No studies found
 		return NULL;
 	}
@@ -887,7 +911,7 @@ static struct study_t *studiesFromPath( const char *path, progress_func_t *callb
 	// is usually a terminal error.
 	if ( !path || strlen( path ) == 0 || strcmp( path, "" ) == 0 || strcmp( path, "/" ) == 0 )
 	{
-	        SSC_LOG( "Empty parameter (%s) - invalid", path ? path : "NULL" );
+		SSC_LOG( "Empty parameter (%s) - invalid", path ? path : "NULL" );
 		if (db)
 		{
 			sqlite3_close(db);
@@ -986,8 +1010,6 @@ static struct study_t *studiesFromPath( const char *path, progress_func_t *callb
 	for (next = root; next; next = next->next_study) { if ((int)next->study_id > retval) retval = next->study_id; }
 	index_objects( studyList, retval, flags & DICOMLIB_REINDEX_STUDY );
 
-	setupSeries( studyList );
-
 	return studyList;
 }
 
@@ -1045,7 +1067,6 @@ int DICOMLib_Image_RGB_Fill( const struct series_t *series, int sizeX, int sizeY
 		image = NULL;
 		return -1;
 	}
-
 	buffer =(const char *) DICOM_image_scaled( instance, &x, &y, 8, instance->frame ); /* rescale to fit given parameters */
 	if ( !buffer )
 	{
@@ -1086,16 +1107,16 @@ int DICOMLib_Image_RGB_Fill( const struct series_t *series, int sizeX, int sizeY
 
 const char *DICOMLib_Image( const struct series_t *series, int *sizeX, int *sizeY, int bits_per_sample, int frame )
 {
-	struct instance_t *instance = series->first_instance;
 	int i;
 	const char *buffer = NULL;
 
-	if ( !series || !instance || !sizeX || !sizeY )
+	if ( !series || !series->first_instance || !sizeX || !sizeY )
 	{
 		SSC_LOG( "Bad parameter" );
 		errno = EINVAL;
 		return NULL;
 	}
+	struct instance_t *instance = series->first_instance;
 	if (*sizeX <= 0) *sizeX = series->columns;
 	if (*sizeY <= 0) *sizeY = series->rows;
 
@@ -1125,7 +1146,7 @@ left = left >= 0 ? left : 0; /* no negative numbers here!! */ \
 snprintf( s, 500-1, __VA_ARGS__ ); SSC_LOG( "DICOMLib_Verify: %s", s ); \
 strncat( series->series_info, s, left ); strncat( series->series_info, "\n", left ); sstrcpy( series->error, s ); \
 } while(0)
-static int DICOMLib_Verify( struct series_t *series )
+int DICOMLib_Verify( struct series_t *series )
 {
 	struct instance_t *instance = NULL, *last = NULL;
 	int count;
@@ -1144,7 +1165,8 @@ static int DICOMLib_Verify( struct series_t *series )
 		SSC_LOG( "Number of frames reported (%d) does not match number found (%d)!", series->frames, count );
 		series->frames = MIN(count, series->frames);
 	}
-	if ( count < minimum || count < 3 )
+	// check if there are enough slices except for DTI data (hack for DTI-mosaic from siemens)
+	if ( (count < minimum || count < 3) && !series->DTI.isDTI )
 	{
 		REPORT( "Series does not have enough slices. %d required, %d found.", MAX( 3, minimum ), count );
 		series->valid = FALSE;
@@ -1284,6 +1306,11 @@ int DICOMLib_DeleteStudy( struct study_t *study )
 	sqlite3 *db = NULL;
 	int rc = sqlite3_open(dbname, &db);
 
+	if (!study)
+	{
+		return 0;
+	}
+
 	if (rc != SQLITE_OK)
 	{
 		SSC_ERROR("Failed to open db %s: %s", dbname, sqlite3_errmsg(db));
@@ -1291,9 +1318,10 @@ int DICOMLib_DeleteStudy( struct study_t *study )
 	}
 
 	// Delete known files
-	if (study && study->first_series)
+	struct series_t *series = DICOMLib_GetSeries(study, NULL);
+	if (series)
 	{
-		for (struct series_t *next = study->first_series; next; next = next->next_series)
+		for (struct series_t *next = series; next; next = next->next_series)
 		{
 			DICOMLib_DeleteSeries(next);	// node is just marked invalid, no dangling pointers here
 		}
@@ -1312,9 +1340,10 @@ int DICOMLib_DeleteStudy( struct study_t *study )
 	pruneEmpty(dir);
 	closedir(dir);
 
-	// Prune invalid entries in the cache
-	sstrcpy(rbuf, "SELECT path FROM studies");
-	if (!dbquery(db, rbuf, dbcleanupcallback, db))
+	// Prune from the cache
+	ssprintf(rbuf, "DELETE FROM studies WHERE path=\"%s\"", study->rootpath);
+	SSC_LOG("Executing sql statement for deletion: %s", rbuf);
+	if (!dbquery(db, rbuf, NULL, db))
 	{
 		SSC_ERROR("query \"%s\" failed", rbuf);
 	}
@@ -1426,6 +1455,12 @@ struct series_t *DICOMLib_GetSeries( struct study_t *study, progress_func_t *cal
 			errno = -1;
 			return NULL;
 		}
+
+		setupSeries( study );
+	}
+	if (!study->initialized)
+	{
+		setupSeries( study );
 	}
 	return study->first_series;
 }

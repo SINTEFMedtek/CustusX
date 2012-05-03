@@ -13,6 +13,8 @@
 #undef verify
 
 #include <math.h>
+#include <limits>
+
 
 #include "DCMTK.h"
 
@@ -44,8 +46,12 @@
 #include "dcmtk/dcmdata/dcrledrg.h"
 #include "dcmtk/dcmimage/dicopxt.h"
 
+#include <QStringList>
+
 #include "sscLogger.h"
 #include "DICOMLib.h"
+
+#include "vector3d.h"
 
 #ifndef DBL_EPSILON
 #define DBL_EPSILON 0.00001f
@@ -54,6 +60,17 @@
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
+
+//* private Siemens DTI tags */
+DcmTagKey SiemensDCM_DiffusionDirectionality(0x0019,0x100d);
+DcmTagKey SiemensDCM_DiffusionGradientOrientation(0x0019,0x100e);
+DcmTagKey SiemensDCM_DiffusionBValue(0x0019,0x100c);
+//* private Philips DTI Tags */
+DcmTagKey PhilipsDCM_DiffusionDirectionality(0x2001,0x1004); // O (Orientation?)
+DcmTagKey PhilipsDCM_DiffusionGradientDirectionRL(0x2005,0x10b0);
+DcmTagKey PhilipsDCM_DiffusionGradientDirectionAP(0x2005,0x10b1);
+DcmTagKey PhilipsDCM_DiffusionGradientDirectionFH(0x2005,0x10b2);
+DcmTagKey PhilipsDCM_DiffusionBValue(0x2001,0x1003);
 
 struct 
 {
@@ -70,7 +87,6 @@ typedef struct {
 	struct study_t **studyList;
 	bool cancel;
 } MyCallbackInfo;
-
 
 int DICOM_Init()
 {
@@ -240,6 +256,128 @@ void readStudyInfo( DcmItem *dset, struct study_t *study, const char *path )
 
 	/* Study description */
 	(void) dicomtag_string( dset, study->studyDescription, DCM_StudyDescription, DICOMLIB_LONG_STRING );
+
+	/* Manufakturer */
+	(void) dicomtag_string( dset, study->manufacturer, DCM_Manufacturer, DICOMLIB_LONG_STRING );
+}
+
+static QStringList var2List(QVariantList variantList)
+{
+	QStringList stringList;
+	QListIterator<QVariant> j(variantList);
+	while (j.hasNext())
+	{
+		QVariant next = j.next();
+		if (next.canConvert(QVariant::String))
+		{
+			stringList << next.toString();
+		}
+		else if (next.type() == QVariant::List)
+		{
+			stringList << var2List(next.toList()).join(", ");
+		}
+		else
+		{
+			SSC_LOG("unknown type in varlist");
+		}
+	}
+	return stringList;
+}
+
+// Parse a CSA blob
+void csaparse(DcmElement *csaBlob, QVariantMap *csaMap)
+{
+	// Found CSA private blob, read it into a buffer
+	long length = csaBlob->getLength();
+	char *val = (char *)malloc(length);
+	long pos = 0;
+	uint32_t ntags, nitems, magic;
+	char vr[5], *str = NULL;
+	if (length <= 4 || !csaBlob->getPartialValue(val, 0, length).good())
+	{
+		SSC_LOG("Failed to read CSA buffer");
+		free(val);
+		return;
+	}
+	// Now parse it
+	if (val[0] == 'S' && val[1] == 'V' && val[2] == '1' && val[3] == '0')
+	{
+		// Siemens CSA v2
+		if (val[4] != '\4' || val[5] != '\3' || val[6] != '\2' || val[7] != '\1')
+		{
+			SSC_LOG("Bad CSAv2 header");
+			free(val);
+			return;
+		}
+		pos = 8;
+	}
+	else if (val[0] == 00 && val[1] == 0)
+	{
+		// not Siemens CSA v1, giving up
+		free(val);
+		return;
+	}
+	memcpy(&ntags, &val[pos], 4);
+	memcpy(&magic, &val[pos + 4], 4); // magic tag
+	if (magic != 77)
+	{
+		SSC_LOG("Bad initial magic tag in Siemens CSA");
+		return;
+	}
+	pos += 8;
+	memset(vr, 0, sizeof(vr));
+	if (csaMap == NULL)
+	{
+		csaMap = new QVariantMap;
+	}
+	for (int i = 0; i < (int)ntags; i++)
+	{
+		str = &val[pos]; pos += 64;
+		pos += 4; // ignore VM
+		strncpy(vr, &val[pos], 4); pos += 4;
+		pos += 4; // ignore syngodt
+		memcpy(&nitems, &val[pos], 4); pos += 4;
+		memcpy(&magic, &val[pos], 4); pos += 4; // magic tag
+		if (magic != 77 && magic != 205)
+		{
+			SSC_LOG("Bad magic tag in Siemens CSA");
+			return;
+		}
+		QVariantList var;
+		for (int j = 0; j < (int)nitems; j++)
+		{
+			uint32_t itemsize;
+			memcpy(&itemsize, &val[pos + 4], 4);
+			memcpy(&magic, &val[pos + 8], 4);
+			assert(magic == 77 || magic == 205);
+			if (magic != 77 && magic != 205)
+			{
+				SSC_LOG("Bad magic item tag in Siemens CSA");
+				return;
+			}
+			pos += 16;
+			if (itemsize > 0)
+			{
+				QVariant tmp = QVariant::fromValue(QString(val));
+				var += tmp;
+			}
+
+			pos += itemsize;
+
+			// discard padded garbage
+			pos += (4 - itemsize % 4) % 4;
+		}
+		if (var.size() > 1)
+		{
+			csaMap->insert(str, QVariant::fromValue(var));
+		}
+		else if (var.size() == 1)
+		{
+			csaMap->insert(str, QVariant::fromValue(var.value(0)));
+		}
+		memset(vr, 0, sizeof(vr));
+	}
+	free(val);
 }
 
 #define seriesError(_x, ...) \
@@ -252,6 +390,7 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	DcmItem *sharedFunc = NULL, *perFrameFunc = NULL;
 	DcmSequenceOfItems *perFrameFuncSeq = NULL;
 	DcmItem *sequence = NULL;
+	bool acrnema = false;	// assume not
 	bool success = true;
 
 	/* Modality - required */
@@ -316,9 +455,13 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 			}
 		}
 	}
-	/* Series description (if available) */
+	/* Series description */
 	series->seriesDescription[0] = '\0';
-	( void ) dicomtag_string( dset, series->seriesDescription, DCM_SeriesDescription, DICOMLIB_LONG_STRING );
+	if ( !dicomtag_string( dset, series->seriesDescription, DCM_SeriesDescription, DICOMLIB_LONG_STRING )
+	     || series->seriesDescription[0] == '\0' )
+	{
+		sstrcpy( series->seriesDescription, series->seriesID );
+	}
 
 	if ( !dicomtag_string( dset, series->SOPClassUID, DCM_SOPClassUID, DICOMLIB_LONG_STRING ) )
 	{
@@ -331,7 +474,8 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 		sstrcpy( series->seriesInstanceUID, "0" );
 	}
 
-	/* Acquisition ID (optional; not really used in DICOM anymore, so what good is it?) */
+	/* Acquisition ID (optional; not really used in DICOM anymore, so what good is it?)
+	A: f.ex. Siemens use this in multi volume scans (fMRI,dwMRI-DTI) to separate volumes/ (Stefano) */
 	series->acquisition[0] = '\0'; /* no acquisitions, which is good */
 	if ( !dicomtag_string( dset, series->acquisition, DCM_AcquisitionNumber, DICOMLIB_LONG_STRING ) )
 	{
@@ -392,6 +536,7 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	}
 
 	(void) dicomtag_string( dset, series->frameOfReferenceUID, DCM_FrameOfReferenceUID, DICOMLIB_LONG_STRING );
+	(void) dicomtag_string( dset, series->repetitionTime, DCM_RepetitionTime, DICOMLIB_LONG_STRING );
 
 	/* Check if we have a concatenation - not supported yet. */
 	if ( dicomtag_string( dset, tmp, DCM_ConcatenationUID, DICOMLIB_LONG_STRING ) )
@@ -422,16 +567,30 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	LOOKUPSEQ( DCM_PlanePositionSequence );
 	if ( !dicomtag_dv( sequence, instance->image_position, DCM_ImagePositionPatient, 3 ) )
 	{
-		seriesError(series, "No valid Image Position Patient tag.");
-		success = false;
+		if ( !dicomtag_dv( dset, instance->image_position, DCM_ACR_NEMA_ImagePosition, 3 ) )
+		{
+			seriesError(series, "No valid Image Position Patient tag.");
+			success = false;
+		}
+		else
+		{
+			acrnema = true;
+		}
 	}
 
 	/* Image Orientation Patient - required */
 	LOOKUPSEQ( DCM_PlaneOrientationSequence );
 	if ( !dicomtag_dv( sequence, series->image_orientation, DCM_ImageOrientationPatient, 6 ) )
 	{
-		seriesError(series, "No valid Image Orientation Patient tag.");
-		success = false;
+		if ( !dicomtag_dv( dset, series->image_orientation, DCM_ACR_NEMA_ImageOrientation, 6 ) )
+		{
+			seriesError(series, "No valid Image Orientation Patient tag.");
+			success = false;
+		}
+		else
+		{
+			acrnema = true;
+		}
 	}
 
 	/* Pixel Spacing - required */
@@ -449,7 +608,60 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 
 	series->patient_orientation[0][0] = '\0';
 	series->patient_orientation[1][0] = '\0';
-	(void)dicomtag_stringv( dset, ( char * )series->patient_orientation, DCM_PatientOrientation, 4, 2 );
+	if ( !dicomtag_stringv( dset, ( char * )series->patient_orientation, DCM_PatientOrientation, 4, 2 ) )
+	{
+		/* Since ACR-NEMA 1 and 2 define a coordinate system relative to the gantry of the scanner, we need
+		 * to know the orientation of the patient in the system to avoid upside down or mirrored images. */
+		if ( acrnema )
+		{
+			sstrcat( series->series_info, "Warning: ACR-NEMA coordinate system without patient orientation defined.\n" );
+		}
+	}
+	else
+	{
+		int i, j;
+
+		/* Safety measure */
+		series->patient_orientation[0][3] = '\0';
+		series->patient_orientation[1][3] = '\0';
+
+		/* Check validity of the patient orientation */
+		if ( series->patient_orientation[0][0] == '\0' || series->patient_orientation[1][0] )
+		{
+			/* Not legal according to standard */
+			sstrcat( series->series_info, "Warning: Patient orientation is defined empty.\n" );
+		}
+		for ( i = 0; i < 2; i++ )
+		{
+			for ( j = 0; j < 3; j++ )
+			{
+				if ( series->patient_orientation[i][j] == '\0' )
+				{
+					break;
+				}
+				if ( strchr( "APRLHF", series->patient_orientation[i][j] ) == NULL )
+				{
+					/* Not legal according to standard */
+					sstrcat( series->series_info, "Warning: Invalid patient orientation defined.\n" );
+				}
+				if ( ( series->patient_orientation[i][j] == 'A' && strchr( series->patient_orientation[i], 'P' ) )
+				        || ( series->patient_orientation[i][j] == 'R' && strchr( series->patient_orientation[i], 'L' ) )
+				        || ( series->patient_orientation[i][j] == 'F' && strchr( series->patient_orientation[i], 'H' ) ) )
+				{
+					/* Be aware: For non-brain acquisitions, this may actually be the valid. Eg axial dental images may
+					 *  have left and right in the same direction. */
+					sstrcat( series->series_info, "Warning: Nonsensical patient orientation defined.\n" );
+				}
+			}
+		}
+		/* TODO: For ACR-NEMA, wrap coordinate system to patient orientation */
+		/* TODO: For now, just check that patient orientation is in DICOM patient orientation. */
+
+		// We can also test patient position tag (0x0018, 0x5100) as a fallback. If value is "HFS" then
+		// this means Head First-Supine, or head first into gantry, with face up.
+
+		// I wonder if we will ever make this a priority. ACR-NEMA is getting more obsolete every year that goes by. - Per
+	}
 
 	/* Get image metadata. We do this here so that we can give useful error messages and invalid notification
 	 * before we try to import instead of after. */
@@ -480,16 +692,195 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	/* Get samples per pixel - required */
 	if ( !dset->findAndGetUint16( DCM_SamplesPerPixel, series->samples_per_pixel ).good() )
 	{
-		seriesError(series, "No valid Samples per Pixel tag.");
-		success = false;
+		if ( !acrnema )
+		{
+			seriesError(series, "No valid Samples per Pixel tag.");
+			success = false;
+		}
+		else
+		{
+			series->samples_per_pixel = 1;
+		}
 	}
 
 	/* Get bits per sample - required */
 	if ( !dset->findAndGetUint16( DCM_BitsAllocated, series->bits_per_sample ).good() )
 	{
-		seriesError(series, "No valid bits allocated tag.");
-		success = false;
+		if ( !acrnema )
+		{
+			seriesError(series, "No valid bits allocated tag.");
+			success = false;
+		}
+		else
+		{
+			series->bits_per_sample = 16;
+		}
 	}
+
+	//* test for diffusion multi directional data (DTI) */
+	series->DTI.isDTI=false;
+	series->DTI.bval[0] = '\0';
+	series->DTI.bvec[0]=0;series->DTI.bvec[1]=0;series->DTI.bvec[2]=0;
+	const Float64* bvec=NULL;
+	OFString OFSread;
+
+	// testing for standard DICOM DTI tags (only seen in philips data-sets up to now)
+	// works for Philips Achieva 3.2.1/3.2.1.1
+	if ( dset->findAndGetFloat64Array(DCM_DiffusionGradientOrientation, bvec ).good() )
+	{
+		// Gradient orientation
+		series->DTI.bvec[0]=bvec[0];
+		series->DTI.bvec[1]=bvec[1];
+		series->DTI.bvec[2]=bvec[2];
+		// SSC_LOG( "Tag DCM_DiffusionGradientOrientation found in file %s %f,%f,%f", instance->path ,series->DTI.bvec[0], series->DTI.bvec[1], series->DTI.bvec[2] );
+		// Directionality: we don't really need this but who knows...
+		if ( dset->findAndGetOFString(DCM_DiffusionDirectionality, OFSread ).good() )
+		{
+			// SSC_LOG( "Tag DCM_DiffusionDirectionality found in file %s : %s",instance->path , OFSread.c_str() );
+			sstrcat(series->DTI.directionality, OFSread.c_str());
+		}
+		// B-value
+		if (dset->findAndGetOFString( DCM_DiffusionBValue,OFSread ).good() )
+		{
+			// SSC_LOG( "Tag DCM_DiffusionBValue found %s", OFSread.c_str() );
+			sstrcat(series->DTI.bval, OFSread.c_str());
+		}
+		series->DTI.isDTI=true;
+	}
+	// testing for private Siemens DTI tags
+	// works for Syngo MR B15; MR B17; MR D11
+	/* TODO: get B-matrix from CSA-tag and estimate B-values and B-vectors from this by default and use DICOM-tags as fallback
+		 see: https://github.com/matthew-brett/nibabel/blob/master/nibabel/nicom/dwiparams.py
+		 (SIEMENS DICOM tags for bvec and bvals could be inaccurate for older datasets) */
+	else if ( dset->tagExists(SiemensDCM_DiffusionBValue) )
+	{
+		// if there is a B-value we have DTI data
+		series->DTI.isDTI=true;
+
+		// Gradient orientation
+		if ( dset->findAndGetFloat64Array(SiemensDCM_DiffusionGradientOrientation, bvec ).good() )
+		{
+			// Siemens Diff.gradients are in patient space coordinates so we convert to image space coordinates:
+			double cross[3];
+			series->DTI.bvec[0]=vector3d_inner_product(&series->image_orientation[0], bvec);
+			series->DTI.bvec[1]=vector3d_inner_product(&series->image_orientation[3], bvec);
+			vector3d_cross_product(cross, &series->image_orientation[0], &series->image_orientation[3] );
+			series->DTI.bvec[2]=vector3d_inner_product(cross, bvec);
+			// SSC_LOG( "Tag SiemensDCM_DiffusionGradientOrientation found in file %s %f,%f,%f", instance->path ,series->DTI.bvec[0], series->DTI.bvec[1], series->DTI.bvec[2] );
+		}
+
+		// Directionality:string with "DIRECTIONAL" or "NONE" - we don't really need this but who knows...
+		if ( dset->findAndGetOFString(SiemensDCM_DiffusionDirectionality, OFSread ).good() )
+		{
+			// SSC_LOG( "Tag SiemensDCM_DiffusionDirectionality found in file %s :\"%s\"",instance->path , OFSread.c_str() );
+			sstrcat(series->DTI.directionality, OFSread.c_str());
+		}
+
+		// B-value
+		if (dset->findAndGetOFString( SiemensDCM_DiffusionBValue,OFSread ).good() )
+		{
+			// SSC_LOG( "Tag DCM_DiffusionBValue found %s", OFSread.c_str() );
+			sstrcat(series->DTI.bval, OFSread.c_str());
+		}
+	}
+
+	// Siemens CSA data?
+	// first: CSA IMAGE Header
+	if (dset->tagExistsWithValue(DcmTagKey(0x0029, 0x1010)))
+	{
+		// This is a CSA, probably. Make sure.
+		char val[200];
+		if (dicomtag_string(dset, val, DcmTagKey(0x0029, 0x0010), 200))
+		{
+			if (strcmp(val, "SIEMENS CSA HEADER") == 0)
+			{
+				DcmElement *csaBlob;
+				dset->findAndGetElement(DcmTagKey(0x0029, 0x1010), csaBlob, false, false);
+				csaparse(csaBlob, series->DTI.csaImageMap);
+			}
+		}
+	}
+	/* CSA SERIES Header not needed so far ...
+	if (dset->tagExistsWithValue(DcmTagKey(0x0029, 0x1020)))
+	{
+		// This is a CSA, probably. Make sure.
+		char val[200];
+		if (dicomtag_string(dset, val, DcmTagKey(0x0029, 0x0010), 200))
+		{
+			if (strcmp(val, "SIEMENS CSA HEADER") == 0)
+			{
+				DcmElement *csaBlob;
+				dset->findAndGetElement(DcmTagKey(0x0029, 0x1020), csaBlob, false, false);
+				csaparse(csaBlob, series->DTI.csaSeriesMap);
+			}
+		}
+	}*/
+
+	// test Mosaic and if yes set relevant information for selected frame
+	series->mosaic = false;
+	if (dset->tagExistsWithValue(DcmTagKey(0x0019,0x100a))) // NumberOfImagesInMosaic
+	{
+		// SSC_LOG( "Tag 0x0019,0x100a found -> mosaic: %s", instance->path );
+
+		// NumberOfImagesInMosaic -> frames
+		uint16_t help;
+		if ( !dset->findAndGetUint16( DcmTagKey(0x0019,0x100a), help ).good() )
+		{
+			seriesError(series, "Reading of NumberOfImagesInMosaic failed.");
+		}
+		else
+		{
+			series->frames = help;
+			instance->frame = frame;
+		}
+
+		// SSC_LOG( "--> found %i frames in mosaic (processing frame %i now)",series->frames, instance->frame);
+		if ( series->frames > 1 ) // sanity check
+		{
+			Float64 sliceDistValue = 2;
+			// SSC_LOG( "--> old rows/cols: %i/%i", series->rows, series->columns);
+
+			// calc rows and colums of frames in mosaic
+			int mosaicSize = ceil( sqrt( series->frames ));
+			series->rows = series->rows / mosaicSize;
+			series->columns = series->columns / mosaicSize;
+
+			// SSC_LOG( "--> calculated rows/cols: %i/%i", series->rows, series->columns);
+
+			/*
+			// correct ImagePatientPosition because IPP is given with mosaic's full size
+			*/
+
+			double sliceDistance[3], imageRowVector[3], imageColumnVector[3];
+			//  calc vector from opper left voxel of mosaic to opper left voxel of desired slice:
+			vector3d_copy(imageRowVector,&series->image_orientation[0] );
+			vector3d_copy(imageColumnVector,&series->image_orientation[3] );
+			vector3d_scalar_multiply(imageRowVector, (double)(series->rows * (mosaicSize - 1)) * 0.5 *  series->pixel_spacing[0]);
+			vector3d_scalar_multiply(imageColumnVector, (double)(series->columns * (mosaicSize - 1)) * 0.5 * series->pixel_spacing[1]);
+
+			// calc Image Orientation normalvector:
+			vector3d_cross_product( sliceDistance, &series->image_orientation[0],
+						&series->image_orientation[3] );
+
+			// and now calc the slice position (distance from first slice):
+			if ( !dset->findAndGetFloat64( DcmTagKey(0x0018,0x0088) , sliceDistValue ).good() || sliceDistValue < 0.001 ) // DCM_SliceSpacing
+			{
+				if ( !dset->findAndGetFloat64( DCM_SliceThickness , sliceDistValue ).good() ) // DCM_SliceSpacing
+					SSC_LOG( "No SliceSpacing or SliceDistance Tag found. Default slice distance is %f",sliceDistValue);
+			}
+			vector3d_scalar_multiply( sliceDistance, instance->frame * sliceDistValue);
+
+
+			// and add all vectors to get real image position of this slice
+			vector3d_add( instance->image_position, instance->image_position, imageRowVector);
+			vector3d_add( instance->image_position, instance->image_position, imageColumnVector);
+			vector3d_add( instance->image_position, instance->image_position, sliceDistance);
+			// SSC_LOG("Image position: %f %f %f",instance->image_position[0],instance->image_position[1],instance->image_position[2] );
+			// and tag as mosaic for raw data extraction
+			series->mosaic = true;
+		}
+	}
+	//SSC_LOG( "--> IPP %f / %f / %f", instance->image_position[0], instance->image_position[1], instance->image_position[2] );
 
 	// Look for RGB colour LUT
 	if (dset->tagExistsWithValue(DCM_RedPaletteColorLookupTableDescriptor))
@@ -544,11 +935,26 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	LOOKUPSEQ( DCM_VOILUTSequence );
 	( void ) dicomtag_window( sequence, instance );
 
-	if (!success)
+	if ( acrnema )
 	{
-		return EPROTO;
+		char tmp[DICOMLIB_LONG_STRING];
+
+		if (!dicomtag_string( dset, tmp, DCM_ACR_NEMA_RecognitionCode, DICOMLIB_LONG_STRING)
+		    || strncmp(tmp, "ACR-NEMA", 8) != 0 || (tmp[9] != '1' && tmp[9] != '2'))
+		{
+			seriesError(series, "Identified as ACR-NEMA but no recognition code found.");
+			return EPROTO;
+		}
+		if (tmp[9] == '1')
+		{
+			series->warning = DICOMLIB_WARNING_ACR_NEMA_1;
+		}
+		else
+		{
+			series->warning = DICOMLIB_WARNING_ACR_NEMA_2;
+		}
 	}
-	return 0;
+	return success ? 0 : EPROTO;
 }
 
 struct filenode *DICOM_Dir_Nodes( struct study_t *study )
@@ -686,12 +1092,9 @@ int DICOM_Dir( const char *path, struct study_t **studyPtr )
 	return 0;
 }
 
-// Returns 0 on success, ENOENT if dictionary could not be found, EINVAL if parameter is bad, EIO if we failed to load it,
-// EPROTO if we think protocol is bad but we could create a series, -1 if we failed to read file due to basic failure.
+// Returns 0 on success, EPROTO if invalid series, EINVAL if internal error
 int parse_DICOM( DcmItem *dset, struct study_t *study, struct series_t *series, struct instance_t *instance, int curFrame )
 {
-	int retval;
-
 	series->series_info[0] = '\0';
 
 	if ( instance->path == NULL || instance == NULL || series == NULL || dset == NULL )
@@ -702,13 +1105,7 @@ int parse_DICOM( DcmItem *dset, struct study_t *study, struct series_t *series, 
 
 	readPatientInfo( dset, study, instance->path );
 	readStudyInfo( dset, study, instance->path );
-	retval = readSeriesInfo( dset, series, instance, curFrame );
-	if ( retval != 0 )
-	{
-		return retval;
-	}
-
-	return 0;
+	return readSeriesInfo( dset, series, instance, curFrame );
 }
 
 // Raw image function - no VOI, using interdata
@@ -719,15 +1116,37 @@ const void *DICOM_raw_image(const struct series_t *series, struct instance_t *in
 	static void *buffer = NULL;	// to keep RGB buffer in memory
 	int maxFrames;
 
+
 	if (buffer)
 	{
 		free(buffer);
 		buffer = NULL;
 	}
-	if ( !dicomimage || !savedPath || strcmp( instance->path, savedPath ) != 0 )
+	if ( !dicomimage || !savedPath || strcmp( instance->path, savedPath ) != 0 || series->mosaic )
 	{
+		DicomImage * scaledDicomImage;
 		delete dicomimage;
 		dicomimage = new DicomImage( instance->path, CIF_AcrNemaCompatibility | CIF_MayDetachPixelData );
+
+		// Siemens mosaic stuff: Clipping the desired image from the mosaic ...
+		if ( series->mosaic )
+		{
+			signed long clipX = 0; // Top left x coordinate for mosaic clipping
+			signed long clipY = 0; // Top left y coordinate for mosaic clipping
+			unsigned long clipWidth = series->rows; // Clipping width for mosaics clipping
+			unsigned long clipHeight = series->columns; // Clipping height for mosaics clipping
+			// Size of the quadratic mosaic f.ex. 60 frames -> 8x8 Matrix -> matrixSize=8 :
+			unsigned int mosaicSize = ceil(sqrt(series->frames));
+			clipX = ( frame % mosaicSize ) * clipWidth;
+			clipY = ( frame / mosaicSize ) * clipHeight;
+
+			scaledDicomImage = dicomimage->createScaledImage( clipX, clipY, clipWidth, clipHeight, clipWidth, clipHeight, 0, 0 );
+			delete dicomimage;
+			dicomimage = scaledDicomImage;
+
+			// mosaic has really only one frame:
+			frame = 0;
+		}
 		free( savedPath );
 		savedPath = strdup( instance->path );
 	}
@@ -813,8 +1232,8 @@ const void *DICOM_raw_image(const struct series_t *series, struct instance_t *in
 const void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *y, int bits, int frame )
 {
 	const int planar = 0; /* interleave colour data, not separate; not that we use this for our monochrome data */
-	static DicomImage *dicomimage = NULL;	// to cache result
-	const int interpolate = 1; /* pbmplus algorithm, because the c't algorithm, whatever that is, crashes on some series */
+	static DicomImage *dicomimage = NULL;	// cached
+	const int interpolate = 4; /* bicubic algorithm */
 	const int aspect = (*x == 0 || *y == 0); /* no aspect ratio lock unless either x or y is zero */
 	struct series_t *series = instance->parent_series;
 	EI_Status status;
@@ -839,12 +1258,32 @@ const void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *
 		errno = EIO;
 		return NULL;
 	}
-	if ( !scaled || refreshScaled || savedX != *x || savedY != *y )
+
+	// Siemens mosaic stuff: Clipping the desired image from the mosaic ...
+	signed long clipX = 0; // Top left x coordinate for mosaic clipping
+	signed long clipY = 0; // Top left y coordinate for mosaic clipping
+	unsigned long clipWidth = series->rows; // Clipping width for mosaics clipping
+	unsigned long clipHeight = series->columns; // Clipping height for mosaics clipping
+	if (series->mosaic)
+	{
+		// Size of the quadratic mosaic f.ex. 60 frames -> 8x8 Matrix -> matrixSize=8:
+		unsigned int mosaicSize = ceil(sqrt(series->frames));
+		clipX = ( frame % mosaicSize ) * clipWidth;
+		clipY = ( frame / mosaicSize ) * clipHeight;
+		// mosaic has really only one frame:
+		frame = 0;
+	}
+
+	if ( !scaled || refreshScaled || savedX != *x || savedY != *y || series->mosaic )
 	{
 		delete scaled;
-		scaled = dicomimage->createScaledImage( (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
+		if ( !series->mosaic )
+			scaled = dicomimage->createScaledImage( (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
+		else
+			scaled = dicomimage->createScaledImage( clipX, clipY, clipWidth, clipHeight, (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
 		savedX = *x;
 		savedY = *y;
+
 	}
 	if ( !scaled )
 	{

@@ -17,11 +17,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#ifdef __APPLE__
-#include <machine/endian.h>
-#else
-#include <endian.h>
-#endif
+#include <byteswap.h>
 
 #include "sscLogger.h"
 #include "identify.h"
@@ -71,9 +67,9 @@ static int fastscan_acrnema( const char *path )
 
 	/* Define convenience macros that ensure correct endianness, and return if we empty buffer. */
 #define GRAB16(x) if (pos < end + 2) { if (big_endian != M_BIG_ENDIAN) { \
-x = swap16(*(uint16_t *)pos); } else { x = *(uint16_t *)pos; } pos += 2; } else { return 0; }
+x = bswap_16(*(uint16_t *)pos); } else { x = *(uint16_t *)pos; } pos += 2; } else { return 0; }
 #define GRAB32(x) if (pos < end + 4) { if (big_endian != M_BIG_ENDIAN) { \
-x = swap32(*(uint32_t *)pos); } else { x = *(uint32_t *)pos; } pos += 4; } else { return 0; }
+x = bswap_32(*(uint32_t *)pos); } else { x = *(uint32_t *)pos; } pos += 4; } else { return 0; }
 
 	GRAB16( group );
 
