@@ -47,6 +47,7 @@ MetricWidget::MetricWidget(QWidget* parent) :
   //table widget
   connect(mTable, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
   connect(mTable, SIGNAL(cellChanged(int, int)), this, SLOT(cellChangedSlot(int, int)));
+  connect(mTable, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
 
   this->setLayout(mVerticalLayout);
 
@@ -109,6 +110,41 @@ void MetricWidget::cellChangedSlot(int row, int col)
     if (data)
       data->setName(item->text());
   }
+
+}
+
+void MetricWidget::cellClickedSlot(int row, int column)
+{
+	if (row < 0 || column < 0)
+		return;
+
+	  QTableWidgetItem* item = mTable->item(row,column);
+	  ssc::DataPtr data = ssc::dataManager()->getData(item->data(Qt::UserRole).toString());
+	  cx::PointMetricPtr pointData = boost::shared_dynamic_cast<cx::PointMetric>(data);
+	  if (pointData)
+	  {
+		  	ssc::Vector3D p_r = pointData->getRefCoord();;
+		  	ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->coord(p_r);;
+		  	this->setManualToolPosition(p_r);
+	  }
+}
+
+
+void MetricWidget::setManualToolPosition(ssc::Vector3D p_r)
+{
+	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+	ssc::Vector3D p_pr = rMpr.inv().coord(p_r);
+
+	// set the picked point as offset tip
+	ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+	ssc::Vector3D offset = tool->get_prMt().vector(ssc::Vector3D(0, 0, tool->getTooltipOffset()));
+	p_pr -= offset;
+	p_r = rMpr.coord(p_pr);
+
+	// TODO set center here will not do: must handle
+	ssc::dataManager()->setCenter(p_r);
+	ssc::Vector3D p0_pr = tool->get_prMt().coord(ssc::Vector3D(0, 0, 0));
+	tool->set_prMt(ssc::createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
 
 void MetricWidget::itemSelectionChanged()
