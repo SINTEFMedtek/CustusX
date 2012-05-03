@@ -403,13 +403,27 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 
   Frame frame;
   frame.mTimestamp = ssc::getMilliSecondsSinceEpoch()/1000; //resmapling the timestamp because we cannot find convert the original timestamp into epoch time
-  frame.mWidth = outBytesPerRow;
-  frame.mHeight = rows;
+  
   //TODO: Create an enum value that identifies the pixel format
   // Must also be implementd in cxMacGrabber.mm captureOutput() and the different formats handed by
   // OpenIGTLinkSender::convertFrame() and by the OpenIGTLink client
 //  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;//Find correct value. TYPE_UINT8 = 3, TYPE_UINT32  = 7 in igtlImageMessage.h
-  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT32;//Find correct value. TYPE_UINT8 = 3, TYPE_UINT32  = 7 in igtlImageMessage.h
+
+  if (this->OutputFormat == VTK_LUMINANCE)
+  {
+	  //std::cout << "8 bit" << std::endl;
+	  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;
+  }
+  else if (this->OutputFormat == VTK_RGBA)
+  {
+	  //std::cout << "32 bit" << std::endl;
+	  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT32;
+  }
+  else
+	  std::cout << "Unknown pixel format (not 8 or 32)" << std::endl;
+  
+  frame.mWidth = outBytesPerRow / this->NumberOfScalarComponents;
+  frame.mHeight = rows;
   frame.mFirstPixel = frameBufferPtr;
 
   //This also updates the data descriptor

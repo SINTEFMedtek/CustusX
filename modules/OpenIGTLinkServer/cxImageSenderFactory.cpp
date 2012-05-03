@@ -16,7 +16,7 @@ namespace cx
 int convertStringWithDefault(QString text, int def)
 {
 	bool ok = true;
-	int retval = text.toInt(&ok);
+	int retval = text.toInt(&ok,0);
 	if (ok)
 		return retval;
 	return def;
