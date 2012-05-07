@@ -38,8 +38,8 @@ QStringList ImageSenderSonix::getArgumentDescription()
 {
 	QStringList retval;
 	retval << "--ipaddress:   IP address to connect to, default=127.0.0.1 (localhost)";
-	retval << "--imagingmode: default=0 (0 = B-mode, 2 = Colour, 6 = Dual, 12 = RF)";
-	retval << "--datatype: Video type, default=0x00000004 (4 = processed, 2 = unprocessed)";
+	retval << "--imagingmode: default=2 (0 = B-mode, 2 = Color)";//, 6 = Dual, 12 = RF)";
+	retval << "--datatype: Video type, default=0x008 (4 = gray, 8 = color)";
 	retval << "--buffersize:  Grabber buffer size,   default=500";
 	retval << "--properties:  dump image properties";
 	return retval;
@@ -85,13 +85,13 @@ void ImageSenderSonix::initialize(StringMap arguments)
 	if (!mArguments.count("imagingmode"))
 		mArguments["imagingmode"] = "0";
 	if (!mArguments.count("datatype"))
-		mArguments["datatype"] = "0x00000004";
+		mArguments["datatype"] = "0x00000008";
 	if (!mArguments.count("buffersize"))
 		mArguments["buffersize"] = "500";
 
 	QString ipaddress       = mArguments["ipaddress"];
 	int imagingMode         = convertStringWithDefault(mArguments["imagingmode"], 0);
-	int acquisitionDataType = convertStringWithDefault(mArguments["datatype"], 0x00000004);
+	int acquisitionDataType = convertStringWithDefault(mArguments["datatype"], 0x00000008);
 	int bufferSize          = convertStringWithDefault(mArguments["buffersize"], 500);
 
 	mSonixGrabber = vtkSonixVideoSource::New();
@@ -100,6 +100,11 @@ void ImageSenderSonix::initialize(StringMap arguments)
 	mSonixGrabber->SetAcquisitionDataType(acquisitionDataType);
 	mSonixGrabber->SetFrameBufferSize(bufferSize);  // Number of image frames in buffer
 	mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
+
+	//std::cout << "imagingMode: " << imagingMode << std::endl;
+	//std::cout << "datatype: " << mArguments["datatype"].toStdString().c_str() << std::endl;
+	//std::cout << "acquisitionDataType: " << acquisitionDataType << " ";
+	//std::cout << "GetAcquisitionDataType: " << mSonixGrabber->GetAcquisitionDataType() << std::endl;
 
 	this->mSonixHelper = new SonixHelper();
 	mSonixGrabber->setSonixHelper(this->mSonixHelper);
