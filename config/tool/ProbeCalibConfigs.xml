@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root>
-    <Version>4.3.3</Version>
+    <Version>4.4.1</Version>
     <USScanner>
         <Name>Vivid 7 - Karkirurgen</Name>
         <USProbe>
@@ -1484,11 +1484,11 @@
             <Name>L17-5</Name>
             <Type>LinearArray</Type>
             <DefaultRTSource>DVI</DefaultRTSource>
-            <Notes/>
+            <Notes></Notes>
             <RTSource>
                 <Name>DVI</Name>
                 <TemporalCalibration>0</TemporalCalibration>
-                <DefaultConfig>WidthMaxDepth4p5</DefaultConfig>
+                <DefaultConfig>WidthMaxDepth4</DefaultConfig>
                 <ImageSize>
                     <Width>800</Width>
                     <Height>600</Height>
@@ -1498,190 +1498,152 @@
                     <ID>WidthMaxDepth3</ID>
                     <Name>Width: Max, Depth: 3 cm</Name>
                     <WidthDeg>0</WidthDeg>
-                    <Depth>386</Depth>
+                    <Depth>353</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>441</Col>
-                        <Row>108</Row>
+                        <Col>429</Col>
+                        <Row>125</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
-                        <Col>178</Col>
-                        <Row>108</Row>
+                        <Col>187</Col>
+                        <Row>125</Row>
                     </Corner>
                     <Corner>
-                        <Col>178</Col>
-                        <Row>494</Row>
+                        <Col>187</Col>
+                        <Row>478</Row>
                     </Corner>
                     <Corner>
-                        <Col>704</Col>
-                        <Row>494</Row>
+                        <Col>671</Col>
+                        <Row>478</Row>
                     </Corner>
                     <Corner>
-                        <Col>704</Col>
-                        <Row>108</Row>
+                        <Col>671</Col>
+                        <Row>125</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>178</Left>
-                        <Right>659</Right>
-                        <Top>108</Top>
-                        <Bottom>494</Bottom>
+                        <Left>187</Left>
+                        <Right>644</Right>
+                        <Top>125</Top>
+                        <Bottom>478</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.078125</Width>
-                        <Height>0.078125</Height>
+                        <Width>0.084985835694051</Width>
+                        <Height>0.084985835694051</Height>
                     </PixelSize>
                 </Config>
                 <Config>
                     <ID>WidthMaxDepth4</ID>
                     <Name>Width: Max, Depth: 4 cm</Name>
                     <WidthDeg>0</WidthDeg>
-                    <Depth>386</Depth>
+                    <Depth>354</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>440.5</Col>
-                        <Row>108</Row>
+                        <Col>428</Col>
+                        <Row>125</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
-                        <Col>244</Col>
-                        <Row>108</Row>
+                        <Col>247</Col>
+                        <Row>125</Row>
                     </Corner>
                     <Corner>
-                        <Col>244</Col>
-                        <Row>494</Row>
+                        <Col>247</Col>
+                        <Row>479</Row>
                     </Corner>
                     <Corner>
-                        <Col>637</Col>
-                        <Row>494</Row>
+                        <Col>609</Col>
+                        <Row>479</Row>
                     </Corner>
                     <Corner>
-                        <Col>637</Col>
-                        <Row>108</Row>
+                        <Col>609</Col>
+                        <Row>125</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>244</Left>
-                        <Right>637</Right>
-                        <Top>108</Top>
-                        <Bottom>494</Bottom>
+                        <Left>247</Left>
+                        <Right>609</Right>
+                        <Top>125</Top>
+                        <Bottom>479</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.10417</Width>
-                        <Height>0.10417</Height>
-                    </PixelSize>
-                </Config>
-                <Config>
-                    <ID>WidthMaxDepth4p5</ID>
-                    <Name>Width: Max, Depth: 4.5 cm</Name>
-                    <WidthDeg>0</WidthDeg>
-                    <Depth>385</Depth>
-                    <Offset>0</Offset>
-                    <Origin>
-                        <Col>441</Col>
-                        <Row>108</Row>
-                    </Origin>
-                    <NCorners>4</NCorners>
-                    <Corner>
-                        <Col>265</Col>
-                        <Row>108</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>265</Col>
-                        <Row>493</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>617</Col>
-                        <Row>493</Row>
-                    </Corner>
-                    <Corner>
-                        <Col>617</Col>
-                        <Row>108</Row>
-                    </Corner>
-                    <CroppingEdges>
-                        <Left>265</Left>
-                        <Right>617</Right>
-                        <Top>108</Top>
-                        <Bottom>493</Bottom>
-                    </CroppingEdges>
-                    <PixelSize>
-                        <Width>0.11688</Width>
-                        <Height>0.11688</Height>
+                        <Width>0.113636363636364</Width>
+                        <Height>0.113636363636364</Height>
                     </PixelSize>
                 </Config>
                 <Config>
                     <ID>WidthMaxDepth6</ID>
                     <Name>Width: Max, Depth: 6 cm</Name>
                     <WidthDeg>0</WidthDeg>
-                    <Depth>386</Depth>
+                    <Depth>353</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>441.5</Col>
-                        <Row>108</Row>
+                        <Col>428.5</Col>
+                        <Row>125</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
-                        <Col>310</Col>
-                        <Row>108</Row>
+                        <Col>308</Col>
+                        <Row>125</Row>
                     </Corner>
                     <Corner>
-                        <Col>310</Col>
-                        <Row>494</Row>
+                        <Col>308</Col>
+                        <Row>478</Row>
                     </Corner>
                     <Corner>
-                        <Col>573</Col>
-                        <Row>494</Row>
+                        <Col>549</Col>
+                        <Row>478</Row>
                     </Corner>
                     <Corner>
-                        <Col>573</Col>
-                        <Row>108</Row>
+                        <Col>549</Col>
+                        <Row>125</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>310</Left>
-                        <Right>573</Right>
-                        <Top>108</Top>
-                        <Bottom>494</Bottom>
+                        <Left>308</Left>
+                        <Right>549</Right>
+                        <Top>125</Top>
+                        <Bottom>478</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.15584</Width>
-                        <Height>0.15584</Height>
+                        <Width>0.169971671388102</Width>
+                        <Height>0.169971671388102</Height>
                     </PixelSize>
                 </Config>
                 <Config>
                     <ID>WidthMaxDepth7</ID>
                     <Name>Width: Max, Depth: 7 cm</Name>
                     <WidthDeg>0</WidthDeg>
-                    <Depth>386</Depth>
+                    <Depth>353</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>441</Col>
-                        <Row>108</Row>
+                        <Col>429</Col>
+                        <Row>125</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
-                        <Col>328</Col>
-                        <Row>108</Row>
+                        <Col>325</Col>
+                        <Row>125</Row>
                     </Corner>
                     <Corner>
-                        <Col>328</Col>
-                        <Row>494</Row>
+                        <Col>325</Col>
+                        <Row>478</Row>
                     </Corner>
                     <Corner>
-                        <Col>554</Col>
-                        <Row>494</Row>
+                        <Col>533</Col>
+                        <Row>478</Row>
                     </Corner>
                     <Corner>
-                        <Col>554</Col>
-                        <Row>108</Row>
+                        <Col>533</Col>
+                        <Row>125</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>328</Left>
-                        <Right>554</Right>
-                        <Top>108</Top>
-                        <Bottom>494</Bottom>
+                        <Left>325</Left>
+                        <Right>533</Right>
+                        <Top>125</Top>
+                        <Bottom>478</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.18182</Width>
-                        <Height>0.18182</Height>
+                        <Width>0.198300283286119</Width>
+                        <Height>0.198300283286119</Height>
                     </PixelSize>
                 </Config>
                 <Config>
