@@ -101,6 +101,7 @@ private:
 	std::vector<unsigned char> mTestData;
 	void setTestImage();
 	vtkImageDataPtr createFilterARGB2RGBA(vtkImageDataPtr input);
+  vtkImageDataPtr createFilterRGBA2RGB(vtkImageDataPtr input);//temporary hack
 	void updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message);
 	void updateSonix();
 	ProbePtr getValidProbe();
@@ -126,6 +127,7 @@ private:
 //	float mOrigin[3];
 //	double mSpacing[3]; // spacing (mm/pixel)
 	bool updateSonixParameters;
+	bool sonixVideo;
 //	int mDepthStart; //mm
 //	int mDepthEnd; //mm
 //	int mWidth; //mm

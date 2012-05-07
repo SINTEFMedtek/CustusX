@@ -62,9 +62,10 @@ protected:
 	virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
 	virtual ssc::LandmarkMap getTargetLandmarks() const = 0;
 	virtual void performRegistration() = 0;
-	virtual ssc::Transform3D getTargetTransform() const = 0;
+	virtual ssc::Transform3D getTargetTransform() const = 0; ///< Return transform from target space to reference space
 	virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target) = 0;
 	virtual QString getTargetName() const = 0;
+	void setManualToolPosition(ssc::Vector3D p_r);
 
 	void nextRow(); ///< jump to the next line in the tablewidget, updates active landmark and highlighted row
 	std::vector<ssc::Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
