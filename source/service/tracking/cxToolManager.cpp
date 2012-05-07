@@ -235,7 +235,7 @@ void ToolManager::initializeManualTool()
 	}
 
 	ssc::Transform3D prMt = this->get_rMpr()->inv() * ssc::createTransformRotateY(M_PI)
-					* ssc::createTransformRotateZ(M_PI_2);
+					* ssc::createTransformRotateZ(M_PI/2);
 	mManualTool->set_prMt(prMt);
 }
 
