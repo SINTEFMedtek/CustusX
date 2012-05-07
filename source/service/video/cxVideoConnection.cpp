@@ -67,8 +67,9 @@ void VideoConnection::setLocalServerCommandLine(QString commandline)
 QString VideoConnection::getLocalServerCommandLine()
 {
 	QString cmd = settings()->value("IGTLink/localServer").toString();
-	if (cmd.isEmpty())
-		cmd = "GrabberServer.app --auto";
+	// removed: stateservice handles this for all platforms
+//	if (cmd.isEmpty())
+//		cmd = "GrabberServer.app --auto";
 	return cmd;
 }
 
