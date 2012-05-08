@@ -105,4 +105,18 @@ include_directories(
 # create the target
 add_library( cxPluginRegistrationGUI ${SOURCE_FILES} )
 target_link_libraries( cxPluginRegistrationGUI cxPluginAcquisitionGUI cxPluginRegistrationLogic cxPluginAlgorithmGUI)
+
+#------------------------------------------------------------------------------
+# Cotire - pch and unity builds
+#------------------------------------------------------------------------------
+if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+    cotire(cxPluginRegistrationGUI)
+    if(COTIRE_ADD_UNITY_BUILDS)
+        target_link_libraries(cxPluginRegistrationGUI_unity 
+        		cxPluginAcquisitionGUI
+        		cxPluginRegistrationLogic 
+        		cxPluginAlgorithmGUI
+        		)
+    endif(COTIRE_ADD_UNITY_BUILDS)
+endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
 # =========================================================
