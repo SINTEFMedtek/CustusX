@@ -156,11 +156,8 @@ public:
 	Display* mCurrentContext;
 
 	vtkWeakPointer<vtkRenderWindow> LastContext;
-	int LastViewportSize[2];
-	int ViewportExtent[4];
 
 	vtkSmartPointer<vtkShaderProgram2> Shader;
-	vtkSmartPointer<vtkGLSLShaderDeviceAdapter2> ShaderDevice;
 
 	std::vector<SingleVolumePainterHelper> mElement;
 
