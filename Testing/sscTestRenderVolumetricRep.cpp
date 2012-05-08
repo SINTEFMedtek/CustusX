@@ -52,32 +52,32 @@ int main(int argc, char **argv)
 
 	std::cout << "test" << std::endl;
 	QWidget mainWindow;
-  QHBoxLayout* layout = new QHBoxLayout(&mainWindow);
+	QHBoxLayout* layout = new QHBoxLayout(&mainWindow);
 	ssc::View* view = new ssc::View(&mainWindow);
-  view->getRenderWindow()->GetInteractor()->EnableRenderOff();
+	view->getRenderWindow()->GetInteractor()->EnableRenderOff();
 	layout->addWidget(view);
-  std::cout << "test2" << std::endl;
+	std::cout << "test2" << std::endl;
 
 	//ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(image1->getUid());
-  ssc::ProgressiveLODVolumetricRepPtr rep = ssc::ProgressiveLODVolumetricRep::New(image1->getUid());
+	ssc::ProgressiveLODVolumetricRepPtr rep = ssc::ProgressiveLODVolumetricRep::New(image1->getUid());
 
 	rep->setImage(image1);
 	view->setRep(rep);
-  std::cout << "test3" << std::endl;
+	std::cout << "test3" << std::endl;
 
 	mainWindow.resize(QSize(1000,1000));
-  std::cout << "test3.1" << std::endl;
+	std::cout << "test3.1" << std::endl;
 	view->getRenderer()->ResetCamera();
-  std::cout << "test3.2" << std::endl;
-  mainWindow.show();
-  std::cout << "test3.3" << std::endl;
+	std::cout << "test3.2" << std::endl;
+	mainWindow.show();
+	std::cout << "test3.3" << std::endl;
 
 	for (unsigned i=0; i<3; ++i)
 	{
 
-	  doRender(view->getRenderWindow());
+		doRender(view->getRenderWindow());
 	}
-  std::cout << "test4" << std::endl;
+	std::cout << "test4" << std::endl;
 
 //#define USE_TRANSFORM_RESCLICER
 #ifdef USE_TRANSFORM_RESCLICER
