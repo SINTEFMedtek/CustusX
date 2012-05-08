@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root>
-    <Version>4.4.2</Version>
+    <Version>4.4.3</Version>
     <USScanner>
         <Name>Vivid 7 - Karkirurgen</Name>
         <USProbe>
@@ -576,7 +576,7 @@
             <DefaultRTSource>S-Video</DefaultRTSource>
             <Notes>If the entire ultrasound plane is not visible, try turning off the acquisition program, unplug and replug the videograbber and restart the acquistion program.</Notes>
             <RTSource>
-                <TemporalCalibration>0</TemporalCalibration>
+                <TemporalCalibration>210</TemporalCalibration>
                 <Name>S-Video</Name>
                 <DefaultConfig>Width6Depth40</DefaultConfig>
                 <ImageSize>
