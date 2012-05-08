@@ -250,7 +250,7 @@ void ViewsWindow::updateRender()
 		if (view->getZoomFactor()<0)
 		  continue;
 
-    ssc::DoubleBoundingBox3D bb_s  = view->getViewport_s();
+		ssc::DoubleBoundingBox3D bb_s  = view->getViewport_s();
 		double viewportHeightmm = bb_s.range()[1];//viewPortHeightPix*mmPerPix(view);
 		double parallelscale = viewportHeightmm/2/view->getZoomFactor();
 
