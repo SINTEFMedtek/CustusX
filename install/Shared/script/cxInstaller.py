@@ -460,16 +460,16 @@ class DCMTK(CppComponent):
 
     def _rawCheckout(self):
         self._changeDirToBase()
-#        runBash('git clone git://git.dcmtk.org/dcmtk DCMTK')
+        runBash('git clone git://git.dcmtk.org/dcmtk DCMTK')
         # the commontk version of DCMTK compiles without problems on Mac.
-        runBash('git clone git://github.com/commontk/DCMTK.git DCMTK')
+#        runBash('git clone git://github.com/commontk/DCMTK.git DCMTK')
         
         self.update()
     def update(self):
         self._changeDirToSource()
         runBash('git pull')
 #        runBash('git checkout master')   
-#        runBash('git checkout PUBLIC_360')  # 3.6.0 seems to have some issues on fedora 16.  
+        runBash('git checkout PUBLIC_360')  # 3.6.0 seems to have some issues on fedora 16.  
 
     def configure(self):
         self._changeDirToBuild()
@@ -483,7 +483,8 @@ class DCMTK(CppComponent):
         CppComponent.build(self)
         runBash('sudo make install')
     def installPath(self):
-        return '/usr/local/include/dcmtk'
+        #return '/usr/local/include/dcmtk'
+        return '' # ignore: use yum instead
     # ---------------------------------------------------------
 
 class SSC(CppComponent):
@@ -553,8 +554,9 @@ cmake \
 -DIGSTK_DIR:PATH="%s" \
 -DOpenIGTLink_DIR:PATH="%s" \
 -DOpenCV_DIR:PATH="%s" \
--DDCMTK_DIR:PATH="%s" \
-../%s''' % (DATA.mCMakeGenerator, DATA.m32bitCompileCMakeOption, DATA.mBuildType, DATA.mBuildShared, ITK().buildPath(), VTK().buildPath(), IGSTK().buildPath(), OpenIGTLink().buildPath(), OpenCV().buildPath(), DCMTK().installPath(), self.sourceFolder() )
+../%s''' % (DATA.mCMakeGenerator, DATA.m32bitCompileCMakeOption, DATA.mBuildType, DATA.mBuildShared, ITK().buildPath(), VTK().buildPath(), IGSTK().buildPath(), OpenIGTLink().buildPath(), OpenCV().buildPath(), 
+#DCMTK().installPath(), 
+self.sourceFolder() )
                     )
         # add xcode project here if needed
 # ---------------------------------------------------------
