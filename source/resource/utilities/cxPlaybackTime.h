@@ -17,6 +17,7 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QColor>
 #include <QTimer>
 #include <boost/shared_ptr.hpp>
 
@@ -92,13 +93,15 @@ typedef boost::shared_ptr<PlaybackTime> PlaybackTimePtr;
 class TimelineEvent
 {
 public:
-	TimelineEvent() : mStartTime(0), mEndTime(0) {}
+	TimelineEvent() : mStartTime(0), mEndTime(0), mColor("black") {}
 	TimelineEvent(QString description, double start, double end) : mDescription(description), mStartTime(start), mEndTime(end) {}
 	TimelineEvent(QString description, double time) : mDescription(description), mStartTime(time), mEndTime(time) {}
 	QString mUid;
 	QString mDescription;
 	double mStartTime;
 	double mEndTime;
+	QColor mColor;
+	QString mGroup;
 	bool isInside(double time, double tol_ms=0) const;
 	bool isSingular() const;
 	bool isOverlap(const TimelineEvent& rhs) const;
