@@ -7,12 +7,12 @@ uniform float level;
 
 float applyWindowLevel(float input, float window, float level)
 {
-	return (input-level)/window + 0.5;
+	return (input - level) / window + 0.5;
 }
 
 vec4 applyWindowLevel(vec4 input, float window, float level)
 {
-	return (input-level)/window + 0.5;
+	return (input - level) / window + 0.5;
 }
 
 void main()
@@ -22,7 +22,7 @@ void main()
     float delta = stepsize;
     vec4 delta_dir = norm_dir * delta;
     vec4 vect = start;
-    vec4 col_acc = vec4(0,0,0,1); // The dest color
+    vec4 col_acc = vec4(0, 0, 0, 1); // The dest color
     float alpha_acc = 0.0; // The  dest alpha for blending
     vec4 color_sample; // The src color 
     float alpha_sample; // The src alpha
@@ -126,8 +126,8 @@ void main()
 				color_sample2 = applyWindowLevel(color_sample2, window, level);
 				vec4 color_sample3 = texture3D(volume_tex,(vect-0.5*delta_dir).xyz);
 				color_sample3 = applyWindowLevel(color_sample3, window, level);
-				col_acc = mix(color_sample, color_sample2,0.5);
-				col_acc = col_acc*0.66 + color_sample3*0.33;
+				col_acc = mix(color_sample, color_sample2, 0.5);
+				col_acc = col_acc * 0.66 + color_sample3 * 0.33;
 				break;
 			}
 		}
