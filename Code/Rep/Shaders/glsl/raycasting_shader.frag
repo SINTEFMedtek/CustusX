@@ -134,7 +134,7 @@ void main()
 
 		vect += delta_dir;
 
-		if (vect.x > 1.0 || vect.y > 1.0 || vect.z > 1.0 || vect.x < 0.0 || vect.y < 0.0 || vect.z < 0.0) break;
+		if (any(greaterThan(vect.xyz, vec3(1, 1, 1))) || any(lessThan(vect.xyz, vec3(0, 0, 0)))) break;
 
 		if (renderMode == 5)
 			if (alpha_acc < 0.01) break;
