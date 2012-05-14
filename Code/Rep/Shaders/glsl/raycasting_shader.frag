@@ -1,4 +1,4 @@
-uniform sampler3D volume_tex;
+uniform sampler3D volumeTexture;
 uniform float stepsize;
 uniform float threshold;
 uniform int renderMode;
@@ -12,60 +12,60 @@ float applyWindowLevel(float input, float window, float level)
 
 vec4 applyWindowLevel(vec4 input, float window, float level)
 {
-	return (input - level) / window + 0.5;
+       return (input - level) / window + 0.5;
 }
 
 void main()
 {
     vec4 start = gl_TexCoord[0];
-    vec4 norm_dir = gl_TexCoord[3];
+    vec4 rayDirection = gl_TexCoord[3];
     float delta = stepsize;
-    vec4 delta_dir = norm_dir * delta;
+    vec4 rayDeltaVector = rayDirection * delta;
     vec4 vect = start;
-    vec4 col_acc = vec4(0, 0, 0, 1); // The dest color
-    float alpha_acc = 0.0; // The  dest alpha for blending
-    vec4 color_sample; // The src color 
-    float alpha_sample; // The src alpha
+    vec4 colorAccumulator = vec4(0, 0, 0, 1); // The dest color
+    float alphaAccumulator = 0.0; // The  dest alpha for blending
+    vec4 colorSample; // The src color 
+    float alphaSample; // The src alpha
     float n = 0.0;
     float thau = 0.02;
     float real_threshold = applyWindowLevel(threshold, window, level);
 
-    if (renderMode == 5) alpha_acc = 1.0;
+    if (renderMode == 5) alphaAccumulator = 1.0;
     
     for(int i = 0; i < 450; i++)
     {
-	    color_sample = texture3D(volume_tex, vect.xyz);
-	    color_sample = applyWindowLevel(color_sample, window, level);
+	    colorSample = texture3D(volumeTexture, vect.xyz);
+	    colorSample = applyWindowLevel(colorSample, window, level);
 
 		if (renderMode == 0) // Accumulated average (compositing)
 		{
-			alpha_sample = color_sample.a * stepsize;
-			col_acc += (1.0 - alpha_acc) * color_sample * alpha_sample;
-			alpha_acc += (1.0 - alpha_acc) * alpha_sample;
+			alphaSample = colorSample.a * stepsize;
+			colorAccumulator += (1.0 - alphaAccumulator) * colorSample * alphaSample;
+			alphaAccumulator += (1.0 - alphaAccumulator) * alphaSample;
 		}
 
 		if (renderMode == 1) // Maximum intensity
 		{
-			if (color_sample.x > col_acc.x)
+			if (colorSample.x > colorAccumulator.x)
 			{
-				col_acc = color_sample;
+				colorAccumulator = colorSample;
 			}
 		}
 
 		if (renderMode == 2) // Average (x-ray)
 		{
-			if (color_sample.x > 0.0)
+			if (colorSample.x > 0.0)
 			{
 				n += 1.0;
-				col_acc += color_sample;
+				colorAccumulator += colorSample;
 			}
 		}
 
 		if (renderMode == 3) // Frank's doodle
 		{
-			alpha_sample = color_sample.a * stepsize;
-			col_acc   += (1.0 - alpha_acc) * color_sample * alpha_sample * 3.0;
-			alpha_acc += alpha_sample;
+			alphaSample = colorSample.a * stepsize;
+			colorAccumulator   += (1.0 - alphaAccumulator) * colorSample * alphaSample * 3.0;
+			alphaAccumulator += alphaSample;
 		}
 
 		if (renderMode == 4) // Accumulated average (compositing) with gradient
@@ -74,18 +74,18 @@ void main()
 			float vsX, vsY, vsZ = 0.0;
 
 			// X
-			vec4 val1 = texture3D(volume_tex, vec3(vect.x - vsX, vect.y, vect.z));
-			vec4 val2 = texture3D(volume_tex, vec3(vect.x + vsX, vect.y, vect.z));
+			vec4 val1 = texture3D(volumeTexture, vec3(vect.x - vsX, vect.y, vect.z));
+			vec4 val2 = texture3D(volumeTexture, vec3(vect.x + vsX, vect.y, vect.z));
 			gradient.x = (val2.x - val1.x) * 0.5;
 
 			// Y
-			val1 = texture3D(volume_tex, vec3(vect.x, vect.y - vsY, vect.z));
-			val2 = texture3D(volume_tex, vec3(vect.x, vect.y + vsY, vect.z));
+			val1 = texture3D(volumeTexture, vec3(vect.x, vect.y - vsY, vect.z));
+			val2 = texture3D(volumeTexture, vec3(vect.x, vect.y + vsY, vect.z));
 			gradient.y = (val2.y - val1.y) * 0.5;
 
 			// X
-			val1 = texture3D(volume_tex, vec3(vect.x, vect.y, vect.z - vsZ));
-			val2 = texture3D(volume_tex, vec3(vect.x, vect.y, vect.z + vsZ));
+			val1 = texture3D(volumeTexture, vec3(vect.x, vect.y, vect.z - vsZ));
+			val2 = texture3D(volumeTexture, vec3(vect.x, vect.y, vect.z + vsZ));
 			gradient.z = (val2.z - val1.z) * 0.5;
 
 			vec3 n_gradient = normalize(gradient);
@@ -109,50 +109,50 @@ void main()
 
 		if (renderMode == 5) // --- Torgrim's algorithm --- (Cloud light scattering)
 		{
-			float voxelValue = (color_sample.r + color_sample.g + color_sample.b) / 3.0;
+			float voxelValue = (colorSample.r + colorSample.g + colorSample.b) / 3.0;
 			if ((voxelValue - threshold) > 0.0)
 			{
-				alpha_sample = voxelValue - threshold;
-				col_acc += alpha_acc * alpha_sample;
-				alpha_acc = alpha_acc * exp((-1.0 * thau) * alpha_sample);
+				alphaSample = voxelValue - threshold;
+				colorAccumulator += alphaAccumulator * alphaSample;
+				alphaAccumulator = alphaAccumulator * exp((-1.0 * thau) * alphaSample);
 			}
 		}
 		if (renderMode == 6)
 		{
-			float voxelValue = (color_sample.x + color_sample.y + color_sample.z)/3.0;
+			float voxelValue = (colorSample.x + colorSample.y + colorSample.z)/3.0;
 			if (voxelValue > real_threshold)
 			{
-				vec4 color_sample2 = texture3D(volume_tex,(vect+0.5*delta_dir).xyz);
-				color_sample2 = applyWindowLevel(color_sample2, window, level);
-				vec4 color_sample3 = texture3D(volume_tex,(vect-0.5*delta_dir).xyz);
-				color_sample3 = applyWindowLevel(color_sample3, window, level);
-				col_acc = mix(color_sample, color_sample2, 0.5);
-				col_acc = col_acc * 0.66 + color_sample3 * 0.33;
+				vec4 colorSample2 = texture3D(volumeTexture,(vect+0.5*rayDeltaVector).xyz);
+				colorSample2 = applyWindowLevel(colorSample2, window, level);
+				vec4 colorSample3 = texture3D(volumeTexture,(vect-0.5*rayDeltaVector).xyz);
+				colorSample3 = applyWindowLevel(colorSample3, window, level);
+				colorAccumulator = mix(colorSample, colorSample2, 0.5);
+				colorAccumulator = colorAccumulator * 0.66 + colorSample3 * 0.33;
 				break;
 			}
 		}
 
-		vect += delta_dir;
+		vect += rayDeltaVector;
 
 		if (any(greaterThan(vect.xyz, vec3(1, 1, 1))) || any(lessThan(vect.xyz, vec3(0, 0, 0)))) break;
 
 		if (renderMode == 5)
-			if (alpha_acc < 0.01) break;
+			if (alphaAccumulator < 0.01) break;
 		else
-			if (alpha_acc > 0.95) break; // terminate if opacity > 1 or the ray is outside the volume
+			if (alphaAccumulator > 0.95) break; // terminate if opacity > 1 or the ray is outside the volume
     }
 
 
 	// Averaging
 	if (renderMode == 2)
 	{
-		col_acc = col_acc / n;
+		colorAccumulator = colorAccumulator / n;
 	}
 
 	if (renderMode == 0)
 	{
-		col_acc.a = alpha_acc;
+		colorAccumulator.a = alphaAccumulator;
 	}
 
-    gl_FragColor = col_acc;
+    gl_FragColor = colorAccumulator;
 }
