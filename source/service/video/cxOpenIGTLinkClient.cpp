@@ -212,6 +212,14 @@ void IGTLinkClient::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
 		mFPSTimer.reset(2000);
 	}
 
+	// TEST
+	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+	imgMsg->GetTimeStamp(timestamp);
+	double timestamp_ms = timestamp->GetTimeStamp() * 1000;
+	QDateTime timestamp_dt = QDateTime::fromMSecsSinceEpoch(timestamp_ms);
+	std::cout << "Queue size: " << mMutexedImageMessageQueue.size() << "\tDelay: " << timestamp_dt.msecsTo(QDateTime::currentDateTime()) << std::endl;
+	// TEST
+
 	QMutexLocker sentry(&mImageMutex);
 	mMutexedImageMessageQueue.push_back(imgMsg);
 	sentry.unlock();
@@ -348,7 +356,6 @@ bool IGTLinkClient::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::
 
 bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
-
 	// Create a message buffer to receive transform data
 	igtl::ImageMessage::Pointer imgMsg;
 	imgMsg = igtl::ImageMessage::New();
@@ -367,44 +374,16 @@ bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointe
 	// Deserialize the transform data
 	// If you want to do a CRC check, call Unpack(1).
 	// If you want to skip CRC check, call Unpack() without argument.
-//  std::cout << "unpack" << std::endl;
 	int c = imgMsg->Unpack();
-//  int a = (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF);
-//  int b = c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF);
-//  std::cout << "finished unpack " << c << " " << a << " " << b  << std::endl;
 
 	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
 	{
-////    std::cout << "ok" << std::endl;
-//    // Retrive the image data
-//    int size[3]; // image dimension
-//    float spacing[3]; // spacing (mm/pixel)
-//    int svsize[3]; // sub-volume size
-//    int svoffset[3]; // sub-volume offset
-//    int scalarType; // scalar type
-//
-//    scalarType = imgMsg->GetScalarType();
-//    imgMsg->GetDimensions(size);
-//    imgMsg->GetSpacing(spacing);
-//    imgMsg->GetSubVolume(svsize, svoffset);
-
-//    std::cerr << "Device Name           : " << imgMsg->GetDeviceName() << std::endl;
-//    std::cerr << "Scalar Type           : " << scalarType << std::endl;
-//    std::cerr << "Dimensions            : (" << size[0] << ", " << size[1] << ", " << size[2] << ")" << std::endl;
-//    std::cerr << "Spacing               : (" << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << ")"
-//        << std::endl;
-//    std::cerr << "Sub-Volume dimensions : (" << svsize[0] << ", " << svsize[1] << ", " << svsize[2] << ")" << std::endl;
-//    std::cerr << "Sub-Volume offset     : (" << svoffset[0] << ", " << svoffset[1] << ", " << svoffset[2] << ")"
-//        << std::endl;
-
 		this->addImageToQueue(imgMsg);
-
 		return true;
 	}
 
 	std::cout << "body crc failed!" << std::endl;
 	return true;
-
 }
 
 } //end namespace cx
