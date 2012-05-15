@@ -46,7 +46,7 @@ QString UsReconstructionFileMaker::write()
   this->writeUSTimestamps(reconstructionFolder);
   QString calibrationFile = this->copyCalibrationFile(reconstructionFolder);
   this->writeUSImages(reconstructionFolder, calibrationFile);
-  this->copyProbeCalibConfigsXml(reconstructionFolder);
+//  this->copyProbeCalibConfigsXml(reconstructionFolder);
   this->writeProbeConfiguration(reconstructionFolder);
 
   this->report();
