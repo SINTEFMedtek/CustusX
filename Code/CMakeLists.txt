@@ -41,7 +41,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscImageLUT2D.h
     Data/sscImageTFData.h
     Data/sscDataManager.h
-	Data/sscNavigatedVideoImage.h
+    Data/sscNavigatedVideoImage.h
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
@@ -290,8 +290,8 @@ SET( SSC_SOURCE_FILES
     Data/sscImageLUT2D.h
     Data/sscImageTFData.cpp
     Data/sscImageTFData.h
-	Data/sscNavigatedVideoImage.cpp
-	Data/sscNavigatedVideoImage.h
+    Data/sscNavigatedVideoImage.cpp
+    Data/sscNavigatedVideoImage.h
     Data/sscGPUImageBuffer.cpp
     Data/sscGPUImageBuffer.h
     Data/sscMesh.h
@@ -313,7 +313,7 @@ SET( SSC_SOURCE_FILES
     Video/sscVideoSourceSHM.h
     Video/sscVideoSourceSHM.cpp
     Video/sscTestVideoSource.h
-    Video/sscTestVideoSource.cpp	
+    Video/sscTestVideoSource.cpp    
     Video/sscImageImportVideoSource.h
     Video/sscImageImportVideoSource.cpp
 
@@ -364,7 +364,7 @@ SET( SSC_SOURCE_FILES
     Widgets/sscVector3DDataAdapterXml.cpp
     Widgets/sscMousePadWidget.h
     Widgets/sscMousePadWidget.cpp
-	) 
+    ) 
 
 # =========================================================
 # =========================================================
@@ -385,7 +385,7 @@ find_package( Boost REQUIRED )
 find_package(VTK REQUIRED)
 
 include(${VTK_USE_FILE})
-	
+    
 #find_package(GLUT)
 find_package(OpenGL)
     SET( SSC_LIBRARIES 
@@ -394,7 +394,7 @@ find_package(OpenGL)
 #        ${GLUT_LIBRARIES}
         )
 
-	
+    
 if (USE_GLX_SHARED_CONTEXT)
 #    SET( SSC_INCLUDE_DIRS
 #        ${SSC_INCLUDE_DIRS}
@@ -495,15 +495,15 @@ configure_file(
 # =========================================================
 
 set( SSC_GENERATED_SOURCE_FILES
-	${SSC_SOURCE_FILES} 
-	${UI_HEADER_FILES} 
-	${MOC_HEADER_FILES} 
-	${GENERATED_RESOURCES} )
+    ${SSC_SOURCE_FILES} 
+    ${UI_HEADER_FILES} 
+    ${MOC_HEADER_FILES} 
+    ${GENERATED_RESOURCES} )
 
 set( SSC_GENERATED_LIBRARIES
-	${QT_LIBRARIES} 
-	${SSC_VTK_LIBRARIES}
-	${SSC_LIBRARIES} )
+    ${QT_LIBRARIES} 
+    ${SSC_VTK_LIBRARIES}
+    ${SSC_LIBRARIES} )
 # =========================================================
 
 include_directories( ${SSC_INCLUDE_DIRS} ${SSC_BINARY_DIR} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
@@ -525,8 +525,8 @@ if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
     cotire(SSC)
     if(COTIRE_ADD_UNITY_BUILDS)
         target_link_libraries(SSC_unity 
-        		${SSC_GENERATED_LIBRARIES}
-        		)
+                ${SSC_GENERATED_LIBRARIES}
+                )
     endif(COTIRE_ADD_UNITY_BUILDS)
 endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
 
@@ -540,9 +540,9 @@ endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
 set (SSC_DIR ${SSC_BINARY_DIR} CACHE PATH "where to find the SSC cmake")
 
 configure_file (
-	"${PROJECT_SOURCE_DIR}/CMake/SSCConfig.cmake.in"
-	"${PROJECT_BINARY_DIR}/SSCConfig.cmake"
-	)
+    "${PROJECT_SOURCE_DIR}/CMake/SSCConfig.cmake.in"
+    "${PROJECT_BINARY_DIR}/SSCConfig.cmake"
+    )
 # Export our build settings and library dependencies
 include (CMakeExportBuildSettings)
 cmake_export_build_settings (${SSC_BINARY_DIR}/SSCBuildSettings.cmake)
