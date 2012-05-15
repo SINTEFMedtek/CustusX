@@ -66,11 +66,12 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   //Read US images
   retval.mUsRaw = this->readUsDataFile(mhdFileName, angio);
 
-  QString caliFilename;
-  QStringList probeConfigPath;
-  this->readCustomMhdTags(mhdFileName, &probeConfigPath, &caliFilename);
-  ProbeXmlConfigParser::Configuration configuration = this->readProbeConfiguration(calFilesPath, probeConfigPath);
-  ssc::ProbeData probeData = createProbeDataFromConfiguration(configuration);
+//  QString caliFilename;
+//  QStringList probeConfigPath;
+//  this->readCustomMhdTags(mhdFileName, &probeConfigPath, &caliFilename);
+//  ProbeXmlConfigParser::Configuration configuration = this->readProbeConfiguration(calFilesPath, probeConfigPath);
+//  ssc::ProbeData probeData = createProbeDataFromConfiguration(configuration);
+  ssc::ProbeData probeData = this->readProbeDataBackwardsCompatible(mhdFileName, calFilesPath);
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
   bool spacingOK = ssc::similar(probeData.getImage().mSpacing, ssc::Vector3D(retval.mUsRaw->getSpacing()), 0.001);
   if (!spacingOK)
@@ -101,6 +102,26 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   }
 
   return retval;
+}
+
+/**Read the probe data either from the .probedata.xml file,
+ * or from ProbeCalibConfigs.xml file for backwards compatibility.
+ *
+ */
+ssc::ProbeData UsReconstructionFileReader::readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath)
+{
+	ssc::ProbeData retval = this->readProbeDataFromFile(mhdFileName);
+
+	if (retval.getType()==ssc::ProbeData::tNONE)
+	{
+		QString caliFilename;
+		QStringList probeConfigPath;
+		this->readCustomMhdTags(mhdFileName, &probeConfigPath, &caliFilename);
+		ProbeXmlConfigParser::Configuration configuration = this->readProbeConfiguration(calFilesPath, probeConfigPath);
+		retval = createProbeDataFromConfiguration(configuration);
+	}
+
+	return retval;
 }
 
 ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(ssc::USReconstructInputData data)
@@ -205,6 +226,24 @@ ProbeXmlConfigParser::Configuration UsReconstructionFileReader::readProbeConfigu
   return configuration;
 }
 
+/**
+ * Write probe configuration to file. This works even for configs not saved to the ProbeCalibConfigs.xml file.
+ */
+ssc::ProbeData UsReconstructionFileReader::readProbeDataFromFile(QString mhdFileName)
+{
+	ssc::ProbeData retval;
+	QString filename = ssc::changeExtension(mhdFileName, "probedata.xml");
+
+	if (!QFileInfo(filename).exists())
+	{
+		ssc::messageManager()->sendWarning("File not found: " + filename + ", failed to load probe data.");
+		return retval;
+	}
+
+	ssc::XmlOptionFile file = ssc::XmlOptionFile(filename, "navnet");
+	retval.parseXml(file.getElement("configuration"));
+	return retval;
+}
 
 ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileName, bool angio)
 {
