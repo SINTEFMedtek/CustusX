@@ -97,6 +97,9 @@ public:
 		ssc::DoubleBoundingBox3D mClipRect_p; ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
 		QSize mSize;
 		Vector3D transform_p_to_u(const Vector3D& q_p) const;
+
+		void addXml(QDomNode dataNode) const; ///< write to xml
+		void parseXml(QDomNode dataNode);///< load from xml
 	};
 
 	enum TYPE { tNONE=0,   ///< undefined
@@ -107,7 +110,8 @@ public:
 public:
 	ProbeData(TYPE type = tNONE);
 //	ProbeData(double depthStart, double depthEnd, double width);
-	void addXml(QDomNode& dataNode) const; ///< write internal state to node
+	void addXml(QDomNode dataNode) const; ///< write to xml
+	void parseXml(QDomNode dataNode);///< load from xml
 
 	TYPE getType() const { return mType; }
 	double getDepthStart() const { return mDepthStart; }
