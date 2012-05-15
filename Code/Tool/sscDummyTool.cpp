@@ -5,8 +5,6 @@
 #include <vtkAppendPolyData.h>
 #include <vtkConeSource.h>
 #include <vtkCylinderSource.h>
-#include <vtkTransformPolyDataFilter.h>
-#include <vtkTransform.h>
 #include <QTimer>
 #include <QTime>
 #include <vtkPlane.h>
