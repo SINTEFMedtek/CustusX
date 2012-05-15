@@ -81,6 +81,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscCrossHairRep2D.h
     Rep/sscTexture3DSlicerProxy.h
     Rep/sscTexture3DSlicerRep.h
+    Rep/sscTexture3DVolumeRep.h
     Rep/sscSlices3DRep.h
     Rep/sscSlicePlanes3DRep.h
     Rep/sscGeometricRep.h
@@ -268,6 +269,10 @@ SET( SSC_SOURCE_FILES
     Rep/sscTexture3DSlicerProxy.cpp
     Rep/sscTexture3DSlicerRep.cpp
     Rep/sscTexture3DSlicerRep.h
+    Rep/sscTexture3DVolumeRep.cpp
+    Rep/sscTexture3DVolumeRep.h
+    Rep/sscTextureVolumePainter.cpp
+    Rep/sscTextureVolumePainter.h
     Rep/sscSlices3DRep.h
     Rep/sscSlices3DRep.cpp
     Rep/sscTextureSlicePainter.cpp
