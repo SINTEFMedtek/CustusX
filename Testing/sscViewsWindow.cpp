@@ -49,7 +49,7 @@ namespace {
 
 ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
 {
-  mZoomFactor = 1;
+	mZoomFactor = 1;
 	m_test_view = NULL;
 	mDumpSpeedData = false;
 	mRenderCount = 0;
@@ -77,35 +77,35 @@ ViewsWindow::~ViewsWindow()
 
 ssc::View* ViewsWindow::getView2D()
 {
-  ssc::View* view = new ssc::View(centralWidget());
-  view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-  view->GetRenderWindow()->GetInteractor()->Disable();
-  view->setZoomFactor(mZoomFactor);
+	ssc::View* view = new ssc::View(centralWidget());
+	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
+	view->GetRenderWindow()->GetInteractor()->Disable();
+	view->setZoomFactor(mZoomFactor);
 
-  mLayouts.insert(view);
-  return view;
+	mLayouts.insert(view);
+	return view;
 }
 
 ssc::View* ViewsWindow::generateGPUSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
-  ssc::View* view = this->getView2D();
+	ssc::View* view = this->getView2D();
 
-  ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
-  proxy->setTool(tool);
+	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
+	proxy->setTool(tool);
 
-  proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
+	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 
-  ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
-  rep->setShaderFile("/Data/Resources/Shaders/Texture3DOverlay.frag");
-  rep->setSliceProxy(proxy);
-  rep->setImages(std::vector<ssc::ImagePtr>(1, image));
+	ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
+	rep->setShaderFile("/Data/Resources/Shaders/Texture3DOverlay.frag");
+	rep->setSliceProxy(proxy);
+	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
 
-  view->addRep(rep);
+	view->addRep(rep);
 
-  m_test_rep = rep;
-  m_test_view = view;
+	m_test_rep = rep;
+	m_test_view = view;
 
-  return view;
+	return view;
 }
 
 
@@ -123,7 +123,7 @@ void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 
 ssc::View* ViewsWindow::generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
-  ssc::View* view = this->getView2D();
+	ssc::View* view = this->getView2D();
 
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
 	proxy->setTool(tool);
@@ -185,7 +185,7 @@ void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image->getUid() );
 	mRepPtr->setMaxVolumeSize(10*1000*1000);
 	mRepPtr->setUseGPUVolumeRayCastMapper(); // if available
-	mRepPtr->setImage(image);
+	mRepPtr->setImage(image);	
 	mRepPtr->setName(image->getName());
 	view->addRep(mRepPtr);
 	
