@@ -1,9 +1,13 @@
+#extension GL_EXT_gpu_shader4 : enable
+#pragma debug(on)
+uniform int lutSize;
 uniform sampler3D volumeTexture;
 uniform float stepsize;
 uniform float threshold;
 uniform int renderMode;
 uniform float window;
 uniform float level;
+uniform samplerBuffer lut;
 
 float applyWindowLevel(float input, float window, float level)
 {
@@ -13,6 +17,18 @@ float applyWindowLevel(float input, float window, float level)
 vec4 applyWindowLevel(vec4 input, float window, float level)
 {
        return (input - level) / window + 0.5;
+}
+
+vec4 applyLut(in float value, in samplerBuffer lut, in int lutSize2)
+{
+	// map through lookup table - interpolated
+	value = clamp(value, 0.0, 1.0);	
+	float pos = value * (float(lutSize2)-1.0); // floating-point lut index
+	int p0 = int(floor(pos)); // integer part of lut index
+	vec4 c0 = texelFetchBuffer(lut, p0);
+	vec4 c1 = texelFetchBuffer(lut, p0+1);
+	vec4 col = mix(c0,c1,pos-float(p0)); // interpolate lut.
+	return col;
 }
 
 void main()
@@ -28,14 +44,22 @@ void main()
     float alphaSample; // The src alpha
     float n = 0.0;
     float thau = 0.02;
-    float real_threshold = applyWindowLevel(threshold, window, level);
 
     if (renderMode == 5) alphaAccumulator = 1.0;
     
     for(int i = 0; i < 450; i++)
     {
 	    colorSample = texture3D(volumeTexture, vect.xyz);
+	    if (all(lessThan(colorSample.rgb, vec3(threshold))))
+	    {
+		    vect = vect + rayDeltaVector;
+		    continue;
+	    }
 	    colorSample = applyWindowLevel(colorSample, window, level);
+	    if ( lutSize > 0)
+	    {
+		    colorSample = applyLut( colorSample.r, lut,lutSize);
+	    }
 
 		if (renderMode == 0) // Accumulated average (compositing)
 		{

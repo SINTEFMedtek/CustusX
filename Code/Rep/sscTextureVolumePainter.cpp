@@ -157,6 +157,8 @@ public:
 			mLutBuffer->bind(mIndex);
 			lutSize = mLutBuffer->getLutSize();
 		}
+		prop->AddShaderVariable("lutSize", lutSize);
+		prop->AddShaderVariable("lut", lut);
 		prop->AddShaderVariable("volumeTexture", texture);
 		prop->AddShaderVariable("window", mWindow);
 		prop->AddShaderVariable("level", mLevel);
