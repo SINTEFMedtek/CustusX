@@ -27,14 +27,16 @@
 
 namespace ssc
 {
-Data::Data() :
-	mUid("DummyUID"), mName("DummyName"), mRegistrationStatus(rsNOT_REGISTRATED)
-{
-}
+//Data::Data() :
+//	mUid("DummyUID"), mName("DummyName"), mRegistrationStatus(rsNOT_REGISTRATED)
+//{
+//}
 
 Data::Data(const QString& uid, const QString& name) :
 	mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED)//, mParentFrame("")
 {
+	mAcquisitionTime = QDateTime::currentDateTime();
+
 	if (name == "")
 		mName = mUid;
 	else

@@ -56,7 +56,7 @@ class Data: public QObject
 {
 Q_OBJECT
 public:
-	Data(); //TODO remove?
+//	Data(); //TODO remove?
 	Data(const QString& uid, const QString& name = "");
 	virtual ~Data();
 
