@@ -268,7 +268,6 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 		}
 		mInternals->mInitialized = true;
 	}
-	float color[4] = {0,1,0,1};
 	actor->GetProperty()->AddShaderVariable("renderMode", 0);
 	actor->GetProperty()->AddShaderVariable("stepsize", 1.0/50.0);
 	
