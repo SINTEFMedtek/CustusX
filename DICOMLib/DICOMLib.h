@@ -12,6 +12,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <limits.h>
+#ifdef __cplusplus
+#include <QMap>
+#include <QVariant>
+#include <QString>
+#endif
 
 /**
  * @defgroup DICOMLib
@@ -78,6 +83,7 @@ enum dicomlib_config_type
 {
 	DICOMLIB_CONF_SPLIT_ACQUISITION,	///< Split images with different acquisition numbers into different series?
 	DICOMLIB_CONF_SPLIT_SERIES_DESCR,	///< Split images with different study description into different series?
+	DICOMLIB_CONF_SPLIT_SEQUENCE_NAME,	///< Split images with different sequence name into different series?
 	DICOMLIB_CONF_MIN_NUM_SLICES,		///< The minimum number of valid slices for a valid series.
 	DICOMLIB_CONF_MIN_DIST_SLICES,		///< The minimum distance between positions in a slice.
 	DICOMLIB_CONF_MAX_ORIENT_DIFF,		///< The maximum difference between the image orientation patient between two images to be in the same series
@@ -106,14 +112,14 @@ enum dicomlib_application_profile
 	DICOMLIB_PROFILE_DVDRAM,			///< PS 3.11 Annex D, STD-GEN-DVD-RAM multi-frame enhanced object
 	DICOMLIB_PROFILE_DVDRAM_UNENHANCED,		///< PS 3.11 Annex D, STD-GEN-DVD-RAM single-frame unenhanced object
 	DICOMLIB_PROFILE_USB,				///< PS 3.11 Annex J, STD-GEN-USB-JPEG multi-frame enhanced object
-	DICOMLIB_PROFILE_USB_UNENHANCED,		///< PS 3.11 Annex J, STD-GEN-USB-JPEG single-frame unenhanced object
+	DICOMLIB_PROFILE_USB_UNENHANCED			///< PS 3.11 Annex J, STD-GEN-USB-JPEG single-frame unenhanced object
 };
 
 enum dicomlib_warning_type
 {
 	DICOMLIB_WARNING_ACR_NEMA_1,
 	DICOMLIB_WARNING_ACR_NEMA_2,
-	DICOMLIB_WARNING_UNKNOWN_SOP_CLASS,
+	DICOMLIB_WARNING_UNKNOWN_SOP_CLASS
 };
 
 struct image_window_t
@@ -190,7 +196,7 @@ struct ultrasound_t
 struct series_t
 {
 	uint32_t series_id;					///< Unique number for each series in this study
-	int frames;						///< The number of frames in this series.
+	int frames;						///< The number of frames in this series. Used for multi frame and mosaic
 	double image_orientation[6];				///< See DICOM standard C.7.6.2.1.1
 	double pixel_spacing[2];				///< Distance between pixels in the plane in mm
 	uint16_t bits_per_sample;				///< Bits allocated for each sample
@@ -198,6 +204,7 @@ struct series_t
 	uint16_t rows;						///< Height of image in pixels.
 	uint16_t columns;					///< Width of image in pixels.
 	char SOPClassUID[DICOMLIB_LONG_STRING];			///< Unique ID for SOP Class (set only internally)
+	char repetitionTime[DICOMLIB_LONG_STRING];
 	char seriesInstanceUID[DICOMLIB_LONG_STRING];		///< Unique ID for series (redefined internally)
 	char seriesID[DICOMLIB_LONG_STRING];			///< Series name
 	char seriesTime[DICOMLIB_LONG_STRING];			///< Time series was initially created.
@@ -213,6 +220,8 @@ struct series_t
 	char splitReason[DICOMLIB_SHORT_STRING];		///< Reason for splitting this series from others -- for debugging
 	bool valid;						///< If series is valid. If not, see error message in series_info.
 	bool multiframe;					///< Whether this is a multi-frame series or not
+	bool mosaic;						///< Whether this series comes from a Siemens mosaic
+								///< --> frames tag contains number of images
 	char patient_orientation[4][2];				///< See DICOM standard C.7.6.1.1.1, if applicable.
 	struct series_t *next_series;				///< Next series in the linked list.
 	struct study_t *parent_study;				///< Owning study
@@ -232,6 +241,19 @@ struct series_t
 		int currentPreset;				///< Which preset to use, if any. -1 if none.
 		struct image_lut_t lut;
 	} VOI;
+	struct {
+		double bvec[3];					///< DTI gradient direction for diffusion weighting
+		char bval[DICOMLIB_SHORT_STRING];		///< DTI B-value for diffusion weighting
+		char directionality[DICOMLIB_LONG_STRING];	///< DTI directionality string from DICOM
+		bool isDTI;					///< Whether this Series contain DTI ( Diffusion Weighted multi-directional MR data )
+#ifdef __cplusplus
+		QVariantMap *csaImageMap;				///< CSA data dictionary
+		QVariantMap *csaSeriesMap;				///< CSA data dictionary
+#else
+		void *csaImageMap;					// horrible hack to avoid porting everything to C++ right now...
+		void *csaSeriesMap;					// horrible hack to avoid porting everything to C++ right now...
+#endif
+	} DTI;
 	double firstpixel, lastpixel;				///< Similar to minmax above, just without conversion to window values.
 	enum dicomlib_warning_type warning;			///< There is a reason for a user warning
 	char rootpath[PATH_MAX];				///< Root path of series
@@ -253,6 +275,7 @@ struct study_t
 	char softwareVersion[DICOMLIB_SHORT_STRING];		///< Software release number (only written)
 	char serialNumber[DICOMLIB_SHORT_STRING];		///< Serial number of system (only written)
 	char studyDescription[DICOMLIB_LONG_STRING];		///< Study description
+	char manufacturer[DICOMLIB_LONG_STRING];		///< Manufacturer (important for parsing non-standard information)
 
 	struct study_t *next_study;				///< Next study in this linked list
 	struct series_t *first_series;				///< Pointer to linked list of series in the study
@@ -262,6 +285,7 @@ struct study_t
 	bool valid;						///< Hide from list if false
 	bool reindex;						///< Force study indices to be unique if split
 	char rootpath[PATH_MAX];				///< Root path of study
+	bool initialized;					///< If lazy loading initialization has been run for this study
 };
 
 /**
@@ -392,7 +416,8 @@ struct series_t *DICOMLib_GetSeries( struct study_t *study, progress_func_t *cal
  *	may be called repeatedly during the call. Caller must free the resulting buffer.
  */
 struct volume_t *DICOMLib_GetVolume( struct series_t *series, progress_func_t *callback );
-
+void DICOMLib_FreeVolume( struct volume_t *volume);
+	
 /**
  *	Add a 8bpp LUT preset with given start value and length. If there are
  *	window settings, they are discarded.
@@ -483,6 +508,13 @@ int DICOMLib_WriteImageSnapshot( const char *filename, const uint8_t *rgb, int b
  *	overlay or other additional information added. Uses DCMTK's inter data format.
  */
 const void *DICOM_raw_image(const struct series_t *series, struct instance_t *instance, int frame );
+
+int DICOMLib_Verify( struct series_t *series );
+
+/**
+ * Exports all DTI volumes from given study
+ **/
+int DICOMLib_WriteNifti( const char *filename, const struct study_t *study );
 
 /** For testing only */
 bool DICOMLib_INTERNAL_TEST(void);

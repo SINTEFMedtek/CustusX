@@ -40,6 +40,7 @@ if (SSC_USE_DCMTK)
     
     INCLUDE_DIRECTORIES( 
         ${QT_INCLUDES} 
+        .
         )
     LINK_DIRECTORIES( 
         )
@@ -53,20 +54,23 @@ if (SSC_USE_DCMTK)
         export.cpp 
         vector3d.h 
         sscDICOMLibAPI.cpp
+	niftiexport.cpp
+	nifti1.h
+	znzlib.h
+	znzlib.c
+	nifti1_io.c
+	nifti1_io.h
         )
     
     SET_TARGET_PROPERTIES( DICOMLib PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "-Wextra ${SNW_COMPILE_FLAGS}" )
     
     TARGET_LINK_LIBRARIES( DICOMLib 
-        oflog 
-        /usr/local/lib/libcharls.so
-        dcmjpls 
-        dcmjpeg 
+        z m ofstd stdc++ oflog dcmdata ofstd dcmimgle dcmdata ofstd dcmimage
+        dcmdata dcmnet dcmdata dcmjpeg CharLS dcmjpls ofstd ijg12 ijg8 ijg16 dcmjpeg
         ${SNW_LINK_LIBS}
         ${QT_LIBRARIES} 
-        ${DCMTK_LIBRARIES} 
         ${TIFF_LIBRARIES} 
-        -lsqlite3 
+        sqlite3
         SSC
         )
     

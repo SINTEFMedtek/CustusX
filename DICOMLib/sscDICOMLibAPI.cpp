@@ -405,7 +405,7 @@ DICOMLibAPIPtr DICOMLibAPI::New()
 	return DICOMLibAPIPtr(new DICOMLibAPI());
 }
 
-DICOMLibAPI::DICOMLibAPI() : mData(NULL), mRefreshThread(NULL), mMutex(QMutex::Recursive)
+DICOMLibAPI::DICOMLibAPI() : mMutex(QMutex::Recursive), mData(NULL), mRefreshThread(NULL)
 {
 	DICOMLib_Init();
 }

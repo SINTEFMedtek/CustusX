@@ -79,8 +79,16 @@ static int exportStudyIE( DcmDataset *dataset, const struct study_t *study )
 	studyDate->setCurrentDate();
 	studyTime->setCurrentTime();
 	dataset->putAndInsertString( DCM_StudyInstanceUID, study->studyInstanceUID );
-	dataset->insert( studyDate );
-	dataset->insert( studyTime );
+	if(dataset->insert( studyDate ) != EC_Normal)
+	{
+		delete studyDate;
+		studyDate = NULL;
+	}
+	if (dataset->insert( studyTime ) != EC_Normal)
+	{
+		delete studyTime;
+		studyTime = NULL;
+	}
 	dataset->putAndInsertString( DCM_StudyID, study->studyID );
 	dataset->insertEmptyElement( DCM_ReferringPhysicianName );	// maybe read this from the DICOM set and re-insert it later
 	dataset->insertEmptyElement( DCM_AccessionNumber );		// not sure how this is used
@@ -504,8 +512,16 @@ static int writeCommonInfo( DcmDataset *dataset, const struct study_t *study, co
 	exportEquipment( dataset, study );
 
 	// C.7.6.1 General Image
-	dataset->insert( contentDate );
-	dataset->insert( contentTime );
+	if (dataset->insert( contentDate ) != EC_Normal)
+	{
+		delete contentDate;
+		contentDate = NULL;
+	}
+	if (dataset->insert( contentTime ) != EC_Normal)
+	{
+		delete contentTime;
+		contentTime = NULL;
+	}
 	ssprintf( buf, "%u", series->series_id );
 	dataset->putAndInsertString( DCM_InstanceNumber, buf );	// has to be unique for SOP instances in a study
 	dataset->insertEmptyElement( DCM_PatientOrientation );	// makes no sense for US - patient can be faced any direction!
@@ -561,9 +577,22 @@ static int writeCommonInfo( DcmDataset *dataset, const struct study_t *study, co
 	// C.11.2 VOI LUT
 	{
 		char tmp[PATH_MAX];
+		ssprintf(tmp, "%g", series->VOI.current.center-volume->rescaleIntercept);
+		if ( dataset->putAndInsertString( DCM_WindowCenter, tmp).good() == false ) SSC_LOG("insert DCM_WindowCenter failed");
 
-		ssprintf(tmp, "%g", series->VOI.current.center);
-		dataset->putAndInsertString( DCM_WindowCenter, tmp);
+		ssprintf(tmp, "%i", -1*volume->rescaleIntercept);
+		if ( dataset->putAndInsertString( DCM_RescaleIntercept, tmp).good() == false ) SSC_LOG("insert DCM_RescaleIntercept failed");
+
+		if ( dataset->putAndInsertString( DCM_RescaleSlope, "1" ).good()==false ) SSC_LOG("insert DCM_RescaleSlope=\"1\" failed");
+
+		// for Compuer Tomography we set the type to Hounsfield Units (HU)
+		if ( strcmp(series->modality, "CT") == 0 )
+		{
+			if ( dataset->putAndInsertString( DCM_RescaleType, "HU").good()==false ) SSC_LOG("insert DCM_RescaleType HU failed");
+		}
+		// else we do not have an idea what this should be -> "US" (unspecified)
+		else if ( dataset->putAndInsertString( DCM_RescaleType, "US").good()==false ) SSC_LOG("insert DCM_RescaleType US failed");
+
 		ssprintf(tmp, "%g", series->VOI.current.width);
 		dataset->putAndInsertString( DCM_WindowWidth, tmp );
 	}
@@ -576,97 +605,96 @@ static int writeCommonInfo( DcmDataset *dataset, const struct study_t *study, co
 
 static int writeUnenhancedFrame( const char *filename, const struct study_t *study, bool anonymize, enum dicomlib_application_profile profile, int frame )
 {
-//	const struct series_t *series = study->first_series;
-//	const struct volume_t *volume = series->volume;
-//	const struct instance_t *instance = series->first_instance;
-//	DcmFileFormat fileFormat;
-//	DcmDataset *dataset = fileFormat.getDataset();
-//	char buf[DICOMLIB_VAL_MAX];
-//	OFCondition result;
-//	int i;
-//
-//	for ( i = 0; i < frame && instance; i++ )
-//	{
-//		instance = instance->next_instance;
-//	}
-//	if (!instance)
-//	{
-//		SW_ERROR("Did not find instance %d", i);
-//		return -1;
-//	}
-//	if ( dataset == NULL )
-//	{
-//		SW_ERROR( "Failed to derive a dataset" );
-//		return -1;
-//	}
-//	if ( volume->bits_per_sample != 8 && volume->bits_per_sample != 16 )
-//	{
-//		SW_ERROR( "Bad bits per sample" );
-//		return EINVAL;
-//	}
-//
-//	writeCommonInfo( dataset, study, series, anonymize );
-//
-//	// C.7.6.3 Image Pixel (cont.)
-//	dataset->putAndInsertString( DCM_SOPClassUID, UID_SecondaryCaptureImageStorage );
-//	if ( volume->samples_per_pixel == 1 && volume->bits_per_sample == 8 )
-//	{
-//		const uint8_t *ptr = (const uint8_t *)volume->volume + volume->x * volume->y * frame;
-//
-//		dataset->putAndInsertString( DCM_PhotometricInterpretation, "MONOCHROME2" );
-//		dataset->putAndInsertUint8Array( DCM_PixelData, ptr, volume->x * volume->y );
-//	}
-//	else if ( volume->samples_per_pixel == 1 && volume->bits_per_sample == 16 )
-//	{
-//		const uint16_t *ptr = (const uint16_t *)volume->volume + volume->x * volume->y * frame;
-//
-//		dataset->putAndInsertString( DCM_PhotometricInterpretation, "MONOCHROME2" );
-//		dataset->putAndInsertUint16Array( DCM_PixelData, ptr, volume->x * volume->y );
-//	}
-//	else if ( volume->samples_per_pixel == 3 )
-//	{
-//		const uint8_t *ptr = (const uint8_t *)volume->volume + volume->x * volume->y * frame * volume->samples_per_pixel;
-//
-//		dataset->putAndInsertUint16( DCM_PlanarConfiguration, 0 );	// interleaved
-//		dataset->putAndInsertString( DCM_PhotometricInterpretation, "RGB" );
-//		dataset->putAndInsertUint8Array( DCM_PixelData, ptr, volume->x * volume->y * volume->samples_per_pixel );
-//	}
-//	else
-//	{
-//		SSC_LOG( "DICOM_write: Bad samples per pixel" );
-//		return EINVAL;
-//	}
-//
-//	// C.7.6.2 Image Plane
-//	ssprintf( buf, "%f\\%f", volume->pixel_spacing[0], volume->pixel_spacing[1] );
-//	dataset->putAndInsertString( DCM_PixelSpacing, buf );
-//	ssprintf( buf, "%f", volume->pixel_spacing[2] );
-//	dataset->putAndInsertString( DCM_SliceThickness, buf );
-//	ssprintf( buf, "%f\\%f\\%f\\%f\\%f\\%f", volume->image_orientation[0], volume->image_orientation[1],
-//		  volume->image_orientation[2], volume->image_orientation[3], volume->image_orientation[4], volume->image_orientation[5] );
-//	dataset->putAndInsertString( DCM_ImageOrientationPatient, buf );
-//	ssprintf( buf, "%f\\%f\\%f", instance->image_position[0], instance->image_position[1], instance->image_position[2] );
-//	dataset->putAndInsertString( DCM_ImagePositionPatient, buf );
-//
-//	/*** Save ***/
-//
-//	unlink( filename );
-//	if ( profile == DICOMLIB_PROFILE_USB )
-//	{
-//		DJ_RPLossless params; // codec parameters, we use the defaults
-//
-//		dataset->chooseRepresentation(EXS_JPEGProcess14SV1TransferSyntax, &params);
-//		result = fileFormat.saveFile( filename, EXS_JPEGProcess14SV1TransferSyntax, EET_ExplicitLength );
-//	}
-//	else	// DVD/CD
-//	{
-//		result = fileFormat.saveFile( filename, EXS_LittleEndianExplicit, EET_ExplicitLength );
-//	}
-//	if ( result.bad() )
-//	{
-//		SW_WARNING( "Failed to save %s: %s", filename, result.text() );
-//		return -1;
-//	}
+	const struct series_t *series = study->first_series;
+	const struct volume_t *volume = series->volume;
+	const struct instance_t *instance = series->first_instance;
+	DcmFileFormat fileFormat;
+	DcmDataset *dataset = fileFormat.getDataset();
+	char buf[DICOMLIB_VAL_MAX];
+	OFCondition result;
+	int i;
+
+	for ( i = 0; i < frame && instance; i++ )
+	{
+		instance = instance->next_instance;
+	}
+	if (!instance)
+	{
+		SSC_ERROR("Did not find instance %d", i);
+		return -1;
+	}
+	if ( dataset == NULL )
+	{
+		SSC_ERROR( "Failed to derive a dataset" );
+		return -1;
+	}
+	if ( volume->bits_per_sample != 8 && volume->bits_per_sample != 16 )
+	{
+		SSC_ERROR( "Bad bits per sample" );
+		return EINVAL;
+	}
+	writeCommonInfo( dataset, study, series, anonymize );
+
+	// C.7.6.3 Image Pixel (cont.)
+	dataset->putAndInsertString( DCM_SOPClassUID, UID_SecondaryCaptureImageStorage );
+	if ( volume->samples_per_pixel == 1 && volume->bits_per_sample == 8 )
+	{
+		const uint8_t *ptr = (const uint8_t *)volume->volume + volume->x * volume->y * frame;
+
+		dataset->putAndInsertString( DCM_PhotometricInterpretation, "MONOCHROME2" );
+		dataset->putAndInsertUint8Array( DCM_PixelData, ptr, volume->x * volume->y );
+	}
+	else if ( volume->samples_per_pixel == 1 && volume->bits_per_sample == 16 )
+	{
+		const uint16_t *ptr = (const uint16_t *)volume->volume + volume->x * volume->y * frame;
+
+		dataset->putAndInsertString( DCM_PhotometricInterpretation, "MONOCHROME2" );
+		dataset->putAndInsertUint16Array( DCM_PixelData, ptr, volume->x * volume->y );
+	}
+	else if ( volume->samples_per_pixel == 3 )
+	{
+		const uint8_t *ptr = (const uint8_t *)volume->volume + volume->x * volume->y * frame * volume->samples_per_pixel;
+
+		dataset->putAndInsertUint16( DCM_PlanarConfiguration, 0 );	// interleaved
+		dataset->putAndInsertString( DCM_PhotometricInterpretation, "RGB" );
+		dataset->putAndInsertUint8Array( DCM_PixelData, ptr, volume->x * volume->y * volume->samples_per_pixel );
+	}
+	else
+	{
+		SSC_LOG( "DICOM_write: Bad samples per pixel" );
+		return EINVAL;
+	}
+
+	// C.7.6.2 Image Plane
+	ssprintf( buf, "%f\\%f", volume->pixel_spacing[0], volume->pixel_spacing[1] );
+	dataset->putAndInsertString( DCM_PixelSpacing, buf );
+	ssprintf( buf, "%f", volume->pixel_spacing[2] );
+	dataset->putAndInsertString( DCM_SliceThickness, buf );
+	ssprintf( buf, "%f\\%f\\%f\\%f\\%f\\%f", volume->image_orientation[0], volume->image_orientation[1],
+		  volume->image_orientation[2], volume->image_orientation[3], volume->image_orientation[4], volume->image_orientation[5] );
+	dataset->putAndInsertString( DCM_ImageOrientationPatient, buf );
+	ssprintf( buf, "%f\\%f\\%f", instance->image_position[0], instance->image_position[1], instance->image_position[2] );
+	dataset->putAndInsertString( DCM_ImagePositionPatient, buf );
+
+	/*** Save ***/
+
+	unlink( filename );
+	if ( profile == DICOMLIB_PROFILE_USB )
+	{
+		DJ_RPLossless params; // codec parameters, we use the defaults
+
+		dataset->chooseRepresentation(EXS_JPEGProcess14SV1TransferSyntax, &params);
+		result = fileFormat.saveFile( filename, EXS_JPEGProcess14SV1TransferSyntax, EET_ExplicitLength );
+	}
+	else	// DVD/CD
+	{
+		result = fileFormat.saveFile( filename, EXS_LittleEndianExplicit, EET_ExplicitLength );
+	}
+	if ( result.bad() )
+	{
+		SSC_WARNING( "Failed to save %s: %s", filename, result.text() );
+		return -1;
+	}
 
 	return 0;
 }
@@ -689,174 +717,174 @@ int DICOMLib_WriteUnenhancedSeries( const char *basefilename, const struct study
 // Write a snapshot to DICOM SC. Anonymization is not an option here, since it is only relevant for PACS.
 int DICOMLib_WriteImageSnapshot( const char *filename, const uint8_t *rgb, int bytes, int width, int height, const struct study_t *study, bool compress )
 {
-//	DcmFileFormat fileFormat;
-//	DcmDataset *dataset = fileFormat.getDataset();
-//	char buf[DICOMLIB_VAL_MAX];
-//	char uid[DICOMLIB_LONG_STRING];
-//	DcmDate *contentDate = new DcmDate( DCM_ContentDate );
-//	DcmTime *contentTime = new DcmTime( DCM_ContentTime );
-//	DcmDate *instanceDate = new DcmDate( DCM_InstanceCreationDate );
-//	DcmTime *instanceTime = new DcmTime( DCM_InstanceCreationTime );
-//	DcmDateTime *acqDateTime = new DcmDateTime( DCM_AcquisitionDateTime );
-//	OFCondition result;
-//	DJ_RPLossless params; // codec parameters, we use the defaults
-//
-//	if ( dataset == NULL )
-//	{
-//		SW_ERROR( "Failed to derive a dataset" );
-//		return -1;
-//	}
-//
-//	SSC_LOG("Exporting %s with %d bytes, %d pixels", filename, bytes, bytes / 3);
-//	dataset->putAndInsertString( DCM_SOPClassUID, UID_SecondaryCaptureImageStorage );
-//
-//	memset( uid, 0, sizeof( uid ) );
-//
-//	// Reset this information on each export.
-//	instanceDate->setCurrentDate();
-//	instanceTime->setCurrentTime();
-//	// TODO: The below should be time of snapshot!
-//	contentDate->setCurrentDate(); // putString( converted timestamp of snapshot )
-//	contentTime->setCurrentTime();
-//	acqDateTime->setCurrentDateTime();
-//
-//	// C.7.1.1 Patient
-//	exportPatientIE( dataset, study, false );
-//
-//	// C.7.2.1 General Study
-//	exportStudyIE( dataset, study );
-//
-//	// C.7.6.1 General Image
-//	dataset->putAndInsertString( DCM_ImageType, "DERIVED\\SECONDARY" );
-//
-//	// C.7.6.3 Image Pixel
-//	dataset->putAndInsertUint16( DCM_SamplesPerPixel, 3 );
-//	dataset->putAndInsertUint16( DCM_BitsAllocated, 8 );
-//	dataset->putAndInsertUint16( DCM_BitsStored, 8 );
-//	dataset->putAndInsertUint16( DCM_HighBit, 7 );
-//	dataset->putAndInsertUint16( DCM_Rows, height );
-//	dataset->putAndInsertUint16( DCM_Columns, width );
-//	dataset->putAndInsertUint16( DCM_PixelRepresentation, 0 );
-//	dataset->putAndInsertUint16( DCM_PlanarConfiguration, 0 );	// interleaved
-//	dataset->putAndInsertString( DCM_PhotometricInterpretation, "RGB" );
-//	dataset->putAndInsertUint8Array( DCM_PixelData, rgb, bytes );
-//
-//	// C.7.3.1 General Series
-//	dataset->putAndInsertString( DCM_Modality, "DOC" );
-//	dataset->putAndInsertString( DCM_SeriesInstanceUID, dcmGenerateUniqueIdentifier( buf, SERIES_UID_ROOT ) );
-//	dataset->insertEmptyElement( DCM_SeriesNumber );
-//	dataset->putAndInsertString( DCM_SeriesDescription, "SonoWand Invite snapshot" );
-//	dataset->putAndInsertString( DCM_BodyPartExamined, "HEAD" );
-//
-//	// C.7.6.1 General Image
-//	dataset->insert( contentDate );
-//	dataset->insert( contentTime );
-//	dataset->insert( acqDateTime );
-//	dataset->insertEmptyElement( DCM_InstanceNumber );
-//	dataset->insertEmptyElement( DCM_PatientOrientation );	// makes no sense
-//	dataset->putAndInsertString( DCM_BurnedInAnnotation, "YES" );
-//
-//	// C.8.6.1 SC Equipment
-//	dataset->putAndInsertString( DCM_ConversionType, "WSD" );	// Workstation
-//
-//	// C.12.1 SOP Common
-//	dataset->putAndInsertString( DCM_SOPInstanceUID, dcmGenerateUniqueIdentifier( uid, INSTANCE_UID_ROOT ) );
-//	dataset->insert( instanceDate );
-//	dataset->insert( instanceTime );
-//
-//	/*** Save ***/
-//
-//	unlink( filename );
-//	if ( compress )
-//	{
-//		dataset->chooseRepresentation( EXS_JPEGProcess14SV1TransferSyntax, &params );
-//		result = fileFormat.saveFile( filename, EXS_JPEGProcess14SV1TransferSyntax, EET_ExplicitLength );
-//	}
-//	else
-//	{
-//		result = fileFormat.saveFile( filename, EXS_LittleEndianExplicit, EET_ExplicitLength );
-//	}
-//	if ( result.bad() )
-//	{
-//		SW_WARNING( "Failed to save %s: %s", filename, result.text() );
-//		return -1;
-//	}
+	DcmFileFormat fileFormat;
+	DcmDataset *dataset = fileFormat.getDataset();
+	char buf[DICOMLIB_VAL_MAX];
+	char uid[DICOMLIB_LONG_STRING];
+	DcmDate *contentDate = new DcmDate( DCM_ContentDate );
+	DcmTime *contentTime = new DcmTime( DCM_ContentTime );
+	DcmDate *instanceDate = new DcmDate( DCM_InstanceCreationDate );
+	DcmTime *instanceTime = new DcmTime( DCM_InstanceCreationTime );
+	DcmDateTime *acqDateTime = new DcmDateTime( DCM_AcquisitionDateTime );
+	OFCondition result;
+	DJ_RPLossless params; // codec parameters, we use the defaults
+
+	if ( dataset == NULL )
+	{
+		SSC_ERROR( "Failed to derive a dataset" );
+		return -1;
+	}
+
+	SSC_LOG("Exporting %s with %d bytes, %d pixels", filename, bytes, bytes / 3);
+	dataset->putAndInsertString( DCM_SOPClassUID, UID_SecondaryCaptureImageStorage );
+
+	memset( uid, 0, sizeof( uid ) );
+
+	// Reset this information on each export.
+	instanceDate->setCurrentDate();
+	instanceTime->setCurrentTime();
+	// TODO: The below should be time of snapshot!
+	contentDate->setCurrentDate(); // putString( converted timestamp of snapshot )
+	contentTime->setCurrentTime();
+	acqDateTime->setCurrentDateTime();
+
+	// C.7.1.1 Patient
+	exportPatientIE( dataset, study, false );
+
+	// C.7.2.1 General Study
+	exportStudyIE( dataset, study );
+
+	// C.7.6.1 General Image
+	dataset->putAndInsertString( DCM_ImageType, "DERIVED\\SECONDARY" );
+
+	// C.7.6.3 Image Pixel
+	dataset->putAndInsertUint16( DCM_SamplesPerPixel, 3 );
+	dataset->putAndInsertUint16( DCM_BitsAllocated, 8 );
+	dataset->putAndInsertUint16( DCM_BitsStored, 8 );
+	dataset->putAndInsertUint16( DCM_HighBit, 7 );
+	dataset->putAndInsertUint16( DCM_Rows, height );
+	dataset->putAndInsertUint16( DCM_Columns, width );
+	dataset->putAndInsertUint16( DCM_PixelRepresentation, 0 );
+	dataset->putAndInsertUint16( DCM_PlanarConfiguration, 0 );	// interleaved
+	dataset->putAndInsertString( DCM_PhotometricInterpretation, "RGB" );
+	dataset->putAndInsertUint8Array( DCM_PixelData, rgb, bytes );
+
+	// C.7.3.1 General Series
+	dataset->putAndInsertString( DCM_Modality, "DOC" );
+	dataset->putAndInsertString( DCM_SeriesInstanceUID, dcmGenerateUniqueIdentifier( buf, SERIES_UID_ROOT ) );
+	dataset->insertEmptyElement( DCM_SeriesNumber );
+	dataset->putAndInsertString( DCM_SeriesDescription, "SonoWand Invite snapshot" );
+	dataset->putAndInsertString( DCM_BodyPartExamined, "HEAD" );
+
+	// C.7.6.1 General Image
+	dataset->insert( contentDate );
+	dataset->insert( contentTime );
+	dataset->insert( acqDateTime );
+	dataset->insertEmptyElement( DCM_InstanceNumber );
+	dataset->insertEmptyElement( DCM_PatientOrientation );	// makes no sense
+	dataset->putAndInsertString( DCM_BurnedInAnnotation, "YES" );
+
+	// C.8.6.1 SC Equipment
+	dataset->putAndInsertString( DCM_ConversionType, "WSD" );	// Workstation
+
+	// C.12.1 SOP Common
+	dataset->putAndInsertString( DCM_SOPInstanceUID, dcmGenerateUniqueIdentifier( uid, INSTANCE_UID_ROOT ) );
+	dataset->insert( instanceDate );
+	dataset->insert( instanceTime );
+
+	/*** Save ***/
+
+	unlink( filename );
+	if ( compress )
+	{
+		dataset->chooseRepresentation( EXS_JPEGProcess14SV1TransferSyntax, &params );
+		result = fileFormat.saveFile( filename, EXS_JPEGProcess14SV1TransferSyntax, EET_ExplicitLength );
+	}
+	else
+	{
+		result = fileFormat.saveFile( filename, EXS_LittleEndianExplicit, EET_ExplicitLength );
+	}
+	if ( result.bad() )
+	{
+		SSC_WARNING( "Failed to save %s: %s", filename, result.text() );
+		return -1;
+	}
 	return 0;
 }
 
 // Write a snapshot to encapsulated PDF. Anonymization is not an option here, since it is only relevant for PACS.
 int DICOMLib_WriteSnapshot( const char *filename, const uint8_t *pdfbuffer, int size, const struct study_t *study )
 {
-//	DcmFileFormat fileFormat;
-//	DcmDataset *dataset = fileFormat.getDataset();
-//	char buf[DICOMLIB_VAL_MAX];
-//	char uid[DICOMLIB_LONG_STRING];
-//	DcmDate *contentDate = new DcmDate( DCM_ContentDate );
-//	DcmTime *contentTime = new DcmTime( DCM_ContentTime );
-//	DcmDate *instanceDate = new DcmDate( DCM_InstanceCreationDate );
-//	DcmTime *instanceTime = new DcmTime( DCM_InstanceCreationTime );
-//	DcmDateTime *acqDateTime = new DcmDateTime( DCM_AcquisitionDateTime );
-//	OFCondition result;
-//
-//	if ( dataset == NULL )
-//	{
-//		SW_ERROR( "Failed to derive a dataset" );
-//		return -1;
-//	}
-//
-//	dataset->putAndInsertString( DCM_SOPClassUID, UID_EncapsulatedPDFStorage );
-//
-//	memset( uid, 0, sizeof( uid ) );
-//
-//	// Reset this information on each export.
-//	instanceDate->setCurrentDate();
-//	instanceTime->setCurrentTime();
-//	// TODO: The below should be time of snapshot!
-//	contentDate->setCurrentDate(); // putString( converted timestamp of snapshot )
-//	contentTime->setCurrentTime();
-//	acqDateTime->setCurrentDateTime();
-//
-//	// C.7.1.1 Patient
-//	exportPatientIE( dataset, study, false );
-//
-//	// C.7.2.1 General Study
-//	exportStudyIE( dataset, study );
-//
-//	// C.24.1 Encapsulated Document Series
-//	dataset->putAndInsertString( DCM_Modality, "DOC" );
-//	dataset->putAndInsertString( DCM_SeriesInstanceUID, dcmGenerateUniqueIdentifier( buf, SERIES_UID_ROOT ) );
-//	dataset->putAndInsertString( DCM_SeriesNumber, "0" );	// TODO - think about this, index of snapshot?
-//	dataset->putAndInsertString( DCM_SeriesDescription, "SonoWand Invite snapshot" );
-//	dataset->putAndInsertString( DCM_BodyPartExamined, "HEAD" );
-//
-//	// C.24.2 Encapsulated Document
-//	dataset->putAndInsertString( DCM_InstanceNumber, "0" );	// TODO - think about this, index of snapshot?
-//	dataset->insert( contentDate );
-//	dataset->insert( contentTime );
-//	dataset->insert( acqDateTime );
-//	dataset->putAndInsertString( DCM_BurnedInAnnotation, "YES" );
-//	dataset->insertEmptyElement( DCM_DocumentTitle );
-//	dataset->insertEmptyElement( DCM_ConceptNameCodeSequence );
-//	dataset->putAndInsertString( DCM_MIMETypeOfEncapsulatedDocument, "application/pdf" );	// see A.45.1.4.1
-//	dataset->putAndInsertUint8Array( DCM_EncapsulatedDocument, pdfbuffer, size );
-//
-//	// C.8.6.1 SC Equipment
-//	dataset->putAndInsertString( DCM_ConversionType, "WSD" );	// Workstation
-//
-//	// C.12.1 SOP Common
-//	dataset->putAndInsertString( DCM_SOPInstanceUID, dcmGenerateUniqueIdentifier( uid, INSTANCE_UID_ROOT ) );
-//	dataset->insert( instanceDate );
-//	dataset->insert( instanceTime );
-//
-//	/*** Save ***/
-//
-//	unlink( filename );
-//	result = fileFormat.saveFile( filename, EXS_LittleEndianExplicit, EET_ExplicitLength );
-//	if ( result.bad() )
-//	{
-//		SW_WARNING( "Failed to save %s: %s", filename, result.text() );
-//		return -1;
-//	}
+	DcmFileFormat fileFormat;
+	DcmDataset *dataset = fileFormat.getDataset();
+	char buf[DICOMLIB_VAL_MAX];
+	char uid[DICOMLIB_LONG_STRING];
+	DcmDate *contentDate = new DcmDate( DCM_ContentDate );
+	DcmTime *contentTime = new DcmTime( DCM_ContentTime );
+	DcmDate *instanceDate = new DcmDate( DCM_InstanceCreationDate );
+	DcmTime *instanceTime = new DcmTime( DCM_InstanceCreationTime );
+	DcmDateTime *acqDateTime = new DcmDateTime( DCM_AcquisitionDateTime );
+	OFCondition result;
+
+	if ( dataset == NULL )
+	{
+		SSC_ERROR( "Failed to derive a dataset" );
+		return -1;
+	}
+
+	dataset->putAndInsertString( DCM_SOPClassUID, UID_EncapsulatedPDFStorage );
+
+	memset( uid, 0, sizeof( uid ) );
+
+	// Reset this information on each export.
+	instanceDate->setCurrentDate();
+	instanceTime->setCurrentTime();
+	// TODO: The below should be time of snapshot!
+	contentDate->setCurrentDate(); // putString( converted timestamp of snapshot )
+	contentTime->setCurrentTime();
+	acqDateTime->setCurrentDateTime();
+
+	// C.7.1.1 Patient
+	exportPatientIE( dataset, study, false );
+
+	// C.7.2.1 General Study
+	exportStudyIE( dataset, study );
+
+	// C.24.1 Encapsulated Document Series
+	dataset->putAndInsertString( DCM_Modality, "DOC" );
+	dataset->putAndInsertString( DCM_SeriesInstanceUID, dcmGenerateUniqueIdentifier( buf, SERIES_UID_ROOT ) );
+	dataset->putAndInsertString( DCM_SeriesNumber, "0" );	// TODO - think about this, index of snapshot?
+	dataset->putAndInsertString( DCM_SeriesDescription, "SonoWand Invite snapshot" );
+	dataset->putAndInsertString( DCM_BodyPartExamined, "HEAD" );
+
+	// C.24.2 Encapsulated Document
+	dataset->putAndInsertString( DCM_InstanceNumber, "0" );	// TODO - think about this, index of snapshot?
+	dataset->insert( contentDate );
+	dataset->insert( contentTime );
+	dataset->insert( acqDateTime );
+	dataset->putAndInsertString( DCM_BurnedInAnnotation, "YES" );
+	dataset->insertEmptyElement( DCM_DocumentTitle );
+	dataset->insertEmptyElement( DCM_ConceptNameCodeSequence );
+	dataset->putAndInsertString( DCM_MIMETypeOfEncapsulatedDocument, "application/pdf" );	// see A.45.1.4.1
+	dataset->putAndInsertUint8Array( DCM_EncapsulatedDocument, pdfbuffer, size );
+
+	// C.8.6.1 SC Equipment
+	dataset->putAndInsertString( DCM_ConversionType, "WSD" );	// Workstation
+
+	// C.12.1 SOP Common
+	dataset->putAndInsertString( DCM_SOPInstanceUID, dcmGenerateUniqueIdentifier( uid, INSTANCE_UID_ROOT ) );
+	dataset->insert( instanceDate );
+	dataset->insert( instanceTime );
+
+	/*** Save ***/
+
+	unlink( filename );
+	result = fileFormat.saveFile( filename, EXS_LittleEndianExplicit, EET_ExplicitLength );
+	if ( result.bad() )
+	{
+		SSC_WARNING( "Failed to save %s: %s", filename, result.text() );
+		return -1;
+	}
 	return 0;
 }
 
@@ -865,344 +893,332 @@ int DICOMLib_WriteSnapshot( const char *filename, const uint8_t *pdfbuffer, int 
 int DICOMLib_WriteSeries( const char *filename, const struct study_t *study, bool anonymize, enum dicomlib_application_profile profile,
 						  enum dicomlib_volume_alignment aligned )
 {
-//	const struct series_t *series = study->first_series;
-//	const struct volume_t *volume = series->volume;
-//	const struct instance_t *instance = series->first_instance;
-//	DcmFileFormat fileFormat;
-//	DcmDataset *dataset = fileFormat.getDataset();
-//	char buf[DICOMLIB_VAL_MAX];
-//	char uid[DICOMLIB_LONG_STRING];
-//	DcmItem *sequence;
-//	int volSize = volume->x * volume->y * volume->z;
-//	OFCondition result;
-//	int i;
-//	OFString sliceVector;
-//	bool ultrasound = strcmp(series->modality, "US") == 0;
-//
-//	if ( dataset == NULL )
-//	{
-//		SW_ERROR( "Failed to derive a dataset" );
-//		return -1;
-//	}
-//
-//	if ( volume->bits_per_sample != 8 && volume->bits_per_sample != 16 )
-//	{
-//		SW_ERROR( "Bad bits per sample" );
-//		return EINVAL;
-//	}
-//
-//	writeCommonInfo( dataset, study, series, anonymize );
-//
-//	// Tags borrowed from new 3D US modality
-//	if (ultrasound)
-//	{
-//		// C.8.24.3 Enhanced US Image
-//		result = dataset->findOrCreateSequenceItem( DCM_TransducerScanPatternCodeSequence, sequence );
-//		if ( result.good() )
-//		{
-//			sequence->putAndInsertString( DCM_CodeValue, "125241" );
-//			sequence->putAndInsertString( DCM_CodingSchemeDesignator, "DCM" );
-//			sequence->putAndInsertString( DCM_CodeMeaning, "Plane scan pattern" );
-//		}
-//		else
-//		{
-//			SW_ERROR( "Failed to create Transducer Scan Pattern Code Sequence: %s", result.text() );
-//			return -1;
-//		}
-//		result = dataset->findOrCreateSequenceItem( DCM_TransducerGeometryCodeSequence, sequence );
-//		if ( result.good() )
-//		{
-//			sequence->putAndInsertString( DCM_CodingSchemeDesignator, "DCM" );
-//			if ( series->us.probeType == DICOMLIB_PROBE_LINEAR )
-//			{
-//				sequence->putAndInsertString( DCM_CodeValue, "125252" );
-//				sequence->putAndInsertString( DCM_CodeMeaning, "Linear ultrasound transducer geometry" );
-//			}
-//			else if ( series->us.probeType == DICOMLIB_PROBE_SECTOR )
-//			{
-//				sequence->putAndInsertString( DCM_CodeValue, "125254" );
-//				sequence->putAndInsertString( DCM_CodeMeaning, "Sector ultrasound transducer geometry" );
-//			}
-//			else
-//			{
-//				SW_ERROR( "Unhandled probe geometry: %d!", (int)series->us.probeType );
-//			}
-//		}
-//		else
-//		{
-//			SW_ERROR( "Failed to create Transducer Geometry Code Sequence: %s", result.text() );
-//		}
-//		if ( dataset->findOrCreateSequenceItem( DCM_TransducerBeamSteeringCodeSequence, sequence ).good() )
-//		{
-//			sequence->putAndInsertString( DCM_CodingSchemeDesignator, "DCM" );
-//			if ( series->us.probeType == DICOMLIB_PROBE_LINEAR )
-//			{
-//				sequence->putAndInsertString( DCM_CodeValue, "125259" );
-//				sequence->putAndInsertString( DCM_CodeMeaning, "Phased beam steering" );
-//			}
-//			else if ( series->us.probeType == DICOMLIB_PROBE_SECTOR )
-//			{
-//				sequence->putAndInsertString( DCM_CodeValue, "125257" );
-//				sequence->putAndInsertString( DCM_CodeMeaning, "Fixed beam direction" );
-//			}
-//			else
-//			{
-//				SW_ERROR( "Unhandled probe beam steering!" );
-//			}
-//		}
-//		if ( dataset->findOrCreateSequenceItem( DCM_TransducerApplicationCodeSequence, sequence ).good() )
-//		{
-//			sequence->putAndInsertString( DCM_CodeValue, "125261" );
-//			sequence->putAndInsertString( DCM_CodingSchemeDesignator, "DCM" );
-//			sequence->putAndInsertString( DCM_CodeMeaning, "External Transducer" );
-//		}
-//		dataset->putAndInsertString( DCM_DimensionOrganizationType, "3D" );
-//		dataset->putAndInsertString( DCM_PositionMeasuringDeviceUsed, "RIGID" );
-//		dataset->putAndInsertString( DCM_TransducerData, series->us.transducerData );
-//		ssprintf( buf, "%g", series->us.TI );
-//		dataset->putAndInsertString( DCM_SoftTissueThermalIndex, buf );
-//		dataset->putAndInsertString( DCM_BoneThermalIndex, buf );						// same calculated result as above
-//		ssprintf( buf, "%g", series->us.MI );
-//		dataset->putAndInsertString( DCM_MechanicalIndex, buf );
-//		dataset->putAndInsertString( DCM_UltrasoundAcquisitionGeometry, "UNDEFINED" );
-//		OFDateTime ofdateTime;
-//		ofdateTime.setISOFormattedDateTime( series->us.acquisitionDateTime );
-//		DcmDateTime *acqDateTime = new DcmDateTime( DCM_AcquisitionDateTime );
-//		acqDateTime->setOFDateTime( ofdateTime );
-//		dataset->insert( acqDateTime );
-//		dataset->putAndInsertFloat64( DCM_AcquisitionDuration, series->us.acquisitionDuration );
-//
-//		// Private tags
-//		dataset->putAndInsertString( DcmTag(0x0135, 0x0010, EVR_LO), "SONOWAND AS");
-//		dataset->putAndInsertString( DcmTag(0x0135, 0x1010, EVR_LO), series->us.scannerName );		// Ultrasound Scanner Name
-//		dataset->putAndInsertString( DcmTag(0x0135, 0x1011, EVR_LO), series->us.transducerSerial );	// Transducer Serial
-//		dataset->putAndInsertString( DcmTag(0x0135, 0x1012, EVR_LO), series->us.application );		// Probe application
-//
-//		// C.8.24.2 Ultrasound Frame Of Reference
-//		dataset->putAndInsertString( DCM_UltrasoundAcquisitionGeometry, "FREEHAND" );
-//		dataset->putAndInsertString( DCM_VolumeFrameOfReferenceUID, series->frameOfReferenceUID );
-//	}
-//
-//	// C.8.24.2 Ultrasound Frame Of Reference cont., also add some of it for non-US because it is generally useful information
-//	switch (aligned)
-//	{
-//	case DICOMLIB_ALIGNMENT_TABLE		: dataset->insertEmptyElement( DCM_PatientFrameOfReferenceSource ); break;
-//	case DICOMLIB_ALIGNMENT_ESTIMATED	: dataset->putAndInsertString( DCM_PatientFrameOfReferenceSource, "ESTIMATED" ); break;
-//	case DICOMLIB_ALIGNMENT_REGISTRATION	: dataset->putAndInsertString( DCM_PatientFrameOfReferenceSource, "REGISTRATION" ); break;
-//	}
-//
-//	writeCommonInfo( dataset, study, series, anonymize );
-//
-//	// C.7.4.2 Synchronization
-//	dataset->putAndInsertString( DCM_SynchronizationFrameOfReferenceUID, dcmGenerateUniqueIdentifier( uid, SYNCHRONIZATION_UID_ROOT ) );
-//	dataset->putAndInsertString( DCM_SynchronizationTrigger, "NO TRIGGER" );
-//	dataset->putAndInsertString( DCM_AcquisitionTimeSynchronized, "N" );
-//
-//	// C.7.6.3 Image Pixel (cont.)
-//#if 0
-//	// TODO later
-//	dataset->putAndInsertSint16( DCM_SmallestImagePixelValue, (Sint16)volume->firstpixel );
-//	dataset->putAndInsertSint16( DCM_LargestImagePixelValue, (Sint16)volume->lastpixel );
-//#endif
-//	if ( volume->samples_per_pixel == 1 && volume->bits_per_sample == 8 )
-//	{
-//		/*** Multi-frame Grayscale Byte Secondary Capture Image, see PS3.3 A.8.3 ***/
-//		dataset->putAndInsertString( DCM_PhotometricInterpretation, "MONOCHROME2" );
-//		dataset->putAndInsertUint8Array( DCM_PixelData, ( const uint8_t * )volume->volume, volSize );
-//		dataset->putAndInsertString( DCM_SOPClassUID, UID_MultiframeGrayscaleByteSecondaryCaptureImageStorage );
-//	}
-//	else if ( volume->samples_per_pixel == 1 && volume->bits_per_sample == 16 )
-//	{
-//		/*** Multi-frame Grayscale Word Secondary Capture Image, see PS3.3 A.8.4 ***/
-//		dataset->putAndInsertString( DCM_PhotometricInterpretation, "MONOCHROME2" );
-//		dataset->putAndInsertUint16Array( DCM_PixelData, ( const uint16_t * )volume->volume, volSize );
-//		dataset->putAndInsertString( DCM_SOPClassUID, UID_MultiframeGrayscaleWordSecondaryCaptureImageStorage );
-//	}
-//	else if ( volume->samples_per_pixel == 3 )
-//	{
-//		/*** Multi-frame True Color Secondary Capture Image, see PS3.3 A.8.5 ***/
-//		dataset->putAndInsertUint16( DCM_PlanarConfiguration, 0 );	// interleaved
-//		dataset->putAndInsertString( DCM_PhotometricInterpretation, "RGB" );
-//		dataset->putAndInsertUint8Array( DCM_PixelData, ( const uint8_t * )volume->volume, volSize * volume->samples_per_pixel );
-//		dataset->putAndInsertString( DCM_SOPClassUID, UID_MultiframeTrueColorSecondaryCaptureImageStorage );
-//	}
-//	else
-//	{
-//		SSC_LOG( "DICOM_write: Bad samples per pixel" );
-//		return EINVAL;
-//	}
-//
-//	// C.7.6.6 Multi-frame
-//	ssprintf( buf, "%d", series->frames );
-//	dataset->putAndInsertString( DCM_NumberOfFrames, buf );
-//	uint16_t incrArray[2] = { 0x0018, 0x2005 };
-//	dataset->putAndInsertUint16Array( DCM_FrameIncrementPointer, incrArray, 1 );	// Set type of indexing. See C.7.6.6.1.1
-//
-//	// C.7.6.14 Acquisition Context
-//	if ( dataset->findOrCreateSequenceItem( DCM_AcquisitionContextSequence, sequence ).good() )
-//	{
-//		// Do nothing. Is type 2 and we have no useful data to add.
-//	}
-//
-//	// C.7.6.16 Multi-frame Functional Groups
-//	// First the shared group
-//	if ( dataset->findOrCreateSequenceItem( DCM_SharedFunctionalGroupsSequence, sequence ).good() )
-//	{
-//		DcmItem *shared;
-//
-//		// C.7.6.16.2.1 Pixel Measures
-//		if ( sequence->findOrCreateSequenceItem( DCM_PixelMeasuresSequence, shared ).good() )
-//		{
-//			ssprintf( buf, "%f\\%f", volume->pixel_spacing[0], volume->pixel_spacing[1] );
-//			shared->putAndInsertString( DCM_PixelSpacing, buf );
-//			ssprintf( buf, "%f", volume->pixel_spacing[2] );
-//			shared->putAndInsertString( DCM_SliceThickness, buf );
-//		}
-//		// C.7.6.16.2.4 Plane Orientation
-//		if ( aligned != DICOMLIB_ALIGNMENT_TABLE
-//			 && sequence->findOrCreateSequenceItem( DCM_PlaneOrientationSequence, shared ).good() )
-//		{
-//			ssprintf( buf, "%f\\%f\\%f\\%f\\%f\\%f", volume->image_orientation[0], volume->image_orientation[1],
-//			          volume->image_orientation[2], volume->image_orientation[3], volume->image_orientation[4], volume->image_orientation[5] );
-//			shared->putAndInsertString( DCM_ImageOrientationPatient, buf );
-//		}
-//		// C.7.6.16.2.10 Frame VOI LUT
-//		if ( sequence->findOrCreateSequenceItem( DCM_FrameVOILUTSequence, shared ).good() )
-//		{
-//			char tmp[PATH_MAX];
-//
-//			ssprintf(tmp, "%g", series->VOI.current.center);
-//			shared->putAndInsertString( DCM_WindowCenter, tmp);
-//			ssprintf(tmp, "%g", series->VOI.current.width);
-//			shared->putAndInsertString( DCM_WindowWidth, tmp );
-//		}
-//		// C.7.6.16.2.24 Image Data Type
-//		if ( ultrasound && sequence->findOrCreateSequenceItem( DCM_ImageDataTypeSequence, shared ).good() )
-//		{
-//			if ( !series->us.flowData )
-//			{
-//				shared->putAndInsertString( DCM_DataType, "TISSUE_INTENSITY" );
-//			}
-//			else
-//			{
-//				shared->putAndInsertString( DCM_DataType, "FLOW_POWER" );
-//			}
-//			shared->putAndInsertString( DCM_AliasedDataType, "YES" );
-//		}
-//		// C.8.24.6.1 US Image Description
-//		if ( ultrasound && sequence->findOrCreateSequenceItem( DCM_USImageDescriptionSequence, shared ).good() )
-//		{
-//			shared->putAndInsertString( DCM_FrameType, "DERIVED\\PRIMARY\\VOLUME\\RESAMPLED" );
-//			shared->putAndInsertString( DCM_VolumetricProperties, "VOLUME" );
-//			shared->putAndInsertString( DCM_VolumeBasedCalculationTechnique, "NONE" );
-//		}
-//	}
-//
-//	// Then the per frame group
-//	if ( !dataset->findOrCreateSequenceItem( DCM_PerFrameFunctionalGroupsSequence, sequence, series->frames - 1 ).good() )
-//	{
-//		SW_ERROR( "Could not write per frame functional group sequence" );
-//		return -1;
-//	}
-//	for ( i = 0; i < series->frames; i++ )
-//	{
-//		DcmItem *item = NULL;
-//
-//		if ( !instance )
-//		{
-//			SW_ERROR( "Incomplete list of instances for frame set! Stopped at %d", i );
-//			return -1;
-//		}
-//		if ( !dataset->findAndGetSequenceItem( DCM_PerFrameFunctionalGroupsSequence, sequence, i ).good() )
-//		{
-//			SW_ERROR( "Could not read per frame functional group sequence at %d", i );
-//			return -1;
-//		}
-//		if ( sequence->findOrCreateSequenceItem( DCM_FrameContentSequence, item ).good() )
-//		{
-//			item->putAndInsertUint16( DCM_FrameAcquisitionNumber, i );
-//		}
-//		if ( aligned != DICOMLIB_ALIGNMENT_TABLE
-//			 && !sequence->findOrCreateSequenceItem( DCM_PlanePositionSequence, item ).good() )
-//		{
-//			SW_ERROR( "Could not write plane position sequence at %d", i );
-//			return -1;
-//		}
-//		if ( item )
-//		{
-//			ssprintf( buf, "%f\\%f\\%f", instance->image_position[0], instance->image_position[1], instance->image_position[2] );
-//			item->putAndInsertString( DCM_ImagePositionPatient, buf );
-//		}
-//		instance = instance->next_instance;
-//	}
-//
-//	// C.8.6.1 SC Equipment
-//	dataset->putAndInsertString( DCM_ConversionType, "WSD" );	// Workstation
-//
-//	// C.8.6.3 SC Multi-frame Image
-//	dataset->putAndInsertString( DCM_BurnedInAnnotation, "NO" );
-//	if ( volume->samples_per_pixel == 1 )
-//	{
-//		dataset->putAndInsertString( DCM_PresentationLUTShape, "IDENTITY" );
-//		dataset->putAndInsertString( DCM_RescaleIntercept, "0" );
-//		dataset->putAndInsertString( DCM_RescaleSlope, "1" );
-//		dataset->putAndInsertString( DCM_RescaleType, "US" );	// unspecified
-//	}
-//
-//	// C.8.6.4 SC Multi-frame Vector
-//	instance = series->first_instance;
-//	for ( i = 0; i < series->frames; i++ )
-//	{
-//		char tmp[128];
-//
-//		if ( !instance )
-//		{
-//			SW_ERROR( "Incomplete list of instances for slice vector!" );
-//			return -1;
-//		}
-//		ssprintf( tmp, "%f", instance->slice_normal_distance );
-//		sliceVector += tmp;
-//		if ( instance->next_instance )
-//		{
-//			sliceVector += '\\';
-//		}
-//		instance = instance->next_instance;
-//	}
-//	dataset->putAndInsertOFStringArray( DCM_SliceLocationVector, sliceVector );	// array of frame positions in mm, see C.7.6.2.1.2
-//
-//	// C.11.2 VOI LUT
-//	// This duplicates the Frame VOI LUT above, but duplicated data is sometimes good for interoperability.
-//	{
-//		char tmp[PATH_MAX];
-//
-//		ssprintf(tmp, "%g", series->VOI.current.center);
-//		dataset->putAndInsertString( DCM_WindowCenter, tmp);
-//		ssprintf(tmp, "%g", series->VOI.current.width);
-//		dataset->putAndInsertString( DCM_WindowWidth, tmp );
-//	}
-//
-//	// C.12.1 SOP Common
-//	dataset->putAndInsertString( DCM_SOPInstanceUID, dcmGenerateUniqueIdentifier( uid, INSTANCE_UID_ROOT ) );
-//
-//	/*** Save ***/
-//
-//	unlink( filename );
-//	if ( profile == DICOMLIB_PROFILE_USB )
-//	{
-//		DJ_RPLossless params; // codec parameters, we use the defaults
-//
-//		dataset->chooseRepresentation(EXS_JPEGProcess14SV1TransferSyntax, &params);
-//		result = fileFormat.saveFile( filename, EXS_JPEGProcess14SV1TransferSyntax, EET_ExplicitLength );
-//	}
-//	else	// DVD/CD
-//	{
-//		result = fileFormat.saveFile( filename, EXS_LittleEndianExplicit, EET_ExplicitLength );
-//	}
-//	if ( result.bad() )
-//	{
-//		SW_WARNING( "Failed to save %s: %s", filename, result.text() );
-//		return -1;
-//	}
-//
+	const struct series_t *series = study->first_series;
+	const struct volume_t *volume = series->volume;
+	const struct instance_t *instance = series->first_instance;
+	DcmFileFormat fileFormat;
+	DcmDataset *dataset = fileFormat.getDataset();
+	char buf[DICOMLIB_VAL_MAX];
+	char uid[DICOMLIB_LONG_STRING];
+	DcmItem *sequence;
+	int volSize = volume->x * volume->y * volume->z;
+	OFCondition result;
+	int i;
+	OFString sliceVector;
+	bool ultrasound = strcmp(series->modality, "US") == 0;
+
+	if ( dataset == NULL )
+	{
+		SSC_ERROR( "Failed to derive a dataset" );
+		return -1;
+	}
+
+	if ( volume->bits_per_sample != 8 && volume->bits_per_sample != 16 )
+	{
+		SSC_ERROR( "Bad bits per sample" );
+		return EINVAL;
+	}
+
+	writeCommonInfo( dataset, study, series, anonymize );
+	
+	// Tags borrowed from new 3D US modality
+	if (ultrasound)
+	{
+		// C.8.24.3 Enhanced US Image
+		result = dataset->findOrCreateSequenceItem( DCM_TransducerScanPatternCodeSequence, sequence );
+		if ( result.good() )
+		{
+			sequence->putAndInsertString( DCM_CodeValue, "125241" );
+			sequence->putAndInsertString( DCM_CodingSchemeDesignator, "DCM" );
+			sequence->putAndInsertString( DCM_CodeMeaning, "Plane scan pattern" );
+		}
+		else
+		{
+			SSC_ERROR( "Failed to create Transducer Scan Pattern Code Sequence: %s", result.text() );
+			return -1;
+		}
+		result = dataset->findOrCreateSequenceItem( DCM_TransducerGeometryCodeSequence, sequence );
+		if ( result.good() )
+		{
+			sequence->putAndInsertString( DCM_CodingSchemeDesignator, "DCM" );
+			if ( series->us.probeType == DICOMLIB_PROBE_LINEAR )
+			{
+				sequence->putAndInsertString( DCM_CodeValue, "125252" );
+				sequence->putAndInsertString( DCM_CodeMeaning, "Linear ultrasound transducer geometry" );
+			}
+			else if ( series->us.probeType == DICOMLIB_PROBE_SECTOR )
+			{
+				sequence->putAndInsertString( DCM_CodeValue, "125254" );
+				sequence->putAndInsertString( DCM_CodeMeaning, "Sector ultrasound transducer geometry" );
+			}
+			else
+			{
+				SSC_ERROR( "Unhandled probe geometry: %d!", (int)series->us.probeType );
+			}
+		}
+		else
+		{
+			SSC_ERROR( "Failed to create Transducer Geometry Code Sequence: %s", result.text() );
+		}
+		if ( dataset->findOrCreateSequenceItem( DCM_TransducerBeamSteeringCodeSequence, sequence ).good() )
+		{
+			sequence->putAndInsertString( DCM_CodingSchemeDesignator, "DCM" );
+			if ( series->us.probeType == DICOMLIB_PROBE_LINEAR )
+			{
+				sequence->putAndInsertString( DCM_CodeValue, "125259" );
+				sequence->putAndInsertString( DCM_CodeMeaning, "Phased beam steering" );
+			}
+			else if ( series->us.probeType == DICOMLIB_PROBE_SECTOR )
+			{
+				sequence->putAndInsertString( DCM_CodeValue, "125257" );
+				sequence->putAndInsertString( DCM_CodeMeaning, "Fixed beam direction" );
+			}
+			else
+			{
+				SSC_ERROR( "Unhandled probe beam steering!" );
+			}
+		}
+		if ( dataset->findOrCreateSequenceItem( DCM_TransducerApplicationCodeSequence, sequence ).good() )
+		{
+			sequence->putAndInsertString( DCM_CodeValue, "125261" );
+			sequence->putAndInsertString( DCM_CodingSchemeDesignator, "DCM" );
+			sequence->putAndInsertString( DCM_CodeMeaning, "External Transducer" );
+		}
+		dataset->putAndInsertString( DCM_DimensionOrganizationType, "3D" );
+		dataset->putAndInsertString( DCM_PositionMeasuringDeviceUsed, "RIGID" );
+		dataset->putAndInsertString( DCM_TransducerData, series->us.transducerData );
+		ssprintf( buf, "%g", series->us.TI );
+		dataset->putAndInsertString( DCM_SoftTissueThermalIndex, buf );
+		dataset->putAndInsertString( DCM_BoneThermalIndex, buf );						// same calculated result as above
+		ssprintf( buf, "%g", series->us.MI );
+		dataset->putAndInsertString( DCM_MechanicalIndex, buf );
+		dataset->putAndInsertString( DCM_UltrasoundAcquisitionGeometry, "UNDEFINED" );
+		OFDateTime ofdateTime;
+		ofdateTime.setISOFormattedDateTime( series->us.acquisitionDateTime );
+		DcmDateTime *acqDateTime = new DcmDateTime( DCM_AcquisitionDateTime );
+		acqDateTime->setOFDateTime( ofdateTime );
+		dataset->insert( acqDateTime );
+		dataset->putAndInsertFloat64( DCM_AcquisitionDuration, series->us.acquisitionDuration );
+
+		// Private tags
+		dataset->putAndInsertString( DcmTag(0x0135, 0x0010, EVR_LO), "SONOWAND AS");
+		dataset->putAndInsertString( DcmTag(0x0135, 0x1010, EVR_LO), series->us.scannerName );		// Ultrasound Scanner Name
+		dataset->putAndInsertString( DcmTag(0x0135, 0x1011, EVR_LO), series->us.transducerSerial );	// Transducer Serial
+		dataset->putAndInsertString( DcmTag(0x0135, 0x1012, EVR_LO), series->us.application );		// Probe application
+
+		// C.8.24.2 Ultrasound Frame Of Reference
+		dataset->putAndInsertString( DCM_UltrasoundAcquisitionGeometry, "FREEHAND" );
+		dataset->putAndInsertString( DCM_VolumeFrameOfReferenceUID, series->frameOfReferenceUID );
+	}
+
+	// C.8.24.2 Ultrasound Frame Of Reference cont., also add some of it for non-US because it is generally useful information
+	switch (aligned)
+	{
+	case DICOMLIB_ALIGNMENT_TABLE		: dataset->insertEmptyElement( DCM_PatientFrameOfReferenceSource ); break;
+	case DICOMLIB_ALIGNMENT_ESTIMATED	: dataset->putAndInsertString( DCM_PatientFrameOfReferenceSource, "ESTIMATED" ); break;
+	case DICOMLIB_ALIGNMENT_REGISTRATION	: dataset->putAndInsertString( DCM_PatientFrameOfReferenceSource, "REGISTRATION" ); break;
+	}
+
+	writeCommonInfo( dataset, study, series, anonymize );
+
+	// C.7.4.2 Synchronization
+	dataset->putAndInsertString( DCM_SynchronizationFrameOfReferenceUID, dcmGenerateUniqueIdentifier( uid, SYNCHRONIZATION_UID_ROOT ) );
+	dataset->putAndInsertString( DCM_SynchronizationTrigger, "NO TRIGGER" );
+	dataset->putAndInsertString( DCM_AcquisitionTimeSynchronized, "N" );
+
+	// C.7.6.3 Image Pixel (cont.)
+#if 0
+	// TODO later
+	dataset->putAndInsertSint16( DCM_SmallestImagePixelValue, (Sint16)volume->firstpixel );
+	dataset->putAndInsertSint16( DCM_LargestImagePixelValue, (Sint16)volume->lastpixel );
+#endif
+	if ( volume->samples_per_pixel == 1 && volume->bits_per_sample == 8 )
+	{
+		/*** Multi-frame Grayscale Byte Secondary Capture Image, see PS3.3 A.8.3 ***/
+		dataset->putAndInsertString( DCM_PhotometricInterpretation, "MONOCHROME2" );
+		dataset->putAndInsertUint8Array( DCM_PixelData, ( const uint8_t * )volume->volume, volSize );
+		dataset->putAndInsertString( DCM_SOPClassUID, UID_MultiframeGrayscaleByteSecondaryCaptureImageStorage );
+	}
+	else if ( volume->samples_per_pixel == 1 && volume->bits_per_sample == 16 )
+	{
+		/*** Multi-frame Grayscale Word Secondary Capture Image, see PS3.3 A.8.4 ***/
+		dataset->putAndInsertString( DCM_PhotometricInterpretation, "MONOCHROME2" );
+		dataset->putAndInsertUint16Array( DCM_PixelData, ( const uint16_t * )volume->volume, volSize );
+		dataset->putAndInsertString( DCM_SOPClassUID, UID_MultiframeGrayscaleWordSecondaryCaptureImageStorage );
+	}
+	else if ( volume->samples_per_pixel == 3 )
+	{
+		/*** Multi-frame True Color Secondary Capture Image, see PS3.3 A.8.5 ***/
+		dataset->putAndInsertUint16( DCM_PlanarConfiguration, 0 );	// interleaved
+		dataset->putAndInsertString( DCM_PhotometricInterpretation, "RGB" );
+		dataset->putAndInsertUint8Array( DCM_PixelData, ( const uint8_t * )volume->volume, volSize * volume->samples_per_pixel );
+		dataset->putAndInsertString( DCM_SOPClassUID, UID_MultiframeTrueColorSecondaryCaptureImageStorage );
+	}
+	else
+	{
+		SSC_LOG( "DICOM_write: Bad samples per pixel" );
+		return EINVAL;
+	}
+
+	// C.7.6.6 Multi-frame
+	ssprintf( buf, "%d", series->frames );
+	dataset->putAndInsertString( DCM_NumberOfFrames, buf );
+	uint16_t incrArray[2] = { 0x0018, 0x2005 };
+	dataset->putAndInsertUint16Array( DCM_FrameIncrementPointer, incrArray, 1 );	// Set type of indexing. See C.7.6.6.1.1
+
+	// C.7.6.14 Acquisition Context
+	if ( dataset->findOrCreateSequenceItem( DCM_AcquisitionContextSequence, sequence ).good() )
+	{
+		// Do nothing. Is type 2 and we have no useful data to add.
+	}
+
+	// C.7.6.16 Multi-frame Functional Groups
+	// First the shared group
+	if ( dataset->findOrCreateSequenceItem( DCM_SharedFunctionalGroupsSequence, sequence ).good() )
+	{
+		DcmItem *shared;
+
+		// C.7.6.16.2.1 Pixel Measures
+		if ( sequence->findOrCreateSequenceItem( DCM_PixelMeasuresSequence, shared ).good() )
+		{
+			ssprintf( buf, "%f\\%f", volume->pixel_spacing[0], volume->pixel_spacing[1] );
+			shared->putAndInsertString( DCM_PixelSpacing, buf );
+			ssprintf( buf, "%f", volume->pixel_spacing[2] );
+			shared->putAndInsertString( DCM_SliceThickness, buf );
+		}
+		// C.7.6.16.2.4 Plane Orientation
+		if ( aligned != DICOMLIB_ALIGNMENT_TABLE
+			 && sequence->findOrCreateSequenceItem( DCM_PlaneOrientationSequence, shared ).good() )
+		{
+			ssprintf( buf, "%f\\%f\\%f\\%f\\%f\\%f", volume->image_orientation[0], volume->image_orientation[1],
+			          volume->image_orientation[2], volume->image_orientation[3], volume->image_orientation[4], volume->image_orientation[5] );
+			shared->putAndInsertString( DCM_ImageOrientationPatient, buf );
+		}
+		// C.7.6.16.2.10 Frame VOI LUT
+		if ( sequence->findOrCreateSequenceItem( DCM_FrameVOILUTSequence, shared ).good() )
+		{
+			char tmp[PATH_MAX];
+
+			ssprintf(tmp, "%g", series->VOI.current.center-volume->rescaleIntercept);
+			if ( shared->putAndInsertString( DCM_WindowCenter, tmp).good()==false ) SSC_LOG("insert of DCM_WindowCenter=%s failed",tmp);
+			ssprintf(tmp, "%g", series->VOI.current.width);
+			shared->putAndInsertString( DCM_WindowWidth, tmp );
+		}
+		// C.7.6.16.2.24 Image Data Type
+		if ( ultrasound && sequence->findOrCreateSequenceItem( DCM_ImageDataTypeSequence, shared ).good() )
+		{
+			if ( !series->us.flowData )
+			{
+				shared->putAndInsertString( DCM_DataType, "TISSUE_INTENSITY" );
+			}
+			else
+			{
+				shared->putAndInsertString( DCM_DataType, "FLOW_POWER" );
+			}
+			shared->putAndInsertString( DCM_AliasedDataType, "YES" );
+		}
+		// C.8.24.6.1 US Image Description
+		if ( ultrasound && sequence->findOrCreateSequenceItem( DCM_USImageDescriptionSequence, shared ).good() )
+		{
+			shared->putAndInsertString( DCM_FrameType, "DERIVED\\PRIMARY\\VOLUME\\RESAMPLED" );
+			shared->putAndInsertString( DCM_VolumetricProperties, "VOLUME" );
+			shared->putAndInsertString( DCM_VolumeBasedCalculationTechnique, "NONE" );
+		}
+	}
+
+	// Then the per frame group
+	if ( !dataset->findOrCreateSequenceItem( DCM_PerFrameFunctionalGroupsSequence, sequence, series->frames - 1 ).good() )
+	{
+		SSC_ERROR( "Could not write per frame functional group sequence" );
+		return -1;
+	}
+	for ( i = 0; i < series->frames; i++ )
+	{
+		DcmItem *item = NULL;
+
+		if ( !instance )
+		{
+			SSC_ERROR( "Incomplete list of instances for frame set! Stopped at %d", i );
+			return -1;
+		}
+		if ( !dataset->findAndGetSequenceItem( DCM_PerFrameFunctionalGroupsSequence, sequence, i ).good() )
+		{
+			SSC_ERROR( "Could not read per frame functional group sequence at %d", i );
+			return -1;
+		}
+		if ( sequence->findOrCreateSequenceItem( DCM_FrameContentSequence, item ).good() )
+		{
+			item->putAndInsertUint16( DCM_FrameAcquisitionNumber, i );
+		}
+		if ( aligned != DICOMLIB_ALIGNMENT_TABLE
+			 && !sequence->findOrCreateSequenceItem( DCM_PlanePositionSequence, item ).good() )
+		{
+			SSC_ERROR( "Could not write plane position sequence at %d", i );
+			return -1;
+		}
+		if ( item )
+		{
+			ssprintf( buf, "%f\\%f\\%f", instance->image_position[0], instance->image_position[1], instance->image_position[2] );
+			item->putAndInsertString( DCM_ImagePositionPatient, buf );
+		}
+		instance = instance->next_instance;
+	}
+
+	// C.8.6.1 SC Equipment
+	dataset->putAndInsertString( DCM_ConversionType, "WSD" );	// Workstation
+
+	// C.8.6.3 SC Multi-frame Image
+	dataset->putAndInsertString( DCM_BurnedInAnnotation, "NO" );
+	/* if ( volume->samples_per_pixel == 1 )
+	{
+		dataset->putAndInsertString( DCM_PresentationLUTShape, "IDENTITY" );
+		dataset->putAndInsertString( DCM_RescaleIntercept, "0" );
+		dataset->putAndInsertString( DCM_RescaleSlope, "1" );
+		dataset->putAndInsertString( DCM_RescaleType, "US" );	// unspecified
+	}*/
+
+	// C.8.6.4 SC Multi-frame Vector
+	instance = series->first_instance;
+	for ( i = 0; i < series->frames; i++ )
+	{
+		char tmp[128];
+
+		if ( !instance )
+		{
+			SSC_ERROR( "Incomplete list of instances for slice vector!" );
+			return -1;
+		}
+		ssprintf( tmp, "%f", instance->slice_normal_distance );
+		sliceVector += tmp;
+		if ( instance->next_instance )
+		{
+			sliceVector += '\\';
+		}
+		instance = instance->next_instance;
+	}
+	dataset->putAndInsertOFStringArray( DCM_SliceLocationVector, sliceVector );	// array of frame positions in mm, see C.7.6.2.1.2
+
+	// C.12.1 SOP Common
+	dataset->putAndInsertString( DCM_SOPInstanceUID, dcmGenerateUniqueIdentifier( uid, INSTANCE_UID_ROOT ) );
+	/*** Save ***/
+
+	unlink( filename );
+	if ( profile == DICOMLIB_PROFILE_USB )
+	{
+		DJ_RPLossless params; // codec parameters, we use the defaults
+
+		dataset->chooseRepresentation(EXS_JPEGProcess14SV1TransferSyntax, &params);
+		result = fileFormat.saveFile( filename, EXS_JPEGProcess14SV1TransferSyntax, EET_ExplicitLength );
+	}
+	else	// DVD/CD
+	{
+		result = fileFormat.saveFile( filename, EXS_LittleEndianExplicit, EET_ExplicitLength );
+	}
+	if ( result.bad() )
+	{
+		SSC_WARNING( "Failed to save %s: %s", filename, result.text() );
+		return -1;
+	}
+
 	return 0;
 }
