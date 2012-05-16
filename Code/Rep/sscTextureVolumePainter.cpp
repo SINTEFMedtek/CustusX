@@ -163,6 +163,7 @@ public:
 		prop->AddShaderVariable("window", mWindow);
 		prop->AddShaderVariable("level", mLevel);
 		prop->AddShaderVariable("threshold", mLLR);
+		prop->AddShaderVariable("transparency", mAlpha);
 		report_gl_error();
 	}
 };
