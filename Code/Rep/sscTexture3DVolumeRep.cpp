@@ -36,6 +36,7 @@
 #include "sscImage.h"
 #include "sscView.h"
 #include "sscImageTF3D.h"
+#include "sscImageLUT2D.h"
 #include "sscTypeConversions.h"
 #include "sscGPUImageBuffer.h"
 #include "sscTextureVolumePainter.h"
@@ -257,14 +258,14 @@ void Texture3DVolumeRep::updateColorAttributeSlot()
 	{
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData() ;
 
-//		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getBaseLookupTable();
-//		ssc::GPUImageLutBufferPtr lutBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
+		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getBaseLookupTable();
+		ssc::GPUImageLutBufferPtr lutBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
 
 		// no lut indicates to the fragment shader that RGBA should be used
-//		if (inputImage->GetNumberOfScalarComponents()==1)
-//		{
-//			mPainter->SetLutBuffer(i, lutBuffer);
-//		}
+		if (inputImage->GetNumberOfScalarComponents()==1)
+		{
+			mPainter->SetLutBuffer(i, lutBuffer);
+		}
 
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
 		float window = (float) mImages[i]->getTransferFunctions3D()->getWindow() / scalarTypeMax;
