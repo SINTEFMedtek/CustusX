@@ -148,6 +148,16 @@ void main()
 			colorAccumulator = colorSample;
 			break;
 		}
+		if (renderMode == 7)
+		{
+			colorAccumulator = 0.5*(rayDirection + vec4(1,1,1,0));
+			break;
+		}
+		if (renderMode == 8)
+		{
+			vec3 point1 = 2.0*gl_FragCoord.xy/1200.0;
+			break;
+		}
 
 		vect += rayDeltaVector;
 
