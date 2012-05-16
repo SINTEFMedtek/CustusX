@@ -145,17 +145,8 @@ void main()
 		}
 		if (renderMode == 6)
 		{
-			float voxelValue = (colorSample.x + colorSample.y + colorSample.z)/3.0;
-			if (voxelValue > real_threshold)
-			{
-				vec4 colorSample2 = texture3D(volumeTexture,(vect+0.5*rayDeltaVector).xyz);
-				colorSample2 = applyWindowLevel(colorSample2, window, level);
-				vec4 colorSample3 = texture3D(volumeTexture,(vect-0.5*rayDeltaVector).xyz);
-				colorSample3 = applyWindowLevel(colorSample3, window, level);
-				colorAccumulator = mix(colorSample, colorSample2, 0.5);
-				colorAccumulator = colorAccumulator * 0.66 + colorSample3 * 0.33;
-				break;
-			}
+			colorAccumulator = colorSample;
+			break;
 		}
 
 		vect += rayDeltaVector;
