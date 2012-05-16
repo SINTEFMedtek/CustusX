@@ -348,6 +348,13 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	// get the pointer to the correct location in the frame buffer, where this data needs to be copied
 	unsigned char *frameBufferPtr = (unsigned char *)((reinterpret_cast<vtkUnsignedCharArray*>(this->FrameBuffer[index]))->GetPointer(0));
 
+	// Get ROI. Use this to clip video before sending
+  uROI roi = this->DataDescriptor->roi;
+  //Try just to update FrameBufferExtent first
+  this->FrameBufferExtent[0] = roi.ulx;
+  this->FrameBufferExtent[1] = roi.urx;
+  this->FrameBufferExtent[2] = roi.uly;
+  this->FrameBufferExtent[3] = roi.bly;
    
 	int outBytesPerRow = ((this->FrameBufferExtent[1]- this->FrameBufferExtent[0]+1)* this->FrameBufferBitsPerPixel + 7)/8;
 	outBytesPerRow += outBytesPerRow % this->FrameBufferRowAlignment;
@@ -448,7 +455,6 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 //    vtkErrorMacro("Couldn't request the angle.");
 //  std::cout << "cx-tx angle =" << angle << std::endl;
 
-  uROI roi = this->DataDescriptor->roi;
   //std::cout << "bottom left" << this->DataDescriptor->roi.blx << std::endl;
   //std::cout << "bottom right" << this->DataDescriptor->roi.brx << std::endl;
 //  std::cout << "ulx: " << roi.ulx << " uly: " << roi.uly << " urx: "  << roi.urx << " ury: " << roi.ury << std::endl;
@@ -1169,8 +1175,11 @@ void vtkSonixVideoSource::DoFormatSetup()
 
 
   //set the frame size from the data descriptor, 
-  this->FrameSize[0] = this->DataDescriptor->w;
-  this->FrameSize[1] = this->DataDescriptor->h;
+//  this->FrameSize[0] = this->DataDescriptor->w;
+//  this->FrameSize[1] = this->DataDescriptor->h;
+	// Set frame size based on ROI. TODO: fix for sector probes
+  this->FrameSize[0] = this->DataDescriptor->roi.urx - this->DataDescriptor->roi.ulx;
+  this->FrameSize[1] = this->DataDescriptor->roi.bly - this->DataDescriptor->roi.ury;
   this->FrameBufferBitsPerPixel = this->DataDescriptor->ss;
   switch (this->AcquisitionDataType)
     {
@@ -1186,8 +1195,9 @@ void vtkSonixVideoSource::DoFormatSetup()
 	case udtBPre:
 	case udtMPre:
 	case udtElastoPre: //this data type does not have a FC at the start
-		this->FrameSize[0] = this->DataDescriptor->h;
-		this->FrameSize[1] = this->DataDescriptor->w;  		
+		//Not needed? Defined above
+//		this->FrameSize[0] = this->DataDescriptor->h;
+//		this->FrameSize[1] = this->DataDescriptor->w;
 		this->OutputFormat = VTK_LUMINANCE;
         this->NumberOfScalarComponents = 1;
         break;
@@ -1196,8 +1206,9 @@ void vtkSonixVideoSource::DoFormatSetup()
 	case udtColorRF:
 	case udtPWRF:
 	case udtRF:
-		this->FrameSize[0] = this->DataDescriptor->h;
-		this->FrameSize[1] = this->DataDescriptor->w;  
+		//Not needed?
+//		this->FrameSize[0] = this->DataDescriptor->h;
+//		this->FrameSize[1] = this->DataDescriptor->w;
 		this->OutputFormat = VTK_LUMINANCE;
         this->NumberOfScalarComponents = 1;
         break;
