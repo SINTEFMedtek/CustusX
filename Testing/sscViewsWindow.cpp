@@ -27,6 +27,7 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscTexture3DSlicerRep.h"
+#include "sscTexture3DVolumeRep.h"
 #include "sscViewsWindow.h"
 
 using ssc::Vector3D;
@@ -199,6 +200,31 @@ void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 	insertView(view, uid, imageFilename, r, c);
 }
 
+void ViewsWindow::define3DGPU(const QString& imageFilename, int r, int c)
+{
+	QString uid = "3D";
+	ssc::View* view = new ssc::View(centralWidget());
+	mLayouts.insert(view);
+	
+	ssc::ImagePtr image = loadImage(imageFilename);
+
+	// volume rep
+	ssc::Texture3DVolumeRepPtr mRepPtr = ssc::Texture3DVolumeRep::New( image->getUid() );
+	std::vector<ssc::ImagePtr> images;
+	images.push_back(image);
+	mRepPtr->setImages(images);
+	mRepPtr->setName(image->getName());
+	view->addRep(mRepPtr);
+	
+	// Tool 3D rep
+	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+	ssc::ToolPtr tool = mToolmanager->getDominantTool();
+	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
+	toolRep->setTool(tool);
+	view->addRep(toolRep);
+	
+	insertView(view, uid, imageFilename, r, c);
+}
 
 void ViewsWindow::start(bool showSliders)
 {
