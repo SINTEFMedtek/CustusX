@@ -351,10 +351,15 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	// Get ROI. Use this to clip video before sending
   uROI roi = this->DataDescriptor->roi;
   //Try just to update FrameBufferExtent first
+  //std::cout << "FrameBufferExtent: " << this->FrameBufferExtent[0] << " " << this->FrameBufferExtent[1] << " " ;
+  //std::cout << this->FrameBufferExtent[2] << " " << this->FrameBufferExtent[3] << std::endl;
   this->FrameBufferExtent[0] = roi.ulx;
   this->FrameBufferExtent[1] = roi.urx;
   this->FrameBufferExtent[2] = roi.uly;
   this->FrameBufferExtent[3] = roi.bly;
+
+  //std::cout << "new FrameBufferExtent: " << this->FrameBufferExtent[0] << " " << this->FrameBufferExtent[1] << " " ;
+  //std::cout << this->FrameBufferExtent[2] << " " << this->FrameBufferExtent[3] << std::endl;
    
 	int outBytesPerRow = ((this->FrameBufferExtent[1]- this->FrameBufferExtent[0]+1)* this->FrameBufferBitsPerPixel + 7)/8;
 	outBytesPerRow += outBytesPerRow % this->FrameBufferRowAlignment;
@@ -390,6 +395,9 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	  }
 	else
 	  {
+		  //std::cout << "outBytesPerRow: " << outBytesPerRow;
+		  //std::cout << " rows: " << rows;
+		  //std::cout << " inBytesPerRow: " << inBytesPerRow << std::endl;
 	  while (--rows >= 0)
 	    {
 	    memcpy(frameBufferPtr,deviceDataPtr,outBytesPerRow);
@@ -434,6 +442,10 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   else
 	  std::cout << "Unknown pixel format (not 8 or 32)" << std::endl;
   
+  //These values may be modified. Refresh
+  rows = this->FrameBufferExtent[3]-this->FrameBufferExtent[2]+1;
+  frameBufferPtr = (unsigned char *)((reinterpret_cast<vtkUnsignedCharArray*>(this->FrameBuffer[index]))->GetPointer(0));
+
   frame.mWidth = outBytesPerRow / this->NumberOfScalarComponents;
   frame.mHeight = rows;
   frame.mFirstPixel = frameBufferPtr;
@@ -443,8 +455,11 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 
   frame.mSpacing[0] = this->DataSpacing[0];
   frame.mSpacing[1] = this->DataSpacing[1];
-  frame.mOrigin[0] = this->DataOrigin[0];
-  frame.mOrigin[1] = this->DataOrigin[1];
+  //frame.mOrigin[0] = this->DataOrigin[0];
+  //frame.mOrigin[1] = this->DataOrigin[1];
+  //Modify origin by ROI
+  frame.mOrigin[0] = this->DataOrigin[0] - roi.ulx;
+  frame.mOrigin[1] = this->DataOrigin[1] - roi.uly;
   //std::cout << "spacing: " << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl;
   //std::cout << "origin: " << this->DataOrigin[0] << ", " << this->DataOrigin[1] << std::endl;
 
@@ -461,14 +476,24 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 //  std::cout << "blx: " << roi.blx << " bly: " << roi.bly << " brx: "  << roi.brx << " bry: " << roi.bry << std::endl;
 
   //Copy ROI info
-  frame.ulx = roi.ulx;
-  frame.uly = roi.uly;
-  frame.urx = roi.urx;
-  frame.ury = roi.ury;
-  frame.brx = roi.brx;
-  frame.bry = roi.bry;
-  frame.blx = roi.blx;
-  frame.bly = roi.bly;
+  //frame.ulx = roi.ulx;
+  //frame.uly = roi.uly;
+  //frame.urx = roi.urx;
+  //frame.ury = roi.ury;
+  //frame.brx = roi.brx;
+  //frame.bry = roi.bry;
+  //frame.blx = roi.blx;
+  //frame.bly = roi.bly;
+  
+  // Just set ROI to FrameBufferExtent
+  frame.ulx = this->FrameBufferExtent[0] - this->FrameBufferExtent[0];
+  frame.uly = this->FrameBufferExtent[2] - this->FrameBufferExtent[2];
+  frame.urx = this->FrameBufferExtent[1] - this->FrameBufferExtent[0];
+  frame.ury = this->FrameBufferExtent[2] - this->FrameBufferExtent[2];
+  frame.brx = this->FrameBufferExtent[1] - this->FrameBufferExtent[0];
+  frame.bry = this->FrameBufferExtent[3] - this->FrameBufferExtent[2];
+  frame.blx = this->FrameBufferExtent[0] - this->FrameBufferExtent[0];
+  frame.bly = this->FrameBufferExtent[3] - this->FrameBufferExtent[2];
 
   // Test if the sonix status message is sent
   //Only send status message when info is changed
@@ -1175,11 +1200,11 @@ void vtkSonixVideoSource::DoFormatSetup()
 
 
   //set the frame size from the data descriptor, 
-//  this->FrameSize[0] = this->DataDescriptor->w;
-//  this->FrameSize[1] = this->DataDescriptor->h;
+  this->FrameSize[0] = this->DataDescriptor->w;
+  this->FrameSize[1] = this->DataDescriptor->h;
 	// Set frame size based on ROI. TODO: fix for sector probes
-  this->FrameSize[0] = this->DataDescriptor->roi.urx - this->DataDescriptor->roi.ulx;
-  this->FrameSize[1] = this->DataDescriptor->roi.bly - this->DataDescriptor->roi.ury;
+  //this->FrameSize[0] = this->DataDescriptor->roi.urx - this->DataDescriptor->roi.ulx;
+  //this->FrameSize[1] = this->DataDescriptor->roi.bly - this->DataDescriptor->roi.ury;
   this->FrameBufferBitsPerPixel = this->DataDescriptor->ss;
   switch (this->AcquisitionDataType)
     {
