@@ -65,8 +65,8 @@ if (SSC_USE_DCMTK)
     SET_TARGET_PROPERTIES( DICOMLib PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "-Wextra ${SNW_COMPILE_FLAGS}" )
     
     TARGET_LINK_LIBRARIES( DICOMLib 
-        z m ofstd stdc++ oflog dcmdata ofstd dcmimgle dcmdata ofstd dcmimage
-        dcmdata dcmnet dcmdata dcmjpeg CharLS dcmjpls ofstd ijg12 ijg8 ijg16 dcmjpeg
+        z m
+        ${DCMTK_LIBRARIES}
         ${SNW_LINK_LIBS}
         ${QT_LIBRARIES} 
         ${TIFF_LIBRARIES} 
