@@ -95,6 +95,14 @@ void TestVisualRendering::test_3D_Tool()
 	CPPUNIT_ASSERT(runWidget());
 }
 
+void TestVisualRendering::test_3D_Tool_GPU()
+{
+	widget->setDescription("3D Volume, moving tool");
+	widget->define3DGPU(image[0], 0, 0);
+
+	CPPUNIT_ASSERT(runWidget());
+}
+
 void TestVisualRendering::test_ACS_3D_Tool()
 {
 	widget->setDescription("ACS+3D, moving tool");
