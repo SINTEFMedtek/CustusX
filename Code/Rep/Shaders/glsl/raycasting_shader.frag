@@ -8,6 +8,7 @@ uniform int renderMode;
 uniform float window;
 uniform float level;
 uniform samplerBuffer lut;
+uniform float transparency;
 
 float applyWindowLevel(float input, float window, float level)
 {
@@ -63,7 +64,8 @@ void main()
 
 		if (renderMode == 0) // Accumulated average (compositing)
 		{
-			alphaSample = colorSample.a * stepsize;
+//			alphaSample = colorSample.a * stepsize;
+			alphaSample = transparency;
 			colorAccumulator += (1.0 - alphaAccumulator) * colorSample * alphaSample;
 			alphaAccumulator += (1.0 - alphaAccumulator) * alphaSample;
 		}
