@@ -357,56 +357,56 @@ void ToolConfigureGroupBox::setState(QLineEdit* line, bool userEdited)
 
 void ToolConfigureGroupBox::populateReference()
 {
-  mReferenceComboBox->clear();
+	mReferenceComboBox->clear();
 
-  int currentIndex = 0;
-  if(mConfigFilesComboBox->currentText().contains("<new config>"))
-  {
-    QStringList selectedTools = mToolListWidget->getTools();
-    foreach(QString string, selectedTools)
-    {
-      ToolFileParser parser(string);
-      IgstkTool::InternalStructure internal = parser.getTool();
-      if(internal.mIsReference)
-      {
-//        std::cout << "Found reference when making new config: " << string << std::endl;
-        currentIndex = this->addRefrenceToComboBox(string);
-      }
-//      else
-//      {
-//        std::cout << string << " is not a refrence." << std::endl;
-//      }
-    }
-  }
-  else
-  {
-    QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
-    ConfigurationFileParser parser(configAbsoluteFilePath);
-    QString reference = parser.getAbsoluteReferenceFilePath();
-//    std::cout << "Added reference: " << reference << std::endl;
-    if(reference.isEmpty())
-    {
-//      ssc::messageManager()->sendDebug("Could not determine the reference for configfile: "+configAbsoluteFilePath);
-      return;
-    }
+	int currentIndex = -1;
 
-    currentIndex = this->addRefrenceToComboBox(reference);
-  }
-  mReferenceComboBox->setCurrentIndex(currentIndex);
+	// populate list
+	QStringList selectedTools = mToolListWidget->getTools();
+	foreach(QString string, selectedTools)
+	{
+		ToolFileParser parser(string);
+		IgstkTool::InternalStructure internal = parser.getTool();
+		if (internal.mIsReference)
+		{
+			currentIndex = this->addRefrenceToComboBox(string);
+		}
+	}
+
+	// look for a selected reference
+	QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
+	ConfigurationFileParser parser(configAbsoluteFilePath);
+	QString reference = parser.getAbsoluteReferenceFilePath();
+	currentIndex = this->addRefrenceToComboBox(reference);
+
+	// if new: select the first one anyway
+	if (mConfigFilesComboBox->currentText().contains("<new config>") && (currentIndex==-1))
+		currentIndex = 0;
+
+	mReferenceComboBox->setCurrentIndex(currentIndex);
 }
+
 int ToolConfigureGroupBox::addRefrenceToComboBox(QString absoluteRefereneFilePath)
 {
-  int index;
+	int index;
 
-  QFile file(absoluteRefereneFilePath);
-  QFileInfo info(file);
+	QFile file(absoluteRefereneFilePath);
+	QFileInfo info(file);
+	QString refUid = info.dir().dirName();
 
-  mReferenceComboBox->addItem(info.dir().dirName());
-  //    std::cout << "Added reference: " << info.dir().dirName() << std::endl;
-  index = mReferenceComboBox->findText(info.dir().dirName());
-  mReferenceComboBox->setItemData(index, info.absoluteFilePath(), Qt::ToolTipRole);
+	QStringList selectedTools = mToolListWidget->getTools();
+	if (!selectedTools.count(absoluteRefereneFilePath))
+		return -1;
 
-  return index;
+	if (refUid.isEmpty())
+		return -1;
+
+	if (mReferenceComboBox->findText(refUid) < 0)
+		mReferenceComboBox->addItem(refUid);
+	index = mReferenceComboBox->findText(refUid);
+	mReferenceComboBox->setItemData(index, info.absoluteFilePath(), Qt::ToolTipRole);
+
+	return index;
 }
 
 
