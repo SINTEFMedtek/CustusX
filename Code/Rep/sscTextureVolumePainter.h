@@ -33,7 +33,7 @@
 
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
-
+#include "sscTransform3D.h"
 //---------------------------------------------------------
 namespace ssc
 {
@@ -63,6 +63,8 @@ public:
 	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
 	void releaseGraphicsResources(int index);
+	void setViewport(float width, float height);
+	void set_nMr(int index, ssc::Transform3D nMr);
 protected:
 	TextureVolumePainter();
 	virtual ~TextureVolumePainter();
@@ -78,6 +80,8 @@ protected:
 	vtkInternals* mInternals;
 	QString mSource;
 	QString mShaderFile;
+	float mWidth;
+	float mHeight;
 };
 
 #endif // WIN32

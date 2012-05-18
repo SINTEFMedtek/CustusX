@@ -129,12 +129,13 @@ void Texture3DVolumeRep::viewChanged()
 {
 	if (!mView)
 		return;
-	if (mView->getZoomFactor() < 0)
-		return; // ignore if zoom is invalid
 	if (!mTargetSpaceIsR)
 	{
 		mBB_s = transform(mView->get_vpMs(), mView->getViewport());
 	}
+	DoubleBoundingBox3D bb = mView->getViewport();
+
+	mPainter->setViewport(bb[1]-bb[0], bb[3]-bb[2]);
 
 }
 
@@ -185,6 +186,17 @@ void Texture3DVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 	vtkMatrix4x4Ptr vtkMatrix = vtkMatrix4x4::New();
 	transform->SetInput((mImages[0]->get_rMd()*createTransformScale(Vector3D(bb[1]-bb[0], bb[3]-bb[2], bb[5]-bb[4]))).getVtkMatrix());
 	mTransformPolyData->SetTransform(transform);
+
+	// identity bb
+	DoubleBoundingBox3D textureSpace(0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
+
+	// create transform from world space to raw data space
+	Transform3D iMr = mImages[0]->get_rMd().inv();
+	// create transform from image space to texture normalized space
+	Transform3D nMi = createTransformNormalize(mImages[0]->boundingBox(), textureSpace);
+	// total transform from slice space to texture space
+	Transform3D nMr = nMi * iMr;
+	mPainter->set_nMr(0, nMr);
 }
 
 std::vector<ssc::ImagePtr> Texture3DVolumeRep::getImages()
