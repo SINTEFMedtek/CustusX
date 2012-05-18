@@ -58,6 +58,8 @@ void main()
     float alphaSample; // The src alpha
     float n = 0.0;
     float thau = 0.02;
+    gl_FragDepth = 1.0;
+    bool found_depth = false;
 
     vec4 near, far;
     near.x = 2.0*gl_FragCoord.x/viewport.x-1.0;
@@ -85,6 +87,7 @@ void main()
 	    {
 		    colorAccumulator = 0.5*(rayDirection + vec4(1,1,1,0));
 		    colorAccumulator.a = 1.0;
+		    gl_FragDepth = gl_FragCoord.z;
 		    break;
 	    }
 	    
@@ -92,6 +95,7 @@ void main()
 		{
 			colorAccumulator = M*vect;
 			colorAccumulator.a = 1.0;
+			gl_FragDepth = gl_FragCoord.z;
 			break;
 		}
 	    if (all(lessThan(colorSample.rgb, vec3(threshold))))
@@ -103,6 +107,14 @@ void main()
 		    }
 
 		    continue;
+	    }
+	    if (!found_depth)
+	    {
+		    vec4 depth = gl_ModelViewProjectionMatrix * vect;
+		    depth.z = depth.z/depth.w;
+		    depth.z = (depth.z + 1.0)*0.5;
+		    gl_FragDepth = depth.z;
+		    found_depth = true;
 	    }
 	    colorSample = applyWindowLevel(colorSample, window, level);
 	    if ( lutSize > 0)
