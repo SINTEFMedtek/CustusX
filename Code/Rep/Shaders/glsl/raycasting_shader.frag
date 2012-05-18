@@ -1,3 +1,4 @@
+#version 120
 #extension GL_EXT_gpu_shader4 : enable
 #pragma debug(on)
 uniform int lutSize;
@@ -9,6 +10,12 @@ uniform float window;
 uniform float level;
 uniform samplerBuffer lut;
 uniform float transparency;
+uniform vec2 viewport;
+uniform vec4 imat0;
+uniform vec4 imat3;
+
+uniform vec4 imat1;
+uniform vec4 imat2;
 
 float applyWindowLevel(float input, float window, float level)
 {
@@ -34,10 +41,16 @@ vec4 applyLut(in float value, in samplerBuffer lut, in int lutSize2)
 
 void main()
 {
-    vec4 start = gl_TexCoord[0];
-    vec4 rayDirection = gl_TexCoord[3];
+	mat4 M;
+	M._m00_m01_m02_m03 = imat0;
+	M._m10_m11_m12_m13 = imat1;
+	M._m20_m21_m22_m23 = imat2;
+	M._m30_m31_m32_m33 = imat3;
+	M = transpose(M);
+	
+    vec4 start = gl_TexCoord[1];
+    vec4 rayDirection;
     float delta = stepsize;
-    vec4 rayDeltaVector = rayDirection * delta;
     vec4 vect = start;
     vec4 colorAccumulator = vec4(0, 0, 0, 1); // The dest color
     float alphaAccumulator = 0.0; // The  dest alpha for blending
@@ -46,14 +59,49 @@ void main()
     float n = 0.0;
     float thau = 0.02;
 
+    vec4 near, far;
+    near.x = 2.0*gl_FragCoord.x/viewport.x-1.0;
+    near.y = 2.0*gl_FragCoord.y/viewport.y-1.0;
+    near.z = -1.0;
+    near.w = 1.0;
+    far.xyw = near.xyw;
+    far.z = 1.0;
+    far.w = 1.0;
+    near =  gl_ModelViewProjectionMatrixInverse * near;
+    far = gl_ModelViewProjectionMatrixInverse * far;
+    near = near/near.w;
+    far = far/far.w;
+			
+    rayDirection = far-near;
+    rayDirection = normalize(rayDirection);
+
+    vec4 rayDeltaVector = rayDirection * delta;
     if (renderMode == 5) alphaAccumulator = 1.0;
     
     for(int i = 0; i < 450; i++)
     {
-	    colorSample = texture3D(volumeTexture, vect.xyz);
+ 	    colorSample = texture3D(volumeTexture, (M*vect).xyz);
+	    if (renderMode == 7)
+	    {
+		    colorAccumulator = 0.5*(rayDirection + vec4(1,1,1,0));
+		    colorAccumulator.a = 1.0;
+		    break;
+	    }
+	    
+		if (renderMode == 8)
+		{
+			colorAccumulator = M*vect;
+			colorAccumulator.a = 1.0;
+			break;
+		}
 	    if (all(lessThan(colorSample.rgb, vec3(threshold))))
 	    {
 		    vect = vect + rayDeltaVector;
+		    if (any(greaterThan((M*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M*vect).xyz, vec3(0, 0, 0))))
+		    {
+			    break;
+		    }
+
 		    continue;
 	    }
 	    colorSample = applyWindowLevel(colorSample, window, level);
@@ -148,20 +196,13 @@ void main()
 			colorAccumulator = colorSample;
 			break;
 		}
-		if (renderMode == 7)
-		{
-			colorAccumulator = 0.5*(rayDirection + vec4(1,1,1,0));
-			break;
-		}
-		if (renderMode == 8)
-		{
-			vec3 point1 = 2.0*gl_FragCoord.xy/1200.0;
-			break;
-		}
 
 		vect += rayDeltaVector;
 
-		if (any(greaterThan(vect.xyz, vec3(1, 1, 1))) || any(lessThan(vect.xyz, vec3(0, 0, 0)))) break;
+		if (any(greaterThan((M*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M*vect).xyz, vec3(0, 0, 0))))
+		{
+			break;
+		}
 
 		if (renderMode == 5)
 			if (alphaAccumulator < 0.01) break;
@@ -180,6 +221,5 @@ void main()
 	{
 		colorAccumulator.a = alphaAccumulator;
 	}
-
-    gl_FragColor = colorAccumulator;
+	gl_FragColor = colorAccumulator;
 }

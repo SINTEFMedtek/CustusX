@@ -36,6 +36,7 @@
 #include <vtkOpenGLTexture.h>
 #include <vtkgl.h>
 #include <vtkProperty.h>
+#include <vtkMatrix4x4.h>
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
@@ -88,6 +89,7 @@ class SingleVolumePainterHelper
 	float mAlpha;
 	HackGLTexture *mTexture;
 	bool mTextureLoaded;
+	Transform3D m_nMr;
 
 public:
 	explicit SingleVolumePainterHelper(int index)
@@ -120,6 +122,10 @@ public:
 		mLevel = level;
 		mLLR = llr;
 		mAlpha = alpha;
+	}
+	void set_nMr( Transform3D nMr)
+	{
+		m_nMr = nMr;
 	}
 	void initializeRendering()
 	{
@@ -164,6 +170,11 @@ public:
 		prop->AddShaderVariable("level", mLevel);
 		prop->AddShaderVariable("threshold", mLLR);
 		prop->AddShaderVariable("transparency", mAlpha);
+		vtkMatrix4x4Ptr M = m_nMr.getVtkMatrix();
+		prop->AddShaderVariable("imat3", 4, (*M)[3]);
+		prop->AddShaderVariable("imat2", 4, (*M)[2]);
+		prop->AddShaderVariable("imat0", 4, (*M)[0]);
+		prop->AddShaderVariable("imat1", 4, (*M)[1]);
 		report_gl_error();
 	}
 };
@@ -269,7 +280,8 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 		mInternals->mInitialized = true;
 	}
 	actor->GetProperty()->AddShaderVariable("renderMode", 0);
-	actor->GetProperty()->AddShaderVariable("stepsize", 1.0/50.0);
+	actor->GetProperty()->AddShaderVariable("stepsize", 1.0);
+	actor->GetProperty()->AddShaderVariable("viewport", mWidth, mHeight);
 	
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
@@ -360,6 +372,17 @@ void TextureVolumePainter::releaseGraphicsResources(int index)
 
 void TextureVolumePainter::PrintSelf(ostream& os, vtkIndent indent)
 {
+}
+
+void TextureVolumePainter::setViewport(float width, float height)
+{
+	mWidth = width;
+	mHeight = height;
+}
+
+void TextureVolumePainter::set_nMr(int index, Transform3D nMr)
+{
+	mInternals->safeIndex(index).set_nMr(nMr);
 }
 
 //---------------------------------------------------------
