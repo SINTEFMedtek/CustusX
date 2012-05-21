@@ -95,7 +95,7 @@ void ImageSenderSonix::initialize(StringMap arguments)
 
 void ImageSenderSonix::initializeSonixSlot()
 {
-	if(!mSonixGrabber->Initialized)
+	if(!mSonixGrabber->IsInitialized())
 	{
 		mGotFrame = false;
 		mSonixGrabber->Initialize();
