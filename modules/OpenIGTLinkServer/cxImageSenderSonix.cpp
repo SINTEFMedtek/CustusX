@@ -49,12 +49,14 @@ QStringList ImageSenderSonix::getArgumentDescription()
 ImageSenderSonix::ImageSenderSonix(QObject* parent) :
     ImageSender(parent),
 	mSocket(0),
-	mEmitStatusMessage(false)
+	mEmitStatusMessage(false),
+	mGotFrame(false)
 {
 }
 
 ImageSenderSonix::~ImageSenderSonix()
 {
+	mTimer->stop();
 	if (mSonixGrabber)
 		{
 			mSonixGrabber->Stop();
@@ -79,6 +81,34 @@ void ImageSenderSonix::initialize(StringMap arguments)
 	
 	connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
 	connect(this, SIGNAL(statusOnQueue(int)), this, SLOT(sendOpenIGTLinkStatusSlot(int)), Qt::QueuedConnection);//Do not work yet
+
+	this->mSonixHelper = new SonixHelper();
+
+	mTimer = new QTimer;
+	connect(mTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
+	mTimer->setInterval(10000);
+	mTimer->start();
+
+	this->initializeSonixGrabber();
+}
+
+
+void ImageSenderSonix::initializeSonixSlot()
+{
+	if(!mSonixGrabber->Initialized)
+	{
+		mGotFrame = false;
+		mSonixGrabber->Initialize();
+	}
+	else if(!mGotFrame)
+	{
+		mSonixGrabber->ReleaseSystemResources();
+		mSonixGrabber->Initialize();
+	}
+}
+
+void ImageSenderSonix::initializeSonixGrabber()
+{
 
 	if (!mArguments.count("ipaddress"))
 		mArguments["ipaddress"] = "127.0.0.1";
@@ -106,7 +136,6 @@ void ImageSenderSonix::initialize(StringMap arguments)
 	//std::cout << "acquisitionDataType: " << acquisitionDataType << " ";
 	//std::cout << "GetAcquisitionDataType: " << mSonixGrabber->GetAcquisitionDataType() << std::endl;
 
-	this->mSonixHelper = new SonixHelper();
 	mSonixGrabber->setSonixHelper(this->mSonixHelper);
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 }
@@ -127,6 +156,8 @@ void ImageSenderSonix::stopStreaming()
 
 void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 {
+	mGotFrame = true;
+
 	if(!mSocket)
 		{
 			return;
