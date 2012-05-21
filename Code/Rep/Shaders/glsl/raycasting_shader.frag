@@ -1,17 +1,17 @@
 #version 120
 #extension GL_EXT_gpu_shader4 : enable
 #pragma debug(on)
-uniform int lutSize;
-uniform sampler3D volumeTexture;
+uniform int lutSize[4];
+uniform sampler3D volumeTexture[4];
 uniform float stepsize;
-uniform float threshold;
+uniform float threshold[4];
 uniform int renderMode;
-uniform float window;
-uniform float level;
-uniform samplerBuffer lut;
-uniform float transparency;
+uniform float window[4];
+uniform float level[4];
+uniform samplerBuffer lut[4];
+uniform float transparency[4];
 uniform vec2 viewport;
-uniform mat4 M;
+uniform mat4 M[4];
 
 float applyWindowLevel(float input, float window, float level)
 {
@@ -71,7 +71,7 @@ void main()
 
 	for(int i = 0; i < 450; i++)
 	{
-		colorSample = texture3D(volumeTexture, (M*vect).xyz);
+		colorSample = texture3D(volumeTexture[0], (M[0]*vect).xyz);
 		if (renderMode == 7)
 		{
 			colorAccumulator = 0.5*(rayDirection + vec4(1,1,1,0));
@@ -82,15 +82,15 @@ void main()
 	    
 		if (renderMode == 8)
 		{
-			colorAccumulator = M*vect;
+			colorAccumulator = M[0]*vect;
 			colorAccumulator.a = 1.0;
 			gl_FragDepth = gl_FragCoord.z;
 			break;
 		}
-		if (all(lessThan(colorSample.rgb, vec3(threshold))))
+		if (all(lessThan(colorSample.rgb, vec3(threshold[0]))))
 		{
 			vect = vect + rayDeltaVector;
-			if (any(greaterThan((M*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M*vect).xyz, vec3(0, 0, 0))))
+			if (any(greaterThan((M[0]*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M[0]*vect).xyz, vec3(0, 0, 0))))
 			{
 				break;
 			}
@@ -105,16 +105,16 @@ void main()
 			gl_FragDepth = depth.z;
 			found_depth = true;
 		}
-		colorSample = applyWindowLevel(colorSample, window, level);
-		if ( lutSize > 0)
+		colorSample = applyWindowLevel(colorSample, window[0], level[0]);
+		if ( lutSize[0] > 0)
 		{
-			colorSample = applyLut( colorSample.r, lut,lutSize);
+			colorSample = applyLut( colorSample.r, lut[0],lutSize[0]);
 		}
 
 		if (renderMode == 0) // Accumulated average (compositing)
 		{
 //			alphaSample = colorSample.a * stepsize;
-			alphaSample = transparency;
+			alphaSample = transparency[0];
 			colorAccumulator += (1.0 - alphaAccumulator) * colorSample * alphaSample;
 			alphaAccumulator += (1.0 - alphaAccumulator) * alphaSample;
 		}
@@ -149,18 +149,18 @@ void main()
 			float vsX, vsY, vsZ = 0.0;
 
 			// X
-			vec4 val1 = texture3D(volumeTexture, vec3(vect.x - vsX, vect.y, vect.z));
-			vec4 val2 = texture3D(volumeTexture, vec3(vect.x + vsX, vect.y, vect.z));
+			vec4 val1 = texture3D(volumeTexture[0], vec3(vect.x - vsX, vect.y, vect.z));
+			vec4 val2 = texture3D(volumeTexture[0], vec3(vect.x + vsX, vect.y, vect.z));
 			gradient.x = (val2.x - val1.x) * 0.5;
 
 			// Y
-			val1 = texture3D(volumeTexture, vec3(vect.x, vect.y - vsY, vect.z));
-			val2 = texture3D(volumeTexture, vec3(vect.x, vect.y + vsY, vect.z));
+			val1 = texture3D(volumeTexture[0], vec3(vect.x, vect.y - vsY, vect.z));
+			val2 = texture3D(volumeTexture[0], vec3(vect.x, vect.y + vsY, vect.z));
 			gradient.y = (val2.y - val1.y) * 0.5;
 
 			// X
-			val1 = texture3D(volumeTexture, vec3(vect.x, vect.y, vect.z - vsZ));
-			val2 = texture3D(volumeTexture, vec3(vect.x, vect.y, vect.z + vsZ));
+			val1 = texture3D(volumeTexture[0], vec3(vect.x, vect.y, vect.z - vsZ));
+			val2 = texture3D(volumeTexture[0], vec3(vect.x, vect.y, vect.z + vsZ));
 			gradient.z = (val2.z - val1.z) * 0.5;
 
 			vec3 n_gradient = normalize(gradient);
@@ -185,9 +185,9 @@ void main()
 		if (renderMode == 5) // --- Torgrim's algorithm --- (Cloud light scattering)
 		{
 			float voxelValue = (colorSample.r + colorSample.g + colorSample.b) / 3.0;
-			if ((voxelValue - threshold) > 0.0)
+			if ((voxelValue - threshold[0]) > 0.0)
 			{
-				alphaSample = voxelValue - threshold;
+				alphaSample = voxelValue - threshold[0];
 				colorAccumulator += alphaAccumulator * alphaSample;
 				alphaAccumulator = alphaAccumulator * exp((-1.0 * thau) * alphaSample);
 			}
@@ -200,7 +200,7 @@ void main()
 
 		vect += rayDeltaVector;
 
-		if (any(greaterThan((M*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M*vect).xyz, vec3(0, 0, 0))))
+		if (any(greaterThan((M[0]*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M[0]*vect).xyz, vec3(0, 0, 0))))
 		{
 			break;
 		}
