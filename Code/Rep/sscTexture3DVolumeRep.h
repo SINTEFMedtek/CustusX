@@ -44,7 +44,7 @@ public:
 	{
 		return "ssc::Texture3DVolumeRep";
 	}
-	void setShaderFile(QString shaderFile);
+	void setShaderFiles(QString vertexShaderFile, QString fragmentShaderFiles);
 	virtual void printSelf(std::ostream & os, ssc::Indent indent);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImages(std::vector<ssc::ImagePtr> images);

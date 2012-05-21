@@ -58,7 +58,7 @@ public:
 	virtual void ReleaseGraphicsResources(vtkWindow *);
 	void PrintSelf(ostream& os, vtkIndent indent);
 
-	void setShaderFile(QString shaderFile);
+	void setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile);
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
 	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
@@ -78,8 +78,8 @@ protected:
 
 	class vtkInternals;
 	vtkInternals* mInternals;
-	QString mSource;
-	QString mShaderFile;
+	QString mVertexShaderFile;
+	QString mFragmentShaderFile;
 	float mWidth;
 	float mHeight;
 };
