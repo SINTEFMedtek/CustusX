@@ -24,7 +24,7 @@ float applyWindowLevel(float input, float window, float level)
 
 vec4 applyWindowLevel(vec4 input, float window, float level)
 {
-       return (input - level) / window + 0.5;
+	return (input - level) / window + 0.5;
 }
 
 vec4 applyLut(in float value, in samplerBuffer lut, in int lutSize2)
@@ -48,48 +48,48 @@ void main()
 	M._m30_m31_m32_m33 = imat3;
 	M = transpose(M);
 	
-    vec4 start = gl_TexCoord[1];
-    vec4 rayDirection;
-    float delta = stepsize;
-    vec4 vect = start;
-    vec4 colorAccumulator = vec4(0, 0, 0, 1); // The dest color
-    float alphaAccumulator = 0.0; // The  dest alpha for blending
-    vec4 colorSample; // The src color 
-    float alphaSample; // The src alpha
-    float n = 0.0;
-    float thau = 0.02;
-    gl_FragDepth = 1.0;
-    bool found_depth = false;
+	vec4 start = gl_TexCoord[1];
+	vec4 rayDirection;
+	float delta = stepsize;
+	vec4 vect = start;
+	vec4 colorAccumulator = vec4(0, 0, 0, 1); // The dest color
+	float alphaAccumulator = 0.0; // The  dest alpha for blending
+	vec4 colorSample; // The src color 
+	float alphaSample; // The src alpha
+	float n = 0.0;
+	float thau = 0.02;
+	gl_FragDepth = 1.0;
+	bool found_depth = false;
 
-    vec4 near, far;
-    near.x = 2.0*gl_FragCoord.x/viewport.x-1.0;
-    near.y = 2.0*gl_FragCoord.y/viewport.y-1.0;
-    near.z = -1.0;
-    near.w = 1.0;
-    far.xyw = near.xyw;
-    far.z = 1.0;
-    far.w = 1.0;
-    near =  gl_ModelViewProjectionMatrixInverse * near;
-    far = gl_ModelViewProjectionMatrixInverse * far;
-    near = near/near.w;
-    far = far/far.w;
+	vec4 near, far;
+	near.x = 2.0*gl_FragCoord.x/viewport.x-1.0;
+	near.y = 2.0*gl_FragCoord.y/viewport.y-1.0;
+	near.z = -1.0;
+	near.w = 1.0;
+	far.xyw = near.xyw;
+	far.z = 1.0;
+	far.w = 1.0;
+	near =  gl_ModelViewProjectionMatrixInverse * near;
+	far = gl_ModelViewProjectionMatrixInverse * far;
+	near = near/near.w;
+	far = far/far.w;
 			
-    rayDirection = far-near;
-    rayDirection = normalize(rayDirection);
+	rayDirection = far-near;
+	rayDirection = normalize(rayDirection);
 
-    vec4 rayDeltaVector = rayDirection * delta;
-    if (renderMode == 5) alphaAccumulator = 1.0;
-    
-    for(int i = 0; i < 450; i++)
-    {
- 	    colorSample = texture3D(volumeTexture, (M*vect).xyz);
-	    if (renderMode == 7)
-	    {
-		    colorAccumulator = 0.5*(rayDirection + vec4(1,1,1,0));
-		    colorAccumulator.a = 1.0;
-		    gl_FragDepth = gl_FragCoord.z;
-		    break;
-	    }
+	vec4 rayDeltaVector = rayDirection * delta;
+	if (renderMode == 5) alphaAccumulator = 1.0;
+
+	for(int i = 0; i < 450; i++)
+	{
+		colorSample = texture3D(volumeTexture, (M*vect).xyz);
+		if (renderMode == 7)
+		{
+			colorAccumulator = 0.5*(rayDirection + vec4(1,1,1,0));
+			colorAccumulator.a = 1.0;
+			gl_FragDepth = gl_FragCoord.z;
+			break;
+		}
 	    
 		if (renderMode == 8)
 		{
@@ -98,29 +98,29 @@ void main()
 			gl_FragDepth = gl_FragCoord.z;
 			break;
 		}
-	    if (all(lessThan(colorSample.rgb, vec3(threshold))))
-	    {
-		    vect = vect + rayDeltaVector;
-		    if (any(greaterThan((M*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M*vect).xyz, vec3(0, 0, 0))))
-		    {
-			    break;
-		    }
+		if (all(lessThan(colorSample.rgb, vec3(threshold))))
+		{
+			vect = vect + rayDeltaVector;
+			if (any(greaterThan((M*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M*vect).xyz, vec3(0, 0, 0))))
+			{
+				break;
+			}
 
-		    continue;
-	    }
-	    if (!found_depth)
-	    {
-		    vec4 depth = gl_ModelViewProjectionMatrix * vect;
-		    depth.z = depth.z/depth.w;
-		    depth.z = (depth.z + 1.0)*0.5;
-		    gl_FragDepth = depth.z;
-		    found_depth = true;
-	    }
-	    colorSample = applyWindowLevel(colorSample, window, level);
-	    if ( lutSize > 0)
-	    {
-		    colorSample = applyLut( colorSample.r, lut,lutSize);
-	    }
+			continue;
+		}
+		if (!found_depth)
+		{
+			vec4 depth = gl_ModelViewProjectionMatrix * vect;
+			depth.z = depth.z/depth.w;
+			depth.z = (depth.z + 1.0)*0.5;
+			gl_FragDepth = depth.z;
+			found_depth = true;
+		}
+		colorSample = applyWindowLevel(colorSample, window, level);
+		if ( lutSize > 0)
+		{
+			colorSample = applyLut( colorSample.r, lut,lutSize);
+		}
 
 		if (renderMode == 0) // Accumulated average (compositing)
 		{
@@ -180,7 +180,7 @@ void main()
 			// --- Not done implementing ---
 			vec3 viewVector;
 			vec3 lightVector;
-/*
+/*			
 			mat4 invRotMat; // Get this as uniform val!!!
 
 			vec4 transLightVector = invRotMat * vec4(lightVector.xyz, 0.0);
@@ -218,9 +218,9 @@ void main()
 
 		if (renderMode == 5)
 			if (alphaAccumulator < 0.01) break;
-		else
-			if (alphaAccumulator > 0.95) break; // terminate if opacity > 1 or the ray is outside the volume
-    }
+			else
+				if (alphaAccumulator > 0.95) break; // terminate if opacity > 1 or the ray is outside the volume
+	}
 
 
 	// Averaging
