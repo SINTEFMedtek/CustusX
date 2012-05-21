@@ -97,11 +97,13 @@ void ImageSenderSonix::initializeSonixSlot()
 {
 	if(!mSonixGrabber->IsInitialized())
 	{
+		std::cout << "initializeSonixSlot() Initializing" << std::endl;
 		mGotFrame = false;
 		mSonixGrabber->Initialize();
 	}
 	else if(!mGotFrame)
 	{
+		std::cout << "initializeSonixSlot() Got no frame. Reinitializing..." << std::endl;
 		mSonixGrabber->ReleaseSystemResources();
 		mSonixGrabber->Initialize();
 	}
