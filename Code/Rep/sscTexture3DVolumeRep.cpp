@@ -19,6 +19,7 @@
 
 #include "sscTexture3DVolumeRep.h"
 
+#include <vtkAppendPolyData.h>
 #include <vtkCellArray.h>
 #include <vtkRenderer.h>
 #include <vtkFloatArray.h>
@@ -98,14 +99,11 @@ Texture3DVolumeRep::Texture3DVolumeRep(const QString& uid) :
 	stripper->SetInputConnection(triangleFilter->GetOutputPort());
 	stripper->Update(); */
 
-	mPolyData = createCube();
-	mPolyData->GetPointData()->SetNormals(NULL);
-	mTransformPolyData = vtkTransformPolyDataFilter::New();
-	mTransformPolyData->SetInput(mPolyData);
+	mMerger = vtkAppendPolyData::New();
 
 	mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
 	mPainterPolyDatamapper->SetPainter(mPainter);
-	mPainterPolyDatamapper->SetInput(mTransformPolyData->GetOutput());
+	mPainterPolyDatamapper->SetInput(mMerger->GetOutput());
 	mActor->SetMapper(mPainterPolyDatamapper);
 }
 
@@ -157,6 +155,11 @@ void Texture3DVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 
 	mImages = images;
 
+	while (mMerger->GetInput())
+	{
+		mMerger->RemoveInput(mMerger->GetInput());
+	}
+	
 	for (unsigned i = 0; i < mImages .size(); ++i)
 	{
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
@@ -168,35 +171,38 @@ void Texture3DVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 		mPainter->SetVolumeBuffer(i, dataBuffer);
 
 		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
+
+		vtkPolyDataPtr cube = createCube();
+		mTransformPolyData[i] = vtkTransformPolyDataFilter::New();
+		mTransformPolyData[i]->SetInput(cube);
+		mMerger->AddInput(mTransformPolyData[i]->GetOutput());
 	}
 	this->updateColorAttributeSlot();
-	update();
+	transformChangedSlot();
 
+}
+
+void Texture3DVolumeRep::transformChangedSlot()
+{
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
-#if 0
-		mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(1,
-			cstring_cast(this->getTCoordName(i)),
-			vtkDataObject::FIELD_ASSOCIATION_POINTS);
-		std::cerr << "Mapping texture coordinates to polydata" << std::endl;
-#endif
+		DoubleBoundingBox3D bb = mImages[i]->boundingBox();
+		vtkMatrixToLinearTransform *transform = vtkMatrixToLinearTransform::New();
+		transform->SetInput((mImages[i]->get_rMd()*createTransformScale(Vector3D(bb[1]-bb[0], bb[3]-bb[2], bb[5]-bb[4]))).getVtkMatrix());
+		mTransformPolyData[i]->SetTransform(transform);
+
+		// identity bb
+		DoubleBoundingBox3D textureSpace(0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
+
+		// create transform from world space to raw data space
+		Transform3D iMr = mImages[i]->get_rMd().inv();
+		// create transform from image space to texture normalized space
+		Transform3D nMi = createTransformNormalize(mImages[i]->boundingBox(), textureSpace);
+		// total transform from slice space to texture space
+		Transform3D nMr = nMi * iMr;
+		std::cout << "Using transform: " << std::endl << nMr << std::endl;
+		mPainter->set_nMr(i, nMr);
 	}
-	DoubleBoundingBox3D bb = mImages[0]->boundingBox();
-	vtkMatrixToLinearTransform *transform = vtkMatrixToLinearTransform::New();
-	vtkMatrix4x4Ptr vtkMatrix = vtkMatrix4x4::New();
-	transform->SetInput((mImages[0]->get_rMd()*createTransformScale(Vector3D(bb[1]-bb[0], bb[3]-bb[2], bb[5]-bb[4]))).getVtkMatrix());
-	mTransformPolyData->SetTransform(transform);
-
-	// identity bb
-	DoubleBoundingBox3D textureSpace(0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
-
-	// create transform from world space to raw data space
-	Transform3D iMr = mImages[0]->get_rMd().inv();
-	// create transform from image space to texture normalized space
-	Transform3D nMi = createTransformNormalize(mImages[0]->boundingBox(), textureSpace);
-	// total transform from slice space to texture space
-	Transform3D nMr = nMi * iMr;
-	mPainter->set_nMr(0, nMr);
 }
 
 std::vector<ssc::ImagePtr> Texture3DVolumeRep::getImages()

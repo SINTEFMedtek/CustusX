@@ -28,6 +28,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
 
+#define MAX_CONCURRENT_VOLUMES 4
 //---------------------------------------------------------
 typedef vtkSmartPointer<class vtkCubeSource> vtkCubeSourcePtr;
 namespace ssc
@@ -60,6 +61,7 @@ protected:
 private slots:
 	void viewChanged();
 	void updateColorAttributeSlot();
+	void transformChangedSlot();
 	QString getTCoordName(int index);
 	private:
 	DoubleBoundingBox3D mBB_s;
@@ -69,8 +71,8 @@ private slots:
 
 	TextureVolumePainterPtr mPainter;
 	vtkActorPtr mActor;
-	vtkPolyDataPtr mPolyData;
-	vtkTransformPolyDataFilterPtr mTransformPolyData;
+	boost::array<vtkTransformPolyDataFilterPtr, MAX_CONCURRENT_VOLUMES> mTransformPolyData;
+	vtkAppendPolyDataPtr mMerger;
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 };
 //---------------------------------------------------------
