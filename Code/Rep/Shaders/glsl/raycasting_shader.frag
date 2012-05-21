@@ -217,9 +217,13 @@ void main()
 		}
 
 		if (renderMode == 5)
+		{
 			if (alphaAccumulator < 0.01) break;
-			else
-				if (alphaAccumulator > 0.95) break; // terminate if opacity > 1 or the ray is outside the volume
+		}
+		else
+		{
+			if (alphaAccumulator > 0.95) break; // terminate if opacity > 1 or the ray is outside the volume
+		}
 	}
 
 
