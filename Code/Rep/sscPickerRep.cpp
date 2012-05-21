@@ -221,7 +221,7 @@ void PickerRep::connectInteractor()
 		return;
 	if (mConnected)
 		return;
-	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
+	mConnections->Connect(mView->getRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
 		SLOT(pickLandmarkSlot(vtkObject*)));
 	mConnected = true;
 }
@@ -232,12 +232,12 @@ void PickerRep::disconnectInteractor()
 		return;
 	if (!mConnected)
 		return;
-	mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
+	mConnections->Disconnect(mView->getRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
 		SLOT(pickLandmarkSlot(vtkObject*)));
 	mConnected = false;
 }
 
-void PickerRep::addRepActorsToViewRenderer(View* view)
+void PickerRep::addRepActorsToViewRenderer(ViewBase *view)
 {
 	if (view == NULL)
 	{
@@ -259,7 +259,7 @@ void PickerRep::addRepActorsToViewRenderer(View* view)
 	this->scaleSphere();
 }
 
-void PickerRep::removeRepActorsFromViewRenderer(View* view)
+void PickerRep::removeRepActorsFromViewRenderer(ViewBase *view)
 {
 	if (view == NULL)
 		return;
@@ -273,7 +273,7 @@ void PickerRep::removeRepActorsFromViewRenderer(View* view)
 vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
 	vtkRendererPtr renderer = NULL;
-	std::set<ssc::View*>::const_iterator it = mViews.begin();
+	std::set<ssc::ViewBase *>::const_iterator it = mViews.begin();
 	for (; it != mViews.end(); ++it)
 	{
 		if (iren.GetRenderWindow() == (*it)->getRenderWindow())

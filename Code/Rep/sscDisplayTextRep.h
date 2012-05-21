@@ -46,21 +46,20 @@ class DisplayTextRep : public ssc::RepImpl
 {
 public:
 	static DisplayTextRepPtr New(const QString& uid, const QString& name);
-	virtual QString getType() const{ return "vm::DisplayTextRep";};
+	virtual QString getType() const{ return "vm::DisplayTextRep";}
 	TextDisplayPtr addText(const Vector3D& color, const QString& text, const Vector3D& pos, int maxWidth=0, vtkViewport *vp=NULL);
 	void setText(unsigned i, const QString& text);
 	void setColor(const Vector3D& color );
 	void setFontSize(int size);
 	virtual ~DisplayTextRep();
+
 protected:
 	DisplayTextRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
 	
 	std::vector<TextDisplayPtr> mDisplayText;
 };
-
-
 
 }//end namespace
 

@@ -23,18 +23,7 @@
 #include <vtkImageData.h>
 #include "sscVector3D.h"
 #include "vtkRenderWindow.h"
-
 #include "sscViewRenderWindow.h"
-
-//#ifdef USE_GLX_SHARED_CONTEXT
-//#include "sscSNWXOpenGLRenderWindow.h"
-//typedef SNWXOpenGLRenderWindow ViewRenderWindow;
-//typedef vtkSmartPointer<SNWXOpenGLRenderWindow> ViewRenderWindowPtr;
-//#else
-//#include "vtkRenderWindow.h"
-//typedef vtkRenderWindow ViewRenderWindow;
-//typedef vtkSmartPointer<ViewRenderWindow> ViewRenderWindowPtr;
-//#endif
 #include "vtkRenderer.h"
 #ifdef check
 #undef check
@@ -64,33 +53,40 @@
 namespace ssc
 {
 
-View::View(QWidget *parent, Qt::WFlags f) :
-		inherited(parent, f), mZoomFactor(-1.0), mRenderWindow(ViewRenderWindowPtr::New()) // set zoom to negative value to signify invalid.
+ViewBase::ViewBase(QWidget *parent, const QString& uid, const QString& name) : mZoomFactor(-1.0)
 {
 	mMTimeHash = 0;
 	mBackgroundColor = QColor("black");
+	mParent = parent;
+	mUid = uid;
+	mName = name;
+}
+
+ViewBase::~ViewBase()
+{
+}
+
+View::View(QWidget *parent, Qt::WFlags f) :
+	   ViewBase(this),
+	   mRenderWindow(ViewRenderWindowPtr::New()) // set zoom to negative value to signify invalid.
+{
 	this->SetRenderWindow(mRenderWindow);
 	clear();
 }
 
 View::View(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
-		inherited(parent, f), mZoomFactor(-1.0), mRenderWindow(ViewRenderWindowPtr::New()) // set zoom to negative value to signify invalid.
+	   ViewBase(this, uid, name),
+	   mRenderWindow(ViewRenderWindowPtr::New()) // set zoom to negative value to signify invalid.
 {
-	mMTimeHash = 0;
-	mBackgroundColor = QColor("black");
 	this->SetRenderWindow(mRenderWindow);
 	clear();
-
-	mUid = uid;
-	mName = name;
-	//  this->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 View::~View()
 {
 }
 
-QString View::getTypeString() const
+QString ViewBase::getTypeString() const
 {
 	switch (this->getType())
 	{
@@ -106,15 +102,17 @@ QString View::getTypeString() const
 	return "";
 }
 
-QString View::getUid()
+QString ViewBase::getUid()
 {
 	return mUid;
 }
-QString View::getName()
+
+QString ViewBase::getName()
 {
 	return mName;
 }
-vtkRendererPtr View::getRenderer() const
+
+vtkRendererPtr ViewBase::getRenderer() const
 {
 	return mRenderer;
 }
@@ -124,7 +122,7 @@ vtkRenderWindowPtr View::getRenderWindow() const
 	return mRenderWindow;
 }
 
-void View::addRep(const RepPtr& rep)
+void ViewBase::addRep(const RepPtr& rep)
 {
 	if (hasRep(rep))
 	{
@@ -135,18 +133,19 @@ void View::addRep(const RepPtr& rep)
 	mReps.push_back(rep);
 }
 
-void View::setRep(const RepPtr& rep)
+void ViewBase::setRep(const RepPtr& rep)
 {
 	removeReps();
 	addRep(rep);
 }
 
-void View::setBackgoundColor(QColor color)
+void ViewBase::setBackgoundColor(QColor color)
 {
 	mBackgroundColor = color;
 	if (mRenderer)
+	{
 		mRenderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
-	//  this->clear();
+	}
 }
 
 /**clear all content of the view. This ensures that props added from
@@ -164,7 +163,7 @@ void View::clear()
 	mRenderWindow->AddRenderer(mRenderer);
 }
 
-void View::removeReps()
+void ViewBase::removeReps()
 {
 
 	for (RepsIter it = mReps.begin(); it != mReps.end(); ++it)
@@ -174,7 +173,7 @@ void View::removeReps()
 	mReps.clear();
 }
 
-void View::removeRep(const RepPtr& rep)
+void ViewBase::removeRep(const RepPtr& rep)
 {
 	RepsIter it = std::find(mReps.begin(), mReps.end(), rep);
 
@@ -185,32 +184,16 @@ void View::removeRep(const RepPtr& rep)
 
 	rep->disconnectFromView(this);
 	mReps.erase(it);
-	//mRenderWindow->Render();
 }
 
-std::vector<RepPtr> View::getReps()
+std::vector<RepPtr> ViewBase::getReps()
 {
 	return mReps;
 }
 
-bool View::hasRep(const RepPtr& rep) const
+bool ViewBase::hasRep(const RepPtr& rep) const
 {
 	return std::count(mReps.begin(), mReps.end(), rep);
-}
-
-void View::resizeEvent(QResizeEvent * event)
-{
-	inherited::resizeEvent(event);
-
-	QSize size = event->size();
-	vtkRenderWindowInteractor* iren = mRenderWindow->GetInteractor();
-	if (iren != NULL)
-		iren->UpdateSize(size.width(), size.height());
-
-	emit resized(size);
-	//std::cout << "resize " << getName() << " " << this->getRenderWindow()->GetMTime() << std::endl;
-	//this->getRenderWindow()->Modified();
-	//std::cout << "   resized " << getName() << " " << this->getRenderWindow()->GetMTime() << std::endl;
 }
 
 void View::print(std::ostream& os)
@@ -257,7 +240,7 @@ void View::printSelf(std::ostream & os, Indent indent)
 
 void View::mouseMoveEvent(QMouseEvent* event)
 {
-	inherited::mouseMoveEvent(event);
+	widget::mouseMoveEvent(event);
 	emit mouseMoveSignal(event);
 }
 
@@ -269,37 +252,38 @@ void View::mousePressEvent(QMouseEvent* event)
 	if ((this->contextMenuPolicy() == Qt::CustomContextMenu) && event->buttons().testFlag(Qt::RightButton))
 		return;
 
-	inherited::mousePressEvent(event);
+	widget::mousePressEvent(event);
 	emit mousePressSignal(event);
 }
 
 void View::mouseReleaseEvent(QMouseEvent* event)
 {
-	inherited::mouseReleaseEvent(event);
+	widget::mouseReleaseEvent(event);
 	emit mouseReleaseSignal(event);
 }
+
 void View::focusInEvent(QFocusEvent* event)
 {
-	inherited::focusInEvent(event);
+	widget::focusInEvent(event);
 	emit focusInSignal(event);
 }
+
 void View::wheelEvent(QWheelEvent* event)
 {
-	inherited::wheelEvent(event);
+	widget::wheelEvent(event);
 	emit mouseWheelSignal(event);
 }
 
 void View::showEvent(QShowEvent* event)
 {
-	inherited::showEvent(event);
+	widget::showEvent(event);
 	emit showSignal(event);
 }
 
-void View::render()
+void ViewBase::render()
 {
 	// Render is called only when mtime is changed.
 	// At least on MaxOS, this is not done automatically.
-
 	unsigned long hash = 0;
 
 	hash += this->getRenderer()->GetMTime();
@@ -308,83 +292,62 @@ void View::render()
 	props->InitTraversal();
 	for (vtkProp* prop = props->GetNextProp(); prop != NULL; prop = props->GetNextProp())
 	{
-		//    vtkProp3D* prop3D = vtkProp3D::SafeDownCast(prop);
-		//    if (prop3D)
-		//      hash += prop3D->GetMTime();
 		vtkImageActor* imageActor = vtkImageActor::SafeDownCast(prop);
 		if (imageActor && imageActor->GetInput())
 		{
-			//      hash += imageActor->GetMTime();
 			hash += imageActor->GetInput()->GetMTime();
 		}
-
-		//    vtkVolume* volume = vtkVolume::SafeDownCast(prop);
-		//    if (volume)
-		//    {
-		////      std::cout << getName() << "\t" << prop->GetRedrawMTime() << "  " << prop->GetMTime() << std::endl;
-		//    }
-		//std::cout << "--" << getName() << "\t" << hash << std::endl;
 		hash += prop->GetMTime();
 		hash += prop->GetRedrawMTime();
 	}
-	//  std::cout << "--" << getName() << "\t" << hash << std::endl;
-
 	if (hash != mMTimeHash)
 	{
 		this->getRenderWindow()->Render();
 		mMTimeHash = hash;
-		//    std::cout << getName() << "\t" << mTime << " " << mTime_W << std::endl;
-		//    std::cout << "RENDER " << getName() << "\t" << hash << std::endl;
 	}
 }
 
 void View::setZoomFactor(double factor)
 {
 	if (similar(factor, mZoomFactor))
+	{
 		return;
-
+	}
 	mZoomFactor = factor;
 	emit resized(this->size());
 }
 
-double View::getZoomFactor() const
+double ViewBase::getZoomFactor() const
 {
 	return mZoomFactor;
 }
 
-ssc::DoubleBoundingBox3D View::getViewport_s() const
+ssc::DoubleBoundingBox3D ViewBase::getViewport_s() const
 {
 	return transform(this->get_vpMs().inv(), this->getViewport());
 }
 
-Transform3D View::get_vpMs() const
+Transform3D ViewBase::get_vpMs() const
 {
 	Vector3D center_vp = this->getViewport().center();
-
-	//  double zoomFactor = 0.3; // real magnification
-	double scale = mZoomFactor / this->mmPerPix();
+	double scale = mZoomFactor / this->mmPerPix();	//  double zoomFactor = 0.3; // real magnification
 	Transform3D S = createTransformScale(Vector3D(scale, scale, scale));
 	Transform3D T = createTransformTranslate(center_vp);// center of viewport in viewport coordinates
 	Transform3D M_vp_w = T * S; // first scale , then translate to center.
-
-	//  std::cout << "vpMs " <<  M_vp_w << std::endl;
-
 	return M_vp_w;
 }
 
 /**return the pixel viewport.
  */
-ssc::DoubleBoundingBox3D View::getViewport() const
+ssc::DoubleBoundingBox3D ViewBase::getViewport() const
 {
-	QSize size = this->size();
-	ssc::DoubleBoundingBox3D vp(0, size.width(), 0, size.height(), 0, 0);
-	//  std::cout << "vp " << vp << std::endl;
-	return vp;
+	QSize size = mParent->size();
+	return ssc::DoubleBoundingBox3D(0, size.width(), 0, size.height(), 0, 0);
 }
 
-double View::mmPerPix() const
+double ViewBase::mmPerPix() const
 {
-	QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(this));
+	QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(mParent));
 	double r_h = (double) screen->heightMM() / (double) screen->geometry().height();
 	double r_w = (double) screen->widthMM() / (double) screen->geometry().width();
 	double retval = (r_h + r_w) / 2.0;

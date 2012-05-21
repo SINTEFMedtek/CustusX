@@ -83,7 +83,7 @@ void CrossHairRep2D::setSliceProxy(ssc::SliceProxyPtr slicer)
 	update();
 }
 
-void CrossHairRep2D::addRepActorsToViewRenderer(ssc::View* view)
+void CrossHairRep2D::addRepActorsToViewRenderer(ssc::ViewBase *view)
 {
 	mCursor.reset( new ssc::CrossHair2D(view->getRenderer()) ) ;
 	double bordarOffset = 150.0;
@@ -92,7 +92,7 @@ void CrossHairRep2D::addRepActorsToViewRenderer(ssc::View* view)
 	update();
 }
 
-void CrossHairRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
+void CrossHairRep2D::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
 {
 	mCursor.reset();
 }

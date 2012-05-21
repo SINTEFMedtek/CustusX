@@ -44,10 +44,11 @@ public:
 	void setMesh(MeshPtr mesh);
 	void setImage(ImagePtr image);
 	bool hasMesh(MeshPtr mesh) const;
+
 protected:
 	SurfaceRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	virtual void addRepActorsToViewRenderer(ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ViewBase *view);
 
 	vtkPolyDataMapperPtr mMapper;
 	vtkContourFilterPtr mContourFilter;

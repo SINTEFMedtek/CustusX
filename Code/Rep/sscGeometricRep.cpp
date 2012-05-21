@@ -53,14 +53,17 @@ GeometricRepPtr GeometricRep::New(const QString& uid, const QString& name)
 	retval->mSelf = retval;
 	return retval;
 }
-void GeometricRep::addRepActorsToViewRenderer(View* view)
+
+void GeometricRep::addRepActorsToViewRenderer(ViewBase *view)
 {
 	view->getRenderer()->AddActor(mActor);
 }
-void GeometricRep::removeRepActorsFromViewRenderer(View* view)
+
+void GeometricRep::removeRepActorsFromViewRenderer(ViewBase *view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 }
+
 void GeometricRep::setMesh(MeshPtr mesh)
 {
   if (mesh == mMesh)

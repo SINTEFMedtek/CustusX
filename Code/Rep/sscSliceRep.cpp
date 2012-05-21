@@ -47,16 +47,15 @@ SliceRepPtr SliceRep::New(const QString& uid)
 	return retval;
 }
 
-void SliceRep::addRepActorsToViewRenderer(View* view)
+void SliceRep::addRepActorsToViewRenderer(ViewBase *view)
 {
 	mVtkImagePlaneWidget->SetInteractor( view->getRenderWindow()->GetInteractor() );
 	mVtkImagePlaneWidget->InteractionOn();
 	mVtkImagePlaneWidget->On();
 }
 
-void SliceRep::removeRepActorsFromViewRenderer(View* view)
+void SliceRep::removeRepActorsFromViewRenderer(ViewBase *view)
 {
-	
 }
 void SliceRep::setImage(ImagePtr image)
 {
@@ -69,10 +68,5 @@ bool SliceRep::hasImage(ImagePtr image) const
 {
 	return (mImage != NULL);
 }
-
-	//void SliceRep::setSliceProxy(SliceProxyPtr proxy) //connect tool transform update to sliceRep
-	//{
-	//	
-	//}
 
 } // namespace ssc

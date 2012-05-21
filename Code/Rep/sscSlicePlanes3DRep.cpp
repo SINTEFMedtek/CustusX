@@ -165,30 +165,16 @@ SlicePlanes3DRep::~SlicePlanes3DRep()
 		mProxy->connectTo3D(false);
 }
 
-void SlicePlanes3DRep::addRepActorsToViewRenderer(ssc::View* view)
+void SlicePlanes3DRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
 {
-//  std::cout << "SlicePlanes3DRep::addRepActorsToViewRenderer() " << mData.size() << std::endl;
-
-//	for (DataMap::iterator i=mData.begin(); i!=mData.end(); ++i)
-//	{
-//		SlicePlanesProxy::DataType baseData = mProxy->getData()[i->first];
-//
-//		i->second.mText = vtkTextActor3DPtr::New();
-//		i->second.mText->SetInput("O");
-//		i->second.mText->GetTextProperty()->SetColor(baseData.mColor.begin());
-//		i->second.mText->GetTextProperty()->SetFontSize(20);
-//		i->second.mText->GetTextProperty()->BoldOn();
-//		view->getRenderer()->AddActor(i->second.mText);
-//		i->second.mRect.reset(new Rect3D(view->getRenderer(), baseData.mColor));
-//	}
 	mView = view;
-  this->changedSlot();
+	this->changedSlot();
 }
 
-void SlicePlanes3DRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void SlicePlanes3DRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
 {
-  this->clearActors();
-  mView = NULL;
+	this->clearActors();
+	mView = NULL;
 }
 
 void SlicePlanes3DRep::clearActors()
@@ -316,7 +302,7 @@ SlicePlanes3DMarkerIn2DRep::~SlicePlanes3DMarkerIn2DRep()
 {
 }
 
-void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View* view)
+void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
 {
 	SlicePlanesProxy::DataType baseData = mProxy->getData()[mType];
 	
@@ -328,7 +314,7 @@ void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View* view)
 	this->changedSlot();
 }
 
-void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
 {
   view->getRenderer()->RemoveActor(mText->getActor());
 	mText.reset();

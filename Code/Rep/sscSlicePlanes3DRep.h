@@ -121,10 +121,12 @@ public:
 	SlicePlanesProxyPtr getProxy() { return mProxy; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
+
 private slots:
 	void changedSlot();
+
 private:
 	struct DataType
 	{
@@ -139,7 +141,7 @@ private:
 	SlicePlanes3DRep(const QString& uid, const QString& name = "");
 	void clearActors();
 	SlicePlanesProxyPtr mProxy;
-	ssc::View* mView;
+	ssc::ViewBase *mView;
 };
 
 typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerIn2DRepPtr;
@@ -166,8 +168,8 @@ public:
 	SlicePlanesProxyPtr getProxy() { return mProxy; }
 	
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
 private slots:
 	void changedSlot();
 private:

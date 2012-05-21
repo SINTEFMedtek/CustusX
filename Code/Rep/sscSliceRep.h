@@ -36,7 +36,7 @@ typedef boost::shared_ptr<class SliceRep> SliceRepPtr;
  *
  * Use this to slice an image.
  *
- * If you want to use this class, test is thoroughly first!!
+ * If you want to use this class, test this thoroughly first!!
  *
  * \ingroup sscRep
  * \ingroup sscRep2D
@@ -54,8 +54,8 @@ public:
 	
 protected:
 	SliceRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	virtual void addRepActorsToViewRenderer(ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ViewBase *view);
 
 	vtkImagePlaneWidgetPtr mVtkImagePlaneWidget;
 

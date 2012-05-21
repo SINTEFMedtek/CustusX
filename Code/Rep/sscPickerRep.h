@@ -77,14 +77,14 @@ protected slots:
 
 protected:
 	PickerRep(const QString& uid, const QString& name = ""); ///< use New instead
-	virtual void addRepActorsToViewRenderer(View* view); ///< connects to the renderwindowinteractor
-	virtual void removeRepActorsFromViewRenderer(View* view); ///< disconnects from the renderwindowinteractor
+	virtual void addRepActorsToViewRenderer(ViewBase *view); ///< connects to the renderwindowinteractor
+	virtual void removeRepActorsFromViewRenderer(ViewBase *view); ///< disconnects from the renderwindowinteractor
 	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
 	void connectInteractor();
 	void disconnectInteractor();
 	void scaleSphere();
 
-	View* mView;
+	ViewBase *mView;
 	bool mEnabled;
 	bool mConnected;
 	ToolPtr mTool; ///< the connected tool
