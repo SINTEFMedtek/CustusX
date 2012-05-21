@@ -194,7 +194,7 @@ void ToolRep3D::setSphereRadiusInNormalizedViewport(bool on)
   }
 }
 
-void ToolRep3D::addRepActorsToViewRenderer(View* view)
+void ToolRep3D::addRepActorsToViewRenderer(ViewBase *view)
 {
   view->getRenderer()->AddActor(mTracer->getActor());
 
@@ -224,7 +224,7 @@ void ToolRep3D::addRepActorsToViewRenderer(View* view)
     view->getRenderer()->AddActor(mRTStream->getActor());
 }
 
-void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
+void ToolRep3D::removeRepActorsFromViewRenderer(ViewBase *view)
 {
   view->getRenderer()->AddActor(mTracer->getActor());
   view->getRenderer()->RemoveActor(mToolActor);

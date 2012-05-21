@@ -52,8 +52,6 @@ namespace ssc
 Slices3DRep::Slices3DRep(const QString& uid) :
 	RepImpl(uid)
 {
-//	mProxy = Texture3DSlicerProxy::New();
-//	mProxy->setTargetSpaceToR();
 	mView = NULL;
 }
 
@@ -104,26 +102,21 @@ void Slices3DRep::setTool(ToolPtr tool)
 		mProxy[i]->getSliceProxy()->setTool(tool);
 }
 
-
-//void Slices3DRep::setSliceProxy(ssc::SliceProxyPtr slicer)
-//{
-//	mProxy->setSliceProxy(slicer);
-//}
-
-void Slices3DRep::addRepActorsToViewRenderer(ssc::View* view)
+void Slices3DRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
 {
 	for (unsigned i=0; i<mProxy.size(); ++i)
+	{
 		view->getRenderer()->AddActor(mProxy[i]->getActor());
-    mView = view;
-//    connect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
-//    this->viewChanged();
+	}
+	mView = view;
 }
 
-void Slices3DRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void Slices3DRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
 {
 	for (unsigned i=0; i<mProxy.size(); ++i)
+	{
 		view->getRenderer()->RemoveActor(mProxy[i]->getActor());
-//	disconnect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
+	}
 	mView = NULL;
 }
 

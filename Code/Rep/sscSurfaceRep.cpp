@@ -73,12 +73,12 @@ SurfaceRepPtr SurfaceRep::New(const QString& uid)
 	return retval;
 }
 
-void SurfaceRep::addRepActorsToViewRenderer(View* view)
+void SurfaceRep::addRepActorsToViewRenderer(ViewBase *view)
 {
 	view->getRenderer()->AddActor(mActor);
 }
 
-void SurfaceRep::removeRepActorsFromViewRenderer(View* view)
+void SurfaceRep::removeRepActorsFromViewRenderer(ViewBase *view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 }

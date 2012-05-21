@@ -98,13 +98,13 @@ public:
 
 protected:
 	Texture3DSlicerRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
 
 private slots:
 	void viewChanged();
 private:
-	View* mView;
+	ViewBase *mView;
 	Texture3DSlicerProxyPtr mProxy;
 };
 //---------------------------------------------------------

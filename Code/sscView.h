@@ -56,49 +56,77 @@ typedef boost::shared_ptr<class Rep> RepPtr;
  * in the vtkMods folder.
  *
  */
-class View: public ViewQVTKWidget
+class ViewBase
 {
-Q_OBJECT
-
-	typedef ViewQVTKWidget inherited;
-
 public:
+	/// type describing the view
 	enum Type
 	{
 		VIEW, VIEW_2D, VIEW_3D, VIEW_REAL_TIME
-	}; ///< type describing the view
-	View(QWidget *parent = NULL, Qt::WFlags f = 0);
-	View(const QString& uid, const QString& name = "", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
-	virtual ~View();
+	};
+	ViewBase(QWidget *parent, const QString& uid = "", const QString& name = "");
+	virtual ~ViewBase();
+	/// \return the View type, indicating display dimension.
 	virtual Type getType() const
 	{
 		return VIEW;
-	} ///< \return the View type, indicating display dimension.
+	}
 	QString getTypeString() const;
 	virtual QString getUid(); ///< Get a views unique id
 	virtual QString getName(); ///< Get a views name
 	virtual vtkRendererPtr getRenderer() const; ///< Get the renderer used by this \a View.
-	virtual vtkRenderWindowPtr getRenderWindow() const; ///< Get the vtkRenderWindow used by this \a View.
 	virtual void addRep(const RepPtr& rep); ///< Adds and connects a rep to the view
 	virtual void setRep(const RepPtr& rep); ///< Remove all other \a Rep objects from this \a View and add the provided Rep to this \a View.
 	virtual void removeRep(const RepPtr& rep); ///< Removes and disconnects the rep from the view
 	virtual bool hasRep(const RepPtr& rep) const; ///< Checks if the view already have the rep
 	virtual std::vector<RepPtr> getReps(); ///< Returns all reps in the view
 	virtual void removeReps(); ///< Removes all reps in the view
-	virtual void clear(); ///< Removes everything in the view, inluding reps.
 	virtual void setBackgoundColor(QColor color);
-
 	virtual void render(); ///< render the view contents if vtk-MTimes are changed
+
+	virtual vtkRenderWindowPtr getRenderWindow() const = 0;
+	virtual QSize size() = 0;
+
+	virtual void setZoomFactor(double factor) = 0;
+	double getZoomFactor() const;
+	Transform3D get_vpMs() const;
+	double mmPerPix() const;
+	ssc::DoubleBoundingBox3D getViewport() const;
+	ssc::DoubleBoundingBox3D getViewport_s() const;
+
+	QWidget *widget() { return mParent; }
+
+protected:
+	double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
+	QColor mBackgroundColor;
+	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
+	QString mUid; ///< The view's unique id
+	QString mName; ///< The view's name
+	vtkRendererPtr mRenderer;
+	std::vector<RepPtr> mReps; ///< Storage for internal reps.
+	typedef std::vector<RepPtr>::iterator RepsIter; ///< Iterator typedef for the internal rep vector.
+	QWidget *mParent;
+};
+typedef boost::shared_ptr<ViewBase> ViewBasePtr;
+
+/// Simple 1:1 conflation of SSC Views and Qt Widgets
+class View : public ViewQVTKWidget, public ViewBase
+{
+Q_OBJECT
+	typedef ViewQVTKWidget widget;
+
+public:
+	View(QWidget *parent = NULL, Qt::WFlags f = 0);
+	View(const QString& uid, const QString& name = "", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
+	virtual ~View();
 
 	void print(std::ostream& os);
 	virtual void printSelf(std::ostream & os, Indent indent);
+	virtual void clear(); ///< Removes everything in the view, inluding reps.
 
-	void setZoomFactor(double factor);
-	double getZoomFactor() const;
-	Transform3D get_vpMs() const;
-	ssc::DoubleBoundingBox3D getViewport() const;
-	ssc::DoubleBoundingBox3D getViewport_s() const;
-	double mmPerPix() const;
+	virtual vtkRenderWindowPtr getRenderWindow() const; ///< Get the vtkRenderWindow used by this \a View.
+	virtual QSize size() { return widget::size(); }
+	virtual void setZoomFactor(double factor);
 
 signals:
 	void resized(QSize size);
@@ -110,16 +138,8 @@ signals:
 	void focusInSignal(QFocusEvent* event);
 
 protected:
-	double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
-	QColor mBackgroundColor;
-	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
-	QString mUid; ///< The view's unique id
-	QString mName; ///< The view's name
-	vtkRendererPtr mRenderer;
 	vtkRenderWindowPtr mRenderWindow;
-	//SNWXOpenGLRenderWindowPtr mRenderWindow;
-	std::vector<RepPtr> mReps; ///< Storage for internal reps.
-	typedef std::vector<RepPtr>::iterator RepsIter; ///< Iterator typedef for the internal rep vector.
+
 private:
 	virtual void showEvent(QShowEvent* event);
 	virtual void wheelEvent(QWheelEvent*);
@@ -127,10 +147,30 @@ private:
 	virtual void mousePressEvent(QMouseEvent *event);
 	virtual void mouseReleaseEvent(QMouseEvent *event);
 	virtual void focusInEvent(QFocusEvent* event);
-	void resizeEvent(QResizeEvent *event);
 };
-
 typedef boost::shared_ptr<View> ViewPtr;
+
+#if 0
+/// More advanced N:1 combination of SSC Views and Qt Widgets
+class ViewContainer : public ViewQVTKWidget
+{
+Q_OBJECT
+
+public:
+	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0) : ViewQVTKWidget(parent, f) {}
+	~ViewContainer() {}
+
+	// Re-export some interfaces public
+	virtual void resizeEvent(QResizeEvent *event) { ViewQVTKWidget::resizeEvent(event); }
+	virtual void mouseMoveEvent(QMouseEvent *event) { ViewQVTKWidget::mouseMoveEvent(event); }
+	virtual void mousePressEvent(QMouseEvent *event) { ViewQVTKWidget::mousePressEvent(event); }
+	virtual void mouseReleaseEvent(QMouseEvent *event) { ViewQVTKWidget::mouseReleaseEvent(event); }
+	virtual void focusInEvent(QFocusEvent *event) { ViewQVTKWidget::focusInEvent(event); }
+	virtual void wheelEvent(QWheelEvent *event) { ViewQVTKWidget::wheelEvent(event); }
+};
+typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
+#endif
+
 } // namespace ssc
 
 #endif /*SSCVIEW_H_*/

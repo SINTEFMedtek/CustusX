@@ -82,14 +82,17 @@ GeometricRep2DPtr GeometricRep2D::New(const QString& uid, const QString& name)
 	retval->mSelf = retval;
 	return retval;
 }
-void GeometricRep2D::addRepActorsToViewRenderer(View* view)
+
+void GeometricRep2D::addRepActorsToViewRenderer(ViewBase *view)
 {
 	view->getRenderer()->AddActor(mActor);
 }
-void GeometricRep2D::removeRepActorsFromViewRenderer(View* view)
+
+void GeometricRep2D::removeRepActorsFromViewRenderer(ViewBase *view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 }
+
 void GeometricRep2D::setMesh(MeshPtr mesh)
 {
   if (mesh == mMesh)

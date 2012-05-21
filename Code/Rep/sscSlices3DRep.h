@@ -73,12 +73,11 @@ public:
 
 protected:
 	Slices3DRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
 
-private slots:
 private:
-	View* mView;
+	ViewBase *mView;
 	std::vector<Texture3DSlicerProxyPtr> mProxy;
 };
 //---------------------------------------------------------

@@ -57,11 +57,6 @@ int main(int argc, char **argv)
 	std::cout << "numPolys  : " << numPolys << std::endl;
 	std::cout << "numStrips : " << numStrips << std::endl;
 
-
-	//std::vector<QString> names = ssc::DataManager::instance()->getImageNames();
-
-
-	//ssc::ViewPtr view(new ssc::View());
 	ssc::View* view = new ssc::View();
 
 	ssc::GeometricRepPtr rep = ssc::GeometricRep::New(mesh1->getUid());

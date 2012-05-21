@@ -63,8 +63,8 @@ private slots:
 
 protected:
 	CrossHairRep2D(const QString& uid, const QString& name="");
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
 
 private:
 	void update();

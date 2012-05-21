@@ -157,21 +157,23 @@ AxesRepPtr AxesRep::New(const QString& uid)
 	return retval;
 }
 
-void AxesRep::addRepActorsToViewRenderer(View* view)
+void AxesRep::addRepActorsToViewRenderer(ViewBase *view)
 {
 	view->getRenderer()->AddActor(mAssembly);
 	for (unsigned i=0; i<mCaption.size(); ++i)
 		view->getRenderer()->AddActor(mCaption[i]);
-  mViewportListener->startListen(view->getRenderer());
-  this->rescale();
+	mViewportListener->startListen(view->getRenderer());
+	this->rescale();
 }
 
-void AxesRep::removeRepActorsFromViewRenderer(View* view)
+void AxesRep::removeRepActorsFromViewRenderer(ViewBase *view)
 {
 	view->getRenderer()->RemoveActor(mAssembly);
 	for (unsigned i=0; i<mCaption.size(); ++i)
+	{
 		view->getRenderer()->RemoveActor(mCaption[i]);
-  mViewportListener->stopListen();
+	}
+	mViewportListener->stopListen();
 }
 
 } // namespace ssc

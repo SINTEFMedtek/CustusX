@@ -52,19 +52,19 @@ class BlendedSliceRep : public RepImpl
 public:
 	virtual ~BlendedSliceRep();
 	static BlendedSliceRepPtr New(const QString& uid);
-	virtual QString getType() const { return "ssc::LayerSliceRep"; };
+	virtual QString getType() const { return "ssc::LayerSliceRep"; }
 	void setSliceProxy(SliceProxyPtr slicer); 
 	void setImages(std::vector<ImagePtr> images);
 	void update();
 protected:
 	BlendedSliceRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(View* view) ;
-	virtual void removeRepActorsFromViewRenderer(View* view) ;
+	virtual void addRepActorsToViewRenderer(ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ViewBase *view);
 	void addInputImages(vtkImageDataPtr slicedImage);
 	
 private slots:
 	void updateAlphaSlot();
-//	void updateThresholdSlot(double val);
+
 private:
 	double getAlpha(int countImage);	
 	bool firstImage;
@@ -73,11 +73,9 @@ private:
 	ssc::SlicedImageProxyPtr mSlicedProxy;
 	std::vector<ssc::SlicedImageProxyPtr> mSlices;
 	
-	
 	vtkImageBlendPtr mBlender;
 	int countImage;
 	vtkImageActorPtr mImageActor;
-		
 };
 
 //---------------------------------------------------------

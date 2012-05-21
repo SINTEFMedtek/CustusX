@@ -69,8 +69,8 @@ public:
 
 protected:
 	ProgressiveLODVolumetricRep(const QString& uid, const QString& name="");
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	virtual void addRepActorsToViewRenderer(ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ViewBase *view);
 
 	VolumetricRepPtr getNextResampleLevel();
 	void startThread(VolumetricRepPtr rep);

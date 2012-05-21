@@ -77,8 +77,8 @@ public:
 
 protected:
 	ToolRep3D(const QString& uid, const QString& name="");
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	virtual void addRepActorsToViewRenderer(ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ViewBase *view);
 	bool showProbe();
 
 private slots:

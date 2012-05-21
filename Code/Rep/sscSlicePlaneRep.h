@@ -42,6 +42,7 @@ namespace ssc
 class SlicePlaneRep : public RepImpl
 {
 	Q_OBJECT
+
 public:
 	virtual ~SlicePlaneRep();
 
@@ -55,8 +56,8 @@ public:
 	
 protected:
 	SlicePlaneRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(View* view);
-	virtual void removeRepActorsFromViewRenderer(View* view);
+	virtual void addRepActorsToViewRenderer(ViewBase *view);
+	virtual void removeRepActorsFromViewRenderer(ViewBase *view);
 	
 private slots:
 	void sliceTransformChangedSlot(Transform3D sMr);
@@ -69,7 +70,6 @@ private:
 	vtkImagePlaneWidgetPtr mVtkImagePlaneWidgetS;
 	
 	ImagePtr mImage;
- 
 };
 
 } // namespace ssc
