@@ -166,13 +166,13 @@ public:
 			mLutBuffer->bind(mIndex);
 			lutSize = mLutBuffer->getLutSize();
 		}
-		shader->GetUniformVariables()->SetUniformi("lutSize", 1, &lutSize);
-		shader->GetUniformVariables()->SetUniformi("lut", 1, &lut);
-		shader->GetUniformVariables()->SetUniformi("volumeTexture", 1, &texture);
-		shader->GetUniformVariables()->SetUniformf("window", 1, &mWindow);
-		shader->GetUniformVariables()->SetUniformf("level", 1, &mLevel);
-		shader->GetUniformVariables()->SetUniformf("threshold", 1, &mLLR);
-		shader->GetUniformVariables()->SetUniformf("transparency", 1, &mAlpha);
+		shader->GetUniformVariables()->SetUniformi(cstring_cast(QString("lutSize[%1]").arg(mIndex)), 1, &lutSize);
+		shader->GetUniformVariables()->SetUniformi(cstring_cast(QString("lut[%1]").arg(mIndex)), 1, &lut);
+		shader->GetUniformVariables()->SetUniformi(cstring_cast(QString("volumeTexture[%1]").arg(mIndex)), 1, &texture);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("window[%1]").arg(mIndex)), 1, &mWindow);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("level[%1]").arg(mIndex)), 1, &mLevel);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("threshold[%1]").arg(mIndex)), 1, &mLLR);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("transparency[%1]").arg(mIndex)), 1, &mAlpha);
 		vtkMatrix4x4Ptr M = m_nMr.getVtkMatrix();
 		float matrix[16];
 		for (int i = 0; i < 4; ++i)
@@ -182,7 +182,7 @@ public:
 				matrix[i*4+j] = M->GetElement(j, i);
 			}
 		}
-		shader->GetUniformVariables()->SetUniformMatrix("M", 4, 4, matrix);
+		shader->GetUniformVariables()->SetUniformMatrix(cstring_cast(QString("M[%1]").arg(mIndex)), 4, 4, matrix);
 		report_gl_error();
 	}
 };
@@ -334,6 +334,8 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 	viewport[0] = mWidth;
 	viewport[1] = mHeight;
 	mInternals->Shader->GetUniformVariables()->SetUniformf("viewport", 2, viewport);
+	int volumes = mInternals->mElement.size();
+	mInternals->Shader->GetUniformVariables()->SetUniformi("volumes", 1, &volumes);
 	
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_PACK_ROW_LENGTH, 0);

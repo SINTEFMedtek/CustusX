@@ -1,16 +1,19 @@
 #version 120
 #extension GL_EXT_gpu_shader4 : enable
 #pragma debug(on)
+
+uniform int volumes;
+uniform float stepsize;
+uniform vec2 viewport;
+
 uniform int lutSize[4];
 uniform sampler3D volumeTexture[4];
-uniform float stepsize;
 uniform float threshold[4];
 uniform int renderMode;
 uniform float window[4];
 uniform float level[4];
 uniform samplerBuffer lut[4];
 uniform float transparency[4];
-uniform vec2 viewport;
 uniform mat4 M[4];
 
 float applyWindowLevel(float input, float window, float level)
@@ -35,13 +38,25 @@ vec4 applyLut(in float value, in samplerBuffer lut, in int lutSize2)
 	return col;
 }
 
+vec4 blendRGBA(in vec4 a, in vec4 b)
+{
+	vec4 ret;
+	ret.a = a.a + b.a*(1.0-a.a);
+	ret.rgb = (a.rgb*a.a + b.rgb*b.a*(1.0-a.a))/ret.a;
+	if (ret.a == 0.0)
+	{
+		ret.rgb = vec3(1);
+	}
+	return ret;
+}
+
 void main()
 {
 	vec4 start = gl_TexCoord[1];
 	vec4 rayDirection;
 	float delta = stepsize;
 	vec4 vect = start;
-	vec4 colorAccumulator = vec4(0, 0, 0, 1); // The dest color
+	vec4 colorAccumulator = vec4(0, 0, 0, 0); // The dest color
 	float alphaAccumulator = 0.0; // The  dest alpha for blending
 	vec4 colorSample; // The src color 
 	float alphaSample; // The src alpha
@@ -69,34 +84,61 @@ void main()
 	vec4 rayDeltaVector = rayDirection * delta;
 	if (renderMode == 5) alphaAccumulator = 1.0;
 
+	bool beenHit[4];
 	for(int i = 0; i < 450; i++)
 	{
-		colorSample = texture3D(volumeTexture[0], (M[0]*vect).xyz);
-		if (renderMode == 7)
+		int hit = 0;
+		int contributingVolumes = 0;
+		for (int i = 0; i < volumes; ++i)
 		{
-			colorAccumulator = 0.5*(rayDirection + vec4(1,1,1,0));
-			colorAccumulator.a = 1.0;
-			gl_FragDepth = gl_FragCoord.z;
-			break;
-		}
-	    
-		if (renderMode == 8)
-		{
-			colorAccumulator = M[0]*vect;
-			colorAccumulator.a = 1.0;
-			gl_FragDepth = gl_FragCoord.z;
-			break;
-		}
-		if (all(lessThan(colorSample.rgb, vec3(threshold[0]))))
-		{
-			vect = vect + rayDeltaVector;
-			if (any(greaterThan((M[0]*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M[0]*vect).xyz, vec3(0, 0, 0))))
+			if (!(any(greaterThan((M[i]*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M[i]*vect).xyz, vec3(0, 0, 0)))))
 			{
-				break;
+				beenHit[i] = true;
+				++hit;
 			}
+			else
+			{
+				continue;
+			}
+			vec4 volumeColorSample = texture3D(volumeTexture[i], (M[i]*vect).xyz);
+			if (all(lessThan(volumeColorSample.rgb, vec3(threshold[i]))))
+			{
+				continue;
+			}
+			++contributingVolumes;
+			volumeColorSample = applyWindowLevel(volumeColorSample, window[i], level[i]);
+			if ( lutSize[i] > 0)
+			{
+				volumeColorSample = applyLut( volumeColorSample.r, lut[i], lutSize[i]);
+			}
+			volumeColorSample.a = transparency[i];
+			colorSample = blendRGBA(colorSample, volumeColorSample);
+		}
 
+		bool allVolumesBeenHit = true;
+		for (int i = 0; i < volumes; ++i)
+		{
+			allVolumesBeenHit = allVolumesBeenHit && beenHit[i];
+		}
+		if (allVolumesBeenHit && hit == 0 && i > 0)
+		{
+			// We left the last volume
+			break;
+		} else if (hit > 0 && contributingVolumes == 0)
+		{
+			// We're inside at least one volume, but none of the volumes exceeded the threshold
+			vect += rayDeltaVector;
+			continue;			
+		} else if (hit==0)
+		{
+			// We didn't hit any volume, but there could be some volumes left to hit, continue iteration
+			// TODO: compute intersection with next volume here
+			vect += rayDeltaVector;
 			continue;
 		}
+
+		colorSample /= float(contributingVolumes);
+		alphaSample /= float(contributingVolumes);
 		if (!found_depth)
 		{
 			vec4 depth = gl_ModelViewProjectionMatrix * vect;
@@ -105,16 +147,10 @@ void main()
 			gl_FragDepth = depth.z;
 			found_depth = true;
 		}
-		colorSample = applyWindowLevel(colorSample, window[0], level[0]);
-		if ( lutSize[0] > 0)
-		{
-			colorSample = applyLut( colorSample.r, lut[0],lutSize[0]);
-		}
 
 		if (renderMode == 0) // Accumulated average (compositing)
 		{
-//			alphaSample = colorSample.a * stepsize;
-			alphaSample = transparency[0];
+			alphaSample = colorSample.a * stepsize;
 			colorAccumulator += (1.0 - alphaAccumulator) * colorSample * alphaSample;
 			alphaAccumulator += (1.0 - alphaAccumulator) * alphaSample;
 		}
@@ -199,11 +235,6 @@ void main()
 		}
 
 		vect += rayDeltaVector;
-
-		if (any(greaterThan((M[0]*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M[0]*vect).xyz, vec3(0, 0, 0))))
-		{
-			break;
-		}
 
 		if (renderMode == 5)
 		{
