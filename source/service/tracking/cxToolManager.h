@@ -192,7 +192,7 @@ private:
 	ToolManager& operator=(ToolManager const&);
 
 #ifndef WIN32
-	void createSymlink();
+	bool createSymlink();
 	QFileInfo getSymlink() const;
 	void cleanupSymlink();
 #endif //WIN32
