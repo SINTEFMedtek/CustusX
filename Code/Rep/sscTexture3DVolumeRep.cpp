@@ -88,7 +88,7 @@ Texture3DVolumeRep::Texture3DVolumeRep(const QString& uid) :
 	mActor = vtkActorPtr::New();
 	mPainter = TextureVolumePainterPtr::New();
 	// default shader for sonowand: override using setshaderfile()
-	mPainter->setShaderFile("/Data/Resources/Shaders/volumetest.xml");
+	mPainter->setShaderFiles("/Data/Resources/Shaders/raycasting_shader.vert", "/Data/Resources/Shaders/raycasting_shader.frag");
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
 
 /**	vtkTriangleFilterPtr triangleFilter = vtkTriangleFilterPtr::New(); //create triangle polygons from input polygons
@@ -120,9 +120,9 @@ Texture3DVolumeRepPtr Texture3DVolumeRep::New(const QString& uid)
     return retval;
 }
 
-void Texture3DVolumeRep::setShaderFile(QString shaderFile)
+void Texture3DVolumeRep::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
 {
-	mPainter->setShaderFile(shaderFile);
+	mPainter->setShaderFiles(vertexShaderFile, fragmentShaderFile);
 }
 
 void Texture3DVolumeRep::viewChanged()

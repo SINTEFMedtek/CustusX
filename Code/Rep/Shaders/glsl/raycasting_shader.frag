@@ -11,11 +11,7 @@ uniform float level;
 uniform samplerBuffer lut;
 uniform float transparency;
 uniform vec2 viewport;
-uniform vec4 imat0;
-uniform vec4 imat3;
-
-uniform vec4 imat1;
-uniform vec4 imat2;
+uniform mat4 M;
 
 float applyWindowLevel(float input, float window, float level)
 {
@@ -41,13 +37,6 @@ vec4 applyLut(in float value, in samplerBuffer lut, in int lutSize2)
 
 void main()
 {
-	mat4 M;
-	M._m00_m01_m02_m03 = imat0;
-	M._m10_m11_m12_m13 = imat1;
-	M._m20_m21_m22_m23 = imat2;
-	M._m30_m31_m32_m33 = imat3;
-	M = transpose(M);
-	
 	vec4 start = gl_TexCoord[1];
 	vec4 rayDirection;
 	float delta = stepsize;

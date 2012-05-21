@@ -37,6 +37,9 @@
 #include <vtkgl.h>
 #include <vtkProperty.h>
 #include <vtkMatrix4x4.h>
+#include <vtkShaderProgram2.h>
+#include <vtkShader2.h>
+#include <vtkShader2Collection.h>
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
@@ -145,7 +148,7 @@ public:
 			mVolumeBuffer->updateTexture();
 		}
 	}
-	void eachRenderInternal(vtkSmartPointer<vtkProperty> prop)
+	void eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader)
 	{
 		if (!mVolumeBuffer)
 		{
@@ -163,18 +166,23 @@ public:
 			mLutBuffer->bind(mIndex);
 			lutSize = mLutBuffer->getLutSize();
 		}
-		prop->AddShaderVariable("lutSize", lutSize);
-		prop->AddShaderVariable("lut", lut);
-		prop->AddShaderVariable("volumeTexture", texture);
-		prop->AddShaderVariable("window", mWindow);
-		prop->AddShaderVariable("level", mLevel);
-		prop->AddShaderVariable("threshold", mLLR);
-		prop->AddShaderVariable("transparency", mAlpha);
+		shader->GetUniformVariables()->SetUniformi("lutSize", 1, &lutSize);
+		shader->GetUniformVariables()->SetUniformi("lut", 1, &lut);
+		shader->GetUniformVariables()->SetUniformi("volumeTexture", 1, &texture);
+		shader->GetUniformVariables()->SetUniformf("window", 1, &mWindow);
+		shader->GetUniformVariables()->SetUniformf("level", 1, &mLevel);
+		shader->GetUniformVariables()->SetUniformf("threshold", 1, &mLLR);
+		shader->GetUniformVariables()->SetUniformf("transparency", 1, &mAlpha);
 		vtkMatrix4x4Ptr M = m_nMr.getVtkMatrix();
-		prop->AddShaderVariable("imat3", 4, (*M)[3]);
-		prop->AddShaderVariable("imat2", 4, (*M)[2]);
-		prop->AddShaderVariable("imat0", 4, (*M)[0]);
-		prop->AddShaderVariable("imat1", 4, (*M)[1]);
+		float matrix[16];
+		for (int i = 0; i < 4; ++i)
+		{
+			for (int j = 0; j < 4; ++j)
+			{
+				matrix[i*4+j] = M->GetElement(j, i);
+			}
+		}
+		shader->GetUniformVariables()->SetUniformMatrix("M", 4, 4, matrix);
 		report_gl_error();
 	}
 };
@@ -185,7 +193,8 @@ public:
 	Display* mCurrentContext;
 
 	vtkWeakPointer<vtkRenderWindow> LastContext;
-	bool mInitialized;
+
+	vtkSmartPointer<vtkShaderProgram2> Shader;
 
 
 	std::vector<SingleVolumePainterHelper> mElement;
@@ -202,7 +211,7 @@ public:
 
 	vtkInternals()
 	{
-		mInitialized = false;
+
 	}
 	~vtkInternals()
 	{
@@ -210,7 +219,11 @@ public:
 	}
 	void ClearGraphicsResources()
 	{
-		mInitialized = false;
+		if (this->Shader != 0)
+		{
+			this->Shader->ReleaseGraphicsResources();
+			this->Shader = 0;
+		}
 	}
 };
 
@@ -220,9 +233,26 @@ TextureVolumePainter::TextureVolumePainter()
 	mInternals = new vtkInternals();
 }
 
-void TextureVolumePainter::setShaderFile(QString shaderFile)
+void TextureVolumePainter::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
 {
-	mShaderFile = shaderFile;
+	mVertexShaderFile = vertexShaderFile;
+	mFragmentShaderFile = fragmentShaderFile;
+}
+
+QString TextureVolumePainter::loadShaderFile(QString shaderFile)
+{
+	QFile fp(shaderFile);
+	if (fp.exists())
+	{
+		fp.open(QFile::ReadOnly);
+		QTextStream shaderfile(&fp);
+		return shaderfile.readAll();
+	}
+	else
+	{
+		std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
+	}
+	return "";
 }
 
 TextureVolumePainter::~TextureVolumePainter()
@@ -269,19 +299,41 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 		return;
 	}
 
-	if (!mInternals->mInitialized)
+	if (!mInternals->Shader)
 	{
-		actor->GetProperty()->LoadMaterial(mShaderFile.toUtf8().constData());
-		actor->GetProperty()->ShadingOn();
+		QString vertexShaderSource = this->loadShaderFile(mVertexShaderFile);
+		QString fragmentShaderSource = this->loadShaderFile(mFragmentShaderFile);
+
+		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
+		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));
+
+		vtkShader2Ptr s1 = vtkShader2Ptr::New();
+		s1->SetType(VTK_SHADER_TYPE_VERTEX);
+		s1->SetSourceCode(cstring_cast(vertexShaderSource));
+		s1->SetContext(pgm->GetContext());
+		pgm->GetShaders()->AddItem(s1);
+
+		vtkShader2Ptr s2 = vtkShader2Ptr::New();
+		s2->SetType(VTK_SHADER_TYPE_FRAGMENT);
+		s2->SetSourceCode(cstring_cast(fragmentShaderSource));
+		s2->SetContext(pgm->GetContext());
+		pgm->GetShaders()->AddItem(s2);
+		mInternals->Shader = pgm;
+		report_gl_error();
 		for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
 		{
 			mInternals->mElement[i].initializeRendering();
 		}
-		mInternals->mInitialized = true;
 	}
-	actor->GetProperty()->AddShaderVariable("renderMode", 0);
-	actor->GetProperty()->AddShaderVariable("stepsize", 1.0);
-	actor->GetProperty()->AddShaderVariable("viewport", mWidth, mHeight);
+
+	int renderMode = 0;
+	mInternals->Shader->GetUniformVariables()->SetUniformi("renderMode", 1, &renderMode);
+	float stepsize = 1.0;
+	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &stepsize);
+	float viewport[2];
+	viewport[0] = mWidth;
+	viewport[1] = mHeight;
+	mInternals->Shader->GetUniformVariables()->SetUniformf("viewport", 2, viewport);
 	
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
@@ -293,9 +345,21 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 	{
 		mInternals->mElement[i].eachPrepareRendering();
 	}
+	mInternals->Shader->Use();
 	report_gl_error();
 
+	if (!mInternals->Shader->IsValid())
+	{
+		vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
+	}
+
 	this->Superclass::PrepareForRendering(renderer, actor);
+	report_gl_error();
+
+	mInternals->Shader->Restore();
+	
+	glDisable(vtkgl::TEXTURE_3D);
+	glBindTexture(GL_TEXTURE_3D, 0);
 	report_gl_error();
 }
 
@@ -309,14 +373,30 @@ void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor
 		return;
 	}
 
-	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
+	// Save context state to be able to restore.
+	mInternals->Shader->Build();
+	if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
 	{
-		mInternals->mElement[i].eachRenderInternal(actor->GetProperty());
+		vtkErrorMacro("Pass Two failed.");
+		abort();
 	}
 
+	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
+	{
+		mInternals->mElement[i].eachRenderInternal(mInternals->Shader);
+	}
+
+	mInternals->Shader->Use();
 	report_gl_error();
 
+	if (!mInternals->Shader->IsValid())
+	{
+		vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
+	}
+
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
+
+	mInternals->Shader->Restore();
 
 	glDisable(vtkgl::TEXTURE_3D);
 	glBindTexture(GL_TEXTURE_3D, 0);
