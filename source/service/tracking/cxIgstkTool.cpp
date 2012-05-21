@@ -229,8 +229,7 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 	else if (igstk::TrackerToolConfigurationEvent().CheckEvent(&event))
 	{
 		//this->internalConfigured(true);
-		ssc::messageManager()->sendInfo(
-						mInternalStructure.mUid + " is successfully configured with the tracking system.");
+		ssc::messageManager()->sendInfo(QString("Configured [%1] with the tracking system").arg(mInternalStructure.mUid));
 	}
 	else if (igstk::TrackerToolAttachmentToTrackerEvent().CheckEvent(&event))
 	{
