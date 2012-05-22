@@ -50,7 +50,8 @@ ImageSenderSonix::ImageSenderSonix(QObject* parent) :
     ImageSender(parent),
 	mSocket(0),
 	mEmitStatusMessage(false),
-	mGotFrame(false)
+	mLastFrameTimestamp(0.0),
+	mCurrentFrameTimestamp(0.0)
 {
 }
 
@@ -97,15 +98,20 @@ void ImageSenderSonix::initializeSonixSlot()
 {
 	if(!mSonixGrabber->IsInitialized())
 	{
-		std::cout << "initializeSonixSlot() Initializing" << std::endl;
-		mGotFrame = false;
+		std::cout << "initializeSonixSlot() Initializing..." << std::endl;
 		mSonixGrabber->Initialize();
+		return;
 	}
-	else if(!mGotFrame)
+
+	if(ssc::similar(mLastFrameTimestamp, mCurrentFrameTimestamp, 0.001))
 	{
-		std::cout << "initializeSonixSlot() Got no frame. Reinitializing..." << std::endl;
+		std::cout << "initializeSonixSlot() Got no new frame. Reinitializing..." << std::endl;
 		mSonixGrabber->ReleaseSystemResources();
 		mSonixGrabber->Initialize();
+	}
+	else
+	{
+		mLastFrameTimestamp = mCurrentFrameTimestamp;
 	}
 }
 
@@ -158,7 +164,7 @@ void ImageSenderSonix::stopStreaming()
 
 void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 {
-	mGotFrame = true;
+	mCurrentFrameTimestamp = frame.mTimestamp;
 
 	if(!mSocket)
 		{
