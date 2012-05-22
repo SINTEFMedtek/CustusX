@@ -205,7 +205,7 @@ int DICOMLib_WriteNifti( const char *dir, const struct study_t *study )
 		znzclose(outfp);
 
 		// Export bval / bvec data for actual processed UID
-		if ( bval.size() > 19 ) // DTI data should contain seveal different diffusion bval
+		if ( bval.size() > 19 ) // DTI data should contain several different diffusion bval
 		{
 			char bvalFilename[PATH_MAX];
 			ofstream bvalStream;
