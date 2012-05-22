@@ -89,6 +89,20 @@ View::~View()
 {
 }
 
+ViewContainer::ViewContainer(QWidget *parent, Qt::WFlags f) :
+			     ViewQVTKWidget(parent, f),
+			     mRenderWindow(ViewRenderWindowPtr::New())
+{
+	this->SetRenderWindow(mRenderWindow);
+	mCols = 1;
+	mRows = 1;
+	clear();
+}
+
+ViewContainer::~ViewContainer()
+{
+}
+
 QString ViewBase::getTypeString() const
 {
 	switch (this->getType())
@@ -161,9 +175,18 @@ void View::clear()
 	mRenderWindow->AddRenderer(mRenderer);
 }
 
+void ViewContainer::clear()
+{
+	for (int i = 0; i < mViews.size(); i++)
+	{
+		mViews[i]->removeReps();
+		mRenderWindow->RemoveRenderer(mViews[i]->getRenderer());
+	}
+	setupViews(mCols, mRows);
+}
+
 void ViewBase::removeReps()
 {
-
 	for (RepsIter it = mReps.begin(); it != mReps.end(); ++it)
 	{
 		(*it)->disconnectFromView(this);
@@ -315,6 +338,16 @@ void View::setZoomFactor(double factor)
 	emit resized(this->size());
 }
 
+void ViewItem::setZoomFactor(double factor)
+{
+	if (similar(factor, mZoomFactor))
+	{
+		return;
+	}
+	mZoomFactor = factor;
+	emit resized(this->size());
+}
+
 double ViewBase::getZoomFactor() const
 {
 	return mZoomFactor;
@@ -350,6 +383,46 @@ double ViewBase::mmPerPix() const
 	double r_w = (double) screen->widthMM() / (double) screen->geometry().width();
 	double retval = (r_h + r_w) / 2.0;
 	return retval;
+}
+
+void ViewContainer::setupViews(int cols, int rows)
+{
+	double w = 0.0;
+	double wf = 1.0 / cols; // width fraction
+	double h = 1.0;
+	double hf = 1.0 / rows; // height fraction
+	mViews.clear();
+	mViews.reserve(cols * rows);
+	QSize grid;
+	grid.setWidth(size().width() / cols);
+	grid.setHeight(size().height() / rows);
+	for (int i = 0; i < cols * rows; i++)
+	{
+		ViewItemPtr item;
+		item.reset(new ViewItem(this, mRenderWindow));
+		item->setSize(grid);
+		vtkRendererPtr renderer = vtkRendererPtr::New();
+		// Calculate the renderer's viewport
+		renderer->SetViewport(w, h, w + wf, h - hf);
+		mRenderWindow->AddRenderer(renderer);
+		item->setRenderer(renderer);
+		mViews.push_back(item);
+		w += wf + 0.001;
+		h -= hf + 0.001;
+	}
+	mCols = cols;
+	mRows = rows;
+}
+
+void ViewItem::setRenderer(vtkRendererPtr renderer)
+{
+	mRenderer = renderer;
+	renderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
+}
+
+ViewItemPtr ViewContainer::getView(int view)
+{
+	return mViews[view];
 }
 
 } // namespace ssc
