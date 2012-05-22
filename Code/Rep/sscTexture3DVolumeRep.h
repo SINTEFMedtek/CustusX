@@ -51,7 +51,6 @@ public:
 	void setImages(std::vector<ssc::ImagePtr> images);
 	std::vector<ssc::ImagePtr> getImages();
 	void update();
-	void setTargetSpaceToR();
 
 protected:
 	Texture3DVolumeRep(const QString& uid);
@@ -67,7 +66,6 @@ private slots:
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ssc::ImagePtr> mImages;
 	View* mView;
-	bool mTargetSpaceIsR;
 
 	TextureVolumePainterPtr mPainter;
 	vtkActorPtr mActor;

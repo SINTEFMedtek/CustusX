@@ -47,11 +47,6 @@ namespace ssc
 {
 //---------------------------------------------------------
 
-void Texture3DVolumeRep::setTargetSpaceToR()
-{
-	mTargetSpaceIsR = true;
-}
-
 static vtkPolyDataPtr createCube()
 {
 	static float x[8][3]={{0,0,0}, {1,0,0}, {1,1,0}, {0,1,0},
@@ -84,7 +79,6 @@ Texture3DVolumeRep::Texture3DVolumeRep(const QString& uid) :
 	RepImpl(uid)
 {
 	mView = NULL;
-	mTargetSpaceIsR = false;
 	//	std::cout << "create Texture3DSlicerRep" << std::endl;
 	mActor = vtkActorPtr::New();
 	mPainter = TextureVolumePainterPtr::New();
@@ -127,10 +121,6 @@ void Texture3DVolumeRep::viewChanged()
 {
 	if (!mView)
 		return;
-	if (!mTargetSpaceIsR)
-	{
-		mBB_s = transform(mView->get_vpMs(), mView->getViewport());
-	}
 	DoubleBoundingBox3D bb = mView->getViewport();
 
 	mPainter->setViewport(bb[1]-bb[0], bb[3]-bb[2]);
@@ -227,33 +217,6 @@ void Texture3DVolumeRep::removeRepActorsFromViewRenderer(ssc::View* view)
 
 void Texture3DVolumeRep::update()
 {
-    for (unsigned i=0; i<mImages.size(); ++i)
-    {
-#if 0
-	    vtkFloatArrayPtr TCoords = vtkFloatArray::SafeDownCast(mPolyData->GetPointData()->GetArray(
-		                                                           cstring_cast(getTCoordName(i))));
-
-	    if (!TCoords) // create the TCoords
-	    {
-		    TCoords = vtkFloatArrayPtr::New();
-		    TCoords->SetNumberOfComponents(3);
-		    TCoords->Allocate(8 * 3);
-		    TCoords->InsertNextTuple3(0.0, 0.0, 0.0);
-		    TCoords->InsertNextTuple3(0.0, 0.0, 1.0);
-		    TCoords->InsertNextTuple3(0.0, 1.0, 1.0);
-		    TCoords->InsertNextTuple3(0.0, 1.0, 0.0);
-		    TCoords->InsertNextTuple3(1.0, 0.0, 1.0);
-		    TCoords->InsertNextTuple3(1.0, 1.0, 1.0);
-		    TCoords->InsertNextTuple3(1.0, 1.0, 0.0);
-		    TCoords->InsertNextTuple3(1.0, 1.0, 1.0);
-		    TCoords->SetName(cstring_cast(getTCoordName(i)));
-		    mPolyData->GetPointData()->AddArray(TCoords);
-		    std::cerr << "Added texture coordinates" << std:: endl;
-	    }
-#endif
-
-	    mPolyData->Modified();
-    }
 
 }
 
@@ -264,10 +227,6 @@ void Texture3DVolumeRep::printSelf(std::ostream & os, ssc::Indent indent)
 
 void Texture3DVolumeRep::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
 {
-	if (!mTargetSpaceIsR)
-	{
-		mBB_s = transform(vpMs.inv(), vp);
-	}
 }
 
 void Texture3DVolumeRep::updateColorAttributeSlot()
