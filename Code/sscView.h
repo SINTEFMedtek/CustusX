@@ -151,26 +151,57 @@ private:
 };
 typedef boost::shared_ptr<View> ViewPtr;
 
-#if 0
-/// More advanced N:1 combination of SSC Views and Qt Widgets
-class ViewContainer : public ViewQVTKWidget
+class ViewItem : public QObject, public ViewBase
 {
 Q_OBJECT
 
 public:
-	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0) : ViewQVTKWidget(parent, f) {}
-	~ViewContainer() {}
+	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow) : ViewBase(parent) { mRenderWindow = renderWindow; }
+	~ViewItem() {}
 
-	// Re-export some interfaces public
-	virtual void resizeEvent(QResizeEvent *event) { ViewQVTKWidget::resizeEvent(event); }
-	virtual void mouseMoveEvent(QMouseEvent *event) { ViewQVTKWidget::mouseMoveEvent(event); }
-	virtual void mousePressEvent(QMouseEvent *event) { ViewQVTKWidget::mousePressEvent(event); }
-	virtual void mouseReleaseEvent(QMouseEvent *event) { ViewQVTKWidget::mouseReleaseEvent(event); }
-	virtual void focusInEvent(QFocusEvent *event) { ViewQVTKWidget::focusInEvent(event); }
-	virtual void wheelEvent(QWheelEvent *event) { ViewQVTKWidget::wheelEvent(event); }
+	// Implement pure virtuals in base class
+	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }
+	virtual QSize size() { return mSize; }
+	virtual void setZoomFactor(double factor);
+
+	void setSize(QSize size) { mSize = size; }
+	void setRenderer(vtkRendererPtr renderer);
+
+signals:
+	void resized(QSize size);
+	void mouseMoveSignal(QMouseEvent *event);
+	void mousePressSignal(QMouseEvent *event);
+	void mouseReleaseSignal(QMouseEvent *event);
+	void mouseWheelSignal(QWheelEvent*);
+	void showSignal(QShowEvent *event);
+	void focusInSignal(QFocusEvent *event);
+
+private:
+	vtkRenderWindowPtr mRenderWindow;
+	QWidget *mParent;
+	QSize mSize;
+};
+typedef boost::shared_ptr<ViewItem> ViewItemPtr;
+
+/// More advanced N:1 combination of SSC Views and Qt Widgets
+class ViewContainer : public ViewQVTKWidget
+{
+Q_OBJECT
+	typedef ViewQVTKWidget widget;
+
+public:
+	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0);
+	~ViewContainer();
+	ViewItemPtr getView(int view);
+	void setupViews(int cols, int rows);
+	void clear();
+
+protected:
+	QList<ViewItemPtr> mViews;
+	vtkRenderWindowPtr mRenderWindow;
+	int mRows, mCols;
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
-#endif
 
 } // namespace ssc
 
