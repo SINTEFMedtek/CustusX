@@ -95,24 +95,19 @@ void main()
 			{
 				beenHit[i] = true;
 				++hit;
+				vec4 volumeColorSample = texture3D(volumeTexture[i], (M[i]*vect).xyz);
+				if (!all(lessThan(volumeColorSample.rgb, vec3(threshold[i]))))
+				{
+					++contributingVolumes;
+					volumeColorSample = applyWindowLevel(volumeColorSample, window[i], level[i]);
+					if ( lutSize[i] > 0)
+					{
+						volumeColorSample = applyLut( volumeColorSample.r, lut[i], lutSize[i]);
+					}
+					volumeColorSample.a = transparency[i];
+					colorSample = blendRGBA(colorSample, volumeColorSample);
+				}
 			}
-			else
-			{
-				continue;
-			}
-			vec4 volumeColorSample = texture3D(volumeTexture[i], (M[i]*vect).xyz);
-			if (all(lessThan(volumeColorSample.rgb, vec3(threshold[i]))))
-			{
-				continue;
-			}
-			++contributingVolumes;
-			volumeColorSample = applyWindowLevel(volumeColorSample, window[i], level[i]);
-			if ( lutSize[i] > 0)
-			{
-				volumeColorSample = applyLut( volumeColorSample.r, lut[i], lutSize[i]);
-			}
-			volumeColorSample.a = transparency[i];
-			colorSample = blendRGBA(colorSample, volumeColorSample);
 		}
 
 		bool allVolumesBeenHit = true;
