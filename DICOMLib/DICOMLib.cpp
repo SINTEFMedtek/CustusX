@@ -90,11 +90,14 @@ static int setupSeries( struct study_t *study )
 {
 	struct series_t *series;
 	struct study_t *iter;
+	QList<QString> DTIUidList;
 
 	for ( iter = study; iter; iter = iter->next_study )
 	{
 		for ( series = iter->first_series; series != NULL; series = series->next_series )
 		{
+			// catch all series with contain DTI stuff
+			if (series->DTI.isDTI) DTIUidList.append(series->seriesInstanceUID);
 			struct instance_t *middle = findInstance( series, series->frames / 2 );
 
 			DICOMLib_Verify( series );
@@ -115,6 +118,20 @@ static int setupSeries( struct study_t *study )
 					series->VOI.range.center, series->VOI.range.width );
 			}
 		}
+
+		// DTI: Now separate the wheat from the chaff (real DTI from trash)
+		for  ( series = iter->first_series; series != NULL; series = series->next_series )
+		{
+			/*
+			// DTI data should usally contain more than 7 diffusion volumes
+			// if we had found diffusion parameters anyway this could be ADC maps or
+			// pre calculated DTI results so we reset the isDTI tag to false
+			*/
+			if (series->DTI.isDTI)
+				if ( DTIUidList.count(series->seriesInstanceUID)<7 )
+					series->DTI.isDTI=false;
+		}
+
 		study->initialized = true;
 	}
 	return 0;
