@@ -1,3 +1,5 @@
+
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -26,24 +28,23 @@ int DICOMLib_WriteNifti( const char *dir, const struct study_t *study )
 	struct series_t *s = NULL;
 	QMap<QString, uint32_t> uid;
 	int retval = 0;
-	int DTICount = 0;
 
-	for (s = study->first_series; s; s = s->next_series)	// find how many different DTI-volumes we have here
+	// find DTI-volumes by seriesInstanceUID
+	for (s = study->first_series; s; s = s->next_series)
 	{
-		if (s->DTI.isDTI)
+	//	if (s->DTI.isDTI)
 		{
 			uid.insertMulti(s->seriesInstanceUID, s->series_id);
-			DTICount++;
 		}
 	}
 	QList<QString> uidList = uid.uniqueKeys();
 	for (int i = 0; i < uidList.size(); i++) // for each found relevant UID
 	{
-		// bvec components for collect bvec data and in the end
-		string bvecX;
-		string bvecY;
-		string bvecZ;
-		string bval;
+		// bvec components for collect bvec data and bvalues
+		string bvecX="";
+		string bvecY="";
+		string bvecZ="";
+		string bval="";
 
 		QString usedUid = uidList[i];
 		znzFile outfp = NULL;
@@ -196,7 +197,6 @@ int DICOMLib_WriteNifti( const char *dir, const struct study_t *study )
 					{
 						SSC_ERROR("Failed to write nifti data, frame %d", j);
 					}
-					// SSC_LOG("Frame++:%i / instFrame:%i / Z:%f / %s",j, inst->frame, inst->image_position[2], inst->path);
 					inst = inst->next_instance;
 				}
 				retval++;
@@ -205,27 +205,33 @@ int DICOMLib_WriteNifti( const char *dir, const struct study_t *study )
 		znzclose(outfp);
 
 		// Export bval / bvec data for actual processed UID
-		char bvalFilename[PATH_MAX];
-		ofstream bvalStream;
-		char bvecFilename[PATH_MAX];
-		ofstream bvecStream;
-		ssprintf(bvalFilename, "%s/%s.bval", dir, usedUid.toStdString().c_str() );
-		ssprintf(bvecFilename, "%s/%s.bvec", dir, usedUid.toStdString().c_str());
-
-		bvalStream.open(bvalFilename, ios::out);
-		bvecStream.open(bvecFilename, ios::out);
-
-		if ( bvalStream.is_open() )
+		if ( bval.size() > 19 ) // DTI data should contain seveal different diffusion bval
 		{
-			bvalStream << bval;
-			bvecStream << bvecX << endl;
-			bvecStream << bvecY << endl;
-			bvecStream << bvecZ;
+			char bvalFilename[PATH_MAX];
+			ofstream bvalStream;
+			char bvecFilename[PATH_MAX];
+			ofstream bvecStream;
+			ssprintf(bvalFilename, "%s/%s.bval", dir, usedUid.toStdString().c_str() );
+			ssprintf(bvecFilename, "%s/%s.bvec", dir, usedUid.toStdString().c_str());
+
+			bvalStream.open(bvalFilename, ios::out);
+			bvecStream.open(bvecFilename, ios::out);
+
+			if ( bvalStream.is_open() )
+			{
+				bvalStream << bval;
+				bvecStream << bvecX << endl;
+				bvecStream << bvecY << endl;
+				bvecStream << bvecZ;
+			}
+
+			bvalStream.close();
+			bvecStream.close();
+			bval.clear();
+			bvecX.clear();
+			bvecY.clear();
+			bvecZ.clear();
 		}
-
-		bvalStream.close();
-		bvecStream.close();
 	}
-
 	return retval;
 }
