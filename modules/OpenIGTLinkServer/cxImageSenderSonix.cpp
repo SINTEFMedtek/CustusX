@@ -110,7 +110,9 @@ void ImageSenderSonix::initializeSonixSlot()
 		// If sonix exam is closed we need to create a new mSonixGrabber
 		// Free resources. Do we need to delete?
 		mSonixGrabber->Stop();
+		std::cout << "Releasing Ultrasonix resources" << std::endl;
 		mSonixGrabber->ReleaseSystemResources();
+		disconnect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 
 		this->initializeSonixGrabber();
 	}
