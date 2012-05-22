@@ -69,7 +69,8 @@ private:
   QTimer* mTimer;
   StringMap mArguments;
   bool mEmitStatusMessage; ///< Emit new US status message
-  bool mGotFrame; ///< True if we have received at least 1 frame since initialize
+  double mLastFrameTimestamp; ///< Time stamp of last frame
+  double mCurrentFrameTimestamp; ///< Current frame timestamp
 
   vtkSonixVideoSourcePtr  mSonixGrabber; ///< Ultrasonix video grabber
   SonixHelper*          mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
