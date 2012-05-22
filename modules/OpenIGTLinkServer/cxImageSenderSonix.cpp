@@ -6,6 +6,7 @@
  */
 
 #include "cxImageSenderSonix.h"
+#include "sscVector3D.h"
 
 #ifdef CX_WIN32
 
