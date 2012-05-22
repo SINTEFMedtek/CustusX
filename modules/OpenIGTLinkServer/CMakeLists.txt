@@ -50,6 +50,11 @@ ENDIF(QT_USE_FILE)
 find_package(OpenIGTLink REQUIRED)
 include(${OpenIGTLink_USE_FILE})
 
+# SSC
+#----------
+find_package(SSC PATHS "../../externals/ssc/CMake" REQUIRED)
+include(${SSC_USE_FILE})
+
 #---------------------e----------
 # Include directories
 #-------------------------------
