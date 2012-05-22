@@ -53,6 +53,7 @@
 namespace ssc
 {
 
+// set zoom to negative value to signify invalid
 ViewBase::ViewBase(QWidget *parent, const QString& uid, const QString& name) : mZoomFactor(-1.0)
 {
 	mMTimeHash = 0;
@@ -67,16 +68,18 @@ ViewBase::~ViewBase()
 }
 
 View::View(QWidget *parent, Qt::WFlags f) :
+	   widget(parent, f),
 	   ViewBase(this),
-	   mRenderWindow(ViewRenderWindowPtr::New()) // set zoom to negative value to signify invalid.
+	   mRenderWindow(ViewRenderWindowPtr::New())
 {
 	this->SetRenderWindow(mRenderWindow);
 	clear();
 }
 
 View::View(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
+	   widget(parent, f),
 	   ViewBase(this, uid, name),
-	   mRenderWindow(ViewRenderWindowPtr::New()) // set zoom to negative value to signify invalid.
+	   mRenderWindow(ViewRenderWindowPtr::New())
 {
 	this->SetRenderWindow(mRenderWindow);
 	clear();
@@ -117,11 +120,6 @@ vtkRendererPtr ViewBase::getRenderer() const
 	return mRenderer;
 }
 
-vtkRenderWindowPtr View::getRenderWindow() const
-{
-	return mRenderWindow;
-}
-
 void ViewBase::addRep(const RepPtr& rep)
 {
 	if (hasRep(rep))
@@ -139,7 +137,7 @@ void ViewBase::setRep(const RepPtr& rep)
 	addRep(rep);
 }
 
-void ViewBase::setBackgoundColor(QColor color)
+void ViewBase::setBackgroundColor(QColor color)
 {
 	mBackgroundColor = color;
 	if (mRenderer)
