@@ -2,7 +2,7 @@
 #extension GL_EXT_gpu_shader4 : enable
 #pragma debug(on)
 
-uniform int volumes;
+const int volumes=${NUMBER_OF_VOLUMES};
 uniform float stepsize;
 uniform vec2 viewport;
 

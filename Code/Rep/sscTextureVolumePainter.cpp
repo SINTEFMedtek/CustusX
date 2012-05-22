@@ -196,6 +196,7 @@ public:
 
 	vtkSmartPointer<vtkShaderProgram2> Shader;
 
+	unsigned int mVolumes;
 
 	std::vector<SingleVolumePainterHelper> mElement;
 
@@ -284,7 +285,7 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 	}
 
 	vtkRenderWindow* renWin = renderer->GetRenderWindow();
-	if (mInternals->LastContext != renWin)
+	if (mInternals->LastContext != renWin || mInternals->mElement.size() != mInternals->mVolumes)
 	{
 		mInternals->ClearGraphicsResources();
 	}
@@ -301,8 +302,10 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 
 	if (!mInternals->Shader)
 	{
+		mInternals->mVolumes = mInternals->mElement.size();
 		QString vertexShaderSource = this->loadShaderFile(mVertexShaderFile);
 		QString fragmentShaderSource = this->loadShaderFile(mFragmentShaderFile);
+		fragmentShaderSource = fragmentShaderSource.replace("${NUMBER_OF_VOLUMES}", QString("%1").arg(mInternals->mElement.size()));
 
 		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
 		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));
@@ -334,8 +337,6 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 	viewport[0] = mWidth;
 	viewport[1] = mHeight;
 	mInternals->Shader->GetUniformVariables()->SetUniformf("viewport", 2, viewport);
-	int volumes = mInternals->mElement.size();
-	mInternals->Shader->GetUniformVariables()->SetUniformi("volumes", 1, &volumes);
 	
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
