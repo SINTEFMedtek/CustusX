@@ -81,7 +81,7 @@ public:
 	virtual bool hasRep(const RepPtr& rep) const; ///< Checks if the view already have the rep
 	virtual std::vector<RepPtr> getReps(); ///< Returns all reps in the view
 	virtual void removeReps(); ///< Removes all reps in the view
-	virtual void setBackgoundColor(QColor color);
+	virtual void setBackgroundColor(QColor color);
 	virtual void render(); ///< render the view contents if vtk-MTimes are changed
 
 	virtual vtkRenderWindowPtr getRenderWindow() const = 0;
@@ -124,7 +124,8 @@ public:
 	virtual void printSelf(std::ostream & os, Indent indent);
 	virtual void clear(); ///< Removes everything in the view, inluding reps.
 
-	virtual vtkRenderWindowPtr getRenderWindow() const; ///< Get the vtkRenderWindow used by this \a View.
+	// Implement pure virtuals in base class
+	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }  ///< Get the vtkRenderWindow used by this \a View.
 	virtual QSize size() { return widget::size(); }
 	virtual void setZoomFactor(double factor);
 
