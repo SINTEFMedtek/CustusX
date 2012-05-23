@@ -88,6 +88,7 @@ private:
 	void calibrateTimeStamp(igtl::ImageMessage::Pointer imgMsg);
 	void addImageToQueue(igtl::ImageMessage::Pointer imgMsg);
 	void addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg);
+	bool readOneMessage();
 
 	bool mHeadingReceived;
 	QString mAddress;
