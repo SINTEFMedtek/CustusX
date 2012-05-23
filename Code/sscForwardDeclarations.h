@@ -31,6 +31,7 @@ typedef boost::weak_ptr<class GPUImageDataBuffer> GPUImageDataBufferWeakPtr;
 typedef boost::shared_ptr<class GPUImageLutBuffer> GPUImageLutBufferPtr;
 typedef boost::weak_ptr<class GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
 typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
+typedef boost::shared_ptr<class FiberBundle> FiberBundlePtr;
 
 // reps
 typedef boost::shared_ptr<class Rep> RepPtr;
@@ -52,6 +53,7 @@ typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerI
 typedef boost::shared_ptr<class SlicePlanesProxy> SlicePlanesProxyPtr;
 typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
 typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
+typedef boost::shared_ptr<class FiberBundleRep> FiberBundleRepPtr;
 
 typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
