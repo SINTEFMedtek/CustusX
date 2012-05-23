@@ -51,6 +51,14 @@ vec4 blendRGBA(in vec4 a, in vec4 b)
 	return ret;
 }
 
+vec2 viewVolumePosition( vec4 fragment, vec2 viewport)
+{
+	vec2 result;
+	result.x = 2.0*fragment.x/viewport.x-1.0;
+	result.y = 2.0*fragment.y/viewport.y-1.0;
+	return result;
+}
+
 vec2 depthTexCoords( vec4 fragment, vec2 viewport)
 {
 	vec2 result;
@@ -75,8 +83,7 @@ void main()
 	bool found_depth = false;
 
 	vec4 near, far;
-	near.x = 2.0*gl_FragCoord.x/viewport.x-1.0;
-	near.y = 2.0*gl_FragCoord.y/viewport.y-1.0;
+	near.xy = viewVolumePosition(gl_FragCoord, viewport);
 	near.z = -1.0;
 	near.w = 1.0;
 	far.xyw = near.xyw;
