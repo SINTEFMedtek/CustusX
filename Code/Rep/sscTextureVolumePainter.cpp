@@ -229,7 +229,9 @@ public:
 };
 
 //---------------------------------------------------------
-TextureVolumePainter::TextureVolumePainter()
+TextureVolumePainter::TextureVolumePainter() :
+	mDepthBuffer(0),
+	mDepthBufferValid(false)
 {
 	mInternals = new vtkInternals();
 }
@@ -389,6 +391,42 @@ void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor
 		mInternals->mElement[i].eachRenderInternal(mInternals->Shader);
 	}
 
+	actor->GetProperty()->SetOpacity(0.5);
+	GLint saveDrawBuffer;
+	glGetIntegerv(GL_DRAW_BUFFER, &saveDrawBuffer);
+	glDrawBuffer(GL_NONE);
+	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
+	glDrawBuffer(saveDrawBuffer);
+	actor->GetProperty()->SetOpacity(1.0);
+
+	if (!mDepthBufferValid && glIsTexture(mDepthBuffer))
+	{
+		glDeleteTextures(1, &mDepthBuffer);
+		mDepthBuffer = 0;
+	}
+	if (!glIsTexture(mDepthBuffer))
+	{
+		glGenTextures(1, &mDepthBuffer);
+		report_gl_error();
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
+		report_gl_error();
+		glTexImage2D(GL_TEXTURE_2D, 0, vtkgl::DEPTH_COMPONENT32, mWidth, mHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		report_gl_error();
+		glTexParameteri(GL_TEXTURE_2D, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
+		glTexParameteri(GL_TEXTURE_2D, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		mDepthBufferValid = true;
+	}
+
+	glActiveTexture(GL_TEXTURE10);
+	glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
+	glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, mWidth, mHeight);
+	report_gl_error();
+	glClear(GL_DEPTH_BUFFER_BIT);
+	int depthTexture = 10;
+	mInternals->Shader->GetUniformVariables()->SetUniformi("depthBuffer", 1, (int*)&depthTexture);
 	mInternals->Shader->Use();
 	report_gl_error();
 
@@ -451,6 +489,11 @@ void TextureVolumePainter::SetColorAttribute(int index, float window, float leve
 
 void TextureVolumePainter::releaseGraphicsResources(int index)
 {
+	if (mDepthBuffer)
+	{
+		glDeleteTextures(1, &mDepthBuffer);
+		mDepthBuffer = 0;
+	}
 }
 
 void TextureVolumePainter::PrintSelf(ostream& os, vtkIndent indent)
@@ -459,8 +502,12 @@ void TextureVolumePainter::PrintSelf(ostream& os, vtkIndent indent)
 
 void TextureVolumePainter::setViewport(float width, float height)
 {
+	if (width != mWidth || height != mHeight)
+	{
+		mDepthBufferValid = false;
+	}
 	mWidth = width;
-	mHeight = height;
+	mHeight = height;	
 }
 
 void TextureVolumePainter::set_nMr(int index, Transform3D nMr)

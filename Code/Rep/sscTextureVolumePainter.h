@@ -82,6 +82,8 @@ protected:
 	QString mFragmentShaderFile;
 	float mWidth;
 	float mHeight;
+	unsigned int mDepthBuffer;
+	bool mDepthBufferValid;
 };
 
 #endif // WIN32
