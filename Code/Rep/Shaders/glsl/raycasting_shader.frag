@@ -15,6 +15,7 @@ uniform float level[4];
 uniform samplerBuffer lut[4];
 uniform float transparency[4];
 uniform mat4 M[4];
+uniform sampler2D depthBuffer;
 
 float applyWindowLevel(float input, float window, float level)
 {
@@ -50,6 +51,14 @@ vec4 blendRGBA(in vec4 a, in vec4 b)
 	return ret;
 }
 
+vec2 depthTexCoords( vec4 fragment, vec2 viewport)
+{
+	vec2 result;
+	result.x = fragment.x/viewport.x;
+	result.y = fragment.y/viewport.y;
+	return result;
+}
+
 void main()
 {
 	vec4 start = gl_TexCoord[1];
@@ -77,7 +86,17 @@ void main()
 	far = gl_ModelViewProjectionMatrixInverse * far;
 	near = near/near.w;
 	far = far/far.w;
-			
+
+	vec2 depthLookup;
+	depthLookup = depthTexCoords(gl_FragCoord, viewport);
+	depthLookup.x = fract(depthLookup.x);
+	depthLookup.y = fract(depthLookup.y); 
+	vec4 depth = texture2D(depthBuffer, depthLookup);
+	if (depth.r*1.01 < gl_FragCoord.z)
+	{
+		discard;
+		return;
+	}
 	rayDirection = far-near;
 	rayDirection = normalize(rayDirection);
 
