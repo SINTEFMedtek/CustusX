@@ -27,6 +27,9 @@
 #include "sscGraphicalPrimitives.h"
 #include "sscViewportListener.h"
 
+class vtkCommand;
+typedef vtkSmartPointer<class vtkCallbackCommand> vtkCallbackCommandPtr;
+
 namespace ssc
 {
 typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
@@ -71,6 +74,7 @@ signals:
 
 public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
+//	void MySlot(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data, vtkCommand* command);
 
 protected slots:
 	void receiveTransforms(Transform3D prMt, double timestamp); ///< receive transforms from the connected tool
@@ -83,6 +87,13 @@ protected:
 	void connectInteractor();
 	void disconnectInteractor();
 	void scaleSphere();
+	static void ProcessEvents(vtkObject* object,
+	                                    unsigned long event,
+	                                    void* clientdata,
+	                                    void* calldata);
+	void OnLeftButtonDown();
+	void OnLeftButtonUp();
+	void OnMouseMove();
 
 	View* mView;
 	bool mEnabled;
@@ -94,6 +105,7 @@ protected:
 
 	ssc::GraphicalPoint3DPtr mGraphicalPoint;
 	ssc::ViewportListenerPtr mViewportListener;
+	vtkCallbackCommandPtr mCallbackCommand;
 };
 
 typedef boost::shared_ptr<PickerRep> PickerRepPtr;
