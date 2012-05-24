@@ -512,7 +512,7 @@ const void *DICOM_raw_image(const struct series_t *series, struct instance_t *in
 int DICOMLib_Verify( struct series_t *series );
 
 /**
- * Exports all DTI volumes from given study
+ * Exports all DTI-series from given study in nifti format incl. bval and bvec files to disc
  **/
 int DICOMLib_WriteNifti( const char *filename, const struct study_t *study );
 
