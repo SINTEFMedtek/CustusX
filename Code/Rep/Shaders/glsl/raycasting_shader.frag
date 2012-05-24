@@ -47,11 +47,13 @@ vec4 blendRGBA(in vec4 a, in vec4 b)
 	return ret;
 }
 
-vec2 viewVolumePosition( vec4 fragment, vec2 viewport)
+vec4 viewVolumePosition( vec4 fragment, vec2 viewport)
 {
-	vec2 result;
-	result.x = 2.0*fragment.x/viewport.x-1.0;
-	result.y = 2.0*fragment.y/viewport.y-1.0;
+	vec4 result;
+	result.x = 2.0*fragment.x/viewport.x - 1.0;
+	result.y = 2.0*fragment.y/viewport.y - 1.0;
+	result.z = 2.0*fragment.z - 1.0;
+	result.w = 1.0;
 	return result;
 }
 
@@ -61,6 +63,29 @@ vec2 depthTexCoords( vec4 fragment, vec2 viewport)
 	result.x = fragment.x/viewport.x;
 	result.y = fragment.y/viewport.y;
 	return result;
+}
+
+vec4 unproject( vec4 viewportPosition, vec2 viewport )
+{
+	vec4 viewVolumePos = viewVolumePosition(viewportPosition, viewport);
+	vec4 worldPosition = gl_ModelViewProjectionMatrixInverse * viewVolumePos;
+	worldPosition /= worldPosition.w;
+	return worldPosition;
+}
+
+vec4 computeRayDirection( vec4 position, vec2 viewport)
+{
+	vec4 near, far;
+	near = position;
+	near.z = 0.0;
+	near = unproject(near, viewport);
+	far = position;
+	far.z = 1.0;
+	far = unproject(far, viewport);
+
+	vec4 rayDirection = far-near;
+	rayDirection = normalize(rayDirection);
+	return rayDirection;
 }
 
 void main()
@@ -88,22 +113,9 @@ void main()
 		discard;
 		return;
 	}
+
+	rayDirection = computeRayDirection(gl_FragCoord, viewport);
 	
-	vec4 near, far;
-	near.xy = viewVolumePosition(gl_FragCoord, viewport);
-	near.z = -1.0;
-	near.w = 1.0;
-	far.xyw = near.xyw;
-	far.z = 1.0;
-	far.w = 1.0;
-	near =  gl_ModelViewProjectionMatrixInverse * near;
-	far = gl_ModelViewProjectionMatrixInverse * far;
-	near = near/near.w;
-	far = far/far.w;
-
-	rayDirection = far-near;
-	rayDirection = normalize(rayDirection);
-
 	vec4 rayDeltaVector = rayDirection * delta;
 	if (renderMode == 5) alphaAccumulator = 1.0;
 
