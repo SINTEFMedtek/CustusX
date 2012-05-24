@@ -78,6 +78,17 @@ void main()
 	gl_FragDepth = 1.0;
 	bool found_depth = false;
 
+	vec2 depthLookup;
+	depthLookup = depthTexCoords(gl_FragCoord, viewport);
+	depthLookup.x = fract(depthLookup.x);
+	depthLookup.y = fract(depthLookup.y); 
+	vec4 depth = texture2D(depthBuffer, depthLookup);
+	if (depth.r*1.01 < gl_FragCoord.z)
+	{
+		discard;
+		return;
+	}
+	
 	vec4 near, far;
 	near.xy = viewVolumePosition(gl_FragCoord, viewport);
 	near.z = -1.0;
@@ -90,16 +101,6 @@ void main()
 	near = near/near.w;
 	far = far/far.w;
 
-	vec2 depthLookup;
-	depthLookup = depthTexCoords(gl_FragCoord, viewport);
-	depthLookup.x = fract(depthLookup.x);
-	depthLookup.y = fract(depthLookup.y); 
-	vec4 depth = texture2D(depthBuffer, depthLookup);
-	if (depth.r*1.01 < gl_FragCoord.z)
-	{
-		discard;
-		return;
-	}
 	rayDirection = far-near;
 	rayDirection = normalize(rayDirection);
 
