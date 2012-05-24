@@ -157,7 +157,6 @@ void main()
 		}
 
 		colorSample /= float(contributingVolumes);
-		alphaSample /= float(contributingVolumes);
 		if (!found_depth)
 		{
 			vec4 depth = gl_ModelViewProjectionMatrix * vect;
