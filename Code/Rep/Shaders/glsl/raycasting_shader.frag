@@ -110,6 +110,7 @@ void main()
 	bool beenHit[4];
 	for(int i = 0; i < 450; i++)
 	{
+		colorSample = vec4(0);
 		int hit = 0;
 		int contributingVolumes = 0;
 		for (int i = 0; i < volumes; ++i)
