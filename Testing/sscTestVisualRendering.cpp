@@ -42,10 +42,7 @@ void TestVisualRendering::setUp()
 {
 	widget = new ViewsWindow("Verify that the volumes are rendered correctly.", false);
 	widget->mDumpSpeedData = false;
-
 	image.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-	//	image.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-	//	image.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	image.push_back("Person5/person5_t2_byte.mhd");
 	image.push_back("Person5/person5_mra_byte.mhd");
 }
@@ -66,16 +63,12 @@ void TestVisualRendering::testInitialize()
 bool TestVisualRendering::runWidget()
 {
 	widget->show();
-
 #ifdef __MACOSX__ // needed on mac for bringing to front: does the opposite on linux
 	widget->activateWindow();
 #endif
 	widget->raise();
-
 	widget->updateRender();
-	int val = qApp->exec();
-
-	return !val && widget->accepted();
+	return !qApp->exec() && widget->accepted();
 }
 
 void TestVisualRendering::testEmptyView()
@@ -87,11 +80,36 @@ void TestVisualRendering::testEmptyView()
 	CPPUNIT_ASSERT(runWidget());
 }
 
+void TestVisualRendering::testEmptyViewContainer()
+{
+	widget->setDescription("Empty view container");
+	ssc::ViewContainer *view = new ssc::ViewContainer(widget->centralWidget());
+	view->setupViews(1, 1);
+	widget->setupViewContainer(view, "dummy", "none", 0, 0);
+
+	CPPUNIT_ASSERT(runWidget());
+}
+
 void TestVisualRendering::test_3D_Tool()
 {
 	widget->setDescription("3D Volume, moving tool");
 	widget->define3D(image[0], 0, 0);
 
+	CPPUNIT_ASSERT(runWidget());
+}
+
+void TestVisualRendering::test_ACS_3D_Tool_Container()
+{
+	widget->mDumpSpeedData = true;
+	ssc::ViewContainer *view = new ssc::ViewContainer(widget->centralWidget());
+	//view->setupViews(1, 1);
+	view->setupViews(1, 1);
+	widget->setDescription("ACS+3D, moving tool in view container");
+	widget->setupViewContainer(view, "dummy", "none", 0, 0);
+	widget->container3D(view, 0, image[0], 1, 1);
+	//widget->containerGPUSlice(view, 1, "A", image[0], ssc::ptAXIAL, 0, 0);
+	//widget->containerGPUSlice(view, 2, "C", image[0], ssc::ptCORONAL, 1, 0);
+	//widget->containerGPUSlice(view, 3, "S", image[0], ssc::ptSAGITTAL, 0, 1);
 	CPPUNIT_ASSERT(runWidget());
 }
 
@@ -134,8 +152,6 @@ void TestVisualRendering::test_ACS_3Volumes_GPU()
 {
 	widget->setDescription("ACS 3 volumes, moving tool, GPU");
 
-//	widget->defineGPUSlice("A", image[0], ssc::ptAXIAL, 0, 0);
-
 	for (unsigned i = 0; i < 3; ++i)
 	{
 		widget->defineGPUSlice("A", image[i], ssc::ptAXIAL, 0, i);
@@ -158,4 +174,3 @@ void TestVisualRendering::test_AnyDual_3Volumes()
 
 	CPPUNIT_ASSERT(runWidget());
 }
-
