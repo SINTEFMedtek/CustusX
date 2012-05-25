@@ -33,7 +33,7 @@ public:
 	CPPUNIT_TEST_SUITE_END();
 private:
 	class ViewsWindow* widget;
-	std::vector<QString> image;
+	QStringList image;
 	bool runWidget();
 };
 
