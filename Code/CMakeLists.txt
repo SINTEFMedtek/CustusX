@@ -150,7 +150,7 @@ elseif(APPLE)
     set( SSC_LIBRARIES ${SSC_LIBRARIES} crypto )
 # needed on linux
 else(WIN32)
-    set( SSC_LIBRARIES ${SSC_LIBRARIES} GLU ssl)
+    set( SSC_LIBRARIES ${SSC_LIBRARIES} GLU crypto ssl)
 endif(WIN32)
 
 # library
