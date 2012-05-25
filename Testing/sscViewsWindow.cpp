@@ -284,14 +284,6 @@ void ViewsWindow::updateRender()
 		camera->SetParallelScale(parallelscale);
 	}
 
-	if (mRenderCount==1)
-	{
-		mTotalRender = 0;
-		mTotalOther = 0;
-		++mRenderCount;
-		return;
-	}
-
 	++mRenderCount;
 	QTime pre = QTime::currentTime();
 	int other = mLastRenderEnd.msecsTo(pre);
@@ -302,19 +294,19 @@ void ViewsWindow::updateRender()
 	mLastRenderEnd = QTime::currentTime();
 
 	int render = pre.msecsTo(mLastRenderEnd);
-	int limit = 30;
+	int limit = 35;
 	mTotalRender += render;
 	mTotalOther += other;
 
 	if (mDumpSpeedData)
 	{
-		if (render+other>limit) // warn if too much time spent rendering.
-		{
-			std::cout << "render: " << render << "/" << other << std::endl;
-		}
 		if (mRenderCount%50==0)
 		{
-			std::cout << "averagerender: " << mTotalRender/mRenderCount << "/" << mTotalOther/mRenderCount << std::endl;
+			std::cout << "averagerender: " << 1.0*mTotalRender/mRenderCount << "/" << 1.0*mTotalOther/mRenderCount << std::endl;
+			std::cout << "fps: " << 1000*(float)mRenderCount/(mTotalRender + mTotalOther) << std::endl;
+			mTotalRender = 0;
+			mTotalOther = 0;
+			mRenderCount = 0;
 		}
 	}
 }
