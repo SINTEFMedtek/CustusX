@@ -513,6 +513,11 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   this->FrameBufferMutex->Unlock();
 }
 
+int vtkSonixVideoSource::IsInitialized()
+{
+	return this->Initialized;
+}
+
 //----------------------------------------------------------------------------
 void vtkSonixVideoSource::Initialize()
 {

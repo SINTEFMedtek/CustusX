@@ -189,6 +189,8 @@ public:
   // first grab is done).
   void Initialize();
 
+  int IsInitialized();
+
   // Description:
   // Free the driver (this is called automatically inside the
   // destructor).
