@@ -258,6 +258,10 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	//  double now = 1.0/1000*(double)QDateTime::currentDateTime().toMSecsSinceEpoch();
 	double grabTime = 1.0 / 1000 * (double) mLastGrabTime.toMSecsSinceEpoch();
 	timestamp->SetTime(grabTime);
+	static QDateTime lastlastGrabTime = mLastGrabTime;
+//	std::cout << "OpenCV stamp:\t" << mLastGrabTime.toString("hh:mm:ss.zzz") << std::endl;
+	std::cout << "OpenCV diff:\t" <<lastlastGrabTime.msecsTo(mLastGrabTime) << "\tdelay:\t" << mLastGrabTime.msecsTo(QDateTime::currentDateTime()) << std::endl;
+	lastlastGrabTime = mLastGrabTime;
 
 	cv::Mat frame;
 	// temporary HACK: all the old probe defs are for 800x600, continue this line for now:

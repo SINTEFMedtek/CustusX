@@ -343,6 +343,18 @@ IGTLinkUSStatusMessage::Pointer IGTLinkClient::getLastSonixStatusMessage()
 
 void IGTLinkClient::readyReadSlot()
 {
+	// read messages until one fails
+	while (this->readOneMessage());
+
+//	readOneMessage();
+}
+
+/**Read one IGTLink message from the socket.
+ * Return false if there was not enough data to
+ * read the entire message.
+ */
+bool IGTLinkClient::readOneMessage()
+{
 
 //  std::cout << "tick " << std::endl;
 
@@ -357,7 +369,7 @@ void IGTLinkClient::readyReadSlot()
 		{
 			//std::cout << "Incomplete heading received, ignoring. " << std::endl;
 			//std::cout << "available: " << mSocket->bytesAvailable() << ", needed " << mHeaderMsg->GetPackSize() << std::endl;
-			return;
+			return false;
 		}
 
 		// after peek: read to increase pos
@@ -401,8 +413,11 @@ void IGTLinkClient::readyReadSlot()
 
 		if (success)
 			mHeadingReceived = false; // restart
+		else
+			return false;
 	}
 //  std::cout << "  tock " << std::endl;
+	return true;
 }
 
 bool IGTLinkClient::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
