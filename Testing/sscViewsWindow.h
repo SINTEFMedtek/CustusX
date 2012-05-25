@@ -8,15 +8,6 @@
 #include "sscSlicerRepSW.h"
 #include "sscAcceptanceBoxWidget.h"
 
-//class SingleLayout
-//{
-//public:
-//	ssc::View* mView;
-//	ssc::SliceProxyPtr mSlicer;         
-//	ssc::SliceRepSWPtr mSliceRep;  ///en vector av slice overlay....
-//};
-
-
 /**Test class  with convenience methods for defining views.
  * Uses the following reps:
  *  - ssc::ToolRep3D
@@ -32,24 +23,29 @@ public:
 	virtual ~ViewsWindow();
 	
 	void setDescription(const QString& desc);
+
+	// create ssc::View-based rendering (will not work with ViewContainers)
 	void define3D(const QString& imageFilename, int r, int c);
 	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	void defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
+
+	// create ssc::ViewContainer-based rendering views (do not mix with above ssc::View-based functions)
+	void container3D(ssc::ViewContainer *widget, int pos, const QString& imageFilename, int r, int c);
+	void containerGPUSlice(ssc::ViewContainer *widget, int pos, const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
+
+	// was test accepted?
 	bool accepted() const { return mAcceptanceBox->accepted(); }
 	
+	// setup views
+	void insertView(ssc::View *view, const QString& uid, const QString& volume, int r, int c);
+	void setupViewContainer(ssc::ViewContainer *view, const QString& uid, const QString& volume, int r, int c);
+
+	/// ugly hack
 	bool mDumpSpeedData;
-	
-	void insertView(ssc::View* view, const QString& uid, const QString& volume, int r, int c);
+
 private:
 	void start(bool showSliders);
-	ssc::View* generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
-	ssc::View* generateGPUSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
 	ssc::ImagePtr loadImage(const QString& imageFilename);
-	ssc::View* getView2D();
-
-//	ssc::Transform3D get_vpMs(ssc::View* view) const;
-//	ssc::DoubleBoundingBox3D getViewport(ssc::View* view) const;
-//	double mmPerPix(ssc::View* view) const;
 
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;
@@ -64,18 +60,14 @@ private:
 	int mTotalRender;
 	int mTotalOther;
 	QTime mLastRenderEnd;
-	ssc::AcceptanceBoxWidget* mAcceptanceBox; 
-	
-	
-	ssc::Texture3DSlicerRepPtr m_test_rep;
-	ssc::View* m_test_view;
+	ssc::AcceptanceBoxWidget* mAcceptanceBox;
 
 public slots:
 	void updateRender();
-	void contrast(int val);
-	void brightness(int val);
+
+	// FIXME - do we need these here??
+	void contrast(int val) {}
+	void brightness(int val) {}
 };
-
-
 
 #endif /*SSCTESTSLICEANDTOOLREP_H_*/
