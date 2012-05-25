@@ -200,20 +200,26 @@ void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 	insertView(view, uid, imageFilename, r, c);
 }
 
-void ViewsWindow::define3DGPU(const QString& imageFilename, int r, int c)
+void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
 {
 	QString uid = "3D";
 	ssc::View* view = new ssc::View(centralWidget());
 	mLayouts.insert(view);
-	
-	ssc::ImagePtr image = loadImage(imageFilename);
+
+	std::vector<ssc::ImagePtr> images;
+
+	QString imageFilename;
+	foreach (imageFilename, imageFilenames)
+	{
+		ssc::ImagePtr image = loadImage(imageFilename);
+		image->getTransferFunctions3D()->setLLR(25.0);
+		images.push_back(image);
+	}
 
 	// volume rep
-	ssc::Texture3DVolumeRepPtr mRepPtr = ssc::Texture3DVolumeRep::New( image->getUid() );
-	std::vector<ssc::ImagePtr> images;
-	images.push_back(image);
+	ssc::Texture3DVolumeRepPtr mRepPtr = ssc::Texture3DVolumeRep::New( images[0]->getUid() );
 	mRepPtr->setImages(images);
-	mRepPtr->setName(image->getName());
+	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);
 	
 	// Tool 3D rep
