@@ -387,28 +387,29 @@ double ViewBase::mmPerPix() const
 
 void ViewContainer::setupViews(int cols, int rows)
 {
-	double w = 0.0;
 	double wf = 1.0 / cols; // width fraction
-	double h = 1.0;
 	double hf = 1.0 / rows; // height fraction
 	mViews.clear();
 	mViews.reserve(cols * rows);
 	QSize grid;
 	grid.setWidth(size().width() / cols);
 	grid.setHeight(size().height() / rows);
-	for (int i = 0; i < cols * rows; i++)
+	for (int c = 0; c < cols; c++)
 	{
-		ViewItemPtr item;
-		item.reset(new ViewItem(this, mRenderWindow));
-		item->setSize(grid);
-		vtkRendererPtr renderer = vtkRendererPtr::New();
-		// Calculate the renderer's viewport
-		renderer->SetViewport(w, h, w + wf, h - hf);
-		mRenderWindow->AddRenderer(renderer);
-		item->setRenderer(renderer);
-		mViews.push_back(item);
-		w += wf + 0.001;
-		h -= hf + 0.001;
+		for (int r = 0; r < rows; r++)
+		{
+			ViewItemPtr item;
+			item.reset(new ViewItem(this, mRenderWindow));
+			item->setSize(grid);
+			vtkRendererPtr renderer = vtkRendererPtr::New();
+			// Calculate the renderer's viewport
+			renderer->SetViewport(wf * c, hf * r, wf * c + wf - 0.01, hf * r + hf - 0.01);
+			mRenderWindow->AddRenderer(renderer);
+			item->setRenderer(renderer);
+			// FIXME, this fucked up:
+			connect(item.get(), SIGNAL(resized(QSize)), this, SIGNAL(resized(QSize)));
+			mViews.push_back(item);
+		}
 	}
 	mCols = cols;
 	mRows = rows;

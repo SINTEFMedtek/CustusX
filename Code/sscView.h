@@ -196,6 +196,9 @@ public:
 	void setupViews(int cols, int rows);
 	void clear();
 
+signals:
+	void resized(QSize size);
+
 protected:
 	QList<ViewItemPtr> mViews;
 	vtkRenderWindowPtr mRenderWindow;
