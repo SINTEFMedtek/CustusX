@@ -30,6 +30,7 @@
 #include <vtkProbeFilter.h>
 #include <vtkSphereSource.h>
 #include <vtkRenderWindow.h>
+#include <vtkCallbackCommand.h>
 #include <vtkPolyDataMapper.h>
 //#include <vtkDataSetAttributes.h>
 #include <vtkEventQtSlotConnect.h>
@@ -57,10 +58,15 @@ PickerRep::PickerRep(const QString& uid, const QString& name) :
 	mViewportListener.reset(new ssc::ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PickerRep::scaleSphere, this));
 
+	  this->mCallbackCommand = vtkCallbackCommandPtr::New();
+	  this->mCallbackCommand->SetClientData(this);
+	  this->mCallbackCommand->SetCallback(PickerRep::ProcessEvents);
+
 	mView = NULL;
 	mEnabled = false;
 	mConnected = false;
 }
+
 
 void PickerRep::scaleSphere()
 {
@@ -164,8 +170,27 @@ Vector3D PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr r
 	return mPickedPoint;
 }
 
+//void PickerRep::MySlot(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data, vtkCommand* command)
+//{
+//	std::cout << "PickerRep::MySlot" << std::endl;
+//	vtkRenderWindowInteractorPtr iren = vtkRenderWindowInteractor::SafeDownCast(caller);
+//
+//	if (iren == NULL)
+//		return;
+//
+////	std::cout << "	PickerRep::MySlot2" << std::endl;
+//	if (command)
+//	{
+////		this->mConnections->a
+////		command->AbortFlagOn();
+//		command->SetAbortFlag(1);
+//		std::cout << "	PickerRep::MySlot " << vtk_event << std::endl;
+//	}
+//}
+
 void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
+	std::cout << "PickerRep::pickLandmarkSlot" << std::endl;
 	vtkRenderWindowInteractorPtr iren = vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
 	if (iren == NULL)
@@ -215,14 +240,74 @@ void PickerRep::setEnabled(bool on)
 	}
 }
 
+void PickerRep::ProcessEvents(vtkObject* vtkNotUsed(object),
+                                    unsigned long event,
+                                    void* clientdata,
+                                    void* vtkNotUsed(calldata))
+{
+	PickerRep* self = reinterpret_cast<PickerRep *>( clientdata );
+
+	//okay, let's do the right thing
+	switch (event)
+	{
+	case vtkCommand::LeftButtonPressEvent:
+		self->OnLeftButtonDown();
+		break;
+	case vtkCommand::LeftButtonReleaseEvent:
+		self->OnLeftButtonUp();
+		break;
+	case vtkCommand::MouseMoveEvent:
+		self->OnMouseMove();
+		break;
+	}
+}
+
+void PickerRep::OnLeftButtonDown()
+{
+	this->pickLandmarkSlot(mView->getRenderWindow()->GetInteractor());
+//	std::cout << "PickerRep::OnLeftButtonDown " << std::endl;
+//	mCallbackCommand->SetAbortFlag(1);
+}
+
+void PickerRep::OnLeftButtonUp()
+{
+//	std::cout << "PickerRep::OnLeftButtonUp "  << std::endl;
+//	mCallbackCommand->SetAbortFlag(1);
+
+}
+
+void PickerRep::OnMouseMove()
+{
+//	std::cout << "PickerRep::OnMouseMove " << std::endl;
+//	mCallbackCommand->SetAbortFlag(1);
+
+}
+
 void PickerRep::connectInteractor()
 {
 	if (!mView)
 		return;
 	if (mConnected)
 		return;
-	mConnections->Connect(mView->getRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
-		SLOT(pickLandmarkSlot(vtkObject*)));
+    vtkRenderWindowInteractorPtr i = mView->getRenderWindow()->GetInteractor();
+    i->AddObserver(vtkCommand::MouseMoveEvent, this->mCallbackCommand, 1.0);
+    i->AddObserver(vtkCommand::LeftButtonPressEvent, this->mCallbackCommand, 1.0);
+    i->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->mCallbackCommand, 1.0);
+
+//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
+//		SLOT(pickLandmarkSlot(vtkObject*)), NULL, 1.0);
+//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonReleaseEvent, this,
+//		SLOT(pickLandmarkSlot(vtkObject*)), NULL, 1.0);
+//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::MouseMoveEvent, this,
+//		SLOT(pickLandmarkSlot(vtkObject*)), NULL, 1.0);
+
+//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonReleaseEvent, this,
+//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
+//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*, NULL, 1.0)));
+//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::MouseMoveEvent, this,
+//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+
 	mConnected = true;
 }
 
@@ -232,8 +317,18 @@ void PickerRep::disconnectInteractor()
 		return;
 	if (!mConnected)
 		return;
-	mConnections->Disconnect(mView->getRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
-		SLOT(pickLandmarkSlot(vtkObject*)));
+    // don't listen for events any more
+	mView->getRenderWindow()->GetInteractor()->RemoveObserver(this->mCallbackCommand);
+//	mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
+//		SLOT(pickLandmarkSlot(vtkObject*)));
+//
+//	mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
+//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*)));
+//	mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::MouseMoveEvent, this,
+//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*)));
+//	mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonReleaseEvent, this,
+//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*)));
+
 	mConnected = false;
 }
 

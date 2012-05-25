@@ -80,6 +80,14 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
     target_link_libraries( TestMeshDMGeoRepView SSC )	
     #add_test(TestMeshDMGeoRepView TestMeshDMGeoRepView)
     
+    # test fiber bundle rep
+    # - ssc::FiberBundle
+    # - ssc::FiberBundleRep
+    add_executable(TestFiberBundleRep sscTestFiberBundleRep.cpp)
+    target_link_libraries( TestFiberBundleRep SSC )	
+    set_target_properties(TestFiberBundleRep PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
+    add_test(TestFiberBundleRep TestFiberBundleRep)
+
     # currently disabled
     # tested class is not in use. 
     #add_executable(TestSliceRep MACOSX_BUNDLE sscTestSliceRep.cpp)

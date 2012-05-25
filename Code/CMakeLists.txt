@@ -46,6 +46,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
     Data/sscPresetTransferFunctions3D.h
+    Data/sscFiberBundle.h
     Video/sscVideoSource.h
     Video/sscVideoRecorder.h
     Video/sscVideoSourceSHM.h
@@ -81,6 +82,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscOrientationAnnotationRep.h
     Rep/sscVideoRep.h
     Rep/sscToolTracer.h
+    Rep/sscFiberBundleRep.h
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
     Widgets/sscStringDataAdapter.h
@@ -148,7 +150,7 @@ elseif(APPLE)
     set( SSC_LIBRARIES ${SSC_LIBRARIES} crypto )
 # needed on linux
 else(WIN32)
-    set( SSC_LIBRARIES ${SSC_LIBRARIES} GLU ssl)
+    set( SSC_LIBRARIES ${SSC_LIBRARIES} GLU crypto ssl)
 endif(WIN32)
 
 # library
@@ -277,6 +279,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscUltrasoundSectorSource.cpp
     Rep/sscToolTracer.h
     Rep/sscToolTracer.cpp
+    Rep/sscFiberBundleRep.h
+    Rep/sscFiberBundleRep.cpp
     
     Data/sscLandmark.h
     Data/sscLandmark.cpp
@@ -306,6 +310,8 @@ SET( SSC_SOURCE_FILES
     Data/sscRegistrationTransform.h
     Data/sscPresetTransferFunctions3D.h
     Data/sscPresetTransferFunctions3D.cpp
+    Data/sscFiberBundle.h
+    Data/sscFiberBundle.cpp
     
     Video/sscVideoSource.h
     Video/sscVideoRecorder.h
