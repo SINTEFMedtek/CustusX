@@ -23,6 +23,75 @@
 namespace ssc
 {
 
+GraphicalPolyData3D::GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source, vtkRendererPtr renderer)
+{
+	mMapper = vtkPolyDataMapperPtr::New();
+
+	mActor = vtkActorPtr::New();
+	mActor->SetMapper(mMapper);
+
+	this->setSource(source);
+	this->setRenderer(renderer);
+}
+
+void GraphicalPolyData3D::setSource(vtkPolyDataAlgorithmPtr source)
+{
+	mSource = source;
+	mMapper->SetInputConnection(mSource->GetOutputPort());
+}
+
+GraphicalPolyData3D::~GraphicalPolyData3D()
+{
+	this->setRenderer(NULL);
+}
+
+void GraphicalPolyData3D::setRenderer(vtkRendererPtr renderer)
+{
+	if (mRenderer)
+		mRenderer->RemoveActor(mActor);
+
+	mRenderer = renderer;
+
+	if (mRenderer)
+		mRenderer->AddActor(mActor);
+}
+
+
+void GraphicalPolyData3D::setColor(Vector3D color)
+{
+	mActor->GetProperty()->SetColor(color.begin());
+}
+
+void GraphicalPolyData3D::setPosition(Vector3D point)
+{
+	mActor->SetPosition(point.begin());
+}
+
+Vector3D GraphicalPolyData3D::getPosition() const
+{
+	return Vector3D(mActor->GetPosition());
+}
+
+vtkActorPtr GraphicalPolyData3D::getActor()
+{
+	return mActor;
+}
+
+vtkPolyDataPtr GraphicalPolyData3D::getPolyData()
+{
+	return mSource->GetOutput();
+}
+
+vtkPolyDataAlgorithmPtr GraphicalPolyData3D::getSource()
+{
+	return mSource;
+}
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
 GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 {
 //	mRenderer = renderer;
@@ -34,7 +103,7 @@ GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 	// 24*16 = 384, 8*8=64, 16*12=192
 	source->SetThetaResolution(16);
   source->SetPhiResolution(12);
-
+  source->LatLongTessellationOn();
 	mapper = vtkPolyDataMapperPtr::New();
 	mapper->SetInputConnection(source->GetOutputPort());
 
@@ -87,6 +156,11 @@ Vector3D GraphicalPoint3D::getValue() const
 vtkActorPtr GraphicalPoint3D::getActor()
 {
 	return actor;
+}
+
+vtkPolyDataPtr GraphicalPoint3D::getPolyData()
+{
+	return source->GetOutput();
 }
 
 

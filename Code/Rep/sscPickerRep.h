@@ -63,8 +63,9 @@ public:
 	void setTool(ToolPtr tool); ///< set the tool to listen to
 
 	void setEnabled(bool on);
+	void setGlyph(vtkPolyDataAlgorithmPtr glyph);
 
-	Vector3D pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
+	void pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
 	Vector3D getPosition() const;
 	void setSphereRadius(double radius);
 
@@ -94,6 +95,9 @@ protected:
 	void OnLeftButtonDown();
 	void OnLeftButtonUp();
 	void OnMouseMove();
+	Vector3D getDisplacement();
+	Vector3D ComputeDisplayToWorld(Vector3D p_d);
+	Vector3D ComputeWorldToDisplay(Vector3D p_w);
 
 	View* mView;
 	bool mEnabled;
@@ -101,7 +105,10 @@ protected:
 	ToolPtr mTool; ///< the connected tool
 	Vector3D mPickedPoint; ///< the last point that was successfully sampled from intersection with an image
 	double mSphereRadius;
-	vtkEventQtSlotConnectPtr mConnections; ///< used to sending signals and events between vtk and qt
+	ssc::GraphicalPolyData3DPtr mGlyph;
+//	vtkEventQtSlotConnectPtr mConnections; ///< used to sending signals and events between vtk and qt
+	Vector3D mClickedPoint;
+	bool mIsDragging;
 
 	ssc::GraphicalPoint3DPtr mGraphicalPoint;
 	ssc::ViewportListenerPtr mViewportListener;
