@@ -53,20 +53,20 @@ PickerRepPtr PickerRep::New(const QString& uid, const QString& name)
 	return retval;
 }
 PickerRep::PickerRep(const QString& uid, const QString& name) :
-	RepImpl(uid, name), mPickedPoint(), mSphereRadius(2), mConnections(vtkEventQtSlotConnectPtr::New())
+		RepImpl(uid, name), mPickedPoint(), mSphereRadius(2) //, mConnections(vtkEventQtSlotConnectPtr::New())
 {
+	mIsDragging = false;
 	mViewportListener.reset(new ssc::ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PickerRep::scaleSphere, this));
 
-	  this->mCallbackCommand = vtkCallbackCommandPtr::New();
-	  this->mCallbackCommand->SetClientData(this);
-	  this->mCallbackCommand->SetCallback(PickerRep::ProcessEvents);
+	this->mCallbackCommand = vtkCallbackCommandPtr::New();
+	this->mCallbackCommand->SetClientData(this);
+	this->mCallbackCommand->SetCallback(PickerRep::ProcessEvents);
 
 	mView = NULL;
 	mEnabled = false;
 	mConnected = false;
 }
-
 
 void PickerRep::scaleSphere()
 {
@@ -76,6 +76,7 @@ void PickerRep::scaleSphere()
 	double size = mViewportListener->getVpnZoom();
 	double sphereSize = mSphereRadius / 100 / size;
 	mGraphicalPoint->setRadius(sphereSize);
+//	mGraphicalPoint->getActor()->GetProperty()->SetRepresentationToWireframe();
 }
 
 PickerRep::~PickerRep()
@@ -101,7 +102,7 @@ void PickerRep::setTool(ToolPtr tool)
 	if (mTool)
 	{
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-			SLOT(receiveTransforms(Transform3D, double)));
+				SLOT(receiveTransforms(Transform3D, double)));
 	}
 
 	mTool = tool;
@@ -111,13 +112,28 @@ void PickerRep::setTool(ToolPtr tool)
 		receiveTransforms(mTool->get_prMt(), 0);
 
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-			SLOT(receiveTransforms(Transform3D, double)));
+				SLOT(receiveTransforms(Transform3D, double)));
 	}
+}
+
+void PickerRep::setGlyph(vtkPolyDataAlgorithmPtr glyph)
+{
+	return; // ignore glyph stuff for now..
+	 mGlyph.reset(new ssc::GraphicalPolyData3D(glyph));
+//	 mGlyph->getActor()->GetProperty()->SetRepresentationToWireframe();
+	 mGlyph->getActor()->SetVisibility(false);
+
+	 if (mView)
+		mGlyph->setRenderer(mView->getRenderer());
+
+//	mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
+//	mGraphicalPoint->setColor(ssc::Vector3D(0, 0, 1));
+//	mGraphicalPoint->setRadius(mSphereRadius);
+//	mGraphicalPoint->getActor()->SetVisibility(false);
 }
 
 typedef vtkSmartPointer<class vtkVolumePicker> vtkVolumePickerPtr;
 typedef vtkSmartPointer<class vtkDataSet> vtkDataSetPtr;
-
 
 /**
  * Trace a ray from clickPosition along the camera view direction and intersect
@@ -126,13 +142,15 @@ typedef vtkSmartPointer<class vtkDataSet> vtkDataSetPtr;
  * \param[in] renderer the renderer from which to get the camera
  * \return the point where the ray intersects the image
  */
-Vector3D PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
+void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
 	vtkVolumePickerPtr picker = vtkVolumePickerPtr::New();
+//	std::cout << "pixel pos " << clickPosition << std::endl;
 // default values:
 //	picker->SetVolumeOpacityIsovalue(0.05);
 //	picker->SetTolerance(1.0E-6);
 	int hit = picker->Pick(clickPosition[0], clickPosition[1], 0, renderer);
+//	std::cout << "  pick pos  " << clickPosition << std::endl;
 
 	// search for picked data in manager, emit uid if found.
 	vtkDataSetPtr data = picker->GetDataSet();
@@ -143,54 +161,55 @@ Vector3D PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr r
 //		std::cout << "looking for " << data.GetPointer() << std::endl;
 
 		std::map<QString, DataPtr> allData = ssc::dataManager()->getData();
-		for (std::map<QString, DataPtr>::iterator iter=allData.begin(); iter!=allData.end(); ++iter)
+		for (std::map<QString, DataPtr>::iterator iter = allData.begin(); iter != allData.end(); ++iter)
 		{
 			ssc::MeshPtr mesh = boost::shared_dynamic_cast<ssc::Mesh>(iter->second);
-			if (mesh && mesh->getVtkPolyData()==data)
+			if (mesh && mesh->getVtkPolyData() == data)
 				emit dataPicked(iter->first);
 
 			ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(iter->second);
 //			if (image)
 //				std::cout << "  checking " << image->getBaseVtkImageData().GetPointer() << std::endl;
-			if (image && image->getBaseVtkImageData()==data)
+			if (image && image->getBaseVtkImageData() == data)
 				emit dataPicked(iter->first);
 		}
 	}
-//	picker->Print(std::cout);
+//	data->Print(std::cout);
+//	std::cout << "  hit: " << data.GetPointer() << std::endl;
+//	std::cout << "  pt : " << mGraphicalPoint->getPolyData().GetPointer() << std::endl;
 	ssc::Vector3D pick_w(picker->GetPickPosition());
+
+	if (data == mGraphicalPoint->getPolyData() || (mGlyph && data==(mGlyph->getPolyData())))
+	{
+		// We have clicked the picker/tool itself.
+		// Store click pos and wait for dragging.
+		mClickedPoint = clickPosition;
+		mIsDragging = true;
+		mCallbackCommand->SetAbortFlag(1); // abort this event: interactor does not receive it.
+		return;
+	}
+	else
+	{
+		mIsDragging = false;
+	}
+
 	mPickedPoint = pick_w;
 
 	if (!hit)
-		return pick_w;
+		return;
 
 	if (mGraphicalPoint)
 		mGraphicalPoint->setValue(mPickedPoint);
+	if (mGlyph)
+		mGlyph->setPosition(mPickedPoint);
 
 	emit pointPicked(mPickedPoint);
-	return mPickedPoint;
+//	return mPickedPoint;
 }
-
-//void PickerRep::MySlot(vtkObject* caller, unsigned long vtk_event, void* client_data, void* call_data, vtkCommand* command)
-//{
-//	std::cout << "PickerRep::MySlot" << std::endl;
-//	vtkRenderWindowInteractorPtr iren = vtkRenderWindowInteractor::SafeDownCast(caller);
-//
-//	if (iren == NULL)
-//		return;
-//
-////	std::cout << "	PickerRep::MySlot2" << std::endl;
-//	if (command)
-//	{
-////		this->mConnections->a
-////		command->AbortFlagOn();
-//		command->SetAbortFlag(1);
-//		std::cout << "	PickerRep::MySlot " << vtk_event << std::endl;
-//	}
-//}
 
 void PickerRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
-	std::cout << "PickerRep::pickLandmarkSlot" << std::endl;
+//	std::cout << "PickerRep::pickLandmarkSlot" << std::endl;
 	vtkRenderWindowInteractorPtr iren = vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
 	if (iren == NULL)
@@ -216,6 +235,8 @@ void PickerRep::receiveTransforms(Transform3D prMt, double timestamp)
 	mPickedPoint = p_r;
 	if (mGraphicalPoint)
 		mGraphicalPoint->setValue(mPickedPoint);
+	if (mGlyph)
+		mGlyph->setPosition(mPickedPoint);
 
 }
 
@@ -231,21 +252,26 @@ void PickerRep::setEnabled(bool on)
 		this->connectInteractor();
 		if (mGraphicalPoint)
 			mGraphicalPoint->getActor()->SetVisibility(true);
+		if (mGlyph)
+		{
+			mGlyph->getActor()->SetVisibility(true);
+			std::cout << "show glyph" << std::endl;
+		}
 	}
 	else
 	{
 		this->disconnectInteractor();
 		if (mGraphicalPoint)
 			mGraphicalPoint->getActor()->SetVisibility(false);
+		if (mGlyph)
+			mGlyph->getActor()->SetVisibility(false);
 	}
 }
 
-void PickerRep::ProcessEvents(vtkObject* vtkNotUsed(object),
-                                    unsigned long event,
-                                    void* clientdata,
-                                    void* vtkNotUsed(calldata))
+void PickerRep::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long event, void* clientdata,
+		void* vtkNotUsed(calldata))
 {
-	PickerRep* self = reinterpret_cast<PickerRep *>( clientdata );
+	PickerRep* self = reinterpret_cast<PickerRep *>(clientdata);
 
 	//okay, let's do the right thing
 	switch (event)
@@ -262,25 +288,95 @@ void PickerRep::ProcessEvents(vtkObject* vtkNotUsed(object),
 	}
 }
 
+/**Convert a point in display to world.
+ * Based on method in vtkInteractorObserver
+ */
+Vector3D PickerRep::ComputeDisplayToWorld(Vector3D p_d)
+{
+	double worldPt[4];
+	vtkRendererPtr ren = mView->getRenderer();
+	ren->SetDisplayPoint(p_d.data());
+	ren->DisplayToWorld();
+	ren->GetWorldPoint(worldPt);
+	return Vector3D(worldPt)/worldPt[3];
+}
+
+/**Convert a point in world to display
+ * Based on method in vtkInteractorObserver
+ */
+Vector3D PickerRep::ComputeWorldToDisplay(Vector3D p_w)
+{
+	Vector3D p_d;
+	vtkRendererPtr ren = mView->getRenderer();
+	ren->SetWorldPoint(p_w[0], p_w[1], p_w[2], 1.0);
+	ren->WorldToDisplay();
+	ren->GetDisplayPoint(p_d.data());
+	return p_d;
+}
+
+/** Get the displacement in the view plane since last event.
+ */
+Vector3D PickerRep::getDisplacement()
+{
+	vtkRenderWindowInteractorPtr interactor = mView->getRenderWindow()->GetInteractor();
+
+	Transform3D vpMw = mView->get_vpMs();
+
+	// find focal point in vp:
+	Vector3D focalPoint;
+	vtkCameraPtr camera = mView->getRenderer()->GetActiveCamera();
+	camera->GetFocalPoint(focalPoint.data());
+	Vector3D focalPoint_vp = this->ComputeWorldToDisplay(focalPoint);
+
+	// find previous pos in world:
+	Vector3D p_prev(interactor->GetLastEventPosition()[0], interactor->GetLastEventPosition()[1], focalPoint_vp[2]);
+//	std::cout << "  p_prev_vp = \t" << p_prev << std::endl;
+	p_prev = this->ComputeDisplayToWorld(p_prev);
+//	std::cout << "  p_prev_w  = \t" << p_prev << std::endl;
+
+	// find current pos in world:
+	Vector3D p_current(interactor->GetEventPosition()[0], interactor->GetEventPosition()[1], focalPoint_vp[2]);
+//	std::cout << "  p_curre_vp = \t" << p_current << std::endl;
+	p_current = this->ComputeDisplayToWorld(p_current);
+//	std::cout << "  p_curre_w  = \t" << p_current << std::endl;
+
+	// both positions are now in the camera focal plane: the diff lies in the view plane.
+	std::cout << "  diff   = \t" << p_current - p_prev << std::endl;
+	return p_current - p_prev;
+}
+
 void PickerRep::OnLeftButtonDown()
 {
-    this->pickLandmarkSlot(mView->GetRenderWindow()->GetInteractor());
+	this->pickLandmarkSlot(mView->GetRenderWindow()->GetInteractor());
 //	std::cout << "PickerRep::OnLeftButtonDown " << std::endl;
 //	mCallbackCommand->SetAbortFlag(1);
 }
 
-void PickerRep::OnLeftButtonUp()
-{
-//	std::cout << "PickerRep::OnLeftButtonUp "  << std::endl;
-//	mCallbackCommand->SetAbortFlag(1);
-
-}
-
 void PickerRep::OnMouseMove()
 {
-//	std::cout << "PickerRep::OnMouseMove " << std::endl;
-//	mCallbackCommand->SetAbortFlag(1);
+	if (mIsDragging)
+	{
+		std::cout << "PickerRep::OnMouseMove " << std::endl;
 
+		mPickedPoint += this->getDisplacement();
+		if (mGraphicalPoint)
+			mGraphicalPoint->setValue(mPickedPoint);
+		if (mGlyph)
+			mGlyph->setPosition(mPickedPoint);
+		emit pointPicked(mPickedPoint);
+
+		mCallbackCommand->SetAbortFlag(1);
+	}
+}
+
+void PickerRep::OnLeftButtonUp()
+{
+	if (mIsDragging)
+	{
+		std::cout << "PickerRep::OnLeftButtonUp " << std::endl;
+		mIsDragging = false;
+		mCallbackCommand->SetAbortFlag(1); // abort this event: interactor does not receive it.
+	}
 }
 
 void PickerRep::connectInteractor()
@@ -290,24 +386,10 @@ void PickerRep::connectInteractor()
 	if (mConnected)
 		return;
 
-    vtkRenderWindowInteractorPtr i = mView->GetRenderWindow()->GetInteractor();
-    i->AddObserver(vtkCommand::MouseMoveEvent, this->mCallbackCommand, 1.0);
-    i->AddObserver(vtkCommand::LeftButtonPressEvent, this->mCallbackCommand, 1.0);
-    i->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->mCallbackCommand, 1.0);
-
-//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
-//		SLOT(pickLandmarkSlot(vtkObject*)), NULL, 1.0);
-//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonReleaseEvent, this,
-//		SLOT(pickLandmarkSlot(vtkObject*)), NULL, 1.0);
-//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::MouseMoveEvent, this,
-//		SLOT(pickLandmarkSlot(vtkObject*)), NULL, 1.0);
-
-//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonReleaseEvent, this,
-//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
-//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
-//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*, NULL, 1.0)));
-//	mConnections->Connect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::MouseMoveEvent, this,
-//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*)), NULL, 1.0);
+	vtkRenderWindowInteractorPtr i = mView->GetRenderWindow()->GetInteractor();
+	i->AddObserver(vtkCommand::MouseMoveEvent, this->mCallbackCommand, 1.0);
+	i->AddObserver(vtkCommand::LeftButtonPressEvent, this->mCallbackCommand, 1.0);
+	i->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->mCallbackCommand, 1.0);
 
 	mConnected = true;
 }
@@ -319,17 +401,8 @@ void PickerRep::disconnectInteractor()
 	if (!mConnected)
 		return;
 
-    // don't listen for events any more
+	// don't listen for events any more
 	mView->GetRenderWindow()->GetInteractor()->RemoveObserver(this->mCallbackCommand);
-//	mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
-//		SLOT(pickLandmarkSlot(vtkObject*)));
-//
-//	mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonPressEvent, this,
-//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*)));
-//	mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::MouseMoveEvent, this,
-//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*)));
-//	mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(), vtkCommand::LeftButtonReleaseEvent, this,
-//		SLOT(MySlot(vtkObject*, unsigned long, void*, void*, vtkCommand*)));
 
 	mConnected = false;
 }
@@ -352,6 +425,9 @@ void PickerRep::addRepActorsToViewRenderer(View* view)
 	mGraphicalPoint->setRadius(mSphereRadius);
 	mGraphicalPoint->getActor()->SetVisibility(false);
 
+	if (mGlyph)
+		mGlyph->setRenderer(mView->getRenderer());
+
 	mViewportListener->startListen(mView->getRenderer());
 	this->scaleSphere();
 }
@@ -364,6 +440,8 @@ void PickerRep::removeRepActorsFromViewRenderer(View* view)
 	this->disconnectInteractor();
 	mViewportListener->stopListen();
 	mGraphicalPoint.reset();
+	if (mGlyph)
+		mGlyph->setRenderer(NULL);
 	mView = NULL;
 }
 
@@ -384,4 +462,4 @@ Vector3D PickerRep::getPosition() const
 	return mPickedPoint;
 }
 
-}//namespace ssc
+} //namespace ssc

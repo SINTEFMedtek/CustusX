@@ -5,7 +5,9 @@
 #include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
 #include "sscViewportListener.h"
+#include <vtkPolyDataAlgorithm.h>
 
+typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 typedef vtkSmartPointer<class vtkArcSource> vtkArcSourcePtr;
 typedef vtkSmartPointer<class vtkArrowSource> vtkArrowSourcePtr;
 
@@ -16,6 +18,34 @@ namespace ssc
  * \addtogroup sscUtility
  * @{
  */
+
+/** \brief Helper for rendering a a polydata in 3D
+ */
+class GraphicalPolyData3D
+{
+public:
+	GraphicalPolyData3D(
+			vtkPolyDataAlgorithmPtr source = vtkPolyDataAlgorithmPtr(),
+			vtkRendererPtr renderer = vtkRendererPtr());
+	void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
+	void setSource(vtkPolyDataAlgorithmPtr source);
+	~GraphicalPolyData3D();
+	void setColor(Vector3D color);
+	void setPosition(Vector3D point);
+	Vector3D getPosition() const;
+
+	vtkActorPtr getActor();
+	vtkPolyDataPtr getPolyData();
+	vtkPolyDataAlgorithmPtr getSource();
+
+private:
+	vtkPolyDataAlgorithmPtr mSource;
+	vtkPolyDataMapperPtr mMapper;
+	vtkActorPtr mActor;
+	vtkRendererPtr mRenderer;
+};
+typedef boost::shared_ptr<GraphicalPolyData3D> GraphicalPolyData3DPtr;
+
 
 /** \brief Helper for rendering a point in 3D
  */
@@ -30,6 +60,8 @@ class GraphicalPoint3D
 		void setValue(Vector3D point);
 		Vector3D getValue() const;
 		vtkActorPtr getActor();
+		vtkPolyDataPtr getPolyData();
+
 	private:
 		vtkSphereSourcePtr source;
 		vtkPolyDataMapperPtr mapper;
