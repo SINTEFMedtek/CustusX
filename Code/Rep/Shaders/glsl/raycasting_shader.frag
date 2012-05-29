@@ -126,6 +126,10 @@ void main()
 	if (renderMode == 5) alphaAccumulator = 1.0;
 
 	bool beenHit[4];
+	for (int j = 0; j < volumes; ++j)
+	{
+		beenHit[j] = false;
+	}
 	for(int i = 0; i < maxIterations; i++)
 	{
 		colorSample = vec4(0);
