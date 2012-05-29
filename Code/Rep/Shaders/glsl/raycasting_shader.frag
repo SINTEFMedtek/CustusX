@@ -189,9 +189,8 @@ void main()
 
 		if (renderMode == 0) // Accumulated average (compositing)
 		{
-			alphaSample = colorSample.a * stepsize;
-			colorAccumulator += (1.0 - alphaAccumulator) * colorSample * alphaSample;
-			alphaAccumulator += (1.0 - alphaAccumulator) * alphaSample;
+			colorAccumulator = blendRGBA(colorAccumulator, colorSample);
+			alphaAccumulator = colorAccumulator.a;
 		}
 
 		if (renderMode == 1) // Maximum intensity
