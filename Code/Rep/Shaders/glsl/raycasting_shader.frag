@@ -74,6 +74,11 @@ vec4 unproject( vec4 viewportPosition, vec2 viewport )
 	return worldPosition;
 }
 
+bool inUnitCube( vec4 pos)
+{
+	return !(any(greaterThan(pos.xyz, vec3(1))) || any(lessThan(pos.xyz, vec3(0))));
+}
+
 vec4 computeRayDirection( vec4 position, vec2 viewport)
 {
 	vec4 near, far;
@@ -128,7 +133,7 @@ void main()
 		int contributingVolumes = 0;
 		for (int i = 0; i < volumes; ++i)
 		{
-			if (!(any(greaterThan((M[i]*vect).xyz, vec3(1, 1, 1))) || any(lessThan((M[i]*vect).xyz, vec3(0, 0, 0)))))
+			if (inUnitCube(M[i]*vect))
 			{
 				beenHit[i] = true;
 				++hit;
