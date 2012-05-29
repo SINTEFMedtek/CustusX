@@ -3,6 +3,7 @@
 #pragma debug(on)
 
 const int volumes=${NUMBER_OF_VOLUMES};
+const int maxIterations = 450;
 uniform float stepsize;
 uniform vec2 viewport;
 
@@ -120,7 +121,7 @@ void main()
 	if (renderMode == 5) alphaAccumulator = 1.0;
 
 	bool beenHit[4];
-	for(int i = 0; i < 450; i++)
+	for(int i = 0; i < maxIterations; i++)
 	{
 		colorSample = vec4(0);
 		int hit = 0;
