@@ -102,14 +102,13 @@ void TestVisualRendering::test_ACS_3D_Tool_Container()
 {
 	widget->mDumpSpeedData = true;
 	ssc::ViewContainer *view = new ssc::ViewContainer(widget->centralWidget());
-	//view->setupViews(1, 1);
-	view->setupViews(1, 1);
+	view->setupViews(2, 2);
 	widget->setDescription("ACS+3D, moving tool in view container");
 	widget->setupViewContainer(view, "dummy", "none", 0, 0);
-	widget->container3D(view, 0, image[0], 1, 1);
-	//widget->containerGPUSlice(view, 1, "A", image[0], ssc::ptAXIAL, 0, 0);
-	//widget->containerGPUSlice(view, 2, "C", image[0], ssc::ptCORONAL, 1, 0);
-	//widget->containerGPUSlice(view, 3, "S", image[0], ssc::ptSAGITTAL, 0, 1);
+	widget->container3D(view, 2, image[0]);
+	widget->containerGPUSlice(view, 1, "A", image[0], ssc::ptAXIAL);
+	widget->containerGPUSlice(view, 0, "C", image[0], ssc::ptCORONAL);
+	widget->containerGPUSlice(view, 3, "S", image[0], ssc::ptSAGITTAL);
 	CPPUNIT_ASSERT(runWidget());
 }
 

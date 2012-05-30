@@ -54,8 +54,9 @@ namespace ssc
 {
 
 // set zoom to negative value to signify invalid
-ViewBase::ViewBase(QWidget *parent, const QString& uid, const QString& name) : mZoomFactor(-1.0)
+ViewBase::ViewBase(QWidget *parent, QSize size, const QString& uid, const QString& name) : mZoomFactor(-1.0)
 {
+	mSize = size;
 	mMTimeHash = 0;
 	mBackgroundColor = QColor("black");
 	mParent = parent;
@@ -69,7 +70,7 @@ ViewBase::~ViewBase()
 
 View::View(QWidget *parent, Qt::WFlags f) :
 	   widget(parent, f),
-	   ViewBase(this),
+	   ViewBase(this, this->size()),
 	   mRenderWindow(ViewRenderWindowPtr::New())
 {
 	this->SetRenderWindow(mRenderWindow);
@@ -78,7 +79,7 @@ View::View(QWidget *parent, Qt::WFlags f) :
 
 View::View(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
 	   widget(parent, f),
-	   ViewBase(this, uid, name),
+	   ViewBase(this, this->size(), uid, name),
 	   mRenderWindow(ViewRenderWindowPtr::New())
 {
 	this->SetRenderWindow(mRenderWindow);
@@ -303,6 +304,8 @@ void View::showEvent(QShowEvent* event)
 
 void ViewBase::render()
 {
+	// FIXME, this does not appear to be in use...
+#if 0
 	// Render is called only when mtime is changed.
 	// At least on MaxOS, this is not done automatically.
 	unsigned long hash = 0;
@@ -326,6 +329,7 @@ void ViewBase::render()
 		this->getRenderWindow()->Render();
 		mMTimeHash = hash;
 	}
+#endif
 }
 
 void View::setZoomFactor(double factor)
@@ -372,8 +376,7 @@ Transform3D ViewBase::get_vpMs() const
  */
 ssc::DoubleBoundingBox3D ViewBase::getViewport() const
 {
-	QSize size = mParent->size();
-	return ssc::DoubleBoundingBox3D(0, size.width(), 0, size.height(), 0, 0);
+	return ssc::DoubleBoundingBox3D(0, mSize.width(), 0, mSize.height(), 0, 0);
 }
 
 double ViewBase::mmPerPix() const
@@ -399,15 +402,12 @@ void ViewContainer::setupViews(int cols, int rows)
 		for (int r = 0; r < rows; r++)
 		{
 			ViewItemPtr item;
-			item.reset(new ViewItem(this, mRenderWindow));
-			item->setSize(grid);
+			item.reset(new ViewItem(this, mRenderWindow, grid));
 			vtkRendererPtr renderer = vtkRendererPtr::New();
 			// Calculate the renderer's viewport
 			renderer->SetViewport(wf * c, hf * r, wf * c + wf - 0.01, hf * r + hf - 0.01);
 			mRenderWindow->AddRenderer(renderer);
 			item->setRenderer(renderer);
-			// FIXME, this fucked up:
-			connect(item.get(), SIGNAL(resized(QSize)), this, SIGNAL(resized(QSize)));
 			mViews.push_back(item);
 		}
 	}
@@ -424,6 +424,66 @@ void ViewItem::setRenderer(vtkRendererPtr renderer)
 ViewItemPtr ViewContainer::getView(int view)
 {
 	return mViews[view];
+}
+
+void ViewContainer::mouseMoveEvent(QMouseEvent* event)
+{
+	widget::mouseMoveEvent(event);
+	emit mouseMoveSignal(event);
+}
+
+void ViewContainer::mousePressEvent(QMouseEvent* event)
+{
+	// special case for CustusX: when context menu is opened, mousereleaseevent is never called.
+	// this sets the render interactor in a zoom state after each menu call. This hack prevents
+	// the mouse press event in this case.
+	if ((this->contextMenuPolicy() == Qt::CustomContextMenu) && event->buttons().testFlag(Qt::RightButton))
+		return;
+
+	widget::mousePressEvent(event);
+	emit mousePressSignal(event);
+}
+
+void ViewContainer::mouseReleaseEvent(QMouseEvent* event)
+{
+	widget::mouseReleaseEvent(event);
+	emit mouseReleaseSignal(event);
+}
+
+void ViewContainer::focusInEvent(QFocusEvent* event)
+{
+	widget::focusInEvent(event);
+	emit focusInSignal(event);
+}
+
+void ViewContainer::wheelEvent(QWheelEvent* event)
+{
+	widget::wheelEvent(event);
+	emit mouseWheelSignal(event);
+}
+
+void ViewContainer::showEvent(QShowEvent* event)
+{
+	widget::showEvent(event);
+	emit showSignal(event);
+}
+
+void ViewContainer::resizeEvent(QResizeEvent *event)
+{
+	QSize grid;
+	grid.setWidth(event->size().width() / mCols);
+	grid.setHeight(event->size().height() / mRows);
+	for (int i = 0; i < mViews.size(); i++)
+	{
+		mViews[i]->setSize(grid);
+	}
+	emit resized(event->size());
+}
+
+void View::resizeEvent(QResizeEvent *event)
+{
+	mSize = event->size();
+	emit resized(event->size());
 }
 
 } // namespace ssc
