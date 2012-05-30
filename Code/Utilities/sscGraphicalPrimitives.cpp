@@ -37,7 +37,11 @@ GraphicalPolyData3D::GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source, vtkRend
 void GraphicalPolyData3D::setSource(vtkPolyDataAlgorithmPtr source)
 {
 	mSource = source;
-	mMapper->SetInputConnection(mSource->GetOutputPort());
+
+	if (mSource)
+		mMapper->SetInputConnection(mSource->GetOutputPort());
+	else
+		mMapper->SetInputConnection(NULL);
 }
 
 GraphicalPolyData3D::~GraphicalPolyData3D()

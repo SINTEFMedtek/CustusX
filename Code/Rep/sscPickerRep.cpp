@@ -119,12 +119,20 @@ void PickerRep::setTool(ToolPtr tool)
 void PickerRep::setGlyph(vtkPolyDataAlgorithmPtr glyph)
 {
 	return; // ignore glyph stuff for now..
-	 mGlyph.reset(new ssc::GraphicalPolyData3D(glyph));
-//	 mGlyph->getActor()->GetProperty()->SetRepresentationToWireframe();
-	 mGlyph->getActor()->SetVisibility(false);
 
-	 if (mView)
-		mGlyph->setRenderer(mView->getRenderer());
+	 if (!mGlyph)
+	 {
+		 mGlyph.reset(new ssc::GraphicalPolyData3D());
+		 mGlyph->getActor()->GetProperty()->SetRepresentationToWireframe();
+		 mGlyph->getActor()->SetVisibility(false);
+		 mGlyph->setColor(ssc::Vector3D(0, 0, 1));
+
+		 if (mView)
+			mGlyph->setRenderer(mView->getRenderer());
+	 }
+	 mGlyph->setSource(glyph);
+
+
 
 //	mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
 //	mGraphicalPoint->setColor(ssc::Vector3D(0, 0, 1));
@@ -183,7 +191,7 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 	{
 		// We have clicked the picker/tool itself.
 		// Store click pos and wait for dragging.
-		mClickedPoint = clickPosition;
+		mClickedPoint = pick_w;
 		mIsDragging = true;
 		mCallbackCommand->SetAbortFlag(1); // abort this event: interactor does not receive it.
 		return;
@@ -193,10 +201,10 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 		mIsDragging = false;
 	}
 
-	mPickedPoint = pick_w;
-
 	if (!hit)
 		return;
+
+	mPickedPoint = pick_w;
 
 	if (mGraphicalPoint)
 		mGraphicalPoint->setValue(mPickedPoint);
@@ -255,7 +263,6 @@ void PickerRep::setEnabled(bool on)
 		if (mGlyph)
 		{
 			mGlyph->getActor()->SetVisibility(true);
-			std::cout << "show glyph" << std::endl;
 		}
 	}
 	else
@@ -320,29 +327,22 @@ Vector3D PickerRep::getDisplacement()
 {
 	vtkRenderWindowInteractorPtr interactor = mView->getRenderWindow()->GetInteractor();
 
-	Transform3D vpMw = mView->get_vpMs();
+//	// find previous pos in world and display:
+	Vector3D p_prev_w = mClickedPoint;
+//	std::cout << "  p_prev_w  = \t" << p_prev_w << std::endl;
+	Vector3D p_prev_d = this->ComputeWorldToDisplay(p_prev_w);
+//	std::cout << "  p_prev_d  = \t" << p_prev_d << std::endl;
 
-	// find focal point in vp:
-	Vector3D focalPoint;
-	vtkCameraPtr camera = mView->getRenderer()->GetActiveCamera();
-	camera->GetFocalPoint(focalPoint.data());
-	Vector3D focalPoint_vp = this->ComputeWorldToDisplay(focalPoint);
-
-	// find previous pos in world:
-	Vector3D p_prev(interactor->GetLastEventPosition()[0], interactor->GetLastEventPosition()[1], focalPoint_vp[2]);
-//	std::cout << "  p_prev_vp = \t" << p_prev << std::endl;
-	p_prev = this->ComputeDisplayToWorld(p_prev);
-//	std::cout << "  p_prev_w  = \t" << p_prev << std::endl;
-
-	// find current pos in world:
-	Vector3D p_current(interactor->GetEventPosition()[0], interactor->GetEventPosition()[1], focalPoint_vp[2]);
-//	std::cout << "  p_curre_vp = \t" << p_current << std::endl;
-	p_current = this->ComputeDisplayToWorld(p_current);
-//	std::cout << "  p_curre_w  = \t" << p_current << std::endl;
+	// find current pos in world and display, set z-pos in d equal to previous z-pos:
+	Vector3D p_current_d(interactor->GetEventPosition()[0], interactor->GetEventPosition()[1], p_prev_d[2]);
+//	std::cout << "  p_current_d = \t" << p_current_d << std::endl;
+	Vector3D p_current_w = this->ComputeDisplayToWorld(p_current_d);
+//	std::cout << "  p_current_w  = \t" << p_current_w << std::endl;
 
 	// both positions are now in the camera focal plane: the diff lies in the view plane.
-	std::cout << "  diff   = \t" << p_current - p_prev << std::endl;
-	return p_current - p_prev;
+//	std::cout << "  diff_d   = \t" << p_current_d - p_prev_d << std::endl;
+//	std::cout << "  diff_w   = \t" << p_current_w - p_prev_w << std::endl;
+	return p_current_w - p_prev_w;
 }
 
 void PickerRep::OnLeftButtonDown()
@@ -356,9 +356,9 @@ void PickerRep::OnMouseMove()
 {
 	if (mIsDragging)
 	{
-		std::cout << "PickerRep::OnMouseMove " << std::endl;
-
 		mPickedPoint += this->getDisplacement();
+		mClickedPoint = mPickedPoint;
+
 		if (mGraphicalPoint)
 			mGraphicalPoint->setValue(mPickedPoint);
 		if (mGlyph)
@@ -373,7 +373,6 @@ void PickerRep::OnLeftButtonUp()
 {
 	if (mIsDragging)
 	{
-		std::cout << "PickerRep::OnLeftButtonUp " << std::endl;
 		mIsDragging = false;
 		mCallbackCommand->SetAbortFlag(1); // abort this event: interactor does not receive it.
 	}
@@ -420,13 +419,31 @@ void PickerRep::addRepActorsToViewRenderer(View* view)
 
 	mView = view;
 
+
 	mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
 	mGraphicalPoint->setColor(ssc::Vector3D(0, 0, 1));
 	mGraphicalPoint->setRadius(mSphereRadius);
 	mGraphicalPoint->getActor()->SetVisibility(false);
 
-	if (mGlyph)
+//	// teset code
+//	vtkSphereSourcePtr glyph = vtkSphereSourcePtr::New();
+//	glyph->SetRadius(40);
+//	glyph->SetThetaResolution(16);
+//	glyph->SetPhiResolution(12);
+//	glyph->LatLongTessellationOn();
+//
+//	 mGlyph.reset(new ssc::GraphicalPolyData3D(glyph));
+//	 mGlyph->getActor()->GetProperty()->SetRepresentationToWireframe();
+//	 mGlyph->getActor()->SetVisibility(false);
+//	 std::cout << "addRepActorsToViewRenderer " << std::endl;
+
+//	 if (mView)
+//		mGlyph->setRenderer(mView->getRenderer());
+//	 // end test code
+
+	 if (mGlyph)
 		mGlyph->setRenderer(mView->getRenderer());
+
 
 	mViewportListener->startListen(mView->getRenderer());
 	this->scaleSphere();
