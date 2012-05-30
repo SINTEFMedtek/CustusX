@@ -27,14 +27,6 @@ class QColor;
 
 #include "sscViewQVTKWidget.h"
 
-//#ifdef USE_GLX_SHARED_CONTEXT
-//#include "sscSNWQVTKWidget.h"
-//typedef SNWQVTKWidget ViewParent;
-//#else
-//#include "QVTKWidget.h"
-//typedef QVTKWidget ViewParent;
-//#endif
-
 #include "sscTransform3D.h"
 
 namespace ssc
@@ -64,7 +56,7 @@ public:
 	{
 		VIEW, VIEW_2D, VIEW_3D, VIEW_REAL_TIME
 	};
-	ViewBase(QWidget *parent, const QString& uid = "", const QString& name = "");
+	ViewBase(QWidget *parent, QSize size, const QString& uid = "", const QString& name = "");
 	virtual ~ViewBase();
 	/// \return the View type, indicating display dimension.
 	virtual Type getType() const
@@ -97,6 +89,7 @@ public:
 	QWidget *widget() { return mParent; }
 
 protected:
+	QSize mSize;
 	double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
 	QColor mBackgroundColor;
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
@@ -148,6 +141,7 @@ private:
 	virtual void mousePressEvent(QMouseEvent *event);
 	virtual void mouseReleaseEvent(QMouseEvent *event);
 	virtual void focusInEvent(QFocusEvent* event);
+	virtual void resizeEvent(QResizeEvent *event);
 };
 typedef boost::shared_ptr<View> ViewPtr;
 
@@ -156,30 +150,21 @@ class ViewItem : public QObject, public ViewBase
 Q_OBJECT
 
 public:
-	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow) : ViewBase(parent) { mRenderWindow = renderWindow; }
+	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QSize size) : ViewBase(parent, size) { mSize = size; mRenderWindow = renderWindow; }
 	~ViewItem() {}
 
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }
 	virtual QSize size() { return mSize; }
 	virtual void setZoomFactor(double factor);
-
-	void setSize(QSize size) { mSize = size; }
+	virtual void setSize(QSize size) { mSize = size; emit resized(size); }
 	void setRenderer(vtkRendererPtr renderer);
 
 signals:
 	void resized(QSize size);
-	void mouseMoveSignal(QMouseEvent *event);
-	void mousePressSignal(QMouseEvent *event);
-	void mouseReleaseSignal(QMouseEvent *event);
-	void mouseWheelSignal(QWheelEvent*);
-	void showSignal(QShowEvent *event);
-	void focusInSignal(QFocusEvent *event);
 
 private:
 	vtkRenderWindowPtr mRenderWindow;
-	QWidget *mParent;
-	QSize mSize;
 };
 typedef boost::shared_ptr<ViewItem> ViewItemPtr;
 
@@ -197,12 +182,27 @@ public:
 	void clear();
 
 signals:
+	void mouseMoveSignal(QMouseEvent *event);
+	void mousePressSignal(QMouseEvent *event);
+	void mouseReleaseSignal(QMouseEvent *event);
+	void mouseWheelSignal(QWheelEvent*);
+	void showSignal(QShowEvent *event);
+	void focusInSignal(QFocusEvent *event);
 	void resized(QSize size);
 
 protected:
 	QList<ViewItemPtr> mViews;
 	vtkRenderWindowPtr mRenderWindow;
 	int mRows, mCols;
+
+private:
+	virtual void showEvent(QShowEvent* event);
+	virtual void wheelEvent(QWheelEvent*);
+	virtual void mouseMoveEvent(QMouseEvent *event);
+	virtual void mousePressEvent(QMouseEvent *event);
+	virtual void mouseReleaseEvent(QMouseEvent *event);
+	virtual void focusInEvent(QFocusEvent* event);
+	virtual void resizeEvent(QResizeEvent *event);
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 

@@ -92,15 +92,16 @@ void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	insertView(view, uid, imageFilename, r, c);
 }
 
-void ViewsWindow::containerGPUSlice(ssc::ViewContainer *widget, int pos, const QString &uid, const QString &imageFilename, ssc::PLANE_TYPE plane, int r, int c)
+void ViewsWindow::containerGPUSlice(ssc::ViewContainer *widget, int pos, const QString &uid, const QString &imageFilename, ssc::PLANE_TYPE plane)
 {
 	ssc::ToolManager *mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 	ssc::ImagePtr image = loadImage(imageFilename);
-	ssc::ViewItemPtr view = widget->getView(pos);
+	ssc::ViewItem *view = widget->getView(pos).get();
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->getRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
+	mLayouts.insert(view);
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
@@ -148,7 +149,7 @@ ssc::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 void ViewsWindow::setupViewContainer(ssc::ViewContainer *view, const QString& uid, const QString& volume, int r, int c)
 {
 	QVBoxLayout *layout = new QVBoxLayout;
-	mSliceLayout->addLayout(layout, r,c);
+	mSliceLayout->addLayout(layout, r, c);
 	layout->addWidget(view);
 	layout->addWidget(new QLabel(uid+" "+volume, this));
 }
@@ -162,11 +163,11 @@ void ViewsWindow::insertView(ssc::View *view, const QString& uid, const QString&
 	layout->addWidget(new QLabel(uid+" "+volume, this));
 }
 
-void ViewsWindow::container3D(ssc::ViewContainer *widget, int pos, const QString& imageFilename, int r, int c)
+void ViewsWindow::container3D(ssc::ViewContainer *widget, int pos, const QString& imageFilename)
 {
-	QString uid = "3D";
-	ssc::ViewItemPtr view = widget->getView(pos);
+	ssc::ViewItem *view = widget->getView(pos).get();
 	ssc::ImagePtr image = loadImage(imageFilename);
+	mLayouts.insert(view);
 
 	// volume rep
 	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New(image->getUid());
@@ -241,9 +242,9 @@ void ViewsWindow::start(bool showSliders)
 
 void ViewsWindow::updateRender()
 {
-	for (std::set<ssc::View*>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+	for (std::set<ssc::ViewBase *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 	{
-		ssc::View* view = *iter;
+		ssc::ViewBase *view = *iter;
 
 		if (view->getZoomFactor()<0)
 		  continue;
