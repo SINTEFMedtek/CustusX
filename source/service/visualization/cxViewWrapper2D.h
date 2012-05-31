@@ -60,6 +60,7 @@ public:
 	virtual void setZoom2D(SyncedValuePtr value);
 	virtual void setOrientationMode(SyncedValuePtr value);
 	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
+	virtual void setViewGroup(ViewGroupDataPtr group);
 
 	static bool overlayIsEnabled();
 
@@ -74,6 +75,7 @@ private slots:
 	void global2DZoomActionSlot();
 	void orientationModeChanged();
 	void settingsChangedSlot(QString key);
+	void optionChangedSlot();
 
 private:
 	virtual void setZoomFactor2D(double zoomFactor);
@@ -106,6 +108,7 @@ private:
 	void resetMultiSlicer();
 	ssc::Texture3DSlicerRepPtr mMultiSliceRep;
 
+	ssc::GeometricRep2DPtr mPickerGlyphRep;
 	ssc::SliceProxyPtr mSliceProxy;
 	ssc::SliceRepSWPtr mSliceRep;
 	std::map<QString, ssc::GeometricRep2DPtr> mGeometricRep;

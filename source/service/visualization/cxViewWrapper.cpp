@@ -61,10 +61,13 @@ ViewGroupData::ViewGroupData() :
 {
 	connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(removeDataSlot(QString)));
 
-	mOptions.getSpherePickerGlyph()->SetRadius(40);
-	mOptions.getSpherePickerGlyph()->SetThetaResolution(16);
-	mOptions.getSpherePickerGlyph()->SetPhiResolution(12);
-	mOptions.getSpherePickerGlyph()->LatLongTessellationOn();
+//	mPickerGlyph.reset(new ssc::Mesh("PickerGlyph"));
+//
+//
+//	mOptions.getSpherePickerGlyph()->SetRadius(40);
+//	mOptions.getSpherePickerGlyph()->SetThetaResolution(16);
+//	mOptions.getSpherePickerGlyph()->SetPhiResolution(12);
+//	mOptions.getSpherePickerGlyph()->LatLongTessellationOn();
 }
 
 void ViewGroupData::removeDataSlot(QString uid)

@@ -39,6 +39,8 @@
 #include "cxViewManager.h"
 #include "sscDoubleWidgets.h"
 #include "cxToolManager.h"
+#include "cxViewWrapper.h"
+#include "cxViewGroup.h"
 
 namespace cx
 {
@@ -89,8 +91,8 @@ QString EraserWidget::defaultWhatsThis() const
 
 void EraserWidget::sphereSizeChangedSlot()
 {
-	if (mEraserSphere)
-		mEraserSphere->SetRadius(mSphereSizeAdapter->getValue());
+	if (mSphere)
+		mSphere->SetRadius(mSphereSizeAdapter->getValue());
 }
 
 /**The image data themselves are not saved during normal file save.
@@ -111,13 +113,15 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
 
-	std::cout << "starting" << std::endl;
+//	std::cout << "starting" << std::endl;
 
 	Eigen::Array3i dim(img->GetDimensions());
 	ssc::Vector3D spacing(img->GetSpacing());
 
-	ssc::Vector3D c(mEraserSphere->GetCenter());
-	double r = mEraserSphere->GetRadius();
+	ssc::Transform3D rMd = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->get_rMd();
+	ssc::Vector3D c(mSphere->GetCenter());
+	c = rMd.coord(c);
+	double r = mSphere->GetRadius();
 
 	ssc::DoubleBoundingBox3D bb_r(c[0]-r, c[0]+r, c[1]-r, c[1]+r, c[2]-r, c[2]+r);
 
@@ -131,13 +135,16 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 	ssc::DoubleBoundingBox3D bb0_raw = ssc::transform(rawMr, bb_r);
 	ssc::IntBoundingBox3D bb1_raw(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
 
+//	std::cout << "     sphere: " << bb0_raw << std::endl;
+//	std::cout << "        raw: " << bb1_raw << std::endl;
+
 	for (int i=0; i<3; ++i)
 	{
 		bb1_raw[2*i] = std::max<double>(bb1_raw[2*i], bb0_raw[2*i]);
 		bb1_raw[2*i+1] = std::min<double>(bb1_raw[2*i+1], bb0_raw[2*i+1]);
 	}
 
-	std::cout << "clip in raw: " << bb1_raw << std::endl;
+//	std::cout << "clip in raw: " << bb1_raw << std::endl;
 	//	double r=50;
 	//	ssc::Vector3D c(200,200,200);
 	for (int x = bb1_raw[0]; x < bb1_raw[1]; ++x)
@@ -230,64 +237,51 @@ void EraserWidget::removeSlot()
 
 void EraserWidget::toggleShowEraser(bool on)
 {
-	ssc::View* view = viewManager()->get3DView();
-
 	if (on)
 	{
-		mEraserSphere = vtkSphereWidgetPtr::New();
-		mEraserSphere->SetInteractor(view->getRenderWindow()->GetInteractor());
-		mEraserSphere->SetEnabled(true);
-		double a = mSphereSizeAdapter->getValue();
-		mEraserSphere->SetRadius(a);
-		cx::ToolManager* tm = cx::ToolManager::getInstance();
-		ssc::Transform3D rMt =
-						*tm->get_rMpr() *
-						tm->getManualTool()->get_prMt();
-		mEraserSphere->SetCenter(rMt.coord(ssc::Vector3D(0, 0, tm->getTooltipOffset())).data());
-//		mEraserSphere->PlaceWidget(-a, a, -a, a, -a, a);
-		mEraserSphere->ScaleOn();
+		mSphere = vtkSphereSourcePtr::New();
 
-		mEraserSphere->SetThetaResolution(12);
-		mEraserSphere->SetPhiResolution(12);
+		mSphere->SetRadius(40);
+		mSphere->SetThetaResolution(16);
+		mSphere->SetPhiResolution(12);
+		mSphere->LatLongTessellationOn(); // more natural wireframe view
+
+		double a = mSphereSizeAdapter->getValue();
+		mSphere->SetRadius(a);
+		ssc::MeshPtr glyph = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph;
+		glyph->setVtkPolyData(mSphere->GetOutput());
+//		glyph->setColor(QColor("blue"));
+		glyph->setColor(QColor(255, 204, 0)); // same as tool
+		glyph->setIsWireframe(true);
+
+//		  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(mSphere->GetOutput(), "testsphere", "testsphere", "Images");
+//		ssc::dataManager()->loadData(mesh);
+//		ssc::dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
+
+//		mEraserSphere = vtkSphereWidgetPtr::New();
+//		mEraserSphere->SetInteractor(view->getRenderWindow()->GetInteractor());
+//		mEraserSphere->SetEnabled(true);
+//		double a = mSphereSizeAdapter->getValue();
+//		mEraserSphere->SetRadius(a);
+//		cx::ToolManager* tm = cx::ToolManager::getInstance();
+//		ssc::Transform3D rMt =
+//						*tm->get_rMpr() *
+//						tm->getManualTool()->get_prMt();
+//		mEraserSphere->SetCenter(rMt.coord(ssc::Vector3D(0, 0, tm->getTooltipOffset())).data());
+////		mEraserSphere->PlaceWidget(-a, a, -a, a, -a, a);
+//		mEraserSphere->ScaleOn();
+//
+//		mEraserSphere->SetThetaResolution(12);
+//		mEraserSphere->SetPhiResolution(12);
 	}
 	else
 	{
-		mEraserSphere->SetEnabled(false);
-		mEraserSphere->SetInteractor(NULL);
-		mEraserSphere = vtkSphereWidgetPtr();
+		viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->setVtkPolyData(NULL);
+//		sphere->SetRadius(0);
+//		mEraserSphere->SetEnabled(false);
+//		mEraserSphere->SetInteractor(NULL);
+//		mEraserSphere = vtkSphereWidgetPtr();
 	}
 }
-
-//void EraserWidget::testSlot()
-//{
-//	typedef vtkSmartPointer<vtkSplineWidget> vtkSplineWidgetPtr;
-//	typedef vtkSmartPointer<vtkSplineWidget2> vtkSplineWidget2Ptr;
-//	typedef vtkSmartPointer<vtkSplineRepresentation> vtkSplineRepresentationPtr;
-//
-//	ssc::View* view = viewManager()->get3DView();
-//	mEraserSphere = vtkSphereWidget::New();
-//	mEraserSphere->SetInteractor(view->getRenderWindow()->GetInteractor());
-//	mEraserSphere->SetEnabled(true);
-//	int a = 50;
-//	mEraserSphere->PlaceWidget(-a, a, -a, a, -a, a);
-//	mEraserSphere->ScaleOn();
-//
-//	mEraserSphere->SetThetaResolution(12);
-//	mEraserSphere->SetPhiResolution(12);
-//
-//	////	vtkSplineWidget2Ptr node1 = vtkSplineWidget2Ptr::New();
-//	//	vtkSplineWidget2* node1 = vtkSplineWidget2::New();
-//	//	vtkSplineRepresentationPtr rep1 = vtkSplineRepresentationPtr::New();
-//	//	node1->SetRepresentation(rep1);
-//	//	node1->SetInteractor(view->getRenderWindow()->GetInteractor());
-//
-//	//	mBoxWidget = vtkBoxWidgetPtr::New();
-//	//	mBoxWidget->RotationEnabledOff();
-//	//
-//	//	double bb_hard[6] =
-//	//	{ -1, 1, -1, 1, -1, 1 };
-//	//	mBoxWidget->PlaceWidget(bb_hard);
-//
-//}
 
 }

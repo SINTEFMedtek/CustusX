@@ -50,7 +50,7 @@ public:
 	virtual ~EraserWidget();
 private:
 	QCheckBox* mShowSphereCheckBox;
-	vtkSphereWidgetPtr mEraserSphere;
+	vtkSphereSourcePtr mSphere;
 	QCheckBox* mShowEraserCheckBox;
 	ssc::DoubleDataAdapterXmlPtr mSphereSizeAdapter;
 
@@ -59,7 +59,6 @@ private:
 
 private slots:
 	void toggleShowEraser(bool on);
-//	void testSlot();
 	void saveSlot();
 	void removeSlot();
 	void sphereSizeChangedSlot();
