@@ -376,8 +376,6 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 	connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
 	mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
 
-	mPickerRep->setGlyph(mViewGroup->getOptions().mPickerGlyph);
-
 	// Set eye angle after camera change. Maybe create a cameraChangedSlot instead
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 	this->optionChangedSlot();
