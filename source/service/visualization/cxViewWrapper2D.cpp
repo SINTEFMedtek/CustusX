@@ -63,8 +63,13 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
 	mView->getRenderWindow()->GetInteractor()->Disable();
 	mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
-	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
+	double length = clipDepth*10;
+	mView->getRenderer()->GetActiveCamera()->SetPosition(0,0,length);
+//	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
+	mView->getRenderer()->GetActiveCamera()->SetClippingRange(length-clipDepth, length+0.1);
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+
+	mView->getRenderer()->GetActiveCamera()->Print(std::cout);
 
 	addReps();
 
@@ -117,6 +122,25 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 	contextMenu.addAction(ortogonalAction);
 	contextMenu.addSeparator();
 	contextMenu.addAction(global2DZoomAction);
+}
+
+void ViewWrapper2D::setViewGroup(ViewGroupDataPtr group)
+{
+	ViewWrapper::setViewGroup(group);
+
+	connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
+	this->optionChangedSlot();
+
+}
+
+void ViewWrapper2D::optionChangedSlot()
+{
+	ViewGroupData::Options options = mViewGroup->getOptions();
+
+	if (mPickerGlyphRep)
+	{
+		mPickerGlyphRep->setMesh(options.mPickerGlyph);
+	}
 }
 
 /** Slot for the orientation action.
@@ -190,6 +214,14 @@ void ViewWrapper2D::addReps()
 	mToolRep2D->setUseCrosshair(true);
 //  mToolRep2D->setUseToolLine(false);
 	mView->addRep(mToolRep2D);
+
+	mPickerGlyphRep = ssc::GeometricRep2D::New("PickerGlyphRep_" + mView->getName());
+	mPickerGlyphRep->setSliceProxy(mSliceProxy);
+	if (mViewGroup)
+	{
+		mPickerGlyphRep->setMesh(mViewGroup->getOptions().mPickerGlyph);
+	}
+	mView->addRep(mPickerGlyphRep);
 }
 
 void ViewWrapper2D::settingsChangedSlot(QString key)
@@ -272,6 +304,16 @@ void ViewWrapper2D::viewportChanged()
 	double viewHeight = mView->heightMM() / getZoomFactor2D();
 //  double parallelScale = mView->heightMM() / 2.0 / getZoomFactor2D();
 	mView->getRenderer()->GetActiveCamera()->SetParallelScale(viewHeight / 2);
+
+
+	// Heuristic guess for a good clip depth. The point is to show 3D data clipped in 2D
+	// with a suitable thickness projected onto the plane.
+	double clipDepth = 2.0; // i.e. all 3D props rendered outside this range is not shown.
+	double length = clipDepth*10;
+	clipDepth = viewHeight/120 + 1.5;
+	mView->getRenderer()->GetActiveCamera()->SetPosition(0,0,length);
+	mView->getRenderer()->GetActiveCamera()->SetClippingRange(length-clipDepth, length+0.1);
+//	std::cout << "height: " << viewHeight << ", d=" << clipDepth << std::endl;
 
 	mSliceProxy->setToolViewportHeight(viewHeight);
 
@@ -405,7 +447,7 @@ void ViewWrapper2D::updateView()
 	{
 		std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
 		ssc::ImagePtr image;
-		//std::cout << "ViewWrapper2D::updateView() " << images.size() << std::endl;
+		std::cout << "ViewWrapper2D::updateView() " << images.size() << std::endl;
 		if (!images.empty())
 			image = images.back(); // always show last in vector
 
