@@ -36,6 +36,7 @@
 #include "sscView.h"
 #include "sscMessageManager.h"
 #include "sscSliceProxy.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -43,39 +44,43 @@ namespace ssc
 GeometricRep2D::GeometricRep2D(const QString& uid, const QString& name) :
 	RepImpl(uid, name)
 {
-  mNormals = vtkPolyDataNormalsPtr::New();
 	mMapper = vtkPolyDataMapperPtr::New();
 	mProperty = vtkPropertyPtr::New();
 	mActor = vtkActorPtr::New();
+	/*
+	mNormals = vtkPolyDataNormalsPtr::New();
 	mCutter = vtkCutterPtr::New();
 	mCutPlane = vtkPlanePtr::New();
 	mStripper = vtkStripperPtr::New();
-  mCutPoly = vtkPolyDataPtr::New();
+	mCutPoly = vtkPolyDataPtr::New();
 
-  //mNormals->SetInputConnection(mMesh->getVtkPolyData()->GetOutputPort());
-  // set plane def
+	//mNormals->SetInputConnection(mMesh->getVtkPolyData()->GetOutputPort());
+	// set plane def
 
 	mCutter->SetInputConnection(mNormals->GetOutputPort());
 
-//cutEdges = vtk.vtkCutter()
-//  cutEdges.SetInputConnection(cowNormals.GetOutputPort())
+	//cutEdges = vtk.vtkCutter()
+	//  cutEdges.SetInputConnection(cowNormals.GetOutputPort())
 	mCutter->SetCutFunction(mCutPlane);
 	mCutter->GenerateCutScalarsOn();
 	mCutter->SetValue(0, 0);
 
-  mStripper->SetInputConnection(mCutter->GetOutputPort());
-  //mStripper->Update(); // ????
-  mCutPoly->SetPoints(mStripper->GetOutput()->GetPoints());
-  mCutPoly->SetLines(mStripper->GetOutput()->GetLines());
+	mStripper->SetInputConnection(mCutter->GetOutputPort());
+	//mStripper->Update(); // ????
+	mCutPoly->SetPoints(mStripper->GetOutput()->GetPoints());
+	mCutPoly->SetLines(mStripper->GetOutput()->GetLines());
 
-  mMapper->SetInput(mCutPoly);
-  // 72 cutMapper.SetInputConnection(cutTriangles.GetOutputPort())
-
-	mActor->SetMapper( mMapper );
-	mActor->SetProperty( mProperty );
+	mMapper->SetInput(mCutPoly);
+	// 72 cutMapper.SetInputConnection(cutTriangles.GetOutputPort())
+*/
+	mActor->SetMapper(mMapper);
+	mActor->SetProperty(mProperty);
 }
+
 GeometricRep2D::~GeometricRep2D()
-{}
+{
+}
+
 GeometricRep2DPtr GeometricRep2D::New(const QString& uid, const QString& name)
 {
 	GeometricRep2DPtr retval(new GeometricRep2D(uid, name));
@@ -92,26 +97,27 @@ void GeometricRep2D::removeRepActorsFromViewRenderer(View* view)
 }
 void GeometricRep2D::setMesh(MeshPtr mesh)
 {
-  if (mesh == mMesh)
-    return;
-  if(mMesh)
-  {
-    disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-    disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-  }
+	if (mesh == mMesh)
+		return;
+	if (mMesh)
+	{
+		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+		disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+	}
 	mMesh = mesh;
-  if (mMesh)
-  {
-    connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-    connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-    this->meshChangedSlot();
-    this->transformChangedSlot();
-  }
+	if (mMesh)
+	{
+		std::cout << "GeometricRep2D::setMesh " << mMesh->getName() << std::endl;
+		connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+		connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		this->meshChangedSlot();
+		this->transformChangedSlot();
+	}
 }
-  
+
 MeshPtr GeometricRep2D::getMesh()
 {
-  return mMesh;
+	return mMesh;
 }
 bool GeometricRep2D::hasMesh(MeshPtr mesh) const
 {
@@ -120,60 +126,71 @@ bool GeometricRep2D::hasMesh(MeshPtr mesh) const
 
 void GeometricRep2D::setSliceProxy(SliceProxyPtr slicer)
 {
-  if (mSlicer)
-  {
-    disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
-  }
-  mSlicer = slicer;
-  if (mSlicer)
-  {
-    connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
-    this->transformChangedSlot();
-  }
+	if (mSlicer)
+	{
+		disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
+	}
+	mSlicer = slicer;
+	if (mSlicer)
+	{
+		connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
+		this->transformChangedSlot();
+	}
 }
 
 void GeometricRep2D::meshChangedSlot()
 {
 	mMesh->connectToRep(mSelf);
+	//	std::cout << "GeometricRep2D::meshChangedSlot()" << std::endl;
 
-	mMapper->SetInput( mMesh->getVtkPolyData() ); // original - show-all method
-  mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
+	mMapper->SetInput(mMesh->getVtkPolyData()); // original - show-all method
+	mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
 	//mNormals->SetInputConnection(mMesh->getVtkPolyData()->Get);
+	/*
 	mNormals->SetInput(mMesh->getVtkPolyData());
-//	mCutter->SetInput(mMesh->getVtkPolyData());
-  
-  //Set mesh color
-  mActor->GetProperty()->SetColor(mMesh->getColor().redF(),
-                                  mMesh->getColor().greenF(),
-                                  mMesh->getColor().blueF());
-  //Set mesh opacity
-  mActor->GetProperty()->SetOpacity(mMesh->getColor().alphaF());
+	*/
+	//	mCutter->SetInput(mMesh->getVtkPolyData());
+
+	//Set mesh color
+	mActor->GetProperty()->SetColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+	//Set mesh opacity
+	mActor->GetProperty()->SetOpacity(mMesh->getColor().alphaF());
+
+	// Turn lightning off - we dont want 3D effects but a clear view of the slice
+	mActor->GetProperty()->LightingOff();
+
+	//	mActor->GetProperty()->SetRepresentationToWireframe();
+//	mActor->GetProperty()->EdgeVisibilityOn();
+//	mActor->GetProperty()->SetLineWidth(3);
+//	mActor->GetProperty()->SetEdgeColor(1, 0, 0);
 }
 
 /**called when transform is changed
  * reset it in the prop.*/
 void GeometricRep2D::transformChangedSlot()
 {
-  if (!mSlicer || !mMesh)
-    return;
+	if (!mSlicer || !mMesh)
+		return;
 
-  Transform3D rMs = mSlicer->get_sMr().inv();
-  Transform3D dMr = mMesh->get_rMd().inv();
-  Transform3D dMs = dMr*rMs;
+	Transform3D rMs = mSlicer->get_sMr().inv();
+	Transform3D dMr = mMesh->get_rMd().inv();
+	Transform3D dMs = dMr * rMs;
 
-  ssc::Vector3D n = dMs.vector(ssc::Vector3D(0,0,1));
-  ssc::Vector3D p = dMs.coord(ssc::Vector3D(0,0,0));
-  mCutPlane->SetNormal(n.begin());
-  mCutPlane->SetOrigin(p.begin());
-//  mStripper->Update();
-  //mStripper->Print(std::cout);
-  //mStripper->GetOutput()->GetPoints()->Print(std::cout);
-  //mStripper->GetOutput()->GetLines()->Print(std::cout);
-  mCutPoly->SetPoints(mStripper->GetOutput()->GetPoints());
-  mCutPoly->SetLines(mStripper->GetOutput()->GetLines());
-  //mCutPoly->Print(std::cout);
+	/*
+	ssc::Vector3D n = dMs.vector(ssc::Vector3D(0, 0, 1));
+	ssc::Vector3D p = dMs.coord(ssc::Vector3D(0, 0, 0));
+	mCutPlane->SetNormal(n.begin());
+	mCutPlane->SetOrigin(p.begin());
+	//  mStripper->Update();
+	//mStripper->Print(std::cout);
+	//mStripper->GetOutput()->GetPoints()->Print(std::cout);
+	//mStripper->GetOutput()->GetLines()->Print(std::cout);
+	mCutPoly->SetPoints(mStripper->GetOutput()->GetPoints());
+	mCutPoly->SetLines(mStripper->GetOutput()->GetLines());
+	//mCutPoly->Print(std::cout);
+	*/
 
-  mActor->SetUserMatrix(dMs.inv().getVtkMatrix());
+	mActor->SetUserMatrix(dMs.inv().getVtkMatrix());
 }
 
 //---------------------------------------------------------

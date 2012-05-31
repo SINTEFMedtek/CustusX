@@ -64,11 +64,11 @@ protected:
 	vtkPropertyPtr mProperty;
 	vtkActorPtr mActor;
 
-	vtkPolyDataNormalsPtr mNormals;
-	vtkCutterPtr mCutter;
-	vtkPlanePtr mCutPlane;
-	vtkStripperPtr mStripper;
-	vtkPolyDataPtr mCutPoly;
+//	vtkPolyDataNormalsPtr mNormals;
+//	vtkCutterPtr mCutter;
+//	vtkPlanePtr mCutPlane;
+//	vtkStripperPtr mStripper;
+//	vtkPolyDataPtr mCutPoly;
 
 
 	MeshPtr mMesh;

@@ -42,9 +42,21 @@ Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyDa
 Mesh::~Mesh()
 {
 }
+
+void Mesh::setIsWireframe(bool on)
+{
+	mWireframe = on;
+	emit meshChanged();
+}
+bool Mesh::getIsWireframe() const
+{
+	return mWireframe;
+}
+
 void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
 {
 	mVtkPolyData = polyData;
+	emit meshChanged();
 }
 vtkPolyDataPtr Mesh::getVtkPolyData()
 {
@@ -56,25 +68,6 @@ void Mesh::addXml(QDomNode& dataNode)
 	QDomDocument doc = dataNode.ownerDocument();
 
 	QDomNode meshNode = dataNode;
-	//
-	//  QDomDocument doc = parentNode.ownerDocument();
-	//  QDomElement meshNode = doc.createElement("mesh");
-	//  parentNode.appendChild(meshNode);
-
-	//  m_rMd_History->addXml(meshNode); //TODO: should be in the superclass
-	//
-	//  QDomElement uidNode = doc.createElement("uid");
-	//  uidNode.appendChild(doc.createTextNode(mUid.c_str()));
-	//  meshNode.appendChild(uidNode);
-	//
-	//  QDomElement nameNode = doc.createElement("name");
-	//  nameNode.appendChild(doc.createTextNode(mName.c_str()));
-	//  meshNode.appendChild(nameNode);
-	//
-	//  QDomElement filePathNode = doc.createElement("filePath");
-	//  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
-	//  meshNode.appendChild(filePathNode);
-
 
 	QDomElement colorNode = doc.createElement("color");
 	QDomElement subNode = doc.createElement("red");
