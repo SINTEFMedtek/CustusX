@@ -23,6 +23,7 @@
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include <vtkSphereSource.h>
+#include "sscMesh.h"
 
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 class QMenu;
@@ -77,11 +78,12 @@ public:
 	struct Options
 	{
 		Options() : mShowLandmarks(false), mShowPointPickerProbe(false),
-				mPickerGlyph(vtkSphereSourcePtr::New()) {}
+				mPickerGlyph(new ssc::Mesh("PickerGlyph")) {}
 		bool mShowLandmarks;
 		bool mShowPointPickerProbe;
-		vtkPolyDataAlgorithmPtr mPickerGlyph; ///< a glyph visually representing the picker.
-		vtkSphereSourcePtr getSpherePickerGlyph() { return vtkSphereSource::SafeDownCast(mPickerGlyph); }
+		ssc::MeshPtr mPickerGlyph;
+//		vtkPolyDataAlgorithmPtr mPickerGlyph; ///< a glyph visually representing the picker.
+//		vtkSphereSourcePtr getSpherePickerGlyph() { return vtkSphereSource::SafeDownCast(mPickerGlyph); }
 	};
 
 	Options getOptions() const;
