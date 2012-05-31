@@ -26,6 +26,7 @@
 
 #include "sscGraphicalPrimitives.h"
 #include "sscViewportListener.h"
+#include "sscForwardDeclarations.h"
 
 class vtkCommand;
 typedef vtkSmartPointer<class vtkCallbackCommand> vtkCallbackCommandPtr;
@@ -63,7 +64,7 @@ public:
 	void setTool(ToolPtr tool); ///< set the tool to listen to
 
 	void setEnabled(bool on);
-	void setGlyph(vtkPolyDataAlgorithmPtr glyph);
+	void setGlyph(ssc::MeshPtr glyph);
 
 	void pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
 	Vector3D getPosition() const;
@@ -98,6 +99,7 @@ protected:
 	Vector3D getDisplacement();
 	Vector3D ComputeDisplayToWorld(Vector3D p_d);
 	Vector3D ComputeWorldToDisplay(Vector3D p_w);
+	void setGlyphCenter(ssc::Vector3D pos);
 
 	View* mView;
 	bool mEnabled;
@@ -105,10 +107,14 @@ protected:
 	ToolPtr mTool; ///< the connected tool
 	Vector3D mPickedPoint; ///< the last point that was successfully sampled from intersection with an image
 	double mSphereRadius;
-	ssc::GraphicalPolyData3DPtr mGlyph;
-//	vtkEventQtSlotConnectPtr mConnections; ///< used to sending signals and events between vtk and qt
+	ssc::MeshPtr mGlyph;
+//	ssc::GraphicalPolyData3DPtr mGlyphRep;
+	ssc::GeometricRepPtr mGlyphRep;
+	//	vtkEventQtSlotConnectPtr mConnections; ///< used to sending signals and events between vtk and qt
 	Vector3D mClickedPoint;
 	bool mIsDragging;
+
+	bool mSnapToSurface; ///< if set, clicking on a ssc::Data surface will pick that point
 
 	ssc::GraphicalPoint3DPtr mGraphicalPoint;
 	ssc::ViewportListenerPtr mViewportListener;

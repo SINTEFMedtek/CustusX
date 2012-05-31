@@ -40,13 +40,14 @@ GeometricRep::GeometricRep(const QString& uid, const QString& name) :
 	mMapper = vtkPolyDataMapperPtr::New();
 	mProperty = vtkPropertyPtr::New();
 	mActor = vtkActorPtr::New();
-	mActor->SetMapper( mMapper );
-	mActor->SetProperty( mProperty );
+	mActor->SetMapper(mMapper);
+	mActor->SetProperty(mProperty);
 
 	mProperty->SetPointSize(2);
 }
 GeometricRep::~GeometricRep()
-{}
+{
+}
 GeometricRepPtr GeometricRep::New(const QString& uid, const QString& name)
 {
 	GeometricRepPtr retval(new GeometricRep(uid, name));
@@ -63,64 +64,68 @@ void GeometricRep::removeRepActorsFromViewRenderer(View* view)
 }
 void GeometricRep::setMesh(MeshPtr mesh)
 {
-  if (mesh == mMesh)
-    return;
-  if(mMesh)
-  {
-    disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-    disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-  }
+	if (mesh == mMesh)
+		return;
+	if (mMesh)
+	{
+		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+		disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+	}
 	mMesh = mesh;
-  if (mMesh)
-  {
-    connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-    connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-    this->meshChangedSlot();
-    this->transformChangedSlot();
-  }
+	if (mMesh)
+	{
+		connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+		connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		this->meshChangedSlot();
+		this->transformChangedSlot();
+	}
 }
-  
+
 MeshPtr GeometricRep::getMesh()
 {
-  return mMesh;
+	return mMesh;
 }
 bool GeometricRep::hasMesh(MeshPtr mesh) const
 {
 	return (mMesh == mesh);
 }
-  
+
 void GeometricRep::meshChangedSlot()
 {
+//	std::cout << "GeometricRep::meshChangedSlot()" << std::endl;
 	mMesh->connectToRep(mSelf);
-  
-	mMapper->SetInput( mMesh->getVtkPolyData() );
+
+	mMapper->SetInput(mMesh->getVtkPolyData());
 	mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
 
-  //Set mesh color
-  mActor->GetProperty()->SetColor(mMesh->getColor().redF(),
-                                  mMesh->getColor().greenF(),
-                                  mMesh->getColor().blueF());
-  //Set mesh opacity
-  mActor->GetProperty()->SetOpacity(mMesh->getColor().alphaF());
+	//Set mesh color
+	mActor->GetProperty()->SetColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+	//Set mesh opacity
+	mActor->GetProperty()->SetOpacity(mMesh->getColor().alphaF());
+
+	if (mMesh->getIsWireframe())
+		mActor->GetProperty()->SetRepresentationToWireframe();
+	else
+		mActor->GetProperty()->SetRepresentationToSurface();
 }
 
 /**called when transform is changed
  * reset it in the prop.*/
 void GeometricRep::transformChangedSlot()
 {
-  if (!mMesh)
-  {
-    return;
-  }
+	if (!mMesh)
+	{
+		return;
+	}
 
-//  std::cout << "GeometricRep::transformChangedSlot() : " << mMesh->getName() << std::endl;
-//  std::cout << "mesh history ptr: " << mMesh->get_rMd_History().get() << std::endl;
-//  std::cout << mMesh->get_rMd() << std::endl;
+	//  std::cout << "GeometricRep::transformChangedSlot() : " << mMesh->getName() << std::endl;
+	//  std::cout << "mesh history ptr: " << mMesh->get_rMd_History().get() << std::endl;
+	//  std::cout << mMesh->get_rMd() << std::endl;
 
-  mActor->SetUserMatrix(mMesh->get_rMd().getVtkMatrix());
+	mActor->SetUserMatrix(mMesh->get_rMd().getVtkMatrix());
 }
 
-  
 //---------------------------------------------------------
-} // namespace ssc
+}
+// namespace ssc
 //---------------------------------------------------------

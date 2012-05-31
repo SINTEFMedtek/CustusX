@@ -43,6 +43,8 @@
 #include "sscView.h"
 #include "sscTool.h"
 #include "sscToolManager.h"
+#include "sscRegistrationTransform.h"
+#include "sscGeometricRep.h"
 
 namespace ssc
 {
@@ -64,8 +66,9 @@ PickerRep::PickerRep(const QString& uid, const QString& name) :
 	this->mCallbackCommand->SetCallback(PickerRep::ProcessEvents);
 
 	mView = NULL;
-	mEnabled = false;
+	mEnabled = true;
 	mConnected = false;
+	mSnapToSurface = false;
 }
 
 void PickerRep::scaleSphere()
@@ -116,28 +119,21 @@ void PickerRep::setTool(ToolPtr tool)
 	}
 }
 
-void PickerRep::setGlyph(vtkPolyDataAlgorithmPtr glyph)
+void PickerRep::setGlyph(ssc::MeshPtr glyph)
 {
-	return; // ignore glyph stuff for now..
+	if (!mGlyph)
+		mGlyph = glyph;
 
-	 if (!mGlyph)
+	 if (!mGlyphRep)
 	 {
-		 mGlyph.reset(new ssc::GraphicalPolyData3D());
-		 mGlyph->getActor()->GetProperty()->SetRepresentationToWireframe();
-		 mGlyph->getActor()->SetVisibility(false);
-		 mGlyph->setColor(ssc::Vector3D(0, 0, 1));
-
+		 mGlyphRep = ssc::GeometricRep::New("PickerGlyphRep");
 		 if (mView)
-			mGlyph->setRenderer(mView->getRenderer());
+		 {
+			 mView->addRep(mGlyphRep);
+		 }
 	 }
-	 mGlyph->setSource(glyph);
 
-
-
-//	mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
-//	mGraphicalPoint->setColor(ssc::Vector3D(0, 0, 1));
-//	mGraphicalPoint->setRadius(mSphereRadius);
-//	mGraphicalPoint->getActor()->SetVisibility(false);
+	 mGlyphRep->setMesh(mGlyph);
 }
 
 typedef vtkSmartPointer<class vtkVolumePicker> vtkVolumePickerPtr;
@@ -187,7 +183,9 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 //	std::cout << "  pt : " << mGraphicalPoint->getPolyData().GetPointer() << std::endl;
 	ssc::Vector3D pick_w(picker->GetPickPosition());
 
-	if (data == mGraphicalPoint->getPolyData() || (mGlyph && data==(mGlyph->getPolyData())))
+	if (data == mGraphicalPoint->getPolyData()
+		|| (mGlyph && data==(mGlyph->getVtkPolyData()))
+		|| (mTool && data==(mTool->getGraphicsPolyData())))
 	{
 		// We have clicked the picker/tool itself.
 		// Store click pos and wait for dragging.
@@ -201,17 +199,20 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 		mIsDragging = false;
 	}
 
-	if (!hit)
-		return;
+//	if (!hit)
+//		return;
 
-	mPickedPoint = pick_w;
+	if (hit && mSnapToSurface)
+	{
+		mPickedPoint = pick_w;
 
-	if (mGraphicalPoint)
-		mGraphicalPoint->setValue(mPickedPoint);
-	if (mGlyph)
-		mGlyph->setPosition(mPickedPoint);
+		if (mGraphicalPoint)
+			mGraphicalPoint->setValue(mPickedPoint);
+		this->setGlyphCenter(mPickedPoint);
 
-	emit pointPicked(mPickedPoint);
+		emit pointPicked(mPickedPoint);
+	}
+
 //	return mPickedPoint;
 }
 
@@ -243,37 +244,50 @@ void PickerRep::receiveTransforms(Transform3D prMt, double timestamp)
 	mPickedPoint = p_r;
 	if (mGraphicalPoint)
 		mGraphicalPoint->setValue(mPickedPoint);
-	if (mGlyph)
-		mGlyph->setPosition(mPickedPoint);
-
+	this->setGlyphCenter(mPickedPoint);
 }
 
 void PickerRep::setEnabled(bool on)
 {
-	if (mEnabled == on)
+	if (mSnapToSurface == on)
 		return;
 
-	mEnabled = on;
+	mSnapToSurface = on;
 
-	if (mEnabled)
+	if (mSnapToSurface)
 	{
-		this->connectInteractor();
+//		this->connectInteractor();
 		if (mGraphicalPoint)
 			mGraphicalPoint->getActor()->SetVisibility(true);
-		if (mGlyph)
-		{
-			mGlyph->getActor()->SetVisibility(true);
-		}
 	}
 	else
 	{
-		this->disconnectInteractor();
+//		this->disconnectInteractor();
 		if (mGraphicalPoint)
 			mGraphicalPoint->getActor()->SetVisibility(false);
-		if (mGlyph)
-			mGlyph->getActor()->SetVisibility(false);
 	}
 }
+
+//void PickerRep::setEnabled(bool on)
+//{
+//	if (mEnabled == on)
+//		return;
+//
+//	mEnabled = on;
+//
+//	if (mEnabled)
+//	{
+//		this->connectInteractor();
+//		if (mGraphicalPoint)
+//			mGraphicalPoint->getActor()->SetVisibility(true);
+//	}
+//	else
+//	{
+//		this->disconnectInteractor();
+//		if (mGraphicalPoint)
+//			mGraphicalPoint->getActor()->SetVisibility(false);
+//	}
+//}
 
 void PickerRep::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long event, void* clientdata,
 		void* vtkNotUsed(calldata))
@@ -361,13 +375,23 @@ void PickerRep::OnMouseMove()
 
 		if (mGraphicalPoint)
 			mGraphicalPoint->setValue(mPickedPoint);
-		if (mGlyph)
-			mGlyph->setPosition(mPickedPoint);
+		this->setGlyphCenter(mPickedPoint);
 		emit pointPicked(mPickedPoint);
 
 		mCallbackCommand->SetAbortFlag(1);
 	}
 }
+
+void PickerRep::setGlyphCenter(ssc::Vector3D pos)
+{
+	if (mGlyph)
+	{
+		mGlyph->get_rMd_History()->setRegistration(ssc::createTransformTranslate(pos));
+//		vtkSphereSourcePtr sphere = vtkSphereSource::SafeDownCast(mGlyph->getSource());
+//		sphere->SetCenter(pos.data());
+	}
+}
+
 
 void PickerRep::OnLeftButtonUp()
 {
@@ -414,36 +438,24 @@ void PickerRep::addRepActorsToViewRenderer(View* view)
 		return;
 	}
 
-	if (mEnabled)
-		this->connectInteractor();
-
 	mView = view;
 
+	if (mEnabled)
+		this->connectInteractor();
 
 	mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
 	mGraphicalPoint->setColor(ssc::Vector3D(0, 0, 1));
 	mGraphicalPoint->setRadius(mSphereRadius);
-	mGraphicalPoint->getActor()->SetVisibility(false);
+	mGraphicalPoint->getActor()->SetVisibility(mSnapToSurface);
 
-//	// teset code
-//	vtkSphereSourcePtr glyph = vtkSphereSourcePtr::New();
-//	glyph->SetRadius(40);
-//	glyph->SetThetaResolution(16);
-//	glyph->SetPhiResolution(12);
-//	glyph->LatLongTessellationOn();
-//
-//	 mGlyph.reset(new ssc::GraphicalPolyData3D(glyph));
-//	 mGlyph->getActor()->GetProperty()->SetRepresentationToWireframe();
-//	 mGlyph->getActor()->SetVisibility(false);
-//	 std::cout << "addRepActorsToViewRenderer " << std::endl;
+//	 if (mGlyphRep)
+//		 mGlyphRep->setRenderer(mView->getRenderer());
 
-//	 if (mView)
-//		mGlyph->setRenderer(mView->getRenderer());
-//	 // end test code
-
-	 if (mGlyph)
-		mGlyph->setRenderer(mView->getRenderer());
-
+	// show even if disabled
+	if (mGlyphRep)
+	{
+		mView->addRep(mGlyphRep);
+	}
 
 	mViewportListener->startListen(mView->getRenderer());
 	this->scaleSphere();
@@ -457,8 +469,12 @@ void PickerRep::removeRepActorsFromViewRenderer(View* view)
 	this->disconnectInteractor();
 	mViewportListener->stopListen();
 	mGraphicalPoint.reset();
-	if (mGlyph)
-		mGlyph->setRenderer(NULL);
+
+	if (mGlyphRep)
+		view->removeRep(mGlyphRep);
+
+//	if (mGlyphRep)
+//		mGlyphRep->setRenderer(NULL);
 	mView = NULL;
 }
 
