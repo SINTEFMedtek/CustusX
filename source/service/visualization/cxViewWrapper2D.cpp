@@ -65,11 +65,8 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	double length = clipDepth*10;
 	mView->getRenderer()->GetActiveCamera()->SetPosition(0,0,length);
-//	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(length-clipDepth, length+0.1);
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
-
-	mView->getRenderer()->GetActiveCamera()->Print(std::cout);
 
 	addReps();
 
@@ -447,7 +444,6 @@ void ViewWrapper2D::updateView()
 	{
 		std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
 		ssc::ImagePtr image;
-		std::cout << "ViewWrapper2D::updateView() " << images.size() << std::endl;
 		if (!images.empty())
 			image = images.back(); // always show last in vector
 

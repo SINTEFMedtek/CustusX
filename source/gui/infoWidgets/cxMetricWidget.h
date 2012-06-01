@@ -14,10 +14,10 @@
 #include <QtGui>
 #include "sscForwardDeclarations.h"
 #include "sscLandmark.h"
-#include "cxPointMetric.h"
-#include "cxDistanceMetric.h"
-#include "cxAngleMetric.h"
-#include "cxPlaneMetric.h"
+#include "sscPointMetric.h"
+#include "sscDistanceMetric.h"
+#include "sscAngleMetric.h"
+#include "sscPlaneMetric.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscVector3DDataAdapterXml.h"
 #include "cxDataMetricWrappers.h"
@@ -65,7 +65,7 @@ private:
   virtual void hideEvent(QHideEvent* event);
   void enablebuttons();
   void setActiveUid(QString uid);
-  PointMetricPtr addPoint(ssc::Vector3D point, ssc::CoordinateSystem space=ssc::CoordinateSystem(ssc::csREF), QString name="point%1");
+  ssc::PointMetricPtr addPoint(ssc::Vector3D point, ssc::CoordinateSystem space=ssc::CoordinateSystem(ssc::csREF), QString name="point%1");
   MetricBasePtr createMetricWrapper(ssc::DataPtr data);
   std::vector<MetricBasePtr> createMetricWrappers();
   std::vector<ssc::DataPtr> refinePointArguments(std::vector<ssc::DataPtr> args, unsigned argNo);
