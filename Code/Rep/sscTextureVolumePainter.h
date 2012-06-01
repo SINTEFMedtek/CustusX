@@ -83,7 +83,8 @@ protected:
 	float mWidth;
 	float mHeight;
 	unsigned int mDepthBuffer;
-	bool mDepthBufferValid;
+	unsigned int mBackgroundBuffer;
+	bool mBuffersValid;
 };
 
 #endif // WIN32
