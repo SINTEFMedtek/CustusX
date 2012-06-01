@@ -23,7 +23,7 @@
 #include "sscTypeConversions.h"
 #include "cxCameraControl.h"
 #include "sscImageAlgorithms.h"
-#include "cxDataMetric.h"
+#include "sscDataMetric.h"
 #include "sscView.h"
 #include "sscImage.h"
 #include "cxViewManager.h"
@@ -233,7 +233,7 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 		action->setIcon(QIcon(":/icons/volume.png"));
 	else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
 		action->setIcon(QIcon(":/icons/surface.png"));
-	else if (boost::shared_dynamic_cast<DataMetric>(data))
+	else if (boost::shared_dynamic_cast<ssc::DataMetric>(data))
 		action->setIcon(QIcon(":/icons/metric.png"));
 
 //  std::cout << "base " << mLastDataActionUid << "  " << uid << std::endl;
