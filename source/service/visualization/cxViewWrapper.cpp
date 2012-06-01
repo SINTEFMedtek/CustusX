@@ -97,14 +97,15 @@ void ViewGroupData::addData(ssc::DataPtr data)
 	emit dataAdded(qstring_cast(data->getUid()));
 }
 
-void ViewGroupData::removeData(ssc::DataPtr data)
+bool ViewGroupData::removeData(ssc::DataPtr data)
 {
 	if (!data)
-		return;
+		return false;
 	if (!std::count(mData.begin(), mData.end(), data))
-		return;
+		return false;
 	mData.erase(std::find(mData.begin(), mData.end(), data));
 	emit dataRemoved(qstring_cast(data->getUid()));
+	return true;
 }
 
 void ViewGroupData::clearData()

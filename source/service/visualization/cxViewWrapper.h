@@ -67,7 +67,7 @@ public:
 	void requestInitialize();
 	std::vector<ssc::DataPtr> getData() const;
 	void addData(ssc::DataPtr data);
-	void removeData(ssc::DataPtr data);
+	bool removeData(ssc::DataPtr data);
 	void clearData();
 	std::vector<ssc::ImagePtr> getImages() const;
 	std::vector<ssc::MeshPtr> getMeshes() const;
