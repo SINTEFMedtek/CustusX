@@ -48,11 +48,11 @@
 #include "cxRepManager.h"
 #include "cxCameraControl.h"
 #include "cxLandmarkRep.h"
-#include "cxPointMetricRep.h"
-#include "cxDistanceMetricRep.h"
-#include "cxAngleMetricRep.h"
-#include "cxPlaneMetricRep.h"
-#include "cxDataMetricRep.h"
+#include "sscPointMetricRep.h"
+#include "sscDistanceMetricRep.h"
+#include "sscAngleMetricRep.h"
+#include "sscPlaneMetricRep.h"
+#include "sscDataMetricRep.h"
 #include "cxDataLocations.h"
 #include "sscTexture3DSlicerRep.h"
 #include "sscSlices3DRep.h"
@@ -62,16 +62,16 @@
 #include "sscAxesRep.h"
 #include "cxViewGroup.h"
 
-#include "cxAngleMetric.h"
-#include "cxDistanceMetric.h"
-#include "cxPointMetric.h"
+#include "sscAngleMetric.h"
+#include "sscDistanceMetric.h"
+#include "sscPointMetric.h"
 
 namespace cx
 {
 
 AxisConnector::AxisConnector(ssc::CoordinateSystem space)
 {
-	mListener.reset(new CoordinateSystemListener(space));
+	mListener.reset(new ssc::CoordinateSystemListener(space));
 	connect(mListener.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
 
 	mRep = ssc::AxesRep::New(space.toString() + "_axis");
@@ -82,7 +82,7 @@ AxisConnector::AxisConnector(ssc::CoordinateSystem space)
 	this->changedSlot();
 }
 
-void AxisConnector::mergeWith(CoordinateSystemListenerPtr base)
+void AxisConnector::mergeWith(ssc::CoordinateSystemListenerPtr base)
 {
 	mBase = base;
 	connect(mBase.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
@@ -452,7 +452,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 			axis->mRep->setCaption("t", ssc::Vector3D(0.7, 1, 0.7));
 			axis->mRep->setFontSize(0.03);
 			axis->connectTo(tool);
-			CoordinateSystemListenerPtr mToolListener = axis->mListener;
+			ssc::CoordinateSystemListenerPtr mToolListener = axis->mListener;
 
 			mAxis.push_back(axis);
 
@@ -557,32 +557,32 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 		rep->setMesh(boost::shared_dynamic_cast<ssc::Mesh>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<PointMetric>(data))
+	else if (boost::shared_dynamic_cast<ssc::PointMetric>(data))
 	{
-		PointMetricRepPtr rep = PointMetricRep::New(data->getUid() + "_3D_rep");
+		ssc::PointMetricRepPtr rep = ssc::PointMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setPointMetric(boost::shared_dynamic_cast<PointMetric>(data));
+		rep->setPointMetric(boost::shared_dynamic_cast<ssc::PointMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<DistanceMetric>(data))
+	else if (boost::shared_dynamic_cast<ssc::DistanceMetric>(data))
 	{
-		DistanceMetricRepPtr rep = DistanceMetricRep::New(data->getUid() + "_3D_rep");
+		ssc::DistanceMetricRepPtr rep = ssc::DistanceMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setDistanceMetric(boost::shared_dynamic_cast<DistanceMetric>(data));
+		rep->setDistanceMetric(boost::shared_dynamic_cast<ssc::DistanceMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<AngleMetric>(data))
+	else if (boost::shared_dynamic_cast<ssc::AngleMetric>(data))
 	{
-		AngleMetricRepPtr rep = AngleMetricRep::New(data->getUid() + "_3D_rep");
+		ssc::AngleMetricRepPtr rep = ssc::AngleMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setMetric(boost::shared_dynamic_cast<AngleMetric>(data));
+		rep->setMetric(boost::shared_dynamic_cast<ssc::AngleMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<PlaneMetric>(data))
+	else if (boost::shared_dynamic_cast<ssc::PlaneMetric>(data))
 	{
-		PlaneMetricRepPtr rep = PlaneMetricRep::New(data->getUid() + "_3D_rep");
+		ssc::PlaneMetricRepPtr rep = ssc::PlaneMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setMetric(boost::shared_dynamic_cast<PlaneMetric>(data));
+		rep->setMetric(boost::shared_dynamic_cast<ssc::PlaneMetric>(data));
 		return rep;
 	}
 
@@ -594,7 +594,7 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
  */
 void ViewWrapper3D::readDataRepSettings(ssc::RepPtr rep)
 {
-	cx::DataMetricRepPtr val = boost::shared_dynamic_cast<DataMetricRep>(rep);
+	ssc::DataMetricRepPtr val = boost::shared_dynamic_cast<ssc::DataMetricRep>(rep);
 	if (!val)
 		return;
 
