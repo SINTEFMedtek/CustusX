@@ -79,6 +79,66 @@ bool inUnitCube( vec4 pos)
 	return !(any(greaterThan(pos.xyz, vec3(1))) || any(lessThan(pos.xyz, vec3(0))));
 }
 
+float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
+{
+	vec4 pos = Matrix * position;
+	vec4 delta = Matrix * rayDirection;
+	float min = maxIterations*stepsize;
+	if (pos.x < 0.0 && delta.x > 0.0)
+	{
+		float distance = -pos.x/delta.x;
+		if (distance < min && inUnitCube(pos + distance*delta))
+		{
+			min = distance;
+		}
+	}
+	if (pos.x > 1.0 && delta.x < 0.0)
+	{
+		float distance = (pos.x-1.0)/-delta.x;
+		if (distance < min && inUnitCube(pos + distance*delta))
+		{
+			min = distance;
+		}
+	}
+	if (pos.y < 0.0 && delta.y > 0.0)
+	{
+		float distance = -pos.y/delta.y;
+		if (distance < min && inUnitCube(pos + distance*delta))
+		{
+			min = distance;
+		}
+	}
+	if (pos.y > 1.0 && delta.y < 0.0)
+	{
+		float distance = (pos.y-1.0)/-delta.y;
+		if (distance < min && inUnitCube(pos + distance*delta))
+		{
+			min = distance;
+		}
+	}
+	if (pos.z < 0.0 && delta.z > 0.0)
+	{
+		float distance = -pos.z/delta.z;
+		if (distance < min && inUnitCube(pos + distance*delta))
+		{
+			min = distance;
+		}
+	}
+	if (pos.z > 1.0 && delta.z < 0.0)
+	{
+		float distance = (pos.z-1.0)/-delta.z;
+		if (distance < min && inUnitCube(pos + distance*delta))
+		{
+			min = distance;
+		}
+	}
+	if (min == maxIterations * stepsize)
+	{
+		return -1.0;
+	}
+	return min;
+}
+
 vec4 computeRayDirection( vec4 position, vec2 viewport)
 {
 	vec4 near, far;
@@ -172,9 +232,28 @@ void main()
 			continue;			
 		} else if (hit==0)
 		{
-			// We didn't hit any volume, but there could be some volumes left to hit, continue iteration
-			// TODO: compute intersection with next volume here
-			vect += rayDeltaVector;
+			// We didn't hit any volume, but there could be some volumes left to hit. Skip distance to next volume, or break if no more volumes will be hit.
+			float min = maxIterations*stepsize;
+			for (int j = 0; j < volumes; ++j)
+			{
+				if (!beenHit[j])
+				{
+					float hit = toHit(M[j], vect, rayDirection);
+					if (hit < 0.0)
+					{
+						beenHit[j] = true; // haven't been hit, but will not hit
+					}
+					else if (hit < min)
+					{
+						min = hit;
+					}
+				}
+			}
+			if (min == maxIterations * stepsize)
+			{
+				break;
+			}
+			vect += min * rayDirection;
 			continue;
 		}
 
