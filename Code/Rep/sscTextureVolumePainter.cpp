@@ -70,6 +70,7 @@ namespace ssc
 vtkStandardNewMacro(TextureVolumePainter);
 vtkCxxRevisionMacro(TextureVolumePainter, "$Revision: 647 $");
 
+#define GL_TRACE(string) if (vtkgl::StringMarkerGREMEDY) {vtkgl::StringMarkerGREMEDY(0, QString("%1:%2 - %3").arg(__func__).arg(__LINE__).arg(string).toUtf8().constData());}
 class HackGLTexture: public vtkOpenGLTexture
 {
 public:
@@ -378,7 +379,7 @@ void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor
 	{
 		return;
 	}
-
+	GL_TRACE("Entering");
 	// Save context state to be able to restore.
 	mInternals->Shader->Build();
 	if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
@@ -483,6 +484,7 @@ bool TextureVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr
 	{
 		std::cout<<"GL_MAX_TEXTURE_COORDS="<<value[0]<<" . Number of texture coordinate sets. Min is 2."<<std::endl;
 	}
+	mgr->LoadSupportedExtension("GL_GREMEDY_string_marker");
 	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_3")
