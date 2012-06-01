@@ -34,10 +34,16 @@ FiberBundlePtr FiberBundle::New(const QString& uid, const QString& name)
 
 DoubleBoundingBox3D FiberBundle::boundingBox() const
 {
-    // Make sure we have updated data first
-    mVtkPolyData->UpdateInformation();
+    DoubleBoundingBox3D retval;
 
-    return DoubleBoundingBox3D(mVtkPolyData->GetBounds());
+    if (mVtkPolyData)
+    {
+        // Make sure we have updated data first
+        mVtkPolyData->UpdateInformation();
+        retval = DoubleBoundingBox3D(mVtkPolyData->GetBounds());
+    }
+
+    return retval;
 }
 
 void FiberBundle::printSelf(std::ostream &os, Indent indent)
