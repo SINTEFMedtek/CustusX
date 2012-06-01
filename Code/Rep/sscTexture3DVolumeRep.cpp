@@ -33,6 +33,7 @@
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>
+#include <vtkProperty.h>
 
 #include "sscImage.h"
 #include "sscView.h"
@@ -92,6 +93,7 @@ Texture3DVolumeRep::Texture3DVolumeRep(const QString& uid) :
 	mPainterPolyDatamapper->SetPainter(mPainter);
 	mPainterPolyDatamapper->SetInput(mMerger->GetOutput());
 	mActor->SetMapper(mPainterPolyDatamapper);
+	mActor->GetProperty()->SetOpacity(0.99);
 }
 
 Texture3DVolumeRep::~Texture3DVolumeRep()

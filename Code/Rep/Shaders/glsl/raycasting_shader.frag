@@ -1,5 +1,6 @@
 #version 120
 #extension GL_EXT_gpu_shader4 : enable
+#extension GL_ARB_texture_rectangle : enable
 #pragma debug(on)
 
 const int volumes=${NUMBER_OF_VOLUMES};
@@ -16,7 +17,8 @@ uniform float level[4];
 uniform samplerBuffer lut[4];
 uniform float transparency[4];
 uniform mat4 M[4];
-uniform sampler2D depthBuffer;
+uniform sampler2DRect depthBuffer;
+uniform sampler2DRect backgroundBuffer;
 
 float applyWindowLevel(float input, float window, float level)
 {
@@ -60,9 +62,8 @@ vec4 viewVolumePosition( vec4 fragment, vec2 viewport)
 
 vec2 depthTexCoords( vec4 fragment, vec2 viewport)
 {
-	vec2 result;
-	result.x = fragment.x/viewport.x;
-	result.y = fragment.y/viewport.y;
+
+	vec2 result = fragment.xy;
 	return result;
 }
 
@@ -166,19 +167,15 @@ void main()
 	float alphaSample; // The src alpha
 	float n = 0.0;
 	float thau = 0.02;
-	gl_FragDepth = 1.0;
 	bool found_depth = false;
 
 	vec2 depthLookup;
 	depthLookup = depthTexCoords(gl_FragCoord, viewport);
-	depthLookup.x = fract(depthLookup.x);
-	depthLookup.y = fract(depthLookup.y); 
-	vec4 depth = texture2D(depthBuffer, depthLookup);
-	if (depth.r*1.01 < gl_FragCoord.z)
-	{
-		discard;
-		return;
-	}
+	vec4 depth = texture2DRect(depthBuffer, depthLookup);
+	vec4 end = gl_FragCoord;
+	end.z = depth.r;
+	end = unproject(end, viewport);
+	float maxLength = length(end-start);
 
 	rayDirection = computeRayDirection(gl_FragCoord, viewport);
 	
@@ -186,6 +183,7 @@ void main()
 	if (renderMode == 5) alphaAccumulator = 1.0;
 
 	bool beenHit[4];
+	bool doBreak = false;
 	for (int j = 0; j < volumes; ++j)
 	{
 		beenHit[j] = false;
@@ -193,6 +191,14 @@ void main()
 	for(int i = 0; i < maxIterations; i++)
 	{
 		colorSample = vec4(0);
+		if (i > maxLength/delta)
+		{
+			colorSample = texture2DRect(backgroundBuffer, depthLookup);
+			colorSample.a = 1.0;
+			doBreak = true;
+		}
+		else
+		{
 		int hit = 0;
 		int contributingVolumes = 0;
 		for (int i = 0; i < volumes; ++i)
@@ -256,14 +262,6 @@ void main()
 			vect += min * rayDirection;
 			continue;
 		}
-
-		if (!found_depth)
-		{
-			vec4 depth = gl_ModelViewProjectionMatrix * vect;
-			depth.z = depth.z/depth.w;
-			depth.z = (depth.z + 1.0)*0.5;
-			gl_FragDepth = depth.z;
-			found_depth = true;
 		}
 
 		if (renderMode == 0) // Accumulated average (compositing)
@@ -351,6 +349,10 @@ void main()
 			break;
 		}
 
+		if (doBreak)
+		{
+			break;
+		}
 		vect += rayDeltaVector;
 
 		if (renderMode == 5)

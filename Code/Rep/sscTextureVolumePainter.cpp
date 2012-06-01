@@ -231,7 +231,8 @@ public:
 //---------------------------------------------------------
 TextureVolumePainter::TextureVolumePainter() :
 	mDepthBuffer(0),
-	mDepthBufferValid(false)
+	mBackgroundBuffer(0),
+	mBuffersValid(false)
 {
 	mInternals = new vtkInternals();
 }
@@ -391,42 +392,59 @@ void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor
 		mInternals->mElement[i].eachRenderInternal(mInternals->Shader);
 	}
 
-	actor->GetProperty()->SetOpacity(0.5);
-	GLint saveDrawBuffer;
-	glGetIntegerv(GL_DRAW_BUFFER, &saveDrawBuffer);
-	glDrawBuffer(GL_NONE);
-	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
-	glDrawBuffer(saveDrawBuffer);
-	actor->GetProperty()->SetOpacity(1.0);
-
-	if (!mDepthBufferValid && glIsTexture(mDepthBuffer))
+	glDepthMask(1);
+	if (!mBuffersValid)
 	{
-		glDeleteTextures(1, &mDepthBuffer);
-		mDepthBuffer = 0;
+		if (glIsTexture(mDepthBuffer))
+		{
+			glDeleteTextures(1, &mDepthBuffer);
+			mDepthBuffer = 0;
+		}
+		if (glIsTexture(mBackgroundBuffer))
+		{
+			glDeleteTextures(1, &mBackgroundBuffer);
+			mBackgroundBuffer = 0;
+		}
 	}
 	if (!glIsTexture(mDepthBuffer))
 	{
 		glGenTextures(1, &mDepthBuffer);
 		report_gl_error();
 		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
+		glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mDepthBuffer);
 		report_gl_error();
-		glTexImage2D(GL_TEXTURE_2D, 0, vtkgl::DEPTH_COMPONENT32, mWidth, mHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(vtkgl::TEXTURE_RECTANGLE_ARB, 0, vtkgl::DEPTH_COMPONENT32, mWidth, mHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 		report_gl_error();
-		glTexParameteri(GL_TEXTURE_2D, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
-		glTexParameteri(GL_TEXTURE_2D, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		mDepthBufferValid = true;
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	}
+	if (!glIsTexture(mBackgroundBuffer))
+	{
+		glGenTextures(1, &mBackgroundBuffer);
+		report_gl_error();
+		glActiveTexture(GL_TEXTURE11);
+		glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mBackgroundBuffer);
+		report_gl_error();
+		glTexImage2D(vtkgl::TEXTURE_RECTANGLE_ARB, 0, GL_RGB, mWidth, mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		report_gl_error();
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	}
+	mBuffersValid = true;
 
 	glActiveTexture(GL_TEXTURE10);
-	glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
-	glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, mWidth, mHeight);
+	glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mDepthBuffer);
+	glCopyTexSubImage2D( vtkgl::TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, mWidth, mHeight);
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mBackgroundBuffer);
+	glCopyTexSubImage2D( vtkgl::TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, mWidth, mHeight);
 	report_gl_error();
-	glClear(GL_DEPTH_BUFFER_BIT);
 	int depthTexture = 10;
 	mInternals->Shader->GetUniformVariables()->SetUniformi("depthBuffer", 1, (int*)&depthTexture);
+	int backgroundTexture = 11;
+	mInternals->Shader->GetUniformVariables()->SetUniformi("backgroundBuffer", 1, (int*)&backgroundTexture);
 	mInternals->Shader->Use();
 	report_gl_error();
 
@@ -468,6 +486,7 @@ bool TextureVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr
 	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_3")
+	        && LoadRequiredExtension(mgr, "GL_ARB_texture_rectangle")
 			&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object")
 			&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
 }
@@ -504,7 +523,7 @@ void TextureVolumePainter::setViewport(float width, float height)
 {
 	if (width != mWidth || height != mHeight)
 	{
-		mDepthBufferValid = false;
+		mBuffersValid = false;
 	}
 	mWidth = width;
 	mHeight = height;	
