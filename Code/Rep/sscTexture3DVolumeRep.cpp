@@ -86,13 +86,6 @@ Texture3DVolumeRep::Texture3DVolumeRep(const QString& uid) :
 	mPainter->setShaderFiles("/Data/Resources/Shaders/raycasting_shader.vert", "/Data/Resources/Shaders/raycasting_shader.frag");
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
 
-/**	vtkTriangleFilterPtr triangleFilter = vtkTriangleFilterPtr::New(); //create triangle polygons from input polygons
-	triangleFilter->SetInputConnection(mCubeSource->GetOutputPort()); //in this case a Planesource
-
-	vtkStripperPtr stripper = vtkStripperPtr::New();
-	stripper->SetInputConnection(triangleFilter->GetOutputPort());
-	stripper->Update(); */
-
 	mMerger = vtkAppendPolyData::New();
 
 	mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
@@ -258,7 +251,6 @@ QString Texture3DVolumeRep::getTCoordName(int index)
 {
      return  "texture"+qstring_cast(index);
 }
-
 
 //---------------------------------------------------------
 }//end namespace
