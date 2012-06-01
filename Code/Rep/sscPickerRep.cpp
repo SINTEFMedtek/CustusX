@@ -183,9 +183,11 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 //	std::cout << "  pt : " << mGraphicalPoint->getPolyData().GetPointer() << std::endl;
 	ssc::Vector3D pick_w(picker->GetPickPosition());
 
-	if (data == mGraphicalPoint->getPolyData()
-		|| (mGlyph && data==(mGlyph->getVtkPolyData()))
-		|| (mTool && data==(mTool->getGraphicsPolyData())))
+	if ( data &&
+		((mGraphicalPoint && (data == mGraphicalPoint->getPolyData() ))
+	   ||(mGlyph          && (data == mGlyph->getVtkPolyData()       ))
+	   ||(mTool           && (data == mTool->getGraphicsPolyData()   )))
+	   )
 	{
 		// We have clicked the picker/tool itself.
 		// Store click pos and wait for dragging.

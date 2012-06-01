@@ -81,7 +81,6 @@ void GeometricRep2D::setMesh(MeshPtr mesh)
 	mMesh = mesh;
 	if (mMesh)
 	{
-		std::cout << "GeometricRep2D::setMesh " << mMesh->getName() << std::endl;
 		connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
 		connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		this->meshChangedSlot();
@@ -115,7 +114,6 @@ void GeometricRep2D::setSliceProxy(SliceProxyPtr slicer)
 void GeometricRep2D::meshChangedSlot()
 {
 	mMesh->connectToRep(mSelf);
-	//	std::cout << "GeometricRep2D::meshChangedSlot()" << std::endl;
 
 	mMapper->SetInput(mMesh->getVtkPolyData()); // original - show-all method
 	mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
