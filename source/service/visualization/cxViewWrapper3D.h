@@ -31,7 +31,7 @@
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
 #include "sscVector3D.h"
-#include "cxPointMetric.h"
+#include "sscPointMetric.h"
 class QAction;
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
@@ -68,13 +68,13 @@ class AxisConnector : public QObject
 	public:
 		AxisConnector(ssc::CoordinateSystem space);
 		void connectTo(ssc::ToolPtr tool);
-		void mergeWith(CoordinateSystemListenerPtr base);
+		void mergeWith(ssc::CoordinateSystemListenerPtr base);
 		ssc::AxesRepPtr mRep; ///< axis
-		CoordinateSystemListenerPtr mListener;
+		ssc::CoordinateSystemListenerPtr mListener;
 	private slots:
 		void changedSlot();
 	private:
-		CoordinateSystemListenerPtr mBase;
+		ssc::CoordinateSystemListenerPtr mBase;
 		ssc::ToolPtr mTool;
 };
 typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
