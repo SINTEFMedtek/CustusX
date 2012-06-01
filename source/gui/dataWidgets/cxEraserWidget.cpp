@@ -46,33 +46,66 @@ namespace cx
 {
 
 EraserWidget::EraserWidget(QWidget* parent) :
-	BaseWidget(parent, "EraserWidget", "Eraser")
+	BaseWidget(parent, "EraserWidget", "Eraser"),
+	mPreviousCenter(0,0,0),
+	mPreviousRadius(0)
 {
+
 	QVBoxLayout* layout = new QVBoxLayout(this);
 
-	this->setToolTip(this->defaultWhatsThis());
+	mContinousEraseTimer = new QTimer(this);
+	connect(mContinousEraseTimer, SIGNAL(timeout()), this, SLOT(continousRemoveSlot())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 
-	layout->addWidget(new QLabel(QString("<font size=4 color=red><b>%1</b></font><br>Erase parts of active volume using a sphere.").arg("Experimental Widget!!")));
-	layout->addStretch();
+//	this->setToolTip(this->defaultWhatsThis());
 
-	mShowEraserCheckBox = new QCheckBox("Show eraser");
-	mShowEraserCheckBox->setToolTip("Show eraser sphere in 3D view.");
+//	layout->addWidget(new QLabel(QString("<font size=4 color=red><b>%1</b></font><br>Erase parts of active volume using a sphere.").arg("Experimental Widget!!")));
+//	layout->addStretch();
+
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
+	layout->addLayout(buttonLayout);
+	QHBoxLayout* buttonLayout2 = new QHBoxLayout;
+	layout->addLayout(buttonLayout2);
+
+	mShowEraserCheckBox = new QCheckBox("Show");
+	mShowEraserCheckBox->setToolTip("Show eraser sphere in the views.");
 	connect(mShowEraserCheckBox, SIGNAL(toggled(bool)), this, SLOT(toggleShowEraser(bool)));
-	layout->addWidget(mShowEraserCheckBox);
+	buttonLayout->addWidget(mShowEraserCheckBox);
 
-	// QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png")
-//	this->createAction(this, , "Test", "Test",
-//		SLOT(testSlot()), layout);
-	this->createAction(this, QIcon(), "Erase", "Erase everything inside sphere",
-		SLOT(removeSlot()), layout);
+	mContinousEraseCheckBox = new QCheckBox("Continous");
+	mContinousEraseCheckBox->setToolTip("Erase continously using the sphere. (might be slow)");
+	connect(mContinousEraseCheckBox, SIGNAL(toggled(bool)), this, SLOT(toggleContinous(bool)));
+	buttonLayout2->addWidget(mContinousEraseCheckBox);
 
-	this->createAction(this, QIcon(), "Save", "Save modified image to disk",
-		SLOT(saveSlot()), layout);
+	mDuplicateAction = this->createAction(this, QIcon(), "Duplicate", "Duplicate active volume - do this before erasing!",
+		SLOT(duplicateSlot()), buttonLayout);
+
+	mSaveAction = this->createAction(this, QIcon(), "Save", "Save modified image to disk",
+		SLOT(saveSlot()), buttonLayout);
+
+	mRemoveAction = this->createAction(this, QIcon(), "Erase", "Erase everything inside sphere",
+		SLOT(removeSlot()), buttonLayout2);
+
 
 	double sphereRadius = 10;
 	mSphereSizeAdapter = ssc::DoubleDataAdapterXml::initialize("SphereSize", "Sphere Size", "Radius of Eraser Sphere", sphereRadius, ssc::DoubleRange(1,200,1), 0, QDomNode());
 	connect(mSphereSizeAdapter.get(), SIGNAL(changed()), this, SLOT(sphereSizeChangedSlot()));
-	layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter));
+	mSphereSize = new ssc::SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter);
+	layout->addWidget(mSphereSize);
+
+	layout->addStretch();
+
+	this->enableButtons();
+}
+
+void EraserWidget::enableButtons()
+{
+	bool e = mShowEraserCheckBox->isChecked();
+
+	mContinousEraseCheckBox->setEnabled(e);
+//	mDuplicateAction->setEnabled(e);
+//	mSaveAction->setEnabled(e);
+	mRemoveAction->setEnabled(e);
+	mSphereSize->setEnabled(e);
 }
 
 EraserWidget::~EraserWidget()
@@ -87,6 +120,51 @@ QString EraserWidget::defaultWhatsThis() const
 		"</p>"
 		"<p><i></i></p>"
 		"</html>";
+}
+
+void EraserWidget::toggleContinous(bool on)
+{
+	if (on)
+	{
+		mContinousEraseTimer->start(300);
+	}
+	else
+	{
+		mContinousEraseTimer->stop();
+	}
+}
+
+void EraserWidget::continousRemoveSlot()
+{
+	ssc::Transform3D rMd = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->get_rMd();
+	ssc::Vector3D c(mSphere->GetCenter());
+	c = rMd.coord(c);
+	double r = mSphere->GetRadius();
+
+	// optimization: dont remove if idle
+	if (ssc::similar(mPreviousCenter, c) && ssc::similar(mPreviousRadius, r))
+		return;
+
+	this->removeSlot();
+}
+
+void EraserWidget::duplicateSlot()
+{
+	ssc::ImagePtr original = ssc::dataManager()->getActiveImage();
+	QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
+
+	ssc::ImagePtr duplicate = duplicateImage(original);
+	ssc::dataManager()->loadData(duplicate);
+	ssc::dataManager()->saveImage(duplicate, outputBasePath);
+	ssc::dataManager()->setActiveImage(duplicate);
+
+	// replace viz of original with duplicate
+	std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
+	for (unsigned i = 0; i < viewGroups.size(); ++i)
+	{
+		if (viewGroups[i]->getData()->removeData(original))
+			viewGroups[i]->getData()->addData(duplicate);
+	}
 }
 
 void EraserWidget::sphereSizeChangedSlot()
@@ -107,6 +185,7 @@ void EraserWidget::saveSlot()
 	ssc::dataManager()->saveImage(image, outputBasePath);
 }
 
+
 template <class TYPE>
 void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 {
@@ -122,6 +201,8 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 	ssc::Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
+	mPreviousCenter = c;
+	mPreviousRadius = r;
 
 	ssc::DoubleBoundingBox3D bb_r(c[0]-r, c[0]+r, c[1]-r, c[1]+r, c[2]-r, c[2]+r);
 
@@ -159,7 +240,6 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 				if ((ssc::Vector3D(x*spacing[0], y*spacing[1], z*spacing[2]) - c_d).length() < r_d)
 					volumePointer[index] = replaceVal;
 			}
-
 }
 
 //#define VTK_VOID            0
@@ -179,6 +259,9 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 
 void EraserWidget::removeSlot()
 {
+	if (!mSphere)
+		return;
+
 //	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
 //	mEraserSphere->GetPolyData(poly);
 
@@ -228,6 +311,7 @@ void EraserWidget::removeSlot()
 	ssc::ImageLUT2DPtr tf2D = image->getLookupTable2D();
 	ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
 
+	img->Modified();
 	image->setVtkImageData(img);
 
 	// keep existing transfer functions
@@ -239,6 +323,7 @@ void EraserWidget::toggleShowEraser(bool on)
 {
 	if (on)
 	{
+		std::vector<ViewGroupPtr> viewGroups = viewManager()->getViewGroups();
 		mSphere = vtkSphereSourcePtr::New();
 
 		mSphere->SetRadius(40);
@@ -248,40 +333,26 @@ void EraserWidget::toggleShowEraser(bool on)
 
 		double a = mSphereSizeAdapter->getValue();
 		mSphere->SetRadius(a);
-		ssc::MeshPtr glyph = viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph;
+		ssc::MeshPtr glyph = viewGroups.front()->getData()->getOptions().mPickerGlyph;
 		glyph->setVtkPolyData(mSphere->GetOutput());
-//		glyph->setColor(QColor("blue"));
 		glyph->setColor(QColor(255, 204, 0)); // same as tool
 		glyph->setIsWireframe(true);
 
-//		  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(mSphere->GetOutput(), "testsphere", "testsphere", "Images");
-//		ssc::dataManager()->loadData(mesh);
-//		ssc::dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
-
-//		mEraserSphere = vtkSphereWidgetPtr::New();
-//		mEraserSphere->SetInteractor(view->getRenderWindow()->GetInteractor());
-//		mEraserSphere->SetEnabled(true);
-//		double a = mSphereSizeAdapter->getValue();
-//		mEraserSphere->SetRadius(a);
-//		cx::ToolManager* tm = cx::ToolManager::getInstance();
-//		ssc::Transform3D rMt =
-//						*tm->get_rMpr() *
-//						tm->getManualTool()->get_prMt();
-//		mEraserSphere->SetCenter(rMt.coord(ssc::Vector3D(0, 0, tm->getTooltipOffset())).data());
-////		mEraserSphere->PlaceWidget(-a, a, -a, a, -a, a);
-//		mEraserSphere->ScaleOn();
-//
-//		mEraserSphere->SetThetaResolution(12);
-//		mEraserSphere->SetPhiResolution(12);
+		// set same glyph in all groups
+		for (unsigned i=0; i<viewGroups.size(); ++i)
+		{
+			ViewGroupData::Options options = viewGroups[i]->getData()->getOptions();
+			options.mPickerGlyph = glyph;
+			viewGroups[i]->getData()->setOptions(options);
+		}
 	}
 	else
 	{
 		viewManager()->getViewGroups().front()->getData()->getOptions().mPickerGlyph->setVtkPolyData(NULL);
-//		sphere->SetRadius(0);
-//		mEraserSphere->SetEnabled(false);
-//		mEraserSphere->SetInteractor(NULL);
-//		mEraserSphere = vtkSphereWidgetPtr();
+		mContinousEraseCheckBox->setChecked(false);
 	}
+
+	this->enableButtons();
 }
 
 }
