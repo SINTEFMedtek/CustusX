@@ -47,32 +47,6 @@ GeometricRep2D::GeometricRep2D(const QString& uid, const QString& name) :
 	mMapper = vtkPolyDataMapperPtr::New();
 	mProperty = vtkPropertyPtr::New();
 	mActor = vtkActorPtr::New();
-	/*
-	mNormals = vtkPolyDataNormalsPtr::New();
-	mCutter = vtkCutterPtr::New();
-	mCutPlane = vtkPlanePtr::New();
-	mStripper = vtkStripperPtr::New();
-	mCutPoly = vtkPolyDataPtr::New();
-
-	//mNormals->SetInputConnection(mMesh->getVtkPolyData()->GetOutputPort());
-	// set plane def
-
-	mCutter->SetInputConnection(mNormals->GetOutputPort());
-
-	//cutEdges = vtk.vtkCutter()
-	//  cutEdges.SetInputConnection(cowNormals.GetOutputPort())
-	mCutter->SetCutFunction(mCutPlane);
-	mCutter->GenerateCutScalarsOn();
-	mCutter->SetValue(0, 0);
-
-	mStripper->SetInputConnection(mCutter->GetOutputPort());
-	//mStripper->Update(); // ????
-	mCutPoly->SetPoints(mStripper->GetOutput()->GetPoints());
-	mCutPoly->SetLines(mStripper->GetOutput()->GetLines());
-
-	mMapper->SetInput(mCutPoly);
-	// 72 cutMapper.SetInputConnection(cutTriangles.GetOutputPort())
-*/
 	mActor->SetMapper(mMapper);
 	mActor->SetProperty(mProperty);
 }
@@ -146,10 +120,6 @@ void GeometricRep2D::meshChangedSlot()
 	mMapper->SetInput(mMesh->getVtkPolyData()); // original - show-all method
 	mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
 	//mNormals->SetInputConnection(mMesh->getVtkPolyData()->Get);
-	/*
-	mNormals->SetInput(mMesh->getVtkPolyData());
-	*/
-	//	mCutter->SetInput(mMesh->getVtkPolyData());
 
 	//Set mesh color
 	mActor->GetProperty()->SetColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
@@ -158,11 +128,6 @@ void GeometricRep2D::meshChangedSlot()
 
 	// Turn lightning off - we dont want 3D effects but a clear view of the slice
 	mActor->GetProperty()->LightingOff();
-
-	//	mActor->GetProperty()->SetRepresentationToWireframe();
-//	mActor->GetProperty()->EdgeVisibilityOn();
-//	mActor->GetProperty()->SetLineWidth(3);
-//	mActor->GetProperty()->SetEdgeColor(1, 0, 0);
 }
 
 /**called when transform is changed
@@ -175,20 +140,6 @@ void GeometricRep2D::transformChangedSlot()
 	Transform3D rMs = mSlicer->get_sMr().inv();
 	Transform3D dMr = mMesh->get_rMd().inv();
 	Transform3D dMs = dMr * rMs;
-
-	/*
-	ssc::Vector3D n = dMs.vector(ssc::Vector3D(0, 0, 1));
-	ssc::Vector3D p = dMs.coord(ssc::Vector3D(0, 0, 0));
-	mCutPlane->SetNormal(n.begin());
-	mCutPlane->SetOrigin(p.begin());
-	//  mStripper->Update();
-	//mStripper->Print(std::cout);
-	//mStripper->GetOutput()->GetPoints()->Print(std::cout);
-	//mStripper->GetOutput()->GetLines()->Print(std::cout);
-	mCutPoly->SetPoints(mStripper->GetOutput()->GetPoints());
-	mCutPoly->SetLines(mStripper->GetOutput()->GetLines());
-	//mCutPoly->Print(std::cout);
-	*/
 
 	mActor->SetUserMatrix(dMs.inv().getVtkMatrix());
 }
