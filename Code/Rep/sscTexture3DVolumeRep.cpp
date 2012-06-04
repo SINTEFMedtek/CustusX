@@ -233,7 +233,7 @@ void Texture3DVolumeRep::updateColorAttributeSlot()
 
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
 		float window = (float) mImages[i]->getTransferFunctions3D()->getWindow() / scalarTypeMax;
-		float llr = (float) 2* mImages[i]->getTransferFunctions3D()->getLLR() / scalarTypeMax;
+		float llr = (float) mImages[i]->getTransferFunctions3D()->getLLR() / scalarTypeMax;
 		float level = (float) mImages[i]->getTransferFunctions3D()->getLevel() / scalarTypeMax;
 		float alpha = (float) mImages[i]->getTransferFunctions3D()->getAlpha();
 		mPainter->SetColorAttribute(i, window, level, llr, alpha);
