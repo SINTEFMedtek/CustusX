@@ -370,7 +370,7 @@ void main()
 		{
 			if (colorAccumulator.a < 0.01) break;
 		}
-		else
+		else if (renderMode != 1 && renderMode != 2)
 		{
 			if (colorAccumulator.a > 0.95) break; // terminate if opacity > 1 or the ray is outside the volume
 		}
