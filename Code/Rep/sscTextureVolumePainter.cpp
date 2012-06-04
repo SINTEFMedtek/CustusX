@@ -1,8 +1,8 @@
 // This file is part of SSC,
 // a C++ Library supporting Image Guided Therapy Applications.
 //
-// Copyright (C) 2008- SINTEF Medical Technology
-// Copyright (C) 2008- Sonowand AS
+// Copyright (C) 2012- SINTEF Medical Technology
+// Copyright (C) 2012- Sonowand AS
 //
 // SSC is owned by SINTEF Medical Technology and Sonowand AS,
 // hereafter named the owners. Each particular piece of code
@@ -20,8 +20,6 @@
 /*
  * vmTextureVolumePainter.cpp
  *
- *  Created on: Oct 13, 2009
- *      Author: petterw
  */
 
 #include "sscTextureVolumePainter.h"
@@ -548,10 +546,6 @@ void TextureVolumePainter::setClipVolume(int index, bool clip)
 {
 	std::cout << "Turning cutplane " << (clip ? "on" : "off") << " for volume " << index << std::endl;
 	mInternals->safeIndex(index).setClip(clip);
-}
-
-void TextureVolumePainter::releaseGraphicsResources(int index)
-{
 }
 
 void TextureVolumePainter::PrintSelf(ostream& os, vtkIndent indent)

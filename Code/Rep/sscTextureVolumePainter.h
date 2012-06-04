@@ -1,8 +1,8 @@
 // This file is part of SSC,
 // a C++ Library supporting Image Guided Therapy Applications.
 //
-// Copyright (C) 2008- SINTEF Medical Technology
-// Copyright (C) 2008- Sonowand AS
+// Copyright (C) 2012- SINTEF Medical Technology
+// Copyright (C) 2012- Sonowand AS
 //
 // SSC is owned by SINTEF Medical Technology and Sonowand AS,
 // hereafter named the owners. Each particular piece of code
@@ -20,12 +20,10 @@
 /*
  * vmTextureVolumePainter.h
  *
- *  Created on: Oct 13, 2009
- *      Author: petterw
  */
 
-#ifndef SSCTEXTURESLICEPAINTER_H_
-#define SSCTEXTURESLICEPAINTER_H_
+#ifndef SSCTEXTUREVOLUMEPAINTER_H_
+#define SSCTEXTUREVOLUMEPAINTER_H_
 
 #include <boost/shared_ptr.hpp>
 #include <vtkOpenGLRepresentationPainter.h>
@@ -42,12 +40,12 @@ namespace ssc
 
 
 /**
- * \brief Helper class for GPU rendering of slices.
+ * \brief Helper class for GPU raycasting rendering of multiple volumes.
  *
- * \sa Texture3DSlicerProxyImpl
+ * \sa Texture3DVolumeRep
  *
  *
- * \ingroup sscProxy
+ * \ingroup sscRep3D
  */
 class TextureVolumePainter : public vtkOpenGLRepresentationPainter
 {
@@ -62,7 +60,6 @@ public:
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
 	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
-	void releaseGraphicsResources(int index);
 	void setViewport(float width, float height);
 	void set_nMr(int index, ssc::Transform3D nMr);
 	void setClipper(SlicePlaneClipperPtr clipper);
@@ -96,4 +93,4 @@ protected:
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
-#endif /* SSCTEXTURESLICEPAINTER_H_ */
+#endif /* SSCTEXTUREVOLUMEPAINTER_H_ */

@@ -1,8 +1,8 @@
 // This file is part of SSC,
 // a C++ Library supporting Image Guided Therapy Applications.
 //
-// Copyright (C) 2008- SINTEF Medical Technology
-// Copyright (C) 2008- Sonowand AS
+// Copyright (C) 2012- SINTEF Medical Technology
+// Copyright (C) 2012- Sonowand AS
 //
 // SSC is owned by SINTEF Medical Technology and Sonowand AS,
 // hereafter named the owners. Each particular piece of code
@@ -36,6 +36,14 @@ namespace ssc
 {
 typedef vtkSmartPointer<class TextureVolumePainter> TextureVolumePainterPtr;
 
+/**
+ * \brief Multi-Volume GPU raycast renderer
+ *
+ * This class uses a ray casting algorthim implemented on the GPU to
+ * render a representation of one or more volumes in the 3D scene.
+ * 
+ * \ingroup sscRep3D
+ */
 class Texture3DVolumeRep: public ssc::RepImpl
 {
 Q_OBJECT
@@ -46,13 +54,27 @@ public:
 	{
 		return "ssc::Texture3DVolumeRep";
 	}
+	/**
+	 * \brief Override the default locations of the shader files
+	 */
 	void setShaderFiles(QString vertexShaderFile, QString fragmentShaderFiles);
 	virtual void printSelf(std::ostream & os, ssc::Indent indent);
-	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
+	/**
+	 * \brief Set the images to render using this Rep
+	 */
 	void setImages(std::vector<ssc::ImagePtr> images);
+	/**
+	 * \brief Get the images rendered with this class
+	 */
 	std::vector<ssc::ImagePtr> getImages();
-	void update();
+	/**
+	 * \brief Set a clip plane for this renderer. Only the plane definition of the clipper is used, it is not used to determine which volumes to clip.
+	 * \sa setClipVolumes
+	 */
 	void setClipper(SlicePlaneClipperPtr clipper);
+	/**
+	 * \brief Set which volumes to clip using the clipper set with \r setClipper
+	 */
 	void setClipVolumes(QStringList volumes);
 
 protected:
@@ -65,7 +87,7 @@ private slots:
 	void updateColorAttributeSlot();
 	void transformChangedSlot();
 	QString getTCoordName(int index);
-	private:
+private:
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ssc::ImagePtr> mImages;
 	QSet<QString> mClipVolumes;
