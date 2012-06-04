@@ -35,6 +35,7 @@
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkgl.h>
+#include <vtkPlane.h>
 #include <vtkProperty.h>
 #include <vtkMatrix4x4.h>
 #include <vtkShaderProgram2.h>
@@ -60,6 +61,7 @@
 #include "sscGPUImageBuffer.h"
 #include "sscTypeConversions.h"
 #include "sscGLHelpers.h"
+#include "sscSlicePlaneClipper.h"
 
 
 //---------------------------------------------------------
@@ -94,6 +96,7 @@ class SingleVolumePainterHelper
 	HackGLTexture *mTexture;
 	bool mTextureLoaded;
 	Transform3D m_nMr;
+	bool mClip;
 
 public:
 	explicit SingleVolumePainterHelper(int index)
@@ -103,6 +106,7 @@ public:
 		int texture = 2*mIndex;
 		mTexture->SetIndex(texture);
 		mTextureLoaded = false;
+		mClip = false;
 	}
 	SingleVolumePainterHelper()
 	{
@@ -130,6 +134,10 @@ public:
 	void set_nMr( Transform3D nMr)
 	{
 		m_nMr = nMr;
+	}
+	void setClip( bool clip)
+	{
+		mClip = clip;
 	}
 	void initializeRendering()
 	{
@@ -174,6 +182,8 @@ public:
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("level[%1]").arg(mIndex)), 1, &mLevel);
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("threshold[%1]").arg(mIndex)), 1, &mLLR);
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("transparency[%1]").arg(mIndex)), 1, &mAlpha);
+		int clip = mClip;
+		shader->GetUniformVariables()->SetUniformi(cstring_cast(QString("useCutPlane[%1]").arg(mIndex)), 1, &clip);
 		vtkMatrix4x4Ptr M = m_nMr.getVtkMatrix();
 		float matrix[16];
 		for (int i = 0; i < 4; ++i)
@@ -393,6 +403,22 @@ void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor
 		mInternals->mElement[i].eachRenderInternal(mInternals->Shader);
 	}
 
+	if (mClipper)
+	{
+		float vector[3];
+		double dvector[3];
+		mClipper->getClipPlaneCopy()->GetNormal(dvector);
+		vector[0] = dvector[0];
+		vector[1] = dvector[1];
+		vector[2] = dvector[2];
+		mInternals->Shader->GetUniformVariables()->SetUniformfv("cutPlaneNormal", 3, 1, vector);
+		mClipper->getClipPlaneCopy()->GetOrigin(dvector);
+		vector[0] = dvector[0];
+		vector[1] = dvector[1];
+		vector[2] = dvector[2];
+		mInternals->Shader->GetUniformVariables()->SetUniformfv("cutPlaneOffset", 3, 1, vector);
+	}
+	
 	glDepthMask(1);
 	if (!mBuffersValid)
 	{
@@ -508,6 +534,12 @@ void TextureVolumePainter::SetColorAttribute(int index, float window, float leve
 	mInternals->safeIndex(index).SetColorAttribute(window, level, llr, alpha);
 }
 
+void TextureVolumePainter::setClipVolume(int index, bool clip)
+{
+	std::cout << "Turning cutplane " << (clip ? "on" : "off") << " for volume " << index << std::endl;
+	mInternals->safeIndex(index).setClip(clip);
+}
+
 void TextureVolumePainter::releaseGraphicsResources(int index)
 {
 	if (mDepthBuffer)
@@ -536,6 +568,10 @@ void TextureVolumePainter::set_nMr(int index, Transform3D nMr)
 	mInternals->safeIndex(index).set_nMr(nMr);
 }
 
+void TextureVolumePainter::setClipper(SlicePlaneClipperPtr clipper)
+{
+	mClipper = clipper;
+}
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------

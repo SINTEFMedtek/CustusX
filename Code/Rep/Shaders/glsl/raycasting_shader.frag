@@ -18,8 +18,11 @@ uniform float level[maxVolumes];
 uniform samplerBuffer lut[maxVolumes];
 uniform float transparency[maxVolumes];
 uniform mat4 M[maxVolumes];
+uniform bool useCutPlane[maxVolumes];
 uniform sampler2DRect depthBuffer;
 uniform sampler2DRect backgroundBuffer;
+uniform vec3 cutPlaneNormal;
+uniform vec3 cutPlaneOffset;
 
 float applyWindowLevel(float input, float window, float level)
 {
@@ -86,6 +89,10 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 	vec4 pos = Matrix * position;
 	vec4 delta = Matrix * rayDirection;
 	float min = maxIterations*stepsize;
+	if (inUnitCube(pos))
+	{
+		return 0.0;
+	}
 	if (pos.x < 0.0 && delta.x > 0.0)
 	{
 		float distance = -pos.x/delta.x;
@@ -204,7 +211,7 @@ void main()
 		int contributingVolumes = 0;
 		for (int i = 0; i < volumes; ++i)
 		{
-			if (inUnitCube(M[i]*vect))
+			if (inUnitCube(M[i]*vect) && (!useCutPlane[i] || dot(cutPlaneNormal, cutPlaneOffset-vect.xyz) < 0.0))
 			{
 				beenHit[i] = true;
 				++hit;
@@ -249,6 +256,10 @@ void main()
 					if (hit < 0.0)
 					{
 						beenHit[j] = true; // haven't been hit, but will not hit
+					}
+					else if (hit == 0.0)
+					{
+						min = delta;
 					}
 					else if (hit < min)
 					{
