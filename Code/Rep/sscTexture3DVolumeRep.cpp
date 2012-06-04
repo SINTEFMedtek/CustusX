@@ -186,7 +186,6 @@ void Texture3DVolumeRep::transformChangedSlot()
 		Transform3D nMi = createTransformNormalize(mImages[i]->boundingBox(), textureSpace);
 		// total transform from slice space to texture space
 		Transform3D nMr = nMi * iMr;
-		std::cout << "Using transform: " << std::endl << nMr << std::endl;
 		mPainter->set_nMr(i, nMr);
 	}
 }
@@ -246,7 +245,6 @@ void Texture3DVolumeRep::updateColorAttributeSlot()
 		float level = (float) mImages[i]->getTransferFunctions3D()->getLevel() / scalarTypeMax;
 		float alpha = (float) mImages[i]->getTransferFunctions3D()->getAlpha();
 		mPainter->SetColorAttribute(i, window, level, llr, alpha);
-		std::cout << "Using window, level, llr: " << window << ", " << level << ", " << llr << std::endl;
 	}
 	mActor->Modified();
 }
