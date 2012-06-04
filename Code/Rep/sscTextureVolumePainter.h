@@ -65,6 +65,8 @@ public:
 	void releaseGraphicsResources(int index);
 	void setViewport(float width, float height);
 	void set_nMr(int index, ssc::Transform3D nMr);
+	void setClipper(SlicePlaneClipperPtr clipper);
+	void setClipVolume(int index, bool clip);
 protected:
 	TextureVolumePainter();
 	virtual ~TextureVolumePainter();
@@ -85,6 +87,7 @@ protected:
 	unsigned int mDepthBuffer;
 	unsigned int mBackgroundBuffer;
 	bool mBuffersValid;
+	SlicePlaneClipperPtr mClipper;
 };
 
 #endif // WIN32

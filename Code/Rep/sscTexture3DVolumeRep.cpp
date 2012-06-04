@@ -137,6 +137,7 @@ void Texture3DVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 	{
 		disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 	}
+	mClipVolumes.clear();
 
 	mImages = images;
 
@@ -254,6 +255,20 @@ QString Texture3DVolumeRep::getTCoordName(int index)
      return  "texture"+qstring_cast(index);
 }
 
+void Texture3DVolumeRep::setClipper(SlicePlaneClipperPtr clipper)
+{
+	mClipper = clipper;
+	mPainter->setClipper(clipper);
+}
+
+void Texture3DVolumeRep::setClipVolumes(QStringList volumes)
+{
+	mClipVolumes = QSet<QString>::fromList(volumes);
+	for (unsigned i = 0; i < mImages.size(); ++i)
+	{
+		mPainter->setClipVolume(i, mClipVolumes.contains(mImages[i]->getUid()));
+	}	
+}
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------

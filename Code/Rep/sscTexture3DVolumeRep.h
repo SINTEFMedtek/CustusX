@@ -22,6 +22,7 @@
 
 #include "sscRepImpl.h"
 #include <vector>
+#include <QSet>
 #include "sscTransform3D.h"
 #include "sscBoundingBox3D.h"
 
@@ -51,6 +52,8 @@ public:
 	void setImages(std::vector<ssc::ImagePtr> images);
 	std::vector<ssc::ImagePtr> getImages();
 	void update();
+	void setClipper(SlicePlaneClipperPtr clipper);
+	void setClipVolumes(QStringList volumes);
 
 protected:
 	Texture3DVolumeRep(const QString& uid);
@@ -65,6 +68,7 @@ private slots:
 	private:
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ssc::ImagePtr> mImages;
+	QSet<QString> mClipVolumes;
 	View* mView;
 
 	TextureVolumePainterPtr mPainter;
@@ -72,6 +76,7 @@ private slots:
 	boost::array<vtkTransformPolyDataFilterPtr, MAX_CONCURRENT_VOLUMES> mTransformPolyData;
 	vtkAppendPolyDataPtr mMerger;
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
+	SlicePlaneClipperPtr mClipper;
 };
 //---------------------------------------------------------
 }//end namespace
