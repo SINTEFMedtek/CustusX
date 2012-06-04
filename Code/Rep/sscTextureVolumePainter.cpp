@@ -285,6 +285,16 @@ void TextureVolumePainter::ReleaseGraphicsResources(vtkWindow* win)
 {
 	mInternals->ClearGraphicsResources(); //the shader
 	mInternals->LastContext = 0;
+	if (mDepthBuffer)
+	{
+		glDeleteTextures(1, &mDepthBuffer);
+		mDepthBuffer = 0;
+	}
+	if (mBackgroundBuffer)
+	{
+		glDeleteTextures(1, &mBackgroundBuffer);
+		mBackgroundBuffer = 0;
+	}
 	this->Superclass::ReleaseGraphicsResources(win);
 }
 
@@ -542,11 +552,6 @@ void TextureVolumePainter::setClipVolume(int index, bool clip)
 
 void TextureVolumePainter::releaseGraphicsResources(int index)
 {
-	if (mDepthBuffer)
-	{
-		glDeleteTextures(1, &mDepthBuffer);
-		mDepthBuffer = 0;
-	}
 }
 
 void TextureVolumePainter::PrintSelf(ostream& os, vtkIndent indent)
