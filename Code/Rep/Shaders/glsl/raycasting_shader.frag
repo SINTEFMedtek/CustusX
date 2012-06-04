@@ -290,11 +290,8 @@ void main()
 
 		if (renderMode == 2) // Average (x-ray)
 		{
-			if (colorSample.x > 0.0)
-			{
-				n += 1.0;
-				colorAccumulator += colorSample;
-			}
+			n += 1.0;
+			colorAccumulator += colorSample;
 		}
 
 		if (renderMode == 3) // Frank's doodle
