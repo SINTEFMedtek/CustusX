@@ -83,6 +83,7 @@ Texture3DVolumeRep::Texture3DVolumeRep(const QString& uid) :
 	//	std::cout << "create Texture3DSlicerRep" << std::endl;
 	mActor = vtkActorPtr::New();
 	mPainter = TextureVolumePainterPtr::New();
+	mPainter->setStepSize(defaultStepSize);
 	// default shader for sonowand: override using setshaderfile()
 	mPainter->setShaderFiles("/Data/Resources/Shaders/raycasting_shader.vert", "/Data/Resources/Shaders/raycasting_shader.frag");
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
@@ -257,6 +258,11 @@ void Texture3DVolumeRep::setClipVolumes(QStringList volumes)
 	{
 		mPainter->setClipVolume(i, mClipVolumes.contains(mImages[i]->getUid()));
 	}	
+}
+
+void Texture3DVolumeRep::setStepSize(double stepsize)
+{
+	mPainter->setStepSize(stepsize);
 }
 //---------------------------------------------------------
 }//end namespace

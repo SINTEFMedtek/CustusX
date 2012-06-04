@@ -76,6 +76,11 @@ public:
 	 * \brief Set which volumes to clip using the clipper set with \r setClipper
 	 */
 	void setClipVolumes(QStringList volumes);
+	/**
+	 * \brief Override default step size.
+	 * Set the sampling distance along each ray in mm. Lower values gives better quality but slower performance. Default value is 1.0
+	 */
+	void setStepSize(double stepsize);
 
 protected:
 	Texture3DVolumeRep(const QString& uid);
@@ -99,6 +104,8 @@ private:
 	vtkAppendPolyDataPtr mMerger;
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 	SlicePlaneClipperPtr mClipper;
+	static const double defaultStepSize = 1.0;
+	
 };
 //---------------------------------------------------------
 }//end namespace
