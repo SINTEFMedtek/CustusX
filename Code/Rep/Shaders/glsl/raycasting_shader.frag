@@ -384,4 +384,5 @@ void main()
 	}
 
 	gl_FragColor = colorAccumulator;
+	gl_FragColor.a = 1.0;
 }
