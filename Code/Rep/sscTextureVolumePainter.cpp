@@ -388,7 +388,7 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 }
 
 void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
-		bool forceCompileOnly)
+                                          bool forceCompileOnly)
 {
 	report_gl_error();
 
@@ -543,7 +543,6 @@ void TextureVolumePainter::SetColorAttribute(int index, float window, float leve
 
 void TextureVolumePainter::setClipVolume(int index, bool clip)
 {
-	std::cout << "Turning cutplane " << (clip ? "on" : "off") << " for volume " << index << std::endl;
 	mInternals->safeIndex(index).setClip(clip);
 }
 
