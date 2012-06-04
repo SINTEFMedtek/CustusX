@@ -1,8 +1,8 @@
 // This file is part of SSC,
 // a C++ Library supporting Image Guided Therapy Applications.
 //
-// Copyright (C) 2008- SINTEF Medical Technology
-// Copyright (C) 2008- Sonowand AS
+// Copyright (C) 2012- SINTEF Medical Technology
+// Copyright (C) 2012- Sonowand AS
 //
 // SSC is owned by SINTEF Medical Technology and Sonowand AS,
 // hereafter named the owners. Each particular piece of code
@@ -210,18 +210,9 @@ void Texture3DVolumeRep::removeRepActorsFromViewRenderer(ssc::View* view)
 	mView = NULL;
 }
 
-void Texture3DVolumeRep::update()
-{
-
-}
-
 void Texture3DVolumeRep::printSelf(std::ostream & os, ssc::Indent indent)
 {
 
-}
-
-void Texture3DVolumeRep::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
-{
 }
 
 void Texture3DVolumeRep::updateColorAttributeSlot()
