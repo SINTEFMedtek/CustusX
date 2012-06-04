@@ -353,8 +353,7 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 
 	int renderMode = 0;
 	mInternals->Shader->GetUniformVariables()->SetUniformi("renderMode", 1, &renderMode);
-	float stepsize = 1.0;
-	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &stepsize);
+	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &mStepSize);
 	float viewport[2];
 	viewport[0] = mWidth;
 	viewport[1] = mHeight;
@@ -570,6 +569,10 @@ void TextureVolumePainter::set_nMr(int index, Transform3D nMr)
 void TextureVolumePainter::setClipper(SlicePlaneClipperPtr clipper)
 {
 	mClipper = clipper;
+}
+void TextureVolumePainter::setStepSize(double stepsize)
+{
+	mStepSize = stepsize;
 }
 //---------------------------------------------------------
 }//end namespace

@@ -64,6 +64,7 @@ public:
 	void set_nMr(int index, ssc::Transform3D nMr);
 	void setClipper(SlicePlaneClipperPtr clipper);
 	void setClipVolume(int index, bool clip);
+	void setStepSize(double stepsize);
 protected:
 	TextureVolumePainter();
 	virtual ~TextureVolumePainter();
@@ -85,6 +86,7 @@ protected:
 	unsigned int mBackgroundBuffer;
 	bool mBuffersValid;
 	SlicePlaneClipperPtr mClipper;
+	float mStepSize;
 };
 
 #endif // WIN32
