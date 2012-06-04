@@ -170,7 +170,6 @@ void main()
 	float delta = stepsize;
 	vec4 vect = start;
 	vec4 colorAccumulator = vec4(0, 0, 0, 0); // The dest color
-	float alphaAccumulator = 0.0; // The  dest alpha for blending
 	vec4 colorSample; // The src color 
 	float alphaSample; // The src alpha
 	float n = 0.0;
@@ -188,7 +187,7 @@ void main()
 	rayDirection = computeRayDirection(gl_FragCoord, viewport);
 	
 	vec4 rayDeltaVector = rayDirection * delta;
-	if (renderMode == 5) alphaAccumulator = 1.0;
+	if (renderMode == 5) colorAccumulator.a = 1.0;
 
 	bool beenHit[volumes];
 	bool doBreak = false;
@@ -279,7 +278,6 @@ void main()
 		if (renderMode == 0) // Accumulated average (compositing)
 		{
 			colorAccumulator = blendRGBA(colorAccumulator, colorSample);
-			alphaAccumulator = colorAccumulator.a;
 		}
 
 		if (renderMode == 1) // Maximum intensity
@@ -301,9 +299,9 @@ void main()
 
 		if (renderMode == 3) // Frank's doodle
 		{
-			alphaSample = colorSample.a * stepsize;
-			colorAccumulator   += (1.0 - alphaAccumulator) * colorSample * alphaSample * 3.0;
-			alphaAccumulator += alphaSample;
+			alphaSample = colorSample.a;
+			colorAccumulator.rgb   += (1.0 - colorAccumulator.a) * colorSample.rgb * alphaSample * 3.0;
+			colorAccumulator.a += alphaSample;
 		}
 
 		if (renderMode == 4) // Accumulated average (compositing) with gradient
@@ -351,13 +349,14 @@ void main()
 			if ((voxelValue - threshold[0]) > 0.0)
 			{
 				alphaSample = voxelValue - threshold[0];
-				colorAccumulator += alphaAccumulator * alphaSample;
-				alphaAccumulator = alphaAccumulator * exp((-1.0 * thau) * alphaSample);
+				colorAccumulator.rgb += colorAccumulator.a * alphaSample;
+				colorAccumulator.a = colorAccumulator.a * exp((-1.0 * thau) * alphaSample);
 			}
 		}
 		if (renderMode == 6)
 		{
 			colorAccumulator = colorSample;
+			colorAccumulator.a = 1.0;
 			break;
 		}
 
@@ -369,11 +368,11 @@ void main()
 
 		if (renderMode == 5)
 		{
-			if (alphaAccumulator < 0.01) break;
+			if (colorAccumulator.a < 0.01) break;
 		}
 		else
 		{
-			if (alphaAccumulator > 0.95) break; // terminate if opacity > 1 or the ray is outside the volume
+			if (colorAccumulator.a > 0.95) break; // terminate if opacity > 1 or the ray is outside the volume
 		}
 	}
 
@@ -384,9 +383,5 @@ void main()
 		colorAccumulator = colorAccumulator / n;
 	}
 
-	if (renderMode == 0)
-	{
-		colorAccumulator.a = alphaAccumulator;
-	}
 	gl_FragColor = colorAccumulator;
 }
