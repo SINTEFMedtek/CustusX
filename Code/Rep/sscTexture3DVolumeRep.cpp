@@ -264,6 +264,11 @@ void Texture3DVolumeRep::setStepSize(double stepsize)
 {
 	mPainter->setStepSize(stepsize);
 }
+
+void Texture3DVolumeRep::setRenderMode(enum RenderMode renderMode)
+{
+	mPainter->setRenderMode(renderMode);
+}
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------

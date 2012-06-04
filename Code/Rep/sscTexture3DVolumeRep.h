@@ -48,6 +48,22 @@ class Texture3DVolumeRep: public ssc::RepImpl
 {
 Q_OBJECT
 public:
+	enum RenderMode {
+		/** Accumulated average (the default) */
+		AccumulatedAverage = 0,
+		/** Maximum intensity projection */
+		MaximumIntensity = 1,
+		/** Simple Average (X-ray) */
+		Average = 2,
+		/** Doesn't work yet */
+		Experimental1 = 3,
+		/** Doesn't work yet */
+		AccumulatedAverageGradient = 4,
+		/** Doesn't work yet */
+		CloudLightScattering = 5,
+		/** Simple thresholding, no transparency */
+		SimpleThresholding = 6
+	};
 	static Texture3DVolumeRepPtr New(const QString& uid);
 	virtual ~Texture3DVolumeRep();
 	virtual QString getType() const
@@ -81,6 +97,10 @@ public:
 	 * Set the sampling distance along each ray in mm. Lower values gives better quality but slower performance. Default value is 1.0
 	 */
 	void setStepSize(double stepsize);
+	/**
+	 * \brief Set the rendering mode
+	 */
+	void setRenderMode(enum RenderMode renderMode);
 
 protected:
 	Texture3DVolumeRep(const QString& uid);
