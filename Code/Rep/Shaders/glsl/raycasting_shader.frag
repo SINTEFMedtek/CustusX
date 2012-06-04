@@ -282,7 +282,7 @@ void main()
 
 		if (renderMode == 1) // Maximum intensity
 		{
-			if (colorSample.x > colorAccumulator.x)
+			if (length(colorSample.rgb) > length(colorAccumulator.rgb))
 			{
 				colorAccumulator = colorSample;
 			}
