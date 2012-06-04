@@ -5,18 +5,19 @@
 
 const int volumes=${NUMBER_OF_VOLUMES};
 const int maxIterations = 450;
+const int maxVolumes = 4;
 uniform float stepsize;
 uniform vec2 viewport;
 
-uniform int lutSize[4];
-uniform sampler3D volumeTexture[4];
-uniform float threshold[4];
+uniform int lutSize[maxVolumes];
+uniform sampler3D volumeTexture[maxVolumes];
+uniform float threshold[maxVolumes];
 uniform int renderMode;
-uniform float window[4];
-uniform float level[4];
-uniform samplerBuffer lut[4];
-uniform float transparency[4];
-uniform mat4 M[4];
+uniform float window[maxVolumes];
+uniform float level[maxVolumes];
+uniform samplerBuffer lut[maxVolumes];
+uniform float transparency[maxVolumes];
+uniform mat4 M[maxVolumes];
 uniform sampler2DRect depthBuffer;
 uniform sampler2DRect backgroundBuffer;
 
@@ -182,7 +183,7 @@ void main()
 	vec4 rayDeltaVector = rayDirection * delta;
 	if (renderMode == 5) alphaAccumulator = 1.0;
 
-	bool beenHit[4];
+	bool beenHit[volumes];
 	bool doBreak = false;
 	for (int j = 0; j < volumes; ++j)
 	{
