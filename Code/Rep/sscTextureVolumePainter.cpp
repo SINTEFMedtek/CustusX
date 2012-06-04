@@ -241,7 +241,8 @@ public:
 TextureVolumePainter::TextureVolumePainter() :
 	mDepthBuffer(0),
 	mBackgroundBuffer(0),
-	mBuffersValid(false)
+	mBuffersValid(false),
+	mRenderMode(0)
 {
 	mInternals = new vtkInternals();
 }
@@ -351,8 +352,7 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 		}
 	}
 
-	int renderMode = 0;
-	mInternals->Shader->GetUniformVariables()->SetUniformi("renderMode", 1, &renderMode);
+	mInternals->Shader->GetUniformVariables()->SetUniformi("renderMode", 1, &mRenderMode);
 	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &mStepSize);
 	float viewport[2];
 	viewport[0] = mWidth;
@@ -573,6 +573,10 @@ void TextureVolumePainter::setClipper(SlicePlaneClipperPtr clipper)
 void TextureVolumePainter::setStepSize(double stepsize)
 {
 	mStepSize = stepsize;
+}
+void TextureVolumePainter::setRenderMode(int renderMode)
+{
+	mRenderMode = renderMode;
 }
 //---------------------------------------------------------
 }//end namespace

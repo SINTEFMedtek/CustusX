@@ -65,6 +65,7 @@ public:
 	void setClipper(SlicePlaneClipperPtr clipper);
 	void setClipVolume(int index, bool clip);
 	void setStepSize(double stepsize);
+	void setRenderMode(int renderMode);
 protected:
 	TextureVolumePainter();
 	virtual ~TextureVolumePainter();
@@ -87,6 +88,7 @@ protected:
 	bool mBuffersValid;
 	SlicePlaneClipperPtr mClipper;
 	float mStepSize;
+	int mRenderMode;
 };
 
 #endif // WIN32
