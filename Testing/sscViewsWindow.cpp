@@ -29,6 +29,7 @@
 #include "sscTexture3DSlicerRep.h"
 #include "sscTexture3DVolumeRep.h"
 #include "sscViewsWindow.h"
+#include "sscImageTF3D.h"
 
 using ssc::Vector3D;
 using ssc::Transform3D;
