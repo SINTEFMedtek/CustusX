@@ -44,7 +44,7 @@ typedef vtkSmartPointer<class TextureVolumePainter> TextureVolumePainterPtr;
  * 
  * \ingroup sscRep3D
  */
-class Texture3DVolumeRep: public ssc::RepImpl
+class GPURayCastVolumeRep: public ssc::RepImpl
 {
 Q_OBJECT
 public:
@@ -64,11 +64,11 @@ public:
 		/** Simple thresholding, no transparency */
 		SimpleThresholding = 6
 	};
-	static Texture3DVolumeRepPtr New(const QString& uid);
-	virtual ~Texture3DVolumeRep();
+	static GPURayCastVolumeRepPtr New(const QString& uid);
+	virtual ~GPURayCastVolumeRep();
 	virtual QString getType() const
 	{
-		return "ssc::Texture3DVolumeRep";
+		return "ssc::GPURayCastVolumeRep";
 	}
 	/**
 	 * \brief Override the default locations of the shader files
@@ -103,7 +103,7 @@ public:
 	void setRenderMode(enum RenderMode renderMode);
 
 protected:
-	Texture3DVolumeRep(const QString& uid);
+	GPURayCastVolumeRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 

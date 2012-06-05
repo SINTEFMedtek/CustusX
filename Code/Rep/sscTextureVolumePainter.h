@@ -42,7 +42,7 @@ namespace ssc
 /**
  * \brief Helper class for GPU raycasting rendering of multiple volumes.
  *
- * \sa Texture3DVolumeRep
+ * \sa GPURayCastVolumeRep
  *
  *
  * \ingroup sscRep3D

@@ -218,7 +218,7 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
 	}
 
 	// volume rep
-	ssc::Texture3DVolumeRepPtr mRepPtr = ssc::Texture3DVolumeRep::New( images[0]->getUid() );
+	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);
