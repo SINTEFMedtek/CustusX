@@ -56,7 +56,7 @@ vtkCxxRevisionMacro(GPURayCastVolumePainter, "$Revision: 647 $");
 
 #define GL_TRACE(string) if (vtkgl::StringMarkerGREMEDY) {vtkgl::StringMarkerGREMEDY(0, QString("%1:%2 - %3").arg(__func__).arg(__LINE__).arg(string).toUtf8().constData());}
 	
-class SingleVolumePainterHelper
+class GPURayCastSingleVolumePainterHelper
 {
 	ssc::GPUImageDataBufferPtr mVolumeBuffer;
 	ssc::GPUImageLutBufferPtr mLutBuffer;
@@ -69,16 +69,16 @@ class SingleVolumePainterHelper
 	bool mClip;
 
 public:
-	explicit SingleVolumePainterHelper(int index)
+	explicit GPURayCastSingleVolumePainterHelper(int index)
 	{
 		mIndex = index;
 		mClip = false;
 	}
-	SingleVolumePainterHelper()
+	GPURayCastSingleVolumePainterHelper()
 	{
 		mIndex = -1;
 	}
-	~SingleVolumePainterHelper()
+	~GPURayCastSingleVolumePainterHelper()
 	{
 	}
 	void SetBuffer(ssc::GPUImageDataBufferPtr buffer)
@@ -174,14 +174,14 @@ public:
 
 	unsigned int mVolumes;
 
-	std::vector<SingleVolumePainterHelper> mElement;
+	std::vector<GPURayCastSingleVolumePainterHelper> mElement;
 
-	SingleVolumePainterHelper& safeIndex(int index)
+	GPURayCastSingleVolumePainterHelper& safeIndex(int index)
 	{
 		if ((int)mElement.size() <= index)
 		{
 			mElement.resize(index+1);
-			mElement[index] = SingleVolumePainterHelper(index);
+			mElement[index] = GPURayCastSingleVolumePainterHelper(index);
 		}
 		return mElement[index];
 	}
