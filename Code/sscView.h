@@ -127,6 +127,7 @@ private:
 	virtual void mousePressEvent(QMouseEvent *event);
 	virtual void mouseReleaseEvent(QMouseEvent *event);
 	virtual void focusInEvent(QFocusEvent* event);
+	virtual void paintEvent(QPaintEvent *event);
 	void resizeEvent(QResizeEvent *event);
 };
 
