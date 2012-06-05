@@ -206,73 +206,73 @@ void main()
 		}
 		else
 		{
-		int hit = 0;
-		int contributingVolumes = 0;
-		for (int i = 0; i < volumes; ++i)
-		{
-			if (inUnitCube(M[i]*vect) && (!useCutPlane[i] || dot(cutPlaneNormal, cutPlaneOffset-vect.xyz) < 0.0))
+			int hit = 0;
+			int contributingVolumes = 0;
+			for (int i = 0; i < volumes; ++i)
 			{
-				beenHit[i] = true;
-				++hit;
-				vec4 volumeColorSample = texture3D(volumeTexture[i], (M[i]*vect).xyz);
-				if (!all(lessThan(volumeColorSample.rgb, vec3(threshold[i]))))
+				if (inUnitCube(M[i]*vect) && (!useCutPlane[i] || dot(cutPlaneNormal, cutPlaneOffset-vect.xyz) < 0.0))
 				{
-					++contributingVolumes;
-					volumeColorSample = applyWindowLevel(volumeColorSample, window[i], level[i]);
-					if ( lutSize[i] > 0)
+					beenHit[i] = true;
+					++hit;
+					vec4 volumeColorSample = texture3D(volumeTexture[i], (M[i]*vect).xyz);
+					if (!all(lessThan(volumeColorSample.rgb, vec3(threshold[i]))))
 					{
-						volumeColorSample = applyLut( volumeColorSample.r, lut[i], lutSize[i]);
+						++contributingVolumes;
+						volumeColorSample = applyWindowLevel(volumeColorSample, window[i], level[i]);
+						if ( lutSize[i] > 0)
+						{
+							volumeColorSample = applyLut( volumeColorSample.r, lut[i], lutSize[i]);
+						}
+						volumeColorSample.a = 0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b)*alpha[i];
+						colorSample = blendRGBA(colorSample, volumeColorSample);
 					}
-					volumeColorSample.a = 0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b)*alpha[i];
-					colorSample = blendRGBA(colorSample, volumeColorSample);
 				}
 			}
-		}
 
-		bool allVolumesBeenHit = true;
-		for (int i = 0; i < volumes; ++i)
-		{
-			allVolumesBeenHit = allVolumesBeenHit && beenHit[i];
-		}
-		if (allVolumesBeenHit && hit == 0 && i > 0)
-		{
-			// We left the last volume
-			break;
-		} else if (hit > 0 && contributingVolumes == 0)
-		{
-			// We're inside at least one volume, but none of the volumes exceeded the threshold
-			vect += rayDeltaVector;
-			continue;			
-		} else if (hit==0)
-		{
-			// We didn't hit any volume, but there could be some volumes left to hit. Skip distance to next volume, or break if no more volumes will be hit.
-			float min = maxIterations*stepsize;
-			for (int j = 0; j < volumes; ++j)
+			bool allVolumesBeenHit = true;
+			for (int i = 0; i < volumes; ++i)
 			{
-				if (!beenHit[j])
+				allVolumesBeenHit = allVolumesBeenHit && beenHit[i];
+			}
+			if (allVolumesBeenHit && hit == 0 && i > 0)
+			{
+				// We left the last volume
+				break;
+			} else if (hit > 0 && contributingVolumes == 0)
+			{
+				// We're inside at least one volume, but none of the volumes exceeded the threshold
+				vect += rayDeltaVector;
+				continue;			
+			} else if (hit==0)
+			{
+				// We didn't hit any volume, but there could be some volumes left to hit. Skip distance to next volume, or break if no more volumes will be hit.
+				float min = maxIterations*stepsize;
+				for (int j = 0; j < volumes; ++j)
 				{
-					float hit = toHit(M[j], vect, rayDirection);
-					if (hit < 0.0)
+					if (!beenHit[j])
 					{
-						beenHit[j] = true; // haven't been hit, but will not hit
-					}
-					else if (hit == 0.0)
-					{
-						min = delta;
-					}
-					else if (hit < min)
-					{
-						min = hit;
+						float hit = toHit(M[j], vect, rayDirection);
+						if (hit < 0.0)
+						{
+							beenHit[j] = true; // haven't been hit, but will not hit
+						}
+						else if (hit == 0.0)
+						{
+							min = delta;
+						}
+						else if (hit < min)
+						{
+							min = hit;
+						}
 					}
 				}
+				if (min == maxIterations * stepsize)
+				{
+					break;
+				}
+				vect += min * rayDirection;
+				continue;
 			}
-			if (min == maxIterations * stepsize)
-			{
-				break;
-			}
-			vect += min * rayDirection;
-			continue;
-		}
 		}
 
 		if (renderMode == 0) // Accumulated average (compositing)
