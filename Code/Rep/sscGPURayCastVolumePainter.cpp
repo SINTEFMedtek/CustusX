@@ -55,16 +55,6 @@ vtkStandardNewMacro(GPURayCastVolumePainter);
 vtkCxxRevisionMacro(GPURayCastVolumePainter, "$Revision: 647 $");
 
 #define GL_TRACE(string) if (vtkgl::StringMarkerGREMEDY) {vtkgl::StringMarkerGREMEDY(0, QString("%1:%2 - %3").arg(__func__).arg(__LINE__).arg(string).toUtf8().constData());}
-class HackGLTexture: public vtkOpenGLTexture
-{
-public:
-	HackGLTexture() {}
-	virtual ~HackGLTexture() {}
-	virtual long GetIndex() {return mIndex;}
-	virtual void SetIndex(long index) {mIndex = index;}
-private:
-	long mIndex;
-};
 	
 class SingleVolumePainterHelper
 {
@@ -75,8 +65,6 @@ class SingleVolumePainterHelper
 	float mLevel;
 	float mLLR;
 	float mAlpha;
-	HackGLTexture *mTexture;
-	bool mTextureLoaded;
 	Transform3D m_nMr;
 	bool mClip;
 
@@ -84,16 +72,11 @@ public:
 	explicit SingleVolumePainterHelper(int index)
 	{
 		mIndex = index;
-		mTexture = new HackGLTexture();
-		int texture = 2*mIndex;
-		mTexture->SetIndex(texture);
-		mTextureLoaded = false;
 		mClip = false;
 	}
 	SingleVolumePainterHelper()
 	{
 		mIndex = -1;
-		mTexture = NULL;
 	}
 	~SingleVolumePainterHelper()
 	{
