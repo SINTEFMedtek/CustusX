@@ -249,6 +249,7 @@ void Texture3DVolumeRep::setClipper(SlicePlaneClipperPtr clipper)
 {
 	mClipper = clipper;
 	mPainter->setClipper(clipper);
+	mActor->Modified();
 }
 
 void Texture3DVolumeRep::setClipVolumes(QStringList volumes)
@@ -258,16 +259,19 @@ void Texture3DVolumeRep::setClipVolumes(QStringList volumes)
 	{
 		mPainter->setClipVolume(i, mClipVolumes.contains(mImages[i]->getUid()));
 	}	
+	mActor->Modified();
 }
 
 void Texture3DVolumeRep::setStepSize(double stepsize)
 {
 	mPainter->setStepSize(stepsize);
+	mActor->Modified();
 }
 
 void Texture3DVolumeRep::setRenderMode(enum RenderMode renderMode)
 {
 	mPainter->setRenderMode(renderMode);
+	mActor->Modified();
 }
 //---------------------------------------------------------
 }//end namespace
