@@ -16,7 +16,7 @@ uniform int renderMode;
 uniform float window[maxVolumes];
 uniform float level[maxVolumes];
 uniform samplerBuffer lut[maxVolumes];
-uniform float transparency[maxVolumes];
+uniform float alpha[maxVolumes];
 uniform mat4 M[maxVolumes];
 uniform bool useCutPlane[maxVolumes];
 uniform sampler2DRect depthBuffer;
@@ -223,7 +223,7 @@ void main()
 					{
 						volumeColorSample = applyLut( volumeColorSample.r, lut[i], lutSize[i]);
 					}
-					volumeColorSample.a = 0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b)*transparency[i];
+					volumeColorSample.a = 0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b)*alpha[i];
 					colorSample = blendRGBA(colorSample, volumeColorSample);
 				}
 			}
