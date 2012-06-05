@@ -67,8 +67,8 @@ namespace ssc
 {
 //---------------------------------------------------------
 
-vtkStandardNewMacro(TextureVolumePainter);
-vtkCxxRevisionMacro(TextureVolumePainter, "$Revision: 647 $");
+vtkStandardNewMacro(GPURayCastVolumePainter);
+vtkCxxRevisionMacro(GPURayCastVolumePainter, "$Revision: 647 $");
 
 #define GL_TRACE(string) if (vtkgl::StringMarkerGREMEDY) {vtkgl::StringMarkerGREMEDY(0, QString("%1:%2 - %3").arg(__func__).arg(__LINE__).arg(string).toUtf8().constData());}
 class HackGLTexture: public vtkOpenGLTexture
@@ -196,7 +196,7 @@ public:
 	}
 };
 
-class TextureVolumePainter::vtkInternals
+class GPURayCastVolumePainter::vtkInternals
 {
 public:
 	Display* mCurrentContext;
@@ -238,7 +238,7 @@ public:
 };
 
 //---------------------------------------------------------
-TextureVolumePainter::TextureVolumePainter() :
+GPURayCastVolumePainter::GPURayCastVolumePainter() :
 	mDepthBuffer(0),
 	mBackgroundBuffer(0),
 	mBuffersValid(false),
@@ -247,13 +247,13 @@ TextureVolumePainter::TextureVolumePainter() :
 	mInternals = new vtkInternals();
 }
 
-void TextureVolumePainter::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
+void GPURayCastVolumePainter::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
 {
 	mVertexShaderFile = vertexShaderFile;
 	mFragmentShaderFile = fragmentShaderFile;
 }
 
-QString TextureVolumePainter::loadShaderFile(QString shaderFile)
+QString GPURayCastVolumePainter::loadShaderFile(QString shaderFile)
 {
 	QFile fp(shaderFile);
 	if (fp.exists())
@@ -269,7 +269,7 @@ QString TextureVolumePainter::loadShaderFile(QString shaderFile)
 	return "";
 }
 
-TextureVolumePainter::~TextureVolumePainter()
+GPURayCastVolumePainter::~GPURayCastVolumePainter()
 {
 	if (mInternals->LastContext)
 	{
@@ -280,7 +280,7 @@ TextureVolumePainter::~TextureVolumePainter()
 	mInternals = 0;
 }
 
-void TextureVolumePainter::ReleaseGraphicsResources(vtkWindow* win)
+void GPURayCastVolumePainter::ReleaseGraphicsResources(vtkWindow* win)
 {
 	mInternals->ClearGraphicsResources(); //the shader
 	mInternals->LastContext = 0;
@@ -297,7 +297,7 @@ void TextureVolumePainter::ReleaseGraphicsResources(vtkWindow* win)
 	this->Superclass::ReleaseGraphicsResources(win);
 }
 
-void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* actor)
+void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* actor)
 {
 	if (!CanRender(renderer, actor))
 	{
@@ -387,7 +387,7 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 	report_gl_error();
 }
 
-void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
+void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
                                           bool forceCompileOnly)
 {
 	report_gl_error();
@@ -496,20 +496,20 @@ void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor
 	report_gl_error();
 }
 
-bool TextureVolumePainter::CanRender(vtkRenderer*, vtkActor*)
+bool GPURayCastVolumePainter::CanRender(vtkRenderer*, vtkActor*)
 {
 	return !mInternals->mElement.empty();
 }
 
-bool TextureVolumePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id)
+bool GPURayCastVolumePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id)
 {
 	bool loaded = mgr->LoadSupportedExtension(cstring_cast(id));
 	if (!loaded)
-		std::cout << "TextureVolumePainter Error: GL extension " + id + " not found" << std::endl;
+		std::cout << "GPURayCastVolumePainter Error: GL extension " + id + " not found" << std::endl;
 	return loaded;
 }
 
-bool TextureVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
+bool GPURayCastVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 {
 	GLint value[2];
 	glGetIntegerv(vtkgl::MAX_TEXTURE_COORDS,value);
@@ -526,31 +526,31 @@ bool TextureVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr
 			&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
 }
 
-void TextureVolumePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer)
+void GPURayCastVolumePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer)
 {
 	mInternals->safeIndex(index).SetBuffer(buffer);
 }
 
-void TextureVolumePainter::SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer)
+void GPURayCastVolumePainter::SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer)
 {
 	mInternals->safeIndex(index).SetBuffer(buffer);
 }
 
-void TextureVolumePainter::SetColorAttribute(int index, float window, float level, float llr,float alpha)
+void GPURayCastVolumePainter::SetColorAttribute(int index, float window, float level, float llr,float alpha)
 {
 	mInternals->safeIndex(index).SetColorAttribute(window, level, llr, alpha);
 }
 
-void TextureVolumePainter::setClipVolume(int index, bool clip)
+void GPURayCastVolumePainter::setClipVolume(int index, bool clip)
 {
 	mInternals->safeIndex(index).setClip(clip);
 }
 
-void TextureVolumePainter::PrintSelf(ostream& os, vtkIndent indent)
+void GPURayCastVolumePainter::PrintSelf(ostream& os, vtkIndent indent)
 {
 }
 
-void TextureVolumePainter::setViewport(float width, float height)
+void GPURayCastVolumePainter::setViewport(float width, float height)
 {
 	if (width != mWidth || height != mHeight)
 	{
@@ -560,20 +560,20 @@ void TextureVolumePainter::setViewport(float width, float height)
 	mHeight = height;	
 }
 
-void TextureVolumePainter::set_nMr(int index, Transform3D nMr)
+void GPURayCastVolumePainter::set_nMr(int index, Transform3D nMr)
 {
 	mInternals->safeIndex(index).set_nMr(nMr);
 }
 
-void TextureVolumePainter::setClipper(SlicePlaneClipperPtr clipper)
+void GPURayCastVolumePainter::setClipper(SlicePlaneClipperPtr clipper)
 {
 	mClipper = clipper;
 }
-void TextureVolumePainter::setStepSize(double stepsize)
+void GPURayCastVolumePainter::setStepSize(double stepsize)
 {
 	mStepSize = stepsize;
 }
-void TextureVolumePainter::setRenderMode(int renderMode)
+void GPURayCastVolumePainter::setRenderMode(int renderMode)
 {
 	mRenderMode = renderMode;
 }
