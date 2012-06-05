@@ -304,8 +304,6 @@ void View::showEvent(QShowEvent* event)
 
 void ViewBase::render()
 {
-	// FIXME, this does not appear to be in use...
-#if 0
 	// Render is called only when mtime is changed.
 	// At least on MaxOS, this is not done automatically.
 	unsigned long hash = 0;
@@ -329,7 +327,6 @@ void ViewBase::render()
 		this->getRenderWindow()->Render();
 		mMTimeHash = hash;
 	}
-#endif
 }
 
 void View::setZoomFactor(double factor)
