@@ -174,7 +174,7 @@ public:
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("window[%1]").arg(mIndex)), 1, &mWindow);
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("level[%1]").arg(mIndex)), 1, &mLevel);
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("threshold[%1]").arg(mIndex)), 1, &mLLR);
-		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("transparency[%1]").arg(mIndex)), 1, &mAlpha);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("alpha[%1]").arg(mIndex)), 1, &mAlpha);
 		int clip = mClip;
 		shader->GetUniformVariables()->SetUniformi(cstring_cast(QString("useCutPlane[%1]").arg(mIndex)), 1, &clip);
 		vtkMatrix4x4Ptr M = m_nMr.getVtkMatrix();
