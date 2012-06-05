@@ -17,12 +17,7 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * vmTextureVolumePainter.cpp
- *
- */
-
-#include "sscTextureVolumePainter.h"
+#include "sscGPURayCastVolumePainter.h"
 
 #ifndef WIN32
 #include <QtCore>
