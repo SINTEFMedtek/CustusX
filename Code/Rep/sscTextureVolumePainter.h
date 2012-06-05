@@ -47,11 +47,11 @@ namespace ssc
  *
  * \ingroup sscRep3D
  */
-class TextureVolumePainter : public vtkOpenGLRepresentationPainter
+class GPURayCastVolumePainter : public vtkOpenGLRepresentationPainter
 {
 public:
-	static TextureVolumePainter* New();
-	vtkTypeRevisionMacro(TextureVolumePainter, vtkOpenGLRepresentationPainter);
+	static GPURayCastVolumePainter* New();
+	vtkTypeRevisionMacro(GPURayCastVolumePainter, vtkOpenGLRepresentationPainter);
 
 	virtual void ReleaseGraphicsResources(vtkWindow *);
 	void PrintSelf(ostream& os, vtkIndent indent);
@@ -67,8 +67,8 @@ public:
 	void setStepSize(double stepsize);
 	void setRenderMode(int renderMode);
 protected:
-	TextureVolumePainter();
-	virtual ~TextureVolumePainter();
+	GPURayCastVolumePainter();
+	virtual ~GPURayCastVolumePainter();
 	virtual void PrepareForRendering(vtkRenderer*, vtkActor*);
 	void RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
 

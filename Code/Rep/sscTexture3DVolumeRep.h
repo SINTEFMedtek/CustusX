@@ -34,7 +34,7 @@
 typedef vtkSmartPointer<class vtkCubeSource> vtkCubeSourcePtr;
 namespace ssc
 {
-typedef vtkSmartPointer<class TextureVolumePainter> TextureVolumePainterPtr;
+typedef vtkSmartPointer<class GPURayCastVolumePainter> GPURayCastVolumePainterPtr;
 
 /**
  * \brief Multi-Volume GPU raycast renderer
@@ -118,7 +118,7 @@ private:
 	QSet<QString> mClipVolumes;
 	View* mView;
 
-	TextureVolumePainterPtr mPainter;
+	GPURayCastVolumePainterPtr mPainter;
 	vtkActorPtr mActor;
 	boost::array<vtkTransformPolyDataFilterPtr, MAX_CONCURRENT_VOLUMES> mTransformPolyData;
 	vtkAppendPolyDataPtr mMerger;

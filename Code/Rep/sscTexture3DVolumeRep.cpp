@@ -82,7 +82,7 @@ GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
 	mView = NULL;
 	//	std::cout << "create Texture3DSlicerRep" << std::endl;
 	mActor = vtkActorPtr::New();
-	mPainter = TextureVolumePainterPtr::New();
+	mPainter = GPURayCastVolumePainterPtr::New();
 	mPainter->setStepSize(defaultStepSize);
 	// default shader for sonowand: override using setshaderfile()
 	mPainter->setShaderFiles("/Data/Resources/Shaders/raycasting_shader.vert", "/Data/Resources/Shaders/raycasting_shader.frag");
