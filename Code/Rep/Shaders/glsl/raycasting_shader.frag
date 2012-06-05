@@ -223,7 +223,7 @@ void main()
 						{
 							volumeColorSample = applyLut( volumeColorSample.r, lut[i], lutSize[i]);
 						}
-						volumeColorSample.a = 0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b)*alpha[i];
+						volumeColorSample.a = stepsize*0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b)*alpha[i];
 						colorSample = blendRGBA(colorSample, volumeColorSample);
 					}
 				}
