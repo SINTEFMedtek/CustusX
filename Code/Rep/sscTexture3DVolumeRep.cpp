@@ -76,7 +76,7 @@ static vtkPolyDataPtr createCube()
 	return cube;
 }
 
-Texture3DVolumeRep::Texture3DVolumeRep(const QString& uid) :
+GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
 	RepImpl(uid)
 {
 	mView = NULL;
@@ -97,23 +97,23 @@ Texture3DVolumeRep::Texture3DVolumeRep(const QString& uid) :
 	mActor->GetProperty()->SetOpacity(0.99);
 }
 
-Texture3DVolumeRep::~Texture3DVolumeRep()
+GPURayCastVolumeRep::~GPURayCastVolumeRep()
 {
 }
 
-Texture3DVolumeRepPtr Texture3DVolumeRep::New(const QString& uid)
+GPURayCastVolumeRepPtr GPURayCastVolumeRep::New(const QString& uid)
 {
-    Texture3DVolumeRepPtr retval(new Texture3DVolumeRep(uid));
+    GPURayCastVolumeRepPtr retval(new GPURayCastVolumeRep(uid));
     retval->mSelf = retval;
     return retval;
 }
 
-void Texture3DVolumeRep::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
+void GPURayCastVolumeRep::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
 {
 	mPainter->setShaderFiles(vertexShaderFile, fragmentShaderFile);
 }
 
-void Texture3DVolumeRep::viewChanged()
+void GPURayCastVolumeRep::viewChanged()
 {
 	if (!mView)
 		return;
@@ -123,7 +123,7 @@ void Texture3DVolumeRep::viewChanged()
 
 }
 
-void Texture3DVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
+void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 {
 	if (mImages.size() == images.size())
 	{
@@ -169,7 +169,7 @@ void Texture3DVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 
 }
 
-void Texture3DVolumeRep::transformChangedSlot()
+void GPURayCastVolumeRep::transformChangedSlot()
 {
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
@@ -191,12 +191,12 @@ void Texture3DVolumeRep::transformChangedSlot()
 	}
 }
 
-std::vector<ssc::ImagePtr> Texture3DVolumeRep::getImages()
+std::vector<ssc::ImagePtr> GPURayCastVolumeRep::getImages()
 {
 	return mImages;
 }
 
-void Texture3DVolumeRep::addRepActorsToViewRenderer(ssc::View* view)
+void GPURayCastVolumeRep::addRepActorsToViewRenderer(ssc::View* view)
 {
     view->getRenderer()->AddActor(mActor);
     mView = view;
@@ -204,19 +204,19 @@ void Texture3DVolumeRep::addRepActorsToViewRenderer(ssc::View* view)
     this->viewChanged();
 }
 
-void Texture3DVolumeRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void GPURayCastVolumeRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 	disconnect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
 	mView = NULL;
 }
 
-void Texture3DVolumeRep::printSelf(std::ostream & os, ssc::Indent indent)
+void GPURayCastVolumeRep::printSelf(std::ostream & os, ssc::Indent indent)
 {
 
 }
 
-void Texture3DVolumeRep::updateColorAttributeSlot()
+void GPURayCastVolumeRep::updateColorAttributeSlot()
 {
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
@@ -240,19 +240,20 @@ void Texture3DVolumeRep::updateColorAttributeSlot()
 	}
 	mActor->Modified();
 }
-QString Texture3DVolumeRep::getTCoordName(int index)
+
+QString GPURayCastVolumeRep::getTCoordName(int index)
 {
      return  "texture"+qstring_cast(index);
 }
 
-void Texture3DVolumeRep::setClipper(SlicePlaneClipperPtr clipper)
+void GPURayCastVolumeRep::setClipper(SlicePlaneClipperPtr clipper)
 {
 	mClipper = clipper;
 	mPainter->setClipper(clipper);
 	mActor->Modified();
 }
 
-void Texture3DVolumeRep::setClipVolumes(QStringList volumes)
+void GPURayCastVolumeRep::setClipVolumes(QStringList volumes)
 {
 	mClipVolumes = QSet<QString>::fromList(volumes);
 	for (unsigned i = 0; i < mImages.size(); ++i)
@@ -262,13 +263,13 @@ void Texture3DVolumeRep::setClipVolumes(QStringList volumes)
 	mActor->Modified();
 }
 
-void Texture3DVolumeRep::setStepSize(double stepsize)
+void GPURayCastVolumeRep::setStepSize(double stepsize)
 {
 	mPainter->setStepSize(stepsize);
 	mActor->Modified();
 }
 
-void Texture3DVolumeRep::setRenderMode(enum RenderMode renderMode)
+void GPURayCastVolumeRep::setRenderMode(enum RenderMode renderMode)
 {
 	mPainter->setRenderMode(renderMode);
 	mActor->Modified();
