@@ -42,10 +42,6 @@
 #include <GL/glu.h>
 #endif
 
-#include <Cg/cg.h>
-#include <Cg/cgGL.h>
-
-
 #ifdef WIN32
 #include <windows.h>
 #include <GL/glext.h>
