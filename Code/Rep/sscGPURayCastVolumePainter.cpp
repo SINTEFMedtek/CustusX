@@ -35,13 +35,6 @@
 #include <vtkShader2.h>
 #include <vtkShader2Collection.h>
 
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include "/usr/include/X11/Xlib.h"
-#else
-#include <GL/glu.h>
-#endif
-
 #ifdef WIN32
 #include <windows.h>
 #include <GL/glext.h>
