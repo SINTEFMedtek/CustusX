@@ -27,7 +27,7 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscTexture3DSlicerRep.h"
-#include "sscTexture3DVolumeRep.h"
+#include "sscGPURayCastVolumeRep.h"
 #include "sscViewsWindow.h"
 #include "sscImageTF3D.h"
 

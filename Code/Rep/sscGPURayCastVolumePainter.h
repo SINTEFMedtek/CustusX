@@ -17,13 +17,8 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * vmTextureVolumePainter.h
- *
- */
-
-#ifndef SSCTEXTUREVOLUMEPAINTER_H_
-#define SSCTEXTUREVOLUMEPAINTER_H_
+#ifndef SSCGPURAYCASTVOLUMEPAINTER_H_
+#define SSCGPURAYCASTVOLUMEPAINTER_H_
 
 #include <boost/shared_ptr.hpp>
 #include <vtkOpenGLRepresentationPainter.h>
@@ -97,4 +92,4 @@ protected:
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
-#endif /* SSCTEXTUREVOLUMEPAINTER_H_ */
+#endif /* SSCGPURAYCASTVOLUMEPAINTER_H_ */

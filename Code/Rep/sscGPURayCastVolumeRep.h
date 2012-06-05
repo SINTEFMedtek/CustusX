@@ -17,8 +17,8 @@
 //
 // See sscLicense.txt for more information.
 
-#ifndef SSCTEXTURE3DVOLUME_H_
-#define SSCTEXTURE3DVOLUME_H_
+#ifndef SSCGPURAYCASTVOLUMEREP_H_
+#define SSCGPURAYCASTVOLUMEREP_H_
 
 #include "sscRepImpl.h"
 #include <vector>
@@ -130,5 +130,5 @@ private:
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
-#endif /* SSCTEXTURE3DVOLUME_H_ */
+#endif /* SSCGPURAYCASTVOLUMEREP_H_ */
 

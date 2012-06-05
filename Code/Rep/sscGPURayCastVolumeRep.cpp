@@ -17,7 +17,7 @@
 //
 // See sscLicense.txt for more information.
 
-#include "sscTexture3DVolumeRep.h"
+#include "sscGPURayCastVolumeRep.h"
 
 #include <vtkAppendPolyData.h>
 #include <vtkCellArray.h>
@@ -41,7 +41,7 @@
 #include "sscImageLUT2D.h"
 #include "sscTypeConversions.h"
 #include "sscGPUImageBuffer.h"
-#include "sscTextureVolumePainter.h"
+#include "sscGPURayCastVolumePainter.h"
 
 //---------------------------------------------------------
 namespace ssc
