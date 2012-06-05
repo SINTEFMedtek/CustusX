@@ -295,6 +295,12 @@ void View::showEvent(QShowEvent* event)
 	emit showSignal(event);
 }
 
+void View::paintEvent(QPaintEvent* event)
+{
+	mMTimeHash = 0;
+	inherited::paintEvent(event);
+}
+
 void View::render()
 {
 	// Render is called only when mtime is changed.
