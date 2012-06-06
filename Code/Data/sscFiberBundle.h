@@ -70,6 +70,9 @@ signals:
   * A fiber bundle is polydata consisting of
   * lines/line segments only.
   *
+  * Yields both Mesh interface and native vtkPolyData
+  * interface on request.
+  *
   * \ingroup sscData
   */
 class FiberBundle : public Data
@@ -81,14 +84,21 @@ public:
     virtual ~FiberBundle() {}
 
     /** Assign polydata model */
-    virtual void setVtkPolyData(const vtkPolyDataPtr& polyData) { mVtkPolyData = polyData; emit bundleChanged(); }
-    virtual vtkPolyDataPtr getVtkPolyData() { return mVtkPolyData; }
+    virtual void setVtkPolyData(const vtkPolyDataPtr& polyData);
+    virtual vtkPolyDataPtr getVtkPolyData() const;
+
+    virtual void setMesh(const MeshPtr& mesh);
+    virtual MeshPtr getMesh() { return mMesh; }
+    virtual bool hasMesh(const MeshPtr& mesh) const;
+
+    virtual void setFilePath(const QString& filePath);
+    virtual QString getFilePath() const;
 
     /** Return model's bounding box */
     virtual DoubleBoundingBox3D boundingBox() const;
 
     vtkLookupTablePtr getLut() { return mLut; }
-    vtkImageDataPtr getVtkImageData() { return mImageData; }
+    vtkImageDataPtr getVtkImageData() { return mImageData; }    // NOT YET SUPPORTED
     ssc::ImagePtr getImage() { return mImage; }
 
     void setROI(const FiberBundleROI& roi) { mROI = roi; }
@@ -98,17 +108,21 @@ public:
     virtual void printSelf(std::ostream &os, Indent indent);
 
 protected:
-    FiberBundle(const QString& uid, const QString& name = "") :	Data(uid, name) {}
+    FiberBundle(const QString& uid, const QString& name = "");
 
 private:
     vtkLookupTablePtr mLut;
     vtkImageDataPtr mImageData;
-    vtkPolyDataPtr mVtkPolyData;
+    MeshPtr mMesh;
     FiberBundleROI mROI;
     ssc::ImagePtr mImage;
 
 signals:
     void bundleChanged();
+
+protected slots:
+    void meshChangedSlot();
+    void transformChangedSlot();
 
 };
 

@@ -71,8 +71,6 @@ private:
     vtkPolyDataMapperPtr mPolyDataMapper;
     vtkPropertyPtr mProperty;
 
-    void loadBundle();
-
 private slots:
     void bundleChanged();
     void bundleTransformChanged();
