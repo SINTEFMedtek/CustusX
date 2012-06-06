@@ -68,6 +68,7 @@ typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
 typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
 typedef boost::shared_ptr<class Mesh> MeshPtr;
+typedef boost::shared_ptr<class VtkFileMesh> VtkFileMeshPtr;
 typedef boost::shared_ptr<class SurfaceRep> SurfaceRepPtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class Texture3DSlicerRep> Texture3DSlicerRepPtr;
