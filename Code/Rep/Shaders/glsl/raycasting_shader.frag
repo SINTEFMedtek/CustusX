@@ -96,6 +96,7 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 	if (pos.x < 0.0 && delta.x > 0.0)
 	{
 		float distance = -pos.x/delta.x;
+		distance += 0.001;
 		if (distance < min && inUnitCube(pos + distance*delta))
 		{
 			min = distance;
@@ -104,6 +105,7 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 	if (pos.x > 1.0 && delta.x < 0.0)
 	{
 		float distance = (pos.x-1.0)/-delta.x;
+		distance += 0.001;
 		if (distance < min && inUnitCube(pos + distance*delta))
 		{
 			min = distance;
@@ -112,6 +114,7 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 	if (pos.y < 0.0 && delta.y > 0.0)
 	{
 		float distance = -pos.y/delta.y;
+		distance += 0.001;
 		if (distance < min && inUnitCube(pos + distance*delta))
 		{
 			min = distance;
@@ -120,6 +123,7 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 	if (pos.y > 1.0 && delta.y < 0.0)
 	{
 		float distance = (pos.y-1.0)/-delta.y;
+		distance += 0.001;
 		if (distance < min && inUnitCube(pos + distance*delta))
 		{
 			min = distance;
@@ -128,6 +132,7 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 	if (pos.z < 0.0 && delta.z > 0.0)
 	{
 		float distance = -pos.z/delta.z;
+		distance += 0.001;
 		if (distance < min && inUnitCube(pos + distance*delta))
 		{
 			min = distance;
@@ -136,6 +141,7 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 	if (pos.z > 1.0 && delta.z < 0.0)
 	{
 		float distance = (pos.z-1.0)/-delta.z;
+		distance += 0.001;
 		if (distance < min && inUnitCube(pos + distance*delta))
 		{
 			min = distance;
