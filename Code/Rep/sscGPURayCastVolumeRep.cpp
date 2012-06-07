@@ -58,12 +58,9 @@ static vtkPolyDataPtr createCube()
 	vtkPolyDataPtr cube = vtkPolyData::New();
 	vtkPoints *points = vtkPoints::New();
 	vtkCellArray *polys = vtkCellArray::New();
-	vtkFloatArray *tCoords = vtkFloatArray::New();
-	tCoords->SetNumberOfComponents(3);
 	int i;
 	// Load the point, cell, and data attributes.
 	for (i=0; i<8; i++) points->InsertPoint(i,x[i]);
-	for (i=0; i<8; i++) tCoords->InsertTupleValue(i, x[i]);
 	for (i=0; i<6; i++) polys->InsertNextCell(4,pts[i]);
 	
 	// We now assign the pieces to the vtkPolyData.
@@ -71,8 +68,6 @@ static vtkPolyDataPtr createCube()
 	points->Delete();
 	cube->SetPolys(polys);
 	polys->Delete();
-	cube->GetPointData()->SetTCoords(tCoords);
-	tCoords->Delete();
 	return cube;
 }
 
@@ -239,11 +234,6 @@ void GPURayCastVolumeRep::updateColorAttributeSlot()
 		mPainter->SetColorAttribute(i, window, level, llr, alpha);
 	}
 	mActor->Modified();
-}
-
-QString GPURayCastVolumeRep::getTCoordName(int index)
-{
-     return  "texture"+qstring_cast(index);
 }
 
 void GPURayCastVolumeRep::setClipper(SlicePlaneClipperPtr clipper)

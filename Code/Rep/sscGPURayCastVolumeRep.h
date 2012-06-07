@@ -111,7 +111,6 @@ private slots:
 	void viewChanged();
 	void updateColorAttributeSlot();
 	void transformChangedSlot();
-	QString getTCoordName(int index);
 private:
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ssc::ImagePtr> mImages;
