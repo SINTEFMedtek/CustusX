@@ -45,6 +45,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
+    Data/sscVtkFileMesh.h
     Data/sscPresetTransferFunctions3D.h
     Data/sscFiberBundle.h
     Data/sscPointMetric.h
@@ -328,6 +329,8 @@ SET( SSC_SOURCE_FILES
     Data/sscGPUImageBuffer.h
     Data/sscMesh.h
     Data/sscMesh.cpp
+    Data/sscVtkFileMesh.h
+    Data/sscVtkFileMesh.cpp
     Data/sscDataManager.cpp
     Data/sscDataManager.h
     Data/sscDataManagerImpl.cpp
