@@ -90,9 +90,9 @@ void FiberBundleRep::setBundle(FiberBundlePtr bundle)
     {
         connect(mBundle.get(), SIGNAL(transformChanged()), this, SLOT(bundleTransformChanged()));
         connect(mBundle.get(), SIGNAL(bundleChanged()), this, SLOT(bundleChanged()));
-
-        this->loadBundle();
     }
+
+    bundleChanged();
 }
 
 /**
@@ -115,33 +115,6 @@ void FiberBundleRep::removeRepActorsFromViewRenderer(View* view)
 
     if (mViewportListener)
         mViewportListener->stopListen();
-}
-
-/**
-  * Loads a polydata mesh from file and assigns
-  * the mesh to the fiber bundle object.
-  *
-  * Prerequisite: The bundle has an assigned file name.
-  */
-void FiberBundleRep::loadBundle()
-{
-    vtkPolyDataPtr model;
-
-    QString filename = mBundle->getFilePath();
-    if (filename.isEmpty() || !filename.endsWith("vtk"))
-    {
-        std::cout << "Could not load model from file: " << filename << std::endl;
-        return;
-    }
-    else
-    {
-        vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
-        reader->SetFileName(cstring_cast(filename));
-
-        model = reader->GetOutput();
-
-        if (model) mBundle->setVtkPolyData(model);
-    }
 }
 
 /** Called whenever bundle has changed */
