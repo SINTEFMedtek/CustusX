@@ -65,6 +65,7 @@ private:
 	int mTotalRender;
 	int mTotalOther;
 	QTime mLastRenderEnd;
+	QString mShaderFolder;
 	ssc::AcceptanceBoxWidget* mAcceptanceBox; 
 	
 	
