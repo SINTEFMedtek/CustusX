@@ -69,14 +69,23 @@ class GPURayCastSingleVolumePainterHelper
 	bool mClip;
 
 public:
-	explicit GPURayCastSingleVolumePainterHelper(int index)
+	explicit GPURayCastSingleVolumePainterHelper(int index) :
+		mIndex(index),
+		mWindow(0.0),
+		mLevel(0.0),
+		mLLR(0.0),
+		mAlpha(1.0),
+		mClip(false)
 	{
-		mIndex = index;
-		mClip = false;
 	}
-	GPURayCastSingleVolumePainterHelper()
+	GPURayCastSingleVolumePainterHelper() :
+		mIndex(-1),
+		mWindow(0.0),
+		mLevel(0.0),
+		mLLR(0.0),
+		mAlpha(1.0),
+		mClip(false)
 	{
-		mIndex = -1;
 	}
 	~GPURayCastSingleVolumePainterHelper()
 	{
@@ -206,9 +215,12 @@ public:
 
 //---------------------------------------------------------
 GPURayCastVolumePainter::GPURayCastVolumePainter() :
+	mWidth(0),
+	mHeight(0),
 	mDepthBuffer(0),
 	mBackgroundBuffer(0),
 	mBuffersValid(false),
+	mStepSize(1.0),
 	mRenderMode(0)
 {
 	mInternals = new vtkInternals();
