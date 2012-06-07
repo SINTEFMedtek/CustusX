@@ -590,6 +590,10 @@ configure_file (
     "${PROJECT_SOURCE_DIR}/CMake/SSCConfig.cmake.in"
     "${PROJECT_BINARY_DIR}/SSCConfig.cmake"
     )
+file(COPY Rep/Shaders/glsl/raycasting_shader.frag DESTINATION Rep)
+file(COPY Rep/Shaders/glsl/raycasting_shader.vert DESTINATION Rep)
+file(COPY Rep/Shaders/glsl/Texture3DOverlay.frag DESTINATION Rep)
+  
 # Export our build settings and library dependencies
 include (CMakeExportBuildSettings)
 cmake_export_build_settings (${SSC_BINARY_DIR}/SSCBuildSettings.cmake)

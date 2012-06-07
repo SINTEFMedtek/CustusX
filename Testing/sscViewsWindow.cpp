@@ -58,6 +58,7 @@ ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(d
 	mTotalRender = 0;
 	mTotalOther = 0;
 	mLastRenderEnd = QTime::currentTime();
+	mShaderFolder = qApp->applicationDirPath() + "/../Code/Rep/";
 	
 	QRect screen = qApp->desktop()->screen()->rect();
 	//this->show();
@@ -98,7 +99,7 @@ ssc::View* ViewsWindow::generateGPUSlice(const QString& uid, ssc::ToolPtr tool, 
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 
 	ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
-	rep->setShaderFile("/Data/Resources/Shaders/Texture3DOverlay.frag");
+	rep->setShaderFile(mShaderFolder + "Texture3DOverlay.frag");
 	rep->setSliceProxy(proxy);
 	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
 
@@ -219,6 +220,7 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
 
 	// volume rep
 	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
+	mRepPtr->setShaderFiles(mShaderFolder + "raycasting_shader.vert", mShaderFolder + "raycasting_shader.frag");
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);
