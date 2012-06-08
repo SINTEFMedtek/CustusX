@@ -27,7 +27,9 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscTexture3DSlicerRep.h"
+#include "sscGPURayCastVolumeRep.h"
 #include "sscViewsWindow.h"
+#include "sscImageTF3D.h"
 
 using ssc::Vector3D;
 using ssc::Transform3D;
@@ -49,13 +51,14 @@ namespace {
 
 ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
 {
-  mZoomFactor = 1;
+	mZoomFactor = 1;
 	m_test_view = NULL;
 	mDumpSpeedData = false;
 	mRenderCount = 0;
 	mTotalRender = 0;
 	mTotalOther = 0;
 	mLastRenderEnd = QTime::currentTime();
+	mShaderFolder = qApp->applicationDirPath() + "/../Code/Rep/";
 	
 	QRect screen = qApp->desktop()->screen()->rect();
 	//this->show();
@@ -77,35 +80,35 @@ ViewsWindow::~ViewsWindow()
 
 ssc::View* ViewsWindow::getView2D()
 {
-  ssc::View* view = new ssc::View(centralWidget());
-  view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-  view->GetRenderWindow()->GetInteractor()->Disable();
-  view->setZoomFactor(mZoomFactor);
+	ssc::View* view = new ssc::View(centralWidget());
+	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
+	view->GetRenderWindow()->GetInteractor()->Disable();
+	view->setZoomFactor(mZoomFactor);
 
-  mLayouts.insert(view);
-  return view;
+	mLayouts.insert(view);
+	return view;
 }
 
 ssc::View* ViewsWindow::generateGPUSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
-  ssc::View* view = this->getView2D();
+	ssc::View* view = this->getView2D();
 
-  ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
-  proxy->setTool(tool);
+	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
+	proxy->setTool(tool);
 
-  proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
+	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 
-  ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
-  rep->setShaderFile("/Data/Resources/Shaders/Texture3DOverlay.frag");
-  rep->setSliceProxy(proxy);
-  rep->setImages(std::vector<ssc::ImagePtr>(1, image));
+	ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
+	rep->setShaderFile(mShaderFolder + "Texture3DOverlay.frag");
+	rep->setSliceProxy(proxy);
+	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
 
-  view->addRep(rep);
+	view->addRep(rep);
 
-  m_test_rep = rep;
-  m_test_view = view;
+	m_test_rep = rep;
+	m_test_view = view;
 
-  return view;
+	return view;
 }
 
 
@@ -123,7 +126,7 @@ void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 
 ssc::View* ViewsWindow::generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
-  ssc::View* view = this->getView2D();
+	ssc::View* view = this->getView2D();
 
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
 	proxy->setTool(tool);
@@ -185,7 +188,7 @@ void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image->getUid() );
 	mRepPtr->setMaxVolumeSize(10*1000*1000);
 	mRepPtr->setUseGPUVolumeRayCastMapper(); // if available
-	mRepPtr->setImage(image);
+	mRepPtr->setImage(image);	
 	mRepPtr->setName(image->getName());
 	view->addRep(mRepPtr);
 	
@@ -199,6 +202,38 @@ void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 	insertView(view, uid, imageFilename, r, c);
 }
 
+void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
+{
+	QString uid = "3D";
+	ssc::View* view = new ssc::View(centralWidget());
+	mLayouts.insert(view);
+
+	std::vector<ssc::ImagePtr> images;
+
+	QString imageFilename;
+	foreach (imageFilename, imageFilenames)
+	{
+		ssc::ImagePtr image = loadImage(imageFilename);
+		image->getTransferFunctions3D()->setLLR(25.0);
+		images.push_back(image);
+	}
+
+	// volume rep
+	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
+	mRepPtr->setShaderFiles(mShaderFolder + "raycasting_shader.vert", mShaderFolder + "raycasting_shader.frag");
+	mRepPtr->setImages(images);
+	mRepPtr->setName(images[0]->getName());
+	view->addRep(mRepPtr);
+	
+	// Tool 3D rep
+	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+	ssc::ToolPtr tool = mToolmanager->getDominantTool();
+	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
+	toolRep->setTool(tool);
+	view->addRep(toolRep);
+	
+	insertView(view, uid, imageFilename, r, c);
+}
 
 void ViewsWindow::start(bool showSliders)
 {
@@ -258,14 +293,6 @@ void ViewsWindow::updateRender()
 		camera->SetParallelScale(parallelscale);
 	}
 
-	if (mRenderCount==1)
-	{
-		mTotalRender = 0;
-		mTotalOther = 0;
-		++mRenderCount;
-		return;
-	}
-
 	++mRenderCount;
 	QTime pre = QTime::currentTime();
 	int other = mLastRenderEnd.msecsTo(pre);
@@ -276,19 +303,19 @@ void ViewsWindow::updateRender()
 	mLastRenderEnd = QTime::currentTime();
 
 	int render = pre.msecsTo(mLastRenderEnd);
-	int limit = 30;
+	int limit = 35;
 	mTotalRender += render;
 	mTotalOther += other;
 
 	if (mDumpSpeedData)
 	{
-		if (render+other>limit) // warn if too much time spent rendering.
-		{
-			std::cout << "render: " << render << "/" << other << std::endl;
-		}
 		if (mRenderCount%50==0)
 		{
-			std::cout << "averagerender: " << mTotalRender/mRenderCount << "/" << mTotalOther/mRenderCount << std::endl;
+			std::cout << "averagerender: " << 1.0*mTotalRender/mRenderCount << "/" << 1.0*mTotalOther/mRenderCount << std::endl;
+			std::cout << "fps: " << 1000*(float)mRenderCount/(mTotalRender + mTotalOther) << std::endl;
+			mTotalRender = 0;
+			mTotalOther = 0;
+			mRenderCount = 0;
 		}
 	}
 }
