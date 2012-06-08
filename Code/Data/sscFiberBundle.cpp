@@ -105,6 +105,16 @@ vtkPolyDataPtr FiberBundle::getVtkPolyData() const
     return mMesh->getVtkPolyData();
 }
 
+void FiberBundle::setColor(const QColor& color)
+{
+    mMesh->setColor(color);
+}
+
+QColor FiberBundle::getColor() const
+{
+    return mMesh->getColor();
+}
+
 void FiberBundle::printSelf(std::ostream &os, Indent indent)
 {
     // Output some numbers and brief info

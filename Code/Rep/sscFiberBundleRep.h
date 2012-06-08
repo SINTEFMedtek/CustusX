@@ -63,6 +63,7 @@ protected:
 private:
     double  mFiberRadius;
     bool    mTubeFilter;
+    int     mTubeSegments;
 
     FiberBundlePtr mBundle;
     ViewportListenerPtr mViewportListener;

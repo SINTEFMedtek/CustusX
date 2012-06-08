@@ -39,7 +39,7 @@ namespace ssc
 {
 /** Constructor */
 FiberBundleRep::FiberBundleRep(const QString& uid, const QString& name)
-    : RepImpl(uid, name), mFiberRadius(.05), mTubeFilter(true)
+    : RepImpl(uid, name), mFiberRadius(.05), mTubeFilter(true), mTubeSegments(8)
 {
     mPolyDataMapper = vtkPolyDataMapperPtr::New();
     mProperty = vtkPropertyPtr::New();
@@ -124,6 +124,9 @@ void FiberBundleRep::bundleChanged()
 
     if (model)
     {
+        QColor color = mBundle->getColor();
+        mActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+
         if (mTubeFilter)
         {
             /** Create a tube filter for the mesh.
@@ -132,7 +135,7 @@ void FiberBundleRep::bundleChanged()
             vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
             tubeFilter->SetInput(model);
             tubeFilter->SetRadius(mFiberRadius); //default is .5
-            tubeFilter->SetNumberOfSides(8);
+            tubeFilter->SetNumberOfSides(mTubeSegments);
             tubeFilter->Update();
 
             mPolyDataMapper->SetInputConnection(tubeFilter->GetOutputPort());
@@ -149,7 +152,7 @@ void FiberBundleRep::bundleChanged()
             mActor->SetMapper(mPolyDataMapper);
         }
 
-        mPolyDataMapper->ScalarVisibilityOff(); //Don't use the LUT from the VtkPolyData
+        mPolyDataMapper->ScalarVisibilityOn();
     }
 
 }
