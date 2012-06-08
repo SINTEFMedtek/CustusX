@@ -27,6 +27,7 @@
 #include "sscDefinitions.h"
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
+#include "sscViewportListener.h"
 
 namespace ssc
 {
@@ -140,6 +141,8 @@ private:
 	void clearActors();
 	SlicePlanesProxyPtr mProxy;
 	ssc::View* mView;
+	ssc::ViewportListenerPtr mViewportListener;
+	void rescale();
 };
 
 typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerIn2DRepPtr;
