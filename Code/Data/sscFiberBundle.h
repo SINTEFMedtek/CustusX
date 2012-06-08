@@ -24,6 +24,7 @@
 #include <boost/weak_ptr.hpp>
 
 #include <QObject>
+#include <QColor>
 
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
@@ -96,6 +97,9 @@ public:
 
     /** Return model's bounding box */
     virtual DoubleBoundingBox3D boundingBox() const;
+
+    virtual void setColor(const QColor& color);
+    virtual QColor getColor() const;
 
     vtkLookupTablePtr getLut() { return mLut; }
     vtkImageDataPtr getVtkImageData() { return mImageData; }    // NOT YET SUPPORTED
