@@ -33,6 +33,7 @@ public:
 	
 	void setDescription(const QString& desc);
 	void define3D(const QString& imageFilename, int r, int c);
+	void define3DGPU(const QStringList& imageFilename, int r, int c);
 	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	void defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	bool accepted() const { return mAcceptanceBox->accepted(); }
@@ -64,6 +65,7 @@ private:
 	int mTotalRender;
 	int mTotalOther;
 	QTime mLastRenderEnd;
+	QString mShaderFolder;
 	ssc::AcceptanceBoxWidget* mAcceptanceBox; 
 	
 	

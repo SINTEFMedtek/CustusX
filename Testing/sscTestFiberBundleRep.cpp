@@ -11,40 +11,38 @@
 #include "sscFiberBundle.h"
 #include "sscAxesRep.h"
 #include "sscView.h"
+#include "sscTestUtilities.h"
 
+/**
+  * Test application for dti fiber bundles in vtk format.
+  * Load a fiber bundle and visualize the 3d model as rep.
+  * If you can see a single strain of fiber, all is well.
+  */
 int main(int argc, char **argv)
 {
-	QApplication app(argc, argv);
+    QApplication app(argc, argv);
 
-    QStringList argList = QCoreApplication::arguments();
+    // std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;
+    QString vtkFileName1 = ssc::TestUtilities::ExpandDataFileName("DTI/FiberBundleNode.vtk");
 
-    QString vtkFileName1;
-    if (!argList.isEmpty() && argList.size() > 1)
-    {
-        // Extract second argument as file name
-        vtkFileName1 = argList[1];
-    }
-    else
-    {
-        std::cout << "TestFiberBundleRep [filename]" << std::endl;
-    }
-
-	ssc::View* view = new ssc::View();
+    ssc::View* view = new ssc::View();
     ssc::FiberBundlePtr bundle = ssc::FiberBundle::New(vtkFileName1);
     bundle->setFilePath(vtkFileName1);
     ssc::FiberBundleRepPtr rep = ssc::FiberBundleRep::New(bundle->getUid());
     rep->setBundle(bundle);
-	view->setRep(rep);
+    view->setRep(rep);
 
-	ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
-	view->addRep(axesRep);
+    ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
+    view->addRep(axesRep);
 
-	QMainWindow mainWindow;
-	mainWindow.setCentralWidget(view);
+    QMainWindow mainWindow;
+    mainWindow.setCentralWidget(view);
     mainWindow.resize(QSize(1200,1024));
     mainWindow.show();
-	view->getRenderer()->ResetCamera();
+    view->getRenderer()->ResetCamera();
 
+    // This is an automatic test, so terminate the application after some time
+    QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit()));
     app.exec();
 
     return 0;
