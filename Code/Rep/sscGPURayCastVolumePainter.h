@@ -28,6 +28,8 @@
 #include "sscForwardDeclarations.h"
 #include "sscTransform3D.h"
 //---------------------------------------------------------
+class TestGPURayCaster;
+
 namespace ssc
 {
 
@@ -88,6 +90,7 @@ protected:
 	SlicePlaneClipperPtr mClipper;
 	float mStepSize;
 	int mRenderMode;
+	friend class ::TestGPURayCaster;
 };
 
 #endif // WIN32
