@@ -40,6 +40,7 @@ namespace ssc
 class SlicePlaneRep : public RepImpl
 {
 	Q_OBJECT
+
 public:
 	virtual ~SlicePlaneRep();
 
@@ -67,7 +68,6 @@ private:
 	vtkImagePlaneWidgetPtr mVtkImagePlaneWidgetS;
 	
 	ImagePtr mImage;
- 
 };
 
 } // namespace ssc

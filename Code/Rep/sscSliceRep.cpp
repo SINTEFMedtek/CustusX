@@ -70,9 +70,4 @@ bool SliceRep::hasImage(ImagePtr image) const
 	return (mImage != NULL);
 }
 
-	//void SliceRep::setSliceProxy(SliceProxyPtr proxy) //connect tool transform update to sliceRep
-	//{
-	//	
-	//}
-
 } // namespace ssc

@@ -23,18 +23,7 @@
 #include <vtkImageData.h>
 #include "sscVector3D.h"
 #include "vtkRenderWindow.h"
-
 #include "sscViewRenderWindow.h"
-
-//#ifdef USE_GLX_SHARED_CONTEXT
-//#include "sscSNWXOpenGLRenderWindow.h"
-//typedef SNWXOpenGLRenderWindow ViewRenderWindow;
-//typedef vtkSmartPointer<SNWXOpenGLRenderWindow> ViewRenderWindowPtr;
-//#else
-//#include "vtkRenderWindow.h"
-//typedef vtkRenderWindow ViewRenderWindow;
-//typedef vtkSmartPointer<ViewRenderWindow> ViewRenderWindowPtr;
-//#endif
 #include "vtkRenderer.h"
 #ifdef check
 #undef check
@@ -208,9 +197,6 @@ void View::resizeEvent(QResizeEvent * event)
 		iren->UpdateSize(size.width(), size.height());
 
 	emit resized(size);
-	//std::cout << "resize " << getName() << " " << this->getRenderWindow()->GetMTime() << std::endl;
-	//this->getRenderWindow()->Modified();
-	//std::cout << "   resized " << getName() << " " << this->getRenderWindow()->GetMTime() << std::endl;
 }
 
 void View::print(std::ostream& os)
@@ -314,41 +300,27 @@ void View::render()
 	props->InitTraversal();
 	for (vtkProp* prop = props->GetNextProp(); prop != NULL; prop = props->GetNextProp())
 	{
-		//    vtkProp3D* prop3D = vtkProp3D::SafeDownCast(prop);
-		//    if (prop3D)
-		//      hash += prop3D->GetMTime();
 		vtkImageActor* imageActor = vtkImageActor::SafeDownCast(prop);
 		if (imageActor && imageActor->GetInput())
 		{
-			//      hash += imageActor->GetMTime();
 			hash += imageActor->GetInput()->GetMTime();
 		}
-
-		//    vtkVolume* volume = vtkVolume::SafeDownCast(prop);
-		//    if (volume)
-		//    {
-		////      std::cout << getName() << "\t" << prop->GetRedrawMTime() << "  " << prop->GetMTime() << std::endl;
-		//    }
-		//std::cout << "--" << getName() << "\t" << hash << std::endl;
 		hash += prop->GetMTime();
 		hash += prop->GetRedrawMTime();
 	}
-	//  std::cout << "--" << getName() << "\t" << hash << std::endl;
-
 	if (hash != mMTimeHash)
 	{
 		this->getRenderWindow()->Render();
 		mMTimeHash = hash;
-		//    std::cout << getName() << "\t" << mTime << " " << mTime_W << std::endl;
-		//    std::cout << "RENDER " << getName() << "\t" << hash << std::endl;
 	}
 }
 
 void View::setZoomFactor(double factor)
 {
 	if (similar(factor, mZoomFactor))
+	{
 		return;
-
+	}
 	mZoomFactor = factor;
 	emit resized(this->size());
 }
@@ -382,10 +354,8 @@ Transform3D View::get_vpMs() const
  */
 ssc::DoubleBoundingBox3D View::getViewport() const
 {
-	QSize size = this->size();
-	ssc::DoubleBoundingBox3D vp(0, size.width(), 0, size.height(), 0, 0);
-	//  std::cout << "vp " << vp << std::endl;
-	return vp;
+	QSize size = inherited::size();
+	return ssc::DoubleBoundingBox3D(0, size.width(), 0, size.height(), 0, 0);
 }
 
 double View::mmPerPix() const
