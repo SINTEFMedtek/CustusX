@@ -61,6 +61,10 @@ public:
 	void setClipVolume(int index, bool clip);
 	void setStepSize(double stepsize);
 	void setRenderMode(int renderMode);
+	/**
+	 * Maximum number of volumes that can be rendered simultaneously
+	 */
+	static const unsigned maxVolumes = 4;
 protected:
 	GPURayCastVolumePainter();
 	virtual ~GPURayCastVolumePainter();

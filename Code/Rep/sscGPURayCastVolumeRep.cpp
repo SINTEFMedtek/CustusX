@@ -136,6 +136,10 @@ void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 	mClipVolumes.clear();
 
 	mImages = images;
+	if (mImages.size() > mPainter->maxVolumes)
+	{
+		mImages.resize(mPainter->maxVolumes);
+	}
 
 	while (mMerger->GetInput())
 	{
