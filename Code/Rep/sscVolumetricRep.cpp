@@ -150,10 +150,12 @@ void VolumetricRep::setResampleFactor(double factor)
 {
 	mResampleFactor = factor;
 }
+
 ImagePtr VolumetricRep::getImage()
 {
 	return mImage;
 }
+
 void VolumetricRep::setImage(ImagePtr image)
 {
 	if (image==mImage)
@@ -189,6 +191,7 @@ void VolumetricRep::setImage(ImagePtr image)
 		mMapper->SetInput( (vtkImageData*)NULL );
 	}
 }
+
 bool VolumetricRep::hasImage(ImagePtr image) const
 {
 	return (mImage == image);

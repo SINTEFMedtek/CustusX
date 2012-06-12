@@ -36,7 +36,7 @@ typedef boost::shared_ptr<class SliceRep> SliceRepPtr;
  *
  * Use this to slice an image.
  *
- * If you want to use this class, test is thoroughly first!!
+ * If you want to use this class, test this thoroughly first!!
  *
  * \ingroup sscRep
  * \ingroup sscRep2D
