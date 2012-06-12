@@ -101,9 +101,12 @@ public:
     virtual void setColor(const QColor& color);
     virtual QColor getColor() const;
 
+    virtual void setSpacing(double x, double y, double z);
+    virtual double* getSpacing() { return &mSpacing[0]; }
+
     vtkLookupTablePtr getLut() { return mLut; }
-    vtkImageDataPtr getVtkImageData() { return mImageData; }    // NOT YET SUPPORTED
-    ssc::ImagePtr getImage() { return mImage; }
+    vtkImageDataPtr getVtkImageData();
+    ssc::ImagePtr getImage() { return ssc::ImagePtr(); } // NOT YET IMPLEMENTED
 
     void setROI(const FiberBundleROI& roi) { mROI = roi; }
     FiberBundleROI* getROI() { return &mROI; }
@@ -116,10 +119,9 @@ protected:
 
 private:
     vtkLookupTablePtr mLut;
-    vtkImageDataPtr mImageData;
     MeshPtr mMesh;
     FiberBundleROI mROI;
-    ssc::ImagePtr mImage;
+    double mSpacing[3];
 
 signals:
     void bundleChanged();
