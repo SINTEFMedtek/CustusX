@@ -73,11 +73,9 @@ private:
 	ssc::SlicedImageProxyPtr mSlicedProxy;
 	std::vector<ssc::SlicedImageProxyPtr> mSlices;
 	
-	
 	vtkImageBlendPtr mBlender;
 	int countImage;
 	vtkImageActorPtr mImageActor;
-		
 };
 
 //---------------------------------------------------------
