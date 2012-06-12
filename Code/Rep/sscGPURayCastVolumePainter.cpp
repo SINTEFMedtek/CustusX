@@ -549,14 +549,17 @@ void GPURayCastVolumePainter::setClipper(SlicePlaneClipperPtr clipper)
 {
 	mClipper = clipper;
 }
+
 void GPURayCastVolumePainter::setStepSize(double stepsize)
 {
 	mStepSize = stepsize;
 }
+
 void GPURayCastVolumePainter::setRenderMode(int renderMode)
 {
 	mRenderMode = renderMode;
 }
+
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
