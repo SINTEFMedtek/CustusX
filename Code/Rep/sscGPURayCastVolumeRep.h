@@ -81,6 +81,7 @@ public:
 	void setImages(std::vector<ssc::ImagePtr> images);
 	/**
 	 * \brief Get the images rendered with this class
+	 * At most ssc::GPURayCastVolumePainter::maxVolumes images will be used, any additional images in the list will be ignored
 	 */
 	std::vector<ssc::ImagePtr> getImages();
 	/**
