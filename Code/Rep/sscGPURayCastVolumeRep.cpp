@@ -1,8 +1,8 @@
 // This file is part of SSC,
 // a C++ Library supporting Image Guided Therapy Applications.
 //
-// Copyright (C) 2008- SINTEF Medical Technology
-// Copyright (C) 2008- Sonowand AS
+// Copyright (C) 2012- SINTEF Medical Technology
+// Copyright (C) 2012- Sonowand AS
 //
 // SSC is owned by SINTEF Medical Technology and Sonowand AS,
 // hereafter named the owners. Each particular piece of code
@@ -17,7 +17,7 @@
 //
 // See sscLicense.txt for more information.
 
-#include "sscTexture3DVolumeRep.h"
+#include "sscGPURayCastVolumeRep.h"
 
 #include <vtkAppendPolyData.h>
 #include <vtkCellArray.h>
@@ -33,6 +33,7 @@
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>
+#include <vtkProperty.h>
 
 #include "sscImage.h"
 #include "sscView.h"
@@ -40,7 +41,7 @@
 #include "sscImageLUT2D.h"
 #include "sscTypeConversions.h"
 #include "sscGPUImageBuffer.h"
-#include "sscTextureVolumePainter.h"
+#include "sscGPURayCastVolumePainter.h"
 
 //---------------------------------------------------------
 namespace ssc
@@ -57,12 +58,9 @@ static vtkPolyDataPtr createCube()
 	vtkPolyDataPtr cube = vtkPolyData::New();
 	vtkPoints *points = vtkPoints::New();
 	vtkCellArray *polys = vtkCellArray::New();
-	vtkFloatArray *tCoords = vtkFloatArray::New();
-	tCoords->SetNumberOfComponents(3);
 	int i;
 	// Load the point, cell, and data attributes.
 	for (i=0; i<8; i++) points->InsertPoint(i,x[i]);
-	for (i=0; i<8; i++) tCoords->InsertTupleValue(i, x[i]);
 	for (i=0; i<6; i++) polys->InsertNextCell(4,pts[i]);
 	
 	// We now assign the pieces to the vtkPolyData.
@@ -70,18 +68,17 @@ static vtkPolyDataPtr createCube()
 	points->Delete();
 	cube->SetPolys(polys);
 	polys->Delete();
-	cube->GetPointData()->SetTCoords(tCoords);
-	tCoords->Delete();
 	return cube;
 }
 
-Texture3DVolumeRep::Texture3DVolumeRep(const QString& uid) :
+GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
 	RepImpl(uid)
 {
 	mView = NULL;
 	//	std::cout << "create Texture3DSlicerRep" << std::endl;
 	mActor = vtkActorPtr::New();
-	mPainter = TextureVolumePainterPtr::New();
+	mPainter = GPURayCastVolumePainterPtr::New();
+	mPainter->setStepSize(defaultStepSize);
 	// default shader for sonowand: override using setshaderfile()
 	mPainter->setShaderFiles("/Data/Resources/Shaders/raycasting_shader.vert", "/Data/Resources/Shaders/raycasting_shader.frag");
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
@@ -92,25 +89,26 @@ Texture3DVolumeRep::Texture3DVolumeRep(const QString& uid) :
 	mPainterPolyDatamapper->SetPainter(mPainter);
 	mPainterPolyDatamapper->SetInput(mMerger->GetOutput());
 	mActor->SetMapper(mPainterPolyDatamapper);
+	mActor->GetProperty()->SetOpacity(0.99);
 }
 
-Texture3DVolumeRep::~Texture3DVolumeRep()
+GPURayCastVolumeRep::~GPURayCastVolumeRep()
 {
 }
 
-Texture3DVolumeRepPtr Texture3DVolumeRep::New(const QString& uid)
+GPURayCastVolumeRepPtr GPURayCastVolumeRep::New(const QString& uid)
 {
-	Texture3DVolumeRepPtr retval(new Texture3DVolumeRep(uid));
+	GPURayCastVolumeRepPtr retval(new GPURayCastVolumeRep(uid));
 	retval->mSelf = retval;
 	return retval;
 }
 
-void Texture3DVolumeRep::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
+void GPURayCastVolumeRep::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
 {
 	mPainter->setShaderFiles(vertexShaderFile, fragmentShaderFile);
 }
 
-void Texture3DVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
+void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 {
 	if (mImages.size() == images.size())
 	{
@@ -125,6 +123,7 @@ void Texture3DVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 	{
 		disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 	}
+	mClipVolumes.clear();
 
 	mImages = images;
 
@@ -154,7 +153,7 @@ void Texture3DVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 	transformChangedSlot();
 }
 
-void Texture3DVolumeRep::transformChangedSlot()
+void GPURayCastVolumeRep::transformChangedSlot()
 {
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
@@ -172,30 +171,29 @@ void Texture3DVolumeRep::transformChangedSlot()
 		Transform3D nMi = createTransformNormalize(mImages[i]->boundingBox(), textureSpace);
 		// total transform from slice space to texture space
 		Transform3D nMr = nMi * iMr;
-		std::cout << "Using transform: " << std::endl << nMr << std::endl;
 		mPainter->set_nMr(i, nMr);
 	}
 }
 
-std::vector<ssc::ImagePtr> Texture3DVolumeRep::getImages()
+std::vector<ssc::ImagePtr> GPURayCastVolumeRep::getImages()
 {
 	return mImages;
 }
 
-void Texture3DVolumeRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void GPURayCastVolumeRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
 {
 	view->getRenderer()->AddActor(mActor);
 	mView = view;
 	mPainter->setViewBase(view);
 }
 
-void Texture3DVolumeRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void GPURayCastVolumeRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 	mView = NULL;
 }
 
-void Texture3DVolumeRep::update()
+void GPURayCastVolumeRep::printSelf(std::ostream & os, ssc::Indent indent)
 {
 }
 
@@ -207,7 +205,7 @@ void Texture3DVolumeRep::setViewportData(const Transform3D& vpMs, const DoubleBo
 {
 }
 
-void Texture3DVolumeRep::updateColorAttributeSlot()
+void GPURayCastVolumeRep::updateColorAttributeSlot()
 {
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
@@ -224,18 +222,41 @@ void Texture3DVolumeRep::updateColorAttributeSlot()
 
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
 		float window = (float) mImages[i]->getTransferFunctions3D()->getWindow() / scalarTypeMax;
-		float llr = (float) 2* mImages[i]->getTransferFunctions3D()->getLLR() / scalarTypeMax;
+		float llr = (float) mImages[i]->getTransferFunctions3D()->getLLR() / scalarTypeMax;
 		float level = (float) mImages[i]->getTransferFunctions3D()->getLevel() / scalarTypeMax;
 		float alpha = (float) mImages[i]->getTransferFunctions3D()->getAlpha();
 		mPainter->SetColorAttribute(i, window, level, llr, alpha);
-		std::cout << "Using window, level, llr: " << window << ", " << level << ", " << llr << std::endl;
 	}
 	mActor->Modified();
 }
 
-QString Texture3DVolumeRep::getTCoordName(int index)
+void GPURayCastVolumeRep::setClipper(SlicePlaneClipperPtr clipper)
 {
-     return  "texture"+qstring_cast(index);
+	mClipper = clipper;
+	mPainter->setClipper(clipper);
+	mActor->Modified();
+}
+
+void GPURayCastVolumeRep::setClipVolumes(QStringList volumes)
+{
+	mClipVolumes = QSet<QString>::fromList(volumes);
+	for (unsigned i = 0; i < mImages.size(); ++i)
+	{
+		mPainter->setClipVolume(i, mClipVolumes.contains(mImages[i]->getUid()));
+	}	
+	mActor->Modified();
+}
+
+void GPURayCastVolumeRep::setStepSize(double stepsize)
+{
+	mPainter->setStepSize(stepsize);
+	mActor->Modified();
+}
+
+void GPURayCastVolumeRep::setRenderMode(enum RenderMode renderMode)
+{
+	mPainter->setRenderMode(renderMode);
+	mActor->Modified();
 }
 
 //---------------------------------------------------------

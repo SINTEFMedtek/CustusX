@@ -28,6 +28,7 @@ int main(int argc, char **argv)
     ssc::View* view = new ssc::View();
     ssc::FiberBundlePtr bundle = ssc::FiberBundle::New(vtkFileName1);
     bundle->setFilePath(vtkFileName1);
+    bundle->setColor(QColor("gold"));
     ssc::FiberBundleRepPtr rep = ssc::FiberBundleRep::New(bundle->getUid());
     rep->setBundle(bundle);
     view->setRep(rep);

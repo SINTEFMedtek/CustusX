@@ -45,6 +45,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
+    Data/sscVtkFileMesh.h
     Data/sscPresetTransferFunctions3D.h
     Data/sscFiberBundle.h
     Data/sscPointMetric.h
@@ -81,7 +82,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscCrossHairRep2D.h
     Rep/sscTexture3DSlicerProxy.h
     Rep/sscTexture3DSlicerRep.h
-    Rep/sscTexture3DVolumeRep.h
+    Rep/sscGPURayCastVolumeRep.h
     Rep/sscSlices3DRep.h
     Rep/sscSlicePlanes3DRep.h
     Rep/sscGeometricRep.h
@@ -269,10 +270,10 @@ SET( SSC_SOURCE_FILES
     Rep/sscTexture3DSlicerProxy.cpp
     Rep/sscTexture3DSlicerRep.cpp
     Rep/sscTexture3DSlicerRep.h
-    Rep/sscTexture3DVolumeRep.cpp
-    Rep/sscTexture3DVolumeRep.h
-    Rep/sscTextureVolumePainter.cpp
-    Rep/sscTextureVolumePainter.h
+    Rep/sscGPURayCastVolumeRep.cpp
+    Rep/sscGPURayCastVolumeRep.h
+    Rep/sscGPURayCastVolumePainter.cpp
+    Rep/sscGPURayCastVolumePainter.h
     Rep/sscSlices3DRep.h
     Rep/sscSlices3DRep.cpp
     Rep/sscTextureSlicePainter.cpp
@@ -328,6 +329,8 @@ SET( SSC_SOURCE_FILES
     Data/sscGPUImageBuffer.h
     Data/sscMesh.h
     Data/sscMesh.cpp
+    Data/sscVtkFileMesh.h
+    Data/sscVtkFileMesh.cpp
     Data/sscDataManager.cpp
     Data/sscDataManager.h
     Data/sscDataManagerImpl.cpp
@@ -587,6 +590,10 @@ configure_file (
     "${PROJECT_SOURCE_DIR}/CMake/SSCConfig.cmake.in"
     "${PROJECT_BINARY_DIR}/SSCConfig.cmake"
     )
+file(COPY Rep/Shaders/glsl/raycasting_shader.frag DESTINATION Rep)
+file(COPY Rep/Shaders/glsl/raycasting_shader.vert DESTINATION Rep)
+file(COPY Rep/Shaders/glsl/Texture3DOverlay.frag DESTINATION Rep)
+  
 # Export our build settings and library dependencies
 include (CMakeExportBuildSettings)
 cmake_export_build_settings (${SSC_BINARY_DIR}/SSCBuildSettings.cmake)

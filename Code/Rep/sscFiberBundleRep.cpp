@@ -39,7 +39,7 @@ namespace ssc
 {
 /** Constructor */
 FiberBundleRep::FiberBundleRep(const QString& uid, const QString& name)
-    : RepImpl(uid, name), mFiberRadius(.05), mTubeFilter(true)
+    : RepImpl(uid, name), mFiberRadius(.05), mTubeFilter(true), mTubeSegments(8)
 {
     mPolyDataMapper = vtkPolyDataMapperPtr::New();
     mProperty = vtkPropertyPtr::New();
@@ -90,9 +90,9 @@ void FiberBundleRep::setBundle(FiberBundlePtr bundle)
     {
         connect(mBundle.get(), SIGNAL(transformChanged()), this, SLOT(bundleTransformChanged()));
         connect(mBundle.get(), SIGNAL(bundleChanged()), this, SLOT(bundleChanged()));
-
-        this->loadBundle();
     }
+
+    bundleChanged();
 }
 
 /**
@@ -117,33 +117,6 @@ void FiberBundleRep::removeRepActorsFromViewRenderer(ViewBase *view)
         mViewportListener->stopListen();
 }
 
-/**
-  * Loads a polydata mesh from file and assigns
-  * the mesh to the fiber bundle object.
-  *
-  * Prerequisite: The bundle has an assigned file name.
-  */
-void FiberBundleRep::loadBundle()
-{
-    vtkPolyDataPtr model;
-
-    QString filename = mBundle->getFilePath();
-    if (filename.isEmpty() || !filename.endsWith("vtk"))
-    {
-        std::cout << "Could not load model from file: " << filename << std::endl;
-        return;
-    }
-    else
-    {
-        vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
-        reader->SetFileName(cstring_cast(filename));
-
-        model = reader->GetOutput();
-
-        if (model) mBundle->setVtkPolyData(model);
-    }
-}
-
 /** Called whenever bundle has changed */
 void FiberBundleRep::bundleChanged()
 {
@@ -151,6 +124,9 @@ void FiberBundleRep::bundleChanged()
 
     if (model)
     {
+        QColor color = mBundle->getColor();
+        mActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+
         if (mTubeFilter)
         {
             /** Create a tube filter for the mesh.
@@ -159,7 +135,7 @@ void FiberBundleRep::bundleChanged()
             vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
             tubeFilter->SetInput(model);
             tubeFilter->SetRadius(mFiberRadius); //default is .5
-            tubeFilter->SetNumberOfSides(8);
+            tubeFilter->SetNumberOfSides(mTubeSegments);
             tubeFilter->Update();
 
             mPolyDataMapper->SetInputConnection(tubeFilter->GetOutputPort());
@@ -176,7 +152,7 @@ void FiberBundleRep::bundleChanged()
             mActor->SetMapper(mPolyDataMapper);
         }
 
-        mPolyDataMapper->ScalarVisibilityOff(); //Don't use the LUT from the VtkPolyData
+        mPolyDataMapper->ScalarVisibilityOn();
     }
 
 }

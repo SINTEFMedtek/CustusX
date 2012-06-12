@@ -18,7 +18,7 @@
 // See sscLicense.txt for more information.
 
 #include "sscFiberBundle.h"
-#include "sscMesh.h"
+#include "sscVtkFileMesh.h"
 #include "sscBoundingBox3D.h"
 
 #include "vtkPolyData.h"
@@ -32,18 +32,87 @@ FiberBundlePtr FiberBundle::New(const QString& uid, const QString& name)
     return retval;
 }
 
-DoubleBoundingBox3D FiberBundle::boundingBox() const
+FiberBundle::FiberBundle(const QString &uid, const QString &name)
+    : Data(uid, name)
 {
-    DoubleBoundingBox3D retval;
+    mMesh.reset(new VtkFileMesh(uid, name));
+}
 
-    if (mVtkPolyData)
+void FiberBundle::setMesh(const MeshPtr& mesh)
+{
+    if (hasMesh(mesh))
+        return;
+
+    // Disconnect current mesh signals, if any
+    if(mMesh)
     {
-        // Make sure we have updated data first
-        mVtkPolyData->UpdateInformation();
-        retval = DoubleBoundingBox3D(mVtkPolyData->GetBounds());
+        disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+        disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
     }
 
-    return retval;
+    // Connect new mesh signals
+    mMesh = mesh;
+
+    if (mMesh)
+    {
+        connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+        connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+    }
+
+    emit bundleChanged();
+}
+
+bool FiberBundle::hasMesh(const MeshPtr& mesh) const
+{
+    return (mMesh == mesh);
+}
+
+void FiberBundle::setFilePath(const QString& filePath)
+{
+    mMesh->setFilePath(filePath);
+}
+
+QString FiberBundle::getFilePath() const
+{
+    return mMesh->getFilePath();
+}
+
+DoubleBoundingBox3D FiberBundle::boundingBox() const
+{
+    DoubleBoundingBox3D bbox;
+    vtkPolyDataPtr polydata;
+
+    if (mMesh) polydata = getVtkPolyData();
+
+    if(polydata)
+    {
+        // Make sure we have updated data first
+        polydata->UpdateInformation();
+        bbox = DoubleBoundingBox3D(polydata->GetBounds());
+    }
+
+    return bbox;
+}
+
+void FiberBundle::setVtkPolyData(const vtkPolyDataPtr& polyData)
+{
+    MeshPtr mesh(new Mesh(mUid, "FiberBundle", polyData));
+    setMesh(mesh);
+}
+
+vtkPolyDataPtr FiberBundle::getVtkPolyData() const
+{
+    return mMesh->getVtkPolyData();
+}
+
+void FiberBundle::setColor(const QColor& color)
+{
+    mMesh->setColor(color);
+}
+
+QColor FiberBundle::getColor() const
+{
+    return mMesh->getColor();
 }
 
 void FiberBundle::printSelf(std::ostream &os, Indent indent)
@@ -52,9 +121,19 @@ void FiberBundle::printSelf(std::ostream &os, Indent indent)
     os << indent << "uid: " << mUid.toStdString() << std::endl;
     os << indent << "name: " << mName.toStdString() << std::endl;
     os << indent << "fileName: " << mFilePath.toStdString() << std::endl;
-    os << indent << "numPoints: " << mVtkPolyData->GetNumberOfPoints() << std::endl;
-    os << indent << "numVerts: " << mVtkPolyData->GetNumberOfVerts() << std::endl;
-    os << indent << "numPolys: " << mVtkPolyData->GetNumberOfPolys() << std::endl;
+    os << indent << "numPoints: " << mMesh->getVtkPolyData()->GetNumberOfPoints() << std::endl;
+    os << indent << "numVerts: " << mMesh->getVtkPolyData()->GetNumberOfVerts() << std::endl;
+    os << indent << "numPolys: " << mMesh->getVtkPolyData()->GetNumberOfPolys() << std::endl;
+}
+
+void FiberBundle::meshChangedSlot()
+{
+    emit bundleChanged();
+}
+
+void FiberBundle::transformChangedSlot()
+{
+    emit transformChanged();
 }
 
 } // end namespace

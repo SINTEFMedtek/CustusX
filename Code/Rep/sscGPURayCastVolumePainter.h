@@ -1,8 +1,8 @@
 // This file is part of SSC,
 // a C++ Library supporting Image Guided Therapy Applications.
 //
-// Copyright (C) 2008- SINTEF Medical Technology
-// Copyright (C) 2008- Sonowand AS
+// Copyright (C) 2012- SINTEF Medical Technology
+// Copyright (C) 2012- Sonowand AS
 //
 // SSC is owned by SINTEF Medical Technology and Sonowand AS,
 // hereafter named the owners. Each particular piece of code
@@ -17,15 +17,8 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * vmTextureVolumePainter.h
- *
- *  Created on: Oct 13, 2009
- *      Author: petterw
- */
-
-#ifndef SSCTEXTURESLICEPAINTER_H_
-#define SSCTEXTURESLICEPAINTER_H_
+#ifndef SSCGPURAYCASTVOLUMEPAINTER_H_
+#define SSCGPURAYCASTVOLUMEPAINTER_H_
 
 #include <boost/shared_ptr.hpp>
 #include <vtkOpenGLRepresentationPainter.h>
@@ -43,18 +36,18 @@ namespace ssc
 
 
 /**
- * \brief Helper class for GPU rendering of slices.
+ * \brief Helper class for GPU raycasting rendering of multiple volumes.
  *
- * \sa Texture3DSlicerProxyImpl
+ * \sa GPURayCastVolumeRep
  *
  *
- * \ingroup sscProxy
+ * \ingroup sscRep3D
  */
-class TextureVolumePainter : public vtkOpenGLRepresentationPainter
+class GPURayCastVolumePainter : public vtkOpenGLRepresentationPainter
 {
 public:
-	static TextureVolumePainter* New();
-	vtkTypeRevisionMacro(TextureVolumePainter, vtkOpenGLRepresentationPainter);
+	static GPURayCastVolumePainter* New();
+	vtkTypeRevisionMacro(GPURayCastVolumePainter, vtkOpenGLRepresentationPainter);
 
 	virtual void ReleaseGraphicsResources(vtkWindow *);
 	void PrintSelf(ostream& os, vtkIndent indent);
@@ -63,13 +56,16 @@ public:
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
 	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
-	void releaseGraphicsResources(int index);
-	void set_nMr(int index, ssc::Transform3D nMr);
 	void setViewBase(ssc::ViewBase *ptr) { mBase = ptr; }
+	void set_nMr(int index, ssc::Transform3D nMr);
+	void setClipper(SlicePlaneClipperPtr clipper);
+	void setClipVolume(int index, bool clip);
+	void setStepSize(double stepsize);
+	void setRenderMode(int renderMode);
 
 protected:
-	TextureVolumePainter();
-	virtual ~TextureVolumePainter();
+	GPURayCastVolumePainter();
+	virtual ~GPURayCastVolumePainter();
 	virtual void PrepareForRendering(vtkRenderer*, vtkActor*);
 	void RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
 
@@ -85,6 +81,10 @@ protected:
 	QSize mLastRenderSize;
 	unsigned int mDepthBuffer;
 	ssc::ViewBase *mBase;
+	unsigned int mBackgroundBuffer;
+	SlicePlaneClipperPtr mClipper;
+	float mStepSize;
+	int mRenderMode;
 };
 
 #endif // WIN32
@@ -93,4 +93,4 @@ protected:
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
-#endif /* SSCTEXTURESLICEPAINTER_H_ */
+#endif /* SSCGPURAYCASTVOLUMEPAINTER_H_ */
