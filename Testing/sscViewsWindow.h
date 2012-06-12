@@ -61,7 +61,16 @@ private:
 	int mTotalRender;
 	int mTotalOther;
 	QTime mLastRenderEnd;
+<<<<<<< HEAD
 	ssc::AcceptanceBoxWidget* mAcceptanceBox;
+=======
+	QString mShaderFolder;
+	ssc::AcceptanceBoxWidget* mAcceptanceBox; 
+	
+	
+	ssc::Texture3DSlicerRepPtr m_test_rep;
+	ssc::View* m_test_view;
+>>>>>>> master
 
 public slots:
 	void updateRender();

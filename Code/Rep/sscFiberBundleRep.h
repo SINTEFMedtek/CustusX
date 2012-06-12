@@ -63,6 +63,7 @@ protected:
 private:
     double  mFiberRadius;
     bool    mTubeFilter;
+    int     mTubeSegments;
 
     FiberBundlePtr mBundle;
     ViewportListenerPtr mViewportListener;
@@ -70,8 +71,6 @@ private:
     vtkActorPtr mActor;
     vtkPolyDataMapperPtr mPolyDataMapper;
     vtkPropertyPtr mProperty;
-
-    void loadBundle();
 
 private slots:
     void bundleChanged();

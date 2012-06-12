@@ -1,8 +1,8 @@
 // This file is part of SSC,
 // a C++ Library supporting Image Guided Therapy Applications.
 //
-// Copyright (C) 2008- SINTEF Medical Technology
-// Copyright (C) 2008- Sonowand AS
+// Copyright (C) 2012- SINTEF Medical Technology
+// Copyright (C) 2012- Sonowand AS
 //
 // SSC is owned by SINTEF Medical Technology and Sonowand AS,
 // hereafter named the owners. Each particular piece of code
@@ -17,14 +17,7 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * vmTextureVolumePainter.cpp
- *
- *  Created on: Oct 13, 2009
- *      Author: petterw
- */
-
-#include "sscTextureVolumePainter.h"
+#include "sscGPURayCastVolumePainter.h"
 
 #ifndef WIN32
 #include <QtCore>
@@ -35,22 +28,12 @@
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkOpenGLTexture.h>
 #include <vtkgl.h>
+#include <vtkPlane.h>
 #include <vtkProperty.h>
 #include <vtkMatrix4x4.h>
 #include <vtkShaderProgram2.h>
 #include <vtkShader2.h>
 #include <vtkShader2Collection.h>
-
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#include "/usr/include/X11/Xlib.h"
-#else
-#include <GL/glu.h>
-#endif
-
-#include <Cg/cg.h>
-#include <Cg/cgGL.h>
-
 
 #ifdef WIN32
 #include <windows.h>
@@ -60,6 +43,7 @@
 #include "sscGPUImageBuffer.h"
 #include "sscTypeConversions.h"
 #include "sscGLHelpers.h"
+#include "sscSlicePlaneClipper.h"
 
 
 //---------------------------------------------------------
@@ -67,21 +51,12 @@ namespace ssc
 {
 //---------------------------------------------------------
 
-vtkStandardNewMacro(TextureVolumePainter);
-vtkCxxRevisionMacro(TextureVolumePainter, "$Revision: 647 $");
+vtkStandardNewMacro(GPURayCastVolumePainter);
+vtkCxxRevisionMacro(GPURayCastVolumePainter, "$Revision: 647 $");
 
-class HackGLTexture: public vtkOpenGLTexture
-{
-public:
-	HackGLTexture() {}
-	virtual ~HackGLTexture() {}
-	virtual long GetIndex() {return mIndex;}
-	virtual void SetIndex(long index) {mIndex = index;}
-private:
-	long mIndex;
-};
+#define GL_TRACE(string) if (vtkgl::StringMarkerGREMEDY) {vtkgl::StringMarkerGREMEDY(0, QString("%1:%2 - %3").arg(__func__).arg(__LINE__).arg(string).toUtf8().constData());}
 	
-class SingleVolumePainterHelper
+class GPURayCastSingleVolumePainterHelper
 {
 	ssc::GPUImageDataBufferPtr mVolumeBuffer;
 	ssc::GPUImageLutBufferPtr mLutBuffer;
@@ -90,25 +65,29 @@ class SingleVolumePainterHelper
 	float mLevel;
 	float mLLR;
 	float mAlpha;
-	HackGLTexture *mTexture;
-	bool mTextureLoaded;
 	Transform3D m_nMr;
+	bool mClip;
 
 public:
-	explicit SingleVolumePainterHelper(int index)
+	explicit GPURayCastSingleVolumePainterHelper(int index) :
+		mIndex(index),
+		mWindow(0.0),
+		mLevel(0.0),
+		mLLR(0.0),
+		mAlpha(1.0),
+		mClip(false)
 	{
-		mIndex = index;
-		mTexture = new HackGLTexture();
-		int texture = 2*mIndex;
-		mTexture->SetIndex(texture);
-		mTextureLoaded = false;
 	}
-	SingleVolumePainterHelper()
+	GPURayCastSingleVolumePainterHelper() :
+		mIndex(-1),
+		mWindow(0.0),
+		mLevel(0.0),
+		mLLR(0.0),
+		mAlpha(1.0),
+		mClip(false)
 	{
-		mIndex = -1;
-		mTexture = NULL;
 	}
-	~SingleVolumePainterHelper()
+	~GPURayCastSingleVolumePainterHelper()
 	{
 	}
 	void SetBuffer(ssc::GPUImageDataBufferPtr buffer)
@@ -129,6 +108,10 @@ public:
 	void set_nMr( Transform3D nMr)
 	{
 		m_nMr = nMr;
+	}
+	void setClip( bool clip)
+	{
+		mClip = clip;
 	}
 	void initializeRendering()
 	{
@@ -172,7 +155,9 @@ public:
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("window[%1]").arg(mIndex)), 1, &mWindow);
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("level[%1]").arg(mIndex)), 1, &mLevel);
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("threshold[%1]").arg(mIndex)), 1, &mLLR);
-		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("transparency[%1]").arg(mIndex)), 1, &mAlpha);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("alpha[%1]").arg(mIndex)), 1, &mAlpha);
+		int clip = mClip;
+		shader->GetUniformVariables()->SetUniformi(cstring_cast(QString("useCutPlane[%1]").arg(mIndex)), 1, &clip);
 		vtkMatrix4x4Ptr M = m_nMr.getVtkMatrix();
 		float matrix[16];
 		for (int i = 0; i < 4; ++i)
@@ -187,7 +172,7 @@ public:
 	}
 };
 
-class TextureVolumePainter::vtkInternals
+class GPURayCastVolumePainter::vtkInternals
 {
 public:
 	Display* mCurrentContext;
@@ -198,14 +183,14 @@ public:
 
 	unsigned int mVolumes;
 
-	std::vector<SingleVolumePainterHelper> mElement;
+	std::vector<GPURayCastSingleVolumePainterHelper> mElement;
 
-	SingleVolumePainterHelper& safeIndex(int index)
+	GPURayCastSingleVolumePainterHelper& safeIndex(int index)
 	{
 		if ((int)mElement.size() <= index)
 		{
 			mElement.resize(index+1);
-			mElement[index] = SingleVolumePainterHelper(index);
+			mElement[index] = GPURayCastSingleVolumePainterHelper(index);
 		}
 		return mElement[index];
 	}
@@ -229,19 +214,23 @@ public:
 };
 
 //---------------------------------------------------------
-TextureVolumePainter::TextureVolumePainter() :
-	mDepthBuffer(0)
+GPURayCastVolumePainter::GPURayCastVolumePainter() :
+	mDepthBuffer(0),
+	mBackgroundBuffer(0),
+	mBuffersValid(false),
+	mStepSize(1.0),
+	mRenderMode(0)
 {
 	mInternals = new vtkInternals();
 }
 
-void TextureVolumePainter::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
+void GPURayCastVolumePainter::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
 {
 	mVertexShaderFile = vertexShaderFile;
 	mFragmentShaderFile = fragmentShaderFile;
 }
 
-QString TextureVolumePainter::loadShaderFile(QString shaderFile)
+QString GPURayCastVolumePainter::loadShaderFile(QString shaderFile)
 {
 	QFile fp(shaderFile);
 	if (fp.exists())
@@ -257,7 +246,7 @@ QString TextureVolumePainter::loadShaderFile(QString shaderFile)
 	return "";
 }
 
-TextureVolumePainter::~TextureVolumePainter()
+GPURayCastVolumePainter::~GPURayCastVolumePainter()
 {
 	if (mInternals->LastContext)
 	{
@@ -268,14 +257,24 @@ TextureVolumePainter::~TextureVolumePainter()
 	mInternals = 0;
 }
 
-void TextureVolumePainter::ReleaseGraphicsResources(vtkWindow* win)
+void GPURayCastVolumePainter::ReleaseGraphicsResources(vtkWindow* win)
 {
 	mInternals->ClearGraphicsResources(); //the shader
 	mInternals->LastContext = 0;
+	if (mDepthBuffer)
+	{
+		glDeleteTextures(1, &mDepthBuffer);
+		mDepthBuffer = 0;
+	}
+	if (mBackgroundBuffer)
+	{
+		glDeleteTextures(1, &mBackgroundBuffer);
+		mBackgroundBuffer = 0;
+	}
 	this->Superclass::ReleaseGraphicsResources(win);
 }
 
-void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* actor)
+void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* actor)
 {
 	if (!CanRender(renderer, actor))
 	{
@@ -330,10 +329,8 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 		}
 	}
 
-	int renderMode = 0;
-	mInternals->Shader->GetUniformVariables()->SetUniformi("renderMode", 1, &renderMode);
-	float stepsize = 1.0;
-	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &stepsize);
+	mInternals->Shader->GetUniformVariables()->SetUniformi("renderMode", 1, &mRenderMode);
+	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &mStepSize);
 	float viewport[2];
 	viewport[0] = mBase->size().width();
 	viewport[1] = mBase->size().height();
@@ -367,8 +364,8 @@ void TextureVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* 
 	report_gl_error();
 }
 
-void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
-		bool forceCompileOnly)
+void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
+                                          bool forceCompileOnly)
 {
 	report_gl_error();
 
@@ -376,7 +373,7 @@ void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor
 	{
 		return;
 	}
-
+	GL_TRACE("Entering");
 	// Save context state to be able to restore.
 	mInternals->Shader->Build();
 	if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
@@ -390,42 +387,76 @@ void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor
 		mInternals->mElement[i].eachRenderInternal(mInternals->Shader);
 	}
 
-	actor->GetProperty()->SetOpacity(0.5);
-	GLint saveDrawBuffer;
-	glGetIntegerv(GL_DRAW_BUFFER, &saveDrawBuffer);
-	glDrawBuffer(GL_NONE);
-	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
-	glDrawBuffer(saveDrawBuffer);
-	actor->GetProperty()->SetOpacity(1.0);
-
-	if (mLastRenderSize != mBase->size() && glIsTexture(mDepthBuffer))
+	if (mClipper)
 	{
-		glDeleteTextures(1, &mDepthBuffer);
-		mDepthBuffer = 0;
+		float vector[3];
+		double dvector[3];
+		mClipper->getClipPlaneCopy()->GetNormal(dvector);
+		vector[0] = dvector[0];
+		vector[1] = dvector[1];
+		vector[2] = dvector[2];
+		mInternals->Shader->GetUniformVariables()->SetUniformfv("cutPlaneNormal", 3, 1, vector);
+		mClipper->getClipPlaneCopy()->GetOrigin(dvector);
+		vector[0] = dvector[0];
+		vector[1] = dvector[1];
+		vector[2] = dvector[2];
+		mInternals->Shader->GetUniformVariables()->SetUniformfv("cutPlaneOffset", 3, 1, vector);
+	}
+	
+	glDepthMask(1);
+	if (mLastRenderSize != mBase->size())
+	{
+		if (glIsTexture(mDepthBuffer))
+		{
+			glDeleteTextures(1, &mDepthBuffer);
+			mDepthBuffer = 0;
+		}
+		if (glIsTexture(mBackgroundBuffer))
+		{
+			glDeleteTextures(1, &mBackgroundBuffer);
+			mBackgroundBuffer = 0;
+		}
 	}
 	if (!glIsTexture(mDepthBuffer))
 	{
 		glGenTextures(1, &mDepthBuffer);
 		report_gl_error();
 		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
+		glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mDepthBuffer);
 		report_gl_error();
-		glTexImage2D(GL_TEXTURE_2D, 0, vtkgl::DEPTH_COMPONENT32, mBase->size().width(), mBase->size().height(), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(vtkgl::TEXTURE_RECTANGLE_ARB, 0, vtkgl::DEPTH_COMPONENT32, mWidth, mHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 		report_gl_error();
-		glTexParameteri(GL_TEXTURE_2D, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
-		glTexParameteri(GL_TEXTURE_2D, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	}
+	if (!glIsTexture(mBackgroundBuffer))
+	{
+		glGenTextures(1, &mBackgroundBuffer);
+		report_gl_error();
+		glActiveTexture(GL_TEXTURE11);
+		glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mBackgroundBuffer);
+		report_gl_error();
+		glTexImage2D(vtkgl::TEXTURE_RECTANGLE_ARB, 0, GL_RGB, mWidth, mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		report_gl_error();
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		mLastRenderSize = mBase->size();
 	}
+	mBuffersValid = true;
 
 	glActiveTexture(GL_TEXTURE10);
-	glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
-	glCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, 0, 0, mBase->size().width(), mBase->size().height());
+	glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mDepthBuffer);
+	glCopyTexSubImage2D( vtkgl::TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, mBase->size().width(), mBase->size().height());
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mBackgroundBuffer);
+	glCopyTexSubImage2D( vtkgl::TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, mBase->size().width(), mBase->size().height());
 	report_gl_error();
-	glClear(GL_DEPTH_BUFFER_BIT);
 	int depthTexture = 10;
 	mInternals->Shader->GetUniformVariables()->SetUniformi("depthBuffer", 1, (int*)&depthTexture);
+	int backgroundTexture = 11;
+	mInternals->Shader->GetUniformVariables()->SetUniformi("backgroundBuffer", 1, (int*)&backgroundTexture);
 	mInternals->Shader->Use();
 	report_gl_error();
 
@@ -443,20 +474,20 @@ void TextureVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor
 	report_gl_error();
 }
 
-bool TextureVolumePainter::CanRender(vtkRenderer*, vtkActor*)
+bool GPURayCastVolumePainter::CanRender(vtkRenderer*, vtkActor*)
 {
 	return !mInternals->mElement.empty();
 }
 
-bool TextureVolumePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id)
+bool GPURayCastVolumePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id)
 {
 	bool loaded = mgr->LoadSupportedExtension(cstring_cast(id));
 	if (!loaded)
-		std::cout << "TextureVolumePainter Error: GL extension " + id + " not found" << std::endl;
+		std::cout << "GPURayCastVolumePainter Error: GL extension " + id + " not found" << std::endl;
 	return loaded;
 }
 
-bool TextureVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
+bool GPURayCastVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 {
 	GLint value[2];
 	glGetIntegerv(vtkgl::MAX_TEXTURE_COORDS,value);
@@ -464,46 +495,56 @@ bool TextureVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr
 	{
 		std::cout<<"GL_MAX_TEXTURE_COORDS="<<value[0]<<" . Number of texture coordinate sets. Min is 2."<<std::endl;
 	}
+	mgr->LoadSupportedExtension("GL_GREMEDY_string_marker");
 	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_3")
+	        && LoadRequiredExtension(mgr, "GL_ARB_texture_rectangle")
 			&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object")
 			&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
 }
 
-void TextureVolumePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer)
+void GPURayCastVolumePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer)
 {
 	mInternals->safeIndex(index).SetBuffer(buffer);
 }
 
-void TextureVolumePainter::SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer)
+void GPURayCastVolumePainter::SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer)
 {
 	mInternals->safeIndex(index).SetBuffer(buffer);
 }
 
-void TextureVolumePainter::SetColorAttribute(int index, float window, float level, float llr,float alpha)
+void GPURayCastVolumePainter::SetColorAttribute(int index, float window, float level, float llr,float alpha)
 {
 	mInternals->safeIndex(index).SetColorAttribute(window, level, llr, alpha);
 }
 
-void TextureVolumePainter::releaseGraphicsResources(int index)
+void GPURayCastVolumePainter::setClipVolume(int index, bool clip)
 {
-	if (mDepthBuffer)
-	{
-		glDeleteTextures(1, &mDepthBuffer);
-		mDepthBuffer = 0;
-	}
+	mInternals->safeIndex(index).setClip(clip);
 }
 
-void TextureVolumePainter::PrintSelf(ostream& os, vtkIndent indent)
+void GPURayCastVolumePainter::PrintSelf(ostream& os, vtkIndent indent)
 {
 }
 
-void TextureVolumePainter::set_nMr(int index, Transform3D nMr)
+void GPURayCastVolumePainter::set_nMr(int index, Transform3D nMr)
 {
 	mInternals->safeIndex(index).set_nMr(nMr);
 }
 
+void GPURayCastVolumePainter::setClipper(SlicePlaneClipperPtr clipper)
+{
+	mClipper = clipper;
+}
+void GPURayCastVolumePainter::setStepSize(double stepsize)
+{
+	mStepSize = stepsize;
+}
+void GPURayCastVolumePainter::setRenderMode(int renderMode)
+{
+	mRenderMode = renderMode;
+}
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
