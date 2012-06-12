@@ -109,6 +109,15 @@ void TestVisualRendering::test_ACS_3D_Tool_Container()
 	widget->containerGPUSlice(view, 1, "A", image[0], ssc::ptAXIAL);
 	widget->containerGPUSlice(view, 0, "C", image[0], ssc::ptCORONAL);
 	widget->containerGPUSlice(view, 3, "S", image[0], ssc::ptSAGITTAL);
+
+	CPPUNIT_ASSERT(runWidget());
+}
+
+void TestVisualRendering::test_3D_Tool_GPU()
+{
+	widget->setDescription("3D Volume, moving tool");
+	widget->define3DGPU(image, 0, 0);
+
 	CPPUNIT_ASSERT(runWidget());
 }
 

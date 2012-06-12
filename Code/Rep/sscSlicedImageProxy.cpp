@@ -43,20 +43,20 @@ SlicedImageProxy::SlicedImageProxy()
 
 	mReslicer = vtkImageReslicePtr::New();
 	mReslicer->SetInterpolationModeToLinear();
-	mReslicer->SetOutputDimensionality( 2);
+	mReslicer->SetOutputDimensionality(2);
 	mReslicer->SetResliceAxes(mMatrixAxes);
 	//mReslicer->SetAutoCropOutput(false); //faster update rate
 	mReslicer->AutoCropOutputOn(); // fix used in 2.0.9, but slower update rate
 
 	mWindowLevel = vtkImageMapToColorsPtr::New();
-	mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
+	mWindowLevel->SetInputConnection(mReslicer->GetOutputPort());
 	mWindowLevel->SetOutputFormatToRGBA();
 
 	mDummyImage = createDummyImageData();
 
-  mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
-  //mRedirecter->SetInput(mWindowLevel->GetOutput());
-  mRedirecter->SetInput(mDummyImage);
+	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
+	//mRedirecter->SetInput(mWindowLevel->GetOutput());
+	mRedirecter->SetInput(mDummyImage);
 }
 
 SlicedImageProxy::~SlicedImageProxy()
@@ -68,16 +68,16 @@ SlicedImageProxy::~SlicedImageProxy()
  */
 vtkImageDataPtr SlicedImageProxy::createDummyImageData()
 {
-  vtkImageDataPtr dummyImageData = vtkImageDataPtr::New();
-  dummyImageData->SetExtent(0, 0, 0, 0, 0, 0);
-  dummyImageData->SetSpacing(1, 1, 1);
-  //dummyImageData->SetScalarTypeToUnsignedShort();
-  dummyImageData->SetScalarTypeToUnsignedChar();
-  dummyImageData->SetNumberOfScalarComponents(1);
-  dummyImageData->AllocateScalars();
-  unsigned char* dataPtr = static_cast<unsigned char*>(dummyImageData->GetScalarPointer());
-  *dataPtr = 0;	// Set voxel to black
-  return dummyImageData;
+	vtkImageDataPtr dummyImageData = vtkImageDataPtr::New();
+	dummyImageData->SetExtent(0, 0, 0, 0, 0, 0);
+	dummyImageData->SetSpacing(1, 1, 1);
+	//dummyImageData->SetScalarTypeToUnsignedShort();
+	dummyImageData->SetScalarTypeToUnsignedChar();
+	dummyImageData->SetNumberOfScalarComponents(1);
+	dummyImageData->AllocateScalars();
+	unsigned char* dataPtr = static_cast<unsigned char*> (dummyImageData->GetScalarPointer());
+	*dataPtr = 0; // Set voxel to black
+	return dummyImageData;
 }
 
 void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
@@ -94,13 +94,12 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 	}
 }
 
-
 void SlicedImageProxy::transferFunctionsChangedSlot()
 {
-  // needed for view::render() to work properly
-  mRedirecter->Modified();
-  mRedirecter->Update();
-  mWindowLevel->SetLookupTable(mImage->getLookupTable2D()->getOutputLookupTable());
+	// needed for view::render() to work properly
+	mRedirecter->Modified();
+	mRedirecter->Update();
+	mWindowLevel->SetLookupTable(mImage->getLookupTable2D()->getOutputLookupTable());
 }
 
 void SlicedImageProxy::setImage(ImagePtr image)
@@ -108,61 +107,64 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	if (mImage)
 	{
 		disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-    disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(transformChangedSlot()));
 	}
 
 	mImage = image;
+
 	if (mImage)
 	{
 		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-    connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		mReslicer->SetInput( mImage->getBaseVtkImageData() );
+		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(transformChangedSlot()));
+		mReslicer->SetInput(mImage->getBaseVtkImageData());
 		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
 		mWindowLevel->Update();
-		
-		if (mImage->getBaseVtkImageData()->GetNumberOfScalarComponents()==3) // color
+
+		if (mImage->getBaseVtkImageData()->GetNumberOfScalarComponents() == 3) // color
 		{
 			// split the image into the components, apply the lut, then merge.
 
 			vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
-			
-			for (int i=0; i<3; ++i)
-			{			
-				
+
+			for (int i = 0; i < 3; ++i)
+			{
+
 				vtkImageMapToColorsPtr windowLevel = vtkImageMapToColorsPtr::New();
 				windowLevel->SetInput(mReslicer->GetOutput());
 				windowLevel->SetActiveComponent(i);
 				windowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
-//				if (i=2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
-//				{
-//					windowLevel->SetOutputFormatToLuminanceAlpha();	
-//				}
-//				else
+				//				if (i=2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
+				//				{
+				//					windowLevel->SetOutputFormatToLuminanceAlpha();
+				//				}
+				//				else
 				{
-					windowLevel->SetOutputFormatToLuminance();					
+					windowLevel->SetOutputFormatToLuminance();
 				}
 
 				merger->SetInput(i, windowLevel->GetOutput());
 			}
-			
+
 			mRedirecter->SetInput(merger->GetOutput());
-		 	//mRedirecter->SetInput(mReslicer->GetOutput());			
+			//mRedirecter->SetInput(mReslicer->GetOutput());
 		}
 		else // grayscale
 		{
 			mReslicer->SetBackgroundLevel(mImage->getMin());
-		 	mRedirecter->SetInput(mWindowLevel->GetOutput());						
+			mRedirecter->SetInput(mWindowLevel->GetOutput());
 		}
 
-    update();
+		update();
 	}
 	else // no image
 	{
-	  mRedirecter->SetInput(mDummyImage);
+		mRedirecter->SetInput(mDummyImage);
 	}
 }
 
-ImagePtr SlicedImageProxy::getImage()const
+ImagePtr SlicedImageProxy::getImage() const
 {
 	return mImage;
 }
@@ -180,16 +182,16 @@ void SlicedImageProxy::update()
 
 	Transform3D rMs = mSlicer->get_sMr().inv();
 	Transform3D iMr = mImage->get_rMd().inv();
-	Transform3D M = iMr*rMs;
-//	std::cout << "iMs, "<< mSlicer->getName() <<"\n" << M << std::endl;
+	Transform3D M = iMr * rMs;
+	//	std::cout << "iMs, "<< mSlicer->getName() <<"\n" << M << std::endl;
 
 	mMatrixAxes->DeepCopy(M.getVtkMatrix());
 
 	/*lock-out render time*/
 	/* this will probably update the pipe*/
 
-//	mReslicer->Update(); //and the mapper
-//	mWindowLevel->Update();
+	//	mReslicer->Update(); //and the mapper
+	//	mWindowLevel->Update();
 }
 
 void SlicedImageProxy::transformChangedSlot()
@@ -210,7 +212,7 @@ void SlicedImageProxy::printSelf(std::ostream & os, Indent indent)
 	os << indent << "mReslicer->GetInput() : " << mReslicer->GetInput() << std::endl;
 	Transform3D test(mReslicer->GetResliceAxes());
 	os << indent << "resliceaxes: " << std::endl;
-	test.put(os, indent.getIndent()+3);
+	test.put(os, indent.getIndent() + 3);
 	os << std::endl;
 	//os << indent << "rMs_debug: " << std::endl;
 	//rMs_debug.put(os, indent.getIndent()+3);
