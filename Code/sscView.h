@@ -87,6 +87,7 @@ public:
 	ssc::DoubleBoundingBox3D getViewport_s() const;
 
 	QWidget *widget() { return mParent; }
+	void forceUpdate() { mMTimeHash = 0; }
 
 protected:
 	QSize mSize;
@@ -143,7 +144,6 @@ private:
 	virtual void focusInEvent(QFocusEvent* event);
 	virtual void resizeEvent(QResizeEvent *event);
 	virtual void paintEvent(QPaintEvent *event);
-	virtual void resizeEvent(QResizeEvent *event);
 };
 typedef boost::shared_ptr<View> ViewPtr;
 
@@ -205,6 +205,7 @@ private:
 	virtual void mouseReleaseEvent(QMouseEvent *event);
 	virtual void focusInEvent(QFocusEvent* event);
 	virtual void resizeEvent(QResizeEvent *event);
+	virtual void paintEvent(QPaintEvent *event);
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 

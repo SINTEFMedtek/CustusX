@@ -197,14 +197,6 @@ void GPURayCastVolumeRep::printSelf(std::ostream & os, ssc::Indent indent)
 {
 }
 
-void Texture3DVolumeRep::printSelf(std::ostream & os, ssc::Indent indent)
-{
-}
-
-void Texture3DVolumeRep::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
-{
-}
-
 void GPURayCastVolumeRep::updateColorAttributeSlot()
 {
 	for (unsigned i = 0; i < mImages.size(); ++i)
