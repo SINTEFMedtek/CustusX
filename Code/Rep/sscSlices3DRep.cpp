@@ -52,8 +52,6 @@ namespace ssc
 Slices3DRep::Slices3DRep(const QString& uid) :
 	RepImpl(uid)
 {
-//	mProxy = Texture3DSlicerProxy::New();
-//	mProxy->setTargetSpaceToR();
 	mView = NULL;
 }
 

@@ -303,7 +303,6 @@ void ViewsWindow::updateRender()
 	mLastRenderEnd = QTime::currentTime();
 
 	int render = pre.msecsTo(mLastRenderEnd);
-	int limit = 35;
 	mTotalRender += render;
 	mTotalOther += other;
 

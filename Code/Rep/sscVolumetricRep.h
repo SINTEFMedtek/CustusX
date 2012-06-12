@@ -101,7 +101,8 @@ protected:
 private slots:
 	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
-  void transferFunctionsChangedSlot();
+	void transferFunctionsChangedSlot();
+
 private:
 	void updateResampleFactor();
 };
