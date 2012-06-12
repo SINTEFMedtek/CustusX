@@ -14,6 +14,7 @@
 namespace ssc {
 
 class View;
+class ViewBase;
 
 // data
 typedef boost::shared_ptr<class Tool> ToolPtr;

@@ -220,7 +220,7 @@ bool ViewBase::hasRep(const RepPtr& rep) const
 
 void View::resizeEvent(QResizeEvent * event)
 {
-	inherited::resizeEvent(event);
+	widget::resizeEvent(event);
 	mSize = event->size();
 	vtkRenderWindowInteractor* iren = mRenderWindow->GetInteractor();
 	if (iren != NULL)
@@ -312,17 +312,22 @@ void View::showEvent(QShowEvent* event)
 	emit showSignal(event);
 }
 
-<<<<<<< HEAD
-void ViewBase::render()
-=======
 void View::paintEvent(QPaintEvent* event)
 {
 	mMTimeHash = 0;
-	inherited::paintEvent(event);
+	widget::paintEvent(event);
 }
 
-void View::render()
->>>>>>> master
+void ViewContainer::paintEvent(QPaintEvent* event)
+{
+	for (int i = 0; i < mViews.size(); i++)
+	{
+		mViews[i]->forceUpdate();
+	}
+	widget::paintEvent(event);
+}
+
+void ViewBase::render()
 {
 	// Render is called only when mtime is changed.
 	// At least on MaxOS, this is not done automatically.
@@ -355,7 +360,6 @@ void View::setZoomFactor(double factor)
 	{
 		return;
 	}
-<<<<<<< HEAD
 	mZoomFactor = factor;
 	emit resized(this->size());
 }
@@ -366,8 +370,6 @@ void ViewItem::setZoomFactor(double factor)
 	{
 		return;
 	}
-=======
->>>>>>> master
 	mZoomFactor = factor;
 	emit resized(this->size());
 }
@@ -396,12 +398,7 @@ Transform3D ViewBase::get_vpMs() const
  */
 ssc::DoubleBoundingBox3D ViewBase::getViewport() const
 {
-<<<<<<< HEAD
 	return ssc::DoubleBoundingBox3D(0, mSize.width(), 0, mSize.height(), 0, 0);
-=======
-	QSize size = inherited::size();
-	return ssc::DoubleBoundingBox3D(0, size.width(), 0, size.height(), 0, 0);
->>>>>>> master
 }
 
 double ViewBase::mmPerPix() const
@@ -503,10 +500,6 @@ void ViewContainer::resizeEvent(QResizeEvent *event)
 		mViews[i]->setSize(grid);
 	}
 	emit resized(event->size());
-}
-
-void View::resizeEvent(QResizeEvent *event)
-{
 }
 
 } // namespace ssc

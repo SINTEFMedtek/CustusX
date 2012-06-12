@@ -217,7 +217,6 @@ public:
 GPURayCastVolumePainter::GPURayCastVolumePainter() :
 	mDepthBuffer(0),
 	mBackgroundBuffer(0),
-	mBuffersValid(false),
 	mStepSize(1.0),
 	mRenderMode(0)
 {
@@ -424,7 +423,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		glActiveTexture(GL_TEXTURE10);
 		glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mDepthBuffer);
 		report_gl_error();
-		glTexImage2D(vtkgl::TEXTURE_RECTANGLE_ARB, 0, vtkgl::DEPTH_COMPONENT32, mWidth, mHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(vtkgl::TEXTURE_RECTANGLE_ARB, 0, vtkgl::DEPTH_COMPONENT32, mBase->size().width(), mBase->size().height(), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 		report_gl_error();
 		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
 		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
@@ -438,13 +437,12 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		glActiveTexture(GL_TEXTURE11);
 		glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mBackgroundBuffer);
 		report_gl_error();
-		glTexImage2D(vtkgl::TEXTURE_RECTANGLE_ARB, 0, GL_RGB, mWidth, mHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(vtkgl::TEXTURE_RECTANGLE_ARB, 0, GL_RGB, mBase->size().width(), mBase->size().height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		report_gl_error();
 		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		mLastRenderSize = mBase->size();
 	}
-	mBuffersValid = true;
 
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mDepthBuffer);
