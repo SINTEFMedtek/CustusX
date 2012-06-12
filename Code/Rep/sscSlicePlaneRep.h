@@ -34,8 +34,6 @@ namespace ssc
  *
  * Unknown functionality.
  * 
- * Used only as experimental feature in Sonowand.
- *
  * \ingroup sscRep
  * \ingroup sscNotUsed
  */

@@ -47,17 +47,24 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscMesh.h
     Data/sscPresetTransferFunctions3D.h
     Data/sscFiberBundle.h
+    Data/sscPointMetric.h
+    Data/sscDistanceMetric.h
+    Data/sscPlaneMetric.h
+    Data/sscAngleMetric.h
+       
     Video/sscVideoSource.h
     Video/sscVideoRecorder.h
     Video/sscVideoSourceSHM.h
     Video/sscTestVideoSource.h
     Video/sscImageImportVideoSource.h
+    
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
     Tool/sscDummyToolManager.h
     Tool/sscManualTool.h
     Tool/sscProbeAdapterRTSource.h
+    
     Rep/sscSliceProxy.h
     Rep/sscRep.h
     Rep/sscSlicerRepSW.h
@@ -74,6 +81,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscCrossHairRep2D.h
     Rep/sscTexture3DSlicerProxy.h
     Rep/sscTexture3DSlicerRep.h
+    Rep/sscTexture3DVolumeRep.h
     Rep/sscSlices3DRep.h
     Rep/sscSlicePlanes3DRep.h
     Rep/sscGeometricRep.h
@@ -83,6 +91,12 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscVideoRep.h
     Rep/sscToolTracer.h
     Rep/sscFiberBundleRep.h
+    Rep/sscDataMetricRep.h
+    Rep/sscPointMetricRep.h
+    Rep/sscDistanceMetricRep.h
+    Rep/sscAngleMetricRep.h
+    Rep/sscPlaneMetricRep.h
+     
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
     Widgets/sscStringDataAdapter.h
@@ -255,6 +269,10 @@ SET( SSC_SOURCE_FILES
     Rep/sscTexture3DSlicerProxy.cpp
     Rep/sscTexture3DSlicerRep.cpp
     Rep/sscTexture3DSlicerRep.h
+    Rep/sscTexture3DVolumeRep.cpp
+    Rep/sscTexture3DVolumeRep.h
+    Rep/sscTextureVolumePainter.cpp
+    Rep/sscTextureVolumePainter.h
     Rep/sscSlices3DRep.h
     Rep/sscSlices3DRep.cpp
     Rep/sscTextureSlicePainter.cpp
@@ -281,6 +299,16 @@ SET( SSC_SOURCE_FILES
     Rep/sscToolTracer.cpp
     Rep/sscFiberBundleRep.h
     Rep/sscFiberBundleRep.cpp
+    Rep/sscDataMetricRep.h
+    Rep/sscDataMetricRep.cpp
+    Rep/sscPointMetricRep.h
+    Rep/sscPointMetricRep.cpp
+    Rep/sscDistanceMetricRep.h
+    Rep/sscDistanceMetricRep.cpp
+    Rep/sscAngleMetricRep.h
+    Rep/sscAngleMetricRep.cpp
+    Rep/sscPlaneMetricRep.h
+    Rep/sscPlaneMetricRep.cpp
     
     Data/sscLandmark.h
     Data/sscLandmark.cpp
@@ -312,6 +340,16 @@ SET( SSC_SOURCE_FILES
     Data/sscPresetTransferFunctions3D.cpp
     Data/sscFiberBundle.h
     Data/sscFiberBundle.cpp
+    Data/sscPointMetric.h
+    Data/sscPointMetric.cpp
+    Data/sscDistanceMetric.h
+    Data/sscDistanceMetric.cpp
+    Data/sscPlaneMetric.h
+    Data/sscPlaneMetric.cpp
+    Data/sscAngleMetric.h
+    Data/sscAngleMetric.cpp
+    Data/sscDataMetric.h
+    Data/sscDataMetric.cpp
     
     Video/sscVideoSource.h
     Video/sscVideoRecorder.h

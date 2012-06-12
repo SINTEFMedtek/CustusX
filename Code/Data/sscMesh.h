@@ -63,6 +63,8 @@ public:
 	virtual DoubleBoundingBox3D boundingBox() const;
 	void setColor(const QColor& color);///< Set the color of the mesh
 	QColor getColor();///< Get the color of the mesh (Values are range 0 - 255)
+	void setIsWireframe(bool on);///< Set rep to wireframe, false means surface
+	bool getIsWireframe() const;///< true=wireframe, false=surface
 	vtkPolyDataPtr getTransformedPolyData(ssc::Transform3D tranform);///< Create a new transformed polydata
 
 signals:
@@ -70,6 +72,7 @@ signals:
 private:
 	vtkPolyDataPtr mVtkPolyData;
 	QColor mColor;
+	bool mWireframe;
 };
 
 typedef boost::shared_ptr<Mesh> MeshPtr;

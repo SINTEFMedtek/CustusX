@@ -26,6 +26,7 @@ public:
 
 	// create ssc::View-based rendering (will not work with ViewContainers)
 	void define3D(const QString& imageFilename, int r, int c);
+	void define3DGPU(const QStringList& imageFilename, int r, int c);
 	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	void defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 
