@@ -4,6 +4,7 @@
 
 #include <vtkPolyData.h>
 #include <vtkRenderer.h>
+#include <vtkTubeFilter.h>
 
 #include <QtGui>
 
@@ -12,6 +13,8 @@
 #include "sscAxesRep.h"
 #include "sscView.h"
 #include "sscTestUtilities.h"
+#include "sscVolumetricRep.h"
+#include "sscDataManager.h"
 
 /**
   * Test application for dti fiber bundles in vtk format.
@@ -29,8 +32,51 @@ int main(int argc, char **argv)
     ssc::FiberBundlePtr bundle = ssc::FiberBundle::New(vtkFileName1);
     bundle->setFilePath(vtkFileName1);
     bundle->setColor(QColor("gold"));
+
+#if 1
+    /** This section specifies the default test setup, where the a fiber bundle rep is used */
     ssc::FiberBundleRepPtr rep = ssc::FiberBundleRep::New(bundle->getUid());
     rep->setBundle(bundle);
+#else
+    /** This section specifies an alternative test setup
+      * where the a volumetric rep is used and image data is extracted
+      * from the fiber bundle.
+      */
+
+    // Get the original poly data
+    vtkPolyDataPtr pd = bundle->getVtkPolyData();
+
+    /** Create a tube filter for the mesh and save the result
+      * as polygonal data in the fiber bundle container.
+      *
+      * This is currently done, because it seems as if the
+      * simple polyline data provided is not enough
+      * (maybe because of the lack of physical extent?).
+      */
+    vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
+    tubeFilter->SetInput(pd);
+    tubeFilter->SetRadius(0.5); //default is .5
+    tubeFilter->SetNumberOfSides(8);
+    tubeFilter->Update();
+
+    bundle->setVtkPolyData(tubeFilter->GetOutput());
+
+    /** Create image from extracted image data */
+    ssc::ImagePtr image = ssc::DataManager::getInstance()->createImage(bundle->getVtkImageData(), bundle->getUid(), bundle->getName());
+    if (!image)
+    {
+        std::cout << "Could get image data from bundle." << std::endl;
+        return -1;
+    }
+
+    /** Create and display the volumetric rep object */
+    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(bundle->getUid());
+    rep->setMaxVolumeSize(10*1000*1000);
+    rep->setUseGPUVolumeRayCastMapper(); // if available
+    rep->setImage(image);
+    rep->setName(bundle->getName());
+#endif
+
     view->setRep(rep);
 
     ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
