@@ -46,6 +46,7 @@ public:
 	virtual ~PointMetricRep() {}
 
 	void setPointMetric(PointMetricPtr point);
+	PointMetricPtr getPointMetric();
 	virtual QString getType() const { return "cx::PointMetricRep"; }
 
 protected:

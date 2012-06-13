@@ -56,8 +56,6 @@ const unsigned GPURayCastVolumePainter::maxVolumes = 4;
 vtkStandardNewMacro(GPURayCastVolumePainter);
 vtkCxxRevisionMacro(GPURayCastVolumePainter, "$Revision: 647 $");
 
-#define GL_TRACE(string) if (vtkgl::StringMarkerGREMEDY) {vtkgl::StringMarkerGREMEDY(0, QString("%1:%2 - %3").arg(__func__).arg(__LINE__).arg(string).toUtf8().constData());}
-	
 class GPURayCastSingleVolumePainterHelper
 {
 	ssc::GPUImageDataBufferPtr mVolumeBuffer;
