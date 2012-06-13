@@ -180,14 +180,14 @@ std::vector<ssc::ImagePtr> GPURayCastVolumeRep::getImages()
 	return mImages;
 }
 
-void GPURayCastVolumeRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void GPURayCastVolumeRep::addRepActorsToViewRenderer(ssc::View *view)
 {
 	view->getRenderer()->AddActor(mActor);
 	mView = view;
-	mPainter->setViewBase(view);
+	mPainter->setView(view);
 }
 
-void GPURayCastVolumeRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void GPURayCastVolumeRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 	mView = NULL;

@@ -98,7 +98,7 @@ void FiberBundleRep::setBundle(FiberBundlePtr bundle)
 /**
   * Adds rep assigned actors to the active renderer
   */
-void FiberBundleRep::addRepActorsToViewRenderer(ViewBase *view)
+void FiberBundleRep::addRepActorsToViewRenderer(View *view)
 {
     view->getRenderer()->AddActor(mActor);
 
@@ -109,7 +109,7 @@ void FiberBundleRep::addRepActorsToViewRenderer(ViewBase *view)
 /**
   * Removes rep assigned actors from the rendering pipeline
   */
-void FiberBundleRep::removeRepActorsFromViewRenderer(ViewBase *view)
+void FiberBundleRep::removeRepActorsFromViewRenderer(View *view)
 {
     view->getRenderer()->RemoveActor(mActor);
 

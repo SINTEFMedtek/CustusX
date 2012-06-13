@@ -55,8 +55,8 @@ public:
 
 protected:
 	DisplayTextRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
+	virtual void addRepActorsToViewRenderer(ssc::View *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 	
 	std::vector<TextDisplayPtr> mDisplayText;
 };

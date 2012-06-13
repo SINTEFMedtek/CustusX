@@ -104,8 +104,8 @@ public:
 
 protected:
 	GPURayCastVolumeRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
+	virtual void addRepActorsToViewRenderer(ssc::View *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
 private slots:
 	void updateColorAttributeSlot();
@@ -114,7 +114,7 @@ private:
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ssc::ImagePtr> mImages;
 	QSet<QString> mClipVolumes;
-	ViewBase *mView;
+	View *mView;
 
 	GPURayCastVolumePainterPtr mPainter;
 	vtkActorPtr mActor;

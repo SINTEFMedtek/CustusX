@@ -79,8 +79,8 @@ class ToolRep2D : public ssc::RepImpl
 		bool showProbe();
 		bool showOffset();
 
-		virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
-		virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
+		virtual void addRepActorsToViewRenderer(ssc::View *view);
+		virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
 	private:
 		void setProbeSector(ssc::ProbeData data);				

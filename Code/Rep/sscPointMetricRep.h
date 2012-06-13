@@ -49,8 +49,8 @@ public:
 	virtual QString getType() const { return "cx::PointMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
+	virtual void addRepActorsToViewRenderer(ssc::View *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
 	virtual void rescale();
 
@@ -64,7 +64,7 @@ private:
 	ssc::GraphicalPoint3DPtr mGraphicalPoint;
 	ssc::CaptionText3DPtr mText;
 	PointMetricPtr mMetric;
-	ssc::ViewBase *mView;
+	ssc::View *mView;
 	ssc::ViewportListenerPtr mViewportListener;
 };
 

@@ -56,7 +56,7 @@ public:
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
 	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
-	void setViewBase(ssc::ViewBase *ptr) { mBase = ptr; }
+	void setView(ssc::View *ptr) { mBase = ptr; }
 	void set_nMr(int index, ssc::Transform3D nMr);
 	void setClipper(SlicePlaneClipperPtr clipper);
 	void setClipVolume(int index, bool clip);
@@ -80,7 +80,7 @@ protected:
 	QString mFragmentShaderFile;
 	QSize mLastRenderSize;
 	unsigned int mDepthBuffer;
-	ssc::ViewBase *mBase;
+	ssc::View *mBase;
 	unsigned int mBackgroundBuffer;
 	SlicePlaneClipperPtr mClipper;
 	float mStepSize;

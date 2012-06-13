@@ -84,8 +84,8 @@ public:
 	
 protected:
 	VolumetricRep(const QString& uid, const QString& name="");
-	virtual void addRepActorsToViewRenderer(ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ViewBase *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 	vtkPiecewiseFunctionPtr mOpacityTransferFunction;
 	vtkColorTransferFunctionPtr mColorTransferFunction;

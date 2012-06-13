@@ -55,12 +55,12 @@ GeometricRepPtr GeometricRep::New(const QString& uid, const QString& name)
 	return retval;
 }
 
-void GeometricRep::addRepActorsToViewRenderer(ViewBase *view)
+void GeometricRep::addRepActorsToViewRenderer(View *view)
 {
 	view->getRenderer()->AddActor(mActor);
 }
 
-void GeometricRep::removeRepActorsFromViewRenderer(ViewBase *view)
+void GeometricRep::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 }

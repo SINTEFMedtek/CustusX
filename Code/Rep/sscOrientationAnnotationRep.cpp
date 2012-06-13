@@ -220,13 +220,13 @@ void OrientationAnnotationRep::setPlaneTypeRadiology(PLANE_TYPE type)
   }
 }
 
-void OrientationAnnotationRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void OrientationAnnotationRep::addRepActorsToViewRenderer(ssc::View *view)
 {
   createAnnotation();
   view->getRenderer()->AddActor(mOrientation);
 }
 
-void OrientationAnnotationRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void OrientationAnnotationRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
   view->getRenderer()->RemoveActor(mOrientation);
 }

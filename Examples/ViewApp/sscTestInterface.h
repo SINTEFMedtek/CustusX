@@ -53,8 +53,8 @@ private:
 
 	ToolManager* mToolmanager;
 	vtkCallbackCommand* mCallback;
-	View* mView1;
-	View* mView2;
+	ViewWidget *mView1;
+	ViewWidget *mView2;
 	ImagePtr mImagePtr1;
 	ImagePtr mImagePtr2;
 	VolumetricRepPtr mRepPtr1;
@@ -62,7 +62,7 @@ private:
 
 	ImagePtr mCurrentImage;
 	VolumetricRepPtr mCurrentRep;
-	View* mCurrentView;
+	ViewWidget *mCurrentView;
 };
 }//namespace ssc
 

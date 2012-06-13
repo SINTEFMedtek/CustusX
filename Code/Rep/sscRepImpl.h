@@ -45,22 +45,22 @@ public:
 	RepImpl(const QString& uid, const QString& name="");
 	virtual ~RepImpl();
 	virtual QString getType() const = 0;
-	virtual void connectToView(ViewBase *theView);
-	virtual void disconnectFromView(ViewBase *theView);
-	virtual bool isConnectedToView(ViewBase *theView) const;
+	virtual void connectToView(View *theView);
+	virtual void disconnectFromView(View *theView);
+	virtual bool isConnectedToView(View *theView) const;
 	void setName(QString name);
 	QString getName() const; ///< \return a reps name
 	QString getUid() const; ///< \return a reps unique id
 	virtual void printSelf(std::ostream & os, Indent indent);
 
 protected:
-	std::set<ViewBase *> mViews;
+	std::set<View *> mViews;
 	QString mName;
 	QString mUid;
 	RepWeakPtr mSelf;
 
-	virtual void addRepActorsToViewRenderer(ViewBase *view) = 0;
-	virtual void removeRepActorsFromViewRenderer(ViewBase *view) = 0;
+	virtual void addRepActorsToViewRenderer(View *view) = 0;
+	virtual void removeRepActorsFromViewRenderer(View *view) = 0;
 
 private:
 	RepImpl(); ///< not implemented

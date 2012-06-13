@@ -48,7 +48,7 @@ typedef boost::shared_ptr<class Rep> RepPtr;
  * in the vtkMods folder.
  *
  */
-class ViewBase
+class View
 {
 public:
 	/// type describing the view
@@ -56,8 +56,8 @@ public:
 	{
 		VIEW, VIEW_2D, VIEW_3D, VIEW_REAL_TIME
 	};
-	ViewBase(QWidget *parent, QSize size, const QString& uid = "", const QString& name = "");
-	virtual ~ViewBase();
+	View(QWidget *parent, QSize size, const QString& uid = "", const QString& name = "");
+	virtual ~View();
 	/// \return the View type, indicating display dimension.
 	virtual Type getType() const
 	{
@@ -101,18 +101,18 @@ protected:
 	typedef std::vector<RepPtr>::iterator RepsIter; ///< Iterator typedef for the internal rep vector.
 	QWidget *mParent;
 };
-typedef boost::shared_ptr<ViewBase> ViewBasePtr;
+typedef boost::shared_ptr<View> ViewPtr;
 
 /// Simple 1:1 conflation of SSC Views and Qt Widgets
-class View : public ViewQVTKWidget, public ViewBase
+class ViewWidget : public ViewQVTKWidget, public View
 {
 Q_OBJECT
 	typedef ViewQVTKWidget widget;
 
 public:
-	View(QWidget *parent = NULL, Qt::WFlags f = 0);
-	View(const QString& uid, const QString& name = "", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
-	virtual ~View();
+	ViewWidget(QWidget *parent = NULL, Qt::WFlags f = 0);
+	ViewWidget(const QString& uid, const QString& name = "", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
+	virtual ~ViewWidget();
 
 	void print(std::ostream& os);
 	virtual void printSelf(std::ostream & os, Indent indent);
@@ -147,12 +147,12 @@ private:
 };
 typedef boost::shared_ptr<View> ViewPtr;
 
-class ViewItem : public QObject, public ViewBase
+class ViewItem : public QObject, public View
 {
 Q_OBJECT
 
 public:
-	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QSize size) : ViewBase(parent, size) { mSize = size; mRenderWindow = renderWindow; }
+	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QSize size) : View(parent, size) { mSize = size; mRenderWindow = renderWindow; }
 	~ViewItem() {}
 
 	// Implement pure virtuals in base class

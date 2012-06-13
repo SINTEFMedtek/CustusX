@@ -54,8 +54,8 @@ public:
 	
 protected:
 	SlicePlaneRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ViewBase *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 	
 private slots:
 	void sliceTransformChangedSlot(Transform3D sMr);

@@ -115,13 +115,13 @@ double BlendedSliceRep::getAlpha(int countImage)
 	}
 }
 
-void BlendedSliceRep::addRepActorsToViewRenderer(ViewBase *view)
+void BlendedSliceRep::addRepActorsToViewRenderer(View *view)
 {
 	mImageActor->SetInput(mBlender->GetOutput() );
 	view->getRenderer()->AddActor(mImageActor);
 }
 
-void BlendedSliceRep::removeRepActorsFromViewRenderer(ViewBase *view)
+void BlendedSliceRep::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveActor(mImageActor);
 }

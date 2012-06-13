@@ -74,47 +74,12 @@ ViewsWindow::~ViewsWindow()
 {
 }
 
-#if 0
-ssc::View* ViewsWindow::getView2D()
-{
-	ssc::View* view = new ssc::View(centralWidget());
-	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-	view->GetRenderWindow()->GetInteractor()->Disable();
-	view->setZoomFactor(mZoomFactor);
-
-	mLayouts.insert(view);
-	return view;
-}
-
-ssc::View* ViewsWindow::generateGPUSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
-{
-	ssc::View* view = this->getView2D();
-
-	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
-	proxy->setTool(tool);
-
-	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
-
-	ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
-	rep->setShaderFile(mShaderFolder + "Texture3DOverlay.frag");
-	rep->setSliceProxy(proxy);
-	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
-
-	view->addRep(rep);
-
-	m_test_rep = rep;
-	m_test_view = view;
-
-	return view;
-}
-#endif
-
 void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
 {
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 	ssc::ImagePtr image = loadImage(imageFilename);
-	ssc::View* view = new ssc::View(centralWidget());
+	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->GetRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
@@ -155,7 +120,7 @@ void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, 
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 	ssc::ImagePtr image = loadImage(imageFilename);
-	ssc::View* view = new ssc::View(centralWidget());
+	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->GetRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
@@ -192,7 +157,7 @@ void ViewsWindow::setupViewContainer(ssc::ViewContainer *view, const QString& ui
 	layout->addWidget(new QLabel(uid+" "+volume, this));
 }
 
-void ViewsWindow::insertView(ssc::View *view, const QString& uid, const QString& volume, int r, int c)
+void ViewsWindow::insertView(ssc::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
 {
 	QVBoxLayout *layout = new QVBoxLayout;
 	mSliceLayout->addLayout(layout, r,c);
@@ -226,7 +191,7 @@ void ViewsWindow::container3D(ssc::ViewContainer *widget, int pos, const QString
 void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 {
 	QString uid = "3D";
-	ssc::View* view = new ssc::View(centralWidget());
+	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
 	mLayouts.insert(view);
 	
 	ssc::ImagePtr image = loadImage(imageFilename);
@@ -252,7 +217,7 @@ void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
 {
 	QString uid = "3D";
-	ssc::View* view = new ssc::View(centralWidget());
+	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
 	mLayouts.insert(view);
 
 	std::vector<ssc::ImagePtr> images;
@@ -313,9 +278,9 @@ void ViewsWindow::start(bool showSliders)
 
 void ViewsWindow::updateRender()
 {
-	for (std::set<ssc::ViewBase *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+	for (std::set<ssc::View *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 	{
-		ssc::ViewBase *view = *iter;
+		ssc::View *view = *iter;
 
 		if (view->getZoomFactor()<0)
 		  continue;

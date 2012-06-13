@@ -74,7 +74,7 @@ bool TestVisualRendering::runWidget()
 void TestVisualRendering::testEmptyView()
 {
 	widget->setDescription("Empty view");
-	ssc::View* view = new ssc::View(widget->centralWidget());
+	ssc::ViewWidget* view = new ssc::ViewWidget(widget->centralWidget());
 	widget->insertView(view, "dummy", "none", 0, 0);
 
 	CPPUNIT_ASSERT(runWidget());

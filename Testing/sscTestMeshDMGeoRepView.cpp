@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 	std::cout << "numPolys  : " << numPolys << std::endl;
 	std::cout << "numStrips : " << numStrips << std::endl;
 
-	ssc::View* view = new ssc::View();
+	ssc::ViewWidget* view = new ssc::ViewWidget();
 
 	ssc::GeometricRepPtr rep = ssc::GeometricRep::New(mesh1->getUid());
 	rep->setMesh(mesh1);

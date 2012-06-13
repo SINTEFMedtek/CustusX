@@ -53,7 +53,7 @@ int main(int argc, char **argv)
 	std::cout << "test" << std::endl;
 	QWidget mainWindow;
 	QHBoxLayout* layout = new QHBoxLayout(&mainWindow);
-	ssc::View* view = new ssc::View(&mainWindow);
+	ssc::ViewWidget* view = new ssc::ViewWidget(&mainWindow);
 	view->getRenderWindow()->GetInteractor()->EnableRenderOff();
 	layout->addWidget(view);
 	std::cout << "test2" << std::endl;

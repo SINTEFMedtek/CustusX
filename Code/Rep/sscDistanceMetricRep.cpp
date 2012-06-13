@@ -58,7 +58,7 @@ void DistanceMetricRep::setDistanceMetric(DistanceMetricPtr point)
 	this->changedSlot();
 }
 
-void DistanceMetricRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void DistanceMetricRep::addRepActorsToViewRenderer(ssc::View *view)
 {
 	mView = view;
 	mGraphicalLine.reset();
@@ -67,7 +67,7 @@ void DistanceMetricRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
 	this->changedSlot();
 }
 
-void DistanceMetricRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void DistanceMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	mView = NULL;
 	mGraphicalLine.reset();

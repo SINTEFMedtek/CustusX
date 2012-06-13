@@ -49,8 +49,8 @@ public:
 	virtual QString getType() const { return "cx::PlaneMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
+	virtual void addRepActorsToViewRenderer(ssc::View *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
 protected slots:
 	virtual void changedSlot();
@@ -65,7 +65,7 @@ private:
 	ssc::CaptionText3DPtr mText;
 	ssc::GraphicalArrow3DPtr mNormal;
 	PlaneMetricPtr mMetric;
-	ssc::ViewBase *mView;
+	ssc::View *mView;
 	ssc::ViewportListenerPtr mViewportListener;
 };
 
