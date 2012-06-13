@@ -119,6 +119,7 @@ protected:
 
 private:
     vtkLookupTablePtr mLut;
+    vtkImageDataPtr mVtkImageData;
     MeshPtr mMesh;
     FiberBundleROI mROI;
     double mSpacing[3];
