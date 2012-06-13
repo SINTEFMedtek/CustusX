@@ -122,6 +122,9 @@ vtkPolyDataPtr FiberBundle::getVtkPolyData() const
   */
 vtkImageDataPtr FiberBundle::getVtkImageData()
 {
+    if (mVtkImageData)
+        return mVtkImageData;
+
     vtkPolyDataPtr pd = getVtkPolyData();
     if (!pd) // No poly data to generate image data from
         return vtkImageDataPtr();
@@ -178,7 +181,8 @@ vtkImageDataPtr FiberBundle::getVtkImageData()
     imgstenc->Update();
 
     // Return the resulting image
-    return imgstenc->GetOutput();
+    mVtkImageData = imgstenc->GetOutput();
+    return mVtkImageData;
 }
 
 void FiberBundle::setSpacing(double x, double y, double z)
