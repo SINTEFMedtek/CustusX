@@ -136,13 +136,17 @@ void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 	mClipVolumes.clear();
 
 	mImages = images;
+	if (mImages.size() > mPainter->maxVolumes)
+	{
+		mImages.resize(mPainter->maxVolumes);
+	}
 
 	while (mMerger->GetInput())
 	{
 		mMerger->RemoveInput(mMerger->GetInput());
 	}
 	
-	for (unsigned i = 0; i < mImages .size(); ++i)
+	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();//

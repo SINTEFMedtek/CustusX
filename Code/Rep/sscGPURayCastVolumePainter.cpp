@@ -308,6 +308,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		QString vertexShaderSource = this->loadShaderFile(mVertexShaderFile);
 		QString fragmentShaderSource = this->loadShaderFile(mFragmentShaderFile);
 		fragmentShaderSource = fragmentShaderSource.replace("${NUMBER_OF_VOLUMES}", QString("%1").arg(mInternals->mElement.size()));
+		fragmentShaderSource = fragmentShaderSource.replace("${MAX_VOLUMES}", QString("%1").arg(maxVolumes));
 
 		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
 		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));
@@ -548,14 +549,17 @@ void GPURayCastVolumePainter::setClipper(SlicePlaneClipperPtr clipper)
 {
 	mClipper = clipper;
 }
+
 void GPURayCastVolumePainter::setStepSize(double stepsize)
 {
 	mStepSize = stepsize;
 }
+
 void GPURayCastVolumePainter::setRenderMode(int renderMode)
 {
 	mRenderMode = renderMode;
 }
+
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
