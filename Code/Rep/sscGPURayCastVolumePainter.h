@@ -66,7 +66,7 @@ public:
 	/**
 	 * Maximum number of volumes that can be rendered simultaneously
 	 */
-	static const unsigned maxVolumes = 4;
+	static const unsigned maxVolumes;
 protected:
 	GPURayCastVolumePainter();
 	virtual ~GPURayCastVolumePainter();
