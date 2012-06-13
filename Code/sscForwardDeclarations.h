@@ -58,6 +58,7 @@ typedef boost::shared_ptr<class OffsetPoint> OffsetPointPtr;
 typedef boost::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotation3DRepPtr;
 typedef boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationRepPtr;
 typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
+typedef boost::shared_ptr<class PointMetricRep> PointMetricRepPtr;
 typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolumetricRepPtr;
 typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
 typedef boost::shared_ptr<class Rep> RepPtr;
