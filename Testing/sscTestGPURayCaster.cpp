@@ -4,12 +4,7 @@
 #include <vtkImageData.h>
 #include "sscImage.h"
 #include "sscGPURayCastVolumePainter.h"
-
-std::ostream& operator<<(std::ostream& s, const QString& data)
-{
-	s << data.toUtf8().constData();
-	return s;
-}
+#include "sscTypeConversions.h"
 
 void TestGPURayCaster::setUp()
 {
