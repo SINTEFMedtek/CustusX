@@ -54,8 +54,8 @@ public:
 	
 protected:
 	SliceRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ViewBase *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 	vtkImagePlaneWidgetPtr mVtkImagePlaneWidget;
 

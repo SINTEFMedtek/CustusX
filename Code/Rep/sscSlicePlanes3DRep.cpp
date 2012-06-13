@@ -164,7 +164,7 @@ SlicePlanes3DRep::~SlicePlanes3DRep()
 		mProxy->connectTo3D(false);
 }
 
-void SlicePlanes3DRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void SlicePlanes3DRep::addRepActorsToViewRenderer(ssc::View *view)
 {
 	//  std::cout << "SlicePlanes3DRep::addRepActorsToViewRenderer() " << mData.size() << std::endl;
 
@@ -185,7 +185,7 @@ void SlicePlanes3DRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
 	mViewportListener->startListen(view->getRenderer());
 }
 
-void SlicePlanes3DRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void SlicePlanes3DRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	mViewportListener->stopListen();
 	this->clearActors();
@@ -344,7 +344,7 @@ SlicePlanes3DMarkerIn2DRep::~SlicePlanes3DMarkerIn2DRep()
 {
 }
 
-void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View *view)
 {
 	SlicePlanesProxy::DataType baseData = mProxy->getData()[mType];
 
@@ -356,7 +356,7 @@ void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
 	this->changedSlot();
 }
 
-void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	view->getRenderer()->RemoveActor(mText->getActor());
 	mText.reset();

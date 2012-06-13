@@ -54,7 +54,7 @@ namespace ssc
 {
 
 // set zoom to negative value to signify invalid
-ViewBase::ViewBase(QWidget *parent, QSize size, const QString& uid, const QString& name) : mZoomFactor(-1.0)
+View::View(QWidget *parent, QSize size, const QString& uid, const QString& name) : mZoomFactor(-1.0)
 {
 	mSize = size;
 	mMTimeHash = 0;
@@ -64,29 +64,29 @@ ViewBase::ViewBase(QWidget *parent, QSize size, const QString& uid, const QStrin
 	mName = name;
 }
 
-ViewBase::~ViewBase()
-{
-}
-
-View::View(QWidget *parent, Qt::WFlags f) :
-	   widget(parent, f),
-	   ViewBase(this, this->size()),
-	   mRenderWindow(ViewRenderWindowPtr::New())
-{
-	this->SetRenderWindow(mRenderWindow);
-	clear();
-}
-
-View::View(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
-	   widget(parent, f),
-	   ViewBase(this, this->size(), uid, name),
-	   mRenderWindow(ViewRenderWindowPtr::New())
-{
-	this->SetRenderWindow(mRenderWindow);
-	clear();
-}
-
 View::~View()
+{
+}
+
+ViewWidget::ViewWidget(QWidget *parent, Qt::WFlags f) :
+	   widget(parent, f),
+	   View(this, this->size()),
+	   mRenderWindow(ViewRenderWindowPtr::New())
+{
+	this->SetRenderWindow(mRenderWindow);
+	clear();
+}
+
+ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
+	   widget(parent, f),
+	   View(this, this->size(), uid, name),
+	   mRenderWindow(ViewRenderWindowPtr::New())
+{
+	this->SetRenderWindow(mRenderWindow);
+	clear();
+}
+
+ViewWidget::~ViewWidget()
 {
 }
 
@@ -104,7 +104,7 @@ ViewContainer::~ViewContainer()
 {
 }
 
-QString ViewBase::getTypeString() const
+QString View::getTypeString() const
 {
 	switch (this->getType())
 	{
@@ -120,22 +120,22 @@ QString ViewBase::getTypeString() const
 	return "";
 }
 
-QString ViewBase::getUid()
+QString View::getUid()
 {
 	return mUid;
 }
 
-QString ViewBase::getName()
+QString View::getName()
 {
 	return mName;
 }
 
-vtkRendererPtr ViewBase::getRenderer() const
+vtkRendererPtr View::getRenderer() const
 {
 	return mRenderer;
 }
 
-void ViewBase::addRep(const RepPtr& rep)
+void View::addRep(const RepPtr& rep)
 {
 	if (hasRep(rep))
 	{
@@ -146,13 +146,13 @@ void ViewBase::addRep(const RepPtr& rep)
 	mReps.push_back(rep);
 }
 
-void ViewBase::setRep(const RepPtr& rep)
+void View::setRep(const RepPtr& rep)
 {
 	removeReps();
 	addRep(rep);
 }
 
-void ViewBase::setBackgroundColor(QColor color)
+void View::setBackgroundColor(QColor color)
 {
 	mBackgroundColor = color;
 	if (mRenderer)
@@ -166,7 +166,7 @@ void ViewBase::setBackgroundColor(QColor color)
  * RemoveAllViewProps() (added to fix problem in snw ultrasound rep,
  * data was not cleared, dont know why).
  */
-void View::clear()
+void ViewWidget::clear()
 {
 	removeReps();
 
@@ -186,7 +186,7 @@ void ViewContainer::clear()
 	setupViews(mCols, mRows);
 }
 
-void ViewBase::removeReps()
+void View::removeReps()
 {
 	for (RepsIter it = mReps.begin(); it != mReps.end(); ++it)
 	{
@@ -195,7 +195,7 @@ void ViewBase::removeReps()
 	mReps.clear();
 }
 
-void ViewBase::removeRep(const RepPtr& rep)
+void View::removeRep(const RepPtr& rep)
 {
 	RepsIter it = std::find(mReps.begin(), mReps.end(), rep);
 
@@ -208,17 +208,17 @@ void ViewBase::removeRep(const RepPtr& rep)
 	mReps.erase(it);
 }
 
-std::vector<RepPtr> ViewBase::getReps()
+std::vector<RepPtr> View::getReps()
 {
 	return mReps;
 }
 
-bool ViewBase::hasRep(const RepPtr& rep) const
+bool View::hasRep(const RepPtr& rep) const
 {
 	return std::count(mReps.begin(), mReps.end(), rep);
 }
 
-void View::resizeEvent(QResizeEvent * event)
+void ViewWidget::resizeEvent(QResizeEvent * event)
 {
 	widget::resizeEvent(event);
 	mSize = event->size();
@@ -228,13 +228,13 @@ void View::resizeEvent(QResizeEvent * event)
 	emit resized(mSize);
 }
 
-void View::print(std::ostream& os)
+void ViewWidget::print(std::ostream& os)
 {
 	Indent ind;
 	printSelf(os, ind);
 }
 
-void View::printSelf(std::ostream & os, Indent indent)
+void ViewWidget::printSelf(std::ostream & os, Indent indent)
 {
 	os << indent << "mUid: " << mUid << std::endl;
 	os << indent << "mName: " << mName << std::endl;
@@ -270,13 +270,13 @@ void View::printSelf(std::ostream & os, Indent indent)
 	}
 }
 
-void View::mouseMoveEvent(QMouseEvent* event)
+void ViewWidget::mouseMoveEvent(QMouseEvent* event)
 {
 	widget::mouseMoveEvent(event);
 	emit mouseMoveSignal(event);
 }
 
-void View::mousePressEvent(QMouseEvent* event)
+void ViewWidget::mousePressEvent(QMouseEvent* event)
 {
 	// special case for CustusX: when context menu is opened, mousereleaseevent is never called.
 	// this sets the render interactor in a zoom state after each menu call. This hack prevents
@@ -288,31 +288,31 @@ void View::mousePressEvent(QMouseEvent* event)
 	emit mousePressSignal(event);
 }
 
-void View::mouseReleaseEvent(QMouseEvent* event)
+void ViewWidget::mouseReleaseEvent(QMouseEvent* event)
 {
 	widget::mouseReleaseEvent(event);
 	emit mouseReleaseSignal(event);
 }
 
-void View::focusInEvent(QFocusEvent* event)
+void ViewWidget::focusInEvent(QFocusEvent* event)
 {
 	widget::focusInEvent(event);
 	emit focusInSignal(event);
 }
 
-void View::wheelEvent(QWheelEvent* event)
+void ViewWidget::wheelEvent(QWheelEvent* event)
 {
 	widget::wheelEvent(event);
 	emit mouseWheelSignal(event);
 }
 
-void View::showEvent(QShowEvent* event)
+void ViewWidget::showEvent(QShowEvent* event)
 {
 	widget::showEvent(event);
 	emit showSignal(event);
 }
 
-void View::paintEvent(QPaintEvent* event)
+void ViewWidget::paintEvent(QPaintEvent* event)
 {
 	mMTimeHash = 0;
 	widget::paintEvent(event);
@@ -327,7 +327,7 @@ void ViewContainer::paintEvent(QPaintEvent* event)
 	widget::paintEvent(event);
 }
 
-void ViewBase::render()
+void View::render()
 {
 	// Render is called only when mtime is changed.
 	// At least on MaxOS, this is not done automatically.
@@ -354,7 +354,7 @@ void ViewBase::render()
 	}
 }
 
-void View::setZoomFactor(double factor)
+void ViewWidget::setZoomFactor(double factor)
 {
 	if (similar(factor, mZoomFactor))
 	{
@@ -374,17 +374,17 @@ void ViewItem::setZoomFactor(double factor)
 	emit resized(this->size());
 }
 
-double ViewBase::getZoomFactor() const
+double View::getZoomFactor() const
 {
 	return mZoomFactor;
 }
 
-ssc::DoubleBoundingBox3D ViewBase::getViewport_s() const
+ssc::DoubleBoundingBox3D View::getViewport_s() const
 {
 	return transform(this->get_vpMs().inv(), this->getViewport());
 }
 
-Transform3D ViewBase::get_vpMs() const
+Transform3D View::get_vpMs() const
 {
 	Vector3D center_vp = this->getViewport().center();
 	double scale = mZoomFactor / this->mmPerPix();	//  double zoomFactor = 0.3; // real magnification
@@ -396,12 +396,12 @@ Transform3D ViewBase::get_vpMs() const
 
 /**return the pixel viewport.
  */
-ssc::DoubleBoundingBox3D ViewBase::getViewport() const
+ssc::DoubleBoundingBox3D View::getViewport() const
 {
 	return ssc::DoubleBoundingBox3D(0, mSize.width(), 0, mSize.height(), 0, 0);
 }
 
-double ViewBase::mmPerPix() const
+double View::mmPerPix() const
 {
 	QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(mParent));
 	double r_h = (double) screen->heightMM() / (double) screen->geometry().height();

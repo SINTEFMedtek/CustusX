@@ -157,7 +157,7 @@ AxesRepPtr AxesRep::New(const QString& uid)
 	return retval;
 }
 
-void AxesRep::addRepActorsToViewRenderer(ViewBase *view)
+void AxesRep::addRepActorsToViewRenderer(View *view)
 {
 	view->getRenderer()->AddActor(mAssembly);
 	for (unsigned i=0; i<mCaption.size(); ++i)
@@ -166,7 +166,7 @@ void AxesRep::addRepActorsToViewRenderer(ViewBase *view)
 	this->rescale();
 }
 
-void AxesRep::removeRepActorsFromViewRenderer(ViewBase *view)
+void AxesRep::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveActor(mAssembly);
 	for (unsigned i=0; i<mCaption.size(); ++i)

@@ -47,18 +47,18 @@ QString RepImpl::getUid() const
 	return mUid;
 }
 
-bool RepImpl::isConnectedToView(ViewBase *theView) const
+bool RepImpl::isConnectedToView(View *theView) const
 {
 	return mViews.count(theView);
 }
 
-void RepImpl::connectToView(ViewBase *theView)
+void RepImpl::connectToView(View *theView)
 {
 	mViews.insert(theView);
 	this->addRepActorsToViewRenderer(theView);
 }
 
-void RepImpl::disconnectFromView(ViewBase *theView)
+void RepImpl::disconnectFromView(View *theView)
 {
 	mViews.erase(theView);
 	this->removeRepActorsFromViewRenderer(theView);

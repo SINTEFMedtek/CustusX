@@ -61,7 +61,7 @@ void PointMetricRep::setPointMetric(PointMetricPtr point)
 	this->changedSlot();
 }
 
-void PointMetricRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void PointMetricRep::addRepActorsToViewRenderer(ssc::View *view)
 {
 	mView = view;
 	mGraphicalPoint.reset();
@@ -70,7 +70,7 @@ void PointMetricRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
 	this->changedSlot();
 }
 
-void PointMetricRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void PointMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	mView = NULL;
 	mGraphicalPoint.reset();

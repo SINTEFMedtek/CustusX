@@ -102,7 +102,7 @@ void Slices3DRep::setTool(ToolPtr tool)
 		mProxy[i]->getSliceProxy()->setTool(tool);
 }
 
-void Slices3DRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void Slices3DRep::addRepActorsToViewRenderer(ssc::View *view)
 {
 	for (unsigned i=0; i<mProxy.size(); ++i)
 	{
@@ -111,7 +111,7 @@ void Slices3DRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
 	mView = view;
 }
 
-void Slices3DRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void Slices3DRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	for (unsigned i=0; i<mProxy.size(); ++i)
 	{

@@ -62,12 +62,12 @@ GeometricRep2DPtr GeometricRep2D::New(const QString& uid, const QString& name)
 	return retval;
 }
 
-void GeometricRep2D::addRepActorsToViewRenderer(ViewBase *view)
+void GeometricRep2D::addRepActorsToViewRenderer(View *view)
 {
 	view->getRenderer()->AddActor(mActor);
 }
 
-void GeometricRep2D::removeRepActorsFromViewRenderer(ViewBase *view)
+void GeometricRep2D::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 }

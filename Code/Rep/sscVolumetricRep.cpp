@@ -136,12 +136,12 @@ VolumetricRepPtr VolumetricRep::New(const QString& uid, const QString& name)
 	return retval;
 }
 
-void VolumetricRep::addRepActorsToViewRenderer(ViewBase *view)
+void VolumetricRep::addRepActorsToViewRenderer(View *view)
 {
 	view->getRenderer()->AddVolume(mVolume);
 }
 
-void VolumetricRep::removeRepActorsFromViewRenderer(ViewBase *view)
+void VolumetricRep::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveVolume(mVolume);
 }

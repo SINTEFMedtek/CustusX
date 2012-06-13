@@ -66,7 +66,7 @@ void AngleMetricRep::setMetric(AngleMetricPtr point)
 	this->changedSlot();
 }
 
-void AngleMetricRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void AngleMetricRep::addRepActorsToViewRenderer(ssc::View *view)
 {
 	mView = view;
 
@@ -78,7 +78,7 @@ void AngleMetricRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
 	this->changedSlot();
 }
 
-void AngleMetricRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void AngleMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	mView = NULL;
 

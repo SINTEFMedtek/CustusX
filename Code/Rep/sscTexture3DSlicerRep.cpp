@@ -94,7 +94,7 @@ void Texture3DSlicerRep::setSliceProxy(ssc::SliceProxyPtr slicer)
 	mProxy->setSliceProxy(slicer);
 }
 
-void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View *view)
 {
     view->getRenderer()->AddActor(mProxy->getActor());
     mView = view;
@@ -102,7 +102,7 @@ void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::ViewBase *view)
     this->viewChanged();
 }
 
-void Texture3DSlicerRep::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void Texture3DSlicerRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	view->getRenderer()->RemoveActor(mProxy->getActor());
 	disconnect(view->widget(), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));

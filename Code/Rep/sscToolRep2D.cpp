@@ -151,7 +151,7 @@ void ToolRep2D::setMergeOffsetAndToolLine(bool on)
 	setVisibility();
 }
 
-void ToolRep2D::addRepActorsToViewRenderer(ssc::ViewBase *view)
+void ToolRep2D::addRepActorsToViewRenderer(ssc::View *view)
 {
 	createToolLine(view->getRenderer(), Vector3D(0,0,0));
 	createCrossHair(view->getRenderer() );
@@ -161,7 +161,7 @@ void ToolRep2D::addRepActorsToViewRenderer(ssc::ViewBase *view)
 	update();
 }
 
-void ToolRep2D::removeRepActorsFromViewRenderer(ssc::ViewBase *view)
+void ToolRep2D::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	cursor.reset();
 	center2Tool.reset();

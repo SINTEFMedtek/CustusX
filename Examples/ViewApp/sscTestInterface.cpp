@@ -53,14 +53,14 @@ TestInterface::TestInterface() :
 	this->resize( QSize(1000,500) );
 	this->show();
 
-	mView1 = new View();
-	mView2 = new View();
+	mView1 = new ViewWidget();
+	mView2 = new ViewWidget();
 }
 TestInterface::~TestInterface()
 {}
 void TestInterface::testDummyToolAndDummyToolManager()
 {
-	mView1 = new View();
+	mView1 = new ViewWidget();
 
 	this->setCentralWidget(mView1);
 

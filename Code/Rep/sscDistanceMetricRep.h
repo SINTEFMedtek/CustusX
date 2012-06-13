@@ -53,8 +53,8 @@ public:
 	virtual QString getType() const { return "cx::DistanceMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
+	virtual void addRepActorsToViewRenderer(ssc::View *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
 protected slots:
 	virtual void changedSlot();
@@ -66,7 +66,7 @@ private:
 	ssc::GraphicalLine3DPtr mGraphicalLine;
 	ssc::CaptionText3DPtr mText;
 	DistanceMetricPtr mMetric;
-	ssc::ViewBase *mView;
+	ssc::View *mView;
 };
 
 }

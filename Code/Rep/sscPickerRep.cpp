@@ -430,7 +430,7 @@ void PickerRep::disconnectInteractor()
 	mConnected = false;
 }
 
-void PickerRep::addRepActorsToViewRenderer(ViewBase *view)
+void PickerRep::addRepActorsToViewRenderer(View *view)
 {
 	if (view == NULL)
 	{
@@ -461,7 +461,7 @@ void PickerRep::addRepActorsToViewRenderer(ViewBase *view)
 	this->scaleSphere();
 }
 
-void PickerRep::removeRepActorsFromViewRenderer(ViewBase *view)
+void PickerRep::removeRepActorsFromViewRenderer(View *view)
 {
 	if (view == NULL)
 		return;
@@ -481,7 +481,7 @@ void PickerRep::removeRepActorsFromViewRenderer(ViewBase *view)
 vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
 	vtkRendererPtr renderer = NULL;
-	std::set<ssc::ViewBase *>::const_iterator it = mViews.begin();
+	std::set<ssc::View *>::const_iterator it = mViews.begin();
 	for (; it != mViews.end(); ++it)
 	{
 		if (iren.GetRenderWindow() == (*it)->getRenderWindow())

@@ -45,7 +45,7 @@ DisplayTextRepPtr DisplayTextRep::New(const QString& uid, const QString& name=""
 	retval->mSelf = retval;
 	return retval;	
 }
-void DisplayTextRep::addRepActorsToViewRenderer(ViewBase *view)
+void DisplayTextRep::addRepActorsToViewRenderer(View *view)
 {
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
 	{
@@ -53,7 +53,7 @@ void DisplayTextRep::addRepActorsToViewRenderer(ViewBase *view)
 	}
 }
 
-void DisplayTextRep::removeRepActorsFromViewRenderer(ViewBase *view)
+void DisplayTextRep::removeRepActorsFromViewRenderer(View *view)
 {
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
 	{

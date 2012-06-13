@@ -124,12 +124,12 @@ ProgressiveLODVolumetricRepPtr ProgressiveLODVolumetricRep::New(const QString& u
 	return retval;
 }
 
-void ProgressiveLODVolumetricRep::addRepActorsToViewRenderer(ViewBase *view)
+void ProgressiveLODVolumetricRep::addRepActorsToViewRenderer(View *view)
 {
 	view->getRenderer()->AddVolume(mAssembly);
 }
 
-void ProgressiveLODVolumetricRep::removeRepActorsFromViewRenderer(ViewBase *view)
+void ProgressiveLODVolumetricRep::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveVolume(mAssembly);
 }

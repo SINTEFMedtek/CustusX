@@ -122,8 +122,8 @@ public:
 	SlicePlanesProxyPtr getProxy() { return mProxy; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
+	virtual void addRepActorsToViewRenderer(ssc::View *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
 private slots:
 	void changedSlot();
@@ -142,7 +142,7 @@ private:
 	SlicePlanes3DRep(const QString& uid, const QString& name = "");
 	void clearActors();
 	SlicePlanesProxyPtr mProxy;
-	ssc::ViewBase *mView;
+	ssc::View *mView;
 	ssc::ViewportListenerPtr mViewportListener;
 	void rescale();
 };
@@ -171,8 +171,8 @@ public:
 	SlicePlanesProxyPtr getProxy() { return mProxy; }
 	
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
+	virtual void addRepActorsToViewRenderer(ssc::View *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 private slots:
 	void changedSlot();
 private:

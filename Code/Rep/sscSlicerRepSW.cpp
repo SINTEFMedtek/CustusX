@@ -85,12 +85,12 @@ void SliceRepSW::setSliceProxy(ssc::SliceProxyPtr slicer)
 	mImageSlicer->setSliceProxy(slicer);
 }
 
-void SliceRepSW::addRepActorsToViewRenderer(ViewBase *view)
+void SliceRepSW::addRepActorsToViewRenderer(View *view)
 {
 	view->getRenderer()->AddActor(mImageActor);
 }
 
-void SliceRepSW::removeRepActorsFromViewRenderer(ViewBase *view)
+void SliceRepSW::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveActor(mImageActor);
 }

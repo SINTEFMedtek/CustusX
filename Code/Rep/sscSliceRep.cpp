@@ -47,14 +47,14 @@ SliceRepPtr SliceRep::New(const QString& uid)
 	return retval;
 }
 
-void SliceRep::addRepActorsToViewRenderer(ViewBase *view)
+void SliceRep::addRepActorsToViewRenderer(View *view)
 {
 	mVtkImagePlaneWidget->SetInteractor( view->getRenderWindow()->GetInteractor() );
 	mVtkImagePlaneWidget->InteractionOn();
 	mVtkImagePlaneWidget->On();
 }
 
-void SliceRep::removeRepActorsFromViewRenderer(ViewBase *view)
+void SliceRep::removeRepActorsFromViewRenderer(View *view)
 {
 }
 void SliceRep::setImage(ImagePtr image)

@@ -57,8 +57,8 @@ public:
 
 protected:
     FiberBundleRep(const QString& uid, const QString& name = "");
-	virtual void addRepActorsToViewRenderer(ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ViewBase *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 private:
     double  mFiberRadius;

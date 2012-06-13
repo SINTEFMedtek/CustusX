@@ -24,13 +24,13 @@ public:
 	
 	void setDescription(const QString& desc);
 
-	// create ssc::View-based rendering (will not work with ViewContainers)
+	// create ssc::ViewWidget-based rendering (will not work with ViewContainers)
 	void define3D(const QString& imageFilename, int r, int c);
 	void define3DGPU(const QStringList& imageFilename, int r, int c);
 	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	void defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 
-	// create ssc::ViewContainer-based rendering views (do not mix with above ssc::View-based functions)
+	// create ssc::ViewContainer-based rendering views (do not mix with above ssc::ViewWidget-based functions)
 	void container3D(ssc::ViewContainer *widget, int pos, const QString& imageFilename);
 	void containerGPUSlice(ssc::ViewContainer *widget, int pos, const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane);
 
@@ -38,7 +38,7 @@ public:
 	bool accepted() const { return mAcceptanceBox->accepted(); }
 	
 	// setup views
-	void insertView(ssc::View *view, const QString& uid, const QString& volume, int r, int c);
+	void insertView(ssc::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
 	void setupViewContainer(ssc::ViewContainer *view, const QString& uid, const QString& volume, int r, int c);
 
 	/// ugly hack
@@ -51,8 +51,8 @@ private:
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;
 	
-	typedef std::set<ssc::ViewBase *> LayoutMap;
-	std::set<ssc::ViewBase *> mLayouts;
+	typedef std::set<ssc::View *> LayoutMap;
+	std::set<ssc::View *> mLayouts;
 	QGridLayout* mSliceLayout;
 	QString mDisplayText;
 	

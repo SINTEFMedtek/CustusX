@@ -13,8 +13,8 @@
 
 namespace ssc {
 
+class ViewWidget;
 class View;
-class ViewBase;
 
 // data
 typedef boost::shared_ptr<class Tool> ToolPtr;
@@ -98,7 +98,6 @@ typedef boost::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotatio
 typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
 typedef boost::shared_ptr<class TestVideoSource> TestVideoSourcePtr;
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
-typedef boost::shared_ptr<class View> ViewPtr;
 
 class LabeledComboBoxWidget;
 

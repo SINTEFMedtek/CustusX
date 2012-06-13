@@ -57,8 +57,8 @@ public:
 	virtual QString getType() const { return "cx::AngleMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::ViewBase *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::ViewBase *view);
+	virtual void addRepActorsToViewRenderer(ssc::View *view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
 protected slots:
 	virtual void changedSlot();
@@ -72,7 +72,7 @@ private:
 	ssc::GraphicalArc3DPtr mArc;
 	ssc::CaptionText3DPtr mText;
 	AngleMetricPtr mMetric;
-	ssc::ViewBase *mView;
+	ssc::View *mView;
 };
 
 }
