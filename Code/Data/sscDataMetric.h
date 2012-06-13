@@ -54,4 +54,4 @@ public:
  */
 }
 
-#endif /* CXDATAMETRIC_H_ */
+#endif /* SSCDATAMETRIC_H_ */
