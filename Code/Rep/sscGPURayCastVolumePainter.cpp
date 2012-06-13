@@ -51,6 +51,8 @@ namespace ssc
 {
 //---------------------------------------------------------
 
+const unsigned GPURayCastVolumePainter::maxVolumes = 4;
+
 vtkStandardNewMacro(GPURayCastVolumePainter);
 vtkCxxRevisionMacro(GPURayCastVolumePainter, "$Revision: 647 $");
 
