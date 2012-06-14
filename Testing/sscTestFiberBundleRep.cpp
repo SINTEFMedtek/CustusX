@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     view->getRenderer()->ResetCamera();
 
     // This is an automatic test, so terminate the application after some time
-    // QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit()));
+    QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit()));
     app.exec();
 
     return 0;
