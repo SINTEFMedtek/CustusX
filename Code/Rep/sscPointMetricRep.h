@@ -17,8 +17,8 @@
 //
 // See sscLicense.txt for more information.
 
-#ifndef CXPOINTMETRICREP_H_
-#define CXPOINTMETRICREP_H_
+#ifndef SSCPOINTMETRICREP_H_
+#define SSCPOINTMETRICREP_H_
 
 #include "sscDataMetricRep.h"
 #include "sscGraphicalPrimitives.h"
@@ -47,7 +47,7 @@ public:
 
 	void setPointMetric(PointMetricPtr point);
 	PointMetricPtr getPointMetric();
-	virtual QString getType() const { return "cx::PointMetricRep"; }
+	virtual QString getType() const { return "ssc::PointMetricRep"; }
 
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
@@ -71,4 +71,4 @@ private:
 
 }
 
-#endif /* CXPOINTMETRICREP_H_ */
+#endif /* SSCPOINTMETRICREP_H_ */

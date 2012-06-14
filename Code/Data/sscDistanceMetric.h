@@ -53,7 +53,6 @@ public:
 
 /**\brief Data class that represents a distance between two points,
  * or a point and a plane.
- * \ingroup cxServicePatient
  *
  * \date Jul 4, 2011
  * \author Christian Askeland, SINTEF
@@ -90,4 +89,4 @@ private:
  */
 }
 
-#endif /* CXDISTANCEMETRIC_H_ */
+#endif /* SSCDISTANCEMETRIC_H_ */

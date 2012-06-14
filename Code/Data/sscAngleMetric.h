@@ -54,7 +54,6 @@ public:
 };
 
 /**\brief Data class that represents an angle between two lines.
- * \ingroup cxServicePatient
  *
  * The lines are defined by four points ABCD. The computed
  * angle is from vector BA to vector CD.
@@ -98,4 +97,4 @@ private:
  */
 }
 
-#endif /* CXANGLEMETRIC_H_ */
+#endif /* SSCANGLEMETRIC_H_ */

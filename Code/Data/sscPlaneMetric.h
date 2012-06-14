@@ -17,8 +17,8 @@
 //
 // See sscLicense.txt for more information.
 
-#ifndef CXPLANEMETRIC_H_
-#define CXPLANEMETRIC_H_
+#ifndef SSCPLANEMETRIC_H_
+#define SSCPLANEMETRIC_H_
 
 #include "sscDataMetric.h"
 #include "sscCoordinateSystemHelpers.h"
@@ -56,7 +56,6 @@ public:
 
 /**
  * \brief Data class representing a plane.
- * \ingroup cxServicePatient
  *
  * Data class that represents an infinite plane defined by all pts r in
  * N*r+c=0, N is the normal, c is a scalar. The plane is defined by setting
@@ -102,4 +101,4 @@ private:
  */
 }
 
-#endif /* CXPLANEMETRIC_H_ */
+#endif /* SSCPLANEMETRIC_H_ */
