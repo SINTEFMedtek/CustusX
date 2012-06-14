@@ -96,7 +96,7 @@ DoubleBoundingBox3D FiberBundle::boundingBox() const
     if(polydata)
     {
         // Make sure we have updated data first
-        polydata->UpdateInformation();
+        polydata->Update();
         bbox = DoubleBoundingBox3D(polydata->GetBounds());
     }
 
