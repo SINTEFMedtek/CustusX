@@ -40,13 +40,21 @@ class FiberBundleROI : QObject
     Q_OBJECT
 
 public:
-    FiberBundleROI(){}
+    FiberBundleROI() : mPoint(Vector3D()), mRadius(0) {}
     FiberBundleROI(Vector3D pt, float radius) : mPoint(pt), mRadius(radius) {}
     FiberBundleROI(const FiberBundleROI& other) : mPoint(other.getPoint()), mRadius(other.getRadius()) {}
 
     FiberBundleROI operator=(const FiberBundleROI& other)
     {
-        return FiberBundleROI(other.getPoint(), other.getRadius());
+        if (this != &other) // protect agains self assignment
+        {
+            // Copy what is needed
+            mPoint = other.getPoint();
+            mRadius = other.getRadius();
+        }
+
+        // return this by convention
+        return *this;
     }
 
     virtual ~FiberBundleROI(){}
