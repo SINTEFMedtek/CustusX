@@ -42,9 +42,7 @@ FiberBundle::FiberBundle(const QString &uid, const QString &name)
     : Data(uid, name)
 {
     mMesh.reset(new VtkFileMesh(uid, name));
-    mSpacing[0] = 0.5;
-    mSpacing[1] = 0.5;
-    mSpacing[2] = 0.5;
+    mSpacing = Vector3D(1.0, 1.0, 1.0);
 
     // Enable shading as default
     setShading(true);
@@ -137,7 +135,7 @@ vtkImageDataPtr FiberBundle::getVtkImageData()
     double bounds[6];
     pd->GetBounds(bounds);
 
-    whiteImage->SetSpacing(mSpacing);
+    whiteImage->SetSpacing(mSpacing[0], mSpacing[1], mSpacing[2]);
 
     // Compute dimensions
     int dim[3];
@@ -171,7 +169,7 @@ vtkImageDataPtr FiberBundle::getVtkImageData()
     vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
     pol2stenc->SetInput(pd);
     pol2stenc->SetOutputOrigin(origin);
-    pol2stenc->SetOutputSpacing(mSpacing);
+    pol2stenc->SetOutputSpacing(mSpacing[0], mSpacing[1], mSpacing[2]);
     pol2stenc->SetOutputWholeExtent(whiteImage->GetExtent());
     pol2stenc->Update();
 
@@ -190,9 +188,7 @@ vtkImageDataPtr FiberBundle::getVtkImageData()
 
 void FiberBundle::setSpacing(double x, double y, double z)
 {
-    mSpacing[0] = x;
-    mSpacing[1] = y;
-    mSpacing[2] = z;
+    mSpacing = Vector3D(x, y, z);
 }
 
 void FiberBundle::setColor(const QColor& color)

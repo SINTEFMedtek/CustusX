@@ -123,7 +123,7 @@ public:
     /** Assign desired volume spacing */
     virtual void setSpacing(double x, double y, double z);
     /** Return currently assigned volume spacing */
-    virtual double* getSpacing() { return &mSpacing[0]; }
+    virtual Vector3D getSpacing() { return mSpacing; }
 
     vtkLookupTablePtr getLut() { return mLut; }
     vtkImageDataPtr getVtkImageData();
@@ -143,7 +143,7 @@ private:
     vtkImageDataPtr mVtkImageData;
     MeshPtr mMesh;
     FiberBundleROI mROI;
-    double mSpacing[3];
+    Vector3D mSpacing;
     bool mShading;
 
 signals:
