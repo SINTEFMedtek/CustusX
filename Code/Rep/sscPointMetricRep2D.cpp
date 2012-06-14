@@ -114,7 +114,6 @@ void PointMetricRep2D::changedSlot()
 		mapper->ScalarVisibilityOff();
 		mActor = vtkActor::New();
 		mActor->SetMapper(mapper);
-		mActor->GetProperty()->SetColor(1.0, 0, 0);
 		mActor->GetProperty()->LightingOff();
 		mView->getRenderer()->AddActor(mActor);
 	}
@@ -122,6 +121,8 @@ void PointMetricRep2D::changedSlot()
 	if (!mActor)
 		return;
 
+	mActor->GetProperty()->SetColor(mColor[0], mColor[1], mColor[2]);
+	
 	Vector3D position = mSliceProxy->get_sMr() * mMetric->getRefCoord();
 	mActor->SetPosition(position[0], position[1], 0);
 

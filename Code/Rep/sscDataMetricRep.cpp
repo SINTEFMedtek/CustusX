@@ -52,4 +52,10 @@ void DataMetricRep::setLabelSize(double size)
 	this->changedSlot();
 }
 
+void DataMetricRep::setColor(double red, double green, double blue)
+{
+	mColor = Vector3D(red, green, blue);
+	this->changedSlot();
+}
+
 }

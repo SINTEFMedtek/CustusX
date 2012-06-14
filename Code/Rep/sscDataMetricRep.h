@@ -46,6 +46,7 @@ public:
 	void setGraphicsSize(double size);
 	void setLabelSize(double size);
 	void setShowLabel(bool on);
+	void setColor(double red, double green, double blue);
 
 protected slots:
 	virtual void changedSlot() = 0; ///< called when interals are changed: update all
