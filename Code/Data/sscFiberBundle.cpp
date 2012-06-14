@@ -45,6 +45,9 @@ FiberBundle::FiberBundle(const QString &uid, const QString &name)
     mSpacing[0] = 0.5;
     mSpacing[1] = 0.5;
     mSpacing[2] = 0.5;
+
+    // Enable shading as default
+    setShading(true);
 }
 
 void FiberBundle::setMesh(const MeshPtr& mesh)

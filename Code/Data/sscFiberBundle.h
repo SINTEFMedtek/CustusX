@@ -101,6 +101,9 @@ public:
     virtual void setColor(const QColor& color);
     virtual QColor getColor() const;
 
+    virtual void setShading(bool shading) { mShading = shading; }
+    virtual bool getShading() const { return mShading; }
+
     virtual void setSpacing(double x, double y, double z);
     virtual double* getSpacing() { return &mSpacing[0]; }
 
@@ -123,6 +126,7 @@ private:
     MeshPtr mMesh;
     FiberBundleROI mROI;
     double mSpacing[3];
+    bool mShading;
 
 signals:
     void bundleChanged();
