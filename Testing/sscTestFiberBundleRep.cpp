@@ -29,7 +29,9 @@ int main(int argc, char **argv)
     ssc::View* view = new ssc::View();
     ssc::FiberBundlePtr bundle = ssc::FiberBundle::New(vtkFileName1);
     bundle->setFilePath(vtkFileName1);
-    bundle->setColor(QColor("gold"));
+    QColor color = QColor("gold");
+    // color.setAlphaF(0.6);
+    bundle->setColor(color);
 
     /** This section specifies the default test setup, where the a fiber bundle rep is used */
     ssc::FiberBundleRepPtr rep = ssc::FiberBundleRep::New(bundle->getUid());
@@ -46,7 +48,7 @@ int main(int argc, char **argv)
     view->getRenderer()->ResetCamera();
 
     // This is an automatic test, so terminate the application after some time
-    QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit()));
+    // QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit()));
     app.exec();
 
     return 0;

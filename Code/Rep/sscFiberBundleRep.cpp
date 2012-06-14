@@ -128,6 +128,7 @@ void FiberBundleRep::bundleChanged()
     {
         QColor color = mBundle->getColor();
         mActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+        mActor->GetProperty()->SetOpacity(color.alphaF());
 
         if (mBundle->getShading())
         {
