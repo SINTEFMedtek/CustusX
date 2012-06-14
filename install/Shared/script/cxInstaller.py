@@ -70,7 +70,7 @@ Modify these to change behaviour
         self.m32bitCompileCMakeOption = "" # use "-DCMAKE_OSX_ARCHITECTURES=i386" for 32 bit. Done automatically by settings --b32 from command line.
         self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
-        self.mUseGCC46 = True # special tricks for GCC version 4.6 (use ITK4.0 etc)
+        self.mUseGCC46 = False # special tricks for GCC version 4.6 (use ITK4.0 etc)
     # ---------------------------------------------------------
 
 
@@ -252,7 +252,8 @@ class ITK(CppComponent):
             runBash('git checkout v4.0rc03') # needed for gcc 4.6  
             #runBash('git checkout v4.1.0') # needed for gcc 4.6, but not ok with igstk.
         else:
-            runBash('git checkout v3.20.0') # version working ok with IGSTK 4.2
+            #runBash('git checkout v3.20.0') # version working ok with IGSTK 4.2
+            runBash('git checkout v4.1.0')
     
     def configure(self):
         self._changeDirToBuild()
@@ -334,7 +335,8 @@ class OpenCV(CppComponent):
         self._changeDirToBase()
 #    	runBash('svn co https://code.ros.org/svn/opencv/trunk/opencv OpenCV')
 #        runBash('svn co https://code.ros.org/svn/opencv/branches/2.3/opencv OpenCV') #old location
-        runBash('svn co http://code.opencv.org/svn/opencv/branches/2.3/opencv OpenCV')
+        #runBash('svn co http://code.opencv.org/svn/opencv/branches/2.3/opencv OpenCV')
+        runBash('svn co http://code.opencv.org/svn/opencv/branches/2.4/opencv OpenCV') #new version for lion compatibility
 
     def update(self):
         pass
@@ -398,24 +400,27 @@ class IGSTK(CppComponent):
         return DATA.mExternalDir + "/IGSTK"
     def _rawCheckout(self):
         self._changeDirToBase()
-        runBash('''\
-cvs -d :pserver:anonymous:igstk@public.kitware.com:/cvsroot/IGSTK login
-cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/IGSTK checkout -r "IGSTK-4-4" IGSTK
-cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/IGSTK logout
-''')
+        runBash('git clone git://igstk.org/IGSTK.git') #from v5.0 igstk is now available using git
+        #runBash('''\
+#cvs -d :pserver:anonymous:igstk@public.kitware.com:/cvsroot/IGSTK login
+#cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/IGSTK checkout -r "IGSTK-4-4" IGSTK
+#cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/IGSTK logout
+#''')
     def update(self):
-	self._changeDirToSource()
-	# this substitution removes compilation of the dysfuct lib that we don't use.
+        self._changeDirToSource()
+        runBash('git checkout v5.0')
+        # this substitution removes compilation of the dysfuct lib that we don't use.
         # Fedora 16 note: try adding "" between -i and s/ if you encounter problems...
-	runBash('''\
-sed -i s/'SUBDIRS( SceneGraphVisualization )'/'#SUBDIRS( SceneGraphVisualization )'/g Utilities/CMakeLists.txt
-''')
+        #runBash('''\
+#sed -i s/'SUBDIRS( SceneGraphVisualization )'/'#SUBDIRS( SceneGraphVisualization )'/g Utilities/CMakeLists.txt
+#''')
         if DATA.mUseGCC46:
-	    # this substitution makes IGSTK 4.4 work with ITK 4.0
+            pass
+        # this substitution makes IGSTK 4.4 work with ITK 4.0
             # Fedora 16 note: try adding "" between -i and s/ if you encounter problems...
-	    runBash('''\
-sed -i s/'ITKIO ITKBasicFilters ITKNumerics ITKCommon ITKSpatialObject'/'${ITK_LIBRARIES}'/g Source/CMakeLists.txt
-''')
+            #runBash('''\
+#sed -i "" s/'ITKIO ITKBasicFilters ITKNumerics ITKCommon ITKSpatialObject'/'${ITK_LIBRARIES}'/g Source/CMakeLists.txt
+#''')
     def configure(self):
         self._changeDirToBuild()
         runBash('''\
