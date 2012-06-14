@@ -31,6 +31,7 @@ endif(X11_FOUND)
 
 SET( SSC_QT_MOC_HEADER_FILES
     sscView.h
+    sscViewContainer.h
 #    vtkMods/sscViewQVTKWidget.h
 #    vtkMods/sscModified_QVTKWidget_5_8.h
     Utilities/sscAcceptanceBoxWidget.h
@@ -175,6 +176,8 @@ SET( SSC_SOURCE_FILES
 
     sscView.cpp
     sscView.h
+    sscViewContainer.cpp
+    sscViewContainer.h
     vtkMods/sscViewRenderWindow.cpp
     vtkMods/sscViewRenderWindow.h
     vtkMods/sscViewQVTKWidget.cpp

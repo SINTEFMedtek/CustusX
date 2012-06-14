@@ -147,68 +147,6 @@ private:
 };
 typedef boost::shared_ptr<View> ViewPtr;
 
-class ViewItem : public QObject, public View
-{
-Q_OBJECT
-
-public:
-	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QSize size) : View(parent, size) { mSize = size; mRenderWindow = renderWindow; }
-	~ViewItem() {}
-
-	// Implement pure virtuals in base class
-	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }
-	virtual QSize size() { return mSize; }
-	virtual void setZoomFactor(double factor);
-	virtual void setSize(QSize size) { mSize = size; emit resized(size); }
-	void setRenderer(vtkRendererPtr renderer);
-
-signals:
-	void resized(QSize size);
-
-private:
-	vtkRenderWindowPtr mRenderWindow;
-};
-typedef boost::shared_ptr<ViewItem> ViewItemPtr;
-
-/// More advanced N:1 combination of SSC Views and Qt Widgets
-class ViewContainer : public ViewQVTKWidget
-{
-Q_OBJECT
-	typedef ViewQVTKWidget widget;
-
-public:
-	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0);
-	~ViewContainer();
-	ViewItemPtr getView(int view);
-	void setupViews(int cols, int rows);
-	void clear();
-
-signals:
-	void mouseMoveSignal(QMouseEvent *event);
-	void mousePressSignal(QMouseEvent *event);
-	void mouseReleaseSignal(QMouseEvent *event);
-	void mouseWheelSignal(QWheelEvent*);
-	void showSignal(QShowEvent *event);
-	void focusInSignal(QFocusEvent *event);
-	void resized(QSize size);
-
-protected:
-	QList<ViewItemPtr> mViews;
-	vtkRenderWindowPtr mRenderWindow;
-	int mRows, mCols;
-
-private:
-	virtual void showEvent(QShowEvent* event);
-	virtual void wheelEvent(QWheelEvent*);
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void mouseReleaseEvent(QMouseEvent *event);
-	virtual void focusInEvent(QFocusEvent* event);
-	virtual void resizeEvent(QResizeEvent *event);
-	virtual void paintEvent(QPaintEvent *event);
-};
-typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
-
 } // namespace ssc
 
 #endif /*SSCVIEW_H_*/

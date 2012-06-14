@@ -90,20 +90,6 @@ ViewWidget::~ViewWidget()
 {
 }
 
-ViewContainer::ViewContainer(QWidget *parent, Qt::WFlags f) :
-			     ViewQVTKWidget(parent, f),
-			     mRenderWindow(ViewRenderWindowPtr::New())
-{
-	this->SetRenderWindow(mRenderWindow);
-	mCols = 1;
-	mRows = 1;
-	clear();
-}
-
-ViewContainer::~ViewContainer()
-{
-}
-
 QString View::getTypeString() const
 {
 	switch (this->getType())
@@ -174,16 +160,6 @@ void ViewWidget::clear()
 	mRenderer = vtkRendererPtr::New();
 	mRenderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
 	mRenderWindow->AddRenderer(mRenderer);
-}
-
-void ViewContainer::clear()
-{
-	for (int i = 0; i < mViews.size(); i++)
-	{
-		mViews[i]->removeReps();
-		mRenderWindow->RemoveRenderer(mViews[i]->getRenderer());
-	}
-	setupViews(mCols, mRows);
 }
 
 void View::removeReps()
@@ -318,15 +294,6 @@ void ViewWidget::paintEvent(QPaintEvent* event)
 	widget::paintEvent(event);
 }
 
-void ViewContainer::paintEvent(QPaintEvent* event)
-{
-	for (int i = 0; i < mViews.size(); i++)
-	{
-		mViews[i]->forceUpdate();
-	}
-	widget::paintEvent(event);
-}
-
 void View::render()
 {
 	// Render is called only when mtime is changed.
@@ -355,16 +322,6 @@ void View::render()
 }
 
 void ViewWidget::setZoomFactor(double factor)
-{
-	if (similar(factor, mZoomFactor))
-	{
-		return;
-	}
-	mZoomFactor = factor;
-	emit resized(this->size());
-}
-
-void ViewItem::setZoomFactor(double factor)
 {
 	if (similar(factor, mZoomFactor))
 	{
@@ -408,98 +365,6 @@ double View::mmPerPix() const
 	double r_w = (double) screen->widthMM() / (double) screen->geometry().width();
 	double retval = (r_h + r_w) / 2.0;
 	return retval;
-}
-
-void ViewContainer::setupViews(int cols, int rows)
-{
-	double wf = 1.0 / cols; // width fraction
-	double hf = 1.0 / rows; // height fraction
-	mViews.clear();
-	mViews.reserve(cols * rows);
-	QSize grid;
-	grid.setWidth(size().width() / cols);
-	grid.setHeight(size().height() / rows);
-	for (int c = 0; c < cols; c++)
-	{
-		for (int r = 0; r < rows; r++)
-		{
-			ViewItemPtr item;
-			item.reset(new ViewItem(this, mRenderWindow, grid));
-			vtkRendererPtr renderer = vtkRendererPtr::New();
-			// Calculate the renderer's viewport
-			renderer->SetViewport(wf * c, hf * r, wf * c + wf - 0.01, hf * r + hf - 0.01);
-			mRenderWindow->AddRenderer(renderer);
-			item->setRenderer(renderer);
-			mViews.push_back(item);
-		}
-	}
-	mCols = cols;
-	mRows = rows;
-}
-
-void ViewItem::setRenderer(vtkRendererPtr renderer)
-{
-	mRenderer = renderer;
-	renderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
-}
-
-ViewItemPtr ViewContainer::getView(int view)
-{
-	return mViews[view];
-}
-
-void ViewContainer::mouseMoveEvent(QMouseEvent* event)
-{
-	widget::mouseMoveEvent(event);
-	emit mouseMoveSignal(event);
-}
-
-void ViewContainer::mousePressEvent(QMouseEvent* event)
-{
-	// special case for CustusX: when context menu is opened, mousereleaseevent is never called.
-	// this sets the render interactor in a zoom state after each menu call. This hack prevents
-	// the mouse press event in this case.
-	if ((this->contextMenuPolicy() == Qt::CustomContextMenu) && event->buttons().testFlag(Qt::RightButton))
-		return;
-
-	widget::mousePressEvent(event);
-	emit mousePressSignal(event);
-}
-
-void ViewContainer::mouseReleaseEvent(QMouseEvent* event)
-{
-	widget::mouseReleaseEvent(event);
-	emit mouseReleaseSignal(event);
-}
-
-void ViewContainer::focusInEvent(QFocusEvent* event)
-{
-	widget::focusInEvent(event);
-	emit focusInSignal(event);
-}
-
-void ViewContainer::wheelEvent(QWheelEvent* event)
-{
-	widget::wheelEvent(event);
-	emit mouseWheelSignal(event);
-}
-
-void ViewContainer::showEvent(QShowEvent* event)
-{
-	widget::showEvent(event);
-	emit showSignal(event);
-}
-
-void ViewContainer::resizeEvent(QResizeEvent *event)
-{
-	QSize grid;
-	grid.setWidth(event->size().width() / mCols);
-	grid.setHeight(event->size().height() / mRows);
-	for (int i = 0; i < mViews.size(); i++)
-	{
-		mViews[i]->setSize(grid);
-	}
-	emit resized(event->size());
 }
 
 } // namespace ssc
