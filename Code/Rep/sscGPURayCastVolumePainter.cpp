@@ -51,11 +51,11 @@ namespace ssc
 {
 //---------------------------------------------------------
 
+const unsigned GPURayCastVolumePainter::maxVolumes = 4;
+
 vtkStandardNewMacro(GPURayCastVolumePainter);
 vtkCxxRevisionMacro(GPURayCastVolumePainter, "$Revision: 647 $");
 
-#define GL_TRACE(string) if (vtkgl::StringMarkerGREMEDY) {vtkgl::StringMarkerGREMEDY(0, QString("%1:%2 - %3").arg(__func__).arg(__LINE__).arg(string).toUtf8().constData());}
-	
 class GPURayCastSingleVolumePainterHelper
 {
 	ssc::GPUImageDataBufferPtr mVolumeBuffer;
@@ -305,6 +305,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		QString vertexShaderSource = this->loadShaderFile(mVertexShaderFile);
 		QString fragmentShaderSource = this->loadShaderFile(mFragmentShaderFile);
 		fragmentShaderSource = fragmentShaderSource.replace("${NUMBER_OF_VOLUMES}", QString("%1").arg(mInternals->mElement.size()));
+		fragmentShaderSource = fragmentShaderSource.replace("${MAX_VOLUMES}", QString("%1").arg(maxVolumes));
 
 		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
 		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));
@@ -535,14 +536,17 @@ void GPURayCastVolumePainter::setClipper(SlicePlaneClipperPtr clipper)
 {
 	mClipper = clipper;
 }
+
 void GPURayCastVolumePainter::setStepSize(double stepsize)
 {
 	mStepSize = stepsize;
 }
+
 void GPURayCastVolumePainter::setRenderMode(int renderMode)
 {
 	mRenderMode = renderMode;
 }
+
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------

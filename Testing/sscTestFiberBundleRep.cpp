@@ -4,6 +4,7 @@
 
 #include <vtkPolyData.h>
 #include <vtkRenderer.h>
+#include <vtkTubeFilter.h>
 
 #include <QtGui>
 
@@ -29,6 +30,8 @@ int main(int argc, char **argv)
     ssc::FiberBundlePtr bundle = ssc::FiberBundle::New(vtkFileName1);
     bundle->setFilePath(vtkFileName1);
     bundle->setColor(QColor("gold"));
+
+    /** This section specifies the default test setup, where the a fiber bundle rep is used */
     ssc::FiberBundleRepPtr rep = ssc::FiberBundleRep::New(bundle->getUid());
     rep->setBundle(bundle);
     view->setRep(rep);

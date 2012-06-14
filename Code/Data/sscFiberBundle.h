@@ -88,22 +88,38 @@ public:
     virtual void setVtkPolyData(const vtkPolyDataPtr& polyData);
     virtual vtkPolyDataPtr getVtkPolyData() const;
 
+    /** Assign mesh to bundle */
     virtual void setMesh(const MeshPtr& mesh);
+    /** Return bundle as mesh */
     virtual MeshPtr getMesh() { return mMesh; }
     virtual bool hasMesh(const MeshPtr& mesh) const;
 
+    /** Assign bundle file path */
     virtual void setFilePath(const QString& filePath);
+    /** Return current bundle file path */
     virtual QString getFilePath() const;
 
     /** Return model's bounding box */
     virtual DoubleBoundingBox3D boundingBox() const;
 
+    /** Set bundle color */
     virtual void setColor(const QColor& color);
+    /** Return current bundle color */
     virtual QColor getColor() const;
 
+    /** Enable/disable shading */
+    virtual void setShading(bool shading) { mShading = shading; }
+    /** Return current shading policy */
+    virtual bool getShading() const { return mShading; }
+
+    /** Assign desired volume spacing */
+    virtual void setSpacing(double x, double y, double z);
+    /** Return currently assigned volume spacing */
+    virtual double* getSpacing() { return &mSpacing[0]; }
+
     vtkLookupTablePtr getLut() { return mLut; }
-    vtkImageDataPtr getVtkImageData() { return mImageData; }    // NOT YET SUPPORTED
-    ssc::ImagePtr getImage() { return mImage; }
+    vtkImageDataPtr getVtkImageData();
+    ssc::ImagePtr getImage() { return ssc::ImagePtr(); } // NOT YET IMPLEMENTED
 
     void setROI(const FiberBundleROI& roi) { mROI = roi; }
     FiberBundleROI* getROI() { return &mROI; }
@@ -116,10 +132,11 @@ protected:
 
 private:
     vtkLookupTablePtr mLut;
-    vtkImageDataPtr mImageData;
+    vtkImageDataPtr mVtkImageData;
     MeshPtr mMesh;
     FiberBundleROI mROI;
-    ssc::ImagePtr mImage;
+    double mSpacing[3];
+    bool mShading;
 
 signals:
     void bundleChanged();

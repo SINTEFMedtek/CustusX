@@ -95,6 +95,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscFiberBundleRep.h
     Rep/sscDataMetricRep.h
     Rep/sscPointMetricRep.h
+    Rep/sscPointMetricRep2D.h
     Rep/sscDistanceMetricRep.h
     Rep/sscAngleMetricRep.h
     Rep/sscPlaneMetricRep.h
@@ -307,6 +308,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscDataMetricRep.cpp
     Rep/sscPointMetricRep.h
     Rep/sscPointMetricRep.cpp
+    Rep/sscPointMetricRep2D.h
+    Rep/sscPointMetricRep2D.cpp
     Rep/sscDistanceMetricRep.h
     Rep/sscDistanceMetricRep.cpp
     Rep/sscAngleMetricRep.h

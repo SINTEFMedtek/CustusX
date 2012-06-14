@@ -32,6 +32,8 @@
 #define MAX_CONCURRENT_VOLUMES 4
 //---------------------------------------------------------
 typedef vtkSmartPointer<class vtkCubeSource> vtkCubeSourcePtr;
+class TestGPURayCaster;
+
 namespace ssc
 {
 typedef vtkSmartPointer<class GPURayCastVolumePainter> GPURayCastVolumePainterPtr;
@@ -81,6 +83,7 @@ public:
 	void setImages(std::vector<ssc::ImagePtr> images);
 	/**
 	 * \brief Get the images rendered with this class
+	 * At most ssc::GPURayCastVolumePainter::maxVolumes images will be used, any additional images in the list will be ignored
 	 */
 	std::vector<ssc::ImagePtr> getImages();
 	/**
@@ -123,7 +126,7 @@ private:
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 	SlicePlaneClipperPtr mClipper;
 	static const double defaultStepSize = 1.0;
-	
+	friend class ::TestGPURayCaster;
 };
 //---------------------------------------------------------
 }//end namespace
