@@ -29,6 +29,8 @@
 #include "sscTransform3D.h"
 #include "sscView.h"
 //---------------------------------------------------------
+class TestGPURayCaster;
+
 namespace ssc
 {
 
@@ -62,7 +64,10 @@ public:
 	void setClipVolume(int index, bool clip);
 	void setStepSize(double stepsize);
 	void setRenderMode(int renderMode);
-
+	/**
+	 * Maximum number of volumes that can be rendered simultaneously
+	 */
+	static const unsigned maxVolumes;
 protected:
 	GPURayCastVolumePainter();
 	virtual ~GPURayCastVolumePainter();
@@ -85,6 +90,7 @@ protected:
 	SlicePlaneClipperPtr mClipper;
 	float mStepSize;
 	int mRenderMode;
+	friend class ::TestGPURayCaster;
 };
 
 #endif // WIN32

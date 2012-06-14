@@ -5,7 +5,7 @@
 
 const int volumes=${NUMBER_OF_VOLUMES};
 const int maxIterations = 450;
-const int maxVolumes = 4;
+const int maxVolumes = ${MAX_VOLUMES};
 uniform float stepsize;
 uniform vec2 viewport;
 

@@ -60,6 +60,11 @@ void PointMetricRep::setPointMetric(PointMetricPtr point)
 	mGraphicalPoint.reset();
 	this->changedSlot();
 }
+	
+PointMetricPtr PointMetricRep::getPointMetric()
+{
+	return mMetric;
+}
 
 void PointMetricRep::addRepActorsToViewRenderer(ssc::View *view)
 {

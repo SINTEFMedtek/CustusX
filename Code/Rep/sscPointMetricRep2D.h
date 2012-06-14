@@ -17,8 +17,8 @@
 //
 // See sscLicense.txt for more information.
 
-#ifndef CXPOINTMETRICREP_H_
-#define CXPOINTMETRICREP_H_
+#ifndef SSCPOINTMETRICREP2D_H_
+#define SSCPOINTMETRICREP2D_H_
 
 #include "sscDataMetricRep.h"
 #include "sscGraphicalPrimitives.h"
@@ -28,30 +28,32 @@
 namespace ssc
 {
 
-typedef boost::shared_ptr<class PointMetricRep> PointMetricRepPtr;
+typedef boost::shared_ptr<class PointMetricRep2D> PointMetricRep2DPtr;
 
 /**Rep for visualizing a PointMetric.
  *
  * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup sscRep2D
  *
  * \date Jul 5, 2011
  * \author Christian Askeland, SINTEF
  */
-class PointMetricRep: public DataMetricRep
+class PointMetricRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static PointMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
-	virtual ~PointMetricRep() {}
+	static PointMetricRep2DPtr New(const QString& uid, const QString& name = ""); ///constructor
+	virtual ~PointMetricRep2D() {}
 
 	void setPointMetric(PointMetricPtr point);
 	PointMetricPtr getPointMetric();
-	virtual QString getType() const { return "cx::PointMetricRep"; }
+	virtual QString getType() const { return "ssc::PointMetricRep2D"; }
+	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	void set_vpMs(Transform3D vpMs);
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(ssc::View* view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 
 	virtual void rescale();
 
@@ -59,16 +61,19 @@ protected slots:
 	virtual void changedSlot();
 
 private:
-	PointMetricRep(const QString& uid, const QString& name = "");
-	PointMetricRep(); ///< not implemented
+	PointMetricRep2D(const QString& uid, const QString& name = "");
+	PointMetricRep2D(); ///< not implemented
 
-	ssc::GraphicalPoint3DPtr mGraphicalPoint;
+	vtkActorPtr mActor;
 	ssc::CaptionText3DPtr mText;
 	PointMetricPtr mMetric;
-	ssc::View *mView;
+	ssc::View* mView;
 	ssc::ViewportListenerPtr mViewportListener;
+	ssc::SliceProxyPtr mSliceProxy;
+	Transform3D m_vpMs;
+	vtkSectorSourcePtr mCircle;
 };
 
 }
 
-#endif /* CXPOINTMETRICREP_H_ */
+#endif /* SSCPOINTMETRICREP2D_H_ */

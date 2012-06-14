@@ -22,6 +22,12 @@
 #include "sscBoundingBox3D.h"
 
 #include "vtkPolyData.h"
+#include "vtkImageData.h"
+#include <vtkSmartPointer.h>
+#include <vtkSphereSource.h>
+#include <vtkPolyDataToImageStencil.h>
+#include <vtkImageStencil.h>
+#include <vtkPointData.h>
 
 namespace ssc
 {
@@ -36,6 +42,12 @@ FiberBundle::FiberBundle(const QString &uid, const QString &name)
     : Data(uid, name)
 {
     mMesh.reset(new VtkFileMesh(uid, name));
+    mSpacing[0] = 0.5;
+    mSpacing[1] = 0.5;
+    mSpacing[2] = 0.5;
+
+    // Enable shading as default
+    setShading(true);
 }
 
 void FiberBundle::setMesh(const MeshPtr& mesh)
@@ -87,7 +99,7 @@ DoubleBoundingBox3D FiberBundle::boundingBox() const
     if(polydata)
     {
         // Make sure we have updated data first
-        polydata->UpdateInformation();
+        polydata->Update();
         bbox = DoubleBoundingBox3D(polydata->GetBounds());
     }
 
@@ -103,6 +115,84 @@ void FiberBundle::setVtkPolyData(const vtkPolyDataPtr& polyData)
 vtkPolyDataPtr FiberBundle::getVtkPolyData() const
 {
     return mMesh->getVtkPolyData();
+}
+
+/**
+  * Try to generate an volume representation of current poly data model,
+  * where the foreground voxels are 1 and the background voxels are 0.
+  *
+  * Volume spacing is presumed to be set.
+  */
+vtkImageDataPtr FiberBundle::getVtkImageData()
+{
+    if (mVtkImageData)
+        return mVtkImageData;
+
+    vtkPolyDataPtr pd = getVtkPolyData();
+    if (!pd) // No poly data to generate image data from
+        return vtkImageDataPtr();
+
+    vtkSmartPointer<vtkImageData> whiteImage = vtkSmartPointer<vtkImageData>::New();
+
+    double bounds[6];
+    pd->GetBounds(bounds);
+
+    whiteImage->SetSpacing(mSpacing);
+
+    // Compute dimensions
+    int dim[3];
+    for (int i = 0; i < 3; i++)
+    {
+        dim[i] = static_cast<int>(std::ceil((bounds[i * 2 + 1] - bounds[i * 2]) / mSpacing[i]));
+    }
+
+    whiteImage->SetDimensions(dim);
+    whiteImage->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
+
+    double origin[3];
+    origin[0] = bounds[0] + mSpacing[0] / 2;
+    origin[1] = bounds[2] + mSpacing[1] / 2;
+    origin[2] = bounds[4] + mSpacing[2] / 2;
+    whiteImage->SetOrigin(origin);
+
+    whiteImage->SetScalarTypeToUnsignedChar();
+    whiteImage->AllocateScalars();
+
+    // Fill the image with foreground voxels:
+    unsigned char inval = 255;
+    unsigned char outval = 0;
+    vtkIdType count = whiteImage->GetNumberOfPoints();
+    for (vtkIdType i = 0; i < count; ++i)
+    {
+        whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
+    }
+
+    // Apply an image stencil to the poly data
+    vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+    pol2stenc->SetInput(pd);
+    pol2stenc->SetOutputOrigin(origin);
+    pol2stenc->SetOutputSpacing(mSpacing);
+    pol2stenc->SetOutputWholeExtent(whiteImage->GetExtent());
+    pol2stenc->Update();
+
+    // Cut the corresponding white image and set the background:
+    vtkSmartPointer<vtkImageStencil> imgstenc = vtkSmartPointer<vtkImageStencil>::New();
+    imgstenc->SetInput(whiteImage);
+    imgstenc->SetStencil(pol2stenc->GetOutput());
+    imgstenc->ReverseStencilOff();
+    imgstenc->SetBackgroundValue(outval);
+    imgstenc->Update();
+
+    // Return the resulting image
+    mVtkImageData = imgstenc->GetOutput();
+    return mVtkImageData;
+}
+
+void FiberBundle::setSpacing(double x, double y, double z)
+{
+    mSpacing[0] = x;
+    mSpacing[1] = y;
+    mSpacing[2] = z;
 }
 
 void FiberBundle::setColor(const QColor& color)
