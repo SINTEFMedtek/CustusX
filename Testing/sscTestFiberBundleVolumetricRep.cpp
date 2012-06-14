@@ -27,7 +27,7 @@ int main(int argc, char **argv)
     // std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;
     QString vtkFileName1 = ssc::TestUtilities::ExpandDataFileName("DTI/FiberBundleNode.vtk");
 
-    ssc::View* view = new ssc::View();
+    ssc::ViewWidget *view = new ssc::ViewWidget();
     ssc::FiberBundlePtr bundle = ssc::FiberBundle::New(vtkFileName1);
     bundle->setFilePath(vtkFileName1);
     bundle->setColor(QColor("gold"));
