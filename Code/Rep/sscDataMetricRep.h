@@ -65,4 +65,4 @@ typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
 
 }
 
-#endif /* CXDATAMETRICREP_H_ */
+#endif /* SSCDATAMETRICREP_H_ */
