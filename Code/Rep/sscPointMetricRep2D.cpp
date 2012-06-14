@@ -46,7 +46,6 @@ PointMetricRep2D::PointMetricRep2D(const QString& uid, const QString& name) :
 {
 	mViewportListener.reset(new ssc::ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PointMetricRep2D::rescale, this));
-	std::cout << "Creating PointMetricRep2D" << std::endl;
 }
 
 //void PointMetricRep2D::setShowLabel(bool on)
@@ -175,12 +174,6 @@ void PointMetricRep2D::setSliceProxy(ssc::SliceProxyPtr sliceProxy)
 	mSliceProxy = sliceProxy;
 	if (mSliceProxy)
 		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(changedSlot()));
-	changedSlot();
-}
-
-void PointMetricRep2D::set_vpMs(Transform3D vpMs)
-{
-	m_vpMs = vpMs;
 	changedSlot();
 }
 	
