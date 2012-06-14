@@ -3,7 +3,7 @@
 #include <QtGui>
 #include <map>
 #include "sscView.h"
-
+#include "sscViewContainer.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscAcceptanceBoxWidget.h"
