@@ -49,10 +49,14 @@ class FiberBundleRep : public RepImpl
 public:
     static FiberBundleRepPtr New(const QString& uid, const QString& name = "");
     virtual ~FiberBundleRep() {}
+
+    /** Return rep type description */
 	virtual QString getType() const;
 
+    /** Assign a fiber bundle */
     virtual void setBundle(FiberBundlePtr bundle);
     virtual bool hasBundle(FiberBundlePtr bundle) const { return (mBundle == bundle); }
+    /** Return currently assigned fiber bundle */
     virtual FiberBundlePtr getBundle() { return mBundle; }
 
 protected:
