@@ -116,6 +116,7 @@ typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkRenderWindowInteractor> vtkRenderWindowInteractorPtr;
 typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
 typedef vtkSmartPointer<class vtkScalarsToColors> vtkScalarsToColorsPtr;
+typedef vtkSmartPointer<class vtkSectorSource> vtkSectorSourcePtr;
 typedef vtkSmartPointer<class vtkShader2 > vtkShader2Ptr;
 typedef vtkSmartPointer<class vtkShaderProgram2 > vtkShaderProgram2Ptr;
 typedef vtkSmartPointer<class vtkSortDataArray> vtkSortDataArrayPtr;
