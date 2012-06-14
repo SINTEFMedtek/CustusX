@@ -39,11 +39,10 @@ PointMetricRep2DPtr PointMetricRep2D::New(const QString& uid, const QString& nam
 }
 
 PointMetricRep2D::PointMetricRep2D(const QString& uid, const QString& name) :
-				DataMetricRep(uid, name), mView(NULL)
-//		mSphereRadius(1),
-//		mShowLabel(false),
-//		mColor(ssc::Vector3D(1,0,0))
+	DataMetricRep(uid, name), mView(NULL),
+	mOutlineWidth(0.1)
 {
+	mOutlineColor = Vector3D(1,1,1) - mColor;
 	mViewportListener.reset(new ssc::ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PointMetricRep2D::rescale, this));
 }
@@ -82,7 +81,8 @@ void PointMetricRep2D::addRepActorsToViewRenderer(ssc::View* view)
 
 void PointMetricRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
 {
-	mView->getRenderer()->RemoveActor(mActor);
+	mView->getRenderer()->RemoveActor(mCircleActor);
+	mView->getRenderer()->RemoveActor(mOutlineActor);
 	mView = NULL;
 	mText.reset();
 	mViewportListener->stopListen();
@@ -100,39 +100,59 @@ void PointMetricRep2D::changedSlot()
 	if (!mMetric)
 		return;
 
-	if (!mActor && mView && mMetric && mSliceProxy)
+	if (!mCircleActor && mView && mMetric && mSliceProxy)
 	{
-		mCircle = vtkSectorSource::New();
-		mCircle->SetOuterRadius(mGraphicsSize);
-		mCircle->SetInnerRadius(0);
-		mCircle->SetStartAngle(0);
-		mCircle->SetEndAngle(360);
-		mCircle->SetCircumferentialResolution(20);
+		mCircleSource = vtkSectorSource::New();
+		mCircleSource->SetOuterRadius(mGraphicsSize);
+		mCircleSource->SetInnerRadius(0);
+		mCircleSource->SetStartAngle(0);
+		mCircleSource->SetEndAngle(360);
+		mCircleSource->SetCircumferentialResolution(20);
 		vtkPolyDataMapperPtr mapper = vtkPolyDataMapper::New();
-		mapper->SetInput(mCircle->GetOutput());
+		mapper->SetInput(mCircleSource->GetOutput());
 		mapper->ScalarVisibilityOff();
-		mActor = vtkActor::New();
-		mActor->SetMapper(mapper);
-		mActor->GetProperty()->LightingOff();
-		mView->getRenderer()->AddActor(mActor);
+		mCircleActor = vtkActor::New();
+		mCircleActor->SetMapper(mapper);
+		mCircleActor->GetProperty()->LightingOff();
+		mView->getRenderer()->AddActor(mCircleActor);
+		
+		mOutlineSource = vtkSectorSource::New();
+		mOutlineSource->SetOuterRadius(mGraphicsSize);
+		mOutlineSource->SetInnerRadius(0);
+		mOutlineSource->SetStartAngle(0);
+		mOutlineSource->SetEndAngle(360);
+		mOutlineSource->SetCircumferentialResolution(20);
+		vtkPolyDataMapperPtr outlineMapper = vtkPolyDataMapper::New();
+		outlineMapper->SetInput(mOutlineSource->GetOutput());
+		outlineMapper->ScalarVisibilityOff();
+		mOutlineActor = vtkActor::New();
+		mOutlineActor->SetMapper(outlineMapper);
+		mOutlineActor->GetProperty()->LightingOff();
+		mView->getRenderer()->AddActor(mOutlineActor);
 	}
 
-	if (!mActor)
+	if (!mCircleActor)
 		return;
 
-	mActor->GetProperty()->SetColor(mColor[0], mColor[1], mColor[2]);
+	mCircleActor->GetProperty()->SetColor(mColor[0], mColor[1], mColor[2]);
+	mOutlineActor->GetProperty()->SetColor(mOutlineColor[0], mOutlineColor[1], mOutlineColor[2]);
 	
 	Vector3D position = mSliceProxy->get_sMr() * mMetric->getRefCoord();
-	mActor->SetPosition(position[0], position[1], 0);
+	mCircleActor->SetPosition(position[0], position[1], 0);
+	mOutlineActor->SetPosition(position[0], position[1], 0);
 
 	if (abs(position[2]) > mGraphicsSize)
 	{
-		mCircle->SetOuterRadius(0);
+		mCircleSource->SetOuterRadius(0);
+		mOutlineSource->SetOuterRadius(0);
+		mOutlineSource->SetInnerRadius(0);
 	}
 	else
 	{
 		double radius = mGraphicsSize*cos(asin(position[2]/mGraphicsSize));
-		mCircle->SetOuterRadius(radius);
+		mCircleSource->SetOuterRadius(radius*(1.0 - mOutlineWidth));
+		mOutlineSource->SetInnerRadius(radius*(1.0 - mOutlineWidth));
+		mOutlineSource->SetOuterRadius(radius);
 	}
 
 	if (!mShowLabel)
@@ -158,7 +178,7 @@ void PointMetricRep2D::changedSlot()
  */
 void PointMetricRep2D::rescale()
 {
-	if (!mActor)
+	if (!mCircleActor)
 		return;
 
 	double size = mViewportListener->getVpnZoom();
@@ -176,5 +196,17 @@ void PointMetricRep2D::setSliceProxy(ssc::SliceProxyPtr sliceProxy)
 		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(changedSlot()));
 	changedSlot();
 }
-	
+
+void PointMetricRep2D::setOutlineWidth(double width)
+{
+	mOutlineWidth = width;
+	changedSlot();
+}
+
+void PointMetricRep2D::setOutlineColor(double red, double green, double blue)
+{
+	mOutlineColor = Vector3D(red, green, blue);
+	changedSlot();
+}
+
 }

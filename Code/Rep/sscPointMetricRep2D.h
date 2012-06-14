@@ -49,6 +49,14 @@ public:
 	PointMetricPtr getPointMetric();
 	virtual QString getType() const { return "ssc::PointMetricRep2D"; }
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	/**
+	 * Set the width of the outline in fractions of the full size
+	 */
+	void setOutlineWidth(double width);
+	/**
+	 * Set the color of the outline
+	 */
+	void setOutlineColor(double red, double green, double blue);
 
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
@@ -63,13 +71,17 @@ private:
 	PointMetricRep2D(const QString& uid, const QString& name = "");
 	PointMetricRep2D(); ///< not implemented
 
-	vtkActorPtr mActor;
 	ssc::CaptionText3DPtr mText;
 	PointMetricPtr mMetric;
 	ssc::View* mView;
 	ssc::ViewportListenerPtr mViewportListener;
 	ssc::SliceProxyPtr mSliceProxy;
-	vtkSectorSourcePtr mCircle;
+	vtkActorPtr mCircleActor;
+	vtkSectorSourcePtr mCircleSource;
+	vtkActorPtr mOutlineActor;
+	vtkSectorSourcePtr mOutlineSource;
+	double mOutlineWidth;
+	ssc::Vector3D mOutlineColor;
 };
 
 }
