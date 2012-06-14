@@ -39,7 +39,7 @@ namespace ssc
 {
 /** Constructor */
 FiberBundleRep::FiberBundleRep(const QString& uid, const QString& name)
-    : RepImpl(uid, name), mFiberRadius(.05), mTubeFilter(true), mTubeSegments(8)
+    : RepImpl(uid, name), mFiberRadius(.05), mTubeSegments(8)
 {
     mPolyDataMapper = vtkPolyDataMapperPtr::New();
     mProperty = vtkPropertyPtr::New();
@@ -82,6 +82,7 @@ void FiberBundleRep::setBundle(FiberBundlePtr bundle)
     {
         disconnect(mBundle.get(), SIGNAL(transformChanged()), this, SLOT(bundleTransformChanged()));
         disconnect(mBundle.get(), SIGNAL(bundleChanged()), this, SLOT(bundleChanged()));
+        mBundle->disconnectFromRep(mSelf);
     }
 
     mBundle = bundle;
@@ -90,6 +91,7 @@ void FiberBundleRep::setBundle(FiberBundlePtr bundle)
     {
         connect(mBundle.get(), SIGNAL(transformChanged()), this, SLOT(bundleTransformChanged()));
         connect(mBundle.get(), SIGNAL(bundleChanged()), this, SLOT(bundleChanged()));
+        mBundle->connectToRep(mSelf);
     }
 
     bundleChanged();
@@ -127,7 +129,7 @@ void FiberBundleRep::bundleChanged()
         QColor color = mBundle->getColor();
         mActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
 
-        if (mTubeFilter)
+        if (mBundle->getShading())
         {
             /** Create a tube filter for the mesh.
               * This filter enables shading and enhances the otherwise hard to differentiate lines.
