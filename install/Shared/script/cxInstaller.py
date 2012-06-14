@@ -289,10 +289,7 @@ class VTK(CppComponent):
         self._changeDirToSource()
         runBash('git checkout master')
         runBash('git pull')
-        if DATA.mUseGCC46:
-            runBash('git checkout v5.8.0')   # needed for gcc 4.6, not good on non-linux
-        else:
-            runBash('git checkout v5.6.1')   # working with IGSTK 4.2
+        runBash('git checkout v5.8.0')   # needed for gcc 4.6, not good on non-linux
 
     def configure(self):
         '''
@@ -409,7 +406,10 @@ class IGSTK(CppComponent):
     def update(self):
         self._changeDirToSource()
         runBash('git checkout v5.0')
-        # this substitution removes compilation of the dysfuct lib that we don't use.
+        runBash('git checkout -B cx_mod_for_50')
+#        print 'git am --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch' % (CustusX3().path(), CustusX3().sourceFolder())
+        runBash(('git am --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
+                # this substitution removes compilation of the dysfuct lib that we don't use.
         # Fedora 16 note: try adding "" between -i and s/ if you encounter problems...
         #runBash('''\
 #sed -i s/'SUBDIRS( SceneGraphVisualization )'/'#SUBDIRS( SceneGraphVisualization )'/g Utilities/CMakeLists.txt
