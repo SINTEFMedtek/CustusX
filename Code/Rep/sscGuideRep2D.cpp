@@ -119,9 +119,13 @@ void GuideRep2D::changedSlot()
 
 	if (distance < mRequestedAccuracy)
 	{
-		mCircleActor->GetProperty()->SetColor(0, 0, 1);
+		mCircleActor->GetProperty()->SetColor(0, 1, 1);
 	}
-	else if (offsetDistance < mRequestedAccuracy && position[2] < 0)
+	else if (offsetDistance < mRequestedAccuracy && position[2] > 0 && distance < 4*mRequestedAccuracy)
+	{
+		mCircleActor->GetProperty()->SetColor(0, 1, 1.0 - (distance-mRequestedAccuracy)/(3*mRequestedAccuracy));
+	}
+	else if (offsetDistance < mRequestedAccuracy && position[2] > 0)
 	{
 		mCircleActor->GetProperty()->SetColor(0, 1, 0);
 	}
