@@ -65,8 +65,7 @@ protected:
 	virtual void removeRepActorsFromViewRenderer(View* view);
 
 private:
-    double  mFiberRadius;
-    int     mTubeSegments;
+    double  mFiberWidth;
 
     FiberBundlePtr mBundle;
     ViewportListenerPtr mViewportListener;
