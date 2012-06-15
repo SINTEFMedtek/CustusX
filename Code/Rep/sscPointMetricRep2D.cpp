@@ -42,9 +42,21 @@ PointMetricRep2D::PointMetricRep2D(const QString& uid, const QString& name) :
 	DataMetricRep(uid, name), mView(NULL),
 	mOutlineWidth(0.1)
 {
+	mFillVisible = true;
 	mOutlineColor = Vector3D(1,1,1) - mColor;
-	mViewportListener.reset(new ssc::ViewportListener);
-	mViewportListener->setCallback(boost::bind(&PointMetricRep2D::rescale, this));
+}
+
+void PointMetricRep2D::setDynamicSize(bool on)
+{
+	if (on)
+	{
+		mViewportListener.reset(new ssc::ViewportListener);
+		mViewportListener->setCallback(boost::bind(&PointMetricRep2D::rescale, this));
+	}
+	else
+	{
+		mViewportListener.reset();
+	}
 }
 
 //void PointMetricRep2D::setShowLabel(bool on)
@@ -75,7 +87,8 @@ void PointMetricRep2D::addRepActorsToViewRenderer(ssc::View* view)
 {
 	mView = view;
 	mText.reset();
-	mViewportListener->startListen(mView->getRenderer());
+	if (mViewportListener)
+		mViewportListener->startListen(mView->getRenderer());
 	this->changedSlot();
 }
 
@@ -85,8 +98,8 @@ void PointMetricRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
 	mView->getRenderer()->RemoveActor(mOutlineActor);
 	mView = NULL;
 	mText.reset();
-	mViewportListener->stopListen();
-	
+	if (mViewportListener)
+		mViewportListener->stopListen();
 }
 
 //void PointMetricRep2D::setSphereRadius(double radius)
@@ -102,30 +115,30 @@ void PointMetricRep2D::changedSlot()
 
 	if (!mCircleActor && mView && mMetric && mSliceProxy)
 	{
-		mCircleSource = vtkSectorSource::New();
+		mCircleSource = vtkSectorSourcePtr::New();
 		mCircleSource->SetOuterRadius(mGraphicsSize);
 		mCircleSource->SetInnerRadius(0);
 		mCircleSource->SetStartAngle(0);
 		mCircleSource->SetEndAngle(360);
 		mCircleSource->SetCircumferentialResolution(20);
-		vtkPolyDataMapperPtr mapper = vtkPolyDataMapper::New();
+		vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
 		mapper->SetInput(mCircleSource->GetOutput());
 		mapper->ScalarVisibilityOff();
-		mCircleActor = vtkActor::New();
+		mCircleActor = vtkActorPtr::New();
 		mCircleActor->SetMapper(mapper);
 		mCircleActor->GetProperty()->LightingOff();
 		mView->getRenderer()->AddActor(mCircleActor);
 		
-		mOutlineSource = vtkSectorSource::New();
+		mOutlineSource = vtkSectorSourcePtr::New();
 		mOutlineSource->SetOuterRadius(mGraphicsSize);
 		mOutlineSource->SetInnerRadius(0);
 		mOutlineSource->SetStartAngle(0);
 		mOutlineSource->SetEndAngle(360);
 		mOutlineSource->SetCircumferentialResolution(20);
-		vtkPolyDataMapperPtr outlineMapper = vtkPolyDataMapper::New();
+		vtkPolyDataMapperPtr outlineMapper = vtkPolyDataMapperPtr::New();
 		outlineMapper->SetInput(mOutlineSource->GetOutput());
 		outlineMapper->ScalarVisibilityOff();
-		mOutlineActor = vtkActor::New();
+		mOutlineActor = vtkActorPtr::New();
 		mOutlineActor->SetMapper(outlineMapper);
 		mOutlineActor->GetProperty()->LightingOff();
 		mView->getRenderer()->AddActor(mOutlineActor);
@@ -138,8 +151,10 @@ void PointMetricRep2D::changedSlot()
 	mOutlineActor->GetProperty()->SetColor(mOutlineColor[0], mOutlineColor[1], mOutlineColor[2]);
 	
 	Vector3D position = mSliceProxy->get_sMr() * mMetric->getRefCoord();
-	mCircleActor->SetPosition(position[0], position[1], 0);
-	mOutlineActor->SetPosition(position[0], position[1], 0);
+	mCircleActor->SetPosition(position[0], position[1], 0.0);
+	mOutlineActor->SetPosition(position[0], position[1], 0.0);
+	mOutlineSource->SetZCoord(0.01);
+	mCircleSource->SetZCoord(0.01);
 
 	if (abs(position[2]) > mGraphicsSize)
 	{
@@ -149,7 +164,15 @@ void PointMetricRep2D::changedSlot()
 	}
 	else
 	{
-		double radius = mGraphicsSize*cos(asin(position[2]/mGraphicsSize));
+		double sphereSize = mGraphicsSize;
+		if (mViewportListener)
+		{
+			double size = mViewportListener->getVpnZoom();
+			sphereSize = mGraphicsSize / 100 / size * 2.5;
+		}
+
+		double radius = sphereSize*cos(asin(position[2]/sphereSize));
+
 		mCircleSource->SetOuterRadius(radius*(1.0 - mOutlineWidth));
 		mOutlineSource->SetInnerRadius(radius*(1.0 - mOutlineWidth));
 		mOutlineSource->SetOuterRadius(radius);
@@ -167,7 +190,12 @@ void PointMetricRep2D::changedSlot()
 		mText->setSize(mLabelSize / 100);
 	}
 
-	this->rescale();
+	mCircleActor->SetVisibility(mFillVisible);
+}
+
+void PointMetricRep2D::setFillVisibility(bool on)
+{
+	mFillVisible = on;
 }
 
 /**Note: Internal method!
@@ -178,12 +206,13 @@ void PointMetricRep2D::changedSlot()
  */
 void PointMetricRep2D::rescale()
 {
-	if (!mCircleActor)
-		return;
-
-	double size = mViewportListener->getVpnZoom();
-//  double sphereSize = 0.007/size;
-	double sphereSize = mGraphicsSize / 100 / size;
+	this->changedSlot();
+//	if (!mCircleActor)
+//		return;
+//
+//	double size = mViewportListener->getVpnZoom();
+////  double sphereSize = 0.007/size;
+//	double sphereSize = mGraphicsSize / 100 / size;
 //	mGraphicalPoint->setRadius(sphereSize);
 }
 

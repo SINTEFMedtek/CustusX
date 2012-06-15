@@ -57,6 +57,8 @@ public:
 	 * Set the color of the outline
 	 */
 	void setOutlineColor(double red, double green, double blue);
+	void setFillVisibility(bool on);
+	void setDynamicSize(bool on);
 
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
@@ -82,7 +84,10 @@ private:
 	vtkSectorSourcePtr mOutlineSource;
 	double mOutlineWidth;
 	ssc::Vector3D mOutlineColor;
+	bool mFillVisible;
 };
+
+
 
 }
 
