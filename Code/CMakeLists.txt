@@ -98,6 +98,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscDistanceMetricRep.h
     Rep/sscAngleMetricRep.h
     Rep/sscPlaneMetricRep.h
+    Rep/sscGuideRep2D.h
      
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
@@ -313,6 +314,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscAngleMetricRep.cpp
     Rep/sscPlaneMetricRep.h
     Rep/sscPlaneMetricRep.cpp
+    Rep/sscGuideRep2D.h
+    Rep/sscGuideRep2D.cpp
     
     Data/sscLandmark.h
     Data/sscLandmark.cpp
