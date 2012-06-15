@@ -120,6 +120,7 @@ public:
 	virtual QString getType() const { return "ssc::SlicePlanes3DRep"; }
 	void setProxy(SlicePlanesProxyPtr proxy);
 	SlicePlanesProxyPtr getProxy() { return mProxy; }
+	void setDynamicLabelSize(bool on);
 
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
