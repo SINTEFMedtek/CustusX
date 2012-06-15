@@ -103,23 +103,25 @@ void GuideRep2D::changedSlot()
 		return;
 
 
-	Vector3D toolPosRef = (*ssc::ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,mSliceProxy->getTool()->getTooltipOffset()));
+	Vector3D toolOffsetPosRef = (*ssc::ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,mSliceProxy->getTool()->getTooltipOffset()));
+	Vector3D toolPosRef = (*ssc::ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,00));
 
-	Vector3D centerRef = mMetric->getRefCoord() + 0.5*(toolPosRef - mMetric->getRefCoord());
+	Vector3D centerRef = mMetric->getRefCoord() + 0.5*(toolOffsetPosRef - mMetric->getRefCoord());
 	Vector3D position = mSliceProxy->get_sMr() * centerRef;
 	mCircleActor->SetPosition(position[0], position[1], 0);
 
 	const double margin = 10;
+	double offsetDistance = (mMetric->getRefCoord() - toolOffsetPosRef).length();
 	double distance = (mMetric->getRefCoord() - toolPosRef).length();
-	double radius = 0.5 * distance + margin;
+	double radius = 0.5 * offsetDistance + margin;
 	mCircleSource->SetOuterRadius(radius);
 	mCircleSource->SetInnerRadius(radius - mOutlineWidth);
 
-	if (abs(position[2]) < 0.5*mRequestedAccuracy)
+	if (distance < mRequestedAccuracy)
 	{
 		mCircleActor->GetProperty()->SetColor(0, 0, 1);
 	}
-	else if (position[2] < 0)
+	else if (offsetDistance < mRequestedAccuracy && position[2] < 0)
 	{
 		mCircleActor->GetProperty()->SetColor(0, 1, 0);
 	}
