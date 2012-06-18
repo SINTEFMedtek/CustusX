@@ -243,7 +243,9 @@ void main()
 			if (allVolumesBeenHit && hit == 0 && i > 0)
 			{
 				// We left the last volume
-				break;
+				colorSample = texture2DRect(backgroundBuffer, depthLookup);
+				colorSample.a = 1.0;
+				doBreak = true;
 			} else if (hit > 0 && contributingVolumes == 0)
 			{
 				// We're inside at least one volume, but none of the volumes exceeded the threshold
@@ -274,7 +276,9 @@ void main()
 				}
 				if (min == maxIterations * stepsize)
 				{
-					break;
+					colorSample = texture2DRect(backgroundBuffer, depthLookup);
+					colorSample.a = 1.0;
+					doBreak = true;
 				}
 				vect += min * rayDirection;
 				continue;
