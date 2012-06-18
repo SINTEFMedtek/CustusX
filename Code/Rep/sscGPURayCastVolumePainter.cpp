@@ -287,9 +287,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	}
 
 	GLint oldTextureUnit;
-	GLint oldTextureBind;
 	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &oldTextureBind);
 	
 	vtkRenderWindow* renWin = renderer->GetRenderWindow();
 	if (mInternals->LastContext != renWin || mInternals->mElement.size() != mInternals->mVolumes)
@@ -371,7 +369,6 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	glBindTexture(GL_TEXTURE_3D, 0);
 
 	glActiveTexture(oldTextureUnit);
-	glBindTexture(GL_TEXTURE_2D, oldTextureBind);
 	report_gl_error();
 }
 
@@ -387,9 +384,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 	GL_TRACE("Entering");
 
 	GLint oldTextureUnit;
-	GLint oldTextureBind;
 	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &oldTextureBind);
 	
 	// Save context state to be able to restore.
 	mInternals->Shader->Build();
@@ -488,7 +483,6 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 	glDisable(vtkgl::TEXTURE_3D);
 	glBindTexture(GL_TEXTURE_3D, 0);
 	glActiveTexture(oldTextureUnit);
-	glBindTexture(GL_TEXTURE_2D, oldTextureBind);
 	report_gl_error();
 }
 
