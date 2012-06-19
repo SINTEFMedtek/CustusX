@@ -73,6 +73,7 @@ private:
 
 	void setPositionFromScreenPos(int x, int y);
 	void createCompactingTransforms();
+	double findCompactedTime(double timeInterval, double totalUsedTime, double totalTime) const;
 
 //	std::vector<std::pair<double, double> > mValidRegions;
 	std::vector<TimelineEvent> mEvents;
