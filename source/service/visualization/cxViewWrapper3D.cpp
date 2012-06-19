@@ -763,6 +763,7 @@ void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
 	mSlicePlanes3DRep = ssc::SlicePlanes3DRep::New("uid");
 	mSlicePlanes3DRep->setProxy(proxy);
+	mSlicePlanes3DRep->setDynamicLabelSize(true);
 	bool show = settings()->value("showSlicePlanes").toBool();
 	mSlicePlanes3DRep->getProxy()->setVisible(show); // init with default value
 

@@ -30,6 +30,7 @@
 #include "sscBoundingBox3D.h"
 #include "sscTransform3D.h"
 #include "sscConfig.h"
+#include "sscPointMetricRep2D.h"
 
 namespace ssc
 {
@@ -101,6 +102,8 @@ private:
 	virtual void meshAdded(ssc::MeshPtr mesh);
 	virtual void imageRemoved(const QString& uid);
 	virtual void meshRemoved(const QString& uid);
+	virtual void pointMetricAdded(ssc::PointMetricPtr mesh);
+	virtual void pointMetricRemoved(const QString& uid);
 
 	virtual void dataAdded(ssc::DataPtr data);
 	virtual void dataRemoved(const QString& uid);
@@ -112,6 +115,7 @@ private:
 	ssc::SliceProxyPtr mSliceProxy;
 	ssc::SliceRepSWPtr mSliceRep;
 	std::map<QString, ssc::GeometricRep2DPtr> mGeometricRep;
+	std::map<QString, ssc::PointMetricRep2DPtr> mPointMetricRep;
 	ssc::ToolRep2DPtr mToolRep2D;
 //  ssc::OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
 	ssc::OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
