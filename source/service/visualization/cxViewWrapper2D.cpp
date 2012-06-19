@@ -529,12 +529,17 @@ void ViewWrapper2D::dataAdded(ssc::DataPtr data)
 	{
 		this->meshAdded(boost::shared_dynamic_cast<ssc::Mesh>(data));
 	}
+	else if (boost::shared_dynamic_cast<ssc::PointMetric>(data))
+	{
+		this->pointMetricAdded(boost::shared_dynamic_cast<ssc::PointMetric>(data));
+	}
 }
 
 void ViewWrapper2D::dataRemoved(const QString& uid)
 {
 	this->imageRemoved(uid);
 	this->meshRemoved(uid);
+	this->pointMetricRemoved(uid);
 }
 
 void ViewWrapper2D::meshAdded(ssc::MeshPtr mesh)
@@ -561,6 +566,36 @@ void ViewWrapper2D::meshRemoved(const QString& uid)
 	mGeometricRep.erase(uid);
 	this->updateView();
 }
+
+void ViewWrapper2D::pointMetricAdded(ssc::PointMetricPtr mesh)
+{
+	if (!mesh)
+		return;
+	if (mPointMetricRep.count(mesh->getUid()))
+		return;
+
+	ssc::PointMetricRep2DPtr rep = ssc::PointMetricRep2D::New(mesh->getUid() + "_rep2D");
+	rep->setSliceProxy(mSliceProxy);
+	rep->setPointMetric(mesh);
+	rep->setFillVisibility(false);
+	rep->setOutlineWidth(0.25);
+	rep->setOutlineColor(1,0,0);
+	rep->setDynamicSize(true);
+	mView->addRep(rep);
+	mPointMetricRep[mesh->getUid()] = rep;
+	this->updateView();
+}
+
+void ViewWrapper2D::pointMetricRemoved(const QString& uid)
+{
+	if (!mPointMetricRep.count(uid))
+		return;
+
+	mView->removeRep(mPointMetricRep[uid]);
+	mPointMetricRep.erase(uid);
+	this->updateView();
+}
+
 
 void ViewWrapper2D::dominantToolChangedSlot()
 {
