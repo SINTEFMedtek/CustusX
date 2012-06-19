@@ -125,17 +125,6 @@ void ImageSenderSonix::initializeSonixSlot()
 
 void ImageSenderSonix::initializeSonixGrabber()
 {
-		//testcode
-	HWND phandle = FindWindow(NULL, "Sonix: No connections");
-	if(phandle)
-	{
-		std::cout << "Found Sonix process" << std::endl;
-	} else 
-	{
-		std::cout << "Didn't find Sonix process" << std::endl;
-		//return;
-	}
-	///////////////
 	if (!mArguments.count("ipaddress"))
 		mArguments["ipaddress"] = "127.0.0.1";
 	if (!mArguments.count("imagingmode"))
