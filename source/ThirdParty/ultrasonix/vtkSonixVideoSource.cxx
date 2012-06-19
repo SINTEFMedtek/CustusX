@@ -517,7 +517,7 @@ int vtkSonixVideoSource::IsInitialized()
 {
 	return this->Initialized;
 }
-bool vtkSonixVideoSource::getFreezeState();
+bool vtkSonixVideoSource::getFreezeState()
 {
 	if (!this->Initialized)
 		return false;
