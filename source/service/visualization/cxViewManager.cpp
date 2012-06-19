@@ -93,6 +93,7 @@ ViewManager::ViewManager() :
 {
 	mRenderTimer.reset(new RenderTimer);
 	mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
+//	mSlicePlanesProxy->getProperties().m3DFontSize = 50;
 
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
