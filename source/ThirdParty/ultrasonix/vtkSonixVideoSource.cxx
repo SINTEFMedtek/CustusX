@@ -534,6 +534,17 @@ void vtkSonixVideoSource::Initialize()
     {
     return;
     }
+	HWND phandle = FindWindow(NULL, "Sonix: No connections");
+	if(phandle)
+	{
+		std::cout << "Found Sonix window. Waiting 15 sec to connect" << std::endl;
+		//Need to delay to make sure the Sonix exam is finished initializing...
+		vtksys::SystemTools::Delay(15000);
+	} else 
+	{
+		std::cout << "Didn't find Sonix window" << std::endl;
+		return;
+	}
 
    
   // 1) connect to sonix machine.
