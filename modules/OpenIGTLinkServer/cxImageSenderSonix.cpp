@@ -113,7 +113,7 @@ void ImageSenderSonix::initializeSonixSlot()
 		std::cout << "Releasing Ultrasonix resources" << std::endl;
 		mSonixGrabber->ReleaseSystemResources();
 		disconnect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)));
-		mSonixGrabber->Delete();
+		//mSonixGrabber->Delete();
 
 		this->initializeSonixGrabber();
 	}
