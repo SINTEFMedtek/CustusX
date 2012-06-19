@@ -175,7 +175,6 @@ public:
 class GPURayCastVolumePainter::vtkInternals
 {
 public:
-//	Display* mCurrentContext;
 
 	vtkWeakPointer<vtkRenderWindow> LastContext;
 
