@@ -99,7 +99,7 @@ void ImageSenderSonix::initializeSonixSlot()
 {
 	if(!mSonixGrabber->IsInitialized())
 	{
-		std::cout << "initializeSonixSlot() Initializing..." << std::endl;
+		//std::cout << "initializeSonixSlot() Initializing..." << std::endl;
 		mSonixGrabber->Initialize();
 		return;
 	}
