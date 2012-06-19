@@ -59,12 +59,6 @@ void PointMetricRep2D::setDynamicSize(bool on)
 	}
 }
 
-//void PointMetricRep2D::setShowLabel(bool on)
-//{
-//  mShowLabel = on;
-//  this->changedSlot();
-//}
-
 void PointMetricRep2D::setPointMetric(PointMetricPtr point)
 {
 	if (mMetric)
@@ -101,12 +95,6 @@ void PointMetricRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
 	if (mViewportListener)
 		mViewportListener->stopListen();
 }
-
-//void PointMetricRep2D::setSphereRadius(double radius)
-//{
-//  mSphereRadius = radius;
-//  this->changedSlot();
-//}
 
 void PointMetricRep2D::changedSlot()
 {
