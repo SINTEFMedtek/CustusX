@@ -678,6 +678,8 @@ void vtkSonixVideoSource::Initialize()
 void vtkSonixVideoSource::ReleaseSystemResources()
 {
   this->ult->disconnect();
+  // Set system to not initialized after release
+  this->Initialized = 0;
 }
 
 //----------------------------------------------------------------------------
