@@ -29,7 +29,8 @@ void TestGPURayCaster::testSetImages()
 	CPPUNIT_ASSERT(mRep->mActor->GetMTime() > mTime);
 	mTime = mRep->mActor->GetMTime();
 	mRep->setImages(images);
-	CPPUNIT_ASSERT_EQUAL(mTime, mRep->mActor->GetMTime());
+	uint64_t mNewTime = mRep->mActor->GetMTime();
+	CPPUNIT_ASSERT_EQUAL(mTime, mNewTime);
 	
 	images.push_back(image2);
 	images.push_back(image3);
