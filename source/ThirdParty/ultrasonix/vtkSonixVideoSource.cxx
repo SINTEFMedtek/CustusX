@@ -517,6 +517,13 @@ int vtkSonixVideoSource::IsInitialized()
 {
 	return this->Initialized;
 }
+bool vtkSonixVideoSource::getFreezeState();
+{
+	if (!this->Initialized)
+		return false;
+	else
+		return this->ult->getFreezeState();
+}
 
 //----------------------------------------------------------------------------
 void vtkSonixVideoSource::Initialize()
@@ -720,8 +727,9 @@ void vtkSonixVideoSource::Record()
     {
     this->Recording = 1;
     this->Modified();
-    if(this->ult->getFreezeState())
-		this->ult->toggleFreeze();
+    //Don't mess with freeze
+//    if(this->ult->getFreezeState())
+//		this->ult->toggleFreeze();
     }
 }
     
@@ -739,8 +747,8 @@ void vtkSonixVideoSource::Stop()
     this->Recording = 0;
     this->Modified();
 
-	if (!this->ult->getFreezeState())
-		this->ult->toggleFreeze();
+//	if (!this->ult->getFreezeState())
+//		this->ult->toggleFreeze();
     }
   else if (this->Playing)
     {
