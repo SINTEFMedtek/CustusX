@@ -70,7 +70,7 @@ private:
 	std::vector<TimelineEvent> convertRegistrationHistoryToEvents(ssc::RegistrationHistoryPtr reg);
 	void showDetails();
 	QColor generateRandomToolColor() const;
-	QString convertMillisecsToNiceString(int ms) const;
+	QString convertMillisecsToNiceString(qint64 ms) const;
 
 	QLabel* mLabel;
 	QLabel* mTotalLengthLabel;
