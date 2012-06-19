@@ -189,7 +189,8 @@ public:
   // first grab is done).
   void Initialize();
 
-  int IsInitialized();
+  int IsInitialized();///< Returns true if Sonix is initialized
+  bool getFreezeState();///< Returns true if connected to Sonix and Sonix in freeze state, false otherwise
 
   // Description:
   // Free the driver (this is called automatically inside the
