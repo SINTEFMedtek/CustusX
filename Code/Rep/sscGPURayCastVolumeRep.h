@@ -20,6 +20,8 @@
 #ifndef SSCGPURAYCASTVOLUMEREP_H_
 #define SSCGPURAYCASTVOLUMEREP_H_
 
+#ifndef WIN32
+
 #include "sscRepImpl.h"
 #include <vector>
 #include <QSet>
@@ -132,5 +134,8 @@ private:
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
+
+#endif // WIN32
+
 #endif /* SSCGPURAYCASTVOLUMEREP_H_ */
 
