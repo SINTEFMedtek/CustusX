@@ -542,7 +542,7 @@ void vtkSonixVideoSource::Initialize()
 		vtksys::SystemTools::Delay(15000);
 	} else 
 	{
-		std::cout << "Didn't find Sonix window" << std::endl;
+		//std::cout << "Didn't find Sonix window" << std::endl;
 		return;
 	}
 
