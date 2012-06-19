@@ -17,6 +17,7 @@
 //
 // See sscLicense.txt for more information.
 
+#ifndef WIN32
 #include "sscGPURayCastVolumeRep.h"
 
 #include <vtkAppendPolyData.h>
@@ -271,3 +272,4 @@ void GPURayCastVolumeRep::setRenderMode(enum RenderMode renderMode)
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
+#endif // WIN32
