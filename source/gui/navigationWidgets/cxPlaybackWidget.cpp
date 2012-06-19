@@ -356,14 +356,14 @@ QString PlaybackWidget::stripLeadingZeros(QString time)
 /**Convert a millisecond count to a hh:mm:ss:zzz time.
  *
  */
-QString PlaybackWidget::convertMillisecsToNiceString(int length) const
+QString PlaybackWidget::convertMillisecsToNiceString(qint64 length) const
 {
 	QString retval;
 
-	int ms = length % 1000;
-	int s = (length / 1000) % 60;
-	int m = (length / (1000*60)) % 60;
-	int h = (length / (1000*60*60));
+	qint64 ms = length % 1000;
+	qint64 s = (length / 1000) % 60;
+	qint64 m = (length / (1000*60)) % 60;
+	qint64 h = (length / (1000*60*60));
 	QChar c = '0';
 
 	retval = QString("%1:%2.%3").arg(m,2,10,c).arg(s,2,10,c).arg(ms,3,10,c);
@@ -385,7 +385,7 @@ void PlaybackWidget::timeChangedSlot()
 {
 	QString color("green");
 	int fontSize = 4;
-	int offset = mTimer->getOffset(); // SmStartTime.secsTo(QDateTime::currentDateTime());
+	qint64 offset = mTimer->getOffset(); // SmStartTime.secsTo(QDateTime::currentDateTime());
 	QString format = QString("<font size=%1 color=%2><b>%3</b></font>").arg(fontSize).arg(color);
 
 	QString currentTime = mTimer->getTime().toString("hh:mm:ss");

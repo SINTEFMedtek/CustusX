@@ -43,23 +43,23 @@ public:
 	PlaybackTime();
 	virtual ~PlaybackTime();
 
-	void initialize(QDateTime start, int length);
+	void initialize(QDateTime start, qint64 length);
 
-	void forward(int msecs); ///< jump forward in ms
-	void rewind(int msecs); ///< jump backward in ms
+	void forward(qint64 msecs); ///< jump forward in ms
+	void rewind(qint64 msecs); ///< jump backward in ms
 	bool isPlaying() const;
 
 	void setTime(QDateTime time);
 	QDateTime getTime() const;
-	void setOffset(int val); ///< set time as an offset from start
-	void moveOffset(int delta); ///< change the offset with an amount
-	int getOffset() const;
-	int getLength() const; ///< length of recording in ms
+	void setOffset(qint64 val); ///< set time as an offset from start
+	void moveOffset(qint64 delta); ///< change the offset with an amount
+	qint64 getOffset() const;
+	qint64 getLength() const; ///< length of recording in ms
 	QDateTime getStartTime() const;
 	void setSpeed(double val); ///< set speed as a ratio of real time. 1 is real time, less is slower, more is faster.
 	double getSpeed() const;
-	void setResolution(int val); ///< set resolution in ms (signals are emitted with this spacing)
-	double getResolution(int val);
+	void setResolution(qint64 val); ///< set resolution in ms (signals are emitted with this spacing)
+	double getResolution();
 
 public slots:
 	void start(); ///< start playing.
@@ -74,13 +74,13 @@ private slots:
 private:
 	QDateTime mStartTime;
 //	QDateTime mTime;
-	int mOffset; ///< current offset from the start time.
-	int mLength;
+	qint64 mOffset; ///< current offset from the start time.
+	qint64 mLength;
 	QTimer* mTimer;
 	double mSpeed;
 
 	QDateTime mPlayStart; ///< real time when play was last started.
-	int mLastPlayOffset; ///< offset when play was last started.
+	qint64 mLastPlayOffset; ///< offset when play was last started.
 
 };
 

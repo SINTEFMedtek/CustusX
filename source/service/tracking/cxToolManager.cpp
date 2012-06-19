@@ -171,15 +171,21 @@ void ToolManager::setPlaybackMode(PlaybackTimePtr controller)
 		cx::PlaybackToolPtr current(new PlaybackTool(iter->second, controller));
 		mTools[current->getUid()] = current;
 
+//		std::cout << "tool: " << iter->first  << std::endl;
 		ssc::TimedTransformMapPtr history = iter->second->getPositionHistory();
 		if (!history->empty())
 		{
 			timeRange.first = std::min(timeRange.first, history->begin()->first);
 			timeRange.second = std::max(timeRange.second, history->rbegin()->first);
+//			std::cout << "===t start " << QDateTime::fromMSecsSinceEpoch(history->begin()->first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//			std::cout << "===t  end " << QDateTime::fromMSecsSinceEpoch(history->rbegin()->first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 		}
 	}
 	mTools[mManualTool->getUid()] = mManualTool;
 
+//	std::cout << "toolmanager" << std::endl;
+//	std::cout << "===start " << QDateTime::fromMSecsSinceEpoch(timeRange.first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//	std::cout << "===  end " << QDateTime::fromMSecsSinceEpoch(timeRange.second).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 	controller->initialize(QDateTime::fromMSecsSinceEpoch(timeRange.first), timeRange.second - timeRange.first);
 
 	ssc::messageManager()->sendInfo("Opened Playback Mode");
@@ -798,7 +804,6 @@ void ToolManager::loadPositionHistory()
 	QString toolUid;
 
 	QStringList missingTools;
-//	std::cout << "========= ToolManager::loadPositionHistory() " << filename << "-- " << reader.atEnd() << std::endl;
 
 	while (!reader.atEnd())
 	{
