@@ -19,6 +19,7 @@ uniform samplerBuffer lut[maxVolumes];
 uniform float alpha[maxVolumes];
 uniform mat4 M[maxVolumes];
 uniform bool useCutPlane[maxVolumes];
+uniform float maxValue[maxVolumes];
 uniform sampler2DRect depthBuffer;
 uniform sampler2DRect backgroundBuffer;
 uniform vec3 cutPlaneNormal;
@@ -224,12 +225,21 @@ void main()
 					if (!all(lessThan(volumeColorSample.rgb, vec3(threshold[i]))))
 					{
 						++contributingVolumes;
+						float alphaSample;
+						if (lutSize[i] > 0)
+						{
+							alphaSample = stepsize*volumeColorSample.r*alpha[i]/maxValue[i];
+						}
+						else
+						{
+							alphaSample = stepsize*0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b)*alpha[i]/maxValue[i];
+						}
 						volumeColorSample = applyWindowLevel(volumeColorSample, window[i], level[i]);
 						if ( lutSize[i] > 0)
 						{
 							volumeColorSample = applyLut( volumeColorSample.r, lut[i], lutSize[i]);
 						}
-						volumeColorSample.a = stepsize*0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b)*alpha[i];
+						volumeColorSample.a = alphaSample;
 						colorSample = blendRGBA(colorSample, volumeColorSample);
 					}
 				}
