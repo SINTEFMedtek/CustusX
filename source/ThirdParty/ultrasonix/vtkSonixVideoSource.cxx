@@ -519,6 +519,11 @@ int vtkSonixVideoSource::IsInitialized()
 }
 bool vtkSonixVideoSource::getFreezeState()
 {
+	// Also return false if data is not available, as freeze state is set
+	// when Sonix exam is not in research state
+	if(!this->ult->isDataAvailable((uData)(AcquisitionDataType)))
+		return false;
+
 	if (!this->Initialized)
 		return false;
 	else
