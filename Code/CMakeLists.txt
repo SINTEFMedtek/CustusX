@@ -147,6 +147,9 @@ set( SSC_INCLUDE_DIRS
     ${SSC_BINARY_DIR}
     ) 
 
+set( SSC_DICOMLIB_INCLUDE_DIRS
+  ${SSC_SOURCE_DIR}/DICOMLib
+  )
 #find_package( CML REQUIRED )
 #find_package (CML PATHS "cml-1_0_2" REQUIRED)
 #include (${CML_USE_FILE})
