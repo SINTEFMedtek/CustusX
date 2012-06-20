@@ -219,12 +219,15 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
 	}
 
 	// volume rep
+	
+#ifndef WIN32
 	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
 	mRepPtr->setShaderFiles(mShaderFolder + "raycasting_shader.vert", mShaderFolder + "raycasting_shader.frag");
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);
-	
+#endif //WIN32
+
 	// Tool 3D rep
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
