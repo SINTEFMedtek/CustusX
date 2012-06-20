@@ -170,6 +170,11 @@ vec4 computeRayDirection( vec4 position, vec2 viewport)
 	return rayDirection;
 }
 
+float opacityTransfer( float intensity, float threshold, float alpha, float maxVal)
+{
+	return alpha * (intensity - threshold) / (maxVal - threshold);
+}
+
 void main()
 {
 	vec4 start = gl_TexCoord[1];
@@ -226,14 +231,17 @@ void main()
 					{
 						++contributingVolumes;
 						float alphaSample;
+						float intensity;
 						if (lutSize[i] > 0)
 						{
-							alphaSample = stepsize*volumeColorSample.r*alpha[i]/maxValue[i];
+							intensity = volumeColorSample.r;
 						}
 						else
 						{
-							alphaSample = stepsize*0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b)*alpha[i]/maxValue[i];
+							intensity = 0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b);
 						}
+						alphaSample = stepsize * opacityTransfer(intensity, threshold[i], alpha[i], maxValue[i]);
+						
 						volumeColorSample = applyWindowLevel(volumeColorSample, window[i], level[i]);
 						if ( lutSize[i] > 0)
 						{
