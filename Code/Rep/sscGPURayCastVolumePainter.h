@@ -55,7 +55,7 @@ public:
 
 	void setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile);
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
-	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer);
+	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer, double maxValue);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
 	void setViewport(float width, float height);
 	void set_nMr(int index, ssc::Transform3D nMr);
