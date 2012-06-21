@@ -20,6 +20,8 @@
 #ifndef WIN32
 #include "sscGPURayCastVolumeRep.h"
 
+#include <stdint.h>
+
 #include <vtkAppendPolyData.h>
 #include <vtkCellArray.h>
 #include <vtkRenderer.h>
@@ -70,6 +72,34 @@ static vtkPolyDataPtr createCube()
 	cube->SetPolys(polys);
 	polys->Delete();
 	return cube;
+}
+
+double maxIntensity(vtkImageDataPtr image)
+{
+	if (image->GetNumberOfScalarComponents() == 1)
+	{
+		return (double)image->GetScalarRange()[1]/image->GetScalarTypeMax();
+	}
+	int dim[3];
+	image->GetDimensions(dim);
+	double max = -1000;
+	for(int x = dim[0]; x >= 0; --x)
+	{
+		for(int y = dim[1]; y >= 0; --y)
+		{
+			for(int z = dim[2]; z >= 0; --z)
+			{
+				double value = image->GetScalarComponentAsDouble(x, y, z, 0) + image->GetScalarComponentAsDouble(x, y, z, 1) + image->GetScalarComponentAsDouble(x, y, z, 2);
+				value /= 3;
+					
+				if (value > max)
+				{
+					max = value;
+				}
+			}
+		}
+	}
+	return (double)max/image->GetScalarTypeMax();
 }
 
 GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
@@ -155,7 +185,8 @@ void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 		ssc::GPUImageDataBufferPtr dataBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
 			inputImage);
 
-		mPainter->SetVolumeBuffer(i, dataBuffer);
+		double maxVal = maxIntensity(inputImage);
+		mPainter->SetVolumeBuffer(i, dataBuffer, maxVal);
 
 		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
 
