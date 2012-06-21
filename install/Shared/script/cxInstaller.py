@@ -55,15 +55,11 @@ class Common(object):
     '''
     def __init__(self):
         self.PLATFORM = platform.system() # {Windows7 = 'Windows', OSX 10.7.4 = 'Darwin', Liux = ?}
-        # user: Used to create root dir.
-        #self.mUser = shell.evaluate('whoami')
         self.mUser = getpass.getuser()
-        # root dir: default base for external and working dir
-        #self.mRootDir = shell.evaluate('cd;pwd')+"/"+self.mUser
-        
-        #TODO just for debugging on jbs comp!!! CHANGE BACK
-        self.mRootDir = "C:\Dev"#os.path().expanduser("~")
-        
+        if(self.PLATFORM == 'Windows'):
+            self.mRootDir = "C:\Dev"
+        else:
+            self.mRootDir = os.path().expanduser("~")
         # external dir: Used as base dir for all externals, such as VTK, ITK, ...
         self.mExternalDir = self.mRootDir + "/external_code"
         # working dir: Used as base dir for Custus and other of our 'own' projects
@@ -259,16 +255,22 @@ class CppComponent(Component):
         runShell('rm -R -f %s/%s' % (self.path(), self.buildFolder()))
     def build(self):
         self._changeDirToBuild()
-        # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
-        # - http://www.mail-archive.com/paraview@paraview.org/msg07520.html
-        # (add it to all project because it does no harm if not needed)
-        runShell('''\
-export DYLD_LIBRARY_PATH=`pwd`/bin; \
-make -j%s
-''' % str(DATA.options.makethreads))
+        if(DATA.PLATFORM == 'Windows'):
+            runShell('nmake')
+        else:
+            # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
+            # - http://www.mail-archive.com/paraview@paraview.org/msg07520.html
+            # (add it to all project because it does no harm if not needed)
+            runShell('''\
+    export DYLD_LIBRARY_PATH=`pwd`/bin; \
+    make -j%s
+    ''' % str(DATA.options.makethreads))
     def makeClean(self):
         self._changeDirToBuild()
-        runShell('make clean')
+        if(DATA.PLATFORM == 'Windows'):
+            runShell('nmake clean')
+        else:
+            runShell('make clean')
     # ---------------------------------------------------------
 
 class ITK(CppComponent):
@@ -452,20 +454,20 @@ class IGSTK(CppComponent):
         self._changeDirToSource()
         runShell('git checkout v5.0')
         runShell('git checkout -B cx_mod_for_50')
-#        print 'git am --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch' % (CustusX3().path(), CustusX3().sourceFolder())
+        #TODO this can be a bug, if CustusX is not checked out yet, this will not work!!!
         runShell(('git am --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
-                # this substitution removes compilation of the dysfuct lib that we don't use.
+        # this substitution removes compilation of the dysfuct lib that we don't use.
         # Fedora 16 note: try adding "" between -i and s/ if you encounter problems...
         #runShell('''\
-#sed -i s/'SUBDIRS( SceneGraphVisualization )'/'#SUBDIRS( SceneGraphVisualization )'/g Utilities/CMakeLists.txt
-#''')
+        #sed -i s/'SUBDIRS( SceneGraphVisualization )'/'#SUBDIRS( SceneGraphVisualization )'/g Utilities/CMakeLists.txt
+        #''')
         if DATA.mUseGCC46:
             pass
-        # this substitution makes IGSTK 4.4 work with ITK 4.0
+            # this substitution makes IGSTK 4.4 work with ITK 4.0
             # Fedora 16 note: try adding "" between -i and s/ if you encounter problems...
             #runShell('''\
-#sed -i "" s/'ITKIO ITKBasicFilters ITKNumerics ITKCommon ITKSpatialObject'/'${ITK_LIBRARIES}'/g Source/CMakeLists.txt
-#''')
+            #sed -i "" s/'ITKIO ITKBasicFilters ITKNumerics ITKCommon ITKSpatialObject'/'${ITK_LIBRARIES}'/g Source/CMakeLists.txt
+            #''')
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
@@ -509,8 +511,8 @@ class DCMTK(CppComponent):
     def name(self):
         return "DCMTK"
     #def buildFolder(self):
-    #    'in-source build because this is necessary for including an uninstalled DCMTK'
-    #    return self.sourceFolder()    
+        #'in-source build because this is necessary for including an uninstalled DCMTK'
+        #return self.sourceFolder()    
     def help(self):
         return 'dcmtk.org'
     def path(self):
@@ -520,8 +522,7 @@ class DCMTK(CppComponent):
         self._changeDirToBase()
         runShell('git clone git://git.dcmtk.org/dcmtk DCMTK')
         # the commontk version of DCMTK compiles without problems on Mac.
-#        runShell('git clone git://github.com/commontk/DCMTK.git DCMTK')
-        
+        #runShell('git clone git://github.com/commontk/DCMTK.git DCMTK')     
         self.update()
     def update(self):
         self._changeDirToSource()
@@ -590,15 +591,10 @@ class CustusX3(CppComponent):
         return DATA.mWorkingDir + "/CustusX3"
     def _rawCheckout(self):
         self._changeDirToBase()
-#        runShell('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
         runShell('git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
-        #runShell('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
         self._changeDirToSource()
-#        runShell('git submodule init')
-#        runShell('git submodule update')
         runShell('git submodule update --init --recursive externals/ssc')
         runShell('git submodule update --init --recursive data')
-        #runShell('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/CustusX3' % DATA.mServerUser)
     def update(self):
         self._changeDirToSource()
         runShell('git checkout master')
@@ -629,7 +625,7 @@ cmake \
             #DCMTK().installPath(), 
             self.sourceFolder() )
             )
-        # add xcode project here if needed
+        #TODO add xcode project here if needed?
 # ---------------------------------------------------------
 
 class CustusX3Data(Component):
