@@ -95,22 +95,17 @@ class Shell (object):
     def __init__(self):
         self.DUMMY = False
         self.VERBOSE = False
-        self.CWD = '/' # remember directory
+        if(DATA.PLATFORM == 'Windows'):
+            self.CWD = "C:\\"
+        else:
+            self.CWD = '/' # remember directory
         self.password = ""
         
     def _runReal(self, cmd):
         '''This function runs shell, no return, insert password'''
         print '*** run:', cmd
-        #p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=CWD)
         p = subprocess.Popen(cmd, shell=True, cwd=self.CWD)
-        # print "entering password ", self.password, " for ", cmd
-        #p.communicate(self.password+"\n")
-        #p.communicate("") # seems to be needed in order to wait for password prompting...?
-        p.communicate()
-        #out = p.stdout.read().strip()
-        #if out!="":
-        # print out
-             #return out #This is the stdout from the shell command
+        p.communicate("") # seems to be needed in order to wait for password prompting...?
     
     def _runDummy(self, cmd):
         '''Dummy version of shell'''
@@ -147,11 +142,9 @@ class Cmd (Shell):
         super(Cmd, self).__init__()
     
     def changeDir(self, path):
+        path = path.replace("/", "\\")
         Shell.run(self, 'cmd /C mkdir '+path)
         Shell.changeDir(self, path)
-        
-    def run(self, cmd):
-        Shell.run(self, cmd)
 
 # ---------------------------------------------------------
 
@@ -165,6 +158,7 @@ class Bash (Shell):
     
     def changeDir(self, path):
         '''mkdir + cd bash operations'''
+        path = path.replace("\\", "/")
         Shell.run(self, 'mkdir -p '+path)
         Shell.changeDir(self, path)
 
@@ -293,8 +287,8 @@ class ITK(CppComponent):
         self.update()
     def update(self):
         self._changeDirToSource()
-        runShell('git checkout master')
-        runShell('git pull')
+        #runShell('git checkout master') # not needed
+        #runShell('git pull')
         if DATA.mUseGCC46:
             runShell('git checkout v4.0rc03') # needed for gcc 4.6  
             #runShell('git checkout v4.1.0') # needed for gcc 4.6, but not ok with igstk.
@@ -319,7 +313,7 @@ cmake \
             DATA.mBuildExAndTest, 
             DATA.mBuildExAndTest, 
             self.sourceFolder()))
-     # ---------------------------------------------------------
+# ---------------------------------------------------------
 
 class VTK(CppComponent):
     def name(self):
@@ -335,8 +329,8 @@ class VTK(CppComponent):
         self.update()
     def update(self):
         self._changeDirToSource()
-        runShell('git checkout master')
-        runShell('git pull')
+        #runShell('git checkout master')
+        #runShell('git pull')
         runShell('git checkout v5.8.0')   # needed for gcc 4.6, not good on non-linux
 
     def configure(self):
@@ -531,8 +525,8 @@ class DCMTK(CppComponent):
         self.update()
     def update(self):
         self._changeDirToSource()
-        runShell('git pull')
-#        runShell('git checkout master')   
+        #runShell('git pull')
+        #runShell('git checkout master')   
         runShell('git checkout PUBLIC_360')  # 3.6.0 seems to have some issues on fedora 16.  
 
     def configure(self):
