@@ -34,6 +34,7 @@
 #include <vtkShaderProgram2.h>
 #include <vtkShader2.h>
 #include <vtkShader2Collection.h>
+#include <vtkImageData.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -67,6 +68,7 @@ class GPURayCastSingleVolumePainterHelper
 	float mAlpha;
 	Transform3D m_nMr;
 	bool mClip;
+	float mMaxValue;
 
 public:
 	explicit GPURayCastSingleVolumePainterHelper(int index) :
@@ -75,7 +77,8 @@ public:
 		mLevel(0.0),
 		mLLR(0.0),
 		mAlpha(1.0),
-		mClip(false)
+		mClip(false),
+		mMaxValue(-1000)
 	{
 	}
 	GPURayCastSingleVolumePainterHelper() :
@@ -84,15 +87,17 @@ public:
 		mLevel(0.0),
 		mLLR(0.0),
 		mAlpha(1.0),
-		mClip(false)
+		mClip(false),
+		mMaxValue(-1000)
 	{
 	}
 	~GPURayCastSingleVolumePainterHelper()
 	{
 	}
-	void SetBuffer(ssc::GPUImageDataBufferPtr buffer)
+	void SetBuffer(ssc::GPUImageDataBufferPtr buffer, double maxValue)
 	{
 		mVolumeBuffer = buffer;
+		mMaxValue = maxValue;
 	}
 	void SetBuffer(ssc::GPUImageLutBufferPtr buffer)
 	{
@@ -156,6 +161,7 @@ public:
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("level[%1]").arg(mIndex)), 1, &mLevel);
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("threshold[%1]").arg(mIndex)), 1, &mLLR);
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("alpha[%1]").arg(mIndex)), 1, &mAlpha);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("maxValue[%1]").arg(mIndex)), 1, &mMaxValue);
 		int clip = mClip;
 		shader->GetUniformVariables()->SetUniformi(cstring_cast(QString("useCutPlane[%1]").arg(mIndex)), 1, &clip);
 		vtkMatrix4x4Ptr M = m_nMr.getVtkMatrix();
@@ -515,9 +521,9 @@ bool GPURayCastVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* 
 			&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
 }
 
-void GPURayCastVolumePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer)
+void GPURayCastVolumePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer, double maxValue)
 {
-	mInternals->safeIndex(index).SetBuffer(buffer);
+	mInternals->safeIndex(index).SetBuffer(buffer, maxValue);
 }
 
 void GPURayCastVolumePainter::SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer)

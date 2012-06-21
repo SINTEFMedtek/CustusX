@@ -19,6 +19,7 @@ uniform samplerBuffer lut[maxVolumes];
 uniform float alpha[maxVolumes];
 uniform mat4 M[maxVolumes];
 uniform bool useCutPlane[maxVolumes];
+uniform float maxValue[maxVolumes];
 uniform sampler2DRect depthBuffer;
 uniform sampler2DRect backgroundBuffer;
 uniform vec3 cutPlaneNormal;
@@ -169,6 +170,11 @@ vec4 computeRayDirection( vec4 position, vec2 viewport)
 	return rayDirection;
 }
 
+float opacityTransfer( float intensity, float threshold, float alpha, float maxVal)
+{
+	return alpha * (intensity - threshold) / (maxVal - threshold);
+}
+
 void main()
 {
 	vec4 start = gl_TexCoord[1];
@@ -224,12 +230,24 @@ void main()
 					if (!all(lessThan(volumeColorSample.rgb, vec3(threshold[i]))))
 					{
 						++contributingVolumes;
+						float alphaSample;
+						float intensity;
+						if (lutSize[i] > 0)
+						{
+							intensity = volumeColorSample.r;
+						}
+						else
+						{
+							intensity = 0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b);
+						}
+						alphaSample = stepsize * opacityTransfer(intensity, threshold[i], alpha[i], maxValue[i]);
+						
 						volumeColorSample = applyWindowLevel(volumeColorSample, window[i], level[i]);
 						if ( lutSize[i] > 0)
 						{
 							volumeColorSample = applyLut( volumeColorSample.r, lut[i], lutSize[i]);
 						}
-						volumeColorSample.a = stepsize*0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b)*alpha[i];
+						volumeColorSample.a = alphaSample;
 						colorSample = blendRGBA(colorSample, volumeColorSample);
 					}
 				}

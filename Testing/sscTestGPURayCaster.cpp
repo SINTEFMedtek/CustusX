@@ -1,3 +1,5 @@
+#ifndef WIN32
+
 #include "sscTestGPURayCaster.h"
 #include "stdint.h"
 #include <vtkActor.h>
@@ -60,3 +62,5 @@ void TestGPURayCaster::testParameters()
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestGPURayCaster );
+
+#endif //WIN32

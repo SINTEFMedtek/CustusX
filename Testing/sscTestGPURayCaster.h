@@ -1,6 +1,8 @@
 #ifndef SSCTESTGPURAYCASTER_H_
 #define SSCTESTGPURAYCASTER_H_
 
+#ifndef WIN32
+
 #include <cppunit/extensions/TestFactoryRegistry.h> 
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -25,4 +27,5 @@ private:
 
 };
 
+#endif //WIN32
 #endif /*SSCTESTGPURAYCASTER_H_*/
