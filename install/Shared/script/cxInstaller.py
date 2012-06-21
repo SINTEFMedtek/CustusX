@@ -45,17 +45,25 @@ import re
 import sys
 import os.path
 import urllib
+import getpass
+import platform
 
-class Common:
+class Common(object):
     '''
-Container for common data.
-Modify these to change behaviour
-'''
+    Container for common data.
+    Modify these to change behaviour
+    '''
     def __init__(self):
+        self.PLATFORM = platform.system() # {Windows7 = 'Windows', OSX 10.7.4 = 'Darwin', Liux = ?}
         # user: Used to create root dir.
-        self.mUser = bash.evaluate('whoami')
+        #self.mUser = shell.evaluate('whoami')
+        self.mUser = getpass.getuser()
         # root dir: default base for external and working dir
-        self.mRootDir = bash.evaluate('cd;pwd')+"/"+self.mUser
+        #self.mRootDir = shell.evaluate('cd;pwd')+"/"+self.mUser
+        
+        #TODO just for debugging on jbs comp!!! CHANGE BACK
+        self.mRootDir = "C:\Dev"#os.path().expanduser("~")
+        
         # external dir: Used as base dir for all externals, such as VTK, ITK, ...
         self.mExternalDir = self.mRootDir + "/external_code"
         # working dir: Used as base dir for Custus and other of our 'own' projects
@@ -68,86 +76,124 @@ Modify these to change behaviour
         self.mBuildExternalsType = "Release" # used for all non-cx libs, this because we want speed even in debug...
         self.mBuildFolder = "build" # default build folder. This is auto-changed when using xcode or 32 bit.
         self.m32bitCompileCMakeOption = "" # use "-DCMAKE_OSX_ARCHITECTURES=i386" for 32 bit. Done automatically by settings --b32 from command line.
-        self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
+        if (self.PLATFORM == 'Windows'):
+            #TODO create option to select cmake generator
+            self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
+        else:
+            self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
         self.mUseGCC46 = False # special tricks for GCC version 4.6 (use ITK4.0 etc)
-    # ---------------------------------------------------------
 
-
-class Bash:
+# ---------------------------------------------------------
+    
+class Shell (object):
     '''
-wrapper for methods that call the shell.
-Also keeps track of the current directory through changeDir()
-'''
+    Superclass for platform specific shells like:
+    -cmd (Windows)
+    -bash (Mac & Linux)
+    '''
     def __init__(self):
         self.DUMMY = False
         self.VERBOSE = False
         self.CWD = '/' # remember directory
         self.password = ""
-
+        
     def _runReal(self, cmd):
-        'This function runs bash, no return, insert password'
+        '''This function runs shell, no return, insert password'''
         print '*** run:', cmd
         #p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=CWD)
         p = subprocess.Popen(cmd, shell=True, cwd=self.CWD)
-# print "entering password ", self.password, " for ", cmd
+        # print "entering password ", self.password, " for ", cmd
         #p.communicate(self.password+"\n")
-        p.communicate("") # seems to be needed in order to wait for password prompting...?
-
+        #p.communicate("") # seems to be needed in order to wait for password prompting...?
+        p.communicate()
         #out = p.stdout.read().strip()
         #if out!="":
         # print out
              #return out #This is the stdout from the shell command
     
     def _runDummy(self, cmd):
-        'dummy version of bash'
+        '''Dummy version of shell'''
         if cmd=="whoami":
-            return self.runReal(cmd)
+            #return self._runReal(cmd) #does not work as expected on windows
+            return DATA.mUser
         print "*** dummy run:", cmd
         return ""
     
     def run(self, cmd):
-        'run a bash script'
+        '''Run a shell script'''
         if self.DUMMY is True:
             return self._runDummy(cmd)
         else:
             return self._runReal(cmd)
            
     def evaluate(self, cmd):
-     'This function takes bash commands and returns them'
-    # print '*** eval run:', cmd
-     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=self.CWD)
-     out = p.stdout.read().strip()
-    # if out!="":
-    # print out
-     return out #This is the stdout from the shell command
+        '''This function takes shell commands and returns them'''
+        # print '*** eval run:', cmd
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=self.CWD)
+        out = p.stdout.read().strip()
+        return out #This is the stdout from the shell command
     
     def changeDir(self, path):
-     'mkdir + cd bash operations'
-     runBash('mkdir -p '+path)
-     self.CWD = path
-        #runBash('cd '+path) - did not work, cd only operate on the local context
-    # --------------------------------------------------------
+        self.CWD = path
+    
+# ---------------------------------------------------------
+    
+class Cmd (Shell):
+    '''
+    Interface to the Windows command shell (cmd.exe).
+    '''
+    def __init__(self):
+        super(Cmd, self).__init__()
+    
+    def changeDir(self, path):
+        Shell.run(self, 'cmd /C mkdir '+path)
+        Shell.changeDir(self, path)
+        
+    def run(self, cmd):
+        Shell.run(self, cmd)
 
 # ---------------------------------------------------------
-# global for bash interaction
-bash = Bash()
-# shortcuts
-runBash = bash.run
-changeDir = bash.changeDir
+
+class Bash (Shell):
+    '''
+    Wrapper for methods that call the bash shell.
+    Also keeps track of the current directory through changeDir()
+    '''
+    def __init__(self):
+        super(Bash, self).__init__()
+    
+    def changeDir(self, path):
+        '''mkdir + cd bash operations'''
+        Shell.run(self, 'mkdir -p '+path)
+        Shell.changeDir(self, path)
+
+# --------------------------------------------------------
+
 # global variable for data
 DATA = Common()
+# global for shell interaction
+shell = Shell()
+if(DATA.PLATFORM == 'Windows'):
+    shell = Cmd()
+else:
+    shell = Bash() 
+# shortcuts
+runShell = shell.run
+changeDir = shell.changeDir
+
 # ---------------------------------------------------------
 
-class Component:
+class Component(object):
     '''
-Data for one Component
-Superclass for all specific components,
-which must implement this interface.
-'''
+    Data for one Component
+    Superclass for all specific components,
+    which must implement this interface.
+    '''
+    def __init__(self):
+        pass
     def name(self):
         'return name of component'
-        #return self.mName
         raise "Not Implemented"
     def help(self):
         'description of item'
@@ -155,7 +201,6 @@ which must implement this interface.
     def path(self):
         'return path where component will be installed'
         raise "Not Implemented"
-        #return self.mPath
     def checkout(self):
         'checkout the component source from external source to this computer (svn co or similar)'
         path = self.path()+'/'+self.sourceFolder()
@@ -188,10 +233,12 @@ which must implement this interface.
 
 class CppComponent(Component):
     '''
-Implementation of Cpp-style components, i.e all c++ libraries
-that contains a source and build folder, and are built with make.
-Inherit from this to get some methods for free.
-'''
+    Implementation of Cpp-style components, i.e all c++ libraries
+    that contains a source and build folder, and are built with make.
+    Inherit from this to get some methods for free.
+    '''
+    def __init__(self):
+        pass
     def sourceFolder(self):
         return self.name()
     def buildFolder(self):
@@ -215,19 +262,19 @@ Inherit from this to get some methods for free.
     def reset(self):
         'delete build folder(s)'
         self._changeDirToBase()
-        runBash('rm -R -f %s/%s' % (self.path(), self.buildFolder()))
+        runShell('rm -R -f %s/%s' % (self.path(), self.buildFolder()))
     def build(self):
         self._changeDirToBuild()
         # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
         # - http://www.mail-archive.com/paraview@paraview.org/msg07520.html
         # (add it to all project because it does no harm if not needed)
-        runBash('''\
+        runShell('''\
 export DYLD_LIBRARY_PATH=`pwd`/bin; \
 make -j%s
 ''' % str(DATA.options.makethreads))
     def makeClean(self):
         self._changeDirToBuild()
-        runBash('make clean')
+        runShell('make clean')
     # ---------------------------------------------------------
 
 class ITK(CppComponent):
@@ -242,30 +289,31 @@ class ITK(CppComponent):
         return 'ITK'
     def _rawCheckout(self):
         self._changeDirToBase()
-        runBash('git clone git://itk.org/ITK.git')
+        runShell('git clone git://itk.org/ITK.git')
         self.update()
     def update(self):
         self._changeDirToSource()
-        runBash('git checkout master')
-        runBash('git pull')
+        runShell('git checkout master')
+        runShell('git pull')
         if DATA.mUseGCC46:
-            runBash('git checkout v4.0rc03') # needed for gcc 4.6  
-            #runBash('git checkout v4.1.0') # needed for gcc 4.6, but not ok with igstk.
+            runShell('git checkout v4.0rc03') # needed for gcc 4.6  
+            #runShell('git checkout v4.1.0') # needed for gcc 4.6, but not ok with igstk.
         else:
-            #runBash('git checkout v3.20.0') # version working ok with IGSTK 4.2
-            runBash('git checkout v4.1.0')
+            #runShell('git checkout v3.20.0') # version working ok with IGSTK 4.2
+            runShell('git checkout v4.1.0')
     
     def configure(self):
         self._changeDirToBuild()
-        runBash('''\
+        runShell('''\
 cmake \
--G"Eclipse CDT4 - Unix Makefiles" \
+-G"%s" \
 %s \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DBUILD_TESTING=%s \
 -DBUILD_EXAMPLES=%s \
-../%s''' % (DATA.m32bitCompileCMakeOption, 
+../%s''' % (DATA.mCMakeGenerator,
+            DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildShared, 
             DATA.mBuildExAndTest, 
@@ -283,22 +331,22 @@ class VTK(CppComponent):
 
     def _rawCheckout(self):
         self._changeDirToBase()
-        runBash('git clone http://vtk.org/VTK.git')
+        runShell('git clone http://vtk.org/VTK.git')
         self.update()
     def update(self):
         self._changeDirToSource()
-        runBash('git checkout master')
-        runBash('git pull')
-        runBash('git checkout v5.8.0')   # needed for gcc 4.6, not good on non-linux
+        runShell('git checkout master')
+        runShell('git pull')
+        runShell('git checkout v5.8.0')   # needed for gcc 4.6, not good on non-linux
 
     def configure(self):
         '''
 Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-collection (!)
 '''
         self._changeDirToBuild()
-        runBash('''\
+        runShell('''\
 \cmake \
--G"Eclipse CDT4 - Unix Makefiles" \
+-G"%s" \
 %s \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DVTK_USE_PARALLEL:BOOL=ON \
@@ -311,7 +359,8 @@ Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-c
 -DVTK_USE_QVTK:BOOL=ON \
 -DVTK_USE_RPATH:BOOL=ON \
 -DDESIRED_QT_VERSION:STRING=4 \
-../%s''' % (DATA.m32bitCompileCMakeOption, 
+../%s''' % (DATA.mCMakeGenerator,
+            DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildExAndTest,
             DATA.mBuildExAndTest,
@@ -330,25 +379,26 @@ class OpenCV(CppComponent):
         return DATA.mExternalDir + "/OpenCV"
     def _rawCheckout(self):
         self._changeDirToBase()
-#    	runBash('svn co https://code.ros.org/svn/opencv/trunk/opencv OpenCV')
-#        runBash('svn co https://code.ros.org/svn/opencv/branches/2.3/opencv OpenCV') #old location
-        #runBash('svn co http://code.opencv.org/svn/opencv/branches/2.3/opencv OpenCV')
-        runBash('svn co http://code.opencv.org/svn/opencv/branches/2.4/opencv OpenCV') #new version for lion compatibility
+#        runShell('svn co https://code.ros.org/svn/opencv/trunk/opencv OpenCV')
+#        runShell('svn co https://code.ros.org/svn/opencv/branches/2.3/opencv OpenCV') #old location
+        #runShell('svn co http://code.opencv.org/svn/opencv/branches/2.3/opencv OpenCV')
+        runShell('svn co http://code.opencv.org/svn/opencv/branches/2.4/opencv OpenCV') #new version for lion compatibility
 
     def update(self):
         pass
     def configure(self):
         self._changeDirToBuild()
-        runBash('''\
+        runShell('''\
 cmake \
--G"Eclipse CDT4 - Unix Makefiles" \
+-G"%s" \
 %s \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DBUILD_EXAMPLES:BOOL=%s \
 -DBUILD_TESTS:BOOL=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DWITH_CUDA:BOOL=OFF \
-../%s''' % (DATA.m32bitCompileCMakeOption, 
+../%s''' % (DATA.mCMakeGenerator,
+            DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildExAndTest,
             DATA.mBuildExAndTest,
@@ -366,20 +416,21 @@ class OpenIGTLink(CppComponent):
         return DATA.mExternalDir + "/OpenIGTLink"
     def _rawCheckout(self):
         self._changeDirToBase()
-        runBash('svn co http://svn.na-mic.org/NAMICSandBox/trunk/OpenIGTLink OpenIGTLink')
+        runShell('svn co http://svn.na-mic.org/NAMICSandBox/trunk/OpenIGTLink OpenIGTLink')
     def update(self):
         pass
     def configure(self):
         self._changeDirToBuild()
-        runBash('''\
+        runShell('\
 cmake \
--G"Eclipse CDT4 - Unix Makefiles" \
+-G"%s" \
 %s \
 -DCMAKE_BUILD_TYPE:STRING=%s \
--DIGSTK_BUILD_EXAMPLES:BOOL=%s \
+-DBUILD_EXAMPLES:BOOL=%s \
 -DBUILD_TESTING:BOOL=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
-../%s''' % (DATA.m32bitCompileCMakeOption, 
+../%s' % (DATA.mCMakeGenerator,
+            DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildExAndTest,
             DATA.mBuildExAndTest,
@@ -397,35 +448,35 @@ class IGSTK(CppComponent):
         return DATA.mExternalDir + "/IGSTK"
     def _rawCheckout(self):
         self._changeDirToBase()
-        runBash('git clone git://igstk.org/IGSTK.git') #from v5.0 igstk is now available using git
-        #runBash('''\
+        runShell('git clone git://igstk.org/IGSTK.git') #from v5.0 igstk is now available using git
+        #runShell('''\
 #cvs -d :pserver:anonymous:igstk@public.kitware.com:/cvsroot/IGSTK login
 #cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/IGSTK checkout -r "IGSTK-4-4" IGSTK
 #cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/IGSTK logout
 #''')
     def update(self):
         self._changeDirToSource()
-        runBash('git checkout v5.0')
-        runBash('git checkout -B cx_mod_for_50')
+        runShell('git checkout v5.0')
+        runShell('git checkout -B cx_mod_for_50')
 #        print 'git am --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch' % (CustusX3().path(), CustusX3().sourceFolder())
-        runBash(('git am --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
+        runShell(('git am --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
                 # this substitution removes compilation of the dysfuct lib that we don't use.
         # Fedora 16 note: try adding "" between -i and s/ if you encounter problems...
-        #runBash('''\
+        #runShell('''\
 #sed -i s/'SUBDIRS( SceneGraphVisualization )'/'#SUBDIRS( SceneGraphVisualization )'/g Utilities/CMakeLists.txt
 #''')
         if DATA.mUseGCC46:
             pass
         # this substitution makes IGSTK 4.4 work with ITK 4.0
             # Fedora 16 note: try adding "" between -i and s/ if you encounter problems...
-            #runBash('''\
+            #runShell('''\
 #sed -i "" s/'ITKIO ITKBasicFilters ITKNumerics ITKCommon ITKSpatialObject'/'${ITK_LIBRARIES}'/g Source/CMakeLists.txt
 #''')
     def configure(self):
         self._changeDirToBuild()
-        runBash('''\
+        runShell('''\
 cmake \
--G"Eclipse CDT4 - Unix Makefiles" \
+-G"%s" \
 %s \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DIGSTK_USE_SceneGraphVisualization:BOOL=OFF \
@@ -444,7 +495,8 @@ cmake \
 -DIGSTK_SERIAL_PORT_5="/Library/CustusX/igstk.links/cu.CustusX.dev5" \
 -DIGSTK_SERIAL_PORT_6="/Library/CustusX/igstk.links/cu.CustusX.dev6" \
 -DIGSTK_SERIAL_PORT_7="/Library/CustusX/igstk.links/cu.CustusX.dev7" \
-../%s''' % (DATA.m32bitCompileCMakeOption, 
+../%s''' % (DATA.mCMakeGenerator,
+            DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildShared, 
             ITK().buildPath(), 
@@ -472,28 +524,29 @@ class DCMTK(CppComponent):
 
     def _rawCheckout(self):
         self._changeDirToBase()
-        runBash('git clone git://git.dcmtk.org/dcmtk DCMTK')
+        runShell('git clone git://git.dcmtk.org/dcmtk DCMTK')
         # the commontk version of DCMTK compiles without problems on Mac.
-#        runBash('git clone git://github.com/commontk/DCMTK.git DCMTK')
+#        runShell('git clone git://github.com/commontk/DCMTK.git DCMTK')
         
         self.update()
     def update(self):
         self._changeDirToSource()
-        runBash('git pull')
-#        runBash('git checkout master')   
-        runBash('git checkout PUBLIC_360')  # 3.6.0 seems to have some issues on fedora 16.  
+        runShell('git pull')
+#        runShell('git checkout master')   
+        runShell('git checkout PUBLIC_360')  # 3.6.0 seems to have some issues on fedora 16.  
 
     def configure(self):
         self._changeDirToBuild()
-        runBash('''\
+        runShell('''\
 \cmake \
--G"Eclipse CDT4 - Unix Makefiles" \
+-G"%s" \
 -DBUILD_SHARED_LIBS:BOOL=%s \
-../%s''' % (DATA.mBuildShared, 
+../%s''' % (DATA.mCMakeGenerator,
+            DATA.mBuildShared, 
             self.sourceFolder()))
     def build(self):
         CppComponent.build(self)
-        runBash('sudo make install')
+        runShell('sudo make install')
     def installPath(self):
         #return '/usr/local/include/dcmtk'
         return '' # ignore: use yum instead
@@ -508,24 +561,29 @@ class SSC(CppComponent):
         return DATA.mWorkingDir + "/SSC"
     def _rawCheckout(self):
         self._changeDirToBase()
-#        runBash('svn co https://wush.net/svn/ssc %s' % self.sourceFolder())
-        runBash('git clone git@github.com:SINTEFMedisinskTeknologi/SSC.git')
+#        runShell('svn co https://wush.net/svn/ssc %s' % self.sourceFolder())
+        runShell('git clone git@github.com:SINTEFMedisinskTeknologi/SSC.git')
     def update(self):
         self._changeDirToSource()
-        runBash('git pull')
-        runBash('git checkout')   
-#        runBash('svn up')
+        runShell('git pull')
+        runShell('git checkout')   
+#        runShell('svn up')
     def configure(self):
         self._changeDirToBuild()
-        runBash('''\
+        runShell('''\
 cmake \
 -G"%s" \
 %s \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DVTK_DIR:PATH="%s" \
-../%s''' % (DATA.mCMakeGenerator, DATA.m32bitCompileCMakeOption, DATA.mBuildType, DATA.mBuildShared, VTK().buildPath(), self.sourceFolder())
-                    )
+../%s''' % (DATA.mCMakeGenerator, 
+            DATA.m32bitCompileCMakeOption, 
+            DATA.mBuildType, 
+            DATA.mBuildShared, 
+            VTK().buildPath(), 
+            self.sourceFolder())
+            )
         # add xcode project here if needed
     # ---------------------------------------------------------
 
@@ -538,23 +596,23 @@ class CustusX3(CppComponent):
         return DATA.mWorkingDir + "/CustusX3"
     def _rawCheckout(self):
         self._changeDirToBase()
-#        runBash('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
-        runBash('git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
-        #runBash('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
+#        runShell('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
+        runShell('git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
+        #runShell('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
         self._changeDirToSource()
-#        runBash('git submodule init')
-#        runBash('git submodule update')
-        runBash('git submodule update --init --recursive externals/ssc')
-        runBash('git submodule update --init --recursive data')
-        #runBash('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/CustusX3' % DATA.mServerUser)
+#        runShell('git submodule init')
+#        runShell('git submodule update')
+        runShell('git submodule update --init --recursive externals/ssc')
+        runShell('git submodule update --init --recursive data')
+        #runShell('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/CustusX3' % DATA.mServerUser)
     def update(self):
         self._changeDirToSource()
-        runBash('git checkout master')
-        runBash('git pull')
-        runBash('git submodule update')
+        runShell('git checkout master')
+        runShell('git pull')
+        runShell('git submodule update')
     def configure(self):
         self._changeDirToBuild()
-        runBash('''\
+        runShell('''\
 cmake \
 -G"%s" \
 %s \
@@ -566,10 +624,17 @@ cmake \
 -DIGSTK_DIR:PATH="%s" \
 -DOpenIGTLink_DIR:PATH="%s" \
 -DOpenCV_DIR:PATH="%s" \
-../%s''' % (DATA.mCMakeGenerator, DATA.m32bitCompileCMakeOption, DATA.mBuildType, DATA.mBuildShared, ITK().buildPath(), VTK().buildPath(), IGSTK().buildPath(), OpenIGTLink().buildPath(), OpenCV().buildPath(), 
-#DCMTK().installPath(), 
-self.sourceFolder() )
-                    )
+../%s''' % (DATA.mCMakeGenerator, 
+            DATA.m32bitCompileCMakeOption, 
+            DATA.mBuildType, DATA.mBuildShared, 
+            ITK().buildPath(), 
+            VTK().buildPath(), 
+            IGSTK().buildPath(), 
+            OpenIGTLink().buildPath(), 
+            OpenCV().buildPath(), 
+            #DCMTK().installPath(), 
+            self.sourceFolder() )
+            )
         # add xcode project here if needed
 # ---------------------------------------------------------
 
@@ -584,10 +649,10 @@ class CustusX3Data(Component):
         return 'data'
     def _rawCheckout(self):
         changeDir(self.path())
-        runBash('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/data' % DATA.mServerUser)
+        runShell('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/data' % DATA.mServerUser)
     def update(self):
         changeDir(self.path()+'/'+self.sourceFolder())
-        runBash('svn up')
+        runShell('svn up')
     def configure(self):
         pass
     def build(self):
@@ -595,20 +660,20 @@ class CustusX3Data(Component):
 # ---------------------------------------------------------
 
 
-class Controller():
+class Controller(object):
     '''
-A command line program that parses options and arguments,
-then performs the requested operations on the selected
-components.
-'''
+    A command line program that parses options and arguments,
+    then performs the requested operations on the selected
+    components.
+    '''
     def __init__(self):
         '''
-initialize and run the controller
-'''
+    Initialize and run the controller
+    '''
         self.libraries = [
                      ITK(),
                      VTK(),
-					 OpenCV(),
+                     OpenCV(),
                      OpenIGTLink(),
                      IGSTK(),
                      #DCMTK(),
@@ -635,14 +700,14 @@ Available components are:
         p = optparse.OptionParser(description=description,
                                     version='%prog version 0.2',
                                     usage= '%prog [options] [components]')
-# p.add_option('--verbose', '-v',
-# action = 'store_true',
-# help='prints verbosely',
-# default=False)
-# p.add_option('--ignore-existing', '-i',
-# action='store_true',
-# help='ignore components already created',
-# default=False)
+        # p.add_option('--verbose', '-v',
+        #             action = 'store_true',
+        #             help='prints verbosely',
+        #             default=False)
+        # p.add_option('--ignore-existing', '-i',
+        #             action='store_true',
+        #             help='ignore components already created',
+        #             default=False)
         p.add_option('--checkout', '--co',
                      action='store_true',
                      help='checkout all selected components',
@@ -686,6 +751,7 @@ Available components are:
                      action='store_true',
                      help='build 32 bit',
                      default=False)
+        #TODO create option to select cmake 
         p.add_option('--xcode',
                      action='store_true',
                      help='generate xcode targets',
@@ -708,10 +774,6 @@ Available components are:
                      action='store_true',
                      help='execute script without calling any shell commands',
                      default=False)
-#        p.add_option('--release', '-r',
-#                     action='store_true',
-#                     help='build release mode',
-#                     default=False)
         p.add_option('--build_type', '-t',
                      action='store',
                      type='string',
@@ -721,22 +783,21 @@ Available components are:
     
     def _parseCommandLine(self):
         '''
-parse the options and arguments from the command line
-'''
+        Parse the options and arguments from the command line
+        '''
         options, arguments = self.optionParser.parse_args()
-        DATA.options = options
-        
-# if options.basic:
-# downloadDiskImages()
-# return
-# if options.verbose:
-# bash.VERBOSE = True
+        DATA.options = options     
+        # if options.basic:
+        # downloadDiskImages()
+        # return
+        # if options.verbose:
+        # shell.VERBOSE = True
         if options.dummy:
             print 'Running DUMMY mode: no shell executed.'
-            bash.DUMMY = True
+            shell.DUMMY = True
         if options.password:
             print 'Set password (not working well): ', options.password
-            bash.password = options.password
+            shell.password = options.password
         if options.user:
             print 'Set server user: ', options.user
             DATA.mServerUser = options.user
@@ -752,9 +813,6 @@ parse the options and arguments from the command line
             DATA.mCMakeGenerator = "Xcode"
             DATA.mBuildFolder = DATA.mBuildFolder + "_xcode"
             print 'Generate xcode'
-#        if options.release:
-#            DATA.mBuildType = "Release"
-#            print 'Build Release'
             
         DATA.mBuildType = options.build_type
         DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType
@@ -774,8 +832,8 @@ parse the options and arguments from the command line
 
     def _performRequestedOperations(self, options, useLibs):
         '''
-checkout, configure, build
-'''
+        checkout, configure, build
+        '''
         # info
         print 'User:', DATA.mUser
         print 'Server User:', DATA.mServerUser
