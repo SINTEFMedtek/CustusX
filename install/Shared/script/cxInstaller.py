@@ -339,7 +339,7 @@ Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-c
 '''
         self._changeDirToBuild()
         runShell('''\
-\cmake \
+cmake \
 -G"%s" \
 %s \
 -DCMAKE_BUILD_TYPE:STRING=%s \
