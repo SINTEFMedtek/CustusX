@@ -210,11 +210,12 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
 
 	std::vector<ssc::ImagePtr> images;
 
-	QString imageFilename;
-	foreach (imageFilename, imageFilenames)
+	double numImages = imageFilenames.size();
+	for (int i = 0; i < numImages; ++i)
 	{
-		ssc::ImagePtr image = loadImage(imageFilename);
-		image->getTransferFunctions3D()->setLLR(25.0);
+		ssc::ImagePtr image = loadImage(imageFilenames[i]);
+		image->getTransferFunctions3D()->setLLR(35.0);
+		image->getTransferFunctions3D()->setAlpha((i / numImages) + .02); // First image most transparent
 		images.push_back(image);
 	}
 
@@ -232,7 +233,7 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
 	toolRep->setTool(tool);
 	view->addRep(toolRep);
 	
-	insertView(view, uid, imageFilename, r, c);
+	insertView(view, uid, imageFilenames[0], r, c);
 }
 
 void ViewsWindow::start(bool showSliders)

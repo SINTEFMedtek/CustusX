@@ -48,6 +48,7 @@ void TestVisualRendering::setUp()
 	//	image.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	image.push_back("Person5/person5_t2_byte.mhd");
 	image.push_back("Person5/person5_mra_byte.mhd");
+	image.push_back("DTI/dti_eigenvector_rgb.mhd");
 }
 
 void TestVisualRendering::tearDown()
@@ -98,7 +99,16 @@ void TestVisualRendering::test_3D_Tool()
 void TestVisualRendering::test_3D_Tool_GPU()
 {
 	widget->setDescription("3D Volume, moving tool");
-	widget->define3DGPU(image, 0, 0);
+	QStringList images; images << image[1] << image[2];
+	widget->define3DGPU(images, 0, 0);
+
+	CPPUNIT_ASSERT(runWidget());
+}
+
+void TestVisualRendering::test_3D_RGB_GPU()
+{
+	widget->setDescription("3D RGB Volume");
+	widget->define3DGPU(QStringList(image[3]), 0, 0);
 
 	CPPUNIT_ASSERT(runWidget());
 }
