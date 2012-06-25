@@ -219,7 +219,7 @@ protected:
   int FrameRate;
   int AcquisitionDataType;
   int ImagingMode;
-  bool firstConnect; ///< Is this the first time we try to connect to Sonix
+  bool mFirstConnect; ///< Is this the first time we try to connect to Sonix
   
   char *SonixHostIP;
 
