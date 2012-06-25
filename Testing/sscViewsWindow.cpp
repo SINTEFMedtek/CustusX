@@ -10,6 +10,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkCamera.h"
+#include "vtkLookupTable.h"
 
 #include "sscTestUtilities.h"
 #include "sscDataManager.h"
@@ -48,6 +49,18 @@ namespace {
 	}
 }
 
+vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueRangeMin, double hueRangeMax,
+	double saturationRangeMin, double saturationRangeMax, double valueRangeMin, double valueRangeMax)
+{
+	vtkLookupTablePtr lut = vtkLookupTablePtr::New();
+	lut->SetTableRange(tableRangeMin, tableRangeMax);
+	lut->SetHueRange(hueRangeMin, hueRangeMax);
+	lut->SetSaturationRange(saturationRangeMin, saturationRangeMax);
+	lut->SetValueRange(valueRangeMin, valueRangeMax);
+	lut->Build();
+
+	return lut;
+}
 
 ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
 {
@@ -176,13 +189,20 @@ void ViewsWindow::insertView(ssc::View* view, const QString& uid, const QString&
 	layout->addWidget(new QLabel(uid+" "+volume, this));
 }
 
-void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
+void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c)
 {
 	QString uid = "3D";
 	ssc::View* view = new ssc::View(centralWidget());
 	mLayouts.insert(view);
 	
 	ssc::ImagePtr image = loadImage(imageFilename);
+
+	if (parameters != NULL)
+	{
+		image->getTransferFunctions3D()->setLLR(parameters->llr);
+		image->getTransferFunctions3D()->setAlpha(parameters->alpha);
+		image->getTransferFunctions3D()->setLut(parameters->lut);
+	}
 
 	// volume rep
 	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image->getUid() );
@@ -202,7 +222,7 @@ void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 	insertView(view, uid, imageFilename, r, c);
 }
 
-void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
+void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c)
 {
 	QString uid = "3D";
 	ssc::View* view = new ssc::View(centralWidget());
@@ -214,8 +234,12 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
 	for (int i = 0; i < numImages; ++i)
 	{
 		ssc::ImagePtr image = loadImage(imageFilenames[i]);
-		image->getTransferFunctions3D()->setLLR(35.0);
-		image->getTransferFunctions3D()->setAlpha((i / numImages) + .02); // First image most transparent
+		if (parameters != NULL)
+		{
+			image->getTransferFunctions3D()->setLLR(parameters[i].llr);
+			image->getTransferFunctions3D()->setAlpha(parameters[i].alpha); // First image most transparent
+			image->getTransferFunctions3D()->setLut(parameters[i].lut);
+		}
 		images.push_back(image);
 	}
 
