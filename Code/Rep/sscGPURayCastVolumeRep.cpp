@@ -83,11 +83,11 @@ double maxIntensity(vtkImageDataPtr image)
 	int dim[3];
 	image->GetDimensions(dim);
 	double max = -1000;
-	for(int x = dim[0]; x >= 0; --x)
+	for(int x = dim[0] - 1; x >= 0; --x)
 	{
-		for(int y = dim[1]; y >= 0; --y)
+		for(int y = dim[1] - 1; y >= 0; --y)
 		{
-			for(int z = dim[2]; z >= 0; --z)
+			for(int z = dim[2] - 1; z >= 0; --z)
 			{
 				double value = image->GetScalarComponentAsDouble(x, y, z, 0) + image->GetScalarComponentAsDouble(x, y, z, 1) + image->GetScalarComponentAsDouble(x, y, z, 2);
 				value /= 3;
