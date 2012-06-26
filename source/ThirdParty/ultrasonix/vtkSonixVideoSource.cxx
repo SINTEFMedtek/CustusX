@@ -162,6 +162,8 @@ vtkSonixVideoSource::vtkSonixVideoSource()
 
   lastRoiUlx = 0;
   lastRoiBry = 0;
+
+  mFirstConnect = true;
 }
 
 //----------------------------------------------------------------------------
@@ -549,9 +551,18 @@ void vtkSonixVideoSource::Initialize()
 	HWND phandle = FindWindow(NULL, "Sonix: No connections");
 	if(phandle)
 	{
-		std::cout << "Found Sonix window. Waiting 15 sec to connect" << std::endl;
-		//Need to delay to make sure the Sonix exam is finished initializing...
-		vtksys::SystemTools::Delay(15000);
+		if (mFirstConnect)
+		{
+			std::cout << "Found Sonix window. First connect - Waiting 30 sec to connect" << std::endl;
+			//Need to delay to make sure the Sonix exam is finished initializing...
+			vtksys::SystemTools::Delay(30000);
+			mFirstConnect = false;
+		}
+		else
+		{
+			std::cout << "Found Sonix window. Reconnect - Waiting 15 sec to connect" << std::endl;
+			vtksys::SystemTools::Delay(15000);
+		}
 	} else 
 	{
 		//std::cout << "Didn't find Sonix window" << std::endl;
