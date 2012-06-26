@@ -253,8 +253,10 @@ void GPURayCastVolumeRep::updateColorAttributeSlot()
 	{
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData() ;
 
-		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getBaseLookupTable();
-		ssc::GPUImageLutBufferPtr lutBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
+		vtkLookupTablePtr lut = mImages[i]->getTransferFunctions3D()->getLut();
+
+		ssc::GPUImageLutBufferPtr lutBuffer;
+		if (lut) lutBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
 
 		// no lut indicates to the fragment shader that RGBA should be used
 		if (inputImage->GetNumberOfScalarComponents()==1)
