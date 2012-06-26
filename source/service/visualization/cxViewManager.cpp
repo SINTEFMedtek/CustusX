@@ -93,6 +93,7 @@ ViewManager::ViewManager() :
 {
 	mRenderTimer.reset(new RenderTimer);
 	mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
+//	mSlicePlanesProxy->getProperties().m3DFontSize = 50;
 
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
@@ -289,6 +290,11 @@ void ViewManager::addXml(QDomNode& parentNode)
 
 		mViewGroups[i]->addXml(viewGroupNode);
 	}
+
+	QDomElement clippedImageNode = doc.createElement("clippedImage");
+	QString clippedImage = (mInteractiveClipper->getImage()) ? mInteractiveClipper->getImage()->getUid() : "";
+	clippedImageNode.appendChild(doc.createTextNode(clippedImage));
+	viewManagerNode.appendChild(clippedImageNode);
 }
 
 void ViewManager::parseXml(QDomNode viewmanagerNode)
@@ -318,6 +324,12 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 			//set active view after all viewgroups are properly set up
 			//if(!activeViewString.isEmpty())
 			//this->setActiveView(getViewWrapper(activeViewString.toStdString()));
+		}
+		else if (child.toElement().tagName() == "clippedImage")
+		{
+			QString clippedImage = child.toElement().text();
+			std::cout << "ClippedImage  " << clippedImage << std::endl;
+			mInteractiveClipper->setImage(ssc::dataManager()->getImage(clippedImage));
 		}
 		child = child.nextSibling();
 	}

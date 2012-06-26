@@ -33,6 +33,7 @@ BoundingBoxWidget::BoundingBoxWidget(QWidget* parent) :
 		mRange[i] = new SliderRangeGroupWidget(this);
 		mRange[i]->setName(caption[i]);
 		mRange[i]->setRange(ssc::DoubleRange(-2000, 2000, 1));
+		mRange[i]->setDecimals(0);
 		connect(mRange[i], SIGNAL(valueChanged(double,double)), this, SIGNAL(changed()));
 		layout->addWidget(mRange[i]);
 	}

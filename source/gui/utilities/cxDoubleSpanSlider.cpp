@@ -5,6 +5,7 @@
  *      \author christiana
  */
 #include "cxDoubleSpanSlider.h"
+#include <QDoubleSpinBox>
 
 namespace cx
 {
@@ -36,9 +37,14 @@ SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent) : QWidget(parent
   //mLabel->setText(mData->getValueName());
   topLayout->addWidget(mLabel);
 
-  mLowerEdit = new ssc::DoubleLineEdit(this);
+//  mLowerEdit = new ssc::DoubleLineEdit(this);
+//  topLayout->addWidget(mLowerEdit);
+//  connect(mLowerEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
+
+  mLowerEdit = new QDoubleSpinBox(this);
   topLayout->addWidget(mLowerEdit);
-  connect(mLowerEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
+  connect(mLowerEdit, SIGNAL(valueChanged(double)), this, SLOT(textEditedSlot()));
+
 
   mSpanSlider = new DoubleSpanSlider(this);
   mSpanSlider->setOrientation(Qt::Horizontal);
@@ -50,9 +56,13 @@ SliderRangeGroupWidget::SliderRangeGroupWidget(QWidget* parent) : QWidget(parent
   // connect to slider
   connect(mSpanSlider, SIGNAL(doubleSpanChanged(double, double)), this, SLOT(doubleSpanChangedSlot(double, double)));
 
-  mUpperEdit = new ssc::DoubleLineEdit(this);
+//  mUpperEdit = new ssc::DoubleLineEdit(this);
+//  topLayout->addWidget(mUpperEdit);
+//  connect(mUpperEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
+
+  mUpperEdit = new QDoubleSpinBox(this);
   topLayout->addWidget(mUpperEdit);
-  connect(mUpperEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
+  connect(mUpperEdit, SIGNAL(valueChanged(double)), this, SLOT(textEditedSlot()));
 
 //  mSlider = new ssc::DoubleSlider(this);
 //  mSlider->setOrientation(Qt::Horizontal);
@@ -68,6 +78,18 @@ void SliderRangeGroupWidget::setRange(const ssc::DoubleRange& range)
 {
 //  std::cout << "SliderRangeGroupWidget::setRange " << mLabel->text() << " " << range.min() <<  "," << range.max() << std::endl;
   mSpanSlider->setDoubleRange(range);
+
+  mLowerEdit->setRange(range.min(), range.max());
+  mLowerEdit->setSingleStep(range.step());
+//  mLowerEdit->setDecimals(mData->getValueDecimals());
+  mUpperEdit->setRange(range.min(), range.max());
+  mUpperEdit->setSingleStep(range.step());
+}
+
+void SliderRangeGroupWidget::setDecimals(int decimals)
+{
+	mLowerEdit->setDecimals(decimals);
+	mUpperEdit->setDecimals(decimals);
 }
 
 void SliderRangeGroupWidget::setValue(std::pair<double,double> val)
@@ -90,7 +112,7 @@ void SliderRangeGroupWidget::doubleSpanChangedSlot(double lower, double upper)
 
 void SliderRangeGroupWidget::textEditedSlot()
 {
-  mValue = std::make_pair(mLowerEdit->getDoubleValue(0), mUpperEdit->getDoubleValue(0));
+  mValue = std::make_pair(mLowerEdit->value(), mUpperEdit->value());
   dataChanged(mValue);
   emit valueChanged(mValue.first, mValue.second);
 }
@@ -103,8 +125,8 @@ void SliderRangeGroupWidget::dataChanged(std::pair<double,double> val)
 
   mSpanSlider->setDoubleLowerValue(val.first);
   mSpanSlider->setDoubleUpperValue(val.second);
-  mLowerEdit->setDoubleValue(val.first);
-  mUpperEdit->setDoubleValue(val.second);
+  mLowerEdit->setValue(val.first);
+  mUpperEdit->setValue(val.second);
 
   mSpanSlider->blockSignals(false);
   mLowerEdit->blockSignals(false);

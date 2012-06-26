@@ -34,7 +34,7 @@ PlaybackTime::PlaybackTime()
 	mTimer->setInterval(40);
 }
 
-void PlaybackTime::initialize(QDateTime start, int length)
+void PlaybackTime::initialize(QDateTime start, qint64 length)
 {
 	this->stop();
 	mStartTime = start;
@@ -78,12 +78,12 @@ void PlaybackTime::pause()
 	this->timeoutSlot();
 }
 
-int PlaybackTime::getOffset() const
+qint64 PlaybackTime::getOffset() const
 {
 	if (mTimer->isActive())
 	{
 		// find the offset from the last start to now.
-		int offset = mPlayStart.msecsTo(QDateTime::currentDateTime());
+		qint64 offset = mPlayStart.msecsTo(QDateTime::currentDateTime());
 		return mLastPlayOffset + mSpeed * offset;
 	}
 	else
@@ -115,17 +115,17 @@ void PlaybackTime::timeoutSlot()
 }
 
 
-void PlaybackTime::forward(int msecs)
+void PlaybackTime::forward(qint64 msecs)
 {
 	this->moveOffset(msecs);
 }
 
-void PlaybackTime::rewind(int msecs)
+void PlaybackTime::rewind(qint64 msecs)
 {
 	this->moveOffset(-msecs);
 }
 
-void PlaybackTime::moveOffset(int delta)
+void PlaybackTime::moveOffset(qint64 delta)
 {
 	this->setOffset(this->getOffset()+delta);
 }
@@ -162,7 +162,7 @@ struct TemporaryPausePlay
 	PlaybackTime* mBase;
 };
 
-void PlaybackTime::setOffset(int val)
+void PlaybackTime::setOffset(qint64 val)
 {
 	if (val==mOffset)
 		return;
@@ -172,14 +172,14 @@ void PlaybackTime::setOffset(int val)
 //	if (playing)
 //		this->stop();
 
-	mOffset = std::max(0, val);
+	mOffset = std::max<quint64>(0, val);
 	this->timeoutSlot();
 
 //	if (playing)
 //		this->start();
 }
 
-int PlaybackTime::getLength() const
+qint64 PlaybackTime::getLength() const
 {
 	return mLength;
 }
@@ -200,12 +200,12 @@ double PlaybackTime::getSpeed() const
 	return mSpeed;
 }
 
-void PlaybackTime::setResolution(int val)
+void PlaybackTime::setResolution(qint64 val)
 {
 	mTimer->setInterval(val);
 }
 
-double PlaybackTime::getResolution(int val)
+double PlaybackTime::getResolution()
 {
 	return mTimer->interval();
 }

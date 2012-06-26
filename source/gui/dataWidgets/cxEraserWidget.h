@@ -49,19 +49,31 @@ public:
 
 	virtual ~EraserWidget();
 private:
-	QCheckBox* mShowSphereCheckBox;
-	vtkSphereWidgetPtr mEraserSphere;
+	QCheckBox* mContinousEraseCheckBox;
+	vtkSphereSourcePtr mSphere;
 	QCheckBox* mShowEraserCheckBox;
 	ssc::DoubleDataAdapterXmlPtr mSphereSizeAdapter;
+	QAction* mDuplicateAction;
+	QAction* mSaveAction;
+	QAction* mRemoveAction;
+	QWidget* mSphereSize;
 
+	void enableButtons();
 	template <class TYPE>
 	void eraseVolume(TYPE* volumePointer, TYPE replaceVal);
 
+	QTimer* mContinousEraseTimer;
+
+	ssc::Vector3D mPreviousCenter;
+	double mPreviousRadius;
+
 private slots:
 	void toggleShowEraser(bool on);
-//	void testSlot();
+	void toggleContinous(bool on);
 	void saveSlot();
 	void removeSlot();
+	void continousRemoveSlot();
+	void duplicateSlot();
 	void sphereSizeChangedSlot();
 };
 

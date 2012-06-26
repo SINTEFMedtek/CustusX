@@ -76,3 +76,18 @@ include_directories(
     
 target_link_libraries(cxUtilities SSC sscUS3DReconstruction ${QT_LIBRARIES} cxSettings )
 
+#------------------------------------------------------------------------------
+# Cotire - pch and unity builds
+#------------------------------------------------------------------------------
+if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+    cotire(cxUtilities)
+    if(COTIRE_ADD_UNITY_BUILDS)
+        target_link_libraries(cxUtilities_unity 
+        		SSC 
+        		sscUS3DReconstruction 
+        		${QT_LIBRARIES} 
+        		cxSettings
+        		)
+    endif(COTIRE_ADD_UNITY_BUILDS)
+endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+
