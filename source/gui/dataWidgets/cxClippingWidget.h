@@ -5,6 +5,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscStringDataAdapter.h"
 //#include "cxViewManager.h"
+#include "cxDataInterface.h"
 class QCheckBox;
 
 namespace cx
@@ -65,10 +66,12 @@ private:
 	QCheckBox* mUseClipperCheckBox;
 	QCheckBox* mInvertPlaneCheckBox;
 	ssc::StringDataAdapterPtr mPlaneAdapter;
+	SelectImageStringDataAdapterPtr mImageAdapter;
 private slots:
 	void clipperChangedSlot();
 	void clearButtonClickedSlot();
 	void saveButtonClickedSlot();
+	void imageChangedSlot();
 };
 
 /**

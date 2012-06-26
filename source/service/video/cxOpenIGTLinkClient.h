@@ -34,6 +34,19 @@ namespace cx
  * @{
  */
 
+class AbsDoubleLess
+{
+public:
+	AbsDoubleLess(double center) : mCenter(center) { };
+
+  bool operator()(const double& d1, const double& d2)
+  {
+    return fabs(d1 - mCenter) < fabs(d2 - mCenter);
+  }
+
+  double mCenter;
+};
+
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
 
 /**\brief Client thread for OpenIGTLink messaging.
@@ -72,8 +85,10 @@ private:
 	cx::RenderTimer mFPSTimer;
 	bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
+	void calibrateTimeStamp(igtl::ImageMessage::Pointer imgMsg);
 	void addImageToQueue(igtl::ImageMessage::Pointer imgMsg);
 	void addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg);
+	bool readOneMessage();
 
 	bool mHeadingReceived;
 	QString mAddress;
@@ -86,6 +101,12 @@ private:
 	QMutex mSonixStatusMutex;
 	std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue;
 	std::list<IGTLinkUSStatusMessage::Pointer> mMutexedSonixStatusMessageQueue;
+
+	bool calibrateMsgTimeStamp;///< Should the time stamps of image messages be calibrated based on the computer clock
+	double mLastReferenceTimestampDiff;
+	bool mGeneratingTimeCalibration;
+	QDateTime mLastSyncTime;
+	std::vector<double> mLastTimeStamps;
 
 };
 

@@ -52,7 +52,7 @@ public:
 protected slots:
 
 	void registerSlot();
-	virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
+	virtual void fixedDataChanged(); ///< listens to the datamanager for when the active image is changed
 	void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
 	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
 	void removeLandmarkButtonClickedSlot();

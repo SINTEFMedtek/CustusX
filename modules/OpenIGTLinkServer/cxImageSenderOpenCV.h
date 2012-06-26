@@ -71,6 +71,9 @@ private:
 	IGTLinkImageMessage::Pointer getImageMessage();
 	void dumpProperty(int val, QString name);
 
+	void initialize_local();
+	void deinitialize_local();
+
 	cv::VideoCapture mVideoCapture; // OpenCV video grabber
 	QDateTime mLastGrabTime;
 

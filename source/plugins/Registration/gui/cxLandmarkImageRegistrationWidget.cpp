@@ -165,13 +165,28 @@ void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
 void LandmarkImageRegistrationWidget::enableButtons()
 {
 	bool selected = !mLandmarkTableWidget->selectedItems().isEmpty();
-	bool tracking = ssc::toolManager()->getDominantTool() && !ssc::toolManager()->getDominantTool()->hasType(ssc::Tool::TOOL_MANUAL)
-		&& ssc::toolManager()->getDominantTool()->getVisible();
+//	bool tracking = ssc::toolManager()->getDominantTool() && !ssc::toolManager()->getDominantTool()->hasType(ssc::Tool::TOOL_MANUAL)
+//		&& ssc::toolManager()->getDominantTool()->getVisible();
 	bool loaded = ssc::dataManager()->getActiveImage() != 0;
 
-	mEditLandmarkButton->setEnabled(selected && !tracking);
-	mRemoveLandmarkButton->setEnabled(selected && !tracking);
-	mAddLandmarkButton->setEnabled(loaded && !tracking);
+	// you might want to add landmarks using the tracking pointer in rare cases.
+	// Thus is must be allowed to do that.
+//	mEditLandmarkButton->setEnabled(selected && !tracking);
+//	mRemoveLandmarkButton->setEnabled(selected && !tracking);
+//	mAddLandmarkButton->setEnabled(loaded && !tracking);
+
+	mEditLandmarkButton->setEnabled(selected);
+	mRemoveLandmarkButton->setEnabled(selected);
+	mAddLandmarkButton->setEnabled(loaded);
+
+	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	if (image)
+	{
+		mAddLandmarkButton->setToolTip(QString("Add landmark to image %1").arg(image->getName()));
+		mEditLandmarkButton->setToolTip(QString("Resample landmark in image %1").arg(image->getName()));
+	}
+
+
 }
 
 void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)

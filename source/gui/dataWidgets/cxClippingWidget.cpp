@@ -15,6 +15,7 @@
 #include "sscDefinitionStrings.h"
 #include "cxInteractiveClipper.h"
 #include "cxViewManager.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
@@ -65,9 +66,14 @@ ClippingWidget::ClippingWidget(QWidget* parent) :
 	mInteractiveClipper = viewManager()->getClipper();
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
 
-	  this->setToolTip(this->defaultWhatsThis());
+	mImageAdapter = SelectImageStringDataAdapter::New();
+	ssc::LabeledComboBoxWidget* imageCombo = new ssc::LabeledComboBoxWidget(this, mImageAdapter);
+	connect(mImageAdapter.get(), SIGNAL(changed()), this, SLOT(imageChangedSlot()));
+//	mImageAdapter->setValue();
 
-	  QVBoxLayout* layout = new QVBoxLayout(this);
+	this->setToolTip(this->defaultWhatsThis());
+
+	QVBoxLayout* layout = new QVBoxLayout(this);
 
 	QGroupBox* activeClipGroupBox = new QGroupBox("Interactive clipper");
 	activeClipGroupBox->setToolTip(this->defaultWhatsThis());
@@ -81,6 +87,7 @@ ClippingWidget::ClippingWidget(QWidget* parent) :
 	mUseClipperCheckBox->setToolTip("Turn on interactive clipping for the active volume.");
 	connect(mUseClipperCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(useClipper(bool)));
 	activeClipLayout->addWidget(mUseClipperCheckBox);
+	activeClipLayout->addWidget(imageCombo);
 	activeClipLayout->addWidget(combo);
 	mInvertPlaneCheckBox = new QCheckBox("Invert plane");
 	mInvertPlaneCheckBox->setToolTip("Use the inverse (mirror) of the selected slice plane.");
@@ -124,6 +131,11 @@ void ClippingWidget::clipperChangedSlot()
 {
 	mUseClipperCheckBox->setChecked(mInteractiveClipper->getUseClipper());
 	mInvertPlaneCheckBox->setChecked(mInteractiveClipper->getInvertPlane());
+}
+
+void ClippingWidget::imageChangedSlot()
+{
+	mInteractiveClipper->setImage(ssc::dataManager()->getImage(mImageAdapter->getValue()));
 }
 
 void ClippingWidget::clearButtonClickedSlot()

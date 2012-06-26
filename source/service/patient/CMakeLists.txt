@@ -11,19 +11,11 @@ SET( CX_QT_MOC_HEADER_FILES
     cxPatientData.h
     cxPatientService.h
 	cxDataManager.h
-    cxPointMetric.h
-    cxDistanceMetric.h
-    cxPlaneMetric.h
-    cxAngleMetric.h
     cxThresholdPreview.h
     cxActiveImageProxy.h
 )
 
 SET ( cxPatientService_SOURCE
-    cxPointMetric.h
-    cxPointMetric.cpp
-    cxDistanceMetric.h
-    cxDistanceMetric.cpp
 	cxDataManager.h
 	cxDataManager.cpp
 	cxPatientData.h
@@ -34,12 +26,6 @@ SET ( cxPatientService_SOURCE
     cxPatientService.cpp
     cxFrameForest.h
     cxFrameForest.cpp
-    cxPlaneMetric.h
-    cxPlaneMetric.cpp
-    cxAngleMetric.h
-    cxAngleMetric.cpp
-    cxDataMetric.h
-    cxDataMetric.cpp
     cxThresholdPreview.h
     cxThresholdPreview.cpp
     cxActiveImageProxy.h
