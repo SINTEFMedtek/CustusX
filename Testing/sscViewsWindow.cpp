@@ -237,7 +237,7 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 		if (parameters != NULL)
 		{
 			image->getTransferFunctions3D()->setLLR(parameters[i].llr);
-			image->getTransferFunctions3D()->setAlpha(parameters[i].alpha); // First image most transparent
+			image->getTransferFunctions3D()->setAlpha(parameters[i].alpha);
 			image->getTransferFunctions3D()->setLut(parameters[i].lut);
 		}
 		images.push_back(image);
