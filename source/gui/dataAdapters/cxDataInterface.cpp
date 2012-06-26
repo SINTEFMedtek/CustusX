@@ -338,8 +338,13 @@ QString ActiveImageStringDataAdapter::getHelp() const
 //---------------------------------------------------------
 
 SelectImageStringDataAdapter::SelectImageStringDataAdapter() :
-    mValueName("Select volume")
+    mValueName("Select volume"),
+    mHelp("Select a volume")
 {
+}
+void SelectImageStringDataAdapter::setHelp(QString text)
+{
+	mHelp = text;
 }
 QString SelectImageStringDataAdapter::getValueName() const
 {
@@ -360,7 +365,7 @@ QString SelectImageStringDataAdapter::getValue() const
 }
 QString SelectImageStringDataAdapter::getHelp() const
 {
-  return "Select a volume";
+  return mHelp;
 }
 ssc::ImagePtr SelectImageStringDataAdapter::getImage()
 {

@@ -73,6 +73,7 @@ private:
 
 	void setPositionFromScreenPos(int x, int y);
 	void createCompactingTransforms();
+	double findCompactedTime(double timeInterval, double totalUsedTime, double totalTime) const;
 
 //	std::vector<std::pair<double, double> > mValidRegions;
 	std::vector<TimelineEvent> mEvents;
@@ -84,7 +85,7 @@ private:
 	int mTolerance_p; ///< tolerance in pix, used to pick/show short events.
 	QStringList mContinousEvents; //< list of all continous events, used for stacked display
 	std::vector<TimelineEvent> mNoncompactedIntervals; ///< listing the intervals that are unchanged by the compacting transform.
-	std::vector<QColor> mEventColors; ///< use to color continous events
+//	std::vector<QColor> mEventColors; ///< use to color continous events
 
 	vtkPiecewiseFunctionPtr mBackward;
 	vtkPiecewiseFunctionPtr mForward;
