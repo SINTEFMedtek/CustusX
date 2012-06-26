@@ -515,6 +515,9 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 
 void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 {
+	if (!data)
+		return;
+
 	if (!mDataReps.count(data->getUid()))
 	{
 		ssc::RepPtr rep = this->createDataRep3D(data);
