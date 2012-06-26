@@ -19,6 +19,7 @@
 #include "cxDataInterface.h"
 #include "cxResampleWidget.h"
 #include "cxCenterlineWidget.h"
+#include <boost/function.hpp>
 
 class QPushButton;
 class QVBoxLayout;
@@ -33,35 +34,42 @@ namespace cx
  *  \date Jun 21, 2012
  *  \author christiana
  */
-class WirePhantomWidget : public RegistrationBaseWidget
+class WirePhantomWidget: public RegistrationBaseWidget
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
-  WirePhantomWidget(RegistrationManagerPtr regManager, QWidget* parent);
-  virtual ~WirePhantomWidget();
-  virtual QString defaultWhatsThis() const;
+	WirePhantomWidget(RegistrationManagerPtr regManager, QWidget* parent);
+	virtual ~WirePhantomWidget();
+	virtual QString defaultWhatsThis() const;
 
 protected:
-  QVBoxLayout* mLayout;
+	QVBoxLayout* mLayout;
 
 private slots:
-  void setImageSlot(QString uid);
-  void segmentationOutputArrived(QString uid);
-  void centerlineOutputArrived(QString uid);
+	void setImageSlot(QString uid);
+	void segmentationOutputArrived(QString uid);
+	void centerlineOutputArrived(QString uid);
 
-  void setColorSlot(QColor color);
-  void measureSlot();
+	//  void setColorSlot(QColor color);
+	void measureSlot();
+	ssc::MeshPtr loadNominalCross();
+	void activeImageChangedSlot(const QString&);
+	void popPendingActions();
 
-protected:
-  class BinaryThresholdImageFilterWidget* mSegmentationWidget;
-  class CenterlineWidget*   mCenterlineWidget;
-  SelectImageStringDataAdapterPtr mUSImageInput;
-  SelectImageStringDataAdapterPtr mSegmentationOutput;
-  SelectDataStringDataAdapterPtr mCenterlineOutput;
-  QPushButton* mMeasureButton;
+private:
+	void showData(ssc::DataPtr data);
+	void registration();
+
+	class BinaryThresholdImageFilterWidget* mSegmentationWidget;
+	class CenterlineWidget* mCenterlineWidget;
+	SelectImageStringDataAdapterPtr mUSImageInput;
+	SelectImageStringDataAdapterPtr mSegmentationOutput;
+	SelectDataStringDataAdapterPtr mCenterlineOutput;
+	QPushButton* mMeasureButton;
+	QTextEdit* mResults;
+	std::vector<boost::function0<void> > mPendingActions;
 };
-
 
 } /* namespace cx */
 #endif /* CXWIREPHANTOMWIDGET_H_ */

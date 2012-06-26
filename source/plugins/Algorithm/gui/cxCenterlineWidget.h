@@ -44,6 +44,7 @@ public:
 
 public slots:
   void setImageInputSlot(QString value);
+  void findCenterlineSlot();
 
 signals:
 void inputImageChanged(QString uid);
@@ -54,7 +55,6 @@ protected:
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
 
 private slots:
-  void findCenterlineSlot();
   void handleFinishedSlot();
 
 private:
