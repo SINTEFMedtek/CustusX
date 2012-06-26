@@ -8,6 +8,7 @@
 #include <Qt>
 #include <QCheckBox>
 #include <QTimer>
+#include <vtkImageData.h>
 #include "sscLabeledComboBoxWidget.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
@@ -17,6 +18,7 @@
 #include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
+#include "sscImageAlgorithms.h"
 
 namespace cx
 {
@@ -49,14 +51,25 @@ ImportDataDialog::ImportDataDialog(QString filename, QWidget* parent) :
   layout->addWidget(mParentFrameCombo);
 
   mNiftiFormatCheckBox = new QCheckBox("Use NIfTI-1/ITK-Snap axis definition", this);
-  mNiftiFormatCheckBox->setToolTip("Use X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior, as in ITK-Snap.");
+  mNiftiFormatCheckBox->setToolTip(""
+	  "Use X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior, as in ITK-Snap.\n"
+	  "This is different from normal DICOM.");
   mNiftiFormatCheckBox->setChecked(false);
   mNiftiFormatCheckBox->setEnabled(false);
   mTransformFromParentFrameCheckBox = new QCheckBox("Import transform from Parent", this);
   mTransformFromParentFrameCheckBox->setToolTip("Replace data transform with that of the parent data.");
   mTransformFromParentFrameCheckBox->setChecked(false);
+
+  mConvertToUnsignedCheckBox = new QCheckBox("Convert to unsigned", this);
+  mConvertToUnsignedCheckBox->setToolTip(""
+	  "Convert imported data set to unsigned values.\n"
+	  "This is recommended on Linux because the 2D overlay\n"
+	  "renderer only handles unsigned.");
+  mConvertToUnsignedCheckBox->setChecked(false);
+
   layout->addWidget(mNiftiFormatCheckBox);
   layout->addWidget(mTransformFromParentFrameCheckBox);
+  layout->addWidget(mConvertToUnsignedCheckBox);
 
   connect(mParentFrameAdapter.get(), SIGNAL(changed()), this, SLOT(updateImportTransformButton()));
   this->updateImportTransformButton();
@@ -113,6 +126,22 @@ void ImportDataDialog::importDataSlot()
   // enable nifti imiport only for meshes. (as this is the only case we have seen)
   mNiftiFormatCheckBox->setEnabled(ssc::dataManager()->getMesh(mData->getUid())!=0);
 
+  mConvertToUnsignedCheckBox->setEnabled(false);
+//  ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mData);
+  if (image && image->getBaseVtkImageData())
+  {
+	  vtkImageDataPtr img = image->getBaseVtkImageData();
+//	  std::cout << "type " << img->GetScalarTypeAsString() << " -- " << img->GetScalarType() << std::endl;
+//	  std::cout << "range " << img->GetScalarTypeMin() << " -- " << img->GetScalarTypeMax() << std::endl;
+	  mConvertToUnsignedCheckBox->setEnabled( (image!=0) && (image->getBaseVtkImageData()->GetScalarTypeMin()<0) );
+#ifndef __APPLE__
+#ifndef WIN32
+	  // i.e. LINUX:
+	  if (mConvertToUnsignedCheckBox->isEnabled())
+		  mConvertToUnsignedCheckBox->setChecked(true);
+#endif // WIN32
+#endif // __APPLE__
+  }
 }
 
 
@@ -152,6 +181,7 @@ void ImportDataDialog::acceptedSlot()
 {
   this->importParentTransform();
   this->convertFromNifti1Coordinates();
+  this->convertToUnsigned();
 }
 
 /** According to
@@ -188,5 +218,24 @@ void ImportDataDialog::importParentTransform()
   mData->get_rMd_History()->setRegistration(parent->get_rMd());
   ssc::messageManager()->sendInfo("Assigned rMd from data [" + parent->getName() + "] to data [" + mData->getName() + "]");
 }
+
+void ImportDataDialog::convertToUnsigned()
+{
+	if (!mConvertToUnsignedCheckBox->isChecked())
+		return;
+
+	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mData);
+	if (!image)
+		return;
+	//	vtkImageDataPtr img = image->getBaseVtkImageData();
+	//	std::cout << "type " << img->GetScalarTypeAsString() << " -- " << img->GetScalarType() << std::endl;
+	//	std::cout << "range " << img->GetScalarTypeMin() << " -- " << img->GetScalarTypeMax() << std::endl;
+	//	mConvertToUnsignedCheckBox->setEnabled( (image!=0) && (image->getBaseVtkImageData()->GetScalarTypeMin()<0) );
+
+	vtkImageDataPtr img = convertImageToUnsigned(image);
+	image->setVtkImageData(img);
+	ssc::dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());
+}
+
 
 }//namespace cx

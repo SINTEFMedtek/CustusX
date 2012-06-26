@@ -12,6 +12,7 @@
 #include "sscDoubleRange.h"
 #include "qxtspanslider.h"
 #include "sscDoubleWidgets.h"
+class QDoubleSpinBox;
 
 namespace cx
 {
@@ -90,6 +91,7 @@ public:
   void addToGridLayout(QGridLayout* gridLayout, int row);
   void setName(QString text);
   void setRange(const ssc::DoubleRange& range);
+  void setDecimals(int decimals);
   void setValue(std::pair<double,double> val);
   std::pair<double,double> getValue() const;
 
@@ -103,11 +105,14 @@ private slots:
 private:
   void dataChanged(std::pair<double,double> val);
   QLabel* mLabel;
-  ssc::DoubleLineEdit* mLowerEdit;
-  ssc::DoubleLineEdit* mUpperEdit;
+//  ssc::DoubleLineEdit* mLowerEdit;
+//  ssc::DoubleLineEdit* mUpperEdit;
+  QDoubleSpinBox* mLowerEdit;
+  QDoubleSpinBox* mUpperEdit;
   DoubleSpanSlider* mSpanSlider;
   std::pair<double,double> mValue;
 };
+
 
 } // namespace cx
 

@@ -6,6 +6,7 @@
  */
 
 #include "cxImageSenderSonix.h"
+#include "sscVector3D.h"
 
 #ifdef CX_WIN32
 
@@ -38,8 +39,8 @@ QStringList ImageSenderSonix::getArgumentDescription()
 {
 	QStringList retval;
 	retval << "--ipaddress:   IP address to connect to, default=127.0.0.1 (localhost)";
-	retval << "--imagingmode: default=0 (0 = B-mode, 2 = Colour, 6 = Dual, 12 = RF)";
-	retval << "--datatype: Video type, default=0x00000004 (4 = processed, 2 = unprocessed)";
+	retval << "--imagingmode: default=2 (0 = B-mode, 2 = Color)";//, 6 = Dual, 12 = RF)";
+	retval << "--datatype: Video type, default=0x008 (4 = gray, 8 = color)";
 	retval << "--buffersize:  Grabber buffer size,   default=500";
 	retval << "--properties:  dump image properties";
 	return retval;
@@ -49,12 +50,15 @@ QStringList ImageSenderSonix::getArgumentDescription()
 ImageSenderSonix::ImageSenderSonix(QObject* parent) :
     ImageSender(parent),
 	mSocket(0),
-	mEmitStatusMessage(false)
+	mEmitStatusMessage(false),
+	mLastFrameTimestamp(0.0),
+	mCurrentFrameTimestamp(0.0)
 {
 }
 
 ImageSenderSonix::~ImageSenderSonix()
 {
+	mTimer->stop();
 	if (mSonixGrabber)
 		{
 			mSonixGrabber->Stop();
@@ -80,18 +84,60 @@ void ImageSenderSonix::initialize(StringMap arguments)
 	connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
 	connect(this, SIGNAL(statusOnQueue(int)), this, SLOT(sendOpenIGTLinkStatusSlot(int)), Qt::QueuedConnection);//Do not work yet
 
+	this->mSonixHelper = new SonixHelper();
+
+	mTimer = new QTimer;
+	connect(mTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
+	mTimer->setInterval(10000);
+	mTimer->start();
+
+	this->initializeSonixGrabber();
+}
+
+
+void ImageSenderSonix::initializeSonixSlot()
+{
+	if(!mSonixGrabber->IsInitialized())
+	{
+		//std::cout << "initializeSonixSlot() Initializing..." << std::endl;
+		mSonixGrabber->Initialize();
+		return;
+	}
+
+	//Don't reinitialize if in freeze state
+	if(!mSonixGrabber->getFreezeState() && ssc::similar(mLastFrameTimestamp, mCurrentFrameTimestamp, 0.001))
+	{
+		std::cout << "initializeSonixSlot() Got no new frame. Reinitializing..." << std::endl;
+		// If sonix exam is closed we need to create a new mSonixGrabber
+		// Free resources. Do we need to delete?
+		mSonixGrabber->Stop();
+		std::cout << "Releasing Ultrasonix resources" << std::endl;
+		mSonixGrabber->ReleaseSystemResources();
+		disconnect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)));
+		//mSonixGrabber->Delete();
+
+		this->initializeSonixGrabber();
+	}
+	else
+	{
+		mLastFrameTimestamp = mCurrentFrameTimestamp;
+	}
+}
+
+void ImageSenderSonix::initializeSonixGrabber()
+{
 	if (!mArguments.count("ipaddress"))
 		mArguments["ipaddress"] = "127.0.0.1";
 	if (!mArguments.count("imagingmode"))
 		mArguments["imagingmode"] = "0";
 	if (!mArguments.count("datatype"))
-		mArguments["datatype"] = "0x00000004";
+		mArguments["datatype"] = "0x00000008";
 	if (!mArguments.count("buffersize"))
 		mArguments["buffersize"] = "500";
 
 	QString ipaddress       = mArguments["ipaddress"];
 	int imagingMode         = convertStringWithDefault(mArguments["imagingmode"], 0);
-	int acquisitionDataType = convertStringWithDefault(mArguments["datatype"], 0x00000004);
+	int acquisitionDataType = convertStringWithDefault(mArguments["datatype"], 0x00000008);
 	int bufferSize          = convertStringWithDefault(mArguments["buffersize"], 500);
 
 	mSonixGrabber = vtkSonixVideoSource::New();
@@ -101,7 +147,11 @@ void ImageSenderSonix::initialize(StringMap arguments)
 	mSonixGrabber->SetFrameBufferSize(bufferSize);  // Number of image frames in buffer
 	mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
 
-	this->mSonixHelper = new SonixHelper();
+	//std::cout << "imagingMode: " << imagingMode << std::endl;
+	//std::cout << "datatype: " << mArguments["datatype"].toStdString().c_str() << std::endl;
+	//std::cout << "acquisitionDataType: " << acquisitionDataType << " ";
+	//std::cout << "GetAcquisitionDataType: " << mSonixGrabber->GetAcquisitionDataType() << std::endl;
+
 	mSonixGrabber->setSonixHelper(this->mSonixHelper);
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 }
@@ -122,6 +172,8 @@ void ImageSenderSonix::stopStreaming()
 
 void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 {
+	mCurrentFrameTimestamp = frame.mTimestamp;
+
 	if(!mSocket)
 		{
 			return;
@@ -168,10 +220,13 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
 //  retval->SetDepthStart(10.0);// Start of sector in mm from origin
 //  retval->SetDepthEnd(40.0);	// End of sector in mm from origin
 //  retval->SetWidth(30.0);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
-  retval->SetDepthStart(frame.uly * frame.mSpacing[1]);// Start of sector in mm from origin
-  retval->SetDepthEnd(frame.bly * frame.mSpacing[1]);	// End of sector in mm from origin
-  retval->SetWidth((frame.urx -  frame.ulx) * frame.mSpacing[0]);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+  retval->SetDepthStart((frame.uly-frame.mOrigin[1]) * frame.mSpacing[1]);// Start of sector in mm from origin
+  retval->SetDepthEnd((frame.bly-frame.mOrigin[1]) * frame.mSpacing[1]);	// End of sector in mm from origin
+  //As ROI is a bit wide we subtract the width by 0.3 mm
+  retval->SetWidth((frame.urx -  frame.ulx ) * frame.mSpacing[0] - 0.3);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
 
+  //std::cout << "uly: " << frame.uly << " bly: " << frame.bly << std::endl;
+  //std::cout << "spacing: " << frame.mSpacing[0] << "  " << frame.mSpacing[1] << std::endl;
   std::cout << "Origin: " << frame.mOrigin[0] << " " << frame.mOrigin[1] << " " << std::endl;
   std::cout << "Probetype: " << retval->GetProbeType() << std::endl;
   std::cout << "Depth start: " << retval->GetDepthStart();

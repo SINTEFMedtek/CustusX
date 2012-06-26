@@ -29,12 +29,13 @@
 #include "sscRegistrationTransform.h"
 #include "cxVideoService.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
+#include "cxSettings.h"
 
 namespace cx
 {
 
 PlaybackWidget::PlaybackWidget(QWidget* parent) :
-				BaseWidget(parent, "TimeControllerWidget", "Time Control")
+				BaseWidget(parent, "PlaybackWidget", "Playback")
 {
 	mOpen = false;
 	this->setToolTip(this->defaultWhatsThis());
@@ -47,25 +48,6 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
-
-	QHBoxLayout* controlButtonsLayout = new QHBoxLayout;
-	topLayout->addLayout(controlButtonsLayout);
-
-	mOpenAction = this->createAction(this,
-//	                QIcon(":/icons/open_icon_library/png/64x64/actions/tool-animator.png"),
-	        		QIcon(":/icons/open_icon_library/png/64x64/others/button-red.png"),
-					"Open Playback", "",
-	                SLOT(toggleOpenSlot()),
-	                controlButtonsLayout);
-//	mOpenAction->setCheckable(true);
-//	mPlayAction = this->createAction(this,
-//	                QIcon(""),
-//					"Stop Playback", "",
-//	                SLOT(closeSlot()),
-//	                controlButtonsLayout);
-
-	controlButtonsLayout->addStretch();
-
 	mStartTimeLabel = new QLabel;
 	topLayout->addWidget(mStartTimeLabel);
 	mTotalLengthLabel = new QLabel;
@@ -77,16 +59,15 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	connect(mToolTimelineWidget, SIGNAL(positionChanged()), this, SLOT(timeLineWidgetValueChangedSlot()));
 	topLayout->addWidget(mToolTimelineWidget);
 
-//	mTimeLineSlider = new QSlider(this);
-//	mTimeLineSlider->setMinimumWidth(50);
-//	mTimeLineSlider->setOrientation(Qt::Horizontal);
-//	connect(mTimeLineSlider, SIGNAL(valueChanged(int)), this, SLOT(timeLineSliderValueChangedSlot(int)));
-//	topLayout->addWidget(mTimeLineSlider);
-
 	// create buttons bar
 	QHBoxLayout* playButtonsLayout = new QHBoxLayout;
 	topLayout->addLayout(playButtonsLayout);
 
+	mOpenAction = this->createAction(this,
+	        		QIcon(":/icons/open_icon_library/png/64x64/others/button-red.png"),
+					"Open Playback", "",
+	                SLOT(toggleOpenSlot()),
+	                playButtonsLayout);
 	this->createAction(this,
 	                QIcon(":/icons/open_icon_library/png/64x64/actions/media-seek-backward-3.png"),
 					"Rewind", "",
@@ -107,6 +88,11 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 					"Stop", "",
 	                SLOT(stopSlot()),
 	                playButtonsLayout);
+	this->createAction(this,
+	      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+	      "Details", "Details",
+	      SLOT(toggleDetailsSlot()),
+	      playButtonsLayout);
 
 	mSpeedAdapter = ssc::DoubleDataAdapterXml::initialize(
 					"speed",
@@ -118,6 +104,7 @@ PlaybackWidget::PlaybackWidget(QWidget* parent) :
 	playButtonsLayout->addStretch();
 
 	topLayout->addStretch();
+	this->showDetails();
 }
 
 PlaybackWidget::~PlaybackWidget()
@@ -130,10 +117,20 @@ QString PlaybackWidget::defaultWhatsThis() const
 	return "";
 }
 
-//void PlaybackWidget::timeLineSliderValueChangedSlot(int val)
-//{
-//	mTimer->setOffset(val);
-//}
+void PlaybackWidget::toggleDetailsSlot()
+{
+	settings()->setValue("playback/ShowDetails", !settings()->value("playback/ShowDetails", "true").toBool());
+	this->showDetails();
+}
+
+void PlaybackWidget::showDetails()
+{
+	bool on = settings()->value("playback/ShowDetails").toBool();
+
+	mStartTimeLabel->setVisible(on);
+	mTotalLengthLabel->setVisible(on);
+//	mLabel->setVisible(on);
+}
 
 void PlaybackWidget::timeLineWidgetValueChangedSlot()
 {
@@ -164,6 +161,21 @@ void PlaybackWidget::toggleOpenSlot()
 	}
 }
 
+QColor PlaybackWidget::generateRandomToolColor() const
+{
+	std::vector<QColor> colors;
+	int s = 255;
+	int v = 192;
+	colors.push_back(QColor::fromHsv(110, s, v));
+	colors.push_back(QColor::fromHsv(80, s, v));
+	colors.push_back(QColor::fromHsv(140, s, v));
+	colors.push_back(QColor::fromHsv(95, s, v));
+	colors.push_back(QColor::fromHsv(125, s, v));
+
+	static int gCounter = 0;
+	return colors[(gCounter++)%colors.size()];
+}
+
 std::vector<TimelineEvent> PlaybackWidget::convertHistoryToEvents(ssc::ToolPtr tool)
 {
 	std::vector<TimelineEvent> retval;
@@ -172,6 +184,8 @@ std::vector<TimelineEvent> PlaybackWidget::convertHistoryToEvents(ssc::ToolPtr t
 		return retval;
 	double timeout = 200;
 	TimelineEvent currentEvent(tool->getName() + " visible", history->begin()->first);
+	currentEvent.mGroup = "tool";
+	currentEvent.mColor = this->generateRandomToolColor(); // QColor::fromHsv(110, 255, 192);
 //	std::cout << "first event start: " << currentEvent.mDescription << " " << currentEvent.mStartTime << " " << history->size() << std::endl;
 
 	for(ssc::TimedTransformMap::iterator iter=history->begin(); iter!=history->end(); ++iter)
@@ -315,20 +329,14 @@ void PlaybackWidget::toolManagerInitializedSlot()
 	QString startDate = mTimer->getStartTime().toString("yyyy-MM-dd");
 	QString startTime = mTimer->getStartTime().toString("hh:mm");
 	QString endTime = mTimer->getStartTime().addMSecs(mTimer->getLength()).toString("hh:mm");
-	QString length = this->stripLeadingZeros(QTime(0,0,0,0).addMSecs(mTimer->getLength()).toString("hh:mm:ss"));
+//	QString length = this->stripLeadingZeros(QTime(0,0,0,0).addMSecs(mTimer->getLength()).toString("hh:mm:ss"));
+	QString length = this->convertMillisecsToNiceString(mTimer->getLength());
 	mStartTimeLabel->setText(
-					QString("Date:").leftJustified(15)    +"\t" + startDate+"\n" +
-					QString("Time:").leftJustified(15)    +"\t" + startTime + " - " + endTime + "\n" +
-					QString("Duration:").leftJustified(15)+"\t" + length);
+					QString("Date:").leftJustified(15)    +"" + startDate+"\n" +
+					QString("Time:").leftJustified(15)    +"" + startTime + " - " + endTime + "\n" +
+					QString("Duration:").leftJustified(15)+"" + length);
 
 	this->timeChangedSlot();
-}
-
-void PlaybackWidget::speedChangedSlot()
-{
-	double speed = mSpeedAdapter->getValue();
-	speed = pow(2,speed);
-	mTimer->setSpeed(speed);
 }
 
 /**strip leading zeros from a hh:mm:ss-formatted time
@@ -345,15 +353,44 @@ QString PlaybackWidget::stripLeadingZeros(QString time)
 	return split.join(":");
 }
 
+/**Convert a millisecond count to a hh:mm:ss:zzz time.
+ *
+ */
+QString PlaybackWidget::convertMillisecsToNiceString(qint64 length) const
+{
+	QString retval;
+
+	qint64 ms = length % 1000;
+	qint64 s = (length / 1000) % 60;
+	qint64 m = (length / (1000*60)) % 60;
+	qint64 h = (length / (1000*60*60));
+	QChar c = '0';
+
+	retval = QString("%1:%2.%3").arg(m,2,10,c).arg(s,2,10,c).arg(ms,3,10,c);
+	if (h>0)
+		retval = QString("%1:%2").arg(h).arg(retval);
+
+	return retval;
+}
+
+void PlaybackWidget::speedChangedSlot()
+{
+	double speed = mSpeedAdapter->getValue();
+	speed = pow(2,speed);
+	mTimer->setSpeed(speed);
+}
+
+
 void PlaybackWidget::timeChangedSlot()
 {
 	QString color("green");
 	int fontSize = 4;
-	int offset = mTimer->getOffset(); // SmStartTime.secsTo(QDateTime::currentDateTime());
+	qint64 offset = mTimer->getOffset(); // SmStartTime.secsTo(QDateTime::currentDateTime());
 	QString format = QString("<font size=%1 color=%2><b>%3</b></font>").arg(fontSize).arg(color);
 
 	QString currentTime = mTimer->getTime().toString("hh:mm:ss");
-	QString currentOffset = this->stripLeadingZeros(QTime(0,0,0,0).addMSecs(offset).toString("hh:mm:ss.zzz"));
+//	QString currentOffset = this->stripLeadingZeros(QTime(0,0,0,0).addMSecs(offset).toString("hh:mm:ss.zzz"));
+	QString currentOffset = this->convertMillisecsToNiceString(offset);
 
 	mLabel->setText(format.arg("Elapsed: "+currentOffset+" \tTime: " + currentTime));
 

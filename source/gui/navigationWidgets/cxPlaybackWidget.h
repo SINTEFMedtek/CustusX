@@ -59,6 +59,7 @@ private slots:
 //	void timeLineSliderValueChangedSlot(int val);
 	void timeLineWidgetValueChangedSlot();
 	void toolManagerInitializedSlot();
+	void toggleDetailsSlot();
 
 private:
 	virtual QString defaultWhatsThis() const;
@@ -67,6 +68,9 @@ private:
 	std::vector<TimelineEvent> createEvents();
 	std::pair<double,double> findTimeRange(std::vector<TimelineEvent> events);
 	std::vector<TimelineEvent> convertRegistrationHistoryToEvents(ssc::RegistrationHistoryPtr reg);
+	void showDetails();
+	QColor generateRandomToolColor() const;
+	QString convertMillisecsToNiceString(qint64 ms) const;
 
 	QLabel* mLabel;
 	QLabel* mTotalLengthLabel;

@@ -12,6 +12,7 @@
 #include "sscMessageManager.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
+#include "sscXmlOptionItem.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
@@ -45,7 +46,8 @@ QString UsReconstructionFileMaker::write()
   this->writeUSTimestamps(reconstructionFolder);
   QString calibrationFile = this->copyCalibrationFile(reconstructionFolder);
   this->writeUSImages(reconstructionFolder, calibrationFile);
-  this->copyProbeCalibConfigsXml(reconstructionFolder);
+//  this->copyProbeCalibConfigsXml(reconstructionFolder);
+  this->writeProbeConfiguration(reconstructionFolder);
 
   this->report();
 
@@ -335,6 +337,9 @@ QString UsReconstructionFileMaker::copyCalibrationFile(QString reconstructionFol
 
 }
 
+/**
+ * Deprecated: use writeProbeConfiguration() instead.
+ */
 void UsReconstructionFileMaker::copyProbeCalibConfigsXml(QString reconstructionFolder)
 {
   QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
@@ -346,6 +351,21 @@ void UsReconstructionFileMaker::copyProbeCalibConfigsXml(QString reconstructionF
     if(!xmlFile.copy(reconstructionFolder+"/"+filename))
       ssc::messageManager()->sendWarning("Could not copy xml file ("+xmlFileName+") to reconstruction folder. Maybe it already exitst in the destinbation folder?");
   }
+}
+
+/**
+ * Write probe configuration to file. This works even for configs not saved to the ProbeCalibConfigs.xml file.
+ */
+void UsReconstructionFileMaker::writeProbeConfiguration(QString reconstructionFolder)
+{
+	ssc::XmlOptionFile file = ssc::XmlOptionFile(reconstructionFolder + "/" + mSessionDescription + ".probedata.xml", "navnet");
+	if (mTool && mTool->getProbe())
+	{
+		mTool->getProbe()->getData().addXml(file.getElement("configuration"));
+		file.getElement("tool").toElement().setAttribute("toolID", mTool->getName());
+		file.getElement("tool").toElement().setAttribute("configurationID", mTool->getProbe()->getConfigurationPath());
+	}
+	file.save();
 }
 
 void UsReconstructionFileMaker::report()

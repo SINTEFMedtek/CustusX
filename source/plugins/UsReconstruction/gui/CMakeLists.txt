@@ -45,6 +45,19 @@ include_directories(
 # create the target
 add_library( cxPluginUSReconstructionGUI ${SOURCE_FILES} )
 target_link_libraries( cxPluginUSReconstructionGUI cxPluginUSReconstructionLogic cxPluginAlgorithmGUI)
+
+#------------------------------------------------------------------------------
+# Cotire - pch and unity builds
+#------------------------------------------------------------------------------
+if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+    cotire(cxPluginUSReconstructionGUI)
+    if(COTIRE_ADD_UNITY_BUILDS)
+        target_link_libraries(cxPluginUSReconstructionGUI_unity 
+        		cxPluginUSReconstructionLogic 
+        		cxPluginAlgorithmGUI
+        		)
+    endif(COTIRE_ADD_UNITY_BUILDS)
+endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
 # =========================================================
 
 
