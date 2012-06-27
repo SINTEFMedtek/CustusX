@@ -40,10 +40,14 @@ namespace cx
 {
 //------------------------------------------------------------------------------
 WirePhantomWidget::WirePhantomWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-		RegistrationBaseWidget(regManager, parent, "WirePhantomWidget", "Wire Phantom")
+		RegistrationBaseWidget(regManager, parent, "WirePhantomWidget", "Wire Phantom Test")
 {
 	connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this,
 					SLOT(activeImageChangedSlot(const QString&)));
+
+	mCompositeAlgorithm.reset(new CompositeTimedAlgorithm());
+	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+	mTimedAlgorithmProgressBar->attach(mCompositeAlgorithm);
 
 	mLayout = new QVBoxLayout(this);
 	mSegmentationWidget = new BinaryThresholdImageFilterWidget(this);
@@ -98,6 +102,7 @@ WirePhantomWidget::WirePhantomWidget(RegistrationManagerPtr regManager, QWidget*
 					"Centerline"));
 	mLayout->addWidget(this->createHorizontalLine());
 	mLayout->addLayout(buttonsLayout);
+	mLayout->addWidget(mTimedAlgorithmProgressBar);
 	mLayout->addWidget(mResults, 1);
 	mLayout->addStretch();
 
@@ -117,21 +122,6 @@ void WirePhantomWidget::activeImageChangedSlot(const QString&)
 	if (image && image->getModality().contains("US"))
 		mUSImageInput->setValue(image->getUid());
 }
-
-//void WirePhantomWidget::setColorSlot(QColor color)
-//{
-//	mCenterlineWidget->setDefaultColor(color);
-//	mSegmentationWidget->setDefaultColor(color);
-//
-//	ssc::MeshPtr mesh;
-//
-//	mesh = ssc::dataManager()->getMesh(mCenterlineOutput->getValue());
-//	if (mesh)
-//		mesh->setColor(color);
-//	mesh = ssc::dataManager()->getMesh(mSegmentationOutput->getValue());
-//	if (mesh)
-//		mesh->setColor(color);
-//}
 
 
 WirePhantomWidget::~WirePhantomWidget()
@@ -155,15 +145,12 @@ void WirePhantomWidget::setImageSlot(QString uid)
 {
 }
 
-//void WirePhantomWidget::resampleOutputArrived(QString uid)
-//{
-//  mResampleOutput->setValue(uid);
-//}
-
 void WirePhantomWidget::segmentationOutputArrived(QString uid)
 {
 	mSegmentationOutput->setValue(uid);
-	this->showData(ssc::dataManager()->getData(uid));
+	// only show result if segmentation widget is visible, too much noise otherwise.
+	if (mSegmentationWidget->isVisible())
+		this->showData(ssc::dataManager()->getData(uid));
 }
 
 void WirePhantomWidget::centerlineOutputArrived(QString uid)
@@ -203,15 +190,28 @@ void WirePhantomWidget::showData(ssc::DataPtr data)
 
 void WirePhantomWidget::measureSlot()
 {
-	mPendingActions.push_back(boost::bind(&WirePhantomWidget::registration, this));
-	QTimer::singleShot(0, this, SLOT(popPendingActions()));
-}
+	// remove old stuff
+	mCompositeAlgorithm->clear();
+	disconnect(mCompositeAlgorithm.get(), SIGNAL(finished()), this, SLOT(registration()));
 
-void WirePhantomWidget::popPendingActions()
-{
-	mPendingActions.back()();
-	mPendingActions.pop_back();
-//	QTimer::singleShot(0, this, SLOT(popPendingActions()));
+	// add all steps
+	if (!mCenterlineOutput->getData())
+	{
+		if (!mSegmentationOutput->getImage())
+		{
+			if (!mUSImageInput->getImage())
+			{
+				ssc::messageManager()->sendWarning("No input selected, measure failed.");
+				return;
+			}
+
+			mCompositeAlgorithm->append(mSegmentationWidget->getSegmentationAlgorithm());
+		}
+		mCompositeAlgorithm->append(mCenterlineWidget->getCenterlineAlgorithm());
+	}
+
+	connect(mCompositeAlgorithm.get(), SIGNAL(finished()), this, SLOT(registration()));
+	mCompositeAlgorithm->execute();
 }
 
 void WirePhantomWidget::registration()
@@ -227,8 +227,6 @@ void WirePhantomWidget::registration()
 	// Find transform matrix fMm
 	// apply fMm to nominal, return diff
 	//
-
-//	std::cout << "using centerline" << mCenterlineOutput->getValue() << std::endl;
 
 	ssc::MeshPtr nominalCross = this->loadNominalCross();
 	if (!nominalCross || !mCenterlineOutput->getData())
@@ -267,37 +265,29 @@ void WirePhantomWidget::registration()
 	// new one as rM'd = Q * rMd, where Q is the inverted registration output.
 	// Delta is thus equal to Q:
 	ssc::Transform3D delta = linearTransform.inv();
-	//std::cout << "delta:\n" << delta << std::endl;
 	mManager->restart();
 	mManager->applyImage2ImageRegistration(delta, "Wire Phantom Measurement");
 
-//		  static Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
 
 	ssc::Vector3D t_delta = linearTransform.matrix().block<3, 1>(0, 3);
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3, 3>(0, 0));
 	double angle = angleAxis.angle();
 
-//	QString qualityText = QString("|t_delta|=%1mm, angle=%2*")
-//		.arg(t_delta.length(), 6, 'f', 2)
-//		.arg(angle / M_PI * 180.0, 6, 'f', 2);
-
 	ssc::Vector3D cross(134.25, 134.25, 99.50);
 	ssc::Vector3D cross_moving = linearTransform.coord(cross);
 	double diff = (cross - cross_moving).length();
-//	ssc::messageManager()->sendSuccess(QString(""
-//		"Registered Wire Phantom. Center point values:\n"
-//		"\tnominal: \t%1\n"
-//		"\tus:      \t%2\n"
-//		"\tshift:   \t%3"
-//		).arg(qstring_cast(cross)).arg(qstring_cast(cross_moving)).arg(diff));
-	mResults->append(QString(""
+
+	QString result = QString(""
 		"Shift vector:\t%1\n"
 		"Accuracy |v|:\t%2mm\n"
 		"Angle:       \t%3*\n"
 		"")
 		.arg(qstring_cast(cross - cross_moving))
 		.arg(diff, 6, 'f', 2)
-		.arg(angle / M_PI * 180.0, 6, 'f', 2));
+		.arg(angle / M_PI * 180.0, 6, 'f', 2);
+
+	mResults->append(result);
+	ssc::messageManager()->sendInfo("Wire Phantom Test Results:\n"+result);
 
 	// add metrics displaying the distance from cross in the nominal and us spaces:
 	ssc::Transform3D usMnom = ssc::SpaceHelpers::get_toMfrom(ssc::SpaceHelpers::getD(mManager->getFixedData()), ssc::SpaceHelpers::getD(mManager->getMovingData()));
@@ -329,8 +319,6 @@ void WirePhantomWidget::registration()
 	d0->setArgument(1, p2);
 	ssc::dataManager()->loadData(d0);
 	this->showData(d0);
-
-
 }
 
 

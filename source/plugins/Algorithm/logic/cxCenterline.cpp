@@ -1,5 +1,7 @@
 #include "cxCenterline.h"
 
+#include "cxAlgorithmHelpers.h"
+
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscRegistrationTransform.h"
@@ -13,7 +15,9 @@ namespace cx
 Centerline::Centerline() :
     ThreadedTimedAlgorithm<vtkImageDataPtr>("centerline", 20),
     mDefaultColor("red")
-{}
+{
+	mUseDefaultMessages = false;
+}
 
 Centerline::~Centerline()
 {}
@@ -28,13 +32,16 @@ bool Centerline::setInput(ssc::ImagePtr inputImage, QString outputBasePath)
   mInput = inputImage;
   mOutputBasePath = outputBasePath;
 
+  if (!mInput)
+  {
+    return false;
+  }
   if (mInput->getMax() != 1 || mInput->getMin() != 0)
   {
     ssc::messageManager()->sendError("Centerline algorithm requires binary volume as input");
     return false;
   }
 
-  this->generate();
   return true;
 }
 
@@ -67,14 +74,25 @@ void Centerline::postProcessingSlot()
   ssc::dataManager()->saveMesh(mesh, mOutputBasePath);
   mOutput = mesh;
 
-  ssc::messageManager()->sendSuccess("Created centerline \"" + mOutput->getName()+"\"");
+  ssc::messageManager()->sendSuccess(QString("Created centerline \"%1\" [%2s]").arg(mOutput->getName()).arg(this->getSecondsPassedAsString()));
 
   emit finished();
 }
 
+
 vtkImageDataPtr Centerline::calculate()
 {
-  ssc::messageManager()->sendInfo("Generating \""+mInput->getName()+"\" centerline... Please wait!");
+    // Centerline algorithm requires binary volume as input
+	  if (!mInput)
+	  {
+	    return vtkImageDataPtr();
+	  }
+	  if (mInput->getMax() != 1 || mInput->getMin() != 0)
+	  {
+	    return vtkImageDataPtr();
+	  }
+
+	  ssc::messageManager()->sendInfo(QString("Creating centerline from \"%1\"...").arg(mInput->getName()));
 
   itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(mInput);
 
