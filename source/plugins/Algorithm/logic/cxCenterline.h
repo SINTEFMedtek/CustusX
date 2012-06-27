@@ -1,7 +1,7 @@
 #ifndef CXCENTERLINE_H_
 #define CXCENTERLINE_H_
 
-#include "cxTimedAlgorithm.h"
+#include "cxThreadedTimedAlgorithm.h"
 
 #include "sscImage.h"
 

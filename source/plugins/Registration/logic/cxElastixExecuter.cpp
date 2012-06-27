@@ -56,7 +56,7 @@ void ElastixExecuter::setDisplayProcessMessages(bool on)
 }
 
 
-void ElastixExecuter::run(QString application,
+void ElastixExecuter::setInput(QString application,
 				ssc::DataPtr fixed,
 				ssc::DataPtr moving,
 				QString outdir,
@@ -97,6 +97,12 @@ void ElastixExecuter::run(QString application,
 	mProcess->start(commandLine);
 //	mProcess->start("elastix");
 }
+
+void ElastixExecuter::execute()
+{
+	emit aboutToStart(); // if properly set: triggers the setInput()
+}
+
 
 
 
