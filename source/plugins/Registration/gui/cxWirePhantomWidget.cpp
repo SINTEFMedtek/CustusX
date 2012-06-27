@@ -35,6 +35,9 @@
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "boost/bind.hpp"
+#include "sscTool.h"
+#include "sscToolManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -42,6 +45,7 @@ namespace cx
 WirePhantomWidget::WirePhantomWidget(RegistrationManagerPtr regManager, QWidget* parent) :
 		RegistrationBaseWidget(regManager, parent, "WirePhantomWidget", "Wire Phantom Test")
 {
+	mLastRegistration = ssc::Transform3D::Identity();
 	connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this,
 					SLOT(activeImageChangedSlot(const QString&)));
 
@@ -74,19 +78,20 @@ WirePhantomWidget::WirePhantomWidget(RegistrationManagerPtr regManager, QWidget*
 	mCenterlineWidget->setDefaultColor(QColor("red"));
 	mSegmentationWidget->setDefaultColor(QColor("red"));
 
-//	this->setColorSlot(QColor("green"));
-//
-//	ColorSelectButton* colorButton = new ColorSelectButton("Color");
-//	colorButton->setColor(QColor("green"));
-//	colorButton->setToolTip("Select color to use when generating surfaces and centerlines.");
-//	connect(colorButton, SIGNAL(colorChanged(QColor)), this, SLOT(setColorSlot(QColor)));
-
 	mMeasureButton = new QPushButton("Execute");
 	mMeasureButton->setToolTip("Measure deviation of input volume from nominal wire cross.");
 	connect(mMeasureButton, SIGNAL(clicked()), this, SLOT(measureSlot()));
 
+	mCalibrationButton = new QPushButton("Probe calib");
+	mCalibrationButton->setToolTip(""
+		"Estimate probe calibration sMt\n"
+		"based on last accuracy test and\n"
+		"the current probe orientation");
+	connect(mCalibrationButton, SIGNAL(clicked()), this, SLOT(generate_sMt()));
+
 	QLayout* buttonsLayout = new QHBoxLayout;
 	buttonsLayout->addWidget(mMeasureButton);
+	buttonsLayout->addWidget(mCalibrationButton);
 
 	mResults = new QTextEdit;
 
@@ -260,6 +265,7 @@ void WirePhantomWidget::registration()
 	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
 
 	vesselReg.checkQuality(linearTransform);
+	mLastRegistration = linearTransform;
 
 	// The registration is performed in space r. Thus, given an old data position rMd, we find the
 	// new one as rM'd = Q * rMd, where Q is the inverted registration output.
@@ -319,6 +325,38 @@ void WirePhantomWidget::registration()
 	d0->setArgument(1, p2);
 	ssc::dataManager()->loadData(d0);
 	this->showData(d0);
+}
+
+void WirePhantomWidget::generate_sMt()
+{
+	ssc::ToolPtr probe = ssc::toolManager()->getDominantTool();
+	if (!probe || !probe->getVisible() || !probe->hasType(ssc::Tool::TOOL_US_PROBE))
+	{
+		ssc::messageManager()->sendWarning("Cannot find visible probe, aborting calibration test.");
+		return;
+	}
+	if (!mManager->getMovingData())
+	{
+		ssc::messageManager()->sendWarning("Cannot find moving data, aborting calibration test.");
+		return;
+	}
+
+	ssc::Transform3D prMt = probe->get_prMt();
+	ssc::Transform3D sMt = probe->getCalibration_sMt();
+	ssc::Transform3D prMs = prMt * sMt.inv();
+	ssc::Transform3D usMpr = mManager->getMovingData()->get_rMd().inv() * *ssc::toolManager()->get_rMpr();
+	ssc::Transform3D nomMus = mLastRegistration.inv();
+
+	ssc::Transform3D sQt; // Q is the new calibration matrix.
+	ssc::Transform3D usMs = usMpr*prMs;
+
+	// start with: nomMus * usMpr * prMs * sMt
+	// move usMpr*prMs to the left and collect a new sMt from the remains:
+	// start with: usMpr * prMs * (usMpr * prMs).inv() * nomMus * usMpr * prMs * sMt
+
+	sQt = usMs.inv() * nomMus * usMs * sMt;
+
+	ssc::messageManager()->sendInfo(QString("Calculated new calibration matrix\nfrom current probe position and last accuracy test:\n%1").arg(qstring_cast(sQt)));
 }
 
 
