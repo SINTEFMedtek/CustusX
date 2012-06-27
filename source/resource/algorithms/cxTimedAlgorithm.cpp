@@ -1,99 +1,34 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #include "cxTimedAlgorithm.h"
 
-#include "itkImageFileReader.h"
+//#include "itkImageFileReader.h"
 #include "sscTypeConversions.h"
-#include "vtkMetaImageWriter.h"
+//#include "vtkMetaImageWriter.h"
 #include "cxSettings.h"
 #include "sscUtilHelpers.h"
+#include "sscMessageManager.h"
+//#include "sscImage.h"
 
 namespace cx
 {
-//---------------------------------------------------------------------------------------------------------------------
-itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImage(ssc::ImagePtr image)
-{
-  //HACK
-  return AlgorithmHelper::getITKfromSSCImageViaFile(image);
-
-//  if(!image)
-//  {
-//    std::cout << "getITKfromSSCImage(): NO image!!!" << std::endl;
-//    return itkImageType::ConstPointer();
-//  }
-//  itkVTKImageToImageFilterType::Pointer vtk2itkFilter = itkVTKImageToImageFilterType::New();
-//  //itkToVtkFilter->SetInput(data);
-//  vtkImageDataPtr input = image->getBaseVtkImageData();
-//  if (input->GetScalarType() != VTK_UNSIGNED_SHORT)
-//  //if (input->GetScalarType() == VTK_UNSIGNED_CHAR)
-//  {
-//    // convert
-//    // May need to use vtkImageShiftScale instead if we got data types other than unsigned char?
-//    vtkImageCastPtr imageCast = vtkImageCastPtr::New();
-//    imageCast->SetInput(input);
-//    imageCast->SetOutputScalarTypeToUnsignedShort();
-//    input = imageCast->GetOutput();
-//  }
-//  vtk2itkFilter->SetInput(input);
-//  vtk2itkFilter->Update();
-//  return vtk2itkFilter->GetOutput();
-}
-//---------------------------------------------------------------------------------------------------------------------
-
-
-/**This is a workaround for _unpredictable_ crashes
- * experienced when using the itk::VTKImageToImageFilter.
- *
- */
-itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImageViaFile(ssc::ImagePtr image)
-{
-  if(!image)
-  {
-    std::cout << "getITKfromSSCImage(): NO image!!!" << std::endl;
-    return itkImageType::ConstPointer();
-  }
-
-  if(image->getMax() > SHRT_MAX || image->getMin() < SHRT_MIN)
-  	ssc::messageManager()->sendWarning("Image values out of range. max: " + qstring_cast(image->getMax())
-  			+ " min: " + qstring_cast(image->getMin()) + " See bug #363 if this needs to be fixed");
-
-  QString tempFolder = settings()->value("globalPatientDataFolder").toString() + "/NoPatient/temp/";
-  QDir().mkpath(tempFolder);
-
-  // write to disk
-  vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-
-  QString filename = tempFolder + "/"+qstring_cast(writer.GetPointer())+".mhd";
-
-
-  writer->SetInput(image->getBaseVtkImageData());
-  writer->SetFileName(cstring_cast(filename));
-  writer->SetCompression(false);
-  writer->Write();
-
-  // read from disk
-  typedef itk::ImageFileReader<itkImageType> ReaderType;
-  ReaderType::Pointer reader = ReaderType::New();
-#if ITK_VERSION_MAJOR==3
-  reader->SetFileName(cstring_cast(filename));
-#else
-  reader->SetFileName(string_cast(filename));
-#endif
-
-////  reader->SetFileName(cstring_cast(filename));
-//  reader->SetFileName(string_cast(filename));
-  reader->Update();
-  itkImageType::ConstPointer retval = reader->GetOutput();
-
-  QFile(filename).remove(); // cleanup
-  QFile(ssc::changeExtension(filename, "raw")).remove(); // cleanup
-
-  return retval;
-}
-//---------------------------------------------------------------------------------------------------------------------
-
 
 TimedBaseAlgorithm::TimedBaseAlgorithm(QString product, int secondsBetweenAnnounce) :
     QObject(),
-    mProduct(product)
+    mProduct(product),
+    mUseDefaultMessages(true)
 {
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(timeoutSlot()));
@@ -105,17 +40,18 @@ TimedBaseAlgorithm::~TimedBaseAlgorithm()
 
 void TimedBaseAlgorithm::startTiming()
 {
-  mStartTime = QDateTime::currentDateTime();
-  mTimer->start();
+	mStartTime = QDateTime::currentDateTime();
+	if (mUseDefaultMessages)
+		ssc::messageManager()->sendInfo(QString("Algorithm %1 started.").arg(mProduct));
+	mTimer->start();
 }
 
 void TimedBaseAlgorithm::stopTiming()
 {
-  QTime timePassed = this->getTimePassed();
-  ssc::messageManager()->sendInfo("Generating took: " + timePassed.toString("hh:mm:ss:zzz"));
-
-  mStartTime = QDateTime();
-  mTimer->stop();
+	if (mUseDefaultMessages)
+		ssc::messageManager()->sendSuccess(QString("Algorithm %1 complete [%2s]").arg(mProduct).arg(this->getSecondsPassedAsString()));
+	//mStartTime = QDateTime(); we might need the timing after this call
+	mTimer->stop();
 }
 
 QTime TimedBaseAlgorithm::getTimePassed()
@@ -125,80 +61,18 @@ QTime TimedBaseAlgorithm::getTimePassed()
   return retval;
 }
 
+QString TimedBaseAlgorithm::getSecondsPassedAsString() const
+{
+	double secs = double(mStartTime.msecsTo(QDateTime::currentDateTime()))/1000;
+	return QString("%1").arg(secs, 0, 'f', 2);
+}
+
 void TimedBaseAlgorithm::timeoutSlot()
 {
-  ssc::messageManager()->sendInfo("Still working on generating the "+mProduct+", "+this->getTimePassed().toString()+" has passed.");
+  ssc::messageManager()->sendInfo(QString("Still executing %1, [%2s] ...").arg(mProduct).arg(this->getTimePassed().toString("ss")));
 }
 //---------------------------------------------------------------------------------------------------------------------
-//template <class T>
-//ThreadedTimedAlgorithm<T>::ThreadedTimedAlgorithm(QString product, int secondsBetweenAnnounce) :
-//  TimedBaseAlgorithm(product, secondsBetweenAnnounce)
-//{
-//  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
-//  connect(&mWatcher, SIGNAL(finished()), this, SLOT(postProcessingSlot()));
-//}
-//
-//template <class T>
-//ThreadedTimedAlgorithm<T>::~ThreadedTimedAlgorithm()
-//{}
-//
-//template <class T>
-//void ThreadedTimedAlgorithm<T>::finishedSlot()
-//{
-//  TimedBaseAlgorithm::stopTiming();
-//}
-//
-//template <class T>
-//void ThreadedTimedAlgorithm<T>::generate()
-//{
-//  TimedBaseAlgorithm::startTiming();
-//
-//  mFutureResult = QtConcurrent::run(this, &ThreadedTimedAlgorithm<T>::calculate);
-//  mWatcher.setFuture(mFutureResult);
-//}
-//template <class T>
-//T ThreadedTimedAlgorithm<T>::getResult()
-//{
-//  T result = mWatcher.future().result();
-//  return result;
-//}
 
 
-template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //centerline
-template class ThreadedTimedAlgorithm<ssc::ImagePtr>; //resample
-//template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //BinaryThresholdImageFilter
-template class ThreadedTimedAlgorithm<vtkPolyDataPtr>; //contour
-
-
-//---------------------------------------------------------------------------------------------------------------------
-Example::Example() :
-    ThreadedTimedAlgorithm<QString>("TestProduct", 1)
-{
-  std::cout << "Test::Test()" << std::endl;
-  this->generate();
-}
-
-Example::~Example()
-{}
-
-void Example::postProcessingSlot()
-{
-  QString result = this->getResult();
-  std::cout << "void Test::postProcessingSlot(), result: "<< result.toStdString() << std::endl;
-  emit finished();
-}
-
-QString Example::calculate()
-{
-  std::cout << " QString Test::calculate()" << std::endl;
-
-#ifdef WIN32
-  Sleep(500);
-#else
-  sleep(5);
-#endif
-
-  return QString("Test successful!!!");
-}
 }//namespace cx
 

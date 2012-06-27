@@ -47,6 +47,7 @@ protected:
 private slots:
   void resampleSlot();
   void handleFinishedSlot();
+  void preprocessResampler();
 
 private:
   ResampleWidget();

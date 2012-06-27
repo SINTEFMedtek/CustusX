@@ -1,5 +1,7 @@
 #include "cxBinaryThresholdImageFilter.h"
 
+#include "cxAlgorithmHelpers.h"
+
 #include "sscDataManager.h"
 #include "sscUtilHelpers.h"
 #include "sscRegistrationTransform.h"
@@ -8,7 +10,9 @@ namespace cx
 {
 BinaryThresholdImageFilter::BinaryThresholdImageFilter() :
     ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 20)
-{}
+{
+	mUseDefaultMessages = false;
+}
 
 BinaryThresholdImageFilter::~BinaryThresholdImageFilter()
 {}
@@ -20,8 +24,6 @@ void BinaryThresholdImageFilter::setInput(ssc::ImagePtr image, QString outputBas
   mTheshold = threshold;
   mUseSmoothing = useSmoothing;
   mSmoothingSigma = smoothSigma;
-
-  this->generate();
 }
 
 ssc::ImagePtr BinaryThresholdImageFilter::getOutput()
@@ -46,7 +48,7 @@ void BinaryThresholdImageFilter::postProcessingSlot()
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 
-  ssc::messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
+  ssc::messageManager()->sendSuccess(QString("Done segmenting: \"%1\" [%2s]").arg(mOutput->getName()).arg(this->getSecondsPassedAsString()));
 
 //  emit finished();
 }

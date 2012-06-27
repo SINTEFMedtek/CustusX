@@ -15,7 +15,7 @@
 #include "cxTimedAlgorithmProgressBar.h"
 #include <QtGui>
 #include "cxTimedAlgorithm.h"
-
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -47,6 +47,7 @@ void TimedAlgorithmProgressBar::attach(TimedAlgorithmPtr algorithm)
 	{
 		connect(algorithm.get(), SIGNAL(started(int)), this, SLOT(algorithmStartedSlot(int)));
 		connect(algorithm.get(), SIGNAL(finished()), this, SLOT(algorithmFinishedSlot()));
+		connect(algorithm.get(), SIGNAL(productChanged()), this, SLOT(productChangedSlot()));
 	}
 
 	mAlgorithm.insert(algorithm);
@@ -61,9 +62,21 @@ void TimedAlgorithmProgressBar::detach(TimedAlgorithmPtr algorithm)
 	{
 		disconnect(algorithm.get(), SIGNAL(started(int)), this, SLOT(algorithmStartedSlot(int)));
 		disconnect(algorithm.get(), SIGNAL(finished()), this, SLOT(algorithmFinishedSlot()));
+		disconnect(algorithm.get(), SIGNAL(productChanged()), this, SLOT(productChangedSlot()));
 	}
 
 	mAlgorithm.erase(algorithm);
+}
+
+void TimedAlgorithmProgressBar::productChangedSlot()
+{
+	TimedBaseAlgorithm* algo = dynamic_cast<TimedBaseAlgorithm*>(sender());
+	QString product = "algorithm";
+	if (algo)
+		product = algo->getProduct();
+
+	mLabel->setText(product);
+//	ssc::messageManager()->sendInfo(QString("Executing %1, please wait!").arg(product));
 }
 
 void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
@@ -83,7 +96,7 @@ void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 	mProgressBar->setRange(0, maxSteps);
 	mProgressBar->setValue(0);
 	mProgressBar->show();
-	ssc::messageManager()->sendInfo(QString("Executing %1, please wait!").arg(product));
+//	ssc::messageManager()->sendInfo(QString("Executing %1, please wait!").arg(product));
 }
 
 void TimedAlgorithmProgressBar::algorithmFinishedSlot()
@@ -93,7 +106,7 @@ void TimedAlgorithmProgressBar::algorithmFinishedSlot()
 	if (algo)
 		product = algo->getProduct();
 
-	ssc::messageManager()->sendSuccess(QString("%1 complete [%2s]").arg(product).arg(mTimerWidget->elaspedSeconds()));
+//	ssc::messageManager()->sendSuccess(QString("%1 complete [%2s]").arg(product).arg(mTimerWidget->elaspedSeconds()));
 
 	if (--mStartedAlgos >0) // dont hide before the last algo has completed.
 		return;
