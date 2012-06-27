@@ -259,7 +259,7 @@ void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
 
 void ViewWrapper3D::PickerRepDataPickedSlot(QString uid)
 {
-	std::cout << "picked: " << uid << std::endl;
+	//std::cout << "picked: " << uid << std::endl;
 }
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
