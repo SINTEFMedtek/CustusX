@@ -130,7 +130,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
     targetData[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
 
     ssc::messageManager()->sendInfo("Updated registration of data " + targetData[i]->getName());
-    std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
+    //std::cout << "rMd_new\n" << newTransform.mValue << std::endl; // too much noise for large patients
   }
 
 //  skriv om update registration:

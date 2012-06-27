@@ -65,6 +65,7 @@ signals:
 private slots:
 	void executionFinishedSlot();
 	void currentPresetChangedSlot();
+	void preprocessExecuter();
 
 private:
 //	void loadCurrentPreset(QString name);
