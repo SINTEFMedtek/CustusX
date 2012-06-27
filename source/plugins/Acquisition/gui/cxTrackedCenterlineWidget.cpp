@@ -26,6 +26,7 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionDataPtr pluginData, 
   this->setWindowTitle("Tracked Centerline");
 
   connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(centerlineFinishedSlot()));
+  connect(&mCenterlineAlgorithm, SIGNAL(aboutToStart()), this, SLOT(preprocessResampler()));
 
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
@@ -59,30 +60,62 @@ void TrackedCenterlineWidget::checkIfReadySlot()
 
 void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
 {
-  RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
-
-  //get the transforms from the session
-  ssc::TimedTransformMap transforms_prMt = this->getRecording(session);
-  if(transforms_prMt.empty())
-  {
-    ssc::messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Aborting volume tracking data generation.");
-    return;
-  }
-
-  //visualize the tracked data as a mesh
-  ssc::loadMeshFromToolTransforms(transforms_prMt);
-
-  //convert the transforms into a binary image
-  TrackingDataToVolume converter;
-  int padding = 10;
-  converter.setInput(transforms_prMt, padding);
-  ssc::ImagePtr image_d = converter.getOutput();
-
-  //extract the centerline
-  QString savepath = patientService()->getPatientData()->getActivePatientFolder();
-  mCenterlineAlgorithm.setInput(image_d, savepath);
-  mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
+//  RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
+//
+//  //get the transforms from the session
+//  ssc::TimedTransformMap transforms_prMt = this->getRecording(session);
+//  if(transforms_prMt.empty())
+//  {
+//    ssc::messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Aborting volume tracking data generation.");
+//    return;
+//  }
+//
+//  //visualize the tracked data as a mesh
+//  ssc::loadMeshFromToolTransforms(transforms_prMt);
+//
+//  //convert the transforms into a binary image
+//  TrackingDataToVolume converter;
+//  int padding = 10;
+//  converter.setInput(transforms_prMt, padding);
+//  ssc::ImagePtr image_d = converter.getOutput();
+//
+//  //extract the centerline
+//  QString savepath = patientService()->getPatientData()->getActivePatientFolder();
+//  mCenterlineAlgorithm.setInput(image_d, savepath);
+  mSessionID = sessionId;
+  mCenterlineAlgorithm.execute();
+//  mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
 }
+
+void TrackedCenterlineWidget::preprocessResampler()
+{
+
+
+	RecordSessionPtr session = mPluginData->getRecordSession(mSessionID);
+
+	//get the transforms from the session
+	ssc::TimedTransformMap transforms_prMt = this->getRecording(session);
+	if(transforms_prMt.empty())
+	{
+		ssc::messageManager()->sendError("Could not find any tracking data from session "+mSessionID+". Aborting volume tracking data generation.");
+		return;
+	}
+
+	//visualize the tracked data as a mesh
+	ssc::loadMeshFromToolTransforms(transforms_prMt);
+
+	//convert the transforms into a binary image
+	TrackingDataToVolume converter;
+	int padding = 10;
+	converter.setInput(transforms_prMt, padding);
+	ssc::ImagePtr image_d = converter.getOutput();
+
+	//extract the centerline
+	QString savepath = patientService()->getPatientData()->getActivePatientFolder();
+	mCenterlineAlgorithm.setInput(image_d, savepath);
+	mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
+}
+
 
 void TrackedCenterlineWidget::centerlineFinishedSlot()
 {

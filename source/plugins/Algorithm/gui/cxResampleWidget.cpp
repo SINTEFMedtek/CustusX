@@ -24,6 +24,7 @@ ResampleWidget::ResampleWidget(QWidget* parent) :
   mStatusLabel(new QLabel(""))
 {
   connect(&mResampleAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
+  connect(&mResampleAlgorithm, SIGNAL(aboutToStart()), this, SLOT(preprocessResampler()));
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
@@ -81,13 +82,18 @@ void ResampleWidget::hideEvent(QHideEvent* event)
   QWidget::hideEvent(event);
 }
 
-void ResampleWidget::resampleSlot()
+void ResampleWidget::preprocessResampler()
 {
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   double margin = mMargin->getValue();
 
   mResampleAlgorithm.setInput(mSelectedImage->getImage(), mReferenceImage->getImage(), outputBasePath, margin);
   mStatusLabel->setText("<font color=orange> Generating resampling... Please wait!</font>\n");
+}
+
+void ResampleWidget::resampleSlot()
+{
+	mResampleAlgorithm.execute();
 }
 
 void ResampleWidget::handleFinishedSlot()

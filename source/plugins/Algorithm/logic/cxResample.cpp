@@ -19,7 +19,7 @@ void Resample::setInput(ssc::ImagePtr image, ssc::ImagePtr reference, QString ou
   mInputReference = reference;
   mOutputBasePath = outputBasePath;
 
-  this->generate();
+//  this->generate();
 }
 
 ssc::ImagePtr Resample::getOutput()
