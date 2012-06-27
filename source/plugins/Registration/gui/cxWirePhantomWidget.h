@@ -20,12 +20,15 @@
 #include "cxResampleWidget.h"
 #include "cxCenterlineWidget.h"
 #include <boost/function.hpp>
+#include "cxCompositeTimedAlgorithm.h"
+#include "cxTimedAlgorithmProgressBar.h"
 
 class QPushButton;
 class QVBoxLayout;
 
 namespace cx
 {
+
 
 /**
  * \brief Probe accuracy measurements using the Wire Phantom.
@@ -55,11 +58,11 @@ private slots:
 	void measureSlot();
 	ssc::MeshPtr loadNominalCross();
 	void activeImageChangedSlot(const QString&);
-	void popPendingActions();
+//	void popPendingActions();
+	void registration();
 
 private:
 	void showData(ssc::DataPtr data);
-	void registration();
 
 	class BinaryThresholdImageFilterWidget* mSegmentationWidget;
 	class CenterlineWidget* mCenterlineWidget;
@@ -69,6 +72,8 @@ private:
 	QPushButton* mMeasureButton;
 	QTextEdit* mResults;
 	std::vector<boost::function0<void> > mPendingActions;
+	CompositeTimedAlgorithmPtr mCompositeAlgorithm;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 };
 
 } /* namespace cx */

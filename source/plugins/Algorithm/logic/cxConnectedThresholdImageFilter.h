@@ -1,7 +1,8 @@
 #ifndef CXCONNECTEDTHRESHOLDIMAGEFILTER_H_
 #define CXCONNECTEDTHRESHOLDIMAGEFILTER_H_
 
-#include "cxTimedAlgorithm.h"
+#include "cxThreadedTimedAlgorithm.h"
+#include "cxAlgorithmHelpers.h"
 
 namespace cx
 {
@@ -30,6 +31,7 @@ public:
   virtual ~ConnectedThresholdImageFilter();
 
   void setInput(ssc::ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed);
+  virtual void execute() { throw "not implemented!!"; }
   ssc::ImagePtr getOutput();
 
 private slots:

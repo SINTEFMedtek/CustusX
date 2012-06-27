@@ -1,7 +1,7 @@
 #ifndef CXSBINARYTHRESHOLDIMAGEFILTER_H_
 #define CXSBINARYTHRESHOLDIMAGEFILTER_H_
 
-#include "cxTimedAlgorithm.h"
+#include "cxThreadedTimedAlgorithm.h"
 
 namespace cx
 {

@@ -23,6 +23,7 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
 {
 	mCenterlineAlgorithm.reset(new Centerline);
   connect(mCenterlineAlgorithm.get(), SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
+  connect(mCenterlineAlgorithm.get(), SIGNAL(aboutToStart()), this, SLOT(preprocessResampler()));
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -76,19 +77,21 @@ void CenterlineWidget::setDefaultColor(QColor color)
   mCenterlineAlgorithm->setDefaultColor(color);
 }
 
+void CenterlineWidget::preprocessResampler()
+{
+	  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
+	  if(mCenterlineAlgorithm->setInput(mSelectedImage->getImage(), outputBasePath))
+	  {
+	  }
+	  else
+	  {
+		  ssc::messageManager()->sendWarning("Centerline: Incorrect input");
+	  }
+}
+
 void CenterlineWidget::findCenterlineSlot()
 {
-  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
-  if(mCenterlineAlgorithm->setInput(mSelectedImage->getImage(), outputBasePath))
-  {
-//    //Only print text if the input is in the correct format
-//    mStatusLabel->setText("<font color=orange> Generating centerline... Please wait!</font>\n");
-  }
-  else
-  {
-	  ssc::messageManager()->sendWarning("Centerline: Incorrect input");
-//    mStatusLabel->setText("<font color=red> Incorrect input</font>\n");
-  }
+	mCenterlineAlgorithm->execute();
 }
 
 void CenterlineWidget::handleFinishedSlot()
@@ -96,8 +99,6 @@ void CenterlineWidget::handleFinishedSlot()
   ssc::DataPtr centerlineImage = mCenterlineAlgorithm->getOutput();
   if(!centerlineImage)
     return;
-
-//  mStatusLabel->setText("<font color=green> Done. </font>\n");
 
   emit outputImageChanged(centerlineImage->getUid());
 }
