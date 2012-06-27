@@ -43,6 +43,7 @@ ElastixManager::ElastixManager(RegistrationManagerPtr regManager) : mRegistratio
 
 	mExecuter.reset(new ElastixExecuter());
 	connect(mExecuter.get(), SIGNAL(finished()), this, SLOT(executionFinishedSlot()));
+	connect(mExecuter.get(), SIGNAL(aboutToStart()), this, SLOT(preprocessExecuter()));
 
 	this->currentPresetChangedSlot();
 }
@@ -154,9 +155,11 @@ QString ElastixManager::getActiveExecutable() const
 
 void ElastixManager::execute()
 {
-//	SSC_LOG("exec");
-//	QDir folder(cx::DataLocations::getRootConfigPath() + "/elastix");
+	mExecuter->execute();
+}
 
+void ElastixManager::preprocessExecuter()
+{
     QStringList parameterFiles;
     if (QFileInfo(mActiveParameterFile0).exists() && QFileInfo(mActiveParameterFile0).exists())
     	parameterFiles << mActiveParameterFile0;
@@ -166,12 +169,11 @@ void ElastixManager::execute()
 	QString timestamp = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
 	QDir outDir(patientService()->getPatientData()->getActivePatientFolder()+"/elastix/"+timestamp);
 	mExecuter->setDisplayProcessMessages(mDisplayProcessMessages->getValue());
-	mExecuter->run(mActiveExecutable,
+	mExecuter->setInput(mActiveExecutable,
 	         mRegistrationManager->getFixedData(),
 	         mRegistrationManager->getMovingData(),
 	         outDir.absolutePath(),
 	         parameterFiles);
-
 }
 
 void ElastixManager::executionFinishedSlot()
