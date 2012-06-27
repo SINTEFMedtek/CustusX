@@ -53,6 +53,7 @@ namespace ssc
 class Image: public Data
 {
 Q_OBJECT
+
 public:
 	struct ShadingStruct
 	{
@@ -88,7 +89,6 @@ public:
 	void setTransferFunctions3D(ImageTF3DPtr transferFuntion);
 	ImageLUT2DPtr getLookupTable2D();
 
-	void printLandmarks(); //TODO: JUST FOR TESTING
 	virtual DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
 	vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
 	int getMax();///< \return Max alpha position in the histogram = max key value in map.
@@ -127,7 +127,6 @@ public:
 	virtual void clearClipPlanes();
 	void mergevtkSettingsIntosscTransform();
 
-//	void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
 	void resetTransferFunctions(bool _2D=true, bool _3D=true); ///< Resets the transfer functions and creates new defaut values.
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);
 	void resetTransferFunction(ImageLUT2DPtr imageLookupTable2D);
@@ -148,7 +147,6 @@ public slots:
 	void removeLandmark(QString uid);
 
 protected slots:
-	//	void transferFunctionsChangedSlot();
 	virtual void transformChangedSlot();
 
 protected:
@@ -172,10 +170,6 @@ protected:
 	std::vector<vtkPlanePtr> mClipPlanes;
 	QString mModality; ///< modality of the image, defined as DICOM tag (0008,0060), Section 3, C.7.3.1.1.1
 	QString mImageType; ///< type of the image, defined as DICOM tag (0008,0008) (mainly value 3, but might be a merge of value 4), Section 3, C.7.6.1.1.2
-
-
-
-
 };
 
 } // end namespace ssc
