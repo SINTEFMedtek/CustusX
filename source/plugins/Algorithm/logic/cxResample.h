@@ -1,7 +1,8 @@
 #ifndef CXRESAMPLE_H_
 #define CXRESAMPLE_H_
 
-#include "cxTimedAlgorithm.h"
+#include "cxThreadedTimedAlgorithm.h"
+#include <boost/function.hpp>
 
 namespace cx
 {
@@ -28,6 +29,7 @@ public:
   virtual ~Resample();
 
   void setInput(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin);
+
   ssc::ImagePtr getOutput();
 
 protected slots:

@@ -41,6 +41,7 @@ public:
   ~CenterlineWidget();
   virtual QString defaultWhatsThis() const;
   void setDefaultColor(QColor color);
+  CenterlinePtr  getCenterlineAlgorithm() { return mCenterlineAlgorithm; }
 
 public slots:
   void setImageInputSlot(QString value);
@@ -56,6 +57,7 @@ protected:
 
 private slots:
   void handleFinishedSlot();
+  void preprocessResampler();
 
 private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
