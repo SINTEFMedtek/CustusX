@@ -60,6 +60,7 @@ private slots:
 	void activeImageChangedSlot(const QString&);
 //	void popPendingActions();
 	void registration();
+	void generate_sMt();
 
 private:
 	void showData(ssc::DataPtr data);
@@ -70,10 +71,13 @@ private:
 	SelectImageStringDataAdapterPtr mSegmentationOutput;
 	SelectDataStringDataAdapterPtr mCenterlineOutput;
 	QPushButton* mMeasureButton;
+	QPushButton* mCalibrationButton;
 	QTextEdit* mResults;
 	std::vector<boost::function0<void> > mPendingActions;
 	CompositeTimedAlgorithmPtr mCompositeAlgorithm;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+	ssc::Transform3D mLastRegistration;
+
 };
 
 } /* namespace cx */
