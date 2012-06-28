@@ -231,7 +231,9 @@ GPURayCastVolumePainter::GPURayCastVolumePainter() :
 	mDSColorBuffer(0),
 	mDSDepthBuffer(0),
 	mDownsampleWidth(512),
-	mDownsampleHeight(512)
+	mDownsampleHeight(512),
+	mShouldResample(false),
+	mResample(false)
 {
 	mInternals = new vtkInternals();
 }
@@ -363,8 +365,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		}
 	}
 
-#if DOWNSAMPLE
-	if (!mUpscaleShader)
+	if (mResample && !mUpscaleShader)
 	{
 		mInternals->mVolumes = mInternals->mElement.size();
 		QString vertexShaderSource = this->loadShaderFile(mUSVertexShaderFile);
@@ -387,7 +388,6 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		mUpscaleShader = pgm;
 		report_gl_error();
 	}
-#endif
 	
 	mInternals->Shader->GetUniformVariables()->SetUniformi("renderMode", 1, &mRenderMode);
 	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &mStepSize);
@@ -395,22 +395,22 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	viewport[0] = mWidth;
 	viewport[1] = mHeight;
 	mInternals->Shader->GetUniformVariables()->SetUniformf("backgroundResolution", 2, viewport);
-#if DOWNSAMPLE
-	viewport[0] = mDownsampleWidth;
-	viewport[1] = mDownsampleHeight;
-#endif
+	if (mResample)
+	{
+		viewport[0] = mDownsampleWidth;
+		viewport[1] = mDownsampleHeight;
+	}
+		
 	mInternals->Shader->GetUniformVariables()->SetUniformf("viewport", 2, viewport);
 	
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
 	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
 	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-#if DOWNSAMPLE
-	if (!vtkgl::IsFramebuffer(mFBO))
+	if (mResample && !vtkgl::IsFramebuffer(mFBO))
 	{
 		createBuffers();
 	}
-#endif
 
 	report_gl_error();
 	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
@@ -575,59 +575,61 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
 	}
 
-#if DOWNSAMPLE
-	vtkgl::BindFramebuffer( vtkgl::DRAW_FRAMEBUFFER, mFBO);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	GLenum status = vtkgl::CheckFramebufferStatus(vtkgl::DRAW_FRAMEBUFFER);
-	switch (status)
+	if (mResample)
 	{
-	case vtkgl::FRAMEBUFFER_COMPLETE:
-		break;
-	default:
-		std::cout << "other framebuffer problem: " << status << std::endl;
-		break;
+		vtkgl::BindFramebuffer( vtkgl::DRAW_FRAMEBUFFER, mFBO);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		GLenum status = vtkgl::CheckFramebufferStatus(vtkgl::DRAW_FRAMEBUFFER);
+		switch (status)
+		{
+		case vtkgl::FRAMEBUFFER_COMPLETE:
+			break;
+		default:
+			std::cout << "other framebuffer problem: " << status << std::endl;
+			break;
+		}
+		report_gl_error();
+		glViewport(0, 0, mDownsampleWidth, mDownsampleHeight);
 	}
-	report_gl_error();
-	glViewport(0, 0, mDownsampleWidth, mDownsampleHeight);
-#endif
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
 
 	mInternals->Shader->Restore();
 
-#if DOWNSAMPLE
-	vtkgl::BindFramebuffer( vtkgl::DRAW_FRAMEBUFFER, 0);
-	report_gl_error();
-	GLenum buffer = GL_BACK;
-	vtkgl::DrawBuffers(1, &buffer);
-	vtkgl::BindFramebuffer( vtkgl::READ_FRAMEBUFFER, mFBO);
-	report_gl_error();
-	glReadBuffer(vtkgl::COLOR_ATTACHMENT0);
+	if (mResample)
+	{
+		vtkgl::BindFramebuffer( vtkgl::DRAW_FRAMEBUFFER, 0);
+		report_gl_error();
+		GLenum buffer = GL_BACK;
+		vtkgl::DrawBuffers(1, &buffer);
+		vtkgl::BindFramebuffer( vtkgl::READ_FRAMEBUFFER, mFBO);
+		report_gl_error();
+		glReadBuffer(vtkgl::COLOR_ATTACHMENT0);
+		
+		GL_TRACE("Before upscale");
+		glViewport(0,0, mWidth, mHeight);
+		glDisable(GL_SCISSOR_TEST);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		mUpscaleShader->Use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, mDSDepthBuffer);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, mDSColorBuffer);
+		int var = 1;
+		mUpscaleShader->GetUniformVariables()->SetUniformi("colors", 1, &var);
+		var = 0;
+		mUpscaleShader->GetUniformVariables()->SetUniformi("depth", 1, &var);
+		glBegin(GL_QUADS);
+		glVertex3f(-1,-1,0);
+		glVertex3f(-1,1,0);
+		glVertex3f(1,1,0);
+		glVertex3f(1,-1,0);
+		glEnd();
+		report_gl_error();
 
-	GL_TRACE("Before upscale");
-	glViewport(0,0, mWidth, mHeight);
-	glDisable(GL_SCISSOR_TEST);
-//	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	mUpscaleShader->Use();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mDSDepthBuffer);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, mDSColorBuffer);
-	int var = 1;
-	mUpscaleShader->GetUniformVariables()->SetUniformi("colors", 1, &var);
-	var = 0;
-	mUpscaleShader->GetUniformVariables()->SetUniformi("depth", 1, &var);
-	glBegin(GL_QUADS);
-	glVertex3f(-1,-1,0);
-	glVertex3f(-1,1,0);
-	glVertex3f(1,1,0);
-	glVertex3f(1,-1,0);
-	glEnd();
-	report_gl_error();
-
-	vtkgl::BindFramebuffer( vtkgl::READ_FRAMEBUFFER, 0);
-	mUpscaleShader->Restore();
-	report_gl_error();
-#endif
+		vtkgl::BindFramebuffer( vtkgl::READ_FRAMEBUFFER, 0);
+		mUpscaleShader->Restore();
+		report_gl_error();
+	}
 	glDisable(vtkgl::TEXTURE_3D);
 	glBindTexture(GL_TEXTURE_3D, 0);
 	glActiveTexture(oldTextureUnit);
@@ -696,7 +698,15 @@ void GPURayCastVolumePainter::setViewport(float width, float height)
 		mBuffersValid = false;
 	}
 	mWidth = width;
-	mHeight = height;	
+	mHeight = height;
+	if (mShouldResample && (mWidth > mDownsampleWidth || mHeight > mDownsampleHeight))
+	{
+		mResample = true;
+	}
+	else
+	{
+		mResample = false;
+	}
 }
 
 void GPURayCastVolumePainter::set_nMr(int index, Transform3D nMr)
@@ -719,6 +729,20 @@ void GPURayCastVolumePainter::setRenderMode(int renderMode)
 	mRenderMode = renderMode;
 }
 
+void GPURayCastVolumePainter::enableImagePlaneDownsampling(int maxWidth, int maxHeight)
+{
+	mShouldResample = true;
+	mDownsampleWidth = maxWidth;
+	mDownsampleHeight = maxHeight;
+	setViewport(mWidth, mHeight);
+}
+
+void GPURayCastVolumePainter::disableImagePlaneDownsampling()
+{
+	mShouldResample = false;
+	mResample = false;
+}
+	
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
