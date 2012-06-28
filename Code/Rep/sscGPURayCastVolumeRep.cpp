@@ -111,7 +111,7 @@ GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
 	mPainter = GPURayCastVolumePainterPtr::New();
 	mPainter->setStepSize(defaultStepSize);
 	// default shader for sonowand: override using setshaderfile()
-	mPainter->setShaderFiles("/Data/Resources/Shaders/raycasting_shader.vert", "/Data/Resources/Shaders/raycasting_shader.frag");
+	mPainter->setShaderFiles("/Data/Resources/Shaders/raycasting_shader.vert", "/Data/Resources/Shaders/raycasting_shader.frag", "/Data/Resources/Shaders/upscale.vert", "/Data/Resources/Shaders/upscale.frag");
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
 
 	mMerger = vtkAppendPolyData::New();
@@ -134,9 +134,9 @@ GPURayCastVolumeRepPtr GPURayCastVolumeRep::New(const QString& uid)
     return retval;
 }
 
-void GPURayCastVolumeRep::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
+void GPURayCastVolumeRep::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile, QString upscaleVert, QString upscaleFrag)
 {
-	mPainter->setShaderFiles(vertexShaderFile, fragmentShaderFile);
+	mPainter->setShaderFiles(vertexShaderFile, fragmentShaderFile, upscaleVert, upscaleFrag);
 }
 
 void GPURayCastVolumeRep::viewChanged()

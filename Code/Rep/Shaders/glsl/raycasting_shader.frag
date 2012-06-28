@@ -8,6 +8,7 @@ const int maxIterations = 450;
 const int maxVolumes = ${MAX_VOLUMES};
 uniform float stepsize;
 uniform vec2 viewport;
+uniform vec2 backgroundResolution;
 
 uniform int lutSize[maxVolumes];
 uniform sampler3D volumeTexture[maxVolumes];
@@ -187,9 +188,10 @@ void main()
 	float n = 0.0;
 	float thau = 0.02;
 	bool found_depth = false;
+	vec2 scaleFactor = backgroundResolution / viewport;
 
 	vec2 depthLookup;
-	depthLookup = depthTexCoords(gl_FragCoord, viewport);
+	depthLookup = depthTexCoords(vec4(gl_FragCoord.xy*scaleFactor,gl_FragCoord.zw), backgroundResolution);
 	vec4 depth = texture2DRect(depthBuffer, depthLookup);
 	vec4 end = gl_FragCoord;
 	end.z = depth.r;
