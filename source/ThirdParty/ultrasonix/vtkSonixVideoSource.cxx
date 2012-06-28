@@ -278,7 +278,7 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 		}
 	else
 		{
-			//std::cout << "No missed frames" << std::endl;
+			//std::cout << "No missed frames. Frame nr: " << frmnum << std::endl;
 		}
 
 
