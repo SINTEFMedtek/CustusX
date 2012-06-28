@@ -18,9 +18,9 @@ namespace cx
 ImageServer::ImageServer(QObject* parent) :
 	QTcpServer(parent)
 {
-	mTimer = new QTimer(this);
-	connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-	mTimer->start(500);
+	//mTimer = new QTimer(this);
+	//connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+	//mTimer->start(500);
 }
 
 void ImageServer::initialize()
@@ -147,7 +147,7 @@ void ImageServer::printHelpText()
 	}
 	std::cout << std::endl;
 	std::cout << std::endl;
-	std::cout << "Press any key + Enter to close the server."<< std::endl;
+	std::cout << "Press Ctrl + C to close the server."<< std::endl;
 	std::cout << std::endl;
 }
 }
