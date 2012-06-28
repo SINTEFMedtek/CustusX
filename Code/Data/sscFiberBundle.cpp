@@ -43,6 +43,7 @@ FiberBundle::FiberBundle(const QString &uid, const QString &name)
 {
 	mMesh.reset(new VtkFileMesh(uid, name));
 	mSpacing = Vector3D(1.0, 1.0, 1.0);
+	mVtkImageCached = false;
 
 	// Enable shading as default
 	setShading(true);
@@ -69,6 +70,8 @@ void FiberBundle::setMesh(const MeshPtr& mesh)
 		connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 	}
 
+	// Flag image cache as false, so that we can read new image on request
+	mVtkImageCached = false;
 	emit bundleChanged();
 }
 
@@ -123,66 +126,68 @@ vtkPolyDataPtr FiberBundle::getVtkPolyData() const
   */
 vtkImageDataPtr FiberBundle::getVtkImageData()
 {
-	if (mVtkImageData)
-		return mVtkImageData;
-
-	vtkPolyDataPtr pd = getVtkPolyData();
-	if (!pd) // No poly data to generate image data from
-		return vtkImageDataPtr();
-
-	vtkSmartPointer<vtkImageData> whiteImage = vtkSmartPointer<vtkImageData>::New();
-
-	double bounds[6];
-	pd->GetBounds(bounds);
-
-	whiteImage->SetSpacing(mSpacing[0], mSpacing[1], mSpacing[2]);
-
-	// Compute dimensions
-	int dim[3];
-	for (int i = 0; i < 3; i++)
+	if (!mVtkImageCached)
 	{
-		dim[i] = static_cast<int>(std::ceil((bounds[i * 2 + 1] - bounds[i * 2]) / mSpacing[i]));
+		vtkPolyDataPtr pd = getVtkPolyData();
+		if (!pd) // No poly data to generate image data from
+			return vtkImageDataPtr();
+
+		vtkSmartPointer<vtkImageData> whiteImage = vtkSmartPointer<vtkImageData>::New();
+
+		double bounds[6];
+		pd->GetBounds(bounds);
+
+		whiteImage->SetSpacing(mSpacing[0], mSpacing[1], mSpacing[2]);
+
+		// Compute dimensions
+		int dim[3];
+		for (int i = 0; i < 3; i++)
+		{
+			dim[i] = static_cast<int>(std::ceil((bounds[i * 2 + 1] - bounds[i * 2]) / mSpacing[i]));
+		}
+
+		whiteImage->SetDimensions(dim);
+		whiteImage->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
+
+		double origin[3];
+		origin[0] = bounds[0] + mSpacing[0] / 2;
+		origin[1] = bounds[2] + mSpacing[1] / 2;
+		origin[2] = bounds[4] + mSpacing[2] / 2;
+		whiteImage->SetOrigin(origin);
+
+		whiteImage->SetScalarTypeToUnsignedChar();
+		whiteImage->AllocateScalars();
+
+		// Fill the image with foreground voxels:
+		unsigned char inval = 255;
+		unsigned char outval = 0;
+		vtkIdType count = whiteImage->GetNumberOfPoints();
+		for (vtkIdType i = 0; i < count; ++i)
+		{
+			whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
+		}
+
+		// Apply an image stencil to the poly data
+		vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+		pol2stenc->SetInput(pd);
+		pol2stenc->SetOutputOrigin(origin);
+		pol2stenc->SetOutputSpacing(mSpacing[0], mSpacing[1], mSpacing[2]);
+		pol2stenc->SetOutputWholeExtent(whiteImage->GetExtent());
+		pol2stenc->Update();
+
+		// Cut the corresponding white image and set the background:
+		vtkSmartPointer<vtkImageStencil> imgstenc = vtkSmartPointer<vtkImageStencil>::New();
+		imgstenc->SetInput(whiteImage);
+		imgstenc->SetStencil(pol2stenc->GetOutput());
+		imgstenc->ReverseStencilOff();
+		imgstenc->SetBackgroundValue(outval);
+		imgstenc->Update();
+
+		// Cache the resulting image
+		mVtkImageData = imgstenc->GetOutput();
+		mVtkImageCached = true;
 	}
 
-	whiteImage->SetDimensions(dim);
-	whiteImage->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
-
-	double origin[3];
-	origin[0] = bounds[0] + mSpacing[0] / 2;
-	origin[1] = bounds[2] + mSpacing[1] / 2;
-	origin[2] = bounds[4] + mSpacing[2] / 2;
-	whiteImage->SetOrigin(origin);
-
-	whiteImage->SetScalarTypeToUnsignedChar();
-	whiteImage->AllocateScalars();
-
-	// Fill the image with foreground voxels:
-	unsigned char inval = 255;
-	unsigned char outval = 0;
-	vtkIdType count = whiteImage->GetNumberOfPoints();
-	for (vtkIdType i = 0; i < count; ++i)
-	{
-		whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
-	}
-
-	// Apply an image stencil to the poly data
-	vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-	pol2stenc->SetInput(pd);
-	pol2stenc->SetOutputOrigin(origin);
-	pol2stenc->SetOutputSpacing(mSpacing[0], mSpacing[1], mSpacing[2]);
-	pol2stenc->SetOutputWholeExtent(whiteImage->GetExtent());
-	pol2stenc->Update();
-
-	// Cut the corresponding white image and set the background:
-	vtkSmartPointer<vtkImageStencil> imgstenc = vtkSmartPointer<vtkImageStencil>::New();
-	imgstenc->SetInput(whiteImage);
-	imgstenc->SetStencil(pol2stenc->GetOutput());
-	imgstenc->ReverseStencilOff();
-	imgstenc->SetBackgroundValue(outval);
-	imgstenc->Update();
-
-	// Return the resulting image
-	mVtkImageData = imgstenc->GetOutput();
 	return mVtkImageData;
 }
 
@@ -214,6 +219,8 @@ void FiberBundle::printSelf(std::ostream &os, Indent indent)
 
 void FiberBundle::meshChangedSlot()
 {
+	// Flag image cache as false, so that we can read new image on request
+	mVtkImageCached = false;
 	emit bundleChanged();
 }
 
