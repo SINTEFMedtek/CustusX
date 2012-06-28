@@ -63,6 +63,8 @@ public:
 	void setClipVolume(int index, bool clip);
 	void setStepSize(double stepsize);
 	void setRenderMode(int renderMode);
+	void enableImagePlaneDownsampling(int maxWidth, int maxHeight);
+	void disableImagePlaneDownsampling();
 	/**
 	 * Maximum number of volumes that can be rendered simultaneously
 	 */
@@ -99,6 +101,8 @@ protected:
 	int mDownsampleWidth;
 	int mDownsampleHeight;
 	vtkSmartPointer<vtkShaderProgram2> mUpscaleShader;
+	bool mShouldResample;
+	bool mResample;
 	friend class ::TestGPURayCaster;
 };
 

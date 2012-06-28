@@ -106,6 +106,8 @@ public:
 	 * \brief Set the rendering mode
 	 */
 	void setRenderMode(enum RenderMode renderMode);
+	void enableImagePlaneDownsampling(int maxWidth, int maxHeight);
+	void disableImagePlaneDownsampling();
 
 protected:
 	GPURayCastVolumeRep(const QString& uid);
