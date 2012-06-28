@@ -599,6 +599,8 @@ configure_file (
     "${PROJECT_SOURCE_DIR}/CMake/SSCConfig.cmake.in"
     "${PROJECT_BINARY_DIR}/SSCConfig.cmake"
     )
+configure_file(Rep/Shaders/glsl/upscale.frag Rep COPYONLY)
+configure_file(Rep/Shaders/glsl/upscale.vert Rep COPYONLY)
 configure_file(Rep/Shaders/glsl/raycasting_shader.frag Rep COPYONLY)
 configure_file(Rep/Shaders/glsl/raycasting_shader.vert Rep COPYONLY)
 configure_file(Rep/Shaders/glsl/Texture3DOverlay.frag Rep COPYONLY)

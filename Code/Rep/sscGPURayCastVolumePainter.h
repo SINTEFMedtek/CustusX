@@ -53,7 +53,7 @@ public:
 	virtual void ReleaseGraphicsResources(vtkWindow *);
 	void PrintSelf(ostream& os, vtkIndent indent);
 
-	void setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile);
+	void setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile, QString upscaleVert, QString upscaleFrag);
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
 	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer, double maxValue);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
@@ -77,11 +77,14 @@ protected:
 	bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);
 	bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
 	QString loadShaderFile(QString shaderFile);
+	void createBuffers();
 
 	class vtkInternals;
 	vtkInternals* mInternals;
 	QString mVertexShaderFile;
 	QString mFragmentShaderFile;
+	QString mUSVertexShaderFile;
+	QString mUSFragmentShaderFile;
 	float mWidth;
 	float mHeight;
 	unsigned int mDepthBuffer;
@@ -90,6 +93,12 @@ protected:
 	SlicePlaneClipperPtr mClipper;
 	float mStepSize;
 	int mRenderMode;
+	unsigned int mFBO;
+	unsigned int mDSColorBuffer;
+	unsigned int mDSDepthBuffer;
+	int mDownsampleWidth;
+	int mDownsampleHeight;
+	vtkSmartPointer<vtkShaderProgram2> mUpscaleShader;
 	friend class ::TestGPURayCaster;
 };
 

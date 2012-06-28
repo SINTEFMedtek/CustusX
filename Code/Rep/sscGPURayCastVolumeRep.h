@@ -77,7 +77,7 @@ public:
 	/**
 	 * \brief Override the default locations of the shader files
 	 */
-	void setShaderFiles(QString vertexShaderFile, QString fragmentShaderFiles);
+	void setShaderFiles(QString vertexShaderFile, QString fragmentShaderFiles, QString upscaleVert, QString upscaleFrag);
 	virtual void printSelf(std::ostream & os, ssc::Indent indent);
 	/**
 	 * \brief Set the images to render using this Rep
