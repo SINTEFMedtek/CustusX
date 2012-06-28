@@ -140,6 +140,7 @@ protected:
 
 private:
 	vtkLookupTablePtr mLut;
+	bool mVtkImageCached;
 	vtkImageDataPtr mVtkImageData;
 	MeshPtr mMesh;
 	FiberBundleROI mROI;
