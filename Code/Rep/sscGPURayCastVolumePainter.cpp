@@ -232,6 +232,7 @@ GPURayCastVolumePainter::GPURayCastVolumePainter() :
 	mDSDepthBuffer(0),
 	mDownsampleWidth(512),
 	mDownsampleHeight(512),
+	mDownsamplePixels(0),
 	mShouldResample(false),
 	mResample(false)
 {
@@ -413,6 +414,9 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 	if (mResample && !vtkgl::IsFramebuffer(mFBO))
 	{
+		float factor = (float)mDownsamplePixels/(mWidth*mHeight);
+		mDownsampleWidth = mWidth * factor;
+		mDownsampleHeight = mHeight * factor;
 		createBuffers();
 	}
 
@@ -703,7 +707,7 @@ void GPURayCastVolumePainter::setViewport(float width, float height)
 	}
 	mWidth = width;
 	mHeight = height;
-	if (mShouldResample && (mWidth > mDownsampleWidth || mHeight > mDownsampleHeight))
+	if (mShouldResample && (mWidth * mHeight > mDownsamplePixels))
 	{
 		mResample = true;
 	}
@@ -733,11 +737,10 @@ void GPURayCastVolumePainter::setRenderMode(int renderMode)
 	mRenderMode = renderMode;
 }
 
-void GPURayCastVolumePainter::enableImagePlaneDownsampling(int maxWidth, int maxHeight)
+void GPURayCastVolumePainter::enableImagePlaneDownsampling(int maxPixels)
 {
 	mShouldResample = true;
-	mDownsampleWidth = maxWidth;
-	mDownsampleHeight = maxHeight;
+	mDownsamplePixels = maxPixels;
 	setViewport(mWidth, mHeight);
 }
 
