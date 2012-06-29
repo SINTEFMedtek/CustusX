@@ -238,12 +238,16 @@ GPURayCastVolumePainter::GPURayCastVolumePainter() :
 	mInternals = new vtkInternals();
 }
 
-void GPURayCastVolumePainter::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile, QString upscaleVert, QString upscaleFrag)
+void GPURayCastVolumePainter::setShaderFolder(QString folder)
 {
-	mVertexShaderFile = vertexShaderFile;
-	mFragmentShaderFile = fragmentShaderFile;
-	mUSVertexShaderFile = upscaleVert;
-	mUSFragmentShaderFile = upscaleFrag;
+	if (!folder.endsWith("/"))
+	{
+		folder +=  "/";
+	}
+	mVertexShaderFile = folder + "raycasting_shader.vert";
+	mFragmentShaderFile = folder + "raycasting_shader.frag";
+	mUSVertexShaderFile = folder + "upscale.vert";
+	mUSFragmentShaderFile = folder + "upscale.frag";
 }
 
 QString GPURayCastVolumePainter::loadShaderFile(QString shaderFile)

@@ -247,7 +247,7 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	
 #ifndef WIN32
 	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
-	mRepPtr->setShaderFiles(mShaderFolder + "raycasting_shader.vert", mShaderFolder + "raycasting_shader.frag", mShaderFolder + "upscale.vert", mShaderFolder + "upscale.frag");
+	mRepPtr->setShaderFolder(mShaderFolder);
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);
