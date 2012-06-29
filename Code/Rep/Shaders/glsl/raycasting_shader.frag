@@ -1,6 +1,5 @@
 #version 120
 #extension GL_EXT_gpu_shader4 : enable
-#extension GL_ARB_texture_rectangle : enable
 #pragma debug(on)
 
 const int volumes=${NUMBER_OF_VOLUMES};
@@ -21,8 +20,8 @@ uniform float alpha[maxVolumes];
 uniform mat4 M[maxVolumes];
 uniform bool useCutPlane[maxVolumes];
 uniform float maxValue[maxVolumes];
-uniform sampler2DRect depthBuffer;
-uniform sampler2DRect backgroundBuffer;
+uniform sampler2D depthBuffer;
+uniform sampler2D backgroundBuffer;
 uniform vec3 cutPlaneNormal;
 uniform vec3 cutPlaneOffset;
 
@@ -68,8 +67,7 @@ vec4 viewVolumePosition( vec4 fragment, vec2 viewport)
 
 vec2 depthTexCoords( vec4 fragment, vec2 viewport)
 {
-
-	vec2 result = fragment.xy;
+	vec2 result = fragment.xy / viewport;
 	return result;
 }
 
@@ -192,7 +190,7 @@ void main()
 
 	vec2 depthLookup;
 	depthLookup = depthTexCoords(vec4(gl_FragCoord.xy*scaleFactor,gl_FragCoord.zw), backgroundResolution);
-	vec4 depth = texture2DRect(depthBuffer, depthLookup);
+	vec4 depth = texture2D(depthBuffer, depthLookup);
 	vec4 end = gl_FragCoord;
 	end.z = depth.r;
 	end = unproject(end, viewport);
@@ -214,7 +212,7 @@ void main()
 		colorSample = vec4(0);
 		if (i > maxLength/delta)
 		{
-			colorSample = texture2DRect(backgroundBuffer, depthLookup);
+			colorSample = texture2D(backgroundBuffer, depthLookup);
 			colorSample.a = 1.0;
 			doBreak = true;
 		}
@@ -263,7 +261,7 @@ void main()
 			if (allVolumesBeenHit && hit == 0 && i > 0)
 			{
 				// We left the last volume
-				colorSample = texture2DRect(backgroundBuffer, depthLookup);
+				colorSample = texture2D(backgroundBuffer, depthLookup);
 				colorSample.a = 1.0;
 				doBreak = true;
 			} else if (hit > 0 && contributingVolumes == 0)
@@ -296,7 +294,7 @@ void main()
 				}
 				if (min == maxIterations * stepsize)
 				{
-					colorSample = texture2DRect(backgroundBuffer, depthLookup);
+					colorSample = texture2D(backgroundBuffer, depthLookup);
 					colorSample.a = 1.0;
 					doBreak = true;
 				}
