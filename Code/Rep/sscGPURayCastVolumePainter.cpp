@@ -336,7 +336,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(renWin); 
 	if (!LoadRequiredExtensions(context->GetExtensionManager()))
 	{
-		std::cout << "Missing required EXTENSION!!!!!!!!!!!." << endl;
+		std::cout << "Missing required EXTENSION!" << endl;
 		return;
 	}
 
@@ -347,6 +347,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		QString fragmentShaderSource = this->loadShaderFile(mFragmentShaderFile);
 		fragmentShaderSource = fragmentShaderSource.replace("${NUMBER_OF_VOLUMES}", QString("%1").arg(mInternals->mElement.size()));
 		fragmentShaderSource = fragmentShaderSource.replace("${MAX_VOLUMES}", QString("%1").arg(maxVolumes));
+		fragmentShaderSource = fragmentShaderSource.replace("${STEPSIZE}", QString("%1").arg(mStepSize));
 
 		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
 		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));

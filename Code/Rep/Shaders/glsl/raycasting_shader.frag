@@ -5,7 +5,8 @@
 const int volumes=${NUMBER_OF_VOLUMES};
 const int maxIterations = 450;
 const int maxVolumes = ${MAX_VOLUMES};
-uniform float stepsize;
+const float stepsize = ${STEPSIZE};
+const float maxDistance = float(maxIterations) * stepsize;
 uniform vec2 viewport;
 uniform vec2 backgroundResolution;
 
@@ -25,14 +26,9 @@ uniform sampler2D backgroundBuffer;
 uniform vec3 cutPlaneNormal;
 uniform vec3 cutPlaneOffset;
 
-float applyWindowLevel(float input, float window, float level)
+vec4 applyWindowLevel(vec4 value, float window, float level)
 {
-	return (input - level) / window + 0.5;
-}
-
-vec4 applyWindowLevel(vec4 input, float window, float level)
-{
-	return (input - level) / window + 0.5;
+	return (value - level) / window + 0.5;
 }
 
 vec4 applyLut(in float value, in samplerBuffer lut, in int lutSize2)
@@ -88,7 +84,7 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 {
 	vec4 pos = Matrix * position;
 	vec4 delta = Matrix * rayDirection;
-	float min = maxIterations*stepsize;
+	float min = maxDistance;
 	if (inUnitCube(pos))
 	{
 		return 0.0;
@@ -147,7 +143,7 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 			min = distance;
 		}
 	}
-	if (min == maxIterations * stepsize)
+	if (min == maxDistance)
 	{
 		return -1.0;
 	}
@@ -272,7 +268,7 @@ void main()
 			} else if (hit==0)
 			{
 				// We didn't hit any volume, but there could be some volumes left to hit. Skip distance to next volume, or break if no more volumes will be hit.
-				float min = maxIterations*stepsize;
+				float min = maxDistance;
 				for (int j = 0; j < volumes; ++j)
 				{
 					if (!beenHit[j])
@@ -292,7 +288,7 @@ void main()
 						}
 					}
 				}
-				if (min == maxIterations * stepsize)
+				if (min == maxDistance)
 				{
 					colorSample = texture2D(backgroundBuffer, depthLookup);
 					colorSample.a = 1.0;
