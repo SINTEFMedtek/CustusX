@@ -303,9 +303,9 @@ void GPURayCastVolumeRep::setRenderMode(enum RenderMode renderMode)
 	mActor->Modified();
 }
 
-void GPURayCastVolumeRep::enableImagePlaneDownsampling(int maxWidth, int maxHeight)
+void GPURayCastVolumeRep::enableImagePlaneDownsampling(int maxPixels)
 {
-	mPainter->enableImagePlaneDownsampling(maxWidth, maxHeight);
+	mPainter->enableImagePlaneDownsampling(maxPixels);
 }
 
 void GPURayCastVolumeRep::disableImagePlaneDownsampling()

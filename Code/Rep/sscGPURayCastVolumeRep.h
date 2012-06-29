@@ -106,7 +106,7 @@ public:
 	 * \brief Set the rendering mode
 	 */
 	void setRenderMode(enum RenderMode renderMode);
-	void enableImagePlaneDownsampling(int maxWidth, int maxHeight);
+	void enableImagePlaneDownsampling(int maxPixels);
 	void disableImagePlaneDownsampling();
 
 protected:
