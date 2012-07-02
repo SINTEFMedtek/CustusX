@@ -30,11 +30,13 @@
 #include <vtkImageResample.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageClip.h>
+#include <vtkImageIterator.h>
 #include "sscImageTF3D.h"
 #include "sscBoundingBox3D.h"
 #include "sscImageLUT2D.h"
 #include "sscRegistrationTransform.h"
 #include "sscLandmark.h"
+#include "sscLogger.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
@@ -96,7 +98,7 @@ Image::~Image()
 }
 
 Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& name) :
-	Data(uid, name), mBaseImageData(data)
+	Data(uid, name), mBaseImageData(data), mMaxRGBIntensity(-1)
 {
 	mUseCropping = false;
 	mCroppingBox_d = DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
@@ -122,6 +124,7 @@ void Image::resetTransferFunctions(bool _2D, bool _3D)
 
 	//mBaseImageData->Update();
 	mBaseImageData->GetScalarRange(); // this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
+	mMaxRGBIntensity = -1;
 
 	if (_3D)
 		this->resetTransferFunction(ImageTF3DPtr(new ImageTF3D(mBaseImageData)));
@@ -327,13 +330,65 @@ vtkImageAccumulatePtr Image::getHistogram()
 	return mHistogramPtr;
 }
 
+template<typename scalartype> static int getRGBMax(vtkImageDataPtr image)
+{
+	int max = 0;
+	vtkImageIterator<scalartype> iter(image, image->GetExtent());
+	while (!iter.IsAtEnd())
+	{
+		typename vtkImageIterator<scalartype>::SpanIterator siter = iter.BeginSpan();
+		while (siter != iter.EndSpan())
+		{
+			int value = *siter;
+			++siter;
+			value += *siter;
+			++siter;
+			value += *siter;
+			++siter;
+			if (value > max)
+			{
+				max = value;
+			}
+		}
+		iter.NextSpan();
+	}
+	return max/3;
+}
+	
+	
 int Image::getMax()
 {
 	// Alternatively create max from histogram
 	//IntIntMap::iterator iter = this->getHistogram()->end();
 	//iter--;
 	//return (*iter).first;
-	return (int) mImageTransferFunctions3D->getScalarMax();
+	if (mBaseImageData->GetNumberOfScalarComponents() == 3)
+	{
+		if (mMaxRGBIntensity != -1)
+		{
+			return mMaxRGBIntensity;
+		}
+		QDateTime before = QDateTime::currentDateTime();
+		double max = 0.0;
+		switch (mBaseImageData->GetScalarType())
+		{
+		case VTK_UNSIGNED_CHAR:
+			max = getRGBMax<unsigned char>(mBaseImageData);
+			break;
+		case VTK_UNSIGNED_SHORT:
+			max = getRGBMax<unsigned short>(mBaseImageData);
+			break;
+		default:
+			SSC_ERROR("Unhandled RGB data type");
+			break;
+		}
+		mMaxRGBIntensity = max;
+		return (int)mMaxRGBIntensity;
+	}
+	else
+	{
+		return (int) mImageTransferFunctions3D->getScalarMax();
+	}
 }
 
 int Image::getMin()

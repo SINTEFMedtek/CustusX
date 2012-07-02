@@ -170,6 +170,7 @@ protected:
 	std::vector<vtkPlanePtr> mClipPlanes;
 	QString mModality; ///< modality of the image, defined as DICOM tag (0008,0060), Section 3, C.7.3.1.1.1
 	QString mImageType; ///< type of the image, defined as DICOM tag (0008,0008) (mainly value 3, but might be a merge of value 4), Section 3, C.7.6.1.1.2
+	double mMaxRGBIntensity;
 };
 
 } // end namespace ssc
