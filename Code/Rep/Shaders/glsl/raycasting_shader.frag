@@ -84,70 +84,70 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 {
 	vec4 pos = Matrix * position;
 	vec4 delta = Matrix * rayDirection;
-	float min = maxDistance;
+	float minimum = maxDistance;
 	if (inUnitCube(pos))
 	{
-		return 0.0;
+		return stepsize;
 	}
 	if (pos.x < 0.0 && delta.x > 0.0)
 	{
 		float distance = -pos.x/delta.x;
 		distance += 0.001;
-		if (distance < min && inUnitCube(pos + distance*delta))
+		if (distance < minimum && inUnitCube(pos + distance*delta))
 		{
-			min = distance;
+			minimum = distance;
 		}
 	}
 	if (pos.x > 1.0 && delta.x < 0.0)
 	{
 		float distance = (pos.x-1.0)/-delta.x;
 		distance += 0.001;
-		if (distance < min && inUnitCube(pos + distance*delta))
+		if (distance < minimum && inUnitCube(pos + distance*delta))
 		{
-			min = distance;
+			minimum = distance;
 		}
 	}
 	if (pos.y < 0.0 && delta.y > 0.0)
 	{
 		float distance = -pos.y/delta.y;
 		distance += 0.001;
-		if (distance < min && inUnitCube(pos + distance*delta))
+		if (distance < minimum && inUnitCube(pos + distance*delta))
 		{
-			min = distance;
+			minimum = distance;
 		}
 	}
 	if (pos.y > 1.0 && delta.y < 0.0)
 	{
 		float distance = (pos.y-1.0)/-delta.y;
 		distance += 0.001;
-		if (distance < min && inUnitCube(pos + distance*delta))
+		if (distance < minimum && inUnitCube(pos + distance*delta))
 		{
-			min = distance;
+			minimum = distance;
 		}
 	}
 	if (pos.z < 0.0 && delta.z > 0.0)
 	{
 		float distance = -pos.z/delta.z;
 		distance += 0.001;
-		if (distance < min && inUnitCube(pos + distance*delta))
+		if (distance < minimum && inUnitCube(pos + distance*delta))
 		{
-			min = distance;
+			minimum = distance;
 		}
 	}
 	if (pos.z > 1.0 && delta.z < 0.0)
 	{
 		float distance = (pos.z-1.0)/-delta.z;
 		distance += 0.001;
-		if (distance < min && inUnitCube(pos + distance*delta))
+		if (distance < minimum && inUnitCube(pos + distance*delta))
 		{
-			min = distance;
+			minimum = distance;
 		}
 	}
-	if (min == maxDistance)
+	if (minimum == maxDistance)
 	{
 		return -1.0;
 	}
-	return min;
+	return min(minimum, stepsize);
 }
 
 vec4 computeRayDirection( vec4 position, vec2 viewport)
@@ -174,7 +174,6 @@ void main()
 {
 	vec4 start = gl_TexCoord[1];
 	vec4 rayDirection;
-	float delta = stepsize;
 	vec4 vect = start;
 	vec4 colorAccumulator = vec4(0, 0, 0, 0); // The dest color
 	vec4 colorSample; // The src color 
@@ -194,7 +193,7 @@ void main()
 
 	rayDirection = computeRayDirection(gl_FragCoord, viewport);
 	
-	vec4 rayDeltaVector = rayDirection * delta;
+	vec4 rayDeltaVector = rayDirection * stepsize;
 	if (renderMode == 5) colorAccumulator.a = 1.0;
 
 	bool beenHit[volumes];
@@ -206,7 +205,7 @@ void main()
 	for(int i = 0; i < maxIterations; i++)
 	{
 		colorSample = vec4(0);
-		if (i > maxLength/delta)
+		if (i > maxLength / stepsize)
 		{
 			colorSample = texture2D(backgroundBuffer, depthLookup);
 			colorSample.a = 1.0;
@@ -268,33 +267,23 @@ void main()
 			} else if (hit==0)
 			{
 				// We didn't hit any volume, but there could be some volumes left to hit. Skip distance to next volume, or break if no more volumes will be hit.
-				float min = maxDistance;
+				float minimum = maxDistance;
 				for (int j = 0; j < volumes; ++j)
 				{
 					if (!beenHit[j])
 					{
 						float hit = toHit(M[j], vect, rayDirection);
-						if (hit < 0.0)
-						{
-							beenHit[j] = true; // haven't been hit, but will not hit
-						}
-						else if (hit == 0.0)
-						{
-							min = delta;
-						}
-						else if (hit < min)
-						{
-							min = hit;
-						}
+						beenHit[j] = (hit < 0.0); // haven't been hit, but will not hit
+						minimum = min(hit, minimum);
 					}
 				}
-				if (min == maxDistance)
+				if (minimum == maxDistance)
 				{
 					colorSample = texture2D(backgroundBuffer, depthLookup);
 					colorSample.a = 1.0;
 					doBreak = true;
 				}
-				vect += min * rayDirection;
+				vect += minimum * rayDirection;
 				continue;
 			}
 		}
