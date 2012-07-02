@@ -172,14 +172,12 @@ float opacityTransfer( float intensity, float threshold, float alpha, float maxV
 
 void main()
 {
-	vec4 start = gl_TexCoord[1];
 	vec4 rayDirection;
-	vec4 vect = start;
+	vec4 vect = gl_TexCoord[1];
 	vec4 colorAccumulator = vec4(0, 0, 0, 0); // The dest color
-	vec4 colorSample; // The src color 
-	float alphaSample; // The src alpha
+	vec4 colorSample; // The src color
 	float n = 0.0;
-	float thau = 0.02;
+	const float thau = 0.02;
 	bool found_depth = false;
 	vec2 scaleFactor = backgroundResolution / viewport;
 
@@ -189,7 +187,7 @@ void main()
 	vec4 end = gl_FragCoord;
 	end.z = depth.r;
 	end = unproject(end, viewport);
-	float maxLength = length(end-start);
+	float maxLength = length(end - gl_TexCoord[1]);
 
 	rayDirection = computeRayDirection(gl_FragCoord, viewport);
 	
@@ -309,7 +307,7 @@ void main()
 
 		if (renderMode == 3) // Frank's doodle
 		{
-			alphaSample = colorSample.a;
+			float alphaSample = colorSample.a;
 			colorAccumulator.rgb   += (1.0 - colorAccumulator.a) * colorSample.rgb * alphaSample * 3.0;
 			colorAccumulator.a += alphaSample;
 		}
@@ -358,7 +356,7 @@ void main()
 			float voxelValue = (colorSample.r + colorSample.g + colorSample.b) / 3.0;
 			if ((voxelValue - threshold[0]) > 0.0)
 			{
-				alphaSample = voxelValue - threshold[0];
+				float alphaSample = voxelValue - threshold[0];
 				colorAccumulator.rgb += colorAccumulator.a * alphaSample;
 				colorAccumulator.a = colorAccumulator.a * exp((-1.0 * thau) * alphaSample);
 			}
