@@ -91,8 +91,8 @@ public:
 
 	virtual DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
 	vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
-	int getMax();///< \return Max alpha position in the histogram = max key value in map.
-	int getMin();///< \return Min alpha position in the histogram = min key value in map.
+	int getMax();	///< \return Return highest used value in the image
+	int getMin();	///< \return Return lowest used value in the image
 	int getRange();///< For convenience: getMax() - getMin()
 	int getMaxAlphaValue();///<Max alpha value (probably 255)
 	virtual void setShadingOn(bool on);
