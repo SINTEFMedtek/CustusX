@@ -213,25 +213,20 @@ void main()
 					if (!all(lessThan(volumeColorSample.rgb, vec3(threshold[i]))))
 					{
 						++contributingVolumes;
-						float alphaSample;
 						float intensity;
+						vec4 windowed = applyWindowLevel(volumeColorSample, window[i], level[i]);;
 						if (lutSize[i] > 0)
 						{
 							intensity = volumeColorSample.r;
+							windowed = applyLut(windowed.r, lut[i], lutSize[i]);
 						}
 						else
 						{
-							intensity = 0.33*(volumeColorSample.r + volumeColorSample.g + volumeColorSample.b);
+							intensity = 0.33 * (volumeColorSample.r + volumeColorSample.g + volumeColorSample.b);
+							windowed = applyWindowLevel(windowed, window[i], level[i]);
 						}
-						alphaSample = stepsize * opacityTransfer(intensity, threshold[i], alpha[i], maxValue[i]);
-						
-						volumeColorSample = applyWindowLevel(volumeColorSample, window[i], level[i]);
-						if ( lutSize[i] > 0)
-						{
-							volumeColorSample = applyLut( volumeColorSample.r, lut[i], lutSize[i]);
-						}
-						volumeColorSample.a = alphaSample;
-						colorSample = blendRGBA(colorSample, volumeColorSample);
+						windowed.a = stepsize * opacityTransfer(intensity, threshold[i], alpha[i], maxValue[i]);
+						colorSample = blendRGBA(colorSample, windowed);
 					}
 				}
 			}
