@@ -326,8 +326,15 @@ void ViewsWindow::updateRender()
 	QTime pre = QTime::currentTime();
 	int other = mLastRenderEnd.msecsTo(pre);
 
+	QSet<vtkRenderWindow *> windowList;
 	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
-		(*iter)->getRenderWindow()->Render();
+	{
+		windowList.insert((*iter)->getRenderWindow().GetPointer());
+	}
+	foreach (vtkRenderWindow *win, windowList)
+	{
+		win->Render();
+	}
 
 	mLastRenderEnd = QTime::currentTime();
 
