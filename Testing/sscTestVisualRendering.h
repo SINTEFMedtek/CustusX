@@ -20,6 +20,7 @@ public:
 	void test_ACS_3Volumes_GPU();
 	void test_3D_RGB_GPU();
 	void test_3D_Composite_GPU();
+	void test_3D_Composite_Views_GPU();
 	void test_3D_Lut();
 	
 public:
@@ -29,6 +30,7 @@ public:
 		CPPUNIT_TEST( test_3D_Tool );					
 		CPPUNIT_TEST( test_3D_Tool_GPU );
 		CPPUNIT_TEST( test_3D_Composite_GPU );
+		CPPUNIT_TEST( test_3D_Composite_Views_GPU );
 		CPPUNIT_TEST( test_ACS_3D_Tool );					
 		CPPUNIT_TEST( test_AnyDual_3D_Tool );					
 		CPPUNIT_TEST( test_ACS_3Volumes );					
