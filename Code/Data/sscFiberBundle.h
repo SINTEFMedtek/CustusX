@@ -37,32 +37,40 @@ namespace ssc
 
 class FiberBundleROI : QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    FiberBundleROI(){}
-    FiberBundleROI(Vector3D pt, float radius) : mPoint(pt), mRadius(radius) {}
-    FiberBundleROI(const FiberBundleROI& other) : mPoint(other.getPoint()), mRadius(other.getRadius()) {}
+	FiberBundleROI() : mPoint(Vector3D()), mRadius(0) {}
+	FiberBundleROI(Vector3D pt, float radius) : mPoint(pt), mRadius(radius) {}
+	FiberBundleROI(const FiberBundleROI& other) : mPoint(other.getPoint()), mRadius(other.getRadius()) {}
 
-    FiberBundleROI operator=(const FiberBundleROI& other)
-    {
-        return FiberBundleROI(other.getPoint(), other.getRadius());
-    }
+	FiberBundleROI operator=(const FiberBundleROI& other)
+	{
+		if (this != &other) // protect agains self assignment
+		{
+			// Copy what is needed
+			mPoint = other.getPoint();
+			mRadius = other.getRadius();
+		}
 
-    virtual ~FiberBundleROI(){}
+		// return this by convention
+		return *this;
+	}
 
-    void setRadius(float radius) { mRadius = radius; emit changed(); }
-    float getRadius() const{ return mRadius; }
+	virtual ~FiberBundleROI(){}
 
-    void setPoint(Vector3D point) { mPoint = point; emit changed(); }
-    Vector3D getPoint() const { return mPoint; }
+	void setRadius(float radius) { mRadius = radius; emit changed(); }
+	float getRadius() const{ return mRadius; }
+
+	void setPoint(Vector3D point) { mPoint = point; emit changed(); }
+	Vector3D getPoint() const { return mPoint; }
 
 private:
-    Vector3D mPoint;
-    float mRadius;
+	Vector3D mPoint;
+	float mRadius;
 
 signals:
-    void changed();
+	void changed();
 };
 
 /**
@@ -78,72 +86,73 @@ signals:
   */
 class FiberBundle : public Data
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    static FiberBundlePtr New(const QString& uid, const QString& name = "");
-    virtual ~FiberBundle() {}
+	static FiberBundlePtr New(const QString& uid, const QString& name = "");
+	virtual ~FiberBundle() {}
 
-    /** Assign polydata model */
-    virtual void setVtkPolyData(const vtkPolyDataPtr& polyData);
-    virtual vtkPolyDataPtr getVtkPolyData() const;
+	/** Assign polydata model */
+	virtual void setVtkPolyData(const vtkPolyDataPtr& polyData);
+	virtual vtkPolyDataPtr getVtkPolyData() const;
 
-    /** Assign mesh to bundle */
-    virtual void setMesh(const MeshPtr& mesh);
-    /** Return bundle as mesh */
-    virtual MeshPtr getMesh() { return mMesh; }
-    virtual bool hasMesh(const MeshPtr& mesh) const;
+	/** Assign mesh to bundle */
+	virtual void setMesh(const MeshPtr& mesh);
+	/** Return bundle as mesh */
+	virtual MeshPtr getMesh() { return mMesh; }
+	virtual bool hasMesh(const MeshPtr& mesh) const;
 
-    /** Assign bundle file path */
-    virtual void setFilePath(const QString& filePath);
-    /** Return current bundle file path */
-    virtual QString getFilePath() const;
+	/** Assign bundle file path */
+	virtual void setFilePath(const QString& filePath);
+	/** Return current bundle file path */
+	virtual QString getFilePath() const;
 
-    /** Return model's bounding box */
-    virtual DoubleBoundingBox3D boundingBox() const;
+	/** Return model's bounding box */
+	virtual DoubleBoundingBox3D boundingBox() const;
 
-    /** Set bundle color */
-    virtual void setColor(const QColor& color);
-    /** Return current bundle color */
-    virtual QColor getColor() const;
+	/** Set bundle color */
+	virtual void setColor(const QColor& color);
+	/** Return current bundle color */
+	virtual QColor getColor() const;
 
-    /** Enable/disable shading */
-    virtual void setShading(bool shading) { mShading = shading; }
-    /** Return current shading policy */
-    virtual bool getShading() const { return mShading; }
+	/** Enable/disable shading */
+	virtual void setShading(bool shading) { mShading = shading; }
+	/** Return current shading policy */
+	virtual bool getShading() const { return mShading; }
 
-    /** Assign desired volume spacing */
-    virtual void setSpacing(double x, double y, double z);
-    /** Return currently assigned volume spacing */
-    virtual double* getSpacing() { return &mSpacing[0]; }
+	/** Assign desired volume spacing */
+	virtual void setSpacing(double x, double y, double z);
+	/** Return currently assigned volume spacing */
+	virtual Vector3D getSpacing() { return mSpacing; }
 
-    vtkLookupTablePtr getLut() { return mLut; }
-    vtkImageDataPtr getVtkImageData();
-    ssc::ImagePtr getImage() { return ssc::ImagePtr(); } // NOT YET IMPLEMENTED
+	vtkLookupTablePtr getLut() { return mLut; }
+	vtkImageDataPtr getVtkImageData();
+	ssc::ImagePtr getImage() { return ssc::ImagePtr(); } // NOT YET IMPLEMENTED
 
-    void setROI(const FiberBundleROI& roi) { mROI = roi; }
-    FiberBundleROI* getROI() { return &mROI; }
+	void setROI(const FiberBundleROI& roi) { mROI = roi; }
+	FiberBundleROI* getROI() { return &mROI; }
 
-    /** Debug output */
-    virtual void printSelf(std::ostream &os, Indent indent);
+	/** Debug output */
+	virtual void printSelf(std::ostream &os, Indent indent);
 
 protected:
-    FiberBundle(const QString& uid, const QString& name = "");
+	FiberBundle(const QString& uid, const QString& name = "");
 
 private:
-    vtkLookupTablePtr mLut;
-    vtkImageDataPtr mVtkImageData;
-    MeshPtr mMesh;
-    FiberBundleROI mROI;
-    double mSpacing[3];
-    bool mShading;
+	vtkLookupTablePtr mLut;
+	bool mVtkImageCached;
+	vtkImageDataPtr mVtkImageData;
+	MeshPtr mMesh;
+	FiberBundleROI mROI;
+	Vector3D mSpacing;
+	bool mShading;
 
 signals:
-    void bundleChanged();
+	void bundleChanged();
 
 protected slots:
-    void meshChangedSlot();
-    void transformChangedSlot();
+	void meshChangedSlot();
+	void transformChangedSlot();
 
 };
 

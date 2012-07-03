@@ -25,9 +25,9 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPolyDataReader.h>
-#include <vtkTubeFilter.h>
 #include <vtkMatrix4x4.h>
 #include <vtkRenderer.h>
+#include <vtkRibbonFilter.h>
 
 #include "sscGraphicalPrimitives.h"
 #include "sscView.h"
@@ -39,12 +39,12 @@ namespace ssc
 {
 /** Constructor */
 FiberBundleRep::FiberBundleRep(const QString& uid, const QString& name)
-    : RepImpl(uid, name), mFiberRadius(.05), mTubeSegments(8)
+    : RepImpl(uid, name), mFiberWidth(.1)
 {
     mPolyDataMapper = vtkPolyDataMapperPtr::New();
     mProperty = vtkPropertyPtr::New();
     // mProperty->SetInterpolationToFlat();
-    mProperty->SetInterpolationToGouraud();
+    // mProperty->SetInterpolationToGouraud();
 
     mActor = vtkActorPtr::New();
 
@@ -128,19 +128,19 @@ void FiberBundleRep::bundleChanged()
     {
         QColor color = mBundle->getColor();
         mActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+        mActor->GetProperty()->SetOpacity(color.alphaF());
 
         if (mBundle->getShading())
         {
-            /** Create a tube filter for the mesh.
+            /** Create a filter for the mesh.
               * This filter enables shading and enhances the otherwise hard to differentiate lines.
               */
-            vtkSmartPointer<vtkTubeFilter> tubeFilter = vtkSmartPointer<vtkTubeFilter>::New();
-            tubeFilter->SetInput(model);
-            tubeFilter->SetRadius(mFiberRadius); //default is .5
-            tubeFilter->SetNumberOfSides(mTubeSegments);
-            tubeFilter->Update();
+            vtkSmartPointer<vtkRibbonFilter> ribbonFilter = vtkSmartPointer<vtkRibbonFilter>::New();
+            ribbonFilter->SetInput(model);
+            ribbonFilter->SetWidth(mFiberWidth);
+            ribbonFilter->SetWidthFactor(3);
 
-            mPolyDataMapper->SetInputConnection(tubeFilter->GetOutputPort());
+            mPolyDataMapper->SetInputConnection(ribbonFilter->GetOutputPort());
         }
         else
         {
@@ -155,6 +155,7 @@ void FiberBundleRep::bundleChanged()
         }
 
         mPolyDataMapper->ScalarVisibilityOn();
+        mPolyDataMapper->SetScalarModeToUsePointFieldData();
     }
 
 }

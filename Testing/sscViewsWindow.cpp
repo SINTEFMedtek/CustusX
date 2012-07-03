@@ -10,6 +10,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkCamera.h"
+#include "vtkLookupTable.h"
 
 #include "sscTestUtilities.h"
 #include "sscDataManager.h"
@@ -46,6 +47,19 @@ namespace {
 	{
 		return boost::dynamic_pointer_cast<ssc::DummyTool>(ssc::ToolManager::getInstance()->getDominantTool());
 	}
+}
+
+vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueRangeMin, double hueRangeMax,
+	double saturationRangeMin, double saturationRangeMax, double valueRangeMin, double valueRangeMax)
+{
+	vtkLookupTablePtr lut = vtkLookupTablePtr::New();
+	lut->SetTableRange(tableRangeMin, tableRangeMax);
+	lut->SetHueRange(hueRangeMin, hueRangeMax);
+	lut->SetSaturationRange(saturationRangeMin, saturationRangeMax);
+	lut->SetValueRange(valueRangeMin, valueRangeMax);
+	lut->Build();
+
+	return lut;
 }
 
 ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
@@ -188,13 +202,20 @@ void ViewsWindow::container3D(ssc::ViewContainer *widget, int pos, const QString
 	view->addRep(toolRep);
 }
 
-void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
+void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c)
 {
 	QString uid = "3D";
 	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
 	mLayouts.insert(view);
 	
 	ssc::ImagePtr image = loadImage(imageFilename);
+
+	if (parameters != NULL)
+	{
+		image->getTransferFunctions3D()->setLLR(parameters->llr);
+		image->getTransferFunctions3D()->setAlpha(parameters->alpha);
+		image->getTransferFunctions3D()->setLut(parameters->lut);
+	}
 
 	// volume rep
 	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image->getUid() );
@@ -214,7 +235,7 @@ void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 	insertView(view, uid, imageFilename, r, c);
 }
 
-void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
+void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c)
 {
 	QString uid = "3D";
 	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
@@ -222,21 +243,29 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
 
 	std::vector<ssc::ImagePtr> images;
 
-	QString imageFilename;
-	foreach (imageFilename, imageFilenames)
+	double numImages = imageFilenames.size();
+	for (int i = 0; i < numImages; ++i)
 	{
-		ssc::ImagePtr image = loadImage(imageFilename);
-		image->getTransferFunctions3D()->setLLR(25.0);
+		ssc::ImagePtr image = loadImage(imageFilenames[i]);
+		if (parameters != NULL)
+		{
+			image->getTransferFunctions3D()->setLLR(parameters[i].llr);
+			image->getTransferFunctions3D()->setAlpha(parameters[i].alpha);
+			image->getTransferFunctions3D()->setLut(parameters[i].lut);
+		}
 		images.push_back(image);
 	}
 
 	// volume rep
+	
+#ifndef WIN32
 	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
-	mRepPtr->setShaderFiles(mShaderFolder + "raycasting_shader.vert", mShaderFolder + "raycasting_shader.frag");
+	mRepPtr->setShaderFolder(mShaderFolder);
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);
-	
+#endif //WIN32
+
 	// Tool 3D rep
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
@@ -244,7 +273,7 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, int r, int c)
 	toolRep->setTool(tool);
 	view->addRep(toolRep);
 	
-	insertView(view, uid, imageFilename, r, c);
+	insertView(view, uid, imageFilenames[0], r, c);
 }
 
 void ViewsWindow::start(bool showSliders)

@@ -30,12 +30,12 @@
 namespace ssc
 {
 Mesh::Mesh(const QString& uid, const QString& name) :
-	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New())
+	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false)
 {
 	mColor = QColor(255, 0, 0, 255);
 }
 Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
-	Data(uid, name), mVtkPolyData(polyData)
+	Data(uid, name), mVtkPolyData(polyData), mWireframe(false)
 {
 	mColor = QColor(255, 0, 0, 255);
 }

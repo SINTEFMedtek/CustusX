@@ -79,7 +79,6 @@ public:
 };
 
 /**\brief Data class that represents a single point.
- * \ingroup cxServicePatient
  *
  * The point is attached to a specific coordinate system / frame.
  *
@@ -122,4 +121,4 @@ private:
  */
 }
 
-#endif /* CXPOINTMETRIC_H_ */
+#endif /* SSCPOINTMETRIC_H_ */

@@ -8,6 +8,25 @@
 #include "sscSlicerRepSW.h"
 #include "sscAcceptanceBoxWidget.h"
 
+/**
+  * @brief Creates and returns a lut, based on range parameters.
+  *
+  * @return Pointer to a complete vtkLookupTable.
+  */
+vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueRangeMin, double hueRangeMax,
+	double saturationRangeMin = 0, double saturationRangeMax = 1, double valueRangeMin = 1, double valueRangeMax = 1);
+
+class ImageParameters
+{
+public:
+	ImageParameters() : llr(.1), alpha(1) {}
+
+	double llr;
+	double alpha;
+
+	vtkLookupTablePtr lut;
+};
+
 /**Test class  with convenience methods for defining views.
  * Uses the following reps:
  *  - ssc::ToolRep3D
@@ -23,10 +42,8 @@ public:
 	virtual ~ViewsWindow();
 	
 	void setDescription(const QString& desc);
-
-	// create ssc::ViewWidget-based rendering (will not work with ViewContainers)
-	void define3D(const QString& imageFilename, int r, int c);
-	void define3DGPU(const QStringList& imageFilename, int r, int c);
+	void define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c);
+	void define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c);
 	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	void defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 

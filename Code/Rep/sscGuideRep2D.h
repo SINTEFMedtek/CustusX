@@ -17,8 +17,8 @@
 //
 // See sscLicense.txt for more information.
 
-#ifndef SSCPOINTMETRICREP_H_
-#define SSCPOINTMETRICREP_H_
+#ifndef SSCGUIDEREP2D_H_
+#define SSCGUIDEREP2D_H_
 
 #include "sscDataMetricRep.h"
 #include "sscGraphicalPrimitives.h"
@@ -28,47 +28,54 @@
 namespace ssc
 {
 
-typedef boost::shared_ptr<class PointMetricRep> PointMetricRepPtr;
+typedef boost::shared_ptr<class GuideRep2D> GuideRep2DPtr;
 
-/**Rep for visualizing a PointMetric.
+/**Rep for visualizing a PointMetric in 2D views.
  *
  * \ingroup sscRep
- * \ingroup sscRep3D
+ * \ingroup sscRep2D
  *
- * \date Jul 5, 2011
- * \author Christian Askeland, SINTEF
+ * \date Jun 14, 2012
+ * \author Sigmund Augdal, SonoWand AS
  */
-class PointMetricRep: public DataMetricRep
+class GuideRep2D: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static PointMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
-	virtual ~PointMetricRep() {}
+	static GuideRep2DPtr New(const QString& uid, const QString& name = ""); ///constructor
+	virtual ~GuideRep2D() {}
 
 	void setPointMetric(PointMetricPtr point);
 	PointMetricPtr getPointMetric();
-	virtual QString getType() const { return "ssc::PointMetricRep"; }
+	virtual QString getType() const { return "ssc::GuideRep2D"; }
+	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	/**
+	 * Set the width of the outline in fractions of the full size
+	 */
+	void setOutlineWidth(double width);
+
+	void setRequestedAccuracy(double accuracy);
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
-
-	virtual void rescale();
+	virtual void addRepActorsToViewRenderer(ssc::View* view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 
 protected slots:
 	virtual void changedSlot();
 
 private:
-	PointMetricRep(const QString& uid, const QString& name = "");
-	PointMetricRep(); ///< not implemented
+	GuideRep2D(const QString& uid, const QString& name = "");
+	GuideRep2D(); ///< not implemented
 
-	ssc::GraphicalPoint3DPtr mGraphicalPoint;
-	ssc::CaptionText3DPtr mText;
 	PointMetricPtr mMetric;
-	ssc::View *mView;
-	ssc::ViewportListenerPtr mViewportListener;
+	ssc::View* mView;
+	ssc::SliceProxyPtr mSliceProxy;
+	vtkActorPtr mCircleActor;
+	vtkSectorSourcePtr mCircleSource;
+	double mOutlineWidth;
+	double mRequestedAccuracy;
 };
 
 }
 
-#endif /* SSCPOINTMETRICREP_H_ */
+#endif /* SSCGUIDEREP2D_H_ */

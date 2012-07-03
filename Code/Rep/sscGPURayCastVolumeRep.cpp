@@ -17,7 +17,10 @@
 //
 // See sscLicense.txt for more information.
 
+#ifndef WIN32
 #include "sscGPURayCastVolumeRep.h"
+
+#include <stdint.h>
 
 #include <vtkAppendPolyData.h>
 #include <vtkCellArray.h>
@@ -71,6 +74,11 @@ static vtkPolyDataPtr createCube()
 	return cube;
 }
 
+double maxIntensity(ssc::ImagePtr image)
+{
+	return (double)image->getMax()/image->getBaseVtkImageData()->GetScalarTypeMax();
+}
+
 GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
 	RepImpl(uid)
 {
@@ -80,7 +88,7 @@ GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
 	mPainter = GPURayCastVolumePainterPtr::New();
 	mPainter->setStepSize(defaultStepSize);
 	// default shader for sonowand: override using setshaderfile()
-	mPainter->setShaderFiles("/Data/Resources/Shaders/raycasting_shader.vert", "/Data/Resources/Shaders/raycasting_shader.frag");
+	mPainter->setShaderFolder("/Data/Resources/Shaders/");
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
 
 	mMerger = vtkAppendPolyData::New();
@@ -103,9 +111,9 @@ GPURayCastVolumeRepPtr GPURayCastVolumeRep::New(const QString& uid)
 	return retval;
 }
 
-void GPURayCastVolumeRep::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
+void GPURayCastVolumeRep::setShaderFolder(QString folder)
 {
-	mPainter->setShaderFiles(vertexShaderFile, fragmentShaderFile);
+	mPainter->setShaderFolder(folder);
 }
 
 void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
@@ -144,7 +152,8 @@ void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 		ssc::GPUImageDataBufferPtr dataBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
 			inputImage);
 
-		mPainter->SetVolumeBuffer(i, dataBuffer);
+		double maxVal = maxIntensity(images[i]);
+		mPainter->SetVolumeBuffer(i, dataBuffer, maxVal);
 
 		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
 
@@ -207,8 +216,10 @@ void GPURayCastVolumeRep::updateColorAttributeSlot()
 	{
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData() ;
 
-		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getBaseLookupTable();
-		ssc::GPUImageLutBufferPtr lutBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
+		vtkLookupTablePtr lut = mImages[i]->getTransferFunctions3D()->getLut();
+
+		ssc::GPUImageLutBufferPtr lutBuffer;
+		if (lut) lutBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
 
 		// no lut indicates to the fragment shader that RGBA should be used
 		if (inputImage->GetNumberOfScalarComponents()==1)
@@ -249,12 +260,17 @@ void GPURayCastVolumeRep::setStepSize(double stepsize)
 	mActor->Modified();
 }
 
-void GPURayCastVolumeRep::setRenderMode(enum RenderMode renderMode)
+void GPURayCastVolumeRep::enableImagePlaneDownsampling(int maxPixels)
 {
-	mPainter->setRenderMode(renderMode);
-	mActor->Modified();
+	mPainter->enableImagePlaneDownsampling(maxPixels);
+}
+
+void GPURayCastVolumeRep::disableImagePlaneDownsampling()
+{
+	mPainter->disableImagePlaneDownsampling();
 }
 
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
+#endif // WIN32

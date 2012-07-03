@@ -17,8 +17,8 @@
 //
 // See sscLicense.txt for more information.
 
-#ifndef CXANGLEMETRICREP_H_
-#define CXANGLEMETRICREP_H_
+#ifndef SSCANGLEMETRICREP_H_
+#define SSCANGLEMETRICREP_H_
 
 #include "sscDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
@@ -54,7 +54,7 @@ public:
 	virtual ~AngleMetricRep() {}
 
 	void setMetric(AngleMetricPtr point);
-	virtual QString getType() const { return "cx::AngleMetricRep"; }
+	virtual QString getType() const { return "ssc::AngleMetricRep"; }
 
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View *view);
@@ -77,4 +77,4 @@ private:
 
 }
 
-#endif /* CXANGLEMETRICREP_H_ */
+#endif /* SSCANGLEMETRICREP_H_ */

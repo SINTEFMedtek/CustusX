@@ -54,16 +54,17 @@ public:
 	virtual void ReleaseGraphicsResources(vtkWindow *);
 	void PrintSelf(ostream& os, vtkIndent indent);
 
-	void setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile);
+	void setShaderFolder(QString folder);
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
-	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer);
+	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer, double maxValue);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
 	void setView(ssc::View *ptr) { mBase = ptr; }
 	void set_nMr(int index, ssc::Transform3D nMr);
 	void setClipper(SlicePlaneClipperPtr clipper);
 	void setClipVolume(int index, bool clip);
 	void setStepSize(double stepsize);
-	void setRenderMode(int renderMode);
+	void enableImagePlaneDownsampling(int maxPixels);
+	void disableImagePlaneDownsampling();
 	/**
 	 * Maximum number of volumes that can be rendered simultaneously
 	 */
@@ -78,18 +79,32 @@ protected:
 	bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);
 	bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
 	QString loadShaderFile(QString shaderFile);
+	void createBuffers();
 
 	class vtkInternals;
 	vtkInternals* mInternals;
 	QString mVertexShaderFile;
 	QString mFragmentShaderFile;
+	QString mUSVertexShaderFile;
+	QString mUSFragmentShaderFile;
 	QSize mLastRenderSize;
+	float mWidth;
+	float mHeight;
 	unsigned int mDepthBuffer;
 	ssc::View *mBase;
 	unsigned int mBackgroundBuffer;
 	SlicePlaneClipperPtr mClipper;
 	float mStepSize;
 	int mRenderMode;
+	unsigned int mFBO;
+	unsigned int mDSColorBuffer;
+	unsigned int mDSDepthBuffer;
+	int mDownsampleWidth;
+	int mDownsampleHeight;
+	int mDownsamplePixels;
+	vtkSmartPointer<vtkShaderProgram2> mUpscaleShader;
+	bool mShouldResample;
+	bool mResample;
 	friend class ::TestGPURayCaster;
 };
 

@@ -1,3 +1,5 @@
+#ifndef WIN32
+
 #include "sscTestGPURayCaster.h"
 #include "stdint.h"
 #include <vtkActor.h>
@@ -29,7 +31,8 @@ void TestGPURayCaster::testSetImages()
 	CPPUNIT_ASSERT(mRep->mActor->GetMTime() > mTime);
 	mTime = mRep->mActor->GetMTime();
 	mRep->setImages(images);
-	CPPUNIT_ASSERT_EQUAL(mTime, mRep->mActor->GetMTime());
+	uint64_t mNewTime = mRep->mActor->GetMTime();
+	CPPUNIT_ASSERT_EQUAL(mTime, mNewTime);
 	
 	images.push_back(image2);
 	images.push_back(image3);
@@ -46,9 +49,6 @@ void TestGPURayCaster::testSetImages()
 void TestGPURayCaster::testParameters()
 {
 	uint64_t mTime = mRep->mActor->GetMTime();
-	CPPUNIT_ASSERT_EQUAL((int)ssc::GPURayCastVolumeRep::AccumulatedAverage, mRep->mPainter->mRenderMode);
-	mRep->setRenderMode(ssc::GPURayCastVolumeRep::MaximumIntensity);
-	CPPUNIT_ASSERT_EQUAL((int)ssc::GPURayCastVolumeRep::MaximumIntensity, mRep->mPainter->mRenderMode);
 	CPPUNIT_ASSERT(mRep->mActor->GetMTime() > mTime);
 	mTime = mRep->mActor->GetMTime();
 
@@ -59,3 +59,5 @@ void TestGPURayCaster::testParameters()
 }
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestGPURayCaster );
+
+#endif //WIN32

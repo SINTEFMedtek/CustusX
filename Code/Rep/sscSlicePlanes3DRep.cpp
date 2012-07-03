@@ -64,7 +64,8 @@ SlicePlanesProxy::SlicePlanesProxy()
 
 	mProperties.m2DFontSize = 20;
 	mProperties.m3DFontSize = 28;
-	mProperties.mPointPos_normvp = Vector3D(0.1, 0.8, 0.0);
+//	mProperties.mPointPos_normvp = Vector3D(0.1, 0.8, 0.0);
+	mProperties.mPointPos_normvp = Vector3D(0.05, 0.95, 0.0);
 	mProperties.mClipPlane = ptANYPLANE;
 	mProperties.mLineWidth = 2;
 	//  mProperties.mDrawPlane = false;
@@ -154,8 +155,7 @@ SlicePlanes3DRepPtr SlicePlanes3DRep::New(const QString& uid, const QString& nam
 SlicePlanes3DRep::SlicePlanes3DRep(const QString& uid, const QString& name) :
 	RepImpl(uid, name), mView(NULL)
 {
-	mViewportListener.reset(new ssc::ViewportListener);
-	mViewportListener->setCallback(boost::bind(&SlicePlanes3DRep::rescale, this));
+//	this->setDynamicLabelSize(true);
 }
 
 SlicePlanes3DRep::~SlicePlanes3DRep()
@@ -164,30 +164,35 @@ SlicePlanes3DRep::~SlicePlanes3DRep()
 		mProxy->connectTo3D(false);
 }
 
-void SlicePlanes3DRep::addRepActorsToViewRenderer(ssc::View *view)
+/** Set this to get a label size that keeps a
+ *  maximum size relative to the viewport.
+ *
+ */
+void SlicePlanes3DRep::setDynamicLabelSize(bool on)
 {
-	//  std::cout << "SlicePlanes3DRep::addRepActorsToViewRenderer() " << mData.size() << std::endl;
+	if (on)
+	{
+		mViewportListener.reset(new ssc::ViewportListener);
+		mViewportListener->setCallback(boost::bind(&SlicePlanes3DRep::rescale, this));
+	}
+	else
+	{
+		mViewportListener.reset();
+	}
+}
 
-	//	for (DataMap::iterator i=mData.begin(); i!=mData.end(); ++i)
-	//	{
-	//		SlicePlanesProxy::DataType baseData = mProxy->getData()[i->first];
-	//
-	//		i->second.mText = vtkTextActor3DPtr::New();
-	//		i->second.mText->SetInput("O");
-	//		i->second.mText->GetTextProperty()->SetColor(baseData.mColor.begin());
-	//		i->second.mText->GetTextProperty()->SetFontSize(20);
-	//		i->second.mText->GetTextProperty()->BoldOn();
-	//		view->getRenderer()->AddActor(i->second.mText);
-	//		i->second.mRect.reset(new Rect3D(view->getRenderer(), baseData.mColor));
-	//	}
+void SlicePlanes3DRep::addRepActorsToViewRenderer(ssc::View* view)
+{
 	mView = view;
 	this->changedSlot();
-	mViewportListener->startListen(view->getRenderer());
+	if (mViewportListener)
+		mViewportListener->startListen(view->getRenderer());
 }
 
 void SlicePlanes3DRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
-	mViewportListener->stopListen();
+	if (mViewportListener)
+		mViewportListener->stopListen();
 	this->clearActors();
 	mView = NULL;
 }
@@ -209,29 +214,7 @@ void SlicePlanes3DRep::clearActors()
 
 void SlicePlanes3DRep::rescale()
 {
-	if (!mView)
-		return;
-	if (!mViewportListener->isListening())
-		return;
-
-	double size = mViewportListener->getVpnZoom();
-
-	SlicePlanesProxy::DataMap baseData = mProxy->getData();
-
-	for (SlicePlanesProxy::DataMap::iterator i = baseData.begin(); i != baseData.end(); ++i)
-	{
-//		SlicePlanesProxy::DataType& base = i->second;
-		DataType& data = mData[i->first];
-
-		if (data.mText)
-		{
-			double planeSize = (i->second.vp_s.range()[0] + i->second.vp_s.range()[1]) / 2.0;
-			double sphereSize = std::min(0.1 / size, planeSize/5); // set to 20% of 2D plane size, but constrain upwards to 0.1/s.
-			data.mText->GetTextProperty()->SetFontSize(sphereSize);
-//			std::cout << "set font size " << sphereSize << ", s=" << size << ", plane="<< planeSize <<  std::endl;
-		}
-	}
-
+	this->changedSlot();
 }
 
 void SlicePlanes3DRep::changedSlot()
@@ -259,6 +242,9 @@ void SlicePlanes3DRep::changedSlot()
 			data.mText->GetTextProperty()->SetColor(base.mColor.begin());
 			data.mText->GetTextProperty()->SetFontSize(mProxy->getProperties().m3DFontSize);
 			data.mText->GetTextProperty()->BoldOn();
+			data.mText->GetTextProperty()->SetVerticalJustificationToBottom();
+			data.mText->GetTextProperty()->SetJustificationToLeft();
+			data.mText->GetTextProperty()->ShadowOff();
 			mView->getRenderer()->AddActor(data.mText);
 		}
 		if (!data.mRect)
@@ -271,15 +257,27 @@ void SlicePlanes3DRep::changedSlot()
 		Vector3D pos_s = vpMnvp.coord(base.mPointPos_normvp);
 		Transform3D T = createTransformTranslate(pos_s);
 
-		//	 	std::cout << "-----------------------------------------------------" << std::endl;
-		//    std::cout << "vp_s" << i->first << " -- " << base.vp_s << std::endl;
-		//	 	std::cout << "rMs" << i->first << " -- " << rMs << std::endl;
-		//    std::cout << "vp_r" << i->first << " -- " << transform(rMs.inv(), base.vp_s) << std::endl;
-		//    std::cout << "-----------------------------------------------------" << std::endl;
+		double scale = 1.0;
+		if (data.mText)
+		{
+			if (mViewportListener)
+			{
+				double size = mViewportListener->getVpnZoom();
+				double planeSize = (i->second.vp_s.range()[0] + i->second.vp_s.range()[1]) / 2.0;
+				double sphereSize = std::min(0.1 / size, planeSize/5); // set to 20% of 2D plane size, but constrain upwards to 0.1/s.
+				sphereSize = sphereSize/50;
+				data.mText->GetTextProperty()->SetFontSize(mProxy->getProperties().m3DFontSize);
+//				std::cout << "set font size " << sphereSize << ", s=" << size << ", plane="<< planeSize <<  std::endl;
+				scale = sphereSize;
+			}
+		}
 
 		if (data.mText)
 		{
-			data.mText->SetUserMatrix((rMs * T).getVtkMatrix());
+			Transform3D T2 = createTransformTranslate(Vector3D(0,-mProxy->getProperties().m3DFontSize,0));
+			Transform3D S = createTransformScale(Vector3D(scale,scale,scale));
+//			data.mText->SetUserMatrix((rMs * T).getVtkMatrix());
+			data.mText->SetUserMatrix((rMs * T * S * T2).getVtkMatrix());
 		}
 
 		if (data.mPoint)
@@ -297,24 +295,8 @@ void SlicePlanes3DRep::changedSlot()
 		{
 			data.mAxes->setPosition(rMs);
 		}
-
-		//		this->setVisibility(data);
 	}
 }
-
-//void SlicePlanes3DRep::setVisibility(DataType data)
-//{
-//  bool visible = mProxy->getVisible();
-//
-//  if (data.mText)
-//    data.mText->setVisible(visible);
-//  if (data.mPoint)
-//    data.mPoint->setVisible(visible);
-//  if (data.mRect)
-//    data.mRect->setVisible(visible);
-//  if (data.mAxes)
-//    data.mAxes->setVisible(visible);
-//}
 
 void SlicePlanes3DRep::setProxy(SlicePlanesProxyPtr proxy)
 {
@@ -348,8 +330,10 @@ void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View *view)
 {
 	SlicePlanesProxy::DataType baseData = mProxy->getData()[mType];
 
-	mText.reset(new ssc::TextDisplay(baseData.mSymbol, baseData.mColor, mProxy->getProperties().m3DFontSize));
+	mText.reset(new ssc::TextDisplay(baseData.mSymbol, baseData.mColor, mProxy->getProperties().m2DFontSize));
 	mText->textProperty()->BoldOn();
+	mText->textProperty()->SetVerticalJustificationToTop();
+	mText->textProperty()->SetJustificationToLeft();
 	mText->setPosition(baseData.mPointPos_normvp);
 	mText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	view->getRenderer()->AddActor2D(mText->getActor());

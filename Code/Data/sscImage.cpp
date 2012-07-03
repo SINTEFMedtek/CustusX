@@ -30,11 +30,13 @@
 #include <vtkImageResample.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageClip.h>
+#include <vtkImageIterator.h>
 #include "sscImageTF3D.h"
 #include "sscBoundingBox3D.h"
 #include "sscImageLUT2D.h"
 #include "sscRegistrationTransform.h"
 #include "sscLandmark.h"
+#include "sscLogger.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
@@ -96,7 +98,7 @@ Image::~Image()
 }
 
 Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& name) :
-	Data(uid, name), mBaseImageData(data)
+	Data(uid, name), mBaseImageData(data), mMaxRGBIntensity(-1)
 {
 	mUseCropping = false;
 	mCroppingBox_d = DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
@@ -122,9 +124,8 @@ void Image::resetTransferFunctions(bool _2D, bool _3D)
 
 	//mBaseImageData->Update();
 	mBaseImageData->GetScalarRange(); // this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
+	mMaxRGBIntensity = -1;
 
-//	this->resetTransferFunction(ImageTF3DPtr(new ImageTF3D(mBaseImageData)),
-//					ImageLUT2DPtr(new ImageLUT2D(mBaseImageData)));
 	if (_3D)
 		this->resetTransferFunction(ImageTF3DPtr(new ImageTF3D(mBaseImageData)));
 	if (_2D)
@@ -188,18 +189,6 @@ void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D)
 	emit transferFunctionsChanged();
 }
 
-//void Image::set_rMd(Transform3D rMd)
-//{
-//	bool changed = !similar(rMd, m_rMd);
-//
-//	Data::set_rMd(rMd);
-//	//std::cout << "Image::setTransform(): \n" << rMd << std::endl;
-//	if (!changed)
-//	{
-//		return;
-//	}
-//}
-
 void Image::transformChangedSlot()
 {
 	if (mReferenceImageData)
@@ -208,7 +197,6 @@ void Image::transformChangedSlot()
 		mOrientatorMatrix->DeepCopy(rMd.inv().getVtkMatrix());
 		mReferenceImageData->Update();
 	}
-	//std::cout << "Image::transformChangedSlot()\n" << rMd << std::endl;
 }
 
 void Image::moveThisAndChildrenToThread(QThread* thread)
@@ -234,6 +222,7 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 	this->resetTransferFunctions();
 	emit vtkImageDataChanged();
 }
+
 vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
 {
 	if (mBaseGrayScaleImageData)
@@ -255,28 +244,28 @@ vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
 	mBaseGrayScaleImageData->Update();
 	return mBaseGrayScaleImageData;
 }
+
 ImageTF3DPtr Image::getTransferFunctions3D()
 {
 	return mImageTransferFunctions3D;
 }
+
 void Image::setTransferFunctions3D(ImageTF3DPtr transferFuntion)
 {
 	mImageTransferFunctions3D = transferFuntion;
 	emit transferFunctionsChanged();
 }
+
 ImageLUT2DPtr Image::getLookupTable2D()
 {
 	return mImageLookupTable2D;
 }
-//See ssc::Data
-/*REGISTRATION_STATUS Image::getRegistrationStatus() const
- {
- return mRegistrationStatus;
- }*/
+
 vtkImageDataPtr Image::getBaseVtkImageData()
 {
 	return mBaseImageData;
 }
+
 vtkImageDataPtr Image::getRefVtkImageData()
 {
 	if (!mReferenceImageData) // optimized: dont init it if you dont need it.
@@ -304,27 +293,27 @@ LandmarkMap Image::getLandmarks()
 {
 	return mLandmarks;
 }
+
 void Image::setLandmark(Landmark landmark)
 {
 	//std::cout << "Image::setLandmark" << std::endl;
 	mLandmarks[landmark.getUid()] = landmark;
 	emit landmarkAdded(landmark.getUid());
 }
+
 void Image::removeLandmark(QString uid)
 {
 	mLandmarks.erase(uid);
 	emit landmarkRemoved(uid);
 }
-void Image::printLandmarks()
-{
-	std::cout << "Landmarks: " << std::endl;
-}
+
 DoubleBoundingBox3D Image::boundingBox() const
 {
 	mBaseImageData->UpdateInformation();
 	DoubleBoundingBox3D bounds(mBaseImageData->GetBounds());
 	return bounds;
 }
+
 vtkImageAccumulatePtr Image::getHistogram()
 {
 	if (mHistogramPtr.GetPointer() == NULL)
@@ -340,14 +329,68 @@ vtkImageAccumulatePtr Image::getHistogram()
 	mHistogramPtr->Update();
 	return mHistogramPtr;
 }
+
+template<typename scalartype> static int getRGBMax(vtkImageDataPtr image)
+{
+	int max = 0;
+	vtkImageIterator<scalartype> iter(image, image->GetExtent());
+	while (!iter.IsAtEnd())
+	{
+		typename vtkImageIterator<scalartype>::SpanIterator siter = iter.BeginSpan();
+		while (siter != iter.EndSpan())
+		{
+			int value = *siter;
+			++siter;
+			value += *siter;
+			++siter;
+			value += *siter;
+			++siter;
+			if (value > max)
+			{
+				max = value;
+			}
+		}
+		iter.NextSpan();
+	}
+	return max/3;
+}
+	
+	
 int Image::getMax()
 {
 	// Alternatively create max from histogram
 	//IntIntMap::iterator iter = this->getHistogram()->end();
 	//iter--;
 	//return (*iter).first;
-	return (int) mImageTransferFunctions3D->getScalarMax();
+	if (mBaseImageData->GetNumberOfScalarComponents() == 3)
+	{
+		if (mMaxRGBIntensity != -1)
+		{
+			return mMaxRGBIntensity;
+		}
+		QDateTime before = QDateTime::currentDateTime();
+		double max = 0.0;
+		switch (mBaseImageData->GetScalarType())
+		{
+		case VTK_UNSIGNED_CHAR:
+			max = getRGBMax<unsigned char>(mBaseImageData);
+			break;
+		case VTK_UNSIGNED_SHORT:
+			max = getRGBMax<unsigned short>(mBaseImageData);
+			break;
+		default:
+			SSC_ERROR("Unhandled RGB data type");
+			break;
+		}
+		mMaxRGBIntensity = max;
+		return (int)mMaxRGBIntensity;
+	}
+	else
+	{
+		return (int) mImageTransferFunctions3D->getScalarMax();
+	}
 }
+
 int Image::getMin()
 {
 	// Alternatively create min from histogram
@@ -360,10 +403,12 @@ int Image::getRange()
 {
 	return this->getMax() - this->getMin();
 }
+
 int Image::getMaxAlphaValue()
 {
 	return 255;
 }
+
 void Image::addXml(QDomNode& dataNode)
 {
 	Data::addXml(dataNode);
@@ -394,7 +439,6 @@ void Image::addXml(QDomNode& dataNode)
 
 	QDomElement cropNode = doc.createElement("crop");
 	cropNode.setAttribute("use", mUseCropping);
-	//std::cout << "qstring_cast(mCroppingBox_r) " << qstring_cast(mCroppingBox_r) << std::endl;
 	cropNode.appendChild(doc.createTextNode(qstring_cast(mCroppingBox_d)));
 	imageNode.appendChild(cropNode);
 
@@ -429,9 +473,6 @@ void Image::parseXml(QDomNode& dataNode)
 	if (dataNode.isNull())
 		return;
 
-	//  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
-	//  m_rMd_History->parseXml(registrationHistory);
-
 	//transferefunctions
 	QDomNode transferfunctionsNode = dataNode.namedItem("transferfunctions");
 	if (!transferfunctionsNode.isNull())
@@ -449,20 +490,12 @@ void Image::parseXml(QDomNode& dataNode)
 	//Assign default values if the shading nodes don't exists to allow backward compability
 	if (!dataNode.namedItem("shadingAmbient").isNull())
 		mShading.ambient = dataNode.namedItem("shadingAmbient").toElement().text().toDouble();
-	//else
-	//  mShading.ambient = 0.2;
 	if (!dataNode.namedItem("shadingDiffuse").isNull())
 		mShading.diffuse = dataNode.namedItem("shadingDiffuse").toElement().text().toDouble();
-	//else
-	//  mShading.diffuse = 0.9;
 	if (!dataNode.namedItem("shadingSpecular").isNull())
 		mShading.specular = dataNode.namedItem("shadingSpecular").toElement().text().toDouble();
-	//else
-	//  mShading.specular = 0.3;
 	if (!dataNode.namedItem("shadingSpecularPower").isNull())
 		mShading.specularPower = dataNode.namedItem("shadingSpecularPower").toElement().text().toDouble();
-	//else
-	//  mShading.specularPower = 15.0;
 
 	// new way:
 	mShading.parseXml(dataNode.namedItem("shading"));
@@ -538,14 +571,17 @@ double Image::getShadingAmbient()
 {
 	return mShading.ambient;
 }
+
 double Image::getShadingDiffuse()
 {
 	return mShading.diffuse;
 }
+
 double Image::getShadingSpecular()
 {
 	return mShading.specular;
 }
+
 double Image::getShadingSpecularPower()
 {
 	return mShading.specularPower;
@@ -626,9 +662,6 @@ void Image::clearClipPlanes()
  */
 void Image::mergevtkSettingsIntosscTransform()
 {
-	//  std::cout << "REMOVE ORIGIN START:" << std::endl;
-	//  mBaseImageData->Print(std::cout);
-
 	// the internal CustusX format does not handle extents starting at non-zero.
 	// Move extent to zero and change rMd.
 	Vector3D origin(mBaseImageData->GetOrigin());
@@ -648,9 +681,6 @@ void Image::mergevtkSettingsIntosscTransform()
 
 	this->get_rMd_History()->setRegistration(this->get_rMd() * createTransformTranslate(origin + extentShift));
 
-	//  std::cout << "REMOVED ORIGIN END:" << std::endl;
-	//  mBaseImageData->Print(std::cout);
-
 	//Since this function discards the vtkImageData, the transfer functions must be fixed
 	ssc::ImageTF3DPtr transferFunctions =	this->getTransferFunctions3D()->createCopy(getBaseVtkImageData());
 	ssc::ImageLUT2DPtr LUT2D = this->getLookupTable2D()->createCopy(getBaseVtkImageData());
@@ -664,7 +694,6 @@ void Image::mergevtkSettingsIntosscTransform()
 	else
 		messageManager()->sendError("Image::mergevtkSettingsIntosscTransform() LUT2D error");
 	this->resetTransferFunction(transferFunctions, LUT2D);
-
 
 	emit vtkImageDataChanged();
 	emit transferFunctionsChanged();
@@ -693,6 +722,5 @@ void Image::setImageType(const QString& val)
 	mImageType = val;
 	emit propertiesChanged();
 }
-
 
 } // namespace ssc

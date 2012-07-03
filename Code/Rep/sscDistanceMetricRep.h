@@ -18,8 +18,8 @@
 // See sscLicense.txt for more information.
 
 
-#ifndef CXDISTANCEMETRICREP_H_
-#define CXDISTANCEMETRICREP_H_
+#ifndef SSCDISTANCEMETRICREP_H_
+#define SSCDISTANCEMETRICREP_H_
 
 #include "sscDataMetricRep.h"
 #include "sscGraphicalPrimitives.h"
@@ -50,7 +50,7 @@ public:
 	virtual ~DistanceMetricRep() {}
 
 	void setDistanceMetric(DistanceMetricPtr point);
-	virtual QString getType() const { return "cx::DistanceMetricRep"; }
+	virtual QString getType() const { return "ssc::DistanceMetricRep"; }
 
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View *view);
@@ -71,4 +71,4 @@ private:
 
 }
 
-#endif /* CXDISTANCEMETRICREP_H_ */
+#endif /* SSCDISTANCEMETRICREP_H_ */

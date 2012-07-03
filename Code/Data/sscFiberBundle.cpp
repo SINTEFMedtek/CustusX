@@ -34,87 +34,88 @@ namespace ssc
 
 FiberBundlePtr FiberBundle::New(const QString& uid, const QString& name)
 {
-    FiberBundlePtr retval(new FiberBundle(uid, name));
-    return retval;
+	FiberBundlePtr retval(new FiberBundle(uid, name));
+	return retval;
 }
 
 FiberBundle::FiberBundle(const QString &uid, const QString &name)
-    : Data(uid, name)
+        : Data(uid, name)
 {
-    mMesh.reset(new VtkFileMesh(uid, name));
-    mSpacing[0] = 0.5;
-    mSpacing[1] = 0.5;
-    mSpacing[2] = 0.5;
+	mMesh.reset(new VtkFileMesh(uid, name));
+	mSpacing = Vector3D(1.0, 1.0, 1.0);
+	mVtkImageCached = false;
 
-    // Enable shading as default
-    setShading(true);
+	// Enable shading as default
+	setShading(true);
 }
 
 void FiberBundle::setMesh(const MeshPtr& mesh)
 {
-    if (hasMesh(mesh))
-        return;
+	if (hasMesh(mesh))
+		return;
 
-    // Disconnect current mesh signals, if any
-    if(mMesh)
-    {
-        disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-        disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-    }
+	// Disconnect current mesh signals, if any
+	if(mMesh)
+	{
+		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+		disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+	}
 
-    // Connect new mesh signals
-    mMesh = mesh;
+	// Connect new mesh signals
+	mMesh = mesh;
 
-    if (mMesh)
-    {
-        connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-        connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-    }
+	if (mMesh)
+	{
+		connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+		connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+	}
 
-    emit bundleChanged();
+	// Flag image cache as false, so that we can read new image on request
+	mVtkImageCached = false;
+	emit bundleChanged();
 }
 
 bool FiberBundle::hasMesh(const MeshPtr& mesh) const
 {
-    return (mMesh == mesh);
+	return (mMesh == mesh);
 }
 
 void FiberBundle::setFilePath(const QString& filePath)
 {
-    mMesh->setFilePath(filePath);
+	mMesh->setFilePath(filePath);
 }
 
 QString FiberBundle::getFilePath() const
 {
-    return mMesh->getFilePath();
+	return mMesh->getFilePath();
 }
 
 DoubleBoundingBox3D FiberBundle::boundingBox() const
 {
-    DoubleBoundingBox3D bbox;
-    vtkPolyDataPtr polydata;
+	DoubleBoundingBox3D bbox;
+	vtkPolyDataPtr polydata;
 
-    if (mMesh) polydata = getVtkPolyData();
+	if (mMesh) polydata = getVtkPolyData();
 
-    if(polydata)
-    {
-        // Make sure we have updated data first
-        polydata->Update();
-        bbox = DoubleBoundingBox3D(polydata->GetBounds());
-    }
+	if(polydata)
+	{
+		// Make sure we have updated data first
+		polydata->Update();
+		bbox = DoubleBoundingBox3D(polydata->GetBounds());
+	}
 
-    return bbox;
+	return bbox;
 }
 
 void FiberBundle::setVtkPolyData(const vtkPolyDataPtr& polyData)
 {
-    MeshPtr mesh(new Mesh(mUid, "FiberBundle", polyData));
-    setMesh(mesh);
+	MeshPtr mesh(new Mesh(mUid, "FiberBundle", polyData));
+	setMesh(mesh);
 }
 
 vtkPolyDataPtr FiberBundle::getVtkPolyData() const
 {
-    return mMesh->getVtkPolyData();
+	return mMesh->getVtkPolyData();
 }
 
 /**
@@ -125,105 +126,107 @@ vtkPolyDataPtr FiberBundle::getVtkPolyData() const
   */
 vtkImageDataPtr FiberBundle::getVtkImageData()
 {
-    if (mVtkImageData)
-        return mVtkImageData;
+	if (!mVtkImageCached)
+	{
+		vtkPolyDataPtr pd = getVtkPolyData();
+		if (!pd) // No poly data to generate image data from
+			return vtkImageDataPtr();
 
-    vtkPolyDataPtr pd = getVtkPolyData();
-    if (!pd) // No poly data to generate image data from
-        return vtkImageDataPtr();
+		vtkSmartPointer<vtkImageData> whiteImage = vtkSmartPointer<vtkImageData>::New();
 
-    vtkSmartPointer<vtkImageData> whiteImage = vtkSmartPointer<vtkImageData>::New();
+		double bounds[6];
+		pd->GetBounds(bounds);
 
-    double bounds[6];
-    pd->GetBounds(bounds);
+		whiteImage->SetSpacing(mSpacing[0], mSpacing[1], mSpacing[2]);
 
-    whiteImage->SetSpacing(mSpacing);
+		// Compute dimensions
+		int dim[3];
+		for (int i = 0; i < 3; i++)
+		{
+			dim[i] = static_cast<int>(std::ceil((bounds[i * 2 + 1] - bounds[i * 2]) / mSpacing[i]));
+		}
 
-    // Compute dimensions
-    int dim[3];
-    for (int i = 0; i < 3; i++)
-    {
-        dim[i] = static_cast<int>(std::ceil((bounds[i * 2 + 1] - bounds[i * 2]) / mSpacing[i]));
-    }
+		whiteImage->SetDimensions(dim);
+		whiteImage->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
 
-    whiteImage->SetDimensions(dim);
-    whiteImage->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
+		double origin[3];
+		origin[0] = bounds[0] + mSpacing[0] / 2;
+		origin[1] = bounds[2] + mSpacing[1] / 2;
+		origin[2] = bounds[4] + mSpacing[2] / 2;
+		whiteImage->SetOrigin(origin);
 
-    double origin[3];
-    origin[0] = bounds[0] + mSpacing[0] / 2;
-    origin[1] = bounds[2] + mSpacing[1] / 2;
-    origin[2] = bounds[4] + mSpacing[2] / 2;
-    whiteImage->SetOrigin(origin);
+		whiteImage->SetScalarTypeToUnsignedChar();
+		whiteImage->AllocateScalars();
 
-    whiteImage->SetScalarTypeToUnsignedChar();
-    whiteImage->AllocateScalars();
+		// Fill the image with foreground voxels:
+		unsigned char inval = 255;
+		unsigned char outval = 0;
+		vtkIdType count = whiteImage->GetNumberOfPoints();
+		for (vtkIdType i = 0; i < count; ++i)
+		{
+			whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
+		}
 
-    // Fill the image with foreground voxels:
-    unsigned char inval = 255;
-    unsigned char outval = 0;
-    vtkIdType count = whiteImage->GetNumberOfPoints();
-    for (vtkIdType i = 0; i < count; ++i)
-    {
-        whiteImage->GetPointData()->GetScalars()->SetTuple1(i, inval);
-    }
+		// Apply an image stencil to the poly data
+		vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+		pol2stenc->SetInput(pd);
+		pol2stenc->SetOutputOrigin(origin);
+		pol2stenc->SetOutputSpacing(mSpacing[0], mSpacing[1], mSpacing[2]);
+		pol2stenc->SetOutputWholeExtent(whiteImage->GetExtent());
+		pol2stenc->Update();
 
-    // Apply an image stencil to the poly data
-    vtkSmartPointer<vtkPolyDataToImageStencil> pol2stenc = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
-    pol2stenc->SetInput(pd);
-    pol2stenc->SetOutputOrigin(origin);
-    pol2stenc->SetOutputSpacing(mSpacing);
-    pol2stenc->SetOutputWholeExtent(whiteImage->GetExtent());
-    pol2stenc->Update();
+		// Cut the corresponding white image and set the background:
+		vtkSmartPointer<vtkImageStencil> imgstenc = vtkSmartPointer<vtkImageStencil>::New();
+		imgstenc->SetInput(whiteImage);
+		imgstenc->SetStencil(pol2stenc->GetOutput());
+		imgstenc->ReverseStencilOff();
+		imgstenc->SetBackgroundValue(outval);
+		imgstenc->Update();
 
-    // Cut the corresponding white image and set the background:
-    vtkSmartPointer<vtkImageStencil> imgstenc = vtkSmartPointer<vtkImageStencil>::New();
-    imgstenc->SetInput(whiteImage);
-    imgstenc->SetStencil(pol2stenc->GetOutput());
-    imgstenc->ReverseStencilOff();
-    imgstenc->SetBackgroundValue(outval);
-    imgstenc->Update();
+		// Cache the resulting image
+		mVtkImageData = imgstenc->GetOutput();
+		mVtkImageCached = true;
+	}
 
-    // Return the resulting image
-    mVtkImageData = imgstenc->GetOutput();
-    return mVtkImageData;
+	return mVtkImageData;
 }
 
 void FiberBundle::setSpacing(double x, double y, double z)
 {
-    mSpacing[0] = x;
-    mSpacing[1] = y;
-    mSpacing[2] = z;
+	mSpacing = Vector3D(x, y, z);
 }
 
 void FiberBundle::setColor(const QColor& color)
 {
-    mMesh->setColor(color);
+	mMesh->setColor(color);
 }
 
 QColor FiberBundle::getColor() const
 {
-    return mMesh->getColor();
+	return mMesh->getColor();
 }
 
 void FiberBundle::printSelf(std::ostream &os, Indent indent)
 {
-    // Output some numbers and brief info
-    os << indent << "uid: " << mUid.toStdString() << std::endl;
-    os << indent << "name: " << mName.toStdString() << std::endl;
-    os << indent << "fileName: " << mFilePath.toStdString() << std::endl;
-    os << indent << "numPoints: " << mMesh->getVtkPolyData()->GetNumberOfPoints() << std::endl;
-    os << indent << "numVerts: " << mMesh->getVtkPolyData()->GetNumberOfVerts() << std::endl;
-    os << indent << "numPolys: " << mMesh->getVtkPolyData()->GetNumberOfPolys() << std::endl;
+	// Output some numbers and brief info
+	os << indent << "uid: " << mUid.toStdString() << std::endl;
+	os << indent << "name: " << mName.toStdString() << std::endl;
+	os << indent << "fileName: " << mFilePath.toStdString() << std::endl;
+	os << indent << "numPoints: " << mMesh->getVtkPolyData()->GetNumberOfPoints() << std::endl;
+	os << indent << "numVerts: " << mMesh->getVtkPolyData()->GetNumberOfVerts() << std::endl;
+	os << indent << "numPolys: " << mMesh->getVtkPolyData()->GetNumberOfPolys() << std::endl;
 }
 
 void FiberBundle::meshChangedSlot()
 {
-    emit bundleChanged();
+	// Flag image cache as false, so that we can read new image on request
+	mVtkImageCached = false;
+	emit bundleChanged();
 }
 
 void FiberBundle::transformChangedSlot()
 {
-    emit transformChanged();
+	emit transformChanged();
 }
 
 } // end namespace

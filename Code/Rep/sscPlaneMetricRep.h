@@ -17,8 +17,8 @@
 //
 // See sscLicense.txt for more information.
 
-#ifndef CXPLANEMETRICREP_H_
-#define CXPLANEMETRICREP_H_
+#ifndef SSCPLANEMETRICREP_H_
+#define SSCPLANEMETRICREP_H_
 
 #include "sscDataMetricRep.h"
 #include "sscGraphicalPrimitives.h"
@@ -46,7 +46,7 @@ public:
 	virtual ~PlaneMetricRep() {}
 
 	void setMetric(PlaneMetricPtr point);
-	virtual QString getType() const { return "cx::PlaneMetricRep"; }
+	virtual QString getType() const { return "ssc::PlaneMetricRep"; }
 
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View *view);
@@ -71,4 +71,4 @@ private:
 
 }
 
-#endif /* CXPLANEMETRICREP_H_ */
+#endif /* SSCPLANEMETRICREP_H_ */

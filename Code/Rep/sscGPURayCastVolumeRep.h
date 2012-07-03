@@ -20,6 +20,8 @@
 #ifndef SSCGPURAYCASTVOLUMEREP_H_
 #define SSCGPURAYCASTVOLUMEREP_H_
 
+#ifndef WIN32
+
 #include "sscRepImpl.h"
 #include <vector>
 #include <QSet>
@@ -50,22 +52,6 @@ class GPURayCastVolumeRep: public ssc::RepImpl
 {
 Q_OBJECT
 public:
-	enum RenderMode {
-		/** Accumulated average (the default) */
-		AccumulatedAverage = 0,
-		/** Maximum intensity projection */
-		MaximumIntensity = 1,
-		/** Simple Average (X-ray) */
-		Average = 2,
-		/** Doesn't work yet */
-		Experimental1 = 3,
-		/** Doesn't work yet */
-		AccumulatedAverageGradient = 4,
-		/** Doesn't work yet */
-		CloudLightScattering = 5,
-		/** Simple thresholding, no transparency */
-		SimpleThresholding = 6
-	};
 	static GPURayCastVolumeRepPtr New(const QString& uid);
 	virtual ~GPURayCastVolumeRep();
 	virtual QString getType() const
@@ -75,7 +61,7 @@ public:
 	/**
 	 * \brief Override the default locations of the shader files
 	 */
-	void setShaderFiles(QString vertexShaderFile, QString fragmentShaderFiles);
+	void setShaderFolder(QString folder);
 	virtual void printSelf(std::ostream & os, ssc::Indent indent);
 	/**
 	 * \brief Set the images to render using this Rep
@@ -103,7 +89,8 @@ public:
 	/**
 	 * \brief Set the rendering mode
 	 */
-	void setRenderMode(enum RenderMode renderMode);
+	void enableImagePlaneDownsampling(int maxPixels);
+	void disableImagePlaneDownsampling();
 
 protected:
 	GPURayCastVolumeRep(const QString& uid);
@@ -131,5 +118,8 @@ private:
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
+
+#endif // WIN32
+
 #endif /* SSCGPURAYCASTVOLUMEREP_H_ */
 

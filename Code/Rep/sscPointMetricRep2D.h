@@ -30,13 +30,13 @@ namespace ssc
 
 typedef boost::shared_ptr<class PointMetricRep2D> PointMetricRep2DPtr;
 
-/**Rep for visualizing a PointMetric.
+/**Rep for visualizing a PointMetric in 2D views.
  *
  * \ingroup sscRep
  * \ingroup sscRep2D
  *
- * \date Jul 5, 2011
- * \author Christian Askeland, SINTEF
+ * \date Jun 14, 2012
+ * \author Sigmund Augdal, SonoWand AS
  */
 class PointMetricRep2D: public DataMetricRep
 {
@@ -49,7 +49,16 @@ public:
 	PointMetricPtr getPointMetric();
 	virtual QString getType() const { return "ssc::PointMetricRep2D"; }
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
-	void set_vpMs(Transform3D vpMs);
+	/**
+	 * Set the width of the outline in fractions of the full size
+	 */
+	void setOutlineWidth(double width);
+	/**
+	 * Set the color of the outline
+	 */
+	void setOutlineColor(double red, double green, double blue);
+	void setFillVisibility(bool on);
+	void setDynamicSize(bool on);
 
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
@@ -64,15 +73,21 @@ private:
 	PointMetricRep2D(const QString& uid, const QString& name = "");
 	PointMetricRep2D(); ///< not implemented
 
-	vtkActorPtr mActor;
 	ssc::CaptionText3DPtr mText;
 	PointMetricPtr mMetric;
 	ssc::View* mView;
 	ssc::ViewportListenerPtr mViewportListener;
 	ssc::SliceProxyPtr mSliceProxy;
-	Transform3D m_vpMs;
-	vtkSectorSourcePtr mCircle;
+	vtkActorPtr mCircleActor;
+	vtkSectorSourcePtr mCircleSource;
+	vtkActorPtr mOutlineActor;
+	vtkSectorSourcePtr mOutlineSource;
+	double mOutlineWidth;
+	ssc::Vector3D mOutlineColor;
+	bool mFillVisible;
 };
+
+
 
 }
 
