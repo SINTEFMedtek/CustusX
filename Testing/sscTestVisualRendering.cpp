@@ -161,6 +161,30 @@ void TestVisualRendering::test_3D_Composite_Views_GPU()
 	CPPUNIT_ASSERT(runWidget());
 }
 
+void TestVisualRendering::test_3D_Composite_Views_GPU_Container()
+{
+	ssc::ViewContainer *view = new ssc::ViewContainer(widget->centralWidget());
+	view->setupViews(2, 2);
+	widget->setDescription("3D Composites (2 volumes) with ACS, moving tool (in viewcontainer)");
+	widget->setupViewContainer(view, "dummy", "none", 0, 0);
+	QStringList images; images << image[1] << image[2];
+	ImageParameters parameters[2];
+
+	parameters[0].llr = 35;
+	parameters[0].alpha = .1;
+
+	parameters[1].llr = 55;
+	parameters[1].alpha = .7;
+	parameters[1].lut = getCreateLut(0, 200, .67, .68, 0, 1, .4, .8);
+
+	widget->containerGPUSlice(view, 1, "A", image[0], ssc::ptAXIAL);
+	widget->containerGPUSlice(view, 0, "C", image[0], ssc::ptCORONAL);
+	widget->containerGPUSlice(view, 3, "S", image[0], ssc::ptSAGITTAL);
+	widget->define3DGPUContainer(view, images, 2, parameters);
+
+	CPPUNIT_ASSERT(runWidget());
+}
+
 void TestVisualRendering::test_3D_RGB_GPU()
 {
 	widget->setDescription("3D RGB Volume");
