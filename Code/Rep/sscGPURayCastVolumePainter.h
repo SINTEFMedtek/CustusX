@@ -62,7 +62,6 @@ public:
 	void setClipper(SlicePlaneClipperPtr clipper);
 	void setClipVolume(int index, bool clip);
 	void setStepSize(double stepsize);
-	void setRenderMode(int renderMode);
 	void enableImagePlaneDownsampling(int maxPixels);
 	void disableImagePlaneDownsampling();
 	/**
