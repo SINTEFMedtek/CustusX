@@ -52,22 +52,6 @@ class GPURayCastVolumeRep: public ssc::RepImpl
 {
 Q_OBJECT
 public:
-	enum RenderMode {
-		/** Accumulated average (the default) */
-		AccumulatedAverage = 0,
-		/** Maximum intensity projection */
-		MaximumIntensity = 1,
-		/** Simple Average (X-ray) */
-		Average = 2,
-		/** Doesn't work yet */
-		Experimental1 = 3,
-		/** Doesn't work yet */
-		AccumulatedAverageGradient = 4,
-		/** Doesn't work yet */
-		CloudLightScattering = 5,
-		/** Simple thresholding, no transparency */
-		SimpleThresholding = 6
-	};
 	static GPURayCastVolumeRepPtr New(const QString& uid);
 	virtual ~GPURayCastVolumeRep();
 	virtual QString getType() const
@@ -105,7 +89,6 @@ public:
 	/**
 	 * \brief Set the rendering mode
 	 */
-	void setRenderMode(enum RenderMode renderMode);
 	void enableImagePlaneDownsampling(int maxPixels);
 	void disableImagePlaneDownsampling();
 

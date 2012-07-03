@@ -394,8 +394,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		mUpscaleShader = pgm;
 		report_gl_error();
 	}
-	
-	mInternals->Shader->GetUniformVariables()->SetUniformi("renderMode", 1, &mRenderMode);
+
 	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &mStepSize);
 	float viewport[2];
 	viewport[0] = mWidth;
@@ -730,11 +729,6 @@ void GPURayCastVolumePainter::setClipper(SlicePlaneClipperPtr clipper)
 void GPURayCastVolumePainter::setStepSize(double stepsize)
 {
 	mStepSize = stepsize;
-}
-
-void GPURayCastVolumePainter::setRenderMode(int renderMode)
-{
-	mRenderMode = renderMode;
 }
 
 void GPURayCastVolumePainter::enableImagePlaneDownsampling(int maxPixels)
