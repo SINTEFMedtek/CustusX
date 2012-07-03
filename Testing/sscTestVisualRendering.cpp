@@ -122,6 +122,27 @@ void TestVisualRendering::test_3D_Composite_GPU()
 	CPPUNIT_ASSERT(runWidget());
 }
 
+void TestVisualRendering::test_3D_Composite_Views_GPU()
+{
+	widget->setDescription("3D Composites (2 volumes) with ACS, moving tool");
+	QStringList images; images << image[1] << image[2];
+	ImageParameters parameters[2];
+
+	parameters[0].llr = 35;
+	parameters[0].alpha = .1;
+
+	parameters[1].llr = 55;
+	parameters[1].alpha = .7;
+	parameters[1].lut = getCreateLut(0, 200, .67, .68, 0, 1, .4, .8);
+
+	widget->defineSlice("A", image[0], ssc::ptAXIAL, 0, 0);
+	widget->defineSlice("C", image[0], ssc::ptCORONAL, 1, 0);
+	widget->defineSlice("S", image[0], ssc::ptSAGITTAL, 0, 1);
+	widget->define3DGPU(images, parameters, 1, 1);
+
+	CPPUNIT_ASSERT(runWidget());
+}
+
 void TestVisualRendering::test_3D_RGB_GPU()
 {
 	widget->setDescription("3D RGB Volume");
