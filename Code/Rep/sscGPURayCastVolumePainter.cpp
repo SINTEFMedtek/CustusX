@@ -34,6 +34,7 @@
 #include <vtkShaderProgram2.h>
 #include <vtkShader2.h>
 #include <vtkShader2Collection.h>
+#include <vtkImageData.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -67,6 +68,7 @@ class GPURayCastSingleVolumePainterHelper
 	float mAlpha;
 	Transform3D m_nMr;
 	bool mClip;
+	float mMaxValue;
 
 public:
 	explicit GPURayCastSingleVolumePainterHelper(int index) :
@@ -75,7 +77,8 @@ public:
 		mLevel(0.0),
 		mLLR(0.0),
 		mAlpha(1.0),
-		mClip(false)
+		mClip(false),
+		mMaxValue(-1000)
 	{
 	}
 	GPURayCastSingleVolumePainterHelper() :
@@ -84,15 +87,17 @@ public:
 		mLevel(0.0),
 		mLLR(0.0),
 		mAlpha(1.0),
-		mClip(false)
+		mClip(false),
+		mMaxValue(-1000)
 	{
 	}
 	~GPURayCastSingleVolumePainterHelper()
 	{
 	}
-	void SetBuffer(ssc::GPUImageDataBufferPtr buffer)
+	void SetBuffer(ssc::GPUImageDataBufferPtr buffer, double maxValue)
 	{
 		mVolumeBuffer = buffer;
+		mMaxValue = maxValue;
 	}
 	void SetBuffer(ssc::GPUImageLutBufferPtr buffer)
 	{
@@ -156,6 +161,7 @@ public:
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("level[%1]").arg(mIndex)), 1, &mLevel);
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("threshold[%1]").arg(mIndex)), 1, &mLLR);
 		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("alpha[%1]").arg(mIndex)), 1, &mAlpha);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast(QString("maxValue[%1]").arg(mIndex)), 1, &mMaxValue);
 		int clip = mClip;
 		shader->GetUniformVariables()->SetUniformi(cstring_cast(QString("useCutPlane[%1]").arg(mIndex)), 1, &clip);
 		vtkMatrix4x4Ptr M = m_nMr.getVtkMatrix();
@@ -175,7 +181,6 @@ public:
 class GPURayCastVolumePainter::vtkInternals
 {
 public:
-	Display* mCurrentContext;
 
 	vtkWeakPointer<vtkRenderWindow> LastContext;
 
@@ -218,15 +223,29 @@ GPURayCastVolumePainter::GPURayCastVolumePainter() :
 	mDepthBuffer(0),
 	mBackgroundBuffer(0),
 	mStepSize(1.0),
-	mRenderMode(0)
+	mRenderMode(0),
+	mFBO(0),
+	mDSColorBuffer(0),
+	mDSDepthBuffer(0),
+	mDownsampleWidth(512),
+	mDownsampleHeight(512),
+	mDownsamplePixels(0),
+	mShouldResample(false),
+	mResample(false)
 {
 	mInternals = new vtkInternals();
 }
 
-void GPURayCastVolumePainter::setShaderFiles(QString vertexShaderFile, QString fragmentShaderFile)
+void GPURayCastVolumePainter::setShaderFolder(QString folder)
 {
-	mVertexShaderFile = vertexShaderFile;
-	mFragmentShaderFile = fragmentShaderFile;
+	if (!folder.endsWith("/"))
+	{
+		folder +=  "/";
+	}
+	mVertexShaderFile = folder + "raycasting_shader.vert";
+	mFragmentShaderFile = folder + "raycasting_shader.frag";
+	mUSVertexShaderFile = folder + "upscale.vert";
+	mUSFragmentShaderFile = folder + "upscale.frag";
 }
 
 QString GPURayCastVolumePainter::loadShaderFile(QString shaderFile)
@@ -270,6 +289,21 @@ void GPURayCastVolumePainter::ReleaseGraphicsResources(vtkWindow* win)
 		glDeleteTextures(1, &mBackgroundBuffer);
 		mBackgroundBuffer = 0;
 	}
+	if (mDSDepthBuffer)
+	{
+		glDeleteTextures(1, &mDSDepthBuffer);
+		mDSDepthBuffer = 0;
+	}
+	if (mDSColorBuffer)
+	{
+		glDeleteTextures(1, &mDSColorBuffer);
+		mDSColorBuffer = 0;
+	}
+	if (mUpscaleShader)
+	{
+		mUpscaleShader->ReleaseGraphicsResources();
+		mUpscaleShader = 0;
+	}		
 	this->Superclass::ReleaseGraphicsResources(win);
 }
 
@@ -282,7 +316,11 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		this->Superclass::PrepareForRendering(renderer, actor);
 		return;
 	}
+	report_gl_error();
 
+	GLint oldTextureUnit;
+	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
+	
 	vtkRenderWindow* renWin = renderer->GetRenderWindow();
 	if (mInternals->LastContext != renWin || mInternals->mElement.size() != mInternals->mVolumes)
 	{
@@ -295,7 +333,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(renWin); 
 	if (!LoadRequiredExtensions(context->GetExtensionManager()))
 	{
-		std::cout << "Missing required EXTENSION!!!!!!!!!!!." << endl;
+		std::cout << "Missing required EXTENSION!" << endl;
 		return;
 	}
 
@@ -306,6 +344,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		QString fragmentShaderSource = this->loadShaderFile(mFragmentShaderFile);
 		fragmentShaderSource = fragmentShaderSource.replace("${NUMBER_OF_VOLUMES}", QString("%1").arg(mInternals->mElement.size()));
 		fragmentShaderSource = fragmentShaderSource.replace("${MAX_VOLUMES}", QString("%1").arg(maxVolumes));
+		fragmentShaderSource = fragmentShaderSource.replace("${STEPSIZE}", QString("%1").arg(mStepSize));
 
 		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
 		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));
@@ -329,17 +368,59 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		}
 	}
 
-	mInternals->Shader->GetUniformVariables()->SetUniformi("renderMode", 1, &mRenderMode);
+	if (mLastRenderSize != mBase->size())
+	{
+		mResample = (mShouldResample && (mBase->size().width() * mBase->size().height() > mDownsamplePixels));
+	}
+
+	if (mResample && !mUpscaleShader)
+	{
+		mInternals->mVolumes = mInternals->mElement.size();
+		QString vertexShaderSource = this->loadShaderFile(mUSVertexShaderFile);
+		QString fragmentShaderSource = this->loadShaderFile(mUSFragmentShaderFile);
+
+		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
+		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));
+
+		vtkShader2Ptr s1 = vtkShader2Ptr::New();
+		s1->SetType(VTK_SHADER_TYPE_VERTEX);
+		s1->SetSourceCode(cstring_cast(vertexShaderSource));
+		s1->SetContext(pgm->GetContext());
+		pgm->GetShaders()->AddItem(s1);
+
+		vtkShader2Ptr s2 = vtkShader2Ptr::New();
+		s2->SetType(VTK_SHADER_TYPE_FRAGMENT);
+		s2->SetSourceCode(cstring_cast(fragmentShaderSource));
+		s2->SetContext(pgm->GetContext());
+		pgm->GetShaders()->AddItem(s2);
+		mUpscaleShader = pgm;
+		report_gl_error();
+	}
+
 	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &mStepSize);
 	float viewport[2];
 	viewport[0] = mBase->size().width();
 	viewport[1] = mBase->size().height();
+	mInternals->Shader->GetUniformVariables()->SetUniformf("backgroundResolution", 2, viewport);
+	if (mResample)
+	{
+		viewport[0] = mDownsampleWidth;
+		viewport[1] = mDownsampleHeight;
+	}
+		
 	mInternals->Shader->GetUniformVariables()->SetUniformf("viewport", 2, viewport);
 	
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
 	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
 	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+	if (mResample && !vtkgl::IsFramebuffer(mFBO))
+	{
+		float factor = (float)mDownsamplePixels/(mBase->size().width() * mBase->size().height());
+		mDownsampleWidth = mBase->size().width() * factor;
+		mDownsampleHeight = mBase->size().height() * factor;
+		createBuffers();
+	}
 
 	report_gl_error();
 	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
@@ -361,7 +442,43 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	
 	glDisable(vtkgl::TEXTURE_3D);
 	glBindTexture(GL_TEXTURE_3D, 0);
+
+	glActiveTexture(oldTextureUnit);
 	report_gl_error();
+}
+
+void GPURayCastVolumePainter::createBuffers()
+{
+	vtkgl::GenFramebuffers(1, &mFBO);
+	report_gl_error();
+	vtkgl::GenRenderbuffers(1, &mDSDepthBuffer);
+	report_gl_error();
+
+	glGenTextures(1, &mDSColorBuffer);
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(GL_TEXTURE_2D, mDSColorBuffer);
+	report_gl_error();
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mDownsampleWidth, mDownsampleHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	report_gl_error();
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	glGenTextures(1, &mDSDepthBuffer);
+	glActiveTexture(GL_TEXTURE11);
+	glBindTexture(GL_TEXTURE_2D, mDSDepthBuffer);
+	report_gl_error();
+	glTexImage2D(GL_TEXTURE_2D, 0, vtkgl::DEPTH_COMPONENT32, mDownsampleWidth, mDownsampleHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+	report_gl_error();
+	glTexParameteri(GL_TEXTURE_2D, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
+	glTexParameteri(GL_TEXTURE_2D, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	vtkgl::BindFramebuffer(vtkgl::DRAW_FRAMEBUFFER, mFBO);
+	vtkgl::FramebufferTexture2D(vtkgl::DRAW_FRAMEBUFFER, vtkgl::COLOR_ATTACHMENT0, GL_TEXTURE_2D, mDSColorBuffer, 0);
+	vtkgl::FramebufferTexture2D(vtkgl::DRAW_FRAMEBUFFER, vtkgl::DEPTH_ATTACHMENT, GL_TEXTURE_2D, mDSDepthBuffer, 0);
+
+	vtkgl::BindFramebuffer(vtkgl::DRAW_FRAMEBUFFER, 0);
 }
 
 void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
@@ -374,6 +491,10 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		return;
 	}
 	GL_TRACE("Entering");
+
+	GLint oldTextureUnit;
+	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
+	
 	// Save context state to be able to restore.
 	mInternals->Shader->Build();
 	if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
@@ -422,35 +543,35 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		glGenTextures(1, &mDepthBuffer);
 		report_gl_error();
 		glActiveTexture(GL_TEXTURE10);
-		glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mDepthBuffer);
+		glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
 		report_gl_error();
-		glTexImage2D(vtkgl::TEXTURE_RECTANGLE_ARB, 0, vtkgl::DEPTH_COMPONENT32, mBase->size().width(), mBase->size().height(), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, vtkgl::DEPTH_COMPONENT32, mBase->size().width(), mBase->size().height(), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 		report_gl_error();
-		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
-		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
-		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
+		glTexParameteri(GL_TEXTURE_2D, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	}
 	if (!glIsTexture(mBackgroundBuffer))
 	{
 		glGenTextures(1, &mBackgroundBuffer);
 		report_gl_error();
 		glActiveTexture(GL_TEXTURE11);
-		glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mBackgroundBuffer);
+		glBindTexture(GL_TEXTURE_2D, mBackgroundBuffer);
 		report_gl_error();
-		glTexImage2D(vtkgl::TEXTURE_RECTANGLE_ARB, 0, GL_RGB, mBase->size().width(), mBase->size().height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mBase->size().width(), mBase->size().height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		report_gl_error();
-		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(vtkgl::TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		mLastRenderSize = mBase->size();
 	}
 
 	glActiveTexture(GL_TEXTURE10);
-	glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mDepthBuffer);
-	glCopyTexSubImage2D( vtkgl::TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, mBase->size().width(), mBase->size().height());
+	glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, mBase->size().width(), mBase->size().height());
 	glActiveTexture(GL_TEXTURE11);
-	glBindTexture(vtkgl::TEXTURE_RECTANGLE_ARB, mBackgroundBuffer);
-	glCopyTexSubImage2D( vtkgl::TEXTURE_RECTANGLE_ARB, 0, 0, 0, 0, 0, mBase->size().width(), mBase->size().height());
+	glBindTexture(GL_TEXTURE_2D, mBackgroundBuffer);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, mBase->size().width(), mBase->size().height());
 	report_gl_error();
 	int depthTexture = 10;
 	mInternals->Shader->GetUniformVariables()->SetUniformi("depthBuffer", 1, (int*)&depthTexture);
@@ -464,12 +585,63 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
 	}
 
+	if (mResample)
+	{
+		vtkgl::BindFramebuffer( vtkgl::DRAW_FRAMEBUFFER, mFBO);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		GLenum status = vtkgl::CheckFramebufferStatus(vtkgl::DRAW_FRAMEBUFFER);
+		switch (status)
+		{
+		case vtkgl::FRAMEBUFFER_COMPLETE:
+			break;
+		default:
+			std::cout << "other framebuffer problem: " << status << std::endl;
+			break;
+		}
+		report_gl_error();
+		glViewport(0, 0, mDownsampleWidth, mDownsampleHeight);
+	}
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
 
 	mInternals->Shader->Restore();
 
+	if (mResample)
+	{
+		vtkgl::BindFramebuffer( vtkgl::DRAW_FRAMEBUFFER, 0);
+		report_gl_error();
+		GLenum buffer = GL_BACK;
+		vtkgl::DrawBuffers(1, &buffer);
+		vtkgl::BindFramebuffer( vtkgl::READ_FRAMEBUFFER, mFBO);
+		report_gl_error();
+		glReadBuffer(vtkgl::COLOR_ATTACHMENT0);
+		
+		GL_TRACE("Before upscale");
+		glViewport(0,0, mBase->size().width(), mBase->size().height());
+		glDisable(GL_SCISSOR_TEST);
+		mUpscaleShader->Use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, mDSDepthBuffer);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, mDSColorBuffer);
+		int var = 1;
+		mUpscaleShader->GetUniformVariables()->SetUniformi("colors", 1, &var);
+		var = 0;
+		mUpscaleShader->GetUniformVariables()->SetUniformi("depth", 1, &var);
+		glBegin(GL_QUADS);
+		glVertex3f(-1,-1,0);
+		glVertex3f(-1,1,0);
+		glVertex3f(1,1,0);
+		glVertex3f(1,-1,0);
+		glEnd();
+		report_gl_error();
+
+		vtkgl::BindFramebuffer( vtkgl::READ_FRAMEBUFFER, 0);
+		mUpscaleShader->Restore();
+		report_gl_error();
+	}
 	glDisable(vtkgl::TEXTURE_3D);
 	glBindTexture(GL_TEXTURE_3D, 0);
+	glActiveTexture(oldTextureUnit);
 	report_gl_error();
 }
 
@@ -498,14 +670,15 @@ bool GPURayCastVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* 
 	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_3")
+	        && LoadRequiredExtension(mgr, "GL_ARB_framebuffer_object")
 	        && LoadRequiredExtension(mgr, "GL_ARB_texture_rectangle")
 			&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object")
 			&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
 }
 
-void GPURayCastVolumePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer)
+void GPURayCastVolumePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer, double maxValue)
 {
-	mInternals->safeIndex(index).SetBuffer(buffer);
+	mInternals->safeIndex(index).SetBuffer(buffer, maxValue);
 }
 
 void GPURayCastVolumePainter::SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer)
@@ -542,11 +715,18 @@ void GPURayCastVolumePainter::setStepSize(double stepsize)
 	mStepSize = stepsize;
 }
 
-void GPURayCastVolumePainter::setRenderMode(int renderMode)
+void GPURayCastVolumePainter::enableImagePlaneDownsampling(int maxPixels)
 {
-	mRenderMode = renderMode;
+	mShouldResample = true;
+	mDownsamplePixels = maxPixels;
 }
 
+void GPURayCastVolumePainter::disableImagePlaneDownsampling()
+{
+	mShouldResample = false;
+	mResample = false;
+}
+	
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------

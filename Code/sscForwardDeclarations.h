@@ -50,6 +50,7 @@ typedef boost::shared_ptr<class GPUImageLutBuffer> GPUImageLutBufferPtr;
 typedef boost::shared_ptr<class GPURayCastVolumeRep> GPURayCastVolumeRepPtr;
 typedef boost::shared_ptr<class GraphicalLine3D> GraphicalLine3DPtr;
 typedef boost::shared_ptr<class GraphicalPoint3D> GraphicalPoint3DPtr;
+typedef boost::shared_ptr<class GuideRep2D> GuideRep2DPtr;
 typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
 typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;

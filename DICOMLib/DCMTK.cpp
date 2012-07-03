@@ -567,30 +567,30 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	LOOKUPSEQ( DCM_PlanePositionSequence );
 	if ( !dicomtag_dv( sequence, instance->image_position, DCM_ImagePositionPatient, 3 ) )
 	{
-		if ( !dicomtag_dv( dset, instance->image_position, DCM_ACR_NEMA_ImagePosition, 3 ) )
-		{
-			seriesError(series, "No valid Image Position Patient tag.");
+//		if ( !dicomtag_dv( dset, instance->image_position, DCM_ACR_NEMA_ImagePosition, 3 ) )
+//		{
+//			seriesError(series, "No valid Image Position Patient tag.");
 			success = false;
-		}
-		else
-		{
-			acrnema = true;
-		}
+//		}
+//		else
+//		{
+//			acrnema = true;
+//		}
 	}
 
 	/* Image Orientation Patient - required */
 	LOOKUPSEQ( DCM_PlaneOrientationSequence );
 	if ( !dicomtag_dv( sequence, series->image_orientation, DCM_ImageOrientationPatient, 6 ) )
 	{
-		if ( !dicomtag_dv( dset, series->image_orientation, DCM_ACR_NEMA_ImageOrientation, 6 ) )
-		{
-			seriesError(series, "No valid Image Orientation Patient tag.");
+//		if ( !dicomtag_dv( dset, series->image_orientation, DCM_ACR_NEMA_ImageOrientation, 6 ) )
+//		{
+//			seriesError(series, "No valid Image Orientation Patient tag.");
 			success = false;
-		}
-		else
-		{
-			acrnema = true;
-		}
+//		}
+//		else
+//		{
+//			acrnema = true;
+//		}
 	}
 
 	/* Pixel Spacing - required */
@@ -935,25 +935,25 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 	LOOKUPSEQ( DCM_VOILUTSequence );
 	( void ) dicomtag_window( sequence, instance );
 
-	if ( acrnema )
-	{
-		char tmp[DICOMLIB_LONG_STRING];
-
-		if (!dicomtag_string( dset, tmp, DCM_ACR_NEMA_RecognitionCode, DICOMLIB_LONG_STRING)
-		    || strncmp(tmp, "ACR-NEMA", 8) != 0 || (tmp[9] != '1' && tmp[9] != '2'))
-		{
-			seriesError(series, "Identified as ACR-NEMA but no recognition code found.");
-			return EPROTO;
-		}
-		if (tmp[9] == '1')
-		{
-			series->warning = DICOMLIB_WARNING_ACR_NEMA_1;
-		}
-		else
-		{
-			series->warning = DICOMLIB_WARNING_ACR_NEMA_2;
-		}
-	}
+//	if ( acrnema )
+//	{
+//		char tmp[DICOMLIB_LONG_STRING];
+//
+//		if (!dicomtag_string( dset, tmp, DCM_ACR_NEMA_RecognitionCode, DICOMLIB_LONG_STRING)
+//		    || strncmp(tmp, "ACR-NEMA", 8) != 0 || (tmp[9] != '1' && tmp[9] != '2'))
+//		{
+//			seriesError(series, "Identified as ACR-NEMA but no recognition code found.");
+//			return EPROTO;
+//		}
+//		if (tmp[9] == '1')
+//		{
+//			series->warning = DICOMLIB_WARNING_ACR_NEMA_1;
+//		}
+//		else
+//		{
+//			series->warning = DICOMLIB_WARNING_ACR_NEMA_2;
+//		}
+//	}
 	return success ? 0 : EPROTO;
 }
 

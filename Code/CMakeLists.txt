@@ -99,6 +99,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscDistanceMetricRep.h
     Rep/sscAngleMetricRep.h
     Rep/sscPlaneMetricRep.h
+    Rep/sscGuideRep2D.h
      
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
@@ -147,6 +148,9 @@ set( SSC_INCLUDE_DIRS
     ${SSC_BINARY_DIR}
     ) 
 
+set( SSC_DICOMLIB_INCLUDE_DIRS
+  ${SSC_SOURCE_DIR}/DICOMLib
+  )
 #find_package( CML REQUIRED )
 #find_package (CML PATHS "cml-1_0_2" REQUIRED)
 #include (${CML_USE_FILE})
@@ -316,6 +320,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscAngleMetricRep.cpp
     Rep/sscPlaneMetricRep.h
     Rep/sscPlaneMetricRep.cpp
+    Rep/sscGuideRep2D.h
+    Rep/sscGuideRep2D.cpp
     
     Data/sscLandmark.h
     Data/sscLandmark.cpp
@@ -596,9 +602,11 @@ configure_file (
     "${PROJECT_SOURCE_DIR}/CMake/SSCConfig.cmake.in"
     "${PROJECT_BINARY_DIR}/SSCConfig.cmake"
     )
-file(COPY Rep/Shaders/glsl/raycasting_shader.frag DESTINATION Rep)
-file(COPY Rep/Shaders/glsl/raycasting_shader.vert DESTINATION Rep)
-file(COPY Rep/Shaders/glsl/Texture3DOverlay.frag DESTINATION Rep)
+configure_file(Rep/Shaders/glsl/upscale.frag Rep COPYONLY)
+configure_file(Rep/Shaders/glsl/upscale.vert Rep COPYONLY)
+configure_file(Rep/Shaders/glsl/raycasting_shader.frag Rep COPYONLY)
+configure_file(Rep/Shaders/glsl/raycasting_shader.vert Rep COPYONLY)
+configure_file(Rep/Shaders/glsl/Texture3DOverlay.frag Rep COPYONLY)
   
 # Export our build settings and library dependencies
 include (CMakeExportBuildSettings)
