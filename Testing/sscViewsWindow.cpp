@@ -290,7 +290,7 @@ void ViewsWindow::define3DGPUContainer(ssc::ViewContainer *widget, const QString
 		}
 		images.push_back(image);
 	}
-	ssc::ViewItem *view = widget->getView(pos).get();
+	ssc::ViewItem *view = widget->getView(pos);
 	mLayouts.insert(view);
 
 #ifndef WIN32

@@ -43,8 +43,8 @@ class ViewItem : public QObject, public View, public QLayoutItem
 Q_OBJECT
 
 public:
-	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QSize size) : QObject(parent), View(parent, size) { mSize = size; mRenderWindow = renderWindow; }
-	virtual ~ViewItem() {}
+	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QRect rect) : QObject(parent), View(parent, rect.size()) { mRect = rect; mRenderWindow = renderWindow; }
+	~ViewItem() {}
 
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }
@@ -52,6 +52,8 @@ public:
 	virtual void setZoomFactor(double factor);
 	virtual void setSize(QSize size) { mSize = size; emit resized(size); }
 	void setRenderer(vtkRendererPtr renderer);
+	virtual QPoint getOrigin() { return mRect.topLeft(); }
+	virtual void setGLViewport(QRect rect) { mRect = rect; }
 
 	// Implementing QLayoutItem's pure virtuals
 	virtual Qt::Orientations expandingDirections() const { return Qt::Vertical | Qt::Horizontal; }
@@ -66,8 +68,8 @@ signals:
 	void resized(QSize size);
 
 private:
-	vtkRenderWindowPtr mRenderWindow;
 	QRect mRect;
+	vtkRenderWindowPtr mRenderWindow;
 };
 typedef boost::shared_ptr<ViewItem> ViewItemPtr;
 
@@ -83,8 +85,7 @@ public:
 	ViewItem *getView(int view);
 	void setupViews(int cols, int rows);
 	void clear();
-
-	QGridLayout *getLayout();
+	void calcSize();
 
 signals:
 	void mouseMoveSignal(QMouseEvent *event);
@@ -98,6 +99,7 @@ signals:
 protected:
 	vtkRenderWindowPtr mRenderWindow;
 	QList<ViewItem *> mViews;
+	int mRows, mCols;
 
 private:
 	virtual void showEvent(QShowEvent* event);

@@ -68,9 +68,9 @@ private:
 
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;
-	
+
 	typedef std::set<ssc::View *> LayoutMap;
-	std::set<ssc::View *> mLayouts;
+	LayoutMap mLayouts;
 	QGridLayout* mSliceLayout;
 	QString mDisplayText;
 	
