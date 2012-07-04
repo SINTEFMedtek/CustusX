@@ -114,7 +114,7 @@ void ViewsWindow::containerGPUSlice(ssc::ViewContainer *widget, int pos, const Q
 	ssc::ToolManager *mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 	ssc::ImagePtr image = loadImage(imageFilename);
-	ssc::ViewItem *view = widget->getView(pos).get();
+	ssc::ViewItem *view = widget->getView(pos);
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->getRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
@@ -182,7 +182,7 @@ void ViewsWindow::insertView(ssc::ViewWidget *view, const QString& uid, const QS
 
 void ViewsWindow::container3D(ssc::ViewContainer *widget, int pos, const QString& imageFilename)
 {
-	ssc::ViewItem *view = widget->getView(pos).get();
+	ssc::ViewItem *view = widget->getView(pos);
 	ssc::ImagePtr image = loadImage(imageFilename);
 	mLayouts.insert(view);
 

@@ -57,6 +57,8 @@ ViewContainer::ViewContainer(QWidget *parent, Qt::WFlags f) :
 			     ViewQVTKWidget(parent, f),
 			     mRenderWindow(ViewRenderWindowPtr::New())
 {
+	// Create default grid layout for this object
+	setLayout(new QGridLayout);
 	this->SetRenderWindow(mRenderWindow);
 	mCols = 1;
 	mRows = 1;
@@ -71,17 +73,22 @@ void ViewContainer::clear()
 {
 	for (int i = 0; i < mViews.size(); i++)
 	{
-		mViews[i]->removeReps();
-		mRenderWindow->RemoveRenderer(mViews[i]->getRenderer());
+		mViews.at(i)->removeReps();
+		mRenderWindow->RemoveRenderer(mViews.at(i)->getRenderer());
 	}
 	setupViews(mCols, mRows);
+}
+
+QGridLayout* ViewContainer::getLayout()
+{
+	return (QGridLayout*) layout();
 }
 
 void ViewContainer::paintEvent(QPaintEvent* event)
 {
 	for (int i = 0; i < mViews.size(); i++)
 	{
-		mViews[i]->forceUpdate();
+		mViews.at(i)->forceUpdate();
 	}
 	widget::paintEvent(event);
 }
@@ -100,8 +107,19 @@ void ViewContainer::setupViews(int cols, int rows)
 {
 	double wf = 1.0 / cols; // width fraction
 	double hf = 1.0 / rows; // height fraction
+
 	mViews.clear();
 	mViews.reserve(cols * rows);
+
+	// Clear existing layout
+	QLayout *widgetLayout = layout();
+	if (widgetLayout)
+	{
+		delete widgetLayout;
+		// Create new layout
+		setLayout(new QGridLayout);
+	}
+
 	QSize grid;
 	grid.setWidth(size().width() / cols);
 	grid.setHeight(size().height() / rows);
@@ -109,16 +127,17 @@ void ViewContainer::setupViews(int cols, int rows)
 	{
 		for (int r = 0; r < rows; r++)
 		{
-			ViewItemPtr item;
-			item.reset(new ViewItem(this, mRenderWindow, grid));
+			ViewItem *item = new ViewItem(this, mRenderWindow, grid);
 			vtkRendererPtr renderer = vtkRendererPtr::New();
 			// Calculate the renderer's viewport
 			renderer->SetViewport(wf * c, hf * r, wf * c + wf - 0.01, hf * r + hf - 0.01);
 			mRenderWindow->AddRenderer(renderer);
 			item->setRenderer(renderer);
+			((QGridLayout*) widgetLayout)->addItem(item, r, c);
 			mViews.push_back(item);
 		}
 	}
+
 	mCols = cols;
 	mRows = rows;
 }
@@ -129,7 +148,7 @@ void ViewItem::setRenderer(vtkRendererPtr renderer)
 	renderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
 }
 
-ViewItemPtr ViewContainer::getView(int view)
+ViewItem *ViewContainer::getView(int view)
 {
 	return mViews[view];
 }
@@ -183,7 +202,7 @@ void ViewContainer::resizeEvent(QResizeEvent *event)
 	grid.setHeight(event->size().height() / mRows);
 	for (int i = 0; i < mViews.size(); i++)
 	{
-		mViews[i]->setSize(grid);
+		mViews.at(i)->setSize(grid);
 	}
 	emit resized(event->size());
 }
