@@ -58,7 +58,7 @@ static vtkPolyDataPtr createCube()
 	static vtkIdType pts[6][4]={{0,1,2,3}, {4,5,6,7}, {0,1,5,4},
 	                            {1,2,6,5}, {2,3,7,6}, {3,0,4,7}};
 	// We'll create the building blocks of polydata including data attributes.
-	vtkPolyDataPtr cube = vtkPolyData::New();
+	vtkPolyDataPtr cube = vtkPolyDataPtr::New();
 	vtkPoints *points = vtkPoints::New();
 	vtkCellArray *polys = vtkCellArray::New();
 	int i;
@@ -91,7 +91,7 @@ GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
 	mPainter->setShaderFolder("/Data/Resources/Shaders/");
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
 
-	mMerger = vtkAppendPolyData::New();
+	mMerger = vtkAppendPolyDataPtr::New();
 
 	mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
 	mPainterPolyDatamapper->SetPainter(mPainter);
@@ -158,7 +158,7 @@ void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
 
 		vtkPolyDataPtr cube = createCube();
-		mTransformPolyData[i] = vtkTransformPolyDataFilter::New();
+		mTransformPolyData[i] = vtkTransformPolyDataFilterPtr::New();
 		mTransformPolyData[i]->SetInput(cube);
 		mMerger->AddInput(mTransformPolyData[i]->GetOutput());
 	}
@@ -171,7 +171,7 @@ void GPURayCastVolumeRep::transformChangedSlot()
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		DoubleBoundingBox3D bb = mImages[i]->boundingBox();
-		vtkMatrixToLinearTransform *transform = vtkMatrixToLinearTransform::New();
+		vtkMatrixToLinearTransformPtr transform = vtkMatrixToLinearTransformPtr::New();
 		transform->SetInput((mImages[i]->get_rMd()*createTransformScale(Vector3D(bb[1]-bb[0], bb[3]-bb[2], bb[5]-bb[4]))).getVtkMatrix());
 		mTransformPolyData[i]->SetTransform(transform);
 
