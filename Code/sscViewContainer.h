@@ -30,18 +30,21 @@ class QColor;
 #include "sscView.h"
 #include "sscTransform3D.h"
 
+// Forward declarations
+class QGridLayout;
+
 namespace ssc
 {
 class DoubleBoundingBox3D;
 typedef boost::shared_ptr<class Rep> RepPtr;
 
-class ViewItem : public QObject, public View
+class ViewItem : public QObject, public View, public QLayoutItem
 {
 Q_OBJECT
 
 public:
-	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QSize size) : View(parent, size) { mSize = size; mRenderWindow = renderWindow; }
-	~ViewItem() {}
+	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QSize size) : QObject(parent), View(parent, size) { mSize = size; mRenderWindow = renderWindow; }
+	virtual ~ViewItem() {}
 
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }
@@ -50,11 +53,21 @@ public:
 	virtual void setSize(QSize size) { mSize = size; emit resized(size); }
 	void setRenderer(vtkRendererPtr renderer);
 
+	// Implementing QLayoutItem's pure virtuals
+	virtual Qt::Orientations expandingDirections() const { return Qt::Vertical | Qt::Horizontal; }
+	virtual QRect geometry() const { return mRect; }
+	virtual bool isEmpty() const { return false; }
+	virtual QSize maximumSize() const { return mParent->size(); }
+	virtual QSize minimumSize() const { return QSize(100, 100); }
+	virtual void setGeometry(const QRect &r) { mRect = r; }
+	virtual QSize sizeHint() const { return mSize; }
+
 signals:
 	void resized(QSize size);
 
 private:
 	vtkRenderWindowPtr mRenderWindow;
+	QRect mRect;
 };
 typedef boost::shared_ptr<ViewItem> ViewItemPtr;
 
@@ -67,9 +80,11 @@ Q_OBJECT
 public:
 	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0);
 	~ViewContainer();
-	ViewItemPtr getView(int view);
+	ViewItem *getView(int view);
 	void setupViews(int cols, int rows);
 	void clear();
+
+	QGridLayout *getLayout();
 
 signals:
 	void mouseMoveSignal(QMouseEvent *event);
@@ -81,9 +96,9 @@ signals:
 	void resized(QSize size);
 
 protected:
-	QList<ViewItemPtr> mViews;
 	vtkRenderWindowPtr mRenderWindow;
 	int mRows, mCols;
+	QList<ViewItem *> mViews;
 
 private:
 	virtual void showEvent(QShowEvent* event);
