@@ -58,8 +58,9 @@ ViewContainer::ViewContainer(QWidget *parent, Qt::WFlags f) :
 			     mRenderWindow(ViewRenderWindowPtr::New())
 {
 	// Create default grid layout for this object
-	setLayout(new QGridLayout);
 	this->SetRenderWindow(mRenderWindow);
+	mCols = 0;
+	mRows = 0;
 	clear();
 }
 
@@ -75,11 +76,6 @@ void ViewContainer::clear()
 		mRenderWindow->RemoveRenderer(mViews.at(i)->getRenderer());
 	}
 	setupViews(1, 1);
-}
-
-QGridLayout* ViewContainer::getLayout()
-{
-	return (QGridLayout*) layout();
 }
 
 void ViewContainer::paintEvent(QPaintEvent* event)
@@ -101,40 +97,57 @@ void ViewItem::setZoomFactor(double factor)
 	emit resized(this->size());
 }
 
-void ViewContainer::setupViews(int cols, int rows)
+void ViewContainer::calcSize()
 {
-	double wf = 1.0 / cols; // width fraction
-	double hf = 1.0 / rows; // height fraction
-
-	mViews.clear();
-	mViews.reserve(cols * rows);
-
-	// Clear existing layout
-	QLayout *widgetLayout = layout();
-	if (widgetLayout)
+	double wf = 1.0 / mCols; // width fraction
+	double hf = 1.0 / mRows; // height fraction
+	QListIterator<ViewItem *> i(mViews);
+	int c = 0;
+	int r = 0;
+	while (i.hasNext())
 	{
-		delete widgetLayout;
-		// Create new layout
-		setLayout(new QGridLayout);
-	}
-
-	QSize grid;
-	grid.setWidth(size().width() / cols);
-	grid.setHeight(size().height() / rows);
-	for (int c = 0; c < cols; c++)
-	{
-		for (int r = 0; r < rows; r++)
+		ViewItem *item = i.next();
+		QSize grid(size().width() / mCols, size().height() / mRows);
+		QRect rect;
+		rect.setX(c * grid.width());
+		rect.setY(r * grid.height());
+		rect.setSize(grid);
+		vtkRendererPtr renderer = item->getRenderer();
+		renderer->SetViewport(wf * c, hf * r, wf * c + wf - 0.01, hf * r + hf - 0.01);
+		item->setGLViewport(rect);
+		c++;
+		if (c >= mCols)
 		{
-			ViewItem *item = new ViewItem(this, mRenderWindow, grid);
-			vtkRendererPtr renderer = vtkRendererPtr::New();
-			// Calculate the renderer's viewport
-			renderer->SetViewport(wf * c, hf * r, wf * c + wf - 0.01, hf * r + hf - 0.01);
-			mRenderWindow->AddRenderer(renderer);
-			item->setRenderer(renderer);
-			((QGridLayout*) widgetLayout)->addItem(item, r, c);
-			mViews.push_back(item);
+			c = 0;
+			r++;
 		}
 	}
+}
+
+void ViewContainer::setupViews(int cols, int rows)
+{
+	if (cols != mCols || rows != mRows)
+	{
+		QListIterator<ViewItem *> i(mViews);
+		while (i.hasNext())
+		{
+			ViewItem *item = i.next();
+			delete item;
+		}
+		mCols = cols;
+		mRows = rows;
+		mViews.clear();
+		mViews.reserve(cols * rows);
+		for (int i = 0; i < cols * rows; i++)
+		{
+			ViewItem *item = new ViewItem(this, mRenderWindow, QRect());
+			vtkRendererPtr renderer = vtkRendererPtr::New();
+			mRenderWindow->AddRenderer(renderer);
+			item->setRenderer(renderer);
+			mViews.append(item);
+		}
+	}
+	calcSize();
 }
 
 void ViewItem::setRenderer(vtkRendererPtr renderer)
@@ -193,12 +206,13 @@ void ViewContainer::showEvent(QShowEvent* event)
 void ViewContainer::resizeEvent(QResizeEvent *event)
 {
 	QSize grid;
-	grid.setWidth(event->size().width() / ((QGridLayout*)layout())->columnCount());
-	grid.setHeight(event->size().height() / ((QGridLayout*)layout())->columnCount());
+	grid.setWidth(event->size().width() / mCols);
+	grid.setHeight(event->size().height() / mRows);
 	for (int i = 0; i < mViews.size(); i++)
 	{
 		mViews.at(i)->setSize(grid);
 	}
+	setupViews(mCols, mRows);
 	emit resized(event->size());
 }
 

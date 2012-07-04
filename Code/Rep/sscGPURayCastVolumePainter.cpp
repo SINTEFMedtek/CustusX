@@ -568,10 +568,10 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
-	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, mBase->size().width(), mBase->size().height());
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mBase->getOrigin().x(), mBase->getOrigin().y(), mBase->size().width(), mBase->size().height());
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, mBackgroundBuffer);
-	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 0, 0, mBase->size().width(), mBase->size().height());
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mBase->getOrigin().x(), mBase->getOrigin().y(), mBase->size().width(), mBase->size().height());
 	report_gl_error();
 	int depthTexture = 10;
 	mInternals->Shader->GetUniformVariables()->SetUniformi("depthBuffer", 1, (int*)&depthTexture);
@@ -599,7 +599,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 			break;
 		}
 		report_gl_error();
-		glViewport(0, 0, mDownsampleWidth, mDownsampleHeight);
+		glViewport(mBase->getOrigin().x(), mBase->getOrigin().y(), mDownsampleWidth, mDownsampleHeight);
 	}
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
 

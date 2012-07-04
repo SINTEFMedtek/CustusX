@@ -78,6 +78,7 @@ public:
 
 	virtual vtkRenderWindowPtr getRenderWindow() const = 0;
 	virtual QSize size() = 0;
+	virtual QPoint getOrigin() = 0;
 
 	virtual void setZoomFactor(double factor) = 0;
 	double getZoomFactor() const;
@@ -121,6 +122,7 @@ public:
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }  ///< Get the vtkRenderWindow used by this \a View.
 	virtual QSize size() { return widget::size(); }
+	virtual QPoint getOrigin() { return QPoint(0, 0); }
 	virtual void setZoomFactor(double factor);
 
 signals:
