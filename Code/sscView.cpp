@@ -62,6 +62,7 @@ View::View(QWidget *parent, QSize size, const QString& uid, const QString& name)
 	mParent = parent;
 	mUid = uid;
 	mName = name;
+	mType = VIEW;
 }
 
 View::~View()
