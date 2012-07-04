@@ -61,7 +61,11 @@ public:
 	/// \return the View type, indicating display dimension.
 	virtual Type getType() const
 	{
-		return VIEW;
+		return mType;
+	}
+	virtual void setType(Type type)
+	{
+		mType = type;
 	}
 	QString getTypeString() const;
 	virtual QString getUid(); ///< Get a views unique id
@@ -101,6 +105,7 @@ protected:
 	std::vector<RepPtr> mReps; ///< Storage for internal reps.
 	typedef std::vector<RepPtr>::iterator RepsIter; ///< Iterator typedef for the internal rep vector.
 	QWidget *mParent;
+	Type mType;
 };
 typedef boost::shared_ptr<View> ViewPtr;
 
