@@ -60,8 +60,6 @@ ViewContainer::ViewContainer(QWidget *parent, Qt::WFlags f) :
 	// Create default grid layout for this object
 	setLayout(new QGridLayout);
 	this->SetRenderWindow(mRenderWindow);
-	mCols = 1;
-	mRows = 1;
 	clear();
 }
 
@@ -76,7 +74,7 @@ void ViewContainer::clear()
 		mViews.at(i)->removeReps();
 		mRenderWindow->RemoveRenderer(mViews.at(i)->getRenderer());
 	}
-	setupViews(mCols, mRows);
+	setupViews(1, 1);
 }
 
 QGridLayout* ViewContainer::getLayout()
@@ -137,9 +135,6 @@ void ViewContainer::setupViews(int cols, int rows)
 			mViews.push_back(item);
 		}
 	}
-
-	mCols = cols;
-	mRows = rows;
 }
 
 void ViewItem::setRenderer(vtkRendererPtr renderer)
@@ -198,8 +193,8 @@ void ViewContainer::showEvent(QShowEvent* event)
 void ViewContainer::resizeEvent(QResizeEvent *event)
 {
 	QSize grid;
-	grid.setWidth(event->size().width() / mCols);
-	grid.setHeight(event->size().height() / mRows);
+	grid.setWidth(event->size().width() / ((QGridLayout*)layout())->columnCount());
+	grid.setHeight(event->size().height() / ((QGridLayout*)layout())->columnCount());
 	for (int i = 0; i < mViews.size(); i++)
 	{
 		mViews.at(i)->setSize(grid);

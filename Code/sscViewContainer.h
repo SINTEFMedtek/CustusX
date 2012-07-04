@@ -97,7 +97,6 @@ signals:
 
 protected:
 	vtkRenderWindowPtr mRenderWindow;
-	int mRows, mCols;
 	QList<ViewItem *> mViews;
 
 private:
