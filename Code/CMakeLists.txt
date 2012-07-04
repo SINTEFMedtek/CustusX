@@ -444,39 +444,19 @@ find_package( Boost REQUIRED )
 find_package(VTK REQUIRED)
 
 include(${VTK_USE_FILE})
-    
-#find_package(GLUT)
+
 find_package(OpenGL)
     SET( SSC_LIBRARIES 
         ${SSC_LIBRARIES}
-        ${OPENGL_LIBRARIES}
-#        ${GLUT_LIBRARIES}
+	${OPENGL_LIBRARIES}
         )
 
     
 if (USE_GLX_SHARED_CONTEXT)
-#    SET( SSC_INCLUDE_DIRS
-#        ${SSC_INCLUDE_DIRS}
-#        ${SSC_SOURCE_DIR}/Code/vtkMods/
-#        )
     SET( SSC_LIBRARIES 
         ${SSC_LIBRARIES}
         GLU
         )
-#    SET( SSC_SOURCE_FILES
-#        ${SSC_SOURCE_FILES}
-#        vtkMods/sscSNWXOpenGLRenderWindow.cpp
-#        vtkMods/sscSNWQVTKWidget.cpp
-        # These files and more should probably be moved here
-        #Data/sscGPUImageBuffer.cpp
-        #Data/sscGPUImageBuffer.h
-        #Rep/sscTextureSlicePainter.cpp
-        #Rep/sscTextureSlicePainter.h
-        #Rep/sscTexture3DSlicerRep.h
-        #Rep/sscTexture3DSlicerRep.cpp
-        #Utilities/sscGLHelpers.cpp
-        #Utilities/sscGLHelpers.h
-#        )
 
     #add moc versions of out modified QVTKWidget
     if (VTK_MAJOR_VERSION EQUAL 5)
@@ -498,10 +478,6 @@ if (USE_GLX_SHARED_CONTEXT)
             SET(SUPPORTED_VTK_VERSION_FOUND "5.8")
         endif (VTK_MINOR_VERSION EQUAL 8)
     endif (VTK_MAJOR_VERSION EQUAL 5)
-#
-#    if (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
-#        message(FATAL_ERROR "vtk version not supported (for glx use): " ${VTK_MAJOR_VERSION} "." ${VTK_MINOR_VERSION})
-#    endif (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
 
 endif (USE_GLX_SHARED_CONTEXT)  
 
