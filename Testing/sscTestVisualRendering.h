@@ -16,6 +16,7 @@ public:
 	void test_3D_Tool_GPU();
 	void test_ACS_3D_Tool();
 	void test_ACS_3D_Tool_Container();
+	void test_AnyDual_3D_Tool_Container();
 	void test_AnyDual_3D_Tool();
 	void test_ACS_3Volumes();
 	void test_AnyDual_3Volumes();
@@ -34,6 +35,7 @@ public:
 		CPPUNIT_TEST( test_3D_Tool );
 		CPPUNIT_TEST( test_3D_Tool_GPU );
 		CPPUNIT_TEST( test_ACS_3D_Tool_Container );
+		CPPUNIT_TEST( test_AnyDual_3D_Tool_Container );
 		CPPUNIT_TEST( test_3D_Composite_GPU );
 		CPPUNIT_TEST( test_3D_Composite_Views_GPU );
 		CPPUNIT_TEST( test_3D_Composite_Views_GPU_Container );

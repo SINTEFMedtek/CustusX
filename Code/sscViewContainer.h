@@ -24,7 +24,6 @@
 #include "vtkForwardDeclarations.h"
 #include "sscIndent.h"
 #include <QLayoutItem>
-class QColor;
 
 #include "sscViewQVTKWidget.h"
 #include "sscView.h"
@@ -43,8 +42,8 @@ class ViewItem : public QObject, public View, public QLayoutItem
 Q_OBJECT
 
 public:
-	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QRect rect) : QObject(parent), View(parent, rect.size()) { mRect = rect; mRenderWindow = renderWindow; }
-	~ViewItem() {}
+	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QSize size) : QObject(parent), View(parent, size) { mSize = size; mRenderWindow = renderWindow; }
+	virtual ~ViewItem() {}
 
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }
@@ -52,16 +51,14 @@ public:
 	virtual void setZoomFactor(double factor);
 	virtual void setSize(QSize size) { mSize = size; emit resized(size); }
 	void setRenderer(vtkRendererPtr renderer);
-	virtual QPoint getOrigin() const { return mRect.topLeft(); }
-	virtual void setGLViewport(QRect rect) { mRect = rect; }
 
 	// Implementing QLayoutItem's pure virtuals
 	virtual Qt::Orientations expandingDirections() const { return Qt::Vertical | Qt::Horizontal; }
-	virtual QRect geometry() const { return mRect; }
+	virtual QRect geometry() const { return QRect(); /* Return translated viewport geometry */ }
 	virtual bool isEmpty() const { return false; }
 	virtual QSize maximumSize() const { return mParent->size(); }
 	virtual QSize minimumSize() const { return QSize(100, 100); }
-	virtual void setGeometry(const QRect &r) { mRect = r; }
+	virtual void setGeometry(const QRect &r) { /* Translate and set viewport geometry */ }
 	virtual QSize sizeHint() const { return mSize; }
 	virtual QRect screenGeometry() const;
 
@@ -69,7 +66,6 @@ signals:
 	void resized(QSize size);
 
 private:
-	QRect mRect;
 	vtkRenderWindowPtr mRenderWindow;
 };
 typedef boost::shared_ptr<ViewItem> ViewItemPtr;
@@ -83,10 +79,10 @@ Q_OBJECT
 public:
 	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0);
 	~ViewContainer();
-	ViewItem *getView(int view);
-	void setupViews(int cols, int rows);
+	const ViewItem *addView(int row, int col, int rowSpan = 1, int colSpan = 1);
 	void clear();
-	void calcSize();
+
+	QGridLayout *getLayout();
 
 signals:
 	void mouseMoveSignal(QMouseEvent *event);
@@ -99,8 +95,6 @@ signals:
 
 protected:
 	vtkRenderWindowPtr mRenderWindow;
-	QList<ViewItem *> mViews;
-	int mRows, mCols;
 
 private:
 	virtual void showEvent(QShowEvent* event);

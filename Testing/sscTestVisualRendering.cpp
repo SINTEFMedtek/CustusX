@@ -84,9 +84,8 @@ void TestVisualRendering::testEmptyView()
 void TestVisualRendering::testEmptyViewContainer()
 {
 	widget->setDescription("Empty view container");
-	ssc::ViewContainer *view = new ssc::ViewContainer(widget->centralWidget());
-	view->setupViews(1, 1);
-	widget->setupViewContainer(view, "dummy", "none", 0, 0);
+	ssc::ViewContainer *viewContainer = new ssc::ViewContainer(widget->centralWidget());
+	widget->setupViewContainer(viewContainer, "dummy", "none", 0, 0);
 
 	CPPUNIT_ASSERT(runWidget());
 }
@@ -102,14 +101,32 @@ void TestVisualRendering::test_3D_Tool()
 void TestVisualRendering::test_ACS_3D_Tool_Container()
 {
 	widget->mDumpSpeedData = true;
-	ssc::ViewContainer *view = new ssc::ViewContainer(widget->centralWidget());
-	view->setupViews(2, 2);
+
 	widget->setDescription("ACS+3D, moving tool in view container");
-	widget->setupViewContainer(view, "dummy", "none", 0, 0);
-	widget->container3D(view, 2, image[0]);
-	widget->containerGPUSlice(view, 1, "A", image[0], ssc::ptAXIAL);
-	widget->containerGPUSlice(view, 0, "C", image[0], ssc::ptCORONAL);
-	widget->containerGPUSlice(view, 3, "S", image[0], ssc::ptSAGITTAL);
+	ssc::ViewContainer *viewContainer = new ssc::ViewContainer(widget->centralWidget());
+	widget->containerGPUSlice(viewContainer->addView(0, 0), "A", image[0], ssc::ptAXIAL);
+	widget->containerGPUSlice(viewContainer->addView(1, 0), "C", image[0], ssc::ptCORONAL);
+	widget->containerGPUSlice(viewContainer->addView(1, 1), "S", image[0], ssc::ptSAGITTAL);
+	widget->container3D(viewContainer->addView(0, 1), image[0]);
+
+	widget->setupViewContainer(viewContainer, "dummy", "none", 0, 0);
+
+	CPPUNIT_ASSERT(runWidget());
+}
+
+void TestVisualRendering::test_AnyDual_3D_Tool_Container()
+{
+	widget->mDumpSpeedData = true;
+
+	widget->setDescription("2 x Any + Side + 3D, moving tool in view container");
+	ssc::ViewContainer *viewContainer = new ssc::ViewContainer(widget->centralWidget());
+	widget->containerGPUSlice(viewContainer->addView(0, 0), "Any", image[0], ssc::ptANYPLANE);
+	widget->containerGPUSlice(viewContainer->addView(1, 0), "Dual", image[0], ssc::ptSIDEPLANE);
+	widget->containerGPUSlice(viewContainer->addView(0, 1), "Any", image[0], ssc::ptANYPLANE);
+	widget->containerGPUSlice(viewContainer->addView(1, 1), "Dual", image[0], ssc::ptSIDEPLANE);
+	widget->container3D(viewContainer->addView(0, 2, 2, 1), image[0]);
+
+	widget->setupViewContainer(viewContainer, "dummy", "none", 0, 0);
 
 	CPPUNIT_ASSERT(runWidget());
 }
