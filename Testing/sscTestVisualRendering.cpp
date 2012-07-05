@@ -105,9 +105,9 @@ void TestVisualRendering::test_ACS_3D_Tool_Container()
 	widget->setDescription("ACS+3D, moving tool in view container");
 	ssc::ViewContainer *viewContainer = new ssc::ViewContainer(widget->centralWidget());
 	widget->containerGPUSlice(viewContainer->addView(0, 0), "A", image[0], ssc::ptAXIAL);
-	widget->containerGPUSlice(viewContainer->addView(1, 0), "C", image[0], ssc::ptCORONAL);
-	widget->containerGPUSlice(viewContainer->addView(1, 1), "S", image[0], ssc::ptSAGITTAL);
-	widget->container3D(viewContainer->addView(0, 1), image[0]);
+	widget->containerGPUSlice(viewContainer->addView(0, 1), "C", image[0], ssc::ptCORONAL);
+	widget->containerGPUSlice(viewContainer->addView(1, 0), "S", image[0], ssc::ptSAGITTAL);
+	widget->container3D(viewContainer->addView(1, 1), image[0]);
 
 	widget->setupViewContainer(viewContainer, "dummy", "none", 0, 0);
 
@@ -180,10 +180,9 @@ void TestVisualRendering::test_3D_Composite_Views_GPU()
 
 void TestVisualRendering::test_3D_Composite_Views_GPU_Container()
 {
-	ssc::ViewContainer *view = new ssc::ViewContainer(widget->centralWidget());
-	view->setupViews(2, 2);
 	widget->setDescription("3D Composites (2 volumes) with ACS, moving tool (in viewcontainer)");
-	widget->setupViewContainer(view, "dummy", "none", 0, 0);
+	ssc::ViewContainer *viewContainer = new ssc::ViewContainer(widget->centralWidget());
+
 	QStringList images; images << image[1] << image[2];
 	ImageParameters parameters[2];
 
@@ -194,10 +193,12 @@ void TestVisualRendering::test_3D_Composite_Views_GPU_Container()
 	parameters[1].alpha = .7;
 	parameters[1].lut = getCreateLut(0, 200, .67, .68, 0, 1, .4, .8);
 
-	widget->containerGPUSlice(view, 1, "A", image[0], ssc::ptAXIAL);
-	widget->containerGPUSlice(view, 0, "C", image[0], ssc::ptCORONAL);
-	widget->containerGPUSlice(view, 3, "S", image[0], ssc::ptSAGITTAL);
-	widget->define3DGPUContainer(view, images, 2, parameters);
+	widget->containerGPUSlice(viewContainer->addView(0, 0), "A", image[0], ssc::ptAXIAL);
+	widget->containerGPUSlice(viewContainer->addView(0, 1), "C", image[0], ssc::ptCORONAL);
+	widget->containerGPUSlice(viewContainer->addView(1, 0), "S", image[0], ssc::ptSAGITTAL);
+	widget->containerGPU3D(viewContainer->addView(1, 1), images, parameters);
+
+	widget->setupViewContainer(viewContainer, "dummy", "none", 0, 0);
 
 	CPPUNIT_ASSERT(runWidget());
 }

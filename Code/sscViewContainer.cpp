@@ -87,9 +87,9 @@ void ViewContainer::clear()
 }
 
 /**
-  * Return this widget's layout object
+  * Return this widget's grid layout object
   */
-QGridLayout* ViewContainer::getLayout()
+QGridLayout* ViewContainer::getGridLayout()
 {
 	return (QGridLayout*) layout();
 }
@@ -121,13 +121,13 @@ void ViewItem::setZoomFactor(double factor)
   * Creates and adds a view to this container.
   * Returns a pointer to the created view item that the container owns.
   */
-const ViewItem *ViewContainer::addView(int row, int col, int rowSpan, int colSpan)
+ViewItem *ViewContainer::addView(int row, int col, int rowSpan, int colSpan)
 {
 	// Create a viewItem for this view
-	ViewItem *item = new ViewItem(this, mRenderWindow, QSize());
-	if (getLayout())
+	ViewItem *item = new ViewItem(this, mRenderWindow, QRect());
+	if (getGridLayout())
 	{
-		getLayout()->addItem(item, row, col, rowSpan, colSpan);
+		getGridLayout()->addItem(item, row, col, rowSpan, colSpan);
 
 		// Create and add view renderer
 		vtkRendererPtr renderer = vtkRendererPtr::New();
@@ -147,7 +147,7 @@ void ViewItem::setRenderer(vtkRendererPtr renderer)
 
 QRect ViewItem::screenGeometry() const
 {
-	return QRect(ssc::View::widget()->mapToGlobal(getOrigin()), size());
+	return QRect(ssc::View::widget()->mapToGlobal(mGeometry.topLeft()), size());
 }
 
 void ViewContainer::mouseMoveEvent(QMouseEvent* event)
@@ -201,26 +201,42 @@ void ViewContainer::resizeEvent(QResizeEvent *event)
 
 	if (layout())
 	{
-		int cols = getLayout()->columnCount();
-		int rows = getLayout()->rowCount();
-		double wf = 1.0 / cols;
-		double hf = 1.0 / rows;
+		int cols = getGridLayout()->columnCount();
+		int rows = getGridLayout()->rowCount();
+		double itemWidthFactor = 1.0 / cols;
+		double itemHeightFactor = 1.0 / rows;
 
 		int itemCol, itemColSpan;
 		int itemRow, itemRowSpan;
-		double itemWidth, itemHeight;
+		double itemX, itemY, itemWidth, itemHeight;
 
 		for (int i = 0; i < layout()->count(); ++i)
 		{
 			ViewItem* item = (ViewItem*) layout()->itemAt(i);
-			getLayout()->getItemPosition(i, &itemRow, &itemCol, &itemRowSpan, &itemColSpan);
+			// Get current item's column and row position and span
+			getGridLayout()->getItemPosition(i, &itemRow, &itemCol, &itemRowSpan, &itemColSpan);
 
-			itemWidth = size.width() / cols * itemColSpan;
-			itemHeight = size.height() / rows * itemRowSpan;
+			itemX = (size.width() / cols) * itemCol;
+			itemY = (size.height() / rows) * itemRow;
+			itemWidth = (size.width() / cols) * itemColSpan;
+			itemHeight = (size.height() / rows) * itemRowSpan;
 
+			// Calculate render viewport
 			vtkRendererPtr renderer = item->getRenderer();
-			renderer->SetViewport(wf * itemCol, hf * itemRow, wf * itemCol * itemColSpan + wf - 0.01, hf * itemRow * itemRowSpan + hf - 0.01);
-			item->setSize(event->size());
+			double xMin = itemWidthFactor * itemCol;
+			double xMax = itemWidthFactor * (itemCol + itemColSpan);
+			double yMin = itemHeightFactor * (rows - (itemRow + itemRowSpan));
+			double yMax = itemHeightFactor * (rows - itemRow);
+			// std::cout << "xMin: " << xMin << " yMin: " << yMin << " xMax: " << xMax << " yMax: " << yMax << std::endl;
+			renderer->SetViewport(xMin, yMin, xMax, yMax);
+
+			// Set item size and geometry
+			item->setSize(QSize(itemWidth, itemHeight));
+			QRect itemGeometry;
+			itemGeometry.setX(itemX);
+			itemGeometry.setY(itemY);
+			itemGeometry.setSize(item->size());
+			item->setGeometry(itemGeometry);
 		}
 	}
 
