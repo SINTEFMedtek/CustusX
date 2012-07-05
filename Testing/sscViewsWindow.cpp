@@ -102,7 +102,7 @@ void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 	ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
-	rep->setShaderFile("/Data/Resources/Shaders/Texture3DOverlay.frag");
+	rep->setShaderFile(mShaderFolder + "Texture3DOverlay.frag");
 	rep->setSliceProxy(proxy);
 	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
 	view->addRep(rep);
@@ -123,7 +123,7 @@ void ViewsWindow::containerGPUSlice(ssc::ViewContainer *widget, int pos, const Q
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 	ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
-	rep->setShaderFile("/Data/Resources/Shaders/Texture3DOverlay.frag");
+	rep->setShaderFile(mShaderFolder + "Texture3DOverlay.frag");
 	rep->setSliceProxy(proxy);
 	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
 	view->addRep(rep);
