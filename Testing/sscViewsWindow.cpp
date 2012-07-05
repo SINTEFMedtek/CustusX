@@ -109,12 +109,11 @@ void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	insertView(view, uid, imageFilename, r, c);
 }
 
-void ViewsWindow::containerGPUSlice(ssc::ViewContainer *widget, int pos, const QString &uid, const QString &imageFilename, ssc::PLANE_TYPE plane)
+void ViewsWindow::containerGPUSlice(ssc::ViewItem *view, const QString &uid, const QString &imageFilename, ssc::PLANE_TYPE plane)
 {
 	ssc::ToolManager *mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 	ssc::ImagePtr image = loadImage(imageFilename);
-	ssc::ViewItem *view = widget->getView(pos);
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->getRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
@@ -180,9 +179,8 @@ void ViewsWindow::insertView(ssc::ViewWidget *view, const QString& uid, const QS
 	layout->addWidget(new QLabel(uid+" "+volume, this));
 }
 
-void ViewsWindow::container3D(ssc::ViewContainer *widget, int pos, const QString& imageFilename)
+void ViewsWindow::container3D(ssc::ViewItem *view, const QString& imageFilename)
 {
-	ssc::ViewItem *view = widget->getView(pos);
 	ssc::ImagePtr image = loadImage(imageFilename);
 	mLayouts.insert(view);
 

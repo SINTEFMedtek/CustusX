@@ -48,9 +48,8 @@ public:
 	void defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 
 	// create ssc::ViewContainer-based rendering views (do not mix with above ssc::ViewWidget-based functions)
-	void container3D(ssc::ViewContainer *widget, int pos, const QString& imageFilename);
-	void containerGPUSlice(ssc::ViewContainer *widget, int pos, const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane);
-	void define3DGPUContainer(ssc::ViewContainer *widget, const QStringList& imageFilenames, int pos, const ImageParameters* parameters);
+	void container3D(ssc::ViewItem *view, const QString& imageFilename);
+	void containerGPUSlice(ssc::ViewItem *view, const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane);
 
 	// was test accepted?
 	bool accepted() const { return mAcceptanceBox->accepted(); }
@@ -68,9 +67,9 @@ private:
 
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;
-
+	
 	typedef std::set<ssc::View *> LayoutMap;
-	LayoutMap mLayouts;
+	std::set<ssc::View *> mLayouts;
 	QGridLayout* mSliceLayout;
 	QString mDisplayText;
 	
