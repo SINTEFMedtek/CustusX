@@ -332,6 +332,12 @@ void ViewWidget::setZoomFactor(double factor)
 	emit resized(this->size());
 }
 
+QRect ViewWidget::screenGeometry() const
+{
+	QPoint origin = mapToGlobal(QPoint(0,0));
+	return QRect(origin, size());
+}
+
 double View::getZoomFactor() const
 {
 	return mZoomFactor;
