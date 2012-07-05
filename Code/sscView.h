@@ -81,8 +81,13 @@ public:
 	virtual void render(); ///< render the view contents if vtk-MTimes are changed
 
 	virtual vtkRenderWindowPtr getRenderWindow() const = 0;
-	virtual QSize size() = 0;
-	virtual QPoint getOrigin() = 0;
+	virtual QSize size() const = 0;
+	virtual QPoint getOrigin() const  = 0;
+
+	/**
+	 * Return the geometry of the view in screen coordinates
+	 */
+	virtual QRect screenGeometry() const = 0;
 
 	virtual void setZoomFactor(double factor) = 0;
 	double getZoomFactor() const;
@@ -91,7 +96,7 @@ public:
 	ssc::DoubleBoundingBox3D getViewport() const;
 	ssc::DoubleBoundingBox3D getViewport_s() const;
 
-	QWidget *widget() { return mParent; }
+	QWidget *widget() const { return mParent; }
 	void forceUpdate() { mMTimeHash = 0; }
 
 protected:
@@ -126,9 +131,10 @@ public:
 
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }  ///< Get the vtkRenderWindow used by this \a View.
-	virtual QSize size() { return widget::size(); }
-	virtual QPoint getOrigin() { return QPoint(0, 0); }
+	virtual QSize size() const { return widget::size(); }
+	virtual QPoint getOrigin() const { return QPoint(0, 0); }
 	virtual void setZoomFactor(double factor);
+	virtual QRect screenGeometry() const;
 
 signals:
 	void resized(QSize size);

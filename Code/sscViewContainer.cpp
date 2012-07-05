@@ -156,6 +156,11 @@ void ViewItem::setRenderer(vtkRendererPtr renderer)
 	renderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
 }
 
+QRect ViewItem::screenGeometry() const
+{
+	return QRect(ssc::View::widget()->mapToGlobal(getOrigin()), size());
+}
+	
 ViewItem *ViewContainer::getView(int view)
 {
 	return mViews[view];

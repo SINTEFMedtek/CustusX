@@ -48,11 +48,11 @@ public:
 
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }
-	virtual QSize size() { return mSize; }
+	virtual QSize size() const { return mSize; }
 	virtual void setZoomFactor(double factor);
 	virtual void setSize(QSize size) { mSize = size; emit resized(size); }
 	void setRenderer(vtkRendererPtr renderer);
-	virtual QPoint getOrigin() { return mRect.topLeft(); }
+	virtual QPoint getOrigin() const { return mRect.topLeft(); }
 	virtual void setGLViewport(QRect rect) { mRect = rect; }
 
 	// Implementing QLayoutItem's pure virtuals
@@ -63,6 +63,7 @@ public:
 	virtual QSize minimumSize() const { return QSize(100, 100); }
 	virtual void setGeometry(const QRect &r) { mRect = r; }
 	virtual QSize sizeHint() const { return mSize; }
+	virtual QRect screenGeometry() const;
 
 signals:
 	void resized(QSize size);
