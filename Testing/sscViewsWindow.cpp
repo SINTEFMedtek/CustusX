@@ -200,6 +200,43 @@ void ViewsWindow::container3D(ssc::ViewItem *view, const QString& imageFilename)
 	view->addRep(toolRep);
 }
 
+void ViewsWindow::containerGPU3D(ssc::ViewItem *view, const QStringList& imageFilenames, const ImageParameters* parameters)
+{
+	mLayouts.insert(view);
+
+	std::vector<ssc::ImagePtr> images;
+
+	double numImages = imageFilenames.size();
+	for (int i = 0; i < numImages; ++i)
+	{
+		ssc::ImagePtr image = loadImage(imageFilenames[i]);
+		if (parameters != NULL)
+		{
+			image->getTransferFunctions3D()->setLLR(parameters[i].llr);
+			image->getTransferFunctions3D()->setAlpha(parameters[i].alpha);
+			image->getTransferFunctions3D()->setLut(parameters[i].lut);
+		}
+		images.push_back(image);
+	}
+
+	// volume rep
+
+#ifndef WIN32
+	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
+	mRepPtr->setShaderFolder(mShaderFolder);
+	mRepPtr->setImages(images);
+	mRepPtr->setName(images[0]->getName());
+	view->addRep(mRepPtr);
+#endif //WIN32
+
+	// Tool 3D rep
+	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+	ssc::ToolPtr tool = mToolmanager->getDominantTool();
+	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
+	toolRep->setTool(tool);
+	view->addRep(toolRep);
+}
+
 void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c)
 {
 	QString uid = "3D";
@@ -272,39 +309,6 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	view->addRep(toolRep);
 	
 	insertView(view, uid, imageFilenames[0], r, c);
-}
-
-void ViewsWindow::define3DGPUContainer(ssc::ViewContainer *widget, const QStringList& imageFilenames, int pos, const ImageParameters* parameters)
-{
-	std::vector<ssc::ImagePtr> images;
-	for (int i = 0; i < imageFilenames.size(); ++i)
-	{
-		ssc::ImagePtr image = loadImage(imageFilenames[i]);
-		if (parameters != NULL)
-		{
-			image->getTransferFunctions3D()->setLLR(parameters[i].llr);
-			image->getTransferFunctions3D()->setAlpha(parameters[i].alpha);
-			image->getTransferFunctions3D()->setLut(parameters[i].lut);
-		}
-		images.push_back(image);
-	}
-	ssc::ViewItem *view = widget->getView(pos);
-	mLayouts.insert(view);
-
-#ifndef WIN32
-	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
-	mRepPtr->setShaderFolder(mShaderFolder);
-	mRepPtr->setImages(images);
-	mRepPtr->setName(images[0]->getName());
-	view->addRep(mRepPtr);
-#endif //WIN32
-
-	// Tool 3D rep
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
-	ssc::ToolPtr tool = mToolmanager->getDominantTool();
-	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
-	toolRep->setTool(tool);
-	view->addRep(toolRep);
 }
 
 void ViewsWindow::start(bool showSliders)

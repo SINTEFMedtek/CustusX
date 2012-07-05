@@ -82,7 +82,6 @@ public:
 
 	virtual vtkRenderWindowPtr getRenderWindow() const = 0;
 	virtual QSize size() const = 0;
-	virtual QPoint getOrigin() const  = 0;
 
 	/**
 	 * Return the geometry of the view in screen coordinates
@@ -132,7 +131,6 @@ public:
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }  ///< Get the vtkRenderWindow used by this \a View.
 	virtual QSize size() const { return widget::size(); }
-	virtual QPoint getOrigin() const { return QPoint(0, 0); }
 	virtual void setZoomFactor(double factor);
 	virtual QRect screenGeometry() const;
 

@@ -50,6 +50,7 @@ public:
 	// create ssc::ViewContainer-based rendering views (do not mix with above ssc::ViewWidget-based functions)
 	void container3D(ssc::ViewItem *view, const QString& imageFilename);
 	void containerGPUSlice(ssc::ViewItem *view, const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane);
+	void containerGPU3D(ssc::ViewItem *view, const QStringList& imageFilenames, const ImageParameters* parameters);
 
 	// was test accepted?
 	bool accepted() const { return mAcceptanceBox->accepted(); }

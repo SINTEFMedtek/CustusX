@@ -42,8 +42,8 @@ class ViewItem : public QObject, public View, public QLayoutItem
 Q_OBJECT
 
 public:
-	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QSize size) : QObject(parent), View(parent, size) { mSize = size; mRenderWindow = renderWindow; }
-	virtual ~ViewItem() {}
+	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QRect rect) : QObject(parent), View(parent, rect.size()) { mRenderWindow = renderWindow; }
+	~ViewItem() {}
 
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }
@@ -54,11 +54,11 @@ public:
 
 	// Implementing QLayoutItem's pure virtuals
 	virtual Qt::Orientations expandingDirections() const { return Qt::Vertical | Qt::Horizontal; }
-	virtual QRect geometry() const { return QRect(); /* Return translated viewport geometry */ }
+	virtual QRect geometry() const { return mGeometry; }
 	virtual bool isEmpty() const { return false; }
 	virtual QSize maximumSize() const { return mParent->size(); }
 	virtual QSize minimumSize() const { return QSize(100, 100); }
-	virtual void setGeometry(const QRect &r) { /* Translate and set viewport geometry */ }
+	virtual void setGeometry(const QRect &r) { mGeometry = r; }
 	virtual QSize sizeHint() const { return mSize; }
 	virtual QRect screenGeometry() const;
 
@@ -67,6 +67,7 @@ signals:
 
 private:
 	vtkRenderWindowPtr mRenderWindow;
+	QRect mGeometry;
 };
 typedef boost::shared_ptr<ViewItem> ViewItemPtr;
 
@@ -79,10 +80,10 @@ Q_OBJECT
 public:
 	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0);
 	~ViewContainer();
-	const ViewItem *addView(int row, int col, int rowSpan = 1, int colSpan = 1);
+	ViewItem *addView(int row, int col, int rowSpan = 1, int colSpan = 1);
 	void clear();
 
-	QGridLayout *getLayout();
+	QGridLayout *getGridLayout();
 
 signals:
 	void mouseMoveSignal(QMouseEvent *event);
