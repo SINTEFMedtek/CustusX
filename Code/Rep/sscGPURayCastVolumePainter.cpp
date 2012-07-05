@@ -368,9 +368,10 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		}
 	}
 
-	if (mLastRenderSize != mBase->size())
+	QSize size(renderer->GetSize()[0], renderer->GetSize()[1]);
+	if (mLastRenderSize != size)
 	{
-		mResample = (mShouldResample && (mBase->size().width() * mBase->size().height() > mDownsamplePixels));
+		mResample = (mShouldResample && (size.width() * size.height() > mDownsamplePixels));
 	}
 
 	if (mResample && !mUpscaleShader)
@@ -399,8 +400,8 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 
 	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &mStepSize);
 	float viewport[2];
-	viewport[0] = mBase->size().width();
-	viewport[1] = mBase->size().height();
+	viewport[0] = size.width();
+	viewport[1] = size.height();
 	mInternals->Shader->GetUniformVariables()->SetUniformf("backgroundResolution", 2, viewport);
 	if (mResample)
 	{
@@ -416,9 +417,9 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 	if (mResample && !vtkgl::IsFramebuffer(mFBO))
 	{
-		float factor = (float)mDownsamplePixels/(mBase->size().width() * mBase->size().height());
-		mDownsampleWidth = mBase->size().width() * factor;
-		mDownsampleHeight = mBase->size().height() * factor;
+		float factor = (float)mDownsamplePixels/(size.width() * size.height());
+		mDownsampleWidth = size.width() * factor;
+		mDownsampleHeight = size.height() * factor;
 		createBuffers();
 	}
 
@@ -525,7 +526,8 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 	}
 	
 	glDepthMask(1);
-	if (mLastRenderSize != mBase->size())
+	QSize size(renderer->GetSize()[0], renderer->GetSize()[1]);
+	if (mLastRenderSize != size)
 	{
 		if (glIsTexture(mDepthBuffer))
 		{
@@ -545,7 +547,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		glActiveTexture(GL_TEXTURE10);
 		glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
 		report_gl_error();
-		glTexImage2D(GL_TEXTURE_2D, 0, vtkgl::DEPTH_COMPONENT32, mBase->size().width(), mBase->size().height(), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, vtkgl::DEPTH_COMPONENT32, size.width(), size.height(), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 		report_gl_error();
 		glTexParameteri(GL_TEXTURE_2D, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
 		glTexParameteri(GL_TEXTURE_2D, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
@@ -559,19 +561,20 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		glActiveTexture(GL_TEXTURE11);
 		glBindTexture(GL_TEXTURE_2D, mBackgroundBuffer);
 		report_gl_error();
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mBase->size().width(), mBase->size().height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.width(), size.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		report_gl_error();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		mLastRenderSize = mBase->size();
+		mLastRenderSize = size;
 	}
 
 	glActiveTexture(GL_TEXTURE10);
 	glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
-	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mBase->getOrigin().x(), mBase->getOrigin().y(), mBase->size().width(), mBase->size().height());
+	QPoint origin(renderer->GetOrigin()[0], renderer->GetOrigin()[1]);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, origin.x(), origin.y(), size.width(), size.height());
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, mBackgroundBuffer);
-	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mBase->getOrigin().x(), mBase->getOrigin().y(), mBase->size().width(), mBase->size().height());
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, origin.x(), origin.y(), size.width(), size.height());
 	report_gl_error();
 	int depthTexture = 10;
 	mInternals->Shader->GetUniformVariables()->SetUniformi("depthBuffer", 1, (int*)&depthTexture);
@@ -599,7 +602,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 			break;
 		}
 		report_gl_error();
-		glViewport(mBase->getOrigin().x(), mBase->getOrigin().y(), mDownsampleWidth, mDownsampleHeight);
+		glViewport(origin.x(), origin.y(), mDownsampleWidth, mDownsampleHeight);
 	}
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
 
@@ -616,7 +619,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		glReadBuffer(vtkgl::COLOR_ATTACHMENT0);
 		
 		GL_TRACE("Before upscale");
-		glViewport(0,0, mBase->size().width(), mBase->size().height());
+		glViewport(0,0, size.width(), size.height());
 		glDisable(GL_SCISSOR_TEST);
 		mUpscaleShader->Use();
 		glActiveTexture(GL_TEXTURE0);
