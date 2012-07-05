@@ -82,7 +82,6 @@ double maxIntensity(ssc::ImagePtr image)
 GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
 	RepImpl(uid)
 {
-	mView = NULL;
 	//	std::cout << "create Texture3DSlicerRep" << std::endl;
 	mActor = vtkActorPtr::New();
 	mPainter = GPURayCastVolumePainterPtr::New();
@@ -196,14 +195,11 @@ std::vector<ssc::ImagePtr> GPURayCastVolumeRep::getImages()
 void GPURayCastVolumeRep::addRepActorsToViewRenderer(ssc::View *view)
 {
 	view->getRenderer()->AddActor(mActor);
-	mView = view;
-	mPainter->setView(view);
 }
 
 void GPURayCastVolumeRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	view->getRenderer()->RemoveActor(mActor);
-	mView = NULL;
 }
 
 void GPURayCastVolumeRep::printSelf(std::ostream & os, ssc::Indent indent)

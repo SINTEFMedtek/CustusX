@@ -104,7 +104,6 @@ private:
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ssc::ImagePtr> mImages;
 	QSet<QString> mClipVolumes;
-	View *mView;
 
 	GPURayCastVolumePainterPtr mPainter;
 	vtkActorPtr mActor;

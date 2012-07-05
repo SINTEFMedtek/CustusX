@@ -58,7 +58,6 @@ public:
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
 	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer, double maxValue);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
-	void setView(ssc::View *ptr) { mBase = ptr; }
 	void set_nMr(int index, ssc::Transform3D nMr);
 	void setClipper(SlicePlaneClipperPtr clipper);
 	void setClipVolume(int index, bool clip);
@@ -91,7 +90,6 @@ protected:
 	float mWidth;
 	float mHeight;
 	unsigned int mDepthBuffer;
-	ssc::View *mBase;
 	unsigned int mBackgroundBuffer;
 	SlicePlaneClipperPtr mClipper;
 	float mStepSize;
