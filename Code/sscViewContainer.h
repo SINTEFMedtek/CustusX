@@ -58,7 +58,7 @@ public:
 	virtual bool isEmpty() const { return false; }
 	virtual QSize maximumSize() const { return mParent->size(); }
 	virtual QSize minimumSize() const { return QSize(100, 100); }
-	virtual void setGeometry(const QRect &r) { mGeometry = r; }
+	virtual void setGeometry(const QRect &r);
 	virtual QSize sizeHint() const { return mSize; }
 	virtual QRect screenGeometry() const;
 

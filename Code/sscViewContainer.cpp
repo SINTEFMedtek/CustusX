@@ -150,6 +150,18 @@ QRect ViewItem::screenGeometry() const
 	return QRect(ssc::View::widget()->mapToGlobal(mGeometry.topLeft()), size());
 }
 
+void ViewItem::setGeometry(const QRect &r)
+{
+	mGeometry = r;
+	QSize size = ssc::View::widget()->size();
+	double xMin = r.left()/(double)size.width();
+	double xMax = r.right()/(double)size.width();
+	double yMin = (size.height() - r.bottom()) / (double)size.height();
+	double yMax = (size.height() - r.top()) / (double)size.height();
+	getRenderer()->SetViewport(xMin, yMin, xMax, yMax);
+	setSize(r.size());
+}
+
 void ViewContainer::mouseMoveEvent(QMouseEvent* event)
 {
 	widget::mouseMoveEvent(event);
@@ -198,47 +210,6 @@ void ViewContainer::showEvent(QShowEvent* event)
 void ViewContainer::resizeEvent(QResizeEvent *event)
 {
 	QSize size = event->size();
-
-	if (layout())
-	{
-		int cols = getGridLayout()->columnCount();
-		int rows = getGridLayout()->rowCount();
-		double itemWidthFactor = 1.0 / cols;
-		double itemHeightFactor = 1.0 / rows;
-
-		int itemCol, itemColSpan;
-		int itemRow, itemRowSpan;
-		double itemX, itemY, itemWidth, itemHeight;
-
-		for (int i = 0; i < layout()->count(); ++i)
-		{
-			ViewItem* item = (ViewItem*) layout()->itemAt(i);
-			// Get current item's column and row position and span
-			getGridLayout()->getItemPosition(i, &itemRow, &itemCol, &itemRowSpan, &itemColSpan);
-
-			itemX = (size.width() / cols) * itemCol;
-			itemY = (size.height() / rows) * itemRow;
-			itemWidth = (size.width() / cols) * itemColSpan;
-			itemHeight = (size.height() / rows) * itemRowSpan;
-
-			// Calculate render viewport
-			vtkRendererPtr renderer = item->getRenderer();
-			double xMin = itemWidthFactor * itemCol;
-			double xMax = itemWidthFactor * (itemCol + itemColSpan);
-			double yMin = itemHeightFactor * (rows - (itemRow + itemRowSpan));
-			double yMax = itemHeightFactor * (rows - itemRow);
-			// std::cout << "xMin: " << xMin << " yMin: " << yMin << " xMax: " << xMax << " yMax: " << yMax << std::endl;
-			renderer->SetViewport(xMin, yMin, xMax, yMax);
-
-			// Set item size and geometry
-			item->setSize(QSize(itemWidth, itemHeight));
-			QRect itemGeometry;
-			itemGeometry.setX(itemX);
-			itemGeometry.setY(itemY);
-			itemGeometry.setSize(item->size());
-			item->setGeometry(itemGeometry);
-		}
-	}
 
 	emit resized(size);
 }
