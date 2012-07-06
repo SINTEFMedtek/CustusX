@@ -136,6 +136,15 @@ public:
 
 signals:
 	void resized(QSize size);
+	void mouseMove(int x, int y, Qt::MouseButtons buttons);
+	void mousePress(int x, int y, Qt::MouseButtons buttons);
+	void mouseRelease(int x, int y, Qt::MouseButtons buttons);
+	void mouseWheel(int x, int y, int delta, int orientation, Qt::MouseButtons buttons);
+	void shown();
+	void focusChange(bool gotFocus, Qt::FocusReason reason);
+
+// old, deprecated signals that pass event objects; this is UNSAFE over thread boundaries!
+signals:
 	void mouseMoveSignal(QMouseEvent* event);
 	void mousePressSignal(QMouseEvent* event);
 	void mouseReleaseSignal(QMouseEvent* event);
