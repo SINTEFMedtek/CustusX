@@ -164,6 +164,10 @@ void ViewItem::setGeometry(const QRect &r)
 	double yMax = (size.height() - r.top()) / (double)size.height();
 	getRenderer()->SetViewport(xMin, yMin, xMax, yMax);
 	setSize(r.size());
+	if (mSlave)
+	{
+		mSlave->setGeometry(r);
+	}
 }
 
 void ViewContainer::mouseMoveEvent(QMouseEvent* event)

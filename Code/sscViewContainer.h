@@ -42,8 +42,8 @@ class ViewItem : public QObject, public View, public QLayoutItem
 Q_OBJECT
 
 public:
-	ViewItem(QString uid, QString name, QWidget *parent, vtkRenderWindowPtr renderWindow, QRect rect) : QObject(parent), View(parent, rect.size(), uid, name) { mRenderWindow = renderWindow; }
-	~ViewItem() {}
+	ViewItem(QString uid, QString name, QWidget *parent, vtkRenderWindowPtr renderWindow, QRect rect) : QObject(parent), View(parent, rect.size(), uid, name), mSlave(NULL) { mRenderWindow = renderWindow; }
+	virtual ~ViewItem() { std::cout << "destroying view item" << std::endl; delete mSlave; }
 
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }
@@ -60,6 +60,8 @@ public:
 	virtual QSize minimumSize() const { return QSize(100, 100); }
 	virtual void setGeometry(const QRect &r);
 	virtual QSize sizeHint() const { return mSize; }
+	virtual QWidget *getSlaveWidget() const { return mSlave; }
+	virtual void setSlaveWidget(QWidget *slave) { mSlave = slave; mSlave->setParent(mParent);}
 	virtual QRect screenGeometry() const;
 
 signals:
@@ -68,6 +70,7 @@ signals:
 private:
 	vtkRenderWindowPtr mRenderWindow;
 	QRect mGeometry;
+	QWidget *mSlave;
 };
 typedef boost::shared_ptr<ViewItem> ViewItemPtr;
 
