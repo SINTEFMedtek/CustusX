@@ -80,6 +80,7 @@ void ViewContainer::clear()
 		{
 			((ViewItem *) item)->getRenderer()->SetViewport(0,0,1,1);
 			((ViewItem *) item)->getRenderer()->Clear();
+			((ViewItem *) item)->getRenderer()->SetBackground(110.0/255.0, 111.0/255.0, 113.0/255.0);
 			((ViewItem *) item)->getRenderer()->Render();
 			cleared = true;
 		}
@@ -87,7 +88,6 @@ void ViewContainer::clear()
 		mRenderWindow->RemoveRenderer(((ViewItem *) item)->getRenderer());
 		delete (ViewItem *)item;
 	}
-
 }
 
 /**
