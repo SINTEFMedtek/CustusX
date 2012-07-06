@@ -72,9 +72,18 @@ ViewContainer::~ViewContainer()
 void ViewContainer::clear()
 {
 	QLayoutItem *item;
+	bool cleared = false;
 	while ((item = layout()->takeAt(0)) != 0)
 	{
 		((ViewItem *) item)->removeReps();
+		if (!cleared)
+		{
+			((ViewItem *) item)->getRenderer()->SetViewport(0,0,1,1);
+			((ViewItem *) item)->getRenderer()->Clear();
+			((ViewItem *) item)->getRenderer()->Render();
+			cleared = true;
+		}
+		
 		mRenderWindow->RemoveRenderer(((ViewItem *) item)->getRenderer());
 	}
 
