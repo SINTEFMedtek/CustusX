@@ -85,6 +85,7 @@ void ViewContainer::clear()
 		}
 		
 		mRenderWindow->RemoveRenderer(((ViewItem *) item)->getRenderer());
+		delete (ViewItem *)item;
 	}
 
 	QLayout *viewLayout = layout();
