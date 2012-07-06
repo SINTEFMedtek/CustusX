@@ -43,7 +43,7 @@ Q_OBJECT
 
 public:
 	ViewItem(QString uid, QString name, QWidget *parent, vtkRenderWindowPtr renderWindow, QRect rect) : QObject(parent), View(parent, rect.size(), uid, name), mSlave(NULL) { mRenderWindow = renderWindow; }
-	virtual ~ViewItem() { std::cout << "destroying view item" << std::endl; delete mSlave; }
+	virtual ~ViewItem() { delete mSlave; }
 
 	// Implement pure virtuals in base class
 	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }
