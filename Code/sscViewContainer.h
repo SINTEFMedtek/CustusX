@@ -64,8 +64,21 @@ public:
 	virtual void setSlaveWidget(QWidget *slave) { mSlave = slave; mSlave->setParent(mParent);}
 	virtual QRect screenGeometry() const;
 
+	// Force signal output
+	void mouseMoveSlot(int x, int y, Qt::MouseButtons buttons) { emit mouseMove(x, y, buttons); }
+	void mousePressSlot(int x, int y, Qt::MouseButtons buttons) { emit mousePress(x, y, buttons); }
+	void mouseReleaseSlot(int x, int y, Qt::MouseButtons buttons) { emit mouseRelease(x, y, buttons); }
+	void mouseWheelSlot(int x, int y, int delta, int orientation, Qt::MouseButtons buttons) { emit mouseWheel(x, y, delta, orientation, buttons); }
+	void resizedSlot(QSize size) { emit resized(size); }
+
 signals:
 	void resized(QSize size);
+	void mouseMove(int x, int y, Qt::MouseButtons buttons);
+	void mousePress(int x, int y, Qt::MouseButtons buttons);
+	void mouseRelease(int x, int y, Qt::MouseButtons buttons);
+	void mouseWheel(int x, int y, int delta, int orientation, Qt::MouseButtons buttons);
+	void shown();
+	void focusChange(bool gotFocus, Qt::FocusReason reason);
 
 private:
 	vtkRenderWindowPtr mRenderWindow;
@@ -87,15 +100,6 @@ public:
 	void clear();
 
 	QGridLayout *getGridLayout();
-
-signals:
-	void mouseMoveSignal(QMouseEvent *event);
-	void mousePressSignal(QMouseEvent *event);
-	void mouseReleaseSignal(QMouseEvent *event);
-	void mouseWheelSignal(QWheelEvent*);
-	void showSignal(QShowEvent *event);
-	void focusInSignal(QFocusEvent *event);
-	void resized(QSize size);
 
 protected:
 	vtkRenderWindowPtr mRenderWindow;

@@ -98,14 +98,14 @@ void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View *view)
 {
     view->getRenderer()->AddActor(mProxy->getActor());
     mView = view;
-    connect(view->widget(), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
+    connect(dynamic_cast<QObject *>(view), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
     this->viewChanged();
 }
 
 void Texture3DSlicerRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
 	view->getRenderer()->RemoveActor(mProxy->getActor());
-	disconnect(view->widget(), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
+	disconnect(dynamic_cast<QObject *>(view), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
 	mView = NULL;
 }
 

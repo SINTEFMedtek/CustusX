@@ -173,7 +173,16 @@ void ViewItem::setGeometry(const QRect &r)
 void ViewContainer::mouseMoveEvent(QMouseEvent* event)
 {
 	widget::mouseMoveEvent(event);
-	emit mouseMoveSignal(event);
+	for (int i = 0; layout() && i < layout()->count(); ++i)
+	{
+		ViewItem *item = (ViewItem *)layout()->itemAt(i);
+		QRect r = item->geometry();
+		QPoint p = event->pos();
+		if (r.contains(p))
+		{
+			item->mouseMoveSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
+		}
+	}
 }
 
 void ViewContainer::mousePressEvent(QMouseEvent* event)
@@ -185,41 +194,66 @@ void ViewContainer::mousePressEvent(QMouseEvent* event)
 		return;
 
 	widget::mousePressEvent(event);
-	emit mousePressSignal(event);
+	for (int i = 0; layout() && i < layout()->count(); ++i)
+	{
+		ViewItem *item = (ViewItem *)layout()->itemAt(i);
+		QRect r = item->geometry();
+		QPoint p = event->pos();
+		if (r.contains(p))
+		{
+			item->mousePressSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
+		}
+	}
 }
 
 void ViewContainer::mouseReleaseEvent(QMouseEvent* event)
 {
 	widget::mouseReleaseEvent(event);
-	emit mouseReleaseSignal(event);
+	for (int i = 0; layout() && i < layout()->count(); ++i)
+	{
+		ViewItem *item = (ViewItem *)layout()->itemAt(i);
+		QRect r = item->geometry();
+		QPoint p = event->pos();
+		if (r.contains(p))
+		{
+			item->mouseReleaseSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
+		}
+	}
 }
 
 void ViewContainer::focusInEvent(QFocusEvent* event)
 {
 	widget::focusInEvent(event);
-	emit focusInSignal(event);
 }
 
 void ViewContainer::wheelEvent(QWheelEvent* event)
 {
 	widget::wheelEvent(event);
-	emit mouseWheelSignal(event);
+	for (int i = 0; layout() && i < layout()->count(); ++i)
+	{
+		ViewItem *item = (ViewItem *)layout()->itemAt(i);
+		QRect r = item->geometry();
+		QPoint p = event->pos();
+		if (r.contains(p))
+		{
+			item->mouseWheelSlot(p.x() - r.left(), p.y() - r.top(), event->delta(), event->orientation(), event->buttons());
+		}
+	}
 }
 
 void ViewContainer::showEvent(QShowEvent* event)
 {
 	widget::showEvent(event);
-	emit showSignal(event);
 }
 
-/**
-  * Resize the container content (views), based on it's size, colums, rows and viewspan
-  */
 void ViewContainer::resizeEvent(QResizeEvent *event)
 {
-	QSize size = event->size();
-
-	emit resized(size);
+	for (int i = 0; layout() && i < layout()->count(); ++i)
+	{
+		ViewItem *item = (ViewItem *)layout()->itemAt(i);
+		QRect r = item->geometry();
+		item->resizedSlot(QSize(event->size().width() - r.width(), event->size().height() - r.height()));
+	}
 }
 
 } // namespace ssc

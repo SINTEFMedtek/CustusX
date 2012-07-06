@@ -250,6 +250,7 @@ void ViewWidget::printSelf(std::ostream & os, Indent indent)
 void ViewWidget::mouseMoveEvent(QMouseEvent* event)
 {
 	widget::mouseMoveEvent(event);
+	emit mouseMove(event->x(), event->y(), event->buttons());
 	emit mouseMoveSignal(event);
 }
 
@@ -262,30 +263,35 @@ void ViewWidget::mousePressEvent(QMouseEvent* event)
 		return;
 
 	widget::mousePressEvent(event);
+	emit mousePress(event->x(), event->y(), event->buttons());
 	emit mousePressSignal(event);
 }
 
 void ViewWidget::mouseReleaseEvent(QMouseEvent* event)
 {
 	widget::mouseReleaseEvent(event);
+	emit mouseRelease(event->x(), event->y(), event->buttons());
 	emit mouseReleaseSignal(event);
 }
 
 void ViewWidget::focusInEvent(QFocusEvent* event)
 {
 	widget::focusInEvent(event);
+	emit focusChange(event->gotFocus(), event->reason());
 	emit focusInSignal(event);
 }
 
 void ViewWidget::wheelEvent(QWheelEvent* event)
 {
 	widget::wheelEvent(event);
+	emit mouseWheel(event->x(), event->y(), event->delta(), event->orientation(), event->buttons());
 	emit mouseWheelSignal(event);
 }
 
 void ViewWidget::showEvent(QShowEvent* event)
 {
 	widget::showEvent(event);
+	emit shown();
 	emit showSignal(event);
 }
 
