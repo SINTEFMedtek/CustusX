@@ -88,12 +88,6 @@ void ViewContainer::clear()
 		delete (ViewItem *)item;
 	}
 
-	QLayout *viewLayout = layout();
-	if (viewLayout)
-	{
-		delete viewLayout;
-		setLayout(new QGridLayout);
-	}
 }
 
 /**
