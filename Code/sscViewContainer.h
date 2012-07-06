@@ -42,7 +42,7 @@ class ViewItem : public QObject, public View, public QLayoutItem
 Q_OBJECT
 
 public:
-	ViewItem(QWidget *parent, vtkRenderWindowPtr renderWindow, QRect rect) : QObject(parent), View(parent, rect.size()) { mRenderWindow = renderWindow; }
+	ViewItem(QString uid, QString name, QWidget *parent, vtkRenderWindowPtr renderWindow, QRect rect) : QObject(parent), View(parent, rect.size(), uid, name) { mRenderWindow = renderWindow; }
 	~ViewItem() {}
 
 	// Implement pure virtuals in base class
@@ -80,7 +80,7 @@ Q_OBJECT
 public:
 	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0);
 	~ViewContainer();
-	ViewItem *addView(int row, int col, int rowSpan = 1, int colSpan = 1);
+	ViewItem *addView(QString uid, int row, int col, int rowSpan = 1, int colSpan = 1, QString name = "");
 	void clear();
 
 	QGridLayout *getGridLayout();
