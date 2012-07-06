@@ -121,10 +121,10 @@ void ViewItem::setZoomFactor(double factor)
   * Creates and adds a view to this container.
   * Returns a pointer to the created view item that the container owns.
   */
-ViewItem *ViewContainer::addView(int row, int col, int rowSpan, int colSpan)
+ViewItem *ViewContainer::addView(QString uid, int row, int col, int rowSpan, int colSpan, QString name)
 {
 	// Create a viewItem for this view
-	ViewItem *item = new ViewItem(this, mRenderWindow, QRect());
+	ViewItem *item = new ViewItem(uid, name, this, mRenderWindow, QRect());
 	if (getGridLayout())
 	{
 		getGridLayout()->addItem(item, row, col, rowSpan, colSpan);
