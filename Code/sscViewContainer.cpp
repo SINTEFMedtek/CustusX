@@ -246,14 +246,4 @@ void ViewContainer::showEvent(QShowEvent* event)
 	widget::showEvent(event);
 }
 
-void ViewContainer::resizeEvent(QResizeEvent *event)
-{
-	for (int i = 0; layout() && i < layout()->count(); ++i)
-	{
-		ViewItem *item = (ViewItem *)layout()->itemAt(i);
-		QRect r = item->geometry();
-		item->resizedSlot(QSize(event->size().width() - r.width(), event->size().height() - r.height()));
-	}
-}
-
 } // namespace ssc

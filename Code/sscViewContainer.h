@@ -111,7 +111,6 @@ private:
 	virtual void mousePressEvent(QMouseEvent *event);
 	virtual void mouseReleaseEvent(QMouseEvent *event);
 	virtual void focusInEvent(QFocusEvent* event);
-	virtual void resizeEvent(QResizeEvent *event);
 	virtual void paintEvent(QPaintEvent *event);
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
