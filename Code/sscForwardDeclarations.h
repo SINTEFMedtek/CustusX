@@ -13,8 +13,10 @@
 
 namespace ssc {
 
-class ViewWidget;
 class View;
+class ViewContainer;
+class ViewItem;
+class ViewWidget;
 
 // KEEP SORTED AND UNIQUE!
 
