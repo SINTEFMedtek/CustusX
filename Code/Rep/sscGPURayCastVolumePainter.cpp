@@ -602,7 +602,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 			break;
 		}
 		report_gl_error();
-		glViewport(origin.x(), origin.y(), mDownsampleWidth, mDownsampleHeight);
+		glViewport(0, 0, mDownsampleWidth, mDownsampleHeight);
 	}
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
 
@@ -619,7 +619,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		glReadBuffer(vtkgl::COLOR_ATTACHMENT0);
 		
 		GL_TRACE("Before upscale");
-		glViewport(0,0, size.width(), size.height());
+		glViewport(origin.x(), origin.y(), size.width(), size.height());
 		glDisable(GL_SCISSOR_TEST);
 		mUpscaleShader->Use();
 		glActiveTexture(GL_TEXTURE0);
