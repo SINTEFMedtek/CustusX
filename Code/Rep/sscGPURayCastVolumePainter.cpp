@@ -399,17 +399,23 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	}
 
 	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &mStepSize);
-	float viewport[2];
-	viewport[0] = size.width();
-	viewport[1] = size.height();
-	mInternals->Shader->GetUniformVariables()->SetUniformf("backgroundResolution", 2, viewport);
+	
+	QPoint origin(renderer->GetOrigin()[0], renderer->GetOrigin()[1]);
+	float viewport[4];
+	viewport[0] = origin.x();
+	viewport[1] = origin.y();	
+	viewport[2] = size.width();
+	viewport[3] = size.height();
+	
 	if (mResample)
 	{
-		viewport[0] = mDownsampleWidth;
-		viewport[1] = mDownsampleHeight;
+		viewport[0] = 0;
+		viewport[1] = 0;
+		viewport[2] = mDownsampleWidth;
+		viewport[3] = mDownsampleHeight;
 	}
 		
-	mInternals->Shader->GetUniformVariables()->SetUniformf("viewport", 2, viewport);
+	mInternals->Shader->GetUniformVariables()->SetUniformf("viewport", 4, viewport);
 	
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
