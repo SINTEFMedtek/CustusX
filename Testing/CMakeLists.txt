@@ -103,11 +103,14 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
     #add_test(TestSliceRep TestSliceRep)
     
     QT4_WRAP_CPP( SSC_TEST_SOURCE_FILES 
-        sscViewsWindow.h)
+        sscViewsWindow.h
+        sscContainerWindow.h)
     set(SSC_TEST_SOURCE_FILES
         sscTestSliceComputer.cpp
         sscViewsWindow.cpp 
+        sscContainerWindow.cpp
         sscTestVisualRendering.cpp
+        sscTestViewContainer.cpp
         sscTestUtilityClasses.cpp
         sscTestTransform3D.cpp
         sscTestBoundingBox3D.cpp

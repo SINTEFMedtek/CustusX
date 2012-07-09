@@ -55,7 +55,8 @@ namespace ssc
 
 ViewContainer::ViewContainer(QWidget *parent, Qt::WFlags f) :
 			     ViewQVTKWidget(parent, f),
-			     mRenderWindow(ViewRenderWindowPtr::New())
+			     mRenderWindow(ViewRenderWindowPtr::New()),
+			     mMTimeHash(0)
 {
 	// Create default grid layout for this object
 	setLayout(new QGridLayout);
@@ -107,8 +108,8 @@ void ViewContainer::paintEvent(QPaintEvent* event)
 			((ViewItem*) layout()->itemAt(i))->forceUpdate();
 		}
 	}
-
 	widget::paintEvent(event);
+	mMTimeHash = 0;
 }
 
 void ViewItem::setZoomFactor(double factor)
@@ -244,6 +245,37 @@ void ViewContainer::wheelEvent(QWheelEvent* event)
 void ViewContainer::showEvent(QShowEvent* event)
 {
 	widget::showEvent(event);
+}
+
+void ViewContainer::renderAll()
+{
+	// First, calculate if anything has changed
+	unsigned long hash = 0;
+	for (int i = 0; layout() && i < layout()->count(); ++i)
+	{
+		ViewItem *item = (ViewItem *)layout()->itemAt(i);
+
+		hash += item->getRenderer()->GetMTime();
+		hash += this->GetRenderWindow()->GetMTime();
+		vtkPropCollection *props = item->getRenderer()->GetViewProps();
+		props->InitTraversal();
+		for (vtkProp* prop = props->GetNextProp(); prop != NULL; prop = props->GetNextProp())
+		{
+			vtkImageActor *imageActor = vtkImageActor::SafeDownCast(prop);
+			if (imageActor && imageActor->GetInput())
+			{
+				hash += imageActor->GetInput()->GetMTime();
+			}
+			hash += prop->GetMTime();
+			hash += prop->GetRedrawMTime();
+		}
+	}
+	// Then, if anything has changed, render everything anew
+	if (hash != mMTimeHash)
+	{
+		this->GetRenderWindow()->Render();
+		mMTimeHash = hash;
+	}
 }
 
 } // namespace ssc

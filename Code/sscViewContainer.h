@@ -98,6 +98,7 @@ public:
 	virtual ~ViewContainer();
 	ViewItem *addView(QString uid, int row, int col, int rowSpan = 1, int colSpan = 1, QString name = "");
 	void clear();
+	void renderAll(); ///< Use this function to render all views at once. Do not call render on each view.
 
 	QGridLayout *getGridLayout();
 
@@ -112,6 +113,8 @@ private:
 	virtual void mouseReleaseEvent(QMouseEvent *event);
 	virtual void focusInEvent(QFocusEvent* event);
 	virtual void paintEvent(QPaintEvent *event);
+
+	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 

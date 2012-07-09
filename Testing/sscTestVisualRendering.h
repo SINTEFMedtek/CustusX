@@ -11,12 +11,9 @@ public:
 	void tearDown();
 	void testInitialize();
 	void testEmptyView();
-	void testEmptyViewContainer();
 	void test_3D_Tool();
 	void test_3D_Tool_GPU();
 	void test_ACS_3D_Tool();
-	void test_ACS_3D_Tool_Container();
-	void test_AnyDual_3D_Tool_Container();
 	void test_AnyDual_3D_Tool();
 	void test_ACS_3Volumes();
 	void test_AnyDual_3Volumes();
@@ -24,21 +21,16 @@ public:
 	void test_3D_RGB_GPU();
 	void test_3D_Composite_GPU();
 	void test_3D_Composite_Views_GPU();
-	void test_3D_Composite_Views_GPU_Container();
 	void test_3D_Lut();
 	
 public:
 	CPPUNIT_TEST_SUITE( TestVisualRendering );
 		CPPUNIT_TEST( testInitialize );
 		CPPUNIT_TEST( testEmptyView );
-		CPPUNIT_TEST( testEmptyViewContainer );
 		CPPUNIT_TEST( test_3D_Tool );
 		CPPUNIT_TEST( test_3D_Tool_GPU );
-		CPPUNIT_TEST( test_ACS_3D_Tool_Container );
-		CPPUNIT_TEST( test_AnyDual_3D_Tool_Container );
 		CPPUNIT_TEST( test_3D_Composite_GPU );
 		CPPUNIT_TEST( test_3D_Composite_Views_GPU );
-		CPPUNIT_TEST( test_3D_Composite_Views_GPU_Container );
 		CPPUNIT_TEST( test_ACS_3D_Tool );
 		CPPUNIT_TEST( test_AnyDual_3D_Tool );
 		CPPUNIT_TEST( test_ACS_3Volumes );
