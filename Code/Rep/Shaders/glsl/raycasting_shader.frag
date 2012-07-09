@@ -7,8 +7,7 @@ const int maxIterations = 450;
 const int maxVolumes = ${MAX_VOLUMES};
 const float stepsize = ${STEPSIZE};
 const float maxDistance = float(maxIterations) * stepsize;
-uniform vec2 viewport;
-uniform vec2 backgroundResolution;
+uniform vec4 viewport;
 
 uniform int lutSize[maxVolumes];
 uniform sampler3D volumeTexture[maxVolumes];
@@ -50,23 +49,23 @@ vec4 blendRGBA(in vec4 a, in vec4 b)
 	return ret;
 }
 
-vec4 viewVolumePosition( vec4 fragment, vec2 viewport)
+vec4 viewVolumePosition( vec4 fragment, vec4 viewport)
 {
 	vec4 result;
-	result.x = 2.0*fragment.x/viewport.x - 1.0;
-	result.y = 2.0*fragment.y/viewport.y - 1.0;
+	result.x = 2.0*(fragment.x-viewport.x)/viewport.z - 1.0;
+	result.y = 2.0*(fragment.y-viewport.y)/viewport.w - 1.0;
 	result.z = 2.0*fragment.z - 1.0;
 	result.w = 1.0;
 	return result;
 }
 
-vec2 depthTexCoords( vec4 fragment, vec2 viewport)
+vec2 depthTexCoords( vec4 fragment, vec4 viewport)
 {
-	vec2 result = fragment.xy / viewport;
+	vec2 result = (fragment.xy - viewport.xy) / viewport.zw;
 	return result;
 }
 
-vec4 unproject( vec4 viewportPosition, vec2 viewport )
+vec4 unproject( vec4 viewportPosition, vec4 viewport )
 {
 	vec4 viewVolumePos = viewVolumePosition(viewportPosition, viewport);
 	vec4 worldPosition = gl_ModelViewProjectionMatrixInverse * viewVolumePos;
@@ -149,7 +148,7 @@ float toHit( mat4 Matrix, vec4 position, vec4 rayDirection)
 	return min(minimum, stepsize);
 }
 
-vec4 computeRayDirection( vec4 position, vec2 viewport)
+vec4 computeRayDirection( vec4 position, vec4 viewport)
 {
 	vec4 near, far;
 	near = position;
@@ -176,7 +175,7 @@ void main()
 	vec4 colorSample; // The src color
 	float n = 0.0;
 	const float thau = 0.02;
-	vec2 depthLookup = depthTexCoords(vec4(gl_FragCoord.xy * (backgroundResolution / viewport), gl_FragCoord.zw), backgroundResolution);
+	vec2 depthLookup = depthTexCoords(gl_FragCoord, viewport);
 	float maxLength = length(unproject(vec4(gl_FragCoord.xy, texture2D(depthBuffer, depthLookup).r, gl_FragCoord.w), viewport) - gl_TexCoord[1]);
 	vec4 rayDirection = computeRayDirection(gl_FragCoord, viewport);
 	vec4 rayDeltaVector = rayDirection * stepsize;
