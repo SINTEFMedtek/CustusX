@@ -63,6 +63,7 @@ public:
 	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
 	void releaseGraphicsResources(int index);
+
 protected:
 	TextureSlicePainter();
 	virtual ~TextureSlicePainter();
@@ -78,6 +79,9 @@ protected:
 	vtkInternals* mInternals;
 	QString mSource;
 	QString mShaderFile;
+
+private:
+	bool hasLoadedExtensions;
 };
 
 #endif // WIN32
