@@ -95,7 +95,7 @@ Q_OBJECT
 
 public:
 	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0);
-	~ViewContainer();
+	virtual ~ViewContainer();
 	ViewItem *addView(QString uid, int row, int col, int rowSpan = 1, int colSpan = 1, QString name = "");
 	void clear();
 
