@@ -177,7 +177,7 @@ void main()
 	float n = 0.0;
 	const float thau = 0.02;
 	vec2 depthLookup = depthTexCoords(vec4(gl_FragCoord.xy * (backgroundResolution / viewport), gl_FragCoord.zw), backgroundResolution);
-	float maxLength = length(unproject(gl_FragCoord * vec4(1.0, 1.0, 0.0, 1.0) + texture2D(depthBuffer, depthLookup).r, viewport) - gl_TexCoord[1]);
+	float maxLength = length(unproject(vec4(gl_FragCoord.xy, texture2D(depthBuffer, depthLookup).r, gl_FragCoord.w), viewport) - gl_TexCoord[1]);
 	vec4 rayDirection = computeRayDirection(gl_FragCoord, viewport);
 	vec4 rayDeltaVector = rayDirection * stepsize;
 	bool beenHit[volumes];
