@@ -190,7 +190,8 @@ public:
 };
 
 //---------------------------------------------------------
-TextureSlicePainter::TextureSlicePainter()
+TextureSlicePainter::TextureSlicePainter() :
+	hasLoadedExtensions(false)
 {
 	mInternals = new vtkInternals();
 }
@@ -243,25 +244,31 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 		this->Superclass::PrepareForRendering(renderer, actor);
 		return;
 	}
+	GL_TRACE("Prepare for 2D rendering");
 
 	vtkRenderWindow* renWin = renderer->GetRenderWindow();
 	if (mInternals->LastContext != renWin)
 	{
 		mInternals->ClearGraphicsResources();
+		hasLoadedExtensions = false; // force re-check
 	}
 	mInternals->LastContext = renWin;
 
-	report_gl_error();
-
 	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(renWin);
-	if (!LoadRequiredExtensions(context->GetExtensionManager()))
+	if (!hasLoadedExtensions)
 	{
-		std::cout << "Missing required EXTENSION!!!!!!!!!!!." << endl;
-		return;
+		GL_TRACE("Loading 2D extensions");
+		if (!LoadRequiredExtensions(context->GetExtensionManager()))
+		{
+			std::cout << "Missing required EXTENSION!!!!!!!!!!!." << endl;
+			return;
+		}
+		hasLoadedExtensions = true;
 	}
 
 	if (!mInternals->Shader)
 	{
+		GL_TRACE("Loading 2D shaders");
 		mSource = this->loadShaderFile(mShaderFile);
 
 		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
@@ -278,6 +285,17 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 		{
 			mInternals->mElement[i].initializeRendering();
 		}
+		// Save context state to be able to restore.
+		mInternals->Shader->Build();
+		if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
+		{
+			vtkErrorMacro("Pass Two failed.");
+			abort();
+		}
+		if (!mInternals->Shader->IsValid())
+		{
+			vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
+		}
 	}
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -285,34 +303,24 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
 	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
 
-	report_gl_error();
 	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
 	{
 		mInternals->mElement[i].eachPrepareRendering();
 	}
-	report_gl_error();
 
 	this->Superclass::PrepareForRendering(renderer, actor);
 	report_gl_error();
+	GL_TRACE("Prepare for 2D rendering complete");
 }
 
 void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
 		bool forceCompileOnly)
 {
-	report_gl_error();
-
 	if (!CanRender(renderer, actor))
 	{
 		return;
 	}
-
-	// Save context state to be able to restore.
-	mInternals->Shader->Build();
-	if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
-	{
-		vtkErrorMacro("Pass Two failed.");
-		abort();
-	}
+	GL_TRACE("2D rendering");
 
 	int layers = mInternals->mElement.size();
 	mInternals->Shader->GetUniformVariables()->SetUniformi("layers", 1, &layers);
@@ -323,20 +331,14 @@ void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
 	}
 
 	mInternals->Shader->Use();
-	report_gl_error();
-
-	if (!mInternals->Shader->IsValid())
-	{
-		vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
-	}
 
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
 
 	mInternals->Shader->Restore();
-
-	glDisable(vtkgl::TEXTURE_3D);
 	glBindTexture(GL_TEXTURE_3D, 0);
+	glDisable(vtkgl::TEXTURE_3D);
 	report_gl_error();
+	GL_TRACE("2D rendering complete");
 }
 
 bool TextureSlicePainter::CanRender(vtkRenderer*, vtkActor*)

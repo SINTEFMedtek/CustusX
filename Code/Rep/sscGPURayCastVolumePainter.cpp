@@ -231,7 +231,8 @@ GPURayCastVolumePainter::GPURayCastVolumePainter() :
 	mDownsampleHeight(512),
 	mDownsamplePixels(0),
 	mShouldResample(false),
-	mResample(false)
+	mResample(false),
+	hasLoadedExtensions(false)
 {
 	mInternals = new vtkInternals();
 }
@@ -316,6 +317,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		this->Superclass::PrepareForRendering(renderer, actor);
 		return;
 	}
+	GL_TRACE("Prepare for 3D rendering");
 	report_gl_error();
 
 	GLint oldTextureUnit;
@@ -325,20 +327,27 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	if (mInternals->LastContext != renWin || mInternals->mElement.size() != mInternals->mVolumes)
 	{
 		mInternals->ClearGraphicsResources();
+		hasLoadedExtensions = false; // force a re-check
 	}
 	mInternals->LastContext = renWin;
 
 	report_gl_error();
 
 	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(renWin); 
-	if (!LoadRequiredExtensions(context->GetExtensionManager()))
+	if (!hasLoadedExtensions)
 	{
-		std::cout << "Missing required EXTENSION!" << endl;
-		return;
+		GL_TRACE("Loading 3D extensions");
+		if (!LoadRequiredExtensions(context->GetExtensionManager()))
+		{
+			std::cout << "Missing required EXTENSION!" << endl;
+			return;
+		}
+		hasLoadedExtensions = true;
 	}
 
 	if (!mInternals->Shader)
 	{
+		GL_TRACE("Loading 3D shaders");
 		mInternals->mVolumes = mInternals->mElement.size();
 		QString vertexShaderSource = this->loadShaderFile(mVertexShaderFile);
 		QString fragmentShaderSource = this->loadShaderFile(mFragmentShaderFile);
@@ -365,6 +374,17 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
 		{
 			mInternals->mElement[i].initializeRendering();
+		}
+		// Save context state to be able to restore.
+		mInternals->Shader->Build();
+		if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
+		{
+			vtkErrorMacro("Pass Two failed.");
+			abort();
+		}
+		if (!mInternals->Shader->IsValid())
+		{
+			vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
 		}
 	}
 
@@ -395,6 +415,16 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		s2->SetContext(pgm->GetContext());
 		pgm->GetShaders()->AddItem(s2);
 		mUpscaleShader = pgm;
+		mUpscaleShader->Build();
+		if (mUpscaleShader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
+		{
+			vtkErrorMacro("Build of resample shader failed.");
+			abort();
+		}
+		if (!mUpscaleShader->IsValid())
+		{
+			vtkErrorMacro(<<" validation of the program failed: "<< mUpscaleShader->GetLastValidateLog());
+		}
 		report_gl_error();
 	}
 
@@ -435,23 +465,15 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		mInternals->mElement[i].eachPrepareRendering();
 	}
 	mInternals->Shader->Use();
-	report_gl_error();
-
-	if (!mInternals->Shader->IsValid())
-	{
-		vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
-	}
-
 	this->Superclass::PrepareForRendering(renderer, actor);
-	report_gl_error();
 
 	mInternals->Shader->Restore();
-	
-	glDisable(vtkgl::TEXTURE_3D);
 	glBindTexture(GL_TEXTURE_3D, 0);
+	glDisable(vtkgl::TEXTURE_3D);
 
 	glActiveTexture(oldTextureUnit);
 	report_gl_error();
+	GL_TRACE("Prepare for 3D rendering complete");
 }
 
 void GPURayCastVolumePainter::createBuffers()
@@ -491,24 +513,14 @@ void GPURayCastVolumePainter::createBuffers()
 void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
                                           bool forceCompileOnly)
 {
-	report_gl_error();
-
 	if (!CanRender(renderer, actor))
 	{
 		return;
 	}
-	GL_TRACE("Entering");
+	GL_TRACE("3D rendering");
 
 	GLint oldTextureUnit;
 	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
-	
-	// Save context state to be able to restore.
-	mInternals->Shader->Build();
-	if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
-	{
-		vtkErrorMacro("Pass Two failed.");
-		abort();
-	}
 
 	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
 	{
@@ -549,29 +561,25 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 	if (!glIsTexture(mDepthBuffer))
 	{
 		glGenTextures(1, &mDepthBuffer);
-		report_gl_error();
 		glActiveTexture(GL_TEXTURE10);
 		glBindTexture(GL_TEXTURE_2D, mDepthBuffer);
-		report_gl_error();
 		glTexImage2D(GL_TEXTURE_2D, 0, vtkgl::DEPTH_COMPONENT32, size.width(), size.height(), 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
-		report_gl_error();
 		glTexParameteri(GL_TEXTURE_2D, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
 		glTexParameteri(GL_TEXTURE_2D, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		report_gl_error();
 	}
 	if (!glIsTexture(mBackgroundBuffer))
 	{
 		glGenTextures(1, &mBackgroundBuffer);
-		report_gl_error();
 		glActiveTexture(GL_TEXTURE11);
 		glBindTexture(GL_TEXTURE_2D, mBackgroundBuffer);
-		report_gl_error();
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.width(), size.height(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		report_gl_error();
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		mLastRenderSize = size;
+		report_gl_error();
 	}
 
 	glActiveTexture(GL_TEXTURE10);
@@ -581,18 +589,12 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, mBackgroundBuffer);
 	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, origin.x(), origin.y(), size.width(), size.height());
-	report_gl_error();
 	int depthTexture = 10;
 	mInternals->Shader->GetUniformVariables()->SetUniformi("depthBuffer", 1, (int*)&depthTexture);
 	int backgroundTexture = 11;
 	mInternals->Shader->GetUniformVariables()->SetUniformi("backgroundBuffer", 1, (int*)&backgroundTexture);
 	mInternals->Shader->Use();
 	report_gl_error();
-
-	if (!mInternals->Shader->IsValid())
-	{
-		vtkErrorMacro(<<" validation of the program failed: "<< mInternals->Shader->GetLastValidateLog());
-	}
 
 	if (mResample)
 	{
@@ -652,6 +654,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 	glBindTexture(GL_TEXTURE_3D, 0);
 	glActiveTexture(oldTextureUnit);
 	report_gl_error();
+	GL_TRACE("3D rendering complete");
 }
 
 bool GPURayCastVolumePainter::CanRender(vtkRenderer*, vtkActor*)

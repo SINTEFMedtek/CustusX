@@ -68,6 +68,7 @@ public:
 	 * Maximum number of volumes that can be rendered simultaneously
 	 */
 	static const unsigned maxVolumes;
+
 protected:
 	GPURayCastVolumePainter();
 	virtual ~GPURayCastVolumePainter();
@@ -104,6 +105,9 @@ protected:
 	bool mShouldResample;
 	bool mResample;
 	friend class ::TestGPURayCaster;
+
+private:
+	bool hasLoadedExtensions;
 };
 
 #endif // WIN32
