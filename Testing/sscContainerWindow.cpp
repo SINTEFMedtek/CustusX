@@ -29,7 +29,7 @@
 #include "sscSlicerRepSW.h"
 #include "sscTexture3DSlicerRep.h"
 #include "sscGPURayCastVolumeRep.h"
-#include "sscViewsWindow.h"
+#include "sscContainerWindow.h"
 #include "sscImageTF3D.h"
 
 using ssc::Vector3D;
@@ -49,20 +49,7 @@ namespace {
 	}
 }
 
-vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueRangeMin, double hueRangeMax,
-	double saturationRangeMin, double saturationRangeMax, double valueRangeMin, double valueRangeMax)
-{
-	vtkLookupTablePtr lut = vtkLookupTablePtr::New();
-	lut->SetTableRange(tableRangeMin, tableRangeMax);
-	lut->SetHueRange(hueRangeMin, hueRangeMax);
-	lut->SetSaturationRange(saturationRangeMin, saturationRangeMax);
-	lut->SetValueRange(valueRangeMin, valueRangeMax);
-	lut->Build();
-
-	return lut;
-}
-
-ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
+ContainerWindow::ContainerWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
 {
 	mZoomFactor = 1;
 	mDumpSpeedData = false;
@@ -79,23 +66,22 @@ ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(d
 	start(showSliders);
 }
 
-void ViewsWindow::setDescription(const QString& desc)
+void ContainerWindow::setDescription(const QString& desc)
 {
 	mAcceptanceBox->setText(desc);
 }
 
-ViewsWindow::~ViewsWindow()
+ContainerWindow::~ContainerWindow()
 {
 }
 
-void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
+void ContainerWindow::containerGPUSlice(ssc::ViewItem *view, const QString &uid, const QString &imageFilename, ssc::PLANE_TYPE plane)
 {
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+	ssc::ToolManager *mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 	ssc::ImagePtr image = loadImage(imageFilename);
-	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-	view->GetRenderWindow()->GetInteractor()->Disable();
+	view->getRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
 	mLayouts.insert(view);
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
@@ -106,30 +92,9 @@ void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	rep->setSliceProxy(proxy);
 	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
 	view->addRep(rep);
-	insertView(view, uid, imageFilename, r, c);
 }
 
-void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
-{
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
-	ssc::ToolPtr tool = mToolmanager->getDominantTool();
-	ssc::ImagePtr image = loadImage(imageFilename);
-	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
-	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-	view->GetRenderWindow()->GetInteractor()->Disable();
-	view->setZoomFactor(mZoomFactor);
-	mLayouts.insert(view);
-	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
-	proxy->setTool(tool);
-	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
-	ssc::SliceRepSWPtr rep = ssc::SliceRepSW::New(uid);
-	rep->setImage(image);
-	rep->setSliceProxy(proxy);
-	view->addRep(rep);
-	insertView(view, uid, imageFilename, r, c);
-}
-
-ssc::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
+ssc::ImagePtr ContainerWindow::loadImage(const QString& imageFilename)
 {
 	QString filename = ssc::TestUtilities::ExpandDataFileName(imageFilename);
 	ssc::ImagePtr image = ssc::DataManager::getInstance()->loadImage(filename, filename, ssc::rtMETAIMAGE);
@@ -143,52 +108,38 @@ ssc::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 	return image;
 }
 
-void ViewsWindow::insertView(ssc::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
+void ContainerWindow::setupViewContainer(ssc::ViewContainer *view, const QString& uid, const QString& volume, int r, int c)
 {
 	QVBoxLayout *layout = new QVBoxLayout;
-	mSliceLayout->addLayout(layout, r,c);
-
+	mSliceLayout->addLayout(layout, r, c);
 	layout->addWidget(view);
 	layout->addWidget(new QLabel(uid+" "+volume, this));
+	mContainer = view;
 }
 
-void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c)
+void ContainerWindow::container3D(ssc::ViewItem *view, const QString& imageFilename)
 {
-	QString uid = "3D";
-	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
-	mLayouts.insert(view);
-	
 	ssc::ImagePtr image = loadImage(imageFilename);
-
-	if (parameters != NULL)
-	{
-		image->getTransferFunctions3D()->setLLR(parameters->llr);
-		image->getTransferFunctions3D()->setAlpha(parameters->alpha);
-		image->getTransferFunctions3D()->setLut(parameters->lut);
-	}
+	mLayouts.insert(view);
 
 	// volume rep
-	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image->getUid() );
+	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New(image->getUid());
 	mRepPtr->setMaxVolumeSize(10*1000*1000);
 	mRepPtr->setUseGPUVolumeRayCastMapper(); // if available
-	mRepPtr->setImage(image);	
+	mRepPtr->setImage(image);
 	mRepPtr->setName(image->getName());
 	view->addRep(mRepPtr);
-	
+
 	// Tool 3D rep
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
-	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
+	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New(tool->getUid(), tool->getName());
 	toolRep->setTool(tool);
 	view->addRep(toolRep);
-	
-	insertView(view, uid, imageFilename, r, c);
 }
 
-void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c)
+void ContainerWindow::containerGPU3D(ssc::ViewItem *view, const QStringList& imageFilenames, const ImageParameters* parameters)
 {
-	QString uid = "3D";
-	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
 	mLayouts.insert(view);
 
 	std::vector<ssc::ImagePtr> images;
@@ -207,7 +158,7 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	}
 
 	// volume rep
-	
+
 #ifndef WIN32
 	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
 	mRepPtr->setShaderFolder(mShaderFolder);
@@ -222,11 +173,9 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
 	toolRep->setTool(tool);
 	view->addRep(toolRep);
-	
-	insertView(view, uid, imageFilenames[0], r, c);
 }
 
-void ViewsWindow::start(bool showSliders)
+void ContainerWindow::start(bool showSliders)
 {
 	// Initialize dummy toolmanager.
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
@@ -255,7 +204,7 @@ void ViewsWindow::start(bool showSliders)
 	mainLayout->addLayout(controlLayout); //Buttons
 }
 
-void ViewsWindow::updateRender()
+void ContainerWindow::updateRender()
 {
 	for (std::set<ssc::View *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 	{
@@ -276,15 +225,7 @@ void ViewsWindow::updateRender()
 	QTime pre = QTime::currentTime();
 	int other = mLastRenderEnd.msecsTo(pre);
 
-	QSet<vtkRenderWindow *> windowList;
-	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
-	{
-		windowList.insert((*iter)->getRenderWindow().GetPointer());
-	}
-	foreach (vtkRenderWindow *win, windowList)
-	{
-		win->Render();
-	}
+	mContainer->renderAll();
 
 	mLastRenderEnd = QTime::currentTime();
 

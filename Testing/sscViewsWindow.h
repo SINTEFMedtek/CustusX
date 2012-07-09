@@ -47,17 +47,11 @@ public:
 	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	void defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 
-	// create ssc::ViewContainer-based rendering views (do not mix with above ssc::ViewWidget-based functions)
-	void container3D(ssc::ViewItem *view, const QString& imageFilename);
-	void containerGPUSlice(ssc::ViewItem *view, const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane);
-	void containerGPU3D(ssc::ViewItem *view, const QStringList& imageFilenames, const ImageParameters* parameters);
-
 	// was test accepted?
 	bool accepted() const { return mAcceptanceBox->accepted(); }
 	
 	// setup views
 	void insertView(ssc::ViewWidget *view, const QString& uid, const QString& volume, int r, int c);
-	void setupViewContainer(ssc::ViewContainer *view, const QString& uid, const QString& volume, int r, int c);
 
 	/// ugly hack
 	bool mDumpSpeedData;
@@ -84,10 +78,6 @@ private:
 
 public slots:
 	void updateRender();
-
-	// FIXME - do we need these here??
-	void contrast(int val) {}
-	void brightness(int val) {}
 };
 
 #endif /*SSCTESTSLICEANDTOOLREP_H_*/

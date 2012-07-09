@@ -1,5 +1,4 @@
 #include <QApplication>
-//#include <boost/scoped_ptr.hpp>
 
 #include <cppunit/extensions/TestFactoryRegistry.h> 
 #include <cppunit/ui/text/TestRunner.h>
@@ -7,15 +6,13 @@
 #include <cppunit/TestResult.h> 
 #include <cppunit/BriefTestProgressListener.h> 
 
-//#define RUN_ALL_TESTS
-
 #ifndef RUN_ALL_TESTS
 #include "sscTestUtilityClasses.h"
 #include "sscTestSliceComputer.h"
 #include "sscTestVisualRendering.h"
+#include "sscTestViewContainer.h"
 #include "sscTestTransform3D.h"
 #include "sscTestBoundingBox3D.h"
-
 #endif
 
 /**main function for SSC unit tests. 
@@ -29,7 +26,7 @@ int main(int argc, char **argv)
 
 	CppUnit::BriefTestProgressListener listener; 
 	runner.eventManager().addListener( &listener ); 
-		
+
 #ifdef RUN_ALL_TESTS
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
@@ -53,6 +50,4 @@ int main(int argc, char **argv)
 		
 	bool failed = runner.run();
 	return !failed;
-} 
-
-
+}

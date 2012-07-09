@@ -81,52 +81,10 @@ void TestVisualRendering::testEmptyView()
 	CPPUNIT_ASSERT(runWidget());
 }
 
-void TestVisualRendering::testEmptyViewContainer()
-{
-	widget->setDescription("Empty view container");
-	ssc::ViewContainer *viewContainer = new ssc::ViewContainer(widget->centralWidget());
-	widget->setupViewContainer(viewContainer, "dummy", "none", 0, 0);
-
-	CPPUNIT_ASSERT(runWidget());
-}
-
 void TestVisualRendering::test_3D_Tool()
 {
 	widget->setDescription("3D Volume, moving tool");
 	widget->define3D(image[0], NULL, 0, 0);
-
-	CPPUNIT_ASSERT(runWidget());
-}
-
-void TestVisualRendering::test_ACS_3D_Tool_Container()
-{
-	widget->mDumpSpeedData = true;
-
-	widget->setDescription("ACS+3D, moving tool in view container");
-	ssc::ViewContainer *viewContainer = new ssc::ViewContainer(widget->centralWidget());
-	widget->containerGPUSlice(viewContainer->addView("Slice A", 0, 0), "A", image[0], ssc::ptAXIAL);
-	widget->containerGPUSlice(viewContainer->addView("Slice C", 0, 1), "C", image[0], ssc::ptCORONAL);
-	widget->containerGPUSlice(viewContainer->addView("Slice S", 1, 0), "S", image[0], ssc::ptSAGITTAL);
-	widget->container3D(viewContainer->addView("3D", 1, 1), image[0]);
-
-	widget->setupViewContainer(viewContainer, "dummy", "none", 0, 0);
-
-	CPPUNIT_ASSERT(runWidget());
-}
-
-void TestVisualRendering::test_AnyDual_3D_Tool_Container()
-{
-	widget->mDumpSpeedData = true;
-
-	widget->setDescription("2 x Any + Side + 3D, moving tool in view container");
-	ssc::ViewContainer *viewContainer = new ssc::ViewContainer(widget->centralWidget());
-	widget->containerGPUSlice(viewContainer->addView("Slice Any1", 0, 0), "Any", image[0], ssc::ptANYPLANE);
-	widget->containerGPUSlice(viewContainer->addView("Slice Dual1", 1, 0), "Dual", image[0], ssc::ptSIDEPLANE);
-	widget->containerGPUSlice(viewContainer->addView("Slice Any2", 0, 1), "Any", image[0], ssc::ptANYPLANE);
-	widget->containerGPUSlice(viewContainer->addView("Slice Dual2", 1, 1), "Dual", image[0], ssc::ptSIDEPLANE);
-	widget->container3D(viewContainer->addView("3D", 0, 2, 2, 1), image[0]);
-
-	widget->setupViewContainer(viewContainer, "dummy", "none", 0, 0);
 
 	CPPUNIT_ASSERT(runWidget());
 }
@@ -174,31 +132,6 @@ void TestVisualRendering::test_3D_Composite_Views_GPU()
 	widget->defineSlice("C", image[0], ssc::ptCORONAL, 1, 0);
 	widget->defineSlice("S", image[0], ssc::ptSAGITTAL, 0, 1);
 	widget->define3DGPU(images, parameters, 1, 1);
-
-	CPPUNIT_ASSERT(runWidget());
-}
-
-void TestVisualRendering::test_3D_Composite_Views_GPU_Container()
-{
-	widget->setDescription("3D Composites (2 volumes) with ACS, moving tool (in viewcontainer)");
-	ssc::ViewContainer *viewContainer = new ssc::ViewContainer(widget->centralWidget());
-
-	QStringList images; images << image[1] << image[2];
-	ImageParameters parameters[2];
-
-	parameters[0].llr = 35;
-	parameters[0].alpha = .1;
-
-	parameters[1].llr = 55;
-	parameters[1].alpha = .7;
-	parameters[1].lut = getCreateLut(0, 200, .67, .68, 0, 1, .4, .8);
-
-	widget->containerGPUSlice(viewContainer->addView("Slice A", 0, 0), "A", image[0], ssc::ptAXIAL);
-	widget->containerGPUSlice(viewContainer->addView("Slice C", 0, 1), "C", image[0], ssc::ptCORONAL);
-	widget->containerGPUSlice(viewContainer->addView("Slice S", 1, 0), "S", image[0], ssc::ptSAGITTAL);
-	widget->containerGPU3D(viewContainer->addView("3D", 1, 1), images, parameters);
-
-	widget->setupViewContainer(viewContainer, "dummy", "none", 0, 0);
 
 	CPPUNIT_ASSERT(runWidget());
 }
