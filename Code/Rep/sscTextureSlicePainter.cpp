@@ -36,7 +36,6 @@
 #include <vtkUniformVariables.h>
 #include <vtkObjectFactory.h>
 #include <vtkOpenGLRenderWindow.h>
-#include <vtkgl.h>
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
@@ -147,7 +146,6 @@ public:
 		shader->GetUniformVariables()->SetUniformf(cstring_cast("alpha"+qstring_cast(mIndex)), 1, &mAlpha);
 		report_gl_error();
 	}
-
 };
 
 class TextureSlicePainter::vtkInternals
@@ -285,7 +283,6 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 		{
 			mInternals->mElement[i].initializeRendering();
 		}
-		// Save context state to be able to restore.
 		mInternals->Shader->Build();
 		if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
 		{

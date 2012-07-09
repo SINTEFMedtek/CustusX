@@ -375,7 +375,6 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		{
 			mInternals->mElement[i].initializeRendering();
 		}
-		// Save context state to be able to restore.
 		mInternals->Shader->Build();
 		if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)
 		{

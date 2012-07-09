@@ -9,7 +9,6 @@ uniform float window0,window1,window2,window3,window4;
 uniform float level0,level1,level2,level3,level4;
 uniform float llr0,llr1,llr2,llr3,llr4;	// low level reject
 uniform float alpha0,alpha1,alpha2,alpha3,alpha4;	// low level reject
-//in vec4 gl_TexCoord[10];
 vec3 bounds_lo = vec3(0.0,0.0,0.0);
 vec3 bounds_hi = vec3(1.0,1.0,1.0);
 
@@ -68,7 +67,7 @@ vec4 applyRGBALayerN(in vec4 base,in int index,in sampler3D texture,in float win
 	if (clampMe(2*index)) // ignore drawing outside texture
 	{
 		return base;
-	}	
+	}
 
 	// get rgb color from texture
 	vec4 col = texture3D(texture, gl_TexCoord[2*index].xyz);
