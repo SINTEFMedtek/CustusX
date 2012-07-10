@@ -113,6 +113,7 @@ private:
 	virtual void mouseReleaseEvent(QMouseEvent *event);
 	virtual void focusInEvent(QFocusEvent* event);
 	virtual void paintEvent(QPaintEvent *event);
+	virtual void resizeEvent( QResizeEvent *event);
 
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
 };

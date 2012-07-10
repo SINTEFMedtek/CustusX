@@ -277,5 +277,11 @@ void ViewContainer::renderAll()
 		mMTimeHash = hash;
 	}
 }
+	
+void ViewContainer::resizeEvent( QResizeEvent *event)
+{
+	ViewQVTKWidget::resizeEvent(event);
+	getGridLayout()->update();
+}
 
 } // namespace ssc
