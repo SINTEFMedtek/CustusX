@@ -290,21 +290,12 @@ void GPURayCastVolumePainter::ReleaseGraphicsResources(vtkWindow* win)
 		glDeleteTextures(1, &mBackgroundBuffer);
 		mBackgroundBuffer = 0;
 	}
-	if (mDSDepthBuffer)
-	{
-		glDeleteTextures(1, &mDSDepthBuffer);
-		mDSDepthBuffer = 0;
-	}
-	if (mDSColorBuffer)
-	{
-		glDeleteTextures(1, &mDSColorBuffer);
-		mDSColorBuffer = 0;
-	}
 	if (mUpscaleShader)
 	{
 		mUpscaleShader->ReleaseGraphicsResources();
 		mUpscaleShader = 0;
-	}		
+	}
+	freeDSBuffers();
 	this->Superclass::ReleaseGraphicsResources(win);
 }
 
@@ -391,6 +382,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	if (mLastRenderSize != size)
 	{
 		mResample = (mShouldResample && (size.width() * size.height() > mDownsamplePixels));
+		freeDSBuffers();
 	}
 
 	if (mResample && !mUpscaleShader)
@@ -455,7 +447,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		float factor = (float)mDownsamplePixels/(size.width() * size.height());
 		mDownsampleWidth = size.width() * factor;
 		mDownsampleHeight = size.height() * factor;
-		createBuffers();
+		createDSBuffers();
 	}
 
 	report_gl_error();
@@ -475,12 +467,9 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	GL_TRACE("Prepare for 3D rendering complete");
 }
 
-void GPURayCastVolumePainter::createBuffers()
+void GPURayCastVolumePainter::createDSBuffers()
 {
 	vtkgl::GenFramebuffers(1, &mFBO);
-	report_gl_error();
-	vtkgl::GenRenderbuffers(1, &mDSDepthBuffer);
-	report_gl_error();
 
 	glGenTextures(1, &mDSColorBuffer);
 	glActiveTexture(GL_TEXTURE11);
@@ -508,6 +497,25 @@ void GPURayCastVolumePainter::createBuffers()
 
 	vtkgl::BindFramebuffer(vtkgl::DRAW_FRAMEBUFFER, 0);
 }
+	
+void GPURayCastVolumePainter::freeDSBuffers()
+{
+	if (mDSDepthBuffer)
+	{
+		glDeleteTextures(1, &mDSDepthBuffer);
+		mDSDepthBuffer = 0;
+	}
+	if (mDSColorBuffer)
+	{
+		glDeleteTextures(1, &mDSColorBuffer);
+		mDSColorBuffer = 0;
+	}
+	if (mFBO)
+	{
+		vtkgl::DeleteFramebuffers(1, &mFBO);
+		mFBO = 0;
+	}
+}	
 
 void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
                                           bool forceCompileOnly)
