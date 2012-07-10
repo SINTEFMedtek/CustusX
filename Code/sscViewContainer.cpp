@@ -91,6 +91,17 @@ void ViewContainer::clear()
 	}
 }
 
+void ViewContainer::clearBackground()
+{
+	vtkRendererPtr renderer = vtkRendererPtr::New();
+	mRenderWindow->AddRenderer(renderer);
+	renderer->SetViewport(0,0,1,1);
+	renderer->Clear();
+	renderer->SetBackground(110.0/255.0, 111.0/255.0, 113.0/255.0);
+	renderer->Render();
+	mRenderWindow->RemoveRenderer(renderer);
+}
+	
 /**
   * Return this widget's grid layout object
   */
@@ -281,6 +292,7 @@ void ViewContainer::renderAll()
 void ViewContainer::resizeEvent( QResizeEvent *event)
 {
 	ViewQVTKWidget::resizeEvent(event);
+	clearBackground();
 	getGridLayout()->update();
 }
 
