@@ -79,7 +79,8 @@ protected:
 	bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);
 	bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
 	QString loadShaderFile(QString shaderFile);
-	void createBuffers();
+	void createDSBuffers();
+	void freeDSBuffers();
 
 	class vtkInternals;
 	vtkInternals* mInternals;
