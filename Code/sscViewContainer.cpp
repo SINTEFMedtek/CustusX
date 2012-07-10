@@ -171,8 +171,8 @@ void ViewItem::setGeometry(const QRect &r)
 	mGeometry = r;
 	QSize size = ssc::View::widget()->size();
 	double xMin = r.left()/(double)size.width();
-	double xMax = r.right()/(double)size.width();
-	double yMin = (size.height() - r.bottom()) / (double)size.height();
+	double xMax = (r.right() + 1)/(double)size.width();
+	double yMin = (size.height() - r.bottom() - 1) / (double)size.height();
 	double yMax = (size.height() - r.top()) / (double)size.height();
 	getRenderer()->SetViewport(xMin, yMin, xMax, yMax);
 	setSize(r.size());
