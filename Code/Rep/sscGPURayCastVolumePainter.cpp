@@ -421,6 +421,18 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 
 	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &mStepSize);
 	
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
+	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+	if (mResample && !vtkgl::IsFramebuffer(mFBO))
+	{
+		float factor = (float)mDownsamplePixels/(size.width() * size.height());
+		mDownsampleWidth = size.width() * factor;
+		mDownsampleHeight = size.height() * factor;
+		createDSBuffers();
+	}
+
 	QPoint origin(renderer->GetOrigin()[0], renderer->GetOrigin()[1]);
 	float viewport[4];
 	viewport[0] = origin.x();
@@ -435,21 +447,8 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		viewport[2] = mDownsampleWidth;
 		viewport[3] = mDownsampleHeight;
 	}
-		
 	mInternals->Shader->GetUniformVariables()->SetUniformf("viewport", 4, viewport);
-	
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
-	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-	if (mResample && !vtkgl::IsFramebuffer(mFBO))
-	{
-		float factor = (float)mDownsamplePixels/(size.width() * size.height());
-		mDownsampleWidth = size.width() * factor;
-		mDownsampleHeight = size.height() * factor;
-		createDSBuffers();
-	}
-
+				
 	report_gl_error();
 	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
 	{
