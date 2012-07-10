@@ -428,6 +428,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	if (mResample && !vtkgl::IsFramebuffer(mFBO))
 	{
 		float factor = (float)mDownsamplePixels/(size.width() * size.height());
+		factor = sqrt(factor);
 		mDownsampleWidth = size.width() * factor;
 		mDownsampleHeight = size.height() * factor;
 		createDSBuffers();
