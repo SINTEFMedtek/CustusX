@@ -319,9 +319,6 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	}
 	GL_TRACE("Prepare for 3D rendering");
 	report_gl_error();
-
-	GLint oldTextureUnit;
-	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
 	
 	vtkRenderWindow* renWin = renderer->GetRenderWindow();
 	if (mInternals->LastContext != renWin || mInternals->mElement.size() != mInternals->mVolumes)
@@ -445,11 +442,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	}
 		
 	mInternals->Shader->GetUniformVariables()->SetUniformf("viewport", 4, viewport);
-	
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
-	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
+
 	if (mResample && !vtkgl::IsFramebuffer(mFBO))
 	{
 		float factor = (float)mDownsamplePixels/(size.width() * size.height());
@@ -463,40 +456,32 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	{
 		mInternals->mElement[i].eachPrepareRendering();
 	}
-	mInternals->Shader->Use();
 	this->Superclass::PrepareForRendering(renderer, actor);
 
-	mInternals->Shader->Restore();
-	glBindTexture(GL_TEXTURE_3D, 0);
-	glDisable(vtkgl::TEXTURE_3D);
-
-	glActiveTexture(oldTextureUnit);
 	report_gl_error();
 	GL_TRACE("Prepare for 3D rendering complete");
 }
 
 void GPURayCastVolumePainter::createBuffers()
 {
+	GLint oldTextureUnit;
+	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
+
 	vtkgl::GenFramebuffers(1, &mFBO);
-	report_gl_error();
 	vtkgl::GenRenderbuffers(1, &mDSDepthBuffer);
-	report_gl_error();
 
 	glGenTextures(1, &mDSColorBuffer);
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, mDSColorBuffer);
-	report_gl_error();
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, mDownsampleWidth, mDownsampleHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	report_gl_error();
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	glGenTextures(1, &mDSDepthBuffer);
 	glActiveTexture(GL_TEXTURE11);
 	glBindTexture(GL_TEXTURE_2D, mDSDepthBuffer);
-	report_gl_error();
 	glTexImage2D(GL_TEXTURE_2D, 0, vtkgl::DEPTH_COMPONENT32, mDownsampleWidth, mDownsampleHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
-	report_gl_error();
+
 	glTexParameteri(GL_TEXTURE_2D, vtkgl::TEXTURE_COMPARE_MODE, GL_NONE);
 	glTexParameteri(GL_TEXTURE_2D, vtkgl::DEPTH_TEXTURE_MODE, GL_LUMINANCE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -507,6 +492,10 @@ void GPURayCastVolumePainter::createBuffers()
 	vtkgl::FramebufferTexture2D(vtkgl::DRAW_FRAMEBUFFER, vtkgl::DEPTH_ATTACHMENT, GL_TEXTURE_2D, mDSDepthBuffer, 0);
 
 	vtkgl::BindFramebuffer(vtkgl::DRAW_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_3D, 0);
+	glDisable(vtkgl::TEXTURE_3D);
+	glActiveTexture(oldTextureUnit);
+	report_gl_error();
 }
 
 void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,

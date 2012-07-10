@@ -295,11 +295,6 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 		}
 	}
 
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
-	glPixelStorei(GL_PACK_SKIP_PIXELS, 0);
-
 	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
 	{
 		mInternals->mElement[i].eachPrepareRendering();
