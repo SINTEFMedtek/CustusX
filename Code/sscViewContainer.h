@@ -114,6 +114,7 @@ private:
 	virtual void focusInEvent(QFocusEvent* event);
 	virtual void paintEvent(QPaintEvent *event);
 	virtual void resizeEvent( QResizeEvent *event);
+	virtual void clearBackground();
 
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
 };
