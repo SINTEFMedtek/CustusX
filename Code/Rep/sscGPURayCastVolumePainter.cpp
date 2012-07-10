@@ -606,7 +606,6 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 	if (mResample)
 	{
 		vtkgl::BindFramebuffer( vtkgl::DRAW_FRAMEBUFFER, mFBO);
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		GLenum status = vtkgl::CheckFramebufferStatus(vtkgl::DRAW_FRAMEBUFFER);
 		switch (status)
 		{
@@ -618,6 +617,8 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		}
 		report_gl_error();
 		glViewport(0, 0, mDownsampleWidth, mDownsampleHeight);
+		glDisable(GL_SCISSOR_TEST);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	}
 	this->Superclass::RenderInternal(renderer, actor, typeflags, forceCompileOnly);
 
