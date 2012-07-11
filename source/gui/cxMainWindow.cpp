@@ -3,6 +3,7 @@
 #include <QtGui>
 #include <QWhatsThis>
 #include "boost/scoped_ptr.hpp"
+#include "boost/bind.hpp"
 #include "sscTime.h"
 #include "sscMessageManager.h"
 #include "cxDataManager.h"
@@ -460,11 +461,19 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 	QDir().mkpath(folder);
 	QString format = ssc::timestampSecondsFormat();
 	QString filename = QDateTime::currentDateTime().toString(format) + ".png";
-	pixmap.save(folder + "/" + filename, "png");
+
+	QtConcurrent::run(boost::bind(&MainWindow::saveScreenShotThreaded, this, pixmap.toImage(), folder + "/" + filename));
+}
+
+/**Intended to be called in a separate thread.
+ * \sa saveScreenShot()
+ */
+void MainWindow::saveScreenShotThreaded(QImage pixmap, QString filename)
+{
+	pixmap.save(filename, "png");
 	ssc::messageManager()->sendInfo("Saved screenshot to " + filename);
 	ssc::messageManager()->playScreenShotSound();
 }
-
 
 void MainWindow::toggleStreamingSlot()
 {

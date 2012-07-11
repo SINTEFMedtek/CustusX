@@ -6,6 +6,7 @@
  */
 
 #include "cxImageSenderSonix.h"
+#include "sscVector3D.h"
 
 #ifdef CX_WIN32
 
@@ -49,12 +50,15 @@ QStringList ImageSenderSonix::getArgumentDescription()
 ImageSenderSonix::ImageSenderSonix(QObject* parent) :
     ImageSender(parent),
 	mSocket(0),
-	mEmitStatusMessage(false)
+	mEmitStatusMessage(false),
+	mLastFrameTimestamp(0.0),
+	mCurrentFrameTimestamp(0.0)
 {
 }
 
 ImageSenderSonix::~ImageSenderSonix()
 {
+	mTimer->stop();
 	if (mSonixGrabber)
 		{
 			mSonixGrabber->Stop();
@@ -80,6 +84,48 @@ void ImageSenderSonix::initialize(StringMap arguments)
 	connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
 	connect(this, SIGNAL(statusOnQueue(int)), this, SLOT(sendOpenIGTLinkStatusSlot(int)), Qt::QueuedConnection);//Do not work yet
 
+	this->mSonixHelper = new SonixHelper();
+
+	mTimer = new QTimer;
+	connect(mTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
+	mTimer->setInterval(10000);
+	mTimer->start();
+
+	this->initializeSonixGrabber();
+}
+
+
+void ImageSenderSonix::initializeSonixSlot()
+{
+	if(!mSonixGrabber->IsInitialized())
+	{
+		//std::cout << "initializeSonixSlot() Initializing..." << std::endl;
+		mSonixGrabber->Initialize();
+		return;
+	}
+
+	//Don't reinitialize if in freeze state
+	if(!mSonixGrabber->getFreezeState() && ssc::similar(mLastFrameTimestamp, mCurrentFrameTimestamp, 0.001))
+	{
+		std::cout << "initializeSonixSlot() Got no new frame. Reinitializing..." << std::endl;
+		// If sonix exam is closed we need to create a new mSonixGrabber
+		// Free resources. Do we need to delete?
+		mSonixGrabber->Stop();
+		std::cout << "Releasing Ultrasonix resources" << std::endl;
+		mSonixGrabber->ReleaseSystemResources();
+		disconnect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)));
+		//mSonixGrabber->Delete();
+
+		this->initializeSonixGrabber();
+	}
+	else
+	{
+		mLastFrameTimestamp = mCurrentFrameTimestamp;
+	}
+}
+
+void ImageSenderSonix::initializeSonixGrabber()
+{
 	if (!mArguments.count("ipaddress"))
 		mArguments["ipaddress"] = "127.0.0.1";
 	if (!mArguments.count("imagingmode"))
@@ -106,7 +152,6 @@ void ImageSenderSonix::initialize(StringMap arguments)
 	//std::cout << "acquisitionDataType: " << acquisitionDataType << " ";
 	//std::cout << "GetAcquisitionDataType: " << mSonixGrabber->GetAcquisitionDataType() << std::endl;
 
-	this->mSonixHelper = new SonixHelper();
 	mSonixGrabber->setSonixHelper(this->mSonixHelper);
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 }
@@ -127,6 +172,8 @@ void ImageSenderSonix::stopStreaming()
 
 void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 {
+	mCurrentFrameTimestamp = frame.mTimestamp;
+
 	if(!mSocket)
 		{
 			return;

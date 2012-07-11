@@ -67,6 +67,21 @@ include_directories(
 # create the target
 add_library( cxPluginAcquisitionGUI ${SOURCE_FILES} )
 target_link_libraries( cxPluginAcquisitionGUI cxPluginAcquisitionLogic cxPluginAlgorithmGUI cxGui )
+
+#------------------------------------------------------------------------------
+# Cotire - pch and unity builds
+#------------------------------------------------------------------------------
+if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+    cotire(cxPluginAcquisitionGUI)
+    if(COTIRE_ADD_UNITY_BUILDS)
+        target_link_libraries(cxPluginAcquisitionGUI_unity 
+        		cxPluginAcquisitionLogic 
+        		cxPluginAlgorithmGUI 
+        		cxGui
+        		)
+    endif(COTIRE_ADD_UNITY_BUILDS)
+endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+
 # =========================================================
 
 

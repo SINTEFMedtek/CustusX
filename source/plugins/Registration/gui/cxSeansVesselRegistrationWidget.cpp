@@ -12,8 +12,8 @@
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxRegistrationDataAdapters.h"
-#include "vesselReg/SeansVesselReg.cxx"
-
+#include "vesselReg/SeansVesselReg.hxx"
+#include "sscMesh.h"
 #include "cxViewManager.h"
 #include "cxView3D.h"
 #include "sscGeometricRep.h"

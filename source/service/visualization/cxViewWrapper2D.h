@@ -30,6 +30,7 @@
 #include "sscBoundingBox3D.h"
 #include "sscTransform3D.h"
 #include "sscConfig.h"
+#include "sscPointMetricRep2D.h"
 
 namespace ssc
 {
@@ -60,6 +61,7 @@ public:
 	virtual void setZoom2D(SyncedValuePtr value);
 	virtual void setOrientationMode(SyncedValuePtr value);
 	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
+	virtual void setViewGroup(ViewGroupDataPtr group);
 
 	static bool overlayIsEnabled();
 
@@ -74,6 +76,7 @@ private slots:
 	void global2DZoomActionSlot();
 	void orientationModeChanged();
 	void settingsChangedSlot(QString key);
+	void optionChangedSlot();
 
 private:
 	virtual void setZoomFactor2D(double zoomFactor);
@@ -99,6 +102,8 @@ private:
 	virtual void meshAdded(ssc::MeshPtr mesh);
 	virtual void imageRemoved(const QString& uid);
 	virtual void meshRemoved(const QString& uid);
+	virtual void pointMetricAdded(ssc::PointMetricPtr mesh);
+	virtual void pointMetricRemoved(const QString& uid);
 
 	virtual void dataAdded(ssc::DataPtr data);
 	virtual void dataRemoved(const QString& uid);
@@ -106,9 +111,11 @@ private:
 	void resetMultiSlicer();
 	ssc::Texture3DSlicerRepPtr mMultiSliceRep;
 
+	ssc::GeometricRep2DPtr mPickerGlyphRep;
 	ssc::SliceProxyPtr mSliceProxy;
 	ssc::SliceRepSWPtr mSliceRep;
 	std::map<QString, ssc::GeometricRep2DPtr> mGeometricRep;
+	std::map<QString, ssc::PointMetricRep2DPtr> mPointMetricRep;
 	ssc::ToolRep2DPtr mToolRep2D;
 //  ssc::OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
 	ssc::OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;

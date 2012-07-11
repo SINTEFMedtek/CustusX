@@ -18,7 +18,9 @@ namespace cx
 {
 Contour::Contour() :
     ThreadedTimedAlgorithm<vtkPolyDataPtr>("surface", 20)
-{}
+{
+	mUseDefaultMessages = false;
+}
 
 Contour::~Contour()
 {}
@@ -34,7 +36,7 @@ void Contour::setInput(ssc::ImagePtr image, QString outputBasePath, int threshol
 	mUseSmoothing = smoothing;
 	mPreserveTopology = preserveTopology;
 
-	this->generate();
+//	this->generate();
 }
 
 ssc::MeshPtr Contour::getOutput()
@@ -61,13 +63,14 @@ void Contour::postProcessingSlot()
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveMesh(mOutput, mOutputBasePath);
 
-  ssc::messageManager()->sendSuccess("Created contour \"" + mOutput->getName()+"\"");
+  ssc::messageManager()->sendSuccess(QString("Created contour \"%1\" [%2s]").arg(mOutput->getName()).arg(this->getSecondsPassedAsString()));
 
 //  emit finished();
 }
 
 vtkPolyDataPtr Contour::calculate()
 {
+	ssc::messageManager()->sendInfo(QString("Creating contour from \"%1\"...").arg(mInput->getName()));
 
   //Shrink input volume
   vtkImageShrink3DPtr shrinker = vtkImageShrink3DPtr::New();

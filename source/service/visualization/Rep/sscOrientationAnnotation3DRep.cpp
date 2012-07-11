@@ -140,10 +140,12 @@ void OrientationAnnotation3DRep::setMarkerFilename(const QString filename)
 
 vtkPropPtr OrientationAnnotation3DRep::readMarkerFromFile(const QString filename)
 {
-	if (filename.isEmpty() || !QFileInfo(filename).exists())
+	if (filename.isEmpty() || !QFileInfo(filename).exists() || QFileInfo(filename).isDir())
 	{
 		return this->createCube();
 	}
+
+	std::cout << "OrientationAnnotation3DRep::readMarkerFromFile " << filename << std::endl;
 
 	vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
 	STLReader->SetFileName(cstring_cast(filename));

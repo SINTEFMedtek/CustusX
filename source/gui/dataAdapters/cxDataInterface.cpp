@@ -338,8 +338,13 @@ QString ActiveImageStringDataAdapter::getHelp() const
 //---------------------------------------------------------
 
 SelectImageStringDataAdapter::SelectImageStringDataAdapter() :
-    mValueName("Select volume")
+    mValueName("Select volume"),
+    mHelp("Select a volume")
 {
+}
+void SelectImageStringDataAdapter::setHelp(QString text)
+{
+	mHelp = text;
 }
 QString SelectImageStringDataAdapter::getValueName() const
 {
@@ -360,7 +365,7 @@ QString SelectImageStringDataAdapter::getValue() const
 }
 QString SelectImageStringDataAdapter::getHelp() const
 {
-  return "Select a volume";
+  return mHelp;
 }
 ssc::ImagePtr SelectImageStringDataAdapter::getImage()
 {
@@ -532,12 +537,13 @@ bool SelectDataStringDataAdapter::setValue(const QString& value)
   if (mData && value==mData->getUid())
     return false;
   ssc::DataPtr temp = ssc::dataManager()->getData(value);
-  if(!temp)
-    return false;
+//  if(!temp) // wrong: must accept to set to zero
+//    return false;
 
   mData = temp;
   emit changed();
-  emit dataChanged(value);
+//  emit dataChanged(value);
+  emit dataChanged(this->getValue());
   return true;
 }
 QString SelectDataStringDataAdapter::getValue() const

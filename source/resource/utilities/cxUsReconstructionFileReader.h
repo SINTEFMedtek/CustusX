@@ -107,12 +107,13 @@ public:
 	std::vector<ssc::TimedPosition> readPositions(QString fileName);
 	ssc::USFrameDataPtr readUsDataFile(QString mhdFileName, bool angio = false);
 
-	void readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName);
-	ProbeXmlConfigParser::Configuration readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath);
-
 private:
 	void readPositionFile(QString posFile, bool alsoReadTimestamps, std::vector<ssc::TimedPosition>* timedPos);
 	void readTimeStampsFile(QString fileName, std::vector<ssc::TimedPosition>* timedPos);
+	void readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName);
+	ProbeXmlConfigParser::Configuration readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath);
+	ssc::ProbeData readProbeDataFromFile(QString mhdFileName);
+	ssc::ProbeData readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath);
 
 	ssc::ImagePtr createMaskFromConfigParams(ssc::USReconstructInputData data);
 	ssc::ImagePtr generateMask(ssc::USReconstructInputData data);
