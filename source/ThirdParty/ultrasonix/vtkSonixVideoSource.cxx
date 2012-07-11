@@ -162,6 +162,8 @@ vtkSonixVideoSource::vtkSonixVideoSource()
 
   lastRoiUlx = 0;
   lastRoiBry = 0;
+
+  mFirstConnect = true;
 }
 
 //----------------------------------------------------------------------------
@@ -276,7 +278,7 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 		}
 	else
 		{
-			//std::cout << "No missed frames" << std::endl;
+			//std::cout << "No missed frames. Frame nr: " << frmnum << std::endl;
 		}
 
 
@@ -348,12 +350,31 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	// get the pointer to the correct location in the frame buffer, where this data needs to be copied
 	unsigned char *frameBufferPtr = (unsigned char *)((reinterpret_cast<vtkUnsignedCharArray*>(this->FrameBuffer[index]))->GetPointer(0));
 
+	// Get ROI. Use this to clip video before sending
+  uROI roi = this->DataDescriptor->roi;
+  //Try just to update FrameBufferExtent first
+  //std::cout << "FrameBufferExtent: " << this->FrameBufferExtent[0] << " " << this->FrameBufferExtent[1] << " " ;
+  //std::cout << this->FrameBufferExtent[2] << " " << this->FrameBufferExtent[3] << std::endl;
+  this->FrameBufferExtent[0] = roi.ulx;
+  this->FrameBufferExtent[1] = roi.urx;
+  this->FrameBufferExtent[2] = roi.uly;
+  this->FrameBufferExtent[3] = roi.bly;
+
+  //Error in roi info?
+  if ((this->FrameBufferExtent[3]-this->FrameBufferExtent[2]+1) >= this->FrameSize[1])
+  {
+	  this->FrameBufferExtent[3] = this->FrameBufferExtent[2] + this->FrameSize[1] -1;
+	  //std::cout << "Error in roi info. New FrameBufferExtent[3]: " << this->FrameBufferExtent[3] << std::endl;
+  }
+
+  //std::cout << "new FrameBufferExtent: " << this->FrameBufferExtent[0] << " " << this->FrameBufferExtent[1] << " " ;
+  //std::cout << this->FrameBufferExtent[2] << " " << this->FrameBufferExtent[3] << std::endl;
    
 	int outBytesPerRow = ((this->FrameBufferExtent[1]- this->FrameBufferExtent[0]+1)* this->FrameBufferBitsPerPixel + 7)/8;
 	outBytesPerRow += outBytesPerRow % this->FrameBufferRowAlignment;
 
 	int inBytesPerRow = this->FrameSize[0] * this->FrameBufferBitsPerPixel/8;
-  
+
 	int rows = this->FrameBufferExtent[3]-this->FrameBufferExtent[2]+1;
 
 	//check if the data received has the same size in bytes as expected
@@ -361,6 +382,12 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	  {
 	  //error; data discrepancy!
 	  //what to do?
+		  std::cout << "Data discrepancy! size: " << sz << " inBytesPerRow: " << inBytesPerRow <<" rows: " << rows <<  std::endl;
+		  std::cout << "FrameSize[0]: " << this->FrameSize[0] << " * FrameBufferBitsPerPixel: " << this->FrameBufferBitsPerPixel << std::endl;
+		  rows = sz / inBytesPerRow;
+		  std::cout << "Trying to fix this by setting rows = " << rows << std::endl;
+		  //TODO: more work is needed here to make sure this works for all probes and depths
+		  //return;
 	  }
 
 	// for frame containing FC (frame count) in the beginning for data coming from cine, jump 2 bytes
@@ -383,6 +410,9 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	  }
 	else
 	  {
+		  //std::cout << "outBytesPerRow: " << outBytesPerRow;
+		  //std::cout << " rows: " << rows;
+		  //std::cout << " inBytesPerRow: " << inBytesPerRow << std::endl;
 	  while (--rows >= 0)
 	    {
 	    memcpy(frameBufferPtr,deviceDataPtr,outBytesPerRow);
@@ -427,6 +457,10 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   else
 	  std::cout << "Unknown pixel format (not 8 or 32)" << std::endl;
   
+  //These values may be modified. Refresh
+  rows = this->FrameBufferExtent[3]-this->FrameBufferExtent[2]+1;
+  frameBufferPtr = (unsigned char *)((reinterpret_cast<vtkUnsignedCharArray*>(this->FrameBuffer[index]))->GetPointer(0));
+
   frame.mWidth = outBytesPerRow / this->NumberOfScalarComponents;
   frame.mHeight = rows;
   frame.mFirstPixel = frameBufferPtr;
@@ -436,8 +470,11 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 
   frame.mSpacing[0] = this->DataSpacing[0];
   frame.mSpacing[1] = this->DataSpacing[1];
-  frame.mOrigin[0] = this->DataOrigin[0];
-  frame.mOrigin[1] = this->DataOrigin[1];
+  //frame.mOrigin[0] = this->DataOrigin[0];
+  //frame.mOrigin[1] = this->DataOrigin[1];
+  //Modify origin by ROI
+  frame.mOrigin[0] = this->DataOrigin[0] - roi.ulx;
+  frame.mOrigin[1] = this->DataOrigin[1] - roi.uly;
   //std::cout << "spacing: " << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl;
   //std::cout << "origin: " << this->DataOrigin[0] << ", " << this->DataOrigin[1] << std::endl;
 
@@ -448,21 +485,30 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 //    vtkErrorMacro("Couldn't request the angle.");
 //  std::cout << "cx-tx angle =" << angle << std::endl;
 
-  uROI roi = this->DataDescriptor->roi;
   //std::cout << "bottom left" << this->DataDescriptor->roi.blx << std::endl;
   //std::cout << "bottom right" << this->DataDescriptor->roi.brx << std::endl;
 //  std::cout << "ulx: " << roi.ulx << " uly: " << roi.uly << " urx: "  << roi.urx << " ury: " << roi.ury << std::endl;
 //  std::cout << "blx: " << roi.blx << " bly: " << roi.bly << " brx: "  << roi.brx << " bry: " << roi.bry << std::endl;
 
   //Copy ROI info
-  frame.ulx = roi.ulx;
-  frame.uly = roi.uly;
-  frame.urx = roi.urx;
-  frame.ury = roi.ury;
-  frame.brx = roi.brx;
-  frame.bry = roi.bry;
-  frame.blx = roi.blx;
-  frame.bly = roi.bly;
+  //frame.ulx = roi.ulx;
+  //frame.uly = roi.uly;
+  //frame.urx = roi.urx;
+  //frame.ury = roi.ury;
+  //frame.brx = roi.brx;
+  //frame.bry = roi.bry;
+  //frame.blx = roi.blx;
+  //frame.bly = roi.bly;
+  
+  // Just set ROI to FrameBufferExtent
+  frame.ulx = this->FrameBufferExtent[0] - this->FrameBufferExtent[0];
+  frame.uly = this->FrameBufferExtent[2] - this->FrameBufferExtent[2];
+  frame.urx = this->FrameBufferExtent[1] - this->FrameBufferExtent[0];
+  frame.ury = this->FrameBufferExtent[2] - this->FrameBufferExtent[2];
+  frame.brx = this->FrameBufferExtent[1] - this->FrameBufferExtent[0];
+  frame.bry = this->FrameBufferExtent[3] - this->FrameBufferExtent[2];
+  frame.blx = this->FrameBufferExtent[0] - this->FrameBufferExtent[0];
+  frame.bly = this->FrameBufferExtent[3] - this->FrameBufferExtent[2];
 
   // Test if the sonix status message is sent
   //Only send status message when info is changed
@@ -482,6 +528,23 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   this->FrameBufferMutex->Unlock();
 }
 
+int vtkSonixVideoSource::IsInitialized()
+{
+	return this->Initialized;
+}
+bool vtkSonixVideoSource::getFreezeState()
+{
+	// Also return false if data is not available, as freeze state is set
+	// when Sonix exam is not in research state
+	if(!this->ult->isDataAvailable((uData)(AcquisitionDataType)))
+		return false;
+
+	if (!this->Initialized)
+		return false;
+	else
+		return this->ult->getFreezeState();
+}
+
 //----------------------------------------------------------------------------
 void vtkSonixVideoSource::Initialize()
 {
@@ -498,6 +561,26 @@ void vtkSonixVideoSource::Initialize()
     {
     return;
     }
+	HWND phandle = FindWindow(NULL, "Sonix: No connections");
+	if(phandle)
+	{
+		if (mFirstConnect)
+		{
+			std::cout << "Found Sonix window. First connect - Waiting 60 sec to connect" << std::endl;
+			//Need to delay to make sure the Sonix exam is finished initializing...
+			vtksys::SystemTools::Delay(60000);
+			mFirstConnect = false;
+		}
+		else
+		{
+			std::cout << "Found Sonix window. Reconnect - Waiting 15 sec to connect" << std::endl;
+			vtksys::SystemTools::Delay(15000);
+		}
+	} else 
+	{
+		//std::cout << "Didn't find Sonix window" << std::endl;
+		return;
+	}
 
    
   // 1) connect to sonix machine.
@@ -631,6 +714,8 @@ void vtkSonixVideoSource::Initialize()
 void vtkSonixVideoSource::ReleaseSystemResources()
 {
   this->ult->disconnect();
+  // Set system to not initialized after release
+  this->Initialized = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -671,8 +756,9 @@ void vtkSonixVideoSource::Record()
     {
     this->Recording = 1;
     this->Modified();
-    if(this->ult->getFreezeState())
-		this->ult->toggleFreeze();
+    //Don't mess with freeze
+//    if(this->ult->getFreezeState())
+//		this->ult->toggleFreeze();
     }
 }
     
@@ -690,8 +776,8 @@ void vtkSonixVideoSource::Stop()
     this->Recording = 0;
     this->Modified();
 
-	if (!this->ult->getFreezeState())
-		this->ult->toggleFreeze();
+//	if (!this->ult->getFreezeState())
+//		this->ult->toggleFreeze();
     }
   else if (this->Playing)
     {
@@ -1171,6 +1257,10 @@ void vtkSonixVideoSource::DoFormatSetup()
   //set the frame size from the data descriptor, 
   this->FrameSize[0] = this->DataDescriptor->w;
   this->FrameSize[1] = this->DataDescriptor->h;
+  //std::cout << "width: " << this->DataDescriptor->w << " height: " << this->DataDescriptor->h << std::endl; 
+	// Set frame size based on ROI. TODO: fix for sector probes
+  //this->FrameSize[0] = this->DataDescriptor->roi.urx - this->DataDescriptor->roi.ulx;
+  //this->FrameSize[1] = this->DataDescriptor->roi.bly - this->DataDescriptor->roi.ury;
   this->FrameBufferBitsPerPixel = this->DataDescriptor->ss;
   switch (this->AcquisitionDataType)
     {
@@ -1186,8 +1276,9 @@ void vtkSonixVideoSource::DoFormatSetup()
 	case udtBPre:
 	case udtMPre:
 	case udtElastoPre: //this data type does not have a FC at the start
-		this->FrameSize[0] = this->DataDescriptor->h;
-		this->FrameSize[1] = this->DataDescriptor->w;  		
+		//Not needed? Defined above
+//		this->FrameSize[0] = this->DataDescriptor->h;
+//		this->FrameSize[1] = this->DataDescriptor->w;
 		this->OutputFormat = VTK_LUMINANCE;
         this->NumberOfScalarComponents = 1;
         break;
@@ -1196,8 +1287,9 @@ void vtkSonixVideoSource::DoFormatSetup()
 	case udtColorRF:
 	case udtPWRF:
 	case udtRF:
-		this->FrameSize[0] = this->DataDescriptor->h;
-		this->FrameSize[1] = this->DataDescriptor->w;  
+		//Not needed?
+//		this->FrameSize[0] = this->DataDescriptor->h;
+//		this->FrameSize[1] = this->DataDescriptor->w;
 		this->OutputFormat = VTK_LUMINANCE;
         this->NumberOfScalarComponents = 1;
         break;

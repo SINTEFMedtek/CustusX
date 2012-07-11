@@ -24,6 +24,7 @@
 
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
+#include "sscVector3D.h"
 
 int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
 {
@@ -133,6 +134,10 @@ IGTLinkClient::IGTLinkClient(QString address, int port, QObject* parent) :
 				QThread(parent), mHeadingReceived(false), mAddress(address), mPort(port)
 {
 //  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
+	calibrateMsgTimeStamp = true;
+	mGeneratingTimeCalibration = false;
+	mLastReferenceTimestampDiff = 0.0;
+	mLastTimeStamps.reserve(20);
 }
 
 void IGTLinkClient::run()
@@ -200,6 +205,75 @@ void IGTLinkClient::errorSlot(QAbstractSocket::SocketError socketError)
 									+ mSocket->errorString());
 }
 
+/**
+ * Calibrate the time stamps of the incoming message based on the computer clock.
+ * Calibration is based on an average of several of the last messages.
+ * The calibration is updated every 20-30 sec.
+ */
+void IGTLinkClient::calibrateTimeStamp(igtl::ImageMessage::Pointer imgMsg)
+{
+	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+	imgMsg->GetTimeStamp(timestamp);
+	double timestamp_ms = timestamp->GetTimeStamp() * 1000;
+	QDateTime timestamp_dt = QDateTime::fromMSecsSinceEpoch(timestamp_ms);
+
+	if (ssc::similar(mLastReferenceTimestampDiff, 0.0, 0.000001))
+	{
+		mLastReferenceTimestampDiff = timestamp_dt.msecsTo(QDateTime::currentDateTime());
+//		std::cout << "First timestamp calib: " << mLastReferenceTimestampDiff << " ms" << std::endl;
+	}
+
+	// Start collecting time stamps if 20 sec since last calibration time
+	if(mLastSyncTime.isNull() || ( mLastSyncTime.msecsTo(QDateTime::currentDateTime()) > 2000) )
+		mGeneratingTimeCalibration = true;
+
+	if(mGeneratingTimeCalibration)
+		mLastTimeStamps.push_back(timestamp_dt.msecsTo(QDateTime::currentDateTime()));
+
+	// Perform time calibration if enough time stamps have been collected
+	if(mLastTimeStamps.size() >= 20)
+	{
+		std::sort(mLastTimeStamps.begin(), mLastTimeStamps.end(), AbsDoubleLess(mLastReferenceTimestampDiff));
+
+		//debug print
+	  /*for (std::vector<double>::const_iterator citer = mLastTimeStamps.begin();
+	      citer != mLastTimeStamps.end(); ++citer)
+	  {
+			std::cout << *citer - mLastReferenceTimestampDiff << " ";
+	  }
+	  std::cout << endl;*/
+
+		mLastTimeStamps.resize(15);
+
+		//debug print
+	  /*for (std::vector<double>::const_iterator citer = mLastTimeStamps.begin();
+	      citer != mLastTimeStamps.end(); ++citer)
+	  {
+			std::cout << *citer - mLastReferenceTimestampDiff << " ";
+	  }
+	  std::cout << endl;*/
+
+		double sumTimes = 0;
+	  for (std::vector<double>::const_iterator citer = mLastTimeStamps.begin();
+	      citer != mLastTimeStamps.end(); ++citer)
+	  {
+	  	sumTimes += *citer;
+	  }
+	  mLastReferenceTimestampDiff = sumTimes / 15.0;
+
+//		std::cout << "Timestamp calib: " << mLastReferenceTimestampDiff << " ms" << std::endl;
+
+		//Reset
+		mLastTimeStamps.clear();
+		mLastSyncTime = QDateTime::currentDateTime();
+		mGeneratingTimeCalibration = false;
+	}
+
+	// Update imgMsg timestamp
+	timestamp->SetTime((timestamp_ms + mLastReferenceTimestampDiff) / 1000.0); // in sec
+	imgMsg->SetTimeStamp(timestamp);
+}
+
 /** add the message to a thread-safe queue
  */
 void IGTLinkClient::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
@@ -211,6 +285,19 @@ void IGTLinkClient::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
 		emit fps(mFPSTimer.getFPS());
 		mFPSTimer.reset(2000);
 	}
+
+	if (calibrateMsgTimeStamp)
+		calibrateTimeStamp(imgMsg);
+
+	//Get modified timestamp
+	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+	imgMsg->GetTimeStamp(timestamp);
+	double timestamp_ms = timestamp->GetTimeStamp() * 1000;
+	QDateTime timestamp_dt = QDateTime::fromMSecsSinceEpoch(timestamp_ms);
+
+//	std::cout << "Queue size: " << mMutexedImageMessageQueue.size() << "\tTimestamp calib: " << mLastReferenceTimestampDiff << " ms" ;//<< std::endl;
+//	std::cout << "\t diff: " << timestamp_dt.msecsTo(QDateTime::currentDateTime()) << std::endl;
+
 
 	QMutexLocker sentry(&mImageMutex);
 	mMutexedImageMessageQueue.push_back(imgMsg);
@@ -256,6 +343,18 @@ IGTLinkUSStatusMessage::Pointer IGTLinkClient::getLastSonixStatusMessage()
 
 void IGTLinkClient::readyReadSlot()
 {
+	// read messages until one fails
+	while (this->readOneMessage());
+
+//	readOneMessage();
+}
+
+/**Read one IGTLink message from the socket.
+ * Return false if there was not enough data to
+ * read the entire message.
+ */
+bool IGTLinkClient::readOneMessage()
+{
 
 //  std::cout << "tick " << std::endl;
 
@@ -270,7 +369,7 @@ void IGTLinkClient::readyReadSlot()
 		{
 			//std::cout << "Incomplete heading received, ignoring. " << std::endl;
 			//std::cout << "available: " << mSocket->bytesAvailable() << ", needed " << mHeaderMsg->GetPackSize() << std::endl;
-			return;
+			return false;
 		}
 
 		// after peek: read to increase pos
@@ -314,8 +413,11 @@ void IGTLinkClient::readyReadSlot()
 
 		if (success)
 			mHeadingReceived = false; // restart
+		else
+			return false;
 	}
 //  std::cout << "  tock " << std::endl;
+	return true;
 }
 
 bool IGTLinkClient::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
@@ -348,7 +450,6 @@ bool IGTLinkClient::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::
 
 bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
-
 	// Create a message buffer to receive transform data
 	igtl::ImageMessage::Pointer imgMsg;
 	imgMsg = igtl::ImageMessage::New();
@@ -367,44 +468,16 @@ bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointe
 	// Deserialize the transform data
 	// If you want to do a CRC check, call Unpack(1).
 	// If you want to skip CRC check, call Unpack() without argument.
-//  std::cout << "unpack" << std::endl;
 	int c = imgMsg->Unpack();
-//  int a = (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF);
-//  int b = c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF);
-//  std::cout << "finished unpack " << c << " " << a << " " << b  << std::endl;
 
 	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
 	{
-////    std::cout << "ok" << std::endl;
-//    // Retrive the image data
-//    int size[3]; // image dimension
-//    float spacing[3]; // spacing (mm/pixel)
-//    int svsize[3]; // sub-volume size
-//    int svoffset[3]; // sub-volume offset
-//    int scalarType; // scalar type
-//
-//    scalarType = imgMsg->GetScalarType();
-//    imgMsg->GetDimensions(size);
-//    imgMsg->GetSpacing(spacing);
-//    imgMsg->GetSubVolume(svsize, svoffset);
-
-//    std::cerr << "Device Name           : " << imgMsg->GetDeviceName() << std::endl;
-//    std::cerr << "Scalar Type           : " << scalarType << std::endl;
-//    std::cerr << "Dimensions            : (" << size[0] << ", " << size[1] << ", " << size[2] << ")" << std::endl;
-//    std::cerr << "Spacing               : (" << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << ")"
-//        << std::endl;
-//    std::cerr << "Sub-Volume dimensions : (" << svsize[0] << ", " << svsize[1] << ", " << svsize[2] << ")" << std::endl;
-//    std::cerr << "Sub-Volume offset     : (" << svoffset[0] << ", " << svoffset[1] << ", " << svoffset[2] << ")"
-//        << std::endl;
-
 		this->addImageToQueue(imgMsg);
-
 		return true;
 	}
 
 	std::cout << "body crc failed!" << std::endl;
 	return true;
-
 }
 
 } //end namespace cx

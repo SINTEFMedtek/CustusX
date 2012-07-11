@@ -10,6 +10,8 @@
 
 SET( CX_QT_MOC_HEADER_FILES
     cxTimedAlgorithm.h
+    cxThreadedTimedAlgorithm.h
+    cxCompositeTimedAlgorithm.h
 )
 
 SET ( cxAlgorithms_Res_SOURCE
@@ -26,6 +28,12 @@ SET ( cxAlgorithms_Res_SOURCE
     sscImageAlgorithms.cpp
     cxTimedAlgorithm.h
     cxTimedAlgorithm.cpp
+    cxThreadedTimedAlgorithm.h
+    cxThreadedTimedAlgorithm.cpp
+    cxCompositeTimedAlgorithm.h
+    cxCompositeTimedAlgorithm.cpp
+    cxAlgorithmHelpers.h
+    cxAlgorithmHelpers.cpp
 )
 
 include_directories(

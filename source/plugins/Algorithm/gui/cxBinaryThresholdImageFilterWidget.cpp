@@ -30,7 +30,9 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   toptopLayout->addStretch();
 
   connect(mSegmentationAlgorithm.get(), SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
+  connect(mSegmentationAlgorithm.get(), SIGNAL(aboutToStart()), this, SLOT(preprocessSegmentation()));
   connect(mContourAlgorithm.get(), SIGNAL(finished()), this, SLOT(handleContourFinishedSlot()));
+  connect(mContourAlgorithm.get(), SIGNAL(aboutToStart()), this, SLOT(preprocessContour()));
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
@@ -83,7 +85,7 @@ void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
   mSelectedImage->setValue(value);
 }
 
-void BinaryThresholdImageFilterWidget::segmentSlot()
+void BinaryThresholdImageFilterWidget::preprocessSegmentation()
 {
 	patientService()->getThresholdPreview()->removePreview(this);
 
@@ -92,6 +94,11 @@ void BinaryThresholdImageFilterWidget::segmentSlot()
   mSegmentationAlgorithm->setInput(mSelectedImage->getImage(), outputBasePath, mSegmentationThresholdAdapter->getValue(), mUseSmothing, mSmoothingSigmaAdapter->getValue());
 
 //  mStatusLabel->setText("<font color=orange> Generating segmentation... Please wait!</font>\n");
+}
+
+void BinaryThresholdImageFilterWidget::segmentSlot()
+{
+	mSegmentationAlgorithm->execute();
 }
 
 void BinaryThresholdImageFilterWidget::handleFinishedSlot()
@@ -104,6 +111,25 @@ void BinaryThresholdImageFilterWidget::handleFinishedSlot()
   	this->generateSurface();
 //  mStatusLabel->setText("<font color=green> Done. </font>\n");
 //  emit outputImageChanged(segmentedImage->getUid());
+
+  emit outputImageChanged(segmentedImage->getUid());
+}
+
+
+void BinaryThresholdImageFilterWidget::preprocessContour()
+{
+	  ssc::ImagePtr segmentedImage = mSegmentationAlgorithm->getOutput();
+	  if(!segmentedImage)
+	    return;
+
+	  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
+	  double decimation = 0.8;
+	  double threshold = 1;/// because the segmented image is 0..1
+	  bool reduceResolution = false;
+	  bool smoothing = true;
+
+	  mContourAlgorithm->setInput(segmentedImage, outputBasePath, threshold, decimation, reduceResolution, smoothing);
+	//  mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
 }
 
 void BinaryThresholdImageFilterWidget::generateSurface()
@@ -111,15 +137,7 @@ void BinaryThresholdImageFilterWidget::generateSurface()
   ssc::ImagePtr segmentedImage = mSegmentationAlgorithm->getOutput();
   if(!segmentedImage)
     return;
-
-  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
-  double decimation = 0.8;
-  double threshold = 1;/// because the segmented image is 0..1
-  bool reduceResolution = false;
-  bool smoothing = true;
-
-  mContourAlgorithm->setInput(segmentedImage, outputBasePath, threshold, decimation, reduceResolution, smoothing);
-//  mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
+  mContourAlgorithm->execute();
 }
 
 void BinaryThresholdImageFilterWidget::handleContourFinishedSlot()
@@ -136,7 +154,7 @@ void BinaryThresholdImageFilterWidget::handleContourFinishedSlot()
 
 //  mStatusLabel->setText("<font color=green> Done. </font>\n");
 
-  emit outputImageChanged(segmentedImage->getUid());
+//  emit outputImageChanged(segmentedImage->getUid());
 }
 
 void BinaryThresholdImageFilterWidget::toogleBinarySlot(bool on)

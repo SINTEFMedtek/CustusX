@@ -51,6 +51,7 @@ private:
   bool writeUSImages(QString reconstructionFolder, QString calibrationFile);
   QString copyCalibrationFile(QString reconstructionFolder);
   void copyProbeCalibConfigsXml(QString reconstructionFolder);
+  void writeProbeConfiguration(QString reconstructionFolder);
 
   void report();
 

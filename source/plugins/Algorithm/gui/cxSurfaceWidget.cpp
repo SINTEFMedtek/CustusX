@@ -31,6 +31,7 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
 {
 	mContourAlgorithm.reset(new Contour());
   connect(mContourAlgorithm.get(), SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
+  connect(mContourAlgorithm.get(), SIGNAL(aboutToStart()), this, SLOT(preprocessContour()));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
@@ -86,7 +87,8 @@ void SurfaceWidget::setImageInputSlot(QString value)
   mSelectedImage->setValue(value);
 }
 
-void SurfaceWidget::surfaceSlot()
+
+void SurfaceWidget::preprocessContour()
 {
 	patientService()->getThresholdPreview()->removePreview(this);
 
@@ -97,6 +99,11 @@ void SurfaceWidget::surfaceSlot()
   		decimation, mReduceResolution, mSmoothing, mPreserveTopology);
 
 //  mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
+}
+
+void SurfaceWidget::surfaceSlot()
+{
+	mContourAlgorithm->execute();
 }
 
 void SurfaceWidget::handleFinishedSlot()

@@ -89,6 +89,8 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
 						timestamps.front().mTime,
 						timestamps.back().mTime);
 		current.mUid = allFiles[i];
+		current.mGroup = "acquisition";
+		current.mColor = QColor::fromHsv(36, 255, 222);
 
 		events.push_back(current);
 

@@ -33,7 +33,7 @@ typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
  * \ingroup cxServicePatient
  *
  * \date 12. okt. 2011
- * \\author Ole Vegard Solberg, SINTEF
+ * \author Ole Vegard Solberg, SINTEF
  */
 class ThresholdPreview: public QObject
 {

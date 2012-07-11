@@ -3,6 +3,7 @@
 #include "itkConnectedThresholdImageFilter.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "cxAlgorithmHelpers.h"
 
 #include "sscDataManager.h"
 #include "sscRegistrationTransform.h"

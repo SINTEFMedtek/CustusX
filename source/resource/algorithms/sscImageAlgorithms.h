@@ -35,6 +35,7 @@ namespace ssc
 ImagePtr resampleImage(ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
 ImagePtr resampleImage(ImagePtr image, Transform3D refMi);
 ImagePtr cropImage(ImagePtr image);
+ImagePtr duplicateImage(ImagePtr image);
 vtkImageDataPtr convertImageToUnsigned(ImagePtr image);
 
 /**
