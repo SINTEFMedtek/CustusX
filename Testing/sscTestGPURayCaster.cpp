@@ -49,9 +49,19 @@ void TestGPURayCaster::testSetImages()
 void TestGPURayCaster::testParameters()
 {
 	uint64_t mTime = mRep->mActor->GetMTime();
+	CPPUNIT_ASSERT(!mRep->mPainter->mShouldResample);
+	CPPUNIT_ASSERT_EQUAL(0, mRep->mPainter->mDownsamplePixels);
+	mRep->enableImagePlaneDownsampling(10000);
+	CPPUNIT_ASSERT_EQUAL(10000, mRep->mPainter->mDownsamplePixels);
+	CPPUNIT_ASSERT(mRep->mPainter->mShouldResample);
 	CPPUNIT_ASSERT(mRep->mActor->GetMTime() > mTime);
+	
 	mTime = mRep->mActor->GetMTime();
+	mRep->disableImagePlaneDownsampling();
+	CPPUNIT_ASSERT(!mRep->mPainter->mShouldResample);
+	CPPUNIT_ASSERT(mRep->mActor->GetMTime() > mTime);
 
+	mTime = mRep->mActor->GetMTime();
 	CPPUNIT_ASSERT_EQUAL((float)1.0, mRep->mPainter->mStepSize);
 	mRep->setStepSize(2.0);
 	CPPUNIT_ASSERT_EQUAL((float)2.0, mRep->mPainter->mStepSize);
