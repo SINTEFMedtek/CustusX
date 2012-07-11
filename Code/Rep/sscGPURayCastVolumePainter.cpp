@@ -637,7 +637,6 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		GL_TRACE("Before upscale");
 		glViewport(origin.x(), origin.y(), size.width(), size.height());
 		glDisable(GL_SCISSOR_TEST);
-		mUpscaleShader->Use();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, mDSDepthBuffer);
 		glActiveTexture(GL_TEXTURE1);
@@ -646,6 +645,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		mUpscaleShader->GetUniformVariables()->SetUniformi("colors", 1, &var);
 		var = 0;
 		mUpscaleShader->GetUniformVariables()->SetUniformi("depth", 1, &var);
+		mUpscaleShader->Use();
 		glBegin(GL_QUADS);
 		glVertex3f(-1,-1,0);
 		glVertex3f(-1,1,0);
