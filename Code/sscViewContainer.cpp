@@ -89,7 +89,8 @@ void ViewContainer::clearBackground()
 	mRenderWindow->AddRenderer(renderer);
 	renderer->SetViewport(0,0,1,1);
 	renderer->Clear();
-	renderer->SetBackground(110.0/255.0, 111.0/255.0, 113.0/255.0);
+	QColor background = palette().color(QPalette::Background);
+	renderer->SetBackground(background.redF(), background.greenF(), background.blueF());
 	renderer->Render();
 	mRenderWindow->RemoveRenderer(renderer);
 }
