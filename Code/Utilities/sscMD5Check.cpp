@@ -25,7 +25,7 @@ namespace ssc
  * @return true if digest created, false otherwise.
  */
 bool CreateFileDigest( unsigned char digest[ MD5_DIGEST_LENGTH ], const char* const pathname );
-	
+
 /**
  * @param digest (out) The digest constructed from the content of the file
  * @param data (in) Data buffer to MD5 to generate checksum from
@@ -33,7 +33,7 @@ bool CreateFileDigest( unsigned char digest[ MD5_DIGEST_LENGTH ], const char* co
  * @return true if digest created, false otherwise.
  */
 bool CreateArrayDigest( unsigned char digest[ MD5_DIGEST_LENGTH ], const unsigned char* const data, int size );
-	
+
 /**
  * @param digest_name (out) The name of the digest file of pathname
  * @param size (in) The available space in digest_name
@@ -41,7 +41,7 @@ bool CreateArrayDigest( unsigned char digest[ MD5_DIGEST_LENGTH ], const unsigne
  * @return true if file name created, false otherwise
  */
 bool DetermineDigestFileName( char* const digest_name, const unsigned int size, const char* const pathname );
-	
+
 /**
  * @param digest (in) The digest to write into pathname
  * @param sourcename (in) The name of the file that this is a digest for. Used to write the file name into the digest file to allow convenient MD5 checking with md5sum. If NULL, nothing will be written. Notice: This must be a zero terminated string.
@@ -160,8 +160,8 @@ bool CreateArrayDigest( unsigned char digest[ MD5_DIGEST_LENGTH ], const unsigne
 
 	// Traverse input file, generate MD5
 	const int block_max_length = 1024;
-	
-	
+
+
 	const unsigned char* file_block = data;
 	for ( file_block=data; file_block<data+size; file_block+=block_max_length )
 	{
@@ -175,10 +175,10 @@ bool CreateArrayDigest( unsigned char digest[ MD5_DIGEST_LENGTH ], const unsigne
 		{
 			break;
 		}
-		
+
 		MD5_Update( &md5_context, file_block, block_length );
 	}
-		
+
 	MD5_Final( digest, &md5_context );
 	return true;
 }

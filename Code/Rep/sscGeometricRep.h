@@ -41,7 +41,7 @@ typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
  */
 class GeometricRep : public RepImpl
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
 	virtual ~GeometricRep();
 
@@ -51,7 +51,7 @@ public:
 	void setMesh(MeshPtr mesh); ///< sets this reps mesh
 	MeshPtr getMesh(); ///< gives this reps mesh
 	bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
-	
+
 protected:
 	GeometricRep(const QString& uid, const QString& name);
 	virtual void addRepActorsToViewRenderer(View *view);
@@ -63,8 +63,8 @@ protected:
 
 	MeshPtr mMesh;
 private slots:
-  void meshChangedSlot();
-  void transformChangedSlot();
+	void meshChangedSlot();
+	void transformChangedSlot();
 };
 
 } // namespace ssc

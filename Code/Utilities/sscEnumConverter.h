@@ -28,13 +28,13 @@
 			  vtCOUNT
 			};
 		} // namespace vm
-	
+
 	Macro in header file (right after enum def, outside namespace):
-	
-	 	SNW_DECLARE_ENUM_STRING_CONVERTERS(vm, VIEW_ZONE_TYPE);
-	 	    
+
+		SNW_DECLARE_ENUM_STRING_CONVERTERS(vm, VIEW_ZONE_TYPE);
+
 	Macro in cpp file (outside namespace):
-		
+
 		SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(vm, VIEW_ZONE_TYPE, vtCOUNT) 
 		{
 			"ACS_3D_LAYOUT",
@@ -42,9 +42,9 @@
 			"DUALANYPLANE_LAYOUT",
 		} 
 		SNW_DEFINE_ENUM_STRING_CONVERTERS_END(vm, VIEW_ZONE_TYPE, vtCOUNT)
-		
+
 	End macro example.
-	
+
  * 
  * 
  * 
@@ -61,7 +61,7 @@
 	  vtDUALANYPLANE_LAYOUT = 2,
 	  vtCOUNT
 	};
-	} // vm 	
+	} // vm 
  *  
  * Define the mText array for your enum, for example
  * 
@@ -95,10 +95,10 @@ class EnumConverter
 {
 public:
 	static boost::array<QString, COUNT> mText;
-	
+
 	static QString enum2string(const ENUM& val)
 	{
-		if (unsigned(val)<mText.size())	
+		if (unsigned(val)<mText.size())
 			return mText[val];
 		return "UNDEFINED";
 	}
@@ -109,7 +109,7 @@ public:
 			if (mText[i].toUpper()==val.toUpper())
 				return static_cast<ENUM>(i);
 		return static_cast<ENUM>(COUNT);
-	}	
+	}
 };
 
 template<class ENUM>

@@ -75,7 +75,7 @@ public:
 	{
 		return mMemorySize;
 	}
-	
+
 	virtual void SetImage (vtkImageDataPtr texture)
 	{
 		if (!texture)

@@ -86,7 +86,7 @@ void NavigatedVideoImage::newFrame()
 	}
 	mSpacing[0] = spacing[0];
 	mSpacing[1] = spacing[1];
-	mSpacing[2] = spacing[2];	
+	mSpacing[2] = spacing[2];
 }
 
 /**

@@ -84,7 +84,7 @@ double ToolRep2D::getOffset()
  */
 void ToolRep2D::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
 {
-	m_vpMs = vpMs;	
+	m_vpMs = vpMs;
 	mBB_vp = vp;
 
 	crossHairResized();
@@ -99,11 +99,11 @@ void ToolRep2D::setSliceProxy(ssc::SliceProxyPtr slicer)
 	{
 		disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
 		disconnect(mSlicer.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
-		disconnect(mSlicer.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));		
+		disconnect(mSlicer.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
 	}
-	
+
 	mSlicer = slicer;
-	
+
 	connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
 	connect(mSlicer.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
 	connect(mSlicer.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
@@ -179,7 +179,7 @@ void ToolRep2D::sliceTransformChangedSlot(Transform3D sMr)
 
 void ToolRep2D::toolTransformAndTimestampSlot(Transform3D prMt, double timestamp)
 {
-	update();	
+	update();
 }
 
 void ToolRep2D::toolVisibleSlot(bool visible)
@@ -233,7 +233,7 @@ void ToolRep2D::update()
 	{
 		cursor->update(cross, mBB_vp); ///crosshair, shows in Navigation
 	}
-	updateOffsetText();	
+	updateOffsetText();
 	updateToolLine(cross, tooltip, toolback);
 }
 
@@ -250,7 +250,7 @@ void ToolRep2D::setVisibility()
 {
 //	Logger::log("vm.log", "ToolRep2D::setVisibility(), offset=" + string_cast(showOffset()));
 	bool hasTool = mSlicer->getTool();
-	
+
 	if (cursor)
 		cursor->getActor()->SetVisibility(mUseCrosshair && hasTool);
 	if (center2Tool)

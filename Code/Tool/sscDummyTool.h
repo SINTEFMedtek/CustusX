@@ -55,13 +55,13 @@ public:
 	void setVisible(bool val);
 
 	virtual double getTooltipOffset() const;
-	virtual void setTooltipOffset(double val);	
+	virtual void setTooltipOffset(double val);
 	virtual Transform3D getCalibration_sMt() const;
 
 	virtual std::map<int, Vector3D> getReferencePoints() const {return std::map<int, Vector3D>();};
 
-	static vtkPolyDataPtr createPolyData(double h1, double h2, double r1, double r2);	
-	
+	static vtkPolyDataPtr createPolyData(double h1, double h2, double r1, double r2);
+
 private slots:
 	virtual void sendTransform();
 

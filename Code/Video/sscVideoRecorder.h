@@ -52,23 +52,23 @@ class VideoRecorder : public QObject
 {
   Q_OBJECT
 public:
-  typedef std::map<double, vtkImageDataPtr> DataType; ///<  <timestamp, frame>
+	typedef std::map<double, vtkImageDataPtr> DataType; ///<  <timestamp, frame>
 public:
-  VideoRecorder(VideoSourcePtr source, bool sync = true);
-  virtual ~VideoRecorder();
+	VideoRecorder(VideoSourcePtr source, bool sync = true);
+	virtual ~VideoRecorder();
 
-  virtual void startRecord();
-  virtual void stopRecord();
-  virtual DataType getRecording(double start, double stop);
+	virtual void startRecord();
+	virtual void stopRecord();
+	virtual DataType getRecording(double start, double stop);
 
-private slots:
-  void newFrameSlot();
+	private slots:
+	void newFrameSlot();
 private:
-  DataType mData;
-  VideoSourcePtr mSource;
+	DataType mData;
+	VideoSourcePtr mSource;
 
-  bool mSynced;
-  double mSyncShift;
+	bool mSynced;
+	double mSyncShift;
 };
 
 typedef boost::shared_ptr<VideoRecorder> VideoRecorderPtr;

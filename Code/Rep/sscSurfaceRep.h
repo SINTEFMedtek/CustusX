@@ -36,7 +36,7 @@ namespace ssc
  */
 class SurfaceRep : public RepImpl
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
 	static SurfaceRepPtr New(const QString& uid);
 	virtual QString getType() const { return "ssc::SurfaceRep"; }
@@ -54,7 +54,7 @@ protected:
 	vtkContourFilterPtr mContourFilter;
 	vtkPropertyPtr mProperty;
 	vtkActorPtr mActor;
-	
+
 	ImagePtr mImage;
 	MeshPtr mMesh;
 };

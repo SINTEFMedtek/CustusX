@@ -45,7 +45,7 @@ typedef boost::shared_ptr<class ImageBlenderProxy> ImageBlenderProxyPtr;
 class ImageBlenderProxy : public QObject
 {
 	Q_OBJECT
-	
+
 public:
 	ImageBlenderProxy();
 	virtual ~ImageBlenderProxy();
@@ -57,18 +57,18 @@ public:
 	std::vector<ImagePtr> getImages( ) { return mImages; };
 	void removeImage(ImagePtr image);
 	void createOverlay();
-	void updateBlender();	
+	void updateBlender();
 	void updateAlpha();
 	void sliceFirstTheneBlend();
 	void volumeBlend();
 	void addSlice(vtkImageDataPtr slice);
-private:	
+private:
 	bool firstImage;
 	vtkImageDataPtr baseImage;
 	vtkImageBlendPtr mBlender;
 	std::vector<ImagePtr> mImages;
 	QString mImageUid;
-	
+
 	vtkWindowLevelLookupTablePtr mLookupTable;
 	vtkImageMapToWindowLevelColorsPtr mWindowLevel;
 	vtkImageMapToWindowLevelColorsPtr mColorMapper;

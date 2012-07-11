@@ -81,7 +81,7 @@ public:
 	void setUseVolumeTextureMapper();
 
 	static double computeResampleFactor(long maxVoxels, ssc::ImagePtr image);
-	
+
 protected:
 	VolumetricRep(const QString& uid, const QString& name="");
 	virtual void addRepActorsToViewRenderer(View *view);

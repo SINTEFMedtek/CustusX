@@ -41,7 +41,7 @@ class RGBColor : public boost::array<double,3>
 public:
 	RGBColor();
 	RGBColor(double r, double g, double b);
-	explicit RGBColor(const double* rgb);	
+	explicit RGBColor(const double* rgb);
 	RGBColor(const RGBColor& t);
 	RGBColor& operator=(const RGBColor& t);
 	RGBColor(QColor c);

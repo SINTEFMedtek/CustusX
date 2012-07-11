@@ -44,7 +44,7 @@ class SliceRepSW : public RepImpl
 {
 	Q_OBJECT
 public:
-	static SliceRepSWPtr New(const QString& uid);	
+	static SliceRepSWPtr New(const QString& uid);
 	virtual ~SliceRepSW();
 	virtual QString getType() const { return "ssc::SliceRepSW"; };
 	bool hasImage(ImagePtr image) const;
@@ -60,11 +60,11 @@ protected:
 	SliceRepSW(const QString& uid);
 	virtual void addRepActorsToViewRenderer(View* view) ;
 	virtual void removeRepActorsFromViewRenderer(View *view) ;
-		
+
 private:
 	SlicedImageProxyPtr mImageSlicer;
 	vtkImageActorPtr mImageActor;
-};	
+};
 
 }// namespace ssc
 

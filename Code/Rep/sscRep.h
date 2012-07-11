@@ -99,9 +99,9 @@ public:
 	 * \return the unique id.
 	 */
 	virtual QString getUid() const = 0;
-	
+
 	virtual void printSelf(std::ostream & os, Indent indent) = 0;
-	
+
 };
 
 } // namespace ssc

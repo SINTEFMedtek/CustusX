@@ -65,7 +65,7 @@ static vtkPolyDataPtr createCube()
 	// Load the point, cell, and data attributes.
 	for (i=0; i<8; i++) points->InsertPoint(i,x[i]);
 	for (i=0; i<6; i++) polys->InsertNextCell(4,pts[i]);
-	
+
 	// We now assign the pieces to the vtkPolyData.
 	cube->SetPoints(points);
 	points->Delete();
@@ -142,7 +142,7 @@ void GPURayCastVolumeRep::setImages(std::vector<ssc::ImagePtr> images)
 	{
 		mMerger->RemoveInput(mMerger->GetInput());
 	}
-	
+
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
@@ -246,7 +246,7 @@ void GPURayCastVolumeRep::setClipVolumes(QStringList volumes)
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		mPainter->setClipVolume(i, mClipVolumes.contains(mImages[i]->getUid()));
-	}	
+	}
 	mActor->Modified();
 }
 

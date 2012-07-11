@@ -32,7 +32,7 @@ vec4 applyWindowLevel(vec4 value, float window, float level)
 vec4 applyLut(in float value, in samplerBuffer lut, in int lutSize2)
 {
 	// map through lookup table - interpolated
-	value = clamp(value, 0.0, 1.0);	
+	value = clamp(value, 0.0, 1.0);
 	float pos = value * (float(lutSize2)-1.0); // floating-point lut index
 	int p0 = int(floor(pos)); // integer part of lut index
 	vec4 c0 = texelFetchBuffer(lut, p0);
@@ -242,7 +242,7 @@ void main()
 			{
 				// We're inside at least one volume, but none of the volumes exceeded the threshold
 				vect += rayDeltaVector;
-				continue;			
+				continue;
 			} else if (hit==0)
 			{
 				// We didn't hit any volume, but there could be some volumes left to hit. Skip distance to next volume, or break if no more volumes will be hit.

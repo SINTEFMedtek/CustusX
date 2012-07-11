@@ -55,23 +55,23 @@ public:
 	void setImage(ImagePtr image);
 	ImagePtr getImage() const;
 	void update();
-	vtkImageDataPtr getOutput(); ///< output 2D sliced image	
+	vtkImageDataPtr getOutput(); ///< output 2D sliced image
 	void printSelf(std::ostream & os, Indent indent);
 
 private slots:
 	void transformChangedSlot();
 	void transferFunctionsChangedSlot();
 
-private: 	
+private: 
 	vtkImageDataPtr createDummyImageData();
 
 	SliceProxyPtr mSlicer;
 	vtkImageDataPtr mDummyImage; ///< need this to fool the vtk pipeline when no image is set
 	ImagePtr mImage;
 	//vtkImageMapToWindowLevelColorsPtr mWindowLevel;
-	vtkImageAlgorithmPtr mRedirecter; 	
+	vtkImageAlgorithmPtr mRedirecter; 
  	//vtkImageReslicePtr mRedirecter;
-	
+
 	vtkImageMapToColorsPtr mWindowLevel;
 	vtkImageReslicePtr mReslicer;
 	vtkMatrix4x4Ptr mMatrixAxes;

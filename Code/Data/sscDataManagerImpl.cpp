@@ -876,25 +876,25 @@ ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uid, QString
 ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, QString name, ImagePtr parentImage, QString filePath)
 {
 	ImagePtr retval = createImage(data, uid, name, filePath);
-  retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
-  retval->get_rMd_History()->setParentSpace(parentImage->getUid());
-  ssc::ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
-  ssc::ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
-  //The parent may have a different range of voxel values. Make sure the transfer functions are working
-  if (transferFunctions)
-  	transferFunctions->fixTransferFunctions();
-  else
-  	std::cout << "transferFunctions error" << std::endl;
-  if (LUT2D)
-  	LUT2D->fixTransferFunctions();
-  else
-  	std::cout << "LUT2D error" << std::endl;
-  retval->resetTransferFunction(transferFunctions, LUT2D);
-  retval->setModality(parentImage->getModality());
-  retval->setImageType(parentImage->getImageType());
-  retval->setShading(parentImage->getShading());
+	retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
+	retval->get_rMd_History()->setParentSpace(parentImage->getUid());
+	ssc::ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
+	ssc::ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
+	//The parent may have a different range of voxel values. Make sure the transfer functions are working
+	if (transferFunctions)
+		transferFunctions->fixTransferFunctions();
+	else
+		std::cout << "transferFunctions error" << std::endl;
+	if (LUT2D)
+		LUT2D->fixTransferFunctions();
+	else
+		std::cout << "LUT2D error" << std::endl;
+	retval->resetTransferFunction(transferFunctions, LUT2D);
+	retval->setModality(parentImage->getModality());
+	retval->setImageType(parentImage->getImageType());
+	retval->setShading(parentImage->getShading());
 
-  retval->setAcquisitionTime(QDateTime::currentDateTime());
+	retval->setAcquisitionTime(QDateTime::currentDateTime());
 
 	return retval;
 }

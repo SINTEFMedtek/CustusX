@@ -98,7 +98,7 @@ ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep(const QString& uid, con
 void ProgressiveLODVolumetricRep::resetResampleList()
 {
 	double r = VolumetricRep::computeResampleFactor(mMaxVoxels, mImage);
-	
+
 	mResampleFactors.clear();
 	mResampleFactors.push_back(r);
 	mResampleFactors.push_back(r/2.0);
@@ -136,15 +136,15 @@ void ProgressiveLODVolumetricRep::removeRepActorsFromViewRenderer(View *view)
 
 ImagePtr ProgressiveLODVolumetricRep::getImage()
 {
-  if (!mCurrent)
-    return ImagePtr();
+	if (!mCurrent)
+		return ImagePtr();
 	return mCurrent->getImage();
 }
 
 vtkVolumePtr ProgressiveLODVolumetricRep::getVtkVolume()
 {
-  if (!mCurrent)
-    return vtkVolumePtr();
+	if (!mCurrent)
+		return vtkVolumePtr();
 	return mCurrent->getVtkVolume();
 }
 
@@ -239,7 +239,7 @@ void ProgressiveLODVolumetricRep::volumetricThreadFinishedSlot()
 	}
 
 	startThread(getNextResampleLevel());
-	
+
 	emit internalVolumeChanged();
 }
 

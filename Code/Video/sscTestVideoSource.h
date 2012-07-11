@@ -48,7 +48,7 @@ namespace ssc
  */
 class TestVideoSource : public VideoSource
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
 	TestVideoSource( QString uid, QString name, int width, int height);

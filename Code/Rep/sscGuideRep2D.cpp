@@ -58,7 +58,7 @@ void GuideRep2D::setPointMetric(PointMetricPtr point)
 
 	this->changedSlot();
 }
-	
+
 PointMetricPtr GuideRep2D::getPointMetric()
 {
 	return mMetric;
@@ -96,7 +96,7 @@ void GuideRep2D::changedSlot()
 		mCircleActor->SetMapper(mapper);
 		mCircleActor->GetProperty()->LightingOff();
 		mView->getRenderer()->AddActor(mCircleActor);
-		
+
 	}
 
 	if (!mCircleActor)
@@ -157,5 +157,5 @@ void GuideRep2D::setRequestedAccuracy(double accuracy)
 	mRequestedAccuracy = accuracy;
 	changedSlot();
 }
-	
+
 }

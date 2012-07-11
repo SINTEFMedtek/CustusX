@@ -62,8 +62,8 @@ Slices3DRep::~Slices3DRep()
 Slices3DRepPtr Slices3DRep::New(const QString& uid)
 {
 	Slices3DRepPtr retval(new Slices3DRep(uid));
-    retval->mSelf = retval;
-    return retval;
+	retval->mSelf = retval;
+	return retval;
 }
 
 void Slices3DRep::setShaderFile(QString shaderFile)

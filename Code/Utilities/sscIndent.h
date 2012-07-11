@@ -25,13 +25,13 @@ public:
 	Indent();
 	explicit Indent(int ind, DETAIL det=dNORMAL);
 	~Indent();
-	
+
 	int getIndent() const;
 	vtkIndent getVtkIndent() const;
 	Indent stepDown() const;
 	bool includeDetails() const;
 	bool includeNormal() const;
-	
+
 	DETAIL mDetail; ///< how much info to print
 	int mIndent;
 };

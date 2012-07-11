@@ -58,13 +58,13 @@ public:
 	virtual void setImage(ImagePtr image);
 	virtual ImagePtr getImage();
 	virtual bool hasImage(ImagePtr image) const;
-	
+
 //virtual void setImage(ImagePtr image) = 0; ///< set the reps image
 //irtual ImagePtr getImage() = 0; ///< get the reps image
 //	virtual bool hasImage(ImagePtr image) const = 0; ///< check if the reps has the image
 	virtual vtkVolumePtr getVtkVolume(); ///< get the images vtkVolume
 	//virtual void setResampleFactor(double factor); ///< set how detailed the image should be
-	virtual void setMaxVolumeSize(long maxVoxels); ///< set max volume size for rendering. Must be set before setImage()	
+	virtual void setMaxVolumeSize(long maxVoxels); ///< set max volume size for rendering. Must be set before setImage()
 
 
 protected:

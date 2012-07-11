@@ -165,7 +165,7 @@ const void *SharedMemoryClient::buffer(bool onlyNew)
 		mBuffer.unlock();
 		return ptr;
 	}
-	return NULL;	
+	return NULL;
 }
 
 const void *SharedMemoryClient::isNew()

@@ -138,7 +138,7 @@ void SliceComputer::setToolPosition(const Transform3D& rMt)
 void SliceComputer::setOrientationType(ORIENTATION_TYPE val) 
 { 
 	mOrientType = val; 
-}	
+}
 
 /**What plane to compute given the other settings.
  */
@@ -185,7 +185,7 @@ void SliceComputer::setToolOffset(double val)
  * Overrides FollowType.
  */
 void SliceComputer::setToolViewOffset(bool use, double viewportHeight, double viewOffset) 
-{	
+{
 	mUseViewOffset = use; 
 	mViewportHeight = viewportHeight; 
 	mViewOffset = viewOffset; 
@@ -195,7 +195,7 @@ void SliceComputer::setToolViewOffset(bool use, double viewportHeight, double vi
  */
 void SliceComputer::setToolViewportHeight(double viewportHeight)
 {
-	mViewportHeight = viewportHeight; 	
+	mViewportHeight = viewportHeight; 
 }
 
 /**Calculate a slice plane given the defined parameters.
@@ -205,28 +205,28 @@ SlicePlane SliceComputer::getPlane()  const
 	std::pair<Vector3D,Vector3D> basis = generateBasisVectors();
 	SlicePlane plane;
 	plane.i = basis.first;
-	plane.j = basis.second;	
+	plane.j = basis.second;
 	plane.c = Vector3D(0,0,mToolOffset);
-	
+
   // transform position from tool to reference space
 	plane.c = m_rMt.coord(plane.c);
 	// transform orientation from tool to reference space for the oblique case only
 	if (mOrientType==otOBLIQUE)
 	{
 		plane.i = m_rMt.vector(plane.i);
-		plane.j = m_rMt.vector(plane.j);		
+		plane.j = m_rMt.vector(plane.j);
 	}
 
 	// orient planes so that gravity is down
   plane = orientToGravity(plane);
-	
+
 	// try to to this also for oblique views, IF the ftFIXED_CENTER is set.
 	// use special acs centermod algo
   plane.c = generateFixedIJCenter(mFixedCenter, plane.c, plane.i, plane.j);
-	
+
   // set center so that it is a fixed distance from viewport top
 	plane = applyViewOffset(plane);
-		
+
 	return plane; 
 }
 
@@ -247,12 +247,12 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 	{
 		return base;
 	}
-	
+
 	SlicePlane retval = base;
 	Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,0));
 	Vector3D newCenter = toolCenter - mViewportHeight*(0.5-mViewOffset) * base.j;
 	retval.c = base.c + dot(newCenter - base.c, base.j) * base.j; // extract j-component of newCenter
-	return retval;	
+	return retval;
 }
 
 /**Generate the <i,j> vector pair spanning the basis plane
@@ -323,7 +323,7 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsRadiology() cons
 Vector3D SliceComputer::generateFixedIJCenter(const Vector3D& center_r, const Vector3D& cross_r, const Vector3D& i, const Vector3D& j) const
 {
 	if (mFollowType==ftFIXED_CENTER)
-	{	
+	{
 		// r is REF, s is SLICE
 		Transform3D M_rs = createTransformIJC(i, j, Vector3D(0,0,0)); // transform from data to slice, zero center.
 		Transform3D M_sr = M_rs.inv();
@@ -354,8 +354,8 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	{
 		return base;
 	}
-	
-	SlicePlane retval = base;	
+
+	SlicePlane retval = base;
 	const Vector3D k = cross(base.i, base.j); // plane normal. Constant
 	Vector3D up;
 	up = -mGravityDirection; // normal case
@@ -363,11 +363,11 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	// weight of nongravity, 0=<w=<1, 1 means dont use gravity
 	double w_n = dot(up, k); 
 	w_n = w_n*w_n; // square to keep stability near normal use.
-	
+
 	Vector3D i_g = cross(up, k); //  |i_g| varies from 0 to 1 depending on 1-w_n
 	Vector3D i_n = base.i; // |i_n|==1
-	
-	
+
+
 	// set i vector to a weighted mean of the two definitions
 	// can also experiment with a tanh function or simply a linear interpolation
 	//
@@ -377,7 +377,7 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	retval.i = i_g*(1.0-w_n) + i_n*w_n; 
 	retval.i = retval.i.normal(); // |i|==1 
 	retval.j = cross(k, retval.i);
-	
+
 	return retval;
 }
 

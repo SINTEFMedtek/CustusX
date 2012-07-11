@@ -328,7 +328,7 @@ void TextDisplay::setMaxWidth( int width, vtkViewport *vp)
 	QString newString = components.join("\n");
 	mapper->SetInput( cstring_cast(newString) );
 }
-	
+
 int TextDisplay::getMaxWidth()
 {
 	return maxWidth;
@@ -338,7 +338,7 @@ int TextDisplay::getWidth( vtkViewport *vp)
 {
 	return mapper->GetWidth( vp );
 }
-	
+
 void TextDisplay::setPosition( const Vector3D& pos )
 {
 	actor->SetPosition( pos[0], pos[1] );

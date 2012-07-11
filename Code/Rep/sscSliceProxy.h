@@ -59,7 +59,7 @@ public:
 	void setFollowType(FOLLOW_TYPE followType);
 	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset);
 	QString getName() const;
-	
+
 	void setGravity(bool use, const Vector3D& dir);
 	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset);
 	void setToolViewportHeight(double viewportHeight);
@@ -83,14 +83,14 @@ public:
 	void setUseTooltipOffset(bool);
 
 #ifdef WIN32
-  typedef ssc::Transform3D Transform3D; 
+	typedef ssc::Transform3D Transform3D; 
 #endif
 
 signals:
 	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.
 	void toolTransformAndTimestamp(Transform3D prMt, double timestamp); ///< forwarded from tool
 	void toolVisible(bool visible); ///< forwarding of visible in tool
-	
+
 private slots:
 	void clinicalApplicationChangedSlot();
 	void tooltipOffsetSlot(double val);

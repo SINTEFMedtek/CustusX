@@ -64,7 +64,7 @@ Q_OBJECT
 public:
 	static Slices3DRepPtr New(const QString& uid);
 	virtual ~Slices3DRep();
-	virtual QString getType() const	{ return "ssc::Slices3DRep"; }
+	virtual QString getType() const { return "ssc::Slices3DRep"; }
 
 	void setShaderFile(QString shaderFile);
 	void setImages(std::vector<ssc::ImagePtr> images);

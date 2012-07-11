@@ -24,14 +24,14 @@ template<class ITER> std::ostream& stream_range(std::ostream& s, ITER begin, ITE
 
 	std::ostringstream ss; // avoid changing state of input stream
 	ss << std::setprecision(3) << std::fixed;
-	
+
 	ss << std::setw(10) << *begin;
 	++begin;
 	for (; begin!=end; ++begin)
 		ss << separator << std::setw(10) << *begin;
-	
+
 	s << ss.str();
-	
+
 	return s;
 }
 // --------------------------------------------------------
