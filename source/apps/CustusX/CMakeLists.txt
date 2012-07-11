@@ -51,7 +51,7 @@ endif (APPLE)
 
 #------------------------------------------------------------------------------
 # Linking
-#-----------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 target_link_libraries( CustusX 
 		cxGui 
 		cxPluginCalibrationGUI 
@@ -60,6 +60,24 @@ target_link_libraries( CustusX
 		cxPluginUSReconstructionGUI 
 		cxPluginAcquisitionGUI
 		)
+		
+#------------------------------------------------------------------------------
+# Cotire - pch and unity builds
+#------------------------------------------------------------------------------
+if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+    cotire(CustusX)
+    if(COTIRE_ADD_UNITY_BUILDS)
+        target_link_libraries(CustusX_unity 
+        		cxGui 
+        		cxPluginCalibrationGUI 
+        		cxPluginAlgorithmGUI 
+        		cxPluginRegistrationGUI
+        		cxPluginUSReconstructionGUI 
+        		cxPluginAcquisitionGUI
+        		)
+    endif(COTIRE_ADD_UNITY_BUILDS)
+endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+
 
 #--------------------------------------------------------------------------------
 # Installer

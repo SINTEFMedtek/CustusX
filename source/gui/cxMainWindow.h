@@ -108,6 +108,8 @@ protected:
 
 private:
 	void saveScreenShot(QPixmap pixmap);
+//	void saveScreenShotThreaded(QString filename);
+	void saveScreenShotThreaded(QImage pixmap, QString filename);
 	void updateWindowTitle();
 	void createActions(); ///< creates and connects (gui-)actions
 	void createMenus(); ///< creates and add (gui-)menues

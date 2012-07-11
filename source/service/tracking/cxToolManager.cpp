@@ -171,15 +171,21 @@ void ToolManager::setPlaybackMode(PlaybackTimePtr controller)
 		cx::PlaybackToolPtr current(new PlaybackTool(iter->second, controller));
 		mTools[current->getUid()] = current;
 
+//		std::cout << "tool: " << iter->first  << std::endl;
 		ssc::TimedTransformMapPtr history = iter->second->getPositionHistory();
 		if (!history->empty())
 		{
 			timeRange.first = std::min(timeRange.first, history->begin()->first);
 			timeRange.second = std::max(timeRange.second, history->rbegin()->first);
+//			std::cout << "===t start " << QDateTime::fromMSecsSinceEpoch(history->begin()->first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//			std::cout << "===t  end " << QDateTime::fromMSecsSinceEpoch(history->rbegin()->first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 		}
 	}
 	mTools[mManualTool->getUid()] = mManualTool;
 
+//	std::cout << "toolmanager" << std::endl;
+//	std::cout << "===start " << QDateTime::fromMSecsSinceEpoch(timeRange.first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
+//	std::cout << "===  end " << QDateTime::fromMSecsSinceEpoch(timeRange.second).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 	controller->initialize(QDateTime::fromMSecsSinceEpoch(timeRange.first), timeRange.second - timeRange.first);
 
 	ssc::messageManager()->sendInfo("Opened Playback Mode");
@@ -408,7 +414,11 @@ void ToolManager::initialize()
 	}
 
 #ifndef WIN32
-	this->createSymlink(); //TODO????
+	if (!this->createSymlink())
+	{
+		ssc::messageManager()->sendError("Initialization of tracking failed.");
+		return;
+	}
 #endif
 
 	if (mTrackerThread)
@@ -429,7 +439,7 @@ void ToolManager::uninitialize()
 
 	if (!this->isInitialized())
 	{
-		ssc::messageManager()->sendInfo("No need to uninitialize, toolmanager is not initialized.");
+//		ssc::messageManager()->sendInfo("No need to uninitialize, toolmanager is not initialized.");
 		return;
 	}
 	if (mTrackerThread)
@@ -442,8 +452,9 @@ void ToolManager::uninitialize()
  *  read/write access (by installer or similar).
  *  Create that file as a symlink to the correct device.
  */
-void ToolManager::createSymlink()
+bool ToolManager::createSymlink()
 {
+	bool retval = true;
 	QFileInfo symlink = this->getSymlink();
 	QDir linkDir(symlink.absolutePath());
 	QString linkfile = symlink.absoluteFilePath();
@@ -453,7 +464,7 @@ void ToolManager::createSymlink()
 	{
 		ssc::messageManager()->sendError(
 						QString("Folder %1 does not exist. System is not properly installed.").arg(linkDir.path()));
-		return;
+		return false;
 	}
 
 	QDir devDir("/dev/");
@@ -468,7 +479,7 @@ void ToolManager::createSymlink()
 	{
 		ssc::messageManager()->sendError(
 						QString("No usb connections found in /dev using filters %1").arg(filters.join(";")));
-		return;
+		return false;
 	}
 	else
 	{
@@ -484,6 +495,7 @@ void ToolManager::createSymlink()
 	if (!devFileInfo.isWritable())
 	{
 		ssc::messageManager()->sendError(QString("Device %1 is not writable. Connection will fail.").arg(device));
+		retval = false;
 	}
 	// this call only succeeds if Custus is run as root.
 	bool val = devFile.link(linkfile);
@@ -492,6 +504,7 @@ void ToolManager::createSymlink()
 		ssc::messageManager()->sendError(
 						QString("Symlink %1 creation to device %2 failed with code %3").arg(linkfile).arg(device).arg(
 										devFile.error()));
+		retval = false;
 	}
 	else
 	{
@@ -501,6 +514,7 @@ void ToolManager::createSymlink()
 	devFile.setPermissions(
 					QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner | QFile::ReadGroup | QFile::WriteGroup
 									| QFile::ExeGroup | QFile::ReadOther | QFile::WriteOther | QFile::ExeOther);
+	return retval;
 }
 
 QFileInfo ToolManager::getSymlink() const
@@ -542,7 +556,7 @@ void ToolManager::stopTracking()
 {
 	if (!mTracking)
 	{
-		ssc::messageManager()->sendWarning("Please start tracking before trying to stop tracking.");
+//		ssc::messageManager()->sendWarning("Please start tracking before trying to stop tracking.");
 		return;
 	}
 	if (mTrackerThread)
@@ -790,7 +804,6 @@ void ToolManager::loadPositionHistory()
 	QString toolUid;
 
 	QStringList missingTools;
-//	std::cout << "========= ToolManager::loadPositionHistory() " << filename << "-- " << reader.atEnd() << std::endl;
 
 	while (!reader.atEnd())
 	{

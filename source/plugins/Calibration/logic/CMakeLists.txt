@@ -39,6 +39,20 @@ target_link_libraries( cxPluginCalibrationLogic
     cxSettings 
     cxPluginAcquisitionLogic
       )
+      
+#------------------------------------------------------------------------------
+# Cotire - pch and unity builds
+#------------------------------------------------------------------------------
+if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+    cotire(cxPluginCalibrationLogic)
+    if(COTIRE_ADD_UNITY_BUILDS)
+        target_link_libraries(cxPluginCalibrationLogic_unity 
+        		cxUtilities 
+                cxSettings 
+                cxPluginAcquisitionLogic
+        		)
+    endif(COTIRE_ADD_UNITY_BUILDS)
+endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
 # =========================================================
 
 #ADD_SUBDIRECTORY( testing )

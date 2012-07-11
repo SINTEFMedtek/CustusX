@@ -23,7 +23,7 @@
 #include "sscTypeConversions.h"
 #include "cxCameraControl.h"
 #include "sscImageAlgorithms.h"
-#include "cxDataMetric.h"
+#include "sscDataMetric.h"
 #include "sscView.h"
 #include "sscImage.h"
 #include "cxViewManager.h"
@@ -60,6 +60,14 @@ ViewGroupData::ViewGroupData() :
 				mCamera3D(CameraData::create())
 {
 	connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(removeDataSlot(QString)));
+
+//	mPickerGlyph.reset(new ssc::Mesh("PickerGlyph"));
+//
+//
+//	mOptions.getSpherePickerGlyph()->SetRadius(40);
+//	mOptions.getSpherePickerGlyph()->SetThetaResolution(16);
+//	mOptions.getSpherePickerGlyph()->SetPhiResolution(12);
+//	mOptions.getSpherePickerGlyph()->LatLongTessellationOn();
 }
 
 void ViewGroupData::removeDataSlot(QString uid)
@@ -89,14 +97,15 @@ void ViewGroupData::addData(ssc::DataPtr data)
 	emit dataAdded(qstring_cast(data->getUid()));
 }
 
-void ViewGroupData::removeData(ssc::DataPtr data)
+bool ViewGroupData::removeData(ssc::DataPtr data)
 {
 	if (!data)
-		return;
+		return false;
 	if (!std::count(mData.begin(), mData.end(), data))
-		return;
+		return false;
 	mData.erase(std::find(mData.begin(), mData.end(), data));
 	emit dataRemoved(qstring_cast(data->getUid()));
+	return true;
 }
 
 void ViewGroupData::clearData()
@@ -225,7 +234,7 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 		action->setIcon(QIcon(":/icons/volume.png"));
 	else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
 		action->setIcon(QIcon(":/icons/surface.png"));
-	else if (boost::shared_dynamic_cast<DataMetric>(data))
+	else if (boost::shared_dynamic_cast<ssc::DataMetric>(data))
 		action->setIcon(QIcon(":/icons/metric.png"));
 
 //  std::cout << "base " << mLastDataActionUid << "  " << uid << std::endl;

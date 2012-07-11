@@ -79,12 +79,40 @@ ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
 	mSendTimer(0),
 	mGrabTimer(0)
 {
+	mGrabTimer = new QTimer(this);
+	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+	//  mTimer->start(40);
+//	mGrabTimer->start(0);
+	//  mTimer->start(1200); // for test of the timeout feature
+	//  mTimer->start(100);
+
+
+	mSendTimer = new QTimer(this);
+	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+//	mSendTimer->start(40);
 }
 
 void ImageSenderOpenCV::initialize(StringMap arguments)
 {
 	mArguments = arguments;
 
+	// Run an init/deinit to check that we have contact right away.
+	// Do NOT keep the connection open: This is because we have no good way to
+	// release resources if the server is a local app and is killed by CustusX.
+	// This way, we can disconnect (thus releasing resources), and then safely
+	// remove the usb cable without having dangling resources in openCV. (problem at least on Linux)
+	this->initialize_local();
+	this->deinitialize_local();
+}
+
+void ImageSenderOpenCV::deinitialize_local()
+{
+	mVideoCapture.release();
+	mVideoCapture = cv::VideoCapture();
+}
+
+void ImageSenderOpenCV::initialize_local()
+{
 //	// if in main thread only (debug)
 //	if (this->thread() == QCoreApplication::instance()->thread() && !mSocket)
 //		cv::namedWindow("ImageSenderOpenCV", CV_WINDOW_KEEPRATIO); //resizable window;
@@ -121,30 +149,18 @@ void ImageSenderOpenCV::initialize(StringMap arguments)
 			<< videoSource.toStdString()
 			<< ", size=(" << width << "," << height << ")" << std::endl;
 	}
-
-	//  mImageData = loadImage(mImageFileDir);
-
-	mGrabTimer = new QTimer(this);
-	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-	//  mTimer->start(40);
-//	mGrabTimer->start(0);
-	//  mTimer->start(1200); // for test of the timeout feature
-	//  mTimer->start(100);
-
-
-	mSendTimer = new QTimer(this);
-	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-//	mSendTimer->start(40);
-
 }
 
 void ImageSenderOpenCV::startStreaming(QTcpSocket* socket)
 {
+	this->initialize_local();
+
 	if (!mGrabTimer || !mSendTimer)
 	{
 		std::cout << "ImageSenderOpenCV: Failed to start streaming: Not initialized." << std::endl;
 		return;
 	}
+
 	mSocket = socket;
 	mGrabTimer->start(0);
 	mSendTimer->start(40);
@@ -157,6 +173,8 @@ void ImageSenderOpenCV::stopStreaming()
 	mGrabTimer->stop();
 	mSendTimer->stop();
 	mSocket = NULL;
+
+	this->deinitialize_local();
 }
 
 void ImageSenderOpenCV::dumpProperties()
@@ -240,6 +258,10 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	//  double now = 1.0/1000*(double)QDateTime::currentDateTime().toMSecsSinceEpoch();
 	double grabTime = 1.0 / 1000 * (double) mLastGrabTime.toMSecsSinceEpoch();
 	timestamp->SetTime(grabTime);
+	static QDateTime lastlastGrabTime = mLastGrabTime;
+//	std::cout << "OpenCV stamp:\t" << mLastGrabTime.toString("hh:mm:ss.zzz") << std::endl;
+	std::cout << "OpenCV diff:\t" <<lastlastGrabTime.msecsTo(mLastGrabTime) << "\tdelay:\t" << mLastGrabTime.msecsTo(QDateTime::currentDateTime()) << std::endl;
+	lastlastGrabTime = mLastGrabTime;
 
 	cv::Mat frame;
 	// temporary HACK: all the old probe defs are for 800x600, continue this line for now:

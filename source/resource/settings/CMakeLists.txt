@@ -49,6 +49,19 @@ add_library(cxSettings
     
 target_link_libraries(cxSettings SSC ${QT_LIBRARIES} )
 
+#------------------------------------------------------------------------------
+# Cotire - pch and unity builds
+#------------------------------------------------------------------------------
+if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+    cotire(cxSettings)
+    if(COTIRE_ADD_UNITY_BUILDS)
+        target_link_libraries(cxSettings_unity 
+        		SSC 
+        		${QT_LIBRARIES}
+        		)
+    endif(COTIRE_ADD_UNITY_BUILDS)
+endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+
 # Select the installed location of configuration files, relative to executable. 
 # MUST match the values in CPack install for CustusX!!
 if (APPLE) 

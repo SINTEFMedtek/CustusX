@@ -91,6 +91,16 @@ ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid,
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
+ImagePtr duplicateImage(ImagePtr image)
+{
+	ssc::Vector3D spacing(image->getBaseVtkImageData()->GetSpacing());
+	return resampleImage(image, spacing, image->getUid()+"_copy%1", image->getName()+" copy%1");
+}
+
+
+/** Return an image that is cropped using its own croppingBox.
+ *  The image is not added to the data manager nor saved.
+ */
 ImagePtr cropImage(ImagePtr image)
 {
   vtkImageClipPtr clip = vtkImageClipPtr::New();

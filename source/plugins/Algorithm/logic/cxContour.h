@@ -1,7 +1,8 @@
 #ifndef CXCONTOUR_H_
 #define CXCONTOUR_H_
 
-#include "cxTimedAlgorithm.h"
+#include "cxThreadedTimedAlgorithm.h"
+#include "cxThreadedTimedAlgorithm.h"
 
 namespace cx
 {

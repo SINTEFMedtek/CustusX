@@ -6,8 +6,11 @@
  */
 #include "cxImageServer.h"
 #include "cxImageSenderFactory.h"
+#include "sscTypeConversions.h"
 #include <iostream>
 #include <QCoreApplication>
+#include <QHostAddress>
+#include <QNetworkInterface>
 
 namespace cx
 {
@@ -15,9 +18,9 @@ namespace cx
 ImageServer::ImageServer(QObject* parent) :
 	QTcpServer(parent)
 {
-	mTimer = new QTimer(this);
-	connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-	mTimer->start(500);
+	//mTimer = new QTimer(this);
+	//connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+	//mTimer->start(500);
 }
 
 void ImageServer::initialize()
@@ -67,11 +70,19 @@ void ImageServer::startListen(int port)
 
 	if (started)
 	{
-		if (this->serverAddress().isNull())
-			std::cout << QString("Server is listening to port %2").arg(this->serverPort()).toStdString() << std::endl;
-		else
-			std::cout << QString("Server %1 is listening to port %2").arg(this->serverAddress().toString()).arg(
-				this->serverPort()).toStdString() << std::endl;
+		//Find IP adresses
+		std::cout <<  "Server IP adresses: " << std::endl;
+		foreach(QNetworkInterface interface, QNetworkInterface::allInterfaces())
+		{
+			if (interface.flags().testFlag(QNetworkInterface::IsRunning))
+			foreach (QNetworkAddressEntry entry, interface.addressEntries())
+			{
+				if ( interface.hardwareAddress() != "00:00:00:00:00:00" && entry.ip().toString() != "127.0.0.1" && entry.ip().toString().contains(".") )
+				std::cout << string_cast(interface.name()) << " " << entry.ip().toString() << std::endl;
+			}
+		}
+
+		std::cout << QString("Server is listening to port %2").arg(this->serverPort()).toStdString() << std::endl;
 	}
 	else
 		std::cout << "Server failed to start. Error: " << this->errorString().toStdString() << std::endl;
@@ -136,7 +147,7 @@ void ImageServer::printHelpText()
 	}
 	std::cout << std::endl;
 	std::cout << std::endl;
-	std::cout << "Press any key + Enter to close the server."<< std::endl;
+	std::cout << "Press Ctrl + C to close the server."<< std::endl;
 	std::cout << std::endl;
 }
 }
