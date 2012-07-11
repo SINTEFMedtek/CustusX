@@ -243,6 +243,8 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 		return;
 	}
 	GL_TRACE("Prepare for 2D rendering");
+	GLint oldTextureUnit;
+	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
 
 	vtkRenderWindow* renWin = renderer->GetRenderWindow();
 	if (mInternals->LastContext != renWin)
@@ -307,6 +309,7 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 
 	this->Superclass::PrepareForRendering(renderer, actor);
 	report_gl_error();
+	glActiveTexture(oldTextureUnit);
 	GL_TRACE("Prepare for 2D rendering complete");
 }
 
@@ -318,6 +321,8 @@ void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
 		return;
 	}
 	GL_TRACE("2D rendering");
+	GLint oldTextureUnit;
+	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
 
 	int layers = mInternals->mElement.size();
 	mInternals->Shader->GetUniformVariables()->SetUniformi("layers", 1, &layers);
@@ -335,6 +340,7 @@ void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor,
 	glBindTexture(GL_TEXTURE_3D, 0);
 	glDisable(vtkgl::TEXTURE_3D);
 	report_gl_error();
+	glActiveTexture(oldTextureUnit);
 	GL_TRACE("2D rendering complete");
 }
 
