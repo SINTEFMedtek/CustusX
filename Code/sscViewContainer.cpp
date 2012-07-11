@@ -73,22 +73,14 @@ ViewContainer::~ViewContainer()
 void ViewContainer::clear()
 {
 	QLayoutItem *item;
-	bool cleared = false;
 	while ((item = layout()->takeAt(0)) != 0)
 	{
 		((ViewItem *) item)->removeReps();
-		if (!cleared)
-		{
-			((ViewItem *) item)->getRenderer()->SetViewport(0,0,1,1);
-			((ViewItem *) item)->getRenderer()->Clear();
-			((ViewItem *) item)->getRenderer()->SetBackground(110.0/255.0, 111.0/255.0, 113.0/255.0);
-			((ViewItem *) item)->getRenderer()->Render();
-			cleared = true;
-		}
 		
 		mRenderWindow->RemoveRenderer(((ViewItem *) item)->getRenderer());
 		delete (ViewItem *)item;
 	}
+	clearBackground();
 }
 
 void ViewContainer::clearBackground()
@@ -97,7 +89,8 @@ void ViewContainer::clearBackground()
 	mRenderWindow->AddRenderer(renderer);
 	renderer->SetViewport(0,0,1,1);
 	renderer->Clear();
-	renderer->SetBackground(110.0/255.0, 111.0/255.0, 113.0/255.0);
+	QColor background = palette().color(QPalette::Background);
+	renderer->SetBackground(background.redF(), background.greenF(), background.blueF());
 	renderer->Render();
 	mRenderWindow->RemoveRenderer(renderer);
 }
