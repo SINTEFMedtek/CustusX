@@ -22,7 +22,7 @@
 #include "sscProbeSector.h"
 //#include "sscStringWidgets.h"
 #include "cxUsReconstructionFileReader.h"
-#include "cxTimedAlgorithm.h"
+#include "cxThreadedTimedAlgorithm.h"
 
 namespace ssc
 {

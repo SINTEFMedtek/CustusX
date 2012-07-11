@@ -52,5 +52,17 @@ include_directories(
 # create the target
 add_library( cxPluginUSReconstructionLogic ${SOURCE_FILES} )
 target_link_libraries( cxPluginUSReconstructionLogic ${cxPluginUSReconstructionLogic_LIB_FILES} )
+
+#------------------------------------------------------------------------------
+# Cotire - pch and unity builds
+#------------------------------------------------------------------------------
+if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+    cotire(cxPluginUSReconstructionLogic)
+    if(COTIRE_ADD_UNITY_BUILDS)
+        target_link_libraries(cxPluginUSReconstructionLogic_unity 
+        		${cxPluginUSReconstructionLogic_LIB_FILES}
+        		)
+    endif(COTIRE_ADD_UNITY_BUILDS)
+endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
 # =========================================================
 

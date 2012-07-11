@@ -16,7 +16,7 @@ namespace cx
 /**
  * TrackedCenterlineWidget
  *
- * \brief
+ * \brief NOT IN USE. TEST!!!
  *
  * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
@@ -36,12 +36,14 @@ protected slots:
   void stoppedSlot();
 
   void centerlineFinishedSlot();
+  void preprocessResampler();
 
 private:
   virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
   ToolPtr findTool(double startTime, double stopTime);
 
   Centerline  mCenterlineAlgorithm;
+  QString mSessionID;
 };
 
 /**

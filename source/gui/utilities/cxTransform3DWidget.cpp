@@ -172,7 +172,7 @@ void Transform3DWidget::addTranslationControls(QString uid, QString name, int in
 {
   QHBoxLayout* hLayout = new QHBoxLayout;
 
-  ssc::DoubleDataAdapterXmlPtr adapter = ssc::DoubleDataAdapterXml::initialize(uid, name, "", 0, ssc::DoubleRange(-1000,1000,0.1),1);
+  ssc::DoubleDataAdapterXmlPtr adapter = ssc::DoubleDataAdapterXml::initialize(uid, name, "", 0, ssc::DoubleRange(-10000,10000,0.1),1);
   connect(adapter.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
   adapter->setInternal2Display(1.0);
   hLayout->addWidget(new ssc::SpinBoxGroupWidget(this, adapter));

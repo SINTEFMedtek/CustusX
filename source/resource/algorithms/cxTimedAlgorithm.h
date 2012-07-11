@@ -1,48 +1,33 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #ifndef CXTIMEDALGORITHM_H_
 #define CXTIMEDALGORITHM_H_
 
-#include <QtGui>
+//#include <QtGui>
 
 #include <QObject>
 #include <QDateTime>
 #include <QTimer>
-
-#include <itkImage.h>
-#include <itkSmoothingRecursiveGaussianImageFilter.h>
-#include <itkBinaryThresholdImageFilter.h>
-#include <itkBinaryThinningImageFilter3D.h>
-#include "ItkVtkGlue/itkImageToVTKImageFilter.h"
-#include "ItkVtkGlue/itkVTKImageToImageFilter.h"
-
-#include <vtkImageCast.h>
-
-#include "sscMessageManager.h"
-#include "sscImage.h"
-
-const unsigned int Dimension = 3;
-//typedef unsigned short PixelType;
-typedef short PixelType; //short will probably work in most cases, but int may be needed
-typedef itk::Image< PixelType, Dimension >  itkImageType;
-typedef itk::ImageToVTKImageFilter<itkImageType> itkToVtkFilterType;
-typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
+#include <boost/function.hpp>
+#include <vector>
+#include <iostream>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
-/**
- * \brief Class with helper functions for algorithms.
- * \ingroup cxResourceAlgorithms
- *
- * \date Feb 16, 2011
- * \author Janne Beate Bakeng, SINTEF
- */
-class AlgorithmHelper
-{
-public:
-  static itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image);
 
-private:
-  static itkImageType::ConstPointer getITKfromSSCImageViaFile(ssc::ImagePtr image);
-};
 
 
 /**
@@ -61,17 +46,28 @@ public:
   TimedBaseAlgorithm(QString product, int secondsBetweenAnnounce);
   virtual ~TimedBaseAlgorithm();
 
-//  virtual void generate() = 0;
-  QString getProduct() const { return mProduct; }
+  virtual QString getProduct() const { return mProduct; }
+  /**Execute the algorithm.
+   * Parts of the execution can be in another thread, thus the call
+   * usually returns after preprocessing is complete.
+   * The exec starts by emitting aboutToStart(), which can be used by
+   * callers to set input arguments.
+   */
+  virtual void execute() = 0;
 
 signals:
+	void aboutToStart(); ///< emitted at start of execute. Use to perform preprocessing
 	void started(int maxSteps); /// < emitted at start of run. \param maxSteps is an input to a QProgressBar, set to zero if unknown.
 	void finished(); ///< should be emitted when at the end of postProcessingSlot
+	void productChanged(); ///< emitted whenever product string has changed
 //	void progress();
 
 protected:
   void startTiming();
   void stopTiming();
+  bool mUseDefaultMessages;
+
+  QString getSecondsPassedAsString() const;
 
 protected slots:
   virtual void finishedSlot() {}
@@ -87,79 +83,8 @@ private:
   QDateTime mStartTime;
   QString   mProduct;
 };
-typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
+typedef boost::shared_ptr<TimedBaseAlgorithm> TimedAlgorithmPtr;
 
-/**
- * \brief Base class for algorithms that wants to thread and time their
- * execution. T is the return type of the calculated data in the thread.
- * \ingroup cxResourceAlgorithms
- *
- * \date Feb 22, 2011
- * \author Janne Beate Bakeng, SINTEF
- */
-template <class T>
-class ThreadedTimedAlgorithm : public TimedBaseAlgorithm
-{
-public:
-  ThreadedTimedAlgorithm(QString product, int secondsBetweenAnnounce) :
-	  TimedBaseAlgorithm(product, secondsBetweenAnnounce)
-  {
-	  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
-	  connect(&mWatcher, SIGNAL(finished()), this, SLOT(postProcessingSlot()));
-	  connect(&mWatcher, SIGNAL(finished()), this, SIGNAL(finished()));
-  }
-  virtual ~ThreadedTimedAlgorithm() {}
-
-protected:
-  virtual void postProcessingSlot() = 0; ///< This happens when the thread (calculate) is finished, here non-thread safe functions can be called
-
-protected:
-  virtual T calculate() = 0; ///< This is the threaded function, should only contain threadsafe function calls
-
-  void generate() ///< Call generate to execute the algorithm
-  {
-	  TimedBaseAlgorithm::startTiming();
-	  emit started(0); // TODO move to started signal from qtconcurrent??
-
-	  mFutureResult = QtConcurrent::run(this, &ThreadedTimedAlgorithm<T>::calculate);
-	  mWatcher.setFuture(mFutureResult);
-  }
-  T getResult() ///< This gets the result calculated in calculate, should only be used after calculate is finished
-  {
-	  T result = mWatcher.future().result();
-	  return result;
-  }
-
-private:
-  void finishedSlot()
-  {
-	  TimedBaseAlgorithm::stopTiming();
-  }
-
-  QFuture<T> mFutureResult;
-  QFutureWatcher<T> mWatcher;
-};
-
-//---------------------------------------------------------------------------------------------------------------------
-/**
- * \brief Implementation of ThreadedTimedAlgorithm that shows the minimum implementation of this class.
- * \ingroup cxResourceAlgorithms
- *
- * \date Feb 22, 2011
- * \author Janne Beate Bakeng, SINTEF
- */
-class Example : public ThreadedTimedAlgorithm<QString>
-{
-  Q_OBJECT
-public:
-  Example();
-  virtual ~Example();
-
-private slots:
-  virtual void postProcessingSlot();
-
-private:
-  virtual QString calculate();
-};
 }//namespace
+
 #endif /* CXTIMEDALGORITHM_H_ */

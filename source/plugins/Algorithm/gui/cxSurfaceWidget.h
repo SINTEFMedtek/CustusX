@@ -58,6 +58,7 @@ private slots:
   void imageChangedSlot(QString uid);
   void handleFinishedSlot();
   void thresholdSlot();
+  void preprocessContour();
 
 private:
   SurfaceWidget();

@@ -48,11 +48,11 @@
 #include "cxRepManager.h"
 #include "cxCameraControl.h"
 #include "cxLandmarkRep.h"
-#include "cxPointMetricRep.h"
-#include "cxDistanceMetricRep.h"
-#include "cxAngleMetricRep.h"
-#include "cxPlaneMetricRep.h"
-#include "cxDataMetricRep.h"
+#include "sscPointMetricRep.h"
+#include "sscDistanceMetricRep.h"
+#include "sscAngleMetricRep.h"
+#include "sscPlaneMetricRep.h"
+#include "sscDataMetricRep.h"
 #include "cxDataLocations.h"
 #include "sscTexture3DSlicerRep.h"
 #include "sscSlices3DRep.h"
@@ -62,16 +62,16 @@
 #include "sscAxesRep.h"
 #include "cxViewGroup.h"
 
-#include "cxAngleMetric.h"
-#include "cxDistanceMetric.h"
-#include "cxPointMetric.h"
+#include "sscAngleMetric.h"
+#include "sscDistanceMetric.h"
+#include "sscPointMetric.h"
 
 namespace cx
 {
 
 AxisConnector::AxisConnector(ssc::CoordinateSystem space)
 {
-	mListener.reset(new CoordinateSystemListener(space));
+	mListener.reset(new ssc::CoordinateSystemListener(space));
 	connect(mListener.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
 
 	mRep = ssc::AxesRep::New(space.toString() + "_axis");
@@ -82,7 +82,7 @@ AxisConnector::AxisConnector(ssc::CoordinateSystem space)
 	this->changedSlot();
 }
 
-void AxisConnector::mergeWith(CoordinateSystemListenerPtr base)
+void AxisConnector::mergeWith(ssc::CoordinateSystemListenerPtr base)
 {
 	mBase = base;
 	connect(mBase.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
@@ -259,7 +259,7 @@ void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
 
 void ViewWrapper3D::PickerRepDataPickedSlot(QString uid)
 {
-	std::cout << "picked: " << uid << std::endl;
+	//std::cout << "picked: " << uid << std::endl;
 }
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
@@ -375,6 +375,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 	connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
 	connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
 	mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
+
 	// Set eye angle after camera change. Maybe create a cameraChangedSlot instead
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 	this->optionChangedSlot();
@@ -451,7 +452,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 			axis->mRep->setCaption("t", ssc::Vector3D(0.7, 1, 0.7));
 			axis->mRep->setFontSize(0.03);
 			axis->connectTo(tool);
-			CoordinateSystemListenerPtr mToolListener = axis->mListener;
+			ssc::CoordinateSystemListenerPtr mToolListener = axis->mListener;
 
 			mAxis.push_back(axis);
 
@@ -514,6 +515,9 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 
 void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 {
+	if (!data)
+		return;
+
 	if (!mDataReps.count(data->getUid()))
 	{
 		ssc::RepPtr rep = this->createDataRep3D(data);
@@ -556,32 +560,32 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 		rep->setMesh(boost::shared_dynamic_cast<ssc::Mesh>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<PointMetric>(data))
+	else if (boost::shared_dynamic_cast<ssc::PointMetric>(data))
 	{
-		PointMetricRepPtr rep = PointMetricRep::New(data->getUid() + "_3D_rep");
+		ssc::PointMetricRepPtr rep = ssc::PointMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setPointMetric(boost::shared_dynamic_cast<PointMetric>(data));
+		rep->setPointMetric(boost::shared_dynamic_cast<ssc::PointMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<DistanceMetric>(data))
+	else if (boost::shared_dynamic_cast<ssc::DistanceMetric>(data))
 	{
-		DistanceMetricRepPtr rep = DistanceMetricRep::New(data->getUid() + "_3D_rep");
+		ssc::DistanceMetricRepPtr rep = ssc::DistanceMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setDistanceMetric(boost::shared_dynamic_cast<DistanceMetric>(data));
+		rep->setDistanceMetric(boost::shared_dynamic_cast<ssc::DistanceMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<AngleMetric>(data))
+	else if (boost::shared_dynamic_cast<ssc::AngleMetric>(data))
 	{
-		AngleMetricRepPtr rep = AngleMetricRep::New(data->getUid() + "_3D_rep");
+		ssc::AngleMetricRepPtr rep = ssc::AngleMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setMetric(boost::shared_dynamic_cast<AngleMetric>(data));
+		rep->setMetric(boost::shared_dynamic_cast<ssc::AngleMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<PlaneMetric>(data))
+	else if (boost::shared_dynamic_cast<ssc::PlaneMetric>(data))
 	{
-		PlaneMetricRepPtr rep = PlaneMetricRep::New(data->getUid() + "_3D_rep");
+		ssc::PlaneMetricRepPtr rep = ssc::PlaneMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setMetric(boost::shared_dynamic_cast<PlaneMetric>(data));
+		rep->setMetric(boost::shared_dynamic_cast<ssc::PlaneMetric>(data));
 		return rep;
 	}
 
@@ -593,7 +597,7 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
  */
 void ViewWrapper3D::readDataRepSettings(ssc::RepPtr rep)
 {
-	cx::DataMetricRepPtr val = boost::shared_dynamic_cast<DataMetricRep>(rep);
+	ssc::DataMetricRepPtr val = boost::shared_dynamic_cast<ssc::DataMetricRep>(rep);
 	if (!val)
 		return;
 
@@ -733,6 +737,7 @@ void ViewWrapper3D::optionChangedSlot()
 
 	this->showLandmarks(options.mShowLandmarks);
 	this->showPointPickerProbe(options.mShowPointPickerProbe);
+	mPickerRep->setGlyph(options.mPickerGlyph);
 }
 
 void ViewWrapper3D::showLandmarks(bool on)
@@ -761,6 +766,7 @@ void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
 	mSlicePlanes3DRep = ssc::SlicePlanes3DRep::New("uid");
 	mSlicePlanes3DRep->setProxy(proxy);
+	mSlicePlanes3DRep->setDynamicLabelSize(true);
 	bool show = settings()->value("showSlicePlanes").toBool();
 	mSlicePlanes3DRep->getProxy()->setVisible(show); // init with default value
 

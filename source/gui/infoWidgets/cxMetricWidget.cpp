@@ -20,8 +20,8 @@
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "cxPointMetric.h"
-#include "cxDistanceMetric.h"
+#include "sscPointMetric.h"
+#include "sscDistanceMetric.h"
 #include "sscDataManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
@@ -120,7 +120,7 @@ void MetricWidget::cellClickedSlot(int row, int column)
 
 	  QTableWidgetItem* item = mTable->item(row,column);
 	  ssc::DataPtr data = ssc::dataManager()->getData(item->data(Qt::UserRole).toString());
-	  cx::PointMetricPtr pointData = boost::shared_dynamic_cast<cx::PointMetric>(data);
+	  ssc::PointMetricPtr pointData = boost::shared_dynamic_cast<ssc::PointMetric>(data);
 	  if (pointData)
 	  {
 		  	ssc::Vector3D p_r = pointData->getRefCoord();;
@@ -177,21 +177,21 @@ void MetricWidget::hideEvent(QHideEvent* event)
 
 MetricBasePtr MetricWidget::createMetricWrapper(ssc::DataPtr data)
 {
-  if (boost::shared_dynamic_cast<PointMetric>(data))
+  if (boost::shared_dynamic_cast<ssc::PointMetric>(data))
   {
-    return MetricBasePtr(new PointMetricWrapper(boost::shared_dynamic_cast<PointMetric>(data)));
+    return MetricBasePtr(new PointMetricWrapper(boost::shared_dynamic_cast<ssc::PointMetric>(data)));
   }
-  else if (boost::shared_dynamic_cast<DistanceMetric>(data))
+  else if (boost::shared_dynamic_cast<ssc::DistanceMetric>(data))
   {
-    return MetricBasePtr(new DistanceMetricWrapper(boost::shared_dynamic_cast<DistanceMetric>(data)));
+    return MetricBasePtr(new DistanceMetricWrapper(boost::shared_dynamic_cast<ssc::DistanceMetric>(data)));
   }
-  else if (boost::shared_dynamic_cast<PlaneMetric>(data))
+  else if (boost::shared_dynamic_cast<ssc::PlaneMetric>(data))
   {
-    return MetricBasePtr(new PlaneMetricWrapper(boost::shared_dynamic_cast<PlaneMetric>(data)));
+    return MetricBasePtr(new PlaneMetricWrapper(boost::shared_dynamic_cast<ssc::PlaneMetric>(data)));
   }
-  else if (boost::shared_dynamic_cast<AngleMetric>(data))
+  else if (boost::shared_dynamic_cast<ssc::AngleMetric>(data))
   {
-    return MetricBasePtr(new AngleMetricWrapper(boost::shared_dynamic_cast<AngleMetric>(data)));
+    return MetricBasePtr(new AngleMetricWrapper(boost::shared_dynamic_cast<ssc::AngleMetric>(data)));
   }
 
 	return MetricBasePtr();
@@ -333,9 +333,9 @@ void MetricWidget::enablebuttons()
   mLoadReferencePointsAction->setEnabled(ssc::toolManager()->getReferenceTool());
 }
 
-PointMetricPtr MetricWidget::addPoint(ssc::Vector3D point, ssc::CoordinateSystem space, QString name)
+ssc::PointMetricPtr MetricWidget::addPoint(ssc::Vector3D point, ssc::CoordinateSystem space, QString name)
 {
-	PointMetricPtr p1(new PointMetric("point%1","point%1"));
+	ssc::PointMetricPtr p1(new ssc::PointMetric("point%1","point%1"));
   p1->get_rMd_History()->setParentSpace("reference");
 	p1->setSpace(space);
 	p1->setCoordinate(point);
@@ -366,7 +366,7 @@ void MetricWidget::addPlaneButtonClickedSlot()
   ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
   ssc::Vector3D p_ref = ssc::SpaceHelpers::getDominantToolTipPoint(ref, true);
 
-  PlaneMetricPtr p1(new PlaneMetric("plane%1","plane%1"));
+  ssc::PlaneMetricPtr p1(new ssc::PlaneMetric("plane%1","plane%1"));
   p1->get_rMd_History()->setParentSpace("reference");
   p1->setSpace(ref);
   p1->setCoordinate(p_ref);
@@ -405,7 +405,7 @@ std::vector<ssc::DataPtr> MetricWidget::refinePointArguments(std::vector<ssc::Da
 
   while (args.size() < argNo)
   {
-  	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
+	  ssc::PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
   	args.push_back(p0);
   }
 
@@ -415,7 +415,7 @@ std::vector<ssc::DataPtr> MetricWidget::refinePointArguments(std::vector<ssc::Da
 
 void MetricWidget::addDistanceButtonClickedSlot()
 {
-	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
+	ssc::DistanceMetricPtr d0(new ssc::DistanceMetric("distance%1","distance%1"));
   d0->get_rMd_History()->setParentSpace("reference");
 	// first try to reuse existing points as distance arguments, otherwise create new ones.
   std::vector<ssc::DataPtr> args;
@@ -465,7 +465,7 @@ void MetricWidget::addDistanceButtonClickedSlot()
 
 void MetricWidget::addAngleButtonClickedSlot()
 {
-  AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
+	ssc::AngleMetricPtr d0(new ssc::AngleMetric("angle%1","angle%1"));
   d0->get_rMd_History()->setParentSpace("reference");
 	// first try to reuse existing points as distance arguments, otherwise create new ones.
   std::vector<ssc::DataPtr> args;

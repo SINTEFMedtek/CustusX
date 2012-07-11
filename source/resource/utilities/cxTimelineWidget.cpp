@@ -33,13 +33,13 @@ TimelineWidget::TimelineWidget(QWidget* parent) :
 	mForward = vtkPiecewiseFunctionPtr::New();
 	mBackward = vtkPiecewiseFunctionPtr::New();
 
-	int s = 255;
-	int v = 192;
-	mEventColors.push_back(QColor::fromHsv(110, s, v));
-	mEventColors.push_back(QColor::fromHsv(80, s, v));
-	mEventColors.push_back(QColor::fromHsv(140, s, v));
-	mEventColors.push_back(QColor::fromHsv(95, s, v));
-	mEventColors.push_back(QColor::fromHsv(125, s, v));
+//	int s = 255;
+//	int v = 192;
+//	mEventColors.push_back(QColor::fromHsv(110, s, v));
+//	mEventColors.push_back(QColor::fromHsv(80, s, v));
+//	mEventColors.push_back(QColor::fromHsv(140, s, v));
+//	mEventColors.push_back(QColor::fromHsv(95, s, v));
+//	mEventColors.push_back(QColor::fromHsv(125, s, v));
 
 	this->setFocusPolicy(Qt::StrongFocus);
 	this->setMouseTracking(true);
@@ -60,6 +60,30 @@ void TimelineWidget::setPos(double pos)
 double TimelineWidget::getPos() const
 {
 	return mPos;
+}
+
+/**Compact free space using a compacting transform
+ *
+ */
+double TimelineWidget::findCompactedTime(double timeInterval, double totalUsedTime, double totalTime) const
+{
+	// compact free space using t' = t * c, where
+	// c = w*c1 + (1-w)*c0
+	// w is this free space's fraction of total time
+	// c1 is compactingFactor1, set so that even a space using more than 99%
+	// of the total time will be reduced to 20%.
+	// c0 is compactingFactor0, set to 0.2. Used for small spaces.
+	// constant factor: apply even to small spaces
+	double compactingFactor0 = 0.2;
+	double compactingFactor1 = totalUsedTime/totalTime * 0.2;
+
+	// find compacting factor c as described above
+	double w = timeInterval/totalTime;
+	double c = w*compactingFactor1 + (1-w)*compactingFactor0;
+	// use c to compact, but also set an absolute limit of fraction of total used time. This handles pauses of days or months.
+	double compactedTime = std::min(timeInterval * c, 0.3*totalUsedTime);
+
+	return compactedTime;
 }
 
 /**Identify intervals containing no events,
@@ -117,46 +141,23 @@ void TimelineWidget::createCompactingTransforms()
 	// function from real time (x) to compact time (y)
 	mForward = vtkPiecewiseFunctionPtr::New();
 
-	// compact free space using t' = t * c, where
-	// c = w*c1 + (1-w)*c0
-	// w is this free space's fraction of total time
-	// c1 is compactingFactor1, set so that even a space using more than 99%
-	// of the total time will be reduced to 20%.
-	// c0 is compactingFactor0, set to 0.2. Used for small spaces.
-	// constant factor: apply even to small spaces
-	double compactingFactor0 = 0.2;
-	double compactingFactor1 = usageFactor * 0.2;
-
 	double y = mStart;
 	mForward->AddPoint(mStart, y);
 	double x_last = mStart;
 	for (unsigned i = 0; i < temp.size(); ++i)
 	{
-//		std::cout << "zone\t" << i << "\t" << temp[i].mStartTime - mStart << "\t" << temp[i].mEndTime - mStart << std::endl;
 		// add first point
-		double emptyPre = temp[i].mStartTime - x_last;
-//		std::cout << "\t\t" << y-mStart << "\t" << emptyPre << std::endl;
-
-		// find compacting factor c as described above
-		double w = emptyPre/(mStop-mStart);
-		double c = w*compactingFactor1 + (1-w)*compactingFactor0;
-//		std::cout << "c\t" << c << std::endl;
-		y = y + emptyPre * c;
+		y = y + this->findCompactedTime(temp[i].mStartTime - x_last, totalUsedTime, mStop-mStart);
 		mForward->AddPoint(temp[i].mStartTime, y);
-
 		// add last point
 		y = y + temp[i].mEndTime - temp[i].mStartTime;
 		mForward->AddPoint(temp[i].mEndTime, y);
+
 		x_last = temp[i].mEndTime;
 	}
 
-	double emptyPre = mStop - x_last;
-	// find compacting factor c as described above
-	double w = emptyPre/(mStop-mStart);
-	w = std::pow(w, 1.0/2.0); // add more weight to the varying component
-	double c = w*compactingFactor1 + (1-w)*compactingFactor0;
-//	std::cout << "c\t" << c << std::endl;
-	y = y + emptyPre * c;
+	// add endpoint
+	y = y + this->findCompactedTime(mStop - x_last, totalUsedTime, mStop-mStart);
 	mForward->AddPoint(mStop, y);
 
 	// normalize y:
@@ -168,9 +169,7 @@ void TimelineWidget::createCompactingTransforms()
 	{
 		double val[4];
 		mForward->GetNodeValue(i, val);
-//		std::cout << "pre\t" << val[0] - mStart << "\t" << val[1] - mStart << std::endl;
 		val[1] = (val[1] - y_min) / (y_max - y_min);
-//		std::cout << "nor\t"<< val[0] - mStart << "\t" << val[1] << std::endl;
 		mForward->SetNodeValue(i, val);
 	}
 
@@ -203,8 +202,10 @@ void TimelineWidget::setEvents(std::vector<TimelineEvent> events)
 	{
 		if (mEvents[i].isSingular())
 			continue;
-		if (!std::count(mContinousEvents.begin(), mContinousEvents.end(), mEvents[i].mDescription))
-			mContinousEvents.push_back(mEvents[i].mDescription);
+//		if (!std::count(mContinousEvents.begin(), mContinousEvents.end(), mEvents[i].mDescription))
+//			mContinousEvents.push_back(mEvents[i].mDescription);
+		if (!std::count(mContinousEvents.begin(), mContinousEvents.end(), mEvents[i].mGroup))
+			mContinousEvents.push_back(mEvents[i].mGroup);
 	}
 
 }
@@ -280,17 +281,18 @@ void TimelineWidget::paintEvent(QPaintEvent* event)
 	// draw all continous events
 	for (unsigned i = 0; i < mEvents.size(); ++i)
 	{
-		if (!mContinousEvents.contains(mEvents[i].mDescription))
+		if (!mContinousEvents.contains(mEvents[i].mGroup))
 			continue;
 		int start_p = this->mapTime2PlotX(mEvents[i].mStartTime);
 		int stop_p = this->mapTime2PlotX(mEvents[i].mEndTime);
 		int level = std::distance(mContinousEvents.begin(),
-						std::find(mContinousEvents.begin(), mContinousEvents.end(), mEvents[i].mDescription));
+						std::find(mContinousEvents.begin(), mContinousEvents.end(), mEvents[i].mGroup));
 		int level_max = mContinousEvents.size();
 		int thisHeight = (mPlotArea.height()) / level_max - margin * (level_max - 1) / level_max;
 		int thisTop = mPlotArea.top() + level * thisHeight + level * margin;
 
-		QColor color = mEventColors[level % mEventColors.size()];
+//		QColor color = mEventColors[level % mEventColors.size()];
+		QColor color = mEvents[i].mColor;
 
 		painter.fillRect(QRect(start_p, thisTop, stop_p - start_p, thisHeight), color);
 	}
@@ -298,7 +300,7 @@ void TimelineWidget::paintEvent(QPaintEvent* event)
 	// draw all singular events
 	for (unsigned i = 0; i < mEvents.size(); ++i)
 	{
-		if (mContinousEvents.contains(mEvents[i].mDescription))
+		if (mContinousEvents.contains(mEvents[i].mGroup))
 			continue;
 
 		int start_p = this->mapTime2PlotX(mEvents[i].mStartTime);

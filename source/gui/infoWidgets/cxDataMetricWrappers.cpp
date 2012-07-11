@@ -20,8 +20,8 @@
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "cxPointMetric.h"
-#include "cxDistanceMetric.h"
+#include "sscPointMetric.h"
+#include "sscDistanceMetric.h"
 #include "sscDataManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
@@ -30,7 +30,7 @@
 namespace cx
 {
 
-PointMetricWrapper::PointMetricWrapper(PointMetricPtr data) : mData(data)
+PointMetricWrapper::PointMetricWrapper(ssc::PointMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
@@ -151,7 +151,7 @@ void PointMetricWrapper::dataChangedSlot()
 //---------------------------------------------------------
 
 
-PlaneMetricWrapper::PlaneMetricWrapper(PlaneMetricPtr data) : mData(data)
+PlaneMetricWrapper::PlaneMetricWrapper(ssc::PlaneMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
@@ -270,7 +270,7 @@ void PlaneMetricWrapper::dataChangedSlot()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-DistanceMetricWrapper::DistanceMetricWrapper(DistanceMetricPtr data) : mData(data)
+DistanceMetricWrapper::DistanceMetricWrapper(ssc::DistanceMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
@@ -283,7 +283,6 @@ void DistanceMetricWrapper::getAvailableArgumentMetrics(QStringList* uid, std::m
   for (std::map<QString, ssc::DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
   {
     if (mData->validArgument(iter->second))
-//    if (boost::shared_dynamic_cast<PointMetric>(iter->second))
     {
       *uid << iter->first;
       (*namemap)[iter->first] = iter->second->getName();
@@ -354,7 +353,6 @@ void DistanceMetricWrapper::pointSelected()
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
     ssc::DataPtr arg = ssc::dataManager()->getData(mPSelector[i]->getValue());
-//    PointMetricPtr p = boost::shared_dynamic_cast<PointMetric>();
     if (mData->validArgument(arg))
       mData->setArgument(i, arg);
   }
@@ -381,7 +379,7 @@ void DistanceMetricWrapper::dataChangedSlot()
 //---------------------------------------------------------
 
 
-AngleMetricWrapper::AngleMetricWrapper(AngleMetricPtr data) : mData(data)
+AngleMetricWrapper::AngleMetricWrapper(ssc::AngleMetricPtr data) : mData(data)
 {
   mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
@@ -393,7 +391,7 @@ void AngleMetricWrapper::getPointMetrics(QStringList* uid, std::map<QString,QStr
   std::map<QString, ssc::DataPtr> data = ssc::dataManager()->getData();
   for (std::map<QString, ssc::DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
   {
-    if (boost::shared_dynamic_cast<PointMetric>(iter->second))
+    if (boost::shared_dynamic_cast<ssc::PointMetric>(iter->second))
     {
       *uid << iter->first;
       (*namemap)[iter->first] = iter->second->getName();
@@ -403,8 +401,6 @@ void AngleMetricWrapper::getPointMetrics(QStringList* uid, std::map<QString,QStr
 
 QWidget* AngleMetricWrapper::createWidget()
 {
-//  std::cout << "AngleMetricWrapper::createWidget() begin"  << std::endl;
-
   QWidget* widget = new QWidget;
   QVBoxLayout* topLayout = new QVBoxLayout(widget);
   QHBoxLayout* hLayout = new QHBoxLayout;
@@ -431,9 +427,7 @@ QWidget* AngleMetricWrapper::createWidget()
     connect(mPSelector[i].get(), SIGNAL(valueWasSet()), this, SLOT(pointSelected()));
   }
 
-//  std::cout << "AngleMetricWrapper::createWidget() prechange"  << std::endl;
   this->dataChangedSlot();
-//  std::cout << "AngleMetricWrapper::createWidget() end"  << std::endl;
   return widget;
 }
 
@@ -463,11 +457,9 @@ void AngleMetricWrapper::pointSelected()
 {
   if (mInternalUpdate)
     return;
-//  std::cout << "AngleMetricWrapper::pointSelected()"<< std::endl;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
-    PointMetricPtr p = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(mPSelector[i]->getValue()));
-//    std::cout << "    " << i << ", set: " << (p?p->getUid():"NULL") << ", old: "<< (mData->getPoint(i)?mData->getPoint(i)->getUid():"NULL") << std::endl;
+	  ssc::PointMetricPtr p = boost::shared_dynamic_cast<ssc::PointMetric>(ssc::dataManager()->getData(mPSelector[i]->getValue()));
     mData->setArgument(i, p);
   }
 }

@@ -21,7 +21,9 @@
 #include "sscTransform3D.h"
 #include <QObject>
 #include <QProcess>
+#include <QFile>
 #include "cxTimedAlgorithm.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -55,11 +57,12 @@ public:
 
 	void setDisplayProcessMessages(bool on);
 
-	void run(QString application,
+	void setInput(QString application,
 	         ssc::DataPtr fixed,
 	         ssc::DataPtr moving,
 	         QString outdir,
 	         QStringList parameterfiles);
+	  virtual void execute();
 
 	ssc::Transform3D getAffineResult_mMf(bool* ok = 0) ;
 	QString getNonlinearResultVolume(bool* ok = 0);

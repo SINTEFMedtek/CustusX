@@ -63,11 +63,14 @@ signals:
     void statusOnQueue(int); ///< Emitted when there is a new IGTLinkUSStatusMessage is in the message queue
 
 protected:
+    void initializeSonixGrabber();
 private:
   QTcpSocket* mSocket;
   QTimer* mTimer;
   StringMap mArguments;
   bool mEmitStatusMessage; ///< Emit new US status message
+  double mLastFrameTimestamp; ///< Time stamp of last frame
+  double mCurrentFrameTimestamp; ///< Current frame timestamp
 
   vtkSonixVideoSourcePtr  mSonixGrabber; ///< Ultrasonix video grabber
   SonixHelper*          mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
@@ -101,6 +104,7 @@ private:
 private slots:
   //void tick();
   void receiveFrameSlot(Frame& frame);
+  void initializeSonixSlot();
 
 };
 

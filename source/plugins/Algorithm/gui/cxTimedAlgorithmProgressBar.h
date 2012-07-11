@@ -62,6 +62,7 @@ public:
 private slots:
 	void algorithmStartedSlot(int maxSteps);
 	void algorithmFinishedSlot();
+	void productChangedSlot();
 
 private:
 	std::set<TimedAlgorithmPtr> mAlgorithm;

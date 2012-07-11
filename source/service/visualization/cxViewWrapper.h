@@ -18,10 +18,14 @@
 #include <vector>
 #include <QVariant>
 #include <QObject>
+#include <vtkPolyDataAlgorithm.h>
 #include "sscDefinitions.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
+#include <vtkSphereSource.h>
+#include "sscMesh.h"
 
+typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 class QMenu;
 class QActionGroup;
 
@@ -63,7 +67,7 @@ public:
 	void requestInitialize();
 	std::vector<ssc::DataPtr> getData() const;
 	void addData(ssc::DataPtr data);
-	void removeData(ssc::DataPtr data);
+	bool removeData(ssc::DataPtr data);
 	void clearData();
 	std::vector<ssc::ImagePtr> getImages() const;
 	std::vector<ssc::MeshPtr> getMeshes() const;
@@ -73,9 +77,13 @@ public:
 	// view options for this group.
 	struct Options
 	{
-		Options() : mShowLandmarks(false), mShowPointPickerProbe(false) {}
+		Options() : mShowLandmarks(false), mShowPointPickerProbe(false),
+				mPickerGlyph(new ssc::Mesh("PickerGlyph")) {}
 		bool mShowLandmarks;
 		bool mShowPointPickerProbe;
+		ssc::MeshPtr mPickerGlyph;
+//		vtkPolyDataAlgorithmPtr mPickerGlyph; ///< a glyph visually representing the picker.
+//		vtkSphereSourcePtr getSpherePickerGlyph() { return vtkSphereSource::SafeDownCast(mPickerGlyph); }
 	};
 
 	Options getOptions() const;

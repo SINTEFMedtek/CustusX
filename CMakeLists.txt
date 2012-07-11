@@ -43,7 +43,7 @@ endif(APPLE)
 #------------------------------------------------------------------------------
 set(CustusX3_VERSION_MAJOR  3)
 set(CustusX3_VERSION_MINOR  2)
-set(CustusX3_VERSION_PATCH  15)
+set(CustusX3_VERSION_PATCH  18)
 
 # set alpha when not a release
 set(CustusX3_VERSION_POSTFIX ".alpha")
@@ -56,8 +56,30 @@ set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${Custus
 set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
 
 if(APPLE)
-	set(CMAKE_INSTALL_PREFIX "Applications/" ) # used during package installation. Appended to some default which seems to be / , might be able to change using DESTDIR env var.
+    # used during package installation. Appended to some default which seems to be / , might be able to change using DESTDIR env var.
+	set(CMAKE_INSTALL_PREFIX "Applications/" ) 
 endif(APPLE)
+
+#-----------------------------------------------------------------------------
+# Cotire (COmpile TIme REducer)
+# Cross-platform cmake module for reducing compile time by generating 
+# precomiled headers (pch) and single compilation unit builds
+# Go to https://github.com/sakra/cotire for more information
+#-----------------------------------------------------------------------------
+option(COTIRE_ENABLE_PRECOMPILED_HEADERS "use cotire to autogenerate precompiled headers (pch)" OFF)
+option(COTIRE_ADD_UNITY_BUILDS "use cotire to autogenerate single comilation unit builds" OFF)
+
+if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/externals/ssc/CMake)
+    include(cotire)
+    # The properties COTIRE_ENABLE_PRECOMPILED_HEADER and COTIRE_ADD_UNITY_BUILD can also be set on targets. 
+    # A target inherits the property value from its enclosing directory.
+    set_directory_properties(
+                PROPERTIES 
+                COTIRE_ENABLE_PRECOMPILED_HEADER ${COTIRE_ENABLE_PRECOMPILED_HEADERS} 
+                COTIRE_ADD_UNITY_BUILD ${COTIRE_ADD_UNITY_BUILDS}
+                )
+endif()
 
 #------------------------------------------------------------------------------
 # Variables
@@ -108,7 +130,7 @@ if (CX_LINUX)
 		set(CX_INSTALL_ROOT_DIR "CustusX")
 		set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
 		set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
-#    set(CPACK_GENERATOR "TGZ;STGZ")
+        #set(CPACK_GENERATOR "TGZ;STGZ")
 		set(CPACK_GENERATOR "TGZ")
 		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 endif (CX_LINUX)
