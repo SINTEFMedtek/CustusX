@@ -259,11 +259,13 @@ void GPURayCastVolumeRep::setStepSize(double stepsize)
 void GPURayCastVolumeRep::enableImagePlaneDownsampling(int maxPixels)
 {
 	mPainter->enableImagePlaneDownsampling(maxPixels);
+	mActor->Modified();
 }
 
 void GPURayCastVolumeRep::disableImagePlaneDownsampling()
 {
 	mPainter->disableImagePlaneDownsampling();
+	mActor->Modified();
 }
 
 //---------------------------------------------------------
