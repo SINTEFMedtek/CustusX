@@ -46,9 +46,9 @@ namespace ssc
 class SlicePlanesProxy : public QObject
 {
 	Q_OBJECT
-public:	
+public:
 	SlicePlanesProxy();
-	
+
 	/**Modifiable properties for one plane
 	 *
 	 */
@@ -85,7 +85,7 @@ public:
 	PropertiesType& getProperties() { return mProperties; } // use this to set properties BEFORE attaching reps/calling setviewportdata()
 
 	void connectTo3D(bool on);
-		
+
 signals:
 	void changed();
 private:
@@ -170,7 +170,7 @@ public:
 	virtual QString getType() const { return "ssc::SlicePlanes3DMarkerIn2DRep"; }
 	void setProxy(PLANE_TYPE type, SlicePlanesProxyPtr proxy);
 	SlicePlanesProxyPtr getProxy() { return mProxy; }
-	
+
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View *view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View *view);

@@ -83,26 +83,26 @@ class ToolRep2D : public ssc::RepImpl
 		virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
 	private:
-		void setProbeSector(ssc::ProbeData data);				
+		void setProbeSector(ssc::ProbeData data);
 		double getOffset();
 		void createCrossHair(vtkRendererPtr renderer);
 		void setVisibility();
-		void createToolLine(vtkRendererPtr renderer, const Vector3D& centerPos );		
+		void createToolLine(vtkRendererPtr renderer, const Vector3D& centerPos );
 		void createOffsetText(vtkRendererPtr renderer, const Vector3D& pos );
-		
+
 		void updateToolLine(const Vector3D& crossPos, const Vector3D& toolTipPos, const Vector3D toolTipBackPos);
 		void updateOffsetText();
 		ToolRep2D(const QString& uid, const QString& name="");
 		void crossHairResized();
 
 		ssc::SliceProxyPtr mSlicer;
-		Transform3D m_vpMs;	
+		Transform3D m_vpMs;
 		DoubleBoundingBox3D mBB_vp;
-		
+
 		bool mUseOffset;
 		bool mUseCrosshair; 
 		bool mUseToolLine; 
-		bool mUseOffsetText;		
+		bool mUseOffsetText;
 		bool mMergeOffsetAndToolLine;
 
 		RGBColor mTooltipPointColor;
@@ -110,7 +110,7 @@ class ToolRep2D : public ssc::RepImpl
 		RGBColor mTooltipLineColor;
 		RGBColor mOffsetLineColor;
 		int mStipplePattern;
-		
+
 		CrossHair2DPtr cursor;
 		LineSegmentPtr center2Tool;
 		LineSegmentPtr tool2Back;

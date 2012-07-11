@@ -35,48 +35,48 @@ typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
 typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
 
 /**
-  * \brief Display a DTI Fiber bundle (fiber tracks) in 3D.
-  *
-  * FiberBundleRep displays a DTI fiber bundle using the supplied graphical
-  * representation from the FiberBundle interface.
-  * Used by Sonowand.
-  *
-  */
+ * \brief Display a DTI Fiber bundle (fiber tracks) in 3D.
+ *
+ * FiberBundleRep displays a DTI fiber bundle using the supplied graphical
+ * representation from the FiberBundle interface.
+ * Used by Sonowand.
+ *
+ */
 class FiberBundleRep : public RepImpl
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    static FiberBundleRepPtr New(const QString& uid, const QString& name = "");
-    virtual ~FiberBundleRep() {}
+	static FiberBundleRepPtr New(const QString& uid, const QString& name = "");
+	virtual ~FiberBundleRep() {}
 
-    /** Return rep type description */
+	/** Return rep type description */
 	virtual QString getType() const;
 
-    /** Assign a fiber bundle */
-    virtual void setBundle(FiberBundlePtr bundle);
-    virtual bool hasBundle(FiberBundlePtr bundle) const { return (mBundle == bundle); }
-    /** Return currently assigned fiber bundle */
-    virtual FiberBundlePtr getBundle() { return mBundle; }
+	/** Assign a fiber bundle */
+	virtual void setBundle(FiberBundlePtr bundle);
+	virtual bool hasBundle(FiberBundlePtr bundle) const { return (mBundle == bundle); }
+	/** Return currently assigned fiber bundle */
+	virtual FiberBundlePtr getBundle() { return mBundle; }
 
 protected:
-    FiberBundleRep(const QString& uid, const QString& name = "");
+	FiberBundleRep(const QString& uid, const QString& name = "");
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
 
 private:
-    double  mFiberWidth;
+	double  mFiberWidth;
 
-    FiberBundlePtr mBundle;
-    ViewportListenerPtr mViewportListener;
+	FiberBundlePtr mBundle;
+	ViewportListenerPtr mViewportListener;
 
-    vtkActorPtr mActor;
-    vtkPolyDataMapperPtr mPolyDataMapper;
-    vtkPropertyPtr mProperty;
+	vtkActorPtr mActor;
+	vtkPolyDataMapperPtr mPolyDataMapper;
+	vtkPropertyPtr mProperty;
 
-private slots:
-    void bundleChanged();
-    void bundleTransformChanged();
+	private slots:
+	void bundleChanged();
+	void bundleTransformChanged();
 
 };
 

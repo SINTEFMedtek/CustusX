@@ -110,7 +110,7 @@ void SSC_Error( const char *file, int line, const char *function, const char *fo
 	#ifndef WIN32
 	syslog(LOG_CRIT | LOG_USER, "%s: %s", function, buf);
 	#endif
-	
+
 	ssc::messageManager()->sendMessage(buf, ssc::mlERROR, 0, false, mergeSourceInfo(file, line, function));
 }
 

@@ -71,7 +71,7 @@ void SlicePlaneRep::setImage(ImagePtr image)
 {
 	mImage = image;
 	mImage->connectToRep(mSelf);
-	mVtkImagePlaneWidgetA->SetInput( image->getBaseVtkImageData() );	
+	mVtkImagePlaneWidgetA->SetInput( image->getBaseVtkImageData() );
 }
 
 bool SlicePlaneRep::hasImage(ImagePtr image) const
@@ -87,14 +87,14 @@ void SlicePlaneRep::setSliceReps( std::vector<ssc::SliceRepSWPtr> slicerReps)
 //	{
 //		mImageActors.push_back( slicerReps.at(i)->getActor() );
 //	}
-	
+
 }
 
 void SlicePlaneRep::setSliceProxy(SliceProxyPtr proxy) //connect tool transform update to sliceRep
 {
 	if (mSlicer)
 	{
-		disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));	
+		disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
 	}
 	mSlicer = proxy;
 	connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));

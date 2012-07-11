@@ -37,23 +37,22 @@ namespace ssc
   */
 class VtkFileMesh: public Mesh
 {
-
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    VtkFileMesh(const QString& uid, const QString& name = "", const QString& filePath = "");
-    virtual ~VtkFileMesh() {}
+	VtkFileMesh(const QString& uid, const QString& name = "", const QString& filePath = "");
+	virtual ~VtkFileMesh() {}
 
-    virtual vtkPolyDataPtr getVtkPolyData();
-    virtual QString getType() const
-    {
-        return "vtkfilemesh";
-    }
+	virtual vtkPolyDataPtr getVtkPolyData();
+	virtual QString getType() const
+	{
+		return "vtkfilemesh";
+	}
 
 private:
-    vtkPolyDataPtr mVtkPolyData;
+	vtkPolyDataPtr mVtkPolyData;
 
-    void loadData();
+	void loadData();
 };
 
 typedef boost::shared_ptr<VtkFileMesh> VtkFileMeshPtr;

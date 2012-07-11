@@ -47,7 +47,7 @@ typedef boost::shared_ptr<class BlendedSliceRep> BlendedSliceRepPtr;
  * \ingroup sscRep2D
  */
 class BlendedSliceRep : public RepImpl
-{	
+{
 	Q_OBJECT
 public:
 	virtual ~BlendedSliceRep();
@@ -61,18 +61,18 @@ protected:
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
 	void addInputImages(vtkImageDataPtr slicedImage);
-	
+
 private slots:
 	void updateAlphaSlot();
 
 private:
-	double getAlpha(int countImage);	
+	double getAlpha(int countImage);
 	bool firstImage;
 	vtkImageDataPtr mBaseImages;
 	SliceProxyPtr mSlicer;
 	ssc::SlicedImageProxyPtr mSlicedProxy;
 	std::vector<ssc::SlicedImageProxyPtr> mSlices;
-	
+
 	vtkImageBlendPtr mBlender;
 	int countImage;
 	vtkImageActorPtr mImageActor;

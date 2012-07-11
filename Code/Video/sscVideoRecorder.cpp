@@ -35,8 +35,8 @@ namespace ssc
 VideoRecorder::VideoRecorder(VideoSourcePtr source, bool sync) :
     mSource(source)
 {
-  mSynced = !sync;
-  mSyncShift = 0;
+	mSynced = !sync;
+	mSyncShift = 0;
 }
 
 VideoRecorder::~VideoRecorder()
@@ -54,55 +54,55 @@ VideoRecorder::~VideoRecorder()
 
 void VideoRecorder::startRecord()
 {
-  connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
+	connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 }
 
 void VideoRecorder::stopRecord()
 {
-  disconnect(mSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
+	disconnect(mSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 }
 
 void VideoRecorder::newFrameSlot()
 {
-  if (!mSource->validData())
-    return;
+	if (!mSource->validData())
+		return;
 
-  double timestamp = mSource->getTimestamp();
+	double timestamp = mSource->getTimestamp();
 
-  if (!mSynced)
-  {
-    mSyncShift = ssc::getMilliSecondsSinceEpoch() - timestamp;
-    ssc::messageManager()->sendInfo(QString("VideoRecorder found and corrected sync shift: %1 s").arg(double(mSyncShift)/1000, 6, 'f', 3));
+	if (!mSynced)
+	{
+		mSyncShift = ssc::getMilliSecondsSinceEpoch() - timestamp;
+		ssc::messageManager()->sendInfo(QString("VideoRecorder found and corrected sync shift: %1 s").arg(double(mSyncShift)/1000, 6, 'f', 3));
 //    std::cout << "RealTimeStreamSourceRecorder SyncShift: " << mSyncShift << std::endl;
-    mSynced = true;
-  }
+		mSynced = true;
+	}
 
 //  double diff = 0;
 //  if (!mData.empty())
 //    diff = timestamp - mData.rbegin()->first;
 //  std::cout << "timestamp " << timestamp << ", " << diff << std::endl;
 
-  vtkImageDataPtr frame = vtkImageDataPtr::New();
+	vtkImageDataPtr frame = vtkImageDataPtr::New();
 //  std::cout << " RC after construct " << frame->GetReferenceCount() << std::endl;
-  frame->DeepCopy(mSource->getVtkImageData());
+	frame->DeepCopy(mSource->getVtkImageData());
 //  std::cout << " RC after fill " << frame->GetReferenceCount() << std::endl;
-  mData[timestamp] = frame;
+	mData[timestamp] = frame;
 //  std::cout << " RC after assign " << frame->GetReferenceCount() << std::endl;
 //  if (frame->GetReferenceCount()>2)
 //  	frame->SetReferenceCount(2);
 //  std::cout << " RC after explicit set " << frame->GetReferenceCount() << std::endl;
 //  mData.clear();
 //  std::cout << " RC after clear map " << frame->GetReferenceCount() << std::endl;
-  frame = NULL;
+	frame = NULL;
 //  std::cout << " RC after construct+clear temp " << mData.find(timestamp)->second->GetReferenceCount() << std::endl;
 //  std::cout << "============================" << std::endl << std::endl;
 }
 
 VideoRecorder::DataType VideoRecorder::getRecording(double start, double stop)
 {
-  start -= mSyncShift;
-  stop -= mSyncShift;
-  VideoRecorder::DataType retval = mData;
+	start -= mSyncShift;
+	stop -= mSyncShift;
+	VideoRecorder::DataType retval = mData;
 
 //  std::cout << std::endl;
 //  RealTimeStreamSourceRecorder::DataType::iterator iter;
@@ -111,8 +111,8 @@ VideoRecorder::DataType VideoRecorder::getRecording(double start, double stop)
 //    std::cout << "timestamp pre: " << (iter->first - start) << std::endl;
 //  }
 
-  retval.erase(retval.begin(), retval.lower_bound(start)); // erase all data earlier than start
-  retval.erase(retval.upper_bound(stop), retval.end()); // erase all data earlier than start
+	retval.erase(retval.begin(), retval.lower_bound(start)); // erase all data earlier than start
+	retval.erase(retval.upper_bound(stop), retval.end()); // erase all data earlier than start
 
 //  std::cout << std::endl;
 
@@ -123,7 +123,7 @@ VideoRecorder::DataType VideoRecorder::getRecording(double start, double stop)
 //  std::cout << std::endl;
 //  std::cout << "recording " << retval.size() << "/" << mData.size() << "   start/stop " << start << ", " << stop << std::endl;
 //  std::cout << "length " << stop - start << std::endl;
-  return retval;
+	return retval;
 }
 
 

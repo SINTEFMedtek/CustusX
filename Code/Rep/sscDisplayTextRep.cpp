@@ -43,7 +43,7 @@ DisplayTextRepPtr DisplayTextRep::New(const QString& uid, const QString& name=""
 {
 	DisplayTextRepPtr retval(new DisplayTextRep(uid, name));
 	retval->mSelf = retval;
-	return retval;	
+	return retval;
 }
 void DisplayTextRep::addRepActorsToViewRenderer(View *view)
 {
@@ -68,7 +68,7 @@ TextDisplayPtr DisplayTextRep::addText(const Vector3D& color, const QString& tex
 {
 	Vector3D c = color;
 	TextDisplayPtr textRep;
-	textRep.reset( new TextDisplay( text, c, 20) );	
+	textRep.reset( new TextDisplay( text, c, 20) );
 	textRep->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	textRep->setPosition(pos);
 	textRep->textProperty()->SetJustificationToLeft();
@@ -97,7 +97,7 @@ TextDisplayPtr DisplayTextRep::addText(const Vector3D& color, const QString& tex
 void DisplayTextRep::setText(unsigned i, const QString& text)
 {
 	if (i<mDisplayText.size())
-		mDisplayText[i]->updateText(text);	
+		mDisplayText[i]->updateText(text);
 }
 
 /**set the color in all existing texts
@@ -110,15 +110,15 @@ void DisplayTextRep::setColor(const Vector3D& color )
 	{
 		mDisplayText.at(i)->textProperty()->SetColor(c.begin()) ;
 	}
-	
+
 }
 
 void DisplayTextRep::setFontSize(int size)
 {
-  for(unsigned i =0; i<mDisplayText.size(); ++i)
-  {
-    mDisplayText.at(i)->textProperty()->SetFontSize(size) ;
-  }
+	for(unsigned i =0; i<mDisplayText.size(); ++i)
+	{
+		mDisplayText.at(i)->textProperty()->SetFontSize(size) ;
+	}
 }
 
 

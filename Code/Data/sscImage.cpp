@@ -354,8 +354,8 @@ template<typename scalartype> static int getRGBMax(vtkImageDataPtr image)
 	}
 	return max/3;
 }
-	
-	
+
+
 int Image::getMax()
 {
 	// Alternatively create max from histogram
@@ -682,7 +682,7 @@ void Image::mergevtkSettingsIntosscTransform()
 	this->get_rMd_History()->setRegistration(this->get_rMd() * createTransformTranslate(origin + extentShift));
 
 	//Since this function discards the vtkImageData, the transfer functions must be fixed
-	ssc::ImageTF3DPtr transferFunctions =	this->getTransferFunctions3D()->createCopy(getBaseVtkImageData());
+	ssc::ImageTF3DPtr transferFunctions = this->getTransferFunctions3D()->createCopy(getBaseVtkImageData());
 	ssc::ImageLUT2DPtr LUT2D = this->getLookupTable2D()->createCopy(getBaseVtkImageData());
 	// Make sure the transfer functions are working
 	if (transferFunctions)

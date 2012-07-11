@@ -217,7 +217,7 @@ double VolumetricRep::computeResampleFactor(long maxVoxels, ssc::ImagePtr image)
 		//std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
 		return factor;
 		//return 1.0;
-	}	
+	}
 	return 1.0;
 }
 

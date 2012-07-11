@@ -30,18 +30,18 @@ namespace ssc
 
 SliceProxyPtr SliceProxy::New(const QString& name)
 {
-  SliceProxyPtr retval(new SliceProxy);
-  retval->mName = name;
-  return retval;
+	SliceProxyPtr retval(new SliceProxy);
+	retval->mName = name;
+	return retval;
 }
 
 QString SliceProxy::getName() const
 {
-  return mName;
+	return mName;
 }
 
 SliceProxy::SliceProxy() :
-    mCutplane(new SliceComputer())
+	mCutplane(new SliceComputer())
 {
 	mAlwaysUseDefaultCenter = false;
 	mUseTooltipOffset = true;
@@ -61,25 +61,25 @@ void SliceProxy::setTool(ToolPtr tool)
 	if (mTool)
 	{
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
-		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));		
-		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));		
-		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(changed())); 		
-	}	
-	
+		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
+		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
+		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(changed())); 
+	}
+
 	mTool = tool;
-	
+
 	if (mTool)
 	{
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
-		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));		
-		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));		
-		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(changed()));/// not used here, but forwarded to users		
+		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
+		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
+		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(changed()));/// not used here, but forwarded to users
 
 		emit toolVisible(mTool->getVisible());
 		toolTransformAndTimestampSlot(mTool->get_prMt(), 0); // initial values
 		tooltipOffsetSlot(mTool->getTooltipOffset());
-	}	
-	
+	}
+
 	this->centerChangedSlot(); // force center update for tool==0
 	this->changed();
 }
@@ -121,7 +121,7 @@ void SliceProxy::setUseTooltipOffset(bool use)
 
 void SliceProxy::toolVisibleSlot(bool visible)
 {
-	
+
 }
 
 /**Provide a nice default transform for displays without a tool.
@@ -135,7 +135,7 @@ Transform3D SliceProxy::getSyntheticToolPos(const Vector3D& center) const
 
 void SliceProxy::setDefaultCenter(const Vector3D& c)
 {
-	mDefaultCenter = c;	
+	mDefaultCenter = c;
 	this->centerChangedSlot();
 }
 
@@ -155,7 +155,7 @@ void SliceProxy::centerChangedSlot()
 	{
 		Vector3D c = ssc::DataManager::getInstance()->getCenter();
 		mCutplane->setFixedCenter(c);
-	  //std::cout << "center changed: " + string_cast(c) << std::endl;
+		//std::cout << "center changed: " + string_cast(c) << std::endl;
 	}
 	else
 	{
@@ -164,24 +164,24 @@ void SliceProxy::centerChangedSlot()
 		// to avoid any confusion - the user must know it is nonnavigable.
 		mCutplane->setFixedCenter(mDefaultCenter);
 		mCutplane->setToolPosition(getSyntheticToolPos(mDefaultCenter));
-	  //std::cout << "center changed: " + string_cast(mDefaultCenter) << std::endl;
-	}	
-	
+		//std::cout << "center changed: " + string_cast(mDefaultCenter) << std::endl;
+	}
+
 	changed();
 }
 
 void SliceProxy::clinicalApplicationChangedSlot()
 {
-  mCutplane->setClinicalApplication(dataManager()->getClinicalApplication());
-  changed();
+	mCutplane->setClinicalApplication(dataManager()->getClinicalApplication());
+	changed();
 }
 
 /**Group the typical plane definition uses together.
  */
 void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
 {
-  mCutplane->initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset, dataManager()->getClinicalApplication());
-  changed();
+	mCutplane->initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset, dataManager()->getClinicalApplication());
+	changed();
 //	setPlane(plane);
 //	//Logger::log("vm.log"," set plane to proxy ");
 //	if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
@@ -201,13 +201,13 @@ void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Ve
 
 SliceComputer SliceProxy::getComputer() const
 {
-  return *mCutplane;
+	return *mCutplane;
 }
 
 void SliceProxy::setComputer(const SliceComputer& val)
 {
-  mCutplane.reset(new SliceComputer(val));
-  changed();
+	mCutplane.reset(new SliceComputer(val));
+	changed();
 }
 
 void SliceProxy::setOrientation(ORIENTATION_TYPE orientation)
@@ -255,7 +255,7 @@ Transform3D SliceProxy::get_sMr()
 	SlicePlane plane = mCutplane->getPlane();
 	//std::cout << "---" << " proxy get transform.c : " << plane.c << std::endl;
 	//std::cout << "proxy get transform -" << getName() <<":\n" << plane << std::endl;
-	return createTransformIJC(plane.i, plane.j, plane.c).inv();	
+	return createTransformIJC(plane.i, plane.j, plane.c).inv();
 }
 
 void SliceProxy::changed()

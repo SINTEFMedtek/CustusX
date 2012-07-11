@@ -23,46 +23,46 @@
 #include <vtkPolyDataReader.h>
 
 /**
-  * \brief Interfaces a vtk poly data file
-  */
+ * \brief Interfaces a vtk poly data file
+ */
 namespace ssc
 {
 
 VtkFileMesh::VtkFileMesh(const QString &uid, const QString &name, const QString& filePath)
-    : Mesh(uid, name)
+	: Mesh(uid, name)
 {
-    setFilePath(filePath);
+	setFilePath(filePath);
 }
 
 /**
-  * Return a vtk poly data object.
-  * Load from file if needed.
-  */
+ * Return a vtk poly data object.
+ * Load from file if needed.
+ */
 vtkPolyDataPtr VtkFileMesh::getVtkPolyData()
 {
-    if (!mVtkPolyData)
-    {
-        loadData();
-    }
+	if (!mVtkPolyData)
+	{
+		loadData();
+	}
 
-    return mVtkPolyData;
+	return mVtkPolyData;
 }
 
 /**
-  * Load and assign a poly data object from file.
-  * Assuming a file path is already provided.
-  */
+ * Load and assign a poly data object from file.
+ * Assuming a file path is already provided.
+ */
 void VtkFileMesh::loadData()
 {
-    if (mFilePath.isEmpty())
-        return;
+	if (mFilePath.isEmpty())
+		return;
 
-    vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
-    reader->SetFileName(mFilePath.toUtf8().constData());
+	vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
+	reader->SetFileName(mFilePath.toUtf8().constData());
 
-    mVtkPolyData = reader->GetOutput();
+	mVtkPolyData = reader->GetOutput();
 
-    emit meshChanged();
+	emit meshChanged();
 }
 
 }

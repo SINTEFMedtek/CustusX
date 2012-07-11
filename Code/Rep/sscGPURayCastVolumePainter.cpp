@@ -313,7 +313,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 
 	GLint oldTextureUnit;
 	glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
-	
+
 	vtkRenderWindow* renWin = renderer->GetRenderWindow();
 	if (mInternals->LastContext != renWin || mInternals->mElement.size() != mInternals->mVolumes)
 	{
@@ -420,7 +420,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	}
 
 	mInternals->Shader->GetUniformVariables()->SetUniformf("stepsize", 1, &mStepSize);
-	
+
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_PACK_ROW_LENGTH, 0);
 	glPixelStorei(GL_PACK_SKIP_ROWS, 0);
@@ -437,10 +437,10 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 	QPoint origin(renderer->GetOrigin()[0], renderer->GetOrigin()[1]);
 	float viewport[4];
 	viewport[0] = origin.x();
-	viewport[1] = origin.y();	
+	viewport[1] = origin.y();
 	viewport[2] = size.width();
 	viewport[3] = size.height();
-	
+
 	if (mResample)
 	{
 		viewport[0] = 0;
@@ -449,7 +449,7 @@ void GPURayCastVolumePainter::PrepareForRendering(vtkRenderer* renderer, vtkActo
 		viewport[3] = mDownsampleHeight;
 	}
 	mInternals->Shader->GetUniformVariables()->SetUniformf("viewport", 4, viewport);
-				
+
 	report_gl_error();
 	for (unsigned i = 0; i < mInternals->mElement.size(); ++i)
 	{
@@ -497,7 +497,7 @@ void GPURayCastVolumePainter::createDSBuffers()
 
 	vtkgl::BindFramebuffer(vtkgl::DRAW_FRAMEBUFFER, 0);
 }
-	
+
 void GPURayCastVolumePainter::freeDSBuffers()
 {
 	if (mDSDepthBuffer)
@@ -515,10 +515,10 @@ void GPURayCastVolumePainter::freeDSBuffers()
 		vtkgl::DeleteFramebuffers(1, &mFBO);
 		mFBO = 0;
 	}
-}	
+}
 
 void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
-                                          bool forceCompileOnly)
+                                             bool forceCompileOnly)
 {
 	if (!CanRender(renderer, actor))
 	{
@@ -549,7 +549,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		vector[2] = dvector[2];
 		mInternals->Shader->GetUniformVariables()->SetUniformfv("cutPlaneOffset", 3, 1, vector);
 	}
-	
+
 	glDepthMask(1);
 	QSize size(renderer->GetSize()[0], renderer->GetSize()[1]);
 	if (mLastRenderSize != size)
@@ -633,7 +633,7 @@ void GPURayCastVolumePainter::RenderInternal(vtkRenderer* renderer, vtkActor* ac
 		vtkgl::BindFramebuffer( vtkgl::READ_FRAMEBUFFER, mFBO);
 		report_gl_error();
 		glReadBuffer(vtkgl::COLOR_ATTACHMENT0);
-		
+
 		GL_TRACE("Before upscale");
 		glViewport(origin.x(), origin.y(), size.width(), size.height());
 		glDisable(GL_SCISSOR_TEST);
@@ -746,7 +746,7 @@ void GPURayCastVolumePainter::disableImagePlaneDownsampling()
 	mShouldResample = false;
 	mResample = false;
 }
-	
+
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------

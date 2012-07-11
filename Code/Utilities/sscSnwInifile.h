@@ -23,18 +23,18 @@ public:
 		CHECK_MD5,
 		NO_CHECK
 	};
-	
+
 	SonowandInifile(QString filename, CHECK_TYPE checkType=CHECK_MD5);
 	~SonowandInifile();
 	void sync();
 	bool checkOK() const; 
 	void clear();
 	void remove( const QString& key);
-	void setValue( const QString & key, const QVariant& value);	
-	
+	void setValue( const QString & key, const QVariant& value);
+
 private:
 	void writeChecksum();
-	
+
 	CHECK_TYPE mCheckType;
 	bool mCheckSuccess;
 	bool mModified;

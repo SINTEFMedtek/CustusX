@@ -43,7 +43,7 @@ public:
 	SliceComputer();
 	~SliceComputer();
 	void setToolPosition(const Transform3D& rMt);
-	void setOrientationType(ORIENTATION_TYPE val);	
+	void setOrientationType(ORIENTATION_TYPE val);
 	void setPlaneType(PLANE_TYPE val);
 	void setFixedCenter(const Vector3D& center); 
 	void setFollowType(FOLLOW_TYPE val); 
@@ -52,7 +52,7 @@ public:
 	void setToolViewOffset(bool use, double viewportHeight, double viewOffset);
 	void setToolViewportHeight(double viewportHeight);
 	void setClinicalApplication(CLINICAL_APPLICATION application);
-	SlicePlane getPlane() const;	
+	SlicePlane getPlane() const;
 
 	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_APPLICATION application);
 	void switchOrientationMode(ORIENTATION_TYPE type);
@@ -74,11 +74,11 @@ private:
 	ORIENTATION_TYPE mOrientType;
 	PLANE_TYPE mPlaneType;
 	FOLLOW_TYPE mFollowType;
-	Vector3D mFixedCenter;	
+	Vector3D mFixedCenter;
 
 	Transform3D m_rMt;
 	double mToolOffset;
-	
+
 	bool mUseGravity;
 	Vector3D mGravityDirection; 
 

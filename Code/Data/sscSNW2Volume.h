@@ -97,7 +97,7 @@ public:
 		{
 		}
 		QString mFrameOfReferenceUID;
-		Transform3D m_imgMraw; // defines the transform from raw input data space to image space.			
+		Transform3D m_imgMraw; // defines the transform from raw input data space to image space.
 		QString mSeriesID;
 		QString mSeriesDescription;
 	};

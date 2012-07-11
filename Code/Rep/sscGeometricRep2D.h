@@ -43,7 +43,7 @@ typedef boost::shared_ptr<class GeometricRep2D> GeometricRep2DPtr;
  */
 class GeometricRep2D : public RepImpl
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
 	virtual ~GeometricRep2D();
 
@@ -53,7 +53,7 @@ public:
 	void setMesh(MeshPtr mesh); ///< sets this reps mesh
 	MeshPtr getMesh(); ///< gives this reps mesh
 	bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
-  void setSliceProxy(ssc::SliceProxyPtr slicer);
+	void setSliceProxy(ssc::SliceProxyPtr slicer);
 
 protected:
 	GeometricRep2D(const QString& uid, const QString& name);
@@ -65,11 +65,11 @@ protected:
 	vtkActorPtr mActor;
 
 	MeshPtr mMesh;
-  SliceProxyPtr mSlicer;
+	SliceProxyPtr mSlicer;
 
 private slots:
-  void meshChangedSlot();
-  void transformChangedSlot();
+	void meshChangedSlot();
+	void transformChangedSlot();
 };
 
 } // namespace ssc

@@ -71,7 +71,7 @@ void PointMetricRep2D::setPointMetric(PointMetricPtr point)
 
 	this->changedSlot();
 }
-	
+
 PointMetricPtr PointMetricRep2D::getPointMetric()
 {
 	return mMetric;
@@ -116,7 +116,7 @@ void PointMetricRep2D::changedSlot()
 		mCircleActor->SetMapper(mapper);
 		mCircleActor->GetProperty()->LightingOff();
 		mView->getRenderer()->AddActor(mCircleActor);
-		
+
 		mOutlineSource = vtkSectorSourcePtr::New();
 		mOutlineSource->SetOuterRadius(mGraphicsSize);
 		mOutlineSource->SetInnerRadius(0);
@@ -137,7 +137,7 @@ void PointMetricRep2D::changedSlot()
 
 	mCircleActor->GetProperty()->SetColor(mColor[0], mColor[1], mColor[2]);
 	mOutlineActor->GetProperty()->SetColor(mOutlineColor[0], mOutlineColor[1], mOutlineColor[2]);
-	
+
 	Vector3D position = mSliceProxy->get_sMr() * mMetric->getRefCoord();
 	mCircleActor->SetPosition(position[0], position[1], 0.0);
 	mOutlineActor->SetPosition(position[0], position[1], 0.0);

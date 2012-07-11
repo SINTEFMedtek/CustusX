@@ -49,23 +49,23 @@ SurfaceRep::SurfaceRep(const QString& uid) :
 	mContourFilter->ComputeGradientsOn();
 	mContourFilter->ComputeScalarsOn();
 	mContourFilter->UseScalarTreeOn();
-	
+
 	/* Filter that computes point normals for a polygonal mesh */
 	//vtkPolyDataNormals* normals = vtkPolyDataNormals::New();
 	//normals->SetInputConnection( iso->GetOutputPort() );
 	//normals->SetFeatureAngle( 60.0 );
-	
+
 	mMapper->SetInputConnection( mContourFilter->GetOutputPort() );
 	mMapper->ScalarVisibilityOff();
 	mActor->SetMapper( mMapper );
-	
-	
+
+
 }
 
 SurfaceRep::~SurfaceRep()
 {
 }
-	
+
 SurfaceRepPtr SurfaceRep::New(const QString& uid)
 {
 	SurfaceRepPtr retval(new SurfaceRep(uid));
@@ -103,7 +103,7 @@ void SurfaceRep::setImage(ImagePtr image)
 	//mContourFilter->SetInput( (vtkDataSet*) &mImage->getRefVtkImageData() );
 	vtkImageData *imag = mImage->getRefVtkImageData();
 	mContourFilter->SetInput( imag );
-	
+
 	std::cout<<"mybe not"<<std::endl;
 }
 

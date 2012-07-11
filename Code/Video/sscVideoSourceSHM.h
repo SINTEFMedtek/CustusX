@@ -93,22 +93,22 @@ protected:
 	int			mImageWidth;
 	int			mImageHeight;
 	int			mImageColorDepth;
-	
+
 private:
 
-	SharedMemoryClient	mSource;
+	SharedMemoryClient mSource;
 
-	vtkImageDataPtr		mImageData;
-	vtkImageImportPtr	mImageImport;
+	vtkImageDataPtr mImageData;
+	vtkImageImportPtr mImageImport;
 
-	double			mTimeStamp;
+	double mTimeStamp;
 
-	bool			mConnected;
-	bool			mStreaming;
+	bool mConnected;
+	bool mStreaming;
 	bool mImportInitialized;
 	bool mStartWhenConnected;
 
-	QTimer*			mPollTimer;
+	QTimer* mPollTimer;
 
 private slots:
 

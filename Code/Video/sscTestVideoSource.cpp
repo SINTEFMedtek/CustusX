@@ -39,7 +39,7 @@ ssc::TestVideoSource::TestVideoSource(QString uid, QString name, int width, int 
 	mImageTimer = new QTimer(this);
 	connect(mImageTimer, SIGNAL(timeout()), this, SLOT(processBuffer()));
 	mBuffer = (uint8_t*)malloc(width * height * 3);
-	
+
 	mImageImport->SetDataScalarTypeToUnsignedChar();
 	mImageImport->SetNumberOfScalarComponents(3);
 	mImageImport->SetWholeExtent(0, mWidth - 1, 0, mHeight - 1, 0, 0);
@@ -99,7 +99,7 @@ static void TestImage(int width, int height, int frames, uint8_t *image, double 
 				uint8_t *pix = &image[(y*width + x) * 3];
 				pix[0] = 0;
 				pix[1] = 0;
-				pix[2] = 0;			
+				pix[2] = 0;
 			}
 		}
 	}

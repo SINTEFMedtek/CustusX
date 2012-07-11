@@ -61,7 +61,7 @@ QString CrossHairRep2D::getType() const
 
 void CrossHairRep2D::set_vpMs(const Transform3D& vpMs)
 {
-	m_vpMs = vpMs;	
+	m_vpMs = vpMs;
 	update();
 }
 
@@ -71,11 +71,11 @@ void CrossHairRep2D::setSliceProxy(ssc::SliceProxyPtr slicer)
 	{
 		disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
 		disconnect(mSlicer.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
-		disconnect(mSlicer.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));		
+		disconnect(mSlicer.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
 	}
-	
+
 	mSlicer = slicer;
-	
+
 	connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
 	connect(mSlicer.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
 	connect(mSlicer.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
@@ -103,7 +103,7 @@ void CrossHairRep2D::sliceTransformChangedSlot(Transform3D sMr)
 }
 void CrossHairRep2D::toolTransformAndTimestampSlot(Transform3D prMt, double timestamp)
 {
-	update();	
+	update();
 }
 void CrossHairRep2D::toolVisibleSlot(bool visible)
 {
@@ -114,7 +114,7 @@ void CrossHairRep2D::update()
 {
 	if (!mSlicer || !mSlicer->getTool())
 		return;
-	
+
 	Transform3D prMt = mSlicer->getTool()->get_prMt();
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
 	Transform3D sMr = mSlicer->get_sMr();
@@ -122,8 +122,8 @@ void CrossHairRep2D::update()
 	if (mCursor)
 	{
 		Transform3D vpMt = m_vpMs*sMr*rMpr*prMt;
-		mCursor->updateRegCross( vpMt.coord(Vector3D(0,0,0)) );			
-		//Logger::log("vm.log", "CrossHairRep2D::update(), center=" + string_cast(vpMt.coord(Vector3D(0,0,0))));	
+		mCursor->updateRegCross( vpMt.coord(Vector3D(0,0,0)) );
+		//Logger::log("vm.log", "CrossHairRep2D::update(), center=" + string_cast(vpMt.coord(Vector3D(0,0,0))));
 	}
 }
 

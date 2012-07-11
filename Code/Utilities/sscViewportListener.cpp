@@ -62,12 +62,12 @@ void ViewportListener::startListen(vtkRendererPtr renderer)
 void ViewportListener::stopListen()
 {
 	// turn off observer
-  if (mObserver)
-  {
-  	mObserver->SetBase(NULL);
-    mRenderer->RemoveObserver(mObserver);
-    mObserver = 0;
-  }
+	if (mObserver)
+	{
+		mObserver->SetBase(NULL);
+		mRenderer->RemoveObserver(mObserver);
+		mObserver = 0;
+	}
 }
 
 bool ViewportListener::isListening() const
@@ -97,20 +97,20 @@ double ViewportListener::getVpnZoom()
 		ssc::messageManager()->sendError("No renderer set, using zoom=1");
 		return 1;
 	}
-  //  use the focal point and focal point + vup.
-  //  Transform both to view space and remove z-coord.
-  //  The distance between then in the view plane can
-  //  be used to rescale the text.
-  vtkCameraPtr camera = mRenderer->GetActiveCamera();
-  ssc::Vector3D p_f(camera->GetFocalPoint());
-  ssc::Vector3D vup(camera->GetViewUp());
-  ssc::Vector3D p_fup = p_f+vup;
-  mRenderer->WorldToView(p_f[0],p_f[1],p_f[2]);
-  mRenderer->WorldToView(p_fup[0],p_fup[1],p_fup[2]);
-  p_f[2] = 0;
-  p_fup[2] = 0;
-  double size = (p_f - p_fup).length()/2;
-  return size;
+	//  use the focal point and focal point + vup.
+	//  Transform both to view space and remove z-coord.
+	//  The distance between then in the view plane can
+	//  be used to rescale the text.
+	vtkCameraPtr camera = mRenderer->GetActiveCamera();
+	ssc::Vector3D p_f(camera->GetFocalPoint());
+	ssc::Vector3D vup(camera->GetViewUp());
+	ssc::Vector3D p_fup = p_f+vup;
+	mRenderer->WorldToView(p_f[0],p_f[1],p_f[2]);
+	mRenderer->WorldToView(p_fup[0],p_fup[1],p_fup[2]);
+	p_f[2] = 0;
+	p_fup[2] = 0;
+	double size = (p_f - p_fup).length()/2;
+	return size;
 }
 
 }

@@ -48,10 +48,10 @@ namespace ssc
  */
 class ImageImportVideoSource : public VideoSource
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  	ImageImportVideoSource( QString uid, QString name="");
+	ImageImportVideoSource( QString uid, QString name="");
 	virtual ~ImageImportVideoSource();
 
 	virtual QString getUid() { return mUid; }

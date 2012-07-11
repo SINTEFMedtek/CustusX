@@ -21,7 +21,7 @@
 #define SSCSLICEREP_H_
 
 #include "vtkSmartPointer.h"
-typedef	vtkSmartPointer<class vtkImagePlaneWidget> vtkImagePlaneWidgetPtr;
+typedef vtkSmartPointer<class vtkImagePlaneWidget> vtkImagePlaneWidgetPtr;
 
 #include "sscRepImpl.h"
 
@@ -51,7 +51,7 @@ public:
 	virtual QString getType() const { return "ssc::SliceRep"; }
 	void setImage(ImagePtr image);
 	bool hasImage(ImagePtr image) const;
-	
+
 protected:
 	SliceRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(View *view);

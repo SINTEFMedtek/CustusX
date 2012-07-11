@@ -37,10 +37,10 @@ namespace ssc
 AxesRep::AxesRep(const QString& uid) :
 	RepImpl(uid)
 {
-  mViewportListener.reset(new ssc::ViewportListener);
-  mViewportListener->setCallback(boost::bind(&AxesRep::rescale, this));
+	mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener->setCallback(boost::bind(&AxesRep::rescale, this));
 
-  mAssembly = vtkAssemblyPtr::New();
+	mAssembly = vtkAssemblyPtr::New();
 	mActor = vtkAxesActorPtr::New();
 	mAssembly->AddPart(mActor);
 	this->setAxisLength(0.2);
@@ -53,13 +53,13 @@ AxesRep::AxesRep(const QString& uid) :
 
 void AxesRep::rescale()
 {
-  if (!mViewportListener->isListening())
-    return;
-  double size = mViewportListener->getVpnZoom();
-  double axisSize = mSize/size;
+	if (!mViewportListener->isListening())
+		return;
+	double size = mViewportListener->getVpnZoom();
+	double axisSize = mSize/size;
 
-  mActor->SetTotalLength( axisSize, axisSize, axisSize );
-  setTransform(Transform3D(mAssembly->GetUserMatrix()));
+	mActor->SetTotalLength( axisSize, axisSize, axisSize );
+	setTransform(Transform3D(mAssembly->GetUserMatrix()));
 }
 
 void AxesRep::setVisible(bool on)
@@ -123,10 +123,10 @@ void AxesRep::setTransform(Transform3D rMt)
 
 	for (unsigned i=0; i<mCaption.size(); ++i)
 	{
-	  if (!mViewportListener->isListening())
-	    continue;
-	  double size = mViewportListener->getVpnZoom();
-	  double axisSize = mSize/size;
+		if (!mViewportListener->isListening())
+			continue;
+		double size = mViewportListener->getVpnZoom();
+		double axisSize = mSize/size;
 
 		Vector3D pos = rMt.coord(axisSize*mCaptionPos[i]);
 		mCaption[i]->SetAttachmentPoint(pos.begin());

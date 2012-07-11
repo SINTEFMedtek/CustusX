@@ -105,7 +105,7 @@ public:
 	enum TYPE { tNONE=0,   ///< undefined
 				tSECTOR=1, ///< US beam is emitted radially in a flat cone. 
 				tLINEAR=2  ///< US beam is emitted straight forward.
-				};	
+				};
 
 public:
 	ProbeData(TYPE type = tNONE);

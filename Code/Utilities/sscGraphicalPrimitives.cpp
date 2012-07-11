@@ -179,7 +179,7 @@ GraphicalLine3D::GraphicalLine3D( vtkRendererPtr renderer)
 	source = vtkLineSourcePtr::New();
 	mapper = vtkPolyDataMapperPtr::New() ;
 	actor = vtkActorPtr::New() ;
-	
+
 	mapper->SetInputConnection( source->GetOutputPort() );
 	actor->SetMapper (mapper );
   this->setRenderer(renderer);

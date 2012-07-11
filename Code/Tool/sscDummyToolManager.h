@@ -78,8 +78,8 @@ public:
 	 * Reset all internal state of the DummyToolMananger instance. Call between tests to avoid state leak.
 	 */
 	static void reset();
-	void addTool(DummyToolPtr tool);	
-	
+	void addTool(DummyToolPtr tool);
+
 private:
 	typedef DummyToolMap::iterator DummyToolMapIter;
 	typedef DummyToolMap::const_iterator DummyToolMapConstIter;

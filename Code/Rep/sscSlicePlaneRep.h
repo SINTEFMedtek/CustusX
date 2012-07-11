@@ -51,22 +51,22 @@ public:
 	bool hasImage(ImagePtr image) const;
 	void setSliceProxy(SliceProxyPtr proxy);
 	void setSliceReps( std::vector<ssc::SliceRepSWPtr> slicerReps);
-	
+
 protected:
 	SlicePlaneRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
-	
+
 private slots:
 	void sliceTransformChangedSlot(Transform3D sMr);
-	
+
 private:
 	SliceProxyPtr mSlicer;
 	std::vector<SliceRepSWPtr> mSlicesPlanes;
 	vtkImagePlaneWidgetPtr mVtkImagePlaneWidgetA;
 	vtkImagePlaneWidgetPtr mVtkImagePlaneWidgetC;
 	vtkImagePlaneWidgetPtr mVtkImagePlaneWidgetS;
-	
+
 	ImagePtr mImage;
 };
 

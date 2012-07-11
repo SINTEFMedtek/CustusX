@@ -52,7 +52,7 @@ void SonowandInifile::remove( const QString& key)
 	mModified = true;
 }
 
-void SonowandInifile::setValue( const QString & key, const QVariant& value)	
+void SonowandInifile::setValue( const QString & key, const QVariant& value)
 {
 	QSettings::setValue(key, value);
 	mModified = true;

@@ -47,38 +47,38 @@ typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
  */
 class SlicePlaneClipper : public QObject
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  typedef std::set<ssc::VolumetricBaseRepPtr> VolumesType;
+	typedef std::set<ssc::VolumetricBaseRepPtr> VolumesType;
 
-  static SlicePlaneClipperPtr New();
-  ~SlicePlaneClipper();
-  void setSlicer(ssc::SliceProxyPtr slicer);
-  void clearVolumes();
-  void addVolume(ssc::VolumetricBaseRepPtr volume);
-  void removeVolume(ssc::VolumetricBaseRepPtr volume);
-  VolumesType getVolumes();
-  ssc::SliceProxyPtr getSlicer();
-  void setInvertPlane(bool on);
-  bool getInvertPlane() const;
-  vtkPlanePtr getClipPlaneCopy();
+	static SlicePlaneClipperPtr New();
+	~SlicePlaneClipper();
+	void setSlicer(ssc::SliceProxyPtr slicer);
+	void clearVolumes();
+	void addVolume(ssc::VolumetricBaseRepPtr volume);
+	void removeVolume(ssc::VolumetricBaseRepPtr volume);
+	VolumesType getVolumes();
+	ssc::SliceProxyPtr getSlicer();
+	void setInvertPlane(bool on);
+	bool getInvertPlane() const;
+	vtkPlanePtr getClipPlaneCopy();
 
-  void saveClipPlaneToVolume(); ///< save the current clip to image
-  void clearClipPlanesInVolume(); ///< clear all saved clips in the image.
+	void saveClipPlaneToVolume(); ///< save the current clip to image
+	void clearClipPlanesInVolume(); ///< clear all saved clips in the image.
 
-private slots:
-  void changedSlot();
-  void volumeRepChangedSlot();
+	private slots:
+	void changedSlot();
+	void volumeRepChangedSlot();
 private:
-  void addClipPlane(ssc::VolumetricBaseRepPtr volume, vtkPlanePtr clipPlane);
-  SlicePlaneClipper();
-  void updateClipPlane();
-  ssc::Vector3D getUnitNormal() const;
-  ssc::SliceProxyPtr mSlicer;
-  VolumesType mVolumes;
-  bool mInvertPlane;
+	void addClipPlane(ssc::VolumetricBaseRepPtr volume, vtkPlanePtr clipPlane);
+	SlicePlaneClipper();
+	void updateClipPlane();
+	ssc::Vector3D getUnitNormal() const;
+	ssc::SliceProxyPtr mSlicer;
+	VolumesType mVolumes;
+	bool mInvertPlane;
 
-  vtkPlanePtr mClipPlane;
+	vtkPlanePtr mClipPlane;
 //  std::vector<vtkPlanePtr> mFixedPlanes;
 };
 
@@ -88,23 +88,23 @@ private:
  */
 class ImageMapperMonitor : public QObject
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image);
-  ~ImageMapperMonitor();
+	ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image);
+	~ImageMapperMonitor();
 
 private slots:
-  void clipPlanesChangedSlot();
-  void cropBoxChangedSlot();
+	void clipPlanesChangedSlot();
+	void cropBoxChangedSlot();
 private:
-  //ssc::VolumetricRepPtr mVolume;
-  vtkVolumePtr mVolume;
-  ImagePtr mImage;
-  std::vector<vtkPlanePtr> mPlanes;
-  vtkVolumeMapperPtr getMapper();
+	//ssc::VolumetricRepPtr mVolume;
+	vtkVolumePtr mVolume;
+	ImagePtr mImage;
+	std::vector<vtkPlanePtr> mPlanes;
+	vtkVolumeMapperPtr getMapper();
 
-  void clearClipPlanes();
-  void fillClipPlanes();
+	void clearClipPlanes();
+	void fillClipPlanes();
 };
 
 } // namespace ssc

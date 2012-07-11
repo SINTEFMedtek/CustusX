@@ -37,7 +37,7 @@ VideoSourceSHM::VideoSourceSHM(int width, int height, int depth)
 {
 	mImportInitialized = false;
 	mStartWhenConnected = false;
-	
+
 	mImageImport->SetDataScalarTypeToUnsignedChar();
 	mImageImport->SetNumberOfScalarComponents(3);
 
@@ -116,7 +116,7 @@ void VideoSourceSHM::stop()
 		mPollTimer->stop();
 		// If all is well - tell the system we've stopped streaming
 		mStreaming = false;
-		
+
 		emit streaming(mStreaming);
 	}
 

@@ -127,7 +127,7 @@ void DummyTool::stopTracking()
 void DummyTool::setVisible(bool val)
 {
 	mVisible = val;
-	emit toolVisible(mVisible);	
+	emit toolVisible(mVisible);
 }
 void DummyTool::sendTransform()
 {
@@ -141,18 +141,18 @@ void DummyTool::sendTransform()
  */
 vtkPolyDataPtr DummyTool::createPolyData(double h1, double h2, double r1, double r2)
 {
-		
+
 //	double r1 = 10;
 //	double r2 = 3;
 //	double h1 = 140;
 //	double h2 =  10;
-	
+
 	vtkAppendPolyDataPtr assembly = vtkAppendPolyDataPtr::New(); 
-	
+
 	vtkPlanePtr plane = vtkPlanePtr::New();
 	plane->SetNormal(0,0,-1);
 	plane->SetOrigin(0,0,-h2);
-	
+
 	vtkConeSourcePtr cone1 = vtkConeSourcePtr::New();
 	double h1_extension = h1*r2 / (r1-r2); 
 	double h1_mod = h1+h1_extension;
@@ -188,19 +188,19 @@ void DummyTool::createLinearMovement(std::vector<Transform3D>* retval, Transform
 	//unsigned N = (unsigned)round((b-a).length()/step);
 	unsigned N = (unsigned)floor((b-a).length()/step + 0.5);
 	Transform3D& T = *T_in;
-	
+
 	for (unsigned i=0; i<N; ++i)
 	{
         Transform3D T_delta = createTransformTranslate(u*step);
         T = T_delta * T;
-        retval->push_back(T * R);		
+        retval->push_back(T * R);
 	}
 }
 
 /** Create a test trajectory that moves within the given bb.
  */
 std::vector<Transform3D> DummyTool::createToolPositionMovement(const DoubleBoundingBox3D& bb) const
-{	
+{
 //	std::cout<<"createToolPositionMovement:"<<bb<<std::endl;
     std::vector<Transform3D> retval;
        
@@ -308,10 +308,10 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 	QDateTime time = QDateTime::currentDateTime();
 	boost::uint64_t ts = (boost::uint64_t)(time.toTime_t())*1000 + time.time().msec();
 	double timestamp = static_cast<double>(ts);
-	
+
 	//check:
 //	std::cout << "check: " << time.toString("yyyyMMdd'T'hhmmss:zzz").toStdString() << std::endl;
-	
+
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 }
 

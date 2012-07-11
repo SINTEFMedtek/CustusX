@@ -187,14 +187,14 @@ PositionStorageWriter::PositionStorageWriter(QString filename) : positions(filen
 
 PositionStorageWriter::~PositionStorageWriter()
 {
-	positions.close();	
+	positions.close();
 }
 
 
 void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, int toolIndex)
 {
 	ssc::Frame3D frame = ssc::Frame3D::create(matrix);
-	
+
 	stream << (quint8)1;	// Type - there is only one
 	stream << (quint8)(8+1+6*10);	// Size of data following this point
 	stream << (quint64)timestamp;	// Milliseconds since Epoch

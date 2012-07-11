@@ -39,7 +39,7 @@ FiberBundlePtr FiberBundle::New(const QString& uid, const QString& name)
 }
 
 FiberBundle::FiberBundle(const QString &uid, const QString &name)
-        : Data(uid, name)
+	: Data(uid, name)
 {
 	mMesh.reset(new VtkFileMesh(uid, name));
 	mSpacing = Vector3D(1.0, 1.0, 1.0);
@@ -119,11 +119,11 @@ vtkPolyDataPtr FiberBundle::getVtkPolyData() const
 }
 
 /**
-  * Try to generate an volume representation of current poly data model,
-  * where the foreground voxels are 1 and the background voxels are 0.
-  *
-  * Volume spacing is presumed to be set.
-  */
+ * Try to generate an volume representation of current poly data model,
+ * where the foreground voxels are 1 and the background voxels are 0.
+ *
+ * Volume spacing is presumed to be set.
+ */
 vtkImageDataPtr FiberBundle::getVtkImageData()
 {
 	if (!mVtkImageCached)
