@@ -48,7 +48,7 @@ typedef boost::weak_ptr<class Probe> ProbeWeakPtr;
  */
 class Probe: public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	virtual ~Probe()
 	{
@@ -87,7 +87,7 @@ signals:
  */
 class Tool: public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	Tool() :
 		mUid(""), mName("")
@@ -192,7 +192,7 @@ signals:
 	void tooltipOffset(double offset);
 	void toolProbeSector();
 	void tps(int);
-  void probeChanged(); ///< Probe/tool characteristics changed
+	void probeChanged(); ///< Probe/tool characteristics changed
 
 protected:
 	QString mUid;

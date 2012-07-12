@@ -26,7 +26,7 @@ bool similar(const SlicePlane& a, const SlicePlane& b)
 /**Initialize the computer with reasonable defaults.
  */
 SliceComputer::SliceComputer() :
-  mClinicalApplication(mdLABORATORY),
+	mClinicalApplication(mdLABORATORY),
 	mOrientType(otORTHOGONAL),
 	mPlaneType(ptAXIAL),
 	mFollowType(ftFIXED_CENTER),
@@ -49,22 +49,22 @@ SliceComputer::~SliceComputer()
  */
 void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_APPLICATION application)
 {
-  setPlaneType(plane);
-  mClinicalApplication = application;
+	setPlaneType(plane);
+	mClinicalApplication = application;
 
-  if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
-  {
-    setOrientationType(ssc::otORTHOGONAL);
-    setFollowType(ssc::ftFIXED_CENTER);
-  }
-  else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
-  {
-    setOrientationType(ssc::otOBLIQUE);
-    setFollowType(ssc::ftFOLLOW_TOOL);
+	if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
+	{
+		setOrientationType(ssc::otORTHOGONAL);
+		setFollowType(ssc::ftFIXED_CENTER);
+	}
+	else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
+	{
+		setOrientationType(ssc::otOBLIQUE);
+		setFollowType(ssc::ftFOLLOW_TOOL);
 
-    setGravity(useGravity, gravityDir);
-    setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
-  }
+		setGravity(useGravity, gravityDir);
+		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
+	}
 }
 
 /**Switch an existing plane definition to its dual definition, i.e.
@@ -75,53 +75,53 @@ void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const
  */
 void SliceComputer::switchOrientationMode(ORIENTATION_TYPE type)
 {
-  if (type==mOrientType)
-    return; // no change
+	if (type==mOrientType)
+		return; // no change
 
-  PLANE_TYPE newType = mPlaneType;
+	PLANE_TYPE newType = mPlaneType;
 
-  if (type==otOBLIQUE) // ACS->ADR
-  {
-    switch (mPlaneType)
-    {
-    case ptSAGITTAL : newType = ptSIDEPLANE; break;
-    case ptCORONAL  : newType = ptANYPLANE; break;
-    case ptAXIAL    : newType = ptRADIALPLANE; break;
-    default: break;
-    }
-  }
-  else if (type==otORTHOGONAL)
-  {
-    switch (mPlaneType)
-    {
-    case ptSIDEPLANE   : newType = ptSAGITTAL; break;
-    case ptANYPLANE    : newType = ptCORONAL; break;
-    case ptRADIALPLANE : newType = ptAXIAL; break;
-    default: break;
-    }
-  }
+	if (type==otOBLIQUE) // ACS->ADR
+	{
+		switch (mPlaneType)
+		{
+		case ptSAGITTAL : newType = ptSIDEPLANE; break;
+		case ptCORONAL  : newType = ptANYPLANE; break;
+		case ptAXIAL    : newType = ptRADIALPLANE; break;
+		default: break;
+		}
+	}
+	else if (type==otORTHOGONAL)
+	{
+		switch (mPlaneType)
+		{
+		case ptSIDEPLANE   : newType = ptSAGITTAL; break;
+		case ptANYPLANE    : newType = ptCORONAL; break;
+		case ptRADIALPLANE : newType = ptAXIAL; break;
+		default: break;
+		}
+	}
 
-  initializeFromPlane(newType, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset, mClinicalApplication);
+	initializeFromPlane(newType, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset, mClinicalApplication);
 }
 
 void SliceComputer::setClinicalApplication(CLINICAL_APPLICATION application)
 {
-  mClinicalApplication = application;
+	mClinicalApplication = application;
 }
 
 ORIENTATION_TYPE SliceComputer::getOrientationType() const
 {
-  return mOrientType;
+	return mOrientType;
 }
 
 PLANE_TYPE SliceComputer::getPlaneType() const
 {
-  return mPlaneType;
+	return mPlaneType;
 }
 
 Transform3D SliceComputer::getToolPosition() const
 {
-  return m_rMt;
+	return m_rMt;
 }
 
 /**Set the position of the navigation tool, using the
@@ -208,7 +208,7 @@ SlicePlane SliceComputer::getPlane()  const
 	plane.j = basis.second;
 	plane.c = Vector3D(0,0,mToolOffset);
 
-  // transform position from tool to reference space
+	// transform position from tool to reference space
 	plane.c = m_rMt.coord(plane.c);
 	// transform orientation from tool to reference space for the oblique case only
 	if (mOrientType==otOBLIQUE)
@@ -218,13 +218,13 @@ SlicePlane SliceComputer::getPlane()  const
 	}
 
 	// orient planes so that gravity is down
-  plane = orientToGravity(plane);
+	plane = orientToGravity(plane);
 
 	// try to to this also for oblique views, IF the ftFIXED_CENTER is set.
 	// use special acs centermod algo
-  plane.c = generateFixedIJCenter(mFixedCenter, plane.c, plane.i, plane.j);
+	plane.c = generateFixedIJCenter(mFixedCenter, plane.c, plane.i, plane.j);
 
-  // set center so that it is a fixed distance from viewport top
+	// set center so that it is a fixed distance from viewport top
 	plane = applyViewOffset(plane);
 
 	return plane; 
@@ -263,17 +263,17 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
  */
 std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectors() const
 {
-  switch (mClinicalApplication)
-  {
-  case mdLAPAROSCOPY:
-  case mdBRONCHOSCOPY:
-  case mdENDOVASCULAR:
-    return this->generateBasisVectorsRadiology();
-  case mdLABORATORY:
-  case mdNEUROLOGY:
-  default:
-    return this->generateBasisVectorsNeurology();
-  }
+	switch (mClinicalApplication)
+	{
+	case mdLAPAROSCOPY:
+	case mdBRONCHOSCOPY:
+	case mdENDOVASCULAR:
+		return this->generateBasisVectorsRadiology();
+	case mdLABORATORY:
+	case mdNEUROLOGY:
+	default:
+		return this->generateBasisVectorsNeurology();
+	}
 }
 
 /** definitions of planes for the neurology application
@@ -281,17 +281,17 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectors() const
  */
 std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsNeurology() const
 {
-  switch (mPlaneType)
-  {
-  case ptAXIAL:       return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0,-1, 0));
-  case ptCORONAL:     return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0, 1));
-  case ptSAGITTAL:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0, 1));
-  case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
-  case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
-  case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
-  default:
-    throw std::exception();
-  }
+	switch (mPlaneType)
+	{
+	case ptAXIAL:       return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0,-1, 0));
+	case ptCORONAL:     return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0, 1));
+	case ptSAGITTAL:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0, 1));
+	case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
+	case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
+	case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
+	default:
+		throw std::exception();
+	}
 }
 
 /** definitions of planes for the radiology application
@@ -299,17 +299,17 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsNeurology() cons
  */
 std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsRadiology() const
 {
-  switch (mPlaneType)
-  {
-  case ptAXIAL:       return std::make_pair(Vector3D( 1, 0, 0), Vector3D( 0,-1, 0));
-  case ptCORONAL:     return std::make_pair(Vector3D( 1, 0, 0), Vector3D( 0, 0, 1));
-  case ptSAGITTAL:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0, 1));
-  case ptANYPLANE:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0,-1));
-  case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
-  case ptRADIALPLANE: return std::make_pair(Vector3D( 0, 1, 0), Vector3D(-1, 0, 0));
-  default:
-    throw std::exception();
-  }
+	switch (mPlaneType)
+	{
+	case ptAXIAL:       return std::make_pair(Vector3D( 1, 0, 0), Vector3D( 0,-1, 0));
+	case ptCORONAL:     return std::make_pair(Vector3D( 1, 0, 0), Vector3D( 0, 0, 1));
+	case ptSAGITTAL:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0, 1));
+	case ptANYPLANE:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0,-1));
+	case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
+	case ptRADIALPLANE: return std::make_pair(Vector3D( 0, 1, 0), Vector3D(-1, 0, 0));
+	default:
+		throw std::exception();
+	}
 }
 
 

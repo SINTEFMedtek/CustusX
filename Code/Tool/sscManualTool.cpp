@@ -31,7 +31,7 @@ namespace ssc
 {
 
 ManualTool::ManualTool(ToolManager* manager, const QString& uid, const QString& name) :
-    Tool(uid,name), mMutex(QMutex::Recursive)
+	Tool(uid,name), mMutex(QMutex::Recursive)
 {
 	mTimestamp = 0;
 	m_prMt = Transform3D::Identity();

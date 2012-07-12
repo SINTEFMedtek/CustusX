@@ -41,26 +41,26 @@ namespace ssc
 
 ToolTracer::ToolTracer()
 {
-  mRunning = false;
-  mPolyData = vtkPolyDataPtr::New();
-  mActor = vtkActorPtr::New();
-  mPolyDataMapper = vtkPolyDataMapperPtr::New();
+	mRunning = false;
+	mPolyData = vtkPolyDataPtr::New();
+	mActor = vtkActorPtr::New();
+	mPolyDataMapper = vtkPolyDataMapperPtr::New();
 
-  mPolyDataMapper->SetInput(mPolyData);
-  mActor->SetMapper(mPolyDataMapper);
+	mPolyDataMapper->SetInput(mPolyData);
+	mActor->SetMapper(mPolyDataMapper);
 
-  mProperty = vtkPropertyPtr::New();
-  mActor->SetProperty( mProperty );
-  mProperty->SetPointSize(4);
+	mProperty = vtkPropertyPtr::New();
+	mActor->SetProperty( mProperty );
+	mProperty->SetPointSize(4);
 
-  this->setColor(QColor("red"));
+	this->setColor(QColor("red"));
 
-  mPoints = vtkPointsPtr::New();
-  mLines = vtkCellArrayPtr::New();
+	mPoints = vtkPointsPtr::New();
+	mLines = vtkCellArrayPtr::New();
 
-  mPolyData->SetPoints(mPoints);
-  mPolyData->SetLines(mLines);
-  mPolyData->SetVerts(mLines);
+	mPolyData->SetPoints(mPoints);
+	mPolyData->SetLines(mLines);
+	mPolyData->SetVerts(mLines);
 }
 
 void ToolTracer::start()
@@ -106,7 +106,7 @@ void ToolTracer::disconnectTool()
 
 void ToolTracer::setColor(QColor color)
 {
-  mActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+	mActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
 }
 
 void ToolTracer::setTool(ToolPtr tool)
@@ -118,12 +118,12 @@ void ToolTracer::setTool(ToolPtr tool)
 
 vtkPolyDataPtr ToolTracer::getPolyData()
 {
-  return mPolyData;
+	return mPolyData;
 }
 
 vtkActorPtr ToolTracer::getActor()
 {
-  return mActor;
+	return mActor;
 }
 
 bool ToolTracer::isRunning() const
@@ -133,21 +133,21 @@ bool ToolTracer::isRunning() const
 
 void ToolTracer::receiveTransforms(Transform3D prMt, double timestamp)
 {
-  Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
-  Transform3D rMt = rMpr * prMt;
+	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMt = rMpr * prMt;
 
-  Vector3D p = rMt.coord(Vector3D(0,0,0));
-  mPoints->InsertNextPoint(p.begin());
+	Vector3D p = rMt.coord(Vector3D(0,0,0));
+	mPoints->InsertNextPoint(p.begin());
 
-  // fill cell points for the entire polydata.
-  // This is very ineffective, but I have no idea how to update mLines incrementally.
-  mLines->Initialize();
-  std::vector<vtkIdType> ids(mPoints->GetNumberOfPoints());
-  for (unsigned i=0; i<ids.size(); ++i)
-    ids[i] = i;
-  mLines->InsertNextCell(ids.size(), &(*ids.begin()));
+	// fill cell points for the entire polydata.
+	// This is very ineffective, but I have no idea how to update mLines incrementally.
+	mLines->Initialize();
+	std::vector<vtkIdType> ids(mPoints->GetNumberOfPoints());
+	for (unsigned i=0; i<ids.size(); ++i)
+		ids[i] = i;
+	mLines->InsertNextCell(ids.size(), &(*ids.begin()));
 
-  mPolyData->Modified();
+	mPolyData->Modified();
 //  mPolyData->Update();
 }
 

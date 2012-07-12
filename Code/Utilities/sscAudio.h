@@ -16,19 +16,19 @@ namespace ssc
 class Audio
 {
 public:
-  Audio(){};
-  virtual ~Audio(){};
+	Audio(){};
+	virtual ~Audio(){};
 
-  virtual void playStartSound() = 0;
-  virtual void playStopSound() = 0;
-  virtual void playCancelSound() = 0;
+	virtual void playStartSound() = 0;
+	virtual void playStopSound() = 0;
+	virtual void playCancelSound() = 0;
 
-  virtual void playSuccessSound() = 0;
-  virtual void playWarningSound() = 0;
-  virtual void playErrorSound() = 0;
+	virtual void playSuccessSound() = 0;
+	virtual void playWarningSound() = 0;
+	virtual void playErrorSound() = 0;
 
-  virtual void playScreenShotSound() = 0;
-  virtual void playSampleSound() = 0;
+	virtual void playScreenShotSound() = 0;
+	virtual void playSampleSound() = 0;
 };
 
 typedef boost::shared_ptr<Audio> AudioPtr;

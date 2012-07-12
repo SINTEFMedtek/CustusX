@@ -52,8 +52,7 @@ DummyToolManager::DummyToolManager() :
 	mDominantTool = tool1;
 	mReferenceTool = tool1;
 
-	mDummyTools->insert(std::pair<QString, DummyToolPtr>(tool1->getUid(),
-                                                            tool1));
+	mDummyTools->insert(std::pair<QString, DummyToolPtr>(tool1->getUid(), tool1));
 }
 DummyToolManager::~ DummyToolManager()
 {}
@@ -82,8 +81,8 @@ void DummyToolManager::initialize()
 }
 void DummyToolManager::uninitialize()
 {
-  mInitialized = false;
-  emit initialized();
+	mInitialized = false;
+	emit initialized();
 }
 void DummyToolManager::startTracking()
 {
@@ -119,7 +118,7 @@ ToolManager::ToolMapPtr DummyToolManager::getConfiguredTools()
 	while(it != mDummyTools->end())
 	{
 		retval->insert(std::pair<QString, ToolPtr>
-                     (((*it).first), (ToolPtr)((*it).second)));
+		               (((*it).first), (ToolPtr)((*it).second)));
 		it++;
 	}
 	return retval;
@@ -127,8 +126,8 @@ ToolManager::ToolMapPtr DummyToolManager::getConfiguredTools()
 
 ToolManager::ToolMapPtr DummyToolManager::getInitializedTools()
 {
-  //TODO?
-  return ToolMapPtr(new ToolMap);
+	//TODO?
+	return ToolMapPtr(new ToolMap);
 }
 
 ToolManager::ToolMapPtr DummyToolManager::getTools()
@@ -168,7 +167,7 @@ std::map<QString, QString> DummyToolManager::getToolUidsAndNames() const
 	while(it != mDummyTools->end())
 	{
 		uidsAndNames.insert(std::pair<QString, QString>(
-                           ((*it).second)->getUid(),((*it).second)->getName()));
+		                    ((*it).second)->getUid(),((*it).second)->getName()));
 		it++;
 	}
 	return uidsAndNames;

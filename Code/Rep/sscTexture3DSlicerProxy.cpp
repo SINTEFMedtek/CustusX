@@ -100,7 +100,7 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 
 Texture3DSlicerProxyImpl::~Texture3DSlicerProxyImpl()
 {
-    mImages.clear();
+	mImages.clear();
 }
 
 Texture3DSlicerProxyPtr Texture3DSlicerProxyImpl::New()
@@ -182,17 +182,17 @@ void Texture3DSlicerProxyImpl::resetGeometryPlane()
 void Texture3DSlicerProxyImpl::createGeometryPlane( Vector3D point1_s,  Vector3D point2_s, Vector3D origin_s )
 {
 //  std::cout << "createGeometryPlane " << point1_s << ", " << point2_s << ", " << origin_s << std::endl;
-    mPlaneSource->SetPoint1( point1_s.begin() );
-    mPlaneSource->SetPoint2( point2_s.begin() );
-    mPlaneSource->SetOrigin( origin_s.begin() );
+	mPlaneSource->SetPoint1( point1_s.begin() );
+	mPlaneSource->SetPoint2( point2_s.begin() );
+	mPlaneSource->SetOrigin( origin_s.begin() );
 //  std::cout << "createGeometryPlane update begin" << std::endl;
-    mPolyData->Update();
+	mPolyData->Update();
 //  std::cout << "createGeometryPlane update end" << std::endl;
-    // each stripper->update() resets the contents of polydata, thus we must reinsert the data here.
-    for (unsigned i=0; i<mImages.size(); ++i)
-    {
-        updateCoordinates(i);
-    }
+	// each stripper->update() resets the contents of polydata, thus we must reinsert the data here.
+	for (unsigned i=0; i<mImages.size(); ++i)
+	{
+		updateCoordinates(i);
+	}
 }
 
 void Texture3DSlicerProxyImpl::setImages(std::vector<ssc::ImagePtr> images)
@@ -239,12 +239,12 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ssc::ImagePtr> images)
 
 void Texture3DSlicerProxyImpl::setSliceProxy(ssc::SliceProxyPtr slicer)
 {
-    if (mSliceProxy)
-        disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
-    mSliceProxy = slicer;
-    if (mSliceProxy)
+	if (mSliceProxy)
+		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
+	mSliceProxy = slicer;
+	if (mSliceProxy)
 	{
-        connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,	SLOT(transformChangedSlot()));
+		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,	SLOT(transformChangedSlot()));
 		for (unsigned i=0; i < mImages.size(); ++i)
 		{
 			updateCoordinates(i);
@@ -263,7 +263,7 @@ void Texture3DSlicerProxyImpl::setSliceProxy(ssc::SliceProxyPtr slicer)
 
 QString Texture3DSlicerProxyImpl::getTCoordName(int index)
 {
-     return  "texture"+qstring_cast(index);
+	return  "texture"+qstring_cast(index);
 }
 
 void Texture3DSlicerProxyImpl::updateCoordinates(int index)
@@ -372,16 +372,15 @@ void Texture3DSlicerProxyImpl::transformChangedSlot()
 	if (mTargetSpaceIsR)
 		this->resetGeometryPlane();
 //	this->viewChanged();
-    this->update();
+	this->update();
 }
 
 void Texture3DSlicerProxyImpl::update()
 {
-    for (unsigned i=0; i<mImages.size(); ++i)
-    {
-        updateCoordinates(i);
-    }
-
+	for (unsigned i=0; i<mImages.size(); ++i)
+	{
+		updateCoordinates(i);
+	}
 }
 
 #endif // WIN32

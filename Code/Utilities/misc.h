@@ -65,7 +65,7 @@ static inline size_t strlcat( char *RESTRICT dst, const char *RESTRICT src, size
 
 	if ( n == 0 )
 	{
-                return ( dlen + strlen( s ) );
+		return ( dlen + strlen( s ) );
 	}
 	while ( *s != '\0' )
 	{

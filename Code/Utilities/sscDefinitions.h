@@ -37,56 +37,56 @@ namespace ssc
 	 */
 	enum CLINICAL_APPLICATION
 	{
-	  mdLABORATORY,
-	  mdNEUROLOGY,
-	  mdLAPAROSCOPY,
-	  mdENDOVASCULAR,
-	  mdBRONCHOSCOPY,
-	  mdCOUNT
+		mdLABORATORY,
+		mdNEUROLOGY,
+		mdLAPAROSCOPY,
+		mdENDOVASCULAR,
+		mdBRONCHOSCOPY,
+		mdCOUNT
 	};
 
 	enum MESSAGE_LEVEL
 	{
-	  mlINFO,
-	  mlWARNING,
-	  mlERROR,
-	  mlDEBUG,
-	  mlCOUT,
-	  mlCERR,
-	  mlSUCCESS,
-	  mlCOUNT
+		mlINFO,
+		mlWARNING,
+		mlERROR,
+		mlDEBUG,
+		mlCOUT,
+		mlCERR,
+		mlSUCCESS,
+		mlCOUNT
 	};
 
 	enum COORDINATE_SYSTEM
 	{
-	  csREF, ///< the data reference space (r)
-	  csDATA, ///< a datas space (d)
-	  csPATIENTREF, ///< the patient/tool reference space (pr)
-	  csTOOL, ///< a tools rspace (t)
-	  csSENSOR, ///< a tools sensor space (s)
-	  csTOOL_OFFSET, ///< the tool space t with a virtual offset added along the z axis.
-	  csCOUNT
+		csREF, ///< the data reference space (r)
+		csDATA, ///< a datas space (d)
+		csPATIENTREF, ///< the patient/tool reference space (pr)
+		csTOOL, ///< a tools rspace (t)
+		csSENSOR, ///< a tools sensor space (s)
+		csTOOL_OFFSET, ///< the tool space t with a virtual offset added along the z axis.
+		csCOUNT
 	};
 
 	enum TRACKING_SYSTEM
 	{
-    tsNONE,             ///< Not specified
-    tsPOLARIS,          ///< NDIs Polaris tracker
-    tsPOLARIS_SPECTRA,  ///< NDIs Polaris Spectra tracker
-    tsPOLARIS_VICRA,    ///< NDIs Polaris Vicra tracker
-    tsAURORA,           ///< NDIs Aurora tracker
-    tsMICRON,           ///< Claron Technologys Micron tracker
-    tsCOUNT
+		tsNONE,             ///< Not specified
+		tsPOLARIS,          ///< NDIs Polaris tracker
+		tsPOLARIS_SPECTRA,  ///< NDIs Polaris Spectra tracker
+		tsPOLARIS_VICRA,    ///< NDIs Polaris Vicra tracker
+		tsAURORA,           ///< NDIs Aurora tracker
+		tsMICRON,           ///< Claron Technologys Micron tracker
+		tsCOUNT
 	};
 
 	/*enum TOOL_TYPE
 	{
-    ttNONE,
-    ttREFERENCE,  ///< references
-    ttMANUAL,     ///< representation of a mouse/keyboard-controlled virtual tool
-    ttPOINTER,    ///< pointers
-    ttUSPROBE,    ///< ultrasound probe
-    ttCOUNT
+		ttNONE,
+		ttREFERENCE,  ///< references
+		ttMANUAL,     ///< representation of a mouse/keyboard-controlled virtual tool
+		ttPOINTER,    ///< pointers
+		ttUSPROBE,    ///< ultrasound probe
+		ttCOUNT
 	};*/
 
 /**

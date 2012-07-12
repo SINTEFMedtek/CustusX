@@ -33,7 +33,7 @@ namespace ssc
 {
 
 VideoRecorder::VideoRecorder(VideoSourcePtr source, bool sync) :
-    mSource(source)
+	mSource(source)
 {
 	mSynced = !sync;
 	mSyncShift = 0;
