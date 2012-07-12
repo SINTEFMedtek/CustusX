@@ -91,9 +91,9 @@ typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
  */
 class Reconstructer: public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 	friend class ThreadedReconstructer;
-    friend class ThreadedTimedReconstructer;
+	friend class ThreadedTimedReconstructer;
 
 public:
 	Reconstructer(XmlOptionFile settings, QString shaderPath);

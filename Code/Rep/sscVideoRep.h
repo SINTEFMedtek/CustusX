@@ -59,51 +59,51 @@ typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
  */
 class VideoGraphics : public QObject
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  VideoGraphics(bool useMaskFilter=false);
-  virtual ~VideoGraphics();
+	VideoGraphics(bool useMaskFilter=false);
+	virtual ~VideoGraphics();
 
-  void setRealtimeStream(VideoSourcePtr data);
-  void setTool(ToolPtr tool);
-  ToolPtr getTool();
-  ssc::ProbeSector getProbeData();
-  void setClipToSector(bool on);
-  void setShowInToolSpace(bool on);
-  vtkActorPtr getActor();
+	void setRealtimeStream(VideoSourcePtr data);
+	void setTool(ToolPtr tool);
+	ToolPtr getTool();
+	ssc::ProbeSector getProbeData();
+	void setClipToSector(bool on);
+	void setShowInToolSpace(bool on);
+	vtkActorPtr getActor();
 
 signals:
-  void newData();
+	void newData();
 
 private slots:
-  void newDataSlot();
-  void receiveTransforms(Transform3D matrix, double timestamp);
-  void receiveVisible(bool visible);
-  void probeSectorChanged();
-  void checkDataIntegrity();
+	void newDataSlot();
+	void receiveTransforms(Transform3D matrix, double timestamp);
+	void receiveVisible(bool visible);
+	void probeSectorChanged();
+	void checkDataIntegrity();
 
 private:
-  void setLookupTable();
-  void clipToSectorChanged();
+	void setLookupTable();
+	void clipToSectorChanged();
 
-  bool mUseMask;
-  bool mClipSector;
+	bool mUseMask;
+	bool mClipSector;
 
-  bool mShowInToolSpace;
-  ToolPtr mTool;
-  ssc::ProbeSector mProbeData;
-  VideoSourcePtr mData;
-  vtkImageChangeInformationPtr mDataRedirecter;
-  vtkActorPtr mPlaneActor;
-  vtkPlaneSourcePtr mPlaneSource;
-  vtkTexturePtr mTexture;
-  UltrasoundSectorSourcePtr mUSSource;
-  vtkDataSetMapperPtr mDataSetMapper;
-  vtkTransformTextureCoordsPtr mTransformTextureCoords;
-  vtkTextureMapToPlanePtr mTextureMapToPlane;
+	bool mShowInToolSpace;
+	ToolPtr mTool;
+	ssc::ProbeSector mProbeData;
+	VideoSourcePtr mData;
+	vtkImageChangeInformationPtr mDataRedirecter;
+	vtkActorPtr mPlaneActor;
+	vtkPlaneSourcePtr mPlaneSource;
+	vtkTexturePtr mTexture;
+	UltrasoundSectorSourcePtr mUSSource;
+	vtkDataSetMapperPtr mDataSetMapper;
+	vtkTransformTextureCoordsPtr mTransformTextureCoords;
+	vtkTextureMapToPlanePtr mTextureMapToPlane;
 
-  vtkImageThresholdPtr mMapZeroToOne;
-  vtkImageMaskPtr mMaskFilter;
+	vtkImageThresholdPtr mMapZeroToOne;
+	vtkImageMaskPtr mMaskFilter;
 };
 
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
@@ -121,42 +121,42 @@ typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
  */
 class VideoFixedPlaneRep : public ssc::RepImpl
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  VideoFixedPlaneRep(const QString& uid, const QString& name="");
-  virtual ~VideoFixedPlaneRep();
-  virtual QString getType() const { return "ssc::RealTimeStreamFixedPlaneRep"; }
-  void setRealtimeStream(VideoSourcePtr data);
-  void setTool(ToolPtr tool);
+	VideoFixedPlaneRep(const QString& uid, const QString& name="");
+	virtual ~VideoFixedPlaneRep();
+	virtual QString getType() const { return "ssc::RealTimeStreamFixedPlaneRep"; }
+	void setRealtimeStream(VideoSourcePtr data);
+	void setTool(ToolPtr tool);
 
-  void setShowSector(bool on);
-  bool getShowSector() const;
+	void setShowSector(bool on);
+	bool getShowSector() const;
 
 protected:
-  virtual void addRepActorsToViewRenderer(ssc::View* view);
-  virtual void removeRepActorsFromViewRenderer(ssc::View* view);
-private slots:
-  void newDataSlot();
+	virtual void addRepActorsToViewRenderer(ssc::View* view);
+	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	private slots:
+	void newDataSlot();
 
 private:
-  void setCamera();
-  void updateSector();
+	void setCamera();
+	void updateSector();
 
-  VideoGraphicsPtr mRTGraphics;
-  bool mShowSector;
+	VideoGraphicsPtr mRTGraphics;
+	bool mShowSector;
 
-  ToolPtr mTool;
-  ssc::ProbeSector mProbeData;
-  VideoSourcePtr mData;
+	ToolPtr mTool;
+	ssc::ProbeSector mProbeData;
+	VideoSourcePtr mData;
 
-  ssc::TextDisplayPtr mStatusText;
-  ssc::TextDisplayPtr mInfoText;
+	ssc::TextDisplayPtr mStatusText;
+	ssc::TextDisplayPtr mInfoText;
 
-  vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
-  vtkActorPtr mProbeSectorActor;
+	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
+	vtkActorPtr mProbeSectorActor;
 
-  vtkRendererPtr mRenderer;
-  View* mView;
+	vtkRendererPtr mRenderer;
+	View* mView;
 };
 
 

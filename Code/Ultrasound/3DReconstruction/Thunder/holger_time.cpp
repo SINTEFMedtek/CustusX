@@ -51,7 +51,7 @@ unsigned long long GetTimeMs64() {
 		gettimeofday(&tv, NULL);
 
 		//uint64 ret = tv.tv_usec;
-    unsigned long long ret = tv.tv_usec;
+		unsigned long long ret = tv.tv_usec;
 		/* Convert from micro seconds (10^-6) to milliseconds (10^-3) */
 		ret /= 1000;
 

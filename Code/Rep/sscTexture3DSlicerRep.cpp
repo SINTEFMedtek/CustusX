@@ -60,14 +60,14 @@ Texture3DSlicerRep::~Texture3DSlicerRep()
 
 Texture3DSlicerRepPtr Texture3DSlicerRep::New(const QString& uid)
 {
-    Texture3DSlicerRepPtr retval(new Texture3DSlicerRep(uid));
-    retval->mSelf = retval;
-    return retval;
+	Texture3DSlicerRepPtr retval(new Texture3DSlicerRep(uid));
+	retval->mSelf = retval;
+	return retval;
 }
 
 void Texture3DSlicerRep::setShaderFile(QString shaderFile)
 {
-  mProxy->setShaderFile(shaderFile);
+	mProxy->setShaderFile(shaderFile);
 }
 
 void Texture3DSlicerRep::viewChanged()
@@ -96,10 +96,10 @@ void Texture3DSlicerRep::setSliceProxy(ssc::SliceProxyPtr slicer)
 
 void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View *view)
 {
-    view->getRenderer()->AddActor(mProxy->getActor());
-    mView = view;
-    connect(dynamic_cast<QObject *>(view), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
-    this->viewChanged();
+	view->getRenderer()->AddActor(mProxy->getActor());
+	mView = view;
+	connect(dynamic_cast<QObject *>(view), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
+	this->viewChanged();
 }
 
 void Texture3DSlicerRep::removeRepActorsFromViewRenderer(ssc::View *view)

@@ -57,23 +57,23 @@ typedef vtkSmartPointer<vtkPolyData> vtkPolyDataPtr;
 class UltrasoundSectorSource : public vtkPolyDataSource 
 {
 public:
-  static UltrasoundSectorSource *New();
-  vtkTypeRevisionMacro(UltrasoundSectorSource,vtkPolyDataSource);
-  void PrintSelf(ostream& os, vtkIndent indent);
+	static UltrasoundSectorSource *New();
+	vtkTypeRevisionMacro(UltrasoundSectorSource,vtkPolyDataSource);
+	void PrintSelf(ostream& os, vtkIndent indent);
 
-  void setProbeSector(vtkPolyDataPtr sector);
+	void setProbeSector(vtkPolyDataPtr sector);
 
 protected:
-  UltrasoundSectorSource();
-  ~UltrasoundSectorSource() {};
+	UltrasoundSectorSource();
+	~UltrasoundSectorSource() {};
 
-  void Execute();
+	void Execute();
 
 private:
-  vtkPolyDataPtr mSector; ///< polydata representation of the sector provided externally. Used as basis during Execute().
+	vtkPolyDataPtr mSector; ///< polydata representation of the sector provided externally. Used as basis during Execute().
 
-  UltrasoundSectorSource(const UltrasoundSectorSource&);  // Not implemented.
-  void operator=(const UltrasoundSectorSource&);  // Not implemented.
+	UltrasoundSectorSource(const UltrasoundSectorSource&);  // Not implemented.
+	void operator=(const UltrasoundSectorSource&);  // Not implemented.
 };
 
 

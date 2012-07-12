@@ -33,25 +33,25 @@ UltrasoundSectorSource::UltrasoundSectorSource()
 
 void UltrasoundSectorSource::Execute()
 {
-  if (!mSector)
-    return;
+	if (!mSector)
+		return;
 
-  vtkPolyData *output = this->GetOutput();
+	vtkPolyData *output = this->GetOutput();
 
-  output->SetPoints(mSector->GetPoints());
-  output->GetPointData()->SetTCoords(mSector->GetPointData()->GetTCoords());
-  //output->SetLines(mSector->GetLines());
-  //output->SetPolys(mSector->GetPolys());
-  output->SetStrips(mSector->GetStrips());
+	output->SetPoints(mSector->GetPoints());
+	output->GetPointData()->SetTCoords(mSector->GetPointData()->GetTCoords());
+	//output->SetLines(mSector->GetLines());
+	//output->SetPolys(mSector->GetPolys());
+	output->SetStrips(mSector->GetStrips());
 }
 
 void UltrasoundSectorSource::setProbeSector(vtkPolyDataPtr sector)
 {
-  mSector = sector;
-  this->Modified();
+	mSector = sector;
+	this->Modified();
 }
 
 void UltrasoundSectorSource::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os, indent);
+	this->Superclass::PrintSelf(os, indent);
 }

@@ -49,36 +49,36 @@ typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
  */
 class ToolTracer : QObject
 {
-  Q_OBJECT
+	Q_OBJECT
 public: 
 public:
-  ToolTracer();
-  void setTool(ToolPtr tool);
-  vtkPolyDataPtr getPolyData();
-  vtkActorPtr getActor();
+	ToolTracer();
+	void setTool(ToolPtr tool);
+	vtkPolyDataPtr getPolyData();
+	vtkActorPtr getActor();
 
-  void setColor(QColor color);
+	void setColor(QColor color);
 
-  void start(); // start path tracking
-  void stop(); // stop tracking
-  void clear(); // erase stored tracking data.
-  bool isRunning() const; // true if started and not stopped.
+	void start(); // start path tracking
+	void stop(); // stop tracking
+	void clear(); // erase stored tracking data.
+	bool isRunning() const; // true if started and not stopped.
 
-private slots:
-  void receiveTransforms(Transform3D prMt, double timestamp);
+	private slots:
+	void receiveTransforms(Transform3D prMt, double timestamp);
 private:
-  void connectTool();
-  void disconnectTool();
+	void connectTool();
+	void disconnectTool();
 
-  bool mRunning;
-  vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
-  vtkActorPtr mActor;
-  ToolPtr mTool;
-  vtkPolyDataMapperPtr mPolyDataMapper;
-  vtkPropertyPtr mProperty;
+	bool mRunning;
+	vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
+	vtkActorPtr mActor;
+	ToolPtr mTool;
+	vtkPolyDataMapperPtr mPolyDataMapper;
+	vtkPropertyPtr mProperty;
 
-  vtkPointsPtr mPoints;
-  vtkCellArrayPtr mLines;
+	vtkPointsPtr mPoints;
+	vtkCellArrayPtr mLines;
 };
 
 } // namespace ssc

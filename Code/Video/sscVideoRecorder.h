@@ -50,7 +50,7 @@ namespace ssc
  */
 class VideoRecorder : public QObject
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
 	typedef std::map<double, vtkImageDataPtr> DataType; ///<  <timestamp, frame>
 public:

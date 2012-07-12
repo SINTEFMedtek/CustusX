@@ -30,7 +30,7 @@ DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 //	std::cout << "dummytool" << std::endl;
 
 //	this->createPolyData();
-    mPolyData = this->createPolyData(150, 15, 4, 2);
+	mPolyData = this->createPolyData(150, 15, 4, 2);
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
 	connect(manager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
@@ -156,29 +156,29 @@ vtkPolyDataPtr DummyTool::createPolyData(double h1, double h2, double r1, double
 	vtkConeSourcePtr cone1 = vtkConeSourcePtr::New();
 	double h1_extension = h1*r2 / (r1-r2); 
 	double h1_mod = h1+h1_extension;
-    cone1->SetResolution(50);
-    cone1->SetRadius(r1);
-    cone1->SetHeight(h1_mod);
-    cone1->SetDirection(0,0,1);
-    double center1 = -h1/2-h2+h1_extension/2;
-    cone1->SetCenter(Vector3D(0,0,center1).begin());
+	cone1->SetResolution(50);
+	cone1->SetRadius(r1);
+	cone1->SetHeight(h1_mod);
+	cone1->SetDirection(0,0,1);
+	double center1 = -h1/2-h2+h1_extension/2;
+	cone1->SetCenter(Vector3D(0,0,center1).begin());
 
 	vtkClipPolyDataPtr clipper1 = vtkClipPolyDataPtr::New();
 	clipper1->SetInput(cone1->GetOutput());
 	clipper1->SetClipFunction(plane);    
-    
-	vtkConeSourcePtr cone2 = vtkConeSourcePtr::New();
-    cone2->SetResolution(25);
-    cone2->SetRadius(r2);
-    cone2->SetHeight(h2);
-    cone2->SetDirection(0,0,1);
-    double center2 = -h2/2;
-    cone2->SetCenter(Vector3D(0,0,center2).begin());
 
-    assembly->AddInput(clipper1->GetOutput());
-    assembly->AddInput(cone2->GetOutput());
+	vtkConeSourcePtr cone2 = vtkConeSourcePtr::New();
+	cone2->SetResolution(25);
+	cone2->SetRadius(r2);
+	cone2->SetHeight(h2);
+	cone2->SetDirection(0,0,1);
+	double center2 = -h2/2;
+	cone2->SetCenter(Vector3D(0,0,center2).begin());
+
+	assembly->AddInput(clipper1->GetOutput());
+	assembly->AddInput(cone2->GetOutput());
 //    mPolyData = assembly->GetOutput();
-    return assembly->GetOutput();
+	return assembly->GetOutput();
 }
 
 void DummyTool::createLinearMovement(std::vector<Transform3D>* retval, Transform3D* T_in, const Transform3D& R, const Vector3D& a, const Vector3D& b, double step) const
@@ -191,9 +191,9 @@ void DummyTool::createLinearMovement(std::vector<Transform3D>* retval, Transform
 
 	for (unsigned i=0; i<N; ++i)
 	{
-        Transform3D T_delta = createTransformTranslate(u*step);
-        T = T_delta * T;
-        retval->push_back(T * R);
+		Transform3D T_delta = createTransformTranslate(u*step);
+		T = T_delta * T;
+		retval->push_back(T * R);
 	}
 }
 
@@ -202,93 +202,93 @@ void DummyTool::createLinearMovement(std::vector<Transform3D>* retval, Transform
 std::vector<Transform3D> DummyTool::createToolPositionMovement(const DoubleBoundingBox3D& bb) const
 {
 //	std::cout<<"createToolPositionMovement:"<<bb<<std::endl;
-    std::vector<Transform3D> retval;
-       
-    Vector3D range = bb.range();
-    // define four points. Traverse them and then back to the starting point.
-    Vector3D a = bb.center() + Vector3D(range[0]/2, 0, 0);
-    Vector3D b = bb.center();
-    Vector3D c = b + Vector3D(0, -range[0]*0.1, 0);
-    Vector3D d = c + Vector3D(0, 0, range[2]/2);
+	std::vector<Transform3D> retval;
+
+	Vector3D range = bb.range();
+	// define four points. Traverse them and then back to the starting point.
+	Vector3D a = bb.center() + Vector3D(range[0]/2, 0, 0);
+	Vector3D b = bb.center();
+	Vector3D c = b + Vector3D(0, -range[0]*0.1, 0);
+	Vector3D d = c + Vector3D(0, 0, range[2]/2);
 
 //    Vector3D a = bb.corner(0,0,0);
 //    Vector3D b = bb.corner(1,0,0);
 //    Vector3D c = bb.corner(1,1,0);
 //    Vector3D d = bb.corner(1,1,1);
-       
+
 //    std::cout << "a" << a << std::endl;
 //    std::cout << "b" << b << std::endl;
 //    std::cout << "c" << c << std::endl;
 //    std::cout << "d" << d << std::endl;
 
-    int steps = 200;
-    double step = *std::max_element(range.begin(), range.end()) / steps;
+	int steps = 200;
+	double step = *std::max_element(range.begin(), range.end()) / steps;
 
-    Transform3D r0 = createTransformRotateX(M_PI)*createTransformRotateZ(-M_PI*0.5);
-    Transform3D R = createTransformRotateZ(-M_PI*0.25)*createTransformRotateX(-M_PI*0.25) * r0;
-    Transform3D T = createTransformTranslate(a);  
-    
-    createLinearMovement(&retval, &T, R, a, b, step);    
+	Transform3D r0 = createTransformRotateX(M_PI)*createTransformRotateZ(-M_PI*0.5);
+	Transform3D R = createTransformRotateZ(-M_PI*0.25)*createTransformRotateX(-M_PI*0.25) * r0;
+	Transform3D T = createTransformTranslate(a);  
 
-    for (unsigned i=0; i<50; ++i)
-    {
-        Transform3D r_delta = createTransformRotateZ(-M_PI*0.01);
-        R = r_delta * R;
-        retval.push_back(T * R);
-    }
-    
-    createLinearMovement(&retval, &T, R, b, c, step);    
+	createLinearMovement(&retval, &T, R, a, b, step);    
 
-    for (unsigned i=0; i<50; ++i)
-    {
-        Transform3D r_delta = createTransformRotateZ(-M_PI*0.01);
-        R = r_delta * R;
-        retval.push_back(T * R);
-    }
+	for (unsigned i=0; i<50; ++i)
+	{
+		Transform3D r_delta = createTransformRotateZ(-M_PI*0.01);
+		R = r_delta * R;
+		retval.push_back(T * R);
+	}
 
-    createLinearMovement(&retval, &T, R, c, d, step);    
-    createLinearMovement(&retval, &T, R, d, a, step);    
+	createLinearMovement(&retval, &T, R, b, c, step);    
 
-    for (unsigned i=0; i<20; ++i)
-    {
-        Transform3D r_delta = createTransformRotateZ(-M_PI/20);
-        R = r_delta * R;
-        retval.push_back(T * R);
-    }
-    
-    return retval;
+	for (unsigned i=0; i<50; ++i)
+	{
+		Transform3D r_delta = createTransformRotateZ(-M_PI*0.01);
+		R = r_delta * R;
+		retval.push_back(T * R);
+	}
+
+	createLinearMovement(&retval, &T, R, c, d, step);    
+	createLinearMovement(&retval, &T, R, d, a, step);    
+
+	for (unsigned i=0; i<20; ++i)
+	{
+		Transform3D r_delta = createTransformRotateZ(-M_PI/20);
+		R = r_delta * R;
+		retval.push_back(T * R);
+	}
+
+	return retval;
 }
 
 /** Create a test trajectory that moves within the given bb.
  */
 std::vector<Transform3D> DummyTool::createToolPositionMovementTranslationOnly(const DoubleBoundingBox3D& bb) const
 {
-    std::vector<Transform3D> retval;
+	std::vector<Transform3D> retval;
 
-    Vector3D range = bb.range();
-    // define four points. Traverse them and then back to the starting point.
+	Vector3D range = bb.range();
+	// define four points. Traverse them and then back to the starting point.
 //    Vector3D a = bb.center() + Vector3D(range[0]/2, range[0]/10, range[0]/10);
 //    Vector3D b = bb.center();
 //    Vector3D c = b + Vector3D(-range[0]*0.1, -range[0]*0.1, -range[0]*0.1);
 //    Vector3D d = c + Vector3D(range[0]*0.1, range[0]*0.1, range[2]/3);
-    Vector3D a = bb.center() + Vector3D( range[0]*0.4,  range[1]*0.4,  range[2]*0.4);
-    Vector3D b = bb.center();
-    Vector3D c = bb.center() + Vector3D(-range[0]*0.4, -range[1]*0.1, -range[2]*0.1);
-    Vector3D d = bb.center() + Vector3D( range[0]*0.0,  range[1]*0.1,  range[2]*0.3);
+	Vector3D a = bb.center() + Vector3D( range[0]*0.4,  range[1]*0.4,  range[2]*0.4);
+	Vector3D b = bb.center();
+	Vector3D c = bb.center() + Vector3D(-range[0]*0.4, -range[1]*0.1, -range[2]*0.1);
+	Vector3D d = bb.center() + Vector3D( range[0]*0.0,  range[1]*0.1,  range[2]*0.3);
 
-    int steps = 200;
-    double step = *std::max_element(range.begin(), range.end()) / steps;
+	int steps = 200;
+	double step = *std::max_element(range.begin(), range.end()) / steps;
 
-    Transform3D r0 = createTransformRotateX(M_PI)*createTransformRotateZ(-M_PI*0.5);
-    Transform3D R = createTransformRotateZ(-M_PI*0.25)*createTransformRotateX(-M_PI*0.25) * r0;
-    Transform3D T = createTransformTranslate(a);
+	Transform3D r0 = createTransformRotateX(M_PI)*createTransformRotateZ(-M_PI*0.5);
+	Transform3D R = createTransformRotateZ(-M_PI*0.25)*createTransformRotateX(-M_PI*0.25) * r0;
+	Transform3D T = createTransformTranslate(a);
 
-    createLinearMovement(&retval, &T, R, a, b, step);
-    createLinearMovement(&retval, &T, R, b, c, step);
-    createLinearMovement(&retval, &T, R, c, d, step);
-    createLinearMovement(&retval, &T, R, d, a, step);
+	createLinearMovement(&retval, &T, R, a, b, step);
+	createLinearMovement(&retval, &T, R, b, c, step);
+	createLinearMovement(&retval, &T, R, c, d, step);
+	createLinearMovement(&retval, &T, R, d, a, step);
 
-    return retval;
+	return retval;
 }
 
 

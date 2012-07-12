@@ -260,13 +260,13 @@ void VolumetricRep::vtkImageDataChangedSlot()
 //		volume = vtkImageDataPtr::New();
 //		volume->DeepCopy(resampler->GetOutput());
 
-	  long voxelsDown = volume->GetNumberOfPoints();
-	  long voxelsOrig = mImage->getBaseVtkImageData()->GetNumberOfPoints();
-    messageManager()->sendInfo("Completed downsampling volume in VolumetricRep: "
-        + mImage->getName()
-        + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "
-        + "Ratio: " + QString::number(mResampleFactor, 'g', 2) + ", "
-        + "Original size: " + qstring_cast(voxelsOrig/1000/1000) + "M.");
+		long voxelsDown = volume->GetNumberOfPoints();
+		long voxelsOrig = mImage->getBaseVtkImageData()->GetNumberOfPoints();
+		messageManager()->sendInfo("Completed downsampling volume in VolumetricRep: "
+		                           + mImage->getName()
+		                           + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "
+		                           + "Ratio: " + QString::number(mResampleFactor, 'g', 2) + ", "
+		                           + "Original size: " + qstring_cast(voxelsOrig/1000/1000) + "M.");
 //    std::cout << "=================== org volume: " << std::endl;
 //    mImage->getGrayScaleBaseVtkImageData()->Print(std::cout);
 //    std::cout << "=================== downsampled volume: " << std::endl;
@@ -291,21 +291,21 @@ void VolumetricRep::transformChangedSlot()
 
 void VolumetricRep::transferFunctionsChangedSlot()
 {
-  mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
-  mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
-  mVolumeProperty->SetShade(mImage->getShadingOn());
-  
-  //Shading parameters from OsiriX
-  /*mVolumeProperty->SetAmbient(0.15);
-  mVolumeProperty->SetDiffuse(0.90);
-  mVolumeProperty->SetSpecular(0.30);
-  mVolumeProperty->SetSpecularPower(15.00);*/
-  
-  mVolumeProperty->SetAmbient(mImage->getShadingAmbient());
-  mVolumeProperty->SetDiffuse(mImage->getShadingDiffuse());
-  mVolumeProperty->SetSpecular(mImage->getShadingSpecular());
-  mVolumeProperty->SetSpecularPower(mImage->getShadingSpecularPower());
-  
+	mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
+	mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
+	mVolumeProperty->SetShade(mImage->getShadingOn());
+
+	//Shading parameters from OsiriX
+	/*mVolumeProperty->SetAmbient(0.15);
+	  mVolumeProperty->SetDiffuse(0.90);
+	  mVolumeProperty->SetSpecular(0.30);
+	  mVolumeProperty->SetSpecularPower(15.00);*/
+
+	mVolumeProperty->SetAmbient(mImage->getShadingAmbient());
+	mVolumeProperty->SetDiffuse(mImage->getShadingDiffuse());
+	mVolumeProperty->SetSpecular(mImage->getShadingSpecular());
+	mVolumeProperty->SetSpecularPower(mImage->getShadingSpecularPower());
+
 }
 
 void VolumetricRep::setMaxVolumeSize(long maxVoxels)

@@ -95,53 +95,53 @@ void generateOpenCLError(cl_int id, const char* file, int line)
 }
 
 float3 cross(float3 v, float3 w) {
-  float3 c = {
-    v.y*w.z - v.z*w.y,
-    v.z*w.x - v.x*w.z,
-    v.x*w.y - v.y*w.x
+	float3 c = {
+		v.y*w.z - v.z*w.y,
+		v.z*w.x - v.x*w.z,
+		v.x*w.y - v.y*w.x
 	};
-  return c;
+	return c;
 }
 
 float3 sub(float3 v, float3 w) {
-  float3 c = {
-    v.x - w.x,
-    v.y - w.y,
-    v.z - w.z
+	float3 c = {
+		v.x - w.x,
+		v.y - w.y,
+		v.z - w.z
 	};
-  return c;
+	return c;
 }
 
 float3 normalize(float3 v) {
 	float length = sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
-  float3 c = {
-    v.x/length,
-    v.y/length,
-    v.z/length
+	float3 c = {
+		v.x/length,
+		v.y/length,
+		v.z/length
 	};
-  return c;
+	return c;
 }
 
 float3 add(float3 v, float3 w) {
-  float3 c = {
-    v.x + w.x,
-    v.y + w.y,
-    v.z + w.z
+	float3 c = {
+		v.x + w.x,
+		v.y + w.y,
+		v.z + w.z
 	};
-  return c;
+	return c;
 }
 
 float3 scale(float a, float3 v) {
-  float3 c = {
-    a * v.x,
-    a * v.y,
-    a * v.z
+	float3 c = {
+		a * v.x,
+		a * v.y,
+		a * v.z
 	};
-  return c;
+	return c;
 }
 
 float dot(float3 v, float3 w) {
-  return v.x*w.x + v.y*w.y + v.z*w.z;
+	return v.x*w.x + v.y*w.y + v.z*w.z;
 }
 
 void random_init(float * data, int length) {
@@ -159,7 +159,7 @@ char* file2string(const char* filename, size_t * final_length) {
 	size_t source_length;
 
 	// open the OpenCL source code file
-  file_stream = fopen(filename, "rb");
+	file_stream = fopen(filename, "rb");
 	if(file_stream == NULL) return 0;
 
 	fseek(file_stream, 0, SEEK_END); 

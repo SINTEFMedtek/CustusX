@@ -43,8 +43,8 @@ public:
 private:
 		typedef vtkSmartPointer<class ViewportObserverPrivate> ViewportObserverPrivatePtr;
 		ViewportObserverPrivatePtr mObserver;
-    vtkRendererPtr mRenderer;
-    boost::function<void ()> mCallback;
+		vtkRendererPtr mRenderer;
+		boost::function<void ()> mCallback;
 };
 
 typedef boost::shared_ptr<ViewportListener> ViewportListenerPtr;

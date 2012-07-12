@@ -82,21 +82,21 @@ ProbeData::ProbeData(TYPE type) :
 
 Vector3D ProbeData::ProbeImageData::transform_p_to_u(const Vector3D& q_p) const
 {
-  ssc::Vector3D c(q_p[0], double(mSize.height()) - q_p[1] - 1, 0);
-  c = multiply_elems(c, mSpacing);
-  return c;
+	ssc::Vector3D c(q_p[0], double(mSize.height()) - q_p[1] - 1, 0);
+	c = multiply_elems(c, mSpacing);
+	return c;
 }
 
 Vector3D ProbeData::ProbeImageData::getOrigin_u() const
 {
-  return this->transform_p_to_u(mOrigin_p);
+	return this->transform_p_to_u(mOrigin_p);
 }
 
 ssc::DoubleBoundingBox3D ProbeData::ProbeImageData::getClipRect_u() const
 {
-  ssc::Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
-  ssc::Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
-  return ssc::DoubleBoundingBox3D(p0,p1);
+	ssc::Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
+	ssc::Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
+	return ssc::DoubleBoundingBox3D(p0,p1);
 }
 
 void ProbeData::setImage(ProbeImageData value)

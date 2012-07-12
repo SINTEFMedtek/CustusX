@@ -139,9 +139,9 @@ bool VideoSourceSHM::isStreaming() const
 }
 
 /**
-  * Grabs latest video source frame (if it exists) and signals a new frame
-  * Must call release on this when buffer no longer is needed
-  */
+ * Grabs latest video source frame (if it exists) and signals a new frame
+ * Must call release on this when buffer no longer is needed
+ */
 void VideoSourceSHM::update()
 {
 	unsigned char* buffer = (unsigned char*) mSource.isNew(); // Fetch new data from server - NULL if no new data present
@@ -164,9 +164,9 @@ void VideoSourceSHM::update()
 }
 
 /**
-  * Connects to a shared memory server end, described by a unique key string.
-  * Connects signals and slots on success.
-  */
+ * Connects to a shared memory server end, described by a unique key string.
+ * Connects signals and slots on success.
+ */
 void VideoSourceSHM::connectServer(const QString& key)
 {
 	mConnected = mSource.attach(key);
@@ -183,9 +183,9 @@ void VideoSourceSHM::connectServer(const QString& key)
 }
 
 /**
-  * Disconnects from current shared memory server end.
-  * Disconnects signals and slots.
-  */
+ * Disconnects from current shared memory server end.
+ * Disconnects signals and slots.
+ */
 void VideoSourceSHM::disconnectServer()
 {
 	stop();
@@ -201,8 +201,8 @@ void VideoSourceSHM::disconnectServer()
 }
 
 /**
-  * Slot: calls update on this
-  */
+ * Slot: calls update on this
+ */
 void VideoSourceSHM::serverPollSlot()
 {
 	this->update();
