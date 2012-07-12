@@ -101,7 +101,10 @@ void GuideRep2D::changedSlot()
 
 	if (!mCircleActor)
 		return;
-
+	if (!mSliceProxy->getTool())
+	{
+		return;
+	}
 
 	Vector3D toolOffsetPosRef = (*ssc::ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,mSliceProxy->getTool()->getTooltipOffset()));
 	Vector3D toolPosRef = (*ssc::ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,00));
