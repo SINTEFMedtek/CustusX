@@ -117,6 +117,7 @@ private:
 	virtual void clearBackground();
 
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
+	ViewItem *mMouseEventTarget;
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 

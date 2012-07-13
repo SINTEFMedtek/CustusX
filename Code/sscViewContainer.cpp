@@ -56,7 +56,8 @@ namespace ssc
 ViewContainer::ViewContainer(QWidget *parent, Qt::WFlags f) :
 			     ViewQVTKWidget(parent, f),
 			     mRenderWindow(ViewRenderWindowPtr::New()),
-			     mMTimeHash(0)
+			     mMTimeHash(0),
+			     mMouseEventTarget(NULL)
 {
 	// Create default grid layout for this object
 	setLayout(new QGridLayout);
@@ -73,6 +74,7 @@ ViewContainer::~ViewContainer()
 void ViewContainer::clear()
 {
 	QLayoutItem *item;
+	mMouseEventTarget = NULL;
 	while ((item = layout()->takeAt(0)) != 0)
 	{
 		((ViewItem *) item)->removeReps();
@@ -178,15 +180,11 @@ void ViewItem::setGeometry(const QRect &r)
 void ViewContainer::mouseMoveEvent(QMouseEvent* event)
 {
 	widget::mouseMoveEvent(event);
-	for (int i = 0; layout() && i < layout()->count(); ++i)
+	if (mMouseEventTarget)
 	{
-		ViewItem *item = (ViewItem *)layout()->itemAt(i);
-		QRect r = item->geometry();
+		QRect r = mMouseEventTarget->geometry();
 		QPoint p = event->pos();
-		if (r.contains(p))
-		{
-			item->mouseMoveSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
-		}
+		mMouseEventTarget->mouseMoveSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
 	}
 }
 
@@ -206,6 +204,7 @@ void ViewContainer::mousePressEvent(QMouseEvent* event)
 		QPoint p = event->pos();
 		if (r.contains(p))
 		{
+			mMouseEventTarget = item;
 			item->mousePressSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
 		}
 	}
@@ -214,15 +213,12 @@ void ViewContainer::mousePressEvent(QMouseEvent* event)
 void ViewContainer::mouseReleaseEvent(QMouseEvent* event)
 {
 	widget::mouseReleaseEvent(event);
-	for (int i = 0; layout() && i < layout()->count(); ++i)
+	if (mMouseEventTarget)
 	{
-		ViewItem *item = (ViewItem *)layout()->itemAt(i);
-		QRect r = item->geometry();
+		QRect r = mMouseEventTarget->geometry();
 		QPoint p = event->pos();
-		if (r.contains(p))
-		{
-			item->mouseReleaseSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
-		}
+		mMouseEventTarget->mouseReleaseSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
+		mMouseEventTarget = NULL;
 	}
 }
 
