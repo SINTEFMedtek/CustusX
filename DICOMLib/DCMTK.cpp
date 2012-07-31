@@ -1352,6 +1352,26 @@ int DICOM_image_window_auto( struct series_t *series, struct instance_t *instanc
 	series->VOI.minmax.width = series->lastpixel - series->firstpixel;
 	series->VOI.minmax.center = series->lastpixel - ( series->VOI.minmax.width / 2 );
 
+	// paranoia check for lastpixel == firstpixel
+	if ( series->VOI.minmax.width == 0 )
+	{
+		if ( instance->numPresets > 0 )
+		{
+			// fall back to instance presets:
+			series->VOI.minmax.width = instance->preset[0].window.width;
+			series->VOI.minmax.center = instance->preset[0].window.center;
+		}
+		else
+		{
+			// fall back to window width 200 -> could be a problem if there
+			// are anywhere other extrem different values in the volume
+			series->VOI.minmax.width = 200;
+			series->VOI.minmax.center = series->VOI.range.center + 100;
+		}
+		series->lastpixel = series->VOI.minmax.center + (series->VOI.minmax.width/2);
+		series->firstpixel = series->VOI.minmax.center - (series->VOI.minmax.width/2);
+	}
+
 	// make suggestion based on modality
 	if ( series->modality[0] == 'C' && series->modality[1] == 'T' )
 	{
