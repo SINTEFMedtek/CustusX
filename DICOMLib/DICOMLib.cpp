@@ -98,27 +98,7 @@ static int setupSeries( struct study_t *study )
 		{
 			// catch all series with contain DTI stuff
 			if (series->DTI.isDTI) DTIUidList.append(series->seriesInstanceUID);
-			struct instance_t *middle = findInstance( series, series->frames / 2 );
-
-			DICOMLib_Verify( series );
-
-			if ( !middle ) // eg in multiframe case
-			{
-				middle = series->first_instance;
-			}
-
-			// Set auto values
-			if ( middle && DICOM_image_window_auto( series, middle ) == 0 )
-			{
-				series->VOI.current = series->VOI.suggestion;
-				series->VOI.currentPreset = -1;
-				SSC_LOG( "Found auto values %f, %f from frame %d in (file %s) -- minmax (%f, %f), range (%f, %f)",
-				        series->VOI.suggestion.center, series->VOI.suggestion.width, 
-					series->frames / 2, middle->path, series->VOI.minmax.center, series->VOI.minmax.width,
-					series->VOI.range.center, series->VOI.range.width );
-			}
 		}
-
 		// DTI: Now separate the wheat from the chaff (real DTI from trash)
 		for  ( series = iter->first_series; series != NULL; series = series->next_series )
 		{
@@ -132,6 +112,35 @@ static int setupSeries( struct study_t *study )
 					series->DTI.isDTI=false;
 		}
 
+
+		for ( series = iter->first_series; series != NULL; series = series->next_series )
+		{
+			struct instance_t *middle = findInstance( series, series->frames / 2 );
+			DICOMLib_Verify( series );
+			if ( !middle ) // eg in multiframe case
+			{
+				middle = series->first_instance;
+			}
+
+			// Set auto values besides DTI data - except for the representative bval=0 series in DTI data
+			if (series->DTI.isDTI != true || strcmp(series->DTI.bval,"0")==0 )
+			{
+				if ( middle && DICOM_image_window_auto( series, middle ) == 0 )
+				{
+					series->VOI.current = series->VOI.suggestion;
+					series->VOI.currentPreset = -1;
+					SSC_LOG( "Found auto values %f, %f from frame %d in (file %s) -- minmax (%f, %f), range (%f, %f)",
+						series->VOI.suggestion.center, series->VOI.suggestion.width,
+						series->frames / 2, middle->path, series->VOI.minmax.center, series->VOI.minmax.width,
+						series->VOI.range.center, series->VOI.range.width );
+				}
+				else // should never happen ...
+					SSC_LOG( " Fount no auto values %f, %f from frame %d in (file %s) -- minmax (%f, %f), range (%f, %f)",
+					      series->VOI.suggestion.center, series->VOI.suggestion.width,
+					      series->frames / 2, middle->path, series->VOI.minmax.center, series->VOI.minmax.width,
+					      series->VOI.range.center, series->VOI.range.width );
+			}
+		}
 		study->initialized = true;
 	}
 	return 0;
