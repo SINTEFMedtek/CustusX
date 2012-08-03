@@ -42,9 +42,9 @@ class ViewWrapperVideo: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapperVideo(ssc::View* view);
+	ViewWrapperVideo(ssc::ViewWidget* view);
 	virtual ~ViewWrapperVideo();
-	virtual ssc::View* getView();
+	virtual ssc::ViewWidget* getView();
 	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) {}
 
 private slots:
@@ -67,7 +67,7 @@ private:
 	ssc::VideoSourcePtr mSource;
 	ssc::DisplayTextRepPtr mPlaneTypeText;
 	ssc::DisplayTextRepPtr mDataNameText;
-	QPointer<ssc::View> mView;
+	QPointer<ssc::ViewWidget> mView;
 	ssc::ToolPtr mTool;
 	DominantToolProxyPtr mDominantToolProxy;
 };

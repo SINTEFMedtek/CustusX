@@ -32,7 +32,7 @@ private slots:
 
 private:
   cx::ReconstructionWidget* mReconstructionWidget;
-  ssc::View* mView;
+  ssc::ViewWidget* mView;
 
   ssc::VolumetricRepPtr mVolumeRep;
   ssc::AxesRepPtr mAxesRep;

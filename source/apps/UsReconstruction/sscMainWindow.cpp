@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget* parent)
   
   layout->addWidget(mReconstructionWidget);
 
-  mView = new ssc::View(this);
+  mView = new ssc::ViewWidget(this);
   layout->addWidget(mView, 1);
 
   connect(ssc::DataManager::getInstance(), SIGNAL(dataLoaded()), this, SLOT(showData()));
