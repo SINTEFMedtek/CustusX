@@ -38,7 +38,7 @@ namespace cx
  * \param f flags
  */
 View3D::View3D(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
-				ssc::View(parent, f)
+				ssc::ViewWidget(parent, f)
 {
 	mUid = uid;
 	mName = name;

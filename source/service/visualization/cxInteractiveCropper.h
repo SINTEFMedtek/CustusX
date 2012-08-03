@@ -50,7 +50,7 @@ class InteractiveCropper: public QObject
 Q_OBJECT
 public:
 	InteractiveCropper();
-	void setView(ssc::View* view); ///< adds an interactive box widget to the view. Press 'I' to show
+	void setView(ssc::ViewWidget* view); ///< adds an interactive box widget to the view. Press 'I' to show
 	ssc::DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
 	void setBoundingBox(const ssc::DoubleBoundingBox3D& bb_d); ///< set BB in reference space
 	void resetBoundingBox(); ///< set bounding box back to initial size (entire volume)
@@ -78,7 +78,7 @@ private:
 
 	vtkVolumeMapperPtr getMapper();
 	ssc::ImagePtr mImage;
-	QPointer<ssc::View> mView;
+	QPointer<ssc::ViewWidget> mView;
 	//vtkBoxRepresentationPtr mBoxRep;
 	//vtkBoxWidget2Ptr mBoxWidget2;
 	vtkBoxWidgetPtr mBoxWidget;

@@ -287,7 +287,7 @@ void ViewWrapper::dataActionSlot()
 				}
 			}
 
-void ViewWrapper::connectContextMenu(ssc::View* view)
+void ViewWrapper::connectContextMenu(ssc::ViewWidget* view)
 {
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenuSlot(const QPoint &)));
 }
