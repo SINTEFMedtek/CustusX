@@ -115,7 +115,7 @@ Q_OBJECT
 public:
 	virtual ~ViewWrapper() {}
 	virtual void initializePlane(ssc::PLANE_TYPE plane) {}
-	virtual ssc::View* getView() = 0;
+	virtual ssc::ViewWidget* getView() = 0;
 	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) = 0;
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
@@ -136,7 +136,7 @@ protected:
 	virtual void dataAdded(ssc::DataPtr data) = 0;
 	virtual void dataRemoved(const QString& uid) = 0;
 
-	void connectContextMenu(ssc::View* view);
+	void connectContextMenu(ssc::ViewWidget* view);
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 	void addDataAction(QString uid, QMenu* contextMenu);
 	QStringList getAllDataNames() const;

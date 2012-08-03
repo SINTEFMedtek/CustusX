@@ -39,7 +39,7 @@ namespace cx
  * \date Dec 9, 2008
  * \\author Janne Beate Bakeng, SINTEF
  */
-class View3D: public ssc::View
+class View3D: public ssc::ViewWidget
 {
 Q_OBJECT
 public:
