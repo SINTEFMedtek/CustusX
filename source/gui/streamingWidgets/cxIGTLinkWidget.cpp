@@ -223,8 +223,8 @@ void IGTLinkWidget::showStream()
   if (mView)
     return;
 
-  mView = new ssc::View();
-  mView->setBackgoundColor(QColor("khaki"));
+  mView = new ssc::ViewWidget();
+  mView->setBackgroundColor(QColor("khaki"));
   mToptopLayout->addWidget(mView, 1);
   mRenderTimer = new QTimer(this);
   connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));

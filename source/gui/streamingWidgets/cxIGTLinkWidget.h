@@ -65,7 +65,7 @@ private:
   QGridLayout* mGridLayout;
   QVBoxLayout* mToptopLayout;
 
-  ssc::View* mView;
+  ssc::ViewWidget* mView;
   QTimer* mRenderTimer;
   RenderTimer mRenderTimerW;
   QLabel* mRenderLabel;
