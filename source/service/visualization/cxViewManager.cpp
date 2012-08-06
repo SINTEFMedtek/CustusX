@@ -14,13 +14,18 @@
 
 #include "cxViewManager.h"
 
+//#include "sscView.h"
+
 #include <QGridLayout>
 #include <QWidget>
 #include <QTimer>
 #include <QTime>
 #include <QAction>
+#include <QtCore>
+#include <qtextstream.h>
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
+#include "cxViewWrapper2D.h"
 #include "sscGLHelpers.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
