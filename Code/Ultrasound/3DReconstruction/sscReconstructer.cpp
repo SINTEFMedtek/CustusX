@@ -73,6 +73,7 @@ ReconstructParams::ReconstructParams(XmlOptionFile settings)
 		mSettings.getElement());
 
 	connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+	connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(transferFunctionChanged()));
 
 	mMaskReduce = StringDataAdapterXml::initialize("Reduce mask (% in 1D)", "",
 		"Speedup by reducing mask size", "3",
@@ -123,6 +124,7 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
 
 	mParams.reset(new ReconstructParams(settings));
 	connect(mParams.get(), SIGNAL(changedInputSettings()), this, SLOT(setSettings()));
+	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
 
 	createAlgorithm();
 }
@@ -178,7 +180,20 @@ void Reconstructer::setSettings()
 
 	emit paramsChanged();
 }
-
+void Reconstructer::transferFunctionChangedSlot()
+{
+	//Use angio reconstruction also if only transfer function is set to angio
+	if(mParams->mPresetTFAdapter->getValue() == "US Angio")
+	{
+		ssc::messageManager()->sendDebug("Reconstructing angio (Because of angio transfer function)");
+		mParams->mAngioAdapter->setValue(true);
+	}
+	else if(mParams->mPresetTFAdapter->getValue() == "US B-Mode" && mParams->mAngioAdapter->getValue())
+	{
+		ssc::messageManager()->sendDebug("Not reconstructing angio (Because of B-Mode transfer function)");
+		mParams->mAngioAdapter->setValue(false);
+	}
+}
 void Reconstructer::clearAll()
 {
 	mFileData = ssc::USReconstructInputData();

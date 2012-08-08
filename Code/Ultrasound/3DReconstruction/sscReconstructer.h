@@ -64,6 +64,7 @@ public:
 
 signals:
 	void changedInputSettings();
+	void transferFunctionChanged();
 };
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 
@@ -118,6 +119,7 @@ public:
 
 public slots:
 	void setSettings();
+	void transferFunctionChangedSlot();
 
 signals:
 	void paramsChanged();
