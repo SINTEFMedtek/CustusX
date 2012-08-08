@@ -441,7 +441,7 @@ static void index_objects( struct study_t *studyList, int start, bool reindex )
 	}
 }
 
-static void readSeriesFromDICOMDIR( struct study_t *study, progress_func_t *callback )
+static struct study_t *readSeriesFromDICOMDIR( struct study_t *study, progress_func_t *callback )
 {
 	char *tmp, path[PATH_MAX];
 	// Generate a list of files associated with a given study
@@ -450,15 +450,21 @@ static void readSeriesFromDICOMDIR( struct study_t *study, progress_func_t *call
 	if ( !node )
 	{
 		SSC_LOG( "failed" );
-		return;
+		return NULL;
 	}
 	sstrcpy(path, study->resource);
 	tmp = strrchr(path, '\0');
 	if (tmp) *tmp = '\0';
-	(void) studiesFromNodes( study, node, callback, 30, true, 0, path );
+
+	if (!studiesFromNodes( study, node, callback, 30, true, 0, path ))
+	{
+		SSC_LOG("canceled");
+		return NULL;
+	}
 
 	/* Set indexing values */
 	index_objects( study, study->study_id, false );
+	return study;
 }
 
 struct study_t *DICOMLib_GetStudies( struct study_t *studyList, const char *path, progress_func_t *callback, int flags )
@@ -1472,7 +1478,11 @@ struct series_t *DICOMLib_GetSeries( struct study_t *study, progress_func_t *cal
 		{
 			// DICOMDIR
 			SSC_LOG( "Get series from DICOMDIR" );
-			readSeriesFromDICOMDIR( study, callback );
+			if (!readSeriesFromDICOMDIR( study, callback ))
+			{
+				SSC_LOG("Cancelled");
+				return NULL;
+			}
 		}
 		else
 		{
