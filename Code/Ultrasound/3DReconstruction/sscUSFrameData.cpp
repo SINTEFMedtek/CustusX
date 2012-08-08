@@ -52,6 +52,7 @@ void USFrameData::reinitialize()
 	{
 		//input = mImage->getBaseVtkImageData();
 		//TODO: Use only color information
+		ssc::messageManager()->sendDebug("Extract angio data before reconstructing");
 		input = this->useAngio(mImage);
 	}
 	else
