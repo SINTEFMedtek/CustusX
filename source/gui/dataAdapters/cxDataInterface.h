@@ -223,6 +223,7 @@ public: // basic methods
 
 public: // optional methods
   virtual QString getHelp() const;
+  virtual void setHelp(QString text);
 
 public: // interface extension
   ssc::ImagePtr getImage();
@@ -234,6 +235,7 @@ signals:
 private:
   QString mImageUid;
   QString mValueName;
+  QString mHelp;
 };
 
 typedef boost::shared_ptr<class SelectRTSourceStringDataAdapter> SelectRTSourceStringDataAdapterPtr;

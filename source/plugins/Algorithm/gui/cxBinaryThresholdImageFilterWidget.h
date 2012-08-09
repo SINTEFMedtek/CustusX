@@ -38,6 +38,7 @@ public:
   virtual ~BinaryThresholdImageFilterWidget();
   virtual QString defaultWhatsThis() const;
   void setDefaultColor(QColor color);
+  BinaryThresholdImageFilterPtr getSegmentationAlgorithm() { return mSegmentationAlgorithm; }
 
 signals:
   void inputImageChanged(QString uid);
@@ -55,6 +56,8 @@ private slots:
   void imageChangedSlot(QString uid);
   void handleFinishedSlot();
   void handleContourFinishedSlot();
+  void preprocessSegmentation();
+  void preprocessContour();
 
 private:
   BinaryThresholdImageFilterWidget();

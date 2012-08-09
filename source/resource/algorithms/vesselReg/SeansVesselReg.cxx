@@ -189,6 +189,7 @@ SeansVesselReg::ContextPtr SeansVesselReg::splitContext(ContextPtr context)
 	ContextPtr retval = ContextPtr(new Context);
 
 	retval->mLtsRatio = context->mLtsRatio;
+	retval->mInvertedTransform = context->mInvertedTransform;
 
 	// constant data: shallow copy
 	retval->mTargetPointLocator = context->mTargetPointLocator;
