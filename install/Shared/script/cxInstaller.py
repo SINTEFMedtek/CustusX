@@ -66,6 +66,7 @@ class Common(object):
         self.mWorkingDir = self.mRootDir + "/workspace"
         # server user: Used for login to cx server etc.
         self.mServerUser = self.mUser
+        self.silent_mode = False
         # build as shared or static libraries
         self.mBuildShared = "ON" # Change to ON or OFF
         self.mBuildType = "Debug" # Debug, Release, RelWithDebInfo, MinSizeRel
@@ -78,7 +79,6 @@ class Common(object):
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
-        self.mUseGCC46 = False # special tricks for GCC version 4.6 (use ITK4.0 etc)
 
 # ---------------------------------------------------------
     
@@ -271,7 +271,19 @@ class CppComponent(Component):
             runShell('nmake clean')
         else:
             runShell('make clean')
-    # ---------------------------------------------------------
+# ---------------------------------------------------------
+
+class CppUnit(CppComponent):
+    def name(self):
+        return "CppUnit"
+    def help(self):
+        return "http://sourceforge.net/projects/cppunit/"
+    def path(self):
+        return DATA.mExternalDir + "CppUnit"
+    def _rawCheckout(self):
+        self._changeDirToBase()
+        runShell('')
+# ---------------------------------------------------------
 
 class ITK(CppComponent):
     def name(self):
@@ -291,13 +303,8 @@ class ITK(CppComponent):
         self._changeDirToSource()
         #runShell('git checkout master') # not needed
         #runShell('git pull')
-        if DATA.mUseGCC46:
-            runShell('git checkout v4.0rc03') # needed for gcc 4.6  
-            #runShell('git checkout v4.1.0') # needed for gcc 4.6, but not ok with igstk.
-        else:
             #runShell('git checkout v3.20.0') # version working ok with IGSTK 4.2
-            runShell('git checkout v4.1.0')
-    
+        runShell('git checkout v4.1.0')
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
@@ -324,17 +331,13 @@ class VTK(CppComponent):
         return 'vtk.org'
     def path(self):
         return DATA.mExternalDir + "/VTK"
-
     def _rawCheckout(self):
         self._changeDirToBase()
         runShell('git clone http://vtk.org/VTK.git')
         self.update()
     def update(self):
         self._changeDirToSource()
-        #runShell('git checkout master')
-        #runShell('git pull')
         runShell('git checkout v5.8.0')   # needed for gcc 4.6, not good on non-linux
-
     def configure(self):
         '''
 Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-collection (!)
@@ -379,7 +382,6 @@ class OpenCV(CppComponent):
 #        runShell('svn co https://code.ros.org/svn/opencv/branches/2.3/opencv OpenCV') #old location
         #runShell('svn co http://code.opencv.org/svn/opencv/branches/2.3/opencv OpenCV')
         runShell('svn co http://code.opencv.org/svn/opencv/branches/2.4/opencv OpenCV') #new version for lion compatibility
-
     def update(self):
         pass
     def configure(self):
@@ -453,21 +455,10 @@ class IGSTK(CppComponent):
     def update(self):
         self._changeDirToSource()
         runShell('git checkout v5.0')
+        runShell('git branch -D cx_mod_for_50')
         runShell('git checkout -B cx_mod_for_50')
         #TODO this can be a bug, if CustusX is not checked out yet, this will not work!!!
-        runShell(('git am --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
-        # this substitution removes compilation of the dysfuct lib that we don't use.
-        # Fedora 16 note: try adding "" between -i and s/ if you encounter problems...
-        #runShell('''\
-        #sed -i s/'SUBDIRS( SceneGraphVisualization )'/'#SUBDIRS( SceneGraphVisualization )'/g Utilities/CMakeLists.txt
-        #''')
-        if DATA.mUseGCC46:
-            pass
-            # this substitution makes IGSTK 4.4 work with ITK 4.0
-            # Fedora 16 note: try adding "" between -i and s/ if you encounter problems...
-            #runShell('''\
-            #sed -i "" s/'ITKIO ITKBasicFilters ITKNumerics ITKCommon ITKSpatialObject'/'${ITK_LIBRARIES}'/g Source/CMakeLists.txt
-            #''')
+        runShell(('git am --whitespace=fix --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
@@ -476,11 +467,10 @@ cmake \
 %s \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DIGSTK_USE_SceneGraphVisualization:BOOL=OFF \
--DIGSTK_DEVELOPMENT_VERSION:BOOL=ON \
--DIGSTK_BUILD_EXAMPLES:BOOL=OFF \
+-DBUILD_EXAMPLES:BOOL=OFF \
 -DBUILD_TESTING:BOOL=OFF \
 -DBUILD_SHARED_LIBS:BOOL=%s \
--DIGSTK_BUILD_TESTING:BOOL=OFF \
+-DBUILD_TESTING:BOOL=OFF \
 -DITK_DIR:PATH="%s" \
 -DVTK_DIR:PATH="%s" \
 -DIGSTK_SERIAL_PORT_0="/Library/CustusX/igstk.links/cu.CustusX.dev0" \
@@ -661,6 +651,7 @@ class Controller(object):
     Initialize and run the controller
     '''
         self.libraries = [
+                     #CppUnit(),
                      ITK(),
                      VTK(),
                      OpenCV(),
@@ -769,6 +760,10 @@ Available components are:
                      type='string',
                      help='build type: (Debug,Release,RelWithDebInfo)',
                      default='Debug')
+        p.add_option('--silent_mode', '-s',
+                     action='store_true',
+                     help='execute script without user interaction',
+                     default=False)
         return p
     
     def _parseCommandLine(self):
@@ -776,7 +771,7 @@ Available components are:
         Parse the options and arguments from the command line
         '''
         options, arguments = self.optionParser.parse_args()
-        DATA.options = options     
+        DATA.options = options
         # if options.basic:
         # downloadDiskImages()
         # return
@@ -785,6 +780,9 @@ Available components are:
         if options.dummy:
             print 'Running DUMMY mode: no shell executed.'
             shell.DUMMY = True
+        if options.silent_mode:
+            print 'Running silent mode: no user interaction needed.'
+            DATA.silent_mode = True
         if options.password:
             print 'Set password (not working well): ', options.password
             shell.password = options.password
@@ -829,7 +827,8 @@ Available components are:
         print 'Server User:', DATA.mServerUser
         print 'Root dir:', DATA.mRootDir
         print 'Use the following components:', [val.name() for val in useLibs]
-        raw_input("\nPress enter to continue or ctrl-C to quit:")
+        if (not DATA.silent_mode):
+            raw_input("\nPress enter to continue or ctrl-C to quit:")
 
         if options.full or options.checkout:
             for lib in useLibs:
