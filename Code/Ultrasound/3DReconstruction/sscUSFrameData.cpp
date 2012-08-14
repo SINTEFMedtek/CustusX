@@ -52,11 +52,12 @@ void USFrameData::reinitialize()
 	{
 		//input = mImage->getBaseVtkImageData();
 		//TODO: Use only color information
-		ssc::messageManager()->sendDebug("Extract angio data before reconstructing");
+//		ssc::messageManager()->sendDebug("Extract angio data before reconstructing");
 		input = this->useAngio(mImage);
 	}
 	else
 	{
+//		ssc::messageManager()->sendDebug("Not angio, remove color if any");
 		input = mImage->getGrayScaleBaseVtkImageData(); // remove color, if any
 	}
 	mDimensions = input->GetDimensions();

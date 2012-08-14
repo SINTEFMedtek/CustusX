@@ -72,8 +72,8 @@ ReconstructParams::ReconstructParams(XmlOptionFile settings)
 		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presets->getPresetList("US"),
 		mSettings.getElement());
 
-	connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 	connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(transferFunctionChanged()));
+	//connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 
 	mMaskReduce = StringDataAdapterXml::initialize("Reduce mask (% in 1D)", "",
 		"Speedup by reducing mask size", "3",
@@ -702,7 +702,7 @@ void Reconstructer::updateFromOriginalFileData()
 
 	mFileData = mOriginalFileData;
 	//  mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
-	mOriginalFileData.mUsRaw->setAngio(mParams->mAngioAdapter->getValue());
+	mFileData.mUsRaw->setAngio(mParams->mAngioAdapter->getValue());
 	mFileData.mUsRaw->reinitialize();
 
 	// Only use this if the time stamps have different formatsh
