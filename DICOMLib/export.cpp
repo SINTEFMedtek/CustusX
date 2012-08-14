@@ -577,7 +577,7 @@ static int writeCommonInfo( DcmDataset *dataset, const struct study_t *study, co
 	// C.11.2 VOI LUT
 	{
 		char tmp[PATH_MAX];
-		ssprintf(tmp, "%g", series->VOI.current.center-volume->rescaleIntercept);
+		ssprintf(tmp, "%f", series->VOI.current.center - volume->rescaleIntercept);
 		if ( dataset->putAndInsertString( DCM_WindowCenter, tmp).good() == false ) SSC_LOG("insert DCM_WindowCenter failed");
 
 		ssprintf(tmp, "%i", -1*volume->rescaleIntercept);
@@ -593,7 +593,7 @@ static int writeCommonInfo( DcmDataset *dataset, const struct study_t *study, co
 		// else we do not have an idea what this should be -> "US" (unspecified)
 		else if ( dataset->putAndInsertString( DCM_RescaleType, "US").good()==false ) SSC_LOG("insert DCM_RescaleType US failed");
 
-		ssprintf(tmp, "%g", series->VOI.current.width);
+		ssprintf(tmp, "%f", series->VOI.current.width);
 		dataset->putAndInsertString( DCM_WindowWidth, tmp );
 	}
 
@@ -987,10 +987,10 @@ int DICOMLib_WriteSeries( const char *filename, const struct study_t *study, boo
 		dataset->putAndInsertString( DCM_DimensionOrganizationType, "3D" );
 		dataset->putAndInsertString( DCM_PositionMeasuringDeviceUsed, "RIGID" );
 		dataset->putAndInsertString( DCM_TransducerData, series->us.transducerData );
-		ssprintf( buf, "%g", series->us.TI );
+		ssprintf( buf, "%f", series->us.TI );
 		dataset->putAndInsertString( DCM_SoftTissueThermalIndex, buf );
 		dataset->putAndInsertString( DCM_BoneThermalIndex, buf );						// same calculated result as above
-		ssprintf( buf, "%g", series->us.MI );
+		ssprintf( buf, "%f", series->us.MI );
 		dataset->putAndInsertString( DCM_MechanicalIndex, buf );
 		dataset->putAndInsertString( DCM_UltrasoundAcquisitionGeometry, "UNDEFINED" );
 		OFDateTime ofdateTime;
@@ -1099,9 +1099,9 @@ int DICOMLib_WriteSeries( const char *filename, const struct study_t *study, boo
 		{
 			char tmp[PATH_MAX];
 
-			ssprintf(tmp, "%g", series->VOI.current.center-volume->rescaleIntercept);
-			if ( shared->putAndInsertString( DCM_WindowCenter, tmp).good()==false ) SSC_LOG("insert of DCM_WindowCenter=%s failed",tmp);
-			ssprintf(tmp, "%g", series->VOI.current.width);
+			ssprintf(tmp, "%f", series->VOI.current.center - (double)volume->rescaleIntercept);
+			shared->putAndInsertString(DCM_WindowCenter, tmp);
+			ssprintf(tmp, "%f", series->VOI.current.width);
 			shared->putAndInsertString( DCM_WindowWidth, tmp );
 		}
 		// C.7.6.16.2.24 Image Data Type
