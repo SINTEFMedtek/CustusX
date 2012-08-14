@@ -63,6 +63,7 @@ public:
 	Vector3D range() const;
 	Vector3D corner(int x, int y, int z) const;
 	bool contains(const Vector3D& p) const;
+	DoubleBoundingBox3D unionWith(const DoubleBoundingBox3D& other) const;
 };
 // --------------------------------------------------------
 

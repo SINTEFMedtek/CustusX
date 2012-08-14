@@ -223,6 +223,28 @@ DoubleBoundingBox3D DoubleBoundingBox3D::fromString(const QString& text)
 	return DoubleBoundingBox3D((double*) &(*raw.begin()));
 }
 
+DoubleBoundingBox3D DoubleBoundingBox3D::unionWith(const DoubleBoundingBox3D& other) const
+{
+	std::vector<Vector3D> cloud;
+	cloud.push_back(corner(0,0,0));
+	cloud.push_back(other.corner(0,0,0));
+	cloud.push_back(corner(0,0,1));
+	cloud.push_back(other.corner(0,0,1));
+	cloud.push_back(corner(0,1,0));
+	cloud.push_back(other.corner(0,1,0));
+	cloud.push_back(corner(0,1,1));
+	cloud.push_back(other.corner(0,1,1));
+	cloud.push_back(corner(1,0,0));
+	cloud.push_back(other.corner(1,0,0));
+	cloud.push_back(corner(1,0,1));
+	cloud.push_back(other.corner(1,0,1));
+	cloud.push_back(corner(1,1,0));
+	cloud.push_back(other.corner(1,1,0));
+	cloud.push_back(corner(1,1,1));
+	cloud.push_back(other.corner(1,1,1));
+	return fromCloud(cloud);
+}
+
 // --------------------------------------------------------
 //} // namespace utils
 } // namespace ssc

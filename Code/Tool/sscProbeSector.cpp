@@ -443,7 +443,15 @@ void ProbeSector::updateSector()
 		for (int i = 0; i <= arcRes; i++)
 		{
 			double theta = startAngle + i * angleIncrement;
-			Vector3D startTheta = c + (mData.getDepthStart()-mData.getCenterOffset()) * unitVector(theta);
+			Vector3D startTheta;
+			if (mData.getCenterOffset() == 0)
+			{
+				startTheta = c + (mData.getDepthStart()-mData.getCenterOffset()) * unitVector(theta);
+			}
+			else
+			{
+				startTheta = c + (mData.getDepthStart()-mData.getCenterOffset()) * unitVector(theta) / sin(theta);
+			}
 			newTCoords->InsertNextTuple(texMl.coord(startTheta).begin());
 			points->InsertNextPoint(uMl.coord(startTheta).begin());
 			//std::cout << "p_arc " << uMl.coord(startTheta) << std::endl;
@@ -451,7 +459,14 @@ void ProbeSector::updateSector()
 		for (int i = 0; i <= arcRes; i++)
 		{
 			double theta = stopAngle - i * angleIncrement;
-			Vector3D endTheta = c + (mData.getDepthEnd()-mData.getCenterOffset()) * unitVector(theta);
+			Vector3D endTheta;
+			double offset = 0;
+			
+			if (mData.getCenterOffset() != 0)
+			{
+				offset = (mData.getDepthStart()-mData.getCenterOffset()) / sin(theta) - (mData.getDepthStart()-mData.getCenterOffset());
+			}
+			endTheta = c + (mData.getDepthEnd()-mData.getCenterOffset()+offset) * unitVector(theta);
 			newTCoords->InsertNextTuple(texMl.coord(endTheta).begin());
 			points->InsertNextPoint(uMl.coord(endTheta).begin());
 			//std::cout << "p_arc " << uMl.coord(endTheta) << std::endl;
