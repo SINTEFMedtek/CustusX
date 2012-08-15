@@ -45,7 +45,14 @@ vec4 blendRGBA(in vec4 a, in vec4 b)
 {
 	vec4 ret;
 	ret.a = a.a + b.a*(1.0-a.a);
-	ret.rgb = (a.rgb * a.a + b.rgb * b.a * (1.0 - a.a)) / ret.a;
+	if (ret.a == 0.0)
+	{
+		ret.rgb = vec3(0);
+	}
+	else
+	{
+		ret.rgb = (a.rgb * a.a + b.rgb * b.a * (1.0 - a.a)) / ret.a;
+	}
 	return ret;
 }
 
