@@ -167,7 +167,8 @@ void Reconstructer::setSettings()
 {
 	this->createAlgorithm();
 
-	this->updateFromOriginalFileData();
+	//Can't be called here, may modify data used by reconstruction thread. Moved to threadedPreReconstruct()
+	//this->updateFromOriginalFileData();
 //	if (this->validInputData())
 //	{
 //
@@ -686,7 +687,8 @@ void Reconstructer::setInputData(ssc::USReconstructInputData fileData)
 {
 	this->clearAll();
 	mOriginalFileData = fileData;
-	this->updateFromOriginalFileData();
+	//Can't be called here, may modify data used by reconstruction thread. Moved to threadedPreReconstruct()
+	//this->updateFromOriginalFileData();
 	emit inputDataSelected(fileData.mFilename);
 }
 
@@ -754,6 +756,7 @@ void Reconstructer::reconstruct()
  */
 void Reconstructer::threadedPreReconstruct()
 {
+	this->updateFromOriginalFileData();
 	if (!this->validInputData())
 		return;
 	mOutput = this->generateOutputVolume();
