@@ -252,11 +252,18 @@ class CppComponent(Component):
     def reset(self):
         'delete build folder(s)'
         self._changeDirToBase()
-        runShell('rm -R -f %s/%s' % (self.path(), self.buildFolder()))
+        if(DATA.PLATFORM == 'Windows'):
+            #runShell('echo WANT TO REMOVE FOLDER %s/%s' % (self.path(), self.buildFolder()))
+            runShell('rd /S /Q "%s/%s"' % (self.path(), self.buildFolder()))
+        else:
+            runShell('rm -R -f %s/%s' % (self.path(), self.buildFolder()))
     def build(self):
         self._changeDirToBuild()
         if(DATA.PLATFORM == 'Windows'):
-            runShell('nmake')
+            if(DATA.mCMakeGenerator == 'Eclipse CDT4 - NMake Makefiles'):
+                runShell('nmake')
+            if(DATA.mCMakeGenerator == 'NMake Makefiles JOM'):
+                runShell('''jom -j%s''' % str(DATA.options.makethreads))
         else:
             # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
             # - http://www.mail-archive.com/paraview@paraview.org/msg07520.html
@@ -268,7 +275,7 @@ class CppComponent(Component):
     def makeClean(self):
         self._changeDirToBuild()
         if(DATA.PLATFORM == 'Windows'):
-            runShell('nmake clean')
+            runShell('nmake -clean')
         else:
             runShell('make clean')
 # ---------------------------------------------------------
@@ -381,9 +388,11 @@ class OpenCV(CppComponent):
 #        runShell('svn co https://code.ros.org/svn/opencv/trunk/opencv OpenCV')
 #        runShell('svn co https://code.ros.org/svn/opencv/branches/2.3/opencv OpenCV') #old location
         #runShell('svn co http://code.opencv.org/svn/opencv/branches/2.3/opencv OpenCV')
-        runShell('svn co http://code.opencv.org/svn/opencv/branches/2.4/opencv OpenCV') #new version for lion compatibility
+        #runShell('svn co http://code.opencv.org/svn/opencv/branches/2.4/opencv OpenCV') #new version for lion compatibility
+        runShell('git clone git://code.opencv.org/opencv.git OpenCV') #OpenCV moved to git, no longer available on svn
     def update(self):
-        pass
+        self._changeDirToSource()
+        runShell('git checkout v2.4.2')
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
@@ -735,7 +744,11 @@ Available components are:
         #TODO create option to select cmake 
         p.add_option('--xcode',
                      action='store_true',
-                     help='generate xcode targets',
+                     help='generate xcode targets (Mac)',
+                     default=False)
+        p.add_option('--jom',
+                     action='store_true',
+                     help='generate jom targets (Windows)',
                      default=False)
         p.add_option('--user',
                      '-u',
@@ -801,6 +814,10 @@ Available components are:
             DATA.mCMakeGenerator = "Xcode"
             DATA.mBuildFolder = DATA.mBuildFolder + "_xcode"
             print 'Generate xcode'
+        if options.jom:
+            DATA.mCMakeGenerator = 'NMake Makefiles JOM'
+            DATA.mBuildFolder = DATA.mBuildFolder + "_jom"
+            print 'Generate jom makefiles'
             
         DATA.mBuildType = options.build_type
         DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType
