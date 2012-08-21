@@ -294,7 +294,7 @@ void MainWindow::createActions()
 	connect(mShowControlPanelAction, SIGNAL(triggered()), this, SLOT(showControlPanelActionSlot()));
 
 	// Application
-	mAboutAction = new QAction(tr("&About"), this); // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
+	mAboutAction = new QAction(tr("&About"), this); // About burde gitt About CustusX, det gjâˆšâˆ�r det ikke av en eller annen grunn???
 	mAboutAction->setShortcut(tr("Ctrl+A"));
 	mAboutAction->setStatusTip(tr("Show the application's About box"));
 	mPreferencesAction = new QAction(tr("&Preferences"), this);
@@ -362,8 +362,8 @@ void MainWindow::createActions()
 	mToolsActionGroup = new QActionGroup(this);
 	mConfigureToolsAction = new QAction(tr("Tool configuration"), mToolsActionGroup);
 	mInitializeToolsAction = new QAction(tr("Initialize"), mToolsActionGroup);
-	mTrackingToolsAction = new QAction(tr("Start tracking"), mToolsActionGroup);
 	mTrackingToolsAction->setShortcut(tr("Ctrl+T"));
+	mReattachTools = new QAction(tr("Reattach tools"), mToolsActionGroup);
 	mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
 	mToolsActionGroup->setExclusive(false); // must turn off to get the checkbox independent.
@@ -380,6 +380,7 @@ void MainWindow::createActions()
 	connect(mConfigureToolsAction, SIGNAL(triggered()), this, SLOT(configureSlot()));
 	connect(mInitializeToolsAction, SIGNAL(triggered()), ssc::toolManager(), SLOT(initialize()));
 	connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
+	connect(mReattachTools, SIGNAL(triggered()), this, SLOT(reattachToolsSlot()));
 	connect(mSaveToolsPositionsAction, SIGNAL(triggered()), ssc::toolManager(), SLOT(saveToolsSlot()));
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateTrackingActionSlot()));
 	connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateTrackingActionSlot()));
@@ -558,6 +559,11 @@ void MainWindow::toggleTrackingSlot()
 		ssc::toolManager()->stopTracking();
 	else
 		ssc::toolManager()->startTracking();
+}
+
+void MainWindow::reattachToolsSlot(){
+	if(ssc::toolManager()->isInitialized())
+		ssc::toolManager()->reattachTools();
 }
 
 namespace
@@ -867,6 +873,7 @@ void MainWindow::createMenus()
 	mToolMenu->addAction(mConfigureToolsAction);
 	mToolMenu->addAction(mInitializeToolsAction);
 	mToolMenu->addAction(mTrackingToolsAction);
+	mToolMenu->addAction(mReattachTools);
 	mToolMenu->addSeparator();
 	mToolMenu->addAction(mSaveToolsPositionsAction);
 	mToolMenu->addSeparator();

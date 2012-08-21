@@ -63,6 +63,7 @@ signals:
 public slots:
 	void initializeSlot(bool on); ///< connects to the hardware
 	void trackSlot(bool on); ///< tracking on or off
+	void reattachToolsSlot(); ///< detach and attach tools
 
 private slots:
 	void trackerTrackingSlot(bool);

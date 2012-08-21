@@ -53,6 +53,11 @@ void IgstkTrackerThread::track(bool on)
 	emit requestTrack(on);
 }
 
+void IgstkTrackerThread::reattachTools()
+{
+	emit requestReattachTools();
+}
+
 void IgstkTrackerThread::run()
 {
 	this->configure();
@@ -71,6 +76,7 @@ void IgstkTrackerThread::configure()
 	connect(mManager.get(), SIGNAL(error()), this, SIGNAL(error()));
 	connect(this, SIGNAL(requestInitialize(bool)), mManager.get(), SLOT(initializeSlot(bool)));
 	connect(this, SIGNAL(requestTrack(bool)), mManager.get(), SLOT(trackSlot(bool)));
+	connect(this, SIGNAL(requestReattachTools()), mManager.get(), SLOT(reattachToolsSlot(bool)));
 
 	emit configured(true);
 }

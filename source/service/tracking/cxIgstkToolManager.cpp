@@ -162,6 +162,14 @@ void IgstkToolManager::trackSlot(bool on)
 		mTracker->stopTracking();
 }
 
+void IgstkToolManager::reattachToolsSlot()
+{
+	if(mTracker->isInitialized())
+	{
+		mTracker->reattachTools(mTools);
+	}
+}
+
 void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
 {
 	mPulseGenerator->CheckTimeouts();

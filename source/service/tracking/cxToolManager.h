@@ -128,6 +128,8 @@ public:
 
 	virtual ssc::SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
+	virtual void reattachTools();  ///< detach and attach all tools on a initialized tracking system
+
 	void runDummyTool(ssc::DummyToolPtr tool);
 	ssc::ToolPtr findFirstProbe();
 

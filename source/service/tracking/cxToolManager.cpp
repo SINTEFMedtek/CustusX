@@ -612,6 +612,11 @@ ssc::SessionToolHistoryMap ToolManager::getSessionHistory(double startTime, doub
 	return retval;
 }
 
+void ToolManager::reattachTools()
+{
+	mTrackerThread->reattachTools();
+}
+
 ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
 {
 	ssc::ToolManager::ToolMap retval;

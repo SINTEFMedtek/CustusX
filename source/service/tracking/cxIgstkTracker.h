@@ -117,6 +117,7 @@ public:
 	void close(); ///< close the
 	void attachTools(std::map<QString, IgstkToolPtr> tools); ///< attach a list of tools to the tracker hw
 	void detachTools(std::map<QString, IgstkToolPtr> tools); ///< detach the list of tools from the tracker hw
+	void reattachTools(std::map<QString, IgstkToolPtr> tools); ///< detach and attach the list of tools from and to the tracker hw
 	void startTracking(); ///< start tracking
 	void stopTracking(); ///< stop tracking
 

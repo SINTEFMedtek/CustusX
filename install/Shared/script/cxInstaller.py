@@ -590,7 +590,10 @@ class CustusX3(CppComponent):
         return DATA.mWorkingDir + "/CustusX3"
     def _rawCheckout(self):
         self._changeDirToBase()
-        runShell('git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
+#        runBash('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
+        runBash('git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
+        #runBash('git clone https://github.com/SINTEFMedisinskTeknologi/CustusX3.git') # No need to setup ssh keys using this method
+        #runBash('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
         self._changeDirToSource()
         runShell('git submodule update --init --recursive externals/ssc')
         runShell('git submodule update --init --recursive data')

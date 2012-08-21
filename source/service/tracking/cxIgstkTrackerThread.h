@@ -55,6 +55,7 @@ public:
 
 	void initialize(bool on); ///< connects to the hardware. Threadsafe.
 	void track(bool on); ///< tracking on or off. Threadsafe.
+	void reattachTools(); ///< detach and attach tools. Threadsafe.
 
 	std::map<QString, IgstkToolPtr> getTools(); ///< ThreadSafe.
 	IgstkToolPtr getRefereceTool(); ///< ThreadSafe
@@ -67,6 +68,7 @@ signals:
 
 	void requestInitialize(bool on); ///< internal signal
 	void requestTrack(bool on); ///< internal signal
+	void requestReattachTools(); ///< internal signal
 
 private:
 	virtual void run();

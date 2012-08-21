@@ -210,6 +210,14 @@ void IgstkTracker::detachTools(std::map<QString, IgstkToolPtr> tools)
 	}
 }
 
+void IgstkTracker::reattachTools(std::map<QString, IgstkToolPtr> tools)
+{
+	//detach
+	//wait for it to complete
+	ssc::messageManager()->sendDebug("IgstkTracker::reattachTools() - NOT IMPLEMENTED YET!");
+	//attach
+}
+
 void IgstkTracker::startTracking()
 {
 	mTracker->RequestStartTracking();
