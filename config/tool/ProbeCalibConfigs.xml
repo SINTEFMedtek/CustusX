@@ -587,153 +587,153 @@
                 <Config>
                     <ID>Width6Depth40</ID>
                     <Name>Width: 6, Depth: 40 mm</Name>
-                    <WidthDeg>117.21906</WidthDeg>
-                    <Depth>444.495425014755</Depth>
-                    <Offset>114.516307394627</Offset>
+                    <WidthDeg>117.80442</WidthDeg>
+                    <Depth>447.95982776887</Depth>
+                    <Offset>111.173187522534</Offset>
                     <Origin>
-                        <Col>460.606076304329</Col>
-                        <Row>8.02868922873668</Row>
+                        <Col>460.229963610149</Col>
+                        <Row>7.96907988273809</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
-                        <Col>362.850668256443</Col>
-                        <Row>67.6765295642592</Row>
+                        <Col>365.033807544298</Col>
+                        <Row>65.3900646723316</Row>
                     </Corner>
                     <Corner>
-                        <Col>-16.5872706390138</Col>
-                        <Row>299.19981864295</Row>
+                        <Col>-18.5483728881313</Col>
+                        <Row>296.761450434311</Row>
                     </Corner>
                     <Corner>
-                        <Col>937.412729360986</Col>
-                        <Row>299.832617530338</Row>
+                        <Col>938.451627111869</Col>
+                        <Row>297.682333543155</Row>
                     </Corner>
                     <Corner>
-                        <Col>557.850668256443</Col>
-                        <Row>68.50574269009</Row>
+                        <Col>555.033807544298</Col>
+                        <Row>66.0354970206169</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>192</Left>
+                        <Left>193</Left>
                         <Right>755</Right>
-                        <Top>68</Top>
+                        <Top>66</Top>
                         <Bottom>509</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.0868558558558559</Width>
-                        <Height>0.0900900900900901</Height>
+                        <Width>0.0898876404494382</Width>
+                        <Height>0.0898876404494382</Height>
                     </PixelSize>
                 </Config>
                 <Config>
                     <ID>Width6Depth65</ID>
                     <Name>Width: 6, Depth: 65 mm</Name>
-                    <WidthDeg>117.21906</WidthDeg>
-                    <Depth>444.986644766884</Depth>
-                    <Offset>69.0947791223331</Offset>
+                    <WidthDeg>117.80442</WidthDeg>
+                    <Depth>447.033784768108</Depth>
+                    <Offset>69.3130568420792</Offset>
                     <Origin>
-                        <Col>460.840146089418</Col>
-                        <Row>30.873970971655</Row>
+                        <Col>461.703783489208</Col>
+                        <Row>29.8079480431447</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
-                        <Col>401.858255380993</Col>
-                        <Row>66.8632064514964</Row>
+                        <Col>402.351913460274</Col>
+                        <Row>65.6081627472749</Row>
                     </Corner>
                     <Corner>
-                        <Col>22.0009929114261</Col>
-                        <Row>298.642356009898</Row>
+                        <Col>19.5626916178488</Col>
+                        <Row>296.501247020863</Row>
                     </Corner>
                     <Corner>
-                        <Col>899.000992911426</Col>
-                        <Row>299.750862318208</Row>
+                        <Col>903.562691617849</Col>
+                        <Row>296.968510529791</Row>
                     </Corner>
                     <Corner>
-                        <Col>518.858255380993</Col>
-                        <Row>68.3971304361082</Row>
+                        <Col>520.351913460274</Col>
+                        <Row>66.7497495651369</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>178</Left>
+                        <Left>180</Left>
                         <Right>755</Right>
-                        <Top>67</Top>
+                        <Top>66</Top>
                         <Bottom>509</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.141429226579346</Width>
-                        <Height>0.146695598567935</Height>
+                        <Width>0.146341463414634</Width>
+                        <Height>0.146341463414634</Height>
                     </PixelSize>
                 </Config>
                 <Config>
                     <ID>WidthXDepth85</ID>
                     <Name>Width: 6, Depth: 85 mm</Name>
-                    <WidthDeg>116.92656</WidthDeg>
-                    <Depth>445.814406316615</Depth>
-                    <Offset>53.6623503506157</Offset>
+                    <WidthDeg>117.80442</WidthDeg>
+                    <Depth>448.883283440978</Depth>
+                    <Offset>52.0768341671354</Offset>
                     <Origin>
-                        <Col>461.738102857473</Col>
-                        <Row>38.6324722755016</Row>
+                        <Col>462.823941117056</Col>
+                        <Row>38.9375414762421</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
-                        <Col>416.001406482125</Col>
-                        <Row>66.7002910333158</Row>
+                        <Col>418.231224624285</Col>
+                        <Row>65.8352419851453</Row>
                     </Corner>
                     <Corner>
-                        <Col>36.0315019170928</Col>
-                        <Row>299.881243309174</Row>
+                        <Col>33.8583010977613</Col>
+                        <Row>297.683592879489</Row>
                     </Corner>
                     <Corner>
-                        <Col>887.031501917093</Col>
-                        <Row>300.553367140975</Row>
+                        <Col>890.858301097761</Col>
+                        <Row>299.221283015822</Row>
                     </Corner>
                     <Corner>
-                        <Col>507.001406482125</Col>
-                        <Row>67.4574820783575</Row>
+                        <Col>507.231224624285</Col>
+                        <Row>66.1402955349753</Row>
                     </Corner>
                     <CroppingEdges>
                         <Left>179</Left>
-                        <Right>754</Right>
-                        <Top>67</Top>
+                        <Right>755</Right>
+                        <Top>66</Top>
                         <Bottom>508</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.183633741067587</Width>
-                        <Height>0.190471674170301</Height>
+                        <Width>0.190476</Width>
+                        <Height>0.190476</Height>
                     </PixelSize>
                 </Config>
                 <Config>
                     <ID>Width6Depth125</ID>
                     <Name>Width: 6, Depth: 125 mm</Name>
-                    <WidthDeg>117.21906</WidthDeg>
-                    <Depth>445.027227635884</Depth>
-                    <Offset>35.6068568852544</Offset>
+                    <WidthDeg>117.80442</WidthDeg>
+                    <Depth>448.14417310791</Depth>
+                    <Offset>35.4674421533576</Offset>
                     <Origin>
-                        <Col>461.831430228571</Col>
-                        <Row>48.2941956941847</Row>
+                        <Col>463.053304118525</Col>
+                        <Row>46.8246738651634</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
-                        <Col>431.436083894831</Col>
-                        <Row>66.8406556933054</Row>
+                        <Col>432.682994210813</Col>
+                        <Row>65.1436184038448</Row>
                     </Corner>
                     <Corner>
-                        <Col>51.544178368663</Col>
-                        <Row>298.64094355546</Row>
+                        <Col>48.9429612596572</Col>
+                        <Row>296.610218588878</Row>
                     </Corner>
                     <Corner>
-                        <Col>871.544178368663</Col>
-                        <Row>299.580063213561</Row>
+                        <Col>876.942961259657</Col>
+                        <Row>296.975720489414</Row>
                     </Corner>
                     <Corner>
-                        <Col>491.436083894831</Col>
-                        <Row>68.0783494175004</Row>
+                        <Col>492.682994210813</Col>
+                        <Row>66.3187990811548</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>178</Left>
-                        <Right>754</Right>
-                        <Top>67</Top>
-                        <Bottom>509</Bottom>
+                        <Left>179</Left>
+                        <Right>755</Right>
+                        <Top>66</Top>
+                        <Bottom>508</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.270938689586447</Width>
-                        <Height>0.28102757969759</Height>
+                        <Width>0.281030</Width>
+                        <Height>0.281030</Height>
                     </PixelSize>
                 </Config>
             </RTSource>
@@ -1100,6 +1100,136 @@
     </USScanner>
     <USScanner>
         <Name>Vivid E9</Name>
+        <USProbe>
+            <Name>9L</Name>
+            <Type>LinearArray</Type>
+            <DefaultRTSource>DVI</DefaultRTSource>
+            <Notes/>
+            <RTSource>
+                <Name>DVI</Name>
+                <TemporalCalibration>170</TemporalCalibration>
+                <DefaultConfig>WidthMaxDepth6</DefaultConfig>
+                <ImageSize>
+                    <Width>800</Width>
+                    <Height>600</Height>
+                </ImageSize>
+                <HorizontalOffset>0</HorizontalOffset>
+                <Config>
+                    <ID>WidthMaxDepth4</ID>
+                    <Name>Width: Max, Depth: 4 cm</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Depth>351</Depth>
+                    <Offset>0</Offset>
+                    <Origin>
+                        <Col>321</Col>
+                        <Row>68</Row>
+                    </Origin>
+                    <NCorners>4</NCorners>
+                    <Corner>
+                        <Col>127</Col>
+                        <Row>68</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>127</Col>
+                        <Row>419</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>515</Col>
+                        <Row>419</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>515</Col>
+                        <Row>68</Row>
+                    </Corner>
+                    <CroppingEdges>
+                        <Left>127</Left>
+                        <Right>515</Right>
+                        <Top>68</Top>
+                        <Bottom>419</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.113635</Width>
+                        <Height>0.113635</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>WidthMaxDepth6</ID>
+                    <Name>Width: Max, Depth: 6 cm</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Depth>351</Depth>
+                    <Offset>0</Offset>
+                    <Origin>
+                        <Col>321</Col>
+                        <Row>68</Row>
+                    </Origin>
+                    <NCorners>4</NCorners>
+                    <Corner>
+                        <Col>192</Col>
+                        <Row>68</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>192</Col>
+                        <Row>419</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>450</Col>
+                        <Row>419</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>450</Col>
+                        <Row>68</Row>
+                    </Corner>
+                    <CroppingEdges>
+                        <Left>192</Left>
+                        <Right>450</Right>
+                        <Top>68</Top>
+                        <Bottom>419</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.169971</Width>
+                        <Height>0.169971</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>WidthMaxDepth8</ID>
+                    <Name>Width: Max, Depth: 8 cm</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Depth>351</Depth>
+                    <Offset>0</Offset>
+                    <Origin>
+                        <Col>321</Col>
+                        <Row>68</Row>
+                    </Origin>
+                    <NCorners>4</NCorners>
+                    <Corner>
+                        <Col>224</Col>
+                        <Row>68</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>224</Col>
+                        <Row>419</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>418</Col>
+                        <Row>419</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>418</Col>
+                        <Row>68</Row>
+                    </Corner>
+                    <CroppingEdges>
+                        <Left>224</Left>
+                        <Right>418</Right>
+                        <Top>68</Top>
+                        <Bottom>419</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.22727</Width>
+                        <Height>0.22727</Height>
+                    </PixelSize>
+                </Config>
+            </RTSource>
+        </USProbe>
         <USProbe>
             <Name>11L</Name>
             <Type>LinearArray</Type>
