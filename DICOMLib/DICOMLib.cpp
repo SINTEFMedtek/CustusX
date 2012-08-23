@@ -122,8 +122,9 @@ static int setupSeries( struct study_t *study )
 			}
 
 			// Set auto values besides DTI data - except for the representative bval=0 series in DTI data
-			if ((series->DTI.isDTI != true || strcmp(series->DTI.bval, "0") == 0)
-			    && series->valid)
+			// FIXME - we should move auto value setting from here to when it is actually used, since it is
+			// quite slow for large series, where some series may be invalid or not even images
+			if (series->DTI.isDTI != true || strcmp(series->DTI.bval, "0") == 0)
 			{
 				if ( middle && DICOM_image_window_auto( series, middle ) == 0 )
 				{
