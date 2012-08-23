@@ -373,13 +373,23 @@ void DataManagerImpl::setLandmarkActive(QString uid, bool active)
 
 ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename, READER_TYPE notused)
 {
-	this->loadData(uid, filename, notused);
+	DataPtr data = this->loadData(uid, filename, notused);
+	if (!data)
+		{
+			messageManager()->sendError("Error with image file: " + filename);
+			return ImagePtr();
+		}
 	return this->getImage(uid);
 }
 
 DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READER_TYPE notused)
 {
 	DataPtr data = this->readData(uid, path, "unknown");
+	if (!data)
+		{
+			messageManager()->sendError("Error with data file: " + path);
+			return DataPtr();
+		}
 	this->loadData(data);
 	return data;
 }
@@ -473,7 +483,12 @@ void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
 // meshes
 MeshPtr DataManagerImpl::loadMesh(const QString& uid, const QString& fileName, READER_TYPE type)
 {
-	this->loadData(uid, fileName, type);
+	DataPtr data = this->loadData(uid, fileName, type);
+	if (!data)
+		{
+			messageManager()->sendError("Error with mesh file: " + fileName);
+			return MeshPtr();
+		}
 	return this->getMesh(uid);
 }
 
