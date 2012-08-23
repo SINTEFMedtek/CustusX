@@ -112,7 +112,6 @@ static int setupSeries( struct study_t *study )
 					series->DTI.isDTI=false;
 		}
 
-
 		for ( series = iter->first_series; series != NULL; series = series->next_series )
 		{
 			struct instance_t *middle = findInstance( series, series->frames / 2 );
@@ -123,7 +122,8 @@ static int setupSeries( struct study_t *study )
 			}
 
 			// Set auto values besides DTI data - except for the representative bval=0 series in DTI data
-			if (series->DTI.isDTI != true || strcmp(series->DTI.bval,"0")==0 )
+			if ((series->DTI.isDTI != true || strcmp(series->DTI.bval, "0") == 0)
+			    && series->valid)
 			{
 				if ( middle && DICOM_image_window_auto( series, middle ) == 0 )
 				{
@@ -135,7 +135,7 @@ static int setupSeries( struct study_t *study )
 						series->VOI.range.center, series->VOI.range.width );
 				}
 				else // should never happen ...
-					SSC_LOG( " Fount no auto values %f, %f from frame %d in (file %s) -- minmax (%f, %f), range (%f, %f)",
+					SSC_LOG( " Found no auto values %f, %f from frame %d in (file %s) -- minmax (%f, %f), range (%f, %f)",
 					      series->VOI.suggestion.center, series->VOI.suggestion.width,
 					      series->frames / 2, middle->path, series->VOI.minmax.center, series->VOI.minmax.width,
 					      series->VOI.range.center, series->VOI.range.width );
