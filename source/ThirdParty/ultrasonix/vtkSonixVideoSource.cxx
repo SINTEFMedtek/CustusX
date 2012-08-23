@@ -566,15 +566,15 @@ void vtkSonixVideoSource::Initialize()
 	{
 		if (mFirstConnect)
 		{
-			std::cout << "Found Sonix window. First connect - Waiting 60 sec to connect" << std::endl;
+			std::cout << "Found Sonix window. First connect - Waiting 80 sec to connect" << std::endl;
 			//Need to delay to make sure the Sonix exam is finished initializing...
-			vtksys::SystemTools::Delay(60000);
+			vtksys::SystemTools::Delay(80000);
 			mFirstConnect = false;
 		}
 		else
 		{
-			std::cout << "Found Sonix window. Reconnect - Waiting 15 sec to connect" << std::endl;
-			vtksys::SystemTools::Delay(15000);
+			std::cout << "Found Sonix window. Reconnect - Waiting 3 sec to connect" << std::endl;
+			vtksys::SystemTools::Delay(3000);
 		}
 	} else 
 	{
