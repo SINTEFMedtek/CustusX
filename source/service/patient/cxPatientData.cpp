@@ -316,12 +316,17 @@ ssc::DataPtr PatientData::importData(QString fileName)
 
 	if (ssc::dataManager()->getData(uid))
 	{
-		ssc::messageManager()->sendWarning("Data with uid " + uid + " already exists. Import cancelled.");
+		ssc::messageManager()->sendWarning("Data with uid " + uid + " already exists. Import canceled.");
 		return ssc::DataPtr();
 	}
 
 	// Read files before copy
 	ssc::DataPtr data = ssc::dataManager()->loadData(uid, fileName, ssc::rtAUTO);
+	if (!data)
+		{
+			ssc::messageManager()->sendWarning("Error with data file: " + fileName + " Import canceled.");
+			return ssc::DataPtr();
+		}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
 
 	data->setShading(true);
