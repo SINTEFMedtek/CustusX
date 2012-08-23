@@ -88,9 +88,9 @@ class ViewWrapper3D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper3D(int startIndex, ssc::View* view);
+	ViewWrapper3D(int startIndex, ssc::ViewWidget* view);
 	virtual ~ViewWrapper3D();
-	virtual ssc::View* getView();
+	virtual ssc::ViewWidget* getView();
 	virtual double getZoom2D() { return -1.0; }
 	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
 	virtual void setViewGroup(ViewGroupDataPtr group);
@@ -148,7 +148,7 @@ private:
 	ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
 	ssc::OrientationAnnotation3DRepPtr mAnnotationMarker;
 
-	QPointer<ssc::View> mView;
+	QPointer<ssc::ViewWidget> mView;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
 

@@ -100,7 +100,7 @@ class ViewManager: public QObject
 {
 	typedef std::map<QString, View2D*> View2DMap;
 	typedef std::map<QString, View3D*> View3DMap;
-	typedef std::map<QString, ssc::View*> ViewMap;
+	typedef std::map<QString, ssc::ViewWidget*> ViewMap;
 
 Q_OBJECT
 public:
@@ -172,7 +172,7 @@ protected:
 	View2DMap* get2DViews(); ///< returns all possible 2D views
 	View3DMap* get3DViews(); ///< returns all possible 3D views
 
-	ssc::View* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
+	ssc::ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
 	View2D* get2DView(const QString& uid); ///< returns a 2D view with a given uid
 	View3D* get3DView(const QString& uid); ///< returns a 3D view with a given uid
 
@@ -218,11 +218,11 @@ protected:
 	bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
 	SyncedValuePtr mGlobalZoom2DVal;
-	bool mSmartRender; ///< use ssc::View::render()
+	bool mSmartRender; ///< use ssc::ViewWidget::render()
 
 	ViewCache<View2D> mViewCache2D;
 	ViewCache<View3D> mViewCache3D;
-	ViewCache<ssc::View> mViewCacheRT;
+	ViewCache<ssc::ViewWidget> mViewCacheRT;
 	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
 	ssc::SlicePlanesProxyPtr mSlicePlanesProxy;

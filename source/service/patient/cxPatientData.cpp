@@ -377,6 +377,14 @@ void PatientData::createPatientFolders(QString choosenDir)
 		ssc::messageManager()->sendInfo("Made a new logging folder: " + newDir);
 	}
 
+	newDir = choosenDir;
+	newDir.append("/US_Acq");
+	if (!QDir().exists(newDir))
+	{
+		QDir().mkdir(newDir);
+		ssc::messageManager()->sendInfo("Made a new ultrasound folder: " + newDir);
+	}
+
 	this->savePatient();
 }
 

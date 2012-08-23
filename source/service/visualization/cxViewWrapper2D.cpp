@@ -19,6 +19,7 @@
  *      \author christiana
  */
 
+
 #include "cxViewWrapper2D.h"
 #include <vector>
 #include <vtkRenderer.h>
@@ -52,7 +53,7 @@
 namespace cx
 {
 
-ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
+ViewWrapper2D::ViewWrapper2D(ssc::ViewWidget* view) :
 				mOrientationActionGroup(new QActionGroup(view))
 {
 //  std::cout << "ViewWrapper2D create" << std::endl;
@@ -422,7 +423,7 @@ void ViewWrapper2D::changeOrientationType(ssc::ORIENTATION_TYPE type)
 	mOrientationMode->set(type);
 }
 
-ssc::View* ViewWrapper2D::getView()
+ssc::ViewWidget* ViewWrapper2D::getView()
 {
 	return mView;
 }

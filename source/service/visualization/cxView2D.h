@@ -41,7 +41,7 @@ class ViewManager;
  * \date Dec 9, 2008
  * \\author Janne Beate Bakeng, SINTEF
  */
-class View2D: public ssc::View
+class View2D: public ssc::ViewWidget
 {
 Q_OBJECT
 public:

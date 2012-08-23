@@ -122,7 +122,7 @@ void InteractiveCropper::initialize()
 	mBoxWidget->SetEnabled(false);
 }
 
-void InteractiveCropper::setView(ssc::View* view)
+void InteractiveCropper::setView(ssc::ViewWidget* view)
 {
 	mView = view;
 	this->updateBoxWidgetInteractor();

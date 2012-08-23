@@ -31,7 +31,7 @@ namespace cx
  */
 View2D::View2D(const QString& uid, const QString& name,
     QWidget *parent, Qt::WFlags f) :
-  View(parent, f)
+    ViewWidget(parent, f)
 {
   mUid = uid;
   mName = name;
