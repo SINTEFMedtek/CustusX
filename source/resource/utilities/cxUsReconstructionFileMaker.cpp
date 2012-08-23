@@ -18,13 +18,20 @@ typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
 namespace cx
 {
-UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::VideoRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ssc::ToolPtr tool, QString calibFilename) :
+UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData,
+		ssc::VideoRecorder::DataType streamRecordedData,
+		QString sessionDescription,
+		QString activepatientPath,
+		ssc::ToolPtr tool,
+		QString calibFilename,
+		bool writeColor) :
     mTrackerRecordedData(trackerRecordedData),
     mStreamRecordedData(streamRecordedData),
     mSessionDescription(sessionDescription),
     mActivepatientPath(activepatientPath),
     mTool(tool),
-    mCalibFilename(calibFilename)
+    mCalibFilename(calibFilename),
+    mWriteColor(writeColor)
 {
   if(mTrackerRecordedData.empty())
     ssc::messageManager()->sendWarning("No tracking data for writing to reconstruction file.");
@@ -198,7 +205,7 @@ std::vector<vtkImageDataPtr> UsReconstructionFileMaker::getFrames()
   for(ssc::VideoRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
   {
     vtkImageDataPtr input = it->second;
-    if (bw)
+    if (bw && !mWriteColor)
     {
       if (it->second->GetNumberOfScalarComponents()>2) // color
       {

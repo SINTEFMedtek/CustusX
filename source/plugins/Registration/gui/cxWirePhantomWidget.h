@@ -61,6 +61,8 @@ private slots:
 //	void popPendingActions();
 	void registration();
 	void generate_sMt();
+	void clearSegmentationOutput();
+	void clearCenterlineOutput();
 
 private:
 	void showData(ssc::DataPtr data);

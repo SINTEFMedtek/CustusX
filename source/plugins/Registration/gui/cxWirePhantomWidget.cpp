@@ -38,6 +38,8 @@
 #include "sscTool.h"
 #include "sscToolManager.h"
 #include "sscTypeConversions.h"
+#include "libQtSignalAdapters/Qt2Func.h"
+#include "libQtSignalAdapters/ConnectionFactories.h"
 
 namespace cx
 {
@@ -115,6 +117,28 @@ WirePhantomWidget::WirePhantomWidget(RegistrationManagerPtr regManager, QWidget*
 	connect(mSegmentationWidget, SIGNAL(outputImageChanged(QString)), this, SLOT(segmentationOutputArrived(QString)));
 	connect(mCenterlineWidget, SIGNAL(outputImageChanged(QString)), this, SLOT(centerlineOutputArrived(QString)));
 
+//	QtSignalAdapters::connect1<void()>(
+//		mSegmentationWidget,
+//		SIGNAL(inputImageChanged(QString)),
+//		boost::bind(&SelectImageStringDataAdapter::setValue, mSegmentationOutput, ""));
+//
+//	QtSignalAdapters::connect1<void()>(
+//		mCenterlineWidget,
+//		SIGNAL(inputImageChanged(QString)),
+//		boost::bind(&SelectDataStringDataAdapter::setValue, mCenterlineOutput, ""));
+
+	connect(mSegmentationWidget, SIGNAL(inputImageChanged(QString)), this, SLOT(clearSegmentationOutput()));
+	connect(mCenterlineWidget,   SIGNAL(inputImageChanged(QString)), this, SLOT(clearCenterlineOutput()));
+}
+
+
+void WirePhantomWidget::clearSegmentationOutput()
+{
+	mSegmentationOutput->setValue("");
+}
+void WirePhantomWidget::clearCenterlineOutput()
+{
+	mCenterlineOutput->setValue("");
 }
 
 void WirePhantomWidget::activeImageChangedSlot(const QString&)
@@ -160,6 +184,7 @@ void WirePhantomWidget::segmentationOutputArrived(QString uid)
 
 void WirePhantomWidget::centerlineOutputArrived(QString uid)
 {
+	std::cout << "WirePhantomWidget::centerlineOutputArrived " << uid << std::endl;
 	mCenterlineOutput->setValue(uid);
 	this->showData(ssc::dataManager()->getData(uid));
 }

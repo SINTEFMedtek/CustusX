@@ -275,12 +275,12 @@ void ViewGroup::mouseClickInViewGroupSlot()
 		}
 	}
 
-	ssc::View* view = static_cast<ssc::View*>(this->sender());
+	ssc::ViewWidget* view = static_cast<ssc::ViewWidget*>(this->sender());
 	if (view)
 		viewManager()->setActiveView(view->getUid());
 }
 
-std::vector<ssc::View*> ViewGroup::getViews() const
+std::vector<ssc::ViewWidget*> ViewGroup::getViews() const
 {
 	return mViews;
 }

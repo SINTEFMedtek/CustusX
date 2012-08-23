@@ -54,10 +54,10 @@ class ViewWrapper2D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper2D(ssc::View* view);
+	ViewWrapper2D(ssc::ViewWidget* view);
 	virtual ~ViewWrapper2D();
 	virtual void initializePlane(ssc::PLANE_TYPE plane);
-	virtual ssc::View* getView();
+	virtual ssc::ViewWidget* getView();
 	virtual void setZoom2D(SyncedValuePtr value);
 	virtual void setOrientationMode(SyncedValuePtr value);
 	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
@@ -122,7 +122,7 @@ private:
 	ssc::DisplayTextRepPtr mPlaneTypeText;
 	ssc::DisplayTextRepPtr mDataNameText;
 	ssc::SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
-	QPointer<ssc::View> mView;
+	QPointer<ssc::ViewWidget> mView;
 
 	// sunchronized data
 	SyncedValuePtr mZoom2D;

@@ -126,7 +126,7 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 
 void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 {
-	mAcquisition->saveSession(sessionId);
+	mAcquisition->saveSession(sessionId, mPluginData->getReconstructer()->getParams()->mAngioAdapter->getValue());
 }
 
 void USAcqusitionWidget::saveDataCompletedSlot(QString mhdFilename)
