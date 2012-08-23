@@ -44,7 +44,7 @@
 namespace cx
 {
 
-ViewWrapperVideo::ViewWrapperVideo(ssc::View* view)
+ViewWrapperVideo::ViewWrapperVideo(ssc::ViewWidget* view)
 {
 	mView = view;
 	this->connectContextMenu(mView);
@@ -73,7 +73,7 @@ ViewWrapperVideo::~ViewWrapperVideo()
 		mView->removeReps();
 }
 
-ssc::View* ViewWrapperVideo::getView()
+ssc::ViewWidget* ViewWrapperVideo::getView()
 {
 	return mView;
 }

@@ -122,14 +122,14 @@ void AxisConnector::changedSlot()
 //---------------------------------------------------------
 
 
-ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
+ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 {
 	mShowAxes = false;
 	mView = view;
 	this->connectContextMenu(mView);
 	QString index = QString::number(startIndex);
 	QColor background = settings()->value("backgroundColor").value<QColor>();
-	mView->setBackgoundColor(background);
+	mView->setBackgroundColor(background);
 
 	view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
@@ -197,7 +197,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	if (key == "backgroundColor")
 	{
 		QColor background = settings()->value("backgroundColor").value<QColor>();
-		mView->setBackgoundColor(background);
+		mView->setBackgroundColor(background);
 	}
 	if (key == "useGPUVolumeRayCastMapper" || "maxRenderSize")
 	{
@@ -682,7 +682,7 @@ void ViewWrapper3D::updateSlices()
 #endif // USE_GLX_SHARED_CONTEXT
 }
 
-ssc::View* ViewWrapper3D::getView()
+ssc::ViewWidget* ViewWrapper3D::getView()
 {
 	return mView;
 }
