@@ -66,6 +66,9 @@ class Common(object):
         self.mWorkingDir = self.mRootDir + "/workspace"
         # server user: Used for login to cx server etc.
         self.mServerUser = self.mUser
+        # GitHub account information
+        self.mGitHubUser = ""
+        self.mGitHubPassword = ""
         self.silent_mode = False
         # build as shared or static libraries
         self.mBuildShared = "ON" # Change to ON or OFF
@@ -74,7 +77,6 @@ class Common(object):
         self.mBuildFolder = "build" # default build folder. This is auto-changed when using xcode or 32 bit.
         self.m32bitCompileCMakeOption = "" # use "-DCMAKE_OSX_ARCHITECTURES=i386" for 32 bit. Done automatically by settings --b32 from command line.
         if (self.PLATFORM == 'Windows'):
-            #TODO create option to select cmake generator
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
@@ -263,7 +265,7 @@ class CppComponent(Component):
             if(DATA.mCMakeGenerator == 'Eclipse CDT4 - NMake Makefiles'):
                 runShell('nmake')
             if(DATA.mCMakeGenerator == 'NMake Makefiles JOM'):
-                runShell('''jom -j%s''' % str(DATA.options.makethreads))
+                runShell('''jom -k -j%s''' % str(DATA.options.makethreads))
         else:
             # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
             # - http://www.mail-archive.com/paraview@paraview.org/msg07520.html
@@ -275,7 +277,10 @@ class CppComponent(Component):
     def makeClean(self):
         self._changeDirToBuild()
         if(DATA.PLATFORM == 'Windows'):
-            runShell('nmake -clean')
+            if(DATA.mCMakeGenerator == 'Eclipse CDT4 - NMake Makefiles'):
+                runShell('nmake -clean')
+            if(DATA.mCMakeGenerator == 'NMake Makefiles JOM'):
+                runShell('jom -clean')
         else:
             runShell('make clean')
 # ---------------------------------------------------------
@@ -392,7 +397,7 @@ class OpenCV(CppComponent):
         runShell('git clone git://code.opencv.org/opencv.git OpenCV') #OpenCV moved to git, no longer available on svn
     def update(self):
         self._changeDirToSource()
-        runShell('git checkout v2.4.2')
+        runShell('git checkout 2.4.2')
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
@@ -590,10 +595,10 @@ class CustusX3(CppComponent):
         return DATA.mWorkingDir + "/CustusX3"
     def _rawCheckout(self):
         self._changeDirToBase()
-#        runBash('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
-        runBash('git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
-        #runBash('git clone https://github.com/SINTEFMedisinskTeknologi/CustusX3.git') # No need to setup ssh keys using this method
-        #runBash('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
+#        runShell('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
+        #runShell('git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
+        runShell('git clone https://%s:%s@github.com/SINTEFMedisinskTeknologi/CustusX3.git' % (DATA.mGitHubUser, DATA.mGitHubPassword)) # No need to setup ssh keys using this method
+        #runShell('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
         self._changeDirToSource()
         runShell('git submodule update --init --recursive externals/ssc')
         runShell('git submodule update --init --recursive data')
@@ -616,6 +621,8 @@ cmake \
 -DIGSTK_DIR:PATH="%s" \
 -DOpenIGTLink_DIR:PATH="%s" \
 -DOpenCV_DIR:PATH="%s" \
+-DULTERIUS_INCLUDE_DIR:PATH="%s" \
+-DULTERIUS_LIBRARY:FILEPATH="%s" \
 ../%s''' % (DATA.mCMakeGenerator, 
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, DATA.mBuildShared, 
@@ -623,11 +630,37 @@ cmake \
             VTK().buildPath(), 
             IGSTK().buildPath(), 
             OpenIGTLink().buildPath(), 
-            OpenCV().buildPath(), 
+            OpenCV().buildPath(),
+            UltrasonixSDK().includePath(),
+            UltrasonixSDK().libFile(),
             #DCMTK().installPath(), 
             self.sourceFolder() )
             )
         #TODO add xcode project here if needed?
+# ---------------------------------------------------------
+
+class UltrasonixSDK(CppComponent):
+    def name(self):
+        return "UltrasonixSDK"
+    def help(self):
+        return 'UltrasonixSDK'
+    def includePath(self):
+        return self.path() + "/" + self.sourceFolder() + "/ulterius/inc"
+    def libFile(self):
+        return self.path() + "/" + self.sourceFolder() + "/ulterius/lib/ulterius.lib"
+    def path(self):
+        return DATA.mExternalDir + "/UltrasonixSDK"
+    def _rawCheckout(self):
+        changeDir(self.path())
+        runShell('git clone ssh://%s@medtek.sintef.no/git/UltrasonixSDK.git' % DATA.mServerUser)
+    def update(self):
+        self._changeDirToSource()
+        runShell('git checkout v5.7.4')
+        runShell('git pull')
+    def configure(self):
+        pass
+    def build(self):
+        pass
 # ---------------------------------------------------------
 
 class CustusX3Data(Component):
@@ -671,6 +704,7 @@ class Controller(object):
                      IGSTK(),
                      #DCMTK(),
                      #SSC(),
+                     UltrasonixSDK(),
                      CustusX3()
                      #CustusX3Data()
                      ]
@@ -767,6 +801,16 @@ Available components are:
                      help='password to send to scripts',
                      #dest='password',
                      default="")
+        p.add_option('--github_user',
+                     action='store',
+                     type='string',
+                     help='user name for github account',
+                     default="")
+        p.add_option('--github_password',
+                     action='store',
+                     type='string',
+                     help='password for github account',
+                     default="")
         p.add_option('--dummy', '-d',
                      action='store_true',
                      help='execute script without calling any shell commands',
@@ -788,6 +832,8 @@ Available components are:
         '''
         options, arguments = self.optionParser.parse_args()
         DATA.options = options
+        
+        DATA.mBuildType = options.build_type
         # if options.basic:
         # downloadDiskImages()
         # return
@@ -805,6 +851,15 @@ Available components are:
         if options.user:
             print 'Set server user: ', options.user
             DATA.mServerUser = options.user
+        if options.github_user:
+            print 'Set GitHub user: ', options.github_user
+            DATA.mGitHubUser = options.github_user
+        if options.github_password:
+            password_supplied = False
+            if len(options.github_password) != 0:
+                password_supplied = True
+            print 'Set GitHub passord: ', password_supplied
+            DATA.mGitHubPassword = options.github_password 
         if options.static:
             DATA.mBuildShared = 'OFF'
             DATA.mBuildFolder = DATA.mBuildFolder + "_static"
@@ -821,9 +876,9 @@ Available components are:
             DATA.mCMakeGenerator = 'NMake Makefiles JOM'
             DATA.mBuildFolder = DATA.mBuildFolder + "_jom"
             print 'Generate jom makefiles'
-            
-        DATA.mBuildType = options.build_type
-        DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType
+        
+        #TODO can be wrong for external libs as they use DATA.mBuildExternalsType!
+        DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType 
         
         useLibNames = [val for val in self.libnames if val in arguments]
         
@@ -831,6 +886,10 @@ Available components are:
             useLibNames = self.libnames
             
         useLibs = [lib for lib in self.libraries if lib.name() in useLibNames]
+        
+        #Windows do not allow linking between different build types
+        if(self.PLATFORM == 'Windows'):
+            DATA.mBuildExternalsType = DATA.mBuildType
                   
         # display help if no components selected
         if len(useLibs)==0:
