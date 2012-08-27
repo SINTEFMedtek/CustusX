@@ -103,6 +103,7 @@ protected:
 private slots:
 	void transformChangedSlot();
 	void updateColorAttributeSlot();
+	void imageChanged();
 //	void viewChanged();
 private:
 	void resetGeometryPlane();

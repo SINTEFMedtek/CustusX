@@ -209,6 +209,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ssc::ImagePtr> images)
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
 	}
 
 	mImages = images;
@@ -224,6 +225,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ssc::ImagePtr> images)
 		mPainter->SetVolumeBuffer(i, dataBuffer);
 
 		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
+		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
 		this->updateCoordinates(i);
 	}
 	this->updateColorAttributeSlot();
@@ -373,6 +375,11 @@ void Texture3DSlicerProxyImpl::transformChangedSlot()
 		this->resetGeometryPlane();
 //	this->viewChanged();
 	this->update();
+}
+
+void Texture3DSlicerProxyImpl::imageChanged()
+{
+	mActor->Modified();
 }
 
 void Texture3DSlicerProxyImpl::update()

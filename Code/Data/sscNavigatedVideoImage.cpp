@@ -84,6 +84,7 @@ void NavigatedVideoImage::newFrame()
 	{
 		emit transformChanged();
 	}
+	emit vtkImageDataChanged();
 	mSpacing[0] = spacing[0];
 	mSpacing[1] = spacing[1];
 	mSpacing[2] = spacing[2];
