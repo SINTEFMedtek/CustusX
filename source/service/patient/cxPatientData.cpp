@@ -316,12 +316,17 @@ ssc::DataPtr PatientData::importData(QString fileName)
 
 	if (ssc::dataManager()->getData(uid))
 	{
-		ssc::messageManager()->sendWarning("Data with uid " + uid + " already exists. Import cancelled.");
+		ssc::messageManager()->sendWarning("Data with uid " + uid + " already exists. Import canceled.");
 		return ssc::DataPtr();
 	}
 
 	// Read files before copy
 	ssc::DataPtr data = ssc::dataManager()->loadData(uid, fileName, ssc::rtAUTO);
+	if (!data)
+		{
+			ssc::messageManager()->sendWarning("Error with data file: " + fileName + " Import canceled.");
+			return ssc::DataPtr();
+		}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
 
 	data->setShading(true);
@@ -375,6 +380,14 @@ void PatientData::createPatientFolders(QString choosenDir)
 	{
 		QDir().mkdir(newDir);
 		ssc::messageManager()->sendInfo("Made a new logging folder: " + newDir);
+	}
+
+	newDir = choosenDir;
+	newDir.append("/US_Acq");
+	if (!QDir().exists(newDir))
+	{
+		QDir().mkdir(newDir);
+		ssc::messageManager()->sendInfo("Made a new ultrasound folder: " + newDir);
 	}
 
 	this->savePatient();

@@ -33,7 +33,12 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 class UsReconstructionFileMaker
 {
 public:
-  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::VideoRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ssc::ToolPtr tool, QString calibFilename);
+	/**
+	 * \param writeColor If set to true, colors will be saved even if settings is set to 8 bit
+	 */
+  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::VideoRecorder::DataType streamRecordedData,
+  		QString sessionDescription, QString activepatientPath, ssc::ToolPtr tool, QString calibFilename,
+  		bool writeColor = false);
   ~UsReconstructionFileMaker();
 
   QString write();
@@ -61,6 +66,7 @@ private:
   QString mActivepatientPath;
   ssc::ToolPtr mTool;
   QString mCalibFilename;
+  bool mWriteColor;///< If set to true, colors will be saved even if settings is set to 8 bit
 
   QStringList mReport;
 };
