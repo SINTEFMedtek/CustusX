@@ -145,7 +145,7 @@ ssc::TimedTransformMap USAcquisition::getRecording(RecordSessionPtr session)
   return retval;
 }
 
-void USAcquisition::saveSession(QString sessionId)
+void USAcquisition::saveSession(QString sessionId, bool writeColor)
 {
   //get session data
   RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
@@ -165,7 +165,9 @@ void USAcquisition::saveSession(QString sessionId)
 		calibFileName = cxTool->getCalibrationFileName();
 
 	// streamRecordedData is empty for ultrasonix? Incorrect time?
-  mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), patientService()->getPatientData()->getActivePatientFolder(), probe, calibFileName));
+  mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(),
+  		patientService()->getPatientData()->getActivePatientFolder(), probe, calibFileName,
+  		writeColor));
 
   mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
   mFileMakerFutureWatcher.setFuture(mFileMakerFuture);
