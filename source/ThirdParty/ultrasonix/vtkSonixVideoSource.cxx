@@ -384,8 +384,13 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	  //what to do?
 		  std::cout << "Data discrepancy! size: " << sz << " inBytesPerRow: " << inBytesPerRow <<" rows: " << rows <<  std::endl;
 		  std::cout << "FrameSize[0]: " << this->FrameSize[0] << " * FrameBufferBitsPerPixel: " << this->FrameBufferBitsPerPixel << std::endl;
-		  rows = sz / inBytesPerRow;
-		  std::cout << "Trying to fix this by setting rows = " << rows << std::endl;
+		  if (rows > sz / inBytesPerRow)
+		  {
+			rows = sz / inBytesPerRow;
+			std::cout << "Trying to fix this by setting rows = " << rows << std::endl;
+		  }
+		  else
+			std::cout << "Keeping rows = " << rows << std::endl;
 		  //TODO: more work is needed here to make sure this works for all probes and depths
 		  //return;
 	  }
@@ -566,15 +571,15 @@ void vtkSonixVideoSource::Initialize()
 	{
 		if (mFirstConnect)
 		{
-			std::cout << "Found Sonix window. First connect - Waiting 60 sec to connect" << std::endl;
+			std::cout << "Found Sonix window. First connect - Waiting 80 sec to connect" << std::endl;
 			//Need to delay to make sure the Sonix exam is finished initializing...
-			vtksys::SystemTools::Delay(60000);
+			vtksys::SystemTools::Delay(80000);
 			mFirstConnect = false;
 		}
 		else
 		{
-			std::cout << "Found Sonix window. Reconnect - Waiting 15 sec to connect" << std::endl;
-			vtksys::SystemTools::Delay(15000);
+			std::cout << "Found Sonix window. Reconnect - Waiting 3 sec to connect" << std::endl;
+			vtksys::SystemTools::Delay(3000);
 		}
 	} else 
 	{
