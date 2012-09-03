@@ -362,6 +362,7 @@ void MainWindow::createActions()
 	mToolsActionGroup = new QActionGroup(this);
 	mConfigureToolsAction = new QAction(tr("Tool configuration"), mToolsActionGroup);
 	mInitializeToolsAction = new QAction(tr("Initialize"), mToolsActionGroup);
+	mTrackingToolsAction = new QAction(tr("Start tracking"), mToolsActionGroup);
 	mTrackingToolsAction->setShortcut(tr("Ctrl+T"));
 	mReattachTools = new QAction(tr("Reattach tools"), mToolsActionGroup);
 	mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
