@@ -66,9 +66,6 @@ class Common(object):
         self.mWorkingDir = self.mRootDir + "/workspace"
         # server user: Used for login to cx server etc.
         self.mServerUser = self.mUser
-        # GitHub account information
-        self.mGitHubUser = ""
-        self.mGitHubPassword = ""
         self.silent_mode = False
         # build as shared or static libraries
         self.mBuildShared = "ON" # Change to ON or OFF
@@ -76,8 +73,10 @@ class Common(object):
         self.mBuildExternalsType = "Release" # used for all non-cx libs, this because we want speed even in debug...
         self.mBuildFolder = "build" # default build folder. This is auto-changed when using xcode or 32 bit.
         self.m32bitCompileCMakeOption = "" # use "-DCMAKE_OSX_ARCHITECTURES=i386" for 32 bit. Done automatically by settings --b32 from command line.
+        self.mBuildSSCExamples = "ON"
         if (self.PLATFORM == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
+            self.mBuildSSCExamples = "OFF"
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
@@ -596,8 +595,8 @@ class CustusX3(CppComponent):
     def _rawCheckout(self):
         self._changeDirToBase()
 #        runShell('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
-        #runShell('git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
-        runShell('git clone https://%s:%s@github.com/SINTEFMedisinskTeknologi/CustusX3.git' % (DATA.mGitHubUser, DATA.mGitHubPassword)) # No need to setup ssh keys using this method
+        runShell('git clone git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
+        #runShell('git clone https://%s:%s@github.com/SINTEFMedisinskTeknologi/CustusX3.git' % (DATA.mGitHubUser, DATA.mGitHubPassword)) # No need to setup ssh keys using this method
         #runShell('git clone ssh://%s@medtekserver.sintef.no/git/CustusX3.git CustusX3' % DATA.mServerUser)
         self._changeDirToSource()
         runShell('git submodule update --init --recursive externals/ssc')
@@ -623,6 +622,7 @@ cmake \
 -DOpenCV_DIR:PATH="%s" \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
+-DSSC_BUILD_EXAMPLES="%s" \
 ../%s''' % (DATA.mCMakeGenerator, 
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, DATA.mBuildShared, 
@@ -633,6 +633,7 @@ cmake \
             OpenCV().buildPath(),
             UltrasonixSDK().includePath(),
             UltrasonixSDK().libFile(),
+            DATA.mBuildSSCExamples,
             #DCMTK().installPath(), 
             self.sourceFolder() )
             )
@@ -851,15 +852,6 @@ Available components are:
         if options.user:
             print 'Set server user: ', options.user
             DATA.mServerUser = options.user
-        if options.github_user:
-            print 'Set GitHub user: ', options.github_user
-            DATA.mGitHubUser = options.github_user
-        if options.github_password:
-            password_supplied = False
-            if len(options.github_password) != 0:
-                password_supplied = True
-            print 'Set GitHub passord: ', password_supplied
-            DATA.mGitHubPassword = options.github_password 
         if options.static:
             DATA.mBuildShared = 'OFF'
             DATA.mBuildFolder = DATA.mBuildFolder + "_static"
@@ -888,7 +880,7 @@ Available components are:
         useLibs = [lib for lib in self.libraries if lib.name() in useLibNames]
         
         #Windows do not allow linking between different build types
-        if(self.PLATFORM == 'Windows'):
+        if(DATA.PLATFORM == 'Windows'):
             DATA.mBuildExternalsType = DATA.mBuildType
                   
         # display help if no components selected
