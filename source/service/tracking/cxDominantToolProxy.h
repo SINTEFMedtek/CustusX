@@ -63,6 +63,7 @@ signals:
 	void tps(int);
 	void probeChanged();
 
+
 private slots:
 	void dominantToolChangedSlot(const QString&);
 private:

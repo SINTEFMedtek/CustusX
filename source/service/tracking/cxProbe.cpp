@@ -171,7 +171,6 @@ void Probe::setProbeSector(ssc::ProbeData probeSector)
 	mData = probeSector;
 	mConfigurationId = "";
 	emit sectorChanged();
-	emit probeChanged();
 }
 void Probe::setProbeImageData(ssc::ProbeData::ProbeImageData imageData)
 {
