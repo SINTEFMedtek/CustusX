@@ -60,8 +60,7 @@ signals:
 	void toolVisible(bool visible);
 	void tooltipOffset(double offset);
 	void toolProbeSector();
-	void tps(int);
-	void probeChanged();
+	void tps(
 
 
 private slots:
