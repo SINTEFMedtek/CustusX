@@ -72,13 +72,15 @@ void Probe::setTemporalCalibration(double val)
 //  std::cout << "Probe::setTemporalCalibration " << val << std::endl;
 	mOverrideTemporalCalibration = true;
 	mTemporalCalibration = val;
-	this->setConfigId(mConfigurationId);
+	mData.setTemporalCalibration(mTemporalCalibration);
+	//this->setConfigId(mConfigurationId);
 }
 
 void Probe::setSoundSpeedCompensationFactor(double factor)
 {
 	mSoundSpeedCompensationFactor = factor;
-	this->setConfigId(mConfigurationId);
+	mData.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
+	//this->setConfigId(mConfigurationId);
 }
 
 ssc::ProbeData Probe::getData() const
@@ -163,6 +165,10 @@ void Probe::setConfigId(QString uid)
 //  std::cout << "probeSector.mTemporalCalibration" << probeSector.mTemporalCalibration << std::endl;
 	mConfigurationId = uid;
 	mData = probeSector;
+	//Update temporal calibration and sound speed compensation
+	if (mOverrideTemporalCalibration)
+		this->setTemporalCalibration(mTemporalCalibration);
+	this->setSoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
 }
 
@@ -193,21 +199,6 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
 	config = mXml->getConfiguration(mScannerUid, mInstrumentUid, rtSourceList.at(0), uid);
 //  std::cout << "uids " << mScannerUid << " " << mInstrumentUid << " " << rtSourceList.at(0) << " " << uid << std::endl;
 //  std::cout << "config.mTemporalCalibration " << config.mTemporalCalibration << std::endl;
-
-	//compensating for different speed of sound in what is scanned by the probe and what is assumed by the scanner
-	if (config.mWidthDeg == 0) //linear probe
-	{
-		if (!ssc::similar(mSoundSpeedCompensationFactor, 1.0))
-		{
-			config.mPixelHeight *= mSoundSpeedCompensationFactor;
-			//ssc::messageManager()->sendDebug("Modifying configuration for a linear probe with the sound speed compensation factor.");
-		}
-	}
-
-	if (mOverrideTemporalCalibration)
-		config.mTemporalCalibration = mTemporalCalibration;
-//  std::cout << "config.mTemporalCalibration " << config.mTemporalCalibration << std::endl;
-
 	return config;
 }
 
