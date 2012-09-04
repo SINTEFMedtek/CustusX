@@ -28,7 +28,6 @@ PlaybackTool::PlaybackTool(ssc::ToolPtr base, PlaybackTimePtr time) :
 	std::cout << "PlaybackTool::PlaybackTool " << this->getUid() << std::endl;
 	connect(mTime.get(), SIGNAL(changed()), this, SLOT(timeChangedSlot()));
 
-	connect(mBase.get(), SIGNAL(probeChanged()), this, SIGNAL(probeChanged()));
 	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 	connect(mBase.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }

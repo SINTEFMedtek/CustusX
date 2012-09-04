@@ -55,7 +55,6 @@ Tool::Tool(IgstkToolPtr igstkTool) :
 		mProbe = Probe::New(mTool->getInternalStructure().mInstrumentId,
 						mTool->getInternalStructure().mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
-		connect(mProbe.get(), SIGNAL(probeChanged()), this, SIGNAL(probeChanged()));
 	}
 	connect(ssc::toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 
