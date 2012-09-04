@@ -260,7 +260,7 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	timestamp->SetTime(grabTime);
 	static QDateTime lastlastGrabTime = mLastGrabTime;
 //	std::cout << "OpenCV stamp:\t" << mLastGrabTime.toString("hh:mm:ss.zzz") << std::endl;
-	std::cout << "OpenCV diff:\t" <<lastlastGrabTime.msecsTo(mLastGrabTime) << "\tdelay:\t" << mLastGrabTime.msecsTo(QDateTime::currentDateTime()) << std::endl;
+//	std::cout << "OpenCV diff:\t" <<lastlastGrabTime.msecsTo(mLastGrabTime) << "\tdelay:\t" << mLastGrabTime.msecsTo(QDateTime::currentDateTime()) << std::endl;
 	lastlastGrabTime = mLastGrabTime;
 
 	cv::Mat frame;
