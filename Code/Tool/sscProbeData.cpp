@@ -22,6 +22,7 @@
 #include "sscTypeConversions.h"
 #include <iostream>
 #include "sscEnumConverter.h"
+#include "sscMessageManager.h"
 
 namespace ssc
 {
@@ -174,5 +175,16 @@ void ProbeData::parseXml(QDomNode dataNode)
 	mImage.parseXml(imageNode);
 }
 
+
+void ProbeData::applySoundSpeedCompensationFactor(double factor)
+{
+	if (this->getType() == ssc::ProbeData::tLINEAR)
+	{
+		if (!ssc::similar(factor, 1.0))
+			mImage.mSpacing[1] = mImage.mSpacing[1] * factor;
+	}
+	else
+		ssc::messageManager()->sendWarning("Will only compensate sound speed for linear probes");
+}
 
 }

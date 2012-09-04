@@ -190,9 +190,9 @@ signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);
 	void tooltipOffset(double offset);
-	void toolProbeSector();
+	void toolProbeSector();///< Only used by sscDummyTool
 	void tps(int);
-	void probeChanged(); ///< Probe/tool characteristics changed
+	void probeChanged(); ///< Deprecated: Use sscProbe::sectorChanged() instead.  (Probe/tool characteristics changed)
 
 protected:
 	QString mUid;

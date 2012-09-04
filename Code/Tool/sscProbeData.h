@@ -130,6 +130,7 @@ public:
 
 	void updateClipRectFromSector();
 	void updateSectorFromClipRect();
+	void applySoundSpeedCompensationFactor(double factor);///< Compensate for soundspeed for linear probes
 
 private:
 	TYPE mType; ///< type of probe
