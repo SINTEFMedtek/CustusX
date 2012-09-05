@@ -88,7 +88,7 @@ private:
 
 	void readCoreFiles(QString fileName, QString calFilesPath);
 	void clearAll();
-	void updateFromOriginalFileData();
+//	void updateFromOriginalFileData();
 	bool validInputData() const;
 };
 
