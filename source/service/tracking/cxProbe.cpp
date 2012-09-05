@@ -80,6 +80,7 @@ void Probe::setSoundSpeedCompensationFactor(double factor)
 {
 	mSoundSpeedCompensationFactor = factor;
 	mData.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
+	emit sectorChanged();
 	//this->setConfigId(mConfigurationId);
 }
 
