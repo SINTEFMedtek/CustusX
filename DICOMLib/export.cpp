@@ -21,6 +21,9 @@
 #include "dcmtk/dcmjpeg/djencode.h"
 #include "dcmtk/dcmjpeg/djrplol.h"
 
+#include <QCoreApplication>
+#include <QThread>
+
 #include "sscLogger.h"
 #include "DICOMLib.h"
 
@@ -888,6 +891,29 @@ int DICOMLib_WriteSnapshot( const char *filename, const uint8_t *pdfbuffer, int 
 	return 0;
 }
 
+class ExportThread : public QThread
+{
+public:
+	ExportThread(DcmFileFormat *fileFormat, const char *filename, const E_TransferSyntax syntax, const E_EncodingType encoding)
+	{
+		mFileFormat = fileFormat;
+		mFileName = filename;
+		mSyntax = syntax;
+		mEncoding = encoding;
+	}
+	virtual void run()
+	{
+		mResult = mFileFormat->saveFile( mFileName, mSyntax, mEncoding );
+	}
+	OFCondition result() { return mResult; }
+private:
+	DcmFileFormat *mFileFormat;
+	const char *mFileName;
+	E_TransferSyntax mSyntax;
+	E_EncodingType mEncoding;
+	OFCondition mResult;
+};
+
 // Before calling this function, remember to change frame of reference UID if the object coordinate system has changed.
 // Also note that when there is duplicate information between the various structs, we prefer volume over series and series over instance.
 int DICOMLib_WriteSeries( const char *filename, const struct study_t *study, bool anonymize, enum dicomlib_application_profile profile,
@@ -1203,18 +1229,27 @@ int DICOMLib_WriteSeries( const char *filename, const struct study_t *study, boo
 	/*** Save ***/
 
 	unlink( filename );
+
+	E_TransferSyntax syntax;
 	if ( profile == DICOMLIB_PROFILE_USB )
 	{
 		DJ_RPLossless params; // codec parameters, we use the defaults
 
-		dataset->chooseRepresentation(EXS_JPEGProcess14SV1TransferSyntax, &params);
-		result = fileFormat.saveFile( filename, EXS_JPEGProcess14SV1TransferSyntax, EET_ExplicitLength );
+		syntax = EXS_JPEGProcess14SV1TransferSyntax;
+		dataset->chooseRepresentation(syntax, &params);
 	}
 	else	// DVD/CD
 	{
-		result = fileFormat.saveFile( filename, EXS_LittleEndianExplicit, EET_ExplicitLength );
+		syntax = EXS_LittleEndianExplicit;
 	}
-	if ( result.bad() )
+	ExportThread thread(&fileFormat, filename, syntax, EET_ExplicitLength);
+	thread.start();
+	while (!thread.isFinished())
+	{
+		qApp->processEvents();
+		thread.wait(1000);
+	}
+	if ( thread.result().bad() )
 	{
 		SSC_WARNING( "Failed to save %s: %s", filename, result.text() );
 		return -1;

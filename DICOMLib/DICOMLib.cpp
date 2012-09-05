@@ -86,7 +86,7 @@ static struct instance_t *findInstance( struct series_t *series, int instance_id
 	return instance;
 }
 
-static int setupSeries( struct study_t *study )
+static int setupSeries( struct study_t *study, progress_func_t *callback = NULL )
 {
 	struct series_t *series;
 	struct study_t *iter;
@@ -114,6 +114,10 @@ static int setupSeries( struct study_t *study )
 
 		for ( series = iter->first_series; series != NULL; series = series->next_series )
 		{
+			if (callback)
+			{
+				callback(1000);
+			}
 			struct instance_t *middle = findInstance( series, series->frames / 2 );
 			DICOMLib_Verify( series );
 			if ( !middle ) // eg in multiframe case
@@ -1493,11 +1497,11 @@ struct series_t *DICOMLib_GetSeries( struct study_t *study, progress_func_t *cal
 			return NULL;
 		}
 
-		setupSeries( study );
+		setupSeries( study, callback);
 	}
 	if (!study->initialized)
 	{
-		setupSeries( study );
+		setupSeries( study, callback );
 	}
 	return study->first_series;
 }

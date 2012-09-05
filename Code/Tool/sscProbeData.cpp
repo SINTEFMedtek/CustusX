@@ -76,7 +76,7 @@ void ProbeData::ProbeImageData::parseXml(QDomNode dataNode)
 
 ProbeData::ProbeData(TYPE type) :
 	mType(type), mDepthStart(0), mDepthEnd(0), mWidth(0),
-	mTemporalCalibration(0), mCenterOffset(0)
+	mTemporalCalibration(0), mCenterOffset(0), mSoundSpeedCompensationFactor(1.0)
 {
 }
 
@@ -180,8 +180,8 @@ void ProbeData::applySoundSpeedCompensationFactor(double factor)
 {
 	if (this->getType() == ssc::ProbeData::tLINEAR)
 	{
-		if (!ssc::similar(factor, 1.0))
-			mImage.mSpacing[1] = mImage.mSpacing[1] * factor;
+		mImage.mSpacing[1] = mImage.mSpacing[1] * factor / mSoundSpeedCompensationFactor;
+		mSoundSpeedCompensationFactor = factor;
 	}
 	else
 		ssc::messageManager()->sendWarning("Will only compensate sound speed for linear probes");
