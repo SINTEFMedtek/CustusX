@@ -140,6 +140,7 @@ private:
 	double mTemporalCalibration;
 	double mCenterOffset; ///< Offset of center point for sectors, mm
 	ProbeImageData mImage;
+	double mSoundSpeedCompensationFactor; ///< The used sound speed compensation factor
 };
 
 } // namespace ssc
