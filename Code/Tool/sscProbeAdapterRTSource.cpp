@@ -74,6 +74,7 @@ void ProbeAdapterRTSource::probeChangedSlot()
 		return;
 	//  std::cout << "ProbeAdapterRTSource::probeChangedSlot() validdata: " << validData() << std::endl;
 
+	mRedirecter->Update();
 	Eigen::Array3i dimImage(mRedirecter->GetOutput()->GetDimensions());
 	//  ssc::Vector3D dimImage(mRedirecter->GetOutput()->GetDimensions());
 	QSize dimProbe = probe->getData().getImage().mSize;
