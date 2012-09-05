@@ -59,7 +59,9 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisit
   QVBoxLayout* topLayout = new QVBoxLayout(this);
 
   // add recording widgets
-  topLayout->addWidget(new QLabel("<b>Acquisition</b>"));
+  QLabel* acqLabel = new QLabel("<b>Acquisition</b>");
+  topLayout->addWidget(acqLabel);
+  acqLabel->setToolTip(this->defaultWhatsThis());
   topLayout->addWidget(mInfoLabel);
   topLayout->addWidget(mRecordSessionWidget);
   topLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New()));
@@ -68,7 +70,10 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisit
   topLayout->addWidget(this->createHorizontalLine());
 
   // add calibration widgets
-  topLayout->addWidget(new QLabel("<b>Calibration</b>"));
+  QLabel* calLabel = new QLabel("<b>Calibration</b>");
+  topLayout->addWidget(calLabel);
+  calLabel->setToolTip(this->defaultWhatsThis());
+
   mFileSelectWidget = new ssc::FileSelectWidget(this);
   connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
   topLayout->addWidget(mFileSelectWidget);
@@ -77,6 +82,8 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisit
   topLayout->addWidget(mVerbose);
 
   QPushButton* calibrateButton = new QPushButton("Calibrate");
+  calibrateButton->setToolTip(this->defaultWhatsThis());
+
   connect(calibrateButton, SIGNAL(clicked()), this, SLOT(calibrateSlot()));
   topLayout->addWidget(calibrateButton);
 
@@ -97,6 +104,10 @@ QString TemporalCalibrationWidget::defaultWhatsThis() const
   return "<html>"
       "<h3>Temporal Calibration.</h3>"
       "<p><i>Calibrate the time shift between the tracking system and the video acquisition source.</i></br>"
+	  "<p>Part 1, Acqusition: Move the probe in a sinusoidal pattern up and down in a water tank or similar."
+	  "The <i>first</i> image should be a typical image, as it is used to correlate against all the others."
+	  "<p>Part 2, Calibration: Press calibrate to calculate the temporal shift for the selected acquisition."
+	  "The shift is not applied in any way. Refer to the log folder for the calibration curves."
       "</html>";
 }
 
@@ -131,9 +142,18 @@ void TemporalCalibrationWidget::calibrateSlot()
   else
     mAlgorithm->setDebugFolder("");
 
-  double shift = mAlgorithm->calibrate();
-  ssc::messageManager()->sendSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));
-  mResult->setText(QString("Shift = %1 ms").arg(shift, 0, 'f', 0));
+  bool success = true;
+  double shift = mAlgorithm->calibrate(&success);
+  if (success)
+  {
+	  ssc::messageManager()->sendSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));
+	  mResult->setText(QString("Shift = %1 ms").arg(shift, 0, 'f', 0));
+  }
+  else
+  {
+	  ssc::messageManager()->sendError(QString("Temporal calibration failed"));
+	  mResult->setText(QString("failed"));
+  }
 }
 
 

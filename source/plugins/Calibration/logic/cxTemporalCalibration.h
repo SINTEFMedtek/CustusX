@@ -40,7 +40,7 @@ public:
 	TemporalCalibration();
   void selectData(QString filename);
   void setDebugFolder(QString path);
-  double calibrate();
+  double calibrate(bool* success);
 
 private:
   vtkImageDataPtr extractLine_y(ssc::USFrameDataPtr data, int line_index_x, int frame);
@@ -51,6 +51,8 @@ private:
   double findCorrelationShift(std::vector<double> frames, std::vector<double> tracking, double resolution) const;
   double findLeastSquares(std::vector<double> frames, std::vector<double> tracking, int shift) const;
   double findLSShift(std::vector<double> frames, std::vector<double> tracking, double resolution) const;
+  bool checkFrameMovementQuality(std::vector<double> pos);
+  void writePositions(QString title, std::vector<double> pos, std::vector<ssc::TimedPosition> time, double shift);
 
   void saveDebugFile();
 
