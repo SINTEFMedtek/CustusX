@@ -29,13 +29,14 @@
 #include "sscUSFrameData.h"
 #include "sscMessageManager.h"
 #include <vtkImageData.h>
+#include <vtkImageLuminance.h>
 
 namespace ssc
 {
 USFrameData::USFrameData(ImagePtr inputFrameData, bool angio) :
 	mUseAngio(angio)
 {
-	mImage = inputFrameData;
+	mBaseImage = inputFrameData;
 
 	this->reinitialize();
 }
@@ -47,25 +48,26 @@ USFrameData::USFrameData(ImagePtr inputFrameData, bool angio) :
  */
 void USFrameData::reinitialize()
 {
-	vtkImageDataPtr input;
+//	vtkImageDataPtr input;
 	if (mUseAngio)
 	{
 		//input = mImage->getBaseVtkImageData();
 		//TODO: Use only color information
 //		ssc::messageManager()->sendDebug("Extract angio data before reconstructing");
-		input = this->useAngio(mImage);
+		mProcessedImage = this->useAngio(mBaseImage);
 	}
 	else
 	{
 //		ssc::messageManager()->sendDebug("Not angio, remove color if any");
-		input = mImage->getGrayScaleBaseVtkImageData(); // remove color, if any
+		mProcessedImage = mBaseImage->getGrayScaleBaseVtkImageData(); // remove color, if any
 	}
-	mDimensions = input->GetDimensions();
+
+	mDimensions = mProcessedImage->GetDimensions();
 	//  std::cout << "dims " << Eigen::Vector3i(mDimensions) << std::endl;
-	mSpacing = Vector3D(input->GetSpacing());
+	mSpacing = Vector3D(mProcessedImage->GetSpacing());
 
 	// Raw data pointer
-	unsigned char *inputPointer = static_cast<unsigned char*> (input->GetScalarPointer());
+	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage->GetScalarPointer());
 
 	//Create one pointer to each frame
 	mFrames.resize(mDimensions[2]);
@@ -82,14 +84,17 @@ vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
 	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
 
 	vtkImageDataPtr inData = inputFrameData->getBaseVtkImageData();
-	vtkImageDataPtr outData = inputFrameData->getGrayScaleBaseVtkImageData();
-	int numComp = inData->GetNumberOfScalarComponents();
-	if (numComp < 3)
+
+	if (inData->GetNumberOfScalarComponents() < 3)
 	{
 		ssc::messageManager()->sendWarning("Angio requested for grayscale ultrasound");
-		return outData;
+		return inputFrameData->getGrayScaleBaseVtkImageData();
 	}
-	//  int scalarType = inData->GetScalarType();
+
+	vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+	luminance->SetInput(inputFrameData->getBaseVtkImageData());
+	vtkImageDataPtr outData = luminance->GetOutput();
+	outData->Update();
 
 	int* outExt = outData->GetExtent();
 
@@ -189,23 +194,23 @@ Vector3D USFrameData::getSpacing()
 
 QString USFrameData::getName()
 {
-	return mImage->getName();
+	return mBaseImage->getName();
 }
 
 QString USFrameData::getUid()
 {
-	return mImage->getUid();
+	return mBaseImage->getUid();
 }
 
 QString USFrameData::getFilePath()
 {
-	return mImage->getFilePath();
+	return mBaseImage->getFilePath();
 }
 
-ImagePtr USFrameData::getBase()
-{
-	return mImage;
-}
+//ImagePtr USFrameData::getBase()
+//{
+//	return mBaseImage;
+//}
 void USFrameData::setAngio(bool angio)
 {
 	mUseAngio = angio;
