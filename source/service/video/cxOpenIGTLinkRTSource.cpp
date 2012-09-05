@@ -440,6 +440,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
  */
 void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer message)
 {
+	std::cout << "OpenIGTLinkRTSource::updateSonixStatus" << std::endl;
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
 	ProbePtr probe = this->getValidProbe();
@@ -456,7 +457,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer mess
 	imageData.mOrigin_p = ssc::Vector3D(message->GetOrigin());
 	mSonixProbeData.setImage(imageData);
 
-	std::cout << "Received Sonix message:\n" << streamXml2String(mSonixProbeData) << std::cout;
+	//std::cout << "Received Sonix message:\n" << streamXml2String(mSonixProbeData) << std::cout;
 
 	sonixVideo = true; // Temporary hack to turn off ARGB_RGBA for sonix
 
