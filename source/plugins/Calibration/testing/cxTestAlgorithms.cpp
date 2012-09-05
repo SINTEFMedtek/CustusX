@@ -14,11 +14,13 @@ void TestAlgorithms::testTemporalCalibration()
   QString filename = cx::DataLocations::getTestDataPath() + "/testing/20110511T092103_temporal_calib_mac.cx3/US_Acq/US-Acq_01_20110511T092317/US-Acq_01_20110511T092317.mhd";
   calibrator.selectData(filename);
 //  calibrator.setDebugFolder("/home/christiana/christiana/");
-  double shift = calibrator.calibrate();
+  bool success = false;
+  double shift = calibrator.calibrate(&success);
 //  std::cout << "val " << shift << std::endl;
 
   double testValue = 115; // shift found on data set during first tests.
 
+  CPPUNIT_ASSERT( success );
   CPPUNIT_ASSERT( ssc::similar(shift, testValue, 1));
 }
 
