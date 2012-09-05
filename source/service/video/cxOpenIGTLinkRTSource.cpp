@@ -275,6 +275,10 @@ void OpenIGTLinkRTSource::disconnectServer()
 
 //	sonixVideo = false; // clear sonix hack flag
 
+	// clear the redirecter
+	mRedirecter->SetInput(mImageImport->GetOutput());
+	mFilter_IGTLink_to_RGB = vtkImageDataPtr();
+
 	emit newFrame(); // changed
 
 //  emit changed();
