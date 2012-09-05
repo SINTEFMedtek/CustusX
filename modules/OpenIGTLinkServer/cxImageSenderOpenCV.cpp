@@ -266,6 +266,7 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	cv::Mat frame;
 	// temporary HACK: all the old probe defs are for 800x600, continue this line for now:
 	cv::resize(frame_source, frame, cv::Size(800, 600), 0, 0, CV_INTER_LINEAR);
+//	frame = frame_source;
 
 	//  std::cout << "grab " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 	//  std::cout << "WH=("<< frame.cols << "," << frame.rows << ")" << ", Channels,Depth=("<< frame.channels() << "," << frame.depth() << ")" << std::endl;
