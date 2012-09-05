@@ -440,7 +440,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
  */
 void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer message)
 {
-	std::cout << "OpenIGTLinkRTSource::updateSonixStatus" << std::endl;
+	//std::cout << "OpenIGTLinkRTSource::updateSonixStatus" << std::endl;
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
 	ProbePtr probe = this->getValidProbe();
@@ -488,7 +488,7 @@ void OpenIGTLinkRTSource::updateSonix()
 	if (!probe)
 		return;
 
-	std::cout << "Ready to emit Sonix message:\n" << streamXml2String(mSonixProbeData) << std::cout;
+	//std::cout << "Ready to emit Sonix message:\n" << streamXml2String(mSonixProbeData) << std::cout;
 
 	probe->setProbeSector(mSonixProbeData);
 	updateSonixParameters = false;
