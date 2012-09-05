@@ -89,65 +89,61 @@ static struct instance_t *findInstance( struct series_t *series, int instance_id
 static int setupSeries( struct study_t *study, progress_func_t *callback = NULL )
 {
 	struct series_t *series;
-	struct study_t *iter;
 	QList<QString> DTIUidList;
 
-	for ( iter = study; iter; iter = iter->next_study )
+	for ( series = study->first_series; series != NULL; series = series->next_series )
 	{
-		for ( series = iter->first_series; series != NULL; series = series->next_series )
-		{
-			// catch all series with contain DTI stuff
-			if (series->DTI.isDTI) DTIUidList.append(series->seriesInstanceUID);
-		}
-		// DTI: Now separate the wheat from the chaff (real DTI from trash)
-		for  ( series = iter->first_series; series != NULL; series = series->next_series )
-		{
-			/*
-			// DTI data should usally contain more than 7 diffusion volumes
-			// if we had found diffusion parameters anyway this could be ADC maps or
-			// pre calculated DTI results so we reset the isDTI tag to false
-			*/
-			if (series->DTI.isDTI)
-				if ( DTIUidList.count(series->seriesInstanceUID)<7 )
-					series->DTI.isDTI=false;
-		}
-
-		for ( series = iter->first_series; series != NULL; series = series->next_series )
-		{
-			if (callback)
-			{
-				callback(1000);
-			}
-			struct instance_t *middle = findInstance( series, series->frames / 2 );
-			DICOMLib_Verify( series );
-			if ( !middle ) // eg in multiframe case
-			{
-				middle = series->first_instance;
-			}
-
-			// Set auto values besides DTI data - except for the representative bval=0 series in DTI data
-			// FIXME - we should move auto value setting from here to when it is actually used, since it is
-			// quite slow for large series, where some series may be invalid or not even images
-			if (series->DTI.isDTI != true || strcmp(series->DTI.bval, "0") == 0)
-			{
-				if ( middle && DICOM_image_window_auto( series, middle ) == 0 )
-				{
-					series->VOI.current = series->VOI.suggestion;
-					series->VOI.currentPreset = -1;
-					SSC_LOG( "Found auto values %f, %f from frame %d in (file %s) -- minmax (%f, %f), range (%f, %f)",
-						series->VOI.suggestion.center, series->VOI.suggestion.width,
-						series->frames / 2, middle->path, series->VOI.minmax.center, series->VOI.minmax.width,
-						series->VOI.range.center, series->VOI.range.width );
-				}
-				else // should never happen ...
-					SSC_LOG( " Found no auto values %f, %f from frame %d in (file %s) -- minmax (%f, %f), range (%f, %f)",
-					      series->VOI.suggestion.center, series->VOI.suggestion.width,
-					      series->frames / 2, middle->path, series->VOI.minmax.center, series->VOI.minmax.width,
-					      series->VOI.range.center, series->VOI.range.width );
-			}
-		}
-		study->initialized = true;
+		// catch all series with contain DTI stuff
+		if (series->DTI.isDTI) DTIUidList.append(series->seriesInstanceUID);
 	}
+	// DTI: Now separate the wheat from the chaff (real DTI from trash)
+	for  ( series = study->first_series; series != NULL; series = series->next_series )
+	{
+		/*
+		// DTI data should usally contain more than 7 diffusion volumes
+		// if we had found diffusion parameters anyway this could be ADC maps or
+		// pre calculated DTI results so we reset the isDTI tag to false
+		*/
+		if (series->DTI.isDTI)
+			if ( DTIUidList.count(series->seriesInstanceUID)<7 )
+				series->DTI.isDTI=false;
+	}
+
+	for ( series = study->first_series; series != NULL; series = series->next_series )
+	{
+		if (callback)
+		{
+			callback(1000);
+		}
+		struct instance_t *middle = findInstance( series, series->frames / 2 );
+		DICOMLib_Verify( series );
+		if ( !middle ) // eg in multiframe case
+		{
+			middle = series->first_instance;
+		}
+
+		// Set auto values besides DTI data - except for the representative bval=0 series in DTI data
+		// FIXME - we should move auto value setting from here to when it is actually used, since it is
+		// quite slow for large series, where some series may be invalid or not even images
+		if (series->DTI.isDTI != true || strcmp(series->DTI.bval, "0") == 0)
+		{
+			if ( middle && DICOM_image_window_auto( series, middle ) == 0 )
+			{
+				series->VOI.current = series->VOI.suggestion;
+				series->VOI.currentPreset = -1;
+				SSC_LOG( "Found auto values %f, %f from frame %d in (file %s) -- minmax (%f, %f), range (%f, %f)",
+					series->VOI.suggestion.center, series->VOI.suggestion.width,
+					series->frames / 2, middle->path, series->VOI.minmax.center, series->VOI.minmax.width,
+					series->VOI.range.center, series->VOI.range.width );
+			}
+			else // should never happen ...
+				SSC_LOG( " Found no auto values %f, %f from frame %d in (file %s) -- minmax (%f, %f), range (%f, %f)",
+				      series->VOI.suggestion.center, series->VOI.suggestion.width,
+				      series->frames / 2, middle->path, series->VOI.minmax.center, series->VOI.minmax.width,
+				      series->VOI.range.center, series->VOI.range.width );
+		}
+	}
+	study->initialized = true;
 	return 0;
 }
 
@@ -1497,7 +1493,7 @@ struct series_t *DICOMLib_GetSeries( struct study_t *study, progress_func_t *cal
 			return NULL;
 		}
 
-		setupSeries( study, callback);
+		// setupSeries( study, callback);
 	}
 	if (!study->initialized)
 	{

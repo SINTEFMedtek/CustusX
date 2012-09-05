@@ -231,6 +231,7 @@ int DICOMLib_WriteNifti( const char *dir, const struct study_t *study )
 			bvecX.clear();
 			bvecY.clear();
 			bvecZ.clear();
+			SSC_LOG( "Nifti data for %s written",usedUid.toStdString().c_str() );
 		}
 	}
 	return retval;
