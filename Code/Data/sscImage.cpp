@@ -225,11 +225,10 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 
 vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
 {
-	// Recalculate this. Angio reconstruction may have changed the data
-//	if (mBaseGrayScaleImageData)
-//	{
-//		return mBaseGrayScaleImageData;
-//	}
+	if (mBaseGrayScaleImageData)
+	{
+		return mBaseGrayScaleImageData;
+	}
 
 	mBaseGrayScaleImageData = getBaseVtkImageData();
 

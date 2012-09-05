@@ -70,9 +70,10 @@ public:
 	void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
 
 private:
-	ImagePtr getBase();
+//	ImagePtr getBase();
 	vtkImageDataPtr useAngio(ImagePtr inputFrameData);/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
-	ImagePtr mImage;
+	ImagePtr mBaseImage;
+	vtkImageDataPtr mProcessedImage; // baseimage converted to grayscale using angio or luminance algorithm
 	std::vector<unsigned char*> mFrames;
 	int* mDimensions;
 	Vector3D mSpacing;

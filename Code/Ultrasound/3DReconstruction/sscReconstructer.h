@@ -131,6 +131,7 @@ private:
 	USReconstructInputData mFileData;
 	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 	bool mSuccess;
+	bool mIsReconstructing; ///< use for blocking of parameter setting while reconstructing.
 	OutputVolumeParams mOutputVolumeParams;
 	XmlOptionFile mSettings;
 	ImagePtr mOutput;///< Output image from reconstruction
@@ -159,7 +160,7 @@ private:
 	void threadedPreReconstruct();
 	void threadedReconstruct();
 	void threadedPostReconstruct();
-
+	bool checkAndWarnForReconstruction();
 	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
 };
 

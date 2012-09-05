@@ -114,7 +114,8 @@ ReconstructParams::~ReconstructParams()
 
 Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
 	mOutputVolumeParams(settings),
-	mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath), mMaxTimeDiff(100)// TODO: Change default value for max allowed time difference between tracking and image time tags
+	mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath), mMaxTimeDiff(100),// TODO: Change default value for max allowed time difference between tracking and image time tags
+	mIsReconstructing(false)
 {
 //	mFileReader.reset(new cx::UsReconstructionFileReader());
 	mSuccess = false;
@@ -163,22 +164,26 @@ void Reconstructer::createAlgorithm()
 	}
 }
 
+/**if called during reconstruction, emit a warning and
+ * return true
+ *
+ */
+bool Reconstructer::checkAndWarnForReconstruction()
+{
+	if (!mIsReconstructing)
+		return false;
+
+	ssc::messageManager()->sendWarning("Tried to change reconstruction parameters while reconstructing.");
+	return true;
+}
+
 void Reconstructer::setSettings()
 {
+	if (this->checkAndWarnForReconstruction())
+		return;
+
 	this->createAlgorithm();
-
-	//Can't be called here, may modify data used by reconstruction thread. Moved to threadedPreReconstruct()
-	//this->updateFromOriginalFileData();
-//	if (this->validInputData())
-//	{
-//
-//		ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
-//		maxVol.writeValue(QString::number(mOutputVolumeParams.getMaxVolumeSize()));
-//		std::cout << "save volsize" << std::endl;
-//
-//		mSettings.save();
-//	}
-
+	this->updateFromOriginalFileData();
 	emit paramsChanged();
 }
 void Reconstructer::transferFunctionChangedSlot()
@@ -685,10 +690,12 @@ ImagePtr Reconstructer::generateOutputVolume()
 
 void Reconstructer::setInputData(ssc::USReconstructInputData fileData)
 {
+	if (this->checkAndWarnForReconstruction())
+		return;
+
 	this->clearAll();
 	mOriginalFileData = fileData;
-	//Can't be called here, may modify data used by reconstruction thread. Moved to threadedPreReconstruct()
-	//this->updateFromOriginalFileData();
+	this->updateFromOriginalFileData();
 	emit inputDataSelected(fileData.mFilename);
 }
 
@@ -707,11 +714,11 @@ void Reconstructer::updateFromOriginalFileData()
 	mFileData.mUsRaw->setAngio(mParams->mAngioAdapter->getValue());
 	mFileData.mUsRaw->reinitialize();
 
-	// Only use this if the time stamps have different formatsh
+	// Only use this if the time stamps have different formats
 	// The function assumes that both lists of time stamps start at the same time,
-	// and that is not completely corrcet.
+	// and that is not completely correct.
 	//this->calibrateTimeStamps();
-	// Use the time calibration from the aquisition module
+	// Use the time calibration from the acquisition module
 	//this->calibrateTimeStamps(0.0, 1.0);
 	this->applyTimeCalibration();
 
@@ -756,7 +763,6 @@ void Reconstructer::reconstruct()
  */
 void Reconstructer::threadedPreReconstruct()
 {
-	this->updateFromOriginalFileData();
 	if (!this->validInputData())
 		return;
 	mOutput = this->generateOutputVolume();
@@ -772,8 +778,10 @@ void Reconstructer::threadedReconstruct()
 
 	QDateTime startTime = QDateTime::currentDateTime();
 
+	mIsReconstructing = true;
 	QDomElement algoSettings = mSettings.getElement("algorithms", mAlgorithm->getName());
 	mSuccess = mAlgorithm->reconstruct(mFileData.mFrames, mFileData.mUsRaw, mOutput, mFileData.mMask, algoSettings);
+	mIsReconstructing = false;
 
 	QTime tempTime = QTime(0, 0);
 	tempTime = tempTime.addMSecs(startTime.time().msecsTo(QDateTime::currentDateTime().time()));
