@@ -100,8 +100,8 @@ private:
 	void setEmptyImage();
 	std::vector<unsigned char> mTestData;
 	void setTestImage();
-	vtkImageDataPtr createFilterARGB2RGBA(vtkImageDataPtr input);
-  vtkImageDataPtr createFilterRGBA2RGB(vtkImageDataPtr input);//temporary hack
+	vtkImageDataPtr createFilterARGB2RGB(vtkImageDataPtr input);
+  vtkImageDataPtr createFilterBGR2RGB(vtkImageDataPtr input);//temporary hack
 	void updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message);
 	void updateSonix();
 	ProbePtr getValidProbe();
@@ -110,7 +110,7 @@ private:
 
 	boost::array<unsigned char, 100> mZero;
 	vtkImageImportPtr mImageImport;
-	vtkImageDataPtr mFilter_ARGB_RGBA;
+	vtkImageDataPtr mFilter_IGTLink_to_RGB;
 	vtkImageAlgorithmPtr mRedirecter;
 	igtl::ImageMessage::Pointer mImageMessage;
 	IGTLinkClientPtr mClient;
@@ -127,7 +127,7 @@ private:
 //	float mOrigin[3];
 //	double mSpacing[3]; // spacing (mm/pixel)
 	bool updateSonixParameters;
-	bool sonixVideo;
+//	bool sonixVideo;
 //	int mDepthStart; //mm
 //	int mDepthEnd; //mm
 //	int mWidth; //mm
