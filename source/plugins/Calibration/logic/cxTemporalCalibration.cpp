@@ -101,7 +101,7 @@ void correlate(double* x, double* y, double* corr, int maxdelay, int n)
 
 TemporalCalibration::TemporalCalibration()
 {
-	mAddRawToDebug = true;
+	mAddRawToDebug = false;
 }
 
 void TemporalCalibration::selectData(QString filename)
@@ -167,8 +167,9 @@ void TemporalCalibration::saveDebugFile()
  * - add this as a delta to the current cal.
  *
  */
-double TemporalCalibration::calibrate()
+double TemporalCalibration::calibrate(bool* success)
 {
+  mDebugStream.str("");
   mDebugStream.clear();
 
   if (!mFileData.mUsRaw)
@@ -187,6 +188,15 @@ double TemporalCalibration::calibrate()
   mDebugStream << "=======================================" << std::endl;
 
   std::vector<double> frameMovement = this->computeProbeMovement();
+
+  if (!this->checkFrameMovementQuality(frameMovement))
+  {
+	  ssc::messageManager()->sendError("Failed to detect movement in images. Make sure that the first image is clear and visible.");
+	  *success = false;
+	  return 0;
+  }
+
+
   std::vector<double> trackingMovement = this->computeTrackingMovement();
 
   // set a resolution, resample both tracking and frames to that
@@ -207,8 +217,29 @@ double TemporalCalibration::calibrate()
   mDebugStream << "Total temporal shift tf-tt = " << offset+shift << " ms" << std::endl;
   mDebugStream << "=======================================" << std::endl;
 
+  double startTime = mFileData.mPositions.front().mTime;
+  this->writePositions("Tracking", trackingMovement, mFileData.mPositions, startTime);
+  this->writePositions("Frames", frameMovement, mFileData.mFrames, startTime);
+  this->writePositions("Shifted Frames", frameMovement, mFileData.mFrames, startTime + totalShift);
+
+
   this->saveDebugFile();
+  *success = true;
   return totalShift;
+}
+
+bool TemporalCalibration::checkFrameMovementQuality(std::vector<double> pos)
+{
+	int count = 0;
+	for (unsigned i=0; i<pos.size(); ++i)
+		if (ssc::similar(pos[i], 0))
+			count++;
+
+	// accept if less than 20% zeros.
+	double error = double(count)/pos.size();
+	if (error > 0.05)
+		ssc::messageManager()->sendWarning(QString("Found %1 \% zeros in frame movement").arg(error*100));
+	return error < 0.2;
 }
 
 /** shift tracking data with the input shift, then compute RMS value of function
@@ -321,6 +352,23 @@ double TemporalCalibration::findCorrelationShift(std::vector<double> frames, std
   mDebugStream << "=======================================" << std::endl;
 
   return shift; // shift frames-tracking: frame = tracking + shift
+}
+
+
+void TemporalCalibration::writePositions(QString title, std::vector<double> pos, std::vector<ssc::TimedPosition> time, double shift)
+{
+	if (pos.size()!=time.size())
+	{
+		std::cout << "size mismatch" << std::endl;
+		return;
+	}
+
+	mDebugStream << title << std::endl;
+	mDebugStream << "time\t" << "pos\t" << std::endl;
+	for (unsigned i=0; i<time.size(); ++i)
+	{
+		mDebugStream << time[i].mTime - shift << "\t" << pos[i] << std::endl;
+	}
 }
 
 /**resample the time+shift function onto a regular time series given by resolution.
