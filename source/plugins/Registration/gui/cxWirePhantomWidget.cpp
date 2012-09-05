@@ -309,7 +309,7 @@ void WirePhantomWidget::registration()
 	double diff = (cross - cross_moving).length();
 
 	QString result = QString(""
-		"Shift vector:\t%1\n"
+		"Shift vector (r):\t%1\n"
 		"Accuracy |v|:\t%2mm\n"
 		"Angle:       \t%3*\n"
 		"")
