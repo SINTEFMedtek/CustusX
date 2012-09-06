@@ -521,14 +521,18 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 	// insert a ARGB->RBGA filter. TODO: need to check the input more thoroughly here, this applies only to the internal CustusX US pipeline.
 	if (mImageImport->GetOutput()->GetNumberOfScalarComponents() == 4 && !mFilter_IGTLink_to_RGB)
 	{
+		std::cout << "device : " << message->GetDeviceName() << std::endl;
 		// the cx sonix server sends BGRX
-		if (message->GetDeviceName() == "ImageSenderSonix")
+		if (QString(message->GetDeviceName()) == "ImageSenderSonix")
+		{
 			mFilter_IGTLink_to_RGB = this->createFilterBGR2RGB(mImageImport->GetOutput());
+		}
 		// the cx mac QT grabber server sends ARGB,
 		// the cx opencv server also sends ARGB, in order to mimic the mac server.
-		else if (message->GetDeviceName() == "cxOpenCVGrabber" || message->GetDeviceName() == "GrabberServer")
+		else if (QString(message->GetDeviceName()) == "cxOpenCVGrabber" || QString(message->GetDeviceName()) == "GrabberServer")
+		{
 			mFilter_IGTLink_to_RGB = this->createFilterARGB2RGB(mImageImport->GetOutput());
-
+		}
 		if (mFilter_IGTLink_to_RGB)
 			mRedirecter->SetInput(mFilter_IGTLink_to_RGB);
 	}
