@@ -382,17 +382,16 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	  {
 	  //error; data discrepancy!
 	  //what to do?
-		  std::cout << "Data discrepancy! size: " << sz << " inBytesPerRow: " << inBytesPerRow <<" rows: " << rows <<  std::endl;
-		  std::cout << "FrameSize[0]: " << this->FrameSize[0] << " * FrameBufferBitsPerPixel: " << this->FrameBufferBitsPerPixel << std::endl;
+		  //std::cout << "Data discrepancy! size: " << sz << " inBytesPerRow: " << inBytesPerRow <<" rows: " << rows <<  std::endl;
+		  //std::cout << "FrameSize[0]: " << this->FrameSize[0] << " * FrameBufferBitsPerPixel: " << this->FrameBufferBitsPerPixel << std::endl;
 		  if (rows > sz / inBytesPerRow)
 		  {
 			rows = sz / inBytesPerRow;
-			std::cout << "Trying to fix this by setting rows = " << rows << std::endl;
+			//std::cout << "Trying to fix this by setting rows = " << rows << std::endl;
 		  }
-		  else
-			std::cout << "Keeping rows = " << rows << std::endl;
+		  //else
+			//std::cout << "Keeping rows = " << rows << std::endl;
 		  //TODO: more work is needed here to make sure this works for all probes and depths
-		  //return;
 	  }
 
 	// for frame containing FC (frame count) in the beginning for data coming from cine, jump 2 bytes
