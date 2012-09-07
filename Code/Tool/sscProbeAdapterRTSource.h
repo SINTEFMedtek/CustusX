@@ -94,6 +94,7 @@ public:
 
 private slots:
 	void probeChangedSlot();
+	void newFrameSlot();
 
 private:
 	QString mUid;
