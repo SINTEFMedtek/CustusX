@@ -227,11 +227,11 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
 
   //std::cout << "uly: " << frame.uly << " bly: " << frame.bly << std::endl;
   //std::cout << "spacing: " << frame.mSpacing[0] << "  " << frame.mSpacing[1] << std::endl;
-  std::cout << "Origin: " << frame.mOrigin[0] << " " << frame.mOrigin[1] << " " << std::endl;
-  std::cout << "Probetype: " << retval->GetProbeType() << std::endl;
-  std::cout << "Depth start: " << retval->GetDepthStart();
-  std::cout << " end: " << retval->GetDepthEnd();
-  std::cout << " width: " << retval->GetWidth() << std::endl;
+//  std::cout << "Origin: " << frame.mOrigin[0] << " " << frame.mOrigin[1] << " " << std::endl;
+//  std::cout << "Probetype: " << retval->GetProbeType() << std::endl;
+//  std::cout << "Depth start: " << retval->GetDepthStart();
+//  std::cout << " end: " << retval->GetDepthEnd();
+//  std::cout << " width: " << retval->GetWidth() << std::endl;
   //  retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   //std::cout << "Spacing: " << frame.mSpacing[0] << ", " << frame.mSpacing[1] << std::endl;
 
