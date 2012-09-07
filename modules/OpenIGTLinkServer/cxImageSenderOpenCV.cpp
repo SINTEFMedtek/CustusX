@@ -263,10 +263,10 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 //	std::cout << "OpenCV diff:\t" <<lastlastGrabTime.msecsTo(mLastGrabTime) << "\tdelay:\t" << mLastGrabTime.msecsTo(QDateTime::currentDateTime()) << std::endl;
 	lastlastGrabTime = mLastGrabTime;
 
-	cv::Mat frame;
+	cv::Mat frame = frame_source;
+	// solved by resampling the definitions in CX. (CA/20120907)
 	// temporary HACK: all the old probe defs are for 800x600, continue this line for now:
-	cv::resize(frame_source, frame, cv::Size(800, 600), 0, 0, CV_INTER_LINEAR);
-//	frame = frame_source;
+	//cv::resize(frame_source, frame, cv::Size(800, 600), 0, 0, CV_INTER_LINEAR);
 
 	//  std::cout << "grab " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 	//  std::cout << "WH=("<< frame.cols << "," << frame.rows << ")" << ", Channels,Depth=("<< frame.channels() << "," << frame.depth() << ")" << std::endl;
