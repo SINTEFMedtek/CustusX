@@ -30,6 +30,7 @@
 #include "sscTransform3D.h"
 #include "sscProbeData.h"
 #include "sscIndent.h"
+#include "sscCoordinateSystemHelpers.h"
 
 namespace ssc
 {
@@ -181,6 +182,10 @@ public:
 	virtual bool hasReferencePointWithId(int id) { Q_UNUSED(id); return false; }
 
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) { Q_UNUSED(startTime); Q_UNUSED(stopTime); return TimedTransformMap(); } ///< Get a tools transforms from within a given session
+
+	virtual CoordinateSystem getSensorCoordinateSystem() { return CoordinateSystem(ssc::csSENSOR, this->getUid()); }
+	virtual CoordinateSystem getToolCoordinateSystem() { return CoordinateSystem(ssc::csTOOL, this->getUid()); }
+	virtual CoordinateSystem getToolOffsetCoordinateSystem() { return CoordinateSystem(ssc::csTOOL_OFFSET, this->getUid()); }
 
 #ifdef WIN32
 	typedef ssc::Transform3D Transform3D;
