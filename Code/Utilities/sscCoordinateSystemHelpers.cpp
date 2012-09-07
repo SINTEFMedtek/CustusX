@@ -54,9 +54,9 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces()
 	}
 
 	// alias for the currently active tool:
-  retval.push_back(CoordinateSystem(csTOOL, "active"));
-  retval.push_back(CoordinateSystem(csSENSOR, "active"));
-  retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
+	retval.push_back(CoordinateSystem(csTOOL, "active"));
+	retval.push_back(CoordinateSystem(csSENSOR, "active"));
+	retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
 
 	std::map<QString, ToolPtr> tools = *toolManager()->getTools();
 	for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
@@ -77,61 +77,61 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces()
 
 Vector3D CoordinateSystemHelpers::getDominantToolTipPoint(CoordinateSystem to, bool useOffset)
 {
-  ToolPtr tool = ssc::toolManager()->getDominantTool();
-  if (!tool)
-    return ssc::Vector3D(0,0,0);
+	ToolPtr tool = ssc::toolManager()->getDominantTool();
+	if (!tool)
+		return ssc::Vector3D(0,0,0);
 
-  QString dominantToolUid = tool->getUid();
+	QString dominantToolUid = tool->getUid();
 
-  CoordinateSystem from(csTOOL, dominantToolUid);
+	CoordinateSystem from(csTOOL, dominantToolUid);
 
-  Vector3D point_t;
-  if(useOffset)
-    point_t = Vector3D(0,0,tool->getTooltipOffset());
-  else
-    point_t = Vector3D(0,0,0);
+	Vector3D point_t;
+	if(useOffset)
+		point_t = Vector3D(0,0,tool->getTooltipOffset());
+	else
+		point_t = Vector3D(0,0,0);
 
-  Vector3D P_to = CoordinateSystemHelpers::get_toMfrom(from, to).coord(point_t);
+	Vector3D P_to = CoordinateSystemHelpers::get_toMfrom(from, to).coord(point_t);
 
-  return P_to;
+	return P_to;
 }
 
 Transform3D CoordinateSystemHelpers::get_toMfrom(CoordinateSystem from, CoordinateSystem to)
 {
-  Transform3D to_M_from = get_rMfrom(to).inv() * get_rMfrom(from);
-  return to_M_from;
+	Transform3D to_M_from = get_rMfrom(to).inv() * get_rMfrom(from);
+	return to_M_from;
 }
 
 Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from)
 {
-  Transform3D rMfrom = Transform3D::Identity();
+	Transform3D rMfrom = Transform3D::Identity();
 
-  switch(from.mId)
-  {
-  case csREF:
-    rMfrom = get_rMr();
-    break;
-  case csDATA:
-    rMfrom = get_rMd(from.mRefObject);
-    break;
-  case csPATIENTREF:
-    rMfrom = get_rMpr();
-    break;
-  case csTOOL:
-    rMfrom = get_rMt(from.mRefObject);
-    break;
-  case csSENSOR:
-    rMfrom = get_rMs(from.mRefObject);
-    break;
-  case csTOOL_OFFSET:
-    rMfrom = get_rMto(from.mRefObject);
-    break;
-  default:
+	switch(from.mId)
+	{
+	case csREF:
+		rMfrom = get_rMr();
+		break;
+	case csDATA:
+		rMfrom = get_rMd(from.mRefObject);
+		break;
+	case csPATIENTREF:
+		rMfrom = get_rMpr();
+		break;
+	case csTOOL:
+		rMfrom = get_rMt(from.mRefObject);
+		break;
+	case csSENSOR:
+		rMfrom = get_rMs(from.mRefObject);
+		break;
+	case csTOOL_OFFSET:
+		rMfrom = get_rMto(from.mRefObject);
+		break;
+	default:
 
-    break;
-  };
+		break;
+	};
 
-  return rMfrom;
+	return rMfrom;
 }
 
 ssc::CoordinateSystem CoordinateSystemHelpers::getPr()
@@ -148,81 +148,81 @@ ssc::CoordinateSystem CoordinateSystemHelpers::getR()
 
 Transform3D CoordinateSystemHelpers::get_rMr()
 {
-  return Transform3D::Identity(); // ref_M_ref
+	return Transform3D::Identity(); // ref_M_ref
 }
 
 Transform3D CoordinateSystemHelpers::get_rMd(QString uid)
 {
-  DataPtr data = dataManager()->getData(uid);
+	DataPtr data = dataManager()->getData(uid);
 
-  if(!data)
-  {
-   messageManager()->sendWarning("Could not find data with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
-    return Transform3D::Identity();
-  }
-  return data->get_rMd(); // ref_M_d
+	if(!data)
+	{
+		messageManager()->sendWarning("Could not find data with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		return Transform3D::Identity();
+	}
+	return data->get_rMd(); // ref_M_d
 }
 
 Transform3D CoordinateSystemHelpers::get_rMpr()
 {
-  Transform3D rMpr = *(toolManager()->get_rMpr());
-  return rMpr; //ref_M_pr
+	Transform3D rMpr = *(toolManager()->get_rMpr());
+	return rMpr; //ref_M_pr
 }
 
 Transform3D CoordinateSystemHelpers::get_rMt(QString uid)
 {
-  ToolPtr tool = toolManager()->getTool(uid);
+	ToolPtr tool = toolManager()->getTool(uid);
 
-  if (!tool && uid=="active")
-    tool = toolManager()->getDominantTool();
+	if (!tool && uid=="active")
+		tool = toolManager()->getDominantTool();
 
-  if(!tool)
-  {
-   messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
-   return Transform3D::Identity();
-  }
-  return get_rMpr() * tool->get_prMt(); // ref_M_t
+	if(!tool)
+	{
+		messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		return Transform3D::Identity();
+	}
+	return get_rMpr() * tool->get_prMt(); // ref_M_t
 }
 
 Transform3D CoordinateSystemHelpers::get_rMto(QString uid)
 {
-  ToolPtr tool = toolManager()->getTool(uid);
+	ToolPtr tool = toolManager()->getTool(uid);
 
-  if (!tool && uid=="active")
-    tool = toolManager()->getDominantTool();
+	if (!tool && uid=="active")
+		tool = toolManager()->getDominantTool();
 
-  if(!tool)
-  {
-   messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
-   return Transform3D::Identity();
-  }
+	if(!tool)
+	{
+		messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		return Transform3D::Identity();
+	}
 
-  double offset = tool->getTooltipOffset();
-  Transform3D tMto = createTransformTranslate(Vector3D(0,0,offset));
-  return get_rMpr() * tool->get_prMt() * tMto; // ref_M_to
+	double offset = tool->getTooltipOffset();
+	Transform3D tMto = createTransformTranslate(Vector3D(0,0,offset));
+	return get_rMpr() * tool->get_prMt() * tMto; // ref_M_to
 }
 
 Transform3D CoordinateSystemHelpers::get_rMs(QString uid)
 {
-  ToolPtr tool = toolManager()->getTool(uid);
+	ToolPtr tool = toolManager()->getTool(uid);
 
-  if (!tool && uid=="active")
-    tool = toolManager()->getDominantTool();
+	if (!tool && uid=="active")
+		tool = toolManager()->getDominantTool();
 
-  if(!tool)
-  {
-   messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
-   return Transform3D::Identity();
-  }
+	if(!tool)
+	{
+		messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		return Transform3D::Identity();
+	}
 
-  Transform3D tMs = tool->getCalibration_sMt().inv();
+	Transform3D tMs = tool->getCalibration_sMt().inv();
 
-  Transform3D rMpr = get_rMpr();
-  Transform3D prMt = tool->get_prMt();
+	Transform3D rMpr = get_rMpr();
+	Transform3D prMt = tool->get_prMt();
 
-  Transform3D rMs = rMpr * prMt * tMs;
+	Transform3D rMs = rMpr * prMt * tMs;
 
-  return rMs; //ref_M_s
+	return rMs; //ref_M_s
 }
 
 } //namespace ssc
