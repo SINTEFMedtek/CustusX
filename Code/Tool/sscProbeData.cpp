@@ -196,7 +196,7 @@ void ProbeData::resample(QSize newSize)
 	if (newSize==mImage.mSize)
 		return;
 
-	ssc::Vector3D factor(double(newSize.width())/mImage.mSize.width(), double(newSize.height())/mImage.mSize.height());
+	ssc::Vector3D factor(double(newSize.width())/mImage.mSize.width(), double(newSize.height())/mImage.mSize.height(), 1);
 
 	mImage.mOrigin_p = multiply_elems(mImage.mOrigin_p, factor);
 	mImage.mSpacing = divide_elems(mImage.mSpacing, factor);
