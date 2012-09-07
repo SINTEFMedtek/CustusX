@@ -187,4 +187,26 @@ void ProbeData::applySoundSpeedCompensationFactor(double factor)
 		ssc::messageManager()->sendWarning("Will only compensate sound speed for linear probes");
 }
 
+/**Set a new image size. resample all other parameters to match this new
+ * image size, keeping sizes in millimeters fixed.
+ *
+ */
+void ProbeData::resample(QSize newSize)
+{
+	if (newSize==mImage.mSize)
+		return;
+
+	ssc::Vector3D factor(double(newSize.width())/mImage.mSize.width(), double(newSize.height())/mImage.mSize.height());
+
+	mImage.mOrigin_p = multiply_elems(mImage.mOrigin_p, factor);
+	mImage.mSpacing = divide_elems(mImage.mSpacing, factor);
+
+	ssc::Vector3D cr0 = multiply_elems(mImage.mClipRect_p.corner(0,0,0), factor);
+	ssc::Vector3D cr1 = multiply_elems(mImage.mClipRect_p.corner(1,1,1), factor);
+	mImage.mClipRect_p = ssc::DoubleBoundingBox3D(cr0, cr1);
+
+	mImage.mSize = newSize;
+}
+
+
 }

@@ -42,6 +42,7 @@ ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ssc::ProbePtr probe, ssc
 	connect(mBase.get(), SIGNAL(streaming(bool)), this, SIGNAL(streaming(bool)));
 	connect(mBase.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
 	connect(mBase.get(), SIGNAL(newFrame()), this, SIGNAL(newFrame()));
+	connect(mBase.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 
 	mRedirecter = vtkImageChangeInformationPtr::New();
 	mRedirecter->SetInput(mBase->getVtkImageData());
@@ -65,6 +66,30 @@ double ProbeAdapterRTSource::getTimestamp()
 		return mBase->getTimestamp() - probe->getData().getTemporalCalibration();
 	else
 		return mBase->getTimestamp();
+}
+
+void ProbeAdapterRTSource::newFrameSlot()
+{
+	ProbePtr probe = mProbe.lock();
+	if (!probe)
+		return;
+
+	ssc::ProbeData data = probe->getData();
+	QSize dimProbe = data.getImage().mSize;
+	QSize dimImage(mRedirecter->GetOutput()->GetDimensions()[0], mRedirecter->GetOutput()->GetDimensions()[1]);
+
+//	if (dimProbe!=dimImage)
+//	{
+//		ssc::messageManager()->sendInfo(
+//			QString("Resampling probe calibration. Calibration:[%1,%2], Image:[%3,%4]")
+//			.arg(dimProbe.width())
+//			.arg(dimProbe.height())
+//			.arg(dimImage.width())
+//			.arg(dimImage.height()));
+//
+//		data.resample(dimImage);
+//		probe->setSector(data);
+//	}
 }
 
 void ProbeAdapterRTSource::probeChangedSlot()
