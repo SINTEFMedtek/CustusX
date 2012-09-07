@@ -173,12 +173,13 @@ void Probe::setConfigId(QString uid)
 	emit sectorChanged();
 }
 
-void Probe::setSector(ssc::ProbeData probeSector)
+void Probe::setData(ssc::ProbeData probeSector, QString configUid)
 {
 	mData = probeSector;
-	if (!mConfigurationId.endsWith('*'))
-		mConfigurationId += "*";
+//	if (!mConfigurationId.endsWith('*'))
+//		mConfigurationId += "*";
 //	mConfigurationId = "";
+	mConfigurationId = configUid;
 	emit sectorChanged();
 }
 //void Probe::setProbeImageData(ssc::ProbeData::ProbeImageData imageData)

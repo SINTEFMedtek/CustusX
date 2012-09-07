@@ -192,7 +192,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	{
 		ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
 		if (probe)
-			probe->setSector(mCurrentData.mProbeData.mData);
+			probe->setData(mCurrentData.mProbeData.mData);
 	}
 
 	// create a vector to allow for quick search
