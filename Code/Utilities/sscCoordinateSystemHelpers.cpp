@@ -83,9 +83,7 @@ Vector3D CoordinateSystemHelpers::getDominantToolTipPoint(CoordinateSystem to, b
 
   QString dominantToolUid = tool->getUid();
 
-  CoordinateSystem from;
-  from.mId = csTOOL;
-  from.mRefObject = dominantToolUid;
+  CoordinateSystem from(csTOOL, dominantToolUid);
 
   Vector3D point_t;
   if(useOffset)
@@ -139,18 +137,14 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from) const
 
 ssc::CoordinateSystem CoordinateSystemHelpers::getPr()
 {
-  CoordinateSystem pr;
-  pr.mId = ssc::csPATIENTREF;
-  pr.mRefObject = "";
-  return pr;
+	CoordinateSystem pr(ssc::csPATIENTREF);
+	return pr;
 }
 
 ssc::CoordinateSystem CoordinateSystemHelpers::getR()
 {
-  CoordinateSystem pr;
-  pr.mId = ssc::csREF;
-  pr.mRefObject = "";
-  return pr;
+	CoordinateSystem pr(ssc::csREF);
+	return pr;
 }
 
 Transform3D CoordinateSystemHelpers::get_rMr() const

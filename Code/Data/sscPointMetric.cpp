@@ -26,9 +26,10 @@
 namespace ssc
 {
 
-CoordinateSystemListener::CoordinateSystemListener(ssc::CoordinateSystem space)
+CoordinateSystemListener::CoordinateSystemListener(ssc::CoordinateSystem space) :
+	mSpace(space)
 {
-	this->setSpace(space);
+	this->doConnect();
 }
 
 CoordinateSystemListener::~CoordinateSystemListener()
@@ -135,9 +136,11 @@ ssc::DataPtr PointMetricReader::load(const QString& uid, const QString& filename
 }
 
 PointMetric::PointMetric(const QString& uid, const QString& name) :
-				DataMetric(uid, name)
+	DataMetric(uid, name),
+	mCoordinate(0,0,0),
+	mSpace(ssc::SpaceHelpers::getR())
 {
-	mSpaceListener.reset(new CoordinateSystemListener);
+	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 

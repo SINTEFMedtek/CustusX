@@ -43,7 +43,7 @@ class CoordinateSystemListener: public QObject
 Q_OBJECT
 
 public:
-	CoordinateSystemListener(ssc::CoordinateSystem space = ssc::CoordinateSystem());
+	CoordinateSystemListener(ssc::CoordinateSystem space);
 	virtual ~CoordinateSystemListener();
 	void setSpace(ssc::CoordinateSystem space);
 	ssc::CoordinateSystem getSpace() const;
