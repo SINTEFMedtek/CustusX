@@ -24,6 +24,7 @@ USAcquisition::USAcquisition(AcquisitionDataPtr pluginData, QObject* parent) : Q
 {
   connect(&mFileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
+  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(clearSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChangedSlot()));
@@ -34,6 +35,14 @@ USAcquisition::USAcquisition(AcquisitionDataPtr pluginData, QObject* parent) : Q
   this->probeChangedSlot();
   this->checkIfReadySlot();
   this->connectToPureVideo();
+}
+
+void USAcquisition::clearSlot()
+{
+	if (mTool)
+	disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this,
+			SLOT(checkIfReadySlot()));
+	mTool.reset();
 }
 
 void USAcquisition::checkIfReadySlot()
@@ -72,13 +81,18 @@ void USAcquisition::checkIfReadySlot()
   emit ready(streaming && mRTRecorder, mWhatsMissing);
 }
 
-void USAcquisition::setTool(ssc::ToolPtr tool)
-{
-  if(mTool && tool && (mTool->getUid() == tool->getUid()))
-    return;
+void USAcquisition::setTool(ssc::ToolPtr tool) {
+	if (mTool && tool && (mTool->getUid() == tool->getUid()))
+		return;
 
-  mTool = tool;
-  emit toolChanged();
+	if (mTool)
+		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this,
+				SLOT(checkIfReadySlot()));
+	mTool = tool;
+	if (mTool)
+		connect(mTool.get(), SIGNAL(toolVisible(bool)), this,
+				SLOT(checkIfReadySlot()));
+	emit toolChanged();
 }
 
 ssc::ToolPtr USAcquisition::getTool()
@@ -125,7 +139,6 @@ void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 
   if(mRTSource)
   {
-//    std::cout << "USAcquisition::connectVideoSource - connected" << std::endl;
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
     mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
   }
@@ -182,7 +195,6 @@ void USAcquisition::fileMakerWriteFinished()
 
 void USAcquisition::dominantToolChangedSlot()
 {
-//  std::cout << "USAcquisition::dominantToolChangedSlot()" << std::endl;
   ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
 
   ssc::ProbePtr probe = tool->getProbe();
