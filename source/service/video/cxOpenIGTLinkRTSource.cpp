@@ -496,7 +496,7 @@ void OpenIGTLinkRTSource::updateSonix()
 
 	//std::cout << "Ready to emit Sonix message:\n" << streamXml2String(mSonixProbeData) << std::cout;
 
-	probe->setSector(mSonixProbeData);
+	probe->setData(mSonixProbeData);
 	updateSonixParameters = false;
 }
 

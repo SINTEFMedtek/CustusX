@@ -69,7 +69,7 @@ public:
 //	void changeProbeSectorParameters(double depthStart, double depthEnd, double width); ///< Update probe sector parameters
 //	void changeProbeSectorSize(int width, int height); ///< Update probe sector parameters
 //	void changeProbeSectorOrigin(ssc::Vector3D origin); ///< Update probe sector origin
-	void setSector(ssc::ProbeData probeSector); ///< Set a new probe sector
+	virtual void setData(ssc::ProbeData probeSector, QString configUid="");
 //	void setProbeImageData(ssc::ProbeData::ProbeImageData imageData); ///< Set a new probe image data
 	void removeCurrentConfig(); ///< remove the current config from disk
 	void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
