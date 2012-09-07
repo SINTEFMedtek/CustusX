@@ -77,6 +77,7 @@ class Common(object):
         if (self.PLATFORM == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
             self.mBuildSSCExamples = "OFF"
+            self.mExternalDir = self.mRootDir + "/external" #path length on windows is limited, need to keep it short
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
@@ -427,9 +428,10 @@ class OpenIGTLink(CppComponent):
         return DATA.mExternalDir + "/OpenIGTLink"
     def _rawCheckout(self):
         self._changeDirToBase()
-        runShell('svn co http://svn.na-mic.org/NAMICSandBox/trunk/OpenIGTLink OpenIGTLink')
+        #runShell('svn co http://svn.na-mic.org/NAMICSandBox/trunk/OpenIGTLink OpenIGTLink')
+        runShell('git clone git://github.com/openigtlink/OpenIGTLink.git')
     def update(self):
-        pass
+        runShell('git checkout master')
     def configure(self):
         self._changeDirToBuild()
         runShell('\
@@ -801,16 +803,6 @@ Available components are:
                      type='string',
                      help='password to send to scripts',
                      #dest='password',
-                     default="")
-        p.add_option('--github_user',
-                     action='store',
-                     type='string',
-                     help='user name for github account',
-                     default="")
-        p.add_option('--github_password',
-                     action='store',
-                     type='string',
-                     help='password for github account',
                      default="")
         p.add_option('--dummy', '-d',
                      action='store_true',
