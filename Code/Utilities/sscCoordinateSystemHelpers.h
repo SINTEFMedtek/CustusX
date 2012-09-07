@@ -17,7 +17,6 @@ namespace ssc
  */
 struct CoordinateSystem
 {
-	CoordinateSystem() {}
 	explicit CoordinateSystem(COORDINATE_SYSTEM id, QString ref="") : mId(id), mRefObject(ref) {}
   COORDINATE_SYSTEM mId; ///< the type of coordinate system
   QString           mRefObject; ///< for tool, sensor and data we need a object uid to define the coordinate system
