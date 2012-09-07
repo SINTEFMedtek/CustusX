@@ -52,14 +52,14 @@ public:
   static std::vector<CoordinateSystem> getAvailableSpaces();
 
 private:
-  Transform3D get_rMfrom(CoordinateSystem from) const; ///< ref_M_from
+  static Transform3D get_rMfrom(CoordinateSystem from); ///< ref_M_from
 
-  Transform3D get_rMr() const; ///< ref_M_ref
-  Transform3D get_rMd(QString uid) const; ///< ref_M_d
-  Transform3D get_rMpr() const; ///< ref_M_pr
-  Transform3D get_rMt(QString uid) const; ///< ref_M_t
-  Transform3D get_rMto(QString uid) const; ///< t_M_to
-  Transform3D get_rMs(QString uid) const; ///< ref_M_s
+  static Transform3D get_rMr(); ///< ref_M_ref
+  static Transform3D get_rMd(QString uid); ///< ref_M_d
+  static Transform3D get_rMpr(); ///< ref_M_pr
+  static Transform3D get_rMt(QString uid); ///< ref_M_t
+  static Transform3D get_rMto(QString uid); ///< t_M_to
+  static Transform3D get_rMs(QString uid); ///< ref_M_s
 };
 typedef CoordinateSystemHelpers SpaceHelpers;
 }//namespace ssc
