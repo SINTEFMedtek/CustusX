@@ -18,11 +18,11 @@ namespace ssc
 struct CoordinateSystem
 {
 	explicit CoordinateSystem(COORDINATE_SYSTEM id, QString ref="") : mId(id), mRefObject(ref) {}
-  COORDINATE_SYSTEM mId; ///< the type of coordinate system
-  QString           mRefObject; ///< for tool, sensor and data we need a object uid to define the coordinate system
+	COORDINATE_SYSTEM mId; ///< the type of coordinate system
+	QString           mRefObject; ///< for tool, sensor and data we need a object uid to define the coordinate system
 
-  QString toString() const;
-  static CoordinateSystem fromString(QString text);
+	QString toString() const;
+	static CoordinateSystem fromString(QString text);
 
 };
 bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs);
@@ -41,25 +41,25 @@ typedef CoordinateSystem Space;
 class CoordinateSystemHelpers
 {
 public:
-  CoordinateSystemHelpers(){};
+	CoordinateSystemHelpers(){};
 
-  static Vector3D getDominantToolTipPoint(CoordinateSystem to, bool useOffset = false); ///< P_to, dominant tools current point in coord
-  static Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
+	static Vector3D getDominantToolTipPoint(CoordinateSystem to, bool useOffset = false); ///< P_to, dominant tools current point in coord
+	static Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
 
-  static ssc::CoordinateSystem getPr(); ///<patient references coordinate system
-  static ssc::CoordinateSystem getR(); ///<data references coordinate system
+	static ssc::CoordinateSystem getPr(); ///<patient references coordinate system
+	static ssc::CoordinateSystem getR(); ///<data references coordinate system
 
-  static std::vector<CoordinateSystem> getAvailableSpaces();
+	static std::vector<CoordinateSystem> getAvailableSpaces();
 
 private:
-  static Transform3D get_rMfrom(CoordinateSystem from); ///< ref_M_from
+	static Transform3D get_rMfrom(CoordinateSystem from); ///< ref_M_from
 
-  static Transform3D get_rMr(); ///< ref_M_ref
-  static Transform3D get_rMd(QString uid); ///< ref_M_d
-  static Transform3D get_rMpr(); ///< ref_M_pr
-  static Transform3D get_rMt(QString uid); ///< ref_M_t
-  static Transform3D get_rMto(QString uid); ///< t_M_to
-  static Transform3D get_rMs(QString uid); ///< ref_M_s
+	static Transform3D get_rMr(); ///< ref_M_ref
+	static Transform3D get_rMd(QString uid); ///< ref_M_d
+	static Transform3D get_rMpr(); ///< ref_M_pr
+	static Transform3D get_rMt(QString uid); ///< ref_M_t
+	static Transform3D get_rMto(QString uid); ///< t_M_to
+	static Transform3D get_rMs(QString uid); ///< ref_M_s
 };
 typedef CoordinateSystemHelpers SpaceHelpers;
 }//namespace ssc
