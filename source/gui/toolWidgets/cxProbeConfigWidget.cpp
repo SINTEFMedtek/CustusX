@@ -136,7 +136,7 @@ void ProbeConfigWidget::shiftDefinition(ssc::Vector3D shift)
 	}
 	data.setImage(image);
 
-	probe->setProbeSector(data);
+	probe->setData(data);
 }
 
 void ProbeConfigWidget::shiftLeftSlot()
@@ -271,7 +271,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	data.setSector(mDepthWidget->getValue().first, mDepthWidget->getValue().second, mWidth->getValue());
 	data.updateClipRectFromSector();
 
-	probe->setProbeSector(data);
+	probe->setData(data);
 
 //	std::cout << "ProbeConfigWidget::guiProbeSectorChanged()" << std::endl;
 }
@@ -292,7 +292,7 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	data.setImage(image);
 	data.updateSectorFromClipRect();
 
-	probe->setProbeSector(data);
+	probe->setData(data);
 
 //	std::cout << "ProbeConfigWidget::guiImageSettingsChanged()" << std::endl;
 }

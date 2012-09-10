@@ -46,6 +46,7 @@ public:
 	virtual ~ViewWrapperVideo();
 	virtual ssc::ViewWidget* getView();
 	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) {}
+	void updateView() {}
 
 private slots:
 	void updateSlot();
