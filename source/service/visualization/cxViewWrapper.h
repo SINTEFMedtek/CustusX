@@ -122,6 +122,8 @@ public:
 	virtual void setZoom2D(SyncedValuePtr value) {}
 	virtual void setOrientationMode(SyncedValuePtr value) {}
 
+	virtual void updateView() = 0;
+
 signals:
 	void orientationChanged(ssc::ORIENTATION_TYPE type);
 

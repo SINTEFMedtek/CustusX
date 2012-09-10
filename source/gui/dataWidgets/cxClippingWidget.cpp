@@ -84,7 +84,7 @@ ClippingWidget::ClippingWidget(QWidget* parent) :
 	ssc::LabeledComboBoxWidget* combo = new ssc::LabeledComboBoxWidget(this, mPlaneAdapter);
 
 	mUseClipperCheckBox = new QCheckBox("Use Clipper");
-	mUseClipperCheckBox->setToolTip("Turn on interactive clipping for the active volume.");
+	mUseClipperCheckBox->setToolTip("Turn on interactive clipping for the selected volume.");
 	connect(mUseClipperCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(useClipper(bool)));
 	activeClipLayout->addWidget(mUseClipperCheckBox);
 	activeClipLayout->addWidget(imageCombo);
@@ -95,11 +95,11 @@ ClippingWidget::ClippingWidget(QWidget* parent) :
 	activeClipLayout->addWidget(mInvertPlaneCheckBox);
 
 	QPushButton* saveButton = new QPushButton("Save clip plane");
-	saveButton->setToolTip("Save the interactive plane as a clip plane in the active volume.");
+	saveButton->setToolTip("Save the interactive plane as a clip plane in the selected volume.");
 	connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClickedSlot()));
 	//saveButton->setEnabled(false);
 	QPushButton* clearButton = new QPushButton("Clear saved planes");
-	clearButton->setToolTip("Remove all saved clip planes from the active volume");
+	clearButton->setToolTip("Remove all saved clip planes from the selected volume");
 	connect(clearButton, SIGNAL(clicked()), this, SLOT(clearButtonClickedSlot()));
 	//clearButton->setEnabled(false);
 	activeClipLayout->addWidget(saveButton);

@@ -308,7 +308,7 @@ QStringList ViewWrapper::getAllDataNames() const
 		{
 			if (image->getCropping())
 				line += " (cropped)";
-			if (!image->getClipPlanes().empty() || (viewManager()->getClipper()->getImage() == image))
+			if (!image->getClipPlanes().empty() || ((viewManager()->getClipper()->getImage() == image) &&  viewManager()->getClipper()->getUseClipper()))
 				line += " (clipped)";
 		}
 
