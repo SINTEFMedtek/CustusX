@@ -70,6 +70,7 @@ public:
 	virtual void setConfigId(QString uid) = 0;
 	virtual void setTemporalCalibration(double val) = 0;
 	virtual void setSoundSpeedCompensationFactor(double val) = 0;
+	virtual void setData(ssc::ProbeData probeSector, QString configUid="") = 0;
 
 signals:
 	void sectorChanged();

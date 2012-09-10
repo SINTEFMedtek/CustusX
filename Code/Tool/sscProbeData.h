@@ -120,6 +120,7 @@ public:
 	double getTemporalCalibration() const { return mTemporalCalibration; }
 	double getCenterOffset() const { return mCenterOffset; }
 	ProbeImageData getImage() const { return mImage; }
+	void resample(QSize mSize);
 
 	void setTemporalCalibration(double value) { mTemporalCalibration = value; }
 //	void setImage(ProbeImageData value) { mImage = value; }
