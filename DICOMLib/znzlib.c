@@ -44,7 +44,7 @@ znzlib.c  (zipped or non-zipped library)
    use_compression!=0 uses zlib (gzip) compression
 */
 
-znzFile znzopen(const char *path, const char *mode, int use_compression)
+znzFile znzopen(const char *path, const char *mode, int WHEN_ZLIB(use_compression))
 {
   znzFile file;
   file = (znzFile) calloc(1,sizeof(struct znzptr));
@@ -81,7 +81,7 @@ znzFile znzopen(const char *path, const char *mode, int use_compression)
 }
 
 
-znzFile znzdopen(int fd, const char *mode, int use_compression)
+znzFile znzdopen(int WHEN_ZLIB(fd), const char *WHEN_ZLIB(mode), int WHEN_ZLIB(use_compression))
 {
   znzFile file;
   file = (znzFile) calloc(1,sizeof(struct znzptr));
@@ -245,7 +245,9 @@ int znzgetc(znzFile file)
 int znzprintf(znzFile stream, const char *format, ...)
 {
   int retval=0;
+#ifdef HAVE_ZLIB
   char *tmpstr;
+#endif
   va_list va;
   if (stream==NULL) { return 0; }
   va_start(va, format);

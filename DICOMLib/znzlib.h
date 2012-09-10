@@ -119,5 +119,17 @@ int znzprintf(znzFile stream, const char *format, ...);
 }
 #endif
 /*=================*/
+#if defined(__cplusplus)
+#define UNUSED(x)       // = nothing
+#elif defined(__GNUC__)
+#define UNUSED(x)       x##_UNUSED __attribute__((unused))
+#else
+#define UNUSED(x)       x##_UNUSED
+#endif
+#ifdef HAVE_ZLIB
+#define WHEN_ZLIB(x) x
+#else
+#define WHEN_ZLIB(x) UNUSED(x)
+#endif
 
 #endif
