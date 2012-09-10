@@ -124,6 +124,8 @@ ViewManager::ViewManager() :
 	mInteractiveCropper.reset(new InteractiveCropper());
 	mInteractiveClipper.reset(new InteractiveClipper());
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
+	connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(updateViews()));
+	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(updateViews()));
 
 	this->syncOrientationMode(SyncedValue::create(0));
 
@@ -140,6 +142,17 @@ ViewManager::ViewManager() :
 
 ViewManager::~ViewManager()
 {
+}
+
+
+void ViewManager::updateViews()
+{
+	for(unsigned i=0; i<mViewGroups.size(); ++i)
+	{
+		ViewGroupPtr group = mViewGroups[i];
+		for (unsigned j=0; j<group->getWrappers().size(); ++j)
+			group->getWrappers()[j]->updateView();
+	}
 }
 
 void ViewManager::duringSavePatientSlot()

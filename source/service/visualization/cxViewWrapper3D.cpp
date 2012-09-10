@@ -181,11 +181,13 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 	this->setStereoType(settings()->value("View3D/stereoType").toInt());
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 
+//	connect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	this->updateView();
 }
 
 ViewWrapper3D::~ViewWrapper3D()
 {
+//	disconnect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	if (mView)
 	{
 		mView->removeReps();
@@ -525,6 +527,13 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 			return;
 		mDataReps[data->getUid()] = rep;
 		mView->addRep(rep);
+
+		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+		if (image)
+		{
+			connect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
+			connect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
+		}
 	}
 
 	this->activeImageChangedSlot();
@@ -535,6 +544,13 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
 {
 	if (!mDataReps.count(uid))
 		return;
+
+	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
+	if (image)
+	{
+		disconnect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
+		disconnect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
+	}
 
 	mView->removeRep(mDataReps[uid]);
 	mDataReps.erase(uid);
