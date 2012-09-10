@@ -496,7 +496,7 @@ void OpenIGTLinkRTSource::updateSonix()
 
 	//std::cout << "Ready to emit Sonix message:\n" << streamXml2String(mSonixProbeData) << std::cout;
 
-	probe->setProbeSector(mSonixProbeData);
+	probe->setData(mSonixProbeData);
 	updateSonixParameters = false;
 }
 
@@ -521,7 +521,6 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 	// insert a ARGB->RBGA filter. TODO: need to check the input more thoroughly here, this applies only to the internal CustusX US pipeline.
 	if (mImageImport->GetOutput()->GetNumberOfScalarComponents() == 4 && !mFilter_IGTLink_to_RGB)
 	{
-		std::cout << "device : " << message->GetDeviceName() << std::endl;
 		// the cx sonix server sends BGRX
 		if (QString(message->GetDeviceName()) == "ImageSenderSonix")
 		{
