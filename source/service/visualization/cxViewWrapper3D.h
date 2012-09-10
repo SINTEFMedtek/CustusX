@@ -117,10 +117,10 @@ private slots:
 	void setStereoEyeAngle(double angle);
 	void settingsChangedSlot(QString key);
 	void PickerRepDataPickedSlot(QString);
+	void updateView();
 
 private:
 	virtual void appendToContextMenu(QMenu& contextMenu);
-	void updateView();
 	void readDataRepSettings(ssc::RepPtr rep);
 	void updateSlices();
 

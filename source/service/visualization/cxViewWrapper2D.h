@@ -64,6 +64,7 @@ public:
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
 	static bool overlayIsEnabled();
+	virtual void updateView();
 
 private slots:
 	void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -81,7 +82,6 @@ private slots:
 private:
 	virtual void setZoomFactor2D(double zoomFactor);
 	virtual double getZoomFactor2D() const;
-	void updateView();
 	void moveManualTool(QPoint point);
 
 	virtual void appendToContextMenu(QMenu& contextMenu);

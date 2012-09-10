@@ -1095,6 +1095,25 @@
                         <Height>0.065359</Height>
                     </PixelSize>
                 </Config>
+                <Config>
+                    <ID>WidthMaxDepth4cm2</ID>
+                    <Name>Width: Max, Depth: 4 cm (2)</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>353.5</Col>
+                        <Row>57.999999999999993</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>133</Left>
+                        <Right>574</Right>
+                        <Top>57</Top>
+                        <Bottom>523</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.086022000000000001</Width>
+                        <Height>0.086022000000000001</Height>
+                    </PixelSize>
+                </Config>
             </RTSource>
         </USProbe>
     </USScanner>
@@ -1614,7 +1633,7 @@
             <Name>L17-5</Name>
             <Type>LinearArray</Type>
             <DefaultRTSource>DVI</DefaultRTSource>
-            <Notes></Notes>
+            <Notes/>
             <RTSource>
                 <Name>DVI</Name>
                 <TemporalCalibration>0</TemporalCalibration>
