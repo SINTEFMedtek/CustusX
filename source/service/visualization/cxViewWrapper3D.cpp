@@ -834,15 +834,19 @@ void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 	bool success = true;
 	if(setDepthPeeling)
 	{
-		if (!this->IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), false))
+		if (!this->IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
 		{
 			ssc::messageManager()->sendWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
 			success = false;
 		}
-		if (!this->SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
+		else if (!this->SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
 		{
 			ssc::messageManager()->sendWarning("Error setting depth peeling");
 			success = false;
+		}
+		else
+		{
+			ssc::messageManager()->sendInfo("Set GPU depth peeling");
 		}
 		if(!success)
 		  settings()->setValue("View3D/depthPeeling", false);
@@ -866,7 +870,10 @@ bool ViewWrapper3D::SetupEnvironmentForDepthPeeling(
 		double occlusionRatio)
 {
   if (!renderWindow || !renderer)
-    return false;
+  {
+	  ssc::messageManager()->sendWarning("Can't set depth peeling. No render / renderwindow");
+	  return false;
+  }
 
   // 1. Use a render window with alpha bits (as initial value is 0 (false)):
   renderWindow->SetAlphaBitPlanes(true);
@@ -903,7 +910,8 @@ bool ViewWrapper3D::IsDepthPeelingSupported(vtkSmartPointer<vtkRenderWindow> ren
 {
   if (!renderWindow || !renderer)
     {
-    return false;
+	  ssc::messageManager()->sendWarning("Can't test depth peeling. No render / renderwindow");
+	  return false;
     }
 
   bool success = true;
