@@ -181,6 +181,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 	this->setStereoType(settings()->value("View3D/stereoType").toInt());
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 
+	this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
+
 //	connect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	this->updateView();
 }
@@ -238,8 +240,9 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 		//    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 		//    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
-
 	}
+	if (key == "View3D/depthPeeling")
+		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
 }
 
 void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
@@ -826,5 +829,115 @@ void ViewWrapper3D::setStereoEyeAngle(double angle)
 	mView->getRenderer()->GetActiveCamera()->SetEyeAngle(angle);
 }
 
+void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
+{
+	bool success = true;
+	if(setDepthPeeling)
+	{
+		if (!this->IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), false))
+		{
+			ssc::messageManager()->sendWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
+			success = false;
+		}
+		if (!this->SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
+		{
+			ssc::messageManager()->sendWarning("Error setting depth peeling");
+			success = false;
+		}
+		if(!success)
+		  settings()->setValue("View3D/depthPeeling", false);
+	}
+}
+
+/**
+ * Setup the rendering environment for depth peeling (general depth peeling
+ * support is requested).
+ * @see IsDepthPeelingSupported()
+ * @param renderWindow a valid openGL-supporting render window
+ * @param renderer a valid renderer instance
+ * @param maxNoOfPeels maximum number of depth peels (multi-pass rendering)
+ * @param occulusionRation the occlusion ration (0.0 means a perfect image,
+ * >0.0 means a non-perfect image which in general results in faster rendering)
+ * @return TRUE if depth peeling could be set up
+ */
+bool ViewWrapper3D::SetupEnvironmentForDepthPeeling(
+		vtkSmartPointer<vtkRenderWindow> renderWindow,
+		vtkSmartPointer<vtkRenderer> renderer, int maxNoOfPeels,
+		double occlusionRatio)
+{
+  if (!renderWindow || !renderer)
+    return false;
+
+  // 1. Use a render window with alpha bits (as initial value is 0 (false)):
+  renderWindow->SetAlphaBitPlanes(true);
+
+  // 2. Force to not pick a framebuffer with a multisample buffer
+  // (as initial value is 8):
+  renderWindow->SetMultiSamples(0);
+
+  // 3. Choose to use depth peeling (if supported) (initial value is 0 (false)):
+  renderer->SetUseDepthPeeling(true);
+
+  // 4. Set depth peeling parameters
+  // - Set the maximum number of rendering passes (initial value is 4):
+  renderer->SetMaximumNumberOfPeels(maxNoOfPeels);
+  // - Set the occlusion ratio (initial value is 0.0, exact image):
+  renderer->SetOcclusionRatio(occlusionRatio);
+
+  return true;
+}
+
+/**
+ * Find out whether this box supports depth peeling. Depth peeling requires
+ * a variety of openGL extensions and appropriate drivers.
+ * @param renderWindow a valid openGL-supporting render window
+ * @param renderer a valid renderer instance
+ * @param doItOffscreen do the test off screen which means that nothing is
+ * rendered to screen (this requires the box to support off screen rendering)
+ * @return TRUE if depth peeling is supported, FALSE otherwise (which means
+ * that another strategy must be used for correct rendering of translucent
+ * geometry, e.g. CPU-based depth sorting)
+ */
+bool ViewWrapper3D::IsDepthPeelingSupported(vtkSmartPointer<vtkRenderWindow> renderWindow,
+		vtkSmartPointer<vtkRenderer> renderer, bool doItOffScreen)
+{
+  if (!renderWindow || !renderer)
+    {
+    return false;
+    }
+
+  bool success = true;
+
+  // Save original renderer / render window state
+  bool origOffScreenRendering = renderWindow->GetOffScreenRendering() == 1;
+  bool origAlphaBitPlanes = renderWindow->GetAlphaBitPlanes() == 1;
+  int origMultiSamples = renderWindow->GetMultiSamples();
+  bool origUseDepthPeeling = renderer->GetUseDepthPeeling() == 1;
+  int origMaxPeels = renderer->GetMaximumNumberOfPeels();
+  double origOcclusionRatio = renderer->GetOcclusionRatio();
+
+  // Activate off screen rendering on demand
+  renderWindow->SetOffScreenRendering(doItOffScreen);
+
+  // Setup environment for depth peeling (with some default parametrization)
+  success = success && SetupEnvironmentForDepthPeeling(renderWindow, renderer,
+                                                       100, 0.1);
+
+  // Do a test render
+  renderWindow->Render();
+
+  // Check whether depth peeling was used
+  success = success && renderer->GetLastRenderingUsedDepthPeeling();
+
+  // recover original state
+  renderWindow->SetOffScreenRendering(origOffScreenRendering);
+  renderWindow->SetAlphaBitPlanes(origAlphaBitPlanes);
+  renderWindow->SetMultiSamples(origMultiSamples);
+  renderer->SetUseDepthPeeling(origUseDepthPeeling);
+  renderer->SetMaximumNumberOfPeels(origMaxPeels);
+  renderer->SetOcclusionRatio(origOcclusionRatio);
+
+  return success;
+}
 //------------------------------------------------------------------------------
 }
