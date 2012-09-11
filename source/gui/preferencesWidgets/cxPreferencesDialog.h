@@ -117,6 +117,7 @@ protected:
   QCheckBox* mSmartRenderCheckBox;
   QCheckBox* mGPURenderCheckBox;
   QCheckBox* mGPU2DRenderCheckBox;
+  QCheckBox* mGPU3DDepthPeelingCheckBox;
   QCheckBox* mShadingCheckBox;
   QGridLayout *mMainLayout;
   ssc::DoubleDataAdapterXmlPtr mMaxRenderSize;
