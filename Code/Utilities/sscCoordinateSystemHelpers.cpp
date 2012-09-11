@@ -134,6 +134,68 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from)
 	return rMfrom;
 }
 
+ssc::CoordinateSystem CoordinateSystemHelpers::getS(ssc::ToolPtr tool)
+{
+	ssc::CoordinateSystem retval(csCOUNT);
+	if (!tool)
+		return retval;
+
+	retval.mId = ssc::csSENSOR;
+	retval.mRefObject = tool->getUid();
+
+	return retval;
+}
+
+ssc::CoordinateSystem CoordinateSystemHelpers::getT(ssc::ToolPtr tool)
+{
+	ssc::CoordinateSystem retval(csCOUNT);
+	if (!tool)
+		return retval;
+
+	ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+	if (refTool && (tool == refTool))
+	{
+		retval.mId = ssc::csPATIENTREF;
+	}
+	else
+		retval.mId = ssc::csTOOL;
+
+	retval.mRefObject = tool->getUid();
+
+	return retval;
+}
+
+ssc::CoordinateSystem CoordinateSystemHelpers::getTO(ssc::ToolPtr tool)
+{
+	ssc::CoordinateSystem retval(csCOUNT);
+	if (!tool)
+		return retval;
+
+	ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+	if (refTool && (tool == refTool))
+	{
+		retval.mId = ssc::csPATIENTREF;
+	}
+	else
+		retval.mId = ssc::csTOOL_OFFSET;
+
+	retval.mRefObject = tool->getUid();
+
+	return retval;
+}
+
+ssc::CoordinateSystem CoordinateSystemHelpers::getD(ssc::DataPtr data)
+{
+	ssc::CoordinateSystem retval(csCOUNT);
+	if (!data)
+		return retval;
+
+	retval.mId = ssc::csDATA;
+	retval.mRefObject = data->getUid();
+
+	return retval;
+}
+
 ssc::CoordinateSystem CoordinateSystemHelpers::getPr()
 {
 	CoordinateSystem pr(ssc::csPATIENTREF);
