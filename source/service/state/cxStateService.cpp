@@ -274,6 +274,7 @@ void StateService::fillDefaultSettings()
 
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
+	this->fillDefault("View3D/depthPeeling", false);
 
 #ifdef __APPLE__
 	this->fillDefault("useGPUVolumeRayCastMapper", false);
