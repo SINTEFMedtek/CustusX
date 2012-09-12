@@ -1041,6 +1041,60 @@
             </RTSource>
         </USProbe>
         <USProbe>
+            <Name>L13-7</Name>
+            <Type>LinearArray</Type>
+            <DefaultRTSource>Digital</DefaultRTSource>
+            <RTSource>
+                <TemporalCalibration>100</TemporalCalibration>
+                <__ImageTimestampCalibration>170</__ImageTimestampCalibration>
+                <Name>Digital</Name>
+                <DefaultConfig>WidthMaxDepth3</DefaultConfig>
+                <ImageSize>
+                    <Width>271</Width>
+                    <Height>616</Height>
+                </ImageSize>
+                <HorizontalOffset>0</HorizontalOffset>
+                <Config>
+                    <ID>WidthMaxDepth3</ID>
+                    <Name>Width: Max, Depth: 3 cm</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Depth>616</Depth>
+                    <Offset>0</Offset>
+                    <Origin>
+                        <Col>136</Col>
+                        <Row>1</Row>
+                    </Origin>
+                    <NCorners>4</NCorners>
+                    <Corner>
+                        <Col>1</Col>
+                        <Row>1</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>271</Col>
+                        <Row>1</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>271</Col>
+                        <Row>616</Row>
+                    </Corner>
+                    <Corner>
+                        <Col>1</Col>
+                        <Row>616</Row>
+                    </Corner>
+                    <CroppingEdges>
+                        <Left>1</Left>
+                        <Right>271</Right>
+                        <Top>1</Top>
+                        <Bottom>271</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.048</Width>
+                        <Height>0.048</Height>
+                    </PixelSize>
+                </Config>
+            </RTSource>
+        </USProbe>
+        <USProbe>
             <Name>L14-5</Name>
             <Type>LinearArray</Type>
             <DefaultRTSource>DVI</DefaultRTSource>
