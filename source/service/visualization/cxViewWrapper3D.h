@@ -135,13 +135,6 @@ private:
 	virtual void dataRemoved(const QString& uid);
 
 	void setTranslucentRenderingToDepthPeeling(bool setDepthPeeling);
-	bool SetupEnvironmentForDepthPeeling(vtkSmartPointer<vtkRenderWindow> renderWindow,
-			vtkSmartPointer<vtkRenderer> renderer, int maxNoOfPeels,
-			double occlusionRatio);
-
-	bool IsDepthPeelingSupported(vtkSmartPointer<vtkRenderWindow> renderWindow,
-			vtkSmartPointer<vtkRenderer> renderer,
-			bool doItOffScreen);
 
 	typedef std::map<QString, ssc::RepPtr> RepMap;
 	RepMap mDataReps;
