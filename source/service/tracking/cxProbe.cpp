@@ -173,17 +173,20 @@ void Probe::setConfigId(QString uid)
 	emit sectorChanged();
 }
 
-void Probe::setProbeSector(ssc::ProbeData probeSector)
+void Probe::setData(ssc::ProbeData probeSector, QString configUid)
 {
 	mData = probeSector;
-	mConfigurationId = "";
+//	if (!mConfigurationId.endsWith('*'))
+//		mConfigurationId += "*";
+//	mConfigurationId = "";
+	mConfigurationId = configUid;
 	emit sectorChanged();
 }
-void Probe::setProbeImageData(ssc::ProbeData::ProbeImageData imageData)
-{
-	mData.setImage(imageData);
-	emit sectorChanged();
-}
+//void Probe::setProbeImageData(ssc::ProbeData::ProbeImageData imageData)
+//{
+//	mData.setImage(imageData);
+//	emit sectorChanged();
+//}
 ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
@@ -212,36 +215,36 @@ QString Probe::getInstrumentScannerId() const
 	return mScannerUid;
 }
 
-void Probe::changeProbeSectorParameters(double depthStart, double depthEnd, double width)
-{
-//	mData.mDepthStart = depthStart;
-//	mData.mDepthEnd = depthEnd;
-//	mData.mWidth = width;
-	mData.setSector(depthStart, depthEnd, width);
-	emit sectorChanged();
-}
+//void Probe::changeProbeSectorParameters(double depthStart, double depthEnd, double width)
+//{
+////	mData.mDepthStart = depthStart;
+////	mData.mDepthEnd = depthEnd;
+////	mData.mWidth = width;
+//	mData.setSector(depthStart, depthEnd, width);
+//	emit sectorChanged();
+//}
 
-void Probe::changeProbeSectorSize(int width, int height)
-{
-//	mData.mImage.mSize.setWidth(width);
-//	mData.mImage.mSize.setHeight(height);
-	ssc::ProbeData::ProbeImageData image = mData.getImage();
-	image.mSize.setWidth(width);
-	image.mSize.setHeight(height);
-	mData.setImage(image);
-
-	emit sectorChanged();
-}
-void Probe::changeProbeSectorOrigin(ssc::Vector3D origin)
-{
-//	mData.mImage.mOrigin_p = origin;
-
-	ssc::ProbeData::ProbeImageData image = mData.getImage();
-	image.mOrigin_p = origin;
-	mData.setImage(image);
-
-	emit sectorChanged();
-}
+//void Probe::changeProbeSectorSize(int width, int height)
+//{
+////	mData.mImage.mSize.setWidth(width);
+////	mData.mImage.mSize.setHeight(height);
+//	ssc::ProbeData::ProbeImageData image = mData.getImage();
+//	image.mSize.setWidth(width);
+//	image.mSize.setHeight(height);
+//	mData.setImage(image);
+//
+//	emit sectorChanged();
+//}
+//void Probe::changeProbeSectorOrigin(ssc::Vector3D origin)
+//{
+////	mData.mImage.mOrigin_p = origin;
+//
+//	ssc::ProbeData::ProbeImageData image = mData.getImage();
+//	image.mOrigin_p = origin;
+//	mData.setImage(image);
+//
+//	emit sectorChanged();
+//}
 
 void Probe::removeCurrentConfig()
 {
