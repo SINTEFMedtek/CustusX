@@ -66,6 +66,8 @@
 #include "sscDistanceMetric.h"
 #include "sscPointMetric.h"
 
+#include "cxDepthPeeling.h"
+
 namespace cx
 {
 
@@ -181,11 +183,15 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 	this->setStereoType(settings()->value("View3D/stereoType").toInt());
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 
+	this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
+
+//	connect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	this->updateView();
 }
 
 ViewWrapper3D::~ViewWrapper3D()
 {
+//	disconnect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	if (mView)
 	{
 		mView->removeReps();
@@ -236,8 +242,9 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 		//    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 		//    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
-
 	}
+	if (key == "View3D/depthPeeling")
+		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
 }
 
 void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
@@ -525,6 +532,13 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 			return;
 		mDataReps[data->getUid()] = rep;
 		mView->addRep(rep);
+
+		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+		if (image)
+		{
+			connect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
+			connect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
+		}
 	}
 
 	this->activeImageChangedSlot();
@@ -535,6 +549,13 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
 {
 	if (!mDataReps.count(uid))
 		return;
+
+	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
+	if (image)
+	{
+		disconnect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
+		disconnect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
+	}
 
 	mView->removeRep(mDataReps[uid]);
 	mDataReps.erase(uid);
@@ -808,6 +829,30 @@ void ViewWrapper3D::globalConfigurationFileChangedSlot(QString key)
 void ViewWrapper3D::setStereoEyeAngle(double angle)
 {
 	mView->getRenderer()->GetActiveCamera()->SetEyeAngle(angle);
+}
+
+void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
+{
+	bool success = true;
+	if(setDepthPeeling)
+	{
+		if (!IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
+		{
+			ssc::messageManager()->sendWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
+			success = false;
+		}
+		else if (!SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
+		{
+			ssc::messageManager()->sendWarning("Error setting depth peeling");
+			success = false;
+		}
+		else
+		{
+			ssc::messageManager()->sendInfo("Set GPU depth peeling");
+		}
+		if(!success)
+		  settings()->setValue("View3D/depthPeeling", false);
+	}
 }
 
 //------------------------------------------------------------------------------

@@ -192,7 +192,7 @@ void PerformanceTab::init()
   mGPURenderCheckBox->setChecked(useGPU3DRender);
   mGPURenderCheckBox->setToolTip("Use a GPU-based 3D renderer instead of the texture-based one, if available.");
 
-    bool useGPU2DRender = settings()->value("useGPU2DRendering").toBool();
+  bool useGPU2DRender = settings()->value("useGPU2DRendering").toBool();
 	mGPU2DRenderCheckBox = new QCheckBox("Use GPU 2D Renderer");
 	mGPU2DRenderCheckBox->setChecked(useGPU2DRender);
 	mGPU2DRenderCheckBox->setToolTip("Use a GPU-based 2D renderer instead of the software-based one, if available.");
@@ -201,6 +201,11 @@ void PerformanceTab::init()
 	mGPU2DRenderCheckBox->setChecked(false);
 	mGPU2DRenderCheckBox->setEnabled(false);
 #endif
+
+  bool useGPU3DDepthPeeling = settings()->value("View3D/depthPeeling").toBool();
+	mGPU3DDepthPeelingCheckBox = new QCheckBox("Use GPU 3D depth peeling");
+	mGPU3DDepthPeelingCheckBox->setChecked(useGPU3DDepthPeeling);
+	mGPU3DDepthPeelingCheckBox->setToolTip("Use a GPU-based 3D depth peeling to correctly visualize translucent surfaces.");
 
   //Layout
   mMainLayout = new QGridLayout;
@@ -211,7 +216,8 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
   mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
   mMainLayout->addWidget(mGPU2DRenderCheckBox, 4, 0);
-  new ssc::SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 5);
+  mMainLayout->addWidget(mGPU3DDepthPeelingCheckBox, 5, 0);
+  new ssc::SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 6);
 
   mTopLayout->addLayout(mMainLayout);
 }
@@ -229,6 +235,7 @@ void PerformanceTab::saveParametersSlot()
   settings()->setValue("maxRenderSize",     mMaxRenderSize->getValue());
   settings()->setValue("smartRender",       mSmartRenderCheckBox->isChecked());
   settings()->setValue("stillUpdateRate",   mStillUpdateRate->getValue());
+  settings()->setValue("View3D/depthPeeling", mGPU3DDepthPeelingCheckBox->isChecked());
 }
 
 //==============================================================================

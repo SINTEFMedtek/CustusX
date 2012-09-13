@@ -15,6 +15,13 @@ ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlCon
 //	config.mConfigId = uid;
 //	config.mName = name;
 
+	QSize storedSize(basis.mImageWidth, basis.mImageHeight);
+	if (storedSize!=data.getImage().mSize)
+	{
+		// wrong size: resample
+		data.resample(storedSize);
+	}
+
 	config.mLeftEdge = data.getImage().mClipRect_p[0];
 	config.mRightEdge = data.getImage().mClipRect_p[1];
 	config.mTopEdge = data.getImage().mClipRect_p[2];

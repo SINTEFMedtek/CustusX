@@ -160,6 +160,7 @@ protected slots:
 	void clearSlot();
 	void duringSavePatientSlot();
 	void duringLoadPatientSlot();
+	void updateViews();
 
 protected:
 	ViewManager(); ///< create all needed views
