@@ -25,6 +25,7 @@ if(X11_FOUND)
     else(APPLE)
         option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" ON)
     endif(APPLE)
+    include_directories( ${X11_INCLUDE_DIR} ) # needed by Mac 10.8+
 else(X11_FOUND)
     option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
 endif(X11_FOUND)

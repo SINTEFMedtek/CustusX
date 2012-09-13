@@ -39,7 +39,8 @@
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
-#include "/usr/include/X11/Xlib.h"
+#include "X11/Xlib.h"
+//#include "/usr/include/X11/Xlib.h"
 #else
 #include <GL/glu.h>
 #endif
