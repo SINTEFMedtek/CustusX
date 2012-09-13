@@ -107,7 +107,7 @@ void GuideRep2D::changedSlot()
 	}
 
 	Vector3D toolOffsetPosRef = (*ssc::ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,mSliceProxy->getTool()->getTooltipOffset()));
-	Vector3D toolPosRef = (*ssc::ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,00));
+	Vector3D toolPosRef = (*ssc::ToolManager::getInstance()->get_rMpr()*mSliceProxy->getTool()->get_prMt()).coord(Vector3D(0,0,0));
 
 	Vector3D centerRef = mMetric->getRefCoord() + 0.5*(toolOffsetPosRef - mMetric->getRefCoord());
 	Vector3D position = mSliceProxy->get_sMr() * centerRef;

@@ -29,6 +29,7 @@
 #include <QObject>
 #include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
+#include "sscCoordinateSystemHelpers.h"
 
 #include <QDateTime>
 class QDomNode;
@@ -89,6 +90,8 @@ public:
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+
+	virtual CoordinateSystem getCoordinateSystem() { return ssc::CoordinateSystem(ssc::csDATA, this->getUid()); }
 
 signals:
 	void transformChanged(); ///< emitted when transform is changed
