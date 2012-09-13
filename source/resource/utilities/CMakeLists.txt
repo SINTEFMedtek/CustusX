@@ -65,6 +65,8 @@ add_library(cxUtilities
     cxPlaybackTime.cpp
     cxTimelineWidget.h
     cxTimelineWidget.cpp
+    cxDepthPeeling.h
+    cxDepthPeeling.cpp
     ${cxUtilities_MOC_SRCS}
     )
     
