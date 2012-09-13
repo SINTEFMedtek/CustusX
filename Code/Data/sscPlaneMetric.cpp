@@ -33,7 +33,8 @@ ssc::DataPtr PlaneMetricReader::load(const QString& uid, const QString& filename
 }
 
 PlaneMetric::PlaneMetric(const QString& uid, const QString& name) :
-				DataMetric(uid, name)
+	DataMetric(uid, name),
+	mSpace(ssc::SpaceHelpers::getR())
 {
 }
 
