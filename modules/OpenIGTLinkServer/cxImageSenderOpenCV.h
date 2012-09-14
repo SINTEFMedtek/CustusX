@@ -14,6 +14,7 @@
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
 #include <QDateTime>
+#include <QSize>
 class QTimer;
 #include "igtlImageMessage.h"
 #include <opencv2/highgui/highgui.hpp>
@@ -67,6 +68,7 @@ private:
 	QTimer* mSendTimer;
 	QTimer* mGrabTimer;
 	StringMap mArguments;
+	QSize mRescaleSize;
 	void dumpProperties();
 	IGTLinkImageMessage::Pointer getImageMessage();
 	void dumpProperty(int val, QString name);
