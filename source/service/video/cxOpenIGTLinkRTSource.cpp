@@ -536,6 +536,7 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 			mRedirecter->SetInput(mFilter_IGTLink_to_RGB);
 	}
 
+//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
 	emit newFrame();
 }
 
