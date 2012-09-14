@@ -59,7 +59,7 @@ class Common(object):
         if(self.PLATFORM == 'Windows'):
             self.mRootDir = "C:\Dev"
         else:
-            self.mRootDir = os.path().expanduser("~")
+            self.mRootDir = os.path.expanduser("~") + "/" + self.mUser
         # external dir: Used as base dir for all externals, such as VTK, ITK, ...
         self.mExternalDir = self.mRootDir + "/external_code"
         # working dir: Used as base dir for Custus and other of our 'own' projects
@@ -349,7 +349,7 @@ class VTK(CppComponent):
         self.update()
     def update(self):
         self._changeDirToSource()
-        runShell('git checkout v5.8.0')   # needed for gcc 4.6, not good on non-linux
+        runShell('git checkout v5.10.0')   # needed for gcc 4.6, not good on non-linux
     def configure(self):
         '''
 Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-collection (!)
