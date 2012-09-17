@@ -27,13 +27,14 @@
 #include <QFileInfo>
 #include <vtkImageData.h>
 #include "recConfig.h"
+#include "sscImage.h"
+#include "sscMessageManager.h"
+#include "sscTypeConversions.h"
+
 #ifdef SSC_USE_OpenCL
 #include "reconstruct_vnn.h"
 #include "utils.h"
 #endif // SSC_USE_OpenCL
-#include "sscImage.h"
-#include "sscMessageManager.h"
-#include "sscTypeConversions.h"
 
 namespace ssc
 {
