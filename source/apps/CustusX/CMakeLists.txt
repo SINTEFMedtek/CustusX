@@ -246,7 +246,22 @@ ENDIF(APPLE)
 #--------------------------------------------------------------------------------
 # Install needed Qt plugins by copying directories from the qt installation
 # One can cull what gets copied by using 'REGEX "..." EXCLUDE'
-INSTALL(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" DESTINATION ${plugin_dest_dir}/plugins)
+INSTALL(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" DESTINATION ${plugin_dest_dir}/plugins
+				DIRECTORY_PERMISSIONS
+						OWNER_READ OWNER_EXECUTE OWNER_WRITE
+						GROUP_READ GROUP_EXECUTE GROUP_WRITE
+						WORLD_READ WORLD_EXECUTE WORLD_WRITE
+						)
+
+#--------------------------------------------------------------------------------
+# Install the OpenIGTLinkServer
+INSTALL(FILES "${CustusX3_BINARY_DIR}/modules/OpenIGTLinkServer/OpenIGTLinkServer" DESTINATION ${plugin_dest_dir}
+				PERMISSIONS
+						OWNER_READ OWNER_EXECUTE OWNER_WRITE
+						GROUP_READ GROUP_EXECUTE GROUP_WRITE
+						WORLD_READ WORLD_EXECUTE WORLD_WRITE
+						)
+
 
 #--------------------------------------------------------------------------------
 # install a qt.conf file
@@ -305,6 +320,9 @@ set(DIRS
 install(CODE "
         file(GLOB_RECURSE QTPLUGINS
           \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+          # add openigtlinkserver
+        file(GLOB_RECURSE QTPLUGINS
+          \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/OpenIGTLinkServer\")
 		include(BundleUtilities)
 		fixup_bundle(\"${APPS}\"   \"\${QTPLUGINS}\"   \"${DIRS}\") "
 		)

@@ -408,7 +408,7 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	GetRandomTestMatrix(matrix);
 	imgMsg->SetMatrix(matrix);
 
-	  std::cout << "   grab+process " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//	  std::cout << "   grab+process " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 
 	return imgMsg;
 }

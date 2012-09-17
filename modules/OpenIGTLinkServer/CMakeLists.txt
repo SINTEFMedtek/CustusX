@@ -172,10 +172,12 @@ target_link_libraries(${ExecutableName}
 #-------------------------------
 # Install files
 #-------------------------------
-install(TARGETS ${ExecutableName}
-		BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
-		RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
-		)
+if (CX_WINDOWS OR CX_LINUX)
+    install(TARGETS ${ExecutableName}
+    		BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
+    		RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
+    		)
+endif()		
 
 if(CX_WINDOWS)
 	#Installing required run time libs for Windows, msv*.dll
