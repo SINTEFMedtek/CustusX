@@ -27,7 +27,7 @@ public:
   BinaryThresholdImageFilter();
   virtual ~BinaryThresholdImageFilter();
 
-  void setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmoothing=true, double smoothSigma=0.5);
+  void setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmoothing=true, double smoothSigma=0.1);
   ssc::ImagePtr getOutput();
 
 protected slots:
