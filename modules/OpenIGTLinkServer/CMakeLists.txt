@@ -27,6 +27,16 @@ if (USE_OpenCV)
 	ADD_DEFINITIONS(-DUSE_OpenCV)
 endif()
 
+option(CX_USE_ISB_GE "use ISB GE scanner interface" OFF)
+if (CX_USE_ISB_GE)
+	ADD_DEFINITIONS(-DCX_USE_ISB_GE)
+	#include_directories( ${CustusX3_SOURCE_DIR}/../../ISB_DataStreaming/ISB_DataStreaming/vtkDataStreamClient )
+	
+	find_package(GEStreamer REQUIRED)
+	include(${GEStreamer_USE_FILE})
+	
+endif()
+
 
 # VTK
 #----------
@@ -80,6 +90,7 @@ SET(ALL_LINK_LIBRARIES
 	SSC
 	${BOOST_LIBRARIES}
 	${QT_LIBRARIES}
+	${GEStreamer_LIBRARIES}
 	OpenIGTLink
 	vtkIO 
 	vtkRendering 
@@ -117,6 +128,7 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxImageSenderFile.h
 		cxImageSenderSonix.h
 		cxImageSenderOpenCV.h
+		cxImageSenderGE.h
 		cxImageSender.h
 )
 
@@ -143,6 +155,8 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxImageSenderOpenCV.cpp
 		cxImageSenderSonix.h
 		cxImageSenderSonix.cpp
+		cxImageSenderGE.h
+		cxImageSenderGE.cpp
 		cxImageSender.h
 		../grabberCommon/cxIGTLinkUSStatusMessage.h
 		../grabberCommon/cxIGTLinkUSStatusMessage.cpp

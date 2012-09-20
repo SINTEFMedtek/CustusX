@@ -552,6 +552,40 @@ class DCMTK(CppComponent):
         return '' # ignore: use yum instead
     # ---------------------------------------------------------
 
+class ISB_DataStreaming(CppComponent):
+    def name(self):
+        return "ISB_DataStreaming"
+    def help(self):
+        return 'ISB GE Digital Interface stuff'
+    def path(self):
+        return DATA.mWorkingDir + "/ISB_DataStreaming"
+    def _rawCheckout(self):
+        self._changeDirToBase()
+        runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef %s' % self.sourceFolder())
+    def update(self):
+        self._changeDirToSource()
+        runShell('svn up')
+    def configure(self):
+        self._changeDirToBuild()
+        runShell('''\
+cmake \
+-G"%s" \
+%s \
+-DCMAKE_BUILD_TYPE:STRING=%s \
+-DBUILD_SHARED_LIBS:BOOL=%s \
+-DVTK_DIR:PATH="%s" \
+-DDATASTREAMING_USE_HDF:BOOL=OFF \
+-DDATASTREAMING_USE_TRACKING:BOOL=OFF \
+../%s''' % (DATA.mCMakeGenerator, 
+            DATA.m32bitCompileCMakeOption, 
+            DATA.mBuildType, 
+            DATA.mBuildShared, 
+            VTK().buildPath(), 
+            self.sourceFolder()+"/vtkDataStreamClient/")
+            )
+        # add xcode project here if needed
+    # ---------------------------------------------------------
+
 class SSC(CppComponent):
     def name(self):
         return "SSC"
@@ -625,6 +659,7 @@ cmake \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
+-DGEStreamer_DIR:PATH="%s" \
 ../%s''' % (DATA.mCMakeGenerator, 
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, DATA.mBuildShared, 
@@ -637,6 +672,7 @@ cmake \
             UltrasonixSDK().libFile(),
             DATA.mBuildSSCExamples,
             #DCMTK().installPath(), 
+            ISB_DataStreaming().buildPath(),
             self.sourceFolder() )
             )
         #TODO add xcode project here if needed?
@@ -707,6 +743,7 @@ class Controller(object):
                      IGSTK(),
                      #DCMTK(),
                      #SSC(),
+                     ISB_DataStreaming(),
                      UltrasonixSDK(),
                      CustusX3()
                      #CustusX3Data()
