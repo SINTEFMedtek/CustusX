@@ -349,7 +349,8 @@ class VTK(CppComponent):
         self.update()
     def update(self):
         self._changeDirToSource()
-        runShell('git checkout v5.10.0')   # needed for gcc 4.6, not good on non-linux
+		#Note: vtk 5.10 contains a bug in STLReader. Skip that version (http://vtk.1045678.n5.nabble.com/VTK-0013160-vtkSTLReader-does-not-read-files-any-more-td5700473.html)
+        runShell('git checkout v5.8.0') 
     def configure(self):
         '''
 Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-collection (!)
