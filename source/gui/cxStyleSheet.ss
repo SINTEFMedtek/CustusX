@@ -11,7 +11,7 @@ QGroupBox
 	font: bold;
 	border: 1px solid gray; 
 	border-radius: 5px;
-	margin-top: 1ex;
+	margin-top: 1.5ex;
 }
 QGroupBox::title 
 {
