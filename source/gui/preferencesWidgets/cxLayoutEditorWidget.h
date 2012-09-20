@@ -75,6 +75,7 @@ private:
   void colorRegion(LayoutRegion region, QString selectColor, QString backColor);
   std::set<LayoutData::iterator> getSelectedViews();
   void updateSelection(QPoint pos);
+  void setSaneGroupIDs();
 
   QBoxLayout* mTopLayout;
   QBoxLayout* mRCLayout;
