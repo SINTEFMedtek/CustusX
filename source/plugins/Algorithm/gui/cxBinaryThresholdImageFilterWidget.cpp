@@ -224,8 +224,8 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
   connect(smoothingCheckBox, SIGNAL(toggled(bool)), this, SLOT(toogleSmoothingSlot(bool)));
 
   mSmoothingSigmaAdapter = ssc::DoubleDataAdapterXml::initialize("Smoothing sigma", "",
-      "Used for smoothing the segmented volume",
-      0.5, ssc::DoubleRange(0, 10, 0.1), 1);
+      "Used for smoothing the segmented volume. Measured in units of image spacing.",
+      0.10, ssc::DoubleRange(0, 5, 0.01), 2);
 
   layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mSegmentationThresholdAdapter));
   //We currently only have binary thresholding, so we remove this checkbox for now
