@@ -104,6 +104,7 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 
 	mAlgorithmGroup = new QFrame(this);
 	mAlgorithmGroup->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
+	mAlgorithmGroup->setSizePolicy(mAlgorithmGroup->sizePolicy().horizontalPolicy(),QSizePolicy::Fixed);
 
 	QVBoxLayout* algoOuterLayout = new QVBoxLayout(mAlgorithmGroup);
 	ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mAlgorithmAdapter);
@@ -111,7 +112,7 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	mAlgoLayout = new QStackedLayout;
 	this->repopulateAlgorithmGroup();
 	algoOuterLayout->addLayout(mAlgoLayout);
-	algoOuterLayout->addStretch();
+	//algoOuterLayout->addStretch();
 	layout->addWidget(mAlgorithmGroup, line, 0, 1, 2);
 	++line;
 

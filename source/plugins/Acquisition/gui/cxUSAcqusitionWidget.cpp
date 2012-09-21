@@ -51,11 +51,15 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	new ssc::LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New(), editsLayout, 0);
 	new ssc::LabeledComboBoxWidget(this, mPluginData->getReconstructer()->getParams()->mPresetTFAdapter, editsLayout, 1);
 
-	this->createAction(this,
+	QAction* optionsAction = this->createAction(this,
 	      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
 	      "Details", "Show Advanced Settings",
 	      SLOT(toggleDetailsSlot()),
-	      mLayout);
+	      NULL);
+
+	  QToolButton* optionsButton = new QToolButton();
+	  optionsButton->setDefaultAction(optionsAction);
+	  editsLayout->addWidget(optionsButton, 0, 2);
 
 	mOptionsWidget = this->createOptionsWidget();
 	mOptionsWidget->setVisible(settings()->value("acquisition/UsAcqShowDetails").toBool());
@@ -97,6 +101,14 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
 	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget,
 		SLOT(setToolSlot(const QString&)));
+
+	// define sound speed group
+	QGroupBox* soundSpeedGroupBox = new QGroupBox("Sound Speed");
+	soundSpeedGroupBox->setToolTip("Sound Speed");
+	QVBoxLayout* soundSpeedLayout = new QVBoxLayout(soundSpeedGroupBox);
+	soundSpeedLayout->addWidget(soundSpeedWidget);
+	soundSpeedLayout->setMargin(soundSpeedLayout->margin()/2);
+
 	//for testing sound speed converting - END
 
 	int line = 0;
@@ -104,7 +116,7 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	layout->addWidget(this->createHorizontalLine(), line, 0, 1, 1);
 	++line;
 
-	// define cropping group
+	// define probe group
 	QGroupBox* probeGroupBox = new QGroupBox("Probe");
 	probeGroupBox->setToolTip("Probe Definition");
 	QVBoxLayout* probeLayout = new QVBoxLayout(probeGroupBox);
@@ -115,7 +127,7 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 //	layout->addWidget(probeWidget, line, 0);
 	layout->addWidget(probeGroupBox, line, 0);
 	++line;
-	layout->addWidget(soundSpeedWidget, line, 0);
+	layout->addWidget(soundSpeedGroupBox, line, 0);
 	++line;
 	layout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()), line, 0);
 	++line;
