@@ -17,6 +17,7 @@
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxTimedAlgorithmProgressBar.h"
+#include "cxRepManager.h"
 
 namespace cx
 {
@@ -90,7 +91,7 @@ void SurfaceWidget::setImageInputSlot(QString value)
 
 void SurfaceWidget::preprocessContour()
 {
-	patientService()->getThresholdPreview()->removePreview(this);
+	RepManager::getInstance()->getThresholdPreview()->removePreview(this);
 
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   double decimation = mDecimationAdapter->getValue()/100;
@@ -195,7 +196,7 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 
 void SurfaceWidget::thresholdSlot()
 {
-	patientService()->getThresholdPreview()->setPreview(this, mSelectedImage->getImage(),
+	RepManager::getInstance()->getThresholdPreview()->setPreview(this, mSelectedImage->getImage(),
 			mSurfaceThresholdAdapter->getValue());
 }
 //------------------------------------------------------------------------------
