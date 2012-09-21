@@ -65,17 +65,6 @@ void FastOrientationRegistrationWidget::hideEvent(QHideEvent* event)
 
 void FastOrientationRegistrationWidget::setOrientationSlot()
 {
-//  ssc::Transform3D tMtm;
-//
-//  if (mInvertButton->isChecked())
-//  {
-//    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI/2);//-M_PI_2); //?
-//  }
-//  else
-//  {
-//    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI/2);//M_PI_2); //?
-//  }
-
   mManager->doFastRegistration_Orientation(this->get_tMtm());
 }
 
@@ -85,11 +74,11 @@ ssc::Transform3D FastOrientationRegistrationWidget::get_tMtm() const
 
 	if (mInvertButton->isChecked())
 	{
-		tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI / 2); //-M_PI_2); //?
+		tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(-M_PI / 2);
 	}
 	else
 	{
-		tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI / 2); //M_PI_2); //?
+		tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI / 2);
 	}
 
 	return tMtm;
@@ -97,17 +86,6 @@ ssc::Transform3D FastOrientationRegistrationWidget::get_tMtm() const
 
 void FastOrientationRegistrationWidget::setPatientOrientationSlot()
 {
-//  ssc::Transform3D tMtm;
-//
-//  if (mInvertButton->isChecked())
-//  {
-//    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI/2);//-M_PI_2); //?
-//  }
-//  else
-//  {
-//    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI/2);//M_PI_2); //?
-//  }
-
   mManager->applyPatientOrientation(this->get_tMtm());
 }
 
