@@ -11,7 +11,6 @@ SET( CX_QT_MOC_HEADER_FILES
     cxPatientData.h
     cxPatientService.h
 	cxDataManager.h
-    cxThresholdPreview.h
     cxActiveImageProxy.h
 )
 
@@ -26,8 +25,6 @@ SET ( cxPatientService_SOURCE
     cxPatientService.cpp
     cxFrameForest.h
     cxFrameForest.cpp
-    cxThresholdPreview.h
-    cxThresholdPreview.cpp
     cxActiveImageProxy.h
     cxActiveImageProxy.cpp
     

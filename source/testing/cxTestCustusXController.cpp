@@ -7,18 +7,19 @@
 
 #include "cxTestCustusXController.h"
 
-#include <QTextEdit>
-#include "cxPatientData.h"
-#include "cxRenderTimer.h"
-#include "sscDataManager.h"
-#include "cxToolManager.h"
-#include "sscDummyTool.h"
 #include <sstream>
+#include <QTextEdit>
 #include <QTimer>
-#include "sscTypeConversions.h"
 
+#include "sscDataManager.h"
+#include "sscDummyTool.h"
+#include "sscTypeConversions.h"
 #include "sscData.h"
 #include "sscConsoleWidget.h"
+#include "sscImage.h"
+#include "cxPatientData.h"
+#include "cxRenderTimer.h"
+#include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxPatientService.h"
