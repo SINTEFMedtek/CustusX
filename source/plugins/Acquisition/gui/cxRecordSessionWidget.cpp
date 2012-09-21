@@ -9,6 +9,7 @@
 #include "sscMessageManager.h"
 #include "cxRecordSession.h"
 #include "cxToolManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -24,6 +25,7 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionDataPtr pluginData, QWidget*
     mPostProcessing(false)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->setMargin(0);
   mDescriptionLabel = new QLabel("Description:");
   layout->addWidget(mInfoLabel);
   layout->addWidget(mDescriptionLabel);
