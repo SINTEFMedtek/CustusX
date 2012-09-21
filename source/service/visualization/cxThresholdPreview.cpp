@@ -13,9 +13,13 @@
 // See CustusX_License.txt for more information.
 
 #include "cxThresholdPreview.h"
+#include <vtkVolume.h>
+#include <vtkVolumeProperty.h>
 #include <QWidget>
 #include "sscImageTF3D.h"
 #include "sscImageLUT2D.h"
+#include "sscVolumetricRep.h"
+#include "cxRepManager.h"
 
 namespace cx
 {
@@ -45,9 +49,17 @@ void ThresholdPreview::revertTransferFunctions()
 	mModifiedImage->resetTransferFunction(mTF3D_original, mTF2D_original);
 	mModifiedImage->setShadingOn(mShadingOn_original);
 
+	//Go back to VTK linear interpolation
+	ssc::VolumetricRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(mModifiedImage);
+	if(volumeRep)
+		volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
+	else
+		ssc::messageManager()->sendError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
+
 	mTF3D_original.reset();
 	mTF2D_original.reset();
 	mModifiedImage.reset();
+
 }
 
 /**
@@ -92,6 +104,13 @@ void ThresholdPreview::setPreview(QWidget* fromWidget, ssc::ImagePtr image, doub
 	lut2D->addColorPoint(setValue, Qt::green);
 	lut2D->addColorPoint(image->getMax(), Qt::green);
 	lut2D->setLLR(setValue);
+
+	//Remove VTK linear interpolation
+	ssc::VolumetricRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(image);
+	if(volumeRep)
+		volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
+	else
+		ssc::messageManager()->sendError("ThresholdPreview::setPreview() can not find VolumetricRep");
 
 	//Start timer that reverts transfer functions when widget is no longer visible
 	mRemoveTimer->start(500);
