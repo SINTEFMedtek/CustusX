@@ -18,12 +18,12 @@
 #include "vtkSplineWidget.h"
 #include "vtkSplineWidget2.h"
 #include "vtkSplineRepresentation.h"
-#include "cxView3D.h"
 #include "vtkRenderWindow.h"
 #include <vtkSphere.h>
 #include <vtkClipPolyData.h>
-#include "sscMesh.h"
+#include <vtkImageData.h>
 
+#include "sscMesh.h"
 #include "sscStringDataAdapter.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscDefinitionStrings.h"
@@ -31,13 +31,14 @@
 #include "sscUtilHelpers.h"
 #include "sscMessageManager.h"
 #include "sscRegistrationTransform.h"
-#include "cxInteractiveCropper.h"
-#include "cxPatientData.h"
-#include <vtkImageData.h>
 #include "sscImageAlgorithms.h"
-#include "cxPatientService.h"
-#include "cxViewManager.h"
 #include "sscDoubleWidgets.h"
+#include "sscImage.h"
+#include "cxPatientData.h"
+#include "cxPatientService.h"
+#include "cxView3D.h"
+#include "cxInteractiveCropper.h"
+#include "cxViewManager.h"
 #include "cxToolManager.h"
 #include "cxViewWrapper.h"
 #include "cxViewGroup.h"
