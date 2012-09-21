@@ -15,10 +15,11 @@
 #include "sscData.h"
 #include "sscDataManager.h"
 #include "sscRegistrationTransform.h"
+#include "sscImageAlgorithms.h"
+#include "sscImage.h"
 #include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
-#include "sscImageAlgorithms.h"
 
 namespace cx
 {

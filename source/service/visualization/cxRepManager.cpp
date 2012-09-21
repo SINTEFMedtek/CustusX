@@ -53,12 +53,18 @@ RepManager::RepManager()
 {
 	mIsUsingGPU3DMapper = false;
 	mMaxRenderSize = 0;
+	mThresholdPreview.reset(new ThresholdPreview());
 
   connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(volumeRemovedSlot(QString)));
 }
 
 RepManager::~RepManager()
 {
+}
+
+ThresholdPreviewPtr RepManager::getThresholdPreview()
+{
+	return mThresholdPreview;
 }
 
 ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
