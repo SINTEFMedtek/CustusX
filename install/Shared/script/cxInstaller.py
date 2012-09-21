@@ -474,7 +474,7 @@ class IGSTK(CppComponent):
         runShell('git branch -D cx_mod_for_50')
         runShell('git checkout -B cx_mod_for_50')
         #TODO this can be a bug, if CustusX is not checked out yet, this will not work!!!
-        runShell(('git am --whitespace=fix --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
+        runShell(('git am --whitespace=fix --signoff < %s/%s/install/Shared/script/IGSTK-5-0-v2.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
