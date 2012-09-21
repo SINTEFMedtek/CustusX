@@ -42,18 +42,29 @@ LandmarkImage2ImageRegistrationWidget::LandmarkImage2ImageRegistrationWidget(Reg
 
 	mFixedDataAdapter.reset(new RegistrationFixedImageStringDataAdapter(regManager));
 	mMovingDataAdapter.reset(new RegistrationMovingImageStringDataAdapter(regManager));
+
+	mTranslationCheckBox = new QCheckBox("Translation only", this);
+	mTranslationCheckBox->setChecked(settings()->value("registration/I2ILandmarkTranslation", false).toBool());
+	connect(mTranslationCheckBox, SIGNAL(toggled(bool)), this, SLOT(translationCheckBoxChanged()));
+
 	mRegisterButton = new QPushButton("Register", this);
 	mRegisterButton->setToolTip("Perform registration");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
 	mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFixedDataAdapter));
 	mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mMovingDataAdapter));
+	mVerticalLayout->addWidget(mTranslationCheckBox);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
 
 	QHBoxLayout* regLayout = new QHBoxLayout;
 	regLayout->addWidget(mRegisterButton);
 	mVerticalLayout->addLayout(regLayout);
 	mVerticalLayout->addStretch();
+}
+
+void LandmarkImage2ImageRegistrationWidget::translationCheckBoxChanged()
+{
+	settings()->setValue("registration/I2ILandmarkTranslation", mTranslationCheckBox->isChecked());
 }
 
 void LandmarkImage2ImageRegistrationWidget::updateRep()
@@ -122,7 +133,7 @@ ssc::LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() con
 
 void LandmarkImage2ImageRegistrationWidget::performRegistration()
 {
-	mManager->doImageRegistration();
+	mManager->doImageRegistration(mTranslationCheckBox->isChecked());
 	this->updateAvarageAccuracyLabel();
 }
 

@@ -50,7 +50,7 @@ public:
   ssc::DataPtr getMovingData();
 
   void doPatientRegistration(); ///< registrates the fixed image to the patient
-  void doImageRegistration(); ///< registrates the image to the fixed image
+  void doImageRegistration(bool translationOnly); ///< registrates the image to the fixed image
   void doFastRegistration_Orientation(const ssc::Transform3D& tMtm); ///< use the current dominant tool orientation to find patient orientation
   void doFastRegistration_Translation(); ///< use the landmarks in master image and patient to perform a translation-only landmark registration
   void applyPatientOrientation(const ssc::Transform3D& tMtm);
@@ -77,6 +77,7 @@ protected:
   ssc::Transform3D performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const;
   vtkPointsPtr convertTovtkPoints(const std::vector<QString>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
   std::vector<ssc::Vector3D> convertAndTransformToPoints(const std::vector<QString>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
+  std::vector<ssc::Vector3D> convertVtkPointsToPoints(vtkPointsPtr base);
   std::vector<QString> getUsableLandmarks(const ssc::LandmarkMap& data_a, const ssc::LandmarkMap& data_b);
   void updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data, QString masterFrame);
   void writePreLandmarkRegistration(QString name, ssc::LandmarkMap landmarks);
