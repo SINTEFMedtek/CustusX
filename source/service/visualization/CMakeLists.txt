@@ -24,6 +24,7 @@ SET( CX_QT_MOC_HEADER_FILES
     Rep/sscOrientationAnnotation3DRep.h
     Rep/sscOrientationAnnotation2DRep.h
     cxRepManager.h
+    cxThresholdPreview.h
 )
 
 SET ( cxVisualizationService_SOURCE
@@ -66,6 +67,8 @@ SET ( cxVisualizationService_SOURCE
     Rep/sscOrientationAnnotation2DRep.cpp
     cxRepManager.h
     cxRepManager.cpp
+    cxThresholdPreview.h
+    cxThresholdPreview.cpp
     )
 
 include_directories(
