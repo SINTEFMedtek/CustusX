@@ -45,6 +45,7 @@ public:
 protected slots:
 	void updateRep();
 	void registerSlot();
+	void translationCheckBoxChanged();
 
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -64,6 +65,7 @@ protected:
 	RegistrationMovingImageStringDataAdapterPtr mMovingDataAdapter;
 
 	QPushButton* mRegisterButton;
+	QCheckBox* mTranslationCheckBox;
 
 private:
 	LandmarkImage2ImageRegistrationWidget(); ///< not implemented

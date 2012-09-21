@@ -23,6 +23,7 @@
 #include "sscMessageManager.h"
 #include "sscTool.h"
 #include "sscTypeConversions.h"
+#include "cxThresholdPreview.h"
 
 namespace ssc
 {
@@ -61,6 +62,8 @@ Q_OBJECT
 public:
 	static RepManager* getInstance(); ///< get the only instance of this class
 	static void destroyInstance(); ///< destroy the only instance of this class
+
+	ThresholdPreviewPtr getThresholdPreview(); ///< Get the ThresholdPreview object
 
 	template<class REP>
 	static boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps, ssc::ToolPtr tool)
@@ -166,6 +169,7 @@ private:
 	virtual ~RepManager(); ///< empty
 	RepManager(RepManager const&); ///< not implemented
 	RepManager& operator=(RepManager const&); ///< not implemented
+	ThresholdPreviewPtr mThresholdPreview; ///< Preview a volume with a selected threshold
 };
 
 //RepManager* repManager();
