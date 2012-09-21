@@ -3,18 +3,18 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QGroupBox>
+#include <vtkImageData.h>
 #include "sscStringDataAdapter.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscDefinitionStrings.h"
-#include "sscDataManager.h"
 #include "sscUtilHelpers.h"
 #include "sscMessageManager.h"
 #include "sscRegistrationTransform.h"
+#include "sscImageAlgorithms.h"
 #include "cxInteractiveCropper.h"
 #include "cxPatientData.h"
-#include <vtkImageData.h>
-#include "sscImageAlgorithms.h"
 #include "cxPatientService.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
