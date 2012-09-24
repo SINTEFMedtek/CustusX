@@ -364,13 +364,28 @@ void MetricWidget::addPointButtonClickedSlot()
 void MetricWidget::addPlaneButtonClickedSlot()
 {
   ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
-  ssc::Vector3D p_ref = ssc::SpaceHelpers::getDominantToolTipPoint(ref, true);
+//  ssc::Vector3D p_ref = ssc::SpaceHelpers::getDominantToolTipPoint(ref, true);
 
   ssc::PlaneMetricPtr p1(new ssc::PlaneMetric("plane%1","plane%1"));
   p1->get_rMd_History()->setParentSpace("reference");
   p1->setSpace(ref);
-  p1->setCoordinate(p_ref);
-  p1->setNormal(ssc::Vector3D(1,0,0));
+
+  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+  if (!tool)
+  {
+	  p1->setCoordinate(ssc::Vector3D(0,0,0));
+	  p1->setNormal(ssc::Vector3D(1,0,0));
+  }
+  else
+  {
+	  ssc::CoordinateSystem from(ssc::csTOOL_OFFSET, tool->getUid());
+	  ssc::Vector3D point_t = ssc::Vector3D(0,0,0);
+	  ssc::Transform3D rMto = ssc::CoordinateSystemHelpers::get_toMfrom(from, ref);
+
+	  p1->setCoordinate(rMto.coord(ssc::Vector3D(0,0,0)));
+	  p1->setNormal(rMto.vector(ssc::Vector3D(0,0,1)));
+  }
+
   ssc::dataManager()->loadData(p1);
 	this->setActiveUid(p1->getUid());
 
