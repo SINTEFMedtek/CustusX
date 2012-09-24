@@ -93,6 +93,27 @@ bool SetupEnvironmentForDepthPeeling(
   return true;
 }
 
+bool TurnOffDepthPeeling(
+		vtkSmartPointer<vtkRenderWindow> renderWindow,
+		vtkSmartPointer<vtkRenderer> renderer)
+{
+  if (!renderWindow || !renderer)
+  {
+	  ssc::messageManager()->sendWarning("Can't turn off depth peeling. No render / renderwindow");
+	  return false;
+  }
+
+  // Set values back to defaults
+  // TODO: Save defaults (see IsDepthPeelingSupported())
+  renderWindow->SetAlphaBitPlanes(false);
+  renderWindow->SetMultiSamples(8);
+  renderer->SetUseDepthPeeling(false);
+  renderer->SetMaximumNumberOfPeels(4);
+  renderer->SetOcclusionRatio(0.0);
+
+  return true;
+}
+
 /**
  * Find out whether this box supports depth peeling. Depth peeling requires
  * a variety of openGL extensions and appropriate drivers.
