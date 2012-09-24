@@ -70,18 +70,18 @@ View::~View()
 }
 
 ViewWidget::ViewWidget(QWidget *parent, Qt::WFlags f) :
-	   widget(parent, f),
-	   View(this, this->size()),
-	   mRenderWindow(ViewRenderWindowPtr::New())
+	widget(parent, f),
+	View(this, this->size()),
+	mRenderWindow(ViewRenderWindowPtr::New())
 {
 	this->SetRenderWindow(mRenderWindow);
 	clear();
 }
 
 ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
-	   widget(parent, f),
-	   View(this, this->size(), uid, name),
-	   mRenderWindow(ViewRenderWindowPtr::New())
+	widget(parent, f),
+	View(this, this->size(), uid, name),
+	mRenderWindow(ViewRenderWindowPtr::New())
 {
 	this->SetRenderWindow(mRenderWindow);
 	clear();
@@ -358,7 +358,7 @@ ssc::DoubleBoundingBox3D View::getViewport_s() const
 Transform3D View::get_vpMs() const
 {
 	Vector3D center_vp = this->getViewport().center();
-	double scale = mZoomFactor / this->mmPerPix();	//  double zoomFactor = 0.3; // real magnification
+	double scale = mZoomFactor / this->mmPerPix(); // double zoomFactor = 0.3; // real magnification
 	Transform3D S = createTransformScale(Vector3D(scale, scale, scale));
 	Transform3D T = createTransformTranslate(center_vp);// center of viewport in viewport coordinates
 	Transform3D M_vp_w = T * S; // first scale , then translate to center.
