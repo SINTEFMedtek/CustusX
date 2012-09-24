@@ -266,7 +266,10 @@ void ViewGroup::mouseClickInViewGroupSlot()
 {
 	std::vector<ssc::ImagePtr> images = mViewGroupData->getImages();
 	if (images.empty())
-		ssc::dataManager()->setActiveImage(ssc::ImagePtr());
+	{
+		//Don't remove active image too easily
+		//ssc::dataManager()->setActiveImage(ssc::ImagePtr());
+	}
 	else
 	{
 		if (!std::count(images.begin(), images.end(), ssc::dataManager()->getActiveImage()))
