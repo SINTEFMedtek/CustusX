@@ -72,7 +72,7 @@ void IgstkToolManager::setReferenceAndTrackerOnTools()
 {
 	if (!mReferenceTool)
 	{
-		ssc::messageManager()->sendDebug("Tracking is configured without a reference tool.");
+		ssc::messageManager()->sendWarning("Tracking is configured without a reference tool.");
 	}
 
 	std::map<QString, IgstkToolPtr>::iterator it;
