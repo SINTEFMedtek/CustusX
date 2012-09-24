@@ -235,8 +235,25 @@ QString PlaneMetricWrapper::getArguments() const
 
 void PlaneMetricWrapper::moveToToolPosition()
 {
-  ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(mData->getSpace(), true);
-  mData->setCoordinate(p);
+	//  ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(mData->getSpace(), true);
+	//  mData->setCoordinate(p);
+//	ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
+
+	ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+	if (!tool)
+	{
+		mData->setCoordinate(ssc::Vector3D(0, 0, 0));
+		mData->setNormal(ssc::Vector3D(1, 0, 0));
+	}
+	else
+	{
+		ssc::CoordinateSystem from(ssc::csTOOL_OFFSET, tool->getUid());
+		ssc::Vector3D point_t = ssc::Vector3D(0, 0, 0);
+		ssc::Transform3D rMto = ssc::CoordinateSystemHelpers::get_toMfrom(from, mData->getSpace());
+
+		mData->setCoordinate(rMto.coord(ssc::Vector3D(0, 0, 0)));
+		mData->setNormal(rMto.vector(ssc::Vector3D(0, 0, 1)));
+	}
 }
 
 void PlaneMetricWrapper::spaceSelected()
