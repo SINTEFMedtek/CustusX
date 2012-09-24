@@ -114,16 +114,16 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	for (unsigned i = 0; i < plugins.size(); ++i)
 	{
 		std::vector<PluginBase::PluginWidget> widgets = plugins[i]->createWidgets();
-		for (unsigned i = 0; i < widgets.size(); ++i)
+		for (unsigned j = 0; j < widgets.size(); ++j)
 		{
-			this->addAsDockWidget(widgets[i].mWidget, widgets[i].mCategory);
+			this->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory);
 		}
 
 		std::vector<QToolBar*> toolBars = plugins[i]->createToolBars();
-		for (unsigned i = 0; i < toolBars.size(); ++i)
+		for (unsigned j = 0; j < toolBars.size(); ++j)
 		{
-			this->addToolBar(toolBars[i]);
-			this->registerToolBar(toolBars[i], "Toolbar");
+			this->addToolBar(toolBars[j]);
+			this->registerToolBar(toolBars[j], "Toolbar");
 		}
 	}
 
@@ -715,18 +715,27 @@ void MainWindow::importDataSlot()
 {
 	this->savePatientFileSlot();
 
+	QString folder = mLastImportDataFolder;
+	if (folder.isEmpty())
+		folder = settings()->value("globalPatientDataFolder").toString();
+
 	//ssc::messageManager()->sendInfo("Importing data...");
-	QString fileName = QFileDialog::getOpenFileName(this, QString(tr("Select data file for import")),
-		settings()->value("globalPatientDataFolder").toString(), tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
-	if (fileName.isEmpty())
+	QStringList fileName = QFileDialog::getOpenFileNames(this, QString(tr("Select data file(s) for import")),
+		folder, tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
+	if (fileName.empty())
 	{
 		ssc::messageManager()->sendInfo("Import canceled");
 		return;
 	}
 
-	ImportDataDialog* wizard = new ImportDataDialog(fileName, this);
-	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction
-	//with the system
+	mLastImportDataFolder = QFileInfo(fileName[0]).absolutePath();
+
+	for (int i=0; i<fileName.size(); ++i)
+	{
+		ImportDataDialog* wizard = new ImportDataDialog(fileName[i], this);
+		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
+	}
+
 }
 
 void MainWindow::patientChangedSlot()
