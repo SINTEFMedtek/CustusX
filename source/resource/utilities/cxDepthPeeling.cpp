@@ -90,7 +90,12 @@ bool SetupEnvironmentForDepthPeeling(
   // - Set the occlusion ratio (initial value is 0.0, exact image):
   renderer->SetOcclusionRatio(occlusionRatio);
 
-  return true;
+  // Do a test render
+  renderWindow->Render();
+  // Check whether depth peeling was used
+  bool success = renderer->GetLastRenderingUsedDepthPeeling();
+
+  return success;
 }
 
 bool TurnOffDepthPeeling(
