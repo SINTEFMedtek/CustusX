@@ -1,55 +1,55 @@
 <!DOCTYPE PresetTransferFunctions3D>
 <root>
-	<Preset modality="CT" name="CT Abdomen">
+	<Preset modality="CT" name="3D CT Abdomen">
 		<transferfunctions>
 		    <alpha>-1024=0 -334=0 45=0 182=138 318=255 1504=255</alpha>
 		    <color>-1024=0/0/0 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset modality="CT" name="CT Bone">
+	<Preset modality="CT" name="3D CT Bone">
 		<transferfunctions>
 		    <alpha>-1024=0 -334=0 120=0 230=255 1504=255</alpha>
 		    <color>-1024=0/0/0 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset modality="CT" name="CT Lung + bone">
+	<Preset modality="CT" name="3D CT Lung + bone">
 		<transferfunctions>
 		    <alpha>-1024=128 -472=0 135=0 230=255 1504=255</alpha>
 		    <color>-1024=102/192/255 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset modality="CT" name="CT Lung">
+	<Preset modality="CT" name="3D CT Lung">
 		<transferfunctions>
 		    <alpha>-1024=70 -472=70 1504=0</alpha>
 		    <color>-1024=102/192/255 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset modality="CT" name="CT Aorta">
+	<Preset modality="CT" name="3D CT Aorta">
 		<transferfunctions>
 		    <alpha>-1024=0 -724=0 82=1 177=85 543=1 449=2 1504=0</alpha>
 		    <color>-1024=144/203/255 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset modality="CT" name="CT Lung + aorta">
+	<Preset modality="CT" name="3D CT Lung + aorta">
 		<transferfunctions>
 		    <alpha>-1024=30 -724=0 82=1 204=156 208=189 366=1 449=2 1504=0</alpha>
 		    <color>-1024=144/203/255 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset modality="CT" name="CT Airways">
+	<Preset modality="CT" name="3D CT Airways">
 		<transferfunctions>
 		    <alpha>-1024=0 -662=0 -326=147 -98=0 3071=0</alpha>
 		    <color>-1024=0/0/0 936=0/255/255 1701=255/0/0 3071=255/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset modality="CT" name="Soft Tissue CT - Standard">
+	<Preset modality="CT" name="3D Soft Tissue CT - Standard">
 		<transferfunctions>
 		    <alpha>0=0 202=7 404=34 549=174</alpha>
 		    <color>12=0/0/0 202=255/0/0 404=255/255/0 549=255/255/255</color>
