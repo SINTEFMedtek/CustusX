@@ -90,6 +90,32 @@ bool SetupEnvironmentForDepthPeeling(
   // - Set the occlusion ratio (initial value is 0.0, exact image):
   renderer->SetOcclusionRatio(occlusionRatio);
 
+  // Do a test render
+  renderWindow->Render();
+  // Check whether depth peeling was used
+  bool success = renderer->GetLastRenderingUsedDepthPeeling();
+
+  return success;
+}
+
+bool TurnOffDepthPeeling(
+		vtkSmartPointer<vtkRenderWindow> renderWindow,
+		vtkSmartPointer<vtkRenderer> renderer)
+{
+  if (!renderWindow || !renderer)
+  {
+	  ssc::messageManager()->sendWarning("Can't turn off depth peeling. No render / renderwindow");
+	  return false;
+  }
+
+  // Set values back to defaults
+  // TODO: Save defaults (see IsDepthPeelingSupported())
+  renderWindow->SetAlphaBitPlanes(false);
+  renderWindow->SetMultiSamples(8);
+  renderer->SetUseDepthPeeling(false);
+  renderer->SetMaximumNumberOfPeels(4);
+  renderer->SetOcclusionRatio(0.0);
+
   return true;
 }
 
