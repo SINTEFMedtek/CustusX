@@ -63,17 +63,6 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 //	std::cout << QString(stylesheet.readAll()) << std::endl;
 	qApp->setStyleSheet(stylesheet.readAll());
 
-	// insert all widgets from all plugins
-	for (unsigned i = 0; i < plugins.size(); ++i)
-	{
-		std::vector<PluginBase::PluginWidget> widgets = plugins[i]->createWidgets();
-		for (unsigned i = 0; i < widgets.size(); ++i)
-		{
-			this->addAsDockWidget(widgets[i].mWidget, widgets[i].mCategory);
-		}
-
-	}
-
 	mCameraControl.reset(new CameraControl(this));
 
 	this->createActions();
@@ -119,6 +108,26 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
 	connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
+
+
+	// insert all widgets from all plugins
+	for (unsigned i = 0; i < plugins.size(); ++i)
+	{
+		std::vector<PluginBase::PluginWidget> widgets = plugins[i]->createWidgets();
+		for (unsigned i = 0; i < widgets.size(); ++i)
+		{
+			this->addAsDockWidget(widgets[i].mWidget, widgets[i].mCategory);
+		}
+
+		std::vector<QToolBar*> toolBars = plugins[i]->createToolBars();
+		for (unsigned i = 0; i < toolBars.size(); ++i)
+		{
+			this->addToolBar(toolBars[i]);
+			this->registerToolBar(toolBars[i], "Toolbar");
+		}
+	}
+
+
 	this->layoutChangedSlot();
 
 	// Restore saved window states
