@@ -202,10 +202,10 @@ void PerformanceTab::init()
 	mGPU2DRenderCheckBox->setEnabled(false);
 #endif
 
-  bool useGPU3DDepthPeeling = settings()->value("View3D/depthPeeling").toBool();
-	mGPU3DDepthPeelingCheckBox = new QCheckBox("Use GPU 3D depth peeling");
-	mGPU3DDepthPeelingCheckBox->setChecked(useGPU3DDepthPeeling);
-	mGPU3DDepthPeelingCheckBox->setToolTip("Use a GPU-based 3D depth peeling to correctly visualize translucent surfaces.");
+//  bool useGPU3DDepthPeeling = settings()->value("View3D/depthPeeling").toBool();
+//	mGPU3DDepthPeelingCheckBox = new QCheckBox("Use GPU 3D depth peeling");
+//	mGPU3DDepthPeelingCheckBox->setChecked(useGPU3DDepthPeeling);
+//	mGPU3DDepthPeelingCheckBox->setToolTip("Use a GPU-based 3D depth peeling to correctly visualize translucent surfaces.");
 
   //Layout
   mMainLayout = new QGridLayout;
@@ -216,7 +216,7 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
   mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
   mMainLayout->addWidget(mGPU2DRenderCheckBox, 4, 0);
-  mMainLayout->addWidget(mGPU3DDepthPeelingCheckBox, 5, 0);
+  //mMainLayout->addWidget(mGPU3DDepthPeelingCheckBox, 5, 0);
   new ssc::SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 6);
 
   mTopLayout->addLayout(mMainLayout);
