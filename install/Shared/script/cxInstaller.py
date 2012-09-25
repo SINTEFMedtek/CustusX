@@ -348,9 +348,23 @@ class VTK(CppComponent):
         runShell('git clone http://vtk.org/VTK.git')
         self.update()
     def update(self):
+        '''
+            Howto create a patch using git:
+            Branch is created like this:
+            git checkout v5.8.0
+            git branch cx_mod_for_5-8-0
+            git checkout cx_mod_for_5-8-0
+            ... make you modifications ...
+            git commit -am "message"
+            git format-patch master --stdout > VTK-5-8-0.patch
+        '''
         self._changeDirToSource()
 		#Note: vtk 5.10 contains a bug in STLReader. Skip that version (http://vtk.1045678.n5.nabble.com/VTK-0013160-vtkSTLReader-does-not-read-files-any-more-td5700473.html)
         runShell('git checkout v5.8.0') 
+        runShell('git branch -D cx_mod_for_5-8-0')
+        runShell('git checkout -B cx_mod_for_5-8-0')
+        #TODO this can be a bug, if CustusX is not checked out yet, this will not work!!!
+        runShell(('git am --whitespace=fix --signoff < %s/%s/install/Shared/script/VTK-5-8-0.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
     def configure(self):
         '''
 Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-collection (!)
