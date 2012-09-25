@@ -235,7 +235,7 @@ void PerformanceTab::saveParametersSlot()
   settings()->setValue("maxRenderSize",     mMaxRenderSize->getValue());
   settings()->setValue("smartRender",       mSmartRenderCheckBox->isChecked());
   settings()->setValue("stillUpdateRate",   mStillUpdateRate->getValue());
-  settings()->setValue("View3D/depthPeeling", mGPU3DDepthPeelingCheckBox->isChecked());
+//  settings()->setValue("View3D/depthPeeling", mGPU3DDepthPeelingCheckBox->isChecked());
 }
 
 //==============================================================================
