@@ -81,6 +81,8 @@ void PlaneMetricRep::changedSlot()
 	{
 		mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
 		mNormal.reset(new ssc::GraphicalArrow3D(mView->getRenderer()));
+		mRect.reset(new Rect3D(mView->getRenderer(), mColor));
+		mRect->setLine(true, 1);
 	}
 
 	if (!mGraphicalPoint)
@@ -115,7 +117,23 @@ void PlaneMetricRep::rescale()
 //  std::cout << "s= " << size << "  ,scale= " << scale << std::endl;
 
 	mGraphicalPoint->setValue(p0_r);
-	mNormal->setValue(p0_r, n_r, sphereSize * 10);
+	mNormal->setValue(p0_r, n_r, sphereSize * 8);
+
+	// draw a rectangle showing the plane:
+	ssc::Vector3D e_z = n_r;
+	ssc::Vector3D k1(1,0,0);
+	ssc::Vector3D k2(0,1,0);
+	ssc::Vector3D e_x;
+	if (cross(k2,e_z).length() > cross(k1,e_z).length())
+		e_x = cross(k2,e_z)/cross(k2,e_z).length();
+	else
+		e_x = cross(k1,e_z)/cross(k1,e_z).length();
+
+	ssc::Vector3D e_y = cross(e_z,e_x);
+	ssc::Transform3D rMb = ssc::createTransformIJC(e_x, e_y, p0_r);
+	double bb_size = 0.10/size;
+	ssc::DoubleBoundingBox3D bb(-bb_size,bb_size,-bb_size,bb_size,0,0);
+	mRect->updatePosition(bb, rMb);
 
 //  double sphereSize = 0.007/size;
 	mGraphicalPoint->setRadius(sphereSize);
