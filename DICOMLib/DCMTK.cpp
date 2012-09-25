@@ -15,7 +15,6 @@
 #include <math.h>
 #include <limits>
 
-
 #include "DCMTK.h"
 
 #include "dcmtk/dcmdata/cmdlnarg.h"
@@ -1116,7 +1115,6 @@ const void *DICOM_raw_image(const struct series_t *series, struct instance_t *in
 	static void *buffer = NULL;	// to keep RGB buffer in memory
 	int maxFrames;
 
-
 	if (buffer)
 	{
 		free(buffer);
@@ -1346,7 +1344,7 @@ int DICOM_image_window_auto( struct series_t *series, struct instance_t *instanc
 		else
 		{
 			// fall back to window width 200 -> could be a problem if there
-			// are anywhere other extrem different values in the volume
+			// are anywhere other extremely different values in the volume
 			series->VOI.minmax.width = 200;
 			series->VOI.minmax.center = series->VOI.range.center + 100;
 		}
