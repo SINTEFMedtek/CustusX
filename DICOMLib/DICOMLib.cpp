@@ -90,7 +90,6 @@ static int setupSeries( struct study_t *study, progress_func_t *callback = NULL 
 {
 	if ( study->initialized == true )
 	{
-		SSC_LOG( "Study already initialized.");
 		return 0;
 	}
 	struct series_t *series;

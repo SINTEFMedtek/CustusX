@@ -15,7 +15,6 @@
 #include <math.h>
 #include <limits>
 
-
 #include "DCMTK.h"
 
 #include "dcmtk/dcmdata/cmdlnarg.h"
@@ -1116,7 +1115,6 @@ const void *DICOM_raw_image(const struct series_t *series, struct instance_t *in
 	static void *buffer = NULL;	// to keep RGB buffer in memory
 	int maxFrames;
 
-
 	if (buffer)
 	{
 		free(buffer);
@@ -1227,30 +1225,20 @@ const void *DICOM_raw_image(const struct series_t *series, struct instance_t *in
 	}
 }
 
-// My sincerest apologies for the convoluted code that follows. It was not
-// easy to make this function perform well. - Per
+
 const void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *y, int bits, int frame )
 {
 	const int planar = 0; /* interleave colour data, not separate; not that we use this for our monochrome data */
-	static DicomImage *dicomimage = NULL;	// cached
+	DicomImage *dicomimage;
 	const int interpolate = 4; /* bicubic algorithm */
 	const int aspect = (*x == 0 || *y == 0); /* no aspect ratio lock unless either x or y is zero */
 	struct series_t *series = instance->parent_series;
 	EI_Status status;
 	const void *buffer;
-	static DicomImage *scaled = NULL;	// to keep resulting buffer in memory
-	static char *savedPath = NULL;
-	static int savedX = -1, savedY = -1;
-	bool refreshScaled = false;
-
-	if ( !dicomimage || !savedPath || strcmp( instance->path, savedPath ) != 0 )
-	{
-		delete dicomimage;
-		dicomimage = new DicomImage( instance->path, CIF_AcrNemaCompatibility | CIF_MayDetachPixelData );
-		free( savedPath );
-		savedPath = strdup( instance->path );
-		refreshScaled = true;
-	}
+	DicomImage *scaled;
+	dicomimage = new DicomImage( instance->path, CIF_AcrNemaCompatibility | CIF_MayDetachPixelData | CIF_UsePartialAccessToPixelData,
+				     frame,
+				     1 );
 	status = dicomimage->getStatus();
 	if ( status != EIS_Normal )
 	{
@@ -1258,7 +1246,6 @@ const void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *
 		errno = EIO;
 		return NULL;
 	}
-
 	// Siemens mosaic stuff: Clipping the desired image from the mosaic ...
 	signed long clipX = 0; // Top left x coordinate for mosaic clipping
 	signed long clipY = 0; // Top left y coordinate for mosaic clipping
@@ -1274,16 +1261,13 @@ const void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *
 		frame = 0;
 	}
 
-	if ( !scaled || refreshScaled || savedX != *x || savedY != *y || series->mosaic )
+	if ( !series->mosaic )
 	{
-		delete scaled;
-		if ( !series->mosaic )
-			scaled = dicomimage->createScaledImage( (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
-		else
-			scaled = dicomimage->createScaledImage( clipX, clipY, clipWidth, clipHeight, (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
-		savedX = *x;
-		savedY = *y;
-
+		scaled = dicomimage->createScaledImage( (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
+	}
+	else
+	{
+		scaled = dicomimage->createScaledImage( clipX, clipY, clipWidth, clipHeight, (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
 	}
 	if ( !scaled )
 	{
@@ -1294,31 +1278,27 @@ const void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *
 	{
 		SSC_LOG( "Error from DCMTK when scaling: %s", scaled->getString( status ) );
 		delete scaled;
-		scaled = NULL;
 		errno = -3;
 		return NULL;
 	}
-
 	scaled->setPresentationLutShape( ESP_Default );
 	scaled->hideAllOverlays();
-
 	if ( series->VOI.current.width == 0 )
 	{
 		scaled->setNoVoiTransformation();
 	} else {
 		scaled->setWindow( series->VOI.current.center, series->VOI.current.width );
 	}
-
-	buffer = scaled->getOutputData( bits, frame, planar );
+	buffer = scaled->getOutputData( bits, 0, planar );
 	if ( !buffer )
 	{
 		SSC_LOG( "NULL buffer returned" );
 		delete scaled;
-		scaled = NULL;
 		errno = ENODATA;
 	}
 	*x = scaled->getWidth();
 	*y = scaled->getHeight();
+	delete dicomimage;
 	return buffer;
 }
 
@@ -1364,7 +1344,7 @@ int DICOM_image_window_auto( struct series_t *series, struct instance_t *instanc
 		else
 		{
 			// fall back to window width 200 -> could be a problem if there
-			// are anywhere other extrem different values in the volume
+			// are anywhere other extremely different values in the volume
 			series->VOI.minmax.width = 200;
 			series->VOI.minmax.center = series->VOI.range.center + 100;
 		}
