@@ -783,6 +783,7 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 		}
 	}
 
+#ifdef DTI
 	// Siemens CSA data?
 	// first: CSA IMAGE Header
 	if (dset->tagExistsWithValue(DcmTagKey(0x0029, 0x1010)))
@@ -814,6 +815,7 @@ static int readSeriesInfo( DcmItem *dset, struct series_t *series, struct instan
 			}
 		}
 	}*/
+#endif
 
 	// test Mosaic and if yes set relevant information for selected frame
 	series->mosaic = false;
