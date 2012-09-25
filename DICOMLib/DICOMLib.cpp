@@ -163,19 +163,18 @@ static void freeInstances( struct series_t *s )
 	}
 }
 
-static void freeSerie( struct series_t *s )
+static void freeSeries( struct series_t *s )
 {
-	if ( s->VOI.lut.table )
-	{
-		free( s->VOI.lut.table );
-	}
+	free( s->VOI.lut.table );
+	delete s->DTI.csaImageMap;
+	delete s->DTI.csaSeriesMap;
 	if ( s->volume )
 	{
 		DICOMLib_FreeVolume(s->volume);
 	}
 }
 
-static void freeSeries( struct study_t *p )
+static void freeSeriesFromStudy( struct study_t *p )
 {
 	struct series_t *s = p->first_series, *next;
 
@@ -183,7 +182,7 @@ static void freeSeries( struct study_t *p )
 	{
 		freeInstances( s );
 		next = s->next_series;
-		freeSerie( s );
+		freeSeries( s );
 		free( s );
 		s = next;
 	}
@@ -199,7 +198,7 @@ int DICOMLib_CloseStudies( struct study_t *study )
 	{
 		next = study->next_study;
 
-		freeSeries( study );
+		freeSeriesFromStudy( study );
 		free( study );
 	}
 	return 0;
@@ -868,7 +867,7 @@ static struct study_t *studiesFromNodes( struct study_t *root, struct filenode *
 				SSC_LOG( "Could not load file: %s", temp_i.path );
 			}
 		}
-		freeSerie( &temp_s );
+		freeSeries( &temp_s );
 
 		progress = MAX( progress, (double)recount / (double)count * SLICE_PARSE_FILES + SLICE_COUNT_FILES );
 		if ( !cancel && callback )
