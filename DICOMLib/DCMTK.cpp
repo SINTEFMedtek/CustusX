@@ -1226,23 +1226,20 @@ const void *DICOM_raw_image(const struct series_t *series, struct instance_t *in
 }
 
 
-const void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *y, int bits, int frame )
+void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *y, int bits, int frame )
 {
 	const int planar = 0; /* interleave colour data, not separate; not that we use this for our monochrome data */
-	DicomImage *dicomimage;
 	const int interpolate = 4; /* bicubic algorithm */
 	const int aspect = (*x == 0 || *y == 0); /* no aspect ratio lock unless either x or y is zero */
 	struct series_t *series = instance->parent_series;
 	EI_Status status;
-	const void *buffer;
+	void *buffer;
 	DicomImage *scaled;
-	dicomimage = new DicomImage( instance->path, CIF_AcrNemaCompatibility | CIF_MayDetachPixelData | CIF_UsePartialAccessToPixelData,
-				     frame,
-				     1 );
-	status = dicomimage->getStatus();
+	DicomImage dicomimage(instance->path, CIF_AcrNemaCompatibility | CIF_MayDetachPixelData | CIF_UsePartialAccessToPixelData, frame, 1);
+	status = dicomimage.getStatus();
 	if ( status != EIS_Normal )
 	{
-		SSC_LOG( "Error from DCMTK reading %s: %s", instance->path, dicomimage->getString( status ) );
+		SSC_LOG( "Error from DCMTK reading %s: %s", instance->path, dicomimage.getString( status ) );
 		errno = EIO;
 		return NULL;
 	}
@@ -1263,11 +1260,11 @@ const void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *
 
 	if ( !series->mosaic )
 	{
-		scaled = dicomimage->createScaledImage( (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
+		scaled = dicomimage.createScaledImage( (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
 	}
 	else
 	{
-		scaled = dicomimage->createScaledImage( clipX, clipY, clipWidth, clipHeight, (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
+		scaled = dicomimage.createScaledImage( clipX, clipY, clipWidth, clipHeight, (unsigned long)*x, (unsigned long)*y, interpolate, aspect );
 	}
 	if ( !scaled )
 	{
@@ -1289,16 +1286,15 @@ const void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *
 	} else {
 		scaled->setWindow( series->VOI.current.center, series->VOI.current.width );
 	}
-	buffer = scaled->getOutputData( bits, 0, planar );
-	if ( !buffer )
+	int size = scaled->getOutputDataSize(bits);
+	buffer = malloc(size);
+	if (!scaled->getOutputData(buffer, size, bits, planar))
 	{
-		SSC_LOG( "NULL buffer returned" );
-		delete scaled;
-		errno = ENODATA;
+		SSC_LOG("Failure");
 	}
 	*x = scaled->getWidth();
 	*y = scaled->getHeight();
-	delete dicomimage;
+	delete scaled;
 	return buffer;
 }
 

@@ -1059,7 +1059,7 @@ int DICOMLib_Image_RGB_Fill( const struct series_t *series, int sizeX, int sizeY
 {
 	struct instance_t *instance;
 	int x = sizeX, y = sizeY, diffX, diffY, i, j;
-	const char *buffer;
+	char *buffer;
 	float targetfx = sizeX, targetfy = sizeY, sourcefx, sourcefy;
 
 	if ( !series || !image || frame < 0 || sizeX < 0 || sizeY < 0 || !series->first_instance )
@@ -1104,7 +1104,7 @@ int DICOMLib_Image_RGB_Fill( const struct series_t *series, int sizeX, int sizeY
 		image = NULL;
 		return -1;
 	}
-	buffer =(const char *) DICOM_image_scaled( instance, &x, &y, 8, instance->frame ); /* rescale to fit given parameters */
+	buffer = (char *)DICOM_image_scaled( instance, &x, &y, 8, instance->frame ); /* rescale to fit given parameters */
 	if ( !buffer )
 	{
 		return errno;	// errno set in DCMTK.cpp
@@ -1139,13 +1139,14 @@ int DICOMLib_Image_RGB_Fill( const struct series_t *series, int sizeX, int sizeY
 			}
 		}
 	}
+	free(buffer);
 	return 0;
 }
 
-const char *DICOMLib_Image( const struct series_t *series, int *sizeX, int *sizeY, int bits_per_sample, int frame )
+char *DICOMLib_Image( const struct series_t *series, int *sizeX, int *sizeY, int bits_per_sample, int frame )
 {
 	int i;
-	const char *buffer = NULL;
+	char *buffer = NULL;
 
 	if ( !series || !series->first_instance || !sizeX || !sizeY )
 	{
@@ -1166,7 +1167,7 @@ const char *DICOMLib_Image( const struct series_t *series, int *sizeX, int *size
 		return NULL;
 	}
 
-	buffer = (const char *)DICOM_image_scaled( instance, sizeX, sizeY, bits_per_sample, instance->frame );
+	buffer = (char *)DICOM_image_scaled( instance, sizeX, sizeY, bits_per_sample, instance->frame );
 	if ( !buffer )
 	{
 		errno = EFAULT;
