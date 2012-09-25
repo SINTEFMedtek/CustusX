@@ -88,6 +88,11 @@ static struct instance_t *findInstance( struct series_t *series, int instance_id
 
 static int setupSeries( struct study_t *study, progress_func_t *callback = NULL )
 {
+	if ( study->initialized == true )
+	{
+		SSC_LOG( "Study already initialized.");
+		return 0;
+	}
 	struct series_t *series;
 	QList<QString> DTIUidList;
 
@@ -1493,12 +1498,8 @@ struct series_t *DICOMLib_GetSeries( struct study_t *study, progress_func_t *cal
 			return NULL;
 		}
 
-		// setupSeries( study, callback);
 	}
-	if (!study->initialized)
-	{
-		setupSeries( study, callback );
-	}
+	setupSeries( study, callback );
 	return study->first_series;
 }
 

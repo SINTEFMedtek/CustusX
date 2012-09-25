@@ -157,7 +157,8 @@ void ViewWidget::clear()
 {
 	removeReps();
 
-	mRenderWindow->RemoveRenderer(mRenderer);
+	if (mRenderer)
+		mRenderWindow->RemoveRenderer(mRenderer);
 	mRenderer = vtkRendererPtr::New();
 	mRenderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
 	mRenderWindow->AddRenderer(mRenderer);

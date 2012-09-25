@@ -64,6 +64,7 @@ private:
 	ssc::GraphicalPoint3DPtr mGraphicalPoint;
 	ssc::CaptionText3DPtr mText;
 	ssc::GraphicalArrow3DPtr mNormal;
+	ssc::Rect3DPtr mRect;
 	PlaneMetricPtr mMetric;
 	ssc::View *mView;
 	ssc::ViewportListenerPtr mViewportListener;

@@ -1066,7 +1066,7 @@ int DICOM_Dir( const char *path, struct study_t **studyPtr )
 	{
 		while (((studyRecord = patientRecord->nextSub(studyRecord)) != NULL))
 		{
-			struct study_t *study = (struct study_t *)malloc( sizeof( *study ));
+			struct study_t *study = (struct study_t *)calloc(1, sizeof( *study ));
 
 			study->next_study = *studyPtr;
 			*studyPtr = study;
