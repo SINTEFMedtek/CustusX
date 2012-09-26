@@ -77,12 +77,14 @@ class Common(object):
         self.mBuildSSCExamples = "ON"
         self.mUseCotire = "OFF"
         self.mSerialPort = "/Library/CustusX/igstk.links/cu.CustusX.dev0"
+        self.mOpenCVStaticCRT = "OFF"
         if (self.PLATFORM == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
             self.mBuildSSCExamples = "OFF"
             self.mExternalDir = self.mRootDir + "/external" #path length on windows is limited, need to keep it short
             self.mUseCotire = "ON"
             self.mSerialPort = "COM20"
+            self.mOpenCVStaticCRT = "OFF"
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
@@ -429,12 +431,14 @@ cmake \
 -DBUILD_TESTS:BOOL=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DWITH_CUDA:BOOL=OFF \
+-DBUILD_WITH_STATIC_CRT:BOOL=%s \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildExAndTest,
             DATA.mBuildExAndTest,
-            DATA.mBuildShared, 
+            DATA.mBuildShared,
+            DATA.mOpenCVStaticCRT,
             self.sourceFolder() ))
 # ---------------------------------------------------------
 
