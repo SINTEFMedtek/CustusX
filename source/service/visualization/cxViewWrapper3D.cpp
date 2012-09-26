@@ -183,7 +183,9 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 	this->setStereoType(settings()->value("View3D/stereoType").toInt());
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 
-	this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
+	//Only try to set depth peeling if View3D/depthPeeling == true
+	if(settings()->value("View3D/depthPeeling").toBool())
+		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
 
 //	connect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	this->updateView();
@@ -836,12 +838,27 @@ void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 	bool success = true;
 	if(setDepthPeeling)
 	{
-		if (!IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
+		vtkSmartPointer<vtkAppendPolyData> translucentGeometry = GenerateOverlappingBunchOfSpheres(100, 100);
+	  // generate a basic Mapper and Actor
+	  vtkSmartPointer<vtkPolyDataMapper> mapper =
+	    vtkSmartPointer<vtkPolyDataMapper>::New();
+	  mapper->SetInputConnection(translucentGeometry->GetOutputPort());
+	  vtkSmartPointer<vtkActor> actor =
+	    vtkSmartPointer<vtkActor>::New();
+	  actor->SetMapper(mapper);
+	  actor->GetProperty()->SetOpacity(0.5); // translucent !!!
+	  actor->GetProperty()->SetColor(1, 0, 0);
+	  actor->RotateX(-72); // put the objects in a position where it is easy to see
+	                       // different overlapping regions
+
+	  mView->getRenderer()->AddActor(actor); //Test add to 3D view
+
+		/*if (!IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
 		{
 			ssc::messageManager()->sendWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
 			success = false;
 		}
-		else if (!SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
+		else*/ if (!SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
 		{
 			ssc::messageManager()->sendWarning("Error setting depth peeling");
 			success = false;
@@ -852,6 +869,10 @@ void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 		}
 		if(!success)
 		  settings()->setValue("View3D/depthPeeling", false);
+	} else
+	{
+		if (TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer()))
+			ssc::messageManager()->sendInfo("Depth peeling turned off");
 	}
 }
 
