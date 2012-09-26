@@ -188,6 +188,8 @@ private:
 
 	std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
 
+	QString mLastImportDataFolder;
+
 	//widgets
 	class SecondaryMainWindow* mControlPanel;
 
