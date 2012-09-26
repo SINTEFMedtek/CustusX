@@ -56,6 +56,7 @@ class Common(object):
     def __init__(self):
         self.PLATFORM = platform.system() # {Windows7 = 'Windows', OSX 10.7.4 = 'Darwin', Liux = ?}
         self.mUser = getpass.getuser()
+        self.mISBpassword = ""
         if(self.PLATFORM == 'Windows'):
             self.mRootDir = "C:\Dev"
         else:
@@ -66,7 +67,7 @@ class Common(object):
         self.mWorkingDir = self.mRootDir + "/workspace"
         # server user: Used for login to cx server etc.
         self.mServerUser = self.mUser
-        self.silent_mode = False
+        self.mSilent_mode = False
         # build as shared or static libraries
         self.mBuildShared = "ON" # Change to ON or OFF
         self.mBuildType = "Debug" # Debug, Release, RelWithDebInfo, MinSizeRel
@@ -74,10 +75,12 @@ class Common(object):
         self.mBuildFolder = "build" # default build folder. This is auto-changed when using xcode or 32 bit.
         self.m32bitCompileCMakeOption = "" # use "-DCMAKE_OSX_ARCHITECTURES=i386" for 32 bit. Done automatically by settings --b32 from command line.
         self.mBuildSSCExamples = "ON"
+        self.mUseCotire = "OFF"
         if (self.PLATFORM == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
             self.mBuildSSCExamples = "OFF"
             self.mExternalDir = self.mRootDir + "/external" #path length on windows is limited, need to keep it short
+            self.mUseCotire = "ON"
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
@@ -562,7 +565,10 @@ class ISB_DataStreaming(CppComponent):
         return DATA.mWorkingDir + "/ISB_DataStreaming"
     def _rawCheckout(self):
         self._changeDirToBase()
-        runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef %s' % self.sourceFolder())
+        if DATA.mISBpassword == "":
+            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef %s' % (self.sourceFolder()))
+        else:
+            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef --password %s %s' % (DATA.mISBpassword, self.sourceFolder()))
     def update(self):
         self._changeDirToSource()
         runShell('svn up')
@@ -660,6 +666,8 @@ cmake \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
+-DCOTIRE_ADD_UNITY_BUILDS="%s" \
+-DCOTIRE_ENABLE_PRECOMPILED_HEADERS="%s" \
 -DGEStreamer_DIR:PATH="%s" \
 ../%s''' % (DATA.mCMakeGenerator, 
             DATA.m32bitCompileCMakeOption, 
@@ -672,7 +680,8 @@ cmake \
             UltrasonixSDK().includePath(),
             UltrasonixSDK().libFile(),
             DATA.mBuildSSCExamples,
-            #DCMTK().installPath(), 
+            DATA.mUseCotire,
+            DATA.mUseCotire,
             ISB_DataStreaming().buildPath(),
             self.sourceFolder() )
             )
@@ -855,6 +864,11 @@ Available components are:
                      action='store_true',
                      help='execute script without user interaction',
                      default=False)
+        p.add_option('--isb_password',
+                     action='store',
+                     type='string',
+                     help='password for svn sintef user at isb',
+                     default="")
         return p
     
     def _parseCommandLine(self):
@@ -875,7 +889,7 @@ Available components are:
             shell.DUMMY = True
         if options.silent_mode:
             print 'Running silent mode: no user interaction needed.'
-            DATA.silent_mode = True
+            DATA.mSilent_mode = True
         if options.password:
             print 'Set password (not working well): ', options.password
             shell.password = options.password
@@ -898,6 +912,8 @@ Available components are:
             DATA.mCMakeGenerator = 'NMake Makefiles JOM'
             DATA.mBuildFolder = DATA.mBuildFolder + "_jom"
             print 'Generate jom makefiles'
+        if options.isb_password:
+            DATA.mISBpassword = options.isb_password
         
         #TODO can be wrong for external libs as they use DATA.mBuildExternalsType!
         DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType 
@@ -928,7 +944,7 @@ Available components are:
         print 'Server User:', DATA.mServerUser
         print 'Root dir:', DATA.mRootDir
         print 'Use the following components:', [val.name() for val in useLibs]
-        if (not DATA.silent_mode):
+        if (not DATA.mSilent_mode):
             raw_input("\nPress enter to continue or ctrl-C to quit:")
 
         if options.full or options.checkout:
