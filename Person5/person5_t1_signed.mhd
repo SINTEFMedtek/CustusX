@@ -1,0 +1,17 @@
+ObjectType = Image 
+NDims = 3 
+BinaryData = True 
+BinaryDataByteOrderMSB = False 
+ElementSpacing = 0.977 0.977 1.200 
+DimSize = 256 256 182 
+Position = -137.566 -118.169 95.220 
+Orientation = 0.997200 -0.045902 0.059035 0.062653 0.081851 -0.994673 0.040825 0.995587 0.084498
+ElementType = MET_SHORT 
+Modality = MET_MOD_MR
+WindowLevel = 395.324
+WindowWidth = 790.648
+ImageType1 = ORIGINAL
+ImageType2 = PRIMARY
+ImageType3 = T1
+ElementDataFile = person5_t1_signed.raw 
+Creator = DICOMtoMetadataFilter

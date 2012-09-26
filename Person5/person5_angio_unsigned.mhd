@@ -1,0 +1,17 @@
+ObjectType = Image 
+NDims = 3 
+BinaryData = True 
+BinaryDataByteOrderMSB = False 
+ElementSpacing = 0.391 0.391 0.500 
+DimSize = 512 512 210 
+Position = -100.965 -93.339 -65.198
+Orientation = 0.998391 -0.029809 0.048246 0.031141 0.999148 -0.027096 -0.047397 0.028554 0.998468
+ElementType = MET_USHORT 
+Modality = MET_MOD_MR
+WindowLevel = 1224.421
+WindowWidth = 2448.841
+ImageType1 = ORIGINAL
+ImageType2 = PRIMARY
+ImageType3 = TOF
+ElementDataFile = person5_angio_unsigned.raw 
+Creator = DICOMtoMetadataFilter
