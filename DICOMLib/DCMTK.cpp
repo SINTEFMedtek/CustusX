@@ -1290,7 +1290,7 @@ void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *y, int
 	}
 	int size = scaled->getOutputDataSize(bits);
 	buffer = malloc(size);
-	if (!scaled->getOutputData(buffer, size, bits, planar))
+	if (!scaled->getOutputData(buffer, size, bits, 0, planar))
 	{
 		SSC_LOG("Failure");
 	}
