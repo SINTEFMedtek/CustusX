@@ -76,11 +76,13 @@ class Common(object):
         self.m32bitCompileCMakeOption = "" # use "-DCMAKE_OSX_ARCHITECTURES=i386" for 32 bit. Done automatically by settings --b32 from command line.
         self.mBuildSSCExamples = "ON"
         self.mUseCotire = "OFF"
+        self.mSerialPort = "/Library/CustusX/igstk.links/cu.CustusX.dev0"
         if (self.PLATFORM == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
             self.mBuildSSCExamples = "OFF"
             self.mExternalDir = self.mRootDir + "/external" #path length on windows is limited, need to keep it short
             self.mUseCotire = "ON"
+            self.mSerialPort = "COM20"
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
@@ -506,20 +508,14 @@ cmake \
 -DBUILD_TESTING:BOOL=OFF \
 -DITK_DIR:PATH="%s" \
 -DVTK_DIR:PATH="%s" \
--DIGSTK_SERIAL_PORT_0="/Library/CustusX/igstk.links/cu.CustusX.dev0" \
--DIGSTK_SERIAL_PORT_1="/Library/CustusX/igstk.links/cu.CustusX.dev1" \
--DIGSTK_SERIAL_PORT_2="/Library/CustusX/igstk.links/cu.CustusX.dev2" \
--DIGSTK_SERIAL_PORT_3="/Library/CustusX/igstk.links/cu.CustusX.dev3" \
--DIGSTK_SERIAL_PORT_4="/Library/CustusX/igstk.links/cu.CustusX.dev4" \
--DIGSTK_SERIAL_PORT_5="/Library/CustusX/igstk.links/cu.CustusX.dev5" \
--DIGSTK_SERIAL_PORT_6="/Library/CustusX/igstk.links/cu.CustusX.dev6" \
--DIGSTK_SERIAL_PORT_7="/Library/CustusX/igstk.links/cu.CustusX.dev7" \
+-DIGSTK_SERIAL_PORT_0="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildShared, 
             ITK().buildPath(), 
             VTK().buildPath(), 
+            DATA.mSerialPort,
             self.sourceFolder())
             )
 # ---------------------------------------------------------
