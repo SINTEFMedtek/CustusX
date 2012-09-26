@@ -129,7 +129,7 @@ public:
 	virtual void clear(); ///< Removes everything in the view, inluding reps.
 
 	// Implement pure virtuals in base class
-	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; }  ///< Get the vtkRenderWindow used by this \a View.
+	virtual vtkRenderWindowPtr getRenderWindow() const { return mRenderWindow; } ///< Get the vtkRenderWindow used by this \a View.
 	virtual QSize size() const { return widget::size(); }
 	virtual void setZoomFactor(double factor);
 	virtual QRect screenGeometry() const;

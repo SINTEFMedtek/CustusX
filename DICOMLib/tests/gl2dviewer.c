@@ -157,7 +157,7 @@ int main ( int argc, const char * argv[] )
 		{
 			int x = series->columns;
 			int y = series->rows;
-			const void *buffer = DICOMLib_Image( series, &x, &y, 8, frame );
+			void *buffer = DICOMLib_Image( series, &x, &y, 8, frame );
 
 			assert( series->columns == x && series->rows == y );
 			if ( !buffer )
@@ -168,6 +168,7 @@ int main ( int argc, const char * argv[] )
 
 			show_image( buffer, x, y, series->samples_per_pixel );
 			usleep( 30000 );
+			free(buffer);
 		}
 		close_window();
 

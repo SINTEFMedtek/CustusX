@@ -37,7 +37,7 @@ struct filenode *DICOM_Dir_Nodes( struct study_t *study );
 int DICOM_image_window_auto( struct series_t *series, struct instance_t *instance );
 
 /** Output image in given size, adjusted for aspect ratio if either x or y is zero. VOI LUT applied. Cached for speed. */
-const void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *y, int bits, int frame );
+void *DICOM_image_scaled( const struct instance_t *instance, int *x, int *y, int bits, int frame );
 
 int DICOM_Init( void );		///< Initialize codecs for DCMTK
 int DICOM_Done( void );		///< Clean up DCMTK

@@ -380,7 +380,7 @@ int DICOMLib_Image_RGB_Fill( const struct series_t *series, int sizeX, int sizeY
  *	Return an image slice from the given series. Give suggested size and frame, and check actual size
  *	that is returned. Do not free the returned buffer.
  */
-const char *DICOMLib_Image( const struct series_t *series, int *sizeX, int *sizeY, int bits_per_sample, int frame );
+char *DICOMLib_Image( const struct series_t *series, int *sizeX, int *sizeY, int bits_per_sample, int frame );
 
 /**
  *	Delete the given study from the disk.

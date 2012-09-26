@@ -90,7 +90,6 @@ static int setupSeries( struct study_t *study, progress_func_t *callback = NULL 
 {
 	if ( study->initialized == true )
 	{
-		SSC_LOG( "Study already initialized.");
 		return 0;
 	}
 	struct series_t *series;
@@ -164,19 +163,18 @@ static void freeInstances( struct series_t *s )
 	}
 }
 
-static void freeSerie( struct series_t *s )
+static void freeSeries( struct series_t *s )
 {
-	if ( s->VOI.lut.table )
-	{
-		free( s->VOI.lut.table );
-	}
+	free( s->VOI.lut.table );
+	delete s->DTI.csaImageMap;
+	delete s->DTI.csaSeriesMap;
 	if ( s->volume )
 	{
 		DICOMLib_FreeVolume(s->volume);
 	}
 }
 
-static void freeSeries( struct study_t *p )
+static void freeSeriesFromStudy( struct study_t *p )
 {
 	struct series_t *s = p->first_series, *next;
 
@@ -184,7 +182,7 @@ static void freeSeries( struct study_t *p )
 	{
 		freeInstances( s );
 		next = s->next_series;
-		freeSerie( s );
+		freeSeries( s );
 		free( s );
 		s = next;
 	}
@@ -200,7 +198,7 @@ int DICOMLib_CloseStudies( struct study_t *study )
 	{
 		next = study->next_study;
 
-		freeSeries( study );
+		freeSeriesFromStudy( study );
 		free( study );
 	}
 	return 0;
@@ -869,7 +867,7 @@ static struct study_t *studiesFromNodes( struct study_t *root, struct filenode *
 				SSC_LOG( "Could not load file: %s", temp_i.path );
 			}
 		}
-		freeSerie( &temp_s );
+		freeSeries( &temp_s );
 
 		progress = MAX( progress, (double)recount / (double)count * SLICE_PARSE_FILES + SLICE_COUNT_FILES );
 		if ( !cancel && callback )
@@ -1060,7 +1058,7 @@ int DICOMLib_Image_RGB_Fill( const struct series_t *series, int sizeX, int sizeY
 {
 	struct instance_t *instance;
 	int x = sizeX, y = sizeY, diffX, diffY, i, j;
-	const char *buffer;
+	char *buffer;
 	float targetfx = sizeX, targetfy = sizeY, sourcefx, sourcefy;
 
 	if ( !series || !image || frame < 0 || sizeX < 0 || sizeY < 0 || !series->first_instance )
@@ -1105,7 +1103,7 @@ int DICOMLib_Image_RGB_Fill( const struct series_t *series, int sizeX, int sizeY
 		image = NULL;
 		return -1;
 	}
-	buffer =(const char *) DICOM_image_scaled( instance, &x, &y, 8, instance->frame ); /* rescale to fit given parameters */
+	buffer = (char *)DICOM_image_scaled( instance, &x, &y, 8, instance->frame ); /* rescale to fit given parameters */
 	if ( !buffer )
 	{
 		return errno;	// errno set in DCMTK.cpp
@@ -1140,13 +1138,14 @@ int DICOMLib_Image_RGB_Fill( const struct series_t *series, int sizeX, int sizeY
 			}
 		}
 	}
+	free(buffer);
 	return 0;
 }
 
-const char *DICOMLib_Image( const struct series_t *series, int *sizeX, int *sizeY, int bits_per_sample, int frame )
+char *DICOMLib_Image( const struct series_t *series, int *sizeX, int *sizeY, int bits_per_sample, int frame )
 {
 	int i;
-	const char *buffer = NULL;
+	char *buffer = NULL;
 
 	if ( !series || !series->first_instance || !sizeX || !sizeY )
 	{
@@ -1167,7 +1166,7 @@ const char *DICOMLib_Image( const struct series_t *series, int *sizeX, int *size
 		return NULL;
 	}
 
-	buffer = (const char *)DICOM_image_scaled( instance, sizeX, sizeY, bits_per_sample, instance->frame );
+	buffer = (char *)DICOM_image_scaled( instance, sizeX, sizeY, bits_per_sample, instance->frame );
 	if ( !buffer )
 	{
 		errno = EFAULT;

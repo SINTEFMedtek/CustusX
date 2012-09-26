@@ -180,8 +180,10 @@ int DICOMLib_WriteNifti( const char *dir, const struct study_t *study )
 					if (outfp == NULL)
 					{
 						SSC_ERROR("Failed to write nifti header");
+						free(hdr.fname);
 						return -1;
 					}
+					free(hdr.fname);
 
 				}
 
