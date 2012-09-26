@@ -183,7 +183,9 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 	this->setStereoType(settings()->value("View3D/stereoType").toInt());
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 
-	this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
+	//Only try to set depth peeling if View3D/depthPeeling == true
+	if(settings()->value("View3D/depthPeeling").toBool())
+		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
 
 //	connect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	this->updateView();
