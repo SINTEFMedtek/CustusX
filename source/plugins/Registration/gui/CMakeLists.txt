@@ -28,6 +28,7 @@ SET( MOC_HEADER_FILES
     cxElastixWidget.h
     cxElastixSyntaxHighlighter.h
     cxWirePhantomWidget.h
+    cxPatientOrientationWidget.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -75,6 +76,8 @@ SET( SOURCE_FILES
     cxElastixSyntaxHighlighter.cpp
     cxWirePhantomWidget.h
     cxWirePhantomWidget.cpp
+    cxPatientOrientationWidget.h
+    cxPatientOrientationWidget.cpp
     )
 
 # =========================================================
