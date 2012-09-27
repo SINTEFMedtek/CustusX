@@ -164,6 +164,7 @@ vtkSonixVideoSource::vtkSonixVideoSource()
   lastRoiBry = 0;
 
   mFirstConnect = true;
+  mDebugOutput = false;
 }
 
 //----------------------------------------------------------------------------
@@ -382,8 +383,11 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	  {
 	  //error; data discrepancy!
 	  //what to do?
-		  //std::cout << "Data discrepancy! size: " << sz << " inBytesPerRow: " << inBytesPerRow <<" rows: " << rows <<  std::endl;
-		  //std::cout << "FrameSize[0]: " << this->FrameSize[0] << " * FrameBufferBitsPerPixel: " << this->FrameBufferBitsPerPixel << std::endl;
+		if (mDebugOutput)
+		{
+		  std::cout << "Data discrepancy! size: " << sz << " inBytesPerRow: " << inBytesPerRow <<" rows: " << rows <<  std::endl;
+		  std::cout << "FrameSize[0]: " << this->FrameSize[0] << " * FrameBufferBitsPerPixel: " << this->FrameBufferBitsPerPixel << std::endl;
+		}
 		  if (rows > sz / inBytesPerRow)
 		  {
 			rows = sz / inBytesPerRow;
@@ -570,9 +574,9 @@ void vtkSonixVideoSource::Initialize()
 	{
 		if (mFirstConnect)
 		{
-			std::cout << "Found Sonix window. First connect - Waiting 80 sec to connect" << std::endl;
+			std::cout << "Found Sonix window. First connect - Waiting "<< mSonixConnectionDelay << " sec to connect" << std::endl;
 			//Need to delay to make sure the Sonix exam is finished initializing...
-			vtksys::SystemTools::Delay(80000);
+			vtksys::SystemTools::Delay(mSonixConnectionDelay * 1000);
 			mFirstConnect = false;
 		}
 		else
@@ -1379,8 +1383,11 @@ void vtkSonixVideoSource::calculateSpacingAndOrigin()
    }
    this->DataSpacing[0] = /*xM*/microns.x/1000.0;
    this->DataSpacing[1] = /*yM*/microns.y/1000.0;
-   //std::cout << "Calculate spacing: x: " << xM << " y: " << yM << "result: " << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl;
-   //this->DataSpacing[2] =
+   if(mDebugOutput)
+   {
+	   std::cout << "Calculate spacing: x: " << microns.x << " y: " << microns.y << "result: ";
+	   std::cout << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl
+   }
    //EndAdd
 }
 
@@ -1392,4 +1399,13 @@ void vtkSonixVideoSource::SetSonixIP(const char *SonixIP)
 	  sprintf(this->SonixHostIP, "%s", SonixIP);
 	  std::cout << "Set SonixHostIP: " << SonixIP << std::endl;
 	  }
+}
+
+void vtkSonixVideoSource::setDebugOutput(bool debug)
+{
+	mDebugOutput = debug;
+}
+void vtkSonixVideoSource::setSonixConnectionDelay(int delay)
+{
+	mSonixConnectionDelay = delay;
 }
