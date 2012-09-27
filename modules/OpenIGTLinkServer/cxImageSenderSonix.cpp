@@ -38,11 +38,13 @@ QString ImageSenderSonix::getType()
 QStringList ImageSenderSonix::getArgumentDescription()
 {
 	QStringList retval;
-	retval << "--ipaddress:   IP address to connect to, default=127.0.0.1 (localhost)";
-	retval << "--imagingmode: default=2 (0 = B-mode, 2 = Color)";//, 6 = Dual, 12 = RF)";
-	retval << "--datatype: Video type, default=0x008 (4 = gray, 8 = color)";
-	retval << "--buffersize:  Grabber buffer size,   default=500";
-	retval << "--properties:  dump image properties";
+	retval << "--ipaddress:	IP address to connect to, default=127.0.0.1 (localhost)";
+	retval << "--imagingmode:	default=2 (0 = B-mode, 2 = Color)";//, 6 = Dual, 12 = RF)";
+	retval << "--datatype:	Video type, default=0x008 (4 = gray, 8 = color)";
+	retval << "--buffersize:	Grabber buffer size,   default=500";
+	retval << "--properties:	dump image properties";
+	retval << "--debug:	Debug output";
+	retval << "--delay:	Delay (sec) before connecting to Sonix (first time), default=80";
 	return retval;
 }
 
@@ -134,13 +136,23 @@ void ImageSenderSonix::initializeSonixGrabber()
 		mArguments["datatype"] = "0x00000008";
 	if (!mArguments.count("buffersize"))
 		mArguments["buffersize"] = "500";
+	if (!mArguments.count("delay"))
+		mArguments["buffersize"] = "80";
 
 	QString ipaddress       = mArguments["ipaddress"];
 	int imagingMode         = convertStringWithDefault(mArguments["imagingmode"], 0);
 	int acquisitionDataType = convertStringWithDefault(mArguments["datatype"], 0x00000008);
 	int bufferSize          = convertStringWithDefault(mArguments["buffersize"], 500);
+	int delay          		= convertStringWithDefault(mArguments["delay"], 80);
+
+
 
 	mSonixGrabber = vtkSonixVideoSource::New();
+	if (mArguments.count("debug"))
+		mSonixGrabber->setDebugOutput(true);
+	else
+		mSonixGrabber->setDebugOutput(false);
+	mSonixGrabber->setSonixConnectionDelay(80);
 	mSonixGrabber->SetSonixIP(ipaddress.toStdString().c_str());
 	mSonixGrabber->SetImagingMode(imagingMode);
 	mSonixGrabber->SetAcquisitionDataType(acquisitionDataType);
