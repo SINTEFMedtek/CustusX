@@ -152,7 +152,7 @@ void ImageSenderSonix::initializeSonixGrabber()
 		mSonixGrabber->setDebugOutput(true);
 	else
 		mSonixGrabber->setDebugOutput(false);
-	mSonixGrabber->setSonixConnectionDelay(80);
+	mSonixGrabber->setSonixConnectionDelay(delay);
 	mSonixGrabber->SetSonixIP(ipaddress.toStdString().c_str());
 	mSonixGrabber->SetImagingMode(imagingMode);
 	mSonixGrabber->SetAcquisitionDataType(acquisitionDataType);
