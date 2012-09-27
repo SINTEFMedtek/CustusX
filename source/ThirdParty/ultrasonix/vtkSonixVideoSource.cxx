@@ -1381,12 +1381,15 @@ void vtkSonixVideoSource::calculateSpacingAndOrigin()
    {
      vtkErrorMacro("Couldn't request the microns (spacing?).");
    }
+   double prevSpacingX = this->DataSpacing[0];
+   double prevSpacingY = this->DataSpacing[1];
    this->DataSpacing[0] = /*xM*/microns.x/1000.0;
    this->DataSpacing[1] = /*yM*/microns.y/1000.0;
-   if(mDebugOutput)
+   if(mDebugOutput && (
+	   (prevSpacingX != this->DataSpacing[0]) || (prevSpacingY != this->DataSpacing[1]) ) )
    {
-	   std::cout << "Calculate spacing: x: " << microns.x << " y: " << microns.y << "result: ";
-	   std::cout << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl
+	   std::cout << "Calculate spacing: x: " << microns.x << " y: " << microns.y << " result (mm): ";
+	   std::cout << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl;
    }
    //EndAdd
 }
