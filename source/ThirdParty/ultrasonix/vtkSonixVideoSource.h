@@ -204,7 +204,9 @@ public:
   //signals:
   //void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is available
 
-void setSonixHelper(SonixHelper* sonixHelper);
+  void setSonixHelper(SonixHelper* sonixHelper);
+  void setDebugOutput(bool debug);///< Turn debug output on/off
+  void setSonixConnectionDelay(int delay);///< The delay (sec) before trying to connect to sonix for the first time
 
 protected:
   vtkSonixVideoSource();
@@ -239,6 +241,9 @@ protected:
   int totalMissedFrames;
   int lastRoiUlx;
   int lastRoiBry;
+
+  bool mDebugOutput;
+  int mSonixConnectionDelay;
 
 private:
  
