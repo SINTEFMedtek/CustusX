@@ -58,7 +58,7 @@ ViewWrapperVideo::ViewWrapperVideo(ssc::ViewWidget* view)
 //	connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(configureSlot()));
 	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(configureSlot()));
 	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(configureSlot()));
-	mDominantToolProxy = DominantToolProxy::New();
+//	mDominantToolProxy = DominantToolProxy::New();
 	//This connect stops video streaming?
 
 	addReps();
