@@ -185,7 +185,9 @@ vtkImageDataPtr convertImageToUnsigned(ImagePtr image)
 {
 	vtkImageDataPtr input = image->getBaseVtkImageData();
 
-	if (input->GetScalarRange()[0] >= 0)
+//	if (input->GetScalarRange()[0] >= 0) // wrong: must convert type even if all data are positive
+//		return input;
+	if (input->GetScalarTypeMin() >= 0)
 		return input;
 
 	vtkImageShiftScalePtr cast = vtkImageShiftScalePtr::New();

@@ -42,7 +42,6 @@ protected:
 private slots:
   void setOrientationSlot();
   void enableToolSampleButtonSlot();
-
 private:
   ssc::Transform3D get_tMtm() const;
   QPushButton* mSetOrientationButton;
