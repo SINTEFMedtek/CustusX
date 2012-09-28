@@ -74,6 +74,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 class uDataDesc;
 class ulterius;
+class uROI;
 
 namespace cx
 {
@@ -230,6 +231,7 @@ protected:
 
   void DoFormatSetup();
   void calculateSpacingAndOrigin();///< Calculate spacing and origin when needed (for each frame?)
+  void UpdateFrameBufferExtent(uROI roi);///< Calculate FrameBufferExtent from roi and FrameSize
 
   // Description:
   // For internal use only
@@ -244,6 +246,9 @@ protected:
 
   bool mDebugOutput;
   int mSonixConnectionDelay;
+
+  int max(int a, int b){ if(a > b) return a; else return b;};
+  int min(int a, int b){ if(a < b) return a; else return b;};
 
 private:
  
