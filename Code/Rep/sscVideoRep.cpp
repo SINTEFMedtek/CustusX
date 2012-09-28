@@ -25,6 +25,8 @@
  */
 #include "sscVideoRep.h"
 
+#include "boost/bind.hpp"
+
 #include <vtkRenderer.h>
 #include <vtkActor2D.h>
 #include <vtkImageData.h>
@@ -417,6 +419,9 @@ VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) 
 	mProbeSectorActor = vtkActorPtr::New();
 //  mProbeSectorActor->GetProperty()->SetColor(1, 0.9, 0); // yellow
 	mProbeSectorActor->GetProperty()->SetColor(1, 165.0/255.0, 0); // orange
+
+	mViewportListener.reset(new ViewportListener());
+	mViewportListener->setCallback(boost::bind(&VideoFixedPlaneRep::setCamera, this));
 }
 
 VideoFixedPlaneRep::~VideoFixedPlaneRep()
@@ -485,6 +490,7 @@ void VideoFixedPlaneRep::setCamera()
 {
 	if (!mRenderer)
 		return;
+	mViewportListener->stopListen();
 	vtkCamera* camera = mRenderer->GetActiveCamera();
 	camera->ParallelProjectionOn();
 	mRenderer->ResetCamera();
@@ -507,6 +513,7 @@ void VideoFixedPlaneRep::setCamera()
 		scale = w_vp/vw;
 
 	camera->SetParallelScale(h/2*scale*1.01); // exactly fill the viewport height
+	mViewportListener->startListen(mRenderer);
 }
 
 
@@ -514,6 +521,7 @@ void VideoFixedPlaneRep::addRepActorsToViewRenderer(ssc::View* view)
 {
 	mView = view;
 	mRenderer = view->getRenderer();
+	mViewportListener->startListen(mRenderer);
 
 	view->getRenderer()->AddActor(mRTGraphics->getActor());
 	view->getRenderer()->AddActor(mInfoText->getActor());
@@ -531,6 +539,7 @@ void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(ssc::View* view)
 	view->getRenderer()->RemoveActor(mStatusText->getActor());
 
 	view->getRenderer()->RemoveActor(mProbeSectorActor);
+	mViewportListener->stopListen();
 }
 
 } // namespace ssc

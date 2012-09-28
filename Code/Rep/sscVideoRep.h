@@ -32,6 +32,7 @@
 #include "sscVtkHelperClasses.h"
 #include "sscForwardDeclarations.h"
 #include "sscProbeSector.h"
+#include "sscViewportListener.h"
 
 typedef vtkSmartPointer<class vtkPlaneSource> vtkPlaneSourcePtr;
 typedef vtkSmartPointer<class vtkTexture> vtkTexturePtr;
@@ -157,6 +158,7 @@ private:
 
 	vtkRendererPtr mRenderer;
 	View* mView;
+	ViewportListenerPtr mViewportListener;
 };
 
 
