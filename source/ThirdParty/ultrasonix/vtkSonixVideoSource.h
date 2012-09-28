@@ -74,6 +74,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 class uDataDesc;
 class ulterius;
+class uROI;
 
 namespace cx
 {
@@ -204,7 +205,9 @@ public:
   //signals:
   //void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is available
 
-void setSonixHelper(SonixHelper* sonixHelper);
+  void setSonixHelper(SonixHelper* sonixHelper);
+  void setDebugOutput(bool debug);///< Turn debug output on/off
+  void setSonixConnectionDelay(int delay);///< The delay (sec) before trying to connect to sonix for the first time
 
 protected:
   vtkSonixVideoSource();
@@ -228,6 +231,7 @@ protected:
 
   void DoFormatSetup();
   void calculateSpacingAndOrigin();///< Calculate spacing and origin when needed (for each frame?)
+  void UpdateFrameBufferExtent(uROI roi);///< Calculate FrameBufferExtent from roi and FrameSize
 
   // Description:
   // For internal use only
@@ -239,6 +243,12 @@ protected:
   int totalMissedFrames;
   int lastRoiUlx;
   int lastRoiBry;
+
+  bool mDebugOutput;
+  int mSonixConnectionDelay;
+
+  int max(int a, int b){ if(a > b) return a; else return b;};
+  int min(int a, int b){ if(a < b) return a; else return b;};
 
 private:
  
