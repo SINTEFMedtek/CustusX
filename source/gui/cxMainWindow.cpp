@@ -989,6 +989,7 @@ void MainWindow::preferencesSlot()
 void MainWindow::quitSlot()
 {
 	ssc::messageManager()->sendInfo("Shutting down CustusX");
+	viewManager()->deactivateCurrentLayout();
 	qApp->quit();
 }
 
