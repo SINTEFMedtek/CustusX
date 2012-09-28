@@ -228,12 +228,13 @@ void ImportDataDialog::convertToUnsigned()
 	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mData);
 	if (!image)
 		return;
-	//	vtkImageDataPtr img = image->getBaseVtkImageData();
-	//	std::cout << "type " << img->GetScalarTypeAsString() << " -- " << img->GetScalarType() << std::endl;
-	//	std::cout << "range " << img->GetScalarTypeMin() << " -- " << img->GetScalarTypeMax() << std::endl;
-	//	mConvertToUnsignedCheckBox->setEnabled( (image!=0) && (image->getBaseVtkImageData()->GetScalarTypeMin()<0) );
+
+//		vtkImageDataPtr img0 = image->getBaseVtkImageData();
+//		std::cout << "type " << img0->GetScalarTypeAsString() << " -- " << img0->GetScalarType() << std::endl;
+//		std::cout << "range " << img0->GetScalarTypeMin() << " -- " << img0->GetScalarTypeMax() << std::endl;
 
 	vtkImageDataPtr img = convertImageToUnsigned(image);
+
 	image->setVtkImageData(img);
 	ssc::dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());
 }

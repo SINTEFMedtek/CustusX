@@ -70,7 +70,7 @@ private:
 	ssc::DisplayTextRepPtr mDataNameText;
 	QPointer<ssc::ViewWidget> mView;
 	ssc::ToolPtr mTool;
-	DominantToolProxyPtr mDominantToolProxy;
+//	DominantToolProxyPtr mDominantToolProxy;
 };
 typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 
