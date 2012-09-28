@@ -27,6 +27,7 @@ FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(Registratio
 
   mDominantToolProxy =  DominantToolProxy::New();
   connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
+  connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(enableToolSampleButtonSlot()));
   this->enableToolSampleButtonSlot();
 
 }
