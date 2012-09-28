@@ -327,9 +327,11 @@ void VideoGraphics::checkDataIntegrity()
 
 void VideoGraphics::newDataSlot()
 {
-	mPlaneActor->SetVisibility(mData!=NULL);
-	if (!mData)
+	if (!mData || !mData->isConnected())
+	{
+		mPlaneActor->SetVisibility(false);
 		return;
+	}
 
 //  mDataRedirecter->GetOutput()->UpdateInformation();
 	mDataRedirecter->UpdateWholeExtent(); // important! syncs update extent to whole extent
