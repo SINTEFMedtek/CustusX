@@ -142,6 +142,8 @@ public:
 
 	RenderTimerPtr getRenderTimer() { return mRenderTimer; }
 
+	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
+
 signals:
 	void imageDeletedFromViews(ssc::ImagePtr image); ///< Emitted when an image is deleted from the views in the cxViewManager
 	void fps(int number); ///< Emits number of frames per second
@@ -180,7 +182,6 @@ protected:
 	void syncOrientationMode(SyncedValuePtr val);
 	void setStretchFactors(LayoutRegion region, int stretchFactor);
 
-	void deactivateCurrentLayout();
 	void activateView(ViewWrapperPtr wrapper, int group, LayoutRegion region);
 	void activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region);
 	void activate3DView(int group, LayoutRegion region);
