@@ -105,7 +105,7 @@ class ViewManager: public QObject
 Q_OBJECT
 public:
 
-	View3D* get3DView(int group = 0, int index = 0);
+	View3DQPtr get3DView(int group = 0, int index = 0);
 	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
 
 //  void fillModelTree(TreeItemPtr root);
