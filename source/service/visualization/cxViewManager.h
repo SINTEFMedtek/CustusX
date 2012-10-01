@@ -162,7 +162,7 @@ protected slots:
 	void clearSlot();
 	void duringSavePatientSlot();
 	void duringLoadPatientSlot();
-	void updateViews();
+	void setModifiedSlot();
 
 protected:
 	ViewManager(); ///< create all needed views
@@ -196,6 +196,7 @@ protected:
 					QString helptext);
 	void loadGlobalSettings();
 	void saveGlobalSettings();
+	void updateViews();
 
 	static ViewManager* mTheInstance; ///< the only instance of this class
 
@@ -221,6 +222,7 @@ protected:
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
 	SyncedValuePtr mGlobalZoom2DVal;
 	bool mSmartRender; ///< use ssc::ViewWidget::render()
+	bool mModified; ///< Modified flag tells renderAllViewsSlot() that the views must be updated
 
 	ViewCache<View2D> mViewCache2D;
 	ViewCache<View3D> mViewCache3D;
