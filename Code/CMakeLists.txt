@@ -449,7 +449,7 @@ include(${VTK_USE_FILE})
 find_package(OpenGL)
     SET( SSC_LIBRARIES 
         ${SSC_LIBRARIES}
-	${OPENGL_LIBRARIES}
+        ${OPENGL_LIBRARIES}
         )
 
     
