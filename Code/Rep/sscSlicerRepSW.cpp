@@ -64,6 +64,8 @@ vtkImageActorPtr SliceRepSW::getActor()
  */
 void SliceRepSW::setImage( ImagePtr image )
 {
+	if (image == getImage())
+		return;
 	if (getImage())
 	{
 		getImage()->disconnectFromRep(mSelf);
