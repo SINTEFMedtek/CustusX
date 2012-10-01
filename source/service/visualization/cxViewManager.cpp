@@ -396,19 +396,21 @@ QWidget* ViewManager::stealCentralWidget()
 
 /**Look for the index'th 3DView in given group.
  */
-View3D* ViewManager::get3DView(int group, int index)
+View3DQPtr ViewManager::get3DView(int group, int index)
 {
 	int count = 0;
-	std::vector<ssc::ViewWidget*> views = mViewGroups[group]->getViews();
+	std::vector<ViewWidgetQPtr> views = mViewGroups[group]->getViews();
 	for (unsigned i = 0; i < views.size(); ++i)
 	{
-		View3D* retval = dynamic_cast<View3D*>(views[i]);
+		if(!views[i])
+			continue;
+		View3DQPtr retval = dynamic_cast<View3D*>(views[i].data());
 		if (!retval)
 			continue;
 		if (index == count++)
 			return retval;
 	}
-	return NULL;
+	return View3DQPtr();
 }
 
 /**deactivate the current layout, leaving an empty layout
