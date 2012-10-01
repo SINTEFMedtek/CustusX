@@ -375,3 +375,22 @@ bool CheckMD5InMemory( const char* const pathname, const unsigned char* const da
 }
 #endif
 
+#ifdef WIN32
+namespace ssc
+{
+//Needed to dynamic linking on Windows
+bool GenerateMD5( const char* const pathname )
+{
+	throw "GenerateMD5 is not implemented on Windows!";
+}
+bool CheckMD5( const char* const pathname )
+{
+	throw "CheckMD5 is not implemented on Windows!";
+}
+bool CheckMD5InMemory( const char* const pathname, const unsigned char* const data, int size )
+{
+	throw "CheckMD5InMemory is not implemented on Windows!";
+}
+} //end namespace ssc
+#endif
+
