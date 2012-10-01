@@ -13,6 +13,25 @@
 #include "igtlImageMessage.h"
 #include "sscMessageManager.h"
 
+// utility for reporting errors
+void reportError(NSError* error)
+{
+    if(!error)
+        return;
+    NSString* errorString = [error localizedDescription];
+    std::string errorStdString = std::string([errorString UTF8String]);
+    ssc::messageManager()->sendError(qstring_cast(errorStdString));
+}
+
+// utility for reporting strings
+void reportString(NSString* string)
+{
+    if(!string)
+        return;
+    std::string stdString = std::string([string UTF8String]);
+    ssc::messageManager()->sendInfo(qstring_cast(stdString));
+}
+
 //==============================================================================
 //Class that connects to the videosignal and receives frames
 @interface VideoObserver : NSObject {
@@ -152,7 +171,7 @@ void MacGrabber::start()
       this->startSession();
   } else
   {
-    ssc::messageManager()->sendError("Could not find a connected device. Aborting.");
+    ssc::messageManager()->sendError("Could not find a connected device (must be present in SupportedGrabbers.txt). Aborting.");
   }
 }
 
@@ -183,6 +202,8 @@ bool MacGrabber::findConnectedDevice()
   NSError *error = nil;
   NSString *words = [[NSString alloc] initWithContentsOfFile:path
                                                  encoding:NSUTF8StringEncoding error:&error];
+  reportError(error);
+
   NSArray* lines = [words componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
   //for (NSString *line in lines)
   //  NSLog(@"Supported grabber: %@", line);
@@ -190,9 +211,9 @@ bool MacGrabber::findConnectedDevice()
   //Report to user all found grabbers
   NSArray *devices = [QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo];
   int i = [devices count];
-  ssc::messageManager()->sendInfo("Number of connected grabber devices: "+qstring_cast(i));
+  ssc::messageManager()->sendInfo("Number of input grabber devices: "+qstring_cast(i));
   for (QTCaptureDevice *device in devices)
-    this->reportString([device localizedDisplayName]);
+    reportString([device localizedDisplayName]);
 
   //Select the grabber with highest file priority
   bool found = false;
@@ -205,7 +226,7 @@ bool MacGrabber::findConnectedDevice()
       if (compareResult == NSOrderedSame)
       {
         NSString *foundtext = [NSString stringWithFormat:@"Matched grabber from file: %@", line];
-        this->reportString(foundtext);
+        reportString(foundtext);
         mObjectiveC->mSelectedDevice = device;
         found = true;
         break;
@@ -266,7 +287,7 @@ bool MacGrabber::openDevice()
   NSError* error;
   bool success = [mObjectiveC->mSelectedDevice open:&error];
   if(!success)
-    this->reportError(error);
+    reportError(error);
     
   return success;
 }
@@ -285,7 +306,7 @@ void MacGrabber::startSession()
   
   if (!success)
   {
-    this->reportError(error);
+    reportError(error);
     return;
   }
   
@@ -334,7 +355,7 @@ void MacGrabber::setupGrabbing()
   bool success = [mObjectiveC->mCaptureSession addOutput:mObjectiveC->mCaptureDecompressedVideoOutput error:&error];
   if(!success)
   {
-    this->reportError(error);
+    reportError(error);
     return;
   }
 
@@ -346,23 +367,6 @@ void MacGrabber::setupGrabbing()
   
   mObjectiveC->mCaptureView = [[QTCaptureView alloc] init];
   [mObjectiveC->mCaptureView setCaptureSession:mObjectiveC->mCaptureSession];
-}
-
-void MacGrabber::reportError(NSError* error)
-{
-  if(!error)
-    return;
-  NSString* errorString = [error localizedDescription];
-  std::string errorStdString = std::string([errorString UTF8String]);
-  ssc::messageManager()->sendError(qstring_cast(errorStdString));
-}
-
-void MacGrabber::reportString(NSString* string)
-{
-  if(!string)
-    return;
-  std::string stdString = std::string([string UTF8String]);
-  ssc::messageManager()->sendInfo(qstring_cast(stdString));  
 }
 
 void MacGrabber::sendFrame(Frame& frame)
