@@ -92,6 +92,7 @@ ViewManager::ViewManager() :
 				mRenderingTimer(new QTimer(this)),
 				mGlobal2DZoom(true),
 				mGlobalObliqueOrientation(false),
+				mModified(false),
 				mViewCache2D(mMainWindowsCentralWidget,	"View2D"),
 				mViewCache3D(mMainWindowsCentralWidget, "View3D"),
 				mViewCacheRT(mMainWindowsCentralWidget, "ViewRT")
@@ -124,8 +125,8 @@ ViewManager::ViewManager() :
 	mInteractiveCropper.reset(new InteractiveCropper());
 	mInteractiveClipper.reset(new InteractiveClipper());
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
-	connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(updateViews()));
-	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(updateViews()));
+	connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(setModifiedSlot()));
+	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(setModifiedSlot()));
 
 	this->syncOrientationMode(SyncedValue::create(0));
 
@@ -144,6 +145,10 @@ ViewManager::~ViewManager()
 {
 }
 
+void ViewManager::setModifiedSlot()
+{
+	mModified = true;
+}
 
 void ViewManager::updateViews()
 {
@@ -781,6 +786,14 @@ void ViewManager::addDefaultLayouts()
 void ViewManager::renderAllViewsSlot()
 {
 	mRenderTimer->beginRender();
+
+	// updateViews() may be a bit expensive so we don't want to have it as a slot as previously
+	// Only set the mModified flag, and update the views here
+	if(mModified)
+	{
+		updateViews();
+		mModified = false;
+	}
 
 	// do a full render anyway at low rate. This is a convenience hack for rendering
 	// occational effects that the smart render is too dumb to see.
