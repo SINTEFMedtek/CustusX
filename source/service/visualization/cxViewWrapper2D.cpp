@@ -513,6 +513,7 @@ void ViewWrapper2D::updateView()
 	mDataNameText->setFontSize(std::max(12, 22 - 2 * text.size()));
 
 	mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
+
 }
 
 void ViewWrapper2D::imageRemoved(const QString& uid)
