@@ -83,7 +83,12 @@ void USAcquisition::checkIfReadySlot()
   	mWhatsMissing.append("<font color=orange>Saving acquisition data.</font><br>");
 
   // remove redundant line breaks
-  mWhatsMissing = mWhatsMissing.split("<br>", QString::SkipEmptyParts).join("<br>");
+  QStringList list = mWhatsMissing.split("<br>", QString::SkipEmptyParts);
+  mWhatsMissing = list.join("<br>");
+
+  //Make sure we have at least 2 lines to avoid "bouncing buttons"
+  if (list.size() < 2)
+	  mWhatsMissing.append("<br>");
 
   // do not require tracking to be present in order to perform an acquisition.
   emit ready(!saving && streaming && mRTRecorder, mWhatsMissing);
