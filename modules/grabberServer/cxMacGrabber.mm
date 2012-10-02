@@ -9,6 +9,7 @@
 #include <iostream>
 #include <QWidget>
 #include <QMacCocoaViewContainer>
+#include <QApplication>
 
 #include "igtlImageMessage.h"
 #include "sscMessageManager.h"
@@ -198,10 +199,17 @@ bool MacGrabber::isGrabbing()
 bool MacGrabber::findConnectedDevice()
 {
   //Read file with supported grabbers
-  NSString *path = [NSString stringWithString:@"SupportedGrabbers.txt"];
+    std::string baseStdString = qApp->applicationDirPath().toStdString() + "/../../../SupportedGrabbers.txt";
+    
+    NSString *path = [NSString stringWithCString:baseStdString.c_str()
+                                                encoding:[NSString defaultCStringEncoding]];
+    
+    
+//  NSString *path = [NSString stringWithString:@"SupportedGrabbers.txt"];
   NSError *error = nil;
   NSString *words = [[NSString alloc] initWithContentsOfFile:path
                                                  encoding:NSUTF8StringEncoding error:&error];
+    reportString(path);
   reportError(error);
 
   NSArray* lines = [words componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
