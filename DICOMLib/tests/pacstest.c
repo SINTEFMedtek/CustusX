@@ -23,7 +23,7 @@ int main ( int argc, const char * argv[] )
 	result = DICOMLib_Init();
 	assert( result == 0 );
 
-	DICOMLib_Network( "SONOWAND", "ANY-SCP", "STORESCP", "158.38.39.22", 5104 );
+	DICOMLib_Network( "SONOWAND", "ANY-SCP", "STORESCP", "10.200.31.178", 5104 );
 
 	study = DICOMLib_StudiesFromPACS( NULL, DICOMLIB_SEARCH_NONE, NULL );
 	if ( !study )
