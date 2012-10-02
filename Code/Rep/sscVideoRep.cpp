@@ -94,7 +94,7 @@ VideoGraphics::VideoGraphics(bool useMaskFilter) :
 
 	mTransformTextureCoords = vtkTransformTextureCoordsPtr::New();
 	mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
-	mTransformTextureCoords->SetOrigin( 0, 0, 0);
+	mTransformTextureCoords->SetOrigin( 0, 0.5, 0);
 	mTransformTextureCoords->SetScale( 1, 1, 0);
 	mTransformTextureCoords->FlipROn(); //r axis
 
@@ -107,6 +107,7 @@ VideoGraphics::VideoGraphics(bool useMaskFilter) :
 	mPlaneActor->SetTexture(mTexture);
 	mPlaneActor->SetMapper(mDataSetMapper);
 	mPlaneActor->SetVisibility(false);
+	mTexture->RepeatOff();
 }
 
 VideoGraphics::~VideoGraphics()
