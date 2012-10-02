@@ -145,30 +145,24 @@ void CustomMetaImage::setTransform(const Transform3D M)
   QStringList data = QTextStream(&file).readAll().split("\n");
 //  std::cout << "before :" << data.join("\n") << std::endl;
   QRegExp regexp("(^TransformMatrix|^Offset|^Position|^Orientation)");
-//  QRegExp regexp("?!(\"^Orientation\"|\"^TransformMatrix)\")");
   QStringList removeThese = data.filter(regexp);
   for (int i=0; i<removeThese.size(); ++i)
     data.removeAll(removeThese[i]);
+
+  // fine index of ElementDataFile - this is the last element according to MHD standard (but we might have appended something else after it).
+  int last = data.lastIndexOf(QRegExp("^ElementDataFile.*"));
 
   int dim = 3; // hardcoded - will fail for 2d images
   std::stringstream tmList;
   for (int c=0; c<dim; ++c)
     for (int r=0; r<dim; ++r)
       tmList << " " << M(r,c);
-//  tmList <<" " << M[0][0] <<" "<< M[1][0] <<" "<<  M[2][0];
-//  tmList <<" " << M[0][1] <<" "<< M[1][1] <<" "<<  M[2][1];
-//  tmList <<" " << M[0][2] <<" "<< M[1][2] <<" "<<  M[2][2];
-  data.push_back(QString("TransformMatrix =" + qstring_cast(tmList.str())));
+  data.insert(last, QString("TransformMatrix =" + qstring_cast(tmList.str())));
 
   std::stringstream posList;
   for (int r=0; r<dim; ++r)
     posList << " " << M(r,3);
-//  posList << M[0][3] <<" "<< M[1][3] <<" "<<  M[2][3];
-  data.push_back(QString("Offset = " + qstring_cast(posList.str())));
-
-//  rMd[0][3] = p_r[0];
-//  rMd[1][3] = p_r[1];
-//  rMd[2][3] = p_r[2];
+  data.insert(last, QString("Offset = " + qstring_cast(posList.str())));
 
 //  std::cout << "after :" << data.join("\n") << std::endl;
 
