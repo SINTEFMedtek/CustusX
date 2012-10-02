@@ -74,5 +74,6 @@ int main ( int argc, const char * argv[] )
 
 	SSC_Logging_Done();
 
+	printf("\n Test succeeded! \n\n");
 	return 0;
 }
