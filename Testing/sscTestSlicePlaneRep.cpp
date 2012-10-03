@@ -92,7 +92,8 @@ void TestSlicePlaneRep::start()
 
 	// generate imageFileName
 	QString imageFileName2 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-	QString imageFileName1 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_t2_byte.mhd");
+	QString imageFileName1 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_t2_unsigned.mhd");
+//	QString imageFileName1 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_t2_byte.mhd");
 	//QString imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.mhd");
 	std::cout << imageFileName1 << std::endl;
 	std::cout << imageFileName2 << std::endl;
