@@ -376,14 +376,6 @@ void PatientData::createPatientFolders(QString choosenDir)
 	}
 
 	newDir = choosenDir;
-	newDir.append("/Surfaces");
-	if (!QDir().exists(newDir))
-	{
-		QDir().mkdir(newDir);
-		ssc::messageManager()->sendInfo("Made a new surface folder: " + newDir);
-	}
-
-	newDir = choosenDir;
 	newDir.append("/Logs");
 	if (!QDir().exists(newDir))
 	{
