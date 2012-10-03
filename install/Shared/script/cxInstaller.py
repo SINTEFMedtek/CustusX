@@ -83,7 +83,7 @@ class Common(object):
             self.mBuildSSCExamples = "OFF"
             self.mExternalDir = self.mRootDir + "/external" #path length on windows is limited, need to keep it short
             self.mUseCotire = "ON"
-            self.mSerialPort = "COM20"
+            self.mSerialPort = "COM9"
             self.mOpenCVStaticCRT = "OFF"
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
