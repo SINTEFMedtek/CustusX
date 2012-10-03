@@ -230,14 +230,21 @@ QString StateService::getDefaultGrabberServer()
 	return result;
 	return "";
 #elif WIN32
-	return ""; // TODO fill in something here...
+	//TODO make this work...
+	QString result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "runOpenIGTLinkServer.exe", "");
+	if (!result.isEmpty())
+		return result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer.exe", "");
+	if (!result.isEmpty())
+		return result;
+	return "";
 #else
 	QString result;
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "runOpenIGTLinkServer.sh", "");
 	if (!result.isEmpty())
 		return result;
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer",
-					"OpenIGTLinkServer", "");
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer", "");
 	if (!result.isEmpty())
 		return result;
 	return "";
