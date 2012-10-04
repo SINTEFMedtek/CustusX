@@ -132,16 +132,10 @@ ToolManager::ToolMapPtr DummyToolManager::getInitializedTools()
 
 ToolManager::ToolMapPtr DummyToolManager::getTools()
 {
-	//Is there a better way to do this?
-	ToolMapPtr retval(new ToolMap);
-	DummyToolMapIter it = mDummyTools->begin();
-	while(it != mDummyTools->end())
-	{
-		retval->insert(std::pair<QString, ToolPtr> (((*it).first), (ToolPtr)((*it).second)));
-		it++;
-	}
+	ToolMapPtr retval(new ToolMap(mDummyTools->begin(), mDummyTools->end()));
 	return retval;
 }
+
 ToolPtr DummyToolManager::getTool(const QString& uid)
 {
 	DummyToolMapConstIter it = mDummyTools->find(uid);
