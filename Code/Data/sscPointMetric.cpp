@@ -103,7 +103,7 @@ void CoordinateSystemListener::doDisconnect()
 		}
 	}
 
-	if (mSpace.mId == ssc::csSENSOR || mSpace.mId == ssc::csTOOL || mSpace.mId == ssc::csTOOL)
+	if (mSpace.mId == ssc::csSENSOR || mSpace.mId == ssc::csTOOL || mSpace.mId == ssc::csTOOL_OFFSET)
 	{
 		ssc::ToolPtr tool = ssc::toolManager()->getTool(mSpace.mRefObject);
 		if (tool)
