@@ -106,8 +106,8 @@ GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 //  source->SetPhiResolution(8);
 	// 24*16 = 384, 8*8=64, 16*12=192
 	source->SetThetaResolution(16);
-  source->SetPhiResolution(12);
-  source->LatLongTessellationOn();
+	source->SetPhiResolution(12);
+	source->LatLongTessellationOn();
 	mapper = vtkPolyDataMapperPtr::New();
 	mapper->SetInputConnection(source->GetOutputPort());
 
@@ -132,9 +132,9 @@ void GraphicalPoint3D::setRenderer(vtkRendererPtr renderer)
 	mRenderer = renderer;
 
 	if (mRenderer)
-  {
-    mRenderer->AddActor(actor);
-  }
+	{
+		mRenderer->AddActor(actor);
+	}
 }
 
 void GraphicalPoint3D::setRadius(double radius)
@@ -182,27 +182,27 @@ GraphicalLine3D::GraphicalLine3D( vtkRendererPtr renderer)
 
 	mapper->SetInputConnection( source->GetOutputPort() );
 	actor->SetMapper (mapper );
-  this->setRenderer(renderer);
+	this->setRenderer(renderer);
 }
 
 GraphicalLine3D::~GraphicalLine3D()
 {
-  this->setRenderer(NULL);
+	this->setRenderer(NULL);
 }
 
 void GraphicalLine3D::setRenderer(vtkRendererPtr renderer)
 {
-  if (mRenderer)
-  {
-    mRenderer->RemoveActor(actor);
-  }
+	if (mRenderer)
+	{
+		mRenderer->RemoveActor(actor);
+	}
 
-  mRenderer = renderer;
+	mRenderer = renderer;
 
-  if (mRenderer)
-  {
-    mRenderer->AddActor(actor);
-  }
+	if (mRenderer)
+	{
+		mRenderer->AddActor(actor);
+	}
 }
 
 void GraphicalLine3D::setColor(Vector3D color)
@@ -237,44 +237,44 @@ vtkActorPtr GraphicalLine3D::getActor()
 
 GraphicalArc3D::GraphicalArc3D( vtkRendererPtr renderer)
 {
-  mRenderer = renderer;
-  source = vtkArcSourcePtr::New();
-  source->SetResolution(20);
-  mapper = vtkPolyDataMapperPtr::New() ;
-  actor = vtkActorPtr::New() ;
+	mRenderer = renderer;
+	source = vtkArcSourcePtr::New();
+	source->SetResolution(20);
+	mapper = vtkPolyDataMapperPtr::New() ;
+	actor = vtkActorPtr::New() ;
 
-  mapper->SetInputConnection( source->GetOutputPort() );
-  actor->SetMapper (mapper );
-  if (mRenderer)
-    mRenderer->AddActor(actor);
+	mapper->SetInputConnection( source->GetOutputPort() );
+	actor->SetMapper (mapper );
+	if (mRenderer)
+		mRenderer->AddActor(actor);
 }
 
 GraphicalArc3D::~GraphicalArc3D()
 {
-  if (mRenderer)
-    mRenderer->RemoveActor(actor);
+	if (mRenderer)
+		mRenderer->RemoveActor(actor);
 }
 
 void GraphicalArc3D::setColor(Vector3D color)
 {
-  actor->GetProperty()->SetColor(color.begin());
+	actor->GetProperty()->SetColor(color.begin());
 }
 
 void GraphicalArc3D::setValue(Vector3D point1, Vector3D point2, Vector3D center)
 {
-  source->SetPoint1(point1.begin());
-  source->SetPoint2(point2.begin());
-  source->SetCenter(center.begin());
+	source->SetPoint1(point1.begin());
+	source->SetPoint2(point2.begin());
+	source->SetCenter(center.begin());
 }
 
 void GraphicalArc3D::setStipple(int stipple)
 {
-  actor->GetProperty()->SetLineStipplePattern(stipple);
+	actor->GetProperty()->SetLineStipplePattern(stipple);
 }
 
 vtkActorPtr GraphicalArc3D::getActor()
 {
-  return actor;
+	return actor;
 }
 
 ///--------------------------------------------------------
@@ -288,28 +288,28 @@ vtkActorPtr GraphicalArc3D::getActor()
 
 GraphicalArrow3D::GraphicalArrow3D( vtkRendererPtr renderer)
 {
-  mRenderer = renderer;
-  source = vtkArrowSourcePtr::New();
-  source->SetTipResolution(24);
-  source->SetShaftResolution(24);
-  mapper = vtkPolyDataMapperPtr::New() ;
-  actor = vtkActorPtr::New() ;
+	mRenderer = renderer;
+	source = vtkArrowSourcePtr::New();
+	source->SetTipResolution(24);
+	source->SetShaftResolution(24);
+	mapper = vtkPolyDataMapperPtr::New() ;
+	actor = vtkActorPtr::New() ;
 
-  mapper->SetInputConnection( source->GetOutputPort() );
-  actor->SetMapper (mapper );
-  if (mRenderer)
-    mRenderer->AddActor(actor);
+	mapper->SetInputConnection( source->GetOutputPort() );
+	actor->SetMapper (mapper );
+	if (mRenderer)
+		mRenderer->AddActor(actor);
 }
 
 GraphicalArrow3D::~GraphicalArrow3D()
 {
-  if (mRenderer)
-    mRenderer->RemoveActor(actor);
+	if (mRenderer)
+		mRenderer->RemoveActor(actor);
 }
 
 void GraphicalArrow3D::setColor(Vector3D color)
 {
-  actor->GetProperty()->SetColor(color.begin());
+	actor->GetProperty()->SetColor(color.begin());
 }
 
 void GraphicalArrow3D::setValue(Vector3D base, Vector3D normal, double length)
@@ -319,18 +319,18 @@ void GraphicalArrow3D::setValue(Vector3D base, Vector3D normal, double length)
 	if (similar(k, Vector3D(0,0,0)))
 		k = cross(Vector3D(0,1,0), normal);
 	k = k.normalized();
-	Transform3D M =  createTransformIJC(normal, k, base);
+	Transform3D M = createTransformIJC(normal, k, base);
 
 //	std::cout << "GraphicalArrow3D::setValue  " << base << " - " << normal << std::endl;
 	Transform3D S = createTransformScale(ssc::Vector3D(length,1,1));
-	M =  M * S;
+	M = M * S;
 	// let arrow shape increase slowly with length:
 //	source->SetTipLength(0.35/sqrt(length));
 //	source->SetTipRadius(0.1*sqrt(length));
 //	source->SetShaftRadius(0.03*sqrt(length));
-  source->SetTipLength(0.35);
-  source->SetTipRadius(0.1*(length));
-  source->SetShaftRadius(0.03*(length));
+	source->SetTipLength(0.35);
+	source->SetTipRadius(0.1*(length));
+	source->SetShaftRadius(0.03*(length));
 	actor->SetUserMatrix(M.getVtkMatrix());
 }
 
@@ -341,66 +341,66 @@ void GraphicalArrow3D::setValue(Vector3D base, Vector3D normal, double length)
 
 Rect3D::Rect3D(vtkRendererPtr renderer, Vector3D color)
 {
-  mRenderer = renderer;
-  mapper = vtkPolyDataMapperPtr::New();
-  actor = vtkActorPtr::New();
-  actor->GetProperty()->SetColor(color.begin());
-  actor->SetMapper(mapper);
-  if (mRenderer)
-    mRenderer->AddActor(actor);
+	mRenderer = renderer;
+	mapper = vtkPolyDataMapperPtr::New();
+	actor = vtkActorPtr::New();
+	actor->GetProperty()->SetColor(color.begin());
+	actor->SetMapper(mapper);
+	if (mRenderer)
+		mRenderer->AddActor(actor);
 
-  mPolyData = vtkPolyDataPtr::New();
-  mPoints = vtkPointsPtr::New();
-  mSide = vtkCellArrayPtr::New();
+	mPolyData = vtkPolyDataPtr::New();
+	mPoints = vtkPointsPtr::New();
+	mSide = vtkCellArrayPtr::New();
 
-  vtkIdType cells[5] = { 0,1,2,3,0 };
-  mSide->InsertNextCell(5, cells);
+	vtkIdType cells[5] = { 0,1,2,3,0 };
+	mSide->InsertNextCell(5, cells);
 
-  mPolyData->SetPoints(mPoints);
-  mapper->SetInput(mPolyData);
+	mPolyData->SetPoints(mPoints);
+	mapper->SetInput(mPolyData);
 }
 
 void Rect3D::setLine(bool on, int width)
 {
-  if (on)
-  {
-    mPolyData->SetLines(mSide);
-    actor->GetProperty()->SetLineWidth(width);
-  }
-  else
-  {
-    mPolyData->SetLines(NULL);
-  }
+	if (on)
+	{
+		mPolyData->SetLines(mSide);
+		actor->GetProperty()->SetLineWidth(width);
+	}
+	else
+	{
+		mPolyData->SetLines(NULL);
+	}
 }
 
 void Rect3D::setSurface(bool on)
 {
-  if (on)
-  {
-    mPolyData->SetPolys(mSide);
-    actor->GetProperty()->SetOpacity(1.0); // transparent planes dont work well together with texture volume. Use 1.0
-  }
-  else
-  {
-    mPolyData->SetPolys(NULL);
-  }
+	if (on)
+	{
+		mPolyData->SetPolys(mSide);
+		actor->GetProperty()->SetOpacity(1.0); // transparent planes dont work well together with texture volume. Use 1.0
+	}
+	else
+	{
+		mPolyData->SetPolys(NULL);
+	}
 }
 
 Rect3D::~Rect3D()
 {
-  if (mRenderer)
-    mRenderer->RemoveActor(actor);
+	if (mRenderer)
+		mRenderer->RemoveActor(actor);
 }
 
 void Rect3D::updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M)
 {
-  mPoints = vtkPointsPtr::New();
-  mPoints->InsertPoint(0, M.coord(bb.corner(0,0,0)).begin());
-  mPoints->InsertPoint(1, M.coord(bb.corner(0,1,0)).begin());
-  mPoints->InsertPoint(2, M.coord(bb.corner(1,1,0)).begin());
-  mPoints->InsertPoint(3, M.coord(bb.corner(1,0,0)).begin());
-  mPolyData->SetPoints(mPoints);
-  mPolyData->Update();
+	mPoints = vtkPointsPtr::New();
+	mPoints->InsertPoint(0, M.coord(bb.corner(0,0,0)).begin());
+	mPoints->InsertPoint(1, M.coord(bb.corner(0,1,0)).begin());
+	mPoints->InsertPoint(2, M.coord(bb.corner(1,1,0)).begin());
+	mPoints->InsertPoint(3, M.coord(bb.corner(1,0,0)).begin());
+	mPolyData->SetPoints(mPoints);
+	mPolyData->Update();
 }
 
 ///--------------------------------------------------------
@@ -414,18 +414,18 @@ FollowerText3D::FollowerText3D( vtkRendererPtr renderer)
 //  if (!mRenderer)
 //  	return;
 
-  mText = vtkVectorTextPtr::New();
-  vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
-  mapper->SetInput(mText->GetOutput());
-  mFollower = vtkFollowerPtr::New();
-  mFollower->SetMapper(mapper);
+	mText = vtkVectorTextPtr::New();
+	vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
+	mapper->SetInput(mText->GetOutput());
+	mFollower = vtkFollowerPtr::New();
+	mFollower->SetMapper(mapper);
 //  mFollower->SetCamera(mRenderer->GetActiveCamera());
-  ssc::Vector3D mTextScale(2,2,2);
-  mFollower->SetScale(mTextScale.begin());
+	ssc::Vector3D mTextScale(2,2,2);
+	mFollower->SetScale(mTextScale.begin());
 
-  this->setSizeInNormalizedViewport(true, 0.025);
+	this->setSizeInNormalizedViewport(true, 0.025);
 //  mRenderer->AddActor(mFollower);
-  this->setRenderer(renderer);
+	this->setRenderer(renderer);
 }
 
 void FollowerText3D::setRenderer(vtkRendererPtr renderer)
@@ -433,24 +433,24 @@ void FollowerText3D::setRenderer(vtkRendererPtr renderer)
 	if (mRenderer)
 	{
 		mRenderer->RemoveActor(mFollower);
-    mViewportListener->stopListen();
+		mViewportListener->stopListen();
 	}
 
-  mRenderer = renderer;
+	mRenderer = renderer;
 
-  if (mRenderer)
-  {
-    mRenderer->AddActor(mFollower);
-    mFollower->SetCamera(mRenderer->GetActiveCamera());
-    if (mViewportListener)
-      mViewportListener->startListen(mRenderer);
-  }
+	if (mRenderer)
+	{
+		mRenderer->AddActor(mFollower);
+		mFollower->SetCamera(mRenderer->GetActiveCamera());
+		if (mViewportListener)
+			mViewportListener->startListen(mRenderer);
+	}
 }
 
 FollowerText3D::~FollowerText3D()
 {
-  if (mRenderer)
-    mRenderer->RemoveActor(mFollower);
+	if (mRenderer)
+		mRenderer->RemoveActor(mFollower);
 }
 
 void FollowerText3D::setSize(double val)
@@ -463,15 +463,15 @@ void FollowerText3D::setSizeInNormalizedViewport(bool on, double size)
 {
 	if (on)
 	{
-	  if (!mViewportListener)
-	  {
-      mViewportListener.reset(new ssc::ViewportListener);
-      mViewportListener->setCallback(boost::bind(&FollowerText3D::scaleText, this));
-	  }
+		if (!mViewportListener)
+		{
+			mViewportListener.reset(new ssc::ViewportListener);
+			mViewportListener->setCallback(boost::bind(&FollowerText3D::scaleText, this));
+		}
 	}
 	else
 	{
-    mViewportListener.reset();
+		mViewportListener.reset();
 	}
 
 	this->setSize(size);
@@ -484,17 +484,17 @@ void FollowerText3D::setColor(Vector3D color)
 
 void FollowerText3D::setText(QString text)
 {
-  mText->SetText(cstring_cast(text));
+	mText->SetText(cstring_cast(text));
 }
 
 void FollowerText3D::setPosition(ssc::Vector3D pos)
 {
-  mFollower->SetPosition(pos.begin());
+	mFollower->SetPosition(pos.begin());
 }
 
 vtkFollowerPtr FollowerText3D::getActor()
 {
-  return mFollower;
+	return mFollower;
 }
 
 /**Note: Internal method!
@@ -507,17 +507,17 @@ void FollowerText3D::scaleText()
 {
 	if (!mViewportListener || !mViewportListener->isListening())
 	{
-    mFollower->SetScale(ssc::Vector3D(mSize,mSize,mSize).begin());
+		mFollower->SetScale(ssc::Vector3D(mSize,mSize,mSize).begin());
 		return;
 	}
 
 	double size = mViewportListener->getVpnZoom();
 
-  double scale = mSize/size;
+	double scale = mSize/size;
 //  std::cout << "s= " << size << "  ,scale= " << scale << std::endl;
-  ssc::Vector3D mTextScale(scale,scale,scale);
-  if (mFollower)
-    mFollower->SetScale(mTextScale.begin());
+	ssc::Vector3D mTextScale(scale,scale,scale);
+	if (mFollower)
+		mFollower->SetScale(mTextScale.begin());
 }
 
 ///--------------------------------------------------------
@@ -537,14 +537,7 @@ CaptionText3D::CaptionText3D( vtkRendererPtr renderer)
 	mText->SetWidth(10);
 	mText->SetHeight(0.03);
 
-//	mText->GetPositionCoordinate()->SetCoordinateSystemToWorld();
-
-//	ssc::Vector3D mTextScale(2,2,2);
-//  mFollower->SetScale(mTextScale.begin());
-//
-//  this->setSizeInNormalizedViewport(true, 0.025);
-////  mRenderer->AddActor(mFollower);
-  this->setRenderer(renderer);
+	this->setRenderer(renderer);
 }
 
 void CaptionText3D::setRenderer(vtkRendererPtr renderer)
@@ -554,27 +547,23 @@ void CaptionText3D::setRenderer(vtkRendererPtr renderer)
 		mRenderer->RemoveActor(mText);
 	}
 
-  mRenderer = renderer;
+	mRenderer = renderer;
 
-  if (mRenderer)
-  {
-    mRenderer->AddActor(mText);
-  }
+	if (mRenderer)
+	{
+		mRenderer->AddActor(mText);
+	}
 }
 
 CaptionText3D::~CaptionText3D()
 {
-  if (mRenderer)
-    mRenderer->RemoveActor(mText);
+	if (mRenderer)
+		mRenderer->RemoveActor(mText);
 }
 
 void CaptionText3D::setSize(double val)
 {
-//	std::cout << "setsize=" << val << std::endl;
-//	mText->SetHeight(mSize*3);
 	mText->SetHeight(val);
-//	this->scaleText();
-//	std::cout << "s=" << val << ",  w,h=" << mText->GetWidth() << "," << mText->GetHeight() << std::endl;
 }
 
 void CaptionText3D::setColor(Vector3D color)
@@ -584,19 +573,17 @@ void CaptionText3D::setColor(Vector3D color)
 
 void CaptionText3D::setText(QString text)
 {
-  mText->SetCaption(cstring_cast(text));
+	mText->SetCaption(cstring_cast(text));
 }
 
 void CaptionText3D::setPosition(ssc::Vector3D pos)
 {
-//	std::cout << "setting pos " << pos << std::endl;
-//	mText->SetPosition(pos.begin());
 	mText->SetAttachmentPoint(pos.begin());
 }
 
 vtkCaptionActor2DPtr CaptionText3D::getActor()
 {
-  return mText;
+	return mText;
 }
 
 ///--------------------------------------------------------
