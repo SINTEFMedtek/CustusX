@@ -44,7 +44,7 @@ public:
 	FiberBundleROI(Vector3D pt, float radius) : mPoint(pt), mRadius(radius) {}
 	FiberBundleROI(const FiberBundleROI& other) : mPoint(other.getPoint()), mRadius(other.getRadius()) {}
 
-	FiberBundleROI operator=(const FiberBundleROI& other)
+	FiberBundleROI &operator=(const FiberBundleROI& other)
 	{
 		if (this != &other) // protect agains self assignment
 		{
