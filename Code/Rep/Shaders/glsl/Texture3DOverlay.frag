@@ -116,7 +116,7 @@ void main()
 	} 
 	if (layers>2)
 	{
-		col = applyLayerN(col,2,lutsize1,lut2,texture2, window2, level2, llr2, alpha2);
+		col = applyLayerN(col,2,lutsize2,lut2,texture2, window2, level2, llr2, alpha2);
 	} 
 	if (layers>3)
 	{
