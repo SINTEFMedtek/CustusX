@@ -93,7 +93,7 @@ void DummyToolManager::startTracking()
 	while(it != mDummyTools->end())
 	{
 		((*it).second)->startTracking();
-		it++;
+		++it;
 	}
 
 }
@@ -106,7 +106,7 @@ void DummyToolManager::stopTracking()
 	while(it != mDummyTools->end())
 	{
 		((*it).second)->stopTracking();
-		it++;
+		++it;
 	}
 }
 
@@ -119,7 +119,7 @@ ToolManager::ToolMapPtr DummyToolManager::getConfiguredTools()
 	{
 		retval->insert(std::pair<QString, ToolPtr>
 		               (((*it).first), (ToolPtr)((*it).second)));
-		it++;
+		++it;
 	}
 	return retval;
 }
@@ -162,7 +162,7 @@ std::map<QString, QString> DummyToolManager::getToolUidsAndNames() const
 	{
 		uidsAndNames.insert(std::pair<QString, QString>(
 		                    ((*it).second)->getUid(),((*it).second)->getName()));
-		it++;
+		++it;
 	}
 	return uidsAndNames;
 }
@@ -173,7 +173,7 @@ std::vector<QString> DummyToolManager::getToolNames() const
 	while(it != mDummyTools->end())
 	{
 		names.push_back(((*it).second)->getName());
-		it++;
+		++it;
 	}
 	return names;
 }
@@ -184,7 +184,7 @@ std::vector<QString> DummyToolManager::getToolUids() const
 	while(it != mDummyTools->end())
 	{
 		uids.push_back(((*it).second)->getUid());
-		it++;
+		++it;
 	}
 	return uids;
 }
@@ -209,7 +209,7 @@ void DummyToolManager::saveTransformsAndTimestamps(QString filePathAndName)
 	while(it != mDummyTools->end())
 	{
 		((*it).second)->saveTransformsAndTimestamps();
-		it++;
+		++it;
 	}
 }
 
