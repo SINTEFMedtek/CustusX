@@ -144,6 +144,10 @@ SNW2VolumeMetaData::SNW2VolumeMetaData()
 	Volume.mLLR = 0.0;
 	Volume.mFirstPixel = -1;
 	Volume.mLastPixel = -1;
+	mIntraoperative = false;
+	Lut.mBitsPerSample = 0;
+	Lut.mLength = 0;
+	Lut.mStart = -1;
 }
 
 ///--------------------------------------------------------

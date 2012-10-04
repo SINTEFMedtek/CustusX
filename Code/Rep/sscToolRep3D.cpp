@@ -42,6 +42,7 @@ namespace ssc
 
 ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
 	RepImpl(uid, name),
+	mSphereRadiusInNormalizedViewport(false),
 	mTooltipPointColor(1.0, 0.8, 0.0),
 	mOffsetPointColor(1.0, 0.8, 0.0),
 	mOffsetLineColor(1.0, 0.8, 0.0),

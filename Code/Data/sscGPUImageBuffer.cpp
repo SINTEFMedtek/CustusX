@@ -230,6 +230,7 @@ public:
 	{
 		mAllocated = false;
 		mLutSize = 0;
+		mLutDataSize = 0;
 		textureId = 0;
 		mMemorySize = 0;
 	}
