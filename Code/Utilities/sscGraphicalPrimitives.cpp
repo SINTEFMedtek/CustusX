@@ -571,9 +571,8 @@ CaptionText3D::~CaptionText3D()
 void CaptionText3D::setSize(double val)
 {
 //	std::cout << "setsize=" << val << std::endl;
-	mSize = val;
 //	mText->SetHeight(mSize*3);
-	mText->SetHeight(mSize);
+	mText->SetHeight(val);
 //	this->scaleText();
 //	std::cout << "s=" << val << ",  w,h=" << mText->GetWidth() << "," << mText->GetHeight() << std::endl;
 }
