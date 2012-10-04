@@ -36,6 +36,8 @@ PlaneMetric::PlaneMetric(const QString& uid, const QString& name) :
 	DataMetric(uid, name),
 	mSpace(ssc::SpaceHelpers::getR())
 {
+	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
+	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
 PlaneMetric::~PlaneMetric()
@@ -82,15 +84,21 @@ void PlaneMetric::setSpace(ssc::CoordinateSystem space)
 	if (space == mSpace)
 		return;
 
+	// keep the absolute position (in ref) constant when changing space.
+	ssc::Transform3D new_M_old = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), space);
+	mCoordinate = new_M_old.coord(mCoordinate);
+	mNormal = new_M_old.vector(mNormal);
+
 	mSpace = space;
 
-	//TODO connect to the owner of space - data or tool or whatever
-	if (mSpace.mId == ssc::csTOOL)
-	{
-		connect(ssc::toolManager()->getTool(mSpace.mRefObject).get(),
-						SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this,
-						SIGNAL(transformChanged()));
-	}
+	mSpaceListener->setSpace(space);
+//	//TODO connect to the owner of space - data or tool or whatever
+//	if (mSpace.mId == ssc::csTOOL)
+//	{
+//		connect(ssc::toolManager()->getTool(mSpace.mRefObject).get(),
+//						SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this,
+//						SIGNAL(transformChanged()));
+//	}
 
 	emit transformChanged();
 }
