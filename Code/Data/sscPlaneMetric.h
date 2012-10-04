@@ -23,6 +23,7 @@
 #include "sscDataMetric.h"
 #include "sscCoordinateSystemHelpers.h"
 #include "sscDataManagerImpl.h"
+#include "sscPointMetric.h"
 
 namespace ssc
 {
@@ -94,6 +95,7 @@ private:
 	ssc::Vector3D mCoordinate;
 	ssc::Vector3D mNormal;
 	ssc::CoordinateSystem mSpace;
+	CoordinateSystemListenerPtr mSpaceListener;
 };
 
 /**
