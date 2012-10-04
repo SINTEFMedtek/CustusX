@@ -220,6 +220,8 @@ public:
 
 //---------------------------------------------------------
 GPURayCastVolumePainter::GPURayCastVolumePainter() :
+	mWidth(0),
+	mHeight(0),
 	mDepthBuffer(0),
 	mBackgroundBuffer(0),
 	mStepSize(1.0),
