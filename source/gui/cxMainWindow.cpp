@@ -37,7 +37,7 @@
 #include "cxToolManagerWidget.h"
 #include "cxVideoService.h"
 #include "cxLogicManager.h"
-
+#include "cxExportDataDialog.h"
 #include "sscGPUImageBuffer.h"
 #include "sscData.h"
 #include "sscConsoleWidget.h"
@@ -296,7 +296,7 @@ void MainWindow::createActions()
 	connect(mLoadFileAction, SIGNAL(triggered()), this, SLOT(loadPatientFileSlot()));
 	connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(savePatientFileSlot()));
 	connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
-	connect(mExportPatientAction, SIGNAL(triggered()), patientService()->getPatientData().get(), SLOT(exportPatient()));
+	connect(mExportPatientAction, SIGNAL(triggered()), this, SLOT(exportDataSlot()));
 	connect(mClearPatientAction, SIGNAL(triggered()), this, SLOT(clearPatientSlot()));
 
 	mShowControlPanelAction = new QAction("Show Control Panel", this);
@@ -711,6 +711,14 @@ void MainWindow::loadPatientFileSlot()
 	//  cx::FrameForest forest;
 }
 
+void MainWindow::exportDataSlot()
+{
+	this->savePatientFileSlot();
+
+	ExportDataDialog* wizard = new ExportDataDialog(this);
+	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
+}
+
 void MainWindow::importDataSlot()
 {
 	this->savePatientFileSlot();
@@ -735,7 +743,6 @@ void MainWindow::importDataSlot()
 		ImportDataDialog* wizard = new ImportDataDialog(fileName[i], this);
 		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 	}
-
 }
 
 void MainWindow::patientChangedSlot()

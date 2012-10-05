@@ -33,6 +33,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/cxImagePropertiesWidget.h
     dataWidgets/cxMeshPropertiesWidget.h
     dataWidgets/cxImportDataDialog.h
+    dataWidgets/cxExportDataDialog.h
     dataWidgets/cxDataViewSelectionWidget.h
     dataWidgets/cxTransferFunctionWidget.h
     dataWidgets/cxTransferFunctionAlphaWidget.h
@@ -171,6 +172,8 @@ SET(cxGui_SRCS
     dataWidgets/cxMeshPropertiesWidget.cpp
     dataWidgets/cxImportDataDialog.h
     dataWidgets/cxImportDataDialog.cpp
+    dataWidgets/cxExportDataDialog.h
+    dataWidgets/cxExportDataDialog.cpp
     dataWidgets/cxDataViewSelectionWidget.h
     dataWidgets/cxDataViewSelectionWidget.cpp
     dataWidgets/sscDICOMWidget.h
