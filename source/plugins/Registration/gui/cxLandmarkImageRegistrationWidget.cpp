@@ -206,11 +206,14 @@ void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	LandmarkRegistrationWidget::hideEvent(event);
 
-	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
-	if (rep)
+	if(viewManager()->get3DView(0, 0))
 	{
-		rep->setPrimarySource(LandmarksSourcePtr());
-		rep->setSecondarySource(LandmarksSourcePtr());
+		LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
+		if (rep)
+		{
+			rep->setPrimarySource(LandmarksSourcePtr());
+			rep->setSecondarySource(LandmarksSourcePtr());
+		}
 	}
 	viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
