@@ -154,11 +154,14 @@ void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 	disconnect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
 	disconnect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
-	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
-	if (rep)
+	if(viewManager()->get3DView(0, 0))
 	{
-		rep->setPrimarySource(LandmarksSourcePtr());
-		rep->setSecondarySource(LandmarksSourcePtr());
+		LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
+		if (rep)
+		{
+			rep->setPrimarySource(LandmarksSourcePtr());
+			rep->setSecondarySource(LandmarksSourcePtr());
+		}
 	}
 	viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }

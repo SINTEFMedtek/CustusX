@@ -30,6 +30,10 @@ bool SetupEnvironmentForDepthPeeling(vtkSmartPointer<vtkRenderWindow> renderWind
 		vtkSmartPointer<vtkRenderer> renderer, int maxNoOfPeels,
 		double occlusionRatio);
 
+bool TurnOffDepthPeeling(
+		vtkSmartPointer<vtkRenderWindow> renderWindow,
+		vtkSmartPointer<vtkRenderer> renderer);///< Turn off depth peeling
+
 bool IsDepthPeelingSupported(vtkSmartPointer<vtkRenderWindow> renderWindow,
 		vtkSmartPointer<vtkRenderer> renderer,
 		bool doItOffScreen);

@@ -10,6 +10,7 @@
 #include "sscMesh.h"
 #include "cxPatientService.h"
 #include "cxTimedAlgorithmProgressBar.h"
+#include "cxRepManager.h"
 
 namespace cx
 {
@@ -43,6 +44,7 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   topLayout->addWidget(selectImageComboBox, 0, 0, 1, 2);
 
   QPushButton* segmentButton = new QPushButton("Segment", this);
+  segmentButton->setToolTip(this->defaultWhatsThis());
   connect(segmentButton, SIGNAL(clicked()), this, SLOT(segmentSlot()));
 
   QPushButton* segmentationOptionsButton = new QPushButton("Options", this);
@@ -74,10 +76,16 @@ void BinaryThresholdImageFilterWidget::setDefaultColor(QColor color)
 
 QString BinaryThresholdImageFilterWidget::defaultWhatsThis() const
 {
-  return "<html>"
-    "<h3>Binary Threshold Image Filter.</h3>"
-    "<p><i>Segment out areas from the selected image using a threshold.</i></p>"
-    "</html>";
+	return "<html>"
+			"<h3>Binary Threshold Image Filter.</h3>"
+			"<p><i>Segment out areas from the selected image using a threshold.</i></p>"
+			"<p><b>The segment button creates both segmented volume, and surface model. </b>"
+			"<p>The options in this widget only affects the segmented volume.<br>"
+			"The generated surface model only use default options.<br>"
+			"Use <i>Visualization Methods | Surface</i> of other surface options are needed"
+			"<p>Turn off smoothing and set <i>Preferences|Performance|Max Render size</i> larger "
+			"than actual volume size to make preview volume more accurate.</p>"
+			"</html>";
 }
 
 void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
@@ -87,7 +95,7 @@ void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
 
 void BinaryThresholdImageFilterWidget::preprocessSegmentation()
 {
-	patientService()->getThresholdPreview()->removePreview(this);
+	RepManager::getInstance()->getThresholdPreview()->removePreview(this);
 
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
@@ -164,7 +172,7 @@ void BinaryThresholdImageFilterWidget::toogleBinarySlot(bool on)
 
 void BinaryThresholdImageFilterWidget::thresholdSlot()
 {
-	patientService()->getThresholdPreview()->setPreview(this, mSelectedImage->getImage(),
+	RepManager::getInstance()->getThresholdPreview()->setPreview(this, mSelectedImage->getImage(),
 			mSegmentationThresholdAdapter->getValue());
 }
 
@@ -181,7 +189,7 @@ void BinaryThresholdImageFilterWidget::toogleSmoothingSlot(bool on)
 
 void BinaryThresholdImageFilterWidget::imageChangedSlot(QString uid)
 {
-//	patientService()->getThresholdPreview()->removePreview(this);
+//	RepManager::getInstance()->getThresholdPreview()->removePreview(this);
 
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
   if(!image)
@@ -224,8 +232,8 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
   connect(smoothingCheckBox, SIGNAL(toggled(bool)), this, SLOT(toogleSmoothingSlot(bool)));
 
   mSmoothingSigmaAdapter = ssc::DoubleDataAdapterXml::initialize("Smoothing sigma", "",
-      "Used for smoothing the segmented volume",
-      0.5, ssc::DoubleRange(0, 10, 0.1), 1);
+      "Used for smoothing the segmented volume. Measured in units of image spacing.",
+      0.10, ssc::DoubleRange(0, 5, 0.01), 2);
 
   layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mSegmentationThresholdAdapter));
   //We currently only have binary thresholding, so we remove this checkbox for now

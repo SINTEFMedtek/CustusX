@@ -11,6 +11,7 @@
 #include <QObject>
 #include "boost/shared_ptr.hpp"
 class QWidget;
+class QToolBar;
 #include <vector>
 
 namespace cx
@@ -34,7 +35,8 @@ public:
 	virtual ~PluginBase() {}
 
 	virtual std::vector<PluginWidget> createWidgets() const = 0;
-//	virtual void addXml(QDomNode& dataNode);
+	virtual std::vector<QToolBar*> createToolBars() const { return std::vector<QToolBar*>(); }
+	//	virtual void addXml(QDomNode& dataNode);
 //	virtual void parseXml(QDomNode& dataNode);
 };
 

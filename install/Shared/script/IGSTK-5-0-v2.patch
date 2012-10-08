@@ -1,0 +1,184 @@
+From a017bca7b112d6ca66629f7d57685140eafbf6f5 Mon Sep 17 00:00:00 2001
+From: Janne Beate Lervik Bakeng <Janne.Beate.Lervik.Bakeng@sintef.no>
+Date: Thu, 14 Jun 2012 11:21:07 +0200
+Subject: [PATCH 1/2] IGSTK 5.0 now compiles on Lion (MacOSX 10.7.4, gcc
+ version 4.2.1 (Based on Apple Inc. build 5658) (LLVM
+ build 2336.9.00), ITK v4.1.0 and works with shared
+ libs. VTK v5.8.0. BUILD_TESTING:OFF, BUILD_EXAMPLES:ON.
+
+Signed-off-by: Christian <christian.askeland@sintef.no>
+---
+ Examples/CMakeLists.txt                          |    1 +
+ Examples/TrackerConfiguration/CMakeLists.txt     |    1 +
+ Examples/TransformReaders/CMakeLists.txt         |    3 ++-
+ Source/CMakeLists.txt                            |    3 ++-
+ Source/igstkMR3DImageToUS3DImageRegistration.cxx |    2 +-
+ Source/igstkPolarisClassicTracker.cxx            |    3 ++-
+ Source/igstkStateMachine.h                       |    4 ++--
+ Source/igstkStateMachine.txx                     |    4 ++--
+ Utilities/SceneGraphVisualization/CMakeLists.txt |    2 ++
+ 9 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/Examples/CMakeLists.txt b/Examples/CMakeLists.txt
+index 0f64162..1912bdb 100644
+--- a/Examples/CMakeLists.txt
++++ b/Examples/CMakeLists.txt
+@@ -38,6 +38,7 @@ IF(IGSTK_USE_Qt)
+    ENDIF(IGSTK_USE_MicronTracker)
+ ENDIF(IGSTK_USE_Qt)
+ 
++
+ IF (IGSTK_USE_OpenIGTLink)
+     SUBDIRS(  OpenIGTLinkTrackerBroadcasting )
+     SUBDIRS(  OpenIGTLinkConfigurationReaders )
+diff --git a/Examples/TrackerConfiguration/CMakeLists.txt b/Examples/TrackerConfiguration/CMakeLists.txt
+index 36da387..2c76f0e 100644
+--- a/Examples/TrackerConfiguration/CMakeLists.txt
++++ b/Examples/TrackerConfiguration/CMakeLists.txt
+@@ -61,6 +61,7 @@ INCLUDE_DIRECTORIES(
+ )
+ 
+ ADD_LIBRARY(TrackerConfiguration ${SRCS} ${HDRS})
++TARGET_LINK_LIBRARIES(TrackerConfiguration TransformReaders IGSTK )
+ 
+ ADD_EXECUTABLE(TrackerConfigurationExample TrackerConfigurationExample.cxx)
+ TARGET_LINK_LIBRARIES(TrackerConfigurationExample TrackerConfiguration TransformReaders IGSTK )
+diff --git a/Examples/TransformReaders/CMakeLists.txt b/Examples/TransformReaders/CMakeLists.txt
+index 2a1cdb9..63aa8da 100644
+--- a/Examples/TransformReaders/CMakeLists.txt
++++ b/Examples/TransformReaders/CMakeLists.txt
+@@ -27,5 +27,6 @@ INCLUDE_DIRECTORIES(
+ )
+ 
+ ADD_LIBRARY( TransformReaders ${SRCS} ${HDRS})
+-ADD_EXECUTABLE(TransformReaderExample TransformReaderExample.cxx) 
++TARGET_LINK_LIBRARIES(TransformReaders IGSTK)
++ADD_EXECUTABLE(TransformReaderExample TransformReaderExample.cxx)
+ TARGET_LINK_LIBRARIES(TransformReaderExample TransformReaders IGSTK)
+diff --git a/Source/CMakeLists.txt b/Source/CMakeLists.txt
+index d064eae..a55ec5a 100644
+--- a/Source/CMakeLists.txt
++++ b/Source/CMakeLists.txt
+@@ -531,7 +531,8 @@ ADD_LIBRARY(IGSTK ${IGSTK_HEADS} ${IGSTK_SRCS})
+ 
+ # Linking with the FLTK, ITK and VTK libraries
+ TARGET_LINK_LIBRARIES( IGSTK
+-    ITKIO ITKBasicFilters ITKNumerics ITKCommon ITKSpatialObject
++    #ITKIO ITKBasicFilters ITKNumerics ITKCommon ITKSpatialObject
++    ${ITK_LIBRARIES}
+     vtkRendering vtkGraphics vtkHybrid vtkImaging 
+     vtkIO vtkFiltering vtkCommon vtksys
+     ${EXTRA_LIBS}
+diff --git a/Source/igstkMR3DImageToUS3DImageRegistration.cxx b/Source/igstkMR3DImageToUS3DImageRegistration.cxx
+index a80c762..4766a40 100644
+--- a/Source/igstkMR3DImageToUS3DImageRegistration.cxx
++++ b/Source/igstkMR3DImageToUS3DImageRegistration.cxx
+@@ -410,7 +410,7 @@ void MR3DImageToUS3DImageRegistration::CalculateRegistrationProcessing()
+   registration->SetInitialTransformParameters( initialParameters );
+   try
+     {
+-    registration->StartRegistration();
++    registration->Update();
+     }
+   catch( itk::ExceptionObject & excp )
+     {
+diff --git a/Source/igstkPolarisClassicTracker.cxx b/Source/igstkPolarisClassicTracker.cxx
+index 8cbb3fc..3922fc7 100644
+--- a/Source/igstkPolarisClassicTracker.cxx
++++ b/Source/igstkPolarisClassicTracker.cxx
+@@ -185,7 +185,8 @@ PolarisClassicTracker::CheckError(CommandInterpreterType *interpreter) const
+   if (errnum)
+     {
+     // convert errnum to a hexidecimal string
+-    itk::OStringStream os;
++    //itk::OStringStream os;
++	std::stringstream os;
+     os << "0x";
+     os.width(2);
+     os.fill('0');
+diff --git a/Source/igstkStateMachine.h b/Source/igstkStateMachine.h
+index 7307663..4956828 100644
+--- a/Source/igstkStateMachine.h
++++ b/Source/igstkStateMachine.h
+@@ -131,14 +131,14 @@ public:
+   /** Export the schematic description of the state machine to a stream.
+    *  This method use the format required as input by the "dot" tool 
+    *  from graphviz. */
+-  void ExportDescription( OutputStreamType & ostr, bool skipLoops ) const;
++  void ExportDescription( OutputStreamType & ostr, bool skipLoops = false ) const;
+ 
+   /** Export the schematic description of the state machine to a stream.
+    *  This method use the format required as input by the "LTSA" analysis 
+    *  tools. 
+    *  LTSA (Labeled Transition Systems Analyzer) available from  
+    *  http://www-dse.doc.ic.ac.uk/concurrency.   */
+-  void ExportDescriptionToLTS( OutputStreamType & ostr, bool skipLoops) const;
++  void ExportDescriptionToLTS( OutputStreamType & ostr, bool skipLoops = false) const;
+ 
+   /** Export the schematic description of the state machine to a stream.
+    *  This method use the "SCXML" format. */
+diff --git a/Source/igstkStateMachine.txx b/Source/igstkStateMachine.txx
+index f84904f..88fc4ca 100644
+--- a/Source/igstkStateMachine.txx
++++ b/Source/igstkStateMachine.txx
+@@ -483,7 +483,7 @@ StateMachine< TClass >
+ template<class TClass>
+ void
+ StateMachine< TClass >
+-::ExportDescription( OutputStreamType & ostr, bool skipLoops=false ) const
++::ExportDescription( OutputStreamType & ostr, bool skipLoops ) const
+ {
+   ostr << "digraph G {" << std::endl;
+ 
+@@ -537,7 +537,7 @@ StateMachine< TClass >
+ template<class TClass>
+ void
+ StateMachine< TClass >
+-::ExportDescriptionToLTS( OutputStreamType & ostr, bool skipLoops=false ) const
++::ExportDescriptionToLTS( OutputStreamType & ostr, bool skipLoops ) const
+ {
+   // Export all the transitions between states
+   int out_count = 0;
+diff --git a/Utilities/SceneGraphVisualization/CMakeLists.txt b/Utilities/SceneGraphVisualization/CMakeLists.txt
+index 657462b..c3c98d1 100644
+--- a/Utilities/SceneGraphVisualization/CMakeLists.txt
++++ b/Utilities/SceneGraphVisualization/CMakeLists.txt
+@@ -23,6 +23,8 @@ INCLUDE_DIRECTORIES(
+   
+ ADD_LIBRARY(SceneGraphVisualization ${SceneGraphVisualization_SRC} )
+ 
++TARGET_LINK_LIBRARIES( SceneGraphVisualization IGSTK)
++
+ # Apply user-defined properties to the library target.
+ IF(IGSTK_LIBRARY_PROPERTIES)
+   SET_TARGET_PROPERTIES(SceneGraphVisualization PROPERTIES
+-- 
+1.7.4.4
+
+
+From 7fc30f41c12193bf8a840f29adc9b1f49ba576ad Mon Sep 17 00:00:00 2001
+From: Christian <christian.askeland@sintef.no>
+Date: Fri, 21 Sep 2012 15:10:36 +0200
+Subject: [PATCH 2/2] fixed sign error in igstkRealTimeClock.cxx - emitted
+ timestamps are now in milliseconds since epoch
+
+---
+ Source/igstkRealTimeClock.cxx |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Source/igstkRealTimeClock.cxx b/Source/igstkRealTimeClock.cxx
+index 3b18f7c..017ae10 100644
+--- a/Source/igstkRealTimeClock.cxx
++++ b/Source/igstkRealTimeClock.cxx
+@@ -84,7 +84,7 @@ void RealTimeClock::Initialize()
+   m_Origin -= static_cast< TimeStampType >( (__int64)tick.QuadPart ) 
+               / m_Frequency;
+     
+-  m_Origin += m_Difference;
++  m_Origin -= m_Difference;
+ 
+ #else
+ 
+-- 
+1.7.4.4
+

@@ -71,6 +71,7 @@ protected slots:
 	void resetDesktopSlot();
 
 	//data menu
+	void exportDataSlot();
 	void importDataSlot(); ///< loads data(images) into the datamanager
 	void deleteDataSlot(); ///< deletes data(image) from the patient
 
@@ -187,6 +188,8 @@ private:
 	QToolBar* mScreenshotToolBar;
 
 	std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
+
+	QString mLastImportDataFolder;
 
 	//widgets
 	class SecondaryMainWindow* mControlPanel;

@@ -276,8 +276,8 @@ void ViewWrapper::dataActionSlot()
 	else
 	{
 		mViewGroup->removeData(data);
-		if (image)
-		ssc::dataManager()->setActiveImage(ssc::ImagePtr());
+		//if (image)
+		//ssc::dataManager()->setActiveImage(ssc::ImagePtr());
 	}
 
 	if (firstData)
