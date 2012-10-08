@@ -48,7 +48,7 @@ LayoutEditorWidget::LayoutEditorWidget(QWidget* parent) :
   mRCLayout->addWidget(mColsEdit);
   mRCLayout->addStretch();
 
-  for (int i=ssc::ptNOPLANE; i<ssc::ptCOUNT; ++i)
+  for (int i=ssc::ptNOPLANE+1; i<ssc::ptCOUNT; ++i)
   {
     ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(i);
     mPlaneNames[type] = qstring_cast(type);
@@ -102,7 +102,7 @@ void LayoutEditorWidget::contextMenuSlot(const QPoint& point)
   menu.addSeparator();
 
   // actions for view group
-  int viewGroupCount = viewManager()->getViewGroups().size();
+  int viewGroupCount = static_cast<int>(viewManager()->getViewGroups().size());
   QActionGroup* groupActions = new QActionGroup(this);
   for (int i=0; i<viewGroupCount; ++i)
   {
@@ -283,6 +283,7 @@ LayoutData::ViewData LayoutEditorWidget::getViewData(QPoint pt)
 void LayoutEditorWidget::rowsColumnsChangedSlot()
 {
   mViewData.resize(mRowsEdit->value(), mColsEdit->value());
+  this->setSaneGroupIDs();
   this->updateGrid();
 }
 
@@ -294,6 +295,18 @@ QString LayoutEditorWidget::getViewName(LayoutData::ViewData data) const
       return mViewNames[i].mName;
   }
   return "NA";
+}
+
+/**walk through views and change invalid groups to a better default: 0
+ *
+ */
+void LayoutEditorWidget::setSaneGroupIDs()
+{
+	  for (LayoutData::iterator iter=mViewData.begin(); iter!=mViewData.end(); ++iter)
+	  {
+		  if (iter->mGroup<0)
+			  iter->mGroup = 0;
+	  }
 }
 
 /**Set visibility and position of frames in the gridlayout

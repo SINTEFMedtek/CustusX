@@ -31,6 +31,7 @@
 #include "cxElastixWidget.h"
 #include "cxManualRegistrationWidget.h"
 #include "cxSettings.h"
+#include "cxPatientOrientationWidget.h"
 
 namespace cx
 {
@@ -163,6 +164,9 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   //manual offset
 //  ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(regManager, this);
 
+  //patient orientation
+  PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(regManager, this);
+
   //plate
   Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(this, "PlateRegistrationWidget", "Plate");
   PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(regManager, imageAndPlateRegistrationWidget);
@@ -175,6 +179,7 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
   this->addTab(manRegWidget, "Manual");
   this->addTab(new ElastixWidget(regManager), "ElastiX");
   this->addTab(image2imageWidget, "Vessel");
+  this->addTab(patientOrientationWidget, "Patient Orientation");
   this->addTab(imageAndPlateRegistrationWidget, "Plate");
 
   connect(mTabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChangedSlot(int)));

@@ -266,7 +266,10 @@ void ViewGroup::mouseClickInViewGroupSlot()
 {
 	std::vector<ssc::ImagePtr> images = mViewGroupData->getImages();
 	if (images.empty())
-		ssc::dataManager()->setActiveImage(ssc::ImagePtr());
+	{
+		//Don't remove active image too easily
+		//ssc::dataManager()->setActiveImage(ssc::ImagePtr());
+	}
 	else
 	{
 		if (!std::count(images.begin(), images.end(), ssc::dataManager()->getActiveImage()))
@@ -275,12 +278,12 @@ void ViewGroup::mouseClickInViewGroupSlot()
 		}
 	}
 
-	ssc::ViewWidget* view = static_cast<ssc::ViewWidget*>(this->sender());
+	ViewWidgetQPtr view = static_cast<ssc::ViewWidget*>(this->sender());
 	if (view)
 		viewManager()->setActiveView(view->getUid());
 }
 
-std::vector<ssc::ViewWidget*> ViewGroup::getViews() const
+std::vector<ViewWidgetQPtr> ViewGroup::getViews() const
 {
 	return mViews;
 }

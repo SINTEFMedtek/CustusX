@@ -77,8 +77,21 @@ void USAcquisition::checkIfReadySlot()
     	mWhatsMissing.append("<font color=red>Need connect to a recorder.</font><br>");
   }
 
+  bool saving = mFileMakerFutureWatcher.isRunning();
+
+  if (saving)
+  	mWhatsMissing.append("<font color=orange>Saving acquisition data.</font><br>");
+
+  // remove redundant line breaks
+  QStringList list = mWhatsMissing.split("<br>", QString::SkipEmptyParts);
+  mWhatsMissing = list.join("<br>");
+
+  //Make sure we have at least 2 lines to avoid "bouncing buttons"
+  if (list.size() < 2)
+	  mWhatsMissing.append("<br>");
+
   // do not require tracking to be present in order to perform an acquisition.
-  emit ready(streaming && mRTRecorder, mWhatsMissing);
+  emit ready(!saving && streaming && mRTRecorder, mWhatsMissing);
 }
 
 void USAcquisition::setTool(ssc::ToolPtr tool) {
@@ -190,6 +203,7 @@ void USAcquisition::fileMakerWriteFinished()
 {
   QString targetFolder = mFileMakerFutureWatcher.future().result();
   mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
+  this->checkIfReadySlot();
   emit saveDataCompleted(mFileMaker->getMhdFilename(targetFolder));
 }
 

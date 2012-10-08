@@ -105,7 +105,7 @@ class ViewManager: public QObject
 Q_OBJECT
 public:
 
-	View3D* get3DView(int group = 0, int index = 0);
+	View3DQPtr get3DView(int group = 0, int index = 0);
 	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
 
 //  void fillModelTree(TreeItemPtr root);
@@ -142,6 +142,8 @@ public:
 
 	RenderTimerPtr getRenderTimer() { return mRenderTimer; }
 
+	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
+
 signals:
 	void imageDeletedFromViews(ssc::ImagePtr image); ///< Emitted when an image is deleted from the views in the cxViewManager
 	void fps(int number); ///< Emits number of frames per second
@@ -160,7 +162,7 @@ protected slots:
 	void clearSlot();
 	void duringSavePatientSlot();
 	void duringLoadPatientSlot();
-	void updateViews();
+	void setModifiedSlot();
 
 protected:
 	ViewManager(); ///< create all needed views
@@ -180,7 +182,6 @@ protected:
 	void syncOrientationMode(SyncedValuePtr val);
 	void setStretchFactors(LayoutRegion region, int stretchFactor);
 
-	void deactivateCurrentLayout();
 	void activateView(ViewWrapperPtr wrapper, int group, LayoutRegion region);
 	void activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region);
 	void activate3DView(int group, LayoutRegion region);
@@ -195,6 +196,7 @@ protected:
 					QString helptext);
 	void loadGlobalSettings();
 	void saveGlobalSettings();
+	void updateViews();
 
 	static ViewManager* mTheInstance; ///< the only instance of this class
 
@@ -220,6 +222,7 @@ protected:
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
 	SyncedValuePtr mGlobalZoom2DVal;
 	bool mSmartRender; ///< use ssc::ViewWidget::render()
+	bool mModified; ///< Modified flag tells renderAllViewsSlot() that the views must be updated
 
 	ViewCache<View2D> mViewCache2D;
 	ViewCache<View3D> mViewCache3D;

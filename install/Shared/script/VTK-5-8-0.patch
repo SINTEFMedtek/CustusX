@@ -1,0 +1,34 @@
+From 5fbcfcbd6ff6c96d527e3cb5abed57cbd2094f62 Mon Sep 17 00:00:00 2001
+From: Christian <christian.askeland@gmail.com>
+Date: Tue, 25 Sep 2012 11:14:34 +0200
+Subject: [PATCH] re-enabled vtkOpenGLGPUVolumeRayCastMapper for MacOSX 10.7+.
+ This fix will crash on 10.6
+
+---
+ VolumeRendering/vtkOpenGLGPUVolumeRayCastMapper.cxx | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/VolumeRendering/vtkOpenGLGPUVolumeRayCastMapper.cxx b/VolumeRendering/vtkOpenGLGPUVolumeRayCastMapper.cxx
+index 35c32fe..33d843f 100644
+--- a/VolumeRendering/vtkOpenGLGPUVolumeRayCastMapper.cxx
++++ b/VolumeRendering/vtkOpenGLGPUVolumeRayCastMapper.cxx
+@@ -2148,11 +2148,14 @@ void vtkOpenGLGPUVolumeRayCastMapper::LoadExtensions(
+   // Cg compiler about an infinite loop.
+ #ifndef APPLE_SNOW_LEOPARD_BUG
+  #ifdef __APPLE__
+-  this->LoadExtensionsSucceeded=0;
+-  return;
++// hack: removed by CA/SINTEF/2012.09.25
++// this renderer now works on MacOSX 10.7+
++//  this->LoadExtensionsSucceeded=0;
++//  return;
+  #endif
+ #endif
+ 
++
+   // Assume success
+   this->LoadExtensionsSucceeded=1;
+ 
+-- 
+1.7.11.3
+
