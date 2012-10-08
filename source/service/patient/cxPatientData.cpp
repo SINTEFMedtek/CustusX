@@ -216,7 +216,8 @@ void PatientData::savePatient()
 	mWorkingDocument = QDomDocument();
 }
 
-void PatientData::exportPatient()
+
+void PatientData::exportPatient(bool niftiFormat)
 {
 	QString targetFolder = mActivePatientFolder + "/Export/"
 					+ QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
@@ -231,7 +232,15 @@ void PatientData::exportPatient()
 	for (ssc::DataManager::MeshMap::iterator iter = meshes.begin(); iter != meshes.end(); ++iter)
 	{
 		ssc::MeshPtr mesh = iter->second;
-		vtkPolyDataPtr poly = mesh->getTransformedPolyData(mesh->get_rMd());
+
+		ssc::Transform3D rMd = mesh->get_rMd();
+		if (niftiFormat)
+		{
+			rMd = rMd * ssc::createTransformRotateZ(M_PI); // convert back to NIFTI format
+			ssc::messageManager()->sendInfo("Nifti export: rotated data " + mesh->getName() + " 180* around Z-axis.");
+		}
+
+		vtkPolyDataPtr poly = mesh->getTransformedPolyData(rMd);
 		// create a copy with the SAME UID as the original. Do not load this one into the datamanager!
 		mesh = ssc::dataManager()->createMesh(poly, mesh->getUid(), mesh->getName(), "Images");
 		ssc::dataManager()->saveMesh(mesh, targetFolder);
@@ -364,14 +373,6 @@ void PatientData::createPatientFolders(QString choosenDir)
 	{
 		QDir().mkdir(newDir);
 		ssc::messageManager()->sendInfo("Made a new image folder: " + newDir);
-	}
-
-	newDir = choosenDir;
-	newDir.append("/Surfaces");
-	if (!QDir().exists(newDir))
-	{
-		QDir().mkdir(newDir);
-		ssc::messageManager()->sendInfo("Made a new surface folder: " + newDir);
 	}
 
 	newDir = choosenDir;

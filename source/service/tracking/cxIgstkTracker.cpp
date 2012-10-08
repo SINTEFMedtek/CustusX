@@ -44,12 +44,7 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 				mInitialized(false),
 				mTracking(false)
 {
-#if defined WIN32
-	mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber4 );
-#else
 	mCommunication->SetPortNumber(igstk::SerialCommunication::PortNumber0);
-
-#endif //WIN32
 	mCommunication->SetParity(igstk::SerialCommunication::NoParity);
 	mCommunication->SetBaudRate(igstk::SerialCommunication::BaudRate115200);
 	mCommunication->SetDataBits(igstk::SerialCommunication::DataBits8);

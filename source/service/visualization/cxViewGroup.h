@@ -73,7 +73,7 @@ public:
 	void removeViews();
 	ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
 	std::vector<ViewWrapperPtr> getWrappers() const { return mViewWrappers; }
-	std::vector<ssc::ViewWidget*> getViews() const;
+	std::vector<ViewWidgetQPtr> getViews() const;
 	ViewGroupDataPtr getData() { return mViewGroupData; }
 	virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
 	virtual void parseXml(QDomNode dataNode); ///< load internal state info from dataNode
@@ -96,7 +96,7 @@ protected:
 	void setZoom2D(double newZoom);
 //  void setSlicePlanesProxy();
 
-	std::vector<ssc::ViewWidget*> mViews;
+	std::vector<ViewWidgetQPtr> mViews;
 
 	struct SyncGroup
 	{

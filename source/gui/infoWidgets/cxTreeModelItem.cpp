@@ -54,7 +54,7 @@ QString TreeItemImpl::getName() const { return mName; }
 QString TreeItemImpl::getType() const { return mType; }
 QString TreeItemImpl::getData() const  { return mData; }
 
-int TreeItemImpl::getChildCount() const { return mChildren.size(); }
+int TreeItemImpl::getChildCount() const { return static_cast<int>(mChildren.size()); }
 int TreeItemImpl::getColumnCount() const { return 3; }
 TreeItemWeakPtr TreeItemImpl::getParent()
 {

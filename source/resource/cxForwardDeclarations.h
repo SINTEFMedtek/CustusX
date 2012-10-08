@@ -2,6 +2,7 @@
 #define CX_FORWARDDECLARARATIONS_H_
 
 #include <boost/shared_ptr.hpp>
+#include <QPointer>
 #include "sscForwardDeclarations.h"
 
 /**\file cxForwardDeclarations.h
@@ -23,6 +24,8 @@ typedef boost::shared_ptr<class ViewWrapper> ViewWrapperPtr;
 typedef boost::shared_ptr<class PatientData> PatientDataPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
+typedef QPointer<View3D> View3DQPtr;
+typedef QPointer<ssc::ViewWidget> ViewWidgetQPtr;
 
 } // namespace cx
 

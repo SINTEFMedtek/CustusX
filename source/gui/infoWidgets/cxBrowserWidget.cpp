@@ -54,7 +54,7 @@ void BrowserItemModel::fillModelTreeFromViewManager(TreeItemPtr root)
   for (unsigned i = 0; i < groups.size(); ++i)
   {
     ViewGroupPtr group = groups[i];
-    std::vector<ssc::ViewWidget*> views = group->getViews();
+    std::vector<ViewWidgetQPtr> views = group->getViews();
     if (views.empty())
       continue;
     TreeItemPtr groupItem = TreeItemImpl::create(topItem, "group"+qstring_cast(i), "view group", qstring_cast(i));

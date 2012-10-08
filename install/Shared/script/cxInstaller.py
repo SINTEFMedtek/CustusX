@@ -56,17 +56,18 @@ class Common(object):
     def __init__(self):
         self.PLATFORM = platform.system() # {Windows7 = 'Windows', OSX 10.7.4 = 'Darwin', Liux = ?}
         self.mUser = getpass.getuser()
+        self.mISBpassword = ""
         if(self.PLATFORM == 'Windows'):
             self.mRootDir = "C:\Dev"
         else:
-            self.mRootDir = os.path().expanduser("~")
+            self.mRootDir = os.path.expanduser("~") + "/" + self.mUser
         # external dir: Used as base dir for all externals, such as VTK, ITK, ...
         self.mExternalDir = self.mRootDir + "/external_code"
         # working dir: Used as base dir for Custus and other of our 'own' projects
         self.mWorkingDir = self.mRootDir + "/workspace"
         # server user: Used for login to cx server etc.
         self.mServerUser = self.mUser
-        self.silent_mode = False
+        self.mSilent_mode = False
         # build as shared or static libraries
         self.mBuildShared = "ON" # Change to ON or OFF
         self.mBuildType = "Debug" # Debug, Release, RelWithDebInfo, MinSizeRel
@@ -74,10 +75,16 @@ class Common(object):
         self.mBuildFolder = "build" # default build folder. This is auto-changed when using xcode or 32 bit.
         self.m32bitCompileCMakeOption = "" # use "-DCMAKE_OSX_ARCHITECTURES=i386" for 32 bit. Done automatically by settings --b32 from command line.
         self.mBuildSSCExamples = "ON"
+        self.mUseCotire = "OFF"
+        self.mSerialPort = "/Library/CustusX/igstk.links/cu.CustusX.dev0"
+        self.mOpenCVStaticCRT = "OFF"
         if (self.PLATFORM == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
             self.mBuildSSCExamples = "OFF"
             self.mExternalDir = self.mRootDir + "/external" #path length on windows is limited, need to keep it short
+            self.mUseCotire = "ON"
+            self.mSerialPort = "COM20"
+            self.mOpenCVStaticCRT = "OFF"
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
@@ -348,8 +355,23 @@ class VTK(CppComponent):
         runShell('git clone http://vtk.org/VTK.git')
         self.update()
     def update(self):
+        '''
+            Howto create a patch using git:
+            Branch is created like this:
+            git checkout v5.8.0
+            git branch cx_mod_for_5-8-0
+            git checkout cx_mod_for_5-8-0
+            ... make you modifications ...
+            git commit -am "message"
+            git format-patch master --stdout > VTK-5-8-0.patch
+        '''
         self._changeDirToSource()
-        runShell('git checkout v5.8.0')   # needed for gcc 4.6, not good on non-linux
+		#Note: vtk 5.10 contains a bug in STLReader. Skip that version (http://vtk.1045678.n5.nabble.com/VTK-0013160-vtkSTLReader-does-not-read-files-any-more-td5700473.html)
+        runShell('git checkout v5.8.0') 
+        runShell('git branch -D cx_mod_for_5-8-0')
+        runShell('git checkout -B cx_mod_for_5-8-0')
+        #TODO this can be a bug, if CustusX is not checked out yet, this will not work!!!
+        runShell(('git am --whitespace=fix --signoff < %s/%s/install/Shared/script/VTK-5-8-0.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
     def configure(self):
         '''
 Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-collection (!)
@@ -409,12 +431,14 @@ cmake \
 -DBUILD_TESTS:BOOL=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DWITH_CUDA:BOOL=OFF \
+-DBUILD_WITH_STATIC_CRT:BOOL=%s \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildExAndTest,
             DATA.mBuildExAndTest,
-            DATA.mBuildShared, 
+            DATA.mBuildShared,
+            DATA.mOpenCVStaticCRT,
             self.sourceFolder() ))
 # ---------------------------------------------------------
 
@@ -473,7 +497,7 @@ class IGSTK(CppComponent):
         runShell('git branch -D cx_mod_for_50')
         runShell('git checkout -B cx_mod_for_50')
         #TODO this can be a bug, if CustusX is not checked out yet, this will not work!!!
-        runShell(('git am --whitespace=fix --signoff < %s/%s/install/Shared/script/IGSTK-5-0.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
+        runShell(('git am --whitespace=fix --signoff < %s/%s/install/Shared/script/IGSTK-5-0-v2.patch') % (CustusX3().path(), CustusX3().sourceFolder()))
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
@@ -488,20 +512,14 @@ cmake \
 -DBUILD_TESTING:BOOL=OFF \
 -DITK_DIR:PATH="%s" \
 -DVTK_DIR:PATH="%s" \
--DIGSTK_SERIAL_PORT_0="/Library/CustusX/igstk.links/cu.CustusX.dev0" \
--DIGSTK_SERIAL_PORT_1="/Library/CustusX/igstk.links/cu.CustusX.dev1" \
--DIGSTK_SERIAL_PORT_2="/Library/CustusX/igstk.links/cu.CustusX.dev2" \
--DIGSTK_SERIAL_PORT_3="/Library/CustusX/igstk.links/cu.CustusX.dev3" \
--DIGSTK_SERIAL_PORT_4="/Library/CustusX/igstk.links/cu.CustusX.dev4" \
--DIGSTK_SERIAL_PORT_5="/Library/CustusX/igstk.links/cu.CustusX.dev5" \
--DIGSTK_SERIAL_PORT_6="/Library/CustusX/igstk.links/cu.CustusX.dev6" \
--DIGSTK_SERIAL_PORT_7="/Library/CustusX/igstk.links/cu.CustusX.dev7" \
+-DIGSTK_SERIAL_PORT_0="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildShared, 
             ITK().buildPath(), 
             VTK().buildPath(), 
+            DATA.mSerialPort,
             self.sourceFolder())
             )
 # ---------------------------------------------------------
@@ -550,6 +568,43 @@ class DCMTK(CppComponent):
     def installPath(self):
         #return '/usr/local/include/dcmtk'
         return '' # ignore: use yum instead
+    # ---------------------------------------------------------
+
+class ISB_DataStreaming(CppComponent):
+    def name(self):
+        return "ISB_DataStreaming"
+    def help(self):
+        return 'ISB GE Digital Interface stuff'
+    def path(self):
+        return DATA.mWorkingDir + "/ISB_DataStreaming"
+    def _rawCheckout(self):
+        self._changeDirToBase()
+        if DATA.mISBpassword == "":
+            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef %s' % (self.sourceFolder()))
+        else:
+            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef --password %s %s' % (DATA.mISBpassword, self.sourceFolder()))
+    def update(self):
+        self._changeDirToSource()
+        runShell('svn up')
+    def configure(self):
+        self._changeDirToBuild()
+        runShell('''\
+cmake \
+-G"%s" \
+%s \
+-DCMAKE_BUILD_TYPE:STRING=%s \
+-DBUILD_SHARED_LIBS:BOOL=%s \
+-DVTK_DIR:PATH="%s" \
+-DDATASTREAMING_USE_HDF:BOOL=OFF \
+-DDATASTREAMING_USE_TRACKING:BOOL=OFF \
+../%s''' % (DATA.mCMakeGenerator, 
+            DATA.m32bitCompileCMakeOption, 
+            DATA.mBuildType, 
+            DATA.mBuildShared, 
+            VTK().buildPath(), 
+            self.sourceFolder()+"/vtkDataStreamClient/")
+            )
+        # add xcode project here if needed
     # ---------------------------------------------------------
 
 class SSC(CppComponent):
@@ -625,6 +680,9 @@ cmake \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
+-DCOTIRE_ADD_UNITY_BUILDS="%s" \
+-DCOTIRE_ENABLE_PRECOMPILED_HEADERS="%s" \
+-DGEStreamer_DIR:PATH="%s" \
 ../%s''' % (DATA.mCMakeGenerator, 
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, DATA.mBuildShared, 
@@ -636,7 +694,9 @@ cmake \
             UltrasonixSDK().includePath(),
             UltrasonixSDK().libFile(),
             DATA.mBuildSSCExamples,
-            #DCMTK().installPath(), 
+            DATA.mUseCotire,
+            DATA.mUseCotire,
+            ISB_DataStreaming().buildPath(),
             self.sourceFolder() )
             )
         #TODO add xcode project here if needed?
@@ -707,6 +767,7 @@ class Controller(object):
                      IGSTK(),
                      #DCMTK(),
                      #SSC(),
+                     ISB_DataStreaming(),
                      UltrasonixSDK(),
                      CustusX3()
                      #CustusX3Data()
@@ -817,6 +878,11 @@ Available components are:
                      action='store_true',
                      help='execute script without user interaction',
                      default=False)
+        p.add_option('--isb_password',
+                     action='store',
+                     type='string',
+                     help='password for svn sintef user at isb',
+                     default="")
         return p
     
     def _parseCommandLine(self):
@@ -837,7 +903,7 @@ Available components are:
             shell.DUMMY = True
         if options.silent_mode:
             print 'Running silent mode: no user interaction needed.'
-            DATA.silent_mode = True
+            DATA.mSilent_mode = True
         if options.password:
             print 'Set password (not working well): ', options.password
             shell.password = options.password
@@ -860,6 +926,8 @@ Available components are:
             DATA.mCMakeGenerator = 'NMake Makefiles JOM'
             DATA.mBuildFolder = DATA.mBuildFolder + "_jom"
             print 'Generate jom makefiles'
+        if options.isb_password:
+            DATA.mISBpassword = options.isb_password
         
         #TODO can be wrong for external libs as they use DATA.mBuildExternalsType!
         DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType 
@@ -890,7 +958,7 @@ Available components are:
         print 'Server User:', DATA.mServerUser
         print 'Root dir:', DATA.mRootDir
         print 'Use the following components:', [val.name() for val in useLibs]
-        if (not DATA.silent_mode):
+        if (not DATA.mSilent_mode):
             raw_input("\nPress enter to continue or ctrl-C to quit:")
 
         if options.full or options.checkout:
