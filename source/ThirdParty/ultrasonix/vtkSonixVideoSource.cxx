@@ -164,6 +164,7 @@ vtkSonixVideoSource::vtkSonixVideoSource()
   lastRoiBry = 0;
 
   mFirstConnect = true;
+  mDebugOutput = false;
 }
 
 //----------------------------------------------------------------------------
@@ -343,7 +344,6 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 		std::cout << "Error incorrect data type" << std::endl;
     }
 
-  	
 	// get the pointer to actual incoming data on to a local pointer
 	unsigned char *deviceDataPtr = static_cast<unsigned char*>(dataPtr);
 
@@ -355,17 +355,8 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   //Try just to update FrameBufferExtent first
   //std::cout << "FrameBufferExtent: " << this->FrameBufferExtent[0] << " " << this->FrameBufferExtent[1] << " " ;
   //std::cout << this->FrameBufferExtent[2] << " " << this->FrameBufferExtent[3] << std::endl;
-  this->FrameBufferExtent[0] = roi.ulx;
-  this->FrameBufferExtent[1] = roi.urx;
-  this->FrameBufferExtent[2] = roi.uly;
-  this->FrameBufferExtent[3] = roi.bly;
 
-  //Error in roi info?
-  if ((this->FrameBufferExtent[3]-this->FrameBufferExtent[2]+1) >= this->FrameSize[1])
-  {
-	  this->FrameBufferExtent[3] = this->FrameBufferExtent[2] + this->FrameSize[1] -1;
-	  //std::cout << "Error in roi info. New FrameBufferExtent[3]: " << this->FrameBufferExtent[3] << std::endl;
-  }
+  this->UpdateFrameBufferExtent(roi);
 
   //std::cout << "new FrameBufferExtent: " << this->FrameBufferExtent[0] << " " << this->FrameBufferExtent[1] << " " ;
   //std::cout << this->FrameBufferExtent[2] << " " << this->FrameBufferExtent[3] << std::endl;
@@ -382,15 +373,22 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	  {
 	  //error; data discrepancy!
 	  //what to do?
-		  //std::cout << "Data discrepancy! size: " << sz << " inBytesPerRow: " << inBytesPerRow <<" rows: " << rows <<  std::endl;
-		  //std::cout << "FrameSize[0]: " << this->FrameSize[0] << " * FrameBufferBitsPerPixel: " << this->FrameBufferBitsPerPixel << std::endl;
+		if (mDebugOutput)
+		{
+		  std::cout << "Data discrepancy! size: " << sz << " inBytesPerRow: " << inBytesPerRow <<" rows: " << rows <<  std::endl;
+		  std::cout << "FrameSize[0]: " << this->FrameSize[0] << " * FrameBufferBitsPerPixel: " << this->FrameBufferBitsPerPixel << std::endl;
+		}
 		  if (rows > sz / inBytesPerRow)
 		  {
 			rows = sz / inBytesPerRow;
-			//std::cout << "Trying to fix this by setting rows = " << rows << std::endl;
+			if (mDebugOutput)
+				std::cout << "Trying to fix this by setting rows = " << rows << std::endl;
 		  }
-		  //else
-			//std::cout << "Keeping rows = " << rows << std::endl;
+		  else
+		  {
+			if (mDebugOutput)
+				std::cout << "Keeping rows = " << rows << std::endl;
+		  }
 		  //TODO: more work is needed here to make sure this works for all probes and depths
 	  }
 
@@ -477,10 +475,15 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   //frame.mOrigin[0] = this->DataOrigin[0];
   //frame.mOrigin[1] = this->DataOrigin[1];
   //Modify origin by ROI
-  frame.mOrigin[0] = this->DataOrigin[0] - roi.ulx;
-  frame.mOrigin[1] = this->DataOrigin[1] - roi.uly;
+  frame.mOrigin[0] = this->DataOrigin[0] - this->FrameBufferExtent[0];//roi.ulx;
+  frame.mOrigin[1] = this->DataOrigin[1] - this->FrameBufferExtent[2];//roi.uly;
+  if(mDebugOutput)
+  {
+	  //std::cout << "frame.mOrigin: " << frame.mOrigin[0] << ", " << frame.mOrigin[1];
+	  //std::cout << " roi ulx, uly: " << roi.ulx << ", " << roi.uly << std::endl;
   //std::cout << "spacing: " << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl;
   //std::cout << "origin: " << this->DataOrigin[0] << ", " << this->DataOrigin[1] << std::endl;
+  } 
 
   //Don't seem to be the correct parameter
   //Read probe angle (0 = linear probe)
@@ -570,9 +573,9 @@ void vtkSonixVideoSource::Initialize()
 	{
 		if (mFirstConnect)
 		{
-			std::cout << "Found Sonix window. First connect - Waiting 80 sec to connect" << std::endl;
+			std::cout << "Found Sonix window. First connect - Waiting "<< mSonixConnectionDelay << " sec to connect" << std::endl;
 			//Need to delay to make sure the Sonix exam is finished initializing...
-			vtksys::SystemTools::Delay(80000);
+			vtksys::SystemTools::Delay(mSonixConnectionDelay * 1000);
 			mFirstConnect = false;
 		}
 		else
@@ -1358,9 +1361,14 @@ void vtkSonixVideoSource::calculateSpacingAndOrigin()
    {
      vtkErrorMacro("Couldn't request the origin.");
    }
+   double prevOriginX = this->DataOrigin[0];
+   double prevOriginY = this->DataOrigin[1];
    this->DataOrigin[0] = origin.x;//xO;
    this->DataOrigin[1] = origin.y;//yO;
    //this->DataOrigin[2] =
+   if (mDebugOutput)
+	   if(prevOriginX != this->DataOrigin[0] || prevOriginY != this->DataOrigin[1])
+		   std::cout << "Origin: " << this->DataOrigin[0] << ", " << this->DataOrigin[1] << std::endl;
 
    //int xM, yM;
    uPoint microns;
@@ -1377,10 +1385,16 @@ void vtkSonixVideoSource::calculateSpacingAndOrigin()
    {
      vtkErrorMacro("Couldn't request the microns (spacing?).");
    }
+   double prevSpacingX = this->DataSpacing[0];
+   double prevSpacingY = this->DataSpacing[1];
    this->DataSpacing[0] = /*xM*/microns.x/1000.0;
    this->DataSpacing[1] = /*yM*/microns.y/1000.0;
-   //std::cout << "Calculate spacing: x: " << xM << " y: " << yM << "result: " << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl;
-   //this->DataSpacing[2] =
+   if(mDebugOutput && (
+	   (prevSpacingX != this->DataSpacing[0]) || (prevSpacingY != this->DataSpacing[1]) ) )
+   {
+	   //std::cout << "Calculate spacing: x: " << microns.x << " y: " << microns.y << " result (mm): ";
+	   std::cout << "Spacing (mm): " << this->DataSpacing[0] << ", " << this->DataSpacing[1] << std::endl;
+   }
    //EndAdd
 }
 
@@ -1392,4 +1406,21 @@ void vtkSonixVideoSource::SetSonixIP(const char *SonixIP)
 	  sprintf(this->SonixHostIP, "%s", SonixIP);
 	  std::cout << "Set SonixHostIP: " << SonixIP << std::endl;
 	  }
+}
+
+void vtkSonixVideoSource::setDebugOutput(bool debug)
+{
+	mDebugOutput = debug;
+}
+void vtkSonixVideoSource::setSonixConnectionDelay(int delay)
+{
+	mSonixConnectionDelay = delay;
+}
+
+void vtkSonixVideoSource::UpdateFrameBufferExtent(uROI roi)
+{
+	this->FrameBufferExtent[0] = max(roi.ulx, 0);
+	this->FrameBufferExtent[1] = min(roi.urx, this->FrameSize[0] - 1);
+	this->FrameBufferExtent[2] = max(roi.uly, 0);
+	this->FrameBufferExtent[3] = min(roi.bly, this->FrameSize[1] - 1);
 }

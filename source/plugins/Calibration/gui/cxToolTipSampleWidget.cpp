@@ -145,7 +145,7 @@ void ToolTipSampleWidget::coordinateSystemChanged()
 
 ssc::CoordinateSystem ToolTipSampleWidget::getSelectedCoordinateSystem()
 {
-  ssc::CoordinateSystem retval;
+  ssc::CoordinateSystem retval(ssc::csCOUNT);
 
   retval.mId = string2enum<ssc::COORDINATE_SYSTEM>(mCoordinateSystems->getValue());
 

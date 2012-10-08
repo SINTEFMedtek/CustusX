@@ -80,7 +80,7 @@ public slots:
 	ssc::DataPtr importData(QString fileName);
 	void savePatient(); ///< Save all application data to XML file
 	void clearPatient();
-	void exportPatient();
+	void exportPatient(bool niftiFormat);
 
 signals:
 	void patientChanged();

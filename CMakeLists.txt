@@ -55,10 +55,6 @@ set(CustusX3_VERSION_POSTFIX ".alpha")
 set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
 set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
 
-if(APPLE)
-    # used during package installation. Appended to some default which seems to be / , might be able to change using DESTDIR env var.
-	set(CMAKE_INSTALL_PREFIX "Applications/" ) 
-endif(APPLE)
 
 #-----------------------------------------------------------------------------
 # Cotire (COmpile TIme REducer)
@@ -113,12 +109,9 @@ set(CX_INSTALL_ROOT_DIR .)
 
 
 if (APPLE)
-		set(CX_INSTALL_ROOT_DIR "CustusX")
-
+		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+		set(CX_INSTALL_ROOT_DIR "Applications/CustusX")
 		set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
-		set(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
-		set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
-		set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
 		
 		option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
 		option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)

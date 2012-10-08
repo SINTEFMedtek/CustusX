@@ -4,6 +4,7 @@
 #include "cxRegistrationBaseWidget.h"
 #include "sscForwardDeclarations.h"
 #include "sscTransform3D.h"
+#include "cxDominantToolProxy.h"
 
 class QPushButton;
 class QCheckBox;
@@ -40,18 +41,12 @@ protected:
 
 private slots:
   void setOrientationSlot();
-  void dominantToolChangedSlot(const QString& uid);
   void enableToolSampleButtonSlot();
-  void toolVisibleSlot(bool visible);
-  void setPatientOrientationSlot();
-
 private:
   ssc::Transform3D get_tMtm() const;
   QPushButton* mSetOrientationButton;
-  QPushButton* mPatientOrientationButton;
   QCheckBox* mInvertButton;
-
-  ssc::ToolPtr mToolToSample; ///< tool to be sampled from
+  DominantToolProxyPtr mDominantToolProxy;
 };
 
 /**

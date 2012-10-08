@@ -5,8 +5,8 @@
 #include "cxGrabber.h"
 
 class QMacCocoaViewContainer;
-class NSError;
-class NSString;
+//class NSError;
+//class NSString;
 
 namespace cx
 {
@@ -54,8 +54,10 @@ private:
   
   void setupGrabbing(); ///< Configures the grabbing session with specified frame formats.
 
-  void reportError(NSError* error); ///< Helper for converting NSError into own messaging system
-  void reportString(NSString* string); ///< Helper for converting NSString into own messaging system
+//  void reportError(NSError* error); ///< Helper for converting NSError into own messaging system
+//  void reportString(NSString* string); ///< Helper for converting NSString into own messaging system
+//  void reportError(QString error); ///< Helper for converting NSError into own messaging system
+//  void reportString(QString string); ///< Helper for converting NSString into own messaging system
 
   bool mSuperVideo; ///< Whether or not we are grabbing using super video or not
 

@@ -23,6 +23,8 @@
 #include "cxPatientData.h"
 #include "sscTypeConversions.h"
 #include "sscTime.h"
+#include "sscData.h"
+#include "sscBoundingBox3D.h"
 #include "cxTransformFile.h"
 
 namespace cx

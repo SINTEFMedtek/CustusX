@@ -209,6 +209,18 @@ std::vector<ssc::Vector3D> RegistrationManager::convertAndTransformToPoints(cons
   return retval;
 }
 
+std::vector<ssc::Vector3D> RegistrationManager::convertVtkPointsToPoints(vtkPointsPtr base)
+{
+  std::vector<ssc::Vector3D> retval;
+
+  for (int i=0; i<base->GetNumberOfPoints(); ++i)
+  {
+    ssc::Vector3D p(base->GetPoint(i));
+    retval.push_back(p);
+  }
+  return retval;
+}
+
 /** Perform a landmark registration between the data sets source and target.
  *  Return transform from source to target.
  */
@@ -292,7 +304,7 @@ void RegistrationManager::writePreLandmarkRegistration(QString name, ssc::Landma
 }
 
 
-void RegistrationManager::doImageRegistration()
+void RegistrationManager::doImageRegistration(bool translationOnly)
 {
   //check that the fixed data is set
   ssc::ImagePtr fixedImage = boost::dynamic_pointer_cast<ssc::Image>(mFixedData);
@@ -324,26 +336,50 @@ void RegistrationManager::doImageRegistration()
   this->writePreLandmarkRegistration(movingImage->getName(), movingImage->getLandmarks());
 
   std::vector<QString> landmarks = getUsableLandmarks(fixedLandmarks, imageLandmarks);
-  vtkPointsPtr p_ref = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
-  vtkPointsPtr p_data = convertTovtkPoints(landmarks, imageLandmarks, ssc::Transform3D::Identity());
+//  vtkPointsPtr p_ref = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
+//  vtkPointsPtr p_data = convertTovtkPoints(landmarks, imageLandmarks, ssc::Transform3D::Identity());
+  vtkPointsPtr p_fixed_r = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
+  vtkPointsPtr p_moving_r = convertTovtkPoints(landmarks, imageLandmarks, movingImage->get_rMd());
+
+  int minNumberOfPoints = 3;
+  if (translationOnly)
+	  minNumberOfPoints = 1;
 
   // ignore if too few data.
-  if (p_ref->GetNumberOfPoints() < 3)
+  if (p_fixed_r->GetNumberOfPoints() < minNumberOfPoints)
   {
-    ssc::messageManager()->sendError(QString("Found %1 corresponding landmarks, need 3, cannot do landmark image registration!").arg(p_ref->GetNumberOfPoints()));
+    ssc::messageManager()->sendError(
+    	QString("Found %1 corresponding landmarks, need %2, cannot do landmark image registration!")
+    	.arg(p_fixed_r->GetNumberOfPoints())
+    	.arg(minNumberOfPoints)
+    	);
     return;
   }
 
   bool ok = false;
-  ssc::Transform3D rMd = this->performLandmarkRegistration(p_data, p_ref, &ok);
+  QString idString;
+  ssc::Transform3D delta;
+
+  if (translationOnly)
+  {
+	  LandmarkTranslationRegistration landmarkTransReg;
+	  delta = landmarkTransReg.registerPoints(convertVtkPointsToPoints(p_fixed_r), convertVtkPointsToPoints(p_moving_r), &ok);
+	  idString = QString("Image to Image Landmark Translation");
+  }
+  else
+  {
+	  ssc::Transform3D rMd;
+	  delta = this->performLandmarkRegistration(p_moving_r, p_fixed_r, &ok);
+	  idString = QString("Image to Image Landmark");
+  }
+
   if (!ok)
   {
-    ssc::messageManager()->sendError("I-I Landmark registration: Failed to register: [" + qstring_cast(p_data->GetNumberOfPoints()) + "p], "+ movingImage->getName());
+    ssc::messageManager()->sendError("I-I Landmark registration: Failed to register: [" + qstring_cast(p_moving_r->GetNumberOfPoints()) + "p], "+ movingImage->getName());
     return;
   }
 
-  ssc::Transform3D delta = rMd * movingImage->get_rMd().inv();
-  this->applyImage2ImageRegistration(delta, "Image to Image Landmark");
+  this->applyImage2ImageRegistration(delta, idString);
 }
 
 /**Perform a fast orientation by setting the patient registration equal to the current dominant

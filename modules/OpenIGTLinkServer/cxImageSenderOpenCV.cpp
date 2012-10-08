@@ -67,8 +67,8 @@ QStringList ImageSenderOpenCV::getArgumentDescription()
 {
 	QStringList retval;
 	retval << "--videoport:  video id,     default=0";
-	retval << "--height:     image height, default=1024";
-	retval << "--width:      image width,  default=768";
+	retval << "--height:     image height, default=camera";
+	retval << "--width:      image width,  default=camera";
 	retval << "--properties: dump image properties";
 	return retval;
 }
@@ -81,15 +81,8 @@ ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
 {
 	mGrabTimer = new QTimer(this);
 	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-	//  mTimer->start(40);
-//	mGrabTimer->start(0);
-	//  mTimer->start(1200); // for test of the timeout feature
-	//  mTimer->start(100);
-
-
 	mSendTimer = new QTimer(this);
 	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-//	mSendTimer->start(40);
 }
 
 void ImageSenderOpenCV::initialize(StringMap arguments)
@@ -120,18 +113,33 @@ void ImageSenderOpenCV::initialize_local()
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
 	if (!mArguments.count("width"))
-		mArguments["width"] = "1024";
+		mArguments["width"] = "";
 	if (!mArguments.count("height"))
-		mArguments["height"] = "768";
+		mArguments["height"] = "";
 
 	QString videoSource = mArguments["videoport"];
 	int videoport = convertStringWithDefault(mArguments["videoport"], 0);
-	int height = convertStringWithDefault(mArguments["height"], 768);
-	int width = convertStringWithDefault(mArguments["width"], 1024);
+//	int height = convertStringWithDefault(mArguments["height"], 768);
+//	int width = convertStringWithDefault(mArguments["width"], 1024);
 
-	mVideoCapture.open(videoSource.toStdString().c_str());
-	if (!mVideoCapture.isOpened()) //if this fails, try to open as a video camera, through the use of an integer param
+	bool sourceIsInt = false;
+	videoSource.toInt(&sourceIsInt);
+
+	if (sourceIsInt)
+	{
+		// open file
 		mVideoCapture.open(videoport);
+	}
+	else
+	{
+		// open camera
+		mVideoCapture.open(videoSource.toStdString().c_str());
+	}
+//	mVideoCapture.open(videoSource.toStdString().c_str());
+//	if (!mVideoCapture.isOpened()) //if this fails, try to open as a video camera, through the use of an integer param
+//	{
+//		mVideoCapture.open(videoport);
+//	}
 	if (!mVideoCapture.isOpened())
 	{
 		cerr << "ImageSenderOpenCV: Failed to open a video device or video file!\n" << endl;
@@ -139,15 +147,33 @@ void ImageSenderOpenCV::initialize_local()
 	}
 	else
 	{
-		mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, width);
-		mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, height);
+		int width = mVideoCapture.get(CV_CAP_PROP_FRAME_WIDTH);
+		int height = mVideoCapture.get(CV_CAP_PROP_FRAME_HEIGHT);
+
+		mRescaleSize.setWidth(convertStringWithDefault(mArguments["width"], width));
+		mRescaleSize.setHeight(convertStringWithDefault(mArguments["height"], height));
+//
+//		bool ok = true;
+//		int width = mArguments["width"].toInt(&ok,0);
+//		if (ok)
+//			mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, width);
+//		int height = mArguments["height"].toInt(&ok,0);
+//		if (ok)
+//			mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, height);
+
+//		mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, width);
+//		mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, height);
 
 		if (mArguments.count("properties"))
 			this->dumpProperties();
 
 		std::cout << "ImageSenderOpenCV: Started streaming from openCV device "
 			<< videoSource.toStdString()
-			<< ", size=(" << width << "," << height << ")" << std::endl;
+			<< ", size=(" << width << "," << height << ")";
+		if (( width!=mRescaleSize.width() )|| (height!=mRescaleSize.height()))
+			std::cout << ". Scaled to (" << mRescaleSize.width() << "," << mRescaleSize.height() << ")";
+
+		std::cout << std::endl;
 	}
 }
 
@@ -209,11 +235,16 @@ void ImageSenderOpenCV::dumpProperty(int val, QString name)
 
 void ImageSenderOpenCV::grab()
 {
-	//  QTime start = QTime::currentTime();
+	if (!mVideoCapture.isOpened())
+	{
+		return;
+	}
+//	  QTime start = QTime::currentTime();
 	// grab images from camera to opencv internal buffer, do not process
 	mVideoCapture.grab();
 	mLastGrabTime = QDateTime::currentDateTime();
-	//  std::cout << "   grab: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//	  std::cout << "   grab: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+
 }
 
 void ImageSenderOpenCV::send()
@@ -221,6 +252,9 @@ void ImageSenderOpenCV::send()
 	//std::cout << "tick" << std::endl;
 	//  QTime start = QTime::currentTime();
 	IGTLinkImageMessage::Pointer imgMsg = this->getImageMessage();
+
+	if (!imgMsg)
+		return;
 
 	if (mSocket)
 	{
@@ -259,23 +293,19 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	double grabTime = 1.0 / 1000 * (double) mLastGrabTime.toMSecsSinceEpoch();
 	timestamp->SetTime(grabTime);
 	static QDateTime lastlastGrabTime = mLastGrabTime;
-//	std::cout << "OpenCV stamp:\t" << mLastGrabTime.toString("hh:mm:ss.zzz") << std::endl;
+//	std::cout << "OpenCV stamp:\t" << mLastGrabTime.toString("hh:mm:ss.zzz").toStdString() << std::endl;
 //	std::cout << "OpenCV diff:\t" <<lastlastGrabTime.msecsTo(mLastGrabTime) << "\tdelay:\t" << mLastGrabTime.msecsTo(QDateTime::currentDateTime()) << std::endl;
 	lastlastGrabTime = mLastGrabTime;
 
 	cv::Mat frame = frame_source;
-	// solved by resampling the definitions in CX. (CA/20120907)
-	// temporary HACK: all the old probe defs are for 800x600, continue this line for now:
-	//cv::resize(frame_source, frame, cv::Size(800, 600), 0, 0, CV_INTER_LINEAR);
+	if (( frame.cols!=mRescaleSize.width() )|| (frame.rows!=mRescaleSize.height()))
+	{
+		cv::resize(frame_source, frame, cv::Size(mRescaleSize.width(), mRescaleSize.height()), 0, 0, CV_INTER_LINEAR);
+	}
 
 	//  std::cout << "grab " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-	//  std::cout << "WH=("<< frame.cols << "," << frame.rows << ")" << ", Channels,Depth=("<< frame.channels() << "," << frame.depth() << ")" << std::endl;
+//	std::cout << "WH=("<< frame.cols << "," << frame.rows << ")" << ", Channels,Depth=("<< frame.channels() << "," << frame.depth() << ")" << std::endl;
 
-	if (!frame.isContinuous())
-	{
-		std::cout << "Error: Non-continous frame data." << std::endl;
-		return IGTLinkImageMessage::Pointer();
-	}
 
 	int size[] =
 	{ 1.0, 1.0, 1.0 }; // spacing (mm/pixel)
@@ -328,17 +358,44 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 
 	if (frame.channels() >= 3)
 	{
-		for (int i = 0; i < N; ++i)
+		if (frame.isContinuous())
 		{
-			*destPtr++ = 255;
-			*destPtr++ = src[2];
-			*destPtr++ = src[1];
-			*destPtr++ = src[0];
-			src += 3;
+			// 3-channel continous colors
+			for (int i = 0; i < N; ++i)
+			{
+				*destPtr++ = 255;
+				*destPtr++ = src[2];
+				*destPtr++ = src[1];
+				*destPtr++ = src[0];
+				src += 3;
+			}
+		}
+		else
+		{
+//			std::cout << "noncontinous conversion, rows=" << size[1] << std::endl;
+			for (int i=0; i<size[1]; ++i)
+			{
+				 const uchar* src = frame.ptr<uchar>(i);
+				 for (int j=0; j<size[0]; ++j)
+				 {
+						*destPtr++ = 255;
+						*destPtr++ = src[2];
+						*destPtr++ = src[1];
+						*destPtr++ = src[0];
+						src += 3;
+				 }
+			}
 		}
 	}
 	if (frame.channels() == 1)
-	{ // BW camera
+	{
+		if (!frame.isContinuous())
+		{
+			std::cout << "Error: Non-continous frame data." << std::endl;
+			return IGTLinkImageMessage::Pointer();
+		}
+
+		// BW camera
 		for (int i = 0; i < N; ++i)
 		{
 			*destPtr++ = *src++;
@@ -351,7 +408,7 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	GetRandomTestMatrix(matrix);
 	imgMsg->SetMatrix(matrix);
 
-	//  std::cout << "   grab+process " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//	  std::cout << "   grab+process " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 
 	return imgMsg;
 }

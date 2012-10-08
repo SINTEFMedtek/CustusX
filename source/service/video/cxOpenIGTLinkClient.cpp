@@ -385,23 +385,23 @@ bool IGTLinkClient::readOneMessage()
 //    std::cout << "client::tick: received: " << mSocket->bytesAvailable() << ", body needed: " << mHeaderMsg->GetBodySizeToRead() << std::endl;
 		bool success = false;
 		// Check data type and receive data body
-//    if (strcmp(mHeaderMsg->GetDeviceType(), "TRANSFORM") == 0)
+//    if (QString(mHeaderMsg->GetDeviceType()) == "TRANSFORM")
 //    {
 //      ReceiveTransform(mSocket, mHeaderMsg);
 //    }
-//    else if (strcmp(mHeaderMsg->GetDeviceType(), "POSITION") == 0)
+//    else if (QString(mHeaderMsg->GetDeviceType() == "POSITION")
 //    {
 //      ReceivePosition(mSocket, mHeaderMsg);
 //    }
-		if (strcmp(mHeaderMsg->GetDeviceType(), "IMAGE") == 0)
+		if (QString(mHeaderMsg->GetDeviceType()) == "IMAGE")
 		{
 			success = this->ReceiveImage(mSocket, mHeaderMsg);
 		}
-		else if (strcmp(mHeaderMsg->GetDeviceType(), "CX_US_ST") == 0)
+		else if (QString(mHeaderMsg->GetDeviceType()) == "CX_US_ST")
 		{
 			success = this->ReceiveSonixStatus(mSocket, mHeaderMsg);
 		}
-//    else if (strcmp(mHeaderMsg->GetDeviceType(), "STATUS") == 0)
+//    else if (QString(mHeaderMsg->GetDeviceType() == "STATUS")
 //    {
 //      ReceiveStatus(mSocket, mHeaderMsg);
 //    }

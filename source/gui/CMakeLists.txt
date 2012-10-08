@@ -10,9 +10,9 @@ endif(CX_WINDOWS)
 
 if (APPLE OR CX_WINDOWS)
     set(QXT_FOLDER "../ThirdParty/qxt_mac_compatible")
-else(APPLE OR CX_WINDOWS)
+else()
     set(QXT_FOLDER "../ThirdParty/qxt")
-endif(APPLE OR CX_WINDOWS)
+endif()
 
 # Make VERSION_NUMBER available for c++ files in gui folder
 ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
@@ -33,6 +33,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/cxImagePropertiesWidget.h
     dataWidgets/cxMeshPropertiesWidget.h
     dataWidgets/cxImportDataDialog.h
+    dataWidgets/cxExportDataDialog.h
     dataWidgets/cxDataViewSelectionWidget.h
     dataWidgets/cxTransferFunctionWidget.h
     dataWidgets/cxTransferFunctionAlphaWidget.h
@@ -171,6 +172,8 @@ SET(cxGui_SRCS
     dataWidgets/cxMeshPropertiesWidget.cpp
     dataWidgets/cxImportDataDialog.h
     dataWidgets/cxImportDataDialog.cpp
+    dataWidgets/cxExportDataDialog.h
+    dataWidgets/cxExportDataDialog.cpp
     dataWidgets/cxDataViewSelectionWidget.h
     dataWidgets/cxDataViewSelectionWidget.cpp
     dataWidgets/sscDICOMWidget.h
