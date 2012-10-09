@@ -8,7 +8,7 @@
 #ifndef CXIMAGESENDERGE_H_
 #define CXIMAGESENDERGE_H_
 
-#include <QObject> //needed for the mocer when OpenCv is not used...
+#include <QObject>
 
 #ifdef CX_USE_ISB_GE
 #include "boost/shared_ptr.hpp"
@@ -16,10 +16,12 @@
 #include <QDateTime>
 #include <QSize>
 class QTimer;
-#include "igtlImageMessage.h"
 #include <QStringList>
+#include "igtlImageMessage.h"
 #include "cxImageSenderFactory.h"
 #include "../grabberCommon/cxIGTLinkImageMessage.h"
+
+#include "GEStreamer.h"
 
 namespace cx
 {
@@ -33,8 +35,8 @@ namespace cx
  */
 class ImageSenderGE: public ImageSender
 {
-public:
 	Q_OBJECT
+public:
 	ImageSenderGE(QObject* parent = NULL);
 	virtual ~ImageSenderGE() {}
 
@@ -52,8 +54,15 @@ private:
 	QTimer* mGrabTimer;
 	StringMap mArguments;
 
-	void initialize_local();
+	//The GE Connection code from ISB
+	data_streaming::GEStreamer mGEStreamer;
+
+	vtkSmartPointer<vtkImageData> mImgStream;//Last image from GE
+	QDateTime mLastGrabTime;
+
+	bool initialize_local();
 	void deinitialize_local();
+	IGTLinkImageMessage::Pointer getImageMessage();
 
 private slots:
 	void grab();
