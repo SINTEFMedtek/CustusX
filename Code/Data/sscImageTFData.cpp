@@ -131,14 +131,14 @@ void ImageTFData::addXml(QDomNode dataNode)
 	// the points as separate nodes.
 	QStringList pointStringList;
 	// Add alpha points
-	for (IntIntMap::iterator opPoint = mOpacityMapPtr->begin(); opPoint != mOpacityMapPtr->end(); opPoint++)
+	for (IntIntMap::iterator opPoint = mOpacityMapPtr->begin(); opPoint != mOpacityMapPtr->end(); ++opPoint)
 		pointStringList.append(QString("%1=%2").arg(opPoint->first). arg(opPoint->second));
 	alphaNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
 
 	pointStringList.clear();
 	QDomElement colorNode = doc.createElement("color");
 	// Add color points
-	for (ColorMap::iterator colorPoint = mColorMapPtr->begin(); colorPoint != mColorMapPtr->end(); colorPoint++)
+	for (ColorMap::iterator colorPoint = mColorMapPtr->begin(); colorPoint != mColorMapPtr->end(); ++colorPoint)
 		pointStringList.append(QString("%1=%2/%3/%4").arg(colorPoint->first). arg(colorPoint->second.red()). arg(
 			colorPoint->second.green()). arg(colorPoint->second.blue()));
 	colorNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
@@ -228,11 +228,11 @@ void ImageTFData::unsignedCT(bool onLoad)
 
 	//	ssc::OpacityMapPtr opacityMap = this->getOpacityMap();
 	OpacityMapPtr newOpacipyMap(new IntIntMap());
-	for (ssc::IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); it++)
+	for (ssc::IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); ++it)
 		(*newOpacipyMap)[it->first + modify] = it->second;
 
 	ColorMapPtr newColorMap(new ColorMap());
-	for (ssc::ColorMap::iterator it = this->getColorMap()->begin(); it != this->getColorMap()->end(); it++)
+	for (ssc::ColorMap::iterator it = this->getColorMap()->begin(); it != this->getColorMap()->end(); ++it)
 		(*newColorMap)[it->first + modify] = it->second;
 
 	mOpacityMapPtr = newOpacipyMap;
@@ -288,7 +288,7 @@ void ImageTFData::fixTransferFunctions()
 			delPoint = opIt->first;
 		else if (opIt->first > this->getScalarMax())
 			delPoint = opIt->first;
-		opIt++;
+		++opIt;
 
 		if (delPoint != 1000000)
 			this->removeAlphaPoint(delPoint);
@@ -302,7 +302,7 @@ void ImageTFData::fixTransferFunctions()
 			delPoint = it->first;
 		else if (it->first > this->getScalarMax())
 			delPoint = it->first;
-		it++;
+		++it;
 
 		if (delPoint != 1000000)
 			this->removeColorPoint(delPoint);
@@ -443,7 +443,7 @@ void ImageTFData::fillColorTFFromMap(vtkColorTransferFunctionPtr tf)
 	// Create vtkColorTransferFunction from the color map
 	tf->RemoveAllPoints();
 
-	for (ColorMap::iterator iter = mColorMapPtr->begin(); iter != mColorMapPtr->end(); iter++)
+	for (ColorMap::iterator iter = mColorMapPtr->begin(); iter != mColorMapPtr->end(); ++iter)
 		tf->AddRGBPoint(iter->first, iter->second.red() / 255.0, iter->second.green() / 255.0, iter->second.blue()
 			/ 255.0);
 	//tf->Update();
@@ -453,7 +453,7 @@ void ImageTFData::fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf)
 {
 	// Create vtkPiecewiseFunction from the color map
 	tf->RemoveAllPoints();
-	for (IntIntMap::iterator iter = mOpacityMapPtr->begin(); iter != mOpacityMapPtr->end(); iter++)
+	for (IntIntMap::iterator iter = mOpacityMapPtr->begin(); iter != mOpacityMapPtr->end(); ++iter)
 		tf->AddPoint(iter->first, iter->second / 255.0);
 	tf->Update();
 }

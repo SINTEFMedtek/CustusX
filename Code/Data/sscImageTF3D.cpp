@@ -46,9 +46,6 @@ namespace ssc
 ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	ImageTFData(base), mOpacityTF(vtkPiecewiseFunctionPtr::New()), mColorTF(vtkColorTransferFunctionPtr::New())
 {
-	connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
-	connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
-
 	mColorTF->SetColorSpaceToRGB();
 
 	double smin = mBase->GetScalarRange()[0];
@@ -67,6 +64,9 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 
 	this->addColorPoint(smin, Qt::black);
 	this->addColorPoint(smax, Qt::white);
+
+	connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
+	connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
 }
 
 void ImageTF3D::removeInitAlphaPoint()

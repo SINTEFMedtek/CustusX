@@ -121,9 +121,10 @@ void PlaneMetric::parseXml(QDomNode& dataNode)
 {
 	Data::parseXml(dataNode);
 
-	mSpace = ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString()));
-	mCoordinate = ssc::Vector3D::fromString(dataNode.toElement().attribute("coord", qstring_cast(mCoordinate)));
-	mNormal = ssc::Vector3D::fromString(dataNode.toElement().attribute("normal", qstring_cast(mNormal)));
+	this->setSpace(ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
+	this->setCoordinate(ssc::Vector3D::fromString(dataNode.toElement().attribute("coord", qstring_cast(mCoordinate))));
+	this->setNormal(ssc::Vector3D::fromString(dataNode.toElement().attribute("normal", qstring_cast(mNormal))));
+
 }
 
 ssc::DoubleBoundingBox3D PlaneMetric::boundingBox() const
