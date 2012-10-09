@@ -9,6 +9,7 @@
 #include "cxImageSenderOpenCV.h"
 #include "cxImageSenderFile.h"
 #include "cxImageSenderSonix.h"
+#include "cxImageSenderGE.h"
 
 namespace cx
 {
@@ -55,6 +56,9 @@ ImageSenderFactory::ImageSenderFactory()
 #endif
 #ifdef USE_OpenCV
 	mAvailable.push_back(ImageSenderPtr(new ImageSenderOpenCV()));
+#endif
+#ifdef CX_USE_ISB_GE
+	mAvailable.push_back(ImageSenderPtr(new ImageSenderGE()));
 #endif
 	mAvailable.push_back(ImageSenderPtr(new MHDImageSender()));
 }
