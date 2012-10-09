@@ -26,6 +26,7 @@
 #include "sscData.h"
 #include "sscBoundingBox3D.h"
 #include "cxTransformFile.h"
+#include "sscCustomMetaImage.h"
 
 namespace cx
 {
@@ -64,6 +65,9 @@ void ElastixExecuter::setInput(QString application,
 				QString outdir,
 				QStringList parameterfiles)
 {
+	mFixed = fixed;
+	mMoving = moving;
+
 	if (!fixed || !moving)
 	{
 		ssc::messageManager()->sendWarning("Failed to start elastiX registration, fixed or missing image missing.");
@@ -116,9 +120,30 @@ QString ElastixExecuter::writeInitTransformToElastixfile(
 	ssc::DataPtr moving,
 	QString outdir)
 {
-//	ElastixEulerTransform::test();
-	ssc::Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
-	ElastixEulerTransform E = ElastixEulerTransform::create(mMf, fixed->boundingBox().center());
+	// elastiX uses the transforms present in the mhd files. If the mhd info is up to date
+	// with the dataManager info, the T0=I, i.e we dont need to tell elastiX anything.
+	// If NOT up to date, then compare file and dataManager, then insert the difference as T0:
+	//
+	// Let f be fixed, m be moving, mm and ff be the intermediate spaces between the file and r:
+	//  	rMd is the transform stored in ssc.
+	//		ddMd is the transform stored in the mhd file.
+	//		T0 is the remainder to be sent to elastiX
+	//
+	// 		mMf = mMr*rMf = mMmm*mmMr*rMff*ffMf = mMmm*T0*ffMf
+	//               -->
+	// 		T0 = mmMm*mMr*rMf*fMff
+	//
+	ssc::Transform3D rMf = fixed->get_rMd();
+	ssc::Transform3D rMm = moving->get_rMd();
+	ssc::Transform3D ffMf = this->getFileTransform_ddMd(mFixed);
+	ssc::Transform3D mmMm = this->getFileTransform_ddMd(mMoving);
+//	ssc::Transform3D mMf = rMm.inv() * rMf;
+	// -->
+	// The remainder transform, not stored in mhd files, must be sent to elastiX:
+	ssc::Transform3D T0 = mmMm*rMm.inv()*rMf*ffMf.inv();
+
+//	ssc::Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
+	ElastixEulerTransform E = ElastixEulerTransform::create(T0, fixed->boundingBox().center());
 
 	QString elastiXText = QString(""
 		"// Input transform file\n"
@@ -248,15 +273,34 @@ QString ElastixExecuter::findMostRecentTransformOutputFile() const
 	return retval;
 }
 
+/**Return the transform present within the mhd file pointed to by the
+ * input volume.
+ *
+ * This is part of the normal rMd transform within ssc::Data, but required
+ * because elastiX reads and uses it.
+ */
+ssc::Transform3D ElastixExecuter::getFileTransform_ddMd(ssc::DataPtr volume)
+{
+	QString patFolder = patientService()->getPatientData()->getActivePatientFolder();
+	ssc::CustomMetaImagePtr reader = ssc::CustomMetaImage::create(patFolder+"/"+volume->getFilePath());
+	ssc::Transform3D ddMd = reader->readTransform();
+	return ddMd;
+}
 
-//struct ElastixResults
-//{
-//	ssc::Transform3D m_mMf;
-//	bool mValidLinearTransform;
-//
-//	QString mNonlinearFilename;
-//	QString mNonlinearTransform;
-//};
+/**Return the result of the latest registration as a linear transform mMf.
+ *
+ * Read the descriptions in writeInitTransformToElastixfile() and
+ * getAffineResult_mmMff for a full discussion.
+ *
+ */
+ssc::Transform3D ElastixExecuter::getAffineResult_mMf(bool* ok)
+{
+	ssc::Transform3D mmMff = this->getAffineResult_mmMff(ok);
+	ssc::Transform3D ffMf = this->getFileTransform_ddMd(mFixed);
+	ssc::Transform3D mmMm = this->getFileTransform_ddMd(mMoving);
+
+	return mmMm.inv() * mmMff * ffMf;
+}
 
 /** Return the result of the latest registration as a linear transform mMf.
  *
@@ -270,9 +314,13 @@ QString ElastixExecuter::findMostRecentTransformOutputFile() const
  * unrecognized (i.e. by CustusX) transforms are ignored with
  * a warning.
  *
+ * NOTE: This 'inner' function returns the raw result from elastiX,
+ * but CustusX expects that the file transforms of the fixed and moving
+ * images are also contained in the result. Use the getAffineResult_mMf()
+ * for the full result.
  *
  */
-ssc::Transform3D ElastixExecuter::getAffineResult_mMf(bool* ok)
+ssc::Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 {
 	QString filename = this->findMostRecentTransformOutputFile();
 	ssc::Transform3D mMf = ssc::Transform3D::Identity();
@@ -309,6 +357,14 @@ ssc::Transform3D ElastixExecuter::getAffineResult_mMf(bool* ok)
 			if (ok)
 				*ok = true;
 			ssc::Transform3D mQf = file.readEulerTransform();
+			// concatenate transforms:
+			mMf = mQf * mMf;
+		}
+		else if (transformType=="AffineTransform")
+		{
+			if (ok)
+				*ok = true;
+			ssc::Transform3D mQf = file.readAffineTransform();
 			// concatenate transforms:
 			mMf = mQf * mMf;
 		}
@@ -395,6 +451,32 @@ ssc::Transform3D ElastixParameterFile::readEulerTransform()
 		ssc::Vector3D(cor[0], cor[1], cor[2]));
 
 	return E.toMatrix();
+}
+
+ssc::Transform3D ElastixParameterFile::readAffineTransform()
+{
+	QString transformType = this->readParameterString("Transform");
+	if (transformType!="AffineTransform")
+		ssc::messageManager()->sendError("Assert failure: attempting to read AffineTransform");
+
+	int numberOfParameters = this->readParameterInt("NumberOfParameters");
+	if (numberOfParameters!=12)
+	{
+		ssc::messageManager()->sendWarning(QString("Expected 12 Euler parameters, got %1").arg(numberOfParameters));
+		return ssc::Transform3D::Identity();
+	}
+	std::vector<double> tp = this->readParameterDoubleVector("TransformParameters");
+//	std::vector<double> cor = this->readParameterDoubleVector("CenterOfRotationPoint");
+
+	ssc::Transform3D M = ssc::Transform3D::Identity();
+
+	for (int r=0; r<3; ++r)
+		for (int c=0; c<3; ++c)
+			M(r,c) = tp[3*r+c];
+	for (int r=0; r<3; ++r)
+		M(r,3) = tp[9+r];
+
+	return M;
 }
 
 ElastixParameterFile::ElastixParameterFile(QString filename) : mFile(filename)
