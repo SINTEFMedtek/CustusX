@@ -65,12 +65,14 @@ QString ImageSenderOpenCV::getType()
 
 QStringList ImageSenderOpenCV::getArgumentDescription()
 {
-	QStringList retval;
-	retval << "--videoport:  video id,     default=0";
-	retval << "--height:     image height, default=camera";
-	retval << "--width:      image width,  default=camera";
-	retval << "--properties: dump image properties";
-	return retval;
+    QStringList retval;
+    retval << "--videoport:			video id,     default=0";
+    retval << "--in_width:			width of incoming image, default=camera";
+    retval << "--in_height:			height of incoming image, default=camera";
+    retval << "--out_width:			width of outgoing image, default=camera";
+    retval << "--out_height:			width of outgoing image, default=camera";
+    retval << "--properties:			dump image properties";
+    return retval;
 }
 
 ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
@@ -112,34 +114,30 @@ void ImageSenderOpenCV::initialize_local()
 
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
-	if (!mArguments.count("width"))
-		mArguments["width"] = "";
-	if (!mArguments.count("height"))
-		mArguments["height"] = "";
+	if (!mArguments.count("out_width"))
+		mArguments["out_width"] = "";
+	if (!mArguments.count("out_height"))
+		mArguments["out_height"] = "";
+    if (!mArguments.count("in_width"))
+        mArguments["in_width"] = "";
+    if (!mArguments.count("in_height"))
+        mArguments["in_height"] = "";
 
 	QString videoSource = mArguments["videoport"];
 	int videoport = convertStringWithDefault(mArguments["videoport"], 0);
-//	int height = convertStringWithDefault(mArguments["height"], 768);
-//	int width = convertStringWithDefault(mArguments["width"], 1024);
 
 	bool sourceIsInt = false;
 	videoSource.toInt(&sourceIsInt);
 
-	if (sourceIsInt)
-	{
-		// open file
+	if (sourceIsInt){
+	    // open device (camera)
 		mVideoCapture.open(videoport);
 	}
-	else
-	{
-		// open camera
+	else{
+        // open file
 		mVideoCapture.open(videoSource.toStdString().c_str());
 	}
-//	mVideoCapture.open(videoSource.toStdString().c_str());
-//	if (!mVideoCapture.isOpened()) //if this fails, try to open as a video camera, through the use of an integer param
-//	{
-//		mVideoCapture.open(videoport);
-//	}
+
 	if (!mVideoCapture.isOpened())
 	{
 		cerr << "ImageSenderOpenCV: Failed to open a video device or video file!\n" << endl;
@@ -147,30 +145,29 @@ void ImageSenderOpenCV::initialize_local()
 	}
 	else
 	{
-		int width = mVideoCapture.get(CV_CAP_PROP_FRAME_WIDTH);
-		int height = mVideoCapture.get(CV_CAP_PROP_FRAME_HEIGHT);
+		//determine default values
+		int default_width = mVideoCapture.get(CV_CAP_PROP_FRAME_WIDTH);
+		int default_height = mVideoCapture.get(CV_CAP_PROP_FRAME_HEIGHT);
 
-		mRescaleSize.setWidth(convertStringWithDefault(mArguments["width"], width));
-		mRescaleSize.setHeight(convertStringWithDefault(mArguments["height"], height));
-//
-//		bool ok = true;
-//		int width = mArguments["width"].toInt(&ok,0);
-//		if (ok)
-//			mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, width);
-//		int height = mArguments["height"].toInt(&ok,0);
-//		if (ok)
-//			mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, height);
+		//set input size
+		int in_width = convertStringWithDefault(mArguments["in_width"], default_width);
+		int in_height = convertStringWithDefault(mArguments["in_height"], default_height);
+		mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, in_width);
+		mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, in_height);
 
-//		mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, width);
-//		mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, height);
+		//set output size (resize)
+		int out_width = convertStringWithDefault(mArguments["out_width"], in_width);
+		int out_height = convertStringWithDefault(mArguments["out_height"], in_height);
+		mRescaleSize.setWidth(out_width);
+		mRescaleSize.setHeight(out_height);
 
 		if (mArguments.count("properties"))
 			this->dumpProperties();
 
 		std::cout << "ImageSenderOpenCV: Started streaming from openCV device "
 			<< videoSource.toStdString()
-			<< ", size=(" << width << "," << height << ")";
-		if (( width!=mRescaleSize.width() )|| (height!=mRescaleSize.height()))
+			<< ", size=(" << in_width << "," << in_height << ")";
+		if (( in_width!=mRescaleSize.width() )|| (in_height!=mRescaleSize.height()))
 			std::cout << ". Scaled to (" << mRescaleSize.width() << "," << mRescaleSize.height() << ")";
 
 		std::cout << std::endl;
