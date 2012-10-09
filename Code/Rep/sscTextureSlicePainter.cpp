@@ -74,11 +74,19 @@ class SingleVolumePainterHelper
 	float mAlpha;
 
 public:
-	explicit SingleVolumePainterHelper(int index)
+	explicit SingleVolumePainterHelper(int index) :
+		mWindow(0.0),
+		mLevel(0.0),
+		mLLR(0.0),
+		mAlpha(1.0)
 	{
 		mIndex = index;
 	}
-	SingleVolumePainterHelper()
+	SingleVolumePainterHelper() :
+		mWindow(0.0),
+		mLevel(0.0),
+		mLLR(0.0),
+		mAlpha(1.0)
 	{
 		mIndex = -1;
 	}

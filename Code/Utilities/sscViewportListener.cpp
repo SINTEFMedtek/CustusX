@@ -18,7 +18,7 @@ namespace ssc
 class ViewportObserverPrivate : public vtkCommand
 {
 public:
-	ViewportObserverPrivate() {}
+	ViewportObserverPrivate() : mBase(NULL) {}
 	static ViewportObserverPrivate* New() {return new ViewportObserverPrivate;}
 	void SetBase(ViewportListener* base) {mBase = base;}
 	virtual void Execute(vtkObject* caller, unsigned long, void*)

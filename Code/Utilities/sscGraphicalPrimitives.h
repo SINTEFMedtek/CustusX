@@ -204,7 +204,6 @@ private:
 	vtkCaptionActor2DPtr mText;
 	//    vtkFollowerPtr mFollower;
 	vtkRendererPtr mRenderer;
-	double mSize;
 
 	//    ssc::ViewportListenerPtr mViewportListener;
 };

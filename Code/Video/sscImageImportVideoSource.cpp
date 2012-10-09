@@ -37,6 +37,7 @@ ImageImportVideoSource::ImageImportVideoSource(QString uid, QString name)
 	mStreaming = false;
 	mValidData = true;
 	mResolution = 1;
+	mTimestamp = 0;
 	mImageImport = vtkImageImportPtr::New();
 	this->setEmptyImage();
 }
