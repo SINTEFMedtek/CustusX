@@ -8,7 +8,7 @@ if (CX_WINDOWS)
     add_definitions(-D_USE_MATH_DEFINES)
 endif(CX_WINDOWS)
 
-if (APPLE OR CX_WINDOWS)
+if (APPLE)
     set(QXT_FOLDER "../ThirdParty/qxt_mac_compatible")
 else()
     set(QXT_FOLDER "../ThirdParty/qxt")
