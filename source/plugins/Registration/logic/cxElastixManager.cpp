@@ -160,10 +160,17 @@ void ElastixManager::execute()
 
 void ElastixManager::preprocessExecuter()
 {
+	// Not necessary - executer makes sure that file transform is read and deviations
+	// accounted for in t0.
+	//
+	// We MUST save the patient before registering.
+	// elastiX uses the Offset+TransformMatrix values, so they must be up to date.
+	//patientService()->getPatientData()->savePatient();
+
     QStringList parameterFiles;
-    if (QFileInfo(mActiveParameterFile0).exists() && QFileInfo(mActiveParameterFile0).exists())
+    if (QFileInfo(mActiveParameterFile0).exists() && QFileInfo(mActiveParameterFile0).isFile())
     	parameterFiles << mActiveParameterFile0;
-    if (QFileInfo(mActiveParameterFile1).exists() && QFileInfo(mActiveParameterFile1).exists())
+    if (QFileInfo(mActiveParameterFile1).exists() && QFileInfo(mActiveParameterFile1).isFile())
     	parameterFiles  << mActiveParameterFile1;
 
 	QString timestamp = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
@@ -203,6 +210,7 @@ void ElastixManager::executionFinishedSlot()
 		* mRegistrationManager->getMovingData()->get_rMd().inv();
 
 	std::cout << "ElastixManager::executionFinishedSlot(), delta_pre_rMd: \n" << delta_pre_rMd << std::endl;
+	std::cout << "ElastixManager::executionFinishedSlot(), expected new rMdm: \n" << mRegistrationManager->getFixedData()->get_rMd() * mMf.inv() << std::endl;
 
 //	mRegistrationManager->applyImage2ImageRegistration(mMf.inv(), desc);
 	mRegistrationManager->applyImage2ImageRegistration(delta_pre_rMd, desc);
