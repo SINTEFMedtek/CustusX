@@ -424,6 +424,7 @@ DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, const
 
 	current->setName(changeExtension(fileInfo.fileName(), ""));
 	//data->setFilePath(relativePath.path().toStdString());
+	current->setFilePath(path); // need path even when not set explicitly: nice for testing
 
 	//  this->loadData(current);
 	return current;
