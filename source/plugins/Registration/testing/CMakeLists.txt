@@ -21,11 +21,17 @@ if (BUILD_TESTING)
       
   # List of all test units
   QT4_WRAP_CPP( SOURCE_FILES 
+  cxElastixSingleThreadedRunner.h
    )
   
   set(SOURCE_FILES
-  cxTest_Registration.h
-  cxTest_Registration.cpp
+  ${SOURCE_FILES}
+  cxTest_RegistrationV2V.h
+  cxTest_RegistrationV2V.cpp
+  cxTest_RegistrationElastix.h
+  cxTest_RegistrationElastix.cpp
+  cxElastixSingleThreadedRunner.h
+  cxElastixSingleThreadedRunner.cpp
   ${CX_TEST_SOURCE_FILES}
   )
   
