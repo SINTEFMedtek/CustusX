@@ -75,12 +75,14 @@ class Common(object):
         self.mBuildFolder = "build" # default build folder. This is auto-changed when using xcode or 32 bit.
         self.m32bitCompileCMakeOption = "" # use "-DCMAKE_OSX_ARCHITECTURES=i386" for 32 bit. Done automatically by settings --b32 from command line.
         self.mBuildSSCExamples = "ON"
+        self.mBuildTesting = "ON"
         self.mUseCotire = "OFF"
         self.mSerialPort = "/Library/CustusX/igstk.links/cu.CustusX.dev0"
         self.mOpenCVStaticCRT = "OFF"
         if (self.PLATFORM == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
             self.mBuildSSCExamples = "OFF"
+            self.mBuildTesting = "OFF"
             self.mExternalDir = self.mRootDir + "/external" #path length on windows is limited, need to keep it short
             self.mUseCotire = "ON"
             self.mSerialPort = "COM9"
@@ -682,6 +684,7 @@ cmake \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
+-DBUILD_TESTING="%s" \
 -DCOTIRE_ADD_UNITY_BUILDS="%s" \
 -DCOTIRE_ENABLE_PRECOMPILED_HEADERS="%s" \
 -DGEStreamer_DIR:PATH="%s" \
@@ -696,6 +699,7 @@ cmake \
             UltrasonixSDK().includePath(),
             UltrasonixSDK().libFile(),
             DATA.mBuildSSCExamples,
+            DATA.mBuildTesting,
             DATA.mUseCotire,
             DATA.mUseCotire,
             ISB_DataStreaming().buildPath(),
