@@ -48,6 +48,27 @@ StringMap extractCommandlineOptions(QStringList cmdline)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
+ImageSenderPtr ImageSenderFactory::getFromArguments(StringMap args)
+{
+	QString type = this->getDefaultSenderType();
+	if (args.count("type"))
+		type = args["type"];
+
+	ImageSenderPtr retval = this->getImageSender(type);
+
+	if (retval)
+	{
+		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
+	}
+	else
+	{
+		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
+	}
+
+	retval->initialize(args);
+	return retval;
+}
+
 
 ImageSenderFactory::ImageSenderFactory()
 {

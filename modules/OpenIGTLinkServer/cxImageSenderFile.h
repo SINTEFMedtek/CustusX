@@ -37,7 +37,7 @@ public:
 	virtual ~MHDImageSender() {}
 
 	virtual void initialize(StringMap arguments);
-	virtual void startStreaming(QTcpSocket* socket);
+	virtual void startStreaming(GrabberSenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
@@ -45,7 +45,8 @@ public:
 
 protected:
 private:
-	QTcpSocket* mSocket;
+//	QTcpSocket* mSocket;
+	GrabberSenderPtr mSender;
 	QTimer* mTimer;
 	int mCounter;
 	vtkImageDataPtr mImageData;

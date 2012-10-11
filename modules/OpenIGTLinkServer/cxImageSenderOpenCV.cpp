@@ -77,7 +77,7 @@ QStringList ImageSenderOpenCV::getArgumentDescription()
 
 ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
 	ImageSender(parent),
-	mSocket(NULL),
+//	mSocket(NULL),
 	mSendTimer(0),
 	mGrabTimer(0)
 {
@@ -174,7 +174,7 @@ void ImageSenderOpenCV::initialize_local()
 	}
 }
 
-void ImageSenderOpenCV::startStreaming(QTcpSocket* socket)
+void ImageSenderOpenCV::startStreaming(GrabberSenderPtr sender)
 {
 	this->initialize_local();
 
@@ -184,7 +184,8 @@ void ImageSenderOpenCV::startStreaming(QTcpSocket* socket)
 		return;
 	}
 
-	mSocket = socket;
+//	mSocket = socket;
+	mSender = sender;
 	mGrabTimer->start(0);
 	mSendTimer->start(40);
 }
@@ -195,7 +196,8 @@ void ImageSenderOpenCV::stopStreaming()
 		return;
 	mGrabTimer->stop();
 	mSendTimer->stop();
-	mSocket = NULL;
+//	mSocket = NULL;
+	mSender.reset();
 
 	this->deinitialize_local();
 }
@@ -246,22 +248,26 @@ void ImageSenderOpenCV::grab()
 
 void ImageSenderOpenCV::send()
 {
-	//std::cout << "tick" << std::endl;
-	//  QTime start = QTime::currentTime();
-	IGTLinkImageMessage::Pointer imgMsg = this->getImageMessage();
-
-	if (!imgMsg)
+	if (!mSender || !mSender->isReady())
 		return;
+	mSender->send(this->getImageMessage());
 
-	if (mSocket)
-	{
-		//------------------------------------------------------------
-		// Pack (serialize) and send
-		imgMsg->Pack();
-		mSocket->write(reinterpret_cast<const char*> (imgMsg->GetPackPointer()), imgMsg->GetPackSize());
-		//  std::cout << "tick " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-	}
-	//  std::cout << "   send: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//	//std::cout << "tick" << std::endl;
+//	//  QTime start = QTime::currentTime();
+//	IGTLinkImageMessage::Pointer imgMsg = this->getImageMessage();
+//
+//	if (!imgMsg)
+//		return;
+//
+//	if (mSocket)
+//	{
+//		//------------------------------------------------------------
+//		// Pack (serialize) and send
+//		imgMsg->Pack();
+//		mSocket->write(reinterpret_cast<const char*> (imgMsg->GetPackPointer()), imgMsg->GetPackSize());
+//		//  std::cout << "tick " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//	}
+//	//  std::cout << "   send: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 }
 
 IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
@@ -276,7 +282,7 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	if (!mVideoCapture.retrieve(frame_source, 0))
 		return IGTLinkImageMessage::Pointer();
 
-	if (this->thread() == QCoreApplication::instance()->thread() && !mSocket)
+	if (this->thread() == QCoreApplication::instance()->thread() && !mSender)
 	{
 		cv::imshow("ImageSenderOpenCV", frame_source);
 	}
