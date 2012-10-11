@@ -30,6 +30,8 @@ namespace cx
 {
 typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+//typedef boost::shared_ptr<class OpenIGTLinkDirectLinkRTSource> OpenIGTLinkDirectLinkRTSourcePtr;
+
 
 /**
  * \file
@@ -106,6 +108,7 @@ private:
 	VideoService& operator=(VideoService const&); // not implemented
 
 	VideoConnectionPtr mIGTLinkConnection;
+//	OpenIGTLinkDirectLinkRTSourcePtr mGrabberDirectLinkVideoSource;
 	ssc::VideoSourcePtr mActiveVideoSource;
 	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
 };

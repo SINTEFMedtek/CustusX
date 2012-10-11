@@ -18,50 +18,31 @@ namespace cx
 ImageServer::ImageServer(QObject* parent) :
 	QTcpServer(parent)
 {
-	//mTimer = new QTimer(this);
-	//connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-	//mTimer->start(500);
 }
 
 void ImageServer::initialize()
 {
 	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
-	
-	ImageSenderFactory factory;
-	QString type = factory.getDefaultSenderType();
-	if (args.count("type"))
-		type = args["type"];
-	
-	mImageSender = factory.getImageSender(type);
-	
-	if (mImageSender)
-	{
-		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
-	}
-	else
-	{
-		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
-	}
+	mImageSender = ImageSenderFactory().getFromArguments(args);
 
-	mImageSender->initialize(args);
-}
-
-void ImageServer::tick()
-{
-////	return;
-////	char s;
-////	std::cin.read(&s, 1);
-//	// if any input detected: quit application
-//	std::string val;
-//	std::cout << "dddd" << std::endl;
-//	std::cin >> val;
-////	if (s=='q')
-//	if (!val.empty())
+//
+//	ImageSenderFactory factory;
+//	QString type = factory.getDefaultSenderType();
+//	if (args.count("type"))
+//		type = args["type"];
+//
+//	mImageSender = factory.getImageSender(type);
+//
+//	if (mImageSender)
 //	{
-//		std::cout << "Close server..." << std::endl;
-//		this->socketDisconnectedSlot();
-//		qApp->quit();
+//		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
 //	}
+//	else
+//	{
+//		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
+//	}
+//
+//	mImageSender->initialize(args);
 }
 
 void ImageServer::startListen(int port)
@@ -107,8 +88,9 @@ void ImageServer::incomingConnection(int socketDescriptor)
 	mSocket->setSocketDescriptor(socketDescriptor);
 	QString clientName = mSocket->localAddress().toString();
 	std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
+	GrabberSenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
 
-	mImageSender->startStreaming(mSocket);
+	mImageSender->startStreaming(sender);
 }
 
 void ImageServer::socketDisconnectedSlot()

@@ -45,6 +45,7 @@ private slots:
   void browseLocalServerSlot();
 
   void useLocalServerChanged();
+  void useDirectLinkChanged();
 
 private:
   void dataChanged();
@@ -59,6 +60,7 @@ private:
   QComboBox* mAddressEdit;
   QLineEdit* mPortEdit;
   QCheckBox* mUseLocalServer;
+  QCheckBox* mUseDirectLink;
   QPushButton* mConnectButton;
   QPushButton* mShowStreamButton;
   QPushButton* mLaunchServerButton;

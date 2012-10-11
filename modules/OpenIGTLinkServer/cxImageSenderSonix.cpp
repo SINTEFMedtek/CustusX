@@ -77,7 +77,7 @@ void ImageSenderSonix::initialize(StringMap arguments)
     mArguments = arguments;
 	
 	mMaxqueueInfo = 20;
-	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
+//	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
 	mDroppedImages = 0;
 
 	typedef cx::Frame Frame;

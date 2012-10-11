@@ -47,6 +47,8 @@
 #include "cxProbe.h"
 #include "cxVideoService.h"
 #include "cxToolManager.h"
+#include "cxImageSenderFactory.h"
+#include "cxGrabberDirectLinkThread.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -56,13 +58,13 @@ namespace cx
 
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
 				mImageImport(vtkImageImportPtr::New()),
-				mLinearSoundSpeedCompesation(1.0),
+//				mLinearSoundSpeedCompesation(1.0),
 				updateSonixParameters(false)//,
 //				sonixVideo(false)//,
 //				mDepthStart(0), mDepthEnd(0), mWidth(0)
 {
 	mLastTimestamp = 0;
-	mTimestampCalibration = 0;
+//	mTimestampCalibration = 0;
 	mConnected = false;
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
@@ -169,25 +171,25 @@ bool OpenIGTLinkRTSource::validData() const
 	return mClient && !mTimeout;
 }
 
-/**Set a time shift that is added to every timestamp acquired from the source.
- * This can be used to calibrate time shifts between source and client.
- */
-void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
-{
-	if (ssc::similar(mTimestampCalibration, delta))
-		return;
-	if (!ssc::similar(delta, 0.0))
-		ssc::messageManager()->sendInfo("set time calibration in rt source: " + qstring_cast(delta) + "ms");
-	mTimestampCalibration = delta;
-}
+///**Set a time shift that is added to every timestamp acquired from the source.
+// * This can be used to calibrate time shifts between source and client.
+// */
+//void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
+//{
+//	if (ssc::similar(mTimestampCalibration, delta))
+//		return;
+//	if (!ssc::similar(delta, 0.0))
+//		ssc::messageManager()->sendInfo("set time calibration in rt source: " + qstring_cast(delta) + "ms");
+//	mTimestampCalibration = delta;
+//}
 
-void OpenIGTLinkRTSource::setSoundSpeedCompensation(double gamma)
-{
-	mLinearSoundSpeedCompesation = gamma;
-	ssc::messageManager()->sendInfo(
-					"Linear sound speed compensation set to: "
-					+ qstring_cast(mLinearSoundSpeedCompesation));
-}
+//void OpenIGTLinkRTSource::setSoundSpeedCompensation(double gamma)
+//{
+//	mLinearSoundSpeedCompesation = gamma;
+//	ssc::messageManager()->sendInfo(
+//					"Linear sound speed compensation set to: "
+//					+ qstring_cast(mLinearSoundSpeedCompesation));
+//}
 
 double OpenIGTLinkRTSource::getTimestamp()
 {
@@ -216,6 +218,26 @@ void OpenIGTLinkRTSource::connectedSlot(bool on)
 
 	emit connected(on);
 }
+
+void OpenIGTLinkRTSource::directLink(std::map<QString, QString> args)
+{
+	if (mClient)
+	{
+		std::cout << "client already exist - returning" << std::endl;
+		return;
+	}
+
+	mClient.reset(new GrabberDirectLinkThread(args, this));
+	connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
+	connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
+
+	mClient->start();
+	mTimeoutTimer->start();
+}
+
 
 void OpenIGTLinkRTSource::connectServer(QString address, int port)
 {
@@ -299,7 +321,7 @@ void OpenIGTLinkRTSource::clientFinishedSlot()
  */
 void OpenIGTLinkRTSource::setEmptyImage()
 {
-	mImageMessage = igtl::ImageMessage::Pointer();
+	mImageMessage = IGTLinkImageMessage::Pointer();
 	mImageImport->SetWholeExtent(0, 1, 0, 1, 0, 0);
 	mImageImport->SetDataExtent(0, 1, 0, 1, 0, 0);
 	mImageImport->SetDataScalarTypeToUnsignedChar();
@@ -314,7 +336,7 @@ void OpenIGTLinkRTSource::setTestImage()
 	int H = 512;
 
 	int numberOfComponents = 4;
-	mImageMessage = igtl::ImageMessage::Pointer();
+	mImageMessage = IGTLinkImageMessage::Pointer();
 	mImageImport->SetWholeExtent(0, W - 1, 0, H - 1, 0, 0);
 	mImageImport->SetDataExtent(0, W - 1, 0, H - 1, 0, 0);
 	mImageImport->SetDataScalarTypeToUnsignedChar();
@@ -338,7 +360,7 @@ void OpenIGTLinkRTSource::setTestImage()
 	mImageImport->Modified();
 }
 
-void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message)
+void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(IGTLinkImageMessage::Pointer message)
 {
 	mImageMessage = message;
 	// Retrive the image data
@@ -361,31 +383,31 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 	//for linear probes used in other substance than the scanner is calibrated for we want to compensate
 	//for the change in sound of speed in that substance, do this by changing spacing in the images y-direction,
 	//this is only valid for linear probes
-	spacing[1] *= mLinearSoundSpeedCompesation;
+//	spacing[1] *= mLinearSoundSpeedCompesation;
 
 
 	mImageImport->SetNumberOfScalarComponents(1);
 
 	switch (scalarType)
 	{
-	case igtl::ImageMessage::TYPE_INT8:
+	case IGTLinkImageMessage::TYPE_INT8:
 		std::cout << "signed char is not supported. Falling back to unsigned char." << std::endl;
 		mImageImport->SetDataScalarTypeToUnsignedChar();
 		break;
-	case igtl::ImageMessage::TYPE_UINT8:
+	case IGTLinkImageMessage::TYPE_UINT8:
 		mImageImport->SetDataScalarTypeToUnsignedChar();
 		break;
-	case igtl::ImageMessage::TYPE_INT16:
+	case IGTLinkImageMessage::TYPE_INT16:
 		mImageImport->SetDataScalarTypeToShort();
 		break;
-	case igtl::ImageMessage::TYPE_UINT16:
+	case IGTLinkImageMessage::TYPE_UINT16:
 //    std::cout << "SetDataScalarTypeToUnsignedShort." << std::endl;
 //		mImageImport->SetDataScalarTypeToUnsignedShort();
     mImageImport->SetNumberOfScalarComponents(2);
     mImageImport->SetDataScalarTypeToUnsignedChar();
 		break;
-	case igtl::ImageMessage::TYPE_INT32:
-	case igtl::ImageMessage::TYPE_UINT32:
+	case IGTLinkImageMessage::TYPE_INT32:
+	case IGTLinkImageMessage::TYPE_UINT32:
 //    std::cout << "SetDataScalarTypeTo4channel." << std::endl;
 		// assume RGBA unsigned colors
 		mImageImport->SetNumberOfScalarComponents(4);
@@ -393,10 +415,10 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 		mImageImport->SetDataScalarTypeToUnsignedChar();
 //    std::cout << "32bit received" << std::endl;
 		break;
-	case igtl::ImageMessage::TYPE_FLOAT32:
+	case IGTLinkImageMessage::TYPE_FLOAT32:
 		mImageImport->SetDataScalarTypeToFloat();
 		break;
-	case igtl::ImageMessage::TYPE_FLOAT64:
+	case IGTLinkImageMessage::TYPE_FLOAT64:
 		mImageImport->SetDataScalarTypeToDouble();
 		break;
 	default:
@@ -413,9 +435,9 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 //  std::cout << "raw time" << timestamp->GetTimeStamp() << ", " << timestamp->GetTimeStamp() - last << std::endl;
 
 	mLastTimestamp = timestamp->GetTimeStamp() * 1000;
-	mLastTimestamp += mTimestampCalibration;
+//	mLastTimestamp += mTimestampCalibration;
 
-	mDebug_orgTime = timestamp->GetTimeStamp() * 1000; // ms
+//	mDebug_orgTime = timestamp->GetTimeStamp() * 1000; // ms
 	mImageImport->SetDataOrigin(0, 0, 0);
 	mImageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
 	mImageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1);
@@ -500,7 +522,7 @@ void OpenIGTLinkRTSource::updateSonix()
 	updateSonixParameters = false;
 }
 
-void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
+void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 {
 #if 1 // remove to use test image
 	if (!message)
