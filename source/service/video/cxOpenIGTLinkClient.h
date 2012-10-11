@@ -25,6 +25,7 @@ class QTcpSocket;
 #include "igtlImageMessage.h"
 #include "cxRenderTimer.h"
 #include "../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h"
+#include "cxIGTLinkClientBase.h"
 
 namespace cx
 {
@@ -54,20 +55,19 @@ typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
  *
  *
  */
-class IGTLinkClient: public QThread
+class IGTLinkClient: public IGTLinkClientBase
 {
 Q_OBJECT
 public:
 	IGTLinkClient(QString address, int port, QObject* parent = NULL);
-	igtl::ImageMessage::Pointer getLastImageMessage(); // threadsafe
-	IGTLinkUSStatusMessage::Pointer getLastSonixStatusMessage(); // threadsafe
-	QString hostDescription() const; // threadsafe
+	virtual QString hostDescription() const; // threadsafe
+	~IGTLinkClient() {}
 
-signals:
-	void imageReceived();
-	void sonixStatusReceived();
-	void fps(double);
-	void connected(bool on);
+//signals:
+//	void imageReceived();
+//	void sonixStatusReceived();
+//	void fps(double);
+//	void connected(bool on);
 
 protected:
 	virtual void run();
@@ -82,12 +82,9 @@ private slots:
 	void errorSlot(QAbstractSocket::SocketError);
 
 private:
-	cx::RenderTimer mFPSTimer;
 	bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
-	void calibrateTimeStamp(igtl::ImageMessage::Pointer imgMsg);
-	void addImageToQueue(igtl::ImageMessage::Pointer imgMsg);
-	void addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg);
+	void calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg);
 	bool readOneMessage();
 
 	bool mHeadingReceived;
@@ -96,11 +93,6 @@ private:
 	QTcpSocket* mSocket;
 //  igtl::ClientSocket::Pointer mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;
-
-	QMutex mImageMutex;
-	QMutex mSonixStatusMutex;
-	std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue;
-	std::list<IGTLinkUSStatusMessage::Pointer> mMutexedSonixStatusMessageQueue;
 
 	bool calibrateMsgTimeStamp;///< Should the time stamps of image messages be calibrated based on the computer clock
 	double mLastReferenceTimestampDiff;

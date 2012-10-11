@@ -30,12 +30,9 @@ protected:
 	void incomingConnection(int socketDescriptor);
 private slots:
 	void socketDisconnectedSlot();
-	void tick();
 private:
 	ImageSenderPtr mImageSender;
-
 	QPointer<QTcpSocket> mSocket;
-	QTimer* mTimer;
 };
 
 } // namespace cx

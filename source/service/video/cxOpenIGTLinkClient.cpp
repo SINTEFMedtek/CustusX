@@ -131,7 +131,7 @@ namespace cx
 {
 
 IGTLinkClient::IGTLinkClient(QString address, int port, QObject* parent) :
-				QThread(parent), mHeadingReceived(false), mAddress(address), mPort(port)
+		IGTLinkClientBase(parent), mHeadingReceived(false), mAddress(address), mPort(port)
 {
 //  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
 	calibrateMsgTimeStamp = true;
@@ -210,7 +210,7 @@ void IGTLinkClient::errorSlot(QAbstractSocket::SocketError socketError)
  * Calibration is based on an average of several of the last messages.
  * The calibration is updated every 20-30 sec.
  */
-void IGTLinkClient::calibrateTimeStamp(igtl::ImageMessage::Pointer imgMsg)
+void IGTLinkClient::calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg)
 {
 	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
 	imgMsg->GetTimeStamp(timestamp);
@@ -274,72 +274,6 @@ void IGTLinkClient::calibrateTimeStamp(igtl::ImageMessage::Pointer imgMsg)
 	imgMsg->SetTimeStamp(timestamp);
 }
 
-/** add the message to a thread-safe queue
- */
-void IGTLinkClient::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
-{
-	mFPSTimer.beginRender();
-	mFPSTimer.endRender();
-	if (mFPSTimer.intervalPassed())
-	{
-		emit fps(mFPSTimer.getFPS());
-		mFPSTimer.reset(2000);
-	}
-
-	if (calibrateMsgTimeStamp)
-		calibrateTimeStamp(imgMsg);
-
-	//Get modified timestamp
-	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-	imgMsg->GetTimeStamp(timestamp);
-	double timestamp_ms = timestamp->GetTimeStamp() * 1000;
-	QDateTime timestamp_dt = QDateTime::fromMSecsSinceEpoch(timestamp_ms);
-
-//	std::cout << "Queue size: " << mMutexedImageMessageQueue.size() << "\tTimestamp calib: " << mLastReferenceTimestampDiff << " ms" ;//<< std::endl;
-//	std::cout << "\t diff: " << timestamp_dt.msecsTo(QDateTime::currentDateTime()) << std::endl;
-
-
-	QMutexLocker sentry(&mImageMutex);
-	mMutexedImageMessageQueue.push_back(imgMsg);
-	sentry.unlock();
-	emit imageReceived(); // emit signal outside lock, catch possibly in another thread
-}
-
-/** add the message to a thread-safe queue
- */
-void IGTLinkClient::addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg)
-{
-	QMutexLocker sentry(&mSonixStatusMutex);
-	mMutexedSonixStatusMessageQueue.push_back(msg);
-	sentry.unlock();
-	emit sonixStatusReceived(); // emit signal outside lock, catch possibly in another thread
-}
-
-/** Threadsafe retrieval of last image message.
- *
- */
-igtl::ImageMessage::Pointer IGTLinkClient::getLastImageMessage()
-{
-	QMutexLocker sentry(&mImageMutex);
-	if (mMutexedImageMessageQueue.empty())
-		return igtl::ImageMessage::Pointer();
-	igtl::ImageMessage::Pointer retval = mMutexedImageMessageQueue.front();
-	mMutexedImageMessageQueue.pop_front();
-	return retval;
-}
-
-/** Threadsafe retrieval of last image message.
- *
- */
-IGTLinkUSStatusMessage::Pointer IGTLinkClient::getLastSonixStatusMessage()
-{
-	QMutexLocker sentry(&mSonixStatusMutex);
-	if (mMutexedSonixStatusMessageQueue.empty())
-		return IGTLinkUSStatusMessage::Pointer();
-	IGTLinkUSStatusMessage::Pointer retval = mMutexedSonixStatusMessageQueue.front();
-	mMutexedSonixStatusMessageQueue.pop_front();
-	return retval;
-}
 
 void IGTLinkClient::readyReadSlot()
 {
@@ -451,8 +385,8 @@ bool IGTLinkClient::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::
 bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
 	// Create a message buffer to receive transform data
-	igtl::ImageMessage::Pointer imgMsg;
-	imgMsg = igtl::ImageMessage::New();
+	IGTLinkImageMessage::Pointer imgMsg;
+	imgMsg = IGTLinkImageMessage::New();
 	imgMsg->SetMessageHeader(header);
 	imgMsg->AllocatePack();
 

@@ -94,7 +94,7 @@ private:
 
   QMutex mImageMutex; ///< A lock for making the class threadsafe
   int mMaxqueueInfo;
-  int mMaxBufferSize;
+//  int mMaxBufferSize;
   std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue
   int mDroppedImages;
 

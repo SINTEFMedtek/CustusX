@@ -21,21 +21,7 @@ class QTimer;
 #include <QStringList>
 #include "cxImageSenderFactory.h"
 #include "../grabberCommon/cxIGTLinkImageMessage.h"
-
-//class ImageSender : public QObject
-//{
-//	Q_OBJECT
-//public:
-//	ImageSender(QObject* parent = NULL) : QObject(parent) {}
-//	virtual ~ImageSender() {}
-//
-//	virtual void initialize(StringMap arguments) = 0;
-//	virtual void startStreaming(QTcpSocket* socket) = 0;
-//	virtual void stopStreaming() = 0;
-//
-//	virtual QString getType() = 0;
-//	virtual QStringList getArgumentDescription() = 0;
-//};
+#include "cxGrabberSender.h"
 
 namespace cx
 {
@@ -56,7 +42,7 @@ public:
 	virtual ~ImageSenderOpenCV() {}
 
 	virtual void initialize(StringMap arguments);
-	virtual void startStreaming(QTcpSocket* socket);
+	virtual void startStreaming(GrabberSenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
@@ -64,7 +50,8 @@ public:
 
 protected:
 private:
-	QTcpSocket* mSocket;
+	GrabberSenderPtr mSender;
+//	QTcpSocket* mSocket;
 	QTimer* mSendTimer;
 	QTimer* mGrabTimer;
 	StringMap mArguments;

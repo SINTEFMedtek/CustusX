@@ -60,6 +60,8 @@ public:
 
 	void setUseLocalServer(bool use);
 	bool getUseLocalServer();
+	void setUseDirectLink(bool use);
+	bool getUseDirectLink();
 
 	void launchServer();
 
@@ -89,7 +91,7 @@ private slots:
 private:
 	void delayedAutoConnectServer();
 
-	double mSoundSpeedCompensationFactor;
+//	double mSoundSpeedCompensationFactor;
 	OpenIGTLinkRTSourcePtr mRTSource;
 	QProcess* mServer;
 	int mConnectWhenLocalServerRunning;
