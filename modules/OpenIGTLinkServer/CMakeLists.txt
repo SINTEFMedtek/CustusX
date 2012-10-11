@@ -133,6 +133,7 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxImageSenderOpenCV.h
 		cxImageSenderGE.h
 		cxImageSender.h
+		cxGrabberSender.h
 )
 
 #QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
@@ -161,6 +162,8 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxImageSenderGE.h
 		cxImageSenderGE.cpp
 		cxImageSender.h
+		cxGrabberSender.h
+		cxGrabberSender.cpp
 		../grabberCommon/cxIGTLinkUSStatusMessage.h
 		../grabberCommon/cxIGTLinkUSStatusMessage.cpp
 		../grabberCommon/cxIGTLinkImageMessage.h
@@ -168,6 +171,14 @@ SET ( cxOpenIGTLinkServer_FILES
 		../grabberCommon/igtl_us_status.h
 		../grabberCommon/igtl_us_status.c
 )
+
+add_library( cxGrabber
+    ${cxOpenIGTLinkServer_FILES} 
+    ${MOC_HEADER_FILES} 
+    )
+target_link_libraries(cxGrabber
+    ${LINK_LIBRARIES}
+    )
 
 if(CX_WIN32)
 	set(ExecutableName "UltrasonixServer") # windows 32 bit version is made for ultrasonix communication
@@ -177,12 +188,12 @@ endif()
 
 add_executable( ${ExecutableName}
     main.cpp 
-    ${cxOpenIGTLinkServer_FILES} 
-    ${MOC_HEADER_FILES} 
+#    ${cxOpenIGTLinkServer_FILES} 
+#    ${MOC_HEADER_FILES} 
     )
 
 target_link_libraries(${ExecutableName}
-    ${LINK_LIBRARIES}
+    cxGrabber
     )
 
 #-------------------------------

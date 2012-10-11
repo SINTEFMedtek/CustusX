@@ -30,6 +30,7 @@
 #include "sscMessageManager.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
+#include "cxImageSenderFactory.h"
 
 namespace cx
 {
@@ -98,6 +99,20 @@ bool VideoConnection::getUseLocalServer()
 		return var.toBool();
 	return true;
 }
+
+void VideoConnection::setUseDirectLink(bool use)
+{
+	settings()->setValue("IGTLink/useDirectLink", use);
+}
+
+bool VideoConnection::getUseDirectLink()
+{
+	QVariant var = settings()->value("IGTLink/useDirectLink");
+	if (var.canConvert<bool> ())
+		return var.toBool();
+	return true;
+}
+
 
 /**Get list of recent hosts. The first is the current.
  *
@@ -196,8 +211,17 @@ void VideoConnection::delayedAutoConnectServer()
 	}
 }
 
+
 void VideoConnection::launchAndConnectServer()
 {
+	if (this->getUseDirectLink())
+	{
+		QString commandline = this->getLocalServerCommandLine();
+		StringMap args = extractCommandlineOptions(commandline.split(" "));
+		mRTSource->directLink(args);
+		return;
+	}
+
 	if (this->getUseLocalServer())
 	{
 		this->launchServer();

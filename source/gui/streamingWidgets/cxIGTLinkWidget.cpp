@@ -59,17 +59,24 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   connect(browseLocalServerAction, SIGNAL(triggered()), this, SLOT(browseLocalServerSlot()));
   QToolButton* button = new QToolButton();
   button->setDefaultAction(browseLocalServerAction);
-  gridLayout->addWidget(button, 3, 2);
+  gridLayout->addWidget(button, 4, 2);
+
+  mUseDirectLink = new QCheckBox("Use Direct Link", this);
+  mUseDirectLink->setChecked(getConnection()->getUseDirectLink());
+  mUseDirectLink->setToolTip("Connect to a grabber inside the CustusX process - no TCP/IP link.");
+  connect(mUseDirectLink, SIGNAL(toggled(bool)), this, SLOT(useDirectLinkChanged()));
+  gridLayout->addWidget(mUseDirectLink, 2, 0, 1, 2);
 
   mUseLocalServer = new QCheckBox("Use Local Server", this);
   mUseLocalServer->setChecked(getConnection()->getUseLocalServer());
+  mUseLocalServer->setToolTip("Run a grabber server from CustusX, then connect to it.");
   connect(mUseLocalServer, SIGNAL(toggled(bool)), this, SLOT(useLocalServerChanged()));
-  gridLayout->addWidget(mUseLocalServer, 2, 0, 1, 2);
+  gridLayout->addWidget(mUseLocalServer, 3, 0, 1, 2);
 
-  gridLayout->addWidget(new QLabel("Local Server", this), 3, 0);
+  gridLayout->addWidget(new QLabel("Local Server", this), 4, 0);
   mLocalServerEdit = new QLineEdit(this);
   mLocalServerEdit->setText(getConnection()->getLocalServerCommandLine());
-  gridLayout->addWidget(mLocalServerEdit, 3, 1);
+  gridLayout->addWidget(mLocalServerEdit, 4, 1);
 
   QHBoxLayout* buttonsLayout = new QHBoxLayout;
   toptopLayout->addLayout(buttonsLayout);
@@ -131,13 +138,23 @@ void IGTLinkWidget::useLocalServerChanged()
 	this->dataChanged();
 }
 
+void IGTLinkWidget::useDirectLinkChanged()
+{
+	this->writeSettings();
+	this->dataChanged();
+}
+
 void IGTLinkWidget::dataChanged()
 {
-  mAddressEdit->setEnabled(!getConnection()->getUseLocalServer());
-  mLocalServerEdit->setEnabled(getConnection()->getUseLocalServer());
-  mLaunchServerButton->setEnabled(getConnection()->getUseLocalServer());
+	bool direct = getConnection()->getUseDirectLink();
+	bool local = getConnection()->getUseLocalServer();
 
-  mShowStreamButton->setEnabled(getConnection()->getVideoSource()->isConnected());
+  mAddressEdit->setEnabled(!local && !direct);
+  mLocalServerEdit->setEnabled(local);
+  mLaunchServerButton->setEnabled(local && !direct);
+  mUseLocalServer->setEnabled(!direct);
+
+  mShowStreamButton->setEnabled(local);
 }
 
 void IGTLinkWidget::updateHostHistory()
@@ -259,6 +276,7 @@ void IGTLinkWidget::writeSettings()
   getConnection()->setHost(mAddressEdit->currentText());
   getConnection()->setPort(mPortEdit->text().toInt());
   getConnection()->setUseLocalServer(mUseLocalServer->isChecked());
+  getConnection()->setUseDirectLink(mUseDirectLink->isChecked());
   this->updateHostHistory();
 }
 
