@@ -36,6 +36,12 @@ GrabberDirectLinkThread::GrabberDirectLinkThread(StringMap args, QObject* parent
 //  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
 }
 
+void GrabberDirectLinkThread::stopSlot()
+{
+	mImageSender->stopStreaming();
+	this->quit();
+}
+
 void GrabberDirectLinkThread::run()
 {
 	ssc::messageManager()->sendInfo("Starting direct link grabber.");
@@ -57,10 +63,10 @@ void GrabberDirectLinkThread::run()
 	// run event loop
 	this->exec();
 
-	emit connected(false);
+	mImageSender->stopStreaming();
 	mImageSender.reset();
 	mGrabberBridge.reset();
-//  std::cout << "finished openIGTLink client thread" << std::endl;
+	emit connected(false);
 }
 
 void GrabberDirectLinkThread::newImageSlot()

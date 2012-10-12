@@ -25,6 +25,10 @@ void ImageServer::initialize()
 	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
 	mImageSender = ImageSenderFactory().getFromArguments(args);
 
+	// test streaming by starting/stopping once (will emit error messages right away instead of waiting for an incoming connecion.)
+	mImageSender->startStreaming(GrabberSenderPtr());
+	mImageSender->stopStreaming();
+
 //
 //	ImageSenderFactory factory;
 //	QString type = factory.getDefaultSenderType();
