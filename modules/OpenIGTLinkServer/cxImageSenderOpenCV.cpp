@@ -77,7 +77,6 @@ QStringList ImageSenderOpenCV::getArgumentDescription()
 
 ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
 	ImageSender(parent),
-//	mSocket(NULL),
 	mSendTimer(0),
 	mGrabTimer(0)
 {
@@ -85,6 +84,11 @@ ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
 	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	mSendTimer = new QTimer(this);
 	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+}
+
+ImageSenderOpenCV::~ImageSenderOpenCV()
+{
+	this->deinitialize_local();
 }
 
 void ImageSenderOpenCV::initialize(StringMap arguments)
@@ -96,8 +100,11 @@ void ImageSenderOpenCV::initialize(StringMap arguments)
 	// release resources if the server is a local app and is killed by CustusX.
 	// This way, we can disconnect (thus releasing resources), and then safely
 	// remove the usb cable without having dangling resources in openCV. (problem at least on Linux)
-	this->initialize_local();
-	this->deinitialize_local();
+	//
+	// Removed: When running as direct link, this causes several seconds of delay at startup.
+	// Instead, the ImageServer calls a start/stop streaming during init.
+    //	this->initialize_local();
+	//	this->deinitialize_local();
 }
 
 void ImageSenderOpenCV::deinitialize_local()
@@ -234,6 +241,7 @@ void ImageSenderOpenCV::dumpProperty(int val, QString name)
 
 void ImageSenderOpenCV::grab()
 {
+//	return;
 	if (!mVideoCapture.isOpened())
 	{
 		return;
@@ -248,26 +256,16 @@ void ImageSenderOpenCV::grab()
 
 void ImageSenderOpenCV::send()
 {
+//	static int counter = 0;
+//	if (++counter==150)
+//	{
+//		std::cout << " ImageSenderOpenCV::send()" << std::endl;
+//		this->stopStreaming();
+//	}
+//	return;
 	if (!mSender || !mSender->isReady())
 		return;
 	mSender->send(this->getImageMessage());
-
-//	//std::cout << "tick" << std::endl;
-//	//  QTime start = QTime::currentTime();
-//	IGTLinkImageMessage::Pointer imgMsg = this->getImageMessage();
-//
-//	if (!imgMsg)
-//		return;
-//
-//	if (mSocket)
-//	{
-//		//------------------------------------------------------------
-//		// Pack (serialize) and send
-//		imgMsg->Pack();
-//		mSocket->write(reinterpret_cast<const char*> (imgMsg->GetPackPointer()), imgMsg->GetPackSize());
-//		//  std::cout << "tick " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-//	}
-//	//  std::cout << "   send: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 }
 
 IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()

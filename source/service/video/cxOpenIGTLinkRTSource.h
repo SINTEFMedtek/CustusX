@@ -79,13 +79,9 @@ public:
 	void directLink(std::map<QString, QString> args);
 	void connectServer(QString address, int port);
 	void disconnectServer();
-//	void setTimestampCalibration(double delta);
-//	double getTimestampCalibration() { return mTimestampCalibration; }
-//	void setSoundSpeedCompensation(double gamma); ///< gamma is the correction factor for the distance along the sound direction
 
 signals:
 	void fps(int fps);
-
 private slots:
 	void clientFinishedSlot();
 	void imageReceivedSlot();
@@ -105,15 +101,13 @@ private:
 	void updateImageImportFromIGTMessage(IGTLinkImageMessage::Pointer message);
 	void updateSonix();
 	ProbePtr getValidProbe();
-
-//	double mDebug_orgTime;
+	void stopClient();
 
 	boost::array<unsigned char, 100> mZero;
 	vtkImageImportPtr mImageImport;
 	vtkImageDataPtr mFilter_IGTLink_to_RGB;
 	vtkImageAlgorithmPtr mRedirecter;
 	IGTLinkImageMessage::Pointer mImageMessage;
-//	IGTLinkClientPtr mClient;
 	IGTLinkClientBasePtr mClient;
 	bool mConnected;
 	QString mDeviceName;
@@ -121,17 +115,7 @@ private:
 	QTimer* mTimeoutTimer;
 	double mFPS;
 	double mLastTimestamp;
-//	double mTimestampCalibration;
-//	double mLinearSoundSpeedCompesation;
-
-//	int mSize[3]; // image dimension
-//	float mOrigin[3];
-//	double mSpacing[3]; // spacing (mm/pixel)
 	bool updateSonixParameters;
-//	bool sonixVideo;
-//	int mDepthStart; //mm
-//	int mDepthEnd; //mm
-//	int mWidth; //mm
 	ssc::ProbeData mSonixProbeData;
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;

@@ -49,6 +49,7 @@
 #include "cxToolManager.h"
 #include "cxImageSenderFactory.h"
 #include "cxGrabberDirectLinkThread.h"
+#include "sscTypeConversions.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -58,31 +59,12 @@ namespace cx
 
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
 				mImageImport(vtkImageImportPtr::New()),
-//				mLinearSoundSpeedCompesation(1.0),
-				updateSonixParameters(false)//,
-//				sonixVideo(false)//,
-//				mDepthStart(0), mDepthEnd(0), mWidth(0)
+				updateSonixParameters(false)
 {
 	mLastTimestamp = 0;
-//	mTimestampCalibration = 0;
 	mConnected = false;
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
-//	mSize[0] = 0;
-//	mSize[1] = 0;
-//	mSize[2] = 0;
-//	mOrigin[0] = 0.0;
-//	mOrigin[1] = 0.0;
-//	mOrigin[2] = 0.0;
-//	mSpacing[0] = 0.0;
-//	mSpacing[1] = 0.0;
-//	mSpacing[2] = 0.0;
-
-	//image flip
-//  vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
-//  flipper->SetFilteredAxes(0); //flipp around Y axis
-//  flipper->SetInput(mImageImport->GetOutput());
-//  mRedirecter->SetInput(flipper->GetOutput());
 	mRedirecter->SetInput(mImageImport->GetOutput());
 
 	mImageImport->SetNumberOfScalarComponents(1);
@@ -94,22 +76,11 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
 	mTimeoutTimer->setInterval(1000);
 	connect(mTimeoutTimer, SIGNAL(timeout()), this, SLOT(timeout()));
 	connect(this, SIGNAL(connected(bool)), this, SIGNAL(streaming(bool))); // define connected as streaming.
-	//connect(this, SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool))); // define connected as streaming.
 }
 
 OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
 {
-	//disconnect();
-	if (mClient)
-	{
-		mClient->quit();
-		mClient->wait(2000);
-		if (mClient->isRunning())
-		{
-			mClient->terminate();
-			mClient->wait(); // forever or until dead thread
-		}
-	}
+	this->stopClient();
 }
 
 void OpenIGTLinkRTSource::timeout()
@@ -170,26 +141,6 @@ bool OpenIGTLinkRTSource::validData() const
 {
 	return mClient && !mTimeout;
 }
-
-///**Set a time shift that is added to every timestamp acquired from the source.
-// * This can be used to calibrate time shifts between source and client.
-// */
-//void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
-//{
-//	if (ssc::similar(mTimestampCalibration, delta))
-//		return;
-//	if (!ssc::similar(delta, 0.0))
-//		ssc::messageManager()->sendInfo("set time calibration in rt source: " + qstring_cast(delta) + "ms");
-//	mTimestampCalibration = delta;
-//}
-
-//void OpenIGTLinkRTSource::setSoundSpeedCompensation(double gamma)
-//{
-//	mLinearSoundSpeedCompesation = gamma;
-//	ssc::messageManager()->sendInfo(
-//					"Linear sound speed compensation set to: "
-//					+ qstring_cast(mLinearSoundSpeedCompesation));
-//}
 
 double OpenIGTLinkRTSource::getTimestamp()
 {
@@ -276,40 +227,49 @@ void OpenIGTLinkRTSource::sonixStatusReceivedSlot()
 	this->updateSonixStatus(mClient->getLastSonixStatusMessage());
 }
 
-void OpenIGTLinkRTSource::disconnectServer()
+/**Get rid of the mClient thread.
+ *
+ */
+void OpenIGTLinkRTSource::stopClient()
 {
-//  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
 	if (mClient)
 	{
-		mClient->quit();
+		mClient->stop();
 		mClient->wait(2000); // forever or until dead thread
+
+		if (mClient->isRunning())
+		{
+			mClient->terminate();
+			mClient->wait(); // forever or until dead thread
+			ssc::messageManager()->sendWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
+		}
 
 		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
 		disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
-		//disconnect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
+
 		mClient.reset();
 	}
+}
+
+
+void OpenIGTLinkRTSource::disconnectServer()
+{
+	this->stopClient();
 
 	mTimeoutTimer->stop();
-
-//	sonixVideo = false; // clear sonix hack flag
 
 	// clear the redirecter
 	mRedirecter->SetInput(mImageImport->GetOutput());
 	mFilter_IGTLink_to_RGB = vtkImageDataPtr();
 
 	emit newFrame(); // changed
-
-//  emit changed();
-//  emit serverStatusChanged();
 }
 
 void OpenIGTLinkRTSource::clientFinishedSlot()
 {
-//  std::cout << "IGTLinkWidget::clientFinishedSlot" << std::endl;
 	if (!mClient)
 		return;
 	if (mClient->isRunning())
