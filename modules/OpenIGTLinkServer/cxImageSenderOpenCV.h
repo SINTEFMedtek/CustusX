@@ -39,7 +39,7 @@ Q_OBJECT
 
 public:
 	ImageSenderOpenCV(QObject* parent = NULL);
-	virtual ~ImageSenderOpenCV() {}
+	virtual ~ImageSenderOpenCV();
 
 	virtual void initialize(StringMap arguments);
 	virtual void startStreaming(GrabberSenderPtr sender);
@@ -51,7 +51,6 @@ public:
 protected:
 private:
 	GrabberSenderPtr mSender;
-//	QTcpSocket* mSocket;
 	QTimer* mSendTimer;
 	QTimer* mGrabTimer;
 	StringMap mArguments;
@@ -67,10 +66,8 @@ private:
 	QDateTime mLastGrabTime;
 
 private slots:
-	//  void tick();
 	void grab();
 	void send();
-
 };
 
 }

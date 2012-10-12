@@ -1,14 +1,34 @@
-/*
- * cxIGTLinkClientBase.cpp
- *
- *  Created on: Oct 11, 2012
- *      Author: christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
 #include "cxIGTLinkClientBase.h"
 
 namespace cx
 {
+
+/**Give subclasses a change to override quit() by using this method instead.
+ *
+ * This is required for OpenCV using Direct Link: release() of the camera must (for
+ * some unknown reason) be called inside exec().
+ *
+ */
+void IGTLinkClientBase::stop()
+{
+	connect(this, SIGNAL(stopInternal()), this, SLOT(stopSlot()));
+	emit stopInternal();
+	this->quit();
+}
 
 
 /** add the message to a thread-safe queue
