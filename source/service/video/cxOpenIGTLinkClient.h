@@ -63,17 +63,10 @@ public:
 	virtual QString hostDescription() const; // threadsafe
 	~IGTLinkClient() {}
 
-//signals:
-//	void imageReceived();
-//	void sonixStatusReceived();
-//	void fps(double);
-//	void connected(bool on);
-
 protected:
 	virtual void run();
 
 private slots:
-//  void tick();
 	void readyReadSlot();
 
 	void hostFoundSlot();
@@ -91,7 +84,6 @@ private:
 	QString mAddress;
 	int mPort;
 	QTcpSocket* mSocket;
-//  igtl::ClientSocket::Pointer mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;
 
 	bool calibrateMsgTimeStamp;///< Should the time stamps of image messages be calibrated based on the computer clock
@@ -99,7 +91,6 @@ private:
 	bool mGeneratingTimeCalibration;
 	QDateTime mLastSyncTime;
 	std::vector<double> mLastTimeStamps;
-
 };
 
 /**

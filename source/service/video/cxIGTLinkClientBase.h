@@ -55,12 +55,17 @@ public:
 	virtual IGTLinkImageMessage::Pointer getLastImageMessage(); // threadsafe
 	virtual IGTLinkUSStatusMessage::Pointer getLastSonixStatusMessage(); // threadsafe
 	virtual QString hostDescription() const = 0; // threadsafe
+	void stop(); ///< use instead of quit()
 
 signals:
 	void imageReceived();
 	void sonixStatusReceived();
 	void fps(double);
 	void connected(bool on);
+	void stopInternal();
+
+protected slots:
+	virtual void stopSlot() {}
 
 protected:
 	cx::RenderTimer mFPSTimer;
