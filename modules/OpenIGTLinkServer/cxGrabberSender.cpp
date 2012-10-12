@@ -5,7 +5,7 @@
  *      Author: christiana
  */
 
-#include "/Users/christiana/christiana/workspace/CustusX3/CustusX3/modules/OpenIGTLinkServer/cxGrabberSender.h"
+#include "cxGrabberSender.h"
 
 namespace cx
 {
