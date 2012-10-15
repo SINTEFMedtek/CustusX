@@ -109,6 +109,7 @@ private:
 
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
 
+
 /**\brief Display a VideoSource in a View.
  *
  * A rep visualizing a VideoSource directly into the view plane.
@@ -153,8 +154,11 @@ private:
 	ssc::TextDisplayPtr mStatusText;
 	ssc::TextDisplayPtr mInfoText;
 
-	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
-	vtkActorPtr mProbeSectorActor;
+//	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
+//	vtkActorPtr mProbeSectorActor;
+	GraphicalPolyData3DPtr mProbeSector;
+	GraphicalPolyData3DPtr mProbeOrigin;
+	GraphicalPolyData3DPtr mProbeClipRect;
 
 	vtkRendererPtr mRenderer;
 	View* mView;

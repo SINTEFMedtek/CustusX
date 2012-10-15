@@ -49,6 +49,9 @@ public:
 	vtkImageDataPtr getMask();
 	vtkPolyDataPtr getSector(); ///< get a polydata representation of the us sector
 	vtkPolyDataPtr getSectorLinesOnly(); ///< get a polydata representation of the us sector
+	vtkPolyDataPtr getSectorSectorOnlyLinesOnly(); ///< get a polydata representation of the us sector
+	vtkPolyDataPtr getClipRectLinesOnly(); ///< get a polydata representation of the us clip rect
+	vtkPolyDataPtr getOriginPolyData(); ///< get a polydata representation of the origin
 	Transform3D get_tMu() const; ///< get transform from image space u to probe tool space t.
 	Transform3D get_uMv() const; ///< get transform from inverted image space v (origin in ul corner) to image space u.
 	void updateSector();

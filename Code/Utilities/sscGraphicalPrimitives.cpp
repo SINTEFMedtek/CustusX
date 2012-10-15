@@ -36,6 +36,7 @@ GraphicalPolyData3D::GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source, vtkRend
 
 void GraphicalPolyData3D::setSource(vtkPolyDataAlgorithmPtr source)
 {
+	mData = vtkPolyDataPtr();
 	mSource = source;
 
 	if (mSource)
@@ -71,6 +72,15 @@ void GraphicalPolyData3D::setPosition(Vector3D point)
 	mActor->SetPosition(point.begin());
 }
 
+void GraphicalPolyData3D::setData(vtkPolyDataPtr data)
+{
+	mSource = vtkPolyDataAlgorithmPtr();
+	mData = data;
+
+	if (mData)
+		mMapper->SetInput(mData);
+}
+
 Vector3D GraphicalPolyData3D::getPosition() const
 {
 	return Vector3D(mActor->GetPosition());
@@ -83,7 +93,10 @@ vtkActorPtr GraphicalPolyData3D::getActor()
 
 vtkPolyDataPtr GraphicalPolyData3D::getPolyData()
 {
-	return mSource->GetOutput();
+	if (mSource)
+		return mSource->GetOutput();
+	else
+		return mData;
 }
 
 vtkPolyDataAlgorithmPtr GraphicalPolyData3D::getSource()

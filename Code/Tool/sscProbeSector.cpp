@@ -35,6 +35,7 @@
 //#include <vtkPolyPlane.h>
 #include "sscBoundingBox3D.h"
 #include "sscVolumeHelpers.h"
+#include "sscUtilHelpers.h"
 
 typedef vtkSmartPointer<class vtkPlanes> vtkPlanesPtr;
 typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
@@ -331,6 +332,26 @@ vtkPolyDataPtr ProbeSector::generateClipper(vtkPolyDataPtr input)
 	// vtkClipPolyData with sector and polyplane
 }
 
+vtkPolyDataPtr ProbeSector::getSectorSectorOnlyLinesOnly()
+{
+	this->updateSector();
+	if (mData.getType() == ProbeData::tNONE)
+		return mPolyData;
+
+	vtkPolyDataPtr output = vtkPolyDataPtr::New();
+	output->SetPoints(mPolyData->GetPoints());
+	output->SetLines(mPolyData->GetLines());
+
+	output->Update();
+	return output;
+}
+
+vtkPolyDataPtr ProbeSector::getClipRectLinesOnly()
+{
+	return this->getClipRectPolyData();
+}
+
+
 /**generate a polydata containing only a polygon representing the sector cliprect.
  *
  */
@@ -349,6 +370,40 @@ vtkPolyDataPtr ProbeSector::getClipRectPolyData()
 	points->InsertNextPoint(bb.corner(1, 0, 0).begin());
 	points->InsertNextPoint(bb.corner(1, 1, 0).begin());
 	points->InsertNextPoint(bb.corner(0, 1, 0).begin());
+
+	vtkPolyDataPtr polydata = vtkPolyDataPtr::New();
+	polydata->SetPoints(points);
+	polydata->SetLines(sides);
+
+	//  polydata = this->generateClipper(polydata);
+	return polydata;
+}
+
+/**generate a polydata showing the origin as a small line.
+ *
+ */
+vtkPolyDataPtr ProbeSector::getOriginPolyData()
+{
+	vtkPointsPtr points = vtkPointsPtr::New();
+	vtkCellArrayPtr sides = vtkCellArrayPtr::New();
+
+	//points->Allocate(N+M);
+	vtkIdType cells[4] =
+	{ 1, 0, 2, 3 };
+	sides->InsertNextCell(4, cells);
+
+	ssc::Vector3D o_u = mData.getImage().getOrigin_u();
+	double length = (mData.getDepthStart() - mData.getDepthEnd())/15;
+	length = ssc::constrainValue(length, 2, 10);
+//	length = 5; //mm
+	ssc::Vector3D tip = o_u + ssc::Vector3D(0, -length, 0);
+	ssc::Vector3D left = o_u + ssc::Vector3D(-length/3, 0, 0);
+	ssc::Vector3D right = o_u + ssc::Vector3D(length/3, 0, 0);
+
+	points->InsertNextPoint(o_u.begin());
+	points->InsertNextPoint(tip.begin());
+	points->InsertNextPoint(left.begin());
+	points->InsertNextPoint(right.begin());
 
 	vtkPolyDataPtr polydata = vtkPolyDataPtr::New();
 	polydata->SetPoints(points);
