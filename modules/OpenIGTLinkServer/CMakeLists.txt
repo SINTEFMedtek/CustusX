@@ -9,23 +9,7 @@ cmake_minimum_required(VERSION 2.6)
 
 find_package( Boost REQUIRED )
 
-# openCV
-#----------
-if (USE_OpenCV)
-    find_package( OpenCV REQUIRED)
-else ()
-    find_package( OpenCV QUIET)
-endif ()
 
-IF( OpenCV_FOUND )
-    option(USE_OpenCV "use OpenCV" ON)
-ELSE()
-    option(USE_OpenCV "use OpenCV" OFF)
-ENDIF()
-
-if (USE_OpenCV)
-    ADD_DEFINITIONS(-DUSE_OpenCV)
-endif()
 
 option(CX_USE_ISB_GE "use ISB GE scanner interface" OFF)
 if (CX_USE_ISB_GE)
