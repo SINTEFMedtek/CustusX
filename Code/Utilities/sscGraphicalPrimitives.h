@@ -29,6 +29,7 @@ public:
 			vtkRendererPtr renderer = vtkRendererPtr());
 	void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
 	void setSource(vtkPolyDataAlgorithmPtr source);
+	void setData(vtkPolyDataPtr data);
 	~GraphicalPolyData3D();
 	void setColor(Vector3D color);
 	void setPosition(Vector3D point);
@@ -40,6 +41,7 @@ public:
 
 private:
 	vtkPolyDataAlgorithmPtr mSource;
+	vtkPolyDataPtr mData;
 	vtkPolyDataMapperPtr mMapper;
 	vtkActorPtr mActor;
 	vtkRendererPtr mRenderer;

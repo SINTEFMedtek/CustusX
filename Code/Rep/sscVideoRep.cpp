@@ -416,10 +416,17 @@ VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) 
 	mStatusText->setPosition(0.5, 0.5);
 	mStatusText->updateText("Not Connected");
 
-	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
-	mProbeSectorActor = vtkActorPtr::New();
-//  mProbeSectorActor->GetProperty()->SetColor(1, 0.9, 0); // yellow
-	mProbeSectorActor->GetProperty()->SetColor(1, 165.0/255.0, 0); // orange
+//	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
+//	mProbeSectorActor = vtkActorPtr::New();
+////  mProbeSectorActor->GetProperty()->SetColor(1, 0.9, 0); // yellow
+//	mProbeSectorActor->GetProperty()->SetColor(1, 165.0/255.0, 0); // orange
+
+	mProbeOrigin.reset(new GraphicalPolyData3D());
+	mProbeOrigin->setColor(ssc::Vector3D(1, 165.0/255.0, 0)); // orange
+	mProbeSector.reset(new GraphicalPolyData3D());
+	mProbeSector->setColor(ssc::Vector3D(1, 165.0/255.0, 0)); // orange
+	mProbeClipRect.reset(new GraphicalPolyData3D());
+	mProbeClipRect->setColor(ssc::Vector3D(1, 0.9, 0)); // yellow
 
 	mViewportListener.reset(new ViewportListener());
 	mViewportListener->setCallback(boost::bind(&VideoFixedPlaneRep::setCamera, this));
@@ -444,18 +451,28 @@ void VideoFixedPlaneRep::updateSector()
 {
 	bool show = mTool && this->getShowSector() && mTool->getProbeSector().getType()!=ssc::ProbeData::tNONE;
 
-	mProbeSectorActor->SetVisibility(show);
+//	mProbeSectorActor->SetVisibility(show);
+	mProbeOrigin->getActor()->SetVisibility(show);
+	mProbeSector->getActor()->SetVisibility(show);
+	mProbeClipRect->getActor()->SetVisibility(show);
 	if (!show)
 		return;
 
 	mProbeData.setData(mTool->getProbeSector());
-	mProbeSectorPolyDataMapper->SetInput(mProbeData.getSectorLinesOnly());
-	if (mProbeSectorPolyDataMapper->GetInput())
-	{
-		mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
-	}
-//  mProbeSectorActor->SetVisibility(mTool->getVisible());
-	mProbeSectorActor->SetVisibility(true);
+
+	mProbeOrigin->setData(mProbeData.getOriginPolyData());
+	mProbeSector->setData(mProbeData.getSectorSectorOnlyLinesOnly());
+	mProbeClipRect->setData(mProbeData.getClipRectLinesOnly());
+
+//	mProbeSector->getActor()->setvi
+
+//	mProbeSectorPolyDataMapper->SetInput(mProbeData.getSectorLinesOnly());
+//	if (mProbeSectorPolyDataMapper->GetInput())
+//	{
+//		mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
+//	}
+////  mProbeSectorActor->SetVisibility(mTool->getVisible());
+//	mProbeSectorActor->SetVisibility(true);
 
 }
 
@@ -528,7 +545,10 @@ void VideoFixedPlaneRep::addRepActorsToViewRenderer(ssc::View* view)
 	view->getRenderer()->AddActor(mInfoText->getActor());
 	view->getRenderer()->AddActor(mStatusText->getActor());
 
-	view->getRenderer()->AddActor(mProbeSectorActor);
+//	view->getRenderer()->AddActor(mProbeSectorActor);
+	mProbeClipRect->setRenderer(view->getRenderer());
+	mProbeOrigin->setRenderer(view->getRenderer());
+	mProbeSector->setRenderer(view->getRenderer());
 	//setCamera();
 }
 
@@ -538,8 +558,11 @@ void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(ssc::View* view)
 	view->getRenderer()->RemoveActor(mRTGraphics->getActor());
 	view->getRenderer()->RemoveActor(mInfoText->getActor());
 	view->getRenderer()->RemoveActor(mStatusText->getActor());
+	mProbeOrigin->setRenderer(NULL);
+	mProbeSector->setRenderer(NULL);
+	mProbeClipRect->setRenderer(NULL);
 
-	view->getRenderer()->RemoveActor(mProbeSectorActor);
+//	view->getRenderer()->RemoveActor(mProbeSectorActor);
 	mViewportListener->stopListen();
 }
 
