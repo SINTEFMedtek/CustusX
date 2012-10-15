@@ -54,6 +54,8 @@ include(${SSC_USE_FILE})
 include_directories(
         ${Boost_INCLUDE_DIRS}
         ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
+        ${CustusX3_SOURCE_DIR}/source/resource/settings
+        ${CustusX3_BINARY_DIR}/source/resource/settings
         #"C:/Program Files/Microsoft SDKs/Windows/v7.1/Samples/multimedia/directshow/baseclasses"
         )
 
@@ -89,12 +91,13 @@ SET(ALL_LINK_LIBRARIES
 	vtkVolumeRendering 
 	)
 
-if(USE_OpenCV)
+if(CX_USE_OpenCV)
 	set (ALL_LINK_LIBRARIES
 			${ALL_LINK_LIBRARIES}
 			${OpenCV_LIBS}
 			)
 endif()
+
 
 if(CX_WINDOWS)
 	SET(LINK_LIBRARIES
@@ -244,7 +247,7 @@ if (CX_WINDOWS)
 			${SSC_BINARY_DIR}/Code
 			${OpenIGTLink_LIBRARY_DIRS}
 			)
-	if(USE_OpenCV)
+	if(CX_USE_OpenCV)
 		set (DIRS
 				${DIRS}
 				${OpenCV_LIB_DIR}

@@ -40,22 +40,6 @@ include(${OpenIGTLink_USE_FILE})
 find_package(IGSTK REQUIRED)
 include(${IGSTK_USE_FILE})
 
-# openCV
-#----------
-if (USE_OpenCV)
-    find_package( OpenCV REQUIRED)
-else ()
-    find_package( OpenCV QUIET)
-endif ()
-IF( OpenCV_FOUND )
-    option(USE_OpenCV "use OpenCV" ON)
-ELSE()
-    option(USE_OpenCV "use OpenCV" OFF)
-ENDIF()
-if (USE_OpenCV)
-    ADD_DEFINITIONS(-DUSE_OpenCV)
-endif()
-
 # SSC
 #----------
 find_package (SSC PATHS "../externals/ssc/CMake" REQUIRED)

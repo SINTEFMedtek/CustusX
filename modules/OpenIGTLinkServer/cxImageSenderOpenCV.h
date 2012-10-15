@@ -9,22 +9,29 @@
 #define CXIMAGESENDEROPENCV_H_
 
 #include <QObject> //needed for the mocer when OpenCv is not used...
+#include "cxConfig.h"
 
-#ifdef USE_OpenCV
+#ifdef CX_USE_OpenCV
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
 #include <QDateTime>
 #include <QSize>
 class QTimer;
 #include "igtlImageMessage.h"
-#include <opencv2/highgui/highgui.hpp>
+//#include <opencv2/highgui/highgui.hpp>
 #include <QStringList>
 #include "cxImageSenderFactory.h"
 #include "../grabberCommon/cxIGTLinkImageMessage.h"
 #include "cxGrabberSender.h"
 
+namespace cv
+{
+	class VideoCapture;
+}
+
 namespace cx
 {
+typedef boost::shared_ptr<cv::VideoCapture> VideoCapturePtr;
 
 /**An object sending images out on an ip port.
  * In order to operate within a nongui thread,
@@ -62,7 +69,7 @@ private:
 	void initialize_local();
 	void deinitialize_local();
 
-	cv::VideoCapture mVideoCapture; // OpenCV video grabber
+	VideoCapturePtr mVideoCapture; // OpenCV video grabber
 	QDateTime mLastGrabTime;
 
 private slots:
@@ -72,5 +79,5 @@ private slots:
 
 }
 
-#endif // USE_OpenCV
+#endif // CX_USE_OpenCV
 #endif /* CXIMAGESENDEROPENCV_H_ */
