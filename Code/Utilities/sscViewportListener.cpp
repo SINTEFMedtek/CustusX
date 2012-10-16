@@ -50,12 +50,11 @@ void ViewportListener::startListen(vtkRendererPtr renderer)
 		mObserver = ViewportObserverPrivatePtr::New();
 		mObserver->SetBase(this);
 		mRenderer->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent, mObserver); // needed during startup
-	  mRenderer->AddObserver(vtkCommand::ModifiedEvent, mObserver); // camera changes, viewport changes
-	  mRenderer->AddObserver(vtkCommand::ActiveCameraEvent, mObserver);
-	  mRenderer->AddObserver(vtkCommand::ResetCameraEvent, mObserver);
-//	  mRenderer->AddObserver(vtkCommand::CreateCameraEvent, mObserver);
-//	  mRenderer->AddObserver(vtkCommand::LeaveEvent, mObserver);
-
+		mRenderer->AddObserver(vtkCommand::ModifiedEvent, mObserver); // camera changes, viewport changes
+		mRenderer->AddObserver(vtkCommand::ActiveCameraEvent, mObserver);
+		mRenderer->AddObserver(vtkCommand::ResetCameraEvent, mObserver);
+		//	  mRenderer->AddObserver(vtkCommand::CreateCameraEvent, mObserver);
+		//	  mRenderer->AddObserver(vtkCommand::LeaveEvent, mObserver);
 	}
 }
 
@@ -65,7 +64,19 @@ void ViewportListener::stopListen()
 	if (mObserver)
 	{
 		mObserver->SetBase(NULL);
+
+		mRenderer->GetActiveCamera()->RemoveObserver(mObserver);
 		mRenderer->RemoveObserver(mObserver);
+
+		if (mRenderer->GetActiveCamera()->HasObserver(vtkCommand::ModifiedEvent, mObserver))
+			std::cout << "ERROR camera vtkCommand::ModifiedEvent" << std::endl;
+		if (mRenderer->HasObserver(vtkCommand::ModifiedEvent, mObserver))
+			std::cout << "ERROR vtkCommand::ModifiedEvent" << std::endl;
+		if (mRenderer->HasObserver(vtkCommand::ActiveCameraEvent, mObserver))
+			std::cout << "ERROR vtkCommand::ActiveCameraEvent" << std::endl;
+		if (mRenderer->HasObserver(vtkCommand::ResetCameraEvent, mObserver))
+			std::cout << "ERROR vtkCommand::ResetCameraEvent" << std::endl;
+
 		mObserver = 0;
 	}
 }
