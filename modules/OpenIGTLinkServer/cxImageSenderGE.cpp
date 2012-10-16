@@ -23,7 +23,6 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
-#include "DataStreamApp.h"
 
 namespace cx
 {
@@ -42,11 +41,11 @@ QStringList ImageSenderGE::getArgumentDescription()
 
 ImageSenderGE::ImageSenderGE(QObject* parent) :
 	ImageSender(parent),
-	mSocket(NULL),
+//	mSocket(NULL),
 	mSendTimer(0),
 	mGrabTimer(0)
 {
-	data_streaming::DataStreamApp test;
+	//data_streaming::DataStreamApp test;
 
 	mGrabTimer = new QTimer(this);
 	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
@@ -100,7 +99,7 @@ bool ImageSenderGE::initialize_local()
 		return true;
 }
 
-void ImageSenderGE::startStreaming(QTcpSocket* socket)
+void ImageSenderGE::startStreaming(GrabberSenderPtr sender)
 {
 	bool initialized = this->initialize_local();
 
@@ -110,7 +109,8 @@ void ImageSenderGE::startStreaming(QTcpSocket* socket)
 		return;
 	}
 
-	mSocket = socket;
+//	mSocket = socket;
+	mSender = sender;
 	mGrabTimer->start(10);
 	mSendTimer->start(40);
 	std::cout << "Started streaming from GS device" << std::endl;
@@ -122,13 +122,23 @@ void ImageSenderGE::stopStreaming()
 		return;
 	mGrabTimer->stop();
 	mSendTimer->stop();
-	mSocket = NULL;
+//	mSocket = NULL;
+	mSender.reset();
 
 	this->deinitialize_local();
 }
 
 void ImageSenderGE::grab()
 {
+	//Wait for next frame
+	//Will only work with scanner, not simple test data
+	/*if (mGEStreamer.stream)
+		mGEStreamer.stream->WaitForImageData();
+	else
+	{
+		std::cout << "ImageSenderGE::grab(): No mGEStreamer.stream" << std::endl;
+	}*/
+
 	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
 	if(!imgStream)
 	{
@@ -141,24 +151,36 @@ void ImageSenderGE::grab()
 	}
 	//Only set image and time if we got a new image
 	mImgStream = imgStream;
-	mLastGrabTime = QDateTime::currentDateTime();
+	mLastGrabTime = mGEStreamer.GetTimeStamp();
+
+	//Will only work with scanner, not simple test data
+	/*if (mGEStreamer.frame)
+		mLastGrabTime = mGEStreamer.frame->GetTimeStamp();
+	else
+	{
+		std::cout << "ImageSenderGE::grab(): No mGEStreamer.frame. Could not get timestamp" << std::endl;
+	}*/
 }
 
 void ImageSenderGE::send()
 {
-	IGTLinkImageMessage::Pointer imgMsg = this->getImageMessage();
+	if (!mSender || !mSender->isReady())
+		return;
 
+	IGTLinkImageMessage::Pointer imgMsg = this->getImageMessage();
 	if (!imgMsg)
 		return;
 
-	if (mSocket)
-	{
-		//------------------------------------------------------------
-		// Pack (serialize) and send
-		imgMsg->Pack();
-		mSocket->write(reinterpret_cast<const char*> (imgMsg->GetPackPointer()), imgMsg->GetPackSize());
-		//  std::cout << "tick " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-	}
+	mSender->send(this->getImageMessage());
+
+//	if (mSocket)
+//	{
+//		//------------------------------------------------------------
+//		// Pack (serialize) and send
+//		imgMsg->Pack();
+//		mSocket->write(reinterpret_cast<const char*> (imgMsg->GetPackPointer()), imgMsg->GetPackSize());
+//		//  std::cout << "tick " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//	}
 }
 
 
@@ -207,7 +229,8 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 	//TODO: get timestamp from GEStreamer
 	igtl::TimeStamp::Pointer ts;
 	ts = igtl::TimeStamp::New();
-	double seconds = 1.0 / 1000 * (double) mLastGrabTime.toMSecsSinceEpoch();
+//	double seconds = 1.0 / 1000 * (double) mLastGrabTime.toMSecsSinceEpoch();
+	double seconds = 1.0 / 1000 * mLastGrabTime;
 	ts->SetTime(seconds); //in seconds
 	retval->SetTimeStamp(ts);
 
