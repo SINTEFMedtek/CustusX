@@ -514,6 +514,11 @@ void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 		{
 			mFilter_IGTLink_to_RGB = this->createFilterARGB2RGB(mImageImport->GetOutput());
 		}
+		else // default: strip alpha channel (should not happen, but cx expects RGB or Gray, not alpha)
+		{
+			mFilter_IGTLink_to_RGB = this->createFilterRGBA2RGB(mImageImport->GetOutput());
+		}
+
 		if (mFilter_IGTLink_to_RGB)
 			mRedirecter->SetInput(mFilter_IGTLink_to_RGB);
 	}
@@ -556,6 +561,21 @@ vtkImageDataPtr OpenIGTLinkRTSource::createFilterBGR2RGB(vtkImageDataPtr input)
   vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
   splitterRGB->SetInput(input);
   splitterRGB->SetComponents(2, 1, 0);//hack convert from BGRA to RGB
+  merger->SetInput(0, splitterRGB->GetOutput());
+
+  return merger->GetOutput();
+}
+
+/**Filter that converts from RGBA to RGB encoding.
+ *
+ */
+vtkImageDataPtr OpenIGTLinkRTSource::createFilterRGBA2RGB(vtkImageDataPtr input)
+{
+  vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
+
+  vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
+  splitterRGB->SetInput(input);
+  splitterRGB->SetComponents(0, 1, 2);
   merger->SetInput(0, splitterRGB->GetOutput());
 
   return merger->GetOutput();
