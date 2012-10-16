@@ -97,7 +97,7 @@ ViewManager::ViewManager() :
 				mViewCache3D(mMainWindowsCentralWidget, "View3D"),
 				mViewCacheRT(mMainWindowsCentralWidget, "ViewRT")
 {
-	mRenderTimer.reset(new RenderTimer("Main Render timer"));
+	mRenderTimer.reset(new CyclicActionTimer("Main Render timer"));
 	mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
 //	mSlicePlanesProxy->getProperties().m3DFontSize = 50;
 

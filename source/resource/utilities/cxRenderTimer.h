@@ -23,17 +23,20 @@ namespace cx
 * @{
 */
 
-typedef boost::shared_ptr<class RenderTimer> RenderTimerPtr;
+typedef boost::shared_ptr<class CyclicActionTimer> RenderTimerPtr;
 
 /**Helper class for counting time spent by the rendering process or other
  * process running in a cycle.
  *
+ *  \date Oct 19, 2010
+ *  \date Oct 16, 2012
+ *  \author christiana
  */
-class RenderTimer
+class CyclicActionTimer
 {
 public:
-	RenderTimer();
-	explicit RenderTimer(QString name);
+	CyclicActionTimer();
+	explicit CyclicActionTimer(QString name);
 	void reset(int interval = 1000);
 	void beginRender();
 	void endRender();

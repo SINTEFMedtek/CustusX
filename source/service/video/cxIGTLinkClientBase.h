@@ -68,7 +68,7 @@ protected slots:
 	virtual void stopSlot() {}
 
 protected:
-	cx::RenderTimer mFPSTimer;
+	cx::CyclicActionTimer mFPSTimer;
 	void addImageToQueue(IGTLinkImageMessage::Pointer imgMsg);
 	void addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg);
 
