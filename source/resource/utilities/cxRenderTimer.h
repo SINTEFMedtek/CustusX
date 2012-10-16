@@ -31,14 +31,17 @@ class RenderTimer
 {
 public:
   RenderTimer();
+  explicit RenderTimer(QString name);
   void reset(int interval = 1000);
   void beginRender();
   void endRender();
   double getFPS();
   bool intervalPassed() const;
   QString dumpStatistics();
+  QString dumpStatisticsSmall();
 
 private:
+  QString mName;
   std::vector<double> mOffRenderTime;
   std::vector<double> mRenderTime;
   //QTime mLastBeginRenderTime, mLastEndRenderTime;

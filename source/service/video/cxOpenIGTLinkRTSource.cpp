@@ -484,6 +484,9 @@ void OpenIGTLinkRTSource::updateSonix()
 
 void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 {
+	static RenderTimer timer2("Convert video timer");
+	timer2.beginRender();
+
 #if 1 // remove to use test image
 	if (!message)
 	{
@@ -518,26 +521,33 @@ void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 			mRedirecter->SetInput(mFilter_IGTLink_to_RGB);
 	}
 
-	QTime start = QTime::currentTime();
-	static RenderTimer timer;
+	timer2.endRender();
+	if (timer2.intervalPassed())
+	{
+		ssc::messageManager()->sendDebug(timer2.dumpStatisticsSmall());
+		timer2.reset(10*1000);
+	}
+
+//	QTime start = QTime::currentTime();
+	static RenderTimer timer("Update video timer");
 	timer.beginRender();
 
 	//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
 	emit newFrame();
 
-
-	static int counter=0;
-	if (++counter%50==0)
-		std::cout << "======= OpenIGTLinkRTSource   post emit newFrame(): " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//	static int counter=0;
+//	if (++counter%50==0)
+//		std::cout << "======= OpenIGTLinkRTSource   post emit newFrame(): " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 
 
 	timer.endRender();
 	if (timer.intervalPassed())
 	{
-		std::cout << timer.dumpStatistics() << std::endl;
+		ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
 		timer.reset(10*1000);
 	}
 }
+
 
 /**Create a pipeline that convert the input 4-component ARGB image (from QuickTime-Mac)
  * into a vtk-style RGBA image.
