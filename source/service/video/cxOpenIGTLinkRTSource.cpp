@@ -518,8 +518,25 @@ void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 			mRedirecter->SetInput(mFilter_IGTLink_to_RGB);
 	}
 
-//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
+	QTime start = QTime::currentTime();
+	static RenderTimer timer;
+	timer.beginRender();
+
+	//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
 	emit newFrame();
+
+
+	static int counter=0;
+	if (++counter%50==0)
+		std::cout << "======= OpenIGTLinkRTSource   post emit newFrame(): " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+
+
+	timer.endRender();
+	if (timer.intervalPassed())
+	{
+		std::cout << timer.dumpStatistics() << std::endl;
+		timer.reset(10*1000);
+	}
 }
 
 /**Create a pipeline that convert the input 4-component ARGB image (from QuickTime-Mac)
