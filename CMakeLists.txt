@@ -201,6 +201,24 @@ if(CPPUNIT_INCLUDE_DIR)
 	endif(CPPUNIT_LIBRARY)
 endif(CPPUNIT_INCLUDE_DIR)
 
+
+# openCV
+#----------
+if (CX_USE_OpenCV)
+    find_package( OpenCV REQUIRED)
+else ()
+    find_package( OpenCV QUIET)
+endif ()
+IF( OpenCV_FOUND )
+    option(CX_USE_OpenCV "use OpenCV" ON)
+ELSE()
+    option(CX_USE_OpenCV "use OpenCV" OFF)
+ENDIF()
+#if (USE_OpenCV)
+#    ADD_DEFINITIONS(-DUSE_OpenCV)
+#    message(STATUS "USE_OpenCV II: " ${USE_OpenCV})
+#endif()
+
 #------------------------------------------------------------------------------
 # Add subdirectories
 #------------------------------------------------------------------------------
