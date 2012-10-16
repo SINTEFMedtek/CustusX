@@ -74,6 +74,10 @@ if (SSC_USE_DCMTK)
         SSC
         )
     
+    IF(BUILD_TESTING)
+	add_subdirectory( unittest )
+    ENDIF(BUILD_TESTING)
+    
     INSTALL( TARGETS DICOMLib LIBRARY DESTINATION lib64 )
 
 endif (SSC_USE_DCMTK)
