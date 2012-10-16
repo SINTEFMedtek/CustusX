@@ -7,7 +7,7 @@
 
 #include "cxImageSenderOpenCV.h"
 
-#ifdef USE_OpenCV
+#ifdef CX_USE_OpenCV
 
 #include <QCoreApplication>
 #include <QTimer>
@@ -24,6 +24,7 @@
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
 
+#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 namespace
@@ -80,6 +81,7 @@ ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
 	mSendTimer(0),
 	mGrabTimer(0)
 {
+	mVideoCapture.reset(new cv::VideoCapture());
 	mGrabTimer = new QTimer(this);
 	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	mSendTimer = new QTimer(this);
@@ -109,8 +111,8 @@ void ImageSenderOpenCV::initialize(StringMap arguments)
 
 void ImageSenderOpenCV::deinitialize_local()
 {
-	mVideoCapture.release();
-	mVideoCapture = cv::VideoCapture();
+	mVideoCapture->release();
+	mVideoCapture.reset(new cv::VideoCapture());
 }
 
 void ImageSenderOpenCV::initialize_local()
@@ -138,14 +140,14 @@ void ImageSenderOpenCV::initialize_local()
 
 	if (sourceIsInt){
 	    // open device (camera)
-		mVideoCapture.open(videoport);
+		mVideoCapture->open(videoport);
 	}
 	else{
         // open file
-		mVideoCapture.open(videoSource.toStdString().c_str());
+		mVideoCapture->open(videoSource.toStdString().c_str());
 	}
 
-	if (!mVideoCapture.isOpened())
+	if (!mVideoCapture->isOpened())
 	{
 		cerr << "ImageSenderOpenCV: Failed to open a video device or video file!\n" << endl;
 		return;
@@ -153,14 +155,14 @@ void ImageSenderOpenCV::initialize_local()
 	else
 	{
 		//determine default values
-		int default_width = mVideoCapture.get(CV_CAP_PROP_FRAME_WIDTH);
-		int default_height = mVideoCapture.get(CV_CAP_PROP_FRAME_HEIGHT);
+		int default_width = mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
+		int default_height = mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
 
 		//set input size
 		int in_width = convertStringWithDefault(mArguments["in_width"], default_width);
 		int in_height = convertStringWithDefault(mArguments["in_height"], default_height);
-		mVideoCapture.set(CV_CAP_PROP_FRAME_WIDTH, in_width);
-		mVideoCapture.set(CV_CAP_PROP_FRAME_HEIGHT, in_height);
+		mVideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, in_width);
+		mVideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, in_height);
 
 		//set output size (resize)
 		int out_width = convertStringWithDefault(mArguments["out_width"], in_width);
@@ -234,21 +236,21 @@ void ImageSenderOpenCV::dumpProperties()
 
 void ImageSenderOpenCV::dumpProperty(int val, QString name)
 {
-	double value = mVideoCapture.get(val);
+	double value = mVideoCapture->get(val);
 	if (value != -1)
-		std::cout << "Property " << name.toStdString() << " : " << mVideoCapture.get(val) << std::endl;
+		std::cout << "Property " << name.toStdString() << " : " << mVideoCapture->get(val) << std::endl;
 }
 
 void ImageSenderOpenCV::grab()
 {
 //	return;
-	if (!mVideoCapture.isOpened())
+	if (!mVideoCapture->isOpened())
 	{
 		return;
 	}
 //	  QTime start = QTime::currentTime();
 	// grab images from camera to opencv internal buffer, do not process
-	mVideoCapture.grab();
+	mVideoCapture->grab();
 	mLastGrabTime = QDateTime::currentDateTime();
 //	  std::cout << "   grab: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 
@@ -270,14 +272,14 @@ void ImageSenderOpenCV::send()
 
 IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 {
-	if (!mVideoCapture.isOpened())
+	if (!mVideoCapture->isOpened())
 		return IGTLinkImageMessage::Pointer();
 
 	QTime start = QTime::currentTime();
 
 	cv::Mat frame_source;
 	//  mVideoCapture >> frame_source;
-	if (!mVideoCapture.retrieve(frame_source, 0))
+	if (!mVideoCapture->retrieve(frame_source, 0))
 		return IGTLinkImageMessage::Pointer();
 
 	if (this->thread() == QCoreApplication::instance()->thread() && !mSender)
@@ -420,4 +422,4 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 
 }
 
-#endif // USE_OpenCV
+#endif // CX_USE_OpenCV
