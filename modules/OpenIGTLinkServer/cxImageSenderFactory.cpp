@@ -75,7 +75,7 @@ ImageSenderFactory::ImageSenderFactory()
 #ifdef CX_WIN32
 	mAvailable.push_back(ImageSenderPtr(new ImageSenderSonix()));
 #endif
-#ifdef USE_OpenCV
+#ifdef CX_USE_OpenCV
 	mAvailable.push_back(ImageSenderPtr(new ImageSenderOpenCV()));
 #endif
 #ifdef CX_USE_ISB_GE
