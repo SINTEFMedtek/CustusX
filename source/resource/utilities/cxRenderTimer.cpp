@@ -20,6 +20,14 @@ RenderTimer::RenderTimer()
   this->reset();
 }
 
+RenderTimer::RenderTimer(QString name)
+{
+	mName = name;
+	mRenderClock.start();
+	mIntervalClock.start();
+	this->reset();
+}
+
 void RenderTimer::reset(int interval)
 {
   mIntervalClock.restart();
@@ -67,7 +75,7 @@ bool RenderTimer::intervalPassed() const
 QString RenderTimer::dumpStatistics()
 {
   std::stringstream ss;
-  ss << "=== Render time statistics ===" << std::endl;
+  ss << "=== " << mName << " statistics ===" << std::endl;
   ss << "Interval \t= " << mInterval << " ms" << std::endl;
   ss << "Elapsed  \t= " << mIntervalClock.elapsed() <<  " ms" << std::endl;
   ss << "FPS      \t= " << this->getFPS() << " frames/s" <<  std::endl;
@@ -103,5 +111,29 @@ QString RenderTimer::dumpStatistics()
   ss << std::endl;
   return qstring_cast(ss.str());
 }
+
+QString RenderTimer::dumpStatisticsSmall()
+{
+	  std::stringstream ss;
+	  ss << mName << ":\t";
+	  ss << "Elapsed=" << mIntervalClock.elapsed() <<  " ms";
+	  ss << "\tFPS=" << this->getFPS() << " fps";
+
+	  if (mRenderTime.empty() || mOffRenderTime.empty())
+	    return qstring_cast(ss.str());
+
+	  double maxRenderTime = *std::max_element(mRenderTime.begin(), mRenderTime.end());
+	  double maxOffRenderTime = *std::max_element(mOffRenderTime.begin(), mOffRenderTime.end());
+
+	  double meanRenderTime = std::accumulate(mRenderTime.begin(), mRenderTime.end(), 0)/mRenderTime.size();
+	  double meanOffRenderTime = std::accumulate(mOffRenderTime.begin(), mOffRenderTime.end(), 0)/mOffRenderTime.size();
+	  double meanTotalTime = meanRenderTime + meanOffRenderTime;
+
+	  ss << "\tMean="<< "(total=in+other)=(" << meanTotalTime << "=" << meanRenderTime << "+" << meanOffRenderTime << ") ms/frame";
+	  ss << "\tMax=(" << maxRenderTime  << "+" << maxOffRenderTime << ")";
+
+	  return qstring_cast(ss.str());
+}
+
 
 } // namespace cx
