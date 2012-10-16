@@ -7,3 +7,5 @@
 // position of configuration folders after install, relative to executable.
 #define CX_CONFIG_ROOT_RELATIVE_INSTALLED "@CX_CONFIG_ROOT_RELATIVE_INSTALLED@"
 
+#cmakedefine CX_USE_OpenCV
+
