@@ -14,14 +14,14 @@
 namespace cx
 {
 
-RenderTimer::RenderTimer()
+CyclicActionTimer::CyclicActionTimer()
 {
   mRenderClock.start();
   mIntervalClock.start();
   this->reset();
 }
 
-RenderTimer::RenderTimer(QString name)
+CyclicActionTimer::CyclicActionTimer(QString name)
 {
 	mName = name;
 	mRenderClock.start();
@@ -29,7 +29,7 @@ RenderTimer::RenderTimer(QString name)
 	this->reset();
 }
 
-void RenderTimer::reset(int interval)
+void CyclicActionTimer::reset(int interval)
 {
   mIntervalClock.restart();
   mInterval = interval;
@@ -38,24 +38,24 @@ void RenderTimer::reset(int interval)
 
 /** rendering engine must call this before a render
  */
-void RenderTimer::beginRender()
+void CyclicActionTimer::beginRender()
 {
 	this->begin();
 }
 
 /** rendering engine must call this after a render
  */
-void RenderTimer::endRender()
+void CyclicActionTimer::endRender()
 {
 	this->time("render");
 }
 
-void RenderTimer::begin()
+void CyclicActionTimer::begin()
 {
 	this->time("outside");
 }
 
-void RenderTimer::time(QString id)
+void CyclicActionTimer::time(QString id)
 {
 	  std::vector<Entry>::iterator iter;
 	  for (iter=mTiming.begin(); iter!=mTiming.end(); ++iter)
@@ -74,7 +74,7 @@ void RenderTimer::time(QString id)
 
 /** return frames per second during the last interval.
  */
-double RenderTimer::getFPS()
+double CyclicActionTimer::getFPS()
 {
   if (!mIntervalClock.elapsed())
     return -1;
@@ -82,12 +82,12 @@ double RenderTimer::getFPS()
   return 1000.0 * numberOfRenderings / mIntervalClock.elapsed();
 }
 
-bool RenderTimer::intervalPassed() const
+bool CyclicActionTimer::intervalPassed() const
 {
   return mIntervalClock.elapsed() > mInterval;
 }
 
-QString RenderTimer::dumpStatistics()
+QString CyclicActionTimer::dumpStatistics()
 {
 	return this->dumpStatisticsSmall();
 //  std::stringstream ss;
@@ -128,7 +128,7 @@ QString RenderTimer::dumpStatistics()
 //  return qstring_cast(ss.str());
 }
 
-QString RenderTimer::dumpStatisticsSmall()
+QString CyclicActionTimer::dumpStatisticsSmall()
 {
 	  std::stringstream ss;
 	  ss << mName << ":\t";

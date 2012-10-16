@@ -69,7 +69,7 @@ private:
 
   ssc::ViewWidget* mView;
   QTimer* mRenderTimer;
-  RenderTimer mRenderTimerW;
+  CyclicActionTimer mRenderTimerW;
   QLabel* mRenderLabel;
 
   QLineEdit* mLocalServerEdit;

@@ -40,7 +40,7 @@ class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class RenderTimer> RenderTimerPtr;
+typedef boost::shared_ptr<class CyclicActionTimer> RenderTimerPtr;
 
 /**
  * \file
