@@ -825,20 +825,11 @@ void ViewManager::renderAllViewsSlot()
 	if (mRenderTimer->intervalPassed())
 	{
 		emit fps(mRenderTimer->getFPS());
-		static int counter=0;
-		if (++counter%30==0)
-			ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+//		static int counter=0;
+//		if (++counter%30==0)
+//			ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
 		mRenderTimer->reset();
 	}
-
-//  if(mRenderingTime->elapsed()>1000)
-//  {
-//    emit fps(mNumberOfRenderings);
-//    mRenderingTime->restart();
-//    mNumberOfRenderings = 1;
-//  }
-//  else
-//    mNumberOfRenderings++;
 }
 
 LayoutData ViewManager::getLayoutData(const QString uid) const
