@@ -41,7 +41,7 @@ public:
 	virtual ~ImageSenderGE() {}
 
 	virtual void initialize(StringMap arguments);
-	virtual void startStreaming(QTcpSocket* socket);
+	virtual void startStreaming(GrabberSenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
@@ -49,7 +49,8 @@ public:
 
 protected:
 private:
-	QTcpSocket* mSocket;
+	GrabberSenderPtr mSender;
+//	QTcpSocket* mSocket;
 	QTimer* mSendTimer;
 	QTimer* mGrabTimer;
 	StringMap mArguments;
@@ -58,7 +59,7 @@ private:
 	data_streaming::GEStreamer mGEStreamer;
 
 	vtkSmartPointer<vtkImageData> mImgStream;//Last image from GE
-	QDateTime mLastGrabTime;
+	igstk::RealTimeClock::TimeStampType mLastGrabTime;
 
 	bool initialize_local();
 	void deinitialize_local();
