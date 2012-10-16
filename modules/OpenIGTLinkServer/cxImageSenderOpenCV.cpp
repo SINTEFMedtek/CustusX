@@ -248,11 +248,13 @@ void ImageSenderOpenCV::grab()
 	{
 		return;
 	}
-//	  QTime start = QTime::currentTime();
+//	QTime start = QTime::currentTime();
 	// grab images from camera to opencv internal buffer, do not process
 	mVideoCapture->grab();
 	mLastGrabTime = QDateTime::currentDateTime();
-//	  std::cout << "   grab: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//	static int counter=0;
+//	if (++counter%50==0)
+//		std::cout << "=== ImageSenderOpenCV   - grab: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 
 }
 
@@ -265,9 +267,15 @@ void ImageSenderOpenCV::send()
 //		this->stopStreaming();
 //	}
 //	return;
+//	QTime start = QTime::currentTime();
+
 	if (!mSender || !mSender->isReady())
 		return;
 	mSender->send(this->getImageMessage());
+
+//	static int counter=0;
+//	if (++counter%50==0)
+//		std::cout << "=== ImageSenderOpenCV   send: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 }
 
 IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()

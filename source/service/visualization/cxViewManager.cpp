@@ -97,7 +97,7 @@ ViewManager::ViewManager() :
 				mViewCache3D(mMainWindowsCentralWidget, "View3D"),
 				mViewCacheRT(mMainWindowsCentralWidget, "ViewRT")
 {
-	mRenderTimer.reset(new RenderTimer);
+	mRenderTimer.reset(new RenderTimer("Main Render timer"));
 	mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
 //	mSlicePlanesProxy->getProperties().m3DFontSize = 50;
 
@@ -825,6 +825,9 @@ void ViewManager::renderAllViewsSlot()
 	if (mRenderTimer->intervalPassed())
 	{
 		emit fps(mRenderTimer->getFPS());
+		static int counter=0;
+		if (++counter%30==0)
+			ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
 		mRenderTimer->reset();
 	}
 
