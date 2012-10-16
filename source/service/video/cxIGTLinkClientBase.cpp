@@ -83,7 +83,7 @@ IGTLinkImageMessage::Pointer IGTLinkClientBase::getLastImageMessage()
 		return IGTLinkImageMessage::Pointer();
 	IGTLinkImageMessage::Pointer retval = mMutexedImageMessageQueue.front();
 	mMutexedImageMessageQueue.pop_front();
-	if (!mMutexedImageMessageQueue.empty())
+	if (mMutexedImageMessageQueue.size() > 1) // should not happen. Symptom of congestion.
 		ssc::messageManager()->sendInfo(QString("%1 remaining video frames in queue.").arg(mMutexedImageMessageQueue.size()));
 	return retval;
 }
