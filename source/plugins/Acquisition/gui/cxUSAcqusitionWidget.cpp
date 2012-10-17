@@ -97,42 +97,51 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	QGridLayout* layout = new QGridLayout(retval);
 	layout->setMargin(0);
 
-	//for testing sound speed converting - BEGIN
 	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget,
-		SLOT(setToolSlot(const QString&)));
+	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget, SLOT(setToolSlot(const QString&)));
 
-	// define sound speed group
-	QGroupBox* soundSpeedGroupBox = new QGroupBox("Sound Speed");
-	soundSpeedGroupBox->setToolTip("Sound Speed");
-	QVBoxLayout* soundSpeedLayout = new QVBoxLayout(soundSpeedGroupBox);
-	soundSpeedLayout->addWidget(soundSpeedWidget);
-	soundSpeedLayout->setMargin(soundSpeedLayout->margin()/2);
-
-	//for testing sound speed converting - END
-
-	int line = 0;
-
-	layout->addWidget(this->createHorizontalLine(), line, 0, 1, 1);
-	++line;
-
-	// define probe group
-	QGroupBox* probeGroupBox = new QGroupBox("Probe");
-	probeGroupBox->setToolTip("Probe Definition");
-	QVBoxLayout* probeLayout = new QVBoxLayout(probeGroupBox);
 	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(this);
 	probeWidget->getActiveProbeConfigWidget()->setVisible(false);
-	probeLayout->addWidget(probeWidget);
-	probeLayout->setMargin(probeLayout->margin()/2);
-//	layout->addWidget(probeWidget, line, 0);
-	layout->addWidget(probeGroupBox, line, 0);
-	++line;
-	layout->addWidget(soundSpeedGroupBox, line, 0);
-	++line;
-	layout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()), line, 0);
-	++line;
+
+	ssc::SpinBoxGroupWidget* temporalCalibrationWidget = new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New());
+
+	int line = 0;
+	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 1);
+	layout->addWidget(this->wrapGroupBox(probeWidget, "Probe", "Probe Definition"), line++, 0);
+	layout->addWidget(this->wrapGroupBox(soundSpeedWidget, "Sound Speed", "Sound Speed"), line++, 0);
+	layout->addWidget(temporalCalibrationWidget, line++, 0);
+
+// alternative: group advanced widgets as tabs:
+//	QTabWidget* tabWidget = new QTabWidget(this);
+//	layout->addWidget(tabWidget, 0, 0);
+//	tabWidget->addTab(this->addVerticalStretch(probeWidget), "Probe");
+//	tabWidget->addTab(this->addVerticalStretch(soundSpeedWidget), "Sound Speed");
+//	tabWidget->addTab(this->addVerticalStretch(temporalCalibrationWidget), "Temporal Calibration");
+
+	return retval;
+}
+
+QWidget* USAcqusitionWidget::wrapGroupBox(QWidget* input, QString name, QString tip)
+{
+	QGroupBox* retval = new QGroupBox(name);
+	retval->setToolTip(tip);
+	QVBoxLayout* layout = new QVBoxLayout(retval);
+	layout->addWidget(input);
+	layout->addStretch();
+	layout->setMargin(layout->margin()/2);
+	return retval;
+}
 
 
+
+QWidget* USAcqusitionWidget::wrapVerticalStretch(QWidget* input)
+{
+	QWidget* retval = new QWidget(this);
+	QVBoxLayout* layout = new QVBoxLayout(retval);
+	layout->addWidget(input);
+	layout->addStretch();
+	layout->setMargin(0);
+	layout->setSpacing(0);
 	return retval;
 }
 

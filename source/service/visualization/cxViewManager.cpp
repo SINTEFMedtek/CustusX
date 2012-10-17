@@ -826,9 +826,9 @@ void ViewManager::renderAllViewsSlot()
 	{
 		emit fps(mRenderTimer->getFPS());
 //		static int counter=0;
-//		if (++counter%30==0)
+//		if (++counter%300==0)
 //			ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
-		mRenderTimer->reset();
+//		mRenderTimer->reset();
 	}
 }
 
