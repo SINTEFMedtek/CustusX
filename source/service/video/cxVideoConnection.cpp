@@ -37,6 +37,15 @@ namespace cx
 
 VideoConnection::VideoConnection()
 {
+	mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
+
+	QStringList connectionOptions;
+	connectionOptions << "Local Server" << "Direct Link" << "Remote Server";
+	mConnectionMethod = ssc::StringDataAdapterXml::initialize("Connection", "",
+			"Method for connecting to Video Server", "Direct Link", connectionOptions,
+			mOptions.getElement());
+	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(settingsChanged()));
+
 	mConnectWhenLocalServerRunning = 0;
 
 	mServer = new QProcess(this);
@@ -60,17 +69,25 @@ VideoConnection::~VideoConnection()
 	mServer->close();
 }
 
-void VideoConnection::setLocalServerCommandLine(QString commandline)
+void VideoConnection::setLocalServerArguments(QString commandline)
+{
+	settings()->setValue("IGTLink/arguments", commandline);
+}
+
+QString VideoConnection::getLocalServerArguments()
+{
+	QString cmd = settings()->value("IGTLink/arguments").toString();
+	return cmd;
+}
+
+void VideoConnection::setLocalServerExecutable(QString commandline)
 {
 	settings()->setValue("IGTLink/localServer", commandline);
 }
 
-QString VideoConnection::getLocalServerCommandLine()
+QString VideoConnection::getLocalServerExecutable()
 {
 	QString cmd = settings()->value("IGTLink/localServer").toString();
-	// removed: stateservice handles this for all platforms
-//	if (cmd.isEmpty())
-//		cmd = "GrabberServer.app --auto";
 	return cmd;
 }
 
@@ -87,32 +104,41 @@ int VideoConnection::getPort()
 	return 18333;
 }
 
-void VideoConnection::setUseLocalServer(bool use)
+//void VideoConnection::setUseLocalServer(bool use)
+//{
+//	settings()->setValue("IGTLink/useLocalServer", use);
+//}
+//
+//bool VideoConnection::getUseLocalServer()
+//{
+//	QVariant var = settings()->value("IGTLink/useLocalServer");
+//	if (var.canConvert<bool> ())
+//		return var.toBool();
+//	return true;
+//}
+//
+//void VideoConnection::setUseDirectLink(bool use)
+//{
+//	settings()->setValue("IGTLink/useDirectLink", use);
+//}
+//
+//bool VideoConnection::getUseDirectLink()
+//{
+//	QVariant var = settings()->value("IGTLink/useDirectLink");
+//	if (var.canConvert<bool> ())
+//		return var.toBool();
+//	return true;
+//}
+
+bool VideoConnection::getUseLocalServer2()
 {
-	settings()->setValue("IGTLink/useLocalServer", use);
+	return mConnectionMethod->getValue() == "Local Server";
 }
 
-bool VideoConnection::getUseLocalServer()
+bool VideoConnection::getUseDirectLink2()
 {
-	QVariant var = settings()->value("IGTLink/useLocalServer");
-	if (var.canConvert<bool> ())
-		return var.toBool();
-	return true;
+	return mConnectionMethod->getValue() == "Direct Link";
 }
-
-void VideoConnection::setUseDirectLink(bool use)
-{
-	settings()->setValue("IGTLink/useDirectLink", use);
-}
-
-bool VideoConnection::getUseDirectLink()
-{
-	QVariant var = settings()->value("IGTLink/useDirectLink");
-	if (var.canConvert<bool> ())
-		return var.toBool();
-	return true;
-}
-
 
 /**Get list of recent hosts. The first is the current.
  *
@@ -149,22 +175,23 @@ void VideoConnection::launchServer()
 	//  QStringList arguments;
 	//  arguments << "18333" <<  "/Users/christiana/Patients/20101126T114627_Lab_66.cx3/US_Acq/USAcq_20100909T111205_5.mhd";
 
-	QString commandline = this->getLocalServerCommandLine();
+	QString commandline = this->getLocalServerExecutable() + " " + this->getLocalServerArguments();
 
-	if (commandline.isEmpty())
+	if (this->getLocalServerExecutable().isEmpty())
 		return;
 	if (mServer->state() != QProcess::NotRunning)
 		return;
-	if (this->getHost().toUpper() != "LOCALHOST")
+//	if (this->getHost().toUpper() != "LOCALHOST")
+	if (!this->getUseLocalServer2())
 	{
-		ssc::messageManager()->sendError("Ignoring Launch local server: Hostname must be Localhost");
+		ssc::messageManager()->sendError("Ignoring Launch local server: Must select local server");
 		return;
 	}
 
-	QStringList text = commandline.split(" ");
-	QString program = text[0];
-	QStringList arguments = text;
-	arguments.pop_front();
+//	QStringList text = commandline.split(" ");
+	QString program = this->getLocalServerExecutable();
+	QStringList arguments = this->getLocalServerArguments().split(" ");
+//	arguments.pop_front();
 
 	if (!QFileInfo(program).isAbsolute())
 		program = DataLocations::getBundlePath() + "/" + program;
@@ -186,7 +213,7 @@ void VideoConnection::connectServer()
 {
 	if (!mRTSource->isConnected())
 	{
-		if (this->getUseLocalServer())
+		if (this->getUseLocalServer2())
 			mRTSource->connectServer("LocalHost", this->getPort());
 		else
 			mRTSource->connectServer(this->getHost(), this->getPort());
@@ -214,15 +241,15 @@ void VideoConnection::delayedAutoConnectServer()
 
 void VideoConnection::launchAndConnectServer()
 {
-	if (this->getUseDirectLink())
+	if (this->getUseDirectLink2())
 	{
-		QString commandline = this->getLocalServerCommandLine();
+		QString commandline = this->getLocalServerArguments();
 		StringMap args = extractCommandlineOptions(commandline.split(" "));
 		mRTSource->directLink(args);
 		return;
 	}
 
-	if (this->getUseLocalServer())
+	if (this->getUseLocalServer2())
 	{
 		this->launchServer();
 
