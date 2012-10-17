@@ -173,9 +173,19 @@ void MainWindow::startupLoadPatient()
 
 void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 {
+	// add a scroller to allow for very large widgets in the vertical direction
+	QScrollArea* scroller = new QScrollArea(NULL);
+	scroller->setWidget(widget);
+	scroller->setWidgetResizable(true);
+	scroller->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	QSizePolicy policy = scroller->sizePolicy();
+	policy.setHorizontalPolicy(QSizePolicy::Minimum);
+	scroller->setSizePolicy(policy);
+
 	QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
 	dockWidget->setObjectName(widget->objectName() + "DockWidget");
-	dockWidget->setWidget(widget);
+//	dockWidget->setWidget(widget);
+	dockWidget->setWidget(scroller);
 
 	QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 

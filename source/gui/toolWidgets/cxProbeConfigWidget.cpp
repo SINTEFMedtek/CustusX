@@ -47,12 +47,11 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 		ssc::DoubleRange(-1000,1000,1),
 		1,
 		QDomNode());
-	connect(mOrigin.get(), SIGNAL(changed()), this, SLOT(guiImageSettingsChanged()));
+	connect(mOrigin.get(), SIGNAL(changed()), this, SLOT(guiOriginSettingsChanged()));
 
 	// define origin group
 	Vector3DWidget* mOriginWidget = Vector3DWidget::createSmallHorizontal(this, mOrigin);
 	mOriginWidget->showDim(2, false);
-	topLayout->addWidget(mOriginWidget);
 
 	// define cropping group
 	QGroupBox* cropGroupBox = new QGroupBox("Crop Box");
@@ -71,6 +70,7 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	QVBoxLayout* sectorLayout = new QVBoxLayout(sectorGroupBox);
 	topLayout->addWidget(sectorGroupBox);
 
+	sectorLayout->addWidget(mOriginWidget);
 	mDepthWidget = new SliderRangeGroupWidget(this);
 	mDepthWidget->setName("Depth");
 	mDepthWidget->setRange(ssc::DoubleRange(0, 100, 1));
@@ -88,16 +88,24 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 	topLayout->addLayout(buttonsLayout);
 
-	this->createAction(this,
-	                QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-left-3.png"),
-					"Shift definition 1 pixel to the left.\nThis will shift the origin, crop box and sector.", "",
-	                SLOT(shiftLeftSlot()),
-	                buttonsLayout);
-	this->createAction(this,
-	                QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
-					"Shift definition 1 pixel to the right.\nThis will shift the origin, crop box and sector.", "",
-	                SLOT(shiftRightSlot()),
-	                buttonsLayout);
+	mSyncBoxToSector = new QCheckBox("Sync Box/Sector", this);
+	mSyncBoxToSector->setChecked(true);
+	mSyncBoxToSector->setToolTip(""
+		"Synchronize Crop Box and Probe Sector,\n"
+		"changes in one will affect the other if possible");
+	connect(mSyncBoxToSector, SIGNAL(toggled(bool)), this, SLOT(syncBoxToSectorChanged()));
+	buttonsLayout->addWidget(mSyncBoxToSector);
+
+//	this->createAction(this,
+//	                QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-left-3.png"),
+//					"Shift definition 1 pixel to the left.\nThis will shift the origin, crop box and sector.", "",
+//	                SLOT(shiftLeftSlot()),
+//	                buttonsLayout);
+//	this->createAction(this,
+//	                QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
+//					"Shift definition 1 pixel to the right.\nThis will shift the origin, crop box and sector.", "",
+//	                SLOT(shiftRightSlot()),
+//	                buttonsLayout);
 
 	buttonsLayout->addStretch();
 	this->createAction(this,
@@ -119,35 +127,40 @@ ProbeConfigWidget::~ProbeConfigWidget()
 {
 }
 
-void ProbeConfigWidget::shiftDefinition(ssc::Vector3D shift)
+void ProbeConfigWidget::syncBoxToSectorChanged()
 {
-	// need a cx probe here, in order to set data.
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
-	if (!probe)
-		return;
-	ssc::ProbeData data = probe->getData();
 
-	ssc::ProbeData::ProbeImageData image = data.getImage();
-	image.mOrigin_p += shift;
-	for (int i=0; i<3; ++i)
-	{
-		image.mClipRect_p[2*i  ] += shift[i];
-		image.mClipRect_p[2*i+1] += shift[i];
-	}
-	data.setImage(image);
-
-	probe->setData(data);
 }
 
-void ProbeConfigWidget::shiftLeftSlot()
-{
-	this->shiftDefinition(ssc::Vector3D(-1, 0, 0));
-}
-
-void ProbeConfigWidget::shiftRightSlot()
-{
-	this->shiftDefinition(ssc::Vector3D( 1, 0, 0));
-}
+//void ProbeConfigWidget::shiftDefinition(ssc::Vector3D shift)
+//{
+//	// need a cx probe here, in order to set data.
+//	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+//	if (!probe)
+//		return;
+//	ssc::ProbeData data = probe->getData();
+//
+//	ssc::ProbeData::ProbeImageData image = data.getImage();
+//	image.mOrigin_p += shift;
+//	for (int i=0; i<3; ++i)
+//	{
+//		image.mClipRect_p[2*i  ] += shift[i];
+//		image.mClipRect_p[2*i+1] += shift[i];
+//	}
+//	data.setImage(image);
+//
+//	probe->setData(data);
+//}
+//
+//void ProbeConfigWidget::shiftLeftSlot()
+//{
+//	this->shiftDefinition(ssc::Vector3D(-1, 0, 0));
+//}
+//
+//void ProbeConfigWidget::shiftRightSlot()
+//{
+//	this->shiftDefinition(ssc::Vector3D( 1, 0, 0));
+//}
 
 QString ProbeConfigWidget::defaultWhatsThis() const
 {
@@ -269,7 +282,9 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	ssc::ProbeData data = probe->getData();
 
 	data.setSector(mDepthWidget->getValue().first, mDepthWidget->getValue().second, mWidth->getValue());
-	data.updateClipRectFromSector();
+
+	if (mSyncBoxToSector->isChecked())
+		data.updateClipRectFromSector();
 
 	probe->setData(data);
 
@@ -287,16 +302,44 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	ssc::ProbeData data = probe->getData();
 
 	ssc::ProbeData::ProbeImageData image = data.getImage();
-	image.mOrigin_p = mOrigin->getValue();
+
 	image.mClipRect_p = mBBWidget->getValue();
 	data.setImage(image);
-	data.updateSectorFromClipRect();
+
+	if (mSyncBoxToSector->isChecked())
+		data.updateSectorFromClipRect();
 
 	probe->setData(data);
 
 //	std::cout << "ProbeConfigWidget::guiImageSettingsChanged()" << std::endl;
 }
 
+void ProbeConfigWidget::guiOriginSettingsChanged()
+{
+	if (mUpdating)
+		return;
+	// need a cx probe here, in order to set data.
+	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	if (!probe)
+		return;
+	ssc::ProbeData data = probe->getData();
+
+	ssc::ProbeData::ProbeImageData image = data.getImage();
+
+	// if sync: move clip rect accordingly
+	if (mSyncBoxToSector->isChecked())
+	{
+		// shift
+		ssc::Vector3D shift = mOrigin->getValue() - image.mOrigin_p;
+		image.mClipRect_p = ssc::transform(ssc::createTransformTranslate(shift), image.mClipRect_p);
+	}
+
+	image.mOrigin_p = mOrigin->getValue();
+
+	data.setImage(image);
+
+	probe->setData(data);
+}
 
 
 
