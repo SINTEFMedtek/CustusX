@@ -23,7 +23,7 @@ include(cisstMacros)
 # link all CppUnit tests to the cisstTestsMain library
 add_executable(testDICOMLib_CppUnit_CTest ${DL_TEST_SOURCE_FILES} )
 target_link_libraries(testDICOMLib_CppUnit_CTest DICOMLib cisstTestsMain cppunit )
-set_target_properties(testDICOMLib_CppUnit_CTest PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS} ${GRABLINKFLAGS}" COMPILE_FLAGS "${SNW_TEST_FLAGS} ${GRABCFLAGS}")
+set_target_properties(testDICOMLib_CppUnit_CTest PROPERTIES LINK_FLAGS "${SSC_LINK_FLAGS} ${GRABLINKFLAGS}" COMPILE_FLAGS "${SSC_TEST_FLAGS} ${GRABCFLAGS}")
 # Generate a CTest list of tests
 CISST_ADD_TESTS(testDICOMLib_CppUnit_CTest)
 
