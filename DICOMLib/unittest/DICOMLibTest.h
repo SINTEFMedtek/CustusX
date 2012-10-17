@@ -11,11 +11,19 @@ public:
 	void setUp();
 	void tearDown();
 	void testDummy();
+	void testInternalTest();
 	void testDump();
+	void testGetNullStudies();
+	void testGetStudiesFromEmptyFolder();
+	void testGetStudies();
 public:
 	CPPUNIT_TEST_SUITE( TestDICOMLib );
 		CPPUNIT_TEST(testDummy);
+		CPPUNIT_TEST(testInternalTest);
 		CPPUNIT_TEST(testDump);
+		CPPUNIT_TEST(testGetNullStudies);
+		CPPUNIT_TEST(testGetStudiesFromEmptyFolder);
+		CPPUNIT_TEST(testGetStudies);
 	CPPUNIT_TEST_SUITE_END();
 private:
 	struct study_t *studyList;

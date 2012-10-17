@@ -4,7 +4,7 @@
 void TestDICOMLib::setUp()
 {
 	studyList = NULL;
-	CPPUNIT_ASSERT( DICOMLib_Init()==0 );
+	CPPUNIT_ASSERT( DICOMLib_Init() == 0 );
 
 	// Pass settings to DICOMLib
 	DICOMLib_Config(DICOMLIB_CONF_SPLIT_SERIES_DESCR, 0);
@@ -25,6 +25,11 @@ void TestDICOMLib::tearDown()
 void TestDICOMLib::testDummy()
 {
 	CPPUNIT_ASSERT( true );
+}
+
+void TestDICOMLib::testInternalTest()
+{
+	CPPUNIT_ASSERT( DICOMLib_INTERNAL_TEST() == true );
 }
 
 void TestDICOMLib::testDump()
@@ -52,6 +57,58 @@ void TestDICOMLib::testDump()
 	DICOMLib_CloseStudies( studyList );
 
 }
+
+void TestDICOMLib::testGetNullStudies()
+{
+	CPPUNIT_ASSERT( DICOMLib_GetStudies( NULL, NULL, NULL, DICOMLIB_NO_CACHE ) == NULL );
+}
+
+void TestDICOMLib::testGetStudiesFromEmptyFolder()
+{
+	CPPUNIT_ASSERT( DICOMLib_GetStudies( NULL, "/testdata/empty/", NULL, DICOMLIB_NO_CACHE ) == NULL );
+}
+
+void TestDICOMLib::testGetStudies()
+{
+	struct study_t *iter;
+	struct series_t *series;
+
+	studyList = DICOMLib_GetStudies( NULL, "/testdata/Sheffield-01/", NULL, DICOMLIB_NO_CACHE );
+	CPPUNIT_ASSERT( studyList && studyList->first_series );
+	CPPUNIT_ASSERT( studyList->series_count == 1 );
+	series = DICOMLib_GetSeries( studyList, NULL );
+	CPPUNIT_ASSERT( series );
+	CPPUNIT_ASSERT( series->frames == 250 );
+	CPPUNIT_ASSERT( studyList->next_study == NULL );
+	CPPUNIT_ASSERT( DICOMLib_DescribeOrientation( series, 0, true ) == 'R' );
+	CPPUNIT_ASSERT( DICOMLib_NoVOI( series ) == 0 );
+
+	studyList = DICOMLib_GetStudies( studyList, "/testdata/SONOWAND-06-Eirik-Mo/", NULL, DICOMLIB_NO_CACHE );
+	CPPUNIT_ASSERT( studyList );
+	iter = studyList->next_study;
+	CPPUNIT_ASSERT( iter );
+	CPPUNIT_ASSERT( iter->series_count == 1 );
+	series = DICOMLib_GetSeries( iter, NULL );
+	CPPUNIT_ASSERT( series );
+	CPPUNIT_ASSERT( series->frames == 160 );
+	CPPUNIT_ASSERT( iter->next_study == NULL );
+	CPPUNIT_ASSERT( DICOMLib_DescribeOrientation( series, 0, false ) == 'P' );
+	CPPUNIT_ASSERT( DICOMLib_DescribeOrientation( series, 0, true ) == 'A' );
+	CPPUNIT_ASSERT( DICOMLib_DescribeOrientation( series, 1, false ) == 'I' );
+	CPPUNIT_ASSERT( DICOMLib_DescribeOrientation( series, 1, true ) == 'S' );
+
+	studyList = DICOMLib_GetStudies( studyList, "/testdata/Stockholm-02-CT/PA1", NULL, DICOMLIB_NO_DICOMDIR | DICOMLIB_NO_CACHE );
+	CPPUNIT_ASSERT( studyList );
+	iter = studyList->next_study->next_study;
+	CPPUNIT_ASSERT( iter );
+	CPPUNIT_ASSERT( iter->series_count == 2 );
+	series = DICOMLib_GetSeries( iter, NULL );
+	CPPUNIT_ASSERT( series );
+	if ( series->frames == 1 ) series = series->next_series;	// order may be random
+	CPPUNIT_ASSERT( series->frames == 138 );
+}
+
+
 
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestDICOMLib );
