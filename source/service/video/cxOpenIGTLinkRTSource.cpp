@@ -484,6 +484,8 @@ void OpenIGTLinkRTSource::updateSonix()
 
 void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 {
+//	static CyclicActionTimer timer("Update Video Image");
+//	timer.begin();
 #if 1 // remove to use test image
 	if (!message)
 	{
@@ -522,9 +524,20 @@ void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 		if (mFilter_IGTLink_to_RGB)
 			mRedirecter->SetInput(mFilter_IGTLink_to_RGB);
 	}
+//	timer.time("convert");
 
 	//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
 	emit newFrame();
+//	timer.time("emit");
+//
+//	if (timer.intervalPassed())
+//	{
+//		static int counter=0;
+//		if (++counter%300==0)
+//			ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
+//		timer.reset();
+//	}
+
 }
 
 
