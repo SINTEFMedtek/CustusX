@@ -36,19 +36,17 @@ public:
 private slots:
   void toggleLaunchServer();
   void launchServer();
-  void showStream();
   void toggleConnectServer();
   void connectServer();
-  void renderSlot();
   void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverStatusChangedSlot();
   void browseLocalServerSlot();
 
-  void useLocalServerChanged();
-  void useDirectLinkChanged();
+//  void useLocalServerChanged();
+//  void useDirectLinkChanged();
+  void dataChanged();
 
 private:
-  void dataChanged();
   void updateHostHistory();
   QProcess* getServer();
   OpenIGTLinkRTSourcePtr getRTSource();
@@ -59,20 +57,24 @@ private:
   virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
   QComboBox* mAddressEdit;
   QLineEdit* mPortEdit;
-  QCheckBox* mUseLocalServer;
-  QCheckBox* mUseDirectLink;
+//  QCheckBox* mUseLocalServer;
+//  QCheckBox* mUseDirectLink;
   QPushButton* mConnectButton;
-  QPushButton* mShowStreamButton;
   QPushButton* mLaunchServerButton;
-  QGridLayout* mGridLayout;
+//  QGridLayout* mGridLayout;
   QVBoxLayout* mToptopLayout;
 
-  ssc::ViewWidget* mView;
-  QTimer* mRenderTimer;
-  CyclicActionTimer mRenderTimerW;
-  QLabel* mRenderLabel;
+  QLineEdit* mDirectLinkArguments;
+  QLineEdit* mLocalServerArguments;
 
   QLineEdit* mLocalServerEdit;
+
+  QStackedWidget* mStackedWidget;
+  QWidget* createDirectLinkWidget();
+  QWidget* createLocalServerWidget();
+  QWidget* createRemoteWidget();
+  QWidget* wrapVerticalStretch(QWidget* input);
+
 };
 
 }//end namespace cx
