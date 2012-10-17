@@ -112,28 +112,36 @@ void ImageServer::socketDisconnectedSlot()
 
 void ImageServer::printHelpText()
 {
-	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
-	cx::ImageSenderFactory factory;
-
-	std::cout << "Usage: " << qApp->applicationName().toStdString() << " (--arg <argval>)*" << std::endl;
-	std::cout << "    --port   : Tcp/IP port # (default=18333)" << std::endl;
-	std::cout << "    --type   : Grabber type  (default=" << factory.getDefaultSenderType().toStdString() << ")"
-		<< std::endl;
-	std::cout << std::endl;
-	std::cout << "    Select one of the types below:" << std::endl;
-
-	QStringList types = factory.getSenderTypes();
-	for (int i = 0; i < types.size(); ++i)
-	{
-		QStringList args = factory.getArgumentDescription(types[i]);
-		std::cout << std::endl;
-		std::cout << "      type = " << types[i].toStdString() << std::endl;
-		for (int j = 0; j < args.size(); ++j)
-			std::cout << "        " << args[j].toStdString() << std::endl;
-	}
+	std::stringstream ss;
+	ss << getArgumentHelpText(qApp->applicationName());
 	std::cout << std::endl;
 	std::cout << std::endl;
 	std::cout << "Press Ctrl + C to close the server."<< std::endl;
 	std::cout << std::endl;
 }
+
+QString ImageServer::getArgumentHelpText(QString applicationName)
+{
+	std::stringstream ss;
+	cx::ImageSenderFactory factory;
+
+	ss << "Usage: " << applicationName << " (--arg <argval>)*" << std::endl;
+	ss << "    --port   : Tcp/IP port # (default=18333)" << std::endl;
+	ss << "    --type   : Grabber type  (default=" << factory.getDefaultSenderType().toStdString() << ")"
+		<< std::endl;
+	ss << std::endl;
+	ss << "    Select one of the types below:" << std::endl;
+
+	QStringList types = factory.getSenderTypes();
+	for (int i = 0; i < types.size(); ++i)
+	{
+		QStringList args = factory.getArgumentDescription(types[i]);
+		ss << std::endl;
+		ss << "      type = " << types[i].toStdString() << std::endl;
+		for (int j = 0; j < args.size(); ++j)
+			ss << "        " << args[j].toStdString() << std::endl;
+	}
+	return qstring_cast(ss.str());
+}
+
 }
