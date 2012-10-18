@@ -83,7 +83,8 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 						ssc::DoubleRange(0, M_PI, M_PI/180), 0);
 	mWidth->setInternal2Display(180.0/M_PI);
 	connect(mWidth.get(), SIGNAL(changed()), this, SLOT(guiProbeSectorChanged()));
-	sectorLayout->addWidget(ssc::createDataWidget(this, mWidth));
+//	sectorLayout->addWidget(ssc::createDataWidget(this, mWidth));//
+	sectorLayout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mWidth, 0, 0));
 
 	// create buttons bar
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
@@ -258,12 +259,14 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	double sy = data.getImage().mSpacing[1];
 
 	mDepthWidget->setValue(std::make_pair(data.getDepthStart()/sy, data.getDepthEnd()/sy));
+	mDepthWidget->setRange(ssc::DoubleRange(0, range.range()[1]*1.5, 1));
+
 	mWidth->setValue(data.getWidth());
 
 	if (data.getType()== ssc::ProbeData::tLINEAR)
 	{
-		mWidth->setValueRange(ssc::DoubleRange(0, 1000, 1));
-		mWidth->setInternal2Display(sx);
+		mWidth->setValueRange(ssc::DoubleRange(0, range.range()[0]*1.5*sx, 1.0*sx));
+		mWidth->setInternal2Display(1.0/sx);
 	}
 	if (data.getType()== ssc::ProbeData::tSECTOR)
 	{
