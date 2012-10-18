@@ -47,24 +47,8 @@ typedef vtkSmartPointer<class vtkFloatArray> vtkFloatArrayPtr;
 namespace ssc
 {
 
-ProbeSector::ProbeSector()// : mType(ProbeSector::tNONE)
+ProbeSector::ProbeSector()
 {
-
-	//  // testdata:
-	//  mData.mType = ProbeSector::tSECTOR;
-	//  mData.mDepthStart = 0;
-	////  mDepthEnd = 350;
-	//  mData.mDepthEnd = 300;
-	//  mData.mWidth = M_PI/4;
-	//  mData.mImage.mSpacing = Vector3D(0.928,0.928,1);
-	////  mSpacing = Vector3D(1,1,1); // using this spacing gives correct image - investigate!
-	//  mData.mImage.mSpacing = Vector3D(0.5,0.5,0);
-	//  mData.mImage.mSize = QSize(512,512);
-	//
-	//  //mOrigin_u = multiply_elems(Vector3D(mSize.width()/2, mSize.height()*0.75, 0), mSpacing);
-	//  mData.mImage.mOrigin_u = multiply_elems(Vector3D(mData.mImage.mSize.width()/2, mData.mImage.mSize.height()*1.0, 0), mData.mImage.mSpacing);
-
-	//mCachedCenter_v = this->get_uMv().inv().coord(mOrigin_u) - mDepthStart * Vector3D(0,1,0);
 	mPolyData = vtkPolyDataPtr::New();
 }
 
@@ -204,18 +188,6 @@ Transform3D ProbeSector::get_tMu() const
 	return tMu;
 }
 
-// old byggy version with t space z-flipped 180deg.
-//Transform3D ProbeSector::get_tMu() const
-//{
-//  Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
-//  Transform3D Rz = ssc::createTransformRotateY(-M_PI/2.0);
-//  ssc::Transform3D R = (Rx*Rz);
-//  ssc::Transform3D T = ssc::createTransformTranslate(-mData.mImage.getOrigin_u());
-//
-//  ssc::Transform3D tMu = R*T;
-//  return tMu;
-//}
-
 Transform3D ProbeSector::get_uMv() const
 {
 	// use H-1 because we count between pixel centers.
@@ -269,69 +241,6 @@ vtkPolyDataPtr ProbeSector::getSectorLinesOnly()
 	return retval->GetOutput();
 }
 
-vtkPolyDataPtr clipPlane(vtkPolyDataPtr input, Vector3D p, Vector3D n)
-{
-	vtkPlanePtr plane = vtkPlanePtr::New();
-	plane->SetOrigin(p.begin());
-	plane->SetNormal(n.begin());
-
-	vtkClipPolyDataPtr clipper = vtkClipPolyDataPtr::New();
-	clipper->SetInput(input);
-	clipper->SetClipFunction(plane);
-	clipper->SetInsideOut(true);
-	clipper->Update();
-	return clipper->GetOutput();
-}
-
-vtkPolyDataPtr ProbeSector::generateClipper(vtkPolyDataPtr input)
-{
-	//  return input;
-
-	//  vtkBoxPtr box = vtkBoxPtr::New();
-	//  DoubleBoundingBox3D bb_p = mData.mImage.mClipRect_p;
-	//  std::cout << "box_p: " << bb_p << std::endl;
-	//  std::cout << "box_p_p0: " << bb_p.corner(0,0,0) << std::endl;
-	//  std::cout << "box_p_p1: " << bb_p.corner(1,1,1) << std::endl;
-	DoubleBoundingBox3D bb = mData.getImage().getClipRect_u();
-	bb[4] = -1;
-	bb[5] = +1;
-	//  std::cout << "box_u: " << bb << std::endl;
-	//  std::cout << "box_u_p0: " << bb.corner(0,0,0) << std::endl;
-	//  std::cout << "box_u_p1: " << bb.corner(1,1,1) << std::endl;
-	//  box->SetBounds(bb.begin());
-
-	vtkPlanesPtr planes = vtkPlanesPtr::New();
-	planes->SetBounds(bb.begin());
-
-	vtkPolyDataPtr retval = input;
-	retval = clipPlane(retval, bb.corner(0, 0, 0), Vector3D(-1, 0, 0));
-	retval = clipPlane(retval, bb.corner(1, 1, 0), Vector3D(1, 0, 0));
-	retval = clipPlane(retval, bb.corner(0, 0, 0), Vector3D(0, -1, 0));
-	retval = clipPlane(retval, bb.corner(1, 1, 0), Vector3D(0, 1, 0));
-	return retval;
-
-	//  vtkPlanePtr plane = vtkPlanePtr::New();
-	//  plane->SetOrigin(bb.corner(0,0,0).begin());
-	//  plane->SetNormal(ssc::Vector3D(-1,0,0).begin());
-
-	//  vtkPolyLinePtr clipRect = this->createClipRectPolyLine();
-	//  vtkPolyPlanePtr clipPlanes = vtkPolyPlanePtr::New();
-	//  clipPlanes->SetPolyLine(clipRect);
-	//  clipPlanes->Update();
-
-	//  vtkClipPolyDataPtr clipper = vtkClipPolyDataPtr::New();
-	//  clipper->SetInput(input);
-	////  clipper->SetClipFunction(box);
-	//  clipper->SetClipFunction(planes);
-	//  clipper->SetInsideOut(true);
-	//  clipper->Update();
-	//  return clipper->GetOutput();
-
-	// vtkPolyData in space u from box or corners
-	// vtkPolyPlane as extrusion of polydata
-	// vtkClipPolyData with sector and polyplane
-}
-
 vtkPolyDataPtr ProbeSector::getSectorSectorOnlyLinesOnly()
 {
 	this->updateSector();
@@ -350,7 +259,6 @@ vtkPolyDataPtr ProbeSector::getClipRectLinesOnly()
 {
 	return this->getClipRectPolyData();
 }
-
 
 /**generate a polydata containing only a polygon representing the sector cliprect.
  *
