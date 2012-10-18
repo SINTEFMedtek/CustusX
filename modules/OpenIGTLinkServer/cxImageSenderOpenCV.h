@@ -71,6 +71,7 @@ private:
 
 	VideoCapturePtr mVideoCapture; // OpenCV video grabber
 	QDateTime mLastGrabTime;
+	bool mAvailableImage;
 
 private slots:
 	void grab();
