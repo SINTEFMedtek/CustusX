@@ -62,7 +62,7 @@ public:
 
 private:
 	//  vtkPolyLinePtr createClipRectPolyLine();
-	vtkPolyDataPtr generateClipper(vtkPolyDataPtr input);
+//	vtkPolyDataPtr generateClipper(vtkPolyDataPtr input);
 	vtkPolyDataPtr getClipRectPolyData();
 	bool clipRectIntersectsSector() const;
 
