@@ -23,6 +23,7 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
+#include "sscMessageManager.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -81,6 +82,8 @@ ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
 	mSendTimer(0),
 	mGrabTimer(0)
 {
+	mAvailableImage = false;
+
 	mVideoCapture.reset(new cv::VideoCapture());
 	mGrabTimer = new QTimer(this);
 	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
@@ -193,7 +196,6 @@ void ImageSenderOpenCV::startStreaming(GrabberSenderPtr sender)
 		return;
 	}
 
-//	mSocket = socket;
 	mSender = sender;
 	mGrabTimer->start(0);
 	mSendTimer->start(40);
@@ -205,7 +207,6 @@ void ImageSenderOpenCV::stopStreaming()
 		return;
 	mGrabTimer->stop();
 	mSendTimer->stop();
-//	mSocket = NULL;
 	mSender.reset();
 
 	this->deinitialize_local();
@@ -252,6 +253,7 @@ void ImageSenderOpenCV::grab()
 	// grab images from camera to opencv internal buffer, do not process
 	mVideoCapture->grab();
 	mLastGrabTime = QDateTime::currentDateTime();
+	mAvailableImage = true;
 //	static int counter=0;
 //	if (++counter%50==0)
 //		std::cout << "=== ImageSenderOpenCV   - grab: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
@@ -271,7 +273,13 @@ void ImageSenderOpenCV::send()
 
 	if (!mSender || !mSender->isReady())
 		return;
+	if (!mAvailableImage)
+	{
+//		ssc::messageManager()->sendDebug("dropped resend of frame");
+		return;
+	}
 	mSender->send(this->getImageMessage());
+	mAvailableImage = false;
 
 //	static int counter=0;
 //	if (++counter%50==0)
