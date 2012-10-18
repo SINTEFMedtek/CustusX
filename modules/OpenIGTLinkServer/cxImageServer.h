@@ -24,7 +24,8 @@ public:
 	ImageServer(QObject* parent = NULL);
 	virtual ~ImageServer();
 	void startListen(int port);
-	void printHelpText();
+	static void printHelpText();
+	static QString getArgumentHelpText(QString applicationName);
 	void initialize();
 protected:
 	void incomingConnection(int socketDescriptor);
