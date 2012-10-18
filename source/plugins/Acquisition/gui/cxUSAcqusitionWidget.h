@@ -57,6 +57,8 @@ private:
 	DisplayTimerWidget* mDisplayTimerWidget;
 	QWidget* mOptionsWidget;
 	QWidget* createOptionsWidget();
+	QWidget* wrapVerticalStretch(QWidget* input);
+	QWidget* wrapGroupBox(QWidget* input, QString name, QString tip);
 };
 
 

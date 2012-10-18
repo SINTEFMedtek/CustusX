@@ -47,18 +47,21 @@ private slots:
 	void deletePresetSlot();
 	void guiImageSettingsChanged();
 	void guiProbeSectorChanged();
-	void shiftLeftSlot();
-	void shiftRightSlot();
+	void guiOriginSettingsChanged();
+//	void shiftLeftSlot();
+//	void shiftRightSlot();
+	void syncBoxToSectorChanged();
 
 private:
 	virtual QString defaultWhatsThis() const;
-	void shiftDefinition(ssc::Vector3D shift);
+//	void shiftDefinition(ssc::Vector3D shift);
 
 	QWidget* mActiveProbeConfigWidget;
 	BoundingBoxWidget* mBBWidget;
 	ssc::Vector3DDataAdapterPtr mOrigin;
 	SliderRangeGroupWidget* mDepthWidget;
 	ssc::DoubleDataAdapterXmlPtr mWidth;
+	QCheckBox* mSyncBoxToSector;
 
 	ActiveProbeConfigurationStringDataAdapterPtr mActiveProbeConfig;
 	bool mUpdating;

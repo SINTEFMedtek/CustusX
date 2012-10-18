@@ -55,7 +55,8 @@ double DoubleDataAdapterTimeCalibration::getValue() const
 
 QString DoubleDataAdapterTimeCalibration::getHelp() const
 {
-  return "Set a temporal shift to add to input probe frames. Will NOT be saved.";
+  return "Set a temporal shift to add to input probe frames.\n"
+	  "Changes done here will NOT be saved.";
 }
 
 bool DoubleDataAdapterTimeCalibration::setValue(double val)

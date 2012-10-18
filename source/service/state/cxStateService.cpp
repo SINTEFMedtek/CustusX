@@ -231,10 +231,10 @@ QString StateService::getDefaultGrabberServer()
 	return "";
 #elif WIN32
 	QString result;
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), "OpenIGTLinkServer.exe --in_width 800 --in_height 600", "");
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), "OpenIGTLinkServer.exe", "--in_width 800 --in_height 600");
 	if (!result.isEmpty())
 		return result;
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer.exe --in_width 800 --in_height 600", "");
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer.exe", "--in_width 800 --in_height 600");
 	if (!result.isEmpty())
 		return result;
 	return "";
@@ -270,7 +270,11 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/labelSize", 2.5);
 	this->fillDefault("View3D/showOrientationAnnotation", true);
 
-	this->fillDefault("IGTLink/localServer", this->getDefaultGrabberServer());
+	QStringList grabber = this->getDefaultGrabberServer().split(" ");
+	this->fillDefault("IGTLink/localServer", grabber[0]);
+	grabber.pop_front();
+	if (grabber.size()>0)
+		this->fillDefault("IGTLink/arguments", grabber.join(" "));
 
 	this->fillDefault("showSectorInRTView", true);
 //  this->fillDefault("autoLandmarkRegistration", true);
