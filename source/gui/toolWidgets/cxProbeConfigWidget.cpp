@@ -66,15 +66,16 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 
 	// create sector group
 	QGroupBox* sectorGroupBox = new QGroupBox("Sector");
-	sectorGroupBox->setToolTip("Define probe sector parameters.\nUnits in mm.");
+	sectorGroupBox->setToolTip("Define probe sector parameters.\nUnits in pixels and degrees.");
 	QVBoxLayout* sectorLayout = new QVBoxLayout(sectorGroupBox);
 	topLayout->addWidget(sectorGroupBox);
 
 	sectorLayout->addWidget(mOriginWidget);
 	mDepthWidget = new SliderRangeGroupWidget(this);
 	mDepthWidget->setName("Depth");
-	mDepthWidget->setRange(ssc::DoubleRange(0, 100, 1));
+	mDepthWidget->setRange(ssc::DoubleRange(0, 1000, 1));
 	mDepthWidget->setDecimals(1);
+	mDepthWidget->setToolTip("Define probe depth.\nUnits in pixels.");
 	connect(mDepthWidget, SIGNAL(valueChanged(double, double)), this, SLOT(guiProbeSectorChanged()));
 	sectorLayout->addWidget(mDepthWidget);
 
@@ -252,13 +253,17 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 
 	mOrigin->setValue(data.getImage().mOrigin_p);
 
-	mDepthWidget->setValue(std::make_pair(data.getDepthStart(), data.getDepthEnd()));
+
+	double sx = data.getImage().mSpacing[0]; // mm/pix
+	double sy = data.getImage().mSpacing[1];
+
+	mDepthWidget->setValue(std::make_pair(data.getDepthStart()/sy, data.getDepthEnd()/sy));
 	mWidth->setValue(data.getWidth());
 
 	if (data.getType()== ssc::ProbeData::tLINEAR)
 	{
 		mWidth->setValueRange(ssc::DoubleRange(0, 1000, 1));
-		mWidth->setInternal2Display(1);
+		mWidth->setInternal2Display(sx);
 	}
 	if (data.getType()== ssc::ProbeData::tSECTOR)
 	{
@@ -281,7 +286,10 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 		return;
 	ssc::ProbeData data = probe->getData();
 
-	data.setSector(mDepthWidget->getValue().first, mDepthWidget->getValue().second, mWidth->getValue());
+	double sx = data.getImage().mSpacing[0]; // mm/pix
+	double sy = data.getImage().mSpacing[1];
+
+	data.setSector(mDepthWidget->getValue().first*sy, mDepthWidget->getValue().second*sy, mWidth->getValue());
 
 	if (mSyncBoxToSector->isChecked())
 		data.updateClipRectFromSector();
@@ -319,6 +327,8 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 	if (mUpdating)
 		return;
 	// need a cx probe here, in order to set data.
+	if (!mActiveProbeConfig->getTool())
+		return;
 	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
