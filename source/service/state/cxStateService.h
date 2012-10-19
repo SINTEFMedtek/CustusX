@@ -137,6 +137,7 @@ private:
 	void fillDefault(QString name, T value);
 	QString getDefaultGrabberServer();
 	QString checkGrabberServerExist(QString path, QString filename, QString args);
+	QString getDefaultGrabberInitScript();
 
 	static StateService* mTheInstance; ///< the only instance of this class
 
