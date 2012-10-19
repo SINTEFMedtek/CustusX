@@ -31,6 +31,7 @@
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxImageSenderFactory.h"
+#include "cxProcessWrapper.h"
 
 namespace cx
 {
@@ -42,19 +43,23 @@ VideoConnection::VideoConnection()
 	QStringList connectionOptions;
 	connectionOptions << "Local Server" << "Direct Link" << "Remote Server";
 	mConnectionMethod = ssc::StringDataAdapterXml::initialize("Connection", "",
-			"Method for connecting to Video Server", "Direct Link", connectionOptions,
+			"Method for connecting to Video Server",
+			"Direct Link",
+			connectionOptions,
 			mOptions.getElement());
 	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(settingsChanged()));
 
 	mConnectWhenLocalServerRunning = 0;
 
-	mServer = new QProcess(this);
-	connect(mServer, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
-	connect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
-
-	connect(mServer, SIGNAL(readyRead()), this, SLOT(serverProcessReadyRead()));
-	mServer->setProcessChannelMode(QProcess::MergedChannels);
-	mServer->setReadChannel(QProcess::StandardOutput);
+	mIniScript.reset(new ProcessWrapper("Init Script"));
+	mProcess.reset(new ProcessWrapper("Local Video Server"));
+//	mServer = new QProcess(this);
+	connect(mProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
+//	connect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
+//
+//	connect(mServer, SIGNAL(readyRead()), this, SLOT(serverProcessReadyRead()));
+//	mServer->setProcessChannelMode(QProcess::MergedChannels);
+//	mServer->setReadChannel(QProcess::StandardOutput);
 
 	mRTSource.reset(new OpenIGTLinkRTSource());
 	connect(getVideoSource().get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
@@ -64,9 +69,9 @@ VideoConnection::VideoConnection()
 VideoConnection::~VideoConnection()
 {
 	mRTSource->disconnectServer();
-	// avoid getting crash reports: disable signal
-	disconnect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
-	mServer->close();
+//	// avoid getting crash reports: disable signal
+//	disconnect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
+//	mServer->close();
 }
 
 void VideoConnection::setLocalServerArguments(QString commandline)
@@ -102,6 +107,22 @@ int VideoConnection::getPort()
 	if (var.canConvert<int> ())
 		return var.toInt();
 	return 18333;
+}
+
+void VideoConnection::setInitScript(QString filename)
+{
+	settings()->setValue("IGTLink/initScript", filename);
+}
+
+QString VideoConnection::getInitScript()
+{
+	QString cmd = settings()->value("IGTLink/initScript").toString();
+	return cmd;
+}
+
+QProcess* VideoConnection::getProcess()
+{
+	return mProcess->getProcess();
 }
 
 //void VideoConnection::setUseLocalServer(bool use)
@@ -171,42 +192,53 @@ void VideoConnection::setHost(QString host)
 
 void VideoConnection::launchServer()
 {
-	//  QString program = "/Users/christiana/christiana/workspace/CustusX3/build_RelWithDebInfo/modules/OpenIGTLinkServer/cxOpenIGTLinkServer";
-	//  QStringList arguments;
-	//  arguments << "18333" <<  "/Users/christiana/Patients/20101126T114627_Lab_66.cx3/US_Acq/USAcq_20100909T111205_5.mhd";
+//	//  QString program = "/Users/christiana/christiana/workspace/CustusX3/build_RelWithDebInfo/modules/OpenIGTLinkServer/cxOpenIGTLinkServer";
+//	//  QStringList arguments;
+//	//  arguments << "18333" <<  "/Users/christiana/Patients/20101126T114627_Lab_66.cx3/US_Acq/USAcq_20100909T111205_5.mhd";
+//
+//	QString commandline = this->getLocalServerExecutable() + " " + this->getLocalServerArguments();
+//
+//	if (this->getLocalServerExecutable().isEmpty())
+//		return;
+//	if (mServer->state() != QProcess::NotRunning)
+//		return;
+////	if (this->getHost().toUpper() != "LOCALHOST")
+//	if (!this->getUseLocalServer2())
+//	{
+//		ssc::messageManager()->sendError("Ignoring Launch local server: Must select local server");
+//		return;
+//	}
+//
+////	QStringList text = commandline.split(" ");
+//	QString program = this->getLocalServerExecutable();
+//	QStringList arguments = this->getLocalServerArguments().split(" ");
+////	arguments.pop_front();
+//
+//	if (!QFileInfo(program).isAbsolute())
+//		program = DataLocations::getBundlePath() + "/" + program;
+//
+//	if (!QFileInfo(program).exists())
+//	{
+//		ssc::messageManager()->sendError("Cannot find IGTLink server " + program);
+//		return;
+//	}
+//
+//	ssc::messageManager()->sendInfo("Launching local IGTLink server " + program + " with arguments " + arguments.join(
+//		", "));
+//
+//	if (mServer->state() == QProcess::NotRunning)
+//		mServer->start(program, arguments);
 
-	QString commandline = this->getLocalServerExecutable() + " " + this->getLocalServerArguments();
-
-	if (this->getLocalServerExecutable().isEmpty())
-		return;
-	if (mServer->state() != QProcess::NotRunning)
-		return;
-//	if (this->getHost().toUpper() != "LOCALHOST")
 	if (!this->getUseLocalServer2())
 	{
 		ssc::messageManager()->sendError("Ignoring Launch local server: Must select local server");
 		return;
 	}
 
-//	QStringList text = commandline.split(" ");
 	QString program = this->getLocalServerExecutable();
 	QStringList arguments = this->getLocalServerArguments().split(" ");
-//	arguments.pop_front();
 
-	if (!QFileInfo(program).isAbsolute())
-		program = DataLocations::getBundlePath() + "/" + program;
-
-	if (!QFileInfo(program).exists())
-	{
-		ssc::messageManager()->sendError("Cannot find IGTLink server " + program);
-		return;
-	}
-
-	ssc::messageManager()->sendInfo("Launching local IGTLink server " + program + " with arguments " + arguments.join(
-		", "));
-
-	if (mServer->state() == QProcess::NotRunning)
-		mServer->start(program, arguments);
+	mProcess->launch(program, arguments);
 }
 
 void VideoConnection::connectServer()
@@ -241,6 +273,8 @@ void VideoConnection::delayedAutoConnectServer()
 
 void VideoConnection::launchAndConnectServer()
 {
+	mIniScript->launch(this->getInitScript());
+
 	if (this->getUseDirectLink2())
 	{
 		QString commandline = this->getLocalServerArguments();
@@ -253,7 +287,7 @@ void VideoConnection::launchAndConnectServer()
 	{
 		this->launchServer();
 
-		if (mServer->state() != QProcess::Running)
+		if (this->getProcess()->state() != QProcess::Running)
 		{
 			mConnectWhenLocalServerRunning = 5; // attempt N connects
 		}
@@ -266,60 +300,68 @@ void VideoConnection::launchAndConnectServer()
 	{
 		this->connectServer();
 	}
-
-}
-
-void VideoConnection::serverProcessError(QProcess::ProcessError error)
-{
-	QString msg;
-	msg += "Video server reported an error: ";
-
-	switch (error)
-	{
-	case QProcess::FailedToStart:
-		msg += "Failed to start";
-		break;
-	case QProcess::Crashed:
-		msg += "Crashed";
-		break;
-	case QProcess::Timedout:
-		msg += "Timed out";
-		break;
-	case QProcess::WriteError:
-		msg += "Write Error";
-		break;
-	case QProcess::ReadError:
-		msg += "Read Error";
-		break;
-	case QProcess::UnknownError:
-		msg += "Unknown Error";
-		break;
-	default:
-		msg += "Invalid error";
-	}
-
-	ssc::messageManager()->sendError(msg);
 }
 
 void VideoConnection::serverProcessStateChanged(QProcess::ProcessState newState)
 {
 	if (newState == QProcess::Running)
 	{
-		ssc::messageManager()->sendInfo("Video Source Server running.");
 		this->delayedAutoConnectServer();
-	}
-	if (newState == QProcess::NotRunning)
-	{
-		ssc::messageManager()->sendInfo("Video Source Server not running.");
-	}
-	if (newState == QProcess::Starting)
-	{
-		ssc::messageManager()->sendInfo("Video Source Server starting.");
 	}
 }
 
-void VideoConnection::serverProcessReadyRead()
-{
-	ssc::messageManager()->sendInfo(QString(mServer->readAllStandardOutput()));
-}
+//void VideoConnection::serverProcessError(QProcess::ProcessError error)
+//{
+//	QString msg;
+//	msg += "Video server reported an error: ";
+//
+//	switch (error)
+//	{
+//	case QProcess::FailedToStart:
+//		msg += "Failed to start";
+//		break;
+//	case QProcess::Crashed:
+//		msg += "Crashed";
+//		break;
+//	case QProcess::Timedout:
+//		msg += "Timed out";
+//		break;
+//	case QProcess::WriteError:
+//		msg += "Write Error";
+//		break;
+//	case QProcess::ReadError:
+//		msg += "Read Error";
+//		break;
+//	case QProcess::UnknownError:
+//		msg += "Unknown Error";
+//		break;
+//	default:
+//		msg += "Invalid error";
+//	}
+//
+//	ssc::messageManager()->sendError(msg);
+//}
+//
+//void VideoConnection::serverProcessStateChanged(QProcess::ProcessState newState)
+//{
+//	if (newState == QProcess::Running)
+//	{
+//		ssc::messageManager()->sendInfo("Video Source Server running.");
+//		this->delayedAutoConnectServer();
+//	}
+//	if (newState == QProcess::NotRunning)
+//	{
+//		ssc::messageManager()->sendInfo("Video Source Server not running.");
+//	}
+//	if (newState == QProcess::Starting)
+//	{
+//		ssc::messageManager()->sendInfo("Video Source Server starting.");
+//	}
+//}
+//
+//void VideoConnection::serverProcessReadyRead()
+//{
+//	ssc::messageManager()->sendInfo(QString(mServer->readAllStandardOutput()));
+//}
+
 }//end namespace cx

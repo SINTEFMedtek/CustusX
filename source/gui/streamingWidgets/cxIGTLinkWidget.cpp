@@ -4,6 +4,7 @@
 #include <QTreeWidgetItem>
 #include <QStringList>
 #include <QVBoxLayout>
+#include <QDir>
 
 #include "vtkRenderWindow.h"
 
@@ -33,6 +34,20 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 	mToptopLayout = toptopLayout;
 
+	QHBoxLayout* initScriptLayout = new QHBoxLayout();
+	toptopLayout->addLayout(initScriptLayout);
+	initScriptLayout->addWidget(new QLabel("Init script", this));
+	mInitScriptWidget = new ssc::FileSelectWidget(this);
+	QString path = QDir::cleanPath(DataLocations::getBundlePath() + "/" + getConnection()->getInitScript());
+	QStringList nameFilters;
+	nameFilters << "*.*";
+	mInitScriptWidget->setNameFilter(nameFilters);
+	mInitScriptWidget->setFilename(path);
+//	mParameterFileWidget0->setFilename(mElastixManager->getActiveParameterFile0());
+	connect(mInitScriptWidget, SIGNAL(fileSelected(QString)), this, SLOT(initScriptSelected(QString)));
+	mInitScriptWidget->setSizePolicy(QSizePolicy::Expanding, mInitScriptWidget->sizePolicy().verticalPolicy());
+	initScriptLayout->addWidget(mInitScriptWidget);
+
 	mToptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, this->getConnection()->getConnectionMethod()));
 	connect(this->getConnection().get(), SIGNAL(settingsChanged()), this, SLOT(dataChanged()));
 
@@ -58,6 +73,11 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 	toptopLayout->addStretch();
 
 	this->dataChanged();
+}
+
+void IGTLinkWidget::initScriptSelected(QString filename)
+{
+	getConnection()->setInitScript(filename);
 }
 
 QWidget* IGTLinkWidget::createDirectLinkWidget()
