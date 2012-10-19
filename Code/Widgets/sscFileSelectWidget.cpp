@@ -67,6 +67,13 @@ void FileSelectWidget::setFilename(QString name)
 		mRootPath = QFileInfo(mFilename).dir().absolutePath();
 		//    std::cout << "FileSelectWidget::setFilename root" << mRootPath << std::endl;
 	}
+	else
+	{
+		if (mRootPath.isEmpty())
+			mRootPath = QFileInfo(mFilename).dir().absolutePath();
+	}
+
+
 
 	this->refresh();
 }
@@ -85,8 +92,8 @@ void FileSelectWidget::setPath(QString path)
 
 void FileSelectWidget::selectData()
 {
-	QString filename = QFileDialog::getOpenFileName(this, QString(tr("Select data file")), mRootPath, tr(
-		"USAcq (*.mhd)"));
+	QString filter = mNameFilters.join(";;");
+	QString filename = QFileDialog::getOpenFileName(this, QString(tr("Select file")), mRootPath, filter);
 
 	if (filename.isEmpty())
 		return;
