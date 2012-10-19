@@ -30,6 +30,9 @@
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
+
 /**
 * \file
 * \addtogroup cxServiceVideo
@@ -67,19 +70,13 @@ public:
 	bool getUseLocalServer2();
 	bool getUseDirectLink2();
 
-//	void setUseLocalServer(bool use);
-//	bool getUseLocalServer();
-//	void setUseDirectLink(bool use);
-//	bool getUseDirectLink();
+	void setInitScript(QString filename);
+	QString getInitScript();
 
 	void launchServer();
-
 	void launchAndConnectServer();
 
-	QProcess* getProcess()
-	{
-		return mServer;
-	}
+	QProcess* getProcess();
 	OpenIGTLinkRTSourcePtr getVideoSource()
 	{
 		return mRTSource;
@@ -92,19 +89,21 @@ signals:
 
 public slots:
 	void connectServer();
-	void serverProcessReadyRead();
+//	void serverProcessReadyRead();
 
-private slots:
+//private slots:
 	void serverProcessStateChanged(QProcess::ProcessState newState);
-	void serverProcessError(QProcess::ProcessError error);
+//	void serverProcessError(QProcess::ProcessError error);
 
 private:
 	void delayedAutoConnectServer();
 
 //	double mSoundSpeedCompensationFactor;
 	OpenIGTLinkRTSourcePtr mRTSource;
-	QProcess* mServer;
+//	QProcess* mServer;
 	int mConnectWhenLocalServerRunning;
+	ProcessWrapperPtr mProcess;
+	ProcessWrapperPtr mIniScript;
 
 	ssc::StringDataAdapterXmlPtr mConnectionMethod;
 	ssc::XmlOptionFile mOptions;
