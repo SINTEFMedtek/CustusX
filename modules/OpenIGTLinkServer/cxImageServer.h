@@ -23,10 +23,10 @@ Q_OBJECT
 public:
 	ImageServer(QObject* parent = NULL);
 	virtual ~ImageServer();
-	void startListen(int port);
+	bool startListen(int port);
 	static void printHelpText();
 	static QString getArgumentHelpText(QString applicationName);
-	void initialize();
+	bool initialize();
 protected:
 	void incomingConnection(int socketDescriptor);
 private slots:

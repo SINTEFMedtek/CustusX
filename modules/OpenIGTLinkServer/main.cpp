@@ -102,8 +102,18 @@ int main(int argc, char* argv[])
 
   int port = cx::convertStringWithDefault(args["port"], 18333);
 
-  server.initialize();
-  server.startListen(port);
+  bool ok = server.initialize();
+  if (!ok)
+  {
+	  std::cout << "Can not start streaming. Quitting application" << std::endl;
+	  return false;
+  }
+  ok = server.startListen(port);
+  if (!ok)
+  {
+	  std::cout << "Can not start listening. Quitting..." << std::endl;
+	  return false;
+  }
 
   int retVal = app.exec();
   return retVal;
