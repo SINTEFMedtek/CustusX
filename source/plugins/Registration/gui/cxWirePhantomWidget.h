@@ -66,6 +66,7 @@ private slots:
 
 private:
 	void showData(ssc::DataPtr data);
+	ssc::Vector3D findCentroid(ssc::MeshPtr mesh);
 
 	class BinaryThresholdImageFilterWidget* mSegmentationWidget;
 	class CenterlineWidget* mCenterlineWidget;
