@@ -250,6 +250,24 @@ QString StateService::getDefaultGrabberServer()
 #endif
 }
 
+QString StateService::getDefaultGrabberInitScript()
+{
+#ifdef __APPLE__
+	return "";
+#elif WIN32
+	return "";
+#else
+	QString result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "run_v2u.sh", "");
+	if (!result.isEmpty())
+		return result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../../CustusX3/install/Linux/copy/", "run_v2u.sh", "");
+	if (!result.isEmpty())
+		return result;
+	return "";
+#endif
+}
+
 /**Enter all default Settings here.
  *
  */
@@ -275,6 +293,8 @@ void StateService::fillDefaultSettings()
 	grabber.pop_front();
 	if (grabber.size()>0)
 		this->fillDefault("IGTLink/arguments", grabber.join(" "));
+
+	this->fillDefault("IGTLink/initScript", this->getDefaultGrabberInitScript());
 
 	this->fillDefault("showSectorInRTView", true);
 //  this->fillDefault("autoLandmarkRegistration", true);
