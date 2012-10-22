@@ -66,6 +66,7 @@ public:
 	ReconstructAlgorithmPtr getAlgorithm();///< The used reconstruction algorithm
 	std::vector<DataAdapterPtr> getAlgoOptions();
 	ReconstructerPtr getReconstructer() { return mReconstructer; }
+	ssc::USReconstructInputData getBaseInputData() { return mOriginalFileData; }
 
 	ImagePtr getOutput();
 	OutputVolumeParams getOutputVolumeParams() const;
