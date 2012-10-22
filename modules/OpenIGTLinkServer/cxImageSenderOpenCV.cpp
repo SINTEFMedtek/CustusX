@@ -183,20 +183,21 @@ void ImageSenderOpenCV::initialize_local()
 	}
 }
 
-void ImageSenderOpenCV::startStreaming(GrabberSenderPtr sender)
+bool ImageSenderOpenCV::startStreaming(GrabberSenderPtr sender)
 {
 	this->initialize_local();
 
 	if (!mGrabTimer || !mSendTimer)
 	{
 		std::cout << "ImageSenderOpenCV: Failed to start streaming: Not initialized." << std::endl;
-		return;
+		return false;
 	}
 
 //	mSocket = socket;
 	mSender = sender;
 	mGrabTimer->start(0);
 	mSendTimer->start(40);
+	return true;
 }
 
 void ImageSenderOpenCV::stopStreaming()

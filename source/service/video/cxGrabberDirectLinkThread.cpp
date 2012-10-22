@@ -52,7 +52,8 @@ void GrabberDirectLinkThread::run()
 	connect(mGrabberBridge.get(), SIGNAL(newImage()), this, SLOT(newImageSlot()), Qt::DirectConnection);
 	connect(mGrabberBridge.get(), SIGNAL(newUSStatus()), this, SLOT(newUSStatusSlot()), Qt::DirectConnection);
 
-	mImageSender->startStreaming(mGrabberBridge);
+	if(!mImageSender->startStreaming(mGrabberBridge))
+		this->quit();
 	emit connected(true);
 
 //  std::cout << "client::run thread: " << QThread::currentThread() << std::endl;

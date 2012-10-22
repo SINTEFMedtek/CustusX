@@ -26,7 +26,8 @@ void ImageServer::initialize()
 	mImageSender = ImageSenderFactory().getFromArguments(args);
 
 	// test streaming by starting/stopping once (will emit error messages right away instead of waiting for an incoming connecion.)
-	mImageSender->startStreaming(GrabberSenderPtr());
+	if (!mImageSender->startStreaming(GrabberSenderPtr()))
+		qApp->quit();
 	mImageSender->stopStreaming();
 
 //
