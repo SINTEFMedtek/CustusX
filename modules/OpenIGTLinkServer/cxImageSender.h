@@ -47,7 +47,7 @@ public:
 
 	virtual void initialize(StringMap arguments) = 0;
 //	virtual void startStreaming(QTcpSocket* socket) = 0;
-	virtual void startStreaming(GrabberSenderPtr sender) = 0;
+	virtual bool startStreaming(GrabberSenderPtr sender) = 0;
 	virtual void stopStreaming() = 0;
 
 	virtual QString getType() = 0;
