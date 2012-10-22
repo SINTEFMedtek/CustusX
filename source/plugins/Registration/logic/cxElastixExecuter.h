@@ -47,7 +47,6 @@ namespace cx
  * \date Feb 4, 2012
  * \author Christian Askeland, SINTEF
  */
-
 class ElastixExecuter : public TimedBaseAlgorithm
 {
 	Q_OBJECT
