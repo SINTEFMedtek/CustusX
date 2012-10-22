@@ -10,11 +10,15 @@
 #include <vtkPlane.h>
 #include <vtkClipPolyData.h>
 #include "sscToolManager.h"
+#include "sscMessageManager.h"
 
 namespace ssc
 {
 
 int DummyTool::mTransformCount = 0;
+
+
+
 
 DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 	mVisible(false),
@@ -106,7 +110,12 @@ QString DummyTool::getName() const
 }
 void DummyTool::startTracking(int interval)
 {
-	mTimer->start(interval);
+	mThread = new DummyToolThread(interval);
+	connect(mThread, SIGNAL(ping()), this, SLOT(sendTransform()));
+	mThread->start();
+
+
+//	mTimer->start(interval);
 //std::cout << "start tracking" << std::endl;
 	mVisible = true;
 
@@ -118,7 +127,9 @@ bool DummyTool::isCalibrated() const
 }
 void DummyTool::stopTracking()
 {
-	mTimer->stop();
+	disconnect(mThread, SIGNAL(ping()), this, SLOT(sendTransform()));
+	mThread->quit();
+//	mTimer->stop();
 	std::cout << "stop tracking" << std::endl;
 
 	mVisible = false;
@@ -311,6 +322,8 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 
 	//check:
 //	std::cout << "check: " << time.toString("yyyyMMdd'T'hhmmss:zzz").toStdString() << std::endl;
+//	std::cout << "DummyTool::set_prMt " << QDateTime::currentDateTime().toString("mm:ss:zzz").toStdString() << std::endl;
+	ssc::messageManager()->sendDebug("DummyTool:: emit toolTransformAndTimestamp()");
 
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 }
