@@ -3,6 +3,9 @@
 
 #include "sscTool.h"
 #include <vector>
+#include <QThread>
+#include <QDateTime>
+#include <QTimer>
 #include "sscBoundingBox3D.h"
 #include "vtkForwardDeclarations.h"
 
@@ -11,6 +14,34 @@ typedef boost::shared_ptr<class QTimer> QTimerPtr;
 namespace ssc
 {
 class ToolManager;
+
+/**Helper class for emitting signals at a constant rate in a separate thread.
+ *
+ */
+class DummyToolThread : public QThread
+{
+	Q_OBJECT
+public:
+	DummyToolThread(int interval, QObject* parent=NULL) : QThread(parent), mInterval(interval) {}
+protected:
+	void run()
+	{
+		QTimer* timer = new QTimer;
+		timer->start(mInterval);
+		connect(timer, SIGNAL(timeout()), this, SIGNAL(ping())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+//		connect(timer, SIGNAL(timeout()), this, SLOT(pong())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+		exec();
+		delete timer;
+	}
+	int mInterval;
+private slots:
+	void pong()
+	{
+		std::cout << "Thread Pong " << QDateTime::currentDateTime().toString("mm:ss:zzz").toStdString() << std::endl;
+	}
+signals:
+	void ping();
+};
 
 /**\brief Implementation of a Tool used for testing.
  *
@@ -83,6 +114,7 @@ private:
 //	Type mType;
 	std::set<Type> mTypes;
 	ProbeData mProbeData;
+	DummyToolThread* mThread;
 };
 typedef boost::shared_ptr<DummyTool> DummyToolPtr;
 }//namespace ssc
