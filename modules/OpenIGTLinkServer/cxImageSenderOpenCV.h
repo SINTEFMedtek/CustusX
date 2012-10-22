@@ -49,7 +49,7 @@ public:
 	virtual ~ImageSenderOpenCV();
 
 	virtual void initialize(StringMap arguments);
-	virtual void startStreaming(GrabberSenderPtr sender);
+	virtual bool startStreaming(GrabberSenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();

@@ -254,15 +254,16 @@ void MHDImageSender::initialize(StringMap arguments)
 	//  mTimer->start(1200); // for test of the timeout feature
 }
 
-void MHDImageSender::startStreaming(GrabberSenderPtr sender)
+bool MHDImageSender::startStreaming(GrabberSenderPtr sender)
 {
 	if (!mTimer)
 	{
 	    std::cout << "MHDImageSender: Failed to start streaming: Not initialized." << std::endl;
-	    return;
+	    return false;
 	}
     mSender = sender;
 	mTimer->start(40);
+	return true;
 }
 
 void MHDImageSender::stopStreaming()
