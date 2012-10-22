@@ -20,14 +20,18 @@ ImageServer::ImageServer(QObject* parent) :
 {
 }
 
-void ImageServer::initialize()
+bool ImageServer::initialize()
 {
+	bool ok = false;
+
 	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
 	mImageSender = ImageSenderFactory().getFromArguments(args);
 
 	// test streaming by starting/stopping once (will emit error messages right away instead of waiting for an incoming connecion.)
-	mImageSender->startStreaming(GrabberSenderPtr());
+	ok = mImageSender->startStreaming(GrabberSenderPtr());
 	mImageSender->stopStreaming();
+
+	return ok;
 
 //
 //	ImageSenderFactory factory;
@@ -49,7 +53,7 @@ void ImageServer::initialize()
 //	mImageSender->initialize(args);
 }
 
-void ImageServer::startListen(int port)
+bool ImageServer::startListen(int port)
 {
 	bool started = this->listen(QHostAddress::Any, port);
 
@@ -68,9 +72,13 @@ void ImageServer::startListen(int port)
 		}
 
 		std::cout << QString("Server is listening to port %2").arg(this->serverPort()).toStdString() << std::endl;
+		return true;
 	}
 	else
+	{
 		std::cout << "Server failed to start. Error: " << this->errorString().toStdString() << std::endl;
+		return false;
+	}
 }
 
 ImageServer::~ImageServer()

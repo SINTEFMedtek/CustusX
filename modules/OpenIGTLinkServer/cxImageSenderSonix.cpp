@@ -168,12 +168,13 @@ void ImageSenderSonix::initializeSonixGrabber()
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 }
 
-void ImageSenderSonix::startStreaming(QTcpSocket* socket)
+bool ImageSenderSonix::startStreaming(QTcpSocket* socket)
 {
 	mSocket = socket;
 	mSonixGrabber->Record();
 	mEmitStatusMessage = true;
 	std::cout << "Started streaming from sonix device" << std::endl;
+	return true;
 }
 
 void ImageSenderSonix::stopStreaming()
