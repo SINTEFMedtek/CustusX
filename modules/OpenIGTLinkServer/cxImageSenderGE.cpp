@@ -99,14 +99,14 @@ bool ImageSenderGE::initialize_local()
 		return true;
 }
 
-void ImageSenderGE::startStreaming(GrabberSenderPtr sender)
+bool ImageSenderGE::startStreaming(GrabberSenderPtr sender)
 {
 	bool initialized = this->initialize_local();
 
 	if (!initialized || !mGrabTimer || !mSendTimer)
 	{
 		std::cout << "ImageSenderGE: Failed to start streaming: Not initialized." << std::endl;
-		return;
+		return false;
 	}
 
 //	mSocket = socket;
@@ -114,6 +114,7 @@ void ImageSenderGE::startStreaming(GrabberSenderPtr sender)
 	mGrabTimer->start(5);
 	//mSendTimer->start(40);
 	std::cout << "Started streaming from GS device" << std::endl;
+	return true;
 }
 
 void ImageSenderGE::stopStreaming()
@@ -139,7 +140,9 @@ void ImageSenderGE::grab()
 		std::cout << "ImageSenderGE::grab(): No mGEStreamer.stream" << std::endl;
 	}*/
 
-	mGEStreamer.WaitForImageData();
+//	mGEStreamer.WaitForImageData();
+	if (!mGEStreamer.HasNewImageData())
+		return;
 	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
 	if(!imgStream)
 	{
