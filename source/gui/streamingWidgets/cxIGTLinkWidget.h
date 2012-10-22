@@ -9,6 +9,9 @@
 #include "sscView.h"
 #include "cxOpenIGTLinkRTSource.h"
 #include "cxRenderTimer.h"
+#include "sscFileSelectWidget.h"
+
+
 namespace cx
 {
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
@@ -45,6 +48,7 @@ private slots:
 //  void useLocalServerChanged();
 //  void useDirectLinkChanged();
   void dataChanged();
+  void initScriptSelected(QString filename);
 
 private:
   void updateHostHistory();
@@ -55,19 +59,20 @@ private:
 
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
+
+  QPushButton* mConnectButton;
+  QVBoxLayout* mToptopLayout;
+  ssc::FileSelectWidget* mInitScriptWidget;
+  // remote server widgets:
   QComboBox* mAddressEdit;
   QLineEdit* mPortEdit;
-//  QCheckBox* mUseLocalServer;
-//  QCheckBox* mUseDirectLink;
-  QPushButton* mConnectButton;
-  QPushButton* mLaunchServerButton;
-//  QGridLayout* mGridLayout;
-  QVBoxLayout* mToptopLayout;
-
-  QLineEdit* mDirectLinkArguments;
-  QLineEdit* mLocalServerArguments;
-
+  // local server widgets:
   QLineEdit* mLocalServerEdit;
+  QLineEdit* mLocalServerArguments;
+  QPushButton* mLaunchServerButton;
+  // direct link widgets:
+  QLineEdit* mDirectLinkArguments;
+
 
   QStackedWidget* mStackedWidget;
   QWidget* createDirectLinkWidget();
