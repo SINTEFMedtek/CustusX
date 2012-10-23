@@ -33,139 +33,14 @@
 
 namespace ssc
 {
-USFrameData::USFrameData(ImagePtr inputFrameData, bool angio) :
-	mUseAngio(angio)
+USFrameData::USFrameData() :
+	mUseAngio(false)
 {
-	mBaseImage = inputFrameData;
+//	mBaseImage = inputFrameData;
 
-	this->reinitialize();
+	//this->reinitialize();
 }
 
-//mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
-
-/** reset the internal state of the oobject to that of the initialization,
- * i.e. no removed frames.
- */
-void USFrameData::reinitialize()
-{
-//	vtkImageDataPtr input;
-	if (mUseAngio)
-	{
-		//input = mImage->getBaseVtkImageData();
-		//TODO: Use only color information
-//		ssc::messageManager()->sendDebug("Extract angio data before reconstructing");
-		mProcessedImage = this->useAngio(mBaseImage);
-	}
-	else
-	{
-//		ssc::messageManager()->sendDebug("Not angio, remove color if any");
-		mProcessedImage = mBaseImage->getGrayScaleBaseVtkImageData(); // remove color, if any
-	}
-
-	mDimensions = mProcessedImage->GetDimensions();
-	//  std::cout << "dims " << Eigen::Vector3i(mDimensions) << std::endl;
-	mSpacing = Vector3D(mProcessedImage->GetSpacing());
-
-	// Raw data pointer
-	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage->GetScalarPointer());
-
-	//Create one pointer to each frame
-	mFrames.resize(mDimensions[2]);
-	unsigned int recordSize = mDimensions[0] * mDimensions[1];
-	for (int record = 0; record < mDimensions[2]; record++)
-	{
-		mFrames[record] = inputPointer + record * recordSize;
-	}
-}
-
-vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
-{
-	// Some of the code here is borrowed from the vtk examples:
-	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
-
-	vtkImageDataPtr inData = inputFrameData->getBaseVtkImageData();
-
-	if (inData->GetNumberOfScalarComponents() < 3)
-	{
-		ssc::messageManager()->sendWarning("Angio requested for grayscale ultrasound");
-		return inputFrameData->getGrayScaleBaseVtkImageData();
-	}
-
-	vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-	luminance->SetInput(inputFrameData->getBaseVtkImageData());
-	vtkImageDataPtr outData = luminance->GetOutput();
-	outData->Update();
-
-	int* outExt = outData->GetExtent();
-
-	//  unsigned char *inPtr = static_cast<unsigned char*>(inData->GetScalarPointerForExtent(outExt));
-	//  unsigned char *outPtr = static_cast<unsigned char*>(outData->GetScalarPointerForExtent(outExt));
-	unsigned char *inPtr = static_cast<unsigned char*> (inData->GetScalarPointer());
-	unsigned char *outPtr = static_cast<unsigned char*> (outData->GetScalarPointer());
-
-	//  int rowLength = (outExt[1] - outExt[0]+1)*inData->GetNumberOfScalarComponents();
-	int maxX = outExt[1] - outExt[0];
-	int maxY = outExt[3] - outExt[2];
-	int maxZ = outExt[5] - outExt[4];
-	//  target = (unsigned long)((maxZ+1)*(maxY+1)/50.0);
-	//  target++;
-
-	// Get increments to march through data
-	vtkIdType inIncX, inIncY, inIncZ;
-	vtkIdType outIncX, outIncY, outIncZ;
-	//The following may give some values if in and out have different extent???
-	inData->GetContinuousIncrements(outExt, inIncX, inIncY, inIncZ); //Don't work?
-	outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ); //Don't work?
-	std::cout << "outExt: " << outExt[0] << " " << outExt[1] << " " << outExt[2] << " " << outExt[3] << " "
-		<< outExt[4] << " " << outExt[5] << endl;
-	//  std::cout << "outIncX: " << outIncX << " outIncY: " << outIncY << " outIncZ: " << outIncZ << std::endl;
-	//  std::cout << "inIncX: " << inIncX << " inIncY: " << inIncY << " inIncZ: " << inIncZ << std::endl;
-
-	// Loop through output pixels
-
-	int idxZ, idxY, idxR;
-
-	for (idxZ = 0; idxZ <= maxZ; idxZ++)
-	{
-		for (idxY = 0; /*!self->AbortExecute &&*/idxY <= maxY; idxY++)
-		{
-			//      if (!id)
-			//        {
-			//        if (!(count%target))
-			//          {
-			//          self->UpdateProgress(count/(50.0*target));
-			//          }
-			//        count++;
-			//        }
-			//      for (int idxR = 0; idxR < rowLength; idxR++)
-			for (idxR = 0; idxR < maxX; idxR++)//Look at 3 scalar components at the same time (RGB)
-			{
-				// Pixel operation. Add foo. Dumber would be impossible.
-				//        *outPtr = (OT)((float)(*inPtr) + foo);
-				if (((*inPtr) == (*(inPtr + 1))) && ((*inPtr) == (*(inPtr + 2))))
-				{
-					//std::cout << "idxZ: " << idxZ << " idxY: " << idxY << " idxR: " << idxR << std::endl;
-					(*outPtr) = 0;
-					(*(outPtr + 1)) = 0;
-					(*(outPtr + 2)) = 0;
-				}
-				else
-				{
-				}//Assume the outVolume is treated with the luminance filter first
-				//        outPtr++;
-				//        inPtr++;
-				outPtr++;
-				inPtr += 3;
-			}
-			//      outPtr += outIncY;
-			//      inPtr += inIncY;
-		}
-		//    outPtr += outIncZ;
-		//    inPtr += inIncZ;
-	}
-
-	return outData;
-}
 
 /**
  * Dimensions will be changed after this
@@ -191,21 +66,21 @@ Vector3D USFrameData::getSpacing()
 {
 	return mSpacing;
 }
-
-QString USFrameData::getName()
-{
-	return mBaseImage->getName();
-}
-
-QString USFrameData::getUid()
-{
-	return mBaseImage->getUid();
-}
-
-QString USFrameData::getFilePath()
-{
-	return mBaseImage->getFilePath();
-}
+//
+//QString USFrameData::getName()
+//{
+//	return mBaseImage->getName();
+//}
+//
+//QString USFrameData::getUid()
+//{
+//	return mBaseImage->getUid();
+//}
+//
+//QString USFrameData::getFilePath()
+//{
+//	return mBaseImage->getFilePath();
+//}
 
 //ImagePtr USFrameData::getBase()
 //{
@@ -215,5 +90,190 @@ void USFrameData::setAngio(bool angio)
 {
 	mUseAngio = angio;
 }
+
+vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
+{
+	// Some of the code here is borrowed from the vtk examples:
+	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
+
+	vtkImageDataPtr inData = inputFrameData->getBaseVtkImageData();
+
+	if (inData->GetNumberOfScalarComponents() < 3)
+	{
+		ssc::messageManager()->sendWarning("Angio requested for grayscale ultrasound");
+		return inputFrameData->getGrayScaleBaseVtkImageData();
+	}
+
+	vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+	luminance->SetInput(inputFrameData->getBaseVtkImageData());
+	vtkImageDataPtr outData = luminance->GetOutput();
+	outData->Update();
+
+	int* outExt = outData->GetExtent();
+
+	unsigned char *inPtr = static_cast<unsigned char*> (inData->GetScalarPointer());
+	unsigned char *outPtr = static_cast<unsigned char*> (outData->GetScalarPointer());
+
+	int maxX = outExt[1] - outExt[0];
+	int maxY = outExt[3] - outExt[2];
+	int maxZ = outExt[5] - outExt[4];
+
+	// Get increments to march through data
+	vtkIdType inIncX, inIncY, inIncZ;
+	vtkIdType outIncX, outIncY, outIncZ;
+	//The following may give some values if in and out have different extent???
+	inData->GetContinuousIncrements(outExt, inIncX, inIncY, inIncZ); //Don't work?
+	outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ); //Don't work?
+	std::cout << "outExt: " << outExt[0] << " " << outExt[1] << " " << outExt[2] << " " << outExt[3] << " "
+		<< outExt[4] << " " << outExt[5] << endl;
+
+	// Loop through output pixels
+	int idxZ, idxY, idxR;
+
+	for (idxZ = 0; idxZ <= maxZ; idxZ++)
+	{
+		for (idxY = 0; /*!self->AbortExecute &&*/idxY <= maxY; idxY++)
+		{
+			for (idxR = 0; idxR < maxX; idxR++)//Look at 3 scalar components at the same time (RGB)
+			{
+				// Pixel operation. Add foo. Dumber would be impossible.
+				//        *outPtr = (OT)((float)(*inPtr) + foo);
+				if (((*inPtr) == (*(inPtr + 1))) && ((*inPtr) == (*(inPtr + 2))))
+				{
+					(*outPtr) = 0;
+					(*(outPtr + 1)) = 0;
+					(*(outPtr + 2)) = 0;
+				}
+				else
+				{
+				}//Assume the outVolume is treated with the luminance filter first
+				outPtr++;
+				inPtr += 3;
+			}
+		}
+	}
+	return outData;
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+USFrameDataMonolithic::USFrameDataMonolithic(ImagePtr inputFrameData) :
+	USFrameData()
+{
+	mBaseImage = inputFrameData;
+	this->reinitialize();
+}
+
+/** reset the internal state of the oobject to that of the initialization,
+ * i.e. no removed frames.
+ */
+void USFrameDataMonolithic::reinitialize()
+{
+	if (mUseAngio)
+	{
+		mProcessedImage = this->useAngio(mBaseImage);
+	}
+	else
+	{
+		mProcessedImage = mBaseImage->getGrayScaleBaseVtkImageData(); // remove color, if any
+	}
+
+	mDimensions = mProcessedImage->GetDimensions();
+	mSpacing = Vector3D(mProcessedImage->GetSpacing());
+
+	// Raw data pointer
+	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage->GetScalarPointer());
+
+	//Create one pointer to each frame
+	mFrames.resize(mDimensions[2]);
+	unsigned int recordSize = mDimensions[0] * mDimensions[1];
+	for (int record = 0; record < mDimensions[2]; record++)
+		mFrames[record] = inputPointer + record * recordSize;
+}
+
+QString USFrameDataMonolithic::getName()
+{
+	return mBaseImage->getName();
+}
+
+QString USFrameDataMonolithic::getUid()
+{
+	return mBaseImage->getUid();
+}
+
+QString USFrameDataMonolithic::getFilePath()
+{
+	return mBaseImage->getFilePath();
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+USFrameDataSplitFrames::USFrameDataSplitFrames(std::vector<ImagePtr> inputFrameData, QString filename) :
+	USFrameData()
+{
+	mFilename = filename;
+	mBaseImage = inputFrameData;
+	this->reinitialize();
+}
+
+/** reset the internal state of the oobject to that of the initialization,
+ * i.e. no removed frames.
+ */
+void USFrameDataSplitFrames::reinitialize()
+{
+	mProcessedImage.clear();
+
+	mProcessedImage.resize(mBaseImage.size());
+	for (unsigned i=0; i<mProcessedImage.size(); ++i)
+	{
+		if (mUseAngio)
+		{
+			mProcessedImage[i] = this->useAngio(mBaseImage[i]);
+		}
+		else
+		{
+			mProcessedImage[i] = mBaseImage[i]->getGrayScaleBaseVtkImageData();
+		}
+	}
+
+	mDimensions = mProcessedImage[0]->GetDimensions();
+	mDimensions[2] = mProcessedImage.size();
+
+	mSpacing = Vector3D(mProcessedImage[0]->GetSpacing());
+	mSpacing[2] = mSpacing[0]; // set z-spacing to arbitrary value.
+
+	//Create one pointer to each frame
+	mFrames.resize(mDimensions[2]);
+	for (int record = 0; record < mDimensions[2]; record++)
+	{
+		// Raw data pointer
+		unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage[record]->GetScalarPointer());
+		mFrames[record] = inputPointer;
+	}
+}
+
+QString USFrameDataSplitFrames::getName()
+{
+	return mFilename;
+}
+
+QString USFrameDataSplitFrames::getUid()
+{
+	return mFilename;
+}
+
+QString USFrameDataSplitFrames::getFilePath()
+{
+	return mFilename;
+}
+
+
 
 }//namespace ssc

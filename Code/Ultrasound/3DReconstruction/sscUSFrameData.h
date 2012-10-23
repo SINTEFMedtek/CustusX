@@ -58,27 +58,62 @@ inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)
 class USFrameData
 {
 public:
-	explicit USFrameData(ImagePtr inputFrameData, bool angio = false);
-	void reinitialize();
-	void removeFrame(unsigned int index);
-	unsigned char* getFrame(unsigned int index);
-	int* getDimensions();
-	Vector3D getSpacing();
-	QString getName();
-	QString getUid();
-	QString getFilePath();
-	void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
+	virtual void reinitialize() = 0;
+	virtual ~USFrameData() {}
+	virtual void removeFrame(unsigned int index);
+	virtual unsigned char* getFrame(unsigned int index);
+	virtual int* getDimensions();
+	virtual Vector3D getSpacing();
+	virtual QString getName() = 0;
+	virtual QString getUid() = 0;
+	virtual QString getFilePath() = 0;
+	virtual void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
 
-private:
-//	ImagePtr getBase();
+protected:
+	explicit USFrameData();
 	vtkImageDataPtr useAngio(ImagePtr inputFrameData);/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
-	ImagePtr mBaseImage;
-	vtkImageDataPtr mProcessedImage; // baseimage converted to grayscale using angio or luminance algorithm
+
+//private:
+//	ImagePtr getBase();
+//	ImagePtr mBaseImage;
+//	vtkImageDataPtr mProcessedImage; // baseimage converted to grayscale using angio or luminance algorithm
 	std::vector<unsigned char*> mFrames;
 	int* mDimensions;
 	Vector3D mSpacing;
 	bool mUseAngio;
 };
+
+class USFrameDataMonolithic : public USFrameData
+{
+public:
+	explicit USFrameDataMonolithic(ImagePtr inputFrameData);
+	virtual void reinitialize();
+
+	virtual QString getName();
+	virtual QString getUid();
+	virtual QString getFilePath();
+
+private:
+	ImagePtr mBaseImage;
+	vtkImageDataPtr mProcessedImage; // baseimage converted to grayscale using angio or luminance algorithm
+};
+
+class USFrameDataSplitFrames : public USFrameData
+{
+public:
+	explicit USFrameDataSplitFrames(std::vector<ImagePtr> inputFrameData, QString filename);
+	virtual void reinitialize();
+
+	virtual QString getName();
+	virtual QString getUid();
+	virtual QString getFilePath();
+
+private:
+	QString mFilename;
+	std::vector<ImagePtr> mBaseImage;
+	std::vector<vtkImageDataPtr> mProcessedImage;
+};
+
 
 typedef boost::shared_ptr<USFrameData> USFrameDataPtr;
 
