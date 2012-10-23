@@ -16,6 +16,7 @@
 #include "cxTool.h"
 #include "cxPatientService.h"
 #include "cxVideoService.h"
+#include "sscReconstructManager.h"
 
 namespace cx
 {
@@ -194,6 +195,10 @@ void USAcquisition::saveSession(QString sessionId, bool writeColor)
   mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(),
   		patientService()->getPatientData()->getActivePatientFolder(), probe, calibFileName,
   		writeColor));
+
+  ssc::USReconstructInputData reconstructData = mFileMaker->getReconstructData();
+  mPluginData->getReconstructer()->selectData(reconstructData);
+  emit acquisitionDataReady();
 
   mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
   mFileMakerFutureWatcher.setFuture(mFileMakerFuture);

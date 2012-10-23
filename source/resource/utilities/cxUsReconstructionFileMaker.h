@@ -8,6 +8,7 @@
 #include "boost/shared_ptr.hpp"
 #include "sscVideoRecorder.h"
 #include "sscTool.h"
+#include "sscUSFrameData.h"
 
 class QDir;
 
@@ -21,6 +22,17 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 * @{
 */
 
+//struct USReconstructInputData
+//{
+//	QString mFilename; ///< filename used for current data read
+//
+//	ssc::USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
+//	std::vector<ssc::TimedPosition> mFrames;
+//	std::vector<ssc::TimedPosition> mPositions;
+//	ssc::ImagePtr mMask;///< Clipping mask for the input data
+//	ssc::ProbeSector mProbeData;
+//};
+
 /**\brief Handles writing files in the format the us reconstruction
  * algorithm wants them.
  *
@@ -29,7 +41,6 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
  * \date Dec 17, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-
 class UsReconstructionFileMaker
 {
 public:
@@ -41,12 +52,13 @@ public:
   		bool writeColor = false);
   ~UsReconstructionFileMaker();
 
+  ssc::USReconstructInputData getReconstructData();
   QString write();
   QString getMhdFilename(QString reconstructionFolder);
 
 private:
-  QString makeFolder(QString patientFolder, QString sessionDescription);
-  bool createSubfolder(QString subfolderAbsolutePath);
+  QString findFolderName(QString patientFolder, QString sessionDescription);
+  bool findNewSubfolder(QString subfolderAbsolutePath);
   vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
   std::vector<vtkImageDataPtr> getFrames();
 
