@@ -37,6 +37,10 @@ typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
  * @{
  */
 
+
+typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
+
+
 /**
  * \verbatim
  * Used coordinate systems:
@@ -58,6 +62,7 @@ public:
 	virtual ~ReconstructManager();
 
 	void selectData(QString filename, QString calFilesPath = "");
+	void selectData(ssc::USReconstructInputData data);
 	void reconstruct(); // assumes readFiles has already been called
 	QString getSelectedData() const;
 
@@ -74,6 +79,8 @@ public:
 	void setOutputRelativePath(QString path);
 	void setOutputBasePath(QString path);
 
+	ssc::ThreadedTimedReconstructerPtr getThreadedTimedReconstructer() { return mThreadedTimedReconstructer; }
+
 signals:
 	void paramsChanged();
 	void algorithmChanged();
@@ -82,7 +89,7 @@ signals:
 
 private:
 	ReconstructerPtr mReconstructer;
-
+	ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
 	cx::UsReconstructionFileReaderPtr mFileReader;
 	ssc::USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 	QString mCalFilesPath; ///< Path to calibration files
@@ -103,7 +110,7 @@ class ThreadedTimedReconstructer: public cx::ThreadedTimedAlgorithm<void>
 {
 Q_OBJECT
 public:
-	ThreadedTimedReconstructer(ReconstructManagerPtr reconstructer);
+	ThreadedTimedReconstructer(ReconstructerPtr reconstructer);
 	virtual ~ThreadedTimedReconstructer();
 
 	void start();
@@ -113,10 +120,8 @@ private slots:
 
 private:
 	virtual void calculate();
-	ReconstructManagerPtr mReconstructer;
+	ReconstructerPtr mReconstructer;
 };
-
-typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
 
 
 /**
