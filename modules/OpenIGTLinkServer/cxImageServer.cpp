@@ -120,8 +120,7 @@ void ImageServer::socketDisconnectedSlot()
 
 void ImageServer::printHelpText()
 {
-	std::stringstream ss;
-	ss << getArgumentHelpText(qApp->applicationName());
+	std::cout << getArgumentHelpText(qApp->applicationName());
 	std::cout << std::endl;
 	std::cout << std::endl;
 	std::cout << "Press Ctrl + C to close the server."<< std::endl;
