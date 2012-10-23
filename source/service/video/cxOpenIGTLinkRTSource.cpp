@@ -449,6 +449,10 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer mess
 
 //	sonixVideo = true; // Temporary hack to turn off ARGB_RGBA for sonix
 
+//	std::cout << "depthStart: " << message->GetDepthStart() << std::endl;
+//	std::cout << "depthEnd: " << message->GetDepthEnd() << std::endl;
+//	std::cout << "width: " << message->GetWidth() << std::endl;
+
 	updateSonixParameters = true;
 }
 

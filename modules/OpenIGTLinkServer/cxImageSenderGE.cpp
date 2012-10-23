@@ -143,6 +143,16 @@ void ImageSenderGE::grab()
 //	mGEStreamer.WaitForImageData();
 	if (!mGEStreamer.HasNewImageData())
 		return;
+	//Get frame geometry if we don't have it yet
+	if(mGEStreamer.HasNewFrameGeometry() || (mFrameGeometry.width < 0.0001))
+	{
+		// Frame geometry have changed. Update even of we get no image
+		mFrameGeometry = mGEStreamer.GetCurrentFrameGeometry();
+		mFrameGeometryChanged = true;
+	}
+	else
+		mFrameGeometryChanged = false;
+
 	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
 	if(!imgStream)
 	{
@@ -165,11 +175,18 @@ void ImageSenderGE::send()
 	if (!mSender || !mSender->isReady())
 		return;
 
+	if(mFrameGeometryChanged)
+	{
+		IGTLinkUSStatusMessage::Pointer statMsg =  this->getFrameStatus();
+		mSender->send(statMsg);
+	}
+
+
 	IGTLinkImageMessage::Pointer imgMsg = this->getImageMessage();
 	if (!imgMsg)
 		return;
 
-	mSender->send(this->getImageMessage());
+	mSender->send(imgMsg);
 
 //	if (mSocket)
 //	{
@@ -246,6 +263,38 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 	memcpy(retval->GetScalarPointer(), mImgStream->GetScalarPointer(), fsize);
 
 	return retval;
+}
+
+IGTLinkUSStatusMessage::Pointer ImageSenderGE::getFrameStatus()
+{
+  IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
+
+  //This is origin from the scanner (= 0,0,0)
+  //Origin according to image is set in the image message
+  if (mImgStream)
+	  retval->SetOrigin(mFrameGeometry.origo[0] + mImgStream->GetOrigin()[0],
+			  mFrameGeometry.origo[1]+ mImgStream->GetOrigin()[1],
+			  mFrameGeometry.origo[2]+ mImgStream->GetOrigin()[2]);
+  else
+	  retval->SetOrigin(mFrameGeometry.origo);
+
+  // 1 = sector, 2 = linear
+  if (mFrameGeometry.kind == 8) //linear
+	  retval->SetProbeType(2);
+  else //kind == 7 or 9 //sector
+	  retval->SetProbeType(1);
+
+  retval->SetDepthStart(mFrameGeometry.depthStart*1000);// Start of sector in mm from origin
+  retval->SetDepthEnd(mFrameGeometry.depthEnd*1000);	// End of sector in mm from origin
+  retval->SetWidth(mFrameGeometry.width);// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+
+  std::cout << "origin: " << mFrameGeometry.origo[0] << " " << mFrameGeometry.origo[1] << " " << mFrameGeometry.origo[2] << std::endl;
+  std::cout << "kind: " << mFrameGeometry.kind << std::endl;
+  std::cout << "depthStart: " << mFrameGeometry.depthStart << " end: " << mFrameGeometry.depthEnd << std::endl;
+  std::cout << "width: " << mFrameGeometry.width << std::endl;
+  std::cout << "tilt: " << mFrameGeometry.tilt << std::endl;
+
+  return retval;
 }
 
 }// namespace cx
