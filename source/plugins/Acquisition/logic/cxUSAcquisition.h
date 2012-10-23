@@ -48,8 +48,9 @@ public:
 
 signals:
 	void ready(bool, QString);
-	void saveDataCompleted(QString mhdFilename);
 	void toolChanged();
+	void acquisitionDataReady(); ///< emitted when data is acquired and sent to the reconstruction module
+	void saveDataCompleted(QString mhdFilename); ///< emitted when data has been saved to file
 
 public slots:
 	void checkIfReadySlot();
