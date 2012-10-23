@@ -403,7 +403,7 @@ QString UsReconstructionFileMaker::copyCalibrationFile(QString reconstructionFol
   if(calibFile.exists())
   {
     if(!calibFile.copy(newFilePath))
-      ssc::messageManager()->sendWarning("Could not copy calibration file ("+calibFileName+") to reconstruction folder. Maybe it already exitst in the destinbation folder?");
+      ssc::messageManager()->sendWarning("Could not copy calibration file ("+calibFileName+") to reconstruction folder"+reconstructionFolder+". Maybe it already exists in the destination folder?");
   }
   return filename;
 
@@ -421,7 +421,7 @@ void UsReconstructionFileMaker::copyProbeCalibConfigsXml(QString reconstructionF
   if(xmlFile.exists())
   {
     if(!xmlFile.copy(reconstructionFolder+"/"+filename))
-      ssc::messageManager()->sendWarning("Could not copy xml file ("+xmlFileName+") to reconstruction folder. Maybe it already exitst in the destinbation folder?");
+      ssc::messageManager()->sendWarning("Could not copy xml file ("+xmlFileName+") to reconstruction folder. Maybe it already exists in the destination folder?");
   }
 }
 
