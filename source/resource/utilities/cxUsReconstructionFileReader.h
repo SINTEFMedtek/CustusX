@@ -99,13 +99,13 @@ public:
 public:
 	UsReconstructionFileReader();
 
-	ssc::USReconstructInputData readAllFiles(QString fileName, QString calFilesPath = "", bool angio = false);
+	ssc::USReconstructInputData readAllFiles(QString fileName, QString calFilesPath = "");
 
 	bool readMaskFile(QString mhdFileName, ssc::ImagePtr mask);
 
 	std::vector<ssc::TimedPosition> readFrameTimestamps(QString fileName);
 	std::vector<ssc::TimedPosition> readPositions(QString fileName);
-	ssc::USFrameDataPtr readUsDataFile(QString mhdFileName, bool angio = false);
+	ssc::USFrameDataPtr readUsDataFile(QString mhdFileName);
 
 private:
 	void readPositionFile(QString posFile, bool alsoReadTimestamps, std::vector<ssc::TimedPosition>* timedPos);

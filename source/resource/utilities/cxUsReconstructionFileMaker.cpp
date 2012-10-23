@@ -56,15 +56,17 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
 	retval.mFilename = this->getMhdFilename(reconstructionFolder);
 
 	// create image data
-	// TODO must be optimized for large datasets
 	std::vector<vtkImageDataPtr> frames = this->getFrames();
 	if (frames.size() >= 1)
 	{
-		vtkImageDataPtr imageData = this->mergeFrames(frames);
-		ssc::ImagePtr image(new ssc::Image(retval.mFilename, imageData));
-		image->setFilePath(reconstructionFolder);
-		bool angio = false; // must be set later on.
-		retval.mUsRaw.reset(new ssc::USFrameData(image, angio));
+		std::vector<ssc::ImagePtr> images;
+		for (unsigned i=0; i<frames.size(); ++i)
+			images.push_back(ssc::ImagePtr(new ssc::Image(retval.mFilename+"_"+qstring_cast(i), frames[i])));
+//		vtkImageDataPtr imageData = this->mergeFrames(frames);
+//		ssc::ImagePtr image(new ssc::Image(retval.mFilename, imageData));
+//		image->setFilePath(reconstructionFolder);
+//		retval.mUsRaw.reset(new ssc::USFrameDataMonolithic(image));
+		retval.mUsRaw.reset(new ssc::USFrameDataSplitFrames(images, retval.mFilename));
 	}
 
 	for (ssc::TimedTransformMap::iterator it = mTrackerRecordedData.begin(); it != mTrackerRecordedData.end(); ++it)
