@@ -56,10 +56,14 @@ void IGTLinkClientBase::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
 //	std::cout << "Queue size: " << mMutexedImageMessageQueue.size()  ;//<< std::endl;
 //	std::cout << "\t diff: " << timestamp_dt.msecsTo(QDateTime::currentDateTime()) << std::endl;
 
-
 	QMutexLocker sentry(&mImageMutex);
 	mMutexedImageMessageQueue.push_back(imgMsg);
+//	int queueSize = mMutexedImageMessageQueue.size();
 	sentry.unlock();
+
+//	if (queueSize.size() > 5) // should not happen. Symptom of congestion.
+//		ssc::messageManager()->sendInfo(QString("Added video frame to queue, size = %1.").arg(queueSize.size()));
+
 	emit imageReceived(); // emit signal outside lock, catch possibly in another thread
 }
 
@@ -83,8 +87,12 @@ IGTLinkImageMessage::Pointer IGTLinkClientBase::getLastImageMessage()
 		return IGTLinkImageMessage::Pointer();
 	IGTLinkImageMessage::Pointer retval = mMutexedImageMessageQueue.front();
 	mMutexedImageMessageQueue.pop_front();
-	if (mMutexedImageMessageQueue.size() > 1) // should not happen. Symptom of congestion.
-		ssc::messageManager()->sendInfo(QString("%1 remaining video frames in queue.").arg(mMutexedImageMessageQueue.size()));
+
+	static int mQueueSizeOnLastGet = 0;
+	int queueSize = mMutexedImageMessageQueue.size();
+	if (( queueSize > mQueueSizeOnLastGet )&&( queueSize > 3 )) // should not happen. Symptom of congestion.
+		ssc::messageManager()->sendInfo(QString("%1 remaining video frames in queue.").arg(queueSize));
+	mQueueSizeOnLastGet = queueSize;
 	return retval;
 }
 
