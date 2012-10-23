@@ -67,12 +67,12 @@ void ImageSenderGE::initialize(StringMap arguments)
 
 	//size of the scan converted texture
 	int volumeDimensions[3] = {600, 600, 1}; //[voxels/pixels]
-	double voxelSize[3] = {0.3, 0.3, 1.0}; //[mm]
+	//double voxelSize[3] = {0.3, 0.3, 1.0}; //[mm]
 
 	//interpolation type
 	data_streaming::InterpolationType interpType = data_streaming::Bilinear;
 
-	mGEStreamer.InitializeClientData(configFilename, fileRoot, dumpHdfToDisk, volumeDimensions, voxelSize, interpType);
+	mGEStreamer.InitializeClientData(configFilename, fileRoot, dumpHdfToDisk, volumeDimensions, interpType);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
@@ -140,9 +140,9 @@ void ImageSenderGE::grab()
 		std::cout << "ImageSenderGE::grab(): No mGEStreamer.stream" << std::endl;
 	}*/
 
-//	mGEStreamer.WaitForImageData();
-	if (!mGEStreamer.HasNewImageData())
-		return;
+	mGEStreamer.WaitForImageData();
+//	if (!mGEStreamer.HasNewImageData())
+//		return;
 	//Get frame geometry if we don't have it yet
 	if(mGEStreamer.HasNewFrameGeometry() || (mFrameGeometry.width < 0.0001))
 	{
@@ -235,7 +235,7 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 	}
 
 	retval->SetDimensions(size); // May be 3 dimensions
-	retval->SetSpacing(mGEStreamer.VoxelSize[0], mGEStreamer.VoxelSize[1], mGEStreamer.VoxelSize[2]); // May be 3 dimensions
+//	retval->SetSpacing(mGEStreamer.VoxelSize[0], mGEStreamer.VoxelSize[1], mGEStreamer.VoxelSize[2]); // May be 3 dimensions
 	retval->SetScalarType(scalarType);
 	retval->SetDeviceName("ImageSenderGE");
 	retval->SetSubVolume(size, offset);
@@ -256,7 +256,8 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 	matrix[0][3] = 0.0;  matrix[1][3] = 0.0;  matrix[2][3] = 0.0; matrix[3][3] = 1.0;
 	retval->SetMatrix(matrix);
 
-	retval->SetOrigin(mImgStream->GetOrigin()[0], mImgStream->GetOrigin()[1], mImgStream->GetOrigin()[2]);//Is origin set in mImgStream? No...
+	retval->SetOrigin(mImgStream->GetOrigin()[0], mImgStream->GetOrigin()[1], mImgStream->GetOrigin()[2]);
+	retval->SetSpacing(mImgStream->GetSpacing()[0], mImgStream->GetSpacing()[1], mImgStream->GetSpacing()[2]); // May be 3 dimensions
 
 	//Set image data
 	int fsize = retval->GetImageSize();
