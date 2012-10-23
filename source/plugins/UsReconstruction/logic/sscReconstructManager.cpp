@@ -175,8 +175,7 @@ void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 	mOriginalFileData.mFilename = fileName;
 	mCalFilesPath = calFilesPath;
 
-	ssc::USReconstructInputData temp = mFileReader->readAllFiles(fileName, calFilesPath,
-		this->getParams()->mAngioAdapter->getValue());
+	ssc::USReconstructInputData temp = mFileReader->readAllFiles(fileName, calFilesPath);
 	if (!temp.mUsRaw)
 		return;
 
