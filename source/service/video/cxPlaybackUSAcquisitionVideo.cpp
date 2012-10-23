@@ -171,7 +171,7 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 	{
 //		std::cout << "firing async op" << std::endl;
 		mUSImageDataReader.reset(new UsReconstructionFileReader());
-		mUSImageDataFutureResult = QtConcurrent::run(boost::bind(&UsReconstructionFileReader::readAllFiles, mUSImageDataReader, filename, "", false));
+		mUSImageDataFutureResult = QtConcurrent::run(boost::bind(&UsReconstructionFileReader::readAllFiles, mUSImageDataReader, filename, ""));
 		mUSImageDataFutureWatcher.setFuture(mUSImageDataFutureResult);
 	}
 }

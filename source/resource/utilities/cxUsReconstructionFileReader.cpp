@@ -35,7 +35,7 @@ UsReconstructionFileReader::UsReconstructionFileReader()
  * the mMask var is filled with data from ProbeData, or from file if present.
  *
  */
-ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath, bool angio)
+ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath)
 {
   if (calFilesPath.isEmpty())
   {
@@ -64,7 +64,7 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   }
 
   //Read US images
-  retval.mUsRaw = this->readUsDataFile(mhdFileName, angio);
+  retval.mUsRaw = this->readUsDataFile(mhdFileName);
 
 //  QString caliFilename;
 //  QStringList probeConfigPath;
@@ -245,7 +245,7 @@ ssc::ProbeData UsReconstructionFileReader::readProbeDataFromFile(QString mhdFile
 	return retval;
 }
 
-ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileName, bool angio)
+ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileName)
 {
   //Read US images
 
@@ -268,7 +268,7 @@ ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileNa
   ssc::ImagePtr UsRaw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(fileName, mhdFileName));
   UsRaw->setFilePath(filePath);
   ssc::USFrameDataPtr retval;
-  retval.reset(new ssc::USFrameData(UsRaw, angio));
+  retval.reset(new ssc::USFrameDataMonolithic(UsRaw));
 
   //std::cout << "raw " << mhdFileName << ", " << Eigen::Array3i(retval->getDimensions()) << std::endl;
 
