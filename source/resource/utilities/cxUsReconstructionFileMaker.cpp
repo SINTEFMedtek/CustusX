@@ -44,9 +44,72 @@ UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trac
 UsReconstructionFileMaker::~UsReconstructionFileMaker()
 {}
 
+/**Create and return the structure that would have been read by UsReconstructFileReader,
+ * if written from this object.
+ *
+ */
+ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
+{
+	ssc::USReconstructInputData retval;
+
+	QString reconstructionFolder = this->findFolderName(mActivepatientPath, mSessionDescription);
+	retval.mFilename = this->getMhdFilename(reconstructionFolder);
+
+	// create image data
+	// TODO must be optimized for large datasets
+	std::vector<vtkImageDataPtr> frames = this->getFrames();
+	if (frames.size() >= 1)
+	{
+		vtkImageDataPtr imageData = this->mergeFrames(frames);
+		ssc::ImagePtr image(new ssc::Image(retval.mFilename, imageData));
+		image->setFilePath(reconstructionFolder);
+		bool angio = false; // must be set later on.
+		retval.mUsRaw.reset(new ssc::USFrameData(image, angio));
+	}
+
+	for (ssc::TimedTransformMap::iterator it = mTrackerRecordedData.begin(); it != mTrackerRecordedData.end(); ++it)
+	{
+		ssc::TimedPosition current;
+		current.mTime = it->first;
+		current.mPos = it->second;
+		retval.mPositions.push_back(current);
+	}
+
+	for (ssc::VideoRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
+	{
+		ssc::TimedPosition current;
+		current.mTime = it->first;
+		// current.mPos = not written - will be found from track positions during reconstruction.
+		retval.mFrames.push_back(current);
+	}
+
+	if (mTool && mTool->getProbe())
+	{
+		retval.mProbeData.setData(mTool->getProbe()->getData());
+	}
+
+	vtkImageDataPtr mask = retval.mProbeData.getMask();
+	retval.mMask = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
+
+	//	QString mFilename; ///< filename used for current data read
+	//	ssc::USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
+	//	std::vector<ssc::TimedPosition> mFrames;
+	//	std::vector<ssc::TimedPosition> mPositions;
+	//	ssc::ImagePtr mMask;///< Clipping mask for the input data
+	//	ssc::ProbeSector mProbeData;
+
+	return retval;
+}
+
 QString UsReconstructionFileMaker::write()
 {
-  QString reconstructionFolder = this->makeFolder(mActivepatientPath, mSessionDescription);
+//  QString reconstructionFolder = this->makeFolder(mActivepatientPath, mSessionDescription);
+  QString reconstructionFolder = this->findFolderName(mActivepatientPath, mSessionDescription);
+  QDir dir;
+  dir.mkpath(reconstructionFolder);
+  dir.cd(reconstructionFolder);
+  mReport << "Made reconstruction folder: "+dir.absolutePath();
+
 
   this->writeTrackerTimestamps(reconstructionFolder);
   this->writeTrackerTransforms(reconstructionFolder);
@@ -67,7 +130,7 @@ QString UsReconstructionFileMaker::getMhdFilename(QString reconstructionFolder)
   return mhdFilename;
 }
 
-QString UsReconstructionFileMaker::makeFolder(QString patientFolder, QString sessionDescription)
+QString UsReconstructionFileMaker::findFolderName(QString patientFolder, QString sessionDescription)
 {
   QString retval("");
   QDir patientDir(patientFolder + "/US_Acq");
@@ -76,7 +139,7 @@ QString UsReconstructionFileMaker::makeFolder(QString patientFolder, QString ses
   QString subfolderAbsolutePath = patientDir.absolutePath()+"/"+subfolder;
   QString newPathName = subfolderAbsolutePath;
   int i=1;
-  while(!this->createSubfolder(newPathName))
+  while(!this->findNewSubfolder(newPathName))
   {
     newPathName = subfolderAbsolutePath+"_"+QString::number(i++);
   }
@@ -86,15 +149,15 @@ QString UsReconstructionFileMaker::makeFolder(QString patientFolder, QString ses
   return retval;
 }
 
-bool UsReconstructionFileMaker::createSubfolder(QString subfolderAbsolutePath)
+bool UsReconstructionFileMaker::findNewSubfolder(QString subfolderAbsolutePath)
 {
   QDir dir;
   if(dir.exists(subfolderAbsolutePath))
     return false;
 
-  dir.mkpath(subfolderAbsolutePath);
-  dir.cd(subfolderAbsolutePath);
-  mReport << "Made reconstruction folder: "+dir.absolutePath();
+//  dir.mkpath(subfolderAbsolutePath);
+//  dir.cd(subfolderAbsolutePath);
+//  mReport << "Made reconstruction folder: "+dir.absolutePath();
   return true;
 }
 

@@ -28,10 +28,17 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	this->setObjectName("USAcqusitionWidget");
 	this->setWindowTitle("US Acquisition");
 
+	// connect to reconstructer signals
+	ssc::ThreadedTimedReconstructerPtr reconstructer = mPluginData->getReconstructer()->getThreadedTimedReconstructer();
+	connect(reconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+	connect(reconstructer.get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
+
 	mAcquisition.reset(new USAcquisition(pluginData));
 	connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
 	//  connect(mAcquisition.get(), SIGNAL(ready(bool)), this, SIGNAL(ready(bool)));
-	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(saveDataCompletedSlot(QString)));
+//	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(saveDataCompletedSlot(QString)));
+	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
+
 
 	mRecordSessionWidget->setDescriptionVisibility(false);
 
@@ -65,6 +72,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	mOptionsWidget->setVisible(settings()->value("acquisition/UsAcqShowDetails").toBool());
 
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+	mTimedAlgorithmProgressBar->attach(reconstructer);
 	mLayout->addWidget(mOptionsWidget);
 
 	mLayout->addStretch();
@@ -150,25 +158,54 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 	mAcquisition->saveSession(sessionId, mPluginData->getReconstructer()->getParams()->mAngioAdapter->getValue());
 }
 
-void USAcqusitionWidget::saveDataCompletedSlot(QString mhdFilename)
-{
-	mPluginData->getReconstructer()->selectData(mhdFilename);
 
+void USAcqusitionWidget::acquisitionDataReadySlot()
+{
 	if (settings()->value("Automation/autoReconstruct").toBool())
 	{
-		mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mPluginData->getReconstructer()));
-		//    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(mPluginData->getReconstructer()));
-		mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
-		connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-		mThreadedTimedReconstructer->start();
-		mRecordSessionWidget->startPostProcessing("Reconstructing");
+		mPluginData->getReconstructer()->getThreadedTimedReconstructer()->start();
+//		mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mPluginData->getReconstructer()));
+//		//    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(mPluginData->getReconstructer()));
+//		mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
+//		connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+//		mThreadedTimedReconstructer->start();
+//		mRecordSessionWidget->startPostProcessing("Reconstructing");
 	}
+}
+
+//void USAcqusitionWidget::saveDataCompletedSlot(QString mhdFilename)
+//{
+//	mPluginData->getReconstructer()->selectData(mhdFilename);
+//
+//	if (settings()->value("Automation/autoReconstruct").toBool())
+//	{
+//		mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mPluginData->getReconstructer()));
+//		//    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(mPluginData->getReconstructer()));
+//		mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
+//		connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+//		mThreadedTimedReconstructer->start();
+//		mRecordSessionWidget->startPostProcessing("Reconstructing");
+//	}
+//
+////	ssc::ThreadedTimedReconstructerPtr reconstructer = mPluginData->getReconstructer()->getThreadedTimedReconstructer();
+////	connect(reconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+////	connect(reconstructer.get(), SIGNAL(started()), this, SLOT(reconstructStartedSlot()));
+//}
+
+void USAcqusitionWidget::reconstructStartedSlot()
+{
+//	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mPluginData->getReconstructer()));
+	//    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(mPluginData->getReconstructer()));
+//	mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
+//	connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+//	mThreadedTimedReconstructer->start();
+	mRecordSessionWidget->startPostProcessing("Reconstructing");
 }
 
 void USAcqusitionWidget::reconstructFinishedSlot()
 {
 	mRecordSessionWidget->stopPostProcessing();
-	mTimedAlgorithmProgressBar->detach(mThreadedTimedReconstructer);
+//	mTimedAlgorithmProgressBar->detach(mThreadedTimedReconstructer);
 //	mThreadedReconstructer.reset();
 }
 
