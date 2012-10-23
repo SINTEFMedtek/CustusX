@@ -41,6 +41,9 @@
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 
+#include "cxAcquisitionData.h"
+#include "sscReconstructManager.h"
+
 namespace cx
 {
 //------------------------------------------------------------------------------
@@ -244,6 +247,22 @@ void WirePhantomWidget::measureSlot()
 	mCompositeAlgorithm->execute();
 }
 
+/**Compute the centroid of the input mesh.
+ */
+ssc::Vector3D WirePhantomWidget::findCentroid(ssc::MeshPtr mesh)
+{
+	vtkPolyDataPtr poly = mesh->getVtkPolyData();
+	vtkPointsPtr points = poly->GetPoints();
+	int N = points->GetNumberOfPoints();
+	if (N==0)
+		return ssc::Vector3D(0,0,0);
+
+	ssc::Vector3D acc(0,0,0);
+	for (int i = 0; i < N; ++i)
+		acc += ssc::Vector3D(points->GetPoint(i));
+	return acc/N;
+}
+
 void WirePhantomWidget::registration()
 {
 	// Verify that a centerline is available:
@@ -304,32 +323,46 @@ void WirePhantomWidget::registration()
 	Eigen::AngleAxisd angleAxis = Eigen::AngleAxisd(linearTransform.matrix().block<3, 3>(0, 0));
 	double angle = angleAxis.angle();
 
-	ssc::Vector3D cross(134.25, 134.25, 99.50);
-	ssc::Vector3D cross_moving = linearTransform.coord(cross);
-	double diff = (cross - cross_moving).length();
+	// Compute the centroid of the wire phantom.
+	// This should be the wire centre, given that the
+	// model is symmetrical.
+	ssc::Vector3D cross_r = this->findCentroid(nominalCross);
+	//	ssc::Vector3D cross(134.25, 134.25, 99.50); // old hardcoded value: obsole after new measurements
+	// should be (CA20121022): <134.212 134.338 100.14>
+//	std::cout << "cross2 " << cross2 << std::endl;
 
-	QString result = QString(""
-		"Shift vector (r):\t%1\n"
-		"Accuracy |v|:\t%2mm\n"
-		"Angle:       \t%3*\n"
-		"")
-		.arg(qstring_cast(cross - cross_moving))
-		.arg(diff, 6, 'f', 2)
-		.arg(angle / M_PI * 180.0, 6, 'f', 2);
+
+	// find transform to probe space t_us, i.e. the middle position from the us acquisition
+	ssc::USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getBaseInputData();
+	ssc::Transform3D prMt_us = ssc::Transform3D::Identity();
+	if (!usData.mPositions.empty())
+		prMt_us = usData.mPositions[usData.mPositions.size()/2].mPos;
+	ssc::Transform3D rMt_us = (*ssc::ToolManager::getInstance()->get_rMpr()) * prMt_us;
+
+	ssc::Vector3D cross_moving_r = linearTransform.coord(cross_r);
+	ssc::Vector3D diff_r = (cross_r - cross_moving_r);
+	ssc::Vector3D diff_tus = rMt_us.inv().vector(diff_r);
+
+	QString result;
+	result += QString("Shift vector (r): %1\n").arg(qstring_cast(diff_r));
+	if (!usData.mPositions.empty())
+		result += QString("Shift vector (probe): %2\n").arg(qstring_cast(diff_tus));
+	result += QString("Accuracy |v|: %3mm\n").arg(diff_r.length(), 6, 'f', 2);
+	result += QString("Angle: %4*\n").arg(angle / M_PI * 180.0, 6, 'f', 2);
 
 	mResults->append(result);
 	ssc::messageManager()->sendInfo("Wire Phantom Test Results:\n"+result);
 
 	// add metrics displaying the distance from cross in the nominal and us spaces:
 	ssc::Transform3D usMnom = ssc::SpaceHelpers::get_toMfrom(ssc::SpaceHelpers::getD(mManager->getFixedData()), ssc::SpaceHelpers::getD(mManager->getMovingData()));
-	ssc::Vector3D cross_us = usMnom.coord(cross);
+	ssc::Vector3D cross_us = usMnom.coord(cross_r);
 
 	ssc::PointMetricPtr p1 = boost::shared_dynamic_cast<ssc::PointMetric>(ssc::dataManager()->getData("cross_nominal"));
 	if (!p1)
 		p1.reset(new ssc::PointMetric("cross_nominal", "cross_nominal"));
 	p1->get_rMd_History()->setParentSpace(nominalCross->getUid());
 	p1->setSpace(ssc::SpaceHelpers::getD(nominalCross));
-	p1->setCoordinate(cross);
+	p1->setCoordinate(cross_r);
 	ssc::dataManager()->loadData(p1);
 	this->showData(p1);
 
