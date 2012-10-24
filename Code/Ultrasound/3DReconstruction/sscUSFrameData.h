@@ -68,10 +68,14 @@ public:
 	virtual QString getUid() = 0;
 	virtual QString getFilePath() = 0;
 	virtual void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
+	virtual void setCropBox(IntBoundingBox3D mCropbox);
 
 protected:
 	explicit USFrameData();
-	vtkImageDataPtr useAngio(ImagePtr inputFrameData);/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
+	vtkImageDataPtr useAngio(vtkImageDataPtr inData);/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
+
+	vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
+	vtkImageDataPtr toGrayscale(vtkImageDataPtr input);
 
 //private:
 //	ImagePtr getBase();
@@ -81,6 +85,8 @@ protected:
 	int* mDimensions;
 	Vector3D mSpacing;
 	bool mUseAngio;
+	bool mDirty;
+	IntBoundingBox3D mCropbox;
 };
 
 class USFrameDataMonolithic : public USFrameData
@@ -109,6 +115,7 @@ public:
 	virtual QString getFilePath();
 
 private:
+//	void crop();
 	QString mFilename;
 	std::vector<ImagePtr> mBaseImage;
 	std::vector<vtkImageDataPtr> mProcessedImage;
