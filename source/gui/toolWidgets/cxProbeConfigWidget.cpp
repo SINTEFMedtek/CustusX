@@ -90,11 +90,11 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 	topLayout->addLayout(buttonsLayout);
 
-	mSyncBoxToSector = new QCheckBox("Sync Box/Sector", this);
+	mSyncBoxToSector = new QCheckBox("Sync Box to Sector", this);
 	mSyncBoxToSector->setChecked(true);
 	mSyncBoxToSector->setToolTip(""
-		"Synchronize Crop Box and Probe Sector,\n"
-		"changes in one will affect the other if possible");
+		"Synchronize Crop Box to Probe Sector,\n"
+		"changes in the sector will reset the crop box.");
 	connect(mSyncBoxToSector, SIGNAL(toggled(bool)), this, SLOT(syncBoxToSectorChanged()));
 	buttonsLayout->addWidget(mSyncBoxToSector);
 
@@ -317,8 +317,8 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	image.mClipRect_p = mBBWidget->getValue();
 	data.setImage(image);
 
-	if (mSyncBoxToSector->isChecked())
-		data.updateSectorFromClipRect();
+//	if (mSyncBoxToSector->isChecked())
+//		data.updateSectorFromClipRect();
 
 	probe->setData(data);
 
