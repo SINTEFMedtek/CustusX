@@ -283,7 +283,8 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("globalApplicationName", enum2string(ssc::mdLABORATORY));
 	this->fillDefault("globalPatientNumber", 1);
 	this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
-	this->fillDefault("Ultrasound/8bitAcquisitionData", true);
+	this->fillDefault("Ultrasound/8bitAcquisitionData", false);
+	this->fillDefault("Ultrasound/CompressAcquisition", true);
 	this->fillDefault("View3D/sphereRadius", 1.0);
 	this->fillDefault("View3D/labelSize", 2.5);
 	this->fillDefault("View3D/showOrientationAnnotation", true);
