@@ -240,7 +240,7 @@ bool UsReconstructionFileMaker::writeUSTimestamps2(QString reconstructionFolder,
  */
 bool UsReconstructionFileMaker::writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data, QString filename)
 {
-	data->save(filename, false);
+	data->save(filename, settings()->value("Ultrasound/CompressAcquisition", true).toBool());
 	return true;;
 }
 
