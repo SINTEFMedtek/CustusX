@@ -31,6 +31,11 @@
 #include <vtkImageData.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageClip.h>
+#include <vtkImageAppend.h>
+#include <vtkMetaImageWriter.h>
+#include "sscTypeConversions.h"
+
+typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
 namespace ssc
 {
@@ -198,6 +203,32 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
 	return outData;
 }
 
+/**write us images to disk.
+ *
+ * The images are handled as an array of 2D frames, but written into
+ * one 3D image mhd file. Due to memory limitations (one large mem block
+ * causes bit trouble), this is done by writing a single frame, and then
+ * appending the other frames manually, and then hacking the mhd file to
+ * incorporate the correct dimensions.
+ *
+ */
+bool USFrameData::save(QString filename, bool compressed)
+{
+	ssc::messageManager()->sendInfo(QString("USFrameData Prepare write frames").arg(this->getDimensions()[2]));
+	vtkImageDataPtr image = this->getSingleBaseImage();
+
+	ssc::messageManager()->sendInfo(QString("USFrameData Start write %1 frames").arg(this->getDimensions()[2]));
+
+	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
+	writer->SetInput(image);
+	writer->SetFileName(cstring_cast(filename));
+	writer->SetCompression(compressed);
+	writer->Write();
+
+	ssc::messageManager()->sendInfo(QString("USFrameData completed write of %1 frames").arg(this->getDimensions()[2]));
+	return true;;
+}
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -244,6 +275,11 @@ void USFrameDataMonolithic::reinitialize()
 		mFrames[record] = inputPointer + record * recordSize;
 }
 
+vtkImageDataPtr USFrameDataMonolithic::getSingleBaseImage()
+{
+	return mBaseImage->getBaseVtkImageData();
+}
+
 QString USFrameDataMonolithic::getName()
 {
 	return mBaseImage->getName();
@@ -264,7 +300,7 @@ QString USFrameDataMonolithic::getFilePath()
 //---------------------------------------------------------
 
 
-USFrameDataSplitFrames::USFrameDataSplitFrames(std::vector<ImagePtr> inputFrameData, QString filename) :
+USFrameDataSplitFrames::USFrameDataSplitFrames(std::vector<vtkImageDataPtr> inputFrameData, QString filename) :
 	USFrameData()
 {
 	mFilename = filename;
@@ -272,11 +308,30 @@ USFrameDataSplitFrames::USFrameDataSplitFrames(std::vector<ImagePtr> inputFrameD
 //	this->reinitialize();
 }
 
+/** Merge all us frames into one vtkImageData
+ *
+ */
+vtkImageDataPtr USFrameDataSplitFrames::mergeFrames(std::vector<vtkImageDataPtr> input)
+{
+  vtkImageAppendPtr filter = vtkImageAppendPtr::New();
+  filter->SetAppendAxis(2); // append along z-axis
+
+  for (unsigned i=0; i<input.size(); ++i)
+    filter->SetInput(i, input[i]);
+
+  filter->Update();
+  return filter->GetOutput();
+}
+
 //void USFrameDataSplitFrames::crop()
 //{
 //	vtkImageDataPtr out = cropImage(in, mCropBox);
 //}
 
+vtkImageDataPtr USFrameDataSplitFrames::getSingleBaseImage()
+{
+	return this->mergeFrames(mBaseImage);
+}
 
 
 /** reset the internal state of the oobject to that of the initialization,
@@ -295,7 +350,7 @@ void USFrameDataSplitFrames::reinitialize()
 	// apply cropping and angio
 	for (unsigned i=0; i<mProcessedImage.size(); ++i)
 	{
-		vtkImageDataPtr current = mBaseImage[i]->getBaseVtkImageData();
+		vtkImageDataPtr current = mBaseImage[i];
 
 		if (mCropbox.range()[0]!=0)
 			current = this->cropImage(current, mCropbox);
