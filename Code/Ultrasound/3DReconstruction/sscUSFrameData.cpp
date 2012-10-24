@@ -214,10 +214,10 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
  */
 bool USFrameData::save(QString filename, bool compressed)
 {
-	ssc::messageManager()->sendInfo(QString("USFrameData Prepare write frames").arg(this->getDimensions()[2]));
+	ssc::messageManager()->sendInfo(QString("USFrameData prepare write frames"));
 	vtkImageDataPtr image = this->getSingleBaseImage();
 
-	ssc::messageManager()->sendInfo(QString("USFrameData Start write %1 frames").arg(this->getDimensions()[2]));
+//	ssc::messageManager()->sendInfo(QString("USFrameData start write %1 frames").arg(image->GetDimensions()[2]));
 
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
 	writer->SetInput(image);
@@ -225,7 +225,7 @@ bool USFrameData::save(QString filename, bool compressed)
 	writer->SetCompression(compressed);
 	writer->Write();
 
-	ssc::messageManager()->sendInfo(QString("USFrameData completed write of %1 frames").arg(this->getDimensions()[2]));
+	ssc::messageManager()->sendInfo(QString("USFrameData completed write of %1 frames").arg(image->GetDimensions()[2]));
 	return true;;
 }
 

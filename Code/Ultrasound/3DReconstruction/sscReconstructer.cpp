@@ -741,7 +741,7 @@ void Reconstructer::updateFromOriginalFileData()
 	mFileData = mOriginalFileData;
 
 	// uncomment to test cropping of data before reconstructing
-	//this->cropInputData();
+//	this->cropInputData();
 
 	//  mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
 	mFileData.mUsRaw->setAngio(mParams->mAngioAdapter->getValue());
