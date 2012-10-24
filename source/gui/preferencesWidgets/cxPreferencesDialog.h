@@ -220,6 +220,7 @@ protected:
 
   QRadioButton* m24bitRadioButton;
   QRadioButton* m8bitRadioButton;
+  QCheckBox* mCompressCheckBox;
 };
 
 /**
