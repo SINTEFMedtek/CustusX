@@ -57,6 +57,12 @@ public:
   QString getMhdFilename(QString reconstructionFolder);
 
 private:
+  QString write(ssc::USReconstructInputData data);
+  bool writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data);
+  bool writeUSTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
+  bool writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
+  bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
+
   QString findFolderName(QString patientFolder, QString sessionDescription);
   bool findNewSubfolder(QString subfolderAbsolutePath);
   vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
