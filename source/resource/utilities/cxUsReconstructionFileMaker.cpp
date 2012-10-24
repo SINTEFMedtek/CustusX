@@ -109,7 +109,7 @@ QString UsReconstructionFileMaker::write(ssc::USReconstructInputData data)
 	dir.mkpath(reconstructionFolder);
 	dir.cd(reconstructionFolder);
 	mReport << "Made reconstruction folder: " + dir.absolutePath();
-	QString session = mSessionDescription+"_direct";
+	QString session = mSessionDescription;
 
 	this->writeTrackerTimestamps2(reconstructionFolder, session, data.mPositions);
 	this->writeTrackerTransforms2(reconstructionFolder, session, data.mPositions);
