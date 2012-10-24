@@ -59,14 +59,14 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
 	std::vector<vtkImageDataPtr> frames = this->getFrames();
 	if (frames.size() >= 1)
 	{
-		std::vector<ssc::ImagePtr> images;
-		for (unsigned i=0; i<frames.size(); ++i)
-			images.push_back(ssc::ImagePtr(new ssc::Image(retval.mFilename+"_"+qstring_cast(i), frames[i])));
+//		std::vector<ssc::ImagePtr> images;
+//		for (unsigned i=0; i<frames.size(); ++i)
+//			images.push_back(ssc::ImagePtr(new ssc::Image(retval.mFilename+"_"+qstring_cast(i), frames[i])));
 //		vtkImageDataPtr imageData = this->mergeFrames(frames);
 //		ssc::ImagePtr image(new ssc::Image(retval.mFilename, imageData));
 //		image->setFilePath(reconstructionFolder);
 //		retval.mUsRaw.reset(new ssc::USFrameDataMonolithic(image));
-		retval.mUsRaw.reset(new ssc::USFrameDataSplitFrames(images, retval.mFilename));
+		retval.mUsRaw.reset(new ssc::USFrameDataSplitFrames(frames, retval.mFilename));
 	}
 
 	for (ssc::TimedTransformMap::iterator it = mTrackerRecordedData.begin(); it != mTrackerRecordedData.end(); ++it)
@@ -100,8 +100,154 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
 	//	ssc::ImagePtr mMask;///< Clipping mask for the input data
 	//	ssc::ProbeSector mProbeData;
 
+	QStringList path = retval.mFilename.split(".");
+	path[path.size()-2] += "_direct";
+	retval.mFilename = path.join(".");
+	this->write(retval);
+
 	return retval;
 }
+
+QString UsReconstructionFileMaker::write(ssc::USReconstructInputData data)
+{
+	QString reconstructionFolder = QDir(data.mFilename).absolutePath();
+	QDir dir;
+	dir.mkpath(reconstructionFolder);
+	dir.cd(reconstructionFolder);
+	mReport << "Made reconstruction folder: " + dir.absolutePath();
+	QString session = mSessionDescription;
+
+	this->writeTrackerTimestamps2(reconstructionFolder, session, data.mPositions);
+	this->writeTrackerTransforms2(reconstructionFolder, session, data.mPositions);
+	this->writeUSTimestamps2(reconstructionFolder, session, data.mFrames);
+//	QString calibrationFile = this->copyCalibrationFile(reconstructionFolder);
+	this->writeUSImages2(reconstructionFolder, data.mUsRaw);
+	//  this->copyProbeCalibConfigsXml(reconstructionFolder);
+	this->writeProbeConfiguration(reconstructionFolder);
+
+	this->report();
+
+	return reconstructionFolder;
+}
+
+bool UsReconstructionFileMaker::writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+{
+  bool success = false;
+
+  QFile file(reconstructionFolder+"/"+session+".tts");
+  if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    ssc::messageManager()->sendError("Cannot open "+file.fileName());
+    return success;
+  }
+  QTextStream stream(&file);
+
+  for (unsigned i=0; i<ts.size(); ++i)
+  {
+	    stream << qstring_cast(ts[i].mTime);
+	    stream << endl;
+  }
+
+//  ssc::TimedTransformMap::iterator it = mTrackerRecordedData.begin();
+//  for(; it != mTrackerRecordedData.end(); ++it)
+//  {
+//    stream << qstring_cast(it->first);
+//    stream << endl;
+//  }
+  file.close();
+  success = true;
+
+  QFileInfo info(file);
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mTrackerRecordedData.size())+" tracking timestamps.";
+
+  return success;
+}
+
+bool UsReconstructionFileMaker::writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+{
+  bool success = false;
+  QFile file(reconstructionFolder+"/"+session+".tp");
+  if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    ssc::messageManager()->sendError("Cannot open "+file.fileName());
+    return success;
+  }
+  QTextStream stream(&file);
+
+//  ssc::TimedTransformMap::iterator it = mTrackerRecordedData.begin();
+//  for(; it != mTrackerRecordedData.end(); ++it)
+  for (unsigned i=0; i<ts.size(); ++i)
+  {
+//    ssc::Transform3D transform = it->second;
+	    ssc::Transform3D transform = ts[i].mPos;
+    stream << transform(0,0) << " ";
+    stream << transform(0,1) << " ";
+    stream << transform(0,2) << " ";
+    stream << transform(0,3);
+    stream << endl;
+    stream << transform(1,0) << " ";
+    stream << transform(1,1) << " ";
+    stream << transform(1,2) << " ";
+    stream << transform(1,3);
+    stream << endl;
+    stream << transform(2,0) << " ";
+    stream << transform(2,1) << " ";
+    stream << transform(2,2) << " ";
+    stream << transform(2,3);
+    stream << endl;
+  }
+  file.close();
+  success = true;
+
+  QFileInfo info(file);
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mTrackerRecordedData.size())+" tracking transforms.";
+
+  return success;
+}
+
+bool UsReconstructionFileMaker::writeUSTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+{
+  bool success = false;
+
+  QFile file(reconstructionFolder+"/"+session+".fts");
+  if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    ssc::messageManager()->sendError("Cannot open "+file.fileName());
+    return success;
+  }
+  QTextStream stream(&file);
+
+  //ssc::VideoRecorder::DataType::iterator it = mStreamRecordedData.begin();
+  //for(; it != mStreamRecordedData.end(); ++it)
+  for (unsigned i=0; i<ts.size(); ++i)
+  {
+    stream << qstring_cast(ts[i].mTime);
+    stream << endl;
+  }
+  file.close();
+  success = true;
+
+  QFileInfo info(file);
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mStreamRecordedData.size())+" frame timestamps.";
+
+  return success;
+}
+
+/**write us images to disk.
+ *
+ * The images are handled as an array of 2D frames, but written into
+ * one 3D image mhd file. Due to memory limitations (one large mem block
+ * causes bit trouble), this is done by writing a single frame, and then
+ * appending the other frames manually, and then hacking the mhd file to
+ * incorporate the correct dimensions.
+ *
+ */
+bool UsReconstructionFileMaker::writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data)
+{
+	data->save(data->getFilePath(), false);
+	return true;;
+}
+
 
 QString UsReconstructionFileMaker::write()
 {
@@ -390,7 +536,6 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 //  writer = NULL; // ensure file is closed (might not be necessary)
 	ssc::messageManager()->sendInfo(QString("completed write of %1 frames").arg( frames.size() ));
   return true;;
-
 }
 
 QString UsReconstructionFileMaker::copyCalibrationFile(QString reconstructionFolder)
