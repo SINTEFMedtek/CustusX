@@ -209,9 +209,9 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 
 	IGTLinkImageMessage::Pointer retval = IGTLinkImageMessage::New();
 
-	int* size = mGEStreamer.VolumeDimensions; // May be 3 dimensions
+//	int* size = mGEStreamer.VolumeDimensions; // May be 3 dimensions
+	int* size = mImgStream->GetDimensions(); // May be 3 dimensions
 	int offset[] = { 0, 0, 0 };
-
 
 	int scalarType = -1;
 	if(mImgStream->GetNumberOfScalarComponents() == 3 || mImgStream->GetNumberOfScalarComponents() == 4)
@@ -258,6 +258,8 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 
 	retval->SetOrigin(mImgStream->GetOrigin()[0], mImgStream->GetOrigin()[1], mImgStream->GetOrigin()[2]);
 	retval->SetSpacing(mImgStream->GetSpacing()[0], mImgStream->GetSpacing()[1], mImgStream->GetSpacing()[2]); // May be 3 dimensions
+
+	//std::cout << "spacing: " << mImgStream->GetSpacing()[0] << " " << mImgStream->GetSpacing()[1] << " " << mImgStream->GetSpacing()[2] << std::endl;
 
 	//Set image data
 	int fsize = retval->GetImageSize();
