@@ -93,39 +93,35 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
 	vtkImageDataPtr mask = retval.mProbeData.getMask();
 	retval.mMask = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
 
-	//	QString mFilename; ///< filename used for current data read
-	//	ssc::USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
-	//	std::vector<ssc::TimedPosition> mFrames;
-	//	std::vector<ssc::TimedPosition> mPositions;
-	//	ssc::ImagePtr mMask;///< Clipping mask for the input data
-	//	ssc::ProbeSector mProbeData;
-
-	QStringList path = retval.mFilename.split(".");
-	path[path.size()-2] += "_direct";
-	retval.mFilename = path.join(".");
-	this->write(retval);
+	//test
+//	QStringList path = retval.mFilename.split(".");
+//	path[path.size()-2] += "_direct";
+//	retval.mFilename = path.join(".");
+//	this->write(retval);
 
 	return retval;
 }
 
 QString UsReconstructionFileMaker::write(ssc::USReconstructInputData data)
 {
-	QString reconstructionFolder = QDir(data.mFilename).absolutePath();
+	QString reconstructionFolder = QFileInfo(data.mFilename).absolutePath();
 	QDir dir;
 	dir.mkpath(reconstructionFolder);
 	dir.cd(reconstructionFolder);
 	mReport << "Made reconstruction folder: " + dir.absolutePath();
-	QString session = mSessionDescription;
+	QString session = mSessionDescription+"_direct";
 
 	this->writeTrackerTimestamps2(reconstructionFolder, session, data.mPositions);
 	this->writeTrackerTransforms2(reconstructionFolder, session, data.mPositions);
 	this->writeUSTimestamps2(reconstructionFolder, session, data.mFrames);
 //	QString calibrationFile = this->copyCalibrationFile(reconstructionFolder);
-	this->writeUSImages2(reconstructionFolder, data.mUsRaw);
+	this->writeUSImages2(reconstructionFolder, data.mUsRaw, data.mFilename);
 	//  this->copyProbeCalibConfigsXml(reconstructionFolder);
-	this->writeProbeConfiguration(reconstructionFolder);
+//	this->writeProbeConfiguration(reconstructionFolder);
+	this->writeProbeConfiguration2(reconstructionFolder, session, data.mProbeData.mData);
 
 	this->report();
+	mReport.clear();
 
 	return reconstructionFolder;
 }
@@ -242,34 +238,50 @@ bool UsReconstructionFileMaker::writeUSTimestamps2(QString reconstructionFolder,
  * incorporate the correct dimensions.
  *
  */
-bool UsReconstructionFileMaker::writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data)
+bool UsReconstructionFileMaker::writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data, QString filename)
 {
-	data->save(data->getFilePath(), false);
+	data->save(filename, false);
 	return true;;
 }
 
+/**
+ * Write probe configuration to file. This works even for configs not saved to the ProbeCalibConfigs.xml file.
+ */
+void UsReconstructionFileMaker::writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data)
+{
+	ssc::XmlOptionFile file = ssc::XmlOptionFile(reconstructionFolder + "/" + session + ".probedata.xml", "navnet");
+	data.addXml(file.getElement("configuration"));
+//	file.getElement("tool").toElement().setAttribute("toolID", mTool->getName());
+//	file.getElement("tool").toElement().setAttribute("configurationID", mTool->getProbe()->getConfigurationPath());
+	file.save();
+}
 
 QString UsReconstructionFileMaker::write()
 {
-//  QString reconstructionFolder = this->makeFolder(mActivepatientPath, mSessionDescription);
-  QString reconstructionFolder = this->findFolderName(mActivepatientPath, mSessionDescription);
-  QDir dir;
-  dir.mkpath(reconstructionFolder);
-  dir.cd(reconstructionFolder);
-  mReport << "Made reconstruction folder: "+dir.absolutePath();
+	this->write(this->getReconstructData());
 
-
-  this->writeTrackerTimestamps(reconstructionFolder);
-  this->writeTrackerTransforms(reconstructionFolder);
-  this->writeUSTimestamps(reconstructionFolder);
-  QString calibrationFile = this->copyCalibrationFile(reconstructionFolder);
-  this->writeUSImages(reconstructionFolder, calibrationFile);
-//  this->copyProbeCalibConfigsXml(reconstructionFolder);
-  this->writeProbeConfiguration(reconstructionFolder);
-
-  this->report();
-
-  return reconstructionFolder;
+	  QString reconstructionFolder = this->findFolderName(mActivepatientPath, mSessionDescription);
+	  return reconstructionFolder;
+//
+////  QString reconstructionFolder = this->makeFolder(mActivepatientPath, mSessionDescription);
+//  QString reconstructionFolder = this->findFolderName(mActivepatientPath, mSessionDescription);
+//  QDir dir;
+//  dir.mkpath(reconstructionFolder);
+//  dir.cd(reconstructionFolder);
+//  mReport << "Made reconstruction folder: "+dir.absolutePath();
+//
+//
+//  this->writeTrackerTimestamps(reconstructionFolder);
+//  this->writeTrackerTransforms(reconstructionFolder);
+//  this->writeUSTimestamps(reconstructionFolder);
+//  QString calibrationFile = this->copyCalibrationFile(reconstructionFolder);
+//  this->writeUSImages(reconstructionFolder, calibrationFile);
+////  this->copyProbeCalibConfigsXml(reconstructionFolder);
+//  this->writeProbeConfiguration(reconstructionFolder);
+//
+//  this->report();
+//
+//  return reconstructionFolder;
 }
 
 QString UsReconstructionFileMaker::getMhdFilename(QString reconstructionFolder)

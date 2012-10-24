@@ -876,7 +876,7 @@
             <Name>EC9-5</Name>
             <Type>CurvedLinearArray</Type>
             <DefaultRTSource>DVI</DefaultRTSource>
-            <Notes></Notes>
+            <Notes/>
             <RTSource>
                 <Name>DVI</Name>
                 <TemporalCalibration>105</TemporalCalibration>
@@ -1410,6 +1410,25 @@
                     <PixelSize>
                         <Width>0.113122171945701</Width>
                         <Height>0.113122171945701</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>clipped4cm</ID>
+                    <Name>clipped 4cm</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>452</Col>
+                        <Row>68</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>157</Left>
+                        <Right>747</Right>
+                        <Top>191</Top>
+                        <Bottom>598</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.064102417766216002</Width>
+                        <Height>0.064102417766216002</Height>
                     </PixelSize>
                 </Config>
             </RTSource>

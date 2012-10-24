@@ -58,10 +58,11 @@ public:
 
 private:
   QString write(ssc::USReconstructInputData data);
-  bool writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data);
+  bool writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data, QString filename);
   bool writeUSTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
   bool writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
   bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
+  void writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data);
 
   QString findFolderName(QString patientFolder, QString sessionDescription);
   bool findNewSubfolder(QString subfolderAbsolutePath);
