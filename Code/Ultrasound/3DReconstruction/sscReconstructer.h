@@ -143,6 +143,7 @@ private:
 	ssc::Transform3D applyOutputOrientation();
 	void findExtentAndOutputTransform();
 	void transformPositionsTo_prMu();
+	void cropInputData();
 
 	void alignTimeSeries();
 	void applyTimeCalibration();

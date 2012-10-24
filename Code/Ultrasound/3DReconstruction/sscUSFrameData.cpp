@@ -30,11 +30,12 @@
 #include "sscMessageManager.h"
 #include <vtkImageData.h>
 #include <vtkImageLuminance.h>
+#include <vtkImageClip.h>
 
 namespace ssc
 {
 USFrameData::USFrameData() :
-	mUseAngio(false)
+	mUseAngio(false), mCropbox(0,0,0,0,0,0), mDirty(true)
 {
 //	mBaseImage = inputFrameData;
 
@@ -88,26 +89,68 @@ Vector3D USFrameData::getSpacing()
 //}
 void USFrameData::setAngio(bool angio)
 {
+	if (angio==mUseAngio)
+		mDirty = true;
+
 	mUseAngio = angio;
 }
 
-vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
+void USFrameData::setCropBox(IntBoundingBox3D cropbox)
+{
+	// ensure clip never happens in z dir.
+	cropbox[4] = -100000;
+	cropbox[5] =  100000;
+
+	if (cropbox==mCropbox)
+		mDirty = true;
+
+	mCropbox = cropbox;
+}
+
+/** Return an image that is cropped using its own croppingBox.
+ *  The image is not added to the data manager nor saved.
+ */
+vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox)
+{
+  vtkImageClipPtr clip = vtkImageClipPtr::New();
+  clip->SetInput(input);
+  clip->SetOutputWholeExtent(cropbox.begin());
+  clip->ClipDataOn();
+  vtkImageDataPtr rawResult = clip->GetOutput();
+
+  rawResult->Update();
+  rawResult->UpdateInformation();
+  rawResult->ComputeBounds();
+  return rawResult;
+}
+
+vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input)
+{
+	vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+	luminance->SetInput(input);
+	vtkImageDataPtr outData = luminance->GetOutput();
+	outData->Update();
+	return outData;
+}
+
+vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
 {
 	// Some of the code here is borrowed from the vtk examples:
 	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
 
-	vtkImageDataPtr inData = inputFrameData->getBaseVtkImageData();
+//	vtkImageDataPtr inData = inputFrameData->getBaseVtkImageData();
 
 	if (inData->GetNumberOfScalarComponents() < 3)
 	{
 		ssc::messageManager()->sendWarning("Angio requested for grayscale ultrasound");
-		return inputFrameData->getGrayScaleBaseVtkImageData();
+		return this->toGrayscale(inData);
 	}
 
-	vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-	luminance->SetInput(inputFrameData->getBaseVtkImageData());
-	vtkImageDataPtr outData = luminance->GetOutput();
-	outData->Update();
+//	vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+//	luminance->SetInput(inputFrameData->getBaseVtkImageData());
+//	vtkImageDataPtr outData = luminance->GetOutput();
+//	outData->Update();
+	vtkImageDataPtr outData = this->toGrayscale(inData);
 
 	int* outExt = outData->GetExtent();
 
@@ -173,14 +216,20 @@ USFrameDataMonolithic::USFrameDataMonolithic(ImagePtr inputFrameData) :
  */
 void USFrameDataMonolithic::reinitialize()
 {
+	if (!mDirty)
+		return;
+	mDirty = false;
+
+	vtkImageDataPtr current = mBaseImage->getBaseVtkImageData();
+
+	if (mCropbox.range()[0]!=0)
+		current = this->cropImage(current, mCropbox);
+
 	if (mUseAngio)
-	{
-		mProcessedImage = this->useAngio(mBaseImage);
-	}
+		current = this->useAngio(current);
 	else
-	{
-		mProcessedImage = mBaseImage->getGrayScaleBaseVtkImageData(); // remove color, if any
-	}
+		current = this->toGrayscale(current); // remove color, if any
+	mProcessedImage = current;
 
 	mDimensions = mProcessedImage->GetDimensions();
 	mSpacing = Vector3D(mProcessedImage->GetSpacing());
@@ -220,27 +269,43 @@ USFrameDataSplitFrames::USFrameDataSplitFrames(std::vector<ImagePtr> inputFrameD
 {
 	mFilename = filename;
 	mBaseImage = inputFrameData;
-	this->reinitialize();
+//	this->reinitialize();
 }
+
+//void USFrameDataSplitFrames::crop()
+//{
+//	vtkImageDataPtr out = cropImage(in, mCropBox);
+//}
+
+
 
 /** reset the internal state of the oobject to that of the initialization,
  * i.e. no removed frames.
  */
 void USFrameDataSplitFrames::reinitialize()
 {
+	if (!mDirty)
+		return;
+	mDirty = false;
+
 	mProcessedImage.clear();
 
 	mProcessedImage.resize(mBaseImage.size());
+
+	// apply cropping and angio
 	for (unsigned i=0; i<mProcessedImage.size(); ++i)
 	{
+		vtkImageDataPtr current = mBaseImage[i]->getBaseVtkImageData();
+
+		if (mCropbox.range()[0]!=0)
+			current = this->cropImage(current, mCropbox);
+
 		if (mUseAngio)
-		{
-			mProcessedImage[i] = this->useAngio(mBaseImage[i]);
-		}
+			current = this->useAngio(current);
 		else
-		{
-			mProcessedImage[i] = mBaseImage[i]->getGrayScaleBaseVtkImageData();
-		}
+			current = this->toGrayscale(current);
+
+		mProcessedImage[i] = current;
 	}
 
 	mDimensions = mProcessedImage[0]->GetDimensions();

@@ -699,6 +699,35 @@ void Reconstructer::setInputData(ssc::USReconstructInputData fileData)
 	emit inputDataSelected(fileData.mFilename);
 }
 
+/**Crop the input data with the image cliprect.
+ * Update probe sector info accordingly
+ */
+void Reconstructer::cropInputData()
+{
+	//IntBoundingBox3D
+	ProbeData sector = mFileData.mProbeData.mData;
+	ProbeData::ProbeImageData imageSector = sector.getImage();
+	IntBoundingBox3D cropbox(imageSector.mClipRect_p.begin());
+	Eigen::Vector3i shift = cropbox.corner(0,0,0).cast<int>();
+	Eigen::Vector3i size = cropbox.range().cast<int>();
+	mFileData.mUsRaw->setCropBox(cropbox);
+
+
+	for (unsigned i=0; i<3; ++i)
+	{
+		imageSector.mClipRect_p[2*i] -= shift[i];
+		imageSector.mClipRect_p[2*i+1] -= shift[i];
+		imageSector.mOrigin_p[i] -= shift[i];
+	}
+	imageSector.mSize.setWidth(size[0]);
+	imageSector.mSize.setHeight(size[1]);
+	sector.setImage(imageSector);
+	mFileData.mProbeData.setData(sector);
+
+	vtkImageDataPtr mask = mFileData.mProbeData.getMask();
+	mFileData.mMask = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
+}
+
 /**Use the mOriginalFileData structure to rebuild all internal data.
  * Useful when settings have changed or data is loaded.
  */
@@ -710,6 +739,10 @@ void Reconstructer::updateFromOriginalFileData()
 		return;
 
 	mFileData = mOriginalFileData;
+
+	// uncomment to test cropping of data before reconstructing
+	//this->cropInputData();
+
 	//  mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
 	mFileData.mUsRaw->setAngio(mParams->mAngioAdapter->getValue());
 	mFileData.mUsRaw->reinitialize();
