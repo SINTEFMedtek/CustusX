@@ -90,7 +90,7 @@ IGTLinkImageMessage::Pointer IGTLinkClientBase::getLastImageMessage()
 
 	static int mQueueSizeOnLastGet = 0;
 	int queueSize = mMutexedImageMessageQueue.size();
-	if (( queueSize > mQueueSizeOnLastGet )&&( queueSize > 3 )) // should not happen. Symptom of congestion.
+	if (( queueSize > mQueueSizeOnLastGet )&&( queueSize > 9 )) // should not happen. Symptom of congestion.
 		ssc::messageManager()->sendInfo(QString("%1 remaining video frames in queue.").arg(queueSize));
 	mQueueSizeOnLastGet = queueSize;
 	return retval;
