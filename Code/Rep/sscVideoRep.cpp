@@ -484,8 +484,8 @@ void VideoFixedPlaneRep::setTool(ToolPtr tool)
 
 void VideoFixedPlaneRep::setRealtimeStream(VideoSourcePtr data)
 {
-	mRTGraphics->setRealtimeStream(data);
 	mData = data;
+	mRTGraphics->setRealtimeStream(data);
 }
 
 void VideoFixedPlaneRep::newDataSlot()
