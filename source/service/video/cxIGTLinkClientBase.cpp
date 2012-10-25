@@ -55,6 +55,7 @@ void IGTLinkClientBase::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
 
 //	std::cout << "Queue size: " << mMutexedImageMessageQueue.size()  ;//<< std::endl;
 //	std::cout << "\t diff: " << timestamp_dt.msecsTo(QDateTime::currentDateTime()) << std::endl;
+//	std::cout << "\t image time: " << timestamp_dt.toString("ss.zzz").toStdString() << std::endl;
 
 	QMutexLocker sentry(&mImageMutex);
 	mMutexedImageMessageQueue.push_back(imgMsg);

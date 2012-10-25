@@ -88,6 +88,10 @@ void ImageSenderGE::deinitialize_local()
 {
 	//Set mImgStream as an empty pointer
 	mImgStream = vtkSmartPointer<vtkImageData>();
+
+	//Clear frame geometry
+	data_streaming::beamspace_geometry emptyGeometry;
+	mFrameGeometry = emptyGeometry;
 }
 
 bool ImageSenderGE::initialize_local()
@@ -149,6 +153,7 @@ void ImageSenderGE::grab()
 		// Frame geometry have changed. Update even of we get no image
 		mFrameGeometry = mGEStreamer.GetCurrentFrameGeometry();
 		mFrameGeometryChanged = true;
+		//std::cout << "Get new GE frame geometry" << std::endl;
 	}
 	else
 		mFrameGeometryChanged = false;
