@@ -36,6 +36,9 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 
 if(APPLE)
 	add_definitions(-D__APPLE__)
+	# get rid of very annoying deprecated warnings in VTK 5.8. Remove when VTK if fixed...
+	SET(CMAKE_CPP_FLAGS "${CMAKE_CPP_FLAGS} -Wno-deprecated")
+	message(STATUS "setting flag " ${CMAKE_CPP_FLAGS})
 endif(APPLE)
 
 #------------------------------------------------------------------------------
