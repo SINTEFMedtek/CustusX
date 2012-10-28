@@ -135,6 +135,8 @@ public:
 	/** Debug output */
 	virtual void printSelf(std::ostream &os, Indent indent);
 
+	virtual Transform3D get_rMd() const;
+
 protected:
 	FiberBundle(const QString& uid, const QString& name = "");
 
