@@ -176,11 +176,13 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
 	//The following may give some values if in and out have different extent???
 	inData->GetContinuousIncrements(outExt, inIncX, inIncY, inIncZ); //Don't work?
 	outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ); //Don't work?
-	std::cout << "outExt: " << outExt[0] << " " << outExt[1] << " " << outExt[2] << " " << outExt[3] << " "
-		<< outExt[4] << " " << outExt[5] << endl;
+//	std::cout << "outExt: " << outExt[0] << " " << outExt[1] << " " << outExt[2] << " " << outExt[3] << " "
+//		<< outExt[4] << " " << outExt[5] << endl;
 
 	// Loop through output pixels
 	int idxZ, idxY, idxR;
+
+//	QDateTime start = QDateTime::currentDateTime();
 
 	for (idxZ = 0; idxZ <= maxZ; idxZ++)
 	{
@@ -193,17 +195,18 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
 				if (((*inPtr) == (*(inPtr + 1))) && ((*inPtr) == (*(inPtr + 2))))
 				{
 					(*outPtr) = 0;
-					(*(outPtr + 1)) = 0;
-					(*(outPtr + 2)) = 0;
+//					(*(outPtr + 1)) = 0;
+//					(*(outPtr + 2)) = 0;
 				}
-				else
-				{
-				}//Assume the outVolume is treated with the luminance filter first
+//				else
+//				{
+//				}//Assume the outVolume is treated with the luminance filter first
 				outPtr++;
 				inPtr += 3;
 			}
 		}
 	}
+//	std::cout << "loop: " << start.msecsTo(QDateTime::currentDateTime()) << "ms" << std::endl;
 	return outData;
 }
 
@@ -243,7 +246,9 @@ USFrameDataMonolithic::USFrameDataMonolithic(ImagePtr inputFrameData) :
 	USFrameData()
 {
 	mBaseImage = inputFrameData;
+//	QDateTime start = QDateTime::currentDateTime();
 	this->reinitialize();
+//	std::cout << "reinit mon cons: " << start.msecsTo(QDateTime::currentDateTime()) << "ms" << std::endl;
 }
 
 /** reset the internal state of the oobject to that of the initialization,
@@ -320,7 +325,10 @@ USFrameDataSplitFrames::USFrameDataSplitFrames(std::vector<vtkImageDataPtr> inpu
 {
 	mFilename = filename;
 	mBaseImage = inputFrameData;
-//	this->reinitialize();
+
+//	QDateTime start = QDateTime::currentDateTime();
+	this->reinitialize();
+//	std::cout << "reinit split cons: " << start.msecsTo(QDateTime::currentDateTime()) << "ms" << std::endl;
 }
 
 /** Merge all us frames into one vtkImageData
