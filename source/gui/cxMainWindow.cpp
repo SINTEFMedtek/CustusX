@@ -656,7 +656,10 @@ void MainWindow::updateWindowTitle()
 	QString versionName = stateService()->getVersionName();
 
 	QString activePatientFolder = patientService()->getPatientData()->getActivePatientFolder();
+	if (activePatientFolder.endsWith('/'))
+		activePatientFolder.chop(1);
 	QString patientName;
+
 	if (!activePatientFolder.isEmpty())
 	{
 		QFileInfo info(activePatientFolder);
