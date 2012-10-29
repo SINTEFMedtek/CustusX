@@ -26,9 +26,13 @@
 #include "sscView.h"
 #include "cxOpenIGTLinkRTSource.h"
 #include "cxRenderTimer.h"
+#include "sscStringDataAdapterXml.h"
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
+
 /**
 * \file
 * \addtogroup cxServiceVideo
@@ -50,25 +54,29 @@ public:
 	VideoConnection();
 	virtual ~VideoConnection();
 
-	void setLocalServerCommandLine(QString commandline);
-	QString getLocalServerCommandLine();
+	ssc::StringDataAdapterXmlPtr getConnectionMethod() { return mConnectionMethod; }
+
+	void setLocalServerArguments(QString commandline);
+	QString getLocalServerArguments();
+
+	void setLocalServerExecutable(QString commandline);
+	QString getLocalServerExecutable();
 	void setPort(int port);
 	int getPort();
 	QStringList getHostHistory();
 	QString getHost();
 	void setHost(QString host);
 
-	void setUseLocalServer(bool use);
-	bool getUseLocalServer();
+	bool getUseLocalServer2();
+	bool getUseDirectLink2();
+
+	void setInitScript(QString filename);
+	QString getInitScript();
 
 	void launchServer();
-
 	void launchAndConnectServer();
 
-	QProcess* getProcess()
-	{
-		return mServer;
-	}
+	QProcess* getProcess();
 	OpenIGTLinkRTSourcePtr getVideoSource()
 	{
 		return mRTSource;
@@ -77,22 +85,29 @@ public:
 signals:
 	void fps(int fps);
 	void connected(bool on);
+	void settingsChanged();
 
 public slots:
 	void connectServer();
-	void serverProcessReadyRead();
+//	void serverProcessReadyRead();
 
-private slots:
+//private slots:
 	void serverProcessStateChanged(QProcess::ProcessState newState);
-	void serverProcessError(QProcess::ProcessError error);
+//	void serverProcessError(QProcess::ProcessError error);
 
 private:
 	void delayedAutoConnectServer();
 
-	double mSoundSpeedCompensationFactor;
+//	double mSoundSpeedCompensationFactor;
 	OpenIGTLinkRTSourcePtr mRTSource;
-	QProcess* mServer;
+//	QProcess* mServer;
 	int mConnectWhenLocalServerRunning;
+	ProcessWrapperPtr mProcess;
+	ProcessWrapperPtr mIniScript;
+
+	ssc::StringDataAdapterXmlPtr mConnectionMethod;
+	ssc::XmlOptionFile mOptions;
+
 };
 typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 

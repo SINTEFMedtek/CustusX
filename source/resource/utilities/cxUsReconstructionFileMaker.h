@@ -8,6 +8,7 @@
 #include "boost/shared_ptr.hpp"
 #include "sscVideoRecorder.h"
 #include "sscTool.h"
+#include "sscUSFrameData.h"
 
 class QDir;
 
@@ -21,6 +22,17 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 * @{
 */
 
+//struct USReconstructInputData
+//{
+//	QString mFilename; ///< filename used for current data read
+//
+//	ssc::USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
+//	std::vector<ssc::TimedPosition> mFrames;
+//	std::vector<ssc::TimedPosition> mPositions;
+//	ssc::ImagePtr mMask;///< Clipping mask for the input data
+//	ssc::ProbeSector mProbeData;
+//};
+
 /**\brief Handles writing files in the format the us reconstruction
  * algorithm wants them.
  *
@@ -29,7 +41,6 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
  * \date Dec 17, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-
 class UsReconstructionFileMaker
 {
 public:
@@ -41,32 +52,50 @@ public:
   		bool writeColor = false);
   ~UsReconstructionFileMaker();
 
+  ssc::USReconstructInputData getReconstructData();
   QString write();
   QString getMhdFilename(QString reconstructionFolder);
 
 private:
-  QString makeFolder(QString patientFolder, QString sessionDescription);
-  bool createSubfolder(QString subfolderAbsolutePath);
-  vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
-  std::vector<vtkImageDataPtr> getFrames();
+  QString write(ssc::USReconstructInputData data);
+  bool writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data, QString filename);
+  bool writeUSTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
+  bool writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
+  bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
+  void writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data);
 
-  bool writeTrackerTimestamps(QString reconstructionFolder);
-  bool writeTrackerTransforms(QString reconstructionFolder);
-  bool writeUSTimestamps(QString reconstructionFolder);
-  bool writeUSImages(QString reconstructionFolder, QString calibrationFile);
-  QString copyCalibrationFile(QString reconstructionFolder);
-  void copyProbeCalibConfigsXml(QString reconstructionFolder);
-  void writeProbeConfiguration(QString reconstructionFolder);
+  QString findFolderName(QString patientFolder, QString sessionDescription);
+  bool findNewSubfolder(QString subfolderAbsolutePath);
+  vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
+  std::vector<vtkImageDataPtr> getFrames(ssc::VideoRecorder::DataType streamRecordedData, bool writeColor);
+
+//  bool writeTrackerTimestamps(QString reconstructionFolder);
+//  bool writeTrackerTransforms(QString reconstructionFolder);
+//  bool writeUSTimestamps(QString reconstructionFolder);
+//  bool writeUSImages(QString reconstructionFolder, QString calibrationFile);
+//  QString copyCalibrationFile(QString reconstructionFolder);
+//  void copyProbeCalibConfigsXml(QString reconstructionFolder);
+//  void writeProbeConfiguration(QString reconstructionFolder);
 
   void report();
 
-  ssc::TimedTransformMap mTrackerRecordedData;
-  ssc::VideoRecorder::DataType mStreamRecordedData;
+  ssc::USReconstructInputData mReconstructData;
+
+  ssc::USReconstructInputData getReconstructData(ssc::TimedTransformMap trackerRecordedData,
+  		ssc::VideoRecorder::DataType streamRecordedData,
+  		QString sessionDescription,
+  		QString activepatientPath,
+  		ssc::ToolPtr tool,
+  		QString calibFilename,
+  		bool writeColor);
+
+//  ssc::TimedTransformMap mTrackerRecordedData;
+//  ssc::VideoRecorder::DataType mStreamRecordedData;
   QString mSessionDescription;
   QString mActivepatientPath;
-  ssc::ToolPtr mTool;
-  QString mCalibFilename;
-  bool mWriteColor;///< If set to true, colors will be saved even if settings is set to 8 bit
+//  ssc::ToolPtr mTool;
+//  QString mCalibFilename;
+//  bool mWriteColor;///< If set to true, colors will be saved even if settings is set to 8 bit
 
   QStringList mReport;
 };

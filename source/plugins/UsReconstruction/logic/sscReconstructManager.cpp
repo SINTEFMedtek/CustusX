@@ -62,6 +62,13 @@ ReconstructManager::ReconstructManager(XmlOptionFile settings, QString shaderPat
 //	mAlignTimestamps = mAlignTimestamps; ///align track and frame timestamps to each other automatically
 //	mTimeCalibration = mTimeCalibration; ///set a offset in the frame timestamps
 //	mAngioAdapter = mAngioAdapter; ///US angio data is used as input
+
+	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mReconstructer));
+	//    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(mPluginData->getReconstructer()));
+//	mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
+//	connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+//	mThreadedTimedReconstructer->start();
+//	mRecordSessionWidget->startPostProcessing("Reconstructing");
 }
 
 ReconstructManager::~ReconstructManager()
@@ -150,6 +157,16 @@ void ReconstructManager::selectData(QString filename, QString calFilesPath)
 	mReconstructer->setInputData(mOriginalFileData);
 }
 
+void ReconstructManager::selectData(ssc::USReconstructInputData data)
+{
+	this->clearAll();
+
+	mOriginalFileData = data;
+	mCalFilesPath = "";
+
+	mReconstructer->setInputData(mOriginalFileData);
+}
+
 /**Read from file into mOriginalFileData.
  * These data are not changed before clearAll() or this method is called again.
  */
@@ -158,8 +175,7 @@ void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 	mOriginalFileData.mFilename = fileName;
 	mCalFilesPath = calFilesPath;
 
-	ssc::USReconstructInputData temp = mFileReader->readAllFiles(fileName, calFilesPath,
-		this->getParams()->mAngioAdapter->getValue());
+	ssc::USReconstructInputData temp = mFileReader->readAllFiles(fileName, calFilesPath);
 	if (!temp.mUsRaw)
 		return;
 
@@ -173,7 +189,7 @@ void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 //---------------------------------------------------------
 
 
-ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructManagerPtr reconstructer) :
+ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructerPtr reconstructer) :
 	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
 {
 	mReconstructer = reconstructer;
@@ -185,18 +201,18 @@ ThreadedTimedReconstructer::~ThreadedTimedReconstructer()
 
 void ThreadedTimedReconstructer::start()
 {
-	mReconstructer->getReconstructer()->threadedPreReconstruct();
+	mReconstructer->threadedPreReconstruct();
 	this->generate();
 }
 
 void ThreadedTimedReconstructer::postProcessingSlot()
 {
-	mReconstructer->getReconstructer()->threadedPostReconstruct();
+	mReconstructer->threadedPostReconstruct();
 }
 
 void ThreadedTimedReconstructer::calculate()
 {
-	mReconstructer->getReconstructer()->threadedReconstruct();
+	mReconstructer->threadedReconstruct();
 }
 
 

@@ -8,11 +8,11 @@ if (CX_WINDOWS)
     add_definitions(-D_USE_MATH_DEFINES)
 endif(CX_WINDOWS)
 
-if (APPLE OR CX_WINDOWS)
-    set(QXT_FOLDER "../ThirdParty/qxt_mac_compatible")
-else()
+#if (APPLE)
+#    set(QXT_FOLDER "../ThirdParty/qxt_mac_compatible")
+#else()
     set(QXT_FOLDER "../ThirdParty/qxt")
-endif()
+#endif()
 
 # Make VERSION_NUMBER available for c++ files in gui folder
 ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
@@ -109,6 +109,8 @@ include_directories(
     .
     ${SSC_SOURCE_DIR}/DICOMLib/
     ${SSC_BINARY_DIR}/DICOMLib/
+
+    ${CustusX3_SOURCE_DIR}/modules/OpenIGTLinkServer
 
     ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/resource/settings

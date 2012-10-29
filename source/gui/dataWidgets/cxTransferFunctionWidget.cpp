@@ -421,8 +421,8 @@ void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetNa
 void TransferFunctionPresetWidget::resetSlot()
 {
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-  activeImage->resetTransferFunctions(this->use2D(), this->use3D());
   mPresetsComboBox->setCurrentIndex(0);
+  activeImage->resetTransferFunctions(this->use2D(), this->use3D());
 }
 
 void TransferFunctionPresetWidget::saveSlot()

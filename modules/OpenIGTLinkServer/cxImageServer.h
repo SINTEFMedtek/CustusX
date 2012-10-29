@@ -23,19 +23,17 @@ Q_OBJECT
 public:
 	ImageServer(QObject* parent = NULL);
 	virtual ~ImageServer();
-	void startListen(int port);
-	void printHelpText();
-	void initialize();
+	bool startListen(int port);
+	static void printHelpText();
+	static QString getArgumentHelpText(QString applicationName);
+	bool initialize();
 protected:
 	void incomingConnection(int socketDescriptor);
 private slots:
 	void socketDisconnectedSlot();
-	void tick();
 private:
 	ImageSenderPtr mImageSender;
-
 	QPointer<QTcpSocket> mSocket;
-	QTimer* mTimer;
 };
 
 } // namespace cx

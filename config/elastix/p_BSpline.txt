@@ -24,7 +24,7 @@
 // In some cases, the direction cosines of the image are corrupt,
 // due to image format conversions for example. In that case, you 
 // may want to set this option to "false".
-(UseDirectionCosines "false")
+(UseDirectionCosines "true")
 
 // **************** Main Components **************************
 

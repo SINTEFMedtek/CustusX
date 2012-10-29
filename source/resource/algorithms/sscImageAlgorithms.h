@@ -17,6 +17,7 @@
 #include "sscTime.h"
 #include "sscTypeConversions.h"
 #include "vtkForwardDeclarations.h"
+#include "sscBoundingBox3D.h"
 
 namespace ssc
 {
@@ -34,6 +35,7 @@ namespace ssc
 
 ImagePtr resampleImage(ImagePtr image, const Vector3D spacing, QString uid="", QString name="");
 ImagePtr resampleImage(ImagePtr image, Transform3D refMi);
+vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
 ImagePtr cropImage(ImagePtr image);
 ImagePtr duplicateImage(ImagePtr image);
 vtkImageDataPtr convertImageToUnsigned(ImagePtr image);

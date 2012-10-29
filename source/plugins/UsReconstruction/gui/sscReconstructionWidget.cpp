@@ -17,8 +17,12 @@ namespace cx
 ReconstructionWidget::ReconstructionWidget(QWidget* parent, ssc::ReconstructManagerPtr reconstructer) :
 	BaseWidget(parent, "", "US Reconstruction"), mReconstructer(reconstructer)
 {
-	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mReconstructer));
-	connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+//	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mReconstructer->getReconstructer()));
+//	connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+
+	ssc::ThreadedTimedReconstructerPtr threadedReconstructer = mReconstructer->getThreadedTimedReconstructer();
+	connect(threadedReconstructer.get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
+	connect(threadedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
 
 	connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
 	connect(mReconstructer.get(), SIGNAL(inputDataSelected(QString)), this, SLOT(inputDataSelected(QString)));
@@ -44,7 +48,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ssc::ReconstructMana
 	connect(mReconstructButton, SIGNAL(clicked()), this, SLOT(reconstruct()));
 
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
-	mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
+	mTimedAlgorithmProgressBar->attach(threadedReconstructer);
 
 	QGridLayout* sizesLayout = new QGridLayout;
 	mMaxVolSizeWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterMaxUSVolumeSize(mReconstructer)));
@@ -182,18 +186,23 @@ QString ReconstructionWidget::getCurrentPath()
 
 void ReconstructionWidget::reconstruct()
 {
-	ssc::messageManager()->sendInfo("Reconstructing...");
-	qApp->processEvents();
-
-//	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mReconstructer));
-//	connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-	mThreadedTimedReconstructer->start();
-	mReconstructButton->setEnabled(false);
-//	std::cout << "================reconstruct started" << std::endl;
-
-//	mReconstructer->reconstruct();
+	mReconstructer->getThreadedTimedReconstructer()->start();
+//	ssc::messageManager()->sendInfo("Reconstructing...");
+//	qApp->processEvents();
+//
+////	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mReconstructer));
+////	connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+//	mThreadedTimedReconstructer->start();
+//	mReconstructButton->setEnabled(false);
+////	std::cout << "================reconstruct started" << std::endl;
+//
+////	mReconstructer->reconstruct();
 }
 
+void ReconstructionWidget::reconstructStartedSlot()
+{
+	mReconstructButton->setEnabled(false);
+}
 void ReconstructionWidget::reconstructFinishedSlot()
 {
 	mReconstructButton->setEnabled(true);

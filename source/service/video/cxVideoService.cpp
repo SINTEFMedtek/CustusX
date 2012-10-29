@@ -21,6 +21,7 @@
 
 #include "cxVideoService.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
+//#include "cxOpenIGTLinkDirectLinkRTSource.h"
 
 namespace cx
 {
@@ -65,6 +66,7 @@ VideoService::VideoService()
 	mIGTLinkConnection.reset(new VideoConnection());
 	mActiveVideoSource = mIGTLinkConnection->getVideoSource();
 	mUSAcquisitionVideoPlayback.reset(new USAcquisitionVideoPlayback());
+//	mGrabberDirectLinkVideoSource.reset(new OpenIGTLinkDirectLinkRTSource());
 
 	connect(mIGTLinkConnection.get(), SIGNAL(connected(bool)), this, SIGNAL(activeVideoSourceChanged()));
 }
