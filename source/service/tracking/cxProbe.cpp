@@ -251,6 +251,8 @@ void Probe::removeCurrentConfig()
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
 
 	int index = this->getConfigIdList().indexOf(config.mConfigId);
+	if (index<0)
+		return;
 	if (index!=0)
 		--index;
 

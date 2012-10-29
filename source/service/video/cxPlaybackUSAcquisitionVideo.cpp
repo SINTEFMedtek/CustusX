@@ -242,11 +242,12 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	mVideoSource->setResolution(spacing[0]);
 
 	vtkImageImportPtr import = mVideoSource->getImageImport();
-	import->SetImportVoidPointer(mCurrentData.mUsRaw->getFrame(index));
-	import->SetDataScalarTypeToUnsignedChar();
-	import->SetNumberOfScalarComponents(1);
-	import->SetWholeExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, 0);
-	import->SetDataExtentToWholeExtent();
+	mCurrentData.mUsRaw->fillImageImport(import, index);
+//	import->SetImportVoidPointer(mCurrentData.mUsRaw->getFrame(index));
+//	import->SetDataScalarTypeToUnsignedChar();
+//	import->SetNumberOfScalarComponents(1);
+//	import->SetWholeExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, 0);
+//	import->SetDataExtentToWholeExtent();
 	import->Modified();
 	import->GetOutput()->Update();
 
@@ -258,6 +259,8 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 
 	mVideoSource->refresh(timestamp);
 }
+
+
 
 } // cx
 
