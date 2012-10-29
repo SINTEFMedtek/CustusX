@@ -67,25 +67,35 @@ private:
   QString findFolderName(QString patientFolder, QString sessionDescription);
   bool findNewSubfolder(QString subfolderAbsolutePath);
   vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
-  std::vector<vtkImageDataPtr> getFrames();
+  std::vector<vtkImageDataPtr> getFrames(ssc::VideoRecorder::DataType streamRecordedData, bool writeColor);
 
-  bool writeTrackerTimestamps(QString reconstructionFolder);
-  bool writeTrackerTransforms(QString reconstructionFolder);
-  bool writeUSTimestamps(QString reconstructionFolder);
-  bool writeUSImages(QString reconstructionFolder, QString calibrationFile);
-  QString copyCalibrationFile(QString reconstructionFolder);
-  void copyProbeCalibConfigsXml(QString reconstructionFolder);
-  void writeProbeConfiguration(QString reconstructionFolder);
+//  bool writeTrackerTimestamps(QString reconstructionFolder);
+//  bool writeTrackerTransforms(QString reconstructionFolder);
+//  bool writeUSTimestamps(QString reconstructionFolder);
+//  bool writeUSImages(QString reconstructionFolder, QString calibrationFile);
+//  QString copyCalibrationFile(QString reconstructionFolder);
+//  void copyProbeCalibConfigsXml(QString reconstructionFolder);
+//  void writeProbeConfiguration(QString reconstructionFolder);
 
   void report();
 
-  ssc::TimedTransformMap mTrackerRecordedData;
-  ssc::VideoRecorder::DataType mStreamRecordedData;
+  ssc::USReconstructInputData mReconstructData;
+
+  ssc::USReconstructInputData getReconstructData(ssc::TimedTransformMap trackerRecordedData,
+  		ssc::VideoRecorder::DataType streamRecordedData,
+  		QString sessionDescription,
+  		QString activepatientPath,
+  		ssc::ToolPtr tool,
+  		QString calibFilename,
+  		bool writeColor);
+
+//  ssc::TimedTransformMap mTrackerRecordedData;
+//  ssc::VideoRecorder::DataType mStreamRecordedData;
   QString mSessionDescription;
   QString mActivepatientPath;
-  ssc::ToolPtr mTool;
-  QString mCalibFilename;
-  bool mWriteColor;///< If set to true, colors will be saved even if settings is set to 8 bit
+//  ssc::ToolPtr mTool;
+//  QString mCalibFilename;
+//  bool mWriteColor;///< If set to true, colors will be saved even if settings is set to 8 bit
 
   QStringList mReport;
 };
