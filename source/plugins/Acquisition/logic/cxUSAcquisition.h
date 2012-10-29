@@ -72,9 +72,11 @@ private:
   ssc::VideoRecorderPtr mRTRecorder;
   ssc::ToolPtr mTool;
 
-  QFuture<QString> mFileMakerFuture;
-  QFutureWatcher<QString> mFileMakerFutureWatcher;
-  UsReconstructionFileMakerPtr mFileMaker;
+//  QFuture<QString> mFileMakerFuture;
+//  QFutureWatcher<QString> mFileMakerFutureWatcher;
+//  UsReconstructionFileMakerPtr mFileMaker;
+
+  std::list<QFutureWatcher<QString>*> mSaveThreads;
 
   QString mWhatsMissing;
 
