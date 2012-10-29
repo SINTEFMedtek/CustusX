@@ -97,7 +97,7 @@ ViewManager::ViewManager() :
 				mViewCache3D(mMainWindowsCentralWidget, "View3D"),
 				mViewCacheRT(mMainWindowsCentralWidget, "ViewRT")
 {
-	mRenderTimer.reset(new RenderTimer);
+	mRenderTimer.reset(new CyclicActionTimer("Main Render timer"));
 	mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
 //	mSlicePlanesProxy->getProperties().m3DFontSize = 50;
 
@@ -825,17 +825,11 @@ void ViewManager::renderAllViewsSlot()
 	if (mRenderTimer->intervalPassed())
 	{
 		emit fps(mRenderTimer->getFPS());
-		mRenderTimer->reset();
+//		static int counter=0;
+//		if (++counter%300==0)
+//			ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+//		mRenderTimer->reset();
 	}
-
-//  if(mRenderingTime->elapsed()>1000)
-//  {
-//    emit fps(mNumberOfRenderings);
-//    mRenderingTime->restart();
-//    mNumberOfRenderings = 1;
-//  }
-//  else
-//    mNumberOfRenderings++;
 }
 
 LayoutData ViewManager::getLayoutData(const QString uid) const

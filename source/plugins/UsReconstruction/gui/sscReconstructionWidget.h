@@ -46,12 +46,13 @@ public slots:
 private slots:
 	void inputDataSelected(QString mhdFileName);
 	void repopulateAlgorithmGroup();
+	void reconstructStartedSlot();
 	void reconstructFinishedSlot();
 	void toggleDetailsSlot();
 
 private:
 	ssc::ReconstructManagerPtr mReconstructer;
-	ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
+//	ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
 
 	ssc::FileSelectWidget* mFileSelectWidget;
 	QPushButton* mReconstructButton;

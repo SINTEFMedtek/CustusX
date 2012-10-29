@@ -10,7 +10,8 @@
 //#define RUN_ALL_TESTS
 
 #ifndef RUN_ALL_TESTS
-#include "cxTest_Registration.h"
+#include "cxTest_RegistrationV2V.h"
+#include "cxTest_RegistrationElastix.h"
 #endif
 
 /**main function for CX unit tests.
@@ -33,9 +34,14 @@ int main(int argc, char **argv)
 //                                       "synth data",
 //                                        &TestRegistration::testV2V_synthetic_data ) );
 //	runner.addTest(TestRegistration::suite());
-	runner.addTest( new CppUnit::TestCaller<TestRegistration>(
-                                       "synth data",
-                                        &TestRegistration::testVessel2VesselRegistration ) );
+//	runner.addTest( new CppUnit::TestCaller<TestRegistrationV2V>(
+//                                       "synth data",
+//                                        &TestRegistrationV2V::testVessel2VesselRegistration ) );
+
+	runner.addTest( new CppUnit::TestCaller<TestRegistrationElastix>(
+                                       "elastiX linear kaisa",
+                                        &TestRegistrationElastix::testElastix ) );
+
 #endif
 	
 	

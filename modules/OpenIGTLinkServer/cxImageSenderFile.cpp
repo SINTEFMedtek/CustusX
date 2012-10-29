@@ -110,7 +110,7 @@ vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input)
 //    return mapper->GetOutputPort();
 }
 
-igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
+IGTLinkImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
 {
   static int staticCounter = 0;
   //------------------------------------------------------------
@@ -157,7 +157,7 @@ igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
 
   //------------------------------------------------------------
   // Create a new IMAGE type message
-  igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
+  IGTLinkImageMessage::Pointer imgMsg = IGTLinkImageMessage::New();
   imgMsg->SetDimensions(size);
   imgMsg->SetSpacing(spacingF);
   imgMsg->SetScalarType(scalarType);
@@ -223,7 +223,7 @@ QStringList MHDImageSender::getArgumentDescription()
 
 MHDImageSender::MHDImageSender(QObject* parent) :
     ImageSender(parent),
-    mSocket(0),
+//    mSocket(0),
     mCounter(0),
     mTimer(0)
 {
@@ -254,35 +254,39 @@ void MHDImageSender::initialize(StringMap arguments)
 	//  mTimer->start(1200); // for test of the timeout feature
 }
 
-void MHDImageSender::startStreaming(QTcpSocket* socket)
+bool MHDImageSender::startStreaming(GrabberSenderPtr sender)
 {
 	if (!mTimer)
 	{
 	    std::cout << "MHDImageSender: Failed to start streaming: Not initialized." << std::endl;
-	    return;
+	    return false;
 	}
-    mSocket = socket;
+    mSender = sender;
 	mTimer->start(40);
+	return true;
 }
 
 void MHDImageSender::stopStreaming()
 {
 	mTimer->stop();
-	mSocket = NULL;
+//	mSender = NULL;
 }
 
 void MHDImageSender::tick()
 {
-	if (!mSocket)
-		std::cout << "MHDImageSender error: no socket" << std::endl;
-//  std::cout << "tick" << std::endl;
+	if (mSender && mSender->isReady())
+		mSender->send(getVtkImageMessage(mImageData));
 
-  igtl::ImageMessage::Pointer imgMsg = getVtkImageMessage(mImageData);
-
-  //------------------------------------------------------------
-  // Pack (serialize) and send
-  imgMsg->Pack();
-  mSocket->write(reinterpret_cast<const char*>(imgMsg->GetPackPointer()), imgMsg->GetPackSize());
+//	if (!mSocket)
+//		std::cout << "MHDImageSender error: no socket" << std::endl;
+////  std::cout << "tick" << std::endl;
+//
+//  igtl::ImageMessage::Pointer imgMsg = getVtkImageMessage(mImageData);
+//
+//  //------------------------------------------------------------
+//  // Pack (serialize) and send
+//  imgMsg->Pack();
+//  mSocket->write(reinterpret_cast<const char*>(imgMsg->GetPackPointer()), imgMsg->GetPackSize());
 }
 
 

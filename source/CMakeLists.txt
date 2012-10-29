@@ -45,6 +45,15 @@ include(${IGSTK_USE_FILE})
 find_package (SSC PATHS "../externals/ssc/CMake" REQUIRED)
 include(${SSC_USE_FILE})
 
+# ISB GE streamer
+#----------
+option(CX_USE_ISB_GE "use ISB GE scanner interface" OFF)
+if (CX_USE_ISB_GE)
+    ADD_DEFINITIONS(-DCX_USE_ISB_GE)
+    find_package(GEStreamer REQUIRED)
+    include(${GEStreamer_USE_FILE})
+endif()
+
 
 #------------------------------------------------------------------------------
 # Add subdirectories

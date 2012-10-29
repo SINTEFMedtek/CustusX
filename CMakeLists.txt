@@ -36,14 +36,17 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 
 if(APPLE)
 	add_definitions(-D__APPLE__)
+	# get rid of very annoying deprecated warnings in VTK 5.8. Remove when VTK if fixed...
+	SET(CMAKE_CPP_FLAGS "${CMAKE_CPP_FLAGS} -Wno-deprecated")
+	message(STATUS "setting flag " ${CMAKE_CPP_FLAGS})
 endif(APPLE)
 
 #------------------------------------------------------------------------------
 # Set CustusX version
 #------------------------------------------------------------------------------
 set(CustusX3_VERSION_MAJOR  3)
-set(CustusX3_VERSION_MINOR  2)
-set(CustusX3_VERSION_PATCH  18)
+set(CustusX3_VERSION_MINOR  3)
+set(CustusX3_VERSION_PATCH  1)
 
 # set alpha when not a release
 set(CustusX3_VERSION_POSTFIX ".alpha")
@@ -200,6 +203,24 @@ if(CPPUNIT_INCLUDE_DIR)
 		set(CPPUNIT_DEBUG_LIBRARIES ${CPPUNIT_DEBUG_LIBRARY} ${CMAKE_DL_LIBS})
 	endif(CPPUNIT_LIBRARY)
 endif(CPPUNIT_INCLUDE_DIR)
+
+
+# openCV
+#----------
+if (CX_USE_OpenCV)
+    find_package( OpenCV REQUIRED)
+else ()
+    find_package( OpenCV QUIET)
+endif ()
+IF( OpenCV_FOUND )
+    option(CX_USE_OpenCV "use OpenCV" ON)
+ELSE()
+    option(CX_USE_OpenCV "use OpenCV" OFF)
+ENDIF()
+#if (USE_OpenCV)
+#    ADD_DEFINITIONS(-DUSE_OpenCV)
+#    message(STATUS "USE_OpenCV II: " ${USE_OpenCV})
+#endif()
 
 #------------------------------------------------------------------------------
 # Add subdirectories

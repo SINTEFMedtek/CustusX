@@ -230,14 +230,38 @@ QString StateService::getDefaultGrabberServer()
 	return result;
 	return "";
 #elif WIN32
-	return ""; // TODO fill in something here...
+	QString result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), "OpenIGTLinkServer.exe", "--in_width 800 --in_height 600");
+	if (!result.isEmpty())
+		return result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer.exe", "--in_width 800 --in_height 600");
+	if (!result.isEmpty())
+		return result;
+	return "";
 #else
 	QString result;
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "runOpenIGTLinkServer.sh", "");
 	if (!result.isEmpty())
 		return result;
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer",
-					"OpenIGTLinkServer", "");
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer", "");
+	if (!result.isEmpty())
+		return result;
+	return "";
+#endif
+}
+
+QString StateService::getDefaultGrabberInitScript()
+{
+#ifdef __APPLE__
+	return "";
+#elif WIN32
+	return "";
+#else
+	QString result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "run_v2u.sh", "");
+	if (!result.isEmpty())
+		return result;
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../../CustusX3/install/Linux/copy/", "run_v2u.sh", "");
 	if (!result.isEmpty())
 		return result;
 	return "";
@@ -259,12 +283,19 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("globalApplicationName", enum2string(ssc::mdLABORATORY));
 	this->fillDefault("globalPatientNumber", 1);
 	this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
-	this->fillDefault("Ultrasound/8bitAcquisitionData", true);
+	this->fillDefault("Ultrasound/8bitAcquisitionData", false);
+	this->fillDefault("Ultrasound/CompressAcquisition", true);
 	this->fillDefault("View3D/sphereRadius", 1.0);
 	this->fillDefault("View3D/labelSize", 2.5);
 	this->fillDefault("View3D/showOrientationAnnotation", true);
 
-	this->fillDefault("IGTLink/localServer", this->getDefaultGrabberServer());
+	QStringList grabber = this->getDefaultGrabberServer().split(" ");
+	this->fillDefault("IGTLink/localServer", grabber[0]);
+	grabber.pop_front();
+	if (grabber.size()>0)
+		this->fillDefault("IGTLink/arguments", grabber.join(" "));
+
+	this->fillDefault("IGTLink/initScript", this->getDefaultGrabberInitScript());
 
 	this->fillDefault("showSectorInRTView", true);
 //  this->fillDefault("autoLandmarkRegistration", true);

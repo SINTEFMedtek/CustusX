@@ -171,7 +171,7 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 	{
 //		std::cout << "firing async op" << std::endl;
 		mUSImageDataReader.reset(new UsReconstructionFileReader());
-		mUSImageDataFutureResult = QtConcurrent::run(boost::bind(&UsReconstructionFileReader::readAllFiles, mUSImageDataReader, filename, "", false));
+		mUSImageDataFutureResult = QtConcurrent::run(boost::bind(&UsReconstructionFileReader::readAllFiles, mUSImageDataReader, filename, ""));
 		mUSImageDataFutureWatcher.setFuture(mUSImageDataFutureResult);
 	}
 }
@@ -181,6 +181,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 //	std::cout << "receiving async op" << std::endl;
 	// file read operation has completed: read and clear
 	mCurrentData = mUSImageDataFutureResult.result();
+	mCurrentData.mUsRaw->reinitialize();
 	// clear result so we can check for it next run
 	mUSImageDataReader.reset();
 
@@ -241,11 +242,12 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	mVideoSource->setResolution(spacing[0]);
 
 	vtkImageImportPtr import = mVideoSource->getImageImport();
-	import->SetImportVoidPointer(mCurrentData.mUsRaw->getFrame(index));
-	import->SetDataScalarTypeToUnsignedChar();
-	import->SetNumberOfScalarComponents(1);
-	import->SetWholeExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, 0);
-	import->SetDataExtentToWholeExtent();
+	mCurrentData.mUsRaw->fillImageImport(import, index);
+//	import->SetImportVoidPointer(mCurrentData.mUsRaw->getFrame(index));
+//	import->SetDataScalarTypeToUnsignedChar();
+//	import->SetNumberOfScalarComponents(1);
+//	import->SetWholeExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, 0);
+//	import->SetDataExtentToWholeExtent();
 	import->Modified();
 	import->GetOutput()->Update();
 
@@ -257,6 +259,8 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 
 	mVideoSource->refresh(timestamp);
 }
+
+
 
 } // cx
 

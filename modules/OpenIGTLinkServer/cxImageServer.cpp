@@ -18,53 +18,42 @@ namespace cx
 ImageServer::ImageServer(QObject* parent) :
 	QTcpServer(parent)
 {
-	//mTimer = new QTimer(this);
-	//connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-	//mTimer->start(500);
 }
 
-void ImageServer::initialize()
+bool ImageServer::initialize()
 {
+	bool ok = false;
+
 	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
-	
-	ImageSenderFactory factory;
-	QString type = factory.getDefaultSenderType();
-	if (args.count("type"))
-		type = args["type"];
-	
-	mImageSender = factory.getImageSender(type);
-	
-	if (mImageSender)
-	{
-		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
-	}
-	else
-	{
-		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
-	}
+	mImageSender = ImageSenderFactory().getFromArguments(args);
 
-	mImageSender->initialize(args);
-}
+	// test streaming by starting/stopping once (will emit error messages right away instead of waiting for an incoming connecion.)
+	ok = mImageSender->startStreaming(GrabberSenderPtr());
+	mImageSender->stopStreaming();
 
-void ImageServer::tick()
-{
-////	return;
-////	char s;
-////	std::cin.read(&s, 1);
-//	// if any input detected: quit application
-//	std::string val;
-//	std::cout << "dddd" << std::endl;
-//	std::cin >> val;
-////	if (s=='q')
-//	if (!val.empty())
+	return ok;
+
+//
+//	ImageSenderFactory factory;
+//	QString type = factory.getDefaultSenderType();
+//	if (args.count("type"))
+//		type = args["type"];
+//
+//	mImageSender = factory.getImageSender(type);
+//
+//	if (mImageSender)
 //	{
-//		std::cout << "Close server..." << std::endl;
-//		this->socketDisconnectedSlot();
-//		qApp->quit();
+//		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
 //	}
+//	else
+//	{
+//		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
+//	}
+//
+//	mImageSender->initialize(args);
 }
 
-void ImageServer::startListen(int port)
+bool ImageServer::startListen(int port)
 {
 	bool started = this->listen(QHostAddress::Any, port);
 
@@ -83,9 +72,13 @@ void ImageServer::startListen(int port)
 		}
 
 		std::cout << QString("Server is listening to port %2").arg(this->serverPort()).toStdString() << std::endl;
+		return true;
 	}
 	else
+	{
 		std::cout << "Server failed to start. Error: " << this->errorString().toStdString() << std::endl;
+		return false;
+	}
 }
 
 ImageServer::~ImageServer()
@@ -107,8 +100,9 @@ void ImageServer::incomingConnection(int socketDescriptor)
 	mSocket->setSocketDescriptor(socketDescriptor);
 	QString clientName = mSocket->localAddress().toString();
 	std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
+	GrabberSenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
 
-	mImageSender->startStreaming(mSocket);
+	mImageSender->startStreaming(sender);
 }
 
 void ImageServer::socketDisconnectedSlot()
@@ -126,28 +120,35 @@ void ImageServer::socketDisconnectedSlot()
 
 void ImageServer::printHelpText()
 {
-	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
-	cx::ImageSenderFactory factory;
-
-	std::cout << "Usage: " << qApp->applicationName().toStdString() << " (--arg <argval>)*" << std::endl;
-	std::cout << "    --port   : Tcp/IP port # (default=18333)" << std::endl;
-	std::cout << "    --type   : Grabber type  (default=" << factory.getDefaultSenderType().toStdString() << ")"
-		<< std::endl;
-	std::cout << std::endl;
-	std::cout << "    Select one of the types below:" << std::endl;
-
-	QStringList types = factory.getSenderTypes();
-	for (int i = 0; i < types.size(); ++i)
-	{
-		QStringList args = factory.getArgumentDescription(types[i]);
-		std::cout << std::endl;
-		std::cout << "      type = " << types[i].toStdString() << std::endl;
-		for (int j = 0; j < args.size(); ++j)
-			std::cout << "        " << args[j].toStdString() << std::endl;
-	}
+	std::cout << getArgumentHelpText(qApp->applicationName());
 	std::cout << std::endl;
 	std::cout << std::endl;
 	std::cout << "Press Ctrl + C to close the server."<< std::endl;
 	std::cout << std::endl;
 }
+
+QString ImageServer::getArgumentHelpText(QString applicationName)
+{
+	std::stringstream ss;
+	cx::ImageSenderFactory factory;
+
+	ss << "Usage: " << applicationName << " (--arg <argval>)*" << std::endl;
+	ss << "    --port   : Tcp/IP port # (default=18333)" << std::endl;
+	ss << "    --type   : Grabber type  (default=" << factory.getDefaultSenderType().toStdString() << ")"
+		<< std::endl;
+	ss << std::endl;
+	ss << "    Select one of the types below:" << std::endl;
+
+	QStringList types = factory.getSenderTypes();
+	for (int i = 0; i < types.size(); ++i)
+	{
+		QStringList args = factory.getArgumentDescription(types[i]);
+		ss << std::endl;
+		ss << "      type = " << types[i].toStdString() << std::endl;
+		for (int j = 0; j < args.size(); ++j)
+			ss << "        " << args[j].toStdString() << std::endl;
+	}
+	return qstring_cast(ss.str());
+}
+
 }

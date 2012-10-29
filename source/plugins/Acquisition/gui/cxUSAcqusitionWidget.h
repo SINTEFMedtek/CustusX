@@ -45,18 +45,22 @@ protected slots:
   void stoppedSlot();
 
 private slots:
+	void reconstructStartedSlot();
   void reconstructFinishedSlot();
-  void saveDataCompletedSlot(QString mhdFilename);
+//  void saveDataCompletedSlot(QString mhdFilename);
   void toggleDetailsSlot();
+  void acquisitionDataReadySlot();
 
 private:
   USAcquisitionPtr mAcquisition;
 //  ssc::ThreadedReconstructerPtr mThreadedReconstructer;
-  ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
+//  ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	DisplayTimerWidget* mDisplayTimerWidget;
 	QWidget* mOptionsWidget;
 	QWidget* createOptionsWidget();
+	QWidget* wrapVerticalStretch(QWidget* input);
+	QWidget* wrapGroupBox(QWidget* input, QString name, QString tip);
 };
 
 

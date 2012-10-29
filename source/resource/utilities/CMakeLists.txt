@@ -28,6 +28,7 @@ SET(${LIBNAME}_MOC_HDRS
     cxDisplayTimerWidget.h
     cxPlaybackTime.h
     cxTimelineWidget.h
+    cxProcessWrapper.h
 )
 
 # SSC
@@ -67,6 +68,8 @@ add_library(cxUtilities
     cxTimelineWidget.cpp
     cxDepthPeeling.h
     cxDepthPeeling.cpp
+    cxProcessWrapper.h
+    cxProcessWrapper.cpp
     ${cxUtilities_MOC_SRCS}
     )
     

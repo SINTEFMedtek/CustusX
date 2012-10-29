@@ -37,6 +37,7 @@ public:
 	QStringList getArgumentDescription(QString type) const; ///< arguments for one Image Sender
 	ImageSenderPtr getImageSender(QString type);
 //	QObject* createSender(QString type, QTcpSocket* socket, StringMap arguments) const; ///< launch a MHDImageSender.
+	ImageSenderPtr getFromArguments(StringMap args);
 private:
 	std::vector<ImageSenderPtr> mAvailable;
 };
