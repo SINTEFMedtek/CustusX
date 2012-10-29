@@ -77,7 +77,7 @@ void ImageSenderSonix::initialize(StringMap arguments)
     mArguments = arguments;
 	
 	mMaxqueueInfo = 20;
-	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
+//	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
 	mDroppedImages = 0;
 
 	typedef cx::Frame Frame;
@@ -168,12 +168,13 @@ void ImageSenderSonix::initializeSonixGrabber()
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 }
 
-void ImageSenderSonix::startStreaming(QTcpSocket* socket)
+bool ImageSenderSonix::startStreaming(QTcpSocket* socket)
 {
 	mSocket = socket;
 	mSonixGrabber->Record();
 	mEmitStatusMessage = true;
 	std::cout << "Started streaming from sonix device" << std::endl;
+	return true;
 }
 
 void ImageSenderSonix::stopStreaming()

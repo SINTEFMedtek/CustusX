@@ -9,32 +9,15 @@ cmake_minimum_required(VERSION 2.6)
 
 find_package( Boost REQUIRED )
 
-# openCV
-#----------
-if (USE_OpenCV)
-		find_package( OpenCV REQUIRED)
-else ()
-		find_package( OpenCV QUIET)
-endif ()
 
-IF( OpenCV_FOUND )
-		option(USE_OpenCV "use OpenCV" ON)
-ELSE()
-		option(USE_OpenCV "use OpenCV" OFF)
-ENDIF()
-
-if (USE_OpenCV)
-	ADD_DEFINITIONS(-DUSE_OpenCV)
-endif()
 
 option(CX_USE_ISB_GE "use ISB GE scanner interface" OFF)
 if (CX_USE_ISB_GE)
-	ADD_DEFINITIONS(-DCX_USE_ISB_GE)
-	#include_directories( ${CustusX3_SOURCE_DIR}/../../ISB_DataStreaming/ISB_DataStreaming/vtkDataStreamClient )
-	
-	find_package(GEStreamer REQUIRED)
-	include(${GEStreamer_USE_FILE})
-	
+    ADD_DEFINITIONS(-DCX_USE_ISB_GE)
+    #include_directories( ${CustusX3_SOURCE_DIR}/../../ISB_DataStreaming/ISB_DataStreaming/vtkDataStreamClient )
+
+    find_package(GEStreamer REQUIRED)
+    include(${GEStreamer_USE_FILE})
 endif()
 
 
@@ -65,25 +48,31 @@ include(${OpenIGTLink_USE_FILE})
 find_package(SSC PATHS "../../externals/ssc/CMake" REQUIRED)
 include(${SSC_USE_FILE})
 
-#---------------------e----------
+#-------------------------------
 # Include directories
 #-------------------------------
 include_directories(
-		${Boost_INCLUDE_DIRS}
-		${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
-		)
+        ${Boost_INCLUDE_DIRS}
+        ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
+        ${CustusX3_SOURCE_DIR}/source/resource/settings
+        ${CustusX3_BINARY_DIR}/source/resource/settings
+        #"C:/Program Files/Microsoft SDKs/Windows/v7.1/Samples/multimedia/directshow/baseclasses"
+        )
 
 #-------------------------------
 # Linking
 #-------------------------------
 
+#link_directories( "C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" )
+
 # link to ulterius only on when building 32 bit
 # - ulterius lib is only available on windows as 32 bit
 if(CX_WIN32)
-	SET(WIN32_LINK_LIBRARIES
-			 ${ULTERIUS_LIBRARY}
-			 vtkOpenIGTUltrasound
-	)
+    SET(WIN32_LINK_LIBRARIES
+            ${ULTERIUS_LIBRARY}
+            vtkOpenIGTUltrasound
+            #STRMBASE
+    )
 endif(CX_WIN32)
 
 SET(ALL_LINK_LIBRARIES
@@ -102,12 +91,13 @@ SET(ALL_LINK_LIBRARIES
 	vtkVolumeRendering 
 	)
 
-if(USE_OpenCV)
+if(CX_USE_OpenCV)
 	set (ALL_LINK_LIBRARIES
 			${ALL_LINK_LIBRARIES}
 			${OpenCV_LIBS}
 			)
 endif()
+
 
 if(CX_WINDOWS)
 	SET(LINK_LIBRARIES
@@ -130,6 +120,7 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxImageSenderOpenCV.h
 		cxImageSenderGE.h
 		cxImageSender.h
+		cxGrabberSender.h
 )
 
 #QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
@@ -158,6 +149,8 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxImageSenderGE.h
 		cxImageSenderGE.cpp
 		cxImageSender.h
+		cxGrabberSender.h
+		cxGrabberSender.cpp
 		../grabberCommon/cxIGTLinkUSStatusMessage.h
 		../grabberCommon/cxIGTLinkUSStatusMessage.cpp
 		../grabberCommon/cxIGTLinkImageMessage.h
@@ -166,6 +159,14 @@ SET ( cxOpenIGTLinkServer_FILES
 		../grabberCommon/igtl_us_status.c
 )
 
+add_library( cxGrabber
+    ${cxOpenIGTLinkServer_FILES} 
+    ${MOC_HEADER_FILES} 
+    )
+target_link_libraries(cxGrabber
+    ${LINK_LIBRARIES}
+    )
+
 if(CX_WIN32)
 	set(ExecutableName "UltrasonixServer") # windows 32 bit version is made for ultrasonix communication
 else()
@@ -173,25 +174,24 @@ else()
 endif()
 
 add_executable( ${ExecutableName}
-								main.cpp 
-								${cxOpenIGTLinkServer_FILES} 
-								${MOC_HEADER_FILES} 
-								)
+    main.cpp 
+#    ${cxOpenIGTLinkServer_FILES} 
+#    ${MOC_HEADER_FILES} 
+    )
 
 target_link_libraries(${ExecutableName}
-	${LINK_LIBRARIES}
-	)
-		
-		
+    cxGrabber
+    )
+
 #-------------------------------
 # Install files
 #-------------------------------
 if (CX_WINDOWS OR CX_LINUX)
     install(TARGETS ${ExecutableName}
-    		BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
-    		RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
-    		)
-endif()		
+        BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
+        RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin
+        )
+endif()
 
 if(CX_WINDOWS)
 	#Installing required run time libs for Windows, msv*.dll
@@ -247,7 +247,7 @@ if (CX_WINDOWS)
 			${SSC_BINARY_DIR}/Code
 			${OpenIGTLink_LIBRARY_DIRS}
 			)
-	if(USE_OpenCV)
+	if(CX_USE_OpenCV)
 		set (DIRS
 				${DIRS}
 				${OpenCV_LIB_DIR}

@@ -459,9 +459,14 @@ void VideoTab::init()
   m8bitRadioButton = new QRadioButton("Save acquisition as 8bit", this);
   m8bitRadioButton->setChecked(bw);
 
+	mCompressCheckBox = new QCheckBox("Compress acquisition data");
+	mCompressCheckBox->setChecked(settings()->value("Ultrasound/CompressAcquisition", true).toBool());
+	mCompressCheckBox->setToolTip("Store the US Acquisition data as compressed MHD");
+
   toplayout->addSpacing(5);
   toplayout->addWidget(m24bitRadioButton);
   toplayout->addWidget(m8bitRadioButton);
+  toplayout->addWidget(mCompressCheckBox);
 
   mTopLayout->addLayout(toplayout);
 
@@ -471,6 +476,7 @@ void VideoTab::saveParametersSlot()
 {
   settings()->setValue("Ultrasound/acquisitionName", mAcquisitionNameLineEdit->text());
   settings()->setValue("Ultrasound/8bitAcquisitionData", m8bitRadioButton->isChecked());
+  settings()->setValue("Ultrasound/CompressAcquisition", mCompressCheckBox->isChecked());
 }
 
 //==============================================================================

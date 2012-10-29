@@ -47,7 +47,7 @@ public:
   ~ImageSenderSonix();
   
 	virtual void initialize(StringMap arguments);
-	virtual void startStreaming(QTcpSocket* socket);
+	virtual bool startStreaming(QTcpSocket* socket);
 	virtual void stopStreaming();
 
 	virtual QString getType();
@@ -94,7 +94,7 @@ private:
 
   QMutex mImageMutex; ///< A lock for making the class threadsafe
   int mMaxqueueInfo;
-  int mMaxBufferSize;
+//  int mMaxBufferSize;
   std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue
   int mDroppedImages;
 

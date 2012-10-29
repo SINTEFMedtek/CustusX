@@ -9,6 +9,9 @@
 #include "sscView.h"
 #include "cxOpenIGTLinkRTSource.h"
 #include "cxRenderTimer.h"
+#include "sscFileSelectWidget.h"
+
+
 namespace cx
 {
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
@@ -36,18 +39,18 @@ public:
 private slots:
   void toggleLaunchServer();
   void launchServer();
-  void showStream();
   void toggleConnectServer();
   void connectServer();
-  void renderSlot();
   void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverStatusChangedSlot();
   void browseLocalServerSlot();
 
-  void useLocalServerChanged();
+//  void useLocalServerChanged();
+//  void useDirectLinkChanged();
+  void dataChanged();
+  void initScriptSelected(QString filename);
 
 private:
-  void dataChanged();
   void updateHostHistory();
   QProcess* getServer();
   OpenIGTLinkRTSourcePtr getRTSource();
@@ -56,21 +59,27 @@ private:
 
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
+
+  QPushButton* mConnectButton;
+  QVBoxLayout* mToptopLayout;
+  ssc::FileSelectWidget* mInitScriptWidget;
+  // remote server widgets:
   QComboBox* mAddressEdit;
   QLineEdit* mPortEdit;
-  QCheckBox* mUseLocalServer;
-  QPushButton* mConnectButton;
-  QPushButton* mShowStreamButton;
-  QPushButton* mLaunchServerButton;
-  QGridLayout* mGridLayout;
-  QVBoxLayout* mToptopLayout;
-
-  ssc::ViewWidget* mView;
-  QTimer* mRenderTimer;
-  RenderTimer mRenderTimerW;
-  QLabel* mRenderLabel;
-
+  // local server widgets:
   QLineEdit* mLocalServerEdit;
+  QLineEdit* mLocalServerArguments;
+  QPushButton* mLaunchServerButton;
+  // direct link widgets:
+  QLineEdit* mDirectLinkArguments;
+
+
+  QStackedWidget* mStackedWidget;
+  QWidget* createDirectLinkWidget();
+  QWidget* createLocalServerWidget();
+  QWidget* createRemoteWidget();
+  QWidget* wrapVerticalStretch(QWidget* input);
+
 };
 
 }//end namespace cx

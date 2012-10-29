@@ -47,6 +47,9 @@
 #include "cxProbe.h"
 #include "cxVideoService.h"
 #include "cxToolManager.h"
+#include "cxImageSenderFactory.h"
+#include "cxGrabberDirectLinkThread.h"
+#include "sscTypeConversions.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -56,31 +59,12 @@ namespace cx
 
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
 				mImageImport(vtkImageImportPtr::New()),
-				mLinearSoundSpeedCompesation(1.0),
-				updateSonixParameters(false)//,
-//				sonixVideo(false)//,
-//				mDepthStart(0), mDepthEnd(0), mWidth(0)
+				updateSonixParameters(false)
 {
 	mLastTimestamp = 0;
-	mTimestampCalibration = 0;
 	mConnected = false;
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
-//	mSize[0] = 0;
-//	mSize[1] = 0;
-//	mSize[2] = 0;
-//	mOrigin[0] = 0.0;
-//	mOrigin[1] = 0.0;
-//	mOrigin[2] = 0.0;
-//	mSpacing[0] = 0.0;
-//	mSpacing[1] = 0.0;
-//	mSpacing[2] = 0.0;
-
-	//image flip
-//  vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
-//  flipper->SetFilteredAxes(0); //flipp around Y axis
-//  flipper->SetInput(mImageImport->GetOutput());
-//  mRedirecter->SetInput(flipper->GetOutput());
 	mRedirecter->SetInput(mImageImport->GetOutput());
 
 	mImageImport->SetNumberOfScalarComponents(1);
@@ -92,22 +76,11 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
 	mTimeoutTimer->setInterval(1000);
 	connect(mTimeoutTimer, SIGNAL(timeout()), this, SLOT(timeout()));
 	connect(this, SIGNAL(connected(bool)), this, SIGNAL(streaming(bool))); // define connected as streaming.
-	//connect(this, SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool))); // define connected as streaming.
 }
 
 OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
 {
-	//disconnect();
-	if (mClient)
-	{
-		mClient->quit();
-		mClient->wait(2000);
-		if (mClient->isRunning())
-		{
-			mClient->terminate();
-			mClient->wait(); // forever or until dead thread
-		}
-	}
+	this->stopClient();
 }
 
 void OpenIGTLinkRTSource::timeout()
@@ -169,26 +142,6 @@ bool OpenIGTLinkRTSource::validData() const
 	return mClient && !mTimeout;
 }
 
-/**Set a time shift that is added to every timestamp acquired from the source.
- * This can be used to calibrate time shifts between source and client.
- */
-void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
-{
-	if (ssc::similar(mTimestampCalibration, delta))
-		return;
-	if (!ssc::similar(delta, 0.0))
-		ssc::messageManager()->sendInfo("set time calibration in rt source: " + qstring_cast(delta) + "ms");
-	mTimestampCalibration = delta;
-}
-
-void OpenIGTLinkRTSource::setSoundSpeedCompensation(double gamma)
-{
-	mLinearSoundSpeedCompesation = gamma;
-	ssc::messageManager()->sendInfo(
-					"Linear sound speed compensation set to: "
-					+ qstring_cast(mLinearSoundSpeedCompesation));
-}
-
 double OpenIGTLinkRTSource::getTimestamp()
 {
 	//oldHACK we need time sync before we can use the real timetags delivered with the image
@@ -216,6 +169,26 @@ void OpenIGTLinkRTSource::connectedSlot(bool on)
 
 	emit connected(on);
 }
+
+void OpenIGTLinkRTSource::directLink(std::map<QString, QString> args)
+{
+	if (mClient)
+	{
+		std::cout << "client already exist - returning" << std::endl;
+		return;
+	}
+
+	mClient.reset(new GrabberDirectLinkThread(args, this));
+	connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
+	connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
+
+	mClient->start();
+	mTimeoutTimer->start();
+}
+
 
 void OpenIGTLinkRTSource::connectServer(QString address, int port)
 {
@@ -254,40 +227,49 @@ void OpenIGTLinkRTSource::sonixStatusReceivedSlot()
 	this->updateSonixStatus(mClient->getLastSonixStatusMessage());
 }
 
-void OpenIGTLinkRTSource::disconnectServer()
+/**Get rid of the mClient thread.
+ *
+ */
+void OpenIGTLinkRTSource::stopClient()
 {
-//  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
 	if (mClient)
 	{
-		mClient->quit();
+		mClient->stop();
 		mClient->wait(2000); // forever or until dead thread
+
+		if (mClient->isRunning())
+		{
+			mClient->terminate();
+			mClient->wait(); // forever or until dead thread
+			ssc::messageManager()->sendWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
+		}
 
 		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
 		disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
-		//disconnect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
+
 		mClient.reset();
 	}
+}
+
+
+void OpenIGTLinkRTSource::disconnectServer()
+{
+	this->stopClient();
 
 	mTimeoutTimer->stop();
-
-//	sonixVideo = false; // clear sonix hack flag
 
 	// clear the redirecter
 	mRedirecter->SetInput(mImageImport->GetOutput());
 	mFilter_IGTLink_to_RGB = vtkImageDataPtr();
 
 	emit newFrame(); // changed
-
-//  emit changed();
-//  emit serverStatusChanged();
 }
 
 void OpenIGTLinkRTSource::clientFinishedSlot()
 {
-//  std::cout << "IGTLinkWidget::clientFinishedSlot" << std::endl;
 	if (!mClient)
 		return;
 	if (mClient->isRunning())
@@ -299,7 +281,7 @@ void OpenIGTLinkRTSource::clientFinishedSlot()
  */
 void OpenIGTLinkRTSource::setEmptyImage()
 {
-	mImageMessage = igtl::ImageMessage::Pointer();
+	mImageMessage = IGTLinkImageMessage::Pointer();
 	mImageImport->SetWholeExtent(0, 1, 0, 1, 0, 0);
 	mImageImport->SetDataExtent(0, 1, 0, 1, 0, 0);
 	mImageImport->SetDataScalarTypeToUnsignedChar();
@@ -314,7 +296,7 @@ void OpenIGTLinkRTSource::setTestImage()
 	int H = 512;
 
 	int numberOfComponents = 4;
-	mImageMessage = igtl::ImageMessage::Pointer();
+	mImageMessage = IGTLinkImageMessage::Pointer();
 	mImageImport->SetWholeExtent(0, W - 1, 0, H - 1, 0, 0);
 	mImageImport->SetDataExtent(0, W - 1, 0, H - 1, 0, 0);
 	mImageImport->SetDataScalarTypeToUnsignedChar();
@@ -338,7 +320,7 @@ void OpenIGTLinkRTSource::setTestImage()
 	mImageImport->Modified();
 }
 
-void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message)
+void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(IGTLinkImageMessage::Pointer message)
 {
 	mImageMessage = message;
 	// Retrive the image data
@@ -361,31 +343,31 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 	//for linear probes used in other substance than the scanner is calibrated for we want to compensate
 	//for the change in sound of speed in that substance, do this by changing spacing in the images y-direction,
 	//this is only valid for linear probes
-	spacing[1] *= mLinearSoundSpeedCompesation;
+//	spacing[1] *= mLinearSoundSpeedCompesation;
 
 
 	mImageImport->SetNumberOfScalarComponents(1);
 
 	switch (scalarType)
 	{
-	case igtl::ImageMessage::TYPE_INT8:
+	case IGTLinkImageMessage::TYPE_INT8:
 		std::cout << "signed char is not supported. Falling back to unsigned char." << std::endl;
 		mImageImport->SetDataScalarTypeToUnsignedChar();
 		break;
-	case igtl::ImageMessage::TYPE_UINT8:
+	case IGTLinkImageMessage::TYPE_UINT8:
 		mImageImport->SetDataScalarTypeToUnsignedChar();
 		break;
-	case igtl::ImageMessage::TYPE_INT16:
+	case IGTLinkImageMessage::TYPE_INT16:
 		mImageImport->SetDataScalarTypeToShort();
 		break;
-	case igtl::ImageMessage::TYPE_UINT16:
+	case IGTLinkImageMessage::TYPE_UINT16:
 //    std::cout << "SetDataScalarTypeToUnsignedShort." << std::endl;
 //		mImageImport->SetDataScalarTypeToUnsignedShort();
     mImageImport->SetNumberOfScalarComponents(2);
     mImageImport->SetDataScalarTypeToUnsignedChar();
 		break;
-	case igtl::ImageMessage::TYPE_INT32:
-	case igtl::ImageMessage::TYPE_UINT32:
+	case IGTLinkImageMessage::TYPE_INT32:
+	case IGTLinkImageMessage::TYPE_UINT32:
 //    std::cout << "SetDataScalarTypeTo4channel." << std::endl;
 		// assume RGBA unsigned colors
 		mImageImport->SetNumberOfScalarComponents(4);
@@ -393,10 +375,10 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 		mImageImport->SetDataScalarTypeToUnsignedChar();
 //    std::cout << "32bit received" << std::endl;
 		break;
-	case igtl::ImageMessage::TYPE_FLOAT32:
+	case IGTLinkImageMessage::TYPE_FLOAT32:
 		mImageImport->SetDataScalarTypeToFloat();
 		break;
-	case igtl::ImageMessage::TYPE_FLOAT64:
+	case IGTLinkImageMessage::TYPE_FLOAT64:
 		mImageImport->SetDataScalarTypeToDouble();
 		break;
 	default:
@@ -413,9 +395,9 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 //  std::cout << "raw time" << timestamp->GetTimeStamp() << ", " << timestamp->GetTimeStamp() - last << std::endl;
 
 	mLastTimestamp = timestamp->GetTimeStamp() * 1000;
-	mLastTimestamp += mTimestampCalibration;
+//	mLastTimestamp += mTimestampCalibration;
 
-	mDebug_orgTime = timestamp->GetTimeStamp() * 1000; // ms
+//	mDebug_orgTime = timestamp->GetTimeStamp() * 1000; // ms
 	mImageImport->SetDataOrigin(0, 0, 0);
 	mImageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
 	mImageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1);
@@ -467,6 +449,10 @@ void OpenIGTLinkRTSource::updateSonixStatus(IGTLinkUSStatusMessage::Pointer mess
 
 //	sonixVideo = true; // Temporary hack to turn off ARGB_RGBA for sonix
 
+//	std::cout << "depthStart: " << message->GetDepthStart() << std::endl;
+//	std::cout << "depthEnd: " << message->GetDepthEnd() << std::endl;
+//	std::cout << "width: " << message->GetWidth() << std::endl;
+
 	updateSonixParameters = true;
 }
 
@@ -500,8 +486,10 @@ void OpenIGTLinkRTSource::updateSonix()
 	updateSonixParameters = false;
 }
 
-void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
+void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 {
+//	static CyclicActionTimer timer("Update Video Image");
+//	timer.begin();
 #if 1 // remove to use test image
 	if (!message)
 	{
@@ -532,13 +520,30 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 		{
 			mFilter_IGTLink_to_RGB = this->createFilterARGB2RGB(mImageImport->GetOutput());
 		}
+		else // default: strip alpha channel (should not happen, but cx expects RGB or Gray, not alpha)
+		{
+			mFilter_IGTLink_to_RGB = this->createFilterRGBA2RGB(mImageImport->GetOutput());
+		}
+
 		if (mFilter_IGTLink_to_RGB)
 			mRedirecter->SetInput(mFilter_IGTLink_to_RGB);
 	}
+//	timer.time("convert");
 
-//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
+	//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
 	emit newFrame();
+//	timer.time("emit");
+//
+//	if (timer.intervalPassed())
+//	{
+//		static int counter=0;
+//		if (++counter%300==0)
+//			ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
+//		timer.reset();
+//	}
+
 }
+
 
 /**Create a pipeline that convert the input 4-component ARGB image (from QuickTime-Mac)
  * into a vtk-style RGBA image.
@@ -574,6 +579,21 @@ vtkImageDataPtr OpenIGTLinkRTSource::createFilterBGR2RGB(vtkImageDataPtr input)
   vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
   splitterRGB->SetInput(input);
   splitterRGB->SetComponents(2, 1, 0);//hack convert from BGRA to RGB
+  merger->SetInput(0, splitterRGB->GetOutput());
+
+  return merger->GetOutput();
+}
+
+/**Filter that converts from RGBA to RGB encoding.
+ *
+ */
+vtkImageDataPtr OpenIGTLinkRTSource::createFilterRGBA2RGB(vtkImageDataPtr input)
+{
+  vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
+
+  vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
+  splitterRGB->SetInput(input);
+  splitterRGB->SetComponents(0, 1, 2);
   merger->SetInput(0, splitterRGB->GetOutput());
 
   return merger->GetOutput();
