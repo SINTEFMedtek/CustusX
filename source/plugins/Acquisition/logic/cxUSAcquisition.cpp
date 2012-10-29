@@ -23,7 +23,7 @@ namespace cx
 
 USAcquisition::USAcquisition(AcquisitionDataPtr pluginData, QObject* parent) : QObject(parent), mPluginData(pluginData)
 {
-  connect(&mFileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
+//  connect(&mFileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(clearSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
@@ -78,10 +78,11 @@ void USAcquisition::checkIfReadySlot()
     	mWhatsMissing.append("<font color=red>Need connect to a recorder.</font><br>");
   }
 
-  bool saving = mFileMakerFutureWatcher.isRunning();
+//  bool saving = mFileMakerFutureWatcher.isRunning();
+	int saving = mSaveThreads.size();
 
-  if (saving)
-  	mWhatsMissing.append("<font color=orange>Saving acquisition data.</font><br>");
+  if (saving!=0)
+  	mWhatsMissing.append(QString("<font color=orange>Saving %1 acquisition data.</font><br>").arg(saving));
 
   // remove redundant line breaks
   QStringList list = mWhatsMissing.split("<br>", QString::SkipEmptyParts);
@@ -92,7 +93,8 @@ void USAcquisition::checkIfReadySlot()
 	  mWhatsMissing.append("<br>");
 
   // do not require tracking to be present in order to perform an acquisition.
-  emit ready(!saving && streaming && mRTRecorder, mWhatsMissing);
+//  emit ready(!saving && streaming && mRTRecorder, mWhatsMissing);
+  emit ready(streaming && mRTRecorder, mWhatsMissing);
 }
 
 void USAcquisition::setTool(ssc::ToolPtr tool) {
@@ -191,25 +193,50 @@ void USAcquisition::saveSession(QString sessionId, bool writeColor)
 	if (cxTool)
 		calibFileName = cxTool->getCalibrationFileName();
 
-	// streamRecordedData is empty for ultrasonix? Incorrect time?
-  mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(),
+  UsReconstructionFileMakerPtr fileMaker;
+  fileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(),
   		patientService()->getPatientData()->getActivePatientFolder(), probe, calibFileName,
   		writeColor));
+  mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
 
-  ssc::USReconstructInputData reconstructData = mFileMaker->getReconstructData();
+  ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData();
   mPluginData->getReconstructer()->selectData(reconstructData);
   emit acquisitionDataReady();
 
-  mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
-  mFileMakerFutureWatcher.setFuture(mFileMakerFuture);
+  QFuture<QString> fileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, fileMaker));
+  QFutureWatcher<QString>* fileMakerFutureWatcher = new QFutureWatcher<QString>();
+  fileMakerFutureWatcher->setFuture(fileMakerFuture);
+  connect(fileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
+  mSaveThreads.push_back(fileMakerFutureWatcher);
+
+  this->checkIfReadySlot();
+//
+//    QFuture<QString> fileMakerFuture;
+//    QFutureWatcher<QString> fileMakerFutureWatcher;
+//    UsReconstructionFileMakerPtr fileMaker;
+//
+//    std::list<QFutureWatcher<QString> > mSaveThreads;
+
 }
 
 void USAcquisition::fileMakerWriteFinished()
 {
-  QString targetFolder = mFileMakerFutureWatcher.future().result();
-  mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
-  this->checkIfReadySlot();
-  emit saveDataCompleted(mFileMaker->getMhdFilename(targetFolder));
+	std::list<QFutureWatcher<QString>*>::iterator iter;
+	for (iter=mSaveThreads.begin(); iter!=mSaveThreads.end(); ++iter)
+	{
+		if (!(*iter)->isFinished())
+			continue;
+		QFutureWatcher<QString>* watcher = *iter;
+		emit saveDataCompleted(watcher->future().result());
+		delete *iter;
+		iter = mSaveThreads.erase(iter);
+	}
+    this->checkIfReadySlot();
+
+//  QString targetFolder = mFileMakerFutureWatcher.future().result();
+//  mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
+//  this->checkIfReadySlot();
+//  emit saveDataCompleted(mFileMaker->getMhdFilename(targetFolder));
 }
 
 void USAcquisition::dominantToolChangedSlot()
