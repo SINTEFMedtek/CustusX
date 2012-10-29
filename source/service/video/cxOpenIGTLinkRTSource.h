@@ -28,6 +28,7 @@
 #include "sscProbeData.h"
 #include "cxProbe.h"
 #include "../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h"
+#include "../../../modules/grabberCommon/cxIGTLinkImageMessage.h"
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
@@ -40,7 +41,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
+typedef boost::shared_ptr<class IGTLinkClientBase> IGTLinkClientBasePtr;
 
 /**\brief Implementation of ssc::VideoSource for the OpenIGTLink protocol.
  * \ingroup cxServiceVideo
@@ -75,19 +76,12 @@ public:
 	virtual void release() {}
 
 	// non-inherited methods
+	void directLink(std::map<QString, QString> args);
 	void connectServer(QString address, int port);
 	void disconnectServer();
-	void setTimestampCalibration(double delta);
-	double getTimestampCalibration() { return mTimestampCalibration; }
-	void setSoundSpeedCompensation(double gamma); ///< gamma is the correction factor for the distance along the sound direction
 
 signals:
 	void fps(int fps);
-
-public:
-	void updateImage(igtl::ImageMessage::Pointer message); // called by receiving thread when new data arrives.
-	void updateSonixStatus(IGTLinkUSStatusMessage::Pointer message);
-
 private slots:
 	void clientFinishedSlot();
 	void imageReceivedSlot();
@@ -97,40 +91,32 @@ private slots:
 	void connectedSlot(bool on);
 
 private:
+	void updateImage(IGTLinkImageMessage::Pointer message); // called by receiving thread when new data arrives.
+	void updateSonixStatus(IGTLinkUSStatusMessage::Pointer message);
 	void setEmptyImage();
 	std::vector<unsigned char> mTestData;
 	void setTestImage();
 	vtkImageDataPtr createFilterARGB2RGB(vtkImageDataPtr input);
-  vtkImageDataPtr createFilterBGR2RGB(vtkImageDataPtr input);//temporary hack
-	void updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message);
+	vtkImageDataPtr createFilterBGR2RGB(vtkImageDataPtr input);//temporary hack
+  	vtkImageDataPtr createFilterRGBA2RGB(vtkImageDataPtr input);
+	void updateImageImportFromIGTMessage(IGTLinkImageMessage::Pointer message);
 	void updateSonix();
 	ProbePtr getValidProbe();
-
-	double mDebug_orgTime;
+	void stopClient();
 
 	boost::array<unsigned char, 100> mZero;
 	vtkImageImportPtr mImageImport;
 	vtkImageDataPtr mFilter_IGTLink_to_RGB;
 	vtkImageAlgorithmPtr mRedirecter;
-	igtl::ImageMessage::Pointer mImageMessage;
-	IGTLinkClientPtr mClient;
+	IGTLinkImageMessage::Pointer mImageMessage;
+	IGTLinkClientBasePtr mClient;
 	bool mConnected;
 	QString mDeviceName;
 	bool mTimeout;
 	QTimer* mTimeoutTimer;
 	double mFPS;
 	double mLastTimestamp;
-	double mTimestampCalibration;
-	double mLinearSoundSpeedCompesation;
-
-//	int mSize[3]; // image dimension
-//	float mOrigin[3];
-//	double mSpacing[3]; // spacing (mm/pixel)
 	bool updateSonixParameters;
-//	bool sonixVideo;
-//	int mDepthStart; //mm
-//	int mDepthEnd; //mm
-//	int mWidth; //mm
 	ssc::ProbeData mSonixProbeData;
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;

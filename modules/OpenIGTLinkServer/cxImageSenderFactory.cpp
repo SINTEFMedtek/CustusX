@@ -9,6 +9,7 @@
 #include "cxImageSenderOpenCV.h"
 #include "cxImageSenderFile.h"
 #include "cxImageSenderSonix.h"
+#include "cxImageSenderGE.h"
 
 namespace cx
 {
@@ -47,14 +48,38 @@ StringMap extractCommandlineOptions(QStringList cmdline)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
+ImageSenderPtr ImageSenderFactory::getFromArguments(StringMap args)
+{
+	QString type = this->getDefaultSenderType();
+	if (args.count("type"))
+		type = args["type"];
+
+	ImageSenderPtr retval = this->getImageSender(type);
+
+	if (retval)
+	{
+		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
+	}
+	else
+	{
+		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
+	}
+
+	retval->initialize(args);
+	return retval;
+}
+
 
 ImageSenderFactory::ImageSenderFactory()
 {
 #ifdef CX_WIN32
 	mAvailable.push_back(ImageSenderPtr(new ImageSenderSonix()));
 #endif
-#ifdef USE_OpenCV
+#ifdef CX_USE_OpenCV
 	mAvailable.push_back(ImageSenderPtr(new ImageSenderOpenCV()));
+#endif
+#ifdef CX_USE_ISB_GE
+	mAvailable.push_back(ImageSenderPtr(new ImageSenderGE()));
 #endif
 	mAvailable.push_back(ImageSenderPtr(new MHDImageSender()));
 }

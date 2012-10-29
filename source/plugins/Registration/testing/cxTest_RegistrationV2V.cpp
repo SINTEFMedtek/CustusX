@@ -1,11 +1,11 @@
 /*
- * cxTestRegistration.cpp
+ * cxTestRegistrationV2V.cpp
  *
  *  \date Oct 24, 2011
  *      \author christiana
  */
 
-#include "cxTest_Registration.h"
+#include "cxTest_RegistrationV2V.h"
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataWriter.h>
@@ -19,12 +19,12 @@
 #include "sscTypeConversions.h"
 #include <QFileInfo>
 
-void TestRegistration::setUp()
+void TestRegistrationV2V::setUp()
 {
 
 }
 
-void TestRegistration::tearDown()
+void TestRegistrationV2V::tearDown()
 {
 	ssc::DataManager::shutdown();
 }
@@ -32,7 +32,7 @@ void TestRegistration::tearDown()
 /**return endpoint
  *
  */
-ssc::Vector3D TestRegistration::append_line(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a, ssc::Vector3D b, double spacing)
+ssc::Vector3D TestRegistrationV2V::append_line(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a, ssc::Vector3D b, double spacing)
 {
 	ssc::Vector3D u = (b-a).normal();
 	unsigned N = (unsigned)floor((b-a).length()/spacing + 0.5);
@@ -44,13 +44,13 @@ ssc::Vector3D TestRegistration::append_line(std::vector<ssc::Vector3D>* pts, ssc
 /**return endpoint
  *
  */
-ssc::Vector3D TestRegistration::append_pt(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a)
+ssc::Vector3D TestRegistrationV2V::append_pt(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a)
 {
 	pts->push_back(a);
 	return a;
 }
 
-QStringList TestRegistration::generateTestData()
+QStringList TestRegistrationV2V::generateTestData()
 {
 	QString path = QString("/home/christiana/Patients/test/");
 	QStringList retval;
@@ -87,14 +87,14 @@ QStringList TestRegistration::generateTestData()
 	return retval;
 }
 
-QString TestRegistration::saveVTKFile(std::vector<ssc::Vector3D> pts, QString filename)
+QString TestRegistrationV2V::saveVTKFile(std::vector<ssc::Vector3D> pts, QString filename)
 {
 	vtkPolyDataPtr poly = this->generatePolyData(pts);
 	this->saveVTKFile(poly, filename);
 	return filename;
 }
 
-vtkPolyDataPtr TestRegistration::generatePolyData(std::vector<ssc::Vector3D> pts)
+vtkPolyDataPtr TestRegistrationV2V::generatePolyData(std::vector<ssc::Vector3D> pts)
 {
 	vtkPolyDataPtr mPolyData = vtkPolyDataPtr::New();
 	vtkPointsPtr mPoints = vtkPointsPtr::New();
@@ -119,7 +119,7 @@ vtkPolyDataPtr TestRegistration::generatePolyData(std::vector<ssc::Vector3D> pts
 	return mPolyData;
 }
 
-void TestRegistration::saveVTKFile(vtkPolyDataPtr data, QString filename)
+void TestRegistrationV2V::saveVTKFile(vtkPolyDataPtr data, QString filename)
 {
 	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
 	writer->SetInput(data);
@@ -129,7 +129,7 @@ void TestRegistration::saveVTKFile(vtkPolyDataPtr data, QString filename)
 }
 
 
-std::vector<ssc::Transform3D> TestRegistration::generateTransforms()
+std::vector<ssc::Transform3D> TestRegistrationV2V::generateTransforms()
 {
 	// This is a set of perturbations that work on the input dataset.
 	// Larger values cause failure.
@@ -162,7 +162,7 @@ std::vector<ssc::Transform3D> TestRegistration::generateTransforms()
 	return pert;
 }
 
-void TestRegistration::testV2V_synthetic_data()
+void TestRegistrationV2V::testV2V_synthetic_data()
 {
 	QStringList files = this->generateTestData();
 
@@ -208,7 +208,7 @@ void TestRegistration::testV2V_synthetic_data()
 //	}
 }
 
-void TestRegistration::testVessel2VesselRegistration()
+void TestRegistrationV2V::testVessel2VesselRegistration()
 {
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/Centerline/US_aneurism_cl_size0.vtk";
 	QString fname1 = cx::DataLocations::getTestDataPath() + "/testing/Centerline/US_aneurism_cl_size1.vtk";
@@ -291,7 +291,7 @@ void TestRegistration::testVessel2VesselRegistration()
 }
 
 
-void TestRegistration::doTestVessel2VesselRegistration(ssc::Transform3D perturbation, QString filenameSource, QString filenameTarget, double tol_dist, double tol_angle)
+void TestRegistrationV2V::doTestVessel2VesselRegistration(ssc::Transform3D perturbation, QString filenameSource, QString filenameTarget, double tol_dist, double tol_angle)
 {
 	bool verbose = 0;
 

@@ -97,63 +97,42 @@ ImagePtr duplicateImage(ImagePtr image)
 	return resampleImage(image, spacing, image->getUid()+"_copy%1", image->getName()+" copy%1");
 }
 
-
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr cropImage(ImagePtr image)
+vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox)
 {
   vtkImageClipPtr clip = vtkImageClipPtr::New();
-  DoubleBoundingBox3D bb = image->getCroppingBox();
-  clip->SetInput(image->getBaseVtkImageData());
-
-  double* sp = image->getBaseVtkImageData()->GetSpacing();
-
-  clip->SetOutputWholeExtent(
-      static_cast<int>(bb[0]/sp[0]+0.5), static_cast<int>(bb[1]/sp[1]+0.5),
-      static_cast<int>(bb[2]/sp[1]+0.5), static_cast<int>(bb[3]/sp[1]+0.5),
-      static_cast<int>(bb[4]/sp[2]+0.5), static_cast<int>(bb[5]/sp[2]+0.5));
-
+  clip->SetInput(input);
+  clip->SetOutputWholeExtent(cropbox.begin());
   clip->ClipDataOn();
   vtkImageDataPtr rawResult = clip->GetOutput();
 
   rawResult->Update();
   rawResult->UpdateInformation();
   rawResult->ComputeBounds();
+  return rawResult;
+}
 
-//  return retVal;
-
-
-//  this->getBaseVtkImageData()->Update();
-//  this->getBaseVtkImageData()->UpdateInformation();
-//  this->getBaseVtkImageData()->Print(std::cout);
-
-//  vtkImageDataPtr rawResult = this->CropAndClipImageTovtkImageData();
+/** Return an image that is cropped using its own croppingBox.
+ *  The image is not added to the data manager nor saved.
+ */
+ImagePtr cropImage(ImagePtr image)
+{
+  DoubleBoundingBox3D bb = image->getCroppingBox();
+  double* sp = image->getBaseVtkImageData()->GetSpacing();
+  IntBoundingBox3D cropbox(
+	      static_cast<int>(bb[0]/sp[0]+0.5), static_cast<int>(bb[1]/sp[0]+0.5),
+	      static_cast<int>(bb[2]/sp[1]+0.5), static_cast<int>(bb[3]/sp[1]+0.5),
+	      static_cast<int>(bb[4]/sp[2]+0.5), static_cast<int>(bb[5]/sp[2]+0.5));
+  vtkImageDataPtr rawResult = cropImage(image->getBaseVtkImageData(), cropbox);
 
   QString uid = image->getUid() + "_crop%1";
   QString name = image->getName()+" crop%1";
   ImagePtr result = dataManager()->createDerivedImage(rawResult,uid, name, image);
   result->mergevtkSettingsIntosscTransform();
 
-/////// Old code
-/*  ImagePtr result = dataManager()->createImage(rawResult,uid, name);
-  result->get_rMd_History()->setRegistration(image->get_rMd());
-  result->mergevtkSettingsIntosscTransform();
-  result->resetTransferFunction(image->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData()),
-  image->getLookupTable2D()->createCopy(image->getBaseVtkImageData()));
-  result->get_rMd_History()->setParentSpace(image->getUid());*/
-///////
-  //messageManager()->sendInfo("Created volume " + result->getName());
-
-//  dataManager()->loadData(result);
-//  dataManager()->saveImage(result, outputBasePath);
-
-//  std::cout << "CROPPED" << std::endl;
-//  std::cout << "rMd\n" << result->get_rMd() << std::endl;
-//  result->getBaseVtkImageData()->Print(std::cout);
-
   return result;
-
 }
 
 /**

@@ -12,6 +12,7 @@
 #include <QTime>
 #include <vector>
 #include <iostream>
+#include <map>
 
 namespace cx
 {
@@ -22,30 +23,43 @@ namespace cx
 * @{
 */
 
-typedef boost::shared_ptr<class RenderTimer> RenderTimerPtr;
+typedef boost::shared_ptr<class CyclicActionTimer> RenderTimerPtr;
 
-/**Helper class for counting time spent by the rendering process
+/**Helper class for counting time spent by the rendering process or other
+ * process running in a cycle.
  *
+ *  \date Oct 19, 2010
+ *  \date Oct 16, 2012
+ *  \author christiana
  */
-class RenderTimer
+class CyclicActionTimer
 {
 public:
-  RenderTimer();
-  void reset(int interval = 1000);
-  void beginRender();
-  void endRender();
-  double getFPS();
-  bool intervalPassed() const;
-  QString dumpStatistics();
+	CyclicActionTimer();
+	explicit CyclicActionTimer(QString name);
+	void reset(int interval = 1000);
+	void beginRender();
+	void endRender();
+
+	void begin(); ///< start timing for this cycle
+	void time(QString id); ///< store time from begin or last time()
+
+	double getFPS();
+	bool intervalPassed() const;
+	QString dumpStatistics();
+	QString dumpStatisticsSmall();
 
 private:
-  std::vector<double> mOffRenderTime;
-  std::vector<double> mRenderTime;
-  //QTime mLastBeginRenderTime, mLastEndRenderTime;
-  QTime mRenderClock; ///< clock for counting time between and inside renderings
-  int mInterval; ///< the interval between each readout+reset of the calculated values.
-  QTime mIntervalClock; ///< Time object used to calculate number of renderings per second (FPS)
-  int mNumberOfRenderings; ///< Variable used to calculate FPS
+	QString mName;
+	struct Entry
+	{
+		QString id;
+		std::vector<double> time;
+	};
+	std::vector<Entry> mTiming;
+	QTime mRenderClock; ///< clock for counting time between and inside renderings
+	int mInterval; ///< the interval between each readout+reset of the calculated values.
+	QTime mIntervalClock; ///< Time object used to calculate number of renderings per second (FPS)
 };
 
 /**

@@ -8,7 +8,7 @@
 #ifndef CXIMAGESENDERGE_H_
 #define CXIMAGESENDERGE_H_
 
-#include <QObject> //needed for the mocer when OpenCv is not used...
+#include <QObject>
 
 #ifdef CX_USE_ISB_GE
 #include "boost/shared_ptr.hpp"
@@ -16,10 +16,12 @@
 #include <QDateTime>
 #include <QSize>
 class QTimer;
-#include "igtlImageMessage.h"
 #include <QStringList>
+#include "igtlImageMessage.h"
 #include "cxImageSenderFactory.h"
 #include "../grabberCommon/cxIGTLinkImageMessage.h"
+
+#include "GEStreamer.h"
 
 namespace cx
 {
@@ -33,13 +35,13 @@ namespace cx
  */
 class ImageSenderGE: public ImageSender
 {
-public:
 	Q_OBJECT
+public:
 	ImageSenderGE(QObject* parent = NULL);
 	virtual ~ImageSenderGE() {}
 
 	virtual void initialize(StringMap arguments);
-	virtual void startStreaming(QTcpSocket* socket);
+	virtual bool startStreaming(GrabberSenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
@@ -47,13 +49,24 @@ public:
 
 protected:
 private:
-	QTcpSocket* mSocket;
+	GrabberSenderPtr mSender;
+//	QTcpSocket* mSocket;
 	QTimer* mSendTimer;
 	QTimer* mGrabTimer;
 	StringMap mArguments;
 
-	void initialize_local();
+	//The GE Connection code from ISB
+	data_streaming::GEStreamer mGEStreamer;
+
+	vtkSmartPointer<vtkImageData> mImgStream;//Last image from GE
+	igstk::RealTimeClock::TimeStampType mLastGrabTime;
+	data_streaming::beamspace_geometry mFrameGeometry;///<Frame geometry from GE
+	bool mFrameGeometryChanged; ///< Have frame geometry changed since last frame
+
+	bool initialize_local();
 	void deinitialize_local();
+	IGTLinkImageMessage::Pointer getImageMessage();
+	IGTLinkUSStatusMessage::Pointer getFrameStatus();
 
 private slots:
 	void grab();

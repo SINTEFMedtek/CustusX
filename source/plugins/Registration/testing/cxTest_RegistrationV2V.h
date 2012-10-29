@@ -1,12 +1,12 @@
 /*
- * cxTestRegistration.h
+ * cxTestRegistrationV2V.h
  *
  *  \date Oct 24, 2011
  *      \author christiana
  */
 
-#ifndef CXTEST_REGISTRATION_H_
-#define CXTEST_REGISTRATION_H_
+#ifndef CXTEST_REGISTRATIONV2V_H_
+#define CXTEST_REGISTRATIONV2V_H_
 
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
@@ -20,7 +20,7 @@
 
 /**
  */
-class TestRegistration : public CppUnit::TestFixture
+class TestRegistrationV2V : public CppUnit::TestFixture
 {
 public:
 	void setUp();
@@ -30,7 +30,7 @@ public:
 	void testV2V_synthetic_data();
 
 public:
-	CPPUNIT_TEST_SUITE( TestRegistration );
+	CPPUNIT_TEST_SUITE( TestRegistrationV2V );
 		CPPUNIT_TEST( testVessel2VesselRegistration );
 		CPPUNIT_TEST( testV2V_synthetic_data );
 	CPPUNIT_TEST_SUITE_END();
@@ -44,7 +44,7 @@ private:
 	ssc::Vector3D append_pt(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a);
 	std::vector<ssc::Transform3D> generateTransforms();
 };
-CPPUNIT_TEST_SUITE_REGISTRATION( TestRegistration );
+CPPUNIT_TEST_SUITE_REGISTRATION( TestRegistrationV2V );
 
 
-#endif /* CXTEST_REGISTRATION_H_ */
+#endif /* CXTEST_REGISTRATIONV2V_H_ */

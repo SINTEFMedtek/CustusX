@@ -47,7 +47,6 @@ namespace cx
  * \date Feb 4, 2012
  * \author Christian Askeland, SINTEF
  */
-
 class ElastixExecuter : public TimedBaseAlgorithm
 {
 	Q_OBJECT
@@ -77,9 +76,13 @@ private:
 	QString writeInitTransformToElastixfile(ssc::DataPtr fixed, ssc::DataPtr moving, QString outdir);
 	QString writeInitTransformToCalfile(ssc::DataPtr fixed, ssc::DataPtr moving, QString outdir);
 	QString findMostRecentTransformOutputFile() const;
+	ssc::Transform3D getAffineResult_mmMff(bool* ok = 0) ;
+	ssc::Transform3D getFileTransform_ddMd(ssc::DataPtr volume);
 
 	QString mLastOutdir;
 	QProcess* mProcess;
+	ssc::DataPtr mFixed;
+	ssc::DataPtr mMoving;
 };
 
 /**Reader class for an Elastix-style parameter file.
@@ -97,6 +100,7 @@ public:
 	std::vector<double> readParameterDoubleVector(QString key) ;
 //	void writeParameter(QString key, QStringList value);
 	ssc::Transform3D readEulerTransform() ;
+	ssc::Transform3D readAffineTransform();
 
 private:
 	QString readParameterRawValue(QString key);

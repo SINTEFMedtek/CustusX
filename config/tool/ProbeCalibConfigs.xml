@@ -876,7 +876,7 @@
             <Name>EC9-5</Name>
             <Type>CurvedLinearArray</Type>
             <DefaultRTSource>DVI</DefaultRTSource>
-            <Notes></Notes>
+            <Notes/>
             <RTSource>
                 <Name>DVI</Name>
                 <TemporalCalibration>105</TemporalCalibration>
@@ -1412,6 +1412,25 @@
                         <Height>0.113122171945701</Height>
                     </PixelSize>
                 </Config>
+                <Config>
+                    <ID>clipped4cm</ID>
+                    <Name>clipped 4cm</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>452</Col>
+                        <Row>68</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>157</Left>
+                        <Right>747</Right>
+                        <Top>191</Top>
+                        <Bottom>598</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.064102417766216002</Width>
+                        <Height>0.064102417766216002</Height>
+                    </PixelSize>
+                </Config>
             </RTSource>
         </USProbe>
     </USScanner>
@@ -1543,6 +1562,44 @@
                     <PixelSize>
                         <Width>0.22727</Width>
                         <Height>0.22727</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>4cmangio</ID>
+                    <Name>4cm angio</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>321</Col>
+                        <Row>68</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>128</Left>
+                        <Right>512</Right>
+                        <Top>70</Top>
+                        <Bottom>414</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.113635</Width>
+                        <Height>0.113635</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>6cmangio</ID>
+                    <Name>6cm angio</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>321</Col>
+                        <Row>68</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>193</Left>
+                        <Right>448</Right>
+                        <Top>69</Top>
+                        <Bottom>417</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.16997100000000001</Width>
+                        <Height>0.16997100000000001</Height>
                     </PixelSize>
                 </Config>
             </RTSource>
