@@ -333,22 +333,29 @@ void WirePhantomWidget::registration()
 
 
 	// find transform to probe space t_us, i.e. the middle position from the us acquisition
-	ssc::USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getBaseInputData();
-	ssc::Transform3D prMt_us = ssc::Transform3D::Identity();
-	if (!usData.mPositions.empty())
-		prMt_us = usData.mPositions[usData.mPositions.size()/2].mPos;
-	ssc::Transform3D rMt_us = (*ssc::ToolManager::getInstance()->get_rMpr()) * prMt_us;
+	std::pair<QString, ssc::Transform3D> probePos = this->getLastProbePosition();
+	ssc::Transform3D rMt_us = probePos.second;
 
 	ssc::Vector3D cross_moving_r = linearTransform.coord(cross_r);
 	ssc::Vector3D diff_r = (cross_r - cross_moving_r);
 	ssc::Vector3D diff_tus = rMt_us.inv().vector(diff_r);
 
+	struct Fmt
+	{
+		QString operator()(double val)
+		{
+			return QString("%1").arg(val, 2, 'f', 2);
+		}
+	};
+	Fmt fmt;
+
 	QString result;
-	result += QString("Shift vector (r): %1\n").arg(qstring_cast(diff_r));
-	if (!usData.mPositions.empty())
-		result += QString("Shift vector (probe): %2\n").arg(qstring_cast(diff_tus));
-	result += QString("Accuracy |v|: %3mm\n").arg(diff_r.length(), 6, 'f', 2);
-	result += QString("Angle: %4*\n").arg(angle / M_PI * 180.0, 6, 'f', 2);
+	result += QString("Results for: %1\n").arg(mManager->getMovingData()->getName());
+	result += QString("Shift vector (r): \t%1\t%2\t%3\n").arg(fmt(diff_r[0])).arg(fmt(diff_r[1])).arg(fmt(diff_r[2]));
+	if (!probePos.first.isEmpty())
+		result += QString("Shift vector (probe): \t%1\t%2\t%3\t(used tracking data from %4)\n").arg(fmt(diff_tus[0])).arg(fmt(diff_tus[1])).arg(fmt(diff_tus[2])).arg(probePos.first);
+	result += QString("Accuracy |v|: \t%1\tmm\n").arg(fmt(diff_r.length()));
+	result += QString("Angle: \t%1\t*\n").arg(fmt(angle / M_PI * 180.0));
 
 	mResults->append(result);
 	ssc::messageManager()->sendInfo("Wire Phantom Test Results:\n"+result);
@@ -385,36 +392,111 @@ void WirePhantomWidget::registration()
 	this->showData(d0);
 }
 
+/**Find the middle probe position from the latest known us recording.
+ * Return this along with the recording filename.
+ *
+ * Use as a guesstimate for the probe position used during wire measurement.
+ *
+ */
+std::pair<QString, ssc::Transform3D> WirePhantomWidget::getLastProbePosition()
+{
+	// find transform to probe space t_us, i.e. the middle position from the us acquisition
+	ssc::USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getBaseInputData();
+	ssc::Transform3D prMt_us = ssc::Transform3D::Identity();
+	if (usData.mPositions.empty())
+		return std::make_pair("", ssc::Transform3D::Identity());
+	prMt_us = usData.mPositions[usData.mPositions.size()/2].mPos;
+	ssc::Transform3D rMt_us = (*ssc::ToolManager::getInstance()->get_rMpr()) * prMt_us;
+	return std::make_pair(usData.mFilename, prMt_us);
+}
+
 void WirePhantomWidget::generate_sMt()
 {
-	ssc::ToolPtr probe = ssc::toolManager()->getDominantTool();
-	if (!probe || !probe->getVisible() || !probe->hasType(ssc::Tool::TOOL_US_PROBE))
+	bool translateOnly = true;
+
+
+	std::pair<QString, ssc::Transform3D> probePos = this->getLastProbePosition();
+	ssc::Transform3D rMt_us = probePos.second;
+	if (probePos.first.isEmpty())
 	{
-		ssc::messageManager()->sendWarning("Cannot find visible probe, aborting calibration test.");
+		ssc::messageManager()->sendWarning("Cannot find probe position from last recording, aborting calibration test.");
 		return;
 	}
+
+	ssc::USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getBaseInputData();
+	ssc::ToolPtr probe = ssc::toolManager()->getTool(usData.mProbeUid);
+	if (!probe || !probe->hasType(ssc::Tool::TOOL_US_PROBE))
+	{
+		ssc::messageManager()->sendWarning("Cannot find probe, aborting calibration test.");
+		return;
+	}
+
+//	ssc::ToolPtr probe = ssc::toolManager()->getDominantTool();
+//	if (!probe || !probe->getVisible() || !probe->hasType(ssc::Tool::TOOL_US_PROBE))
+//	{
+//		ssc::messageManager()->sendWarning("Cannot find visible probe, aborting calibration test.");
+//		return;
+//	}
 	if (!mManager->getMovingData())
 	{
 		ssc::messageManager()->sendWarning("Cannot find moving data, aborting calibration test.");
 		return;
 	}
 
-	ssc::Transform3D prMt = probe->get_prMt();
-	ssc::Transform3D sMt = probe->getCalibration_sMt();
-	ssc::Transform3D prMs = prMt * sMt.inv();
-	ssc::Transform3D usMpr = mManager->getMovingData()->get_rMd().inv() * *ssc::toolManager()->get_rMpr();
-	ssc::Transform3D nomMus = mLastRegistration.inv();
 
-	ssc::Transform3D sQt; // Q is the new calibration matrix.
-	ssc::Transform3D usMs = usMpr*prMs;
+	if (translateOnly)
+	{
+		ssc::Vector3D cross_r = this->findCentroid(this->loadNominalCross());
+		//	ssc::Vector3D cross(134.25, 134.25, 99.50); // old hardcoded value: obsole after new measurements
+		// should be (CA20121022): <134.212 134.338 100.14>
+	//	std::cout << "cross2 " << cross2 << std::endl;
 
-	// start with: nomMus * usMpr * prMs * sMt
-	// move usMpr*prMs to the left and collect a new sMt from the remains:
-	// start with: usMpr * prMs * (usMpr * prMs).inv() * nomMus * usMpr * prMs * sMt
 
-	sQt = usMs.inv() * nomMus * usMs * sMt;
+		// find transform to probe space t_us, i.e. the middle position from the us acquisition
+//		std::pair<QString, ssc::Transform3D> probePos = this->getLastProbePosition();
+//		ssc::Transform3D rMt_us = probePos.second;
 
-	ssc::messageManager()->sendInfo(QString("Calculated new calibration matrix\nfrom current probe position and last accuracy test:\n%1").arg(qstring_cast(sQt)));
+		ssc::Vector3D cross_moving_r = mLastRegistration.coord(cross_r);
+		ssc::Vector3D diff_r = (cross_r - cross_moving_r);
+		ssc::Vector3D diff_tus = rMt_us.inv().vector(diff_r);
+
+		ssc::Transform3D sMt = probe->getCalibration_sMt();
+		ssc::Transform3D sQt; // Q is the new calibration matrix.
+
+		sQt = sMt * ssc::createTransformTranslate(diff_tus);
+		ssc::messageManager()->sendError("Must be tested! Check sign.");
+
+		ssc::messageManager()->sendInfo(QString(""
+				"Calculated new calibration matrix\n"
+				"adding only translation\n"
+				"from last accuracy test\n"
+				"and raw data %1:"
+				"%2").arg(probePos.first).arg(qstring_cast(sQt)));
+	}
+	else
+	{
+		ssc::Transform3D prMt = rMt_us;
+		ssc::Transform3D sMt = probe->getCalibration_sMt();
+		ssc::Transform3D prMs = prMt * sMt.inv();
+		ssc::Transform3D usMpr = mManager->getMovingData()->get_rMd().inv() * *ssc::toolManager()->get_rMpr();
+		ssc::Transform3D nomMus = mLastRegistration.inv();
+
+		ssc::Transform3D sQt; // Q is the new calibration matrix.
+		ssc::Transform3D usMs = usMpr*prMs;
+
+		// start with: nomMus * usMpr * prMs * sMt
+		// move usMpr*prMs to the left and collect a new sMt from the remains:
+		// start with: usMpr * prMs * (usMpr * prMs).inv() * nomMus * usMpr * prMs * sMt
+
+		sQt = usMs.inv() * nomMus * usMs * sMt;
+
+		ssc::messageManager()->sendInfo(QString(""
+				"Calculated new calibration matrix\n"
+				"from last accuracy test\n"
+				"and raw data %1:"
+				"%2").arg(probePos.first).arg(qstring_cast(sQt)));
+	}
+
 }
 
 
