@@ -57,6 +57,7 @@ public:
 	void setFilename(QString name);
 	void setNameFilter(QStringList filter);
 	void setPath(QString path);
+	void setFolderDepth(int depth);
 
 public slots:
 	void refresh();
@@ -79,6 +80,7 @@ private:
 	QString mFilename;
 	QString mRootPath;
 	QStringList mNameFilters;
+	int mFolderDepth;
 };
 
 }
