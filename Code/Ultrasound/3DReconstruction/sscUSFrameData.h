@@ -23,6 +23,7 @@
 #include <vector>
 #include "sscImage.h"
 #include "sscProbeSector.h"
+typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 namespace ssc
 {
@@ -70,6 +71,7 @@ public:
 	virtual void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
 	virtual void setCropBox(IntBoundingBox3D mCropbox);
 	bool save(QString filename, bool compressed);
+	virtual void fillImageImport(vtkImageImportPtr import, int index) = 0; ///< fill import with a single frame
 
 protected:
 	virtual vtkImageDataPtr getSingleBaseImage() = 0;
@@ -100,6 +102,7 @@ public:
 	virtual QString getName();
 	virtual QString getUid();
 	virtual QString getFilePath();
+	virtual void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
 
 protected:
 	virtual vtkImageDataPtr getSingleBaseImage();
@@ -118,6 +121,7 @@ public:
 	virtual QString getName();
 	virtual QString getUid();
 	virtual QString getFilePath();
+	virtual void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
 
 protected:
 	virtual vtkImageDataPtr getSingleBaseImage();
@@ -142,6 +146,7 @@ struct USReconstructInputData
 	std::vector<ssc::TimedPosition> mPositions;
 	ssc::ImagePtr mMask;///< Clipping mask for the input data
 	ssc::ProbeSector mProbeData;
+	QString mProbeUid;
 };
 
 /**
