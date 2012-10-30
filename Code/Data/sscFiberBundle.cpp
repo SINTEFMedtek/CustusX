@@ -229,4 +229,8 @@ void FiberBundle::transformChangedSlot()
 	emit transformChanged();
 }
 
+Transform3D FiberBundle::get_rMd() const
+{
+	return mMesh->get_rMd();
+}
 } // end namespace

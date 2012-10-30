@@ -33,6 +33,7 @@
 #include <vtkImageClip.h>
 #include <vtkImageAppend.h>
 #include <vtkMetaImageWriter.h>
+#include <vtkImageImport.h>
 #include "sscTypeConversions.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
@@ -94,7 +95,7 @@ Vector3D USFrameData::getSpacing()
 //}
 void USFrameData::setAngio(bool angio)
 {
-	if (angio==mUseAngio)
+	if (angio!=mUseAngio)
 		mDirty = true;
 
 	mUseAngio = angio;
@@ -106,7 +107,7 @@ void USFrameData::setCropBox(IntBoundingBox3D cropbox)
 	cropbox[4] = -100000;
 	cropbox[5] =  100000;
 
-	if (cropbox==mCropbox)
+	if (cropbox!=mCropbox)
 		mDirty = true;
 
 	mCropbox = cropbox;
@@ -131,6 +132,9 @@ vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D c
 
 vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input)
 {
+	if (input->GetNumberOfScalarComponents() == 1) // already gray
+		return input;
+
 	vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
 	luminance->SetInput(input);
 	vtkImageDataPtr outData = luminance->GetOutput();
@@ -172,11 +176,13 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
 	//The following may give some values if in and out have different extent???
 	inData->GetContinuousIncrements(outExt, inIncX, inIncY, inIncZ); //Don't work?
 	outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ); //Don't work?
-	std::cout << "outExt: " << outExt[0] << " " << outExt[1] << " " << outExt[2] << " " << outExt[3] << " "
-		<< outExt[4] << " " << outExt[5] << endl;
+//	std::cout << "outExt: " << outExt[0] << " " << outExt[1] << " " << outExt[2] << " " << outExt[3] << " "
+//		<< outExt[4] << " " << outExt[5] << endl;
 
 	// Loop through output pixels
 	int idxZ, idxY, idxR;
+
+//	QDateTime start = QDateTime::currentDateTime();
 
 	for (idxZ = 0; idxZ <= maxZ; idxZ++)
 	{
@@ -189,17 +195,18 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
 				if (((*inPtr) == (*(inPtr + 1))) && ((*inPtr) == (*(inPtr + 2))))
 				{
 					(*outPtr) = 0;
-					(*(outPtr + 1)) = 0;
-					(*(outPtr + 2)) = 0;
+//					(*(outPtr + 1)) = 0;
+//					(*(outPtr + 2)) = 0;
 				}
-				else
-				{
-				}//Assume the outVolume is treated with the luminance filter first
+//				else
+//				{
+//				}//Assume the outVolume is treated with the luminance filter first
 				outPtr++;
 				inPtr += 3;
 			}
 		}
 	}
+//	std::cout << "loop: " << start.msecsTo(QDateTime::currentDateTime()) << "ms" << std::endl;
 	return outData;
 }
 
@@ -239,7 +246,9 @@ USFrameDataMonolithic::USFrameDataMonolithic(ImagePtr inputFrameData) :
 	USFrameData()
 {
 	mBaseImage = inputFrameData;
+//	QDateTime start = QDateTime::currentDateTime();
 	this->reinitialize();
+//	std::cout << "reinit mon cons: " << start.msecsTo(QDateTime::currentDateTime()) << "ms" << std::endl;
 }
 
 /** reset the internal state of the oobject to that of the initialization,
@@ -275,6 +284,17 @@ void USFrameDataMonolithic::reinitialize()
 		mFrames[record] = inputPointer + record * recordSize;
 }
 
+void USFrameDataMonolithic::fillImageImport(vtkImageImportPtr import, int index)
+{
+	vtkImageDataPtr image = mBaseImage->getBaseVtkImageData();
+	import->SetImportVoidPointer(image->GetScalarPointer(0,0,index));
+	import->SetDataScalarType(image->GetScalarType());
+	import->SetNumberOfScalarComponents(image->GetNumberOfScalarComponents());
+	int* dim = image->GetDimensions();
+	import->SetWholeExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, 0);
+	import->SetDataExtentToWholeExtent();
+}
+
 vtkImageDataPtr USFrameDataMonolithic::getSingleBaseImage()
 {
 	return mBaseImage->getBaseVtkImageData();
@@ -305,7 +325,10 @@ USFrameDataSplitFrames::USFrameDataSplitFrames(std::vector<vtkImageDataPtr> inpu
 {
 	mFilename = filename;
 	mBaseImage = inputFrameData;
-//	this->reinitialize();
+
+//	QDateTime start = QDateTime::currentDateTime();
+	this->reinitialize();
+//	std::cout << "reinit split cons: " << start.msecsTo(QDateTime::currentDateTime()) << "ms" << std::endl;
 }
 
 /** Merge all us frames into one vtkImageData
@@ -393,6 +416,16 @@ QString USFrameDataSplitFrames::getFilePath()
 {
 	return mFilename;
 }
+
+void USFrameDataSplitFrames::fillImageImport(vtkImageImportPtr import, int index)
+{
+	import->SetImportVoidPointer(mBaseImage[index]->GetScalarPointer());
+	import->SetDataScalarType(mBaseImage[index]->GetScalarType());
+	import->SetNumberOfScalarComponents(mBaseImage[index]->GetNumberOfScalarComponents());
+	import->SetWholeExtent(mBaseImage[index]->GetWholeExtent());
+	import->SetDataExtentToWholeExtent();
+}
+
 
 
 

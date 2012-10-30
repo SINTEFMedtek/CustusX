@@ -95,6 +95,7 @@ void FiberBundleRep::setBundle(FiberBundlePtr bundle)
 	}
 
 	bundleChanged();
+	this->bundleTransformChanged();
 }
 
 /**

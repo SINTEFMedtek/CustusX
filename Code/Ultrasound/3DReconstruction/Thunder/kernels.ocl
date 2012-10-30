@@ -36,6 +36,36 @@ typedef struct _pixel_type
 	int y;
 } pixel_type;
 
+// need prototypes to avoid warning on Mac 10.8
+pixel_type findPixel(
+		float bscan_spacing_x,
+		float bscan_spacing_y,
+		__global float4 * plane_eq,
+		__global float4 * plane_points,
+		int current_bscan,
+		float dist,
+		float4 voxel_coord
+);
+bool valid_pixel(pixel_type p,
+		__global unsigned char * mask,
+		int bscan_w,
+		int bscan_h,
+		float dist,
+		float kernel_radius);
+int findClosestPlane(
+	__global unsigned char * mask, 
+	int bscan_w, 
+	int bscan_h, 
+	int bscan_n, 
+	float bscan_spacing_x, 
+	float bscan_spacing_y, 
+	__global float4 * plane_eq,
+	__global float4 * plane_points,	
+	int current_bscan, 
+	float4 voxel_coord, 
+	float kernel_radius
+	);
+
 /**
  * Find the closest position of the voxel_coord on the plane given by 
  * plane_eq and plane_points. dist is the precomputed distance from voxel_coord
@@ -109,7 +139,7 @@ int findClosestPlane(
 	float kernel_radius
 	)
 {
-	float temp;
+//	float temp;
 	int done_up = 0;
 	int done_down = 0;
 	int min_bscan = current_bscan;
