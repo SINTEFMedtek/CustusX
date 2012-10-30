@@ -35,6 +35,7 @@ namespace ssc
 FileSelectWidget::FileSelectWidget(QWidget* parent)
 {
 	mNameFilters << "*.mhd";
+	mFolderDepth = 2;
 
 	QHBoxLayout* dataLayout = new QHBoxLayout(this);
 	dataLayout->setMargin(0);
@@ -48,6 +49,11 @@ FileSelectWidget::FileSelectWidget(QWidget* parent)
 
 	dataLayout->addWidget(mDataComboBox);
 	dataLayout->addWidget(mSelectDataButton);
+}
+
+void FileSelectWidget::setFolderDepth(int depth)
+{
+	mFolderDepth = depth;
 }
 
 QString FileSelectWidget::getFilename() const
@@ -139,7 +145,7 @@ void FileSelectWidget::updateComboBox()
 	mDataComboBox->blockSignals(true);
 	mDataComboBox->clear();
 
-	QStringList files = this->getAllFiles(mRootPath, 3);
+	QStringList files = this->getAllFiles(mRootPath, mFolderDepth);
 
 	for (int i = 0; i < files.size(); ++i)
 	{
