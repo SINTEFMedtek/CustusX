@@ -15,6 +15,7 @@
 #include "cxStateService.h"
 
 #include <iostream>
+#include <QApplication>
 #include <QByteArray>
 #include <QDir>
 #include "sscEnumConverter.h"
@@ -219,13 +220,14 @@ QString StateService::checkGrabberServerExist(QString path, QString filename, QS
 QString StateService::getDefaultGrabberServer()
 {
 #ifdef __APPLE__
-	QString filename = "GrabberServer.app";
+	QString filename = "GrabberServer";
 	QString postfix = " --auto";
 	QString result;
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), filename, postfix);
+	result = this->checkGrabberServerExist(qApp->applicationDirPath(), filename, postfix);
 	if (!result.isEmpty())
 	return result;
-	result = this->checkGrabberServerExist(DataLocations::getRootConfigPath() + "/../install/Apple", filename, postfix);
+//	result = this->checkGrabberServerExist(DataLocations::getRootConfigPath() + "/../install/Apple", filename, postfix);
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/grabberServer", filename, postfix);
 	if (!result.isEmpty())
 	return result;
 	return "";

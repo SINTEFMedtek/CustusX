@@ -186,11 +186,12 @@ if(APPLE)
 	install(FILES ${CustusX3_SOURCE_DIR}/install/Apple/SupportedGrabbers.txt
 			DESTINATION ${CX_INSTALL_ROOT_DIR}
 			)
-	install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/GrabberServer.app 
-			DESTINATION ${CX_INSTALL_ROOT_DIR}
-			#COMPONENT CustusX
-			USE_SOURCE_PERMISSIONS
-			)
+# no longer necessary as the GrabberServer is built in 64bit
+#	install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/GrabberServer.app 
+#			DESTINATION ${CX_INSTALL_ROOT_DIR}
+#			#COMPONENT CustusX
+#			USE_SOURCE_PERMISSIONS
+#			)
 			
 		# Install folder for storage of igstk<->CustusX symlinks. 
 		# The symlinks must be in an absolute location.
@@ -263,6 +264,12 @@ if(APPLE)
     						GROUP_READ GROUP_EXECUTE GROUP_WRITE
     						WORLD_READ WORLD_EXECUTE WORLD_WRITE
     						)
+    INSTALL(FILES "${CustusX3_BINARY_DIR}/modules/GrabberServer/GrabberServer" DESTINATION ${plugin_dest_dir}
+    				PERMISSIONS
+    						OWNER_READ OWNER_EXECUTE OWNER_WRITE
+    						GROUP_READ GROUP_EXECUTE GROUP_WRITE
+    						WORLD_READ WORLD_EXECUTE WORLD_WRITE
+    						)
 endif()
 
 
@@ -313,6 +320,8 @@ set(DIRS
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/gui
 		${CustusX3_BINARY_DIR}/source/gui
 		${CustusX3_BINARY_DIR}/source/logic/
+		${CustusX3_BINARY_DIR}/modules/grabberServer
+		${CustusX3_BINARY_DIR}/modules/OpenIGTLinkServer
 		)
 
 # old version without plugins: remove after testing on win/linux.	
@@ -326,6 +335,8 @@ install(CODE "
           # add openigtlinkserver
         file(GLOB_RECURSE QTPLUGINS
           \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/OpenIGTLinkServer\")
+        file(GLOB_RECURSE QTPLUGINS
+          \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/GrabberServer\")
 		include(BundleUtilities)
 		fixup_bundle(\"${APPS}\"   \"\${QTPLUGINS}\"   \"${DIRS}\") "
 		)
