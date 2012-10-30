@@ -1099,8 +1099,8 @@
             <Type>LinearArray</Type>
             <DefaultRTSource>DVI</DefaultRTSource>
             <RTSource>
-                <TemporalCalibration>100</TemporalCalibration>
-                <__ImageTimestampCalibration>170</__ImageTimestampCalibration>
+                <TemporalCalibration>160</TemporalCalibration>
+                <TemporalCalibrationLinux>130</TemporalCalibrationLinux>
                 <Name>DVI</Name>
                 <DefaultConfig>WidthMaxDepth4</DefaultConfig>
                 <ImageSize>
