@@ -70,7 +70,7 @@ private slots:
 	void updateComboBox();
 
 private:
-	QStringList getAllFiles(QString folder);
+	QStringList getAllFiles(QString folder, int depth = 5);
 
 	QComboBox* mDataComboBox;
 	QToolButton* mSelectDataButton;

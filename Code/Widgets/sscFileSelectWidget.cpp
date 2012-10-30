@@ -105,7 +105,7 @@ void FileSelectWidget::selectData()
 	emit fileSelected(mFilename);
 }
 
-QStringList FileSelectWidget::getAllFiles(QString folder)
+QStringList FileSelectWidget::getAllFiles(QString folder, int depth)
 {
 	QDir dir(folder);
 	QStringList files = dir.entryList(mNameFilters, QDir::Files);
@@ -117,10 +117,13 @@ QStringList FileSelectWidget::getAllFiles(QString folder)
 	}
 	QStringList folders = dir.entryList(QStringList(), QDir::AllDirs | QDir::NoDotAndDotDot);
 
-	for (int i = 0; i < folders.size(); ++i)
+	if (depth>0)
 	{
-		files = this->getAllFiles(folder + "/" + folders[i]);
-		retval.append(files);
+		for (int i = 0; i < folders.size(); ++i)
+		{
+			files = this->getAllFiles(folder + "/" + folders[i], depth-1);
+			retval.append(files);
+		}
 	}
 
 	return retval;
@@ -136,7 +139,7 @@ void FileSelectWidget::updateComboBox()
 	mDataComboBox->blockSignals(true);
 	mDataComboBox->clear();
 
-	QStringList files = this->getAllFiles(mRootPath);
+	QStringList files = this->getAllFiles(mRootPath, 3);
 
 	for (int i = 0; i < files.size(); ++i)
 	{
