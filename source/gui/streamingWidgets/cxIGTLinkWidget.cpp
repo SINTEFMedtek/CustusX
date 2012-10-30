@@ -42,7 +42,9 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 	QStringList nameFilters;
 	nameFilters << "*.*";
 	mInitScriptWidget->setNameFilter(nameFilters);
-	mInitScriptWidget->setFilename(path);
+
+	if (!getConnection()->getInitScript().isEmpty())
+		mInitScriptWidget->setFilename(path);
 //	mParameterFileWidget0->setFilename(mElastixManager->getActiveParameterFile0());
 	connect(mInitScriptWidget, SIGNAL(fileSelected(QString)), this, SLOT(initScriptSelected(QString)));
 	mInitScriptWidget->setSizePolicy(QSizePolicy::Expanding, mInitScriptWidget->sizePolicy().verticalPolicy());

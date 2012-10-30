@@ -49,9 +49,9 @@ set(CustusX3_VERSION_MINOR  3)
 set(CustusX3_VERSION_PATCH  1)
 
 # set alpha when not a release
-set(CustusX3_VERSION_POSTFIX ".alpha")
+#set(CustusX3_VERSION_POSTFIX ".alpha")
 # set beta when a quick release
-#set(CustusX3_VERSION_POSTFIX ".beta")
+set(CustusX3_VERSION_POSTFIX ".beta")
 # set nothing when a normal release
 #set(CustusX3_VERSION_POSTFIX "")
 

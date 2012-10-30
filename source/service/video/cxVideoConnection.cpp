@@ -41,10 +41,14 @@ VideoConnection::VideoConnection()
 	mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
 
 	QStringList connectionOptions;
+	QString defaultConnection = "Direct Link";
+#ifdef __APPLE__
+	defaultConnection = "Local Server";	// grabber server is the preferred method on Mac.
+#endif
 	connectionOptions << "Local Server" << "Direct Link" << "Remote Server";
 	mConnectionMethod = ssc::StringDataAdapterXml::initialize("Connection", "",
 			"Method for connecting to Video Server",
-			"Direct Link",
+			defaultConnection,
 			connectionOptions,
 			mOptions.getElement());
 	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(settingsChanged()));
