@@ -18,6 +18,7 @@
 // See sscLicense.txt for more information.
 
 
+#include "sscTypeConversions.h"
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef __APPLE__
@@ -289,82 +290,82 @@ void ocl_print_info()
 
 	clGetPlatformIDs(256, platforms, &platforms_n);
 	for (unsigned int i = 0; i < platforms_n; i++) {
-		printf("platform %d of %d:\n", i+1, platforms_n);
+		std::cout << QString("platform %1 of %2:").arg(i+1).arg(platforms_n) << std::endl;
 		clGetPlatformInfo(platforms[i], CL_PLATFORM_VERSION, 2048, str, &temp_size);
-		printf("\t CL_PLATFORM_VERSION: %s\n", str);
+		std::cout << QString("\t CL_PLATFORM_VERSION: %1").arg(str) << std::endl;
 		clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, 2048, str, &temp_size);
-		printf("\t CL_PLATFORM_NAME: %s\n", str);
+		std::cout << QString("\t CL_PLATFORM_NAME: %1").arg(str) << std::endl;
 		clGetPlatformInfo(platforms[i], CL_PLATFORM_VENDOR, 2048, str, &temp_size);
-		printf("\t CL_PLATFORM_VENDOR: %s\n", str);
+		std::cout << QString("\t CL_PLATFORM_VENDOR: %1").arg(str) << std::endl;
 
 		clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_ALL, 256, devices, &devices_n);
 		for (unsigned int j = 0; j < devices_n; j++) {
-			printf("\t device %d of %d:\n", j+1, devices_n);
+			std::cout << QString("\t device %1 of %2:").arg(j+1).arg(devices_n) << std::endl;
 			cl_device_type type;
 			clGetDeviceInfo(devices[j], CL_DEVICE_TYPE, sizeof(type), &type, &temp_size);
 			if (type == CL_DEVICE_TYPE_CPU)
-				printf("\t\t CL_DEVICE_TYPE: CL_DEVICE_TYPE_CPU\n");
+				std::cout << QString("\t\t CL_DEVICE_TYPE: CL_DEVICE_TYPE_CPU") << std::endl;
 			else if (type == CL_DEVICE_TYPE_GPU)
-				printf("\t\t CL_DEVICE_TYPE: CL_DEVICE_TYPE_GPU\n");
+				std::cout << QString("\t\t CL_DEVICE_TYPE: CL_DEVICE_TYPE_GPU") << std::endl;
 			else if (type == CL_DEVICE_TYPE_ACCELERATOR)
-				printf("\t\t CL_DEVICE_TYPE: CL_DEVICE_TYPE_ACCELERATOR\n");
+				std::cout << QString("\t\t CL_DEVICE_TYPE: CL_DEVICE_TYPE_ACCELERATOR") << std::endl;
 			else if (type == CL_DEVICE_TYPE_DEFAULT)
-				printf("\t\t CL_DEVICE_TYPE: CL_DEVICE_TYPE_DEFAULT\n");
+				std::cout << QString("\t\t CL_DEVICE_TYPE: CL_DEVICE_TYPE_DEFAULT") << std::endl;
 			else 
-				printf("\t\t CL_DEVICE_TYPE: (combination)\n");
+				std::cout << QString("\t\t CL_DEVICE_TYPE: (combination)") << std::endl;
 
 			cl_uint temp_uint;
 			cl_ulong temp_ulong;
 			size_t temp_size_t;
 			cl_bool temp_bool;
 			size_t * size_t_array = (size_t *) malloc(sizeof(size_t)*3);
-			printf("\t\t device id: %p\n", devices[j]);
+			std::cout << QString("\t\t device id: %1").arg((long int)devices[j]) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_CLOCK_FREQUENCY, sizeof(temp_uint), &temp_uint, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_CLOCK_FREQUENCY: %d MHz\n", temp_uint);
+			std::cout << QString("\t\t CL_DEVICE_MAX_CLOCK_FREQUENCY: %1 MHz").arg(temp_uint) << std::endl;
 
-			printf("\n");
-			printf("\tMemory info:\n");
+			std::cout << std::endl;
+			std::cout << QString("\tMemory info:") << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
-			printf("\t\t CL_DEVICE_GLOBAL_MEM_SIZE: %lu Mb\n", temp_ulong/1024/1024);
+			std::cout << QString("\t\t CL_DEVICE_GLOBAL_MEM_SIZE: %1 Mb").arg(temp_ulong/1024/1024) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_MEM_ALLOC_SIZE: %lu Mb\n", temp_ulong/1024/1024);
+			std::cout << QString("\t\t CL_DEVICE_MAX_MEM_ALLOC_SIZE: %1 Mb").arg(temp_ulong/1024/1024) << std::endl;
 //			clGetDeviceInfo(devices[j], CL_DEVICE_HOST_UNIFIED_MEMORY, sizeof(cl_bool), &temp_bool, &temp_size);
 //			printf("\t\t CL_DEVICE_HOST_UNIFIED_MEMORY: %u \n", temp_bool);
 
-			printf("\n");
+			std::cout << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(temp_uint), &temp_uint, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_COMPUTE_UNITS: %d\n", temp_uint);
+			std::cout << QString("\t\t CL_DEVICE_MAX_COMPUTE_UNITS: %1").arg(temp_uint) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(temp_uint), &temp_uint, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS: %d\n", temp_uint);
+			std::cout << QString("\t\t CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS: %1").arg(temp_uint) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t)*3, size_t_array, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_WORK_ITEM_SIZES: %lu %lu %lu\n", size_t_array[0], size_t_array[1], size_t_array[2]);
+			std::cout << QString("\t\t CL_DEVICE_MAX_WORK_ITEM_SIZES: %1 %2 %3").arg(size_t_array[0]).arg(size_t_array[1]).arg(size_t_array[2]) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(temp_size_t), &temp_size_t, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_WORK_GROUP_SIZE: %lu\n", temp_size_t);
+			std::cout << QString("\t\t CL_DEVICE_MAX_WORK_GROUP_SIZE: %1").arg(temp_size_t) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_ADDRESS_BITS, sizeof(temp_uint), &temp_uint, &temp_size);
-			printf("\t\t CL_DEVICE_ADDRESS_BITS: %d\n", temp_uint);
+			std::cout << QString("\t\t CL_DEVICE_ADDRESS_BITS: %1").arg(temp_uint) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_MAX_PARAMETER_SIZE, sizeof(temp_size_t), &temp_size_t, &temp_size);
-			printf("\t\t CL_DEVICE_MAX_PARAMETER_SIZE: %lu b\n", temp_size_t);
+			std::cout << QString("\t\t CL_DEVICE_MAX_PARAMETER_SIZE: %1 b").arg(temp_size_t) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_LOCAL_MEM_SIZE, sizeof(temp_ulong), &temp_ulong, &temp_size);
-			printf("\t\t CL_DEVICE_LOCAL_MEM_SIZE: %lu b\n", temp_ulong);
+			std::cout << QString("\t\t CL_DEVICE_LOCAL_MEM_SIZE: %1 b").arg(temp_ulong) << std::endl;
 
-			printf("\n");
-			printf("\tDevice info:\n");
+			std::cout << std::endl;
+			std::cout << QString("\tDevice info:") << std::endl;
 
 			clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 2048, str, &temp_size);
-			printf("\t\t CL_DEVICE_NAME: %s\n", str);
+			std::cout << QString("\t\t CL_DEVICE_NAME: %1").arg(str) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_VENDOR, 2048, str, &temp_size);
-			printf("\t\t CL_DEVICE_VENDOR: %s\n", str);
+			std::cout << QString("\t\t CL_DEVICE_VENDOR: %1").arg(str) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_VERSION, 2048, str, &temp_size);
-			printf("\t\t CL_DEVICE_VERSION: %s\n", str);
+			std::cout << QString("\t\t CL_DEVICE_VERSION: %1").arg(str) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DRIVER_VERSION, 2048, str, &temp_size);
-			printf("\t\t CL_DRIVER_VERSION: %s\n", str);
+			std::cout << QString("\t\t CL_DRIVER_VERSION: %1").arg(str) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_AVAILABLE, sizeof(cl_bool), &temp_bool, &temp_size);
-			printf("\t\t CL_DEVICE_AVAILABLE: %u \n", temp_bool);
+			std::cout << QString("\t\t CL_DEVICE_AVAILABLE: %1").arg(temp_bool) << std::endl;
 			clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 2048, str, &temp_size);
-			printf("\t\t CL_DEVICE_EXTENSIONS: %s\n", str);
+			std::cout << QString("\t\t CL_DEVICE_EXTENSIONS: %1").arg(str) << std::endl;
 		}
 	}
-	printf("\n");
+	std::cout << std::endl;
 }
 
 
