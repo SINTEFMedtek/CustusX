@@ -291,7 +291,7 @@ void WirePhantomWidget::registration()
 	this->showData(mCenterlineOutput->getData());
 
 
-	SeansVesselReg vesselReg;
+	ssc::SeansVesselReg vesselReg;
 	vesselReg.mt_auto_lts = true;
 	vesselReg.mt_ltsRatio = 80;
 	vesselReg.mt_doOnlyLinear = true;
