@@ -86,7 +86,7 @@ void SeansVesselRegistrationWidget::registerSlot()
 //	mManager->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose,
 //		logPath);
 
-	SeansVesselReg vesselReg;
+	ssc::SeansVesselReg vesselReg;
 	vesselReg.mt_auto_lts = true;
 	vesselReg.mt_ltsRatio = mLTSRatioSpinBox->value();
 	vesselReg.mt_doOnlyLinear = mLinearCheckBox->isChecked();
@@ -240,8 +240,8 @@ public:
 	}
 
 private:
-	SeansVesselReg mRegistrator;
-	SeansVesselReg::ContextPtr mContext;
+	ssc::SeansVesselReg mRegistrator;
+	ssc::SeansVesselReg::ContextPtr mContext;
 	RegistrationManagerPtr mManager;
 	vtkPolyDataPtr mMovingData;
 	vtkPolyDataPtr mPolyLines;
