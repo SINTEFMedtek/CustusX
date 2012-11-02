@@ -33,6 +33,8 @@ namespace ssc
  * \{
  */
 
+typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
+
 typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
 /** \brief One position with timestamp
  */
@@ -59,83 +61,47 @@ inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)
 class USFrameData
 {
 public:
-	virtual void reinitialize() = 0;
+	static USFrameDataPtr create(ImagePtr inputFrameData);
+	static USFrameDataPtr create(std::vector<vtkImageDataPtr> inputFrameData, QString filename);
 	virtual ~USFrameData() {}
 	virtual void removeFrame(unsigned int index);
 	virtual unsigned char* getFrame(unsigned int index);
-	virtual int* getDimensions();
+	virtual Eigen::Array3i getDimensions();
 	virtual Vector3D getSpacing();
-	virtual QString getName() = 0;
-	virtual QString getUid() = 0;
-	virtual QString getFilePath() = 0;
+	virtual QString getName();
+	virtual QString getUid();
+	virtual QString getFilePath();
 	virtual void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
 	virtual void setCropBox(IntBoundingBox3D mCropbox);
 	bool save(QString filename, bool compressed);
-	virtual void fillImageImport(vtkImageImportPtr import, int index) = 0; ///< fill import with a single frame
+	virtual void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
+
+	virtual USFrameDataPtr copy();
 
 protected:
-	virtual vtkImageDataPtr getSingleBaseImage() = 0;
-	explicit USFrameData();
+	void initialize();
+	virtual void clearCache();
+	void generateCache();
+	virtual vtkImageDataPtr getSingleBaseImage();
+	USFrameData();
 	vtkImageDataPtr useAngio(vtkImageDataPtr inData);/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
+	vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
 
 	vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
 	vtkImageDataPtr toGrayscale(vtkImageDataPtr input);
 
-//private:
-//	ImagePtr getBase();
-//	ImagePtr mBaseImage;
-//	vtkImageDataPtr mProcessedImage; // baseimage converted to grayscale using angio or luminance algorithm
-	std::vector<unsigned char*> mFrames;
-	int* mDimensions;
-	Vector3D mSpacing;
+	std::vector<int> mReducedToFull; ///< map from indexes in the reduced volume to the full (original) volume.
+//	int* mDimensions;
+//	Vector3D mSpacing;
 	bool mUseAngio;
-	bool mDirty;
 	IntBoundingBox3D mCropbox;
-};
 
-class USFrameDataMonolithic : public USFrameData
-{
-public:
-	explicit USFrameDataMonolithic(ImagePtr inputFrameData);
-	virtual void reinitialize();
-
-	virtual QString getName();
-	virtual QString getUid();
-	virtual QString getFilePath();
-	virtual void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
-
-protected:
-	virtual vtkImageDataPtr getSingleBaseImage();
-
-private:
-	ImagePtr mBaseImage;
-	vtkImageDataPtr mProcessedImage; // baseimage converted to grayscale using angio or luminance algorithm
-};
-
-class USFrameDataSplitFrames : public USFrameData
-{
-public:
-	explicit USFrameDataSplitFrames(std::vector<vtkImageDataPtr> inputFrameData, QString filename);
-	virtual void reinitialize();
-
-	virtual QString getName();
-	virtual QString getUid();
-	virtual QString getFilePath();
-	virtual void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
-
-protected:
-	virtual vtkImageDataPtr getSingleBaseImage();
-
-private:
-	vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
-//	void crop();
 	QString mFilename;
+	vtkImageDataPtr mOptionalWholeBase; ///< handle for original monolithic data if present
 	std::vector<vtkImageDataPtr> mBaseImage;
 	std::vector<vtkImageDataPtr> mProcessedImage;
 };
 
-
-typedef boost::shared_ptr<USFrameData> USFrameDataPtr;
 
 struct USReconstructInputData
 {

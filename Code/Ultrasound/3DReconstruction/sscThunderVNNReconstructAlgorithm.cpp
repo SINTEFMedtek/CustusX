@@ -55,40 +55,49 @@ QString ThunderVNNReconstructAlgorithm::getName() const
 std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElement root)
 {
 	std::vector<DataAdapterPtr> retval;
+#ifdef SSC_USE_OpenCL
+	retval.push_back(this->getProcessorOption(root));
+	retval.push_back(this->getDistanceOption(root));
+	retval.push_back(this->getPrintOpenCLInfoOption(root));
+#endif
+	return retval;
+}
 
+StringDataAdapterXmlPtr ThunderVNNReconstructAlgorithm::getProcessorOption(QDomElement root)
+{
 #ifdef SSC_USE_OpenCL
 	QStringList processors;
 	if (ocl_has_device_type("CPU"))
 		processors << "CPU";
 	if (ocl_has_device_type("GPU"))
 		processors << "GPU";
-
-	mProcessorOption = StringDataAdapterXml::initialize("Processor", "", "Which processor to use when reconstructing",
+#endif
+	return StringDataAdapterXml::initialize("Processor", "", "Which processor to use when reconstructing",
 		processors[0], processors, root);
-	mDistanceOption
-		= DoubleDataAdapterXml::initialize("Distance (mm)", "",
+}
+
+DoubleDataAdapterXmlPtr ThunderVNNReconstructAlgorithm::getDistanceOption(QDomElement root)
+{
+	return  DoubleDataAdapterXml::initialize("Distance (mm)", "",
 			"Max distance from frame to voxel when filling output volume. mm.", 1, ssc::DoubleRange(0.1, 10, 0.01), 0,
 			root);
-	mPrintOpenCLInfoOption = BoolDataAdapterXml::initialize("Print OpenCL Info", "",
+}
+
+BoolDataAdapterPtr ThunderVNNReconstructAlgorithm::getPrintOpenCLInfoOption(QDomElement root)
+{
+	return BoolDataAdapterXml::initialize("Print OpenCL Info", "",
 		"Query OpenCL and print info about CPU to stdout.", false, root);
-
-	retval.push_back(mProcessorOption);
-	retval.push_back(mDistanceOption);
-	retval.push_back(mPrintOpenCLInfoOption);
-#endif
-
-	return retval;
 }
 
 bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
-	USFrameDataPtr frameData, ImagePtr outputData, ImagePtr frameMask, QDomElement settings)
+	USFrameDataPtr frameData, vtkImageDataPtr outputData, ImagePtr frameMask, QDomElement settings)
 {
 	bool success = false;
 #ifdef SSC_USE_OpenCL
-	std::cout << "processor: " << mProcessorOption->getValue() << std::endl;
-	std::cout << "distance: " << mDistanceOption->getValue() << std::endl;
+	std::cout << "processor: " << this->getProcessorOption(settings)->getValue() << std::endl;
+	std::cout << "distance: " << this->getDistanceOption(settings)->getValue() << std::endl;
 
-	if (mPrintOpenCLInfoOption->getValue())
+	if (this->getPrintOpenCLInfoOption(settings)->getValue())
 	{
 		std::cout << "Printing OpenCL info to stdout..." << std::endl;
 		ocl_print_info();
@@ -120,7 +129,7 @@ bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 	//data.input_dim = input->getDimensions();
 	//data.input_spacing = input->GetSpacing();
 
-	int* inputDims = frameData->getDimensions();
+	Eigen::Array3i inputDims = frameData->getDimensions();
 	//test
 	//long size = data.input_dim[0]*data.input_dim[1]*data.input_dim[2];
 	double size = double(inputDims[0] * inputDims[1] * inputDims[2]) / 1024 / 1024;
@@ -146,14 +155,16 @@ bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 	data.input_mask = static_cast<unsigned char*> (input_mask->GetScalarPointer());
 	//  data.frameMask = frameMask;
 
-	vtkImageDataPtr output = outputData->getBaseVtkImageData();
+	vtkImageDataPtr output = outputData;
 	data.output = static_cast<unsigned char*> (output->GetScalarPointer());
 	//  data.outputData = outputData;
 	output->GetDimensions(data.output_dim);
 	output->GetSpacing(data.output_spacing);
 
-	success = reconstruct_vnn(&data, path.absoluteFilePath().toStdString().c_str(), mProcessorOption->getValue(),
-		static_cast<float> (mDistanceOption->getValue()));
+	success = reconstruct_vnn(&data,
+			path.absoluteFilePath().toStdString().c_str(),
+			this->getProcessorOption(settings)->getValue(),
+		static_cast<float> (this->getDistanceOption(settings)->getValue()));
 	//ssc::messageManager()->sendInfo("ThunderVNNReconstructAlgorithm::reconstruct ***success***");
 #endif // SSC_USE_OpenCL
 	return success;

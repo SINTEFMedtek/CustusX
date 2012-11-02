@@ -31,6 +31,8 @@ SET( SOURCE_FILES
   utils/sscReconstructHelper.cpp
   sscUSFrameData.h
   sscUSFrameData.cpp
+  sscReconstructCore.cpp
+  sscReconstructCore.h
       )
 
 # =========================================================

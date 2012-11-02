@@ -43,18 +43,17 @@ public:
 	// constants, set only based on input data
 	ssc::DoubleBoundingBox3D mExtent;
 	double mInputSpacing;
-	Eigen::Array3i mInputDim;
 	ssc::Transform3D m_rMd; ///< transform from output data space to global ref space r
 
-	OutputVolumeParams(ssc::XmlOptionFile settings) :
-		mExtent(0, 0, 0, 0, 0, 0), mInputSpacing(0), mInputDim(0, 0, 0), m_rMd(Transform3D::Identity()),
-			mDim(0, 0, 0), mSpacing(0), mSettings(settings)
+	OutputVolumeParams() :
+		mExtent(0, 0, 0, 0, 0, 0), mInputSpacing(0), m_rMd(Transform3D::Identity()),
+			mDim(0, 0, 0), mSpacing(0), mMaxVolumeSize(32)
 	{
 	}
 	/** Initialize the volue parameters with sensible defaults.
 	 */
-	OutputVolumeParams(ssc::XmlOptionFile settings, ssc::DoubleBoundingBox3D extent, double inputSpacing, Eigen::Array3i inputDim) :
-		mExtent(extent), mInputSpacing(inputSpacing), mInputDim(inputDim), mSettings(settings)
+	OutputVolumeParams(ssc::DoubleBoundingBox3D extent, double inputSpacing) :
+		mExtent(extent), mInputSpacing(inputSpacing), mMaxVolumeSize(32)
 	{
 		// Calculate optimal output image spacing and dimensions based on US frame spacing
 		this->setSpacing(mInputSpacing);
@@ -107,26 +106,19 @@ public:
 
 	void setMaxVolumeSize(double maxSize)
 	{
-		ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
-//		std::cout << "file pre write:\n " << mSettings.getDocument().toString(4) << std::endl;
-//		std::cout << "write " << maxSize << std::endl;
-		maxVol.writeValue(QString::number(maxSize));
+		mMaxVolumeSize = maxSize;
 	}
 
 	unsigned long getMaxVolumeSize()
 	{
-		ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
-		double maxVolVal = maxVol.readValue(QString::number(1024 * 1024 * 16)).toDouble();
-//		std::cout << "read " << maxVolVal << std::endl;
-//		std::cout << "file:\n " << mSettings.getDocument().toString(4) << std::endl;
-		return maxVolVal;
+		return mMaxVolumeSize;
 	}
 
 private:
 	// controllable data, set only using the setters
 	Eigen::Array3i mDim;
 	double mSpacing;
-	XmlOptionFile mSettings;
+	double mMaxVolumeSize;
 };
 
 /**

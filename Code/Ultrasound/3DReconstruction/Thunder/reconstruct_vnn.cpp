@@ -166,7 +166,7 @@ bool call_vnn_kernel(cl_kernel vnn, ocl_context* context, reconstruct_data* data
 
 	float volume_spacing = data->output_spacing[0];
 
-	int* inputDim = data->frameData->getDimensions();
+	Eigen::Array3i inputDim = data->frameData->getDimensions();
 	int bscan_w = inputDim[0];
 	int bscan_h = inputDim[1];
 	int bscan_n = inputDim[2];
@@ -379,7 +379,7 @@ bool reconstruct_vnn(reconstruct_data* data, const char* kernel_path, QString pr
 
 	cl_kernel vnn = ocl_kernel_build(program, context->device, "vnn");
 
-	int* inputDims = data->frameData->getDimensions();
+	Eigen::Array3i inputDims = data->frameData->getDimensions();
 	ssc::Vector3D inputSpacing = data->frameData->getSpacing();
 	float3* plane_points = generate_plane_points(data->input_pos_matrices, inputDims[0], inputDims[1], inputDims[2],
 		inputSpacing[0], inputSpacing[1]);

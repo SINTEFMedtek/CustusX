@@ -55,12 +55,13 @@ public:
 		return "PNN";
 	}
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
-	virtual bool reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData, ImagePtr outputData,
+	virtual bool reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData, vtkImageDataPtr outputData,
 		ImagePtr frameMask, QDomElement settings);
-	DoubleDataAdapterXmlPtr mInterpolationStepsOption;
+//	DoubleDataAdapterXmlPtr mInterpolationStepsOption;
+	DoubleDataAdapterXmlPtr getInterpolationStepsOption(QDomElement root);
 private:
 	//DoubleDataAdapterXmlPtr mInterpolationDistanceOption;
-	bool validPixel(int x, int y, int* dims, unsigned char* rawPointer)
+	bool validPixel(int x, int y, const Eigen::Array3i& dims, unsigned char* rawPointer)
 	{
 		return (x >= 0) && (x < dims[0]) && (y >= 0) && (y < dims[1]) && (rawPointer[x + y * dims[0]] != 0);
 	}
@@ -70,7 +71,7 @@ private:
 		return (x >= 0) && (x < dims[0]) && (y >= 0) && (y < dims[1]) && (z >= 0) && (z < dims[2]);
 	}
 
-	void interpolate(ImagePtr inputData, ImagePtr outputData);
+	void interpolate(ImagePtr inputData, vtkImageDataPtr outputData, QDomElement settings);
 	vtkImageDataPtr createMask(vtkImageDataPtr inputData);
 	void fillHole(unsigned char *inputPointer, unsigned char *outputPointer, int x, int y, int z, const Eigen::Array3i& dim, int interpolationSteps);
 };
