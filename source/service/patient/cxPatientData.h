@@ -81,6 +81,7 @@ public slots:
 	void savePatient(); ///< Save all application data to XML file
 	void clearPatient();
 	void exportPatient(bool niftiFormat);
+	void autoSave();
 
 signals:
 	void patientChanged();

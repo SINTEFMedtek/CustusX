@@ -681,6 +681,7 @@ void MainWindow::onWorkflowStateChangedSlot()
 
 	viewManager()->setActiveLayout(desktop.mLayoutUid);
 	this->restoreState(desktop.mMainWindowState);
+	patientService()->getPatientData()->autoSave();
 }
 
 void MainWindow::saveDesktopSlot()
@@ -1027,6 +1028,8 @@ void MainWindow::configureSlot()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+	patientService()->getPatientData()->autoSave();
+
 	settings()->setValue("mainWindow/geometry", saveGeometry());
 	settings()->setValue("mainWindow/windowState", saveState());
 	settings()->sync();

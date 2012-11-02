@@ -416,12 +416,22 @@ void AutomationTab::init()
   mAutoSelectDominantToolCheckBox = new QCheckBox("Auto Select Active Tool");
   mAutoSelectDominantToolCheckBox->setChecked(autoSelectDominantTool);
 
+  bool autoSave = settings()->value("Automation/autoSave").toBool();
+  mAutoSaveCheckBox = new QCheckBox("Auto Save");
+  mAutoSaveCheckBox->setChecked(autoSave);
+
+  bool autoShow = settings()->value("Automation/autoShowNewData").toBool();
+  mAutoShowNewDataCheckBox = new QCheckBox("Auto Show New Data");
+  mAutoShowNewDataCheckBox->setChecked(autoShow);
+
   //Layout
   mMainLayout = new QVBoxLayout;
   mMainLayout->addWidget(mAutoStartTrackingCheckBox);
   mMainLayout->addWidget(mAutoStartStreamingCheckBox);
   mMainLayout->addWidget(mAutoReconstructCheckBox);
   mMainLayout->addWidget(mAutoSelectDominantToolCheckBox);
+  mMainLayout->addWidget(mAutoSaveCheckBox);
+  mMainLayout->addWidget(mAutoShowNewDataCheckBox);
 
   mTopLayout->addLayout(mMainLayout);
 
@@ -433,6 +443,8 @@ void AutomationTab::saveParametersSlot()
   settings()->setValue("Automation/autoStartStreaming", mAutoStartStreamingCheckBox->isChecked());
   settings()->setValue("Automation/autoReconstruct", mAutoReconstructCheckBox->isChecked());
   settings()->setValue("Automation/autoSelectDominantTool", mAutoSelectDominantToolCheckBox->isChecked());
+  settings()->setValue("Automation/autoSave", mAutoSaveCheckBox->isChecked());
+  settings()->setValue("Automation/autoShowNewData", mAutoShowNewDataCheckBox->isChecked());
 }
 
 //==============================================================================
