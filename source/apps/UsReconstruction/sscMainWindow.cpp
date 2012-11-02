@@ -57,7 +57,7 @@ void MainWindow::showData()
   }
 
   //ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getInput();
-  ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getOutput();
+  ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getReconstructer()->createCore()->reconstruct();
   mVolumeRep->setImage(data);
 
   //Test: show axes

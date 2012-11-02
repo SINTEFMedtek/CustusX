@@ -307,6 +307,8 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	if (mUpdating)
 		return;
 	// need a cx probe here, in order to set data.
+	if (!mActiveProbeConfig->getTool())
+		return;
 	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
