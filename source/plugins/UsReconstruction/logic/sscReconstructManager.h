@@ -14,13 +14,11 @@
 #include "sscReconstructAlgorithm.h"
 #include "sscBoundingBox3D.h"
 #include "sscReconstructedOutputVolumeParams.h"
-//#include "probeXmlConfigParser.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 #include "sscXmlOptionItem.h"
 #include "sscProbeSector.h"
-//#include "sscStringWidgets.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxThreadedTimedAlgorithm.h"
 
@@ -29,6 +27,7 @@ namespace ssc
 
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
+typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 
 /**
@@ -63,41 +62,44 @@ public:
 
 	void selectData(QString filename, QString calFilesPath = "");
 	void selectData(ssc::USReconstructInputData data);
-	void reconstruct(); // assumes readFiles has already been called
 	QString getSelectedData() const;
 
 	ReconstructParamsPtr getParams();
 
-	ReconstructAlgorithmPtr getAlgorithm();///< The used reconstruction algorithm
 	std::vector<DataAdapterPtr> getAlgoOptions();
 	ReconstructerPtr getReconstructer() { return mReconstructer; }
 	ssc::USReconstructInputData getBaseInputData() { return mOriginalFileData; }
 
-	ImagePtr getOutput();
 	OutputVolumeParams getOutputVolumeParams() const;
 	void setOutputVolumeParams(const OutputVolumeParams& par);
 	void setOutputRelativePath(QString path);
 	void setOutputBasePath(QString path);
 
-	ssc::ThreadedTimedReconstructerPtr getThreadedTimedReconstructer() { return mThreadedTimedReconstructer; }
+		std::set<ssc::ThreadedTimedReconstructerPtr> getThreadedReconstruction() { return mThreadedReconstruction; }
+
+		void startReconstruction();
 
 signals:
 	void paramsChanged();
 	void algorithmChanged();
 	void inputDataSelected(QString mhdFileName);
-	void reconstructFinished();
+	void reconstructAboutToStart();
 
 private:
 	ReconstructerPtr mReconstructer;
-	ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
+	std::set<ssc::ThreadedTimedReconstructerPtr> mThreadedReconstruction;
 	cx::UsReconstructionFileReaderPtr mFileReader;
 	ssc::USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 	QString mCalFilesPath; ///< Path to calibration files
 
+	void launch(ThreadedTimedReconstructerPtr thread);
 	void readCoreFiles(QString fileName, QString calFilesPath);
 	void clearAll();
-//	void updateFromOriginalFileData();
 	bool validInputData() const;
+
+private slots:
+	void threadFinishedSlot();
+
 };
 
 /**
@@ -110,7 +112,7 @@ class ThreadedTimedReconstructer: public cx::ThreadedTimedAlgorithm<void>
 {
 Q_OBJECT
 public:
-	ThreadedTimedReconstructer(ReconstructerPtr reconstructer);
+	ThreadedTimedReconstructer(ReconstructCorePtr reconstructer);
 	virtual ~ThreadedTimedReconstructer();
 
 	void start();
@@ -120,7 +122,7 @@ private slots:
 
 private:
 	virtual void calculate();
-	ReconstructerPtr mReconstructer;
+	ReconstructCorePtr mReconstructer;
 };
 
 

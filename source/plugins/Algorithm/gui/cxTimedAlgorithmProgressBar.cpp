@@ -20,8 +20,8 @@
 namespace cx
 {
 
-TimedAlgorithmProgressBar::TimedAlgorithmProgressBar(QWidget* parent) :
-	mStartedAlgos(0)
+TimedAlgorithmProgressBar::TimedAlgorithmProgressBar(QWidget* parent) //:
+//	mStartedAlgos(0)
 {
 	QHBoxLayout* layout = new QHBoxLayout(this);
 	layout->setMargin(0);
@@ -63,6 +63,7 @@ void TimedAlgorithmProgressBar::detach(TimedAlgorithmPtr algorithm)
 		disconnect(algorithm.get(), SIGNAL(started(int)), this, SLOT(algorithmStartedSlot(int)));
 		disconnect(algorithm.get(), SIGNAL(finished()), this, SLOT(algorithmFinishedSlot()));
 		disconnect(algorithm.get(), SIGNAL(productChanged()), this, SLOT(productChangedSlot()));
+		this->algorithmFinished(algorithm.get());
 	}
 
 	mAlgorithm.erase(algorithm);
@@ -88,7 +89,8 @@ void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 
 	mLabel->setText(product);
 	mLabel->show();
-	mStartedAlgos++;
+//	mStartedAlgos++;
+	mStartedAlgos.insert(algo);
 
 	mTimerWidget->show();
 	mTimerWidget->start();
@@ -102,14 +104,23 @@ void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 void TimedAlgorithmProgressBar::algorithmFinishedSlot()
 {
 	TimedBaseAlgorithm* algo = dynamic_cast<TimedBaseAlgorithm*>(sender());
+	this->algorithmFinished(algo);
+}
+
+void TimedAlgorithmProgressBar::algorithmFinished(TimedBaseAlgorithm* algo)
+{
+//	TimedBaseAlgorithm* algo = dynamic_cast<TimedBaseAlgorithm*>(sender());
 	QString product = "algorithm";
 	if (algo)
 		product = algo->getProduct();
 
 //	ssc::messageManager()->sendSuccess(QString("%1 complete [%2s]").arg(product).arg(mTimerWidget->elaspedSeconds()));
 
-	if (--mStartedAlgos >0) // dont hide before the last algo has completed.
+	mStartedAlgos.erase(algo);
+	if (!mStartedAlgos.empty())
 		return;
+//	if (--mStartedAlgos >0) // dont hide before the last algo has completed.
+//		return;
 
 	mProgressBar->setValue(0);
 	mProgressBar->hide();

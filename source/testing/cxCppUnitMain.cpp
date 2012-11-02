@@ -32,9 +32,12 @@ int main(int argc, char **argv)
 //	runner.addTest( new CppUnit::TestCaller<cxTestSpeed>(
 //                                       "init",
 //                                        &cxTestSpeed::testKaisaSpeed ) );
-  runner.addTest( new CppUnit::TestCaller<cxTestSpeed>(
+	runner.addTest( new CppUnit::TestCaller<cxTestSpeed>(
                                        "init",
-                                        &cxTestSpeed::testLapSpeed ) );
+                                        &cxTestSpeed::testKaisaMetricsSpeed ) );
+//  runner.addTest( new CppUnit::TestCaller<cxTestSpeed>(
+//                                       "init",
+//                                        &cxTestSpeed::testLapSpeed ) );
 	//runner.addTest(cxTestExamples::suite());
 #endif
 	

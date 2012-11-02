@@ -94,7 +94,7 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::T
 //		ssc::ImagePtr image(new ssc::Image(retval.mFilename, imageData));
 //		image->setFilePath(reconstructionFolder);
 //		retval.mUsRaw.reset(new ssc::USFrameDataMonolithic(image));
-		retval.mUsRaw.reset(new ssc::USFrameDataSplitFrames(frames, retval.mFilename));
+		retval.mUsRaw = ssc::USFrameData::create(frames, retval.mFilename);
 	}
 
 	for (ssc::TimedTransformMap::iterator it = trackerRecordedData.begin(); it != trackerRecordedData.end(); ++it)
