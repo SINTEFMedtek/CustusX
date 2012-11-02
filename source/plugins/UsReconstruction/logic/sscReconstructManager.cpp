@@ -29,6 +29,9 @@
 #include "cxToolManager.h"
 #include "sscManualTool.h"
 #include "sscReconstructer.h"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
+#include "cxViewManager.h"
 
 //Windows fix
 #ifndef M_PI
@@ -210,6 +213,9 @@ void ThreadedTimedReconstructer::start()
 void ThreadedTimedReconstructer::postProcessingSlot()
 {
 	mReconstructer->threadedPostReconstruct();
+
+	cx::patientService()->getPatientData()->autoSave();
+	cx::viewManager()->autoShowData(mReconstructer->getOutput());
 }
 
 void ThreadedTimedReconstructer::calculate()
