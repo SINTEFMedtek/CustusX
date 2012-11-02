@@ -181,7 +181,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 //	std::cout << "receiving async op" << std::endl;
 	// file read operation has completed: read and clear
 	mCurrentData = mUSImageDataFutureResult.result();
-	mCurrentData.mUsRaw->reinitialize();
+//	mCurrentData.mUsRaw->reinitialize();
 	// clear result so we can check for it next run
 	mUSImageDataReader.reset();
 
@@ -237,7 +237,7 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	int timeout = 1000; // invalidate data if timestamp differ from time too much
 	mVideoSource->setValidData(fabs(timestamp-*iter)<timeout);
 
-	int* dim = mCurrentData.mUsRaw->getDimensions();
+	Eigen::Array3i dim = mCurrentData.mUsRaw->getDimensions();
 	ssc::Vector3D spacing = mCurrentData.mUsRaw->getSpacing();
 	mVideoSource->setResolution(spacing[0]);
 

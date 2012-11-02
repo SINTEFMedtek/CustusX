@@ -67,6 +67,7 @@ public:
   	emit aboutToStart();
   	this->generate();
   }
+  bool isFinished() const { return mWatcher.isFinished(); }
 
 protected:
   virtual void postProcessingSlot() = 0; ///< This happens when the thread (calculate) is finished, here non-thread safe functions can be called
