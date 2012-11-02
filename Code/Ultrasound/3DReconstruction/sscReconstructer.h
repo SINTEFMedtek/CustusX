@@ -32,6 +32,8 @@
 #include "sscXmlOptionItem.h"
 #include "sscProbeSector.h"
 
+#include "sscReconstructCore.h"
+
 namespace ssc
 {
 
@@ -54,11 +56,12 @@ public:
 	StringDataAdapterXmlPtr mOrientationAdapter;
 	StringDataAdapterXmlPtr mPresetTFAdapter;
 	StringDataAdapterXmlPtr mAlgorithmAdapter;
-//	std::vector<DataAdapterPtr> mAlgoOptions;
 	StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction
 	BoolDataAdapterXmlPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
 	DoubleDataAdapterXmlPtr mTimeCalibration; ///set a offset in the frame timestamps
+	DoubleDataAdapterXmlPtr mMaxVolumeSize; ///< Set max size of output volume.
 	BoolDataAdapterXmlPtr mAngioAdapter; ///US angio data is used as input
+	BoolDataAdapterXmlPtr mCreateBModeWhenAngio; /// If angio requested, create a B-mode reoconstruction based on the same data set.
 
 	XmlOptionFile mSettings;
 
@@ -101,21 +104,21 @@ public:
 	virtual ~Reconstructer();
 
 	void setInputData(USReconstructInputData fileData);
-	void reconstruct(); // assumes readFiles has already been called
+//	void reconstruct(); // assumes readFiles has already been called
+	ReconstructCorePtr createCore(); ///< used for threaded reconstruction
+	ReconstructCorePtr createDualCore(); ///< core version for B-mode in case of angio recording.
 
-	ImagePtr getOutput();
+//	ImagePtr getOutput();
 	ReconstructParamsPtr mParams;
 	std::vector<DataAdapterPtr> mAlgoOptions;
 
-	ReconstructAlgorithmPtr mAlgorithm;///< The used reconstruction algorithm
+//	ReconstructAlgorithmPtr mAlgorithm;///< The used reconstruction algorithm
 
 	OutputVolumeParams getOutputVolumeParams() const;
 	void setOutputVolumeParams(const OutputVolumeParams& par);
 	void setOutputRelativePath(QString path);
 	void setOutputBasePath(QString path);
 	void clearAll();
-	Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
-	Transform3D slerpInterpolate(const Transform3D& a, const Transform3D& b, double t);
 
 public slots:
 	void setSettings();
@@ -125,43 +128,30 @@ signals:
 	void paramsChanged();
 	void algorithmChanged();
 	void inputDataSelected(QString mhdFileName);
-	void reconstructFinished();
+//	void reconstructFinished();
 
 private:
 	USReconstructInputData mFileData;
 	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
-	bool mSuccess;
-	bool mIsReconstructing; ///< use for blocking of parameter setting while reconstructing.
+//	bool mIsReconstructing; ///< use for blocking of parameter setting while reconstructing.
 	OutputVolumeParams mOutputVolumeParams;
 	XmlOptionFile mSettings;
-	ImagePtr mOutput;///< Output image from reconstruction
 	QString mOutputRelativePath;///< Relative path to the output image
 	QString mOutputBasePath;///< Global path where the relative path starts, for the output image
 	QString mShaderPath; ///< name of shader folder
 	double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
 
-	ssc::Transform3D applyOutputOrientation();
-	void findExtentAndOutputTransform();
-	void transformPositionsTo_prMu();
-	void cropInputData();
-
-	void alignTimeSeries();
-	void applyTimeCalibration();
-	void calibrateTimeStamps(double timeOffset, double scale);
-	void interpolatePositions();
-	std::vector<ssc::Vector3D> generateInputRectangle();
-	ImagePtr generateOutputVolume();
 	void clearOutput();
 	void createAlgorithm();
 	void updateFromOriginalFileData();
+	ReconstructCore::InputParams createCoreParameters();
 
-	QString generateOutputUid();
-	QString generateImageName(QString uid) const;
+	ReconstructCorePtr mReconstructCore; ///< in progress: algorithm part of class moved here.
 
-	void threadedPreReconstruct();
-	void threadedReconstruct();
-	void threadedPostReconstruct();
-	bool checkAndWarnForReconstruction();
+//	void threadedPreReconstruct();
+//	void threadedReconstruct();
+//	void threadedPostReconstruct();
+//	bool checkAndWarnForReconstruction();
 	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
 };
 

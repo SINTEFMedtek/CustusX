@@ -60,7 +60,9 @@ SET( SSC_QT_MOC_HEADER_FILES
     Video/sscVideoSourceSHM.h
     Video/sscTestVideoSource.h
     Video/sscImageImportVideoSource.h
-    
+
+    Video/sscImageImportVideoSource.h
+        
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h

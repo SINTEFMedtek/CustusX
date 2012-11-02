@@ -61,14 +61,17 @@ public:
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual bool reconstruct(std::vector<TimedPosition> frameInfo,
 		USFrameDataPtr frameData,
-		ImagePtr outputData,
+		vtkImageDataPtr outputData,
 		ImagePtr frameMask,
 		QDomElement settings);
 
-	StringDataAdapterXmlPtr mProcessorOption;///< Select the processor to run the ocl code on (CPU/GPU)
+	StringDataAdapterXmlPtr getProcessorOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getDistanceOption(QDomElement root);
+	BoolDataAdapterPtr getPrintOpenCLInfoOption(QDomElement root);
+//	StringDataAdapterXmlPtr mProcessorOption;///< Select the processor to run the ocl code on (CPU/GPU)
 private:
-	DoubleDataAdapterXmlPtr mDistanceOption;
-	BoolDataAdapterXmlPtr mPrintOpenCLInfoOption;
+//	DoubleDataAdapterXmlPtr mDistanceOption;
+//	BoolDataAdapterXmlPtr mPrintOpenCLInfoOption;
 	QString mShaderPath;
 };
 

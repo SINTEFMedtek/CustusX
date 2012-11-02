@@ -67,7 +67,7 @@ public:
 	 * \param frameMask A mask image for the frame.
 	 * \param settings Reference to settings file containing algorithm-specific settings
 	 */
-	virtual bool reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData, ImagePtr outputData,
+	virtual bool reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData, vtkImageDataPtr outputData,
 		ImagePtr frameMask, QDomElement settings) = 0;
 };
 

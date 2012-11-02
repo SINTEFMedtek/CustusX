@@ -40,63 +40,118 @@ typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
 namespace ssc
 {
-USFrameData::USFrameData() :
-	mUseAngio(false), mCropbox(0,0,0,0,0,0), mDirty(true)
-{
-//	mBaseImage = inputFrameData;
 
-	//this->reinitialize();
+USFrameDataPtr USFrameData::create(ImagePtr inputFrameData)
+{
+	USFrameDataPtr retval(new USFrameData());
+
+	retval->mFilename = inputFrameData->getName();
+
+	vtkImageDataPtr input = inputFrameData->getBaseVtkImageData();
+	retval->mOptionalWholeBase = input;
+	retval->mBaseImage.resize(input->GetDimensions()[2]);
+
+	for (int i=0; i<retval->mBaseImage.size(); ++i)
+	{
+		vtkImageImportPtr import = vtkImageImportPtr::New();
+
+		import->SetImportVoidPointer(input->GetScalarPointer(0,0,i));
+		import->SetDataScalarType(input->GetScalarType());
+		import->SetDataSpacing(input->GetSpacing());
+		import->SetNumberOfScalarComponents(input->GetNumberOfScalarComponents());
+		int* extent = input->GetWholeExtent();
+		extent[4] = 0;
+		extent[5] = 0;
+		import->SetWholeExtent(extent);
+		import->SetDataExtentToWholeExtent();
+
+		import->Update();
+		retval->mBaseImage[i] = import->GetOutput();
+	}
+
+	retval->initialize();
+
+	return retval;
 }
 
+USFrameDataPtr USFrameData::create(std::vector<vtkImageDataPtr> inputFrameData, QString filename)
+{
+	USFrameDataPtr retval(new USFrameData());
+	retval->mFilename = filename;
+	retval->mBaseImage = inputFrameData;
+
+	retval->initialize();
+
+	return retval;
+}
+
+USFrameData::USFrameData() :
+		mUseAngio(false), mCropbox(0,0,0,0,0,0)
+{
+}
+
+void USFrameData::initialize()
+{
+	if (mBaseImage.empty())
+		return;
+
+	mReducedToFull.clear();
+	for (unsigned i=0; i<mBaseImage.size(); ++i)
+		mReducedToFull.push_back(i);
+
+//	mDimensions = mBaseImage[0]->GetDimensions();
+//	mDimensions[2] = mBaseImage.size();
+//
+//	mSpacing = Vector3D(mBaseImage[0]->GetSpacing());
+//	mSpacing[2] = mSpacing[0]; // set z-spacing to arbitrary value.
+}
 
 /**
  * Dimensions will be changed after this
  */
 void USFrameData::removeFrame(unsigned int index)
 {
-	//	std::cout << "USFrameData::removeFrame " << index << std::endl;
-	mFrames.erase(mFrames.begin() + index);
-	mDimensions[2]--;
+	if (index>=mReducedToFull.size())
+	{
+		ssc::messageManager()->sendError("index error");
+		return;
+	}
+	mReducedToFull.erase(mReducedToFull.begin()+index);
+
+//	std::cout << "USFrameData::removeFrame " << index << ", ptr=" << this << std::endl;
+//	mDimensions[2]--;
+
+	this->clearCache();
 }
 
-unsigned char* USFrameData::getFrame(unsigned int index)
+Eigen::Array3i USFrameData::getDimensions()
 {
-	return mFrames[index];
-}
-
-int* USFrameData::getDimensions()
-{
-	return mDimensions;
+	Eigen::Array3i retval(mBaseImage[0]->GetDimensions());
+	if (mCropbox[1]!=0)
+	{
+		retval[0] = mCropbox.range()[0];
+		retval[1] = mCropbox.range()[1];
+	}
+	retval[2] = mReducedToFull.size();
+	return retval;
+////	return mDimensions;
+//	mDimensions = mBaseImage[0]->GetDimensions();
+//	mDimensions[2] = mBaseImage.size();
 }
 
 Vector3D USFrameData::getSpacing()
 {
-	return mSpacing;
+	if (mBaseImage.empty())
+		return Vector3D(1,1,1);
+	ssc::Vector3D retval = Vector3D(mBaseImage[0]->GetSpacing());
+	retval[2] = retval[0]; // set z-spacing to arbitrary value.
+	return retval;
 }
-//
-//QString USFrameData::getName()
-//{
-//	return mBaseImage->getName();
-//}
-//
-//QString USFrameData::getUid()
-//{
-//	return mBaseImage->getUid();
-//}
-//
-//QString USFrameData::getFilePath()
-//{
-//	return mBaseImage->getFilePath();
-//}
 
-//ImagePtr USFrameData::getBase()
-//{
-//	return mBaseImage;
-//}
 void USFrameData::setAngio(bool angio)
 {
 	if (angio!=mUseAngio)
-		mDirty = true;
+		this->clearCache();
 
 	mUseAngio = angio;
 }
@@ -107,8 +162,10 @@ void USFrameData::setCropBox(IntBoundingBox3D cropbox)
 	cropbox[4] = -100000;
 	cropbox[5] =  100000;
 
+//	std::cout << "USFrameData::setCropBox " << cropbox << std::endl;
+
 	if (cropbox!=mCropbox)
-		mDirty = true;
+		this->clearCache();
 
 	mCropbox = cropbox;
 }
@@ -218,6 +275,9 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
  * appending the other frames manually, and then hacking the mhd file to
  * incorporate the correct dimensions.
  *
+ * Update: Because we want to compress data, the standard vtk filter is used.
+ * This is not a big problem anymore because this is done in a working thread.
+ *
  */
 bool USFrameData::save(QString filename, bool compressed)
 {
@@ -236,144 +296,30 @@ bool USFrameData::save(QString filename, bool compressed)
 	return true;;
 }
 
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-USFrameDataMonolithic::USFrameDataMonolithic(ImagePtr inputFrameData) :
-	USFrameData()
+unsigned char* USFrameData::getFrame(unsigned int index)
 {
-	mBaseImage = inputFrameData;
-//	QDateTime start = QDateTime::currentDateTime();
-	this->reinitialize();
-//	std::cout << "reinit mon cons: " << start.msecsTo(QDateTime::currentDateTime()) << "ms" << std::endl;
-}
+	this->generateCache();
 
-/** reset the internal state of the oobject to that of the initialization,
- * i.e. no removed frames.
- */
-void USFrameDataMonolithic::reinitialize()
-{
-	if (!mDirty)
-		return;
-	mDirty = false;
-
-	vtkImageDataPtr current = mBaseImage->getBaseVtkImageData();
-
-	if (mCropbox.range()[0]!=0)
-		current = this->cropImage(current, mCropbox);
-
-	if (mUseAngio)
-		current = this->useAngio(current);
-	else
-		current = this->toGrayscale(current); // remove color, if any
-	mProcessedImage = current;
-
-	mDimensions = mProcessedImage->GetDimensions();
-	mSpacing = Vector3D(mProcessedImage->GetSpacing());
-
+	if (mProcessedImage.size()<=index)
+		ssc::messageManager()->sendError("index error");
 	// Raw data pointer
-	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage->GetScalarPointer());
-
-	//Create one pointer to each frame
-	mFrames.resize(mDimensions[2]);
-	unsigned int recordSize = mDimensions[0] * mDimensions[1];
-	for (int record = 0; record < mDimensions[2]; record++)
-		mFrames[record] = inputPointer + record * recordSize;
+	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage[index]->GetScalarPointer());
+	return inputPointer;
 }
 
-void USFrameDataMonolithic::fillImageImport(vtkImageImportPtr import, int index)
+void USFrameData::generateCache()
 {
-	vtkImageDataPtr image = mBaseImage->getBaseVtkImageData();
-	import->SetImportVoidPointer(image->GetScalarPointer(0,0,index));
-	import->SetDataScalarType(image->GetScalarType());
-	import->SetNumberOfScalarComponents(image->GetNumberOfScalarComponents());
-	int* dim = image->GetDimensions();
-	import->SetWholeExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, 0);
-	import->SetDataExtentToWholeExtent();
-}
-
-vtkImageDataPtr USFrameDataMonolithic::getSingleBaseImage()
-{
-	return mBaseImage->getBaseVtkImageData();
-}
-
-QString USFrameDataMonolithic::getName()
-{
-	return mBaseImage->getName();
-}
-
-QString USFrameDataMonolithic::getUid()
-{
-	return mBaseImage->getUid();
-}
-
-QString USFrameDataMonolithic::getFilePath()
-{
-	return mBaseImage->getFilePath();
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-USFrameDataSplitFrames::USFrameDataSplitFrames(std::vector<vtkImageDataPtr> inputFrameData, QString filename) :
-	USFrameData()
-{
-	mFilename = filename;
-	mBaseImage = inputFrameData;
-
-//	QDateTime start = QDateTime::currentDateTime();
-	this->reinitialize();
-//	std::cout << "reinit split cons: " << start.msecsTo(QDateTime::currentDateTime()) << "ms" << std::endl;
-}
-
-/** Merge all us frames into one vtkImageData
- *
- */
-vtkImageDataPtr USFrameDataSplitFrames::mergeFrames(std::vector<vtkImageDataPtr> input)
-{
-  vtkImageAppendPtr filter = vtkImageAppendPtr::New();
-  filter->SetAppendAxis(2); // append along z-axis
-
-  for (unsigned i=0; i<input.size(); ++i)
-    filter->SetInput(i, input[i]);
-
-  filter->Update();
-  return filter->GetOutput();
-}
-
-//void USFrameDataSplitFrames::crop()
-//{
-//	vtkImageDataPtr out = cropImage(in, mCropBox);
-//}
-
-vtkImageDataPtr USFrameDataSplitFrames::getSingleBaseImage()
-{
-	return this->mergeFrames(mBaseImage);
-}
-
-
-/** reset the internal state of the oobject to that of the initialization,
- * i.e. no removed frames.
- */
-void USFrameDataSplitFrames::reinitialize()
-{
-	if (!mDirty)
+	if (!mProcessedImage.empty())
 		return;
-	mDirty = false;
 
 	mProcessedImage.clear();
 
-	mProcessedImage.resize(mBaseImage.size());
+	mProcessedImage.resize(mReducedToFull.size());
 
 	// apply cropping and angio
-	for (unsigned i=0; i<mProcessedImage.size(); ++i)
+	for (unsigned i=0; i<mReducedToFull.size(); ++i)
 	{
-		vtkImageDataPtr current = mBaseImage[i];
+		vtkImageDataPtr current = mBaseImage[mReducedToFull[i] ];
 
 		if (mCropbox.range()[0]!=0)
 			current = this->cropImage(current, mCropbox);
@@ -385,42 +331,70 @@ void USFrameDataSplitFrames::reinitialize()
 
 		mProcessedImage[i] = current;
 	}
+//	std::cout << "USFrameData::generateCache " << std::endl;
 
-	mDimensions = mProcessedImage[0]->GetDimensions();
-	mDimensions[2] = mProcessedImage.size();
-
-	mSpacing = Vector3D(mProcessedImage[0]->GetSpacing());
-	mSpacing[2] = mSpacing[0]; // set z-spacing to arbitrary value.
-
-	//Create one pointer to each frame
-	mFrames.resize(mDimensions[2]);
-	for (int record = 0; record < mDimensions[2]; record++)
-	{
-		// Raw data pointer
-		unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage[record]->GetScalarPointer());
-		mFrames[record] = inputPointer;
-	}
 }
 
-QString USFrameDataSplitFrames::getName()
+/** Merge all us frames into one vtkImageData
+ *
+ */
+vtkImageDataPtr USFrameData::mergeFrames(std::vector<vtkImageDataPtr> input)
+{
+  vtkImageAppendPtr filter = vtkImageAppendPtr::New();
+  filter->SetAppendAxis(2); // append along z-axis
+
+  for (unsigned i=0; i<input.size(); ++i)
+    filter->SetInput(i, input[i]);
+
+  filter->Update();
+  return filter->GetOutput();
+}
+
+void USFrameData::clearCache()
+{
+	mProcessedImage.clear();
+}
+
+USFrameDataPtr USFrameData::copy()
+{
+	USFrameDataPtr retval(new USFrameData(*this));
+	retval->clearCache();
+	this->initialize();
+	return retval;
+}
+
+//void USFrameDataSplitFrames::crop()
+//{
+//	vtkImageDataPtr out = cropImage(in, mCropBox);
+//}
+
+vtkImageDataPtr USFrameData::getSingleBaseImage()
+{
+	if (mOptionalWholeBase)
+		return mOptionalWholeBase;
+	return this->mergeFrames(mBaseImage);
+}
+
+QString USFrameData::getName()
 {
 	return mFilename;
 }
 
-QString USFrameDataSplitFrames::getUid()
+QString USFrameData::getUid()
 {
 	return mFilename;
 }
 
-QString USFrameDataSplitFrames::getFilePath()
+QString USFrameData::getFilePath()
 {
 	return mFilename;
 }
 
-void USFrameDataSplitFrames::fillImageImport(vtkImageImportPtr import, int index)
+void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 {
 	import->SetImportVoidPointer(mBaseImage[index]->GetScalarPointer());
 	import->SetDataScalarType(mBaseImage[index]->GetScalarType());
+	import->SetDataSpacing(mBaseImage[index]->GetSpacing());
 	import->SetNumberOfScalarComponents(mBaseImage[index]->GetNumberOfScalarComponents());
 	import->SetWholeExtent(mBaseImage[index]->GetWholeExtent());
 	import->SetDataExtentToWholeExtent();

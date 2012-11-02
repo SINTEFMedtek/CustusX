@@ -33,21 +33,16 @@ PNNReconstructAlgorithm::PNNReconstructAlgorithm()
 
 std::vector<DataAdapterPtr> PNNReconstructAlgorithm::getSettings(QDomElement root)
 {
-	//	mProcessorOption = StringOptionItem::initialize("Processor", "",
-	//		      "Which processor to use when reconstructing",
-	//		      "CPU", QString("CPU GPU").split(" "),
-	//		      root);
-	//	mInterpolationDistanceOption = DoubleDataAdapterXml::initialize("Distance (mm)", "",
-	//		      "Interpolation distance in mm",
-	//		      0.5, ssc::DoubleRange(0.1, 10, 0.01), 0,
-	//          root);
-	mInterpolationStepsOption = DoubleDataAdapterXml::initialize("Distance (voxels)", "",
-		"Interpolation steps in voxels", 3, ssc::DoubleRange(1, 10, 1), 0, root);
-
 	std::vector<DataAdapterPtr> retval;
-	//	retval.push_back(mProcessorOption);
-	//	retval.push_back(mInterpolationDistanceOption);
-	retval.push_back(mInterpolationStepsOption);
+	retval.push_back(this->getInterpolationStepsOption(root));
+	return retval;
+}
+
+DoubleDataAdapterXmlPtr PNNReconstructAlgorithm::getInterpolationStepsOption(QDomElement root)
+{
+	DoubleDataAdapterXmlPtr retval;
+	retval = DoubleDataAdapterXml::initialize("Distance (voxels)", "",
+		"Interpolation steps in voxels", 3, ssc::DoubleRange(1, 10, 1), 0, root);
 	return retval;
 }
 
@@ -63,15 +58,15 @@ void optimizedCoordTransform(ssc::Vector3D* p, boost::array<double, 16> tt)
 }
 
 bool PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData,
-	ImagePtr outputData, ImagePtr frameMask, QDomElement settings)
+		vtkImageDataPtr outputData, ImagePtr frameMask, QDomElement settings)
 {
 	//std::vector<Planes> planes = generate_planes(frameInfo, frameData);
 
 	//vtkImageDataPtr input = frameData->getBaseVtkImageData();
 	USFrameDataPtr input = frameData;
-	vtkImageDataPtr target = outputData->getBaseVtkImageData();
+	vtkImageDataPtr target = outputData;
 
-	int* inputDims = frameData->getDimensions();
+	Eigen::Array3i inputDims = frameData->getDimensions();
 
 	Eigen::Array3i targetDims(target->GetDimensions());
 	ssc::Vector3D targetSpacing(target->GetSpacing());
@@ -137,7 +132,7 @@ bool PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
 	}//record
 
 	// Fill holes
-	this->interpolate(tempOutputData, outputData);
+	this->interpolate(tempOutputData, outputData, settings);
 
 	return true;
 }
@@ -232,12 +227,12 @@ vtkImageDataPtr PNNReconstructAlgorithm::createMask(vtkImageDataPtr inputData)
 	return mask;
 }
 
-void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, ImagePtr outputData)
+void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr outputData, QDomElement settings)
 {
 	messageManager()->sendInfo("Interpolating...");
 
 	vtkImageDataPtr input = inputData->getBaseVtkImageData();
-	vtkImageDataPtr output = outputData->getBaseVtkImageData();
+	vtkImageDataPtr output = outputData;
 	vtkImageDataPtr mask = this->createMask(input);
 
 	//int* inputDims = input->GetDimensions();
@@ -259,7 +254,9 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, ImagePtr outputDat
 	//ssc::Vector3D spacing(output->GetSpacing());
 	// Assume output spacing is equal in all directions
 	//int interpolationSteps = static_cast<int>((mInterpolationDistanceOption->getValue() / spacing[0]) + 0.5);
-	int interpolationSteps = static_cast<int> (mInterpolationStepsOption->getValue());
+	DoubleDataAdapterXmlPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
+
+	int interpolationSteps = static_cast<int> (interpolationStepsOption->getValue());
 	messageManager()->sendInfo("interpolationSteps: " + qstring_cast(interpolationSteps));
 
 	int total = outputDims[0] * outputDims[1] * outputDims[2];
