@@ -19,9 +19,6 @@ SET ( cxAlgorithms_Res_SOURCE
     ItkVtkGlue/itkImageToVTKImageFilter.txx
     ItkVtkGlue/itkVTKImageToImageFilter.h
     ItkVtkGlue/itkVTKImageToImageFilter.txx
-    vesselReg/SeansVesselReg.cxx
-    vesselReg/SeansVesselReg.hxx
-    vesselReg/HackTPSTransform.hxx
     itkBinaryThinningImageFilter3D.h
     itkBinaryThinningImageFilter3D.txx
     sscImageAlgorithms.h
