@@ -426,6 +426,10 @@ SET( SSC_SOURCE_FILES
     Widgets/sscVector3DDataAdapterXml.cpp
     Widgets/sscMousePadWidget.h
     Widgets/sscMousePadWidget.cpp
+
+    vesselReg/SeansVesselReg.cxx
+    vesselReg/SeansVesselReg.hxx
+    vesselReg/HackTPSTransform.hxx
     ) 
 
 # =========================================================
