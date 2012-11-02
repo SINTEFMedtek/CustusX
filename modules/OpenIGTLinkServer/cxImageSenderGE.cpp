@@ -230,7 +230,7 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 		}
 		else if(mImgStream->GetScalarTypeMax() <= 256)
 		{
-			IGTLinkImageMessage::TYPE_UINT8;// scalar type
+			scalarType = IGTLinkImageMessage::TYPE_UINT8;// scalar type
 		}
 	}
 	if (scalarType == -1)
