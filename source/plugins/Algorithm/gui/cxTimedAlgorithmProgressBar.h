@@ -65,10 +65,12 @@ private slots:
 	void productChangedSlot();
 
 private:
+	void algorithmFinished(TimedBaseAlgorithm* algo);
 	std::set<TimedAlgorithmPtr> mAlgorithm;
 	QProgressBar* mProgressBar;
 	QLabel* mLabel;
-	int mStartedAlgos;
+//	int mStartedAlgos;
+	std::set<TimedBaseAlgorithm*> mStartedAlgos;
 	DisplayTimerWidget* mTimerWidget;
 };
 

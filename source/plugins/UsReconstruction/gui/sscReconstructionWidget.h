@@ -50,6 +50,8 @@ private slots:
 	void reconstructFinishedSlot();
 	void toggleDetailsSlot();
 
+	void reconstructAboutToStartSlot();
+
 private:
 	ssc::ReconstructManagerPtr mReconstructer;
 //	ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;

@@ -25,7 +25,8 @@ void TestUsReconstruction::testSlerpInterpolation()
 {
 //  ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(ssc::XmlOptionFile(),""));
 
-  ssc::ReconstructerPtr reconstructer(new ssc::Reconstructer(ssc::XmlOptionFile(),""));
+//  ssc::ReconstructerPtr reconstructer(new ssc::Reconstructer(ssc::XmlOptionFile(),""));
+  ssc::ReconstructCorePtr reconstructer(new ssc::ReconstructCore());
 
 	ssc::Transform3D a;
 	ssc::Transform3D b;
@@ -88,18 +89,25 @@ void TestUsReconstruction::testConstructor()
 void TestUsReconstruction::testAngioReconstruction()
 {
 	std::cout << "testAngioReconstruction running" << std::endl;
-  ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(ssc::XmlOptionFile(),""));
+	ssc::XmlOptionFile settings;
+  ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(settings,""));
 	QString filename = cx::DataLocations::getTestDataPath() + "/testing/USAngioTest.cx3/US_Acq/US-Acq_01_20110520T121038/US-Acq_01_20110520T121038.mhd";
-  //reconstructer->mAlgorithmAdapter->setValue("PNN");//default
+  reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
   reconstructer->getParams()->mAngioAdapter->setValue(true);
 
-  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getAlgorithm()));// Check if we got the PNN algorithm
-  boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getAlgorithm())->mInterpolationStepsOption->setValue(1);
+	QDomElement algo = settings.getElement("algorithms", "PNN");
+//  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getAlgorithm()));// Check if we got the PNN algorithm
+//  boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getAlgorithm())->getInterpolationStepsOption(algo)->setValue(1);
 
   reconstructer->selectData(filename);
-  reconstructer->reconstruct();
+//  reconstructer->reconstruct();
+  ssc::ReconstructCorePtr core = reconstructer->getReconstructer()->createCore();
 
-  ssc::ImagePtr output = reconstructer->getOutput();
+  boost::shared_ptr<ssc::PNNReconstructAlgorithm> algorithm = boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(core->createAlgorithm("PNN"));
+  CPPUNIT_ASSERT(algorithm);// Check if we got the PNN algorithm
+  algorithm->getInterpolationStepsOption(algo)->setValue(1);
+
+  ssc::ImagePtr output = core->reconstruct();
 
   CPPUNIT_ASSERT( output->getRange() != 0);//Just check if the output volume is empty
 
@@ -125,16 +133,27 @@ void TestUsReconstruction::testAngioReconstruction()
 
 void TestUsReconstruction::testThunderGPUReconstruction()
 {
-  ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(ssc::XmlOptionFile(),""));
+	ssc::XmlOptionFile settings;
+  ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(settings,""));
   QString filename = cx::DataLocations::getTestDataPath() + "/testing/USAngioTest.cx3/US_Acq/US-Acq_01_20110520T121038/US-Acq_01_20110520T121038.mhd";
   reconstructer->getParams()->mAlgorithmAdapter->setValue("ThunderVNN");
-  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm()));
-  boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm())->mProcessorOption->setValue("GPU");// Fails for AMD (most macs)
+//  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm()));
+
+	QDomElement algo = settings.getElement("algorithms", "ThunderVNN");
+//  boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm())->getProcessorOption(algo)->setValue("GPU");// Fails for AMD (most macs)
 //  boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm)->mProcessorOption->setValue("CPU");
   reconstructer->selectData(filename);
-  reconstructer->reconstruct();
+//  reconstructer->reconstruct();
+  ssc::ReconstructCorePtr core = reconstructer->getReconstructer()->createCore();
 
-  ssc::ImagePtr output = reconstructer->getOutput();
+  boost::shared_ptr<ssc::ThunderVNNReconstructAlgorithm> algorithm;
+  algorithm = boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(core->createAlgorithm("ThunderVNN"));
+  CPPUNIT_ASSERT(algorithm);// Check if we got the PNN algorithm
+  algorithm->getProcessorOption(algo)->setValue("GPU");
+
+  ssc::ImagePtr output = core->reconstruct();
+
+//  ssc::ImagePtr output = reconstructer->getOutput();
 
   CPPUNIT_ASSERT( output->getRange() != 0);//Just check if the output volume is empty
 
