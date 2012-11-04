@@ -89,3 +89,4 @@ include_directories(Rep)
 ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
 target_link_libraries(cxVisualizationService SSC cxSettings cxVideoService cxPatientService cxTrackingService cxAlgorithms_Res)
 
+add_subdirectory(testing)

@@ -40,6 +40,15 @@ typedef boost::shared_ptr<class CameraData> CameraDataPtr;
  * @{
  */
 
+/**Define a priority for the input data.
+ * High means display on top, low means in the back.
+ */
+int getPriority(ssc::DataPtr data);
+
+/**Sorts ssc::DataPtr in default display ordering, using getPriority().
+ */
+bool dataTypeSort(const ssc::DataPtr data1, const ssc::DataPtr data2);
+
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 
 class SyncedValue: public QObject
@@ -67,6 +76,7 @@ public:
 	void requestInitialize();
 	std::vector<ssc::DataPtr> getData() const;
 	void addData(ssc::DataPtr data);
+	void addDataSorted(ssc::DataPtr data); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
 	bool removeData(ssc::DataPtr data);
 	void clearData();
 	std::vector<ssc::ImagePtr> getImages() const;
@@ -89,7 +99,7 @@ public:
 	Options getOptions() const;
 	void setOptions(Options options);
 
-private slots:
+private slots: //eller signals?????
 	void removeDataSlot(QString uid);signals:
 	void dataAdded(QString uid);
 	void dataRemoved(QString uid);
