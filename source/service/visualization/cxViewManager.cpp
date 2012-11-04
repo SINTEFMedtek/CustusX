@@ -1129,7 +1129,7 @@ void ViewManager::autoShowData(ssc::DataPtr data)
 {
 	if (settings()->value("Automation/autoShowNewData").toBool())
 	{
-		this->getViewGroups()[0]->getData()->addData(data);
+		this->getViewGroups()[0]->getData()->addDataSorted(data);
 	}
 }
 
