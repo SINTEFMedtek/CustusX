@@ -227,7 +227,7 @@ void ToolRep3D::addRepActorsToViewRenderer(View *view)
 
 void ToolRep3D::removeRepActorsFromViewRenderer(View *view)
 {
-	view->getRenderer()->AddActor(mTracer->getActor());
+	view->getRenderer()->RemoveActor(mTracer->getActor());
 	view->getRenderer()->RemoveActor(mToolActor);
 	view->getRenderer()->RemoveActor(mProbeSectorActor);
 	if (mRTStream)

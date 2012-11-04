@@ -48,6 +48,7 @@ public:
 
 	virtual QString getSpace();
 };
+typedef boost::shared_ptr<DataMetric> DataMetricPtr;
 
 /**
  * @}
