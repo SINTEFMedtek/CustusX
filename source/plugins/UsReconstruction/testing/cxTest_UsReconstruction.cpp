@@ -64,16 +64,16 @@ void TestUsReconstruction::testSlerpInterpolation()
 	goal.matrix().block<3, 3>(0, 0) = goalm;
 	goal.matrix().block<4, 1>(0, 3) = Eigen::Vector4d(5.0, 5.0, 5.0, 1.0);
 
-	//if (!ssc::similar(c, goal))
-	//{
+	if (!ssc::similar(c, goal))
+	{
 		std::cout << "result: "<< std::endl << c << std::endl;
 		std::cout << "goal: "<< std::endl << goal << std::endl;
-	//}
+	}
 	CPPUNIT_ASSERT(ssc::similar(c, goal));
 
 	// Test if normalized = the column lengths are 1
 	double norm = goal.matrix().block<3, 1>(0, 0).norm();
-	std::cout << "norm: " << norm << std::endl;
+//	std::cout << "norm: " << norm << std::endl;
 	CPPUNIT_ASSERT(ssc::similar(norm, 1.0));
 	norm = goal.matrix().block<3, 1>(0, 1).norm();
 	CPPUNIT_ASSERT(ssc::similar(norm, 1.0));
@@ -88,16 +88,20 @@ void TestUsReconstruction::testConstructor()
 
 void TestUsReconstruction::testAngioReconstruction()
 {
-	std::cout << "testAngioReconstruction running" << std::endl;
+//	std::cout << "testAngioReconstruction running" << std::endl;
 	ssc::XmlOptionFile settings;
   ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(settings,""));
-	QString filename = cx::DataLocations::getTestDataPath() + "/testing/USAngioTest.cx3/US_Acq/US-Acq_01_20110520T121038/US-Acq_01_20110520T121038.mhd";
+	QString filename = cx::DataLocations::getTestDataPath() + "/testing/"
+	"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
   reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
   reconstructer->getParams()->mAngioAdapter->setValue(true);
 
 	QDomElement algo = settings.getElement("algorithms", "PNN");
 //  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getAlgorithm()));// Check if we got the PNN algorithm
 //  boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getAlgorithm())->getInterpolationStepsOption(algo)->setValue(1);
+
+	reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
+	reconstructer->setOutputRelativePath("Images");
 
   reconstructer->selectData(filename);
 //  reconstructer->reconstruct();
@@ -115,27 +119,39 @@ void TestUsReconstruction::testAngioReconstruction()
   unsigned char* volumePtr = reinterpret_cast<unsigned char*>(volume->GetScalarPointer());
   CPPUNIT_ASSERT(volumePtr); //Check if the pointer != NULL
 
-  int* dimensions = volume->GetDimensions();
+  //  int* dimensions = volume->GetDimensions();
+
+//  int z = dimensions[2]/2;
+////  for (int z=0; z<dimensions[2]; ++z)
+//	  for (int y=0; y<dimensions[1]; ++y)
+//	  {
+//		  std::cout << " " << y << " " << z << " ";
+//		  for (int x=0; x<dimensions[0]; ++x)
+//		  {
+//			  std::cout << (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z)) << " ";
+//		  }
+//		  std::cout << std::endl;
+//	  }
+
   // inside angio area
-  int x = 133;
-  int y = 130;
-  int z = 81;
-  int position = x + y * dimensions[0] + z * dimensions[0]*dimensions[1];
-  CPPUNIT_ASSERT( volumePtr[position] !=0 );//Check if the voxel value is != zero inside the angio area
+  int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(143,152,170));
+  CPPUNIT_ASSERT( val > 1 );//Check if the voxel value is != zero inside the angio area
+//  std::cout << "p0 " << val << std::endl;
 
   // outside angio
-  x = 60;
-  y = 60;
-  z = 146;
-  position = x + y * dimensions[0] + z * dimensions[0]*dimensions[1];
-  CPPUNIT_ASSERT( volumePtr[position] ==0 );//Check if the voxel value is zero outside the angio area
+  val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(179,142,170));
+//  std::cout << "p1 " << val << std::endl;
+  CPPUNIT_ASSERT( val ==1 );//Check if the voxel value is zero outside the angio area
+
 }
 
 void TestUsReconstruction::testThunderGPUReconstruction()
 {
 	ssc::XmlOptionFile settings;
   ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(settings,""));
-  QString filename = cx::DataLocations::getTestDataPath() + "/testing/USAngioTest.cx3/US_Acq/US-Acq_01_20110520T121038/US-Acq_01_20110520T121038.mhd";
+  QString filename = cx::DataLocations::getTestDataPath() + "/testing/"
+  "2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
+//  QString filename = cx::DataLocations::getTestDataPath() + "/testing/USAngioTest.cx3/US_Acq/US-Acq_01_20110520T121038/US-Acq_01_20110520T121038.mhd";
   reconstructer->getParams()->mAlgorithmAdapter->setValue("ThunderVNN");
 //  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm()));
 
@@ -143,6 +159,8 @@ void TestUsReconstruction::testThunderGPUReconstruction()
 //  boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm())->getProcessorOption(algo)->setValue("GPU");// Fails for AMD (most macs)
 //  boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getAlgorithm)->mProcessorOption->setValue("CPU");
   reconstructer->selectData(filename);
+  reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
+  reconstructer->setOutputRelativePath("Images");
 //  reconstructer->reconstruct();
   ssc::ReconstructCorePtr core = reconstructer->getReconstructer()->createCore();
 
@@ -163,18 +181,14 @@ void TestUsReconstruction::testThunderGPUReconstruction()
   CPPUNIT_ASSERT(volumePtr); //Check if the pointer != NULL
 
   int* dimensions = volume->GetDimensions();
-  // outside angio
-  int x = 60;
-  int y = 60;
-  int z = 146;
-  int position = x + y * dimensions[0] + z * dimensions[0]*dimensions[1];
-  CPPUNIT_ASSERT( volumePtr[position] !=0 );//Check if the voxel value is != zero outside the angio area
+  // inside angio area
+  int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(143,152,170));
+  CPPUNIT_ASSERT( val > 1 );//Check if the voxel value is != zero inside the angio area
+//  std::cout << "p0 " << val << std::endl;
 
-  // inside angio
-  x = 133;
-  y = 130;
-  z = 81;
-  position = x + y * dimensions[0] + z * dimensions[0]*dimensions[1];
-  CPPUNIT_ASSERT( volumePtr[position] !=0 );//Check if the voxel value is != zero inside the angio area
+  // outside angio
+  val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(179,142,170));
+  //std::cout << "p1 " << val << std::endl;
+  CPPUNIT_ASSERT( val ==1 );//Check if the voxel value is zero outside the angio area
 }
 
