@@ -65,8 +65,8 @@ std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElem
 
 StringDataAdapterXmlPtr ThunderVNNReconstructAlgorithm::getProcessorOption(QDomElement root)
 {
-#ifdef SSC_USE_OpenCL
 	QStringList processors;
+#ifdef SSC_USE_OpenCL
 	if (ocl_has_device_type("CPU"))
 		processors << "CPU";
 	if (ocl_has_device_type("GPU"))
