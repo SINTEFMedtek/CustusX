@@ -289,7 +289,7 @@ void VisualizationTab::init()
   double eyeAngle = settings()->value("View3D/eyeAngle").toDouble();
   mEyeAngleAdapter = ssc::DoubleDataAdapterXml::initialize("Eye angle (degrees)", "",
       "Separation between eyes in degrees",
-      eyeAngle, ssc::DoubleRange(0, 10, 0.1), 1);
+      eyeAngle, ssc::DoubleRange(0, 25, 0.1), 1);
   connect(mEyeAngleAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(eyeAngleSlot()));
 
   QVBoxLayout* stereoLayout = new QVBoxLayout();
