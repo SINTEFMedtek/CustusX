@@ -27,7 +27,6 @@
 #include <vtkMatrix4x4.h>
 
 #include <vtkPolyDataNormals.h>
-#include <vtkCutter.h>
 #include <vtkPlane.h>
 #include <vtkStripper.h>
 #include <vtkCellArray.h>
