@@ -19,16 +19,7 @@
 
 #include "sscDataManager.h"
 
-#include <vtkImageData.h>
-#include <vtkMetaImageReader.h>
-
-#include <vtkPolyData.h>
-#include <vtkPolyDataReader.h>
-#include <vtkSTLReader.h>
-
 #include "sscDataManagerImpl.h"
-#include "sscImage.h"
-#include "sscMesh.h"
 #include "sscPresetTransferFunctions3D.h"
 
 namespace ssc
