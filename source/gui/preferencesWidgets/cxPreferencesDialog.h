@@ -27,6 +27,7 @@ namespace cx
 class MessageManager;
 class ViewManager;
 class FilePreviewWidget;
+class ToolImagePreviewWidget;
 class ToolFilterGroupBox;
 class ToolConfigureGroupBox;
 
@@ -270,6 +271,7 @@ private slots:
 
 private:
   FilePreviewWidget*  mFilePreviewWidget;
+  ToolImagePreviewWidget*  mImagePreviewWidget;
   ToolConfigureGroupBox* mToolConfigureGroupBox;
   ToolFilterGroupBox*    mToolFilterGroupBox;
 };
