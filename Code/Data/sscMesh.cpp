@@ -149,10 +149,10 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(ssc::Transform3D transform)
 {
 	// if transform elements exists, create a copy with entire position inside the polydata:
 	if (ssc::similar(transform, ssc::Transform3D::Identity()))
-		return mVtkPolyData;
+		return getVtkPolyData();
 
 	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
-	poly->DeepCopy(mVtkPolyData);
+	poly->DeepCopy(getVtkPolyData());
 	vtkPointsPtr points = poly->GetPoints();
 
 	for (int i = 0; i < poly->GetNumberOfPoints(); ++i)
