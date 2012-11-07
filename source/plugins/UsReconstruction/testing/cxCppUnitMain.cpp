@@ -7,10 +7,10 @@
 #include <cppunit/TestResult.h> 
 #include <cppunit/BriefTestProgressListener.h> 
 
-#define RUN_ALL_TESTS
+//#define RUN_ALL_TESTS
 
 #ifndef RUN_ALL_TESTS
-#include "cxTest_Example_CppUnit.h"
+#include "cxTest_UsReconstruction.h"
 #endif
 
 /**main function for CX unit tests.
@@ -29,10 +29,13 @@ int main(int argc, char **argv)
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
 #else
-	runner.addTest( new CppUnit::TestCaller<cxTestExamples>(
-                                       "identity transform",
-                                        &cxTestExamples::testIdentityTransform ) );
-	runner.addTest(cxTestExamples::suite());
+	runner.addTest( new CppUnit::TestCaller<TestUsReconstruction>(
+									   "TestUsReconstruction::testConstructor",
+										&TestUsReconstruction::testAngioReconstruction ) );
+//	runner.addTest( new CppUnit::TestCaller<TestUsReconstruction>(
+//									   "TestUsReconstruction::testConstructor",
+//										&TestUsReconstruction::testConstructor ) );
+//	runner.addTest(cxTestExamples::suite());
 #endif
 	
 	
