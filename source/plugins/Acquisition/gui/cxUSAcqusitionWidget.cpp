@@ -96,8 +96,8 @@ QString USAcqusitionWidget::defaultWhatsThis() const
 
 void USAcqusitionWidget::reconstructAboutToStartSlot()
 {
-	std::set<ssc::ThreadedTimedReconstructerPtr> reconstructer = mPluginData->getReconstructer()->getThreadedReconstruction();
-	std::set<ssc::ThreadedTimedReconstructerPtr>::iterator iter;
+	std::set<cx::TimedAlgorithmPtr> reconstructer = mPluginData->getReconstructer()->getThreadedReconstruction();
+	std::set<cx::TimedAlgorithmPtr>::iterator iter;
 	for(iter=reconstructer.begin(); iter!=reconstructer.end(); ++iter)
 	{
 		connect((*iter).get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
@@ -191,8 +191,8 @@ void USAcqusitionWidget::reconstructFinishedSlot()
 //	std::cout << "USAcqusitionWidget::reconstructFinishedSlot()" << std::endl;
 	// stop if all threads are finished
 	bool finished = true;
-	std::set<ssc::ThreadedTimedReconstructerPtr> reconstructer = mPluginData->getReconstructer()->getThreadedReconstruction();
-	std::set<ssc::ThreadedTimedReconstructerPtr>::iterator iter;
+	std::set<cx::TimedAlgorithmPtr> reconstructer = mPluginData->getReconstructer()->getThreadedReconstruction();
+	std::set<cx::TimedAlgorithmPtr>::iterator iter;
 	for(iter=reconstructer.begin(); iter!=reconstructer.end(); ++iter)
 	{
 		finished = finished && (*iter)->isFinished();

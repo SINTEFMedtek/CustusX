@@ -54,6 +54,10 @@ public:
    * callers to set input arguments.
    */
   virtual void execute() = 0;
+  /**Returns true after the finished() signal is emitted.
+   *
+   */
+  virtual bool isFinished() const = 0;
 
 signals:
 	void aboutToStart(); ///< emitted at start of execute. Use to perform preprocessing

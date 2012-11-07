@@ -109,8 +109,11 @@ void ElastixExecuter::execute()
 	emit aboutToStart(); // if properly set: triggers the setInput()
 }
 
-
-
+bool ElastixExecuter::isFinished() const
+{
+	std::cout << "TODO: check ElastixExecuter::isFinished()" << std::endl;
+	return mProcess->atEnd();
+}
 
 /**Write the initial (pre-registration) mMf transform to
  * disk as required by elastix.
