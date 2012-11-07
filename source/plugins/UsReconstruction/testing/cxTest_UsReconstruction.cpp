@@ -13,11 +13,13 @@
 
 void TestUsReconstruction::setUp()
 {
+	ssc::MessageManager::initialize();
   // this stuff will be performed just before all tests in this class
 }
 
 void TestUsReconstruction::tearDown()
 {
+	ssc::MessageManager::shutdown();
   // this stuff will be performed just after all tests in this class
 }
 
