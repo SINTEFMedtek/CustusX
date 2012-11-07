@@ -60,6 +60,17 @@ void SSC_Logging( bool on ); ///< Turn logging on or off.
 #define SSC_ERROR( ... ) SSC_Error(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__ ); ///< log using printf-style. Example: SSC_ERROR(s%, "Hello world!");
 
 /**
+  */
+#define SSC_ASSERT(STATEMENT)			\
+{										\
+	if (!(STATEMENT))					\
+	{									\
+		SSC_ERROR("%s","Assert failure!");\
+		exit(1);						\
+	}									\
+}
+
+/**
 * @}
 */
 

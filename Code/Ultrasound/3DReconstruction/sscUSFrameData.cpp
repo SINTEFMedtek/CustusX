@@ -36,6 +36,8 @@
 #include <vtkImageImport.h>
 #include "sscTypeConversions.h"
 
+#include "sscLogger.h"
+
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
 namespace ssc
@@ -98,33 +100,28 @@ void USFrameData::initialize()
 	mReducedToFull.clear();
 	for (unsigned i=0; i<mBaseImage.size(); ++i)
 		mReducedToFull.push_back(i);
-
-//	mDimensions = mBaseImage[0]->GetDimensions();
-//	mDimensions[2] = mBaseImage.size();
-//
-//	mSpacing = Vector3D(mBaseImage[0]->GetSpacing());
-//	mSpacing[2] = mSpacing[0]; // set z-spacing to arbitrary value.
 }
+
+USFrameData::~USFrameData()
+{
+	mProcessedImage.clear();
+	mBaseImage.clear();
+	mOptionalWholeBase = vtkImageDataPtr();
+}
+
 
 /**
  * Dimensions will be changed after this
  */
 void USFrameData::removeFrame(unsigned int index)
 {
-	if (index>=mReducedToFull.size())
-	{
-		ssc::messageManager()->sendError("index error");
-		return;
-	}
+	SSC_ASSERT(index < mReducedToFull.size());
 	mReducedToFull.erase(mReducedToFull.begin()+index);
-
-//	std::cout << "USFrameData::removeFrame " << index << ", ptr=" << this << std::endl;
-//	mDimensions[2]--;
 
 	this->clearCache();
 }
 
-Eigen::Array3i USFrameData::getDimensions()
+Eigen::Array3i USFrameData::getDimensions() const
 {
 	Eigen::Array3i retval(mBaseImage[0]->GetDimensions());
 	if (mCropbox[1]!=0)
@@ -134,12 +131,9 @@ Eigen::Array3i USFrameData::getDimensions()
 	}
 	retval[2] = mReducedToFull.size();
 	return retval;
-////	return mDimensions;
-//	mDimensions = mBaseImage[0]->GetDimensions();
-//	mDimensions[2] = mBaseImage.size();
 }
 
-Vector3D USFrameData::getSpacing()
+Vector3D USFrameData::getSpacing() const
 {
 	if (mBaseImage.empty())
 		return Vector3D(1,1,1);
@@ -173,7 +167,7 @@ void USFrameData::setCropBox(IntBoundingBox3D cropbox)
 /** Return an image that is cropped using its own croppingBox.
  *  The image is not added to the data manager nor saved.
  */
-vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox)
+vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox) const
 {
   vtkImageClipPtr clip = vtkImageClipPtr::New();
   clip->SetInput(input);
@@ -187,7 +181,7 @@ vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D c
   return rawResult;
 }
 
-vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input)
+vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 {
 	if (input->GetNumberOfScalarComponents() == 1) // already gray
 		return input;
@@ -199,12 +193,10 @@ vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input)
 	return outData;
 }
 
-vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
+vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
 {
 	// Some of the code here is borrowed from the vtk examples:
 	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
-
-//	vtkImageDataPtr inData = inputFrameData->getBaseVtkImageData();
 
 	if (inData->GetNumberOfScalarComponents() < 3)
 	{
@@ -212,10 +204,6 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
 		return this->toGrayscale(inData);
 	}
 
-//	vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-//	luminance->SetInput(inputFrameData->getBaseVtkImageData());
-//	vtkImageDataPtr outData = luminance->GetOutput();
-//	outData->Update();
 	vtkImageDataPtr outData = this->toGrayscale(inData);
 
 	int* outExt = outData->GetExtent();
@@ -233,13 +221,9 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
 	//The following may give some values if in and out have different extent???
 	inData->GetContinuousIncrements(outExt, inIncX, inIncY, inIncZ); //Don't work?
 	outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ); //Don't work?
-//	std::cout << "outExt: " << outExt[0] << " " << outExt[1] << " " << outExt[2] << " " << outExt[3] << " "
-//		<< outExt[4] << " " << outExt[5] << endl;
 
 	// Loop through output pixels
 	int idxZ, idxY, idxR;
-
-//	QDateTime start = QDateTime::currentDateTime();
 
 	for (idxZ = 0; idxZ <= maxZ; idxZ++)
 	{
@@ -252,18 +236,13 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData)
 				if (((*inPtr) == (*(inPtr + 1))) && ((*inPtr) == (*(inPtr + 2))))
 				{
 					(*outPtr) = 0;
-//					(*(outPtr + 1)) = 0;
-//					(*(outPtr + 2)) = 0;
 				}
-//				else
-//				{
-//				}//Assume the outVolume is treated with the luminance filter first
+				//Assume the outVolume is treated with the luminance filter first
 				outPtr++;
 				inPtr += 3;
 			}
 		}
 	}
-//	std::cout << "loop: " << start.msecsTo(QDateTime::currentDateTime()) << "ms" << std::endl;
 	return outData;
 }
 
@@ -296,17 +275,25 @@ bool USFrameData::save(QString filename, bool compressed)
 	return true;;
 }
 
-unsigned char* USFrameData::getFrame(unsigned int index)
+unsigned char* USFrameData::getFrame(unsigned int index) const
 {
-	this->generateCache();
+	if (mProcessedImage.empty())
+	{
+		ssc::messageManager()->sendError(QString("USFrameData %1 not properly initialized prior to calling getFrame()").arg(this->getName()));
+		return NULL;
+	}
 
-	if (mProcessedImage.size()<=index)
-		ssc::messageManager()->sendError("index error");
+	SSC_ASSERT(index < mProcessedImage.size());
+
 	// Raw data pointer
 	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage[index]->GetScalarPointer());
 	return inputPointer;
 }
 
+/** Fill cache, enabling getFrames()
+  * NOT thread-safe.
+  *
+  */
 void USFrameData::generateCache()
 {
 	if (!mProcessedImage.empty())
@@ -319,6 +306,7 @@ void USFrameData::generateCache()
 	// apply cropping and angio
 	for (unsigned i=0; i<mReducedToFull.size(); ++i)
 	{
+		SSC_ASSERT(mBaseImage.size()>mReducedToFull[i]);
 		vtkImageDataPtr current = mBaseImage[mReducedToFull[i] ];
 
 		if (mCropbox.range()[0]!=0)
@@ -331,14 +319,18 @@ void USFrameData::generateCache()
 
 		mProcessedImage[i] = current;
 	}
-//	std::cout << "USFrameData::generateCache " << std::endl;
-
 }
+
+void USFrameData::initializeFrames()
+{
+	this->generateCache();
+}
+
 
 /** Merge all us frames into one vtkImageData
  *
  */
-vtkImageDataPtr USFrameData::mergeFrames(std::vector<vtkImageDataPtr> input)
+vtkImageDataPtr USFrameData::mergeFrames(std::vector<vtkImageDataPtr> input) const
 {
   vtkImageAppendPtr filter = vtkImageAppendPtr::New();
   filter->SetAppendAxis(2); // append along z-axis
@@ -363,11 +355,6 @@ USFrameDataPtr USFrameData::copy()
 	return retval;
 }
 
-//void USFrameDataSplitFrames::crop()
-//{
-//	vtkImageDataPtr out = cropImage(in, mCropBox);
-//}
-
 vtkImageDataPtr USFrameData::getSingleBaseImage()
 {
 	if (mOptionalWholeBase)
@@ -375,17 +362,17 @@ vtkImageDataPtr USFrameData::getSingleBaseImage()
 	return this->mergeFrames(mBaseImage);
 }
 
-QString USFrameData::getName()
+QString USFrameData::getName() const
 {
 	return mFilename;
 }
 
-QString USFrameData::getUid()
+QString USFrameData::getUid() const
 {
 	return mFilename;
 }
 
-QString USFrameData::getFilePath()
+QString USFrameData::getFilePath() const
 {
 	return mFilename;
 }

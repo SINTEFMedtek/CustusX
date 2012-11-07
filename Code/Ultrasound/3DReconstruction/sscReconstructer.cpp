@@ -17,16 +17,11 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- *  sscReconstructer.cpp
- *  Created by Ole Vegard Solberg on 5/4/10.
- */
 #include "sscReconstructer.h"
 
 #include <algorithm>
 #include <QtCore>
 #include <vtkImageData.h>
-//#include "matrixInterpolation.h"
 #include "sscBoundingBox3D.h"
 #include "sscDataManager.h"
 #include "sscXmlOptionItem.h"
@@ -41,11 +36,8 @@
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
 #include "sscUtilHelpers.h"
-//#include "cxCreateProbeDataFromConfiguration.h"
 #include "sscVolumeHelpers.h"
-//#include "cxUsReconstructionFileReader.h"
 #include "sscPresetTransferFunctions3D.h"
-//#include "cxToolManager.h"
 #include "sscManualTool.h"
 
 //Windows fix
@@ -126,12 +118,8 @@ ReconstructParams::~ReconstructParams()
 ///--------------------------------------------------------
 
 Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
-	mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath)//,
-//	mIsReconstructing(false)
+	mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath)
 {
-//	mFileReader.reset(new cx::UsReconstructionFileReader());
-//	mSuccess = false;
-	mReconstructCore.reset(new ReconstructCore());
 	mSettings = settings;
 	mSettings.getElement("algorithms");
 
@@ -146,46 +134,26 @@ Reconstructer::~Reconstructer()
 {
 }
 
-//std::map<QString, ReconstructionAlgorithmPtr> mLoadedAlgorithms;
 
 void Reconstructer::createAlgorithm()
 {
 	QString name = mParams->mAlgorithmAdapter->getValue();
 
-//	if (mAlgorithm && mAlgorithm->getName() == name)
-//		return;
-
-	ReconstructAlgorithmPtr algo = mReconstructCore->createAlgorithm(name);
+	ReconstructCorePtr core; ///< in progress: algorithm part of class moved here.
+	core.reset(new ReconstructCore());
+	ReconstructAlgorithmPtr algo = core->createAlgorithm(name);
 
 	// generate settings for new algo
 	if (algo)
 	{
 		QDomElement element = mSettings.getElement("algorithms", algo->getName());
 		mAlgoOptions = algo->getSettings(element);
-//		ssc::messageManager()->sendInfo("Using reconstruction algorithm " + mAlgorithm->getName());
-
 		emit algorithmChanged();
 	}
 }
 
-///**if called during reconstruction, emit a warning and
-// * return true
-// *
-// */
-//bool Reconstructer::checkAndWarnForReconstruction()
-//{
-//	if (!mIsReconstructing)
-//		return false;
-//
-//	ssc::messageManager()->sendWarning("Tried to change reconstruction parameters while reconstructing.");
-//	return true;
-//}
-
 void Reconstructer::setSettings()
 {
-//	if (this->checkAndWarnForReconstruction())
-//		return;
-
 	this->createAlgorithm();
 	this->updateFromOriginalFileData();
 	emit paramsChanged();
@@ -209,13 +177,6 @@ void Reconstructer::clearAll()
 	mFileData = ssc::USReconstructInputData();
 	mOriginalFileData = ssc::USReconstructInputData();
 	mOutputVolumeParams = OutputVolumeParams();
-	this->clearOutput();
-}
-
-void Reconstructer::clearOutput()
-{
-//	mReconstructCore.reset();
-//	mOutput.reset();
 }
 
 OutputVolumeParams Reconstructer::getOutputVolumeParams() const
@@ -226,8 +187,7 @@ OutputVolumeParams Reconstructer::getOutputVolumeParams() const
 void Reconstructer::setOutputVolumeParams(const OutputVolumeParams& par)
 {
 	mOutputVolumeParams = par;
-	  this->setSettings();
-//	emit paramsChanged();
+	this->setSettings();
 }
 
 void Reconstructer::setOutputRelativePath(QString path)
@@ -251,9 +211,6 @@ bool Reconstructer::validInputData() const
 
 void Reconstructer::setInputData(ssc::USReconstructInputData fileData)
 {
-//	if (this->checkAndWarnForReconstruction())
-//		return;
-
 	this->clearAll();
 	mOriginalFileData = fileData;
 	this->updateFromOriginalFileData();
@@ -266,69 +223,14 @@ void Reconstructer::setInputData(ssc::USReconstructInputData fileData)
  */
 void Reconstructer::updateFromOriginalFileData()
 {
-	this->clearOutput();
-
 	if (!this->validInputData())
 		return;
 
 	ReconstructCorePtr core = this->createCore();
 	mOutputVolumeParams = core->getOutputVolumeParams();
 
-//	// TODO: create new USFrameData object with same raw data.
-//	mFileData = mOriginalFileData;
-//	mFileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
-//
-//	// uncomment to test cropping of data before reconstructing
-////	this->cropInputData();
-//
-//	//  mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
-//	mFileData.mUsRaw->setAngio(mParams->mAngioAdapter->getValue());
-//	QDateTime start = QDateTime::currentDateTime();
-////	mFileData.mUsRaw->reinitialize();
-//
-//	// Only use this if the time stamps have different formats
-//	// The function assumes that both lists of time stamps start at the same time,
-//	// and that is not completely correct.
-//	//this->calibrateTimeStamps();
-//	// Use the time calibration from the acquisition module
-//	//this->calibrateTimeStamps(0.0, 1.0);
-//	this->applyTimeCalibration();
-//
-//	this->transformPositionsTo_prMu();
-//
-//	//mPos (in mPositions) is now prMu
-//
-//	this->interpolatePositions();
-//	// mFrames: now mPos as prMu
-//	if (!this->validInputData())
-//	{
-//		ssc::messageManager()->sendError("Invalid reconstruct input.");
-//		return;
-//	}
-//
-//	if (mFileData.mFrames.empty()) // if all positions are filtered out
-//		return;
-//
-//	this->findExtentAndOutputTransform();
-//	//  mOutput = this->generateOutputVolume();
-//	//mPos in mFrames is now dMu
-
 	emit paramsChanged();
 }
-
-//void Reconstructer::reconstruct()
-//{
-//	if (!this->validInputData())
-//	{
-//		ssc::messageManager()->sendError("Reconstruct failed: no data loaded");
-//		return;
-//	}
-//	ssc::messageManager()->sendInfo("Perform reconstruction on: " + mOriginalFileData.mFilename);
-//
-//	this->threadedPreReconstruct();
-//	this->threadedReconstruct();
-//	this->threadedPostReconstruct();
-//}
 
 ReconstructCore::InputParams Reconstructer::createCoreParameters()
 {
@@ -384,47 +286,6 @@ ReconstructCorePtr Reconstructer::createDualCore()
 	return retval;
 }
 
-///**The reconstruct part that must be fun pre-rec in the main thread.
-// *
-// */
-//void Reconstructer::threadedPreReconstruct()
-//{
-//	if (!this->validInputData())
-//		return;
-//	mIsReconstructing = true;
-//
-//	ReconstructCorePtr core = this->createCore();
-//	mReconstructCore = core;
-//
-//	mReconstructCore->threadedPreReconstruct();
-//}
-//
-///**The reconstruct part that can be run in a separate thread.
-// *
-// */
-//void Reconstructer::threadedReconstruct()
-//{
-//	if (!this->validInputData())
-//		return;
-//	mReconstructCore->threadedReconstruct();
-//}
-//
-///**The reconstruct part that must be done post-rec in the main thread.
-// *
-// */
-//void Reconstructer::threadedPostReconstruct()
-//{
-//	if (!this->validInputData())
-//		return;
-//
-//	mReconstructCore->threadedPostReconstruct();
-//	mIsReconstructing = false;
-//}
-//
-//ImagePtr Reconstructer::getOutput()
-//{
-//	return mReconstructCore->getOutput();
-//}
 
 
 
