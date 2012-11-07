@@ -35,11 +35,12 @@ class CompositeTimedAlgorithm : public TimedBaseAlgorithm
 {
 	Q_OBJECT
 public:
-	CompositeTimedAlgorithm();
+	explicit CompositeTimedAlgorithm(QString name="composite");
 	virtual QString getProduct() const;
 	void append(TimedAlgorithmPtr child);
 	void clear();
 	virtual void execute();
+	virtual bool isFinished() const;
 private slots:
 	void jumpToNextChild();
 private:
@@ -47,6 +48,34 @@ private:
 	int mCurrent;
 };
 typedef boost::shared_ptr<CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
+
+
+
+/**Composition of several TimedBaseAlgorithms executing in parallel.
+ *
+ * Usage: Append all algorithms as children then execute. All children
+ * will be executed in parallel. started()/finished() will also work.
+ *
+ * \ingroup cxResourceAlgorithms
+ * \date Nov 06, 2012
+ * \author christiana
+ */
+class CompositeParallelTimedAlgorithm : public TimedBaseAlgorithm
+{
+	Q_OBJECT
+public:
+	CompositeParallelTimedAlgorithm(QString name="parallel");
+	virtual QString getProduct() const;
+	void append(TimedAlgorithmPtr child);
+	void clear();
+	virtual void execute();
+	virtual bool isFinished() const;
+private slots:
+	void oneFinished();
+private:
+	std::vector<TimedAlgorithmPtr> mChildren;
+};
+typedef boost::shared_ptr<CompositeParallelTimedAlgorithm> CompositeParallelTimedAlgorithmPtr;
 
 
 }
