@@ -1,6 +1,7 @@
 #include <cxFilePreviewWidget.h>
 
 #include <QTextEdit>
+#include <QLabel>
 #include <QTextDocument>
 #include <QPushButton>
 #include <QTextStream>
@@ -18,6 +19,7 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
     BaseWidget(parent, "FilePreviewWidget", "File Preview"),
     mTextDocument(new QTextDocument()),
     mTextEdit(new QTextEdit()),
+    mFileNameLable(new QLabel()),
     mSaveButton(new QPushButton("Save")),
     mFileSystemWatcher(new QFileSystemWatcher())
 {
@@ -33,6 +35,7 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
   layout->addWidget(mTextEdit);
+  layout->addWidget(mFileNameLable);
   layout->addLayout(buttonLayout);
 
   connect(mTextEdit, SIGNAL(textChanged()), this, SLOT(textChangedSlot()));
@@ -94,6 +97,10 @@ void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
   mTextDocument->setPlainText(text);
   mTextDocument->setModified(false);
 //  mSaveButton->setEnabled(true);
+
+  QString elideText = fontMetrics().elidedText(absoluteFilePath, Qt::ElideLeft, mTextEdit->width());
+  mFileNameLable->setText(elideText);
+
   this->textChangedSlot();
 }
 
