@@ -61,7 +61,8 @@ public:
 	         ssc::DataPtr moving,
 	         QString outdir,
 	         QStringList parameterfiles);
-	  virtual void execute();
+	virtual void execute();
+	virtual bool isFinished() const;
 
 	ssc::Transform3D getAffineResult_mMf(bool* ok = 0) ;
 	QString getNonlinearResultVolume(bool* ok = 0);
