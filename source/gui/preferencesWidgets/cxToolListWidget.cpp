@@ -44,17 +44,25 @@ void ToolListWidget::addTool(QString absoluteFilePath)
 	QFile file(absoluteFilePath);
 	QFileInfo info(file);
 	QListWidgetItem* item = new QListWidgetItem(/*QIcon, */info.dir().dirName());
-
-	IgstkTool::InternalStructure internal = this->getToolInternal(absoluteFilePath);
-	QString toolPicture = internal.mPictureFileName;
-	if(!toolPicture.isEmpty())
-		item->setToolTip("<html><img src=" +internal.mPictureFileName + " width=300/></html>");
-	else
-		item->setToolTip("<html> Image missing. </html>");
-
+	item->setData(Qt::ToolTipRole, info.absoluteFilePath());
 	item->setData(Qt::UserRole, info.absoluteFilePath());
 	this->addItem(item);
 	emit listSizeChanged();
+
+//	QFile file(absoluteFilePath);
+//	QFileInfo info(file);
+//	QListWidgetItem* item = new QListWidgetItem(/*QIcon, */info.dir().dirName());
+//
+//	IgstkTool::InternalStructure internal = this->getToolInternal(absoluteFilePath);
+//	QString toolPicture = internal.mPictureFileName;
+//	if(!toolPicture.isEmpty())
+//		item->setToolTip("<html><img src=" +internal.mPictureFileName + " width=300/></html>");
+//	else
+//		item->setToolTip("<html> Image missing. </html>");
+//
+//	item->setData(Qt::UserRole, info.absoluteFilePath());
+//	this->addItem(item);
+//	emit listSizeChanged();
 }
 
 IgstkTool::InternalStructure ToolListWidget::getToolInternal(QString toolAbsoluteFilePath)
