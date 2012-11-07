@@ -16,6 +16,7 @@
 #include "cxDataLocations.h"
 #include "cxStateService.h"
 #include "cxFilePreviewWidget.h"
+#include "cxToolImagePreviewWidget.h"
 #include "cxToolConfigureWidget.h"
 #include "cxToolFilterWidget.h"
 #include "cxColorSelectButton.h"
@@ -497,7 +498,8 @@ void VideoTab::saveParametersSlot()
 
 ToolConfigTab::ToolConfigTab(QWidget* parent) :
     PreferencesTab(parent),
-    mFilePreviewWidget(new FilePreviewWidget(this))
+    mFilePreviewWidget(new FilePreviewWidget(this)),
+    mImagePreviewWidget(new ToolImagePreviewWidget(this))
 {
   mToolConfigureGroupBox = new ToolConfigureGroupBox(this);
   mToolFilterGroupBox  = new ToolFilterGroupBox(this);
@@ -509,6 +511,9 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
   connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
   connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
 
+  connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mImagePreviewWidget, SLOT(previewFileSlot(QString)));
+  connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mImagePreviewWidget, SLOT(previewFileSlot(QString)));
+
   this->applicationChangedSlot();
 }
 
@@ -519,17 +524,24 @@ void ToolConfigTab::init()
 {
   QGroupBox* filepreviewGroupBox = new QGroupBox(this);
   filepreviewGroupBox->setTitle("Toolfile preview");
-  QVBoxLayout* filepreviewLayout = new QVBoxLayout();
+  QHBoxLayout* filepreviewLayout = new QHBoxLayout();
   filepreviewGroupBox->setLayout(filepreviewLayout);
   filepreviewLayout->addWidget(mFilePreviewWidget);
+
+  QGroupBox* imagepreviewGroupBox = new QGroupBox(this);
+  imagepreviewGroupBox->setTitle("Tool image preview");
+  QVBoxLayout* imagepreviewLayout = new QVBoxLayout();
+  imagepreviewGroupBox->setLayout(imagepreviewLayout);
+  imagepreviewLayout->addWidget(mImagePreviewWidget);
 
   //layout
   QGridLayout* layout = new QGridLayout;
   mTopLayout->addLayout(layout);
 
-  layout->addWidget(mToolConfigureGroupBox, 0, 0, 1, 1);
-  layout->addWidget(mToolFilterGroupBox, 0, 1, 1, 1);
-  layout->addWidget(filepreviewGroupBox, 1, 0, 1, 2);
+  layout->addWidget(mToolConfigureGroupBox, 0, 0, 1, 2);
+  layout->addWidget(mToolFilterGroupBox, 0, 2, 1, 2);
+  layout->addWidget(filepreviewGroupBox, 1, 0, 1, 3);
+  layout->addWidget(imagepreviewGroupBox, 1, 3, 1, 1);
 
   mToolConfigureGroupBox->setCurrentlySelectedCofiguration(DataLocations::getToolConfigFilePath());
 }
