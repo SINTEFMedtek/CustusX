@@ -96,23 +96,17 @@ typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 class Reconstructer: public QObject
 {
 	Q_OBJECT
-	friend class ThreadedReconstructer;
-	friend class ThreadedTimedReconstructer;
 
 public:
 	Reconstructer(XmlOptionFile settings, QString shaderPath);
 	virtual ~Reconstructer();
 
 	void setInputData(USReconstructInputData fileData);
-//	void reconstruct(); // assumes readFiles has already been called
 	ReconstructCorePtr createCore(); ///< used for threaded reconstruction
 	ReconstructCorePtr createDualCore(); ///< core version for B-mode in case of angio recording.
 
-//	ImagePtr getOutput();
 	ReconstructParamsPtr mParams;
 	std::vector<DataAdapterPtr> mAlgoOptions;
-
-//	ReconstructAlgorithmPtr mAlgorithm;///< The used reconstruction algorithm
 
 	OutputVolumeParams getOutputVolumeParams() const;
 	void setOutputVolumeParams(const OutputVolumeParams& par);
@@ -128,7 +122,6 @@ signals:
 	void paramsChanged();
 	void algorithmChanged();
 	void inputDataSelected(QString mhdFileName);
-//	void reconstructFinished();
 
 private:
 	USReconstructInputData mFileData;
@@ -141,17 +134,10 @@ private:
 	QString mShaderPath; ///< name of shader folder
 	double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
 
-	void clearOutput();
 	void createAlgorithm();
 	void updateFromOriginalFileData();
 	ReconstructCore::InputParams createCoreParameters();
 
-	ReconstructCorePtr mReconstructCore; ///< in progress: algorithm part of class moved here.
-
-//	void threadedPreReconstruct();
-//	void threadedReconstruct();
-//	void threadedPostReconstruct();
-//	bool checkAndWarnForReconstruction();
 	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
 };
 

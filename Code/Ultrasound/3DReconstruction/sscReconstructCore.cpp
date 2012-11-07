@@ -19,30 +19,17 @@
 
 #include "sscReconstructCore.h"
 
-#include <algorithm>
-#include <QtCore>
 #include <vtkImageData.h>
-//#include "matrixInterpolation.h"
-#include "sscBoundingBox3D.h"
 #include "sscDataManager.h"
-#include "sscXmlOptionItem.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
 #include "sscToolManager.h"
-#include "sscMessageManager.h"
 #include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscPNNReconstructAlgorithm.h"
-#include "utils/sscReconstructHelper.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
-#include "sscUtilHelpers.h"
-//#include "cxCreateProbeDataFromConfiguration.h"
 #include "sscVolumeHelpers.h"
-//#include "cxUsReconstructionFileReader.h"
 #include "sscPresetTransferFunctions3D.h"
-//#include "cxToolManager.h"
-#include "sscManualTool.h"
+#include "sscTimeKeeper.h"
 
 namespace ssc
 {
@@ -186,7 +173,6 @@ Transform3D ReconstructCore::slerpInterpolate(const Transform3D& a, const Transf
 
 
 	for (int i = 0; i < 4; i++)
-//		for (int j = 0; j < 4; j++)
 		c(i, 3) = (1 - t) * a(i, 3) + t * b(i, 3);
 	return c;
 }
@@ -207,7 +193,6 @@ struct RemoveDataType
  */
 void ReconstructCore::interpolatePositions()
 {
-	//TODO: Check if the affine transforms still are affine after the linear interpolation
 	int startFrames = mFileData.mFrames.size();
 
 	std::map<int,RemoveDataType> removedData;
@@ -231,10 +216,6 @@ void ReconstructCore::interpolatePositions()
 		{
 			double diff1 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime);
 			double diff2 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos + 1].mTime);
-//			//      ssc::messageManager()->sendInfo("Time difference is too large. Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(diff1) + " or "+ qstring_cast(diff2));
-//			ssc::messageManager()->sendInfo("Removed input frame: " + qstring_cast(i_frame) + ", difference is: "
-//				+ QString::number(diff1, 'f', 1) + " or " + QString::number(diff2, 'f', 1)
-//				+ " Time difference is too large.");
 			removedData[i_frame].add(std::max(diff1, diff2));
 
 			mFileData.mFrames.erase(mFileData.mFrames.begin() + i_frame);
@@ -246,7 +227,6 @@ void ReconstructCore::interpolatePositions()
 			double t = 0;
 			if (!similar(t_delta_tracking, 0))
 				t = (mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime) / t_delta_tracking;
-			//    mFrames[i_frame].mPos = mPositions[i_pos].mPos;
 //			mFileData.mFrames[i_frame].mPos = interpolate(mFileData.mPositions[i_pos].mPos, mFileData.mPositions[i_pos + 1].mPos, t);
 			mFileData.mFrames[i_frame].mPos = slerpInterpolate(mFileData.mPositions[i_pos].mPos, mFileData.mPositions[i_pos + 1].mPos, t);
 			i_frame++;// Only increment if we didn't delete the frame
@@ -260,10 +240,6 @@ void ReconstructCore::interpolatePositions()
 		int last = first + iter->second.count-1;
 		ssc::messageManager()->sendInfo(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
 		removeCount += iter->second.count;
-//		ssc::messageManager()->sendInfo("Removed input frame: " + qstring_cast(i_frame) + ", difference is: "
-//			+ QString::number(diff1, 'f', 1) + " or " + QString::number(diff2, 'f', 1)
-//			+ " Time difference is too large.");
-//		removedData[i_frame].add(std::min(diff1, diff2));
 	}
 
 	double removed = double(startFrames - mFileData.mFrames.size()) / double(startFrames);
@@ -314,10 +290,6 @@ std::vector<ssc::Vector3D> ReconstructCore::generateInputRectangle()
 	Eigen::Array3i dims = mFileData.mUsRaw->getDimensions();
 	ssc::Vector3D spacing = mFileData.mUsRaw->getSpacing();
 
-//	std::cout << "mFileData.mUsRaw->getDimensions() " << dims << std::endl;
-//	Eigen::Array3i mdims(mFileData.mMask->getBaseVtkImageData()->GetDimensions());
-//	std::cout << "mFileData.mMask->getBaseVtkImageData() " << mdims << std::endl;
-
 	int xmin = dims[0];
 	int xmax = 0;
 	int ymin = dims[1];
@@ -363,9 +335,6 @@ std::vector<ssc::Vector3D> ReconstructCore::generateInputRectangle()
  */
 ssc::Transform3D ReconstructCore::applyOutputOrientation()
 {
-	//  QString newOrient = mSettings.getStringOption("Orientation").getValue();
-//	mInput.mOrientation = mParams->mOrientationAdapter->getValue();
-
 	ssc::Transform3D prMdd = Transform3D::Identity();
 
 	if (mInput.mOrientation == "PatientReference")
@@ -510,6 +479,7 @@ ReconstructAlgorithmPtr ReconstructCore::createAlgorithm(QString name)
 ssc::ImagePtr ReconstructCore::reconstruct()
 {
 	this->threadedPreReconstruct();
+	this->threadablePreReconstruct();
 	this->threadedReconstruct();
 	this->threadedPostReconstruct();
 	return mOutput;
@@ -522,8 +492,21 @@ void ReconstructCore::threadedPreReconstruct()
 {
 	if (!this->validInputData())
 		return;
-	ssc::messageManager()->sendInfo("Using reconstruction algorithm " + mAlgorithm->getName());
 	mRawOutput = this->generateRawOutputVolume();
+}
+
+/**The reconstruct part that must be run
+ *  - between threadedPreReconstruct() and threadedReconstruct(),
+ *  - can be threaded relative to main thread,
+ *  - can NOT be threaded relative to other threads using same USFrameData.
+ */
+void ReconstructCore::threadablePreReconstruct()
+{
+	if (!this->validInputData())
+		return;
+	TimeKeeper timer;
+	mFileData.mUsRaw->initializeFrames();
+	timer.printElapsedSeconds("Reconstruct initialization time");
 }
 
 /**The reconstruct part that can be run in a separate thread.
@@ -534,16 +517,11 @@ void ReconstructCore::threadedReconstruct()
 	if (!this->validInputData())
 		return;
 
-	QDateTime startTime = QDateTime::currentDateTime();
+	TimeKeeper timer;
 
-//	mIsReconstructing = true;
-//	QDomElement algoSettings = mSettings.getElement("algorithms", mAlgorithm->getName());
 	mSuccess = mAlgorithm->reconstruct(mFileData.mFrames, mFileData.mUsRaw, mRawOutput, mFileData.mMask, mInput.mAlgoSettings);
-//	mIsReconstructing = false;
 
-	QTime tempTime = QTime(0, 0);
-	tempTime = tempTime.addMSecs(startTime.time().msecsTo(QDateTime::currentDateTime().time()));
-	ssc::messageManager()->sendInfo("Reconstruct time: " + tempTime.toString("hh:mm:ss:zzz"));
+	timer.printElapsedSeconds("Reconstruct core time");
 }
 
 /**The reconstruct part that must be done post-rec in the main thread.
@@ -558,7 +536,14 @@ void ReconstructCore::threadedPostReconstruct()
 	{
 		mOutput = this->generateOutputVolume(mRawOutput);
 
-		ssc::messageManager()->sendSuccess("Reconstruction done, " + mOutput->getName());
+		Eigen::Array3i outputDims(mRawOutput->GetDimensions());
+		int total = outputDims[0] * outputDims[1] * outputDims[2];
+		ssc::messageManager()->sendInfo(QString("US Reconstruction complete: %1Mb, output=%2, algo=%3, preset=%4, angio=%5")
+										.arg(total/1024/1024)
+										.arg(mOutput->getName())
+										.arg(mAlgorithm->getName())
+										.arg(mInput.mTransferFunctionPreset)
+										.arg(mInput.mAngio));
 
 		DataManager::getInstance()->loadData(mOutput);
 		DataManager::getInstance()->saveImage(mOutput, mInput.mOutputBasePath);
@@ -575,11 +560,6 @@ void ReconstructCore::threadedPostReconstruct()
  */
 ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
 {
-//	Eigen::Array3i dim = mOutputVolumeParams.getDim();
-//	ssc::Vector3D spacing = ssc::Vector3D(1, 1, 1) * mOutputVolumeParams.getSpacing();
-
-//	vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);
-
 	//If no output path is selecetd, use the same path as the input
 	QString filePath;
 	if (mInput.mOutputBasePath.isEmpty() && mInput.mOutputRelativePath.isEmpty())
@@ -589,7 +569,6 @@ ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
 
 	QString uid = this->generateOutputUid();
 	QString name = this->generateImageName(uid);
-	std::cout << "creating vol " << uid << " with name " << name << std::endl;
 
 	ImagePtr image = dataManager()->createImage(rawOutput, uid + "_%1", name + " %1", filePath);
 	image->get_rMd_History()->setRegistration(mOutputVolumeParams.m_rMd);

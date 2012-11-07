@@ -64,6 +64,7 @@ public:
 	void initialize(InputParams input, USReconstructInputData fileData);
 	ssc::ImagePtr reconstruct();
 	void threadedPreReconstruct();
+	void threadablePreReconstruct();
 	void threadedReconstruct();
 	void threadedPostReconstruct();
 	ImagePtr getOutput();

@@ -24,6 +24,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscVolumeHelpers.h"
+#include "sscTimeKeeper.h"
 
 namespace ssc
 {
@@ -229,7 +230,11 @@ vtkImageDataPtr PNNReconstructAlgorithm::createMask(vtkImageDataPtr inputData)
 
 void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr outputData, QDomElement settings)
 {
-	messageManager()->sendInfo("Interpolating...");
+	TimeKeeper timer;
+	DoubleDataAdapterXmlPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
+	int interpolationSteps = static_cast<int> (interpolationStepsOption->getValue());
+
+//	messageManager()->sendInfo(QString("PNN hole filling [steps=%1] ...").arg(interpolationSteps));
 
 	vtkImageDataPtr input = inputData->getBaseVtkImageData();
 	vtkImageDataPtr output = outputData;
@@ -254,10 +259,10 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 	//ssc::Vector3D spacing(output->GetSpacing());
 	// Assume output spacing is equal in all directions
 	//int interpolationSteps = static_cast<int>((mInterpolationDistanceOption->getValue() / spacing[0]) + 0.5);
-	DoubleDataAdapterXmlPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
+//	DoubleDataAdapterXmlPtr interpolationStepsOption = this->getInterpolationStepsOption(settings);
 
-	int interpolationSteps = static_cast<int> (interpolationStepsOption->getValue());
-	messageManager()->sendInfo("interpolationSteps: " + qstring_cast(interpolationSteps));
+//	int interpolationSteps = static_cast<int> (interpolationStepsOption->getValue());
+//	messageManager()->sendInfo("interpolationSteps: " + qstring_cast(interpolationSteps));
 
 	int total = outputDims[0] * outputDims[1] * outputDims[2];
 	int removed = 0;
@@ -297,7 +302,14 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData, vtkImageDataPtr ou
 	int valid = 100*double(ignored)/double(total);
 	int outside = 100*double(removed)/double(total);
 	int holes = 100*double(total-ignored-removed)/double(total);
-	std::cout << QString("PNN: Size:%1Mb, Valid voxels: %2\%, Outside mask: %3\%  Filled holes: %4\%").arg(total/1024/1024).arg(valid).arg(outside).arg(holes) << std::endl;
+	ssc::messageManager()->sendDebug(
+				QString("PNN: Size: %1Mb, Valid voxels: %2\%, Outside mask: %3\%  Filled holes [steps=%4, %5s]: %6\%")
+				.arg(total/1024/1024)
+				.arg(valid)
+				.arg(outside)
+				.arg(interpolationSteps)
+				.arg(timer.getElapsedSecondsAsString())
+				.arg(holes));
 }
 
 /**Fill the empty voxel (x,y,z) with the average value of the surrounding box.

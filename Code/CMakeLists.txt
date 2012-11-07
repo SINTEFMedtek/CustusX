@@ -242,7 +242,9 @@ SET( SSC_SOURCE_FILES
     Utilities/sscSharedMemory.cpp
     Utilities/sscLogger.h
     Utilities/sscLogger.cpp
-        
+    Utilities/sscTimeKeeper.h
+    Utilities/sscTimeKeeper.cpp
+
     Rep/sscRep.h
     Rep/sscRepImpl.h
     Rep/sscRepImpl.cpp
