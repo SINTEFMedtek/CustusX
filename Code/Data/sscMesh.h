@@ -66,6 +66,7 @@ public:
 	void setIsWireframe(bool on);///< Set rep to wireframe, false means surface
 	bool getIsWireframe() const;///< true=wireframe, false=surface
 	vtkPolyDataPtr getTransformedPolyData(ssc::Transform3D tranform);///< Create a new transformed polydata
+	bool isFibreBundle() const;
 
 signals:
 	void meshChanged();

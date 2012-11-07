@@ -32,7 +32,7 @@
 #include "sscView.h"
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
-#include "sscFiberBundle.h"
+#include "sscMesh.h"
 
 namespace ssc
 {
@@ -70,7 +70,7 @@ QString FiberBundleRep::getType() const
 /**
  * Assign new fiber bundle object
  */
-void FiberBundleRep::setBundle(FiberBundlePtr bundle)
+void FiberBundleRep::setBundle(MeshPtr bundle)
 {
 	// Already has this bundle assigned
 	if (hasBundle(bundle)) return;
@@ -80,7 +80,7 @@ void FiberBundleRep::setBundle(FiberBundlePtr bundle)
 	if (mBundle)
 	{
 		disconnect(mBundle.get(), SIGNAL(transformChanged()), this, SLOT(bundleTransformChanged()));
-		disconnect(mBundle.get(), SIGNAL(bundleChanged()), this, SLOT(bundleChanged()));
+		disconnect(mBundle.get(), SIGNAL(meshChanged()), this, SLOT(bundleChanged()));
 		mBundle->disconnectFromRep(mSelf);
 	}
 
@@ -89,7 +89,7 @@ void FiberBundleRep::setBundle(FiberBundlePtr bundle)
 	if (mBundle)
 	{
 		connect(mBundle.get(), SIGNAL(transformChanged()), this, SLOT(bundleTransformChanged()));
-		connect(mBundle.get(), SIGNAL(bundleChanged()), this, SLOT(bundleChanged()));
+		connect(mBundle.get(), SIGNAL(meshChanged()), this, SLOT(bundleChanged()));
 		mBundle->connectToRep(mSelf);
 	}
 

@@ -9,9 +9,9 @@
 #include <QtGui>
 
 #include "sscFiberBundleRep.h"
-#include "sscFiberBundle.h"
 #include "sscAxesRep.h"
 #include "sscView.h"
+#include "sscVtkFileMesh.h"
 #include "sscTestUtilities.h"
 
 /**
@@ -27,8 +27,7 @@ int main(int argc, char **argv)
     QString vtkFileName1 = ssc::TestUtilities::ExpandDataFileName("DTI/FiberBundleNode.vtk");
 
     ssc::ViewWidget *view = new ssc::ViewWidget();
-    ssc::FiberBundlePtr bundle = ssc::FiberBundle::New(vtkFileName1);
-    bundle->setFilePath(vtkFileName1);
+    ssc::MeshPtr bundle(new ssc::VtkFileMesh(vtkFileName1, vtkFileName1, vtkFileName1));
     QColor color = QColor("gold");
     // color.setAlphaF(0.6);
     bundle->setColor(color);

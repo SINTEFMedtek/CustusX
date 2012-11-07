@@ -54,10 +54,10 @@ public:
 	virtual QString getType() const;
 
 	/** Assign a fiber bundle */
-	virtual void setBundle(FiberBundlePtr bundle);
-	virtual bool hasBundle(FiberBundlePtr bundle) const { return (mBundle == bundle); }
+	virtual void setBundle(MeshPtr bundle);
+	virtual bool hasBundle(MeshPtr bundle) const { return (mBundle == bundle); }
 	/** Return currently assigned fiber bundle */
-	virtual FiberBundlePtr getBundle() { return mBundle; }
+	virtual MeshPtr getBundle() { return mBundle; }
 
 protected:
 	FiberBundleRep(const QString& uid, const QString& name = "");
@@ -67,7 +67,7 @@ protected:
 private:
 	double  mFiberWidth;
 
-	FiberBundlePtr mBundle;
+	MeshPtr mBundle;
 	ViewportListenerPtr mViewportListener;
 
 	vtkActorPtr mActor;
