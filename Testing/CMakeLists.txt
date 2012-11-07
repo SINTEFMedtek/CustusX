@@ -88,14 +88,6 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
     set_target_properties(TestFiberBundleRep PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
     add_test(TestFiberBundleRep TestFiberBundleRep)
 
-    # test fiber bundle with volumetric rep
-    # - ssc::FiberBundle
-    # - ssc::VolumetricRep
-    add_executable(TestFiberBundleVolumetricRep sscTestFiberBundleVolumetricRep.cpp)
-    target_link_libraries( TestFiberBundleVolumetricRep SSC )
-    set_target_properties(TestFiberBundleVolumetricRep PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
-    add_test(TestFiberBundleVolumetricRep TestFiberBundleVolumetricRep)
-
     # currently disabled
     # tested class is not in use. 
     #add_executable(TestSliceRep MACOSX_BUNDLE sscTestSliceRep.cpp)
