@@ -312,12 +312,12 @@ void TextDisplay::setMaxWidth( int width, vtkViewport *vp)
 	{
 		vtkTextMapperPtr line = vtkTextMapperPtr::New();
 		bool changed = false;
-		line->SetInput( cstring_cast(*it) );
+		line->SetInput( it->toLatin1().constData() );
 		line->SetTextProperty(mapper->GetTextProperty());
 		while((*it).length() > 0 && line->GetWidth(vp) > maxWidth)
 		{
 			(*it).chop(1);
-			line->SetInput( cstring_cast(QString("%1...").arg(*it)) );
+			line->SetInput( QString("%1...").arg(*it).toLatin1().constData() );
 			changed = true;
 		}
 		if (changed)
@@ -326,7 +326,7 @@ void TextDisplay::setMaxWidth( int width, vtkViewport *vp)
 		}
 	}
 	QString newString = components.join("\n");
-	mapper->SetInput( cstring_cast(newString) );
+	mapper->SetInput( newString.toLatin1().constData() );
 }
 
 int TextDisplay::getMaxWidth()
