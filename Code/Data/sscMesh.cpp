@@ -166,7 +166,7 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(ssc::Transform3D transform)
 	return poly;
 }
 
-bool Mesh::isFibreBundle() const
+bool Mesh::isFiberBundle() const
 {
 	vtkPolyDataPtr poly = getVtkPolyData();
 	return poly->GetLines()->GetNumberOfCells() > 0 && poly->GetPolys()->GetNumberOfCells() == 0 && poly->GetStrips()->GetNumberOfCells() == 0;
