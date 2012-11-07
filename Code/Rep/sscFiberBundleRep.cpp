@@ -24,7 +24,6 @@
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
-#include <vtkPolyDataReader.h>
 #include <vtkMatrix4x4.h>
 #include <vtkRenderer.h>
 #include <vtkRibbonFilter.h>
