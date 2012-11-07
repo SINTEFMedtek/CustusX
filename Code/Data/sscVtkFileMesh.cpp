@@ -31,6 +31,8 @@ namespace ssc
 VtkFileMesh::VtkFileMesh(const QString &uid, const QString &name, const QString& filePath)
 	: Mesh(uid, name)
 {
+	mReader = vtkPolyDataReaderPtr::New();
+	mVtkPolyData = mReader->GetOutput();
 	setFilePath(filePath);
 }
 
@@ -38,31 +40,15 @@ VtkFileMesh::VtkFileMesh(const QString &uid, const QString &name, const QString&
  * Return a vtk poly data object.
  * Load from file if needed.
  */
-vtkPolyDataPtr VtkFileMesh::getVtkPolyData()
-{
-	if (!mVtkPolyData)
-	{
-		loadData();
-	}
-
-	return mVtkPolyData;
-}
-
-/**
- * Load and assign a poly data object from file.
- * Assuming a file path is already provided.
- */
-void VtkFileMesh::loadData()
+vtkPolyDataPtr VtkFileMesh::getVtkPolyData() const
 {
 	if (mFilePath.isEmpty())
-		return;
+	{
+		return vtkPolyDataPtr();
+	}
+	mReader->SetFileName(mFilePath.toUtf8().constData());
 
-	vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
-	reader->SetFileName(mFilePath.toUtf8().constData());
-
-	mVtkPolyData = reader->GetOutput();
-
-	emit meshChanged();
+	return mVtkPolyData;
 }
 
 }

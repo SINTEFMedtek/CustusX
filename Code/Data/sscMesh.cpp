@@ -58,7 +58,7 @@ void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
 	mVtkPolyData = polyData;
 	emit meshChanged();
 }
-vtkPolyDataPtr Mesh::getVtkPolyData()
+vtkPolyDataPtr Mesh::getVtkPolyData() const
 {
 	return mVtkPolyData;
 }
@@ -140,8 +140,8 @@ QColor Mesh::getColor()
 
 DoubleBoundingBox3D Mesh::boundingBox() const
 {
-	mVtkPolyData->UpdateInformation();
-	DoubleBoundingBox3D bounds(mVtkPolyData->GetBounds());
+	getVtkPolyData()->Update();
+	DoubleBoundingBox3D bounds(getVtkPolyData()->GetBounds());
 	return bounds;
 }
 
