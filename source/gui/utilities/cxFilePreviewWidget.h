@@ -5,6 +5,7 @@
 #include "boost/shared_ptr.hpp"
 class QTextDocument;
 class QTextEdit;
+class QLabel;
 class QPushButton;
 class QFileSystemWatcher;
 class QFile;
@@ -23,17 +24,17 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class FilePreviewWidget : public BaseWidget
+class FilePreviewWidget: public BaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  FilePreviewWidget(QWidget* parent);
-  virtual ~FilePreviewWidget();
+	FilePreviewWidget(QWidget* parent);
+	virtual ~FilePreviewWidget();
 
-  virtual QString defaultWhatsThis() const;
+	virtual QString defaultWhatsThis() const;
 
-  template<class SYNTAXHIGHLIGHTER>
+	template<class SYNTAXHIGHLIGHTER>
 	void setSyntaxHighLighter()
 	{
 		delete mSyntaxHighlighter;
@@ -41,21 +42,22 @@ public:
 	}
 
 public slots:
-  void previewFileSlot(const QString& absoluteFilePath);
-  void saveSlot();
-  void textChangedSlot();
+	void previewFileSlot(const QString& absoluteFilePath);
+	void saveSlot();
+	void textChangedSlot();
 
 private:
-  void watchFile(bool on);
+	void watchFile(bool on);
 
-  QTextDocument* mTextDocument;
-  QTextEdit*     mTextEdit;
-  QSyntaxHighlighter* mSyntaxHighlighter;
+	QTextDocument* 						mTextDocument;
+	QTextEdit* 								mTextEdit;
+	QLabel*										mFileNameLable;
+	QSyntaxHighlighter* 			mSyntaxHighlighter;
 
-  QPushButton*   mSaveButton;
+	QPushButton* 							mSaveButton;
 
-  QFileSystemWatcher* mFileSystemWatcher;
-  boost::shared_ptr<QFile>  mCurrentFile;
+	QFileSystemWatcher*				mFileSystemWatcher;
+	boost::shared_ptr<QFile>	mCurrentFile;
 };
 
 }
