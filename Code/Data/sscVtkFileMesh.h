@@ -43,7 +43,7 @@ public:
 	VtkFileMesh(const QString& uid, const QString& name = "", const QString& filePath = "");
 	virtual ~VtkFileMesh() {}
 
-	virtual vtkPolyDataPtr getVtkPolyData();
+	virtual vtkPolyDataPtr getVtkPolyData() const;
 	virtual QString getType() const
 	{
 		return "vtkfilemesh";
@@ -51,8 +51,7 @@ public:
 
 private:
 	vtkPolyDataPtr mVtkPolyData;
-
-	void loadData();
+	vtkPolyDataReaderPtr mReader;
 };
 
 typedef boost::shared_ptr<VtkFileMesh> VtkFileMeshPtr;
