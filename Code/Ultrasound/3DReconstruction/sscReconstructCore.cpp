@@ -109,6 +109,8 @@ void ReconstructCore::cropInputData()
 	sector.setImage(imageSector);
 	mFileData.mProbeData.setData(sector);
 
+	std::cout << streamXml2String(sector) << std::endl;
+
 	vtkImageDataPtr mask = mFileData.mProbeData.getMask();
 	mFileData.mMask = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
 }
@@ -290,15 +292,23 @@ std::vector<ssc::Vector3D> ReconstructCore::generateInputRectangle()
 	Eigen::Array3i dims = mFileData.mUsRaw->getDimensions();
 	ssc::Vector3D spacing = mFileData.mUsRaw->getSpacing();
 
-	int xmin = dims[0];
+	Eigen::Array3i maskDims(mFileData.mMask->getBaseVtkImageData()->GetDimensions());
+
+	if (( maskDims[0]<dims[0] )||( maskDims[1]<dims[1] ))
+		ssc::messageManager()->sendError(QString("input data (%1) and mask (%2) dim mimatch")
+										 .arg(qstring_cast(dims))
+										 .arg(qstring_cast(maskDims)));
+
+	int xmin = maskDims[0];
 	int xmax = 0;
-	int ymin = dims[1];
+	int ymin = maskDims[1];
 	int ymax = 0;
+
 	unsigned char* ptr = static_cast<unsigned char*> (mFileData.mMask->getBaseVtkImageData()->GetScalarPointer());
-	for (int x = 0; x < dims[0]; x++)
-		for (int y = 0; y < dims[1]; y++)
+	for (int x = 0; x < maskDims[0]; x++)
+		for (int y = 0; y < maskDims[1]; y++)
 		{
-			unsigned char val = ptr[x + y * dims[0]];
+			unsigned char val = ptr[x + y * maskDims[0]];
 			if (val != 0)
 			{
 				xmin = std::min(xmin, x);

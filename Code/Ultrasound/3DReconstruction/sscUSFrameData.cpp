@@ -125,7 +125,7 @@ Eigen::Array3i USFrameData::getDimensions() const
 {
 	Eigen::Array3i retval(mBaseImage[0]->GetDimensions());
 
-	if (mCropbox.range()[0]==0)
+	if (mCropbox.range()[0]!=0)
 	{
 		// no cache, generate one sample
 		if (mProcessedImage.empty())
