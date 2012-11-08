@@ -53,19 +53,19 @@ IntBoundingBox3D::IntBoundingBox3D(const int* data)
 	std::copy(data, data + size(), elems);
 }
 // --------------------------------------------------------
-Vector3D IntBoundingBox3D::bottomLeft() const
+Eigen::Vector3i IntBoundingBox3D::bottomLeft() const
 {
-	return Vector3D(elems[0], elems[2], elems[4]);
+	return Eigen::Vector3i(elems[0], elems[2], elems[4]);
 }
-Vector3D IntBoundingBox3D::topRight() const
+Eigen::Vector3i IntBoundingBox3D::topRight() const
 {
-	return Vector3D(elems[1], elems[3], elems[5]);
+	return Eigen::Vector3i(elems[1], elems[3], elems[5]);
 }
-Vector3D IntBoundingBox3D::center() const
+Eigen::Vector3i IntBoundingBox3D::center() const
 {
 	return (bottomLeft() + topRight()) / 2.0;
 }
-Vector3D IntBoundingBox3D::range() const
+Eigen::Vector3i IntBoundingBox3D::range() const
 {
 	return topRight() - bottomLeft();
 }
@@ -73,9 +73,9 @@ Vector3D IntBoundingBox3D::range() const
  * Insert 0 or 1 for each of the 3 axis in order to get start or 
  * stop corner along that axis.  
  */
-Vector3D IntBoundingBox3D::corner(int x, int y, int z) const
+Eigen::Vector3i IntBoundingBox3D::corner(int x, int y, int z) const
 {
-	Vector3D c;
+	Eigen::Vector3i c;
 	c[0] = x ? elems[1] : elems[0];
 	c[1] = y ? elems[3] : elems[2];
 	c[2] = z ? elems[5] : elems[4];

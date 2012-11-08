@@ -30,11 +30,11 @@ public:
 	explicit IntBoundingBox3D(const double* data);
 	explicit IntBoundingBox3D(const int* data);
 
-	Vector3D bottomLeft() const;
-	Vector3D topRight() const;
-	Vector3D center() const;
-	Vector3D range() const;
-	Vector3D corner(int x, int y, int z) const;
+	Eigen::Vector3i bottomLeft() const;
+	Eigen::Vector3i topRight() const;
+	Eigen::Vector3i center() const;
+	Eigen::Vector3i range() const;
+	Eigen::Vector3i corner(int x, int y, int z) const;
 };
 // --------------------------------------------------------
 
