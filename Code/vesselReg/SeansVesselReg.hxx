@@ -59,6 +59,8 @@ public:
 
 	bool execute(ssc::DataPtr source, ssc::DataPtr target, QString logPath);
 	ssc::Transform3D getLinearResult(ContextPtr context=ContextPtr());
+	double getResultMetric(ContextPtr context=ContextPtr());
+	double getResultLtsRatio(ContextPtr context=ContextPtr());
 	ssc::Transform3D getNonLinearTransform();
 	void checkQuality(ssc::Transform3D linearTransform);
 	ssc::ImagePtr loadMinc(char* source_file);

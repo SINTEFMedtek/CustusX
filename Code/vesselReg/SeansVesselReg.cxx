@@ -565,6 +565,20 @@ ssc::Transform3D SeansVesselReg::getLinearResult(ContextPtr context)
 	return retval;
 }
 
+double SeansVesselReg::getResultMetric(ContextPtr context)
+{
+	if (!context)
+		context = mLastRun;
+	return context->mMetric;
+}
+
+double SeansVesselReg::getResultLtsRatio(ContextPtr context)
+{
+	if (!context)
+		context = mLastRun;
+	return context->mLtsRatio;
+}
+
 /**Convert the linear transform part of myContatenation to a ssc::Transform3D
  */
 ssc::Transform3D SeansVesselReg::getLinearTransform(vtkGeneralTransformPtr myConcatenation)
