@@ -214,6 +214,14 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(ssc::DataPtr source, ss
 {
 	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target);
 	vtkPolyDataPtr inputSourcePolyData = this->convertToPolyData(source);
+	targetPolyData->Update();
+	inputSourcePolyData->Update();
+	//Make sure we have stuff to work with
+	if (!inputSourcePolyData->GetNumberOfPoints() || !targetPolyData->GetNumberOfPoints())
+	{
+		std::cerr << "Can't execute with empty source or target data" << std::endl;
+		return ContextPtr();
+	}
 
 	double margin = 40;
 	vtkPolyDataPtr sourcePolyData = this->crop(inputSourcePolyData, targetPolyData, margin);
