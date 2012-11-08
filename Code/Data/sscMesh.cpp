@@ -152,6 +152,7 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(ssc::Transform3D transform)
 	if (ssc::similar(transform, ssc::Transform3D::Identity()))
 		return getVtkPolyData();
 
+	getVtkPolyData()->Update();
 	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
 	poly->DeepCopy(getVtkPolyData());
 	vtkPointsPtr points = poly->GetPoints();
