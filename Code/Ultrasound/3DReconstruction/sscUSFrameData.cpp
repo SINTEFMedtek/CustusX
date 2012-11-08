@@ -124,14 +124,28 @@ void USFrameData::removeFrame(unsigned int index)
 Eigen::Array3i USFrameData::getDimensions() const
 {
 	Eigen::Array3i retval(mBaseImage[0]->GetDimensions());
-	if (mCropbox[1]!=0)
+
+	if (mCropbox.range()[0]==0)
 	{
-		retval[0] = mCropbox.range()[0];
-		retval[1] = mCropbox.range()[1];
+		// no cache, generate one sample
+		if (mProcessedImage.empty())
+		{
+			vtkImageDataPtr sample = this->cropImage(mBaseImage[0], mCropbox);
+			retval[0] = sample->GetDimensions()[0];
+			retval[1] = sample->GetDimensions()[1];
+		}
+		// cache is available, use that
+		else
+		{
+			retval[0] = mProcessedImage[0]->GetDimensions()[0];
+			retval[1] = mProcessedImage[0]->GetDimensions()[1];
+		}
 	}
+
 	retval[2] = mReducedToFull.size();
 	return retval;
 }
+
 
 Vector3D USFrameData::getSpacing() const
 {

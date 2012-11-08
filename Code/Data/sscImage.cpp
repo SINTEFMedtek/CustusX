@@ -667,7 +667,7 @@ void Image::mergevtkSettingsIntosscTransform()
 	Vector3D origin(mBaseImageData->GetOrigin());
 	Vector3D spacing(mBaseImageData->GetSpacing());
 	IntBoundingBox3D extent(mBaseImageData->GetExtent());
-	Vector3D extentShift = multiply_elems(extent.corner(0, 0, 0), spacing);
+	Vector3D extentShift = multiply_elems(extent.corner(0, 0, 0).cast<double>(), spacing);
 
 	vtkImageChangeInformationPtr info = vtkImageChangeInformationPtr::New();
 	info->SetInput(mBaseImageData);
