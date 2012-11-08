@@ -64,10 +64,24 @@ void ReconstructManager::startReconstruction()
 	cx::CompositeTimedAlgorithmPtr serial(new cx::CompositeTimedAlgorithm("US Reconstruction"));
 	cx::CompositeParallelTimedAlgorithmPtr parallel(new cx::CompositeParallelTimedAlgorithm());
 
+	ReconstructCorePtr core = mReconstructer->createCore();
+
+	if (!core)
+	{
+		ssc::messageManager()->sendWarning("Failed to start reconstruction");
+		return;
+	}
+
 	if (mReconstructer->mParams->mCreateBModeWhenAngio->getValue() && mReconstructer->mParams->mAngioAdapter->getValue())
 	{
 		ReconstructCorePtr core = mReconstructer->createCore();
 		ReconstructCorePtr dualCore = mReconstructer->createDualCore();
+
+		if (!dualCore)
+		{
+			ssc::messageManager()->sendWarning("Failed to start reconstruction");
+			return;
+		}
 
 		serial->append(ThreadedTimedReconstructerStep1::create(core));
 		serial->append(ThreadedTimedReconstructerStep1::create(dualCore));
@@ -77,8 +91,6 @@ void ReconstructManager::startReconstruction()
 	}
 	else
 	{
-		ReconstructCorePtr core = mReconstructer->createCore();
-
 		serial->append(ThreadedTimedReconstructerStep1::create(core));
 		serial->append(parallel);
 		parallel->append(ThreadedTimedReconstructerStep2::create(core));
