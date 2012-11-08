@@ -43,6 +43,8 @@ GeometricRep::GeometricRep(const QString& uid, const QString& name) :
 	mActor->SetMapper(mMapper);
 	mActor->SetProperty(mProperty);
 
+	mActor->GetProperty()->BackfaceCullingOn();
+
 	mProperty->SetPointSize(2);
 }
 GeometricRep::~GeometricRep()
@@ -120,10 +122,6 @@ void GeometricRep::transformChangedSlot()
 	{
 		return;
 	}
-
-	//  std::cout << "GeometricRep::transformChangedSlot() : " << mMesh->getName() << std::endl;
-	//  std::cout << "mesh history ptr: " << mMesh->get_rMd_History().get() << std::endl;
-	//  std::cout << mMesh->get_rMd() << std::endl;
 
 	mActor->SetUserMatrix(mMesh->get_rMd().getVtkMatrix());
 }
