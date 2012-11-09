@@ -27,6 +27,7 @@ namespace cx
 class MessageManager;
 class ViewManager;
 class FilePreviewWidget;
+class ToolImagePreviewWidget;
 class ToolFilterGroupBox;
 class ToolConfigureGroupBox;
 
@@ -192,6 +193,8 @@ protected:
   QCheckBox* mAutoStartTrackingCheckBox;
   QCheckBox* mAutoStartStreamingCheckBox;
   QCheckBox* mAutoReconstructCheckBox;
+  QCheckBox* mAutoSaveCheckBox;
+  QCheckBox* mAutoShowNewDataCheckBox;
   QVBoxLayout *mMainLayout;
 };
 
@@ -268,6 +271,7 @@ private slots:
 
 private:
   FilePreviewWidget*  mFilePreviewWidget;
+  ToolImagePreviewWidget*  mImagePreviewWidget;
   ToolConfigureGroupBox* mToolConfigureGroupBox;
   ToolFilterGroupBox*    mToolFilterGroupBox;
 };

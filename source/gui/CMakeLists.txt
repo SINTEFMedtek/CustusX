@@ -71,11 +71,14 @@ SET(cxGui_MOC_HDRS
     utilities/cxDoubleSpanSlider.h
     utilities/cxBaseWidget.h
     utilities/cxTransform3DWidget.h
-    utilities/cxFilePreviewWidget.h
     utilities/cxSelectionGroupBox.h
     utilities/cxColorSelectButton.h
     utilities/cxVector3DWidget.h
     utilities/cxBoundingBoxWidget.h
+    utilities/cxFileWatcherWidget.h
+    utilities/cxFilePreviewWidget.h
+    utilities/cxImagePreviewWidget.h
+    utilities/cxToolImagePreviewWidget.h
     #----------------------    
     cxMainWindow.h
     cxSecondaryMainWindow.h
@@ -239,8 +242,6 @@ SET(cxGui_SRCS
     utilities/cxAudio.cpp
     utilities/cxTransform3DWidget.h
     utilities/cxTransform3DWidget.cpp
-    utilities/cxFilePreviewWidget.h
-    utilities/cxFilePreviewWidget.cpp
     utilities/snwSyntaxHighlighter.cpp
     utilities/cxSelectionGroupBox.h
     utilities/cxSelectionGroupBox.cpp
@@ -250,6 +251,15 @@ SET(cxGui_SRCS
     utilities/cxVector3DWidget.cpp    
     utilities/cxBoundingBoxWidget.h
     utilities/cxBoundingBoxWidget.cpp
+    utilities/cxFileWatcherWidget.h
+    utilities/cxFileWatcherWidget.cpp
+    utilities/cxFilePreviewWidget.h
+    utilities/cxFilePreviewWidget.cpp
+    utilities/cxImagePreviewWidget.h
+    utilities/cxImagePreviewWidget.h
+    utilities/cxImagePreviewWidget.cpp
+    utilities/cxToolImagePreviewWidget.h
+    utilities/cxToolImagePreviewWidget.cpp
     #----------------------    
     cxMainWindow.h
     cxMainWindow.cpp 

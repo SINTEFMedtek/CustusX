@@ -29,7 +29,7 @@
 #include "sscPositionStorageFile.h"
 #include "sscTime.h"
 #include "sscEnumConverter.h"
-
+#include "sscDummyTool.h"
 #include "cxTool.h"
 #include "cxIgstkTracker.h"
 #include "cxToolConfigurationParser.h"
@@ -222,7 +222,7 @@ void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
 	mTools[tool->getUid()] = tool;
 	tool->setVisible(true);
 	connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
-	tool->startTracking();
+	tool->startTracking(20);
 	this->setDominantTool(tool->getUid());
 
 	emit initialized();
