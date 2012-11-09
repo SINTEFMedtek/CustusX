@@ -21,6 +21,7 @@ public:
   cx::MainWindow* mMainWindow;
   QString mPatientFolder;
   QString mTestData;
+  int mBaseTime;
 
   CustusXController(QObject* parent);
   void start();

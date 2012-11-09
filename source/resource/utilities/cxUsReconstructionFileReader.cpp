@@ -73,7 +73,8 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
 //  ssc::ProbeData probeData = createProbeDataFromConfiguration(configuration);
   ssc::ProbeData probeData = this->readProbeDataBackwardsCompatible(mhdFileName, calFilesPath);
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
-  bool spacingOK = ssc::similar(probeData.getImage().mSpacing, ssc::Vector3D(retval.mUsRaw->getSpacing()), 0.001);
+  bool spacingOK = ssc::similar(probeData.getImage().mSpacing[0], retval.mUsRaw->getSpacing()[0], 0.001)
+  	  	  	  	&& ssc::similar(probeData.getImage().mSpacing[1], retval.mUsRaw->getSpacing()[1], 0.001);
   if (!spacingOK)
   {
       ssc::messageManager()->sendWarning(""
@@ -134,7 +135,9 @@ ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(ssc::USReco
   ssc::Vector3D usSpacing(data.mUsRaw->getSpacing());
 
   // checking
-  bool spacingOK = ssc::similar(usSpacing, ssc::Vector3D(mask->GetSpacing()), 0.001);
+  bool spacingOK = true;
+  spacingOK = spacingOK && ssc::similar(usSpacing[0], mask->GetSpacing()[0], 0.001);
+  spacingOK = spacingOK && ssc::similar(usSpacing[1], mask->GetSpacing()[1], 0.001);
   bool dimOK = ssc::similar(usDim, Eigen::Array3i(mask->GetDimensions()));
   if (!dimOK || !spacingOK)
   {
@@ -268,7 +271,7 @@ ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileNa
   ssc::ImagePtr UsRaw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(fileName, mhdFileName));
   UsRaw->setFilePath(filePath);
   ssc::USFrameDataPtr retval;
-  retval.reset(new ssc::USFrameDataMonolithic(UsRaw));
+  retval = ssc::USFrameData::create(UsRaw);
 
   //std::cout << "raw " << mhdFileName << ", " << Eigen::Array3i(retval->getDimensions()) << std::endl;
 

@@ -14,13 +14,11 @@
 #include "sscReconstructAlgorithm.h"
 #include "sscBoundingBox3D.h"
 #include "sscReconstructedOutputVolumeParams.h"
-//#include "probeXmlConfigParser.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 #include "sscXmlOptionItem.h"
 #include "sscProbeSector.h"
-//#include "sscStringWidgets.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxThreadedTimedAlgorithm.h"
 
@@ -29,6 +27,7 @@ namespace ssc
 
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
+typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 
 /**
@@ -39,6 +38,8 @@ typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 
 
 typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
+typedef boost::shared_ptr<class ThreadedTimedReconstructerStep1> ThreadedTimedReconstructerStep1Ptr;
+typedef boost::shared_ptr<class ThreadedTimedReconstructerStep2> ThreadedTimedReconstructerStep2Ptr;
 
 
 /**
@@ -63,45 +64,54 @@ public:
 
 	void selectData(QString filename, QString calFilesPath = "");
 	void selectData(ssc::USReconstructInputData data);
-	void reconstruct(); // assumes readFiles has already been called
 	QString getSelectedData() const;
 
 	ReconstructParamsPtr getParams();
 
-	ReconstructAlgorithmPtr getAlgorithm();///< The used reconstruction algorithm
 	std::vector<DataAdapterPtr> getAlgoOptions();
 	ReconstructerPtr getReconstructer() { return mReconstructer; }
 	ssc::USReconstructInputData getBaseInputData() { return mOriginalFileData; }
 
-	ImagePtr getOutput();
 	OutputVolumeParams getOutputVolumeParams() const;
 	void setOutputVolumeParams(const OutputVolumeParams& par);
 	void setOutputRelativePath(QString path);
 	void setOutputBasePath(QString path);
 
-	ssc::ThreadedTimedReconstructerPtr getThreadedTimedReconstructer() { return mThreadedTimedReconstructer; }
+	std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction() { return mThreadedReconstruction; }
+
+	void startReconstruction();
 
 signals:
 	void paramsChanged();
 	void algorithmChanged();
 	void inputDataSelected(QString mhdFileName);
-	void reconstructFinished();
+	void reconstructAboutToStart();
 
 private:
 	ReconstructerPtr mReconstructer;
-	ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
+	std::set<cx::TimedAlgorithmPtr> mThreadedReconstruction;
 	cx::UsReconstructionFileReaderPtr mFileReader;
 	ssc::USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 	QString mCalFilesPath; ///< Path to calibration files
 
+	void launch(cx::TimedAlgorithmPtr thread);
 	void readCoreFiles(QString fileName, QString calFilesPath);
 	void clearAll();
-//	void updateFromOriginalFileData();
 	bool validInputData() const;
+
+private slots:
+	void threadFinishedSlot();
+
 };
 
 /**
  * \brief Threading adapter for the reconstruction algorithm.
+ *
+ * Executes ReconstructCore functions:
+ *  - threadedPreReconstruct() [main thread]
+ *  - threadablePreReconstruct() [work thread]
+ *  - threadedReconstruct() [work thread]
+ *  - threadedPostReconstruct() [main thread]
  *
  * \date Jan 27, 2012
  * \author Christian Askeland, SINTEF
@@ -110,17 +120,89 @@ class ThreadedTimedReconstructer: public cx::ThreadedTimedAlgorithm<void>
 {
 Q_OBJECT
 public:
-	ThreadedTimedReconstructer(ReconstructerPtr reconstructer);
+	static ThreadedTimedReconstructerPtr create(ReconstructCorePtr reconstructer)
+	{
+		return ThreadedTimedReconstructerPtr(new ThreadedTimedReconstructer(reconstructer));
+	}
+	ThreadedTimedReconstructer(ReconstructCorePtr reconstructer);
 	virtual ~ThreadedTimedReconstructer();
 
-	void start();
-
 private slots:
+	virtual void preProcessingSlot();
 	virtual void postProcessingSlot();
 
 private:
 	virtual void calculate();
-	ReconstructerPtr mReconstructer;
+	ReconstructCorePtr mReconstructer;
+};
+
+/**
+ * \brief Threading adapter for the reconstruction algorithm.
+ *
+ * Must be run before ThreadedTimedReconstructerStep1.
+ *
+ * Executes ReconstructCore functions:
+ *  - threadedPreReconstruct() [main thread]
+ *  - threadablePreReconstruct() [work thread]
+ *
+ * \date Jan 27, 2012
+ * \author Christian Askeland, SINTEF
+ */
+class ThreadedTimedReconstructerStep1: public cx::ThreadedTimedAlgorithm<void>
+{
+Q_OBJECT
+public:
+	static ThreadedTimedReconstructerStep1Ptr create(ReconstructCorePtr reconstructer)
+	{
+		return ThreadedTimedReconstructerStep1Ptr(new ThreadedTimedReconstructerStep1(reconstructer));
+	}
+
+	ThreadedTimedReconstructerStep1(ReconstructCorePtr reconstructer);
+	virtual ~ThreadedTimedReconstructerStep1();
+
+//	void start();
+
+private slots:
+	virtual void preProcessingSlot();
+	virtual void postProcessingSlot();
+
+private:
+	virtual void calculate();
+	ReconstructCorePtr mReconstructer;
+};
+
+/**
+ * \brief Threading adapter for the reconstruction algorithm.
+ *
+ * Must be run after ThreadedTimedReconstructerStep2.
+ *
+ * Executes ReconstructCore functions:
+ *  - threadedReconstruct() [work thread]
+ *  - threadedPostReconstruct() [main thread]
+ *
+ * \date Jan 27, 2012
+ * \author Christian Askeland, SINTEF
+ */
+class ThreadedTimedReconstructerStep2: public cx::ThreadedTimedAlgorithm<void>
+{
+Q_OBJECT
+public:
+	static ThreadedTimedReconstructerStep2Ptr create(ReconstructCorePtr reconstructer)
+	{
+		return ThreadedTimedReconstructerStep2Ptr(new ThreadedTimedReconstructerStep2(reconstructer));
+	}
+	ThreadedTimedReconstructerStep2(ReconstructCorePtr reconstructer);
+	virtual ~ThreadedTimedReconstructerStep2();
+
+//	void start();
+
+private slots:
+	virtual void preProcessingSlot();
+	virtual void postProcessingSlot();
+
+private:
+	virtual void calculate();
+	ReconstructCorePtr mReconstructer;
 };
 
 
