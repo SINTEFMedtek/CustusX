@@ -159,16 +159,7 @@ void MainWindow::changeEvent(QEvent * event)
  */
 void MainWindow::startupLoadPatient()
 {
-	int doLoad = QApplication::arguments().indexOf("--load");
-	if (doLoad < 0)
-		return;
-//	std::cout << "!!!!!!!!!!!!!! load " << doLoad << std::endl;
-	if (doLoad + 1 >= QApplication::arguments().size())
-		return;
-
-	QString folder = QApplication::arguments()[doLoad + 1];
-	ssc::messageManager()->sendInfo("Startup Load patient: " + folder);
-	patientService()->getPatientData()->loadPatient(folder);
+	patientService()->getPatientData()->startupLoadPatient();
 }
 
 void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
