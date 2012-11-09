@@ -19,6 +19,7 @@
 #include <QDir>
 #include <QTimer>
 #include <QTextStream>
+#include <QApplication>
 
 #include "sscTime.h"
 #include "sscMessageManager.h"
@@ -130,6 +131,61 @@ QString PatientData::getNullFolder() const
 	return patientDatafolder + "/NoPatient";
 }
 
+/**Parse command line and return --load <patient folder> folder,
+ * if any.
+ */
+QString PatientData::getCommandLineStartupPatient()
+{
+	int doLoad = QApplication::arguments().indexOf("--load");
+	if (doLoad < 0)
+		return "";
+	if (doLoad + 1 >= QApplication::arguments().size())
+		return "";
+
+	QString folder = QApplication::arguments()[doLoad + 1];
+
+	return folder;
+}
+
+/**Parse the command line and load a patient if the switch --patient is found
+ */
+void PatientData::startupLoadPatient()
+{
+	QString folder = this->getCommandLineStartupPatient();
+
+	if (!folder.isEmpty())
+	{
+		ssc::messageManager()->sendInfo(QString("Startup Load [%1] from command line").arg(folder));
+	}
+
+	if (folder.isEmpty() && settings()->value("Automation/autoLoadRecentPatient").toBool())
+	{
+		folder = settings()->value("startup/lastPatient").toString();
+
+		QDateTime lastSaveTime = QDateTime::fromString(settings()->value("startup/lastPatientSaveTime").toString(), ssc::timestampSecondsFormat());
+		double minsSinceLastSave = lastSaveTime.secsTo(QDateTime::currentDateTime())/60;
+		int allowedMinsSinceLastSave = 8*60;
+		if (minsSinceLastSave > allowedMinsSinceLastSave) // if less than 8 hours, accept
+		{
+			ssc::messageManager()->sendInfo(
+				QString("Startup Load: Ignored recent patient because %1 hours since last save, limit is %2")
+				.arg(int(minsSinceLastSave/60))
+				.arg(int(allowedMinsSinceLastSave/60)));
+			folder = "";
+		}
+
+		if (!folder.isEmpty())
+			ssc::messageManager()->sendInfo(QString("Startup Load [%1] as recent patient").arg(folder));
+	}
+
+	if (folder.isEmpty())
+		return;
+
+//	ssc::messageManager()->sendInfo("Startup Load patient: " + folder);
+	this->loadPatient(folder);
+}
+
+
 //void PatientData::loadPatientFileSlot()
 void PatientData::loadPatient(QString choosenDir)
 {
@@ -219,6 +275,9 @@ void PatientData::savePatient()
 	//TODO Implement when we know what we want to save here...
 
 	mWorkingDocument = QDomDocument();
+
+	settings()->setValue("startup/lastPatient", mActivePatientFolder);
+	settings()->setValue("startup/lastPatientSaveTime", QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()));
 
 	ssc::messageManager()->sendInfo("Saved patient " + mActivePatientFolder);
 }
