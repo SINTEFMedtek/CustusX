@@ -415,15 +415,28 @@ void AutomationTab::init()
 
   bool autoSelectDominantTool = settings()->value("Automation/autoSelectDominantTool").toBool();
   mAutoSelectDominantToolCheckBox = new QCheckBox("Auto Select Active Tool");
+  mAutoSelectDominantToolCheckBox->setToolTip(""
+	  "Automatically select an active tool when a tool becomes visible");
   mAutoSelectDominantToolCheckBox->setChecked(autoSelectDominantTool);
 
   bool autoSave = settings()->value("Automation/autoSave").toBool();
   mAutoSaveCheckBox = new QCheckBox("Auto Save");
+  mAutoSaveCheckBox->setToolTip(""
+	  "Save patient after major events,\n"
+	  "such as workflow step change, registration, reconstruction.");
   mAutoSaveCheckBox->setChecked(autoSave);
 
   bool autoShow = settings()->value("Automation/autoShowNewData").toBool();
   mAutoShowNewDataCheckBox = new QCheckBox("Auto Show New Data");
+  mAutoShowNewDataCheckBox->setToolTip(""
+	  "Show new data in the first view.\n"
+	  "Occors after load data and reconstruct.");
   mAutoShowNewDataCheckBox->setChecked(autoShow);
+
+  bool autoLoadPatient = settings()->value("Automation/autoLoadRecentPatient").toBool();
+  mAutoLoadPatientCheckBox = new QCheckBox("Auto Load Recent Patient");
+  mAutoLoadPatientCheckBox->setToolTip("Load the last saved patient if within 8 hours.");
+  mAutoLoadPatientCheckBox->setChecked(autoLoadPatient);
 
   //Layout
   mMainLayout = new QVBoxLayout;
@@ -433,6 +446,7 @@ void AutomationTab::init()
   mMainLayout->addWidget(mAutoSelectDominantToolCheckBox);
   mMainLayout->addWidget(mAutoSaveCheckBox);
   mMainLayout->addWidget(mAutoShowNewDataCheckBox);
+  mMainLayout->addWidget(mAutoLoadPatientCheckBox);
 
   mTopLayout->addLayout(mMainLayout);
 
@@ -446,6 +460,7 @@ void AutomationTab::saveParametersSlot()
   settings()->setValue("Automation/autoSelectDominantTool", mAutoSelectDominantToolCheckBox->isChecked());
   settings()->setValue("Automation/autoSave", mAutoSaveCheckBox->isChecked());
   settings()->setValue("Automation/autoShowNewData", mAutoShowNewDataCheckBox->isChecked());
+  settings()->setValue("Automation/autoLoadRecentPatient", mAutoLoadPatientCheckBox->isChecked());
 }
 
 //==============================================================================
