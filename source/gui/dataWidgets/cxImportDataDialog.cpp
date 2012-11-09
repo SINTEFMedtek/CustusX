@@ -20,6 +20,7 @@
 #include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
+#include "cxViewManager.h"
 
 namespace cx
 {
@@ -183,6 +184,9 @@ void ImportDataDialog::acceptedSlot()
   this->importParentTransform();
   this->convertFromNifti1Coordinates();
   this->convertToUnsigned();
+
+	patientService()->getPatientData()->autoSave();
+	viewManager()->autoShowData(mData);
 }
 
 /** According to

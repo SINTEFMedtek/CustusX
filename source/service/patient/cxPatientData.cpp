@@ -167,6 +167,12 @@ void PatientData::loadPatient(QString choosenDir)
 	this->setActivePatient(choosenDir);
 }
 
+void PatientData::autoSave()
+{
+	if (settings()->value("Automation/autoSave").toBool())
+		this->savePatient();
+}
+
 void PatientData::savePatient()
 {
 
@@ -181,8 +187,7 @@ void PatientData::savePatient()
 	QDomDocument doc;
 	this->generateSaveDoc(doc);
 	mWorkingDocument = doc;
-	emit
-	isSaving(); // give all listeners a chance to add to the document
+	emit isSaving(); // give all listeners a chance to add to the document
 
 	QFile file(mActivePatientFolder + "/custusdoc.xml");
 	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
@@ -190,7 +195,7 @@ void PatientData::savePatient()
 		QTextStream stream(&file);
 		stream << doc.toString(4);
 		file.close();
-		ssc::messageManager()->sendInfo("Created " + file.fileName());
+//		ssc::messageManager()->sendInfo("Created " + file.fileName());
 	}
 	else
 	{
@@ -214,6 +219,8 @@ void PatientData::savePatient()
 	//TODO Implement when we know what we want to save here...
 
 	mWorkingDocument = QDomDocument();
+
+	ssc::messageManager()->sendInfo("Saved patient " + mActivePatientFolder);
 }
 
 
@@ -347,7 +354,7 @@ ssc::DataPtr PatientData::importData(QString fileName)
 	this->copyAllSimilarFiles(fileName, patientsImageFolder);
 //  ssc::messageManager()->sendDebug("Data is now copied into the patient folder!");
 
-	this->savePatient();
+//	this->autoSave();
 
 	return data;
 }

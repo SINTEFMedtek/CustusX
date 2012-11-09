@@ -359,6 +359,13 @@ IgstkTool::InternalStructure ToolFileParser::getTool()
 	if (!toolGeofileText.isEmpty())
 		toolGeofileText = toolFolderAbsolutePath + toolGeofileText;
 	internalStructure.mGraphicsFileName = toolGeofileText;
+
+	QDomElement toolPicfileElement = toolNode.firstChildElement(mToolPicFileTag);
+	QString toolPicfileText = toolPicfileElement.text();
+	if (!toolPicfileText.isEmpty())
+		toolPicfileText = toolFolderAbsolutePath + toolPicfileText;
+	internalStructure.mPictureFileName = toolPicfileText;
+
 	QDomElement toolInstrumentElement = toolNode.firstChildElement(mToolInstrumentTag);
 	if (toolInstrumentElement.isNull())
 	{

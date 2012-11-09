@@ -50,6 +50,7 @@ private slots:
 //  void saveDataCompletedSlot(QString mhdFilename);
   void toggleDetailsSlot();
   void acquisitionDataReadySlot();
+  void reconstructAboutToStartSlot();
 
 private:
   USAcquisitionPtr mAcquisition;

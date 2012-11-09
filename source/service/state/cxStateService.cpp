@@ -279,6 +279,9 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Automation/autoStartStreaming", true);
 	this->fillDefault("Automation/autoReconstruct", true);
 	this->fillDefault("Automation/autoSelectDominantTool", true);
+	this->fillDefault("Automation/autoSave", true);
+	this->fillDefault("Automation/autoShowNewData", true);
+
 	this->fillDefault("renderingInterval", 33);
 	this->fillDefault("backgroundColor", QColor("black"));
 	this->fillDefault("globalPatientDataFolder", QDir::homePath() + "/Patients");
