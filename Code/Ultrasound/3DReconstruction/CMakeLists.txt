@@ -55,7 +55,7 @@ include_directories(
 
 
 
-# openCV
+# openCL
 #----------
 if (SSC_USE_OpenCL)
 
