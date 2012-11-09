@@ -79,6 +79,7 @@ class Common(object):
         self.mUseCotire = "OFF"
         self.mSerialPort = "/Library/CustusX/igstk.links/cu.CustusX.dev0"
         self.mOpenCVStaticCRT = "OFF"
+        self.mOSX_DEPLOYMENT_TARGET = "10.6" # Deploy for OSX 10.6 Snow Leopard and later
         if (self.PLATFORM == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
             self.mBuildSSCExamples = "OFF"
@@ -336,12 +337,14 @@ cmake \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DBUILD_TESTING=%s \
 -DBUILD_EXAMPLES=%s \
+-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildShared, 
             DATA.mBuildExAndTest, 
             DATA.mBuildExAndTest, 
+            DATA.mOSX_DEPLOYMENT_TARGET,
             self.sourceFolder()))
 # ---------------------------------------------------------
 
@@ -394,12 +397,14 @@ cmake \
 -DVTK_USE_QVTK:BOOL=ON \
 -DVTK_USE_RPATH:BOOL=ON \
 -DDESIRED_QT_VERSION:STRING=4 \
+-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildExAndTest,
             DATA.mBuildExAndTest,
             DATA.mBuildShared, 
+            DATA.mOSX_DEPLOYMENT_TARGET,
             self.sourceFolder()))
 # ---------------------------------------------------------
 
@@ -435,6 +440,7 @@ cmake \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DWITH_CUDA:BOOL=OFF \
 -DBUILD_WITH_STATIC_CRT:BOOL=%s \
+-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
@@ -442,6 +448,7 @@ cmake \
             DATA.mBuildExAndTest,
             DATA.mBuildShared,
             DATA.mOpenCVStaticCRT,
+            DATA.mOSX_DEPLOYMENT_TARGET,
             self.sourceFolder() ))
 # ---------------------------------------------------------
 
@@ -470,12 +477,14 @@ cmake \
 -DBUILD_EXAMPLES:BOOL=%s \
 -DBUILD_TESTING:BOOL=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
+-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 ../%s' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
             DATA.mBuildExAndTest,
             DATA.mBuildExAndTest,
             DATA.mBuildShared, 
+            DATA.mOSX_DEPLOYMENT_TARGET,
             self.sourceFolder() ))
 # ---------------------------------------------------------
 
@@ -517,6 +526,7 @@ cmake \
 -DITK_DIR:PATH="%s" \
 -DVTK_DIR:PATH="%s" \
 -DIGSTK_SERIAL_PORT_0="%s" \
+-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildExternalsType, 
@@ -524,6 +534,7 @@ cmake \
             ITK().buildPath(), 
             VTK().buildPath(), 
             DATA.mSerialPort,
+            DATA.mOSX_DEPLOYMENT_TARGET,
             self.sourceFolder())
             )
 # ---------------------------------------------------------
@@ -563,8 +574,10 @@ class DCMTK(CppComponent):
 \cmake \
 -G"%s" \
 -DBUILD_SHARED_LIBS:BOOL=%s \
+-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.mBuildShared, 
+            DATA.mOSX_DEPLOYMENT_TARGET,
             self.sourceFolder()))
     def build(self):
         CppComponent.build(self)
@@ -601,11 +614,13 @@ cmake \
 -DVTK_DIR:PATH="%s" \
 -DDATASTREAMING_USE_HDF:BOOL=OFF \
 -DDATASTREAMING_USE_TRACKING:BOOL=OFF \
-../%s''' % (DATA.mCMakeGenerator, 
+-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
+../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, 
             DATA.mBuildShared, 
             VTK().buildPath(), 
+            DATA.mOSX_DEPLOYMENT_TARGET,
             self.sourceFolder()+"/vtkDataStreamClient/")
             )
         # add xcode project here if needed
@@ -688,7 +703,8 @@ cmake \
 -DCOTIRE_ADD_UNITY_BUILDS="%s" \
 -DCOTIRE_ENABLE_PRECOMPILED_HEADERS="%s" \
 -DGEStreamer_DIR:PATH="%s" \
-../%s''' % (DATA.mCMakeGenerator, 
+-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
+../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, DATA.mBuildShared, 
             ITK().buildPath(), 
@@ -703,6 +719,7 @@ cmake \
             DATA.mUseCotire,
             DATA.mUseCotire,
             ISB_DataStreaming().buildPath(),
+            DATA.mOSX_DEPLOYMENT_TARGET,
             self.sourceFolder() )
             )
         #TODO add xcode project here if needed?
