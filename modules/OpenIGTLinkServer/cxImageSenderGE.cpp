@@ -147,18 +147,27 @@ void ImageSenderGE::grab()
 	mGEStreamer.WaitForImageData();
 //	if (!mGEStreamer.HasNewImageData())
 //		return;
-	//Get frame geometry if we don't have it yet
-	if(mGEStreamer.HasNewFrameGeometry() || (mFrameGeometry.width < 0.0001))
+
+	//Update mGEStreamer.frame
+	//All function should now be called on this object
+	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
+	if(!imgStream || mGEStreamer.frame == NULL)
 	{
-		// Frame geometry have changed. Update even of we get no image
-		mFrameGeometry = mGEStreamer.GetCurrentFrameGeometry();
+		std::cout << "ImageSenderGE::grab() failed: Got no frame" << std::endl;
+		return;
+	}
+
+	//Get frame geometry if we don't have it yet
+	if(mGEStreamer.frame->GetGeometryChanged() || (mFrameGeometry.width < 0.0001))
+	{
+		// Frame geometry have changed.
+		mFrameGeometry = *(mGEStreamer.frame->GetFrameGeometry());//Is this ok?
 		mFrameGeometryChanged = true;
 		//std::cout << "Get new GE frame geometry" << std::endl;
 	}
 	else
 		mFrameGeometryChanged = false;
 
-	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
 	if(!imgStream)
 	{
 		std::cout << "ImageSenderGE::grab(): No image from GEStreamer" << std::endl;
@@ -166,7 +175,7 @@ void ImageSenderGE::grab()
 	}
 	else
 	{
-//		std::cout << "ImageSenderGE::grab(): Got image from GEStreamer" << std::endl;
+		//sstd::cout << "ImageSenderGE::grab(): Got image from GEStreamer" << std::endl;
 	}
 	//Only set image and time if we got a new image
 	mImgStream = imgStream;
