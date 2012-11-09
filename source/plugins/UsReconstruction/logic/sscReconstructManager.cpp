@@ -10,7 +10,6 @@
 #include <algorithm>
 #include <QtCore>
 #include <vtkImageData.h>
-//#include "matrixInterpolation.h"
 #include "sscBoundingBox3D.h"
 #include "sscDataManager.h"
 #include "sscXmlOptionItem.h"
@@ -18,8 +17,6 @@
 #include "sscDoubleDataAdapterXml.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
-//#include "sscThunderVNNReconstructAlgorithm.h"
-//#include "sscPNNReconstructAlgorithm.h"
 #include "utils/sscReconstructHelper.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"
@@ -32,6 +29,10 @@
 #include "cxToolManager.h"
 #include "sscManualTool.h"
 #include "sscReconstructer.h"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
+#include "cxViewManager.h"
+#include "cxCompositeTimedAlgorithm.h"
 
 //Windows fix
 #ifndef M_PI
@@ -43,7 +44,6 @@ namespace ssc
 
 
 ReconstructManager::ReconstructManager(XmlOptionFile settings, QString shaderPath)
-	//mOutputRelativePath(""), mOutputBasePath(""), mMaxTimeDiff(100)// TODO: Change default value for max allowed time difference between tracking and image time tags
 {
 	mFileReader.reset(new cx::UsReconstructionFileReader());
 
@@ -52,23 +52,6 @@ ReconstructManager::ReconstructManager(XmlOptionFile settings, QString shaderPat
 	connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SIGNAL(paramsChanged()));
 	connect(mReconstructer.get(), SIGNAL(algorithmChanged()), this, SIGNAL(algorithmChanged()));
 	connect(mReconstructer.get(), SIGNAL(inputDataSelected(QString)), this, SIGNAL(inputDataSelected(QString)));
-	connect(mReconstructer.get(), SIGNAL(reconstructFinished()), this, SIGNAL(reconstructFinished()));
-
-//	mOrientationAdapter = mOrientationAdapter;
-//	mPresetTFAdapter = mPresetTFAdapter;
-//	mAlgorithmAdapter = mAlgorithmAdapter;
-//	//	std::vector<DataAdapterPtr> mAlgoOptions;
-//	mMaskReduce = mMaskReduce;//Reduce mask size in % in each direction
-//	mAlignTimestamps = mAlignTimestamps; ///align track and frame timestamps to each other automatically
-//	mTimeCalibration = mTimeCalibration; ///set a offset in the frame timestamps
-//	mAngioAdapter = mAngioAdapter; ///US angio data is used as input
-
-	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mReconstructer));
-	//    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(mPluginData->getReconstructer()));
-//	mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
-//	connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-//	mThreadedTimedReconstructer->start();
-//	mRecordSessionWidget->startPostProcessing("Reconstructing");
 }
 
 ReconstructManager::~ReconstructManager()
@@ -76,16 +59,89 @@ ReconstructManager::~ReconstructManager()
 
 }
 
+void ReconstructManager::startReconstruction()
+{
+	cx::CompositeTimedAlgorithmPtr serial(new cx::CompositeTimedAlgorithm("US Reconstruction"));
+	cx::CompositeParallelTimedAlgorithmPtr parallel(new cx::CompositeParallelTimedAlgorithm());
+
+	ReconstructCorePtr core = mReconstructer->createCore();
+
+	if (!core)
+	{
+		ssc::messageManager()->sendWarning("Failed to start reconstruction");
+		return;
+	}
+
+	if (mReconstructer->mParams->mCreateBModeWhenAngio->getValue() && mReconstructer->mParams->mAngioAdapter->getValue())
+	{
+		ReconstructCorePtr core = mReconstructer->createCore();
+		ReconstructCorePtr dualCore = mReconstructer->createDualCore();
+
+		if (!dualCore)
+		{
+			ssc::messageManager()->sendWarning("Failed to start reconstruction");
+			return;
+		}
+
+		serial->append(ThreadedTimedReconstructerStep1::create(core));
+		serial->append(ThreadedTimedReconstructerStep1::create(dualCore));
+		serial->append(parallel);
+		parallel->append(ThreadedTimedReconstructerStep2::create(core));
+		parallel->append(ThreadedTimedReconstructerStep2::create(dualCore));
+	}
+	else
+	{
+		serial->append(ThreadedTimedReconstructerStep1::create(core));
+		serial->append(parallel);
+		parallel->append(ThreadedTimedReconstructerStep2::create(core));
+	}
+
+	this->launch(serial);
+
+
+//	ThreadedTimedReconstructerPtr thread(new ssc::ThreadedTimedReconstructer(mReconstructer->createCore()));
+//	this->launch(thread);
+
+//	if (mReconstructer->mParams->mCreateBModeWhenAngio->getValue() && mReconstructer->mParams->mAngioAdapter->getValue())
+//	{
+//		ReconstructCorePtr dualCore = mReconstructer->createDualCore();
+//		ThreadedTimedReconstructerPtr dual(new ssc::ThreadedTimedReconstructer(dualCore));
+//		this->launch(dual);
+//	}
+
+}
+
+void ReconstructManager::launch(cx::TimedAlgorithmPtr thread)
+{
+	mThreadedReconstruction.insert(thread);
+	emit reconstructAboutToStart();
+	connect(thread.get(), SIGNAL(finished()), this, SLOT(threadFinishedSlot())); // connect after emit, to allow listeners to get thread at finish
+	thread->execute();
+}
+
+void ReconstructManager::threadFinishedSlot()
+{
+	std::set<cx::TimedAlgorithmPtr>::iterator iter;
+	for(iter=mThreadedReconstruction.begin(); iter!=mThreadedReconstruction.end(); )
+	{
+		if ((*iter)->isFinished())
+		{
+			mThreadedReconstruction.erase(iter);
+			iter = mThreadedReconstruction.begin();
+		}
+		else
+		{
+			++iter;
+		}
+	}
+}
+
+
 ReconstructParamsPtr ReconstructManager::getParams()
 {
 	return mReconstructer->mParams;
 }
 
-
-ReconstructAlgorithmPtr ReconstructManager::getAlgorithm()
-{
-	return mReconstructer->mAlgorithm;
-}
 
 std::vector<DataAdapterPtr> ReconstructManager::getAlgoOptions()
 {
@@ -124,17 +180,6 @@ bool ReconstructManager::validInputData() const
 	if (mOriginalFileData.mFrames.empty() || !mOriginalFileData.mUsRaw || mOriginalFileData.mPositions.empty())
 		return false;
 	return true;
-}
-
-void ReconstructManager::reconstruct()
-{
-	mReconstructer->reconstruct();
-}
-
-
-ImagePtr ReconstructManager::getOutput()
-{
-	return mReconstructer->getOutput();
 }
 
 void ReconstructManager::clearAll()
@@ -189,7 +234,7 @@ void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 //---------------------------------------------------------
 
 
-ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructerPtr reconstructer) :
+ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructCorePtr reconstructer) :
 	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
 {
 	mReconstructer = reconstructer;
@@ -199,21 +244,87 @@ ThreadedTimedReconstructer::~ThreadedTimedReconstructer()
 {
 }
 
-void ThreadedTimedReconstructer::start()
+void ThreadedTimedReconstructer::preProcessingSlot()
 {
 	mReconstructer->threadedPreReconstruct();
-	this->generate();
+}
+
+void ThreadedTimedReconstructer::calculate()
+{
+	mReconstructer->threadablePreReconstruct();
+	mReconstructer->threadedReconstruct();
 }
 
 void ThreadedTimedReconstructer::postProcessingSlot()
 {
 	mReconstructer->threadedPostReconstruct();
+
+	cx::patientService()->getPatientData()->autoSave();
+	cx::viewManager()->autoShowData(mReconstructer->getOutput());
 }
 
-void ThreadedTimedReconstructer::calculate()
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+ThreadedTimedReconstructerStep1::ThreadedTimedReconstructerStep1(ReconstructCorePtr reconstructer) :
+	cx::ThreadedTimedAlgorithm<void> ("US PreReconstruction", 30)
+{
+	mUseDefaultMessages = false;
+	mReconstructer = reconstructer;
+}
+
+ThreadedTimedReconstructerStep1::~ThreadedTimedReconstructerStep1()
+{
+}
+
+void ThreadedTimedReconstructerStep1::preProcessingSlot()
+{
+	mReconstructer->threadedPreReconstruct();
+}
+
+void ThreadedTimedReconstructerStep1::calculate()
+{
+	mReconstructer->threadablePreReconstruct();
+}
+
+void ThreadedTimedReconstructerStep1::postProcessingSlot()
+{
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+ThreadedTimedReconstructerStep2::ThreadedTimedReconstructerStep2(ReconstructCorePtr reconstructer) :
+	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
+{
+	mUseDefaultMessages = false;
+	mReconstructer = reconstructer;
+}
+
+ThreadedTimedReconstructerStep2::~ThreadedTimedReconstructerStep2()
+{
+}
+
+void ThreadedTimedReconstructerStep2::preProcessingSlot()
+{
+}
+
+void ThreadedTimedReconstructerStep2::calculate()
 {
 	mReconstructer->threadedReconstruct();
 }
 
+void ThreadedTimedReconstructerStep2::postProcessingSlot()
+{
+	mReconstructer->threadedPostReconstruct();
+
+	cx::patientService()->getPatientData()->autoSave();
+	cx::viewManager()->autoShowData(mReconstructer->getOutput());
+}
 
 }

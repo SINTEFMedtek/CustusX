@@ -29,9 +29,10 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	this->setWindowTitle("US Acquisition");
 
 	// connect to reconstructer signals
-	ssc::ThreadedTimedReconstructerPtr reconstructer = mPluginData->getReconstructer()->getThreadedTimedReconstructer();
-	connect(reconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-	connect(reconstructer.get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
+	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
+//	ssc::ThreadedTimedReconstructerPtr reconstructer = mPluginData->getReconstructer()->getThreadedTimedReconstructer();
+//	connect(reconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+//	connect(reconstructer.get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
 
 	mAcquisition.reset(new USAcquisition(pluginData));
 	connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
@@ -72,7 +73,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	mOptionsWidget->setVisible(settings()->value("acquisition/UsAcqShowDetails").toBool());
 
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
-	mTimedAlgorithmProgressBar->attach(reconstructer);
+//	mTimedAlgorithmProgressBar->attach(reconstructer);
 	mLayout->addWidget(mOptionsWidget);
 
 	mLayout->addStretch();
@@ -91,6 +92,19 @@ QString USAcqusitionWidget::defaultWhatsThis() const
 		"<h3>US Acquisition.</h3>"
 		"<p><i>Record and reconstruct US data.</i></br>"
 		"</html>";
+}
+
+void USAcqusitionWidget::reconstructAboutToStartSlot()
+{
+	std::set<cx::TimedAlgorithmPtr> reconstructer = mPluginData->getReconstructer()->getThreadedReconstruction();
+	std::set<cx::TimedAlgorithmPtr>::iterator iter;
+	for(iter=reconstructer.begin(); iter!=reconstructer.end(); ++iter)
+	{
+		connect((*iter).get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
+		connect((*iter).get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+
+		mTimedAlgorithmProgressBar->attach(*iter);
+	}
 }
 
 void USAcqusitionWidget::toggleDetailsSlot()
@@ -163,50 +177,33 @@ void USAcqusitionWidget::acquisitionDataReadySlot()
 {
 	if (settings()->value("Automation/autoReconstruct").toBool())
 	{
-		mPluginData->getReconstructer()->getThreadedTimedReconstructer()->start();
-//		mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mPluginData->getReconstructer()));
-//		//    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(mPluginData->getReconstructer()));
-//		mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
-//		connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-//		mThreadedTimedReconstructer->start();
-//		mRecordSessionWidget->startPostProcessing("Reconstructing");
+		mPluginData->getReconstructer()->startReconstruction();
 	}
 }
 
-//void USAcqusitionWidget::saveDataCompletedSlot(QString mhdFilename)
-//{
-//	mPluginData->getReconstructer()->selectData(mhdFilename);
-//
-//	if (settings()->value("Automation/autoReconstruct").toBool())
-//	{
-//		mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mPluginData->getReconstructer()));
-//		//    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(mPluginData->getReconstructer()));
-//		mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
-//		connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-//		mThreadedTimedReconstructer->start();
-//		mRecordSessionWidget->startPostProcessing("Reconstructing");
-//	}
-//
-////	ssc::ThreadedTimedReconstructerPtr reconstructer = mPluginData->getReconstructer()->getThreadedTimedReconstructer();
-////	connect(reconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-////	connect(reconstructer.get(), SIGNAL(started()), this, SLOT(reconstructStartedSlot()));
-//}
-
 void USAcqusitionWidget::reconstructStartedSlot()
 {
-//	mThreadedTimedReconstructer.reset(new ssc::ThreadedTimedReconstructer(mPluginData->getReconstructer()));
-	//    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(mPluginData->getReconstructer()));
-//	mTimedAlgorithmProgressBar->attach(mThreadedTimedReconstructer);
-//	connect(mThreadedTimedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-//	mThreadedTimedReconstructer->start();
 	mRecordSessionWidget->startPostProcessing("Reconstructing");
 }
 
 void USAcqusitionWidget::reconstructFinishedSlot()
 {
-	mRecordSessionWidget->stopPostProcessing();
-//	mTimedAlgorithmProgressBar->detach(mThreadedTimedReconstructer);
-//	mThreadedReconstructer.reset();
+//	std::cout << "USAcqusitionWidget::reconstructFinishedSlot()" << std::endl;
+	// stop if all threads are finished
+	bool finished = true;
+	std::set<cx::TimedAlgorithmPtr> reconstructer = mPluginData->getReconstructer()->getThreadedReconstruction();
+	std::set<cx::TimedAlgorithmPtr>::iterator iter;
+	for(iter=reconstructer.begin(); iter!=reconstructer.end(); ++iter)
+	{
+		finished = finished && (*iter)->isFinished();
+
+//		std::cout << "   (*iter)->isFinished()" << (*iter)->isFinished() << std::endl;
+		if ((*iter)->isFinished())
+			mTimedAlgorithmProgressBar->detach(*iter);
+	}
+
+	if (finished)
+		mRecordSessionWidget->stopPostProcessing();
 }
 
 void USAcqusitionWidget::startedSlot()
