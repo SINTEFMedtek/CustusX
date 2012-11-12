@@ -594,14 +594,6 @@ void MainWindow::newPatientSlot()
 
 	QString choosenDir = patientDatafolder + "/" + timestamp + postfix;
 
-	// not necessary:
-//	// if existing, revert to seconds format
-//	if (QDir().exists(choosenDir))
-//	{
-//		timestamp = QDateTime::currentDateTime().toString(timestampSecondsFormatFolderFriendly()) + "_";
-//		choosenDir = patientDatafolder + "/" + timestamp + postfix;
-//	}
-
 	choosenDir = QFileDialog::getSaveFileName(this, tr("Select directory to save patient in"), choosenDir);
 	if (choosenDir == QString::null)
 		return; // On cancel
@@ -613,11 +605,13 @@ void MainWindow::newPatientSlot()
 	settings()->setValue("globalPatientNumber", ++patientNumber);
 
 	patientService()->getPatientData()->newPatient(choosenDir);
+	patientService()->getPatientData()->writeRecentPatientData();
 }
 
 void MainWindow::clearPatientSlot()
 {
 	patientService()->getPatientData()->clearPatient();
+	patientService()->getPatientData()->writeRecentPatientData();
 	ssc::messageManager()->sendWarning("Cleared current patient data");
 }
 
@@ -631,6 +625,7 @@ void MainWindow::savePatientFileSlot()
 	}
 
 	patientService()->getPatientData()->savePatient();
+	patientService()->getPatientData()->writeRecentPatientData();
 }
 
 void MainWindow::onApplicationStateChangedSlot()
@@ -712,6 +707,7 @@ void MainWindow::loadPatientFileSlot()
 		return; // On cancel
 
 	patientService()->getPatientData()->loadPatient(choosenDir);
+	patientService()->getPatientData()->writeRecentPatientData();
 
 	//  cx::FrameForest forest;
 }
