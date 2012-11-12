@@ -137,11 +137,6 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	return retval;
 }
 
-/** Add the widgets for the current algorithm to a stacked widget.
- *  When algo is changed, even back to a previous algo, just hide the old
- *  and add a new on the stack.
- *
- */
 void ReconstructionWidget::repopulateAlgorithmGroup()
 {
 	QString algoName = mReconstructer->getParams()->mAlgorithmAdapter->getValue();
