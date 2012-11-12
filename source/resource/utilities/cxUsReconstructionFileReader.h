@@ -112,8 +112,8 @@ private:
 	void readTimeStampsFile(QString fileName, std::vector<ssc::TimedPosition>* timedPos);
 	void readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName);
 	ProbeXmlConfigParser::Configuration readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath);
-	ssc::ProbeData readProbeDataFromFile(QString mhdFileName);
-	ssc::ProbeData readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath);
+	std::pair<QString, ssc::ProbeData>  readProbeDataFromFile(QString mhdFileName);
+	std::pair<QString, ssc::ProbeData>  readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath);
 
 	ssc::ImagePtr createMaskFromConfigParams(ssc::USReconstructInputData data);
 	ssc::ImagePtr generateMask(ssc::USReconstructInputData data);

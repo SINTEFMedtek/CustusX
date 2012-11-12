@@ -83,6 +83,7 @@ public slots:
 	void exportPatient(bool niftiFormat);
 	void autoSave();
 	void startupLoadPatient();
+	void writeRecentPatientData();
 
 signals:
 	void patientChanged();
