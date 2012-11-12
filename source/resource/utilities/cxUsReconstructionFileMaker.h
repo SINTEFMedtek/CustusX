@@ -62,7 +62,7 @@ private:
   bool writeUSTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
   bool writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
   bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
-  void writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data);
+  void writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid);
 
   QString findFolderName(QString patientFolder, QString sessionDescription);
   bool findNewSubfolder(QString subfolderAbsolutePath);
