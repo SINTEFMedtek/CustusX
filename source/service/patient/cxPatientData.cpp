@@ -212,13 +212,14 @@ void PatientData::loadPatient(QString choosenDir)
 		}
 		file.close();
 	}
-	else //User have created the directory create xml file and folders
-	{
-		//TODO: Ask the user if he want to convert the folder
-		ssc::messageManager()->sendInfo(
-						"Found no CX3 data in folder: " + choosenDir + " Converting the folder to a patent folder...");
-		createPatientFolders(choosenDir);
-	}
+	// This feature has been a hassle, and never used. Removed.
+//	else //User have created the directory create xml file and folders
+//	{
+//		//TODO: Ask the user if he want to convert the folder
+//		ssc::messageManager()->sendInfo(
+//						"Found no CX3 data in folder: " + choosenDir + " Converting the folder to a patent folder...");
+//		createPatientFolders(choosenDir);
+//	}
 
 	this->setActivePatient(choosenDir);
 }
@@ -276,10 +277,16 @@ void PatientData::savePatient()
 
 	mWorkingDocument = QDomDocument();
 
+	ssc::messageManager()->sendInfo("Saved patient " + mActivePatientFolder);
+}
+
+/** Writes settings info describing the patient name and current time.
+  * Used for auto load.
+  */
+void PatientData::writeRecentPatientData()
+{
 	settings()->setValue("startup/lastPatient", mActivePatientFolder);
 	settings()->setValue("startup/lastPatientSaveTime", QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()));
-
-	ssc::messageManager()->sendInfo("Saved patient " + mActivePatientFolder);
 }
 
 

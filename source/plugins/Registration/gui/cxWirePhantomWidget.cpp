@@ -464,13 +464,12 @@ void WirePhantomWidget::generate_sMt()
 		ssc::Transform3D sQt; // Q is the new calibration matrix.
 
 		sQt = sMt * ssc::createTransformTranslate(diff_tus);
-		ssc::messageManager()->sendError("Must be tested! Check sign.");
 
 		ssc::messageManager()->sendInfo(QString(""
 				"Calculated new calibration matrix\n"
-				"adding only translation\n"
+				"adding only translation "
 				"from last accuracy test\n"
-				"and raw data %1:"
+				"and raw data %1:\n"
 				"%2").arg(probePos.first).arg(qstring_cast(sQt)));
 	}
 	else
@@ -493,7 +492,7 @@ void WirePhantomWidget::generate_sMt()
 		ssc::messageManager()->sendInfo(QString(""
 				"Calculated new calibration matrix\n"
 				"from last accuracy test\n"
-				"and raw data %1:"
+				"and raw data %1:\n"
 				"%2").arg(probePos.first).arg(qstring_cast(sQt)));
 	}
 
