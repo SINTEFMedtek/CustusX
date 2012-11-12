@@ -52,6 +52,7 @@ private slots:
 
 private:
   void updateHostHistory();
+  void updateDirectLinkArgumentHistory();
   QProcess* getServer();
   OpenIGTLinkRTSourcePtr getRTSource();
   VideoConnectionPtr getConnection();
@@ -71,7 +72,7 @@ private:
   QLineEdit* mLocalServerArguments;
   QPushButton* mLaunchServerButton;
   // direct link widgets:
-  QLineEdit* mDirectLinkArguments;
+  QComboBox* mDirectLinkArguments;
 
 
   QStackedWidget* mStackedWidget;
