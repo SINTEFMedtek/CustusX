@@ -194,6 +194,7 @@ protected:
   QCheckBox* mAutoStartStreamingCheckBox;
   QCheckBox* mAutoReconstructCheckBox;
   QCheckBox* mAutoSaveCheckBox;
+  QCheckBox* mAutoLoadPatientCheckBox;
   QCheckBox* mAutoShowNewDataCheckBox;
   QVBoxLayout *mMainLayout;
 };
