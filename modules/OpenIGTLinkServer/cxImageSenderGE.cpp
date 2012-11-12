@@ -35,7 +35,13 @@ QString ImageSenderGE::getType()
 QStringList ImageSenderGE::getArgumentDescription()
 {
 	QStringList retval;
-	retval << "For now configurations are written in the config file located in the directory to which the DATA_STREAM_ROOT environment variable points to";
+	//Tabs are set so that tool tip looks nice
+	retval << "--ip:		GE scanner IP address";//default = 127.0.0.1, find a typical direct link address
+	retval << "--streamport:		GE scanner streaming port, default = 6543";
+	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
+	retval << "--buffersize:		Size of GEStreamer buffer, default = 100";
+	retval << "--openclpath:		Path to ScanConvert.cl";
+	retval << "--testmode:		GEStreamer test mode, default = 0";
 	return retval;
 }
 
@@ -57,9 +63,6 @@ void ImageSenderGE::initialize(StringMap arguments)
 {
 	mArguments = arguments;
 
-	//the stream config filename - has to be located in the directory to which the DATA_STREAM_ROOT environment variable points to
-	std::string configFilename = "config.txt";
-
 	//where to dump the hdf files
 	std::string fileRoot = "c:\\test";
 	//is dumping enabled
@@ -72,7 +75,22 @@ void ImageSenderGE::initialize(StringMap arguments)
 	//interpolation type
 	data_streaming::InterpolationType interpType = data_streaming::Bilinear;
 
-	mGEStreamer.InitializeClientData(configFilename, fileRoot, dumpHdfToDisk, volumeDimensions, interpType);
+	//Set defaults
+	if (!mArguments.count("ip"))
+		mArguments["ip"] = "127.0.0.1";
+	if (!mArguments.count("streamport"))
+		mArguments["streamport"] = "6543";
+	if (!mArguments.count("commandport"))
+		mArguments["commandport"] = "-1";
+	if (!mArguments.count("buffersize"))
+		mArguments["buffersize"] = "100";
+    if (!mArguments.count("openclpath"))
+        mArguments["openclpath"] = ".";
+    if (!mArguments.count("testmode"))
+        mArguments["testmode"] = "0";
+
+
+	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, volumeDimensions, interpType);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
@@ -96,7 +114,14 @@ void ImageSenderGE::deinitialize_local()
 
 bool ImageSenderGE::initialize_local()
 {
-	mImgStream = mGEStreamer.ConnectToScanner();
+	std::string hostIp = mArguments["ip"].toStdString();
+	int streamPort = convertStringWithDefault(mArguments["streamport"], -1);
+	int commandPort = convertStringWithDefault(mArguments["commandport"], -1);
+//	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
+//	std::string = openclpath = mArguments["openclpath"].toStdString();
+	bool testMode = convertStringWithDefault(mArguments["testmode"], 0);
+
+	mImgStream = mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
 	if(!mImgStream)
 		return false;
 	else
@@ -148,17 +173,19 @@ void ImageSenderGE::grab()
 //	if (!mGEStreamer.HasNewImageData())
 //		return;
 
+	bool testMode = convertStringWithDefault(mArguments["testmode"], 0);
+
 	//Update mGEStreamer.frame
 	//All function should now be called on this object
 	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
-	if(!imgStream || mGEStreamer.frame == NULL)
+	if(!testMode && mGEStreamer.frame == NULL)
 	{
 		std::cout << "ImageSenderGE::grab() failed: Got no frame" << std::endl;
 		return;
 	}
 
 	//Get frame geometry if we don't have it yet
-	if(mGEStreamer.frame->GetGeometryChanged() || (mFrameGeometry.width < 0.0001))
+	if(!testMode && (mGEStreamer.frame->GetGeometryChanged() || (mFrameGeometry.width < 0.0001)))
 	{
 		// Frame geometry have changed.
 		mFrameGeometry = *(mGEStreamer.frame->GetFrameGeometry());//Is this ok?

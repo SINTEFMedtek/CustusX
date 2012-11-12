@@ -68,12 +68,12 @@ QString ImageSenderOpenCV::getType()
 QStringList ImageSenderOpenCV::getArgumentDescription()
 {
     QStringList retval;
-    retval << "--videoport:			video id,     default=0";
-    retval << "--in_width:			width of incoming image, default=camera";
-    retval << "--in_height:			height of incoming image, default=camera";
-    retval << "--out_width:			width of outgoing image, default=camera";
-    retval << "--out_height:			width of outgoing image, default=camera";
-    retval << "--properties:			dump image properties";
+    retval << "--videoport:		video id,     default=0";
+    retval << "--in_width:		width of incoming image, default=camera";
+    retval << "--in_height:		height of incoming image, default=camera";
+    retval << "--out_width:		width of outgoing image, default=camera";
+    retval << "--out_height:		width of outgoing image, default=camera";
+    retval << "--properties:		dump image properties";
     return retval;
 }
 
