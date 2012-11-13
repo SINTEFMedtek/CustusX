@@ -99,6 +99,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/gui
     ${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/logic
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
+    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction    
 
     ../logic
 

@@ -11,6 +11,7 @@ if (BUILD_TESTING)
   include_directories( 
     ${CPPUNIT_INCLUDE_DIR}     
     ../logic
+    ../logic/3DReconstruction
     ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking

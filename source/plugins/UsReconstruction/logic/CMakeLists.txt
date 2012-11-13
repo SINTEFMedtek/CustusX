@@ -12,6 +12,8 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
+add_subdirectory(3DReconstruction)
+
 SET( MOC_HEADER_FILES
    sscReconstructManager.h
     )
@@ -48,6 +50,8 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/resource/algorithms
+    ${CustusX3_SOURCE_DIR}/source/plugins/USReconstruction/logic/3DReconstruction
+    ./3DReconstruction
     )
 
 # =========================================================
