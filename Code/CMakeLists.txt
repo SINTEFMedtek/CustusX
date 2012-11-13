@@ -144,7 +144,7 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/Math/
     ${SSC_SOURCE_DIR}/Code/Widgets/
     ${SSC_SOURCE_DIR}/Code/3rdParty/
-    ${SSC_SOURCE_DIR}/Code/Ultrasound/3DReconstruction
+#    ${SSC_SOURCE_DIR}/Code/Ultrasound/3DReconstruction
 #    ${SSC_SOURCE_DIR}/Code/3rdParty/cml-1_0_2
     ${SSC_SOURCE_DIR}/Code/vtkMods/
     ${SSC_BINARY_DIR}
@@ -161,7 +161,7 @@ set( SSC_DICOMLIB_INCLUDE_DIRS
 
 
 set(SSC_LIBRARY_DIRS 
-    ${SSC_SOURCE_DIR}/Code/Ultrasound/3DReconstruction
+#    ${SSC_SOURCE_DIR}/Code/Ultrasound/3DReconstruction
     )    
 
 set( SSC_LIBRARIES QVTK )
