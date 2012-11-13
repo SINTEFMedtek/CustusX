@@ -606,4 +606,4 @@ endif ()
 
 SET_TARGET_PROPERTIES( SSC PROPERTIES COMPILE_FLAGS "${SNW_COMPILE_FLAGS}" LINK_FLAGS "${SNW_LINK_FLAGS}" LINK_LIBS "${SNW_LINK_LIBS}")
 
-add_subdirectory(Ultrasound/3DReconstruction)
+#add_subdirectory(Ultrasound/3DReconstruction)
