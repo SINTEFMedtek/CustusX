@@ -94,7 +94,7 @@ void ReconstructCore::cropInputData()
 	ProbeData::ProbeImageData imageSector = sector.getImage();
 	IntBoundingBox3D cropbox(imageSector.mClipRect_p.begin());
 	Eigen::Vector3i shift = cropbox.corner(0,0,0).cast<int>();
-	Eigen::Vector3i size = cropbox.range().cast<int>();
+	Eigen::Vector3i size = cropbox.range().cast<int>() + Eigen::Vector3i(1,1,0); // convert from extent format to size format by adding 1
 	mFileData.mUsRaw->setCropBox(cropbox);
 
 
@@ -108,8 +108,6 @@ void ReconstructCore::cropInputData()
 	imageSector.mSize.setHeight(size[1]);
 	sector.setImage(imageSector);
 	mFileData.mProbeData.setData(sector);
-
-	std::cout << streamXml2String(sector) << std::endl;
 
 	vtkImageDataPtr mask = mFileData.mProbeData.getMask();
 	mFileData.mMask = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
