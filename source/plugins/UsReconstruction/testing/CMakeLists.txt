@@ -21,10 +21,10 @@ if (BUILD_TESTING)
     )
       
   # List of all test units
-  QT4_WRAP_CPP( SOURCE_FILES 
+  QT4_WRAP_CPP( CX_TEST_US_RECONSTRUCTION_SOURCE_FILES
    )
   
-  set(SOURCE_FILES
+  set(CX_TEST_US_RECONSTRUCTION_SOURCE_FILES
   cxTest_UsReconstruction.h
   cxTest_UsReconstruction.cpp
   ${CX_TEST_SOURCE_FILES}
@@ -32,9 +32,9 @@ if (BUILD_TESTING)
   
   # A CppUnit executable included for debugging purposes.
   # Not part of ctest
-  add_executable(cxTestUsReconstruction cxCppUnitMain.cpp ${SOURCE_FILES} )
+  add_executable(cxTestUsReconstruction cxCppUnitMain.cpp ${CX_TEST_US_RECONSTRUCTION_SOURCE_FILES} )
   target_link_libraries(cxTestUsReconstruction
-    cxPluginUSReconstructionLogic 
+    cxPluginUSReconstruction
     ${CPPUNIT_LIBRARIES})
   
   # -----------------------------------------------
@@ -46,10 +46,10 @@ if (BUILD_TESTING)
   include(cisstMacros)
   
   # Link all CppUnit tests to the cisstTestsMain library
-  add_executable(testUsRec_CppUnit_CTest ${SOURCE_FILES} )
+  add_executable(testUsRec_CppUnit_CTest ${CX_TEST_US_RECONSTRUCTION_SOURCE_FILES} )
   target_link_libraries(testUsRec_CppUnit_CTest 
     cisstTestsMain
-    cxPluginUSReconstructionLogic
+    cxPluginUSReconstruction
     ${CPPUNIT_LIBRARIES}
     ${BOOST_LIBRARIES}
 )
