@@ -33,7 +33,7 @@ if (BUILD_TESTING)
   # Not part of ctest
   add_executable(cxTestImageAlgorithms cxCppUnitMain.cpp ${SOURCE_FILES} )
   target_link_libraries(cxTestImageAlgorithms
-    cxAlgorithms_Res 
+    cxResource
     ${CPPUNIT_LIBRARIES})
   
   # -----------------------------------------------
@@ -48,7 +48,7 @@ if (BUILD_TESTING)
   add_executable(testImgAlg_CppUnit_CTest ${SOURCE_FILES} )
   target_link_libraries(testImgAlg_CppUnit_CTest 
     cisstTestsMain
-    cxAlgorithms_Res
+    cxResource
     ${CPPUNIT_LIBRARIES}
     ${BOOST_LIBRARIES}
 )

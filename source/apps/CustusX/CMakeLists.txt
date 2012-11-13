@@ -54,11 +54,11 @@ endif (APPLE)
 #------------------------------------------------------------------------------
 target_link_libraries( CustusX 
 		cxGui 
-		cxPluginCalibrationGUI 
-		cxPluginAlgorithmGUI 
-		cxPluginRegistrationGUI
-		cxPluginUSReconstructionGUI 
-		cxPluginAcquisitionGUI
+                cxPluginCalibration
+                cxPluginAlgorithm
+                cxPluginRegistration
+                cxPluginUSReconstruction
+                cxPluginAcquisition
 		)
 		
 #------------------------------------------------------------------------------
@@ -69,11 +69,11 @@ if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
     if(COTIRE_ADD_UNITY_BUILDS)
         target_link_libraries(CustusX_unity 
         		cxGui 
-        		cxPluginCalibrationGUI 
-        		cxPluginAlgorithmGUI 
-        		cxPluginRegistrationGUI
-        		cxPluginUSReconstructionGUI 
-        		cxPluginAcquisitionGUI
+                        cxPluginCalibration
+                        cxPluginAlgorithm
+                        cxPluginRegistration
+                        cxPluginUSReconstruction
+                        cxPluginAcquisition
         		)
     endif(COTIRE_ADD_UNITY_BUILDS)
 endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)

@@ -52,7 +52,7 @@ ELSE(APPLE)
   ADD_EXECUTABLE(ReconstructGUI ${SOURCE_FILES} )
 ENDIF(APPLE)
 
-target_link_libraries( ReconstructGUI cxPluginUSReconstructionGUI )
+target_link_libraries( ReconstructGUI cxPluginUSReconstruction )
 # =========================================================
 
 #add_executable( sscUsReconstruction MACOSX_BUNDLE ${SOURCE_FILES} )
