@@ -111,8 +111,13 @@ public:
 	ssc::GPUImageDataBufferPtr getGPUImageDataBuffer(vtkImageDataPtr volume);
 	ssc::GPUImageLutBufferPtr getGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
 	int getMemoryUsage(int *textures);
+	/**
+	 * Free all resources in the repository, for instance on session change
+	 */
+	void clear();
 private:
 	GPUImageBufferRepository();
+	~GPUImageBufferRepository();
 	class GPUImageBufferRepositoryInternal* mInternal;
 	static GPUImageBufferRepository* mInstance;
 	void tearDown();

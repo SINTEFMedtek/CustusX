@@ -504,6 +504,17 @@ GPUImageBufferRepository::GPUImageBufferRepository()
 	mInternal = new GPUImageBufferRepositoryInternal();
 }
 
+GPUImageBufferRepository::~GPUImageBufferRepository()
+{
+	tearDown();
+}
+
+void GPUImageBufferRepository::clear()
+{
+	tearDown();
+	mInternal = new GPUImageBufferRepositoryInternal();
+}
+
 GPUImageBufferRepository* GPUImageBufferRepository::getInstance()
 {
 	if (!mInstance)
@@ -517,7 +528,6 @@ void GPUImageBufferRepository::shutdown()
 {
 	if(mInstance)
 	{
-		mInstance->tearDown();
 		delete mInstance;
 	}
 	mInstance = NULL;
