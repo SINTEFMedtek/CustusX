@@ -70,6 +70,8 @@ add_library(cxUtilities
     cxDepthPeeling.cpp
     cxProcessWrapper.h
     cxProcessWrapper.cpp
+    sscUSFrameData.h
+    sscUSFrameData.cpp
     ${cxUtilities_MOC_SRCS}
     )
     
