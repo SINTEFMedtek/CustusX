@@ -38,6 +38,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/gui
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     ../logic
+    ../logic/3DReconstruction    
     )
 
 

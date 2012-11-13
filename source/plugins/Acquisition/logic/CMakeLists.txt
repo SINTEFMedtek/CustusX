@@ -35,6 +35,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/algorithms
 
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
+    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction    
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
