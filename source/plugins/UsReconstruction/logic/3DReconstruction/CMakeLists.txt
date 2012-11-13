@@ -132,9 +132,9 @@ add_library( sscUS3DReconstruction ${SOURCE_FILES} )
 
 # Don't try to use OpenCl if we haven't got it
 IF( SSC_USE_OpenCL )
-    target_link_libraries( sscUS3DReconstruction SSC ${OPENCL_LIBRARIES})
+    target_link_libraries( sscUS3DReconstruction SSC cxUtilities ${OPENCL_LIBRARIES})
 ELSE()
-    target_link_libraries( sscUS3DReconstruction SSC)
+    target_link_libraries( sscUS3DReconstruction SSC cxUtilities)
 ENDIF()
 
 
