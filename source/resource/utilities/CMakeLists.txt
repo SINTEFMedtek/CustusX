@@ -81,7 +81,7 @@ include_directories(
     )
     
     
-target_link_libraries(cxUtilities SSC sscUS3DReconstruction ${QT_LIBRARIES} cxSettings )
+target_link_libraries(cxUtilities SSC ${QT_LIBRARIES} cxSettings )
 
 #------------------------------------------------------------------------------
 # Cotire - pch and unity builds
