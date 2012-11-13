@@ -89,9 +89,15 @@ QWidget* IGTLinkWidget::createDirectLinkWidget()
 	layout->setMargin(0);
 
 	layout->addWidget(new QLabel("Arguments", this), 0, 0);
-	mDirectLinkArguments = new QLineEdit(this);
-	mDirectLinkArguments->setText(getConnection()->getLocalServerArguments());
+	mDirectLinkArguments = new QComboBox(this);
+	//Reduce size as mDirectLinkArguments can contain too much info for the widget
+	mDirectLinkArguments->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+	//Set size expanding in horizontal direction
+	mDirectLinkArguments->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	mDirectLinkArguments->setEditable(true);
+	mDirectLinkArguments->setInsertPolicy(QComboBox::InsertAtTop);
 	mDirectLinkArguments->setToolTip(ImageServer::getArgumentHelpText(""));
+	this->updateDirectLinkArgumentHistory();
 	layout->addWidget(mDirectLinkArguments, 0, 1);
 
 	return retval;
@@ -236,6 +242,14 @@ void IGTLinkWidget::updateHostHistory()
 	mAddressEdit->blockSignals(false);
 }
 
+void IGTLinkWidget::updateDirectLinkArgumentHistory()
+{
+	mDirectLinkArguments->blockSignals(true);
+	mDirectLinkArguments->clear();
+	mDirectLinkArguments->addItems(getConnection()->getDirectLinkArgumentHistory());
+	mDirectLinkArguments->blockSignals(false);
+}
+
 void IGTLinkWidget::browseLocalServerSlot()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Select Server"), "~");
@@ -298,7 +312,8 @@ void IGTLinkWidget::writeSettings()
 {
 	if (this->getConnection()->getUseDirectLink2())
 	{
-		getConnection()->setLocalServerArguments(mDirectLinkArguments->text());
+		getConnection()->setLocalServerArguments(mDirectLinkArguments->currentText());
+		this->updateDirectLinkArgumentHistory();
 	}
 	else if (this->getConnection()->getUseLocalServer2())
 	{

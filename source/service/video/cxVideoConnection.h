@@ -56,8 +56,6 @@ public:
 
 	ssc::StringDataAdapterXmlPtr getConnectionMethod() { return mConnectionMethod; }
 
-	void setLocalServerArguments(QString commandline);
-	QString getLocalServerArguments();
 
 	void setLocalServerExecutable(QString commandline);
 	QString getLocalServerExecutable();
@@ -66,6 +64,9 @@ public:
 	QStringList getHostHistory();
 	QString getHost();
 	void setHost(QString host);
+	QStringList getDirectLinkArgumentHistory();
+	void setLocalServerArguments(QString commandline);
+	QString getLocalServerArguments();
 
 	bool getUseLocalServer2();
 	bool getUseDirectLink2();
