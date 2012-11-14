@@ -24,6 +24,7 @@ include_directories(
     ${SSC_BINARY_DIR} 
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/gui
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
+    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction    
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/resource/algorithms
@@ -51,7 +52,7 @@ ELSE(APPLE)
   ADD_EXECUTABLE(ReconstructGUI ${SOURCE_FILES} )
 ENDIF(APPLE)
 
-target_link_libraries( ReconstructGUI cxPluginUSReconstructionGUI )
+target_link_libraries( ReconstructGUI cxPluginUSReconstruction )
 # =========================================================
 
 #add_executable( sscUsReconstruction MACOSX_BUNDLE ${SOURCE_FILES} )
