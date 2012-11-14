@@ -111,7 +111,7 @@ private:
 	vtkAppendPolyDataPtr mMerger;
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 	SlicePlaneClipperPtr mClipper;
-	static const double defaultStepSize = 1.0;
+	static const double defaultStepSize;
 	friend class ::TestGPURayCaster;
 };
 //---------------------------------------------------------

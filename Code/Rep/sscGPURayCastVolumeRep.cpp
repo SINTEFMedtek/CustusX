@@ -82,6 +82,7 @@ double maxIntensity(ssc::ImagePtr image)
 GPURayCastVolumeRep::GPURayCastVolumeRep(const QString& uid) :
 	RepImpl(uid)
 {
+	const double defaultStepSize = 1.0;
 	//	std::cout << "create Texture3DSlicerRep" << std::endl;
 	mActor = vtkActorPtr::New();
 	mPainter = GPURayCastVolumePainterPtr::New();
