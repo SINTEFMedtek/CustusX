@@ -15,14 +15,16 @@
 #include <QDir>
 #include "sscUtilHelpers.h"
 
+#include <itkGrayscaleFillholeImageFilter.h>
+
 namespace cx
 {
 
 //---------------------------------------------------------------------------------------------------------------------
-itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImage(ssc::ImagePtr image)
+itkImageType::ConstPointer AlgorithmHelper::getITKfromVTKImage(vtkImageDataPtr image)
 {
   //HACK
-  return AlgorithmHelper::getITKfromSSCImageViaFile(image);
+  return AlgorithmHelper::getITKfromVTKImageViaFile(image);
 
 //  if(!image)
 //  {
@@ -48,22 +50,33 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImage(ssc::ImagePtr ima
 }
 //---------------------------------------------------------------------------------------------------------------------
 
+itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImage(ssc::ImagePtr input)
+{
+	if (!input)
+		return getITKfromVTKImage(vtkImageDataPtr());
+	else
+		return getITKfromVTKImage(input->getBaseVtkImageData());
+}
+//---------------------------------------------------------------------------------------------------------------------
 
 /**This is a workaround for _unpredictable_ crashes
  * experienced when using the itk::VTKImageToImageFilter.
  *
  */
-itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImageViaFile(ssc::ImagePtr image)
+itkImageType::ConstPointer AlgorithmHelper::getITKfromVTKImageViaFile(vtkImageDataPtr input)
 {
-  if(!image)
+  if(!input)
   {
     std::cout << "getITKfromSSCImage(): NO image!!!" << std::endl;
     return itkImageType::ConstPointer();
   }
 
-  if(image->getMax() > SHRT_MAX || image->getMin() < SHRT_MIN)
-  	ssc::messageManager()->sendWarning("Image values out of range. max: " + qstring_cast(image->getMax())
-  			+ " min: " + qstring_cast(image->getMin()) + " See bug #363 if this needs to be fixed");
+  double minVal = input->GetScalarRange()[0];
+  double maxVal = input->GetScalarRange()[1];
+
+  if(maxVal > SHRT_MAX || minVal < SHRT_MIN)
+  	ssc::messageManager()->sendWarning("Image values out of range. max: " + qstring_cast(maxVal)
+  			+ " min: " + qstring_cast(minVal) + " See bug #363 if this needs to be fixed");
 
   QString tempFolder = settings()->value("globalPatientDataFolder").toString() + "/NoPatient/temp/";
   QDir().mkpath(tempFolder);
@@ -74,7 +87,7 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImageViaFile(ssc::Image
   QString filename = tempFolder + "/"+qstring_cast(writer.GetPointer())+".mhd";
 
 
-  writer->SetInput(image->getBaseVtkImageData());
+  writer->SetInput(input);
   writer->SetFileName(cstring_cast(filename));
   writer->SetCompression(false);
   writer->Write();
@@ -99,6 +112,33 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImageViaFile(ssc::Image
   return retval;
 }
 //---------------------------------------------------------------------------------------------------------------------
+
+vtkImageDataPtr AlgorithmHelper::getVTKFromITK(itkImageType::ConstPointer input)
+{
+	//Convert ITK to VTK
+	itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
+	itkToVtkFilter->SetInput(input);
+	itkToVtkFilter->Update();
+
+	vtkImageDataPtr rawResult = vtkImageDataPtr::New();
+	rawResult->DeepCopy(itkToVtkFilter->GetOutput());
+	// TODO: possible memory problem here - check debug mem system of itk/vtk
+
+	return rawResult;
+}
+
+vtkImageDataPtr AlgorithmHelper::execute_itk_GrayscaleFillholeImageFilter(vtkImageDataPtr input)
+{
+  itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromVTKImage(input);
+
+  typedef itk::GrayscaleFillholeImageFilter<itkImageType, itkImageType> FilterType;
+  FilterType::Pointer filter = FilterType::New();
+
+  filter->SetInput(itkImage);
+  filter->Update();
+
+  return AlgorithmHelper::getVTKFromITK(filter->GetOutput());
+}
 
 
 }

@@ -11,6 +11,7 @@ if (BUILD_TESTING)
   include_directories( 
     ${CPPUNIT_INCLUDE_DIR}     
     ../logic
+    ..
     ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
@@ -20,12 +21,12 @@ if (BUILD_TESTING)
     )
       
   # List of all test units
-  QT4_WRAP_CPP( SOURCE_FILES 
+  QT4_WRAP_CPP( CX_TEST_REGISTRATION_SOURCE_FILES
   cxElastixSingleThreadedRunner.h
    )
   
-  set(SOURCE_FILES
-  ${SOURCE_FILES}
+  set(CX_TEST_REGISTRATION_SOURCE_FILES
+  ${CX_TEST_REGISTRATION_SOURCE_FILES}
   cxTest_RegistrationV2V.h
   cxTest_RegistrationV2V.cpp
   cxTest_RegistrationElastix.h
@@ -37,9 +38,9 @@ if (BUILD_TESTING)
   
   # A CppUnit executable included for debugging purposes.
   # Not part of ctest
-  add_executable(cxTestRegistration cxCppUnitMain.cpp ${SOURCE_FILES} )
+  add_executable(cxTestRegistration cxCppUnitMain.cpp ${CX_TEST_REGISTRATION_SOURCE_FILES} )
   target_link_libraries(cxTestRegistration
-    cxPluginRegistrationLogic 
+    cxPluginRegistration
     ${CPPUNIT_LIBRARIES})
   
   # -----------------------------------------------
@@ -51,10 +52,10 @@ if (BUILD_TESTING)
   include(cisstMacros)
   
   # Link all CppUnit tests to the cisstTestsMain library
-  add_executable(testRegistration_CppUnit_CTest ${SOURCE_FILES} )
+  add_executable(testRegistration_CppUnit_CTest ${CX_TEST_REGISTRATION_SOURCE_FILES} )
   target_link_libraries(testRegistration_CppUnit_CTest 
     cisstTestsMain
-    cxPluginRegistrationLogic
+    cxPluginRegistration
     ${CPPUNIT_LIBRARIES}
     ${BOOST_LIBRARIES}
 )

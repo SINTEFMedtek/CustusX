@@ -54,11 +54,11 @@ endif (APPLE)
 #------------------------------------------------------------------------------
 target_link_libraries( CustusX 
 		cxGui 
-		cxPluginCalibrationGUI 
-		cxPluginAlgorithmGUI 
-		cxPluginRegistrationGUI
-		cxPluginUSReconstructionGUI 
-		cxPluginAcquisitionGUI
+                cxPluginCalibration
+                cxPluginAlgorithm
+                cxPluginRegistration
+                cxPluginUSReconstruction
+                cxPluginAcquisition
 		)
 		
 #------------------------------------------------------------------------------
@@ -69,11 +69,11 @@ if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
     if(COTIRE_ADD_UNITY_BUILDS)
         target_link_libraries(CustusX_unity 
         		cxGui 
-        		cxPluginCalibrationGUI 
-        		cxPluginAlgorithmGUI 
-        		cxPluginRegistrationGUI
-        		cxPluginUSReconstructionGUI 
-        		cxPluginAcquisitionGUI
+                        cxPluginCalibration
+                        cxPluginAlgorithm
+                        cxPluginRegistration
+                        cxPluginUSReconstruction
+                        cxPluginAcquisition
         		)
     endif(COTIRE_ADD_UNITY_BUILDS)
 endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
@@ -126,7 +126,7 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
 		)
 
 # Install openCL shaders into bundle
-install(FILES ${CustusX3_SOURCE_DIR}/externals/ssc/Code/Ultrasound/3DReconstruction/Thunder/kernels.ocl 
+install(FILES ${CustusX3_SOURCE_DIR}source/plugins/USReconstruction/logic/3DReconstruction/Thunder/kernels.ocl 
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
 				)
 
@@ -296,7 +296,6 @@ set(DIRS
 		${DCMTK_DIR}/lib
 		${INCLUDE_DIRECTORIES}
 		${SSC_BINARY_DIR}/Code
-		${SSC_BINARY_DIR}/Code/Ultrasound/3DReconstruction
 		${SSC_BINARY_DIR}/DICOMLib
 		${CustusX3_BINARY_DIR}
 		${CustusX3_BINARY_DIR}/source
@@ -317,6 +316,7 @@ set(DIRS
 		${CustusX3_BINARY_DIR}/source/plugins/Registration/logic
 		${CustusX3_BINARY_DIR}/source/plugins/Registration/gui
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic
+        ${CustusX3_BINARY_DIR}/source/plugins/USReconstruction/logic/3DReconstruction
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/gui
 		${CustusX3_BINARY_DIR}/source/gui
 		${CustusX3_BINARY_DIR}/source/logic/
