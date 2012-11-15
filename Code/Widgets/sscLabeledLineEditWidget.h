@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include "sscStringDataAdapter.h"
+#include "sscOptimizedUpdateWidget.h"
 
 namespace ssc
 {
@@ -37,13 +38,13 @@ namespace ssc
  *
  * \ingroup sscWidget
  */
-class LabeledLineEditWidget: public QWidget
+class LabeledLineEditWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
 	LabeledLineEditWidget(QWidget* parent, EditableStringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
 private slots:
-	void dataChanged();
+    virtual void prePaintEvent();
 	void editingFinished();
 private:
 	QLabel* mLabel;

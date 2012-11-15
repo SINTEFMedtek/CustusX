@@ -28,10 +28,10 @@ namespace ssc
 
 LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, ssc::StringDataAdapterPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
-	QWidget(parent)
+    OptimizedUpdateWidget(parent)
 {
 	mData = dataInterface;
-	connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
+    connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
 	QHBoxLayout* topLayout = new QHBoxLayout;
 	topLayout->setMargin(0);
@@ -56,7 +56,7 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, ssc::StringDataAda
 		topLayout->addWidget(mCombo, 1);
 	}
 
-	dataChanged();
+    this->setModified();
 }
 
 void LabeledComboBoxWidget::comboIndexChanged(int index)
@@ -64,7 +64,7 @@ void LabeledComboBoxWidget::comboIndexChanged(int index)
 	mData->setValue(mCombo->itemData(index).toString());
 }
 
-void LabeledComboBoxWidget::dataChanged()
+void LabeledComboBoxWidget::prePaintEvent()
 {
 	mCombo->blockSignals(true);
 	mCombo->clear();

@@ -103,6 +103,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscPlaneMetricRep.h
     Rep/sscGuideRep2D.h
      
+    Widgets/sscOptimizedUpdateWidget.h
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
     Widgets/sscStringDataAdapter.h
@@ -394,6 +395,8 @@ SET( SSC_SOURCE_FILES
     Tool/sscProbeAdapterRTSource.h
     Tool/sscProbeAdapterRTSource.cpp
     
+    Widgets/sscOptimizedUpdateWidget.h
+    Widgets/sscOptimizedUpdateWidget.cpp
     Widgets/sscDoubleRange.h
     Widgets/sscHelperWidgets.cpp
     Widgets/sscHelperWidgets.h

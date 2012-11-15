@@ -28,15 +28,16 @@
 #include <iostream>
 #include "sscVector3D.h"
 #include "sscTypeConversions.h"
+#include "sscMousePadWidget.h"
 
 namespace ssc
 {
 
 ScalarInteractionWidget::ScalarInteractionWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface) :
-	QWidget(parent), mSlider(NULL), mSpinBox(NULL), mLabel(NULL), mEdit(NULL), mInfiniteSlider(NULL)
+    OptimizedUpdateWidget(parent), mSlider(NULL), mSpinBox(NULL), mLabel(NULL), mEdit(NULL), mInfiniteSlider(NULL)
 {
 	mData = dataInterface;
-	connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
+    connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 }
 
 void ScalarInteractionWidget::enableLabel()
@@ -140,7 +141,7 @@ void ScalarInteractionWidget::build(QGridLayout* gridLayout, int row)
 	else
 		this->addToOwnLayout();
 
-	dataChanged();
+    this->setModified();
 }
 
 void ScalarInteractionWidget::doubleValueChanged(double val)
@@ -167,8 +168,9 @@ void ScalarInteractionWidget::textEditedSlot()
 	mData->setValue(newVal);
 }
 
-void ScalarInteractionWidget::dataChanged()
+void ScalarInteractionWidget::prePaintEvent()
 {
+    std::cout << "ScalarInteractionWidget::prePaintEvent() " << this << " " << mData->getValueName() << std::endl;
 	DoubleRange range = mData->getValueRange();
 	DoubleRange dRange(mData->convertInternal2Display(range.min()), mData->convertInternal2Display(range.max()),
 		mData->convertInternal2Display(range.step()));

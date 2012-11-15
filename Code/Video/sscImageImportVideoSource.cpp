@@ -17,7 +17,6 @@
 //
 // See sscLicense.txt for more information.
 
-#include <QTimer>
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 #include "sscImageImportVideoSource.h"

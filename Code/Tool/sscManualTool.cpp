@@ -19,7 +19,6 @@
 
 #include "sscManualTool.h"
 #include <QTime>
-#include <QTimer>
 #include <vtkSTLReader.h>
 #include <vtkCursor3D.h>
 #include "sscDummyTool.h"

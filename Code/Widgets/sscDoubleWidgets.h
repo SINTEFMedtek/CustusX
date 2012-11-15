@@ -37,12 +37,12 @@
 
 #include "sscDoubleRange.h"
 #include "sscDoubleDataAdapter.h"
-#include "sscMousePadWidget.h"
+#include "sscOptimizedUpdateWidget.h"
 
 namespace ssc
 {
 //typedef boost::shared_ptr<class DoubleDataAdapterDoDoubleDataAdapter
-
+class MousePadWidget;
 
 /**\brief Custom widget for display of double-valued data.
  *
@@ -137,7 +137,7 @@ public:
  *
  * \ingroup sscWidget
  */
-class ScalarInteractionWidget: public QWidget
+class ScalarInteractionWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
@@ -154,13 +154,14 @@ public:
 	void addToGridLayout(QGridLayout* gridLayout = 0, int row = 0);
 	void build(QGridLayout* gridLayout = 0, int row = 0);
 
-protected slots:
-	void dataChanged();
 private slots:
 	void textEditedSlot();
 	void doubleValueChanged(double val);
 	//  void doubleValueChanged(double val);
 	void infiniteSliderMouseMoved(QPointF delta);
+
+protected:
+    virtual void prePaintEvent();
 
 private:
 
