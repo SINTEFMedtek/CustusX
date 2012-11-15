@@ -47,7 +47,6 @@ public:
 signals:
 
 protected slots:
-	void updateSlot();
 	void itemSelectionChanged();
 
   void removeButtonClickedSlot();
@@ -59,10 +58,6 @@ protected slots:
   void addDistanceButtonClickedSlot();
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);
-
-protected:
-  void paintEvent(QPaintEvent* event);
-  void setModified();
 
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -88,7 +83,6 @@ private:
   QAction* mRemoveAction; ///< the Remove Landmark button
   QAction* mLoadReferencePointsAction; ///< button for loading a reference tools reference points
   QStackedWidget* mEditWidgets;
-  bool mModified; ///< use to compute only prior to paintEvent()
 };
 
 }//end namespace cx

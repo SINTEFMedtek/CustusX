@@ -57,8 +57,8 @@ protected:
 	virtual void performRegistration()
 	{
 	}
-	virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
-	QString getLandmarkName(QString uid);
+    virtual void prePaintEvent(); ///< populates the table widget
+    QString getLandmarkName(QString uid);
 	virtual ssc::Transform3D getTargetTransform() const;
 	ssc::PickerRepPtr getPickerRep();
 
