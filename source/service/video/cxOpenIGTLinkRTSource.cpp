@@ -35,6 +35,7 @@
 #include <vtkImageMapToColors.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageChangeInformation.h>
+#include <vtkExtractVOI.h>
 #include "sscTypeConversions.h"
 #include "cxOpenIGTLinkClient.h"
 #include "sscMessageManager.h"
@@ -529,6 +530,22 @@ void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 			mRedirecter->SetInput(mFilter_IGTLink_to_RGB);
 	}
 //	timer.time("convert");
+
+	int* extent = mRedirecter->GetOutput()->GetExtent();
+	//Check if 3D volume. If so, only use middle frame
+	if(extent[5]- extent[4] > 0)
+	{
+		std::cout << "Got 3D volume, showing middle slice" << std::endl;
+		int slice = floor(extent[4]+0.5f*(extent[5]-extent[4]));
+		vtkSmartPointer<vtkExtractVOI> extractVOI = vtkSmartPointer<vtkExtractVOI>::New();
+		if (mFilter_IGTLink_to_RGB)
+			extractVOI->SetInput(mFilter_IGTLink_to_RGB);
+		else
+			extractVOI->SetInput(mImageImport->GetOutput());
+		extractVOI->SetVOI(extent[0], extent[1], extent[2], extent[3], slice, slice);
+		extractVOI->Update();
+		mRedirecter->SetInput(extractVOI->GetOutput());
+	}
 
 	//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
 	emit newFrame();
