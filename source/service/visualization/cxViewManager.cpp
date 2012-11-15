@@ -795,6 +795,8 @@ void ViewManager::renderAllViewsSlot()
 		mModified = false;
 	}
 
+	mRenderTimer->time("update");
+
 	// do a full render anyway at low rate. This is a convenience hack for rendering
 	// occational effects that the smart render is too dumb to see.
 	bool smart = mSmartRender;
@@ -820,16 +822,17 @@ void ViewManager::renderAllViewsSlot()
 	if (!smart)
 		mLastFullRender = QDateTime::currentDateTime();
 
-	mRenderTimer->endRender();
+	mRenderTimer->time("render");
 
 	if (mRenderTimer->intervalPassed())
 	{
 		emit fps(mRenderTimer->getFPS());
 //		static int counter=0;
-//		if (++counter%300==0)
+//        if (++counter%5==0)
 //			ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
-//		mRenderTimer->reset();
+		mRenderTimer->reset();
 	}
+//	std::cout << "==============================ViewManager::render" << std::endl;
 }
 
 LayoutData ViewManager::getLayoutData(const QString uid) const
