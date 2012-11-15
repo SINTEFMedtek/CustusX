@@ -165,7 +165,7 @@ void PerformanceTab::init()
   
   mRenderingIntervalSpinBox = new QSpinBox;
   mRenderingIntervalSpinBox->setSuffix("ms");
-  mRenderingIntervalSpinBox->setMinimum(16);
+  mRenderingIntervalSpinBox->setMinimum(4);
   mRenderingIntervalSpinBox->setMaximum(1000);
   mRenderingIntervalSpinBox->setValue(renderingInterval);
   connect(mRenderingIntervalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(renderingIntervalSlot(int)));
