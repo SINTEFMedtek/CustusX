@@ -26,6 +26,7 @@
 #include "sscLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
 #include "sscRegistrationTransform.h"
+#include "sscTimeKeeper.h"
 
 namespace cx
 {
@@ -39,7 +40,8 @@ MetricWidget::MetricWidget(QWidget* parent) :
   BaseWidget(parent, "MetricWidget", "Metrics/3D ruler"),
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this)),
-  mActiveLandmark("")
+  mActiveLandmark(""),
+    mModified(true)
 {
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
   connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(updateSlot()));
@@ -215,17 +217,41 @@ std::vector<MetricBasePtr> MetricWidget::createMetricWrappers()
   return retval;
 }
 
+void MetricWidget::paintEvent(QPaintEvent* event)
+{
+//    ssc::TimeKeeper timer;
+    this->prePaintEvent();
+//    timer.printElapsedms("metric prepaint");
+    QWidget::paintEvent(event);
+//    timer.printElapsedms("metric paint");
+}
+
 /**update contents of table.
  * rebuild table only if necessary
  *
  */
 void MetricWidget::updateSlot()
 {
-//  std::cout << "update " << std::endl;
+    this->setModified();
+}
+
+void MetricWidget::setModified()
+{
+//    std::cout << "MetricWidget::setModified()" << std::endl;
+    mModified = true;
+    this->update();
+}
+
+void MetricWidget::prePaintEvent()
+{
+//    std::cout << "MetricWidget::prePaintEvent" << std::endl;
+    if (!mModified)
+        return;
 
   mTable->blockSignals(true);
 
   std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers();
+
 
   bool rebuild = newMetrics.size()!=mMetrics.size();
 
@@ -241,7 +267,7 @@ void MetricWidget::updateSlot()
   // rebuild all:
   if (rebuild)
   {
-//    std::cout << "rebuild " << newMetrics.size() << std::endl;
+    std::cout << "rebuild " << newMetrics.size() << std::endl;
     mTable->clear();
 
     while (mEditWidgets->count())
@@ -325,6 +351,8 @@ void MetricWidget::updateSlot()
   mTable->blockSignals(false);
 
   this->enablebuttons();
+
+  mModified = false;
 }
 
 void MetricWidget::enablebuttons()
