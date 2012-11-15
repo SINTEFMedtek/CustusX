@@ -51,6 +51,7 @@ protected:
 private:
 	GrabberSenderPtr mSender;
 //	QTcpSocket* mSocket;
+	bool mInitialized;
 	QTimer* mSendTimer;
 	QTimer* mGrabTimer;
 	StringMap mArguments;
