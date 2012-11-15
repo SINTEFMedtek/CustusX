@@ -60,6 +60,10 @@ protected slots:
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);
 
+protected:
+  void paintEvent(QPaintEvent* event);
+  void setModified();
+
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
@@ -70,6 +74,7 @@ private:
   std::vector<MetricBasePtr> createMetricWrappers();
   std::vector<ssc::DataPtr> refinePointArguments(std::vector<ssc::DataPtr> args, unsigned argNo);
   void setManualToolPosition(ssc::Vector3D p_r);
+  void prePaintEvent();
 
 //  template<class T>
   QAction* createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot);
@@ -83,6 +88,7 @@ private:
   QAction* mRemoveAction; ///< the Remove Landmark button
   QAction* mLoadReferencePointsAction; ///< button for loading a reference tools reference points
   QStackedWidget* mEditWidgets;
+  bool mModified; ///< use to compute only prior to paintEvent()
 };
 
 }//end namespace cx
