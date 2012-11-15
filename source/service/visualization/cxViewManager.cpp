@@ -827,9 +827,9 @@ void ViewManager::renderAllViewsSlot()
 	if (mRenderTimer->intervalPassed())
 	{
 		emit fps(mRenderTimer->getFPS());
-//		static int counter=0;
+//        static int counter=0;
 //        if (++counter%5==0)
-//			ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+//            ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
 		mRenderTimer->reset();
 	}
 //	std::cout << "==============================ViewManager::render" << std::endl;
