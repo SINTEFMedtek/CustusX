@@ -499,6 +499,9 @@ void ViewManager::setActiveLayout(const QString& layout)
 
 void ViewManager::setRenderingInterval(int interval)
 {
+    if (interval==mRenderingTimer->interval())
+        return;
+
 	mRenderingTimer->stop();
 	if (interval == 0)
 		interval = 30;
@@ -786,41 +789,43 @@ void ViewManager::addDefaultLayouts()
 void ViewManager::renderAllViewsSlot()
 {
 	mRenderTimer->beginRender();
+    mLastBeginRender = QDateTime::currentDateTime();
+    this->setRenderingInterval(settings()->value("renderingInterval").toInt());
 
-	// updateViews() may be a bit expensive so we don't want to have it as a slot as previously
-	// Only set the mModified flag, and update the views here
-	if(mModified)
-	{
-		updateViews();
-		mModified = false;
-	}
+    // updateViews() may be a bit expensive so we don't want to have it as a slot as previously
+    // Only set the mModified flag, and update the views here
+    if(mModified)
+    {
+        updateViews();
+        mModified = false;
+    }
 
-	mRenderTimer->time("update");
+//    mRenderTimer->time("update");
 
-	// do a full render anyway at low rate. This is a convenience hack for rendering
-	// occational effects that the smart render is too dumb to see.
-	bool smart = mSmartRender;
-	int smartInterval = mRenderingTimer->interval() * 40;
-	if (mLastFullRender.time().msecsTo(QDateTime::currentDateTime().time()) > smartInterval)
-		smart = false;
+    // do a full render anyway at low rate. This is a convenience hack for rendering
+    // occational effects that the smart render is too dumb to see.
+    bool smart = mSmartRender;
+    int smartInterval = mRenderingTimer->interval() * 40;
+    if (mLastFullRender.time().msecsTo(QDateTime::currentDateTime().time()) > smartInterval)
+        smart = false;
 
-	for (ViewMap::iterator iter = mViewMap.begin(); iter != mViewMap.end(); ++iter)
-	{
-		if (iter->second->isVisible())
-		{
-			if (smart)
-				dynamic_cast<ssc::View*>(iter->second)->render(); // render only changed scenegraph (shaky but smooth)
-			else
-			{
-				iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
-			}
+    for (ViewMap::iterator iter = mViewMap.begin(); iter != mViewMap.end(); ++iter)
+    {
+        if (iter->second->isVisible())
+        {
+            if (smart)
+                dynamic_cast<ssc::View*>(iter->second)->render(); // render only changed scenegraph (shaky but smooth)
+            else
+            {
+                iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
+            }
 
-			report_gl_error_text(cstring_cast(QString("During rendering of view: ") + iter->first));
-		}
-	}
+            report_gl_error_text(cstring_cast(QString("During rendering of view: ") + iter->first));
+        }
+    }
 
-	if (!smart)
-		mLastFullRender = QDateTime::currentDateTime();
+    if (!smart)
+        mLastFullRender = QDateTime::currentDateTime();
 
 	mRenderTimer->time("render");
 
@@ -828,11 +833,20 @@ void ViewManager::renderAllViewsSlot()
 	{
 		emit fps(mRenderTimer->getFPS());
 //        static int counter=0;
-//        if (++counter%5==0)
+//        if (++counter%3==0)
 //            ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
-		mRenderTimer->reset();
+        mRenderTimer->reset();
 	}
 //	std::cout << "==============================ViewManager::render" << std::endl;
+
+    // tests show that the application wait between renderings even if the rendering uses more time
+    // then the interval. This hack shortens the wait time between renderings but keeps below the
+    // input update rate at all times.
+    int usage = mLastBeginRender.msecsTo(QDateTime::currentDateTime()); // time spent in rendering
+    int leftover = std::max(0, mRenderingTimer->interval() - usage); // time left of the rendering interval
+    int timeToNext = std::max(1, leftover); // always wait at least 1ms - give others time to do stuff
+//    std::cout << QString("setting interval %1, usage is %2").arg(timeToNext).arg(usage) << std::endl;
+    this->setRenderingInterval(timeToNext);
 }
 
 LayoutData ViewManager::getLayoutData(const QString uid) const
