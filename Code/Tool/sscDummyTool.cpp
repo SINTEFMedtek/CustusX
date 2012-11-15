@@ -314,8 +314,8 @@ Transform3D* DummyTool::getNextTransform()
 
 void DummyTool::set_prMt(const Transform3D& prMt)
 {
-//	TimeKeeper timer;
-//	static int count=0;
+//    TimeKeeper timer;
+//    static int count=0;
 
 	m_prMt = prMt;
 
@@ -329,12 +329,12 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 //	std::cout << "DummyTool::set_prMt " << QDateTime::currentDateTime().toString("mm:ss:zzz").toStdString() << std::endl;
 //	ssc::messageManager()->sendDebug("DummyTool:: emit toolTransformAndTimestamp()");
 
-//	std::cout << "start emit tool pos" << std::endl;
+//    std::cout << "start emit tool pos" << std::endl;
 
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 
-//	if (++count%300==0)
-//		timer.printElapsedms("emit tool pos");
+//    if (++count%100==0)
+//        timer.printElapsedms("emit tool pos");
 }
 
 double DummyTool::getTooltipOffset() const 

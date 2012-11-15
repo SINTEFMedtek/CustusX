@@ -170,7 +170,7 @@ void ScalarInteractionWidget::textEditedSlot()
 
 void ScalarInteractionWidget::prePaintEvent()
 {
-    std::cout << "ScalarInteractionWidget::prePaintEvent() " << this << " " << mData->getValueName() << std::endl;
+//    std::cout << "ScalarInteractionWidget::prePaintEvent() " << this << " " << mData->getValueName() << std::endl;
 	DoubleRange range = mData->getValueRange();
 	DoubleRange dRange(mData->convertInternal2Display(range.min()), mData->convertInternal2Display(range.max()),
 		mData->convertInternal2Display(range.step()));
