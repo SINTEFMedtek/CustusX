@@ -17,45 +17,38 @@
 //
 // See sscLicense.txt for more information.
 
-
-/*
- * sscCheckBoxWidget.h
- *
- *  Created on: Feb 7, 2011
- *      Author: christiana
- */
-
-#ifndef SSCCHECKBOXWIDGET_H_
-#define SSCCHECKBOXWIDGET_H_
-
-#include "sscBoolDataAdapter.h"
-
-#include <QWidget>
-#include <QCheckBox>
-#include <QGridLayout>
 #include "sscOptimizedUpdateWidget.h"
+#include <iostream>
 
 namespace ssc
 {
 
-/**\brief Widget for the BoolDataAdapter.
- *
- * \ingroup sscWidget
- */
-class CheckBoxWidget: public OptimizedUpdateWidget
+
+OptimizedUpdateWidget::OptimizedUpdateWidget(QWidget* parent) :
+    QWidget(parent), mModified(true)
 {
-Q_OBJECT
-public:
-	CheckBoxWidget(QWidget* parent, BoolDataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
-private slots:
-    void prePaintEvent();
-	void valueChanged(bool val);
-
-private:
-	QCheckBox* mCheckBox;
-	BoolDataAdapterPtr mData;
-};
-
 }
 
-#endif /* SSCCHECKBOXWIDGET_H_ */
+void OptimizedUpdateWidget::paintEvent(QPaintEvent* event)
+{
+    this->prePaintEventPrivate();
+    QWidget::paintEvent(event);
+}
+
+void OptimizedUpdateWidget::setModified()
+{
+    mModified = true;
+    this->update();
+}
+
+void OptimizedUpdateWidget::prePaintEventPrivate()
+{
+    if (!mModified)
+        return;
+
+    this->prePaintEvent();
+
+    mModified = false;
+}
+
+} // namespace ssc

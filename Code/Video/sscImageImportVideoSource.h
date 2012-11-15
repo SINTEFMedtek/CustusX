@@ -30,7 +30,6 @@
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
-class QTimer;
 
 namespace ssc
 {

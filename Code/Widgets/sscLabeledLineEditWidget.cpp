@@ -28,10 +28,10 @@ namespace ssc
 
 LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, ssc::EditableStringDataAdapterPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
-	QWidget(parent)
+    OptimizedUpdateWidget(parent)
 {
 	mData = dataInterface;
-	connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
+    connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
 	QHBoxLayout* topLayout = new QHBoxLayout;
 	topLayout->setMargin(0);
@@ -56,7 +56,7 @@ LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, ssc::EditableStrin
 		topLayout->addWidget(mLine, 1);
 	}
 
-	dataChanged();
+    this->setModified();
 }
 
 void LabeledLineEditWidget::editingFinished()
@@ -64,7 +64,7 @@ void LabeledLineEditWidget::editingFinished()
 	mData->setValue(mLine->text());
 }
 
-void LabeledLineEditWidget::dataChanged()
+void LabeledLineEditWidget::prePaintEvent()
 {
 	mLine->blockSignals(true);
 	mLine->setReadOnly(mData->isReadOnly());

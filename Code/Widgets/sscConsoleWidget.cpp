@@ -42,7 +42,7 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 	this->setReadOnly(true);
 	this->createTextCharFormats();
 
-	connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(printMessage(Message)));
+    connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(printMessage(Message)));
 
 	mLineWrappingAction->setCheckable(true);
 	connect(mLineWrappingAction, SIGNAL(triggered(bool)), this, SLOT(lineWrappingSlot(bool)));

@@ -26,6 +26,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include "sscStringDataAdapter.h"
+#include "sscOptimizedUpdateWidget.h"
 
 namespace ssc
 {
@@ -37,13 +38,13 @@ namespace ssc
  *
  * \ingroup sscWidget
  */
-class LabeledComboBoxWidget: public QWidget
+class LabeledComboBoxWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
 	LabeledComboBoxWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
 private slots:
-	void dataChanged();
+    void prePaintEvent();
 	void comboIndexChanged(int val);
 private:
 	QLabel* mLabel;

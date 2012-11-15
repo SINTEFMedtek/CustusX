@@ -11,6 +11,7 @@
 #include <vtkClipPolyData.h>
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
+#include "sscTimeKeeper.h"
 
 namespace ssc
 {
@@ -313,6 +314,9 @@ Transform3D* DummyTool::getNextTransform()
 
 void DummyTool::set_prMt(const Transform3D& prMt)
 {
+//	TimeKeeper timer;
+//	static int count=0;
+
 	m_prMt = prMt;
 
 	// use ms since Epoch (AD1970)
@@ -323,9 +327,14 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 	//check:
 //	std::cout << "check: " << time.toString("yyyyMMdd'T'hhmmss:zzz").toStdString() << std::endl;
 //	std::cout << "DummyTool::set_prMt " << QDateTime::currentDateTime().toString("mm:ss:zzz").toStdString() << std::endl;
-	ssc::messageManager()->sendDebug("DummyTool:: emit toolTransformAndTimestamp()");
+//	ssc::messageManager()->sendDebug("DummyTool:: emit toolTransformAndTimestamp()");
+
+//	std::cout << "start emit tool pos" << std::endl;
 
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
+
+//	if (++count%300==0)
+//		timer.printElapsedms("emit tool pos");
 }
 
 double DummyTool::getTooltipOffset() const 

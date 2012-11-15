@@ -31,10 +31,10 @@ namespace ssc
 {
 
 CheckBoxWidget::CheckBoxWidget(QWidget* parent, ssc::BoolDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
-	QWidget(parent)
+    OptimizedUpdateWidget(parent)
 {
 	mData = dataInterface;
-	connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
+    connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
 	QHBoxLayout* topLayout = new QHBoxLayout;
 	topLayout->setMargin(0);
@@ -54,7 +54,7 @@ CheckBoxWidget::CheckBoxWidget(QWidget* parent, ssc::BoolDataAdapterPtr dataInte
 		topLayout->addWidget(mCheckBox);
 	}
 
-	dataChanged();
+    this->setModified();
 }
 
 void CheckBoxWidget::valueChanged(bool val)
@@ -64,7 +64,7 @@ void CheckBoxWidget::valueChanged(bool val)
 	mData->setValue(val);
 }
 
-void CheckBoxWidget::dataChanged()
+void CheckBoxWidget::prePaintEvent()
 {
 	mCheckBox->blockSignals(true);
 
