@@ -47,7 +47,7 @@ QStringList ImageSenderGE::getArgumentDescription()
 
 ImageSenderGE::ImageSenderGE(QObject* parent) :
 	ImageSender(parent),
-//	mSocket(NULL),
+	mInitialized(false),
 	mSendTimer(0),
 	mGrabTimer(0)
 {
@@ -130,9 +130,9 @@ bool ImageSenderGE::initialize_local()
 
 bool ImageSenderGE::startStreaming(GrabberSenderPtr sender)
 {
-	bool initialized = this->initialize_local();
+	mInitialized = this->initialize_local();
 
-	if (!initialized || !mGrabTimer || !mSendTimer)
+	if (!mInitialized || !mGrabTimer || !mSendTimer)
 	{
 		std::cout << "ImageSenderGE: Failed to start streaming: Not initialized." << std::endl;
 		return false;
@@ -148,7 +148,7 @@ bool ImageSenderGE::startStreaming(GrabberSenderPtr sender)
 
 void ImageSenderGE::stopStreaming()
 {
-	if (!mGrabTimer || !mSendTimer)
+	if (!mInitialized || !mGrabTimer || !mSendTimer)
 		return;
 	mGrabTimer->stop();
 	mSendTimer->stop();
