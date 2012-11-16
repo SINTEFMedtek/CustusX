@@ -238,6 +238,7 @@ SET(cxGui_SRCS
     utilities/cxTabbedWidget.h
     utilities/cxTabbedWidget.cpp
     utilities/cxBaseWidget.h
+    utilities/cxBaseWidget.cpp
     utilities/cxAudio.h
     utilities/cxAudio.cpp
     utilities/cxTransform3DWidget.h

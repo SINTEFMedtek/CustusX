@@ -222,7 +222,7 @@ void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
 	mTools[tool->getUid()] = tool;
 	tool->setVisible(true);
 	connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
-	tool->startTracking(20);
+    tool->startTracking(30);
 	this->setDominantTool(tool->getUid());
 
 	emit initialized();

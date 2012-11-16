@@ -110,22 +110,22 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
 
 
-	// insert all widgets from all plugins
-	for (unsigned i = 0; i < plugins.size(); ++i)
-	{
-		std::vector<PluginBase::PluginWidget> widgets = plugins[i]->createWidgets();
-		for (unsigned j = 0; j < widgets.size(); ++j)
-		{
-			this->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory);
-		}
+    // insert all widgets from all plugins
+    for (unsigned i = 0; i < plugins.size(); ++i)
+    {
+        std::vector<PluginBase::PluginWidget> widgets = plugins[i]->createWidgets();
+        for (unsigned j = 0; j < widgets.size(); ++j)
+        {
+            this->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory);
+        }
 
-		std::vector<QToolBar*> toolBars = plugins[i]->createToolBars();
-		for (unsigned j = 0; j < toolBars.size(); ++j)
-		{
-			this->addToolBar(toolBars[j]);
-			this->registerToolBar(toolBars[j], "Toolbar");
-		}
-	}
+        std::vector<QToolBar*> toolBars = plugins[i]->createToolBars();
+        for (unsigned j = 0; j < toolBars.size(); ++j)
+        {
+            this->addToolBar(toolBars[j]);
+            this->registerToolBar(toolBars[j], "Toolbar");
+        }
+    }
 
 
 	this->layoutChangedSlot();
