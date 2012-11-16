@@ -71,7 +71,7 @@ void LandmarkRegistrationWidget::activeImageChangedSlot()
 	}
 
 	//get the images landmarks and populate the landmark table
-	this->populateTheLandmarkTableWidget();
+    this->setModified();
 }
 
 void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
@@ -121,7 +121,7 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 	this->activeImageChangedSlot();
 
 	mManager->restart();
-	this->populateTheLandmarkTableWidget();
+    this->setModified();
 }
 
 void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
@@ -138,7 +138,7 @@ void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
 	mCurrentImage.reset();
 }
 
-void LandmarkRegistrationWidget::populateTheLandmarkTableWidget()
+void LandmarkRegistrationWidget::prePaintEvent()
 {
 	mLandmarkTableWidget->blockSignals(true);
 	mLandmarkTableWidget->clear();
@@ -217,28 +217,57 @@ void LandmarkRegistrationWidget::populateTheLandmarkTableWidget()
 	mLandmarkTableWidget->blockSignals(false);
 }
 
-void LandmarkRegistrationWidget::nextRow()
+//void LandmarkRegistrationWidget::nextRow()
+//{
+//    if (mLandmarkTableWidget->rowCount()==0)
+//    {
+//        std::cout << "LandmarkRegistrationWidget::nextRow() no rows!" << std::endl;
+//        return;
+//    }
+//	int selectedRow = mLandmarkTableWidget->currentRow();
+
+//	if (selectedRow == -1 && mLandmarkTableWidget->rowCount() != 0) //no row is selected yet
+//	{
+//		mLandmarkTableWidget->selectRow(0);
+//		selectedRow = mLandmarkTableWidget->currentRow();
+//	}
+
+//	int nextRow = selectedRow + 1;
+//	int lastRow = mLandmarkTableWidget->rowCount() - 1;
+//	if (nextRow > lastRow)
+//	{
+//		nextRow = lastRow;
+//	}
+
+//	selectedRow = nextRow;
+//	mLandmarkTableWidget->selectRow(selectedRow);
+//	mLandmarkTableWidget->setCurrentCell(selectedRow, 0);
+
+//	mActiveLandmark = mLandmarkTableWidget->currentItem()->data(Qt::UserRole).toString();
+//}
+
+void LandmarkRegistrationWidget::activateLandmark(QString uid)
 {
-	int selectedRow = mLandmarkTableWidget->currentRow();
+    mActiveLandmark = uid;
+    this->setModified();
+}
 
-	if (selectedRow == -1 && mLandmarkTableWidget->rowCount() != 0) //no row is selected yet
-	{
-		mLandmarkTableWidget->selectRow(0);
-		selectedRow = mLandmarkTableWidget->currentRow();
-	}
+/** Return the next landmark in the series of available landmarks,
+  * beginning with the active landmark.
+  */
+QString LandmarkRegistrationWidget::getNextLandmark()
+{
+    std::vector<ssc::Landmark> lm = this->getAllLandmarks();
 
-	int nextRow = selectedRow + 1;
-	int lastRow = mLandmarkTableWidget->rowCount() - 1;
-	if (nextRow > lastRow)
-	{
-		nextRow = lastRow;
-	}
+    for (int i=0; i<lm.size()-1; ++i)
+    {
+        if (lm[i].getUid()==mActiveLandmark)
+        {
+            return lm[i+1].getUid();
+        }
+    }
 
-	selectedRow = nextRow;
-	mLandmarkTableWidget->selectRow(selectedRow);
-	mLandmarkTableWidget->setCurrentCell(selectedRow, 0);
-
-	mActiveLandmark = mLandmarkTableWidget->currentItem()->data(Qt::UserRole).toString();
+    return "";
 }
 
 std::vector<ssc::Landmark> LandmarkRegistrationWidget::getAllLandmarks() const
@@ -295,7 +324,7 @@ void LandmarkRegistrationWidget::cellChangedSlot(int row, int column)
 void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 {
 	this->performRegistration();
-	this->populateTheLandmarkTableWidget();
+    this->setModified();
 }
 
 void LandmarkRegistrationWidget::updateAvarageAccuracyLabel()
