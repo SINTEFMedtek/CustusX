@@ -11,7 +11,7 @@ namespace ssc
 
 	enum ORIENTATION_TYPE
 	{
-		otOBLIQUE,   ///< orient planes relative to the tool space 
+		otOBLIQUE,   ///< orient planes relative to the tool space
 		otORTHOGONAL, ///< orient planes relative to the image/reference space.
 		otCOUNT
 	};
@@ -74,6 +74,7 @@ namespace ssc
 		tsPOLARIS,          ///< NDIs Polaris tracker
 		tsPOLARIS_SPECTRA,  ///< NDIs Polaris Spectra tracker
 		tsPOLARIS_VICRA,    ///< NDIs Polaris Vicra tracker
+		tsPOLARIS_CLASSIC,  ///< NDIs Polaris Classic tracker
 		tsAURORA,           ///< NDIs Aurora tracker
 		tsMICRON,           ///< Claron Technologys Micron tracker
 		tsCOUNT
