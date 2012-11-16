@@ -121,8 +121,9 @@ void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 	ssc::Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
 	image->setLandmark(ssc::Landmark(uid, pos_d));
 
-	this->nextRow();
+    this->activateLandmark(uid);
 }
+
 
 void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
@@ -142,7 +143,7 @@ void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 	ssc::Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
 	image->setLandmark(ssc::Landmark(uid, pos_d));
 
-	this->nextRow();
+    this->activateLandmark(this->getNextLandmark());
 }
 
 void LandmarkImageRegistrationWidget::removeLandmarkButtonClickedSlot()
@@ -151,9 +152,9 @@ void LandmarkImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 	if (!image)
 		return;
 
-	image->removeLandmark(mActiveLandmark);
-
-	this->nextRow();
+    QString next = this->getNextLandmark();
+    image->removeLandmark(mActiveLandmark);
+    this->activateLandmark(next);
 }
 
 void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
@@ -218,9 +219,9 @@ void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
 	viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 
-void LandmarkImageRegistrationWidget::populateTheLandmarkTableWidget()
+void LandmarkImageRegistrationWidget::prePaintEvent()
 {
-	LandmarkRegistrationWidget::populateTheLandmarkTableWidget();
+    LandmarkRegistrationWidget::prePaintEvent();
 
 	std::vector<ssc::Landmark> landmarks = this->getAllLandmarks();
 

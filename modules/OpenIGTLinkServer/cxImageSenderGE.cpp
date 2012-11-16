@@ -47,7 +47,7 @@ QStringList ImageSenderGE::getArgumentDescription()
 
 ImageSenderGE::ImageSenderGE(QObject* parent) :
 	ImageSender(parent),
-//	mSocket(NULL),
+	mInitialized(false),
 	mSendTimer(0),
 	mGrabTimer(0)
 {
@@ -69,7 +69,7 @@ void ImageSenderGE::initialize(StringMap arguments)
 	bool dumpHdfToDisk = false;
 
 	//size of the scan converted texture
-	int volumeDimensions[3] = {600, 600, 1}; //[voxels/pixels]
+	int volumeDimensions[3] = {300, 300, 1}; //[voxels/pixels]
 	//double voxelSize[3] = {0.3, 0.3, 1.0}; //[mm]
 
 	//interpolation type
@@ -85,12 +85,14 @@ void ImageSenderGE::initialize(StringMap arguments)
 	if (!mArguments.count("buffersize"))
 		mArguments["buffersize"] = "100";
     if (!mArguments.count("openclpath"))
-        mArguments["openclpath"] = ".";
+        mArguments["openclpath"] = "";
     if (!mArguments.count("testmode"))
         mArguments["testmode"] = "0";
 
+   	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
+   	std::string openclpath = mArguments["openclpath"].toStdString();
 
-	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, volumeDimensions, interpType);
+	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, volumeDimensions, interpType, bufferSize, openclpath);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
@@ -117,8 +119,6 @@ bool ImageSenderGE::initialize_local()
 	std::string hostIp = mArguments["ip"].toStdString();
 	int streamPort = convertStringWithDefault(mArguments["streamport"], -1);
 	int commandPort = convertStringWithDefault(mArguments["commandport"], -1);
-//	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
-//	std::string = openclpath = mArguments["openclpath"].toStdString();
 	bool testMode = convertStringWithDefault(mArguments["testmode"], 0);
 
 	mImgStream = mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
@@ -130,9 +130,9 @@ bool ImageSenderGE::initialize_local()
 
 bool ImageSenderGE::startStreaming(GrabberSenderPtr sender)
 {
-	bool initialized = this->initialize_local();
+	mInitialized = this->initialize_local();
 
-	if (!initialized || !mGrabTimer || !mSendTimer)
+	if (!mInitialized || !mGrabTimer || !mSendTimer)
 	{
 		std::cout << "ImageSenderGE: Failed to start streaming: Not initialized." << std::endl;
 		return false;
@@ -148,7 +148,7 @@ bool ImageSenderGE::startStreaming(GrabberSenderPtr sender)
 
 void ImageSenderGE::stopStreaming()
 {
-	if (!mGrabTimer || !mSendTimer)
+	if (!mInitialized || !mGrabTimer || !mSendTimer)
 		return;
 	mGrabTimer->stop();
 	mSendTimer->stop();
