@@ -214,6 +214,7 @@ protected:
 
 	QTimer* mRenderingTimer; ///< timer that drives rendering
 	QDateTime mLastFullRender;
+    QDateTime mLastBeginRender;
 
 	RenderTimerPtr mRenderTimer;
 
