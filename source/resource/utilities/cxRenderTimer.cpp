@@ -79,7 +79,8 @@ double CyclicActionTimer::getFPS()
   if (!mIntervalClock.elapsed())
     return -1;
   double numberOfRenderings =  mTiming.empty() ? 0 : mTiming.front().time.size();
-  return 1000.0 * numberOfRenderings / mIntervalClock.elapsed();
+  double fps = 1000.0 * numberOfRenderings / mIntervalClock.elapsed();
+  return floor(fps+0.5); // round
 }
 
 bool CyclicActionTimer::intervalPassed() const

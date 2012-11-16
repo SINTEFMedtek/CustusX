@@ -30,7 +30,6 @@ TransformFile::TransformFile(QString fileName) :
 
 /**
  * Reads a whitespace separated 4x4 matrix from file
- * \param fileName Input file
  * \param ok success flag. If NULL, logger warnings are emitted instead
  * \return  The matrix
  */

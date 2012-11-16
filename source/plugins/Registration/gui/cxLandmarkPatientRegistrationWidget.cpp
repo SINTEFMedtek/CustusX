@@ -126,7 +126,7 @@ void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 	ssc::toolManager()->setLandmark(ssc::Landmark(mActiveLandmark, p_pr));
 	ssc::messageManager()->playSampleSound();
 
-	this->nextRow();
+    this->activateLandmark(this->getNextLandmark());
 }
 
 void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)
@@ -168,8 +168,9 @@ void LandmarkPatientRegistrationWidget::hideEvent(QHideEvent* event)
 
 void LandmarkPatientRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
+    QString next = this->getNextLandmark();
 	ssc::toolManager()->removeLandmark(mActiveLandmark);
-	this->nextRow();
+    this->activateLandmark(next);
 }
 
 void LandmarkPatientRegistrationWidget::cellClickedSlot(int row, int column)
@@ -179,9 +180,9 @@ void LandmarkPatientRegistrationWidget::cellClickedSlot(int row, int column)
 	mRemoveLandmarkButton->setEnabled(true);
 }
 
-void LandmarkPatientRegistrationWidget::populateTheLandmarkTableWidget()
+void LandmarkPatientRegistrationWidget::prePaintEvent()
 {
-	LandmarkRegistrationWidget::populateTheLandmarkTableWidget();
+    LandmarkRegistrationWidget::prePaintEvent();
 
 	std::vector<ssc::Landmark> landmarks = this->getAllLandmarks();
 	mRemoveLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
