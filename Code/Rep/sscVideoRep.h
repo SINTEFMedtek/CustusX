@@ -105,6 +105,8 @@ private:
 
 	vtkImageThresholdPtr mMapZeroToOne;
 	vtkImageMaskPtr mMaskFilter;
+
+	ImagePtr mImage;//Can be used instead of mTexture. This allows visualization of rt 3D
 };
 
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;

@@ -47,12 +47,15 @@
 #include <vtkTextureMapToPlane.h>
 #include <vtkCellArray.h>
 #include <vtkImageChangeInformation.h>
+#include <vtkExtractVOI.h>
 #include "sscBoundingBox3D.h"
 #include "sscToolManager.h"
 #include "sscView.h"
 #include "sscTool.h"
 #include "sscTypeConversions.h"
-#include  "sscUltrasoundSectorSource.h"
+#include "sscUltrasoundSectorSource.h"
+#include "sscDataManager.h"
+#include "sscImage.h"
 
 
 namespace ssc
@@ -288,6 +291,9 @@ void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 			mMaskFilter->SetImageInput(mMapZeroToOne->GetOutput());
 			mTexture->SetInput(mMaskFilter->GetOutput());
 		}
+
+		mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), mData->getName(), mData->getName());
+		ssc::dataManager()->loadData(boost::shared_dynamic_cast<ssc::Data>(mImage));
 	}
 
 	this->newDataSlot();
@@ -336,6 +342,23 @@ void VideoGraphics::newDataSlot()
 		return;
 	}
 
+	mImage->setVtkImageData(mData->getVtkImageData());//Update pointer
+
+	//Check if 3D volume. If so, only use middle frame
+	int* extent = mData->getVtkImageData()->GetExtent();
+	if(extent[5]- extent[4] > 0)
+	{
+		int slice = floor(extent[4]+0.5f*(extent[5]-extent[4]));
+		if (slice < 0) slice = 0;
+//		std::cout << "Got 3D volume, showing middle slice: " << slice << std::endl;
+		vtkSmartPointer<vtkExtractVOI> extractVOI = vtkSmartPointer<vtkExtractVOI>::New();
+		extractVOI->SetInput(mData->getVtkImageData());
+		extractVOI->SetVOI(extent[0], extent[1], extent[2], extent[3], slice, slice);
+		extractVOI->Update();
+		mDataRedirecter->SetInput(extractVOI->GetOutput());
+	} else //2D
+		mDataRedirecter->SetInput(mData->getVtkImageData());
+
 //  mDataRedirecter->GetOutput()->UpdateInformation();
 	mDataRedirecter->UpdateWholeExtent(); // important! syncs update extent to whole extent
 	mDataRedirecter->GetOutput()->Update();
@@ -364,7 +387,6 @@ void VideoGraphics::newDataSlot()
 	{
 		mTexture->MapColorScalarsThroughLookupTableOff();
 	}
-
 
 	// set the planesource where we have no probedata.
 	DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
