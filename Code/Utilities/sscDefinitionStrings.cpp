@@ -72,6 +72,7 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(ssc, TRACKING_SYSTEM, tsCOUNT)
 	"polaris",
 	"polaris spectra",
 	"polaris vicra",
+	"polaris classic",
 	"aurora",
 	"micron"
 }
