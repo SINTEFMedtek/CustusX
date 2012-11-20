@@ -10,6 +10,7 @@
 #include <sstream>
 #include <QStringList>
 #include "sscTypeConversions.h"
+#include <cmath>
 
 namespace cx
 {
