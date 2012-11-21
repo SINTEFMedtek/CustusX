@@ -32,6 +32,7 @@
 
 #include <QWidget>
 #include <QCheckBox>
+#include <QLabel>
 #include <QGridLayout>
 #include "sscOptimizedUpdateWidget.h"
 
@@ -52,7 +53,8 @@ private slots:
 	void valueChanged(bool val);
 
 private:
-	QCheckBox* mCheckBox;
+    QLabel* mLabel;
+    QCheckBox* mCheckBox;
 	BoolDataAdapterPtr mData;
 };
 

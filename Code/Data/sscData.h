@@ -78,7 +78,7 @@ public:
 	virtual QDateTime getAcquisitionTime() const;
 	virtual QString getType() const
 	{
-		return "unknown";
+        return "data";
 	}
 
 	virtual QString getSpace();
