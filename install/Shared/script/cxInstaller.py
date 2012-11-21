@@ -79,6 +79,8 @@ class Common(object):
         self.mUseCotire = "OFF"
         self.mSerialPort = "/Library/CustusX/igstk.links/cu.CustusX.dev0"
         self.mOpenCVStaticCRT = "OFF"
+        self.mOpenCVWithJasper = "OFF"
+        self.mOpenCVWithTiff = "OFF"
         self.mOSX_DEPLOYMENT_TARGET = "10.6" # Deploy for OSX 10.6 Snow Leopard and later
         if (self.PLATFORM == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
@@ -440,6 +442,10 @@ cmake \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DWITH_CUDA:BOOL=OFF \
 -DBUILD_WITH_STATIC_CRT:BOOL=%s \
+-DBUILD_TIFF:BOOL=%s \
+-DWITH_TIFF:BOOL=%s \
+-DBUILD_JASPER:BOOL=%s \
+-DWITH_JASPER:BOOL=%s \
 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
@@ -448,6 +454,10 @@ cmake \
             DATA.mBuildExAndTest,
             DATA.mBuildShared,
             DATA.mOpenCVStaticCRT,
+            DATA.mOpenCVWithTiff,
+            DATA.mOpenCVWithTiff,
+            DATA.mOpenCVWithJasper,
+            DATA.mOpenCVWithJasper,
             DATA.mOSX_DEPLOYMENT_TARGET,
             self.sourceFolder() ))
 # ---------------------------------------------------------

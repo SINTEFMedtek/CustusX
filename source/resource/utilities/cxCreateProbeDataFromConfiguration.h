@@ -17,7 +17,7 @@
 * @{
 */
 
-/**\convert from ProbeXmlConfigParser::Configuration to ssc::ProbeData
+/**convert from ProbeXmlConfigParser::Configuration to ssc::ProbeData
  *
  * Notes about the conversion:
  * The xml format contains redundant data. The following list defines
