@@ -40,19 +40,24 @@ CheckBoxWidget::CheckBoxWidget(QWidget* parent, ssc::BoolDataAdapterPtr dataInte
 	topLayout->setMargin(0);
 	this->setLayout(topLayout);
 
+    mLabel = new QLabel(this);
+    mLabel->setText(dataInterface->getValueName());
+    topLayout->addWidget(mLabel);
+
 	mCheckBox = new QCheckBox(this);
-	mCheckBox->setText(dataInterface->getValueName());
 	topLayout->addWidget(mCheckBox);
 	connect(mCheckBox, SIGNAL(toggled(bool)), this, SLOT(valueChanged(bool)));
 
-	if (gridLayout) // add to input gridlayout
-	{
-		gridLayout->addWidget(mCheckBox, row, 0, 1, 2);
-	}
-	else // add directly to this
-	{
-		topLayout->addWidget(mCheckBox);
-	}
+    if (gridLayout) // add to input gridlayout
+    {
+        gridLayout->addWidget(mLabel, row, 0);
+        gridLayout->addWidget(mCheckBox, row, 1);
+    }
+    else // add directly to this
+    {
+        topLayout->addWidget(mLabel);
+        topLayout->addWidget(mCheckBox, 1);
+    }
 
     this->setModified();
 }

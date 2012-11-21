@@ -63,6 +63,16 @@ QString StringDataAdapterXml::getHelp() const
 	return mHelp;
 }
 
+void StringDataAdapterXml::setHelp(QString val)
+{
+    if (val == mHelp)
+        return;
+
+    mHelp = val;
+    emit changed();
+}
+
+
 QString StringDataAdapterXml::getValue() const
 {
 	return mValue;
