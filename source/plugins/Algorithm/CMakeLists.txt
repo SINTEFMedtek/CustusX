@@ -25,7 +25,8 @@ SET( MOC_HEADER_FILES
     gui/cxCenterlineWidget.h
     gui/cxResampleWidget.h
     gui/cxTimedAlgorithmProgressBar.h
-    )
+	gui/cxFilterWidget.h
+	)
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 
@@ -62,6 +63,8 @@ SET( SOURCE_FILES
     gui/cxSegmentationMethodsWidget.cpp
     gui/cxTimedAlgorithmProgressBar.h
     gui/cxTimedAlgorithmProgressBar.cpp
+	gui/cxFilterWidget.h
+	gui/cxFilterWidget.cpp
   )
 
 # =========================================================
