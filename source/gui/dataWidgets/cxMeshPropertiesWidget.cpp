@@ -25,7 +25,7 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   
   mSelectMeshWidget = SelectMeshStringDataAdapter::New();
   mSelectMeshWidget->setValueName("Surface: ");
-  connect(mSelectMeshWidget.get(), SIGNAL(meshChanged(QString)), this, SLOT(meshSelectedSlot(const QString&)));
+  connect(mSelectMeshWidget.get(), SIGNAL(dataChanged(QString)), this, SLOT(meshSelectedSlot(const QString&)));
   
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);

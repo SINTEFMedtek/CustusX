@@ -11,7 +11,10 @@ add_subdirectory(settings)
 #add_subdirectory(testing)
 
 SET( CX_QT_MOC_HEADER_FILES
-    algorithms/cxTimedAlgorithm.h
+	algorithms/cxFilter.h
+	algorithms/cxFilterTimedAlgorithm.h
+	algorithms/cxDummyFilter.h
+	algorithms/cxTimedAlgorithm.h
     algorithms/cxThreadedTimedAlgorithm.h
     algorithms/cxCompositeTimedAlgorithm.h
     settings/cxSettings.h
@@ -22,7 +25,13 @@ SET( CX_QT_MOC_HEADER_FILES
 )
 
 SET ( cxResource_SOURCE
-    algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
+	algorithms/cxFilter.h
+	algorithms/cxFilter.cpp
+	algorithms/cxFilterTimedAlgorithm.h
+	algorithms/cxFilterTimedAlgorithm.cpp
+	algorithms/cxDummyFilter.h
+	algorithms/cxDummyFilter.cpp
+	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
     algorithms/ItkVtkGlue/itkImageToVTKImageFilter.txx
     algorithms/ItkVtkGlue/itkVTKImageToImageFilter.h
     algorithms/ItkVtkGlue/itkVTKImageToImageFilter.txx

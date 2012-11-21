@@ -28,7 +28,7 @@ ResampleWidget::ResampleWidget(QWidget* parent) :
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
-  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
+  connect(mSelectedImage.get(), SIGNAL(dataChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
 
   mReferenceImage = SelectImageStringDataAdapter::New();
