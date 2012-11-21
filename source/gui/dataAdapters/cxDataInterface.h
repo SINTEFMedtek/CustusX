@@ -92,23 +92,6 @@ public:
   virtual ssc::DoubleRange getValueRange() const;
 };
 
-/** Base class for all DataAdapters that selects an image.
- */
-class SelectImageStringDataAdapterBase : public ssc::StringDataAdapter
-{
-  Q_OBJECT
-public:
-  SelectImageStringDataAdapterBase();
-  virtual ~SelectImageStringDataAdapterBase() {}
-
-public: // basic methods
-
-public: // optional methods
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-};
-typedef boost::shared_ptr<class SelectImageStringDataAdapterBase> SelectImageStringDataAdapterBasePtr;
-
 /** Base class for all DataAdapters that selects a real time source.
  */
 class SelectRTSourceStringDataAdapterBase : public ssc::StringDataAdapter
@@ -118,29 +101,45 @@ public:
   SelectRTSourceStringDataAdapterBase();
   virtual ~SelectRTSourceStringDataAdapterBase() {}
 
-public: // basic methods
-
 public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
 };
 typedef boost::shared_ptr<class SelectRTSourceStringDataAdapterBase> SelectRTSourceStringDataAdapterBasePtr;
 
-/** Base class for all DataAdapters that selects a data.
+/** Base class for all DataAdapters that selects a ssc::Data or descendants.
  */
 class SelectDataStringDataAdapterBase : public ssc::StringDataAdapter
 {
   Q_OBJECT
 public:
-  SelectDataStringDataAdapterBase();
   virtual ~SelectDataStringDataAdapterBase() {}
 
 public: // basic methods
+    virtual QString getValueName() const;
 
 public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
+  virtual QString getHelp() const;
 
+public: // interface extension
+  virtual ssc::DataPtr getData() const;
+  virtual void setValueName(const QString name);
+  virtual void setHelp(QString text);
+
+signals:
+  void dataChanged(QString);
+
+protected:
+    /** Construct base with a filter that determined allowed ssc::Data types based
+      * on their getType() return value. The default of ".*" means any type.
+      */
+    explicit SelectDataStringDataAdapterBase(QString typeRegexp = ".*");
+    std::map<QString, ssc::DataPtr> filterOnType(std::map<QString, ssc::DataPtr> input, QString regexp) const;
+    QString mTypeRegexp;
+    QString mValueName;
+    QString mHelp;
 
 };
 typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStringDataAdapterBasePtr;
@@ -185,7 +184,7 @@ typedef boost::shared_ptr<class SelectCoordinateSystemStringDataAdapterBase> Sel
  * where active image is the value
  * and DataName is taken from the valuerange
  */
-class ActiveImageStringDataAdapter : public SelectImageStringDataAdapterBase
+class ActiveImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -194,12 +193,8 @@ public:
   virtual ~ActiveImageStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
-
-public: // optional methods
-  virtual QString getHelp() const;
 };
 
 
@@ -208,34 +203,24 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * The image is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  */
-class SelectImageStringDataAdapter : public SelectImageStringDataAdapterBase
+class SelectImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
   static SelectImageStringDataAdapterPtr New() { return SelectImageStringDataAdapterPtr(new SelectImageStringDataAdapter()); }
-  SelectImageStringDataAdapter();
   virtual ~SelectImageStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
-public: // optional methods
-  virtual QString getHelp() const;
-  virtual void setHelp(QString text);
-
 public: // interface extension
   ssc::ImagePtr getImage();
-  void setValueName(const QString name);
 
-signals:
-    void imageChanged(QString);
-
+protected:
+  SelectImageStringDataAdapter();
 private:
   QString mImageUid;
-  QString mValueName;
-  QString mHelp;
 };
 
 typedef boost::shared_ptr<class SelectRTSourceStringDataAdapter> SelectRTSourceStringDataAdapterPtr;
@@ -262,9 +247,6 @@ public: // optional methods
 public: // interface extension
   ssc::VideoSourcePtr getRTSource();
   void setValueName(const QString name);
-
-//signals:
-//    void rtSourceChanged();
 
 private slots:
   void setDefaultSlot();
@@ -352,27 +334,19 @@ class SelectDataStringDataAdapter : public SelectDataStringDataAdapterBase
   Q_OBJECT
 public:
   static SelectDataStringDataAdapterPtr New() { return SelectDataStringDataAdapterPtr(new SelectDataStringDataAdapter()); }
-  SelectDataStringDataAdapter();
   virtual ~SelectDataStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
-public: // optional methods
-  virtual QString getHelp() const;
-
 public: // interface extension
-  ssc::DataPtr getData() const;
-  void setValueName(const QString name);
+  virtual ssc::DataPtr getData() const;
 
+protected:
+  SelectDataStringDataAdapter();
 private:
   ssc::DataPtr mData;
-  QString mValueName;
-
-  signals:
-    void dataChanged(QString);
 
 };
 
@@ -381,34 +355,24 @@ typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDat
  * The image is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
  */
-class SelectMeshStringDataAdapter : public ssc::StringDataAdapter
+class SelectMeshStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
   static SelectMeshStringDataAdapterPtr New() { return SelectMeshStringDataAdapterPtr(new SelectMeshStringDataAdapter()); }
-  SelectMeshStringDataAdapter();
   virtual ~SelectMeshStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
-public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-
 public: // interface extension
   ssc::MeshPtr getMesh();
-  void setValueName(const QString name);
 
-signals:
-    void meshChanged(QString);
-
+protected:
+  SelectMeshStringDataAdapter();
 private:
   QString mMeshUid;
-  QString mValueName;
 };
 
 typedef boost::shared_ptr<class ParentFrameStringDataAdapter> ParentFrameStringDataAdapterPtr;
