@@ -71,7 +71,7 @@ vtkSmartPointer<vtkAppendPolyData> GenerateOverlappingBunchOfSpheres(int theta,
  * @param renderWindow a valid openGL-supporting render window
  * @param renderer a valid renderer instance
  * @param maxNoOfPeels maximum number of depth peels (multi-pass rendering)
- * @param occulusionRation the occlusion ration (0.0 means a perfect image,
+ * @param occlusionRatio the occlusion ration (0.0 means a perfect image,
  * >0.0 means a non-perfect image which in general results in faster rendering)
  * @return TRUE if depth peeling could be set up
  */
@@ -107,7 +107,7 @@ bool SetupEnvironmentForDepthPeeling(
  * a variety of openGL extensions and appropriate drivers.
  * @param renderWindow a valid openGL-supporting render window
  * @param renderer a valid renderer instance
- * @param doItOffscreen do the test off screen which means that nothing is
+ * @param doItOffScreen do the test off screen which means that nothing is
  * rendered to screen (this requires the box to support off screen rendering)
  * @return TRUE if depth peeling is supported, FALSE otherwise (which means
  * that another strategy must be used for correct rendering of translucent
