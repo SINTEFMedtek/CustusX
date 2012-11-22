@@ -63,6 +63,7 @@ public:
 	virtual bool setValue(const QString& value); ///< set the data value.
 	virtual QString getValue() const; ///< get the data value.
 	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
+    virtual void setHelp(QString val);
 	virtual QStringList getValueRange() const; /// range of value. Use if data is constrained to a set.
 	virtual void setValueRange(QStringList range);
 	virtual QString convertInternal2Display(QString internal); ///< conversion from internal value to display value
