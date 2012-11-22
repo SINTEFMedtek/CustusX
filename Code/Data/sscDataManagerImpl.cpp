@@ -493,6 +493,30 @@ MeshPtr DataManagerImpl::loadMesh(const QString& uid, const QString& fileName, R
 	return this->getMesh(uid);
 }
 
+void DataManagerImpl::saveData(DataPtr data, const QString& basePath)
+{
+    if (!data)
+        return;
+
+    ImagePtr image = boost::shared_dynamic_cast<Image>(data);
+    if (image)
+    {
+        this->saveImage(image, basePath);
+        return;
+    }
+
+    MeshPtr mesh = boost::shared_dynamic_cast<Mesh>(data);
+    if (mesh)
+    {
+        this->saveMesh(mesh, basePath);
+        return;
+    }
+
+    // no other implementations..
+    ssc::messageManager()->sendWarning(QString("Could not save %1 - not implemented").arg(data->getName()));
+}
+
+
 void DataManagerImpl::saveMesh(MeshPtr mesh, const QString& basePath)
 {
 	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();

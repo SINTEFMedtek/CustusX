@@ -102,7 +102,8 @@ public:
 	// data
 	virtual void loadData(DataPtr data) = 0;
 	virtual DataPtr loadData(const QString& uid, const QString& path, READER_TYPE notused) = 0;
-	virtual std::map<QString, DataPtr> getData() const = 0;
+    virtual void saveData(DataPtr data, const QString& basePath) = 0; ///< Save data to file
+    virtual std::map<QString, DataPtr> getData() const = 0;
 	virtual DataPtr getData(const QString& uid) const = 0;
 
 	// global data (move to separate class if list grows)
