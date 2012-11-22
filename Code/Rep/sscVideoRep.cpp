@@ -47,12 +47,16 @@
 #include <vtkTextureMapToPlane.h>
 #include <vtkCellArray.h>
 #include <vtkImageChangeInformation.h>
+#include <vtkExtractVOI.h>
 #include "sscBoundingBox3D.h"
 #include "sscToolManager.h"
 #include "sscView.h"
 #include "sscTool.h"
 #include "sscTypeConversions.h"
-#include  "sscUltrasoundSectorSource.h"
+#include "sscUltrasoundSectorSource.h"
+#include "sscDataManager.h"
+#include "sscImage.h"
+#include "sscRegistrationTransform.h"
 
 
 namespace ssc
@@ -62,7 +66,7 @@ namespace ssc
 VideoGraphics::VideoGraphics(bool useMaskFilter) :
 	mPlaneActor(vtkActorPtr::New()),
 	mPlaneSource(vtkPlaneSourcePtr::New()),
-	mTexture(vtkTexturePtr::New() )
+	mTexture(vtkTexturePtr::New())
 {
 	mClipSector = true;
 	mDataRedirecter = vtkImageChangeInformationPtr::New();
@@ -108,6 +112,8 @@ VideoGraphics::VideoGraphics(bool useMaskFilter) :
 	mPlaneActor->SetMapper(mDataSetMapper);
 	mPlaneActor->SetVisibility(false);
 	mTexture->RepeatOff();
+
+	mImage = ssc::ImagePtr();
 }
 
 VideoGraphics::~VideoGraphics()
@@ -161,6 +167,9 @@ void VideoGraphics::setTool(ToolPtr tool)
 	}
 	this->clipToSectorChanged();
 	this->probeSectorChanged();
+
+	if(mTool && mImage)
+		mImage->setName(mTool->getName());
 }
 
 /**Turn sector clipping on/off.
@@ -288,6 +297,8 @@ void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 			mMaskFilter->SetImageInput(mMapZeroToOne->GetOutput());
 			mTexture->SetInput(mMaskFilter->GetOutput());
 		}
+		mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
+//		ssc::dataManager()->loadData(boost::shared_dynamic_cast<ssc::Data>(mImage));//Uncomment to test unstable 4D US
 	}
 
 	this->newDataSlot();
@@ -301,6 +312,13 @@ void VideoGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 	Transform3D tMu = mProbeData.get_tMu();
 	Transform3D rMu = rMpr * prMt * tMu;
 	mPlaneActor->SetUserMatrix(rMu.getVtkMatrix());
+
+	//TODO: Set correct position and orientation on mImage
+	/*std::cout << "rMu: " << rMu << std::endl;
+	if (mImage)
+	{
+		mImage->get_rMd_History()->setRegistration(rMu);
+	}*/
 }
 
 void VideoGraphics::receiveVisible(bool visible)
@@ -336,6 +354,23 @@ void VideoGraphics::newDataSlot()
 		return;
 	}
 
+	mImage->setVtkImageData(mData->getVtkImageData());//Update pointer
+
+	//Check if 3D volume. If so, only use middle frame
+	int* extent = mData->getVtkImageData()->GetExtent();
+	if(extent[5]- extent[4] > 0)
+	{
+		int slice = floor(extent[4]+0.5f*(extent[5]-extent[4]));
+		if (slice < 0) slice = 0;
+//		std::cout << "Got 3D volume, showing middle slice: " << slice << std::endl;
+		vtkSmartPointer<vtkExtractVOI> extractVOI = vtkSmartPointer<vtkExtractVOI>::New();
+		extractVOI->SetInput(mData->getVtkImageData());
+		extractVOI->SetVOI(extent[0], extent[1], extent[2], extent[3], slice, slice);
+		extractVOI->Update();
+		mDataRedirecter->SetInput(extractVOI->GetOutput());
+	} else //2D
+		mDataRedirecter->SetInput(mData->getVtkImageData());
+
 //  mDataRedirecter->GetOutput()->UpdateInformation();
 	mDataRedirecter->UpdateWholeExtent(); // important! syncs update extent to whole extent
 	mDataRedirecter->GetOutput()->Update();
@@ -364,7 +399,6 @@ void VideoGraphics::newDataSlot()
 	{
 		mTexture->MapColorScalarsThroughLookupTableOff();
 	}
-
 
 	// set the planesource where we have no probedata.
 	DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
