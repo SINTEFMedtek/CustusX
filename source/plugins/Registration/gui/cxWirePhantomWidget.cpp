@@ -151,8 +151,9 @@ void WirePhantomWidget::activeImageChangedSlot(const QString&)
 	if (!mUSImageInput->getValue().isEmpty())
 		return;
 
-	if (image && image->getModality().contains("US"))
-		mUSImageInput->setValue(image->getUid());
+    // removed: led to setting of preview...
+//	if (image && image->getModality().contains("US"))
+//		mUSImageInput->setValue(image->getUid());
 }
 
 
