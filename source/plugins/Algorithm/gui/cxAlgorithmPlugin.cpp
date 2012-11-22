@@ -10,6 +10,7 @@
 #include <vector>
 #include "cxVisualizationMethodsWidget.h"
 #include "cxSegmentationMethodsWidget.h"
+#include "cxFilterWidget.h"
 
 namespace cx
 {
@@ -33,6 +34,11 @@ std::vector<PluginBase::PluginWidget> AlgorithmPlugin::createWidgets() const
 	retval.push_back(PluginBase::PluginWidget(
 			new VisualizationMethodsWidget(NULL, "VisualizationMethodsWidget", "Visualization Methods"),
 			"Algorithms"));
+    retval.push_back(PluginBase::PluginWidget(
+            new FilterWidget(NULL),
+            "Algorithms"));
+
+
 
 	return retval;
 

@@ -27,11 +27,13 @@ TimedAlgorithmProgressBar::TimedAlgorithmProgressBar(QWidget* parent) //:
 	layout->setMargin(0);
 
 	mLabel = new QLabel;
-	layout->addWidget(mLabel);
+    mLabel->hide();
+    layout->addWidget(mLabel);
 
 	mTimerWidget = new DisplayTimerWidget(this);
 	mTimerWidget->setFontSize(3);
-	layout->addWidget(mTimerWidget);
+    mTimerWidget->hide();
+    layout->addWidget(mTimerWidget);
 
 	mProgressBar = new QProgressBar;
 	mProgressBar->hide();
