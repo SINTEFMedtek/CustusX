@@ -15,7 +15,7 @@
 #ifndef CXDUMMYFILTER_H
 #define CXDUMMYFILTER_H
 
-#include "cxFilter.h"
+#include "cxFilterImpl.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
@@ -29,7 +29,7 @@ namespace cx
  * \date Nov 17, 2012
  * \author christiana
  */
-class DummyFilter : public Filter
+class DummyFilter : public FilterImpl
 {
     Q_OBJECT
 
@@ -39,23 +39,23 @@ public:
     virtual QString getType() const;
     virtual QString getName() const;
     virtual QString getHelp() const;
-    virtual std::vector<DataAdapterPtr> getOptions(QDomElement root);
-    virtual std::vector<Filter::ArgumentType> getInputTypes();
-    virtual std::vector<Filter::ArgumentType> getOutputTypes();
-    virtual bool preProcess(std::vector<ssc::DataPtr> input, QDomElement options, QString outputPath);
+//    virtual std::vector<DataAdapterPtr> getOptions(QDomElement root);
+//    virtual std::vector<SelectDataStringDataAdapterBase> getInputTypes();
+//    virtual std::vector<SelectDataStringDataAdapterBase> getOutputTypes();
+
+//    virtual bool preProcess(QString outputPath);
     virtual bool execute();
-    virtual std::vector<ssc::DataPtr> postProcess();
+    virtual void postProcess();
 
+protected:
+    virtual void createOptions(QDomElement root);
+    virtual void createInputTypes();
+    virtual void createOutputTypes();
 
-    // extensions:
+private:
     ssc::StringDataAdapterPtr getStringOption(QDomElement root);
     ssc::DoubleDataAdapterPtr getDoubleOption(QDomElement root);
     ssc::BoolDataAdapterPtr getBoolOption(QDomElement root);
-
-private:
-    std::vector<ssc::DataPtr> mInput;
-    QDomElement mOptions;
-    QString mOutputPath;
 };
 
 } // namespace cx

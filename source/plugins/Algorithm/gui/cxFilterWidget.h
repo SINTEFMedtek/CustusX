@@ -20,6 +20,7 @@
 #include "sscStringDataAdapterXml.h"
 #include "cxFilter.h"
 #include "cxFilterTimedAlgorithm.h"
+#include "cxThresholdPreview.h"
 
 namespace cx
 {
@@ -43,6 +44,7 @@ public:
       * content but store the previous contents, making it easy to swap between uids.
       */
     void setOptions(QString uid, std::vector<DataAdapterPtr> options);
+    void setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options);
     QString getCurrentUid();
     std::vector<DataAdapterPtr> getOptions(QString uid);
     std::vector<DataAdapterPtr> getCurrentOptions();
@@ -70,8 +72,9 @@ private slots:
     void filterChangedSlot();
     void runFilterSlot();
     void finishedSlot();
+    void obscuredSlot(bool obscured);
 private:
-    DataAdapterPtr createDataAdapter(Filter::ArgumentType type);
+//    DataAdapterPtr createDataAdapter(Filter::ArgumentType type);
     QGroupBox* wrapInGroupBox(QWidget* base, QString name);
 
     ssc::XmlOptionFile mOptions;
@@ -84,6 +87,7 @@ private:
     OptionsWidget* mOutputsWidget;
     OptionsWidget* mOptionsWidget;
     TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+    boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 
 }

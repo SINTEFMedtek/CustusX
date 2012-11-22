@@ -23,6 +23,7 @@
 #include "cxPatientData.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxDataInterface.h"
+#include "cxBinaryThresholdImageFilter.h"
 
 namespace cx
 {
@@ -32,6 +33,13 @@ OptionsWidget::OptionsWidget(QWidget* parent)
     this->setSizePolicy(this->sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
     mStackedLayout = new QStackedLayout(this);
     mStackedLayout->setMargin(0);
+}
+
+void OptionsWidget::setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options)
+{
+    std::vector<DataAdapterPtr> converted;
+    std::copy(options.begin(), options.end(), std::back_inserter(converted));
+    this->setOptions(uid, converted);
 }
 
 void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
@@ -45,10 +53,14 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
     {
         if (uid==mStackedLayout->widget(i)->objectName())
         {
+//            mStackedLayout->currentWidget()->hide();
             mStackedLayout->setCurrentIndex(i);
+//            mStackedLayout->currentWidget()->show();
             return;
         }
     }
+
+    this->updateGeometry(); // dont work - how to reduce size of widget when changing??
 
     // No existing found,
     // create a new stack element for this uid:
@@ -91,9 +103,14 @@ std::vector<DataAdapterPtr> OptionsWidget::getOptions(QString uid)
 FilterWidget::FilterWidget(QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
 {
+    mObscuredListener.reset(new WidgetObscuredListener(this));
+    connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+
     mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
 
     mAvailableFilters.push_back(FilterPtr(new DummyFilter()));
+    mAvailableFilters.push_back(FilterPtr(new BinaryThresholdImageFilter()));
+
     QStringList availableFilters;
     for (unsigned i=0; i<mAvailableFilters.size(); ++i)
         availableFilters << mAvailableFilters[i]->getType();
@@ -132,6 +149,12 @@ FilterWidget::FilterWidget(QWidget* parent) :
     topLayout->addStretch();
 
     this->filterChangedSlot();
+}
+
+void FilterWidget::obscuredSlot(bool obscured)
+{
+    if (mCurrentFilter)
+        mCurrentFilter->setActive(!obscured);
 }
 
 QGroupBox* FilterWidget::wrapInGroupBox(QWidget* base, QString name)
@@ -177,19 +200,12 @@ void FilterWidget::filterChangedSlot()
 
     if (mCurrentFilter)
     {
-        std::vector<Filter::ArgumentType> inputTypes = mCurrentFilter->getInputTypes();
-        std::vector<Filter::ArgumentType> outputTypes = mCurrentFilter->getOutputTypes();
+        std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
+        std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
 
+        mInputsWidget->setOptions(mCurrentFilter->getType(), mCurrentFilter->getInputTypes());
 
-        std::vector<DataAdapterPtr> inputs;
-        for (unsigned i=0; i<inputTypes.size(); ++i)
-            inputs.push_back(this->createDataAdapter(inputTypes[i]));
-        mInputsWidget->setOptions(mCurrentFilter->getType(), inputs);
-
-        std::vector<DataAdapterPtr> outputs;
-        for (unsigned i=0; i<outputTypes.size(); ++i)
-            outputs.push_back(this->createDataAdapter(outputTypes[i]));
-        mOutputsWidget->setOptions(mCurrentFilter->getType(), outputs);
+        mOutputsWidget->setOptions(mCurrentFilter->getType(), mCurrentFilter->getOutputTypes());
 
         ssc::XmlOptionFile node = mOptions.descend(mCurrentFilter->getType());
         std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions(node.getElement());
@@ -199,31 +215,6 @@ void FilterWidget::filterChangedSlot()
         mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>());
 }
 
-DataAdapterPtr FilterWidget::createDataAdapter(Filter::ArgumentType type)
-{
-    SelectDataStringDataAdapterBasePtr retval;
-
-    if (type.mDataType == "data")
-    {
-        retval = SelectDataStringDataAdapter::New();
-    }
-    else if (type.mDataType == "mesh")
-    {
-        retval = SelectMeshStringDataAdapter::New();
-    }
-    else if (type.mDataType == "image")
-    {
-        retval = SelectImageStringDataAdapter::New();
-    }
-
-    if (retval)
-    {
-        retval->setHelp(type.mHelp);
-        retval->setValueName(type.mName);
-    }
-
-    return retval;
-}
 
 void FilterWidget::runFilterSlot()
 {
@@ -240,20 +231,20 @@ void FilterWidget::runFilterSlot()
     connect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
     mTimedAlgorithmProgressBar->attach(mThread);
 
-    std::vector<ssc::DataPtr> input;
-    std::vector<DataAdapterPtr> inputAdapters = mInputsWidget->getOptions(mCurrentFilter->getType());
+//    std::vector<ssc::DataPtr> input;
+//    std::vector<DataAdapterPtr> inputAdapters = mInputsWidget->getOptions(mCurrentFilter->getType());
 
-    for (unsigned i=0; i<inputAdapters.size(); ++i)
-    {
-        SelectDataStringDataAdapterBasePtr base = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(inputAdapters[i]);
-        if (!base)
-            continue;
-        input.push_back(base->getData());
-    }
+//    for (unsigned i=0; i<inputAdapters.size(); ++i)
+//    {
+//        SelectDataStringDataAdapterBasePtr base = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(inputAdapters[i]);
+//        if (!base)
+//            continue;
+//        input.push_back(base->getData());
+//    }
 
-    mThread->setInput(input,
-                     patientService()->getPatientData()->getActivePatientFolder(),
-                     mOptions.getElement(mCurrentFilter->getType()));
+//    mThread->setInput(input,
+//                     patientService()->getPatientData()->getActivePatientFolder(),
+//                     mOptions.getElement(mCurrentFilter->getType()));
 
     mThread->execute();
 }
@@ -263,17 +254,17 @@ void FilterWidget::finishedSlot()
     mTimedAlgorithmProgressBar->detach(mThread);
     disconnect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
 
-    std::vector<ssc::DataPtr> result = mThread->getOutput();
-    std::vector<DataAdapterPtr> outputAdapters = mOutputsWidget->getOptions(mCurrentFilter->getType());
+//    std::vector<ssc::DataPtr> result = mThread->getOutput();
+//    std::vector<DataAdapterPtr> outputAdapters = mOutputsWidget->getOptions(mCurrentFilter->getType());
 
-    for (unsigned i=0; i<outputAdapters.size(); ++i)
-    {
-        SelectDataStringDataAdapterBasePtr base = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(outputAdapters[i]);
-        if (!base)
-            continue;
-        if (i < result.size())
-            base->setValue(result[i]->getUid());
-    }
+//    for (unsigned i=0; i<outputAdapters.size(); ++i)
+//    {
+//        SelectDataStringDataAdapterBasePtr base = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(outputAdapters[i]);
+//        if (!base)
+//            continue;
+//        if (i < result.size())
+//            base->setValue(result[i]->getUid());
+//    }
 
     mThread.reset();
 }
