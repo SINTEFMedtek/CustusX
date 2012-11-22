@@ -29,6 +29,27 @@ namespace cx
 typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
 
 /**
+  * Listen to a widget, then emit signals when it is obscured.
+  * This hack solves the issue of tabbed widgets no receiving hide() events,
+  * or being !visible at all.
+  */
+class WidgetObscuredListener : public QObject
+{
+    Q_OBJECT
+public:
+    WidgetObscuredListener(QWidget* listenedTo);
+
+signals:
+    void obscured(bool visible);
+private slots:
+    void timeoutSlot();
+private:
+    bool mObscured;
+    QWidget* mWidget;
+    QTimer *mRemoveTimer; ///< Timer for removing segmentation preview coloring if widget is not visible
+};
+
+/**
  * \brief Use transfer function to preview a threshold in the selected volume. Used by widgets: segmentation and surface generation
  * \ingroup cxServicePatient
  *
@@ -41,21 +62,18 @@ Q_OBJECT
 public:
 	ThresholdPreview();
 
-	void setPreview(QWidget* fromWidget, ssc::ImagePtr image, double setValue);
-	void removePreview(QWidget* fromWidget);
-
-private slots:
-	void removeIfNotVisibleSlot();
+    void setPreview(ssc::ImagePtr image, double setValue);
+    void removePreview();
 
 private:
 	void revertTransferFunctions();
 
 	ssc::ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
-	QWidget* mFromWidget; ///< The calling widget
-	ssc::ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
+//	QWidget* mFromWidget; ///< The calling widget
+    ssc::ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
 	ssc::ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
 	bool mShadingOn_original; ///< Was shading originally enabled in image
-	QTimer *mRemoveTimer; ///< Timer for removing segmentation preview coloring if widget is not visible
+//	QTimer *mRemoveTimer; ///< Timer for removing segmentation preview coloring if widget is not visible
 };
 
 /**

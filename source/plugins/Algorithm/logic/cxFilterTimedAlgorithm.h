@@ -40,22 +40,17 @@ public:
 
   FilterPtr getFilter();
 
-  /**
-    * Call either before calling execute(), or inside a aboutToStart() slot.
-    */
-  void setInput(std::vector<ssc::DataPtr> input, QString outputBasePath, QDomElement options);
-  std::vector<ssc::DataPtr> getOutput();
-
 protected slots:
+  virtual void preProcessingSlot();
   virtual void postProcessingSlot();
 
 private:
   virtual bool calculate();
 
-  QString       mOutputBasePath;
-  std::vector<ssc::DataPtr> mInput;
-  std::vector<ssc::DataPtr> mOutput;
-  QDomElement mOptions;
+//  QString       mOutputBasePath;
+//  std::vector<ssc::DataPtr> mInput;
+//  std::vector<ssc::DataPtr> mOutput;
+//  QDomElement mOptions;
   FilterPtr mFilter;
 };
 typedef boost::shared_ptr<class FilterTimedAlgorithm> FilterTimedAlgorithmPtr;

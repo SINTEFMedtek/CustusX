@@ -35,15 +35,6 @@ QString DummyFilter::getHelp() const
            "Can also be used as a template for new filters.";
 }
 
-std::vector<DataAdapterPtr> DummyFilter::getOptions(QDomElement root)
-{
-    std::vector<DataAdapterPtr> retval;
-    retval.push_back(this->getStringOption(root));
-    retval.push_back(this->getDoubleOption(root));
-    retval.push_back(this->getBoolOption(root));
-    return retval;
-}
-
 ssc::StringDataAdapterPtr DummyFilter::getStringOption(QDomElement root)
 {
     QStringList list;
@@ -65,77 +56,71 @@ ssc::BoolDataAdapterPtr DummyFilter::getBoolOption(QDomElement root)
         "Dummy bool value.", false, root);
 }
 
-
-std::vector<Filter::ArgumentType> DummyFilter::getInputTypes()
+void DummyFilter::createOptions(QDomElement root)
 {
-    std::vector<Filter::ArgumentType> retval;
-
-    Filter::ArgumentType arg0("data");
-    arg0.mName = "Dummy Input";
-    arg0.mHelp = "Dummy input for a dummy algorithm";
-    retval.push_back(arg0);
-
-    Filter::ArgumentType arg1("mesh");
-    arg1.mName = "Dummy Mesh Input";
-    arg1.mHelp = "Dummy mesh input for a dummy algorithm";
-    retval.push_back(arg1);
-
-    Filter::ArgumentType arg2("image");
-    arg2.mName = "Dummy Image Input";
-    arg2.mHelp = "Dummy image input for a dummy algorithm";
-    retval.push_back(arg2);
-
-    return retval;
+    mOptionsAdapters.push_back(this->getStringOption(root));
+    mOptionsAdapters.push_back(this->getDoubleOption(root));
+    mOptionsAdapters.push_back(this->getBoolOption(root));
 }
 
-std::vector<Filter::ArgumentType> DummyFilter::getOutputTypes()
+void DummyFilter::createInputTypes()
 {
-    std::vector<Filter::ArgumentType> retval;
+    SelectDataStringDataAdapterBasePtr temp;
 
-    Filter::ArgumentType arg0("data");
-    arg0.mName = "Dummy Output";
-    arg0.mHelp = "Dummy output from the dummy algorithm.\n"
-            "Output equals input.";
-    retval.push_back(arg0);
+    temp = SelectDataStringDataAdapter::New();
+    temp->setValueName("Dummy Input");
+    temp->setHelp("Dummy data input for a dummy algorithm");
+    mInputTypes.push_back(temp);
 
-    return retval;
+    temp = SelectImageStringDataAdapter::New();
+    temp->setValueName("Dummy Image Input");
+    temp->setHelp("Dummy image input for a dummy algorithm");
+    mInputTypes.push_back(temp);
+
+    temp = SelectMeshStringDataAdapter::New();
+    temp->setValueName("Dummy Mesh Input");
+    temp->setHelp("Dummy mesh input for a dummy algorithm");
+    mInputTypes.push_back(temp);
 }
 
-
-bool DummyFilter::preProcess(std::vector<ssc::DataPtr> input, QDomElement options, QString outputPath)
+void DummyFilter::createOutputTypes()
 {
-    std::cout << "DummyFilter::preProcess " << input.size() << std::endl;
-    mInput = input;
-    mOptions = options;
-    mOutputPath = outputPath;
-    return true;
+    SelectDataStringDataAdapterBasePtr temp;
+
+    temp = SelectDataStringDataAdapter::New();
+    temp->setValueName("Dummy Output");
+    temp->setHelp("Dummy output from the dummy algorithm");
+    mOutputTypes.push_back(temp);
 }
 
 bool DummyFilter::execute()
 {
-    ssc::StringDataAdapterPtr stringOption = this->getStringOption(mOptions);
-    ssc::DoubleDataAdapterPtr doubleOption = this->getDoubleOption(mOptions);
-    ssc::BoolDataAdapterPtr boolOption = this->getBoolOption(mOptions);
+    ssc::StringDataAdapterPtr stringOption = this->getStringOption(mCopiedOptions);
+    ssc::DoubleDataAdapterPtr doubleOption = this->getDoubleOption(mCopiedOptions);
+    ssc::BoolDataAdapterPtr boolOption = this->getBoolOption(mCopiedOptions);
 
     std::cout << "Running dummy algorithm..." << std::endl;
     std::cout << QString("  String option [%1]: %2").arg(stringOption->getValueName()).arg(stringOption->getValue()) << std::endl;
     std::cout << QString("  Double option [%1]: %2").arg(doubleOption->getValueName()).arg(doubleOption->getValue()) << std::endl;
     std::cout << QString("  Bool   option [%1]: %2").arg(boolOption->getValueName()).arg(boolOption->getValue()) << std::endl;
 
-    for (unsigned i=0; i< mInput.size(); ++i)
-        std::cout << QString("  Input %1: %2").arg(mInput[i] ? mInput[i]->getName() : "NULL") << std::endl;
+    for (unsigned i=0; i< mCopiedInput.size(); ++i)
+        std::cout << QString("  Input %1: %2").arg(mCopiedInput[i] ? mCopiedInput[i]->getName() : "NULL") << std::endl;
 
     std::cout << "Returning input as output." << std::endl;
 
     return true;
 }
 
-std::vector<ssc::DataPtr> DummyFilter::postProcess()
+void DummyFilter::postProcess()
 {
     //TODO: add stuff such as saving to dataManager here.
-    std::cout << "DummyFilter::postProcess " << mInput.size() << std::endl;
+    std::cout << "DummyFilter::postProcess " << mCopiedInput.size() << std::endl;
 
-    return mInput;
+    if (mInputTypes.front()->getData())
+        mOutputTypes.front()->setValue(mInputTypes.front()->getData()->getUid());
+
+//    return mInput;
 }
 
 

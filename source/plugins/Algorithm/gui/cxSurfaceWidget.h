@@ -13,6 +13,7 @@
 #include "sscDoubleDataAdapterXml.h"
 #include "cxBaseWidget.h"
 #include "cxContour.h"
+#include "cxThresholdPreview.h"
 
 namespace cx
 {
@@ -59,6 +60,7 @@ private slots:
   void handleFinishedSlot();
   void thresholdSlot();
   void preprocessContour();
+  void obscuredSlot(bool obscured);
 
 private:
   SurfaceWidget();
@@ -76,6 +78,7 @@ private:
 	cx::TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
 	ContourPtr mContourAlgorithm;
+    boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 
 /**

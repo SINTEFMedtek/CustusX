@@ -22,7 +22,10 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   mDefaultColor("red")//,
 //  mStatusLabel(new QLabel(""))
 {
-	mSegmentationAlgorithm.reset(new BinaryThresholdImageFilter);
+    mObscuredListener.reset(new WidgetObscuredListener(this));
+    connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+
+    mSegmentationAlgorithm.reset(new BinaryThresholdImageFilterOld);
 	mContourAlgorithm.reset(new Contour);
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
@@ -69,6 +72,12 @@ BinaryThresholdImageFilterWidget::~BinaryThresholdImageFilterWidget()
 {
 }
 
+void BinaryThresholdImageFilterWidget::obscuredSlot(bool obscured)
+{
+    if (obscured)
+        RepManager::getInstance()->getThresholdPreview()->removePreview();
+}
+
 void BinaryThresholdImageFilterWidget::setDefaultColor(QColor color)
 {
   mDefaultColor = color;
@@ -95,7 +104,7 @@ void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
 
 void BinaryThresholdImageFilterWidget::preprocessSegmentation()
 {
-	RepManager::getInstance()->getThresholdPreview()->removePreview(this);
+    RepManager::getInstance()->getThresholdPreview()->removePreview();
 
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
@@ -172,7 +181,8 @@ void BinaryThresholdImageFilterWidget::toogleBinarySlot(bool on)
 
 void BinaryThresholdImageFilterWidget::thresholdSlot()
 {
-	RepManager::getInstance()->getThresholdPreview()->setPreview(this, mSelectedImage->getImage(),
+    std::cout << "BinaryThresholdImageFilterWidget::thresholdSlot()" << std::endl;
+    RepManager::getInstance()->getThresholdPreview()->setPreview(mSelectedImage->getImage(),
 			mSegmentationThresholdAdapter->getValue());
 }
 
@@ -255,7 +265,7 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
   layout->addWidget(mSmoothingSigmaWidget.get());
 
   this->toogleBinarySlot(mBinary);
-  this->thresholdSlot();
+//  this->\thresholdSlot();
   this->toogleSurfaceSlot(mSurface);
   this->toogleSmoothingSlot(mUseSmothing);
 
