@@ -48,6 +48,11 @@ void GrabberDirectLinkThread::run()
 	ssc::messageManager()->sendInfo("Starting direct link grabber.");
 
 	mImageSender = ImageSenderFactory().getFromArguments(mArguments);
+	if(!mImageSender)
+	{
+		this->quit();
+		return;
+	}
 	mGrabberBridge.reset(new GrabberSenderDirectLink());
 
 	connect(mGrabberBridge.get(), SIGNAL(newImage()), this, SLOT(newImageSlot()), Qt::DirectConnection);
