@@ -314,6 +314,7 @@ void RegistrationHistory::setRegistration(const Transform3D& transform)
 {
 	mData.clear();
 	this->addRegistration(RegistrationTransform(transform));
+	emit currentChanged();
 }
 
 /**Set a parent fram, overwriting all history.

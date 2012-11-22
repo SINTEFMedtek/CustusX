@@ -56,6 +56,7 @@
 #include "sscUltrasoundSectorSource.h"
 #include "sscDataManager.h"
 #include "sscImage.h"
+#include "sscRegistrationTransform.h"
 
 
 namespace ssc
@@ -65,7 +66,7 @@ namespace ssc
 VideoGraphics::VideoGraphics(bool useMaskFilter) :
 	mPlaneActor(vtkActorPtr::New()),
 	mPlaneSource(vtkPlaneSourcePtr::New()),
-	mTexture(vtkTexturePtr::New() )
+	mTexture(vtkTexturePtr::New())
 {
 	mClipSector = true;
 	mDataRedirecter = vtkImageChangeInformationPtr::New();
@@ -111,6 +112,8 @@ VideoGraphics::VideoGraphics(bool useMaskFilter) :
 	mPlaneActor->SetMapper(mDataSetMapper);
 	mPlaneActor->SetVisibility(false);
 	mTexture->RepeatOff();
+
+	mImage = ssc::ImagePtr();
 }
 
 VideoGraphics::~VideoGraphics()
@@ -164,6 +167,9 @@ void VideoGraphics::setTool(ToolPtr tool)
 	}
 	this->clipToSectorChanged();
 	this->probeSectorChanged();
+
+	if(mTool && mImage)
+		mImage->setName(mTool->getName());
 }
 
 /**Turn sector clipping on/off.
@@ -291,9 +297,8 @@ void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 			mMaskFilter->SetImageInput(mMapZeroToOne->GetOutput());
 			mTexture->SetInput(mMaskFilter->GetOutput());
 		}
-
-		mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), mData->getName(), mData->getName());
-		ssc::dataManager()->loadData(boost::shared_dynamic_cast<ssc::Data>(mImage));
+		mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
+//		ssc::dataManager()->loadData(boost::shared_dynamic_cast<ssc::Data>(mImage));//Uncomment to test unstable 4D US
 	}
 
 	this->newDataSlot();
@@ -307,6 +312,13 @@ void VideoGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 	Transform3D tMu = mProbeData.get_tMu();
 	Transform3D rMu = rMpr * prMt * tMu;
 	mPlaneActor->SetUserMatrix(rMu.getVtkMatrix());
+
+	//TODO: Set correct position and orientation on mImage
+	/*std::cout << "rMu: " << rMu << std::endl;
+	if (mImage)
+	{
+		mImage->get_rMd_History()->setRegistration(rMu);
+	}*/
 }
 
 void VideoGraphics::receiveVisible(bool visible)
