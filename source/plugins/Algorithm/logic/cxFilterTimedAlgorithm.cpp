@@ -32,40 +32,29 @@ FilterPtr FilterTimedAlgorithm::getFilter()
     return mFilter;
 }
 
-void FilterTimedAlgorithm::setInput(std::vector<ssc::DataPtr> input, QString outputBasePath, QDomElement options)
+void FilterTimedAlgorithm::preProcessingSlot()
 {
-    mInput = input;
-    mOptions = options;
-    mOutputBasePath = outputBasePath;
-    mOutput.clear();
-
-    mFilter->preProcess(input, options, outputBasePath);
-}
-
-std::vector<ssc::DataPtr> FilterTimedAlgorithm::getOutput()
-{
-  return mOutput;
+    mFilter->preProcess();
 }
 
 void FilterTimedAlgorithm::postProcessingSlot()
 {
   bool success = this->getResult();
 
+  mFilter->postProcess();
+
   if (success)
   {
       ssc::messageManager()->sendSuccess(QString("Done \"%1\": [%2s]")
                                          .arg(mFilter->getName())
                                          .arg(this->getSecondsPassedAsString()));
-      mOutput = mFilter->postProcess();
   }
   else
   {
       ssc::messageManager()->sendWarning(QString("Failed \"%1\": [%2s]")
                                          .arg(mFilter->getName())
                                          .arg(this->getSecondsPassedAsString()));
-      mOutput.clear();
   }
-
 }
 
 bool FilterTimedAlgorithm::calculate()

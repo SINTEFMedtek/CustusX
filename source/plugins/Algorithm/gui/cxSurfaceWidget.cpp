@@ -30,6 +30,9 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     mDefaultColor("red")
 //    mStatusLabel(new QLabel(""))
 {
+    mObscuredListener.reset(new WidgetObscuredListener(this));
+    connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+
 	mContourAlgorithm.reset(new Contour());
   connect(mContourAlgorithm.get(), SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
   connect(mContourAlgorithm.get(), SIGNAL(aboutToStart()), this, SLOT(preprocessContour()));
@@ -83,6 +86,12 @@ QString SurfaceWidget::defaultWhatsThis() const
     "</html>";
 }
 
+void SurfaceWidget::obscuredSlot(bool obscured)
+{
+    if (obscured)
+        RepManager::getInstance()->getThresholdPreview()->removePreview();
+}
+
 void SurfaceWidget::setImageInputSlot(QString value)
 {
   mSelectedImage->setValue(value);
@@ -91,7 +100,7 @@ void SurfaceWidget::setImageInputSlot(QString value)
 
 void SurfaceWidget::preprocessContour()
 {
-	RepManager::getInstance()->getThresholdPreview()->removePreview(this);
+    RepManager::getInstance()->getThresholdPreview()->removePreview();
 
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   double decimation = mDecimationAdapter->getValue()/100;
@@ -196,7 +205,8 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 
 void SurfaceWidget::thresholdSlot()
 {
-	RepManager::getInstance()->getThresholdPreview()->setPreview(this, mSelectedImage->getImage(),
+    std::cout << "SurfaceWidget::thresholdSlot()" << std::endl;
+    RepManager::getInstance()->getThresholdPreview()->setPreview(mSelectedImage->getImage(),
 			mSurfaceThresholdAdapter->getValue());
 }
 //------------------------------------------------------------------------------
