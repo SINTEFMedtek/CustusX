@@ -24,42 +24,50 @@
 namespace cx
 {
 
-ThresholdPreview::ThresholdPreview()
+
+WidgetObscuredListener::WidgetObscuredListener(QWidget *listenedTo) : mWidget(listenedTo)
 {
-	//Timer for removing segmentation preview coloring if widget is not visible
-	mRemoveTimer = new QTimer(this);
-	connect(mRemoveTimer, SIGNAL(timeout()), this, SLOT(removeIfNotVisibleSlot()));
+    mRemoveTimer = new QTimer(this);
+    connect(mRemoveTimer, SIGNAL(timeout()), this, SLOT(timeoutSlot()));
+    mRemoveTimer->start(500);
+
+    mObscured = mWidget->visibleRegion().isEmpty();
 }
 
-void ThresholdPreview::removeIfNotVisibleSlot()
+void WidgetObscuredListener::timeoutSlot()
 {
-	//Revert to original transfer functions when the widget is no longer visible
-	if (mFromWidget->visibleRegion().isEmpty())
-	{
-		mRemoveTimer->stop();
-		this->revertTransferFunctions();
-	}
+    if (mObscured == mWidget->visibleRegion().isEmpty())
+        return;
+
+    emit obscured(mWidget->visibleRegion().isEmpty());
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+ThresholdPreview::ThresholdPreview()
+{
 }
 
 void ThresholdPreview::revertTransferFunctions()
 {
-	if (!mModifiedImage)
-		return;
+    if (!mModifiedImage)
+        return;
 
-	mModifiedImage->resetTransferFunction(mTF3D_original, mTF2D_original);
-	mModifiedImage->setShadingOn(mShadingOn_original);
+    mModifiedImage->resetTransferFunction(mTF3D_original, mTF2D_original);
+    mModifiedImage->setShadingOn(mShadingOn_original);
 
-	//Go back to VTK linear interpolation
-	ssc::VolumetricRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(mModifiedImage);
-	if(volumeRep)
-		volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
-	else
-		ssc::messageManager()->sendError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
+    //Go back to VTK linear interpolation
+    ssc::VolumetricRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(mModifiedImage);
+    if(volumeRep)
+        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
+    else
+        ssc::messageManager()->sendError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
 
-	mTF3D_original.reset();
-	mTF2D_original.reset();
-	mModifiedImage.reset();
-
+    mTF3D_original.reset();
+    mTF2D_original.reset();
+    mModifiedImage.reset();
 }
 
 /**
@@ -71,53 +79,47 @@ void ThresholdPreview::revertTransferFunctions()
  * \param image The image to modify the transfer function of
  * \param setValue The threshold value to be used
  */
-void ThresholdPreview::setPreview(QWidget* fromWidget, ssc::ImagePtr image, double setValue)
+void ThresholdPreview::setPreview(ssc::ImagePtr image, double setValue)
 {
-	if (!image)
-		return;
-	if (fromWidget->visibleRegion().isEmpty())
-		return; // Don't do anything if the widget isn't visible
+    if (!image)
+        return;
 
-	//Revert value from old widget if a new one is trying to use setPreview()
-	if (mFromWidget != fromWidget)
-		removePreview(mFromWidget);
-	mFromWidget = fromWidget;
+    std::cout << "ThresholdPreview::setPreview " << image->getName() << " - " << setValue << std::endl;
 
-	if (!mModifiedImage)
-	{
-		mModifiedImage = image;
-		mTF3D_original = image->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData());
-		mTF2D_original = image->getLookupTable2D()->createCopy(image->getBaseVtkImageData());
-		mShadingOn_original = image->getShadingOn();
-	}
-	image->resetTransferFunctions();
-	ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
-	tf3D->removeInitAlphaPoint();
-	tf3D->addAlphaPoint(setValue - 1, 0);
-	tf3D->addAlphaPoint(setValue, image->getMaxAlphaValue());
-	tf3D->addColorPoint(setValue, Qt::green);
-	tf3D->addColorPoint(image->getMax(), Qt::green);
-	image->setShadingOn(true);
+    if (!mModifiedImage)
+    {
+        mModifiedImage = image;
+        mTF3D_original = image->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData());
+        mTF2D_original = image->getLookupTable2D()->createCopy(image->getBaseVtkImageData());
+        mShadingOn_original = image->getShadingOn();
+    }
+    image->resetTransferFunctions();
+    ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+    tf3D->removeInitAlphaPoint();
+    tf3D->addAlphaPoint(setValue - 1, 0);
+    tf3D->addAlphaPoint(setValue, image->getMaxAlphaValue());
+    tf3D->addColorPoint(setValue, Qt::green);
+    tf3D->addColorPoint(image->getMax(), Qt::green);
+    image->setShadingOn(true);
 
-	ssc::ImageLUT2DPtr lut2D = image->getLookupTable2D();
-	lut2D->setFullRangeWinLevel();
-	lut2D->addColorPoint(setValue, Qt::green);
-	lut2D->addColorPoint(image->getMax(), Qt::green);
-	lut2D->setLLR(setValue);
+    ssc::ImageLUT2DPtr lut2D = image->getLookupTable2D();
+    lut2D->setFullRangeWinLevel();
+    lut2D->addColorPoint(setValue, Qt::green);
+    lut2D->addColorPoint(image->getMax(), Qt::green);
+    lut2D->setLLR(setValue);
 
-	//Remove VTK linear interpolation
-	ssc::VolumetricRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(image);
-	if(volumeRep)
-		volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
-	else
-		ssc::messageManager()->sendError("ThresholdPreview::setPreview() can not find VolumetricRep");
-
-	//Start timer that reverts transfer functions when widget is no longer visible
-	mRemoveTimer->start(500);
+    //Remove VTK linear interpolation
+    ssc::VolumetricRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(image);
+    if(volumeRep)
+        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
+    else
+        ssc::messageManager()->sendError("ThresholdPreview::setPreview() can not find VolumetricRep");
 }
 
-void ThresholdPreview::removePreview(QWidget* fromWidget)
+void ThresholdPreview::removePreview()
 {
-	this->revertTransferFunctions();
+    std::cout << "ThresholdPreview::removePreview " << std::endl;
+    this->revertTransferFunctions();
 }
+
 }

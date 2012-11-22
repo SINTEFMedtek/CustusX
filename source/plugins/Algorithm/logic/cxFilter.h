@@ -19,6 +19,7 @@
 #include <QObject>
 #include "sscData.h"
 #include "sscDataAdapter.h"
+#include "cxDataInterface.h"
 class QDomElement;
 
 namespace cx
@@ -27,6 +28,16 @@ namespace cx
 typedef boost::shared_ptr<class Filter> FilterPtr;
 
 /** Base class for CustusX filters/algorithms
+ *
+ * Intended for use in a multithreaded environment.
+ *
+ * The methods getHelp(), getName(), getInputTypes(), getOutputTypes(),
+ * getOptions() can be used outside of actual filter execution for
+ * initialization and gui interaction.
+ *
+ * preProcess(), execute() and postProcess() must be called in sequence
+ * and together executes the algorithm. They work on a copy of the input
+ * data (the input volumes themselved are not copied, only pointers and options).
  *
  *
  * \ingroup cxResourceAlgorithms
@@ -38,19 +49,19 @@ class Filter : public QObject
     Q_OBJECT
 
 public:
-    /** Definition of one Filter input or output argument.
-      */
-    class ArgumentType
-    {
-    public:
-        explicit ArgumentType(QString dataType) : mDataType(dataType) {}
-        /**
-          * mesh, image, data (corresponding to ssc::Data::getType())
-          */
-        QString mDataType;
-        QString mName;
-        QString mHelp;
-    };
+//    /** Definition of one Filter input or output argument.
+//      */
+//    class ArgumentType
+//    {
+//    public:
+//        explicit ArgumentType(QString dataType) : mDataType(dataType) {}
+//        /**
+//          * mesh, image, data (corresponding to ssc::Data::getType())
+//          */
+//        QString mDataType;
+//        QString mName;
+//        QString mHelp;
+//    };
 
 public:
     explicit Filter();
@@ -78,27 +89,27 @@ public:
     /**
       *  List of input arguments.
       */
-    virtual std::vector<ArgumentType> getInputTypes() = 0;
+    virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes() = 0;
     /**
       *  Return a help text describing algorithm usage.
       */
-    virtual std::vector<ArgumentType> getOutputTypes() = 0;
-
-//    - setting of data must be in preprocessing pga threading issues
-//    - update() cannot use vtk stuff in a nonconst way.
-//    - postprocess saves to data manager.
-//    - in priciple all this is impossible - vtk cannot be part of a chain if also available in another thread.
-
+    virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes() = 0;
     /**
-      * Set input parameters for algorithm and perform preprocessing tasks.
-      * Must be called from the main thread.
+      * Set Active state.
+      * Active filters are used by the ui (or similar) and can interact
+      * with the system, for example by showing a preview.
       *
-      * \param input List of data inputs corresponding to getInputTypes()
-      * \param settings Reference to settings file containing algorithm-specific settings
+      * Inactive filters should no interact with the system.
+      */
+    virtual void setActive(bool on) = 0;
+    /**
+      * Perform main thread preprocessing. Copies input data from options and
+      * the input adapters into thread-safe storage.
+      *
       * \param outputPath is path to data files for current patient.
       * \return success.
       */
-    virtual bool preProcess(std::vector<ssc::DataPtr> input, QDomElement options, QString outputPath) = 0;
+    virtual bool preProcess() = 0;
     /**
       * Execute filter with the given inputs and produce an output.
       * This method is threadable - can be executed in a secondary thread.
@@ -110,13 +121,14 @@ public:
       */
     virtual bool execute() = 0;
     /**
-      * Perform postprocessing tasks and return result from calculation.
+      * Perform postprocessing tasks and set result from calculation
+      * into the output adapters.
+      *
       * Must be called from the main thread.
       * Assumes execute() has been called.
       *
-      * \return List of data outputs corresponding to getOutputTypes()
       */
-    virtual std::vector<ssc::DataPtr> postProcess() = 0;
+    virtual void postProcess() = 0;
 
     
 };
