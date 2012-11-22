@@ -63,6 +63,7 @@ ImageSenderPtr ImageSenderFactory::getFromArguments(StringMap args)
 	else
 	{
 		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
+		return retval;
 	}
 
 	retval->initialize(args);
