@@ -39,7 +39,8 @@ void WidgetObscuredListener::timeoutSlot()
     if (mObscured == mWidget->visibleRegion().isEmpty())
         return;
 
-    emit obscured(mWidget->visibleRegion().isEmpty());
+    mObscured = mWidget->visibleRegion().isEmpty();
+    emit obscured(mObscured);
 }
 
 ///--------------------------------------------------------
@@ -84,7 +85,12 @@ void ThresholdPreview::setPreview(ssc::ImagePtr image, double setValue)
     if (!image)
         return;
 
-    std::cout << "ThresholdPreview::setPreview " << image->getName() << " - " << setValue << std::endl;
+    if (image!=mModifiedImage)
+    {
+        this->removePreview();
+    }
+
+//    std::cout << "ThresholdPreview::setPreview " << image->getName() << " - " << setValue << std::endl;
 
     if (!mModifiedImage)
     {
@@ -118,7 +124,7 @@ void ThresholdPreview::setPreview(ssc::ImagePtr image, double setValue)
 
 void ThresholdPreview::removePreview()
 {
-    std::cout << "ThresholdPreview::removePreview " << std::endl;
+//    std::cout << "ThresholdPreview::removePreview " << std::endl;
     this->revertTransferFunctions();
 }
 
