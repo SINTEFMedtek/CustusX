@@ -42,6 +42,8 @@ class FilterImpl : public Filter
 public:
     virtual ~FilterImpl() {}
 
+    virtual QString getUid() const;
+    virtual void setUid(QString uid);
     virtual std::vector<DataAdapterPtr> getOptions(QDomElement root);
     virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes();
     virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes();
@@ -51,6 +53,10 @@ public:
 
 protected:
     explicit FilterImpl();
+
+    /** Helper: Return the index'th input type as an image.
+      * Return zero if not available (as image). */
+    ssc::ImagePtr getCopiedInputImage(int index = 0);
 
     virtual void createOptions(QDomElement root) = 0;
     virtual void createInputTypes() = 0;
@@ -65,6 +71,7 @@ protected:
     std::vector<ssc::DataPtr> mCopiedInput;
     QDomElement mCopiedOptions;
     bool mActive;
+    QString mUid;
 
 };
 

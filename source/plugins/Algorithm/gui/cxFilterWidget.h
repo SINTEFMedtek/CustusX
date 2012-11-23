@@ -54,40 +54,73 @@ private:
     std::map<QString, std::vector<DataAdapterPtr> > mOptions;
 };
 
-/** Dummy implementation of Filter
+/** Helper widget for displaying the input/output/options part of a Filter.
+ * Intended to be included in other Filter widgets.
  *
  * \ingroup cxPluginAlgorithm
  * \date Nov 18, 2012
  * \author christiana
+ * \author Janne Beate Bakeng
  */
-class FilterWidget : public BaseWidget
+class FilterSetupWidget : public BaseWidget
 {
     Q_OBJECT
 public:
-    FilterWidget(QWidget* parent);
-
-protected:
+    FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame);
+    void setFilter(FilterPtr filter);
     QString defaultWhatsThis() const;
+    /**
+      * Add a GroupBox around the widget with the algo name.
+      */
+    void setNamedFrame(bool on);
+
+private slots:
+    void obscuredSlot(bool obscured);
+private:
+    QGroupBox* wrapInGroupBox(QWidget* base, QString name);
+
+    ssc::XmlOptionFile mOptions;
+    FilterPtr mCurrentFilter;
+
+    OptionsWidget* mInputsWidget;
+    OptionsWidget* mOutputsWidget;
+    OptionsWidget* mOptionsWidget;
+    QGroupBox* mFrame;
+    boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+};
+
+
+/** Widget for selecting and running a Filter.
+ *
+ *  Select one filter from a drop-down list, then set it up
+ *  and run it. All available filters in the system should be
+ *  in this widget.
+ *
+ * \ingroup cxPluginAlgorithm
+ * \date Nov 18, 2012
+ * \author christiana
+ * \author Janne Beate Bakeng
+ */
+class AllFiltersWidget : public BaseWidget
+{
+    Q_OBJECT
+public:
+    AllFiltersWidget(QWidget* parent);
+    QString defaultWhatsThis() const;
+
 private slots:
     void filterChangedSlot();
     void runFilterSlot();
     void finishedSlot();
-    void obscuredSlot(bool obscured);
 private:
-//    DataAdapterPtr createDataAdapter(Filter::ArgumentType type);
-    QGroupBox* wrapInGroupBox(QWidget* base, QString name);
-
     ssc::XmlOptionFile mOptions;
     FilterPtr mCurrentFilter;
     ssc::StringDataAdapterXmlPtr mFilterSelector;
     std::vector<FilterPtr> mAvailableFilters;
     FilterTimedAlgorithmPtr mThread;
 
-    OptionsWidget* mInputsWidget;
-    OptionsWidget* mOutputsWidget;
-    OptionsWidget* mOptionsWidget;
+    FilterSetupWidget* mSetupWidget;
     TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
-    boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 
 }

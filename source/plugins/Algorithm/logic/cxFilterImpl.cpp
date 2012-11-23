@@ -1,4 +1,3 @@
-
 // This file is part of CustusX, an Image Guided Therapy Application.
 //
 // Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
@@ -15,12 +14,25 @@
 
 #include "cxFilterImpl.h"
 
+#include "sscImage.h"
+
 namespace cx
 {
 
 FilterImpl::FilterImpl() : mActive(false)
 {
+}
 
+QString FilterImpl::getUid() const
+{
+    if (mUid.isEmpty())
+        return this->getType();
+    return mUid;
+}
+
+void FilterImpl::setUid(QString uid)
+{
+    mUid = uid;
 }
 
 std::vector<DataAdapterPtr> FilterImpl::getOptions(QDomElement root)
@@ -72,6 +84,14 @@ bool FilterImpl::preProcess()
     mCopiedOptions = mOptions.cloneNode(true).toElement();
     return true;
 }
+
+ssc::ImagePtr FilterImpl::getCopiedInputImage(int index)
+{
+    if (mCopiedInput.size() < index+1)
+        return ssc::ImagePtr();
+    return boost::shared_dynamic_cast<ssc::Image>(mCopiedInput[index]);
+}
+
 
 } // namespace cx
 

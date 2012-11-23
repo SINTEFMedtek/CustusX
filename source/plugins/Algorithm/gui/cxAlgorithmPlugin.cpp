@@ -11,6 +11,12 @@
 #include "cxVisualizationMethodsWidget.h"
 #include "cxSegmentationMethodsWidget.h"
 #include "cxFilterWidget.h"
+#include "cxPipeline.h"
+#include "cxPipelineWidget.h"
+#include "cxBinaryThresholdImageFilter.h"
+#include "cxBinaryThinningImageFilter3DFilter.h"
+#include "cxDummyFilter.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -24,6 +30,7 @@ AlgorithmPlugin::~AlgorithmPlugin()
 
 }
 
+
 std::vector<PluginBase::PluginWidget> AlgorithmPlugin::createWidgets() const
 {
 	std::vector<PluginWidget> retval;
@@ -35,10 +42,22 @@ std::vector<PluginBase::PluginWidget> AlgorithmPlugin::createWidgets() const
 			new VisualizationMethodsWidget(NULL, "VisualizationMethodsWidget", "Visualization Methods"),
 			"Algorithms"));
     retval.push_back(PluginBase::PluginWidget(
-            new FilterWidget(NULL),
+            new AllFiltersWidget(NULL),
             "Algorithms"));
 
+    PipelinePtr pipeline(new Pipeline());
 
+    ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("dummypipeline");
+    FilterGroupPtr filters(new FilterGroup(options));
+    filters->append(FilterPtr(new DummyFilter()));
+    filters->append(FilterPtr(new BinaryThresholdImageFilter()));
+    filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
+
+    pipeline->initialize(filters);
+
+    retval.push_back(PluginBase::PluginWidget(
+            new PipelineWidget(NULL, pipeline),
+            "Algorithms"));
 
 	return retval;
 

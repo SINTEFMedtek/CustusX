@@ -17,11 +17,14 @@ SET( MOC_HEADER_FILES
 	logic/cxFilterImpl.h
 	logic/cxFilterTimedAlgorithm.h
 	logic/cxDummyFilter.h
-    logic/cxCenterline.h
+	logic/cxPipeline.h
+	logic/cxCenterline.h
     logic/cxResample.h
     logic/cxBinaryThresholdImageFilter.h
     logic/cxContour.h
     logic/cxConnectedThresholdImageFilter.h
+	logic/cxContourFilter.h
+	logic/cxBinaryThinningImageFilter3DFilter.h
    gui/cxAlgorithmPlugin.h
     gui/cxBinaryThresholdImageFilterWidget.h
     gui/cxConnectedThresholdImageFilterWidget.h
@@ -30,6 +33,7 @@ SET( MOC_HEADER_FILES
     gui/cxResampleWidget.h
     gui/cxTimedAlgorithmProgressBar.h
 	gui/cxFilterWidget.h
+	gui/cxPipelineWidget.h
 	)
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -45,7 +49,9 @@ SET( SOURCE_FILES
 	logic/cxFilterTimedAlgorithm.cpp
 	logic/cxDummyFilter.h
 	logic/cxDummyFilter.cpp
-    logic/cxTrackingDataToVolume.h
+	logic/cxPipeline.h
+	logic/cxPipeline.cpp
+	logic/cxTrackingDataToVolume.h
     logic/cxTrackingDataToVolume.cpp
     logic/cxCenterline.h
     logic/cxCenterline.cpp
@@ -57,6 +63,10 @@ SET( SOURCE_FILES
     logic/cxContour.cpp
     logic/cxConnectedThresholdImageFilter.h
     logic/cxConnectedThresholdImageFilter.cpp
+	logic/cxContourFilter.h
+	logic/cxContourFilter.cpp
+	logic/cxBinaryThinningImageFilter3DFilter.h
+	logic/cxBinaryThinningImageFilter3DFilter.cpp
    gui/cxAlgorithmPlugin.h
    gui/cxAlgorithmPlugin.cpp
     gui/cxBinaryThresholdImageFilterWidget.h
@@ -77,6 +87,8 @@ SET( SOURCE_FILES
     gui/cxTimedAlgorithmProgressBar.cpp
 	gui/cxFilterWidget.h
 	gui/cxFilterWidget.cpp
+	gui/cxPipelineWidget.h
+	gui/cxPipelineWidget.cpp
   )
 
 # =========================================================
