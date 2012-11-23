@@ -28,6 +28,8 @@
 #include "sscDoubleWidgets.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscCheckBoxWidget.h"
+#include "sscColorSelectWidget.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -52,7 +54,15 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 		return new ssc::CheckBoxWidget(parent, bl, gridLayout, row);
 	}
 
-	return NULL;
+    ColorDataAdapterPtr cl = boost::shared_dynamic_cast<ssc::ColorDataAdapter>(data);
+    if (cl)
+    {
+        return new ssc::ColorSelectWidget(parent, cl, gridLayout, row);
+    }
+
+    std::cout << "Failed to create Data Widget for " << (data ? data->getValueName() : "NULL") << std::endl;
+
+    return NULL;
 }
 
 }

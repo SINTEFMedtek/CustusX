@@ -1,0 +1,76 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
+#include "sscColorSelectWidget.h"
+
+namespace ssc
+{
+
+ColorSelectWidget::ColorSelectWidget(QWidget* parent, ssc::ColorDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
+    OptimizedUpdateWidget(parent)
+{
+    mData = dataInterface;
+    connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
+
+    QHBoxLayout* topLayout = new QHBoxLayout;
+    topLayout->setMargin(0);
+    this->setLayout(topLayout);
+
+    mLabel = new QLabel(this);
+    mLabel->setText(dataInterface->getValueName());
+    topLayout->addWidget(mLabel);
+
+    mColorButton = new cx::ColorSelectButton("");
+//    mColorButton->setColor(QColor("green"));
+//    mColorButton->setToolTip("Select color to use when generating surfaces and centerlines.");
+    connect(mColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(valueChanged(QColor)));
+
+//    mCheckBox = new QCheckBox(this);
+//    topLayout->addWidget(mCheckBox);
+//    connect(mCheckBox, SIGNAL(toggled(bool)), this, SLOT(valueChanged(bool)));
+
+    if (gridLayout) // add to input gridlayout
+    {
+        gridLayout->addWidget(mLabel, row, 0);
+        gridLayout->addWidget(mColorButton, row, 1);
+    }
+    else // add directly to this
+    {
+        topLayout->addWidget(mLabel);
+        topLayout->addWidget(mColorButton, 1);
+    }
+
+    this->setModified();
+}
+
+void ColorSelectWidget::valueChanged(QColor val)
+{
+    if (val == mData->getValue())
+        return;
+    mData->setValue(val);
+}
+
+void ColorSelectWidget::prePaintEvent()
+{
+    mColorButton->blockSignals(true);
+
+    mColorButton->setColor(mData->getValue());
+    mColorButton->setToolTip(mData->getHelp());
+
+    mColorButton->blockSignals(false);
+}
+
+
+} // namespace ssc
+

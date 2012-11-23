@@ -121,7 +121,11 @@ SET( SSC_QT_MOC_HEADER_FILES
     Widgets/sscVector3DDataAdapter.h
     Widgets/sscVector3DDataAdapterXml.h
     Widgets/sscMousePadWidget.h
-    Utilities/sscMessageManager.h
+	Widgets/sscColorDataAdapter.h
+	Widgets/sscColorDataAdapterXml.h
+	Widgets/sscColorSelectWidget.h
+	Widgets/cxColorSelectButton.h
+	Utilities/sscMessageManager.h
     Utilities/sscSharedMemory.h
     )
 
@@ -428,6 +432,13 @@ SET( SSC_SOURCE_FILES
     Widgets/sscVector3DDataAdapterXml.cpp
     Widgets/sscMousePadWidget.h
     Widgets/sscMousePadWidget.cpp
+	Widgets/sscColorDataAdapter.h
+	Widgets/sscColorDataAdapterXml.h
+	Widgets/sscColorDataAdapterXml.cpp
+	Widgets/sscColorSelectWidget.h
+	Widgets/sscColorSelectWidget.cpp
+	Widgets/cxColorSelectButton.h
+	Widgets/cxColorSelectButton.cpp
 
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx
