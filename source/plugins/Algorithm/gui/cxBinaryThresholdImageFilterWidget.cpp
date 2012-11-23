@@ -99,6 +99,7 @@ QString BinaryThresholdImageFilterWidget::defaultWhatsThis() const
 
 void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
 {
+    std::cout << "BinaryThresholdImageFilterWidget::setImageInputSlot(QString value) " << value << std::endl;
   mSelectedImage->setValue(value);
 }
 
@@ -199,6 +200,7 @@ void BinaryThresholdImageFilterWidget::toogleSmoothingSlot(bool on)
 
 void BinaryThresholdImageFilterWidget::imageChangedSlot(QString uid)
 {
+    std::cout << "BinaryThresholdImageFilterWidget::imageChangedSlot(QString uid) " << uid << std::endl;
 //	RepManager::getInstance()->getThresholdPreview()->removePreview(this);
 
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);

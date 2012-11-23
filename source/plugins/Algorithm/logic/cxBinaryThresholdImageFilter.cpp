@@ -200,6 +200,7 @@ void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
   mLowerThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
   int initValue = image->getMin() + ((image->getMax() - image->getMin()) / 10);
   mLowerThresholdOption->setValue(initValue);
+  RepManager::getInstance()->getThresholdPreview()->removePreview();
 
 //  QString imageName = image->getName();
 //  if(imageName.contains("us", Qt::CaseInsensitive)) //assume the image is ultrasound
@@ -210,8 +211,8 @@ void BinaryThresholdImageFilter::thresholdSlot()
 {
     if (mActive)
     {
-        std::cout << "BinaryThresholdImageFilter::thresholdSlot()" << std::endl;
-        RepManager::getInstance()->getThresholdPreview()->setPreview(this->getInputImage(),
+        ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mInputTypes[0]->getData());
+        RepManager::getInstance()->getThresholdPreview()->setPreview(image,
                 mLowerThresholdOption->getValue());
     }
 }
