@@ -348,17 +348,25 @@ void VideoGraphics::checkDataIntegrity()
 
 void VideoGraphics::newDataSlot()
 {
-	if (!mData || !mData->isConnected())
+	if (!mData || !mData->isStreaming())
+	{
+		mPlaneActor->SetVisibility(false);
+		return;
+	}
+	//Don't do anything if we get an empty image
+	mData->getVtkImageData()->Update();
+	int* dim = mData->getVtkImageData()->GetDimensions();
+	if(dim[0] == 0 || dim[1] == 0)
 	{
 		mPlaneActor->SetVisibility(false);
 		return;
 	}
 
-	mImage->setVtkImageData(mData->getVtkImageData());//Update pointer
+	mImage->setVtkImageData(mData->getVtkImageData());//Update pointer to 4D image
 
 	//Check if 3D volume. If so, only use middle frame
 	int* extent = mData->getVtkImageData()->GetExtent();
-	if(extent[5]- extent[4] > 0)
+	if(extent[5] - extent[4] > 0)
 	{
 		int slice = floor(extent[4]+0.5f*(extent[5]-extent[4]));
 		if (slice < 0) slice = 0;
