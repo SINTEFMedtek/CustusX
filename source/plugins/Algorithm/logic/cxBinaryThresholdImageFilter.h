@@ -87,7 +87,6 @@ private slots:
     void thresholdSlot();
 
 private:
-    ssc::ImagePtr getInputImage();
     ssc::DoubleDataAdapterXmlPtr mLowerThresholdOption;
     vtkImageDataPtr mRawResult;
 };
