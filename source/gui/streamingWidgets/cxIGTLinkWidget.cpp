@@ -375,19 +375,16 @@ void IGTLinkWidget::serverStatusChangedSlot()
 void IGTLinkWidget::saveSnapshotSlot()
 {
 	ssc::messageManager()->sendInfo("IGTLinkWidget::saveSnapshotSlot()");
-	std::cout << "RTSource: " << getRTSource() << std::endl;
 
 	if(!getRTSource())
 	{
 		ssc::messageManager()->sendWarning("No RT source");
 		return;
 	}
-//	if(getRTSource()->isConnected())
-//		return;
-	if(getRTSource()->isStreaming())
+	if(!getRTSource()->isStreaming())
 	{
 		ssc::messageManager()->sendWarning("RT soure is not streaming");
-		//return;
+		return;
 	}
 	vtkImageDataPtr input = getRTSource()->getVtkImageData();
 	if(!input)
