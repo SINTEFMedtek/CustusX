@@ -24,6 +24,7 @@
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxDataInterface.h"
 #include "cxBinaryThresholdImageFilter.h"
+#include "cxBinaryThinningImageFilter3DFilter.h"
 
 namespace cx
 {
@@ -100,43 +101,33 @@ std::vector<DataAdapterPtr> OptionsWidget::getOptions(QString uid)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-FilterWidget::FilterWidget(QWidget* parent) :
-    BaseWidget(parent, "FilterWidget", "Configurable Filter")
+
+FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame) :
+    BaseWidget(parent, "FilterSetupWidget", "FilterSetup")
 {
+    mFrame = NULL;
+
+    QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+    toptopLayout->setMargin(0);
+
+    QWidget* topWidget = new QWidget;
+    QVBoxLayout* topLayout = new QVBoxLayout(topWidget);
+    topLayout->setMargin(0);
+
+    if (addFrame)
+    {
+        mFrame = this->wrapInGroupBox(topWidget, "Algorithm");
+        toptopLayout->addWidget(mFrame);
+    }
+    else
+    {
+        toptopLayout->addWidget(topWidget);
+    }
+
     mObscuredListener.reset(new WidgetObscuredListener(this));
     connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
 
-    mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
-
-    mAvailableFilters.push_back(FilterPtr(new DummyFilter()));
-    mAvailableFilters.push_back(FilterPtr(new BinaryThresholdImageFilter()));
-
-    QStringList availableFilters;
-    for (unsigned i=0; i<mAvailableFilters.size(); ++i)
-        availableFilters << mAvailableFilters[i]->getType();
-
-    mFilterSelector = ssc::StringDataAdapterXml::initialize("filter",
-                                                            "Filter",
-                                                            "Select which filter to use.",
-                                                            availableFilters[0],
-                                                            availableFilters,
-                                                            mOptions.getElement());
-    connect(mFilterSelector.get(), SIGNAL(valueWasSet()), this, SLOT(filterChangedSlot()));
-
-    QVBoxLayout* topLayout = new QVBoxLayout(this);
-
-    QHBoxLayout* filterLayout = new QHBoxLayout;
-    filterLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFilterSelector));
-    topLayout->addLayout(filterLayout);
-
-    this->createAction(this,
-                    QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
-                    "Run Filter", "",
-                    SLOT(runFilterSlot()),
-                    filterLayout);
-
-    mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
-    topLayout->addWidget(mTimedAlgorithmProgressBar);
+    mOptions = options;
 
     mInputsWidget = new OptionsWidget(this);
     topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
@@ -145,28 +136,24 @@ FilterWidget::FilterWidget(QWidget* parent) :
 
     mOptionsWidget = new OptionsWidget(this);
     topLayout->addWidget(this->wrapInGroupBox(mOptionsWidget, "Options"));
-
-    topLayout->addStretch();
-
-    this->filterChangedSlot();
 }
 
-void FilterWidget::obscuredSlot(bool obscured)
+void FilterSetupWidget::obscuredSlot(bool obscured)
 {
     if (mCurrentFilter)
         mCurrentFilter->setActive(!obscured);
 }
 
-QGroupBox* FilterWidget::wrapInGroupBox(QWidget* base, QString name)
+QGroupBox* FilterSetupWidget::wrapInGroupBox(QWidget* base, QString name)
 {
     QGroupBox* groupBox = new QGroupBox(name);
     QVBoxLayout* layout = new QVBoxLayout(groupBox);
-    layout->setMargin(0);
+    layout->setMargin(2);
     layout->addWidget(base);
     return groupBox;
 }
 
-QString FilterWidget::defaultWhatsThis() const
+QString FilterSetupWidget::defaultWhatsThis() const
 {
     QString name("None");
     QString help("");
@@ -176,27 +163,17 @@ QString FilterWidget::defaultWhatsThis() const
         help = mCurrentFilter->getHelp();
     }
     return QString("<html>"
-                   "<h3>Filter Widget.</h3>"
-                   "<p>Select one type of filter.</p>"
-                   "<p><i>Currently selected filter:</ithis></p>"
                    "<h4>%1</h4>"
                    "<p>%2</p>"
                    "</html>").arg(name).arg(help);
 }
 
-void FilterWidget::filterChangedSlot()
+void FilterSetupWidget::setFilter(FilterPtr filter)
 {
-//    std::cout << "FilterWidget::filterChangedSlot()" << std::endl;
+    mCurrentFilter = filter;
 
-    for (unsigned i=0; i<mAvailableFilters.size(); ++i)
-    {
-        if (mAvailableFilters[i]->getType() == mFilterSelector->getValue())
-        {
-            mCurrentFilter = mAvailableFilters[i];
-        }
-    }
-
-    mFilterSelector->setHelp(this->defaultWhatsThis());
+    if (mFrame)
+        mFrame->setTitle(mCurrentFilter->getName());
 
     if (mCurrentFilter)
     {
@@ -215,8 +192,102 @@ void FilterWidget::filterChangedSlot()
         mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>());
 }
 
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
 
-void FilterWidget::runFilterSlot()
+
+AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
+    BaseWidget(parent, "FilterWidget", "Configurable Filter")
+{
+    mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
+    mSetupWidget = new FilterSetupWidget(this, mOptions, false);
+
+    mAvailableFilters.push_back(FilterPtr(new DummyFilter()));
+    mAvailableFilters.push_back(FilterPtr(new BinaryThresholdImageFilter()));
+    mAvailableFilters.push_back(FilterPtr(new BinaryThinningImageFilter3DFilter()));
+
+    QStringList availableFilters;
+    std::map<QString,QString> names;
+    for (unsigned i=0; i<mAvailableFilters.size(); ++i)
+    {
+        availableFilters << mAvailableFilters[i]->getType();
+        names[mAvailableFilters[i]->getType()] = mAvailableFilters[i]->getName();
+    }
+
+    mFilterSelector = ssc::StringDataAdapterXml::initialize("filter",
+                                                            "Filter",
+                                                            "Select which filter to use.",
+                                                            availableFilters[0],
+                                                            availableFilters,
+                                                            mOptions.getElement());
+    mFilterSelector->setDisplayNames(names);
+    connect(mFilterSelector.get(), SIGNAL(valueWasSet()), this, SLOT(filterChangedSlot()));
+
+    QVBoxLayout* topLayout = new QVBoxLayout(this);
+
+    QHBoxLayout* filterLayout = new QHBoxLayout;
+    filterLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFilterSelector));
+    topLayout->addLayout(filterLayout);
+
+    this->createAction(this,
+                    QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
+                    "Run Filter", "",
+                    SLOT(runFilterSlot()),
+                    filterLayout);
+
+    mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+    topLayout->addWidget(mTimedAlgorithmProgressBar);
+
+    topLayout->addWidget(mSetupWidget);
+
+    topLayout->addStretch();
+
+    this->filterChangedSlot();
+}
+
+QString AllFiltersWidget::defaultWhatsThis() const
+{
+    return QString("<html>"
+                   "<h3>Filter Widget.</h3>"
+                   "<p>Select one type of filter.</p>"
+                   "<p><i>Currently selected filter:</i></p>"
+                   "<p>%1</p>"
+                   "</html>").arg(mSetupWidget->defaultWhatsThis());
+
+//    QString name("None");
+//    QString help("");
+//    if (mCurrentFilter)
+//    {
+//        name = mCurrentFilter->getName();
+//        help = mCurrentFilter->getHelp();
+//    }
+//    return QString("<html>"
+//                   "<h3>Filter Widget.</h3>"
+//                   "<p>Select one type of filter.</p>"
+//                   "<p><i>Currently selected filter:</i></p>"
+//                   "<h4>%1</h4>"
+//                   "<p>%2</p>"
+//                   "</html>").arg(name).arg(help);
+}
+
+void AllFiltersWidget::filterChangedSlot()
+{
+    for (unsigned i=0; i<mAvailableFilters.size(); ++i)
+    {
+        if (mAvailableFilters[i]->getType() == mFilterSelector->getValue())
+        {
+            mCurrentFilter = mAvailableFilters[i];
+        }
+    }
+
+    mFilterSelector->setHelp(this->defaultWhatsThis());
+
+    mSetupWidget->setFilter(mCurrentFilter);
+}
+
+
+void AllFiltersWidget::runFilterSlot()
 {
     if (!mCurrentFilter)
         return;
@@ -231,41 +302,13 @@ void FilterWidget::runFilterSlot()
     connect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
     mTimedAlgorithmProgressBar->attach(mThread);
 
-//    std::vector<ssc::DataPtr> input;
-//    std::vector<DataAdapterPtr> inputAdapters = mInputsWidget->getOptions(mCurrentFilter->getType());
-
-//    for (unsigned i=0; i<inputAdapters.size(); ++i)
-//    {
-//        SelectDataStringDataAdapterBasePtr base = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(inputAdapters[i]);
-//        if (!base)
-//            continue;
-//        input.push_back(base->getData());
-//    }
-
-//    mThread->setInput(input,
-//                     patientService()->getPatientData()->getActivePatientFolder(),
-//                     mOptions.getElement(mCurrentFilter->getType()));
-
     mThread->execute();
 }
 
-void FilterWidget::finishedSlot()
+void AllFiltersWidget::finishedSlot()
 {
     mTimedAlgorithmProgressBar->detach(mThread);
     disconnect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
-
-//    std::vector<ssc::DataPtr> result = mThread->getOutput();
-//    std::vector<DataAdapterPtr> outputAdapters = mOutputsWidget->getOptions(mCurrentFilter->getType());
-
-//    for (unsigned i=0; i<outputAdapters.size(); ++i)
-//    {
-//        SelectDataStringDataAdapterBasePtr base = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(outputAdapters[i]);
-//        if (!base)
-//            continue;
-//        if (i < result.size())
-//            base->setValue(result[i]->getUid());
-//    }
-
     mThread.reset();
 }
 

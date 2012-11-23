@@ -225,12 +225,13 @@ bool BinaryThresholdImageFilter::preProcess()
 
 bool BinaryThresholdImageFilter::execute()
 {
-    if (mCopiedInput.size()<1 || !mCopiedInput[0] || mCopiedInput[0]->getType()!="image")
+    ssc::ImagePtr input = this->getCopiedInputImage();
+    if (!input)
         return false;
 
     ssc::DoubleDataAdapterXmlPtr lowerThreshold = this->getLowerThresholdOption(mCopiedOptions);
 
-    itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(this->getInputImage());
+    itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
 
     //Binary Thresholding
     typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
@@ -255,19 +256,12 @@ bool BinaryThresholdImageFilter::execute()
     return true;
 }
 
-ssc::ImagePtr BinaryThresholdImageFilter::getInputImage()
-{
-    if (mCopiedInput.size() < 1)
-        return ssc::ImagePtr();
-    return boost::shared_dynamic_cast<ssc::Image>(mCopiedInput[0]);
-}
-
 void BinaryThresholdImageFilter::postProcess()
 {
     if (!mRawResult)
         return;
 
-    ssc::ImagePtr input = this->getInputImage();
+    ssc::ImagePtr input = this->getCopiedInputImage();
 
     if (!input)
         return;
@@ -281,6 +275,9 @@ void BinaryThresholdImageFilter::postProcess()
     output->resetTransferFunctions();
     ssc::dataManager()->loadData(output);
     ssc::dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+
+    // set output
+    mOutputTypes.front()->setValue(output->getUid());
 }
 
 
