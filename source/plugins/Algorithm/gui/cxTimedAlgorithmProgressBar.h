@@ -55,6 +55,7 @@ class TimedAlgorithmProgressBar : public QWidget
 public:
 	TimedAlgorithmProgressBar(QWidget* parent=NULL);
 	virtual ~TimedAlgorithmProgressBar() {}
+    void setShowTextLabel(bool on);
 
 	void attach(TimedAlgorithmPtr algorithm);
 	void detach(TimedAlgorithmPtr algorithm);
@@ -72,6 +73,7 @@ private:
 //	int mStartedAlgos;
 	std::set<TimedBaseAlgorithm*> mStartedAlgos;
 	DisplayTimerWidget* mTimerWidget;
+    bool mShowTextLabel;
 };
 
 /**

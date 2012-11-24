@@ -12,6 +12,34 @@
 #include <iostream>
 #include "sscOptimizedUpdateWidget.h"
 
+/** Frame descendant with dedicated style sheet: framed
+  *
+  * \ingroup cxGUI
+  * \date Nov 25, 2012
+  * \author christiana
+  */
+class CXFrame : public QFrame
+{
+    Q_OBJECT
+public:
+    CXFrame(QWidget* parent) : QFrame(parent) {}
+    virtual ~CXFrame() {}
+};
+
+/** QToolButton descendant with dedicated style sheet: smaller
+  *
+  * \ingroup cxGUI
+  * \date Nov 25, 2012
+  * \author christiana
+  */
+class CXSmallToolButton : public QToolButton
+{
+    Q_OBJECT
+public:
+    CXSmallToolButton(QWidget* parent=0) : QToolButton(parent) {}
+};
+
+
 namespace cx
 {
 /**
@@ -46,6 +74,8 @@ public:
       * Creates a horizontal line which can be inserted into widgets
       */
     QFrame* createHorizontalLine();
+    QGroupBox* wrapInGroupBox(QWidget* base, QString name);
+    CXFrame* wrapInFrame(QWidget* base);
 
 	/**Shorthand method for action creation.
 	 * If layout is used, a QToolButton is created and added to it.
