@@ -209,6 +209,7 @@ void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
 
 void BinaryThresholdImageFilter::thresholdSlot()
 {
+//    std::cout << "BinaryThresholdImageFilter::thresholdSlot() " << mActive << std::endl;
     if (mActive)
     {
         ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mInputTypes[0]->getData());

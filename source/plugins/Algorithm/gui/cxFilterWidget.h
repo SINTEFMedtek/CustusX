@@ -77,7 +77,6 @@ public:
 private slots:
     void obscuredSlot(bool obscured);
 private:
-    QGroupBox* wrapInGroupBox(QWidget* base, QString name);
 
     ssc::XmlOptionFile mOptions;
     FilterPtr mCurrentFilter;
@@ -113,10 +112,9 @@ private slots:
     void runFilterSlot();
     void finishedSlot();
 private:
-    ssc::XmlOptionFile mOptions;
+    FilterGroupPtr mFilters;
     FilterPtr mCurrentFilter;
     ssc::StringDataAdapterXmlPtr mFilterSelector;
-    std::vector<FilterPtr> mAvailableFilters;
     FilterTimedAlgorithmPtr mThread;
 
     FilterSetupWidget* mSetupWidget;

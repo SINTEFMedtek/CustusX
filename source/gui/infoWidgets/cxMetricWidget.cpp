@@ -256,14 +256,9 @@ void MetricWidget::prePaintEvent()
     {
     	MetricBasePtr wrapper = mMetrics[i];
         connect(wrapper->getData().get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
-//  		mEditWidgets->addWidget(wrapper->createWidget());
-
   		QGroupBox* groupBox = new QGroupBox(wrapper->getData()->getName(), this);
   		groupBox->setFlat(true);
-//  	  QFrame* groupBox = new QFrame(this);
   	  QVBoxLayout* gbLayout = new QVBoxLayout(groupBox);
-//  	  groupBox->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-//  	  groupBox->setLineWidth(3);
   	  gbLayout->setMargin(4);
   	  gbLayout->addWidget(wrapper->createWidget());
   	  mEditWidgets->addWidget(groupBox);

@@ -32,7 +32,7 @@ protected slots:
   void setColorSlotDelayed();
 //  void visibilityChangedSlot(bool visible);
 //  void populateMeshComboBoxSlot();
-  void meshSelectedSlot(const QString& comboBoxText);
+  void meshSelectedSlot();
   void importTransformSlot();
   void deleteDataSlot();
 

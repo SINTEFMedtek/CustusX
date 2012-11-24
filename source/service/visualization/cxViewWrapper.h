@@ -99,8 +99,10 @@ public:
 	Options getOptions() const;
 	void setOptions(Options options);
 
-private slots: //eller signals?????
-	void removeDataSlot(QString uid);signals:
+private slots:
+    void removeDataSlot(QString uid);
+
+signals:
 	void dataAdded(QString uid);
 	void dataRemoved(QString uid);
 	void initialized();

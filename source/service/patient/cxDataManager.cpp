@@ -78,12 +78,4 @@ void DataManager::setDebugMode(bool on)
 	emit debugModeChanged(mDebugMode);
 }
 
-void DataManager::deleteImageSlot(ssc::ImagePtr image)
-{
-	if (!this->getImage(image->getUid()))
-		return;
-	mData.erase(image->getUid());
-	emit currentImageDeleted(image);
-}
-
 } //namespace cx

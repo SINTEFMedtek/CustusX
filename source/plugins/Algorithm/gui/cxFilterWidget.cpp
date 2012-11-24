@@ -25,6 +25,7 @@
 #include "cxDataInterface.h"
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -38,6 +39,7 @@ OptionsWidget::OptionsWidget(QWidget* parent)
 
 void OptionsWidget::setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options)
 {
+//    std::cout << "OptionsWidget::setOptions " << uid << ", ptr=" << this << ", size=" << options.size() << std::endl;
     std::vector<DataAdapterPtr> converted;
     std::copy(options.begin(), options.end(), std::back_inserter(converted));
     this->setOptions(uid, converted);
@@ -144,15 +146,6 @@ void FilterSetupWidget::obscuredSlot(bool obscured)
         mCurrentFilter->setActive(!obscured);
 }
 
-QGroupBox* FilterSetupWidget::wrapInGroupBox(QWidget* base, QString name)
-{
-    QGroupBox* groupBox = new QGroupBox(name);
-    QVBoxLayout* layout = new QVBoxLayout(groupBox);
-    layout->setMargin(2);
-    layout->addWidget(base);
-    return groupBox;
-}
-
 QString FilterSetupWidget::defaultWhatsThis() const
 {
     QString name("None");
@@ -170,6 +163,13 @@ QString FilterSetupWidget::defaultWhatsThis() const
 
 void FilterSetupWidget::setFilter(FilterPtr filter)
 {
+    if (filter==mCurrentFilter)
+        return;
+
+    if (mCurrentFilter)
+        mCurrentFilter->setActive(false);
+
+//    std::cout << "FilterSetupWidget::setFilter " << filter->getUid() << ", ptr=" << this << std::endl;
     mCurrentFilter = filter;
 
     if (mFrame)
@@ -177,16 +177,18 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 
     if (mCurrentFilter)
     {
+        mCurrentFilter->setActive(!mObscuredListener->isObscured());
+
         std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
         std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
 
-        mInputsWidget->setOptions(mCurrentFilter->getType(), mCurrentFilter->getInputTypes());
+        mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes());
 
-        mOutputsWidget->setOptions(mCurrentFilter->getType(), mCurrentFilter->getOutputTypes());
+        mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes());
 
-        ssc::XmlOptionFile node = mOptions.descend(mCurrentFilter->getType());
+        ssc::XmlOptionFile node = mOptions.descend(mCurrentFilter->getUid());
         std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions(node.getElement());
-        mOptionsWidget->setOptions(mCurrentFilter->getType(), options);
+        mOptionsWidget->setOptions(mCurrentFilter->getUid(), options);
     }
     else
         mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>());
@@ -200,19 +202,18 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
 {
-    mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
-    mSetupWidget = new FilterSetupWidget(this, mOptions, false);
-
-    mAvailableFilters.push_back(FilterPtr(new DummyFilter()));
-    mAvailableFilters.push_back(FilterPtr(new BinaryThresholdImageFilter()));
-    mAvailableFilters.push_back(FilterPtr(new BinaryThinningImageFilter3DFilter()));
+    ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
+    mFilters.reset(new FilterGroup(options));
+    mFilters->append(FilterPtr(new DummyFilter()));
+    mFilters->append(FilterPtr(new BinaryThresholdImageFilter()));
+    mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
 
     QStringList availableFilters;
     std::map<QString,QString> names;
-    for (unsigned i=0; i<mAvailableFilters.size(); ++i)
+    for (unsigned i=0; i<mFilters->size(); ++i)
     {
-        availableFilters << mAvailableFilters[i]->getType();
-        names[mAvailableFilters[i]->getType()] = mAvailableFilters[i]->getName();
+        availableFilters << mFilters->get(i)->getUid();
+        names[mFilters->get(i)->getUid()] = mFilters->get(i)->getName();
     }
 
     mFilterSelector = ssc::StringDataAdapterXml::initialize("filter",
@@ -220,7 +221,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
                                                             "Select which filter to use.",
                                                             availableFilters[0],
                                                             availableFilters,
-                                                            mOptions.getElement());
+                                                            options.getElement());
     mFilterSelector->setDisplayNames(names);
     connect(mFilterSelector.get(), SIGNAL(valueWasSet()), this, SLOT(filterChangedSlot()));
 
@@ -239,6 +240,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
     topLayout->addWidget(mTimedAlgorithmProgressBar);
 
+    mSetupWidget = new FilterSetupWidget(this, options, false);
     topLayout->addWidget(mSetupWidget);
 
     topLayout->addStretch();
@@ -273,11 +275,11 @@ QString AllFiltersWidget::defaultWhatsThis() const
 
 void AllFiltersWidget::filterChangedSlot()
 {
-    for (unsigned i=0; i<mAvailableFilters.size(); ++i)
+    for (unsigned i=0; i<mFilters->size(); ++i)
     {
-        if (mAvailableFilters[i]->getType() == mFilterSelector->getValue())
+        if (mFilters->get(i)->getUid() == mFilterSelector->getValue())
         {
-            mCurrentFilter = mAvailableFilters[i];
+            mCurrentFilter = mFilters->get(i);
         }
     }
 

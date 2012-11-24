@@ -40,6 +40,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/cxTransferFunctionColorWidget.h
     dataWidgets/sscDICOMWidget.h
     dataWidgets/cxEraserWidget.h
+	dataWidgets/cxDataSelectWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
     infoWidgets/cxBrowserWidget.h
@@ -184,7 +185,9 @@ SET(cxGui_SRCS
     dataWidgets/sscDICOMWidget.cpp
     dataWidgets/cxEraserWidget.h
     dataWidgets/cxEraserWidget.cpp
-    #----------------------
+	dataWidgets/cxDataSelectWidget.h
+	dataWidgets/cxDataSelectWidget.cpp
+	#----------------------
     infoWidgets/cxBrowserWidget.h
     infoWidgets/cxBrowserWidget.cpp
     infoWidgets/cxFrameTreeWidget.cpp
