@@ -109,7 +109,8 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     ${CustusX3_SOURCE_DIR}/source/gui/utilities
     ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters
-    )
+	${CustusX3_SOURCE_DIR}/source/gui/dataWidgets
+	)
 
 set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui)
 

@@ -25,6 +25,7 @@ namespace cx
 {
 class TimedAlgorithmProgressBar;
 
+
 class PipelineWidgetFilterLine : public BaseWidget
 {
     Q_OBJECT
@@ -47,7 +48,6 @@ private slots:
 protected:
     virtual void mousePressEvent(QMouseEvent* event);
 };
-
 
 /** GUI for sequential execution of Filters.
  *
@@ -74,7 +74,7 @@ private:
     FilterSetupWidget* mSetupWidget;
 
     FilterTimedAlgorithmPtr mThread;
-    int mCurrentlyRunningIndex;
+    PipelineWidgetFilterLine* mCurrentlyRunningPipelineWidgetFilterLine;
 };
 
 

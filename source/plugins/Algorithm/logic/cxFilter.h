@@ -96,6 +96,8 @@ public:
     /**
       * Perform main thread preprocessing. Copies input data from options and
       * the input adapters into thread-safe storage.
+      * Assumes getOptions(), getInputTypes(), getOutputTypes()
+      * has been called (this initializes options)
       *
       * \param outputPath is path to data files for current patient.
       * \return success.

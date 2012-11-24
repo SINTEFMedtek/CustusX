@@ -38,13 +38,14 @@ class WidgetObscuredListener : public QObject
     Q_OBJECT
 public:
     WidgetObscuredListener(QWidget* listenedTo);
+    bool isObscured() const;
 
 signals:
     void obscured(bool visible);
 private slots:
     void timeoutSlot();
 private:
-    bool mObscured;
+    bool mObscuredAtLastCheck;
     QWidget* mWidget;
     QTimer *mRemoveTimer; ///< Timer for removing segmentation preview coloring if widget is not visible
 };

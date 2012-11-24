@@ -46,20 +46,20 @@ QString BinaryThinningImageFilter3DFilter::getHelp() const
     "<p>"
     "This filter computes one-pixel-wide skeleton of a 3D input image."
             "</p><p>"
-    "This class is parametrized over the type of the input image"
+    "This class is parametrized over the type of the input image "
     "and the type of the output image."
     "</p><p>"
-    "The input is assumed to be a binary image. All non-zero valued voxels"
-    "are set to 1 internally to simplify the computation. The filter will"
-    "produce a skeleton of the object.  The output background values are 0,"
+    "The input is assumed to be a binary image. All non-zero valued voxels "
+    "are set to 1 internally to simplify the computation. The filter will "
+    "produce a skeleton of the object.  The output background values are 0, "
     "and the foreground values are 1."
             "</p><p>"
-    "A 26-neighbourhood configuration is used for the foreground and a"
-    "6-neighbourhood configuration for the background. Thinning is performed"
-    "symmetrically in order to guarantee that the skeleton lies medial within"
+    "A 26-neighbourhood configuration is used for the foreground and a "
+    "6-neighbourhood configuration for the background. Thinning is performed "
+    "symmetrically in order to guarantee that the skeleton lies medial within "
     "the object."
             "</p><p>"
-    "This filter is a parallel thinning algorithm and is an implementation"
+    "This filter is a parallel thinning algorithm and is an implementation "
     "of the algorithm described in:"
             "</p><p>"
     "T.C. Lee, R.L. Kashyap, and C.N. Chu.<br>"
@@ -159,7 +159,7 @@ void BinaryThinningImageFilter3DFilter::postProcess()
     if(!mRawResult)
         return;
 
-    QColor outputColor;
+    ssc::ColorDataAdapterPtr outputColor = this->getColorOption(mCopiedOptions);
 
     ssc::ImagePtr input = this->getCopiedInputImage();
 
@@ -172,7 +172,7 @@ void BinaryThinningImageFilter3DFilter::postProcess()
     QString uid = input->getUid() + "_cl%1";
     QString name = input->getName()+" cl%1";
     ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
-    mesh->setColor(outputColor);
+    mesh->setColor(outputColor->getValue());
     mesh->get_rMd_History()->setParentSpace(input->getUid());
     ssc::dataManager()->loadData(mesh);
     ssc::dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
