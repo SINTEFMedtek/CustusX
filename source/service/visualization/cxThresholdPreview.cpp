@@ -31,16 +31,21 @@ WidgetObscuredListener::WidgetObscuredListener(QWidget *listenedTo) : mWidget(li
     connect(mRemoveTimer, SIGNAL(timeout()), this, SLOT(timeoutSlot()));
     mRemoveTimer->start(500);
 
-    mObscured = mWidget->visibleRegion().isEmpty();
+    mObscuredAtLastCheck = this->isObscured();
+}
+
+bool WidgetObscuredListener::isObscured() const
+{
+    return mWidget->visibleRegion().isEmpty();
 }
 
 void WidgetObscuredListener::timeoutSlot()
 {
-    if (mObscured == mWidget->visibleRegion().isEmpty())
+    if (mObscuredAtLastCheck == this->isObscured())
         return;
 
-    mObscured = mWidget->visibleRegion().isEmpty();
-    emit obscured(mObscured);
+    mObscuredAtLastCheck = this->isObscured();
+    emit obscured(mObscuredAtLastCheck);
 }
 
 ///--------------------------------------------------------

@@ -21,6 +21,48 @@
 namespace cx
 {
 
+typedef boost::shared_ptr<class FusedInputOutputSelectDataStringDataAdapter> FusedInputOutputSelectDataStringDataAdapterPtr;
+
+/** Data-DataAdapter that fuses two Data-DataAdapters.
+  *
+  * There are two arguments: input and output.
+  * The output is wrapped by this adapter,
+  * changes in the input will set the output.
+  *
+  *
+  */
+class FusedInputOutputSelectDataStringDataAdapter : public SelectDataStringDataAdapterBase
+{
+  Q_OBJECT
+public:
+    virtual ~FusedInputOutputSelectDataStringDataAdapter() {}
+    static FusedInputOutputSelectDataStringDataAdapterPtr create(SelectDataStringDataAdapterBasePtr base, SelectDataStringDataAdapterBasePtr input);
+
+public: // basic methods
+    virtual QString getValueName() const;
+    virtual bool setValue(const QString& value);
+    virtual QString getValue() const;
+
+public: // optional methods
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+  virtual QString getHelp() const;
+
+public: // interface extension
+  virtual ssc::DataPtr getData() const;
+  virtual void setValueName(const QString name);
+  virtual void setHelp(QString text);
+
+protected slots:
+    void inputDataChangedSlot();
+protected:
+    FusedInputOutputSelectDataStringDataAdapter(SelectDataStringDataAdapterBasePtr base, SelectDataStringDataAdapterBasePtr input);
+    SelectDataStringDataAdapterBasePtr mInput;
+    SelectDataStringDataAdapterBasePtr mBase;
+};
+
+
+
 /** Sequential execution of Filters.
  *
  * \ingroup cxPluginAlgorithms
