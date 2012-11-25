@@ -88,6 +88,8 @@ vtkPolyDataPtr Contour::calculate()
   else
     convert->SetInput(mInput->getBaseVtkImageData());
 
+  std::cout << "convert old  in: " << convert->GetInput() << " t=" << mThreshold << std::endl;
+
   convert->SetValue(0, mThreshold);
   convert->Update();
 
