@@ -81,10 +81,8 @@ bool DoubleDataAdapterXml::setValue(double val)
 
 	mValue = val;
 	mStore.writeValue(QString::number(val));
-	emit
-	valueWasSet();
-	emit
-	changed();
+    emit valueWasSet();
+    emit changed();
 	return true;
 }
 
