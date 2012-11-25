@@ -63,8 +63,8 @@ signals:
     void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-    QString color2string(QColor color);
-    QColor string2color(QString input);
+    QString color2string(QColor color) const;
+    QColor string2color(QString input) const;
 
     QString mName;
     QString mUid;

@@ -32,13 +32,7 @@ ColorSelectWidget::ColorSelectWidget(QWidget* parent, ssc::ColorDataAdapterPtr d
     topLayout->addWidget(mLabel);
 
     mColorButton = new cx::ColorSelectButton("");
-//    mColorButton->setColor(QColor("green"));
-//    mColorButton->setToolTip("Select color to use when generating surfaces and centerlines.");
     connect(mColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(valueChanged(QColor)));
-
-//    mCheckBox = new QCheckBox(this);
-//    topLayout->addWidget(mCheckBox);
-//    connect(mCheckBox, SIGNAL(toggled(bool)), this, SLOT(valueChanged(bool)));
 
     if (gridLayout) // add to input gridlayout
     {

@@ -48,7 +48,6 @@ private slots:
 private:
     QLabel* mLabel;
     cx::ColorSelectButton* mColorButton;
-//    QCheck\Box* mCheckBox;
     ColorDataAdapterPtr mData;
 };
 

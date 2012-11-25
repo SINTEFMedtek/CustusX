@@ -39,12 +39,12 @@ ColorDataAdapterXmlPtr ColorDataAdapterXml::initialize(const QString& uid, QStri
     return retval;
 }
 
-QString ColorDataAdapterXml::color2string(QColor color)
+QString ColorDataAdapterXml::color2string(QColor color) const
 {
     return qstring_cast(Eigen::Vector4f(color.redF(), color.greenF(), color.blueF(), color.alphaF()));
 }
 
-QColor ColorDataAdapterXml::string2color(QString input)
+QColor ColorDataAdapterXml::string2color(QString input) const
 {
     QStringList c = input.split(" ");
     if (c.size()<4)
