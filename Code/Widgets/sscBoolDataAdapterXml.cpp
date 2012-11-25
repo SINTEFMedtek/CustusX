@@ -61,6 +61,12 @@ QString BoolDataAdapterXml::getHelp() const
 	return mHelp;
 }
 
+void BoolDataAdapterXml::setHelp(QString val)
+{
+    mHelp = val;
+    emit changed();
+}
+
 bool BoolDataAdapterXml::getValue() const
 {
 	return mValue;

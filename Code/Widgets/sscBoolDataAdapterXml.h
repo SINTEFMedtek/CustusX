@@ -66,6 +66,7 @@ public:
 	// optional methods
 	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
 	QString getUid() const;
+    void setHelp(QString val);
 
 signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
