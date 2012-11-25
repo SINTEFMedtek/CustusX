@@ -25,7 +25,9 @@
 #include "cxDataInterface.h"
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
+#include "cxContourFilter.h"
 #include "sscTypeConversions.h"
+#include "cxDataSelectWidget.h"
 
 namespace cx
 {
@@ -75,7 +77,11 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
 
     for (unsigned i = 0; i < options.size(); ++i)
     {
-        ssc::createDataWidget(widget, options[i], layout, i);
+        SelectDataStringDataAdapterBasePtr dataSelectDataAdapter = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(options[i]);
+        if (dataSelectDataAdapter)
+            layout->addWidget(new DataSelectWidget(this, dataSelectDataAdapter));
+        else
+            ssc::createDataWidget(widget, options[i], layout, i);
     }
 
     mStackedLayout->setCurrentWidget(widget);
@@ -207,6 +213,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     mFilters->append(FilterPtr(new DummyFilter()));
     mFilters->append(FilterPtr(new BinaryThresholdImageFilter()));
     mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
+    mFilters->append(FilterPtr(new ContourFilter()));
 
     QStringList availableFilters;
     std::map<QString,QString> names;
