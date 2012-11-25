@@ -20,6 +20,7 @@
 #include "sscLabeledComboBoxWidget.h"
 #include <iostream>
 #include "sscTypeConversions.h"
+#include "sscHelperWidgets.h"
 
 namespace ssc
 {
@@ -33,26 +34,24 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, ssc::StringDataAda
 	mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
-	QHBoxLayout* topLayout = new QHBoxLayout;
-	topLayout->setMargin(0);
-	this->setLayout(topLayout);
-
 	mLabel = new QLabel(this);
 	mLabel->setText(mData->getValueName());
-	topLayout->addWidget(mLabel);
 
 	mCombo = new QComboBox(this);
-	topLayout->addWidget(mCombo);
 	connect(mCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboIndexChanged(int)));
 
 	if (gridLayout) // add to input gridlayout
 	{
-		gridLayout->addWidget(mLabel, row, 0);
+        gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, this), row, 0);
 		gridLayout->addWidget(mCombo, row, 1);
 	}
 	else // add directly to this
 	{
-		topLayout->addWidget(mLabel);
+        QHBoxLayout* topLayout = new QHBoxLayout;
+        topLayout->setMargin(0);
+        this->setLayout(topLayout);
+
+        topLayout->addWidget(mLabel);
 		topLayout->addWidget(mCombo, 1);
 	}
 

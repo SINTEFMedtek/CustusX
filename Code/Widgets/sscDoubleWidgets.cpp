@@ -29,6 +29,7 @@
 #include "sscVector3D.h"
 #include "sscTypeConversions.h"
 #include "sscMousePadWidget.h"
+#include "sscHelperWidgets.h"
 
 namespace ssc
 {
@@ -101,22 +102,17 @@ void ScalarInteractionWidget::addToOwnLayout()
 		topLayout->addWidget(mInfiniteSlider, 1);
 }
 
+
 /**Layout all widgets into the input grid, including this.
  *
  */
 void ScalarInteractionWidget::addToGridLayout(QGridLayout* gridLayout, int row)
 {
-	//Since SliderGroupWidget (this) is a widget we need to add this.
-	//If not we will get an invisible widget on top of all the other widgets of the parent
-	QHBoxLayout* hackLayout = new QHBoxLayout;
-	hackLayout->setMargin(0);
-	hackLayout->setSpacing(0);
-
 	int col = 0;
-	if (mLabel)
-		hackLayout->addWidget(mLabel);
-	hackLayout->addWidget(this);
-	gridLayout->addLayout(hackLayout, row, col++);
+
+    //Since SliderGroupWidget (this) is a widget we need to add this.
+    //If not we will get an invisible widget on top of all the other widgets of the parent
+    gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, this), row, col++);
 
 	if (mEdit)
 		gridLayout->addWidget(mEdit, row, col++);

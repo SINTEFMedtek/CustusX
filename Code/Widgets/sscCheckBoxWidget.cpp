@@ -26,6 +26,7 @@
 
 #include <sscCheckBoxWidget.h>
 #include <QGridLayout>
+#include "sscHelperWidgets.h"
 
 namespace ssc
 {
@@ -36,25 +37,23 @@ CheckBoxWidget::CheckBoxWidget(QWidget* parent, ssc::BoolDataAdapterPtr dataInte
 	mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
-	QHBoxLayout* topLayout = new QHBoxLayout;
-	topLayout->setMargin(0);
-	this->setLayout(topLayout);
-
     mLabel = new QLabel(this);
     mLabel->setText(dataInterface->getValueName());
-    topLayout->addWidget(mLabel);
 
 	mCheckBox = new QCheckBox(this);
-	topLayout->addWidget(mCheckBox);
 	connect(mCheckBox, SIGNAL(toggled(bool)), this, SLOT(valueChanged(bool)));
 
     if (gridLayout) // add to input gridlayout
     {
-        gridLayout->addWidget(mLabel, row, 0);
+        gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, this), row, 0);
         gridLayout->addWidget(mCheckBox, row, 1);
     }
     else // add directly to this
     {
+        QHBoxLayout* topLayout = new QHBoxLayout;
+        topLayout->setMargin(0);
+        this->setLayout(topLayout);
+
         topLayout->addWidget(mLabel);
         topLayout->addWidget(mCheckBox, 1);
     }

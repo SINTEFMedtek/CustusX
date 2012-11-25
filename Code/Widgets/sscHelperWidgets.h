@@ -23,6 +23,7 @@
 #include <QWidget>
 #include "sscDataAdapter.h"
 class QGridLayout;
+class QHBoxLayout;
 
 namespace ssc
 {
@@ -48,6 +49,24 @@ public:
 		this->setWindowFlags(flags);
 	}
 };
+
+/** Create a layout with zero margin/spacing
+  * containing the input widgets.
+  *
+  * This is used in a hack for the DataAdapter
+  * widgets that add to a QGridLayout.
+  *
+  * The DataAdapter Widget itself, which is invisible
+  * if a gridlayout is used, is added to the
+  * gridlayout this way. See ScalarInteractionWidget for
+  * an example.
+  * Failure to do this would cause a dangling widget.
+  *
+  *   \author christiana
+  *   \date Nov 25, 2012
+  *   \ingroup sscWidget
+  */
+QHBoxLayout* mergeWidgetsIntoHBoxLayout(QWidget* first, QWidget* second);
 
 /**\brief Create a widget capable of displaying the input data.
  *
