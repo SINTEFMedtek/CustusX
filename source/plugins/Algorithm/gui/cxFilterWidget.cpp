@@ -91,8 +91,8 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
         }
         else
         {
-            layout->addWidget(ssc::createDataWidget(widget, options[i]), i, 0);
-//            ssc::createDataWidget(widget, options[i], layout, i); // DO NOT USE: a hidden widget inside here has no parent, causes hiding upon delete.
+//            layout->addWidget(ssc::createDataWidget(widget, options[i]), i, 0);
+            ssc::createDataWidget(widget, options[i], layout, i);
         }
     }
 
