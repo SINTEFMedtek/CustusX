@@ -42,6 +42,7 @@ class OptimizedUpdateWidget: public QWidget
 Q_OBJECT
 public:
     OptimizedUpdateWidget(QWidget* parent = NULL);
+    virtual ~OptimizedUpdateWidget() {}
 
 public slots:
     /**
