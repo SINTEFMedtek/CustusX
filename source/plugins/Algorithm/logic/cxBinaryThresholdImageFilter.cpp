@@ -160,7 +160,7 @@ void BinaryThresholdImageFilter::createOptions(QDomElement root)
     mLowerThresholdOption = this->getLowerThresholdOption(root);
     connect(mLowerThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
     mOptionsAdapters.push_back(mLowerThresholdOption);
-std:cout << "BinaryThresholdImageFilter::createOptions(QDomElement root) "  << mLowerThresholdOption.get() << std::endl;
+//std:cout << "BinaryThresholdImageFilter::createOptions(QDomElement root) "  << mLowerThresholdOption.get() << std::endl;
 }
 
 void BinaryThresholdImageFilter::createInputTypes()
