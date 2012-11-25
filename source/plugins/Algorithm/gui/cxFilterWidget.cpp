@@ -53,19 +53,26 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
     if (mStackedLayout->currentWidget() && (uid == mStackedLayout->currentWidget()->objectName()))
         return;
 
-    // set current to uid, if already created
-    for (int i=0; i<mStackedLayout->count(); ++i)
-    {
-        if (uid==mStackedLayout->widget(i)->objectName())
-        {
-//            mStackedLayout->currentWidget()->hide();
-            mStackedLayout->setCurrentIndex(i);
-//            mStackedLayout->currentWidget()->show();
-            return;
-        }
-    }
+    QLayoutItem *child;
+     while ((child = mStackedLayout->takeAt(0)) != 0)
+     {
+         // delete both the layoutitem AND the widget. Not auto done because layoutitem is no QObject.
+         QWidget* widget = child->widget();
+         delete child;
+         delete widget;
+     }
 
-    this->updateGeometry(); // dont work - how to reduce size of widget when changing??
+//    // set current to uid, if already created
+//    for (int i=0; i<mStackedLayout->count(); ++i)
+//    {
+//        if (uid==mStackedLayout->widget(i)->objectName())
+//        {
+//            mStackedLayout->setCurrentIndex(i);
+//            return;
+//        }
+//    }
+
+//    this->updateGeometry(); // dont work - how to reduce size of widget when changing??
 
     // No existing found,
     // create a new stack element for this uid:
@@ -73,15 +80,20 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
     widget->setObjectName(uid);
     mStackedLayout->addWidget(widget);
     QGridLayout* layout = new QGridLayout(widget);
-//    layout->setMargin(0);
+    layout->setMargin(layout->margin()/2);
 
     for (unsigned i = 0; i < options.size(); ++i)
     {
         SelectDataStringDataAdapterBasePtr dataSelectDataAdapter = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(options[i]);
         if (dataSelectDataAdapter)
-            layout->addWidget(new DataSelectWidget(this, dataSelectDataAdapter));
+        {
+            layout->addWidget(new DataSelectWidget(widget, dataSelectDataAdapter));
+        }
         else
-            ssc::createDataWidget(widget, options[i], layout, i);
+        {
+            layout->addWidget(ssc::createDataWidget(widget, options[i]), i, 0);
+//            ssc::createDataWidget(widget, options[i], layout, i); // DO NOT USE: a hidden widget inside here has no parent, causes hiding upon delete.
+        }
     }
 
     mStackedLayout->setCurrentWidget(widget);
@@ -181,15 +193,17 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
     if (mFrame)
         mFrame->setTitle(mCurrentFilter->getName());
 
+//    std::cout << "options : " << mOptions.getElement().ownerDocument().toString() << std::endl;
+
+
     if (mCurrentFilter)
     {
         mCurrentFilter->setActive(!mObscuredListener->isObscured());
 
         std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
-        std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
-
         mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes());
 
+        std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
         mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes());
 
         ssc::XmlOptionFile node = mOptions.descend(mCurrentFilter->getUid());
@@ -223,7 +237,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
         names[mFilters->get(i)->getUid()] = mFilters->get(i)->getName();
     }
 
-    mFilterSelector = ssc::StringDataAdapterXml::initialize("filter",
+    mFilterSelector = ssc::StringDataAdapterXml::initialize("filterSelector",
                                                             "Filter",
                                                             "Select which filter to use.",
                                                             availableFilters[0],
@@ -238,11 +252,18 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     filterLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFilterSelector));
     topLayout->addLayout(filterLayout);
 
-    this->createAction(this,
+    this->setStyleSheet("CXSmallToolButton#RunFilterButton { width : 36px; height : 12px; }");
+
+    QAction* runAction = this->createAction(this,
                     QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
                     "Run Filter", "",
                     SLOT(runFilterSlot()),
-                    filterLayout);
+                    NULL);
+
+    CXSmallToolButton* button = new CXSmallToolButton();
+    button->setObjectName("RunFilterButton");
+    button->setDefaultAction(runAction);
+    filterLayout->addWidget(button);
 
     mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
     topLayout->addWidget(mTimedAlgorithmProgressBar);
@@ -290,9 +311,8 @@ void AllFiltersWidget::filterChangedSlot()
         }
     }
 
-    mFilterSelector->setHelp(this->defaultWhatsThis());
-
     mSetupWidget->setFilter(mCurrentFilter);
+    mFilterSelector->setHelp(this->defaultWhatsThis());
 }
 
 

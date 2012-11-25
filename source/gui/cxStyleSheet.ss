@@ -10,13 +10,10 @@ CXFrame
 	border-radius: 3px;
 }
 
-cx--CXSmallToolButton
+CXSmallToolButton
 {
-/**
-8 pix work ok with Filter lines.
-*/
-	width : 12px;
-	height : 12px;
+	width : 10px;
+	height : 10px;
 }
 
 /** This is an attempt to move the QRadioButton vertically in line with the rest of the widgets - no good so far.

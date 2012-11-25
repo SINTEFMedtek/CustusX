@@ -45,6 +45,8 @@ PipelineWidgetFilterLine::PipelineWidgetFilterLine(QWidget* parent, FilterPtr fi
 //    if (mFilter->getName()=="Segmentation")
 //    {
 
+    this->setStyleSheet("CXSmallToolButton#RunFilterButton { width : 36px; height : 12px; }");
+
     mAction = this->createAction(this,
                     QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
                     "Run Filter", "",
@@ -53,6 +55,7 @@ PipelineWidgetFilterLine::PipelineWidgetFilterLine(QWidget* parent, FilterPtr fi
     mAction->setData(mFilter->getUid());
 
     CXSmallToolButton* button = new CXSmallToolButton();
+    button->setObjectName("RunFilterButton");
     button->setDefaultAction(mAction);
     layout->addWidget(button);
 

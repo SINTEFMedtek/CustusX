@@ -108,6 +108,8 @@ ssc::ColorDataAdapterXmlPtr ContourFilter::getColorOption(QDomElement root)
 
 void ContourFilter::createOptions(QDomElement root)
 {
+//    std::cout << "ContourFilter::createOptions : " << root.ownerDocument().toString() << std::endl;
+
     mReduceResolutionOption = this->getReduceResolutionOption(root);
     mOptionsAdapters.push_back(mReduceResolutionOption);
 
@@ -191,9 +193,7 @@ bool ContourFilter::execute()
     if (!input)
         return false;
 
-    QDomDocument doc("out");
-    doc.appendChild(mCopiedOptions);
-    std::cout << "options : " << doc.toString() << std::endl;
+//    std::cout << "ContourFilter::execute : " << mCopiedOptions.ownerDocument().toString() << std::endl;
 
     ssc::BoolDataAdapterXmlPtr reduceResolutionOption = this->getReduceResolutionOption(mCopiedOptions);
     ssc::BoolDataAdapterXmlPtr smoothingOption = this->getSmoothingOption(mCopiedOptions);
