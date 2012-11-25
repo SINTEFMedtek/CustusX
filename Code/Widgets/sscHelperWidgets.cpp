@@ -65,4 +65,19 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
     return NULL;
 }
 
+
+QHBoxLayout* mergeWidgetsIntoHBoxLayout(QWidget* first, QWidget* second)
+{
+    QHBoxLayout* hackLayout = new QHBoxLayout;
+    hackLayout->setMargin(0);
+    hackLayout->setSpacing(0);
+
+    if (first)
+        hackLayout->addWidget(first);
+    if (second)
+        hackLayout->addWidget(second);
+
+    return hackLayout;
+}
+
 }

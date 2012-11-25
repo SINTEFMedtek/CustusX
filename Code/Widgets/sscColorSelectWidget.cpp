@@ -13,6 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "sscColorSelectWidget.h"
+#include "sscHelperWidgets.h"
 
 namespace ssc
 {
@@ -23,24 +24,23 @@ ColorSelectWidget::ColorSelectWidget(QWidget* parent, ssc::ColorDataAdapterPtr d
     mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
-    QHBoxLayout* topLayout = new QHBoxLayout;
-    topLayout->setMargin(0);
-    this->setLayout(topLayout);
-
     mLabel = new QLabel(this);
     mLabel->setText(dataInterface->getValueName());
-    topLayout->addWidget(mLabel);
 
     mColorButton = new cx::ColorSelectButton("");
     connect(mColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(valueChanged(QColor)));
 
     if (gridLayout) // add to input gridlayout
     {
-        gridLayout->addWidget(mLabel, row, 0);
+        gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, this), row, 0);
         gridLayout->addWidget(mColorButton, row, 1);
     }
     else // add directly to this
     {
+        QHBoxLayout* topLayout = new QHBoxLayout;
+        topLayout->setMargin(0);
+        this->setLayout(topLayout);
+
         topLayout->addWidget(mLabel);
         topLayout->addWidget(mColorButton, 1);
     }
