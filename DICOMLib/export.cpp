@@ -602,7 +602,14 @@ static int writeCommonInfo( DcmDataset *dataset, const struct study_t *study, co
 
 	// C.12.1 SOP Common
 	dataset->putAndInsertString( DCM_SOPInstanceUID, dcmGenerateUniqueIdentifier( uid, INSTANCE_UID_ROOT ) );
-	dataset->putAndInsertString( DCM_SpecificCharacterSet, "ISO_IR 100");
+	if ( strcmp(study->SpecificCharacterSet,"ISO_IR 192") == 0 )
+	{
+		dataset->putAndInsertString( DCM_SpecificCharacterSet, "ISO_IR 192");
+	}
+	else if ( strcmp(study->SpecificCharacterSet,"ISO_IR 100") == 0 )
+	{
+		dataset->putAndInsertString( DCM_SpecificCharacterSet, "ISO_IR 100");
+	}
 
 	return 0;
 }
