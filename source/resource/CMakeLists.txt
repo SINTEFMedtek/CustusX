@@ -22,7 +22,7 @@ SET( CX_QT_MOC_HEADER_FILES
 )
 
 SET ( cxResource_SOURCE
-    algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
+	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
     algorithms/ItkVtkGlue/itkImageToVTKImageFilter.txx
     algorithms/ItkVtkGlue/itkVTKImageToImageFilter.h
     algorithms/ItkVtkGlue/itkVTKImageToImageFilter.txx

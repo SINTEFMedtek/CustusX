@@ -22,7 +22,10 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   mDefaultColor("red")//,
 //  mStatusLabel(new QLabel(""))
 {
-	mSegmentationAlgorithm.reset(new BinaryThresholdImageFilter);
+    mObscuredListener.reset(new WidgetObscuredListener(this));
+    connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+
+    mSegmentationAlgorithm.reset(new BinaryThresholdImageFilterOld);
 	mContourAlgorithm.reset(new Contour);
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
@@ -37,8 +40,8 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
-  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
-  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
+  connect(mSelectedImage.get(), SIGNAL(dataChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
+  connect(mSelectedImage.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
 
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0, 1, 2);
@@ -69,6 +72,12 @@ BinaryThresholdImageFilterWidget::~BinaryThresholdImageFilterWidget()
 {
 }
 
+void BinaryThresholdImageFilterWidget::obscuredSlot(bool obscured)
+{
+    if (obscured)
+        RepManager::getInstance()->getThresholdPreview()->removePreview();
+}
+
 void BinaryThresholdImageFilterWidget::setDefaultColor(QColor color)
 {
   mDefaultColor = color;
@@ -90,12 +99,13 @@ QString BinaryThresholdImageFilterWidget::defaultWhatsThis() const
 
 void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
 {
+    std::cout << "BinaryThresholdImageFilterWidget::setImageInputSlot(QString value) " << value << std::endl;
   mSelectedImage->setValue(value);
 }
 
 void BinaryThresholdImageFilterWidget::preprocessSegmentation()
 {
-	RepManager::getInstance()->getThresholdPreview()->removePreview(this);
+    RepManager::getInstance()->getThresholdPreview()->removePreview();
 
   QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
@@ -172,7 +182,8 @@ void BinaryThresholdImageFilterWidget::toogleBinarySlot(bool on)
 
 void BinaryThresholdImageFilterWidget::thresholdSlot()
 {
-	RepManager::getInstance()->getThresholdPreview()->setPreview(this, mSelectedImage->getImage(),
+    std::cout << "BinaryThresholdImageFilterWidget::thresholdSlot()" << std::endl;
+    RepManager::getInstance()->getThresholdPreview()->setPreview(mSelectedImage->getImage(),
 			mSegmentationThresholdAdapter->getValue());
 }
 
@@ -189,6 +200,7 @@ void BinaryThresholdImageFilterWidget::toogleSmoothingSlot(bool on)
 
 void BinaryThresholdImageFilterWidget::imageChangedSlot(QString uid)
 {
+    std::cout << "BinaryThresholdImageFilterWidget::imageChangedSlot(QString uid) " << uid << std::endl;
 //	RepManager::getInstance()->getThresholdPreview()->removePreview(this);
 
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
@@ -255,7 +267,7 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
   layout->addWidget(mSmoothingSigmaWidget.get());
 
   this->toogleBinarySlot(mBinary);
-  this->thresholdSlot();
+//  this->\thresholdSlot();
   this->toogleSurfaceSlot(mSurface);
   this->toogleSmoothingSlot(mUseSmothing);
 

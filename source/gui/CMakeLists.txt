@@ -40,6 +40,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/cxTransferFunctionColorWidget.h
     dataWidgets/sscDICOMWidget.h
     dataWidgets/cxEraserWidget.h
+	dataWidgets/cxDataSelectWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
     infoWidgets/cxBrowserWidget.h
@@ -72,7 +73,6 @@ SET(cxGui_MOC_HDRS
     utilities/cxBaseWidget.h
     utilities/cxTransform3DWidget.h
     utilities/cxSelectionGroupBox.h
-    utilities/cxColorSelectButton.h
     utilities/cxVector3DWidget.h
     utilities/cxBoundingBoxWidget.h
     utilities/cxFileWatcherWidget.h
@@ -185,7 +185,9 @@ SET(cxGui_SRCS
     dataWidgets/sscDICOMWidget.cpp
     dataWidgets/cxEraserWidget.h
     dataWidgets/cxEraserWidget.cpp
-    #----------------------
+	dataWidgets/cxDataSelectWidget.h
+	dataWidgets/cxDataSelectWidget.cpp
+	#----------------------
     infoWidgets/cxBrowserWidget.h
     infoWidgets/cxBrowserWidget.cpp
     infoWidgets/cxFrameTreeWidget.cpp
@@ -246,8 +248,6 @@ SET(cxGui_SRCS
     utilities/snwSyntaxHighlighter.cpp
     utilities/cxSelectionGroupBox.h
     utilities/cxSelectionGroupBox.cpp
-    utilities/cxColorSelectButton.h
-    utilities/cxColorSelectButton.cpp
     utilities/cxVector3DWidget.h
     utilities/cxVector3DWidget.cpp    
     utilities/cxBoundingBoxWidget.h
