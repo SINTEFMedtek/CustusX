@@ -2,7 +2,6 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QFrame>
 #include "cxBinaryThresholdImageFilterWidget.h"
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
@@ -26,11 +25,11 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(Regis
 
   mResampleOutput = SelectImageStringDataAdapter::New();
   mResampleOutput->setValueName("Output: ");
-  connect(mResampleOutput.get(), SIGNAL(imageChanged(QString)), mSegmentationWidget, SLOT(setImageInputSlot(QString)));
+  connect(mResampleOutput.get(), SIGNAL(dataChanged(QString)), mSegmentationWidget, SLOT(setImageInputSlot(QString)));
 
   mSegmentationOutput = SelectImageStringDataAdapter::New();
   mSegmentationOutput->setValueName("Output: ");
-  connect(mSegmentationOutput.get(), SIGNAL(imageChanged(QString)), mCenterlineWidget, SLOT(setImageInputSlot(QString)));
+  connect(mSegmentationOutput.get(), SIGNAL(dataChanged(QString)), mCenterlineWidget, SLOT(setImageInputSlot(QString)));
 //  connect(mSegmentationOutput.get(), SIGNAL(imageChanged(QString)), mSurfaceWidget, SLOT(setImageInputSlot(QString)));
 
 //  mSurfaceOutput = SelectMeshStringDataAdapter::New();

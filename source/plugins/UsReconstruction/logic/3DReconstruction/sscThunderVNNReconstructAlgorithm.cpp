@@ -79,7 +79,7 @@ StringDataAdapterXmlPtr ThunderVNNReconstructAlgorithm::getProcessorOption(QDomE
 DoubleDataAdapterXmlPtr ThunderVNNReconstructAlgorithm::getDistanceOption(QDomElement root)
 {
 	return  DoubleDataAdapterXml::initialize("Distance (mm)", "",
-			"Max distance from frame to voxel when filling output volume. mm.", 1, ssc::DoubleRange(0.1, 10, 0.01), 0,
+            "Max distance from frame to voxel when filling output volume. mm.", 1, ssc::DoubleRange(0.1, 10, 0.1), 1,
 			root);
 }
 
