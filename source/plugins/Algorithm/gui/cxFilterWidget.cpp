@@ -62,18 +62,6 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
          delete widget;
      }
 
-//    // set current to uid, if already created
-//    for (int i=0; i<mStackedLayout->count(); ++i)
-//    {
-//        if (uid==mStackedLayout->widget(i)->objectName())
-//        {
-//            mStackedLayout->setCurrentIndex(i);
-//            return;
-//        }
-//    }
-
-//    this->updateGeometry(); // dont work - how to reduce size of widget when changing??
-
     // No existing found,
     // create a new stack element for this uid:
     QWidget* widget = new QWidget(this);
@@ -91,7 +79,6 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
         }
         else
         {
-//            layout->addWidget(ssc::createDataWidget(widget, options[i]), i, 0);
             ssc::createDataWidget(widget, options[i], layout, i);
         }
     }
