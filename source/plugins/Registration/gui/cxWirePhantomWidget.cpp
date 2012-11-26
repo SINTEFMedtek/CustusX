@@ -65,11 +65,11 @@ WirePhantomWidget::WirePhantomWidget(RegistrationManagerPtr regManager, QWidget*
 	mUSImageInput = SelectImageStringDataAdapter::New();
 	mUSImageInput->setValueName("US Image: ");
 	mUSImageInput->setHelp("Select an US volume acquired from the wire phantom.");
-	connect(mUSImageInput.get(), SIGNAL(imageChanged(QString)), mSegmentationWidget, SLOT(setImageInputSlot(QString)));
+    connect(mUSImageInput.get(), SIGNAL(dataChanged(QString)), mSegmentationWidget, SLOT(setImageInputSlot(QString)));
 
 	mSegmentationOutput = SelectImageStringDataAdapter::New();
 	mSegmentationOutput->setValueName("Output: ");
-	connect(mSegmentationOutput.get(), SIGNAL(imageChanged(QString)), mCenterlineWidget,
+    connect(mSegmentationOutput.get(), SIGNAL(dataChanged(QString)), mCenterlineWidget,
 			SLOT(setImageInputSlot(QString)));
 
 	mCenterlineOutput = SelectDataStringDataAdapter::New();
@@ -151,8 +151,9 @@ void WirePhantomWidget::activeImageChangedSlot(const QString&)
 	if (!mUSImageInput->getValue().isEmpty())
 		return;
 
-	if (image && image->getModality().contains("US"))
-		mUSImageInput->setValue(image->getUid());
+    // removed: led to setting of preview...
+//	if (image && image->getModality().contains("US"))
+//		mUSImageInput->setValue(image->getUid());
 }
 
 

@@ -40,6 +40,7 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--streamport:		GE scanner streaming port, default = 6543";
 	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
 	retval << "--buffersize:		Size of GEStreamer buffer, default = 100";
+	retval << "--imagesize2D:	Returned image size in pixels, default = 250000 (500*500)";
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--testmode:		GEStreamer test mode, default = 0";
 	return retval;
@@ -68,9 +69,8 @@ void ImageSenderGE::initialize(StringMap arguments)
 	//is dumping enabled
 	bool dumpHdfToDisk = false;
 
-	//size of the scan converted texture
-	int volumeDimensions[3] = {300, 300, 1}; //[voxels/pixels]
-	//double voxelSize[3] = {0.3, 0.3, 1.0}; //[mm]
+	//size of the scan converted 2D image in pixels
+//	long imageSize2D = 500*500;
 
 	//interpolation type
 	data_streaming::InterpolationType interpType = data_streaming::Bilinear;
@@ -88,11 +88,14 @@ void ImageSenderGE::initialize(StringMap arguments)
         mArguments["openclpath"] = "";
     if (!mArguments.count("testmode"))
         mArguments["testmode"] = "0";
+    if (!mArguments.count("imagesize2D"))
+        mArguments["imagesize2D"] = "250000";
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
+   	long imageSize2D = convertStringWithDefault(mArguments["imagesize2D"], -1);
    	std::string openclpath = mArguments["openclpath"].toStdString();
 
-	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, volumeDimensions, interpType, bufferSize, openclpath);
+	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize2D, interpType, bufferSize, openclpath);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
