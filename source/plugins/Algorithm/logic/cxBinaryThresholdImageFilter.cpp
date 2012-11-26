@@ -150,9 +150,11 @@ QString BinaryThresholdImageFilter::getHelp() const
 
 ssc::DoubleDataAdapterXmlPtr BinaryThresholdImageFilter::getLowerThresholdOption(QDomElement root)
 {
-    return ssc::DoubleDataAdapterXml::initialize("Threshold", "",
+    ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
             "Select lower threshold for the segmentation", 1, ssc::DoubleRange(0, 100, 1), 0,
             root);
+    retval->setAddSlider(true);
+    return retval;
 }
 
 void BinaryThresholdImageFilter::createOptions(QDomElement root)
@@ -160,7 +162,6 @@ void BinaryThresholdImageFilter::createOptions(QDomElement root)
     mLowerThresholdOption = this->getLowerThresholdOption(root);
     connect(mLowerThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
     mOptionsAdapters.push_back(mLowerThresholdOption);
-//std:cout << "BinaryThresholdImageFilter::createOptions(QDomElement root) "  << mLowerThresholdOption.get() << std::endl;
 }
 
 void BinaryThresholdImageFilter::createInputTypes()
@@ -198,8 +199,13 @@ void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
   if(!image)
     return;
   mLowerThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
-  int initValue = image->getMin() + ((image->getMax() - image->getMin()) / 10);
-  mLowerThresholdOption->setValue(initValue);
+  int oldValue = mLowerThresholdOption->getValue();
+  // avoid reset if old value is still within range
+  if ((image->getMin() > oldValue )||( oldValue > image->getMax()))
+  {
+      int initValue = + image->getMin() + image->getRange()/10;
+      mLowerThresholdOption->setValue(initValue);
+  }
   RepManager::getInstance()->getThresholdPreview()->removePreview();
 
 //  QString imageName = image->getName();

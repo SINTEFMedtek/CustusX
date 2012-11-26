@@ -67,27 +67,29 @@ QString ContourFilter::getHelp() const
 
 ssc::BoolDataAdapterXmlPtr ContourFilter::getReduceResolutionOption(QDomElement root)
 {
-    return ssc::BoolDataAdapterXml::initialize("Reduce input volumes resolution", "",
-        "Reduce input volumes resolution", false, root);
+    return ssc::BoolDataAdapterXml::initialize("Reduce input", "",
+        "Reduce input volumes resolution by a factor of 2 in all directions.", false, root);
 }
 
 ssc::BoolDataAdapterXmlPtr ContourFilter::getSmoothingOption(QDomElement root)
 {
     return ssc::BoolDataAdapterXml::initialize("Smoothing", "",
-        "Smoothing", true, root);
+        "Smooth the output contour", true, root);
 }
 
 ssc::BoolDataAdapterXmlPtr ContourFilter::getPreserveTopologyOption(QDomElement root)
 {
     return ssc::BoolDataAdapterXml::initialize("Preserve mesh topology", "",
-        "Preserve mesh topology", true, root);
+        "Preserve mesh topology during reduction", true, root);
 }
 
 ssc::DoubleDataAdapterXmlPtr ContourFilter::getSurfaceThresholdOption(QDomElement root)
 {
-    return  ssc::DoubleDataAdapterXml::initialize("Threshold", "",
+    ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
         "Values from this threshold and above will be included",
         100.0, ssc::DoubleRange(-1000, 1000, 1), 0, root);
+    retval->setAddSlider(true);
+    return retval;
 }
 
 ssc::DoubleDataAdapterXmlPtr ContourFilter::getDecimationOption(QDomElement root)
@@ -108,19 +110,17 @@ ssc::ColorDataAdapterXmlPtr ContourFilter::getColorOption(QDomElement root)
 
 void ContourFilter::createOptions(QDomElement root)
 {
-//    std::cout << "ContourFilter::createOptions : " << root.ownerDocument().toString() << std::endl;
-
     mReduceResolutionOption = this->getReduceResolutionOption(root);
     mOptionsAdapters.push_back(mReduceResolutionOption);
-
-    mOptionsAdapters.push_back(this->getSmoothingOption(root));
-    mOptionsAdapters.push_back(this->getPreserveTopologyOption(root));
 
     mSurfaceThresholdOption = this->getSurfaceThresholdOption(root);
     connect(mSurfaceThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
     mOptionsAdapters.push_back(mSurfaceThresholdOption);
 
+    mOptionsAdapters.push_back(this->getSmoothingOption(root));
     mOptionsAdapters.push_back(this->getDecimationOption(root));
+    mOptionsAdapters.push_back(this->getPreserveTopologyOption(root));
+
     mOptionsAdapters.push_back(this->getColorOption(root));
 }
 
@@ -161,6 +161,13 @@ void ContourFilter::imageChangedSlot(QString uid)
 
   mSurfaceThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
   mSurfaceThresholdOption->setValue(image->getRange() / 2 + image->getMin());
+  int oldValue = mSurfaceThresholdOption->getValue();
+  // avoid reset if old value is still within range
+  if ((image->getMin() > oldValue )||( oldValue > image->getMax()))
+  {
+      int initValue = + image->getMin() + image->getRange()/2 ;
+      mSurfaceThresholdOption->setValue(initValue);
+  }
   RepManager::getInstance()->getThresholdPreview()->removePreview();
 
   int extent[6];
