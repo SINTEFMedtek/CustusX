@@ -108,25 +108,26 @@ void ScalarInteractionWidget::addToOwnLayout()
  */
 void ScalarInteractionWidget::addToGridLayout(QGridLayout* gridLayout, int row)
 {
-	int col = 0;
-
     //Since SliderGroupWidget (this) is a widget we need to add this.
     //If not we will get an invisible widget on top of all the other widgets of the parent
-    gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, this), row, col++);
+    gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, this), row, 0);
 
-	if (mEdit)
-		gridLayout->addWidget(mEdit, row, col++);
+    QHBoxLayout* controlsLayout = new QHBoxLayout;
+    controlsLayout->setSpacing(0);
+    controlsLayout->setMargin(0);
+    gridLayout->addLayout(controlsLayout, row, 1);
+
+    if (mEdit)
+        controlsLayout->addWidget(mEdit);
 	if (mSpinBox)
-		gridLayout->addWidget(mSpinBox, row, col++);
+        controlsLayout->addWidget(mSpinBox);
 	if (mSlider)
 	{
-		gridLayout->setColumnStretch(col, 1);
-		gridLayout->addWidget(mSlider, row, col++);
+        controlsLayout->addWidget(mSlider, 1);
 	}
 	if (mInfiniteSlider)
 	{
-		gridLayout->setColumnStretch(col, 1);
-		gridLayout->addWidget(mInfiniteSlider, row, col++);
+        controlsLayout->addWidget(mInfiniteSlider, 1);
 	}
 }
 

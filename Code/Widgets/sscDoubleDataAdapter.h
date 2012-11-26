@@ -85,6 +85,7 @@ public:
 	virtual QString getValueName() const = 0; ///< name of data entity. Used for display to user.
 	virtual bool setValue(double value) = 0; ///< set the data value.
 	virtual double getValue() const = 0; ///< get the data value.
+    virtual bool addSlider() const { return false; } ///< request gui to add a slider in addition to editbox etc.
 
 public:
 	// optional methods
