@@ -79,6 +79,9 @@ public:
 		return display / mFactor;
 	} ///< conversion from internal value to display value
 
+    virtual bool addSlider() const { return mAddSlider; }
+    void setAddSlider(bool add) { mAddSlider = add; }
+
 public:
 	QString getUid() const;
 
@@ -95,6 +98,7 @@ private:
 	DoubleRange mRange;
 	XmlOptionItem mStore;
 	double mFactor;
+    bool mAddSlider;
 };
 
 } // namespace ssc

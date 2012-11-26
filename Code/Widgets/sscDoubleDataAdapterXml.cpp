@@ -105,6 +105,7 @@ int DoubleDataAdapterXml::getValueDecimals() const
 DoubleDataAdapterXml::DoubleDataAdapterXml()
 {
 	mFactor = 1.0;
+    mAddSlider = false;
 }
 
 } // namespace ssc
