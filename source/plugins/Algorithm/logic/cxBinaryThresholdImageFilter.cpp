@@ -199,6 +199,7 @@ void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
   if(!image)
     return;
   mLowerThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
+  std::cout << "BinaryThresholdImageFilter::imageChangedSlot " << image->getMin() << " "  << image->getMax() << std::endl;
   int oldValue = mLowerThresholdOption->getValue();
   // avoid reset if old value is still within range
   if ((image->getMin() > oldValue )||( oldValue > image->getMax()))
@@ -206,6 +207,7 @@ void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
       int initValue = + image->getMin() + image->getRange()/10;
       mLowerThresholdOption->setValue(initValue);
   }
+  std::cout << "                            imageChangedSlot() " << mLowerThresholdOption->getValue() << std::endl;
   RepManager::getInstance()->getThresholdPreview()->removePreview();
 
 //  QString imageName = image->getName();
@@ -215,7 +217,7 @@ void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
 
 void BinaryThresholdImageFilter::thresholdSlot()
 {
-//    std::cout << "BinaryThresholdImageFilter::thresholdSlot() " << mActive << std::endl;
+    std::cout << "BinaryThresholdImageFilter::thresholdSlot() " << mLowerThresholdOption->getValue() << std::endl;
     if (mActive)
     {
         ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mInputTypes[0]->getData());

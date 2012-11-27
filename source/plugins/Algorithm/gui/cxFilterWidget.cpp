@@ -84,6 +84,7 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
         else
         {
             ssc::createDataWidget(widget, options[i], layout, i);
+//            layout->addWidget(ssc::createDataWidget(widget, options[i]), i, 0);
         }
     }
 
@@ -125,6 +126,9 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options
     QVBoxLayout* topLayout = new QVBoxLayout(topWidget);
     topLayout->setMargin(0);
 
+//    QToolBox* toolBox = new QToolBox;
+//    toptopLayout->addWidget(toolBox);
+
     if (addFrame)
     {
         mFrame = this->wrapInGroupBox(topWidget, "Algorithm");
@@ -141,22 +145,26 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options
     mOptions = options;
 
 
-    topWidget->setStyleSheet(""
-                        "QGroupBox"
-                        "{ "
-                        "    border: 0px solid gray; "
-                        "    border-top: 1px solid gray; "
-                        "    border-radius: 0px;"
-                        "}"
-                        "");
+//    topWidget->setStyleSheet(""
+//                        "QGroupBox"
+//                        "{ "
+//                        "    border: 0px solid gray; "
+//                        "    border-radius: 0px;"
+//                        "}"
+//                        "");
+//    //                        "    border-top: 1px solid gray; "
 
     mInputsWidget = new OptionsWidget(this);
-    topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
     mOutputsWidget = new OptionsWidget(this);
-    topLayout->addWidget(this->wrapInGroupBox(mOutputsWidget, "Output"));
-
     mOptionsWidget = new OptionsWidget(this);
+
+    topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
+    topLayout->addWidget(this->wrapInGroupBox(mOutputsWidget, "Output"));
     topLayout->addWidget(this->wrapInGroupBox(mOptionsWidget, "Options"));
+
+//    toolBox->addItem(mInputsWidget, "Input");
+//    toolBox->addItem(mOutputsWidget, "Output");
+//    toolBox->addItem(mOptionsWidget, "Options");
 }
 
 void FilterSetupWidget::obscuredSlot(bool obscured)
@@ -252,10 +260,9 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     QVBoxLayout* topLayout = new QVBoxLayout(this);
 
     QHBoxLayout* filterLayout = new QHBoxLayout;
-    filterLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFilterSelector));
     topLayout->addLayout(filterLayout);
 
-    this->setStyleSheet("CXSmallToolButton#RunFilterButton { width : 36px; height : 12px; }");
+    filterLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFilterSelector));
 
     QAction* runAction = this->createAction(this,
                     QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),

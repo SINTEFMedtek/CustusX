@@ -56,7 +56,7 @@ ssc::DoubleDataAdapterXmlPtr SmoothingImageFilter::getSigma(QDomElement root)
 {
     return ssc::DoubleDataAdapterXml::initialize("Smoothing sigma", "",
         "Used for smoothing the segmented volume. Measured in units of image spacing.",
-        0.10, ssc::DoubleRange(0, 5, 0.01), 2);
+        0.10, ssc::DoubleRange(0, 5, 0.01), 2, root);
 }
 
 void SmoothingImageFilter::createOptions(QDomElement root)
