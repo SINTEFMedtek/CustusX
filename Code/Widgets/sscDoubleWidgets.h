@@ -154,6 +154,9 @@ public:
 	void addToGridLayout(QGridLayout* gridLayout = 0, int row = 0);
 	void build(QGridLayout* gridLayout = 0, int row = 0);
 
+public slots:
+    virtual void setModified();
+
 private slots:
 	void textEditedSlot();
 	void doubleValueChanged(double val);
