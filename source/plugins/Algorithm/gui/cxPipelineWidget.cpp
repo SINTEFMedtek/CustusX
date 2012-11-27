@@ -28,24 +28,23 @@ PipelineWidgetFilterLine::PipelineWidgetFilterLine(QWidget* parent, FilterPtr fi
     mFilter(filter)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
+    connect(this, SIGNAL(requestRunFilter()), this, SLOT(requestRunFilterSlot()));
 
     mRadioButton = new QRadioButton(this);
     buttonGroup->addButton(mRadioButton);
     connect(mRadioButton, SIGNAL(toggled(bool)), this, SLOT(radioButtonSelectedSlot(bool)));
     layout->addWidget(mRadioButton);
-    std::cout << QString("PipelineWidgetFilterLine margin=%1, spacing=%2").arg(layout->margin()).arg(layout->spacing()) << std::endl;
+//    std::cout << QString("PipelineWidgetFilterLine margin=%1, spacing=%2").arg(layout->margin()).arg(layout->spacing()) << std::endl;
 //    layout->setMargin(layout->margin()/2);
     layout->setMargin(0);
 
-    mAlgoNameLabel = new QLabel(mFilter->getName(), this);
+    mAlgoNameLabel = new QLabel(QString("<b>%1</b>").arg(mFilter->getName()), this);
     mAlgoNameLabel->setToolTip(mFilter->getHelp());
-    layout->addWidget(mAlgoNameLabel);    
+    layout->addWidget(mAlgoNameLabel);
 
-//    // debug
-//    if (mFilter->getName()=="Segmentation")
-//    {
-
-    this->setStyleSheet("CXSmallToolButton#RunFilterButton { width : 36px; height : 12px; }");
+    mTimedAlgorithmProgressBar = new TimedAlgorithmProgressBar;
+    mTimedAlgorithmProgressBar->setShowTextLabel(false);
+    layout->addWidget(mTimedAlgorithmProgressBar, 1);
 
     mAction = this->createAction(this,
                     QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
@@ -58,25 +57,11 @@ PipelineWidgetFilterLine::PipelineWidgetFilterLine(QWidget* parent, FilterPtr fi
     button->setObjectName("RunFilterButton");
     button->setDefaultAction(mAction);
     layout->addWidget(button);
+}
 
-//    }
-//    else if (mFilter->getName()=="Centerline")
-//    {
-//        mAction = this->createAction(this,
-//                        QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
-//                        "Run Filter", "",
-//                        SIGNAL(requestRunFilter()),
-//                        layout);
-//        mAction->setData(mFilter->getUid());
-//    }
-//    else
-//    {
-
-//    }
-
-    mTimedAlgorithmProgressBar = new TimedAlgorithmProgressBar;
-    mTimedAlgorithmProgressBar->setShowTextLabel(false);
-    layout->addWidget(mTimedAlgorithmProgressBar, 1);
+void PipelineWidgetFilterLine::requestRunFilterSlot()
+{
+    mRadioButton->setChecked(true);
 }
 
 void PipelineWidgetFilterLine::radioButtonSelectedSlot(bool on)
@@ -84,8 +69,8 @@ void PipelineWidgetFilterLine::radioButtonSelectedSlot(bool on)
     if (!on)
         return;
 
-    std::cout << "mAlgoNameLabel " << mAlgoNameLabel->width() << " " << mAlgoNameLabel->height() << std::endl;
-    std::cout << "mRadioButton " << mRadioButton->width() << " " << mRadioButton->height() << std::endl << std::endl;
+//    std::cout << "mAlgoNameLabel " << mAlgoNameLabel->width() << " " << mAlgoNameLabel->height() << std::endl;
+//    std::cout << "mRadioButton " << mRadioButton->width() << " " << mRadioButton->height() << std::endl << std::endl;
 
     emit filterSelected(mFilter->getUid());
 }
@@ -108,8 +93,8 @@ QString PipelineWidgetFilterLine::defaultWhatsThis() const
 
 PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
     BaseWidget(parent, "PipelineWidget", "Pipeline"),
-    mPipeline(pipeline),
-    mCurrentlyRunningPipelineWidgetFilterLine(NULL)
+    mPipeline(pipeline)//,
+    //mCurrentlyRunningPipelineWidgetFilterLine(NULL)
 {
     FilterGroupPtr filters = mPipeline->getFilters();
     std::vector<SelectDataStringDataAdapterBasePtr> nodes = mPipeline->getNodes();
@@ -128,9 +113,13 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
         PipelineWidgetFilterLine* algoLine = new PipelineWidgetFilterLine(this, filters->get(i), mButtonGroup);
         connect(algoLine, SIGNAL(requestRunFilter()), this, SLOT(runFilterSlot()));
         connect(algoLine, SIGNAL(filterSelected(QString)), this, SLOT(filterSelectedSlot(QString)));
+        algoLine->mTimedAlgorithmProgressBar->attach(mPipeline->getTimedAlgorithm(filters->get(i)->getUid()));
+
         mAlgoLines.push_back(algoLine);
-//        topLayout->addWidget(this->wrapInFrame(algoLine));
-        topLayout->addWidget(algoLine);
+        QFrame* frame = this->wrapInFrame(algoLine);
+        frame->setObjectName("FilterBackground");
+        topLayout->addWidget(frame);
+//        topLayout->addWidget(algoLine);
     }
     topLayout->addWidget(new DataSelectWidget(this, nodes.back()));
 
@@ -154,36 +143,69 @@ void PipelineWidget::filterSelectedSlot(QString uid)
             mAlgoLines[i]->mRadioButton->setChecked(true);
 }
 
+//void PipelineWidget::runFilterSlot()
+//{
+//    if (mThread)
+//    {
+//        ssc::messageManager()->sendWarning(QString("Last operation on %1 is not finished. Could not start filtering")
+//                                           .arg(mThread->getFilter()->getName()));
+//        return;
+//    }
+
+//    mCurrentlyRunningPipelineWidgetFilterLine = dynamic_cast<PipelineWidgetFilterLine*>(sender());
+
+//    if (!mCurrentlyRunningPipelineWidgetFilterLine)
+//        return;
+
+//    FilterPtr filter = mCurrentlyRunningPipelineWidgetFilterLine->mFilter;
+
+//    mThread.reset(new FilterTimedAlgorithm(filter));
+//    connect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
+//    mCurrentlyRunningPipelineWidgetFilterLine->mTimedAlgorithmProgressBar->attach(mThread);
+
+//    mThread->execute();
+//}
+
 void PipelineWidget::runFilterSlot()
 {
-    if (mThread)
-    {
-        ssc::messageManager()->sendWarning(QString("Last operation on %1 is not finished. Could not start filtering")
-                                           .arg(mThread->getFilter()->getName()));
-        return;
-    }
+    PipelineWidgetFilterLine* line = dynamic_cast<PipelineWidgetFilterLine*>(sender());
 
-    mCurrentlyRunningPipelineWidgetFilterLine = dynamic_cast<PipelineWidgetFilterLine*>(sender());
-
-    if (!mCurrentlyRunningPipelineWidgetFilterLine)
+    if (!line)
         return;
 
-    FilterPtr filter = mCurrentlyRunningPipelineWidgetFilterLine->mFilter;
+    mPipeline->execute(line->mFilter->getUid());
 
-    mThread.reset(new FilterTimedAlgorithm(filter));
-    connect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
-    mCurrentlyRunningPipelineWidgetFilterLine->mTimedAlgorithmProgressBar->attach(mThread);
+//    if (mThread)
+//    {
+//        ssc::messageManager()->sendWarning(QString("Last operation on %1 is not finished. Could not start filtering")
+//                                           .arg(mThread->getFilter()->getName()));
+//        return;
+//    }
 
-    mThread->execute();
+
+
+
+//    mCurrentlyRunningPipelineWidgetFilterLine = dynamic_cast<PipelineWidgetFilterLine*>(sender());
+
+//    if (!mCurrentlyRunningPipelineWidgetFilterLine)
+//        return;
+
+//    FilterPtr filter = mCurrentlyRunningPipelineWidgetFilterLine->mFilter;
+
+//    mThread.reset(new FilterTimedAlgorithm(filter));
+//    connect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
+//    mCurrentlyRunningPipelineWidgetFilterLine->mTimedAlgorithmProgressBar->attach(mThread);
+
+//    mThread->execute();
 }
 
-void PipelineWidget::finishedSlot()
-{
-    mCurrentlyRunningPipelineWidgetFilterLine->mTimedAlgorithmProgressBar->detach(mThread);
-    mCurrentlyRunningPipelineWidgetFilterLine = NULL;
-    disconnect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
-    mThread.reset();
-}
+//void PipelineWidget::finishedSlot()
+//{
+//    mCurrentlyRunningPipelineWidgetFilterLine->mTimedAlgorithmProgressBar->detach(mThread);
+//    mCurrentlyRunningPipelineWidgetFilterLine = NULL;
+//    disconnect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
+//    mThread.reset();
+//}
 
 QString PipelineWidget::defaultWhatsThis() const
 {

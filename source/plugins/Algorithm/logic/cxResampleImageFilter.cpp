@@ -49,7 +49,7 @@ ssc::DoubleDataAdapterXmlPtr ResampleImageFilter::getMarginOption(QDomElement ro
 {
     return ssc::DoubleDataAdapterXml::initialize("Margin", "",
                                                    "mm Margin added to ref image bounding box",
-                                                    5.0, ssc::DoubleRange(0, 50, 1), 1);
+                                                    5.0, ssc::DoubleRange(0, 50, 1), 1, root);
 }
 
 void ResampleImageFilter::createOptions(QDomElement root)
