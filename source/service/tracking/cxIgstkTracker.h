@@ -22,6 +22,7 @@
 #include <igstkLogger.h>
 #include <igstkTracker.h>
 #include <igstkPolarisTracker.h>
+#include <igstkPolarisClassicTracker.h>
 #include <igstkAuroraTracker.h>
 #include <itkStdStreamLogOutput.h>
 #ifdef WIN32
@@ -70,17 +71,21 @@ public:
 #endif
 	typedef igstk::Tracker TrackerType;
 	typedef igstk::PolarisTracker PolarisTrackerType;
+	typedef igstk::PolarisClassicTracker PolarisClassicTrackerType;
 	typedef igstk::AuroraTracker AuroraTrackerType;
 
-	/*enum Type
-	 {
-	 TRACKER_NONE,             ///< Not specified
-	 TRACKER_POLARIS,          ///< NDIs Polaris tracker
-	 TRACKER_POLARIS_SPECTRA,  ///< NDIs Polaris Spectra tracker
-	 TRACKER_POLARIS_VICRA,    ///< NDIs Polaris Vicra tracker
-	 TRACKER_AURORA,           ///< NDIs Aurora tracker
-	 TRACKER_MICRON            ///< Claron Technologys Micron tracker
-	 };*/
+	/*only used for documentation purposes
+	enum TRACKING_SYSTEM
+	{
+		tsNONE,             ///< Not specified
+		tsPOLARIS,          ///< NDIs Polaris tracker
+		tsPOLARIS_SPECTRA,  ///< NDIs Polaris Spectra tracker
+		tsPOLARIS_VICRA,    ///< NDIs Polaris Vicra tracker
+		tsPOLARIS_CLASSIC,  ///< NDIs Polaris Classic tracker
+		tsAURORA,           ///< NDIs Aurora tracker
+		tsMICRON,           ///< Claron Technologys Micron tracker
+		tsCOUNT
+	};*/
 
 	/*only used for documentation purposes
 	 TRACKER_INVALID_REQUEST,                    ///< internal state machine didn't accept the request
@@ -152,7 +157,9 @@ protected:
 	TrackerType* mTracker; ///< pointer to the base class of the internal igstk tracker
 
 	PolarisTrackerType::Pointer mTempPolarisTracker; ///< pointer to a temp polaris tracker
+	PolarisClassicTrackerType::Pointer mTempPolarisClassicTracker; ///< pointer to a temp polaris classic tracker
 	AuroraTrackerType::Pointer mTempAuroraTracker; ///< pointer to a temp aurora tracker
+
 	CommunicationType::Pointer mCommunication; ///< pointer to the serial communication used to communicate with the NDI trackers
 	ObserverType::Pointer mTrackerObserver; ///< observer listening for igstk events
 	igstk::Logger::Pointer mTrackerLogger; ///< logging the internal igstk behavior
