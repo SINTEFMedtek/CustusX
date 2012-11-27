@@ -11,51 +11,53 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-
-#ifndef CXDUMMYFILTER_H
-#define CXDUMMYFILTER_H
+#ifndef CXRESAMPLEIMAGEFILTER_H
+#define CXRESAMPLEIMAGEFILTER_H
 
 #include "cxFilterImpl.h"
-#include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
 
 namespace cx
 {
 
-/** Dummy implementation of Filter
+/** Filter for resampling and cropping a volume into the space of another.
  *
- * \ingroup cxResourceAlgorithms
- * \date Nov 17, 2012
+ *
+ * \ingroup cxPluginAlgorithm
+ * \date Nov 26, 2012
  * \author christiana
  */
-class DummyFilter : public FilterImpl
+class ResampleImageFilter : public FilterImpl
 {
     Q_OBJECT
 
 public:
-    virtual ~DummyFilter() {}
+    virtual ~ResampleImageFilter() {}
 
     virtual QString getType() const;
     virtual QString getName() const;
     virtual QString getHelp() const;
-
-//    virtual bool preProcess(QString outputPath);
     virtual bool execute();
     virtual void postProcess();
+
+    // extensions:
+    ssc::DoubleDataAdapterXmlPtr getMarginOption(QDomElement root);
 
 protected:
     virtual void createOptions(QDomElement root);
     virtual void createInputTypes();
     virtual void createOutputTypes();
 
+private slots:
+
 private:
-    ssc::StringDataAdapterPtr getStringOption(QDomElement root);
-    ssc::DoubleDataAdapterPtr getDoubleOption(QDomElement root);
-    ssc::BoolDataAdapterPtr getBoolOption(QDomElement root);
+    ssc::ImagePtr mRawResult;
 };
+typedef boost::shared_ptr<class ResampleImageFilter> ResampleImageFilterPtr;
+
 
 } // namespace cx
 
 
-#endif // CXDUMMYFILTER_H
+
+#endif // CXRESAMPLEIMAGEFILTER_H
