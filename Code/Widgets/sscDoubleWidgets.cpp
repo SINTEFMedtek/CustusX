@@ -46,13 +46,15 @@ void ScalarInteractionWidget::enableLabel()
 	mLabel = new QLabel(this);
 	mLabel->setText(mData->getValueName());
 }
+
 void ScalarInteractionWidget::enableSlider()
 {
 	mSlider = new ssc::DoubleSlider(this);
-	mSlider->setMinimumWidth(50);
-	mSlider->setOrientation(Qt::Horizontal);
-	connect(mSlider, SIGNAL(doubleValueChanged(double)), this, SLOT(doubleValueChanged(double)));
+    mSlider->setMinimumWidth(50);
+    mSlider->setOrientation(Qt::Horizontal);
+    connect(mSlider, SIGNAL(doubleValueChanged(double)), this, SLOT(doubleValueChanged(double)));
 }
+
 void ScalarInteractionWidget::enableInfiniteSlider()
 {
 	QSize minBarSize = QSize(20, 20);
@@ -75,6 +77,7 @@ void ScalarInteractionWidget::enableEdit()
 	mEdit = new ssc::DoubleLineEdit(this);
 	connect(mEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
 }
+
 void ScalarInteractionWidget::enableSpinBox()
 {
 	mSpinBox = new QDoubleSpinBox(this);
@@ -163,6 +166,18 @@ void ScalarInteractionWidget::textEditedSlot()
 		return;
 
 	mData->setValue(newVal);
+}
+
+void ScalarInteractionWidget::setModified()
+{
+    // Problem: If one of the sliders are visible, paint() is not called.
+    // Force repaint here.
+    //
+    // Possible solution: this is obscured by the slider,
+    // but repaint goes to the children. Maybe design is flawed and we need to
+    // listen to the children as well?
+    if (mSlider || mInfiniteSlider)
+        this->prePaintEvent();
 }
 
 void ScalarInteractionWidget::prePaintEvent()

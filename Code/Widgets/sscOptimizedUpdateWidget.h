@@ -48,7 +48,7 @@ public slots:
     /**
       * Call to trigger a call to prePaintEvent() prior to next paintEvent()
       */
-    void setModified();
+    virtual void setModified();
 
 protected:
     /**
