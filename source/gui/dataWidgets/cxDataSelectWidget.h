@@ -49,6 +49,8 @@ private slots:
     void updateDataVisibility();
     void viewGroupChangedSlot();
 private:
+    void setRemoveIcon();
+    void setShowIcon();
     ViewGroupDataPtr getActiveViewGroupData();
     SelectDataStringDataAdapterBasePtr mData;
     ViewGroupDataPtr mCurrentViewGroup;
