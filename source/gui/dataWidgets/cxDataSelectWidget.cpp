@@ -45,7 +45,7 @@ DataSelectWidget::DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterB
     layout->addWidget(toggleShowButton);
 
     mRemoveAction = this->createAction(this,
-                                       QIcon(":/icons/preset_remove.png"),
+                                       QIcon(),
                                        "<html><h4>Permanently delete data.</h4><p>Press button twice to delete.<br>"
                                        "Right-click after the first click to cancel.<p></html>"
                                        , "",
@@ -59,6 +59,9 @@ DataSelectWidget::DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterB
 
     connect(viewManager(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
     connect(mData.get(), SIGNAL(changed()), this, SLOT(updateDataVisibility()));
+
+    this->setRemoveIcon();
+    this->viewGroupChangedSlot();
 }
 
 ViewGroupDataPtr DataSelectWidget::getActiveViewGroupData()
@@ -94,16 +97,24 @@ void DataSelectWidget::viewGroupChangedSlot()
 
 void DataSelectWidget::updateDataVisibility()
 {
-    mToggleShowAction->setEnabled(mData->getData());
+    mToggleShowAction->setEnabled(mData->getData() && (mCurrentViewGroup!=0));
     mRemoveAction->setEnabled(mData->getData());
-    if (!mData->getData())
-        return;
 
-    std::vector<ssc::DataPtr> visibleData = mCurrentViewGroup->getData();
-    bool visible = std::count(visibleData.begin(), visibleData.end(), mData->getData());
-
+    bool visible = false;
+    if (mData->getData())
+    {
+        std::vector<ssc::DataPtr> visibleData;
+        if (mCurrentViewGroup)
+        {
+            visibleData = mCurrentViewGroup->getData();
+        }
+        visible = std::count(visibleData.begin(), visibleData.end(), mData->getData());
+    }
+    mToggleShowAction->blockSignals(true);
     mToggleShowAction->setChecked(visible);
+    mToggleShowAction->blockSignals(false);
     this->cancelRemovalSlot();
+    this->setShowIcon();
 }
 
 QString DataSelectWidget::defaultWhatsThis() const
@@ -117,13 +128,40 @@ QString DataSelectWidget::defaultWhatsThis() const
   */
 void DataSelectWidget::requestEraseData()
 {
+    this->setRemoveIcon();
+
     if (mRemoveAction->isChecked())
+    {
         return;
+    }
     if (!mData->getData())
         return;
 
-//    std::cout << mRemoveAction->isChecked() << " DataSelectWidget::requestEraseData() removing " << mData->getData()->getUid() << std::endl;
     ssc::dataManager()->removeData(mData->getData()->getUid());
+}
+
+void DataSelectWidget::setRemoveIcon()
+{
+    if (mRemoveAction->isChecked())
+    {
+        mRemoveAction->setIcon(QIcon(":/icons/preset_remove.png"));
+    }
+    else
+    {
+        mRemoveAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/edit-delete-2.png"));
+    }
+}
+
+void DataSelectWidget::setShowIcon()
+{
+    if (mToggleShowAction->isChecked())
+    {
+        mToggleShowAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/others/eye.png.png"));
+    }
+    else
+    {
+        mToggleShowAction->setIcon(QIcon(":/icons/eye.png"));
+    }
 }
 
 /** Uncheck the remove button without triggering a remove.
@@ -133,6 +171,7 @@ void DataSelectWidget::cancelRemovalSlot()
 {
     mRemoveAction->blockSignals(true);
     mRemoveAction->setChecked(false);
+    this->setRemoveIcon();
     mRemoveAction->blockSignals(false);
 }
 
@@ -142,9 +181,13 @@ void DataSelectWidget::toggleShowData()
         return;
 
     if (mToggleShowAction->isChecked())
+    {
         mCurrentViewGroup->addData(mData->getData());
+    }
     else
+    {
         mCurrentViewGroup->removeData(mData->getData());
+    }
 }
 
 

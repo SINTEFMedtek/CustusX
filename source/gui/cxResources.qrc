@@ -84,5 +84,6 @@
         <file>icons/camera-n.png</file>
         <file>icons/camera-o.png</file>
         <file>icons/open_icon_library/png/64x64/others/eye.png.png</file>
+        <file>icons/eye.png</file>
     </qresource>
 </RCC>

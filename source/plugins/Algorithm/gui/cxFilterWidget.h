@@ -46,12 +46,12 @@ public:
     void setOptions(QString uid, std::vector<DataAdapterPtr> options);
     void setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options);
     QString getCurrentUid();
-    std::vector<DataAdapterPtr> getOptions(QString uid);
-    std::vector<DataAdapterPtr> getCurrentOptions();
+//    std::vector<DataAdapterPtr> getOptions(QString uid);
+//    std::vector<DataAdapterPtr> getCurrentOptions();
 
 private:
     QStackedLayout* mStackedLayout;
-    std::map<QString, std::vector<DataAdapterPtr> > mOptions;
+//    std::map<QString, std::vector<DataAdapterPtr> > mOptions;
 };
 
 /** Helper widget for displaying the input/output/options part of a Filter.
