@@ -29,6 +29,9 @@ QStringList IgstkTracker::getSupportedTrackingSystems()
 {
 	QStringList retval;
 	retval << enum2string(ssc::tsPOLARIS);
+	//retval << enum2string(ssc::tsPOLARIS_SPECTRA);
+	//retval << enum2string(ssc::tsPOLARIS_VICRA);
+	retval << enum2string(ssc::tsPOLARIS_CLASSIC);
 	retval << enum2string(ssc::tsAURORA);
 	return retval;
 }
@@ -73,6 +76,14 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 		mTempPolarisTracker->SetCommunication(mCommunication);
 		ssc::messageManager()->sendInfo("Tracker is set to Polaris");
 		mTracker = mTempPolarisTracker.GetPointer();
+		mValid = true;
+		break;
+	case ssc::tsPOLARIS_CLASSIC:
+		mUid = mName = "Polaris Classic";
+		mTempPolarisClassicTracker = PolarisClassicTrackerType::New();
+		mTempPolarisClassicTracker->SetCommunication(mCommunication);
+		ssc::messageManager()->sendInfo("Tracker is set to Polaris Classic");
+		mTracker = mTempPolarisClassicTracker.GetPointer();
 		mValid = true;
 		break;
 		//There is no special handling of the tracking system if its spectra or vicra, polaris is polaris as we see it
