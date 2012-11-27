@@ -2,7 +2,6 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QFrame>
 #include "cxBinaryThresholdImageFilterWidget.h"
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
