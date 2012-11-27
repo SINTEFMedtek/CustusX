@@ -129,9 +129,12 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
         connect(algoLine, SIGNAL(requestRunFilter()), this, SLOT(runFilterSlot()));
         connect(algoLine, SIGNAL(filterSelected(QString)), this, SLOT(filterSelectedSlot(QString)));
         mAlgoLines.push_back(algoLine);
-        topLayout->addWidget(this->wrapInFrame(algoLine));
+//        topLayout->addWidget(this->wrapInFrame(algoLine));
+        topLayout->addWidget(algoLine);
     }
     topLayout->addWidget(new DataSelectWidget(this, nodes.back()));
+
+    topLayout->addSpacing(12);
 
     mSetupWidget = new FilterSetupWidget(this, filters->getOptions(), true);
     topLayout->addWidget(mSetupWidget);
