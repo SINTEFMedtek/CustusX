@@ -12,37 +12,39 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXDUMMYFILTER_H
-#define CXDUMMYFILTER_H
+#ifndef CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
+#define CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
 
 #include "cxFilterImpl.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
+
+#include "sscColorDataAdapterXml.h"
 
 namespace cx
 {
 
-/** Dummy implementation of Filter
+/** Filter implementation of the itk::BinaryThinningImageFilter3D
  *
- * \ingroup cxResourceAlgorithms
- * \date Nov 17, 2012
+ *
+ * \ingroup cxPluginAlgorithm
+ * \date 11 22, 2012
  * \author christiana
  */
-class DummyFilter : public FilterImpl
+class BinaryThinningImageFilter3DFilter : public FilterImpl
 {
     Q_OBJECT
 
 public:
-    virtual ~DummyFilter() {}
+    virtual ~BinaryThinningImageFilter3DFilter() {}
 
     virtual QString getType() const;
     virtual QString getName() const;
     virtual QString getHelp() const;
 
-//    virtual bool preProcess(QString outputPath);
+    virtual bool preProcess();
     virtual bool execute();
     virtual void postProcess();
+
+    ssc::ColorDataAdapterPtr getColorOption(QDomElement root);
 
 protected:
     virtual void createOptions(QDomElement root);
@@ -50,12 +52,10 @@ protected:
     virtual void createOutputTypes();
 
 private:
-    ssc::StringDataAdapterPtr getStringOption(QDomElement root);
-    ssc::DoubleDataAdapterPtr getDoubleOption(QDomElement root);
-    ssc::BoolDataAdapterPtr getBoolOption(QDomElement root);
+    vtkImageDataPtr mRawResult;
 };
+
 
 } // namespace cx
 
-
-#endif // CXDUMMYFILTER_H
+#endif // CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
