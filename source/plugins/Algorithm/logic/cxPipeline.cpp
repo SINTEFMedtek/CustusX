@@ -12,6 +12,11 @@
 //
 // See CustusX_License.txt for more information.
 #include "cxPipeline.h"
+#include "sscTypeConversions.h"
+
+#include "boost/bind.hpp"
+#include "libQtSignalAdapters/Qt2Func.h"
+#include "libQtSignalAdapters/ConnectionFactories.h"
 
 namespace cx
 {
@@ -29,7 +34,8 @@ FusedInputOutputSelectDataStringDataAdapter::FusedInputOutputSelectDataStringDat
     mInput = input;
     connect(mInput.get(), SIGNAL(changed()), this, SLOT(inputDataChangedSlot()));
 //    connect(mInput.get(), SIGNAL(dataChanged(QString)), this, SLOT(inputDataChangedSlot()));
-//    connect(mBase.get(), SIGNAL(dataChanged(QString)), this, SIGNAL(dataChanged(QString)));
+    connect(mBase.get(), SIGNAL(dataChanged(QString)), this, SIGNAL(dataChanged(QString)));
+    connect(mBase.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
     connect(mBase.get(), SIGNAL(changed()), this, SIGNAL(changed()));
 }
 
@@ -46,7 +52,9 @@ QString FusedInputOutputSelectDataStringDataAdapter::getValue() const
 
 QString FusedInputOutputSelectDataStringDataAdapter::getValueName() const
 {
-    return mBase->getValueName();
+    if (mValueName.isEmpty())
+        return mBase->getValueName();
+    return mValueName;
 }
 
 QStringList FusedInputOutputSelectDataStringDataAdapter::getValueRange() const
@@ -71,12 +79,24 @@ ssc::DataPtr FusedInputOutputSelectDataStringDataAdapter::getData() const
 
 void FusedInputOutputSelectDataStringDataAdapter::setValueName(const QString name)
 {
-    mBase->setValueName(name);
+    if (name==mValueName)
+        return;
+//    mBase->setValueName(name);
+    mValueName = name;
+    emit changed();
 }
 
 void FusedInputOutputSelectDataStringDataAdapter::setHelp(QString text)
 {
     mBase->setHelp(text);
+}
+
+void FusedInputOutputSelectDataStringDataAdapter::changedSlot()
+{
+    // this sync helps the pipeline behaving when the output is changed.
+    this->blockSignals(true);
+    mInput->setValue(mBase->getValue());
+    this->blockSignals(false);
 }
 
 void FusedInputOutputSelectDataStringDataAdapter::inputDataChangedSlot()
@@ -87,7 +107,7 @@ void FusedInputOutputSelectDataStringDataAdapter::inputDataChangedSlot()
 
 
 
-///--------------------------------------------------------inputDataChangedSlot
+///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
@@ -95,6 +115,7 @@ void FusedInputOutputSelectDataStringDataAdapter::inputDataChangedSlot()
 Pipeline::Pipeline(QObject *parent) :
     QObject(parent)
 {
+    mCompositeTimedAlgorithm.reset(new CompositeTimedAlgorithm("Pipeline"));
 }
 
 void Pipeline::initialize(FilterGroupPtr filters)
@@ -108,6 +129,14 @@ void Pipeline::initialize(FilterGroupPtr filters)
         filter->getOutputTypes();
         filter->getOptions(mFilters->getOptions().descend(filter->getUid()).getElement());
     }
+
+    this->getNodes();
+
+    for (unsigned i=0; i<mFilters->size(); ++i)
+    {
+        FilterPtr current = mFilters->get(i);
+        mTimedAlgorithm[current->getUid()].reset(new FilterTimedAlgorithm(current));
+    }
 }
 FilterGroupPtr Pipeline::getFilters() const
 {
@@ -115,6 +144,15 @@ FilterGroupPtr Pipeline::getFilters() const
 }
 
 std::vector<SelectDataStringDataAdapterBasePtr> Pipeline::getNodes()
+{
+    // TODO: create getMainXXType() in filters instead of using zero.
+
+    if (mNodes.empty())
+        mNodes = this->createNodes();
+    return mNodes;
+}
+
+std::vector<SelectDataStringDataAdapterBasePtr> Pipeline::createNodes()
 {
     // TODO: create fused nodes: input+output
     // TODO: create getMainXXType() in filters instead of using zero.
@@ -134,18 +172,70 @@ std::vector<SelectDataStringDataAdapterBasePtr> Pipeline::getNodes()
         SelectDataStringDataAdapterBasePtr base  = mFilters->get(i)->getInputTypes()[0];
         FusedInputOutputSelectDataStringDataAdapterPtr node;
         node = FusedInputOutputSelectDataStringDataAdapter::create(base, output);
+        node->setValueName(QString("Node %1").arg(i));
         retval.push_back(node);
     }
 
     // last node is the output of the last algo
     retval.push_back(mFilters->get(mFilters->size()-1)->getOutputTypes()[0]);
 
+    for (unsigned i=0; i<retval.size(); ++i)
+        QtSignalAdapters::connect1<void(QString)>(retval[i].get(), SIGNAL(dataChanged(QString)),
+            boost::bind(&Pipeline::nodeValueChanged, this, _1, i));
+
     return retval;
 }
 
-void Pipeline::execute(int filterIndex)
-{
 
+void Pipeline::nodeValueChanged(QString uid, int index)
+{
+//    std::cout << "Pipeline::nodeValueChanged(QString uid, int index) " << uid << " " << index << std::endl;
+
+    // clear all nodes beyond the input:
+    for (unsigned i=index+1; i<mNodes.size(); ++i)
+        mNodes[i]->setValue("");
+}
+
+TimedAlgorithmPtr Pipeline::getTimedAlgorithm(QString uid)
+{
+    return mTimedAlgorithm[uid];
+}
+
+void Pipeline::execute(QString uid)
+{
+    int endIndex = -1;
+
+    for (unsigned i=0; i<mFilters->size(); ++i)
+        if (mFilters->get(i)->getUid()==uid)
+            endIndex = i;
+    if (endIndex<0)
+        return;
+
+    // filter i require node i as input
+    int startIndex = endIndex;
+
+    for ( ; startIndex>=-1; --startIndex)
+    {
+        if (startIndex<0)
+            break;
+        if (mNodes[startIndex]->getData())
+            break; // found node with data: stop here
+    }
+
+    std::cout << "Pipeline::execute3 s=" << startIndex << ", e=" << endIndex << std::endl;
+
+    if (startIndex<0)
+    {
+        ssc::messageManager()->sendWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
+        return;
+    }
+
+    mCompositeTimedAlgorithm->clear();
+    for (unsigned i=startIndex; i<=endIndex; ++i)
+        mCompositeTimedAlgorithm->append(mTimedAlgorithm[mFilters->get(i)->getUid()]);
+
+    // run all filters
+    mCompositeTimedAlgorithm->execute();
 }
 
 

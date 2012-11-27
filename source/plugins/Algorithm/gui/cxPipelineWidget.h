@@ -45,6 +45,7 @@ signals:
 
 private slots:
     void radioButtonSelectedSlot(bool on);
+    void requestRunFilterSlot();
 protected:
     virtual void mousePressEvent(QMouseEvent* event);
 };
@@ -65,7 +66,7 @@ public:
 private slots:
     void runFilterSlot();
     void filterSelectedSlot(QString uid);
-    void finishedSlot();
+//    void finishedSlot();
 private:
     void selectFilter(int index);
     PipelinePtr mPipeline;
@@ -73,8 +74,8 @@ private:
     std::vector<PipelineWidgetFilterLine*> mAlgoLines;
     FilterSetupWidget* mSetupWidget;
 
-    FilterTimedAlgorithmPtr mThread;
-    PipelineWidgetFilterLine* mCurrentlyRunningPipelineWidgetFilterLine;
+//    FilterTimedAlgorithmPtr mThread;
+//    PipelineWidgetFilterLine* mCurrentlyRunningPipeli\neWidgetFilterLine;
 };
 
 

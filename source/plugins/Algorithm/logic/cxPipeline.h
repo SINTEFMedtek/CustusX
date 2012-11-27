@@ -17,6 +17,8 @@
 #include <QObject>
 #include "cxFilter.h"
 #include "sscXmlOptionItem.h"
+#include "cxFilterTimedAlgorithm.h"
+#include "cxCompositeTimedAlgorithm.h"
 
 namespace cx
 {
@@ -55,10 +57,13 @@ public: // interface extension
 
 protected slots:
     void inputDataChangedSlot();
+    void changedSlot();
+
 protected:
     FusedInputOutputSelectDataStringDataAdapter(SelectDataStringDataAdapterBasePtr base, SelectDataStringDataAdapterBasePtr input);
     SelectDataStringDataAdapterBasePtr mInput;
     SelectDataStringDataAdapterBasePtr mBase;
+    QString mValueName;
 };
 
 
@@ -93,19 +98,30 @@ public:
       */
     std::vector<SelectDataStringDataAdapterBasePtr> getNodes();
     /**
+      * Get the TimedAlgorithm for a given filter.
+      * Do not run this directly: Rather use the execute() method
+      * to run all filters serially.
+      */
+    TimedAlgorithmPtr getTimedAlgorithm(QString uid);
+    /**
       * Execute the filter at filterIndex. Recursively execute
       * all filters earlier in the pipeline if they dont have
       * an output value.
       */
-    void execute(int filterIndex);
+    void execute(QString uid);
 
 signals:
     
 public slots:
-    
-private:
-    FilterGroupPtr mFilters;
+    void nodeValueChanged(QString uid, int index);
 
+private:
+    std::vector<SelectDataStringDataAdapterBasePtr> createNodes();
+
+    FilterGroupPtr mFilters;
+    std::vector<SelectDataStringDataAdapterBasePtr> mNodes;
+    std::map<QString, TimedAlgorithmPtr> mTimedAlgorithm;
+    CompositeTimedAlgorithmPtr mCompositeTimedAlgorithm;
 };
 typedef boost::shared_ptr<Pipeline> PipelinePtr;
 
