@@ -6,7 +6,7 @@
 <configuration clinical_app= <!-- [Laboratory, Neurology, Laparoscopy] --> >
 
 <!-- There can be [1, n] tracker tags in each configuration. -->
-<tracker type= <!-- [polaris, aurora] --> >
+<tracker type= <!-- [polaris, polaris classic, aurora] --> >
  
     <!-- There can be [0, n] toolfile tags in each configuration. -->
     <toolfile reference= <!-- [yes, no] --> > <!--[relative path to reference tool file] --> </toolfile>
