@@ -25,11 +25,13 @@
  */
 #include "sscHelperWidgets.h"
 
+#include <iostream>
 #include "sscDoubleWidgets.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscCheckBoxWidget.h"
 #include "sscColorSelectWidget.h"
 #include "sscTypeConversions.h"
+#include <iostream>
 
 namespace ssc
 {

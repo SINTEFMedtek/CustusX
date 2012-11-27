@@ -1242,8 +1242,8 @@ int DICOMLib_Verify( struct series_t *series )
 		// Check if we have valid spacing between slices
 		if ( fabs(dir[2]) > fabs(avgDist * config[DICOMLIB_CONF_MAX_GAP]) )
 		{
-			REPORT( "Series volume has missing frames. Average distance is %f, found space of %f, limit is %f",
-				avgDist, dir[2], config[DICOMLIB_CONF_MAX_GAP] );
+			REPORT( "Series volume has missing frames. Average distance is %f, found space of %f, limit is %f in instance %s" ,
+				avgDist, dir[2], config[DICOMLIB_CONF_MAX_GAP], instance->path );
 			series->valid = FALSE;
 			return 0;
 		}
