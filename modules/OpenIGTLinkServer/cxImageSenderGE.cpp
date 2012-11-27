@@ -113,7 +113,7 @@ void ImageSenderGE::deinitialize_local()
 	mImgStream = vtkSmartPointer<vtkImageData>();
 
 	//Clear frame geometry
-	data_streaming::beamspace_geometry emptyGeometry;
+	data_streaming::frame_geometry emptyGeometry;
 	mFrameGeometry = emptyGeometry;
 }
 
@@ -191,7 +191,7 @@ void ImageSenderGE::grab()
 	if(!testMode && (mGEStreamer.frame->GetGeometryChanged() || (mFrameGeometry.width < 0.0001)))
 	{
 		// Frame geometry have changed.
-		mFrameGeometry = *(mGEStreamer.frame->GetFrameGeometry());//Is this ok?
+		mFrameGeometry = mGEStreamer.GetFrameGeometry();
 		mFrameGeometryChanged = true;
 		//std::cout << "Get new GE frame geometry" << std::endl;
 	}
@@ -319,24 +319,24 @@ IGTLinkUSStatusMessage::Pointer ImageSenderGE::getFrameStatus()
   //This is origin from the scanner (= 0,0,0)
   //Origin according to image is set in the image message
   if (mImgStream)
-	  retval->SetOrigin(mFrameGeometry.origo[0] + mImgStream->GetOrigin()[0],
-			  mFrameGeometry.origo[1]+ mImgStream->GetOrigin()[1],
-			  mFrameGeometry.origo[2]+ mImgStream->GetOrigin()[2]);
+	  retval->SetOrigin(mFrameGeometry.origin[0] + mImgStream->GetOrigin()[0],
+			  mFrameGeometry.origin[1]+ mImgStream->GetOrigin()[1],
+			  mFrameGeometry.origin[2]+ mImgStream->GetOrigin()[2]);
   else
-	  retval->SetOrigin(mFrameGeometry.origo);
+	  retval->SetOrigin(mFrameGeometry.origin);
 
   // 1 = sector, 2 = linear
-  if (mFrameGeometry.kind == 8) //linear
+  if (mFrameGeometry.imageType == data_streaming::Linear) //linear
 	  retval->SetProbeType(2);
-  else //kind == 7 or 9 //sector
+  else //sector
 	  retval->SetProbeType(1);
 
-  retval->SetDepthStart(mFrameGeometry.depthStart*1000);// Start of sector in mm from origin
-  retval->SetDepthEnd(mFrameGeometry.depthEnd*1000);	// End of sector in mm from origin
+  retval->SetDepthStart(mFrameGeometry.depthStart);// Start of sector in mm from origin
+  retval->SetDepthEnd(mFrameGeometry.depthEnd);	// End of sector in mm from origin
   retval->SetWidth(mFrameGeometry.width);// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
 
-  std::cout << "origin: " << mFrameGeometry.origo[0] << " " << mFrameGeometry.origo[1] << " " << mFrameGeometry.origo[2] << std::endl;
-  std::cout << "kind: " << mFrameGeometry.kind << std::endl;
+  std::cout << "origin: " << mFrameGeometry.origin[0] << " " << mFrameGeometry.origin[1] << " " << mFrameGeometry.origin[2] << std::endl;
+  std::cout << "imageType: " << mFrameGeometry.imageType << std::endl;
   std::cout << "depthStart: " << mFrameGeometry.depthStart << " end: " << mFrameGeometry.depthEnd << std::endl;
   std::cout << "width: " << mFrameGeometry.width << std::endl;
   std::cout << "tilt: " << mFrameGeometry.tilt << std::endl;
