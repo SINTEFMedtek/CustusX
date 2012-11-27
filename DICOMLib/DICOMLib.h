@@ -286,6 +286,7 @@ struct study_t
 	bool reindex;						///< Force study indices to be unique if split
 	char rootpath[PATH_MAX];				///< Root path of study
 	bool initialized;					///< If lazy loading initialization has been run for this study
+	char SpecificCharacterSet[DICOMLIB_LONG_STRING];	///< Character set encoding  for export see DICOM Part 3 C.12.1.1.2
 };
 
 /**

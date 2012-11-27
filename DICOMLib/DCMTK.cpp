@@ -14,6 +14,7 @@
 
 #include <math.h>
 #include <limits>
+#include <iconv.h>
 
 #include "DCMTK.h"
 
@@ -107,10 +108,138 @@ int DICOM_Done()
 	return 0;
 }
 
+/// Convert string to system default encoding
+bool convert_string( char *input, const char from_encoding[] )
+{
+	const char tocode[] = "UTF-8";
+	size_t inleft, outleft, converted = 0;
+	char *output, *outbuf, *tmp;
+	const char *inbuf;
+	size_t outlen;
+	iconv_t cd;
+	char fromcode[strlen(from_encoding)];
+
+	/* Mapping from DICOM SpecificCharacterSet to iconv speak
+	 * see DICOM standard C.12.1.1.2  and cmd: 'iconv --list' */
+	strcpy (fromcode,from_encoding);
+	for( unsigned int i = 0; i < (strlen(fromcode)); i++ )
+	{
+	     switch(fromcode[i])
+	     {
+		     case ' ':
+			     fromcode[i] = '-';
+			     break;
+		     case '_':
+			     fromcode[i] = '-';
+			     break;
+	     }
+	}
+
+
+	if (strcmp (fromcode,"ISO-IR-192") == 0 ) // UTF-8
+	{
+		if ((iconv_t)(-1) == ( cd = iconv_open( tocode, "UTF-8" )))
+		{
+			SSC_LOG("Failed to iconv_open %s to UTF-8", fromcode);
+			return false;
+		}
+	}
+	else if (strcmp (fromcode,"ISO-2022-IR-13") == 0 ) // Japan
+	{
+		if ((iconv_t)(-1) == ( cd = iconv_open( tocode, "ISO2022JP" )))
+		{
+			SSC_LOG("Failed to iconv_open %s to UTF-8", fromcode);
+			return false;
+		}
+	}
+	else if ((iconv_t)(-1) == ( cd = iconv_open( tocode, fromcode )))
+	{
+		SSC_LOG("Failed to iconv_open %s to UTF-8 trying now ISO8859-1 as default ...", fromcode);
+		if ( (iconv_t)(-1) == ( cd = iconv_open( tocode, "ISO8859-1" ) ) )
+		{
+			SSC_LOG("ISO8859-1 to UTF-8 failed too");
+			return false;
+		}
+		else
+		{
+			SSC_LOG("ISO8859-1 to UTF-8 seems to work ...");
+		}
+	}
+
+	// SSC_LOG("from encoding %s convert: %s",from_encoding, input);
+
+	inleft = strlen (input);
+	inbuf = input;
+
+	outlen = inleft;
+
+	/* we allocate 4 bytes more for nul-termination */
+	if (!(output = (char*)malloc (outlen + 4)))
+	{
+		iconv_close (cd);
+		return false;
+	}
+
+	do
+	{
+		errno = 0;
+		outbuf = output + converted;
+		outleft = outlen - converted;
+		converted = iconv (cd, (char **) &inbuf, &inleft, &outbuf, &outleft);
+		if (converted != (size_t) -1 || errno == EINVAL)
+		{
+			break;
+		}
+
+		if (errno != E2BIG)
+		{
+		iconv_close (cd);
+		free (output);
+		return false;
+		}
+
+		converted = outbuf - output;
+		outlen += inleft * 2 + 8;
+
+		if (!(tmp = (char*)realloc (output, outlen + 4)))
+		{
+			iconv_close (cd);
+			free (output);
+			return false;
+		}
+
+		output = tmp;
+		outbuf = output + converted;
+	} while (1);
+
+	iconv (cd, NULL, NULL, &outbuf, &outleft);
+	iconv_close (cd);
+
+	// null termination:
+	memset (outbuf, 0, 4);
+
+	strcpy (input, output);
+
+	return true;
+}
+
 /// Read string
 static bool dicomtag_string( DcmItem *dset, char *target, const DcmTagKey &tagKey, int len )
 {
 	OFString value;
+
+	/* Get the character set encoding  from DICOM data set for later conversion*/
+	char specificCharacterSet [DICOMLIB_LONG_STRING];
+	if ( !dset->findAndGetOFString( DCM_SpecificCharacterSet, value ).good() )
+	{
+		strcpy (specificCharacterSet,"ISO_IR 192");
+		//SSC_LOG( "%s: No DCM_SpecificCharacterSet tag found.", tagKey.toString().c_str() );
+	}
+	else
+	{
+		strlcpy( specificCharacterSet, value.c_str(), DICOMLIB_LONG_STRING );
+		//SSC_LOG( "%s: DCM_SpecificCharacterSet tag found: %s", tagKey.toString().c_str(),specificCharacterSet );
+	}
 
 	if ( !dset->findAndGetOFString( tagKey, value ).good() )
 	{
@@ -118,7 +247,18 @@ static bool dicomtag_string( DcmItem *dset, char *target, const DcmTagKey &tagKe
 		return false;
 	}
 	strlcpy( target, value.c_str(), len );
-	return true;	// hmm well
+
+	if ( !convert_string(target,specificCharacterSet) )
+	{
+		SSC_LOG("String conversion of %s failed", tagKey.toString().c_str());
+		strcpy(target,"charset enc error");
+	}
+	else
+	{
+		// SSC_LOG("UTF-8 converted string: %s",target);
+	}
+
+	return true;
 }
 
 /// Read string array
@@ -126,6 +266,18 @@ static bool dicomtag_stringv( DcmItem *dset, char *target, const DcmTagKey &tagK
 {
 	int i;
 	OFString value;
+
+	/* Get the character set encoding  from DICOM data set for later conversion*/
+	char specificCharacterSet [DICOMLIB_LONG_STRING];
+	if ( !dset->findAndGetOFString( DCM_SpecificCharacterSet, value ).good() )
+	{
+		strcpy (specificCharacterSet,"ISO_IR 192");
+		//SSC_LOG( "%s: No DCM_SpecificCharacterSet tag found.", path );
+	}
+	else
+	{
+		strlcpy( specificCharacterSet, value.c_str(), DICOMLIB_LONG_STRING );
+	}
 
 	for ( i = 0; i < vals; i++ )
 	{
@@ -136,6 +288,15 @@ static bool dicomtag_stringv( DcmItem *dset, char *target, const DcmTagKey &tagK
 			return false;
 		}
 		strlcpy( ptr, value.c_str(), len );
+		if ( !convert_string(ptr,specificCharacterSet) )
+		{
+			SSC_LOG("String conversion of %s failed", tagKey.toString().c_str());
+			strcpy(ptr,"charset enc error");
+		}
+		else
+		{
+			// SSC_LOG("UTF-8 converted string: %s",target);
+		}
 	}
 	return true;
 }
@@ -223,7 +384,6 @@ void readPatientInfo( DcmItem *dset, struct study_t *study, const char *path )
 void readStudyInfo( DcmItem *dset, struct study_t *study, const char *path )
 {
 	(void)path;	// silence compiler warning
-
 	/* Study ID */
 	if ( !dicomtag_string( dset, study->studyID, DCM_StudyID, DICOMLIB_LONG_STRING ) )
 	{
@@ -1080,7 +1240,6 @@ int DICOM_Dir( const char *path, struct study_t **studyPtr )
 			sstrcpy( study->resource, dirfile );
 			study->first_series = NULL;
 			study->study_id = count++;
-
 			readPatientInfo( patientRecord, study, dirfile );
 			readStudyInfo( studyRecord, study, dirfile );
 			while (((seriesRecord = studyRecord->nextSub(seriesRecord)) != NULL))
@@ -1356,7 +1515,9 @@ int DICOM_image_window_auto( struct series_t *series, struct instance_t *instanc
 		/* CT brain preset */
 		series->VOI.suggestion.center = 20;
 		series->VOI.suggestion.width = 80;
-	} else {
+	}
+	else
+	{
 		series->VOI.suggestion = series->VOI.minmax;
 	}
 

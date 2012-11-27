@@ -31,6 +31,7 @@
 #include "sscCheckBoxWidget.h"
 #include "sscColorSelectWidget.h"
 #include "sscTypeConversions.h"
+#include <iostream>
 
 namespace ssc
 {

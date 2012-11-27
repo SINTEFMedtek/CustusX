@@ -344,14 +344,13 @@ void Study::buildSeries()
 StudyData Study::getData()
 {
 	StudyData retval;
-
-	retval.mPatientName = mBase->patientName;
+	retval.mPatientName = QString::fromUtf8(mBase->patientName);
 	retval.mPatientID = mBase->patientID;
 	retval.mPatientBirthDate = QDate::fromString(QString(mBase->patientBirthDate), "yyyyMMdd");
 	retval.mPatientSex = mBase->patientSex;
 	retval.mStudyDate = SNW2VolumeMetaData::DateTime::fromDateAndTime(mBase->studyDate, mBase->studyTime).toQDateTime();
 	retval.mStudyID = mBase->studyID;
-	retval.mStudyDescription = mBase->studyDescription;
+	retval.mStudyDescription = QString::fromUtf8(mBase->studyDescription);
 
 	return retval;
 }
