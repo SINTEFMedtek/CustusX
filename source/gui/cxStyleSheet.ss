@@ -12,8 +12,16 @@ CXFrame
 
 CXSmallToolButton
 {
-	width : 10px;
-	height : 10px;
+	border: 1px solid palette(dark);
+	border-radius: 4px;
+	background-color: palette(button);
+	width : 15px;
+	height : 15px;
+}
+
+CXSmallToolButton::checked
+{
+	background-color: palette(light)
 }
 
 /** This is an attempt to move the QRadioButton vertically in line with the rest of the widgets - no good so far.

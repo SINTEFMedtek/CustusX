@@ -11,51 +11,53 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-
-#ifndef CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
-#define CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
+#ifndef CXRESAMPLEIMAGEFILTER_H
+#define CXRESAMPLEIMAGEFILTER_H
 
 #include "cxFilterImpl.h"
-
-#include "sscColorDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 
 namespace cx
 {
 
-/** Filter implementation of the itk::BinaryThinningImageFilter3D
+/** Filter for resampling and cropping a volume into the space of another.
  *
  *
  * \ingroup cxPluginAlgorithm
- * \date 11 22, 2012
+ * \date Nov 26, 2012
  * \author christiana
  */
-class BinaryThinningImageFilter3DFilter : public FilterImpl
+class ResampleImageFilter : public FilterImpl
 {
     Q_OBJECT
 
 public:
-    virtual ~BinaryThinningImageFilter3DFilter() {}
+    virtual ~ResampleImageFilter() {}
 
     virtual QString getType() const;
     virtual QString getName() const;
     virtual QString getHelp() const;
-
-    virtual bool preProcess();
     virtual bool execute();
     virtual void postProcess();
 
-    ssc::ColorDataAdapterPtr getColorOption(QDomElement root);
+    // extensions:
+    ssc::DoubleDataAdapterXmlPtr getMarginOption(QDomElement root);
 
 protected:
     virtual void createOptions(QDomElement root);
     virtual void createInputTypes();
     virtual void createOutputTypes();
 
+private slots:
+
 private:
-    vtkImageDataPtr mRawResult;
+    ssc::ImagePtr mRawResult;
 };
+typedef boost::shared_ptr<class ResampleImageFilter> ResampleImageFilterPtr;
 
 
 } // namespace cx
 
-#endif // CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
+
+
+#endif // CXRESAMPLEIMAGEFILTER_H

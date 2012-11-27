@@ -11,51 +11,55 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-
-#ifndef CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
-#define CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
+#ifndef CXSMOOTHINGIMAGEFILTER_H
+#define CXSMOOTHINGIMAGEFILTER_H
 
 #include "cxFilterImpl.h"
 
-#include "sscColorDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 
 namespace cx
 {
 
-/** Filter implementation of the itk::BinaryThinningImageFilter3D
+/** Filter for smoothing a volume.
  *
  *
  * \ingroup cxPluginAlgorithm
- * \date 11 22, 2012
+ * \date Nov 26, 2012
  * \author christiana
  */
-class BinaryThinningImageFilter3DFilter : public FilterImpl
+class SmoothingImageFilter : public FilterImpl
 {
     Q_OBJECT
 
 public:
-    virtual ~BinaryThinningImageFilter3DFilter() {}
+    virtual ~SmoothingImageFilter() {}
 
     virtual QString getType() const;
     virtual QString getName() const;
     virtual QString getHelp() const;
 
-    virtual bool preProcess();
     virtual bool execute();
     virtual void postProcess();
 
-    ssc::ColorDataAdapterPtr getColorOption(QDomElement root);
+    // extensions:
+    ssc::DoubleDataAdapterXmlPtr getSigma(QDomElement root);
 
 protected:
     virtual void createOptions(QDomElement root);
     virtual void createInputTypes();
     virtual void createOutputTypes();
 
+private slots:
+
 private:
     vtkImageDataPtr mRawResult;
 };
+typedef boost::shared_ptr<class SmoothingImageFilter> SmoothingImageFilterPtr;
 
 
 } // namespace cx
 
-#endif // CXBINARYTHINNINGIMAGEFILTER3DFILTER_H
+
+
+#endif // CXSMOOTHINGIMAGEFILTER_H

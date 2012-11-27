@@ -25,6 +25,8 @@ SET( MOC_HEADER_FILES
     logic/cxConnectedThresholdImageFilter.h
 	logic/cxContourFilter.h
 	logic/cxBinaryThinningImageFilter3DFilter.h
+	logic/cxSmoothingImageFilter.h
+	logic/cxResampleImageFilter.h
    gui/cxAlgorithmPlugin.h
     gui/cxBinaryThresholdImageFilterWidget.h
     gui/cxConnectedThresholdImageFilterWidget.h
@@ -67,6 +69,10 @@ SET( SOURCE_FILES
 	logic/cxContourFilter.cpp
 	logic/cxBinaryThinningImageFilter3DFilter.h
 	logic/cxBinaryThinningImageFilter3DFilter.cpp
+	logic/cxSmoothingImageFilter.h
+	logic/cxSmoothingImageFilter.cpp
+	logic/cxResampleImageFilter.h
+	logic/cxResampleImageFilter.cpp
    gui/cxAlgorithmPlugin.h
    gui/cxAlgorithmPlugin.cpp
     gui/cxBinaryThresholdImageFilterWidget.h

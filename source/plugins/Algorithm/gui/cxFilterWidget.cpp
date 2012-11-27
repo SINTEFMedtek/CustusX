@@ -15,7 +15,6 @@
 #include "cxFilterWidget.h"
 
 #include "sscStringDataAdapter.h"
-#include "cxDummyFilter.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "sscHelperWidgets.h"
@@ -23,9 +22,14 @@
 #include "cxPatientData.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxDataInterface.h"
+
+#include "cxDummyFilter.h"
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
 #include "cxContourFilter.h"
+#include "cxSmoothingImageFilter.h"
+#include "cxResampleImageFilter.h"
+
 #include "sscTypeConversions.h"
 #include "cxDataSelectWidget.h"
 
@@ -84,7 +88,7 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
     }
 
     mStackedLayout->setCurrentWidget(widget);
-    mOptions[uid] = options;
+//    mOptions[uid] = options;
 }
 
 QString OptionsWidget::getCurrentUid()
@@ -92,17 +96,17 @@ QString OptionsWidget::getCurrentUid()
     return mStackedLayout->currentWidget()->objectName();
 }
 
-std::vector<DataAdapterPtr> OptionsWidget::getCurrentOptions()
-{
-    return this->getOptions(this->getCurrentUid());
-}
+//std::vector<DataAdapterPtr> OptionsWidget::getCurrentOptions()
+//{
+//    return this->getOptions(this->getCurrentUid());
+//}
 
-std::vector<DataAdapterPtr> OptionsWidget::getOptions(QString uid)
-{
-    if (!mOptions.count(uid))
-        return std::vector<DataAdapterPtr>();
-    return mOptions[uid];
-}
+//std::vector<DataAdapterPtr> OptionsWidget::getOptions(QString uid)
+//{
+//    if (!mOptions.count(uid))
+//        return std::vector<DataAdapterPtr>();
+//    return mOptions[uid];
+//}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -135,6 +139,16 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options
     connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
 
     mOptions = options;
+
+
+    topWidget->setStyleSheet(""
+                        "QGroupBox"
+                        "{ "
+                        "    border: 0px solid gray; "
+                        "    border-top: 1px solid gray; "
+                        "    border-radius: 0px;"
+                        "}"
+                        "");
 
     mInputsWidget = new OptionsWidget(this);
     topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
@@ -215,6 +229,8 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     mFilters->append(FilterPtr(new BinaryThresholdImageFilter()));
     mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
     mFilters->append(FilterPtr(new ContourFilter()));
+    mFilters->append(FilterPtr(new SmoothingImageFilter()));
+    mFilters->append(FilterPtr(new ResampleImageFilter()));
 
     QStringList availableFilters;
     std::map<QString,QString> names;
