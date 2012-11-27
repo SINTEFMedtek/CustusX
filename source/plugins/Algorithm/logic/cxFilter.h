@@ -20,6 +20,7 @@
 #include "sscData.h"
 #include "sscDataAdapter.h"
 #include "cxDataInterface.h"
+#include "sscXmlOptionItem.h"
 class QDomElement;
 
 namespace cx
@@ -49,27 +50,17 @@ class Filter : public QObject
     Q_OBJECT
 
 public:
-//    /** Definition of one Filter input or output argument.
-//      */
-//    class ArgumentType
-//    {
-//    public:
-//        explicit ArgumentType(QString dataType) : mDataType(dataType) {}
-//        /**
-//          * mesh, image, data (corresponding to ssc::Data::getType())
-//          */
-//        QString mDataType;
-//        QString mName;
-//        QString mHelp;
-//    };
-
-public:
     explicit Filter();
     virtual ~Filter() {}
     
 
     /**
       *  Return a unique string for this algorithm.
+      */
+    virtual QString getUid() const  = 0;
+    virtual void setUid(QString uid) = 0;
+    /**
+      *  Return the type of this algorithm.
       */
     virtual QString getType() const  = 0;
     /**
@@ -105,6 +96,8 @@ public:
     /**
       * Perform main thread preprocessing. Copies input data from options and
       * the input adapters into thread-safe storage.
+      * Assumes getOptions(), getInputTypes(), getOutputTypes()
+      * has been called (this initializes options)
       *
       * \param outputPath is path to data files for current patient.
       * \return success.
@@ -132,6 +125,49 @@ public:
 
     
 };
+
+
+/** Collection of filters.
+  *
+  * Connects them by giving them unique id's.
+  *
+  */
+class FilterGroup
+{
+public:
+    FilterGroup(ssc::XmlOptionFile options);
+    /**
+      * Get the option node for this pipeline
+      */
+    ssc::XmlOptionFile getOptions();
+    /**
+      * Get all filters in pipeline
+      */
+    std::vector<FilterPtr> getFilters() const;
+    /**
+      * Append a filter to group
+      */
+    void append(FilterPtr filter);
+
+    size_t size() const { return mFilters.size(); }
+    bool empty() const { return mFilters.empty(); }
+//    FilterPtr& operator[](size_t index) { return mFilters[index]; }
+//    const FilterPtr& operator[](size_t index) const { return mFilters[index]; }
+    FilterPtr get(int index) { return mFilters[index]; }
+    FilterPtr get(QString uid)
+    {
+        for (unsigned i=0; i<mFilters.size(); ++i)
+            if (mFilters[i]->getUid()==uid)
+                return mFilters[i];
+        return FilterPtr();
+    }
+
+private:
+    std::vector<FilterPtr> mFilters;
+    ssc::XmlOptionFile mOptions;
+};
+typedef boost::shared_ptr<FilterGroup> FilterGroupPtr;
+
 
 } // namespace cx
 

@@ -130,7 +130,6 @@ public: // interface extension
 
 signals:
   void dataChanged(QString);
-
 protected:
     /** Construct base with a filter that determined allowed ssc::Data types based
       * on their getType() return value. The default of ".*" means any type.
@@ -346,7 +345,8 @@ public: // interface extension
 protected:
   SelectDataStringDataAdapter();
 private:
-  ssc::DataPtr mData;
+//  ssc::DataPtr mData;
+  QString mUid;
 
 };
 

@@ -169,8 +169,7 @@ SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase(QString typeReg
 {
     mValueName = "Select data";
     mHelp = mValueName;
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()),                         this, SIGNAL(changed()));
-  connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),   this, SIGNAL(changed()));
+    connect(ssc::dataManager(), SIGNAL(dataLoaded()),   this, SIGNAL(changed()));
 }
 
 /**
@@ -532,11 +531,13 @@ SelectDataStringDataAdapter::SelectDataStringDataAdapter() : SelectDataStringDat
 
 bool SelectDataStringDataAdapter::setValue(const QString& value)
 {
-  if (mData && value==mData->getUid())
+  if (value==mUid)
     return false;
-  ssc::DataPtr temp = ssc::dataManager()->getData(value);
 
-  mData = temp;
+  mUid = "";
+  if (ssc::dataManager()->getData(value))
+      mUid = value;
+
   emit changed();
   emit dataChanged(this->getValue());
   return true;
@@ -544,14 +545,16 @@ bool SelectDataStringDataAdapter::setValue(const QString& value)
 
 QString SelectDataStringDataAdapter::getValue() const
 {
-  if(!mData)
-    return "<no data>";
-  return mData->getUid();
+    return mUid;
+//  if(!mData)
+//    return "<no data>";
+//  return mData->getUid();
 }
 
 ssc::DataPtr SelectDataStringDataAdapter::getData() const
 {
-  return mData;
+    return ssc::dataManager()->getData(mUid);
+//  return mData;
 }
 
 //---------------------------------------------------------

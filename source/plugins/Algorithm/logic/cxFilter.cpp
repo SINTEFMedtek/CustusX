@@ -22,5 +22,36 @@ Filter::Filter() :
 {
 }
 
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+FilterGroup::FilterGroup(ssc::XmlOptionFile options) :
+    mOptions(options)
+{
+}
+
+/**
+  * Get the option node for this pipeline
+  */
+ssc::XmlOptionFile FilterGroup::getOptions()
+{
+    return mOptions;
+}
+
+/**
+  * Get all filters in pipeline
+  */
+std::vector<FilterPtr> FilterGroup::getFilters() const
+{
+    return mFilters;
+}
+
+void FilterGroup::append(FilterPtr filter)
+{
+    mFilters.push_back(filter);
+    filter->setUid(QString("%1_%2").arg(filter->getType()).arg(mFilters.size()));
+}
+
 
 } // namespace cx

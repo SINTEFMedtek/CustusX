@@ -20,8 +20,8 @@
 namespace cx
 {
 
-TimedAlgorithmProgressBar::TimedAlgorithmProgressBar(QWidget* parent) //:
-//	mStartedAlgos(0)
+TimedAlgorithmProgressBar::TimedAlgorithmProgressBar(QWidget* parent) :
+    mShowTextLabel(true)
 {
 	QHBoxLayout* layout = new QHBoxLayout(this);
 	layout->setMargin(0);
@@ -82,6 +82,13 @@ void TimedAlgorithmProgressBar::productChangedSlot()
 //	ssc::messageManager()->sendInfo(QString("Executing %1, please wait!").arg(product));
 }
 
+void TimedAlgorithmProgressBar::setShowTextLabel(bool on)
+{
+    mShowTextLabel = on;
+    if (mLabel->isVisible())
+        mLabel->setVisible(on);
+}
+
 void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 {
 	TimedBaseAlgorithm* algo = dynamic_cast<TimedBaseAlgorithm*>(sender());
@@ -90,8 +97,7 @@ void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 		product = algo->getProduct();
 
 	mLabel->setText(product);
-	mLabel->show();
-//	mStartedAlgos++;
+    mLabel->setVisible(mShowTextLabel);
 	mStartedAlgos.insert(algo);
 
 	mTimerWidget->show();

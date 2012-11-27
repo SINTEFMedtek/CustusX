@@ -150,9 +150,11 @@ QString BinaryThresholdImageFilter::getHelp() const
 
 ssc::DoubleDataAdapterXmlPtr BinaryThresholdImageFilter::getLowerThresholdOption(QDomElement root)
 {
-    return ssc::DoubleDataAdapterXml::initialize("Threshold", "",
+    ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
             "Select lower threshold for the segmentation", 1, ssc::DoubleRange(0, 100, 1), 0,
             root);
+    retval->setAddSlider(true);
+    return retval;
 }
 
 void BinaryThresholdImageFilter::createOptions(QDomElement root)
@@ -160,7 +162,6 @@ void BinaryThresholdImageFilter::createOptions(QDomElement root)
     mLowerThresholdOption = this->getLowerThresholdOption(root);
     connect(mLowerThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
     mOptionsAdapters.push_back(mLowerThresholdOption);
-std:cout << "BinaryThresholdImageFilter::createOptions(QDomElement root) "  << mLowerThresholdOption.get() << std::endl;
 }
 
 void BinaryThresholdImageFilter::createInputTypes()
@@ -198,8 +199,13 @@ void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
   if(!image)
     return;
   mLowerThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
-  int initValue = image->getMin() + ((image->getMax() - image->getMin()) / 10);
-  mLowerThresholdOption->setValue(initValue);
+  int oldValue = mLowerThresholdOption->getValue();
+  // avoid reset if old value is still within range
+  if ((image->getMin() > oldValue )||( oldValue > image->getMax()))
+  {
+      int initValue = + image->getMin() + image->getRange()/10;
+      mLowerThresholdOption->setValue(initValue);
+  }
   RepManager::getInstance()->getThresholdPreview()->removePreview();
 
 //  QString imageName = image->getName();
@@ -209,6 +215,7 @@ void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
 
 void BinaryThresholdImageFilter::thresholdSlot()
 {
+//    std::cout << "BinaryThresholdImageFilter::thresholdSlot() " << mActive << std::endl;
     if (mActive)
     {
         ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mInputTypes[0]->getData());
@@ -225,12 +232,13 @@ bool BinaryThresholdImageFilter::preProcess()
 
 bool BinaryThresholdImageFilter::execute()
 {
-    if (mCopiedInput.size()<1 || !mCopiedInput[0] || mCopiedInput[0]->getType()!="image")
+    ssc::ImagePtr input = this->getCopiedInputImage();
+    if (!input)
         return false;
 
     ssc::DoubleDataAdapterXmlPtr lowerThreshold = this->getLowerThresholdOption(mCopiedOptions);
 
-    itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(this->getInputImage());
+    itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
 
     //Binary Thresholding
     typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
@@ -255,19 +263,12 @@ bool BinaryThresholdImageFilter::execute()
     return true;
 }
 
-ssc::ImagePtr BinaryThresholdImageFilter::getInputImage()
-{
-    if (mCopiedInput.size() < 1)
-        return ssc::ImagePtr();
-    return boost::shared_dynamic_cast<ssc::Image>(mCopiedInput[0]);
-}
-
 void BinaryThresholdImageFilter::postProcess()
 {
     if (!mRawResult)
         return;
 
-    ssc::ImagePtr input = this->getInputImage();
+    ssc::ImagePtr input = this->getCopiedInputImage();
 
     if (!input)
         return;
@@ -281,6 +282,9 @@ void BinaryThresholdImageFilter::postProcess()
     output->resetTransferFunctions();
     ssc::dataManager()->loadData(output);
     ssc::dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+
+    // set output
+    mOutputTypes.front()->setValue(output->getUid());
 }
 
 
