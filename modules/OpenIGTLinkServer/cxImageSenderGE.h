@@ -61,7 +61,7 @@ private:
 
 	vtkSmartPointer<vtkImageData> mImgStream;//Last image from GE
 	igstk::RealTimeClock::TimeStampType mLastGrabTime;
-	data_streaming::beamspace_geometry mFrameGeometry;///<Frame geometry from GE
+	data_streaming::frame_geometry mFrameGeometry;///<Frame geometry from GE
 	bool mFrameGeometryChanged; ///< Have frame geometry changed since last frame
 
 	bool initialize_local();
