@@ -19,6 +19,7 @@
 #include <QtGui>
 #include "sscTypeConversions.h"
 #include "cxDataSelectWidget.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -37,6 +38,7 @@ PipelineWidgetFilterLine::PipelineWidgetFilterLine(QWidget* parent, FilterPtr fi
 //    std::cout << QString("PipelineWidgetFilterLine margin=%1, spacing=%2").arg(layout->margin()).arg(layout->spacing()) << std::endl;
 //    layout->setMargin(layout->margin()/2);
     layout->setMargin(0);
+    layout->setSpacing(2);
 
     mAlgoNameLabel = new QLabel(QString("<b>%1</b>").arg(mFilter->getName()), this);
     mAlgoNameLabel->setToolTip(mFilter->getHelp());
@@ -56,6 +58,17 @@ PipelineWidgetFilterLine::PipelineWidgetFilterLine(QWidget* parent, FilterPtr fi
     CXSmallToolButton* button = new CXSmallToolButton();
     button->setObjectName("RunFilterButton");
     button->setDefaultAction(mAction);
+    layout->addWidget(button);
+
+    mDetailsAction = this->createAction(this,
+                    QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+                    "Run Filter", "",
+                    SIGNAL(showDetails()),
+                    NULL);
+    mDetailsAction->setData(mFilter->getUid());
+
+    button = new CXSmallToolButton();
+    button->setDefaultAction(mDetailsAction);
     layout->addWidget(button);
 }
 
@@ -106,31 +119,53 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
     topLayout->setSpacing(4);
     mButtonGroup = new QButtonGroup(this);
 
+    struct Inner
+    {
+        static QHBoxLayout* addHMargin(QWidget* base)
+        {
+            QHBoxLayout* layout = new QHBoxLayout;
+            layout->addWidget(base);
+            layout->setContentsMargins(4,0,4,0);
+            return layout;
+        }
+    };
+
     for (unsigned i=0; i<filters->size(); ++i)
     {
-        topLayout->addWidget(new DataSelectWidget(this, nodes[i]));
+        topLayout->addLayout(Inner::addHMargin(new DataSelectWidget(this, nodes[i])));
+//        topLayout->addWidget(new DataSelectWidget(this, nodes[i]));
 
         PipelineWidgetFilterLine* algoLine = new PipelineWidgetFilterLine(this, filters->get(i), mButtonGroup);
         connect(algoLine, SIGNAL(requestRunFilter()), this, SLOT(runFilterSlot()));
+        connect(algoLine, SIGNAL(showDetails()), this, SLOT(toggleDetailsSlot()));
         connect(algoLine, SIGNAL(filterSelected(QString)), this, SLOT(filterSelectedSlot(QString)));
         algoLine->mTimedAlgorithmProgressBar->attach(mPipeline->getTimedAlgorithm(filters->get(i)->getUid()));
 
         mAlgoLines.push_back(algoLine);
         QFrame* frame = this->wrapInFrame(algoLine);
+        frame->layout()->setContentsMargins(4,0,4,0);
         frame->setObjectName("FilterBackground");
         topLayout->addWidget(frame);
 //        topLayout->addWidget(algoLine);
     }
-    topLayout->addWidget(new DataSelectWidget(this, nodes.back()));
+//    topLayout->addWidget(new DataSelectWidget(this, nodes.back()));
+    topLayout->addLayout(Inner::addHMargin(new DataSelectWidget(this, nodes.back())));
 
     topLayout->addSpacing(12);
 
     mSetupWidget = new FilterSetupWidget(this, filters->getOptions(), true);
     topLayout->addWidget(mSetupWidget);
+    mSetupWidget->setVisible(settings()->value("pipeline/showDetails").toBool());
 
     topLayout->addStretch();
 
     this->filterSelectedSlot(filters->get(0)->getUid());
+}
+
+void PipelineWidget::toggleDetailsSlot()
+{
+  mSetupWidget->setVisible(!mSetupWidget->isVisible());
+  settings()->setValue("pipeline/showDetails", mSetupWidget->isVisible());
 }
 
 void PipelineWidget::filterSelectedSlot(QString uid)
@@ -143,29 +178,6 @@ void PipelineWidget::filterSelectedSlot(QString uid)
             mAlgoLines[i]->mRadioButton->setChecked(true);
 }
 
-//void PipelineWidget::runFilterSlot()
-//{
-//    if (mThread)
-//    {
-//        ssc::messageManager()->sendWarning(QString("Last operation on %1 is not finished. Could not start filtering")
-//                                           .arg(mThread->getFilter()->getName()));
-//        return;
-//    }
-
-//    mCurrentlyRunningPipelineWidgetFilterLine = dynamic_cast<PipelineWidgetFilterLine*>(sender());
-
-//    if (!mCurrentlyRunningPipelineWidgetFilterLine)
-//        return;
-
-//    FilterPtr filter = mCurrentlyRunningPipelineWidgetFilterLine->mFilter;
-
-//    mThread.reset(new FilterTimedAlgorithm(filter));
-//    connect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
-//    mCurrentlyRunningPipelineWidgetFilterLine->mTimedAlgorithmProgressBar->attach(mThread);
-
-//    mThread->execute();
-//}
-
 void PipelineWidget::runFilterSlot()
 {
     PipelineWidgetFilterLine* line = dynamic_cast<PipelineWidgetFilterLine*>(sender());
@@ -174,38 +186,7 @@ void PipelineWidget::runFilterSlot()
         return;
 
     mPipeline->execute(line->mFilter->getUid());
-
-//    if (mThread)
-//    {
-//        ssc::messageManager()->sendWarning(QString("Last operation on %1 is not finished. Could not start filtering")
-//                                           .arg(mThread->getFilter()->getName()));
-//        return;
-//    }
-
-
-
-
-//    mCurrentlyRunningPipelineWidgetFilterLine = dynamic_cast<PipelineWidgetFilterLine*>(sender());
-
-//    if (!mCurrentlyRunningPipelineWidgetFilterLine)
-//        return;
-
-//    FilterPtr filter = mCurrentlyRunningPipelineWidgetFilterLine->mFilter;
-
-//    mThread.reset(new FilterTimedAlgorithm(filter));
-//    connect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
-//    mCurrentlyRunningPipelineWidgetFilterLine->mTimedAlgorithmProgressBar->attach(mThread);
-
-//    mThread->execute();
 }
-
-//void PipelineWidget::finishedSlot()
-//{
-//    mCurrentlyRunningPipelineWidgetFilterLine->mTimedAlgorithmProgressBar->detach(mThread);
-//    mCurrentlyRunningPipelineWidgetFilterLine = NULL;
-//    disconnect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
-//    mThread.reset();
-//}
 
 QString PipelineWidget::defaultWhatsThis() const
 {
