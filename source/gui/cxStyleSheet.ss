@@ -13,10 +13,11 @@ CXFrame
 
 CXFrame#FilterBackground
 {
-	border: 0px solid gray;
+	border: 1px solid palette(dark);
 	border-radius: 3px;
-	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+/*	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 									  stop: 0 palette(midlight), stop: 1 palette(dark));
+*/
 }
 /*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 								  stop: 0 #f6f7fa, stop: 1 #dadbde);
@@ -35,8 +36,10 @@ CXSmallToolButton#RunFilterButton
 {
 	width : 60px;
 	height : 15px;
+	/*
 	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
 									  stop: 0 palette(midlight), stop: 1 palette(dark));
+*/
 }
 
 CXSmallToolButton::checked
@@ -61,12 +64,12 @@ QRadioButton::indicator
 /** The Linux GroupBox contains no border. This makes is useless
  *  in cx. New definition here:
  */
- /*
- disabled: OSX10.8 groupbox was cool. Investigate.
+
+ /*OSX10.8 groupbox was cool. Investigate.*/
 QGroupBox
 { 
-	font: bold;
-	border: 1px solid gray; 
+	font: bold 10px;
+	border: 1px solid palette(dark);
 	border-radius: 3px;
 	margin-top: 1em;
 }
@@ -76,5 +79,4 @@ QGroupBox::title
 	subcontrol-position: top left;
 	padding: 0px 0px;
 }
-*/
-		
+
