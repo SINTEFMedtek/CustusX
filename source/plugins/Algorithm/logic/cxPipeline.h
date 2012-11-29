@@ -89,6 +89,13 @@ public:
       */
     FilterGroupPtr getFilters() const;
     /**
+      * Set all options with the named valueName to the value,
+      * given that they are of the correct type.
+      *
+      * Supported types: bool, double, QString, QColor
+      */
+    void setOption(QString valueName, QVariant value);
+    /**
       * Get all nodes. If there are N filters, there are N+1 nodes.
       * Node N are input to filter N, and have node N+1 as output.
       *
@@ -104,11 +111,18 @@ public:
       */
     TimedAlgorithmPtr getTimedAlgorithm(QString uid);
     /**
+      * Get the TimedAlgorithm for the entire pipeline. This is
+      * a composition of all the individual filters.
+      * Do not run this directly: Rather use the execute() method,
+      * use this for extra stuff like checking for finished.
+      */
+    TimedAlgorithmPtr getPipelineTimedAlgorithm();
+    /**
       * Execute the filter at filterIndex. Recursively execute
       * all filters earlier in the pipeline if they dont have
       * an output value.
       */
-    void execute(QString uid);
+    void execute(QString uid = "");
 
 signals:
     
@@ -116,6 +130,7 @@ public slots:
     void nodeValueChanged(QString uid, int index);
 
 private:
+    void setOption(DataAdapterPtr adapter, QVariant value);
     std::vector<SelectDataStringDataAdapterBasePtr> createNodes();
 
     FilterGroupPtr mFilters;

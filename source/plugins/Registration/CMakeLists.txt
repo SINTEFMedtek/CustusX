@@ -34,7 +34,8 @@ SET( MOC_HEADER_FILES
     gui/cxElastixWidget.h
     gui/cxElastixSyntaxHighlighter.h
     gui/cxWirePhantomWidget.h
-    gui/cxPatientOrientationWidget.h
+	gui/cxWirePhantomWidgetOld.h
+	gui/cxPatientOrientationWidget.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -90,7 +91,9 @@ SET( SOURCE_FILES
     gui/cxElastixSyntaxHighlighter.cpp
     gui/cxWirePhantomWidget.h
     gui/cxWirePhantomWidget.cpp
-    gui/cxPatientOrientationWidget.h
+	gui/cxWirePhantomWidgetOld.h
+	gui/cxWirePhantomWidgetOld.cpp
+	gui/cxPatientOrientationWidget.h
     gui/cxPatientOrientationWidget.cpp
     )
 
