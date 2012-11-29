@@ -69,6 +69,8 @@ public:
 	this->generate();
   }
   virtual bool isFinished() const { return mWatcher.isFinished(); }
+  virtual bool isRunning() const { return mWatcher.isRunning(); }
+
 
 protected:
   virtual void preProcessingSlot() {} ///< This happens before the thread (calculate) is started, here non-thread safe functions can be called
