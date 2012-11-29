@@ -18,6 +18,11 @@
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 
+#include "sscBoolDataAdapter.h"
+#include "sscDoubleDataAdapter.h"
+#include "sscColorDataAdapter.h"
+#include "sscStringDataAdapter.h"
+
 namespace cx
 {
 
@@ -143,6 +148,59 @@ FilterGroupPtr Pipeline::getFilters() const
     return mFilters;
 }
 
+/** Set all options with the named valueName to the value,
+  * given that they are of the correct type.
+  *
+  * Supported types: bool, double, QString, QColor
+  */
+void Pipeline::setOption(QString valueName, QVariant value)
+{
+    for (unsigned i=0; i<mFilters->size(); ++i)
+    {
+        FilterPtr filter = mFilters->get(i);
+        std::vector<DataAdapterPtr> options = filter->getOptions(mFilters->getOptions().descend(filter->getUid()).getElement());
+
+        for (unsigned j=0; j<options.size(); ++j)
+        {
+            if (options[j]->getValueName()==valueName)
+                this->setOption(options[j], value);
+        }
+    }
+}
+
+void Pipeline::setOption(DataAdapterPtr adapter, QVariant value)
+{
+    if (value.canConvert<bool>())
+    {
+        ssc::BoolDataAdapterPtr specific = boost::shared_dynamic_cast<ssc::BoolDataAdapter>(adapter);
+        if (specific)
+            specific->setValue(qvariant_cast<bool>(value));
+    }
+    else if (value.canConvert<double>())
+    {
+        ssc::DoubleDataAdapterPtr specific = boost::shared_dynamic_cast<ssc::DoubleDataAdapter>(adapter);
+        if (specific)
+            specific->setValue(qvariant_cast<double>(value));
+    }
+    else if (value.canConvert<QColor>())
+    {
+        ssc::ColorDataAdapterPtr specific = boost::shared_dynamic_cast<ssc::ColorDataAdapter>(adapter);
+        if (specific)
+            specific->setValue(qvariant_cast<QColor>(value));
+    }
+    else if (value.canConvert<QString>())
+    {
+        ssc::StringDataAdapterPtr specific = boost::shared_dynamic_cast<ssc::StringDataAdapter>(adapter);
+        if (specific)
+            specific->setValue(qvariant_cast<QString>(value));
+    }
+    else
+    {
+        ssc::messageManager()->sendWarning(QString("Attempt to set option of type %2 is not supported").arg(value.typeName()));
+    }
+}
+
+
 std::vector<SelectDataStringDataAdapterBasePtr> Pipeline::getNodes()
 {
     // TODO: create getMainXXType() in filters instead of using zero.
@@ -201,8 +259,17 @@ TimedAlgorithmPtr Pipeline::getTimedAlgorithm(QString uid)
     return mTimedAlgorithm[uid];
 }
 
+TimedAlgorithmPtr Pipeline::getPipelineTimedAlgorithm()
+{
+    return mCompositeTimedAlgorithm;
+}
+
 void Pipeline::execute(QString uid)
 {
+    // no input uid: execute entire pipeline
+    if (uid.isEmpty())
+        uid = mFilters->get(mFilters->size()-1)->getUid();
+
     int endIndex = -1;
 
     for (unsigned i=0; i<mFilters->size(); ++i)

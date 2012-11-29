@@ -12,8 +12,16 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxWirePhantomWidget.h"
+#include "cxWirePhantomWidgetOld.h"
 
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QFrame>
+#include "cxBinaryThresholdImageFilterWidget.h"
+#include "cxDataInterface.h"
+#include "sscLabeledComboBoxWidget.h"
+#include "sscTypeConversions.h"
+#include "cxColorSelectButton.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
 #include "cxRegistrationManager.h"
@@ -26,45 +34,54 @@
 #include "sscDistanceMetric.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
+#include "boost/bind.hpp"
 #include "sscTool.h"
 #include "sscToolManager.h"
 #include "sscTypeConversions.h"
+#include "libQtSignalAdapters/Qt2Func.h"
+#include "libQtSignalAdapters/ConnectionFactories.h"
+
 #include "cxAcquisitionData.h"
 #include "sscReconstructManager.h"
-#include "cxPipelineWidget.h"
-
-#include "cxSmoothingImageFilter.h"
-#include "cxBinaryThinningImageFilter3DFilter.h"
-#include "cxBinaryThresholdImageFilter.h"
 
 namespace cx
 {
 //------------------------------------------------------------------------------
-WirePhantomWidget::WirePhantomWidget(RegistrationManagerPtr regManager, QWidget* parent) :
-        RegistrationBaseWidget(regManager, parent, "WirePhantomWidget", "Wire Phantom Test")
+WirePhantomWidgetOld::WirePhantomWidgetOld(RegistrationManagerPtr regManager, QWidget* parent) :
+        RegistrationBaseWidget(regManager, parent, "WirePhantomWidgetOld", "Wire Phantom Test Old")
 {
     mLastRegistration = ssc::Transform3D::Identity();
+    connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this,
+                    SLOT(activeImageChangedSlot(const QString&)));
 
-    // fill the pipeline with filters:
-    mPipeline.reset(new Pipeline());
-    ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("registration").descend("WirePhantomWidget");
-    FilterGroupPtr filters(new FilterGroup(options));
-    filters->append(FilterPtr(new SmoothingImageFilter()));
-    filters->append(FilterPtr(new BinaryThresholdImageFilter()));
-    filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
-    mPipeline->initialize(filters);
-
-    mPipeline->getNodes()[0]->setValueName("US Image:");
-    mPipeline->getNodes()[0]->setHelp("Select an US volume acquired from the wire phantom.");
-    mPipeline->setOption("Color", QVariant(QColor("red")));
+    mCompositeAlgorithm.reset(new CompositeTimedAlgorithm());
+    mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+    mTimedAlgorithmProgressBar->attach(mCompositeAlgorithm);
 
     mLayout = new QVBoxLayout(this);
+    mSegmentationWidget = new BinaryThresholdImageFilterWidget(this);
+    mCenterlineWidget = new CenterlineWidget(this);
 
-    mPipelineWidget = new PipelineWidget(NULL, mPipeline);
+    mUSImageInput = SelectImageStringDataAdapter::New();
+    mUSImageInput->setValueName("US Image: ");
+    mUSImageInput->setHelp("Select an US volume acquired from the wire phantom.");
+    connect(mUSImageInput.get(), SIGNAL(dataChanged(QString)), mSegmentationWidget, SLOT(setImageInputSlot(QString)));
+
+    mSegmentationOutput = SelectImageStringDataAdapter::New();
+    mSegmentationOutput->setValueName("Output: ");
+    connect(mSegmentationOutput.get(), SIGNAL(dataChanged(QString)), mCenterlineWidget,
+            SLOT(setImageInputSlot(QString)));
+
+    mCenterlineOutput = SelectDataStringDataAdapter::New();
+    mCenterlineOutput->setValueName("Output: ");
+    connect(mCenterlineOutput.get(), SIGNAL(dataChanged(QString)), this, SLOT(setImageSlot(QString)));
 
     QPushButton* showCrossButton = new QPushButton("Show Cross");
     showCrossButton->setToolTip("Load the centerline description of the wire cross");
     connect(showCrossButton, SIGNAL(clicked()), this, SLOT(loadNominalCross()));
+
+    mCenterlineWidget->setDefaultColor(QColor("red"));
+    mSegmentationWidget->setDefaultColor(QColor("red"));
 
     mMeasureButton = new QPushButton("Execute");
     mMeasureButton->setToolTip("Measure deviation of input volume from nominal wire cross.");
@@ -84,20 +101,71 @@ WirePhantomWidget::WirePhantomWidget(RegistrationManagerPtr regManager, QWidget*
     mResults = new QTextEdit;
 
     mLayout->addWidget(showCrossButton);
-    mLayout->addWidget(mPipelineWidget);
+    mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mUSImageInput));
+    mLayout->addWidget(this->createHorizontalLine());
+    mLayout->addWidget(
+            this->createMethodWidget(mSegmentationWidget, new ssc::LabeledComboBoxWidget(this, mSegmentationOutput),
+                    "Segmentation"));
+    mLayout->addWidget(this->createHorizontalLine());
+    mLayout->addWidget(
+            this->createMethodWidget(mCenterlineWidget, new ssc::LabeledComboBoxWidget(this, mCenterlineOutput),
+                    "Centerline"));
+    mLayout->addWidget(this->createHorizontalLine());
     mLayout->addLayout(buttonsLayout);
+    mLayout->addWidget(mTimedAlgorithmProgressBar);
     mLayout->addWidget(mResults, 1);
     mLayout->addStretch();
+
+//  connect(mResampleWidget, SIGNAL(outputImageChanged(QString)), this , SLOT(resampleOutputArrived(QString)));
+    connect(mSegmentationWidget, SIGNAL(outputImageChanged(QString)), this, SLOT(segmentationOutputArrived(QString)));
+    connect(mCenterlineWidget, SIGNAL(outputImageChanged(QString)), this, SLOT(centerlineOutputArrived(QString)));
+
+//	QtSignalAdapters::connect1<void()>(
+//		mSegmentationWidget,
+//		SIGNAL(inputImageChanged(QString)),
+//		boost::bind(&SelectImageStringDataAdapter::setValue, mSegmentationOutput, ""));
+//
+//	QtSignalAdapters::connect1<void()>(
+//		mCenterlineWidget,
+//		SIGNAL(inputImageChanged(QString)),
+//		boost::bind(&SelectDataStringDataAdapter::setValue, mCenterlineOutput, ""));
+
+    connect(mSegmentationWidget, SIGNAL(inputImageChanged(QString)), this, SLOT(clearSegmentationOutput()));
+    connect(mCenterlineWidget,   SIGNAL(inputImageChanged(QString)), this, SLOT(clearCenterlineOutput()));
 }
 
-WirePhantomWidget::~WirePhantomWidget()
+
+void WirePhantomWidgetOld::clearSegmentationOutput()
+{
+    mSegmentationOutput->setValue("");
+}
+void WirePhantomWidgetOld::clearCenterlineOutput()
+{
+    mCenterlineOutput->setValue("");
+}
+
+void WirePhantomWidgetOld::activeImageChangedSlot(const QString&)
+{
+    ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+
+    if (!mUSImageInput->getValue().isEmpty())
+        return;
+
+    // removed: led to setting of preview...
+//	if (image && image->getModality().contains("US"))
+//		mUSImageInput->setValue(image->getUid());
+}
+
+
+WirePhantomWidgetOld::~WirePhantomWidgetOld()
 {
 }
 
-QString WirePhantomWidget::defaultWhatsThis() const
+QString WirePhantomWidgetOld::defaultWhatsThis() const
 {
     return "<html>"
             "<h3>Measure US accuracy using the wire phantom.</h3>"
+            "<p><font color=red>Deprecated! Use Wire Phantom instead.</p>"
             "<p>"
             "Select a US recording of the wire phantom, then press"
             "the register button to find deviation from the nominal"
@@ -107,7 +175,26 @@ QString WirePhantomWidget::defaultWhatsThis() const
             "</html>";
 }
 
-ssc::MeshPtr WirePhantomWidget::loadNominalCross()
+void WirePhantomWidgetOld::setImageSlot(QString uid)
+{
+}
+
+void WirePhantomWidgetOld::segmentationOutputArrived(QString uid)
+{
+    mSegmentationOutput->setValue(uid);
+    // only show result if segmentation widget is visible, too much noise otherwise.
+    if (mSegmentationWidget->isVisible())
+        this->showData(ssc::dataManager()->getData(uid));
+}
+
+void WirePhantomWidgetOld::centerlineOutputArrived(QString uid)
+{
+    std::cout << "WirePhantomWidgetOld::centerlineOutputArrived " << uid << std::endl;
+    mCenterlineOutput->setValue(uid);
+    this->showData(ssc::dataManager()->getData(uid));
+}
+
+ssc::MeshPtr WirePhantomWidgetOld::loadNominalCross()
 {
     QString nominalCrossFilename = DataLocations::getRootConfigPath()+"/models/wire_phantom_cross_pts.vtk";
     ssc::MeshPtr retval;
@@ -131,22 +218,40 @@ ssc::MeshPtr WirePhantomWidget::loadNominalCross()
     return retval;
 }
 
-void WirePhantomWidget::showData(ssc::DataPtr data)
+void WirePhantomWidgetOld::showData(ssc::DataPtr data)
 {
     viewManager()->getViewGroups()[0]->getData()->addData(data);
 }
 
-void WirePhantomWidget::measureSlot()
+void WirePhantomWidgetOld::measureSlot()
 {
-    if (mPipeline->getPipelineTimedAlgorithm()->isRunning())
-        return;
-    connect(mPipeline->getPipelineTimedAlgorithm().get(), SIGNAL(finished()), this, SLOT(registration()));
-    mPipeline->execute();
+    // remove old stuff
+    mCompositeAlgorithm->clear();
+    disconnect(mCompositeAlgorithm.get(), SIGNAL(finished()), this, SLOT(registration()));
+
+    // add all steps
+    if (!mCenterlineOutput->getData())
+    {
+        if (!mSegmentationOutput->getImage())
+        {
+            if (!mUSImageInput->getImage())
+            {
+                ssc::messageManager()->sendWarning("No input selected, measure failed.");
+                return;
+            }
+
+            mCompositeAlgorithm->append(mSegmentationWidget->getSegmentationAlgorithm());
+        }
+        mCompositeAlgorithm->append(mCenterlineWidget->getCenterlineAlgorithm());
+    }
+
+    connect(mCompositeAlgorithm.get(), SIGNAL(finished()), this, SLOT(registration()));
+    mCompositeAlgorithm->execute();
 }
 
 /**Compute the centroid of the input mesh.
  */
-ssc::Vector3D WirePhantomWidget::findCentroid(ssc::MeshPtr mesh)
+ssc::Vector3D WirePhantomWidgetOld::findCentroid(ssc::MeshPtr mesh)
 {
     vtkPolyDataPtr poly = mesh->getVtkPolyData();
     vtkPointsPtr points = poly->GetPoints();
@@ -160,11 +265,8 @@ ssc::Vector3D WirePhantomWidget::findCentroid(ssc::MeshPtr mesh)
     return acc/N;
 }
 
-void WirePhantomWidget::registration()
+void WirePhantomWidgetOld::registration()
 {
-//    // disconnect the connection that started this registration
-    disconnect(mPipeline->getPipelineTimedAlgorithm().get(), SIGNAL(finished()), this, SLOT(registration()));
-
     // Verify that a centerline is available:
     //  - if no centerline, run centerline algo on segmentation,
     //  - if no segmentation, run segmentation
@@ -177,19 +279,19 @@ void WirePhantomWidget::registration()
     // apply fMm to nominal, return diff
     //
 
-    ssc::DataPtr measuredCross = mPipeline->getNodes().back()->getData();
     ssc::MeshPtr nominalCross = this->loadNominalCross();
-    if (!nominalCross || !measuredCross)
+    if (!nominalCross || !mCenterlineOutput->getData())
     {
         ssc::messageManager()->sendError("Missing fixed/moving data. WirePhantom measurement failed.");
         return;
     }
 
     mManager->setFixedData(nominalCross);
-    mManager->setMovingData(measuredCross);
+    mManager->setMovingData(mCenterlineOutput->getData());
 
     this->showData(nominalCross);
-    this->showData(measuredCross);
+    this->showData(mCenterlineOutput->getData());
+
 
     ssc::SeansVesselReg vesselReg;
     vesselReg.mt_auto_lts = true;
@@ -260,16 +362,6 @@ void WirePhantomWidget::registration()
     mResults->append(result);
     ssc::messageManager()->sendInfo("Wire Phantom Test Results:\n"+result);
 
-    this->showDataMetrics(cross_r);
-}
-
-/** Show the nominal and measured cross positions and the line between them as data metrics.
-  * The input is the cross in ref space.
-  * Note: The two points is shown in the same physical position in the view. Use Registration History
-  * to investigate the difference.
-  */
-void WirePhantomWidget::showDataMetrics(ssc::Vector3D cross_r)
-{
     // add metrics displaying the distance from cross in the nominal and us spaces:
     ssc::Transform3D usMnom = ssc::SpaceHelpers::get_toMfrom(ssc::SpaceHelpers::getD(mManager->getFixedData()), ssc::SpaceHelpers::getD(mManager->getMovingData()));
     ssc::Vector3D cross_us = usMnom.coord(cross_r);
@@ -277,8 +369,8 @@ void WirePhantomWidget::showDataMetrics(ssc::Vector3D cross_r)
     ssc::PointMetricPtr p1 = boost::shared_dynamic_cast<ssc::PointMetric>(ssc::dataManager()->getData("cross_nominal"));
     if (!p1)
         p1.reset(new ssc::PointMetric("cross_nominal", "cross_nominal"));
-    p1->get_rMd_History()->setParentSpace(mManager->getFixedData()->getUid());
-    p1->setSpace(ssc::SpaceHelpers::getD(mManager->getFixedData()));
+    p1->get_rMd_History()->setParentSpace(nominalCross->getUid());
+    p1->setSpace(ssc::SpaceHelpers::getD(nominalCross));
     p1->setCoordinate(cross_r);
     ssc::dataManager()->loadData(p1);
     this->showData(p1);
@@ -308,7 +400,7 @@ void WirePhantomWidget::showDataMetrics(ssc::Vector3D cross_r)
  * Use as a guesstimate for the probe position used during wire measurement.
  *
  */
-std::pair<QString, ssc::Transform3D> WirePhantomWidget::getLastProbePosition()
+std::pair<QString, ssc::Transform3D> WirePhantomWidgetOld::getLastProbePosition()
 {
     // find transform to probe space t_us, i.e. the middle position from the us acquisition
     ssc::USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getBaseInputData();
@@ -320,7 +412,7 @@ std::pair<QString, ssc::Transform3D> WirePhantomWidget::getLastProbePosition()
     return std::make_pair(usData.mFilename, prMt_us);
 }
 
-void WirePhantomWidget::generate_sMt()
+void WirePhantomWidgetOld::generate_sMt()
 {
     bool translateOnly = true;
 
