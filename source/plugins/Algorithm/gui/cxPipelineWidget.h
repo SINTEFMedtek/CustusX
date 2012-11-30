@@ -28,28 +28,28 @@ class TimedAlgorithmProgressBar;
 
 class PipelineWidgetFilterLine : public BaseWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    PipelineWidgetFilterLine(QWidget* parent, FilterPtr filter, QButtonGroup *buttonGroup);
-    QString defaultWhatsThis() const;
+	PipelineWidgetFilterLine(QWidget* parent, FilterPtr filter, QButtonGroup *buttonGroup);
+	QString defaultWhatsThis() const;
 
-    QRadioButton* mRadioButton;
-    QLabel* mAlgoNameLabel;
-    QAction* mAction;
-    QAction* mDetailsAction;
-    TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
-    FilterPtr mFilter;
+	QRadioButton* mRadioButton;
+	QLabel* mAlgoNameLabel;
+	QAction* mAction;
+	QAction* mDetailsAction;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+	FilterPtr mFilter;
 
 signals:
-    void requestRunFilter();
-    void filterSelected(QString uid);
-    void showDetails();
+	void requestRunFilter();
+	void filterSelected(QString uid);
+	void showDetails();
 
 private slots:
-    void radioButtonSelectedSlot(bool on);
-    void requestRunFilterSlot();
+	void radioButtonSelectedSlot(bool on);
+	void requestRunFilterSlot();
 protected:
-    virtual void mousePressEvent(QMouseEvent* event);
+	virtual void mousePressEvent(QMouseEvent* event);
 };
 
 /** GUI for sequential execution of Filters.
@@ -61,23 +61,23 @@ protected:
  */
 class PipelineWidget : public BaseWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    PipelineWidget(QWidget* parent, PipelinePtr pipeline);
-    QString defaultWhatsThis() const;
+	PipelineWidget(QWidget* parent, PipelinePtr pipeline);
+	QString defaultWhatsThis() const;
 private slots:
-    void runFilterSlot();
-    void filterSelectedSlot(QString uid);
-    void toggleDetailsSlot();
+	void runFilterSlot();
+	void filterSelectedSlot(QString uid);
+	void toggleDetailsSlot();
 private:
-    void selectFilter(int index);
-    PipelinePtr mPipeline;
-    QButtonGroup* mButtonGroup;
-    std::vector<PipelineWidgetFilterLine*> mAlgoLines;
-    FilterSetupWidget* mSetupWidget;
+	void selectFilter(int index);
+	PipelinePtr mPipeline;
+	QButtonGroup* mButtonGroup;
+	std::vector<PipelineWidgetFilterLine*> mAlgoLines;
+	FilterSetupWidget* mSetupWidget;
 
-//    FilterTimedAlgorithmPtr mThread;
-//    PipelineWidgetFilterLine* mCurrentlyRunningPipeli\neWidgetFilterLine;
+	//    FilterTimedAlgorithmPtr mThread;
+	//    PipelineWidgetFilterLine* mCurrentlyRunningPipeli\neWidgetFilterLine;
 };
 
 

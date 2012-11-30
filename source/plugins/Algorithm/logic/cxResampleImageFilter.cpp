@@ -29,57 +29,57 @@ namespace cx
 
 QString ResampleImageFilter::getName() const
 {
-    return "Resample";
+	return "Resample";
 }
 
 QString ResampleImageFilter::getType() const
 {
-    return "ResampleImageFilter";
+	return "ResampleImageFilter";
 }
 
 QString ResampleImageFilter::getHelp() const
 {
-    return "<html>"
-      "<h3>Resample.</h3>"
-      "<p><i>Resample the volume into the space of the reference volume. Also crop to the same volume.</i></p>"
-      "</html>";
+	return "<html>"
+	        "<h3>Resample.</h3>"
+	        "<p><i>Resample the volume into the space of the reference volume. Also crop to the same volume.</i></p>"
+	        "</html>";
 }
 
 ssc::DoubleDataAdapterXmlPtr ResampleImageFilter::getMarginOption(QDomElement root)
 {
-    return ssc::DoubleDataAdapterXml::initialize("Margin", "",
-                                                   "mm Margin added to ref image bounding box",
-                                                    5.0, ssc::DoubleRange(0, 50, 1), 1, root);
+	return ssc::DoubleDataAdapterXml::initialize("Margin", "",
+	                                             "mm Margin added to ref image bounding box",
+	                                             5.0, ssc::DoubleRange(0, 50, 1), 1, root);
 }
 
 void ResampleImageFilter::createOptions(QDomElement root)
 {
-    mOptionsAdapters.push_back(this->getMarginOption(root));
+	mOptionsAdapters.push_back(this->getMarginOption(root));
 }
 
 void ResampleImageFilter::createInputTypes()
 {
-    SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringDataAdapterBasePtr temp;
 
-    temp = SelectImageStringDataAdapter::New();
-    temp->setValueName("Input");
-    temp->setHelp("Select input to be resampled");
-    mInputTypes.push_back(temp);
+	temp = SelectImageStringDataAdapter::New();
+	temp->setValueName("Input");
+	temp->setHelp("Select input to be resampled");
+	mInputTypes.push_back(temp);
 
-    temp = SelectImageStringDataAdapter::New();
-    temp->setValueName("Reference");
-    temp->setHelp("Select reference. Resample input into this coordinate system and bounding box");
-    mInputTypes.push_back(temp);
+	temp = SelectImageStringDataAdapter::New();
+	temp->setValueName("Reference");
+	temp->setHelp("Select reference. Resample input into this coordinate system and bounding box");
+	mInputTypes.push_back(temp);
 }
 
 void ResampleImageFilter::createOutputTypes()
 {
-    SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringDataAdapterBasePtr temp;
 
-    temp = SelectDataStringDataAdapter::New();
-    temp->setValueName("Output");
-    temp->setHelp("Output thresholded binary image");
-    mOutputTypes.push_back(temp);
+	temp = SelectDataStringDataAdapter::New();
+	temp->setValueName("Output");
+	temp->setHelp("Output thresholded binary image");
+	mOutputTypes.push_back(temp);
 }
 
 //bool ResampleImageFilter::preProcess()
@@ -94,56 +94,56 @@ void ResampleImageFilter::createOutputTypes()
  */
 bool ResampleImageFilter::execute()
 {
-    ssc::ImagePtr input = this->getCopiedInputImage(0);
-    ssc::ImagePtr reference = this->getCopiedInputImage(1);
-    if (!input || !reference)
-        return false;
+	ssc::ImagePtr input = this->getCopiedInputImage(0);
+	ssc::ImagePtr reference = this->getCopiedInputImage(1);
+	if (!input || !reference)
+		return false;
 
-    ssc::DoubleDataAdapterXmlPtr marginOption = this->getMarginOption(mCopiedOptions);
-    double margin = marginOption->getValue();
+	ssc::DoubleDataAdapterXmlPtr marginOption = this->getMarginOption(mCopiedOptions);
+	double margin = marginOption->getValue();
 
-    ssc::Transform3D refMi = reference->get_rMd().inv() * input->get_rMd();
-    ssc::ImagePtr oriented = resampleImage(input, refMi);//There is an error with the transfer functions in this image
+	ssc::Transform3D refMi = reference->get_rMd().inv() * input->get_rMd();
+	ssc::ImagePtr oriented = resampleImage(input, refMi);//There is an error with the transfer functions in this image
 
-    ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
-    ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
+	ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
+	ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
 
-    // increase bb size by margin
-    bb_crop[0] -= margin;
-    bb_crop[1] += margin;
-    bb_crop[2] -= margin;
-    bb_crop[3] += margin;
-    bb_crop[4] -= margin;
-    bb_crop[5] += margin;
+	// increase bb size by margin
+	bb_crop[0] -= margin;
+	bb_crop[1] += margin;
+	bb_crop[2] -= margin;
+	bb_crop[3] += margin;
+	bb_crop[4] -= margin;
+	bb_crop[5] += margin;
 
-    oriented->setCroppingBox(bb_crop);
+	oriented->setCroppingBox(bb_crop);
 
-    ssc::ImagePtr cropped = cropImage(oriented);
+	ssc::ImagePtr cropped = cropImage(oriented);
 
-    QString uid = input->getUid() + "_resample%1";
-    QString name = input->getName() + " resample%1";
+	QString uid = input->getUid() + "_resample%1";
+	QString name = input->getName() + " resample%1";
 
-    ssc::ImagePtr resampled = resampleImage(cropped, ssc::Vector3D(reference->getBaseVtkImageData()->GetSpacing()), uid, name);
+	ssc::ImagePtr resampled = resampleImage(cropped, ssc::Vector3D(reference->getBaseVtkImageData()->GetSpacing()), uid, name);
 
-    // important! move thread affinity to main thread - ensures signals/slots is still called correctly
-    resampled->moveThisAndChildrenToThread(QApplication::instance()->thread());
+	// important! move thread affinity to main thread - ensures signals/slots is still called correctly
+	resampled->moveThisAndChildrenToThread(QApplication::instance()->thread());
 
-    mRawResult =  resampled;
-    return true;
+	mRawResult =  resampled;
+	return true;
 }
 
 void ResampleImageFilter::postProcess()
 {
-    if (!mRawResult)
-        return;
+	if (!mRawResult)
+		return;
 
-    ssc::ImagePtr output = mRawResult;
-//    output->resetTransferFunctions();
-    ssc::dataManager()->loadData(output);
-    ssc::dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+	ssc::ImagePtr output = mRawResult;
+	//    output->resetTransferFunctions();
+	ssc::dataManager()->loadData(output);
+	ssc::dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
 
-    // set output
-    mOutputTypes.front()->setValue(output->getUid());
+	// set output
+	mOutputTypes.front()->setValue(output->getUid());
 }
 
 
