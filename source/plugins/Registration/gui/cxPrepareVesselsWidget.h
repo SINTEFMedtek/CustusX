@@ -15,9 +15,9 @@
 #define CXPREPAREVESSELSWIDGET_H
 
 #include "cxRegistrationBaseWidget.h"
-#include "cxDataInterface.h"
-#include "cxResampleWidget.h"
-#include "cxCenterlineWidget.h"
+#include "sscColorDataAdapter.h"
+#include "cxPipeline.h"
+#include "cxFilter.h"
 
 class QPushButton;
 class QVBoxLayout;
@@ -52,22 +52,14 @@ protected:
   QVBoxLayout* mLayout;
 
 private slots:
-  void setImageSlot(QString uid);
-  void resampleOutputArrived(QString uid);
-  void segmentationOutputArrived(QString uid);
-  void centerlineOutputArrived(QString uid);
-
-  void setColorSlot(QColor color);
+  void setColorSlot();
   void toMovingSlot();
   void toFixedSlot();
 
 protected:
-  class ResampleWidget*     mResampleWidget;
-  class BinaryThresholdImageFilterWidget* mSegmentationWidget;
-  class CenterlineWidget*   mCenterlineWidget;
-  SelectImageStringDataAdapterPtr mResampleOutput;
-  SelectImageStringDataAdapterPtr mSegmentationOutput;
-  SelectDataStringDataAdapterPtr mCenterlineOutput;
+  class PipelineWidget* mPipelineWidget;
+  PipelinePtr mPipeline;
+  ssc::ColorDataAdapterPtr mColorDataAdapter;
 };
 
 
