@@ -36,7 +36,7 @@ FilterGroup::FilterGroup(ssc::XmlOptionFile options) :
   */
 ssc::XmlOptionFile FilterGroup::getOptions()
 {
-    return mOptions;
+	return mOptions;
 }
 
 /**
@@ -44,13 +44,13 @@ ssc::XmlOptionFile FilterGroup::getOptions()
   */
 std::vector<FilterPtr> FilterGroup::getFilters() const
 {
-    return mFilters;
+	return mFilters;
 }
 
 void FilterGroup::append(FilterPtr filter)
 {
-    mFilters.push_back(filter);
-    filter->setUid(QString("%1_%2").arg(filter->getType()).arg(mFilters.size()));
+	mFilters.push_back(filter);
+	filter->setUid(QString("%1_%2").arg(filter->getType()).arg(mFilters.size()));
 }
 
 

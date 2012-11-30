@@ -29,29 +29,29 @@ namespace cx
  */
 class ResampleImageFilter : public FilterImpl
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    virtual ~ResampleImageFilter() {}
+	virtual ~ResampleImageFilter() {}
 
-    virtual QString getType() const;
-    virtual QString getName() const;
-    virtual QString getHelp() const;
-    virtual bool execute();
-    virtual void postProcess();
+	virtual QString getType() const;
+	virtual QString getName() const;
+	virtual QString getHelp() const;
+	virtual bool execute();
+	virtual void postProcess();
 
-    // extensions:
-    ssc::DoubleDataAdapterXmlPtr getMarginOption(QDomElement root);
+	// extensions:
+	ssc::DoubleDataAdapterXmlPtr getMarginOption(QDomElement root);
 
 protected:
-    virtual void createOptions(QDomElement root);
-    virtual void createInputTypes();
-    virtual void createOutputTypes();
+	virtual void createOptions(QDomElement root);
+	virtual void createInputTypes();
+	virtual void createOutputTypes();
 
 private slots:
 
 private:
-    ssc::ImagePtr mRawResult;
+	ssc::ImagePtr mRawResult;
 };
 typedef boost::shared_ptr<class ResampleImageFilter> ResampleImageFilterPtr;
 

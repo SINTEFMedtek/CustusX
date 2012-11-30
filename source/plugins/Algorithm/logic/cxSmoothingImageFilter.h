@@ -30,30 +30,30 @@ namespace cx
  */
 class SmoothingImageFilter : public FilterImpl
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    virtual ~SmoothingImageFilter() {}
+	virtual ~SmoothingImageFilter() {}
 
-    virtual QString getType() const;
-    virtual QString getName() const;
-    virtual QString getHelp() const;
+	virtual QString getType() const;
+	virtual QString getName() const;
+	virtual QString getHelp() const;
 
-    virtual bool execute();
-    virtual void postProcess();
+	virtual bool execute();
+	virtual void postProcess();
 
-    // extensions:
-    ssc::DoubleDataAdapterXmlPtr getSigma(QDomElement root);
+	// extensions:
+	ssc::DoubleDataAdapterXmlPtr getSigma(QDomElement root);
 
 protected:
-    virtual void createOptions(QDomElement root);
-    virtual void createInputTypes();
-    virtual void createOutputTypes();
+	virtual void createOptions(QDomElement root);
+	virtual void createInputTypes();
+	virtual void createOutputTypes();
 
 private slots:
 
 private:
-    vtkImageDataPtr mRawResult;
+	vtkImageDataPtr mRawResult;
 };
 typedef boost::shared_ptr<class SmoothingImageFilter> SmoothingImageFilterPtr;
 
