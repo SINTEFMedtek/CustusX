@@ -54,11 +54,14 @@ CXSmallToolButton::checked
 	width : 8px;
 	height : 8px;
 }*/
+
+/*
+This was a hack on Mac - because indicator for some reason is moved down a bit. No good on Unity.
 QRadioButton::indicator
 {
 	bottom : 2px;
 }
-
+*/
 
 
 /** The Linux GroupBox contains no border. This makes is useless
