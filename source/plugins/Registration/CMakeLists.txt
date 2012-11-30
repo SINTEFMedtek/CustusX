@@ -26,6 +26,7 @@ SET( MOC_HEADER_FILES
     gui/cxFastImageRegistrationWidget.h
     gui/cxFastOrientationRegistrationWidget.h
     gui/cxImageSegmentationAndCenterlineWidget.h
+	gui/cxPrepareVesselsWidget.h
     gui/cxPlateRegistrationWidget.h
     gui/cxSeansVesselRegistrationWidget.h
     gui/cxRegisterI2IWidget.h
@@ -55,7 +56,9 @@ SET( SOURCE_FILES
    gui/cxRegistrationPlugin.cpp
    gui/cxRegistrationBaseWidget.h
    gui/cxRegistrationBaseWidget.cpp
-    gui/cxLandmarkImageRegistrationWidget.h
+	gui/cxPrepareVesselsWidget.h
+	gui/cxPrepareVesselsWidget.cpp
+	gui/cxLandmarkImageRegistrationWidget.h
     gui/cxLandmarkImageRegistrationWidget.cpp
     gui/cxLandmarkRegistrationWidget.h
     gui/cxLandmarkRegistrationWidget.cpp
