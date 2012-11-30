@@ -143,7 +143,8 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
 
         mAlgoLines.push_back(algoLine);
         QFrame* frame = this->wrapInFrame(algoLine);
-        frame->layout()->setContentsMargins(4,0,4,0);
+//        frame->layout()->setContentsMargins(4,0,4,0); // nice on mac
+        frame->layout()->setContentsMargins(4,4,4,4); // nice on linux
         frame->setObjectName("FilterBackground");
         topLayout->addWidget(frame);
 //        topLayout->addWidget(algoLine);
