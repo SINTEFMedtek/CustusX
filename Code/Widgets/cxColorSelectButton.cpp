@@ -11,8 +11,11 @@
 namespace cx
 {
 
-ColorSelectButton::ColorSelectButton(QString caption, QColor color, QWidget* parent) : QPushButton(caption, parent)
+ColorSelectButton::ColorSelectButton(QString caption, QColor color, QWidget* parent) : QToolButton(parent)
 {
+	if (!caption.isEmpty())
+		this->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	this->setText(caption);
   connect(this, SIGNAL(clicked()), this, SLOT(clickedSlot()));
   this->setColor(color);
 }
