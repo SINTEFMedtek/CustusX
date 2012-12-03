@@ -1305,8 +1305,8 @@
             <Type>LinearArray</Type>
             <DefaultRTSource>DVI</DefaultRTSource>
             <RTSource>
-                <TemporalCalibration>100</TemporalCalibration>
-                <__ImageTimestampCalibration>170</__ImageTimestampCalibration>
+                <TemporalCalibration>160</TemporalCalibration>
+                <TemporalCalibrationLinux>170</TemporalCalibrationLinux>
                 <Name>DVI</Name>
                 <DefaultConfig>WidthMaxDepth4</DefaultConfig>
                 <ImageSize>
@@ -1359,7 +1359,7 @@
                     <Depth>612</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>452</Col>
+                        <Col>451</Col>
                         <Row>68</Row>
                     </Origin>
                     <NCorners>4</NCorners>
@@ -1380,14 +1380,14 @@
                         <Row>68</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>157</Left>
-                        <Right>747</Right>
+                        <Left>155</Left>
+                        <Right>746</Right>
                         <Top>68</Top>
                         <Bottom>680</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.064102417766216</Width>
-                        <Height>0.064102417766216</Height>
+                        <Width>0.064102417766216002</Width>
+                        <Height>0.064102417766216002</Height>
                     </PixelSize>
                 </Config>
                 <Config>

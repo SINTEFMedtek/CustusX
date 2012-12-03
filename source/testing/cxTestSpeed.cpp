@@ -31,7 +31,22 @@ void cxTestSpeed::testKaisaSpeed()
 //  QTimer::singleShot( 5*1000+1, &custusX, SLOT(beginCheckRenderSlot()) );
 //  QTimer::singleShot(20*1000,   &custusX, SLOT(endCheckRenderSlot()) );
 //  QTimer::singleShot(21*1000,   &custusX, SLOT(displayResultsSlot()) );
-  QTimer::singleShot(5*1000,   qApp, SLOT(quit()) );
+
+
+  QTimer::singleShot(10*1000,   qApp, SLOT(quit()) );
+
+  qApp->exec();
+  custusX.stop();
+}
+
+void cxTestSpeed::testKaisaMetricsSpeed()
+{
+  CustusXController custusX(NULL);
+
+  custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa_metrics.cx3";
+  custusX.start();
+
+//  QTimer::singleShot(10*1000,   qApp, SLOT(quit()) );
 
   qApp->exec();
   custusX.stop();
@@ -53,6 +68,8 @@ void cxTestSpeed::testLapSpeed()
 //  QTimer::singleShot( 5*1000+1, &custusX, SLOT(beginCheckRenderSlot()) );
 //  QTimer::singleShot(20*1000,   &custusX, SLOT(endCheckRenderSlot()) );
 //  QTimer::singleShot(21*1000,   &custusX, SLOT(displayResultsSlot()) );
+
+
   QTimer::singleShot(5*1000,   qApp, SLOT(quit()) );
 
   qApp->exec();

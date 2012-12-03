@@ -309,6 +309,8 @@ void BrowserWidget::closeEvent(QCloseEvent* event)
   QWidget::closeEvent(event);
   disconnect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateTreeWidget()));
   disconnect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)), this, SLOT(populateTreeWidget()));
+  disconnect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(populateTreeWidget()));
+  disconnect(viewManager(), SIGNAL(activeViewChanged()), this, SLOT(populateTreeWidget()));
 }
 
 void BrowserWidget::resetView()

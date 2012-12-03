@@ -80,6 +80,7 @@ public:
 		igstk::Transform mCalibration; ///< transform read from mCalibrationFilename
 		QString mCalibrationFilename; ///< path to the tools calibration file
 		QString mGraphicsFileName; ///< path to this tools graphics file
+		QString mPictureFileName; ///< path to picture of the tool
 		QString mTransformSaveFileName; ///< path to where transforms should be saved
 		QString mLoggingFolderName; ///< path to where log should be saved
 		QString mInstrumentId; ///< The instruments id
@@ -92,7 +93,8 @@ public:
 						mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX),
 						mReferencePoints(), mWireless(true),
 						m5DOF(true), mCalibrationFilename(""),
-						mGraphicsFileName(""), mTransformSaveFileName(""),
+						mGraphicsFileName(""), mPictureFileName(""),
+						mTransformSaveFileName(""),
 						mLoggingFolderName(""), mInstrumentId(""),
 						mInstrumentScannerId("")
 		{}	///< sets up default values for all the members

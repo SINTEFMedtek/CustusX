@@ -44,26 +44,6 @@ protected:
   ReconstructManagerPtr mReconstructer;
 };
 
-/** Interface to setting max size for reconstructed us volume.
- */
-class DoubleDataAdapterMaxUSVolumeSize : public DoubleDataAdapterOutputValueParams
-{
-  Q_OBJECT
-public:
-  DoubleDataAdapterMaxUSVolumeSize(ReconstructManagerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer), mFactor(1024*1024) {}
-  virtual ~DoubleDataAdapterMaxUSVolumeSize() {}
-  virtual QString getValueName() const { return "Volume Size"; }
-  virtual QString getHelp() const { return "Output Volume Size (Mb)"; }
-  virtual double convertInternal2Display(double internal) { return internal/mFactor; } ///< conversion from internal value to display value
-  virtual double convertDisplay2Internal(double display) { return display*mFactor; } ///< conversion from internal value to display value
-  ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(mFactor,mFactor*500,mFactor); }
-protected:
-  virtual double getValue(OutputVolumeParams* params) const { return params->getMaxVolumeSize(); }
-  virtual void setValue(OutputVolumeParams* params, double val) { params->setMaxVolumeSize(val); }
-
-  double mFactor;
-};
-
 /** Interface to setting spacing in output volume
  */
 class DoubleDataAdapterSpacing : public DoubleDataAdapterOutputValueParams

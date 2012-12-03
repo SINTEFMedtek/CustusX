@@ -71,9 +71,11 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
 //  this->readCustomMhdTags(mhdFileName, &probeConfigPath, &caliFilename);
 //  ProbeXmlConfigParser::Configuration configuration = this->readProbeConfiguration(calFilesPath, probeConfigPath);
 //  ssc::ProbeData probeData = createProbeDataFromConfiguration(configuration);
-  ssc::ProbeData probeData = this->readProbeDataBackwardsCompatible(mhdFileName, calFilesPath);
+  std::pair<QString, ssc::ProbeData>  probeDataFull = this->readProbeDataBackwardsCompatible(mhdFileName, calFilesPath);
+  ssc::ProbeData  probeData = probeDataFull.second;
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
-  bool spacingOK = ssc::similar(probeData.getImage().mSpacing, ssc::Vector3D(retval.mUsRaw->getSpacing()), 0.001);
+  bool spacingOK = ssc::similar(probeData.getImage().mSpacing[0], retval.mUsRaw->getSpacing()[0], 0.001)
+  	  	  	  	&& ssc::similar(probeData.getImage().mSpacing[1], retval.mUsRaw->getSpacing()[1], 0.001);
   if (!spacingOK)
   {
       ssc::messageManager()->sendWarning(""
@@ -84,6 +86,7 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   }
   probeData.getImage().mSpacing = ssc::Vector3D(retval.mUsRaw->getSpacing());
   retval.mProbeData.setData(probeData);
+  retval.mProbeUid = probeDataFull.first;
 
   retval.mFrames = this->readFrameTimestamps(fileName);
   retval.mPositions = this->readPositions(fileName);
@@ -108,17 +111,17 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
  * or from ProbeCalibConfigs.xml file for backwards compatibility.
  *
  */
-ssc::ProbeData UsReconstructionFileReader::readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath)
+std::pair<QString, ssc::ProbeData>  UsReconstructionFileReader::readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath)
 {
-	ssc::ProbeData retval = this->readProbeDataFromFile(mhdFileName);
+	std::pair<QString, ssc::ProbeData>  retval = this->readProbeDataFromFile(mhdFileName);
 
-	if (retval.getType()==ssc::ProbeData::tNONE)
+	if (retval.second.getType()==ssc::ProbeData::tNONE)
 	{
 		QString caliFilename;
 		QStringList probeConfigPath;
 		this->readCustomMhdTags(mhdFileName, &probeConfigPath, &caliFilename);
 		ProbeXmlConfigParser::Configuration configuration = this->readProbeConfiguration(calFilesPath, probeConfigPath);
-		retval = createProbeDataFromConfiguration(configuration);
+		retval.second = createProbeDataFromConfiguration(configuration);
 	}
 
 	return retval;
@@ -134,7 +137,9 @@ ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(ssc::USReco
   ssc::Vector3D usSpacing(data.mUsRaw->getSpacing());
 
   // checking
-  bool spacingOK = ssc::similar(usSpacing, ssc::Vector3D(mask->GetSpacing()), 0.001);
+  bool spacingOK = true;
+  spacingOK = spacingOK && ssc::similar(usSpacing[0], mask->GetSpacing()[0], 0.001);
+  spacingOK = spacingOK && ssc::similar(usSpacing[1], mask->GetSpacing()[1], 0.001);
   bool dimOK = ssc::similar(usDim, Eigen::Array3i(mask->GetDimensions()));
   if (!dimOK || !spacingOK)
   {
@@ -229,9 +234,9 @@ ProbeXmlConfigParser::Configuration UsReconstructionFileReader::readProbeConfigu
 /**
  * Write probe configuration to file. This works even for configs not saved to the ProbeCalibConfigs.xml file.
  */
-ssc::ProbeData UsReconstructionFileReader::readProbeDataFromFile(QString mhdFileName)
+std::pair<QString, ssc::ProbeData> UsReconstructionFileReader::readProbeDataFromFile(QString mhdFileName)
 {
-	ssc::ProbeData retval;
+	std::pair<QString, ssc::ProbeData>  retval;
 	QString filename = ssc::changeExtension(mhdFileName, "probedata.xml");
 
 	if (!QFileInfo(filename).exists())
@@ -241,7 +246,10 @@ ssc::ProbeData UsReconstructionFileReader::readProbeDataFromFile(QString mhdFile
 	}
 
 	ssc::XmlOptionFile file = ssc::XmlOptionFile(filename, "navnet");
-	retval.parseXml(file.getElement("configuration"));
+	retval.second.parseXml(file.getElement("configuration"));
+
+	retval.first = file.getElement("tool").toElement().attribute("toolID");
+
 	return retval;
 }
 
@@ -268,7 +276,7 @@ ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileNa
   ssc::ImagePtr UsRaw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(fileName, mhdFileName));
   UsRaw->setFilePath(filePath);
   ssc::USFrameDataPtr retval;
-  retval.reset(new ssc::USFrameDataMonolithic(UsRaw));
+  retval = ssc::USFrameData::create(UsRaw);
 
   //std::cout << "raw " << mhdFileName << ", " << Eigen::Array3i(retval->getDimensions()) << std::endl;
 

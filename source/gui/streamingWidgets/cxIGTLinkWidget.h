@@ -44,6 +44,7 @@ private slots:
   void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverStatusChangedSlot();
   void browseLocalServerSlot();
+  void saveSnapshotSlot(); ///<Save snapshot of RT image/volume
 
 //  void useLocalServerChanged();
 //  void useDirectLinkChanged();
@@ -52,6 +53,7 @@ private slots:
 
 private:
   void updateHostHistory();
+  void updateDirectLinkArgumentHistory();
   QProcess* getServer();
   OpenIGTLinkRTSourcePtr getRTSource();
   VideoConnectionPtr getConnection();
@@ -61,6 +63,7 @@ private:
   virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
 
   QPushButton* mConnectButton;
+  QPushButton* mSnapshotButton;
   QVBoxLayout* mToptopLayout;
   ssc::FileSelectWidget* mInitScriptWidget;
   // remote server widgets:
@@ -71,7 +74,7 @@ private:
   QLineEdit* mLocalServerArguments;
   QPushButton* mLaunchServerButton;
   // direct link widgets:
-  QLineEdit* mDirectLinkArguments;
+  QComboBox* mDirectLinkArguments;
 
 
   QStackedWidget* mStackedWidget;

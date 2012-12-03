@@ -24,30 +24,30 @@ namespace cx
  */
 class ConnectedThresholdImageFilter : public ThreadedTimedAlgorithm<vtkImageDataPtr>
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  ConnectedThresholdImageFilter();
-  virtual ~ConnectedThresholdImageFilter();
+	ConnectedThresholdImageFilter();
+	virtual ~ConnectedThresholdImageFilter();
 
-  void setInput(ssc::ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed);
-  virtual void execute() { throw "not implemented!!"; }
-  ssc::ImagePtr getOutput();
+	void setInput(ssc::ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed);
+	virtual void execute() { throw "not implemented!!"; }
+	ssc::ImagePtr getOutput();
 
 private slots:
-  virtual void postProcessingSlot();
+	virtual void postProcessingSlot();
 
 private:
-  virtual vtkImageDataPtr calculate();
+	virtual vtkImageDataPtr calculate();
 
-  QString       mOutputBasePath;
-  ssc::ImagePtr mInput;
-  ssc::ImagePtr mOutput;
+	QString       mOutputBasePath;
+	ssc::ImagePtr mInput;
+	ssc::ImagePtr mOutput;
 
-  float           mLowerThreshold;
-  float           mUpperTheshold;
-  int             mReplaceValue;
-  itkImageType::IndexType mSeed;
+	float           mLowerThreshold;
+	float           mUpperTheshold;
+	int             mReplaceValue;
+	itkImageType::IndexType mSeed;
 };
 
 /**

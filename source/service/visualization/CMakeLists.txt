@@ -87,5 +87,6 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 include_directories(Rep)
 
 ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxVisualizationService SSC cxSettings cxVideoService cxPatientService cxTrackingService cxAlgorithms_Res)
+target_link_libraries(cxVisualizationService SSC cxResource cxVideoService cxPatientService cxTrackingService)
 
+add_subdirectory(testing)

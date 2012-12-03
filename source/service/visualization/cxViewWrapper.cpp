@@ -97,6 +97,71 @@ void ViewGroupData::addData(ssc::DataPtr data)
 	emit dataAdded(qstring_cast(data->getUid()));
 }
 
+int getPriority(ssc::DataPtr data)
+{
+	if (data->getType()=="mesh")
+		return 6;
+	ssc::DataMetricPtr metric = boost::shared_dynamic_cast<ssc::DataMetric>(data);
+	if (metric)
+		return 7;
+
+	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+	if (image)
+	{
+		if (image->getModality().toUpper().contains("US"))
+		{
+			if (image->getImageType().toUpper().contains("B-MODE"))
+				return 4;
+			else // angio types
+				return 5;
+		}
+		else if (image->getModality().toUpper().contains("MR"))
+		{
+			// MR, CT, SC, others
+			return 2;
+		}
+		else if (image->getModality().toUpper().contains("CT"))
+		{
+			// MR, CT, SC, others
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	return 3;
+}
+
+bool dataTypeSort(const ssc::DataPtr data1, const ssc::DataPtr data2)
+{
+	return getPriority(data1) < getPriority(data2);
+}
+
+void ViewGroupData::addDataSorted(ssc::DataPtr data)
+{
+	if (!data)
+		return;
+	if (std::count(mData.begin(), mData.end(), data))
+		return;
+//	std::cout << "adding: " << data->getName() << std::endl;
+	for (int i=mData.size()-1; i>=0; --i)
+	{
+		if (!dataTypeSort(data, mData[i]))
+		{
+			mData.insert(mData.begin()+i+1, data);
+			break;
+		}
+	}
+	if (!std::count(mData.begin(), mData.end(), data))
+		mData.insert(mData.begin(), data);
+//	std::cout << "  post sort:" << std::endl;
+//	for (unsigned i=0; i<mData.size();++i)
+//		std::cout << "    " << mData[i]->getName() << std::endl;
+	emit dataAdded(qstring_cast(data->getUid()));
+}
+
 bool ViewGroupData::removeData(ssc::DataPtr data)
 {
 	if (!data)

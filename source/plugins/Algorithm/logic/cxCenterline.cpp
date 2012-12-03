@@ -63,7 +63,7 @@ void Centerline::postProcessingSlot()
   outImage->resetTransferFunctions();
 
   //automatically generate a mesh from the centerline
-  vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(outImage, 1, 0);
+  vtkPolyDataPtr centerlinePolyData = ssc::SeansVesselReg::extractPolyData(outImage, 1, 0);
 
   QString uid = mInput->getUid() + "_cl%1";
   QString name = mInput->getName()+" cl%1";

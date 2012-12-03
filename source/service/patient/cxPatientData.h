@@ -81,6 +81,9 @@ public slots:
 	void savePatient(); ///< Save all application data to XML file
 	void clearPatient();
 	void exportPatient(bool niftiFormat);
+	void autoSave();
+	void startupLoadPatient();
+	void writeRecentPatientData();
 
 signals:
 	void patientChanged();
@@ -94,6 +97,7 @@ private:
 	QString getNullFolder() const;
 	void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (absolute path)
 	void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
+	QString getCommandLineStartupPatient();
 
 	//saving/loading
 	void generateSaveDoc(QDomDocument& doc);
