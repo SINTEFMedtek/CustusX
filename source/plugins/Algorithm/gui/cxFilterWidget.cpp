@@ -38,62 +38,63 @@ namespace cx
 
 OptionsWidget::OptionsWidget(QWidget* parent)
 {
-    this->setSizePolicy(this->sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
-    mStackedLayout = new QStackedLayout(this);
-    mStackedLayout->setMargin(0);
+	this->setSizePolicy(this->sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
+	mStackedLayout = new QStackedLayout(this);
+	mStackedLayout->setMargin(0);
 }
 
 void OptionsWidget::setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options)
 {
-//    std::cout << "OptionsWidget::setOptions " << uid << ", ptr=" << this << ", size=" << options.size() << std::endl;
-    std::vector<DataAdapterPtr> converted;
-    std::copy(options.begin(), options.end(), std::back_inserter(converted));
-    this->setOptions(uid, converted);
+	//    std::cout << "OptionsWidget::setOptions " << uid << ", ptr=" << this << ", size=" << options.size() << std::endl;
+	std::vector<DataAdapterPtr> converted;
+	std::copy(options.begin(), options.end(), std::back_inserter(converted));
+	this->setOptions(uid, converted);
 }
 
 void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
 {
-    // return if already on uid
-    if (mStackedLayout->currentWidget() && (uid == mStackedLayout->currentWidget()->objectName()))
-        return;
+	// return if already on uid
+	if (mStackedLayout->currentWidget() && (uid == mStackedLayout->currentWidget()->objectName()))
+		return;
 
-    QLayoutItem *child;
-     while ((child = mStackedLayout->takeAt(0)) != 0)
-     {
-         // delete both the layoutitem AND the widget. Not auto done because layoutitem is no QObject.
-         QWidget* widget = child->widget();
-         delete child;
-         delete widget;
-     }
+	QLayoutItem *child;
+	while ((child = mStackedLayout->takeAt(0)) != 0)
+	{
+		// delete both the layoutitem AND the widget. Not auto done because layoutitem is no QObject.
+		QWidget* widget = child->widget();
+		delete child;
+		delete widget;
+	}
 
-    // No existing found,
-    // create a new stack element for this uid:
-    QWidget* widget = new QWidget(this);
-    widget->setObjectName(uid);
-    mStackedLayout->addWidget(widget);
-    QGridLayout* layout = new QGridLayout(widget);
-    layout->setMargin(layout->margin()/2);
+	// No existing found,
+	// create a new stack element for this uid:
+	QWidget* widget = new QWidget(this);
+	widget->setObjectName(uid);
+	mStackedLayout->addWidget(widget);
+	QGridLayout* layout = new QGridLayout(widget);
+	layout->setMargin(layout->margin()/2);
 
-    for (unsigned i = 0; i < options.size(); ++i)
-    {
-        SelectDataStringDataAdapterBasePtr dataSelectDataAdapter = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(options[i]);
-        if (dataSelectDataAdapter)
-        {
-            layout->addWidget(new DataSelectWidget(widget, dataSelectDataAdapter));
-        }
-        else
-        {
-            ssc::createDataWidget(widget, options[i], layout, i);
-        }
-    }
+	for (unsigned i = 0; i < options.size(); ++i)
+	{
+		SelectDataStringDataAdapterBasePtr dataSelectDataAdapter = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(options[i]);
+		if (dataSelectDataAdapter)
+		{
+			layout->addWidget(new DataSelectWidget(widget, dataSelectDataAdapter));
+		}
+		else
+		{
+			ssc::createDataWidget(widget, options[i], layout, i);
+			//            layout->addWidget(ssc::createDataWidget(widget, options[i]), i, 0);
+		}
+	}
 
-    mStackedLayout->setCurrentWidget(widget);
-//    mOptions[uid] = options;
+	mStackedLayout->setCurrentWidget(widget);
+	//    mOptions[uid] = options;
 }
 
 QString OptionsWidget::getCurrentUid()
 {
-    return mStackedLayout->currentWidget()->objectName();
+	return mStackedLayout->currentWidget()->objectName();
 }
 
 //std::vector<DataAdapterPtr> OptionsWidget::getCurrentOptions()
@@ -116,103 +117,110 @@ QString OptionsWidget::getCurrentUid()
 FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame) :
     BaseWidget(parent, "FilterSetupWidget", "FilterSetup")
 {
-    mFrame = NULL;
+	mFrame = NULL;
 
-    QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-    toptopLayout->setMargin(0);
+	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+	toptopLayout->setMargin(0);
 
-    QWidget* topWidget = new QWidget;
-    QVBoxLayout* topLayout = new QVBoxLayout(topWidget);
-    topLayout->setMargin(0);
+	QWidget* topWidget = new QWidget;
+	QVBoxLayout* topLayout = new QVBoxLayout(topWidget);
+	topLayout->setMargin(0);
 
-    if (addFrame)
-    {
-        mFrame = this->wrapInGroupBox(topWidget, "Algorithm");
-        toptopLayout->addWidget(mFrame);
-    }
-    else
-    {
-        toptopLayout->addWidget(topWidget);
-    }
+	//    QToolBox* toolBox = new QToolBox;
+	//    toptopLayout->addWidget(toolBox);
 
-    mObscuredListener.reset(new WidgetObscuredListener(this));
-    connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+	if (addFrame)
+	{
+		mFrame = this->wrapInGroupBox(topWidget, "Algorithm");
+		toptopLayout->addWidget(mFrame);
+	}
+	else
+	{
+		toptopLayout->addWidget(topWidget);
+	}
 
-    mOptions = options;
+	mObscuredListener.reset(new WidgetObscuredListener(this));
+	connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+
+	mOptions = options;
 
 
-    topWidget->setStyleSheet(""
-                        "QGroupBox"
-                        "{ "
-                        "    border: 0px solid gray; "
-                        "    border-top: 1px solid gray; "
-                        "    border-radius: 0px;"
-                        "}"
-                        "");
+	//    topWidget->setStyleSheet(""
+	//                        "QGroupBox"
+	//                        "{ "
+	//                        "    border: 0px solid gray; "
+	//                        "    border-radius: 0px;"
+	//                        "}"
+	//                        "");
+	//    //                        "    border-top: 1px solid gray; "
 
-    mInputsWidget = new OptionsWidget(this);
-    topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
-    mOutputsWidget = new OptionsWidget(this);
-    topLayout->addWidget(this->wrapInGroupBox(mOutputsWidget, "Output"));
+	mInputsWidget = new OptionsWidget(this);
+	mOutputsWidget = new OptionsWidget(this);
+	mOptionsWidget = new OptionsWidget(this);
 
-    mOptionsWidget = new OptionsWidget(this);
-    topLayout->addWidget(this->wrapInGroupBox(mOptionsWidget, "Options"));
+	topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
+	topLayout->addWidget(this->wrapInGroupBox(mOutputsWidget, "Output"));
+	topLayout->addWidget(this->wrapInGroupBox(mOptionsWidget, "Options"));
+
+	//    toolBox->addItem(mInputsWidget, "Input");
+	//    toolBox->addItem(mOutputsWidget, "Output");
+	//    toolBox->addItem(mOptionsWidget, "Options");
 }
 
 void FilterSetupWidget::obscuredSlot(bool obscured)
 {
-    if (mCurrentFilter)
-        mCurrentFilter->setActive(!obscured);
+	if (mCurrentFilter)
+		mCurrentFilter->setActive(!obscured);
 }
 
 QString FilterSetupWidget::defaultWhatsThis() const
 {
-    QString name("None");
-    QString help("");
-    if (mCurrentFilter)
-    {
-        name = mCurrentFilter->getName();
-        help = mCurrentFilter->getHelp();
-    }
-    return QString("<html>"
-                   "<h4>%1</h4>"
-                   "<p>%2</p>"
-                   "</html>").arg(name).arg(help);
+	QString name("None");
+	QString help("");
+	if (mCurrentFilter)
+	{
+		name = mCurrentFilter->getName();
+		help = mCurrentFilter->getHelp();
+	}
+	return QString("<html>"
+	               "<h4>%1</h4>"
+	               "<p>%2</p>"
+	               "</html>").arg(name).arg(help);
 }
 
 void FilterSetupWidget::setFilter(FilterPtr filter)
 {
-    if (filter==mCurrentFilter)
-        return;
+	if (filter==mCurrentFilter)
+		return;
 
-    if (mCurrentFilter)
-        mCurrentFilter->setActive(false);
+	if (mCurrentFilter)
+		mCurrentFilter->setActive(false);
 
-//    std::cout << "FilterSetupWidget::setFilter " << filter->getUid() << ", ptr=" << this << std::endl;
-    mCurrentFilter = filter;
+	//    std::cout << "FilterSetupWidget::setFilter " << filter->getUid() << ", ptr=" << this << std::endl;
+	mCurrentFilter = filter;
 
-    if (mFrame)
-        mFrame->setTitle(mCurrentFilter->getName());
+	if (mFrame)
+		mFrame->setTitle(mCurrentFilter->getName());
 
-//    std::cout << "options : " << mOptions.getElement().ownerDocument().toString() << std::endl;
+	//    std::cout << "options : " << mOptions.getElement().ownerDocument().toString() << std::endl;
 
 
-    if (mCurrentFilter)
-    {
-        mCurrentFilter->setActive(!mObscuredListener->isObscured());
+	if (mCurrentFilter)
+	{
+		mCurrentFilter->setActive(!mObscuredListener->isObscured());
 
-        std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
-        mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes());
+		std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
+		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes());
 
-        std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
-        mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes());
+		std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
+		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes());
 
-        ssc::XmlOptionFile node = mOptions.descend(mCurrentFilter->getUid());
-        std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions(node.getElement());
-        mOptionsWidget->setOptions(mCurrentFilter->getUid(), options);
-    }
-    else
-        mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>());
+		ssc::XmlOptionFile node = mOptions.descend(mCurrentFilter->getUid());
+		std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions(node.getElement());
+		mOptionsWidget->setOptions(mCurrentFilter->getUid(), options);
+	}
+	else
+		mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>());
 }
 
 ///--------------------------------------------------------
@@ -223,125 +231,124 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")
 {
-    ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
-    mFilters.reset(new FilterGroup(options));
-    mFilters->append(FilterPtr(new DummyFilter()));
-    mFilters->append(FilterPtr(new BinaryThresholdImageFilter()));
-    mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
-    mFilters->append(FilterPtr(new ContourFilter()));
-    mFilters->append(FilterPtr(new SmoothingImageFilter()));
-    mFilters->append(FilterPtr(new ResampleImageFilter()));
+	ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
+	mFilters.reset(new FilterGroup(options));
+	mFilters->append(FilterPtr(new DummyFilter()));
+	mFilters->append(FilterPtr(new BinaryThresholdImageFilter()));
+	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
+	mFilters->append(FilterPtr(new ContourFilter()));
+	mFilters->append(FilterPtr(new SmoothingImageFilter()));
+	mFilters->append(FilterPtr(new ResampleImageFilter()));
 
-    QStringList availableFilters;
-    std::map<QString,QString> names;
-    for (unsigned i=0; i<mFilters->size(); ++i)
-    {
-        availableFilters << mFilters->get(i)->getUid();
-        names[mFilters->get(i)->getUid()] = mFilters->get(i)->getName();
-    }
+	QStringList availableFilters;
+	std::map<QString,QString> names;
+	for (unsigned i=0; i<mFilters->size(); ++i)
+	{
+		availableFilters << mFilters->get(i)->getUid();
+		names[mFilters->get(i)->getUid()] = mFilters->get(i)->getName();
+	}
 
-    mFilterSelector = ssc::StringDataAdapterXml::initialize("filterSelector",
-                                                            "Filter",
-                                                            "Select which filter to use.",
-                                                            availableFilters[0],
-                                                            availableFilters,
-                                                            options.getElement());
-    mFilterSelector->setDisplayNames(names);
-    connect(mFilterSelector.get(), SIGNAL(valueWasSet()), this, SLOT(filterChangedSlot()));
+	mFilterSelector = ssc::StringDataAdapterXml::initialize("filterSelector",
+	                                                        "Filter",
+	                                                        "Select which filter to use.",
+	                                                        availableFilters[0],
+	                                                        availableFilters,
+	                                                        options.getElement());
+	mFilterSelector->setDisplayNames(names);
+	connect(mFilterSelector.get(), SIGNAL(valueWasSet()), this, SLOT(filterChangedSlot()));
 
-    QVBoxLayout* topLayout = new QVBoxLayout(this);
+	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
-    QHBoxLayout* filterLayout = new QHBoxLayout;
-    filterLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFilterSelector));
-    topLayout->addLayout(filterLayout);
+	QHBoxLayout* filterLayout = new QHBoxLayout;
+	topLayout->addLayout(filterLayout);
 
-    this->setStyleSheet("CXSmallToolButton#RunFilterButton { width : 36px; height : 12px; }");
+	filterLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFilterSelector));
 
-    QAction* runAction = this->createAction(this,
-                    QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
-                    "Run Filter", "",
-                    SLOT(runFilterSlot()),
-                    NULL);
+	QAction* runAction = this->createAction(this,
+	                                        QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
+	                                        "Run Filter", "",
+	                                        SLOT(runFilterSlot()),
+	                                        NULL);
 
-    CXSmallToolButton* button = new CXSmallToolButton();
-    button->setObjectName("RunFilterButton");
-    button->setDefaultAction(runAction);
-    filterLayout->addWidget(button);
+	CXSmallToolButton* button = new CXSmallToolButton();
+	button->setObjectName("RunFilterButton");
+	button->setDefaultAction(runAction);
+	filterLayout->addWidget(button);
 
-    mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
-    topLayout->addWidget(mTimedAlgorithmProgressBar);
+	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
+	topLayout->addWidget(mTimedAlgorithmProgressBar);
 
-    mSetupWidget = new FilterSetupWidget(this, options, false);
-    topLayout->addWidget(mSetupWidget);
+	mSetupWidget = new FilterSetupWidget(this, options, false);
+	topLayout->addWidget(mSetupWidget);
 
-    topLayout->addStretch();
+	topLayout->addStretch();
 
-    this->filterChangedSlot();
+	this->filterChangedSlot();
 }
 
 QString AllFiltersWidget::defaultWhatsThis() const
 {
-    return QString("<html>"
-                   "<h3>Filter Widget.</h3>"
-                   "<p>Select one type of filter.</p>"
-                   "<p><i>Currently selected filter:</i></p>"
-                   "<p>%1</p>"
-                   "</html>").arg(mSetupWidget->defaultWhatsThis());
+	return QString("<html>"
+	               "<h3>Filter Widget.</h3>"
+	               "<p>Select one type of filter.</p>"
+	               "<p><i>Currently selected filter:</i></p>"
+	               "<p>%1</p>"
+	               "</html>").arg(mSetupWidget->defaultWhatsThis());
 
-//    QString name("None");
-//    QString help("");
-//    if (mCurrentFilter)
-//    {
-//        name = mCurrentFilter->getName();
-//        help = mCurrentFilter->getHelp();
-//    }
-//    return QString("<html>"
-//                   "<h3>Filter Widget.</h3>"
-//                   "<p>Select one type of filter.</p>"
-//                   "<p><i>Currently selected filter:</i></p>"
-//                   "<h4>%1</h4>"
-//                   "<p>%2</p>"
-//                   "</html>").arg(name).arg(help);
+	//    QString name("None");
+	//    QString help("");
+	//    if (mCurrentFilter)
+	//    {
+	//        name = mCurrentFilter->getName();
+	//        help = mCurrentFilter->getHelp();
+	//    }
+	//    return QString("<html>"
+	//                   "<h3>Filter Widget.</h3>"
+	//                   "<p>Select one type of filter.</p>"
+	//                   "<p><i>Currently selected filter:</i></p>"
+	//                   "<h4>%1</h4>"
+	//                   "<p>%2</p>"
+	//                   "</html>").arg(name).arg(help);
 }
 
 void AllFiltersWidget::filterChangedSlot()
 {
-    for (unsigned i=0; i<mFilters->size(); ++i)
-    {
-        if (mFilters->get(i)->getUid() == mFilterSelector->getValue())
-        {
-            mCurrentFilter = mFilters->get(i);
-        }
-    }
+	for (unsigned i=0; i<mFilters->size(); ++i)
+	{
+		if (mFilters->get(i)->getUid() == mFilterSelector->getValue())
+		{
+			mCurrentFilter = mFilters->get(i);
+		}
+	}
 
-    mSetupWidget->setFilter(mCurrentFilter);
-    mFilterSelector->setHelp(this->defaultWhatsThis());
+	mSetupWidget->setFilter(mCurrentFilter);
+	mFilterSelector->setHelp(this->defaultWhatsThis());
 }
 
 
 void AllFiltersWidget::runFilterSlot()
 {
-    if (!mCurrentFilter)
-        return;
-    if (mThread)
-    {
-        ssc::messageManager()->sendWarning(QString("Last operation on %1 is not finished. Could not start filtering")
-                                           .arg(mThread->getFilter()->getName()));
-        return;
-    }
+	if (!mCurrentFilter)
+		return;
+	if (mThread)
+	{
+		ssc::messageManager()->sendWarning(QString("Last operation on %1 is not finished. Could not start filtering")
+		                                   .arg(mThread->getFilter()->getName()));
+		return;
+	}
 
-    mThread.reset(new FilterTimedAlgorithm(mCurrentFilter));
-    connect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
-    mTimedAlgorithmProgressBar->attach(mThread);
+	mThread.reset(new FilterTimedAlgorithm(mCurrentFilter));
+	connect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
+	mTimedAlgorithmProgressBar->attach(mThread);
 
-    mThread->execute();
+	mThread->execute();
 }
 
 void AllFiltersWidget::finishedSlot()
 {
-    mTimedAlgorithmProgressBar->detach(mThread);
-    disconnect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
-    mThread.reset();
+	mTimedAlgorithmProgressBar->detach(mThread);
+	disconnect(mThread.get(), SIGNAL(finished()), this, SLOT(finishedSlot()));
+	mThread.reset();
 }
 
 } // namespace cx

@@ -41,6 +41,7 @@ public:
 	void clear();
 	virtual void execute();
 	virtual bool isFinished() const;
+    virtual bool isRunning() const;
 private slots:
 	void jumpToNextChild();
 private:
@@ -70,6 +71,7 @@ public:
 	void clear();
 	virtual void execute();
 	virtual bool isFinished() const;
+    virtual bool isRunning() const;
 private slots:
 	void oneFinished();
 private:
