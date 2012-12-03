@@ -17,6 +17,7 @@
 
 #include <vtkImageCast.h>
 #include "sscForwardDeclarations.h"
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
@@ -40,9 +41,13 @@ class AlgorithmHelper
 {
 public:
   static itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image);
+  static itkImageType::ConstPointer getITKfromVTKImage(vtkImageDataPtr image);
+
+  static vtkImageDataPtr getVTKFromITK(itkImageType::ConstPointer input);
+  static vtkImageDataPtr execute_itk_GrayscaleFillholeImageFilter(vtkImageDataPtr input);
 
 private:
-  static itkImageType::ConstPointer getITKfromSSCImageViaFile(ssc::ImagePtr image);
+  static itkImageType::ConstPointer getITKfromVTKImageViaFile(vtkImageDataPtr image);
 };
 
 

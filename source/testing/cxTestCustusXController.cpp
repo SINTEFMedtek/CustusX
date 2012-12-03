@@ -28,6 +28,7 @@ CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
   mTestData += "Test Results:\n";
   mMainWindow = NULL;
+  mBaseTime = 1000;
 }
 void CustusXController::start()
 {
@@ -77,7 +78,7 @@ void CustusXController::loadPatientSlot()
 
 void CustusXController::initialBeginCheckRenderSlot()
 {
-  cx::viewManager()->getRenderTimer()->reset(100000);
+  cx::viewManager()->getRenderTimer()->reset(mBaseTime);
   QTimer::singleShot( 5*1000,   this, SLOT(initialEndCheckRenderSlot()) );
 }
 
@@ -87,8 +88,8 @@ void CustusXController::initialEndCheckRenderSlot()
   mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics();
 
   // start next timing
-  cx::viewManager()->getRenderTimer()->reset(100000);
-  QTimer::singleShot(20*1000,   this, SLOT(secondEndCheckRenderSlot()) );
+  cx::viewManager()->getRenderTimer()->reset(5*mBaseTime);
+  QTimer::singleShot(4*mBaseTime,   this, SLOT(secondEndCheckRenderSlot()) );
 }
 //
 //void CustusXController::secondBeginCheckRenderSlot()
@@ -100,10 +101,10 @@ void CustusXController::initialEndCheckRenderSlot()
 
 void CustusXController::secondEndCheckRenderSlot()
 {
-  std::cout << cx::viewManager()->getRenderTimer()->dumpStatistics() << std::endl;
-  mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics();
+//  std::cout << cx::viewManager()->getRenderTimer()->dumpStatistics() << std::endl;
+//  mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics();
 
-  this->displayResultsSlot();
+//  this->displayResultsSlot();
 }
 
 void CustusXController::displayResultsSlot()

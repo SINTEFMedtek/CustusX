@@ -47,7 +47,6 @@ public:
 signals:
 
 protected slots:
-	void updateSlot();
 	void itemSelectionChanged();
 
   void removeButtonClickedSlot();
@@ -70,6 +69,7 @@ private:
   std::vector<MetricBasePtr> createMetricWrappers();
   std::vector<ssc::DataPtr> refinePointArguments(std::vector<ssc::DataPtr> args, unsigned argNo);
   void setManualToolPosition(ssc::Vector3D p_r);
+  void prePaintEvent();
 
 //  template<class T>
   QAction* createAction(QActionGroup* group, QString iconName, QString text, QString tip, const char* slot);

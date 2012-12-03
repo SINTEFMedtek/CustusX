@@ -41,10 +41,14 @@ VideoConnection::VideoConnection()
 	mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
 
 	QStringList connectionOptions;
+	QString defaultConnection = "Direct Link";
+#ifdef __APPLE__
+	defaultConnection = "Local Server";	// grabber server is the preferred method on Mac.
+#endif
 	connectionOptions << "Local Server" << "Direct Link" << "Remote Server";
 	mConnectionMethod = ssc::StringDataAdapterXml::initialize("Connection", "",
 			"Method for connecting to Video Server",
-			"Direct Link",
+			defaultConnection,
 			connectionOptions,
 			mOptions.getElement());
 	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(settingsChanged()));
@@ -72,17 +76,6 @@ VideoConnection::~VideoConnection()
 //	// avoid getting crash reports: disable signal
 //	disconnect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
 //	mServer->close();
-}
-
-void VideoConnection::setLocalServerArguments(QString commandline)
-{
-	settings()->setValue("IGTLink/arguments", commandline);
-}
-
-QString VideoConnection::getLocalServerArguments()
-{
-	QString cmd = settings()->value("IGTLink/arguments").toString();
-	return cmd;
 }
 
 void VideoConnection::setLocalServerExecutable(QString commandline)
@@ -188,6 +181,32 @@ void VideoConnection::setHost(QString host)
 		history.removeLast();
 
 	settings()->setValue("IGTLink/hostHistory", history);
+}
+
+QStringList VideoConnection::getDirectLinkArgumentHistory()
+{
+	QStringList history = settings()->value("IGTLink/directLinkArgumentHistory").toStringList();
+	if (history.isEmpty())
+		history << "";
+	return history;
+}
+
+void VideoConnection::setLocalServerArguments(QString commandline)
+{
+	QStringList history = this->getDirectLinkArgumentHistory();
+	history.prepend(commandline);
+	for (int i = 1; i < history.size(); ++i)
+		if (history[i] == commandline)
+			history.removeAt(i);
+	while (history.size() > 5)
+		history.removeLast();
+
+	settings()->setValue("IGTLink/directLinkArgumentHistory", history);
+}
+
+QString VideoConnection::getLocalServerArguments()
+{
+	return this->getDirectLinkArgumentHistory().front(); // history will always contain elements.
 }
 
 void VideoConnection::launchServer()

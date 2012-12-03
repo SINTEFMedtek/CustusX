@@ -26,8 +26,10 @@ namespace cx
  */
 void IGTLinkClientBase::stop()
 {
-	connect(this, SIGNAL(stopInternal()), this, SLOT(stopSlot()));
-	emit stopInternal();
+	//OpenCL hack removed
+	//This hack for OpenCV creates problems for GEStreamer
+//	connect(this, SIGNAL(stopInternal()), this, SLOT(stopSlot()));
+//	emit stopInternal();
 	this->quit();
 }
 

@@ -25,7 +25,7 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   
   mSelectMeshWidget = SelectMeshStringDataAdapter::New();
   mSelectMeshWidget->setValueName("Surface: ");
-  connect(mSelectMeshWidget.get(), SIGNAL(meshChanged(QString)), this, SLOT(meshSelectedSlot(const QString&)));
+  connect(mSelectMeshWidget.get(), SIGNAL(changed()), this, SLOT(meshSelectedSlot()));
   
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
@@ -67,7 +67,7 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
 
   toptopLayout->addStretch();
 
-  this->meshSelectedSlot("...");
+  this->meshSelectedSlot();
 }
 
 MeshPropertiesWidget::~MeshPropertiesWidget()
@@ -122,7 +122,7 @@ void MeshPropertiesWidget::setColorSlotDelayed()
 }
 
 
-void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
+void MeshPropertiesWidget::meshSelectedSlot()
 {
   mMeshPropertiesGroupBox->setEnabled(false);
 

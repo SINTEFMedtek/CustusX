@@ -17,7 +17,7 @@
 
 #include "vtkSmartPointer.h"
 
-#include "sscDummyTool.h"
+//#include "sscDummyTool.h"
 #include "sscToolManager.h"
 #include "sscDefinitions.h"
 #include "sscManualTool.h"

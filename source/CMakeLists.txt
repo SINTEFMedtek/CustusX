@@ -54,10 +54,16 @@ if (CX_USE_ISB_GE)
     include(${GEStreamer_USE_FILE})
 endif()
 
+#------------------------------------------------------------------------------
+# Add CMake modules
+#------------------------------------------------------------------------------
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
 
 #------------------------------------------------------------------------------
 # Add subdirectories
 #------------------------------------------------------------------------------
+
 add_subdirectory(resource)
 add_subdirectory(service)
 add_subdirectory(logic)

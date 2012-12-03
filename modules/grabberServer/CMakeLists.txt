@@ -143,7 +143,9 @@ include_directories(
 # Executable
 #------------------------------------------------------------------------------
 if(APPLE)
-	add_executable(GrabberServer MACOSX_BUNDLE ${SOURCES})
+#	add_executable(GrabberServer MACOSX_BUNDLE ${SOURCES})
+# change: not a bundle anymore (add to cx bundle instead)
+	add_executable(GrabberServer ${SOURCES})
 endif(APPLE)
 
 if(CX_WINDOWS)
@@ -209,12 +211,13 @@ set(DIRS ${QT_INCLUDES}
 
 # Install files
 #----------
-install(TARGETS GrabberServer
-	BUNDLE DESTINATION ${GRABBERSERVER_INSTALL_FOLDER_NAME}
-	RUNTIME DESTINATION bin
-	)
 
 if(CX_WINDOWS)
+    install(TARGETS GrabberServer
+    	BUNDLE DESTINATION ${GRABBERSERVER_INSTALL_FOLDER_NAME}
+    	RUNTIME DESTINATION bin
+    	)
+
 	#Installing required run time libs for Windows, msv*.dll
 	set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
 	include (InstallRequiredSystemLibraries)

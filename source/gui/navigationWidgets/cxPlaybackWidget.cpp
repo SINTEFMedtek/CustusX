@@ -440,11 +440,11 @@ void PlaybackWidget::stopSlot()
 }
 void PlaybackWidget::forwardSlot()
 {
-	mTimer->forward(1000);
+	mTimer->forward(1000*mTimer->getSpeed());
 }
 void PlaybackWidget::rewindSlot()
 {
-	mTimer->rewind(1000);
+	mTimer->rewind(1000*mTimer->getSpeed());
 }
 
 

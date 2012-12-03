@@ -20,6 +20,7 @@
 #include "cxRegistrationHistoryWidget.h"
 #include "cxRegistrationMethodsWidget.h"
 #include "cxWirePhantomWidget.h"
+#include "cxWirePhantomWidgetOld.h"
 #include "cxPatientOrientationWidget.h"
 
 namespace cx
@@ -43,6 +44,9 @@ std::vector<PluginBase::PluginWidget> RegistrationPlugin::createWidgets() const
 	retval.push_back(PluginBase::PluginWidget(
 			new WirePhantomWidget(mRegistrationManager, NULL),
 			"Algorithms"));
+    retval.push_back(PluginBase::PluginWidget(
+            new WirePhantomWidgetOld(mRegistrationManager, NULL),
+            "Algorithms"));
 
 	return retval;
 }

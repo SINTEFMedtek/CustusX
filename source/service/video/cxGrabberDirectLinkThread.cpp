@@ -38,7 +38,8 @@ GrabberDirectLinkThread::GrabberDirectLinkThread(StringMap args, QObject* parent
 
 void GrabberDirectLinkThread::stopSlot()
 {
-	mImageSender->stopStreaming();
+	if(mImageSender)//stopSlot is called even if startStreaming fails
+		mImageSender->stopStreaming();
 	this->quit();
 }
 
@@ -47,6 +48,11 @@ void GrabberDirectLinkThread::run()
 	ssc::messageManager()->sendInfo("Starting direct link grabber.");
 
 	mImageSender = ImageSenderFactory().getFromArguments(mArguments);
+	if(!mImageSender)
+	{
+		this->quit();
+		return;
+	}
 	mGrabberBridge.reset(new GrabberSenderDirectLink());
 
 	connect(mGrabberBridge.get(), SIGNAL(newImage()), this, SLOT(newImageSlot()), Qt::DirectConnection);

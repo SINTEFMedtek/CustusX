@@ -120,7 +120,7 @@ void LandmarkImage2ImageRegistrationWidget::hideEvent(QHideEvent* event)
 	viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 
-void LandmarkImage2ImageRegistrationWidget::populateTheLandmarkTableWidget()
+void LandmarkImage2ImageRegistrationWidget::prePaintEvent()
 {
 }
 

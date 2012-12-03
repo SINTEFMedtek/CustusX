@@ -33,6 +33,8 @@
 #include "cxSettings.h"
 #include "cxPatientOrientationWidget.h"
 
+#include "cxPrepareVesselsWidget.h"
+
 namespace cx
 {
 
@@ -154,11 +156,13 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
 //  FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
 //  MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
 
-  ImageSegmentationAndCenterlineWidget* prepareRegistrationWidget = new ImageSegmentationAndCenterlineWidget(regManager, image2imageWidget);
+  ImageSegmentationAndCenterlineWidget* prepareRegistrationWidgetOld = new ImageSegmentationAndCenterlineWidget(regManager, image2imageWidget);
+  PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(regManager, image2imageWidget);
 
 
 //  image2imageWidget->addTab(movingRegistrationWidget, "Moving"); //should be application specific
   image2imageWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
+  image2imageWidget->addTab(prepareRegistrationWidgetOld, "PrepareOld"); //should be application specific
   image2imageWidget->addTab(new RegisterI2IWidget(regManager, image2imageWidget),"Register");
 
   //manual offset

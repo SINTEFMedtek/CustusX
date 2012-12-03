@@ -1,10 +1,11 @@
 #include <cxFilePreviewWidget.h>
 
 #include <QTextEdit>
+#include <QLabel>
 #include <QTextDocument>
 #include <QPushButton>
 #include <QTextStream>
-#include <QFileInfo>
+//#include <QFileInfo>
 #include <iostream>
 #include "sscTypeConversions.h"
 #include <QFileSystemWatcher>
@@ -15,16 +16,17 @@ namespace cx
 {
 
 FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
-    BaseWidget(parent, "FilePreviewWidget", "File Preview"),
+		FileWatcherWidget(parent, "FilePreviewWidget", "File Preview"),
     mTextDocument(new QTextDocument()),
     mTextEdit(new QTextEdit()),
-    mSaveButton(new QPushButton("Save")),
-    mFileSystemWatcher(new QFileSystemWatcher())
+    //mFileNameLabel(new QLabel()),
+    mSaveButton(new QPushButton("Save"))
+    //mFileSystemWatcher(new QFileSystemWatcher())
 {
 	mSyntaxHighlighter = NULL;
   connect(mSaveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
   mSaveButton->setEnabled(false);
-  connect(mFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(previewFileSlot(const QString&)));
+  //connect(mFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(previewFileSlot(const QString&)));
 
   QHBoxLayout* buttonLayout = new QHBoxLayout();
   buttonLayout->addStretch();
@@ -33,6 +35,7 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
   layout->addWidget(mTextEdit);
+  //layout->addWidget(mFileNameLabel);
   layout->addLayout(buttonLayout);
 
   connect(mTextEdit, SIGNAL(textChanged()), this, SLOT(textChangedSlot()));
@@ -45,8 +48,6 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
 
 FilePreviewWidget::~FilePreviewWidget()
 {}
-
-
 
 QString FilePreviewWidget::defaultWhatsThis() const
 {
@@ -65,28 +66,31 @@ void FilePreviewWidget::textChangedSlot()
 void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
   mSaveButton->setEnabled(false);
-  if(mCurrentFile)
-  {
-    if(mCurrentFile->isOpen())
-    {
-      this->watchFile(false);
-      mCurrentFile->close();
-    }
-  }
+//  if(mCurrentFile)
+//  {
+//    if(mCurrentFile->isOpen())
+//    {
+//      this->watchFile(false);
+//      mCurrentFile->close();
+//    }
+//  }
+//
+//  mCurrentFile.reset(new QFile(absoluteFilePath));
+//  this->watchFile(true);
+//
+//  if(!mCurrentFile->exists())
+//  {
+////    ssc::messageManager()->sendDebug("File "+absoluteFilePath+" does not exist.");
+//    return;
+//  }
 
-  mCurrentFile.reset(new QFile(absoluteFilePath));
-  this->watchFile(true);
+//  if(!mCurrentFile->open(QIODevice::ReadOnly))
+//  {
+//    ssc::messageManager()->sendWarning("Could not open file "+absoluteFilePath);
+//  }
+  if(!this->internalOpenNewFile(absoluteFilePath))
+  	return;
 
-  if(!mCurrentFile->exists())
-  {
-//    ssc::messageManager()->sendDebug("File "+absoluteFilePath+" does not exist.");
-    return;
-  }
-
-  if(!mCurrentFile->open(QIODevice::ReadOnly))
-  {
-    ssc::messageManager()->sendWarning("Could not open file "+absoluteFilePath);
-  }
   QTextStream stream(mCurrentFile.get());
   QString text = stream.readAll();
   mCurrentFile->close();
@@ -94,6 +98,10 @@ void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
   mTextDocument->setPlainText(text);
   mTextDocument->setModified(false);
 //  mSaveButton->setEnabled(true);
+
+  //QString elideText = fontMetrics().elidedText(absoluteFilePath, Qt::ElideLeft, mTextEdit->width());
+  //mFileNameLabel->setText(elideText);
+
   this->textChangedSlot();
 }
 
@@ -119,22 +127,22 @@ void FilePreviewWidget::saveSlot()
 
 }
 
-void FilePreviewWidget::watchFile(bool on)
-{
-	if (!mCurrentFile)
-		return;
-
-	QFileInfo info(*mCurrentFile);
-
-	if (on)
-	{
-		if (!mFileSystemWatcher->files().contains(info.absoluteFilePath()))
-			mFileSystemWatcher->addPath(info.absoluteFilePath());
-	}
-	else
-	{
-		mFileSystemWatcher->removePath(info.absoluteFilePath());
-	}
-}
+//void FilePreviewWidget::watchFile(bool on)
+//{
+//	if (!mCurrentFile)
+//		return;
+//
+//	QFileInfo info(*mCurrentFile);
+//
+//	if (on)
+//	{
+//		if (!mFileSystemWatcher->files().contains(info.absoluteFilePath()))
+//			mFileSystemWatcher->addPath(info.absoluteFilePath());
+//	}
+//	else
+//	{
+//		mFileSystemWatcher->removePath(info.absoluteFilePath());
+//	}
+//}
 
 }//namespace cx

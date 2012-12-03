@@ -94,7 +94,7 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::T
 //		ssc::ImagePtr image(new ssc::Image(retval.mFilename, imageData));
 //		image->setFilePath(reconstructionFolder);
 //		retval.mUsRaw.reset(new ssc::USFrameDataMonolithic(image));
-		retval.mUsRaw.reset(new ssc::USFrameDataSplitFrames(frames, retval.mFilename));
+		retval.mUsRaw = ssc::USFrameData::create(frames, retval.mFilename);
 	}
 
 	for (ssc::TimedTransformMap::iterator it = trackerRecordedData.begin(); it != trackerRecordedData.end(); ++it)
@@ -120,6 +120,7 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::T
 
 	vtkImageDataPtr mask = retval.mProbeData.getMask();
 	retval.mMask = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
+	retval.mProbeUid = tool->getUid();
 
 	//test
 //	QStringList path = retval.mFilename.split(".");
@@ -146,7 +147,7 @@ QString UsReconstructionFileMaker::write(ssc::USReconstructInputData data)
 	this->writeUSImages2(reconstructionFolder, data.mUsRaw, data.mFilename);
 	//  this->copyProbeCalibConfigsXml(reconstructionFolder);
 //	this->writeProbeConfiguration(reconstructionFolder);
-	this->writeProbeConfiguration2(reconstructionFolder, session, data.mProbeData.mData);
+	this->writeProbeConfiguration2(reconstructionFolder, session, data.mProbeData.mData, data.mProbeUid);
 
 	this->report();
 	mReport.clear();
@@ -277,11 +278,11 @@ bool UsReconstructionFileMaker::writeUSImages2(QString reconstructionFolder, ssc
 /**
  * Write probe configuration to file. This works even for configs not saved to the ProbeCalibConfigs.xml file.
  */
-void UsReconstructionFileMaker::writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data)
+void UsReconstructionFileMaker::writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid)
 {
 	ssc::XmlOptionFile file = ssc::XmlOptionFile(reconstructionFolder + "/" + session + ".probedata.xml", "navnet");
 	data.addXml(file.getElement("configuration"));
-//	file.getElement("tool").toElement().setAttribute("toolID", mTool->getName());
+	file.getElement("tool").toElement().setAttribute("toolID", uid);
 //	file.getElement("tool").toElement().setAttribute("configurationID", mTool->getProbe()->getConfigurationPath());
 	file.save();
 }

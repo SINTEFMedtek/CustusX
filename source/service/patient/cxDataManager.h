@@ -33,11 +33,9 @@ public:
 	virtual ssc::PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 signals:
-	void currentImageDeleted(ssc::ImagePtr image); ///< emitted when data is deleted
 	void debugModeChanged(bool on);
 
 public slots:
-	void deleteImageSlot(ssc::ImagePtr image); ///< Deletes image and emits dataDeleted signal
 	void setDebugMode(bool on);
 
 protected:

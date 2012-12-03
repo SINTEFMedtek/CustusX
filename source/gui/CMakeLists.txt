@@ -40,6 +40,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/cxTransferFunctionColorWidget.h
     dataWidgets/sscDICOMWidget.h
     dataWidgets/cxEraserWidget.h
+	dataWidgets/cxDataSelectWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
     infoWidgets/cxBrowserWidget.h
@@ -71,11 +72,13 @@ SET(cxGui_MOC_HDRS
     utilities/cxDoubleSpanSlider.h
     utilities/cxBaseWidget.h
     utilities/cxTransform3DWidget.h
-    utilities/cxFilePreviewWidget.h
     utilities/cxSelectionGroupBox.h
-    utilities/cxColorSelectButton.h
     utilities/cxVector3DWidget.h
     utilities/cxBoundingBoxWidget.h
+    utilities/cxFileWatcherWidget.h
+    utilities/cxFilePreviewWidget.h
+    utilities/cxImagePreviewWidget.h
+    utilities/cxToolImagePreviewWidget.h
     #----------------------    
     cxMainWindow.h
     cxSecondaryMainWindow.h
@@ -182,7 +185,9 @@ SET(cxGui_SRCS
     dataWidgets/sscDICOMWidget.cpp
     dataWidgets/cxEraserWidget.h
     dataWidgets/cxEraserWidget.cpp
-    #----------------------
+	dataWidgets/cxDataSelectWidget.h
+	dataWidgets/cxDataSelectWidget.cpp
+	#----------------------
     infoWidgets/cxBrowserWidget.h
     infoWidgets/cxBrowserWidget.cpp
     infoWidgets/cxFrameTreeWidget.cpp
@@ -235,21 +240,27 @@ SET(cxGui_SRCS
     utilities/cxTabbedWidget.h
     utilities/cxTabbedWidget.cpp
     utilities/cxBaseWidget.h
+    utilities/cxBaseWidget.cpp
     utilities/cxAudio.h
     utilities/cxAudio.cpp
     utilities/cxTransform3DWidget.h
     utilities/cxTransform3DWidget.cpp
-    utilities/cxFilePreviewWidget.h
-    utilities/cxFilePreviewWidget.cpp
     utilities/snwSyntaxHighlighter.cpp
     utilities/cxSelectionGroupBox.h
     utilities/cxSelectionGroupBox.cpp
-    utilities/cxColorSelectButton.h
-    utilities/cxColorSelectButton.cpp
     utilities/cxVector3DWidget.h
     utilities/cxVector3DWidget.cpp    
     utilities/cxBoundingBoxWidget.h
     utilities/cxBoundingBoxWidget.cpp
+    utilities/cxFileWatcherWidget.h
+    utilities/cxFileWatcherWidget.cpp
+    utilities/cxFilePreviewWidget.h
+    utilities/cxFilePreviewWidget.cpp
+    utilities/cxImagePreviewWidget.h
+    utilities/cxImagePreviewWidget.h
+    utilities/cxImagePreviewWidget.cpp
+    utilities/cxToolImagePreviewWidget.h
+    utilities/cxToolImagePreviewWidget.cpp
     #----------------------    
     cxMainWindow.h
     cxMainWindow.cpp 

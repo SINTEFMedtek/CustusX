@@ -26,6 +26,8 @@ bool ImageServer::initialize()
 
 	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
 	mImageSender = ImageSenderFactory().getFromArguments(args);
+	if(!mImageSender)
+		return false;
 
 	// test streaming by starting/stopping once (will emit error messages right away instead of waiting for an incoming connecion.)
 	ok = mImageSender->startStreaming(GrabberSenderPtr());
