@@ -71,7 +71,7 @@ CXFrame* BaseWidget::wrapInFrame(QWidget* base)
 //                      );
 //    frame->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
 //    frame->setSizePolicy(frame->sizePolicy().horizontalPolicy(),QSizePolicy::Fixed);
-    std::cout << "frame class " << frame->metaObject()->className() << std::endl;
+//    std::cout << "frame class " << frame->metaObject()->className() << std::endl;
 
     QVBoxLayout* layout = new QVBoxLayout(frame);
     layout->setMargin(0);

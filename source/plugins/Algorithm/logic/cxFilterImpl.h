@@ -37,41 +37,41 @@ namespace cx
  */
 class FilterImpl : public Filter
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    virtual ~FilterImpl() {}
+	virtual ~FilterImpl() {}
 
-    virtual QString getUid() const;
-    virtual void setUid(QString uid);
-    virtual std::vector<DataAdapterPtr> getOptions(QDomElement root);
-    virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes();
-    virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes();
-    virtual void setActive(bool on);
+	virtual QString getUid() const;
+	virtual void setUid(QString uid);
+	virtual std::vector<DataAdapterPtr> getOptions(QDomElement root);
+	virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes();
+	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes();
+	virtual void setActive(bool on);
 
-    virtual bool preProcess();
+	virtual bool preProcess();
 
 protected:
-    explicit FilterImpl();
+	explicit FilterImpl();
 
-    /** Helper: Return the index'th input type as an image.
-      * Return zero if not available (as image). */
-    ssc::ImagePtr getCopiedInputImage(int index = 0);
+	/** Helper: Return the index'th input type as an image.
+	  * Return zero if not available (as image). */
+	ssc::ImagePtr getCopiedInputImage(int index = 0);
 
-    virtual void createOptions(QDomElement root) = 0;
-    virtual void createInputTypes() = 0;
-    virtual void createOutputTypes() = 0;
+	virtual void createOptions(QDomElement root) = 0;
+	virtual void createInputTypes() = 0;
+	virtual void createOutputTypes() = 0;
 
-    std::vector<SelectDataStringDataAdapterBasePtr> mInputTypes;
-    std::vector<SelectDataStringDataAdapterBasePtr> mOutputTypes;
-    std::vector<DataAdapterPtr> mOptionsAdapters;
-    QDomElement mOptions;
+	std::vector<SelectDataStringDataAdapterBasePtr> mInputTypes;
+	std::vector<SelectDataStringDataAdapterBasePtr> mOutputTypes;
+	std::vector<DataAdapterPtr> mOptionsAdapters;
+	QDomElement mOptions;
 
-    // data used by execute - copied for thread safety purposes
-    std::vector<ssc::DataPtr> mCopiedInput;
-    QDomElement mCopiedOptions;
-    bool mActive;
-    QString mUid;
+	// data used by execute - copied for thread safety purposes
+	std::vector<ssc::DataPtr> mCopiedInput;
+	QDomElement mCopiedOptions;
+	bool mActive;
+	QString mUid;
 
 };
 

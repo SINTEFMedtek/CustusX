@@ -60,29 +60,29 @@ public slots:
 	void clearSlot();
 
 private slots:
-  void probeChangedSlot();
-  void fileMakerWriteFinished();
-  void dominantToolChangedSlot();
-  void setTool(ssc::ToolPtr tool);
-  ssc::ToolPtr getTool();
+	void probeChangedSlot();
+	void fileMakerWriteFinished();
+	void dominantToolChangedSlot();
+	void setTool(ssc::ToolPtr tool);
+	ssc::ToolPtr getTool();
 
 private:
-  AcquisitionDataPtr mPluginData;
-  ssc::VideoSourcePtr mRTSource;
-  ssc::VideoRecorderPtr mRTRecorder;
-  ssc::ToolPtr mTool;
+	AcquisitionDataPtr mPluginData;
+	ssc::VideoSourcePtr mRTSource;
+	ssc::VideoRecorderPtr mRTRecorder;
+	ssc::ToolPtr mTool;
 
-//  QFuture<QString> mFileMakerFuture;
-//  QFutureWatcher<QString> mFileMakerFutureWatcher;
-//  UsReconstructionFileMakerPtr mFileMaker;
+	//  QFuture<QString> mFileMakerFuture;
+	//  QFutureWatcher<QString> mFileMakerFutureWatcher;
+	//  UsReconstructionFileMakerPtr mFileMaker;
 
-  std::list<QFutureWatcher<QString>*> mSaveThreads;
+	std::list<QFutureWatcher<QString>*> mSaveThreads;
 
-  QString mWhatsMissing;
+	QString mWhatsMissing;
 
-  virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session);
-  void connectVideoSource(ssc::VideoSourcePtr source);
-  void connectToPureVideo();
+	virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session);
+	void connectVideoSource(ssc::VideoSourcePtr source);
+	void connectToPureVideo();
 
 };
 typedef boost::shared_ptr<USAcquisition> USAcquisitionPtr;

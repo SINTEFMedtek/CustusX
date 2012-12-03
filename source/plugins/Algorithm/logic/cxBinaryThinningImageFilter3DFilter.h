@@ -31,28 +31,28 @@ namespace cx
  */
 class BinaryThinningImageFilter3DFilter : public FilterImpl
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    virtual ~BinaryThinningImageFilter3DFilter() {}
+	virtual ~BinaryThinningImageFilter3DFilter() {}
 
-    virtual QString getType() const;
-    virtual QString getName() const;
-    virtual QString getHelp() const;
+	virtual QString getType() const;
+	virtual QString getName() const;
+	virtual QString getHelp() const;
 
-    virtual bool preProcess();
-    virtual bool execute();
-    virtual void postProcess();
+	virtual bool preProcess();
+	virtual bool execute();
+	virtual void postProcess();
 
-    ssc::ColorDataAdapterPtr getColorOption(QDomElement root);
+	ssc::ColorDataAdapterPtr getColorOption(QDomElement root);
 
 protected:
-    virtual void createOptions(QDomElement root);
-    virtual void createInputTypes();
-    virtual void createOutputTypes();
+	virtual void createOptions(QDomElement root);
+	virtual void createInputTypes();
+	virtual void createOutputTypes();
 
 private:
-    vtkImageDataPtr mRawResult;
+	vtkImageDataPtr mRawResult;
 };
 
 

@@ -26,27 +26,27 @@ namespace cx
  */
 class BinaryThresholdImageFilterOld : public ThreadedTimedAlgorithm<vtkImageDataPtr>
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  BinaryThresholdImageFilterOld();
-  virtual ~BinaryThresholdImageFilterOld();
+	BinaryThresholdImageFilterOld();
+	virtual ~BinaryThresholdImageFilterOld();
 
-  void setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmoothing=true, double smoothSigma=0.1);
-  ssc::ImagePtr getOutput();
+	void setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmoothing=true, double smoothSigma=0.1);
+	ssc::ImagePtr getOutput();
 
 protected slots:
-  virtual void postProcessingSlot();
+	virtual void postProcessingSlot();
 
 private:
-  virtual vtkImageDataPtr calculate();
+	virtual vtkImageDataPtr calculate();
 
-  QString       mOutputBasePath;
-  ssc::ImagePtr mInput;
-  ssc::ImagePtr mOutput;
-  int           mTheshold;
-  bool          mUseSmoothing;
-  double        mSmoothingSigma;
+	QString       mOutputBasePath;
+	ssc::ImagePtr mInput;
+	ssc::ImagePtr mOutput;
+	int           mTheshold;
+	bool          mUseSmoothing;
+	double        mSmoothingSigma;
 };
 typedef boost::shared_ptr<class BinaryThresholdImageFilterOld> BinaryThresholdImageFilterOldPtr;
 
@@ -58,37 +58,37 @@ typedef boost::shared_ptr<class BinaryThresholdImageFilterOld> BinaryThresholdIm
  */
 class BinaryThresholdImageFilter : public FilterImpl
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    virtual ~BinaryThresholdImageFilter() {}
+	virtual ~BinaryThresholdImageFilter() {}
 
-    virtual QString getType() const;
-    virtual QString getName() const;
-    virtual QString getHelp() const;
-    virtual void setActive(bool on);
+	virtual QString getType() const;
+	virtual QString getName() const;
+	virtual QString getHelp() const;
+	virtual void setActive(bool on);
 
-    bool preProcess();
-    virtual bool execute();
-    virtual void postProcess();
+	bool preProcess();
+	virtual bool execute();
+	virtual void postProcess();
 
-    // extensions:
-    ssc::DoubleDataAdapterXmlPtr getLowerThresholdOption(QDomElement root);
+	// extensions:
+	ssc::DoubleDataAdapterXmlPtr getLowerThresholdOption(QDomElement root);
 
 protected:
-    virtual void createOptions(QDomElement root);
-    virtual void createInputTypes();
-    virtual void createOutputTypes();
+	virtual void createOptions(QDomElement root);
+	virtual void createInputTypes();
+	virtual void createOutputTypes();
 
 private slots:
-    /** Set new value+range of the threshold option.
-      */
-    void imageChangedSlot(QString uid);
-    void thresholdSlot();
+	/** Set new value+range of the threshold option.
+	  */
+	void imageChangedSlot(QString uid);
+	void thresholdSlot();
 
 private:
-    ssc::DoubleDataAdapterXmlPtr mLowerThresholdOption;
-    vtkImageDataPtr mRawResult;
+	ssc::DoubleDataAdapterXmlPtr mLowerThresholdOption;
+	vtkImageDataPtr mRawResult;
 };
 typedef boost::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
 

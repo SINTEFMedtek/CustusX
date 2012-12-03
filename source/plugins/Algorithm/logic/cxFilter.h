@@ -47,83 +47,83 @@ typedef boost::shared_ptr<class Filter> FilterPtr;
  */
 class Filter : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit Filter();
-    virtual ~Filter() {}
-    
+	explicit Filter();
+	virtual ~Filter() {}
 
-    /**
-      *  Return a unique string for this algorithm.
-      */
-    virtual QString getUid() const  = 0;
-    virtual void setUid(QString uid) = 0;
-    /**
-      *  Return the type of this algorithm.
-      */
-    virtual QString getType() const  = 0;
-    /**
-      *  Return a descriptive name for this algorithm.
-      */
-    virtual QString getName() const = 0;
-    /**
-      *  Return a help text describing algorithm usage.
-      */
-    virtual QString getHelp() const = 0;
-    /**
-      *  Fill options for this algorithm.
-      *  Input is the root node for this algo, filled with stored settings (if any).
-      *  On completion, the root is filled with default values for settings.
-      */
-    virtual std::vector<DataAdapterPtr> getOptions(QDomElement root) = 0;
-    /**
-      *  List of input arguments.
-      */
-    virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes() = 0;
-    /**
-      *  Return a help text describing algorithm usage.
-      */
-    virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes() = 0;
-    /**
-      * Set Active state.
-      * Active filters are used by the ui (or similar) and can interact
-      * with the system, for example by showing a preview.
-      *
-      * Inactive filters should no interact with the system.
-      */
-    virtual void setActive(bool on) = 0;
-    /**
-      * Perform main thread preprocessing. Copies input data from options and
-      * the input adapters into thread-safe storage.
-      * Assumes getOptions(), getInputTypes(), getOutputTypes()
-      * has been called (this initializes options)
-      *
-      * \param outputPath is path to data files for current patient.
-      * \return success.
-      */
-    virtual bool preProcess() = 0;
-    /**
-      * Execute filter with the given inputs and produce an output.
-      * This method is threadable - can be executed in a secondary thread.
-      * Assumes preprocess has been called.
-      *
-      * \param input List of data inputs corresponding to getInputTypes()
-      * \param settings Reference to settings file containing algorithm-specific settings
-      * \return success.
-      */
-    virtual bool execute() = 0;
-    /**
-      * Perform postprocessing tasks and set result from calculation
-      * into the output adapters.
-      *
-      * Must be called from the main thread.
-      * Assumes execute() has been called.
-      *
-      */
-    virtual void postProcess() = 0;
 
-    
+	/**
+	  *  Return a unique string for this algorithm.
+	  */
+	virtual QString getUid() const  = 0;
+	virtual void setUid(QString uid) = 0;
+	/**
+	  *  Return the type of this algorithm.
+	  */
+	virtual QString getType() const  = 0;
+	/**
+	  *  Return a descriptive name for this algorithm.
+	  */
+	virtual QString getName() const = 0;
+	/**
+	  *  Return a help text describing algorithm usage.
+	  */
+	virtual QString getHelp() const = 0;
+	/**
+	  *  Fill options for this algorithm.
+	  *  Input is the root node for this algo, filled with stored settings (if any).
+	  *  On completion, the root is filled with default values for settings.
+	  */
+	virtual std::vector<DataAdapterPtr> getOptions(QDomElement root) = 0;
+	/**
+	  *  List of input arguments.
+	  */
+	virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes() = 0;
+	/**
+	  *  Return a help text describing algorithm usage.
+	  */
+	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes() = 0;
+	/**
+	  * Set Active state.
+	  * Active filters are used by the ui (or similar) and can interact
+	  * with the system, for example by showing a preview.
+	  *
+	  * Inactive filters should no interact with the system.
+	  */
+	virtual void setActive(bool on) = 0;
+	/**
+	  * Perform main thread preprocessing. Copies input data from options and
+	  * the input adapters into thread-safe storage.
+	  * Assumes getOptions(), getInputTypes(), getOutputTypes()
+	  * has been called (this initializes options)
+	  *
+	  * \param outputPath is path to data files for current patient.
+	  * \return success.
+	  */
+	virtual bool preProcess() = 0;
+	/**
+	  * Execute filter with the given inputs and produce an output.
+	  * This method is threadable - can be executed in a secondary thread.
+	  * Assumes preprocess has been called.
+	  *
+	  * \param input List of data inputs corresponding to getInputTypes()
+	  * \param settings Reference to settings file containing algorithm-specific settings
+	  * \return success.
+	  */
+	virtual bool execute() = 0;
+	/**
+	  * Perform postprocessing tasks and set result from calculation
+	  * into the output adapters.
+	  *
+	  * Must be called from the main thread.
+	  * Assumes execute() has been called.
+	  *
+	  */
+	virtual void postProcess() = 0;
+
+
 };
 
 
@@ -135,36 +135,36 @@ public:
 class FilterGroup
 {
 public:
-    FilterGroup(ssc::XmlOptionFile options);
-    /**
-      * Get the option node for this pipeline
-      */
-    ssc::XmlOptionFile getOptions();
-    /**
-      * Get all filters in pipeline
-      */
-    std::vector<FilterPtr> getFilters() const;
-    /**
-      * Append a filter to group
-      */
-    void append(FilterPtr filter);
+	FilterGroup(ssc::XmlOptionFile options);
+	/**
+	  * Get the option node for this pipeline
+	  */
+	ssc::XmlOptionFile getOptions();
+	/**
+	  * Get all filters in pipeline
+	  */
+	std::vector<FilterPtr> getFilters() const;
+	/**
+	  * Append a filter to group
+	  */
+	void append(FilterPtr filter);
 
-    size_t size() const { return mFilters.size(); }
-    bool empty() const { return mFilters.empty(); }
-//    FilterPtr& operator[](size_t index) { return mFilters[index]; }
-//    const FilterPtr& operator[](size_t index) const { return mFilters[index]; }
-    FilterPtr get(int index) { return mFilters[index]; }
-    FilterPtr get(QString uid)
-    {
-        for (unsigned i=0; i<mFilters.size(); ++i)
-            if (mFilters[i]->getUid()==uid)
-                return mFilters[i];
-        return FilterPtr();
-    }
+	size_t size() const { return mFilters.size(); }
+	bool empty() const { return mFilters.empty(); }
+	//    FilterPtr& operator[](size_t index) { return mFilters[index]; }
+	//    const FilterPtr& operator[](size_t index) const { return mFilters[index]; }
+	FilterPtr get(int index) { return mFilters[index]; }
+	FilterPtr get(QString uid)
+	{
+		for (unsigned i=0; i<mFilters.size(); ++i)
+			if (mFilters[i]->getUid()==uid)
+				return mFilters[i];
+		return FilterPtr();
+	}
 
 private:
-    std::vector<FilterPtr> mFilters;
-    ssc::XmlOptionFile mOptions;
+	std::vector<FilterPtr> mFilters;
+	ssc::XmlOptionFile mOptions;
 };
 typedef boost::shared_ptr<FilterGroup> FilterGroupPtr;
 
