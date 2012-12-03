@@ -1443,7 +1443,7 @@
             <Notes>Generated 20121203T101906</Notes>
             <RTSource>
                 <Name>DVI</Name>
-                <TemporalCalibration>0</TemporalCalibration>
+                <TemporalCalibration>12</TemporalCalibration>
                 <DefaultConfig>Width75Depth6</DefaultConfig>
                 <ImageSize>
                     <Width>1280</Width>
