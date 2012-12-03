@@ -682,13 +682,14 @@ RECURSIVE              = YES
 
 EXCLUDE                = @CustusX3_SOURCE_DIR@/testing \
                          @CustusX3_SOURCE_DIR@/config \
-                         @CustusX3_SOURCE_DIR@/modules \
                          @CustusX3_SOURCE_DIR@/data \
                          @CustusX3_SOURCE_DIR@/install \
                          @CustusX3_SOURCE_DIR@/externals/ssc/Code/3rdParty \
                          @CustusX3_SOURCE_DIR@/externals/ssc/Code/Ultrasound/Interface \
                          @CustusX3_SOURCE_DIR@/source/ThirdParty/qxt_mac_compatible \
                          @CustusX3_SOURCE_DIR@/source/ThirdParty/qxt
+
+#                         @CustusX3_SOURCE_DIR@/modules \
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix file system feature) are excluded 
