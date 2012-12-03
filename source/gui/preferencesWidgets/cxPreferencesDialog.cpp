@@ -16,6 +16,7 @@
 #include "cxDataLocations.h"
 #include "cxStateService.h"
 #include "cxFilePreviewWidget.h"
+#include "cxToolImagePreviewWidget.h"
 #include "cxToolConfigureWidget.h"
 #include "cxToolFilterWidget.h"
 #include "cxColorSelectButton.h"
@@ -164,7 +165,7 @@ void PerformanceTab::init()
   
   mRenderingIntervalSpinBox = new QSpinBox;
   mRenderingIntervalSpinBox->setSuffix("ms");
-  mRenderingIntervalSpinBox->setMinimum(16);
+  mRenderingIntervalSpinBox->setMinimum(4);
   mRenderingIntervalSpinBox->setMaximum(1000);
   mRenderingIntervalSpinBox->setValue(renderingInterval);
   connect(mRenderingIntervalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(renderingIntervalSlot(int)));
@@ -289,7 +290,7 @@ void VisualizationTab::init()
   double eyeAngle = settings()->value("View3D/eyeAngle").toDouble();
   mEyeAngleAdapter = ssc::DoubleDataAdapterXml::initialize("Eye angle (degrees)", "",
       "Separation between eyes in degrees",
-      eyeAngle, ssc::DoubleRange(0, 10, 0.1), 1);
+      eyeAngle, ssc::DoubleRange(0, 25, 0.1), 1);
   connect(mEyeAngleAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(eyeAngleSlot()));
 
   QVBoxLayout* stereoLayout = new QVBoxLayout();
@@ -414,7 +415,28 @@ void AutomationTab::init()
 
   bool autoSelectDominantTool = settings()->value("Automation/autoSelectDominantTool").toBool();
   mAutoSelectDominantToolCheckBox = new QCheckBox("Auto Select Active Tool");
+  mAutoSelectDominantToolCheckBox->setToolTip(""
+	  "Automatically select an active tool when a tool becomes visible");
   mAutoSelectDominantToolCheckBox->setChecked(autoSelectDominantTool);
+
+  bool autoSave = settings()->value("Automation/autoSave").toBool();
+  mAutoSaveCheckBox = new QCheckBox("Auto Save");
+  mAutoSaveCheckBox->setToolTip(""
+	  "Save patient after major events,\n"
+	  "such as workflow step change, registration, reconstruction.");
+  mAutoSaveCheckBox->setChecked(autoSave);
+
+  bool autoShow = settings()->value("Automation/autoShowNewData").toBool();
+  mAutoShowNewDataCheckBox = new QCheckBox("Auto Show New Data");
+  mAutoShowNewDataCheckBox->setToolTip(""
+	  "Show new data in the first view.\n"
+	  "Occors after load data and reconstruct.");
+  mAutoShowNewDataCheckBox->setChecked(autoShow);
+
+  bool autoLoadPatient = settings()->value("Automation/autoLoadRecentPatient").toBool();
+  mAutoLoadPatientCheckBox = new QCheckBox("Auto Load Recent Patient");
+  mAutoLoadPatientCheckBox->setToolTip("Load the last saved patient if within 8 hours.");
+  mAutoLoadPatientCheckBox->setChecked(autoLoadPatient);
 
   //Layout
   mMainLayout = new QVBoxLayout;
@@ -422,6 +444,9 @@ void AutomationTab::init()
   mMainLayout->addWidget(mAutoStartStreamingCheckBox);
   mMainLayout->addWidget(mAutoReconstructCheckBox);
   mMainLayout->addWidget(mAutoSelectDominantToolCheckBox);
+  mMainLayout->addWidget(mAutoSaveCheckBox);
+  mMainLayout->addWidget(mAutoShowNewDataCheckBox);
+  mMainLayout->addWidget(mAutoLoadPatientCheckBox);
 
   mTopLayout->addLayout(mMainLayout);
 
@@ -433,6 +458,9 @@ void AutomationTab::saveParametersSlot()
   settings()->setValue("Automation/autoStartStreaming", mAutoStartStreamingCheckBox->isChecked());
   settings()->setValue("Automation/autoReconstruct", mAutoReconstructCheckBox->isChecked());
   settings()->setValue("Automation/autoSelectDominantTool", mAutoSelectDominantToolCheckBox->isChecked());
+  settings()->setValue("Automation/autoSave", mAutoSaveCheckBox->isChecked());
+  settings()->setValue("Automation/autoShowNewData", mAutoShowNewDataCheckBox->isChecked());
+  settings()->setValue("Automation/autoLoadRecentPatient", mAutoLoadPatientCheckBox->isChecked());
 }
 
 //==============================================================================
@@ -485,7 +513,8 @@ void VideoTab::saveParametersSlot()
 
 ToolConfigTab::ToolConfigTab(QWidget* parent) :
     PreferencesTab(parent),
-    mFilePreviewWidget(new FilePreviewWidget(this))
+    mFilePreviewWidget(new FilePreviewWidget(this)),
+    mImagePreviewWidget(new ToolImagePreviewWidget(this))
 {
   mToolConfigureGroupBox = new ToolConfigureGroupBox(this);
   mToolFilterGroupBox  = new ToolFilterGroupBox(this);
@@ -497,6 +526,9 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
   connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
   connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
 
+  connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mImagePreviewWidget, SLOT(previewFileSlot(QString)));
+  connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mImagePreviewWidget, SLOT(previewFileSlot(QString)));
+
   this->applicationChangedSlot();
 }
 
@@ -507,17 +539,24 @@ void ToolConfigTab::init()
 {
   QGroupBox* filepreviewGroupBox = new QGroupBox(this);
   filepreviewGroupBox->setTitle("Toolfile preview");
-  QVBoxLayout* filepreviewLayout = new QVBoxLayout();
+  QHBoxLayout* filepreviewLayout = new QHBoxLayout();
   filepreviewGroupBox->setLayout(filepreviewLayout);
   filepreviewLayout->addWidget(mFilePreviewWidget);
+
+  QGroupBox* imagepreviewGroupBox = new QGroupBox(this);
+  imagepreviewGroupBox->setTitle("Tool image preview");
+  QVBoxLayout* imagepreviewLayout = new QVBoxLayout();
+  imagepreviewGroupBox->setLayout(imagepreviewLayout);
+  imagepreviewLayout->addWidget(mImagePreviewWidget);
 
   //layout
   QGridLayout* layout = new QGridLayout;
   mTopLayout->addLayout(layout);
 
-  layout->addWidget(mToolConfigureGroupBox, 0, 0, 1, 1);
-  layout->addWidget(mToolFilterGroupBox, 0, 1, 1, 1);
-  layout->addWidget(filepreviewGroupBox, 1, 0, 1, 2);
+  layout->addWidget(mToolConfigureGroupBox, 0, 0, 1, 2);
+  layout->addWidget(mToolFilterGroupBox, 0, 2, 1, 2);
+  layout->addWidget(filepreviewGroupBox, 1, 0, 1, 3);
+  layout->addWidget(imagepreviewGroupBox, 1, 3, 1, 1);
 
   mToolConfigureGroupBox->setCurrentlySelectedCofiguration(DataLocations::getToolConfigFilePath());
 }

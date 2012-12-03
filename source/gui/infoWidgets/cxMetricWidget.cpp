@@ -26,6 +26,7 @@
 #include "sscLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
 #include "sscRegistrationTransform.h"
+#include "sscTimeKeeper.h"
 
 namespace cx
 {
@@ -41,8 +42,8 @@ MetricWidget::MetricWidget(QWidget* parent) :
   mTable(new QTableWidget(this)),
   mActiveLandmark("")
 {
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(updateSlot()));
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(setModified()));
+  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(setModified()));
 
   //table widget
   connect(mTable, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
@@ -167,7 +168,7 @@ void MetricWidget::showEvent(QShowEvent* event)
 //  options.mShowPointPickerProbe = true;
 //  data->setOptions(options);
 
-  this->updateSlot();
+  this->setModified();
 }
 
 void MetricWidget::hideEvent(QHideEvent* event)
@@ -215,17 +216,12 @@ std::vector<MetricBasePtr> MetricWidget::createMetricWrappers()
   return retval;
 }
 
-/**update contents of table.
- * rebuild table only if necessary
- *
- */
-void MetricWidget::updateSlot()
+void MetricWidget::prePaintEvent()
 {
-//  std::cout << "update " << std::endl;
-
   mTable->blockSignals(true);
 
   std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers();
+
 
   bool rebuild = newMetrics.size()!=mMetrics.size();
 
@@ -241,7 +237,7 @@ void MetricWidget::updateSlot()
   // rebuild all:
   if (rebuild)
   {
-//    std::cout << "rebuild " << newMetrics.size() << std::endl;
+    std::cout << "rebuild " << newMetrics.size() << std::endl;
     mTable->clear();
 
     while (mEditWidgets->count())
@@ -251,7 +247,7 @@ void MetricWidget::updateSlot()
 
     for (unsigned i=0; i<mMetrics.size(); ++i)
     {
-    	disconnect(mMetrics[i]->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
+        disconnect(mMetrics[i]->getData().get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
     }
 
     mMetrics = newMetrics;
@@ -259,15 +255,10 @@ void MetricWidget::updateSlot()
     for (unsigned i=0; i<mMetrics.size(); ++i)
     {
     	MetricBasePtr wrapper = mMetrics[i];
-  		connect(wrapper->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
-//  		mEditWidgets->addWidget(wrapper->createWidget());
-
+        connect(wrapper->getData().get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
   		QGroupBox* groupBox = new QGroupBox(wrapper->getData()->getName(), this);
   		groupBox->setFlat(true);
-//  	  QFrame* groupBox = new QFrame(this);
   	  QVBoxLayout* gbLayout = new QVBoxLayout(groupBox);
-//  	  groupBox->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-//  	  groupBox->setLineWidth(3);
   	  gbLayout->setMargin(4);
   	  gbLayout->addWidget(wrapper->createWidget());
   	  mEditWidgets->addWidget(groupBox);
@@ -350,7 +341,7 @@ ssc::PointMetricPtr MetricWidget::addPoint(ssc::Vector3D point, ssc::CoordinateS
 void MetricWidget::setActiveUid(QString uid)
 {
 	mActiveLandmark = uid;
-	this->updateSlot();
+    this->setModified();
 }
 
 void MetricWidget::addPointButtonClickedSlot()

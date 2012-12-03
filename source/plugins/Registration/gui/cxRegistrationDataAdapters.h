@@ -32,12 +32,13 @@ public:
   virtual ~RegistrationFixedImageStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
+//  virtual QString getValueName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
 public: // optional methods
-  virtual QString getHelp() const;
+//  virtual QString getHelp() const;
+//  virtual ssc::DataPtr getData() const;
 
 private:
   RegistrationManagerPtr mManager;
@@ -56,12 +57,13 @@ public:
   virtual ~RegistrationMovingImageStringDataAdapter() {}
 
 public: // basic methods
-  virtual QString getValueName() const;
+//  virtual QString getValueName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
 public: // optional methods
-  virtual QString getHelp() const;
+//  virtual QString getHelp() const;
+//  virtual ssc::DataPtr getData() const;
 
 private:
   RegistrationManagerPtr mManager;

@@ -45,10 +45,13 @@ public slots:
 	void paramsChangedSlot();
 private slots:
 	void inputDataSelected(QString mhdFileName);
+	/** Add the widgets for the current algorithm to a stacked widget.*/
 	void repopulateAlgorithmGroup();
 	void reconstructStartedSlot();
 	void reconstructFinishedSlot();
 	void toggleDetailsSlot();
+
+	void reconstructAboutToStartSlot();
 
 private:
 	ssc::ReconstructManagerPtr mReconstructer;

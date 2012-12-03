@@ -523,6 +523,7 @@ void RegistrationManager::applyImage2ImageRegistration(ssc::Transform3D delta_pr
 	this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData, regTrans.mFixed);
 	mLastRegistrationTime = regTrans.mTimestamp;
 	ssc::messageManager()->sendSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
+	patientService()->getPatientData()->autoSave();
 }
 
 /**\brief apply a new patient registration
@@ -538,6 +539,7 @@ void RegistrationManager::applyPatientRegistration(ssc::Transform3D rMpr_new, QS
 	ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
 	mLastRegistrationTime = regTrans.mTimestamp;
 	ssc::messageManager()->sendSuccess(QString("Patient registration [%1] has been performed.").arg(description));
+	patientService()->getPatientData()->autoSave();
 }
 
 void RegistrationManager::addXml(QDomNode& parentNode)

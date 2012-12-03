@@ -318,7 +318,7 @@ void TestRegistrationV2V::doTestVessel2VesselRegistration(ssc::Transform3D pertu
 		std::cout << info << std::endl;
 	}
 
-	cx::SeansVesselReg vesselReg;
+	ssc::SeansVesselReg vesselReg;
 	vesselReg.setDebugOutput(verbose);
 	vesselReg.mt_doOnlyLinear = true;
 

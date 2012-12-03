@@ -14,14 +14,15 @@
 
 #include "cxCompositeTimedAlgorithm.h"
 
+#include <QStringList>
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 
 namespace cx
 {
 
-CompositeTimedAlgorithm::CompositeTimedAlgorithm() :
-	TimedBaseAlgorithm("composite", 20),
+CompositeTimedAlgorithm::CompositeTimedAlgorithm(QString name) :
+	TimedBaseAlgorithm(name, 20),
 	mCurrent(-1)
 {
 }
@@ -58,6 +59,7 @@ void CompositeTimedAlgorithm::execute()
 	// if already started, ignore
 	if (mCurrent>=0)
 		return;
+	this->startTiming();
 	mCurrent = -1;
 	emit started(0);
 	this->jumpToNextChild();
@@ -83,9 +85,100 @@ void CompositeTimedAlgorithm::jumpToNextChild()
 	if (mCurrent>=mChildren.size())
 	{
 		mCurrent = -1;
+		this->stopTiming();
 		emit finished();
 	}
 }
+
+bool CompositeTimedAlgorithm::isFinished() const
+{
+    return mCurrent == -1;
+}
+
+bool CompositeTimedAlgorithm::isRunning() const
+{
+    return mCurrent >= 0;
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+CompositeParallelTimedAlgorithm::CompositeParallelTimedAlgorithm(QString name) :
+	TimedBaseAlgorithm(name, 20)
+{
+}
+
+QString CompositeParallelTimedAlgorithm::getProduct() const
+{
+	QStringList products;
+	for (unsigned i=0; i<mChildren.size(); ++i)
+	{
+		products << mChildren[i]->getProduct();
+	}
+
+	if (products.isEmpty())
+		return "composite parallel";
+
+	return products.join(", ");
+}
+
+void CompositeParallelTimedAlgorithm::append(TimedAlgorithmPtr child)
+{
+	mChildren.push_back(child);
+}
+
+void CompositeParallelTimedAlgorithm::clear()
+{
+
+	// if already started, ignore
+	if (!this->isFinished())
+	{
+		ssc::messageManager()->sendError("Attempt to restart CompositeTimedAlgorithm while running failed.");
+		return;
+	}
+
+	mChildren.clear();
+}
+
+void CompositeParallelTimedAlgorithm::execute()
+{
+	emit aboutToStart();
+	emit started(0);
+	for (unsigned i=0; i<mChildren.size(); ++i)
+	{
+		connect(mChildren[i].get(), SIGNAL(finished()), this, SLOT(oneFinished()));
+	}
+	for (unsigned i=0; i<mChildren.size(); ++i)
+	{
+		mChildren[i]->execute();
+	}
+}
+
+void CompositeParallelTimedAlgorithm::oneFinished()
+{
+	emit productChanged();
+
+	if (this->isFinished())
+		emit finished();
+}
+
+bool CompositeParallelTimedAlgorithm::isFinished() const
+{
+	int count = 0;
+	for (unsigned i=0; i<mChildren.size(); ++i)
+	{
+		if (mChildren[i]->isFinished())
+			++count;
+	}
+	return (count==mChildren.size());
+}
+
+bool CompositeParallelTimedAlgorithm::isRunning() const
+{
+    return !this->isFinished();
+}
+
 
 
 }

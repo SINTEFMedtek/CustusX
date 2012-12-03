@@ -143,9 +143,10 @@ public:
 	RenderTimerPtr getRenderTimer() { return mRenderTimer; }
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
+	void autoShowData(ssc::DataPtr data);
 
 signals:
-	void imageDeletedFromViews(ssc::ImagePtr image); ///< Emitted when an image is deleted from the views in the cxViewManager
+//	void imageDeletedFromViews(ssc::ImagePtr image); ///< Emitted when an image is deleted from the views in the cxViewManager
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes
 	void activeViewChanged(); ///< emitted when the active view changes
@@ -213,6 +214,7 @@ protected:
 
 	QTimer* mRenderingTimer; ///< timer that drives rendering
 	QDateTime mLastFullRender;
+    QDateTime mLastBeginRender;
 
 	RenderTimerPtr mRenderTimer;
 

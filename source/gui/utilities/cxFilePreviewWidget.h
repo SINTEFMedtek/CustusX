@@ -1,13 +1,14 @@
 #ifndef CXFILEPREVIEWWIDGET_H_
 #define CXFILEPREVIEWWIDGET_H_
 
-#include "cxBaseWidget.h"
-#include "boost/shared_ptr.hpp"
+#include "cxFileWatcherWidget.h"
+//#include "boost/shared_ptr.hpp"
 class QTextDocument;
 class QTextEdit;
+//class QLabel;
 class QPushButton;
-class QFileSystemWatcher;
-class QFile;
+//class QFileSystemWatcher;
+//class QFile;
 #include <QSyntaxHighlighter>
 
 namespace cx
@@ -23,17 +24,17 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class FilePreviewWidget : public BaseWidget
+class FilePreviewWidget: public FileWatcherWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  FilePreviewWidget(QWidget* parent);
-  virtual ~FilePreviewWidget();
+	FilePreviewWidget(QWidget* parent);
+	virtual ~FilePreviewWidget();
 
-  virtual QString defaultWhatsThis() const;
+	virtual QString defaultWhatsThis() const;
 
-  template<class SYNTAXHIGHLIGHTER>
+	template<class SYNTAXHIGHLIGHTER>
 	void setSyntaxHighLighter()
 	{
 		delete mSyntaxHighlighter;
@@ -41,21 +42,22 @@ public:
 	}
 
 public slots:
-  void previewFileSlot(const QString& absoluteFilePath);
-  void saveSlot();
-  void textChangedSlot();
+	virtual void previewFileSlot(const QString& absoluteFilePath);
+	void saveSlot();
+	void textChangedSlot();
 
 private:
-  void watchFile(bool on);
+	//void watchFile(bool on);
 
-  QTextDocument* mTextDocument;
-  QTextEdit*     mTextEdit;
-  QSyntaxHighlighter* mSyntaxHighlighter;
+	QTextDocument* 						mTextDocument;
+	QTextEdit* 								mTextEdit;
+	//QLabel*										mFileNameLabel;
+	QSyntaxHighlighter* 			mSyntaxHighlighter;
 
-  QPushButton*   mSaveButton;
+	QPushButton* 							mSaveButton;
 
-  QFileSystemWatcher* mFileSystemWatcher;
-  boost::shared_ptr<QFile>  mCurrentFile;
+	//QFileSystemWatcher*				mFileSystemWatcher;
+	//boost::shared_ptr<QFile>	mCurrentFile;
 };
 
 }

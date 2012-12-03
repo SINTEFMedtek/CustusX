@@ -7,6 +7,7 @@
 #include <QDir>
 
 #include "vtkRenderWindow.h"
+#include <vtkImageData.h>
 
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
@@ -15,11 +16,14 @@
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
+#include "sscTime.h"
 #include "sscMessageManager.h"
 #include "cxVideoConnection.h"
 //#include "cxStateService.h"
 #include "cxImageServer.h"
 #include "cxVideoService.h"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
@@ -42,7 +46,9 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 	QStringList nameFilters;
 	nameFilters << "*.*";
 	mInitScriptWidget->setNameFilter(nameFilters);
-	mInitScriptWidget->setFilename(path);
+
+	if (!getConnection()->getInitScript().isEmpty())
+		mInitScriptWidget->setFilename(path);
 //	mParameterFileWidget0->setFilename(mElastixManager->getActiveParameterFile0());
 	connect(mInitScriptWidget, SIGNAL(fileSelected(QString)), this, SLOT(initScriptSelected(QString)));
 	mInitScriptWidget->setSizePolicy(QSizePolicy::Expanding, mInitScriptWidget->sizePolicy().verticalPolicy());
@@ -70,6 +76,13 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 	connect(mConnectButton, SIGNAL(clicked()), this, SLOT(toggleConnectServer()));
 	toptopLayout->addWidget(mConnectButton);
 
+	mSnapshotButton = new QPushButton("Snapshot", this);
+	mSnapshotButton->setToolTip(""
+			"Save snapshot of real time image/volume in the snapshot folder");
+	mSnapshotButton->setDisabled(true);
+	connect(mSnapshotButton, SIGNAL(clicked()), this, SLOT(saveSnapshotSlot()));
+	toptopLayout->addWidget(mSnapshotButton);
+
 	toptopLayout->addStretch();
 
 	this->dataChanged();
@@ -87,9 +100,15 @@ QWidget* IGTLinkWidget::createDirectLinkWidget()
 	layout->setMargin(0);
 
 	layout->addWidget(new QLabel("Arguments", this), 0, 0);
-	mDirectLinkArguments = new QLineEdit(this);
-	mDirectLinkArguments->setText(getConnection()->getLocalServerArguments());
+	mDirectLinkArguments = new QComboBox(this);
+	//Reduce size as mDirectLinkArguments can contain too much info for the widget
+	mDirectLinkArguments->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+	//Set size expanding in horizontal direction
+	mDirectLinkArguments->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	mDirectLinkArguments->setEditable(true);
+	mDirectLinkArguments->setInsertPolicy(QComboBox::InsertAtTop);
 	mDirectLinkArguments->setToolTip(ImageServer::getArgumentHelpText(""));
+	this->updateDirectLinkArgumentHistory();
 	layout->addWidget(mDirectLinkArguments, 0, 1);
 
 	return retval;
@@ -234,6 +253,14 @@ void IGTLinkWidget::updateHostHistory()
 	mAddressEdit->blockSignals(false);
 }
 
+void IGTLinkWidget::updateDirectLinkArgumentHistory()
+{
+	mDirectLinkArguments->blockSignals(true);
+	mDirectLinkArguments->clear();
+	mDirectLinkArguments->addItems(getConnection()->getDirectLinkArgumentHistory());
+	mDirectLinkArguments->blockSignals(false);
+}
+
 void IGTLinkWidget::browseLocalServerSlot()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Select Server"), "~");
@@ -296,7 +323,8 @@ void IGTLinkWidget::writeSettings()
 {
 	if (this->getConnection()->getUseDirectLink2())
 	{
-		getConnection()->setLocalServerArguments(mDirectLinkArguments->text());
+		getConnection()->setLocalServerArguments(mDirectLinkArguments->currentText());
+		this->updateDirectLinkArgumentHistory();
 	}
 	else if (this->getConnection()->getUseLocalServer2())
 	{
@@ -331,11 +359,50 @@ void IGTLinkWidget::connectServer()
 void IGTLinkWidget::serverStatusChangedSlot()
 {
 	if (getRTSource()->isConnected())
+	{
+		mSnapshotButton->setEnabled(getRTSource()->isStreaming());
 		mConnectButton->setText("Disconnect Server");
+	}
 	else
+	{
+		mSnapshotButton->setEnabled(getRTSource()->isStreaming());
 		mConnectButton->setText("Connect Server");
+	}
 
 	this->adjustSize();
+}
+
+void IGTLinkWidget::saveSnapshotSlot()
+{
+	ssc::messageManager()->sendInfo("IGTLinkWidget::saveSnapshotSlot()");
+
+	if(!getRTSource())
+	{
+		ssc::messageManager()->sendWarning("No RT source");
+		return;
+	}
+	if(!getRTSource()->isStreaming())
+	{
+		ssc::messageManager()->sendWarning("RT soure is not streaming");
+		return;
+	}
+	vtkImageDataPtr input = getRTSource()->getVtkImageData();
+	if(!input)
+	{
+		ssc::messageManager()->sendWarning("No RT data");
+		return;
+	}
+	int* extent = input->GetExtent();
+	QString filename;
+	QString format = ssc::timestampSecondsFormat();
+	if(extent[5]- extent[4] > 0) //3D
+		filename = "3DRTSnapshot" + QDateTime::currentDateTime().toString(format);
+	else //2D
+		filename = "2DRTSnapshot" + QDateTime::currentDateTime().toString(format);
+
+	ssc::ImagePtr output = ssc::dataManager()->createImage(input, filename, filename);
+	QString folder = patientService()->getPatientData()->getActivePatientFolder() + "/Screenshots/";
+	ssc::dataManager()->saveImage(output, folder); //Always sets type as 8 bit, even when 24 bit
 }
 
 } //end namespace cx

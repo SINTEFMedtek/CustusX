@@ -36,8 +36,14 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 
 if(APPLE)
 	add_definitions(-D__APPLE__)
+
 	# get rid of very annoying deprecated warnings in VTK 5.8. Remove when VTK if fixed...
-	SET(CMAKE_CPP_FLAGS "${CMAKE_CPP_FLAGS} -Wno-deprecated")
+        #SET(CMAKE_CPP_FLAGS "${CMAKE_CPP_FLAGS} -Wno-deprecated") # did not work ... must set in cmake-gui ... ??
+
+        # support running on 10.6 Snow Leopard
+        SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.6" CACHE STRING "Minimum OSX deployment version")
+
+
 	message(STATUS "setting flag " ${CMAKE_CPP_FLAGS})
 endif(APPLE)
 
@@ -46,7 +52,7 @@ endif(APPLE)
 #------------------------------------------------------------------------------
 set(CustusX3_VERSION_MAJOR  3)
 set(CustusX3_VERSION_MINOR  3)
-set(CustusX3_VERSION_PATCH  1)
+set(CustusX3_VERSION_PATCH  2)
 
 # set alpha when not a release
 set(CustusX3_VERSION_POSTFIX ".alpha")

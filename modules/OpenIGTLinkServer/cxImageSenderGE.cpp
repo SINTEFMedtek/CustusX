@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QTime>
 #include <QHostAddress>
+#include <QFileInfo>
 #include "igtlOSUtil.h"
 #include "igtlImageMessage.h"
 #include "igtlServerSocket.h"
@@ -23,6 +24,9 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
+#include "sscMessageManager.h"
+#include "cxDataLocations.h"
+#include "geConfig.h"
 
 namespace cx
 {
@@ -35,13 +39,20 @@ QString ImageSenderGE::getType()
 QStringList ImageSenderGE::getArgumentDescription()
 {
 	QStringList retval;
-	retval << "For now configurations are written in the config file located in the directory to which the DATA_STREAM_ROOT environment variable points to";
+	//Tabs are set so that tool tip looks nice
+	retval << "--ip:		GE scanner IP address";//default = 127.0.0.1, find a typical direct link address
+	retval << "--streamport:		GE scanner streaming port, default = 6543";
+	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
+	retval << "--buffersize:		Size of GEStreamer buffer, default = 100";
+	retval << "--imagesize2D:	Returned image size in pixels, default = 250000 (500*500)";
+	retval << "--openclpath:		Path to ScanConvert.cl";
+	retval << "--testmode:		GEStreamer test mode, default = 0";
 	return retval;
 }
 
 ImageSenderGE::ImageSenderGE(QObject* parent) :
 	ImageSender(parent),
-//	mSocket(NULL),
+	mInitialized(false),
 	mSendTimer(0),
 	mGrabTimer(0)
 {
@@ -57,22 +68,55 @@ void ImageSenderGE::initialize(StringMap arguments)
 {
 	mArguments = arguments;
 
-	//the stream config filename - has to be located in the directory to which the DATA_STREAM_ROOT environment variable points to
-	std::string configFilename = "config.txt";
-
 	//where to dump the hdf files
 	std::string fileRoot = "c:\\test";
 	//is dumping enabled
 	bool dumpHdfToDisk = false;
 
-	//size of the scan converted texture
-	int volumeDimensions[3] = {600, 600, 1}; //[voxels/pixels]
-	//double voxelSize[3] = {0.3, 0.3, 1.0}; //[mm]
+	//size of the scan converted 2D image in pixels
+//	long imageSize2D = 500*500;
 
 	//interpolation type
 	data_streaming::InterpolationType interpType = data_streaming::Bilinear;
 
-	mGEStreamer.InitializeClientData(configFilename, fileRoot, dumpHdfToDisk, volumeDimensions, interpType);
+	//Set defaults
+	if (!mArguments.count("ip"))
+		mArguments["ip"] = "127.0.0.1";
+	if (!mArguments.count("streamport"))
+		mArguments["streamport"] = "6543";
+	if (!mArguments.count("commandport"))
+		mArguments["commandport"] = "-1";
+	if (!mArguments.count("buffersize"))
+		mArguments["buffersize"] = "100";
+    if (!mArguments.count("openclpath"))
+        mArguments["openclpath"] = "";
+    if (!mArguments.count("testmode"))
+        mArguments["testmode"] = "0";
+    if (!mArguments.count("imagesize2D"))
+        mArguments["imagesize2D"] = "250000";
+
+   	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
+   	long imageSize2D = convertStringWithDefault(mArguments["imagesize2D"], -1);
+   	std::string openclpath = mArguments["openclpath"].toStdString();
+
+   	//Find GEStreamer OpenCL kernel code
+   	//Look in arg in, GEStreamer source dir, and installed dir
+   	QStringList paths;
+   	paths << QString::fromStdString(openclpath) << GEStreamer_KERNEL_PATH << DataLocations::getShaderPath();
+//   	std::cout << "OpenCL kernel paths: " << paths.join("  \n").toStdString();
+   	QFileInfo path;
+	path = QFileInfo(paths[0] + QString("/ScanConvertCL.cl"));
+	if (!path.exists())
+		path = QFileInfo(paths[1] + QString("/ScanConvertCL.cl"));
+	if (!path.exists())
+		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
+	if (!path.exists())
+	{
+		ssc::messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
+	} else
+		openclpath = path.absolutePath().toStdString();
+
+	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize2D, interpType, bufferSize, openclpath);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
@@ -90,13 +134,18 @@ void ImageSenderGE::deinitialize_local()
 	mImgStream = vtkSmartPointer<vtkImageData>();
 
 	//Clear frame geometry
-	data_streaming::beamspace_geometry emptyGeometry;
+	data_streaming::frame_geometry emptyGeometry;
 	mFrameGeometry = emptyGeometry;
 }
 
 bool ImageSenderGE::initialize_local()
 {
-	mImgStream = mGEStreamer.ConnectToScanner();
+	std::string hostIp = mArguments["ip"].toStdString();
+	int streamPort = convertStringWithDefault(mArguments["streamport"], -1);
+	int commandPort = convertStringWithDefault(mArguments["commandport"], -1);
+	bool testMode = convertStringWithDefault(mArguments["testmode"], 0);
+
+	mImgStream = mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
 	if(!mImgStream)
 		return false;
 	else
@@ -105,9 +154,9 @@ bool ImageSenderGE::initialize_local()
 
 bool ImageSenderGE::startStreaming(GrabberSenderPtr sender)
 {
-	bool initialized = this->initialize_local();
+	mInitialized = this->initialize_local();
 
-	if (!initialized || !mGrabTimer || !mSendTimer)
+	if (!mInitialized || !mGrabTimer || !mSendTimer)
 	{
 		std::cout << "ImageSenderGE: Failed to start streaming: Not initialized." << std::endl;
 		return false;
@@ -123,7 +172,7 @@ bool ImageSenderGE::startStreaming(GrabberSenderPtr sender)
 
 void ImageSenderGE::stopStreaming()
 {
-	if (!mGrabTimer || !mSendTimer)
+	if (!mInitialized || !mGrabTimer || !mSendTimer)
 		return;
 	mGrabTimer->stop();
 	mSendTimer->stop();
@@ -147,18 +196,29 @@ void ImageSenderGE::grab()
 	mGEStreamer.WaitForImageData();
 //	if (!mGEStreamer.HasNewImageData())
 //		return;
-	//Get frame geometry if we don't have it yet
-	if(mGEStreamer.HasNewFrameGeometry() || (mFrameGeometry.width < 0.0001))
+
+	bool testMode = convertStringWithDefault(mArguments["testmode"], 0);
+
+	//Update mGEStreamer.frame
+	//All function should now be called on this object
+	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
+	if(!testMode && mGEStreamer.frame == NULL)
 	{
-		// Frame geometry have changed. Update even of we get no image
-		mFrameGeometry = mGEStreamer.GetCurrentFrameGeometry();
+		std::cout << "ImageSenderGE::grab() failed: Got no frame" << std::endl;
+		return;
+	}
+
+	//Get frame geometry if we don't have it yet
+	if(!testMode && (mGEStreamer.frame->GetGeometryChanged() || (mFrameGeometry.width < 0.0001)))
+	{
+		// Frame geometry have changed.
+		mFrameGeometry = mGEStreamer.GetFrameGeometry();
 		mFrameGeometryChanged = true;
 		//std::cout << "Get new GE frame geometry" << std::endl;
 	}
 	else
 		mFrameGeometryChanged = false;
 
-	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
 	if(!imgStream)
 	{
 		std::cout << "ImageSenderGE::grab(): No image from GEStreamer" << std::endl;
@@ -166,7 +226,7 @@ void ImageSenderGE::grab()
 	}
 	else
 	{
-//		std::cout << "ImageSenderGE::grab(): Got image from GEStreamer" << std::endl;
+		//sstd::cout << "ImageSenderGE::grab(): Got image from GEStreamer" << std::endl;
 	}
 	//Only set image and time if we got a new image
 	mImgStream = imgStream;
@@ -230,7 +290,7 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 		}
 		else if(mImgStream->GetScalarTypeMax() <= 256)
 		{
-			IGTLinkImageMessage::TYPE_UINT8;// scalar type
+			scalarType = IGTLinkImageMessage::TYPE_UINT8;// scalar type
 		}
 	}
 	if (scalarType == -1)
@@ -280,24 +340,24 @@ IGTLinkUSStatusMessage::Pointer ImageSenderGE::getFrameStatus()
   //This is origin from the scanner (= 0,0,0)
   //Origin according to image is set in the image message
   if (mImgStream)
-	  retval->SetOrigin(mFrameGeometry.origo[0] + mImgStream->GetOrigin()[0],
-			  mFrameGeometry.origo[1]+ mImgStream->GetOrigin()[1],
-			  mFrameGeometry.origo[2]+ mImgStream->GetOrigin()[2]);
+	  retval->SetOrigin(mFrameGeometry.origin[0] + mImgStream->GetOrigin()[0],
+			  mFrameGeometry.origin[1]+ mImgStream->GetOrigin()[1],
+			  mFrameGeometry.origin[2]+ mImgStream->GetOrigin()[2]);
   else
-	  retval->SetOrigin(mFrameGeometry.origo);
+	  retval->SetOrigin(mFrameGeometry.origin);
 
   // 1 = sector, 2 = linear
-  if (mFrameGeometry.kind == 8) //linear
+  if (mFrameGeometry.imageType == data_streaming::Linear) //linear
 	  retval->SetProbeType(2);
-  else //kind == 7 or 9 //sector
+  else //sector
 	  retval->SetProbeType(1);
 
-  retval->SetDepthStart(mFrameGeometry.depthStart*1000);// Start of sector in mm from origin
-  retval->SetDepthEnd(mFrameGeometry.depthEnd*1000);	// End of sector in mm from origin
+  retval->SetDepthStart(mFrameGeometry.depthStart);// Start of sector in mm from origin
+  retval->SetDepthEnd(mFrameGeometry.depthEnd);	// End of sector in mm from origin
   retval->SetWidth(mFrameGeometry.width);// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
 
-  std::cout << "origin: " << mFrameGeometry.origo[0] << " " << mFrameGeometry.origo[1] << " " << mFrameGeometry.origo[2] << std::endl;
-  std::cout << "kind: " << mFrameGeometry.kind << std::endl;
+  std::cout << "origin: " << mFrameGeometry.origin[0] << " " << mFrameGeometry.origin[1] << " " << mFrameGeometry.origin[2] << std::endl;
+  std::cout << "imageType: " << mFrameGeometry.imageType << std::endl;
   std::cout << "depthStart: " << mFrameGeometry.depthStart << " end: " << mFrameGeometry.depthEnd << std::endl;
   std::cout << "width: " << mFrameGeometry.width << std::endl;
   std::cout << "tilt: " << mFrameGeometry.tilt << std::endl;

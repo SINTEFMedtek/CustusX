@@ -55,6 +55,7 @@ class TimedAlgorithmProgressBar : public QWidget
 public:
 	TimedAlgorithmProgressBar(QWidget* parent=NULL);
 	virtual ~TimedAlgorithmProgressBar() {}
+    void setShowTextLabel(bool on);
 
 	void attach(TimedAlgorithmPtr algorithm);
 	void detach(TimedAlgorithmPtr algorithm);
@@ -65,11 +66,14 @@ private slots:
 	void productChangedSlot();
 
 private:
+	void algorithmFinished(TimedBaseAlgorithm* algo);
 	std::set<TimedAlgorithmPtr> mAlgorithm;
 	QProgressBar* mProgressBar;
 	QLabel* mLabel;
-	int mStartedAlgos;
+//	int mStartedAlgos;
+	std::set<TimedBaseAlgorithm*> mStartedAlgos;
 	DisplayTimerWidget* mTimerWidget;
+    bool mShowTextLabel;
 };
 
 /**

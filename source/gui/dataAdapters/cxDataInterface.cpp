@@ -70,7 +70,6 @@ ssc::DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-
 DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase()
 {
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChanged()));
@@ -114,14 +113,8 @@ ssc::DoubleRange DoubleDataAdapter2DWindow::getValueRange() const
   return ssc::DoubleRange(1,range,range/1000.0);
 }
 
-
-
-
 //---------------------------------------------------------
 //---------------------------------------------------------
-
-
-
 
 double DoubleDataAdapter2DLevel::getValueInternal() const
 {
@@ -140,45 +133,15 @@ ssc::DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
   return ssc::DoubleRange(1,max,max/1000.0);
 }
 
-
-
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-SelectImageStringDataAdapterBase::SelectImageStringDataAdapterBase()
-{
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()),                         this, SIGNAL(changed()));
-  connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),   this, SIGNAL(changed()));
-}
-QStringList SelectImageStringDataAdapterBase::getValueRange() const
-{
-  std::vector<ssc::ImagePtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getImages());
-//  std::vector<QString> uids = ssc::dataManager()->getImageUids();
-  QStringList retval;
-  retval << "";
-//  for (unsigned i=0; i<uids.size(); ++i)
-//    retval << qstring_cast(uids[i]);
-  for (unsigned i=0; i<sorted.size(); ++i)
-    retval << sorted[i]->getUid();
-  return retval;
-}
-QString SelectImageStringDataAdapterBase::convertInternal2Display(QString internal)
-{
-  ssc::ImagePtr image = ssc::dataManager()->getImage(internal);
-  if (!image)
-    return "<no volume>";
-  return qstring_cast(image->getName());
-}
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
+////---------------------------------------------------------
+////---------------------------------------------------------
+////---------------------------------------------------------
 
 SelectRTSourceStringDataAdapterBase::SelectRTSourceStringDataAdapterBase()
 {
   connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SIGNAL(changed()));
 }
+
 QStringList SelectRTSourceStringDataAdapterBase::getValueRange() const
 {
   ssc::DataManager::StreamMap streams = ssc::dataManager()->getStreams();
@@ -189,6 +152,7 @@ QStringList SelectRTSourceStringDataAdapterBase::getValueRange() const
     retval << qstring_cast(it->second->getUid());
   return retval;
 }
+
 QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString internal)
 {
   ssc::VideoSourcePtr rtSource = ssc::dataManager()->getStream(internal);
@@ -200,30 +164,45 @@ QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString int
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase()
+SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase(QString typeRegexp) :
+    mTypeRegexp(typeRegexp)
 {
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()),                         this, SIGNAL(changed()));
-  connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),   this, SIGNAL(changed()));
+    mValueName = "Select data";
+    mHelp = mValueName;
+    connect(ssc::dataManager(), SIGNAL(dataLoaded()),   this, SIGNAL(changed()));
 }
+
+/**
+  * Erase all data with type not conforming to input regexp.
+  */
+std::map<QString, ssc::DataPtr> SelectDataStringDataAdapterBase::filterOnType(std::map<QString, ssc::DataPtr> input, QString regexp) const
+{
+    QRegExp reg(regexp);
+
+    std::map<QString, ssc::DataPtr>::iterator iter, current;
+
+    for (iter=input.begin(); iter!=input.end(); )
+    {
+        current = iter++; // increment iterator before erasing!
+        if (!current->second->getType().contains(reg))
+            input.erase(current);
+    }
+
+    return input;
+}
+
 QStringList SelectDataStringDataAdapterBase::getValueRange() const
 {
-  std::vector<ssc::DataPtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getData());
+  std::map<QString, ssc::DataPtr> data = ssc::dataManager()->getData();
+  data = this->filterOnType(data, mTypeRegexp);
+  std::vector<ssc::DataPtr> sorted = sortOnGroupsAndAcquisitionTime(data);
   QStringList retval;
   retval << "";
   for (unsigned i=0; i<sorted.size(); ++i)
     retval << sorted[i]->getUid();
   return retval;
-
-//  std::vector<QString> meshUids = ssc::dataManager()->getMeshUids();
-//  std::vector<QString> imageUids = ssc::dataManager()->getImageUids();
-//  QStringList retval;
-//  retval << "";
-//  for (unsigned i=0; i<meshUids.size(); ++i)
-//    retval << qstring_cast(meshUids[i]);
-//  for (unsigned i=0; i<imageUids.size(); ++i)
-//    retval << qstring_cast(imageUids[i]);
-//  return retval;
 }
+
 QString SelectDataStringDataAdapterBase::convertInternal2Display(QString internal)
 {
   ssc::DataPtr data = ssc::dataManager()->getData(internal);
@@ -231,6 +210,33 @@ QString SelectDataStringDataAdapterBase::convertInternal2Display(QString interna
     return "<no data>";
   return qstring_cast(data->getName());
 }
+
+QString SelectDataStringDataAdapterBase::getHelp() const
+{
+  return mHelp;
+}
+
+QString SelectDataStringDataAdapterBase::getValueName() const
+{
+  return mValueName;
+}
+
+void SelectDataStringDataAdapterBase::setHelp(QString text)
+{
+    mHelp = text;
+    emit changed();
+}
+void SelectDataStringDataAdapterBase::setValueName(QString val)
+{
+  mValueName = val;
+  emit changed();
+}
+
+ssc::DataPtr SelectDataStringDataAdapterBase::getData() const
+{
+    return ssc::dataManager()->getData(this->getValue());
+}
+
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -239,6 +245,7 @@ SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
 {
   connect(ssc::toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
 }
+
 QStringList SelectToolStringDataAdapterBase::getValueRange() const
 {
   std::vector<QString> uids = ssc::toolManager()->getToolUids();
@@ -248,6 +255,7 @@ QStringList SelectToolStringDataAdapterBase::getValueRange() const
     retval << qstring_cast(uids[i]);
   return retval;
 }
+
 QString SelectToolStringDataAdapterBase::convertInternal2Display(QString internal)
 {
   ssc::ToolPtr tool = ssc::toolManager()->getTool(internal);
@@ -258,8 +266,6 @@ QString SelectToolStringDataAdapterBase::convertInternal2Display(QString interna
   return qstring_cast(tool->getName());
 }
 
-
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -267,6 +273,7 @@ QString SelectToolStringDataAdapterBase::convertInternal2Display(QString interna
 SelectCoordinateSystemStringDataAdapterBase::SelectCoordinateSystemStringDataAdapterBase()
 {
 }
+
 QStringList SelectCoordinateSystemStringDataAdapterBase::getValueRange() const
 {
   QStringList retval;
@@ -278,6 +285,7 @@ QStringList SelectCoordinateSystemStringDataAdapterBase::getValueRange() const
   retval << qstring_cast(ssc::csSENSOR);
   return retval;
 }
+
 QString SelectCoordinateSystemStringDataAdapterBase::convertInternal2Display(QString internal)
 {
   if (internal.isEmpty())
@@ -302,14 +310,13 @@ QString SelectCoordinateSystemStringDataAdapterBase::convertInternal2Display(QSt
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-ActiveImageStringDataAdapter::ActiveImageStringDataAdapter()
+ActiveImageStringDataAdapter::ActiveImageStringDataAdapter() : SelectDataStringDataAdapterBase("image")
 {
+  mValueName = "Active Volume";
+  mHelp = "Select the active volume";
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)),      this, SIGNAL(changed()));
 }
-QString ActiveImageStringDataAdapter::getValueName() const
-{
-  return "Active Volume";
-}
+
 bool ActiveImageStringDataAdapter::setValue(const QString& value)
 {
   ssc::ImagePtr newImage = ssc::dataManager()->getImage(value);
@@ -318,64 +325,44 @@ bool ActiveImageStringDataAdapter::setValue(const QString& value)
   ssc::dataManager()->setActiveImage(newImage);
   return true;
 }
+
 QString ActiveImageStringDataAdapter::getValue() const
 {
   if (!ssc::dataManager()->getActiveImage())
     return "";
   return qstring_cast(ssc::dataManager()->getActiveImage()->getUid());
 }
-QString ActiveImageStringDataAdapter::getHelp() const
-{
-  return "Select the active volume";
-}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
+SelectImageStringDataAdapter::SelectImageStringDataAdapter() : SelectDataStringDataAdapterBase("image")
+{
+    mValueName = "Select volume";
+    mHelp = "Select a volume";
+}
 
-SelectImageStringDataAdapter::SelectImageStringDataAdapter() :
-    mValueName("Select volume"),
-    mHelp("Select a volume")
-{
-}
-void SelectImageStringDataAdapter::setHelp(QString text)
-{
-	mHelp = text;
-}
-QString SelectImageStringDataAdapter::getValueName() const
-{
-  return mValueName;
-}
 bool SelectImageStringDataAdapter::setValue(const QString& value)
 {
   if (value==mImageUid)
     return false;
   mImageUid = value;
   emit changed();
-  emit imageChanged(mImageUid);
+  emit dataChanged(mImageUid);
   return true;
 }
+
 QString SelectImageStringDataAdapter::getValue() const
 {
   return mImageUid;
 }
-QString SelectImageStringDataAdapter::getHelp() const
-{
-  return mHelp;
-}
+
 ssc::ImagePtr SelectImageStringDataAdapter::getImage()
 {
   return ssc::dataManager()->getImage(mImageUid);
 }
 
-void SelectImageStringDataAdapter::setValueName(const QString name)
-{
-  mValueName = name;
-}
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -386,10 +373,12 @@ SelectRTSourceStringDataAdapter::SelectRTSourceStringDataAdapter() :
   connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(setDefaultSlot()));
   this->setDefaultSlot();
 }
+
 QString SelectRTSourceStringDataAdapter::getValueName() const
 {
   return mValueName;
 }
+
 bool SelectRTSourceStringDataAdapter::setValue(const QString& value)
 {
   if(mRTSource && (mRTSource->getUid() == value))
@@ -406,19 +395,21 @@ bool SelectRTSourceStringDataAdapter::setValue(const QString& value)
   connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SIGNAL(changed()));
 
   emit changed();
-  //emit rtSourceChanged();
   return true;
 }
+
 QString SelectRTSourceStringDataAdapter::getValue() const
 {
   if(!mRTSource)
     return "<no real time source>";
   return mRTSource->getUid();
 }
+
 QString SelectRTSourceStringDataAdapter::getHelp() const
 {
   return "Select a real time source";
 }
+
 ssc::VideoSourcePtr SelectRTSourceStringDataAdapter::getRTSource()
 {
   return mRTSource;
@@ -428,6 +419,7 @@ void SelectRTSourceStringDataAdapter::setValueName(const QString name)
 {
   mValueName = name;
 }
+
 void SelectRTSourceStringDataAdapter::setDefaultSlot()
 {
   ssc::DataManager::StreamMap streams = ssc::dataManager()->getStreams();
@@ -437,6 +429,7 @@ void SelectRTSourceStringDataAdapter::setDefaultSlot()
     this->setValue(it->first);
   }
 }
+
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -445,28 +438,34 @@ SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter
 {
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(setDefaultSlot()));
 }
+
 QString SelectCoordinateSystemStringDataAdapter::getValueName() const
 {
   return "Select coordinate system";
 }
+
 bool SelectCoordinateSystemStringDataAdapter::setValue(const QString& value)
 {
   mCoordinateSystem = string2enum<ssc::COORDINATE_SYSTEM>(value);
   emit changed();
   return true;
 }
+
 QString SelectCoordinateSystemStringDataAdapter::getValue() const
 {
   return qstring_cast(mCoordinateSystem);
 }
+
 QString SelectCoordinateSystemStringDataAdapter::getHelp() const
 {
   return "Select a coordinate system";
 }
+
 void SelectCoordinateSystemStringDataAdapter::setDefaultSlot()
 {
   this->setValue(qstring_cast(ssc::csPATIENTREF));
 }
+
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -476,18 +475,22 @@ SelectToolStringDataAdapter::SelectToolStringDataAdapter()
 	mValueName = "Select a tool";
 	mHelp = mValueName;
 }
+
 void SelectToolStringDataAdapter::setHelp(QString help)
 {
   mHelp = help;
 }
+
 void SelectToolStringDataAdapter::setValueName(QString name)
 {
   mValueName = name;
 }
+
 QString SelectToolStringDataAdapter::getValueName() const
 {
   return mValueName;
 }
+
 bool SelectToolStringDataAdapter::setValue(const QString& value)
 {
   if(mTool && value==mTool->getUid())
@@ -500,134 +503,94 @@ bool SelectToolStringDataAdapter::setValue(const QString& value)
   emit changed();
   return true;
 }
+
 QString SelectToolStringDataAdapter::getValue() const
 {
   if(!mTool)
     return "<no tool>";
   return mTool->getUid();
 }
+
 QString SelectToolStringDataAdapter::getHelp() const
 {
   return mHelp;
 }
+
 ssc::ToolPtr SelectToolStringDataAdapter::getTool() const
 {
   return mTool;
 }
 
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectDataStringDataAdapter::SelectDataStringDataAdapter() :
-    mValueName("Select data")
+SelectDataStringDataAdapter::SelectDataStringDataAdapter() : SelectDataStringDataAdapterBase(".*")
 {
 }
-void SelectDataStringDataAdapter::setValueName(const QString name)
-{
-  mValueName = name;
-}
-QString SelectDataStringDataAdapter::getValueName() const
-{
-  return mValueName;
-}
+
 bool SelectDataStringDataAdapter::setValue(const QString& value)
 {
-  if (mData && value==mData->getUid())
+  if (value==mUid)
     return false;
-  ssc::DataPtr temp = ssc::dataManager()->getData(value);
-//  if(!temp) // wrong: must accept to set to zero
-//    return false;
 
-  mData = temp;
+  mUid = "";
+  if (ssc::dataManager()->getData(value))
+      mUid = value;
+
   emit changed();
-//  emit dataChanged(value);
   emit dataChanged(this->getValue());
   return true;
 }
+
 QString SelectDataStringDataAdapter::getValue() const
 {
-  if(!mData)
-    return "<no data>";
-  return mData->getUid();
+    return mUid;
+//  if(!mData)
+//    return "<no data>";
+//  return mData->getUid();
 }
-QString SelectDataStringDataAdapter::getHelp() const
-{
-  return "Select data";
-}
+
 ssc::DataPtr SelectDataStringDataAdapter::getData() const
 {
-  return mData;
+    return ssc::dataManager()->getData(mUid);
+//  return mData;
 }
+
+//---------------------------------------------------------
+//---------------------------------------------------------
 //---------------------------------------------------------
 
 SelectMeshStringDataAdapter::SelectMeshStringDataAdapter() :
-    mValueName("Select mesh")
+    SelectDataStringDataAdapterBase("mesh")
 {
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()),                         this, SIGNAL(changed()));
-  connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),   this, SIGNAL(changed()));
+    mValueName = "Select mesh";
+    mHelp = "Select a mesh";
 }
-QString SelectMeshStringDataAdapter::getValueName() const
-{
-  return mValueName;
-}
+
 bool SelectMeshStringDataAdapter::setValue(const QString& value)
 {
   if (value==mMeshUid)
     return false;
   mMeshUid = value;
   emit changed();
-  emit meshChanged(mMeshUid);
+  emit dataChanged(mMeshUid);
   return true;
 }
+
 QString SelectMeshStringDataAdapter::getValue() const
 {
   return mMeshUid;
 }
-QString SelectMeshStringDataAdapter::getHelp() const
-{
-  return "Select a mesh";
-}
-QStringList SelectMeshStringDataAdapter::getValueRange() const
-{
-  std::vector<ssc::MeshPtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getMeshes());
-  QStringList retval;
-  retval << "";
-  for (unsigned i=0; i<sorted.size(); ++i)
-    retval << sorted[i]->getUid();
-  return retval;
 
-//  std::vector<QString> uids = ssc::dataManager()->getMeshUids();
-//  QStringList retval;
-//  retval << "";
-//  for (unsigned i=0; i<uids.size(); ++i)
-//    retval << qstring_cast(uids[i]);
-//  return retval;
-}
-QString SelectMeshStringDataAdapter::convertInternal2Display(QString internal)
-{
-  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(internal);
-  if (!mesh)
-    return "<no mesh>";
-  return qstring_cast(mesh->getName());
-}
 ssc::MeshPtr SelectMeshStringDataAdapter::getMesh()
 {
   return ssc::dataManager()->getMesh(mMeshUid);
 }
 
-void SelectMeshStringDataAdapter::setValueName(const QString name)
-{
-  mValueName = name;
-}
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
-
-
-
 
 ParentFrameStringDataAdapter::ParentFrameStringDataAdapter()
 {
@@ -699,7 +662,6 @@ QString ParentFrameStringDataAdapter::convertInternal2Display(QString internal)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-
 bool SetParentFrameStringDataAdapter::setValue(const QString& value)
 {
   if (!mData)
@@ -707,7 +669,6 @@ bool SetParentFrameStringDataAdapter::setValue(const QString& value)
   mData->get_rMd_History()->setParentSpace(value);
   return true;
 }
-
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -774,11 +735,9 @@ void DataUidEditableStringDataAdapter::setData(ssc::DataPtr data)
   emit changed();
 }
 
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
-
 
 DataModalityStringDataAdapter::DataModalityStringDataAdapter()
 {
@@ -832,13 +791,9 @@ QStringList DataModalityStringDataAdapter::getValueRange() const
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }
 
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
-
-
-
 
 ImageTypeStringDataAdapter::ImageTypeStringDataAdapter()
 {

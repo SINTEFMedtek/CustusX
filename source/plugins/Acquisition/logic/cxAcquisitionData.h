@@ -15,7 +15,7 @@ class QDomNode;
 
 namespace ssc
 {
-	typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
+typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 }
 
 namespace cx
@@ -37,26 +37,26 @@ public:
 	AcquisitionData(ssc::ReconstructManagerPtr reconstructer);
 	virtual ~AcquisitionData();
 
-  void addRecordSession(RecordSessionPtr session);
-  void removeRecordSession(RecordSessionPtr session);
-  std::vector<RecordSessionPtr> getRecordSessions();
-  RecordSessionPtr getRecordSession(QString uid);
-  QString getNewUid();
+	void addRecordSession(RecordSessionPtr session);
+	void removeRecordSession(RecordSessionPtr session);
+	std::vector<RecordSessionPtr> getRecordSessions();
+	RecordSessionPtr getRecordSession(QString uid);
+	QString getNewUid();
 
-  ssc::ReconstructManagerPtr getReconstructer() { return mReconstructer; };
+	ssc::ReconstructManagerPtr getReconstructer() { return mReconstructer; };
 
-  //Interface for saving/loading
-  void addXml(QDomNode& dataNode); ///< adds xml information about the StateService and its variabels
-  void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the StateService.
+	//Interface for saving/loading
+	void addXml(QDomNode& dataNode); ///< adds xml information about the StateService and its variabels
+	void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the StateService.
 
 signals:
-  void  recordedSessionsChanged();
+	void  recordedSessionsChanged();
 
 private:
-  std::vector<RecordSessionPtr> mRecordSessions;
+	std::vector<RecordSessionPtr> mRecordSessions;
 
-  // referenced plugins:
-  ssc::ReconstructManagerPtr mReconstructer;
+	// referenced plugins:
+	ssc::ReconstructManagerPtr mReconstructer;
 };
 
 typedef boost::shared_ptr<AcquisitionData> AcquisitionDataPtr;
