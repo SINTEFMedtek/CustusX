@@ -32,26 +32,26 @@ namespace cx
  */
 class FilterTimedAlgorithm : public ThreadedTimedAlgorithm<bool>
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  FilterTimedAlgorithm(FilterPtr filter);
-  virtual ~FilterTimedAlgorithm();
+	FilterTimedAlgorithm(FilterPtr filter);
+	virtual ~FilterTimedAlgorithm();
 
-  FilterPtr getFilter();
+	FilterPtr getFilter();
 
 protected slots:
-  virtual void preProcessingSlot();
-  virtual void postProcessingSlot();
+	virtual void preProcessingSlot();
+	virtual void postProcessingSlot();
 
 private:
-  virtual bool calculate();
+	virtual bool calculate();
 
-//  QString       mOutputBasePath;
-//  std::vector<ssc::DataPtr> mInput;
-//  std::vector<ssc::DataPtr> mOutput;
-//  QDomElement mOptions;
-  FilterPtr mFilter;
+	//  QString       mOutputBasePath;
+	//  std::vector<ssc::DataPtr> mInput;
+	//  std::vector<ssc::DataPtr> mOutput;
+	//  QDomElement mOptions;
+	FilterPtr mFilter;
 };
 typedef boost::shared_ptr<class FilterTimedAlgorithm> FilterTimedAlgorithmPtr;
 

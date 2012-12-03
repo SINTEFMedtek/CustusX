@@ -32,48 +32,48 @@ namespace cx
  */
 class ContourFilter : public FilterImpl
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    virtual ~ContourFilter() {}
+	virtual ~ContourFilter() {}
 
-    virtual QString getType() const;
-    virtual QString getName() const;
-    virtual QString getHelp() const;
-    virtual void setActive(bool on);
+	virtual QString getType() const;
+	virtual QString getName() const;
+	virtual QString getHelp() const;
+	virtual void setActive(bool on);
 
-    bool preProcess();
-    virtual bool execute();
-    virtual void postProcess();
+	bool preProcess();
+	virtual bool execute();
+	virtual void postProcess();
 
-    // extensions:
-    ssc::BoolDataAdapterXmlPtr getReduceResolutionOption(QDomElement root);
-    ssc::BoolDataAdapterXmlPtr getSmoothingOption(QDomElement root);
-    ssc::BoolDataAdapterXmlPtr getPreserveTopologyOption(QDomElement root);
-    ssc::DoubleDataAdapterXmlPtr getSurfaceThresholdOption(QDomElement root);
-    ssc::DoubleDataAdapterXmlPtr getDecimationOption(QDomElement root);
-    ssc::ColorDataAdapterXmlPtr getColorOption(QDomElement root);
+	// extensions:
+	ssc::BoolDataAdapterXmlPtr getReduceResolutionOption(QDomElement root);
+	ssc::BoolDataAdapterXmlPtr getSmoothingOption(QDomElement root);
+	ssc::BoolDataAdapterXmlPtr getPreserveTopologyOption(QDomElement root);
+	ssc::DoubleDataAdapterXmlPtr getSurfaceThresholdOption(QDomElement root);
+	ssc::DoubleDataAdapterXmlPtr getDecimationOption(QDomElement root);
+	ssc::ColorDataAdapterXmlPtr getColorOption(QDomElement root);
 
 protected:
-    virtual void createOptions(QDomElement root);
-    virtual void createInputTypes();
-    virtual void createOutputTypes();
+	virtual void createOptions(QDomElement root);
+	virtual void createInputTypes();
+	virtual void createOutputTypes();
 
 private slots:
-    /** Set new value+range of the threshold option.
-      */
-    void imageChangedSlot(QString uid);
-    void thresholdSlot();
+	/** Set new value+range of the threshold option.
+	  */
+	void imageChangedSlot(QString uid);
+	void thresholdSlot();
 
 private:
-    ssc::BoolDataAdapterXmlPtr mReduceResolutionOption;
-//    ssc::BoolDataAdapterXmlPtr mSmoothingOption;
-//    ssc::BoolDataAdapterXmlPtr mPreserveTopologyOption;
-    ssc::DoubleDataAdapterXmlPtr mSurfaceThresholdOption;
-//    ssc::DoubleDataAdapterXmlPtr mDecimationOption;
-//    ssc::ColorDataAdapterXmlPtr mColorOption;
-//    ssc::DoubleDataAdapterXmlPtr mLowerThresholdOption;
-    vtkPolyDataPtr mRawResult;
+	ssc::BoolDataAdapterXmlPtr mReduceResolutionOption;
+	//    ssc::BoolDataAdapterXmlPtr mSmoothingOption;
+	//    ssc::BoolDataAdapterXmlPtr mPreserveTopologyOption;
+	ssc::DoubleDataAdapterXmlPtr mSurfaceThresholdOption;
+	//    ssc::DoubleDataAdapterXmlPtr mDecimationOption;
+	//    ssc::ColorDataAdapterXmlPtr mColorOption;
+	//    ssc::DoubleDataAdapterXmlPtr mLowerThresholdOption;
+	vtkPolyDataPtr mRawResult;
 };
 typedef boost::shared_ptr<class ContourFilter> ContourFilterPtr;
 

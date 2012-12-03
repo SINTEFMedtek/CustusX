@@ -31,28 +31,28 @@ namespace cx
  */
 class DummyFilter : public FilterImpl
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    virtual ~DummyFilter() {}
+	virtual ~DummyFilter() {}
 
-    virtual QString getType() const;
-    virtual QString getName() const;
-    virtual QString getHelp() const;
+	virtual QString getType() const;
+	virtual QString getName() const;
+	virtual QString getHelp() const;
 
-//    virtual bool preProcess(QString outputPath);
-    virtual bool execute();
-    virtual void postProcess();
+	//    virtual bool preProcess(QString outputPath);
+	virtual bool execute();
+	virtual void postProcess();
 
 protected:
-    virtual void createOptions(QDomElement root);
-    virtual void createInputTypes();
-    virtual void createOutputTypes();
+	virtual void createOptions(QDomElement root);
+	virtual void createInputTypes();
+	virtual void createOutputTypes();
 
 private:
-    ssc::StringDataAdapterPtr getStringOption(QDomElement root);
-    ssc::DoubleDataAdapterPtr getDoubleOption(QDomElement root);
-    ssc::BoolDataAdapterPtr getBoolOption(QDomElement root);
+	ssc::StringDataAdapterPtr getStringOption(QDomElement root);
+	ssc::DoubleDataAdapterPtr getDoubleOption(QDomElement root);
+	ssc::BoolDataAdapterPtr getBoolOption(QDomElement root);
 };
 
 } // namespace cx

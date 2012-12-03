@@ -63,6 +63,7 @@ public:
 	         QStringList parameterfiles);
 	virtual void execute();
 	virtual bool isFinished() const;
+    virtual bool isRunning() const;
 
 	ssc::Transform3D getAffineResult_mMf(bool* ok = 0) ;
 	QString getNonlinearResultVolume(bool* ok = 0);

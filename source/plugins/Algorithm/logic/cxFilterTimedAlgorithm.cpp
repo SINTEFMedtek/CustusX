@@ -20,8 +20,8 @@ namespace cx
 FilterTimedAlgorithm::FilterTimedAlgorithm(FilterPtr filter) :
     ThreadedTimedAlgorithm<bool>(filter->getName(), 20)
 {
-    mFilter = filter;
-    mUseDefaultMessages = false;
+	mFilter = filter;
+	mUseDefaultMessages = false;
 }
 
 FilterTimedAlgorithm::~FilterTimedAlgorithm()
@@ -29,37 +29,37 @@ FilterTimedAlgorithm::~FilterTimedAlgorithm()
 
 FilterPtr FilterTimedAlgorithm::getFilter()
 {
-    return mFilter;
+	return mFilter;
 }
 
 void FilterTimedAlgorithm::preProcessingSlot()
 {
-    mFilter->preProcess();
+	mFilter->preProcess();
 }
 
 void FilterTimedAlgorithm::postProcessingSlot()
 {
-  bool success = this->getResult();
+	bool success = this->getResult();
 
-  mFilter->postProcess();
+	mFilter->postProcess();
 
-  if (success)
-  {
-      ssc::messageManager()->sendSuccess(QString("Done \"%1\": [%2s]")
-                                         .arg(mFilter->getName())
-                                         .arg(this->getSecondsPassedAsString()));
-  }
-  else
-  {
-      ssc::messageManager()->sendWarning(QString("Failed \"%1\": [%2s]")
-                                         .arg(mFilter->getName())
-                                         .arg(this->getSecondsPassedAsString()));
-  }
+	if (success)
+	{
+		ssc::messageManager()->sendSuccess(QString("Done \"%1\": [%2s]")
+		                                   .arg(mFilter->getName())
+		                                   .arg(this->getSecondsPassedAsString()));
+	}
+	else
+	{
+		ssc::messageManager()->sendWarning(QString("Failed \"%1\": [%2s]")
+		                                   .arg(mFilter->getName())
+		                                   .arg(this->getSecondsPassedAsString()));
+	}
 }
 
 bool FilterTimedAlgorithm::calculate()
 {
-    return mFilter->execute();
+	return mFilter->execute();
 }
 
 

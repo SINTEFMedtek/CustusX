@@ -35,23 +35,23 @@ class TimedAlgorithmProgressBar;
  */
 class OptionsWidget : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    OptionsWidget(QWidget* parent);
+	OptionsWidget(QWidget* parent);
 
-    /**
-      * Set options for a given uid. Setting different uid will change the widget
-      * content but store the previous contents, making it easy to swap between uids.
-      */
-    void setOptions(QString uid, std::vector<DataAdapterPtr> options);
-    void setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options);
-    QString getCurrentUid();
-//    std::vector<DataAdapterPtr> getOptions(QString uid);
-//    std::vector<DataAdapterPtr> getCurrentOptions();
+	/**
+	  * Set options for a given uid. Setting different uid will change the widget
+	  * content but store the previous contents, making it easy to swap between uids.
+	  */
+	void setOptions(QString uid, std::vector<DataAdapterPtr> options);
+	void setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options);
+	QString getCurrentUid();
+	//    std::vector<DataAdapterPtr> getOptions(QString uid);
+	//    std::vector<DataAdapterPtr> getCurrentOptions();
 
 private:
-    QStackedLayout* mStackedLayout;
-//    std::map<QString, std::vector<DataAdapterPtr> > mOptions;
+	QStackedLayout* mStackedLayout;
+	//    std::map<QString, std::vector<DataAdapterPtr> > mOptions;
 };
 
 /** Helper widget for displaying the input/output/options part of a Filter.
@@ -64,28 +64,28 @@ private:
  */
 class FilterSetupWidget : public BaseWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame);
-    void setFilter(FilterPtr filter);
-    QString defaultWhatsThis() const;
-    /**
-      * Add a GroupBox around the widget with the algo name.
-      */
-    void setNamedFrame(bool on);
+	FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame);
+	void setFilter(FilterPtr filter);
+	QString defaultWhatsThis() const;
+	/**
+	  * Add a GroupBox around the widget with the algo name.
+	  */
+	void setNamedFrame(bool on);
 
 private slots:
-    void obscuredSlot(bool obscured);
+	void obscuredSlot(bool obscured);
 private:
 
-    ssc::XmlOptionFile mOptions;
-    FilterPtr mCurrentFilter;
+	ssc::XmlOptionFile mOptions;
+	FilterPtr mCurrentFilter;
 
-    OptionsWidget* mInputsWidget;
-    OptionsWidget* mOutputsWidget;
-    OptionsWidget* mOptionsWidget;
-    QGroupBox* mFrame;
-    boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+	OptionsWidget* mInputsWidget;
+	OptionsWidget* mOutputsWidget;
+	OptionsWidget* mOptionsWidget;
+	QGroupBox* mFrame;
+	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 
 
@@ -102,23 +102,23 @@ private:
  */
 class AllFiltersWidget : public BaseWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    AllFiltersWidget(QWidget* parent);
-    QString defaultWhatsThis() const;
+	AllFiltersWidget(QWidget* parent);
+	QString defaultWhatsThis() const;
 
 private slots:
-    void filterChangedSlot();
-    void runFilterSlot();
-    void finishedSlot();
+	void filterChangedSlot();
+	void runFilterSlot();
+	void finishedSlot();
 private:
-    FilterGroupPtr mFilters;
-    FilterPtr mCurrentFilter;
-    ssc::StringDataAdapterXmlPtr mFilterSelector;
-    FilterTimedAlgorithmPtr mThread;
+	FilterGroupPtr mFilters;
+	FilterPtr mCurrentFilter;
+	ssc::StringDataAdapterXmlPtr mFilterSelector;
+	FilterTimedAlgorithmPtr mThread;
 
-    FilterSetupWidget* mSetupWidget;
-    TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
+	FilterSetupWidget* mSetupWidget;
+	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 };
 
 }
