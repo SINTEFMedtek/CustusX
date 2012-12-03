@@ -45,258 +45,258 @@ namespace cx
 
 QString ContourFilter::getName() const
 {
-    return "Contour";
+	return "Contour";
 }
 
 QString ContourFilter::getType() const
 {
-    return "ContourFilter";
+	return "ContourFilter";
 }
 
 QString ContourFilter::getHelp() const
 {
-    return "<html>"
-      "<h3>Surfacing.</h3>"
-      "<p><i>Find the surface of a binary volume using marching cubes.</i></p>"
-            "<p>- Optional factor 2 reduction</p>"
-            "<p>- Marching Cubes contouring</p>"
-            "<p>- Optional Windowed Sinc smoothing</p>"
-            "<p>- Decimation of triangles</p>"
-      "</html>";
+	return "<html>"
+	        "<h3>Surfacing.</h3>"
+	        "<p><i>Find the surface of a binary volume using marching cubes.</i></p>"
+	        "<p>- Optional factor 2 reduction</p>"
+	        "<p>- Marching Cubes contouring</p>"
+	        "<p>- Optional Windowed Sinc smoothing</p>"
+	        "<p>- Decimation of triangles</p>"
+	        "</html>";
 }
 
 ssc::BoolDataAdapterXmlPtr ContourFilter::getReduceResolutionOption(QDomElement root)
 {
-    return ssc::BoolDataAdapterXml::initialize("Reduce input", "",
-        "Reduce input volumes resolution by a factor of 2 in all directions.", false, root);
+	return ssc::BoolDataAdapterXml::initialize("Reduce input", "",
+	                                           "Reduce input volumes resolution by a factor of 2 in all directions.", false, root);
 }
 
 ssc::BoolDataAdapterXmlPtr ContourFilter::getSmoothingOption(QDomElement root)
 {
-    return ssc::BoolDataAdapterXml::initialize("Smoothing", "",
-        "Smooth the output contour", true, root);
+	return ssc::BoolDataAdapterXml::initialize("Smoothing", "",
+	                                           "Smooth the output contour", true, root);
 }
 
 ssc::BoolDataAdapterXmlPtr ContourFilter::getPreserveTopologyOption(QDomElement root)
 {
-    return ssc::BoolDataAdapterXml::initialize("Preserve mesh topology", "",
-        "Preserve mesh topology during reduction", true, root);
+	return ssc::BoolDataAdapterXml::initialize("Preserve mesh topology", "",
+	                                           "Preserve mesh topology during reduction", true, root);
 }
 
 ssc::DoubleDataAdapterXmlPtr ContourFilter::getSurfaceThresholdOption(QDomElement root)
 {
-    ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
-        "Values from this threshold and above will be included",
-        100.0, ssc::DoubleRange(-1000, 1000, 1), 0, root);
-    retval->setAddSlider(true);
-    return retval;
+	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
+	                                                                            "Values from this threshold and above will be included",
+	                                                                            100.0, ssc::DoubleRange(-1000, 1000, 1), 0, root);
+	retval->setAddSlider(true);
+	return retval;
 }
 
 ssc::DoubleDataAdapterXmlPtr ContourFilter::getDecimationOption(QDomElement root)
 {
-    ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Decimation %", "",
-        "Reduce number of triangles in output surface",
-        0.8, ssc::DoubleRange(0, 1, 0.01), 0, root);
-    retval->setInternal2Display(100);
-    return retval;
+	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Decimation %", "",
+	                                                                            "Reduce number of triangles in output surface",
+	                                                                            0.8, ssc::DoubleRange(0, 1, 0.01), 0, root);
+	retval->setInternal2Display(100);
+	return retval;
 }
 
 ssc::ColorDataAdapterXmlPtr ContourFilter::getColorOption(QDomElement root)
 {
-    return ssc::ColorDataAdapterXml::initialize("Color", "",
-                                                "Color of output model.",
-                                                QColor("green"), root);
+	return ssc::ColorDataAdapterXml::initialize("Color", "",
+	                                            "Color of output model.",
+	                                            QColor("green"), root);
 }
 
 void ContourFilter::createOptions(QDomElement root)
 {
-    mReduceResolutionOption = this->getReduceResolutionOption(root);
-    mOptionsAdapters.push_back(mReduceResolutionOption);
+	mReduceResolutionOption = this->getReduceResolutionOption(root);
+	mOptionsAdapters.push_back(mReduceResolutionOption);
 
-    mSurfaceThresholdOption = this->getSurfaceThresholdOption(root);
-    connect(mSurfaceThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
-    mOptionsAdapters.push_back(mSurfaceThresholdOption);
+	mSurfaceThresholdOption = this->getSurfaceThresholdOption(root);
+	connect(mSurfaceThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
+	mOptionsAdapters.push_back(mSurfaceThresholdOption);
 
-    mOptionsAdapters.push_back(this->getSmoothingOption(root));
-    mOptionsAdapters.push_back(this->getDecimationOption(root));
-    mOptionsAdapters.push_back(this->getPreserveTopologyOption(root));
+	mOptionsAdapters.push_back(this->getSmoothingOption(root));
+	mOptionsAdapters.push_back(this->getDecimationOption(root));
+	mOptionsAdapters.push_back(this->getPreserveTopologyOption(root));
 
-    mOptionsAdapters.push_back(this->getColorOption(root));
+	mOptionsAdapters.push_back(this->getColorOption(root));
 }
 
 void ContourFilter::createInputTypes()
 {
-    SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringDataAdapterBasePtr temp;
 
-    temp = SelectImageStringDataAdapter::New();
-    temp->setValueName("Input");
-    temp->setHelp("Select image input for contouring");
-    connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
-    mInputTypes.push_back(temp);
+	temp = SelectImageStringDataAdapter::New();
+	temp->setValueName("Input");
+	temp->setHelp("Select image input for contouring");
+	connect(temp.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
+	mInputTypes.push_back(temp);
 }
 
 void ContourFilter::createOutputTypes()
 {
-    SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringDataAdapterBasePtr temp;
 
-    temp = SelectMeshStringDataAdapter::New();
-    temp->setValueName("Output");
-    temp->setHelp("Output contour");
-    mOutputTypes.push_back(temp);
+	temp = SelectMeshStringDataAdapter::New();
+	temp->setValueName("Output");
+	temp->setHelp("Output contour");
+	mOutputTypes.push_back(temp);
 }
 
 void ContourFilter::setActive(bool on)
 {
-    FilterImpl::setActive(on);
+	FilterImpl::setActive(on);
 
-    if (!mActive)
-        RepManager::getInstance()->getThresholdPreview()->removePreview();
+	if (!mActive)
+		RepManager::getInstance()->getThresholdPreview()->removePreview();
 }
 
 void ContourFilter::imageChangedSlot(QString uid)
 {
-  ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
-  if(!image)
-    return;
+	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
+	if(!image)
+		return;
 
-  mSurfaceThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
-  mSurfaceThresholdOption->setValue(image->getRange() / 2 + image->getMin());
-  int oldValue = mSurfaceThresholdOption->getValue();
-  // avoid reset if old value is still within range
-  if ((image->getMin() > oldValue )||( oldValue > image->getMax()))
-  {
-      int initValue = + image->getMin() + image->getRange()/2 ;
-      mSurfaceThresholdOption->setValue(initValue);
-  }
-  RepManager::getInstance()->getThresholdPreview()->removePreview();
+	mSurfaceThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
+	mSurfaceThresholdOption->setValue(image->getRange() / 2 + image->getMin());
+	int oldValue = mSurfaceThresholdOption->getValue();
+	// avoid reset if old value is still within range
+	if ((image->getMin() > oldValue )||( oldValue > image->getMax()))
+	{
+		int initValue = + image->getMin() + image->getRange()/2 ;
+		mSurfaceThresholdOption->setValue(initValue);
+	}
+	RepManager::getInstance()->getThresholdPreview()->removePreview();
 
-  int extent[6];
-  image->getBaseVtkImageData()->GetExtent(extent);
-  mReduceResolutionOption->setHelp("Current input resolution: " + qstring_cast(extent[1])
-        + " " + qstring_cast(extent[3]) + " " + qstring_cast(extent[5])
-        + " (If checked: " + qstring_cast(extent[1]/2)+ " " + qstring_cast(extent[3]/2) + " "
-        + qstring_cast(extent[5]/2) + ")");
+	int extent[6];
+	image->getBaseVtkImageData()->GetExtent(extent);
+	mReduceResolutionOption->setHelp("Current input resolution: " + qstring_cast(extent[1])
+	                                 + " " + qstring_cast(extent[3]) + " " + qstring_cast(extent[5])
+	                                 + " (If checked: " + qstring_cast(extent[1]/2)+ " " + qstring_cast(extent[3]/2) + " "
+	                                 + qstring_cast(extent[5]/2) + ")");
 }
 
 void ContourFilter::thresholdSlot()
 {
-//    std::cout << "ContourFilter::thresholdSlot() " << mActive << std::endl;
-    if (mActive)
-    {
-        ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mInputTypes[0]->getData());
-        RepManager::getInstance()->getThresholdPreview()->setPreview(image, mSurfaceThresholdOption->getValue());
-    }
+	//    std::cout << "ContourFilter::thresholdSlot() " << mActive << std::endl;
+	if (mActive)
+	{
+		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mInputTypes[0]->getData());
+		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mSurfaceThresholdOption->getValue());
+	}
 }
 
 bool ContourFilter::preProcess()
 {
-    RepManager::getInstance()->getThresholdPreview()->removePreview();
-    return FilterImpl::preProcess();
+	RepManager::getInstance()->getThresholdPreview()->removePreview();
+	return FilterImpl::preProcess();
 }
 
 bool ContourFilter::execute()
 {
-    ssc::ImagePtr input = this->getCopiedInputImage();
-    if (!input)
-        return false;
+	ssc::ImagePtr input = this->getCopiedInputImage();
+	if (!input)
+		return false;
 
-//    std::cout << "ContourFilter::execute : " << mCopiedOptions.ownerDocument().toString() << std::endl;
+	//    std::cout << "ContourFilter::execute : " << mCopiedOptions.ownerDocument().toString() << std::endl;
 
-    ssc::BoolDataAdapterXmlPtr reduceResolutionOption = this->getReduceResolutionOption(mCopiedOptions);
-    ssc::BoolDataAdapterXmlPtr smoothingOption = this->getSmoothingOption(mCopiedOptions);
-    ssc::BoolDataAdapterXmlPtr preserveTopologyOption = this->getPreserveTopologyOption(mCopiedOptions);
-    ssc::DoubleDataAdapterXmlPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
-    ssc::DoubleDataAdapterXmlPtr decimationOption = this->getDecimationOption(mCopiedOptions);
+	ssc::BoolDataAdapterXmlPtr reduceResolutionOption = this->getReduceResolutionOption(mCopiedOptions);
+	ssc::BoolDataAdapterXmlPtr smoothingOption = this->getSmoothingOption(mCopiedOptions);
+	ssc::BoolDataAdapterXmlPtr preserveTopologyOption = this->getPreserveTopologyOption(mCopiedOptions);
+	ssc::DoubleDataAdapterXmlPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
+	ssc::DoubleDataAdapterXmlPtr decimationOption = this->getDecimationOption(mCopiedOptions);
 
-//    ssc::messageManager()->sendInfo(QString("Creating contour from \"%1\"...").arg(input->getName()));
+	//    ssc::messageManager()->sendInfo(QString("Creating contour from \"%1\"...").arg(input->getName()));
 
-  //Shrink input volume
-  vtkImageShrink3DPtr shrinker = vtkImageShrink3DPtr::New();
-  if(reduceResolutionOption->getValue())
-  {
-      std::cout << "smooth" << std::endl;
-    shrinker->SetInput(input->getBaseVtkImageData());
-    shrinker->SetShrinkFactors(2,2,2);
-    shrinker->Update();
-  }
+	//Shrink input volume
+	vtkImageShrink3DPtr shrinker = vtkImageShrink3DPtr::New();
+	if(reduceResolutionOption->getValue())
+	{
+		std::cout << "smooth" << std::endl;
+		shrinker->SetInput(input->getBaseVtkImageData());
+		shrinker->SetShrinkFactors(2,2,2);
+		shrinker->Update();
+	}
 
-  // Find countour
-  vtkMarchingCubesPtr convert = vtkMarchingCubesPtr::New();
-  if(reduceResolutionOption->getValue())
-    convert->SetInput(shrinker->GetOutput());
-  else
-    convert->SetInput(input->getBaseVtkImageData());
+	// Find countour
+	vtkMarchingCubesPtr convert = vtkMarchingCubesPtr::New();
+	if(reduceResolutionOption->getValue())
+		convert->SetInput(shrinker->GetOutput());
+	else
+		convert->SetInput(input->getBaseVtkImageData());
 
-  convert->SetValue(0, surfaceThresholdOption->getValue());
-  convert->Update();
+	convert->SetValue(0, surfaceThresholdOption->getValue());
+	convert->Update();
 
-  vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
-  cubesPolyData = convert->GetOutput();
-  std::cout << "convert->GetOutput(); " << cubesPolyData.GetPointer() << std::endl;
+	vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
+	cubesPolyData = convert->GetOutput();
+	std::cout << "convert->GetOutput(); " << cubesPolyData.GetPointer() << std::endl;
 
-  // Smooth surface model
-  vtkWindowedSincPolyDataFilterPtr smoother = vtkWindowedSincPolyDataFilterPtr::New();
-  if(smoothingOption->getValue())
-  {
-    smoother->SetInput(cubesPolyData);
-    smoother->Update();
-    cubesPolyData = smoother->GetOutput();
-  }
+	// Smooth surface model
+	vtkWindowedSincPolyDataFilterPtr smoother = vtkWindowedSincPolyDataFilterPtr::New();
+	if(smoothingOption->getValue())
+	{
+		smoother->SetInput(cubesPolyData);
+		smoother->Update();
+		cubesPolyData = smoother->GetOutput();
+	}
 
-  //Create a surface of triangles
+	//Create a surface of triangles
 
-  //Decimate surface model (remove a percentage of the polygons)
-  vtkTriangleFilterPtr trifilt = vtkTriangleFilterPtr::New();
-  vtkDecimateProPtr deci = vtkDecimateProPtr::New();
-  vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-  if (decimationOption->getValue() > 0.000001)
-  {
-    trifilt->SetInput(cubesPolyData);
-    trifilt->Update();
-    deci->SetInput(trifilt->GetOutput());
-    deci->SetTargetReduction(decimationOption->getValue());
-    deci->SetPreserveTopology(preserveTopologyOption->getValue());
-//    deci->PreserveTopologyOn();
-    deci->Update();
-    cubesPolyData = deci->GetOutput();
-  }
+	//Decimate surface model (remove a percentage of the polygons)
+	vtkTriangleFilterPtr trifilt = vtkTriangleFilterPtr::New();
+	vtkDecimateProPtr deci = vtkDecimateProPtr::New();
+	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
+	if (decimationOption->getValue() > 0.000001)
+	{
+		trifilt->SetInput(cubesPolyData);
+		trifilt->Update();
+		deci->SetInput(trifilt->GetOutput());
+		deci->SetTargetReduction(decimationOption->getValue());
+		deci->SetPreserveTopology(preserveTopologyOption->getValue());
+		//    deci->PreserveTopologyOn();
+		deci->Update();
+		cubesPolyData = deci->GetOutput();
+	}
 
-  normals->SetInput(cubesPolyData);
-  normals->Update();
+	normals->SetInput(cubesPolyData);
+	normals->Update();
 
-  cubesPolyData->DeepCopy(normals->GetOutput());
+	cubesPolyData->DeepCopy(normals->GetOutput());
 
-  mRawResult =  cubesPolyData;
-    return true;
+	mRawResult =  cubesPolyData;
+	return true;
 }
 
 void ContourFilter::postProcess()
 {
-    if (!mRawResult)
-        return;
+	if (!mRawResult)
+		return;
 
-    ssc::ImagePtr input = this->getCopiedInputImage();
+	ssc::ImagePtr input = this->getCopiedInputImage();
 
-    if (!input)
-        return;
+	if (!input)
+		return;
 
-    QString uid = input->getUid() + "_ge%1";
-    QString name = input->getName()+" ge%1";
-    ssc::MeshPtr output = ssc::dataManager()->createMesh(mRawResult, uid, name, "Images");
-    if (!output)
-        return;
+	QString uid = input->getUid() + "_ge%1";
+	QString name = input->getName()+" ge%1";
+	ssc::MeshPtr output = ssc::dataManager()->createMesh(mRawResult, uid, name, "Images");
+	if (!output)
+		return;
 
-    output->get_rMd_History()->setRegistration(input->get_rMd());
-    output->get_rMd_History()->setParentSpace(input->getUid());
+	output->get_rMd_History()->setRegistration(input->get_rMd());
+	output->get_rMd_History()->setParentSpace(input->getUid());
 
-    ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
-    output->setColor(colorOption->getValue());
+	ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
+	output->setColor(colorOption->getValue());
 
-    ssc::dataManager()->loadData(output);
-    ssc::dataManager()->saveData(output, patientService()->getPatientData()->getActivePatientFolder());
+	ssc::dataManager()->loadData(output);
+	ssc::dataManager()->saveData(output, patientService()->getPatientData()->getActivePatientFolder());
 
-    // set output
-    mOutputTypes.front()->setValue(output->getUid());
+	// set output
+	mOutputTypes.front()->setValue(output->getUid());
 }
 
 } // namespace cx

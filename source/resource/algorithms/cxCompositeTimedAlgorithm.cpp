@@ -92,9 +92,13 @@ void CompositeTimedAlgorithm::jumpToNextChild()
 
 bool CompositeTimedAlgorithm::isFinished() const
 {
-	return mCurrent==-1;
+    return mCurrent == -1;
 }
 
+bool CompositeTimedAlgorithm::isRunning() const
+{
+    return mCurrent >= 0;
+}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -169,6 +173,12 @@ bool CompositeParallelTimedAlgorithm::isFinished() const
 	}
 	return (count==mChildren.size());
 }
+
+bool CompositeParallelTimedAlgorithm::isRunning() const
+{
+    return !this->isFinished();
+}
+
 
 
 }

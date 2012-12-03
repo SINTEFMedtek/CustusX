@@ -115,6 +115,11 @@ bool ElastixExecuter::isFinished() const
 	return mProcess->atEnd();
 }
 
+bool ElastixExecuter::isRunning() const
+{
+    return !mProcess->state()!=QProcess::NotRunning;
+}
+
 /**Write the initial (pre-registration) mMf transform to
  * disk as required by elastix.
  */

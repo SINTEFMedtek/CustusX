@@ -25,71 +25,71 @@ FilterImpl::FilterImpl() : mActive(false)
 
 QString FilterImpl::getUid() const
 {
-    if (mUid.isEmpty())
-        return this->getType();
-    return mUid;
+	if (mUid.isEmpty())
+		return this->getType();
+	return mUid;
 }
 
 void FilterImpl::setUid(QString uid)
 {
-    mUid = uid;
+	mUid = uid;
 }
 
 std::vector<DataAdapterPtr> FilterImpl::getOptions(QDomElement root)
 {
-    if (mOptionsAdapters.empty())
-    {
-        this->createOptions(root);
-        mOptions = root;
-    }
-    return mOptionsAdapters;
+	if (mOptionsAdapters.empty())
+	{
+		this->createOptions(root);
+		mOptions = root;
+	}
+	return mOptionsAdapters;
 }
 
 std::vector<SelectDataStringDataAdapterBasePtr> FilterImpl::getInputTypes()
 {
-    if (mInputTypes.empty())
-    {
-        this->createInputTypes();
-    }
+	if (mInputTypes.empty())
+	{
+		this->createInputTypes();
+	}
 
-    return mInputTypes;
+	return mInputTypes;
 }
 
 std::vector<SelectDataStringDataAdapterBasePtr> FilterImpl::getOutputTypes()
 {
-    if (mOutputTypes.empty())
-    {
-        this->createOutputTypes();
-    }
+	if (mOutputTypes.empty())
+	{
+		this->createOutputTypes();
+	}
 
-    return mOutputTypes;
+	return mOutputTypes;
 }
 
 void FilterImpl::setActive(bool on)
 {
-    mActive = on;
+	mActive = on;
 }
 
 
 bool FilterImpl::preProcess()
 {
-    std::cout << "FilterImpl::preProcess " << mInputTypes.size() << std::endl;
+	std::cout << "FilterImpl::preProcess " << mInputTypes.size() << std::endl;
 
-    mCopiedInput.clear();
-    for (unsigned i=0; i<mInputTypes.size(); ++i)
-    {
-        mCopiedInput.push_back(mInputTypes[i]->getData());
-    }
+	mCopiedInput.clear();
+	for (unsigned i=0; i<mInputTypes.size(); ++i)
+	{
+		mCopiedInput.push_back(mInputTypes[i]->getData());
+	}
 
-    mCopiedOptions = mOptions.cloneNode(true).toElement();
-    return true;
+	mCopiedOptions = mOptions.cloneNode(true).toElement();
+	return true;
 }
 
 ssc::ImagePtr FilterImpl::getCopiedInputImage(int index)
 {
-    if (mCopiedInput.size() < index+1)
-        return ssc::ImagePtr();
-    return boost::shared_dynamic_cast<ssc::Image>(mCopiedInput[index]);
+	if (mCopiedInput.size() < index+1)
+		return ssc::ImagePtr();
+	return boost::shared_dynamic_cast<ssc::Image>(mCopiedInput[index]);
 }
 
 

@@ -10,6 +10,19 @@ CXFrame
 	border-radius: 3px;
 }
 
+
+CXFrame#FilterBackground
+{
+	border: 1px solid palette(dark);
+	border-radius: 3px;
+/*	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+									  stop: 0 palette(midlight), stop: 1 palette(dark));
+*/
+}
+/*background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+								  stop: 0 #f6f7fa, stop: 1 #dadbde);
+*/
+
 CXSmallToolButton
 {
 	border: 1px solid palette(dark);
@@ -17,6 +30,16 @@ CXSmallToolButton
 	background-color: palette(button);
 	width : 15px;
 	height : 15px;
+}
+
+CXSmallToolButton#RunFilterButton
+{
+	width : 60px;
+	height : 15px;
+	/*
+	background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+									  stop: 0 palette(midlight), stop: 1 palette(dark));
+*/
 }
 
 CXSmallToolButton::checked
@@ -31,20 +54,25 @@ CXSmallToolButton::checked
 	width : 8px;
 	height : 8px;
 }*/
+
+/*
+This was a hack on Mac - because indicator for some reason is moved down a bit. No good on Unity.
 QRadioButton::indicator
 {
 	bottom : 2px;
 }
-
+*/
 
 
 /** The Linux GroupBox contains no border. This makes is useless
  *  in cx. New definition here:
  */
+
+ /*OSX10.8 groupbox was cool. Investigate.*/
 QGroupBox
 { 
-	font: bold;
-	border: 1px solid gray; 
+	font: bold 10px;
+	border: 1px solid palette(dark);
 	border-radius: 3px;
 	margin-top: 1em;
 }
@@ -55,4 +83,3 @@ QGroupBox::title
 	padding: 0px 0px;
 }
 
-		
