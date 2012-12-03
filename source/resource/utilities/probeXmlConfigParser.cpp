@@ -206,8 +206,24 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
   }
   QDomNode rtSourceNode = currentRtSourceNodeList.first();
 
+  // read temporal calibration. Accept platform-specific overrides as well.
   retval.mTemporalCalibration = 0;
+
   readTextNode(&retval.mTemporalCalibration, rtSourceNode, "TemporalCalibration");
+  QString tempCalPlatformName = "None";
+//  std::cout << "Base tc: " << retval.mTemporalCalibration << std::endl;
+#ifdef WIN32
+  tempCalPlatformName = "TemporalCalibrationWindows";
+#elif __APPLE__
+  tempCalPlatformName = "TemporalCalibrationApple";
+#else
+  tempCalPlatformName = "TemporalCalibrationLinux";
+#endif
+	QDomNode node = rtSourceNode.namedItem(tempCalPlatformName);
+	if(!node.isNull())
+		readTextNode(&retval.mTemporalCalibration, rtSourceNode, tempCalPlatformName);
+
+	//  std::cout << "Platform tc: " << retval.mTemporalCalibration << std::endl;
 
     QDomElement sizeNode = findElement(rtSourceNode, "ImageSize");
     readTextNode(&retval.mImageWidth, sizeNode, "Width");

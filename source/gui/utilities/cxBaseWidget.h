@@ -10,6 +10,35 @@
 #include <QToolButton>
 #include <QAction>
 #include <iostream>
+#include "sscOptimizedUpdateWidget.h"
+
+/** Frame descendant with dedicated style sheet: framed
+  *
+  * \ingroup cxGUI
+  * \date Nov 25, 2012
+  * \author christiana
+  */
+class CXFrame : public QFrame
+{
+    Q_OBJECT
+public:
+    CXFrame(QWidget* parent) : QFrame(parent) {}
+    virtual ~CXFrame() {}
+};
+
+/** QToolButton descendant with dedicated style sheet: smaller
+  *
+  * \ingroup cxGUI
+  * \date Nov 25, 2012
+  * \author christiana
+  */
+class CXSmallToolButton : public QToolButton
+{
+    Q_OBJECT
+public:
+    CXSmallToolButton(QWidget* parent=0) : QToolButton(parent) {}
+};
+
 
 namespace cx
 {
@@ -23,66 +52,30 @@ namespace cx
  * \\author Janne Beate Bakeng
  */
 
-class BaseWidget: public QWidget
+class BaseWidget: public ssc::OptimizedUpdateWidget
 {
 Q_OBJECT
 
 public:
-	BaseWidget(QWidget* parent, QString objectName, QString windowTitle) :
-		QWidget(parent), mObjectName(objectName), mWindowTitle(windowTitle)
-	{
-		if (mObjectName=="US Reconstruction")
-			std::cout << ":: [" <<  this->objectName().toAscii().constData() << "]" << std::endl;
-		this->setObjectName(mObjectName);
-		this->setWindowTitle(mWindowTitle);
-	}
-
+    BaseWidget(QWidget* parent, QString objectName, QString windowTitle);
 	virtual ~BaseWidget() {}
 	virtual QString defaultWhatsThis() const = 0; ///< Returns a short description of what this widget will do for you.
 
-	QWidget* createMethodWidget(QWidget* inputWidget, QWidget* outputWidget, QString methodname, bool inputChecked =
-		false, bool outputVisible = true)
-	{
-		QWidget* retval = new QWidget(this);
-		QVBoxLayout* toplayout = new QVBoxLayout(retval);
-		QGridLayout* layout = new QGridLayout();
-		toplayout->addLayout(layout);
-		toplayout->addStretch();
-
-		QLabel* methodLabel = new QLabel("<b>" + methodname + "</b>");
-		QCheckBox* checkBox = new QCheckBox("generate");
-
-		inputWidget->setVisible(inputChecked);
-		outputWidget->setVisible(outputVisible);
-		connect(checkBox, SIGNAL(clicked(bool)), inputWidget, SLOT(setVisible(bool)));
-
-		layout->addWidget(methodLabel, 0, 0);
-		layout->addWidget(checkBox, 0, 1);
-		layout->addWidget(inputWidget, 1, 0, 1, 2);
-		layout->addWidget(outputWidget, 2, 0, 1, 2);
-
-		return retval;
-	}
-
-	QGroupBox* createGroupbox(QWidget* widget, QString boxname)
-	{
-		QGroupBox* retval = new QGroupBox(this);
-		QVBoxLayout* toplayout = new QVBoxLayout(retval);
-
-		QLabel* nameLabel = new QLabel(boxname);
-		toplayout->addWidget(nameLabel);
-		toplayout->addWidget(widget);
-
-		return retval;
-	}
-
-	QFrame* createHorizontalLine() ///< creates a horizontal line witch can be inserted into widgets
-	{
-		QFrame* retval = new QFrame();
-		retval->setFrameStyle(QFrame::Sunken + QFrame::HLine);
-		retval->setFixedHeight(12);
-		return retval;
-	}
+    /**
+      * Create a specialized widget for filters, with input/ouput, enable and options.
+      */
+    QWidget* createMethodWidget(QWidget* inputWidget, QWidget* outputWidget, QString methodname, bool inputChecked =
+        false, bool outputVisible = true);
+    /**
+      * Create a group box with a given name.
+      */
+    QGroupBox* createGroupbox(QWidget* widget, QString boxname);
+    /**
+      * Creates a horizontal line which can be inserted into widgets
+      */
+    QFrame* createHorizontalLine();
+    QGroupBox* wrapInGroupBox(QWidget* base, QString name);
+    CXFrame* wrapInFrame(QWidget* base);
 
 	/**Shorthand method for action creation.
 	 * If layout is used, a QToolButton is created and added to it.
@@ -107,22 +100,15 @@ public:
 	  return action;
 	}
 
+
 public slots:
-	void adjustSizeSlot()
-	{
-		this->parentWidget()->adjustSize();
-		this->adjustSize();
-	}
+    void adjustSizeSlot();
 
 protected:
-	virtual void showEvent(QShowEvent* event)
-	{
-		this->setWhatsThis(this->defaultWhatsThis());
-		QWidget::showEvent(event);
-	}
+    virtual void showEvent(QShowEvent* event);
 
 private:
-	QString mObjectName;
+    QString mObjectName;
 	QString mWindowTitle;
 };
 

@@ -43,7 +43,7 @@ if (APPLE)
 	add_executable(CustusX MACOSX_BUNDLE ${SOURCES} )
 else (APPLE)
 	if(CX_WINDOWS)
-		add_executable(CustusX ${SOURCES} CustusX.rc)
+		add_executable(CustusX WIN32 ${SOURCES} CustusX.rc)
 	else(CX_WINDOWS)
 		add_executable(CustusX ${SOURCES} )
 	endif(CX_WINDOWS)
@@ -54,11 +54,11 @@ endif (APPLE)
 #------------------------------------------------------------------------------
 target_link_libraries( CustusX 
 		cxGui 
-		cxPluginCalibrationGUI 
-		cxPluginAlgorithmGUI 
-		cxPluginRegistrationGUI
-		cxPluginUSReconstructionGUI 
-		cxPluginAcquisitionGUI
+                cxPluginCalibration
+                cxPluginAlgorithm
+                cxPluginRegistration
+                cxPluginUSReconstruction
+                cxPluginAcquisition
 		)
 		
 #------------------------------------------------------------------------------
@@ -69,11 +69,11 @@ if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
     if(COTIRE_ADD_UNITY_BUILDS)
         target_link_libraries(CustusX_unity 
         		cxGui 
-        		cxPluginCalibrationGUI 
-        		cxPluginAlgorithmGUI 
-        		cxPluginRegistrationGUI
-        		cxPluginUSReconstructionGUI 
-        		cxPluginAcquisitionGUI
+                        cxPluginCalibration
+                        cxPluginAlgorithm
+                        cxPluginRegistration
+                        cxPluginUSReconstruction
+                        cxPluginAcquisition
         		)
     endif(COTIRE_ADD_UNITY_BUILDS)
 endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
@@ -126,10 +126,13 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
 		)
 
 # Install openCL shaders into bundle
-install(FILES ${CustusX3_SOURCE_DIR}/externals/ssc/Code/Ultrasound/3DReconstruction/Thunder/kernels.ocl 
+install(FILES ${CustusX3_SOURCE_DIR}source/plugins/USReconstruction/logic/3DReconstruction/Thunder/kernels.ocl 
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
 				)
-
+				
+install(FILES ${GEStreamer_KERNEL_PATH}/ScanConvertCL.cl 
+				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
+				)
 
 # Install Shared files
 install(FILES 
@@ -186,11 +189,12 @@ if(APPLE)
 	install(FILES ${CustusX3_SOURCE_DIR}/install/Apple/SupportedGrabbers.txt
 			DESTINATION ${CX_INSTALL_ROOT_DIR}
 			)
-	install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/GrabberServer.app 
-			DESTINATION ${CX_INSTALL_ROOT_DIR}
-			#COMPONENT CustusX
-			USE_SOURCE_PERMISSIONS
-			)
+# no longer necessary as the GrabberServer is built in 64bit
+#	install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/Apple/GrabberServer.app 
+#			DESTINATION ${CX_INSTALL_ROOT_DIR}
+#			#COMPONENT CustusX
+#			USE_SOURCE_PERMISSIONS
+#			)
 			
 		# Install folder for storage of igstk<->CustusX symlinks. 
 		# The symlinks must be in an absolute location.
@@ -263,6 +267,12 @@ if(APPLE)
     						GROUP_READ GROUP_EXECUTE GROUP_WRITE
     						WORLD_READ WORLD_EXECUTE WORLD_WRITE
     						)
+    INSTALL(FILES "${CustusX3_BINARY_DIR}/modules/GrabberServer/GrabberServer" DESTINATION ${plugin_dest_dir}
+    				PERMISSIONS
+    						OWNER_READ OWNER_EXECUTE OWNER_WRITE
+    						GROUP_READ GROUP_EXECUTE GROUP_WRITE
+    						WORLD_READ WORLD_EXECUTE WORLD_WRITE
+    						)
 endif()
 
 
@@ -289,7 +299,6 @@ set(DIRS
 		${DCMTK_DIR}/lib
 		${INCLUDE_DIRECTORIES}
 		${SSC_BINARY_DIR}/Code
-		${SSC_BINARY_DIR}/Code/Ultrasound/3DReconstruction
 		${SSC_BINARY_DIR}/DICOMLib
 		${CustusX3_BINARY_DIR}
 		${CustusX3_BINARY_DIR}/source
@@ -310,9 +319,12 @@ set(DIRS
 		${CustusX3_BINARY_DIR}/source/plugins/Registration/logic
 		${CustusX3_BINARY_DIR}/source/plugins/Registration/gui
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic
+        ${CustusX3_BINARY_DIR}/source/plugins/USReconstruction/logic/3DReconstruction
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/gui
 		${CustusX3_BINARY_DIR}/source/gui
 		${CustusX3_BINARY_DIR}/source/logic/
+		${CustusX3_BINARY_DIR}/modules/grabberServer
+		${CustusX3_BINARY_DIR}/modules/OpenIGTLinkServer
 		)
 
 # old version without plugins: remove after testing on win/linux.	
@@ -326,6 +338,8 @@ install(CODE "
           # add openigtlinkserver
         file(GLOB_RECURSE QTPLUGINS
           \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/OpenIGTLinkServer\")
+        file(GLOB_RECURSE QTPLUGINS
+          \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/GrabberServer\")
 		include(BundleUtilities)
 		fixup_bundle(\"${APPS}\"   \"\${QTPLUGINS}\"   \"${DIRS}\") "
 		)

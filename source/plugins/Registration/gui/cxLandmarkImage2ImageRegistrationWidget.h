@@ -52,8 +52,8 @@ protected:
 	virtual void hideEvent(QHideEvent* event);
 	virtual ssc::LandmarkMap getTargetLandmarks() const;
 	virtual void performRegistration();
-	virtual void populateTheLandmarkTableWidget(); ///< populates the table widget
-	virtual ssc::Transform3D getTargetTransform() const;
+    virtual void prePaintEvent(); ///< populates the table widget
+    virtual ssc::Transform3D getTargetTransform() const;
 	virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
 	virtual QString getTargetName() const;
 

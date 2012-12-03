@@ -110,22 +110,22 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
 
 
-	// insert all widgets from all plugins
-	for (unsigned i = 0; i < plugins.size(); ++i)
-	{
-		std::vector<PluginBase::PluginWidget> widgets = plugins[i]->createWidgets();
-		for (unsigned j = 0; j < widgets.size(); ++j)
-		{
-			this->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory);
-		}
+    // insert all widgets from all plugins
+    for (unsigned i = 0; i < plugins.size(); ++i)
+    {
+        std::vector<PluginBase::PluginWidget> widgets = plugins[i]->createWidgets();
+        for (unsigned j = 0; j < widgets.size(); ++j)
+        {
+            this->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory);
+        }
 
-		std::vector<QToolBar*> toolBars = plugins[i]->createToolBars();
-		for (unsigned j = 0; j < toolBars.size(); ++j)
-		{
-			this->addToolBar(toolBars[j]);
-			this->registerToolBar(toolBars[j], "Toolbar");
-		}
-	}
+        std::vector<QToolBar*> toolBars = plugins[i]->createToolBars();
+        for (unsigned j = 0; j < toolBars.size(); ++j)
+        {
+            this->addToolBar(toolBars[j]);
+            this->registerToolBar(toolBars[j], "Toolbar");
+        }
+    }
 
 
 	this->layoutChangedSlot();
@@ -159,16 +159,7 @@ void MainWindow::changeEvent(QEvent * event)
  */
 void MainWindow::startupLoadPatient()
 {
-	int doLoad = QApplication::arguments().indexOf("--load");
-	if (doLoad < 0)
-		return;
-//	std::cout << "!!!!!!!!!!!!!! load " << doLoad << std::endl;
-	if (doLoad + 1 >= QApplication::arguments().size())
-		return;
-
-	QString folder = QApplication::arguments()[doLoad + 1];
-	ssc::messageManager()->sendInfo("Startup Load patient: " + folder);
-	patientService()->getPatientData()->loadPatient(folder);
+	patientService()->getPatientData()->startupLoadPatient();
 }
 
 void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
@@ -603,14 +594,6 @@ void MainWindow::newPatientSlot()
 
 	QString choosenDir = patientDatafolder + "/" + timestamp + postfix;
 
-	// not necessary:
-//	// if existing, revert to seconds format
-//	if (QDir().exists(choosenDir))
-//	{
-//		timestamp = QDateTime::currentDateTime().toString(timestampSecondsFormatFolderFriendly()) + "_";
-//		choosenDir = patientDatafolder + "/" + timestamp + postfix;
-//	}
-
 	choosenDir = QFileDialog::getSaveFileName(this, tr("Select directory to save patient in"), choosenDir);
 	if (choosenDir == QString::null)
 		return; // On cancel
@@ -622,11 +605,13 @@ void MainWindow::newPatientSlot()
 	settings()->setValue("globalPatientNumber", ++patientNumber);
 
 	patientService()->getPatientData()->newPatient(choosenDir);
+	patientService()->getPatientData()->writeRecentPatientData();
 }
 
 void MainWindow::clearPatientSlot()
 {
 	patientService()->getPatientData()->clearPatient();
+	patientService()->getPatientData()->writeRecentPatientData();
 	ssc::messageManager()->sendWarning("Cleared current patient data");
 }
 
@@ -640,6 +625,7 @@ void MainWindow::savePatientFileSlot()
 	}
 
 	patientService()->getPatientData()->savePatient();
+	patientService()->getPatientData()->writeRecentPatientData();
 }
 
 void MainWindow::onApplicationStateChangedSlot()
@@ -681,6 +667,7 @@ void MainWindow::onWorkflowStateChangedSlot()
 
 	viewManager()->setActiveLayout(desktop.mLayoutUid);
 	this->restoreState(desktop.mMainWindowState);
+	patientService()->getPatientData()->autoSave();
 }
 
 void MainWindow::saveDesktopSlot()
@@ -720,6 +707,7 @@ void MainWindow::loadPatientFileSlot()
 		return; // On cancel
 
 	patientService()->getPatientData()->loadPatient(choosenDir);
+	patientService()->getPatientData()->writeRecentPatientData();
 
 	//  cx::FrameForest forest;
 }
@@ -1027,6 +1015,8 @@ void MainWindow::configureSlot()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+	patientService()->getPatientData()->autoSave();
+
 	settings()->setValue("mainWindow/geometry", saveGeometry());
 	settings()->setValue("mainWindow/windowState", saveState());
 	settings()->sync();

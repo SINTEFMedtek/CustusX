@@ -44,7 +44,7 @@ if (BUILD_TESTING)
     # A CppUnit executable included for debugging purposes.
     # Not part of ctest
     add_executable(testCalibrationPlugin cxCppUnitMain.cpp ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testCalibrationPlugin SSC cxPluginCalibrationLogic ${CPPUNIT_LIBRARIES})
+    target_link_libraries(testCalibrationPlugin SSC cxPluginCalibration ${CPPUNIT_LIBRARIES})
     
     # -----------------------------------------------
     # -- CppUnit - CTest integration. ---------------
@@ -60,7 +60,7 @@ if (BUILD_TESTING)
     target_link_libraries(testCalibrationPlugin_CppUnit_CTest 
         cisstTestsMain 
         SSC 
-        cxPluginCalibrationLogic
+        cxPluginCalibration
         ${CPPUNIT_LIBRARIES})
     # Generate a CTest list of tests
     CISST_ADD_TESTS(testCalibrationPlugin_CppUnit_CTest)

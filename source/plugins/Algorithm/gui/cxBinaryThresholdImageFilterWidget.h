@@ -8,6 +8,7 @@
 #include "cxBaseWidget.h"
 #include "cxContour.h"
 #include "cxBinaryThresholdImageFilter.h"
+#include "cxThresholdPreview.h"
 
 namespace cx
 {
@@ -38,7 +39,7 @@ public:
   virtual ~BinaryThresholdImageFilterWidget();
   virtual QString defaultWhatsThis() const;
   void setDefaultColor(QColor color);
-  BinaryThresholdImageFilterPtr getSegmentationAlgorithm() { return mSegmentationAlgorithm; }
+  BinaryThresholdImageFilterOldPtr getSegmentationAlgorithm() { return mSegmentationAlgorithm; }
 
 signals:
   void inputImageChanged(QString uid);
@@ -58,6 +59,7 @@ private slots:
   void handleContourFinishedSlot();
   void preprocessSegmentation();
   void preprocessContour();
+  void obscuredSlot(bool obscured);
 
 private:
   BinaryThresholdImageFilterWidget();
@@ -79,8 +81,9 @@ private:
 //  QLabel* mStatusLabel;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 
-  BinaryThresholdImageFilterPtr mSegmentationAlgorithm;
+  BinaryThresholdImageFilterOldPtr mSegmentationAlgorithm;
   ContourPtr mContourAlgorithm;
+  boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 
 /**

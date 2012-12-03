@@ -19,6 +19,7 @@
 #include <QDir>
 #include <QTimer>
 #include <QTextStream>
+#include <QApplication>
 
 #include "sscTime.h"
 #include "sscMessageManager.h"
@@ -130,6 +131,61 @@ QString PatientData::getNullFolder() const
 	return patientDatafolder + "/NoPatient";
 }
 
+/**Parse command line and return --load <patient folder> folder,
+ * if any.
+ */
+QString PatientData::getCommandLineStartupPatient()
+{
+	int doLoad = QApplication::arguments().indexOf("--load");
+	if (doLoad < 0)
+		return "";
+	if (doLoad + 1 >= QApplication::arguments().size())
+		return "";
+
+	QString folder = QApplication::arguments()[doLoad + 1];
+
+	return folder;
+}
+
+/**Parse the command line and load a patient if the switch --patient is found
+ */
+void PatientData::startupLoadPatient()
+{
+	QString folder = this->getCommandLineStartupPatient();
+
+	if (!folder.isEmpty())
+	{
+		ssc::messageManager()->sendInfo(QString("Startup Load [%1] from command line").arg(folder));
+	}
+
+	if (folder.isEmpty() && settings()->value("Automation/autoLoadRecentPatient").toBool())
+	{
+		folder = settings()->value("startup/lastPatient").toString();
+
+		QDateTime lastSaveTime = QDateTime::fromString(settings()->value("startup/lastPatientSaveTime").toString(), ssc::timestampSecondsFormat());
+		double minsSinceLastSave = lastSaveTime.secsTo(QDateTime::currentDateTime())/60;
+		int allowedMinsSinceLastSave = 8*60;
+		if (minsSinceLastSave > allowedMinsSinceLastSave) // if less than 8 hours, accept
+		{
+			ssc::messageManager()->sendInfo(
+				QString("Startup Load: Ignored recent patient because %1 hours since last save, limit is %2")
+				.arg(int(minsSinceLastSave/60))
+				.arg(int(allowedMinsSinceLastSave/60)));
+			folder = "";
+		}
+
+		if (!folder.isEmpty())
+			ssc::messageManager()->sendInfo(QString("Startup Load [%1] as recent patient").arg(folder));
+	}
+
+	if (folder.isEmpty())
+		return;
+
+//	ssc::messageManager()->sendInfo("Startup Load patient: " + folder);
+	this->loadPatient(folder);
+}
+
+
 //void PatientData::loadPatientFileSlot()
 void PatientData::loadPatient(QString choosenDir)
 {
@@ -156,15 +212,22 @@ void PatientData::loadPatient(QString choosenDir)
 		}
 		file.close();
 	}
-	else //User have created the directory create xml file and folders
-	{
-		//TODO: Ask the user if he want to convert the folder
-		ssc::messageManager()->sendInfo(
-						"Found no CX3 data in folder: " + choosenDir + " Converting the folder to a patent folder...");
-		createPatientFolders(choosenDir);
-	}
+	// This feature has been a hassle, and never used. Removed.
+//	else //User have created the directory create xml file and folders
+//	{
+//		//TODO: Ask the user if he want to convert the folder
+//		ssc::messageManager()->sendInfo(
+//						"Found no CX3 data in folder: " + choosenDir + " Converting the folder to a patent folder...");
+//		createPatientFolders(choosenDir);
+//	}
 
 	this->setActivePatient(choosenDir);
+}
+
+void PatientData::autoSave()
+{
+	if (settings()->value("Automation/autoSave").toBool())
+		this->savePatient();
 }
 
 void PatientData::savePatient()
@@ -181,8 +244,7 @@ void PatientData::savePatient()
 	QDomDocument doc;
 	this->generateSaveDoc(doc);
 	mWorkingDocument = doc;
-	emit
-	isSaving(); // give all listeners a chance to add to the document
+	emit isSaving(); // give all listeners a chance to add to the document
 
 	QFile file(mActivePatientFolder + "/custusdoc.xml");
 	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
@@ -190,7 +252,7 @@ void PatientData::savePatient()
 		QTextStream stream(&file);
 		stream << doc.toString(4);
 		file.close();
-		ssc::messageManager()->sendInfo("Created " + file.fileName());
+//		ssc::messageManager()->sendInfo("Created " + file.fileName());
 	}
 	else
 	{
@@ -214,6 +276,17 @@ void PatientData::savePatient()
 	//TODO Implement when we know what we want to save here...
 
 	mWorkingDocument = QDomDocument();
+
+	ssc::messageManager()->sendInfo("Saved patient " + mActivePatientFolder);
+}
+
+/** Writes settings info describing the patient name and current time.
+  * Used for auto load.
+  */
+void PatientData::writeRecentPatientData()
+{
+	settings()->setValue("startup/lastPatient", mActivePatientFolder);
+	settings()->setValue("startup/lastPatientSaveTime", QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()));
 }
 
 
@@ -347,7 +420,7 @@ ssc::DataPtr PatientData::importData(QString fileName)
 	this->copyAllSimilarFiles(fileName, patientsImageFolder);
 //  ssc::messageManager()->sendDebug("Data is now copied into the patient folder!");
 
-	this->savePatient();
+//	this->autoSave();
 
 	return data;
 }

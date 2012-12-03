@@ -65,10 +65,15 @@ public:
   virtual void execute()
   {
   	emit aboutToStart();
-  	this->generate();
+	this->preProcessingSlot();
+	this->generate();
   }
+  virtual bool isFinished() const { return mWatcher.isFinished(); }
+  virtual bool isRunning() const { return mWatcher.isRunning(); }
+
 
 protected:
+  virtual void preProcessingSlot() {} ///< This happens before the thread (calculate) is started, here non-thread safe functions can be called
   virtual void postProcessingSlot() = 0; ///< This happens when the thread (calculate) is finished, here non-thread safe functions can be called
 
 protected:

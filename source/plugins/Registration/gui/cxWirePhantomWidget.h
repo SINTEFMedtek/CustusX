@@ -16,12 +16,8 @@
 #define CXWIREPHANTOMWIDGET_H_
 
 #include "cxRegistrationBaseWidget.h"
-#include "cxDataInterface.h"
-#include "cxResampleWidget.h"
-#include "cxCenterlineWidget.h"
-#include <boost/function.hpp>
-#include "cxCompositeTimedAlgorithm.h"
-#include "cxTimedAlgorithmProgressBar.h"
+#include "cxPipeline.h"
+#include "cxFilter.h"
 
 class QPushButton;
 class QVBoxLayout;
@@ -35,6 +31,7 @@ namespace cx
  * \ingroup cxPluginRegistration
  *
  *  \date Jun 21, 2012
+ *  \date Nov 28, 2012
  *  \author christiana
  */
 class WirePhantomWidget: public RegistrationBaseWidget
@@ -50,36 +47,22 @@ protected:
 	QVBoxLayout* mLayout;
 
 private slots:
-	void setImageSlot(QString uid);
-	void segmentationOutputArrived(QString uid);
-	void centerlineOutputArrived(QString uid);
-
-	//  void setColorSlot(QColor color);
 	void measureSlot();
 	ssc::MeshPtr loadNominalCross();
-	void activeImageChangedSlot(const QString&);
-//	void popPendingActions();
 	void registration();
 	void generate_sMt();
-	void clearSegmentationOutput();
-	void clearCenterlineOutput();
 
 private:
-	std::pair<QString, ssc::Transform3D> getLastProbePosition();
+    void showDataMetrics(ssc::Vector3D cross_r);
+    std::pair<QString, ssc::Transform3D> getLastProbePosition();
 	void showData(ssc::DataPtr data);
 	ssc::Vector3D findCentroid(ssc::MeshPtr mesh);
 
-	class BinaryThresholdImageFilterWidget* mSegmentationWidget;
-	class CenterlineWidget* mCenterlineWidget;
-	SelectImageStringDataAdapterPtr mUSImageInput;
-	SelectImageStringDataAdapterPtr mSegmentationOutput;
-	SelectDataStringDataAdapterPtr mCenterlineOutput;
+    class PipelineWidget* mPipelineWidget;
+    PipelinePtr mPipeline;
 	QPushButton* mMeasureButton;
 	QPushButton* mCalibrationButton;
 	QTextEdit* mResults;
-	std::vector<boost::function0<void> > mPendingActions;
-	CompositeTimedAlgorithmPtr mCompositeAlgorithm;
-	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	ssc::Transform3D mLastRegistration;
 
 };

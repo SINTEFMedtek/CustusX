@@ -54,6 +54,15 @@ public:
    * callers to set input arguments.
    */
   virtual void execute() = 0;
+  /**
+   * Returns true after the finished() signal is emitted.
+   */
+  virtual bool isFinished() const = 0;
+  /**
+   * Returns true if preprocess is started and postprocess not complete.
+   * (Right after aboutToStart, right before finished())
+   */
+  virtual bool isRunning() const = 0;
 
 signals:
 	void aboutToStart(); ///< emitted at start of execute. Use to perform preprocessing

@@ -14,6 +14,8 @@ namespace cx
 DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
 {
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChanged())); // for debugging: if initializing a manual tool with probe properties
+  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChanged()));
   this->dominantToolChanged();
 }
 
@@ -49,7 +51,7 @@ double DoubleDataAdapterTimeCalibration::getValue() const
 //  std::cout << "DoubleDataAdapterTimeCalibration::getValue()" << std::endl;
   if (!mTool)
     return 0;
-//  std::cout << "mTool->getProbe()->getData().mTemporalCalibration " << mTool->getProbe()->getData().mTemporalCalibration << std::endl;
+//  std::cout << "mTool->getProbe()->getData().mTemporalCalibration " << mTool->getProbe()->getData().getTemporalCalibration() << std::endl;
   return mTool->getProbe()->getData().getTemporalCalibration();
 }
 

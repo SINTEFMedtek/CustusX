@@ -26,26 +26,26 @@ namespace cx
 class RecordSession
 {
 public:
-  RecordSession(QString uid, double startTime, double stopTime, QString description);
-  virtual ~RecordSession();
+	RecordSession(QString uid, double startTime, double stopTime, QString description);
+	virtual ~RecordSession();
 
-  QString getUid();
-  QString getDescription();
-  double getStartTime();
-  double getStopTime();
+	QString getUid();
+	QString getDescription();
+	double getStartTime();
+	double getStopTime();
 
-//  ssc::SessionToolHistoryMap getSessionHistory();
+	//  ssc::SessionToolHistoryMap getSessionHistory();
 
-  void addXml(QDomNode& dataNode);
-  void parseXml(QDomNode& dataNode);
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode& dataNode);
 
 protected:
-//  QString getNewUid();
+	//  QString getNewUid();
 
-  QString mUid;
-  double mStartTime;
-  double mStopTime;
-  QString mDescription;
+	QString mUid;
+	double mStartTime;
+	double mStopTime;
+	QString mDescription;
 };
 
 typedef boost::shared_ptr<RecordSession> RecordSessionPtr;
@@ -60,8 +60,8 @@ typedef boost::shared_ptr<RecordSession> RecordSessionPtr;
  */
 class USAcqRecordSession : public RecordSession
 {
-  USAcqRecordSession(QString uid, double startTime, double stopTime, QString description);
-  virtual ~USAcqRecordSession();
+	USAcqRecordSession(QString uid, double startTime, double stopTime, QString description);
+	virtual ~USAcqRecordSession();
 
 private:
 
