@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QTime>
 #include <QHostAddress>
+#include <QFileInfo>
 #include "igtlOSUtil.h"
 #include "igtlImageMessage.h"
 #include "igtlServerSocket.h"
@@ -23,6 +24,9 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
+#include "sscMessageManager.h"
+#include "cxDataLocations.h"
+#include "geConfig.h"
 
 namespace cx
 {
@@ -94,6 +98,23 @@ void ImageSenderGE::initialize(StringMap arguments)
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
    	long imageSize2D = convertStringWithDefault(mArguments["imagesize2D"], -1);
    	std::string openclpath = mArguments["openclpath"].toStdString();
+
+   	//Find GEStreamer OpenCL kernel code
+   	//Look in arg in, GEStreamer source dir, and installed dir
+   	QStringList paths;
+   	paths << QString::fromStdString(openclpath) << GEStreamer_KERNEL_PATH << DataLocations::getShaderPath();
+//   	std::cout << "OpenCL kernel paths: " << paths.join("  \n").toStdString();
+   	QFileInfo path;
+	path = QFileInfo(paths[0] + QString("/ScanConvertCL.cl"));
+	if (!path.exists())
+		path = QFileInfo(paths[1] + QString("/ScanConvertCL.cl"));
+	if (!path.exists())
+		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
+	if (!path.exists())
+	{
+		ssc::messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
+	} else
+		openclpath = path.absolutePath().toStdString();
 
 	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize2D, interpType, bufferSize, openclpath);
 
