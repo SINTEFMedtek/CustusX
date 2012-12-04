@@ -644,6 +644,8 @@ void ViewWrapper3D::updateView()
 
 void ViewWrapper3D::activeImageChangedSlot()
 {
+	if(!mViewGroup)
+		return;
 	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
 
 	// only show landmarks belonging to image visible in this view:
