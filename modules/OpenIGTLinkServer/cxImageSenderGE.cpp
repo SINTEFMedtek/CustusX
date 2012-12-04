@@ -47,6 +47,7 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--imagesize2D:	Returned image size in pixels, default = 250000 (500*500)";
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--testmode:		GEStreamer test mode, default = 0";
+	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
 	return retval;
 }
 
@@ -94,10 +95,13 @@ void ImageSenderGE::initialize(StringMap arguments)
         mArguments["testmode"] = "0";
     if (!mArguments.count("imagesize2D"))
         mArguments["imagesize2D"] = "250000";
+    if (!mArguments.count("useOpenCL"))
+        mArguments["useOpenCL"] = "1";
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
    	long imageSize2D = convertStringWithDefault(mArguments["imagesize2D"], -1);
    	std::string openclpath = mArguments["openclpath"].toStdString();
+	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
 
    	//Find GEStreamer OpenCL kernel code
    	//Look in arg in, GEStreamer source dir, and installed dir
@@ -116,7 +120,7 @@ void ImageSenderGE::initialize(StringMap arguments)
 	} else
 		openclpath = path.absolutePath().toStdString();
 
-	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize2D, interpType, bufferSize, openclpath);
+	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize2D, interpType, bufferSize, openclpath, useOpenCL);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
