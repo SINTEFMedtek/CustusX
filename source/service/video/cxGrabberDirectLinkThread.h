@@ -57,7 +57,7 @@ protected:
 private slots:
 	void newImageSlot();
 	void newUSStatusSlot();
-	void stopSlot();
+//	void stopSlot();
 
 private:
 	std::map<QString, QString> mArguments;
