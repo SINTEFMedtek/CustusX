@@ -235,7 +235,7 @@ protected:
 
 public slots:
 	void vtkImageDataChangedSlot();
-	void transferFunctionsChangedSlot();
+//	void transferFunctionsChangedSlot();//Not uses any longer. Use ActiveImageProxy in CustusX
 };
 
 } // namespace ssc

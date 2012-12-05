@@ -262,7 +262,7 @@ void DataManagerImpl::clear()
 
 	emit centerChanged();
 	emit activeImageChanged("");
-	emit activeImageTransferFunctionsChanged();
+//	emit activeImageTransferFunctionsChanged();
 	emit landmarkPropertiesChanged();
 	//emit clinicalApplicationChanged();
 	emit dataLoaded();
@@ -309,22 +309,29 @@ void DataManagerImpl::setActiveImage(ImagePtr activeImage)
 	if (mActiveImage == activeImage)
 		return;
 
-	if (mActiveImage)
-	{
-		disconnect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+//	if (mActiveImage)
+//	{
+//		disconnect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		//disconnect(mActiveImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		disconnect(mActiveImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-	}
+//		disconnect(mActiveImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
+//	}
 
 	mActiveImage = activeImage;
 
-	if (mActiveImage)
-	{
-		connect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+//	if (mActiveImage)
+//	{
+//		connect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		//connect(mActiveImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		connect(mActiveImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-	}
-	this->vtkImageDataChangedSlot();
+//		connect(mActiveImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
+//	}
+//	this->vtkImageDataChangedSlot();//don't use?
+
+	QString uid = "";
+	if (mActiveImage)
+		uid = mActiveImage->getUid();
+
+	emit activeImageChanged(uid);
+	messageManager()->sendInfo("Active image set to " + qstring_cast(uid));
 }
 
 void DataManagerImpl::setLandmarkNames(std::vector<QString> names)
@@ -851,14 +858,14 @@ void DataManagerImpl::vtkImageDataChangedSlot()
 	if (mActiveImage)
 		uid = mActiveImage->getUid();
 
-	emit activeImageChanged(uid);
+//	emit activeImageChanged(uid);
 //	messageManager()->sendInfo("Active image set to " + qstring_cast(uid));
 }
 
-void DataManagerImpl::transferFunctionsChangedSlot()
-{
-	emit activeImageTransferFunctionsChanged();
-}
+//void DataManagerImpl::transferFunctionsChangedSlot()
+//{
+//	emit activeImageTransferFunctionsChanged();
+//}
 
 CLINICAL_APPLICATION DataManagerImpl::getClinicalApplication() const
 {
