@@ -43,6 +43,12 @@ VideoRecorderSaveThread::VideoRecorderSaveThread(QObject* parent, QString saveFo
 	mCompressed(compressed),
 	mWriteColor(writeColor)
 {
+	std::cout << "**VideoRecorderSaveThread::VideoRecorderSaveThread()" << std::endl;
+}
+
+VideoRecorderSaveThread::~VideoRecorderSaveThread()
+{
+	std::cout << "**VideoRecorderSaveThread::~VideoRecorderSaveThread()" << std::endl;
 }
 
 QString VideoRecorderSaveThread::addData(double timestamp, vtkImageDataPtr image)
@@ -91,9 +97,12 @@ bool VideoRecorderSaveThread::closeTimestampsFile()
 	mTimestampsFile.close();
 
 	QFileInfo info(mTimestampsFile);
-	ssc::messageManager()->sendInfo(QString("Saved %1 timestamps to file %2")
-									.arg(mImageIndex)
-									.arg(info.fileName()));
+	if (!mCancel)
+	{
+		ssc::messageManager()->sendInfo(QString("Saved %1 timestamps to file %2")
+										.arg(mImageIndex)
+										.arg(info.fileName()));
+	}
 	return true;
 }
 
@@ -183,6 +192,7 @@ void VideoRecorderSaveThread::run()
 SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor) :
 	mSource(source)
 {
+	std::cout << "**SavingVideoRecorder::SavingVideoRecorder()" << std::endl;
 	mSaveFolder = saveFolder;
 	mSaveThread.reset(new VideoRecorderSaveThread(NULL, saveFolder, prefix, compressed, writeColor));
 	mSaveThread->start();
@@ -190,6 +200,7 @@ SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString sav
 
 SavingVideoRecorder::~SavingVideoRecorder()
 {
+	std::cout << "**SavingVideoRecorder::~SavingVideoRecorder()" << std::endl;
 	mSaveThread->stop();
 }
 
@@ -215,6 +226,16 @@ void SavingVideoRecorder::newFrameSlot()
 	vtkImageDataPtr frame = vtkImageDataPtr::New();
 	frame->DeepCopy(image);
 
+	// numbers in Kb
+	int currentMem = frame->GetActualMemorySize() * mImages.size();
+	int maxMem = 2*1000*1000; // store max 2Gb of data before clearing cache
+//	std::cout << "memused (" << mImages.size() << ") :"<< currentMem/1000 << "." << currentMem << std::endl;
+
+	bool discardImage = (currentMem > maxMem);
+
+	if (discardImage)
+		frame = vtkImageDataPtr();
+
 	CachedImageDataPtr cache(new CachedImageData(filename, frame));
 	mImages.push_back(cache);
 	mTimestamps.push_back(timestamp);
@@ -236,6 +257,22 @@ void SavingVideoRecorder::cancel()
 	mSaveThread->wait(); // wait indefinitely for thread to finish
 
 	//TODO: delete contents
+	this->deleteFolder(mSaveFolder);
+}
+
+/** Delete folder and all contents that have been written by savers.
+  */
+void SavingVideoRecorder::deleteFolder(QString folder)
+{
+	QStringList filters;
+	filters << "*.fts" << "*.mhd" << "*.raw" << "*.zraw";
+
+	QDir dir(folder);
+	QStringList files = dir.entryList(filters);
+
+	for (int i=0; i<files.size(); ++i)
+		dir.remove(files[i]);
+	dir.rmdir(folder);
 }
 
 //SavingVideoRecorder::DataType SavingVideoRecorder::getRecording()

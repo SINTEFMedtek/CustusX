@@ -57,6 +57,7 @@ public:
 	  * Create the thread object, set folder to save to.
 	  */
 	VideoRecorderSaveThread(QObject* parent, QString saveFolder, QString prefix, bool compressed, bool writeColor);
+	virtual ~VideoRecorderSaveThread();
 	/**
 	  * Add data to be saved.
 	  */
@@ -130,6 +131,7 @@ private slots:
 private:
 	std::vector<CachedImageDataPtr> mImages;
 	std::vector<double> mTimestamps;
+	void deleteFolder(QString folder);
 
 	QString mSaveFolder;
 //	DataType mData;
