@@ -87,8 +87,32 @@ private:
 };
 typedef boost::shared_ptr<ViewItem> ViewItemPtr;
 
+class ViewContainerBase
+{
+public:
+	ViewContainerBase(QWidget *parent = NULL);
+	virtual ~ViewContainerBase();
+	ViewItem *addView(QString uid, int row, int col, int rowSpan = 1, int colSpan = 1, QString name = "");
+	virtual void clear();
+	void renderAll(); ///< Use this function to render all views at once. Do not call render on each view.
+
+	virtual QGridLayout *getGridLayout() = 0;
+	vtkRenderWindowPtr getRenderWindow() { return mRenderWindow; }
+	void handleMousePress(const QPoint &pos, const Qt::MouseButtons &buttons); 
+	void handleMouseRelease(const QPoint &pos, const Qt::MouseButtons &buttons); 
+	void handleMouseMove(const QPoint &pos, const Qt::MouseButtons &buttons); 
+
+protected:
+	virtual void doRender() = 0;
+	ViewItem *mMouseEventTarget;
+	vtkRenderWindowPtr mRenderWindow;
+	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
+	virtual void clearBackground() = 0;
+	QWidget *mWidget;
+};
+
 /// More advanced N:1 combination of SSC Views and Qt Widgets
-class ViewContainer : public ViewQVTKWidget
+class ViewContainer : public ViewQVTKWidget, public ViewContainerBase
 {
 Q_OBJECT
 	typedef ViewQVTKWidget widget;
@@ -96,14 +120,12 @@ Q_OBJECT
 public:
 	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0);
 	virtual ~ViewContainer();
-	ViewItem *addView(QString uid, int row, int col, int rowSpan = 1, int colSpan = 1, QString name = "");
-	void clear();
-	void renderAll(); ///< Use this function to render all views at once. Do not call render on each view.
 
-	QGridLayout *getGridLayout();
+	virtual QGridLayout *getGridLayout();
 
 protected:
-	vtkRenderWindowPtr mRenderWindow;
+	virtual void clearBackground();
+	virtual void doRender();
 
 private:
 	virtual void showEvent(QShowEvent* event);
@@ -114,10 +136,7 @@ private:
 	virtual void focusInEvent(QFocusEvent* event);
 	virtual void paintEvent(QPaintEvent *event);
 	virtual void resizeEvent( QResizeEvent *event);
-	virtual void clearBackground();
 
-	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
-	ViewItem *mMouseEventTarget;
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 
