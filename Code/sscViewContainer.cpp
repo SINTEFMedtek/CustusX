@@ -53,12 +53,20 @@
 namespace ssc
 {
 
+ViewContainerBase::ViewContainerBase(QWidget *parent) : mMouseEventTarget(NULL), mMTimeHash(0), mWidget(parent)
+{
+}
+
+ViewContainerBase::~ViewContainerBase()
+{
+}
+
 ViewContainer::ViewContainer(QWidget *parent, Qt::WFlags f) :
 			     ViewQVTKWidget(parent, f),
-			     mRenderWindow(ViewRenderWindowPtr::New()),
-			     mMTimeHash(0),
-			     mMouseEventTarget(NULL)
+			     ViewContainerBase(parent)
 {
+	mWidget = this;
+	mRenderWindow = vtkRenderWindowPtr::New();
 	// Create default grid layout for this object
 	setLayout(new QGridLayout);
 	this->SetRenderWindow(mRenderWindow);
@@ -71,11 +79,10 @@ ViewContainer::~ViewContainer()
 /**
   * Clears view container, deleting all layout objects
   */
-void ViewContainer::clear()
+void ViewContainerBase::clear()
 {
 	QLayoutItem *item;
-	mMouseEventTarget = NULL;
-	while ((item = layout()->takeAt(0)) != 0)
+	while ((item = getGridLayout()->takeAt(0)) != 0)
 	{
 		((ViewItem *) item)->removeReps();
 		
@@ -83,6 +90,7 @@ void ViewContainer::clear()
 		delete (ViewItem *)item;
 	}
 	clearBackground();
+	mMouseEventTarget = NULL;
 }
 
 void ViewContainer::clearBackground()
@@ -132,10 +140,10 @@ void ViewItem::setZoomFactor(double factor)
   * Creates and adds a view to this container.
   * Returns a pointer to the created view item that the container owns.
   */
-ViewItem *ViewContainer::addView(QString uid, int row, int col, int rowSpan, int colSpan, QString name)
+ViewItem *ViewContainerBase::addView(QString uid, int row, int col, int rowSpan, int colSpan, QString name)
 {
 	// Create a viewItem for this view
-	ViewItem *item = new ViewItem(uid, name, this, mRenderWindow, QRect());
+	ViewItem *item = new ViewItem(uid, name, mWidget, mRenderWindow, QRect());
 	if (getGridLayout())
 	{
 		getGridLayout()->addItem(item, row, col, rowSpan, colSpan);
@@ -180,12 +188,17 @@ void ViewItem::setGeometry(const QRect &r)
 void ViewContainer::mouseMoveEvent(QMouseEvent* event)
 {
 	widget::mouseMoveEvent(event);
+	handleMouseMove(event->pos(), event->buttons());
+}
+
+void ViewContainerBase::handleMouseMove(const QPoint &pos, const Qt::MouseButtons &buttons)
+{
 	if (mMouseEventTarget)
 	{
 		QRect r = mMouseEventTarget->geometry();
-		QPoint p = event->pos();
-		mMouseEventTarget->mouseMoveSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
-	}
+		QPoint p = pos;
+		mMouseEventTarget->mouseMoveSlot(p.x() - r.left(), p.y() - r.top(), buttons);
+	}	
 }
 
 void ViewContainer::mousePressEvent(QMouseEvent* event)
@@ -197,15 +210,18 @@ void ViewContainer::mousePressEvent(QMouseEvent* event)
 		return;
 
 	widget::mousePressEvent(event);
-	for (int i = 0; layout() && i < layout()->count(); ++i)
+	handleMousePress(event->pos(), event->buttons());
+}
+void ViewContainerBase::handleMousePress(const QPoint &pos, const Qt::MouseButtons & buttons)
+{
+	for (int i = 0; getGridLayout() && i < getGridLayout()->count(); ++i)
 	{
-		ViewItem *item = (ViewItem *)layout()->itemAt(i);
+		ViewItem *item = (ViewItem *)getGridLayout()->itemAt(i);
 		QRect r = item->geometry();
-		QPoint p = event->pos();
-		if (r.contains(p))
+		if (r.contains(pos))
 		{
 			mMouseEventTarget = item;
-			item->mousePressSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
+			item->mousePressSlot(pos.x() - r.left(), pos.y() - r.top(), buttons);
 		}
 	}
 }
@@ -213,11 +229,16 @@ void ViewContainer::mousePressEvent(QMouseEvent* event)
 void ViewContainer::mouseReleaseEvent(QMouseEvent* event)
 {
 	widget::mouseReleaseEvent(event);
+	handleMouseRelease(event->pos(), event->buttons());
+}
+
+void ViewContainerBase::handleMouseRelease(const QPoint &pos, const Qt::MouseButtons &buttons)
+{
 	if (mMouseEventTarget)
 	{
 		QRect r = mMouseEventTarget->geometry();
-		QPoint p = event->pos();
-		mMouseEventTarget->mouseReleaseSlot(p.x() - r.left(), p.y() - r.top(), event->buttons());
+		QPoint p = pos;
+		mMouseEventTarget->mouseReleaseSlot(p.x() - r.left(), p.y() - r.top(), buttons);
 		mMouseEventTarget = NULL;
 	}
 }
@@ -247,16 +268,16 @@ void ViewContainer::showEvent(QShowEvent* event)
 	widget::showEvent(event);
 }
 
-void ViewContainer::renderAll()
+void ViewContainerBase::renderAll()
 {
 	// First, calculate if anything has changed
 	unsigned long hash = 0;
-	for (int i = 0; layout() && i < layout()->count(); ++i)
+	for (int i = 0; getGridLayout() && i < getGridLayout()->count(); ++i)
 	{
-		ViewItem *item = (ViewItem *)layout()->itemAt(i);
+		ViewItem *item = (ViewItem *)getGridLayout()->itemAt(i);
 
 		hash += item->getRenderer()->GetMTime();
-		hash += this->GetRenderWindow()->GetMTime();
+		hash += this->getRenderWindow()->GetMTime();
 		vtkPropCollection *props = item->getRenderer()->GetViewProps();
 		props->InitTraversal();
 		for (vtkProp* prop = props->GetNextProp(); prop != NULL; prop = props->GetNextProp())
@@ -273,11 +294,16 @@ void ViewContainer::renderAll()
 	// Then, if anything has changed, render everything anew
 	if (hash != mMTimeHash)
 	{
-		this->GetRenderWindow()->Render();
+		doRender();
 		mMTimeHash = hash;
 	}
 }
-	
+
+void ViewContainer::doRender()
+{
+	getRenderWindow()->Render();
+}
+
 void ViewContainer::resizeEvent( QResizeEvent *event)
 {
 	ViewQVTKWidget::resizeEvent(event);
