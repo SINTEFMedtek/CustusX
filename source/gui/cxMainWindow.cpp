@@ -134,12 +134,10 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	// Must be done after all DockWidgets are created
 	if (!restoreGeometry(settings()->value("mainWindow/geometry").toByteArray()))
 	{
-		std::cout << "**show maxim" << std::endl;
 		this->showMaximized();
 	}
 	else
 	{
-		std::cout << "**show" << std::endl;
 		this->show();
 	}
 
@@ -1029,18 +1027,6 @@ void MainWindow::configureSlot()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-//	patientService()->getPatientData()->autoSave();
-
-//	settings()->setValue("mainWindow/geometry", saveGeometry());
-//	settings()->setValue("mainWindow/windowState", saveState());
-//	settings()->sync();
-//	ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
-
-//	if (ssc::toolManager()->isTracking())
-//	{
-//		ssc::messageManager()->sendInfo("Closing: Stopping tracking");
-//		ssc::toolManager()->stopTracking();
-//	}
 	QMainWindow::closeEvent(event);
 	this->quitSlot();
 }
