@@ -170,6 +170,7 @@ void ScalarInteractionWidget::textEditedSlot()
 
 void ScalarInteractionWidget::setModified()
 {
+	OptimizedUpdateWidget::setModified();
     // Problem: If one of the sliders are visible, paint() is not called.
     // Force repaint here.
     //
