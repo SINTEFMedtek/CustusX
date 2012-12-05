@@ -43,12 +43,12 @@ VideoRecorderSaveThread::VideoRecorderSaveThread(QObject* parent, QString saveFo
 	mCompressed(compressed),
 	mWriteColor(writeColor)
 {
-	std::cout << "**VideoRecorderSaveThread::VideoRecorderSaveThread()" << std::endl;
+//	std::cout << "**VideoRecorderSaveThread::VideoRecorderSaveThread()" << std::endl;
 }
 
 VideoRecorderSaveThread::~VideoRecorderSaveThread()
 {
-	std::cout << "**VideoRecorderSaveThread::~VideoRecorderSaveThread()" << std::endl;
+//	std::cout << "**VideoRecorderSaveThread::~VideoRecorderSaveThread()" << std::endl;
 }
 
 QString VideoRecorderSaveThread::addData(double timestamp, vtkImageDataPtr image)
@@ -192,7 +192,7 @@ void VideoRecorderSaveThread::run()
 SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor) :
 	mSource(source)
 {
-	std::cout << "**SavingVideoRecorder::SavingVideoRecorder()" << std::endl;
+//	std::cout << "**SavingVideoRecorder::SavingVideoRecorder()" << std::endl;
 	mSaveFolder = saveFolder;
 	mSaveThread.reset(new VideoRecorderSaveThread(NULL, saveFolder, prefix, compressed, writeColor));
 	mSaveThread->start();
@@ -200,7 +200,7 @@ SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString sav
 
 SavingVideoRecorder::~SavingVideoRecorder()
 {
-	std::cout << "**SavingVideoRecorder::~SavingVideoRecorder()" << std::endl;
+//	std::cout << "**SavingVideoRecorder::~SavingVideoRecorder()" << std::endl;
 	mSaveThread->stop();
 }
 
