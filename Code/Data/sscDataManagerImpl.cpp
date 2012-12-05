@@ -143,21 +143,36 @@ namespace
 }
 
 //-----
-DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
+vtkImageDataPtr MetaImageReader::load(const QString& filename)
 {
-	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
-	Transform3D rMd = customReader->readTransform();
-
 	//load the image from file
 	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
 	reader->SetFileName(cstring_cast(filename));
 	reader->ReleaseDataFlagOn();
 
 	if (!ErrorObserver::checkedRead(reader, filename))
-		return DataPtr();
+		return vtkImageDataPtr();
+
+	return reader->GetOutput();
+}
+
+//-----
+DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
+{
+	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
+	Transform3D rMd = customReader->readTransform();
+
+	vtkImageDataPtr raw = this->load(filename);
+	//load the image from file
+//	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
+//	reader->SetFileName(cstring_cast(filename));
+//	reader->ReleaseDataFlagOn();
+
+//	if (!ErrorObserver::checkedRead(reader, filename))
+//		return DataPtr();
 
 	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
-	zeroer->SetInput(reader->GetOutput());
+	zeroer->SetInput(raw);
 	zeroer->SetOutputOrigin(0, 0, 0);
 
 	vtkImageDataPtr imageData = zeroer->GetOutput();

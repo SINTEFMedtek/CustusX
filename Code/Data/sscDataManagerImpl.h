@@ -65,6 +65,8 @@ public:
 		return (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0);
 	}
 	virtual DataPtr load(const QString& uid, const QString& filename);
+
+	vtkImageDataPtr load(const QString& filename);
 };
 
 /**\brief Reader for minc files.
