@@ -84,6 +84,7 @@ class CachedImageDataContainer : public ImageDataContainer
 {
 public:
 	CachedImageDataContainer(QString baseFilename, int size);
+	CachedImageDataContainer(std::vector<CachedImageDataPtr> frames);
 	virtual ~CachedImageDataContainer() {}
 	virtual vtkImageDataPtr get(unsigned index);
 	virtual unsigned size() const;

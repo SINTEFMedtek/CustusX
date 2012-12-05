@@ -264,10 +264,12 @@ void USAcquisition::startRecord(QString sessionId)
 	ssc::messageManager()->sendSuccess("Ultrasound acquisition started.", true);
 }
 
-void USAcquisition::stopRecord()
+void USAcquisition::stopRecord(bool canceled)
 {
 //	mRTRecorder->stopRecord();
 	mVideoRecorder->stopRecord();
+	if (canceled)
+		mVideoRecorder->cancel();
 	ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
 }
 

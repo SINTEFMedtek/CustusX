@@ -213,7 +213,7 @@ void USAcqusitionWidget::startedSlot(QString sessionId)
 	mDisplayTimerWidget->start();
 }
 
-void USAcqusitionWidget::stoppedSlot()
+void USAcqusitionWidget::stoppedSlot(bool canceled)
 {
 //	if (mThreadedReconstructer)
 //	{
@@ -225,6 +225,6 @@ void USAcqusitionWidget::stoppedSlot()
 //	}
 
 	mDisplayTimerWidget->stop();
-	mAcquisition->stopRecord();
+	mAcquisition->stopRecord(canceled);
 }
 }//namespace cx

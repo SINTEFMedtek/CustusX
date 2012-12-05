@@ -38,28 +38,40 @@ VideoRecorderSaveThread::VideoRecorderSaveThread(QObject* parent, QString saveFo
 	mImageIndex(0),
 	mMutex(QMutex::Recursive),
 	mStop(false),
+	mCancel(false),
 	mTimestampsFile(saveFolder+"/"+prefix+".fts"),
 	mCompressed(compressed),
 	mWriteColor(writeColor)
 {
 }
 
-void VideoRecorderSaveThread::addData(double timestamp, vtkImageDataPtr data)
+QString VideoRecorderSaveThread::addData(double timestamp, vtkImageDataPtr image)
 {
-	if (!data)
-		return;
+	if (!image)
+		return "";
 
-	vtkImageDataPtr frame = vtkImageDataPtr::New();
-	frame->DeepCopy(data);
+	DataType data;
+	data.mTimestamp = timestamp;
+	data.mImage = vtkImageDataPtr::New();
+	data.mImage->DeepCopy(image);
+	data.mImageFilename = QString("%1/%2_%3.mhd").arg(mSaveFolder).arg(mPrefix).arg(mImageIndex++);
 
 	{
 		QMutexLocker sentry(&mMutex);
-		mPendingData.push_back(std::make_pair(timestamp, frame));
+		mPendingData.push_back(data);
 	}
+
+	return data.mImageFilename;
 }
 
 void VideoRecorderSaveThread::stop()
 {
+	mStop = true;
+}
+
+void VideoRecorderSaveThread::cancel()
+{
+	mCancel = true;
 	mStop = true;
 }
 
@@ -85,24 +97,30 @@ bool VideoRecorderSaveThread::closeTimestampsFile()
 	return true;
 }
 
-void VideoRecorderSaveThread::write(vtkImageDataPtr data)
+void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 {
-	QString filename = QString("%1/%2_%3.mhd").arg(mSaveFolder).arg(mPrefix).arg(mImageIndex++);
+	// write timestamp
+	QTextStream stream(&mTimestampsFile);
+	stream << qstring_cast(data.mTimestamp);
+	stream << endl;
 
 	// convert to 8 bit data if applicable.
-	if (!mWriteColor && data->GetNumberOfScalarComponents()>2)
+	if (!mWriteColor && data.mImage->GetNumberOfScalarComponents()>2)
 	{
 		  vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-		  luminance->SetInput(data);
-		  data = luminance->GetOutput();
-		  data->Update();
+		  luminance->SetInput(data.mImage);
+		  data.mImage = luminance->GetOutput();
+		  data.mImage->Update();
 	}
 
+	// write image
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-	writer->SetInput(data);
-	writer->SetFileName(cstring_cast(filename));
+	writer->SetInput(data.mImage);
+	writer->SetFileName(cstring_cast(data.mImageFilename));
 	writer->SetCompression(mCompressed);
 	writer->Write();
+//	std:cout << "** VideoRecorderSaveThread::write() " << data.mImageFilename << std::endl;
+
 }
 
 /** Write all pending images to file.
@@ -112,18 +130,18 @@ void VideoRecorderSaveThread::writeQueue()
 {
 	while(!mPendingData.empty())
 	{
+		if (mCancel)
+			return;
+
 		DataType current;
+
 		{
 			QMutexLocker sentry(&mMutex);
 			current = mPendingData.front();
 			mPendingData.pop_front();
 		}
 
-		QTextStream stream(&mTimestampsFile);
-		stream << qstring_cast(current.first);
-		stream << endl;
-
-		this->write(current.second);
+		this->write(current);
 	}
 }
 
@@ -135,6 +153,7 @@ void VideoRecorderSaveThread::run()
 		this->writeQueue();
 		this->msleep(20);
 	}
+
 	this->writeQueue();
 	this->closeTimestampsFile();
 }
@@ -164,6 +183,7 @@ void VideoRecorderSaveThread::run()
 SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor) :
 	mSource(source)
 {
+	mSaveFolder = saveFolder;
 	mSaveThread.reset(new VideoRecorderSaveThread(NULL, saveFolder, prefix, compressed, writeColor));
 	mSaveThread->start();
 }
@@ -188,20 +208,40 @@ void SavingVideoRecorder::newFrameSlot()
 	if (!mSource->validData())
 		return;
 
-	mSaveThread->addData(mSource->getTimestamp(), mSource->getVtkImageData());
-
+	vtkImageDataPtr image = mSource->getVtkImageData();
 	double timestamp = mSource->getTimestamp();
+	QString filename = mSaveThread->addData(timestamp, image);
 
 	vtkImageDataPtr frame = vtkImageDataPtr::New();
-	frame->DeepCopy(mSource->getVtkImageData());
-	mData[timestamp] = frame;
-	frame = NULL;
+	frame->DeepCopy(image);
+
+	CachedImageDataPtr cache(new CachedImageData(filename, frame));
+	mImages.push_back(cache);
+	mTimestamps.push_back(timestamp);
 }
 
-SavingVideoRecorder::DataType SavingVideoRecorder::getRecording()
+std::vector<CachedImageDataPtr> SavingVideoRecorder::getImageData()
 {
-	return mData;
+	return mImages;
 }
+
+std::vector<double> SavingVideoRecorder::getTimestamps()
+{
+	return mTimestamps;
+}
+
+void SavingVideoRecorder::cancel()
+{
+	mSaveThread->cancel();
+	mSaveThread->wait(); // wait indefinitely for thread to finish
+
+	//TODO: delete contents
+}
+
+//SavingVideoRecorder::DataType SavingVideoRecorder::getRecording()
+//{
+//	return mData;
+//}
 
 void SavingVideoRecorder::completeSave()
 {
