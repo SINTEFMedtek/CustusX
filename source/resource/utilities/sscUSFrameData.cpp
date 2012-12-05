@@ -100,7 +100,7 @@ USFrameDataPtr USFrameData::create(ImagePtr inputFrameData)
   */
 USFrameDataPtr USFrameData::create(QString inputFilename)
 {
-	std::cout << "USFrameData::create() " << inputFilename << std::endl;
+//	std::cout << "USFrameData::create() " << inputFilename << std::endl;
 	QFileInfo info(inputFilename);
 
 	ssc::TimeKeeper timer;
@@ -144,6 +144,16 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 //    retval = ssc::USFrameData::create(info.path()+info.completeBaseName());
 }
 
+USFrameDataPtr USFrameData::create(QString filename, std::vector<cx::CachedImageDataPtr> frames)
+{
+	USFrameDataPtr retval(new USFrameData());
+	retval->mFilename = filename;
+	retval->mImageContainer.reset(new cx::CachedImageDataContainer(frames));
+	retval->initialize();
+	std:cout << "USFrameData::create() " << retval->mImageContainer->size() << ", " << retval->mReducedToFull.size() << std::endl;
+
+	return retval;
+}
 
 USFrameData::USFrameData() :
 		mUseAngio(false), mCropbox(0,0,0,0,0,0)
@@ -201,6 +211,7 @@ Eigen::Array3i USFrameData::getDimensions() const
 	}
 
 	retval[2] = mReducedToFull.size();
+
 	return retval;
 }
 

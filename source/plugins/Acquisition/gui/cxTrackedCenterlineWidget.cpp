@@ -140,7 +140,7 @@ void TrackedCenterlineWidget::startedSlot(QString sessionId)
   }
 }
 
-void TrackedCenterlineWidget::stoppedSlot()
+void TrackedCenterlineWidget::stoppedSlot(bool)
 {
   //hide preview of tool path
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
