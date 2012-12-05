@@ -540,8 +540,8 @@ void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 	if (timer.intervalPassed())
 	{
 		static int counter=0;
-		if (++counter%10==0)
-			ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
+//		if (++counter%10==0)
+//			ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
 		timer.reset();
 	}
 

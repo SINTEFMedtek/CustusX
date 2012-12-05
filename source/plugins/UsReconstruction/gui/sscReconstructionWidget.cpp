@@ -30,6 +30,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ssc::ReconstructMana
 
 	mFileSelectWidget = new ssc::FileSelectWidget(this);
 	connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
+	mFileSelectWidget->setNameFilter(QStringList() << "*.fts");
 
 	QHBoxLayout* extentLayout = new QHBoxLayout;
 	mExtentLineEdit = new QLineEdit(this);
@@ -197,7 +198,7 @@ void ReconstructionWidget::inputDataSelected(QString mhdFileName)
 	if (mReconstructer->getSelectedData().isEmpty())
 	{
 		return;
-	}
+	}	
 
 	mFileSelectWidget->setFilename(mhdFileName);
 }

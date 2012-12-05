@@ -32,7 +32,7 @@ RecordBaseWidget::RecordBaseWidget(AcquisitionDataPtr pluginData, QWidget* paren
   this->setWindowTitle("Record Base");
 
   connect(mRecordSessionWidget, SIGNAL(newSession(QString)), this, SLOT(postProcessingSlot(QString)));
-  connect(mRecordSessionWidget, SIGNAL(started()), this, SLOT(startedSlot()));
+  connect(mRecordSessionWidget, SIGNAL(started(QString)), this, SLOT(startedSlot(QString)));
   connect(mRecordSessionWidget, SIGNAL(stopped()), this, SLOT(stoppedSlot()));
 
   mLayout->addWidget(mRecordSessionWidget);

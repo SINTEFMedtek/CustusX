@@ -119,13 +119,18 @@ void RecordSessionWidget::startRecording()
     return;
   }
 
+//  \mCurrentSession = mPluginData->getNewUid();
   mStartTimeMSec = ssc::getMilliSecondsSinceEpoch();
+
+  mCurrentSession.reset(new RecordSession(mPluginData->getNewUid(), mStartTimeMSec, mStartTimeMSec, mDescriptionLine->text()));
+  mPluginData->addRecordSession(mCurrentSession);
+
   mStartStopButton->setText("Stop");
   mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-stop.png"));
   mCancelButton->setEnabled(true);
 
   ssc::messageManager()->playStartSound();
-  emit started();
+  emit started(mCurrentSession->getUid());
 }
 
 void RecordSessionWidget::stopRecording()
@@ -135,16 +140,20 @@ void RecordSessionWidget::stopRecording()
 
   mStopTimeMSec = ssc::getMilliSecondsSinceEpoch();
 
-  RecordSessionPtr session = RecordSessionPtr(new RecordSession(mPluginData->getNewUid(), mStartTimeMSec, mStopTimeMSec, mDescriptionLine->text()));
-  mPluginData->addRecordSession(session);
+  if (!mCurrentSession)
+	  std::cout << "no current session " << std::endl;
+  mCurrentSession->setStopTime(mStopTimeMSec);
+//  RecordSessionPtr session = RecordSessionPtr(new RecordSession(mCurrentSession, mStartTimeMSec, mStopTimeMSec, mDescriptionLine->text()));
+//  mPluginData->addRecordSession(session);
 
   ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
 
+  QString session = mCurrentSession->getUid();
   this->reset();
   ssc::messageManager()->playStopSound();
   emit stopped();
 
-  emit newSession(session->getUid());
+  emit newSession(session);
 }
 
 bool RecordSessionWidget::isRecording()
@@ -155,6 +164,7 @@ bool RecordSessionWidget::isRecording()
 void RecordSessionWidget::reset()
 {
   mPostProcessing = false;
+  mCurrentSession.reset();
 
   mStartStopButton->blockSignals(true);
   mStartStopButton->setChecked(false);
