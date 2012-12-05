@@ -56,7 +56,7 @@ signals:
 public slots:
 	void checkIfReadySlot();
 	void startRecord(QString sessionId);
-	void stopRecord();
+	void stopRecord(bool canceled);
 	void saveSession(QString sessionId, bool writeColor = false);///< \param writeColor If set to true, colors will be saved even if settings is set to 8 bit
 	void clearSlot();
 
