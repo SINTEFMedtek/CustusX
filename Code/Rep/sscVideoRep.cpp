@@ -303,7 +303,7 @@ void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 		if(!mImage)
 		{
 			mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
-			//ssc::dataManager()->loadData(boost::shared_dynamic_cast<ssc::Data>(mImage));//Uncomment to test unstable 4D US
+			ssc::dataManager()->loadData(boost::shared_dynamic_cast<ssc::Data>(mImage));//Uncomment to test unstable 4D US
 		}
 	}
 
