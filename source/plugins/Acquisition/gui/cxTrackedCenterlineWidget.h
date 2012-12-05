@@ -32,7 +32,7 @@ public:
 protected slots:
   void checkIfReadySlot();
   void postProcessingSlot(QString sessionId);
-  void startedSlot();
+  void startedSlot(QString sessionId);
   void stoppedSlot();
 
   void centerlineFinishedSlot();

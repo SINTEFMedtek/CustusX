@@ -42,7 +42,7 @@ public:
 protected slots:
 
   virtual void postProcessingSlot(QString sessionId) = 0;
-  virtual void startedSlot() = 0;
+  virtual void startedSlot(QString sessionId) = 0;
   virtual void stoppedSlot() = 0;
 
 protected:
@@ -74,7 +74,7 @@ signals:
 protected slots:
   virtual void checkIfReadySlot() = 0;
   virtual void postProcessingSlot(QString sessionId) = 0;
-  virtual void startedSlot() = 0;
+  virtual void startedSlot(QString sessionId) = 0;
   virtual void stoppedSlot() = 0;
 
 protected:

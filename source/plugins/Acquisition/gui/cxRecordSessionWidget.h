@@ -41,7 +41,7 @@ public:
   void stopPostProcessing();
 
 signals:
-  void started();
+  void started(QString);
   void stopped();
   void newSession(QString);
 
@@ -71,6 +71,8 @@ private:
   double mStartTimeMSec;
   double mStopTimeMSec;
   bool mPostProcessing;
+
+  RecordSessionPtr mCurrentSession;
 };
 
 /**

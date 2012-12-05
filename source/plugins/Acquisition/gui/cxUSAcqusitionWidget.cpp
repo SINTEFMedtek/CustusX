@@ -206,10 +206,10 @@ void USAcqusitionWidget::reconstructFinishedSlot()
 		mRecordSessionWidget->stopPostProcessing();
 }
 
-void USAcqusitionWidget::startedSlot()
+void USAcqusitionWidget::startedSlot(QString sessionId)
 {
-	mAcquisition->startRecord();
 	mRecordSessionWidget->setDescription(settings()->value("Ultrasound/acquisitionName").toString());
+	mAcquisition->startRecord(sessionId);
 	mDisplayTimerWidget->start();
 }
 
