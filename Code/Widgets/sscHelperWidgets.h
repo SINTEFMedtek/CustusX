@@ -67,6 +67,13 @@ public:
   *   \ingroup sscWidget
   */
 QHBoxLayout* mergeWidgetsIntoHBoxLayout(QWidget* first, QWidget* second);
+/** Add on hack for mergeWidgetsIntoHBoxLayout(),
+  * create a small extent for the widget so that is has a visible region
+  *   \author christiana
+  *   \date Dec 5, 2012
+  *   \ingroup sscWidget
+  */
+QWidget* addDummyMargin(QWidget* widget);
 
 /**\brief Create a widget capable of displaying the input data.
  *

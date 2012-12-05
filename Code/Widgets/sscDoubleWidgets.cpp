@@ -105,15 +105,14 @@ void ScalarInteractionWidget::addToOwnLayout()
 		topLayout->addWidget(mInfiniteSlider, 1);
 }
 
-
 /**Layout all widgets into the input grid, including this.
  *
  */
 void ScalarInteractionWidget::addToGridLayout(QGridLayout* gridLayout, int row)
 {
-    //Since SliderGroupWidget (this) is a widget we need to add this.
+	//Since SliderGroupWidget (this) is a widget we need to add this.
     //If not we will get an invisible widget on top of all the other widgets of the parent
-    gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, this), row, 0);
+    gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, addDummyMargin(this)), row, 0);
 
     QHBoxLayout* controlsLayout = new QHBoxLayout;
     controlsLayout->setSpacing(0);
@@ -168,18 +167,18 @@ void ScalarInteractionWidget::textEditedSlot()
 	mData->setValue(newVal);
 }
 
-void ScalarInteractionWidget::setModified()
-{
-	OptimizedUpdateWidget::setModified();
-    // Problem: If one of the sliders are visible, paint() is not called.
-    // Force repaint here.
-    //
-    // Possible solution: this is obscured by the slider,
-    // but repaint goes to the children. Maybe design is flawed and we need to
-    // listen to the children as well?
-    if (mSlider || mInfiniteSlider)
-        this->prePaintEvent();
-}
+//void ScalarInteractionWidget::setModified()
+//{
+//	OptimizedUpdateWidget::setModified();
+//    // Problem: If one of the sliders are visible, paint() is not called.
+//    // Force repaint here.
+//    //
+//    // Possible solution: this is obscured by the slider,
+//    // but repaint goes to the children. Maybe design is flawed and we need to
+//    // listen to the children as well?
+////    if (mSlider || mInfiniteSlider)
+////        this->prePaintEvent();
+//}
 
 void ScalarInteractionWidget::prePaintEvent()
 {
