@@ -21,9 +21,10 @@ typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 namespace cx
 {
 
-CachedImageData::CachedImageData(QString filename)
+CachedImageData::CachedImageData(QString filename, vtkImageDataPtr image)
 {
 	mFilename = filename;
+	mImageData = image;
 }
 
 vtkImageDataPtr CachedImageData::getImage()
