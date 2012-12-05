@@ -89,6 +89,7 @@ SET(ALL_LINK_LIBRARIES
 	vtkWidgets 
 	vtkFiltering 
 	vtkVolumeRendering 
+    cxResource
 	)
 
 if(CX_USE_OpenCV)
@@ -263,3 +264,9 @@ if (CX_WINDOWS)
 		 )      
 			
 endif (CX_WINDOWS)
+
+#Make GE defines available in source
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/geConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/geConfig.h" )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )

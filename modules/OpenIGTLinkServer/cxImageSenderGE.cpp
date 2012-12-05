@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QTime>
 #include <QHostAddress>
+#include <QFileInfo>
 #include "igtlOSUtil.h"
 #include "igtlImageMessage.h"
 #include "igtlServerSocket.h"
@@ -23,6 +24,9 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
+#include "sscMessageManager.h"
+#include "cxDataLocations.h"
+#include "geConfig.h"
 
 namespace cx
 {
@@ -43,6 +47,7 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--imagesize2D:	Returned image size in pixels, default = 250000 (500*500)";
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--testmode:		GEStreamer test mode, default = 0";
+	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
 	return retval;
 }
 
@@ -90,12 +95,32 @@ void ImageSenderGE::initialize(StringMap arguments)
         mArguments["testmode"] = "0";
     if (!mArguments.count("imagesize2D"))
         mArguments["imagesize2D"] = "250000";
+    if (!mArguments.count("useOpenCL"))
+        mArguments["useOpenCL"] = "1";
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
    	long imageSize2D = convertStringWithDefault(mArguments["imagesize2D"], -1);
    	std::string openclpath = mArguments["openclpath"].toStdString();
+	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
 
-	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize2D, interpType, bufferSize, openclpath);
+   	//Find GEStreamer OpenCL kernel code
+   	//Look in arg in, GEStreamer source dir, and installed dir
+   	QStringList paths;
+   	paths << QString::fromStdString(openclpath) << GEStreamer_KERNEL_PATH << DataLocations::getShaderPath();
+//   	std::cout << "OpenCL kernel paths: " << paths.join("  \n").toStdString();
+   	QFileInfo path;
+	path = QFileInfo(paths[0] + QString("/ScanConvertCL.cl"));
+	if (!path.exists())
+		path = QFileInfo(paths[1] + QString("/ScanConvertCL.cl"));
+	if (!path.exists())
+		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
+	if (!path.exists())
+	{
+		ssc::messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
+	} else
+		openclpath = path.absolutePath().toStdString();
+
+	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize2D, interpType, bufferSize, openclpath, useOpenCL);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
