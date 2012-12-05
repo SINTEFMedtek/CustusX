@@ -867,7 +867,7 @@ void DataManagerImpl::vtkImageDataChangedSlot()
 		uid = mActiveImage->getUid();
 
 	emit activeImageChanged(uid);
-	messageManager()->sendInfo("Active image set to " + qstring_cast(uid));
+//	messageManager()->sendInfo("Active image set to " + qstring_cast(uid));
 }
 
 void DataManagerImpl::transferFunctionsChangedSlot()
