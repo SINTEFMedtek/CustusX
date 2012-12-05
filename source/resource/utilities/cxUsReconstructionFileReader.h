@@ -101,13 +101,13 @@ public:
 
 	ssc::USReconstructInputData readAllFiles(QString fileName, QString calFilesPath = "");
 
-	bool readMaskFile(QString mhdFileName, ssc::ImagePtr mask);
-
 	std::vector<ssc::TimedPosition> readFrameTimestamps(QString fileName);
-	std::vector<ssc::TimedPosition> readPositions(QString fileName);
-	ssc::USFrameDataPtr readUsDataFile(QString mhdFileName);
 
 private:
+	std::vector<ssc::TimedPosition> readPositions(QString fileName);
+	bool readMaskFile(QString mhdFileName, ssc::ImagePtr mask);
+	ssc::USFrameDataPtr readUsDataFile(QString mhdFileName);
+
 	void readPositionFile(QString posFile, bool alsoReadTimestamps, std::vector<ssc::TimedPosition>* timedPos);
 	void readTimeStampsFile(QString fileName, std::vector<ssc::TimedPosition>* timedPos);
 	void readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName);

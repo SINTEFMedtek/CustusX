@@ -25,11 +25,17 @@
 #include "sscProbeSector.h"
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
+namespace cx
+{
+typedef boost::shared_ptr<class ImageDataContainer> ImageDataContainerPtr;
+}
+
 namespace ssc
 {
 
+
 /**
- * \addtogroup sscUSReconstruction
+ * \addtogroup cxResourceUtilities
  * \{
  */
 
@@ -71,7 +77,8 @@ class USFrameData
 {
 public:
 	static USFrameDataPtr create(ImagePtr inputFrameData);
-	static USFrameDataPtr create(std::vector<vtkImageDataPtr> inputFrameData, QString filename);
+//	static USFrameDataPtr create(std::vector<vtkImageDataPtr> inputFrameData, QString filename);
+	static USFrameDataPtr create(QString inputFilename);
 	~USFrameData();
 
 	unsigned char* getFrame(unsigned int index) const;
@@ -84,7 +91,7 @@ public:
 	void removeFrame(unsigned int index);
 	void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
 	void setCropBox(IntBoundingBox3D mCropbox);
-	bool save(QString filename, bool compressed);
+//	bool save(QString filename, bool compressed);
 	void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
 	void initializeFrames(); ///< call to enable use of getFrame()
 
@@ -94,10 +101,10 @@ protected:
 	void initialize();
 	virtual void clearCache();
 	void generateCache();
-	virtual vtkImageDataPtr getSingleBaseImage();
+//	virtual vtkImageDataPtr getSingleBaseImage();
 	USFrameData();
 	vtkImageDataPtr useAngio(vtkImageDataPtr inData) const;/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
-	vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input) const;
+//	vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input) const;
 
 	vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox) const;
 	vtkImageDataPtr toGrayscale(vtkImageDataPtr input) const;
@@ -107,11 +114,11 @@ protected:
 	IntBoundingBox3D mCropbox;
 
 	QString mFilename;
-	vtkImageDataPtr mOptionalWholeBase; ///< handle for original monolithic data if present
-	std::vector<vtkImageDataPtr> mBaseImage;
+//	vtkImageDataPtr mOptionalWholeBase; ///< handle for original monolithic data if present
+//	std::vector<vtkImageDataPtr> mBaseImage;
 	std::vector<vtkImageDataPtr> mProcessedImage;
+	cx::ImageDataContainerPtr mImageContainer;
 };
-
 
 struct USReconstructInputData
 {
