@@ -129,7 +129,10 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
 install(FILES ${CustusX3_SOURCE_DIR}source/plugins/USReconstruction/logic/3DReconstruction/Thunder/kernels.ocl 
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
 				)
-
+				
+install(FILES ${GEStreamer_KERNEL_PATH}/ScanConvertCL.cl 
+				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
+				)
 
 # Install Shared files
 install(FILES 
