@@ -297,8 +297,14 @@ void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 			mMaskFilter->SetImageInput(mMapZeroToOne->GetOutput());
 			mTexture->SetInput(mMaskFilter->GetOutput());
 		}
-		mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
-//		ssc::dataManager()->loadData(boost::shared_dynamic_cast<ssc::Data>(mImage));//Uncomment to test unstable 4D US
+
+		//Only add image in dataManager once
+		mImage = dataManager()->getImage("4D US");
+		if(!mImage)
+		{
+			mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
+			//ssc::dataManager()->loadData(boost::shared_dynamic_cast<ssc::Data>(mImage));//Uncomment to test unstable 4D US
+		}
 	}
 
 	this->newDataSlot();
@@ -314,11 +320,11 @@ void VideoGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 	mPlaneActor->SetUserMatrix(rMu.getVtkMatrix());
 
 	//TODO: Set correct position and orientation on mImage
-	/*std::cout << "rMu: " << rMu << std::endl;
+	//std::cout << "rMu: " << rMu << std::endl;
 	if (mImage)
 	{
 		mImage->get_rMd_History()->setRegistration(rMu);
-	}*/
+	}
 }
 
 void VideoGraphics::receiveVisible(bool visible)

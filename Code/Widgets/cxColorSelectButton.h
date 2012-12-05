@@ -8,7 +8,7 @@
 #ifndef CXCOLORSELECTBUTTON_H_
 #define CXCOLORSELECTBUTTON_H_
 
-#include <QPushButton>
+#include <QToolButton>
 #include <QColor>
 
 namespace cx
@@ -21,7 +21,7 @@ namespace cx
  * the button itself in the selected color.
  *
  */
-class ColorSelectButton : public QPushButton
+class ColorSelectButton : public QToolButton
 {
   Q_OBJECT
 public:
