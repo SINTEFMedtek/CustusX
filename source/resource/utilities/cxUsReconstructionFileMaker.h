@@ -86,7 +86,7 @@ private:
   ssc::USReconstructInputData mReconstructData;
 
   ssc::USReconstructInputData getReconstructData(ssc::TimedTransformMap trackerRecordedData,
-  		SavingVideoRecorder::DataType streamRecordedData,
+//  		SavingVideoRecorder::DataType streamRecordedData,
 //  		QString sessionDescription,
 //  		QString activepatientPath,
   		ssc::ToolPtr tool,

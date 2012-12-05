@@ -108,7 +108,7 @@ void RecordSessionWidget::cancelSlot()
 
   this->reset();
   ssc::messageManager()->playCancelSound();
-  emit stopped();
+  emit stopped(true);
 }
 
 void RecordSessionWidget::startRecording()
@@ -151,7 +151,7 @@ void RecordSessionWidget::stopRecording()
   QString session = mCurrentSession->getUid();
   this->reset();
   ssc::messageManager()->playStopSound();
-  emit stopped();
+  emit stopped(false);
 
   emit newSession(session);
 }

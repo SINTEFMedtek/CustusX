@@ -33,7 +33,7 @@ protected slots:
   void checkIfReadySlot();
   void postProcessingSlot(QString sessionId);
   void startedSlot(QString sessionId);
-  void stoppedSlot();
+  void stoppedSlot(bool);
 
   void centerlineFinishedSlot();
   void preprocessResampler();
