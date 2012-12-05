@@ -40,7 +40,7 @@ public:
 	/**
 	  * Initialize with a given image file
 	  */
-	explicit CachedImageData(QString filename);
+	explicit CachedImageData(QString filename, vtkImageDataPtr image = NULL);
 	/**
 	  *
 	  */
