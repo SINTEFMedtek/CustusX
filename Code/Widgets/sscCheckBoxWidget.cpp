@@ -45,7 +45,7 @@ CheckBoxWidget::CheckBoxWidget(QWidget* parent, ssc::BoolDataAdapterPtr dataInte
 
     if (gridLayout) // add to input gridlayout
     {
-        gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, this), row, 0);
+        gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, addDummyMargin(this)), row, 0);
         gridLayout->addWidget(mCheckBox, row, 1);
     }
     else // add directly to this
