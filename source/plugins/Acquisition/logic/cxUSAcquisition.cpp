@@ -269,8 +269,15 @@ void USAcquisition::stopRecord(bool canceled)
 //	mRTRecorder->stopRecord();
 	mVideoRecorder->stopRecord();
 	if (canceled)
+	{
 		mVideoRecorder->cancel();
-	ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
+		mVideoRecorder.reset();
+		ssc::messageManager()->sendInfo("Ultrasound acquisition stopped.");
+	}
+	else
+	{
+		ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
+	}
 }
 
 
