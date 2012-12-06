@@ -28,6 +28,8 @@
 #include "sscBoundingBox3D.h"
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
+#include "cxActiveImageProxy.h"
+
 
 namespace cx
 {
@@ -86,6 +88,7 @@ private:
 	CropBoxEnableCallbackPtr mCropBoxEnableCallback;
 	CropBoxEnableCallbackPtr mCropBoxDisableCallback;
 	bool mShowBoxWidget;
+	ActiveImageProxyPtr mActiveImageProxy;
 };
 
 typedef boost::shared_ptr<InteractiveCropper> InteractiveCropperPtr;
