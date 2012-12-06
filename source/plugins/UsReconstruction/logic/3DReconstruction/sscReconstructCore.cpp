@@ -601,6 +601,7 @@ vtkImageDataPtr ReconstructCore::generateRawOutputVolume()
 	Eigen::Array3i dim = mOutputVolumeParams.getDim();
 	ssc::Vector3D spacing = ssc::Vector3D(1, 1, 1) * mOutputVolumeParams.getSpacing();
 	vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);
+	std::cout << "ReconstructCore::generateRawOutputVolume() spacing  " << mOutputVolumeParams.getSpacing() << std::endl;
 	return data;
 }
 

@@ -18,20 +18,22 @@
 namespace cx
 {
 
-/**Give subclasses a change to override quit() by using this method instead.
- *
- * This is required for OpenCV using Direct Link: release() of the camera must (for
- * some unknown reason) be called inside exec().
- *
- */
-void IGTLinkClientBase::stop()
-{
-	//OpenCL hack removed
-	//This hack for OpenCV creates problems for GEStreamer
-//	connect(this, SIGNAL(stopInternal()), this, SLOT(stopSlot()));
-//	emit stopInternal();
-	this->quit();
-}
+// This was a problem encountered on MacOSX+OpenCV - this does not work well anyway - disable.
+//
+///**Give subclasses a change to override quit() by using this method instead.
+// *
+// * This is required for OpenCV using Direct Link: release() of the camera must (for
+// * some unknown reason) be called inside exec().
+// *
+// */
+//void IGTLinkClientBase::stop()
+//{
+//	//OpenCL hack removed
+//	//This hack for OpenCV creates problems for GEStreamer
+////	connect(this, SIGNAL(stopInternal()), this, SLOT(stopSlot()));
+////	emit stopInternal();
+//	this->quit();
+//}
 
 
 /** add the message to a thread-safe queue

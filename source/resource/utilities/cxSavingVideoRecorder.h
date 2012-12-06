@@ -25,6 +25,7 @@
 #include "sscVideoRecorder.h"
 #include "sscTool.h"
 #include "sscUSFrameData.h"
+#include "cxImageDataContainer.h"
 
 namespace cx
 {
@@ -56,20 +57,29 @@ public:
 	  * Create the thread object, set folder to save to.
 	  */
 	VideoRecorderSaveThread(QObject* parent, QString saveFolder, QString prefix, bool compressed, bool writeColor);
+	virtual ~VideoRecorderSaveThread();
 	/**
 	  * Add data to be saved.
 	  */
-	void addData(double timestamp, vtkImageDataPtr data);
+	QString addData(double timestamp, vtkImageDataPtr data);
 	void stop();
+	void cancel();
 
 protected:
+	struct DataType
+	{
+		double mTimestamp;
+		QString mImageFilename;
+		vtkImageDataPtr mImage;
+	};
 	QString mSaveFolder;
 	QString mPrefix;
 	int mImageIndex;
-	typedef std::pair<double, vtkImageDataPtr> DataType; ///< timestamp + image data
+//	typedef std::pair<double, vtkImageDataPtr> DataType; ///< timestamp + image data
 	std::list<DataType> mPendingData;
 	QMutex mMutex; ///< protects the mPendingData
 	bool mStop;
+	bool mCancel;
 	QFile mTimestampsFile;
 	bool mCompressed;
 	bool mWriteColor;
@@ -81,7 +91,7 @@ protected:
 	void writeQueue();
 	bool openTimestampsFile();
 	bool closeTimestampsFile();
-	void write(vtkImageDataPtr data);
+	void write(DataType data);
 };
 
 /** \brief Recorder for a VideoSource.
@@ -99,14 +109,19 @@ class SavingVideoRecorder : public QObject
 {
 	Q_OBJECT
 public:
-	typedef std::map<double, vtkImageDataPtr> DataType; ///<  <timestamp, frame>
+//	typedef std::map<double, vtkImageDataPtr> DataType; ///<  <timestamp, frame>
 public:
 	SavingVideoRecorder(ssc::VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor);
 	virtual ~SavingVideoRecorder();
 
 	virtual void startRecord();
 	virtual void stopRecord();
-	virtual DataType getRecording();
+	void cancel();
+
+//	virtual DataType getRecording();
+	std::vector<CachedImageDataPtr> getImageData();
+	std::vector<double> getTimestamps();
+
 	/** Call to force complete the writing of data to disk.
 	  */
 	void completeSave();
@@ -114,7 +129,12 @@ public:
 private slots:
 	void newFrameSlot();
 private:
-	DataType mData;
+	std::vector<CachedImageDataPtr> mImages;
+	std::vector<double> mTimestamps;
+	void deleteFolder(QString folder);
+
+	QString mSaveFolder;
+//	DataType mData;
 	ssc::VideoSourcePtr mSource;
 	boost::shared_ptr<VideoRecorderSaveThread> mSaveThread;
 

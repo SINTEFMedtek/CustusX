@@ -237,7 +237,7 @@ void OpenIGTLinkRTSource::stopClient()
 {
 	if (mClient)
 	{
-		mClient->stop();
+		mClient->quit();
 		mClient->wait(2000); // forever or until dead thread
 
 		if (mClient->isRunning())
