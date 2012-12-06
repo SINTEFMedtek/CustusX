@@ -28,10 +28,16 @@ namespace ssc
 /** \brief Interface for all classes following the modified/prepaint paradigm.
  *
  * Use this class when the widget is modified several times
- * between each repaing. Instead of doing expensive computations
+ * between each repaint. Instead of doing expensive computations
  * upon setModified(), the computations are rather deferred to
  * a pre paint step.
  * This is similar to the VTK modified/update paradigm.
+ *
+ * NOTE:
+ *  In order for this to work, the widget itself must have a visible region.
+ *  If the widget is completely covered by child widgets or other widgets,
+ *  no paintEvent will come, and the prePaintEvent will not be called.
+ *  See ScalarInteractionWidget for an example of how to hack this if necessary.
  *
  *   \author christiana
  *   \date Nov 15, 2012

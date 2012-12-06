@@ -31,6 +31,7 @@ OptimizedUpdateWidget::OptimizedUpdateWidget(QWidget* parent) :
 
 void OptimizedUpdateWidget::paintEvent(QPaintEvent* event)
 {
+    // disable system
     this->prePaintEventPrivate();
     QWidget::paintEvent(event);
 }
@@ -38,6 +39,8 @@ void OptimizedUpdateWidget::paintEvent(QPaintEvent* event)
 void OptimizedUpdateWidget::setModified()
 {
     mModified = true;
+    // disable system
+//    this->prePaintEvent();
     this->update();
 }
 
