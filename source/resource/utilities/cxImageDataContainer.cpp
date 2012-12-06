@@ -15,6 +15,7 @@
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 #include "sscDataManagerImpl.h"
+#include "sscLogger.h"
 
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
@@ -61,7 +62,18 @@ CachedImageDataContainer::CachedImageDataContainer(QString baseFilename, int siz
 		if (size>=0 && i>=size)
 			break;
 	}
+
+	if (size>=0)
+	{
+		SSC_ASSERT(size == mImages.size());
+	}
 }
+
+CachedImageDataContainer::CachedImageDataContainer(std::vector<CachedImageDataPtr> frames)
+{
+	mImages = frames;
+}
+
 
 vtkImageDataPtr CachedImageDataContainer::get(unsigned index)
 {

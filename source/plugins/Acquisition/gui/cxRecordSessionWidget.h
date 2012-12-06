@@ -42,7 +42,7 @@ public:
 
 signals:
   void started(QString);
-  void stopped();
+  void stopped(bool canceled=false);
   void newSession(QString);
 
 public slots:
