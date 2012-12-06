@@ -24,8 +24,9 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
   mBorder(5),
   mReadOnly(false)
 {
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
-          this, SLOT(activeImageTransferFunctionsChangedSlot()));
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
+
   mCurrentAlphaPoint.reset();
 }
 TransferFunctionAlphaWidget::~TransferFunctionAlphaWidget()
