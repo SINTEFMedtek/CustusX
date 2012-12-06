@@ -34,6 +34,8 @@ public:
 	double getStartTime();
 	double getStopTime();
 
+	void setStopTime(double val) { mStopTime = val; }
+
 	//  ssc::SessionToolHistoryMap getSessionHistory();
 
 	void addXml(QDomNode& dataNode);

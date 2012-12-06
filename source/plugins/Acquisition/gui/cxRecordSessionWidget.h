@@ -41,8 +41,8 @@ public:
   void stopPostProcessing();
 
 signals:
-  void started();
-  void stopped();
+  void started(QString);
+  void stopped(bool canceled=false);
   void newSession(QString);
 
 public slots:
@@ -71,6 +71,8 @@ private:
   double mStartTimeMSec;
   double mStopTimeMSec;
   bool mPostProcessing;
+
+  RecordSessionPtr mCurrentSession;
 };
 
 /**

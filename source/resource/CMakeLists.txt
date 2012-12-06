@@ -19,6 +19,8 @@ SET( CX_QT_MOC_HEADER_FILES
     utilities/cxPlaybackTime.h
     utilities/cxTimelineWidget.h
     utilities/cxProcessWrapper.h
+	utilities/cxSavingVideoRecorder.h
+	utilities/cxImageDataContainer.h
 )
 
 SET ( cxResource_SOURCE
@@ -68,6 +70,10 @@ SET ( cxResource_SOURCE
     utilities/cxProcessWrapper.cpp
     utilities/sscUSFrameData.h
     utilities/sscUSFrameData.cpp
+	utilities/cxSavingVideoRecorder.h
+	utilities/cxSavingVideoRecorder.cpp
+	utilities/cxImageDataContainer.h
+	utilities/cxImageDataContainer.cpp
 )
 
 include_directories(

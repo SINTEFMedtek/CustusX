@@ -52,8 +52,8 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisit
   mAcquisition->checkIfReadySlot();
 
   connect(mRecordSessionWidget, SIGNAL(newSession(QString)), mAcquisition.get(), SLOT(saveSession(QString)));
-  connect(mRecordSessionWidget, SIGNAL(started()), mAcquisition.get(), SLOT(startRecord()));
-  connect(mRecordSessionWidget, SIGNAL(stopped()), mAcquisition.get(), SLOT(stopRecord()));
+  connect(mRecordSessionWidget, SIGNAL(started(QString)), mAcquisition.get(), SLOT(startRecord(QString)));
+  connect(mRecordSessionWidget, SIGNAL(stopped(bool)), mAcquisition.get(), SLOT(stopRecord(bool)));
   mRecordSessionWidget->setDescriptionVisibility(false);
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);

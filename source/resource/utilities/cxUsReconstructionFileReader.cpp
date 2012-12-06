@@ -49,29 +49,29 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   ssc::USReconstructInputData retval;
 
   // ignore if a directory is read - store folder name only
-  if (QFileInfo(fileName).suffix()!="mhd")
+  if (QFileInfo(fileName).suffix().isEmpty())
     return retval;
 
   retval.mFilename = fileName;
 
-  QString mhdFileName = ssc::changeExtension(fileName, "mhd");
+//  QString mhdFileName = ssc::changeExtension(fileName, "mhd");
 
-  if (!QFileInfo(ssc::changeExtension(fileName, "mhd")).exists())
+  if (!QFileInfo(ssc::changeExtension(fileName, "fts")).exists())
   {
     // There may not be any files here due to the automatic calling of the function
-    ssc::messageManager()->sendWarning("File not found: "+ssc::changeExtension(fileName, "mhd")+", reconstruct load failed");
+    ssc::messageManager()->sendWarning("File not found: "+ssc::changeExtension(fileName, "fts")+", reconstruct load failed");
     return retval;
   }
 
   //Read US images
-  retval.mUsRaw = this->readUsDataFile(mhdFileName);
+  retval.mUsRaw = this->readUsDataFile(fileName);
 
 //  QString caliFilename;
 //  QStringList probeConfigPath;
 //  this->readCustomMhdTags(mhdFileName, &probeConfigPath, &caliFilename);
 //  ProbeXmlConfigParser::Configuration configuration = this->readProbeConfiguration(calFilesPath, probeConfigPath);
 //  ssc::ProbeData probeData = createProbeDataFromConfiguration(configuration);
-  std::pair<QString, ssc::ProbeData>  probeDataFull = this->readProbeDataBackwardsCompatible(mhdFileName, calFilesPath);
+  std::pair<QString, ssc::ProbeData>  probeDataFull = this->readProbeDataBackwardsCompatible(ssc::changeExtension(fileName, "mhd"), calFilesPath);
   ssc::ProbeData  probeData = probeDataFull.second;
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
   bool spacingOK = ssc::similar(probeData.getImage().mSpacing[0], retval.mUsRaw->getSpacing()[0], 0.001)
@@ -255,33 +255,43 @@ std::pair<QString, ssc::ProbeData> UsReconstructionFileReader::readProbeDataFrom
 
 ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileName)
 {
-  //Read US images
+//	std::cout << "UsReconstructionFileReader::readUsDataFile " << mhdFileName << std::endl;
+//  //Read US images
 
-  //Split mhdFileName into file name and file path
-  QStringList list = mhdFileName.split("/");
-  QString fileName = list[list.size()-1];
-  list[list.size()-1] = "";
-  QString filePath = list.join("/");//+"/";
+//  //Split mhdFileName into file name and file path
+//  QStringList list = mhdFileName.split("/");
+//  QString fileName = list[list.size()-1];
+//  list[list.size()-1] = "";
+//  QString filePath = list.join("/");//+"/";
 
-  // Remove file ending from file name
-  list = fileName.split(".");
-  if(list.size() > 1)
-  {
-    list[list.size()-1] = "";
-    fileName = list.join("");
-  }
+//  // Remove file ending from file name
+//  list = fileName.split(".");
+//  if(list.size() > 1)
+//  {
+//    list[list.size()-1] = "";
+//    fileName = list.join("");
+//  }
 
-  //std::cout << "raw " << mhdFileName<< std::endl;
-  //Use file name as uid
-  ssc::ImagePtr UsRaw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(fileName, mhdFileName));
-  UsRaw->setFilePath(filePath);
-  ssc::USFrameDataPtr retval;
-  retval = ssc::USFrameData::create(UsRaw);
+//  std::cout << "   fileName:" << fileName << std::endl;
+//  std::cout << "   mhdFileName:" << mhdFileName << std::endl;
+//  std::cout << "   filePath:" << filePath << std::endl;
+//  //std::cout << "raw " << mhdFileName<< std::endl;
+//  //Use file name as uid
+//  ssc::ImagePtr UsRaw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(fileName, mhdFileName));
+//  UsRaw->setFilePath(filePath);
+//  ssc::USFrameDataPtr retval;
+//  retval = ssc::USFrameData::create(UsRaw);
 
-  //std::cout << "raw " << mhdFileName << ", " << Eigen::Array3i(retval->getDimensions()) << std::endl;
+
+	return ssc::USFrameData::create(mhdFileName);
+
+//  QFileInfo info(mhdFileName);
+//  retval = ssc::USFrameData::create(info.path()+info.completeBaseName());
+
+//  //std::cout << "raw " << mhdFileName << ", " << Eigen::Array3i(retval->getDimensions()) << std::endl;
 
 
-  return retval;
+//  return retval;
 }
 
 std::vector<ssc::TimedPosition> UsReconstructionFileReader::readFrameTimestamps(QString fileName)

@@ -2,13 +2,17 @@
 #define CXUSRECONSTRUCTIONFILEMAKER_H_
 
 #include <QFile>
+#include <QThread>
+#include <QMutex>
 #include <QString>
 #include <QStringList>
 #include <QTextStream>
+#include <utility>
 #include "boost/shared_ptr.hpp"
 #include "sscVideoRecorder.h"
 #include "sscTool.h"
 #include "sscUSFrameData.h"
+#include "cxSavingVideoRecorder.h"
 
 class QDir;
 
@@ -22,6 +26,9 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 * @{
 */
 
+
+
+
 //struct USReconstructInputData
 //{
 //	QString mFilename; ///< filename used for current data read
@@ -33,7 +40,7 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 //	ssc::ProbeSector mProbeData;
 //};
 
-/**\brief Handles writing files in the format the us reconstruction
+/** \brief Handles writing files in the format the us reconstruction
  * algorithm wants them.
  *
  *\sa UsReconstructionFileReader
@@ -47,18 +54,23 @@ public:
 	/**
 	 * \param writeColor If set to true, colors will be saved even if settings is set to 8 bit
 	 */
-  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::VideoRecorder::DataType streamRecordedData,
-  		QString sessionDescription, QString activepatientPath, ssc::ToolPtr tool, QString calibFilename,
-  		bool writeColor = false);
+  UsReconstructionFileMaker(QString sessionDescription, QString activepatientPath);
   ~UsReconstructionFileMaker();
 
+  void setData(ssc::TimedTransformMap trackerRecordedData, SavingVideoRecorderPtr videoRecorder,
+  		ssc::ToolPtr tool, QString calibFilename, bool writeColor = false);
   ssc::USReconstructInputData getReconstructData();
   QString write();
   QString getMhdFilename(QString reconstructionFolder);
 
+
+  QString getFolderName() const { return mFolderName; }
+  QString getSessionName() const { return mSessionDescription; }
+
+
 private:
   QString write(ssc::USReconstructInputData data);
-  bool writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data, QString filename);
+//  bool writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data, QString filename);
   bool writeUSTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
   bool writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
   bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
@@ -66,38 +78,26 @@ private:
 
   QString findFolderName(QString patientFolder, QString sessionDescription);
   bool findNewSubfolder(QString subfolderAbsolutePath);
-  vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
-  std::vector<vtkImageDataPtr> getFrames(ssc::VideoRecorder::DataType streamRecordedData, bool writeColor);
-
-//  bool writeTrackerTimestamps(QString reconstructionFolder);
-//  bool writeTrackerTransforms(QString reconstructionFolder);
-//  bool writeUSTimestamps(QString reconstructionFolder);
-//  bool writeUSImages(QString reconstructionFolder, QString calibrationFile);
-//  QString copyCalibrationFile(QString reconstructionFolder);
-//  void copyProbeCalibConfigsXml(QString reconstructionFolder);
-//  void writeProbeConfiguration(QString reconstructionFolder);
+//  vtkImageDataPtr mergeFrames(std::vector<vtkImageDataPtr> input);
+//  std::vector<vtkImageDataPtr> getFrames(ssc::VideoRecorder::DataType streamRecordedData, bool writeColor);
 
   void report();
 
   ssc::USReconstructInputData mReconstructData;
 
   ssc::USReconstructInputData getReconstructData(ssc::TimedTransformMap trackerRecordedData,
-  		ssc::VideoRecorder::DataType streamRecordedData,
-  		QString sessionDescription,
-  		QString activepatientPath,
+//  		SavingVideoRecorder::DataType streamRecordedData,
+//  		QString sessionDescription,
+//  		QString activepatientPath,
   		ssc::ToolPtr tool,
   		QString calibFilename,
   		bool writeColor);
 
-//  ssc::TimedTransformMap mTrackerRecordedData;
-//  ssc::VideoRecorder::DataType mStreamRecordedData;
   QString mSessionDescription;
   QString mActivepatientPath;
-//  ssc::ToolPtr mTool;
-//  QString mCalibFilename;
-//  bool mWriteColor;///< If set to true, colors will be saved even if settings is set to 8 bit
-
   QStringList mReport;
+	QString mFolderName;
+	SavingVideoRecorderPtr mVideoRecorder;
 };
 
 typedef boost::shared_ptr<UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
