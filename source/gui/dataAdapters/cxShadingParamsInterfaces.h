@@ -12,6 +12,7 @@
 #include "sscDoubleRange.h"
 #include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
+#include "cxActiveImageProxy.h"
 
 
 namespace cx
@@ -37,6 +38,7 @@ private slots:
   void activeImageChanged();
 protected:
   ssc::ImagePtr mImage;
+  ActiveImageProxyPtr mActiveImageProxy;
 };
   
 /** Interface for setting the ambient parameter for the shading.
