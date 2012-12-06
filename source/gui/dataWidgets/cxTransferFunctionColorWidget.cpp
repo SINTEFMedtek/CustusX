@@ -27,8 +27,8 @@ TransferFunctionColorWidget::TransferFunctionColorWidget(QWidget* parent) :
   mCurrentClickY(INT_MAX),
   mBorder(5)
 {
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
-          this, SLOT(activeImageTransferFunctionsChangedSlot()));
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mCurrentPoint.reset();
   

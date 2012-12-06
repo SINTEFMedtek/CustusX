@@ -13,6 +13,7 @@
 #include <QDomElement>
 #include <sscImage.h>
 #include "sscPresetTransferFunctions3D.h"
+#include "cxActiveImageProxy.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -44,6 +45,7 @@ protected:
 
   //ssc::ImagePtr mCurrentImage;
   bool mInitialized;///< Is TransferFunctionWidget initialized
+  ActiveImageProxyPtr mActiveImageProxy;
 };
 }
 

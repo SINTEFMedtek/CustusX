@@ -15,6 +15,8 @@
 #include "sscLandmark.h"
 #include "sscTransform3D.h"
 #include "cxRegistrationBaseWidget.h"
+#include "cxActiveImageProxy.h"
+
 
 class QVBoxLayout;
 class QComboBox;
@@ -82,6 +84,8 @@ protected:
 
 	//data
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
+
+	ActiveImageProxyPtr mActiveImageProxy;
 
 private:
 	LandmarkRegistrationWidget(); ///< not implemented
