@@ -300,7 +300,7 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 	if (scalarType == -1)
 	{
 		std::cerr << "unknown image type" << std::endl;
-		exit(0);
+		return IGTLinkImageMessage::Pointer();
 	}
 
 	retval->SetDimensions(size); // May be 3 dimensions

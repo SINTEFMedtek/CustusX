@@ -158,7 +158,7 @@ IGTLinkImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
   if (scalarType==-1)
   {
     std::cerr << "unknown image type" << std::endl;
-    exit(0);
+	return IGTLinkImageMessage::Pointer();
   }
 
   //------------------------------------------------------------
