@@ -41,8 +41,8 @@ public:
 protected slots:
 
   void postProcessingSlot(QString sessionId);
-  void startedSlot();
-  void stoppedSlot();
+  void startedSlot(QString sessionId);
+  void stoppedSlot(bool);
 
 private slots:
 	void reconstructStartedSlot();
