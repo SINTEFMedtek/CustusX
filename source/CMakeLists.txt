@@ -54,6 +54,15 @@ if (CX_USE_ISB_GE)
     include(${GEStreamer_USE_FILE})
 endif()
 
+# Tube-Segmentation-Framework (TSF)
+#----------
+option(CX_USE_TSF "use Tube-Segmentation-Framework (TSF)" OFF)
+if (CX_USE_TSF)
+    ADD_DEFINITIONS(-DCX_USE_TSF)
+    find_package(TSF PATHS "../../Tube-Segmentation-Framework/CMake" REQUIRED)
+    include(${TSF_USE_FILE})
+endif()
+
 #------------------------------------------------------------------------------
 # Add CMake modules
 #------------------------------------------------------------------------------
