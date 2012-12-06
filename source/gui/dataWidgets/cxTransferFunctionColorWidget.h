@@ -5,6 +5,7 @@
 
 #include <sscImage.h>
 #include "sscForwardDeclarations.h"
+#include "cxActiveImageProxy.h"
 
 class QRect;
 class QMenu;
@@ -77,6 +78,7 @@ protected:
   
   ssc::ImagePtr mImage;
   ssc::ImageTFDataPtr mImageTF;
+  ActiveImageProxyPtr mActiveImageProxy;
   
   bool isInsideCurrentPoint();///< Checks if a screen coordinate is inside any of the point rectangles. Sets mCurrentPoint.position and mCurrentPoint.value
   void contextMenuEvent(QContextMenuEvent *event);///< Decides what happens when you rightclick in a view
