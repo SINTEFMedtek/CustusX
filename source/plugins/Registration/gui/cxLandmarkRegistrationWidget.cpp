@@ -31,6 +31,11 @@ LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegistrationManagerPtr re
 	connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
 	connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(cellChangedSlot(int,int)));
 
+	mActiveImageProxy = ActiveImageProxy::New();
+	connect(mActiveImageProxy.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
+	connect(mActiveImageProxy.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+
 	this->setLayout(mVerticalLayout);
 }
 
@@ -55,20 +60,7 @@ void LandmarkRegistrationWidget::activeImageChangedSlot()
 	if (mCurrentImage == activeImage)
 		return;
 
-	//disconnect from the old image
-	if (mCurrentImage)
-	{
-		disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
-		disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
-	}
-
 	mCurrentImage = activeImage;
-
-	if (mCurrentImage)
-	{
-		connect(mCurrentImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
-		connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
-	}
 
 	//get the images landmarks and populate the landmark table
     this->setModified();
@@ -117,7 +109,6 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
 	connect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
-	connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
 	this->activeImageChangedSlot();
 
 	mManager->restart();
@@ -128,13 +119,7 @@ void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	QWidget::hideEvent(event);
 	disconnect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
-	disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
 
-	if (mCurrentImage)
-	{
-		disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
-		disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
-	}
 	mCurrentImage.reset();
 }
 

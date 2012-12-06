@@ -4,6 +4,7 @@
 #include "cxBaseWidget.h"
 #include "sscForwardDeclarations.h"
 #include "cxDataInterface.h"
+#include "cxActiveImageProxy.h"
 
 namespace cx
 {
@@ -50,6 +51,7 @@ private:
   DataUidEditableStringDataAdapterPtr mUidAdapter;
   DataModalityStringDataAdapterPtr mModalityAdapter;
   ImageTypeStringDataAdapterPtr mImageTypeAdapter;
+  ActiveImageProxyPtr mActiveImageProxy;
 };
 
 /**
