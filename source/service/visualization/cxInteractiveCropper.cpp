@@ -94,8 +94,9 @@ public:
 
 InteractiveCropper::InteractiveCropper()
 {
-	connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
-	connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
+	mActiveImageProxy = ActiveImageProxy::New();
+	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
+	connect(mActiveImageProxy.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
 }
 
 void InteractiveCropper::initialize()
@@ -229,19 +230,7 @@ void InteractiveCropper::resetBoundingBox()
 
 void InteractiveCropper::imageChangedSlot()
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-
-	if (mImage)
-	{
-		disconnect(mImage.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
-	}
-
-	mImage = image;
-
-	if (mImage)
-	{
-		connect(mImage.get(), SIGNAL(cropBoxChanged()), this, SLOT(imageCropChangedSlot()));
-	}
+	mImage = ssc::dataManager()->getActiveImage();
 
 	this->imageCropChangedSlot();
 	emit changed();
