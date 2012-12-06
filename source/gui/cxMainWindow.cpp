@@ -133,9 +133,13 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	// Restore saved window states
 	// Must be done after all DockWidgets are created
 	if (!restoreGeometry(settings()->value("mainWindow/geometry").toByteArray()))
+	{
 		this->showMaximized();
+	}
 	else
+	{
 		this->show();
+	}
 
 	if (settings()->value("gui/fullscreen").toBool())
 		this->setWindowState(this->windowState() | Qt::WindowFullScreen);
@@ -998,6 +1002,14 @@ void MainWindow::quitSlot()
 {
 	ssc::messageManager()->sendInfo("Shutting down CustusX");
 	viewManager()->deactivateCurrentLayout();
+
+	patientService()->getPatientData()->autoSave();
+
+	settings()->setValue("mainWindow/geometry", saveGeometry());
+	settings()->setValue("mainWindow/windowState", saveState());
+	settings()->sync();
+	ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
+
 	qApp->quit();
 }
 
@@ -1015,18 +1027,7 @@ void MainWindow::configureSlot()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-	patientService()->getPatientData()->autoSave();
-
-	settings()->setValue("mainWindow/geometry", saveGeometry());
-	settings()->setValue("mainWindow/windowState", saveState());
-	settings()->sync();
-	ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
-
-	if (ssc::toolManager()->isTracking())
-	{
-		ssc::messageManager()->sendInfo("Closing: Stopping tracking");
-		ssc::toolManager()->stopTracking();
-	}
 	QMainWindow::closeEvent(event);
+	this->quitSlot();
 }
 }//namespace cx
