@@ -206,14 +206,14 @@ void USAcqusitionWidget::reconstructFinishedSlot()
 		mRecordSessionWidget->stopPostProcessing();
 }
 
-void USAcqusitionWidget::startedSlot()
+void USAcqusitionWidget::startedSlot(QString sessionId)
 {
-	mAcquisition->startRecord();
 	mRecordSessionWidget->setDescription(settings()->value("Ultrasound/acquisitionName").toString());
+	mAcquisition->startRecord(sessionId);
 	mDisplayTimerWidget->start();
 }
 
-void USAcqusitionWidget::stoppedSlot()
+void USAcqusitionWidget::stoppedSlot(bool canceled)
 {
 //	if (mThreadedReconstructer)
 //	{
@@ -225,6 +225,6 @@ void USAcqusitionWidget::stoppedSlot()
 //	}
 
 	mDisplayTimerWidget->stop();
-	mAcquisition->stopRecord();
+	mAcquisition->stopRecord(canceled);
 }
 }//namespace cx

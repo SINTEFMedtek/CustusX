@@ -13,6 +13,7 @@
 #include "cxUsReconstructionFileMaker.h"
 #include "cxRecordSession.h"
 #include <cxAcquisitionData.h>
+#include "cxSavingVideoRecorder.h"
 
 namespace cx
 {
@@ -54,8 +55,8 @@ signals:
 
 public slots:
 	void checkIfReadySlot();
-	void startRecord();
-	void stopRecord();
+	void startRecord(QString sessionId);
+	void stopRecord(bool canceled);
 	void saveSession(QString sessionId, bool writeColor = false);///< \param writeColor If set to true, colors will be saved even if settings is set to 8 bit
 	void clearSlot();
 
@@ -69,12 +70,14 @@ private slots:
 private:
 	AcquisitionDataPtr mPluginData;
 	ssc::VideoSourcePtr mRTSource;
-	ssc::VideoRecorderPtr mRTRecorder;
+	SavingVideoRecorderPtr mVideoRecorder;
+//	ssc::VideoRecorderPtr mRTRecorder;
 	ssc::ToolPtr mTool;
 
 	//  QFuture<QString> mFileMakerFuture;
 	//  QFutureWatcher<QString> mFileMakerFutureWatcher;
 	//  UsReconstructionFileMakerPtr mFileMaker;
+	UsReconstructionFileMakerPtr mCurrentSessionFileMaker;
 
 	std::list<QFutureWatcher<QString>*> mSaveThreads;
 

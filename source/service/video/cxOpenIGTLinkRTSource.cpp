@@ -237,7 +237,7 @@ void OpenIGTLinkRTSource::stopClient()
 {
 	if (mClient)
 	{
-		mClient->stop();
+		mClient->quit();
 		mClient->wait(2000); // forever or until dead thread
 
 		if (mClient->isRunning())
@@ -540,8 +540,8 @@ void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
 	if (timer.intervalPassed())
 	{
 		static int counter=0;
-		if (++counter%10==0)
-			ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
+//		if (++counter%10==0)
+//			ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
 		timer.reset();
 	}
 
