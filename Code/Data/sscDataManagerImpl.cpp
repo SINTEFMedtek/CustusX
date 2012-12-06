@@ -171,6 +171,9 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 //	if (!ErrorObserver::checkedRead(reader, filename))
 //		return DataPtr();
 
+	if(!raw)
+		return DataPtr();
+
 	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
 	zeroer->SetInput(raw);
 	zeroer->SetOutputOrigin(0, 0, 0);
