@@ -59,6 +59,8 @@ ImageSenderGE::ImageSenderGE(QObject* parent) :
 {
 	//data_streaming::DataStreamApp test;
 
+	mImgStream = vtkSmartPointer<vtkImageData>();
+
 	mGrabTimer = new QTimer(this);
 	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	mSendTimer = new QTimer(this);
