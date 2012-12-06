@@ -70,6 +70,13 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
     return NULL;
 }
 
+QWidget* addDummyMargin(QWidget* widget)
+{
+	QHBoxLayout* topLayout = new QHBoxLayout;
+	topLayout->setContentsMargins(1,0,0,0);
+	widget->setLayout(topLayout);
+	return widget;
+}
 
 QHBoxLayout* mergeWidgetsIntoHBoxLayout(QWidget* first, QWidget* second)
 {

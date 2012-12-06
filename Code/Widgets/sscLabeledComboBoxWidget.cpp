@@ -42,7 +42,7 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, ssc::StringDataAda
 
 	if (gridLayout) // add to input gridlayout
 	{
-        gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, this), row, 0);
+        gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, addDummyMargin(this)), row, 0);
 		gridLayout->addWidget(mCombo, row, 1);
 	}
 	else // add directly to this
