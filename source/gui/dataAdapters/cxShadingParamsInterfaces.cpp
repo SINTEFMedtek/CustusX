@@ -14,8 +14,10 @@ namespace cx
 {
 DoubleDataAdapterShadingBase::DoubleDataAdapterShadingBase()
 {
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChanged()));
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SIGNAL(changed()));
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChanged()));
+  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
+
 }
 void DoubleDataAdapterShadingBase::activeImageChanged()
 {  

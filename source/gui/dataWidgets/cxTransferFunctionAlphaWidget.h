@@ -6,6 +6,7 @@
 #include <limits.h>
 #include <sscImage.h>
 #include "sscForwardDeclarations.h"
+#include "cxActiveImageProxy.h"
 
 class QRect;
 
@@ -89,6 +90,7 @@ protected:
   bool mReadOnly;///< Is class readOnly? Eg no mouse interaction possible
 
   virtual QSize sizeHint () const { return QSize(200, 100);};///< Define a recommended size
+  ActiveImageProxyPtr mActiveImageProxy;
 };
 }
 #endif /* CXTRANSFERFUNCTIONALPHAWIDGET_H_ */

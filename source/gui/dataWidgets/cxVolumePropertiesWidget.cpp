@@ -82,7 +82,11 @@ VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
 
   toptopLayout->addStretch();
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(updateSlot()));
+  mActiveImageProxy = ActiveImageProxy::New();
+  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(updateSlot()));
+  //TODO: Check if the following are needed
+//  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateSlot()));
+//  connect(mActiveImageProxy.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(updateSlot()));
   updateSlot();
 }
 
