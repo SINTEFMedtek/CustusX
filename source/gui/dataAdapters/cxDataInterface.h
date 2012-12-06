@@ -18,6 +18,7 @@
 //#include "cxRegistrationManager.h"
 #include "cxForwardDeclarations.h"
 //#include "cxRecordSession.h"
+#include "cxActiveImageProxy.h"
 
 namespace cx
 {
@@ -65,6 +66,7 @@ protected:
   virtual void setValueInternal(double val) = 0;
 
   ssc::ImagePtr mImage;
+  ActiveImageProxyPtr mActiveImageProxy;
 };
 
 /**DataInterface implementation for the LUT 2D window value
