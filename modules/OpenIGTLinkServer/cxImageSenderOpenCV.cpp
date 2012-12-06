@@ -358,7 +358,7 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	if (scalarType == -1)
 	{
 		std::cerr << "unknown image type" << std::endl;
-		exit(0);
+		return IGTLinkImageMessage::Pointer();
 	}
 	//------------------------------------------------------------
 	// Create a new IMAGE type message
