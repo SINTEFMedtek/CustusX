@@ -45,7 +45,7 @@ void UsReconstructionFileMaker::setData(ssc::TimedTransformMap trackerRecordedDa
 {
 	mVideoRecorder = videoRecorder;
 	mReconstructData = this->getReconstructData(trackerRecordedData,
-			videoRecorder->getRecording(),
+//			videoRecorder->getRecording(),
 //			sessionDescription,
 //			activepatientPath,
 			tool,
@@ -53,17 +53,19 @@ void UsReconstructionFileMaker::setData(ssc::TimedTransformMap trackerRecordedDa
 			writeColor);
 }
 
+
 ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
 {
 	return mReconstructData;
 }
+
 
 /**Create and return the structure that would have been read by UsReconstructFileReader,
  * if written from this object.
  *
  */
 ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::TimedTransformMap trackerRecordedData,
-		SavingVideoRecorder::DataType streamRecordedData,
+//		SavingVideoRecorder::DataType streamRecordedData,
 //		QString sessionDescription,
 //		QString activepatientPath,
 		ssc::ToolPtr tool,
@@ -72,8 +74,8 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::T
 {
 	  if(trackerRecordedData.empty())
 	    ssc::messageManager()->sendWarning("No tracking data for writing to reconstruction file.");
-	  if(streamRecordedData.empty())
-	    ssc::messageManager()->sendWarning("No real time streaming data for writing to reconstruction file. (Computer clocks not synced?)");
+//	  if(streamRecordedData.empty())
+//	    ssc::messageManager()->sendWarning("No real time streaming data for writing to reconstruction file. (Computer clocks not synced?)");
 	  if(mFolderName.isEmpty())
 	    ssc::messageManager()->sendWarning("Active patient folder given to reconstruction file maker is empty.");
 
@@ -81,25 +83,28 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::T
 
 //	QString reconstructionFolder = this->findFolderName(activepatientPath, sessionDescription);
 	retval.mFilename = this->getMhdFilename(mFolderName);
+	retval.mUsRaw = ssc::USFrameData::create(retval.mFilename, mVideoRecorder->getImageData());
 
-	// create image data
-//	std::vector<vtkImageDataPtr> frames = this->getFrames(streamRecordedData, writeColor);
-	if (streamRecordedData.size() >= 1)
-	{
-		std::vector<vtkImageDataPtr> frames;
-		for(ssc::VideoRecorder::DataType::iterator it = streamRecordedData.begin(); it != streamRecordedData.end(); ++it)
-			frames.push_back(it->second);
-//		std::vector<ssc::ImagePtr> images;
-//		for (unsigned i=0; i<frames.size(); ++i)
-//			images.push_back(ssc::ImagePtr(new ssc::Image(retval.mFilename+"_"+qstring_cast(i), frames[i])));
-//		vtkImageDataPtr imageData = this->mergeFrames(frames);
-//		ssc::ImagePtr image(new ssc::Image(retval.mFilename, imageData));
-//		image->setFilePath(reconstructionFolder);
-//		retval.mUsRaw.reset(new ssc::USFrameDataMonolithic(image));
-
-//		retval.mUsRaw = ssc::USFrameData::create(frames, retval.mFilename);
-		retval.mUsRaw = ssc::USFrameData::create(retval.mFilename);
-	}
+//	// create image data
+////	std::vector<vtkImageDataPtr> frames = this->getFrames(streamRecordedData, writeColor);
+//	if (streamRecordedData.size() >= 1)
+//	{
+////		std::vector<vtkImageDataPtr> frames;
+////		for(ssc::VideoRecorder::DataType::iterator it = streamRecordedData.begin(); it != streamRecordedData.end(); ++it)
+////			frames.push_back(it->second);
+////		std::vector<ssc::ImagePtr> images;
+////		for (unsigned i=0; i<frames.size(); ++i)
+////			images.push_back(ssc::ImagePtr(new ssc::Image(retval.mFilename+"_"+qstring_cast(i), frames[i])));
+////		vtkImageDataPtr imageData = this->mergeFrames(frames);
+////		ssc::ImagePtr image(new ssc::Image(retval.mFilename, imageData));
+////		image->setFilePath(reconstructionFolder);
+////		retval.mUsRaw.reset(new ssc::USFrameDataMonolithic(image));
+//
+////		retval.mUsRaw = ssc::USFrameData::create(frames, retval.mFilename);
+////		std::vector<CachedImageDataPtr> frames = mVideoRecorder->getImageData();
+////		retval.mUsRaw = ssc::USFrameData::create(mVideoRecorder->getImageData());
+////		retval.mUsRaw = ssc::USFrameData::create(retval.mFilename, mVideoRecorder->getRecording().size(), mVideoRecorder->getRecording());
+//	}
 
 	for (ssc::TimedTransformMap::iterator it = trackerRecordedData.begin(); it != trackerRecordedData.end(); ++it)
 	{
@@ -109,13 +114,22 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::T
 		retval.mPositions.push_back(current);
 	}
 
-	for (ssc::VideoRecorder::DataType::iterator it = streamRecordedData.begin(); it != streamRecordedData.end(); ++it)
+	std::vector<double> fts = mVideoRecorder->getTimestamps();
+	for (unsigned i=0; i<fts.size(); ++i)
 	{
 		ssc::TimedPosition current;
-		current.mTime = it->first;
+		current.mTime = fts[i];
 		// current.mPos = not written - will be found from track positions during reconstruction.
 		retval.mFrames.push_back(current);
 	}
+
+//	for (ssc::VideoRecorder::DataType::iterator it = streamRecordedData.begin(); it != streamRecordedData.end(); ++it)
+//	{
+//		ssc::TimedPosition current;
+//		current.mTime = it->first;
+//		// current.mPos = not written - will be found from track positions during reconstruction.
+//		retval.mFrames.push_back(current);
+//	}
 
 	if (tool && tool->getProbe())
 	{
