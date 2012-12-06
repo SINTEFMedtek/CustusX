@@ -36,12 +36,12 @@ GrabberDirectLinkThread::GrabberDirectLinkThread(StringMap args, QObject* parent
 //  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
 }
 
-void GrabberDirectLinkThread::stopSlot()
-{
-	if(mImageSender)//stopSlot is called even if startStreaming fails
-		mImageSender->stopStreaming();
-	this->quit();
-}
+//void GrabberDirectLinkThread::stopSlot()
+//{
+//	if(mImageSender)//stopSlot is called even if startStreaming fails
+//		mImageSender->stopStreaming();
+//	this->quit();
+//}
 
 void GrabberDirectLinkThread::run()
 {

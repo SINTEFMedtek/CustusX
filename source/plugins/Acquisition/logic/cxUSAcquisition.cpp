@@ -17,6 +17,7 @@
 #include "cxPatientService.h"
 #include "cxVideoService.h"
 #include "sscReconstructManager.h"
+#include "sscReconstructer.h"
 
 namespace cx
 {
@@ -51,7 +52,8 @@ void USAcquisition::checkIfReadySlot()
 
 	mWhatsMissing.clear();
 
-	if(tracking && streaming && mRTRecorder)
+//	if(tracking && streaming && mRTRecorder)
+	if(tracking && streaming)
 	{
 		mWhatsMissing = "<font color=green>Ready to record!</font><br>";
 		if (!mTool || !mTool->getVisible())
@@ -72,8 +74,8 @@ void USAcquisition::checkIfReadySlot()
 		{
 			mWhatsMissing.append("<font color=red>Need to get a stream.</font><br>");
 		}
-		if(!mRTRecorder)
-			mWhatsMissing.append("<font color=red>Need connect to a recorder.</font><br>");
+//		if(!mRTRecorder)
+//			mWhatsMissing.append("<font color=red>Need connect to a recorder.</font><br>");
 	}
 
 	int saving = mSaveThreads.size();
@@ -90,7 +92,7 @@ void USAcquisition::checkIfReadySlot()
 		mWhatsMissing.append("<br>");
 
 	// do not require tracking to be present in order to perform an acquisition.
-	emit ready(streaming && mRTRecorder, mWhatsMissing);
+	emit ready(streaming, mWhatsMissing);
 }
 
 void USAcquisition::setTool(ssc::ToolPtr tool) {
@@ -98,12 +100,10 @@ void USAcquisition::setTool(ssc::ToolPtr tool) {
 		return;
 
 	if (mTool)
-		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this,
-		           SLOT(checkIfReadySlot()));
+		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(checkIfReadySlot()));
 	mTool = tool;
 	if (mTool)
-		connect(mTool.get(), SIGNAL(toolVisible(bool)), this,
-		        SLOT(checkIfReadySlot()));
+		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(checkIfReadySlot()));
 	emit toolChanged();
 }
 
@@ -150,7 +150,7 @@ void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 	if(mRTSource)
 	{
 		connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-		mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
+//		mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
 	}
 
 	this->checkIfReadySlot();
@@ -172,7 +172,8 @@ void USAcquisition::saveSession(QString sessionId, bool writeColor)
 {
 	//get session data
 	RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
-	ssc::VideoRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
+//	ssc::VideoRecorder::DataType streamRecordedData = mVideoRecorder->getRecording();
+//	ssc::VideoRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
 
 	ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
 	if(trackerRecordedData.empty())
@@ -187,21 +188,27 @@ void USAcquisition::saveSession(QString sessionId, bool writeColor)
 	if (cxTool)
 		calibFileName = cxTool->getCalibrationFileName();
 
-	UsReconstructionFileMakerPtr fileMaker;
-	fileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(),
-	                                              patientService()->getPatientData()->getActivePatientFolder(), probe, calibFileName,
-	                                              writeColor));
-	mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
+//	UsReconstructionFileMakerPtr fileMaker;
+	mCurrentSessionFileMaker->setData(trackerRecordedData, mVideoRecorder,
+                                      probe, calibFileName,
+                                      writeColor);
+//	fileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(),
+//	                                              patientService()->getPatientData()->getActivePatientFolder(),
+//	                                              probe, calibFileName,
+//	                                              writeColor));
+//	mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
+	mVideoRecorder.reset();
 
-	ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData();
+	ssc::USReconstructInputData reconstructData = mCurrentSessionFileMaker->getReconstructData();
 	mPluginData->getReconstructer()->selectData(reconstructData);
 	emit acquisitionDataReady();
 
-	QFuture<QString> fileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, fileMaker));
+	QFuture<QString> fileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mCurrentSessionFileMaker));
 	QFutureWatcher<QString>* fileMakerFutureWatcher = new QFutureWatcher<QString>();
 	fileMakerFutureWatcher->setFuture(fileMakerFuture);
 	connect(fileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
 	mSaveThreads.push_back(fileMakerFutureWatcher);
+	mCurrentSessionFileMaker.reset(); // filemaker is now stored in the mSaveThreads queue, clear as current.
 
 	this->checkIfReadySlot();
 }
@@ -233,16 +240,44 @@ void USAcquisition::dominantToolChangedSlot()
 	this->probeChangedSlot();
 }
 
-void USAcquisition::startRecord()
+void USAcquisition::startRecord(QString sessionId)
 {
-	mRTRecorder->startRecord();
+	RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
+
+	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(
+	                                   session->getDescription(),
+	                                   patientService()->getPatientData()->getActivePatientFolder()));
+
+	bool writeColor = mPluginData->getReconstructer()->getParams()->mAngioAdapter->getValue()
+	        ||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
+
+	std::cout << "writeColor " << writeColor << std::endl;
+	mVideoRecorder.reset(new SavingVideoRecorder(
+	                         mRTSource,
+	                         mCurrentSessionFileMaker->getFolderName(),
+	                         mCurrentSessionFileMaker->getSessionName(),
+	                         settings()->value("Ultrasound/CompressAcquisition", true).toBool(),
+	                         writeColor));
+	mVideoRecorder->startRecord();
+
+//	mRTRecorder->startRecord();
 	ssc::messageManager()->sendSuccess("Ultrasound acquisition started.", true);
 }
 
-void USAcquisition::stopRecord()
+void USAcquisition::stopRecord(bool canceled)
 {
-	mRTRecorder->stopRecord();
-	ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
+//	mRTRecorder->stopRecord();
+	mVideoRecorder->stopRecord();
+	if (canceled)
+	{
+		mVideoRecorder->cancel();
+		mVideoRecorder.reset();
+		ssc::messageManager()->sendInfo("Ultrasound acquisition stopped.");
+	}
+	else
+	{
+		ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
+	}
 }
 
 

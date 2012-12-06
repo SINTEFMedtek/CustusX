@@ -20,11 +20,17 @@
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
+#include "sscForwardDeclarations.h"
+
+#include <vtkImageExtractComponents.h>
+#include <vtkImageAppendComponents.h>
 
 typedef vtkSmartPointer<vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<vtkImageMapToColors> vtkImageMapToColorsPtr;
 typedef vtkSmartPointer<vtkLookupTable> vtkLookupTablePtr;
 typedef vtkSmartPointer<vtkMetaImageReader> vtkMetaImageReaderPtr;
+typedef vtkSmartPointer<vtkImageAppendComponents> vtkImageAppendComponentsPtr;
+typedef vtkSmartPointer<vtkImageExtractComponents> vtkImageExtractComponentsPtr;
 
 
 
@@ -229,6 +235,8 @@ MHDImageSender::MHDImageSender(QObject* parent) :
 {
 }
 
+
+
 void MHDImageSender::initialize(StringMap arguments)
 {
     mCounter = 0;
@@ -238,6 +246,23 @@ void MHDImageSender::initialize(StringMap arguments)
 	QString filename = mArguments["filename"];
 	mImageData = loadImage(filename);
 	// mImageData = convertToTestColorImage(mImageData);
+
+	if (mImageData->GetNumberOfScalarComponents()==3)
+	{
+		vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
+		vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
+		splitterRGB->SetInput(mImageData);
+		splitterRGB->SetComponents(0, 1, 2);
+		merger->SetInput(0, splitterRGB->GetOutput());
+
+		vtkImageExtractComponentsPtr splitterA = vtkImageExtractComponentsPtr::New();
+		splitterA->SetInput(mImageData);
+		splitterA->SetComponents(0);
+		merger->SetInput(1, splitterA->GetOutput());
+
+		merger->Update();
+		mImageData = merger->GetOutput();
+	}
 
 	if (mImageData)
 	{
