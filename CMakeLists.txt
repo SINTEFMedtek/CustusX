@@ -13,7 +13,7 @@ add_definitions(-DCustusX3_VERSION_MAJOR=${CustusX3_VERSION_MAJOR}
 	-DCustusX3_VERSION_MINOR=${CustusX3_VERSION_MINOR}
 	-DCustusX3_VERSION_PATCH=${CustusX3_VERSION_PATCH})
 
-# Needed for TSF on Linux, but won't work because ITK (and other dependencies?) don't suppport C++11 (C++0x)
+# Needed for Tube-Segmentation-Framework on Linux, but won't work because ITK (and other dependencies?) don't suppport C++11 (C++0x)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 # Use:

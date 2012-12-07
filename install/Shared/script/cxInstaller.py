@@ -297,16 +297,18 @@ class CppComponent(Component):
             runShell('make clean')
 # ---------------------------------------------------------
 
-class CppUnit(CppComponent):
-    def name(self):
-        return "CppUnit"
-    def help(self):
-        return "http://sourceforge.net/projects/cppunit/"
-    def path(self):
-        return DATA.mExternalDir + "CppUnit"
-    def _rawCheckout(self):
-        self._changeDirToBase()
-        runShell('')
+#===============================================================================
+# class CppUnit(CppComponent):
+#    def name(self):
+#        return "CppUnit"
+#    def help(self):
+#        return "http://sourceforge.net/projects/cppunit/"
+#    def path(self):
+#        return DATA.mExternalDir + "CppUnit"
+#    def _rawCheckout(self):
+#        self._changeDirToBase()
+#        runShell('')
+#===============================================================================
 # ---------------------------------------------------------
 
 class ITK(CppComponent):
@@ -549,53 +551,55 @@ cmake \
             )
 # ---------------------------------------------------------
 
-class DCMTK(CppComponent):
-    '''
-    The only way to get 3.6.1 to work is to install it,
-    thats the reason for the special treatment in this class.
-    
-    This might change in the future.
-    '''
-    def name(self):
-        return "DCMTK"
-    #def buildFolder(self):
-        #'in-source build because this is necessary for including an uninstalled DCMTK'
-        #return self.sourceFolder()    
-    def help(self):
-        return 'dcmtk.org'
-    def path(self):
-        return DATA.mExternalDir + "/DCMTK"
-
-    def _rawCheckout(self):
-        self._changeDirToBase()
-        runShell('git clone git://git.dcmtk.org/dcmtk DCMTK')
-        # the commontk version of DCMTK compiles without problems on Mac.
-        #runShell('git clone git://github.com/commontk/DCMTK.git DCMTK')     
-        self.update()
-    def update(self):
-        self._changeDirToSource()
-        #runShell('git pull')
-        #runShell('git checkout master')   
-        runShell('git checkout PUBLIC_360')  # 3.6.0 seems to have some issues on fedora 16.  
-
-    def configure(self):
-        self._changeDirToBuild()
-        runShell('''\
-\cmake \
--G"%s" \
--DBUILD_SHARED_LIBS:BOOL=%s \
--DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
-../%s''' % (DATA.mCMakeGenerator,
-            DATA.mBuildShared, 
-            DATA.mOSX_DEPLOYMENT_TARGET,
-            self.sourceFolder()))
-    def build(self):
-        CppComponent.build(self)
-        runShell('sudo make install')
-    def installPath(self):
-        #return '/usr/local/include/dcmtk'
-        return '' # ignore: use yum instead
-    # ---------------------------------------------------------
+#===============================================================================
+# class DCMTK(CppComponent):
+#    '''
+#    The only way to get 3.6.1 to work is to install it,
+#    thats the reason for the special treatment in this class.
+#    
+#    This might change in the future.
+#    '''
+#    def name(self):
+#        return "DCMTK"
+#    #def buildFolder(self):
+#        #'in-source build because this is necessary for including an uninstalled DCMTK'
+#        #return self.sourceFolder()    
+#    def help(self):
+#        return 'dcmtk.org'
+#    def path(self):
+#        return DATA.mExternalDir + "/DCMTK"
+# 
+#    def _rawCheckout(self):
+#        self._changeDirToBase()
+#        runShell('git clone git://git.dcmtk.org/dcmtk DCMTK')
+#        # the commontk version of DCMTK compiles without problems on Mac.
+#        #runShell('git clone git://github.com/commontk/DCMTK.git DCMTK')     
+#        self.update()
+#    def update(self):
+#        self._changeDirToSource()
+#        #runShell('git pull')
+#        #runShell('git checkout master')   
+#        runShell('git checkout PUBLIC_360')  # 3.6.0 seems to have some issues on fedora 16.  
+# 
+#    def configure(self):
+#        self._changeDirToBuild()
+#        runShell('''\
+# \cmake \
+# -G"%s" \
+# -DBUILD_SHARED_LIBS:BOOL=%s \
+# -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
+# ../%s''' % (DATA.mCMakeGenerator,
+#            DATA.mBuildShared, 
+#            DATA.mOSX_DEPLOYMENT_TARGET,
+#            self.sourceFolder()))
+#    def build(self):
+#        CppComponent.build(self)
+#        runShell('sudo make install')
+#    def installPath(self):
+#        #return '/usr/local/include/dcmtk'
+#        return '' # ignore: use yum instead
+#===============================================================================
+# ---------------------------------------------------------
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
@@ -636,40 +640,42 @@ cmake \
         # add xcode project here if needed
     # ---------------------------------------------------------
 
-class SSC(CppComponent):
-    def name(self):
-        return "SSC"
-    def help(self):
-        return 'SintefSonowandCooperation'
-    def path(self):
-        return DATA.mWorkingDir + "/SSC"
-    def _rawCheckout(self):
-        self._changeDirToBase()
-#        runShell('svn co https://wush.net/svn/ssc %s' % self.sourceFolder())
-        runShell('git clone git@github.com:SINTEFMedisinskTeknologi/SSC.git')
-    def update(self):
-        self._changeDirToSource()
-        runShell('git pull')
-        runShell('git checkout')   
-#        runShell('svn up')
-    def configure(self):
-        self._changeDirToBuild()
-        runShell('''\
-cmake \
--G"%s" \
-%s \
--DCMAKE_BUILD_TYPE:STRING=%s \
--DBUILD_SHARED_LIBS:BOOL=%s \
--DVTK_DIR:PATH="%s" \
-../%s''' % (DATA.mCMakeGenerator, 
-            DATA.m32bitCompileCMakeOption, 
-            DATA.mBuildType, 
-            DATA.mBuildShared, 
-            VTK().buildPath(), 
-            self.sourceFolder())
-            )
-        # add xcode project here if needed
-    # ---------------------------------------------------------
+#===============================================================================
+# class SSC(CppComponent):
+#    def name(self):
+#        return "SSC"
+#    def help(self):
+#        return 'SintefSonowandCooperation'
+#    def path(self):
+#        return DATA.mWorkingDir + "/SSC"
+#    def _rawCheckout(self):
+#        self._changeDirToBase()
+# #        runShell('svn co https://wush.net/svn/ssc %s' % self.sourceFolder())
+#        runShell('git clone git@github.com:SINTEFMedisinskTeknologi/SSC.git')
+#    def update(self):
+#        self._changeDirToSource()
+#        runShell('git pull')
+#        runShell('git checkout')   
+# #        runShell('svn up')
+#    def configure(self):
+#        self._changeDirToBuild()
+#        runShell('''\
+# cmake \
+# -G"%s" \
+# %s \
+# -DCMAKE_BUILD_TYPE:STRING=%s \
+# -DBUILD_SHARED_LIBS:BOOL=%s \
+# -DVTK_DIR:PATH="%s" \
+# ../%s''' % (DATA.mCMakeGenerator, 
+#            DATA.m32bitCompileCMakeOption, 
+#            DATA.mBuildType, 
+#            DATA.mBuildShared, 
+#            VTK().buildPath(), 
+#            self.sourceFolder())
+#            )
+#        # add xcode project here if needed
+#===============================================================================
+# ---------------------------------------------------------
 
 class CustusX3(CppComponent):
     def name(self):
@@ -708,6 +714,7 @@ cmake \
 -DOpenCV_DIR:PATH="%s" \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
+-DTube-Segmentation-Framework_DIR:PATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
 -DBUILD_TESTING="%s" \
 -DCOTIRE_ADD_UNITY_BUILDS="%s" \
@@ -719,11 +726,12 @@ cmake \
             DATA.mBuildType, DATA.mBuildShared, 
             ITK().buildPath(), 
             VTK().buildPath(), 
-            IGSTK().buildPath(), 
+            IGSTK().buildPath(),     
             OpenIGTLink().buildPath(), 
             OpenCV().buildPath(),
             UltrasonixSDK().includePath(),
             UltrasonixSDK().libFile(),
+            TubeSegmentationFramework.buildPath(),
             DATA.mBuildSSCExamples,
             DATA.mBuildTesting,
             DATA.mUseCotire,
@@ -759,25 +767,60 @@ class UltrasonixSDK(CppComponent):
         pass
 # ---------------------------------------------------------
 
-class CustusX3Data(Component):
-    def name(self):
-        return "CustusX3-Data"
-    def help(self):
-        return 'data files for CustusX'
-    def path(self):
-        return DATA.mWorkingDir + "/CustusX3"
-    def sourceFolder(self):
-        return 'data'
-    def _rawCheckout(self):
-        changeDir(self.path())
-        runShell('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/data' % DATA.mServerUser)
-    def update(self):
-        changeDir(self.path()+'/'+self.sourceFolder())
-        runShell('svn up')
-    def configure(self):
-        pass
-    def build(self):
-        pass
+class TubeSegmentationFramework(CppComponent):
+   def name(self):
+       return "TSF"
+   def help(self):
+       return 'Tube-Segmentation-Framework'
+   def path(self):
+       return DATA.mWorkingDir + "/Tube-Segmenation-Framework"
+   def _rawCheckout(self):
+       changeDir(self.path())
+       runShell('git clone git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
+       self._changeDirToSource()
+       runShell('git submodule update --init --recursive')
+   def update(self):
+       self._changeDirToSource()
+       runShell('git checkout master')
+       runShell('git pull')
+   def configure(self):
+       self._changeDirToBuild()
+       runShell('''\
+cmake \
+-G"%s" \
+%s \
+-DCMAKE_BUILD_TYPE:STRING=%s \
+-DBUILD_SHARED_LIBS:BOOL=%s \
+../%s''' % (DATA.mCMakeGenerator, 
+           DATA.m32bitCompileCMakeOption, 
+           DATA.mBuildType, 
+           DATA.mBuildShared,  
+           self.sourceFolder())
+           )
+        
+# ---------------------------------------------------------
+
+#===============================================================================
+# class CustusX3Data(Component):
+#    def name(self):
+#        return "CustusX3-Data"
+#    def help(self):
+#        return 'data files for CustusX'
+#    def path(self):
+#        return DATA.mWorkingDir + "/CustusX3"
+#    def sourceFolder(self):
+#        return 'data'
+#    def _rawCheckout(self):
+#        changeDir(self.path())
+#        runShell('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/data' % DATA.mServerUser)
+#    def update(self):
+#        changeDir(self.path()+'/'+self.sourceFolder())
+#        runShell('svn up')
+#    def configure(self):
+#        pass
+#    def build(self):
+#        pass
+#===============================================================================
 # ---------------------------------------------------------
 
 
@@ -802,6 +845,7 @@ class Controller(object):
                      #SSC(),
                      ISB_DataStreaming(),
                      UltrasonixSDK(),
+                     TubeSegmentationFramework(),
                      CustusX3()
                      #CustusX3Data()
                      ]
