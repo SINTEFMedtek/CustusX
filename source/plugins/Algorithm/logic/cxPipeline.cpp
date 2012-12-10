@@ -281,11 +281,14 @@ void Pipeline::execute(QString uid)
 	// filter i require node i as input
 	int startIndex = endIndex;
 
+	// index now counts filters <0...N-1>
+	// nodes are <0...N>
+
 	for ( ; startIndex>=-1; --startIndex)
 	{
 		if (startIndex<0)
 			break;
-		if (mNodes[startIndex]->getData())
+		if (mNodes[startIndex+1]->getData()) // index output node for filter[startIndex]
 			break; // found node with data: stop here
 	}
 
