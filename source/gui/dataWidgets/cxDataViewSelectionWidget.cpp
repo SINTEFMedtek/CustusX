@@ -38,7 +38,27 @@ DataListWidget::DataListWidget(QWidget* parent) :
   this->setSelectionMode(QAbstractItemView::SingleSelection);
 
   connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChangedSlot()));
+
+//  this->setMinimumSize(QSize(20, 20));
+  this->setSizePolicy(QSizePolicy::Expanding, this->sizePolicy().verticalPolicy());
+
 }
+
+/**
+  * Only way to downsize the QListWidget, in conjunction with
+  * this->setSizePolicy(QSizePolicy::Expanding, this->sizePolicy().verticalPolicy())
+  *
+  * Setting minimumSize did not work, for unknown reason.
+  */
+QSize DataListWidget::sizeHint() const
+{
+	return QSize(80,20);
+}
+
+//QSize DataListWidget::minimumSizeHint () const
+//{
+//	return QSize(20,20);
+//}
 
 DataListWidget::~DataListWidget()
 {}

@@ -201,7 +201,9 @@ SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString sav
 SavingVideoRecorder::~SavingVideoRecorder()
 {
 //	std::cout << "**SavingVideoRecorder::~SavingVideoRecorder()" << std::endl;
-	mSaveThread->stop();
+
+	mSaveThread->cancel();
+	mSaveThread->wait(); // wait indefinitely for thread to finish
 }
 
 void SavingVideoRecorder::startRecord()
@@ -256,7 +258,6 @@ void SavingVideoRecorder::cancel()
 	mSaveThread->cancel();
 	mSaveThread->wait(); // wait indefinitely for thread to finish
 
-	//TODO: delete contents
 	this->deleteFolder(mSaveFolder);
 }
 

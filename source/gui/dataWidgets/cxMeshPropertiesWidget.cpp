@@ -9,6 +9,7 @@
 #include "sscLabeledComboBoxWidget.h"
 #include "sscLabeledLineEditWidget.h"
 #include "cxDataInterface.h"
+#include "cxDataSelectWidget.h"
 
 namespace cx
 {
@@ -30,7 +31,7 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 
-  toptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mSelectMeshWidget));
+  toptopLayout->addWidget(new DataSelectWidget(this, mSelectMeshWidget));
 
   toptopLayout->addWidget(mMeshPropertiesGroupBox);
   QGridLayout* gridLayout = new QGridLayout(mMeshPropertiesGroupBox);
@@ -49,21 +50,16 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   int position = 1;
   
   mUidAdapter = DataUidEditableStringDataAdapter::New();
-  ssc::LabeledLineEditWidget*  uidEdit = new ssc::LabeledLineEditWidget(this, mUidAdapter);
-  gridLayout->addWidget(uidEdit, position++, 0);
-
   mNameAdapter = DataNameEditableStringDataAdapter::New();
-  ssc::LabeledLineEditWidget*  nameEdit = new ssc::LabeledLineEditWidget(this, mNameAdapter);
-  gridLayout->addWidget(nameEdit, position++, 0);
-
   mParentFrameAdapter = ParentFrameStringDataAdapter::New();
-  ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
-  gridLayout->addWidget(combo, position++, 0);
 
-  gridLayout->addWidget(deleteButton, position++, 0);
+  gridLayout->addWidget(new ssc::LabeledLineEditWidget(this, mUidAdapter), position++, 0, 1, 2);
+  new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, position++);
+  new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, position++);
 
-  gridLayout->addWidget(chooseColor, position++, 0);
-  gridLayout->addWidget(importTransformButton, position++, 0);
+  gridLayout->addWidget(deleteButton, position++, 0, 1, 2);
+  gridLayout->addWidget(chooseColor, position++, 0, 1, 2);
+  gridLayout->addWidget(importTransformButton, position++, 0, 1, 2);
 
   toptopLayout->addStretch();
 
