@@ -64,7 +64,7 @@ VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
   mImageTypeAdapter = ImageTypeStringDataAdapter::New();
 
   int i=0;
-  gridLayout->addWidget(new ssc::LabeledLineEditWidget(this, mUidAdapter), i++, 0);
+  gridLayout->addWidget(new ssc::LabeledLineEditWidget(this, mUidAdapter), i++, 0, 1, 2);
   new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, i++);
   new ssc::LabeledComboBoxWidget(this, mModalityAdapter, gridLayout, i++);
   new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter, gridLayout, i++);
@@ -76,7 +76,7 @@ VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
 //  gridLayout->addWidget(modalityCombo,  i++, 0);
 //  gridLayout->addWidget(imageTypeCombo, i++, 0);
 //  gridLayout->addWidget(parentFrame,    i++, 0);
-//  gridLayout->addWidget(deleteButton,   i++, 0);
+  gridLayout->addWidget(deleteButton, i++, 0, 1, 2);
 
   toptopLayout->addStretch();
 

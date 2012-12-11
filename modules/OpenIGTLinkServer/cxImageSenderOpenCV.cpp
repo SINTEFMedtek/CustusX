@@ -199,6 +199,8 @@ bool ImageSenderOpenCV::startStreaming(GrabberSenderPtr sender)
 	mSender = sender;
 	mGrabTimer->start(0);
 	mSendTimer->start(40);
+	mCounter.start();
+
 	return true;
 }
 
@@ -253,6 +255,7 @@ void ImageSenderOpenCV::grab()
 //	QTime start = QTime::currentTime();
 	// grab images from camera to opencv internal buffer, do not process
 	mVideoCapture->grab();
+	int val = mCounter.elapsed();
 	mLastGrabTime = QDateTime::currentDateTime();
 	mAvailableImage = true;
 //	static int counter=0;
