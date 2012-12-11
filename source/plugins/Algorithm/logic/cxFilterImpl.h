@@ -21,6 +21,7 @@
 #include "sscDataAdapter.h"
 #include "cxDataInterface.h"
 #include "cxFilter.h"
+#include "sscDoubleDataAdapterXml.h"
 #include <QDomElement>
 
 namespace cx
@@ -57,6 +58,10 @@ protected:
 	/** Helper: Return the index'th input type as an image.
 	  * Return zero if not available (as image). */
 	ssc::ImagePtr getCopiedInputImage(int index = 0);
+	/** Helper:
+      * Call if you have an image threshold dataAdapter that need update from an image change.
+	  */
+	void updateThresholdFromImageChange(QString uid, ssc::DoubleDataAdapterXmlPtr threshold);
 
 	virtual void createOptions(QDomElement root) = 0;
 	virtual void createInputTypes() = 0;
