@@ -15,6 +15,7 @@
 #include "cxFilterImpl.h"
 
 #include "sscImage.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
@@ -90,6 +91,24 @@ ssc::ImagePtr FilterImpl::getCopiedInputImage(int index)
 	if (mCopiedInput.size() < index+1)
 		return ssc::ImagePtr();
 	return boost::shared_dynamic_cast<ssc::Image>(mCopiedInput[index]);
+}
+
+void FilterImpl::updateThresholdFromImageChange(QString uid, ssc::DoubleDataAdapterXmlPtr threshold)
+{
+	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
+	if(!image)
+		return;
+	threshold->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
+	int oldValue = threshold->getValue();
+	// avoid reset if old value is still within range,
+	// but reset anyway if old val is 0..1, this can indicate old image was binary.
+	if ((image->getMin() > oldValue )||( oldValue > image->getMax() )||( oldValue<=1 ))
+	{
+		int initValue = ceil(double(image->getMin()) + double(image->getRange())/10); // round up
+		threshold->setValue(initValue);
+	}
+	std::cout << "FilterImpl::imageChangedSlot " << image->getMin() << " "  << image->getMax() << std::endl;
+	std::cout << "            imageChangedSlot() " << threshold->getValue() << std::endl;
 }
 
 
