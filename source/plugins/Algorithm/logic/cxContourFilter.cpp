@@ -159,15 +159,17 @@ void ContourFilter::imageChangedSlot(QString uid)
 	if(!image)
 		return;
 
-	mSurfaceThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
-	mSurfaceThresholdOption->setValue(image->getRange() / 2 + image->getMin());
-	int oldValue = mSurfaceThresholdOption->getValue();
-	// avoid reset if old value is still within range
-	if ((image->getMin() > oldValue )||( oldValue > image->getMax()))
-	{
-		int initValue = + image->getMin() + image->getRange()/2 ;
-		mSurfaceThresholdOption->setValue(initValue);
-	}
+	this->updateThresholdFromImageChange(uid, mSurfaceThresholdOption);
+
+//	mSurfaceThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
+//	mSurfaceThresholdOption->setValue(image->getRange() / 2 + image->getMin());
+//	int oldValue = mSurfaceThresholdOption->getValue();
+//	// avoid reset if old value is still within range
+//	if ((image->getMin() > oldValue )||( oldValue > image->getMax()))
+//	{
+//		int initValue = + image->getMin() + image->getRange()/2 ;
+//		mSurfaceThresholdOption->setValue(initValue);
+//	}
 	RepManager::getInstance()->getThresholdPreview()->removePreview();
 
 	int extent[6];
