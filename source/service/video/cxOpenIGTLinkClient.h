@@ -35,19 +35,6 @@ namespace cx
  * @{
  */
 
-class AbsDoubleLess
-{
-public:
-	AbsDoubleLess(double center) : mCenter(center) { };
-
-  bool operator()(const double& d1, const double& d2)
-  {
-    return fabs(d1 - mCenter) < fabs(d2 - mCenter);
-  }
-
-  double mCenter;
-};
-
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
 
 /**\brief Client thread for OpenIGTLink messaging.
@@ -77,7 +64,6 @@ private slots:
 private:
 	bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
-	void calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg);
 	bool readOneMessage();
 
 	bool mHeadingReceived;
@@ -85,12 +71,6 @@ private:
 	int mPort;
 	QTcpSocket* mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;
-
-	bool calibrateMsgTimeStamp;///< Should the time stamps of image messages be calibrated based on the computer clock
-	double mLastReferenceTimestampDiff;
-	bool mGeneratingTimeCalibration;
-	QDateTime mLastSyncTime;
-	std::vector<double> mLastTimeStamps;
 };
 
 /**
