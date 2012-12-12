@@ -195,25 +195,24 @@ void BinaryThresholdImageFilter::setActive(bool on)
 
 void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
 {
-	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
-	if(!image)
-		return;
-	mLowerThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
-	std::cout << "BinaryThresholdImageFilter::imageChangedSlot " << image->getMin() << " "  << image->getMax() << std::endl;
-	int oldValue = mLowerThresholdOption->getValue();
-	// avoid reset if old value is still within range
-	if ((image->getMin() > oldValue )||( oldValue > image->getMax()))
-	{
-		int initValue = + image->getMin() + image->getRange()/10;
-		mLowerThresholdOption->setValue(initValue);
-	}
-	std::cout << "                            imageChangedSlot() " << mLowerThresholdOption->getValue() << std::endl;
+	this->updateThresholdFromImageChange(uid, mLowerThresholdOption);
+//	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
+//	if(!image)
+//		return;
+//	mLowerThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
+//	int oldValue = mLowerThresholdOption->getValue();
+//	// avoid reset if old value is still within range,
+//	// but reset anyway if old val is 0..1, this can indicate old image was binary.
+//	if ((image->getMin() > oldValue )||( oldValue > image->getMax() )||( oldValue<=1 ))
+//	{
+//		int initValue = ceil(double(image->getMin()) + double(image->getRange())/10); // round up
+//		mLowerThresholdOption->setValue(initValue);
+//	}
+//	std::cout << "BinaryThresholdImageFilter::imageChangedSlot " << image->getMin() << " "  << image->getMax() << std::endl;
+//	std::cout << "                            imageChangedSlot() " << mLowerThresholdOption->getValue() << std::endl;
 	RepManager::getInstance()->getThresholdPreview()->removePreview();
-
-	//  QString imageName = image->getName();
-	//  if(imageName.contains("us", Qt::CaseInsensitive)) //assume the image is ultrasound
-	//    this->toogleSmoothingSlot(true);
 }
+
 
 void BinaryThresholdImageFilter::thresholdSlot()
 {

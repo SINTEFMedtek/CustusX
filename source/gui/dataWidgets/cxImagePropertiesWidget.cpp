@@ -16,6 +16,7 @@
 #include "cxTransferFunctionAlphaWidget.h"
 #include "cxTransferFunctionColorWidget.h"
 #include "cxViewWrapper2D.h"
+#include "cxDataSelectWidget.h"
 
 namespace cx
 {
@@ -149,7 +150,8 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 {
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 
-  toptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveImageStringDataAdapter::New()));
+////  toptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveImageStringDataAdapter::New()));
+  toptopLayout->addWidget(new DataSelectWidget(this, ActiveImageStringDataAdapter::New()));
 
   // widget with opacity and volume ordering
   QWidget* overlayWidget = new QWidget(this);

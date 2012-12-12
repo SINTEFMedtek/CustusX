@@ -180,6 +180,7 @@ public: // optional methods
 };
 typedef boost::shared_ptr<class SelectCoordinateSystemStringDataAdapterBase> SelectCoordinateSystemStringDataAdapterBasePtr;
 
+typedef boost::shared_ptr<class ActiveImageStringDataAdapter> ActiveImageStringDataAdapterPtr;
 /** Adapter that connects to the current active image.
  * Example: Active image: [DataName]
  * where active image is the value
@@ -189,7 +190,7 @@ class ActiveImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
-  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveImageStringDataAdapter()); }
+  static ActiveImageStringDataAdapterPtr New() { return ActiveImageStringDataAdapterPtr(new ActiveImageStringDataAdapter()); }
   ActiveImageStringDataAdapter();
   virtual ~ActiveImageStringDataAdapter() {}
 
