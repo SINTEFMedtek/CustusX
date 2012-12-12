@@ -399,12 +399,15 @@ void WirePhantomWidget::generate_sMt()
 
         sQt = usMs.inv() * nomMus * usMs * sMt;
 
-        ssc::messageManager()->sendInfo(QString(""
-                "Calculated new calibration matrix\n"
-                "from last accuracy test\n"
-                "and raw data %1:\n"
-                "%2").arg(probePos.first).arg(qstring_cast(sQt)));
-    }
+		ssc::messageManager()->sendInfo(QString(""
+												"Calculated new calibration matrix\n"
+												"from last accuracy test\n"
+												"and raw data %1.\n"
+												"Old calibration matrix sMt:\n"
+												"%2\n"
+												"New calibration matrix sQt:\n"
+												"%3\n").arg(probePos.first).arg(qstring_cast(sMt)).arg(qstring_cast(sQt)));
+	}
 
 }
 
