@@ -31,6 +31,8 @@ class DataListWidget : public QListWidget
 public:
   DataListWidget(QWidget* parent = NULL);
   virtual ~DataListWidget();
+//	virtual QSize minimumSizeHint () const;
+  virtual QSize sizeHint() const;
 
 signals:
 //  void dataSelected(QString uid);

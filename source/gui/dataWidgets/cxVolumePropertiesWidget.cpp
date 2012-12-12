@@ -12,6 +12,7 @@
 #include "cxShadingWidget.h"
 #include "cxDataInterface.h"
 #include "sscDataManager.h"
+#include "cxDataSelectWidget.h"
 
 namespace cx
 {
@@ -25,9 +26,9 @@ ActiveVolumeWidget::ActiveVolumeWidget(QWidget* parent) :
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
-
-  ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, ActiveImageStringDataAdapter::New());
-  layout->addWidget(combo);
+//  ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, ActiveImageStringDataAdapter::New());
+  layout->addWidget(new DataSelectWidget(this, ActiveImageStringDataAdapter::New()));
+//  layout->addWidget(combo);
 }
 
 QString ActiveVolumeWidget::defaultWhatsThis() const
@@ -56,29 +57,26 @@ VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
   deleteButton->setToolTip("Remove the selected Image from the system.");
   connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteDataSlot()));
 
-
   mParentFrameAdapter = ParentFrameStringDataAdapter::New();
-  ssc::LabeledComboBoxWidget*  parentFrame = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
-
   mNameAdapter = DataNameEditableStringDataAdapter::New();
-  ssc::LabeledLineEditWidget*  nameEdit = new ssc::LabeledLineEditWidget(this, mNameAdapter);
-
   mUidAdapter = DataUidEditableStringDataAdapter::New();
-  ssc::LabeledLineEditWidget*  uidEdit = new ssc::LabeledLineEditWidget(this, mUidAdapter);
-
   mModalityAdapter = DataModalityStringDataAdapter::New();
-  ssc::LabeledComboBoxWidget* modalityCombo = new ssc::LabeledComboBoxWidget(this, mModalityAdapter);
-
   mImageTypeAdapter = ImageTypeStringDataAdapter::New();
-  ssc::LabeledComboBoxWidget* imageTypeCombo = new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter);
 
   int i=0;
-  gridLayout->addWidget(uidEdit,        i++, 0);
-  gridLayout->addWidget(nameEdit,       i++, 0);
-  gridLayout->addWidget(modalityCombo,  i++, 0);
-  gridLayout->addWidget(imageTypeCombo, i++, 0);
-  gridLayout->addWidget(parentFrame,    i++, 0);
-  gridLayout->addWidget(deleteButton,   i++, 0);
+  gridLayout->addWidget(new ssc::LabeledLineEditWidget(this, mUidAdapter), i++, 0, 1, 2);
+  new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, i++);
+  new ssc::LabeledComboBoxWidget(this, mModalityAdapter, gridLayout, i++);
+  new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter, gridLayout, i++);
+  new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, i++);
+
+//  int i=0;
+//  gridLayout->addWidget(uidEdit,        i++, 0);
+//  gridLayout->addWidget(nameEdit,       i++, 0);
+//  gridLayout->addWidget(modalityCombo,  i++, 0);
+//  gridLayout->addWidget(imageTypeCombo, i++, 0);
+//  gridLayout->addWidget(parentFrame,    i++, 0);
+  gridLayout->addWidget(deleteButton, i++, 0, 1, 2);
 
   toptopLayout->addStretch();
 

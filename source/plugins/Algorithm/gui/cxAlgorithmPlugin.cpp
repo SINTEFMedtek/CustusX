@@ -45,19 +45,21 @@ std::vector<PluginBase::PluginWidget> AlgorithmPlugin::createWidgets() const
 	                     new AllFiltersWidget(NULL),
 	                     "Algorithms"));
 
-	PipelinePtr pipeline(new Pipeline());
+// test code for pipeline:
 
-	ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("dummypipeline");
-	FilterGroupPtr filters(new FilterGroup(options));
-	filters->append(FilterPtr(new DummyFilter()));
-	filters->append(FilterPtr(new BinaryThresholdImageFilter()));
-	filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
+//	PipelinePtr pipeline(new Pipeline());
 
-	pipeline->initialize(filters);
+//	ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("dummypipeline");
+//	FilterGroupPtr filters(new FilterGroup(options));
+//	filters->append(FilterPtr(new DummyFilter()));
+//	filters->append(FilterPtr(new BinaryThresholdImageFilter()));
+//	filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
 
-	retval.push_back(PluginBase::PluginWidget(
-	                     new PipelineWidget(NULL, pipeline),
-	                     "Algorithms"));
+//	pipeline->initialize(filters);
+
+//	retval.push_back(PluginBase::PluginWidget(
+//	                     new PipelineWidget(NULL, pipeline),
+//	                     "Algorithms"));
 
 	return retval;
 
