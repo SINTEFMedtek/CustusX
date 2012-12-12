@@ -37,6 +37,20 @@ namespace cx
  * @{
  */
 
+
+class AbsDoubleLess
+{
+public:
+	AbsDoubleLess(double center) : mCenter(center) { };
+
+  bool operator()(const double& d1, const double& d2)
+  {
+    return fabs(d1 - mCenter) < fabs(d2 - mCenter);
+  }
+
+  double mCenter;
+};
+
 typedef boost::shared_ptr<class IGTLinkClientBase> IGTLinkClientBasePtr;
 
 /**\brief Base class Client thread for OpenIGTLink messaging.
@@ -50,7 +64,7 @@ class IGTLinkClientBase: public QThread
 {
 Q_OBJECT
 public:
-	IGTLinkClientBase(QObject* parent = NULL) : QThread(parent) {  }
+	IGTLinkClientBase(QObject* parent = NULL);
 	virtual ~IGTLinkClientBase() {}
 	virtual IGTLinkImageMessage::Pointer getLastImageMessage(); // threadsafe
 	virtual IGTLinkUSStatusMessage::Pointer getLastSonixStatusMessage(); // threadsafe
@@ -71,12 +85,19 @@ protected:
 	cx::CyclicActionTimer mFPSTimer;
 	void addImageToQueue(IGTLinkImageMessage::Pointer imgMsg);
 	void addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg);
+	void calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg);
 
 private:
 	QMutex mImageMutex;
 	QMutex mSonixStatusMutex;
 	std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue;
 	std::list<IGTLinkUSStatusMessage::Pointer> mMutexedSonixStatusMessageQueue;
+
+	bool calibrateMsgTimeStamp;///< Should the time stamps of image messages be calibrated based on the computer clock
+	double mLastReferenceTimestampDiff;
+	bool mGeneratingTimeCalibration;
+	QDateTime mLastSyncTime;
+	std::vector<double> mLastTimeStamps;
 };
 
 /**
