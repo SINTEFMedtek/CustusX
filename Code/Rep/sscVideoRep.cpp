@@ -302,8 +302,8 @@ void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 		mImage = dataManager()->getImage("4D US");
 		if(!mImage)
 		{
-			mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
-			ssc::dataManager()->loadData(boost::shared_dynamic_cast<ssc::Data>(mImage));//Uncomment to test unstable 4D US
+//			mImage = dataManager()->createImage(mDataRedirecter->GetOutput(), "4D US", mData->getName());
+//			ssc::dataManager()->loadData(boost::shared_dynamic_cast<ssc::Data>(mImage));//Uncomment to test unstable 4D US
 		}
 	}
 
@@ -368,7 +368,10 @@ void VideoGraphics::newDataSlot()
 		return;
 	}
 
-	mImage->setVtkImageData(mData->getVtkImageData());//Update pointer to 4D image
+	if (mImage)
+	{
+		mImage->setVtkImageData(mData->getVtkImageData());//Update pointer to 4D image
+	}
 
 	//Check if 3D volume. If so, only use middle frame
 	int* extent = mData->getVtkImageData()->GetExtent();
