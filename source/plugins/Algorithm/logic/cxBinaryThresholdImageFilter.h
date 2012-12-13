@@ -5,7 +5,8 @@
 #include "cxFilterImpl.h"
 #include "sscStringDataAdapter.h"
 #include "sscDoubleDataAdapter.h"
-#include "sscBoolDataAdapter.h"
+#include "sscColorDataAdapterXml.h"
+#include "sscBoolDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 
 namespace cx
@@ -74,6 +75,8 @@ public:
 
 	// extensions:
 	ssc::DoubleDataAdapterXmlPtr getLowerThresholdOption(QDomElement root);
+	ssc::ColorDataAdapterXmlPtr getColorOption(QDomElement root);
+	ssc::BoolDataAdapterXmlPtr getGenerateSurfaceOption(QDomElement root);
 
 protected:
 	virtual void createOptions(QDomElement root);
@@ -89,8 +92,69 @@ private slots:
 private:
 	ssc::DoubleDataAdapterXmlPtr mLowerThresholdOption;
 	vtkImageDataPtr mRawResult;
+	vtkPolyDataPtr mRawContour;
 };
 typedef boost::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;
+
+
+///** Filter decorating another filter by adding a contouring step.
+// *
+// * The input filter is passed unchanged, but in addition the output
+// * is contoured and added as a secondary output.
+// *
+// *
+// * \ingroup cxPluginAlgorithm
+// * \date Nov 21, 2012
+// * \author christiana
+// */
+//class ContouringDecoratingFilter : public FilterImpl
+//{
+//	Q_OBJECT
+
+//public:
+//	explicit ContouringDecoratingFilter(FilterPtr base);
+//	virtual ~ContouringDecoratingFilter() {}
+
+//	virtual QString getType() const;
+//	virtual QString getName() const;
+//	virtual QString getHelp() const;
+
+//	virtual std::vector<DataAdapterPtr> getOptions(QDomElement root);
+//	virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes();
+//	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes();
+//	virtual void setActive(bool on);
+//	virtual bool preProcess();
+//	virtual bool execute();
+//	virtual void postProcess();
+
+//	// extensions:
+//	ssc::BoolDataAdapterXmlPtr getGenerateSurfaceOption(QDomElement root);
+
+//protected:
+//	virtual void createOptions(QDomElement root);
+//	virtual void createInputTypes();
+//	virtual void createOutputTypes();
+
+//private slots:
+
+//private:
+////	std::vector<SelectDataStringDataAdapterBasePtr> mInputTypes;
+////	std::vector<SelectDataStringDataAdapterBasePtr> mOutputTypes;
+////	std::vector<DataAdapterPtr> mOptionsAdapters;
+////	QDomElement mOptions;
+
+////	// data used by execute - copied for thread safety purposes
+////	std::vector<ssc::DataPtr> mCopiedInput;
+////	QDomElement mCopiedOptions;
+////	bool mActive;
+////	QString mUid;
+
+
+////	ssc::BoolDataAdapterXmlPtr mGenerateSurfaceOption;
+//	FilterPtr mBase;
+//};
+//typedef boost::shared_ptr<class ContouringDecoratingFilter> ContouringDecoratingFilterPtr;
+
 
 /**
  * @}

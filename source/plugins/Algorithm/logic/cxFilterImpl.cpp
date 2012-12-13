@@ -74,7 +74,7 @@ void FilterImpl::setActive(bool on)
 
 bool FilterImpl::preProcess()
 {
-	std::cout << "FilterImpl::preProcess " << mInputTypes.size() << std::endl;
+//	std::cout << "FilterImpl::preProcess " << mInputTypes.size() << std::endl;
 
 	mCopiedInput.clear();
 	for (unsigned i=0; i<mInputTypes.size(); ++i)
@@ -107,8 +107,8 @@ void FilterImpl::updateThresholdFromImageChange(QString uid, ssc::DoubleDataAdap
 		int initValue = ceil(double(image->getMin()) + double(image->getRange())/10); // round up
 		threshold->setValue(initValue);
 	}
-	std::cout << "FilterImpl::imageChangedSlot " << image->getMin() << " "  << image->getMax() << std::endl;
-	std::cout << "            imageChangedSlot() " << threshold->getValue() << std::endl;
+//	std::cout << "FilterImpl::imageChangedSlot " << image->getMin() << " "  << image->getMax() << std::endl;
+//	std::cout << "            imageChangedSlot() " << threshold->getValue() << std::endl;
 }
 
 

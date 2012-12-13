@@ -266,20 +266,30 @@ TimedAlgorithmPtr Pipeline::getPipelineTimedAlgorithm()
 
 void Pipeline::execute(QString uid)
 {
-	// no input uid: execute entire pipeline
-	if (uid.isEmpty())
-		uid = mFilters->get(mFilters->size()-1)->getUid();
+	// generate |startIndex, endIndex>, pointing to the filters to be executed
 
 	int endIndex = -1;
+	int startIndex = endIndex;
 
-	for (unsigned i=0; i<mFilters->size(); ++i)
-		if (mFilters->get(i)->getUid()==uid)
-			endIndex = i;
-	if (endIndex<0)
+	if (uid.isEmpty()) // execute entire pipeline, if necessary
+	{
+		endIndex = mFilters->size();
+		startIndex = endIndex;
+	}
+	else // execute at least one given filter, more if necessary
+	{
+		for (unsigned i=0; i<mFilters->size(); ++i)
+			if (mFilters->get(i)->getUid()==uid)
+				endIndex = i+1; // set end index to after filter to execute;
+		startIndex = endIndex-1;
+	}
+
+	if (endIndex<0) // input filter not found: ignore
 		return;
 
-	// filter i require node i as input
-	int startIndex = endIndex;
+//	// filter i require node i as input
+
+	//	int startIndex = endIndex;
 
 	// index now counts filters <0...N-1>
 	// nodes are <0...N>
@@ -288,11 +298,11 @@ void Pipeline::execute(QString uid)
 	{
 		if (startIndex<0)
 			break;
-		if (mNodes[startIndex+1]->getData()) // index output node for filter[startIndex]
+		if (mNodes[startIndex]->getData()) // index output node for filter[startIndex]
 			break; // found node with data: stop here
 	}
 
-	std::cout << "Pipeline::execute3 s=" << startIndex << ", e=" << endIndex << std::endl;
+	std::cout << "Pipeline::execute filter range s=|" << startIndex << "," << endIndex << ">" << std::endl;
 
 	if (startIndex<0)
 	{
@@ -301,12 +311,56 @@ void Pipeline::execute(QString uid)
 	}
 
 	mCompositeTimedAlgorithm->clear();
-	for (unsigned i=startIndex; i<=endIndex; ++i)
+	for (unsigned i=startIndex; i<endIndex; ++i)
 		mCompositeTimedAlgorithm->append(mTimedAlgorithm[mFilters->get(i)->getUid()]);
 
 	// run all filters
 	mCompositeTimedAlgorithm->execute();
 }
+
+//void Pipeline::execute(QString uid)
+//{
+//	// no input uid: execute entire pipeline
+//	if (uid.isEmpty())
+//		uid = mFilters->get(mFilters->size()-1)->getUid();
+
+//	int endIndex = -1;
+
+//	for (unsigned i=0; i<mFilters->size(); ++i)
+//		if (mFilters->get(i)->getUid()==uid)
+//			endIndex = i;
+//	if (endIndex<0)
+//		return;
+
+//	// filter i require node i as input
+//	int startIndex = endIndex;
+
+//	// index now counts filters <0...N-1>
+//	// nodes are <0...N>
+
+//	for ( ; startIndex>=-1; --startIndex)
+//	{
+//		if (startIndex<0)
+//			break;
+//		if (mNodes[startIndex+1]->getData()) // index output node for filter[startIndex]
+//			break; // found node with data: stop here
+//	}
+
+//	std::cout << "Pipeline::execute3 s=" << startIndex << ", e=" << endIndex << std::endl;
+
+//	if (startIndex<0)
+//	{
+//		ssc::messageManager()->sendWarning(QString("Cannot execute filter %1: No input data set").arg(uid));
+//		return;
+//	}
+
+//	mCompositeTimedAlgorithm->clear();
+//	for (unsigned i=startIndex; i<=endIndex; ++i)
+//		mCompositeTimedAlgorithm->append(mTimedAlgorithm[mFilters->get(i)->getUid()]);
+
+//	// run all filters
+//	mCompositeTimedAlgorithm->execute();
+//}
 
 
 } // namespace cx
