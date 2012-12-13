@@ -115,7 +115,7 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
 		ssc::messageManager()->sendError("Filter/Node mismatch");
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
-	std::cout << "PipelineWidget spacing " << topLayout->spacing() << std::endl;\
+//	std::cout << "PipelineWidget spacing " << topLayout->spacing() << std::endl;\
 	topLayout->setSpacing(4);
 	mButtonGroup = new QButtonGroup(this);
 

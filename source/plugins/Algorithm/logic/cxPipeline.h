@@ -121,6 +121,10 @@ public:
 	  * Execute the filter at filterIndex. Recursively execute
 	  * all filters earlier in the pipeline if they dont have
 	  * an output value.
+	  *
+	  * Empty input tries to update the pipeline output, i.e. execute
+	  * all filters required to generate the final output, or none if already
+	  * filled.
 	  */
 	void execute(QString uid = "");
 
