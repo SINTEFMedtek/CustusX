@@ -24,7 +24,6 @@
 
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
-#include "sscVector3D.h"
 
 int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
 {
@@ -134,10 +133,6 @@ IGTLinkClient::IGTLinkClient(QString address, int port, QObject* parent) :
 		IGTLinkClientBase(parent), mHeadingReceived(false), mAddress(address), mPort(port)
 {
 //  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
-	calibrateMsgTimeStamp = true;
-	mGeneratingTimeCalibration = false;
-	mLastReferenceTimestampDiff = 0.0;
-	mLastTimeStamps.reserve(20);
 }
 
 void IGTLinkClient::run()
@@ -204,76 +199,6 @@ void IGTLinkClient::errorSlot(QAbstractSocket::SocketError socketError)
 					"Socket error [Host=" + this->hostDescription() + ", Code=" + socketError + "]\n"
 									+ mSocket->errorString());
 }
-
-/**
- * Calibrate the time stamps of the incoming message based on the computer clock.
- * Calibration is based on an average of several of the last messages.
- * The calibration is updated every 20-30 sec.
- */
-void IGTLinkClient::calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg)
-{
-	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-	imgMsg->GetTimeStamp(timestamp);
-	double timestamp_ms = timestamp->GetTimeStamp() * 1000;
-	QDateTime timestamp_dt = QDateTime::fromMSecsSinceEpoch(timestamp_ms);
-
-	if (ssc::similar(mLastReferenceTimestampDiff, 0.0, 0.000001))
-	{
-		mLastReferenceTimestampDiff = timestamp_dt.msecsTo(QDateTime::currentDateTime());
-//		std::cout << "First timestamp calib: " << mLastReferenceTimestampDiff << " ms" << std::endl;
-	}
-
-	// Start collecting time stamps if 20 sec since last calibration time
-	if(mLastSyncTime.isNull() || ( mLastSyncTime.msecsTo(QDateTime::currentDateTime()) > 2000) )
-		mGeneratingTimeCalibration = true;
-
-	if(mGeneratingTimeCalibration)
-		mLastTimeStamps.push_back(timestamp_dt.msecsTo(QDateTime::currentDateTime()));
-
-	// Perform time calibration if enough time stamps have been collected
-	if(mLastTimeStamps.size() >= 20)
-	{
-		std::sort(mLastTimeStamps.begin(), mLastTimeStamps.end(), AbsDoubleLess(mLastReferenceTimestampDiff));
-
-		//debug print
-	  /*for (std::vector<double>::const_iterator citer = mLastTimeStamps.begin();
-	      citer != mLastTimeStamps.end(); ++citer)
-	  {
-			std::cout << *citer - mLastReferenceTimestampDiff << " ";
-	  }
-	  std::cout << endl;*/
-
-		mLastTimeStamps.resize(15);
-
-		//debug print
-	  /*for (std::vector<double>::const_iterator citer = mLastTimeStamps.begin();
-	      citer != mLastTimeStamps.end(); ++citer)
-	  {
-			std::cout << *citer - mLastReferenceTimestampDiff << " ";
-	  }
-	  std::cout << endl;*/
-
-		double sumTimes = 0;
-	  for (std::vector<double>::const_iterator citer = mLastTimeStamps.begin();
-	      citer != mLastTimeStamps.end(); ++citer)
-	  {
-	  	sumTimes += *citer;
-	  }
-	  mLastReferenceTimestampDiff = sumTimes / 15.0;
-
-//		std::cout << "Timestamp calib: " << mLastReferenceTimestampDiff << " ms" << std::endl;
-
-		//Reset
-		mLastTimeStamps.clear();
-		mLastSyncTime = QDateTime::currentDateTime();
-		mGeneratingTimeCalibration = false;
-	}
-
-	// Update imgMsg timestamp
-	timestamp->SetTime((timestamp_ms + mLastReferenceTimestampDiff) / 1000.0); // in sec
-	imgMsg->SetTimeStamp(timestamp);
-}
-
 
 void IGTLinkClient::readyReadSlot()
 {
