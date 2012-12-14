@@ -160,16 +160,6 @@ void ContourFilter::imageChangedSlot(QString uid)
 		return;
 
 	this->updateThresholdFromImageChange(uid, mSurfaceThresholdOption);
-
-//	mSurfaceThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
-//	mSurfaceThresholdOption->setValue(image->getRange() / 2 + image->getMin());
-//	int oldValue = mSurfaceThresholdOption->getValue();
-//	// avoid reset if old value is still within range
-//	if ((image->getMin() > oldValue )||( oldValue > image->getMax()))
-//	{
-//		int initValue = + image->getMin() + image->getRange()/2 ;
-//		mSurfaceThresholdOption->setValue(initValue);
-//	}
 	RepManager::getInstance()->getThresholdPreview()->removePreview();
 
 	int extent[6];
@@ -212,33 +202,52 @@ bool ContourFilter::execute()
 
 	//    ssc::messageManager()->sendInfo(QString("Creating contour from \"%1\"...").arg(input->getName()));
 
+	mRawResult = this->execute(input->getBaseVtkImageData(),
+	                           surfaceThresholdOption->getValue(),
+	                           reduceResolutionOption->getValue(),
+	                           smoothingOption->getValue(),
+	                           preserveTopologyOption->getValue(),
+	                           decimationOption->getValue());
+	return true;
+}
+
+vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
+                                      double threshold,
+                                      bool reduceResolution,
+                                      bool smoothing,
+                                      bool preserveTopology,
+                                      double decimation)
+{
+	if (!input)
+		return vtkPolyDataPtr();
+
 	//Shrink input volume
 	vtkImageShrink3DPtr shrinker = vtkImageShrink3DPtr::New();
-	if(reduceResolutionOption->getValue())
+	if(reduceResolution)
 	{
-		std::cout << "smooth" << std::endl;
-		shrinker->SetInput(input->getBaseVtkImageData());
+//		std::cout << "smooth" << std::endl;
+		shrinker->SetInput(input);
 		shrinker->SetShrinkFactors(2,2,2);
 		shrinker->Update();
 	}
 
 	// Find countour
 	vtkMarchingCubesPtr convert = vtkMarchingCubesPtr::New();
-	if(reduceResolutionOption->getValue())
+	if(reduceResolution)
 		convert->SetInput(shrinker->GetOutput());
 	else
-		convert->SetInput(input->getBaseVtkImageData());
+		convert->SetInput(input);
 
-	convert->SetValue(0, surfaceThresholdOption->getValue());
+	convert->SetValue(0, threshold);
 	convert->Update();
 
 	vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
 	cubesPolyData = convert->GetOutput();
-	std::cout << "convert->GetOutput(); " << cubesPolyData.GetPointer() << std::endl;
+//	std::cout << "convert->GetOutput(); " << cubesPolyData.GetPointer() << std::endl;
 
 	// Smooth surface model
 	vtkWindowedSincPolyDataFilterPtr smoother = vtkWindowedSincPolyDataFilterPtr::New();
-	if(smoothingOption->getValue())
+	if(smoothing)
 	{
 		smoother->SetInput(cubesPolyData);
 		smoother->Update();
@@ -251,13 +260,13 @@ bool ContourFilter::execute()
 	vtkTriangleFilterPtr trifilt = vtkTriangleFilterPtr::New();
 	vtkDecimateProPtr deci = vtkDecimateProPtr::New();
 	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-	if (decimationOption->getValue() > 0.000001)
+	if (decimation > 0.000001)
 	{
 		trifilt->SetInput(cubesPolyData);
 		trifilt->Update();
 		deci->SetInput(trifilt->GetOutput());
-		deci->SetTargetReduction(decimationOption->getValue());
-		deci->SetPreserveTopology(preserveTopologyOption->getValue());
+		deci->SetTargetReduction(decimation);
+		deci->SetPreserveTopology(preserveTopology);
 		//    deci->PreserveTopologyOn();
 		deci->Update();
 		cubesPolyData = deci->GetOutput();
@@ -268,8 +277,7 @@ bool ContourFilter::execute()
 
 	cubesPolyData->DeepCopy(normals->GetOutput());
 
-	mRawResult =  cubesPolyData;
-	return true;
+	return cubesPolyData;
 }
 
 void ContourFilter::postProcess()
@@ -282,23 +290,33 @@ void ContourFilter::postProcess()
 	if (!input)
 		return;
 
-	QString uid = input->getUid() + "_ge%1";
-	QString name = input->getName()+" ge%1";
-	ssc::MeshPtr output = ssc::dataManager()->createMesh(mRawResult, uid, name, "Images");
-	if (!output)
-		return;
-
-	output->get_rMd_History()->setRegistration(input->get_rMd());
-	output->get_rMd_History()->setParentSpace(input->getUid());
-
 	ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
-	output->setColor(colorOption->getValue());
+	ssc::MeshPtr output = this->postProcess(mRawResult, input, colorOption->getValue());
+
+	if (output)
+		mOutputTypes.front()->setValue(output->getUid());
+}
+
+ssc::MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ssc::ImagePtr base, QColor color)
+{
+	if (!contour || !base)
+		return ssc::MeshPtr();
+
+	QString uid = base->getUid() + "_ge%1";
+	QString name = base->getName()+" ge%1";
+	ssc::MeshPtr output = ssc::dataManager()->createMesh(contour, uid, name, "Images");
+	if (!output)
+		return ssc::MeshPtr();
+
+	output->get_rMd_History()->setRegistration(base->get_rMd());
+	output->get_rMd_History()->setParentSpace(base->getUid());
+
+	output->setColor(color);
 
 	ssc::dataManager()->loadData(output);
 	ssc::dataManager()->saveData(output, patientService()->getPatientData()->getActivePatientFolder());
 
-	// set output
-	mOutputTypes.front()->setValue(output->getUid());
+	return output;
 }
 
 } // namespace cx
