@@ -14,6 +14,8 @@
 #include "cxPatientData.h"
 #include "cxRepManager.h"
 #include "cxThresholdPreview.h"
+#include "cxContourFilter.h"
+#include "sscMesh.h"
 
 namespace cx
 {
@@ -157,11 +159,28 @@ ssc::DoubleDataAdapterXmlPtr BinaryThresholdImageFilter::getLowerThresholdOption
 	return retval;
 }
 
+ssc::BoolDataAdapterXmlPtr BinaryThresholdImageFilter::getGenerateSurfaceOption(QDomElement root)
+{
+	ssc::BoolDataAdapterXmlPtr retval = ssc::BoolDataAdapterXml::initialize("Generate Surface", "",
+	                                                                        "Generate a surface of the output volume", true,
+	                                                                            root);
+	return retval;
+}
+
+ssc::ColorDataAdapterXmlPtr BinaryThresholdImageFilter::getColorOption(QDomElement root)
+{
+	return ssc::ColorDataAdapterXml::initialize("Color", "",
+	                                            "Color of output model.",
+	                                            QColor("green"), root);
+}
+
 void BinaryThresholdImageFilter::createOptions(QDomElement root)
 {
 	mLowerThresholdOption = this->getLowerThresholdOption(root);
 	connect(mLowerThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
 	mOptionsAdapters.push_back(mLowerThresholdOption);
+	mOptionsAdapters.push_back(this->getGenerateSurfaceOption(root));
+	mOptionsAdapters.push_back(this->getColorOption(root));
 }
 
 void BinaryThresholdImageFilter::createInputTypes()
@@ -183,6 +202,11 @@ void BinaryThresholdImageFilter::createOutputTypes()
 	temp->setValueName("Output");
 	temp->setHelp("Output thresholded binary image");
 	mOutputTypes.push_back(temp);
+
+	temp = SelectDataStringDataAdapter::New();
+	temp->setValueName("Contour");
+	temp->setHelp("Output contour generated from thresholded binary image.");
+	mOutputTypes.push_back(temp);
 }
 
 void BinaryThresholdImageFilter::setActive(bool on)
@@ -196,27 +220,13 @@ void BinaryThresholdImageFilter::setActive(bool on)
 void BinaryThresholdImageFilter::imageChangedSlot(QString uid)
 {
 	this->updateThresholdFromImageChange(uid, mLowerThresholdOption);
-//	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
-//	if(!image)
-//		return;
-//	mLowerThresholdOption->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
-//	int oldValue = mLowerThresholdOption->getValue();
-//	// avoid reset if old value is still within range,
-//	// but reset anyway if old val is 0..1, this can indicate old image was binary.
-//	if ((image->getMin() > oldValue )||( oldValue > image->getMax() )||( oldValue<=1 ))
-//	{
-//		int initValue = ceil(double(image->getMin()) + double(image->getRange())/10); // round up
-//		mLowerThresholdOption->setValue(initValue);
-//	}
-//	std::cout << "BinaryThresholdImageFilter::imageChangedSlot " << image->getMin() << " "  << image->getMax() << std::endl;
-//	std::cout << "                            imageChangedSlot() " << mLowerThresholdOption->getValue() << std::endl;
 	RepManager::getInstance()->getThresholdPreview()->removePreview();
 }
 
 
 void BinaryThresholdImageFilter::thresholdSlot()
 {
-	std::cout << "BinaryThresholdImageFilter::thresholdSlot() " << mLowerThresholdOption->getValue() << std::endl;
+//	std::cout << "BinaryThresholdImageFilter::thresholdSlot() " << mLowerThresholdOption->getValue() << std::endl;
 	if (mActive)
 	{
 		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mInputTypes[0]->getData());
@@ -261,6 +271,10 @@ bool BinaryThresholdImageFilter::execute()
 	// TODO: possible memory problem here - check debug mem system of itk/vtk
 
 	mRawResult =  rawResult;
+
+    double threshold = 1;/// because the segmented image is 0..1
+	mRawContour = ContourFilter::execute(mRawResult, threshold);
+
 	return true;
 }
 
@@ -286,9 +300,116 @@ void BinaryThresholdImageFilter::postProcess()
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());
+
+	// set contour output
+	ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
+	ssc::MeshPtr contour = ContourFilter::postProcess(mRawContour, output, colorOption->getValue());
+	mOutputTypes[1]->setValue(contour->getUid());
 }
 
 
+
+
+/////--------------------------------------------------------
+
+
+//ContouringDecoratingFilter::ContouringDecoratingFilter(FilterPtr base) :
+//    mBase(base)
+//{
+
+//}
+
+
+//QString ContouringDecoratingFilter::getName() const
+//{
+//	return mBase->getName() + "/Contouring";
+//}
+
+//QString ContouringDecoratingFilter::getType() const
+//{
+//	return mBase->getType() + "_Contouring";
+//}
+
+//QString ContouringDecoratingFilter::getHelp() const
+//{
+//	return mBase->getHelp() +
+//			"<html>"
+//	        "<p>In addition, check the \"Generate surface\" box to create a surface representation "
+//	        "of the output.<p>"
+//	        "</html>";
+//}
+
+//ssc::BoolDataAdapterXmlPtr ContouringDecoratingFilter::getGenerateSurfaceOption(QDomElement root)
+//{
+//	ssc::BoolDataAdapterXmlPtr retval = ssc::BoolDataAdapterXml::initialize("Generate Surface", "",
+//	                                                                        "Generate a surface of the output volume", true,
+//	                                                                            root);
+//	return retval;
+//}
+
+//void ContouringDecoratingFilter::createOptions(QDomElement root)
+//{
+//	mOptionsAdapters.push_back(this->getGenerateSurfaceOption(root));
+//}
+
+//void ContouringDecoratingFilter::createInputTypes()
+//{
+//}
+
+//void ContouringDecoratingFilter::createOutputTypes()
+//{
+//	SelectDataStringDataAdapterBasePtr temp;
+
+//	temp = SelectDataStringDataAdapter::New();
+//	temp->setValueName("Contour");
+//	temp->setHelp("Output contour generated from the output volume");
+//	mOutputTypes.push_back(temp);
+//}
+
+//void ContouringDecoratingFilter::setActive(bool on)
+//{
+//	FilterImpl::setActive(on);
+//	mBase->setActive(on);
+//}
+
+
+//bool ContouringDecoratingFilter::preProcess()
+//{
+//	return FilterImpl::preProcess() && mBase->preProcess();
+//}
+
+//bool ContouringDecoratingFilter::execute()
+//{
+//	bool success = mBase->execute();
+//	if (!success)
+//		return success;
+
+//	ContourFilter::execute()
+//}
+
+//void ContouringDecoratingFilter::postProcess()
+//{
+//	if (!mRawResult)
+//		return;
+
+//	ssc::ImagePtr input = this->getCopiedInputImage();
+
+//	if (!input)
+//		return;
+
+//	QString uid = input->getUid() + "_seg%1";
+//	QString name = input->getName()+" seg%1";
+//	ssc::ImagePtr output = ssc::dataManager()->createDerivedImage(mRawResult,uid, name, input);
+//	if (!output)
+//		return;
+
+//	output->resetTransferFunctions();
+//	ssc::dataManager()->loadData(output);
+//	ssc::dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+
+//	// set output
+//	mOutputTypes.front()->setValue(output->getUid());
+//}
 
 
 

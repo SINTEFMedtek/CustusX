@@ -36,8 +36,8 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegistrationManagerPtr regManager, QW
   filters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
   mPipeline->initialize(filters);
 
-  mPipeline->getNodes()[0]->setValueName("US Image:");
-  mPipeline->getNodes()[0]->setHelp("Select an US volume acquired from the wire phantom.");
+//  mPipeline->getNodes()[0]->setValueName("US Image:");
+//  mPipeline->getNodes()[0]->setHelp("Select an US volume acquired from the wire phantom.");
   mPipeline->setOption("Color", QVariant(QColor("red")));
 
   mLayout = new QVBoxLayout(this);
