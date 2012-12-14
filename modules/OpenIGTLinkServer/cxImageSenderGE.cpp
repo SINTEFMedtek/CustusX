@@ -43,7 +43,7 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--ip:		GE scanner IP address";//default = 127.0.0.1, find a typical direct link address
 	retval << "--streamport:		GE scanner streaming port, default = 6543";
 	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
-	retval << "--buffersize:		Size of GEStreamer buffer, default = 100";
+	retval << "--buffersize:		Size of GEStreamer buffer, default = 10";
 	retval << "--imagesize2D:	Returned image size in pixels, default = 250000 (500*500)";
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--testmode:		GEStreamer test mode, default = 0";
@@ -90,7 +90,7 @@ void ImageSenderGE::initialize(StringMap arguments)
 	if (!mArguments.count("commandport"))
 		mArguments["commandport"] = "-1";
 	if (!mArguments.count("buffersize"))
-		mArguments["buffersize"] = "100";
+		mArguments["buffersize"] = "10";
     if (!mArguments.count("openclpath"))
         mArguments["openclpath"] = "";
     if (!mArguments.count("testmode"))
@@ -362,11 +362,11 @@ IGTLinkUSStatusMessage::Pointer ImageSenderGE::getFrameStatus()
   retval->SetDepthEnd(mFrameGeometry.depthEnd);	// End of sector in mm from origin
   retval->SetWidth(mFrameGeometry.width);// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
 
-  std::cout << "origin: " << mFrameGeometry.origin[0] << " " << mFrameGeometry.origin[1] << " " << mFrameGeometry.origin[2] << std::endl;
-  std::cout << "imageType: " << mFrameGeometry.imageType << std::endl;
-  std::cout << "depthStart: " << mFrameGeometry.depthStart << " end: " << mFrameGeometry.depthEnd << std::endl;
-  std::cout << "width: " << mFrameGeometry.width << std::endl;
-  std::cout << "tilt: " << mFrameGeometry.tilt << std::endl;
+//  std::cout << "origin: " << mFrameGeometry.origin[0] << " " << mFrameGeometry.origin[1] << " " << mFrameGeometry.origin[2] << std::endl;
+//  std::cout << "imageType: " << mFrameGeometry.imageType << std::endl;
+//  std::cout << "depthStart: " << mFrameGeometry.depthStart << " end: " << mFrameGeometry.depthEnd << std::endl;
+//  std::cout << "width: " << mFrameGeometry.width << std::endl;
+//  std::cout << "tilt: " << mFrameGeometry.tilt << std::endl;
 
   return retval;
 }

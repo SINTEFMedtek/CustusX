@@ -54,6 +54,20 @@ public:
 	ssc::DoubleDataAdapterXmlPtr getDecimationOption(QDomElement root);
 	ssc::ColorDataAdapterXmlPtr getColorOption(QDomElement root);
 
+	/** This is the core algorithm, call this if you dont need all the filter stuff.
+	    Generate a contour from a vtkImageData.
+	  */
+	static vtkPolyDataPtr execute(vtkImageDataPtr input,
+			                              double threshold,
+	                                      bool reduceResolution=false,
+	                                      bool smoothing=true,
+	                                      bool preserveTopology=true,
+	                                      double decimation=0.8);
+	/** Generate a mesh from the contour using base to generate name.
+	  * Save to dataManager.
+	  */
+	static ssc::MeshPtr postProcess(vtkPolyDataPtr contour, ssc::ImagePtr base, QColor color);
+
 protected:
 	virtual void createOptions(QDomElement root);
 	virtual void createInputTypes();
