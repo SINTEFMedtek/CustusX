@@ -731,7 +731,7 @@ cmake \
             OpenCV().buildPath(),
             UltrasonixSDK().includePath(),
             UltrasonixSDK().libFile(),
-            TubeSegmentationFramework.buildPath(),
+            TubeSegmentationFramework().buildPath(),
             DATA.mBuildSSCExamples,
             DATA.mBuildTesting,
             DATA.mUseCotire,
@@ -769,7 +769,7 @@ class UltrasonixSDK(CppComponent):
 
 class TubeSegmentationFramework(CppComponent):
    def name(self):
-       return "TSF"
+       return "Tube-Segmentation-Framework"
    def help(self):
        return 'Tube-Segmentation-Framework'
    def path(self):
@@ -791,6 +791,7 @@ cmake \
 %s \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
+-DUSE_C++11=false \
 ../%s''' % (DATA.mCMakeGenerator, 
            DATA.m32bitCompileCMakeOption, 
            DATA.mBuildType, 
