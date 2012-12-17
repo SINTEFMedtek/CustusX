@@ -15,7 +15,7 @@
 #include "cxPipelineWidget.h"
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
-#include "cxDummyFilter.h"
+//#include "cxDummyFilter.h"
 #include "cxDataLocations.h"
 
 namespace cx
