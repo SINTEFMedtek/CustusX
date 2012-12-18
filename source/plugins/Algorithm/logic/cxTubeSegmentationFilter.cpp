@@ -1,7 +1,9 @@
 #include "cxTubeSegmentationFilter.h"
 
 #ifdef CX_USE_TSF
-#include "tube-segmentation.hpp"
+//#include "tube-segmentation.hpp"
+//#include "openCLUtilities.hpp"
+//#include <map>
 
 namespace cx {
 
@@ -78,6 +80,48 @@ bool TubeSegmentationFilter::execute()
 		return false;
 
 	//======================================================
+	//char ** argv;
+//	char *argv[]{
+//		"/home/jbake/jbake/workspace/Tube-Segmenation-Framework/build_Debug/tubeSegmentation",
+//		"/home/jbake/jbake/data/helix/helix.mhd",
+//		"--mode",
+//		"white",
+//		"--display",
+//		"NULL"
+//	};
+//	int argc = sizeof argv/sizeof argv[0] - 1;
+//
+//    // Parse parameters from program arguments
+//	std::map<std::string, std::string> parameters = this->getParameters(argc, argv);
+//
+//    // Write out parameter list
+//    std::cout << "The following parameters are set: " << std::endl;
+//    std::map<std::string, std::string>::iterator it;
+//    for(it = parameters.begin(); it != parameters.end(); it++) {
+//    	std::cout << it->first << " " << it->second << std::endl;
+//    }
+//
+//	OpenCL ocl;
+//	ocl.context = createCLContextFromArguments(argc, argv);
+
+//    // Select first device
+//    cl::vector<cl::Device> devices = ocl.context.getInfo<CL_CONTEXT_DEVICES>();
+//    std::cout << "Using device: " << devices[0].getInfo<CL_DEVICE_NAME>() << std::endl;
+//    ocl.queue = cl::CommandQueue(ocl.context, devices[0], CL_QUEUE_PROFILING_ENABLE);
+//
+//    // Query the size of available memory
+//    unsigned int memorySize = devices[0].getInfo<CL_DEVICE_GLOBAL_MEM_SIZE>();
+//    std::cout << "Available memory on selected device " << (double)memorySize/(1024*1024) << " MB "<< std::endl;
+//
+//    // Compile and create program
+//    if(parameters.count("buffers-only") == 0 && (int)devices[0].getInfo<CL_DEVICE_EXTENSIONS>().find("cl_khr_3d_image_writes") > -1) {
+//        ocl.program = buildProgramFromSource(ocl.context, "kernels.cl");
+//        parameters["3d_write"] = "true";
+//    } else {
+//        ocl.program = buildProgramFromSource(ocl.context, "kernels_no_3d_write.cl");
+//        std::cout << "Writing to 3D textures is not supported on the selected device." << std::endl;
+//    }
+
 
 	//======================================================
 
@@ -98,6 +142,36 @@ void TubeSegmentationFilter::postProcess()
 	 */
 	std::cout << "NOT IMPLEMENTED: TubeSegmentationFilter::postProcess()" << std::endl;
 }
+
+/**
+ * Just needed for development/debugging!!!
+ */
+//std::map<std::string, std::string> TubeSegmentationFilter::getParameters(int argc, char ** argv) {
+//	std::map<std::string, std::string> parameters;
+//    // Go through each parameter, first parameter is filename
+//    for(int i = 2; i < argc; i++) {
+//        std::string token = argv[i];
+//        if(token.substr(0,2) == "--") {
+//            // Check to see if the parameter has a value
+//            std::string nextToken;
+//            if(i+1 < argc) {
+//                nextToken = argv[i+1];
+//            } else {
+//                nextToken = "--";
+//            }
+//            if(nextToken.substr(0,2) == "--") {
+//                // next token is not a value
+//                parameters[token.substr(2)] = "dummy-value";
+//            } else {
+//                // next token is a value, store the value
+//                parameters[token.substr(2)] = nextToken;
+//                i++;
+//            }
+//        }
+//    }
+//
+//    return parameters;
+//}
 
 } /* namespace cx */
 #endif //CX_USE_TSF
