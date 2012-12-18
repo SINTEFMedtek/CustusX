@@ -36,8 +36,9 @@ protected:
 	virtual void createOptions(QDomElement root);
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
-//
-//private:
+
+private:
+//	std::map<std::string, std::string> getParameters(int argc, char ** argv); //Just needed for development/debugging!!!
 //	ssc::StringDataAdapterPtr getStringOption(QDomElement root);
 //	ssc::DoubleDataAdapterPtr getDoubleOption(QDomElement root);
 //	ssc::BoolDataAdapterPtr getBoolOption(QDomElement root);
