@@ -99,6 +99,8 @@ public:
 
 	virtual USFrameDataPtr copy();
 
+	bool is4D();//Do this object contain 4D data? (Opposed to the usual 3D data)
+
 protected:
 	void initialize();
 	virtual void clearCache();
