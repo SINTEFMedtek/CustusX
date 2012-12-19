@@ -2,6 +2,10 @@
 #define CXTUBESEGMENTATIONFILTER_H_
 
 #include "cxFilterImpl.h"
+#include <boost/unordered_map.hpp>
+
+typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
+typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 namespace cx {
 
@@ -38,12 +42,15 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-//	std::map<std::string, std::string> getParameters(int argc, char ** argv); //Just needed for development/debugging!!!
-//	ssc::StringDataAdapterPtr getStringOption(QDomElement root);
-//	ssc::DoubleDataAdapterPtr getDoubleOption(QDomElement root);
-//	ssc::BoolDataAdapterPtr getBoolOption(QDomElement root);
+	boost::unordered_map<std::string, std::string> getParameters(int argc, char ** argv); //Just needed for development/debugging!!!
+	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z);
+
+	vtkImageDataPtr mRawCenterlineResult;
+	vtkImageDataPtr mRawSegmentationResult;
 
 };
+typedef boost::shared_ptr<class TubeSegmentationFilter> TubeSegmentationFilterPtr;
+
 #endif //CX_USE_TSF
 
 } /* namespace cx */
