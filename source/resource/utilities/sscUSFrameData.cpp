@@ -488,8 +488,10 @@ void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 
 bool USFrameData::is4D()
 {
-	if (mProcessedImage.size() > 0)
-		if (mProcessedImage[0]->GetDataDimension() == 3)
+	int numberOfFrames = mReducedToFull.size();
+
+	if (numberOfFrames > 0)
+		if(mImageContainer->get(0)->GetDataDimension() == 3)
 			return true;
 	return false;
 }
