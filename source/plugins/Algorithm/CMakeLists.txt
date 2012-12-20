@@ -121,7 +121,11 @@ include_directories(
 	${CustusX3_SOURCE_DIR}/source/gui/dataWidgets
 	)
 
-set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui ${OPENCL_LIBRARIES} tubeSegmentationLib OCL-Utilities)
+set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui)
+message(STATUS "CX_USE_TSF: "${CX_USE_TSF})
+if (CX_USE_TSF)
+    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} ${OPENCL_LIBRARIES} tubeSegmentationLib OCL-Utilities)
+endif(CX_USE_TSF)
 
 # =========================================================
 # create the target

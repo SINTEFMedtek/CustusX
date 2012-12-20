@@ -82,7 +82,7 @@ bool TubeSegmentationFilter::execute()
 	int argc = sizeof argv/sizeof argv[0] - 1;
 
     // Parse parameters from program arguments
-	boost::unordered_map<std::string, std::string> parameters = this->getParameters(argc, argv);
+	boost::unordered_map<std::string, std::string> parameters = getParameters(argc, argv);
 
     // Write out parameter list
     std::cout << "The following parameters are set: " << std::endl;
@@ -204,36 +204,6 @@ void TubeSegmentationFilter::postProcess()
 	ssc::dataManager()->saveImage(outputSegmentaion, patientService()->getPatientData()->getActivePatientFolder());
 
 	mOutputTypes[1]->setValue(outputSegmentaion->getUid());
-}
-
-/**
- * Just needed for development/debugging!!!
- */
-boost::unordered_map<std::string, std::string> TubeSegmentationFilter::getParameters(int argc, char ** argv) {
-	boost::unordered_map<std::string, std::string> parameters;
-    // Go through each parameter, first parameter is filename
-    for(int i = 2; i < argc; i++) {
-        std::string token = argv[i];
-        if(token.substr(0,2) == "--") {
-            // Check to see if the parameter has a value
-            std::string nextToken;
-            if(i+1 < argc) {
-                nextToken = argv[i+1];
-            } else {
-                nextToken = "--";
-            }
-            if(nextToken.substr(0,2) == "--") {
-                // next token is not a value
-                parameters[token.substr(2)] = "dummy-value";
-            } else {
-                // next token is a value, store the value
-                parameters[token.substr(2)] = nextToken;
-                i++;
-            }
-        }
-    }
-
-    return parameters;
 }
 
 vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int size_x, int size_y, int size_z)
