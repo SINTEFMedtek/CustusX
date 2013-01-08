@@ -85,5 +85,13 @@
 			<color>0=0/0/0 255=255/255/255</color>
 		</lookuptable2D>
 		<shading ambient="0.2" diffuse="0.9" specular="0.3" on="0" specularPower="15"/>
-	</Preset>	
+	</Preset>
+    
+    <Preset modality="MR" name="MR Default">
+		<transferfunctions>
+		    <alpha>0=0 200=0 300=100 600=255</alpha>
+		    <color>0=0/0/0 480=255/255/255</color>
+		</transferfunctions>
+	    <shading on="1" ambient="0.15" diffuse="0.90" specular="0.30" specularPower="15.0"/>
+	</Preset>
 </root>
