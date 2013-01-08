@@ -20,7 +20,6 @@
 #include "cxRegistrationHistoryWidget.h"
 #include "cxRegistrationMethodsWidget.h"
 #include "cxWirePhantomWidget.h"
-#include "cxWirePhantomWidgetOld.h"
 #include "cxPatientOrientationWidget.h"
 
 namespace cx
@@ -44,25 +43,8 @@ std::vector<PluginBase::PluginWidget> RegistrationPlugin::createWidgets() const
 	retval.push_back(PluginBase::PluginWidget(
 			new WirePhantomWidget(mRegistrationManager, NULL),
 			"Algorithms"));
-    retval.push_back(PluginBase::PluginWidget(
-            new WirePhantomWidgetOld(mRegistrationManager, NULL),
-            "Algorithms"));
 
 	return retval;
 }
-
-//std::vector<QToolBar*> RegistrationPlugin::createToolBars() const
-//{
-//	std::vector<QToolBar*> retval;
-//
-//	QToolBar* pator = new QToolBar("Patient Orientation");
-//	pator->setObjectName("PatientOrientationToolBar");
-//	pator->addWidget(new PatientOrientationWidget(mRegistrationManager, NULL));
-//
-//	retval.push_back(pator);
-//
-//	return retval;
-//}
-
 
 }

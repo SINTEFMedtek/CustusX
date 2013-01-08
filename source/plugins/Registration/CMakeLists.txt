@@ -25,7 +25,6 @@ SET( MOC_HEADER_FILES
     gui/cxManualRegistrationWidget.h
     gui/cxFastImageRegistrationWidget.h
     gui/cxFastOrientationRegistrationWidget.h
-    gui/cxImageSegmentationAndCenterlineWidget.h
 	gui/cxPrepareVesselsWidget.h
     gui/cxPlateRegistrationWidget.h
     gui/cxSeansVesselRegistrationWidget.h
@@ -35,7 +34,6 @@ SET( MOC_HEADER_FILES
     gui/cxElastixWidget.h
     gui/cxElastixSyntaxHighlighter.h
     gui/cxWirePhantomWidget.h
-	gui/cxWirePhantomWidgetOld.h
 	gui/cxPatientOrientationWidget.h
     )
 
@@ -76,8 +74,6 @@ SET( SOURCE_FILES
     gui/cxFastPatientRegistrationWidget.cpp
     gui/cxFastOrientationRegistrationWidget.h
     gui/cxFastOrientationRegistrationWidget.cpp
-    gui/cxImageSegmentationAndCenterlineWidget.h
-    gui/cxImageSegmentationAndCenterlineWidget.cpp
     gui/cxPlateRegistrationWidget.h
     gui/cxPlateRegistrationWidget.cpp
     gui/cxSeansVesselRegistrationWidget.h
@@ -94,8 +90,6 @@ SET( SOURCE_FILES
     gui/cxElastixSyntaxHighlighter.cpp
     gui/cxWirePhantomWidget.h
     gui/cxWirePhantomWidget.cpp
-	gui/cxWirePhantomWidgetOld.h
-	gui/cxWirePhantomWidgetOld.cpp
 	gui/cxPatientOrientationWidget.h
     gui/cxPatientOrientationWidget.cpp
     )
