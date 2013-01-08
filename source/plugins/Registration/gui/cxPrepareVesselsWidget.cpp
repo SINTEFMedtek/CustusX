@@ -63,8 +63,9 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegistrationManagerPtr regManager, QW
 
     mLayout->addWidget(ssc::createDataWidget(this, mColorDataAdapter));
   mLayout->addWidget(mPipelineWidget);
-  mLayout->addLayout(buttonsLayout);
   mLayout->addStretch();
+  mLayout->addLayout(buttonsLayout);
+//  mLayout->addStretch();
 
   this->setColorSlot();
 

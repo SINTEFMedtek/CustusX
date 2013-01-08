@@ -74,7 +74,7 @@ private:
 	PipelinePtr mPipeline;
 	QButtonGroup* mButtonGroup;
 	std::vector<PipelineWidgetFilterLine*> mAlgoLines;
-	FilterSetupWidget* mSetupWidget;
+	CompactFilterSetupWidget* mSetupWidget;
 
 	//    FilterTimedAlgorithmPtr mThread;
 	//    PipelineWidgetFilterLine* mCurrentlyRunningPipeli\neWidgetFilterLine;

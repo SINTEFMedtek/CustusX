@@ -79,7 +79,7 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
 		SelectDataStringDataAdapterBasePtr dataSelectDataAdapter = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(options[i]);
 		if (dataSelectDataAdapter)
 		{
-			layout->addWidget(new DataSelectWidget(widget, dataSelectDataAdapter));
+			layout->addWidget(new DataSelectWidget(widget, dataSelectDataAdapter), i, 0, 1, 2);
 		}
 		else
 		{
@@ -126,9 +126,6 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options
 	QVBoxLayout* topLayout = new QVBoxLayout(topWidget);
 	topLayout->setMargin(0);
 
-	//    QToolBox* toolBox = new QToolBox;
-	//    toptopLayout->addWidget(toolBox);
-
 	if (addFrame)
 	{
 		mFrame = this->wrapInGroupBox(topWidget, "Algorithm");
@@ -144,16 +141,6 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options
 
 	mOptions = options;
 
-
-	//    topWidget->setStyleSheet(""
-	//                        "QGroupBox"
-	//                        "{ "
-	//                        "    border: 0px solid gray; "
-	//                        "    border-radius: 0px;"
-	//                        "}"
-	//                        "");
-	//    //                        "    border-top: 1px solid gray; "
-
 	mInputsWidget = new OptionsWidget(this);
 	mOutputsWidget = new OptionsWidget(this);
 	mOptionsWidget = new OptionsWidget(this);
@@ -161,10 +148,6 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options
 	topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
 	topLayout->addWidget(this->wrapInGroupBox(mOutputsWidget, "Output"));
 	topLayout->addWidget(this->wrapInGroupBox(mOptionsWidget, "Options"));
-
-	//    toolBox->addItem(mInputsWidget, "Input");
-	//    toolBox->addItem(mOutputsWidget, "Output");
-	//    toolBox->addItem(mOptionsWidget, "Options");
 }
 
 void FilterSetupWidget::obscuredSlot(bool obscured)
@@ -196,37 +179,123 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 	if (mCurrentFilter)
 		mCurrentFilter->setActive(false);
 
-	//    std::cout << "FilterSetupWidget::setFilter " << filter->getUid() << ", ptr=" << this << std::endl;
 	mCurrentFilter = filter;
 
 	if (mFrame)
 		mFrame->setTitle(mCurrentFilter->getName());
-
-	//    std::cout << "options : " << mOptions.getElement().ownerDocument().toString() << std::endl;
-
 
 	if (mCurrentFilter)
 	{
 		mCurrentFilter->setActive(!mObscuredListener->isObscured());
 
 		std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
-		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes());
-
 		std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
-		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes());
-
 		ssc::XmlOptionFile node = mOptions.descend(mCurrentFilter->getUid());
 		std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions(node.getElement());
+
+		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes());
+		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes());
 		mOptionsWidget->setOptions(mCurrentFilter->getUid(), options);
 	}
 	else
+	{
+		mInputsWidget->setOptions("", std::vector<DataAdapterPtr>());
+		mOutputsWidget->setOptions("", std::vector<DataAdapterPtr>());
 		mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>());
+	}
+}
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+CompactFilterSetupWidget::CompactFilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame) :
+    BaseWidget(parent, "FilterSetupWidget", "FilterSetup")
+{
+	mFrame = NULL;
+
+	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+	toptopLayout->setMargin(0);
+
+	mOptionsWidget = new OptionsWidget(this);
+
+	if (addFrame)
+	{
+		mFrame = this->wrapInGroupBox(mOptionsWidget, "Algorithm");
+		toptopLayout->addWidget(mFrame);
+	}
+	else
+	{
+		toptopLayout->addWidget(mOptionsWidget);
+	}
+
+	mObscuredListener.reset(new WidgetObscuredListener(this));
+	connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
+
+	mOptions = options;
+}
+
+void CompactFilterSetupWidget::obscuredSlot(bool obscured)
+{
+	if (mCurrentFilter)
+		mCurrentFilter->setActive(!obscured);
+}
+
+QString CompactFilterSetupWidget::defaultWhatsThis() const
+{
+	QString name("None");
+	QString help("");
+	if (mCurrentFilter)
+	{
+		name = mCurrentFilter->getName();
+		help = mCurrentFilter->getHelp();
+	}
+	return QString("<html>"
+	               "<h4>%1</h4>"
+	               "<p>%2</p>"
+	               "</html>").arg(name).arg(help);
+}
+
+void CompactFilterSetupWidget::setFilter(FilterPtr filter)
+{
+	if (filter==mCurrentFilter)
+		return;
+
+	if (mCurrentFilter)
+		mCurrentFilter->setActive(false);
+
+	mCurrentFilter = filter;
+
+	if (mFrame)
+		mFrame->setTitle(mCurrentFilter->getName());
+
+	if (mCurrentFilter)
+	{
+		mCurrentFilter->setActive(!mObscuredListener->isObscured());
+
+		std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
+		std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
+		ssc::XmlOptionFile node = mOptions.descend(mCurrentFilter->getUid());
+		std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions(node.getElement());
+
+		std::vector<DataAdapterPtr> all;
+		std::remove_copy(inputTypes.begin(), inputTypes.end(), std::back_inserter(all), inputTypes[0]);
+		std::remove_copy(outputTypes.begin(), outputTypes.end(), std::back_inserter(all), outputTypes[0]);
+		std::copy(options.begin(), options.end(), std::back_inserter(all));
+
+		mOptionsWidget->setOptions(mCurrentFilter->getUid(), all);
+	}
+	else
+	{
+		mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>());
+	}
 }
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
-
 
 AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
     BaseWidget(parent, "FilterWidget", "Configurable Filter")

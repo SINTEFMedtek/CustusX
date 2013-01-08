@@ -69,10 +69,9 @@ public:
 	FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame);
 	void setFilter(FilterPtr filter);
 	QString defaultWhatsThis() const;
-	/**
-	  * Add a GroupBox around the widget with the algo name.
+	/** Compact Mode: one group, hide main input/output
 	  */
-	void setNamedFrame(bool on);
+	void setCompact(bool on);
 
 private slots:
 	void obscuredSlot(bool obscured);
@@ -83,6 +82,32 @@ private:
 
 	OptionsWidget* mInputsWidget;
 	OptionsWidget* mOutputsWidget;
+	OptionsWidget* mOptionsWidget;
+	QGroupBox* mFrame;
+	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
+};
+
+/** Helper widget for displaying the input/output/options part of a Filter.
+ * Intended to be included in other Filter widgets.
+ *
+ * \ingroup cxPluginAlgorithm
+ * \date Dec 13, 2012
+ * \author christiana
+ */
+class CompactFilterSetupWidget : public BaseWidget
+{
+	Q_OBJECT
+public:
+	CompactFilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame);
+	void setFilter(FilterPtr filter);
+	QString defaultWhatsThis() const;
+
+private slots:
+	void obscuredSlot(bool obscured);
+private:
+
+	ssc::XmlOptionFile mOptions;
+	FilterPtr mCurrentFilter;
 	OptionsWidget* mOptionsWidget;
 	QGroupBox* mFrame;
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;

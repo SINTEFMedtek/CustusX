@@ -154,7 +154,7 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
 
 	topLayout->addSpacing(12);
 
-	mSetupWidget = new FilterSetupWidget(this, filters->getOptions(), true);
+	mSetupWidget = new CompactFilterSetupWidget(this, filters->getOptions(), true);
 	topLayout->addWidget(mSetupWidget);
 	mSetupWidget->setVisible(settings()->value("pipeline/showDetails").toBool());
 
