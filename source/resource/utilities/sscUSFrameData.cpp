@@ -486,7 +486,15 @@ void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 	timer.printElapsedms(QString("import index %1").arg(index));
 }
 
+bool USFrameData::is4D()
+{
+	int numberOfFrames = mReducedToFull.size();
 
+	if (numberOfFrames > 0)
+		if(mImageContainer->get(0)->GetDataDimension() == 3)
+			return true;
+	return false;
+}
 
 
 }//namespace ssc

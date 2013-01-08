@@ -292,6 +292,9 @@ void VideoConnection::delayedAutoConnectServer()
 
 void VideoConnection::launchAndConnectServer()
 {
+	if (this->getVideoSource()->isConnected())
+		return;
+
 	mIniScript->launch(this->getInitScript());
 
 	if (this->getUseDirectLink2())

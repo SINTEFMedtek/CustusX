@@ -29,6 +29,9 @@
 #include "cxContourFilter.h"
 #include "cxSmoothingImageFilter.h"
 #include "cxResampleImageFilter.h"
+#ifdef CX_USE_TSF
+#include "cxTubeSegmentationFilter.h"
+#endif //CX_USE_TSF
 
 #include "sscTypeConversions.h"
 #include "cxDataSelectWidget.h"
@@ -308,6 +311,9 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 	mFilters->append(FilterPtr(new ContourFilter()));
 	mFilters->append(FilterPtr(new SmoothingImageFilter()));
 	mFilters->append(FilterPtr(new ResampleImageFilter()));
+#ifdef CX_USE_TSF
+	mFilters->append(FilterPtr(new TubeSegmentationFilter()));
+#endif //CX_USE_TSF
 
 	QStringList availableFilters;
 	std::map<QString,QString> names;

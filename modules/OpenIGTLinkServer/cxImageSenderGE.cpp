@@ -25,6 +25,7 @@
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 #include "cxDataLocations.h"
 #include "geConfig.h"
 
@@ -43,8 +44,8 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--ip:		GE scanner IP address";//default = 127.0.0.1, find a typical direct link address
 	retval << "--streamport:		GE scanner streaming port, default = 6543";
 	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
-	retval << "--buffersize:		Size of GEStreamer buffer, default = 100";
-	retval << "--imagesize2D:	Returned image size in pixels, default = 250000 (500*500)";
+	retval << "--buffersize:		Size of GEStreamer buffer, default = 10";
+	retval << "--imagesize:		Returned image/volume size in pixels, default = 500x500x1";
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--testmode:		GEStreamer test mode, default = 0";
 	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
@@ -90,18 +91,28 @@ void ImageSenderGE::initialize(StringMap arguments)
 	if (!mArguments.count("commandport"))
 		mArguments["commandport"] = "-1";
 	if (!mArguments.count("buffersize"))
-		mArguments["buffersize"] = "100";
+		mArguments["buffersize"] = "10";
     if (!mArguments.count("openclpath"))
         mArguments["openclpath"] = "";
     if (!mArguments.count("testmode"))
         mArguments["testmode"] = "0";
-    if (!mArguments.count("imagesize2D"))
-        mArguments["imagesize2D"] = "250000";
+    if (!mArguments.count("imagesize"))
+        mArguments["imagesize"] = "500x500x1";
     if (!mArguments.count("useOpenCL"))
         mArguments["useOpenCL"] = "1";
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
-   	long imageSize2D = convertStringWithDefault(mArguments["imagesize2D"], -1);
+
+   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
+   	long imageSize = 1;
+   	for (int i = 0; i < sizeList.length(); i++)
+   	{
+   		int dimSize = convertStringWithDefault(sizeList.at(i), 1);
+   		imageSize *= dimSize;
+   	}
+   	if (imageSize <= 1)
+   		ssc::messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
+
    	std::string openclpath = mArguments["openclpath"].toStdString();
 	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
 
@@ -122,7 +133,7 @@ void ImageSenderGE::initialize(StringMap arguments)
 	} else
 		openclpath = path.absolutePath().toStdString();
 
-	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize2D, interpType, bufferSize, openclpath, useOpenCL);
+	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize, interpType, bufferSize, openclpath, useOpenCL);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
@@ -362,11 +373,11 @@ IGTLinkUSStatusMessage::Pointer ImageSenderGE::getFrameStatus()
   retval->SetDepthEnd(mFrameGeometry.depthEnd);	// End of sector in mm from origin
   retval->SetWidth(mFrameGeometry.width);// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
 
-  std::cout << "origin: " << mFrameGeometry.origin[0] << " " << mFrameGeometry.origin[1] << " " << mFrameGeometry.origin[2] << std::endl;
-  std::cout << "imageType: " << mFrameGeometry.imageType << std::endl;
-  std::cout << "depthStart: " << mFrameGeometry.depthStart << " end: " << mFrameGeometry.depthEnd << std::endl;
-  std::cout << "width: " << mFrameGeometry.width << std::endl;
-  std::cout << "tilt: " << mFrameGeometry.tilt << std::endl;
+//  std::cout << "origin: " << mFrameGeometry.origin[0] << " " << mFrameGeometry.origin[1] << " " << mFrameGeometry.origin[2] << std::endl;
+//  std::cout << "imageType: " << mFrameGeometry.imageType << std::endl;
+//  std::cout << "depthStart: " << mFrameGeometry.depthStart << " end: " << mFrameGeometry.depthEnd << std::endl;
+//  std::cout << "width: " << mFrameGeometry.width << std::endl;
+//  std::cout << "tilt: " << mFrameGeometry.tilt << std::endl;
 
   return retval;
 }

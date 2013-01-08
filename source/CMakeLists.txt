@@ -54,6 +54,22 @@ if (CX_USE_ISB_GE)
     include(${GEStreamer_USE_FILE})
 endif()
 
+# Tube-Segmentation-Framework (Tube-Segmentation-Framework)
+#----------
+if (CX_USE_TSF)
+    find_package(Tube-Segmentation-Framework PATHS "${CustusX3_SOURCE_DIR}/../../Tube-Segmentation-Framework/Tube-Segmentation-Framework/CMake" REQUIRED)
+    #find_package(Tube-Segmentation-Framework REQUIRED)
+else ()
+    #find_package(Tube-Segmentation-Framework QUIET)
+endif ()
+IF( Tube-Segmentation-Framework_FOUND )
+    option(CX_USE_TSF "use TSF (Tube-Segmentation-Framework)" ON)
+    ADD_DEFINITIONS(-DCX_USE_TSF)
+    include(${Tube-Segmentation-Framework_USE_FILE})
+ELSE()
+    option(CX_USE_TSF "use TSF (Tube-Segmentation-Framework)" OFF)
+ENDIF()
+
 #------------------------------------------------------------------------------
 # Add CMake modules
 #------------------------------------------------------------------------------
