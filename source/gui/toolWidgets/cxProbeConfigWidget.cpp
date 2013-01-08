@@ -179,6 +179,8 @@ QString ProbeConfigWidget::defaultWhatsThis() const
 
 void ProbeConfigWidget::savePresetSlot()
 {
+	if (!mActiveProbeConfig->getTool())
+		return;
 	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
