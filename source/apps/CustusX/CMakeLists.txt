@@ -53,7 +53,7 @@ endif (APPLE)
 # Linking
 #------------------------------------------------------------------------------
 target_link_libraries( CustusX 
-		cxGui 
+		        cxGui 
                 cxPluginCalibration
                 cxPluginAlgorithm
                 cxPluginRegistration
@@ -68,7 +68,7 @@ if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
     cotire(CustusX)
     if(COTIRE_ADD_UNITY_BUILDS)
         target_link_libraries(CustusX_unity 
-        		cxGui 
+        		        cxGui 
                         cxPluginCalibration
                         cxPluginAlgorithm
                         cxPluginRegistration

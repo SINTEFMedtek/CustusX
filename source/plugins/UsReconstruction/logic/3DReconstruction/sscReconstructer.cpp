@@ -205,6 +205,11 @@ bool Reconstructer::validInputData() const
 {
 	if (mOriginalFileData.mFrames.empty() || !mOriginalFileData.mUsRaw || mOriginalFileData.mPositions.empty())
 		return false;
+	if(mOriginalFileData.mUsRaw->is4D())
+	{
+		ssc::messageManager()->sendWarning("US reconstructer do not handle 4D US data");
+		return false;
+	}
 	return true;
 }
 

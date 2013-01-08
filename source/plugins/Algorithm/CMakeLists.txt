@@ -27,7 +27,8 @@ SET( MOC_HEADER_FILES
 	logic/cxBinaryThinningImageFilter3DFilter.h
 	logic/cxSmoothingImageFilter.h
 	logic/cxResampleImageFilter.h
-   gui/cxAlgorithmPlugin.h
+	logic/cxTubeSegmentationFilter.h
+    gui/cxAlgorithmPlugin.h
     gui/cxBinaryThresholdImageFilterWidget.h
     gui/cxConnectedThresholdImageFilterWidget.h
     gui/cxSurfaceWidget.h
@@ -51,6 +52,8 @@ SET( SOURCE_FILES
 	logic/cxFilterTimedAlgorithm.cpp
 	logic/cxDummyFilter.h
 	logic/cxDummyFilter.cpp
+	logic/cxTubeSegmentationFilter.h
+	logic/cxTubeSegmentationFilter.cpp
 	logic/cxPipeline.h
 	logic/cxPipeline.cpp
 	logic/cxTrackingDataToVolume.h
@@ -73,8 +76,8 @@ SET( SOURCE_FILES
 	logic/cxSmoothingImageFilter.cpp
 	logic/cxResampleImageFilter.h
 	logic/cxResampleImageFilter.cpp
-   gui/cxAlgorithmPlugin.h
-   gui/cxAlgorithmPlugin.cpp
+    gui/cxAlgorithmPlugin.h
+    gui/cxAlgorithmPlugin.cpp
     gui/cxBinaryThresholdImageFilterWidget.h
     gui/cxBinaryThresholdImageFilterWidget.cpp
     gui/cxConnectedThresholdImageFilterWidget.h
@@ -119,6 +122,10 @@ include_directories(
 	)
 
 set(CX_ALGORITHM_LIBRARIES cxPatientService cxTrackingService cxResource cxGui)
+message(STATUS "CX_USE_TSF: "${CX_USE_TSF})
+if (CX_USE_TSF)
+    set(CX_ALGORITHM_LIBRARIES ${CX_ALGORITHM_LIBRARIES} ${OPENCL_LIBRARIES} tubeSegmentationLib OCL-Utilities)
+endif(CX_USE_TSF)
 
 # =========================================================
 # create the target

@@ -9,8 +9,8 @@ cmake_minimum_required(VERSION 2.6)
 
 find_package( Boost REQUIRED )
 
-
-
+# GEStreamer
+#----------
 option(CX_USE_ISB_GE "use ISB GE scanner interface" OFF)
 if (CX_USE_ISB_GE)
     ADD_DEFINITIONS(-DCX_USE_ISB_GE)
