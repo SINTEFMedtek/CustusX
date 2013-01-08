@@ -74,7 +74,13 @@ QString FusedInputOutputSelectDataStringDataAdapter::convertInternal2Display(QSt
 
 QString FusedInputOutputSelectDataStringDataAdapter::getHelp() const
 {
-	return mBase->getHelp();
+//	return mBase->getHelp();
+	return QString("<html>"
+	               "<h4>%1</h4> <p>%2</p>"
+	               "<h4>%3</h4> <p>%4</p>"
+	               "</html>")
+	        .arg("Input").arg(mInput->getHelp())
+	        .arg("Output").arg(mBase->getHelp());
 }
 
 ssc::DataPtr FusedInputOutputSelectDataStringDataAdapter::getData() const
