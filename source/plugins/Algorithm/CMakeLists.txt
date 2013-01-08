@@ -18,10 +18,7 @@ SET( MOC_HEADER_FILES
 	logic/cxFilterTimedAlgorithm.h
 	logic/cxDummyFilter.h
 	logic/cxPipeline.h
-	logic/cxCenterline.h
-    logic/cxResample.h
     logic/cxBinaryThresholdImageFilter.h
-    logic/cxContour.h
     logic/cxConnectedThresholdImageFilter.h
 	logic/cxContourFilter.h
 	logic/cxBinaryThinningImageFilter3DFilter.h
@@ -29,11 +26,7 @@ SET( MOC_HEADER_FILES
 	logic/cxResampleImageFilter.h
 	logic/cxTubeSegmentationFilter.h
     gui/cxAlgorithmPlugin.h
-    gui/cxBinaryThresholdImageFilterWidget.h
     gui/cxConnectedThresholdImageFilterWidget.h
-    gui/cxSurfaceWidget.h
-    gui/cxCenterlineWidget.h
-    gui/cxResampleWidget.h
     gui/cxTimedAlgorithmProgressBar.h
 	gui/cxFilterWidget.h
 	gui/cxPipelineWidget.h
@@ -58,14 +51,8 @@ SET( SOURCE_FILES
 	logic/cxPipeline.cpp
 	logic/cxTrackingDataToVolume.h
     logic/cxTrackingDataToVolume.cpp
-    logic/cxCenterline.h
-    logic/cxCenterline.cpp
-    logic/cxResample.h
-    logic/cxResample.cpp
     logic/cxBinaryThresholdImageFilter.h
     logic/cxBinaryThresholdImageFilter.cpp
-    logic/cxContour.h
-    logic/cxContour.cpp
     logic/cxConnectedThresholdImageFilter.h
     logic/cxConnectedThresholdImageFilter.cpp
 	logic/cxContourFilter.h
@@ -78,20 +65,8 @@ SET( SOURCE_FILES
 	logic/cxResampleImageFilter.cpp
     gui/cxAlgorithmPlugin.h
     gui/cxAlgorithmPlugin.cpp
-    gui/cxBinaryThresholdImageFilterWidget.h
-    gui/cxBinaryThresholdImageFilterWidget.cpp
     gui/cxConnectedThresholdImageFilterWidget.h
     gui/cxConnectedThresholdImageFilterWidget.cpp
-    gui/cxSurfaceWidget.cpp
-    gui/cxSurfaceWidget.h
-    gui/cxCenterlineWidget.cpp
-    gui/cxCenterlineWidget.h
-    gui/cxResampleWidget.cpp
-    gui/cxResampleWidget.h
-    gui/cxVisualizationMethodsWidget.h
-    gui/cxVisualizationMethodsWidget.cpp
-    gui/cxSegmentationMethodsWidget.h
-    gui/cxSegmentationMethodsWidget.cpp
     gui/cxTimedAlgorithmProgressBar.h
     gui/cxTimedAlgorithmProgressBar.cpp
 	gui/cxFilterWidget.h
