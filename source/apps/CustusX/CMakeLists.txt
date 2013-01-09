@@ -126,7 +126,7 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
 		)
 
 # Install openCL shaders into bundle
-install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/USReconstruction/logic/3DReconstruction/Thunder/kernels.ocl
+install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction/Thunder/kernels.ocl
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
 				)
 
@@ -292,6 +292,7 @@ set(DIRS
 		${QT_LIBRARY_DIRS}
 		${QT_BINARY_DIR}
 		${SSC_INCLUDE_DIRS} 
+		${GEStreamer_LIBRARY_DIRS} 
 		${VTK_LIBRARY_DIRS}
 		${OpenCV_LIB_DIR}
 		${OPENCL_LIBRARY_DIRS}
@@ -327,7 +328,7 @@ set(DIRS
 		${CustusX3_BINARY_DIR}/source/plugins/Registration/gui
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic
-        ${CustusX3_BINARY_DIR}/source/plugins/USReconstruction/logic/3DReconstruction
+        ${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/gui
 		${CustusX3_BINARY_DIR}/source/gui
 		${CustusX3_BINARY_DIR}/source/logic/
