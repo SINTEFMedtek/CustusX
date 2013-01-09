@@ -126,13 +126,15 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/
 		)
 
 # Install openCL shaders into bundle
-install(FILES ${CustusX3_SOURCE_DIR}source/plugins/USReconstruction/logic/3DReconstruction/Thunder/kernels.ocl 
+install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/USReconstruction/logic/3DReconstruction/Thunder/kernels.ocl
 				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
 				)
-				
-install(FILES ${GEStreamer_KERNEL_PATH}/ScanConvertCL.cl 
-				DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
-				)
+
+if (CX_USE_ISB_GE)
+	install(FILES ${GEStreamer_KERNEL_PATH}/ScanConvertCL.cl
+					DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
+					)
+endif()
 
 # Install Shared files
 install(FILES 
@@ -307,17 +309,23 @@ set(DIRS
 		${CustusX3_BINARY_DIR}/source/service/tracking
 		${CustusX3_BINARY_DIR}/source/service/video
 		${CustusX3_BINARY_DIR}/source/service/visualization
+		${CustusX3_BINARY_DIR}/source/resource
 		${CustusX3_BINARY_DIR}/source/resource/algorithms
 		${CustusX3_BINARY_DIR}/source/resource/settings
 		${CustusX3_BINARY_DIR}/source/resource/utilities
+		${CustusX3_BINARY_DIR}/source/plugins/Acquisition
 		${CustusX3_BINARY_DIR}/source/plugins/Acquisition/logic
 		${CustusX3_BINARY_DIR}/source/plugins/Acquisition/gui
+		${CustusX3_BINARY_DIR}/source/plugins/Algorithm
 		${CustusX3_BINARY_DIR}/source/plugins/Algorithm/logic
 		${CustusX3_BINARY_DIR}/source/plugins/Algorithm/gui
+		${CustusX3_BINARY_DIR}/source/plugins/Calibration
 		${CustusX3_BINARY_DIR}/source/plugins/Calibration/logic
 		${CustusX3_BINARY_DIR}/source/plugins/Calibration/gui
+		${CustusX3_BINARY_DIR}/source/plugins/Registration
 		${CustusX3_BINARY_DIR}/source/plugins/Registration/logic
 		${CustusX3_BINARY_DIR}/source/plugins/Registration/gui
+		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/logic
         ${CustusX3_BINARY_DIR}/source/plugins/USReconstruction/logic/3DReconstruction
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/gui
