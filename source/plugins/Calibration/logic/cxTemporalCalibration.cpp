@@ -187,6 +187,8 @@ double TemporalCalibration::calibrate(bool* success)
   mDebugStream << "Loaded data: " << mFilename << std::endl;
   mDebugStream << "=======================================" << std::endl;
 
+  mFileData.mUsRaw->initializeFrames();
+
   std::vector<double> frameMovement = this->computeProbeMovement();
 
   if (!this->checkFrameMovementQuality(frameMovement))
