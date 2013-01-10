@@ -379,9 +379,13 @@ void ToolConfigureGroupBox::populateReference()
 	QString reference = parser.getAbsoluteReferenceFilePath();
 	currentIndex = this->addRefrenceToComboBox(reference);
 
-	// if new: select the first one anyway
-	if (mConfigFilesComboBox->currentText().contains("<new config>") && (currentIndex==-1))
+	// always select a reference if available:
+	if (currentIndex<0)
 		currentIndex = 0;
+
+//	// if new: select the first one anyway
+//	if (mConfigFilesComboBox->currentText().contains("<new config>") && (currentIndex==-1))
+//		currentIndex = 0;
 
 	mReferenceComboBox->setCurrentIndex(currentIndex);
 }
