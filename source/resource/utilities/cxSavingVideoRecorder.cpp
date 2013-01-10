@@ -214,7 +214,7 @@ void SavingVideoRecorder::newFrameSlot()
 	vtkImageDataPtr frame = vtkImageDataPtr::New();
 	frame->DeepCopy(image);
 
-	CachedImageDataPtr cache(new CachedImageData(filename, frame));
+	CachedImageDataPtr cache(new CachedImageData(filename, frame, false));
 	mImages.push_back(cache);
 	mTimestamps.push_back(timestamp);
 
@@ -228,7 +228,9 @@ void SavingVideoRecorder::purgeCache()
 
 	// numbers in Kb
 	int currentMem = mImages.back()->getImage()->GetActualMemorySize() * mImages.size();
-	int maxMem = 2*1000*1000; // store max 2Gb of data before clearing cache
+	// Store max 4Gb of data before clearing cache.
+	// This is an arbitrary number assumed to be easy to handle for the computer.
+	int maxMem = 4*1000*1000;
 //	std::cout << "memused (" << mImages.size() << ") :"<< currentMem/1000 << "." << currentMem << std::endl;
 
 	bool discardImage = (currentMem > maxMem);
@@ -253,7 +255,7 @@ void SavingVideoRecorder::dataSavedSlot(QString filename)
 		if (mImages[i]->getFilename() != filename)
 			continue;
 
-		mImages[i]->setPurgeValid();
+		mImages[i]->setExistsOnDisk(true);
 		break;
 	}
 }
@@ -290,11 +292,6 @@ void SavingVideoRecorder::deleteFolder(QString folder)
 		dir.remove(files[i]);
 	dir.rmdir(folder);
 }
-
-//SavingVideoRecorder::DataType SavingVideoRecorder::getRecording()
-//{
-//	return mData;
-//}
 
 void SavingVideoRecorder::completeSave()
 {
