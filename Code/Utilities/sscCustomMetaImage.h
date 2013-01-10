@@ -34,11 +34,17 @@ public:
 
   QString readModality();
   QString readImageType();
+  void setModality(QString value);
+  void setImageType(QString value);
 
   QString readKey(QString key);
 
 private:
   QString mFilename;
+
+  void remove(QStringList* data, QStringList keys);
+  void append(QStringList* data, QString key, QString value);
+
 };
 
 }
