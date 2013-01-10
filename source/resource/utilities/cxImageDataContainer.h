@@ -29,6 +29,8 @@ namespace cx
 
 /** Delayed loading of one vtkImageData.
  *
+ * The data might not exist on disk at the time of construction, in this case use the
+ * setExistsOnDisk() when it becomes available.
  *
  * \ingroup cxResourceUtilities
  * \date Dec 04 2012
@@ -40,18 +42,24 @@ public:
 	/**
 	  * Initialize with a given image file
 	  */
-	explicit CachedImageData(QString filename, vtkImageDataPtr image = NULL);
+	explicit CachedImageData(QString filename, vtkImageDataPtr image = NULL, bool existsOnDisk = true);
 	/**
-	  *
+	  * Return name of file.
 	  */
 	QString getFilename() { return mFilename; }
 	vtkImageDataPtr getImage();
-	void setPurgeValid();
-	/** clear the image contents
+	/**
+	  * Call to inform class that data has been saved to disk meaning
+	  * that the data can be cleared from memory if necessary.
+	  */
+	void setExistsOnDisk(bool on);
+	/**
+	  * Clear the image contents from memory, if possible.
+	  * Return true if purge was successful.
 	  */
 	bool purge();
 private:
-	bool mPurgeValid;
+	bool mExistsOnDisk; ///< true if data exist on disk and can be loaded
 	QString mFilename;
 	vtkImageDataPtr mImageData;
 };
