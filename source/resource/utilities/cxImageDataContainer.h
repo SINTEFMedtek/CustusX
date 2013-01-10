@@ -44,14 +44,17 @@ public:
 	/**
 	  *
 	  */
+	QString getFilename() { return mFilename; }
 	vtkImageDataPtr getImage();
+	void setPurgeValid();
 	/** clear the image contents
 	  */
-	void purge() {}
-	/** request threaded filling of the image contents.
-	  */
-	void fill() {}
+	bool purge();
+//	/** request threaded filling of the image contents.
+//	  */
+//	void fill() {}
 private:
+	bool mPurgeValid;
 	QString mFilename;
 	vtkImageDataPtr mImageData;
 };
