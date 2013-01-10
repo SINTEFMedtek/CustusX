@@ -31,9 +31,6 @@ CachedImageData::CachedImageData(QString filename, vtkImageDataPtr image)
 
 vtkImageDataPtr CachedImageData::getImage()
 {
-// no cache: careful - leads to several loads and multiple storage outside - more mem use
-//	return ssc::MetaImageReader().load(mFilename);
-
 	if (!mImageData)
 	{
 		mImageData = ssc::MetaImageReader().load(mFilename);
