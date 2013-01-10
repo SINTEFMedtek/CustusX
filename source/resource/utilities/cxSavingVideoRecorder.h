@@ -65,6 +65,9 @@ public:
 	void stop();
 	void cancel();
 
+signals:
+	void dataSaved(QString filename); ///< emitted for each saved vtkImageData
+
 protected:
 	struct DataType
 	{
@@ -128,10 +131,13 @@ public:
 
 private slots:
 	void newFrameSlot();
+	void dataSavedSlot(QString filename);
 private:
 	std::vector<CachedImageDataPtr> mImages;
 	std::vector<double> mTimestamps;
 	void deleteFolder(QString folder);
+	void purgeCache();
+	int mLastPurgedImageIndex;
 
 	QString mSaveFolder;
 //	DataType mData;

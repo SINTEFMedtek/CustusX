@@ -130,6 +130,7 @@ void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 	writer->Write();
 //	std:cout << "** VideoRecorderSaveThread::write() " << data.mImageFilename << std::endl;
 
+	emit dataSaved(data.mImageFilename);
 }
 
 /** Write all pending images to file.
@@ -167,34 +168,19 @@ void VideoRecorderSaveThread::run()
 	this->closeTimestampsFile();
 }
 
-
-///** Merge all us frames into one vtkImageData
-// *
-// */
-//vtkImageDataPtr USFrameData::mergeFrames(std::vector<vtkImageDataPtr> input) const
-//{
-//  vtkImageAppendPtr filter = vtkImageAppendPtr::New();
-//  filter->SetAppendAxis(2); // append along z-axis
-
-//  for (unsigned i=0; i<input.size(); ++i)
-//    filter->SetInput(i, input[i]);
-
-//  filter->Update();
-//  return filter->GetOutput();
-//}
-
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
 
 SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor) :
+	mLastPurgedImageIndex(-1),
 	mSource(source)
 {
 //	std::cout << "**SavingVideoRecorder::SavingVideoRecorder()" << std::endl;
 	mSaveFolder = saveFolder;
 	mSaveThread.reset(new VideoRecorderSaveThread(NULL, saveFolder, prefix, compressed, writeColor));
+	connect(mSaveThread.get(), SIGNAL(dataSaved(QString)), this, SLOT(dataSavedSlot(QString)));
 	mSaveThread->start();
 }
 
@@ -228,19 +214,48 @@ void SavingVideoRecorder::newFrameSlot()
 	vtkImageDataPtr frame = vtkImageDataPtr::New();
 	frame->DeepCopy(image);
 
+	CachedImageDataPtr cache(new CachedImageData(filename, frame));
+	mImages.push_back(cache);
+	mTimestamps.push_back(timestamp);
+
+	this->purgeCache();
+}
+
+void SavingVideoRecorder::purgeCache()
+{
+	if (mImages.empty())
+		return;
+
 	// numbers in Kb
-	int currentMem = frame->GetActualMemorySize() * mImages.size();
+	int currentMem = mImages.back()->getImage()->GetActualMemorySize() * mImages.size();
 	int maxMem = 2*1000*1000; // store max 2Gb of data before clearing cache
 //	std::cout << "memused (" << mImages.size() << ") :"<< currentMem/1000 << "." << currentMem << std::endl;
 
 	bool discardImage = (currentMem > maxMem);
 
-	if (discardImage)
-		frame = vtkImageDataPtr();
+	if (!discardImage)
+		return;
 
-	CachedImageDataPtr cache(new CachedImageData(filename, frame));
-	mImages.push_back(cache);
-	mTimestamps.push_back(timestamp);
+	if (mImages.size() >= mLastPurgedImageIndex+1)
+		return;
+
+	bool success = mImages[mLastPurgedImageIndex+1]->purge();
+
+	if (!success)
+
+	mLastPurgedImageIndex++;
+}
+
+void SavingVideoRecorder::dataSavedSlot(QString filename)
+{
+	for (int i=0; i<mImages.size(); ++i)
+	{
+		if (mImages[i]->getFilename() != filename)
+			continue;
+
+		mImages[i]->setPurgeValid();
+		break;
+	}
 }
 
 std::vector<CachedImageDataPtr> SavingVideoRecorder::getImageData()
