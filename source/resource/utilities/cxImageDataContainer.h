@@ -50,9 +50,6 @@ public:
 	/** clear the image contents
 	  */
 	bool purge();
-//	/** request threaded filling of the image contents.
-//	  */
-//	void fill() {}
 private:
 	bool mPurgeValid;
 	QString mFilename;
