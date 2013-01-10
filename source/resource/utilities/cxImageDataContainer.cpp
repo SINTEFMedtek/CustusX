@@ -24,6 +24,7 @@ namespace cx
 
 CachedImageData::CachedImageData(QString filename, vtkImageDataPtr image)
 {
+	mPurgeValid = false;
 	mFilename = filename;
 	mImageData = image;
 }
@@ -39,6 +40,21 @@ vtkImageDataPtr CachedImageData::getImage()
 	}
 	return mImageData;
 }
+
+void CachedImageData::setPurgeValid()
+{
+	mPurgeValid = true;
+}
+
+bool CachedImageData::purge()
+{
+	if (mPurgeValid)
+		return false;
+
+	mImageData = vtkImageDataPtr();
+	return false;
+}
+
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
