@@ -228,9 +228,9 @@ void SavingVideoRecorder::purgeCache()
 
 	// numbers in Kb
 	int currentMem = mImages.back()->getImage()->GetActualMemorySize() * mImages.size();
-	// Store max 4Gb of data before clearing cache.
+	// Store max xGb of data before clearing cache.
 	// This is an arbitrary number assumed to be easy to handle for the computer.
-	int maxMem = 4*1000*1000;
+	int maxMem = 2*1000*1000;
 //	std::cout << "memused (" << mImages.size() << ") :"<< currentMem/1000 << "." << currentMem << std::endl;
 
 	bool discardImage = (currentMem > maxMem);
