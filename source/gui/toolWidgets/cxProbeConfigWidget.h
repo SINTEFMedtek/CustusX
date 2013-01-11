@@ -42,19 +42,15 @@ public:
 
 private slots:
 	void activeProbeConfigurationChangedSlot();
-//	void guiChanged();
 	void savePresetSlot();
 	void deletePresetSlot();
 	void guiImageSettingsChanged();
 	void guiProbeSectorChanged();
 	void guiOriginSettingsChanged();
-//	void shiftLeftSlot();
-//	void shiftRightSlot();
 	void syncBoxToSectorChanged();
 
 private:
 	virtual QString defaultWhatsThis() const;
-//	void shiftDefinition(ssc::Vector3D shift);
 
 	QWidget* mActiveProbeConfigWidget;
 	BoundingBoxWidget* mBBWidget;
@@ -66,13 +62,6 @@ private:
 	ActiveProbeConfigurationStringDataAdapterPtr mActiveProbeConfig;
 	QString mLastKnownProbeConfigName; ///< used for suggesting save names for new config
 	bool mUpdating;
-
-//	ssc::Vector3D mOrigin_p; ///< probe origin in pixel space p. (upper-left corner origin)
-//	ssc::Vector3D mSpacing;
-//	ssc::DoubleBoundingBox3D mClipRect_p; ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
-
-
-//	ssc::ProbeData mData; ///< current sector data
 };
 
 }
