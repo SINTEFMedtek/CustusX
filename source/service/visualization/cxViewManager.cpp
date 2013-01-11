@@ -351,7 +351,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 		else if (child.toElement().tagName() == "clippedImage")
 		{
 			QString clippedImage = child.toElement().text();
-			std::cout << "ClippedImage  " << clippedImage << std::endl;
+//			std::cout << "ClippedImage  " << clippedImage << std::endl;
 			mInteractiveClipper->setImage(ssc::dataManager()->getImage(clippedImage));
 		}
 		child = child.nextSibling();

@@ -153,7 +153,7 @@ void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 	mStreamRep->setShowSector(settings()->value("showSectorInRTView").toBool());
 
 	ssc::messageManager()->sendInfo(
-					"Setup rt rep with source="
+					"Setup video rep with source="
 					+ source->getName() + " and tool="
 					+ (tool ? tool->getName() : "none"));
 }
