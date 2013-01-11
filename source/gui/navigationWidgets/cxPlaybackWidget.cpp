@@ -158,6 +158,11 @@ void PlaybackWidget::toggleOpenSlot()
 	{
 		ToolManager::getInstance()->setPlaybackMode(mTimer);
 		videoService()->setPlaybackMode(mTimer);
+
+		ssc::messageManager()->sendInfo(QString("Started Playback with start time [%1] and end time [%2]")
+						.arg(mTimer->getStartTime().toString(ssc::timestampMilliSecondsFormatNice()))
+						.arg(mTimer->getStartTime().addMSecs(mTimer->getLength()).toString(ssc::timestampMilliSecondsFormatNice())));
+
 	}
 }
 
