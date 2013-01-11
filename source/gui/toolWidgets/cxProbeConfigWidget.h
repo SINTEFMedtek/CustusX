@@ -64,6 +64,7 @@ private:
 	QCheckBox* mSyncBoxToSector;
 
 	ActiveProbeConfigurationStringDataAdapterPtr mActiveProbeConfig;
+	QString mLastKnownProbeConfigName; ///< used for suggesting save names for new config
 	bool mUpdating;
 
 //	ssc::Vector3D mOrigin_p; ///< probe origin in pixel space p. (upper-left corner origin)
