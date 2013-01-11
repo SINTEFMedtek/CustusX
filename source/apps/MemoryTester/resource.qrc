@@ -1,0 +1,9 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>images/application-exit.png</file>
+     <file>images/effect.png</file>
+     <file>images/exec.png</file>
+     <file>images/go-home.png</file>
+
+ </qresource>
+ </RCC>
