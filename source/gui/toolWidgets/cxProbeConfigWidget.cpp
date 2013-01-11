@@ -185,7 +185,12 @@ void ProbeConfigWidget::savePresetSlot()
 	if (!probe)
 		return;
 
-	QString newName = QString("%1 (2)").arg(probe->getConfigName(probe->getConfigId()));
+	// use the previously selected config as a suggestion for new config name.
+	QString oldname = probe->getConfigName(probe->getConfigId());
+	if (oldname.isEmpty())
+		oldname = mLastKnownProbeConfigName;
+
+	QString newName = QString("%1 (2)").arg(oldname);
 
     bool ok;
     newName = QInputDialog::getText(this, "Save Config",
@@ -219,7 +224,6 @@ void ProbeConfigWidget::savePresetSlot()
     	}
     }
 
-    std::cout << QString("Save probe config uid=%1, name=%2").arg(newUid).arg(newName) << std::endl;
     probe->saveCurrentConfig(newUid, newName);
 }
 
@@ -276,7 +280,10 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 		mWidth->setInternal2Display(180.0/M_PI);
 	}
 
-//	std::cout << "ProbeConfigWidget::activeProbeConfigurationChangedSlot()" << std::endl;
+	if (!probe->getConfigId().isEmpty())
+	{
+		mLastKnownProbeConfigName = probe->getConfigName(probe->getConfigId());
+	}
 	mUpdating= false;
 }
 
