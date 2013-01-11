@@ -193,9 +193,18 @@ void IGTLinkClientBase::calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg)
 		mGeneratingTimeCalibration = false;
 	}
 
+	//test code for testing how much time is added by the time calibration,
+	//and if it is constant for local time stamps
+	//igtl::TimeStamp::Pointer oldtimestamp = igtl::TimeStamp::New();
+	//imgMsg->GetTimeStamp(oldtimestamp);
+
 	// Update imgMsg timestamp
 	timestamp->SetTime((timestamp_ms + mLastReferenceTimestampDiff) / 1000.0); // in sec
 	imgMsg->SetTimeStamp(timestamp);
+
+	//test code
+	//double timestampDiff = (timestamp->GetTimeStamp() - oldtimestamp->GetTimeStamp()) * 1000; //ms
+	//std::cout << "timestampDiff: " << timestampDiff << " ms" << std::endl;
 }
 
 } /* namespace cx */
