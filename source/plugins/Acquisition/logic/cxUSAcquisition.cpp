@@ -239,6 +239,7 @@ void USAcquisition::startRecord(QString sessionId)
 	                                   session->getDescription(),
 	                                   patientService()->getPatientData()->getActivePatientFolder()));
 
+	mPluginData->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
 	bool writeColor = mPluginData->getReconstructer()->getParams()->mAngioAdapter->getValue()
 	        ||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 
