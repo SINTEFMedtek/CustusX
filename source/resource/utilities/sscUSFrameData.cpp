@@ -162,9 +162,20 @@ Eigen::Array3i USFrameData::getDimensions() const
 
 Vector3D USFrameData::getSpacing() const
 {
-	if (mImageContainer->empty())
-		return Vector3D(1,1,1);
-	ssc::Vector3D retval = Vector3D(mImageContainer->get(0)->GetSpacing());
+	Vector3D retval(1,1,1);
+
+    // no cache, generate one sample
+	if (mProcessedImage.empty())
+	{
+		if (!mImageContainer->empty())
+			retval = Vector3D(mImageContainer->get(0)->GetSpacing());
+	}
+	// cache is available, use that
+	else
+	{
+		retval = Vector3D(mProcessedImage[0]->GetSpacing());
+	}
+
 	retval[2] = retval[0]; // set z-spacing to arbitrary value.
 	return retval;
 }
