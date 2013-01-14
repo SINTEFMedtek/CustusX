@@ -2210,14 +2210,14 @@
                         <Row>105</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>243</Left>
-                        <Right>782</Right>
-                        <Top>106</Top>
-                        <Bottom>667</Bottom>
+                        <Left>249</Left>
+                        <Right>778</Right>
+                        <Top>110</Top>
+                        <Bottom>663</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.0710479573712256</Width>
-                        <Height>0.0710479573712256</Height>
+                        <Width>0.071047957371225601</Width>
+                        <Height>0.071047957371225601</Height>
                     </PixelSize>
                 </Config>
                 <Config>
@@ -2248,14 +2248,14 @@
                         <Row>105</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>273</Left>
-                        <Right>752</Right>
-                        <Top>106</Top>
-                        <Bottom>667</Bottom>
+                        <Left>277</Left>
+                        <Right>747</Right>
+                        <Top>110</Top>
+                        <Bottom>663</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.0797867323922239</Width>
-                        <Height>0.0797867323922239</Height>
+                        <Width>0.079786732392223905</Width>
+                        <Height>0.079786732392223905</Height>
                     </PixelSize>
                 </Config>
                 <Config>
@@ -2286,14 +2286,14 @@
                         <Row>105</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>297</Left>
-                        <Right>728</Right>
-                        <Top>106</Top>
-                        <Bottom>668</Bottom>
+                        <Left>300</Left>
+                        <Right>725</Right>
+                        <Top>110</Top>
+                        <Bottom>664</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.0886519248802488</Width>
-                        <Height>0.0886519248802488</Height>
+                        <Width>0.088651924880248797</Width>
+                        <Height>0.088651924880248797</Height>
                     </PixelSize>
                 </Config>
                 <Config>
@@ -2324,10 +2324,10 @@
                         <Row>105</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>333</Left>
-                        <Right>692</Right>
-                        <Top>106</Top>
-                        <Bottom>667</Bottom>
+                        <Left>337</Left>
+                        <Right>688</Right>
+                        <Top>110</Top>
+                        <Bottom>664</Bottom>
                     </CroppingEdges>
                     <PixelSize>
                         <Width>0.106571936056838</Width>
