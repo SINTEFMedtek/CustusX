@@ -71,12 +71,8 @@ private:
 	AcquisitionDataPtr mPluginData;
 	ssc::VideoSourcePtr mRTSource;
 	SavingVideoRecorderPtr mVideoRecorder;
-//	ssc::VideoRecorderPtr mRTRecorder;
 	ssc::ToolPtr mTool;
 
-	//  QFuture<QString> mFileMakerFuture;
-	//  QFutureWatcher<QString> mFileMakerFutureWatcher;
-	//  UsReconstructionFileMakerPtr mFileMaker;
 	UsReconstructionFileMakerPtr mCurrentSessionFileMaker;
 
 	std::list<QFutureWatcher<QString>*> mSaveThreads;
