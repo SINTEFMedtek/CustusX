@@ -1869,8 +1869,8 @@
                     <Depth>351</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>321</Col>
-                        <Row>68</Row>
+                        <Col>320.625</Col>
+                        <Row>66.25</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
@@ -1890,10 +1890,10 @@
                         <Row>68</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>127</Left>
+                        <Left>125</Left>
                         <Right>515</Right>
-                        <Top>68</Top>
-                        <Bottom>419</Bottom>
+                        <Top>66</Top>
+                        <Bottom>417</Bottom>
                     </CroppingEdges>
                     <PixelSize>
                         <Width>0.113635</Width>
@@ -1907,8 +1907,8 @@
                     <Depth>351</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>321</Col>
-                        <Row>68</Row>
+                        <Col>320.3125</Col>
+                        <Row>66.25</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
@@ -1928,14 +1928,14 @@
                         <Row>68</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>192</Left>
-                        <Right>450</Right>
-                        <Top>68</Top>
-                        <Bottom>419</Bottom>
+                        <Left>190</Left>
+                        <Right>449</Right>
+                        <Top>66</Top>
+                        <Bottom>417</Bottom>
                     </CroppingEdges>
                     <PixelSize>
-                        <Width>0.169971</Width>
-                        <Height>0.169971</Height>
+                        <Width>0.16997100000000001</Width>
+                        <Height>0.16997100000000001</Height>
                     </PixelSize>
                 </Config>
                 <Config>
@@ -1945,8 +1945,8 @@
                     <Depth>351</Depth>
                     <Offset>0</Offset>
                     <Origin>
-                        <Col>321</Col>
-                        <Row>68</Row>
+                        <Col>320</Col>
+                        <Row>66.25</Row>
                     </Origin>
                     <NCorners>4</NCorners>
                     <Corner>
@@ -1966,10 +1966,10 @@
                         <Row>68</Row>
                     </Corner>
                     <CroppingEdges>
-                        <Left>224</Left>
-                        <Right>418</Right>
-                        <Top>68</Top>
-                        <Bottom>419</Bottom>
+                        <Left>222</Left>
+                        <Right>417</Right>
+                        <Top>66</Top>
+                        <Bottom>417</Bottom>
                     </CroppingEdges>
                     <PixelSize>
                         <Width>0.22727</Width>
@@ -1985,10 +1985,10 @@
                         <Row>68</Row>
                     </Origin>
                     <CroppingEdges>
-                        <Left>128</Left>
-                        <Right>512</Right>
-                        <Top>70</Top>
-                        <Bottom>414</Bottom>
+                        <Left>130</Left>
+                        <Right>510</Right>
+                        <Top>72</Top>
+                        <Bottom>411</Bottom>
                     </CroppingEdges>
                     <PixelSize>
                         <Width>0.113635</Width>
@@ -2000,14 +2000,71 @@
                     <Name>6cm angio</Name>
                     <WidthDeg>0</WidthDeg>
                     <Origin>
-                        <Col>321</Col>
-                        <Row>68</Row>
+                        <Col>320</Col>
+                        <Row>66.25</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>196</Left>
+                        <Right>443</Right>
+                        <Top>71</Top>
+                        <Bottom>411</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.16997100000000001</Width>
+                        <Height>0.16997100000000001</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>8cmangio</ID>
+                    <Name>8 cm angio</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>320</Col>
+                        <Row>66.25</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>225</Left>
+                        <Right>415</Right>
+                        <Top>68</Top>
+                        <Bottom>415</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.22727</Width>
+                        <Height>0.22727</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>4cmAngio</ID>
+                    <Name>4 cm Angio</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>320.625</Col>
+                        <Row>66.25</Row>
+                    </Origin>
+                    <CroppingEdges>
+                        <Left>128</Left>
+                        <Right>513</Right>
+                        <Top>68</Top>
+                        <Bottom>415</Bottom>
+                    </CroppingEdges>
+                    <PixelSize>
+                        <Width>0.113635</Width>
+                        <Height>0.113635</Height>
+                    </PixelSize>
+                </Config>
+                <Config>
+                    <ID>6cmAngio</ID>
+                    <Name>6 cm Angio</Name>
+                    <WidthDeg>0</WidthDeg>
+                    <Origin>
+                        <Col>320.3125</Col>
+                        <Row>66.25</Row>
                     </Origin>
                     <CroppingEdges>
                         <Left>193</Left>
-                        <Right>448</Right>
-                        <Top>69</Top>
-                        <Bottom>417</Bottom>
+                        <Right>446</Right>
+                        <Top>68</Top>
+                        <Bottom>415</Bottom>
                     </CroppingEdges>
                     <PixelSize>
                         <Width>0.16997100000000001</Width>
