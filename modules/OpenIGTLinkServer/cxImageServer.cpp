@@ -29,9 +29,10 @@ bool ImageServer::initialize()
 	if(!mImageSender)
 		return false;
 
-	// test streaming by starting/stopping once (will emit error messages right away instead of waiting for an incoming connecion.)
-	ok = mImageSender->startStreaming(GrabberSenderPtr());
-	mImageSender->stopStreaming();
+//	// test streaming by starting/stopping once (will emit error messages right away instead of waiting for an incoming connecion.)
+//	ok = mImageSender->startStreaming(GrabberSenderPtr());
+//	mImageSender->stopStreaming();
+	ok = true;
 
 	return ok;
 

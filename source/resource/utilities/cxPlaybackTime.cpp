@@ -40,9 +40,9 @@ void PlaybackTime::initialize(QDateTime start, qint64 length)
 	mStartTime = start;
 	mLength = length;
 
-	ssc::messageManager()->sendInfo(QString("Initialized PlaybackTime with start time [%1] and end time [%2]")
-					.arg(mStartTime.toString(ssc::timestampMilliSecondsFormatNice()))
-					.arg(mStartTime.addMSecs(mLength).toString(ssc::timestampMilliSecondsFormatNice())));
+//	ssc::messageManager()->sendInfo(QString("Initialized PlaybackTime with start time [%1] and end time [%2]")
+//					.arg(mStartTime.toString(ssc::timestampMilliSecondsFormatNice()))
+//					.arg(mStartTime.addMSecs(mLength).toString(ssc::timestampMilliSecondsFormatNice())));
 }
 
 PlaybackTime::~PlaybackTime()
