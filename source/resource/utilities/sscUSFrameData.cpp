@@ -231,6 +231,8 @@ vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 
 vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
 {
+//	std::cout << "USFrameData::useAngio " << std::endl;
+
 	// Some of the code here is borrowed from the vtk examples:
 	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
 
@@ -265,13 +267,25 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
 	{
 		for (idxY = 0; /*!self->AbortExecute &&*/idxY <= maxY; idxY++)
 		{
-			for (idxR = 0; idxR < maxX; idxR++)//Look at 3 scalar components at the same time (RGB)
+			for (idxR = 0; idxR <= maxX; idxR++)//Look at 3 scalar components at the same time (RGB)
 			{
 				// Pixel operation. Add foo. Dumber would be impossible.
 				//        *outPtr = (OT)((float)(*inPtr) + foo);
 				if (((*inPtr) == (*(inPtr + 1))) && ((*inPtr) == (*(inPtr + 2))))
 				{
 					(*outPtr) = 0;
+				}
+				else
+				{
+					// strong check: look for near-gray values and remove them.
+					double r = inPtr[0];
+					double g = inPtr[1];
+					double b = inPtr[2];
+					int metric = (fabs(r-g) + fabs(r-b) + fabs(g-b)) / 3; // average absolute diff must be less than or equal to this
+//					std::cout << QString("  %1,%2,%3 \t %4, %5 -- %6").arg(int(inPtr[0])).arg(int(inPtr[1])).arg(int(inPtr[2])).arg(idxR).arg(idxY).arg(metric) << std::endl;
+					if (metric <= 3)
+						(*outPtr) = 0;
+
 				}
 				//Assume the outVolume is treated with the luminance filter first
 				outPtr++;
