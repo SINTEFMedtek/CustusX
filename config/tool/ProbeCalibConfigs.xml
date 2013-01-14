@@ -1977,44 +1977,6 @@
                     </PixelSize>
                 </Config>
                 <Config>
-                    <ID>4cmangio</ID>
-                    <Name>4cm angio</Name>
-                    <WidthDeg>0</WidthDeg>
-                    <Origin>
-                        <Col>321</Col>
-                        <Row>68</Row>
-                    </Origin>
-                    <CroppingEdges>
-                        <Left>130</Left>
-                        <Right>510</Right>
-                        <Top>72</Top>
-                        <Bottom>411</Bottom>
-                    </CroppingEdges>
-                    <PixelSize>
-                        <Width>0.113635</Width>
-                        <Height>0.113635</Height>
-                    </PixelSize>
-                </Config>
-                <Config>
-                    <ID>6cmangio</ID>
-                    <Name>6cm angio</Name>
-                    <WidthDeg>0</WidthDeg>
-                    <Origin>
-                        <Col>320</Col>
-                        <Row>66.25</Row>
-                    </Origin>
-                    <CroppingEdges>
-                        <Left>196</Left>
-                        <Right>443</Right>
-                        <Top>71</Top>
-                        <Bottom>411</Bottom>
-                    </CroppingEdges>
-                    <PixelSize>
-                        <Width>0.16997100000000001</Width>
-                        <Height>0.16997100000000001</Height>
-                    </PixelSize>
-                </Config>
-                <Config>
                     <ID>8cmangio</ID>
                     <Name>8 cm angio</Name>
                     <WidthDeg>0</WidthDeg>
