@@ -616,6 +616,7 @@ QString ReconstructCore::generateOutputUid()
 	QString name = mFileData.mFilename.split("/").back();
 	name = name.split(".").front();
 
+	std::cout << "ReconstructCore::generateOutputUid() " << name << std::endl;
 	QStringList split = name.split("_");
 	QStringList prefix = split.front().split("-");
 	if (prefix.size() == 2)
@@ -624,7 +625,7 @@ QString ReconstructCore::generateOutputUid()
 	}
 	else
 	{
-		split[0] += "rec";
+		split[0] += "_rec";
 	}
 
 	return split.join("_");
@@ -642,6 +643,10 @@ QString ReconstructCore::generateImageName(QString uid) const
 	prefix = prefix.split("-").front(); // retrieve US part.
 	if (prefix.isEmpty())
 		prefix = "US";
+
+	std::cout << "reconstruct input uid " << uid << std::endl;
+	if (mInput.mAngio) // tag angio images as such
+		prefix += "A";
 
 	// retrieve  index counter from _99_
 	QString counter = "";
