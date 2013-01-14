@@ -305,7 +305,7 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 {
 	ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("filterwidget");
 	mFilters.reset(new FilterGroup(options));
-	mFilters->append(FilterPtr(new DummyFilter()));
+//	mFilters->append(FilterPtr(new DummyFilter()));
 	mFilters->append(FilterPtr(new BinaryThresholdImageFilter()));
 	mFilters->append(FilterPtr(new BinaryThinningImageFilter3DFilter()));
 	mFilters->append(FilterPtr(new ContourFilter()));

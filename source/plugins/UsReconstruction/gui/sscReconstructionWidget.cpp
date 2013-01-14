@@ -119,12 +119,10 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	layout->addWidget(mAlgorithmGroup, line, 0, 1, 2);
 	++line;
 
-	ssc::createDataWidget(this, mReconstructer->getParams()->mAlignTimestamps, layout, line++);
 	ssc::createDataWidget(this, mReconstructer->getParams()->mAngioAdapter, layout, line++);
 	ssc::createDataWidget(this, mReconstructer->getParams()->mCreateBModeWhenAngio, layout, line++);
-	ssc::createDataWidget(this, mReconstructer->getParams()->mTimeCalibration, layout, line++);
-	ssc::createDataWidget(this, mReconstructer->getParams()->mMaskReduce, layout, line++);
 	ssc::createDataWidget(this, mReconstructer->getParams()->mOrientationAdapter, layout, line++);
+	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 2);
 
 	mDimXWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterXDim(mReconstructer)));
 	mDimYWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterYDim(mReconstructer)));
@@ -133,7 +131,11 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	outputVolDimLayout->addWidget(mDimXWidget);
 	outputVolDimLayout->addWidget(mDimYWidget);
 	outputVolDimLayout->addWidget(mDimZWidget);
-	layout->addLayout(outputVolDimLayout, line, 0, 1, 2);
+	layout->addLayout(outputVolDimLayout, line++, 0, 1, 2);
+
+	ssc::createDataWidget(this, mReconstructer->getParams()->mAlignTimestamps, layout, line++);
+	ssc::createDataWidget(this, mReconstructer->getParams()->mTimeCalibration, layout, line++);
+	ssc::createDataWidget(this, mReconstructer->getParams()->mMaskReduce, layout, line++);
 
 	return retval;
 }
