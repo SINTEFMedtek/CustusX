@@ -22,23 +22,36 @@ typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 namespace cx
 {
 
-CachedImageData::CachedImageData(QString filename, vtkImageDataPtr image)
+CachedImageData::CachedImageData(QString filename, vtkImageDataPtr image, bool existsOnDisk)
 {
+	mExistsOnDisk = existsOnDisk;
 	mFilename = filename;
 	mImageData = image;
 }
 
 vtkImageDataPtr CachedImageData::getImage()
 {
-// no cache: careful - leads to several loads and multiple storage outside - more mem use
-//	return ssc::MetaImageReader().load(mFilename);
-
 	if (!mImageData)
 	{
 		mImageData = ssc::MetaImageReader().load(mFilename);
 	}
 	return mImageData;
 }
+
+void CachedImageData::setExistsOnDisk(bool on)
+{
+	mExistsOnDisk = on;
+}
+
+bool CachedImageData::purge()
+{
+	if (mExistsOnDisk)
+		return false;
+
+	mImageData = vtkImageDataPtr();
+	return false;
+}
+
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------

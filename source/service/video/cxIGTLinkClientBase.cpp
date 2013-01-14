@@ -108,10 +108,12 @@ IGTLinkImageMessage::Pointer IGTLinkClientBase::getLastImageMessage()
 	IGTLinkImageMessage::Pointer retval = mMutexedImageMessageQueue.front();
 	mMutexedImageMessageQueue.pop_front();
 
+	// this happens when the main thread is busy. This is bad, but happens a lot during operation.
+	// Removed this in order to remove spam from console
 	static int mQueueSizeOnLastGet = 0;
 	int queueSize = mMutexedImageMessageQueue.size();
-	if (( queueSize > mQueueSizeOnLastGet )&&( queueSize > 9 )) // should not happen. Symptom of congestion.
-		ssc::messageManager()->sendInfo(QString("%1 remaining video frames in queue.").arg(queueSize));
+//	if (( queueSize > mQueueSizeOnLastGet )&&( queueSize > 9 )) // should not happen. Symptom of congestion.
+//		ssc::messageManager()->sendInfo(QString("%1 remaining video frames in queue.").arg(queueSize));
 	mQueueSizeOnLastGet = queueSize;
 	return retval;
 }
@@ -193,9 +195,18 @@ void IGTLinkClientBase::calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg)
 		mGeneratingTimeCalibration = false;
 	}
 
+	//test code for testing how much time is added by the time calibration,
+	//and if it is constant for local time stamps
+	//igtl::TimeStamp::Pointer oldtimestamp = igtl::TimeStamp::New();
+	//imgMsg->GetTimeStamp(oldtimestamp);
+
 	// Update imgMsg timestamp
 	timestamp->SetTime((timestamp_ms + mLastReferenceTimestampDiff) / 1000.0); // in sec
 	imgMsg->SetTimeStamp(timestamp);
+
+	//test code
+	//double timestampDiff = (timestamp->GetTimeStamp() - oldtimestamp->GetTimeStamp()) * 1000; //ms
+	//std::cout << "timestampDiff: " << timestampDiff << " ms" << std::endl;
 }
 
 } /* namespace cx */
