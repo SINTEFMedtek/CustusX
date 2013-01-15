@@ -197,7 +197,6 @@ void ReconstructManager::selectData(QString filename, QString calFilesPath)
 		return;
 	}
 
-	std::cout << "ReconstructManager::selectData " << filename << std::endl;
 	this->clearAll();
 	this->readCoreFiles(filename, calFilesPath);
 	mReconstructer->setInputData(mOriginalFileData);
@@ -209,7 +208,6 @@ void ReconstructManager::selectData(ssc::USReconstructInputData data)
 
 	mOriginalFileData = data;
 	mCalFilesPath = "";
-	std::cout << "ReconstructManager::selectData " << data.mFilename<< std::endl;
 
 	mReconstructer->setInputData(mOriginalFileData);
 }
