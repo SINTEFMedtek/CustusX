@@ -83,11 +83,11 @@ void ReconstructManager::startReconstruction()
 			return;
 		}
 
+		serial->append(ThreadedTimedReconstructerStep1::create(dualCore)); // run dualcore first, as it is set to not release memory after preprocess.
 		serial->append(ThreadedTimedReconstructerStep1::create(core));
-		serial->append(ThreadedTimedReconstructerStep1::create(dualCore));
 		serial->append(parallel);
-		parallel->append(ThreadedTimedReconstructerStep2::create(core));
 		parallel->append(ThreadedTimedReconstructerStep2::create(dualCore));
+		parallel->append(ThreadedTimedReconstructerStep2::create(core));
 	}
 	else
 	{
@@ -134,6 +134,8 @@ void ReconstructManager::threadFinishedSlot()
 			++iter;
 		}
 	}
+
+	mOriginalFileData.mUsRaw->purgeAll();
 }
 
 

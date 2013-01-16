@@ -16,6 +16,7 @@
 #include <vtkImageData.h>
 #include "sscDataManagerImpl.h"
 #include "sscLogger.h"
+#include "sscTypeConversions.h"
 
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
@@ -29,6 +30,12 @@ CachedImageData::CachedImageData(QString filename, vtkImageDataPtr image, bool e
 	mImageData = image;
 }
 
+CachedImageData::~CachedImageData()
+{
+//	std::cout << "CachedImageData::~CachedImageData() " << mFilename << std::endl;
+}
+
+
 vtkImageDataPtr CachedImageData::getImage()
 {
 	if (!mImageData)
@@ -40,18 +47,38 @@ vtkImageDataPtr CachedImageData::getImage()
 
 void CachedImageData::setExistsOnDisk(bool on)
 {
+//	std::cout << "CachedImageData::setExistsOnDisk " << mFilename << " " << on << std::endl;
 	mExistsOnDisk = on;
 }
 
 bool CachedImageData::purge()
 {
-	if (mExistsOnDisk)
-		return false;
+//	std::cout << "CachedImageData::purge " << QFileInfo(mFilename).fileName() << " " << mExistsOnDisk << std::endl;
 
-	mImageData = vtkImageDataPtr();
+	if (mExistsOnDisk)
+	{
+		mImageData = vtkImageDataPtr();
+		return true;
+	}
+
 	return false;
 }
 
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+void ImageDataContainer::purgeAll()
+{
+	int count = 0;
+	for (unsigned i=0; i<this->size(); ++i)
+	{
+		if (this->purge(i))
+			count++;
+	}
+	double fraction = double(count)/this->size();
+//	std::cout << QString("PurgeAll imagecache: purged %1\% of %2 frames.").arg(fraction).arg(this->size()) << std::endl;
+}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
