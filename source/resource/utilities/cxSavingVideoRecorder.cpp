@@ -231,21 +231,24 @@ void SavingVideoRecorder::purgeCache()
 	// Store max xGb of data before clearing cache.
 	// This is an arbitrary number assumed to be easy to handle for the computer.
 	int maxMem = 2*1000*1000;
-//	std::cout << "memused (" << mImages.size() << ") :"<< currentMem/1000 << "." << currentMem << std::endl;
+//	std::cout << "memused (" << mImages.size() << ") :"<< currentMem/1000 << "Mb ." << currentMem << std::endl;
+//	std:cout << QString("images: %1, memory: %2 Mb, limit: %3 Mb").arg(mImages.size()).arg(currentMem/1024).arg(maxMem/1024) << std::endl;
 
 	bool discardImage = (currentMem > maxMem);
 
 	if (!discardImage)
 		return;
 
-	if (mImages.size() >= mLastPurgedImageIndex+1)
-		return;
+//	std::cout << QString("attempting purging %1").arg(mLastPurgedImageIndex+1) << std::endl;
 
-	bool success = mImages[mLastPurgedImageIndex+1]->purge();
+	if (mLastPurgedImageIndex+1 <= mImages.size())
+	{
+		bool success = mImages[mLastPurgedImageIndex+1]->purge();
 
-	if (!success)
+		if (success)
+			mLastPurgedImageIndex++;
+	}
 
-	mLastPurgedImageIndex++;
 }
 
 void SavingVideoRecorder::dataSavedSlot(QString filename)
@@ -276,6 +279,9 @@ void SavingVideoRecorder::cancel()
 	mSaveThread->wait(); // wait indefinitely for thread to finish
 
 	this->deleteFolder(mSaveFolder);
+
+//	for (unsigned i=0; i<mImages.size(); ++i)
+//		mImages[i]->purge();
 }
 
 /** Delete folder and all contents that have been written by savers.
