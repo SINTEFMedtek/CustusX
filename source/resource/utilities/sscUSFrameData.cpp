@@ -102,7 +102,7 @@ USFrameDataPtr USFrameData::create(QString filename, std::vector<cx::CachedImage
 }
 
 USFrameData::USFrameData() :
-		mUseAngio(false), mCropbox(0,0,0,0,0,0)
+		mUseAngio(false), mCropbox(0,0,0,0,0,0), mPurgeInput(true)
 {
 }
 
@@ -217,6 +217,9 @@ vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D c
   return rawResult;
 }
 
+/**Convert input to grayscale, and return a COPY of that volume ( in order to break the pipeline for memory purposes)
+ *
+ */
 vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 {
 	if (input->GetNumberOfScalarComponents() == 1) // already gray
@@ -226,7 +229,13 @@ vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 	luminance->SetInput(input);
 	vtkImageDataPtr outData = luminance->GetOutput();
 	outData->Update();
-	return outData;
+
+//	return outData;
+
+	vtkImageDataPtr copy = vtkImageDataPtr::New();
+	copy->DeepCopy(outData);
+	return copy;
+
 }
 
 vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
@@ -341,6 +350,12 @@ unsigned char* USFrameData::getFrame(unsigned int index) const
 	return inputPointer;
 }
 
+void USFrameData::setPurgeInputDataAfterInitialize(bool value)
+{
+	mPurgeInput = value;
+}
+
+
 /** Fill cache, enabling getFrames()
   * NOT thread-safe.
   *
@@ -369,7 +384,13 @@ void USFrameData::generateCache()
 			current = this->toGrayscale(current);
 
 		mProcessedImage[i] = current;
+
+		if (mPurgeInput)
+			mImageContainer->purge(mReducedToFull[i]);
 	}
+
+	if (mPurgeInput)
+		mImageContainer->purgeAll();
 }
 
 void USFrameData::initializeFrames()
@@ -377,6 +398,10 @@ void USFrameData::initializeFrames()
 	this->generateCache();
 }
 
+void USFrameData::purgeAll()
+{
+	mImageContainer->purgeAll();
+}
 
 ///** Merge all us frames into one vtkImageData
 // *

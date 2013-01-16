@@ -94,8 +94,10 @@ public:
 	void setCropBox(IntBoundingBox3D mCropbox);
 	void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
 	void initializeFrames(); ///< call to enable use of getFrame()
+	void setPurgeInputDataAfterInitialize(bool value);
 
 	virtual USFrameDataPtr copy();
+	void purgeAll();
 
 	bool is4D();//Do this object contain 4D data? (Opposed to the usual 3D data)
 
@@ -116,6 +118,7 @@ protected:
 	QString mFilename;
 	std::vector<vtkImageDataPtr> mProcessedImage;
 	cx::ImageDataContainerPtr mImageContainer;
+	bool mPurgeInput;
 };
 
 struct USReconstructInputData

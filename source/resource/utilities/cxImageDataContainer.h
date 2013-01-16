@@ -43,6 +43,7 @@ public:
 	  * Initialize with a given image file
 	  */
 	explicit CachedImageData(QString filename, vtkImageDataPtr image = NULL, bool existsOnDisk = true);
+	~CachedImageData();
 	/**
 	  * Return name of file.
 	  */
@@ -79,6 +80,8 @@ public:
 	virtual vtkImageDataPtr get(unsigned index) = 0;
 	virtual unsigned size() const = 0;
 	bool empty() const { return this->size()==0; }
+	virtual bool purge(unsigned index) { return false; }
+	virtual void purgeAll();
 };
 typedef boost::shared_ptr<ImageDataContainer> ImageDataContainerPtr;
 
@@ -96,6 +99,7 @@ public:
 	virtual ~CachedImageDataContainer() {}
 	virtual vtkImageDataPtr get(unsigned index);
 	virtual unsigned size() const;
+	virtual bool purge(unsigned index) { return mImages[index]->purge(); }
 private:
 	std::vector<CachedImageDataPtr> mImages;
 };
