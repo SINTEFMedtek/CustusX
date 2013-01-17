@@ -76,6 +76,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisit
 
   mFileSelectWidget = new ssc::FileSelectWidget(this);
   connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
+  mFileSelectWidget->setNameFilter(QStringList() << "*.fts");
   topLayout->addWidget(mFileSelectWidget);
 
   mVerbose = new QCheckBox("Save data to temporal_calib.txt");

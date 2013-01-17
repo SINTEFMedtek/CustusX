@@ -29,6 +29,8 @@ namespace cx
 
 /** Delayed loading of one vtkImageData.
  *
+ * The data might not exist on disk at the time of construction, in this case use the
+ * setExistsOnDisk() when it becomes available.
  *
  * \ingroup cxResourceUtilities
  * \date Dec 04 2012
@@ -40,18 +42,25 @@ public:
 	/**
 	  * Initialize with a given image file
 	  */
-	explicit CachedImageData(QString filename, vtkImageDataPtr image = NULL);
+	explicit CachedImageData(QString filename, vtkImageDataPtr image = NULL, bool existsOnDisk = true);
+	~CachedImageData();
 	/**
-	  *
+	  * Return name of file.
 	  */
+	QString getFilename() { return mFilename; }
 	vtkImageDataPtr getImage();
-	/** clear the image contents
+	/**
+	  * Call to inform class that data has been saved to disk meaning
+	  * that the data can be cleared from memory if necessary.
 	  */
-	void purge() {}
-	/** request threaded filling of the image contents.
+	void setExistsOnDisk(bool on);
+	/**
+	  * Clear the image contents from memory, if possible.
+	  * Return true if purge was successful.
 	  */
-	void fill() {}
+	bool purge();
 private:
+	bool mExistsOnDisk; ///< true if data exist on disk and can be loaded
 	QString mFilename;
 	vtkImageDataPtr mImageData;
 };
@@ -71,6 +80,8 @@ public:
 	virtual vtkImageDataPtr get(unsigned index) = 0;
 	virtual unsigned size() const = 0;
 	bool empty() const { return this->size()==0; }
+	virtual bool purge(unsigned index) { return false; }
+	virtual void purgeAll();
 };
 typedef boost::shared_ptr<ImageDataContainer> ImageDataContainerPtr;
 
@@ -88,6 +99,7 @@ public:
 	virtual ~CachedImageDataContainer() {}
 	virtual vtkImageDataPtr get(unsigned index);
 	virtual unsigned size() const;
+	virtual bool purge(unsigned index) { return mImages[index]->purge(); }
 private:
 	std::vector<CachedImageDataPtr> mImages;
 };

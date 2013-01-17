@@ -30,11 +30,9 @@ namespace cx
 ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "ProbeConfigWidget", "Probe Configuration")
 {
 	mUpdating = false;
-//	this->setStatusTip(this->defaultWhatsThis());
 	this->setToolTip(this->defaultWhatsThis());
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
-//	topLayout->addWidget(new QLabel("Probe!!!!"));
 	mActiveProbeConfig = ActiveProbeConfigurationStringDataAdapter::New();
 	connect(mActiveProbeConfig.get(), SIGNAL(changed()), this, SLOT(activeProbeConfigurationChangedSlot()));
 	mActiveProbeConfigWidget = new ssc::LabeledComboBoxWidget(this, mActiveProbeConfig);
@@ -83,7 +81,6 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 						ssc::DoubleRange(0, M_PI, M_PI/180), 0);
 	mWidth->setInternal2Display(180.0/M_PI);
 	connect(mWidth.get(), SIGNAL(changed()), this, SLOT(guiProbeSectorChanged()));
-//	sectorLayout->addWidget(ssc::createDataWidget(this, mWidth));//
 	sectorLayout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mWidth, 0, 0));
 
 	// create buttons bar
@@ -97,17 +94,6 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 		"changes in the sector will reset the crop box.");
 	connect(mSyncBoxToSector, SIGNAL(toggled(bool)), this, SLOT(syncBoxToSectorChanged()));
 	buttonsLayout->addWidget(mSyncBoxToSector);
-
-//	this->createAction(this,
-//	                QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-left-3.png"),
-//					"Shift definition 1 pixel to the left.\nThis will shift the origin, crop box and sector.", "",
-//	                SLOT(shiftLeftSlot()),
-//	                buttonsLayout);
-//	this->createAction(this,
-//	                QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
-//					"Shift definition 1 pixel to the right.\nThis will shift the origin, crop box and sector.", "",
-//	                SLOT(shiftRightSlot()),
-//	                buttonsLayout);
 
 	buttonsLayout->addStretch();
 	this->createAction(this,
@@ -134,36 +120,6 @@ void ProbeConfigWidget::syncBoxToSectorChanged()
 
 }
 
-//void ProbeConfigWidget::shiftDefinition(ssc::Vector3D shift)
-//{
-//	// need a cx probe here, in order to set data.
-//	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
-//	if (!probe)
-//		return;
-//	ssc::ProbeData data = probe->getData();
-//
-//	ssc::ProbeData::ProbeImageData image = data.getImage();
-//	image.mOrigin_p += shift;
-//	for (int i=0; i<3; ++i)
-//	{
-//		image.mClipRect_p[2*i  ] += shift[i];
-//		image.mClipRect_p[2*i+1] += shift[i];
-//	}
-//	data.setImage(image);
-//
-//	probe->setData(data);
-//}
-//
-//void ProbeConfigWidget::shiftLeftSlot()
-//{
-//	this->shiftDefinition(ssc::Vector3D(-1, 0, 0));
-//}
-//
-//void ProbeConfigWidget::shiftRightSlot()
-//{
-//	this->shiftDefinition(ssc::Vector3D( 1, 0, 0));
-//}
-
 QString ProbeConfigWidget::defaultWhatsThis() const
 {
   return "<html>"
@@ -179,11 +135,18 @@ QString ProbeConfigWidget::defaultWhatsThis() const
 
 void ProbeConfigWidget::savePresetSlot()
 {
+	if (!mActiveProbeConfig->getTool())
+		return;
 	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 
-	QString newName = QString("%1 (2)").arg(probe->getConfigName(probe->getConfigId()));
+	// use the previously selected config as a suggestion for new config name.
+	QString oldname = probe->getConfigName(probe->getConfigId());
+	if (oldname.isEmpty())
+		oldname = mLastKnownProbeConfigName;
+
+	QString newName = QString("%1 (2)").arg(oldname);
 
     bool ok;
     newName = QInputDialog::getText(this, "Save Config",
@@ -217,7 +180,6 @@ void ProbeConfigWidget::savePresetSlot()
     	}
     }
 
-    std::cout << QString("Save probe config uid=%1, name=%2").arg(newUid).arg(newName) << std::endl;
     probe->saveCurrentConfig(newUid, newName);
 }
 
@@ -236,7 +198,6 @@ void ProbeConfigWidget::deletePresetSlot()
 		return;
 	}
 
-//    std::cout << QString("Delete probe config uid=%1").arg(probe->getConfigId()) << std::endl;
 	probe->removeCurrentConfig();
 }
 
@@ -253,7 +214,6 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	mBBWidget->setValue(data.getImage().mClipRect_p, range);
 
 	mOrigin->setValue(data.getImage().mOrigin_p);
-
 
 	double sx = data.getImage().mSpacing[0]; // mm/pix
 	double sy = data.getImage().mSpacing[1];
@@ -274,7 +234,10 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 		mWidth->setInternal2Display(180.0/M_PI);
 	}
 
-//	std::cout << "ProbeConfigWidget::activeProbeConfigurationChangedSlot()" << std::endl;
+	if (!probe->getConfigId().isEmpty())
+	{
+		mLastKnownProbeConfigName = probe->getConfigName(probe->getConfigId());
+	}
 	mUpdating= false;
 }
 
@@ -298,8 +261,6 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 		data.updateClipRectFromSector();
 
 	probe->setData(data);
-
-//	std::cout << "ProbeConfigWidget::guiProbeSectorChanged()" << std::endl;
 }
 
 void ProbeConfigWidget::guiImageSettingsChanged()
@@ -319,12 +280,7 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	image.mClipRect_p = mBBWidget->getValue();
 	data.setImage(image);
 
-//	if (mSyncBoxToSector->isChecked())
-//		data.updateSectorFromClipRect();
-
 	probe->setData(data);
-
-//	std::cout << "ProbeConfigWidget::guiImageSettingsChanged()" << std::endl;
 }
 
 void ProbeConfigWidget::guiOriginSettingsChanged()
