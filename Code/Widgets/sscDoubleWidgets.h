@@ -165,15 +165,16 @@ private slots:
 
 protected:
     virtual void prePaintEvent();
+	DoubleDataAdapterPtr mData;
 
 private:
+	void enableAll(bool);
 
 	DoubleSlider* mSlider;
 	QDoubleSpinBox* mSpinBox;
 	QLabel* mLabel;
 	DoubleLineEdit* mEdit;
 	MousePadWidget* mInfiniteSlider;
-	DoubleDataAdapterPtr mData;
 };
 
 /**\brief Composite widget for scalar data manipulation.

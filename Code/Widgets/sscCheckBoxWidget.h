@@ -48,6 +48,7 @@ class CheckBoxWidget: public OptimizedUpdateWidget
 Q_OBJECT
 public:
 	CheckBoxWidget(QWidget* parent, BoolDataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+
 private slots:
     void prePaintEvent();
 	void valueChanged(bool val);

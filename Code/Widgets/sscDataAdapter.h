@@ -42,8 +42,10 @@
  */
 class DataAdapter: public QObject
 {
-Q_OBJECT
+	Q_OBJECT
+
 public:
+	DataAdapter();
 	virtual ~DataAdapter()
 	{
 	}
@@ -51,11 +53,19 @@ public:
 public:
 	// basic methods
 	virtual QString getValueName() const = 0; ///< name of data entity. Used for display to user.
+	virtual bool getEnabled() const; ///< Get the enabled/disabled state of the dataadapter.
+
+public slots:
+	virtual bool setEnabled(bool enabled); ///< Set the enabled/disabled state of the dataadapter.
+
 public:
 	// optional methods
 
 signals:
 	void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
+
+protected:
+	bool mEnabled; //< a dataadaapter can be in either a enabled or disabled state
 };
 typedef boost::shared_ptr<DataAdapter> DataAdapterPtr;
 

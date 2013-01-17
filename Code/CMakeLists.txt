@@ -405,6 +405,8 @@ SET( SSC_SOURCE_FILES
     Widgets/sscHelperWidgets.cpp
     Widgets/sscHelperWidgets.h
     Widgets/sscDoubleDataAdapter.h
+    Widgets/sscDataAdapter.h
+    Widgets/sscDataAdapter.cpp
     Widgets/sscBoolDataAdapter.h
     Widgets/sscDoubleWidgets.h    
     Widgets/sscDoubleWidgets.cpp    

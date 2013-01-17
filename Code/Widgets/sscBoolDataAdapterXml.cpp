@@ -67,6 +67,18 @@ void BoolDataAdapterXml::setHelp(QString val)
     emit changed();
 }
 
+/*
+bool BoolDataAdapterXml::getEnabled() const
+{
+	return mStore.readValue(QString::number(value)).toInt();
+}
+
+bool BoolDataAdapterXml::setEnabled(bool enabled)
+{
+
+}
+*/
+
 bool BoolDataAdapterXml::getValue() const
 {
 	return mValue;

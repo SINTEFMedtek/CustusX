@@ -21,6 +21,8 @@ namespace ssc
 ColorSelectWidget::ColorSelectWidget(QWidget* parent, ssc::ColorDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
+	this->setEnabled(dataInterface->getEnabled());
+
     mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
@@ -58,6 +60,8 @@ void ColorSelectWidget::valueChanged(QColor val)
 void ColorSelectWidget::prePaintEvent()
 {
     mColorButton->blockSignals(true);
+
+    this->setEnabled(mData->getEnabled());
 
     mColorButton->setColor(mData->getValue());
     mColorButton->setToolTip(mData->getHelp());

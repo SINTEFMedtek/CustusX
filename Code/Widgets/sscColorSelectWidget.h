@@ -41,6 +41,7 @@ class ColorSelectWidget: public OptimizedUpdateWidget
 Q_OBJECT
 public:
     ColorSelectWidget(QWidget* parent, ColorDataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
+
 private slots:
     void prePaintEvent();
     void valueChanged(QColor val);

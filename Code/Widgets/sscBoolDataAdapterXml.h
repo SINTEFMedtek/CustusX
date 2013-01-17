@@ -67,7 +67,12 @@ public:
 	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
 	QString getUid() const;
     void setHelp(QString val);
+    /*
+	virtual bool getEnabled() const; ///< Get the enabled/disabled state of the dataadapter.
 
+public slots:
+	virtual bool setEnabled(bool enabled); ///< Set the enabled/disabled state of the dataadapter.
+*/
 signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
