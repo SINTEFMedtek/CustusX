@@ -6,17 +6,21 @@
 namespace cx
 {
 
-vtkImageDataPtr generateVtkImageData()
+vtkImageDataPtr MemHolder::generateVtkImageData()
 {
-	int dimension = 100; // generate 100^3 = 1Mb volume.
+	int dim[3];
+	dim[0] = 1024;
+	dim[1] = 768;
+	dim[2] = 1;
+	int numComp = 3;
 
 	vtkImageDataPtr data = vtkImageDataPtr::New();
 	data->SetSpacing(1, 1, 1);
-	data->SetExtent(0, dimension-1, 0, dimension-1, 0, dimension-1);
+	data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
 	data->SetScalarTypeToUnsignedChar();
-	data->SetNumberOfScalarComponents(1);
+	data->SetNumberOfScalarComponents(numComp);
 
-	int scalarSize = dimension*dimension*dimension;
+	int scalarSize = dim[0]*dim[1]*dim[2]*numComp;
 
 	unsigned char *rawchars = (unsigned char*)malloc(scalarSize+1);
 	char initValue = 1;
@@ -36,6 +40,62 @@ vtkImageDataPtr generateVtkImageData()
 
 	return data;
 }
+
+void MemHolder::generateLeak()
+{
+	int N = 500;
+
+	std::vector<vtkImageDataPtr> storage;
+	for (unsigned i=0; i<N; ++i)
+	{
+		vtkImageDataPtr data = generateVtkImageData();
+		storage.push_back(data);
+	}
+	std::cout << "generated leak for images=" << N << std::endl;
+
+//	vtkImageDataPtr temp = vtkImageDataPtr::New();
+//	temp->DeepCopy(mRedirecter->GetOutput());
+//	mTestStorage.push_back(temp);
+//
+//	if (mTestStorage.size()==500)
+//	{
+//		mTestStorage.clear();
+//		mTestStorageCleared = true;
+//		std::cout << "cleared test storage for vtkImageData leak" << std::endl;
+//	}
+
+}
+
+//vtkImageDataPtr generateVtkImageData()
+//{
+//	int dimension = 100; // generate 100^3 = 1Mb volume.
+//
+//	vtkImageDataPtr data = vtkImageDataPtr::New();
+//	data->SetSpacing(1, 1, 1);
+//	data->SetExtent(0, dimension-1, 0, dimension-1, 0, dimension-1);
+//	data->SetScalarTypeToUnsignedChar();
+//	data->SetNumberOfScalarComponents(1);
+//
+//	int scalarSize = dimension*dimension*dimension;
+//
+//	unsigned char *rawchars = (unsigned char*)malloc(scalarSize+1);
+//	char initValue = 1;
+//	std::fill(rawchars,rawchars+scalarSize, initValue);
+//
+//	vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
+//	array->SetNumberOfComponents(1);
+//	//TODO: Whithout the +1 the volume is black
+//	array->SetArray(rawchars, scalarSize+1, 0); // take ownership
+//	data->GetPointData()->SetScalars(array);
+//
+//	// A trick to get a full LUT in ssc::Image (automatic LUT generation)
+//	// Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
+//	rawchars[0] = 255;
+//	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
+//	rawchars[0] = 0;
+//
+//	return data;
+//}
 
 int MemHolder::addBlock()
 {
@@ -91,9 +151,11 @@ void MemoryTester::addActions()
 
 	mAddMemAction = new QAction("AddMem", this);
 	mRemoveMemAction = new QAction("RemMem", this);
+	mLeakAction = new QAction("Leak", this);
 
 	connect(mAddMemAction, SIGNAL(triggered()), mMemory.get(), SLOT(addBlock()));
 	connect(mRemoveMemAction, SIGNAL(triggered()), mMemory.get(), SLOT(removeBlock()));
+	connect(mLeakAction, SIGNAL(triggered()), mMemory.get(), SLOT(generateLeak()));
 
 //	mAction2 = new QAction("Action2", this);
 ////    mAction2->setIcon(QIcon(":/images/application-exit.png"));
@@ -122,6 +184,7 @@ void MemoryTester::addToolbar()
 	mToolbar = this->addToolBar("Mytoolbar");
 	mToolbar->addAction(mAction1);
 	mToolbar->addAction(mAddMemAction);
+	mToolbar->addAction(mLeakAction);
   mToolbar->addAction(mRemoveMemAction);
 //	mToolbar->addAction(mCrashAct);
 }
