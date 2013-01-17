@@ -2,6 +2,8 @@
 #define CXTUBESEGMENTATIONFILTER_H_
 
 #include "cxFilterImpl.h"
+#include "sscStringDataAdapterXml.h"
+#include "sscBoolDataAdapterXml.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
@@ -40,11 +42,30 @@ protected:
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 
+private slots:
+	void toggleAutoMinimum();
+	void toggleAutoMaximum();
+
 private:
 	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z);
 
+	ssc::StringDataAdapterXmlPtr makeDeviceOption(QDomElement root);
+	ssc::BoolDataAdapterXmlPtr makeBuffersOnlyOption(QDomElement root);
+	ssc::BoolDataAdapterXmlPtr makeAutoMinimumOption(QDomElement root);
+	ssc::DoubleDataAdapterXmlPtr makeMinimumOption(QDomElement root);
+	ssc::BoolDataAdapterXmlPtr makeAutoMaximumOption(QDomElement root);
+	ssc::DoubleDataAdapterXmlPtr makeMaximumOption(QDomElement root);
+	ssc::StringDataAdapterXmlPtr makeModeOption(QDomElement root);
+	ssc::BoolDataAdapterXmlPtr makeNoSegmentationOption(QDomElement root);
+	ssc::StringDataAdapterXmlPtr makeCenterlineMethodOption(QDomElement root);
+
 	vtkImageDataPtr mRawCenterlineResult;
 	vtkImageDataPtr mRawSegmentationResult;
+
+	ssc::BoolDataAdapterXmlPtr mAutoMinimumOption;
+	ssc::BoolDataAdapterXmlPtr mAutoMaximumOption;
+	ssc::DoubleDataAdapterXmlPtr mMinimumOption;
+	ssc::DoubleDataAdapterXmlPtr mMaximumOption;
 
 };
 typedef boost::shared_ptr<class TubeSegmentationFilter> TubeSegmentationFilterPtr;

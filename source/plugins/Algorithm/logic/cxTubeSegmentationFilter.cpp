@@ -31,35 +31,6 @@ QString TubeSegmentationFilter::getHelp() const
 	        "<p><i>Extracts the centerline and creates a segementation. </br>GPU-base algorithm wrtiten by Erik Smistad (NTNU).</i></p>"
 	        "</html>";
 }
-void TubeSegmentationFilter::createOptions(QDomElement root)
-{
- //TODO
-}
-
-void TubeSegmentationFilter::createInputTypes()
-{
-	SelectDataStringDataAdapterBasePtr temp;
-
-	temp = SelectImageStringDataAdapter::New();
-	temp->setValueName("Input");
-	temp->setHelp("Select input to run Tube segmentation on.");
-	mInputTypes.push_back(temp);
-}
-
-void TubeSegmentationFilter::createOutputTypes()
-{
-	SelectDataStringDataAdapterBasePtr temp;
-
-	temp = SelectDataStringDataAdapter::New();
-	temp->setValueName("Centerline");
-	temp->setHelp("Generated centerline.");
-	mOutputTypes.push_back(temp);
-
-	temp = SelectDataStringDataAdapter::New();
-	temp->setValueName("Segmentation");
-	temp->setHelp("Generated segmentation.");
-	mOutputTypes.push_back(temp);
-}
 
 bool TubeSegmentationFilter::execute()
 {
@@ -69,16 +40,18 @@ bool TubeSegmentationFilter::execute()
     		return false;
 
 	//======================================================
-	char *argv[]{
-		"/home/jbake/jbake/workspace/Tube-Segmenation-Framework/build_Debug/tubeSegmentation",
-		"/home/jbake/jbake/data/helix/helix.mhd",
-		"--mode",
-		"white",
-		"--storage-dir",
-		"/home/jbake/jbake/workspace/",
-		"--timing",
-		"NULL"
-	};
+
+	char  arg0[] = "not needed?"; //"/home/jbake/jbake/workspace/Tube-Segmenation-Framework/build_Debug/tubeSegmentation"; // executable
+	char  arg1[] = "/home/jbake/jbake/data/helix/helix.mhd"; // dataset
+	char  arg2[] = "--mode";
+	char  arg3[] = "white"; // modes value
+	char  arg4[] = "--storage-dir";
+	char  arg5[] = "/home/jbake/jbake/workspace/"; // storage-dirs value
+	char  arg6[] = "--timing";
+	char  arg7[] = "NULL"; // end of list
+	char* argv[] = { &arg0[0], &arg1[0], &arg2[0], &arg3[0], &arg4[0], &arg5[0], &arg6[0], &arg7[0], NULL };
+
+    //char** argv = this->generateParameterList();
 	int argc = sizeof argv/sizeof argv[0] - 1;
 
     // Parse parameters from program arguments
@@ -206,11 +179,70 @@ void TubeSegmentationFilter::postProcess()
 	mOutputTypes[1]->setValue(outputSegmentaion->getUid());
 }
 
+void TubeSegmentationFilter::createOptions(QDomElement root)
+{
+	mOptionsAdapters.push_back(this->makeDeviceOption(root));
+	mOptionsAdapters.push_back(this->makeBuffersOnlyOption(root));
+	mAutoMinimumOption = this->makeAutoMinimumOption(root);
+	mOptionsAdapters.push_back(mAutoMinimumOption);
+	mMinimumOption = this->makeMinimumOption(root);
+	mOptionsAdapters.push_back(mMinimumOption);
+	mAutoMaximumOption = this->makeAutoMaximumOption(root);
+	mOptionsAdapters.push_back(mAutoMaximumOption);
+	mMaximumOption = this->makeMaximumOption(root);
+	mOptionsAdapters.push_back(mMaximumOption);
+	mOptionsAdapters.push_back(this->makeModeOption(root));
+	mOptionsAdapters.push_back(this->makeNoSegmentationOption(root));
+	mOptionsAdapters.push_back(this->makeCenterlineMethodOption(root));
+
+	connect(mAutoMinimumOption.get(), SIGNAL(changed()), this, SLOT(toggleAutoMinimum()));
+	this->toggleAutoMinimum();
+	connect(mAutoMaximumOption.get(), SIGNAL(changed()), this, SLOT(toggleAutoMaximum()));
+	this->toggleAutoMaximum();
+}
+
+void TubeSegmentationFilter::createInputTypes()
+{
+	SelectDataStringDataAdapterBasePtr temp;
+
+	temp = SelectImageStringDataAdapter::New();
+	temp->setValueName("Input");
+	temp->setHelp("Select input to run Tube segmentation on.");
+	mInputTypes.push_back(temp);
+}
+
+void TubeSegmentationFilter::createOutputTypes()
+{
+	SelectDataStringDataAdapterBasePtr temp;
+
+	temp = SelectDataStringDataAdapter::New();
+	temp->setValueName("Centerline");
+	temp->setHelp("Generated centerline.");
+	mOutputTypes.push_back(temp);
+
+	temp = SelectDataStringDataAdapter::New();
+	temp->setValueName("Segmentation");
+	temp->setHelp("Generated segmentation.");
+	mOutputTypes.push_back(temp);
+}
+
+void TubeSegmentationFilter::toggleAutoMinimum()
+{
+	//ssc::BoolDataAdapterXmlPtr autoMin = this->makeAutoMinimumOption(mOptions);
+	std::cout << "toggleAutoMinimum: " << mAutoMinimumOption->getValue() << std::endl;
+	//this->makeMinimumOption(mCopiedOptions)->setEnabled(!autoMin->getValue());
+	mMinimumOption->setEnabled(!mAutoMinimumOption->getValue());
+}
+
+void TubeSegmentationFilter::toggleAutoMaximum()
+{
+	//ssc::BoolDataAdapterXmlPtr autoMax = this->makeAutoMaximumOption(mOptions);
+	//this->makeMaximumOption(mCopiedOptions)->setEnabled(autoMax->getValue());
+	mMaximumOption->setEnabled(!mAutoMaximumOption->getValue());
+}
+
 vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int size_x, int size_y, int size_z)
 {
-	int size[3]; // image dimension
-
-	//======================================================
 	vtkImageImportPtr imageImport = vtkImageImportPtr::New();
 
 	imageImport->SetWholeExtent(0, size_x - 1, 0, size_y - 1, 0, size_z - 1);
@@ -220,13 +252,77 @@ vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int s
 	imageImport->SetImportVoidPointer((void*)data);
 	imageImport->GetOutput()->Update();
 	imageImport->Modified();
-	//======================================================
 
 	vtkImageDataPtr retval = imageImport->GetOutput();
 
 	return retval;
 }
 
+ssc::StringDataAdapterXmlPtr TubeSegmentationFilter::makeDeviceOption(QDomElement root)
+{
+	QStringList list;
+	list << "gpu" << "cpu";
+	return ssc::StringDataAdapterXml::initialize("tsf_device", "Device", "Which type of device to run calculations on",
+	                                             list[0], list, root);
+}
+
+ssc::BoolDataAdapterXmlPtr TubeSegmentationFilter::makeBuffersOnlyOption(QDomElement root)
+{
+	return ssc::BoolDataAdapterXml::initialize("tsf_buffers-only", "Buffers only",
+	                                           "Disable writing to 3D images", false, root);
+}
+
+ssc::BoolDataAdapterXmlPtr TubeSegmentationFilter::makeAutoMinimumOption(QDomElement root)
+{
+	return ssc::BoolDataAdapterXml::initialize("tsf_auto-minimum", "Auto minimum",
+	                                           "Find minimum automatically", false, root);
+}
+
+ssc::DoubleDataAdapterXmlPtr TubeSegmentationFilter::makeMinimumOption(QDomElement root)
+{
+	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("tsf_minimum", "Minimum",
+		                                                                        "Set minimum threshold",
+		                                                                        0, ssc::DoubleRange(-1000, 1000, 1), 0, root);
+		retval->setAddSlider(true);
+		return retval;
+}
+
+ssc::BoolDataAdapterXmlPtr TubeSegmentationFilter::makeAutoMaximumOption(QDomElement root)
+{
+	return ssc::BoolDataAdapterXml::initialize("tsf_auto-maximum", "Auto maximum",
+	                                           "Find maximum automatically", false, root);
+}
+
+ssc::DoubleDataAdapterXmlPtr TubeSegmentationFilter::makeMaximumOption(QDomElement root)
+{
+	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("tsf_maximum", "Maximum",
+		                                                                        "Set maximum threshold",
+		                                                                        100.0, ssc::DoubleRange(-1000, 1000, 1), 0, root);
+		retval->setAddSlider(true);
+		return retval;
+}
+
+ssc::StringDataAdapterXmlPtr TubeSegmentationFilter::makeModeOption(QDomElement root)
+{
+	QStringList list;
+	list << "black" << "white";
+	return ssc::StringDataAdapterXml::initialize("tsf_mode", "Mode", "Look for black or white tubes",
+	                                             list[0], list, root);
+}
+
+ssc::BoolDataAdapterXmlPtr TubeSegmentationFilter::makeNoSegmentationOption(QDomElement root)
+{
+	return ssc::BoolDataAdapterXml::initialize("tsf_no-segmentation", "Segmentation",
+	                                           "Turns off segmentation and returns centerline only", false, root);
+}
+
+ssc::StringDataAdapterXmlPtr TubeSegmentationFilter::makeCenterlineMethodOption(QDomElement root)
+{
+	QStringList list;
+	list << "gpu" << "cpu";
+	return ssc::StringDataAdapterXml::initialize("tsf_centerline-method", "Centerline Method", "Specify which centerline method to use",
+	                                             list[0], list, root);
+}
 } /* namespace cx */
 #endif //CX_USE_TSF
 
