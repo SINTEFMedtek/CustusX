@@ -497,13 +497,8 @@ void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
 
 	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
 	customReader->setTransform(image->get_rMd());
-
-	//  QSettings header(filename, QSettings::IniFormat);
-	//  std::cout << "fn: " << header.fileName() << std::endl;
-	//  QStringList transform;
-	//  transform << "3" << "4" << "5";
-	//  header.setValue("TransformMatrix", transform);
-
+	customReader->setModality(image->getModality());
+	customReader->setImageType(image->getImageType());
 }
 
 // meshes

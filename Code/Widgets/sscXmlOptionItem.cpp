@@ -298,7 +298,7 @@ void XmlOptionFile::save()
 		QTextStream stream(&file);
 		stream << mDocument.toString(4);
 		file.close();
-		ssc::messageManager()->sendInfo("Created " + file.fileName());
+//		ssc::messageManager()->sendInfo("Created " + file.fileName());
 	}
 	else
 	{
