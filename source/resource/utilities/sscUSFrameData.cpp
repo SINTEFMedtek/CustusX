@@ -53,44 +53,10 @@ USFrameDataPtr USFrameData::create(ImagePtr inputFrameData)
 
 	retval->mFilename = inputFrameData->getName();
 	retval->mImageContainer.reset(new cx::SplitFramesContainer(inputFrameData->getBaseVtkImageData()));
-
-//	vtkImageDataPtr input = inputFrameData->getBaseVtkImageData();
-//	retval->mOptionalWholeBase = input;
-//	retval->mBaseImage.resize(input->GetDimensions()[2]);
-
-//	for (int i=0; i<retval->mBaseImage.size(); ++i)
-//	{
-//		vtkImageImportPtr import = vtkImageImportPtr::New();
-
-//		import->SetImportVoidPointer(input->GetScalarPointer(0,0,i));
-//		import->SetDataScalarType(input->GetScalarType());
-//		import->SetDataSpacing(input->GetSpacing());
-//		import->SetNumberOfScalarComponents(input->GetNumberOfScalarComponents());
-//		int* extent = input->GetWholeExtent();
-//		extent[4] = 0;
-//		extent[5] = 0;
-//		import->SetWholeExtent(extent);
-//		import->SetDataExtentToWholeExtent();
-
-//		import->Update();
-//		retval->mBaseImage[i] = import->GetOutput();
-//	}
-
 	retval->initialize();
 
 	return retval;
 }
-
-//USFrameDataPtr USFrameData::create(std::vector<vtkImageDataPtr> inputFrameData, QString filename)
-//{
-//	USFrameDataPtr retval(new USFrameData());
-//	retval->mFilename = filename;
-//	retval->mBaseImage = inputFrameData;
-
-//	retval->initialize();
-
-//	return retval;
-//}
 
 /** Create object from file.
   * If file or file+.mhd exists, use this,
@@ -100,7 +66,6 @@ USFrameDataPtr USFrameData::create(ImagePtr inputFrameData)
   */
 USFrameDataPtr USFrameData::create(QString inputFilename)
 {
-//	std::cout << "USFrameData::create() " << inputFilename << std::endl;
 	QFileInfo info(inputFilename);
 
 	ssc::TimeKeeper timer;
@@ -108,7 +73,6 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 
 	if (QFileInfo(mhdSingleFile).exists())
 	{
-//		std::cout << "USFrameData::create() single: " << mhdSingleFile << std::endl;
 		vtkImageDataPtr image = ssc::MetaImageReader().load(mhdSingleFile);
 		// load from single file
 		USFrameDataPtr retval = USFrameData::create(ImagePtr(new Image(mhdSingleFile, image)));
@@ -123,25 +87,7 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 		retval->mImageContainer.reset(new cx::CachedImageDataContainer(inputFilename, -1));
 		retval->initialize();
 		return retval;
-
-//		(inputFilename);
-//		std::vector<vtkImageDataPtr> frames;
-//		for (unsigned i=0; true; ++i)
-//		{
-//			QString mhdFile = info.absolutePath()+"/"+info.completeBaseName()+QString("_%1.mhd").arg(i);
-////			std::cout << "USFrameData::create() multi: " << mhdFile << std::endl;
-//			if (!QFileInfo(mhdFile).exists())
-//				break;
-//			vtkImageDataPtr frame = ssc::MetaImageReader().load(mhdFile);
-//			frames.push_back(frame);
-//		}
-
-//		timer.printElapsedms(QString("Loading multi %1").arg(inputFilename));
-//		return USFrameData::create(frames, inputFilename);
 	}
-
-
-//    retval = ssc::USFrameData::create(info.path()+info.completeBaseName());
 }
 
 USFrameDataPtr USFrameData::create(QString filename, std::vector<cx::CachedImageDataPtr> frames)
@@ -156,7 +102,7 @@ USFrameDataPtr USFrameData::create(QString filename, std::vector<cx::CachedImage
 }
 
 USFrameData::USFrameData() :
-		mUseAngio(false), mCropbox(0,0,0,0,0,0)
+		mUseAngio(false), mCropbox(0,0,0,0,0,0), mPurgeInput(true)
 {
 }
 
@@ -174,9 +120,7 @@ USFrameData::~USFrameData()
 {
 	mProcessedImage.clear();
 	mImageContainer.reset();
-//	mOptionalWholeBase = vtkImageDataPtr();
 }
-
 
 /**
  * Dimensions will be changed after this
@@ -218,9 +162,20 @@ Eigen::Array3i USFrameData::getDimensions() const
 
 Vector3D USFrameData::getSpacing() const
 {
-	if (mImageContainer->empty())
-		return Vector3D(1,1,1);
-	ssc::Vector3D retval = Vector3D(mImageContainer->get(0)->GetSpacing());
+	Vector3D retval(1,1,1);
+
+    // no cache, generate one sample
+	if (mProcessedImage.empty())
+	{
+		if (!mImageContainer->empty())
+			retval = Vector3D(mImageContainer->get(0)->GetSpacing());
+	}
+	// cache is available, use that
+	else
+	{
+		retval = Vector3D(mProcessedImage[0]->GetSpacing());
+	}
+
 	retval[2] = retval[0]; // set z-spacing to arbitrary value.
 	return retval;
 }
@@ -238,8 +193,6 @@ void USFrameData::setCropBox(IntBoundingBox3D cropbox)
 	// ensure clip never happens in z dir.
 	cropbox[4] = -100000;
 	cropbox[5] =  100000;
-
-//	std::cout << "USFrameData::setCropBox " << cropbox << std::endl;
 
 	if (cropbox!=mCropbox)
 		this->clearCache();
@@ -264,6 +217,9 @@ vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D c
   return rawResult;
 }
 
+/**Convert input to grayscale, and return a COPY of that volume ( in order to break the pipeline for memory purposes)
+ *
+ */
 vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 {
 	if (input->GetNumberOfScalarComponents() == 1) // already gray
@@ -273,11 +229,19 @@ vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 	luminance->SetInput(input);
 	vtkImageDataPtr outData = luminance->GetOutput();
 	outData->Update();
-	return outData;
+
+//	return outData;
+
+	vtkImageDataPtr copy = vtkImageDataPtr::New();
+	copy->DeepCopy(outData);
+	return copy;
+
 }
 
 vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
 {
+//	std::cout << "USFrameData::useAngio " << std::endl;
+
 	// Some of the code here is borrowed from the vtk examples:
 	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
 
@@ -312,7 +276,7 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
 	{
 		for (idxY = 0; /*!self->AbortExecute &&*/idxY <= maxY; idxY++)
 		{
-			for (idxR = 0; idxR < maxX; idxR++)//Look at 3 scalar components at the same time (RGB)
+			for (idxR = 0; idxR <= maxX; idxR++)//Look at 3 scalar components at the same time (RGB)
 			{
 				// Pixel operation. Add foo. Dumber would be impossible.
 				//        *outPtr = (OT)((float)(*inPtr) + foo);
@@ -320,14 +284,24 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
 				{
 					(*outPtr) = 0;
 				}
+				else
+				{
+					// strong check: look for near-gray values and remove them.
+					double r = inPtr[0];
+					double g = inPtr[1];
+					double b = inPtr[2];
+					int metric = (fabs(r-g) + fabs(r-b) + fabs(g-b)) / 3; // average absolute diff must be less than or equal to this
+//					std::cout << QString("  %1,%2,%3 \t %4, %5 -- %6").arg(int(inPtr[0])).arg(int(inPtr[1])).arg(int(inPtr[2])).arg(idxR).arg(idxY).arg(metric) << std::endl;
+					if (metric <= 3)
+						(*outPtr) = 0;
+
+				}
 				//Assume the outVolume is treated with the luminance filter first
 				outPtr++;
 				inPtr += 3;
 			}
 		}
 	}
-
-//	outData = AlgorithmHelpers::execute_itk_GrayscaleFillholeImageFilter(outData);
 
 	return outData;
 }
@@ -376,6 +350,12 @@ unsigned char* USFrameData::getFrame(unsigned int index) const
 	return inputPointer;
 }
 
+void USFrameData::setPurgeInputDataAfterInitialize(bool value)
+{
+	mPurgeInput = value;
+}
+
+
 /** Fill cache, enabling getFrames()
   * NOT thread-safe.
   *
@@ -404,7 +384,13 @@ void USFrameData::generateCache()
 			current = this->toGrayscale(current);
 
 		mProcessedImage[i] = current;
+
+		if (mPurgeInput)
+			mImageContainer->purge(mReducedToFull[i]);
 	}
+
+	if (mPurgeInput)
+		mImageContainer->purgeAll();
 }
 
 void USFrameData::initializeFrames()
@@ -412,6 +398,10 @@ void USFrameData::initializeFrames()
 	this->generateCache();
 }
 
+void USFrameData::purgeAll()
+{
+	mImageContainer->purgeAll();
+}
 
 ///** Merge all us frames into one vtkImageData
 // *
@@ -441,13 +431,6 @@ USFrameDataPtr USFrameData::copy()
 	return retval;
 }
 
-//vtkImageDataPtr USFrameData::getSingleBaseImage()
-//{
-//	if (mOptionalWholeBase)
-//		return mOptionalWholeBase;
-//	return this->mergeFrames(mBaseImage);
-//}
-
 QString USFrameData::getName() const
 {
 	return QFileInfo(mFilename).completeBaseName();
@@ -456,7 +439,6 @@ QString USFrameData::getName() const
 QString USFrameData::getUid() const
 {
 	return QFileInfo(mFilename).completeBaseName();
-//	return mFilename;
 }
 
 QString USFrameData::getFilePath() const
@@ -469,21 +451,12 @@ void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 	ssc::TimeKeeper timer;
 	vtkImageDataPtr source = mImageContainer->get(index);
 
-//	if (mProcessedImage.size() > index)
-//	{
-//		source = mProcessedImage[index];
-//	}
-
-//	std::cout << "USFrameData::fillImageImport" << source->GetNumberOfScalarComponents() << std::endl;
-
 	import->SetImportVoidPointer(source->GetScalarPointer());
 	import->SetDataScalarType(source->GetScalarType());
 	import->SetDataSpacing(source->GetSpacing());
 	import->SetNumberOfScalarComponents(source->GetNumberOfScalarComponents());
 	import->SetWholeExtent(source->GetWholeExtent());
 	import->SetDataExtentToWholeExtent();
-
-	timer.printElapsedms(QString("import index %1").arg(index));
 }
 
 bool USFrameData::is4D()
