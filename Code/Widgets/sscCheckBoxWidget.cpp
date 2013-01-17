@@ -34,6 +34,8 @@ namespace ssc
 CheckBoxWidget::CheckBoxWidget(QWidget* parent, ssc::BoolDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
+	this->setEnabled(dataInterface->getEnabled());
+
 	mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
@@ -71,6 +73,8 @@ void CheckBoxWidget::valueChanged(bool val)
 void CheckBoxWidget::prePaintEvent()
 {
 	mCheckBox->blockSignals(true);
+
+	this->setEnabled(mData->getEnabled());
 
 	mCheckBox->setChecked(mData->getValue());
 	mCheckBox->setToolTip(mData->getHelp());

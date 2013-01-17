@@ -39,6 +39,7 @@ ScalarInteractionWidget::ScalarInteractionWidget(QWidget* parent, ssc::DoubleDat
 {
 	mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
+    this->enableAll(mData->getEnabled());
 }
 
 void ScalarInteractionWidget::enableLabel()
@@ -182,6 +183,8 @@ void ScalarInteractionWidget::textEditedSlot()
 
 void ScalarInteractionWidget::prePaintEvent()
 {
+	this->enableAll(mData->getEnabled());
+
 //    std::cout << "ScalarInteractionWidget::prePaintEvent() " << this << " " << mData->getValueName() << std::endl;
 	DoubleRange range = mData->getValueRange();
 	DoubleRange dRange(mData->convertInternal2Display(range.min()), mData->convertInternal2Display(range.max()),
@@ -219,6 +222,22 @@ void ScalarInteractionWidget::prePaintEvent()
 	{
 		mLabel->setToolTip(mData->getHelp());
 	}
+}
+
+void ScalarInteractionWidget::enableAll(bool enable)
+{
+	if(this)
+		QWidget::setEnabled(enable);
+	if(mSlider)
+		mSlider->setEnabled(enable);
+	if(mSpinBox)
+		mSpinBox->setEnabled(enable);
+	if(mLabel)
+		mLabel->setEnabled(enable);
+	if(mEdit)
+		mEdit->setEnabled(enable);
+	if(mInfiniteSlider)
+		mInfiniteSlider->setEnabled(enable);
 }
 
 // --------------------------------------------------------

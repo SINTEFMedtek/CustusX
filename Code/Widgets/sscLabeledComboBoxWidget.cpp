@@ -31,6 +31,8 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, ssc::StringDataAda
 	QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
+	this->setEnabled(dataInterface->getEnabled());
+
 	mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
@@ -67,6 +69,8 @@ void LabeledComboBoxWidget::prePaintEvent()
 {
 	mCombo->blockSignals(true);
 	mCombo->clear();
+
+	this->setEnabled(mData->getEnabled());
 
 	QString currentValue = mData->getValue();
 	QStringList range = mData->getValueRange();
