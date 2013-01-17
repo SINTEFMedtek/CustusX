@@ -285,6 +285,7 @@ ReconstructCorePtr Reconstructer::createDualCore()
 
 	USReconstructInputData fileData = mOriginalFileData;
 	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
+	fileData.mUsRaw->setPurgeInputDataAfterInitialize(false);
 
 	retval->initialize(par, fileData);
 

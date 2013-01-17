@@ -9,8 +9,6 @@
 #include "cxViewManager.h"
 #include "cxView3D.h"
 #include "cxRepManager.h"
-#include "cxCenterline.h"
-//#include "cxStateService.h"
 #include "cxTrackingDataToVolume.h"
 #include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"
@@ -25,8 +23,8 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionDataPtr pluginData, 
   this->setObjectName("TrackedCenterlineWidget");
   this->setWindowTitle("Tracked Centerline");
 
-  connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(centerlineFinishedSlot()));
-  connect(&mCenterlineAlgorithm, SIGNAL(aboutToStart()), this, SLOT(preprocessResampler()));
+//  connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(centerlineFinishedSlot()));
+//  connect(&mCenterlineAlgorithm, SIGNAL(aboutToStart()), this, SLOT(preprocessResampler()));
 
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
@@ -83,7 +81,7 @@ void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
 //  QString savepath = patientService()->getPatientData()->getActivePatientFolder();
 //  mCenterlineAlgorithm.setInput(image_d, savepath);
   mSessionID = sessionId;
-  mCenterlineAlgorithm.execute();
+//  mCenterlineAlgorithm.execute();
 //  mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
 }
 
@@ -112,7 +110,7 @@ void TrackedCenterlineWidget::preprocessResampler()
 
 	//extract the centerline
 	QString savepath = patientService()->getPatientData()->getActivePatientFolder();
-	mCenterlineAlgorithm.setInput(image_d, savepath);
+//	mCenterlineAlgorithm.setInput(image_d, savepath);
 	mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
 }
 

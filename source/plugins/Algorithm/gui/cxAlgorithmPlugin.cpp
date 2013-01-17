@@ -8,8 +8,6 @@
 #include "cxAlgorithmPlugin.h"
 
 #include <vector>
-#include "cxVisualizationMethodsWidget.h"
-#include "cxSegmentationMethodsWidget.h"
 #include "cxFilterWidget.h"
 #include "cxPipeline.h"
 #include "cxPipelineWidget.h"
@@ -35,12 +33,6 @@ std::vector<PluginBase::PluginWidget> AlgorithmPlugin::createWidgets() const
 {
 	std::vector<PluginWidget> retval;
 
-	retval.push_back(PluginBase::PluginWidget(
-	                     new SegmentationMethodsWidget(NULL, "SegmentationMethodsWidget", "Segmentation Methods"),
-	                     "Algorithms"));
-	retval.push_back(PluginBase::PluginWidget(
-	                     new VisualizationMethodsWidget(NULL, "VisualizationMethodsWidget", "Visualization Methods"),
-	                     "Algorithms"));
 	retval.push_back(PluginBase::PluginWidget(
 	                     new AllFiltersWidget(NULL),
 	                     "Algorithms"));

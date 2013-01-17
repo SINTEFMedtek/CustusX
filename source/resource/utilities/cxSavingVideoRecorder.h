@@ -65,6 +65,9 @@ public:
 	void stop();
 	void cancel();
 
+signals:
+	void dataSaved(QString filename); ///< emitted for each saved vtkImageData
+
 protected:
 	struct DataType
 	{
@@ -128,13 +131,16 @@ public:
 
 private slots:
 	void newFrameSlot();
+	void dataSavedSlot(QString filename);
 private:
 	std::vector<CachedImageDataPtr> mImages;
 	std::vector<double> mTimestamps;
 	void deleteFolder(QString folder);
-
+	/** Use to remove data in memory when the recording is large
+	  */
+	void purgeCache();
+	int mLastPurgedImageIndex;
 	QString mSaveFolder;
-//	DataType mData;
 	ssc::VideoSourcePtr mSource;
 	boost::shared_ptr<VideoRecorderSaveThread> mSaveThread;
 

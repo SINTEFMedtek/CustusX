@@ -117,48 +117,6 @@ void ToolManager::setPlaybackMode(PlaybackTimePtr controller)
 		return;
 	}
 
-//	QDateTime now = QDateTime::currentDateTime();
-//	ssc::ToolPtr test = mTools["Ultrasonix_L14-5"];
-//	if (test)
-//	{
-//		ssc::TimedTransformMapPtr history = test->getPositionHistory();
-//		QDateTime start = now.addSecs(-60*60); // 1h back
-//		std::cout << "adding test data to probe " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-//
-//		for (int i=0; i<3000; ++i)
-//		{
-//			start = start.addMSecs(20);
-//			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
-//			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
-//		}
-//
-//		start = start.addSecs(1*60); // 10 minutes back
-//
-//		for (int i=0; i<2000; ++i)
-//		{
-//			start = start.addMSecs(20);
-//			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(100, i*0.1,0));
-//			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
-//		}
-//
-//	}
-//
-//	ssc::ToolPtr test2 = mTools["01-117-0329_Planning-Navigator"];
-//	if (test2)
-//	{
-//		ssc::TimedTransformMapPtr history = test2->getPositionHistory();
-//		QDateTime start = now.addSecs(-60*60); // 1h back
-//		std::cout << "adding test data to pointer " << start.toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-//		start = start.addSecs(5);
-//
-//		for (int i=0; i<2000; ++i)
-//		{
-//			start = start.addMSecs(20);
-//			ssc::Transform3D pos = ssc::createTransformTranslate(ssc::Vector3D(i*0.1,0,0));
-//			history->insert(std::make_pair(start.toMSecsSinceEpoch(), pos));
-//		}
-//	}
-
 	ssc::ToolManager::ToolMap original = mTools; ///< all tools
 	mTools.clear();
 
@@ -171,21 +129,15 @@ void ToolManager::setPlaybackMode(PlaybackTimePtr controller)
 		cx::PlaybackToolPtr current(new PlaybackTool(iter->second, controller));
 		mTools[current->getUid()] = current;
 
-//		std::cout << "tool: " << iter->first  << std::endl;
 		ssc::TimedTransformMapPtr history = iter->second->getPositionHistory();
 		if (!history->empty())
 		{
 			timeRange.first = std::min(timeRange.first, history->begin()->first);
 			timeRange.second = std::max(timeRange.second, history->rbegin()->first);
-//			std::cout << "===t start " << QDateTime::fromMSecsSinceEpoch(history->begin()->first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-//			std::cout << "===t  end " << QDateTime::fromMSecsSinceEpoch(history->rbegin()->first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 		}
 	}
 	mTools[mManualTool->getUid()] = mManualTool;
 
-//	std::cout << "toolmanager" << std::endl;
-//	std::cout << "===start " << QDateTime::fromMSecsSinceEpoch(timeRange.first).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
-//	std::cout << "===  end " << QDateTime::fromMSecsSinceEpoch(timeRange.second).toString(ssc::timestampMilliSecondsFormatNice()) << std::endl;
 	controller->initialize(QDateTime::fromMSecsSinceEpoch(timeRange.first), timeRange.second - timeRange.first);
 
 	ssc::messageManager()->sendInfo("Opened Playback Mode");

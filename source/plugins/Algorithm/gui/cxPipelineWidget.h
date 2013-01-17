@@ -36,14 +36,14 @@ public:
 	QRadioButton* mRadioButton;
 	QLabel* mAlgoNameLabel;
 	QAction* mAction;
-	QAction* mDetailsAction;
+//	QAction* mDetailsAction;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	FilterPtr mFilter;
 
 signals:
 	void requestRunFilter();
 	void filterSelected(QString uid);
-	void showDetails();
+//	void showDetails();
 
 private slots:
 	void radioButtonSelectedSlot(bool on);
@@ -68,16 +68,13 @@ public:
 private slots:
 	void runFilterSlot();
 	void filterSelectedSlot(QString uid);
-	void toggleDetailsSlot();
+//	void toggleDetailsSlot();
 private:
 	void selectFilter(int index);
 	PipelinePtr mPipeline;
 	QButtonGroup* mButtonGroup;
 	std::vector<PipelineWidgetFilterLine*> mAlgoLines;
 	CompactFilterSetupWidget* mSetupWidget;
-
-	//    FilterTimedAlgorithmPtr mThread;
-	//    PipelineWidgetFilterLine* mCurrentlyRunningPipeli\neWidgetFilterLine;
 };
 
 
