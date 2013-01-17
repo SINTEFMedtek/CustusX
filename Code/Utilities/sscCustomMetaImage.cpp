@@ -72,6 +72,68 @@ QString CustomMetaImage::readImageType()
 	return this->readKey("ImageType3");
 }
 
+/** Remove all lines starting with a key from data.
+  *
+  */
+void CustomMetaImage::remove(QStringList* data, QStringList keys)
+{
+	QRegExp regexp(QString("(^%1)").arg(keys.join("|^")));
+	QStringList removeThese = data->filter(regexp);
+	for (int i=0; i<removeThese.size(); ++i)
+		data->removeAll(removeThese[i]);
+}
+
+/** Append key, value pair to data.
+  * The line is added last, but BEFORE the "ElementDataFile" key,
+  * which is required to be last.
+  *
+  */
+void CustomMetaImage::append(QStringList* data, QString key, QString value)
+{
+	// fine index of ElementDataFile - this is the last element according to MHD standard (but we might have appended something else after it).
+    int last = data->lastIndexOf(QRegExp("^ElementDataFile.*"));
+	data->insert(last, QString("%1 = %2").arg(key).arg(value));
+}
+
+void CustomMetaImage::setModality(QString value)
+{
+	QFile file(mFilename);
+
+    if (!file.open(QIODevice::ReadWrite))
+    {
+      messageManager()->sendError("Failed to open file " + mFilename + ".");
+      return;
+    }
+
+    QStringList data = QTextStream(&file).readAll().split("\n");
+
+	this->remove(&data, QStringList()<<"Modality");
+	this->append(&data, "Modality", value);
+
+    file.resize(0);
+    file.write(data.join("\n").toAscii());
+}
+
+void CustomMetaImage::setImageType(QString value)
+{
+	QFile file(mFilename);
+
+    if (!file.open(QIODevice::ReadWrite))
+    {
+      messageManager()->sendError("Failed to open file " + mFilename + ".");
+      return;
+    }
+
+    QStringList data = QTextStream(&file).readAll().split("\n");
+
+	this->remove(&data, QStringList()<<"ImageType3");
+	this->append(&data, "ImageType3", value);
+
+    file.resize(0);
+    file.write(data.join("\n").toAscii());
+}
+
+
 Transform3D CustomMetaImage::readTransform()
 {
   //messageManager()->sendDebug("load filename: "+string_cast(filename));
@@ -143,28 +205,20 @@ void CustomMetaImage::setTransform(const Transform3D M)
   }
 
   QStringList data = QTextStream(&file).readAll().split("\n");
-//  std::cout << "before :" << data.join("\n") << std::endl;
-  QRegExp regexp("(^TransformMatrix|^Offset|^Position|^Orientation)");
-  QStringList removeThese = data.filter(regexp);
-  for (int i=0; i<removeThese.size(); ++i)
-    data.removeAll(removeThese[i]);
 
-  // fine index of ElementDataFile - this is the last element according to MHD standard (but we might have appended something else after it).
-  int last = data.lastIndexOf(QRegExp("^ElementDataFile.*"));
+  this->remove(&data, QStringList()<<"TransformMatrix"<<"Offset"<<"Position"<<"Orientation");
 
   int dim = 3; // hardcoded - will fail for 2d images
   std::stringstream tmList;
   for (int c=0; c<dim; ++c)
     for (int r=0; r<dim; ++r)
       tmList << " " << M(r,c);
-  data.insert(last, QString("TransformMatrix =" + qstring_cast(tmList.str())));
+  this->append(&data, "TransformMatrix", qstring_cast(tmList.str()));
 
   std::stringstream posList;
   for (int r=0; r<dim; ++r)
     posList << " " << M(r,3);
-  data.insert(last, QString("Offset = " + qstring_cast(posList.str())));
-
-//  std::cout << "after :" << data.join("\n") << std::endl;
+  this->append(&data, "Offset", qstring_cast(posList.str()));
 
   file.resize(0);
   file.write(data.join("\n").toAscii());
