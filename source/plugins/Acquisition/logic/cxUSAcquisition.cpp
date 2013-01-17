@@ -150,7 +150,6 @@ void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 	if(mRTSource)
 	{
 		connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-//		mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
 	}
 
 	this->checkIfReadySlot();
@@ -172,8 +171,6 @@ void USAcquisition::saveSession(QString sessionId, bool writeColor)
 {
 	//get session data
 	RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
-//	ssc::VideoRecorder::DataType streamRecordedData = mVideoRecorder->getRecording();
-//	ssc::VideoRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
 
 	ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
 	if(trackerRecordedData.empty())
@@ -188,15 +185,9 @@ void USAcquisition::saveSession(QString sessionId, bool writeColor)
 	if (cxTool)
 		calibFileName = cxTool->getCalibrationFileName();
 
-//	UsReconstructionFileMakerPtr fileMaker;
 	mCurrentSessionFileMaker->setData(trackerRecordedData, mVideoRecorder,
                                       probe, calibFileName,
                                       writeColor);
-//	fileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(),
-//	                                              patientService()->getPatientData()->getActivePatientFolder(),
-//	                                              probe, calibFileName,
-//	                                              writeColor));
-//	mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
 	mVideoRecorder.reset();
 
 	ssc::USReconstructInputData reconstructData = mCurrentSessionFileMaker->getReconstructData();
@@ -248,10 +239,10 @@ void USAcquisition::startRecord(QString sessionId)
 	                                   session->getDescription(),
 	                                   patientService()->getPatientData()->getActivePatientFolder()));
 
+	mPluginData->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
 	bool writeColor = mPluginData->getReconstructer()->getParams()->mAngioAdapter->getValue()
 	        ||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 
-	std::cout << "writeColor " << writeColor << std::endl;
 	mVideoRecorder.reset(new SavingVideoRecorder(
 	                         mRTSource,
 	                         mCurrentSessionFileMaker->getFolderName(),
@@ -260,13 +251,11 @@ void USAcquisition::startRecord(QString sessionId)
 	                         writeColor));
 	mVideoRecorder->startRecord();
 
-//	mRTRecorder->startRecord();
 	ssc::messageManager()->sendSuccess("Ultrasound acquisition started.", true);
 }
 
 void USAcquisition::stopRecord(bool canceled)
 {
-//	mRTRecorder->stopRecord();
 	mVideoRecorder->stopRecord();
 	if (canceled)
 	{

@@ -100,9 +100,16 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 
     rep->setMaxVolumeSize(maxRenderSize);
     rep->setImage(image);
-    mVolumetricRepByImageMap[image->getUid()] = rep;
+    //Cache is disabled for now. It uses too much memory per volume (100-200MB)
+    //TODO: Allow caching of 2 recent volumes. Get visible volumes from ViewManager
+    //and purge old not visible ones (need timestamps)
+    //mVolumetricRepByImageMap[image->getUid()] = rep;
+    return rep;
   }
-  return mVolumetricRepByImageMap[image->getUid()];
+  ssc::messageManager()->sendError("RepManager cache disabled");
+  //Cache disabled.
+  //return mVolumetricRepByImageMap[image->getUid()];
+  return ssc::VolumetricRepPtr();
 }
 
 /**always remove from cache after deleting a volume, because we _might_ import the same volume again,

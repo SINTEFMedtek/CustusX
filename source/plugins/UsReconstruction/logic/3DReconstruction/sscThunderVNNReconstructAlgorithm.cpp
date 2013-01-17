@@ -93,6 +93,12 @@ bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 	USFrameDataPtr frameData, vtkImageDataPtr outputData, ImagePtr frameMask, QDomElement settings)
 {
 	bool success = false;
+
+	if (frameInfo.empty())
+		return false;
+	if (frameData->getDimensions()[2]==0)
+		return false;
+
 #ifdef SSC_USE_OpenCL
 	std::cout << "processor: " << this->getProcessorOption(settings)->getValue() << std::endl;
 	std::cout << "distance: " << this->getDistanceOption(settings)->getValue() << std::endl;

@@ -60,16 +60,16 @@ PipelineWidgetFilterLine::PipelineWidgetFilterLine(QWidget* parent, FilterPtr fi
 	button->setDefaultAction(mAction);
 	layout->addWidget(button);
 
-	mDetailsAction = this->createAction(this,
-	                                    QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
-	                                    "Run Filter", "",
-	                                    SIGNAL(showDetails()),
-	                                    NULL);
-	mDetailsAction->setData(mFilter->getUid());
+//	mDetailsAction = this->createAction(this,
+//	                                    QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+//	                                    "Run Filter", "",
+//	                                    SIGNAL(showDetails()),
+//	                                    NULL);
+//	mDetailsAction->setData(mFilter->getUid());
 
-	button = new CXSmallToolButton();
-	button->setDefaultAction(mDetailsAction);
-	layout->addWidget(button);
+//	button = new CXSmallToolButton();
+//	button->setDefaultAction(mDetailsAction);
+//	layout->addWidget(button);
 }
 
 void PipelineWidgetFilterLine::requestRunFilterSlot()
@@ -137,7 +137,7 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
 
 		PipelineWidgetFilterLine* algoLine = new PipelineWidgetFilterLine(this, filters->get(i), mButtonGroup);
 		connect(algoLine, SIGNAL(requestRunFilter()), this, SLOT(runFilterSlot()));
-		connect(algoLine, SIGNAL(showDetails()), this, SLOT(toggleDetailsSlot()));
+//		connect(algoLine, SIGNAL(showDetails()), this, SLOT(toggleDetailsSlot()));
 		connect(algoLine, SIGNAL(filterSelected(QString)), this, SLOT(filterSelectedSlot(QString)));
 		algoLine->mTimedAlgorithmProgressBar->attach(mPipeline->getTimedAlgorithm(filters->get(i)->getUid()));
 
@@ -156,18 +156,21 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
 
 	mSetupWidget = new CompactFilterSetupWidget(this, filters->getOptions(), true);
 	topLayout->addWidget(mSetupWidget);
-	mSetupWidget->setVisible(settings()->value("pipeline/showDetails").toBool());
+//	mSetupWidget->setVisible(settings()->value("pipeline/showDetails").toBool());
 
 	topLayout->addStretch();
 
 	this->filterSelectedSlot(filters->get(0)->getUid());
 }
 
-void PipelineWidget::toggleDetailsSlot()
-{
-	mSetupWidget->setVisible(!mSetupWidget->isVisible());
-	settings()->setValue("pipeline/showDetails", mSetupWidget->isVisible());
-}
+///**
+//  * Not used - reuse if you would like to toggle visibility in some way.
+//  */
+//void PipelineWidget::toggleDetailsSlot()
+//{
+//	mSetupWidget->setVisible(!mSetupWidget->isVisible());
+//	settings()->setValue("pipeline/showDetails", mSetupWidget->isVisible());
+//}
 
 void PipelineWidget::filterSelectedSlot(QString uid)
 {

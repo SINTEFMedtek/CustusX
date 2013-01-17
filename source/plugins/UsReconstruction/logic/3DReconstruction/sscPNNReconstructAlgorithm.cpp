@@ -62,6 +62,10 @@ bool PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
 		vtkImageDataPtr outputData, ImagePtr frameMask, QDomElement settings)
 {
 	//std::vector<Planes> planes = generate_planes(frameInfo, frameData);
+	if (frameInfo.empty())
+		return false;
+	if (frameData->getDimensions()[2]==0)
+		return false;
 
 	//vtkImageDataPtr input = frameData->getBaseVtkImageData();
 	USFrameDataPtr input = frameData;

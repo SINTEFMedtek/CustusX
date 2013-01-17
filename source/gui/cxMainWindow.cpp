@@ -598,9 +598,17 @@ void MainWindow::newPatientSlot()
 
 	QString choosenDir = patientDatafolder + "/" + timestamp + postfix;
 
-	choosenDir = QFileDialog::getSaveFileName(this, tr("Select directory to save patient in"), choosenDir);
-	if (choosenDir == QString::null)
-		return; // On cancel
+	QFileDialog dialog(this, tr("Select directory to save patient in"), patientDatafolder + "/");
+	dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+	dialog.setOption(QFileDialog::ShowDirsOnly, true);
+	dialog.selectFile(timestamp + postfix);
+	if (!dialog.exec())
+		return;
+	choosenDir = dialog.selectedFiles().front();
+
+//	choosenDir = QFileDialog::getSaveFileName(this, tr("Select directory to save patient in"), choosenDir);
+//	if (choosenDir == QString::null)
+//		return; // On cancel
 	if (!choosenDir.endsWith(".cx3"))
 		choosenDir += QString(".cx3");
 

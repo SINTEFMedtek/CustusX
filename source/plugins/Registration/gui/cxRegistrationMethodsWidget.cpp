@@ -13,10 +13,6 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 
-////segmentation
-//#include "cxConnectedThresholdImageFilterWidget.h"
-//#include "cxBinaryThresholdImageFilterWidget.h"
-
 //registration
 #include "cxLandmarkImageRegistrationWidget.h"
 #include "cxLandmarkImage2ImageRegistrationWidget.h"
@@ -24,9 +20,7 @@
 #include "cxFastImageRegistrationWidget.h"
 #include "cxFastPatientRegistrationWidget.h"
 #include "cxFastOrientationRegistrationWidget.h"
-#include "cxImageSegmentationAndCenterlineWidget.h"
 #include "cxPlateRegistrationWidget.h"
-//#include "cxManualRegistrationOffsetWidget.h"
 #include "cxRegisterI2IWidget.h"
 #include "cxElastixWidget.h"
 #include "cxManualRegistrationWidget.h"
@@ -37,7 +31,6 @@
 
 namespace cx
 {
-
 
 LandmarkRegistrationsWidget::LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
   TabbedWidget(parent, objectName, windowTitle)
@@ -153,20 +146,11 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(RegistrationManagerPtr regM
 
   //vessel based image to image
   Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(this, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
-//  FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
-//  MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
 
-  ImageSegmentationAndCenterlineWidget* prepareRegistrationWidgetOld = new ImageSegmentationAndCenterlineWidget(regManager, image2imageWidget);
   PrepareVesselsWidget* prepareRegistrationWidget = new PrepareVesselsWidget(regManager, image2imageWidget);
 
-
-//  image2imageWidget->addTab(movingRegistrationWidget, "Moving"); //should be application specific
   image2imageWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
-  image2imageWidget->addTab(prepareRegistrationWidgetOld, "PrepareOld"); //should be application specific
   image2imageWidget->addTab(new RegisterI2IWidget(regManager, image2imageWidget),"Register");
-
-  //manual offset
-//  ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(regManager, this);
 
   //patient orientation
   PatientOrientationWidget* patientOrientationWidget = new PatientOrientationWidget(regManager, this);

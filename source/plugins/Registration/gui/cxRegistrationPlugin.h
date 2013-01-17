@@ -50,9 +50,7 @@ public:
 	RegistrationPlugin(AcquisitionDataPtr acquisitionData);
 	virtual ~RegistrationPlugin() {}
 
-//  AcquisitionDataPtr getAcquisitionData() { return mAcquisitionData; }
 	virtual std::vector<PluginWidget> createWidgets() const;
-//	virtual std::vector<QToolBar*> createToolBars() const;
 signals:
 
 private slots:
