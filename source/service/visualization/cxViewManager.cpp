@@ -931,7 +931,7 @@ unsigned ViewManager::findLayoutData(const QString uid) const
 
 QActionGroup* ViewManager::createLayoutActionGroup()
 {
-	QActionGroup* retval = new QActionGroup(NULL);
+	QActionGroup* retval = new QActionGroup(this);
 	retval->setExclusive(true);
 
 	// add default layouts
@@ -1102,7 +1102,7 @@ void ViewManager::saveGlobalSettings()
 
 QActionGroup* ViewManager::createInteractorStyleActionGroup()
 {
-	QActionGroup* camGroup = new QActionGroup(NULL);
+	QActionGroup* camGroup = new QActionGroup(this);
 	camGroup->setExclusive(true);
 
 	this->addInteractorStyleAction("Unicam", camGroup, "vtkInteractorStyleUnicam", QIcon(":/icons/camera-u.png"),
