@@ -19,7 +19,7 @@
 namespace cx
 {
 StatusBar::StatusBar() :
-	mRenderingFpsLabel(new QLabel()), mGrabbingInfoLabel(new QLabel()), mTpsLabel(new QLabel())
+	mRenderingFpsLabel(new QLabel(this)), mGrabbingInfoLabel(new QLabel(this)), mTpsLabel(new QLabel(this))
 {
 	connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
