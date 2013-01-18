@@ -262,11 +262,12 @@ void MainWindow::shutdown()
 
 	ssc::GPUImageBufferRepository::shutdown();
 	ssc::MessageManager::shutdown();
+	Settings::destroyInstance();
 }
 
 QMenu* MainWindow::createPopupMenu()
 {
-	QMenu* popupMenu = new QMenu(0);
+	QMenu* popupMenu = new QMenu(this);
 	std::map<QString, QActionGroup*>::iterator it = mWidgetGroupsMap.begin();
 	for (; it != mWidgetGroupsMap.end(); ++it)
 	{
@@ -926,7 +927,7 @@ void MainWindow::createMenus()
 	mNavigationMenu->addActions(mInteractorStyleActionGroup->actions());
 
 	this->menuBar()->addMenu(mHelpMenu);
-	mHelpMenu->addAction(QWhatsThis::createAction());
+	mHelpMenu->addAction(QWhatsThis::createAction(this));
 
 }
 
@@ -971,7 +972,7 @@ void MainWindow::createToolBars()
 
 	mHelpToolBar = addToolBar("Help");
 	mHelpToolBar->setObjectName("HelpToolBar");
-	mHelpToolBar->addAction(QWhatsThis::createAction());
+	mHelpToolBar->addAction(QWhatsThis::createAction(this));
 	this->registerToolBar(mHelpToolBar, "Toolbar");
 
 	mScreenshotToolBar = addToolBar("Screenshot");
