@@ -8,6 +8,7 @@
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 
+#include "sscTypeConversions.h"
 #include "sscDataManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
@@ -41,6 +42,7 @@ bool TubeSegmentationFilter::execute()
 
 	//======================================================
 
+    /*
 	char  arg0[] = "not needed?"; //"/home/jbake/jbake/workspace/Tube-Segmenation-Framework/build_Debug/tubeSegmentation"; // executable
 	char  arg1[] = "/home/jbake/jbake/data/helix/helix.mhd"; // dataset
 	char  arg2[] = "--mode";
@@ -48,14 +50,39 @@ bool TubeSegmentationFilter::execute()
 	char  arg4[] = "--storage-dir";
 	char  arg5[] = "/home/jbake/jbake/workspace/"; // storage-dirs value
 	char  arg6[] = "--timing";
+	//char  arg2[] = "--parameters";
+	//char  arg3[] = "us-accuracy";
 	char  arg7[] = "NULL"; // end of list
 	char* argv[] = { &arg0[0], &arg1[0], &arg2[0], &arg3[0], &arg4[0], &arg5[0], &arg6[0], &arg7[0], NULL };
+	//char* argv[] = { &arg0[0], &arg1[0], &arg2[0], &arg3[0], &arg7[0], NULL };
 
     //char** argv = this->generateParameterList();
 	int argc = sizeof argv/sizeof argv[0] - 1;
+	*/
+    /*
+	QStringList stringlist = generateParametersFromOptions();
+	QByteArray temp = stringlist.simplified().toLocal8Bit();
+	QList<QByteArray> list = temp.split(' ');
+	int argc = list.count();
+	char **argv = new char*[argc];
+	for (int i = 0; i < argc; ++i)
+	    argv[i] = list[i].data();
+	*/
+
+    /*
+    QStringList stringlist = this->generateParametersFromOptions();
+    for (int i = 0; i < stringlist.size(); ++i)
+         std::cout << stringlist.at(i).toLocal8Bit().constData() << std::endl;
+
+    char** argv = this->convertValue(this->generateParametersFromOptions());
+    int argc = sizeof argv/sizeof argv[0] - 1;
+    std::cout << "argc " << argc << std::endl;
 
     // Parse parameters from program arguments
 	boost::unordered_map<std::string, std::string> parameters = getParameters(argc, argv);
+	*/
+
+    boost::unordered_map<std::string, std::string> parameters = this->generateParametersFromOptions();
 
     // Write out parameter list
     std::cout << "The following parameters are set: " << std::endl;
@@ -64,8 +91,9 @@ bool TubeSegmentationFilter::execute()
     	std::cout << it->first << " " << it->second << std::endl;
     }
 
-	OpenCL ocl;
-	ocl.context = createCLContextFromArguments(argc, argv);
+    OpenCL ocl;
+	//ocl.context = createCLContextFromArguments(argc, argv);
+    ocl.context = this->createCLContextFromArguments(parameters);
 
     // Select first device
     cl::vector<cl::Device> devices = ocl.context.getInfo<CL_CONTEXT_DEVICES>();
@@ -155,9 +183,11 @@ void TubeSegmentationFilter::postProcess()
 	QString uidCenterline = input->getUid() + "_tsf_cl%1";
 	QString nameCenterline = input->getName()+"_tsf_cl%1";
 
+	//mRawCenterlineResult->Print(std::cout);
+
 	ssc::ImagePtr outputCenterline = ssc::dataManager()->createDerivedImage(mRawCenterlineResult,uidCenterline, nameCenterline, input);
-		if (!outputCenterline)
-			return;
+	if (!outputCenterline)
+		return;
 
 	ssc::dataManager()->loadData(outputCenterline);
 	ssc::dataManager()->saveImage(outputCenterline, patientService()->getPatientData()->getActivePatientFolder());
@@ -181,8 +211,10 @@ void TubeSegmentationFilter::postProcess()
 
 void TubeSegmentationFilter::createOptions(QDomElement root)
 {
-	mOptionsAdapters.push_back(this->makeDeviceOption(root));
-	mOptionsAdapters.push_back(this->makeBuffersOnlyOption(root));
+	mDeviceOption = this->makeDeviceOption(root);
+	mOptionsAdapters.push_back(mDeviceOption);
+	mBufferOnlyOption = this->makeBuffersOnlyOption(root);
+	mOptionsAdapters.push_back(mBufferOnlyOption);
 	mAutoMinimumOption = this->makeAutoMinimumOption(root);
 	mOptionsAdapters.push_back(mAutoMinimumOption);
 	mMinimumOption = this->makeMinimumOption(root);
@@ -191,9 +223,14 @@ void TubeSegmentationFilter::createOptions(QDomElement root)
 	mOptionsAdapters.push_back(mAutoMaximumOption);
 	mMaximumOption = this->makeMaximumOption(root);
 	mOptionsAdapters.push_back(mMaximumOption);
-	mOptionsAdapters.push_back(this->makeModeOption(root));
-	mOptionsAdapters.push_back(this->makeNoSegmentationOption(root));
-	mOptionsAdapters.push_back(this->makeCenterlineMethodOption(root));
+	mModeOption = this->makeModeOption(root);
+	mOptionsAdapters.push_back(mModeOption);
+	mNoSegmentationOption = this->makeNoSegmentationOption(root);
+	mOptionsAdapters.push_back(mNoSegmentationOption);
+	mCenterlineMethodOption = this->makeCenterlineMethodOption(root);
+	mOptionsAdapters.push_back(mCenterlineMethodOption);
+	mTimingOption = this->makeTimingOption(root);
+	mOptionsAdapters.push_back(mTimingOption);
 
 	connect(mAutoMinimumOption.get(), SIGNAL(changed()), this, SLOT(toggleAutoMinimum()));
 	this->toggleAutoMinimum();
@@ -228,16 +265,11 @@ void TubeSegmentationFilter::createOutputTypes()
 
 void TubeSegmentationFilter::toggleAutoMinimum()
 {
-	//ssc::BoolDataAdapterXmlPtr autoMin = this->makeAutoMinimumOption(mOptions);
-	std::cout << "toggleAutoMinimum: " << mAutoMinimumOption->getValue() << std::endl;
-	//this->makeMinimumOption(mCopiedOptions)->setEnabled(!autoMin->getValue());
 	mMinimumOption->setEnabled(!mAutoMinimumOption->getValue());
 }
 
 void TubeSegmentationFilter::toggleAutoMaximum()
 {
-	//ssc::BoolDataAdapterXmlPtr autoMax = this->makeAutoMaximumOption(mOptions);
-	//this->makeMaximumOption(mCopiedOptions)->setEnabled(autoMax->getValue());
 	mMaximumOption->setEnabled(!mAutoMaximumOption->getValue());
 }
 
@@ -256,6 +288,103 @@ vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int s
 	vtkImageDataPtr retval = imageImport->GetOutput();
 
 	return retval;
+}
+
+boost::unordered_map<std::string, std::string> TubeSegmentationFilter::generateParametersFromOptions()
+{
+	boost::unordered_map<std::string, std::string> retval;
+
+	//TODO BEGIN
+	//std::string  storageDir = "storage-dir";
+	//std::string storageDirPath = "/home/jbake/jbake/workspace/"; // storage-dirs value
+	//retval[storageDir] = storageDirPath;
+
+
+	//std::string parameters = "--parameters";
+	//std::string parametersFile = "us-accuracy";
+	//retval[parameters] = parametersFile;
+	//TODO END
+
+	//ssc::BoolDataAdapterXmlPtr mTimingOption;
+	if(mTimingOption->getValue()){
+		std::string timing = "timing";
+		retval[timing] = "dummy-value";
+	}
+
+	//ssc::StringDataAdapterXmlPtr mDeviceOption;
+	std::string device = "device";
+	std::string deviceType = mDeviceOption->getValue().toStdString();
+	retval[device] = deviceType;
+
+	//ssc::BoolDataAdapterXmlPtr mBufferOnlyOption;
+	std::string bufferOnly = "buffers-only";
+	if(mBufferOnlyOption->getValue())
+		retval[bufferOnly] = "dummy-value";
+
+	//ssc::BoolDataAdapterXmlPtr mAutoMinimumOption;
+	//ssc::DoubleDataAdapterXmlPtr mMinimumOption;
+	if(!mAutoMinimumOption->getValue())
+	{
+		std::string minimum = "minimum";
+		std::string minumumValue = boost::lexical_cast<std::string>(mMinimumOption->getValue());
+		retval[minimum] = minumumValue;
+	}
+
+	//ssc::BoolDataAdapterXmlPtr mAutoMaximumOption;
+	//ssc::DoubleDataAdapterXmlPtr mMaximumOption;
+	if(!mAutoMaximumOption->getValue())
+	{
+		std::string maximum = "maximum";
+		std::string maximumValue = boost::lexical_cast<std::string>(mMaximumOption->getValue());
+		retval[maximum] = maximumValue;
+	}
+
+	//ssc::StringDataAdapterXmlPtr mModeOption;
+	std::string mode = "mode";
+	std::string modeType = mModeOption->getValue().toStdString();
+	retval[mode] = modeType;
+
+	//ssc::BoolDataAdapterXmlPtr mNoSegmentationOption;
+	std::string noSegmentation = "";
+	if(mNoSegmentationOption->getValue())
+	{
+		noSegmentation = "no-segmentation";
+		retval[noSegmentation] = "dummy-value";
+	}
+
+	//ssc::StringDataAdapterXmlPtr mCenterlineMethodOption;
+	std::string centerlineMethod = "centerline-method";
+	std::string centerlineMethodType = mCenterlineMethodOption->getValue().toStdString();
+	retval[centerlineMethod] = centerlineMethodType;
+
+	return retval;
+}
+
+cl::Context TubeSegmentationFilter::createCLContextFromArguments(boost::unordered_map<std::string, std::string> parameters) {
+    cl_device_type type = CL_DEVICE_TYPE_ALL;
+    cl_vendor vendor = VENDOR_ANY;
+
+    boost::unordered_map<std::string, std::string>::iterator deviceIt = parameters.find("device");
+    if(deviceIt != parameters.end())
+    {
+    	if(deviceIt->second == "cpu")
+    		type = CL_DEVICE_TYPE_CPU;
+    	else if(deviceIt->second == "gpu")
+    		type = CL_DEVICE_TYPE_GPU;
+    }
+
+    boost::unordered_map<std::string, std::string>::iterator vendorIt = parameters.find("vendor");
+    if(vendorIt != parameters.end())
+    {
+    	if(vendorIt->second == "amd")
+    		type = VENDOR_AMD;
+    	else if(vendorIt->second == "intel")
+    		type = VENDOR_INTEL;
+    	else if(vendorIt->second == "nvidia")
+    	    type = VENDOR_NVIDIA;
+    }
+
+    return createCLContext(type, vendor);
 }
 
 ssc::StringDataAdapterXmlPtr TubeSegmentationFilter::makeDeviceOption(QDomElement root)
@@ -314,6 +443,12 @@ ssc::BoolDataAdapterXmlPtr TubeSegmentationFilter::makeNoSegmentationOption(QDom
 {
 	return ssc::BoolDataAdapterXml::initialize("tsf_no-segmentation", "Segmentation",
 	                                           "Turns off segmentation and returns centerline only", false, root);
+}
+
+ssc::BoolDataAdapterXmlPtr TubeSegmentationFilter::makeTimingOption(QDomElement root)
+{
+	return ssc::BoolDataAdapterXml::initialize("tsf_timing", "Timing",
+	                                           "Prints timing information.", false, root);
 }
 
 ssc::StringDataAdapterXmlPtr TubeSegmentationFilter::makeCenterlineMethodOption(QDomElement root)
