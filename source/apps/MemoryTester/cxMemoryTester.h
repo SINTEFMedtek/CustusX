@@ -22,6 +22,9 @@ public:
 public slots:
 	int addBlock();
 	int removeBlock();
+	void generateLeak();
+private:
+	vtkImageDataPtr  generateVtkImageData();
 };
 
 class MemoryTester : public QMainWindow
@@ -43,6 +46,7 @@ private:
 
 	QAction* mAddMemAction;
 	QAction* mRemoveMemAction;
+	QAction* mLeakAction;
 
 	QAction* mAction1;
 //	QAction* mAction2;
