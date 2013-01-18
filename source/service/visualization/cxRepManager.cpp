@@ -103,16 +103,12 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
     mVolumetricRepByImageMap[image->getUid()] = rep;
   }
 
-  //purge not visible volumes from cache
-  this->purgeVolumetricReps();
+  //Call to purge is moved to ViewWrapper::dataRemovedSlot
+  //this->purgeVolumetricReps();
 
   return mVolumetricRepByImageMap[image->getUid()];
 }
 
-/**
- * Purge not visible volumes from cache.
- * This is because caching of volumetric reps uses a lot of memory (100-200 MB) per volume
- */
 void RepManager::purgeVolumetricReps()
 {
 	std::map<QString, ssc::ImagePtr> images = ViewManager::getInstance()->getVisibleImages();
