@@ -145,6 +145,12 @@ public:
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(ssc::DataPtr data);
 
+	/**
+	 * Return a list of all images used in viewGroups
+	 * Uses a map to remove duplicates
+	 */
+	std::map<QString, ssc::ImagePtr> getVisibleImages();
+
 signals:
 //	void imageDeletedFromViews(ssc::ImagePtr image); ///< Emitted when an image is deleted from the views in the cxViewManager
 	void fps(int number); ///< Emits number of frames per second
