@@ -26,7 +26,7 @@ WorkflowStateMachine::WorkflowStateMachine()
 {
 	mStarted = false;
 	connect(this, SIGNAL(started()), this, SLOT(startedSlot()));
-	mActionGroup = new QActionGroup(NULL);
+	mActionGroup = new QActionGroup(this);
 
 	mParentState = new ParentWorkflowState(this);
 
