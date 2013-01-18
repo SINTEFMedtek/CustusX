@@ -2,6 +2,10 @@
 #define CXTUBESEGMENTATIONFILTER_H_
 
 #include "cxFilterImpl.h"
+
+#include <boost/unordered_map.hpp>
+//#include "commons.hpp"
+#include "openCLUtilities.hpp"
 #include "sscStringDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 
@@ -48,6 +52,8 @@ private slots:
 
 private:
 	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z);
+	boost::unordered_map<std::string, std::string> generateParametersFromOptions();
+	cl::Context createCLContextFromArguments(boost::unordered_map<std::string, std::string> parameters);
 
 	ssc::StringDataAdapterXmlPtr makeDeviceOption(QDomElement root);
 	ssc::BoolDataAdapterXmlPtr makeBuffersOnlyOption(QDomElement root);
@@ -57,15 +63,22 @@ private:
 	ssc::DoubleDataAdapterXmlPtr makeMaximumOption(QDomElement root);
 	ssc::StringDataAdapterXmlPtr makeModeOption(QDomElement root);
 	ssc::BoolDataAdapterXmlPtr makeNoSegmentationOption(QDomElement root);
+	ssc::BoolDataAdapterXmlPtr makeTimingOption(QDomElement root);
 	ssc::StringDataAdapterXmlPtr makeCenterlineMethodOption(QDomElement root);
 
 	vtkImageDataPtr mRawCenterlineResult;
 	vtkImageDataPtr mRawSegmentationResult;
 
+	ssc::StringDataAdapterXmlPtr mDeviceOption;
+	ssc::BoolDataAdapterXmlPtr mBufferOnlyOption;
 	ssc::BoolDataAdapterXmlPtr mAutoMinimumOption;
 	ssc::BoolDataAdapterXmlPtr mAutoMaximumOption;
 	ssc::DoubleDataAdapterXmlPtr mMinimumOption;
 	ssc::DoubleDataAdapterXmlPtr mMaximumOption;
+	ssc::StringDataAdapterXmlPtr mModeOption;
+	ssc::BoolDataAdapterXmlPtr mNoSegmentationOption;
+	ssc::StringDataAdapterXmlPtr mCenterlineMethodOption;
+	ssc::BoolDataAdapterXmlPtr mTimingOption;
 
 };
 typedef boost::shared_ptr<class TubeSegmentationFilter> TubeSegmentationFilterPtr;
