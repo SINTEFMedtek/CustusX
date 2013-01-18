@@ -163,6 +163,7 @@ protected:
 	typedef std::multimap<QString, ssc::RepPtr> RepMultiMap;
 	RepMultiMap mRepCache;
 //  RepMap              mRepMap; ///< contains all the reps in the specific maps above. Use for simplified access.
+	void purgeVolumetricReps();
 
 private:
 	RepManager(); ///< creates a pool of reps

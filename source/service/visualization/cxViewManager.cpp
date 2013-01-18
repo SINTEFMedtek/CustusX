@@ -160,6 +160,21 @@ void ViewManager::updateViews()
 	}
 }
 
+std::map<QString, ssc::ImagePtr> ViewManager::getVisibleImages()
+{
+	std::map<QString, ssc::ImagePtr> retval;
+	for(unsigned i=0; i<mViewGroups.size(); ++i)
+	{
+		ViewGroupPtr group = mViewGroups[i];
+		std::vector<ssc::ImagePtr> images = group->getImages();
+		for (unsigned j=0; j<images.size(); ++j)
+		{
+			retval[images[j]->getUid()] = images[j];
+		}
+	}
+	return retval;
+}
+
 void ViewManager::duringSavePatientSlot()
 {
 	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
