@@ -177,7 +177,7 @@ void InteractiveCropper::showBoxWidget(bool on)
 ssc::DoubleBoundingBox3D InteractiveCropper::getBoundingBox()
 {
 	if (!mImage || !mBoxWidget)
-		return ssc::DoubleBoundingBox3D();
+		return ssc::DoubleBoundingBox3D(0,0,0,0,0,0);
 	return mImage->getCroppingBox();
 }
 
@@ -275,7 +275,7 @@ ssc::DoubleBoundingBox3D InteractiveCropper::getBoxWidgetSize()
 {
 	if (!mImage || !mBoxWidget)
 	{
-		return ssc::DoubleBoundingBox3D();
+		return ssc::DoubleBoundingBox3D::zero();
 	}
 
 	double bb_hard[6] =
@@ -313,7 +313,7 @@ void InteractiveCropper::boxWasShown(bool val)
 ssc::DoubleBoundingBox3D InteractiveCropper::getMaxBoundingBox()
 {
 	if (!mImage)
-		return ssc::DoubleBoundingBox3D();
+		return ssc::DoubleBoundingBox3D::zero();
 	return mImage->boundingBox();
 }
 
