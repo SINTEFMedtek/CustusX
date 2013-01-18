@@ -32,7 +32,7 @@ namespace cx
 
 ApplicationStateMachine::ApplicationStateMachine()
 {
-	mActionGroup = new QActionGroup(NULL);
+	mActionGroup = new QActionGroup(this);
 
 	mParentState = new ParentApplicationState(this);
 

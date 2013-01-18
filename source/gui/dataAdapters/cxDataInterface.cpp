@@ -437,6 +437,7 @@ void SelectRTSourceStringDataAdapter::setDefaultSlot()
 
 SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
 {
+	mCoordinateSystem = ssc::csCOUNT;
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(setDefaultSlot()));
 }
 
