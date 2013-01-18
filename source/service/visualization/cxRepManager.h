@@ -147,6 +147,12 @@ public:
 		return retval;
 	}
 
+	/**
+	 * Purge not visible volumes from cache.
+	 * This is because caching of volumetric reps uses a lot of memory (100-200 MB) per volume
+	 */
+	void purgeVolumetricReps();
+
 protected slots:
 	void volumeRemovedSlot(QString uid);
 

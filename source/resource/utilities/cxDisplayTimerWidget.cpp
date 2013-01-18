@@ -21,7 +21,7 @@ namespace cx
 DisplayTimerWidget::DisplayTimerWidget(QWidget* parent) : QWidget(parent),
 	mFontSize(8)
 {
-	mTimer = new QTimer;
+	mTimer = new QTimer(this);
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(timeoutSlot()));
 	mTimer->setInterval(1000);
 
