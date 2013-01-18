@@ -15,9 +15,7 @@
 #include "cxRepManager.h"
 
 #include "sscMessageManager.h"
-#include "cxToolManager.h"
 #include "sscDataManager.h"
-
 #include "sscImage.h"
 #include "sscTransform3D.h"
 #include "sscToolRep3D.h"
@@ -27,6 +25,8 @@
 #include "sscProgressiveLODVolumetricRep.h"
 #include "cxTool.h"
 #include "cxSettings.h"
+#include "cxToolManager.h"
+#include "cxViewManager.h"
 
 namespace cx
 {
@@ -100,16 +100,29 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 
     rep->setMaxVolumeSize(maxRenderSize);
     rep->setImage(image);
-    //Cache is disabled for now. It uses too much memory per volume (100-200MB)
-    //TODO: Allow caching of 2 recent volumes. Get visible volumes from ViewManager
-    //and purge old not visible ones (need timestamps)
-    //mVolumetricRepByImageMap[image->getUid()] = rep;
-    return rep;
+    mVolumetricRepByImageMap[image->getUid()] = rep;
   }
-  ssc::messageManager()->sendError("RepManager cache disabled");
-  //Cache disabled.
-  //return mVolumetricRepByImageMap[image->getUid()];
-  return ssc::VolumetricRepPtr();
+
+  //Call to purge is moved to ViewWrapper::dataRemovedSlot
+  //this->purgeVolumetricReps();
+
+  return mVolumetricRepByImageMap[image->getUid()];
+}
+
+void RepManager::purgeVolumetricReps()
+{
+	std::map<QString, ssc::ImagePtr> images = ViewManager::getInstance()->getVisibleImages();
+
+	VolumetricRepMap::const_iterator iter;
+	for (iter= mVolumetricRepByImageMap.begin(); iter != mVolumetricRepByImageMap.end(); ++iter)
+	{
+		//Remove from cache if not a visible image
+		if (!images.count(iter->first))
+		{
+//			std::cout << "purge image from cache: " << iter->first << std::endl;
+			this->volumeRemovedSlot(iter->first);
+		}
+	}
 }
 
 /**always remove from cache after deleting a volume, because we _might_ import the same volume again,
