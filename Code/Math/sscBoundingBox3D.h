@@ -56,6 +56,7 @@ public:
 	static DoubleBoundingBox3D fromViewport(const double* data);
 	static DoubleBoundingBox3D fromCloud(std::vector<Vector3D> cloud);
 	static DoubleBoundingBox3D fromString(const QString& text); ///< construct a bb from a string containing 6 whitespace-separated numbers
+	static DoubleBoundingBox3D zero() { return DoubleBoundingBox3D(0,0,0,0,0,0); }
 
 	Vector3D bottomLeft() const;
 	Vector3D topRight() const;
