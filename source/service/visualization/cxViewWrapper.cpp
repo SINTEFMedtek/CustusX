@@ -28,6 +28,7 @@
 #include "sscImage.h"
 #include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
+#include "cxRepManager.h"
 
 namespace cx
 {
@@ -253,6 +254,7 @@ void ViewWrapper::dataRemovedSlot(QString uid)
 	this->dataRemoved(uid);
 //  this->imageRemoved(uid);
 //  this->meshRemoved(uid);
+	RepManager::getInstance()->purgeVolumetricReps();
 }
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
