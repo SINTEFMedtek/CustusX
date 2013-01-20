@@ -24,15 +24,17 @@ set -x
 #lcov --zerocounters -directory .
 
 #kjør alle tester
+#ctest
 
 # convert coverage data from app runs
 lcov --capture --directory . --output-file cx_coverage.gcov
 # remove system and external libraries
-lcov --remove cx_coverage.gcov 'eigen3/Eigen/*' '/opt/*' 'external_code/*' '/Library/*' '/usr/*' --output-file cx_coverage.gcov
+lcov --remove cx_coverage.gcov 'eigen3/Eigen/*' '/opt/*' 'external_code/*' '/Library/*' '/usr/*' '/moc*.cxx' --output-file cx_coverage.gcov
 # generate html
 genhtml cx_coverage.gcov -output-directory coverage_info
 # open in web browser
-open coverage_info/index.html
+#open coverage_info/index.html # mac
+firefox coverage_info/index.html
 
 
 
