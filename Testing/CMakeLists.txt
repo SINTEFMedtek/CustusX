@@ -9,6 +9,7 @@ endif(COMMAND cmake_policy)
 # =========================================================
 
 if (BUILD_TESTING)
+	#INCLUDE(CodeCoverage)
 
     find_package(SSC REQUIRED)
     include (${SSC_USE_FILE} )
@@ -58,6 +59,7 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
     target_link_libraries( TestDataManager SSC )	
     set_target_properties(TestDataManager PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
     add_test(TestDataManager TestDataManager)
+	#SETUP_TARGET_FOR_COVERAGE(CoverageTestDataManager TestDataManager CoverageTestDataManager.xml)
     
     # test rendering of a 3D volume 
     # - ssc::View
@@ -110,12 +112,14 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
         ${SSC_TEST_SOURCE_FILES}
         )
         
-    add_executable(testSSC 
-        sscCPPUnitMain.cpp
-        ${SSC_TEST_SOURCE_FILES}
-        )
-    target_link_libraries(testSSC SSC ${CPPUNIT_LIBRARIES})
-    set_target_properties(testSSC PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
+	if (SSC_BUILD_PURE_CPPUNIT_TESTS)
+		add_executable(testSSC
+			sscCPPUnitMain.cpp
+			${SSC_TEST_SOURCE_FILES}
+			)
+		target_link_libraries(testSSC SSC ${CPPUNIT_LIBRARIES})
+		set_target_properties(testSSC PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
+	endif()
     
     # --------------- -------------------------------
     # -- CppUnit - CTest integration. ---------------
