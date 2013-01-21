@@ -436,6 +436,9 @@ bool ToolManager::createSymlink()
 	else
 	{
 		ssc::messageManager()->sendInfo(QString("Device files: %1").arg(files.join(",")));
+		if (files.size() > 1)
+			ssc::messageManager()->sendWarning(
+					QString("More than one tracker connected? Will only try to connect to: %1").arg(files[0]));
 	}
 
 	QString device = devDir.filePath(files[0]);
