@@ -34,13 +34,14 @@ vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
 
 	int scalarSize = dim[0]*dim[1]*dim[2];
 
-	unsigned char *rawchars = (unsigned char*)malloc(scalarSize+1);
+	scalarSize += 1;	//TODO: Whithout the +1 the volume is black
+
+	unsigned char *rawchars = (unsigned char*)malloc(scalarSize);
 	std::fill(rawchars,rawchars+scalarSize, initValue);
 
 	vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
 	array->SetNumberOfComponents(1);
-	//TODO: Whithout the +1 the volume is black
-	array->SetArray(rawchars, scalarSize+1, 0); // take ownership
+	array->SetArray(rawchars, scalarSize, 0); // take ownership
 	data->GetPointData()->SetScalars(array);
 
 	// A trick to get a full LUT in ssc::Image (automatic LUT generation)
