@@ -437,7 +437,7 @@ bool ToolManager::createSymlink()
 	{
 		ssc::messageManager()->sendInfo(QString("Device files: %1").arg(files.join(",")));
 		if (files.size() > 1)
-			ssc::messageManager()->sendWarning(
+			ssc::messageManager()->sendError(
 					QString("More than one tracker connected? Will only try to connect to: %1").arg(files[0]));
 	}
 
