@@ -5,7 +5,10 @@
 
 #include <boost/unordered_map.hpp>
 //#include "commons.hpp"
+
+#ifdef CX_USE_TSF
 #include "openCLUtilities.hpp"
+#endif //CX_USE_TSF
 #include "sscStringDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 
