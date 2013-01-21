@@ -169,7 +169,7 @@ set(SSC_LIBRARY_DIRS
 #    ${SSC_SOURCE_DIR}/Code/Ultrasound/3DReconstruction
     )    
 
-set( SSC_LIBRARIES QVTK )
+set( SSC_LIBRARIES ${SSC_LIBRARIES} QVTK ${SSC_GCOV_LIBRARY})
 
 if(WIN32)
     set( SSC_LIBRARIES ${SSC_LIBRARIES} )
@@ -571,7 +571,6 @@ set (BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
 # =========================================================
 # create the target
 add_library( SSC ${SSC_GENERATED_SOURCE_FILES} )
-#target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} profile_rt)
 target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES})
 #message(STATUS SSC Libs:\n ${SSC_GENERATED_LIBRARIES})
 # =========================================================

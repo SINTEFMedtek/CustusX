@@ -10,6 +10,23 @@ endif(COMMAND cmake_policy)
 
 project( SSC )
 
+# code coverage
+option(SSC_USE_GCOV "add gcov to enable coverage testing" OFF)
+if(SSC_USE_GCOV)
+	message(STATUS "Building SSC with gcov code coverage support.")
+	set(SSC_GCOV_LIBRARY )
+	if(WIN32)
+		message(ERROR "gcov not supported for WIN32")
+	# needed on apple
+	elseif(APPLE)
+		set( SSC_GCOV_LIBRARY ${SSC_GCOV_LIBRARY} profile_rt )
+	# needed on linux
+	else(WIN32)
+		set( SSC_GCOV_LIBRARY ${SSC_GCOV_LIBRARY} gcov)
+	endif(WIN32)
+
+	add_definitions(--coverage)
+endif()
 
 enable_testing()
 
