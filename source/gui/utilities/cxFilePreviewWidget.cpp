@@ -17,10 +17,10 @@ namespace cx
 
 FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
 		FileWatcherWidget(parent, "FilePreviewWidget", "File Preview"),
-    mTextDocument(new QTextDocument()),
-    mTextEdit(new QTextEdit()),
+	mTextDocument(new QTextDocument(this)),
+	mTextEdit(new QTextEdit(this)),
     //mFileNameLabel(new QLabel()),
-    mSaveButton(new QPushButton("Save"))
+	mSaveButton(new QPushButton("Save", this))
     //mFileSystemWatcher(new QFileSystemWatcher())
 {
 	mSyntaxHighlighter = NULL;
