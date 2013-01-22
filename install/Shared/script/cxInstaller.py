@@ -93,6 +93,7 @@ class Common(object):
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
+        self.mCoverage = "OFF"
 
 # ---------------------------------------------------------
     
@@ -721,6 +722,7 @@ cmake \
 -DCOTIRE_ENABLE_PRECOMPILED_HEADERS="%s" \
 -DGEStreamer_DIR:PATH="%s" \
 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
+-DSSC_USE_GCOV:BOOL=%s \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, DATA.mBuildShared, 
@@ -738,6 +740,7 @@ cmake \
             DATA.mUseCotire,
             ISB_DataStreaming().buildPath(),
             DATA.mOSX_DEPLOYMENT_TARGET,
+            DATA.mCoverage,
             self.sourceFolder() )
             )
         #TODO add xcode project here if needed?
@@ -961,6 +964,11 @@ Available components are:
                      type='string',
                      help='password for svn sintef user at isb',
                      default="")
+        p.add_option('--coverage',
+                     '--cv',
+                     action='store_true',
+                     help='gcov code coverage',
+                     default=False)
         return p
     
     def _parseCommandLine(self):
@@ -1006,6 +1014,8 @@ Available components are:
             print 'Generate jom makefiles'
         if options.isb_password:
             DATA.mISBpassword = options.isb_password
+        if options.coverage:
+            DATA.mCoverage = 'ON'
         
         #TODO can be wrong for external libs as they use DATA.mBuildExternalsType!
         DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType 
