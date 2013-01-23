@@ -48,12 +48,13 @@ ReconstructPreprocessor::~ReconstructPreprocessor()
 
 void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> cores)
 {
-    std::vector<bool> angio;
+	TimeKeeper timer;
+
+	std::vector<bool> angio;
     for (unsigned i=0; i<cores.size(); ++i)
         angio.push_back(cores[0]->getInputParams().mAngio);
 
     std::vector<std::vector<vtkImageDataPtr> > frames = mFileData.mUsRaw->initializeFrames(angio);
-//    std::vector<ProcessedUSInputDataPtr> processedData = mFileData.mUsRaw->initializeFrames(angio);
 
     for (unsigned i=0; i<cores.size(); ++i)
     {
@@ -64,6 +65,9 @@ void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> co
                                                                QFileInfo(mFileData.mFilename).completeBaseName() ));
         cores[i]->initialize(input, this->getOutputVolumeParams());
     }
+
+
+	timer.printElapsedSeconds("Reconstruct preprocess time");
 }
 
 namespace
@@ -280,7 +284,6 @@ void ReconstructPreprocessor::interpolatePositions()
     }
 }
 
-
 /**
  * Pre:  mPos is prMt
  * Post: mPos is prMu
@@ -299,7 +302,6 @@ void ReconstructPreprocessor::transformPositionsTo_prMu()
     }
     //mPos is prMu
 }
-
 
 /**
  * Generate a rectangle (2D) defining ROI in input image space
@@ -447,7 +449,6 @@ void ReconstructPreprocessor::findExtentAndOutputTransform()
     mOutputVolumeParams.constrainVolumeSize();
 }
 
-
 /**Use the mOriginalFileData structure to rebuild all internal data.
  * Useful when settings have changed or data is loaded.
  */
@@ -455,9 +456,6 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
 {
     // uncomment to test cropping of data before reconstructing
     this->cropInputData();
-
-//	this->clearOutput();
-//    mFileData.mUsRaw->setAngio(mInput.mAngio);
 
     // Only use this if the time stamps have different formats
     // The function assumes that both lists of time stamps start at the same time,
@@ -482,35 +480,9 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
 void ReconstructPreprocessor::initialize(ReconstructCore::InputParams input, USReconstructInputData fileData)
 {
     mInput = input;
-
     mFileData = fileData;
     this->updateFromOriginalFileData();
-
-//    mAlgorithm = this->createAlgorithm(mInput.mAlgorithmUid);
 }
 
-///**The reconstruct part that must be fun pre-rec in the main thread.
-// *
-// */
-//void ReconstructCore::threadedPreReconstruct()
-//{
-//    if (!this->validInputData())
-//        return;
-//    mRawOutput = this->generateRawOutputVolume();
-//}
-
-///**The reconstruct part that must be run
-// *  - between threadedPreReconstruct() and threadedReconstruct(),
-// *  - can be threaded relative to main thread,
-// *  - can NOT be threaded relative to other threads using same USFrameData.
-// */
-//void ReconstructCore::threadablePreReconstruct()
-//{
-//    if (!this->validInputData())
-//        return;
-//    TimeKeeper timer;
-//    mFileData.mUsRaw->initializeFrames();
-//    timer.printElapsedSeconds("Reconstruct initialization time");
-//}
 
 } /* namespace ssc */

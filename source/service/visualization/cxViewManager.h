@@ -119,7 +119,8 @@ public:
 	QActionGroup* createInteractorStyleActionGroup();
 	bool isCustomLayout(const QString& uid) const;
 
-	static ViewManager* getInstance(); ///< returns the only instance of this class
+	static ViewManager* createInstance(); ///< create the instance
+	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
 	static void destroyInstance(); ///< destroys the only instance of this class
 
 	QWidget* stealCentralWidget(); ///< lets the viewmanager know where to place its layout
