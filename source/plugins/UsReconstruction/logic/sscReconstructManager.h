@@ -78,9 +78,17 @@ public:
 	void setOutputRelativePath(QString path);
 	void setOutputBasePath(QString path);
 
+	/** Return the currently reconstructing thread object.
+	  */
 	std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction() { return mThreadedReconstruction; }
 
-	void startReconstruction();
+	/** Execute the reconstruction in another thread.
+	  *
+	  * The returned cores can be used to retrieve output,
+	  * but this must be done AFTER the threads have completed.
+	  * In general, dont use the retval, it is for unit testing.
+	  */
+	std::vector<ReconstructCorePtr> startReconstruction();
 
 signals:
 	void paramsChanged();

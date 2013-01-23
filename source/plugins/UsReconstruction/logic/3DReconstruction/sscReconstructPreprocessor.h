@@ -43,16 +43,10 @@ public:
 
     // used for reconstruction algo
     void initialize(ReconstructCore::InputParams input, USReconstructInputData fileData);
-//    ssc::ImagePtr reconstruct();
-//    void threadedPreReconstruct();
-//    void threadablePreReconstruct();
-//    void threadedReconstruct();
-//    void threadedPostReconstruct();
     OutputVolumeParams getOutputVolumeParams() { return mOutputVolumeParams; }
     ReconstructCore::InputParams getInputParams() { return mInput; }
     /** Return the filedata after preprocessing, ready to be sent to reconstruction
       */
-//    USReconstructInputData getProcessedFileData();
     void initializeCores(std::vector<ReconstructCorePtr> cores); ///< fill input cores with relevant processed input
 
     static Transform3D slerpInterpolate(const Transform3D& a, const Transform3D& b, double t);

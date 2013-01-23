@@ -38,7 +38,8 @@
  */
 struct reconstruct_data
 {
-	ssc::USFrameDataPtr frameData;
+//	ssc::USFrameDataPtr frameData;
+	ssc::ProcessedUSInputDataPtr frameData;
 	//ssc::ImagePtr frameMask;
 	//ssc::ImagePtr outputData;
 

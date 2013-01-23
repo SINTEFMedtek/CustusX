@@ -30,6 +30,7 @@
 #include "sscVolumeHelpers.h"
 #include "sscPresetTransferFunctions3D.h"
 #include "sscTimeKeeper.h"
+#include "sscLogger.h"
 
 namespace ssc
 {
@@ -104,6 +105,7 @@ void ReconstructCore::threadedReconstruct()
 {
 	if (!this->validInputData())
 		return;
+	SSC_ASSERT(mRawOutput);
 
 	TimeKeeper timer;
 
@@ -181,7 +183,6 @@ vtkImageDataPtr ReconstructCore::generateRawOutputVolume()
 	Eigen::Array3i dim = mOutputVolumeParams.getDim();
 	ssc::Vector3D spacing = ssc::Vector3D(1, 1, 1) * mOutputVolumeParams.getSpacing();
 	vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);
-	std::cout << "ReconstructCore::generateRawOutputVolume() spacing  " << mOutputVolumeParams.getSpacing() << std::endl;
 	return data;
 }
 
@@ -194,11 +195,8 @@ QString ReconstructCore::generateOutputUid()
 {
 	QString base = mFileData->getUid();
 	QString name = mFileData->getFilePath().split("/").back();
-//	QString base = mFileData.mUsRaw->getUid();
-//	QString name = mFileData.mFilename.split("/").back();
 	name = name.split(".").front();
 
-	std::cout << "ReconstructCore::generateOutputUid() " << name << std::endl;
 	QStringList split = name.split("_");
 	QStringList prefix = split.front().split("-");
 	if (prefix.size() == 2)
@@ -226,7 +224,7 @@ QString ReconstructCore::generateImageName(QString uid) const
 	if (prefix.isEmpty())
 		prefix = "US";
 
-	std::cout << "reconstruct input uid " << uid << std::endl;
+//	std::cout << "reconstruct input uid " << uid << std::endl;
 	if (mInput.mAngio) // tag angio images as such
 		prefix += "A";
 

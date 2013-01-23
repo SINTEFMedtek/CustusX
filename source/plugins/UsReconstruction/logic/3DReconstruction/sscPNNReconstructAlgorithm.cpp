@@ -42,7 +42,7 @@ std::vector<DataAdapterPtr> PNNReconstructAlgorithm::getSettings(QDomElement roo
 DoubleDataAdapterXmlPtr PNNReconstructAlgorithm::getInterpolationStepsOption(QDomElement root)
 {
 	DoubleDataAdapterXmlPtr retval;
-	retval = DoubleDataAdapterXml::initialize("Distance (voxels)", "",
+	retval = DoubleDataAdapterXml::initialize("interpolationSteps", "Distance (voxels)",
 		"Interpolation steps in voxels", 3, ssc::DoubleRange(1, 10, 1), 0, root);
 	return retval;
 }
