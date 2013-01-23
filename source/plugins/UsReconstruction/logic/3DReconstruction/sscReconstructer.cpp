@@ -231,8 +231,8 @@ void Reconstructer::updateFromOriginalFileData()
 	if (!this->validInputData())
 		return;
 
-	ReconstructCorePtr core = this->createCore();
-	mOutputVolumeParams = core->getOutputVolumeParams();
+	ReconstructPreprocessorPtr preprocessor = this->createPreprocessor();
+	mOutputVolumeParams = preprocessor->getOutputVolumeParams();
 
 	emit paramsChanged();
 }
@@ -255,12 +255,12 @@ ReconstructCore::InputParams Reconstructer::createCoreParameters()
 	return par;
 }
 
-ReconstructCorePtr Reconstructer::createCore()
+ReconstructPreprocessorPtr Reconstructer::createPreprocessor()
 {
 	if (!this->validInputData())
-		return ReconstructCorePtr();
+		return ReconstructPreprocessorPtr();
 
-	ReconstructCorePtr retval(new ReconstructCore());
+	ReconstructPreprocessorPtr retval(new ReconstructPreprocessor());
 
 	ReconstructCore::InputParams par = this->createCoreParameters();
 
@@ -272,7 +272,48 @@ ReconstructCorePtr Reconstructer::createCore()
 	return retval;
 }
 
-ReconstructCorePtr Reconstructer::createDualCore()
+std::vector<ReconstructCorePtr> Reconstructer::createCores()
+{
+	std::vector<ReconstructCorePtr> retval;
+
+	// create both
+	if (mParams->mCreateBModeWhenAngio->getValue() && mParams->mAngioAdapter->getValue())
+	{
+		retval.push_back(this->createBModeCore());
+		retval.push_back(this->createAngioCore());
+	}
+	// only angio
+	else if (mParams->mAngioAdapter->getValue())
+	{
+		retval.push_back(this->createAngioCore());
+	}
+	// only bmode
+	else
+	{
+		retval.push_back(this->createBModeCore());
+	}
+
+	return retval;
+}
+
+ReconstructCorePtr Reconstructer::createAngioCore()
+{
+	if (!this->validInputData())
+		return ReconstructCorePtr();
+
+	ReconstructCorePtr retval(new ReconstructCore());
+
+	ReconstructCore::InputParams par = this->createCoreParameters();
+
+//	USReconstructInputData fileData = mOriginalFileData;
+//	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
+
+	retval->initialize(par);
+
+	return retval;
+}
+
+ReconstructCorePtr Reconstructer::createBModeCore()
 {
 	if (!this->validInputData())
 		return ReconstructCorePtr();
@@ -283,11 +324,11 @@ ReconstructCorePtr Reconstructer::createDualCore()
 	par.mAngio = false;
 	par.mTransferFunctionPreset = "US B-Mode";
 
-	USReconstructInputData fileData = mOriginalFileData;
-	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
-	fileData.mUsRaw->setPurgeInputDataAfterInitialize(false);
+//	USReconstructInputData fileData = mOriginalFileData;
+//	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
+//	fileData.mUsRaw->setPurgeInputDataAfterInitialize(false);
 
-	retval->initialize(par, fileData);
+	retval->initialize(par);
 
 	return retval;
 }

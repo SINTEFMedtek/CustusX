@@ -56,6 +56,34 @@ inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)
 	return lhs.mTime < rhs.mTime;
 }
 
+/** Output from the reconstruct preprocessing and is input to the reconstruction.
+  *
+  * Interface is thread-safe.
+  */
+class ProcessedUSInputData
+{
+public:
+	ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<ssc::TimedPosition> pos, ssc::ImagePtr mask, QString path, QString uid);
+
+	unsigned char* getFrame(unsigned int index) const;
+	Eigen::Array3i getDimensions() const;
+	Vector3D getSpacing() const;
+	std::vector<ssc::TimedPosition> getFrames();
+	ssc::ImagePtr getMask();
+
+	QString getFilePath();
+	QString getUid();
+
+private:
+	std::vector<vtkImageDataPtr> mProcessedImage;
+	std::vector<ssc::TimedPosition> mFrames;
+	ssc::ImagePtr mMask;///< Clipping mask for the input data
+	QString mPath;
+	QString mUid;
+};
+typedef boost::shared_ptr<ProcessedUSInputData> ProcessedUSInputDataPtr;
+
+
 /**\brief Helper class encapsulating a 2S US data set.
  *
  * The class is a thin wrapper around a Image , with the
@@ -82,7 +110,7 @@ public:
 	static USFrameDataPtr create(QString filename, std::vector<cx::CachedImageDataPtr> frames);
 	~USFrameData();
 
-	unsigned char* getFrame(unsigned int index) const;
+//	unsigned char* getFrame(unsigned int index) const;
 	Eigen::Array3i getDimensions() const;
 	Vector3D getSpacing() const;
 	QString getName() const;
@@ -90,11 +118,18 @@ public:
 	QString getFilePath() const;
 
 	void removeFrame(unsigned int index);
-	void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
+//	void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
 	void setCropBox(IntBoundingBox3D mCropbox);
 	void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
-	void initializeFrames(); ///< call to enable use of getFrame()
+//	void initializeFrames(); ///< call to enable use of getFrame()
 	void setPurgeInputDataAfterInitialize(bool value);
+
+//	void initializeFrames(bool bmode, ProcessedUSInputDataPtr* bmode_in, bool angio, ProcessedUSInputDataPtr* angio_in);
+	/** Use the input raw data and control parameters to generate filtered frames.
+	  * The input angio controls how many output objects that will be created, and if each
+	  * of them should be angio or grayscale.
+	  */
+	std::vector<std::vector<vtkImageDataPtr> > initializeFrames(std::vector<bool> angio);
 
 	virtual USFrameDataPtr copy();
 	void purgeAll();
@@ -103,8 +138,8 @@ public:
 
 protected:
 	void initialize();
-	virtual void clearCache();
-	void generateCache();
+//	virtual void clearCache();
+//	void generateCache();
 	USFrameData();
 	vtkImageDataPtr useAngio(vtkImageDataPtr inData) const;/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
 
@@ -112,14 +147,15 @@ protected:
 	vtkImageDataPtr toGrayscale(vtkImageDataPtr input) const;
 
 	std::vector<int> mReducedToFull; ///< map from indexes in the reduced volume to the full (original) volume.
-	bool mUseAngio;
+//	bool mUseAngio;
 	IntBoundingBox3D mCropbox;
 
 	QString mFilename;
-	std::vector<vtkImageDataPtr> mProcessedImage;
+//	std::vector<vtkImageDataPtr> mProcessedImage;
 	cx::ImageDataContainerPtr mImageContainer;
 	bool mPurgeInput;
 };
+
 
 struct USReconstructInputData
 {

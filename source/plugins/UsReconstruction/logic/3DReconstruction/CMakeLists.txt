@@ -41,6 +41,8 @@ SET( SOURCE_FILES
   utils/sscReconstructHelper.cpp
   sscReconstructCore.cpp
   sscReconstructCore.h
+  sscReconstructPreprocessor.cpp
+  sscReconstructPreprocessor.h
       )
 
 # =========================================================

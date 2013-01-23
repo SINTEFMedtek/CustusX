@@ -89,14 +89,15 @@ BoolDataAdapterPtr ThunderVNNReconstructAlgorithm::getPrintOpenCLInfoOption(QDom
 		"Query OpenCL and print info about CPU to stdout.", false, root);
 }
 
-bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
-	USFrameDataPtr frameData, vtkImageDataPtr outputData, ImagePtr frameMask, QDomElement settings)
+bool ThunderVNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
+												 vtkImageDataPtr outputData, QDomElement settings)
 {
 	bool success = false;
 
-	if (frameInfo.empty())
+
+	if (input->getFrames().empty())
 		return false;
-	if (frameData->getDimensions()[2]==0)
+	if (input->getDimensions()[2]==0)
 		return false;
 
 #ifdef SSC_USE_OpenCL
