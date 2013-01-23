@@ -59,11 +59,8 @@ public:
 	}
 	virtual QString getName() const;
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
-	virtual bool reconstruct(std::vector<TimedPosition> frameInfo,
-		USFrameDataPtr frameData,
-		vtkImageDataPtr outputData,
-		ImagePtr frameMask,
-		QDomElement settings);
+	virtual bool reconstruct(ProcessedUSInputDataPtr input,
+							 vtkImageDataPtr outputData, QDomElement settings);
 
 	StringDataAdapterXmlPtr getProcessorOption(QDomElement root);
 	DoubleDataAdapterXmlPtr getDistanceOption(QDomElement root);

@@ -58,20 +58,21 @@ void optimizedCoordTransform(ssc::Vector3D* p, boost::array<double, 16> tt)
 	(*p)[2] = t[8] * x + t[9] * y + t[10] * z + t[11];
 }
 
-bool PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, USFrameDataPtr frameData,
-		vtkImageDataPtr outputData, ImagePtr frameMask, QDomElement settings)
+bool PNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
+		vtkImageDataPtr outputData, QDomElement settings)
 {
+	std::vector<TimedPosition> frameInfo = input->getFrames();
 	//std::vector<Planes> planes = generate_planes(frameInfo, frameData);
 	if (frameInfo.empty())
 		return false;
-	if (frameData->getDimensions()[2]==0)
+	if (input->getDimensions()[2]==0)
 		return false;
 
 	//vtkImageDataPtr input = frameData->getBaseVtkImageData();
-	USFrameDataPtr input = frameData;
+//	USFrameDataPtr input = frameData;
 	vtkImageDataPtr target = outputData;
 
-	Eigen::Array3i inputDims = frameData->getDimensions();
+	Eigen::Array3i inputDims = input->getDimensions();
 
 	Eigen::Array3i targetDims(target->GetDimensions());
 	ssc::Vector3D targetSpacing(target->GetSpacing());
@@ -94,7 +95,7 @@ bool PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
 	//unsigned char *inputPointer = static_cast<unsigned char*>( input->GetScalarPointer() );
 	unsigned char *outputPointer = static_cast<unsigned char*> (tempOutput->GetScalarPointer());
 	//unsigned char *outputPointer = static_cast<unsigned char*>(target->GetScalarPointer());
-	unsigned char* maskPointer = static_cast<unsigned char*> (frameMask->getBaseVtkImageData()->GetScalarPointer());
+	unsigned char* maskPointer = static_cast<unsigned char*> (input->getMask()->getBaseVtkImageData()->GetScalarPointer());
 
 	// Traverse all input pixels
 	for (int record = 0; record < inputDims[2]; record++)
