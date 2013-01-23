@@ -108,13 +108,14 @@ int MemHolder::addBlock()
 
 	mBlocks.push_back(block);
 	std::cout << QString("generated memory: %1 Mb, %2 blocks").arg(double(block.mData.front()->GetActualMemorySize() * N) / 1000.0).arg(mBlocks.size()).toStdString() << std::endl;
-
+	return N;
 }
 
 int MemHolder::removeBlock()
 {
 	mBlocks.pop_back();
 	std::cout << QString("removed one block, %1 left").arg(mBlocks.size()).toStdString() << std::endl;
+	return mBlocks.size();
 }
 
 
