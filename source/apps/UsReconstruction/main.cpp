@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 	MainWindow top;
   top.resize(700, 600);
   top.show();
-#ifdef __MACOSX__ // needed on mac for bringing to front: does the opposite on linux
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
   top.activateWindow();
 #endif
   top.raise();
