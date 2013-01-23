@@ -66,7 +66,7 @@ void TestViewContainer::testInitialize()
 bool TestViewContainer::runWidget()
 {
 	widget->show();
-#ifdef __MACOSX__ // needed on mac for bringing to front: does the opposite on linux
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
 	widget->activateWindow();
 #endif
 	widget->raise();

@@ -95,6 +95,7 @@ public:
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	void update();
 	void setTargetSpaceToR();
+	static bool isSupported(vtkRenderWindowPtr window);
 
 protected:
 	Texture3DSlicerRep(const QString& uid);

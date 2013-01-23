@@ -37,17 +37,14 @@ int main(int argc, char **argv)
 //  runner.addTest( new CppUnit::TestCaller<TestVisualRendering>(
 //                                       "visual",
 //                                        &TestVisualRendering::testEmptyView ) );
-//  runner.addTest( new CppUnit::TestCaller<TestVisualRendering>(
+//  runner.addTest( new CppUnit::TestCaller<TestViewContainer>(
 //                                       "visual",
-//                                        &TestVisualRendering::test_ACS_3Volumes ) );
-//  runner.addTest( new CppUnit::TestCaller<TestVisualRendering>(
-//                                       "visual",
-//                                        &TestVisualRendering::test_ACS_3Volumes_GPU ) );
+//                                        &TestViewContainer::testEmptyViewContainer ) );
 //	runner.addTest(TestSpaceOrganizer::suite());
-  runner.addTest(TestTransform3D::suite());
+//  runner.addTest(TestTransform3D::suite());
 //  runner.addTest(TestBoundingBox3D::suite());
 #endif
-		
+
 	bool failed = runner.run();
 	return !failed;
 }

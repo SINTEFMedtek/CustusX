@@ -368,12 +368,12 @@ bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, 
 
 bool TextureSlicePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 {
-	GLint value[2];
-	glGetIntegerv(vtkgl::MAX_TEXTURE_COORDS,value);
-	if( value[0] < 8)
-	{
-		std::cout<<"GL_MAX_TEXTURE_COORDS="<<value[0]<<" . Number of texture coordinate sets. Min is 2."<<std::endl;
-	}
+//	GLint value[2];
+//	glGetIntegerv(vtkgl::MAX_TEXTURE_COORDS,value);
+//	if( value[0] < 8)
+//	{
+//		std::cout<<"GL_MAX_TEXTURE_COORDS="<<value[0]<<" . Number of texture coordinate sets. Min is 2."<<std::endl;
+//	}
 	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
 			&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object")

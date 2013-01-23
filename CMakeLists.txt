@@ -28,6 +28,8 @@ if(SSC_USE_GCOV)
 	add_definitions(--coverage)
 endif()
 
+option(SSC_BUILD_PURE_CPPUNIT_TESTS "build cppunit tests unconnected to the ctest framework. Do not use when doine code coverage" OFF)
+
 enable_testing()
 
 include_directories( /usr/local/include )

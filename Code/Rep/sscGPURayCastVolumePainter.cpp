@@ -682,12 +682,12 @@ bool GPURayCastVolumePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* m
 
 bool GPURayCastVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 {
-	GLint value[2];
-	glGetIntegerv(vtkgl::MAX_TEXTURE_COORDS,value);
-	if( value[0] < 8)
-	{
-		std::cout<<"GL_MAX_TEXTURE_COORDS="<<value[0]<<" . Number of texture coordinate sets. Min is 2."<<std::endl;
-	}
+//	GLint value[2];
+//	glGetIntegerv(vtkgl::MAX_TEXTURE_COORDS,value);
+//	if( value[0] < 8)
+//	{
+//		std::cout<<"GL_MAX_TEXTURE_COORDS="<<value[0]<<" . Number of texture coordinate sets. Min is 2."<<std::endl;
+//	}
 	mgr->LoadSupportedExtension("GL_GREMEDY_string_marker");
 	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")

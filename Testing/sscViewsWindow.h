@@ -43,9 +43,9 @@ public:
 	
 	void setDescription(const QString& desc);
 	void define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c);
-	void define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c);
+	bool define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c);
 	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
-	void defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
+	bool defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 
 	// was test accepted?
 	bool accepted() const { return mAcceptanceBox->accepted(); }

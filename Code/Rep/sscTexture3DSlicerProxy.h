@@ -62,6 +62,8 @@ public:
 	virtual void update() {}
 	virtual void setTargetSpaceToR(){}
 	virtual vtkActorPtr getActor() { return vtkActorPtr(); }
+
+	static bool isSupported(vtkRenderWindowPtr window);
 };
 
 #ifndef WIN32

@@ -66,8 +66,9 @@ void TestVisualRendering::testInitialize()
 bool TestVisualRendering::runWidget()
 {
 	widget->show();
-#ifdef __MACOSX__ // needed on mac for bringing to front: does the opposite on linux
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
 	widget->activateWindow();
+	std::cout << "on mac!!!" << std::endl;
 #endif
 	widget->raise();
 	widget->updateRender();
@@ -94,7 +95,7 @@ void TestVisualRendering::test_3D_Tool()
 void TestVisualRendering::test_3D_Tool_GPU()
 {
 	widget->setDescription("3D Volume, moving tool");
-	widget->define3DGPU(QStringList(image[0]), NULL, 0, 0);
+	CPPUNIT_ASSERT(widget->define3DGPU(QStringList(image[0]), NULL, 0, 0));
 
 	CPPUNIT_ASSERT(runWidget());
 }
@@ -112,7 +113,7 @@ void TestVisualRendering::test_3D_Composite_GPU()
 	parameters[1].alpha = .7;
 	parameters[1].lut = getCreateLut(0, 200, .67, .68, 0, 1, .4, .8);
 
-	widget->define3DGPU(images, parameters, 0, 0);
+	CPPUNIT_ASSERT(widget->define3DGPU(images, parameters, 0, 0));
 
 	CPPUNIT_ASSERT(runWidget());
 }
@@ -133,7 +134,7 @@ void TestVisualRendering::test_3D_Composite_Views_GPU()
 	widget->defineSlice("A", image[0], ssc::ptAXIAL, 0, 0);
 	widget->defineSlice("C", image[0], ssc::ptCORONAL, 1, 0);
 	widget->defineSlice("S", image[0], ssc::ptSAGITTAL, 0, 1);
-	widget->define3DGPU(images, parameters, 1, 1);
+	CPPUNIT_ASSERT(widget->define3DGPU(images, parameters, 1, 1));
 
 	CPPUNIT_ASSERT(runWidget());
 }
@@ -145,7 +146,7 @@ void TestVisualRendering::test_3D_RGB_GPU()
 	ImageParameters parameters;
 	parameters.llr = 35;
 
-	widget->define3DGPU(QStringList(image[3]), &parameters, 0, 0);
+	CPPUNIT_ASSERT(widget->define3DGPU(QStringList(image[3]), &parameters, 0, 0));
 
 	CPPUNIT_ASSERT(runWidget());
 }
@@ -204,9 +205,9 @@ void TestVisualRendering::test_ACS_3Volumes_GPU()
 
 	for (unsigned i = 0; i < 3; ++i)
 	{
-		widget->defineGPUSlice("A", image[i], ssc::ptAXIAL, 0, i);
-		widget->defineGPUSlice("C", image[i], ssc::ptCORONAL, 1, i);
-		widget->defineGPUSlice("S", image[i], ssc::ptSAGITTAL, 2, i);
+		CPPUNIT_ASSERT(widget->defineGPUSlice("A", image[i], ssc::ptAXIAL, 0, i));
+		CPPUNIT_ASSERT(widget->defineGPUSlice("C", image[i], ssc::ptCORONAL, 1, i));
+		CPPUNIT_ASSERT(widget->defineGPUSlice("S", image[i], ssc::ptSAGITTAL, 2, i));
 	}
 
 	CPPUNIT_ASSERT(runWidget());

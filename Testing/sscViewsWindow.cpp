@@ -88,12 +88,16 @@ ViewsWindow::~ViewsWindow()
 {
 }
 
-void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
-{
+bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
+{	
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 	ssc::ImagePtr image = loadImage(imageFilename);
 	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
+
+	if (!ssc::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
+		return false;
+
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->GetRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
@@ -107,6 +111,8 @@ void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
 	view->addRep(rep);
 	insertView(view, uid, imageFilename, r, c);
+
+	return true;
 }
 
 void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
@@ -185,7 +191,7 @@ void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* 
 	insertView(view, uid, imageFilename, r, c);
 }
 
-void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c)
+bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c)
 {
 	QString uid = "3D";
 	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
@@ -207,14 +213,15 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	}
 
 	// volume rep
-	
-#ifndef WIN32
+	if (!ssc::GPURayCastVolumeRep::isSupported(view->getRenderWindow()))
+		return false;
+//#ifndef WIN32
 	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
 	mRepPtr->setShaderFolder(mShaderFolder);
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);
-#endif //WIN32
+//#endif //WIN32
 
 	// Tool 3D rep
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
@@ -224,6 +231,8 @@ void ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	view->addRep(toolRep);
 	
 	insertView(view, uid, imageFilenames[0], r, c);
+
+	return true;
 }
 
 void ViewsWindow::start(bool showSliders)

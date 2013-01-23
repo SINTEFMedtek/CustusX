@@ -68,6 +68,7 @@ public:
 	 * Maximum number of volumes that can be rendered simultaneously
 	 */
 	static const unsigned maxVolumes;
+	static bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);
 
 protected:
 	GPURayCastVolumePainter();
@@ -76,8 +77,7 @@ protected:
 	void RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
 
 	bool CanRender(vtkRenderer*, vtkActor*);
-	bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);
-	bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
+	static bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
 	QString loadShaderFile(QString shaderFile);
 	void createDSBuffers();
 	void freeDSBuffers();
