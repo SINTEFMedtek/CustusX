@@ -43,6 +43,7 @@
 #include "sscSliceProxy.h"
 #include "sscTypeConversions.h"
 #include "sscGPUImageBuffer.h"
+#include <vtkOpenGLRenderWindow.h>
 
 //---------------------------------------------------------
 namespace ssc
@@ -56,7 +57,19 @@ Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
 	return Texture3DSlicerProxyPtr(new Texture3DSlicerProxy());
 }
 
+bool Texture3DSlicerProxy::isSupported(vtkRenderWindowPtr window)
+{
+	return false;
+}
+
 #else
+
+bool Texture3DSlicerProxy::isSupported(vtkRenderWindowPtr window)
+{
+	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(window);
+	bool success =  context && TextureSlicePainter::LoadRequiredExtensions(context->GetExtensionManager());
+	return success;
+}
 
 Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
 {

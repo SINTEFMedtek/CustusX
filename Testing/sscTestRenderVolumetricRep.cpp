@@ -59,6 +59,14 @@ int main(int argc, char **argv)
 	layout->addWidget(view);
 	std::cout << "test2" << std::endl;
 
+// this rep only works on linux
+#ifdef WIN32
+	return 1;
+#endif
+#ifdef __APPLE__
+	return 1;
+#endif
+
 	//ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(image1->getUid());
 	ssc::ProgressiveLODVolumetricRepPtr rep = ssc::ProgressiveLODVolumetricRep::New(image1->getUid());
 

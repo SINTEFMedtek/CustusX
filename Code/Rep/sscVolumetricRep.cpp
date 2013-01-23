@@ -109,7 +109,7 @@ VolumetricRep::~VolumetricRep()
 
 void VolumetricRep::setUseGPUVolumeRayCastMapper()
 {
-#if VTK_MINOR_VERSION >= 6
+#if (( VTK_MINOR_VERSION >= 6 )||( VTK_MAJOR_VERSION >5 ))
 	vtkGPUVolumeRayCastMapperPtr mapper = vtkGPUVolumeRayCastMapperPtr::New();
 	mMapper = mapper;
 	mMapper->SetBlendModeToComposite();

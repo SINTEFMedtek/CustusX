@@ -91,6 +91,10 @@ public:
 	 */
 	void enableImagePlaneDownsampling(int maxPixels);
 	void disableImagePlaneDownsampling();
+	/**
+	 * \brief Check that the rep is supported on this plaform/renderer
+	 */
+	static bool isSupported(vtkRenderWindowPtr window);
 
 protected:
 	GPURayCastVolumeRep(const QString& uid);

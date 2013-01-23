@@ -37,6 +37,7 @@
 #include <vtkMatrixToLinearTransform.h>
 #include <vtkMatrix4x4.h>
 #include <vtkProperty.h>
+#include <vtkOpenGLRenderWindow.h>
 
 #include "sscImage.h"
 #include "sscView.h"
@@ -268,6 +269,14 @@ void GPURayCastVolumeRep::disableImagePlaneDownsampling()
 	mPainter->disableImagePlaneDownsampling();
 	mActor->Modified();
 }
+
+bool GPURayCastVolumeRep::isSupported(vtkRenderWindowPtr window)
+{
+	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(window);
+	bool success =  context && GPURayCastVolumePainter::LoadRequiredExtensions(context->GetExtensionManager());
+	return success;
+}
+
 
 //---------------------------------------------------------
 }//end namespace

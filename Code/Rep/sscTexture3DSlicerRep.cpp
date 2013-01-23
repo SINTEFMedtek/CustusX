@@ -124,6 +124,11 @@ void Texture3DSlicerRep::setViewportData(const Transform3D& vpMs, const DoubleBo
 	mProxy->setViewportData(vpMs, vp);
 }
 
+bool Texture3DSlicerRep::isSupported(vtkRenderWindowPtr window)
+{
+	return Texture3DSlicerProxy::isSupported(window);
+}
+
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------

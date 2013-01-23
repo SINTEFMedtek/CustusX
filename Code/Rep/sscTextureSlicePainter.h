@@ -64,6 +64,8 @@ public:
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
 	void releaseGraphicsResources(int index);
 
+	static bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);
+
 protected:
 	TextureSlicePainter();
 	virtual ~TextureSlicePainter();
@@ -71,8 +73,7 @@ protected:
 	void RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags, bool forceCompileOnly);
 
 	bool CanRender(vtkRenderer*, vtkActor*);
-	bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);
-	bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
+	static bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
 	QString loadShaderFile(QString shaderFile);
 
 	class vtkInternals;
