@@ -231,6 +231,7 @@ void MainWindow::initialize()
 	cx::VideoService::initialize();
 	cx::DataManager::initialize();
 	cx::ToolManager::initializeObject();
+	cx::ViewManager::createInstance();
 
 	// logic layer
 	cx::LogicManager::initialize();
