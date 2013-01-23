@@ -57,6 +57,7 @@ private:
   void saveDebugFile();
 
   ssc::USReconstructInputData mFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
+  std::vector<vtkImageDataPtr> mProcessedFrames; ///< frame data processed from the input mFileData.
   QString mDebugFolder;
   QString mFilename;
   mutable std::stringstream mDebugStream;

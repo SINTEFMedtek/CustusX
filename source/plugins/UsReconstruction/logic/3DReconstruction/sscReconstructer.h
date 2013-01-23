@@ -33,6 +33,7 @@
 #include "sscProbeSector.h"
 
 #include "sscReconstructCore.h"
+#include "sscReconstructPreprocessor.h"
 
 namespace ssc
 {
@@ -102,8 +103,8 @@ public:
 	virtual ~Reconstructer();
 
 	void setInputData(USReconstructInputData fileData);
-	ReconstructCorePtr createCore(); ///< used for threaded reconstruction
-	ReconstructCorePtr createDualCore(); ///< core version for B-mode in case of angio recording.
+	ReconstructPreprocessorPtr createPreprocessor();
+	std::vector<ReconstructCorePtr> createCores(); ///< create reconstruct cores matching the current parameters
 
 	ReconstructParamsPtr mParams;
 	std::vector<DataAdapterPtr> mAlgoOptions;
@@ -124,6 +125,9 @@ signals:
 	void inputDataSelected(QString mhdFileName);
 
 private:
+	ReconstructCorePtr createAngioCore(); ///< used for threaded reconstruction
+	ReconstructCorePtr createBModeCore(); ///< core version for B-mode in case of angio recording.
+
 	USReconstructInputData mFileData;
 	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 //	bool mIsReconstructing; ///< use for blocking of parameter setting while reconstructing.

@@ -56,8 +56,13 @@ void MainWindow::showData()
     mView->addRep(mVolumeRep);
   }
 
+  ssc::ReconstructPreprocessorPtr preprocessor = mReconstructionWidget->reconstructer()->getReconstructer()->createPreprocessor();
+  std::vector<ssc::ReconstructCorePtr> cores = mReconstructionWidget->reconstructer()->getReconstructer()->createCores();
+  preprocessor->initializeCores(cores);
+  ssc::ImagePtr data = cores[0]->reconstruct();
+
   //ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getInput();
-  ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getReconstructer()->createCore()->reconstruct();
+  //ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getReconstructer()->createCore()->reconstruct();
   mVolumeRep->setImage(data);
 
   //Test: show axes
