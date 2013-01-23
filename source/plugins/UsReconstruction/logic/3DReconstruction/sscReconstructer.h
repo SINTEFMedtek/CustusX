@@ -105,9 +105,11 @@ public:
 	void setInputData(USReconstructInputData fileData);
 	ReconstructPreprocessorPtr createPreprocessor();
 	std::vector<ReconstructCorePtr> createCores(); ///< create reconstruct cores matching the current parameters
+	XmlOptionFile getSettings() { return mSettings; }
 
 	ReconstructParamsPtr mParams;
 	std::vector<DataAdapterPtr> mAlgoOptions;
+	ReconstructAlgorithmPtr createAlgorithm();
 
 	OutputVolumeParams getOutputVolumeParams() const;
 	void setOutputVolumeParams(const OutputVolumeParams& par);
@@ -125,12 +127,11 @@ signals:
 	void inputDataSelected(QString mhdFileName);
 
 private:
-	ReconstructCorePtr createAngioCore(); ///< used for threaded reconstruction
+	ReconstructCorePtr createCore(); ///< used for threaded reconstruction
 	ReconstructCorePtr createBModeCore(); ///< core version for B-mode in case of angio recording.
 
 	USReconstructInputData mFileData;
 	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
-//	bool mIsReconstructing; ///< use for blocking of parameter setting while reconstructing.
 	OutputVolumeParams mOutputVolumeParams;
 	XmlOptionFile mSettings;
 	QString mOutputRelativePath;///< Relative path to the output image
@@ -138,7 +139,7 @@ private:
 	QString mShaderPath; ///< name of shader folder
 	double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
 
-	void createAlgorithm();
+	void initAlgorithm();
 	void updateFromOriginalFileData();
 	ReconstructCore::InputParams createCoreParameters();
 

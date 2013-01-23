@@ -127,21 +127,26 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
 	connect(mParams.get(), SIGNAL(changedInputSettings()), this, SLOT(setSettings()));
 	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
 
-	createAlgorithm();
+	this->initAlgorithm();
 }
 
 Reconstructer::~Reconstructer()
 {
 }
 
-
-void Reconstructer::createAlgorithm()
+ReconstructAlgorithmPtr Reconstructer::createAlgorithm()
 {
 	QString name = mParams->mAlgorithmAdapter->getValue();
 
 	ReconstructCorePtr core; ///< in progress: algorithm part of class moved here.
 	core.reset(new ReconstructCore());
 	ReconstructAlgorithmPtr algo = core->createAlgorithm(name);
+	return algo;
+}
+
+void Reconstructer::initAlgorithm()
+{
+	ReconstructAlgorithmPtr algo = this->createAlgorithm();
 
 	// generate settings for new algo
 	if (algo)
@@ -154,10 +159,11 @@ void Reconstructer::createAlgorithm()
 
 void Reconstructer::setSettings()
 {
-	this->createAlgorithm();
+	this->initAlgorithm();
 	this->updateFromOriginalFileData();
 	emit paramsChanged();
 }
+
 void Reconstructer::transferFunctionChangedSlot()
 {
 	//Use angio reconstruction also if only transfer function is set to angio
@@ -280,23 +286,18 @@ std::vector<ReconstructCorePtr> Reconstructer::createCores()
 	if (mParams->mCreateBModeWhenAngio->getValue() && mParams->mAngioAdapter->getValue())
 	{
 		retval.push_back(this->createBModeCore());
-		retval.push_back(this->createAngioCore());
+		retval.push_back(this->createCore());
 	}
-	// only angio
-	else if (mParams->mAngioAdapter->getValue())
-	{
-		retval.push_back(this->createAngioCore());
-	}
-	// only bmode
+	// only one thread
 	else
 	{
-		retval.push_back(this->createBModeCore());
+		retval.push_back(this->createCore());
 	}
 
 	return retval;
 }
 
-ReconstructCorePtr Reconstructer::createAngioCore()
+ReconstructCorePtr Reconstructer::createCore()
 {
 	if (!this->validInputData())
 		return ReconstructCorePtr();
@@ -304,10 +305,6 @@ ReconstructCorePtr Reconstructer::createAngioCore()
 	ReconstructCorePtr retval(new ReconstructCore());
 
 	ReconstructCore::InputParams par = this->createCoreParameters();
-
-//	USReconstructInputData fileData = mOriginalFileData;
-//	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
-
 	retval->initialize(par);
 
 	return retval;
@@ -323,10 +320,6 @@ ReconstructCorePtr Reconstructer::createBModeCore()
 	ReconstructCore::InputParams par = this->createCoreParameters();
 	par.mAngio = false;
 	par.mTransferFunctionPreset = "US B-Mode";
-
-//	USReconstructInputData fileData = mOriginalFileData;
-//	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
-//	fileData.mUsRaw->setPurgeInputDataAfterInitialize(false);
 
 	retval->initialize(par);
 

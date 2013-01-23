@@ -59,7 +59,7 @@ ReconstructManager::~ReconstructManager()
 
 }
 
-void ReconstructManager::startReconstruction()
+std::vector<ReconstructCorePtr> ReconstructManager::startReconstruction()
 {
 	cx::CompositeTimedAlgorithmPtr serial(new cx::CompositeTimedAlgorithm("US Reconstruction"));
 	cx::CompositeParallelTimedAlgorithmPtr parallel(new cx::CompositeParallelTimedAlgorithm());
@@ -70,7 +70,7 @@ void ReconstructManager::startReconstruction()
 	if (cores.empty())
 	{
 		ssc::messageManager()->sendWarning("Failed to start reconstruction");
-		return;
+		return cores;
 	}
 
 	serial->append(ThreadedTimedReconstructerStep1::create(preprocessor, cores));
@@ -79,6 +79,8 @@ void ReconstructManager::startReconstruction()
 		parallel->append(ThreadedTimedReconstructerStep2::create(cores[i]));
 
 	this->launch(serial);
+
+	return cores;
 }
 
 void ReconstructManager::launch(cx::TimedAlgorithmPtr thread)
@@ -105,7 +107,8 @@ void ReconstructManager::threadFinishedSlot()
 		}
 	}
 
-	mOriginalFileData.mUsRaw->purgeAll();
+	if (mThreadedReconstruction.empty())
+		mOriginalFileData.mUsRaw->purgeAll();
 }
 
 
@@ -296,6 +299,7 @@ ThreadedTimedReconstructerStep2::~ThreadedTimedReconstructerStep2()
 
 void ThreadedTimedReconstructerStep2::preProcessingSlot()
 {
+	mReconstructer->threadedPreReconstruct();
 }
 
 void ThreadedTimedReconstructerStep2::calculate()
@@ -308,7 +312,8 @@ void ThreadedTimedReconstructerStep2::postProcessingSlot()
 	mReconstructer->threadedPostReconstruct();
 
 	cx::patientService()->getPatientData()->autoSave();
-	cx::viewManager()->autoShowData(mReconstructer->getOutput());
+	if (cx::viewManager()) // might be called by auto test - no service
+		cx::viewManager()->autoShowData(mReconstructer->getOutput());
 }
 
 }
