@@ -53,7 +53,7 @@ void TestUsReconstruction::testSlerpInterpolation()
 
 	double t = 0.5;
 
-	ssc::Transform3D c = reconstructer->slerpInterpolate(a, b, t);
+	ssc::Transform3D c = ssc::ReconstructPreprocessor::slerpInterpolate(a, b, t);
 	//ssc::Transform3D c = reconstructer->interpolate(a, b, t);
 
 	Eigen::Matrix3d goalm;
@@ -99,21 +99,23 @@ void TestUsReconstruction::testAngioReconstruction()
   reconstructer->getParams()->mAngioAdapter->setValue(true);
 
 	QDomElement algo = settings.getElement("algorithms", "PNN");
-//  CPPUNIT_ASSERT(boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getAlgorithm()));// Check if we got the PNN algorithm
-//  boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getAlgorithm())->getInterpolationStepsOption(algo)->setValue(1);
 
 	reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
 	reconstructer->setOutputRelativePath("Images");
 
   reconstructer->selectData(filename);
-//  reconstructer->reconstruct();
-  ssc::ReconstructCorePtr core = reconstructer->getReconstructer()->createCore();
 
-  boost::shared_ptr<ssc::PNNReconstructAlgorithm> algorithm = boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(core->createAlgorithm("PNN"));
+  ssc::ReconstructPreprocessorPtr preprocessor = reconstructer->getReconstructer()->createPreprocessor();
+  std::vector<ssc::ReconstructCorePtr> cores = reconstructer->getReconstructer()->createCores();
+  CPPUNIT_ASSERT(cores.size()==1);
+
+  boost::shared_ptr<ssc::PNNReconstructAlgorithm> algorithm = boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(cores[0]->createAlgorithm("PNN"));
   CPPUNIT_ASSERT(algorithm);// Check if we got the PNN algorithm
   algorithm->getInterpolationStepsOption(algo)->setValue(1);
 
-  ssc::ImagePtr output = core->reconstruct();
+  preprocessor->initializeCores(cores);
+
+  ssc::ImagePtr output = cores[0]->reconstruct();
 
   CPPUNIT_ASSERT( output->getRange() != 0);//Just check if the output volume is empty
 
@@ -164,14 +166,19 @@ void TestUsReconstruction::testThunderGPUReconstruction()
   reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
   reconstructer->setOutputRelativePath("Images");
 //  reconstructer->reconstruct();
-  ssc::ReconstructCorePtr core = reconstructer->getReconstructer()->createCore();
+//  ssc::ReconstructCorePtr core = reconstructer->getReconstructer()->createCore();
+  ssc::ReconstructPreprocessorPtr preprocessor = reconstructer->getReconstructer()->createPreprocessor();
+  std::vector<ssc::ReconstructCorePtr> cores = reconstructer->getReconstructer()->createCores();
+  CPPUNIT_ASSERT(cores.size()==1);
 
   boost::shared_ptr<ssc::ThunderVNNReconstructAlgorithm> algorithm;
-  algorithm = boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(core->createAlgorithm("ThunderVNN"));
+  algorithm = boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(cores[0]->createAlgorithm("ThunderVNN"));
   CPPUNIT_ASSERT(algorithm);// Check if we got the PNN algorithm
   algorithm->getProcessorOption(algo)->setValue("GPU");
 
-  ssc::ImagePtr output = core->reconstruct();
+  preprocessor->initializeCores(cores);
+
+  ssc::ImagePtr output = cores[0]->reconstruct();
 
 //  ssc::ImagePtr output = reconstructer->getOutput();
 

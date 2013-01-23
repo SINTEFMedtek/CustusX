@@ -64,51 +64,21 @@ void ReconstructManager::startReconstruction()
 	cx::CompositeTimedAlgorithmPtr serial(new cx::CompositeTimedAlgorithm("US Reconstruction"));
 	cx::CompositeParallelTimedAlgorithmPtr parallel(new cx::CompositeParallelTimedAlgorithm());
 
-	ReconstructCorePtr core = mReconstructer->createCore();
+	ReconstructPreprocessorPtr preprocessor = mReconstructer->createPreprocessor();
+	std::vector<ReconstructCorePtr> cores = mReconstructer->createCores();
 
-	if (!core)
+	if (cores.empty())
 	{
 		ssc::messageManager()->sendWarning("Failed to start reconstruction");
 		return;
 	}
 
-	if (mReconstructer->mParams->mCreateBModeWhenAngio->getValue() && mReconstructer->mParams->mAngioAdapter->getValue())
-	{
-		ReconstructCorePtr core = mReconstructer->createCore();
-		ReconstructCorePtr dualCore = mReconstructer->createDualCore();
-
-		if (!dualCore)
-		{
-			ssc::messageManager()->sendWarning("Failed to start reconstruction");
-			return;
-		}
-
-		serial->append(ThreadedTimedReconstructerStep1::create(dualCore)); // run dualcore first, as it is set to not release memory after preprocess.
-		serial->append(ThreadedTimedReconstructerStep1::create(core));
-		serial->append(parallel);
-		parallel->append(ThreadedTimedReconstructerStep2::create(dualCore));
-		parallel->append(ThreadedTimedReconstructerStep2::create(core));
-	}
-	else
-	{
-		serial->append(ThreadedTimedReconstructerStep1::create(core));
-		serial->append(parallel);
-		parallel->append(ThreadedTimedReconstructerStep2::create(core));
-	}
+	serial->append(ThreadedTimedReconstructerStep1::create(preprocessor, cores));
+	serial->append(parallel);
+	for (unsigned i=0; i<cores.size(); ++i)
+		parallel->append(ThreadedTimedReconstructerStep2::create(cores[i]));
 
 	this->launch(serial);
-
-
-//	ThreadedTimedReconstructerPtr thread(new ssc::ThreadedTimedReconstructer(mReconstructer->createCore()));
-//	this->launch(thread);
-
-//	if (mReconstructer->mParams->mCreateBModeWhenAngio->getValue() && mReconstructer->mParams->mAngioAdapter->getValue())
-//	{
-//		ReconstructCorePtr dualCore = mReconstructer->createDualCore();
-//		ThreadedTimedReconstructerPtr dual(new ssc::ThreadedTimedReconstructer(dualCore));
-//		this->launch(dual);
-//	}
-
 }
 
 void ReconstructManager::launch(cx::TimedAlgorithmPtr thread)
@@ -236,34 +206,34 @@ void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 //---------------------------------------------------------
 
 
-ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructCorePtr reconstructer) :
-	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
-{
-	mReconstructer = reconstructer;
-}
+//ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructCorePtr reconstructer) :
+//	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
+//{
+//	mReconstructer = reconstructer;
+//}
 
-ThreadedTimedReconstructer::~ThreadedTimedReconstructer()
-{
-}
+//ThreadedTimedReconstructer::~ThreadedTimedReconstructer()
+//{
+//}
 
-void ThreadedTimedReconstructer::preProcessingSlot()
-{
-	mReconstructer->threadedPreReconstruct();
-}
+//void ThreadedTimedReconstructer::preProcessingSlot()
+//{
+//	mReconstructer->threadedPreReconstruct();
+//}
 
-void ThreadedTimedReconstructer::calculate()
-{
-	mReconstructer->threadablePreReconstruct();
-	mReconstructer->threadedReconstruct();
-}
+//void ThreadedTimedReconstructer::calculate()
+//{
+//	mReconstructer->threadablePreReconstruct();
+//	mReconstructer->threadedReconstruct();
+//}
 
-void ThreadedTimedReconstructer::postProcessingSlot()
-{
-	mReconstructer->threadedPostReconstruct();
+//void ThreadedTimedReconstructer::postProcessingSlot()
+//{
+//	mReconstructer->threadedPostReconstruct();
 
-	cx::patientService()->getPatientData()->autoSave();
-	cx::viewManager()->autoShowData(mReconstructer->getOutput());
-}
+//	cx::patientService()->getPatientData()->autoSave();
+//	cx::viewManager()->autoShowData(mReconstructer->getOutput());
+//}
 
 
 //---------------------------------------------------------
@@ -271,11 +241,13 @@ void ThreadedTimedReconstructer::postProcessingSlot()
 //---------------------------------------------------------
 
 
-ThreadedTimedReconstructerStep1::ThreadedTimedReconstructerStep1(ReconstructCorePtr reconstructer) :
+ThreadedTimedReconstructerStep1::ThreadedTimedReconstructerStep1(ReconstructPreprocessorPtr input, std::vector<ReconstructCorePtr> cores) :
 	cx::ThreadedTimedAlgorithm<void> ("US PreReconstruction", 30)
 {
+	mInput = input;
 	mUseDefaultMessages = false;
-	mReconstructer = reconstructer;
+//	mReconstructer = reconstructer;
+	mCores = cores;
 }
 
 ThreadedTimedReconstructerStep1::~ThreadedTimedReconstructerStep1()
@@ -284,12 +256,22 @@ ThreadedTimedReconstructerStep1::~ThreadedTimedReconstructerStep1()
 
 void ThreadedTimedReconstructerStep1::preProcessingSlot()
 {
-	mReconstructer->threadedPreReconstruct();
+//	mReconstructer->threadedPreReconstruct();
 }
 
 void ThreadedTimedReconstructerStep1::calculate()
 {
-	mReconstructer->threadablePreReconstruct();
+	mInput->initializeCores(mCores);
+
+//	ProcessedUSInputDataPtr bmode_in, angio_in;
+//	mInput->getProcessedFileData().mUsRaw->initializeFrames(mBMode!=0, &bmode_in, mAngio!=0, &angio_in);
+
+//	if (mBMode)
+//		mBMode->initialize(bmode_in, mInput->getOutputVolumeParams());
+//	if (mAngio)
+//		mAngio->initialize(angio_in, mInput->getOutputVolumeParams());
+
+//	mReconstructer->threadablePreReconstruct();
 }
 
 void ThreadedTimedReconstructerStep1::postProcessingSlot()

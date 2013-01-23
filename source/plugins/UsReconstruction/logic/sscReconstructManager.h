@@ -21,6 +21,7 @@
 #include "sscProbeSector.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxThreadedTimedAlgorithm.h"
+#include "sscReconstructPreprocessor.h"
 
 namespace ssc
 {
@@ -104,37 +105,37 @@ private slots:
 
 };
 
-/**
- * \brief Threading adapter for the reconstruction algorithm.
- *
- * Executes ReconstructCore functions:
- *  - threadedPreReconstruct() [main thread]
- *  - threadablePreReconstruct() [work thread]
- *  - threadedReconstruct() [work thread]
- *  - threadedPostReconstruct() [main thread]
- *
- * \date Jan 27, 2012
- * \author Christian Askeland, SINTEF
- */
-class ThreadedTimedReconstructer: public cx::ThreadedTimedAlgorithm<void>
-{
-Q_OBJECT
-public:
-	static ThreadedTimedReconstructerPtr create(ReconstructCorePtr reconstructer)
-	{
-		return ThreadedTimedReconstructerPtr(new ThreadedTimedReconstructer(reconstructer));
-	}
-	ThreadedTimedReconstructer(ReconstructCorePtr reconstructer);
-	virtual ~ThreadedTimedReconstructer();
+///**
+// * \brief Threading adapter for the reconstruction algorithm.
+// *
+// * Executes ReconstructCore functions:
+// *  - threadedPreReconstruct() [main thread]
+// *  - threadablePreReconstruct() [work thread]
+// *  - threadedReconstruct() [work thread]
+// *  - threadedPostReconstruct() [main thread]
+// *
+// * \date Jan 27, 2012
+// * \author Christian Askeland, SINTEF
+// */
+//class ThreadedTimedReconstructer: public cx::ThreadedTimedAlgorithm<void>
+//{
+//Q_OBJECT
+//public:
+//	static ThreadedTimedReconstructerPtr create(ReconstructCorePtr reconstructer)
+//	{
+//		return ThreadedTimedReconstructerPtr(new ThreadedTimedReconstructer(reconstructer));
+//	}
+//	ThreadedTimedReconstructer(ReconstructCorePtr reconstructer);
+//	virtual ~ThreadedTimedReconstructer();
 
-private slots:
-	virtual void preProcessingSlot();
-	virtual void postProcessingSlot();
+//private slots:
+//	virtual void preProcessingSlot();
+//	virtual void postProcessingSlot();
 
-private:
-	virtual void calculate();
-	ReconstructCorePtr mReconstructer;
-};
+//private:
+//	virtual void calculate();
+//	ReconstructCorePtr mReconstructer;
+//};
 
 /**
  * \brief Threading adapter for the reconstruction algorithm.
@@ -152,15 +153,13 @@ class ThreadedTimedReconstructerStep1: public cx::ThreadedTimedAlgorithm<void>
 {
 Q_OBJECT
 public:
-	static ThreadedTimedReconstructerStep1Ptr create(ReconstructCorePtr reconstructer)
+	static ThreadedTimedReconstructerStep1Ptr create(ReconstructPreprocessorPtr input, std::vector<ReconstructCorePtr> cores)
 	{
-		return ThreadedTimedReconstructerStep1Ptr(new ThreadedTimedReconstructerStep1(reconstructer));
+		return ThreadedTimedReconstructerStep1Ptr(new ThreadedTimedReconstructerStep1(input, cores));
 	}
 
-	ThreadedTimedReconstructerStep1(ReconstructCorePtr reconstructer);
+	ThreadedTimedReconstructerStep1(ReconstructPreprocessorPtr input, std::vector<ReconstructCorePtr> cores);
 	virtual ~ThreadedTimedReconstructerStep1();
-
-//	void start();
 
 private slots:
 	virtual void preProcessingSlot();
@@ -168,7 +167,8 @@ private slots:
 
 private:
 	virtual void calculate();
-	ReconstructCorePtr mReconstructer;
+	ReconstructPreprocessorPtr mInput;
+	std::vector<ReconstructCorePtr> mCores;
 };
 
 /**
