@@ -7,7 +7,6 @@
 #include "sscMessageManager.h"
 #include "sscHelperWidgets.h"
 #include "sscTypeConversions.h"
-#include "sscReconstructer.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxSettings.h"
 
@@ -178,7 +177,7 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 
 QString ReconstructionWidget::getCurrentPath()
 {
-	return QFileInfo(mReconstructer->getSelectedData()).dir().absolutePath();
+	return QFileInfo(mReconstructer->getSelectedFilename()).dir().absolutePath();
 }
 
 void ReconstructionWidget::reconstruct()
@@ -189,7 +188,7 @@ void ReconstructionWidget::reconstruct()
 
 void ReconstructionWidget::reload()
 {
-	this->selectData(mReconstructer->getSelectedData());
+	this->selectData(mReconstructer->getSelectedFilename());
 }
 
 /**Called when data is loaded into reconstructer.
@@ -197,7 +196,7 @@ void ReconstructionWidget::reload()
  */
 void ReconstructionWidget::inputDataSelected(QString mhdFileName)
 {
-	if (mReconstructer->getSelectedData().isEmpty())
+	if (mReconstructer->getSelectedFilename().isEmpty())
 	{
 		return;
 	}	

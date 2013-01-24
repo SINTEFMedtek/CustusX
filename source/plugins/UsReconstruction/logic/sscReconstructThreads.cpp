@@ -35,7 +35,6 @@
 #include "sscPresetTransferFunctions3D.h"
 #include "cxToolManager.h"
 #include "sscManualTool.h"
-#include "sscReconstructer.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxViewManager.h"
