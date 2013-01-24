@@ -113,6 +113,7 @@ void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 	stream << qstring_cast(data.mTimestamp);
 	stream << endl;
 
+//	std::cout << "** VideoRecorderSaveThread::write() start" << data.mImageFilename << std::endl;
 	// convert to 8 bit data if applicable.
 	if (!mWriteColor && data.mImage->GetNumberOfScalarComponents()>2)
 	{
@@ -128,7 +129,7 @@ void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 	writer->SetFileName(cstring_cast(data.mImageFilename));
 	writer->SetCompression(mCompressed);
 	writer->Write();
-//	std:cout << "** VideoRecorderSaveThread::write() " << data.mImageFilename << std::endl;
+//	std::cout << "** VideoRecorderSaveThread::write() " << data.mImageFilename << std::endl;
 
 	emit dataSaved(data.mImageFilename);
 }
@@ -208,6 +209,7 @@ void SavingVideoRecorder::newFrameSlot()
 		return;
 
 	vtkImageDataPtr image = mSource->getVtkImageData();
+	image->Update();
 	double timestamp = mSource->getTimestamp();
 	QString filename = mSaveThread->addData(timestamp, image);
 
