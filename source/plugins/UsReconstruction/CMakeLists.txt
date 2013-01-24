@@ -12,6 +12,7 @@
 
 SET( MOC_HEADER_FILES
   logic/sscReconstructManager.h
+  logic/sscReconstructThreads.h
    gui/sscReconstructionWidget.h
    gui/sscReconstructOutputValueParamsInterfaces.h
    gui/cxUsReconstructionPlugin.h
@@ -24,6 +25,8 @@ SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
   logic/sscReconstructManager.h
   logic/sscReconstructManager.cpp
+  logic/sscReconstructThreads.h
+  logic/sscReconstructThreads.cpp
   gui/sscReconstructionWidget.cpp
   gui/sscReconstructOutputValueParamsInterfaces.cpp
   gui/sscReconstructOutputValueParamsInterfaces.h

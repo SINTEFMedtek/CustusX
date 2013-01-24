@@ -33,6 +33,7 @@
 #include "cxPatientData.h"
 #include "cxViewManager.h"
 #include "cxCompositeTimedAlgorithm.h"
+#include "sscReconstructThreads.h"
 
 //Windows fix
 #ifndef M_PI
@@ -45,8 +46,6 @@ namespace ssc
 
 ReconstructManager::ReconstructManager(XmlOptionFile settings, QString shaderPath)
 {
-	mFileReader.reset(new cx::UsReconstructionFileReader());
-
 	mReconstructer.reset(new Reconstructer(settings, shaderPath));
 
 	connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SIGNAL(paramsChanged()));
@@ -73,10 +72,10 @@ std::vector<ReconstructCorePtr> ReconstructManager::startReconstruction()
 		return cores;
 	}
 
-	serial->append(ThreadedTimedReconstructerStep1::create(preprocessor, cores));
+	serial->append(ThreadedTimedReconstructPreprocessor::create(preprocessor, cores));
 	serial->append(parallel);
 	for (unsigned i=0; i<cores.size(); ++i)
-		parallel->append(ThreadedTimedReconstructerStep2::create(cores[i]));
+		parallel->append(ThreadedTimedReconstructCore::create(cores[i]));
 
 	this->launch(serial);
 
@@ -126,7 +125,6 @@ std::vector<DataAdapterPtr> ReconstructManager::getAlgoOptions()
 QString ReconstructManager::getSelectedData() const
 {
 	return mOriginalFileData.mFilename;
-//	return mReconstructer->getSelectedData();
 }
 
 
@@ -182,7 +180,7 @@ void ReconstructManager::selectData(ssc::USReconstructInputData data)
 	this->clearAll();
 
 	mOriginalFileData = data;
-	mCalFilesPath = "";
+//	mCalFilesPath = "";
 
 	mReconstructer->setInputData(mOriginalFileData);
 }
@@ -193,127 +191,17 @@ void ReconstructManager::selectData(ssc::USReconstructInputData data)
 void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
 {
 	mOriginalFileData.mFilename = fileName;
-	mCalFilesPath = calFilesPath;
+//	mCalFilesPath = calFilesPath;
 
-	ssc::USReconstructInputData temp = mFileReader->readAllFiles(fileName, calFilesPath);
+	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
+	ssc::USReconstructInputData temp = fileReader->readAllFiles(fileName, calFilesPath);
 	if (!temp.mUsRaw)
 		return;
 
 	mOriginalFileData = temp;
 	mOriginalFileData.mFilename = fileName;
-	mCalFilesPath = calFilesPath;
+//	mCalFilesPath = calFilesPath;
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-//ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructCorePtr reconstructer) :
-//	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
-//{
-//	mReconstructer = reconstructer;
-//}
-
-//ThreadedTimedReconstructer::~ThreadedTimedReconstructer()
-//{
-//}
-
-//void ThreadedTimedReconstructer::preProcessingSlot()
-//{
-//	mReconstructer->threadedPreReconstruct();
-//}
-
-//void ThreadedTimedReconstructer::calculate()
-//{
-//	mReconstructer->threadablePreReconstruct();
-//	mReconstructer->threadedReconstruct();
-//}
-
-//void ThreadedTimedReconstructer::postProcessingSlot()
-//{
-//	mReconstructer->threadedPostReconstruct();
-
-//	cx::patientService()->getPatientData()->autoSave();
-//	cx::viewManager()->autoShowData(mReconstructer->getOutput());
-//}
-
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-ThreadedTimedReconstructerStep1::ThreadedTimedReconstructerStep1(ReconstructPreprocessorPtr input, std::vector<ReconstructCorePtr> cores) :
-	cx::ThreadedTimedAlgorithm<void> ("US PreReconstruction", 30)
-{
-	mInput = input;
-	mUseDefaultMessages = false;
-//	mReconstructer = reconstructer;
-	mCores = cores;
-}
-
-ThreadedTimedReconstructerStep1::~ThreadedTimedReconstructerStep1()
-{
-}
-
-void ThreadedTimedReconstructerStep1::preProcessingSlot()
-{
-//	mReconstructer->threadedPreReconstruct();
-}
-
-void ThreadedTimedReconstructerStep1::calculate()
-{
-	mInput->initializeCores(mCores);
-
-//	ProcessedUSInputDataPtr bmode_in, angio_in;
-//	mInput->getProcessedFileData().mUsRaw->initializeFrames(mBMode!=0, &bmode_in, mAngio!=0, &angio_in);
-
-//	if (mBMode)
-//		mBMode->initialize(bmode_in, mInput->getOutputVolumeParams());
-//	if (mAngio)
-//		mAngio->initialize(angio_in, mInput->getOutputVolumeParams());
-
-//	mReconstructer->threadablePreReconstruct();
-}
-
-void ThreadedTimedReconstructerStep1::postProcessingSlot()
-{
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-ThreadedTimedReconstructerStep2::ThreadedTimedReconstructerStep2(ReconstructCorePtr reconstructer) :
-	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
-{
-	mUseDefaultMessages = false;
-	mReconstructer = reconstructer;
-}
-
-ThreadedTimedReconstructerStep2::~ThreadedTimedReconstructerStep2()
-{
-}
-
-void ThreadedTimedReconstructerStep2::preProcessingSlot()
-{
-	mReconstructer->threadedPreReconstruct();
-}
-
-void ThreadedTimedReconstructerStep2::calculate()
-{
-	mReconstructer->threadedReconstruct();
-}
-
-void ThreadedTimedReconstructerStep2::postProcessingSlot()
-{
-	mReconstructer->threadedPostReconstruct();
-
-	cx::patientService()->getPatientData()->autoSave();
-	if (cx::viewManager()) // might be called by auto test - no service
-		cx::viewManager()->autoShowData(mReconstructer->getOutput());
-}
 
 }
