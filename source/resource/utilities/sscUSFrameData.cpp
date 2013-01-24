@@ -391,7 +391,9 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 	std::vector<std::vector<vtkImageDataPtr> > raw(angio.size());
 
 	for (unsigned i=0; i<raw.size(); ++i)
+	{
 		raw[i].resize(mReducedToFull.size());
+	}
 
 	// apply cropping and angio
 	for (unsigned i=0; i<mReducedToFull.size(); ++i)
