@@ -73,6 +73,11 @@ ViewManager* viewManager()
 }
 ViewManager* ViewManager::getInstance()
 {
+	return mTheInstance;
+}
+
+ViewManager* ViewManager::createInstance()
+{
 	if (mTheInstance == NULL)
 	{
 		mTheInstance = new ViewManager();

@@ -4,8 +4,9 @@
 #include <cppunit/extensions/TestFactoryRegistry.h> 
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
+#include "sscReconstructManager.h"
 
-/**Unit tests that show the properties of the cxToolConfigurationParser class
+/**Unit tests that test the US reconstruction plugin
  */
 class TestUsReconstruction : public CppUnit::TestFixture
 {
@@ -17,6 +18,7 @@ public:
 	void testConstructor();///< Test reconstructer constructor
 	void testAngioReconstruction();///< Test reconstruction of US angio data (#318)
 	void testThunderGPUReconstruction();///< Test Thunder GPU reconstruction
+	void testDualAngio();
 
 public:
 	CPPUNIT_TEST_SUITE( TestUsReconstruction );
@@ -24,8 +26,13 @@ public:
 		CPPUNIT_TEST( testSlerpInterpolation );
 		CPPUNIT_TEST( testAngioReconstruction );
 		CPPUNIT_TEST( testThunderGPUReconstruction );
+		CPPUNIT_TEST( testDualAngio );
 	CPPUNIT_TEST_SUITE_END();
 private:
+	ssc::ReconstructManagerPtr createManager();
+	/** Validate the angio data output from the specific data set used.
+	  */
+	void validateAngioData(ssc::ImagePtr output);
 
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestUsReconstruction );

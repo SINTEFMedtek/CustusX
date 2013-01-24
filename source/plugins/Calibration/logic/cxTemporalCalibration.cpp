@@ -187,7 +187,8 @@ double TemporalCalibration::calibrate(bool* success)
   mDebugStream << "Loaded data: " << mFilename << std::endl;
   mDebugStream << "=======================================" << std::endl;
 
-  mFileData.mUsRaw->initializeFrames();
+//  mFileData.mUsRaw->initializeFrames();
+  mProcessedFrames = mFileData.mUsRaw->initializeFrames(std::vector<bool>(1, false)).front();
 
   std::vector<double> frameMovement = this->computeProbeMovement();
 
@@ -568,10 +569,11 @@ vtkImageDataPtr TemporalCalibration::extractLine_y(ssc::USFrameDataPtr data, int
   vtkImageDataPtr retval = ssc::generateVtkImageDataDouble(Eigen::Array3i(dimY, 1, 1), ssc::Vector3D(1,1,1), 1);
 
   /// convert one frame to a vtkImageData: base
-  uchar* raw_source = data->getFrame(frame);
-  vtkImageDataPtr base = ssc::generateVtkImageData(Eigen::Array3i(dimX, dimY, 1), ssc::Vector3D(1,1,1), 0);
-  uchar* base_ptr = static_cast<uchar*>(base->GetScalarPointer());
-  std::copy(raw_source, raw_source+dimX*dimY, base_ptr);
+//  uchar* raw_source = data->getFrame(frame);
+//  vtkImageDataPtr base = ssc::generateVtkImageData(Eigen::Array3i(dimX, dimY, 1), ssc::Vector3D(1,1,1), 0);
+//  uchar* base_ptr = static_cast<uchar*>(base->GetScalarPointer());
+//  std::copy(raw_source, raw_source+dimX*dimY, base_ptr);
+  vtkImageDataPtr base = mProcessedFrames[frame];
 
   // run the base frame through the mask. Result is source.
   vtkImageMaskPtr maskFilter = vtkImageMaskPtr::New();

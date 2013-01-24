@@ -47,6 +47,66 @@ typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 namespace ssc
 {
 
+ProcessedUSInputData::ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<ssc::TimedPosition> pos, ssc::ImagePtr mask, QString path, QString uid) :
+	mProcessedImage(frames),
+	mFrames(pos),
+	mMask(mask),
+	mPath(path),
+	mUid(uid)
+{
+
+}
+
+unsigned char* ProcessedUSInputData::getFrame(unsigned int index) const
+{
+	SSC_ASSERT(index < mProcessedImage.size());
+
+	// Raw data pointer
+	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage[index]->GetScalarPointer());
+	return inputPointer;
+}
+
+Eigen::Array3i ProcessedUSInputData::getDimensions() const
+{
+	Eigen::Array3i retval;
+	retval[0] = mProcessedImage[0]->GetDimensions()[0];
+	retval[1] = mProcessedImage[0]->GetDimensions()[1];
+	retval[2] = mProcessedImage.size();
+	return retval;
+}
+
+Vector3D ProcessedUSInputData::getSpacing() const
+{
+	Vector3D retval = Vector3D(mProcessedImage[0]->GetSpacing());
+	retval[2] = retval[0]; // set z-spacing to arbitrary value.
+	return retval;
+}
+
+std::vector<ssc::TimedPosition> ProcessedUSInputData::getFrames()
+{
+	return mFrames;
+}
+
+ssc::ImagePtr ProcessedUSInputData::getMask()
+{
+	return mMask;
+}
+
+QString ProcessedUSInputData::getFilePath()
+{
+	return mPath;
+}
+
+QString ProcessedUSInputData::getUid()
+{
+	return mUid;
+}
+
+
+///----------------------------------------------------------------------------
+///----------------------------------------------------------------------------
+///----------------------------------------------------------------------------
+
 USFrameDataPtr USFrameData::create(ImagePtr inputFrameData)
 {
 	USFrameDataPtr retval(new USFrameData());
@@ -102,7 +162,7 @@ USFrameDataPtr USFrameData::create(QString filename, std::vector<cx::CachedImage
 }
 
 USFrameData::USFrameData() :
-		mUseAngio(false), mCropbox(0,0,0,0,0,0), mPurgeInput(true)
+		mCropbox(0,0,0,0,0,0), mPurgeInput(true)
 {
 }
 
@@ -118,7 +178,6 @@ void USFrameData::initialize()
 
 USFrameData::~USFrameData()
 {
-	mProcessedImage.clear();
 	mImageContainer.reset();
 }
 
@@ -129,8 +188,6 @@ void USFrameData::removeFrame(unsigned int index)
 {
 	SSC_ASSERT(index < mReducedToFull.size());
 	mReducedToFull.erase(mReducedToFull.begin()+index);
-
-	this->clearCache();
 }
 
 Eigen::Array3i USFrameData::getDimensions() const
@@ -139,23 +196,12 @@ Eigen::Array3i USFrameData::getDimensions() const
 
 	if (mCropbox.range()[0]!=0)
 	{
-		// no cache, generate one sample
-		if (mProcessedImage.empty())
-		{
-			vtkImageDataPtr sample = this->cropImage(mImageContainer->get(0), mCropbox);
-			retval[0] = sample->GetDimensions()[0];
-			retval[1] = sample->GetDimensions()[1];
-		}
-		// cache is available, use that
-		else
-		{
-			retval[0] = mProcessedImage[0]->GetDimensions()[0];
-			retval[1] = mProcessedImage[0]->GetDimensions()[1];
-		}
+		vtkImageDataPtr sample = this->cropImage(mImageContainer->get(0), mCropbox);
+		retval[0] = sample->GetDimensions()[0];
+		retval[1] = sample->GetDimensions()[1];
 	}
 
 	retval[2] = mReducedToFull.size();
-
 	return retval;
 }
 
@@ -163,40 +209,25 @@ Eigen::Array3i USFrameData::getDimensions() const
 Vector3D USFrameData::getSpacing() const
 {
 	Vector3D retval(1,1,1);
-
-    // no cache, generate one sample
-	if (mProcessedImage.empty())
-	{
-		if (!mImageContainer->empty())
-			retval = Vector3D(mImageContainer->get(0)->GetSpacing());
-	}
-	// cache is available, use that
-	else
-	{
-		retval = Vector3D(mProcessedImage[0]->GetSpacing());
-	}
-
+	if (!mImageContainer->empty())
+		retval = Vector3D(mImageContainer->get(0)->GetSpacing());
 	retval[2] = retval[0]; // set z-spacing to arbitrary value.
 	return retval;
 }
 
-void USFrameData::setAngio(bool angio)
-{
-	if (angio!=mUseAngio)
-		this->clearCache();
+//void USFrameData::setAngio(bool angio)
+//{
+//	if (angio!=mUseAngio)
+//		this->clearCache();
 
-	mUseAngio = angio;
-}
+//	mUseAngio = angio;
+//}
 
 void USFrameData::setCropBox(IntBoundingBox3D cropbox)
 {
 	// ensure clip never happens in z dir.
 	cropbox[4] = -100000;
 	cropbox[5] =  100000;
-
-	if (cropbox!=mCropbox)
-		this->clearCache();
-
 	mCropbox = cropbox;
 }
 
@@ -335,39 +366,32 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
 //	return true;;
 //}
 
-unsigned char* USFrameData::getFrame(unsigned int index) const
-{
-	if (mProcessedImage.empty())
-	{
-		ssc::messageManager()->sendError(QString("USFrameData %1 not properly initialized prior to calling getFrame()").arg(this->getName()));
-		return NULL;
-	}
+//unsigned char* USFrameData::getFrame(unsigned int index) const
+//{
+//	if (mProcessedImage.empty())
+//	{
+//		ssc::messageManager()->sendError(QString("USFrameData %1 not properly initialized prior to calling getFrame()").arg(this->getName()));
+//		return NULL;
+//	}
 
-	SSC_ASSERT(index < mProcessedImage.size());
+//	SSC_ASSERT(index < mProcessedImage.size());
 
-	// Raw data pointer
-	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage[index]->GetScalarPointer());
-	return inputPointer;
-}
+//	// Raw data pointer
+//	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage[index]->GetScalarPointer());
+//	return inputPointer;
+//}
 
 void USFrameData::setPurgeInputDataAfterInitialize(bool value)
 {
 	mPurgeInput = value;
 }
 
-
-/** Fill cache, enabling getFrames()
-  * NOT thread-safe.
-  *
-  */
-void USFrameData::generateCache()
+std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::vector<bool> angio)
 {
-	if (!mProcessedImage.empty())
-		return;
+	std::vector<std::vector<vtkImageDataPtr> > raw(angio.size());
 
-	mProcessedImage.clear();
-
-	mProcessedImage.resize(mReducedToFull.size());
+	for (unsigned i=0; i<raw.size(); ++i)
+		raw[i].resize(mReducedToFull.size());
 
 	// apply cropping and angio
 	for (unsigned i=0; i<mReducedToFull.size(); ++i)
@@ -378,12 +402,19 @@ void USFrameData::generateCache()
 		if (mCropbox.range()[0]!=0)
 			current = this->cropImage(current, mCropbox);
 
-		if (mUseAngio)
-			current = this->useAngio(current);
-		else
-			current = this->toGrayscale(current);
-
-		mProcessedImage[i] = current;
+		for (unsigned j=0; j<angio.size(); ++j)
+		{
+			if (angio[j])
+			{
+				vtkImageDataPtr angioFrame = this->useAngio(current);
+				raw[j][i] = angioFrame;
+			}
+			else
+			{
+				vtkImageDataPtr grayFrame = this->toGrayscale(current);
+				raw[j][i] = grayFrame;
+			}
+		}
 
 		if (mPurgeInput)
 			mImageContainer->purge(mReducedToFull[i]);
@@ -391,12 +422,52 @@ void USFrameData::generateCache()
 
 	if (mPurgeInput)
 		mImageContainer->purgeAll();
+
+	return raw;
 }
 
-void USFrameData::initializeFrames()
-{
-	this->generateCache();
-}
+
+///** Fill cache, enabling getFrames()
+//  * NOT thread-safe.
+//  *
+//  */
+//void USFrameData::generateCache()
+//{
+//	if (!mProcessedImage.empty())
+//		return;
+
+//	mProcessedImage.clear();
+
+//	mProcessedImage.resize(mReducedToFull.size());
+
+//	// apply cropping and angio
+//	for (unsigned i=0; i<mReducedToFull.size(); ++i)
+//	{
+//		SSC_ASSERT(mImageContainer->size()>mReducedToFull[i]);
+//		vtkImageDataPtr current = mImageContainer->get(mReducedToFull[i]);
+
+//		if (mCropbox.range()[0]!=0)
+//			current = this->cropImage(current, mCropbox);
+
+//		if (mUseAngio)
+//			current = this->useAngio(current);
+//		else
+//			current = this->toGrayscale(current);
+
+//		mProcessedImage[i] = current;
+
+//		if (mPurgeInput)
+//			mImageContainer->purge(mReducedToFull[i]);
+//	}
+
+//	if (mPurgeInput)
+//		mImageContainer->purgeAll();
+//}
+
+//void USFrameData::initializeFrames()
+//{
+//	this->generateCache();
+//}
 
 void USFrameData::purgeAll()
 {
@@ -418,15 +489,15 @@ void USFrameData::purgeAll()
 //  return filter->GetOutput();
 //}
 
-void USFrameData::clearCache()
-{
-	mProcessedImage.clear();
-}
+//void USFrameData::clearCache()
+//{
+//	mProcessedImage.clear();
+//}
 
 USFrameDataPtr USFrameData::copy()
 {
 	USFrameDataPtr retval(new USFrameData(*this));
-	retval->clearCache();
+//	retval->clearCache();
 	this->initialize();
 	return retval;
 }
