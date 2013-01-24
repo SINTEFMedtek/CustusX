@@ -56,8 +56,8 @@ void MainWindow::showData()
     mView->addRep(mVolumeRep);
   }
 
-  ssc::ReconstructPreprocessorPtr preprocessor = mReconstructionWidget->reconstructer()->getReconstructer()->createPreprocessor();
-  std::vector<ssc::ReconstructCorePtr> cores = mReconstructionWidget->reconstructer()->getReconstructer()->createCores();
+  ssc::ReconstructPreprocessorPtr preprocessor = mReconstructionWidget->reconstructer()->createPreprocessor();
+  std::vector<ssc::ReconstructCorePtr> cores = mReconstructionWidget->reconstructer()->createCores();
   preprocessor->initializeCores(cores);
   ssc::ImagePtr data = cores[0]->reconstruct();
 

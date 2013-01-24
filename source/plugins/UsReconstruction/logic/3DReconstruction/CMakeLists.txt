@@ -21,7 +21,6 @@ include_directories(
     )
 
 SET( MOC_HEADER_FILES
-   sscReconstructer.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -29,8 +28,6 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
-  sscReconstructer.cpp
-  sscReconstructer.h
   sscReconstructedOutputVolumeParams.h
   sscReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.h
