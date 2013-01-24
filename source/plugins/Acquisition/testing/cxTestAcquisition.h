@@ -15,10 +15,12 @@ public:
 	void tearDown();
 
 	void testConstructor();///< Test constructor
+	void testStoreMHDSource();
 
 public:
 	CPPUNIT_TEST_SUITE( TestAcquisition );
 		CPPUNIT_TEST( testConstructor );
+		CPPUNIT_TEST( testStoreMHDSource );
 	CPPUNIT_TEST_SUITE_END();
 private:
 };
