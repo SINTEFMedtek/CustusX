@@ -103,4 +103,4 @@ endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
 # add/remove to suit your own needs.
 #add_subdirectory(logic)
 #add_subdirectory(gui)
-#add_subdirectory(testing)
+add_subdirectory(testing)
