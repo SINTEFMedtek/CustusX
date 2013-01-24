@@ -6,7 +6,6 @@
 #define USTEST_MAINWINDOW_H_
 
 #include <QtGui>
-#include "sscReconstructer.h"
 
 #include <QtGui>
 #include <vtkRenderer.h>
