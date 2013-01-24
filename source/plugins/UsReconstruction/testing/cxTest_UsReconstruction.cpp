@@ -1,13 +1,11 @@
 #include "cxTest_UsReconstruction.h"
 
 #include <vtkImageData.h>
-#include "sscReconstructer.h"
 #include "sscReconstructManager.h"
 #include "sscImage.h"
 #include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscPNNReconstructAlgorithm.h"
 #include "cxDataLocations.h"
-#include "sscReconstructer.h"
 #include "cxDataManager.h"
 
 //#include "cxToolConfigurationParser.h"
@@ -152,15 +150,15 @@ void TestUsReconstruction::testAngioReconstruction()
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 
 	// set an algorithm-specific parameter
-	QDomElement algo = reconstructer->getReconstructer()->getSettings().getElement("algorithms", "PNN");
+	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "PNN");
 	boost::shared_ptr<ssc::PNNReconstructAlgorithm> algorithm;
-	algorithm = boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getReconstructer()->createAlgorithm());
+	algorithm = boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
 	CPPUNIT_ASSERT(algorithm);// Check if we got the PNN algorithm
 	algorithm->getInterpolationStepsOption(algo)->setValue(1);
 
 	// run the reconstruction in the main thread
-	ssc::ReconstructPreprocessorPtr preprocessor = reconstructer->getReconstructer()->createPreprocessor();
-	std::vector<ssc::ReconstructCorePtr> cores = reconstructer->getReconstructer()->createCores();
+	ssc::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	std::vector<ssc::ReconstructCorePtr> cores = reconstructer->createCores();
 	CPPUNIT_ASSERT(cores.size()==1);
 	preprocessor->initializeCores(cores);
 	cores[0]->reconstruct();
@@ -183,15 +181,15 @@ void TestUsReconstruction::testThunderGPUReconstruction()
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(false);
 
 	// set an algorithm-specific parameter
-	QDomElement algo = reconstructer->getReconstructer()->getSettings().getElement("algorithms", "VNN");
+	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "VNN");
 	boost::shared_ptr<ssc::ThunderVNNReconstructAlgorithm> algorithm;
-	algorithm = boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->getReconstructer()->createAlgorithm());
+	algorithm = boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->createAlgorithm());
 	CPPUNIT_ASSERT(algorithm);// Check if we got the VNN algorithm
 	algorithm->getProcessorOption(algo)->setValue("GPU");
 
 	// run the reconstruction in the main thread
-	ssc::ReconstructPreprocessorPtr preprocessor = reconstructer->getReconstructer()->createPreprocessor();
-	std::vector<ssc::ReconstructCorePtr> cores = reconstructer->getReconstructer()->createCores();
+	ssc::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	std::vector<ssc::ReconstructCorePtr> cores = reconstructer->createCores();
 	CPPUNIT_ASSERT(cores.size()==1);
 	preprocessor->initializeCores(cores);
 	cores[0]->reconstruct();
@@ -213,9 +211,9 @@ void TestUsReconstruction::testDualAngio()
 	reconstructer->getParams()->mCreateBModeWhenAngio->setValue(true);
 
 	// set an algorithm-specific parameter
-	QDomElement algo = reconstructer->getReconstructer()->getSettings().getElement("algorithms", "PNN");
+	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "PNN");
 	boost::shared_ptr<ssc::PNNReconstructAlgorithm> algorithm;
-	algorithm = boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->getReconstructer()->createAlgorithm());
+	algorithm = boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
 	CPPUNIT_ASSERT(algorithm);// Check if we got the PNN algorithm
 	algorithm->getInterpolationStepsOption(algo)->setValue(1);
 
