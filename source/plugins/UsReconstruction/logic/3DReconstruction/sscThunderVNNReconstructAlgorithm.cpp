@@ -89,14 +89,15 @@ BoolDataAdapterPtr ThunderVNNReconstructAlgorithm::getPrintOpenCLInfoOption(QDom
 		"Query OpenCL and print info about CPU to stdout.", false, root);
 }
 
-bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
-	USFrameDataPtr frameData, vtkImageDataPtr outputData, ImagePtr frameMask, QDomElement settings)
+bool ThunderVNNReconstructAlgorithm::reconstruct(ProcessedUSInputDataPtr input,
+												 vtkImageDataPtr outputData, QDomElement settings)
 {
 	bool success = false;
 
-	if (frameInfo.empty())
+
+	if (input->getFrames().empty())
 		return false;
-	if (frameData->getDimensions()[2]==0)
+	if (input->getDimensions()[2]==0)
 		return false;
 
 #ifdef SSC_USE_OpenCL
@@ -128,14 +129,14 @@ bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 	//vtkImageDataPtr input = frameData->getBaseVtkImageData();
 	//  USFrameDataPtr input = frameData;//TODO: Fix input
 
-	data.frameData = frameData;
+	data.frameData = input;
 	//  data.input = static_cast<unsigned char*>(input->GetScalarPointer());
 	//input->GetDimensions(data.input_dim);
 	//input->GetSpacing(data.input_spacing);
 	//data.input_dim = input->getDimensions();
 	//data.input_spacing = input->GetSpacing();
 
-	Eigen::Array3i inputDims = frameData->getDimensions();
+	Eigen::Array3i inputDims = input->getDimensions();
 	//test
 	//long size = data.input_dim[0]*data.input_dim[1]*data.input_dim[2];
 	double size = double(inputDims[0] * inputDims[1] * inputDims[2]) / 1024 / 1024;
@@ -149,6 +150,7 @@ bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 	//for (int i = 0; i < size; i++)
 	//  data.input[i]=255;
 
+	std::vector<ssc::TimedPosition> frameInfo = input->getFrames();
 	data.input_pos_matrices = new double[frameInfo.size() * 12];
 	for (unsigned int i = 0; i < frameInfo.size(); i++)
 	{
@@ -157,7 +159,7 @@ bool ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
 			data.input_pos_matrices[12 * i + j] = m[j];
 	}
 
-	vtkImageDataPtr input_mask = frameMask->getBaseVtkImageData();
+	vtkImageDataPtr input_mask = input->getMask()->getBaseVtkImageData();
 	data.input_mask = static_cast<unsigned char*> (input_mask->GetScalarPointer());
 	//  data.frameMask = frameMask;
 

@@ -311,7 +311,7 @@ void WirePhantomWidget::showDataMetrics(ssc::Vector3D cross_r)
 std::pair<QString, ssc::Transform3D> WirePhantomWidget::getLastProbePosition()
 {
     // find transform to probe space t_us, i.e. the middle position from the us acquisition
-    ssc::USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getBaseInputData();
+    ssc::USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getSelectedFileData();
     ssc::Transform3D prMt_us = ssc::Transform3D::Identity();
     if (usData.mPositions.empty())
         return std::make_pair("", ssc::Transform3D::Identity());
@@ -333,7 +333,7 @@ void WirePhantomWidget::generate_sMt()
         return;
     }
 
-    ssc::USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getBaseInputData();
+    ssc::USReconstructInputData usData = mManager->getAcquisitionData()->getReconstructer()->getSelectedFileData();
     ssc::ToolPtr probe = ssc::toolManager()->getTool(usData.mProbeUid);
     if (!probe || !probe->hasType(ssc::Tool::TOOL_US_PROBE))
     {

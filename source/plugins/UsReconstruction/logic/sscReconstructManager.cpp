@@ -28,11 +28,11 @@
 #include "sscPresetTransferFunctions3D.h"
 #include "cxToolManager.h"
 #include "sscManualTool.h"
-#include "sscReconstructer.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxViewManager.h"
 #include "cxCompositeTimedAlgorithm.h"
+#include "sscReconstructThreads.h"
 
 //Windows fix
 #ifndef M_PI
@@ -43,15 +43,17 @@ namespace ssc
 {
 
 
-ReconstructManager::ReconstructManager(XmlOptionFile settings, QString shaderPath)
+ReconstructManager::ReconstructManager(XmlOptionFile settings, QString shaderPath) :
+	mOutputRelativePath(""), mOutputBasePath(""), mShaderPath(shaderPath)
 {
-	mFileReader.reset(new cx::UsReconstructionFileReader());
+	mSettings = settings;
+	mSettings.getElement("algorithms");
 
-	mReconstructer.reset(new Reconstructer(settings, shaderPath));
+	mParams.reset(new ReconstructParams(settings));
+	connect(mParams.get(), SIGNAL(changedInputSettings()), this, SLOT(setSettings()));
+	connect(mParams.get(), SIGNAL(transferFunctionChanged()), this, SLOT(transferFunctionChangedSlot()));
 
-	connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SIGNAL(paramsChanged()));
-	connect(mReconstructer.get(), SIGNAL(algorithmChanged()), this, SIGNAL(algorithmChanged()));
-	connect(mReconstructer.get(), SIGNAL(inputDataSelected(QString)), this, SIGNAL(inputDataSelected(QString)));
+	this->initAlgorithm();
 }
 
 ReconstructManager::~ReconstructManager()
@@ -59,56 +61,73 @@ ReconstructManager::~ReconstructManager()
 
 }
 
-void ReconstructManager::startReconstruction()
+ReconstructAlgorithmPtr ReconstructManager::createAlgorithm()
+{
+	QString name = mParams->mAlgorithmAdapter->getValue();
+
+	ReconstructCorePtr core; ///< in progress: algorithm part of class moved here.
+	core.reset(new ReconstructCore());
+	ReconstructAlgorithmPtr algo = core->createAlgorithm(name);
+	return algo;
+}
+
+void ReconstructManager::initAlgorithm()
+{
+	ReconstructAlgorithmPtr algo = this->createAlgorithm();
+
+	// generate settings for new algo
+	if (algo)
+	{
+		QDomElement element = mSettings.getElement("algorithms", algo->getName());
+		mAlgoOptions = algo->getSettings(element);
+		emit algorithmChanged();
+	}
+}
+
+void ReconstructManager::setSettings()
+{
+	this->initAlgorithm();
+	this->updateFromOriginalFileData();
+	emit paramsChanged();
+}
+
+void ReconstructManager::transferFunctionChangedSlot()
+{
+	//Use angio reconstruction also if only transfer function is set to angio
+	if(mParams->mPresetTFAdapter->getValue() == "US Angio")
+	{
+		ssc::messageManager()->sendDebug("Reconstructing angio (Because of angio transfer function)");
+		mParams->mAngioAdapter->setValue(true);
+	}
+	else if(mParams->mPresetTFAdapter->getValue() == "US B-Mode" && mParams->mAngioAdapter->getValue())
+	{
+		ssc::messageManager()->sendDebug("Not reconstructing angio (Because of B-Mode transfer function)");
+		mParams->mAngioAdapter->setValue(false);
+	}
+}
+
+std::vector<ReconstructCorePtr> ReconstructManager::startReconstruction()
 {
 	cx::CompositeTimedAlgorithmPtr serial(new cx::CompositeTimedAlgorithm("US Reconstruction"));
 	cx::CompositeParallelTimedAlgorithmPtr parallel(new cx::CompositeParallelTimedAlgorithm());
 
-	ReconstructCorePtr core = mReconstructer->createCore();
+	ReconstructPreprocessorPtr preprocessor = this->createPreprocessor();
+	std::vector<ReconstructCorePtr> cores = this->createCores();
 
-	if (!core)
+	if (cores.empty())
 	{
 		ssc::messageManager()->sendWarning("Failed to start reconstruction");
-		return;
+		return cores;
 	}
 
-	if (mReconstructer->mParams->mCreateBModeWhenAngio->getValue() && mReconstructer->mParams->mAngioAdapter->getValue())
-	{
-		ReconstructCorePtr core = mReconstructer->createCore();
-		ReconstructCorePtr dualCore = mReconstructer->createDualCore();
-
-		if (!dualCore)
-		{
-			ssc::messageManager()->sendWarning("Failed to start reconstruction");
-			return;
-		}
-
-		serial->append(ThreadedTimedReconstructerStep1::create(dualCore)); // run dualcore first, as it is set to not release memory after preprocess.
-		serial->append(ThreadedTimedReconstructerStep1::create(core));
-		serial->append(parallel);
-		parallel->append(ThreadedTimedReconstructerStep2::create(dualCore));
-		parallel->append(ThreadedTimedReconstructerStep2::create(core));
-	}
-	else
-	{
-		serial->append(ThreadedTimedReconstructerStep1::create(core));
-		serial->append(parallel);
-		parallel->append(ThreadedTimedReconstructerStep2::create(core));
-	}
+	serial->append(ThreadedTimedReconstructPreprocessor::create(preprocessor, cores));
+	serial->append(parallel);
+	for (unsigned i=0; i<cores.size(); ++i)
+		parallel->append(ThreadedTimedReconstructCore::create(cores[i]));
 
 	this->launch(serial);
 
-
-//	ThreadedTimedReconstructerPtr thread(new ssc::ThreadedTimedReconstructer(mReconstructer->createCore()));
-//	this->launch(thread);
-
-//	if (mReconstructer->mParams->mCreateBModeWhenAngio->getValue() && mReconstructer->mParams->mAngioAdapter->getValue())
-//	{
-//		ReconstructCorePtr dualCore = mReconstructer->createDualCore();
-//		ThreadedTimedReconstructerPtr dual(new ssc::ThreadedTimedReconstructer(dualCore));
-//		this->launch(dual);
-//	}
-
+	return cores;
 }
 
 void ReconstructManager::launch(cx::TimedAlgorithmPtr thread)
@@ -135,60 +154,62 @@ void ReconstructManager::threadFinishedSlot()
 		}
 	}
 
-	mOriginalFileData.mUsRaw->purgeAll();
+	if (mThreadedReconstruction.empty())
+		mOriginalFileData.mUsRaw->purgeAll();
 }
 
-
-ReconstructParamsPtr ReconstructManager::getParams()
+void ReconstructManager::clearAll()
 {
-	return mReconstructer->mParams;
+	mOriginalFileData = ssc::USReconstructInputData();
+	mOutputVolumeParams = OutputVolumeParams();
 }
-
-
-std::vector<DataAdapterPtr> ReconstructManager::getAlgoOptions()
-{
-	return mReconstructer->mAlgoOptions;
-}
-
-QString ReconstructManager::getSelectedData() const
-{
-	return mOriginalFileData.mFilename;
-//	return mReconstructer->getSelectedData();
-}
-
 
 OutputVolumeParams ReconstructManager::getOutputVolumeParams() const
 {
-	return mReconstructer->getOutputVolumeParams();
+	return mOutputVolumeParams;
 }
 
 void ReconstructManager::setOutputVolumeParams(const OutputVolumeParams& par)
 {
-	mReconstructer->setOutputVolumeParams(par);
+	mOutputVolumeParams = par;
+	this->setSettings();
 }
 
 void ReconstructManager::setOutputRelativePath(QString path)
 {
-	mReconstructer->setOutputRelativePath(path);
+	mOutputRelativePath = path;
 }
 
 void ReconstructManager::setOutputBasePath(QString path)
 {
-	mReconstructer->setOutputBasePath(path);
+	mOutputBasePath = path;
 }
 
 bool ReconstructManager::validInputData() const
 {
 	if (mOriginalFileData.mFrames.empty() || !mOriginalFileData.mUsRaw || mOriginalFileData.mPositions.empty())
 		return false;
+	if(mOriginalFileData.mUsRaw->is4D())
+	{
+		ssc::messageManager()->sendWarning("US reconstructer do not handle 4D US data");
+		return false;
+	}
 	return true;
 }
 
-void ReconstructManager::clearAll()
+ReconstructParamsPtr ReconstructManager::getParams()
 {
-	mOriginalFileData = ssc::USReconstructInputData();
+	return mParams;
+}
 
-	mReconstructer->clearAll();
+std::vector<DataAdapterPtr> ReconstructManager::getAlgoOptions()
+{
+	return mAlgoOptions;
+}
+
+QString ReconstructManager::getSelectedFilename() const
+{
+	return mOriginalFileData.mFilename;
 }
 
 void ReconstructManager::selectData(QString filename, QString calFilesPath)
@@ -199,134 +220,113 @@ void ReconstructManager::selectData(QString filename, QString calFilesPath)
 		return;
 	}
 
-	this->clearAll();
-	this->readCoreFiles(filename, calFilesPath);
-	mReconstructer->setInputData(mOriginalFileData);
+	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
+	ssc::USReconstructInputData fileData = fileReader->readAllFiles(filename, calFilesPath);
+	fileData.mFilename = filename;
+	this->selectData(fileData);
 }
 
-void ReconstructManager::selectData(ssc::USReconstructInputData data)
+void ReconstructManager::selectData(ssc::USReconstructInputData fileData)
 {
 	this->clearAll();
-
-	mOriginalFileData = data;
-	mCalFilesPath = "";
-
-	mReconstructer->setInputData(mOriginalFileData);
+	mOriginalFileData = fileData;
+	this->updateFromOriginalFileData();
+	emit inputDataSelected(fileData.mFilename);
 }
 
-/**Read from file into mOriginalFileData.
- * These data are not changed before clearAll() or this method is called again.
- */
-void ReconstructManager::readCoreFiles(QString fileName, QString calFilesPath)
+void ReconstructManager::updateFromOriginalFileData()
 {
-	mOriginalFileData.mFilename = fileName;
-	mCalFilesPath = calFilesPath;
-
-	ssc::USReconstructInputData temp = mFileReader->readAllFiles(fileName, calFilesPath);
-	if (!temp.mUsRaw)
+	if (!this->validInputData())
 		return;
 
-	mOriginalFileData = temp;
-	mOriginalFileData.mFilename = fileName;
-	mCalFilesPath = calFilesPath;
+	ReconstructPreprocessorPtr preprocessor = this->createPreprocessor();
+	mOutputVolumeParams = preprocessor->getOutputVolumeParams();
+
+	emit paramsChanged();
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-ThreadedTimedReconstructer::ThreadedTimedReconstructer(ReconstructCorePtr reconstructer) :
-	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
+ReconstructCore::InputParams ReconstructManager::createCoreParameters()
 {
-	mReconstructer = reconstructer;
+	ReconstructCore::InputParams par;
+	par.mAlgorithmUid = mParams->mAlgorithmAdapter->getValue();
+	par.mAlgoSettings = mSettings.getElement("algorithms", par.mAlgorithmUid).cloneNode(true).toElement();
+	par.mOutputBasePath = mOutputBasePath;
+	par.mOutputRelativePath = mOutputRelativePath;
+	par.mShaderPath = mShaderPath;
+	par.mAngio = mParams->mAngioAdapter->getValue();
+	par.mTransferFunctionPreset = mParams->mPresetTFAdapter->getValue();
+	par.mMaxOutputVolumeSize = mParams->mMaxVolumeSize->getValue();
+	par.mExtraTimeCalibration = mParams->mTimeCalibration->getValue();
+	par.mAlignTimestamps = mParams->mAlignTimestamps->getValue();
+	par.mMaskReduce = mParams->mMaskReduce->getValue().toDouble();
+	par.mOrientation = mParams->mOrientationAdapter->getValue();
+	return par;
 }
 
-ThreadedTimedReconstructer::~ThreadedTimedReconstructer()
+ReconstructPreprocessorPtr ReconstructManager::createPreprocessor()
 {
+	if (!this->validInputData())
+		return ReconstructPreprocessorPtr();
+
+	ReconstructPreprocessorPtr retval(new ReconstructPreprocessor());
+
+	ReconstructCore::InputParams par = this->createCoreParameters();
+
+	USReconstructInputData fileData = mOriginalFileData;
+	fileData.mUsRaw = mOriginalFileData.mUsRaw->copy();
+
+	retval->initialize(par, fileData);
+
+	return retval;
 }
 
-void ThreadedTimedReconstructer::preProcessingSlot()
+std::vector<ReconstructCorePtr> ReconstructManager::createCores()
 {
-	mReconstructer->threadedPreReconstruct();
+	std::vector<ReconstructCorePtr> retval;
+
+	// create both
+	if (mParams->mCreateBModeWhenAngio->getValue() && mParams->mAngioAdapter->getValue())
+	{
+		retval.push_back(this->createBModeCore());
+		retval.push_back(this->createCore());
+	}
+	// only one thread
+	else
+	{
+		retval.push_back(this->createCore());
+	}
+
+	return retval;
 }
 
-void ThreadedTimedReconstructer::calculate()
+ReconstructCorePtr ReconstructManager::createCore()
 {
-	mReconstructer->threadablePreReconstruct();
-	mReconstructer->threadedReconstruct();
+	if (!this->validInputData())
+		return ReconstructCorePtr();
+
+	ReconstructCorePtr retval(new ReconstructCore());
+
+	ReconstructCore::InputParams par = this->createCoreParameters();
+	retval->initialize(par);
+
+	return retval;
 }
 
-void ThreadedTimedReconstructer::postProcessingSlot()
+ReconstructCorePtr ReconstructManager::createBModeCore()
 {
-	mReconstructer->threadedPostReconstruct();
+	if (!this->validInputData())
+		return ReconstructCorePtr();
 
-	cx::patientService()->getPatientData()->autoSave();
-	cx::viewManager()->autoShowData(mReconstructer->getOutput());
+	ReconstructCorePtr retval(new ReconstructCore());
+
+	ReconstructCore::InputParams par = this->createCoreParameters();
+	par.mAngio = false;
+	par.mTransferFunctionPreset = "US B-Mode";
+
+	retval->initialize(par);
+
+	return retval;
 }
 
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-ThreadedTimedReconstructerStep1::ThreadedTimedReconstructerStep1(ReconstructCorePtr reconstructer) :
-	cx::ThreadedTimedAlgorithm<void> ("US PreReconstruction", 30)
-{
-	mUseDefaultMessages = false;
-	mReconstructer = reconstructer;
-}
-
-ThreadedTimedReconstructerStep1::~ThreadedTimedReconstructerStep1()
-{
-}
-
-void ThreadedTimedReconstructerStep1::preProcessingSlot()
-{
-	mReconstructer->threadedPreReconstruct();
-}
-
-void ThreadedTimedReconstructerStep1::calculate()
-{
-	mReconstructer->threadablePreReconstruct();
-}
-
-void ThreadedTimedReconstructerStep1::postProcessingSlot()
-{
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-ThreadedTimedReconstructerStep2::ThreadedTimedReconstructerStep2(ReconstructCorePtr reconstructer) :
-	cx::ThreadedTimedAlgorithm<void> ("US Reconstruction", 30)
-{
-	mUseDefaultMessages = false;
-	mReconstructer = reconstructer;
-}
-
-ThreadedTimedReconstructerStep2::~ThreadedTimedReconstructerStep2()
-{
-}
-
-void ThreadedTimedReconstructerStep2::preProcessingSlot()
-{
-}
-
-void ThreadedTimedReconstructerStep2::calculate()
-{
-	mReconstructer->threadedReconstruct();
-}
-
-void ThreadedTimedReconstructerStep2::postProcessingSlot()
-{
-	mReconstructer->threadedPostReconstruct();
-
-	cx::patientService()->getPatientData()->autoSave();
-	cx::viewManager()->autoShowData(mReconstructer->getOutput());
-}
 
 }
