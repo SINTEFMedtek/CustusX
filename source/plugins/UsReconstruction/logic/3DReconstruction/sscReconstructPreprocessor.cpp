@@ -52,7 +52,7 @@ void ReconstructPreprocessor::initializeCores(std::vector<ReconstructCorePtr> co
 
 	std::vector<bool> angio;
     for (unsigned i=0; i<cores.size(); ++i)
-        angio.push_back(cores[0]->getInputParams().mAngio);
+        angio.push_back(cores[i]->getInputParams().mAngio);
 
     std::vector<std::vector<vtkImageDataPtr> > frames = mFileData.mUsRaw->initializeFrames(angio);
 
