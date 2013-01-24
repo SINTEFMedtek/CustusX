@@ -130,14 +130,14 @@ private:
 	ReconstructCorePtr createCore(); ///< used for threaded reconstruction
 	ReconstructCorePtr createBModeCore(); ///< core version for B-mode in case of angio recording.
 
-	USReconstructInputData mFileData;
+//	USReconstructInputData mFileData;
 	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 	OutputVolumeParams mOutputVolumeParams;
 	XmlOptionFile mSettings;
 	QString mOutputRelativePath;///< Relative path to the output image
 	QString mOutputBasePath;///< Global path where the relative path starts, for the output image
 	QString mShaderPath; ///< name of shader folder
-	double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
+//	double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
 
 	void initAlgorithm();
 	void updateFromOriginalFileData();

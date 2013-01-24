@@ -105,6 +105,7 @@ ssc::ReconstructManagerPtr TestUsReconstruction::createManager()
 
 void TestUsReconstruction::validateAngioData(ssc::ImagePtr output)
 {
+	CPPUNIT_ASSERT(output->getModality().contains("US"));
 	CPPUNIT_ASSERT( output->getRange() != 0);//Just check if the output volume is empty
 
 	// Check two voxel values
@@ -162,10 +163,11 @@ void TestUsReconstruction::testAngioReconstruction()
 	std::vector<ssc::ReconstructCorePtr> cores = reconstructer->getReconstructer()->createCores();
 	CPPUNIT_ASSERT(cores.size()==1);
 	preprocessor->initializeCores(cores);
-	ssc::ImagePtr output = cores[0]->reconstruct();
+	cores[0]->reconstruct();
 
 	// check validity of output:
 	this->validateAngioData(cores[0]->getOutput());
+	CPPUNIT_ASSERT(cores[0]->getOutput()->getImageType().contains("Angio"));
 }
 
 void TestUsReconstruction::testThunderGPUReconstruction()
@@ -196,6 +198,7 @@ void TestUsReconstruction::testThunderGPUReconstruction()
 
 	// check validity of output:
 	this->validateAngioData(cores[0]->getOutput()); // even if not angio - the check is sloppy
+	CPPUNIT_ASSERT(cores[0]->getOutput()->getImageType().contains("B-Mode"));
 }
 
 void TestUsReconstruction::testDualAngio()
@@ -232,6 +235,8 @@ void TestUsReconstruction::testDualAngio()
 	CPPUNIT_ASSERT(!thread->isRunning());
 	this->validateAngioData(cores[0]->getOutput()); // even if not angio - the check is sloppy
 	this->validateAngioData(cores[1]->getOutput());
+	CPPUNIT_ASSERT(cores[0]->getOutput()->getImageType().contains("B-Mode"));
+	CPPUNIT_ASSERT(cores[1]->getOutput()->getImageType().contains("Angio"));
 }
 
 
