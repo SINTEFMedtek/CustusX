@@ -180,7 +180,7 @@ void Reconstructer::transferFunctionChangedSlot()
 }
 void Reconstructer::clearAll()
 {
-	mFileData = ssc::USReconstructInputData();
+//	mFileData = ssc::USReconstructInputData();
 	mOriginalFileData = ssc::USReconstructInputData();
 	mOutputVolumeParams = OutputVolumeParams();
 }
