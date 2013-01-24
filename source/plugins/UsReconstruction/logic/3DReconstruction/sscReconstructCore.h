@@ -61,43 +61,29 @@ public:
 	virtual ~ReconstructCore();
 
 	// used for reconstruction algo
-	void initialize(InputParams input, USReconstructInputData fileData);
+	void initialize(InputParams input);
+	void initialize(ProcessedUSInputDataPtr fileData, OutputVolumeParams outputVolumeParams);
 	ssc::ImagePtr reconstruct();
 	void threadedPreReconstruct();
-	void threadablePreReconstruct();
 	void threadedReconstruct();
 	void threadedPostReconstruct();
 	ImagePtr getOutput();
-	OutputVolumeParams getOutputVolumeParams() { return mOutputVolumeParams; }
 
 	// published helper methods, also needed for parameter display outside of reconstruction execution:
 	ReconstructAlgorithmPtr createAlgorithm(QString uid);
-	Transform3D slerpInterpolate(const Transform3D& a, const Transform3D& b, double t);
-
+	InputParams getInputParams() { return mInput; }
 
 private:
-	void cropInputData();
-	void updateFromOriginalFileData();
 	bool validInputData() const;
 	QString generateOutputUid();
 	QString generateImageName(QString uid) const;
-	void findExtentAndOutputTransform();
-	ssc::Transform3D applyOutputOrientation();
-	std::vector<ssc::Vector3D> generateInputRectangle();
-	void transformPositionsTo_prMu();
-	void interpolatePositions();
-	Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
-	void applyTimeCalibration();
-	void alignTimeSeries();
-	void calibrateTimeStamps(double offset, double scale);
 
 	vtkImageDataPtr generateRawOutputVolume();
 	ImagePtr generateOutputVolume(vtkImageDataPtr rawOutput);
 
 	// input data
 	InputParams mInput;
-	USReconstructInputData mFileData;
-	double mMaxTimeDiff;
+	ProcessedUSInputDataPtr mFileData;
 
 	// generated data
 	ReconstructAlgorithmPtr mAlgorithm;///< The used reconstruction algorithm
