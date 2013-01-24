@@ -17,7 +17,6 @@
 #include "cxPatientService.h"
 #include "cxVideoService.h"
 #include "sscReconstructManager.h"
-#include "sscReconstructer.h"
 
 namespace cx
 {

@@ -15,7 +15,6 @@
 #include "cxDoubleDataAdapterTemporalCalibration.h"
 #include "sscReconstructManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
-#include "sscReconstructer.h"
 #include "cxProbeConfigWidget.h"
 
 namespace cx

@@ -21,12 +21,15 @@
 #include "sscProbeSector.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxThreadedTimedAlgorithm.h"
+#include "sscReconstructPreprocessor.h"
+#include "sscReconstructParams.h"
+#include "sscReconstructCore.h"
+#include "sscReconstructPreprocessor.h"
 
 namespace ssc
 {
 
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
-typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 
@@ -36,13 +39,15 @@ typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
  * @{
  */
 
-
 typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructerStep1> ThreadedTimedReconstructerStep1Ptr;
-typedef boost::shared_ptr<class ThreadedTimedReconstructerStep2> ThreadedTimedReconstructerStep2Ptr;
-
+typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
+typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
 
 /**
+ * \brief Manager for the us reconstruction process.
+ *
+ * Create a 3D volume based on a set of 2D images with 3D position.
+ *
  * \verbatim
  * Used coordinate systems:
  * u  = raw input Ultrasound frames (in x, y. Origin lower left.)
@@ -52,6 +57,9 @@ typedef boost::shared_ptr<class ThreadedTimedReconstructerStep2> ThreadedTimedRe
  * d  = Output Data space
  * \endverbatim
  *
+ * \author Ole Vegard Solberg
+ * \author Christian Askeland
+ * \date May 4, 2010
  */
 class ReconstructManager: public QObject
 {
@@ -62,24 +70,85 @@ public:
 	ReconstructManager(XmlOptionFile settings, QString shaderPath);
 	virtual ~ReconstructManager();
 
+	/**
+	  * Set input data for reconstruction
+	  */
 	void selectData(QString filename, QString calFilesPath = "");
+	/**
+	  * Set input data for reconstruction
+	  */
 	void selectData(ssc::USReconstructInputData data);
-	QString getSelectedData() const;
+	/**
+	  * Get the currently selected filename
+	  */
+	QString getSelectedFilename() const;
+	/**
+	  * Return the currently selected input data
+	  */
+	ssc::USReconstructInputData getSelectedFileData() { return mOriginalFileData; }
 
+	/**
+	  * Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
+	  */
 	ReconstructParamsPtr getParams();
-
+	/**
+	  * Return control parameters for the currently selected algorithm, adjustable like getParams()
+	  */
 	std::vector<DataAdapterPtr> getAlgoOptions();
-	ReconstructerPtr getReconstructer() { return mReconstructer; }
-	ssc::USReconstructInputData getBaseInputData() { return mOriginalFileData; }
-
+	/**
+	  * Return the settings xml file where parameters are stored
+	  */
+	XmlOptionFile getSettings() { return mSettings; }
+	/**
+	  * Return params controlling the output data. These are data-dependent.
+	  */
 	OutputVolumeParams getOutputVolumeParams() const;
+	/**
+	  * Control the output volume
+	  */
 	void setOutputVolumeParams(const OutputVolumeParams& par);
+	/**
+	  * Set location of output relative to base
+	  */
 	void setOutputRelativePath(QString path);
+	/**
+	  * Set base location of output
+	  */
 	void setOutputBasePath(QString path);
 
+	/** Execute the reconstruction in another thread.
+	  *
+	  * The returned cores can be used to retrieve output,
+	  * but this must be done AFTER the threads have completed.
+	  * In general, dont use the retval, it is for unit testing.
+	  */
+	std::vector<ReconstructCorePtr> startReconstruction();
+	/** Return the currently reconstructing thread object(s).
+	  */
 	std::set<cx::TimedAlgorithmPtr> getThreadedReconstruction() { return mThreadedReconstruction; }
 
-	void startReconstruction();
+	/**
+	  * Create the reconstruct preprocessor object.
+	  * This is usually created internally during reconstruction,
+	  * published for use in unit testing.
+	  */
+	ReconstructPreprocessorPtr createPreprocessor();
+	/**
+	  * Create the reconstruct core object.
+	  * This is usually created internally during reconstruction,
+	  * published for use in unit testing.
+	  */
+	std::vector<ReconstructCorePtr> createCores(); ///< create reconstruct cores matching the current parameters
+	/**
+	  * Create the reconstruct algorithm object.
+	  * This is usually created internally during reconstruction,
+	  * published for use in unit testing.
+	  */
+	ReconstructAlgorithmPtr createAlgorithm();
+
+private slots:
+	void setSettings();
+	void transferFunctionChangedSlot();
 
 signals:
 	void paramsChanged();
@@ -88,121 +157,34 @@ signals:
 	void reconstructAboutToStart();
 
 private:
-	ReconstructerPtr mReconstructer;
+	ReconstructParamsPtr mParams;
+	std::vector<DataAdapterPtr> mAlgoOptions;
 	std::set<cx::TimedAlgorithmPtr> mThreadedReconstruction;
-	cx::UsReconstructionFileReaderPtr mFileReader;
 	ssc::USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
-	QString mCalFilesPath; ///< Path to calibration files
+
+	OutputVolumeParams mOutputVolumeParams;
+	XmlOptionFile mSettings;
+	QString mOutputRelativePath;///< Relative path to the output image
+	QString mOutputBasePath;///< Global path where the relative path starts, for the output image
+	QString mShaderPath; ///< name of shader folder
 
 	void launch(cx::TimedAlgorithmPtr thread);
-	void readCoreFiles(QString fileName, QString calFilesPath);
 	void clearAll();
-	bool validInputData() const;
+	ReconstructCorePtr createCore(); ///< used for threaded reconstruction
+	ReconstructCorePtr createBModeCore(); ///< core version for B-mode in case of angio recording.
+
+	void initAlgorithm();
+	/** Use the mOriginalFileData structure to rebuild all internal data.
+	 *  Useful when settings have changed or data is loaded.
+	 */
+	void updateFromOriginalFileData();
+	ReconstructCore::InputParams createCoreParameters();
+
+	bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
 
 private slots:
 	void threadFinishedSlot();
 
-};
-
-/**
- * \brief Threading adapter for the reconstruction algorithm.
- *
- * Executes ReconstructCore functions:
- *  - threadedPreReconstruct() [main thread]
- *  - threadablePreReconstruct() [work thread]
- *  - threadedReconstruct() [work thread]
- *  - threadedPostReconstruct() [main thread]
- *
- * \date Jan 27, 2012
- * \author Christian Askeland, SINTEF
- */
-class ThreadedTimedReconstructer: public cx::ThreadedTimedAlgorithm<void>
-{
-Q_OBJECT
-public:
-	static ThreadedTimedReconstructerPtr create(ReconstructCorePtr reconstructer)
-	{
-		return ThreadedTimedReconstructerPtr(new ThreadedTimedReconstructer(reconstructer));
-	}
-	ThreadedTimedReconstructer(ReconstructCorePtr reconstructer);
-	virtual ~ThreadedTimedReconstructer();
-
-private slots:
-	virtual void preProcessingSlot();
-	virtual void postProcessingSlot();
-
-private:
-	virtual void calculate();
-	ReconstructCorePtr mReconstructer;
-};
-
-/**
- * \brief Threading adapter for the reconstruction algorithm.
- *
- * Must be run before ThreadedTimedReconstructerStep1.
- *
- * Executes ReconstructCore functions:
- *  - threadedPreReconstruct() [main thread]
- *  - threadablePreReconstruct() [work thread]
- *
- * \date Jan 27, 2012
- * \author Christian Askeland, SINTEF
- */
-class ThreadedTimedReconstructerStep1: public cx::ThreadedTimedAlgorithm<void>
-{
-Q_OBJECT
-public:
-	static ThreadedTimedReconstructerStep1Ptr create(ReconstructCorePtr reconstructer)
-	{
-		return ThreadedTimedReconstructerStep1Ptr(new ThreadedTimedReconstructerStep1(reconstructer));
-	}
-
-	ThreadedTimedReconstructerStep1(ReconstructCorePtr reconstructer);
-	virtual ~ThreadedTimedReconstructerStep1();
-
-//	void start();
-
-private slots:
-	virtual void preProcessingSlot();
-	virtual void postProcessingSlot();
-
-private:
-	virtual void calculate();
-	ReconstructCorePtr mReconstructer;
-};
-
-/**
- * \brief Threading adapter for the reconstruction algorithm.
- *
- * Must be run after ThreadedTimedReconstructerStep2.
- *
- * Executes ReconstructCore functions:
- *  - threadedReconstruct() [work thread]
- *  - threadedPostReconstruct() [main thread]
- *
- * \date Jan 27, 2012
- * \author Christian Askeland, SINTEF
- */
-class ThreadedTimedReconstructerStep2: public cx::ThreadedTimedAlgorithm<void>
-{
-Q_OBJECT
-public:
-	static ThreadedTimedReconstructerStep2Ptr create(ReconstructCorePtr reconstructer)
-	{
-		return ThreadedTimedReconstructerStep2Ptr(new ThreadedTimedReconstructerStep2(reconstructer));
-	}
-	ThreadedTimedReconstructerStep2(ReconstructCorePtr reconstructer);
-	virtual ~ThreadedTimedReconstructerStep2();
-
-//	void start();
-
-private slots:
-	virtual void preProcessingSlot();
-	virtual void postProcessingSlot();
-
-private:
-	virtual void calculate();
-	ReconstructCorePtr mReconstructer;
 };
 
 
