@@ -22,6 +22,7 @@ int DummyTool::mTransformCount = 0;
 
 
 DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
+    mPositionHistory(new ssc::TimedTransformMap()),
 	mVisible(false),
 	m_prMt(Transform3D::Identity()),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
@@ -58,6 +59,15 @@ void DummyTool::setToolPositionMovementBB(const DoubleBoundingBox3D& bb)
 std::vector<Transform3D> DummyTool::getToolPositionMovement()
 {
 	return mTransforms;
+}
+
+ssc::TimedTransformMap DummyTool::getSessionHistory(double startTime, double stopTime)
+{
+	ssc::TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
+	ssc::TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
+
+	ssc::TimedTransformMap retval(startIt, stopIt);
+	return retval;
 }
 
 /**Use this to override the default movement pattern in the tool.
@@ -319,10 +329,12 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 
 	m_prMt = prMt;
 
-	// use ms since Epoch (AD1970)
-	QDateTime time = QDateTime::currentDateTime();
-	boost::uint64_t ts = (boost::uint64_t)(time.toTime_t())*1000 + time.time().msec();
-	double timestamp = static_cast<double>(ts);
+//	// use ms since Epoch (AD1970)
+//	QDateTime time = QDateTime::currentDateTime();
+//	boost::uint64_t ts = (boost::uint64_t)(time.toTime_t())*1000 + time.time().msec();
+//	double timestamp = static_cast<double>(ts);
+	double timestamp = this->getTimestamp();
+	(*mPositionHistory)[timestamp] = m_prMt;
 
 	//check:
 //	std::cout << "check: " << time.toString("yyyyMMdd'T'hhmmss:zzz").toStdString() << std::endl;

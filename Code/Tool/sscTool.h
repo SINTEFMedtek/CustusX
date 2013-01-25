@@ -71,6 +71,7 @@ public:
 	virtual void setTemporalCalibration(double val) = 0;
 	virtual void setSoundSpeedCompensationFactor(double val) = 0;
 	virtual void setData(ssc::ProbeData probeSector, QString configUid="") = 0;
+	virtual void setRTSource(ssc::VideoSourcePtr source) = 0;
 
 signals:
 	void sectorChanged();
