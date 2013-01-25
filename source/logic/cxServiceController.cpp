@@ -116,12 +116,9 @@ void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
 
 	if (probe)
 	{
-		ProbePtr probeInterface = boost::shared_dynamic_cast<Probe>(probe->getProbe());
+		ssc::ProbePtr probeInterface = probe->getProbe();
 		if (!probeInterface)
-		{
-//			ssc::messageManager()->sendError("Probe not a cx instance.");
 			return;
-		}
 		probeInterface->setRTSource(source);
 	}
 }
