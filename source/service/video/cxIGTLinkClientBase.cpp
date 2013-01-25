@@ -23,7 +23,6 @@ namespace cx
 IGTLinkClientBase::IGTLinkClientBase(QObject* parent) :
 		QThread(parent)
 {
-	calibrateMsgTimeStamp = true;
 	mGeneratingTimeCalibration = false;
 	mLastReferenceTimestampDiff = 0.0;
 	mLastTimeStamps.reserve(20);
@@ -46,12 +45,8 @@ IGTLinkClientBase::IGTLinkClientBase(QObject* parent) :
 //	this->quit();
 //}
 
-
-/** add the message to a thread-safe queue
- */
 void IGTLinkClientBase::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
 {
-
 	mFPSTimer.beginRender();
 	mFPSTimer.endRender();
 	if (mFPSTimer.intervalPassed())
@@ -60,7 +55,21 @@ void IGTLinkClientBase::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
 		mFPSTimer.reset(2000);
 	}
 
-	//Needed time stamp fix?
+	//Test if Sonix. Then calibrate time stamps
+	//May need to test for other sources in the future.
+	//E.g. if we want to use timestamps from other scanners, like GE
+	bool calibrateMsgTimeStamp = false;
+	if(QString(imgMsg->GetDeviceName()).contains("Sonix", Qt::CaseInsensitive))
+	{
+		calibrateMsgTimeStamp = true;
+//		ssc::messageManager()->sendInfo("Calibrate time stamps");
+	} else {
+//		ssc::messageManager()->sendInfo("No time stamp calibration performed");
+	}
+
+	//Calibrate time stamp if needed.
+	//Should only be needed if time stamp is set on another computer that is
+	//not synched with the one running this code: e.g. The Ultrasonix scanner
 	if (calibrateMsgTimeStamp)
 		calibrateTimeStamp(imgMsg);
 
