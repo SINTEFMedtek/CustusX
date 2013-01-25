@@ -31,6 +31,7 @@ USAcquisition::USAcquisition(AcquisitionDataPtr pluginData, QObject* parent) : Q
 	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
 
+	this->dominantToolChangedSlot();
 	this->probeChangedSlot();
 	this->checkIfReadySlot();
 	this->connectToPureVideo();
