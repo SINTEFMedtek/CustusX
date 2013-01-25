@@ -77,7 +77,6 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::T
 	ssc::USReconstructInputData retval;
 
 	retval.mFilename = this->getMhdFilename(mFolderName);
-	std::cout << "UsReconstructionFileMaker::getReconstructData " << std::endl;
 	retval.mUsRaw = ssc::USFrameData::create(retval.mFilename, mVideoRecorder->getImageData());
 
 
