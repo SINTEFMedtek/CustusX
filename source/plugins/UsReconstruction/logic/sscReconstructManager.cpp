@@ -287,13 +287,19 @@ std::vector<ReconstructCorePtr> ReconstructManager::createCores()
 	// create both
 	if (mParams->mCreateBModeWhenAngio->getValue() && mParams->mAngioAdapter->getValue())
 	{
-		retval.push_back(this->createBModeCore());
-		retval.push_back(this->createCore());
+		ReconstructCorePtr core = this->createBModeCore();
+		if (core)
+			retval.push_back(core);
+		core = this->createCore();
+		if (core)
+			retval.push_back(core);
 	}
 	// only one thread
 	else
 	{
-		retval.push_back(this->createCore());
+		ReconstructCorePtr core = this->createCore();
+		if (core)
+			retval.push_back(core);
 	}
 
 	return retval;
