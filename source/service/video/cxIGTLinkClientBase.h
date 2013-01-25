@@ -83,6 +83,12 @@ signals:
 
 protected:
 	cx::CyclicActionTimer mFPSTimer;
+	/** Add the message to a thread-safe queue.
+	 * Tests if the time stamps of image messages should be calibrated based on the computer clock.
+	 * Time stamps only need to be synched if set on another computer that is
+	 * not synched, e.g. the Ultrasonix scanner
+	 * \param[in] imgMsg Incoming image message
+	 */
 	void addImageToQueue(IGTLinkImageMessage::Pointer imgMsg);
 	void addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg);
 	void calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg);
@@ -93,7 +99,6 @@ private:
 	std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue;
 	std::list<IGTLinkUSStatusMessage::Pointer> mMutexedSonixStatusMessageQueue;
 
-	bool calibrateMsgTimeStamp;///< Should the time stamps of image messages be calibrated based on the computer clock
 	double mLastReferenceTimestampDiff;
 	bool mGeneratingTimeCalibration;
 	QDateTime mLastSyncTime;
