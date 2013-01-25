@@ -102,6 +102,11 @@ public:
 	ssc::USReconstructInputData readAllFiles(QString fileName, QString calFilesPath = "");
 
 	std::vector<ssc::TimedPosition> readFrameTimestamps(QString fileName);
+	/**
+	  * Read probe data from the probedata config file attached to the mhd file,
+	  * named <mhdfilename-base>.probedata.xml
+	  */
+	static std::pair<QString, ssc::ProbeData>  readProbeDataFromFile(QString mhdFileName);
 
 private:
 	std::vector<ssc::TimedPosition> readPositions(QString fileName);
@@ -112,7 +117,6 @@ private:
 	void readTimeStampsFile(QString fileName, std::vector<ssc::TimedPosition>* timedPos);
 	void readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName);
 	ProbeXmlConfigParser::Configuration readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath);
-	std::pair<QString, ssc::ProbeData>  readProbeDataFromFile(QString mhdFileName);
 	std::pair<QString, ssc::ProbeData>  readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath);
 
 	ssc::ImagePtr createMaskFromConfigParams(ssc::USReconstructInputData data);

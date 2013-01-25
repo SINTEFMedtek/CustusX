@@ -34,6 +34,9 @@ private slots:
 
 private:
   ssc::ReconstructManagerPtr createReconstructionManager();
+  void verifyFileData(ssc::USReconstructInputData data);
+
+  double mRecordDuration; ///< duration of recording in ms.
   ssc::VideoSourcePtr mVideoSource;
   cx::AcquisitionDataPtr mAcquisitionData;
   cx::USAcquisitionPtr mAcquisition;

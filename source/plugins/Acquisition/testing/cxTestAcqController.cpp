@@ -29,6 +29,7 @@
 #include "cxVideoConnection.h"
 #include "sscReconstructManager.h"
 #include "sscTime.h"
+#include <cppunit/extensions/HelperMacros.h>
 
 TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
 {
@@ -39,6 +40,7 @@ TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
 
 ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
 {
+	mRecordDuration = 3000;
 	//	std::cout << "testAngioReconstruction running" << std::endl;
 	ssc::XmlOptionFile settings;
 	ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(settings,""));
@@ -55,13 +57,27 @@ void TestAcqController::initialize()
 			"/testing/"
 			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
 
-
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
 
+	std::cout << "TestAcqController::initialize() init video" << std::endl;
 	cx::videoService()->getIGTLinkVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1").arg(filename));
 	mVideoSource = cx::videoService()->getIGTLinkVideoConnection()->getVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 	cx::videoService()->getIGTLinkVideoConnection()->launchAndConnectServer();
+
+	std::cout << "TestAcqController::initialize() init tool" << std::endl;
+	ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
+	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(ssc::DoubleBoundingBox3D(0,0,0,10,10,10)));
+	std::pair<QString, ssc::ProbeData> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(filename);
+	dummyTool->setProbeSector(probedata.second);
+	// TODO should be auto, but doesnt, might because tooman is not initialized
+	dummyTool->getProbe()->setRTSource(mVideoSource);
+	CPPUNIT_ASSERT(dummyTool->getProbe());
+//	CPPUNIT_ASSERT(dummyTool->getProbe()->isValid());
+	dummyTool->setVisible(true);
+	// TODO: refactor toolmanager to be runnable in dummy mode (playback might benefit from this too)
+	cx::ToolManager::getInstance()->runDummyTool(dummyTool);
+	CPPUNIT_ASSERT(dummyTool->getProbe()->getRTSource());
 
 	mAcquisitionData.reset(new cx::AcquisitionData(this->createReconstructionManager()));
 
@@ -79,7 +95,7 @@ void TestAcqController::start()
 
 	mAcquisition->startRecord(mRecordSession->getUid());
 
-	QTimer::singleShot(3000, this, SLOT(stop()));
+	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 
 void TestAcqController::stop()
@@ -116,12 +132,44 @@ void TestAcqController::saveDataCompletedSlot(QString path)
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
 	ssc::USReconstructInputData fileData = fileReader->readAllFiles(filename, "calFilesPath""");
 	std::cout << "resulting file content:" << std::endl;
+	this->verifyFileData(fileData);
+}
+
+void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
+{
+	CPPUNIT_ASSERT(!fileData.mFilename.isEmpty());
+	// check for enough received image frames
+	int framesPerSecond = 20; // minimum frame rate
+	CPPUNIT_ASSERT(fileData.mFrames.size() > framesPerSecond*mRecordDuration/1000);
+	// check for duration equal to input duration
+	double frame_time_ms = fileData.mFrames.back().mTime - fileData.mFrames.front().mTime;
+	CPPUNIT_ASSERT(ssc::similar(frame_time_ms, mRecordDuration, 0.05*mRecordDuration));
+
+	int positionsPerSecond = 10; // minimum tracker pos rate
+	CPPUNIT_ASSERT(fileData.mPositions.size() > framesPerSecond*mRecordDuration/1000);
+	// check for duration equal to input duration
+	double pos_time_ms = fileData.mPositions.back().mTime - fileData.mPositions.front().mTime;
+	CPPUNIT_ASSERT(ssc::similar(pos_time_ms, mRecordDuration, 0.05*mRecordDuration));
+
 	std::cout << "filename: " << fileData.mFilename << std::endl;
 	std::cout << "frame count " << fileData.mFrames.size() << std::endl;
 	if (!fileData.mFrames.empty())
 		std::cout << "time: " << fileData.mFrames.back().mTime - fileData.mFrames.front().mTime << std::endl;
 
+	CPPUNIT_ASSERT(fileData.mProbeData.mData.getType()!=ssc::ProbeData::tNONE);
+
+	// check content of images
+	cx::ImageDataContainerPtr images = fileData.mUsRaw->getImageContainer();
+	CPPUNIT_ASSERT(images->size() == fileData.mFrames.size());
+	for (unsigned i=0; i<images->size(); ++i)
+	{
+		CPPUNIT_ASSERT(images->get(i));
+		Eigen::Array3i dim(images->get(i)->GetDimensions());
+		CPPUNIT_ASSERT(dim[0]==fileData.mProbeData.mData.getImage().mSize.width());
+		CPPUNIT_ASSERT(dim[1]==fileData.mProbeData.mData.getImage().mSize.height());
+	}
 }
+
 
 void TestAcqController::acquisitionDataReadySlot()
 {
@@ -130,28 +178,6 @@ void TestAcqController::acquisitionDataReadySlot()
 	// read data and print info - this if the result of the memory pathway
 	ssc::USReconstructInputData fileData = mAcquisitionData->getReconstructer()->getSelectedFileData();
 	std::cout << "resulting memory content:" << std::endl;
-	std::cout << "filename: " << fileData.mFilename << std::endl;
-	std::cout << "frame count " << fileData.mFrames.size() << std::endl;
-	if (!fileData.mFrames.empty())
-		std::cout << "time: " << fileData.mFrames.back().mTime - fileData.mFrames.front().mTime << std::endl;
+	this->verifyFileData(fileData);
 }
 
-
-//void TestAcqController::loadPatientSlot()
-//{
-//  cx::patientService()->getPatientData()->loadPatient(mPatientFolder);
-//  cx::stateService()->getWorkflow()->setActiveState("NavigationUid");
-//  mMainWindow->setGeometry( 10, 10, 1200, 800);
-
-//  if (!ssc::DataManager::getInstance()->getImages().size())
-//    return;
-
-//  ssc::ImagePtr image = ssc::DataManager::getInstance()->getImages().begin()->second;
-//  ssc::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
-
-//  ssc::DataManager::getInstance()->setCenter(bb_r.center());
-
-//  ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
-//  dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
-//  cx::ToolManager::getInstance()->runDummyTool(dummyTool);
-//}
