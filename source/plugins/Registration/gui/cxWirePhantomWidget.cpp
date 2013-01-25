@@ -281,7 +281,7 @@ void WirePhantomWidget::showDataMetrics(ssc::Vector3D cross_r)
     p1->setSpace(ssc::SpaceHelpers::getD(mManager->getFixedData()));
     p1->setCoordinate(cross_r);
     ssc::dataManager()->loadData(p1);
-    this->showData(p1);
+    //this->showData(p1);
 
     ssc::PointMetricPtr p2 = boost::shared_dynamic_cast<ssc::PointMetric>(ssc::dataManager()->getData("cross_us"));
     if (!p2)
@@ -290,7 +290,7 @@ void WirePhantomWidget::showDataMetrics(ssc::Vector3D cross_r)
     p2->setSpace(ssc::SpaceHelpers::getD(mManager->getMovingData()));
     p2->setCoordinate(cross_us);
     ssc::dataManager()->loadData(p2);
-    this->showData(p2);
+    //this->showData(p2);
 
     ssc::DistanceMetricPtr d0 = boost::shared_dynamic_cast<ssc::DistanceMetric>(ssc::dataManager()->getData("accuracy"));
     if (!d0)
