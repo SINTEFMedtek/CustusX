@@ -17,6 +17,8 @@
 #include "cxPatientService.h"
 #include "cxVideoService.h"
 #include "sscReconstructManager.h"
+#include "cxDataLocations.h"
+#include "sscTime.h"
 
 namespace cx
 {
@@ -188,13 +190,28 @@ void USAcquisition::saveSession(QString sessionId, bool writeColor)
 	mCurrentSessionFileMaker->setData(trackerRecordedData, mVideoRecorder,
                                       probe, calibFileName,
                                       writeColor);
+	mCurrentSessionFileMaker->setDeleteFilesOnRelease(true);
+
+	///TODO this forces write of images to disk, but also writes other crap we dont need.
+	//mCurrentSessionFileMaker->write();
+	// Use instead of filemaker->write(), this writes only images, other stuff kept in memory.
+	mVideoRecorder->completeSave();
 	mVideoRecorder.reset();
 
 	ssc::USReconstructInputData reconstructData = mCurrentSessionFileMaker->getReconstructData();
 	mPluginData->getReconstructer()->selectData(reconstructData);
 	emit acquisitionDataReady();
 
-	QFuture<QString> fileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mCurrentSessionFileMaker));
+	// now start saving of data to the patient folder, compressed version:
+//	mCurrentSessionFileMaker->redirectSaveLocation(patientService()->getPatientData()->getActivePatientFolder());
+//	mCurrentSessionFileMaker->setImageCompression(settings()->value("Ultrasound/CompressAcquisition", true).toBool());
+	QFuture<QString> fileMakerFuture =
+	        QtConcurrent::run(boost::bind(
+	                              &UsReconstructionFileMaker::writeToNewFolder,
+	                              mCurrentSessionFileMaker,
+	                              patientService()->getPatientData()->getActivePatientFolder(),
+	                              settings()->value("Ultrasound/CompressAcquisition", true).toBool()
+	                              ));
 	QFutureWatcher<QString>* fileMakerFutureWatcher = new QFutureWatcher<QString>();
 	fileMakerFutureWatcher->setFuture(fileMakerFuture);
 	connect(fileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
@@ -235,9 +252,13 @@ void USAcquisition::startRecord(QString sessionId)
 {
 	RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
 
+//	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(
+//	                                   session->getDescription(),
+//	                                   patientService()->getPatientData()->getActivePatientFolder()));
+	QString tempFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
 	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(
 	                                   session->getDescription(),
-	                                   patientService()->getPatientData()->getActivePatientFolder()));
+	                                   tempFolder));
 
 	mPluginData->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
 	bool writeColor = mPluginData->getReconstructer()->getParams()->mAngioAdapter->getValue()
@@ -247,7 +268,7 @@ void USAcquisition::startRecord(QString sessionId)
 	                         mRTSource,
 	                         mCurrentSessionFileMaker->getFolderName(),
 	                         mCurrentSessionFileMaker->getSessionName(),
-	                         settings()->value("Ultrasound/CompressAcquisition", true).toBool(),
+	                         false, // no compression when saving to cache
 	                         writeColor));
 	mVideoRecorder->startRecord();
 

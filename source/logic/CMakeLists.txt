@@ -20,11 +20,13 @@ include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    ${CustusX3_SOURCE_DIR}/source/resource/settings
 
     ${CustusX3_SOURCE_DIR}/source/service/patient     
     ${CustusX3_SOURCE_DIR}/source/service/tracking     
     ${CustusX3_SOURCE_DIR}/source/service/visualization
     ${CustusX3_SOURCE_DIR}/source/service/video
+    ${CustusX3_SOURCE_DIR}/source/service/state
     )
 
 
@@ -38,6 +40,7 @@ target_link_libraries(cxLogicManager
     cxTrackingService
     cxVisualizationService
     cxVideoService
+	cxStateService
     )
 
 
