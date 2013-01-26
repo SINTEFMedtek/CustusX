@@ -23,6 +23,7 @@
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxPatientService.h"
+#include "cxLogicManager.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
@@ -38,7 +39,7 @@ void CustusXController::start()
 //  qApp->setWindowIcon(QIcon(":/icons/CustusX.png"));
 //  qApp->setWindowIcon(QIcon(":/icons/.png"));
 
-  cx::MainWindow::initialize();
+  cx::LogicManager::initialize();
 
   mMainWindow = new cx::MainWindow(std::vector<cx::PluginBasePtr>());
   mMainWindow->show();
@@ -54,7 +55,7 @@ void CustusXController::start()
 void CustusXController::stop()
 {
   delete mMainWindow;
-  cx::MainWindow::shutdown(); // shutdown all global resources, _after_ gui is deleted.
+  cx::LogicManager::shutdown(); // shutdown all global resources, _after_ gui is deleted.
 }
 
 void CustusXController::loadPatientSlot()

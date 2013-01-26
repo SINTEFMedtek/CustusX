@@ -94,7 +94,7 @@ public:
 		mUsed.clear();
 	}
 private:
-	QWidget* mCentralWidget; ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
+	QWidget* mCentralWidget;
 	int mNameGenerator;
 	QString mTypeText;
 	std::vector<VIEW_TYPE*> mCached;
