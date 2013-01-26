@@ -23,9 +23,9 @@ typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 namespace cx
 {
 
-CachedImageData::CachedImageData(QString filename, vtkImageDataPtr image, bool existsOnDisk)
+CachedImageData::CachedImageData(QString filename, vtkImageDataPtr image)
 {
-	mExistsOnDisk = existsOnDisk;
+//	mExistsOnDisk = existsOnDisk;
 	mFilename = filename;
 	mImageData = image;
 }
@@ -45,23 +45,23 @@ vtkImageDataPtr CachedImageData::getImage()
 	return mImageData;
 }
 
-void CachedImageData::setExistsOnDisk(bool on)
-{
-//	std::cout << "CachedImageData::setExistsOnDisk " << mFilename << " " << on << std::endl;
-	mExistsOnDisk = on;
-}
+//void CachedImageData::setExistsOnDisk(bool on)
+//{
+////	std::cout << "CachedImageData::setExistsOnDisk " << mFilename << " " << on << std::endl;
+//	mExistsOnDisk = on;
+//}
 
 bool CachedImageData::purge()
 {
 //	std::cout << "CachedImageData::purge " << QFileInfo(mFilename).fileName() << " " << mExistsOnDisk << std::endl;
 
-	if (mExistsOnDisk)
-	{
+//	if (mExistsOnDisk)
+//	{
 		mImageData = vtkImageDataPtr();
 		return true;
-	}
+//	}
 
-	return false;
+//	return false;
 }
 
 ///--------------------------------------------------------

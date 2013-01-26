@@ -19,6 +19,7 @@
 #include "cxRegistrationPlugin.h"
 
 #include "sscTypeConversions.h"
+#include "cxLogicManager.h"
 
 #ifdef WIN32
 int WinMain(int argc, char *argv[])
@@ -35,7 +36,7 @@ int main(int argc, char *argv[])
   app.setWindowIcon(QIcon(":/icons/CustusX.png"));
   app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
-  cx::MainWindow::initialize();
+  cx::LogicManager::initialize();
 
 	std::vector<cx::PluginBasePtr> plugins;
 
@@ -62,7 +63,7 @@ int main(int argc, char *argv[])
 
   plugins.clear();
   delete mainWin;
-  cx::MainWindow::shutdown(); // shutdown all global resources, _after_ gui is deleted.
+  cx::LogicManager::shutdown(); // shutdown all global resources, _after_ gui is deleted.
   return retVal;
   
 }

@@ -74,6 +74,8 @@ SET ( cxResource_SOURCE
 	utilities/cxSavingVideoRecorder.cpp
 	utilities/cxImageDataContainer.h
 	utilities/cxImageDataContainer.cpp
+	utilities/cxFileHelpers.h
+	utilities/cxFileHelpers.cpp
 )
 
 include_directories(

@@ -57,12 +57,31 @@ public:
   UsReconstructionFileMaker(QString sessionDescription, QString activepatientPath);
   ~UsReconstructionFileMaker();
 
+  /**
+	* If set, image files in created by this object will be deleted when
+	* object goes out of scope
+	*/
+  void setDeleteFilesOnRelease(bool on);
   void setData(ssc::TimedTransformMap trackerRecordedData, SavingVideoRecorderPtr videoRecorder,
   		ssc::ToolPtr tool, QString calibFilename, bool writeColor = false);
   ssc::USReconstructInputData getReconstructData();
+  /** Write data to disk. Assume videoRecorder handles the saving of the frames
+	*/
   QString write();
   QString getMhdFilename(QString reconstructionFolder);
 
+  /** Change write location, enabling writeRedirected() to be called threaded.
+	* TODO: not necessary????
+	*/
+  void redirectSaveLocation(QString newFolder);
+  /** Set compression on/off for the case where this class and not the SavingVideoRecorder saves images.
+	*/
+  void setImageCompression(bool on);
+  /** Write data to disk. Assume videoRecorder has saved images in another location, reuse filenames from
+	* that object to rewrite into new location.
+	*
+	*/
+  QString writeToNewFolder(QString activepatientPath, bool compression);
 
   QString getFolderName() const { return mFolderName; }
   QString getSessionName() const { return mSessionDescription; }
@@ -70,11 +89,13 @@ public:
 
 private:
   QString write(ssc::USReconstructInputData data);
+  QString write(QString newBaseFolder);
 //  bool writeUSImages2(QString reconstructionFolder, ssc::USFrameDataPtr data, QString filename);
   bool writeUSTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
   bool writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
   bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
   void writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid);
+  void writeUSImages(QString path, std::vector<QString> images, bool compression);
 
   QString findFolderName(QString patientFolder, QString sessionDescription);
   bool findNewSubfolder(QString subfolderAbsolutePath);
@@ -98,6 +119,7 @@ private:
   QStringList mReport;
 	QString mFolderName;
 	SavingVideoRecorderPtr mVideoRecorder;
+	bool mDeleteFilesOnRelease;
 };
 
 typedef boost::shared_ptr<UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
