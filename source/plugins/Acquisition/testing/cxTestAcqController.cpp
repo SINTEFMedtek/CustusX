@@ -33,9 +33,6 @@
 
 TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
 {
-//  mTestData += "Test Results:\n";
-//  mMainWindow = NULL;
-//  mBaseTime = 1000;
 }
 
 ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
@@ -103,8 +100,6 @@ void TestAcqController::stop()
     mRecordSession->setStopTime(ssc::getMilliSecondsSinceEpoch());
 	mAcquisition->stopRecord(false);
 	mAcquisition->saveSession(mRecordSession->getUid(), true);
-//  delete mMainWindow;
-//  cx::MainWindow::shutdown(); // shutdown all global resources, _after_ gui is deleted.
 }
 
 void TestAcqController::newFrameSlot()
@@ -116,12 +111,12 @@ void TestAcqController::newFrameSlot()
 
 void TestAcqController::setReady(bool ok, QString text)
 {
-	std::cout << QString("Ready %1:\n %2").arg(ok).arg(text) << std::endl;
+	std::cout << QString("Acquisition Ready Status %1: %2").arg(ok).arg(text) << std::endl;
 }
 
 void TestAcqController::saveDataCompletedSlot(QString path)
 {
-	std::cout << "TestAcqController::saveDataCompletedSlot() " << path << std::endl;
+//	std::cout << "TestAcqController::saveDataCompletedSlot() " << path << std::endl;
 	QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
 	// convert path to path + file - needed by reader
@@ -131,7 +126,7 @@ void TestAcqController::saveDataCompletedSlot(QString path)
 	// read file and print info - this is the result of the file pathway
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
 	ssc::USReconstructInputData fileData = fileReader->readAllFiles(filename, "calFilesPath""");
-	std::cout << "resulting file content:" << std::endl;
+	std::cout << " ** Resulting ssc::USReconstructInputData file content:" << std::endl;
 	this->verifyFileData(fileData);
 }
 
@@ -151,10 +146,10 @@ void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 	double pos_time_ms = fileData.mPositions.back().mTime - fileData.mPositions.front().mTime;
 	CPPUNIT_ASSERT(ssc::similar(pos_time_ms, mRecordDuration, 0.05*mRecordDuration));
 
-	std::cout << "filename: " << fileData.mFilename << std::endl;
-	std::cout << "frame count " << fileData.mFrames.size() << std::endl;
+	std::cout << "\tfilename: " << fileData.mFilename << std::endl;
+	std::cout << "\tframe count " << fileData.mFrames.size() << std::endl;
 	if (!fileData.mFrames.empty())
-		std::cout << "time: " << fileData.mFrames.back().mTime - fileData.mFrames.front().mTime << std::endl;
+		std::cout << "\ttime: " << fileData.mFrames.back().mTime - fileData.mFrames.front().mTime << std::endl;
 
 	CPPUNIT_ASSERT(fileData.mProbeData.mData.getType()!=ssc::ProbeData::tNONE);
 
@@ -173,11 +168,11 @@ void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 
 void TestAcqController::acquisitionDataReadySlot()
 {
-	std::cout << "TestAcqController::acquisitionDataReadySlot() " << std::endl;
+//	std::cout << "TestAcqController::acquisitionDataReadySlot() " << std::endl;
 
 	// read data and print info - this if the result of the memory pathway
 	ssc::USReconstructInputData fileData = mAcquisitionData->getReconstructer()->getSelectedFileData();
-	std::cout << "resulting memory content:" << std::endl;
+	std::cout << " ** Resulting ssc::USReconstructInputData memory content:" << std::endl;
 	this->verifyFileData(fileData);
 }
 
