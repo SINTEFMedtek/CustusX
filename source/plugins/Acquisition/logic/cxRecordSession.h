@@ -52,22 +52,22 @@ protected:
 
 typedef boost::shared_ptr<RecordSession> RecordSessionPtr;
 
-/**
- * USAcqRecordSession
- *
- * \brief
- *
- * \date Dec 8, 2010
- * \author Janne Beate Bakeng
- */
-class USAcqRecordSession : public RecordSession
-{
-	USAcqRecordSession(QString uid, double startTime, double stopTime, QString description);
-	virtual ~USAcqRecordSession();
+///**
+// * USAcqRecordSession
+// *
+// * \brief
+// *
+// * \date Dec 8, 2010
+// * \author Janne Beate Bakeng
+// */
+//class USAcqRecordSession : public RecordSession
+//{
+//	USAcqRecordSession(QString uid, double startTime, double stopTime, QString description);
+//	virtual ~USAcqRecordSession();
 
-private:
+//private:
 
-};
+//};
 
 /**
  * @}
