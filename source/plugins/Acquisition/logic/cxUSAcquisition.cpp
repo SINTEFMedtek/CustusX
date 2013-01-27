@@ -203,8 +203,6 @@ void USAcquisition::saveSession(QString sessionId, bool writeColor)
 	emit acquisitionDataReady();
 
 	// now start saving of data to the patient folder, compressed version:
-//	mCurrentSessionFileMaker->redirectSaveLocation(patientService()->getPatientData()->getActivePatientFolder());
-//	mCurrentSessionFileMaker->setImageCompression(settings()->value("Ultrasound/CompressAcquisition", true).toBool());
 	QFuture<QString> fileMakerFuture =
 	        QtConcurrent::run(boost::bind(
 	                              &UsReconstructionFileMaker::writeToNewFolder,
@@ -252,9 +250,6 @@ void USAcquisition::startRecord(QString sessionId)
 {
 	RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
 
-//	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(
-//	                                   session->getDescription(),
-//	                                   patientService()->getPatientData()->getActivePatientFolder()));
 	QString tempFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
 	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(
 	                                   session->getDescription(),

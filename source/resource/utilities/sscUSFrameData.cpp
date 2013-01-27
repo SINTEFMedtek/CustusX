@@ -165,17 +165,6 @@ USFrameDataPtr USFrameData::create(QString filename, std::vector<QString> frames
 	return retval;
 }
 
-//USFrameDataPtr USFrameData::create(QString filename, std::vector<cx::CachedImageDataPtr> frames)
-//{
-//	USFrameDataPtr retval(new USFrameData());
-//	retval->mFilename = filename;
-//	retval->mImageContainer.reset(new cx::CachedImageDataContainer(frames));
-//	retval->initialize();
-//	std:cout << "USFrameData::create() " << retval->mImageContainer->size() << ", " << retval->mReducedToFull.size() << std::endl;
-
-//	return retval;
-//}
-
 USFrameData::USFrameData() :
 		mCropbox(0,0,0,0,0,0), mPurgeInput(true)
 {
