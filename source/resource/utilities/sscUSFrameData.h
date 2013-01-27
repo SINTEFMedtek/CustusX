@@ -107,7 +107,6 @@ class USFrameData
 public:
 	static USFrameDataPtr create(ImagePtr inputFrameData);
 	static USFrameDataPtr create(QString inputFilename);
-//	static USFrameDataPtr create(QString filename, std::vector<cx::CachedImageDataPtr> frames);
 	static USFrameDataPtr create(QString filename, std::vector<QString> frames);
 	~USFrameData();
 

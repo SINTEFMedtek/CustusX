@@ -48,6 +48,34 @@ ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
 	return reconstructer;
 }
 
+void TestAcqController::setupVideo(QString framesFile)
+{
+	std::cout << "TestAcqController::initialize() init video" << std::endl;
+	cx::videoService()->getIGTLinkVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1").arg(framesFile));
+	mVideoSource = cx::videoService()->getIGTLinkVideoConnection()->getVideoSource();
+	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
+	cx::videoService()->getIGTLinkVideoConnection()->launchAndConnectServer();
+}
+
+void TestAcqController::setupProbe(QString probedefinition)
+{
+	std::cout << "TestAcqController::initialize() init tool" << std::endl;
+	ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
+	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(ssc::DoubleBoundingBox3D(0,0,0,10,10,10)));
+	std::pair<QString, ssc::ProbeData> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(probedefinition);
+	dummyTool->setProbeSector(probedata.second);
+	// TODO should be auto, but doesnt, might because tooman is not initialized
+	dummyTool->getProbe()->setRTSource(mVideoSource);
+	CPPUNIT_ASSERT(dummyTool->getProbe());
+	CPPUNIT_ASSERT(dummyTool->getProbe()->isValid());
+	dummyTool->setVisible(true);
+	// TODO: refactor toolmanager to be runnable in dummy mode (playback might benefit from this too)
+	cx::ToolManager::getInstance()->runDummyTool(dummyTool);
+	CPPUNIT_ASSERT(dummyTool->getProbe()->getRTSource());
+}
+
+
+
 void TestAcqController::initialize()
 {
 	QString filename = cx::DataLocations::getTestDataPath() +
@@ -56,25 +84,8 @@ void TestAcqController::initialize()
 
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
 
-	std::cout << "TestAcqController::initialize() init video" << std::endl;
-	cx::videoService()->getIGTLinkVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1").arg(filename));
-	mVideoSource = cx::videoService()->getIGTLinkVideoConnection()->getVideoSource();
-	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
-	cx::videoService()->getIGTLinkVideoConnection()->launchAndConnectServer();
-
-	std::cout << "TestAcqController::initialize() init tool" << std::endl;
-	ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
-	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(ssc::DoubleBoundingBox3D(0,0,0,10,10,10)));
-	std::pair<QString, ssc::ProbeData> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(filename);
-	dummyTool->setProbeSector(probedata.second);
-	// TODO should be auto, but doesnt, might because tooman is not initialized
-	dummyTool->getProbe()->setRTSource(mVideoSource);
-	CPPUNIT_ASSERT(dummyTool->getProbe());
-//	CPPUNIT_ASSERT(dummyTool->getProbe()->isValid());
-	dummyTool->setVisible(true);
-	// TODO: refactor toolmanager to be runnable in dummy mode (playback might benefit from this too)
-	cx::ToolManager::getInstance()->runDummyTool(dummyTool);
-	CPPUNIT_ASSERT(dummyTool->getProbe()->getRTSource());
+	this->setupVideo(filename);
+	this->setupProbe(filename);
 
 	mAcquisitionData.reset(new cx::AcquisitionData(this->createReconstructionManager()));
 
