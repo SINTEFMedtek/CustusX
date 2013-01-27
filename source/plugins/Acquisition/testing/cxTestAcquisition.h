@@ -15,6 +15,9 @@ public:
 	void tearDown();
 
 	void testConstructor();///< Test constructor
+	/** Run a full acquisition from MHD source direct link.
+	  * Save data and evaluate results.
+	  */
 	void testStoreMHDSource();
 
 public:

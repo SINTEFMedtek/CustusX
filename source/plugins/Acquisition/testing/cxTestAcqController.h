@@ -17,30 +17,32 @@
  */
 class TestAcqController : public QObject
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  TestAcqController(QObject* parent);
-  void initialize();
+	TestAcqController(QObject* parent);
+	void initialize();
 
 private slots:
-  void newFrameSlot();
-  void start();
-  void stop();
+	void newFrameSlot();
+	void start();
+	void stop();
 
-  void setReady(bool ok, QString text);
-  void saveDataCompletedSlot(QString name);
-  void acquisitionDataReadySlot();
+	void setReady(bool ok, QString text);
+	void saveDataCompletedSlot(QString name);
+	void acquisitionDataReadySlot();
 
 private:
-  ssc::ReconstructManagerPtr createReconstructionManager();
-  void verifyFileData(ssc::USReconstructInputData data);
+	ssc::ReconstructManagerPtr createReconstructionManager();
+	void verifyFileData(ssc::USReconstructInputData data);
+	void setupVideo(QString framesFile);
+	void setupProbe(QString probedefinition);
 
-  double mRecordDuration; ///< duration of recording in ms.
-  ssc::VideoSourcePtr mVideoSource;
-  cx::AcquisitionDataPtr mAcquisitionData;
-  cx::USAcquisitionPtr mAcquisition;
-  cx::RecordSessionPtr mRecordSession;
+	double mRecordDuration; ///< duration of recording in ms.
+	ssc::VideoSourcePtr mVideoSource;
+	cx::AcquisitionDataPtr mAcquisitionData;
+	cx::USAcquisitionPtr mAcquisition;
+	cx::RecordSessionPtr mRecordSession;
 };
 
 
