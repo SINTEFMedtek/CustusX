@@ -73,12 +73,12 @@ void RecordSession::parseXml(QDomNode& parentNode)
 	mDescription = parentNode.namedItem("description").toElement().text();
 }
 
-USAcqRecordSession::USAcqRecordSession(QString uid, double startTime, double stopTime, QString description) :
-    RecordSession(uid, startTime, stopTime, description)
-{
-}
+//USAcqRecordSession::USAcqRecordSession(QString uid, double startTime, double stopTime, QString description) :
+//    RecordSession(uid, startTime, stopTime, description)
+//{
+//}
 
-USAcqRecordSession::~USAcqRecordSession()
-{}
+//USAcqRecordSession::~USAcqRecordSession()
+//{}
 
 }//namespace cx
