@@ -14,6 +14,9 @@
 
 #include <cxPatientService.h>
 #include "cxPatientData.h"
+#include "cxFileHelpers.h"
+#include "cxDataLocations.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -51,14 +54,23 @@ void PatientService::setInstance(PatientService* instance)
 	mInstance = instance;
 }
 
+void PatientService::clearCache()
+{
+	std::cout << "DataLocations::getCachePath() " << DataLocations::getCachePath() << std::endl;
+	// clear the global cache used by app
+	removeNonemptyDirRecursively(DataLocations::getCachePath());
+}
+
 PatientService::PatientService()
 {
+	this->clearCache();
 	mPatientData.reset(new PatientData());
 }
 
 PatientService::~PatientService()
 {
-
+	mPatientData.reset();
+	this->clearCache();
 }
 
 PatientDataPtr PatientService::getPatientData()

@@ -285,9 +285,9 @@ void Tool::calculateTpsSlot()
 {
 	int tpsNr = 0;
 
-	int numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());if
-(	numberOfTransformsToCheck == 0)
-	return;
+	int numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
+	if (	numberOfTransformsToCheck == 0)
+		return;
 
 	ssc::TimedTransformMap::reverse_iterator it = mPositionHistory->rbegin();
 	double lastTransform = it->first;

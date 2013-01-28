@@ -46,7 +46,7 @@ void cxTestSpeed::testKaisaMetricsSpeed()
   custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa_metrics.cx3";
   custusX.start();
 
-//  QTimer::singleShot(10*1000,   qApp, SLOT(quit()) );
+  QTimer::singleShot(10*1000,   qApp, SLOT(quit()) );
 
   qApp->exec();
   custusX.stop();

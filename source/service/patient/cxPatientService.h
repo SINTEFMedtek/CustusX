@@ -66,6 +66,11 @@ private:
 	PatientService& operator=(PatientService const&); // not implemented
 
 	PatientDataPtr mPatientData;
+
+	/**
+	  * Clear the global cache used by the entire application (cx::DataLocations::getCachePath()).
+	  */
+	void clearCache();
 };
 
 PatientService* patientService();
