@@ -39,14 +39,7 @@ public:
   RecordBaseWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description = "Record Session");
   virtual ~RecordBaseWidget();
 
-//protected slots:
-
-//  virtual void postProcessingSlot(QString sessionId) = 0;
-//  virtual void startedSlot(QString sessionId) = 0;
-//  virtual void stoppedSlot(bool) = 0;
-
 protected:
-
   AcquisitionDataPtr mPluginData;
   AcquisitionPtr mBase;
   QVBoxLayout* mLayout;

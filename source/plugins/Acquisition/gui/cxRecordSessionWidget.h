@@ -37,19 +37,8 @@ public:
   void setDescription(QString text);
   void setDescriptionVisibility(bool value);
 
-//  void startPostProcessing(QString description);
-//  void stopPostProcessing();
-
-//signals:
-//  void started(QString);
-//  void stopped(bool canceled=false);
-//  void newSession(QString);
-
 public slots:
-	void setReady(bool val, QString text);
-
-//protected:
-//  void changeEvent(QEvent* event);
+	void setReady(bool val, QString text); ///< deprecated: use readinessChangedSlot instead.
 
 private slots:
   void startStopSlot(bool);
@@ -58,24 +47,13 @@ private slots:
   void readinessChangedSlot();
 
 private:
-//  void startRecording();
-//  void stopRecording();
-//  bool isRecording();
-
-//  void reset();
 
   AcquisitionPtr mBase;
-//  AcquisitionDataPtr mPluginData;
   QLabel* mInfoLabel;
   QPushButton* mStartStopButton;
   QPushButton* mCancelButton;
   QLabel* mDescriptionLabel;
   QLineEdit* mDescriptionLine;
-//  double mStartTimeMSec;
-//  double mStopTimeMSec;
-//  bool mPostProcessing;
-
-//  RecordSessionPtr mCurrentSession;
 };
 
 /**

@@ -27,16 +27,12 @@ RecordBaseWidget::RecordBaseWidget(AcquisitionDataPtr pluginData, QWidget* paren
     mPluginData(pluginData),
     mLayout(new QVBoxLayout(this))
 {
-  this->setObjectName("RecordBaseWidget");
-  this->setWindowTitle("Record Base");
+	this->setObjectName("RecordBaseWidget");
+	this->setWindowTitle("Record Base");
 
 	mBase.reset(new Acquisition(pluginData));
 	mRecordSessionWidget = new RecordSessionWidget(mBase, this, description);
-//  connect(mRecordSessionWidget, SIGNAL(newSession(QString)), this, SLOT(postProcessingSlot(QString)));
-//  connect(mRecordSessionWidget, SIGNAL(started(QString)), this, SLOT(startedSlot(QString)));
-//  connect(mRecordSessionWidget, SIGNAL(stopped(bool)), this, SLOT(stoppedSlot(bool)));
-
-  mLayout->addWidget(mRecordSessionWidget);
+	mLayout->addWidget(mRecordSessionWidget);
 }
 
 RecordBaseWidget::~RecordBaseWidget()

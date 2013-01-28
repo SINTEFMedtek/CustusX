@@ -33,11 +33,9 @@ USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(par
 	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
 
-//	connect(mBase.get(), SIGNAL(newSession()), this, SLOT(saveSession()));
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
 	connect(mBase.get(), SIGNAL(stopped()), this, SLOT(recordStopped()));
 	connect(mBase.get(), SIGNAL(cancelled()), this, SLOT(recordCancelled()));
-//	connect(this, SIGNAL(acquisitionDataReady()), this, SLOT(startReconstruction()));
 
 	this->dominantToolChangedSlot();
 	this->probeChangedSlot();
@@ -60,7 +58,6 @@ void USAcquisition::checkIfReadySlot()
 
 	mWhatsMissing.clear();
 
-//	if(tracking && streaming && mRTRecorder)
 	if(tracking && streaming)
 	{
 		mWhatsMissing = "<font color=green>Ready to record!</font><br>";
@@ -82,8 +79,6 @@ void USAcquisition::checkIfReadySlot()
 		{
 			mWhatsMissing.append("<font color=red>Need to get a stream.</font><br>");
 		}
-//		if(!mRTRecorder)
-//			mWhatsMissing.append("<font color=red>Need connect to a recorder.</font><br>");
 	}
 
 	int saving = mSaveThreads.size();
@@ -100,7 +95,6 @@ void USAcquisition::checkIfReadySlot()
 		mWhatsMissing.append("<br>");
 
 	// do not require tracking to be present in order to perform an acquisition.
-//	emit ready(streaming, mWhatsMissing);
 	mBase->setReady(streaming, mWhatsMissing);
 }
 
@@ -164,7 +158,6 @@ void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 	this->checkIfReadySlot();
 }
 
-
 ssc::TimedTransformMap USAcquisition::getRecording(RecordSessionPtr session)
 {
 	ssc::TimedTransformMap retval;
@@ -175,21 +168,6 @@ ssc::TimedTransformMap USAcquisition::getRecording(RecordSessionPtr session)
 
 	return retval;
 }
-
-//void USAcquisition::acquisitionStateChangedSlot()
-//{
-//	Acquisition::STATE state = mBase->getState();
-
-//	switch (state)
-//	{
-//	case Acquisition::sRUNNING :
-//		break;
-//	case Acquisition::sNOT_RUNNING :
-//		break;
-//	case Acquisition::sPOST_PROCESSING :
-//		break;
-//	}
-//}
 
 void USAcquisition::saveSession()
 {
