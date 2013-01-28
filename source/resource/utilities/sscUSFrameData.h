@@ -107,24 +107,21 @@ class USFrameData
 public:
 	static USFrameDataPtr create(ImagePtr inputFrameData);
 	static USFrameDataPtr create(QString inputFilename);
-	static USFrameDataPtr create(QString filename, std::vector<cx::CachedImageDataPtr> frames);
+	static USFrameDataPtr create(QString filename, std::vector<QString> frames);
 	~USFrameData();
 
-//	unsigned char* getFrame(unsigned int index) const;
 	Eigen::Array3i getDimensions() const;
 	Vector3D getSpacing() const;
 	QString getName() const;
 	QString getUid() const;
 	QString getFilePath() const;
+	cx::ImageDataContainerPtr getImageContainer() { return mImageContainer; }
 
 	void removeFrame(unsigned int index);
-//	void setAngio(bool angio);///< Use only angio data as input. reinitialize() must be called afterwards
 	void setCropBox(IntBoundingBox3D mCropbox);
 	void fillImageImport(vtkImageImportPtr import, int index); ///< fill import with a single frame
-//	void initializeFrames(); ///< call to enable use of getFrame()
 	void setPurgeInputDataAfterInitialize(bool value);
 
-//	void initializeFrames(bool bmode, ProcessedUSInputDataPtr* bmode_in, bool angio, ProcessedUSInputDataPtr* angio_in);
 	/** Use the input raw data and control parameters to generate filtered frames.
 	  * The input angio controls how many output objects that will be created, and if each
 	  * of them should be angio or grayscale.
@@ -138,8 +135,6 @@ public:
 
 protected:
 	void initialize();
-//	virtual void clearCache();
-//	void generateCache();
 	USFrameData();
 	vtkImageDataPtr useAngio(vtkImageDataPtr inData) const;/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
 
@@ -147,11 +142,9 @@ protected:
 	vtkImageDataPtr toGrayscale(vtkImageDataPtr input) const;
 
 	std::vector<int> mReducedToFull; ///< map from indexes in the reduced volume to the full (original) volume.
-//	bool mUseAngio;
 	IntBoundingBox3D mCropbox;
 
 	QString mFilename;
-//	std::vector<vtkImageDataPtr> mProcessedImage;
 	cx::ImageDataContainerPtr mImageContainer;
 	bool mPurgeInput;
 };

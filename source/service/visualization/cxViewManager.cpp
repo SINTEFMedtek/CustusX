@@ -92,15 +92,12 @@ void ViewManager::destroyInstance()
 }
 
 ViewManager::ViewManager() :
-				mLayout(new QGridLayout()),
-				mMainWindowsCentralWidget(new QWidget()),
-				mRenderingTimer(new QTimer(this)),
+				mLayout(NULL),
+				mMainWindowsCentralWidget(NULL),
+				mRenderingTimer(NULL),
 				mGlobal2DZoom(true),
 				mGlobalObliqueOrientation(false),
-				mModified(false),
-				mViewCache2D(mMainWindowsCentralWidget,	"View2D"),
-				mViewCache3D(mMainWindowsCentralWidget, "View3D"),
-				mViewCacheRT(mMainWindowsCentralWidget, "ViewRT")
+				mModified(false)
 {
 	mRenderTimer.reset(new CyclicActionTimer("Main Render timer"));
 	mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
@@ -116,10 +113,6 @@ ViewManager::ViewManager() :
 	mSmartRender = settings()->value("smartRender", true).toBool();
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
-	mLayout->setSpacing(2);
-	mLayout->setMargin(4);
-	mMainWindowsCentralWidget->setLayout(mLayout);
-
 	const unsigned VIEW_GROUP_COUNT = 5; // set this to enough
 	// initialize view groups:
 	for (unsigned i = 0; i < VIEW_GROUP_COUNT; ++i)
@@ -127,28 +120,44 @@ ViewManager::ViewManager() :
 		mViewGroups.push_back(ViewGroupPtr(new ViewGroup()));
 	}
 
+	this->syncOrientationMode(SyncedValue::create(0));
+}
+
+ViewManager::~ViewManager()
+{
+}
+
+QWidget* ViewManager::initialize()
+{
+	mLayout = new QGridLayout;
+	mMainWindowsCentralWidget = new QWidget;
+	mViewCache2D.reset(new ViewCache<View2D>(mMainWindowsCentralWidget,	"View2D"));
+	mViewCache3D.reset(new ViewCache<View3D>(mMainWindowsCentralWidget, "View3D"));
+	mViewCacheRT.reset(new ViewCache<ssc::ViewWidget>(mMainWindowsCentralWidget, "ViewRT"));
+
+	mLayout->setSpacing(2);
+	mLayout->setMargin(4);
+	mMainWindowsCentralWidget->setLayout(mLayout);
+
 	mInteractiveCropper.reset(new InteractiveCropper());
 	mInteractiveClipper.reset(new InteractiveClipper());
 	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(setModifiedSlot()));
 	connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(setModifiedSlot()));
 
-	this->syncOrientationMode(SyncedValue::create(0));
-
 	// set start layout
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE");
 
+	mRenderingTimer = new QTimer(this);
 	this->setRenderingInterval(settings()->value("renderingInterval").toInt());
-
 	connect(mRenderingTimer, SIGNAL(timeout()), this, SLOT(renderAllViewsSlot()));
 
 	mGlobalZoom2DVal = SyncedValue::create(1);
 	this->setGlobal2DZoom(mGlobal2DZoom);
+
+	return mMainWindowsCentralWidget;
 }
 
-ViewManager::~ViewManager()
-{
-}
 
 void ViewManager::setModifiedSlot()
 {
@@ -334,10 +343,13 @@ void ViewManager::addXml(QDomNode& parentNode)
 		mViewGroups[i]->addXml(viewGroupNode);
 	}
 
-	QDomElement clippedImageNode = doc.createElement("clippedImage");
-	QString clippedImage = (mInteractiveClipper->getImage()) ? mInteractiveClipper->getImage()->getUid() : "";
-	clippedImageNode.appendChild(doc.createTextNode(clippedImage));
-	viewManagerNode.appendChild(clippedImageNode);
+	if (mInteractiveClipper)
+	{
+		QDomElement clippedImageNode = doc.createElement("clippedImage");
+		QString clippedImage = (mInteractiveClipper->getImage()) ? mInteractiveClipper->getImage()->getUid() : "";
+		clippedImageNode.appendChild(doc.createTextNode(clippedImage));
+		viewManagerNode.appendChild(clippedImageNode);
+	}
 }
 
 void ViewManager::parseXml(QDomNode viewmanagerNode)
@@ -414,11 +426,6 @@ void ViewManager::clearSlot()
 	}
 }
 
-QWidget* ViewManager::stealCentralWidget()
-{
-	return mMainWindowsCentralWidget;
-}
-
 /**Look for the index'th 3DView in given group.
  */
 View3DQPtr ViewManager::get3DView(int group, int index)
@@ -442,9 +449,9 @@ View3DQPtr ViewManager::get3DView(int group, int index)
  */
 void ViewManager::deactivateCurrentLayout()
 {
-	mViewCache2D.clearUsedViews();
-	mViewCache3D.clearUsedViews();
-	mViewCacheRT.clearUsedViews();
+	mViewCache2D->clearUsedViews();
+	mViewCache3D->clearUsedViews();
+	mViewCacheRT->clearUsedViews();
 	mViewMap.clear();
 
 	for (unsigned i = 0; i < mViewGroups.size(); ++i)
@@ -557,7 +564,7 @@ void ViewManager::activateView(ViewWrapperPtr wrapper, int group, LayoutRegion r
 
 void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region)
 {
-	View2D* view = mViewCache2D.retrieveView();
+	View2D* view = mViewCache2D->retrieveView();
 	// use only default color for 2d views.
 //  QColor background = settings()->value("backgroundColor").value<QColor>();
 //  view->setBackgroundColor(background);
@@ -568,7 +575,7 @@ void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion 
 
 void ViewManager::activate3DView(int group, LayoutRegion region)
 {
-	View3D* view = mViewCache3D.retrieveView();
+	View3D* view = mViewCache3D->retrieveView();
 //  moved to wrapper
 //  QColor background = settings()->value("backgroundColor").value<QColor>();
 //  view->setBackgroundColor(background);
@@ -583,7 +590,7 @@ void ViewManager::activate3DView(int group, LayoutRegion region)
 
 void ViewManager::activateRTStreamView(int group, LayoutRegion region)
 {
-	ssc::ViewWidget* view = mViewCacheRT.retrieveView();
+	ssc::ViewWidget* view = mViewCacheRT->retrieveView();
 //  QColor background = settings()->value("backgroundColor").value<QColor>();
 //  view->setBackgroundColor(background);
 	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view));

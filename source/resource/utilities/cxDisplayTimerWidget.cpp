@@ -39,6 +39,8 @@ void DisplayTimerWidget::setFontSize(int fontSize)
 
 void DisplayTimerWidget::start()
 {
+	if (mTimer->isActive())
+		return;
 	mStartTime = QDateTime::currentDateTime();
 	mTimer->start();
 	timeoutSlot();

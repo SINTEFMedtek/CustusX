@@ -15,10 +15,15 @@ public:
 	void tearDown();
 
 	void testConstructor();///< Test constructor
+	/** Run a full acquisition from MHD source direct link.
+	  * Save data and evaluate results.
+	  */
+	void testStoreMHDSource();
 
 public:
 	CPPUNIT_TEST_SUITE( TestAcquisition );
 		CPPUNIT_TEST( testConstructor );
+		CPPUNIT_TEST( testStoreMHDSource );
 	CPPUNIT_TEST_SUITE_END();
 private:
 };

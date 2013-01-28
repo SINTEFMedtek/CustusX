@@ -177,8 +177,14 @@ void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
     tool->startTracking(30);
 	this->setDominantTool(tool->getUid());
 
-	emit initialized();
+	ssc::messageManager()->sendInfo("Dummy: Config/Init/Track started in toolManager");
+	mConfigured = true;
+	emit configured();
+	this->initializedSlot(true);
+	this->trackerTrackingSlot(true);
 }
+
+
 
 void ToolManager::initializeManualTool()
 {

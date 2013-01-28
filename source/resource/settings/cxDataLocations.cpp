@@ -108,5 +108,12 @@ QString DataLocations::getXmlSettingsFile()
 //  return getAppDataPath() + "/CustusX.xml";
 }
 
+QString DataLocations::getCachePath()
+{
+	QString path(getRootConfigPath()+"/cache/");
+    return path;
+}
+
+
 
 } // namespace cx
