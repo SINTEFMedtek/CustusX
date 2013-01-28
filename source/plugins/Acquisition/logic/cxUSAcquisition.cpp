@@ -194,7 +194,6 @@ void USAcquisition::saveSession()
 	mCurrentSessionFileMaker->setData(trackerRecordedData, mVideoRecorder,
                                       probe, calibFileName,
                                       writeColor);
-	mCurrentSessionFileMaker->setDeleteFilesOnRelease(true);
 
 	///TODO this forces write of images to disk, but also writes other crap we dont need.
 	//mCurrentSessionFileMaker->write();
