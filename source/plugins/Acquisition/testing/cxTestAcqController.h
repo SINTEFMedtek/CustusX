@@ -22,15 +22,17 @@ class TestAcqController : public QObject
 public:
 	TestAcqController(QObject* parent);
 	void initialize();
+	void verify();
 
 private slots:
 	void newFrameSlot();
 	void start();
 	void stop();
 
-	void setReady(bool ok, QString text);
+//	void setReady(bool ok, QString text);
 	void saveDataCompletedSlot(QString name);
 	void acquisitionDataReadySlot();
+	void readinessChangedSlot();
 
 private:
 	ssc::ReconstructManagerPtr createReconstructionManager();
@@ -42,7 +44,11 @@ private:
 	ssc::VideoSourcePtr mVideoSource;
 	cx::AcquisitionDataPtr mAcquisitionData;
 	cx::USAcquisitionPtr mAcquisition;
-	cx::RecordSessionPtr mRecordSession;
+	cx::AcquisitionPtr mAcquisitionBase;
+//	cx::RecordSessionPtr mRecordSession;
+
+	bool mMemDataValid;
+	bool mFileDataValid;
 };
 
 

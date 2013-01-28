@@ -44,21 +44,18 @@ class USAcquisition : public QObject
 {
 	Q_OBJECT
 public:
-	USAcquisition(AcquisitionDataPtr pluginData, QObject* parent = 0);
+	USAcquisition(AcquisitionPtr base, QObject* parent = 0);
 	QString getWhatsMissingText() const { return mWhatsMissing; }
 
 signals:
-	void ready(bool, QString);
+//	void ready(bool, QString);
 	void toolChanged();
 	void acquisitionDataReady(); ///< emitted when data is acquired and sent to the reconstruction module
 	void saveDataCompleted(QString mhdFilename); ///< emitted when data has been saved to file
 
 public slots:
-	void checkIfReadySlot();
-	void startRecord(QString sessionId);
-	void stopRecord(bool canceled);
-	void saveSession(QString sessionId, bool writeColor = false);///< \param writeColor If set to true, colors will be saved even if settings is set to 8 bit
-	void clearSlot();
+//	void startRecord(QString sessionId);
+//	void stopRecord(bool canceled);
 
 private slots:
 	void probeChangedSlot();
@@ -67,8 +64,16 @@ private slots:
 	void setTool(ssc::ToolPtr tool);
 	ssc::ToolPtr getTool();
 
+	void clearSlot();
+	void checkIfReadySlot();
+	void saveSession();
+	void recordStarted();
+	void recordStopped();
+	void recordCancelled();
+
 private:
-	AcquisitionDataPtr mPluginData;
+	AcquisitionPtr mBase;
+//	AcquisitionDataPtr mPluginData;
 	ssc::VideoSourcePtr mRTSource;
 	SavingVideoRecorderPtr mVideoRecorder;
 	ssc::ToolPtr mTool;

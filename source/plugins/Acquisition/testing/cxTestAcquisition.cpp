@@ -40,5 +40,6 @@ void TestAcquisition::testStoreMHDSource()
 	// look for saved stuff (both inmem and ondisk)
 	// turn on autoreconstruct and check that stuff is generated
 //	std::cout << "done" << std::endl;
+	controller.verify();
 
 }
