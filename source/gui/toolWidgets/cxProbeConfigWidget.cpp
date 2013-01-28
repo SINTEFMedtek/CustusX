@@ -98,13 +98,13 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	buttonsLayout->addStretch();
 	this->createAction(this,
 	                QIcon(":/icons/preset_remove.png"),
-					"Delete the current preset", "",
+					"Delete the current probe config", "",
 	                SLOT(deletePresetSlot()),
 	                buttonsLayout);
 
 	this->createAction(this,
 		            QIcon(":/icons/preset_save.png"),
-					"Add the current setting as a preset", "",
+					"Add the current setting as a probe config", "",
 	                SLOT(savePresetSlot()),
 	                buttonsLayout);
 
