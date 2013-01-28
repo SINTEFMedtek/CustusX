@@ -442,6 +442,8 @@ void ProbeXmlConfigParser::removeConfig(QString scanner, QString probe, QString 
 	QDomNode parentNode = victim.parentNode();
 	parentNode.removeChild(victim);
 	victim = QDomElement();// Create null element (redundant?)
+
+	mFile.save();
 }
 
 /**Add a trivial QDomElement with a QTextElement, i.e.
