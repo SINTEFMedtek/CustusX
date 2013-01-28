@@ -33,6 +33,8 @@
 
 TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
 {
+	mMemDataValid = false;
+	mFileDataValid = false;
 }
 
 ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
@@ -89,40 +91,47 @@ void TestAcqController::initialize()
 
 	mAcquisitionData.reset(new cx::AcquisitionData(this->createReconstructionManager()));
 
-	mAcquisition.reset(new cx::USAcquisition(mAcquisitionData));
-	connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), this, SLOT(setReady(bool,QString)));
+	mAcquisitionBase.reset(new cx::Acquisition(mAcquisitionData));
+	mAcquisition.reset(new cx::USAcquisition(mAcquisitionBase));
+//	connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), this, SLOT(setReady(bool,QString)));
+	connect(mAcquisitionBase.get(), SIGNAL(readinessChanged()), this, SLOT(readinessChangedSlot()));
 	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(saveDataCompletedSlot(QString)));
 	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
 }
 
 void TestAcqController::start()
 {
-	double startTime = ssc::getMilliSecondsSinceEpoch();
-	mRecordSession.reset(new cx::RecordSession(mAcquisitionData->getNewUid(), startTime, startTime, "test_acq"));
-    mAcquisitionData->addRecordSession(mRecordSession);
+	mAcquisitionBase->startRecord();
 
-	mAcquisition->startRecord(mRecordSession->getUid());
+//	double startTime = ssc::getMilliSecondsSinceEpoch();
+//	mRecordSession.reset(new cx::RecordSession(mAcquisitionData->getNewUid(), startTime, startTime, "test_acq"));
+//    mAcquisitionData->addRecordSession(mRecordSession);
+//	mAcquisition->startRecord(mRecordSession->getUid());
 
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 
 void TestAcqController::stop()
 {
-    mRecordSession->setStopTime(ssc::getMilliSecondsSinceEpoch());
-	mAcquisition->stopRecord(false);
-	mAcquisition->saveSession(mRecordSession->getUid(), true);
+	mAcquisitionBase->stopRecord();
+
+//	mRecordSession->setStopTime(ssc::getMilliSecondsSinceEpoch());
+//	mAcquisition->stopRecord(false);
+//	mAcquisition->saveSession(mRecordSession->getUid(), true);
 }
 
 void TestAcqController::newFrameSlot()
 {
-	if (!mRecordSession)
+	if (!mAcquisitionBase->getLatestSession())
 		this->start();
 //	std::cout << "TestAcqController::newFrameSlot()" << std::endl;
 }
 
-void TestAcqController::setReady(bool ok, QString text)
+void TestAcqController::readinessChangedSlot()
 {
-	std::cout << QString("Acquisition Ready Status %1: %2").arg(ok).arg(text) << std::endl;
+	std::cout << QString("Acquisition Ready Status %1: %2")
+	             .arg(mAcquisitionBase->isReady())
+	             .arg(mAcquisitionBase->getInfoText()) << std::endl;
 }
 
 void TestAcqController::saveDataCompletedSlot(QString path)
@@ -139,6 +148,7 @@ void TestAcqController::saveDataCompletedSlot(QString path)
 	ssc::USReconstructInputData fileData = fileReader->readAllFiles(filename, "calFilesPath""");
 	std::cout << " ** Resulting ssc::USReconstructInputData file content:" << std::endl;
 	this->verifyFileData(fileData);
+	mFileDataValid = true;
 }
 
 void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
@@ -185,5 +195,12 @@ void TestAcqController::acquisitionDataReadySlot()
 	ssc::USReconstructInputData fileData = mAcquisitionData->getReconstructer()->getSelectedFileData();
 	std::cout << " ** Resulting ssc::USReconstructInputData memory content:" << std::endl;
 	this->verifyFileData(fileData);
+	mMemDataValid = true;
+}
+
+void TestAcqController::verify()
+{
+	CPPUNIT_ASSERT(mMemDataValid);
+	CPPUNIT_ASSERT(mFileDataValid);
 }
 
