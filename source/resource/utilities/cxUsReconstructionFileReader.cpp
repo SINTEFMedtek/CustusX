@@ -231,9 +231,6 @@ ProbeXmlConfigParser::Configuration UsReconstructionFileReader::readProbeConfigu
   return configuration;
 }
 
-/**
- * Write probe configuration to file. This works even for configs not saved to the ProbeCalibConfigs.xml file.
- */
 std::pair<QString, ssc::ProbeData> UsReconstructionFileReader::readProbeDataFromFile(QString mhdFileName)
 {
 	std::pair<QString, ssc::ProbeData>  retval;

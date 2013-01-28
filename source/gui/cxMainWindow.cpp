@@ -81,8 +81,9 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	mLayoutActionGroup = NULL;
 	this->updateWindowTitle();
 
-	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
+	this->setCentralWidget(viewManager()->initialize());
 
+	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
 	this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
@@ -102,8 +103,6 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->addAsDockWidget(new ssc::ConsoleWidget(this), "Utility");
 	this->addAsDockWidget(new FrameTreeWidget(this), "Browsing");
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
-
-	this->setCentralWidget(viewManager()->stealCentralWidget());
 
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
@@ -222,49 +221,51 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::initialize()
-{
-	// resources layer
-	ssc::MessageManager::initialize();
+//void MainWindow::initialize()
+//{
+////	// resources layer
+////	ssc::MessageManager::initialize();
 
-	// services layer
-	cx::VideoService::initialize();
-	cx::DataManager::initialize();
-	cx::ToolManager::initializeObject();
-	cx::ViewManager::createInstance();
+////	// services layer
+////	cx::PatientService::initialize();
+////	cx::VideoService::initialize();
+////	cx::DataManager::initialize();
+////	cx::ToolManager::initializeObject();
+////	cx::ViewManager::createInstance();
 
-	// logic layer
-	cx::LogicManager::initialize();
+//	// logic layer
+//	cx::LogicManager::initialize();
 
-	// gui layer:
-	// inited by mainwindow construction in main()
-}
+//	// gui layer:
+//	// inited by mainwindow construction in main()
+//}
 
-/** deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
- */
-void MainWindow::shutdown()
-{
-	// gui layer
-	// already destroyed by mainwindow
+///** deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
+// */
+//void MainWindow::shutdown()
+//{
+//	// gui layer
+//	// already destroyed by mainwindow
 
-	// old stuff - high level
-	StateService::destroyInstance();
-	ViewManager::destroyInstance();
-	//  RegistrationManager::shutdown();
-	RepManager::destroyInstance();
+//	// old stuff - high level
+//	StateService::destroyInstance();
+//	ViewManager::destroyInstance();
+//	//  RegistrationManager::shutdown();
+//	RepManager::destroyInstance();
 
-	// logic layer
-	cx::LogicManager::shutdown();
+//	// logic layer
+//	cx::LogicManager::shutdown();
 
-	// service layer
-	cx::ToolManager::shutdown();
-	cx::DataManager::shutdown();
-	cx::VideoService::shutdown();
+//	// service layer
+//	cx::ToolManager::shutdown();
+//	cx::DataManager::shutdown();
+//	cx::VideoService::shutdown();
+//	cx::PatientService::shutdown();
 
-	ssc::GPUImageBufferRepository::shutdown();
-	ssc::MessageManager::shutdown();
-	Settings::destroyInstance();
-}
+//	ssc::GPUImageBufferRepository::shutdown();
+//	ssc::MessageManager::shutdown();
+//	Settings::destroyInstance();
+//}
 
 QMenu* MainWindow::createPopupMenu()
 {

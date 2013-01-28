@@ -36,13 +36,10 @@ public:
 
 	void setStopTime(double val) { mStopTime = val; }
 
-	//  ssc::SessionToolHistoryMap getSessionHistory();
-
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
 
 protected:
-	//  QString getNewUid();
 
 	QString mUid;
 	double mStartTime;
@@ -51,23 +48,6 @@ protected:
 };
 
 typedef boost::shared_ptr<RecordSession> RecordSessionPtr;
-
-/**
- * USAcqRecordSession
- *
- * \brief
- *
- * \date Dec 8, 2010
- * \author Janne Beate Bakeng
- */
-class USAcqRecordSession : public RecordSession
-{
-	USAcqRecordSession(QString uid, double startTime, double stopTime, QString description);
-	virtual ~USAcqRecordSession();
-
-private:
-
-};
 
 /**
  * @}

@@ -20,7 +20,6 @@
 namespace cx
 {
 
-
 USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* parent) :
 	RecordBaseWidget(pluginData, parent, settings()->value("Ultrasound/acquisitionName").toString())
 {
@@ -29,16 +28,10 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 
 	// connect to reconstructer signals
 	connect(mPluginData->getReconstructer().get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
-//	ssc::ThreadedTimedReconstructerPtr reconstructer = mPluginData->getReconstructer()->getThreadedTimedReconstructer();
-//	connect(reconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-//	connect(reconstructer.get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
-
-	mAcquisition.reset(new USAcquisition(pluginData));
-	connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
-	//  connect(mAcquisition.get(), SIGNAL(ready(bool)), this, SIGNAL(ready(bool)));
-//	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(saveDataCompletedSlot(QString)));
+	mAcquisition.reset(new USAcquisition(mBase));
 	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
 
+	connect(mBase.get(), SIGNAL(stateChanged()), this, SLOT(acquisitionStateChangedSlot()));
 
 	mRecordSessionWidget->setDescriptionVisibility(false);
 
@@ -72,13 +65,10 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	mOptionsWidget->setVisible(settings()->value("acquisition/UsAcqShowDetails").toBool());
 
 	mTimedAlgorithmProgressBar = new cx::TimedAlgorithmProgressBar;
-//	mTimedAlgorithmProgressBar->attach(reconstructer);
 	mLayout->addWidget(mOptionsWidget);
 
 	mLayout->addStretch();
 	mLayout->addWidget(mTimedAlgorithmProgressBar);
-
-	mAcquisition->checkIfReadySlot();
 }
 
 USAcqusitionWidget::~USAcqusitionWidget()
@@ -153,8 +143,6 @@ QWidget* USAcqusitionWidget::wrapGroupBox(QWidget* input, QString name, QString 
 	return retval;
 }
 
-
-
 QWidget* USAcqusitionWidget::wrapVerticalStretch(QWidget* input)
 {
 	QWidget* retval = new QWidget(this);
@@ -166,12 +154,6 @@ QWidget* USAcqusitionWidget::wrapVerticalStretch(QWidget* input)
 	return retval;
 }
 
-void USAcqusitionWidget::postProcessingSlot(QString sessionId)
-{
-	mAcquisition->saveSession(sessionId, mPluginData->getReconstructer()->getParams()->mAngioAdapter->getValue());
-}
-
-
 void USAcqusitionWidget::acquisitionDataReadySlot()
 {
 	if (settings()->value("Automation/autoReconstruct").toBool())
@@ -180,14 +162,34 @@ void USAcqusitionWidget::acquisitionDataReadySlot()
 	}
 }
 
+void USAcqusitionWidget::acquisitionStateChangedSlot()
+{
+	Acquisition::STATE state = mBase->getState();
+
+	switch (state)
+	{
+	case Acquisition::sRUNNING :
+		mDisplayTimerWidget->start();
+		break;
+	case Acquisition::sNOT_RUNNING :
+		mDisplayTimerWidget->stop();
+		break;
+	case Acquisition::sPOST_PROCESSING :
+		break;
+	}
+}
+
+
 void USAcqusitionWidget::reconstructStartedSlot()
 {
-	mRecordSessionWidget->startPostProcessing("Reconstructing");
+	// TODO reconstruction is still controlled from the widget. Move this to USAcquisition, but keep in mind
+	// that temp cal also uses that class. - configurable
+
+	mBase->startPostProcessing();
 }
 
 void USAcqusitionWidget::reconstructFinishedSlot()
 {
-//	std::cout << "USAcqusitionWidget::reconstructFinishedSlot()" << std::endl;
 	// stop if all threads are finished
 	bool finished = true;
 	std::set<cx::TimedAlgorithmPtr> reconstructer = mPluginData->getReconstructer()->getThreadedReconstruction();
@@ -195,35 +197,12 @@ void USAcqusitionWidget::reconstructFinishedSlot()
 	for(iter=reconstructer.begin(); iter!=reconstructer.end(); ++iter)
 	{
 		finished = finished && (*iter)->isFinished();
-
-//		std::cout << "   (*iter)->isFinished()" << (*iter)->isFinished() << std::endl;
 		if ((*iter)->isFinished())
 			mTimedAlgorithmProgressBar->detach(*iter);
 	}
 
 	if (finished)
-		mRecordSessionWidget->stopPostProcessing();
+		mBase->stopPostProcessing();
 }
 
-void USAcqusitionWidget::startedSlot(QString sessionId)
-{
-	mRecordSessionWidget->setDescription(settings()->value("Ultrasound/acquisitionName").toString());
-	mAcquisition->startRecord(sessionId);
-	mDisplayTimerWidget->start();
-}
-
-void USAcqusitionWidget::stoppedSlot(bool canceled)
-{
-//	if (mThreadedReconstructer)
-//	{
-//		// TODO Did not work - crashes
-//		mThreadedReconstructer->terminate();
-//		mThreadedReconstructer->wait();
-//		mPluginData->getReconstructer()->selectData(mPluginData->getReconstructer()->getSelectedData());
-//		// TODO perform cleanup of all resources connected to this recording.
-//	}
-
-	mDisplayTimerWidget->stop();
-	mAcquisition->stopRecord(canceled);
-}
 }//namespace cx

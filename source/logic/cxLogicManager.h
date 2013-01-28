@@ -34,12 +34,28 @@ class LogicManager : public QObject
 public:
   static LogicManager* getInstance();
 
+  /**
+	* Initialize the manager, including all services (calls initializeServices() ).
+	*/
   static void initialize();
+  /**
+	* Shutdown the manager, including all services (calls shutdownServices() ).
+	*/
   static void shutdown();
 
-//  ServiceControllerPtr getServiceController();
-
 private:
+  /**
+	* Initialize all system services, resources and other static objects.
+	*/
+  static void initializeServices();
+  /**
+	* Shutdown all system services, resources and other static objects.
+	*
+	* Deallocate all global resources.
+	* Assumes MainWindow already has been destroyed and the mainloop is exited.
+	*/
+  static void shutdownServices();
+
   static LogicManager* mInstance;
   static void setInstance(LogicManager* instance);
 

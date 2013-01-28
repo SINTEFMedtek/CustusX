@@ -30,8 +30,8 @@ int main(int argc, char **argv)
 	runner.addTest( registry.makeTest() );
 #else
 	runner.addTest( new CppUnit::TestCaller<TestAcquisition>(
-									   "TestAcquisition::testDualAngio",
-										&TestAcquisition::testConstructor ) );
+									   "TestAcquisition::testStoreMHDSource",
+										&TestAcquisition::testStoreMHDSource ) );
 //	runner.addTest( new CppUnit::TestCaller<TestAcquisition>(
 //									   "TestAcquisition::testConstructor",
 //										&TestAcquisition::testConstructor ) );
