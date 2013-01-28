@@ -23,18 +23,13 @@ namespace cx
 
 UsReconstructionFileMaker::UsReconstructionFileMaker(QString sessionDescription, QString activepatientPath) :
     mSessionDescription(sessionDescription),
-    mActivepatientPath(activepatientPath),
-    mDeleteFilesOnRelease(false)
+    mActivepatientPath(activepatientPath)
 {
 	mFolderName = this->findFolderName(mActivepatientPath, mSessionDescription);
 }
 
 UsReconstructionFileMaker::~UsReconstructionFileMaker()
 {
-	if (mDeleteFilesOnRelease)
-	{
-		SavingVideoRecorder::deleteFolder(mFolderName);
-	}
 }
 
 void UsReconstructionFileMaker::setData(ssc::TimedTransformMap trackerRecordedData,
@@ -49,12 +44,6 @@ void UsReconstructionFileMaker::setData(ssc::TimedTransformMap trackerRecordedDa
 	                                            calibFilename,
 	                                            writeColor);
 }
-
-void UsReconstructionFileMaker::setDeleteFilesOnRelease(bool on)
-{
-	mDeleteFilesOnRelease = on;
-}
-
 
 ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
 {
@@ -287,14 +276,14 @@ void UsReconstructionFileMaker::report()
 	}
 }
 
-void UsReconstructionFileMaker::writeUSImages(QString path, std::vector<QString> images, bool compression)
+void UsReconstructionFileMaker::writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression)
 {
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
 
-	for (unsigned i=0; i<images.size(); ++i)
+	for (unsigned i=0; i<images->size(); ++i)
 	{
-		vtkImageDataPtr currentImage = ssc::MetaImageReader().load(images[i]);
-		QString filename = path + "/" + QFileInfo(images[i]).fileName();
+		vtkImageDataPtr currentImage = images->get(i);
+		QString filename = path + "/" + QFileInfo(images->getFilename(i)).fileName();
 
 		writer->SetInput(currentImage);
 		writer->SetFileName(cstring_cast(filename));

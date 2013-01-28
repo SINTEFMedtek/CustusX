@@ -28,6 +28,7 @@ typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 namespace cx
 {
 typedef boost::shared_ptr<class ImageDataContainer> ImageDataContainerPtr;
+typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
 typedef boost::shared_ptr<class CachedImageData> CachedImageDataPtr;
 }
 
@@ -107,7 +108,7 @@ class USFrameData
 public:
 	static USFrameDataPtr create(ImagePtr inputFrameData);
 	static USFrameDataPtr create(QString inputFilename);
-	static USFrameDataPtr create(QString filename, std::vector<QString> frames);
+	static USFrameDataPtr create(QString filename, cx::CachedImageDataContainerPtr images);
 	~USFrameData();
 
 	Eigen::Array3i getDimensions() const;

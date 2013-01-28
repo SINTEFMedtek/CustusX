@@ -47,18 +47,13 @@ public:
 	  */
 	QString getFilename() { return mFilename; }
 	vtkImageDataPtr getImage();
-//	/**
-//	  * Call to inform class that data has been saved to disk meaning
-//	  * that the data can be cleared from memory if necessary.
-//	  */
-//	void setExistsOnDisk(bool on);
 	/**
 	  * Clear the image contents from memory, if possible.
 	  * Return true if purge was successful.
 	  */
 	bool purge();
-//private:
-	bool mExistsOnDisk; ///< true if data exist on disk and can be loaded
+
+private:
 	QString mFilename;
 	vtkImageDataPtr mImageData;
 };
@@ -84,6 +79,7 @@ public:
 typedef boost::shared_ptr<ImageDataContainer> ImageDataContainerPtr;
 
 /** Container class for delayed loading of images.
+  * The images will also not be stored by this container.
  *
  * \ingroup cxResourceUtilities
  * \date Dec 04 2012
@@ -92,15 +88,26 @@ typedef boost::shared_ptr<ImageDataContainer> ImageDataContainerPtr;
 class CachedImageDataContainer : public ImageDataContainer
 {
 public:
+	CachedImageDataContainer();
 	CachedImageDataContainer(QString baseFilename, int size);
-	CachedImageDataContainer(std::vector<CachedImageDataPtr> frames);
-	virtual ~CachedImageDataContainer() {}
+	CachedImageDataContainer(std::vector<QString> frames);
+//	CachedImageDataContainer(std::vector<CachedImageDataPtr> frames);
+	virtual ~CachedImageDataContainer();
 	virtual vtkImageDataPtr get(unsigned index);
+	virtual QString getFilename(unsigned index);
 	virtual unsigned size() const;
 	virtual bool purge(unsigned index) { return mImages[index]->purge(); }
+	/**
+	* If set, image files managed by this object will be deleted when
+	* object goes out of scope
+	*/
+	void setDeleteFilesOnRelease(bool on) { mDeleteFilesOnRelease = on; }
+	void append(QString filename);
 private:
 	std::vector<CachedImageDataPtr> mImages;
+	bool mDeleteFilesOnRelease;
 };
+typedef boost::shared_ptr<CachedImageDataContainer> CachedImageDataContainerPtr;
 
 /** Container class for extracting 2D vtkImageData from a 3D base image.
  *
