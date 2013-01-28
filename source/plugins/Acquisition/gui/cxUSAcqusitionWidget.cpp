@@ -33,12 +33,13 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 //	connect(reconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
 //	connect(reconstructer.get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
 
-	mAcquisition.reset(new USAcquisition(pluginData));
-	connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
+	mAcquisition.reset(new USAcquisition(mBase));
+//	connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
 	//  connect(mAcquisition.get(), SIGNAL(ready(bool)), this, SIGNAL(ready(bool)));
 //	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(saveDataCompletedSlot(QString)));
 	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
 
+	connect(mBase.get(), SIGNAL(stateChanged()), this, SLOT(acquisitionStateChangedSlot()));
 
 	mRecordSessionWidget->setDescriptionVisibility(false);
 
@@ -78,7 +79,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	mLayout->addStretch();
 	mLayout->addWidget(mTimedAlgorithmProgressBar);
 
-	mAcquisition->checkIfReadySlot();
+//	mAcquisition->checkIfReadySlot();
 }
 
 USAcqusitionWidget::~USAcqusitionWidget()
@@ -153,8 +154,6 @@ QWidget* USAcqusitionWidget::wrapGroupBox(QWidget* input, QString name, QString 
 	return retval;
 }
 
-
-
 QWidget* USAcqusitionWidget::wrapVerticalStretch(QWidget* input)
 {
 	QWidget* retval = new QWidget(this);
@@ -166,10 +165,10 @@ QWidget* USAcqusitionWidget::wrapVerticalStretch(QWidget* input)
 	return retval;
 }
 
-void USAcqusitionWidget::postProcessingSlot(QString sessionId)
-{
-	mAcquisition->saveSession(sessionId, mPluginData->getReconstructer()->getParams()->mAngioAdapter->getValue());
-}
+//void USAcqusitionWidget::postProcessingSlot(QString sessionId)
+//{
+//	mAcquisition->saveSession(sessionId, mPluginData->getReconstructer()->getParams()->mAngioAdapter->getValue());
+//}
 
 
 void USAcqusitionWidget::acquisitionDataReadySlot()
@@ -180,9 +179,27 @@ void USAcqusitionWidget::acquisitionDataReadySlot()
 	}
 }
 
+void USAcqusitionWidget::acquisitionStateChangedSlot()
+{
+	Acquisition::STATE state = mBase->getState();
+
+	switch (state)
+	{
+	case Acquisition::sRUNNING :
+		mDisplayTimerWidget->start();
+		break;
+	case Acquisition::sNOT_RUNNING :
+		mDisplayTimerWidget->stop();
+		break;
+	case Acquisition::sPOST_PROCESSING :
+		break;
+	}
+}
+
 void USAcqusitionWidget::reconstructStartedSlot()
 {
-	mRecordSessionWidget->startPostProcessing("Reconstructing");
+//	mRecordSessionWidget->startPostProcessing("Reconstructing");
+	mBase->startPostProcessing();
 }
 
 void USAcqusitionWidget::reconstructFinishedSlot()
@@ -202,28 +219,29 @@ void USAcqusitionWidget::reconstructFinishedSlot()
 	}
 
 	if (finished)
-		mRecordSessionWidget->stopPostProcessing();
+		mBase->stopPostProcessing();
+//		mRecordSessionWidget->stopPostProcessing();
 }
 
-void USAcqusitionWidget::startedSlot(QString sessionId)
-{
-	mRecordSessionWidget->setDescription(settings()->value("Ultrasound/acquisitionName").toString());
-	mAcquisition->startRecord(sessionId);
-	mDisplayTimerWidget->start();
-}
+//void USAcqusitionWidget::startedSlot(QString sessionId)
+//{
+//	mRecordSessionWidget->setDescription(settings()->value("Ultrasound/acquisitionName").toString());
+//	mAcquisition->startRecord(sessionId);
+//	mDisplayTimerWidget->start();
+//}
 
-void USAcqusitionWidget::stoppedSlot(bool canceled)
-{
-//	if (mThreadedReconstructer)
-//	{
-//		// TODO Did not work - crashes
-//		mThreadedReconstructer->terminate();
-//		mThreadedReconstructer->wait();
-//		mPluginData->getReconstructer()->selectData(mPluginData->getReconstructer()->getSelectedData());
-//		// TODO perform cleanup of all resources connected to this recording.
-//	}
+//void USAcqusitionWidget::stoppedSlot(bool canceled)
+//{
+////	if (mThreadedReconstructer)
+////	{
+////		// TODO Did not work - crashes
+////		mThreadedReconstructer->terminate();
+////		mThreadedReconstructer->wait();
+////		mPluginData->getReconstructer()->selectData(mPluginData->getReconstructer()->getSelectedData());
+////		// TODO perform cleanup of all resources connected to this recording.
+////	}
 
-	mDisplayTimerWidget->stop();
-	mAcquisition->stopRecord(canceled);
-}
+//	mDisplayTimerWidget->stop();
+//	mAcquisition->stopRecord(canceled);
+//}
 }//namespace cx
