@@ -141,10 +141,6 @@ signals:
 	  * Use isReady() and getInfoText() get more info.
 	  */
 	void readinessChanged();
-//	/** Emitted when a recording is complete (start + stop is called)
-//	  *
-//	  */
-//	void newSession();
 
 private:
 	RecordSessionPtr mLatestSession;
