@@ -23,8 +23,6 @@
 #include "cxForwardDeclarations.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
-//#include "cxTreeModelItem.h"
-//#include "cxInteractiveClipper.h"
 
 class QActionGroup;
 class QAction;
@@ -123,7 +121,10 @@ public:
 	static ViewManager* getInstance(); ///< returns the only instance of this class, NULL unless createInstance has been called.
 	static void destroyInstance(); ///< destroys the only instance of this class
 
-	QWidget* stealCentralWidget(); ///< lets the viewmanager know where to place its layout
+	/** Initialize the widget and fill with the default view layout.
+	  * Return the top widget, it should be added to the calling gui.
+	  */
+	QWidget* initialize();
 
 	void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
 
@@ -214,7 +215,7 @@ protected:
 
 	QString mActiveLayout; ///< the active layout (type)
 	QGridLayout* mLayout; ///< the layout
-	QWidget* mMainWindowsCentralWidget; ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
+	QPointer<QWidget> mMainWindowsCentralWidget; ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
 
 	QString mActiveView; ///< the active view
 	ViewMap mViewMap; ///< a map of all the views
@@ -233,9 +234,9 @@ protected:
 	bool mSmartRender; ///< use ssc::ViewWidget::render()
 	bool mModified; ///< Modified flag tells renderAllViewsSlot() that the views must be updated
 
-	ViewCache<View2D> mViewCache2D;
-	ViewCache<View3D> mViewCache3D;
-	ViewCache<ssc::ViewWidget> mViewCacheRT;
+	boost::shared_ptr<ViewCache<View2D> > mViewCache2D;
+	boost::shared_ptr<ViewCache<View3D> > mViewCache3D;
+	boost::shared_ptr<ViewCache<ssc::ViewWidget> > mViewCacheRT;
 	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
 	ssc::SlicePlanesProxyPtr mSlicePlanesProxy;

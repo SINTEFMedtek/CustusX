@@ -150,11 +150,15 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 	}
 }
 
-USFrameDataPtr USFrameData::create(QString filename, std::vector<cx::CachedImageDataPtr> frames)
+USFrameDataPtr USFrameData::create(QString filename, std::vector<QString> frames)
 {
+	std::vector<cx::CachedImageDataPtr> cache(frames.size());
+	for (unsigned i=0; i<cache.size(); ++i)
+		cache[i].reset(new cx::CachedImageData(frames[i]));
+
 	USFrameDataPtr retval(new USFrameData());
 	retval->mFilename = filename;
-	retval->mImageContainer.reset(new cx::CachedImageDataContainer(frames));
+	retval->mImageContainer.reset(new cx::CachedImageDataContainer(cache));
 	retval->initialize();
 	std:cout << "USFrameData::create() " << retval->mImageContainer->size() << ", " << retval->mReducedToFull.size() << std::endl;
 
@@ -215,14 +219,6 @@ Vector3D USFrameData::getSpacing() const
 	return retval;
 }
 
-//void USFrameData::setAngio(bool angio)
-//{
-//	if (angio!=mUseAngio)
-//		this->clearCache();
-
-//	mUseAngio = angio;
-//}
-
 void USFrameData::setCropBox(IntBoundingBox3D cropbox)
 {
 	// ensure clip never happens in z dir.
@@ -261,8 +257,6 @@ vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 	vtkImageDataPtr outData = luminance->GetOutput();
 	outData->Update();
 
-//	return outData;
-
 	vtkImageDataPtr copy = vtkImageDataPtr::New();
 	copy->DeepCopy(outData);
 	return copy;
@@ -271,8 +265,6 @@ vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 
 vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
 {
-//	std::cout << "USFrameData::useAngio " << std::endl;
-
 	// Some of the code here is borrowed from the vtk examples:
 	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
 
@@ -337,50 +329,6 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
 	return outData;
 }
 
-///**write us images to disk.
-// *
-// * The images are handled as an array of 2D frames, but written into
-// * one 3D image mhd file. Due to memory limitations (one large mem block
-// * causes bit trouble), this is done by writing a single frame, and then
-// * appending the other frames manually, and then hacking the mhd file to
-// * incorporate the correct dimensions.
-// *
-// * Update: Because we want to compress data, the standard vtk filter is used.
-// * This is not a big problem anymore because this is done in a working thread.
-// *
-// */
-//bool USFrameData::save(QString filename, bool compressed)
-//{
-//	ssc::messageManager()->sendInfo(QString("USFrameData prepare write frames"));
-//	vtkImageDataPtr image = this->getSingleBaseImage();
-
-////	ssc::messageManager()->sendInfo(QString("USFrameData start write %1 frames").arg(image->GetDimensions()[2]));
-
-//	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-//	writer->SetInput(image);
-//	writer->SetFileName(cstring_cast(filename));
-//	writer->SetCompression(compressed);
-//	writer->Write();
-
-//	ssc::messageManager()->sendInfo(QString("USFrameData completed write of %1 frames").arg(image->GetDimensions()[2]));
-//	return true;;
-//}
-
-//unsigned char* USFrameData::getFrame(unsigned int index) const
-//{
-//	if (mProcessedImage.empty())
-//	{
-//		ssc::messageManager()->sendError(QString("USFrameData %1 not properly initialized prior to calling getFrame()").arg(this->getName()));
-//		return NULL;
-//	}
-
-//	SSC_ASSERT(index < mProcessedImage.size());
-
-//	// Raw data pointer
-//	unsigned char *inputPointer = static_cast<unsigned char*> (mProcessedImage[index]->GetScalarPointer());
-//	return inputPointer;
-//}
-
 void USFrameData::setPurgeInputDataAfterInitialize(bool value)
 {
 	mPurgeInput = value;
@@ -428,78 +376,14 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 	return raw;
 }
 
-
-///** Fill cache, enabling getFrames()
-//  * NOT thread-safe.
-//  *
-//  */
-//void USFrameData::generateCache()
-//{
-//	if (!mProcessedImage.empty())
-//		return;
-
-//	mProcessedImage.clear();
-
-//	mProcessedImage.resize(mReducedToFull.size());
-
-//	// apply cropping and angio
-//	for (unsigned i=0; i<mReducedToFull.size(); ++i)
-//	{
-//		SSC_ASSERT(mImageContainer->size()>mReducedToFull[i]);
-//		vtkImageDataPtr current = mImageContainer->get(mReducedToFull[i]);
-
-//		if (mCropbox.range()[0]!=0)
-//			current = this->cropImage(current, mCropbox);
-
-//		if (mUseAngio)
-//			current = this->useAngio(current);
-//		else
-//			current = this->toGrayscale(current);
-
-//		mProcessedImage[i] = current;
-
-//		if (mPurgeInput)
-//			mImageContainer->purge(mReducedToFull[i]);
-//	}
-
-//	if (mPurgeInput)
-//		mImageContainer->purgeAll();
-//}
-
-//void USFrameData::initializeFrames()
-//{
-//	this->generateCache();
-//}
-
 void USFrameData::purgeAll()
 {
 	mImageContainer->purgeAll();
 }
 
-///** Merge all us frames into one vtkImageData
-// *
-// */
-//vtkImageDataPtr USFrameData::mergeFrames(std::vector<vtkImageDataPtr> input) const
-//{
-//  vtkImageAppendPtr filter = vtkImageAppendPtr::New();
-//  filter->SetAppendAxis(2); // append along z-axis
-
-//  for (unsigned i=0; i<input.size(); ++i)
-//    filter->SetInput(i, input[i]);
-
-//  filter->Update();
-//  return filter->GetOutput();
-//}
-
-//void USFrameData::clearCache()
-//{
-//	mProcessedImage.clear();
-//}
-
 USFrameDataPtr USFrameData::copy()
 {
 	USFrameDataPtr retval(new USFrameData(*this));
-//	retval->clearCache();
 	this->initialize();
 	return retval;
 }

@@ -40,8 +40,8 @@ public:
 	MainWindow(std::vector<PluginBasePtr> plugins);
 	virtual ~MainWindow();
 
-	static void initialize();
-	static void shutdown(); ///< deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
+//	static void initialize();
+//	static void shutdown(); ///< deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
 
 	virtual QMenu* createPopupMenu();
 

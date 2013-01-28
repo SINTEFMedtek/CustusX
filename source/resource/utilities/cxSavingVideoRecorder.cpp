@@ -113,6 +113,7 @@ void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 	stream << qstring_cast(data.mTimestamp);
 	stream << endl;
 
+//	std::cout << "** VideoRecorderSaveThread::write() start" << data.mImageFilename << std::endl;
 	// convert to 8 bit data if applicable.
 	if (!mWriteColor && data.mImage->GetNumberOfScalarComponents()>2)
 	{
@@ -128,9 +129,9 @@ void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 	writer->SetFileName(cstring_cast(data.mImageFilename));
 	writer->SetCompression(mCompressed);
 	writer->Write();
-//	std:cout << "** VideoRecorderSaveThread::write() " << data.mImageFilename << std::endl;
+//	std::cout << "** VideoRecorderSaveThread::write() " << data.mImageFilename << std::endl;
 
-	emit dataSaved(data.mImageFilename);
+//	emit dataSaved(data.mImageFilename);
 }
 
 /** Write all pending images to file.
@@ -174,13 +175,13 @@ void VideoRecorderSaveThread::run()
 
 
 SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor) :
-	mLastPurgedImageIndex(-1),
+//	mLastPurgedImageIndex(-1),
 	mSource(source)
 {
 //	std::cout << "**SavingVideoRecorder::SavingVideoRecorder()" << std::endl;
 	mSaveFolder = saveFolder;
 	mSaveThread.reset(new VideoRecorderSaveThread(NULL, saveFolder, prefix, compressed, writeColor));
-	connect(mSaveThread.get(), SIGNAL(dataSaved(QString)), this, SLOT(dataSavedSlot(QString)));
+//	connect(mSaveThread.get(), SIGNAL(dataSaved(QString)), this, SLOT(dataSavedSlot(QString)));
 	mSaveThread->start();
 }
 
@@ -208,62 +209,64 @@ void SavingVideoRecorder::newFrameSlot()
 		return;
 
 	vtkImageDataPtr image = mSource->getVtkImageData();
+	image->Update();
 	double timestamp = mSource->getTimestamp();
 	QString filename = mSaveThread->addData(timestamp, image);
 
-	vtkImageDataPtr frame = vtkImageDataPtr::New();
-	frame->DeepCopy(image);
+	mImages.push_back(filename);
+//	vtkImageDataPtr frame = vtkImageDataPtr::New();
+//	frame->DeepCopy(image);
 
-	CachedImageDataPtr cache(new CachedImageData(filename, frame, false));
-	mImages.push_back(cache);
+//	CachedImageDataPtr cache(new CachedImageData(filename, frame, false));
+//	mImages.push_back(cache);
 	mTimestamps.push_back(timestamp);
 
-	this->purgeCache();
+//	this->purgeCache();
 }
 
-void SavingVideoRecorder::purgeCache()
-{
-	if (mImages.empty())
-		return;
+//void SavingVideoRecorder::purgeCache()
+//{
+//	if (mImages.empty())
+//		return;
 
-	// numbers in Kb
-	int currentMem = mImages.back()->getImage()->GetActualMemorySize() * mImages.size();
-	// Store max xGb of data before clearing cache.
-	// This is an arbitrary number assumed to be easy to handle for the computer.
-	int maxMem = 2*1000*1000;
-//	std::cout << "memused (" << mImages.size() << ") :"<< currentMem/1000 << "Mb ." << currentMem << std::endl;
-//	std:cout << QString("images: %1, memory: %2 Mb, limit: %3 Mb").arg(mImages.size()).arg(currentMem/1024).arg(maxMem/1024) << std::endl;
+//	// numbers in Kb
+//	int currentMem = mImages.back()->getImage()->GetActualMemorySize() * mImages.size();
+//	// Store max xGb of data before clearing cache.
+//	// This is an arbitrary number assumed to be easy to handle for the computer.
+//	int maxMem = 2*1000*1000;
+////	std::cout << "memused (" << mImages.size() << ") :"<< currentMem/1000 << "Mb ." << currentMem << std::endl;
+////	std:cout << QString("images: %1, memory: %2 Mb, limit: %3 Mb").arg(mImages.size()).arg(currentMem/1024).arg(maxMem/1024) << std::endl;
 
-	bool discardImage = (currentMem > maxMem);
+//	bool discardImage = (currentMem > maxMem);
 
-	if (!discardImage)
-		return;
+//	if (!discardImage)
+//		return;
 
-//	std::cout << QString("attempting purging %1").arg(mLastPurgedImageIndex+1) << std::endl;
+////	std::cout << QString("attempting purging %1").arg(mLastPurgedImageIndex+1) << std::endl;
 
-	if (mLastPurgedImageIndex+1 <= mImages.size())
-	{
-		bool success = mImages[mLastPurgedImageIndex+1]->purge();
+//	if (mLastPurgedImageIndex+1 <= mImages.size())
+//	{
+//		bool success = mImages[mLastPurgedImageIndex+1]->purge();
 
-		if (success)
-			mLastPurgedImageIndex++;
-	}
+//		if (success)
+//			mLastPurgedImageIndex++;
+//	}
 
-}
+//}
 
-void SavingVideoRecorder::dataSavedSlot(QString filename)
-{
-	for (int i=0; i<mImages.size(); ++i)
-	{
-		if (mImages[i]->getFilename() != filename)
-			continue;
+//void SavingVideoRecorder::dataSavedSlot(QString filename)
+//{
+//	for (int i=0; i<mImages.size(); ++i)
+//	{
+//		if (mImages[i]->getFilename() != filename)
+//			continue;
 
-		mImages[i]->setExistsOnDisk(true);
-		break;
-	}
-}
+//		mImages[i]->setExistsOnDisk(true);
+//		break;
+//	}
+//}
 
-std::vector<CachedImageDataPtr> SavingVideoRecorder::getImageData()
+std::vector<QString> SavingVideoRecorder::getImageData()
 {
 	return mImages;
 }

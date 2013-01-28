@@ -20,8 +20,6 @@ class TimedAlgorithmProgressBar;
 * @{
 */
 
-
-
 /**
  * USAcqusitionWidget
  *
@@ -32,30 +30,22 @@ class TimedAlgorithmProgressBar;
  */
 class USAcqusitionWidget : public RecordBaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* parent);
-  virtual ~USAcqusitionWidget();
-  virtual QString defaultWhatsThis() const;
-
-protected slots:
-
-  void postProcessingSlot(QString sessionId);
-  void startedSlot(QString sessionId);
-  void stoppedSlot(bool);
+	USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* parent);
+	virtual ~USAcqusitionWidget();
+	virtual QString defaultWhatsThis() const;
 
 private slots:
 	void reconstructStartedSlot();
-  void reconstructFinishedSlot();
-//  void saveDataCompletedSlot(QString mhdFilename);
-  void toggleDetailsSlot();
-  void acquisitionDataReadySlot();
-  void reconstructAboutToStartSlot();
+	void reconstructFinishedSlot();
+	void toggleDetailsSlot();
+	void acquisitionDataReadySlot();
+	void reconstructAboutToStartSlot();
+	void acquisitionStateChangedSlot();
 
 private:
-  USAcquisitionPtr mAcquisition;
-//  ssc::ThreadedReconstructerPtr mThreadedReconstructer;
-//  ssc::ThreadedTimedReconstructerPtr mThreadedTimedReconstructer;
+	USAcquisitionPtr mAcquisition;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	DisplayTimerWidget* mDisplayTimerWidget;
 	QWidget* mOptionsWidget;

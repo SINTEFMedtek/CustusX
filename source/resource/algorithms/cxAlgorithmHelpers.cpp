@@ -14,6 +14,7 @@
 #include "cxSettings.h"
 #include <QDir>
 #include "sscUtilHelpers.h"
+#include "cxDataLocations.h"
 
 #include <itkGrayscaleFillholeImageFilter.h>
 
@@ -78,7 +79,8 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromVTKImageViaFile(vtkImageDa
   	ssc::messageManager()->sendWarning("Image values out of range. max: " + qstring_cast(maxVal)
   			+ " min: " + qstring_cast(minVal) + " See bug #363 if this needs to be fixed");
 
-  QString tempFolder = settings()->value("globalPatientDataFolder").toString() + "/NoPatient/temp/";
+  QString tempFolder = DataLocations::getCachePath() + "/vtk2itk/";
+//  QString tempFolder = settings()->value("globalPatientDataFolder").toString() + "/NoPatient/temp/";
   QDir().mkpath(tempFolder);
 
   // write to disk
