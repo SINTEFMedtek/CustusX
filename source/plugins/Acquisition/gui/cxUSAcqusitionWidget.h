@@ -44,6 +44,10 @@ private slots:
 	void reconstructAboutToStartSlot();
 	void acquisitionStateChangedSlot();
 
+	void recordStarted();
+	void recordStopped();
+	void recordCancelled();
+
 private:
 	USAcquisitionPtr mAcquisition;
 	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
