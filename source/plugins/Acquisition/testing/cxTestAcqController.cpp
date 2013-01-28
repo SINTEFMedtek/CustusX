@@ -33,8 +33,6 @@
 
 TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
 {
-	mMemDataValid = false;
-	mFileDataValid = false;
 }
 
 ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
@@ -122,6 +120,12 @@ void TestAcqController::readinessChangedSlot()
 	             .arg(mAcquisitionBase->getInfoText()) << std::endl;
 }
 
+void TestAcqController::acquisitionDataReadySlot()
+{
+	// read data and print info - this if the result of the memory pathway
+	mMemOutputData = mAcquisitionData->getReconstructer()->getSelectedFileData();
+}
+
 void TestAcqController::saveDataCompletedSlot(QString path)
 {
 	QTimer::singleShot(100,   qApp, SLOT(quit()) );
@@ -132,10 +136,7 @@ void TestAcqController::saveDataCompletedSlot(QString path)
 
 	// read file and print info - this is the result of the file pathway
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
-	ssc::USReconstructInputData fileData = fileReader->readAllFiles(filename, "calFilesPath""");
-	std::cout << " ** Resulting ssc::USReconstructInputData file content:" << std::endl;
-	this->verifyFileData(fileData);
-	mFileDataValid = true;
+	mFileOutputData = fileReader->readAllFiles(filename, "calFilesPath""");
 }
 
 void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
@@ -173,19 +174,11 @@ void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 	}
 }
 
-
-void TestAcqController::acquisitionDataReadySlot()
-{
-	// read data and print info - this if the result of the memory pathway
-	ssc::USReconstructInputData fileData = mAcquisitionData->getReconstructer()->getSelectedFileData();
-	std::cout << " ** Resulting ssc::USReconstructInputData memory content:" << std::endl;
-	this->verifyFileData(fileData);
-	mMemDataValid = true;
-}
-
 void TestAcqController::verify()
 {
-	CPPUNIT_ASSERT(mMemDataValid);
-	CPPUNIT_ASSERT(mFileDataValid);
+	std::cout << " ** Resulting ssc::USReconstructInputData memory content:" << std::endl;
+	this->verifyFileData(mMemOutputData);
+	std::cout << " ** Resulting ssc::USReconstructInputData file content:" << std::endl;
+	this->verifyFileData(mFileOutputData);
 }
 

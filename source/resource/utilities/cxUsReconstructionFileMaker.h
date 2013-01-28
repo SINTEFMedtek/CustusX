@@ -43,11 +43,6 @@ public:
 	UsReconstructionFileMaker(QString sessionDescription, QString activepatientPath);
 	~UsReconstructionFileMaker();
 
-	/**
-	* If set, image files in created by this object will be deleted when
-	* object goes out of scope
-	*/
-	void setDeleteFilesOnRelease(bool on);
 	void setData(ssc::TimedTransformMap trackerRecordedData, SavingVideoRecorderPtr videoRecorder,
 	             ssc::ToolPtr tool, QString calibFilename, bool writeColor = false);
 	ssc::USReconstructInputData getReconstructData();
@@ -80,7 +75,7 @@ private:
 	bool writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	void writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid);
-	void writeUSImages(QString path, std::vector<QString> images, bool compression);
+	void writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression);
 
 	QString findFolderName(QString patientFolder, QString sessionDescription);
 	bool findNewSubfolder(QString subfolderAbsolutePath);
@@ -101,7 +96,6 @@ private:
 	QStringList mReport;
 	QString mFolderName;
 	SavingVideoRecorderPtr mVideoRecorder;
-	bool mDeleteFilesOnRelease;
 };
 
 typedef boost::shared_ptr<UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
