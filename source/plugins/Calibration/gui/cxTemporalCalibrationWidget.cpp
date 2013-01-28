@@ -40,20 +40,23 @@ typedef unsigned char uchar;
 
 TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisitionData, QWidget* parent) :
     BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibration"),
-    mRecordSessionWidget(new RecordSessionWidget(acquisitionData, this, "temporal_calib")),
 		mInfoLabel(new QLabel(""))
 {
+
   mAlgorithm.reset(new TemporalCalibration);
   connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
-  mAcquisition.reset(new USAcquisition(acquisitionData));
-  connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
+  AcquisitionPtr acquisitionBase(new Acquisition(acquisitionData));
+  mAcquisition.reset(new USAcquisition(acquisitionBase));
+//  connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
   connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
-  mAcquisition->checkIfReadySlot();
+//  mAcquisition->checkIfReadySlot();
 
-  connect(mRecordSessionWidget, SIGNAL(newSession(QString)), mAcquisition.get(), SLOT(saveSession(QString)));
-  connect(mRecordSessionWidget, SIGNAL(started(QString)), mAcquisition.get(), SLOT(startRecord(QString)));
-  connect(mRecordSessionWidget, SIGNAL(stopped(bool)), mAcquisition.get(), SLOT(stopRecord(bool)));
+  mRecordSessionWidget = new RecordSessionWidget(acquisitionBase, this, "temporal_calib");
+
+//  connect(mRecordSessionWidget, SIGNAL(newSession(QString)), mAcquisition.get(), SLOT(saveSession(QString)));
+//  connect(mRecordSessionWidget, SIGNAL(started(QString)), mAcquisition.get(), SLOT(startRecord(QString)));
+//  connect(mRecordSessionWidget, SIGNAL(stopped(bool)), mAcquisition.get(), SLOT(stopRecord(bool)));
   mRecordSessionWidget->setDescriptionVisibility(false);
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);

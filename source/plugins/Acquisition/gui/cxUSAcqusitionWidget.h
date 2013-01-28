@@ -40,9 +40,9 @@ public:
 
 protected slots:
 
-  void postProcessingSlot(QString sessionId);
-  void startedSlot(QString sessionId);
-  void stoppedSlot(bool);
+//  void postProcessingSlot(QString sessionId);
+//  void startedSlot(QString sessionId);
+//  void stoppedSlot(bool);
 
 private slots:
 	void reconstructStartedSlot();
@@ -51,6 +51,7 @@ private slots:
   void toggleDetailsSlot();
   void acquisitionDataReadySlot();
   void reconstructAboutToStartSlot();
+  void acquisitionStateChangedSlot();
 
 private:
   USAcquisitionPtr mAcquisition;

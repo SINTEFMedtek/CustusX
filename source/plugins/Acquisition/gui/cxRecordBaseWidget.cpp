@@ -25,15 +25,16 @@ namespace cx
 RecordBaseWidget::RecordBaseWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description):
     BaseWidget(parent, "RecordBaseWidget", "Record Base"),
     mPluginData(pluginData),
-    mLayout(new QVBoxLayout(this)),
-    mRecordSessionWidget(new RecordSessionWidget(pluginData, this, description))
+    mLayout(new QVBoxLayout(this))
 {
   this->setObjectName("RecordBaseWidget");
   this->setWindowTitle("Record Base");
 
-  connect(mRecordSessionWidget, SIGNAL(newSession(QString)), this, SLOT(postProcessingSlot(QString)));
-  connect(mRecordSessionWidget, SIGNAL(started(QString)), this, SLOT(startedSlot(QString)));
-  connect(mRecordSessionWidget, SIGNAL(stopped(bool)), this, SLOT(stoppedSlot(bool)));
+	mBase.reset(new Acquisition(pluginData));
+	mRecordSessionWidget = new RecordSessionWidget(mBase, this, description);
+//  connect(mRecordSessionWidget, SIGNAL(newSession(QString)), this, SLOT(postProcessingSlot(QString)));
+//  connect(mRecordSessionWidget, SIGNAL(started(QString)), this, SLOT(startedSlot(QString)));
+//  connect(mRecordSessionWidget, SIGNAL(stopped(bool)), this, SLOT(stoppedSlot(bool)));
 
   mLayout->addWidget(mRecordSessionWidget);
 }

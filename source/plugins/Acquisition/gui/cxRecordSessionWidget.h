@@ -29,7 +29,7 @@ class RecordSessionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  RecordSessionWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString defaultDescription = "Record Session");
+  RecordSessionWidget(AcquisitionPtr base, QWidget* parent, QString defaultDescription = "Record Session");
   virtual ~RecordSessionWidget();
 
   virtual QString defaultWhatsThis() const;
@@ -37,42 +37,45 @@ public:
   void setDescription(QString text);
   void setDescriptionVisibility(bool value);
 
-  void startPostProcessing(QString description);
-  void stopPostProcessing();
+//  void startPostProcessing(QString description);
+//  void stopPostProcessing();
 
-signals:
-  void started(QString);
-  void stopped(bool canceled=false);
-  void newSession(QString);
+//signals:
+//  void started(QString);
+//  void stopped(bool canceled=false);
+//  void newSession(QString);
 
 public slots:
 	void setReady(bool val, QString text);
 
-protected:
-  void changeEvent(QEvent* event);
+//protected:
+//  void changeEvent(QEvent* event);
 
 private slots:
   void startStopSlot(bool);
   void cancelSlot();
+  void recordStateChangedSlot();
+  void readinessChangedSlot();
 
 private:
-  void startRecording();
-  void stopRecording();
-  bool isRecording();
+//  void startRecording();
+//  void stopRecording();
+//  bool isRecording();
 
-  void reset();
+//  void reset();
 
-  AcquisitionDataPtr mPluginData;
+  AcquisitionPtr mBase;
+//  AcquisitionDataPtr mPluginData;
   QLabel* mInfoLabel;
   QPushButton* mStartStopButton;
   QPushButton* mCancelButton;
   QLabel* mDescriptionLabel;
   QLineEdit* mDescriptionLine;
-  double mStartTimeMSec;
-  double mStopTimeMSec;
-  bool mPostProcessing;
+//  double mStartTimeMSec;
+//  double mStopTimeMSec;
+//  bool mPostProcessing;
 
-  RecordSessionPtr mCurrentSession;
+//  RecordSessionPtr mCurrentSession;
 };
 
 /**

@@ -23,7 +23,7 @@
 namespace cx
 {
 
-USAcquisition::USAcquisition(AcquisitionDataPtr pluginData, QObject* parent) : QObject(parent), mPluginData(pluginData)
+USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(parent), mBase(base)
 {
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
 	connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(clearSlot()));
@@ -32,6 +32,12 @@ USAcquisition::USAcquisition(AcquisitionDataPtr pluginData, QObject* parent) : Q
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChangedSlot()));
 	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
+
+//	connect(mBase.get(), SIGNAL(newSession()), this, SLOT(saveSession()));
+	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
+	connect(mBase.get(), SIGNAL(stopped()), this, SLOT(recordStopped()));
+	connect(mBase.get(), SIGNAL(cancelled()), this, SLOT(recordCancelled()));
+//	connect(this, SIGNAL(acquisitionDataReady()), this, SLOT(startReconstruction()));
 
 	this->dominantToolChangedSlot();
 	this->probeChangedSlot();
@@ -94,7 +100,8 @@ void USAcquisition::checkIfReadySlot()
 		mWhatsMissing.append("<br>");
 
 	// do not require tracking to be present in order to perform an acquisition.
-	emit ready(streaming, mWhatsMissing);
+//	emit ready(streaming, mWhatsMissing);
+	mBase->setReady(streaming, mWhatsMissing);
 }
 
 void USAcquisition::setTool(ssc::ToolPtr tool) {
@@ -169,15 +176,32 @@ ssc::TimedTransformMap USAcquisition::getRecording(RecordSessionPtr session)
 	return retval;
 }
 
-void USAcquisition::saveSession(QString sessionId, bool writeColor)
+//void USAcquisition::acquisitionStateChangedSlot()
+//{
+//	Acquisition::STATE state = mBase->getState();
+
+//	switch (state)
+//	{
+//	case Acquisition::sRUNNING :
+//		break;
+//	case Acquisition::sNOT_RUNNING :
+//		break;
+//	case Acquisition::sPOST_PROCESSING :
+//		break;
+//	}
+//}
+
+void USAcquisition::saveSession()
 {
 	//get session data
-	RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
+	RecordSessionPtr session = mBase->getLatestSession();
+	if (!session)
+		return;
 
 	ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
 	if(trackerRecordedData.empty())
 	{
-		ssc::messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Volume data only will be written.");
+		ssc::messageManager()->sendError("Could not find any tracking data from session "+session->getUid()+". Volume data only will be written.");
 	}
 
 	ssc::ToolPtr probe = this->getTool();
@@ -186,6 +210,8 @@ void USAcquisition::saveSession(QString sessionId, bool writeColor)
 	ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(probe);
 	if (cxTool)
 		calibFileName = cxTool->getCalibrationFileName();
+
+	bool writeColor = mBase->getPluginData()->getReconstructer()->getParams()->mAngioAdapter->getValue();
 
 	mCurrentSessionFileMaker->setData(trackerRecordedData, mVideoRecorder,
                                       probe, calibFileName,
@@ -199,7 +225,7 @@ void USAcquisition::saveSession(QString sessionId, bool writeColor)
 	mVideoRecorder.reset();
 
 	ssc::USReconstructInputData reconstructData = mCurrentSessionFileMaker->getReconstructData();
-	mPluginData->getReconstructer()->selectData(reconstructData);
+	mBase->getPluginData()->getReconstructer()->selectData(reconstructData);
 	emit acquisitionDataReady();
 
 	// now start saving of data to the patient folder, compressed version:
@@ -246,17 +272,17 @@ void USAcquisition::dominantToolChangedSlot()
 	this->probeChangedSlot();
 }
 
-void USAcquisition::startRecord(QString sessionId)
+void USAcquisition::recordStarted()
 {
-	RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
+	RecordSessionPtr session = mBase->getLatestSession();
 
 	QString tempFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
 	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(
 	                                   session->getDescription(),
 	                                   tempFolder));
 
-	mPluginData->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
-	bool writeColor = mPluginData->getReconstructer()->getParams()->mAngioAdapter->getValue()
+	mBase->getPluginData()->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
+	bool writeColor = mBase->getPluginData()->getReconstructer()->getParams()->mAngioAdapter->getValue()
 	        ||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 
 	mVideoRecorder.reset(new SavingVideoRecorder(
@@ -270,19 +296,19 @@ void USAcquisition::startRecord(QString sessionId)
 	ssc::messageManager()->sendSuccess("Ultrasound acquisition started.", true);
 }
 
-void USAcquisition::stopRecord(bool canceled)
+void USAcquisition::recordStopped()
 {
 	mVideoRecorder->stopRecord();
-	if (canceled)
-	{
-		mVideoRecorder->cancel();
-		mVideoRecorder.reset();
-		ssc::messageManager()->sendInfo("Ultrasound acquisition stopped.");
-	}
-	else
-	{
-		ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
-	}
+	ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
+	this->saveSession();
+}
+
+void USAcquisition::recordCancelled()
+{
+	mVideoRecorder->stopRecord();
+	mVideoRecorder->cancel();
+	mVideoRecorder.reset();
+	ssc::messageManager()->sendInfo("Ultrasound acquisition stopped.");
 }
 
 
