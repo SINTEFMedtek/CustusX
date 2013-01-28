@@ -48,14 +48,9 @@ public:
 	QString getWhatsMissingText() const { return mWhatsMissing; }
 
 signals:
-//	void ready(bool, QString);
 	void toolChanged();
 	void acquisitionDataReady(); ///< emitted when data is acquired and sent to the reconstruction module
 	void saveDataCompleted(QString mhdFilename); ///< emitted when data has been saved to file
-
-public slots:
-//	void startRecord(QString sessionId);
-//	void stopRecord(bool canceled);
 
 private slots:
 	void probeChangedSlot();
@@ -73,7 +68,6 @@ private slots:
 
 private:
 	AcquisitionPtr mBase;
-//	AcquisitionDataPtr mPluginData;
 	ssc::VideoSourcePtr mRTSource;
 	SavingVideoRecorderPtr mVideoRecorder;
 	ssc::ToolPtr mTool;

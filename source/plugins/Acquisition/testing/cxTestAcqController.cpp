@@ -93,7 +93,6 @@ void TestAcqController::initialize()
 
 	mAcquisitionBase.reset(new cx::Acquisition(mAcquisitionData));
 	mAcquisition.reset(new cx::USAcquisition(mAcquisitionBase));
-//	connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), this, SLOT(setReady(bool,QString)));
 	connect(mAcquisitionBase.get(), SIGNAL(readinessChanged()), this, SLOT(readinessChangedSlot()));
 	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(saveDataCompletedSlot(QString)));
 	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
@@ -102,29 +101,18 @@ void TestAcqController::initialize()
 void TestAcqController::start()
 {
 	mAcquisitionBase->startRecord();
-
-//	double startTime = ssc::getMilliSecondsSinceEpoch();
-//	mRecordSession.reset(new cx::RecordSession(mAcquisitionData->getNewUid(), startTime, startTime, "test_acq"));
-//    mAcquisitionData->addRecordSession(mRecordSession);
-//	mAcquisition->startRecord(mRecordSession->getUid());
-
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 
 void TestAcqController::stop()
 {
 	mAcquisitionBase->stopRecord();
-
-//	mRecordSession->setStopTime(ssc::getMilliSecondsSinceEpoch());
-//	mAcquisition->stopRecord(false);
-//	mAcquisition->saveSession(mRecordSession->getUid(), true);
 }
 
 void TestAcqController::newFrameSlot()
 {
 	if (!mAcquisitionBase->getLatestSession())
 		this->start();
-//	std::cout << "TestAcqController::newFrameSlot()" << std::endl;
 }
 
 void TestAcqController::readinessChangedSlot()
@@ -136,7 +124,6 @@ void TestAcqController::readinessChangedSlot()
 
 void TestAcqController::saveDataCompletedSlot(QString path)
 {
-//	std::cout << "TestAcqController::saveDataCompletedSlot() " << path << std::endl;
 	QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
 	// convert path to path + file - needed by reader
@@ -189,8 +176,6 @@ void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 
 void TestAcqController::acquisitionDataReadySlot()
 {
-//	std::cout << "TestAcqController::acquisitionDataReadySlot() " << std::endl;
-
 	// read data and print info - this if the result of the memory pathway
 	ssc::USReconstructInputData fileData = mAcquisitionData->getReconstructer()->getSelectedFileData();
 	std::cout << " ** Resulting ssc::USReconstructInputData memory content:" << std::endl;

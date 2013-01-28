@@ -29,7 +29,6 @@ private slots:
 	void start();
 	void stop();
 
-//	void setReady(bool ok, QString text);
 	void saveDataCompletedSlot(QString name);
 	void acquisitionDataReadySlot();
 	void readinessChangedSlot();
@@ -45,7 +44,6 @@ private:
 	cx::AcquisitionDataPtr mAcquisitionData;
 	cx::USAcquisitionPtr mAcquisition;
 	cx::AcquisitionPtr mAcquisitionBase;
-//	cx::RecordSessionPtr mRecordSession;
 
 	bool mMemDataValid;
 	bool mFileDataValid;

@@ -20,9 +20,6 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionPtr base, QWidget* parent, Q
     mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"), "Start")),
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/process-stop-7.png"), "Cancel")),
     mDescriptionLine(new QLineEdit(defaultDescription))
-//    mStartTimeMSec(-1),
-//    mStopTimeMSec(-1),
-//    mPostProcessing(false)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
@@ -39,7 +36,6 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionPtr base, QWidget* parent, Q
   mStartStopButton->setCheckable(true);
   connect(mStartStopButton, SIGNAL(clicked(bool)), this, SLOT(startStopSlot(bool)));
   connect(mCancelButton, SIGNAL(clicked(bool)), this, SLOT(cancelSlot()));
-//  mCancelButton->setEnabled(false);
 
   this->recordStateChangedSlot();
   this->readinessChangedSlot();
@@ -74,18 +70,6 @@ void RecordSessionWidget::setDescription(QString text)
   mDescriptionLine->setText(text);
 }
 
-//void RecordSessionWidget::changeEvent(QEvent* event)
-//{
-//  QWidget::changeEvent(event);
-//  if(event->type() != QEvent::EnabledChange)
-//    return;
-
-//  if(!this->isEnabled())
-//	  mBase->cancelRecord();
-////    this->stopRecording();
-//}
-
-
 void RecordSessionWidget::readinessChangedSlot()
 {
 	this->setEnabled(mBase->isReady());
@@ -97,9 +81,6 @@ void RecordSessionWidget::recordStateChangedSlot()
 	Acquisition::STATE state = mBase->getState();
 
 	mStartStopButton->blockSignals(true);
-
-//	this->setEnabled(mBase->isReady());
-//    mInfoLabel->setText(mBase->getInfoText());
 
 	switch (state)
 	{
@@ -129,112 +110,14 @@ void RecordSessionWidget::recordStateChangedSlot()
 	mStartStopButton->blockSignals(false);
 }
 
-//void RecordSessionWidget::startPostProcessing(QString description)
-//{
-//  mPostProcessing = true;
-
-//  mCancelButton->setEnabled(true);
-//  mStartStopButton->setText(description);
-//  mStartStopButton->setEnabled(false);
-//}
-
-//void RecordSessionWidget::stopPostProcessing()
-//{
-//  this->reset();
-//}
-
-//RecordSessionWidget::recordStateChangedSlot()
-//{
-
-//}
-
 void RecordSessionWidget::startStopSlot(bool checked)
 {
 	mBase->toggleRecord();
-
-//  if(checked)
-//    this->startRecording();
-//  else
-//    this->stopRecording();
 }
 
 void RecordSessionWidget::cancelSlot()
 {
 	mBase->cancelRecord();
-//  if(!this->isRecording() && !mPostProcessing)
-//    return;
-
-//  this->reset();
-////  ssc::messageManager()->playCancelSound();
-//  emit stopped(true);
 }
 
-
-//void RecordSessionWidget::startRecording()
-//{
-//  if(this->isRecording())
-//  {
-//    ssc::messageManager()->sendInfo("Already recording a session, stop before trying to start a new record session.");
-//    return;
-//  }
-
-////  \mCurrentSession = mPluginData->getNewUid();
-////  mStartTimeMSec = ssc::getMilliSecondsSinceEpoch();
-
-////  mCurrentSession.reset(new RecordSession(mPluginData->getNewUid(), mStartTimeMSec, mStartTimeMSec, mDescriptionLine->text()));
-////  mPluginData->addRecordSession(mCurrentSession);
-
-//  mStartStopButton->setText("Stop");
-//  mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-stop.png"));
-//  mCancelButton->setEnabled(true);
-
-//  ssc::messageManager()->playStartSound();
-//  emit started(mCurrentSession->getUid());
-//}
-
-//void RecordSessionWidget::stopRecording()
-//{
-//  if(!this->isRecording())
-//    return;
-
-//  mStopTimeMSec = ssc::getMilliSecondsSinceEpoch();
-
-//  if (!mCurrentSession)
-//	  std::cout << "no current session " << std::endl;
-//  mCurrentSession->setStopTime(mStopTimeMSec);
-////  RecordSessionPtr session = RecordSessionPtr(new RecordSession(mCurrentSession, mStartTimeMSec, mStopTimeMSec, mDescriptionLine->text()));
-////  mPluginData->addRecordSession(session);
-
-//  ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
-
-//  QString session = mCurrentSession->getUid();
-//  this->reset();
-//  ssc::messageManager()->playStopSound();
-//  emit stopped(false);
-
-//  emit newSession(session);
-//}
-
-//bool RecordSessionWidget::isRecording()
-//{
-//  return (mStartTimeMSec > -1);
-//}
-
-//void RecordSessionWidget::reset()
-//{
-//  mPostProcessing = false;
-//  mCurrentSession.reset();
-
-//  mStartStopButton->blockSignals(true);
-//  mStartStopButton->setChecked(false);
-//  mStartStopButton->blockSignals(false);
-//  mStartStopButton->setText("Start");
-//  mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"));
-//  mStartStopButton->setEnabled(true);
-
-//  mCancelButton->setEnabled(false);
-
-//  mStartTimeMSec = -1;
-//  mStopTimeMSec = -1;
-//}
 }
