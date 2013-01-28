@@ -32,6 +32,9 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
 
 	connect(mBase.get(), SIGNAL(stateChanged()), this, SLOT(acquisitionStateChangedSlot()));
+	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
+	connect(mBase.get(), SIGNAL(stopped()), this, SLOT(recordStopped()));
+	connect(mBase.get(), SIGNAL(cancelled()), this, SLOT(recordCancelled()));
 
 	mRecordSessionWidget->setDescriptionVisibility(false);
 
@@ -169,15 +172,27 @@ void USAcqusitionWidget::acquisitionStateChangedSlot()
 	switch (state)
 	{
 	case Acquisition::sRUNNING :
-		mDisplayTimerWidget->start();
 		break;
 	case Acquisition::sNOT_RUNNING :
-		mDisplayTimerWidget->stop();
 		break;
 	case Acquisition::sPOST_PROCESSING :
 		break;
 	}
 }
+
+void USAcqusitionWidget::recordStarted()
+{
+	mDisplayTimerWidget->start();
+}
+void USAcqusitionWidget::recordStopped()
+{
+	mDisplayTimerWidget->stop();
+}
+void USAcqusitionWidget::recordCancelled()
+{
+	mDisplayTimerWidget->stop();
+}
+
 
 
 void USAcqusitionWidget::reconstructStartedSlot()
