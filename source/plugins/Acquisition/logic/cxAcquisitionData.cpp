@@ -137,7 +137,6 @@ void Acquisition::setReady(bool val, QString text)
 		this->cancelRecord();
 
 	emit readinessChanged();
-//	emit stateChanged();
 }
 
 void Acquisition::toggleRecord()
@@ -158,8 +157,6 @@ void Acquisition::startRecord()
 
 	double startTime = ssc::getMilliSecondsSinceEpoch();
 	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, "test_acq"));
-//	mPluginData->addRecordSession(mLatestSession);
-//	this->startRecord(mLatestSession->getUid());
 	ssc::messageManager()->playStartSound();
 	this->setState(sRUNNING);
 }
@@ -172,13 +169,10 @@ void Acquisition::stopRecord()
 	}
 
 	mLatestSession->setStopTime(ssc::getMilliSecondsSinceEpoch());
-//	this->stopRecord(false);
-//	mAcquisition->saveSession(mRecordSession->getUid(), true);
 	mPluginData->addRecordSession(mLatestSession);
 	ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
 	ssc::messageManager()->playStopSound();
 	this->setState(sNOT_RUNNING);
-//	emit newSession();
 }
 
 void Acquisition::cancelRecord()
