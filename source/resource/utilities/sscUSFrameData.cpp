@@ -150,15 +150,16 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 	}
 }
 
-USFrameDataPtr USFrameData::create(QString filename, std::vector<QString> frames)
+USFrameDataPtr USFrameData::create(QString filename, cx::CachedImageDataContainerPtr images)
 {
-	std::vector<cx::CachedImageDataPtr> cache(frames.size());
-	for (unsigned i=0; i<cache.size(); ++i)
-		cache[i].reset(new cx::CachedImageData(frames[i]));
+//	std::vector<cx::CachedImageDataPtr> cache(frames.size());
+//	for (unsigned i=0; i<cache.size(); ++i)
+//		cache[i].reset(new cx::CachedImageData(frames[i]));
 
 	USFrameDataPtr retval(new USFrameData());
 	retval->mFilename = filename;
-	retval->mImageContainer.reset(new cx::CachedImageDataContainer(cache));
+//	retval->mImageContainer.reset(new cx::CachedImageDataContainer(cache));
+	retval->mImageContainer = images;
 	retval->initialize();
 	std:cout << "USFrameData::create() " << retval->mImageContainer->size() << ", " << retval->mReducedToFull.size() << std::endl;
 

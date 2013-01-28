@@ -17,6 +17,8 @@
 #include "sscDataManagerImpl.h"
 #include "sscLogger.h"
 #include "sscTypeConversions.h"
+#include <QDir>
+#include "sscUtilHelpers.h"
 
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
@@ -25,15 +27,14 @@ namespace cx
 
 CachedImageData::CachedImageData(QString filename, vtkImageDataPtr image)
 {
-//	mExistsOnDisk = existsOnDisk;
 	mFilename = filename;
 	mImageData = image;
 }
 
 CachedImageData::~CachedImageData()
 {
-//	std::cout << "CachedImageData::~CachedImageData() " << mFilename << std::endl;
 }
+
 
 
 vtkImageDataPtr CachedImageData::getImage()
@@ -45,23 +46,10 @@ vtkImageDataPtr CachedImageData::getImage()
 	return mImageData;
 }
 
-//void CachedImageData::setExistsOnDisk(bool on)
-//{
-////	std::cout << "CachedImageData::setExistsOnDisk " << mFilename << " " << on << std::endl;
-//	mExistsOnDisk = on;
-//}
-
 bool CachedImageData::purge()
 {
-//	std::cout << "CachedImageData::purge " << QFileInfo(mFilename).fileName() << " " << mExistsOnDisk << std::endl;
-
-//	if (mExistsOnDisk)
-//	{
 		mImageData = vtkImageDataPtr();
 		return true;
-//	}
-
-//	return false;
 }
 
 ///--------------------------------------------------------
@@ -85,7 +73,8 @@ void ImageDataContainer::purgeAll()
 ///--------------------------------------------------------
 
 
-CachedImageDataContainer::CachedImageDataContainer(QString baseFilename, int size)
+CachedImageDataContainer::CachedImageDataContainer(QString baseFilename, int size) :
+    mDeleteFilesOnRelease(false)
 {
 	QFileInfo info(baseFilename);
 
@@ -109,15 +98,46 @@ CachedImageDataContainer::CachedImageDataContainer(QString baseFilename, int siz
 	}
 }
 
-CachedImageDataContainer::CachedImageDataContainer(std::vector<CachedImageDataPtr> frames)
+CachedImageDataContainer::CachedImageDataContainer() :
+    mDeleteFilesOnRelease(false)
 {
-	mImages = frames;
 }
 
+CachedImageDataContainer::CachedImageDataContainer(std::vector<QString> frames) :
+    mDeleteFilesOnRelease(false)
+{
+	for (unsigned i=0; i<frames.size(); ++i)
+		this->append(frames[i]);
+}
+
+void CachedImageDataContainer::append(QString filename)
+{
+	mImages.push_back(CachedImageDataPtr(new CachedImageData(filename)));
+}
+
+CachedImageDataContainer::~CachedImageDataContainer()
+{
+	if (mDeleteFilesOnRelease)
+	{
+		for (unsigned i=0; i<mImages.size(); ++i)
+		{
+			QDir().remove(mImages[i]->getFilename());
+			QDir().remove(ssc::changeExtension(mImages[i]->getFilename(), "raw"));
+			QDir().remove(ssc::changeExtension(mImages[i]->getFilename(), "zraw"));
+		}
+	}
+}
 
 vtkImageDataPtr CachedImageDataContainer::get(unsigned index)
 {
-	return mImages[index]->getImage();
+	vtkImageDataPtr retval = mImages[index]->getImage();
+	mImages[index]->purge();
+	return retval;
+}
+
+QString CachedImageDataContainer::getFilename(unsigned index)
+{
+	return mImages[index]->getFilename();
 }
 
 

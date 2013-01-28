@@ -56,7 +56,7 @@ void PatientService::setInstance(PatientService* instance)
 
 void PatientService::clearCache()
 {
-	std::cout << "DataLocations::getCachePath() " << DataLocations::getCachePath() << std::endl;
+//	std::cout << "DataLocations::getCachePath() " << DataLocations::getCachePath() << std::endl;
 	// clear the global cache used by app
 	removeNonemptyDirRecursively(DataLocations::getCachePath());
 }

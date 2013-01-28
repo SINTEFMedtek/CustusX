@@ -122,7 +122,8 @@ public:
 	void cancel();
 
 //	virtual DataType getRecording();
-	std::vector<QString> getImageData();
+	CachedImageDataContainerPtr getImageData();
+//	std::vector<QString> getImageData();
 	std::vector<double> getTimestamps();
 
 	/** Call to force complete the writing of data to disk.
@@ -139,7 +140,8 @@ private slots:
 //	void dataSavedSlot(QString filename);
 private:
 //	std::vector<CachedImageDataPtr> mImages;
-	std::vector<QString> mImages;
+//	std::vector<QString> mImages;
+	CachedImageDataContainerPtr mImages;
 	std::vector<double> mTimestamps;
 	/** Use to remove data in memory when the recording is large
 	  */

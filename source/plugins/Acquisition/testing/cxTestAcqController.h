@@ -39,14 +39,14 @@ private:
 	void setupVideo(QString framesFile);
 	void setupProbe(QString probedefinition);
 
+	ssc::USReconstructInputData mMemOutputData;
+	ssc::USReconstructInputData mFileOutputData;
+
 	double mRecordDuration; ///< duration of recording in ms.
 	ssc::VideoSourcePtr mVideoSource;
 	cx::AcquisitionDataPtr mAcquisitionData;
 	cx::USAcquisitionPtr mAcquisition;
 	cx::AcquisitionPtr mAcquisitionBase;
-
-	bool mMemDataValid;
-	bool mFileDataValid;
 };
 
 
