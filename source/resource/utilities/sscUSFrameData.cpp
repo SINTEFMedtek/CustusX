@@ -161,7 +161,7 @@ USFrameDataPtr USFrameData::create(QString filename, cx::CachedImageDataContaine
 //	retval->mImageContainer.reset(new cx::CachedImageDataContainer(cache));
 	retval->mImageContainer = images;
 	retval->initialize();
-	std:cout << "USFrameData::create() " << retval->mImageContainer->size() << ", " << retval->mReducedToFull.size() << std::endl;
+//	std:cout << "USFrameData::create() " << retval->mImageContainer->size() << ", " << retval->mReducedToFull.size() << std::endl;
 
 	return retval;
 }
@@ -201,9 +201,16 @@ Eigen::Array3i USFrameData::getDimensions() const
 
 	if (mCropbox.range()[0]!=0)
 	{
+		// WARNING: cannot use dimensions from the cropImage function - it uses extent
 		vtkImageDataPtr sample = this->cropImage(mImageContainer->get(0), mCropbox);
-		retval[0] = sample->GetDimensions()[0];
-		retval[1] = sample->GetDimensions()[1];
+//		retval[0] = sample->GetDimensions()[0];
+//		retval[1] = sample->GetDimensions()[1];
+		Eigen::Array<int, 6, 1> extent(sample->GetWholeExtent());
+//		std::cout << "wholeextent " << extent << std::endl;
+//		std::cout << "dim " << retval << std::endl;
+		retval[0] = extent[1]-extent[0]+1;
+		retval[1] = extent[3]-extent[2]+1;
+//		std::cout << "extent dim: " << retval[0] << " " << retval[1] << std::endl;
 	}
 
 	retval[2] = mReducedToFull.size();
@@ -228,20 +235,20 @@ void USFrameData::setCropBox(IntBoundingBox3D cropbox)
 	mCropbox = cropbox;
 }
 
-/** Return an image that is cropped using its own croppingBox.
- *  The image is not added to the data manager nor saved.
+/** Crop the image by setting the wholeExtent.
+ *
+ * WARNING: This means that the dimension differ from the extent - this
+ * is a speed optimization during preprocessing.
+ * Using ClipDataOn would create a copy with dim==extent
  */
 vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox) const
 {
   vtkImageClipPtr clip = vtkImageClipPtr::New();
   clip->SetInput(input);
   clip->SetOutputWholeExtent(cropbox.begin());
-  clip->ClipDataOn();
+//  clip->ClipDataOn();
   vtkImageDataPtr rawResult = clip->GetOutput();
-
   rawResult->Update();
-  rawResult->UpdateInformation();
-  rawResult->ComputeBounds();
   return rawResult;
 }
 
@@ -264,18 +271,29 @@ vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 
 }
 
-vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
+vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr grayFrame) const
 {
+//	ssc::TimeKeeper timer;
+
 	// Some of the code here is borrowed from the vtk examples:
 	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
 
 	if (inData->GetNumberOfScalarComponents() < 3)
 	{
 		ssc::messageManager()->sendWarning("Angio requested for grayscale ultrasound");
-		return this->toGrayscale(inData);
+//		return this->toGrayscale(inData);
+		return grayFrame;
 	}
 
-	vtkImageDataPtr outData = this->toGrayscale(inData);
+	vtkImageDataPtr outData = vtkImageDataPtr::New();
+	outData->DeepCopy(grayFrame);
+//	vtkImageDataPtr outData = this->toGrayscale(inData);
+//	timer.printElapsedms("\t\t\t\tgrayscale part opt\t");
+//	timer.reset();
+
+//	vtkImageDataPtr throwaway = this->toGrayscale(inData);
+//	timer.printElapsedms("\t\t\t\tgrayscale part throwaway\t");
+//	timer.reset();
 
 	int* outExt = outData->GetExtent();
 
@@ -326,6 +344,8 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData) const
 			}
 		}
 	}
+//	timer.printElapsedms("\t\t\t\tangio algo\t");
+//	timer.reset();
 
 	return outData;
 }
@@ -337,6 +357,8 @@ void USFrameData::setPurgeInputDataAfterInitialize(bool value)
 
 std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::vector<bool> angio)
 {
+//	ssc::TimeKeeper timer;
+//	std::cout << "USFrameData::initializeFrames start " << mReducedToFull.size() << std::endl;
 	std::vector<std::vector<vtkImageDataPtr> > raw(angio.size());
 
 	for (unsigned i=0; i<raw.size(); ++i)
@@ -347,28 +369,57 @@ std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::ve
 	// apply cropping and angio
 	for (unsigned i=0; i<mReducedToFull.size(); ++i)
 	{
+//		timer.printElapsedms("inbetween");
+//		timer.reset();
 		SSC_ASSERT(mImageContainer->size()>mReducedToFull[i]);
 		vtkImageDataPtr current = mImageContainer->get(mReducedToFull[i]);
+//		timer.printElapsedms("\tload image\t");
+//		timer.reset();
+
+//		std::cout << "i="<<i<< ", " << Eigen::Array3i(current->GetDimensions()) << std::endl;
 
 		if (mCropbox.range()[0]!=0)
 			current = this->cropImage(current, mCropbox);
 
+//		std::cout << "i="<<i<< ", " << Eigen::Array3i(current->GetDimensions()) << std::endl;
+
+//		timer.printElapsedms("\t\t\tcrop\t");
+//		timer.reset();
+
+		// optimization: grayFrame is used in both calculations: compute once
+		vtkImageDataPtr grayFrame = this->toGrayscale(current);
+//		timer.printElapsedms("\t\t\tgray\t");
+//		timer.reset();
+
 		for (unsigned j=0; j<angio.size(); ++j)
 		{
+
 			if (angio[j])
 			{
-				vtkImageDataPtr angioFrame = this->useAngio(current);
+				vtkImageDataPtr angioFrame = this->useAngio(current, grayFrame);
 				raw[j][i] = angioFrame;
+//				timer.printElapsedms("\t\t\tangio\t");
+//				timer.reset();
+//				std::cout << "i="<<i<< ", " << Eigen::Array3i(angioFrame->GetDimensions()) << std::endl;
 			}
 			else
 			{
-				vtkImageDataPtr grayFrame = this->toGrayscale(current);
+//				vtkImageDataPtr grayFrame = this->toGrayscale(current);
 				raw[j][i] = grayFrame;
+//				timer.printElapsedms("\t\t\tgray\t");
+//				timer.reset();
+//				std::cout << "i="<<i<< ", " << Eigen::Array3i(grayFrame->GetDimensions()) << std::endl;
 			}
 		}
 
+//		timer.printElapsedms("\t\t\tprocess\t");
+//		timer.reset();
+
 		if (mPurgeInput)
 			mImageContainer->purge(mReducedToFull[i]);
+
+//		timer.printElapsedms("\t\t\tinit\t");
+//		timer.reset();
 	}
 
 	if (mPurgeInput)
