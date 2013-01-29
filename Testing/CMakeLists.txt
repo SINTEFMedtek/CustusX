@@ -112,33 +112,13 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
         ${SSC_TEST_SOURCE_FILES}
         )
         
-	if (SSC_BUILD_PURE_CPPUNIT_TESTS)
-		add_executable(testSSC
-			sscCPPUnitMain.cpp
-			${SSC_TEST_SOURCE_FILES}
-			)
-		target_link_libraries(testSSC SSC ${CPPUNIT_LIBRARIES})
-		set_target_properties(testSSC PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
-	endif()
-    
-    # --------------- -------------------------------
-    # -- CppUnit - CTest integration. ---------------
-    # --   Use CISST_ADD_TESTS() to convert each CppUnit test to a CTest test. 
-    
-    # Initialize cisst routines
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/Testing/cisst_code)
-    include(cisstMacros)
-    add_subdirectory(cisst_code)
-    
-    # link all CppUnit tests to the cisstTestsMain library
-    add_executable(testSSC_CppUnit_CTest ${SSC_TEST_SOURCE_FILES} )
-    set_target_properties(testSSC_CppUnit_CTest PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
-    target_link_libraries(testSSC_CppUnit_CTest cisstTestsMain SSC ${CPPUNIT_LIBRARIES})
-    # Generate a CTest list of tests
-    CISST_ADD_TESTS(testSSC_CppUnit_CTest)
-    
-    # -- finished CppUnit - CTest integration. ------
-    # -----------------------------------------------
+
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
+	include(cxTestMacros)
+	add_subdirectory(cisst_code)
+
+	# define cppunit tests and ctest tests from same source:
+	SSC_ADD_CTEST_CPPUNIT_TESTS(testSSC sscCPPUnitMain.cpp "${SSC_TEST_SOURCE_FILES}" SSC)
 
 endif (BUILD_TESTING)
     
