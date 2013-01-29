@@ -15,6 +15,7 @@
 #include "sscTime.h"
 #include "sscMessageManager.h"
 #include "cxToolManager.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -156,7 +157,7 @@ void Acquisition::startRecord()
 	}
 
 	double startTime = ssc::getMilliSecondsSinceEpoch();
-	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, "test_acq"));
+	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, settings()->value("Ultrasound/acquisitionName").toString()));
 	ssc::messageManager()->playStartSound();
 	this->setState(sRUNNING);
 }

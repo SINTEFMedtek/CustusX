@@ -137,7 +137,7 @@ public:
 protected:
 	void initialize();
 	USFrameData();
-	vtkImageDataPtr useAngio(vtkImageDataPtr inData) const;/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
+	vtkImageDataPtr useAngio(vtkImageDataPtr inData, vtkImageDataPtr grayFrame) const;/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
 
 	vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox) const;
 	vtkImageDataPtr toGrayscale(vtkImageDataPtr input) const;
