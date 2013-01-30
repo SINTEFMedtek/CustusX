@@ -21,25 +21,8 @@ include_directories( ${CPPUNIT_INCLUDE_DIR})
         ${CX_TEST_SOURCE_FILES}
     )
     
-    # A CppUnit executable included for debugging purposes.
-    # Not part of ctest
-    add_executable(cxTestToolManager cxCppUnitMain.cpp ${TM_TEST_SOURCE_FILES} )
-    target_link_libraries(cxTestToolManager cxTrackingService ${CPPUNIT_LIBRARIES})
-    
-    # -----------------------------------------------
-    # -- CppUnit - CTest integration. ---------------
-    # Use CISST_ADD_TESTS() to convert each CppUnit test to a CTest test. 
-    
-    # Initialize cisst routines
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/Testing/cisst_code)
-    include(cisstMacros)
-    
-    # Link all CppUnit tests to the cisstTestsMain library
-    add_executable(testTM_CppUnit_CTest ${TM_TEST_SOURCE_FILES} )
-    target_link_libraries(testTM_CppUnit_CTest cisstTestsMain cxTrackingService ${CPPUNIT_LIBRARIES})
-    # Generate a CTest list of tests
-    CISST_ADD_TESTS(testTM_CppUnit_CTest)
-    
-    # -- finished CppUnit - CTest integration. ------
-    # -----------------------------------------------
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
+	include(cxTestMacros)
+	# define cppunit tests and ctest tests from same source:
+	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestToolManager cxCppUnitMain.cpp "${TM_TEST_SOURCE_FILES}" cxTrackingService)
 endif (BUILD_TESTING)
