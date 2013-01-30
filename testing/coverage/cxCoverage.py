@@ -18,6 +18,10 @@ import os.path
 import urllib
 import getpass
 import platform
+import os
+import time
+import webbrowser
+
 
 class Common(object):
     '''
@@ -96,106 +100,177 @@ changeDir = shell.changeDir
 
 # ---------------------------------------------------------
 
+
+def packageTextAsHTML(heading, body, filename):
+	"""
+	Create a minimal html file containgin header and body
+	"""
+	skeleton = """\
+<!DOCTYPE html>
+<html>
+<body>
+<h1>%s</h1>
+<p>%s</p>
+</body>
+</html>
+"""
+	body = '&nbsp&nbsp&nbsp&nbsp&nbsp'.join(body.split('\t'))
+	body = '<br>'.join(body.split('\n'))
+	print body
+	text = skeleton % (heading, body)
+	f = open(filename, 'w')
+	f.write(text)
+	f.close()
+	return filename
+
 class Controller(object):
-    '''
-    A command line program that parses options and arguments,
-    then performs the requested operations on the selected
-    components.
-    '''
-    def __init__(self):
-    	'''
-    	Initialize and run the controller
-    	'''        
-        self.optionParser = self._createOptionParser();
-        self._parseCommandLine()
+	'''
+	A command line program that parses options and arguments,
+	then performs the requested operations on the selected
+	components.
+	'''
+	def __init__(self):
+		'''
+		Initialize and run the controller
+		'''        
+		self.optionParser = self._createOptionParser();
+		self._parseCommandLine()
     
-    def _createOptionParser(self):
-        description='''
-Coverage script for CustusX and its components.
-Uses lcov to run ctest and generate coverage reports from them.
-%s.
-'''        
-        #Create instance of OptionParser Module, included in Standard Library
-        p = optparse.OptionParser(description=description,
-                                    version='%prog version 0.1',
-                                    usage= '%prog [options] [components]')
-        p.add_option('--initialize', '-i',
-                     action='store_true',
-                     help='reset all counters and generate zero counters for all lines',
-                     default=False)
-        p.add_option('--post_test', '-p',
-                     action='store_true',
-                     help='generate test html data from the tests',
-                     default=False)
-        p.add_option('--full', '-f',
-                     action='store_true',
-                     help='initialize, run tests, generate html data',
-                     default=False)
-        p.add_option('--run_tests', '-t',
-                     action='store_true',
-                     help='run ctest',
-                     default=False)
-        p.add_option('--ctest_args', '-c',
-                     action='store',
-                     type='string',
-                     help='arguments to pass to ctest',
-                     default="")
-        return p
+	def _createOptionParser(self):
+		"""
+		"""
+		description='''
+		Coverage script for CustusX and its components.
+		Uses lcov to run ctest and generate coverage reports from them.
+		%s.
+		'''        
+		#Create instance of OptionParser Module, included in Standard Library
+		p = optparse.OptionParser(description=description,
+				            version='%prog version 0.1',
+				            usage= '%prog [options] [components]')
+		p.add_option('--initialize', '-i',
+			     action='store_true',
+			     help='reset all counters and generate zero counters for all lines',
+			     default=False)
+		p.add_option('--post_test', '-p',
+			     action='store_true',
+			     help='generate test html data from the tests',
+			     default=False)
+		p.add_option('--full', '-f',
+			     action='store_true',
+			     help='initialize, run tests, generate html data',
+			     default=False)
+		p.add_option('--run_tests', '-t',
+			     action='store_true',
+			     help='run ctest',
+			     default=False)
+		p.add_option('--ctest_args', '-c',
+			     action='store',
+			     type='string',
+			     help='arguments to pass to ctest',
+			     default="")
+		return p
     
-    def _parseCommandLine(self):
-        '''
-        Parse the options and arguments from the command line
-        '''
-        options, arguments = self.optionParser.parse_args()
+	def _parseCommandLine(self):
+		'''
+		Parse the options and arguments from the command line
+		'''
+		options, arguments = self.optionParser.parse_args()
 
-                  
-        path = ""
-	if len(arguments)>0:
-		path = arguments[0]
-        # display help if no path set
-        if len(path)==0:
-        	self.optionParser.print_help()
-		return
+		path = ''
+		if len(arguments)>0:
+			path = arguments[0]
+		# display help if no path set
+		if len(path)==0:
+			self.optionParser.print_help()
+			return
 
-	full = (not options.initialize) and (not options.run_tests) and (not options.post_test)
+		full = (not options.initialize) and (not options.run_tests) and (not options.post_test)
 
-	print "Running coverage on folder %s" % path
-	changeDir(path)
+		print 'Running coverage on folder %s' % path
+		changeDir(os.path.abspath(path))
 
-	if full or options.initialize:
-		print "Initializing ..."
-		runShell("""\
-lcov --zerocounters -directory . \
-""")
-		runShell("""\
-lcov --capture --initial --directory . --output-file cx_coverage_base.gcov \
-""")
+		if full or options.initialize:
+			print 'Initializing ...'
+			self._generateCoverage()
 
-	if full or options.run_tests:
-		cmd = "ctest"
-		if options.ctest_args:
-			cmd = cmd + " " + options.ctest_args
-		cmd = cmd + " > ./coverage_info/ctest_results.txt"
-		print "Running %s ..." % cmd
-		runShell("mkdir ./coverage_info")
+		if full or options.run_tests:
+			self._run_ctest(options.ctest_args)
+
+		if full or options.post_test:
+			print 'Generating html ...'
+			#htmlFolder = self._generateCoverage()
+			htmlFolder = 'coverage_info'
+			self._publishCoverage(htmlFolder)
+
+	def _initializeCoverage(self):
+		"""
+		Initialize lcov by resetting all existing counters
+		and initializing/generating counters for all files.
+		"""
+		runShell('lcov --zerocounters -directory .')
+		runShell('lcov --capture --initial --directory . --output-file cx_coverage_base.gcov')
+
+	def _run_ctest(self, ctest_args):
+		"""
+		Run ctest with the input arguments,
+		post the output to the unittest folder on medtek.sintef.no
+		"""
+		path = shell.CWD + '/coverage_info'
+		cmd = 'ctest'
+		if ctest_args:
+			cmd = cmd + ' ' + ctest_args
+		cmd = cmd + ' > %s/ctest_results.txt' % path
+		print 'Running %s ...' % cmd
+		runShell('mkdir %s' % path)
 		runShell(cmd)
-	if full or options.post_test:
-		print "Generating html ..."
-		runShell("""\
-lcov --capture --directory . --output-file cx_coverage_test.gcov \
-""")
-		runShell("""\
-lcov -add-tracefile cx_coverage_base.gcov -add-tracefile cx_coverage_test.gcov -o cx_coverage_total.gcov \
-""")
-		runShell("""\
-lcov --remove cx_coverage_total.gcov '/eigen3/Eigen/*' '/opt/*' '/external_code/*' '/Library/*' '/usr/*' '/moc*.cxx' '/CustusX3/build_*' '/testing/*' '/Testing/*' '/Examples/*' --output-file cx_coverage.gcov \
-""")
-		runShell("""\
-genhtml cx_coverage.gcov -output-directory ./coverage_info \
-""")
-		runShell("xdg-open ./coverage_info/index.html")
-		runShell("scp -r ./coverage_info/* /Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/coverage")
-		runShell("scp -r ./coverage_info/* /Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/coverage")
+
+		with open('%s/ctest_results.txt' % path, 'r') as f:
+			read_data = f.read()
+
+		htmlFile = '%s/ctest_results.html' % path
+		packageTextAsHTML('Unit tests run %s' % time.strftime('%Y-%m-%d_%H-%M'), read_data, htmlFile)
+		runShell('scp -r %s medtek@medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/unittest/index.html' % htmlFile)
+            
+	def _generateCoverage(self):
+		"""
+		Given that lcov is initialized and ctest is run,
+		Generate html output from the gcov data.
+		Return output folder name.
+		"""
+		runShell('lcov --capture --directory . --output-file cx_coverage_test.gcov')
+		runShell('lcov -add-tracefile cx_coverage_base.gcov -add-tracefile cx_coverage_test.gcov -o cx_coverage_total.gcov')
+		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/testing/*" "/Testing/*" "/Examples/*" --output-file cx_coverage.gcov')
+		runShell('genhtml cx_coverage.gcov -output-directory ./coverage_info')
+		return './coverage_info'
+
+	def _publishCoverage(self, htmlFolder):
+		"""
+		Publish the input folder containing lcov html files to medtek.sintef.no,
+		both to the static location coverage accessible from the wiki,
+		and to the CustusX/coverage/<timestamp> folder for history storage.
+
+		Additionally, open in a local web browser
+		"""
+		inpath = '%s/%s/' % (shell.CWD, htmlFolder)
+		indexFile = '%s/index.html' % inpath
+		print 'Opening %s in browser...' % indexFile 
+		webbrowser.open('file://%s' % indexFile)
+        	if True:
+			return
+		runShell('scp -r %s/* medtek@medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/coverage' % inpath)
+		datedFolder = '%s_%s' % (htmlFolder, time.strftime('%Y-%m-%d_%H-%M'))
+		datedpath = '%s/%s/' % (shell.CWD, datedFolder)
+		# this assumes htmlFolder is a folder, not a path!
+		#print 'htmlfolder: ', htmlFolder
+		#print 'datedFolder: ', datedFolder
+		#print 'cwd ', os.getcwd()
+		#print 'shell.cwd ', shell.CWD
+		os.rename(inpath, datedpath)
+		runShell('scp -r %s medtek@medtek.sintef.no:/Volumes/MedTekDisk/Software/CustusX/coverage' % datedFolder)
+		os.rename(datedpath, inpath)
+
+
 def main():
     Controller()
 
