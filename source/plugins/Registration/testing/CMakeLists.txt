@@ -36,32 +36,9 @@ if (BUILD_TESTING)
   ${CX_TEST_SOURCE_FILES}
   )
   
-  # A CppUnit executable included for debugging purposes.
-  # Not part of ctest
-  add_executable(cxTestRegistration cxCppUnitMain.cpp ${CX_TEST_REGISTRATION_SOURCE_FILES} )
-  target_link_libraries(cxTestRegistration
-    cxPluginRegistration
-    ${CPPUNIT_LIBRARIES})
-  
-  # -----------------------------------------------
-  # -- CppUnit - CTest integration. ---------------
-  # Use CISST_ADD_TESTS() to convert each CppUnit test to a CTest test. 
-  
-  # Initialize cisst routines
-  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/Testing/cisst_code)
-  include(cisstMacros)
-  
-  # Link all CppUnit tests to the cisstTestsMain library
-  add_executable(testRegistration_CppUnit_CTest ${CX_TEST_REGISTRATION_SOURCE_FILES} )
-  target_link_libraries(testRegistration_CppUnit_CTest 
-    cisstTestsMain
-    cxPluginRegistration
-    ${CPPUNIT_LIBRARIES}
-    ${BOOST_LIBRARIES}
-)
-  # Generate a CTest list of tests
-  CISST_ADD_TESTS(testRegistration_CppUnit_CTest)
-  
-  # -- finished CppUnit - CTest integration. ------
-  # -----------------------------------------------
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
+	include(cxTestMacros)
+	# define cppunit tests and ctest tests from same source:
+	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestRegistration cxCppUnitMain.cpp "${CX_TEST_REGISTRATION_SOURCE_FILES}" cxPluginRegistration)
+
 endif (BUILD_TESTING)
