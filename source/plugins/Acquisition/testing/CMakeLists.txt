@@ -37,32 +37,9 @@ if (BUILD_TESTING)
 		${CX_TEST_ACQUISITION_SOURCE_FILES}
 		)
 
-	# A CppUnit executable included for debugging purposes.
-	# Not part of ctest
-	add_executable(cxTestAcquisition cxCppUnitMain.cpp ${CX_TEST_ACQUISITION_SOURCE_FILES} )
-	target_link_libraries(cxTestAcquisition
-		cxPluginAcquisition
-		${CPPUNIT_LIBRARIES})
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
+	include(cxTestMacros)
+	# define cppunit tests and ctest tests from same source:
+	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestAcquisition cxCppUnitMain.cpp "${CX_TEST_ACQUISITION_SOURCE_FILES}" cxPluginAcquisition)
 
-	# -----------------------------------------------
-	# -- CppUnit - CTest integration. ---------------
-	# Use CISST_ADD_TESTS() to convert each CppUnit test to a CTest test.
-
-	# Initialize cisst routines
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/Testing/cisst_code)
-	include(cisstMacros)
-
-	# Link all CppUnit tests to the cisstTestsMain library
-	add_executable(testAcq_CppUnit_CTest ${CX_TEST_ACQUISITION_SOURCE_FILES} )
-	target_link_libraries(testAcq_CppUnit_CTest
-		cisstTestsMain
-		cxPluginAcquisition
-		${CPPUNIT_LIBRARIES}
-		${BOOST_LIBRARIES}
-		)
-	# Generate a CTest list of tests
-	CISST_ADD_TESTS(testAcq_CppUnit_CTest)
-
-	# -- finished CppUnit - CTest integration. ------
-	# -----------------------------------------------
 endif (BUILD_TESTING)
