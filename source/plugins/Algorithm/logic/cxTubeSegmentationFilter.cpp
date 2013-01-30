@@ -4,11 +4,13 @@
 #include "tube-segmentation.hpp"
 #include "openCLUtilities.hpp"
 #include "tsf-config.h"
+#include "Exceptions.hpp"
 
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
@@ -35,7 +37,8 @@ QString TubeSegmentationFilter::getHelp() const
 
 bool TubeSegmentationFilter::execute()
 {
-    //get the image
+
+	//get the image
     ssc::ImagePtr input = this->getCopiedInputImage();
     	if (!input)
     		return false;
@@ -81,19 +84,26 @@ bool TubeSegmentationFilter::execute()
     // Parse parameters from program arguments
 	boost::unordered_map<std::string, std::string> parameters = getParameters(argc, argv);
 	*/
-
-    boost::unordered_map<std::string, std::string> parameters = this->generateParametersFromOptions();
+try{
+    mParameters = this->getParameters();
 
     // Write out parameter list
+    this->printParameters(mParameters);
+
+    //TODO remove
+    return true;
+
+    /*
     std::cout << "The following parameters are set: " << std::endl;
     boost::unordered_map<std::string, std::string>::iterator it;
-    for(it = parameters.begin(); it != parameters.end(); it++) {
+    for(it = mParameters.begin(); it != mParameters.end(); it++) {
     	std::cout << it->first << " " << it->second << std::endl;
     }
+    */
 
     OpenCL ocl;
 	//ocl.context = createCLContextFromArguments(argc, argv);
-    ocl.context = this->createCLContextFromArguments(parameters);
+    ocl.context = this->createCLContextFromArguments(mParameters);
 
     // Select first device
     cl::vector<cl::Device> devices = ocl.context.getInfo<CL_CONTEXT_DEVICES>();
@@ -107,12 +117,17 @@ bool TubeSegmentationFilter::execute()
     try{
 	    // Compile and create program
 	    std::string kernelFile;
-	    if(parameters.count("buffers-only") == 0 && (int)devices[0].getInfo<CL_DEVICE_EXTENSIONS>().find("cl_khr_3d_image_writes") > -1) {
+	    if(!getParamBool(mParameters, "buffers-only") && (int)devices[0].getInfo<CL_DEVICE_EXTENSIONS>().find("cl_khr_3d_image_writes") > -1) {
 	    	kernelFile = std::string(KERNELS_DIR) + "/kernels.cl";
 	        ocl.program = buildProgramFromSource(ocl.context, kernelFile);
-	        parameters["3d_write"] = "true";
+	        BoolParameter v = mParameters.bools["3d_write"];
+			v.set(true);
+			mParameters.bools["3d_write"] = v;
 	    } else {
 	    	kernelFile = std::string(KERNELS_DIR) + "/kernels_no_3d_write.cl";
+	        BoolParameter v = mParameters.bools["3d_write"];
+	        v.set(false);
+	        mParameters.bools["3d_write"] = v;
 	        ocl.program = buildProgramFromSource(ocl.context, kernelFile);
 	        std::cout << "Writing to 3D textures is not supported on the selected device." << std::endl;
 	    }
@@ -123,24 +138,20 @@ bool TubeSegmentationFilter::execute()
             return false;
         }
     }
-    catch (...){
-    	std::cout << "Caught unexpected exception in TubeSegmentationFilter::execute(), contact programmer." << std::endl;
-    	return false;
-    }
 
     SIPL::int3 size;
     TubeSegmentation TS;
     try {
     	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+input->getFilePath()).toStdString();
-    	std::cout << "reading and transfering: " << filename << std::endl;
+    	//std::cout << "reading and transfering: " << filename << std::endl;
         // Read dataset and transfer to device
-        cl::Image3D dataset = readDatasetAndTransfer(ocl, filename, parameters, &size);
+        cl::Image3D dataset = readDatasetAndTransfer(ocl, filename, mParameters, &size);
 
         // Run specified method on dataset
-        if(parameters.count("centerline-method") && parameters["centerline-method"] == "ridge") {
-            TS = runCircleFittingAndRidgeTraversal(ocl, dataset, size, parameters);
+        if(getParamStr(mParameters, "centerline-method") == "ridge") {
+            TS = runCircleFittingAndRidgeTraversal(ocl, dataset, size, mParameters);
         } else {
-            TS = runCircleFittingAndNewCenterlineAlg(ocl, dataset, size, parameters);
+            TS = runCircleFittingAndNewCenterlineAlg(ocl, dataset, size, mParameters);
         }
     } catch(cl::Error e) {
         std::cout << "OpenCL error: " << getCLErrorString(e.err()) << std::endl;
@@ -153,19 +164,25 @@ bool TubeSegmentationFilter::execute()
 
 
     //TODO Clean up!!!
-    if(parameters.count("display") > 0 || parameters.count("storage-dir") > 0 || parameters["centerline-method"] == "ridge") {
+    //TODO cannot clean up yet, because need this data to make the file...
+    /*if(mParameters.count("display") > 0 || mParameters.count("storage-dir") > 0 || mParameters["centerline-method"] == "ridge") {
         // Cleanup transferred data
         delete[] TS.centerline;
         delete[] TS.TDF;
-        if(parameters.count("no-segmentation") == 0)
+        if(mParameters.count("no-segmentation") == 0)
             delete[] TS.segmentation;
-        if(parameters["centerline-method"] == "ridge")
+        if(mParameters["centerline-method"] == "ridge")
             delete[] TS.radius;
-    }
-
+    }*/
+} catch(std::exception& s){
+	printf("std::exception: %s \n",s.what());
+} catch(SIPL::SIPLException& e){
+	printf("SIPL::SIPLException: %s \n",e.what());
+} catch(...){
+	std::cout << "Caught unhandled exception." << std::endl;
+}
 	//======================================================
-
-	return true;
+ 	return true;
 }
 
 void TubeSegmentationFilter::postProcess()
@@ -194,6 +211,22 @@ void TubeSegmentationFilter::postProcess()
 
 	mOutputTypes.front()->setValue(outputCenterline->getUid());
 
+	// Centerline (vtk)
+	//======================================================
+	boost::unordered_map<std::string, StringParameter>::iterator it = mParameters.strings.find("centerline-vtk-file");
+	if(it != mParameters.strings.end())
+	{
+		QString vtkFilename = qstring_cast(it->second.get());
+		//load vtk into CustusX
+		ssc::DataPtr data = patientService()->getPatientData()->importData(vtkFilename);
+		if(data){
+			QString uid = data->getUid();
+			mOutputTypes[1]->setValue(uid);
+		}else{
+			ssc::messageManager()->sendError("Could not import vtk centerline: "+vtkFilename);
+		}
+	}
+
 	// Segmentation
 	//======================================================
 	QString uidSegmentation = input->getUid() + "_tsf_seg%1";
@@ -206,11 +239,30 @@ void TubeSegmentationFilter::postProcess()
 	ssc::dataManager()->loadData(outputSegmentaion);
 	ssc::dataManager()->saveImage(outputSegmentaion, patientService()->getPatientData()->getActivePatientFolder());
 
-	mOutputTypes[1]->setValue(outputSegmentaion->getUid());
+	mOutputTypes.back()->setValue(outputSegmentaion->getUid());
 }
 
 void TubeSegmentationFilter::createOptions(QDomElement root)
 {
+	this->createDefaultOptions(root);
+
+	//TODO load saved options, done automatically because this is xml adapters???
+
+	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
+	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); stringIt++)
+		mOptionsAdapters.push_back(*stringIt);
+
+	std::vector<ssc::BoolDataAdapterXmlPtr>::iterator boolIt;
+	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); boolIt++)
+		mOptionsAdapters.push_back(*boolIt);
+
+	std::vector<ssc::DoubleDataAdapterXmlPtr>::iterator doubleIt;
+	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); doubleIt++)
+		mOptionsAdapters.push_back(*doubleIt);
+
+	//TODO connect options that should be connected
+
+	/*
 	mDeviceOption = this->makeDeviceOption(root);
 	mOptionsAdapters.push_back(mDeviceOption);
 	mBufferOnlyOption = this->makeBuffersOnlyOption(root);
@@ -236,6 +288,7 @@ void TubeSegmentationFilter::createOptions(QDomElement root)
 	this->toggleAutoMinimum();
 	connect(mAutoMaximumOption.get(), SIGNAL(changed()), this, SLOT(toggleAutoMaximum()));
 	this->toggleAutoMaximum();
+	*/
 }
 
 void TubeSegmentationFilter::createInputTypes()
@@ -257,6 +310,11 @@ void TubeSegmentationFilter::createOutputTypes()
 	temp->setHelp("Generated centerline.");
 	mOutputTypes.push_back(temp);
 
+	SelectMeshStringDataAdapterPtr vtkCenterline = SelectMeshStringDataAdapter::New();
+	vtkCenterline->setValueName("Centerline (vtk)");
+	vtkCenterline->setHelp("Generated centerline mesh (vtk-format).");
+	mOutputTypes.push_back(vtkCenterline);
+
 	temp = SelectDataStringDataAdapter::New();
 	temp->setValueName("Segmentation");
 	temp->setHelp("Generated segmentation.");
@@ -265,12 +323,12 @@ void TubeSegmentationFilter::createOutputTypes()
 
 void TubeSegmentationFilter::toggleAutoMinimum()
 {
-	mMinimumOption->setEnabled(!mAutoMinimumOption->getValue());
+	//mMinimumOption->setEnabled(!mAutoMinimumOption->getValue());
 }
 
 void TubeSegmentationFilter::toggleAutoMaximum()
 {
-	mMaximumOption->setEnabled(!mAutoMaximumOption->getValue());
+	//mMaximumOption->setEnabled(!mAutoMaximumOption->getValue());
 }
 
 vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int size_x, int size_y, int size_z)
@@ -279,7 +337,7 @@ vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int s
 
 	imageImport->SetWholeExtent(0, size_x - 1, 0, size_y - 1, 0, size_z - 1);
 	imageImport->SetDataExtentToWholeExtent();
-	imageImport->SetDataScalarTypeToUnsignedChar();
+	imageImport->SetDataScalarTypeToUnsignedShort();
 	imageImport->SetNumberOfScalarComponents(1);
 	imageImport->SetImportVoidPointer((void*)data);
 	imageImport->GetOutput()->Update();
@@ -290,19 +348,121 @@ vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int s
 	return retval;
 }
 
-boost::unordered_map<std::string, std::string> TubeSegmentationFilter::generateParametersFromOptions()
+void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 {
-	boost::unordered_map<std::string, std::string> retval;
+	paramList defaultOptions = initParameters();
 
+	this->printParameters(defaultOptions); //debugging
+
+	//TODO add vendor and device manually...
+
+	//TODO skip parameters we don't want:
+	// display, storage-dir ...
+	std::vector<std::string> hideParameter;
+	hideParameter.push_back("display");
+	hideParameter.push_back("storage-dir");
+
+	//TODO set storage-dir untill problem is fixed
+	setParameter(defaultOptions, "storage-dir", "/home/jbake/jbake/workspace/");
+
+	//generate string adapters
+    boost::unordered_map<std::string, StringParameter>::iterator stringIt;
+    for(stringIt = defaultOptions.strings.begin(); stringIt != defaultOptions.strings.end(); ++stringIt )
+    {
+    	if(std::find(hideParameter.begin(), hideParameter.end(), stringIt->first) == hideParameter.end())
+    		mStringOptions.push_back(this->makeStringOption(root, stringIt->first, stringIt->second));
+    }
+
+	//generate bool adapters
+    boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
+    for(boolIt = defaultOptions.bools.begin(); boolIt != defaultOptions.bools.end(); ++boolIt )
+    {
+    	if(std::find(hideParameter.begin(), hideParameter.end(), boolIt->first) == hideParameter.end())
+    		mBoolOptions.push_back(this->makeBoolOption(root, boolIt->first, boolIt->second));
+    }
+
+	//generate double adapters
+    boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
+    for(numericIt = defaultOptions.numerics.begin(); numericIt != defaultOptions.numerics.end(); ++numericIt )
+    {
+    	if(std::find(hideParameter.begin(), hideParameter.end(), numericIt->first) == hideParameter.end())
+    		mDoubleOptions.push_back(this->makeDoubleOption(root, numericIt->first, numericIt->second));
+    }
+
+}
+
+paramList TubeSegmentationFilter::getParameters()
+{
+	//TODO rydd opp...
+
+	paramList retval = initParameters();
+
+	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
+	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
+	{
+		//TODO hvordan vet vi om det gikk?
+		try{
+			std::cout << "Setter et string parameter: " << stringIt->get()->getValueName().toStdString() << " " << stringIt->get()->getValue().toStdString() << std::endl;
+			retval = setParameter(retval, stringIt->get()->getValueName().toStdString(), stringIt->get()->getValue().toStdString());
+		} catch (std::exception e)
+		{
+			ssc::messageManager()->sendError("Could not process a parameter needed for tube segementation.");
+			//TODO read what()
+			//TODO throw!!!
+		}
+	}
+
+	std::vector<ssc::BoolDataAdapterXmlPtr>::iterator boolIt;
+	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
+	{
+		//TODO hvordan vet vi om det gikk?
+		try{
+			std::string value = boolIt->get()->getValue() ? "true" : "false";
+			std::cout << "Setter et bool parameter: " << boolIt->get()->getValueName().toStdString() << " " << boolIt->get()->getValue() << std::endl;
+			retval = setParameter(retval, boolIt->get()->getValueName().toStdString(), value);
+		} catch (std::exception e)
+		{
+			ssc::messageManager()->sendError("Could not process a parameter needed for tube segementation.");
+			//TODO read what()
+			//TODO throw!!!
+		}
+	}
+
+	std::vector<ssc::DoubleDataAdapterXmlPtr>::iterator doubleIt;
+	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
+	{
+		//TODO hvordan vet vi om det gikk?
+		try{
+			double dbl = doubleIt->get()->getValue();
+			std::string value = boost::lexical_cast<std::string>(dbl);
+			//std::ostringstream strs;
+			//strs << dbl;
+			//std::string value = strs.str();
+			std::cout << "Setter et double parameter: " << doubleIt->get()->getValueName().toStdString() << " " << doubleIt->get()->getValue() << std::endl;
+			retval = setParameter(retval, doubleIt->get()->getValueName().toStdString(), value);
+		} catch (std::exception e)
+		{
+			ssc::messageManager()->sendError("Could not process a parameter needed for tube segementation.");
+			//TODO read what()
+			//TODO throw!!!
+		}
+	}
+	return retval;
+
+	/*
 	//TODO BEGIN
-	//std::string  storageDir = "storage-dir";
-	//std::string storageDirPath = "/home/jbake/jbake/workspace/"; // storage-dirs value
-	//retval[storageDir] = storageDirPath;
+	std::string  storageDir = "storage-dir";
+	std::string storageDirPath = "/home/jbake/jbake/workspace/"; // storage-dirs value
+	retval[storageDir] = storageDirPath;
 
 
-	//std::string parameters = "--parameters";
+	//std::string parameters = "parameters";
 	//std::string parametersFile = "us-accuracy";
 	//retval[parameters] = parametersFile;
+
+	std::string centerlineVtkFile = "centerline-vtk-file";
+	std::string centerlineVtkFileFile = "/home/jbake/Desktop/vtkCenterline.vtk";
+	retval[centerlineVtkFile] = centerlineVtkFileFile;
 	//TODO END
 
 	//ssc::BoolDataAdapterXmlPtr mTimingOption;
@@ -358,35 +518,105 @@ boost::unordered_map<std::string, std::string> TubeSegmentationFilter::generateP
 	retval[centerlineMethod] = centerlineMethodType;
 
 	return retval;
+	*/
 }
 
-cl::Context TubeSegmentationFilter::createCLContextFromArguments(boost::unordered_map<std::string, std::string> parameters) {
+cl::Context TubeSegmentationFilter::createCLContextFromArguments(paramList parameters)
+{
     cl_device_type type = CL_DEVICE_TYPE_ALL;
     cl_vendor vendor = VENDOR_ANY;
 
-    boost::unordered_map<std::string, std::string>::iterator deviceIt = parameters.find("device");
-    if(deviceIt != parameters.end())
+    boost::unordered_map<std::string, StringParameter>::iterator deviceIt = parameters.strings.find("device");
+    if(deviceIt != parameters.strings.end())
     {
-    	if(deviceIt->second == "cpu")
+    	if(deviceIt->second.get() == "cpu")
     		type = CL_DEVICE_TYPE_CPU;
-    	else if(deviceIt->second == "gpu")
+    	else if(deviceIt->second.get() == "gpu")
     		type = CL_DEVICE_TYPE_GPU;
     }
 
-    boost::unordered_map<std::string, std::string>::iterator vendorIt = parameters.find("vendor");
-    if(vendorIt != parameters.end())
+    boost::unordered_map<std::string, StringParameter>::iterator vendorIt = parameters.strings.find("vendor");
+    if(vendorIt != parameters.strings.end())
     {
-    	if(vendorIt->second == "amd")
+    	if(vendorIt->second.get() == "amd")
     		type = VENDOR_AMD;
-    	else if(vendorIt->second == "intel")
+    	else if(vendorIt->second.get() == "intel")
     		type = VENDOR_INTEL;
-    	else if(vendorIt->second == "nvidia")
+    	else if(vendorIt->second.get() == "nvidia")
     	    type = VENDOR_NVIDIA;
     }
 
     return createCLContext(type, vendor);
 }
 
+void TubeSegmentationFilter::printParameters(paramList parameters)
+{
+	std::cout << "\n" << std::endl;
+    std::cout << "The following parameters are set: " << std::endl;
+
+    boost::unordered_map<std::string,StringParameter>::iterator itString;
+    for(itString = parameters.strings.begin(); itString != parameters.strings.end(); itString++) {
+    	std::cout << itString->first << " " << itString->second.get() << std::endl;
+    }
+
+    boost::unordered_map<std::string,BoolParameter>::iterator itBool;
+    for(itBool = parameters.bools.begin(); itBool != parameters.bools.end(); itBool++) {
+    	std::string value = itBool->second.get() ? "true" : "false";
+    	std::cout << itBool->first << " " << value << std::endl;
+    }
+
+    boost::unordered_map<std::string,NumericParameter>::iterator itNumeric;
+    for(itNumeric = parameters.numerics.begin(); itNumeric != parameters.numerics.end(); itNumeric++) {
+    	std::cout << itNumeric->first << " " << itNumeric->second.get() << std::endl;
+    }
+
+    std::cout << "\n" << std::endl;
+}
+
+ssc::StringDataAdapterXmlPtr TubeSegmentationFilter::makeStringOption(QDomElement root, std::string name, StringParameter parameter)
+{
+	//TODO fix when available from tsf lib
+	QString helptext = qstring_cast("Coming!"); //parameter.getHelpText();
+	std::vector<std::string> possibilities; //parameter.getPossibilities();
+	possibilities.push_back("todo1");
+	possibilities.push_back("todo2");
+	possibilities.push_back("todo3");
+
+	QString value = qstring_cast(parameter.get());
+
+	QStringList list;
+	std::vector<std::string>::iterator it;
+	for(it = possibilities.begin(); it != possibilities.end(); ++it)
+		list << qstring_cast(*it);
+
+	return ssc::StringDataAdapterXml::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, list, root);
+}
+
+ssc::BoolDataAdapterXmlPtr TubeSegmentationFilter::makeBoolOption(QDomElement root, std::string name, BoolParameter parameter)
+{
+	//TODO fix when available from tsf lib
+	QString helptext = qstring_cast("Coming!"); //parameter.getHelpText();
+	bool value = parameter.get();
+	return ssc::BoolDataAdapterXml::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, root);
+}
+
+ssc::DoubleDataAdapterXmlPtr TubeSegmentationFilter::makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter)
+{
+	//TODO fix when available from tsf lib
+	QString helptext = qstring_cast("Coming!"); //parameter.getHelpText();
+	double value = parameter.get();
+	double min = 0;
+	double max = 10;
+	double step = 1;
+
+	ssc::DoubleRange range(min, max, step);
+	int decimals = 2;
+
+	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, range, decimals, root);
+	retval->setAddSlider(true);
+	return retval;
+}
+/*
 ssc::StringDataAdapterXmlPtr TubeSegmentationFilter::makeDeviceOption(QDomElement root)
 {
 	QStringList list;
@@ -458,6 +688,7 @@ ssc::StringDataAdapterXmlPtr TubeSegmentationFilter::makeCenterlineMethodOption(
 	return ssc::StringDataAdapterXml::initialize("tsf_centerline-method", "Centerline Method", "Specify which centerline method to use",
 	                                             list[0], list, root);
 }
+*/
 } /* namespace cx */
 #endif //CX_USE_TSF
 
