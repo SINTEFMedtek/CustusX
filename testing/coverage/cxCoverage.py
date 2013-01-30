@@ -165,60 +165,37 @@ Uses lcov to run ctest and generate coverage reports from them.
 	if full or options.initialize:
 		print "Initializing ..."
 		runShell("""\
-lcov \
---zerocounters \
--directory . \
+lcov --zerocounters -directory . \
 """)
 		runShell("""\
-lcov \
---capture \
---initial \
---directory . \
---output-file cx_coverage_base.gcov \
+lcov --capture --initial --directory . --output-file cx_coverage_base.gcov \
 """)
 
 	if full or options.run_tests:
 		cmd = "ctest"
 		if options.ctest_args:
 			cmd = cmd + " " + options.ctest_args
+		cmd = cmd + " > ./coverage_info/ctest_results.txt"
 		print "Running %s ..." % cmd
+		runShell("mkdir ./coverage_info")
 		runShell(cmd)
 	if full or options.post_test:
 		print "Generating html ..."
 		runShell("""\
-lcov \
---capture \
---directory . \
---output-file cx_coverage_test.gcov \
+lcov --capture --directory . --output-file cx_coverage_test.gcov \
 """)
 		runShell("""\
-lcov \
--add-tracefile cx_coverage_base.gcov \
--add-tracefile cx_coverage_test.gcov \
--o cx_coverage_total.gcov \
+lcov -add-tracefile cx_coverage_base.gcov -add-tracefile cx_coverage_test.gcov -o cx_coverage_total.gcov \
 """)
 		runShell("""\
-lcov \
---remove cx_coverage_total.gcov \
-'eigen3/Eigen/*' \
-'/opt/*' \
-'external_code/*' \
-'/Library/*' \
-'/usr/*' \
-'/moc*.cxx' \
-'/CustusX3_build_*' \
-'/testing/' \
-'/Testing/' \
-'/Examples/' \
---output-file cx_coverage.gcov \
+lcov --remove cx_coverage_total.gcov '/eigen3/Eigen/*' '/opt/*' '/external_code/*' '/Library/*' '/usr/*' '/moc*.cxx' '/CustusX3/build_*' '/testing/*' '/Testing/*' '/Examples/*' --output-file cx_coverage.gcov \
 """)
 		runShell("""\
-genhtml \
-cx_coverage.gcov \
--output-directory ./coverage_info \
+genhtml cx_coverage.gcov -output-directory ./coverage_info \
 """)
 		runShell("xdg-open ./coverage_info/index.html")
-
+		runShell("scp -r ./coverage_info/* /Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/coverage")
+		runShell("scp -r ./coverage_info/* /Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/coverage")
 def main():
     Controller()
 
