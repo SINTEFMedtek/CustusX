@@ -192,14 +192,14 @@ class Controller(object):
 
 		if full or options.initialize:
 			print 'Initializing ...'
-			self._generateCoverage()
+			self._initializeCoverage()
 
 		if full or options.run_tests:
 			self._run_ctest(options.ctest_args)
 
 		if full or options.post_test:
 			print 'Generating html ...'
-			#htmlFolder = self._generateCoverage()
+			htmlFolder = self._generateCoverage()
 			htmlFolder = 'coverage_info'
 			self._publishCoverage(htmlFolder)
 
