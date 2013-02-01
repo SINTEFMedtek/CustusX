@@ -41,30 +41,9 @@ if (BUILD_TESTING)
         ${CX_TEST_SOURCE_FILES}
         )
         
-    # A CppUnit executable included for debugging purposes.
-    # Not part of ctest
-    add_executable(testCalibrationPlugin cxCppUnitMain.cpp ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testCalibrationPlugin SSC cxPluginCalibration ${CPPUNIT_LIBRARIES})
-    
-    # -----------------------------------------------
-    # -- CppUnit - CTest integration. ---------------
-    # 
-    # Use CISST_ADD_TESTS() to convert each CppUnit test to a CTest test. 
-    
-    # Initialize cisst routines
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/Testing/cisst_code)
-    include(cisstMacros)
-    
-    # Link all CppUnit tests to the cisstTestsMain library
-    add_executable(testCalibrationPlugin_CppUnit_CTest ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testCalibrationPlugin_CppUnit_CTest 
-        cisstTestsMain 
-        SSC 
-        cxPluginCalibration
-        ${CPPUNIT_LIBRARIES})
-    # Generate a CTest list of tests
-    CISST_ADD_TESTS(testCalibrationPlugin_CppUnit_CTest)
-    
-    # -- finished CppUnit - CTest integration. ------
-    # -----------------------------------------------
+	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
+	include(cxTestMacros)
+	# define cppunit tests and ctest tests from same source:
+	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestCalibrationPlugin cxCppUnitMain.cpp "${CX_TEST_SOURCE_FILES}" cxPluginCalibration)
+
 endif (BUILD_TESTING)

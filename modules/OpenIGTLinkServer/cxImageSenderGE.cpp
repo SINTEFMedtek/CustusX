@@ -60,7 +60,8 @@ ImageSenderGE::ImageSenderGE(QObject* parent) :
 {
 	//data_streaming::DataStreamApp test;
 
-	mImgStream = vtkSmartPointer<vtkImageData>();
+//	mImgStream = vtkSmartPointer<vtkImageData>();
+	mImgExportedStream = vtkSmartPointer<data_streaming::vtkExportedStreamData>();
 
 	mGrabTimer = new QTimer(this);
 	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
@@ -148,7 +149,7 @@ void ImageSenderGE::initialize(StringMap arguments)
 void ImageSenderGE::deinitialize_local()
 {
 	//Set mImgStream as an empty pointer
-	mImgStream = vtkSmartPointer<vtkImageData>();
+	mImgExportedStream = vtkSmartPointer<data_streaming::vtkExportedStreamData>();
 
 	//Clear frame geometry
 	data_streaming::frame_geometry emptyGeometry;
@@ -162,11 +163,13 @@ bool ImageSenderGE::initialize_local()
 	int commandPort = convertStringWithDefault(mArguments["commandport"], -1);
 	bool testMode = convertStringWithDefault(mArguments["testmode"], 0);
 
-	mImgStream = mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
-	if(!mImgStream)
-		return false;
-	else
-		return true;
+	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
+
+//	mImgStream = mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
+//	if(!mImgStream)
+//		return false;
+//	else
+//		return true;
 }
 
 bool ImageSenderGE::startStreaming(GrabberSenderPtr sender)
@@ -216,17 +219,40 @@ void ImageSenderGE::grab()
 
 	bool testMode = convertStringWithDefault(mArguments["testmode"], 0);
 
-	//Update mGEStreamer.frame
-	//All function should now be called on this object
-	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
-	if(!testMode && mGEStreamer.frame == NULL)
+
+	vtkSmartPointer<data_streaming::vtkExportedStreamData> imgExportedStream = mGEStreamer.GetExportedStreamDataAndMoveToNextFrame();
+
+	//Get new image
+	if(!imgExportedStream)
 	{
-		std::cout << "ImageSenderGE::grab() failed: Got no frame" << std::endl;
+		std::cout << "ImageSenderGE::grab(): No image from GEStreamer" << std::endl;
 		return;
 	}
 
 	//Get frame geometry if we don't have it yet
-	if(!testMode && (mGEStreamer.frame->GetGeometryChanged() || (mFrameGeometry.width < 0.0001)))
+	if(imgExportedStream->GetTissueGeometryChanged())
+	{
+		// Frame geometry have changed.
+		mFrameGeometry = imgExportedStream->GetTissueGeometry();
+		mFrameGeometryChanged = true;
+	}
+	else
+		mFrameGeometryChanged = false;
+
+	mImgExportedStream = imgExportedStream;
+	mLastGrabTime = mImgExportedStream->GetTimeStamp();
+
+	//Update mGEStreamer.frame
+	//All function should now be called on this object
+/*	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
+	if(!testMode && mGEStreamer.frame == NULL)
+	{
+		std::cout << "ImageSenderGE::grab() failed: Got no frame" << std::endl;
+		return;
+	}*/
+
+	//Get frame geometry if we don't have it yet
+/*	if(!testMode && (mGEStreamer.frame->GetGeometryChanged() || (mFrameGeometry.width < 0.0001)))
 	{
 		// Frame geometry have changed.
 		mFrameGeometry = mGEStreamer.GetFrameGeometry();
@@ -235,8 +261,8 @@ void ImageSenderGE::grab()
 	}
 	else
 		mFrameGeometryChanged = false;
-
-	if(!imgStream)
+*/
+/*	if(!imgStream)
 	{
 		std::cout << "ImageSenderGE::grab(): No image from GEStreamer" << std::endl;
 		return;
@@ -247,7 +273,7 @@ void ImageSenderGE::grab()
 	}
 	//Only set image and time if we got a new image
 	mImgStream = imgStream;
-	mLastGrabTime = mGEStreamer.GetTimeStamp();
+	mLastGrabTime = mGEStreamer.GetTimeStamp();*/
 
 	send();
 }
@@ -283,29 +309,36 @@ void ImageSenderGE::send()
 
 IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 {
-	if(!mImgStream)
+	if(!mImgExportedStream)
 	{
 		std::cout << "ImageSenderGE::getImageMessage(): No GEStreamer image" << std::endl;
+		return IGTLinkImageMessage::Pointer();
+	}
+
+	vtkSmartPointer<vtkImageData> img = mImgExportedStream->GetScanConvertedImage();
+	if(!img)
+	{
+		std::cout << "ImageSenderGE::getImageMessage(): No scan converted image from GEStreamer" << std::endl;
 		return IGTLinkImageMessage::Pointer();
 	}
 
 	IGTLinkImageMessage::Pointer retval = IGTLinkImageMessage::New();
 
 //	int* size = mGEStreamer.VolumeDimensions; // May be 3 dimensions
-	int* size = mImgStream->GetDimensions(); // May be 3 dimensions
+	int* size = img->GetDimensions(); // May be 3 dimensions
 	int offset[] = { 0, 0, 0 };
 
 	int scalarType = -1;
-	if(mImgStream->GetNumberOfScalarComponents() == 3 || mImgStream->GetNumberOfScalarComponents() == 4)
+	if(img->GetNumberOfScalarComponents() == 3 || img->GetNumberOfScalarComponents() == 4)
 	{
 		scalarType = IGTLinkImageMessage::TYPE_UINT32;// scalar type
-	} else if(mImgStream->GetNumberOfScalarComponents() == 1)
+	} else if(img->GetNumberOfScalarComponents() == 1)
 	{
-		if(mImgStream->GetScalarTypeMax() > 256 && mImgStream->GetScalarTypeMax() <= 65536)
+		if(img->GetScalarTypeMax() > 256 && img->GetScalarTypeMax() <= 65536)
 		{
 			scalarType = IGTLinkImageMessage::TYPE_UINT16;// scalar type
 		}
-		else if(mImgStream->GetScalarTypeMax() <= 256)
+		else if(img->GetScalarTypeMax() <= 256)
 		{
 			scalarType = IGTLinkImageMessage::TYPE_UINT8;// scalar type
 		}
@@ -338,28 +371,32 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 	matrix[0][3] = 0.0;  matrix[1][3] = 0.0;  matrix[2][3] = 0.0; matrix[3][3] = 1.0;
 	retval->SetMatrix(matrix);
 
-	retval->SetOrigin(mImgStream->GetOrigin()[0], mImgStream->GetOrigin()[1], mImgStream->GetOrigin()[2]);
-	retval->SetSpacing(mImgStream->GetSpacing()[0], mImgStream->GetSpacing()[1], mImgStream->GetSpacing()[2]); // May be 3 dimensions
+	retval->SetOrigin(img->GetOrigin()[0], img->GetOrigin()[1], img->GetOrigin()[2]);
+	retval->SetSpacing(img->GetSpacing()[0], img->GetSpacing()[1], img->GetSpacing()[2]); // May be 3 dimensions
 
-	//std::cout << "spacing: " << mImgStream->GetSpacing()[0] << " " << mImgStream->GetSpacing()[1] << " " << mImgStream->GetSpacing()[2] << std::endl;
+	//std::cout << "spacing: " << img->GetSpacing()[0] << " " << img->GetSpacing()[1] << " " << img->GetSpacing()[2] << std::endl;
 
 	//Set image data
 	int fsize = retval->GetImageSize();
-	memcpy(retval->GetScalarPointer(), mImgStream->GetScalarPointer(), fsize);
+	memcpy(retval->GetScalarPointer(), img->GetScalarPointer(), fsize);
 
 	return retval;
 }
 
 IGTLinkUSStatusMessage::Pointer ImageSenderGE::getFrameStatus()
 {
-  IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
+	IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
+
+	vtkSmartPointer<vtkImageData> img = vtkSmartPointer<vtkImageData>();
+	if(mImgExportedStream)
+		vtkSmartPointer<vtkImageData> img = mImgExportedStream->GetScanConvertedImage();
 
   //This is origin from the scanner (= 0,0,0)
   //Origin according to image is set in the image message
-  if (mImgStream)
-	  retval->SetOrigin(mFrameGeometry.origin[0] + mImgStream->GetOrigin()[0],
-			  mFrameGeometry.origin[1]+ mImgStream->GetOrigin()[1],
-			  mFrameGeometry.origin[2]+ mImgStream->GetOrigin()[2]);
+  if (mImgExportedStream && img)
+	  retval->SetOrigin(mFrameGeometry.origin[0] + img->GetOrigin()[0],
+			  mFrameGeometry.origin[1]+ img->GetOrigin()[1],
+			  mFrameGeometry.origin[2]+ img->GetOrigin()[2]);
   else
 	  retval->SetOrigin(mFrameGeometry.origin);
 

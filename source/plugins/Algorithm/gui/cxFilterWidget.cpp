@@ -193,8 +193,7 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 
 		std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
 		std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
-		ssc::XmlOptionFile node = mOptions.descend(mCurrentFilter->getUid());
-		std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions(node.getElement());
+		std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions();
 
 		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes());
 		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes());
@@ -280,8 +279,7 @@ void CompactFilterSetupWidget::setFilter(FilterPtr filter)
 
 		std::vector<SelectDataStringDataAdapterBasePtr> inputTypes = mCurrentFilter->getInputTypes();
 		std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
-		ssc::XmlOptionFile node = mOptions.descend(mCurrentFilter->getUid());
-		std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions(node.getElement());
+		std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions();
 
 		std::vector<DataAdapterPtr> all;
 		std::remove_copy(inputTypes.begin(), inputTypes.end(), std::back_inserter(all), inputTypes[0]);

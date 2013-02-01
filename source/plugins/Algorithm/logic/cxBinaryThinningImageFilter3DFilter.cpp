@@ -75,9 +75,9 @@ ssc::ColorDataAdapterPtr BinaryThinningImageFilter3DFilter::getColorOption(QDomE
 	                                            QColor("green"), root);
 }
 
-void BinaryThinningImageFilter3DFilter::createOptions(QDomElement root)
+void BinaryThinningImageFilter3DFilter::createOptions()
 {
-	mOptionsAdapters.push_back(this->getColorOption(root));
+	mOptionsAdapters.push_back(this->getColorOption(mOptions));
 }
 
 void BinaryThinningImageFilter3DFilter::createInputTypes()
