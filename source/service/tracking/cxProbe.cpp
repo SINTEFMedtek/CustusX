@@ -104,7 +104,12 @@ ProbePtr Probe::New(QString instrumentUid, QString scannerUid)
 
 void Probe::setRTSource(ssc::VideoSourcePtr source)
 {
-	ssc::VideoSourcePtr adapter(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
+	boost::shared_ptr<ssc::ProbeAdapterRTSource> adapter;
+	adapter = boost::shared_dynamic_cast<ssc::ProbeAdapterRTSource>(mSource);
+	if (source==adapter->getBaseSource())
+		return;
+
+	adapter.reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
 	mSource = adapter;
 	emit sectorChanged();
 }
