@@ -138,7 +138,7 @@ void Pipeline::initialize(FilterGroupPtr filters)
 		FilterPtr filter = mFilters->get(i);
 		filter->getInputTypes();
 		filter->getOutputTypes();
-		filter->getOptions(mFilters->getOptions().descend(filter->getUid()).getElement());
+		filter->getOptions();
 	}
 
 	this->getNodes();
@@ -164,7 +164,7 @@ void Pipeline::setOption(QString valueName, QVariant value)
 	for (unsigned i=0; i<mFilters->size(); ++i)
 	{
 		FilterPtr filter = mFilters->get(i);
-		std::vector<DataAdapterPtr> options = filter->getOptions(mFilters->getOptions().descend(filter->getUid()).getElement());
+		std::vector<DataAdapterPtr> options = filter->getOptions();
 
 		for (unsigned j=0; j<options.size(); ++j)
 		{
