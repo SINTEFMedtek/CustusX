@@ -92,6 +92,8 @@ public:
 		return mBase->isStreaming();
 	}
 
+	ssc::VideoSourcePtr getBaseSource() { return mBase; }
+
 private slots:
 	void probeChangedSlot();
 	void newFrameSlot();
