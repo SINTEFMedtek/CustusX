@@ -108,20 +108,20 @@ ssc::ColorDataAdapterXmlPtr ContourFilter::getColorOption(QDomElement root)
 	                                            QColor("green"), root);
 }
 
-void ContourFilter::createOptions(QDomElement root)
+void ContourFilter::createOptions()
 {
-	mReduceResolutionOption = this->getReduceResolutionOption(root);
+	mReduceResolutionOption = this->getReduceResolutionOption(mOptions);
 	mOptionsAdapters.push_back(mReduceResolutionOption);
 
-	mSurfaceThresholdOption = this->getSurfaceThresholdOption(root);
+	mSurfaceThresholdOption = this->getSurfaceThresholdOption(mOptions);
 	connect(mSurfaceThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
 	mOptionsAdapters.push_back(mSurfaceThresholdOption);
 
-	mOptionsAdapters.push_back(this->getSmoothingOption(root));
-	mOptionsAdapters.push_back(this->getDecimationOption(root));
-	mOptionsAdapters.push_back(this->getPreserveTopologyOption(root));
+	mOptionsAdapters.push_back(this->getSmoothingOption(mOptions));
+	mOptionsAdapters.push_back(this->getDecimationOption(mOptions));
+	mOptionsAdapters.push_back(this->getPreserveTopologyOption(mOptions));
 
-	mOptionsAdapters.push_back(this->getColorOption(root));
+	mOptionsAdapters.push_back(this->getColorOption(mOptions));
 }
 
 void ContourFilter::createInputTypes()

@@ -50,7 +50,10 @@ std::vector<FilterPtr> FilterGroup::getFilters() const
 void FilterGroup::append(FilterPtr filter)
 {
 	mFilters.push_back(filter);
-	filter->setUid(QString("%1_%2").arg(filter->getType()).arg(mFilters.size()));
+
+	QString uid = QString("%1_%2").arg(filter->getType()).arg(mFilters.size());
+	ssc::XmlOptionFile node = mOptions.descend(uid);
+	filter->initialize(node.getElement(), uid);
 }
 
 

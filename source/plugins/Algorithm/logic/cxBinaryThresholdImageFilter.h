@@ -45,7 +45,7 @@ public:
 	ssc::BoolDataAdapterXmlPtr getGenerateSurfaceOption(QDomElement root);
 
 protected:
-	virtual void createOptions(QDomElement root);
+	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 
