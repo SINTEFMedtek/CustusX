@@ -527,7 +527,7 @@ void ToolManager::stopTracking()
 void ToolManager::saveToolsSlot()
 {
 	this->savePositionHistory();
-	ssc::messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
+//	ssc::messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
 }
 
 ssc::LandmarkMap ToolManager::getLandmarks()

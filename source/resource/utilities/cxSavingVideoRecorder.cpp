@@ -99,9 +99,9 @@ bool VideoRecorderSaveThread::closeTimestampsFile()
 	QFileInfo info(mTimestampsFile);
 	if (!mCancel)
 	{
-		ssc::messageManager()->sendInfo(QString("Saved %1 timestamps to file %2")
-										.arg(mImageIndex)
-										.arg(info.fileName()));
+//		ssc::messageManager()->sendInfo(QString("Saved %1 timestamps to file %2")
+//										.arg(mImageIndex)
+//										.arg(info.fileName()));
 	}
 	return true;
 }

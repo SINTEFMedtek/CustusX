@@ -27,6 +27,7 @@ ServiceController::ServiceController()
 	// connecting the video source and the tracking us probe.
 	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateVideoConnections()));
 	connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(updateVideoConnections()));
+	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(updateVideoConnections()));
 //	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(updateVideoConnections()));
 	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(updateVideoConnections()));
 
@@ -85,9 +86,6 @@ void ServiceController::updateVideoConnections()
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 
 	this->connectVideoToProbe(tool);
-
-//	if (tool)
-//		ssc::toolManager()->setDominantTool(tool->getUid());
 }
 
 /**insert the rt source into the (first) probe tool

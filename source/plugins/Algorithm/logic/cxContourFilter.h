@@ -69,7 +69,7 @@ public:
 	static ssc::MeshPtr postProcess(vtkPolyDataPtr contour, ssc::ImagePtr base, QColor color);
 
 protected:
-	virtual void createOptions(QDomElement root);
+	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 

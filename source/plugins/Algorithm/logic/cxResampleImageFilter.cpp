@@ -52,9 +52,9 @@ ssc::DoubleDataAdapterXmlPtr ResampleImageFilter::getMarginOption(QDomElement ro
 	                                             5.0, ssc::DoubleRange(0, 50, 1), 1, root);
 }
 
-void ResampleImageFilter::createOptions(QDomElement root)
+void ResampleImageFilter::createOptions()
 {
-	mOptionsAdapters.push_back(this->getMarginOption(root));
+	mOptionsAdapters.push_back(this->getMarginOption(mOptions));
 }
 
 void ResampleImageFilter::createInputTypes()
