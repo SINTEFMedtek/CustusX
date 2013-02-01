@@ -246,6 +246,8 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 {
 	if (mUpdating)
 		return;
+	if(!mActiveProbeConfig->getTool())
+		return;
 	// need a cx probe here, in order to set data.
 	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)

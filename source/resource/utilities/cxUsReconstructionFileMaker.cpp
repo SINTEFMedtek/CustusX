@@ -103,7 +103,7 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::T
 
 QString UsReconstructionFileMaker::write(ssc::USReconstructInputData data)
 {
-	ssc::TimeKeeper timer;
+//	ssc::TimeKeeper timer;
 	QString reconstructionFolder = QFileInfo(data.mFilename).absolutePath();
 	QDir dir;
 	dir.mkpath(reconstructionFolder);
@@ -119,7 +119,7 @@ QString UsReconstructionFileMaker::write(ssc::USReconstructInputData data)
 
 	this->report();
 	mReport.clear();
-	timer.printElapsedms("UsReconstructionFileMaker::write");
+//	timer.printElapsedms("UsReconstructionFileMaker::write");
 
 	return reconstructionFolder;
 }
@@ -309,9 +309,11 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString activepatientPath, b
 
 	this->writeUSImages(path, mVideoRecorder->getImageData(), compression);
 
+	int time = timer.getElapsedms();
+	mReport << QString("Completed save to %1. Spent %2s, %3fps").arg(mSessionDescription).arg(time/1000).arg(mVideoRecorder->getImageData()->size()*1000/time);
+
 	this->report();
 	mReport.clear();
-	timer.printElapsedms("UsReconstructionFileMaker::write new");
 
 	return path;
 }

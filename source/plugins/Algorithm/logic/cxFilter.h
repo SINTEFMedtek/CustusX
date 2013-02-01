@@ -58,7 +58,15 @@ public:
 	  *  Return a unique string for this algorithm.
 	  */
 	virtual QString getUid() const  = 0;
-	virtual void setUid(QString uid) = 0;
+//	virtual void setUid(QString uid) = 0;
+	/**
+	  *  Initialize algorithm
+	  *  Fill options for this algorithm.
+	  *  Input is the root node for this algo, filled with stored settings (if any).
+	  *
+	  * Set uid - if no uid is given, a default based on class name is used.
+	  */
+	virtual void initialize(QDomElement root, QString uid = "") = 0;
 	/**
 	  *  Return the type of this algorithm.
 	  */
@@ -73,10 +81,9 @@ public:
 	virtual QString getHelp() const = 0;
 	/**
 	  *  Fill options for this algorithm.
-	  *  Input is the root node for this algo, filled with stored settings (if any).
-	  *  On completion, the root is filled with default values for settings.
+	  *  The options use the input xml noe from init to fill.
 	  */
-	virtual std::vector<DataAdapterPtr> getOptions(QDomElement root) = 0;
+	virtual std::vector<DataAdapterPtr> getOptions() = 0;
 	/**
 	  *  List of input arguments.
 	  */

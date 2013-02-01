@@ -44,8 +44,8 @@ public:
 	virtual ~FilterImpl() {}
 
 	virtual QString getUid() const;
-	virtual void setUid(QString uid);
-	virtual std::vector<DataAdapterPtr> getOptions(QDomElement root);
+	virtual void initialize(QDomElement root, QString uid = "");
+	virtual std::vector<DataAdapterPtr> getOptions();
 	virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes();
 	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes();
 	virtual void setActive(bool on);
@@ -63,7 +63,7 @@ protected:
 	  */
 	void updateThresholdFromImageChange(QString uid, ssc::DoubleDataAdapterXmlPtr threshold);
 
-	virtual void createOptions(QDomElement root) = 0;
+	virtual void createOptions() = 0;
 	virtual void createInputTypes() = 0;
 	virtual void createOutputTypes() = 0;
 
@@ -76,6 +76,7 @@ protected:
 	std::vector<ssc::DataPtr> mCopiedInput;
 	QDomElement mCopiedOptions;
 	bool mActive;
+private:
 	QString mUid;
 
 };
