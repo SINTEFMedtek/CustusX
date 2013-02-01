@@ -3,38 +3,44 @@
 #####################################################
 # Unix setup script
 # Author: Christian Askeland, SINTEF Medical Technology
-# Date:   2011.08.11
+# Date:   2013.01.30
 #
 # Description:	
-#
-#    Install git using yum.
-#    Configure the git installation. 
 #
 #
 #####################################################
 
 #USER=`whoami`
 
-echo "Generating coverage from cwd..."
+if [[ "$1" == "" ]] ; then
+    echo "Usage: cx_run_lcov <path_to_build_root>"
+    exit
+fi
+
+echo "Generating coverage from $1"
 
 echo ""
 set -x
 
+cd $1
+
 # remove previous coverage counts - not working
 #lcov --zerocounters -directory .
+#lcov --capture --initial --directory . --output-file cx_coverage_base.gcov
 
 #kjør alle tester
 #ctest
 
 # convert coverage data from app runs
-lcov --capture --directory . --output-file cx_coverage.gcov
+#lcov --capture --directory . --output-file cx_coverage_test.gcov
+lcov -add-tracefile cx_coverage_base.gcov -a cx_coverage_test.gcov -o cx_coverage_total.gcov
 # remove system and external libraries
-lcov --remove cx_coverage.gcov 'eigen3/Eigen/*' '/opt/*' 'external_code/*' '/Library/*' '/usr/*' '/moc*.cxx' --output-file cx_coverage.gcov
+lcov --remove cx_coverage_total.gcov 'eigen3/Eigen/*' '/opt/*' 'external_code/*' '/Library/*' '/usr/*' '/moc*.cxx' '/CustusX3_build_*' '/testing/' --output-file cx_coverage.gcov
 # generate html
-genhtml cx_coverage.gcov -output-directory coverage_info
+genhtml cx_coverage.gcov -output-directory ./coverage_info
 # open in web browser
 #open coverage_info/index.html # mac
-firefox coverage_info/index.html
+xdg-open ./coverage_info/index.html
 
 
 

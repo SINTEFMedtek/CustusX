@@ -31,17 +31,19 @@ QString FilterImpl::getUid() const
 	return mUid;
 }
 
-void FilterImpl::setUid(QString uid)
+void FilterImpl::initialize(QDomElement root, QString uid)
 {
-	mUid = uid;
+	if (!uid.isEmpty())
+		mUid = uid;
+
+	mOptions = root;
 }
 
-std::vector<DataAdapterPtr> FilterImpl::getOptions(QDomElement root)
+std::vector<DataAdapterPtr> FilterImpl::getOptions()
 {
 	if (mOptionsAdapters.empty())
 	{
-		this->createOptions(root);
-		mOptions = root;
+		this->createOptions();
 	}
 	return mOptionsAdapters;
 }

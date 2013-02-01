@@ -59,7 +59,9 @@ private:
 	//The GE Connection code from ISB
 	data_streaming::GEStreamer mGEStreamer;
 
-	vtkSmartPointer<vtkImageData> mImgStream;//Last image from GE
+//	vtkSmartPointer<vtkImageData> mImgStream;//Last image from GE
+	vtkSmartPointer<data_streaming::vtkExportedStreamData> mImgExportedStream;//Last image from GE
+
 	igstk::RealTimeClock::TimeStampType mLastGrabTime;
 	data_streaming::frame_geometry mFrameGeometry;///<Frame geometry from GE
 	bool mFrameGeometryChanged; ///< Have frame geometry changed since last frame
