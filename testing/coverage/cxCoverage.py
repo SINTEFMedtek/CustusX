@@ -116,7 +116,7 @@ def packageTextAsHTML(heading, body, filename):
 """
 	body = '&nbsp&nbsp&nbsp&nbsp&nbsp'.join(body.split('\t'))
 	body = '<br>'.join(body.split('\n'))
-	print body
+	#print body
 	text = skeleton % (heading, body)
 	f = open(filename, 'w')
 	f.write(text)
@@ -221,8 +221,9 @@ class Controller(object):
 		if ctest_args:
 			cmd = cmd + ' ' + ctest_args
 		cmd = cmd + ' > %s/ctest_results.txt' % path
+		cmd = cmd + ' -output-log %s/ctest_results.txt' % path
 		print 'Running %s ...' % cmd
-		runShell('mkdir %s' % path)
+		runShell('mkdir -p %s' % path)
 		runShell(cmd)
 
 		with open('%s/ctest_results.txt' % path, 'r') as f:
@@ -230,7 +231,7 @@ class Controller(object):
 
 		htmlFile = '%s/ctest_results.html' % path
 		packageTextAsHTML('Unit tests run %s' % time.strftime('%Y-%m-%d_%H-%M'), read_data, htmlFile)
-		runShell('scp -r %s medtek@medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/unittest/index.html' % htmlFile)
+		runShell('scp -r %s medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/unittest/index.html' % htmlFile)
             
 	def _generateCoverage(self):
 		"""
@@ -258,7 +259,7 @@ class Controller(object):
 		webbrowser.open('file://%s' % indexFile)
         	if True:
 			return
-		runShell('scp -r %s/* medtek@medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/coverage' % inpath)
+		runShell('scp -r %s/* medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/coverage' % inpath)
 		datedFolder = '%s_%s' % (htmlFolder, time.strftime('%Y-%m-%d_%H-%M'))
 		datedpath = '%s/%s/' % (shell.CWD, datedFolder)
 		# this assumes htmlFolder is a folder, not a path!
@@ -267,7 +268,7 @@ class Controller(object):
 		#print 'cwd ', os.getcwd()
 		#print 'shell.cwd ', shell.CWD
 		os.rename(inpath, datedpath)
-		runShell('scp -r %s medtek@medtek.sintef.no:/Volumes/MedTekDisk/Software/CustusX/coverage' % datedFolder)
+		runShell('scp -r %s medtek.sintef.no:/Volumes/MedTekDisk/Software/CustusX/coverage' % datedFolder)
 		os.rename(datedpath, inpath)
 
 
