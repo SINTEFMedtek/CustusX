@@ -45,7 +45,7 @@ public:
 	virtual void postProcess();
 
 protected:
-	virtual void createOptions(QDomElement root);
+	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 

@@ -59,9 +59,9 @@ ssc::DoubleDataAdapterXmlPtr SmoothingImageFilter::getSigma(QDomElement root)
 	                                             0.10, ssc::DoubleRange(0, 5, 0.01), 2, root);
 }
 
-void SmoothingImageFilter::createOptions(QDomElement root)
+void SmoothingImageFilter::createOptions()
 {
-	mOptionsAdapters.push_back(this->getSigma(root));
+	mOptionsAdapters.push_back(this->getSigma(mOptions));
 }
 
 void SmoothingImageFilter::createInputTypes()
