@@ -66,13 +66,13 @@ ssc::ColorDataAdapterXmlPtr BinaryThresholdImageFilter::getColorOption(QDomEleme
 	                                            QColor("green"), root);
 }
 
-void BinaryThresholdImageFilter::createOptions(QDomElement root)
+void BinaryThresholdImageFilter::createOptions()
 {
-	mLowerThresholdOption = this->getLowerThresholdOption(root);
+	mLowerThresholdOption = this->getLowerThresholdOption(mOptions);
 	connect(mLowerThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
 	mOptionsAdapters.push_back(mLowerThresholdOption);
-	mOptionsAdapters.push_back(this->getGenerateSurfaceOption(root));
-	mOptionsAdapters.push_back(this->getColorOption(root));
+	mOptionsAdapters.push_back(this->getGenerateSurfaceOption(mOptions));
+	mOptionsAdapters.push_back(this->getColorOption(mOptions));
 }
 
 void BinaryThresholdImageFilter::createInputTypes()

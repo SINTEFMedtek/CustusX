@@ -40,14 +40,14 @@ ssc::StringDataAdapterPtr DummyFilter::getStringOption(QDomElement root)
 	QStringList list;
 	list << "String0" << "String1";
 	return ssc::StringDataAdapterXml::initialize("String", "", "dummy string option",
-	                                             list[0], list, root);
+												 list[0], list, root);
 }
 
 ssc::DoubleDataAdapterPtr DummyFilter::getDoubleOption(QDomElement root)
 {
 	return ssc::DoubleDataAdapterXml::initialize("Value", "",
 	                                             "dummy double value.", 1, ssc::DoubleRange(0.1, 10, 0.01), 2,
-	                                             root);
+												 root);
 }
 
 ssc::BoolDataAdapterPtr DummyFilter::getBoolOption(QDomElement root)
@@ -56,11 +56,11 @@ ssc::BoolDataAdapterPtr DummyFilter::getBoolOption(QDomElement root)
 	                                           "Dummy bool value.", false, root);
 }
 
-void DummyFilter::createOptions(QDomElement root)
+void DummyFilter::createOptions()
 {
-	mOptionsAdapters.push_back(this->getStringOption(root));
-	mOptionsAdapters.push_back(this->getDoubleOption(root));
-	mOptionsAdapters.push_back(this->getBoolOption(root));
+	mOptionsAdapters.push_back(this->getStringOption(mOptions));
+	mOptionsAdapters.push_back(this->getDoubleOption(mOptions));
+	mOptionsAdapters.push_back(this->getBoolOption(mOptions));
 }
 
 void DummyFilter::createInputTypes()
