@@ -49,6 +49,7 @@
 #include "sscDICOMWidget.h"
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
+#include "cxSamplerWidget.h"
 
 #include "sscDICOMLibConfig.h"
 
@@ -987,6 +988,11 @@ void MainWindow::createToolBars()
 	camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
 	camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
 	this->registerToolBar(camera3DViewToolBar, "Toolbar");
+
+	QToolBar* samplerWidgetToolBar = addToolBar("Sampler");
+	samplerWidgetToolBar->setObjectName("SamplerToolBar");
+	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
+	this->registerToolBar(samplerWidgetToolBar, "Toolbar");
 }
 
 void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)

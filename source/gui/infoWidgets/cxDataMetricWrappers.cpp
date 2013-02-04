@@ -47,7 +47,7 @@ QWidget* PointMetricWrapper::createWidget()
   topLayout->addLayout(hLayout);
 
   QString value;// = qstring_cast(mData->getFrame());
-  std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces();
+  std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
   QStringList range;
   for (unsigned i=0; i<spaces.size(); ++i)
     range << spaces[i].toString();
@@ -168,7 +168,7 @@ QWidget* PlaneMetricWrapper::createWidget()
   topLayout->addLayout(hLayout);
 
   QString value;// = qstring_cast(mData->getFrame());
-  std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces();
+  std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
   QStringList range;
   for (unsigned i=0; i<spaces.size(); ++i)
     range << spaces[i].toString();
