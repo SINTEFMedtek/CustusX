@@ -62,7 +62,8 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(ssc, COORDINATE_SYSTEM, csCOUNT)
 	"patient reference",
 	"tool",
 	"sensor",
-	"tool offset"
+	"tool offset",
+	"voxel"
 }
 SNW_DEFINE_ENUM_STRING_CONVERTERS_END(ssc, COORDINATE_SYSTEM, csCOUNT)
 

@@ -115,6 +115,12 @@ void SlicedImageProxy::setImage(ImagePtr image)
 
 	if (mImage)
 	{
+		// if input is 2D - use directly
+		if (mImage->getBaseVtkImageData()->GetDimensions()[2]==1)
+			mWindowLevel->SetInput(mImage->getBaseVtkImageData());
+		else
+			mWindowLevel->SetInputConnection(mReslicer->GetOutputPort());
+
 		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(transformChangedSlot()));
@@ -177,10 +183,12 @@ vtkImageDataPtr SlicedImageProxy::getOutput()
 
 void SlicedImageProxy::update()
 {
-	if (!mSlicer || !mImage)
+	if (!mImage)
 		return;
 
-	Transform3D rMs = mSlicer->get_sMr().inv();
+	Transform3D rMs = Transform3D::Identity();
+	if (mSlicer)
+		rMs = mSlicer->get_sMr().inv();
 	Transform3D iMr = mImage->get_rMd().inv();
 	Transform3D M = iMr * rMs;
 	//	std::cout << "iMs, "<< mSlicer->getName() <<"\n" << M << std::endl;

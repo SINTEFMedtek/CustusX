@@ -65,6 +65,11 @@ void LabeledComboBoxWidget::comboIndexChanged(int index)
 	mData->setValue(mCombo->itemData(index).toString());
 }
 
+void LabeledComboBoxWidget::showLabel(bool on)
+{
+	mLabel->setVisible(on);
+}
+
 void LabeledComboBoxWidget::prePaintEvent()
 {
 	mCombo->blockSignals(true);

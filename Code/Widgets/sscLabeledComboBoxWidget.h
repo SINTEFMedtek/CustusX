@@ -43,7 +43,7 @@ class LabeledComboBoxWidget: public OptimizedUpdateWidget
 Q_OBJECT
 public:
 	LabeledComboBoxWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
-
+	void showLabel(bool on);
 private slots:
     void prePaintEvent();
 	void comboIndexChanged(int val);

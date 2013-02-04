@@ -5,6 +5,8 @@
 #include "sscDataManager.h"
 #include "sscData.h"
 #include "sscDefinitionStrings.h"
+#include "sscImage.h"
+#include "vtkImageData.h"
 
 namespace ssc
 {
@@ -34,23 +36,34 @@ bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs)
 
 // --------------------------------------------------------
 
-std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces()
+std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces(bool compact)
 {
 	std::vector<CoordinateSystem> retval;
 	retval.push_back(CoordinateSystem(csREF));
 	retval.push_back(CoordinateSystem(csPATIENTREF));
 
-	std::set<QString> dataSpaces;
-	std::map<QString, DataPtr> data = dataManager()->getData();
-	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
+	// alias for the currently active tool:
+	retval.push_back(CoordinateSystem(csDATA, "active"));
+	retval.push_back(CoordinateSystem(csDATA_VOXEL, "active"));
+
+	if (!compact)
 	{
-		dataSpaces.insert(iter->second->getSpace());
-//		dataSpaces.insert(iter->second->getParentSpace()); // system only handle spaces identical to data.
-	}
-	dataSpaces.erase("");
-	for (std::set<QString>::iterator iter=dataSpaces.begin(); iter!=dataSpaces.end(); ++iter)
-	{
-		retval.push_back(CoordinateSystem(csDATA, *iter));
+		std::set<QString> dataSpaces;
+		std::map<QString, DataPtr> data = dataManager()->getData();
+		for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
+		{
+			dataSpaces.insert(iter->second->getSpace());
+	//		dataSpaces.insert(iter->second->getParentSpace()); // system only handle spaces identical to data.
+		}
+		dataSpaces.erase("");
+		for (std::set<QString>::iterator iter=dataSpaces.begin(); iter!=dataSpaces.end(); ++iter)
+		{
+			retval.push_back(CoordinateSystem(csDATA, *iter));
+		}
+		for (std::set<QString>::iterator iter=dataSpaces.begin(); iter!=dataSpaces.end(); ++iter)
+		{
+			retval.push_back(CoordinateSystem(csDATA_VOXEL, *iter));
+		}
 	}
 
 	// alias for the currently active tool:
@@ -58,18 +71,21 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces()
 	retval.push_back(CoordinateSystem(csSENSOR, "active"));
 	retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
 
-	std::map<QString, ToolPtr> tools = *toolManager()->getTools();
-	for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	if (!compact)
 	{
-		retval.push_back(CoordinateSystem(csTOOL, iter->first));
-	}
-	for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-	{
-		retval.push_back(CoordinateSystem(csSENSOR, iter->first));
-	}
-	for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-	{
-		retval.push_back(CoordinateSystem(csTOOL_OFFSET, iter->first));
+		std::map<QString, ToolPtr> tools = *toolManager()->getTools();
+		for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+		{
+			retval.push_back(CoordinateSystem(csTOOL, iter->first));
+		}
+		for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+		{
+			retval.push_back(CoordinateSystem(csSENSOR, iter->first));
+		}
+		for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+		{
+			retval.push_back(CoordinateSystem(csTOOL_OFFSET, iter->first));
+		}
 	}
 
 	return retval;
@@ -125,6 +141,9 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from)
 		break;
 	case csTOOL_OFFSET:
 		rMfrom = get_rMto(from.mRefObject);
+		break;
+	case csDATA_VOXEL:
+		rMfrom = get_rMdv(from.mRefObject);
 		break;
 	default:
 
@@ -217,12 +236,34 @@ Transform3D CoordinateSystemHelpers::get_rMd(QString uid)
 {
 	DataPtr data = dataManager()->getData(uid);
 
+	if (!data && uid=="active")
+		data = dataManager()->getActiveImage();
+
 	if(!data)
 	{
 		messageManager()->sendWarning("Could not find data with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
 		return Transform3D::Identity();
 	}
 	return data->get_rMd(); // ref_M_d
+}
+
+Transform3D CoordinateSystemHelpers::get_rMdv(QString uid)
+{
+	DataPtr data = dataManager()->getData(uid);
+
+	if (!data && uid=="active")
+		data = dataManager()->getActiveImage();
+
+	if(!data)
+	{
+		messageManager()->sendWarning("Could not find data with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
+		return Transform3D::Identity();
+	}
+
+	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+	if (!image)
+		return data->get_rMd();
+	return data->get_rMd()*ssc::createTransformScale(ssc::Vector3D(image->getBaseVtkImageData()->GetSpacing())); // ref_M_d
 }
 
 Transform3D CoordinateSystemHelpers::get_rMpr()
