@@ -30,8 +30,8 @@ int main(int argc, char **argv)
 	runner.addTest( registry.makeTest() );
 #else
 	runner.addTest( new CppUnit::TestCaller<TestUsReconstruction>(
-									   "TestUsReconstruction::testDualAngio",
-										&TestUsReconstruction::testDualAngio ) );
+									   "TestUsReconstruction::testAngioReconstruction",
+										&TestUsReconstruction::testAngioReconstruction ) );
 //	runner.addTest( new CppUnit::TestCaller<TestUsReconstruction>(
 //									   "TestUsReconstruction::testConstructor",
 //										&TestUsReconstruction::testConstructor ) );
