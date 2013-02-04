@@ -246,7 +246,7 @@ vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D c
   vtkImageClipPtr clip = vtkImageClipPtr::New();
   clip->SetInput(input);
   clip->SetOutputWholeExtent(cropbox.begin());
-//  clip->ClipDataOn();
+  clip->ClipDataOn();
   vtkImageDataPtr rawResult = clip->GetOutput();
   rawResult->Update();
   return rawResult;
@@ -458,7 +458,15 @@ QString USFrameData::getFilePath() const
 void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 {
 	ssc::TimeKeeper timer;
-	vtkImageDataPtr source = mImageContainer->get(index);
+//	vtkImageDataPtr source = mImageContainer->get(index);
+
+	vtkImageDataPtr current = mImageContainer->get(index);
+	if (mCropbox.range()[0]!=0)
+		current = this->cropImage(current, mCropbox);
+	vtkImageDataPtr grayFrame = this->toGrayscale(current);
+	static vtkImageDataPtr source;
+	source = this->useAngio(current, grayFrame);
+	source->Update();
 
 	import->SetImportVoidPointer(source->GetScalarPointer());
 	import->SetDataScalarType(source->GetScalarType());
@@ -467,6 +475,9 @@ void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 	import->SetWholeExtent(source->GetWholeExtent());
 	import->SetDataExtentToWholeExtent();
 }
+
+
+
 
 bool USFrameData::is4D()
 {
