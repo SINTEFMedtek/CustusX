@@ -42,6 +42,24 @@ IntBoundingBox3D::IntBoundingBox3D(const Vector3D& a, const Vector3D& b)
 	elems[4] = static_cast<int> (bl[2]);
 	elems[5] = static_cast<int> (tr[2]);
 }
+
+IntBoundingBox3D::IntBoundingBox3D(const Eigen::Vector3i& a, const Eigen::Vector3i& b)
+{
+	Eigen::Vector3i bl, tr;
+	for (unsigned i = 0; i < a.size(); ++i)
+	{
+		bl[i] = std::min(a[i], b[i]);
+		tr[i] = std::max(a[i], b[i]);
+	}
+
+	elems[0] = static_cast<int> (bl[0]);
+	elems[1] = static_cast<int> (tr[0]);
+	elems[2] = static_cast<int> (bl[1]);
+	elems[3] = static_cast<int> (tr[1]);
+	elems[4] = static_cast<int> (bl[2]);
+	elems[5] = static_cast<int> (tr[2]);
+}
+
 IntBoundingBox3D::IntBoundingBox3D(const double* data)
 {
 	for (unsigned i = 0; i < size(); ++i)
@@ -82,6 +100,17 @@ Eigen::Vector3i IntBoundingBox3D::corner(int x, int y, int z) const
 	return c;
 }
 // --------------------------------------------------------
+
+/** return true if p is inside or on the edge of the bounding box
+ */
+bool IntBoundingBox3D::contains(const Eigen::Vector3i& p) const
+{
+	bool inside = true;
+	for (unsigned i = 0; i < 3; ++i)
+		inside &= ((elems[2 * i] <= p[i]) && (p[i] <= elems[2 * i + 1]));
+	return inside;
+}
+
 std::ostream& operator<<(std::ostream& s, const IntBoundingBox3D& data)
 {
 	return stream_range(s, data.begin(), data.end());

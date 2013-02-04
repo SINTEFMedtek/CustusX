@@ -27,6 +27,7 @@ public:
 	IntBoundingBox3D();
 	explicit IntBoundingBox3D(int x0, int x1, int y0, int y1, int z0 = 0, int z1 = 0);
 	explicit IntBoundingBox3D(const Vector3D& a, const Vector3D& b);
+	explicit IntBoundingBox3D(const Eigen::Vector3i& a, const Eigen::Vector3i& b);
 	explicit IntBoundingBox3D(const double* data);
 	explicit IntBoundingBox3D(const int* data);
 
@@ -35,6 +36,7 @@ public:
 	Eigen::Vector3i center() const;
 	Eigen::Vector3i range() const;
 	Eigen::Vector3i corner(int x, int y, int z) const;
+	bool contains(const Eigen::Vector3i& p) const;
 };
 // --------------------------------------------------------
 

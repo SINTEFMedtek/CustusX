@@ -53,13 +53,14 @@ public:
 	static ssc::CoordinateSystem getPr();
 	static ssc::CoordinateSystem getR(); ///<data references coordinate system
 
-	static std::vector<CoordinateSystem> getAvailableSpaces();
+	static std::vector<CoordinateSystem> getAvailableSpaces(bool compact);
 
 private:
 	static Transform3D get_rMfrom(CoordinateSystem from); ///< ref_M_from
 
 	static Transform3D get_rMr(); ///< ref_M_ref
 	static Transform3D get_rMd(QString uid); ///< ref_M_d
+	static Transform3D get_rMdv(QString uid); ///< ref_M_dv
 	static Transform3D get_rMpr(); ///< ref_M_pr
 	static Transform3D get_rMt(QString uid); ///< ref_M_t
 	static Transform3D get_rMto(QString uid); ///< t_M_to
