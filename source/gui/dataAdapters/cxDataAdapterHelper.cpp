@@ -19,11 +19,11 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 	SelectDataStringDataAdapterBasePtr dsda = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(data);
 	if (dsda)
 	{
-		QWidget* temp = new DataSelectWidget(parent, dsda);
+		retval = new DataSelectWidget(parent, dsda);
 		gridLayout->addWidget(temp, row, 0, 1, 2);
-		return temp;
+		return retval;
 	}
-
+	return retval;
 }
 
 } /* namespace cx */
