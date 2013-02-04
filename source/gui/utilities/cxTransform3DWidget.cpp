@@ -32,23 +32,23 @@ public:
 
     QString text = qstring_cast(M).split("\n")[0];
     QRect rect = QFontMetrics(this->font()).boundingRect(text);
-    QSize s(rect.width()*1.1+5, 4*rect.height()*1.1+5);
+    QSize s(rect.width()*1.0+5, 4*rect.height()*1.2+5);
     return s;
   }
 };
 
-template<class T>
-QAction* Transform3DWidget::createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot)
-{
-  QAction* action = new QAction(QIcon(iconName), text, this);
-  action->setStatusTip(tip);
-  action->setToolTip(tip);
-  connect(action, SIGNAL(triggered()), this, slot);
-  QToolButton* button = new QToolButton();
-  button->setDefaultAction(action);
-  layout->addWidget(button);
-  return action;
-}
+//template<class T>
+//QAction* Transform3DWidget::createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot)
+//{
+//  QAction* action = new QAction(QIcon(iconName), text, this);
+//  action->setStatusTip(tip);
+//  action->setToolTip(tip);
+//  connect(action, SIGNAL(triggered()), this, slot);
+//  QToolButton* button = new QToolButton();
+//  button->setDefaultAction(action);
+//  layout->addWidget(button);
+//  return action;
+//}
 
 
 Transform3DWidget::Transform3DWidget(QWidget* parent) :
@@ -72,11 +72,12 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
 
   mLayout->addWidget(mTextEdit, 1);
 
-  mEditAction = this->createAction(mLayout,
-      ":/icons/open_icon_library/png/64x64/actions/system-run-5.png",
+  mEditAction = this->createAction(this,
+      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
       "Edit",
       "Toggle Edit Matrix",
-      SLOT(toggleEditSlot()));
+      SLOT(toggleEditSlot()),
+      mLayout);
 
 //  mLayout->addStretch();
 
