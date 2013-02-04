@@ -21,6 +21,7 @@
 #include <iostream>
 #include "sscTypeConversions.h"
 #include "sscHelperWidgets.h"
+#include "sscLogger.h"
 
 namespace ssc
 {
@@ -31,6 +32,8 @@ LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, ssc::StringDataAda
 	QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
+	SSC_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
+
 	this->setEnabled(dataInterface->getEnabled());
 
 	mData = dataInterface;

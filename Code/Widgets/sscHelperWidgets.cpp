@@ -31,6 +31,7 @@
 #include "sscCheckBoxWidget.h"
 #include "sscColorSelectWidget.h"
 #include "sscTypeConversions.h"
+#include "sscLabeledLineEditWidget.h"
 #include <iostream>
 
 namespace ssc
@@ -41,7 +42,10 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 	StringDataAdapterPtr str = boost::shared_dynamic_cast<ssc::StringDataAdapter>(data);
 	if (str)
 	{
-		return new ssc::LabeledComboBoxWidget(parent, str, gridLayout, row);
+		if (str->getAllowOnlyValuesInRange())
+			return new ssc::LabeledComboBoxWidget(parent, str, gridLayout, row);
+		else
+			return new ssc::LabeledLineEditWidget(parent, str, gridLayout, row);
 	}
 
 	DoubleDataAdapterPtr dbl = boost::shared_dynamic_cast<ssc::DoubleDataAdapter>(data);

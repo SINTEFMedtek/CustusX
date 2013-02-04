@@ -31,10 +31,10 @@
 namespace ssc
 {
 
-/**\brief Composite widget for string selection.
+/**\brief Composite widget for string edit.
  *
- * Consists of <namelabel, combobox>.
- * Insert a subclass of ssc::StringDataAdStringDataAdapter to connect to data.
+ *  Accepts a StringDataAdapterPtr that has getAllowOnlyValuesInRange()==false
+ *
  *
  * \ingroup sscWidget
  */
@@ -42,14 +42,14 @@ class LabeledLineEditWidget: public OptimizedUpdateWidget
 {
 Q_OBJECT
 public:
-	LabeledLineEditWidget(QWidget* parent, EditableStringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
+	LabeledLineEditWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
 private slots:
     virtual void prePaintEvent();
 	void editingFinished();
 private:
 	QLabel* mLabel;
 	QLineEdit* mLine;
-	EditableStringDataAdapterPtr mData;
+	StringDataAdapterPtr mData;
 };
 
 } // namespace ssc

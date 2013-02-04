@@ -56,6 +56,7 @@ public:
 	 */
 	static StringDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QString value,
 		QStringList range, QDomNode root);
+	static StringDataAdapterXmlPtr initialize(const QString& uid, QString name, QString help, QString value, QDomNode root);
 
 public:
 	// inherited interface
@@ -69,6 +70,10 @@ public:
 	virtual QString convertInternal2Display(QString internal); ///< conversion from internal value to display value
 	virtual void setDisplayNames(std::map<QString, QString> names);
 
+	virtual bool isReadOnly() const { return mIsReadOnly; }
+	virtual bool getAllowOnlyValuesInRange() const { return mAllowOnlyValuesInRange; }
+	void setReadOnly(bool val);
+
 public:
 	QString getUid() const;
 
@@ -76,6 +81,7 @@ signals:
 	void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
+	StringDataAdapterXml();
 	QString mName;
 	QString mUid;
 	QString mHelp;
@@ -83,6 +89,8 @@ private:
 	QStringList mRange;
 	XmlOptionItem mStore;
 	std::map<QString, QString> mDisplayNames;
+	bool mIsReadOnly;
+	bool mAllowOnlyValuesInRange;
 };
 
 // --------------------------------------------------------

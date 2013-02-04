@@ -20,16 +20,18 @@
 #include "sscLabeledLineEditWidget.h"
 #include <iostream>
 #include "sscTypeConversions.h"
+#include "sscLogger.h"
 
 namespace ssc
 {
 
 ///----------------
 
-LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, ssc::EditableStringDataAdapterPtr dataInterface,
+LabeledLineEditWidget::LabeledLineEditWidget(QWidget* parent, ssc::StringDataAdapterPtr dataInterface,
 	QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
+	SSC_ASSERT(dataInterface->getAllowOnlyValuesInRange()==false);
 	mData = dataInterface;
     connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
