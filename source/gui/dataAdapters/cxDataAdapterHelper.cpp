@@ -20,7 +20,7 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 	if (dsda)
 	{
 		retval = new DataSelectWidget(parent, dsda);
-		gridLayout->addWidget(temp, row, 0, 1, 2);
+		gridLayout->addWidget(retval, row, 0, 1, 2);
 		return retval;
 	}
 	return retval;
