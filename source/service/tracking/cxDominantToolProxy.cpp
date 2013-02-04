@@ -24,6 +24,9 @@ DominantToolProxy::DominantToolProxy()
 					SLOT(dominantToolChangedSlot(const QString&)));
 	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this,
 					SIGNAL(dominantToolChanged(const QString&)));
+
+	if (ssc::toolManager()->getDominantTool())
+		this->dominantToolChangedSlot(ssc::toolManager()->getDominantTool()->getUid());
 }
 
 void DominantToolProxy::dominantToolChangedSlot(const QString& uid)
