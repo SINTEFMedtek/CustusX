@@ -6,8 +6,10 @@
 #include <vector>
 #include "sscForwardDeclarations.h"
 #include "sscDoubleWidgets.h"
-#include "sscStringDataAdapter.h"
+#include "sscStringDataAdapterXml.h"
 #include "cxTransform3DWidget.h"
+#include "sscPointMetric.h"
+
 
 class QCheckBox;
 class QGroupBox;
@@ -44,6 +46,7 @@ protected slots:
 //  void toolsSectorConfigurationChangedSlot();///< Update the combo box when the tools configuration is changed outside the widget. Also used initially to read the tools value.
   void manualToolChanged();
   void manualToolWidgetChanged();
+  void spacesChangedSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -59,6 +62,8 @@ private:
   QVBoxLayout* mToptopLayout;
   QGroupBox* mManualGroup;
   Transform3DWidget* mManualToolWidget;
+  ssc::StringDataAdapterXmlPtr mSpaceSelector;
+  ssc::CoordinateSystemListenerPtr mListener;
 
 //  ssc::SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;

@@ -20,17 +20,10 @@
 
 namespace cx
 {
-
-/// -------------------------------------------------------
-/// -------------------------------------------------------
-/// -------------------------------------------------------
-
   
 ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   BaseWidget(parent, "ToolPropertiesWidget", "Tool Properties")
 {
-//  ssc::Frame3D().test();
-
   //layout
   mToptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
@@ -59,7 +52,6 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   activeToolLayout->addWidget(mActiveToolVisibleLabel);
   activeGroupLayout->addLayout(activeToolLayout);
 
-
   QGroupBox* manualGroup = new QGroupBox(this);
   manualGroup->setTitle("Manual Tool");
   mToptopLayout->addWidget(manualGroup);
@@ -71,26 +63,25 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(ToolManager::getInstance()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
   connect(ToolManager::getInstance()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
   connect(mManualToolWidget, SIGNAL(changed()), this, SLOT(manualToolWidgetChanged()));
+
+  mSpaceSelector = ssc::StringDataAdapterXml::initialize("selectSpace",
+      "Space",
+      "Select coordinate system to store position in.",
+      "",
+	  QStringList(),
+      QDomNode());
+  connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spacesChangedSlot()));
+  connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(setModified()));
+  mSpaceSelector->setValue(ssc::SpaceHelpers::getPr().toString());
+  manualGroupLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mSpaceSelector));
+  this->spacesChangedSlot();
+
   mManualGroup = manualGroup;
   this->manualToolChanged();
   
-  //TODO: Add enable/disable US Probe visualization in 2D/3D?
-  //TODO: Only show US probe properties if tool is US Probe
-
   mUSSectorConfigBox = new ssc::LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New());
   mToptopLayout->addWidget(mUSSectorConfigBox);
   mUSSectorConfigBox->hide();
-
-//  mUSSectorConfigBox = new QComboBox(this);
-//  mUSSectorConfigLabel = new QLabel("Probe sector configuration:", this);
-//  mToptopLayout->addWidget(mUSSectorConfigLabel);
-//  mToptopLayout->addWidget(mUSSectorConfigBox);
-//  mUSSectorConfigLabel->hide();
-//  mUSSectorConfigBox->hide();
-
-//  QGroupBox* group2D = new QGroupBox(this);
-//  group2D->setTitle("2D properties");
-//  mToptopLayout->addWidget(group2D);
 
   QGridLayout* gridLayout = new QGridLayout;
   activeGroupLayout->addLayout(gridLayout);
@@ -98,11 +89,6 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   new ssc::SpinBoxAndSliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterActiveToolOffset), gridLayout, 0);
 
   mToptopLayout->addStretch();
-
-//  void configured(); ///< signal emitted when the system is configured
-//  void initialized(); ///< signal emitted when the system is initialized
-//  void trackingStarted(); ///< signal emitted when the system starts tracking
-//  void trackingStopped(); ///< signal emitted when the system stops tracking
 
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
@@ -113,8 +99,6 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
-
-//  connect(mUSSectorConfigBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configurationChangedSlot(int)));
 
   dominantToolChangedSlot();
   referenceToolChangedSlot();
@@ -138,14 +122,42 @@ void ToolPropertiesWidget::manualToolChanged()
 {
   mManualGroup->setVisible(ToolManager::getInstance()->getManualTool()->getVisible());
   mManualToolWidget->blockSignals(true);
-  mManualToolWidget->setMatrix(ToolManager::getInstance()->getManualTool()->get_prMt());
+
+  ssc::Transform3D prMt = ToolManager::getInstance()->getManualTool()->get_prMt();
+  ssc::CoordinateSystem space_q = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
+  ssc::CoordinateSystem space_mt = ssc::SpaceHelpers::getTO(ToolManager::getInstance()->getManualTool());
+  ssc::Transform3D qMt = ssc::SpaceHelpers::get_toMfrom(space_mt, space_q);
+
+  mManualToolWidget->setMatrix(qMt);
   mManualToolWidget->blockSignals(false);
 }
 
 void ToolPropertiesWidget::manualToolWidgetChanged()
 {
-  ssc::Transform3D M = mManualToolWidget->getMatrix();
-  ToolManager::getInstance()->getManualTool()->set_prMt(M);
+	ssc::Transform3D qMt = mManualToolWidget->getMatrix();
+  ssc::CoordinateSystem space_q = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
+  ssc::CoordinateSystem space_mt = ssc::SpaceHelpers::getTO(ToolManager::getInstance()->getManualTool());
+  ssc::CoordinateSystem space_pr = ssc::SpaceHelpers::getPr();
+  ssc::Transform3D qMpr = ssc::SpaceHelpers::get_toMfrom(space_pr, space_q);
+  ssc::Transform3D prMt = qMpr.inv() * qMt;
+
+  ToolManager::getInstance()->getManualTool()->set_prMt(prMt);
+}
+
+void ToolPropertiesWidget::spacesChangedSlot()
+{
+	ssc::CoordinateSystem space = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
+
+	std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
+	QStringList range;
+	for (unsigned i=0; i<spaces.size(); ++i)
+	  range << spaces[i].toString();
+
+	mSpaceSelector->setValueRange(range);
+	mSpaceSelector->setValue(space.toString());
+	mSpaceSelector->setHelp(QString("The space q to display tool position in,\n"
+	                                "qMt"));
+//	mListener->setSpace(space);
 }
 
 void ToolPropertiesWidget::dominantToolChangedSlot()
