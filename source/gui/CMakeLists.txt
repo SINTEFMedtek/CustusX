@@ -49,6 +49,7 @@ SET(cxGui_MOC_HDRS
     infoWidgets/cxFrameTreeWidget.h
     infoWidgets/cxTreeModelItem.h   
     infoWidgets/cxDataMetricWrappers.h   
+	infoWidgets/cxSamplerWidget.h
     #----------------------
     navigationWidgets/cxNavigationWidget.h
     navigationWidgets/cxTrackPadWidget.h
@@ -202,6 +203,8 @@ SET(cxGui_SRCS
     infoWidgets/cxMetricWidget.cpp
     infoWidgets/cxDataMetricWrappers.h   
     infoWidgets/cxDataMetricWrappers.cpp   
+	infoWidgets/cxSamplerWidget.h
+	infoWidgets/cxSamplerWidget.cpp
     #----------------------
     navigationWidgets/cxNavigationWidget.h
     navigationWidgets/cxNavigationWidget.cpp

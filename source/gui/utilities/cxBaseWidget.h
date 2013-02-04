@@ -82,7 +82,7 @@ public:
 	 * If tip is empty, it is set equal to text.
 	 */
 	template<class T>
-	QAction* createAction(QObject* parent, QIcon iconName, QString text, QString tip, T slot, QLayout* layout=NULL)
+	QAction* createAction(QObject* parent, QIcon iconName, QString text, QString tip, T slot, QLayout* layout=NULL, QToolButton* button = new QToolButton())
 	{
 		if (tip.isEmpty())
 			tip = text;
@@ -93,7 +93,7 @@ public:
 	  connect(action, SIGNAL(triggered()), this, slot);
 	  if (layout)
 	  {
-		  QToolButton* button = new QToolButton();
+//		  QToolButton* button = new QToolButton();
 		  button->setDefaultAction(action);
 		  layout->addWidget(button);
 	  }

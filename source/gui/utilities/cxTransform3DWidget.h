@@ -72,8 +72,8 @@ private:
 //    Vector3DDataAdapterPtr mAngleAdapter;
 //    Vector3DDataAdapterPtr mTranslationAdapter;
 
-  template<class T>
-  QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
+//  template<class T>
+//  QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
 };
 
 }
