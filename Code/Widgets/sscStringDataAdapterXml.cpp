@@ -32,6 +32,11 @@
 namespace ssc
 {
 
+StringDataAdapterXml::StringDataAdapterXml() : 	mIsReadOnly(false)
+{
+
+}
+
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
@@ -45,7 +50,27 @@ StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QSt
 	retval->mRange = range;
 	retval->mStore = XmlOptionItem(uid, root.toElement());
 	retval->mValue = retval->mStore.readValue(value);
+	retval->mAllowOnlyValuesInRange = true;
 	return retval;
+}
+
+StringDataAdapterXmlPtr StringDataAdapterXml::initialize(const QString& uid, QString name, QString help, QString value, QDomNode root)
+{
+	StringDataAdapterXmlPtr retval(new StringDataAdapterXml());
+	retval->mUid = uid;
+	retval->mName = name.isEmpty() ? uid : name;
+	retval->mHelp = help;
+	//retval->mRange = range;
+	retval->mStore = XmlOptionItem(uid, root.toElement());
+	retval->mValue = retval->mStore.readValue(value);
+	retval->mAllowOnlyValuesInRange = false;
+	return retval;
+}
+
+void StringDataAdapterXml::setReadOnly(bool val)
+{
+	mIsReadOnly = val;
+	emit changed();
 }
 
 QString StringDataAdapterXml::getUid() const
