@@ -8,6 +8,7 @@
 
 #ifdef CX_USE_TSF
 #include "openCLUtilities.hpp"
+#include "parameters.hpp"
 #endif //CX_USE_TSF
 #include "sscStringDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
@@ -55,9 +56,17 @@ private slots:
 
 private:
 	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z);
-	boost::unordered_map<std::string, std::string> generateParametersFromOptions();
-	cl::Context createCLContextFromArguments(boost::unordered_map<std::string, std::string> parameters);
+	void createDefaultOptions(QDomElement root); //generate options based on file with all valid parameters for smistads algorithm
+	paramList getParameters(); //fetches the parameters set by the user
+	cl::Context createCLContextFromArguments(paramList parameters);
 
+	void printParameters(paramList params); //helper function
+
+	ssc::StringDataAdapterXmlPtr makeStringOption(QDomElement root, std::string name, StringParameter parameter);
+	ssc::BoolDataAdapterXmlPtr makeBoolOption(QDomElement root, std::string name, BoolParameter parameter);
+	ssc::DoubleDataAdapterXmlPtr makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter);
+
+	/*
 	ssc::StringDataAdapterXmlPtr makeDeviceOption(QDomElement root);
 	ssc::BoolDataAdapterXmlPtr makeBuffersOnlyOption(QDomElement root);
 	ssc::BoolDataAdapterXmlPtr makeAutoMinimumOption(QDomElement root);
@@ -68,10 +77,16 @@ private:
 	ssc::BoolDataAdapterXmlPtr makeNoSegmentationOption(QDomElement root);
 	ssc::BoolDataAdapterXmlPtr makeTimingOption(QDomElement root);
 	ssc::StringDataAdapterXmlPtr makeCenterlineMethodOption(QDomElement root);
+	*/
 
 	vtkImageDataPtr mRawCenterlineResult;
 	vtkImageDataPtr mRawSegmentationResult;
 
+	std::vector<ssc::StringDataAdapterXmlPtr> mStringOptions;
+	std::vector<ssc::BoolDataAdapterXmlPtr> mBoolOptions;
+	std::vector<ssc::DoubleDataAdapterXmlPtr> mDoubleOptions;
+
+	/*
 	ssc::StringDataAdapterXmlPtr mDeviceOption;
 	ssc::BoolDataAdapterXmlPtr mBufferOnlyOption;
 	ssc::BoolDataAdapterXmlPtr mAutoMinimumOption;
@@ -82,6 +97,9 @@ private:
 	ssc::BoolDataAdapterXmlPtr mNoSegmentationOption;
 	ssc::StringDataAdapterXmlPtr mCenterlineMethodOption;
 	ssc::BoolDataAdapterXmlPtr mTimingOption;
+	*/
+
+	paramList mParameters; //the parameters used in last execution
 
 };
 typedef boost::shared_ptr<class TubeSegmentationFilter> TubeSegmentationFilterPtr;
