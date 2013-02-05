@@ -125,16 +125,25 @@ void TestUsReconstruction::validateAngioData(ssc::ImagePtr output)
 	//		  std::cout << std::endl;
 	//	  }
 
-	//    int* dimensions = volume->GetDimensions();
-	// inside angio area
-	int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(143,152,170));
-	CPPUNIT_ASSERT( val > 1 );//Check if the voxel value is != zero inside the angio area
-	//  std::cout << "p0 " << val << std::endl;
+//	//    int* dimensions = volume->GetDimensions();
+//	// inside angio area
+//	int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(143,152,170));
+//	CPPUNIT_ASSERT( val > 1 );//Check if the voxel value is != zero inside the angio area
+//	//  std::cout << "p0 " << val << std::endl;
 
-	// outside angio
-	val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(179,142,170));
-	//std::cout << "p1 " << val << std::endl;
-	CPPUNIT_ASSERT( val ==1 );//Check if the voxel value is zero outside the angio area
+	CPPUNIT_ASSERT(this->getValue(output, 143, 152, 170)  > 1);
+	CPPUNIT_ASSERT(this->getValue(output, 179, 142, 170) == 1);
+//	// outside angio
+//	val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(179,142,170));
+//	//std::cout << "p1 " << val << std::endl;
+//	CPPUNIT_ASSERT( val ==1 );//Check if the voxel value is zero outside the angio area
+}
+
+int TestUsReconstruction::getValue(ssc::ImagePtr data, int x, int y, int z)
+{
+	vtkImageDataPtr volume = data->getGrayScaleBaseVtkImageData();
+	val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z));
+	return val;
 }
 
 void TestUsReconstruction::testAngioReconstruction()
