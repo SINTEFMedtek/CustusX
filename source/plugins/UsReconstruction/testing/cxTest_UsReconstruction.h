@@ -33,6 +33,7 @@ private:
 	/** Validate the angio data output from the specific data set used.
 	  */
 	void validateAngioData(ssc::ImagePtr output);
+	int getValue(ssc::ImagePtr data, int x, int y, int z);
 
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestUsReconstruction );
