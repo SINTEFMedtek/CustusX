@@ -132,10 +132,10 @@ bool ResampleImageFilter::execute()
 	return true;
 }
 
-void ResampleImageFilter::postProcess()
+bool ResampleImageFilter::postProcess()
 {
 	if (!mRawResult)
-		return;
+		return false;
 
 	ssc::ImagePtr output = mRawResult;
 	//    output->resetTransferFunctions();
@@ -144,6 +144,7 @@ void ResampleImageFilter::postProcess()
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());
+	return true;
 }
 
 

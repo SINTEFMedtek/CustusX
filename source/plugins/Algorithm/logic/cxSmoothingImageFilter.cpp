@@ -114,21 +114,21 @@ bool SmoothingImageFilter::execute()
 	return true;
 }
 
-void SmoothingImageFilter::postProcess()
+bool SmoothingImageFilter::postProcess()
 {
 	if (!mRawResult)
-		return;
+		return false;
 
 	ssc::ImagePtr input = this->getCopiedInputImage();
 
 	if (!input)
-		return;
+		return false;
 
 	QString uid = input->getUid() + "_sm%1";
 	QString name = input->getName()+" sm%1";
 	ssc::ImagePtr output = ssc::dataManager()->createDerivedImage(mRawResult,uid, name, input);
 	if (!output)
-		return;
+		return false;
 
 	//    output->resetTransferFunctions();
 	ssc::dataManager()->loadData(output);
@@ -136,6 +136,8 @@ void SmoothingImageFilter::postProcess()
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());
+
+	return true;
 }
 
 
