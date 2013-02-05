@@ -37,6 +37,7 @@ private:
   QString mFilename;
   QLabel* mUidLabel;
   QLabel* mNameLabel;
+  QLabel* mErrorLabel;
   SetParentFrameStringDataAdapterPtr mParentFrameAdapter;
   DataModalityStringDataAdapterPtr mModalityAdapter;
   ImageTypeStringDataAdapterPtr mImageTypeAdapter;

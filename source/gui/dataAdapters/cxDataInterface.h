@@ -422,7 +422,7 @@ public: // basic methods
 typedef boost::shared_ptr<class DataNameEditableStringDataAdapter> DataNameEditableStringDataAdapterPtr;
 /** Adapter for displaying and changing name of a ssc::Data.
  */
-class DataNameEditableStringDataAdapter : public ssc::EditableStringDataAdapter
+class DataNameEditableStringDataAdapter : public ssc::StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -436,6 +436,10 @@ public: // basic methods
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
 
+	virtual bool isReadOnly() const { return false; }
+	virtual bool getAllowOnlyValuesInRange() const { return false; }
+
+
 private:
   ssc::DataPtr mData;
 };
@@ -443,7 +447,7 @@ private:
 typedef boost::shared_ptr<class DataUidEditableStringDataAdapter> DataUidEditableStringDataAdapterPtr;
 /** Adapter for displaying and changing name of a ssc::Data.
  */
-class DataUidEditableStringDataAdapter : public ssc::EditableStringDataAdapter
+class DataUidEditableStringDataAdapter : public ssc::StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -456,7 +460,10 @@ public: // basic methods
   virtual QString getValueName() const;
   virtual bool setValue(const QString& value);
   virtual QString getValue() const;
-  virtual bool isReadOnly() const { return true; }
+//  virtual bool isReadOnly() const { return true; }
+
+	virtual bool isReadOnly() const { return true; }
+	virtual bool getAllowOnlyValuesInRange() const { return false; }
 
 private:
   ssc::DataPtr mData;
