@@ -118,7 +118,10 @@ ssc::MeshPtr WirePhantomWidget::loadNominalCross()
             retval = iter->second;
 
     if (!retval)
-        retval = boost::shared_dynamic_cast<ssc::Mesh>(patientService()->getPatientData()->importData(nominalCrossFilename));
+    {
+    	QString infoText;
+        retval = boost::shared_dynamic_cast<ssc::Mesh>(patientService()->getPatientData()->importData(nominalCrossFilename, infoText));
+    }
 
     if (!retval)
     {

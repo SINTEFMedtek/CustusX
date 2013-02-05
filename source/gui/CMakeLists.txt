@@ -25,6 +25,7 @@ SET(cxGui_MOC_HDRS
     dataAdapters/cxToolDataAdapters.h
     dataAdapters/cxDoubleDataAdapterTemporalCalibration.h
     dataAdapters/cxVector3DComponentDataAdapter.h
+    dataAdapters/cxDataAdapterHelper.h
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxShadingWidget.h
@@ -157,6 +158,8 @@ SET(cxGui_SRCS
     dataAdapters/cxDoubleDataAdapterTemporalCalibration.cpp    
     dataAdapters/cxVector3DComponentDataAdapter.h
     dataAdapters/cxVector3DComponentDataAdapter.cpp
+    dataAdapters/cxDataAdapterHelper.h
+    dataAdapters/cxDataAdapterHelper.cpp
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxVolumePropertiesWidget.cpp
