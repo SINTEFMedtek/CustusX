@@ -55,7 +55,8 @@ void TestTubeSegmentationFramework::testFilter()
 			"/testing/"
 			"TubeSegmentationFramework/helix.mhd";
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/TubeSegmentationFramework/");
-	ssc::DataPtr data = cx::patientService()->getPatientData()->importData(filename);
+	QString info;
+	ssc::DataPtr data = cx::patientService()->getPatientData()->importData(filename, info);
 	CPPUNIT_ASSERT(data);
 
 	//set which data to process
