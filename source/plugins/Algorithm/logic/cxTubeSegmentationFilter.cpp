@@ -135,7 +135,8 @@ bool TubeSegmentationFilter::postProcess()
 	{
 		QString vtkFilename = qstring_cast(it->second.get());
 		//load vtk into CustusX
-		ssc::DataPtr data = patientService()->getPatientData()->importData(vtkFilename);
+		QString info;
+		ssc::DataPtr data = patientService()->getPatientData()->importData(vtkFilename, info);
 		if(data){
 			QString uid = data->getUid();
 			mOutputTypes[1]->setValue(uid);
