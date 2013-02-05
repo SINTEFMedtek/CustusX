@@ -76,6 +76,9 @@ ImportDataDialog::ImportDataDialog(QString filename, QWidget* parent) :
   connect(mParentFrameAdapter.get(), SIGNAL(changed()), this, SLOT(updateImportTransformButton()));
   this->updateImportTransformButton();
 
+  mErrorLabel = new QLabel();
+  layout->addWidget(mErrorLabel);
+
   QHBoxLayout* buttons = new QHBoxLayout;
   layout->addLayout(buttons);
   mOkButton = new QPushButton("OK", this);
@@ -102,7 +105,15 @@ void ImportDataDialog::showEvent(QShowEvent* event)
 
 void ImportDataDialog::importDataSlot()
 {
-  mData = patientService()->getPatientData()->importData(mFilename);
+  QString infoText;
+  mData = patientService()->getPatientData()->importData(mFilename, infoText);
+  if (!infoText.isEmpty())
+  {
+	  infoText += "<font color=red><br>If these warnings are not expected the import have probably failed.</font>";
+	  if(infoText.contains("File already exists", Qt::CaseInsensitive))
+		  infoText += "<font color=red><br>Importing two different volumes with the same name will lead to undesired effects.</font>";
+	  mErrorLabel->setText(infoText);
+  }
 
   if (!mData)
   {

@@ -77,7 +77,11 @@ public:
 public slots:
 	void newPatient(QString choosenDir);
 	void loadPatient(QString chosenDir);
-	ssc::DataPtr importData(QString fileName);
+	/** \brief Import data into CustusX
+	 * \param fileName The file name of the imported file(s)
+	 * \param[out] infoText Information about any errors/warnings that occurred during import
+	 */
+	ssc::DataPtr importData(QString fileName, QString &infoText);
 	void savePatient(); ///< Save all application data to XML file
 	void clearPatient();
 	void exportPatient(bool niftiFormat);
@@ -103,8 +107,20 @@ private:
 	void generateSaveDoc(QDomDocument& doc);
 	void readLoadDoc(QDomDocument& loadDoc, QString patientFolder);
 
-	bool copyFile(QString source, QString dest);
-	bool copyAllSimilarFiles(QString fileName, QString destFolder);
+	/** \brief Copy file (=source) dest folder.
+	 * \param source Name of file to be copied.
+	 * \param dest Destination of copy operation
+	 * \param[out] infoText Information about any errors/warnings that occurred during copy
+	 */
+	bool copyFile(QString source, QString dest, QString &infoText);
+
+	/** \brief Copy filename and all files with the same name (and different extension)
+	 * to destFolder.
+	 * \param fileName Name of file to be copied. All files with the same first name will be copied (all different extensions in the same folder as fineName)
+	 * \param destFolder Destination of copy operation
+	 * \param[out] infoText Information about any errors/warnings that occurred during copy
+	 */
+	bool copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText);
 	static QString getVersionName();
 
 	//Patient
