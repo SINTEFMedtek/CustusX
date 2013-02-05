@@ -16,8 +16,9 @@
 
 #include "sscStringDataAdapter.h"
 #include "sscLabeledComboBoxWidget.h"
-#include "cxDataLocations.h"
 #include "sscHelperWidgets.h"
+#include "cxDataAdapterHelper.h"
+#include "cxDataLocations.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxTimedAlgorithmProgressBar.h"
@@ -79,16 +80,7 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
 
 	for (unsigned i = 0; i < options.size(); ++i)
 	{
-		SelectDataStringDataAdapterBasePtr dataSelectDataAdapter = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(options[i]);
-		if (dataSelectDataAdapter)
-		{
-			layout->addWidget(new DataSelectWidget(widget, dataSelectDataAdapter), i, 0, 1, 2);
-		}
-		else
-		{
-			ssc::createDataWidget(widget, options[i], layout, i);
-			//            layout->addWidget(ssc::createDataWidget(widget, options[i]), i, 0);
-		}
+		createDataWidget(widget, options[i], layout, i);
 	}
 
 	mStackedLayout->setCurrentWidget(widget);

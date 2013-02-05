@@ -21,7 +21,6 @@
 
 namespace cx
 {
-
 DoubleDataAdapterActiveToolOffset::DoubleDataAdapterActiveToolOffset()
 {
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
