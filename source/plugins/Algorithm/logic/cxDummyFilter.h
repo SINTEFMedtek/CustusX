@@ -42,7 +42,7 @@ public:
 
 	//    virtual bool preProcess(QString outputPath);
 	virtual bool execute();
-	virtual void postProcess();
+	virtual bool postProcess();
 
 protected:
 	virtual void createOptions();

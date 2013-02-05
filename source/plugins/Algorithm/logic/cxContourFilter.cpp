@@ -280,21 +280,23 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 	return cubesPolyData;
 }
 
-void ContourFilter::postProcess()
+bool ContourFilter::postProcess()
 {
 	if (!mRawResult)
-		return;
+		return false;
 
 	ssc::ImagePtr input = this->getCopiedInputImage();
 
 	if (!input)
-		return;
+		return false;
 
 	ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
 	ssc::MeshPtr output = this->postProcess(mRawResult, input, colorOption->getValue());
 
 	if (output)
 		mOutputTypes.front()->setValue(output->getUid());
+
+	return true;
 }
 
 ssc::MeshPtr ContourFilter::postProcess(vtkPolyDataPtr contour, ssc::ImagePtr base, QColor color)

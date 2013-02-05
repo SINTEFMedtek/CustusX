@@ -112,7 +112,7 @@ bool DummyFilter::execute()
 	return true;
 }
 
-void DummyFilter::postProcess()
+bool DummyFilter::postProcess()
 {
 	//TODO: add stuff such as saving to dataManager here.
 	std::cout << "DummyFilter::postProcess " << mCopiedInput.size() << std::endl;
@@ -121,6 +121,7 @@ void DummyFilter::postProcess()
 		mOutputTypes.front()->setValue(mInputTypes.front()->getData()->getUid());
 
 	//    return mInput;
+	return true;
 }
 
 
