@@ -10,10 +10,7 @@ namespace cx {
 
 QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout, int row)
 {
-	QWidget* retval = ssc::createDataWidget(parent, data, gridLayout, row);
-
-	if(retval != NULL)
-		return retval;
+	QWidget* retval = NULL;
 
 	//make cx widgets
 	SelectDataStringDataAdapterBasePtr dsda = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(data);
@@ -23,7 +20,10 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 		gridLayout->addWidget(retval, row, 0, 1, 2);
 		return retval;
 	}
-	return retval;
+	if(retval != NULL)
+		return retval;
+
+	retval = ssc::createDataWidget(parent, data, gridLayout, row);
 }
 
 } /* namespace cx */
