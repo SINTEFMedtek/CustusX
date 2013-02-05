@@ -48,11 +48,11 @@ if (BUILD_TESTING)
 		    cxTestTubeSegmentationFramework.cpp
 		    ${CX_TEST_ACQUISITION_SOURCE_FILES}
 		)
-    endif(CX_USE_TSF)
 
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
-	include(cxTestMacros)
-	# define cppunit tests and ctest tests from same source:
-	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestTubeSegmentationFramework cxCppUnitMain.cpp "${CX_TEST_ACQUISITION_SOURCE_FILES}" cxPluginAlgorithm)
+		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
+		include(cxTestMacros)
+		# define cppunit tests and ctest tests from same source:
+		SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestTubeSegmentationFramework cxCppUnitMain.cpp "${CX_TEST_ACQUISITION_SOURCE_FILES}" cxPluginAlgorithm)
+    endif(CX_USE_TSF)
 
 endif (BUILD_TESTING)
