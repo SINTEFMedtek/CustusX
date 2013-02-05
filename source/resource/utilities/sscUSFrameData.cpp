@@ -201,7 +201,8 @@ Eigen::Array3i USFrameData::getDimensions() const
 
 	if (mCropbox.range()[0]!=0)
 	{
-		// WARNING: cannot use dimensions from the cropImage function - it uses extent
+		// WARNING: cannot use dimensions from the cropImage function - it uses extent,
+		// which may be larger. We need the real size, given by wholeextent/updateextent.
 		vtkImageDataPtr sample = this->cropImage(mImageContainer->get(0), mCropbox);
 //		retval[0] = sample->GetDimensions()[0];
 //		retval[1] = sample->GetDimensions()[1];
@@ -246,7 +247,7 @@ vtkImageDataPtr USFrameData::cropImage(vtkImageDataPtr input, IntBoundingBox3D c
   vtkImageClipPtr clip = vtkImageClipPtr::New();
   clip->SetInput(input);
   clip->SetOutputWholeExtent(cropbox.begin());
-//  clip->ClipDataOn();
+//  clip->ClipDataOn(); // this line sets wholeextent==extent, but uses lots of time (~6ms/frame)
   vtkImageDataPtr rawResult = clip->GetOutput();
   rawResult->Update();
   return rawResult;
@@ -271,57 +272,88 @@ vtkImageDataPtr USFrameData::toGrayscale(vtkImageDataPtr input) const
 
 }
 
+// for testing
+//void printStuff(QString text, vtkImageDataPtr data)
+//{
+//	std::cout << text << std::endl;
+//	Eigen::Array<int, 6, 1> wholeExtent(data->GetWholeExtent());
+//	Eigen::Array<int, 6, 1> extent(data->GetExtent());
+//	Eigen::Array<int, 6, 1> updateExtent(data->GetUpdateExtent());
+//	std::cout << "\t whole ext " <<  wholeExtent << std::endl;
+//	std::cout << "\tupdate ext " <<  updateExtent << std::endl;
+//	std::cout << "\t       ext " <<  extent << std::endl;
+////	data->UpdateInformation();
+
+//	Eigen::Array<vtkIdType,3,1> hinc;
+//	data->GetContinuousIncrements(data->GetWholeExtent(), hinc[0], hinc[1], hinc[2]);
+//	std::cout << "\t whole inc " <<  hinc << std::endl;
+
+//	Eigen::Array<vtkIdType,3,1> uinc;
+//	data->GetContinuousIncrements(data->GetUpdateExtent(), uinc[0], uinc[1], uinc[2]);
+//	std::cout << "\t      uinc " <<  uinc << std::endl;
+
+//	Eigen::Array<vtkIdType,3,1> inc;
+//	data->GetContinuousIncrements(data->GetExtent(), inc[0], inc[1], inc[2]);
+//	std::cout << "\t       inc " <<  inc << std::endl;
+
+//	Eigen::Array3i dim(data->GetDimensions());
+//	std::cout << "\t       dim " <<  dim << std::endl;
+
+//	Eigen::Array3i max(wholeExtent[1] - wholeExtent[0], wholeExtent[3] - wholeExtent[2], wholeExtent[5] - wholeExtent[4]);
+//	std::cout << "\t       max " <<  max << std::endl;
+//}
+
 vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr grayFrame) const
 {
-//	ssc::TimeKeeper timer;
-
 	// Some of the code here is borrowed from the vtk examples:
 	// http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
 
-	if (inData->GetNumberOfScalarComponents() < 3)
+	if (inData->GetNumberOfScalarComponents() != 3)
 	{
 		ssc::messageManager()->sendWarning("Angio requested for grayscale ultrasound");
-//		return this->toGrayscale(inData);
 		return grayFrame;
 	}
 
 	vtkImageDataPtr outData = vtkImageDataPtr::New();
 	outData->DeepCopy(grayFrame);
-//	vtkImageDataPtr outData = this->toGrayscale(inData);
-//	timer.printElapsedms("\t\t\t\tgrayscale part opt\t");
-//	timer.reset();
+	outData->Update(); // updates whole extent.
 
-//	vtkImageDataPtr throwaway = this->toGrayscale(inData);
-//	timer.printElapsedms("\t\t\t\tgrayscale part throwaway\t");
-//	timer.reset();
+//	printStuff("Clipped color in", inData);
+//	printStuff("Grayscale in", outData);
 
-	int* outExt = outData->GetExtent();
+	int* inExt = inData->GetWholeExtent();
+	int* outExt = outData->GetWholeExtent();
 
-	unsigned char *inPtr = static_cast<unsigned char*> (inData->GetScalarPointer());
-	unsigned char *outPtr = static_cast<unsigned char*> (outData->GetScalarPointer());
+	// Remember that the input might (and do due to vtkImageClip) contain leaps.
+	// This means that the wholeextent might be larger than the extent, thus
+	// we must use a startoffset and leaps between lines.
+
+	unsigned char *inPtr = static_cast<unsigned char*> (inData->GetScalarPointerForExtent(inData->GetWholeExtent()));
+	unsigned char *outPtr = static_cast<unsigned char*> (outData->GetScalarPointerForExtent(outData->GetWholeExtent()));
 
 	int maxX = outExt[1] - outExt[0];
 	int maxY = outExt[3] - outExt[2];
 	int maxZ = outExt[5] - outExt[4];
 
-	// Get increments to march through data
-	vtkIdType inIncX, inIncY, inIncZ;
-	vtkIdType outIncX, outIncY, outIncZ;
-	//The following may give some values if in and out have different extent???
-	inData->GetContinuousIncrements(outExt, inIncX, inIncY, inIncZ); //Don't work?
-	outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ); //Don't work?
+	Eigen::Array<vtkIdType,3,1> inInc;
+	inData->GetContinuousIncrements(inData->GetWholeExtent(), inInc[0], inInc[1], inInc[2]);
+	SSC_ASSERT(inInc[0]==0);
+	// we assume (wholeextent == extent) for the outData in the algorithm below. assert here.
+	Eigen::Array<vtkIdType,3,1> outInc;
+	outData->GetContinuousIncrements(outData->GetWholeExtent(), outInc[0], outInc[1], outInc[2]);
+	SSC_ASSERT(outInc[0]==0);
+	SSC_ASSERT(outInc[1]==0);
+	SSC_ASSERT(outInc[2]==0);
 
-	// Loop through output pixels
-	int idxZ, idxY, idxR;
-
-	for (idxZ = 0; idxZ <= maxZ; idxZ++)
+	for (int z=0; z<=maxZ; z++)
 	{
-		for (idxY = 0; /*!self->AbortExecute &&*/idxY <= maxY; idxY++)
+		for (int y=0; y<=maxY; y++)
 		{
-			for (idxR = 0; idxR <= maxX; idxR++)//Look at 3 scalar components at the same time (RGB)
+			for (int x=0; x<=maxX; x++)
 			{
-				// Pixel operation. Add foo. Dumber would be impossible.
-				//        *outPtr = (OT)((float)(*inPtr) + foo);
+				//Look at 3 scalar components at the same time (RGB),
+				//if color is grayscale or close to grayscale: set to zero.
+
 				if (((*inPtr) == (*(inPtr + 1))) && ((*inPtr) == (*(inPtr + 2))))
 				{
 					(*outPtr) = 0;
@@ -342,10 +374,10 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr gr
 				outPtr++;
 				inPtr += 3;
 			}
+			inPtr += inInc[1];
 		}
+		inPtr += inInc[2];
 	}
-//	timer.printElapsedms("\t\t\t\tangio algo\t");
-//	timer.reset();
 
 	return outData;
 }
@@ -458,7 +490,15 @@ QString USFrameData::getFilePath() const
 void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 {
 	ssc::TimeKeeper timer;
-	vtkImageDataPtr source = mImageContainer->get(index);
+//	vtkImageDataPtr source = mImageContainer->get(index);
+
+//	 use this test code to display angio output:
+	vtkImageDataPtr current = mImageContainer->get(index);
+	current = this->cropImage(current, ssc::IntBoundingBox3D(157, 747, 68, 680, 0, 0));
+	vtkImageDataPtr grayFrame = this->toGrayscale(current);
+	static vtkImageDataPtr source;
+	source = this->useAngio(current, grayFrame);
+	source->Update();
 
 	import->SetImportVoidPointer(source->GetScalarPointer());
 	import->SetDataScalarType(source->GetScalarType());
@@ -467,6 +507,9 @@ void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 	import->SetWholeExtent(source->GetWholeExtent());
 	import->SetDataExtentToWholeExtent();
 }
+
+
+
 
 bool USFrameData::is4D()
 {

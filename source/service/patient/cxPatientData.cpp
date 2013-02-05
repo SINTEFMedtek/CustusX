@@ -322,7 +322,7 @@ void PatientData::exportPatient(bool niftiFormat)
 	ssc::messageManager()->sendInfo("Exported patient data to " + targetFolder + ".");
 }
 
-bool PatientData::copyFile(QString source, QString dest)
+bool PatientData::copyFile(QString source, QString dest, QString &infoText)
 {
 	if (source == dest)
 		return true;
@@ -331,7 +331,9 @@ bool PatientData::copyFile(QString source, QString dest)
 
 	if (info.exists())
 	{
-		ssc::messageManager()->sendWarning("File already exists: " + dest + ", copy skipped.");
+		QString text = "File already exists: " + dest + ", copy skipped.";
+		infoText = "<font color=orange>" + text + "</font><br>";
+		ssc::messageManager()->sendWarning(text);
 		return true;
 	}
 
@@ -344,12 +346,16 @@ bool PatientData::copyFile(QString source, QString dest)
 	}
 	if (!toFile.flush())
 	{
-		ssc::messageManager()->sendWarning("Failed to copy file: " + source);
+		QString text = "Failed to copy file: " + source;
+		ssc::messageManager()->sendWarning(text);
+		infoText = "<font color=red>" + text + "</font><br>";
 		return false;
 	}
 	if (!toFile.exists())
 	{
-		ssc::messageManager()->sendWarning("File not copied: " + source);
+		QString text = "File not copied: " + source;
+		ssc::messageManager()->sendWarning(text);
+		infoText = "<font color=red>" + text + "</font><br>";
 		return false;
 	}
 
@@ -358,11 +364,7 @@ bool PatientData::copyFile(QString source, QString dest)
 	return true;
 }
 
-/**Copy filename and all files with the same name (and different extension)
- * to destFolder.
- *
- */
-bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder)
+bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder, QString &infoText)
 {
 	QDir sourceFolder(QFileInfo(fileName).path());
 	QStringList filter;
@@ -373,17 +375,21 @@ bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder)
 	{
 		QString sourceFile = sourceFolder.path() + "/" + sourceFiles[i];
 		QString destFile = destFolder + "/" + QFileInfo(sourceFiles[i]).fileName();
-		this->copyFile(sourceFile, destFile);
+		QString text;
+		this->copyFile(sourceFile, destFile, text);
+		infoText.append(text);
 	}
 
 	return true;
 }
 
-ssc::DataPtr PatientData::importData(QString fileName)
+ssc::DataPtr PatientData::importData(QString fileName, QString &infoText)
 {
 	if (fileName.isEmpty())
 	{
-		ssc::messageManager()->sendInfo("Import canceled");
+		QString text = "Import canceled";
+		ssc::messageManager()->sendInfo(text);
+		infoText = "<font color=red>" + text + "</font>";
 		return ssc::DataPtr();
 	}
 
@@ -398,7 +404,9 @@ ssc::DataPtr PatientData::importData(QString fileName)
 
 	if (ssc::dataManager()->getData(uid))
 	{
-		ssc::messageManager()->sendWarning("Data with uid " + uid + " already exists. Import canceled.");
+		QString text = "Data with uid " + uid + " already exists. Import canceled.";
+		ssc::messageManager()->sendWarning(text);
+		infoText = "<font color=red>" + text + "</font>";
 		return ssc::DataPtr();
 	}
 
@@ -406,7 +414,9 @@ ssc::DataPtr PatientData::importData(QString fileName)
 	ssc::DataPtr data = ssc::dataManager()->loadData(uid, fileName, ssc::rtAUTO);
 	if (!data)
 		{
-			ssc::messageManager()->sendWarning("Error with data file: " + fileName + " Import canceled.");
+			QString text = "Error with data file: " + fileName + " Import canceled.";
+			ssc::messageManager()->sendWarning(text);
+			infoText = "<font color=red>" + text + "</font>";
 			return ssc::DataPtr();
 		}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
@@ -417,10 +427,13 @@ ssc::DataPtr PatientData::importData(QString fileName)
 
 	data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
 
-	this->copyAllSimilarFiles(fileName, patientsImageFolder);
+	this->copyAllSimilarFiles(fileName, patientsImageFolder, infoText);
 //  ssc::messageManager()->sendDebug("Data is now copied into the patient folder!");
 
 //	this->autoSave();
+
+	// remove redundant line breaks
+	infoText = infoText.split("<br>", QString::SkipEmptyParts).join("<br>");
 
 	return data;
 }
