@@ -55,7 +55,7 @@ bool TubeSegmentationFilter::execute()
 	try {
 		mParameters = loadParameterPreset(mParameters);
 
-		this->printParameters(mParameters);
+		//this->printParameters(mParameters);
 
 		mOutput = run(filename, mParameters);
 	} catch(SIPL::SIPLException e) {
@@ -94,18 +94,17 @@ bool TubeSegmentationFilter::execute()
  	return true;
 }
 
-void TubeSegmentationFilter::postProcess()
+bool TubeSegmentationFilter::postProcess()
 {
-	if(mOutput == NULL)
+	if(!mOutput)
 	{
 		ssc::messageManager()->sendWarning("No output generated from the tube segmentation filter.");
-		return;
+		return false;
 	}
 
 	ssc::ImagePtr input = this->getCopiedInputImage();
-
 	if (!input)
-		return;
+		return false;
 
 	// Centerline
 	//======================================================
@@ -115,14 +114,17 @@ void TubeSegmentationFilter::postProcess()
 		QString nameCenterline = input->getName()+"_tsf_cl%1";
 		SIPL::int3* size = mOutput->getSize();
 		vtkImageDataPtr rawCenterlineResult = this->convertToVtkImageData(mOutput->getCenterlineVoxels(), size->x, size->y, size->z);
+		if(!rawCenterlineResult)
+			return false;
 
 		ssc::ImagePtr outputCenterline = ssc::dataManager()->createDerivedImage(rawCenterlineResult ,uidCenterline, nameCenterline, input);
 		if (!outputCenterline)
-			return;
+			return false;
+
 		ssc::dataManager()->loadData(outputCenterline);
 		ssc::dataManager()->saveImage(outputCenterline, patientService()->getPatientData()->getActivePatientFolder());
 
-		mOutputTypes.front()->setValue(outputCenterline->getUid());
+		mOutputTypes[0]->setValue(outputCenterline->getUid());
 	}
 
 
@@ -153,13 +155,15 @@ void TubeSegmentationFilter::postProcess()
 
 		ssc::ImagePtr outputSegmentaion = ssc::dataManager()->createDerivedImage(rawSegmentationResult,uidSegmentation, nameSegmentation, input);
 		if (!outputSegmentaion)
-			return;
+			return false;
 
 		ssc::dataManager()->loadData(outputSegmentaion);
 		ssc::dataManager()->saveImage(outputSegmentaion, patientService()->getPatientData()->getActivePatientFolder());
 
-		mOutputTypes.back()->setValue(outputSegmentaion->getUid());
+		mOutputTypes[2]->setValue(outputSegmentaion->getUid());
 	}
+
+	return true;
 }
 
 void TubeSegmentationFilter::createOptions()

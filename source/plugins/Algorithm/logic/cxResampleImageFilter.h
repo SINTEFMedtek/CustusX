@@ -38,7 +38,7 @@ public:
 	virtual QString getName() const;
 	virtual QString getHelp() const;
 	virtual bool execute();
-	virtual void postProcess();
+	virtual bool postProcess();
 
 	// extensions:
 	ssc::DoubleDataAdapterXmlPtr getMarginOption(QDomElement root);

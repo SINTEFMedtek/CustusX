@@ -37,7 +37,7 @@ public:
 
 	bool preProcess();
 	virtual bool execute();
-	virtual void postProcess();
+	virtual bool postProcess();
 
 	// extensions:
 	ssc::DoubleDataAdapterXmlPtr getLowerThresholdOption(QDomElement root);
