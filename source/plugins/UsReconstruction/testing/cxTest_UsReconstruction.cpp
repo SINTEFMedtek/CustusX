@@ -101,48 +101,76 @@ ssc::ReconstructManagerPtr TestUsReconstruction::createManager()
 	return reconstructer;
 }
 
-void TestUsReconstruction::validateAngioData(ssc::ImagePtr output)
+void TestUsReconstruction::validateData(ssc::ImagePtr output)
 {
 	CPPUNIT_ASSERT(output->getModality().contains("US"));
 	CPPUNIT_ASSERT( output->getRange() != 0);//Just check if the output volume is empty
 
-	// Check two voxel values
 	vtkImageDataPtr volume = output->getGrayScaleBaseVtkImageData();
 	unsigned char* volumePtr = reinterpret_cast<unsigned char*>(volume->GetScalarPointer());
 	CPPUNIT_ASSERT(volumePtr); //Check if the pointer != NULL
+}
 
-	//  int* dimensions = volume->GetDimensions();
+void TestUsReconstruction::validateAngioData(ssc::ImagePtr angioOut)
+{
+	this->validateData(angioOut);
 
-	//  int z = dimensions[2]/2;
-	////  for (int z=0; z<dimensions[2]; ++z)
-	//	  for (int y=0; y<dimensions[1]; ++y)
-	//	  {
-	//		  std::cout << " " << y << " " << z << " ";
-	//		  for (int x=0; x<dimensions[0]; ++x)
-	//		  {
-	//			  std::cout << (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z)) << " ";
-	//		  }
-	//		  std::cout << std::endl;
-	//	  }
+	CPPUNIT_ASSERT(angioOut->getImageType().contains("Angio"));
 
-//	//    int* dimensions = volume->GetDimensions();
-//	// inside angio area
-//	int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(143,152,170));
-//	CPPUNIT_ASSERT( val > 1 );//Check if the voxel value is != zero inside the angio area
-//	//  std::cout << "p0 " << val << std::endl;
+	// this is the wire phantom cross: fire samples along one line and one on the other.
+	// visible in bmode, invisible in angio.
+	CPPUNIT_ASSERT(this->getValue(angioOut, 38, 144, 146) == 1);
+	CPPUNIT_ASSERT(this->getValue(angioOut, 94, 145, 132) == 1);
+	CPPUNIT_ASSERT(this->getValue(angioOut, 145, 149, 129) == 1);
+	CPPUNIT_ASSERT(this->getValue(angioOut, 237, 158, 118) == 1);
+	CPPUNIT_ASSERT(this->getValue(angioOut, 278, 158, 110) == 1);
+	CPPUNIT_ASSERT(this->getValue(angioOut, 242, 146, 202) == 1	);
+	// black points at random positions outside cross
+	CPPUNIT_ASSERT(this->getValue(angioOut, 242, 125, 200) == 1);
+	CPPUNIT_ASSERT(this->getValue(angioOut, 233, 138, 141) == 1);
+	// one sample in a flash and a black sample just outside it.
+	CPPUNIT_ASSERT(this->getValue(angioOut, 143, 152, 170)  > 1);
+	CPPUNIT_ASSERT(this->getValue(angioOut, 179, 142, 170) == 1);
+	// two samples in a flash and three black samples just outside it.
+	CPPUNIT_ASSERT(this->getValue(angioOut, 343,  94,  84) > 240 );
+	CPPUNIT_ASSERT(this->getValue(angioOut, 319,  92,  84) > 240 );
+	CPPUNIT_ASSERT(this->getValue(angioOut, 316, 105,  72) == 1);
+	CPPUNIT_ASSERT(this->getValue(angioOut, 317,  98,  44) == 1);
+	CPPUNIT_ASSERT(this->getValue(angioOut, 316, 108,  65) == 1);
+}
 
-	CPPUNIT_ASSERT(this->getValue(output, 143, 152, 170)  > 1);
-	CPPUNIT_ASSERT(this->getValue(output, 179, 142, 170) == 1);
-//	// outside angio
-//	val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(179,142,170));
-//	//std::cout << "p1 " << val << std::endl;
-//	CPPUNIT_ASSERT( val ==1 );//Check if the voxel value is zero outside the angio area
+void TestUsReconstruction::validateBModeData(ssc::ImagePtr bmodeOut)
+{
+	this->validateData(bmodeOut);
+
+	CPPUNIT_ASSERT(bmodeOut->getImageType().contains("B-Mode"));
+
+	// this is the wire phantom cross: fire samples along one line and one on the other.
+	// visible in bmode, invisible in angio.
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 38, 144, 146) > 200);
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 94, 145, 132) > 200);
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 145, 149, 129) > 200);
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 237, 158, 118) > 200);
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 278, 158, 110) > 200);
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 242, 146, 202) > 200);
+	// black points at random positions outside cross
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 242, 125, 200) == 1);
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 233, 138, 141) == 1);
+	// one sample in a flash and a black sample just outside it.
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 143, 152, 170)  > 1);
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 179, 142, 170) == 1);
+	// two samples in a flash and three black samples just outside it.
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 343,  94,  84) > 240 );
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 319,  92,  84) > 240 );
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 316, 105,  72) == 1);
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 317,  98,  44) == 1);
+	CPPUNIT_ASSERT(this->getValue(bmodeOut, 316, 108,  65) == 1);
 }
 
 int TestUsReconstruction::getValue(ssc::ImagePtr data, int x, int y, int z)
 {
 	vtkImageDataPtr volume = data->getGrayScaleBaseVtkImageData();
-	val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z));
+	int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z));
 	return val;
 }
 
@@ -174,7 +202,6 @@ void TestUsReconstruction::testAngioReconstruction()
 
 	// check validity of output:
 	this->validateAngioData(cores[0]->getOutput());
-	CPPUNIT_ASSERT(cores[0]->getOutput()->getImageType().contains("Angio"));
 }
 
 void TestUsReconstruction::testThunderGPUReconstruction()
@@ -203,9 +230,8 @@ void TestUsReconstruction::testThunderGPUReconstruction()
 	preprocessor->initializeCores(cores);
 	cores[0]->reconstruct();
 
-	// check validity of output:
-	this->validateAngioData(cores[0]->getOutput()); // even if not angio - the check is sloppy
-	CPPUNIT_ASSERT(cores[0]->getOutput()->getImageType().contains("B-Mode"));
+	// check validity of output:	
+	this->validateBModeData(cores[0]->getOutput());
 }
 
 void TestUsReconstruction::testDualAngio()
@@ -240,10 +266,9 @@ void TestUsReconstruction::testDualAngio()
 	// validate output
 	CPPUNIT_ASSERT(thread->isFinished());
 	CPPUNIT_ASSERT(!thread->isRunning());
-	this->validateAngioData(cores[0]->getOutput()); // even if not angio - the check is sloppy
+
+	this->validateBModeData(cores[0]->getOutput());
 	this->validateAngioData(cores[1]->getOutput());
-	CPPUNIT_ASSERT(cores[0]->getOutput()->getImageType().contains("B-Mode"));
-	CPPUNIT_ASSERT(cores[1]->getOutput()->getImageType().contains("Angio"));
 }
 
 
