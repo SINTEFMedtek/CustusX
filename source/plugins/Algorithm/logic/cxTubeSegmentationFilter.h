@@ -4,10 +4,8 @@
 #include "cxFilterImpl.h"
 
 #include <boost/unordered_map.hpp>
-//#include "commons.hpp"
 
 #ifdef CX_USE_TSF
-//#include "openCLUtilities.hpp"
 #include "parameters.hpp"
 class TSFOutput;
 #endif //CX_USE_TSF
@@ -46,7 +44,7 @@ public:
 	virtual QString getHelp() const;
 
 	virtual bool execute();
-	virtual void postProcess();
+	virtual bool postProcess();
 
 protected:
 	virtual void createOptions();
