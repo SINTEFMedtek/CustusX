@@ -51,6 +51,7 @@ ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
 void TestAcqController::setupVideo(QString framesFile)
 {
 	std::cout << "TestAcqController::initialize() init video" << std::endl;
+	cx::videoService()->getIGTLinkVideoConnection()->getConnectionMethod()->setValue("Direct Link");
 	cx::videoService()->getIGTLinkVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1").arg(framesFile));
 	mVideoSource = cx::videoService()->getIGTLinkVideoConnection()->getVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));

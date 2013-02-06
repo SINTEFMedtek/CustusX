@@ -154,10 +154,11 @@ bool BinaryThinningImageFilter3DFilter::execute()
 	return true;
 }
 
-void BinaryThinningImageFilter3DFilter::postProcess()
+bool BinaryThinningImageFilter3DFilter::postProcess()
 {
+	bool success = false;
 	if(!mRawResult)
-		return;
+		return success;
 
 	ssc::ColorDataAdapterPtr outputColor = this->getColorOption(mCopiedOptions);
 
@@ -179,6 +180,9 @@ void BinaryThinningImageFilter3DFilter::postProcess()
 
 	// set output
 	mOutputTypes.front()->setValue(mesh->getUid());
+	success = true;
+
+	return success;
 }
 
 
