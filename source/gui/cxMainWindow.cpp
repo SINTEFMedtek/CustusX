@@ -50,6 +50,7 @@
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
+#include "cxDataAdapterHelper.h"
 
 #include "sscDICOMLibConfig.h"
 
@@ -66,6 +67,8 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 
 	mCameraControl.reset(new CameraControl(this));
 
+	this->setCentralWidget(viewManager()->initialize());
+
 	this->createActions();
 	this->createMenus();
 	this->createToolBars();
@@ -81,8 +84,6 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 
 	mLayoutActionGroup = NULL;
 	this->updateWindowTitle();
-
-	this->setCentralWidget(viewManager()->initialize());
 
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
@@ -993,6 +994,11 @@ void MainWindow::createToolBars()
 	samplerWidgetToolBar->setObjectName("SamplerToolBar");
 	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
 	this->registerToolBar(samplerWidgetToolBar, "Toolbar");
+
+	QToolBar* toolOffsetToolBar = addToolBar("Tool Offset");
+	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
+	toolOffsetToolBar->addWidget(createDataWidget(this, DoubleDataAdapterActiveToolOffset::create()));
+	this->registerToolBar(toolOffsetToolBar, "Toolbar");
 }
 
 void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
