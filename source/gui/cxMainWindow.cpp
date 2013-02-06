@@ -130,8 +130,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	// window menu must be created after all dock widgets are created
 	QMenu* popupMenu = this->createPopupMenu();
 	popupMenu->setTitle("Window");
-	//this->menuBar()->addMenu(popupMenu);
-	this->menuBar()->insertMenu(mWorkflowMenuAction, popupMenu);
+	this->menuBar()->insertMenu(mHelpMenuAction, popupMenu);
 
 	this->layoutChangedSlot();
 
@@ -896,7 +895,7 @@ void MainWindow::createMenus()
 //	this->menuBar()->addMenu(popupMenu);
 
 	//workflow
-	mWorkflowMenuAction = this->menuBar()->addMenu(mWorkflowMenu);
+	this->menuBar()->addMenu(mWorkflowMenu);
 	stateService()->getWorkflow()->fillMenu(mWorkflowMenu);
 
 	QList<QAction *> actions = mWorkflowMenu->actions();
@@ -934,7 +933,7 @@ void MainWindow::createMenus()
 	mNavigationMenu->addSeparator();
 	mNavigationMenu->addActions(mInteractorStyleActionGroup->actions());
 
-	this->menuBar()->addMenu(mHelpMenu);
+	mHelpMenuAction = this->menuBar()->addMenu(mHelpMenu);
 	mHelpMenu->addAction(QWhatsThis::createAction(this));
 
 }
