@@ -795,6 +795,7 @@ cmake \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DUSE_C++11=false \
+-DSIPL_USE_GTK=false \
 ../%s''' % (DATA.mCMakeGenerator, 
            DATA.m32bitCompileCMakeOption, 
            DATA.mBuildType, 
