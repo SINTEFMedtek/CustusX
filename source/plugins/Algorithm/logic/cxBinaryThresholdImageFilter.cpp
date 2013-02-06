@@ -168,21 +168,21 @@ bool BinaryThresholdImageFilter::execute()
 	return true;
 }
 
-void BinaryThresholdImageFilter::postProcess()
+bool BinaryThresholdImageFilter::postProcess()
 {
 	if (!mRawResult)
-		return;
+		return false;
 
 	ssc::ImagePtr input = this->getCopiedInputImage();
 
 	if (!input)
-		return;
+		return false;
 
 	QString uid = input->getUid() + "_seg%1";
 	QString name = input->getName()+" seg%1";
 	ssc::ImagePtr output = ssc::dataManager()->createDerivedImage(mRawResult,uid, name, input);
 	if (!output)
-		return;
+		return false;
 
 	output->resetTransferFunctions();
 	ssc::dataManager()->loadData(output);
@@ -195,6 +195,8 @@ void BinaryThresholdImageFilter::postProcess()
 	ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
 	ssc::MeshPtr contour = ContourFilter::postProcess(mRawContour, output, colorOption->getValue());
 	mOutputTypes[1]->setValue(contour->getUid());
+
+	return true;
 }
 
 

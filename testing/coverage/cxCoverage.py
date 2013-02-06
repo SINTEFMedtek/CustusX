@@ -160,6 +160,10 @@ class Controller(object):
 			     action='store_true',
 			     help='initialize, run tests, generate html data',
 			     default=False)
+		p.add_option('--publish', '-u',
+			     action='store_true',
+			     help='publish results to medtek.sintef.no/unittest and medtek.sintef.no/coverage',
+			     default=False)
 		p.add_option('--run_tests', '-t',
 			     action='store_true',
 			     help='run ctest',
@@ -185,10 +189,12 @@ class Controller(object):
 			self.optionParser.print_help()
 			return
 
-		full = (not options.initialize) and (not options.run_tests) and (not options.post_test)
+		full = (not options.initialize) and (not options.run_tests) and (not options.post_test) and (not options.publish)
 
 		print 'Running coverage on folder %s' % path
 		changeDir(os.path.abspath(path))
+		self.mOutputPath = shell.CWD + '/coverage_info'
+		self.mCTestResultsFile = '%s/ctest_results.txt' % self.mOutputPath
 
 		if full or options.initialize:
 			print 'Initializing ...'
@@ -199,9 +205,12 @@ class Controller(object):
 
 		if full or options.post_test:
 			print 'Generating html ...'
-			htmlFolder = self._generateCoverage()
-			htmlFolder = 'coverage_info'
-			self._publishCoverage(htmlFolder)
+			self._publishCoverage()
+
+		if full or options.publish:
+			print 'Posting to medtek.sintef.no ...'
+			self._publish_ctest()
+			self._publishCoverage()
 
 	def _initializeCoverage(self):
 		"""
@@ -214,25 +223,27 @@ class Controller(object):
 	def _run_ctest(self, ctest_args):
 		"""
 		Run ctest with the input arguments,
-		post the output to the unittest folder on medtek.sintef.no
 		"""
-		path = shell.CWD + '/coverage_info'
 		cmd = 'ctest'
 		if ctest_args:
 			cmd = cmd + ' ' + ctest_args
-		cmd = cmd + ' > %s/ctest_results.txt' % path
-		cmd = cmd + ' -output-log %s/ctest_results.txt' % path
+		#cmd = cmd + ' > %s/ctest_results.txt' % path
+		cmd = '%s -output-log %s' % (cmd, self.mCTestResultsFile)
 		print 'Running %s ...' % cmd
-		runShell('mkdir -p %s' % path)
+		runShell('mkdir -p %s' % self.mOutputPath)
 		runShell(cmd)
-
-		with open('%s/ctest_results.txt' % path, 'r') as f:
+            
+	def _publish_ctest(self):
+		"""
+		post the ctest output to the unittest folder on medtek.sintef.no
+		"""
+		with open(self.mCTestResultsFile, 'r') as f:
 			read_data = f.read()
 
-		htmlFile = '%s/ctest_results.html' % path
+		htmlFile = '%s.html' % self.mCTestResultsFile
 		packageTextAsHTML('Unit tests run %s' % time.strftime('%Y-%m-%d_%H-%M'), read_data, htmlFile)
 		runShell('scp -r %s medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/unittest/index.html' % htmlFile)
-            
+
 	def _generateCoverage(self):
 		"""
 		Given that lcov is initialized and ctest is run,
@@ -242,10 +253,9 @@ class Controller(object):
 		runShell('lcov --capture --directory . --output-file cx_coverage_test.gcov')
 		runShell('lcov -add-tracefile cx_coverage_base.gcov -add-tracefile cx_coverage_test.gcov -o cx_coverage_total.gcov')
 		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/testing/*" "/Testing/*" "/Examples/*" --output-file cx_coverage.gcov')
-		runShell('genhtml cx_coverage.gcov -output-directory ./coverage_info')
-		return './coverage_info'
+		runShell('genhtml cx_coverage.gcov -output-directory %s' % self.mOutputPath)
 
-	def _publishCoverage(self, htmlFolder):
+	def _publishCoverage(self):
 		"""
 		Publish the input folder containing lcov html files to medtek.sintef.no,
 		both to the static location coverage accessible from the wiki,
@@ -253,23 +263,20 @@ class Controller(object):
 
 		Additionally, open in a local web browser
 		"""
-		inpath = '%s/%s/' % (shell.CWD, htmlFolder)
-		indexFile = '%s/index.html' % inpath
+#		inpath = '%s/%s/' % (shell.CWD, htmlFolder)
+		indexFile = '%s/index.html' % self.mOutputPath
 		print 'Opening %s in browser...' % indexFile 
 		webbrowser.open('file://%s' % indexFile)
-        	if True:
-			return
-		runShell('scp -r %s/* medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/coverage' % inpath)
-		datedFolder = '%s_%s' % (htmlFolder, time.strftime('%Y-%m-%d_%H-%M'))
-		datedpath = '%s/%s/' % (shell.CWD, datedFolder)
+		runShell('scp -r %s/* medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/coverage' % self.mOutputPath)
+		datedpath = '%s_%s' % (self.mOutputPath, time.strftime('%Y-%m-%d_%H-%M'))
 		# this assumes htmlFolder is a folder, not a path!
 		#print 'htmlfolder: ', htmlFolder
 		#print 'datedFolder: ', datedFolder
 		#print 'cwd ', os.getcwd()
 		#print 'shell.cwd ', shell.CWD
-		os.rename(inpath, datedpath)
-		runShell('scp -r %s medtek.sintef.no:/Volumes/MedTekDisk/Software/CustusX/coverage' % datedFolder)
-		os.rename(datedpath, inpath)
+		os.rename(self.mOutputPath, datedpath)
+		runShell('scp -r %s medtek.sintef.no:/Volumes/MedTekDisk/Software/CustusX/coverage' % datedpath)
+		os.rename(datedpath, self.mOutputPath)
 
 
 def main():
