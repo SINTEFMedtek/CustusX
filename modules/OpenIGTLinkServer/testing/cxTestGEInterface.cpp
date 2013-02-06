@@ -1,5 +1,6 @@
 #include "cxTestGEInterface.h"
 
+#ifdef CX_USE_ISB_GE
 #include <QTimer>
 #include "GEStreamer.h"
 //#include "sscVector3D.h"
@@ -96,6 +97,6 @@ void TestGEInterface::testGEStreamer()
 	CPPUNIT_ASSERT(img);//Got image?
 	img = imgExportedStream->GetFrequencyImage();
 	CPPUNIT_ASSERT(img);//Got image?*/
-
-
 }
+
+#endif //CX_USE_ISB_GE
