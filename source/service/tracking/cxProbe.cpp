@@ -106,10 +106,12 @@ void Probe::setRTSource(ssc::VideoSourcePtr source)
 {
 	boost::shared_ptr<ssc::ProbeAdapterRTSource> adapter;
 	adapter = boost::shared_dynamic_cast<ssc::ProbeAdapterRTSource>(mSource);
-	if (source==adapter->getBaseSource())
+	if (adapter && (source==adapter->getBaseSource()))
 		return;
 
-	adapter.reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
+	mSource.reset();
+	if (source)
+		adapter.reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
 	mSource = adapter;
 	emit sectorChanged();
 }

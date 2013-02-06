@@ -158,6 +158,7 @@ void ToolPropertiesWidget::spacesChangedSlot()
 	mSpaceSelector->setHelp(QString("The space q to display tool position in,\n"
 	                                "qMt"));
 //	mListener->setSpace(space);
+	this->setModified();
 }
 
 void ToolPropertiesWidget::dominantToolChangedSlot()

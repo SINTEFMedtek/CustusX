@@ -289,6 +289,7 @@ void LandmarkRegistrationWidget::cellChangedSlot(int row, int column)
 	{
 		Qt::CheckState state = item->checkState();
 		ssc::dataManager()->setLandmarkActive(uid, state == Qt::Checked);
+		this->performRegistration(); // automatic when changing active state (Mantis #0000674)s
 	}
 	if (column == 2)
 	{
@@ -308,7 +309,10 @@ void LandmarkRegistrationWidget::cellChangedSlot(int row, int column)
 
 void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 {
-	this->performRegistration();
+//  - This has too many side effects when we use the landmarks for several different registrations,
+//	i.e. image2image, patient, fast... Rather register explicitly, and add it to the buttons where you
+//  want the automation, such as in the patient reg sampler. (Mantis #0000674)
+//	this->performRegistration();
     this->setModified();
 }
 
