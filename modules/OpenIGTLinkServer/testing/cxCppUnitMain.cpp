@@ -29,6 +29,9 @@ int main(int argc, char **argv)
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
 #else
+
+#ifdef CX_USE_ISB_GE
+
 //	runner.addTest( new CppUnit::TestCaller<TestGEInterface>(
 //									   "TestGEInterface::testConstructor",
 //										&TestGEInterface::testConstructor ) );
@@ -36,6 +39,8 @@ int main(int argc, char **argv)
 									   "TestGEInterface::testInit",
 										&TestGEInterface::testInit ) );
 //	runner.addTest(cxTestExamples::suite());
+#endif
+
 #endif
 	
 	
