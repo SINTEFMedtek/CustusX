@@ -65,13 +65,12 @@ private:
 	ssc::BoolDataAdapterXmlPtr makeBoolOption(QDomElement root, std::string name, BoolParameter parameter);
 	ssc::DoubleDataAdapterXmlPtr makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter);
 
-	TSFOutput* mOutput;
-
 	std::vector<ssc::StringDataAdapterXmlPtr> mStringOptions;
 	std::vector<ssc::BoolDataAdapterXmlPtr> mBoolOptions;
 	std::vector<ssc::DoubleDataAdapterXmlPtr> mDoubleOptions;
 
-	paramList mParameters; //the parameters used in last execution
+	TSFOutput* mOutput; ///< output from last execution
+	paramList mParameters; ///< the parameters used in last execution
 
 };
 typedef boost::shared_ptr<class TubeSegmentationFilter> TubeSegmentationFilterPtr;
