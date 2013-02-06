@@ -29,11 +29,11 @@
 #include "sscGLHelpers.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkInteractorStyleUnicam.h"
-#include "vtkInteractorStyleTrackballCamera.h"
-#include "vtkInteractorStyleTrackballActor.h"
-#include "vtkInteractorStyleFlight.h"
+//#include "vtkRenderWindowInteractor.h"
+//#include "vtkInteractorStyleUnicam.h"
+//#include "vtkInteractorStyleTrackballCamera.h"
+//#include "vtkInteractorStyleTrackballActor.h"
+//#include "vtkInteractorStyleFlight.h"
 
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
@@ -58,6 +58,7 @@
 #include "cxPatientData.h"
 #include "cxInteractiveClipper.h"
 #include "sscImage.h"
+#include "cxCameraStyle.h"
 
 namespace cx
 {
@@ -81,7 +82,7 @@ ViewManager* ViewManager::createInstance()
 	if (mTheInstance == NULL)
 	{
 		mTheInstance = new ViewManager();
-	}
+		}
 	return mTheInstance;
 }
 
@@ -129,6 +130,8 @@ ViewManager::~ViewManager()
 
 QWidget* ViewManager::initialize()
 {
+	mCameraStyle.reset(new CameraStyle()); // uses the global viewmanager() instance - must be created after creation of this.
+
 	mLayout = new QGridLayout;
 	mMainWindowsCentralWidget = new QWidget;
 	mViewCache2D.reset(new ViewCache<View2D>(mMainWindowsCentralWidget,	"View2D"));
@@ -1114,60 +1117,88 @@ void ViewManager::saveGlobalSettings()
 
 QActionGroup* ViewManager::createInteractorStyleActionGroup()
 {
-	QActionGroup* camGroup = new QActionGroup(this);
-	camGroup->setExclusive(true);
+	return mCameraStyle->createInteractorStyleActionGroup();
+//	QActionGroup* camGroup = new QActionGroup(this);
+//	camGroup->setExclusive(true);
 
-	this->addInteractorStyleAction("Unicam", camGroup, "vtkInteractorStyleUnicam", QIcon(":/icons/camera-u.png"),
-					"Set 3D interaction to a single-button style, useful for touch screens.");
-	this->addInteractorStyleAction("Normal Camera", camGroup, "vtkInteractorStyleTrackballCamera",
-					QIcon(":/icons/camera-n.png"), "Set 3D interaction to the normal camera-oriented style.");
-	this->addInteractorStyleAction("Object", camGroup, "vtkInteractorStyleTrackballActor",
-					QIcon(":/icons/camera-o.png"), "Set 3D interaction to a object-oriented style.");
-	this->addInteractorStyleAction("Flight", camGroup, "vtkInteractorStyleFlight", QIcon(":/icons/camera-f.png"),
-					"Set 3D interaction to a flight style.");
+//	this->addInteractorStyleAction("Normal Camera", camGroup,
+//	                               "vtkInteractorStyleTrackballCamera",
+//	                               QIcon(":/icons/camera-n.png"),
+//	                               "Set 3D interaction to the normal camera-oriented style.");
+//	this->addInteractorStyleAction("Tool", camGroup,
+//	                               "cxInteractorStyleTool",
+//	                               QIcon(":/icons/camera-t.png"),
+//	                               "Camera following tool.");
+//	this->addInteractorStyleAction("Angled Tool", camGroup,
+//	                               "cxInteractorStyleAngledTool",
+//	                               QIcon(":/icons/camera-at.png"),
+//	                               "Camera following tool (Placed at an angle of 20 degrees).");
+//	this->addInteractorStyleAction("Unicam", camGroup,
+//	                               "vtkInteractorStyleUnicam",
+//	                               QIcon(":/icons/camera-u.png"),
+//	                               "Set 3D interaction to a single-button style, useful for touch screens.");
 
-	return camGroup;
+////	this->addInteractorStyleAction("Object", camGroup, "vtkInteractorStyleTrackballActor",
+////					QIcon(":/icons/camera-o.png"), "Set 3D interaction to a object-oriented style.");
+////	this->addInteractorStyleAction("Flight", camGroup, "vtkInteractorStyleFlight", QIcon(":/icons/camera-f.png"),
+////					"Set 3D interaction to a flight style.");
+
+//	return camGroup;
 }
 
-void ViewManager::addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,
-				QString helptext)
-{
-	ssc::ViewWidget* view = viewManager()->get3DView();
-	if (!view)
-		return;
-	vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
+//void ViewManager::addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,
+//				QString helptext)
+//{
+//	vtkRenderWindowInteractor* interactor = NULL;
+//	ssc::ViewWidget* view = viewManager()->get3DView();
+//	if (view)
+//		interactor = view->getRenderWindow()->GetInteractor();
 
-	QAction* action = new QAction(caption, group);
-	action->setIcon(icon);
-	action->setCheckable(true);
-	action->setData(className);
-	action->setToolTip(helptext);
-	action->setWhatsThis(helptext);
-	action->setChecked(QString(interactor->GetInteractorStyle()->GetClassName()) == className);
-	connect(action, SIGNAL(triggered(bool)), this, SLOT(setInteractionStyleActionSlot()));
-}
+////	std::cout << "add interact" << std::endl;
+//	QAction* action = new QAction(caption, group);
+//	action->setIcon(icon);
+//	action->setCheckable(true);
+//	action->setData(className);
+//	action->setToolTip(helptext);
+//	action->setWhatsThis(helptext);
+//	if (interactor)
+//		action->setChecked(QString(interactor->GetInteractorStyle()->GetClassName()) == className);
+//	connect(action, SIGNAL(triggered(bool)), this, SLOT(setInteractionStyleActionSlot()));
+//}
 
-void ViewManager::setInteractionStyleActionSlot()
-{
-	QAction* theAction = static_cast<QAction*>(sender());if(!theAction)
-	return;
+//void ViewManager::setInteractionStyleActionSlot()
+//{
+//	QAction* theAction = static_cast<QAction*>(sender());
+//	if(!theAction)
+//		return;
 
-	QString uid = theAction->data().toString();
+//	QString uid = theAction->data().toString();
 
-	ssc::ViewWidget* view = viewManager()->get3DView();
-	vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
+//	ssc::ViewWidget* view = viewManager()->get3DView();
+//	if (!view)
+//		return;
+//	vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
 
-	if (uid=="vtkInteractorStyleTrackballCamera")
-		interactor->SetInteractorStyle(vtkInteractorStyleTrackballCameraPtr::New());
-	else if (uid=="vtkInteractorStyleUnicam")
-		interactor->SetInteractorStyle(vtkInteractorStyleUnicamPtr::New());
-//  else if (uid=="vtkInteractorStyleTrackballActor")
-//    interactor->SetInteractorStyle(vtkInteractorStyleTrackballActorPtr::New());
-	else if (uid=="vtkInteractorStyleFlight")
-		interactor->SetInteractorStyle(vtkInteractorStyleFlightPtr::New());
+//	if (uid.startsWith("cx"))
+//	{
+//		// reset to default vtk interactor
+//		interactor->SetInteractorStyle(vtkInteractorStyleTrackballCameraPtr::New());
 
-	ssc::messageManager()->sendInfo("Set Interactor: " + QString(interactor->GetInteractorStyle()->GetClassName()));
-}
+//	}
+//	else
+//	{
+//		if (uid=="vtkInteractorStyleTrackballCamera")
+//			interactor->SetInteractorStyle(vtkInteractorStyleTrackballCameraPtr::New());
+//		else if (uid=="vtkInteractorStyleUnicam")
+//			interactor->SetInteractorStyle(vtkInteractorStyleUnicamPtr::New());
+//	//  else if (uid=="vtkInteractorStyleTrackballActor")
+//	//    interactor->SetInteractorStyle(vtkInteractorStyleTrackballActorPtr::New());
+//		else if (uid=="vtkInteractorStyleFlight")
+//			interactor->SetInteractorStyle(vtkInteractorStyleFlightPtr::New());
+//	}
+
+//	ssc::messageManager()->sendInfo("Set Interactor: " + uid);
+//}
 
 void ViewManager::autoShowData(ssc::DataPtr data)
 {

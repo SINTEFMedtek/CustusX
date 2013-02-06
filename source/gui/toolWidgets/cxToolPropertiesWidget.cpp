@@ -56,6 +56,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   manualGroup->setTitle("Manual Tool");
   mToptopLayout->addWidget(manualGroup);
   QVBoxLayout* manualGroupLayout = new QVBoxLayout;
+  mManualGroup = manualGroup;
   manualGroup->setLayout(manualGroupLayout);
   manualGroupLayout->setMargin(0);
   mManualToolWidget = new Transform3DWidget(manualGroup);
@@ -74,11 +75,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(setModified()));
   mSpaceSelector->setValue(ssc::SpaceHelpers::getPr().toString());
   manualGroupLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mSpaceSelector));
-  this->spacesChangedSlot();
 
-  mManualGroup = manualGroup;
-  this->manualToolChanged();
-  
   mUSSectorConfigBox = new ssc::LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New());
   mToptopLayout->addWidget(mUSSectorConfigBox);
   mUSSectorConfigBox->hide();
@@ -100,9 +97,11 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
 
-  dominantToolChangedSlot();
-  referenceToolChangedSlot();
-  updateSlot();
+  this->dominantToolChangedSlot();
+  this->referenceToolChangedSlot();
+  this->updateSlot();
+  this->manualToolChanged();
+  this->spacesChangedSlot();
 }
 
 ToolPropertiesWidget::~ToolPropertiesWidget()
@@ -120,6 +119,8 @@ QString ToolPropertiesWidget::defaultWhatsThis() const
 
 void ToolPropertiesWidget::manualToolChanged()
 {
+	if (!ToolManager::getInstance()->getManualTool())
+		return;
   mManualGroup->setVisible(ToolManager::getInstance()->getManualTool()->getVisible());
   mManualToolWidget->blockSignals(true);
 
@@ -157,8 +158,8 @@ void ToolPropertiesWidget::spacesChangedSlot()
 	mSpaceSelector->setValue(space.toString());
 	mSpaceSelector->setHelp(QString("The space q to display tool position in,\n"
 	                                "qMt"));
-//	mListener->setSpace(space);
 	this->setModified();
+	this->manualToolChanged();
 }
 
 void ToolPropertiesWidget::dominantToolChangedSlot()
