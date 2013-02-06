@@ -40,7 +40,7 @@ public:
 	virtual QString getHelp() const;
 
 	virtual bool execute();
-	virtual void postProcess();
+	virtual bool postProcess();
 
 	// extensions:
 	ssc::DoubleDataAdapterXmlPtr getSigma(QDomElement root);

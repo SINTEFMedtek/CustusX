@@ -127,8 +127,10 @@ public:
 	  * Must be called from the main thread.
 	  * Assumes execute() has been called.
 	  *
+	  *  \return success.
+	  *
 	  */
-	virtual void postProcess() = 0;
+	virtual bool postProcess() = 0;
 
 
 };

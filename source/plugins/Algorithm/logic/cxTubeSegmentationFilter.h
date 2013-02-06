@@ -4,12 +4,12 @@
 #include "cxFilterImpl.h"
 
 #include <boost/unordered_map.hpp>
-//#include "commons.hpp"
 
 #ifdef CX_USE_TSF
-#include "openCLUtilities.hpp"
 #include "parameters.hpp"
+class TSFOutput;
 #endif //CX_USE_TSF
+
 #include "sscStringDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 
@@ -36,6 +36,7 @@ class TubeSegmentationFilter : public FilterImpl
 	Q_OBJECT
 
 public:
+	TubeSegmentationFilter();
 	virtual ~TubeSegmentationFilter() {}
 
 	virtual QString getType() const;
@@ -43,22 +44,20 @@ public:
 	virtual QString getHelp() const;
 
 	virtual bool execute();
-	virtual void postProcess();
+	virtual bool postProcess();
 
 protected:
-	virtual void createOptions(QDomElement root);
+	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 
 private slots:
-	void toggleAutoMinimum();
-	void toggleAutoMaximum();
+	void patientChangedSlot();
 
 private:
 	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z);
 	void createDefaultOptions(QDomElement root); //generate options based on file with all valid parameters for smistads algorithm
 	paramList getParameters(); //fetches the parameters set by the user
-	cl::Context createCLContextFromArguments(paramList parameters);
 
 	void printParameters(paramList params); //helper function
 
@@ -66,38 +65,11 @@ private:
 	ssc::BoolDataAdapterXmlPtr makeBoolOption(QDomElement root, std::string name, BoolParameter parameter);
 	ssc::DoubleDataAdapterXmlPtr makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter);
 
-	/*
-	ssc::StringDataAdapterXmlPtr makeDeviceOption(QDomElement root);
-	ssc::BoolDataAdapterXmlPtr makeBuffersOnlyOption(QDomElement root);
-	ssc::BoolDataAdapterXmlPtr makeAutoMinimumOption(QDomElement root);
-	ssc::DoubleDataAdapterXmlPtr makeMinimumOption(QDomElement root);
-	ssc::BoolDataAdapterXmlPtr makeAutoMaximumOption(QDomElement root);
-	ssc::DoubleDataAdapterXmlPtr makeMaximumOption(QDomElement root);
-	ssc::StringDataAdapterXmlPtr makeModeOption(QDomElement root);
-	ssc::BoolDataAdapterXmlPtr makeNoSegmentationOption(QDomElement root);
-	ssc::BoolDataAdapterXmlPtr makeTimingOption(QDomElement root);
-	ssc::StringDataAdapterXmlPtr makeCenterlineMethodOption(QDomElement root);
-	*/
-
-	vtkImageDataPtr mRawCenterlineResult;
-	vtkImageDataPtr mRawSegmentationResult;
+	TSFOutput* mOutput;
 
 	std::vector<ssc::StringDataAdapterXmlPtr> mStringOptions;
 	std::vector<ssc::BoolDataAdapterXmlPtr> mBoolOptions;
 	std::vector<ssc::DoubleDataAdapterXmlPtr> mDoubleOptions;
-
-	/*
-	ssc::StringDataAdapterXmlPtr mDeviceOption;
-	ssc::BoolDataAdapterXmlPtr mBufferOnlyOption;
-	ssc::BoolDataAdapterXmlPtr mAutoMinimumOption;
-	ssc::BoolDataAdapterXmlPtr mAutoMaximumOption;
-	ssc::DoubleDataAdapterXmlPtr mMinimumOption;
-	ssc::DoubleDataAdapterXmlPtr mMaximumOption;
-	ssc::StringDataAdapterXmlPtr mModeOption;
-	ssc::BoolDataAdapterXmlPtr mNoSegmentationOption;
-	ssc::StringDataAdapterXmlPtr mCenterlineMethodOption;
-	ssc::BoolDataAdapterXmlPtr mTimingOption;
-	*/
 
 	paramList mParameters; //the parameters used in last execution
 

@@ -42,7 +42,7 @@ public:
 
 	virtual bool preProcess();
 	virtual bool execute();
-	virtual void postProcess();
+	virtual bool postProcess();
 
 	ssc::ColorDataAdapterPtr getColorOption(QDomElement root);
 
