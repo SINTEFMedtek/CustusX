@@ -1,6 +1,7 @@
 #ifndef CXTESTGEINTERFACE_H_
 #define CXTESTGEINTERFACE_H_
 
+#ifdef CX_USE_ISB_GE
 #include <cppunit/extensions/TestFactoryRegistry.h> 
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
@@ -28,4 +29,5 @@ private:
 CPPUNIT_TEST_SUITE_REGISTRATION( TestGEInterface );
 
 
+#endif //CX_USE_ISB_GE
 #endif /*CXTESTGEINTERFACE_H_*/
