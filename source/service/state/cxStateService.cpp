@@ -281,7 +281,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Automation/autoSelectDominantTool", true);
 	this->fillDefault("Automation/autoSave", true);
 	this->fillDefault("Automation/autoLoadRecentPatient", true);
-	this->fillDefault("Automation/autoShowNewData", true);
+	this->fillDefault("Automation/autoShowNewData", false);
 
 	this->fillDefault("renderingInterval", 33);
 	this->fillDefault("backgroundColor", QColor("black"));
