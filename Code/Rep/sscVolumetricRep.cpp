@@ -256,21 +256,13 @@ void VolumetricRep::vtkImageDataChangedSlot()
 		resampler->GetOutput()->GetScalarRange();
 		volume = resampler->GetOutput();
 
-		// did not help for large-volume problem (CA)
-//		volume = vtkImageDataPtr::New();
-//		volume->DeepCopy(resampler->GetOutput());
-
 		long voxelsDown = volume->GetNumberOfPoints();
 		long voxelsOrig = mImage->getBaseVtkImageData()->GetNumberOfPoints();
 		messageManager()->sendInfo("Completed downsampling volume in VolumetricRep: "
-		                           + mImage->getName()
-		                           + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "
-		                           + "Ratio: " + QString::number(mResampleFactor, 'g', 2) + ", "
-		                           + "Original size: " + qstring_cast(voxelsOrig/1000/1000) + "M.");
-//    std::cout << "=================== org volume: " << std::endl;
-//    mImage->getGrayScaleBaseVtkImageData()->Print(std::cout);
-//    std::cout << "=================== downsampled volume: " << std::endl;
-//    volume->Print(std::cout);
+								   + mImage->getName()
+								   + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "
+								   + "Ratio: " + QString::number(mResampleFactor, 'g', 2) + ", "
+								   + "Original size: " + qstring_cast(voxelsOrig/1000/1000) + "M.");
 	}
 
 	mMapper->SetInput(volume);
