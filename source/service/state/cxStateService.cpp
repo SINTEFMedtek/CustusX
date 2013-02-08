@@ -317,15 +317,19 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("useGPUVolumeRayCastMapper", false);
 	this->fillDefault("useGPU2DRendering", false);
 	this->fillDefault("stillUpdateRate", 8.0);
+	this->fillDefault("useProgressiveLODTextureVolumeRayCastMapper", false);
 #elif WIN32
 	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", false);
 	this->fillDefault("stillUpdateRate", 0.001);
+	this->fillDefault("useProgressiveLODTextureVolumeRayCastMapper", false);
 #else
 	this->fillDefault("useGPUVolumeRayCastMapper", true);
 	this->fillDefault("useGPU2DRendering", true);
 	this->fillDefault("stillUpdateRate", 0.001);
+	this->fillDefault("useProgressiveLODTextureVolumeRayCastMapper", true);
 #endif
+
 
 	this->fillDefault("smartRender", true);
 
