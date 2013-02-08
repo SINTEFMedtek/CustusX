@@ -40,62 +40,39 @@ public:
 	/**
 	 * \param writeColor If set to true, colors will be saved even if settings is set to 8 bit
 	 */
-	UsReconstructionFileMaker(QString sessionDescription, QString activepatientPath);
+	UsReconstructionFileMaker(QString sessionDescription);
 	~UsReconstructionFileMaker();
 
-	void setData(ssc::TimedTransformMap trackerRecordedData, SavingVideoRecorderPtr videoRecorder,
-	             ssc::ToolPtr tool, QString calibFilename, bool writeColor = false);
+	static QString createUniqueFolder(QString patientFolder, QString sessionDescription);
 	ssc::USReconstructInputData getReconstructData();
-	/** Write data to disk. Assume videoRecorder handles the saving of the frames
-	*/
-	QString write();
-	QString getMhdFilename(QString reconstructionFolder);
 
-	/** Change write location, enabling writeRedirected() to be called threaded.
-	* TODO: not necessary????
-	*/
-	void redirectSaveLocation(QString newFolder);
-	/** Set compression on/off for the case where this class and not the SavingVideoRecorder saves images.
-	*/
-	void setImageCompression(bool on);
 	/** Write data to disk. Assume videoRecorder has saved images in another location, reuse filenames from
 	* that object to rewrite into new location.
-	*
 	*/
-	QString writeToNewFolder(QString activepatientPath, bool compression);
+	QString writeToNewFolder(QString path, bool compression);
 
-	QString getFolderName() const { return mFolderName; }
 	QString getSessionName() const { return mSessionDescription; }
 
+	ssc::USReconstructInputData getReconstructData(SavingVideoRecorderPtr videoRecorder,
+	                                               ssc::TimedTransformMap trackerRecordedData,
+	                                               ssc::ToolPtr tool,
+	                                               bool writeColor);
+	void setReconstructData(ssc::USReconstructInputData data) { mReconstructData = data; }
 
 private:
-	QString write(ssc::USReconstructInputData data);
-	QString write(QString newBaseFolder);
 	bool writeUSTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	bool writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	void writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid);
 	void writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression);
 
-	QString findFolderName(QString patientFolder, QString sessionDescription);
-	bool findNewSubfolder(QString subfolderAbsolutePath);
+	static bool findNewSubfolder(QString subfolderAbsolutePath);
 	void report();
 
 	ssc::USReconstructInputData mReconstructData;
 
-	ssc::USReconstructInputData getReconstructData(ssc::TimedTransformMap trackerRecordedData,
-	                                               //  		SavingVideoRecorder::DataType streamRecordedData,
-	                                               //  		QString sessionDescription,
-	                                               //  		QString activepatientPath,
-	                                               ssc::ToolPtr tool,
-	                                               QString calibFilename,
-	                                               bool writeColor);
-
 	QString mSessionDescription;
-	QString mActivepatientPath;
 	QStringList mReport;
-	QString mFolderName;
-	SavingVideoRecorderPtr mVideoRecorder;
 };
 
 typedef boost::shared_ptr<UsReconstructionFileMaker> UsReconstructionFileMakerPtr;

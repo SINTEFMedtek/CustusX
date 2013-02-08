@@ -184,16 +184,22 @@ void USAcquisition::saveSession()
 
 	ssc::ToolPtr probe = this->getTool();
 
-	QString calibFileName;
-	ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(probe);
-	if (cxTool)
-		calibFileName = cxTool->getCalibrationFileName();
+//	QString calibFileName;
+//	ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(probe);
+//	if (cxTool)
+//		calibFileName = cxTool->getCalibrationFileName();
 
 	bool writeColor = mBase->getPluginData()->getReconstructer()->getParams()->mAngioAdapter->getValue();
 
-	mCurrentSessionFileMaker->setData(trackerRecordedData, mVideoRecorder,
-                                      probe, calibFileName,
-                                      writeColor);
+	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(session->getDescription()));
+
+	ssc::USReconstructInputData reconstructData = mCurrentSessionFileMaker->getReconstructData(mVideoRecorder, trackerRecordedData,
+	                                                                                            probe,
+														                                        writeColor);
+//	mCurrentSessionFileMaker->setData(mVideoRecorder, trackerRecordedData, mVideoRecorder,
+//                                      probe, calibFileName,
+//                                      writeColor);
+	mCurrentSessionFileMaker->setReconstructData(reconstructData);
 
 	///TODO this forces write of images to disk, but also writes other crap we dont need.
 	//mCurrentSessionFileMaker->write();
@@ -201,16 +207,18 @@ void USAcquisition::saveSession()
 	mVideoRecorder->completeSave();
 	mVideoRecorder.reset();
 
-	ssc::USReconstructInputData reconstructData = mCurrentSessionFileMaker->getReconstructData();
+//	ssc::USReconstructInputData reconstructData = mCurrentSessionFileMaker->getReconstructData();
 	mBase->getPluginData()->getReconstructer()->selectData(reconstructData);
 	emit acquisitionDataReady();
+
+	QString saveFolder = UsReconstructionFileMaker::createUniqueFolder(patientService()->getPatientData()->getActivePatientFolder(), session->getDescription());
 
 	// now start saving of data to the patient folder, compressed version:
 	QFuture<QString> fileMakerFuture =
 	        QtConcurrent::run(boost::bind(
 	                              &UsReconstructionFileMaker::writeToNewFolder,
 	                              mCurrentSessionFileMaker,
-	                              patientService()->getPatientData()->getActivePatientFolder(),
+	                              saveFolder,
 	                              settings()->value("Ultrasound/CompressAcquisition", true).toBool()
 	                              ));
 	QFutureWatcher<QString>* fileMakerFutureWatcher = new QFutureWatcher<QString>();
@@ -253,10 +261,12 @@ void USAcquisition::recordStarted()
 {
 	RecordSessionPtr session = mBase->getLatestSession();
 
-	QString tempFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
-	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(
-	                                   session->getDescription(),
-	                                   tempFolder));
+	QString tempBaseFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+//	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(
+//	                                   session->getDescription(),
+//	                                   tempFolder));
+
+	QString cacheFolder = UsReconstructionFileMaker::createUniqueFolder(tempBaseFolder, session->getDescription());
 
 	mBase->getPluginData()->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
 	bool writeColor = mBase->getPluginData()->getReconstructer()->getParams()->mAngioAdapter->getValue()
@@ -264,8 +274,8 @@ void USAcquisition::recordStarted()
 
 	mVideoRecorder.reset(new SavingVideoRecorder(
 	                         mRTSource,
-	                         mCurrentSessionFileMaker->getFolderName(),
-	                         mCurrentSessionFileMaker->getSessionName(),
+	                         cacheFolder,
+	                         session->getDescription(),
 	                         false, // no compression when saving to cache
 	                         writeColor));
 	mVideoRecorder->startRecord();
