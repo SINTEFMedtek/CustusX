@@ -21,28 +21,13 @@ typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 namespace cx
 {
 
-UsReconstructionFileMaker::UsReconstructionFileMaker(QString sessionDescription, QString activepatientPath) :
-    mSessionDescription(sessionDescription),
-    mActivepatientPath(activepatientPath)
+UsReconstructionFileMaker::UsReconstructionFileMaker(QString sessionDescription) :
+    mSessionDescription(sessionDescription)
 {
-	mFolderName = this->findFolderName(mActivepatientPath, mSessionDescription);
 }
 
 UsReconstructionFileMaker::~UsReconstructionFileMaker()
 {
-}
-
-void UsReconstructionFileMaker::setData(ssc::TimedTransformMap trackerRecordedData,
-                                        SavingVideoRecorderPtr videoRecorder,
-                                        ssc::ToolPtr tool,
-                                        QString calibFilename,
-                                        bool writeColor)
-{
-	mVideoRecorder = videoRecorder;
-	mReconstructData = this->getReconstructData(trackerRecordedData,
-	                                            tool,
-	                                            calibFilename,
-	                                            writeColor);
 }
 
 ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
@@ -50,26 +35,22 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
 	return mReconstructData;
 }
 
-
 /**Create and return the structure that would have been read by UsReconstructFileReader,
  * if written from this object.
  *
  */
-ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::TimedTransformMap trackerRecordedData,
+ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(SavingVideoRecorderPtr videoRecorder,
+                                                                          ssc::TimedTransformMap trackerRecordedData,
                                                                           ssc::ToolPtr tool,
-                                                                          QString calibFilename,
                                                                           bool writeColor)
 {
 	if(trackerRecordedData.empty())
 		ssc::messageManager()->sendWarning("No tracking data for writing to reconstruction file.");
-	if(mFolderName.isEmpty())
-		ssc::messageManager()->sendWarning("Active patient folder given to reconstruction file maker is empty.");
 
 	ssc::USReconstructInputData retval;
 
-	retval.mFilename = this->getMhdFilename(mFolderName);
-	retval.mUsRaw = ssc::USFrameData::create(retval.mFilename, mVideoRecorder->getImageData());
-
+	retval.mFilename = mSessionDescription; // not saved yet - no filename
+	retval.mUsRaw = ssc::USFrameData::create(mSessionDescription, videoRecorder->getImageData());
 
 	for (ssc::TimedTransformMap::iterator it = trackerRecordedData.begin(); it != trackerRecordedData.end(); ++it)
 	{
@@ -79,7 +60,7 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::T
 		retval.mPositions.push_back(current);
 	}
 
-	std::vector<double> fts = mVideoRecorder->getTimestamps();
+	std::vector<double> fts = videoRecorder->getTimestamps();
 	for (unsigned i=0; i<fts.size(); ++i)
 	{
 		ssc::TimedPosition current;
@@ -99,29 +80,6 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ssc::T
 		retval.mProbeUid = tool->getUid();
 
 	return retval;
-}
-
-QString UsReconstructionFileMaker::write(ssc::USReconstructInputData data)
-{
-//	ssc::TimeKeeper timer;
-	QString reconstructionFolder = QFileInfo(data.mFilename).absolutePath();
-	QDir dir;
-	dir.mkpath(reconstructionFolder);
-	dir.cd(reconstructionFolder);
-	mReport << "Made reconstruction folder: " + dir.absolutePath();
-	QString session = mSessionDescription;
-
-	this->writeTrackerTimestamps2(reconstructionFolder, session, data.mPositions);
-	this->writeTrackerTransforms2(reconstructionFolder, session, data.mPositions);
-	this->writeProbeConfiguration2(reconstructionFolder, session, data.mProbeData.mData, data.mProbeUid);
-
-	mVideoRecorder->completeSave();
-
-	this->report();
-	mReport.clear();
-//	timer.printElapsedms("UsReconstructionFileMaker::write");
-
-	return reconstructionFolder;
 }
 
 bool UsReconstructionFileMaker::writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
@@ -227,19 +185,7 @@ void UsReconstructionFileMaker::writeProbeConfiguration2(QString reconstructionF
 	file.save();
 }
 
-QString UsReconstructionFileMaker::write()
-{
-	this->write(this->getReconstructData());
-	return mFolderName;
-}
-
-QString UsReconstructionFileMaker::getMhdFilename(QString reconstructionFolder)
-{
-	QString mhdFilename = reconstructionFolder+"/"+mSessionDescription+".mhd";
-	return mhdFilename;
-}
-
-QString UsReconstructionFileMaker::findFolderName(QString patientFolder, QString sessionDescription)
+QString UsReconstructionFileMaker::createUniqueFolder(QString patientFolder, QString sessionDescription)
 {
 	QString retval("");
 	QDir patientDir(patientFolder + "/US_Acq");
@@ -248,7 +194,7 @@ QString UsReconstructionFileMaker::findFolderName(QString patientFolder, QString
 	QString subfolderAbsolutePath = patientDir.absolutePath()+"/"+subfolder;
 	QString newPathName = subfolderAbsolutePath;
 	int i=1;
-	while(!this->findNewSubfolder(newPathName))
+	while(!findNewSubfolder(newPathName))
 	{
 		newPathName = subfolderAbsolutePath+"_"+QString::number(i++);
 	}
@@ -292,11 +238,10 @@ void UsReconstructionFileMaker::writeUSImages(QString path, CachedImageDataConta
 	}
 }
 
-QString UsReconstructionFileMaker::writeToNewFolder(QString activepatientPath, bool compression)
+QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compression)
 {
 	ssc::TimeKeeper timer;
-
-	QString path = this->findFolderName(activepatientPath, mSessionDescription);
+	mReconstructData.mFilename = path+"/"+mSessionDescription+".fts"; // use fts since this is a single unique file.
 
 	mReport.clear();
 	mReport << "Made reconstruction folder: " + path;
@@ -307,15 +252,20 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString activepatientPath, b
 	this->writeUSTimestamps2(path, session, mReconstructData.mFrames);
 	this->writeProbeConfiguration2(path, session, mReconstructData.mProbeData.mData, mReconstructData.mProbeUid);
 
-	this->writeUSImages(path, mVideoRecorder->getImageData(), compression);
+
+	CachedImageDataContainerPtr imageData = boost::shared_dynamic_cast<CachedImageDataContainer>(mReconstructData.mUsRaw->getImageContainer());
+	if (imageData)
+		this->writeUSImages(path, imageData, compression);
+	else
+		mReport << "failed to find frame data, save failed.";
 
 	int time = timer.getElapsedms();
-	mReport << QString("Completed save to %1. Spent %2s, %3fps").arg(mSessionDescription).arg(time/1000).arg(mVideoRecorder->getImageData()->size()*1000/time);
+	mReport << QString("Completed save to %1. Spent %2s, %3fps").arg(mSessionDescription).arg(time/1000).arg(imageData->size()*1000/time);
 
 	this->report();
 	mReport.clear();
 
-	return path;
+	return mReconstructData.mFilename;
 }
 
 

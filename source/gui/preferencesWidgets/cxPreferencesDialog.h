@@ -117,6 +117,7 @@ protected:
   QLabel* mRenderingRateLabel;
   QCheckBox* mSmartRenderCheckBox;
   QCheckBox* mGPURenderCheckBox;
+  QCheckBox* mProgressiveTextureRenderCheckBox;
   QCheckBox* mGPU2DRenderCheckBox;
 //  QCheckBox* mGPU3DDepthPeelingCheckBox;
   QCheckBox* mShadingCheckBox;

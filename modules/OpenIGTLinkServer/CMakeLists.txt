@@ -270,3 +270,6 @@ configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/geConfig.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/geConfig.h" )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+
+
+add_subdirectory(testing)

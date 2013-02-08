@@ -50,6 +50,7 @@
 #include "cxPlaybackWidget.h"
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
+#include "cxDataAdapterHelper.h"
 
 #include "sscDICOMLibConfig.h"
 
@@ -66,6 +67,8 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 
 	mCameraControl.reset(new CameraControl(this));
 
+	this->setCentralWidget(viewManager()->initialize());
+
 	this->createActions();
 	this->createMenus();
 	this->createToolBars();
@@ -81,8 +84,6 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 
 	mLayoutActionGroup = NULL;
 	this->updateWindowTitle();
-
-	this->setCentralWidget(viewManager()->initialize());
 
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
@@ -127,6 +128,10 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
         }
     }
 
+	// window menu must be created after all dock widgets are created
+	QMenu* popupMenu = this->createPopupMenu();
+	popupMenu->setTitle("Window");
+	this->menuBar()->insertMenu(mHelpMenuAction, popupMenu);
 
 	this->layoutChangedSlot();
 
@@ -885,10 +890,10 @@ void MainWindow::createMenus()
 	mFileMenu->addAction(mShowControlPanelAction);
 	mFileMenu->addAction(mQuitAction);
 
-	// window
-	QMenu* popupMenu = this->createPopupMenu();
-	popupMenu->setTitle("Window");
-	this->menuBar()->addMenu(popupMenu);
+//	// window
+//	QMenu* popupMenu = this->createPopupMenu();
+//	popupMenu->setTitle("Window");
+//	this->menuBar()->addMenu(popupMenu);
 
 	//workflow
 	this->menuBar()->addMenu(mWorkflowMenu);
@@ -929,7 +934,7 @@ void MainWindow::createMenus()
 	mNavigationMenu->addSeparator();
 	mNavigationMenu->addActions(mInteractorStyleActionGroup->actions());
 
-	this->menuBar()->addMenu(mHelpMenu);
+	mHelpMenuAction = this->menuBar()->addMenu(mHelpMenu);
 	mHelpMenu->addAction(QWhatsThis::createAction(this));
 
 }
@@ -993,6 +998,11 @@ void MainWindow::createToolBars()
 	samplerWidgetToolBar->setObjectName("SamplerToolBar");
 	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
 	this->registerToolBar(samplerWidgetToolBar, "Toolbar");
+
+	QToolBar* toolOffsetToolBar = addToolBar("Tool Offset");
+	toolOffsetToolBar->setObjectName("ToolOffsetToolBar");
+	toolOffsetToolBar->addWidget(createDataWidget(this, DoubleDataAdapterActiveToolOffset::create()));
+	this->registerToolBar(toolOffsetToolBar, "Toolbar");
 }
 
 void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
