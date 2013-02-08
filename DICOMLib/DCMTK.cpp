@@ -1722,6 +1722,11 @@ struct study_t *DICOMLib_StudiesFromPACS( const char *searchString, enum pacs_se
 	/* Set the presentation contexts which will be negotiated when the network connection will be established */
 	/* we prefer Little Endian Explicit */
 	cond = ASC_addPresentationContext( params, 1, opt_abstractSyntax, transferSyntaxes, 3 );
+	if ( cond.bad() )
+	{
+		DimseCondition::dump( cond );
+		SSC_LOG( "Failed to add presentation context: %s", cond.text() );
+	}
 
 	/* Create association, i.e. try to establish a network connection to another DICOM application. This call creates an instance of T_ASC_Association*. */
 	SSC_LOG( "Create association..." );
@@ -1751,8 +1756,6 @@ struct study_t *DICOMLib_StudiesFromPACS( const char *searchString, enum pacs_se
 	}
 
 	/* C-FIND-RQ to the other DICOM application and receive corresponding response messages. */
-	cond = EC_Normal;
-
 	T_ASC_PresentationContextID presId = ASC_findAcceptedPresentationContextID( assoc, opt_abstractSyntax );
 	assert( presId != 0 );
 	DIC_US msgId = assoc->nextMsgID++;
