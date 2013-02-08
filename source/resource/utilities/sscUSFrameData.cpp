@@ -474,14 +474,14 @@ QString USFrameData::getName() const
 void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 {
 	ssc::TimeKeeper timer;
-//	vtkImageDataPtr source = mImageContainer->get(index);
+	vtkImageDataPtr source = mImageContainer->get(index);
 
 //	 use this test code to display angio output:
-	vtkImageDataPtr current = mImageContainer->get(index);
-	current = this->cropImage(current, ssc::IntBoundingBox3D(157, 747, 68, 680, 0, 0));
-	vtkImageDataPtr grayFrame = this->toGrayscale(current);
-	static vtkImageDataPtr source;
-	source = this->useAngio(current, grayFrame);
+//	vtkImageDataPtr current = mImageContainer->get(index);
+//	current = this->cropImage(current, ssc::IntBoundingBox3D(157, 747, 68, 680, 0, 0));
+//	vtkImageDataPtr grayFrame = this->toGrayscale(current);
+//	static vtkImageDataPtr source;
+//	source = this->useAngio(current, grayFrame);
 	source->Update();
 
 	import->SetImportVoidPointer(source->GetScalarPointer());

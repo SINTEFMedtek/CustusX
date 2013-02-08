@@ -193,6 +193,11 @@ void PerformanceTab::init()
   mGPURenderCheckBox->setChecked(useGPU3DRender);
   mGPURenderCheckBox->setToolTip("Use a GPU-based 3D renderer instead of the texture-based one, if available.");
 
+  bool useProgressiveLODTextureVolumeRayCastMapper = settings()->value("useProgressiveLODTextureVolumeRayCastMapper").toBool();
+  mProgressiveTextureRenderCheckBox = new QCheckBox("Use LOD Texture Mapper");
+  mProgressiveTextureRenderCheckBox->setChecked(useProgressiveLODTextureVolumeRayCastMapper);
+  mProgressiveTextureRenderCheckBox->setToolTip("When using the 3D texture mapper,\nuse a progressive level-of-detail rendering,\nif available.");
+
   bool useGPU2DRender = settings()->value("useGPU2DRendering").toBool();
 	mGPU2DRenderCheckBox = new QCheckBox("Use GPU 2D Renderer");
 	mGPU2DRenderCheckBox->setChecked(useGPU2DRender);
@@ -201,6 +206,12 @@ void PerformanceTab::init()
 #ifndef USE_GLX_SHARED_CONTEXT
 	mGPU2DRenderCheckBox->setChecked(false);
 	mGPU2DRenderCheckBox->setEnabled(false);
+#endif
+
+#if !defined(__APPLE__) && !defined(WIN32)
+	mProgressiveTextureRenderCheckBox->setEnabled(true);
+#else
+	mProgressiveTextureRenderCheckBox->setEnabled(false);
 #endif
 
 //  bool useGPU3DDepthPeeling = settings()->value("View3D/depthPeeling").toBool();
@@ -216,9 +227,10 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
   mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
-  mMainLayout->addWidget(mGPU2DRenderCheckBox, 4, 0);
+  mMainLayout->addWidget(mProgressiveTextureRenderCheckBox, 4, 0);
+  mMainLayout->addWidget(mGPU2DRenderCheckBox, 5, 0);
   //mMainLayout->addWidget(mGPU3DDepthPeelingCheckBox, 5, 0);
-  new ssc::SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 6);
+  new ssc::SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 7);
 
   mTopLayout->addLayout(mMainLayout);
 }
@@ -232,6 +244,8 @@ void PerformanceTab::saveParametersSlot()
 {
   settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
   settings()->setValue("useGPUVolumeRayCastMapper", mGPURenderCheckBox->isChecked());
+  settings()->setValue("useProgressiveLODTextureVolumeRayCastMapper", mProgressiveTextureRenderCheckBox->isChecked());
+
   settings()->setValue("useGPU2DRendering", mGPU2DRenderCheckBox->isChecked());
   settings()->setValue("maxRenderSize",     mMaxRenderSize->getValue());
   settings()->setValue("smartRender",       mSmartRenderCheckBox->isChecked());
