@@ -47,17 +47,23 @@ public:
 	virtual bool postProcess();
 
 protected:
+	//TODO create a reset option (to default values)!!!
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 
 private slots:
 	void patientChangedSlot();
+	void inputChangedSlot();
+	void parametersFileChanged();
+//	void centerlineMethodChanged();
 
 private:
-	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z);
-	void createDefaultOptions(QDomElement root); //generate options based on file with all valid parameters for smistads algorithm
-	paramList getParameters(); //fetches the parameters set by the user
+	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ssc::ImagePtr input);
+	void createDefaultOptions(QDomElement root); ///< generate options based on file with all valid parameters for smistads algorithm
+	paramList getParametersFromOptions(); ///< fetches the parameters set by the user
+	void setParamtersToOptions(paramList parameters); ///< set the options to a given set of parameters
+	void setOptionValue(QString valueName, QString value); ///< set one option to a specific value
 
 	void printParameters(paramList params); //helper function
 
@@ -65,9 +71,9 @@ private:
 	ssc::BoolDataAdapterXmlPtr makeBoolOption(QDomElement root, std::string name, BoolParameter parameter);
 	ssc::DoubleDataAdapterXmlPtr makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter);
 
-	std::vector<ssc::StringDataAdapterXmlPtr> mStringOptions;
-	std::vector<ssc::BoolDataAdapterXmlPtr> mBoolOptions;
-	std::vector<ssc::DoubleDataAdapterXmlPtr> mDoubleOptions;
+	std::vector<ssc::StringDataAdapterXmlPtr> mStringOptions; ///< string options to be displayed to the user
+	std::vector<ssc::BoolDataAdapterXmlPtr> mBoolOptions; ///< bool options to be displayed to the user
+	std::vector<ssc::DoubleDataAdapterXmlPtr> mDoubleOptions; ///< double options to be displayed to the user
 
 	TSFOutput* mOutput; ///< output from last execution
 	paramList mParameters; ///< the parameters used in last execution
