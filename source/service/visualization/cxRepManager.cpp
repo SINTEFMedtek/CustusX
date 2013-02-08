@@ -67,10 +67,10 @@ ThresholdPreviewPtr RepManager::getThresholdPreview()
 	return mThresholdPreview;
 }
 
-ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
+ssc::VolumetricBaseRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 {
   if (!image)
-    return ssc::VolumetricRepPtr();
+	return ssc::VolumetricBaseRepPtr();
 
   // clear cache if settings have changed
   bool ok = true;
@@ -89,14 +89,33 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 
   if (!mVolumetricRepByImageMap.count(image->getUid()))
   {
-    QString uid("VolumetricRep_img_" + image->getUid());
-    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
-
-//    bool useGPURender = settings()->value("useGPUVolumeRayCastMapper").toBool();
-    if (useGPURender)
-    	rep->setUseGPUVolumeRayCastMapper();
-    else
-    	rep->setUseVolumeTextureMapper();
+	QString uid("VolumetricRep_img_" + image->getUid());
+//    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
+	ssc::VolumetricBaseRepPtr rep;
+#if !defined(__APPLE__) && !defined(WIN32)
+	// linux:
+	if (useGPURender)
+	{
+		ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
+		volrep->setUseGPUVolumeRayCastMapper();
+		rep = volrep;
+	}
+	else
+	{
+		rep = ssc::ProgressiveLODVolumetricRep::New(uid, uid);
+	}
+#else
+	ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
+	if (useGPURender)
+	{
+		volrep->setUseGPUVolumeRayCastMapper();
+	}
+	else
+	{
+		volrep->setUseVolumeTextureMapper();
+	}
+	rep = volrep;
+#endif
 
     rep->setMaxVolumeSize(maxRenderSize);
     rep->setImage(image);

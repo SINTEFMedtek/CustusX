@@ -35,7 +35,7 @@ namespace cx
 {
 
 typedef std::map<QString, ssc::RepPtr> RepMap;
-typedef std::map<QString, ssc::VolumetricRepPtr> VolumetricRepMap;
+typedef std::map<QString, ssc::VolumetricBaseRepPtr> VolumetricRepMap;
 
 class MessageManager;
 
@@ -106,7 +106,7 @@ public:
 	/**Get a volumetric rep based on which image you want to  display.
 	 * This is useful when creating the rep is expensive and should be done only once.
 	 */
-	ssc::VolumetricRepPtr getVolumetricRep(ssc::ImagePtr image);
+	ssc::VolumetricBaseRepPtr getVolumetricRep(ssc::ImagePtr image);
 
 	/**Get a previously cached Rep.
 	 *
