@@ -131,9 +131,10 @@ void TestAcqController::saveDataCompletedSlot(QString path)
 {
 	QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
-	// convert path to path + file - needed by reader
-	QStringList splitPath = path.split("/");
-	QString filename = splitPath.join("/") + "/" + splitPath.back() + ".fts";
+//	// convert path to path + file - needed by reader
+//	QStringList splitPath = path.split("/");
+//	QString filename = splitPath.join("/") + "/" + splitPath.back() + ".fts";
+	QString filename = path;
 
 	// read file and print info - this is the result of the file pathway
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
