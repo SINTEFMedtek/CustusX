@@ -125,6 +125,7 @@ public:
 	CachedImageDataContainerPtr getImageData();
 //	std::vector<QString> getImageData();
 	std::vector<double> getTimestamps();
+	QString getSaveFolder() { return mSaveFolder; }
 
 	/** Call to force complete the writing of data to disk.
 	  */
