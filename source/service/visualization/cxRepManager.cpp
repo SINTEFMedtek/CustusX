@@ -79,6 +79,7 @@ ssc::VolumetricBaseRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
     maxRenderSize = 10 * pow(10.0,6);
 
   bool useGPURender = settings()->value("useGPUVolumeRayCastMapper").toBool();
+  bool useProgressiveLODTextureVolumeRayCastMapper = settings()->value("useProgressiveLODTextureVolumeRayCastMapper").toBool();
 
   if (mIsUsingGPU3DMapper!=useGPURender || !ssc::similar(mMaxRenderSize, maxRenderSize))
   {
@@ -92,30 +93,49 @@ ssc::VolumetricBaseRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 	QString uid("VolumetricRep_img_" + image->getUid());
 //    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
 	ssc::VolumetricBaseRepPtr rep;
-#if !defined(__APPLE__) && !defined(WIN32)
-	// linux:
-	if (useGPURender)
-	{
-		ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
-		volrep->setUseGPUVolumeRayCastMapper();
-		rep = volrep;
-	}
-	else
+
+	if (useProgressiveLODTextureVolumeRayCastMapper && !useGPURender)
 	{
 		rep = ssc::ProgressiveLODVolumetricRep::New(uid, uid);
 	}
-#else
-	ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
-	if (useGPURender)
-	{
-		volrep->setUseGPUVolumeRayCastMapper();
-	}
 	else
 	{
-		volrep->setUseVolumeTextureMapper();
+		ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
+		if (useGPURender)
+		{
+			volrep->setUseGPUVolumeRayCastMapper();
+		}
+		else
+		{
+			volrep->setUseVolumeTextureMapper();
+		}
+		rep = volrep;
 	}
-	rep = volrep;
-#endif
+
+//#if !defined(__APPLE__) && !defined(WIN32)
+//	// linux:
+//	if (useGPURender)
+//	{
+//		ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
+//		volrep->setUseGPUVolumeRayCastMapper();
+//		rep = volrep;
+//	}
+//	else
+//	{
+//		rep = ssc::ProgressiveLODVolumetricRep::New(uid, uid);
+//	}
+//#else
+//	ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
+//	if (useGPURender)
+//	{
+//		volrep->setUseGPUVolumeRayCastMapper();
+//	}
+//	else
+//	{
+//		volrep->setUseVolumeTextureMapper();
+//	}
+//	rep = volrep;
+//#endif
 
     rep->setMaxVolumeSize(maxRenderSize);
     rep->setImage(image);
