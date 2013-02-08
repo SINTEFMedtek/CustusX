@@ -573,7 +573,7 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 {
 	if (boost::shared_dynamic_cast<ssc::Image>(data))
 	{
-		ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(
+		ssc::VolumetricBaseRepPtr rep = RepManager::getInstance()->getVolumetricRep(
 						boost::shared_dynamic_cast<ssc::Image>(data));
 		return rep;
 	}
