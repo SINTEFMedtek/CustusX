@@ -205,7 +205,7 @@ class Controller(object):
 
 		if full or options.post_test:
 			print 'Generating html ...'
-			self._publishCoverage()
+			self._generateCoverage()
 
 		if full or options.publish:
 			print 'Posting to medtek.sintef.no ...'
@@ -219,6 +219,7 @@ class Controller(object):
 		"""
 		runShell('lcov --zerocounters -directory .')
 		runShell('lcov --capture --initial --directory . --output-file cx_coverage_base.gcov')
+		runShell('rm -r -f %s' % self.mOutputPath)
 
 	def _run_ctest(self, ctest_args):
 		"""
@@ -228,7 +229,7 @@ class Controller(object):
 		if ctest_args:
 			cmd = cmd + ' ' + ctest_args
 		#cmd = cmd + ' > %s/ctest_results.txt' % path
-		cmd = '%s -output-log %s' % (cmd, self.mCTestResultsFile)
+		cmd = '%s --output-log %s' % (cmd, self.mCTestResultsFile)
 		print 'Running %s ...' % cmd
 		runShell('mkdir -p %s' % self.mOutputPath)
 		runShell(cmd)
@@ -242,7 +243,8 @@ class Controller(object):
 
 		htmlFile = '%s.html' % self.mCTestResultsFile
 		packageTextAsHTML('Unit tests run %s' % time.strftime('%Y-%m-%d_%H-%M'), read_data, htmlFile)
-		runShell('scp -r %s medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/unittest/index.html' % htmlFile)
+		webbrowser.open('file://%s' % htmlFile)
+		runShell('scp -r %s medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/unittest/index.html' % htmlFile)	
 
 	def _generateCoverage(self):
 		"""
@@ -251,9 +253,10 @@ class Controller(object):
 		Return output folder name.
 		"""
 		runShell('lcov --capture --directory . --output-file cx_coverage_test.gcov')
-		runShell('lcov -add-tracefile cx_coverage_base.gcov -add-tracefile cx_coverage_test.gcov -o cx_coverage_total.gcov')
-		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/testing/*" "/Testing/*" "/Examples/*" --output-file cx_coverage.gcov')
-		runShell('genhtml cx_coverage.gcov -output-directory %s' % self.mOutputPath)
+		runShell('lcov --add-tracefile cx_coverage_base.gcov --add-tracefile cx_coverage_test.gcov --output-file cx_coverage_total.gcov')
+		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/Examples/*" --output-file cx_coverage.gcov')
+#		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/testing/*" "/Testing/*" "/Examples/*" --output-file cx_coverage.gcov')
+		runShell('genhtml cx_coverage.gcov --output-directory %s' % self.mOutputPath)
 
 	def _publishCoverage(self):
 		"""
@@ -266,7 +269,8 @@ class Controller(object):
 #		inpath = '%s/%s/' % (shell.CWD, htmlFolder)
 		indexFile = '%s/index.html' % self.mOutputPath
 		print 'Opening %s in browser...' % indexFile 
-		webbrowser.open('file://%s' % indexFile)
+		#open.webbrowser('file://%s' % indexFile) # not portable on files
+		runShell('gvfs-open file://%s' % indexFile)
 		runShell('scp -r %s/* medtek.sintef.no:/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/coverage' % self.mOutputPath)
 		datedpath = '%s_%s' % (self.mOutputPath, time.strftime('%Y-%m-%d_%H-%M'))
 		# this assumes htmlFolder is a folder, not a path!
