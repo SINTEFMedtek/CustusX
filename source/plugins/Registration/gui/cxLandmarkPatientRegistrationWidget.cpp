@@ -127,6 +127,8 @@ void LandmarkPatientRegistrationWidget::toolSampleButtonClickedSlot()
 	ssc::messageManager()->playSampleSound();
 
     this->activateLandmark(this->getNextLandmark());
+
+	this->performRegistration(); // automatic when sampling in physical patient space (Mantis #0000674)s
 }
 
 void LandmarkPatientRegistrationWidget::showEvent(QShowEvent* event)

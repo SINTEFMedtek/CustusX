@@ -54,7 +54,7 @@ protected:
 	virtual QString getTargetName() const;
 	virtual ssc::LandmarkMap getTargetLandmarks() const;
 	virtual void setTargetLandmark(QString uid, ssc::Vector3D p_target);
-	virtual void performRegistration()
+	virtual void performRegistration() // no registration in this widget - only definition of pts.
 	{
 	}
     virtual void prePaintEvent(); ///< populates the table widget

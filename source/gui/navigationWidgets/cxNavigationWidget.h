@@ -33,23 +33,24 @@ public:
 
   virtual QString defaultWhatsThis() const;
 
-protected slots:
-  void radioButtonToggledSlot(bool checked);
-  void trackingConfiguredSlot();
+//protected slots:
+//  void radioButtonToggledSlot(bool checked);
+//  void trackingConfiguredSlot();
 
 protected:
   QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
 
   //camera settings
   QGroupBox*    mCameraGroupBox; ///< widget to put all camera specific settings
-  QRadioButton* mDefaultCameraStyleRadioButton; ///< for selecting the default camera style
-  QRadioButton* mToolCameraStyleRadioButton; ///< for selecting tool following camera style
-  QRadioButton* mAngledToolCameraStyleRadioButton; ///< for selecting an angled tool following camera style
-  QLabel*       mCameraOffsetLabel; ///< camera offset label
-  QSlider*      mCameraOffsetSlider; ///< slider for adjusting the camera offset
+//  QRadioButton* mDefaultCameraStyleRadioButton; ///< for selecting the default camera style
+//  QRadioButton* mToolCameraStyleRadioButton; ///< for selecting tool following camera style
+//  QRadioButton* mAngledToolCameraStyleRadioButton; ///< for selecting an angled tool following camera style
+//  QLabel*       mCameraOffsetLabel; ///< camera offset label
+//  QSlider*      mCameraOffsetSlider; ///< slider for adjusting the camera offset
   QVBoxLayout*  mCameraGroupLayout; ///< layout for the cameragroupbox
 
-  CameraStylePtr mCameraStyle;
+//  CameraStylePtr mCameraStyle;
+  CameraStylePtr getCameraStyle();
 };
 }
 #endif /* CXNAVIGATIONWIDGET_H_ */
