@@ -215,7 +215,8 @@ void EraserWidget::eraseVolume(TYPE* volumePointer, TYPE replaceVal)
 	c = rawMr.coord(c);
 	r = rawMr.vector(r * ssc::Vector3D::UnitX()).length();
 	ssc::DoubleBoundingBox3D bb0_raw = ssc::transform(rawMr, bb_r);
-	ssc::IntBoundingBox3D bb1_raw(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
+//	ssc::IntBoundingBox3D bb1_raw(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
+	ssc::IntBoundingBox3D bb1_raw(0, dim[0], 0, dim[1], 0, dim[2]);
 
 //	std::cout << "     sphere: " << bb0_raw << std::endl;
 //	std::cout << "        raw: " << bb1_raw << std::endl;

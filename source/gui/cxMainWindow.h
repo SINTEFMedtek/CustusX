@@ -132,6 +132,7 @@ private:
 	QMenu* mLayoutMenu; ///< menu for changing view layouts
 	QMenu* mNavigationMenu; ///< menu for navigation and interaction
 	QMenu* mHelpMenu;
+	QAction* mHelpMenuAction; ///< Action for helpMenu
 
 	//actions and actiongroups
 	QAction* mAboutAction;
