@@ -184,11 +184,6 @@ void USAcquisition::saveSession()
 
 	ssc::ToolPtr probe = this->getTool();
 
-//	QString calibFileName;
-//	ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(probe);
-//	if (cxTool)
-//		calibFileName = cxTool->getCalibrationFileName();
-
 	bool writeColor = mBase->getPluginData()->getReconstructer()->getParams()->mAngioAdapter->getValue();
 
 	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(session->getDescription()));
@@ -196,18 +191,12 @@ void USAcquisition::saveSession()
 	ssc::USReconstructInputData reconstructData = mCurrentSessionFileMaker->getReconstructData(mVideoRecorder, trackerRecordedData,
 	                                                                                            probe,
 														                                        writeColor);
-//	mCurrentSessionFileMaker->setData(mVideoRecorder, trackerRecordedData, mVideoRecorder,
-//                                      probe, calibFileName,
-//                                      writeColor);
 	mCurrentSessionFileMaker->setReconstructData(reconstructData);
 
-	///TODO this forces write of images to disk, but also writes other crap we dont need.
-	//mCurrentSessionFileMaker->write();
 	// Use instead of filemaker->write(), this writes only images, other stuff kept in memory.
 	mVideoRecorder->completeSave();
 	mVideoRecorder.reset();
 
-//	ssc::USReconstructInputData reconstructData = mCurrentSessionFileMaker->getReconstructData();
 	mBase->getPluginData()->getReconstructer()->selectData(reconstructData);
 	emit acquisitionDataReady();
 
@@ -262,10 +251,6 @@ void USAcquisition::recordStarted()
 	RecordSessionPtr session = mBase->getLatestSession();
 
 	QString tempBaseFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
-//	mCurrentSessionFileMaker.reset(new UsReconstructionFileMaker(
-//	                                   session->getDescription(),
-//	                                   tempFolder));
-
 	QString cacheFolder = UsReconstructionFileMaker::createUniqueFolder(tempBaseFolder, session->getDescription());
 
 	mBase->getPluginData()->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
