@@ -24,9 +24,12 @@
 #include "sscTransform3D.h"
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
-
+#include "sscViewportListener.h"
+#include "sscEnumConverter.h"
+class QIcon;
 class QWidget;
 class QMenu;
+class QActionGroup;
 
 namespace cx
 {
@@ -42,6 +45,11 @@ using ssc::Transform3D;
  * @{
  */
 
+enum CAMERA_STYLE_TYPE
+{
+	cstDEFAULT_STYLE, cstTOOL_STYLE, cstANGLED_TOOL_STYLE, cstUNICAM_STYLE, cstCOUNT
+};
+
 /**
  * \class CameraStyle
  *
@@ -49,50 +57,55 @@ using ssc::Transform3D;
  * Refactored from class View3D.
  *
  * \date Dec 9, 2008
- * \\author Janne Beate Bakeng, SINTEF
- * \\author Christian Askeland, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
+ * \author Christian Askeland, SINTEF
  */
 class CameraStyle: public QObject
 {
 Q_OBJECT
 public:
-	enum Style
-	{
-		DEFAULT_STYLE, TOOL_STYLE, ANGLED_TOOL_STYLE
-	};
-
 	CameraStyle();
 
-	void setCameraStyle(Style style, int offset = -1); ///< lets the user select where the camera, offset only used by TOOL_STYLE
+	/** Select tool style. This replaces the vtkInteractor Style.
+	  *
+	  */
+	void setCameraStyle(CAMERA_STYLE_TYPE style);
+	QActionGroup* createInteractorStyleActionGroup();
 
-public slots:
-	void setCameraOffsetSlot(int offset); ///< sets the camera offset
-
-protected slots:
+private slots:
 	void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
 	void dominantToolChangedSlot();
 	void viewChangedSlot();
+	void setInteractionStyleActionSlot();
 
-protected:
+private:
 	View3D* getView() const;
 	vtkRendererPtr getRenderer() const;
 	vtkCameraPtr getCamera() const;
 	ssc::ToolRep3DPtr getToolRep() const;
+	bool isToolFollowingStyle(CAMERA_STYLE_TYPE style) const;
 
-	void activateCameraDefaultStyle();
-	void activateCameraToolStyle(int offset = 0);
-	void activateCameraAngledToolStyle(int offset = 0);
 	void connectTool();
 	void disconnectTool();
+	void viewportChangedSlot();
+	void updateCamera();
+	void updateActionGroup();
 
-	Style mCameraStyle; ///< the current camerastyle
-	int mCameraOffset; ///< the distance between the camera and focalpoint
+	void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,
+					QString helptext);
+
+	CAMERA_STYLE_TYPE mCameraStyle; ///< the current camerastyle
 	ssc::ToolPtr mFollowingTool; ///< the tool the camera is following
+	ssc::ViewportListenerPtr mViewportListener;
+	bool mBlockCameraUpdate; ///< for breaking a camera update loop
+	QActionGroup* mCameraStyleGroup;
 };
 
 /**
  * @}
  */
 } //namespace cx
+
+SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CAMERA_STYLE_TYPE);
 
 #endif /* CXCAMERASTYLE_H_ */

@@ -34,9 +34,18 @@ class DoubleDataAdapterActiveToolOffset : public ssc::DoubleDataAdapter
 {
   Q_OBJECT
 public:
+	static boost::shared_ptr<DoubleDataAdapterActiveToolOffset> create()
+	{
+		return boost::shared_ptr<DoubleDataAdapterActiveToolOffset>(new DoubleDataAdapterActiveToolOffset());
+	}
+
   DoubleDataAdapterActiveToolOffset();
   virtual ~DoubleDataAdapterActiveToolOffset() {}
-  virtual QString getValueName() const { return "Offset (mm)"; }
+  virtual QString getValueName() const { return "Offset"; }
+  virtual QString getHelp() const
+  {
+	  return "Tool tip virtual offset, in mm.";
+  }
   virtual double getValue() const;
   virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}

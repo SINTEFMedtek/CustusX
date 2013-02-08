@@ -108,14 +108,12 @@ class USFrameData
 public:
 	static USFrameDataPtr create(ImagePtr inputFrameData);
 	static USFrameDataPtr create(QString inputFilename);
-	static USFrameDataPtr create(QString filename, cx::CachedImageDataContainerPtr images);
+	static USFrameDataPtr create(QString name, cx::CachedImageDataContainerPtr images);
 	~USFrameData();
 
 	Eigen::Array3i getDimensions() const;
 	Vector3D getSpacing() const;
 	QString getName() const;
-	QString getUid() const;
-	QString getFilePath() const;
 	cx::ImageDataContainerPtr getImageContainer() { return mImageContainer; }
 
 	void removeFrame(unsigned int index);
@@ -145,7 +143,7 @@ protected:
 	std::vector<int> mReducedToFull; ///< map from indexes in the reduced volume to the full (original) volume.
 	IntBoundingBox3D mCropbox;
 
-	QString mFilename;
+	QString mName;
 	cx::ImageDataContainerPtr mImageContainer;
 	bool mPurgeInput;
 };

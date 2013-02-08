@@ -39,6 +39,7 @@ typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class CyclicActionTimer> RenderTimerPtr;
+typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 
 /**
  * \file
@@ -143,6 +144,7 @@ public:
 	InteractiveCropperPtr getCropper();
 
 	RenderTimerPtr getRenderTimer() { return mRenderTimer; }
+	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(ssc::DataPtr data);
@@ -165,7 +167,7 @@ public slots:
 protected slots:
 	void renderAllViewsSlot(); ///< renders all views
 	void setLayoutActionSlot();
-	void setInteractionStyleActionSlot();
+//	void setInteractionStyleActionSlot();
 	void settingsChangedSlot(QString key);
 
 	void clearSlot();
@@ -201,8 +203,8 @@ protected:
 	QAction* addLayoutAction(QString layout, QActionGroup* group);
 	void setRenderingInterval(int interval);
 
-	void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,
-					QString helptext);
+//	void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,
+//					QString helptext);
 	void loadGlobalSettings();
 	void saveGlobalSettings();
 	void updateViews();
@@ -240,6 +242,8 @@ protected:
 	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
 	ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
+
+	CameraStylePtr mCameraStyle;
 
 private:
 	ViewManager(ViewManager const&);
