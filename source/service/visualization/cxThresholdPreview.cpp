@@ -65,7 +65,7 @@ void ThresholdPreview::revertTransferFunctions()
     mModifiedImage->setShadingOn(mShadingOn_original);
 
     //Go back to VTK linear interpolation
-    ssc::VolumetricRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(mModifiedImage);
+	ssc::VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(mModifiedImage);
     if(volumeRep)
         volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
     else
@@ -120,7 +120,7 @@ void ThresholdPreview::setPreview(ssc::ImagePtr image, double setValue)
     lut2D->setLLR(setValue);
 
     //Remove VTK linear interpolation
-    ssc::VolumetricRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(image);
+	ssc::VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(image);
     if(volumeRep)
         volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
     else
