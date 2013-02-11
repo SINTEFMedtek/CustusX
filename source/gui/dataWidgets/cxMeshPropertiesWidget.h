@@ -35,7 +35,7 @@ protected slots:
   void meshSelectedSlot();
   void importTransformSlot();
   void deleteDataSlot();
-  void backfaceCullingSlot(bool checked);
+  void meshChangedSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -50,6 +50,7 @@ private:
   DataUidEditableStringDataAdapterPtr mUidAdapter;
   SelectMeshStringDataAdapterPtr mSelectMeshWidget;
   QCheckBox* mBackfaceCullingCheckBox;
+  QCheckBox* mFrontfaceCullingCheckBox;
   
   MeshPropertiesWidget();
 };

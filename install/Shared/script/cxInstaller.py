@@ -715,6 +715,7 @@ cmake \
 -DOpenCV_DIR:PATH="%s" \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
+-DCX_USE_TSF:BOOL=true \
 -DTube-Segmentation-Framework_DIR:PATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
 -DBUILD_TESTING="%s" \
