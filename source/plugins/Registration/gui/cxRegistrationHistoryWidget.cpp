@@ -101,11 +101,13 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
       "Step to latest registration",
       SLOT(fastForwardSlot()));
 
-  mDetailsAction = createAction(topLayout,
+ /* mDetailsAction = createAction(topLayout,
       ":/icons/open_icon_library/png/64x64/actions/system-run-5.png",
       "Details",
       "Show registration history",
-      SLOT(showDetailsSlot()));
+      SLOT(showDetailsSlot()));*/
+  //Removed the details button, as we always want the history visible
+  showDetailsSlot();
 
   topLayout->addStretch();
 }

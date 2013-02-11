@@ -63,7 +63,6 @@ private:
   QAction* mRemoveAction;
   QAction* mForwardAction;
   QAction* mFastForwardAction;
-  QAction* mDetailsAction;
 
   QLabel* mBehindLabel;
   QLabel* mInFrontLabel;
