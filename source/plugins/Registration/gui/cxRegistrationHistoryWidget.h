@@ -40,7 +40,7 @@ protected slots:
   void fastForwardSlot();
   void updateSlot();
   void reconnectSlot();
-  void showDetailsSlot();
+//  void showDetailsSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -63,6 +63,7 @@ private:
   QAction* mRemoveAction;
   QAction* mForwardAction;
   QAction* mFastForwardAction;
+//  QAction* mDetailsAction;
 
   QLabel* mBehindLabel;
   QLabel* mInFrontLabel;
