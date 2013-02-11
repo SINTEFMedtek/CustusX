@@ -63,7 +63,7 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
 //  toptopLayout->setMargin(0);
 //  toptopLayout->addLayout(topLayout);
   mTextEdit = new QTextEdit;
-  mTextEdit->setVisible(false);
+  mTextEdit->setVisible(true);
   mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
   toptopLayout->addWidget(mTextEdit, 1);
 
@@ -107,7 +107,6 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
       "Show registration history",
       SLOT(showDetailsSlot()));*/
   //Removed the details button, as we always want the history visible
-  showDetailsSlot();
 
   topLayout->addStretch();
 }
@@ -387,10 +386,10 @@ void RegistrationHistoryWidget::fastForwardSlot()
   }
 }
 
-void RegistrationHistoryWidget::showDetailsSlot()
+/*void RegistrationHistoryWidget::showDetailsSlot()
 {
   mTextEdit->setVisible(!mTextEdit->isVisible());
-}
+}*/
 
 void RegistrationHistoryWidget::updateSlot()
 {
