@@ -85,6 +85,11 @@ bool FilterImpl::preProcess()
 	}
 
 	mCopiedOptions = mOptions.cloneNode(true).toElement();
+
+	// clear output
+	for (unsigned i=0; i<mOutputTypes.size(); ++i)
+		mOutputTypes[i]->setValue("");
+
 	return true;
 }
 
