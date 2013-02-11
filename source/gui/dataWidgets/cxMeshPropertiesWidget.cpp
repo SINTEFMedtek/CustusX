@@ -60,7 +60,9 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   mBackfaceCullingCheckBox = new QCheckBox("Backface culling", this);
   mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
   gridLayout->addWidget(mBackfaceCullingCheckBox, position++, 0, 1, 2);
-  connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), this, SLOT(backfaceCullingSlot(bool)));
+  mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling", this);
+  mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
+  gridLayout->addWidget(mFrontfaceCullingCheckBox, position++, 0, 1, 2);
 
   gridLayout->addWidget(deleteButton, position++, 0, 1, 2);
   gridLayout->addWidget(chooseColor, position++, 0, 1, 2);
@@ -129,23 +131,34 @@ void MeshPropertiesWidget::meshSelectedSlot()
   if (mMesh == mSelectMeshWidget->getMesh())
     return;
   
+  if(mMesh)
+  {
+	  disconnect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
+	  disconnect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
+	  disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+  }
+
   mMesh = mSelectMeshWidget->getMesh();
   mMeshPropertiesGroupBox->setEnabled(mMesh!=0);
 
   if (!mMesh)
     return;
-  
+
+  mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
+  mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+  connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
+  connect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
+  connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+
   mParentFrameAdapter->setData(mMesh);
   mNameAdapter->setData(mMesh);
   mUidAdapter->setData(mMesh);
-  mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
-}
-
-void MeshPropertiesWidget::backfaceCullingSlot(bool checked)
-{
-	if(!mMesh)
-		return;
-	mMesh->setBackfaceCulling(checked);
 }
   
+void MeshPropertiesWidget::meshChangedSlot()
+{
+	  mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
+	  mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+}
+
 }//end namespace cx

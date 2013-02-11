@@ -165,6 +165,7 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 	ssc::ImagePtr input = this->getCopiedInputImage();
 
 	ssc::ImagePtr outImage = ssc::dataManager()->createDerivedImage(mRawResult,input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1", input);
+	mRawResult = NULL;
 	outImage->resetTransferFunctions();
 
 	//automatically generate a mesh from the centerline

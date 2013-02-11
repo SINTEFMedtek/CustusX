@@ -129,6 +129,7 @@ bool BinaryThresholdImageFilter::preProcess()
 {
 	RepManager::getInstance()->getThresholdPreview()->removePreview();
 	return FilterImpl::preProcess();
+
 }
 
 bool BinaryThresholdImageFilter::execute()
@@ -138,6 +139,7 @@ bool BinaryThresholdImageFilter::execute()
 		return false;
 
 	ssc::DoubleDataAdapterXmlPtr lowerThreshold = this->getLowerThresholdOption(mCopiedOptions);
+	ssc::BoolDataAdapterXmlPtr generateSurface = this->getGenerateSurfaceOption(mCopiedOptions);
 
 	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
 
@@ -162,8 +164,11 @@ bool BinaryThresholdImageFilter::execute()
 
 	mRawResult =  rawResult;
 
-    double threshold = 1;/// because the segmented image is 0..1
-	mRawContour = ContourFilter::execute(mRawResult, threshold);
+	if (generateSurface->getValue())
+	{
+		double threshold = 1;/// because the segmented image is 0..1
+		mRawContour = ContourFilter::execute(mRawResult, threshold);
+	}
 
 	return true;
 }
@@ -181,6 +186,7 @@ bool BinaryThresholdImageFilter::postProcess()
 	QString uid = input->getUid() + "_seg%1";
 	QString name = input->getName()+" seg%1";
 	ssc::ImagePtr output = ssc::dataManager()->createDerivedImage(mRawResult,uid, name, input);
+	mRawResult = NULL;
 	if (!output)
 		return false;
 
@@ -192,9 +198,13 @@ bool BinaryThresholdImageFilter::postProcess()
 	mOutputTypes.front()->setValue(output->getUid());
 
 	// set contour output
-	ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
-	ssc::MeshPtr contour = ContourFilter::postProcess(mRawContour, output, colorOption->getValue());
-	mOutputTypes[1]->setValue(contour->getUid());
+	if (mRawContour!=NULL)
+	{
+		ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
+		ssc::MeshPtr contour = ContourFilter::postProcess(mRawContour, output, colorOption->getValue());
+		mOutputTypes[1]->setValue(contour->getUid());
+		mRawContour = vtkPolyDataPtr();
+	}
 
 	return true;
 }

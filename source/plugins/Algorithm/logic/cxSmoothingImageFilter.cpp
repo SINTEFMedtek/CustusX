@@ -127,6 +127,7 @@ bool SmoothingImageFilter::postProcess()
 	QString uid = input->getUid() + "_sm%1";
 	QString name = input->getName()+" sm%1";
 	ssc::ImagePtr output = ssc::dataManager()->createDerivedImage(mRawResult,uid, name, input);
+	mRawResult = NULL;
 	if (!output)
 		return false;
 
