@@ -138,6 +138,7 @@ bool ResampleImageFilter::postProcess()
 		return false;
 
 	ssc::ImagePtr output = mRawResult;
+	mRawResult.reset();
 	//    output->resetTransferFunctions();
 	ssc::dataManager()->loadData(output);
 	ssc::dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
