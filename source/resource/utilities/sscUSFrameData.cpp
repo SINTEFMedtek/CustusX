@@ -111,7 +111,7 @@ USFrameDataPtr USFrameData::create(ImagePtr inputFrameData)
 {
 	USFrameDataPtr retval(new USFrameData());
 
-	retval->mFilename = inputFrameData->getName();
+	retval->mName = QFileInfo(inputFrameData->getName()).completeBaseName();
 	retval->mImageContainer.reset(new cx::SplitFramesContainer(inputFrameData->getBaseVtkImageData()));
 	retval->initialize();
 
@@ -136,32 +136,26 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 		vtkImageDataPtr image = ssc::MetaImageReader().load(mhdSingleFile);
 		// load from single file
 		USFrameDataPtr retval = USFrameData::create(ImagePtr(new Image(mhdSingleFile, image)));
-		retval->mFilename = mhdSingleFile;
+		retval->mName = QFileInfo(mhdSingleFile).completeBaseName();
 		timer.printElapsedms(QString("Loading single %1").arg(inputFilename));
 		return retval;
 	}
 	else
 	{
 		USFrameDataPtr retval(new USFrameData());
-		retval->mFilename = inputFilename;
+		retval->mName = QFileInfo(inputFilename).completeBaseName();
 		retval->mImageContainer.reset(new cx::CachedImageDataContainer(inputFilename, -1));
 		retval->initialize();
 		return retval;
 	}
 }
 
-USFrameDataPtr USFrameData::create(QString filename, cx::CachedImageDataContainerPtr images)
+USFrameDataPtr USFrameData::create(QString name, cx::CachedImageDataContainerPtr images)
 {
-//	std::vector<cx::CachedImageDataPtr> cache(frames.size());
-//	for (unsigned i=0; i<cache.size(); ++i)
-//		cache[i].reset(new cx::CachedImageData(frames[i]));
-
 	USFrameDataPtr retval(new USFrameData());
-	retval->mFilename = filename;
-//	retval->mImageContainer.reset(new cx::CachedImageDataContainer(cache));
+	retval->mName = name;
 	retval->mImageContainer = images;
 	retval->initialize();
-//	std:cout << "USFrameData::create() " << retval->mImageContainer->size() << ", " << retval->mReducedToFull.size() << std::endl;
 
 	return retval;
 }
@@ -474,17 +468,7 @@ USFrameDataPtr USFrameData::copy()
 
 QString USFrameData::getName() const
 {
-	return QFileInfo(mFilename).completeBaseName();
-}
-
-QString USFrameData::getUid() const
-{
-	return QFileInfo(mFilename).completeBaseName();
-}
-
-QString USFrameData::getFilePath() const
-{
-	return mFilename;
+	return QFileInfo(mName).completeBaseName();
 }
 
 void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
