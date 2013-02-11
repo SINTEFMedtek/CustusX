@@ -57,6 +57,11 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, position++);
   new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, position++);
 
+  mBackfaceCullingCheckBox = new QCheckBox("Backface culling", this);
+  mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
+  gridLayout->addWidget(mBackfaceCullingCheckBox, position++, 0, 1, 2);
+  connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), this, SLOT(backfaceCullingSlot(bool)));
+
   gridLayout->addWidget(deleteButton, position++, 0, 1, 2);
   gridLayout->addWidget(chooseColor, position++, 0, 1, 2);
   gridLayout->addWidget(importTransformButton, position++, 0, 1, 2);
@@ -117,7 +122,6 @@ void MeshPropertiesWidget::setColorSlotDelayed()
   }
 }
 
-
 void MeshPropertiesWidget::meshSelectedSlot()
 {
   mMeshPropertiesGroupBox->setEnabled(false);
@@ -134,6 +138,14 @@ void MeshPropertiesWidget::meshSelectedSlot()
   mParentFrameAdapter->setData(mMesh);
   mNameAdapter->setData(mMesh);
   mUidAdapter->setData(mMesh);
+  mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
+}
+
+void MeshPropertiesWidget::backfaceCullingSlot(bool checked)
+{
+	if(!mMesh)
+		return;
+	mMesh->setBackfaceCulling(checked);
 }
   
 }//end namespace cx
