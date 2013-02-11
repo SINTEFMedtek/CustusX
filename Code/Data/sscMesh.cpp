@@ -31,12 +31,12 @@
 namespace ssc
 {
 Mesh::Mesh(const QString& uid, const QString& name) :
-	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(true)
+	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false)
 {
 	mColor = QColor(255, 0, 0, 255);
 }
 Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
-	Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(true)
+	Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false)
 {
 	mColor = QColor(255, 0, 0, 255);
 }
@@ -88,6 +88,7 @@ void Mesh::addXml(QDomNode& dataNode)
 	QDomElement cullingNode = doc.createElement("culling");
 	QDomElement elem = cullingNode.toElement();
 	elem.setAttribute("backfaceCulling", mBackfaceCulling);
+	elem.setAttribute("frontfaceCulling", mFrontfaceCulling);
 	meshNode.appendChild(cullingNode);
 }
 
@@ -133,7 +134,10 @@ void Mesh::parseXml(QDomNode& dataNode)
 
 	QDomNode cullingNode = dataNode.namedItem("culling");
 	if (!cullingNode.isNull())
+	{
 		mBackfaceCulling = cullingNode.toElement().attribute("backfaceCulling").toInt();
+		mFrontfaceCulling = cullingNode.toElement().attribute("frontfaceCulling").toInt();
+	}
 }
 
 void Mesh::setColor(const QColor& color)
@@ -147,7 +151,7 @@ QColor Mesh::getColor()
 	return mColor;
 }
 
-void Mesh::setBackfaceCulling(bool backfaceCulling)
+void Mesh::setBackfaceCullingSlot(bool backfaceCulling)
 {
 	mBackfaceCulling = backfaceCulling;
 	emit meshChanged();
@@ -156,6 +160,17 @@ void Mesh::setBackfaceCulling(bool backfaceCulling)
 bool Mesh::getBackfaceCulling()
 {
 	return mBackfaceCulling;
+}
+
+void Mesh::setFrontfaceCullingSlot(bool frontfaceCulling)
+{
+	mFrontfaceCulling = frontfaceCulling;
+	emit meshChanged();
+}
+
+bool Mesh::getFrontfaceCulling()
+{
+	return mFrontfaceCulling;
 }
 
 DoubleBoundingBox3D Mesh::boundingBox() const
