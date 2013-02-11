@@ -111,11 +111,9 @@ void GeometricRep::meshChangedSlot()
 	else
 		mActor->GetProperty()->SetRepresentationToSurface();
 
-	//Set backface culling
-	if (mMesh->getBackfaceCulling())
-		mActor->GetProperty()->BackfaceCullingOn();
-	else
-		mActor->GetProperty()->BackfaceCullingOff();
+	//Set backface and frontface culling
+	mActor->GetProperty()->SetBackfaceCulling(mMesh->getBackfaceCulling());
+	mActor->GetProperty()->SetFrontfaceCulling(mMesh->getFrontfaceCulling());
 }
 
 /**called when transform is changed

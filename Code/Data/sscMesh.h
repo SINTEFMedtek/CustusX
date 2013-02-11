@@ -63,8 +63,8 @@ public:
 	virtual DoubleBoundingBox3D boundingBox() const;
 	void setColor(const QColor& color);///< Set the color of the mesh
 	QColor getColor();///< Get the color of the mesh (Values are range 0 - 255)
-	void setBackfaceCulling(bool backfaceCulling);///< Set backface culling on/off in mesh visualization
 	bool getBackfaceCulling();///< Get backface culling
+	bool getFrontfaceCulling();///< Get frontface culling
 	void setIsWireframe(bool on);///< Set rep to wireframe, false means surface
 	bool getIsWireframe() const;///< true=wireframe, false=surface
 	vtkPolyDataPtr getTransformedPolyData(ssc::Transform3D tranform);///< Create a new transformed polydata
@@ -72,11 +72,16 @@ public:
 
 signals:
 	void meshChanged();
+public slots:
+	void setBackfaceCullingSlot(bool backfaceCulling);///< Set backface culling on/off in mesh visualization
+	void setFrontfaceCullingSlot(bool backfaceCulling);///< Set frontface culling on/off in mesh visualization
+
 private:
 	vtkPolyDataPtr mVtkPolyData;
 	QColor mColor;
 	bool mWireframe;
-	bool mBackfaceCulling; ///< If backface culling is on, polygons facing away from camera are not drawn.
+	bool mBackfaceCulling; ///< If backface culling is on, polygons facing outwards are not drawn.
+	bool mFrontfaceCulling; ///< If frontface culling is on, polygons facing inwards are not drawn.
 };
 
 typedef boost::shared_ptr<Mesh> MeshPtr;
