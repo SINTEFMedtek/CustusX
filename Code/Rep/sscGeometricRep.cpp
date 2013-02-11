@@ -43,8 +43,6 @@ GeometricRep::GeometricRep(const QString& uid, const QString& name) :
 	mActor->SetMapper(mMapper);
 	mActor->SetProperty(mProperty);
 
-	mActor->GetProperty()->BackfaceCullingOn();
-
 	mProperty->SetPointSize(2);
 }
 GeometricRep::~GeometricRep()
@@ -112,6 +110,12 @@ void GeometricRep::meshChangedSlot()
 		mActor->GetProperty()->SetRepresentationToWireframe();
 	else
 		mActor->GetProperty()->SetRepresentationToSurface();
+
+	//Set backface culling
+	if (mMesh->getBackfaceCulling())
+		mActor->GetProperty()->BackfaceCullingOn();
+	else
+		mActor->GetProperty()->BackfaceCullingOff();
 }
 
 /**called when transform is changed
