@@ -292,6 +292,7 @@ bool ContourFilter::postProcess()
 
 	ssc::ColorDataAdapterXmlPtr colorOption = this->getColorOption(mOptions);
 	ssc::MeshPtr output = this->postProcess(mRawResult, input, colorOption->getValue());
+	mRawResult = NULL;
 
 	if (output)
 		mOutputTypes.front()->setValue(output->getUid());
