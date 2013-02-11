@@ -56,6 +56,7 @@ private slots:
 	void patientChangedSlot();
 	void inputChangedSlot();
 	void parametersFileChanged();
+	void resetOptions();
 //	void centerlineMethodChanged();
 
 private:
@@ -70,6 +71,9 @@ private:
 	ssc::StringDataAdapterXmlPtr makeStringOption(QDomElement root, std::string name, StringParameter parameter);
 	ssc::BoolDataAdapterXmlPtr makeBoolOption(QDomElement root, std::string name, BoolParameter parameter);
 	ssc::DoubleDataAdapterXmlPtr makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter);
+
+	ssc::StringDataAdapterXmlPtr mResetOption; ///< temporary fix for resetting options to default
+//	ssc::StringDataAdapterXmlPtr mSaveParametersOption; ///< temporary fix for saving parameters to file
 
 	std::vector<ssc::StringDataAdapterXmlPtr> mStringOptions; ///< string options to be displayed to the user
 	std::vector<ssc::BoolDataAdapterXmlPtr> mBoolOptions; ///< bool options to be displayed to the user
