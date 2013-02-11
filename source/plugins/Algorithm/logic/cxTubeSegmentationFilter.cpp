@@ -215,6 +215,9 @@ void TubeSegmentationFilter::createOptions()
 {
 	this->createDefaultOptions(mOptions);
 
+	//TODO temporary fix to be able to reset options
+	mOptionsAdapters.push_back(mResetOption);
+
 	//TODO options are automatically populated with saved data, because these are xml adapters
 	//BUT these options are saved on a system level (NOT patient level!)
 
@@ -307,6 +310,18 @@ void TubeSegmentationFilter::parametersFileChanged()
 	this->setParamtersToOptions(temp);
 }
 
+void TubeSegmentationFilter::resetOptions()
+{
+	if(mResetOption->getValue() == "reset")
+	{
+		paramList defaultParameters = initParameters();
+		this->setParamtersToOptions(defaultParameters);
+		this->patientChangedSlot();
+		this->inputChangedSlot();
+		mResetOption->setValue("not reset");
+	}
+}
+
 //TODO later...
 //void TubeSegmentationFilter::centerlineMethodChanged()
 //{
@@ -329,7 +344,9 @@ vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int s
 	imageImport->GetOutput()->Update();
 	imageImport->Modified();
 
-	vtkImageDataPtr retval = imageImport->GetOutput();
+//	vtkImageDataPtr retval = imageImport->GetOutput();
+	vtkImageDataPtr retval = vtkImageDataPtr::New();
+	retval->DeepCopy(imageImport->GetOutput());
 
 	return retval;
 }
@@ -361,6 +378,15 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 //    	if(stringIt->first == "centerline-method")
 //    		connect(option.get(), SIGNAL(changed()), this, SLOT(centerlineMethodChanged()));
     }
+
+    //Manuelly adding option for resetting.
+    QStringList list;
+    list << "not reset";
+    list << "reset";
+//	mResetOption = this->makeStringOption(root, "RESET TO DEFAULT", list);
+    mResetOption = ssc::StringDataAdapterXml::initialize("tsf_reset_to_default", "RESET TO DEFAULT", "Used to reset options to default values.", "not reset", list, root);
+	//mStringOptions.push_back(mResetOption);
+	connect(mResetOption.get(), SIGNAL(changed()), this, SLOT(resetOptions()));
 
 	//generate bool adapters
     boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
