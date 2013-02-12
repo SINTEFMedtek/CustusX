@@ -97,6 +97,7 @@ endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
 #         - config - tool
 #                  - shader
 #                  - settings 
+#                  - tsf
 #
 # On Apple, the bin folder is replaced by bundles.
 #
@@ -135,6 +136,28 @@ if (CX_USE_ISB_GE)
 	install(FILES ${GEStreamer_KERNEL_PATH}/ScanConvertCL.cl
 					DESTINATION ${CX_INSTALL_ROOT_DIR}/config/shaders/
 					)
+endif()
+
+if (CX_USE_TSF)
+    message(STATUS "KERNELS_DIR is set to " ${Tube-Segmentation-Framework_KERNELS_DIR})
+	install(FILES ${Tube-Segmentation-Framework_KERNELS_DIR}/kernels.cl
+					DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
+					)
+    install(FILES ${Tube-Segmentation-Framework_KERNELS_DIR}/kernels_no_3d_write.cl
+					DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
+					)
+	message(STATUS "PARAMETERS_DIR is set to " ${Tube-Segmentation-Framework_PARAMETERS_DIR})
+	install(DIRECTORY ${Tube-Segmentation-Framework_PARAMETERS_DIR} 
+			DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
+			FILE_PERMISSIONS
+					OWNER_READ OWNER_EXECUTE OWNER_WRITE
+					GROUP_READ GROUP_EXECUTE GROUP_WRITE
+					WORLD_READ WORLD_EXECUTE WORLD_WRITE
+			DIRECTORY_PERMISSIONS
+					OWNER_READ OWNER_EXECUTE OWNER_WRITE
+					GROUP_READ GROUP_EXECUTE GROUP_WRITE
+					WORLD_READ WORLD_EXECUTE WORLD_WRITE
+			)
 endif()
 
 # Install Shared files
