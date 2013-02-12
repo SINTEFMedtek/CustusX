@@ -15,6 +15,7 @@
 #include "sscDataManager.h"
 #include "sscDataManagerImpl.h"
 #include "sscRegistrationTransform.h"
+#include "cxDataLocations.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 
@@ -56,11 +57,13 @@ bool TubeSegmentationFilter::execute()
 	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+input->getFilePath()).toStdString();
 
 	try {
-		mParameters = loadParameterPreset(mParameters);
+		ssc::messageManager()->sendDebug("Looking for TSF files in folder: "+cx::DataLocations::getTSFPath());
+
+		mParameters = loadParameterPreset(mParameters, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
 
 		//this->printParameters(mParameters);
 
-		mOutput = run(filename, mParameters);
+		mOutput = run(filename, mParameters, cx::DataLocations::getTSFPath().toStdString());
 	} catch(SIPL::SIPLException e) {
 		std::string error = e.what();
 		ssc::messageManager()->sendError(qstring_cast(error));
@@ -274,7 +277,7 @@ void TubeSegmentationFilter::patientChangedSlot()
 
 	for(std::vector<ssc::StringDataAdapterXmlPtr>::iterator it = mStringOptions.begin(); it != mStringOptions.end(); ++it)
 	{
-		//TODO set storage-dir untill problem is fixed
+		//TODO set storage-dir until problem is fixed
 		if(it->get()->getValueName().compare("storage-dir") == 0)
 			it->get()->setValue(activePatientFolder);
 	}
@@ -302,7 +305,7 @@ void TubeSegmentationFilter::parametersFileChanged()
 	paramList temp = this->getParametersFromOptions();
 	try
 	{
-		temp = loadParameterPreset(temp);
+		temp = loadParameterPreset(temp, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
 	} catch (SIPL::SIPLException e)
 	{
 		ssc::messageManager()->sendWarning("Error when loading parameter file "+qstring_cast(parameterFile)+". Preset is corrupt.");
@@ -314,11 +317,16 @@ void TubeSegmentationFilter::resetOptions()
 {
 	if(mResetOption->getValue() == "reset")
 	{
-		paramList defaultParameters = initParameters();
-		this->setParamtersToOptions(defaultParameters);
-		this->patientChangedSlot();
-		this->inputChangedSlot();
-		mResetOption->setValue("not reset");
+		try{
+			paramList defaultParameters = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
+			this->setParamtersToOptions(defaultParameters);
+			this->patientChangedSlot();
+			this->inputChangedSlot();
+			mResetOption->setValue("not reset");
+		} catch (SIPL::SIPLException& e){
+			std::string message = "When resettting options, could not init parameters. \""+std::string(e.what())+"\"";
+			ssc::messageManager()->sendError(qstring_cast(message));
+		}
 	}
 }
 
@@ -353,7 +361,13 @@ vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int s
 
 void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 {
-	paramList defaultOptions = initParameters();
+	paramList defaultOptions;
+	try{
+		defaultOptions = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
+	} catch (SIPL::SIPLException& e){
+		std::string message = "When creating default options, could not init parameters. \""+std::string(e.what())+"\"";
+		ssc::messageManager()->sendError(qstring_cast(message));
+	}
 
 	// skip parameters we don't want:
 	// display, storage-dir ...
@@ -408,7 +422,13 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 
 paramList TubeSegmentationFilter::getParametersFromOptions()
 {
-	paramList retval = initParameters();
+	paramList retval;
+	try{
+		retval = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
+	} catch (SIPL::SIPLException& e){
+		std::string message = "When getting parameters from options, could not init parameters. \""+std::string(e.what())+"\"";
+		ssc::messageManager()->sendError(qstring_cast(message));
+	}
 
 	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
