@@ -42,8 +42,9 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedShortArray.h>
 #include <boost/cstdint.hpp>
-
 #include "sscGLHelpers.h"
+
+#include "sscLogger.h"
 
 namespace ssc
 {
@@ -151,6 +152,9 @@ public:
 			size = 0;
 			internalType = 0;
 			std::cout << "Bit size not supported!" << std::endl;
+			QString dataType(mTexture->GetScalarTypeAsString());
+			QString errorString = QString("Attempt to update 3D GL texture from type %1 failed. Only unsigned types supported").arg(dataType);
+			SSC_ERROR("%s", errorString.toStdString().data());
 			break;
 		}
 
