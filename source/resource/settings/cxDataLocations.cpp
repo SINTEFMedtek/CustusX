@@ -12,6 +12,10 @@
 #include "cxConfig.h"
 #include "cxSettings.h"
 
+#ifdef CX_USE_TSF
+#include "tsf-config.h"
+#endif
+
 namespace cx
 {
 
@@ -113,6 +117,20 @@ QString DataLocations::getCachePath()
 	QString path(getRootConfigPath()+"/cache/");
     return path;
 }
+
+#ifdef CX_USE_TSF
+QString DataLocations::getTSFPath()
+{
+	QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED + "/tsf"; // look for installed location
+	if (QDir(path).exists())
+		return path;
+
+	if (QDir(KERNELS_DIR).exists()) // look for folder in source code
+		return KERNELS_DIR;
+
+	return "";
+}
+#endif
 
 
 
