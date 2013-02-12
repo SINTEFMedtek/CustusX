@@ -170,12 +170,12 @@ std::map<QDateTime,QString> RegistrationHistoryWidget::getRegistrationTimes()
     std::vector<ssc::RegistrationTransform> current = allHistories[i]->getData();
     for (unsigned j=0; j<current.size(); ++j)
     {
-      retval[current[j].mTimestamp] = current[j].mType;
+		retval[current[j].mTimestamp] = QString("%1 [f=%2, m=%3]").arg(current[j].mType).arg(current[j].mFixed).arg(current[j].mMoving);
     }
     std::vector<ssc::ParentSpace> frames = allHistories[i]->getParentSpaces();
     for (unsigned j=0; j<frames.size(); ++j)
     {
-      retval[frames[j].mTimestamp] = frames[j].mType;
+		retval[frames[j].mTimestamp] = QString("%1 [val=%2]").arg(frames[j].mType).arg(frames[j].mValue);
     }
   }
 
