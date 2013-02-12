@@ -86,8 +86,8 @@ void TestTubeSegmentationFramework::testParameters()
 	std::string path = std::string(PARAMETERS_DIR)+"/parameters";
 	CPPUNIT_ASSERT_MESSAGE("Could not find parameter file.", ifstream(path.c_str()));
 
-	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Inititalizing parameters with default values failed.", initParameters());
-	paramList defaultParameters = initParameters();
+	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Inititalizing parameters with default values failed.", initParameters(path));
+	paramList defaultParameters = initParameters(path);
 
 	CPPUNIT_ASSERT_MESSAGE("No default string parameters found.", !defaultParameters.strings.empty());
 	CPPUNIT_ASSERT_MESSAGE("No default bool parameters found.", !defaultParameters.bools.empty());
@@ -98,7 +98,7 @@ void TestTubeSegmentationFramework::testParameters()
 
 	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Set parameter parameter to airway failed.", setParameter(defaultParameters, "parameters", "airway"));
 	paramList presetParameter = setParameter(defaultParameters, "parameters", "airway");
-	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Load presets failed.", loadParameterPreset(presetParameter));
+	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Load presets failed.", loadParameterPreset(presetParameter, path));
 
 
 }
