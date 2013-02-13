@@ -301,7 +301,6 @@ if(APPLE)
     						)
 endif()
 
-
 #--------------------------------------------------------------------------------
 # install a qt.conf file
 # this inserts some cmake code into the install script to write the file
@@ -325,6 +324,7 @@ set(DIRS
 		${ITK_DIR}/lib
 		${DCMTK_DIR}/lib
 		${INCLUDE_DIRECTORIES}
+		${Tube-Segmentation-Framework_LIBRARY_DIRS}
 		${SSC_BINARY_DIR}/Code
 		${SSC_BINARY_DIR}/DICOMLib
 		${CustusX3_BINARY_DIR}
