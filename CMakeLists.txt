@@ -59,15 +59,15 @@ endif(APPLE)
 # Set CustusX version
 #------------------------------------------------------------------------------
 set(CustusX3_VERSION_MAJOR  3)
-set(CustusX3_VERSION_MINOR  3)
-set(CustusX3_VERSION_PATCH  2)
+set(CustusX3_VERSION_MINOR  4)
+set(CustusX3_VERSION_PATCH  0)
 
 # set alpha when not a release
-set(CustusX3_VERSION_POSTFIX ".alpha")
+#set(CustusX3_VERSION_POSTFIX ".alpha")
 # set beta when a quick release
 #set(CustusX3_VERSION_POSTFIX ".beta")
 # set nothing when a normal release
-#set(CustusX3_VERSION_POSTFIX "")
+set(CustusX3_VERSION_POSTFIX ".rc1")
 
 set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
 set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
