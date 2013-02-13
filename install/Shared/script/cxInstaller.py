@@ -777,7 +777,7 @@ class TubeSegmentationFramework(CppComponent):
    def help(self):
        return 'Tube-Segmentation-Framework'
    def path(self):
-       return DATA.mWorkingDir + "/Tube-Segmenation-Framework"
+       return DATA.mWorkingDir + "/Tube-Segmentation-Framework"
    def _rawCheckout(self):
        changeDir(self.path())
        runShell('git clone git@github.com:SINTEFMedisinskTeknologi/Tube-Segmentation-Framework.git')
