@@ -301,9 +301,6 @@ if(APPLE)
     						)
 endif()
 
-
-message(STATUS "Tube-Segmentation-Framework_LIBRARY_DIRS" 		${Tube-Segmentation-Framework_LIBRARY_DIRS})
-
 #--------------------------------------------------------------------------------
 # install a qt.conf file
 # this inserts some cmake code into the install script to write the file
