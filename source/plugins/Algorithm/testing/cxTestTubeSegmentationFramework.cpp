@@ -83,7 +83,7 @@ void TestTubeSegmentationFramework::testFilter()
 
 void TestTubeSegmentationFramework::testParameters()
 {
-	std::string path = std::string(PARAMETERS_DIR)+"/parameters";
+	std::string path = std::string(PARAMETERS_DIR);
 	CPPUNIT_ASSERT_MESSAGE("Could not find parameter file.", ifstream(path.c_str()));
 
 	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Inititalizing parameters with default values failed.", initParameters(path));
