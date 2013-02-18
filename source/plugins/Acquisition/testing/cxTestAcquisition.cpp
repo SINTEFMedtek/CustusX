@@ -16,6 +16,7 @@
 
 void TestAcquisition::setUp()
 {
+	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
 }
 
