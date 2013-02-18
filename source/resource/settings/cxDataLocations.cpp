@@ -19,9 +19,26 @@
 namespace cx
 {
 
+//---------------------------------------------------------
+bool DataLocations::mTestMode = false;
+//---------------------------------------------------------
+
+void DataLocations::setTestMode()
+{
+	mTestMode = true;
+}
+
 QString DataLocations::getTestDataPath()
 {
   return CX_DATA_ROOT;
+}
+
+QString DataLocations::getSettingsPath()
+{
+	QString retval = cx::DataLocations::getRootConfigPath() + "/settings";
+	if (mTestMode)
+		retval = getTestDataPath() + "/temp/settings";
+	return retval;
 }
 
 QString DataLocations::getBundlePath()
@@ -108,7 +125,8 @@ QString changeExtension(QString name, QString ext)
 
 QString DataLocations::getXmlSettingsFile()
 {
-  return changeExtension(settings()->fileName(), "xml");
+	return getSettingsPath() + "/settings.xml";
+//  return changeExtension(settings()->fileName(), "xml");
 //  return getAppDataPath() + "/CustusX.xml";
 }
 
