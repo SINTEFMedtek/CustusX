@@ -108,12 +108,14 @@ private slots:
 	void imageChanged();
 //	void viewChanged();
 private:
+	void updateUnsignedVolumes(); ///< update the unsigned volumes list from the input mImages, done whenever input has changed.
 	void resetGeometryPlane();
 	void updateCoordinates(int index);
 	QString getTCoordName(int index);
 	void setColorAttributes(int i);
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ssc::ImagePtr> mImages;
+	std::vector<ssc::ImagePtr> mUnsignedImages;
 	ssc::SliceProxyPtr mSliceProxy;
 //	View* mView;
 	bool mTargetSpaceIsR;

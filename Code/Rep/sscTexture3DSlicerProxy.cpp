@@ -44,6 +44,7 @@
 #include "sscTypeConversions.h"
 #include "sscGPUImageBuffer.h"
 #include <vtkOpenGLRenderWindow.h>
+#include "sscVolumeHelpers.h"
 
 //---------------------------------------------------------
 namespace ssc
@@ -114,6 +115,7 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 Texture3DSlicerProxyImpl::~Texture3DSlicerProxyImpl()
 {
 	mImages.clear();
+	mUnsignedImages.clear();
 }
 
 Texture3DSlicerProxyPtr Texture3DSlicerProxyImpl::New()
@@ -222,25 +224,33 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ssc::ImagePtr> images)
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
+//		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
+		disconnect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
+		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged()),      this, SLOT(updateColorAttributeSlot()));
 	}
 
 	mImages = images;
+	mUnsignedImages.clear();
+//	mUnsignedImages.resize(mImages.size());
 
 	for (unsigned i = 0; i < mImages .size(); ++i)
 	{
+//		mUnsignedImages[i] = convertImageToUnsigned(mImages[i]);
+
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();//
+//		vtkImageDataPtr inputImage = mUnsignedImages[i]->getBaseVtkImageData();//
 
-		ssc::GPUImageDataBufferPtr dataBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
-			inputImage);
+//		ssc::GPUImageDataBufferPtr dataBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
+//			inputImage);
 
-		mPainter->SetVolumeBuffer(i, dataBuffer);
+//		mPainter->SetVolumeBuffer(i, dataBuffer);
 
 		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
-		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
+		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged()),      this, SLOT(updateColorAttributeSlot()));
+//		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
 		this->updateCoordinates(i);
 	}
+
 	this->updateColorAttributeSlot();
 
 	for (unsigned i = 0; i < mImages.size(); ++i)
@@ -251,6 +261,24 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ssc::ImagePtr> images)
 	}
 }
 
+void Texture3DSlicerProxyImpl::updateUnsignedVolumes()
+{
+	mUnsignedImages.resize(mImages.size());
+
+	for (unsigned i = 0; i < mImages.size(); ++i)
+	{
+		// optimization: input the old converted vtkImageData: this is used instead of a new conversion in the convert function.
+		vtkImageDataPtr oldRaw;
+		if (mUnsignedImages[i])
+			oldRaw = mUnsignedImages[i]->getBaseVtkImageData();
+		mUnsignedImages[i] = convertImageToUnsigned(mImages[i], oldRaw);
+		vtkImageDataPtr inputImage = mUnsignedImages[i]->getBaseVtkImageData();
+
+		ssc::GPUImageDataBufferPtr dataBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
+			inputImage);
+		mPainter->SetVolumeBuffer(i, dataBuffer);
+	}
+}
 
 void Texture3DSlicerProxyImpl::setSliceProxy(ssc::SliceProxyPtr slicer)
 {
@@ -287,7 +315,7 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	if (!mPolyData || !mSliceProxy)
 		return;
 
-	vtkImageDataPtr volume = mImages[index]->getBaseVtkImageData();
+	vtkImageDataPtr volume = mUnsignedImages[index]->getBaseVtkImageData();
 	// create a bb describing the volume in physical (raw data) space
 	Vector3D origin(volume->GetOrigin());
 	Vector3D spacing(volume->GetSpacing());
@@ -359,11 +387,13 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 
 void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 {
-	for (unsigned i = 0; i < mImages.size(); ++i)
-	{
-		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData() ;
+	this->updateUnsignedVolumes();
 
-		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getBaseLookupTable();
+	for (unsigned i = 0; i < mUnsignedImages.size(); ++i)
+	{
+		vtkImageDataPtr inputImage = mUnsignedImages[i]->getBaseVtkImageData() ;
+
+		vtkLookupTablePtr lut = mUnsignedImages[i]->getLookupTable2D()->getBaseLookupTable();
 		ssc::GPUImageLutBufferPtr lutBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
 
 		// no lut indicates to the fragment shader that RGBA should be used
@@ -373,10 +403,10 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 		}
 
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
-		float window = (float) mImages[i]->getLookupTable2D()->getWindow() / scalarTypeMax;
-		float llr = (float) mImages[i]->getLookupTable2D()->getLLR() / scalarTypeMax;
-		float level = (float) mImages[i]->getLookupTable2D()->getLevel() / scalarTypeMax;
-		float alpha = (float) mImages[i]->getLookupTable2D()->getAlpha();
+		float window = (float) mUnsignedImages[i]->getLookupTable2D()->getWindow() / scalarTypeMax;
+		float llr = (float) mUnsignedImages[i]->getLookupTable2D()->getLLR() / scalarTypeMax;
+		float level = (float) mUnsignedImages[i]->getLookupTable2D()->getLevel() / scalarTypeMax;
+		float alpha = (float) mUnsignedImages[i]->getLookupTable2D()->getAlpha();
 		mPainter->SetColorAttribute(i, window, level, llr, alpha);
 	}
 	mActor->Modified();

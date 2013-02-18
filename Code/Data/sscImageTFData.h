@@ -114,6 +114,7 @@ public:
 	virtual void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
 	void unsignedCT(bool onLoad);
+	void shift(int val); ///< shift the transfter function index values by the input amount. Used for signed/unsigned conversion.
 
 	void fixTransferFunctions(); ///< Modify/repair transfer function so it matches current image
 	void fillColorTFFromMap(vtkColorTransferFunctionPtr tf);

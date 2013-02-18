@@ -226,6 +226,38 @@ void ImageTFData::unsignedCT(bool onLoad)
 	if(onLoad)
 		modify = 1024;
 
+	this->shift(modify);
+
+//	//	ssc::OpacityMapPtr opacityMap = this->getOpacityMap();
+//	OpacityMapPtr newOpacipyMap(new IntIntMap());
+//	for (ssc::IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); ++it)
+//		(*newOpacipyMap)[it->first + modify] = it->second;
+
+//	ColorMapPtr newColorMap(new ColorMap());
+//	for (ssc::ColorMap::iterator it = this->getColorMap()->begin(); it != this->getColorMap()->end(); ++it)
+//		(*newColorMap)[it->first + modify] = it->second;
+
+//	mOpacityMapPtr = newOpacipyMap;
+//	mColorMapPtr = newColorMap;
+
+//	mLevel = mLevel + modify;
+//	mLLR = mLLR + modify;
+//	// Don't emit for now. This function are used also for temporary modifications
+//	// Emit is moved to fixTransferFunctions()
+////	emit changed();
+}
+
+void ImageTFData::shift(int val)
+{
+	int modify = val;
+//	//Signed after all. Don't do anyting
+//	if (this->getScalarMin() < 0)
+//		return;
+
+//	int modify = -1024;
+//	if(onLoad)
+//		modify = 1024;
+
 	//	ssc::OpacityMapPtr opacityMap = this->getOpacityMap();
 	OpacityMapPtr newOpacipyMap(new IntIntMap());
 	for (ssc::IntIntMap::iterator it = this->getOpacityMap()->begin(); it != this->getOpacityMap()->end(); ++it)
@@ -243,7 +275,12 @@ void ImageTFData::unsignedCT(bool onLoad)
 	// Don't emit for now. This function are used also for temporary modifications
 	// Emit is moved to fixTransferFunctions()
 //	emit changed();
+
+	this->colorMapChanged();
+	this->alphaLLRChanged();
+	emit changed();
 }
+
 
 void ImageTFData::fixTransferFunctions()
 {
