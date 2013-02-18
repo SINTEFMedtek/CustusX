@@ -102,6 +102,7 @@ private:
 	void updateImageImportFromIGTMessage(IGTLinkImageMessage::Pointer message);
 	void updateSonix();
 	ProbePtr getValidProbe();
+	void runClient(IGTLinkClientBasePtr client);
 	void stopClient();
 
 	boost::array<unsigned char, 100> mZero;

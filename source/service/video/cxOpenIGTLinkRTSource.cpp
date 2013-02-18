@@ -53,6 +53,7 @@
 #include "sscTypeConversions.h"
 #include "sscImage.h"
 #include "sscData.h"
+#include "sscLogger.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -175,33 +176,24 @@ void OpenIGTLinkRTSource::connectedSlot(bool on)
 
 void OpenIGTLinkRTSource::directLink(std::map<QString, QString> args)
 {
-	if (mClient)
-	{
-		std::cout << "client already exist - returning" << std::endl;
-		return;
-	}
-
-	mClient.reset(new GrabberDirectLinkThread(args, this));
-	connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
-	connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
-	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
-	connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
-	connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
-
-	mClient->start();
-	mTimeoutTimer->start();
+	this->runClient(IGTLinkClientBasePtr(new GrabberDirectLinkThread(args, this)));
 }
 
 
 void OpenIGTLinkRTSource::connectServer(QString address, int port)
 {
+	this->runClient(IGTLinkClientBasePtr(new IGTLinkClient(address, port, this)));
+}
+
+
+void OpenIGTLinkRTSource::runClient(IGTLinkClientBasePtr client)
+{
 	if (mClient)
 	{
-		std::cout << "no client - returning" << std::endl;
+		std::cout << "client already exist - returning" << std::endl;
 		return;
 	}
-//  std::cout << "OpenIGTLinkRTSource::connect to server" << std::endl;
-	mClient.reset(new IGTLinkClient(address, port, this));
+	mClient = client;
 	connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
 	connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
@@ -211,9 +203,6 @@ void OpenIGTLinkRTSource::connectServer(QString address, int port)
 
 	mClient->start();
 	mTimeoutTimer->start();
-
-//  emit changed();
-//  emit serverStatusChanged();
 }
 
 void OpenIGTLinkRTSource::imageReceivedSlot()
@@ -273,10 +262,11 @@ void OpenIGTLinkRTSource::disconnectServer()
 
 void OpenIGTLinkRTSource::clientFinishedSlot()
 {
+//	SSC_LOG("*************************");
 	if (!mClient)
 		return;
-	if (mClient->isRunning())
-		return;
+//	if (mClient->isRunning()) // buggy: client might return running even if shutting down
+//		return;
 	this->disconnectServer();
 }
 
