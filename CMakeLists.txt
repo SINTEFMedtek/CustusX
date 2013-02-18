@@ -66,8 +66,10 @@ set(CustusX3_VERSION_PATCH  0)
 #set(CustusX3_VERSION_POSTFIX ".alpha")
 # set beta when a quick release
 #set(CustusX3_VERSION_POSTFIX ".beta")
+# set release candidate during release procedure
+#set(CustusX3_VERSION_POSTFIX ".rc1")
 # set nothing when a normal release
-set(CustusX3_VERSION_POSTFIX ".rc1")
+set(CustusX3_VERSION_POSTFIX "")
 
 set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
 set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
