@@ -51,6 +51,7 @@
 
 #include "sscImageLUT2D.h"
 #include "sscImageTF3D.h"
+#include "sscLogger.h"
 
 
 namespace ssc
@@ -163,14 +164,6 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 	Transform3D rMd = customReader->readTransform();
 
 	vtkImageDataPtr raw = this->load(filename);
-	//load the image from file
-//	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
-//	reader->SetFileName(cstring_cast(filename));
-//	reader->ReleaseDataFlagOn();
-
-//	if (!ErrorObserver::checkedRead(reader, filename))
-//		return DataPtr();
-
 	if(!raw)
 		return DataPtr();
 
@@ -189,22 +182,32 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 	image->setModality(customReader->readModality());
 	image->setImageType(customReader->readImageType());
 
-	bool ok = true;
+	bool ok1 = true;
+	bool ok2 = true;
+	double level = customReader->readKey("WindowLevel").toDouble(&ok1);
+	double window = customReader->readKey("WindowWidth").toDouble(&ok2);
 
-	QString levelString = customReader->readKey("WindowLevel");
-	double level = levelString.toDouble(&ok);
-	if (ok)
+	if (ok1 && ok2)
 	{
-		image->getTransferFunctions3D()->setLevel(level);
+//		image->getTransferFunctions3D()->setLevel(level);
+//		image->getTransferFunctions3D()->setWindow(window);
+
+		// set TF 3D using the color points and alpha points based on windowlevel settings.
+		ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+//		SSC_LOG("level: %f, win: %f, first: %f, second: %f", level, window, level-window/2, level+window/2);
+		tf3D->addColorPoint(level-window/2, QColor("black"));
+		tf3D->addColorPoint(level+window/2, QColor("white"));
+		tf3D->removeInitAlphaPoint();
+		tf3D->addAlphaPoint(level-0.7*window/2, 0);
+		tf3D->addAlphaPoint(level+window/2, 255);
+
 		image->getLookupTable2D()->setLevel(level);
-	}
-	QString windowString = customReader->readKey("WindowWidth");
-	double window = windowString.toDouble(&ok);
-	if (ok)
-	{
-		image->getTransferFunctions3D()->setWindow(window);
 		image->getLookupTable2D()->setWindow(window);
 	}
+
+	// add shading for known preoperative modalities
+	if (image->getModality().contains("CT") || image->getModality().contains("MR"))
+		image->setShadingOn(true);
 
 	//std::cout << "ImagePtr MetaImageReader::load" << std::endl << std::endl;
 	return image;
