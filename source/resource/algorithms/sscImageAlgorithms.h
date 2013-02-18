@@ -38,7 +38,6 @@ ImagePtr resampleImage(ImagePtr image, Transform3D refMi);
 vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
 ImagePtr cropImage(ImagePtr image);
 ImagePtr duplicateImage(ImagePtr image);
-vtkImageDataPtr convertImageToUnsigned(ImagePtr image);
 
 /**
  */

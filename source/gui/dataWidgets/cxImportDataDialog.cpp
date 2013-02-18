@@ -21,6 +21,7 @@
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxViewManager.h"
+#include "sscVolumeHelpers.h"
 
 namespace cx
 {
@@ -248,7 +249,7 @@ void ImportDataDialog::convertToUnsigned()
 //		std::cout << "type " << img0->GetScalarTypeAsString() << " -- " << img0->GetScalarType() << std::endl;
 //		std::cout << "range " << img0->GetScalarTypeMin() << " -- " << img0->GetScalarTypeMax() << std::endl;
 
-	vtkImageDataPtr img = convertImageToUnsigned(image);
+	vtkImageDataPtr img = ssc::convertImageToUnsigned(image)->getBaseVtkImageData();
 
 	image->setVtkImageData(img);
 	ssc::dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());
