@@ -16,6 +16,7 @@
 #include <QtCore>
 #include "cxDataLocations.h"
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {

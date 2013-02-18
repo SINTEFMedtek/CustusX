@@ -28,18 +28,30 @@ void TestAcquisition::testConstructor()
 {
 }
 
-void TestAcquisition::testStoreMHDSource()
+
+// start mhd file video source
+// start dummy probe ?
+// start acquisition
+// look for saved stuff (both inmem and ondisk)
+// turn on autoreconstruct and check that stuff is generated
+void TestAcquisition::testStoreMHDSourceLocalServer()
 {
 	TestAcqController controller(NULL);
+	controller.mConnectionMethod = "Local Server";
 	controller.initialize();
 	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
-	// start mhd file video source
-	// start dummy probe ?
-	// start acquisition
-	// look for saved stuff (both inmem and ondisk)
-	// turn on autoreconstruct and check that stuff is generated
-//	std::cout << "done" << std::endl;
+	controller.verify();
+
+}
+
+void TestAcquisition::testStoreMHDSourceDirectLink()
+{
+	TestAcqController controller(NULL);
+	controller.mConnectionMethod = "Direct Link";
+	controller.initialize();
+	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
+	qApp->exec();
 	controller.verify();
 
 }

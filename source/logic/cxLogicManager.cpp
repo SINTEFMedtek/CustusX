@@ -50,6 +50,7 @@ void LogicManager::initializeServices()
 	cx::DataManager::initialize();
 	cx::ToolManager::initializeObject();
 	cx::ViewManager::createInstance();
+	cx::StateService::getInstance();
 	// init stateservice....
 
 	// logic layer

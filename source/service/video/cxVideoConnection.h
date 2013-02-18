@@ -56,7 +56,6 @@ public:
 
 	ssc::StringDataAdapterXmlPtr getConnectionMethod() { return mConnectionMethod; }
 
-
 	void setLocalServerExecutable(QString commandline);
 	QString getLocalServerExecutable();
 	void setPort(int port);
@@ -82,6 +81,7 @@ public:
 	{
 		return mRTSource;
 	}
+	void setReconnectInterval(int interval) { mReconnectInterval = interval; }
 
 signals:
 	void fps(int fps);
@@ -90,19 +90,14 @@ signals:
 
 public slots:
 	void connectServer();
-//	void serverProcessReadyRead();
-
-//private slots:
 	void serverProcessStateChanged(QProcess::ProcessState newState);
-//	void serverProcessError(QProcess::ProcessError error);
 
 private:
 	void delayedAutoConnectServer();
 
-//	double mSoundSpeedCompensationFactor;
 	OpenIGTLinkRTSourcePtr mRTSource;
-//	QProcess* mServer;
 	int mConnectWhenLocalServerRunning;
+	int mReconnectInterval;
 	ProcessWrapperPtr mProcess;
 	ProcessWrapperPtr mIniScript;
 
