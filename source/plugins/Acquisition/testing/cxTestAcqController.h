@@ -24,6 +24,8 @@ public:
 	void initialize();
 	void verify();
 
+	QString mConnectionMethod;
+
 private slots:
 	void newFrameSlot();
 	void start();
@@ -33,14 +35,16 @@ private slots:
 	void acquisitionDataReadySlot();
 	void readinessChangedSlot();
 
+	void setupVideo();
+	void setupProbe();
+
 private:
 	ssc::ReconstructManagerPtr createReconstructionManager();
 	void verifyFileData(ssc::USReconstructInputData data);
-	void setupVideo(QString framesFile);
-	void setupProbe(QString probedefinition);
 
 	ssc::USReconstructInputData mMemOutputData;
 	ssc::USReconstructInputData mFileOutputData;
+	QString mAcqDataFilename;
 
 	double mRecordDuration; ///< duration of recording in ms.
 	ssc::VideoSourcePtr mVideoSource;

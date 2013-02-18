@@ -38,6 +38,7 @@ namespace cx
 
 VideoConnection::VideoConnection()
 {
+	mReconnectInterval = 400;
 	mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
 
 	QStringList connectionOptions;
@@ -57,13 +58,7 @@ VideoConnection::VideoConnection()
 
 	mIniScript.reset(new ProcessWrapper("Init Script"));
 	mProcess.reset(new ProcessWrapper("Local Video Server"));
-//	mServer = new QProcess(this);
 	connect(mProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
-//	connect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
-//
-//	connect(mServer, SIGNAL(readyRead()), this, SLOT(serverProcessReadyRead()));
-//	mServer->setProcessChannelMode(QProcess::MergedChannels);
-//	mServer->setReadChannel(QProcess::StandardOutput);
 
 	mRTSource.reset(new OpenIGTLinkRTSource());
 	connect(getVideoSource().get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
@@ -73,9 +68,6 @@ VideoConnection::VideoConnection()
 VideoConnection::~VideoConnection()
 {
 	mRTSource->disconnectServer();
-//	// avoid getting crash reports: disable signal
-//	disconnect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
-//	mServer->close();
 }
 
 void VideoConnection::setLocalServerExecutable(QString commandline)
@@ -117,32 +109,6 @@ QProcess* VideoConnection::getProcess()
 {
 	return mProcess->getProcess();
 }
-
-//void VideoConnection::setUseLocalServer(bool use)
-//{
-//	settings()->setValue("IGTLink/useLocalServer", use);
-//}
-//
-//bool VideoConnection::getUseLocalServer()
-//{
-//	QVariant var = settings()->value("IGTLink/useLocalServer");
-//	if (var.canConvert<bool> ())
-//		return var.toBool();
-//	return true;
-//}
-//
-//void VideoConnection::setUseDirectLink(bool use)
-//{
-//	settings()->setValue("IGTLink/useDirectLink", use);
-//}
-//
-//bool VideoConnection::getUseDirectLink()
-//{
-//	QVariant var = settings()->value("IGTLink/useDirectLink");
-//	if (var.canConvert<bool> ())
-//		return var.toBool();
-//	return true;
-//}
 
 bool VideoConnection::getUseLocalServer2()
 {
@@ -211,43 +177,6 @@ QString VideoConnection::getLocalServerArguments()
 
 void VideoConnection::launchServer()
 {
-//	//  QString program = "/Users/christiana/christiana/workspace/CustusX3/build_RelWithDebInfo/modules/OpenIGTLinkServer/cxOpenIGTLinkServer";
-//	//  QStringList arguments;
-//	//  arguments << "18333" <<  "/Users/christiana/Patients/20101126T114627_Lab_66.cx3/US_Acq/USAcq_20100909T111205_5.mhd";
-//
-//	QString commandline = this->getLocalServerExecutable() + " " + this->getLocalServerArguments();
-//
-//	if (this->getLocalServerExecutable().isEmpty())
-//		return;
-//	if (mServer->state() != QProcess::NotRunning)
-//		return;
-////	if (this->getHost().toUpper() != "LOCALHOST")
-//	if (!this->getUseLocalServer2())
-//	{
-//		ssc::messageManager()->sendError("Ignoring Launch local server: Must select local server");
-//		return;
-//	}
-//
-////	QStringList text = commandline.split(" ");
-//	QString program = this->getLocalServerExecutable();
-//	QStringList arguments = this->getLocalServerArguments().split(" ");
-////	arguments.pop_front();
-//
-//	if (!QFileInfo(program).isAbsolute())
-//		program = DataLocations::getBundlePath() + "/" + program;
-//
-//	if (!QFileInfo(program).exists())
-//	{
-//		ssc::messageManager()->sendError("Cannot find IGTLink server " + program);
-//		return;
-//	}
-//
-//	ssc::messageManager()->sendInfo("Launching local IGTLink server " + program + " with arguments " + arguments.join(
-//		", "));
-//
-//	if (mServer->state() == QProcess::NotRunning)
-//		mServer->start(program, arguments);
-
 	if (!this->getUseLocalServer2())
 	{
 		ssc::messageManager()->sendError("Ignoring Launch local server: Must select local server");
@@ -285,7 +214,7 @@ void VideoConnection::delayedAutoConnectServer()
 	if (mConnectWhenLocalServerRunning)
 	{
 		--mConnectWhenLocalServerRunning;
-		QTimer::singleShot(400, this, SLOT(connectServer())); // the process need some time to get its tcp server up and listening. GrabberServer seems to need more than 500ms
+		QTimer::singleShot(mReconnectInterval, this, SLOT(connectServer())); // the process need some time to get its tcp server up and listening. GrabberServer seems to need more than 500ms
 	}
 }
 
@@ -331,59 +260,5 @@ void VideoConnection::serverProcessStateChanged(QProcess::ProcessState newState)
 		this->delayedAutoConnectServer();
 	}
 }
-
-//void VideoConnection::serverProcessError(QProcess::ProcessError error)
-//{
-//	QString msg;
-//	msg += "Video server reported an error: ";
-//
-//	switch (error)
-//	{
-//	case QProcess::FailedToStart:
-//		msg += "Failed to start";
-//		break;
-//	case QProcess::Crashed:
-//		msg += "Crashed";
-//		break;
-//	case QProcess::Timedout:
-//		msg += "Timed out";
-//		break;
-//	case QProcess::WriteError:
-//		msg += "Write Error";
-//		break;
-//	case QProcess::ReadError:
-//		msg += "Read Error";
-//		break;
-//	case QProcess::UnknownError:
-//		msg += "Unknown Error";
-//		break;
-//	default:
-//		msg += "Invalid error";
-//	}
-//
-//	ssc::messageManager()->sendError(msg);
-//}
-//
-//void VideoConnection::serverProcessStateChanged(QProcess::ProcessState newState)
-//{
-//	if (newState == QProcess::Running)
-//	{
-//		ssc::messageManager()->sendInfo("Video Source Server running.");
-//		this->delayedAutoConnectServer();
-//	}
-//	if (newState == QProcess::NotRunning)
-//	{
-//		ssc::messageManager()->sendInfo("Video Source Server not running.");
-//	}
-//	if (newState == QProcess::Starting)
-//	{
-//		ssc::messageManager()->sendInfo("Video Source Server starting.");
-//	}
-//}
-//
-//void VideoConnection::serverProcessReadyRead()
-//{
-//	ssc::messageManager()->sendInfo(QString(mServer->readAllStandardOutput()));
-//}
 
 }//end namespace cx
