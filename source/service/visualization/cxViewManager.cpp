@@ -529,6 +529,8 @@ void ViewManager::setActiveLayout(const QString& layout)
 
 void ViewManager::setRenderingInterval(int interval)
 {
+	if (!mRenderingTimer)
+		return;
     if (interval==mRenderingTimer->interval())
         return;
 
