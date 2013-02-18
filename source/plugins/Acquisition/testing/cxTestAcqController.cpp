@@ -30,6 +30,7 @@
 #include "sscReconstructManager.h"
 #include "sscTime.h"
 #include <cppunit/extensions/HelperMacros.h>
+#include "sscLogger.h"
 
 TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
 {
@@ -48,22 +49,24 @@ ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
 	return reconstructer;
 }
 
-void TestAcqController::setupVideo(QString framesFile)
+void TestAcqController::setupVideo()
 {
-	std::cout << "TestAcqController::initialize() init video" << std::endl;
-	cx::videoService()->getIGTLinkVideoConnection()->getConnectionMethod()->setValue("Direct Link");
-	cx::videoService()->getIGTLinkVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1").arg(framesFile));
+	std::cout << "\nTestAcqController::initialize() init video" << std::endl;
+	cx::videoService()->getIGTLinkVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
+	cx::videoService()->getIGTLinkVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1").arg(mAcqDataFilename));
 	mVideoSource = cx::videoService()->getIGTLinkVideoConnection()->getVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
+
+	cx::videoService()->getIGTLinkVideoConnection()->setReconnectInterval(1000);
 	cx::videoService()->getIGTLinkVideoConnection()->launchAndConnectServer();
 }
 
-void TestAcqController::setupProbe(QString probedefinition)
+void TestAcqController::setupProbe()
 {
-	std::cout << "TestAcqController::initialize() init tool" << std::endl;
+	std::cout << "\nTestAcqController::initialize() init tool" << std::endl;
 	ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(ssc::DoubleBoundingBox3D(0,0,0,10,10,10)));
-	std::pair<QString, ssc::ProbeData> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(probedefinition);
+	std::pair<QString, ssc::ProbeData> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
 	dummyTool->setProbeSector(probedata.second);
 	// TODO should be auto, but doesnt, might because tooman is not initialized
 	dummyTool->getProbe()->setRTSource(mVideoSource);
@@ -75,18 +78,13 @@ void TestAcqController::setupProbe(QString probedefinition)
 	CPPUNIT_ASSERT(dummyTool->getProbe()->getRTSource());
 }
 
-
-
 void TestAcqController::initialize()
 {
-	QString filename = cx::DataLocations::getTestDataPath() +
+	mAcqDataFilename = cx::DataLocations::getTestDataPath() +
 			"/testing/"
 			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
 
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
-
-	this->setupVideo(filename);
-	this->setupProbe(filename);
 
 	mAcquisitionData.reset(new cx::AcquisitionData(this->createReconstructionManager()));
 
@@ -95,23 +93,30 @@ void TestAcqController::initialize()
 	connect(mAcquisitionBase.get(), SIGNAL(readinessChanged()), this, SLOT(readinessChangedSlot()));
 	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(saveDataCompletedSlot(QString)));
 	connect(mAcquisition.get(), SIGNAL(acquisitionDataReady()), this, SLOT(acquisitionDataReadySlot()));
+
+	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
+	QTimer::singleShot(0, this, SLOT(setupVideo()));
+	connect(cx::videoService()->getIGTLinkVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(setupProbe()));
+	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(start()));
 }
 
 void TestAcqController::start()
 {
+	std::cout << "\nTestAcqController::start() start record" << std::endl;
 	mAcquisitionBase->startRecord();
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 
 void TestAcqController::stop()
 {
+	std::cout << "\nTestAcqController::stop() stop record" << std::endl;
 	mAcquisitionBase->stopRecord();
 }
 
 void TestAcqController::newFrameSlot()
 {
-	if (!mAcquisitionBase->getLatestSession())
-		this->start();
+//	if (!mAcquisitionBase->getLatestSession())
+//		this->start();
 }
 
 void TestAcqController::readinessChangedSlot()
@@ -131,14 +136,9 @@ void TestAcqController::saveDataCompletedSlot(QString path)
 {
 	QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
-//	// convert path to path + file - needed by reader
-//	QStringList splitPath = path.split("/");
-//	QString filename = splitPath.join("/") + "/" + splitPath.back() + ".fts";
-	QString filename = path;
-
 	// read file and print info - this is the result of the file pathway
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
-	mFileOutputData = fileReader->readAllFiles(filename, "calFilesPath""");
+	mFileOutputData = fileReader->readAllFiles(path, "calFilesPath""");
 }
 
 void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)

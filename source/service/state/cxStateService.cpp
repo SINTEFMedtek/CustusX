@@ -242,10 +242,16 @@ QString StateService::getDefaultGrabberServer()
 	return "";
 #else
 	QString result;
+	// run from installed folder
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/..", "runOpenIGTLinkServer.sh", "");
 	if (!result.isEmpty())
 		return result;
+	// run from build folder
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer", "");
+	if (!result.isEmpty())
+		return result;
+	// run from test folders
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer", "");
 	if (!result.isEmpty())
 		return result;
 	return "";
