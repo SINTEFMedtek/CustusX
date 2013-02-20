@@ -10,6 +10,7 @@ namespace cx
  *
  * \brief
  *
+ * \ingroup cxResourceOpenIGTLinkUtilities
  * \date Jan 25, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
