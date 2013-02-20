@@ -10,6 +10,8 @@
 
 #include "sscImage.h"
 #include "sscTool.h"
+#include "cxIGTLinkImageMessage.h"
+#include "cxIGTLinkUSStatusMessage.h"
 
 namespace cx
 {
@@ -23,14 +25,35 @@ public:
 	IGTLinkConversion();
 	virtual ~IGTLinkConversion();
 
+	/**
+	  * Encode the image into a IGTLink message, containing
+	  * image data, uid and timstamp
+	  */
 	IGTLinkImageMessage::Pointer encode(ssc::ImagePtr image);
-	ssc::ImagePtr decode(IGTLinkImageMessage::Pointer imgMsg);
+	/**
+	  * Decode the IGTLink message to create an image containing
+	  * image data, uid and timstamp
+	  */
+	ssc::ImagePtr decode(IGTLinkImageMessage::Pointer msg);
 
+	/**
+	  * Encode the input probedata into an IGTLink message.
+	  */
 	IGTLinkUSStatusMessage::Pointer encode(ssc::ProbeData);
-	ssc::ProbeData decode(IGTLinkUSStatusMessage::Pointer msg);
+	/**
+	  * Decode the input probe and image messages to create a
+	  * ssc::ProbeData object based in the input base.
+	  *
+	  * Each message contains part of the data, the parts that
+	  * are missing are simply not filled in (i.e. keep the values
+	  * already present in base.)
+	  *
+	  * Some or all of the input messages can be NULL.
+	  */
+	ssc::ProbeData decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ssc::ProbeData base);
 
 private:
-	ProbePtr getValidProbe();
+//	ProbePtr getValidProbe();
 };
 
 } //namespace cx
