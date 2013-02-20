@@ -155,10 +155,10 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
 
-  mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
-  mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
-  mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
-  mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
+//  mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
+//  mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
+//  mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
+//  mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
 
   mActiveImageProxy = ActiveImageProxy::New();
   connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
@@ -172,12 +172,12 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
   mLayout->addWidget(mTransferFunctionAlphaWidget);
   mLayout->addWidget(mTransferFunctionColorWidget);
 
-  QGridLayout* gridLayout = new QGridLayout;
-  mLayout->addLayout(gridLayout);
-  new ssc::SliderGroupWidget(this, mDataWindow, gridLayout, 0);
-  new ssc::SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
-  new ssc::SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
-  new ssc::SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
+//  QGridLayout* gridLayout = new QGridLayout;
+//  mLayout->addLayout(gridLayout);
+//  new ssc::SliderGroupWidget(this, mDataWindow, gridLayout, 0);
+//  new ssc::SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
+//  new ssc::SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
+//  new ssc::SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(mLayout);
 }
@@ -203,10 +203,10 @@ void TransferFunction3DWidget::activeImageChangedSlot()
   mTransferFunctionAlphaWidget->setData(image, tf);
   mTransferFunctionColorWidget->setData(image, tf);
 
-  mDataWindow->setImageTFData(tf);
-  mDataLevel->setImageTFData(tf);
-  mDataAlpha->setImageTFData(tf);
-  mDataLLR->setImageTFData(tf);
+//  mDataWindow->setImageTFData(tf);
+//  mDataLevel->setImageTFData(tf);
+//  mDataAlpha->setImageTFData(tf);
+//  mDataLLR->setImageTFData(tf);
 }
 
 //---------------------------------------------------------
