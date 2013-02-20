@@ -56,7 +56,7 @@ include(${OpenIGTLink_USE_FILE})
 
 # SSC
 #----------
-find_package(SSC PATHS "../../externals/ssc/CMake" REQUIRED)
+find_package(SSC PATHS "../../../externals/ssc/CMake" REQUIRED)
 include(${SSC_USE_FILE})
 
 # APPLE libs
@@ -127,8 +127,6 @@ set(SOURCES
 		cxMacGrabberServer.h
 		cxMacGrabberServer.cpp
 		cxOpenIGTLinkSession.cpp
-		../grabberCommon/cxIGTLinkImageMessage.h
-		../grabberCommon/cxIGTLinkImageMessage.cpp
 		${${LIBNAME}_MOC_HDRS}
 		${${LIBNAME}_MOC_SRCS}
 )
@@ -137,6 +135,7 @@ include_directories(
 		.
 		${CMAKE_CURRENT_BINARY_DIR}/gui #so that is finds the generated ui files
 		${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
+        ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
 )
 
 #------------------------------------------------------------------------------

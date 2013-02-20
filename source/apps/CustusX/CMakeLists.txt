@@ -287,13 +287,13 @@ INSTALL(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" DESTINATION ${plugin_dest_dir
 # Install the OpenIGTLinkServer
 # Only on Apple: Linux/Win does this in the OpenIGTLinkServer folder.
 if(APPLE)
-    INSTALL(FILES "${CustusX3_BINARY_DIR}/modules/OpenIGTLinkServer/OpenIGTLinkServer" DESTINATION ${plugin_dest_dir}
+    INSTALL(FILES "${CustusX3_BINARY_DIR}/source/apps/OpenIGTLinkServer/OpenIGTLinkServer" DESTINATION ${plugin_dest_dir}
     				PERMISSIONS
     						OWNER_READ OWNER_EXECUTE OWNER_WRITE
     						GROUP_READ GROUP_EXECUTE GROUP_WRITE
     						WORLD_READ WORLD_EXECUTE WORLD_WRITE
     						)
-    INSTALL(FILES "${CustusX3_BINARY_DIR}/modules/GrabberServer/GrabberServer" DESTINATION ${plugin_dest_dir}
+    INSTALL(FILES "${CustusX3_BINARY_DIR}/source/apps/GrabberServer/GrabberServer" DESTINATION ${plugin_dest_dir}
     				PERMISSIONS
     						OWNER_READ OWNER_EXECUTE OWNER_WRITE
     						GROUP_READ GROUP_EXECUTE GROUP_WRITE
@@ -356,8 +356,9 @@ set(DIRS
 		${CustusX3_BINARY_DIR}/source/plugins/UsReconstruction/gui
 		${CustusX3_BINARY_DIR}/source/gui
 		${CustusX3_BINARY_DIR}/source/logic/
-		${CustusX3_BINARY_DIR}/modules/grabberServer
-		${CustusX3_BINARY_DIR}/modules/OpenIGTLinkServer
+		${CustusX3_BINARY_DIR}/source/apps/grabberServer
+		${CustusX3_BINARY_DIR}/source/apps/OpenIGTLinkServer
+		${CustusX3_BINARY_DIR}/source/resource/videoServer
 		)
 
 # old version without plugins: remove after testing on win/linux.	

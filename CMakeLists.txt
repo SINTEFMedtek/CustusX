@@ -253,13 +253,15 @@ if (LINUX)
 else (LINUX)
 		option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" OFF) #default is off for others
 endif (LINUX)
-if(BUILD_OPEN_IGTLINK_SERVER)
-		add_subdirectory( modules/OpenIGTLinkServer )
-endif(BUILD_OPEN_IGTLINK_SERVER)
+#if(BUILD_OPEN_IGTLINK_SERVER)
+#		add_subdirectory( source/apps/OpenIGTLinkServer )
+#		add_subdirectory( source/resource/videoServer )
+#		add_subdirectory( source/resource/OpenIGTLinkUtilities )
+#endif(BUILD_OPEN_IGTLINK_SERVER)
 
 option(BUILD_GRABBER_SERVER "build grabber server" OFF) #default is off
 if(BUILD_GRABBER_SERVER)
-		add_subdirectory( modules/grabberServer )
+		add_subdirectory( source/apps/grabberServer )
 endif(BUILD_GRABBER_SERVER)
 
 #------------------------------------------------------------------------------
