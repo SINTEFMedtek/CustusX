@@ -115,7 +115,7 @@ protected:
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
-  DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
+//  DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 
   ActiveImageProxyPtr mActiveImageProxy;
 };
