@@ -11,6 +11,7 @@
 #include <QDir>
 #include "cxConfig.h"
 #include "cxSettings.h"
+#include "sscTypeConversions.h"
 
 #ifdef CX_USE_TSF
 #include "tsf-config.h"
@@ -45,7 +46,12 @@ QString DataLocations::getBundlePath()
 {
 #ifdef __APPLE__
   QString path(qApp->applicationDirPath()+"/../../..");
-  return path;
+  QString bundle(qApp->applicationDirPath()+"/../..");
+//  std::cout << "check bundle: " << bundle << ", isbundle=" << QFileInfo(bundle).isBundle() << std::endl;
+  if (QFileInfo(bundle).isBundle())
+	  return path;
+  else
+	  return qApp->applicationDirPath();
 #else
   QString path(qApp->applicationDirPath());
   return path;
