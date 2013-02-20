@@ -52,6 +52,8 @@ if(BUILD_OPEN_IGTLINK_SERVER)
         cxIGTLinkUSStatusMessage.cpp
         igtl_us_status.h
         igtl_us_status.c
+        cxIGTLinkConversion.h
+        cxIGTLinkConversion.cpp
     )
 
     add_library( cxOpenIGTLinkUtilities
@@ -62,6 +64,6 @@ if(BUILD_OPEN_IGTLINK_SERVER)
         ${LINK_LIBRARIES}
         )
 
-    #add_subdirectory(testing)
+    add_subdirectory(testing)
 
 endif(BUILD_OPEN_IGTLINK_SERVER)
