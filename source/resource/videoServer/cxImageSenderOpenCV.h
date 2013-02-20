@@ -21,7 +21,7 @@ class QTimer;
 //#include <opencv2/highgui/highgui.hpp>
 #include <QStringList>
 #include "cxImageSenderFactory.h"
-#include "../grabberCommon/cxIGTLinkImageMessage.h"
+#include "cxIGTLinkImageMessage.h"
 #include "cxGrabberSender.h"
 
 namespace cv

@@ -8,6 +8,9 @@
 #ifndef CXIGTLINKCONVERSION_H_
 #define CXIGTLINKCONVERSION_H_
 
+#include "sscImage.h"
+#include "sscTool.h"
+
 namespace cx
 {
 

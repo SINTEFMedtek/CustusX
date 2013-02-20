@@ -20,8 +20,8 @@ class QTimer;
 #include <vtkSmartPointer.h>
 #include "cxImageSenderFactory.h"
 
-#include "../grabberCommon/cxIGTLinkImageMessage.h"
-#include "../grabberCommon/cxIGTLinkUSStatusMessage.h"
+#include "cxIGTLinkImageMessage.h"
+#include "cxIGTLinkUSStatusMessage.h"
 #include "vtkSonixVideoSource.h"
 #include "SonixHelper.h"
 #include "cxImageSender.h"

@@ -21,7 +21,7 @@
 
 #include "cxVideoService.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
-//#include "cxOpenIGTLinkDirectLinkRTSource.h"
+#include "cxOpenIGTLinkRTSource.h"
 
 namespace cx
 {

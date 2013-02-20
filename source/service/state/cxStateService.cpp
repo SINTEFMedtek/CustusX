@@ -227,7 +227,7 @@ QString StateService::getDefaultGrabberServer()
 	if (!result.isEmpty())
 	return result;
 //	result = this->checkGrabberServerExist(DataLocations::getRootConfigPath() + "/../install/Apple", filename, postfix);
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/grabberServer", filename, postfix);
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../grabberServer", filename, postfix);
 	if (!result.isEmpty())
 	return result;
 	return "";
@@ -236,7 +236,7 @@ QString StateService::getDefaultGrabberServer()
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath(), "OpenIGTLinkServer.exe", "--in_width 800 --in_height 600");
 	if (!result.isEmpty())
 		return result;
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer.exe", "--in_width 800 --in_height 600");
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../OpenIGTLinkServer", "OpenIGTLinkServer.exe", "--in_width 800 --in_height 600");
 	if (!result.isEmpty())
 		return result;
 	return "";
@@ -247,11 +247,11 @@ QString StateService::getDefaultGrabberServer()
 	if (!result.isEmpty())
 		return result;
 	// run from build folder
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer", "");
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../OpenIGTLinkServer", "OpenIGTLinkServer", "");
 	if (!result.isEmpty())
 		return result;
 	// run from test folders
-	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../../modules/OpenIGTLinkServer", "OpenIGTLinkServer", "");
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../apps/OpenIGTLinkServer", "OpenIGTLinkServer", "");
 	if (!result.isEmpty())
 		return result;
 	return "";

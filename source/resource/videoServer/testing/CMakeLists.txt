@@ -9,8 +9,9 @@ if (BUILD_TESTING)
 	# CppUnit test framework: Create executable testCX
 	#
 	include_directories(
-        ${CustusX3_SOURCE_DIR}/modules/OpenIGTLinkServer
-		${CPPUNIT_INCLUDE_DIR}
+                ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+                ${CustusX3_SOURCE_DIR}/source/resource/videoServer
+                ${CPPUNIT_INCLUDE_DIR}
 		)
 
 	# List of all test units
