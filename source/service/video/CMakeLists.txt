@@ -30,16 +30,17 @@ SET (cxVideoService_SOURCE
     cxGrabberDirectLinkThread.cpp
     cxIGTLinkClientBase.h
     cxIGTLinkClientBase.cpp
-    ../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h
-    ../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.cpp
-    ../../../modules/grabberCommon/igtl_us_status.h
-    ../../../modules/grabberCommon/igtl_us_status.c
+#    ../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h
+#    ../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.cpp
+#    ../../../modules/grabberCommon/igtl_us_status.h
+#    ../../../modules/grabberCommon/igtl_us_status.c
 )
 
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/modules/OpenIGTLinkServer
+    ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+    ${CustusX3_SOURCE_DIR}/source/resource/videoServer
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/service/tracking

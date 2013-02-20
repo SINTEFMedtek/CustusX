@@ -24,7 +24,7 @@
 #include <vector>
 #include <QtGui>
 #include "sscView.h"
-#include "cxOpenIGTLinkRTSource.h"
+//#include "cxOpenIGTLinkRTSource.h"
 #include "cxRenderTimer.h"
 #include "sscStringDataAdapterXml.h"
 
@@ -32,6 +32,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
+typedef boost::shared_ptr<class OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 
 /**
 * \file

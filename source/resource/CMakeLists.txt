@@ -2,6 +2,9 @@
 ##               Resource Layer
 ###########################################################
 
+add_subdirectory(videoServer)
+add_subdirectory(OpenIGTLinkUtilities)
+
 #add_subdirectory(utilities)
 
 # extra definitions:
@@ -76,6 +79,13 @@ SET ( cxResource_SOURCE
 	utilities/cxImageDataContainer.cpp
 	utilities/cxFileHelpers.h
 	utilities/cxFileHelpers.cpp
+	
+#	OpenIGTLinkUtilities/cxIGTLinkImageMessage.h
+#	OpenIGTLinkUtilities/cxIGTLinkImageMessage.cpp    
+#    OpenIGTLinkUtilities/cxIGTLinkUSStatusMessage.h
+#    OpenIGTLinkUtilities/cxIGTLinkUSStatusMessage.cpp
+#    OpenIGTLinkUtilities/igtl_us_status.h
+#    OpenIGTLinkUtilities/igtl_us_status.c	
 )
 
 include_directories(

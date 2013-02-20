@@ -27,8 +27,8 @@
 #include <vector>
 #include "sscProbeData.h"
 #include "cxProbe.h"
-#include "../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h"
-#include "../../../modules/grabberCommon/cxIGTLinkImageMessage.h"
+#include "cxIGTLinkUSStatusMessage.h"
+#include "cxIGTLinkImageMessage.h"
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;

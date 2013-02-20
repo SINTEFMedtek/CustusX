@@ -2,5 +2,7 @@ ADD_SUBDIRECTORY(UsReconstruction)
 ADD_SUBDIRECTORY(CustusX)
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(MemoryTester)
+add_subdirectory(OpenIGTLinkServer)
+#add_subdirectory()
 
       

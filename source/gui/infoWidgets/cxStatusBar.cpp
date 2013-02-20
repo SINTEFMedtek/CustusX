@@ -15,6 +15,8 @@
 #include "boost/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
+#include "cxOpenIGTLinkRTSource.h"
+
 
 namespace cx
 {

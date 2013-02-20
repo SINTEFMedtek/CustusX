@@ -18,7 +18,8 @@ if (BUILD_TESTING)
 		${CustusX3_SOURCE_DIR}/source/resource/settings
 		${CustusX3_SOURCE_DIR}/source/resource/utilities
 		${CustusX3_SOURCE_DIR}/source/resource/algorithms
-		${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction
+                ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+                ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction
 		${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
 		${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction
 		${CustusX3_SOURCE_DIR}/source/logic/

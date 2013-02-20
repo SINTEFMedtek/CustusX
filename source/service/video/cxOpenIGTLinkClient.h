@@ -24,7 +24,7 @@ class QTcpSocket;
 #include "igtlClientSocket.h"
 #include "igtlImageMessage.h"
 #include "cxRenderTimer.h"
-#include "../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h"
+#include "cxIGTLinkUSStatusMessage.h"
 #include "cxIGTLinkClientBase.h"
 
 namespace cx
