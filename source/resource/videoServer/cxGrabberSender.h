@@ -11,8 +11,8 @@
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 #include <qtcpsocket.h>
-#include "../grabberCommon/cxIGTLinkImageMessage.h"
-#include "../grabberCommon/cxIGTLinkUSStatusMessage.h"
+#include "cxIGTLinkImageMessage.h"
+#include "cxIGTLinkUSStatusMessage.h"
 
 namespace cx
 {

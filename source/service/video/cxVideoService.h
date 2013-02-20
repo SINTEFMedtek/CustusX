@@ -25,6 +25,7 @@
 #include <QObject>
 
 #include "cxVideoConnection.h"
+#include "sscVideoSource.h"
 
 namespace cx
 {
