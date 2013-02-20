@@ -53,6 +53,7 @@ void TestAcqController::setupVideo()
 {
 	std::cout << "\nTestAcqController::initialize() init video" << std::endl;
 	cx::videoService()->getIGTLinkVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
+	cx::videoService()->getIGTLinkVideoConnection()->setLocalServerExecutable(cx::DataLocations::getBundlePath() + "/../../../apps/OpenIGTLinkServer/OpenIGTLinkServer");
 	cx::videoService()->getIGTLinkVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1").arg(mAcqDataFilename));
 	mVideoSource = cx::videoService()->getIGTLinkVideoConnection()->getVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
