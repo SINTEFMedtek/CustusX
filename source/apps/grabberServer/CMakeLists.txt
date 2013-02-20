@@ -168,6 +168,7 @@ set( MAC_LINK_LIBRARIES
 set( ALL_LINK_LIBRARIES
 	SSC
 	OpenIGTLink
+	cxOpenIGTLinkUtilities
 	${QT_LIBRARIES}
 )
 
