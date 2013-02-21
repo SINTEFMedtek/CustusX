@@ -150,7 +150,11 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
 
 		cast->Update();
 		if (verbose)
-			ssc::messageManager()->sendInfo(QString("Converting image %1 from %2 to %3").arg(image->getName()).arg(input->GetScalarTypeAsString()).arg(cast->GetOutput()->GetScalarTypeAsString()));
+			ssc::messageManager()->sendInfo(QString("Converting image %1 from %2 to %3, shift=%4")
+											.arg(image->getName())
+											.arg(input->GetScalarTypeAsString())
+											.arg(cast->GetOutput()->GetScalarTypeAsString())
+											.arg(shift));
 		convertedImageData = cast->GetOutput();
 	}
 
