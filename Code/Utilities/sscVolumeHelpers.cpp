@@ -39,35 +39,40 @@ namespace ssc
 
 vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
                                      Vector3D spacing,
-                                     const unsigned char initValue)
+                                     const unsigned char initValue,
+                                     int components)
 {
 	vtkImageDataPtr data = vtkImageDataPtr::New();
 	data->SetSpacing(spacing[0], spacing[1], spacing[2]);
 	data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
 	data->SetScalarTypeToUnsignedChar();
-	data->SetNumberOfScalarComponents(1);
+	data->SetNumberOfScalarComponents(components);
+	data->AllocateScalars();
 
-	int scalarSize = dim[0]*dim[1]*dim[2];
+	int scalarSize = dim[0]*dim[1]*dim[2]*components;
 
-	scalarSize += 1;	//TODO: Whithout the +1 the volume is black
+	unsigned char* ptr = reinterpret_cast<unsigned char*>(data->GetScalarPointer());
+	std::fill(ptr, ptr+scalarSize, initValue);
 
-	unsigned char *rawchars = (unsigned char*)malloc(scalarSize);
-	std::fill(rawchars,rawchars+scalarSize, initValue);
+//	scalarSize += 1;	//TODO: Whithout the +1 the volume is black
 
-	vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
-	array->SetNumberOfComponents(1);
-	array->SetArray(rawchars, scalarSize, 0); // take ownership
-	data->GetPointData()->SetScalars(array);
+//	unsigned char *rawchars = (unsigned char*)malloc(scalarSize);
+//	std::fill(rawchars,rawchars+scalarSize, initValue);
+
+//	vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
+//	array->SetNumberOfComponents(1);
+//	array->SetArray(rawchars, scalarSize, 0); // take ownership
+//	data->GetPointData()->SetScalars(array);
 
 	// A trick to get a full LUT in ssc::Image (automatic LUT generation)
 	// Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
-	rawchars[0] = 255;
+	ptr[0] = 255;
 	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
-	rawchars[0] = 0;
-
+	ptr[0] = 0;
 
 	return data;
 }
+
 
 vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim,
                                            ssc::Vector3D spacing,
