@@ -18,6 +18,8 @@
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 #include "sscTypeConversions.h"
+#include <vtkImageExtractComponents.h>
+#include <vtkImageAppendComponents.h>
 
 typedef vtkSmartPointer<vtkImageImport> vtkImageImportPtr;
 
@@ -62,6 +64,7 @@ IGTLinkImageMessage::Pointer IGTLinkConversion::encode(ssc::ImagePtr image)
 	// size parameters
 	int   size[]     = {256, 256, 1};       // image dimension
 	rawImage->GetDimensions(size);
+//	std::cout << "img dim " << size[0] << size[1] << size[2] << std::endl;
 	//size[2] = 1; // grab only one frame
 
 	double spacingD[3];
@@ -241,8 +244,11 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 //		this->updateSonix();
 //	}
 
-	imageImport->GetOutput()->Update();
-	ssc::ImagePtr retval(new ssc::Image(deviceName, imageImport->GetOutput()));
+//	imageImport->GetOutput()->Update();
+	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB("RGBA", imageImport->GetOutput());
+	imageRGB->Update();
+
+	ssc::ImagePtr retval(new ssc::Image(deviceName, imageRGB));
 	retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
 
 	return retval;
@@ -324,5 +330,96 @@ ssc::ProbeData IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMe
 
 //	return probe;
 //}
+
+
+
+//void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
+//{
+//	static CyclicActionTimer timer("Update Video Image");
+//	timer.begin();
+//#if 1 // remove to use test image
+//	if (!message)
+//	{
+//		std::cout << "got empty image !!!" << std::endl;
+//		this->setEmptyImage();
+//		return;
+//	}
+
+//	this->updateImageImportFromIGTMessage(message);
+//	mImageImport->GetOutput()->Update();
+//#endif
+
+//	mTimeout = false;
+//	mTimeoutTimer->start();
+
+//	// this seems to add 3ms per update()
+//	// insert a ARGB->RBGA filter. TODO: need to check the input more thoroughly here, this applies only to the internal CustusX US pipeline.
+//	if (mImageImport->GetOutput()->GetNumberOfScalarComponents() == 4 && !mFilter_IGTLink_to_RGB)
+//	{
+//		// the cx sonix server sends BGRX
+//		if (QString(message->GetDeviceName()) == "ImageSenderSonix")
+//		{
+//			mFilter_IGTLink_to_RGB = this->createFilterBGR2RGB(mImageImport->GetOutput());
+//		}
+//		// the cx mac QT grabber server sends ARGB,
+//		// the cx opencv server also sends ARGB, in order to mimic the mac server.
+//		else if (QString(message->GetDeviceName()) == "cxOpenCVGrabber" || QString(message->GetDeviceName()) == "GrabberServer")
+//		{
+//			mFilter_IGTLink_to_RGB = this->createFilterARGB2RGB(mImageImport->GetOutput());
+//		}
+//		else // default: strip alpha channel (should not happen, but cx expects RGB or Gray, not alpha)
+//		{
+//			mFilter_IGTLink_to_RGB = this->createFilterRGBA2RGB(mImageImport->GetOutput());
+//		}
+
+//		if (mFilter_IGTLink_to_RGB)
+//			mRedirecter->SetInput(mFilter_IGTLink_to_RGB);
+//	}
+//	timer.time("convert");
+
+//	//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
+//	emit newFrame();
+//	timer.time("emit");
+
+//	if (timer.intervalPassed())
+//	{
+//		static int counter=0;
+////		if (++counter%10==0)
+////			ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
+//		timer.reset();
+//	}
+
+//}
+
+
+
+vtkImageDataPtr IGTLinkConversion::createFilterFormat2RGB(QString format, vtkImageDataPtr input)
+{
+	int R = format.indexOf('R', 0, Qt::CaseInsensitive);
+	int G = format.indexOf('G', 0, Qt::CaseInsensitive);
+	int B = format.indexOf('B', 0, Qt::CaseInsensitive);
+	if (R<0 || G<0 || B<0 || format.size()>4)
+	{
+		R = 0;
+		G = 1;
+		B = 2;
+	}
+
+	return this->createFilterAny2RGB(R, G, B, input);
+}
+
+vtkImageDataPtr IGTLinkConversion::createFilterAny2RGB(int R, int G, int B, vtkImageDataPtr input)
+{
+	input->Update();
+	if (input->GetNumberOfScalarComponents() == 1)
+		return input;
+
+	vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
+	vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
+	splitterRGB->SetInput(input);
+	splitterRGB->SetComponents(R, G, B);
+	merger->SetInput(0, splitterRGB->GetOutput());
+	return merger->GetOutput();
+}
 
 } // namespace cx
