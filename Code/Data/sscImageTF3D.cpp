@@ -39,14 +39,15 @@
 #include "sscMessageManager.h"
 #include "vtkForwardDeclarations.h"
 #include "sscImageTF3D.h"
+#include "sscLogger.h"
 
 namespace ssc
 {
 
 ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
-	ImageTFData(base), mOpacityTF(vtkPiecewiseFunctionPtr::New()), mColorTF(vtkColorTransferFunctionPtr::New())
+	ImageTFData(base)//, mOpacityTF(vtkPiecewiseFunctionPtr::New()), mColorTF(vtkColorTransferFunctionPtr::New())
 {
-	mColorTF->SetColorSpaceToRGB();
+//	mColorTF->SetColorSpaceToRGB();
 
 	double smin = mBase->GetScalarRange()[0];
 	double smax = mBase->GetScalarRange()[1];
@@ -87,11 +88,7 @@ ImageTF3DPtr ImageTF3D::createCopy(vtkImageDataPtr newDataBase)
 {
 	ImageTF3DPtr retval(new ImageTF3D(newDataBase));
 	retval->deepCopy(this);
-	retval->mOpacityTF->DeepCopy(mOpacityTF);
-	retval->mColorTF->DeepCopy(mColorTF);
 	retval->setVtkImageData(newDataBase);//deepCopy also copies the data base
-
-//	retval->transferFunctionsChangedSlot();//Called through the setVtkImageData() above
 	return retval;
 }
 
@@ -126,6 +123,13 @@ void ImageTF3D::refreshColorTF()
 	// Note on optimization:
 	// the table generation can be moved to setLut(), leaving only
 	// BuildFunctionFromTable here.
+
+	if (!mColorTF)
+	{
+		mColorTF = vtkColorTransferFunctionPtr::New();
+		mColorTF->SetColorSpaceToRGB();
+	}
+
 
 	double min = this->getLevel() - (this->getWindow() / 2.0);
 	double max = this->getLevel() + (this->getWindow() / 2.0);
@@ -163,6 +167,10 @@ void ImageTF3D::refreshOpacityTF()
 	if (!mLut)
 		return;
 
+	if (!mOpacityTF)
+	{
+		mOpacityTF = vtkPiecewiseFunctionPtr::New();
+	}
 	this->fillOpacityTFFromMap(mOpacityTF);
 }
 

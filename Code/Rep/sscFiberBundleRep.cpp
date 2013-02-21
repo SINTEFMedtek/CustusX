@@ -130,7 +130,7 @@ void FiberBundleRep::bundleChanged()
 		mActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
 		mActor->GetProperty()->SetOpacity(color.alphaF());
 
-		if (mBundle->getShading())
+		if (mBundle->getShadingOn())
 		{
 			/** Create a filter for the mesh.
 			 * This filter enables shading and enhances the otherwise hard to differentiate lines.

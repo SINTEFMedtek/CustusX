@@ -73,8 +73,10 @@ public:
 	virtual QString getFilePath() const; ///< \return the corresponding file path
 	virtual REGISTRATION_STATUS getRegistrationStatus() const; ///< \return what kind of registration that has been performed on this data object.
 	virtual Transform3D get_rMd() const; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
-	virtual void setShading(bool on);
-	virtual bool getShading() const;
+	virtual void setShadingOn(bool on);
+	virtual bool getShadingOn() const;
+//	virtual void setShading(bool on);
+//	virtual bool getShading() const;
 	virtual QDateTime getAcquisitionTime() const;
 	virtual QString getType() const
 	{

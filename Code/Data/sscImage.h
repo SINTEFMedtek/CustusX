@@ -73,40 +73,44 @@ public:
 
 	virtual ~Image();
 	Image(const QString& uid, const vtkImageDataPtr& data, const QString& name = "");
-	void setVtkImageData(const vtkImageDataPtr& data);
+	virtual void setVtkImageData(const vtkImageDataPtr& data);
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkImageDataPtr getGrayScaleBaseVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	virtual LandmarkMap getLandmarks(); ///< \return all landmarks defined on the image.
+	/** Return a version of this, containing image data and transfer functions converted to unsigned.
+	  * This is used for the 3D texture slicer that doesnt handle signed data.
+	  */
+	virtual ImagePtr getUnsigned(ImagePtr self);
 
 	virtual QString getModality() const;
 	virtual void setModality(const QString& val);
 	virtual QString getImageType() const;
 	virtual void setImageType(const QString& val);
 
-	ImageTF3DPtr getTransferFunctions3D();
-	void setTransferFunctions3D(ImageTF3DPtr transferFuntion);
-	ImageLUT2DPtr getLookupTable2D();
+	virtual ImageTF3DPtr getTransferFunctions3D();
+	virtual void setTransferFunctions3D(ImageTF3DPtr transferFuntion);
+	virtual ImageLUT2DPtr getLookupTable2D();
 
 	virtual DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
-	vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
-	int getMax();	///< \return Return highest used value in the image
-	int getMin();	///< \return Return lowest used value in the image
-	int getRange();///< For convenience: getMax() - getMin()
-	int getMaxAlphaValue();///<Max alpha value (probably 255)
+	virtual vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
+	virtual int getMax();	///< \return Return highest used value in the image
+	virtual int getMin();	///< \return Return lowest used value in the image
+	virtual int getRange();///< For convenience: getMax() - getMin()
+	virtual int getMaxAlphaValue();///<Max alpha value (probably 255)
 	virtual void setShadingOn(bool on);
 	virtual bool getShadingOn() const;
-	void setShadingAmbient(double ambient); ///<Set shading ambient parmeter
-	void setShadingDiffuse(double diffuse); ///<Set shading diffuse parmeter
-	void setShadingSpecular(double specular); ///<Set shading specular parmeter
-	void setShadingSpecularPower(double specularPower); ///<Set shading specular power parmeter
-	double getShadingAmbient(); ///<Get shading ambient parmeter
-	double getShadingDiffuse(); ///<Get shading diffuse parmeter
-	double getShadingSpecular(); ///<Get shading specular parmeter
-	double getShadingSpecularPower(); ///<Get shading specular power parmeter
-	Image::ShadingStruct getShading();
-	void setShading(Image::ShadingStruct shading);
+	virtual void setShadingAmbient(double ambient); ///<Set shading ambient parmeter
+	virtual void setShadingDiffuse(double diffuse); ///<Set shading diffuse parmeter
+	virtual void setShadingSpecular(double specular); ///<Set shading specular parmeter
+	virtual void setShadingSpecularPower(double specularPower); ///<Set shading specular power parmeter
+	virtual double getShadingAmbient(); ///<Get shading ambient parmeter
+	virtual double getShadingDiffuse(); ///<Get shading diffuse parmeter
+	virtual double getShadingSpecular(); ///<Get shading specular parmeter
+	virtual double getShadingSpecularPower(); ///<Get shading specular power parmeter
+	virtual Image::ShadingStruct getShading();
+	virtual void setShading(Image::ShadingStruct shading);
 
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels \param dataNode Data node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
@@ -160,6 +164,7 @@ protected:
 	vtkMatrix4x4Ptr mOrientatorMatrix;
 	vtkImageDataPtr mReferenceImageData; ///< imagedata after filtering through the orientatior, given in reference space
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
+	ImagePtr mUnsigned; ///< version of this containing unsigned data.
 
 	LandmarkMap mLandmarks; ///< map with all landmarks always in space d (data).
 

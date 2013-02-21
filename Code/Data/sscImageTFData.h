@@ -107,8 +107,10 @@ public:
 
 	void addAlphaPoint(int alphaPosition, int alphaValue);///< Add point to the opacity transfer function
 	void removeAlphaPoint(int alphaPosition);///< Remove point from the opacity transfer function
+	void moveAlphaPoint(int oldpos, int newpos, int alphaValue);
 	void addColorPoint(int colorPosition, QColor colorValue);///< Add point to the color transfer function
 	void removeColorPoint(int colorPosition);///< Remove point from the color transfer function
+	void moveColorPoint(int oldpos, int newpos, QColor colorValue);
 
 	virtual void addXml(QDomNode dataNode); ///< adds xml information about the transferfunction and its variabels
 	virtual void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
