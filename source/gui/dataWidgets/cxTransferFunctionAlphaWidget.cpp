@@ -314,8 +314,9 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(int mouseX, int mouseY)
     else if (newAlphaPoint.position >= nextpoint->first)
       newAlphaPoint.position = nextpoint->first - 1;
 
-    mImageTF->removeAlphaPoint(mCurrentAlphaPoint.position);
-    mImageTF->addAlphaPoint(newAlphaPoint.position, newAlphaPoint.value);
+//    mImageTF->removeAlphaPoint(mCurrentAlphaPoint.position);
+//    mImageTF->addAlphaPoint(newAlphaPoint.position, newAlphaPoint.value);
+	mImageTF->moveAlphaPoint(mCurrentAlphaPoint.position, newAlphaPoint.position, newAlphaPoint.value);
 
     mCurrentAlphaPoint = newAlphaPoint;
   }
