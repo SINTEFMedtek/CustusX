@@ -1,9 +1,16 @@
-/*
- * cxDataLocations.cpp
- *
- *  \date Jun 22, 2010
- *      \author christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 #include "cxDataLocations.h"
 
 #include <iostream>
@@ -11,6 +18,7 @@
 #include <QDir>
 #include "cxConfig.h"
 #include "cxSettings.h"
+#include "sscTypeConversions.h"
 
 #ifdef CX_USE_TSF
 #include "tsf-config.h"
@@ -45,7 +53,12 @@ QString DataLocations::getBundlePath()
 {
 #ifdef __APPLE__
   QString path(qApp->applicationDirPath()+"/../../..");
-  return path;
+  QString bundle(qApp->applicationDirPath()+"/../..");
+//  std::cout << "check bundle: " << bundle << ", isbundle=" << QFileInfo(bundle).isBundle() << std::endl;
+  if (QFileInfo(bundle).isBundle())
+	  return path;
+  else
+	  return qApp->applicationDirPath();
 #else
   QString path(qApp->applicationDirPath());
   return path;
