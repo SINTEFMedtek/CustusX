@@ -18,16 +18,19 @@ public:
 
 	void testConstructor();
 	void testDecodeEncodeImage();
+	void testDecodeEncodeColorImage();
 	void testDecodeEncodeProbeData();
 public:
 	CPPUNIT_TEST_SUITE( TestIGTLinkUtilities );
 		CPPUNIT_TEST( testConstructor );
 		CPPUNIT_TEST( testDecodeEncodeImage );
+		CPPUNIT_TEST( testDecodeEncodeColorImage );
 		CPPUNIT_TEST( testDecodeEncodeProbeData );
 	CPPUNIT_TEST_SUITE_END();
 private:
 	int getValue(ssc::ImagePtr data, int x, int y, int z);
 	void setValue(vtkImageDataPtr data, int x, int y, int z, unsigned char val);
+	Eigen::Array3i getValue3i(ssc::ImagePtr data, int x, int y, int z);
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestIGTLinkUtilities );
 

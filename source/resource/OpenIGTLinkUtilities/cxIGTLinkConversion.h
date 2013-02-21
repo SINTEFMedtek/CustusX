@@ -66,7 +66,16 @@ public:
 	ssc::ProbeData decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ssc::ProbeData base);
 
 private:
-//	ProbePtr getValidProbe();
+	/** Filter that converts to RGB format based on a format string
+	  * of the form "RGBA" or any other ordering of these four letters,
+	  * the letters define the ordering of channels in the input.
+	  */
+	vtkImageDataPtr createFilterFormat2RGB(QString format, vtkImageDataPtr input);
+	/** Filter that converts from a XYZW-format to RGB.
+	  * The input indexes are the indexes or red/green/blue in the input.
+	  * The alpha channel is discarded.
+	  */
+	vtkImageDataPtr createFilterAny2RGB(int R, int G, int B, vtkImageDataPtr input);
 };
 
 } //namespace cx

@@ -6,6 +6,39 @@
 #include "sscVolumeHelpers.h"
 #include "vtkImageData.h"
 
+/** Create a 2D RGBA test image with some variation
+  *
+  */
+vtkImageDataPtr createRGBATestImage()
+{
+	Eigen::Array3i dim(512,512,1);
+	int components = 4;
+	vtkImageDataPtr retval = ssc::generateVtkImageData(dim,
+	                                                   ssc::Vector3D(0.5,0.6,0.7),
+														255, components);
+	int scalarSize = dim[0]*dim[1]*dim[2]*components;
+
+	unsigned char* ptr = reinterpret_cast<unsigned char*>(retval->GetScalarPointer());
+
+	for (unsigned z=0; z<dim[2]; ++z)
+	{
+		for (unsigned y=0; y<dim[1]; ++y)
+		{
+			for (unsigned x=0; x<dim[0]; ++x)
+			{
+				ptr[0] = 255;       // red
+				ptr[1] = 0;         // green
+				ptr[2] = x / 2;     // blue
+				ptr[3] = 100;		// alpha
+				ptr+=components;
+			}
+		}
+	}
+
+	return retval;
+}
+
+
 void TestIGTLinkUtilities::setUp()
 {
 //	cx::DataLocations::setTestMode();
@@ -26,6 +59,13 @@ int TestIGTLinkUtilities::getValue(ssc::ImagePtr data, int x, int y, int z)
 	vtkImageDataPtr volume = data->getGrayScaleBaseVtkImageData();
 	int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z));
 	return val;
+}
+
+Eigen::Array3i TestIGTLinkUtilities::getValue3i(ssc::ImagePtr data, int x, int y, int z)
+{
+	vtkImageDataPtr volume = data->getBaseVtkImageData();
+	unsigned char* ptr = reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z));
+	return Eigen::Array3i(ptr[0], ptr[1], ptr[2]);
 }
 
 void TestIGTLinkUtilities::setValue(vtkImageDataPtr data, int x, int y, int z, unsigned char val)
@@ -72,8 +112,39 @@ void TestIGTLinkUtilities::testDecodeEncodeImage()
 		CPPUNIT_ASSERT(this->getValue(input, p[0], p[1], p[2]) == val);
 		CPPUNIT_ASSERT(this->getValue(output, p[0], p[1], p[2]) == val);
 	}
+}
 
+void TestIGTLinkUtilities::testDecodeEncodeColorImage()
+{
+	typedef std::vector<std::pair<Eigen::Array3i, Eigen::Array3i> > ValVectorType;
+	ValVectorType values;
+	values.push_back(std::make_pair(Eigen::Array3i(  0,   0,  0), Eigen::Array3i(255,  0,  0)));
+	values.push_back(std::make_pair(Eigen::Array3i(100,  50,  0), Eigen::Array3i(255,  0, 50)));
+	values.push_back(std::make_pair(Eigen::Array3i(124,  20,  0), Eigen::Array3i(255,  0, 62)));
 
+	QDateTime time = QDateTime::currentDateTime();
+	vtkImageDataPtr rawImage = createRGBATestImage();
+
+	ssc::ImagePtr input(new ssc::Image("my_uid", rawImage));
+	input->setAcquisitionTime(time);
+
+	cx::IGTLinkConversion converter;
+	cx::IGTLinkImageMessage::Pointer msg = converter.encode(input);
+	ssc::ImagePtr output = converter.decode(msg);
+
+	CPPUNIT_ASSERT(output);
+	CPPUNIT_ASSERT(time == output->getAcquisitionTime());
+	CPPUNIT_ASSERT(input->getUid() == output->getUid());
+	CPPUNIT_ASSERT(ssc::similar(Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()), Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions())));
+	CPPUNIT_ASSERT(ssc::similar(ssc::Vector3D(input->getBaseVtkImageData()->GetSpacing()), ssc::Vector3D(output->getBaseVtkImageData()->GetSpacing())));
+
+	for (ValVectorType::iterator iter=values.begin(); iter!=values.end(); ++iter)
+	{
+		Eigen::Array3i p = iter->first;
+		Eigen::Array3i val = iter->second;
+		CPPUNIT_ASSERT(ssc::similar(this->getValue3i(input, p[0], p[1], p[2]), val));
+		CPPUNIT_ASSERT(ssc::similar(this->getValue3i(output, p[0], p[1], p[2]), val));
+	}
 }
 
 void TestIGTLinkUtilities::testDecodeEncodeProbeData()
