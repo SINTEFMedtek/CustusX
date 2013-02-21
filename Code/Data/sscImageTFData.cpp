@@ -36,6 +36,7 @@
 #include "sscVector3D.h"
 #include "sscImageTF3D.h"
 #include "sscLogger.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -251,13 +252,6 @@ void ImageTFData::unsignedCT(bool onLoad)
 void ImageTFData::shift(int val)
 {
 	int modify = val;
-//	//Signed after all. Don't do anyting
-//	if (this->getScalarMin() < 0)
-//		return;
-
-//	int modify = -1024;
-//	if(onLoad)
-//		modify = 1024;
 
 	//	ssc::OpacityMapPtr opacityMap = this->getOpacityMap();
 	OpacityMapPtr newOpacipyMap(new IntIntMap());
@@ -278,7 +272,7 @@ void ImageTFData::shift(int val)
 //	emit changed();
 
 	this->colorMapChanged();
-	this->alphaLLRChanged();
+	//this->alphaLLRChanged(); // dont do this - it resets the 3D transfer function, clearing the opacity map
 	emit changed();
 }
 
