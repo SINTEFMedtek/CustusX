@@ -18,6 +18,7 @@
 #include "sscTool.h"
 #include "sscImageAlgorithms.h"
 #include "sscRegistrationTransform.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -122,6 +123,7 @@ double DoubleDataAdapter2DLevel::getValueInternal() const
 }
 void DoubleDataAdapter2DLevel::setValueInternal(double val)
 {
+	SSC_LOG("");
   mImage->getLookupTable2D()->setLevel(val);
 }
 ssc::DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
