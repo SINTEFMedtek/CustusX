@@ -35,6 +35,7 @@
 
 #include "sscVector3D.h"
 #include "sscImageTF3D.h"
+#include "sscLogger.h"
 
 namespace ssc
 {
@@ -446,15 +447,12 @@ void ImageTFData::removeAlphaPoint(int alphaPosition)
 	mOpacityMapPtr->erase(alphaPosition);
 	emit changed();
 }
-//void ImageTFData::setAlphaValue(int alphaPosition, int alphaValue)
-//{
-//  (*mOpacityMapPtr)[alphaPosition] = alphaValue;
-//  emit changed();
-//}
-//int ImageTFData::getAlphaValue(int alphaPosition)
-//{
-//  return (*mOpacityMapPtr)[alphaPosition];
-//}
+void ImageTFData::moveAlphaPoint(int oldpos, int newpos, int alphaValue)
+{
+	mOpacityMapPtr->erase(oldpos);
+	(*mOpacityMapPtr)[newpos] = alphaValue;
+	emit changed();
+}
 void ImageTFData::addColorPoint(int colorPosition, QColor colorValue)
 {
 	(*mColorMapPtr)[colorPosition] = colorValue;
@@ -468,12 +466,14 @@ void ImageTFData::removeColorPoint(int colorPosition)
 	this->colorMapChanged();
 	emit changed();
 }
-//void ImageTFData::setColorValue(int colorPosition, QColor colorValue)
-//{
-//  (*mColorMapPtr)[colorPosition] = colorValue;
-//  this->colorMapChanged();
-//  emit changed();
-//}
+
+void ImageTFData::moveColorPoint(int oldpos, int newpos, QColor colorValue)
+{
+	mColorMapPtr->erase(oldpos);
+	(*mColorMapPtr)[newpos] = colorValue;
+	this->colorMapChanged();
+	emit changed();
+}
 
 void ImageTFData::fillColorTFFromMap(vtkColorTransferFunctionPtr tf)
 {

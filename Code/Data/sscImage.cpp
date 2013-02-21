@@ -41,6 +41,9 @@
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "sscUtilHelpers.h"
+#include "sscVolumeHelpers.h"
+
+#include "sscUnsignedDerivedImage.h"
 
 typedef vtkSmartPointer<vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
@@ -112,6 +115,23 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	this->resetTransferFunctions();
 }
 
+
+ImagePtr Image::getUnsigned(ImagePtr self)
+{
+	SSC_ASSERT(this==self.get());
+
+	if (!mUnsigned)
+	{
+		// self is unsigned: return self
+		if (this->getBaseVtkImageData()->GetScalarTypeMin() >= 0)
+			return self;
+		else // signed: create unsigned adapter
+			mUnsigned = UnsignedDerivedImage::create(self);
+	}
+
+	return mUnsigned;
+}
+
 void Image::resetTransferFunctions(bool _2D, bool _3D)
 {
 	//messageManager()->sendDebug("Image::reset called");
@@ -134,8 +154,13 @@ void Image::resetTransferFunctions(bool _2D, bool _3D)
 
 void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D)
 {
+	this->blockSignals(true); // avoid emitting two transferFunctionsChanged() for one call.
+
 	this->resetTransferFunction(imageTransferFunctions3D);
 	this->resetTransferFunction(imageLookupTable2D);
+
+	this->blockSignals(false);
+	emit transferFunctionsChanged();
 }
 
 void Image::resetTransferFunction(ImageLUT2DPtr imageLookupTable2D)

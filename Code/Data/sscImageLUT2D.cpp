@@ -32,6 +32,7 @@
 #include <vtkColorTransferFunction.h>
 
 #include "sscVector3D.h"
+#include "sscLogger.h"
 
 namespace ssc
 {
@@ -62,7 +63,7 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	this->setWindow(0.8*srange);
 	this->transferFunctionsChangedSlot();//Need to update transfer function after setting window/level
 
-	connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
+//	connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged())); called by the slot.
 	connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
 }
 

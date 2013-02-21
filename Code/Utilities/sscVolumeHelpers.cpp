@@ -99,7 +99,6 @@ vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim,
 
 	return data;
 }
-
 /**Convert the input image to the smallest unsigned format.
  *
  * CT images are always shifted +1024 and converted.
