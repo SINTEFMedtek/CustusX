@@ -223,13 +223,19 @@ QString StateService::getDefaultGrabberServer()
 	QString filename = "GrabberServer";
 	QString postfix = " --auto";
 	QString result;
+	// run from installed folder
 	result = this->checkGrabberServerExist(qApp->applicationDirPath(), filename, postfix);
 	if (!result.isEmpty())
-	return result;
-//	result = this->checkGrabberServerExist(DataLocations::getRootConfigPath() + "/../install/Apple", filename, postfix);
+		return result;
+	//	result = this->checkGrabberServerExist(DataLocations::getRootConfigPath() + "/../install/Apple", filename, postfix);
+	// run from build folder
 	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../grabberServer", filename, postfix);
 	if (!result.isEmpty())
-	return result;
+		return result;
+	// run from test folders
+	result = this->checkGrabberServerExist(DataLocations::getBundlePath() + "/../../../apps/grabberServer", filename, postfix);
+	if (!result.isEmpty())
+		return result;
 	return "";
 #elif WIN32
 	QString result;
@@ -302,10 +308,15 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/showOrientationAnnotation", true);
 
 	QStringList grabber = this->getDefaultGrabberServer().split(" ");
+//	std::cout << "def grabber: " << grabber.join("--") << std::endl;
 	this->fillDefault("IGTLink/localServer", grabber[0]);
 	grabber.pop_front();
 	if (grabber.size()>0)
+	{
+//		std::cout << "def grabber2: " << grabber.join("--") << std::endl;
 		this->fillDefault("IGTLink/arguments", grabber.join(" "));
+		this->fillDefault("IGTLink/directLinkArgumentHistory", QStringList() << grabber.join(" "));
+	}
 
 	this->fillDefault("IGTLink/initScript", this->getDefaultGrabberInitScript());
 
