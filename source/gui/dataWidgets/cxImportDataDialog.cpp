@@ -22,6 +22,8 @@
 #include "cxPatientService.h"
 #include "cxViewManager.h"
 #include "sscVolumeHelpers.h"
+#include "sscImageTF3D.h"
+#include "sscImageLUT2D.h"
 
 namespace cx
 {
@@ -245,13 +247,13 @@ void ImportDataDialog::convertToUnsigned()
 	if (!image)
 		return;
 
-//		vtkImageDataPtr img0 = image->getBaseVtkImageData();
-//		std::cout << "type " << img0->GetScalarTypeAsString() << " -- " << img0->GetScalarType() << std::endl;
-//		std::cout << "range " << img0->GetScalarTypeMin() << " -- " << img0->GetScalarTypeMax() << std::endl;
+	ssc::ImagePtr converted = ssc::convertImageToUnsigned(image);
 
-	vtkImageDataPtr img = ssc::convertImageToUnsigned(image)->getBaseVtkImageData();
+	image->setVtkImageData(converted->getBaseVtkImageData());
 
-	image->setVtkImageData(img);
+	ssc::ImageTF3DPtr TF3D = converted->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData());
+	ssc::ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy(image->getBaseVtkImageData());
+	image->resetTransferFunction(TF3D, LUT2D);
 	ssc::dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());
 }
 
