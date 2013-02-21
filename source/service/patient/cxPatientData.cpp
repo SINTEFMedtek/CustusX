@@ -421,7 +421,7 @@ ssc::DataPtr PatientData::importData(QString fileName, QString &infoText)
 		}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
 
-	data->setShading(true);
+	data->setShadingOn(true);
 
 	QDir patientDataDir(mActivePatientFolder);
 
