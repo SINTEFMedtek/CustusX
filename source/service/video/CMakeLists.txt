@@ -5,12 +5,12 @@
 SET( CX_QT_MOC_HEADER_FILES
 	cxVideoService.h
     cxVideoConnection.h
-    cxOpenIGTLinkClient.h
-    cxOpenIGTLinkRTSource.h
+    cxGrabberVideoSource.h
     cxPlaybackUSAcquisitionVideo.h
-#    cxOpenIGTLinkDirectLinkRTSource.h
-    cxGrabberDirectLinkThread.h
-    cxIGTLinkClientBase.h
+
+    cxGrabberReceiveThread.h
+    cxGrabberReceiveThreadDirectLink.h
+	cxGrabberReceiveThreadIGTLink.h
 )
 
 SET (cxVideoService_SOURCE
@@ -18,22 +18,17 @@ SET (cxVideoService_SOURCE
 	cxVideoService.cpp
     cxVideoConnection.h
     cxVideoConnection.cpp
-    cxOpenIGTLinkClient.h
-    cxOpenIGTLinkClient.cpp
-    cxOpenIGTLinkRTSource.h
-    cxOpenIGTLinkRTSource.cpp
+    cxGrabberVideoSource.h
+    cxGrabberVideoSource.cpp
     cxPlaybackUSAcquisitionVideo.h
     cxPlaybackUSAcquisitionVideo.cpp
-#    cxOpenIGTLinkDirectLinkRTSource.cpp
-#    cxOpenIGTLinkDirectLinkRTSource.h
-    cxGrabberDirectLinkThread.h
-    cxGrabberDirectLinkThread.cpp
-    cxIGTLinkClientBase.h
-    cxIGTLinkClientBase.cpp
-#    ../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.h
-#    ../../../modules/grabberCommon/cxIGTLinkUSStatusMessage.cpp
-#    ../../../modules/grabberCommon/igtl_us_status.h
-#    ../../../modules/grabberCommon/igtl_us_status.c
+
+    cxGrabberReceiveThread.h
+    cxGrabberReceiveThread.cpp
+	cxGrabberReceiveThreadIGTLink.h
+	cxGrabberReceiveThreadIGTLink.cpp
+    cxGrabberReceiveThreadDirectLink.h
+    cxGrabberReceiveThreadDirectLink.cpp
 )
 
 include_directories(

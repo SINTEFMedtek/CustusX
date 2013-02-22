@@ -11,9 +11,8 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-
-#ifndef CXOPENIGTLINKCLIENT_H_
-#define CXOPENIGTLINKCLIENT_H_
+#ifndef CXGRABBERRECEIVETHREADIGTLINK_H_
+#define CXGRABBERRECEIVETHREADIGTLINK_H_
 
 #include <vector>
 #include <QtCore>
@@ -25,7 +24,7 @@ class QTcpSocket;
 #include "igtlImageMessage.h"
 #include "cxRenderTimer.h"
 #include "cxIGTLinkUSStatusMessage.h"
-#include "cxIGTLinkClientBase.h"
+#include "cxGrabberReceiveThread.h"
 
 namespace cx
 {
@@ -35,20 +34,20 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
+typedef boost::shared_ptr<class GrabberReceiveThreadIGTLink> GrabberReceiveThreadIGTLinkPtr;
 
 /**\brief Client thread for OpenIGTLink messaging.
  * \ingroup cxServiceVideo
  *
  *
  */
-class IGTLinkClient: public IGTLinkClientBase
+class GrabberReceiveThreadIGTLink: public GrabberReceiveThread
 {
 Q_OBJECT
 public:
-	IGTLinkClient(QString address, int port, QObject* parent = NULL);
+	GrabberReceiveThreadIGTLink(QString address, int port, QObject* parent = NULL);
 	virtual QString hostDescription() const; // threadsafe
-	~IGTLinkClient() {}
+	~GrabberReceiveThreadIGTLink() {}
 
 protected:
 	virtual void run();
@@ -65,12 +64,16 @@ private:
 	bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
 	bool readOneMessage();
+	void addToQueue(IGTLinkUSStatusMessage::Pointer msg);
+	void addToQueue(IGTLinkImageMessage::Pointer msg);
 
 	bool mHeadingReceived;
 	QString mAddress;
 	int mPort;
 	QTcpSocket* mSocket;
 	igtl::MessageHeader::Pointer mHeaderMsg;
+	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
+
 };
 
 /**
@@ -78,4 +81,4 @@ private:
  */
 } //end namespace cx
 
-#endif /* CXOPENIGTLINKCLIENT_H_ */
+#endif /* CXGRABBERRECEIVETHREADIGTLINK_H_ */

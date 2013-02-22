@@ -28,6 +28,8 @@ class QTcpSocket;
 #include "cxRenderTimer.h"
 #include "cxIGTLinkUSStatusMessage.h"
 #include "cxIGTLinkImageMessage.h"
+#include "sscImage.h"
+#include "sscTool.h"
 
 namespace cx
 {
@@ -51,25 +53,28 @@ public:
   double mCenter;
 };
 
-typedef boost::shared_ptr<class IGTLinkClientBase> IGTLinkClientBasePtr;
+typedef boost::shared_ptr<class GrabberReceiveThread> GrabberReceiveThreadPtr;
 
-/**\brief Base class Client thread for OpenIGTLink messaging.
+/** \brief Base class for receiving messages from grabber.
+ *
+ * Subclass to implement for a specific protocol.
+ * Supported messages:
+ *  - ssc::Image : contains vtkImageData, timestamp, uid, all else is discarded.
+ *  - ssc::ProbeData : contains sector and image definition, temporal cal is discarded.
+ *
  * \ingroup cxServiceVideo
- *
- *  \date Oct 11, 2012
- *  \author christiana
- *
+ * \date Oct 11, 2012
+ * \author christiana
  */
-class IGTLinkClientBase: public QThread
+class GrabberReceiveThread: public QThread
 {
 Q_OBJECT
 public:
-	IGTLinkClientBase(QObject* parent = NULL);
-	virtual ~IGTLinkClientBase() {}
-	virtual IGTLinkImageMessage::Pointer getLastImageMessage(); // threadsafe
-	virtual IGTLinkUSStatusMessage::Pointer getLastSonixStatusMessage(); // threadsafe
+	GrabberReceiveThread(QObject* parent = NULL);
+	virtual ~GrabberReceiveThread() {}
+	virtual ssc::ImagePtr getLastImageMessage(); // threadsafe
+	virtual ssc::ProbeData getLastSonixStatusMessage(); // threadsafe
 	virtual QString hostDescription() const = 0; // threadsafe
-//	void stop(); ///< use instead of quit()
 
 signals:
 	void imageReceived();
@@ -77,9 +82,6 @@ signals:
 	void fps(double);
 	void connected(bool on);
 	void stopInternal();
-
-//protected slots:
-//	virtual void stopSlot() {}
 
 protected:
 	cx::CyclicActionTimer mFPSTimer;
@@ -89,15 +91,15 @@ protected:
 	 * not synched, e.g. the Ultrasonix scanner
 	 * \param[in] imgMsg Incoming image message
 	 */
-	void addImageToQueue(IGTLinkImageMessage::Pointer imgMsg);
-	void addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg);
-	void calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg);
+	void addImageToQueue(ssc::ImagePtr imgMsg);
+	void addSonixStatusToQueue(ssc::ProbeData msg);
+	void calibrateTimeStamp(ssc::ImagePtr imgMsg);
 
 private:
 	QMutex mImageMutex;
 	QMutex mSonixStatusMutex;
-	std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue;
-	std::list<IGTLinkUSStatusMessage::Pointer> mMutexedSonixStatusMessageQueue;
+	std::list<ssc::ImagePtr> mMutexedImageMessageQueue;
+	std::list<ssc::ProbeData> mMutexedSonixStatusMessageQueue;
 
 	double mLastReferenceTimestampDiff;
 	bool mGeneratingTimeCalibration;

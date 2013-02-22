@@ -24,7 +24,7 @@
 #include "cxStateService.h"
 #include "cxPatientService.h"
 #include "cxDataLocations.h"
-#include "cxOpenIGTLinkRTSource.h"
+#include "cxGrabberVideoSource.h"
 #include "cxVideoService.h"
 #include "cxVideoConnection.h"
 #include "sscReconstructManager.h"
@@ -85,8 +85,8 @@ void TestAcqController::initialize()
 			"/testing/"
 			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
 
+	qApp->processEvents(); // wait for stateservice to finish init of application states - needed before load patient.
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
-
 	mAcquisitionData.reset(new cx::AcquisitionData(this->createReconstructionManager()));
 
 	mAcquisitionBase.reset(new cx::Acquisition(mAcquisitionData));
