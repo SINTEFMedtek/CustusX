@@ -24,7 +24,7 @@ class QTcpSocket;
 #include "igtlClientSocket.h"
 #include "igtlImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
-#include "cxIGTLinkClientBase.h"
+#include "cxGrabberReceiveThread.h"
 #include "cxImageSender.h"
 #include "cxGrabberSender.h"
 
@@ -44,7 +44,7 @@ typedef boost::shared_ptr<class GrabberDirectLinkThread> GrabberDirectLinkThread
  *  \date Oct 11, 2012
  *  \author christiana
  */
-class GrabberDirectLinkThread: public IGTLinkClientBase
+class GrabberDirectLinkThread: public GrabberReceiveThread
 {
 Q_OBJECT
 public:
@@ -57,7 +57,6 @@ protected:
 private slots:
 	void newImageSlot();
 	void newUSStatusSlot();
-//	void stopSlot();
 
 private:
 	std::map<QString, QString> mArguments;

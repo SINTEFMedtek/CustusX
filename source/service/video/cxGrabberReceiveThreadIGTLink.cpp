@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxOpenIGTLinkClient.h"
+#include "cxGrabberReceiveThreadIGTLink.h"
 
 #include "igtlOSUtil.h"
 #include "igtlMessageHeader.h"
@@ -24,103 +24,104 @@
 
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
+#include "cxIGTLinkConversion.h"
 
-int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
-{
-	std::cerr << "Receiving TRANSFORM data type." << std::endl;
+//int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
+//{
+//	std::cerr << "Receiving TRANSFORM data type." << std::endl;
 
-	// Create a message buffer to receive transform data
-	igtl::TransformMessage::Pointer transMsg;
-	transMsg = igtl::TransformMessage::New();
-	transMsg->SetMessageHeader(header);
-	transMsg->AllocatePack();
+//	// Create a message buffer to receive transform data
+//	igtl::TransformMessage::Pointer transMsg;
+//	transMsg = igtl::TransformMessage::New();
+//	transMsg->SetMessageHeader(header);
+//	transMsg->AllocatePack();
 
-	// Receive transform data from the socket
-	socket->Receive(transMsg->GetPackBodyPointer(), transMsg->GetPackBodySize());
-	// Deserialize the transform data
-	// If you want to do a CRC check, call Unpack(1).
-	// If you want to skip CRC check, call Unpack() without argument.
-	int c = transMsg->Unpack();
+//	// Receive transform data from the socket
+//	socket->Receive(transMsg->GetPackBodyPointer(), transMsg->GetPackBodySize());
+//	// Deserialize the transform data
+//	// If you want to do a CRC check, call Unpack(1).
+//	// If you want to skip CRC check, call Unpack() without argument.
+//	int c = transMsg->Unpack();
 
-	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
-	{
-		// Retrive the transform data
-		igtl::Matrix4x4 matrix;
-		transMsg->GetMatrix(matrix);
-		igtl::PrintMatrix(matrix);
-		return 1;
-	}
+//	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+//	{
+//		// Retrive the transform data
+//		igtl::Matrix4x4 matrix;
+//		transMsg->GetMatrix(matrix);
+//		igtl::PrintMatrix(matrix);
+//		return 1;
+//	}
 
-	return 0;
-}
+//	return 0;
+//}
 
-int ReceivePosition(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
-{
-	std::cerr << "Receiving POSITION data type." << std::endl;
+//int ReceivePosition(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
+//{
+//	std::cerr << "Receiving POSITION data type." << std::endl;
 
-	// Create a message buffer to receive transform data
-	igtl::PositionMessage::Pointer positionMsg;
-	positionMsg = igtl::PositionMessage::New();
-	positionMsg->SetMessageHeader(header);
-	positionMsg->AllocatePack();
+//	// Create a message buffer to receive transform data
+//	igtl::PositionMessage::Pointer positionMsg;
+//	positionMsg = igtl::PositionMessage::New();
+//	positionMsg->SetMessageHeader(header);
+//	positionMsg->AllocatePack();
 
-	// Receive position position data from the socket
-	socket->Receive(positionMsg->GetPackBodyPointer(), positionMsg->GetPackBodySize());
-	// Deserialize the transform data
-	// If you want to do a CRC check, call Unpack(1).
-	// If you want to skip CRC check, call Unpack() without argument.
-	int c = positionMsg->Unpack();
+//	// Receive position position data from the socket
+//	socket->Receive(positionMsg->GetPackBodyPointer(), positionMsg->GetPackBodySize());
+//	// Deserialize the transform data
+//	// If you want to do a CRC check, call Unpack(1).
+//	// If you want to skip CRC check, call Unpack() without argument.
+//	int c = positionMsg->Unpack();
 
-	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
-	{
-		// Retrive the transform data
-		float position[3];
-		float quaternion[4];
+//	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+//	{
+//		// Retrive the transform data
+//		float position[3];
+//		float quaternion[4];
 
-		positionMsg->GetPosition(position);
-		positionMsg->GetQuaternion(quaternion);
+//		positionMsg->GetPosition(position);
+//		positionMsg->GetQuaternion(quaternion);
 
-		std::cerr << "position   = (" << position[0] << ", " << position[1] << ", " << position[2] << ")" << std::endl;
-		std::cerr << "quaternion = (" << quaternion[0] << ", " << quaternion[1] << ", " << quaternion[2] << ", "
-						<< quaternion[3] << ")" << std::endl << std::endl;
+//		std::cerr << "position   = (" << position[0] << ", " << position[1] << ", " << position[2] << ")" << std::endl;
+//		std::cerr << "quaternion = (" << quaternion[0] << ", " << quaternion[1] << ", " << quaternion[2] << ", "
+//						<< quaternion[3] << ")" << std::endl << std::endl;
 
-		return 1;
-	}
+//		return 1;
+//	}
 
-	return 0;
-}
+//	return 0;
+//}
 
-int ReceiveStatus(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
-{
+//int ReceiveStatus(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
+//{
 
-	std::cerr << "Receiving STATUS data type." << std::endl;
+//	std::cerr << "Receiving STATUS data type." << std::endl;
 
-	// Create a message buffer to receive transform data
-	igtl::StatusMessage::Pointer statusMsg;
-	statusMsg = igtl::StatusMessage::New();
-	statusMsg->SetMessageHeader(header);
-	statusMsg->AllocatePack();
+//	// Create a message buffer to receive transform data
+//	igtl::StatusMessage::Pointer statusMsg;
+//	statusMsg = igtl::StatusMessage::New();
+//	statusMsg->SetMessageHeader(header);
+//	statusMsg->AllocatePack();
 
-	// Receive transform data from the socket
-	socket->Receive(statusMsg->GetPackBodyPointer(), statusMsg->GetPackBodySize());
-	// Deserialize the transform data
-	// If you want to do a CRC check, call Unpack(1).
-	// If you want to skip CRC check, call Unpack() without argument.
-	int c = statusMsg->Unpack();
+//	// Receive transform data from the socket
+//	socket->Receive(statusMsg->GetPackBodyPointer(), statusMsg->GetPackBodySize());
+//	// Deserialize the transform data
+//	// If you want to do a CRC check, call Unpack(1).
+//	// If you want to skip CRC check, call Unpack() without argument.
+//	int c = statusMsg->Unpack();
 
-	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
-	{
-		std::cerr << "========== STATUS ==========" << std::endl;
-		std::cerr << " Code      : " << statusMsg->GetCode() << std::endl;
-		std::cerr << " SubCode   : " << statusMsg->GetSubCode() << std::endl;
-		std::cerr << " Error Name: " << statusMsg->GetErrorName() << std::endl;
-		std::cerr << " Status    : " << statusMsg->GetStatusString() << std::endl;
-		std::cerr << "============================" << std::endl;
-	}
+//	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+//	{
+//		std::cerr << "========== STATUS ==========" << std::endl;
+//		std::cerr << " Code      : " << statusMsg->GetCode() << std::endl;
+//		std::cerr << " SubCode   : " << statusMsg->GetSubCode() << std::endl;
+//		std::cerr << " Error Name: " << statusMsg->GetErrorName() << std::endl;
+//		std::cerr << " Status    : " << statusMsg->GetStatusString() << std::endl;
+//		std::cerr << "============================" << std::endl;
+//	}
 
-	return 0;
+//	return 0;
 
-}
+//}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -129,13 +130,13 @@ int ReceiveStatus(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Poin
 namespace cx
 {
 
-IGTLinkClient::IGTLinkClient(QString address, int port, QObject* parent) :
-		IGTLinkClientBase(parent), mHeadingReceived(false), mAddress(address), mPort(port)
+GrabberReceiveThreadIGTLink::GrabberReceiveThreadIGTLink(QString address, int port, QObject* parent) :
+		GrabberReceiveThread(parent), mHeadingReceived(false), mAddress(address), mPort(port)
 {
 //  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
 }
 
-void IGTLinkClient::run()
+void GrabberReceiveThreadIGTLink::run()
 {
 //  std::cout << "client::run thread: " << QThread::currentThread() << std::endl;
 	//std::cout << "run client thread, connecting to " << mAddress << " " << mPort << std::endl;
@@ -174,33 +175,33 @@ void IGTLinkClient::run()
 	delete mSocket;
 }
 
-QString IGTLinkClient::hostDescription() const
+QString GrabberReceiveThreadIGTLink::hostDescription() const
 {
 	return mAddress + ":" + qstring_cast(mPort);
 }
 
-void IGTLinkClient::hostFoundSlot()
+void GrabberReceiveThreadIGTLink::hostFoundSlot()
 {
 	ssc::messageManager()->sendInfo("Host found: " + this->hostDescription());
 }
-void IGTLinkClient::connectedSlot()
+void GrabberReceiveThreadIGTLink::connectedSlot()
 {
 	ssc::messageManager()->sendSuccess("Connected to host " + this->hostDescription());
 	emit connected(true);
 }
-void IGTLinkClient::disconnectedSlot()
+void GrabberReceiveThreadIGTLink::disconnectedSlot()
 {
 	ssc::messageManager()->sendInfo("Disconnected to host " + this->hostDescription());
 	emit connected(false);
 }
-void IGTLinkClient::errorSlot(QAbstractSocket::SocketError socketError)
+void GrabberReceiveThreadIGTLink::errorSlot(QAbstractSocket::SocketError socketError)
 {
 	ssc::messageManager()->sendError(
 					"Socket error [Host=" + this->hostDescription() + ", Code=" + socketError + "]\n"
 									+ mSocket->errorString());
 }
 
-void IGTLinkClient::readyReadSlot()
+void GrabberReceiveThreadIGTLink::readyReadSlot()
 {
 	// read messages until one fails
 	while (this->readOneMessage());
@@ -212,7 +213,7 @@ void IGTLinkClient::readyReadSlot()
  * Return false if there was not enough data to
  * read the entire message.
  */
-bool IGTLinkClient::readOneMessage()
+bool GrabberReceiveThreadIGTLink::readOneMessage()
 {
 
 //  std::cout << "tick " << std::endl;
@@ -279,7 +280,7 @@ bool IGTLinkClient::readOneMessage()
 	return true;
 }
 
-bool IGTLinkClient::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
+bool GrabberReceiveThreadIGTLink::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
 	IGTLinkUSStatusMessage::Pointer msg;
 	msg = IGTLinkUSStatusMessage::New();
@@ -298,7 +299,7 @@ bool IGTLinkClient::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::
 	int c = msg->Unpack();
 	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
 	{
-		this->addSonixStatusToQueue(msg);
+		this->addToQueue(msg);
 
 		return true;
 	}
@@ -307,7 +308,7 @@ bool IGTLinkClient::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::
 	return true;
 }
 
-bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
+bool GrabberReceiveThreadIGTLink::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
 	// Create a message buffer to receive transform data
 	IGTLinkImageMessage::Pointer imgMsg;
@@ -331,12 +332,32 @@ bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointe
 
 	if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
 	{
-		this->addImageToQueue(imgMsg);
+		this->addToQueue(imgMsg);
 		return true;
 	}
 
 	std::cout << "body crc failed!" << std::endl;
 	return true;
+}
+
+void GrabberReceiveThreadIGTLink::addToQueue(IGTLinkUSStatusMessage::Pointer msg)
+{
+	// set temporary, then assume the image adder will pass this message on.
+	mUnsentUSStatusMessage = msg;
+}
+
+void GrabberReceiveThreadIGTLink::addToQueue(IGTLinkImageMessage::Pointer msg)
+{
+	IGTLinkConversion converter;
+	this->addImageToQueue(converter.decode(msg));
+
+	// if us status not sent, do it here
+	if (mUnsentUSStatusMessage)
+	{
+		ssc::ProbeData probeData;
+		this->addSonixStatusToQueue(converter.decode(mUnsentUSStatusMessage, msg, probeData));
+		mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
+	}
 }
 
 } //end namespace cx

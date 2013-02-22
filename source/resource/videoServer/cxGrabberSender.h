@@ -13,6 +13,8 @@
 #include <qtcpsocket.h>
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
+#include "sscImage.h"
+#include "sscTool.h"
 
 namespace cx
 {
@@ -38,6 +40,12 @@ public:
 	/**Send an US status message, NOT packed
 	 */
 	virtual void send(IGTLinkUSStatusMessage::Pointer msg) = 0;
+	/**Send an image message, NOT packed.
+	 */
+	virtual void send(ssc::ImagePtr msg) = 0;
+	/**Send an US status message, NOT packed
+	 */
+	virtual void send(ssc::ProbeData msg) = 0;
 };
 typedef boost::shared_ptr<GrabberSender> GrabberSenderPtr;
 
@@ -53,6 +61,8 @@ public:
 	bool isReady() const;
 	virtual void send(IGTLinkImageMessage::Pointer msg);
 	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
+	virtual void send(ssc::ImagePtr msg);
+	virtual void send(ssc::ProbeData msg);
 private:
 	QTcpSocket* mSocket;
 	int mMaxBufferSize;
@@ -72,17 +82,19 @@ public:
 	bool isReady() const;
 	virtual void send(IGTLinkImageMessage::Pointer msg);
 	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
+	virtual void send(ssc::ImagePtr msg);
+	virtual void send(ssc::ProbeData msg);
 
-	IGTLinkImageMessage::Pointer popImage();
-	IGTLinkUSStatusMessage::Pointer popUSStatus();
+	ssc::ImagePtr popImage();
+	ssc::ProbeData popUSStatus();
 
 signals:
 	void newImage();
 	void newUSStatus();
 private:
-	IGTLinkImageMessage::Pointer mImage;
-	IGTLinkUSStatusMessage::Pointer mUSStatus;
-
+	ssc::ImagePtr mImage;
+	ssc::ProbeData mUSStatus;
+	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 };
 typedef boost::shared_ptr<GrabberSenderDirectLink> GrabberSenderDirectLinkPtr;
 
