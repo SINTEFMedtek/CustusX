@@ -16,6 +16,8 @@
 #include "sscReconstructManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxProbeConfigWidget.h"
+#include "cxDisplayTimerWidget.h"
+
 
 namespace cx
 {

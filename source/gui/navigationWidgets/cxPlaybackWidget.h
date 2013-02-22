@@ -16,14 +16,12 @@
 #define CXPLAYBACKWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "cxPlaybackTime.h"
 #include "sscDoubleDataAdapterXml.h"
-#include <QSlider>
-#include "cxTimelineWidget.h"
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
 #include "sscVector3D.h"
 #include "sscRegistrationTransform.h"
+#include "cxPlaybackTime.h"
 
 namespace cx
 {
@@ -53,10 +51,7 @@ private slots:
 	void rewindSlot();
 
 	void toggleOpenSlot();
-//	void openSlot();
-//	void closeSlot();
 	void speedChangedSlot();
-//	void timeLineSliderValueChangedSlot(int val);
 	void timeLineWidgetValueChangedSlot();
 	void toolManagerInitializedSlot();
 	void toggleDetailsSlot();
@@ -76,7 +71,6 @@ private:
 	QLabel* mTotalLengthLabel;
 	QLabel* mStartTimeLabel;
 	bool mOpen;
-//	QSlider* mTimeLineSlider;
 	PlaybackTimePtr mTimer;
 	QAction* mPlayAction;
 	QAction* mOpenAction;

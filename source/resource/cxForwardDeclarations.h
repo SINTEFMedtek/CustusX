@@ -4,6 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include <QPointer>
 #include "sscForwardDeclarations.h"
+#include "vtkForwardDeclarations.h"
 
 /**\file cxForwardDeclarations.h
  *
@@ -11,8 +12,17 @@
  * full definitions of the ssc is needed.
  */
 
-namespace cx {
-//typedef boost::shared_ptr<class InriaRep2D> InriaRep2DPtr;
+namespace ssc
+{
+typedef boost::shared_ptr<class ImageImportVideoSource> ImageImportVideoSourcePtr;
+
+typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
+typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
+}
+
+namespace cx
+{
+
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 
 class View2D;
@@ -26,6 +36,9 @@ typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
 typedef QPointer<View3D> View3DQPtr;
 typedef QPointer<ssc::ViewWidget> ViewWidgetQPtr;
+
+typedef boost::shared_ptr<class UsReconstructionFileReader> UsReconstructionFileReaderPtr;
+
 
 } // namespace cx
 

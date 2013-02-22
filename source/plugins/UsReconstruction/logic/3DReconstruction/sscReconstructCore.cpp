@@ -31,6 +31,7 @@
 #include "sscPresetTransferFunctions3D.h"
 #include "sscTimeKeeper.h"
 #include "sscLogger.h"
+#include "sscUSFrameData.h"
 
 namespace ssc
 {

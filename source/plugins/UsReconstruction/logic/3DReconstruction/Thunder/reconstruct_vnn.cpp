@@ -19,6 +19,7 @@
 
 
 #include "reconstruct_vnn.h"
+#include "sscUSFrameData.h"
 
 #ifdef __APPLE__
 #include <OpenCL/OpenCL.h>

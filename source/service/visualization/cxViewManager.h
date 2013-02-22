@@ -38,7 +38,7 @@ class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class CyclicActionTimer> RenderTimerPtr;
+typedef boost::shared_ptr<class CyclicActionTimer> CyclicActionTimerPtr;
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 
 /**
@@ -143,7 +143,7 @@ public:
 	InteractiveClipperPtr getClipper();
 	InteractiveCropperPtr getCropper();
 
-	RenderTimerPtr getRenderTimer() { return mRenderTimer; }
+	CyclicActionTimerPtr getRenderTimer() { return mRenderTimer; }
 	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
@@ -226,7 +226,7 @@ protected:
 	QDateTime mLastFullRender;
     QDateTime mLastBeginRender;
 
-	RenderTimerPtr mRenderTimer;
+	CyclicActionTimerPtr mRenderTimer;
 
 	std::vector<ViewGroupPtr> mViewGroups;
 

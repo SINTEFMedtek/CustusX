@@ -18,6 +18,7 @@
 #include "sscUtilHelpers.h"
 #include "cxCreateProbeDataFromConfiguration.h"
 #include "sscVolumeHelpers.h"
+#include "sscUSFrameData.h"
 
 namespace cx
 {

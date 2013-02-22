@@ -16,7 +16,11 @@
 #ifndef CXDISPLAYTIMERWIDGET_H_
 #define CXDISPLAYTIMERWIDGET_H_
 
-#include <QtGui>
+#include <QWidget>
+#include <QDateTime>
+class QTimer;
+class QLabel;
+class QDateTime;
 
 namespace cx
 {

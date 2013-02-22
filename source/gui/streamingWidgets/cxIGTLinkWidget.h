@@ -8,7 +8,6 @@
 #include "sscDoubleWidgets.h"
 #include "sscView.h"
 #include "cxGrabberVideoSource.h"
-#include "cxRenderTimer.h"
 #include "sscFileSelectWidget.h"
 
 

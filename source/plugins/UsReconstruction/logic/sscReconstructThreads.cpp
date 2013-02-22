@@ -31,7 +31,6 @@
 #include "sscUtilHelpers.h"
 #include "cxCreateProbeDataFromConfiguration.h"
 #include "sscVolumeHelpers.h"
-#include "cxUsReconstructionFileReader.h"
 #include "sscPresetTransferFunctions3D.h"
 #include "cxToolManager.h"
 #include "sscManualTool.h"

@@ -16,13 +16,14 @@
 #define CXPLAYBACKTOOL_H_
 
 #include "sscTool.h"
-#include "sscToolManager.h"
-#include "cxPlaybackTime.h"
+//#include "sscToolManager.h"
 
 namespace cx
 {
 
 typedef boost::shared_ptr<class PlaybackTool> PlaybackToolPtr;
+typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+
 
 /**\brief A tool used during playback
  *

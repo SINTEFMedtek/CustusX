@@ -13,7 +13,6 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include "sscFileSelectWidget.h"
-#include "cxUsReconstructionFileReader.h"
 #include <cxTemporalCalibration.h>
 #include "cxUSAcqusitionWidget.h"
 

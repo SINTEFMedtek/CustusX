@@ -27,6 +27,8 @@ SET( CX_QT_MOC_HEADER_FILES
 )
 
 SET ( cxResource_SOURCE
+	cxForwardDeclarations.h
+
 	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
     algorithms/ItkVtkGlue/itkImageToVTKImageFilter.txx
     algorithms/ItkVtkGlue/itkVTKImageToImageFilter.h
@@ -79,7 +81,9 @@ SET ( cxResource_SOURCE
 	utilities/cxImageDataContainer.cpp
 	utilities/cxFileHelpers.h
 	utilities/cxFileHelpers.cpp
-	
+	utilities/cxUSReconstructInputData.h
+	utilities/cxUSReconstructInputData.cpp
+
 #	OpenIGTLinkUtilities/cxIGTLinkImageMessage.h
 #	OpenIGTLinkUtilities/cxIGTLinkImageMessage.cpp    
 #    OpenIGTLinkUtilities/cxIGTLinkUSStatusMessage.h

@@ -25,6 +25,7 @@
 #include "sscTypeConversions.h"
 #include "sscVolumeHelpers.h"
 #include "sscTimeKeeper.h"
+#include "sscUSFrameData.h"
 
 namespace ssc
 {
