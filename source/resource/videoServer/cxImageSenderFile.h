@@ -45,7 +45,6 @@ public:
 
 protected:
 private:
-//	QTcpSocket* mSocket;
 	GrabberSenderPtr mSender;
 	QTimer* mTimer;
 	int mCounter;
@@ -53,6 +52,10 @@ private:
 	StringMap mArguments;
 	std::vector<unsigned char> mTestData;
 	vtkImageImportPtr mImageImport;
+
+	boost::shared_ptr<class SplitFramesContainer> mDataSource;
+	int mCurrentFrame;
+	QString mRawUid; /// raw text to send as device name - excluding frame id
 	void setTestImage();
 private slots:
 	void tick();

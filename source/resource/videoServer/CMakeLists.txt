@@ -56,6 +56,8 @@ include_directories(
         ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
         ${CustusX3_SOURCE_DIR}/source/resource/settings
         ${CustusX3_BINARY_DIR}/source/resource/settings
+        ${CustusX3_SOURCE_DIR}/source/resource/utilities
+        ${CustusX3_SOURCE_DIR}/source/resource
         ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
         #"C:/Program Files/Microsoft SDKs/Windows/v7.1/Samples/multimedia/directshow/baseclasses"
         )
