@@ -7,14 +7,14 @@
 #include <QtGui>
 #include "sscDoubleWidgets.h"
 #include "sscView.h"
-#include "cxOpenIGTLinkRTSource.h"
+#include "cxGrabberVideoSource.h"
 #include "cxRenderTimer.h"
 #include "sscFileSelectWidget.h"
 
 
 namespace cx
 {
-typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
+typedef boost::shared_ptr<class IGTLinkClient> GrabberReceiveThreadIGTLinkPtr;
 typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
 
 

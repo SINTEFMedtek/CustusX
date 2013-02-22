@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxIGTLinkClientBase.h"
+#include "cxGrabberReceiveThread.h"
 #include "sscMessageManager.h"
 #include "sscVector3D.h"
 
@@ -20,7 +20,7 @@ namespace cx
 {
 
 
-IGTLinkClientBase::IGTLinkClientBase(QObject* parent) :
+GrabberReceiveThread::GrabberReceiveThread(QObject* parent) :
 		QThread(parent)
 {
 	mGeneratingTimeCalibration = false;
@@ -45,7 +45,7 @@ IGTLinkClientBase::IGTLinkClientBase(QObject* parent) :
 //	this->quit();
 //}
 
-void IGTLinkClientBase::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
+void GrabberReceiveThread::addImageToQueue(ssc::ImagePtr imgMsg)
 {
 	mFPSTimer.beginRender();
 	mFPSTimer.endRender();
@@ -59,11 +59,13 @@ void IGTLinkClientBase::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
 	//May need to test for other sources in the future.
 	//E.g. if we want to use timestamps from other scanners, like GE
 	bool calibrateMsgTimeStamp = false;
-	if(QString(imgMsg->GetDeviceName()).contains("Sonix", Qt::CaseInsensitive))
+	if(imgMsg->getUid().contains("Sonix", Qt::CaseInsensitive))
 	{
 		calibrateMsgTimeStamp = true;
 //		ssc::messageManager()->sendInfo("Calibrate time stamps");
-	} else {
+	}
+	else
+	{
 //		ssc::messageManager()->sendInfo("No time stamp calibration performed");
 	}
 
@@ -71,15 +73,7 @@ void IGTLinkClientBase::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
 	//Should only be needed if time stamp is set on another computer that is
 	//not synched with the one running this code: e.g. The Ultrasonix scanner
 	if (calibrateMsgTimeStamp)
-		calibrateTimeStamp(imgMsg);
-
-	// testcode?
-	//Get modified timestamp
-	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-	imgMsg->GetTimeStamp(timestamp);
-	double timestamp_ms = timestamp->GetTimeStamp() * 1000;
-	QDateTime timestamp_dt = QDateTime::fromMSecsSinceEpoch(timestamp_ms);
-	// end testcode
+		this->calibrateTimeStamp(imgMsg);
 
 //	std::cout << "Queue size: " << mMutexedImageMessageQueue.size()  ;//<< std::endl;
 //	std::cout << "\t diff: " << timestamp_dt.msecsTo(QDateTime::currentDateTime()) << std::endl;
@@ -98,7 +92,7 @@ void IGTLinkClientBase::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
 
 /** add the message to a thread-safe queue
  */
-void IGTLinkClientBase::addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer msg)
+void GrabberReceiveThread::addSonixStatusToQueue(ssc::ProbeData msg)
 {
 	QMutexLocker sentry(&mSonixStatusMutex);
 	mMutexedSonixStatusMessageQueue.push_back(msg);
@@ -109,12 +103,12 @@ void IGTLinkClientBase::addSonixStatusToQueue(IGTLinkUSStatusMessage::Pointer ms
 /** Threadsafe retrieval of last image message.
  *
  */
-IGTLinkImageMessage::Pointer IGTLinkClientBase::getLastImageMessage()
+ssc::ImagePtr GrabberReceiveThread::getLastImageMessage()
 {
 	QMutexLocker sentry(&mImageMutex);
 	if (mMutexedImageMessageQueue.empty())
-		return IGTLinkImageMessage::Pointer();
-	IGTLinkImageMessage::Pointer retval = mMutexedImageMessageQueue.front();
+		return ssc::ImagePtr();
+	ssc::ImagePtr retval = mMutexedImageMessageQueue.front();
 	mMutexedImageMessageQueue.pop_front();
 
 	// this happens when the main thread is busy. This is bad, but happens a lot during operation.
@@ -130,12 +124,12 @@ IGTLinkImageMessage::Pointer IGTLinkClientBase::getLastImageMessage()
 /** Threadsafe retrieval of last image message.
  *
  */
-IGTLinkUSStatusMessage::Pointer IGTLinkClientBase::getLastSonixStatusMessage()
+ssc::ProbeData GrabberReceiveThread::getLastSonixStatusMessage()
 {
 	QMutexLocker sentry(&mSonixStatusMutex);
 	if (mMutexedSonixStatusMessageQueue.empty())
-		return IGTLinkUSStatusMessage::Pointer();
-	IGTLinkUSStatusMessage::Pointer retval = mMutexedSonixStatusMessageQueue.front();
+		return ssc::ProbeData();
+	ssc::ProbeData retval = mMutexedSonixStatusMessageQueue.front();
 	mMutexedSonixStatusMessageQueue.pop_front();
 	return retval;
 }
@@ -145,12 +139,14 @@ IGTLinkUSStatusMessage::Pointer IGTLinkClientBase::getLastSonixStatusMessage()
  * Calibration is based on an average of several of the last messages.
  * The calibration is updated every 20-30 sec.
  */
-void IGTLinkClientBase::calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg)
+void GrabberReceiveThread::calibrateTimeStamp(ssc::ImagePtr imgMsg)
 {
-	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
-	imgMsg->GetTimeStamp(timestamp);
-	double timestamp_ms = timestamp->GetTimeStamp() * 1000;
-	QDateTime timestamp_dt = QDateTime::fromMSecsSinceEpoch(timestamp_ms);
+//	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+//	imgMsg->GetTimeStamp(timestamp);
+//	double timestamp_ms = timestamp->GetTimeStamp() * 1000;
+//	QDateTime timestamp_dt = QDateTime::fromMSecsSinceEpoch(timestamp_ms);
+	QDateTime timestamp_dt = imgMsg->getAcquisitionTime();
+	double timestamp_ms = timestamp_dt.toMSecsSinceEpoch();
 
 	if (ssc::similar(mLastReferenceTimestampDiff, 0.0, 0.000001))
 	{
@@ -210,8 +206,9 @@ void IGTLinkClientBase::calibrateTimeStamp(IGTLinkImageMessage::Pointer imgMsg)
 	//imgMsg->GetTimeStamp(oldtimestamp);
 
 	// Update imgMsg timestamp
-	timestamp->SetTime((timestamp_ms + mLastReferenceTimestampDiff) / 1000.0); // in sec
-	imgMsg->SetTimeStamp(timestamp);
+//	timestamp->SetTime((timestamp_ms + mLastReferenceTimestampDiff) / 1000.0); // in sec
+//	imgMsg->SetTimeStamp(timestamp);
+	imgMsg->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestamp_ms + mLastReferenceTimestampDiff));
 
 	//test code
 	//double timestampDiff = (timestamp->GetTimeStamp() - oldtimestamp->GetTimeStamp()) * 1000; //ms

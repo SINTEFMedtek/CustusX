@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxGrabberDirectLinkThread.h"
+#include "cxGrabberReceiveThreadDirectLink.h"
 
 #include "igtlOSUtil.h"
 #include "igtlMessageHeader.h"
@@ -31,7 +31,7 @@ namespace cx
 {
 
 GrabberDirectLinkThread::GrabberDirectLinkThread(StringMap args, QObject* parent) :
-		IGTLinkClientBase(parent), mArguments(args)
+		GrabberReceiveThread(parent), mArguments(args)
 {
 //  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
 }

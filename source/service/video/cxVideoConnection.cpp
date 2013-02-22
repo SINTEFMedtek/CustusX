@@ -32,7 +32,7 @@
 #include "cxDataLocations.h"
 #include "cxImageSenderFactory.h"
 #include "cxProcessWrapper.h"
-#include "cxOpenIGTLinkRTSource.h"
+#include "cxGrabberVideoSource.h"
 
 namespace cx
 {

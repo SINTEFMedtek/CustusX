@@ -6,6 +6,7 @@
  */
 
 #include "cxGrabberSender.h"
+#include "cxIGTLinkConversion.h"
 
 namespace cx
 {
@@ -45,6 +46,24 @@ void GrabberSenderQTcpSocket::send(IGTLinkUSStatusMessage::Pointer msg)
 	mSocket->write(reinterpret_cast<const char*> (msg->GetPackPointer()), msg->GetPackSize());
 }
 
+void GrabberSenderQTcpSocket::send(ssc::ImagePtr msg)
+{
+	if (!this->isReady())
+		return;
+
+	IGTLinkConversion converter;
+	this->send(converter.encode(msg));
+}
+
+void GrabberSenderQTcpSocket::send(ssc::ProbeData msg)
+{
+	if (!this->isReady())
+		return;
+
+	IGTLinkConversion converter;
+	this->send(converter.encode(msg));
+}
+
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -58,26 +77,46 @@ void GrabberSenderDirectLink::send(IGTLinkImageMessage::Pointer msg)
 {
 	if (!msg || !this->isReady())
 		return;
-	mImage = msg;
-	emit newImage();
+	IGTLinkConversion converter;
+	this->send(converter.decode(msg));
+	if (mUnsentUSStatusMessage)
+	{
+		this->send(converter.decode(mUnsentUSStatusMessage, msg, mUSStatus));
+		mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
+	}
 }
 void GrabberSenderDirectLink::send(IGTLinkUSStatusMessage::Pointer msg)
 {
 	if (!msg || !this->isReady())
 		return;
+	mUnsentUSStatusMessage = msg;
+}
+
+void GrabberSenderDirectLink::send(ssc::ImagePtr msg)
+{
+	if (!this->isReady())
+		return;
+	mImage = msg;
+	emit newImage();
+}
+
+void GrabberSenderDirectLink::send(ssc::ProbeData msg)
+{
+	if (!this->isReady())
+		return;
 	mUSStatus = msg;
 	emit newUSStatus();
 }
 
-IGTLinkImageMessage::Pointer GrabberSenderDirectLink::popImage()
+ssc::ImagePtr GrabberSenderDirectLink::popImage()
 {
 	return mImage;
-	mImage = IGTLinkImageMessage::Pointer();
+	mImage.reset();
 }
-IGTLinkUSStatusMessage::Pointer GrabberSenderDirectLink::popUSStatus()
+ssc::ProbeData GrabberSenderDirectLink::popUSStatus()
 {
 	return mUSStatus;
-	mUSStatus = IGTLinkUSStatusMessage::Pointer();
+//	mUSStatus = IGTLinkUSStatusMessage::Pointer();
 }
 
 
