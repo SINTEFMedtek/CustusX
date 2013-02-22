@@ -3,7 +3,6 @@
 
 #include "cxRecordBaseWidget.h"
 #include "cxUSAcquisition.h"
-#include "cxDisplayTimerWidget.h"
 
 namespace ssc
 {
@@ -13,6 +12,7 @@ namespace ssc
 namespace cx
 {
 class TimedAlgorithmProgressBar;
+class DisplayTimerWidget;
 
 /**
 * \file

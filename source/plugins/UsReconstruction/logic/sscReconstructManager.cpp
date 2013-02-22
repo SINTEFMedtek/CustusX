@@ -24,7 +24,6 @@
 #include "sscUtilHelpers.h"
 #include "cxCreateProbeDataFromConfiguration.h"
 #include "sscVolumeHelpers.h"
-#include "cxUsReconstructionFileReader.h"
 #include "sscPresetTransferFunctions3D.h"
 #include "cxToolManager.h"
 #include "sscManualTool.h"
@@ -33,6 +32,8 @@
 #include "cxViewManager.h"
 #include "cxCompositeTimedAlgorithm.h"
 #include "sscReconstructThreads.h"
+#include "sscUSFrameData.h"
+#include "cxUsReconstructionFileReader.h"
 
 //Windows fix
 #ifndef M_PI

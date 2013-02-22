@@ -14,21 +14,17 @@
 #ifndef CXSAVINGVIDEORECORDER_H
 #define CXSAVINGVIDEORECORDER_H
 
+#include <vector>
 #include <QFile>
 #include <QThread>
 #include <QMutex>
-#include <QString>
-#include <QStringList>
-#include <QTextStream>
-#include <utility>
-#include "boost/shared_ptr.hpp"
-#include "sscVideoRecorder.h"
-#include "sscTool.h"
-#include "sscUSFrameData.h"
-#include "cxImageDataContainer.h"
+
+#include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
 
 /** Class that saves vtkImageData continously to file.
   *
@@ -65,9 +61,6 @@ public:
 	void stop();
 	void cancel();
 
-signals:
-//	void dataSaved(QString filename); ///< emitted for each saved vtkImageData
-
 protected:
 	struct DataType
 	{
@@ -78,7 +71,6 @@ protected:
 	QString mSaveFolder;
 	QString mPrefix;
 	int mImageIndex;
-//	typedef std::pair<double, vtkImageDataPtr> DataType; ///< timestamp + image data
 	std::list<DataType> mPendingData;
 	QMutex mMutex; ///< protects the mPendingData
 	bool mStop;
@@ -111,8 +103,7 @@ protected:
 class SavingVideoRecorder : public QObject
 {
 	Q_OBJECT
-public:
-//	typedef std::map<double, vtkImageDataPtr> DataType; ///<  <timestamp, frame>
+
 public:
 	SavingVideoRecorder(ssc::VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor);
 	virtual ~SavingVideoRecorder();
@@ -121,9 +112,7 @@ public:
 	virtual void stopRecord();
 	void cancel();
 
-//	virtual DataType getRecording();
 	CachedImageDataContainerPtr getImageData();
-//	std::vector<QString> getImageData();
 	std::vector<double> getTimestamps();
 	QString getSaveFolder() { return mSaveFolder; }
 
@@ -138,16 +127,9 @@ public:
 
 private slots:
 	void newFrameSlot();
-//	void dataSavedSlot(QString filename);
 private:
-//	std::vector<CachedImageDataPtr> mImages;
-//	std::vector<QString> mImages;
 	CachedImageDataContainerPtr mImages;
 	std::vector<double> mTimestamps;
-	/** Use to remove data in memory when the recording is large
-	  */
-//	void purgeCache();
-//	int mLastPurgedImageIndex;
 	QString mSaveFolder;
 	ssc::VideoSourcePtr mSource;
 	boost::shared_ptr<VideoRecorderSaveThread> mSaveThread;

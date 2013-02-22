@@ -33,13 +33,13 @@
 #include "cxTool.h"
 #include "cxIgstkTracker.h"
 #include "cxToolConfigurationParser.h"
-//#include "cxRecordSession.h"
 #include "cxManualToolAdapter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
 #include "cxPlaybackTool.h"
 #include "sscLogger.h"
+#include "cxPlaybackTime.h"
 
 namespace cx
 {

@@ -26,7 +26,6 @@
 #include "cxTool.h"
 #include "vtkForwardDeclarations.h"
 #include "cxManualToolAdapter.h"
-#include "cxPlaybackTime.h"
 
 class QDomNode;
 class QDomDocument;
@@ -43,6 +42,7 @@ namespace cx
  */
 
 typedef boost::shared_ptr<class IgstkTrackerThread> IgstkTrackerThreadPtr;
+typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 /**
  * \brief Interface towards the navigation system.

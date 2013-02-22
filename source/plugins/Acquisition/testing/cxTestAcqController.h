@@ -11,6 +11,7 @@
 #include "cxVideoService.h"
 #include "cxAcquisitionData.h"
 #include "cxUSAcquisition.h"
+#include "cxUSReconstructInputData.h"
 
 /**Helper object for automated control of the CustusX application.
  *

@@ -11,13 +11,14 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
+
 #include "cxImageDataContainer.h"
+#include <QDir>
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 #include "sscDataManagerImpl.h"
 #include "sscLogger.h"
 #include "sscTypeConversions.h"
-#include <QDir>
 #include "sscUtilHelpers.h"
 
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
