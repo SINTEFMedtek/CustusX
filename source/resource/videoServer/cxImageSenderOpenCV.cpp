@@ -24,6 +24,7 @@
 #include "vtkImageMapToColors.h"
 #include "vtkMetaImageWriter.h"
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -369,7 +370,6 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	imgMsg->SetDimensions(size);
 	imgMsg->SetSpacing(spacingF);
 	imgMsg->SetScalarType(scalarType);
-	imgMsg->SetDeviceName("cxOpenCVGrabber");
 	imgMsg->SetSubVolume(svsize, svoffset);
 	imgMsg->AllocateScalars();
 	imgMsg->SetTimeStamp(timestamp);
@@ -378,6 +378,7 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 	uchar* src = frame.data;
 	//  std::cout << "pre copy " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 	int N = size[0] * size[1];
+	QString colorFormat;
 
 	if (frame.channels() >= 3)
 	{
@@ -409,6 +410,7 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 				 }
 			}
 		}
+		colorFormat = "ARGB";
 	}
 	if (frame.channels() == 1)
 	{
@@ -423,7 +425,10 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 		{
 			*destPtr++ = *src++;
 		}
+		colorFormat = "R";
 	}
+
+	imgMsg->SetDeviceName(cstring_cast(QString("cxOpenCV [%1]").arg(colorFormat)));
 
 	//------------------------------------------------------------
 	// Get randome orientation matrix and set it.
