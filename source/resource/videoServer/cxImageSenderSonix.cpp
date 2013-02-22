@@ -268,7 +268,7 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
   retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   //std::cout << "Frame spacing: " << frame.mSpacing[0] << " " << frame.mSpacing[1] << std::endl;
   retval->SetScalarType(frame.mPixelFormat); //Use frame.mPixelFormat directly
-  retval->SetDeviceName("ImageSenderSonix"); // TODO write something useful here
+  retval->SetDeviceName("ImageSenderSonix [BGRX]"); // TODO write something useful here
   retval->SetSubVolume(size,offset);
   retval->AllocateScalars();
 
