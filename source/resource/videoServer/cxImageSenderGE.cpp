@@ -355,7 +355,7 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 	retval->SetDimensions(size); // May be 3 dimensions
 //	retval->SetSpacing(mGEStreamer.VoxelSize[0], mGEStreamer.VoxelSize[1], mGEStreamer.VoxelSize[2]); // May be 3 dimensions
 	retval->SetScalarType(scalarType);
-	retval->SetDeviceName("ImageSenderGE");
+	retval->SetDeviceName("ImageSenderGE [BGRX]");
 	retval->SetSubVolume(size, offset);
 	retval->AllocateScalars();
 

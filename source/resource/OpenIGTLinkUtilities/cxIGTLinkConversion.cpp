@@ -229,23 +229,16 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 
 	imageImport->Modified();
 
-//	// Update the parts of the probe data that must be read from the image.
-//	ssc::ProbeData::ProbeImageData imageData = mSonixProbeData.getImage();
-//	imageData.mSpacing = ssc::Vector3D(spacing[0], spacing[1], spacing[2]);
-//	imageData.mSize = QSize(size[0], size[1]);
-//	imageData.mClipRect_p = ssc::DoubleBoundingBox3D(0, imageData.mSize.width(), 0, imageData.mSize.height(), 0, 0);
-//	mSonixProbeData.setImage(imageData);
-////	std::cout << "Received Sonix message:\n" << streamXml2String(mSonixProbeData) << std::cout;
+	// retrieve  index counter from _99_
+	QString format = "";
+	QRegExp colorFormat("\\[[A-Za-z]{1,4}\\]");
+	if (colorFormat.indexIn(deviceName) > 0)
+	{
+		format = colorFormat.cap(0).remove("[").remove("]");
+	}
+	std::cout << QString("found format %1 from %2").arg(format).arg(deviceName) << std::endl;
 
-//	//Only do the following for the digital Ultrasonix interface
-//	if (updateSonixParameters)
-//	{
-//		//TODO: Send all necessary parameters (origin + size) in IGTLinkUSStatusMessage and only update from there.
-//		this->updateSonix();
-//	}
-
-//	imageImport->GetOutput()->Update();
-	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB("RGBA", imageImport->GetOutput());
+	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, imageImport->GetOutput());
 	imageRGB->Update();
 
 	ssc::ImagePtr retval(new ssc::Image(deviceName, imageRGB));
