@@ -41,7 +41,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class IGTLinkClientBase> IGTLinkClientBasePtr;
+typedef boost::shared_ptr<class GrabberReceiveThread> GrabberReceiveThreadPtr;
 
 /**\brief Implementation of ssc::VideoSource for the OpenIGTLink protocol.
  * \ingroup cxServiceVideo
@@ -68,7 +68,6 @@ public:
 	virtual QString getStatusString() const;
 
 	virtual void start();
-//  virtual void pause();
 	virtual void stop();
 
 	virtual bool validData() const;
@@ -91,34 +90,19 @@ private slots:
 	void connectedSlot(bool on);
 
 private:
-	void updateImage(IGTLinkImageMessage::Pointer message); // called by receiving thread when new data arrives.
-	void updateSonixStatus(IGTLinkUSStatusMessage::Pointer message);
-	void setEmptyImage();
-	std::vector<unsigned char> mTestData;
-	void setTestImage();
-	vtkImageDataPtr createFilterARGB2RGB(vtkImageDataPtr input);
-	vtkImageDataPtr createFilterBGR2RGB(vtkImageDataPtr input);//temporary hack
-  	vtkImageDataPtr createFilterRGBA2RGB(vtkImageDataPtr input);
-	void updateImageImportFromIGTMessage(IGTLinkImageMessage::Pointer message);
-	void updateSonix();
-	ProbePtr getValidProbe();
-	void runClient(IGTLinkClientBasePtr client);
+	void updateImage(ssc::ImagePtr message); // called by receiving thread when new data arrives.
+	void updateSonixStatus(ssc::ProbeData message);
+	void runClient(GrabberReceiveThreadPtr client);
 	void stopClient();
 
-	boost::array<unsigned char, 100> mZero;
-	vtkImageImportPtr mImageImport;
-	vtkImageDataPtr mFilter_IGTLink_to_RGB;
+	ssc::ImagePtr mEmptyImage;
+	ssc::ImagePtr mReceivedImage;
 	vtkImageAlgorithmPtr mRedirecter;
-	IGTLinkImageMessage::Pointer mImageMessage;
-	IGTLinkClientBasePtr mClient;
+	GrabberReceiveThreadPtr mClient;
 	bool mConnected;
-	QString mDeviceName;
 	bool mTimeout;
 	QTimer* mTimeoutTimer;
 	double mFPS;
-	double mLastTimestamp;
-	bool updateSonixParameters;
-	ssc::ProbeData mSonixProbeData;
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 
