@@ -23,6 +23,7 @@
 #include "sscBoundingBox3D.h"
 #include "sscReconstructedOutputVolumeParams.h"
 #include "sscReconstructCore.h"
+#include "cxUSReconstructInputData.h"
 
 namespace ssc
 {

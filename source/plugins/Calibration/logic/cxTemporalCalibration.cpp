@@ -20,12 +20,15 @@
 #include "sscUtilHelpers.h"
 #include "sscVolumeHelpers.h"
 #include "vtkImageCorrelation.h"
-typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
-
+#include "sscUSFrameData.h"
+#include "sscImage.h"
+#include "cxUsReconstructionFileReader.h"
 #include "sscMessageManager.h"
 #include "sscTime.h"
 #include <vtkImageMask.h>
+
 typedef vtkSmartPointer<vtkImageMask> vtkImageMaskPtr;
+typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
 
 namespace cx
 {

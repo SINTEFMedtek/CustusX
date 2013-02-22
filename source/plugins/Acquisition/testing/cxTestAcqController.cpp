@@ -10,6 +10,7 @@
 #include <sstream>
 #include <QTextEdit>
 #include <QTimer>
+#include <cppunit/extensions/HelperMacros.h>
 
 #include "sscDataManager.h"
 #include "sscDummyTool.h"
@@ -29,8 +30,10 @@
 #include "cxVideoConnection.h"
 #include "sscReconstructManager.h"
 #include "sscTime.h"
-#include <cppunit/extensions/HelperMacros.h>
 #include "sscLogger.h"
+#include "sscUSFrameData.h"
+#include "cxUsReconstructionFileReader.h"
+#include "cxImageDataContainer.h"
 
 TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
 {

@@ -24,6 +24,8 @@
 #include "sscImageImportVideoSource.h"
 #include "cxToolManager.h"
 #include "cxProbe.h"
+#include "sscUSFrameData.h"
+#include "cxPlaybackTime.h"
 
 namespace cx
 {

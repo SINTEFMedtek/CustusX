@@ -18,21 +18,18 @@
 #define CXIGTLinkClientBaseBASE_H_
 
 #include <vector>
-#include <QtCore>
-#include <QTcpSocket>
 #include "boost/shared_ptr.hpp"
-class QTcpSocket;
-#include "igtlMessageHeader.h"
-#include "igtlClientSocket.h"
-#include "igtlImageMessage.h"
-#include "cxRenderTimer.h"
-#include "cxIGTLinkUSStatusMessage.h"
-#include "cxIGTLinkImageMessage.h"
+
+#include <QThread>
+#include <QMutex>
+
 #include "sscImage.h"
 #include "sscTool.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class CyclicActionTimer> CyclicActionTimerPtr;
+
 /**
  * \file
  * \addtogroup cxServiceVideo
@@ -84,7 +81,7 @@ signals:
 	void stopInternal();
 
 protected:
-	cx::CyclicActionTimer mFPSTimer;
+	cx::CyclicActionTimerPtr mFPSTimer;
 	/** Add the message to a thread-safe queue.
 	 * Tests if the time stamps of image messages should be calibrated based on the computer clock.
 	 * Time stamps only need to be synched if set on another computer that is

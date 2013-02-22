@@ -5,9 +5,11 @@
  *      \author christiana
  */
 
-#include <cxUSAcquisition.h>
+#include "cxUSAcquisition.h"
+
 #include <QtConcurrentRun>
 #include "boost/bind.hpp"
+
 #include "sscToolManager.h"
 #include "sscTypeConversions.h"
 #include "cxPatientData.h"
@@ -19,6 +21,8 @@
 #include "sscReconstructManager.h"
 #include "cxDataLocations.h"
 #include "sscTime.h"
+#include "cxUsReconstructionFileMaker.h"
+#include "cxSavingVideoRecorder.h"
 
 namespace cx
 {

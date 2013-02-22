@@ -10,13 +10,15 @@
 
 #include <QFuture>
 #include <QFutureWatcher>
-#include "cxUsReconstructionFileMaker.h"
+
 #include "cxRecordSession.h"
-#include <cxAcquisitionData.h>
-#include "cxSavingVideoRecorder.h"
+#include "cxAcquisitionData.h"
+#include "sscTool.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
+typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
 
 /**
  * \file
