@@ -134,12 +134,14 @@ public:
 		mManager = manager;
 		mContext = mRegistrator.createContext(mManager->getMovingData(), mManager->getFixedData());
 
-		mMovingData = mRegistrator.convertToPolyData(mContext->mSourcePoints);
+		//mMovingData = mRegistrator.convertToPolyData(mContext->mSourcePoints);
+		mMovingData = mContext->getMovingPoints();
+		mFixedData = mContext->getFixedPoints();
 
 		ssc::MeshPtr moving(new ssc::Mesh("v2vreg_moving", "v2vreg_moving", mMovingData));
 		moving->setColor(QColor("red"));
 
-		ssc::MeshPtr fixed(new ssc::Mesh("v2vreg_fixed", "v2vreg_fixed", mContext->mTargetPoints));
+		ssc::MeshPtr fixed(new ssc::Mesh("v2vreg_fixed", "v2vreg_fixed", mFixedData));
 		fixed->setColor(QColor("green"));
 
 		mPolyLines = vtkPolyDataPtr::New();
@@ -207,9 +209,17 @@ public:
 		if (!mContext)
 			return;
 		mRegistrator.computeDistances(mContext);
-		vtkPolyDataPtr temp = mRegistrator.convertToPolyData(mContext->mSourcePoints);
-		mMovingData->SetPoints(temp->GetPoints());
-		mMovingData->SetVerts(temp->GetVerts());
+//		vtkPolyDataPtr temp = mRegistrator.convertToPolyData(mContext->mSourcePoints);
+//		mMovingData->SetPoints(temp->GetPoints());
+//		mMovingData->SetVerts(temp->GetVerts());
+
+		vtkPolyDataPtr moving = mContext->getMovingPoints();
+		mMovingData->SetPoints(moving->GetPoints());
+		mMovingData->SetVerts(moving->GetVerts());
+
+		vtkPolyDataPtr fixed = mContext->getFixedPoints();
+		mFixedData->SetPoints(fixed->GetPoints());
+		mFixedData->SetVerts(fixed->GetVerts());
 
 		//		// draw lines: slow but nice
 		//		mLines.clear();
@@ -243,7 +253,7 @@ private:
 	ssc::SeansVesselReg mRegistrator;
 	ssc::SeansVesselReg::ContextPtr mContext;
 	RegistrationManagerPtr mManager;
-	vtkPolyDataPtr mMovingData;
+	vtkPolyDataPtr mMovingData, mFixedData;
 	vtkPolyDataPtr mPolyLines;
 	ssc::GeometricRepPtr m_mRep, m_fRep, m_lineRep;
 	//	std::vector<ssc::GraphicalLine3DPtr> mLines;
