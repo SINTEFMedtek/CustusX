@@ -480,6 +480,30 @@ vtkPolyDataPtr SeansVesselReg::convertToPolyData(ssc::DataPtr data)
 	return vtkPolyDataPtr();
 }
 
+vtkPolyDataPtr SeansVesselReg::Context::getMovingPoints()
+{
+	if (mInvertedTransform)
+	{
+		return mTargetPoints;
+	}
+	else
+	{
+		return SeansVesselReg::convertToPolyData(mSourcePoints);
+	}
+}
+
+vtkPolyDataPtr SeansVesselReg::Context::getFixedPoints()
+{
+	if (mInvertedTransform)
+	{
+		return SeansVesselReg::convertToPolyData(mSourcePoints);
+	}
+	else
+	{
+		return mTargetPoints;
+	}
+}
+
 vtkPolyDataPtr SeansVesselReg::convertToPolyData(vtkPointsPtr input)
 {
 	vtkCellArrayPtr cellArray = vtkCellArrayPtr::New();
