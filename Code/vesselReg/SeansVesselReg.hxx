@@ -36,6 +36,9 @@ public:
 		vtkPolyDataPtr mTargetPoints; ///< input: target data
 		vtkPointsPtr mSourcePoints; ///< input: current source data, modified according to last iteration
 
+		vtkPolyDataPtr getMovingPoints(); ///< the moving data (one of target or source, depending on inversion)
+		vtkPolyDataPtr getFixedPoints(); ///< the fixed data (one of target or source, depending on inversion)
+
 		vtkPointsPtr mSortedSourcePoints; ///< source points sorted according to distance to target, #mSortedSourcePoints==#mSortedTargetPoints
 		vtkPointsPtr mSortedTargetPoints; ///< source points projected onto the target points (closest points) #mSortedSourcePoints==#mSortedTargetPoints
 
@@ -85,7 +88,7 @@ public:
 	ContextPtr createContext(ssc::DataPtr source, ssc::DataPtr target);
 	void performOneRegistration(ContextPtr context, bool linear);
 	void computeDistances(ContextPtr context);
-	vtkPolyDataPtr convertToPolyData(vtkPointsPtr input);
+	static vtkPolyDataPtr convertToPolyData(vtkPointsPtr input);
 
 	/**
 	 * Extract polydata from a image.
