@@ -1,24 +1,19 @@
 #ifndef CXUSRECONSTRUCTIONFILEMAKER_H_
 #define CXUSRECONSTRUCTIONFILEMAKER_H_
 
-#include <QFile>
-#include <QThread>
-#include <QMutex>
-#include <QString>
-#include <QStringList>
-#include <QTextStream>
-#include <utility>
-#include "boost/shared_ptr.hpp"
-#include "sscVideoRecorder.h"
-#include "sscTool.h"
-#include "sscUSFrameData.h"
-#include "cxSavingVideoRecorder.h"
-
+class QTextStream;
 class QDir;
+
+#include "sscTool.h"
+#include "cxUSReconstructInputData.h"
+#include "cxForwardDeclarations.h"
+
 
 namespace cx
 {
 typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
+typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
+typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
 
 /**
 * \file

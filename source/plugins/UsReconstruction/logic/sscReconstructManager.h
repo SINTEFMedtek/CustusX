@@ -19,7 +19,6 @@
 #include "sscBoolDataAdapterXml.h"
 #include "sscXmlOptionItem.h"
 #include "sscProbeSector.h"
-#include "cxUsReconstructionFileReader.h"
 #include "cxThreadedTimedAlgorithm.h"
 #include "sscReconstructPreprocessor.h"
 #include "sscReconstructParams.h"

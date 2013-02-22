@@ -16,6 +16,7 @@
 #include "sscTime.h"
 #include "sscTypeConversions.h"
 #include "cxToolManager.h"
+#include "cxPlaybackTime.h"
 
 namespace cx
 {

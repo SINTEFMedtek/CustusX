@@ -24,6 +24,7 @@
 #include "sscTransform3D.h"
 #include "sscReconstructAlgorithm.h"
 #include "vtkForwardDeclarations.h"
+#include "cxUSReconstructInputData.h"
 
 namespace ssc
 {

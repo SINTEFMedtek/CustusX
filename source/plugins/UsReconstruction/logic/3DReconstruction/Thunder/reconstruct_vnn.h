@@ -17,8 +17,7 @@
 //
 // See sscLicense.txt for more information.
 
-
-#include "sscUSFrameData.h"
+#include "cxForwardDeclarations.h"
 
 /**
  * \addtogroup sscThunder
@@ -38,14 +37,7 @@
  */
 struct reconstruct_data
 {
-//	ssc::USFrameDataPtr frameData;
 	ssc::ProcessedUSInputDataPtr frameData;
-	//ssc::ImagePtr frameMask;
-	//ssc::ImagePtr outputData;
-
-	//unsigned char* input;
-	//int input_dim[3];
-	//double input_spacing[3];
 
 	double* input_pos_matrices;
 	unsigned char* input_mask;

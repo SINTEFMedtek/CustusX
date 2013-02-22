@@ -15,6 +15,7 @@
 #include "cxGrabberReceiveThread.h"
 #include "sscMessageManager.h"
 #include "sscVector3D.h"
+#include "cxRenderTimer.h"
 
 namespace cx
 {
@@ -23,6 +24,7 @@ namespace cx
 GrabberReceiveThread::GrabberReceiveThread(QObject* parent) :
 		QThread(parent)
 {
+	mFPSTimer.reset(new CyclicActionTimer());
 	mGeneratingTimeCalibration = false;
 	mLastReferenceTimestampDiff = 0.0;
 	mLastTimeStamps.reserve(20);
@@ -47,12 +49,12 @@ GrabberReceiveThread::GrabberReceiveThread(QObject* parent) :
 
 void GrabberReceiveThread::addImageToQueue(ssc::ImagePtr imgMsg)
 {
-	mFPSTimer.beginRender();
-	mFPSTimer.endRender();
-	if (mFPSTimer.intervalPassed())
+	mFPSTimer->beginRender();
+	mFPSTimer->endRender();
+	if (mFPSTimer->intervalPassed())
 	{
-		emit fps(mFPSTimer.getFPS());
-		mFPSTimer.reset(2000);
+		emit fps(mFPSTimer->getFPS());
+		mFPSTimer->reset(2000);
 	}
 
 	//Test if Sonix. Then calibrate time stamps

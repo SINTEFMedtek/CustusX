@@ -17,16 +17,21 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QTextStream>
+
 #include <vtkImageChangeInformation.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageData.h>
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
+
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "sscXmlOptionItem.h"
+#include "cxImageDataContainer.h"
+#include "sscVideoSource.h"
 
 namespace cx
 {
@@ -43,12 +48,10 @@ VideoRecorderSaveThread::VideoRecorderSaveThread(QObject* parent, QString saveFo
 	mCompressed(compressed),
 	mWriteColor(writeColor)
 {
-//	std::cout << "**VideoRecorderSaveThread::VideoRecorderSaveThread()" << std::endl;
 }
 
 VideoRecorderSaveThread::~VideoRecorderSaveThread()
 {
-//	std::cout << "**VideoRecorderSaveThread::~VideoRecorderSaveThread()" << std::endl;
 }
 
 QString VideoRecorderSaveThread::addData(double timestamp, vtkImageDataPtr image)
@@ -113,7 +116,6 @@ void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 	stream << qstring_cast(data.mTimestamp);
 	stream << endl;
 
-//	std::cout << "** VideoRecorderSaveThread::write() start" << data.mImageFilename << std::endl;
 	// convert to 8 bit data if applicable.
 	if (!mWriteColor && data.mImage->GetNumberOfScalarComponents()>2)
 	{
@@ -129,9 +131,6 @@ void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 	writer->SetFileName(cstring_cast(data.mImageFilename));
 	writer->SetCompression(mCompressed);
 	writer->Write();
-//	std::cout << "** VideoRecorderSaveThread::write() " << data.mImageFilename << std::endl;
-
-//	emit dataSaved(data.mImageFilename);
 }
 
 /** Write all pending images to file.
@@ -181,17 +180,13 @@ SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString sav
 	mImages.reset(new cx::CachedImageDataContainer());
 	mImages->setDeleteFilesOnRelease(true);
 
-//	std::cout << "**SavingVideoRecorder::SavingVideoRecorder()" << std::endl;
 	mSaveFolder = saveFolder;
 	mSaveThread.reset(new VideoRecorderSaveThread(NULL, saveFolder, prefix, compressed, writeColor));
-//	connect(mSaveThread.get(), SIGNAL(dataSaved(QString)), this, SLOT(dataSavedSlot(QString)));
 	mSaveThread->start();
 }
 
 SavingVideoRecorder::~SavingVideoRecorder()
 {
-//	std::cout << "**SavingVideoRecorder::~SavingVideoRecorder()" << std::endl;
-
 	mSaveThread->cancel();
 	mSaveThread->wait(); // wait indefinitely for thread to finish
 }
@@ -218,19 +213,11 @@ void SavingVideoRecorder::newFrameSlot()
 
 	mImages->append(filename);
 	mTimestamps.push_back(timestamp);
-
-//	this->purgeCache();
 }
 
 CachedImageDataContainerPtr SavingVideoRecorder::getImageData()
 {
-//	std::cout << " ***  SavingVideoRecorder::getImageData()" << std::endl;
 	return mImages;
-
-//	        mImages.reset(new cx::CachedImageDataContainer());
-//	CachedImageDataContainerPtr retval(new cx::CachedImageDataContainer(mImages));
-//	retval->setDeleteFilesOnRelease(true);
-//	return retval;
 }
 
 std::vector<double> SavingVideoRecorder::getTimestamps()

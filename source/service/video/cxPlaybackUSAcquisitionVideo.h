@@ -19,9 +19,9 @@
 #include <QFutureWatcher>
 #include <vector>
 #include "sscVideoSource.h"
+#include "cxUSReconstructInputData.h"
 #include "cxPlaybackTime.h"
-#include "sscImageImportVideoSource.h"
-#include "cxUsReconstructionFileReader.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {

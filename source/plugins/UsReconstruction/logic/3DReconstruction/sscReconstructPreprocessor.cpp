@@ -33,6 +33,7 @@
 #include "sscVolumeHelpers.h"
 #include "sscPresetTransferFunctions3D.h"
 #include "sscTimeKeeper.h"
+#include "sscUSFrameData.h"
 
 namespace ssc
 {

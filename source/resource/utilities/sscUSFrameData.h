@@ -20,16 +20,14 @@
 #ifndef SSCUSFRAMEDATA_H_
 #define SSCUSFRAMEDATA_H_
 
-#include <vector>
-#include "sscImage.h"
 #include "sscProbeSector.h"
+#include "cxUSReconstructInputData.h"
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 namespace cx
 {
 typedef boost::shared_ptr<class ImageDataContainer> ImageDataContainerPtr;
 typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
-typedef boost::shared_ptr<class CachedImageData> CachedImageDataPtr;
 }
 
 namespace ssc
@@ -42,20 +40,7 @@ namespace ssc
  */
 
 typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
-
-typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
-/** \brief One position with timestamp
- */
-class TimedPosition
-{
-public:
-	double mTime;// Should always be in ms
-	Transform3D mPos;
-};
-inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)
-{
-	return lhs.mTime < rhs.mTime;
-}
+//typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
 
 /** Output from the reconstruct preprocessing and is input to the reconstruction.
   *
@@ -146,19 +131,6 @@ protected:
 	QString mName;
 	cx::ImageDataContainerPtr mImageContainer;
 	bool mPurgeInput;
-};
-
-
-struct USReconstructInputData
-{
-	QString mFilename; ///< filename used for current data read
-
-	ssc::USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
-	std::vector<ssc::TimedPosition> mFrames;
-	std::vector<ssc::TimedPosition> mPositions;
-	ssc::ImagePtr mMask;///< Clipping mask for the input data
-	ssc::ProbeSector mProbeData;
-	QString mProbeUid;
 };
 
 /**

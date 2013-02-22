@@ -1,5 +1,6 @@
 #include "cxUsReconstructionFileMaker.h"
 
+#include <QTextStream>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -15,6 +16,9 @@
 #include "sscXmlOptionItem.h"
 #include "sscTimeKeeper.h"
 #include "sscDataManagerImpl.h"
+#include "sscUSFrameData.h"
+#include "cxSavingVideoRecorder.h"
+#include "cxImageDataContainer.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
