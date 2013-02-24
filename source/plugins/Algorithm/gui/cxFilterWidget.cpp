@@ -38,6 +38,7 @@
 #include "cxDataSelectWidget.h"
 #include "sscMessageManager.h"
 #include "cxThresholdPreview.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {

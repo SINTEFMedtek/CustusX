@@ -16,6 +16,9 @@
 
 #include "sscImage.h"
 #include "sscDataManager.h"
+#include "cxSelectDataStringDataAdapter.h"
+#include "sscDoubleDataAdapterXml.h"
+#include "sscStringDataAdapterXml.h"
 
 namespace cx
 {

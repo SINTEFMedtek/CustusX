@@ -21,6 +21,7 @@
 #include "cxDataLocations.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {

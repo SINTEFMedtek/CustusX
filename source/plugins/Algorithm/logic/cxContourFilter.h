@@ -16,9 +16,7 @@
 #define CXCONTOURFILTER_H
 
 #include "cxFilterImpl.h"
-#include "sscBoolDataAdapterXml.h"
-#include "sscColorDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
+class QColor;
 
 namespace cx
 {
@@ -81,12 +79,7 @@ private slots:
 
 private:
 	ssc::BoolDataAdapterXmlPtr mReduceResolutionOption;
-	//    ssc::BoolDataAdapterXmlPtr mSmoothingOption;
-	//    ssc::BoolDataAdapterXmlPtr mPreserveTopologyOption;
 	ssc::DoubleDataAdapterXmlPtr mSurfaceThresholdOption;
-	//    ssc::DoubleDataAdapterXmlPtr mDecimationOption;
-	//    ssc::ColorDataAdapterXmlPtr mColorOption;
-	//    ssc::DoubleDataAdapterXmlPtr mLowerThresholdOption;
 	vtkPolyDataPtr mRawResult;
 };
 typedef boost::shared_ptr<class ContourFilter> ContourFilterPtr;

@@ -22,6 +22,8 @@
 #include "vtkImageData.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
+#include "cxSelectDataStringDataAdapter.h"
+#include "sscDoubleDataAdapterXml.h"
 
 namespace cx
 {

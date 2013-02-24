@@ -16,6 +16,7 @@
 #include "cxInteractiveClipper.h"
 #include "cxViewManager.h"
 #include "sscDataManager.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {
