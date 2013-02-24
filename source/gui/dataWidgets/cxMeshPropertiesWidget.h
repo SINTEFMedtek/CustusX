@@ -8,6 +8,7 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
 
 /**
  * \class ImagePropertiesWidget

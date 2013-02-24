@@ -13,6 +13,7 @@
 #include "cxDataInterface.h"
 #include "sscDataManager.h"
 #include "cxDataSelectWidget.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {

@@ -17,7 +17,7 @@
 //#include <QObject>
 #include "cxFilter.h"
 #include "sscXmlOptionItem.h"
-#include "cxDataInterface.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {

@@ -8,6 +8,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
+#include "sscColorDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 #include "sscTypeConversions.h"
 
@@ -18,6 +19,7 @@
 #include "cxContourFilter.h"
 #include "sscMesh.h"
 #include "sscImage.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 
 namespace cx

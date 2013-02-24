@@ -5,11 +5,13 @@
 #include "sscForwardDeclarations.h"
 #include "sscStringDataAdapter.h"
 //#include "cxViewManager.h"
-#include "cxDataInterface.h"
+//#include "cxDataInterface.h"
 class QCheckBox;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /**

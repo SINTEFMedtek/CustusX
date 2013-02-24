@@ -17,6 +17,7 @@
 #include "cxTransferFunctionColorWidget.h"
 #include "cxViewWrapper2D.h"
 #include "cxDataSelectWidget.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {
