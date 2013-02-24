@@ -21,9 +21,15 @@ typedef boost::shared_ptr<class ImageImportVideoSource> ImageImportVideoSourcePt
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
 typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
 
+typedef boost::shared_ptr<class StringDataAdapter> StringDataAdapterPtr;
+typedef boost::shared_ptr<class DoubleDataAdapter> DoubleDataAdapterPtr;
+typedef boost::shared_ptr<class BoolDataAdapter> BoolDataAdapterPtr;
+typedef boost::shared_ptr<class ColorDataAdapter> ColorDataAdapterPtr;
+
 typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
 typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
 typedef boost::shared_ptr<class BoolDataAdapterXml> BoolDataAdapterXmlPtr;
+typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
 
 typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 }

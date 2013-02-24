@@ -16,8 +16,6 @@
 
 #include "cxFilterImpl.h"
 
-#include "sscDoubleDataAdapterXml.h"
-
 namespace cx
 {
 

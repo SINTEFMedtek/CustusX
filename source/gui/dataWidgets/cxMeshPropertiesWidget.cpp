@@ -10,6 +10,7 @@
 #include "sscLabeledLineEditWidget.h"
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {
