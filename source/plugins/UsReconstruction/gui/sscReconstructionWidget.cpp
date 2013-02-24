@@ -9,6 +9,11 @@
 #include "sscTypeConversions.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxSettings.h"
+#include "sscReconstructParams.h"
+#include "cxTimedAlgorithm.h"
+#include "sscStringDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
+#include "sscBoolDataAdapterXml.h"
 
 namespace cx
 {

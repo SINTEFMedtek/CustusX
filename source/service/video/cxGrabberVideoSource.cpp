@@ -44,7 +44,6 @@
 #include "sscProbeData.h"
 #include "sscToolManager.h"
 #include "sscDataManager.h"
-#include "cxTool.h"
 #include "cxProbe.h"
 #include "cxVideoService.h"
 #include "cxToolManager.h"
@@ -55,6 +54,7 @@
 #include "sscData.h"
 #include "sscLogger.h"
 #include "sscVolumeHelpers.h"
+#include "cxRenderTimer.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -62,7 +62,7 @@ typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 namespace cx
 {
 
-OpenIGTLinkRTSource::OpenIGTLinkRTSource()
+GrabberVideoSource::GrabberVideoSource()
 {
 	mConnected = false;
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
@@ -81,12 +81,12 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource()
 	connect(this, SIGNAL(connected(bool)), this, SIGNAL(streaming(bool))); // define connected as streaming.
 }
 
-OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
+GrabberVideoSource::~GrabberVideoSource()
 {
 	this->stopClient();
 }
 
-void OpenIGTLinkRTSource::timeout()
+void GrabberVideoSource::timeout()
 {
 	if (mTimeout)
 		return;
@@ -96,25 +96,25 @@ void OpenIGTLinkRTSource::timeout()
 	emit newFrame();
 }
 
-QString OpenIGTLinkRTSource::getName()
+QString GrabberVideoSource::getName()
 {
 	return mReceivedImage->getUid();
 }
 
-void OpenIGTLinkRTSource::fpsSlot(double fpsNumber)
+void GrabberVideoSource::fpsSlot(double fpsNumber)
 {
 	mFPS = fpsNumber;
 	emit fps(fpsNumber);
 }
 
-QString OpenIGTLinkRTSource::getInfoString() const
+QString GrabberVideoSource::getInfoString() const
 {
 	if (!mClient)
 		return "";
 	return mClient->hostDescription() + " - " + QString::number(mFPS, 'f', 1) + " fps";
 }
 
-QString OpenIGTLinkRTSource::getStatusString() const
+QString GrabberVideoSource::getStatusString() const
 {
 	if (!mClient)
 		return "Not connected";
@@ -123,37 +123,37 @@ QString OpenIGTLinkRTSource::getStatusString() const
 	return "Running";
 }
 
-void OpenIGTLinkRTSource::start()
+void GrabberVideoSource::start()
 {
 
 }
 
-void OpenIGTLinkRTSource::stop()
+void GrabberVideoSource::stop()
 {
 
 }
 
-bool OpenIGTLinkRTSource::validData() const
+bool GrabberVideoSource::validData() const
 {
 	return mClient && !mTimeout;
 }
 
-double OpenIGTLinkRTSource::getTimestamp()
+double GrabberVideoSource::getTimestamp()
 {
 	return mReceivedImage->getAcquisitionTime().toMSecsSinceEpoch();
 }
 
-bool OpenIGTLinkRTSource::isConnected() const
+bool GrabberVideoSource::isConnected() const
 {
 	return mClient && mConnected;
 }
 
-bool OpenIGTLinkRTSource::isStreaming() const
+bool GrabberVideoSource::isStreaming() const
 {
 	return this->isConnected();
 }
 
-void OpenIGTLinkRTSource::connectedSlot(bool on)
+void GrabberVideoSource::connectedSlot(bool on)
 {
 	mConnected = on;
 
@@ -163,19 +163,19 @@ void OpenIGTLinkRTSource::connectedSlot(bool on)
 	emit connected(on);
 }
 
-void OpenIGTLinkRTSource::directLink(std::map<QString, QString> args)
+void GrabberVideoSource::directLink(std::map<QString, QString> args)
 {
 	this->runClient(GrabberReceiveThreadPtr(new GrabberDirectLinkThread(args, this)));
 }
 
 
-void OpenIGTLinkRTSource::connectServer(QString address, int port)
+void GrabberVideoSource::connectServer(QString address, int port)
 {
 	this->runClient(GrabberReceiveThreadPtr(new GrabberReceiveThreadIGTLink(address, port, this)));
 }
 
 
-void OpenIGTLinkRTSource::runClient(GrabberReceiveThreadPtr client)
+void GrabberVideoSource::runClient(GrabberReceiveThreadPtr client)
 {
 	if (mClient)
 	{
@@ -194,14 +194,14 @@ void OpenIGTLinkRTSource::runClient(GrabberReceiveThreadPtr client)
 	mTimeoutTimer->start();
 }
 
-void OpenIGTLinkRTSource::imageReceivedSlot()
+void GrabberVideoSource::imageReceivedSlot()
 {
 	if (!mClient)
 		return;
 	this->updateImage(mClient->getLastImageMessage());
 }
 
-void OpenIGTLinkRTSource::sonixStatusReceivedSlot()
+void GrabberVideoSource::sonixStatusReceivedSlot()
 {
 	if (!mClient)
 		return;
@@ -211,7 +211,7 @@ void OpenIGTLinkRTSource::sonixStatusReceivedSlot()
 /**Get rid of the mClient thread.
  *
  */
-void OpenIGTLinkRTSource::stopClient()
+void GrabberVideoSource::stopClient()
 {
 	if (mClient)
 	{
@@ -235,7 +235,7 @@ void OpenIGTLinkRTSource::stopClient()
 	}
 }
 
-void OpenIGTLinkRTSource::disconnectServer()
+void GrabberVideoSource::disconnectServer()
 {
 	this->stopClient();
 
@@ -247,7 +247,7 @@ void OpenIGTLinkRTSource::disconnectServer()
 	emit newFrame(); // changed
 }
 
-void OpenIGTLinkRTSource::clientFinishedSlot()
+void GrabberVideoSource::clientFinishedSlot()
 {
 	if (!mClient)
 		return;
@@ -260,7 +260,7 @@ void OpenIGTLinkRTSource::clientFinishedSlot()
  *  and store locally. Also reset the old local info with
  *  information from the probe in toolmanager.
  */
-void OpenIGTLinkRTSource::updateSonixStatus(ssc::ProbeData msg)
+void GrabberVideoSource::updateSonixStatus(ssc::ProbeData msg)
 {
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (!tool)
@@ -285,7 +285,7 @@ void OpenIGTLinkRTSource::updateSonixStatus(ssc::ProbeData msg)
 	probe->setData(data);
 }
 
-void OpenIGTLinkRTSource::updateImage(ssc::ImagePtr message)
+void GrabberVideoSource::updateImage(ssc::ImagePtr message)
 {
 	static CyclicActionTimer timer("Update Video Image");
 	timer.begin();
@@ -318,7 +318,7 @@ void OpenIGTLinkRTSource::updateImage(ssc::ImagePtr message)
 
 }
 
-vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
+vtkImageDataPtr GrabberVideoSource::getVtkImageData()
 {
 	return mRedirecter->GetOutput();
 }

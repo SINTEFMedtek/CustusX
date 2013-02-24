@@ -3,6 +3,7 @@
 #include "sscAxesRep.h"//test
 #include "sscXmlOptionItem.h"
 #include "sscTypeConversions.h"
+#include "sscReconstructPreprocessor.h"
 
   
 MainWindow::MainWindow(QWidget* parent)

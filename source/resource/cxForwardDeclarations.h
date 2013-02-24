@@ -12,18 +12,27 @@
  * full definitions of the ssc is needed.
  */
 
+typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
+
 namespace ssc
 {
 typedef boost::shared_ptr<class ImageImportVideoSource> ImageImportVideoSourcePtr;
 
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
 typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
+
+typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
+typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
+typedef boost::shared_ptr<class BoolDataAdapterXml> BoolDataAdapterXmlPtr;
+
+typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 }
 
 namespace cx
 {
 
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
+typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 
 class View2D;
 class View3D;
@@ -38,6 +47,7 @@ typedef QPointer<View3D> View3DQPtr;
 typedef QPointer<ssc::ViewWidget> ViewWidgetQPtr;
 
 typedef boost::shared_ptr<class UsReconstructionFileReader> UsReconstructionFileReaderPtr;
+typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
 
 
 } // namespace cx

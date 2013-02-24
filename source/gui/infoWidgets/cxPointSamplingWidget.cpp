@@ -15,6 +15,7 @@
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "sscDataManager.h"
+#include "sscManualTool.h"
 
 namespace cx
 {

@@ -2,13 +2,9 @@
 #define CXFILEPREVIEWWIDGET_H_
 
 #include "cxFileWatcherWidget.h"
-//#include "boost/shared_ptr.hpp"
 class QTextDocument;
 class QTextEdit;
-//class QLabel;
 class QPushButton;
-//class QFileSystemWatcher;
-//class QFile;
 #include <QSyntaxHighlighter>
 
 namespace cx

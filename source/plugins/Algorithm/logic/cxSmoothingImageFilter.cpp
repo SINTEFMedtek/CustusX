@@ -15,6 +15,8 @@
 #include "cxSmoothingImageFilter.h"
 
 #include "cxAlgorithmHelpers.h"
+#include <itkSmoothingRecursiveGaussianImageFilter.h>
+
 
 #include "sscDataManager.h"
 #include "sscUtilHelpers.h"

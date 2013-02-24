@@ -14,6 +14,10 @@
 
 #include "cxWirePhantomWidget.h"
 
+#include <QPushButton>
+#include <QTextEdit>
+#include <vtkPolyData.h>
+#include <vtkPoints.h>
 #include "sscDataManager.h"
 #include "sscMesh.h"
 #include "cxRegistrationManager.h"

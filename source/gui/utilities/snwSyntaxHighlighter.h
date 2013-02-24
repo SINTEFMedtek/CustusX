@@ -1,7 +1,7 @@
 #ifndef SNWSYNTAXHIGHLIGHTER_H_
 #define SNWSYNTAXHIGHLIGHTER_H_
 
-#include <QtGui>
+#include <QSyntaxHighlighter>
 
 namespace snw
 {

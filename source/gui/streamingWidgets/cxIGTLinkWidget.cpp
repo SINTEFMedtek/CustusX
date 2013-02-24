@@ -24,6 +24,8 @@
 #include "cxVideoService.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
+#include "sscStringDataAdapterXml.h"
+#include "cxGrabberVideoSource.h"
 
 namespace cx
 {
@@ -195,7 +197,7 @@ QProcess* IGTLinkWidget::getServer()
 	return getConnection()->getProcess();
 }
 
-OpenIGTLinkRTSourcePtr IGTLinkWidget::getRTSource()
+GrabberVideoSourcePtr IGTLinkWidget::getRTSource()
 {
 	return getConnection()->getVideoSource();
 }

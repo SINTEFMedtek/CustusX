@@ -1,5 +1,6 @@
 #include "cxTest_UsReconstruction.h"
 
+#include <QApplication>
 #include <vtkImageData.h>
 #include "sscReconstructManager.h"
 #include "sscImage.h"
@@ -7,8 +8,9 @@
 #include "sscPNNReconstructAlgorithm.h"
 #include "cxDataLocations.h"
 #include "cxDataManager.h"
-
-//#include "cxToolConfigurationParser.h"
+#include "sscReconstructPreprocessor.h"
+#include "sscReconstructParams.h"
+#include "cxTimedAlgorithm.h"
 
 void TestUsReconstruction::setUp()
 {

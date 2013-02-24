@@ -15,7 +15,8 @@
 #ifndef CXACTIVEIMAGEPROXY_H_
 #define CXACTIVEIMAGEPROXY_H_
 
-#include "sscImage.h"
+#include <QObject>
+#include "sscForwardDeclarations.h"
 
 namespace cx
 {

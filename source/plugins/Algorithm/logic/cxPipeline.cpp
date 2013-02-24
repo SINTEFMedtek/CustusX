@@ -14,14 +14,19 @@
 #include "cxPipeline.h"
 #include "sscTypeConversions.h"
 
+#include <QtCore>
 #include "boost/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
+
+#include "sscMessageManager.h"
 
 #include "sscBoolDataAdapter.h"
 #include "sscDoubleDataAdapter.h"
 #include "sscColorDataAdapter.h"
 #include "sscStringDataAdapter.h"
+#include "cxCompositeTimedAlgorithm.h"
+#include "cxFilterTimedAlgorithm.h"
 
 namespace cx
 {

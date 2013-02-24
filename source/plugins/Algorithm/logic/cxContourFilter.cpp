@@ -37,7 +37,7 @@
 #include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxRepManager.h"
-
+#include "cxThresholdPreview.h"
 
 namespace cx
 {

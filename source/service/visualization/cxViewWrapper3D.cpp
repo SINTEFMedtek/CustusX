@@ -57,6 +57,7 @@
 #include "sscTexture3DSlicerRep.h"
 #include "sscSlices3DRep.h"
 #include "sscEnumConverter.h"
+#include "sscManualTool.h"
 
 #include "sscData.h"
 #include "sscAxesRep.h"
@@ -727,12 +728,12 @@ void ViewWrapper3D::toolsAvailableSlot()
 	for (iter = tools->begin(); iter != tools->end(); ++iter)
 	{
 		ssc::ToolPtr tool = iter->second;
-		if (tool->hasType(Tool::TOOL_REFERENCE))
+		if (tool->hasType(ssc::Tool::TOOL_REFERENCE))
 			continue;
 
 		ssc::ToolRep3DPtr toolRep = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
 
-		if (tool->hasType(Tool::TOOL_MANUAL) && !settings()->value("showManualTool").toBool())
+		if (tool->hasType(ssc::Tool::TOOL_MANUAL) && !settings()->value("showManualTool").toBool())
 		{
 			if (toolRep)
 				mView->removeRep(toolRep);

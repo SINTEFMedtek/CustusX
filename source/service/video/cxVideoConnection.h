@@ -12,27 +12,20 @@
 //
 // See CustusX_License.txt for more information.
 
-/*
- * cxRTSourceManager.h
- *
- *  \date Jan 25, 2011
- *      \author christiana
- */
 #ifndef CXVIDEOCONNECTION_H_
 #define CXVIDEOCONNECTION_H_
 
 #include <vector>
-#include <QtGui>
-#include "sscView.h"
-//#include "cxOpenIGTLinkRTSource.h"
-#include "cxRenderTimer.h"
-#include "sscStringDataAdapterXml.h"
+#include <QObject>
+#include <QProcess>
+#include "cxForwardDeclarations.h"
+#include "sscXmlOptionItem.h"
 
 namespace cx
 {
 
 typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
-typedef boost::shared_ptr<class OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
+typedef boost::shared_ptr<class GrabberVideoSource> GrabberVideoSourcePtr;
 
 /**
 * \file
@@ -47,6 +40,8 @@ typedef boost::shared_ptr<class OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
  * The connection can either operate on a remote server or a local one.
  * GUI can be found in cxIGTLinkWidget (along with some additional functionality...)
  *
+ *  \date Jan 25, 2011
+ *  \author christiana
  */
 class VideoConnection: public QObject
 {
@@ -78,7 +73,7 @@ public:
 	void launchAndConnectServer();
 
 	QProcess* getProcess();
-	OpenIGTLinkRTSourcePtr getVideoSource()
+	GrabberVideoSourcePtr getVideoSource()
 	{
 		return mRTSource;
 	}
@@ -96,7 +91,7 @@ public slots:
 private:
 	void delayedAutoConnectServer();
 
-	OpenIGTLinkRTSourcePtr mRTSource;
+	GrabberVideoSourcePtr mRTSource;
 	int mConnectWhenLocalServerRunning;
 	int mReconnectInterval;
 	ProcessWrapperPtr mProcess;

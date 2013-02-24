@@ -16,12 +16,11 @@
 #define CXVIEWWRAPPERRTSTREAM_H_
 
 #include <vector>
-#include <QtGui>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
 #include "sscDefinitions.h"
+
 #include "cxViewWrapper.h"
-#include "cxDominantToolProxy.h"
 
 namespace cx
 {

@@ -23,6 +23,8 @@
 #include "sscTime.h"
 #include "cxUsReconstructionFileMaker.h"
 #include "cxSavingVideoRecorder.h"
+#include "sscReconstructParams.h"
+#include "sscBoolDataAdapterXml.h"
 
 namespace cx
 {

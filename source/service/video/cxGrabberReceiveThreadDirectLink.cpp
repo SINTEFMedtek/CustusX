@@ -14,18 +14,11 @@
 
 #include "cxGrabberReceiveThreadDirectLink.h"
 
-#include "igtlOSUtil.h"
-#include "igtlMessageHeader.h"
-#include "igtlTransformMessage.h"
-#include "igtlPositionMessage.h"
-#include "igtlImageMessage.h"
-#include "igtlClientSocket.h"
-#include "igtlStatusMessage.h"
-
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "sscVector3D.h"
 #include "cxImageSenderFactory.h"
+#include "cxRenderTimer.h"
 
 namespace cx
 {
@@ -65,7 +58,7 @@ void GrabberDirectLinkThread::run()
 //  std::cout << "client::run thread: " << QThread::currentThread() << std::endl;
 	//std::cout << "run client thread, connecting to " << mAddress << " " << mPort << std::endl;
 
-	mFPSTimer.reset(2000);
+	mFPSTimer->reset(2000);
 
 	// run event loop
 	this->exec();

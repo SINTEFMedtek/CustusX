@@ -18,7 +18,6 @@
 #include <string>
 #include <QObject>
 #include "sscForwardDeclarations.h"
-#include "sscData.h"
 
 namespace cx
 {

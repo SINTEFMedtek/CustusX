@@ -27,6 +27,7 @@
 #include "cxVector3DWidget.h"
 #include "sscRegistrationTransform.h"
 #include "sscTimeKeeper.h"
+#include "sscManualTool.h"
 
 namespace cx
 {

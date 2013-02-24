@@ -16,20 +16,15 @@
 #define CXGRABBERDIRECTLINKTHREAD_H_
 
 #include <vector>
-#include <QtCore>
-#include <QTcpSocket>
 #include "boost/shared_ptr.hpp"
-class QTcpSocket;
-#include "igtlMessageHeader.h"
-#include "igtlClientSocket.h"
-#include "igtlImageMessage.h"
-#include "cxIGTLinkUSStatusMessage.h"
+
 #include "cxGrabberReceiveThread.h"
-#include "cxImageSender.h"
-#include "cxGrabberSender.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class ImageSender> ImageSenderPtr;
+typedef boost::shared_ptr<class GrabberSenderDirectLink> GrabberSenderDirectLinkPtr;
+
 /**
  * \file
  * \addtogroup cxServiceVideo
