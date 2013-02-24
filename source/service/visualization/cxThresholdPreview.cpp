@@ -20,6 +20,9 @@
 #include "sscImageLUT2D.h"
 #include "sscVolumetricRep.h"
 #include "cxRepManager.h"
+#include <QTimer>
+#include "sscImage.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {

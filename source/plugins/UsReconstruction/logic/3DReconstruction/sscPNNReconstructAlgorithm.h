@@ -20,12 +20,7 @@
 #ifndef SSCPNNRECONSTRUCTALGORITHM_H_
 #define SSCPNNRECONSTRUCTALGORITHM_H_
 
-#include <vtkImageData.h>
 #include "sscReconstructAlgorithm.h"
-#include "sscImage.h"
-#include "sscDoubleDataAdapterXml.h"
-//#include "sscStringDataAdapterXml.h"
-
 
 namespace ssc
 {

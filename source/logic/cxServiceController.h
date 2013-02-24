@@ -10,9 +10,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <QObject>
-
-#include "sscTool.h"
-#include "cxProbe.h"
+#include "sscForwardDeclarations.h"
 
 namespace cx
 {

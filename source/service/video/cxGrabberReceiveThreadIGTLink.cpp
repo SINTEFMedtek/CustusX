@@ -25,6 +25,7 @@
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxIGTLinkConversion.h"
+#include "cxRenderTimer.h"
 
 //int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
 //{
@@ -165,7 +166,7 @@ void GrabberReceiveThreadIGTLink::run()
 	// Create a message buffer to receive header
 	mHeaderMsg = igtl::MessageHeader::New();
 
-	mFPSTimer.reset(2000);
+	mFPSTimer->reset(2000);
 
 	// run event loop
 	this->exec();

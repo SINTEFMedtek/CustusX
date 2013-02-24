@@ -14,6 +14,8 @@
 
 #include <cxEraserWidget.h>
 
+#include <QTimer>
+
 #include "vtkSphereWidget.h"
 #include "vtkSplineWidget.h"
 #include "vtkSplineWidget2.h"

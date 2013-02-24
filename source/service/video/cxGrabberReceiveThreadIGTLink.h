@@ -15,13 +15,8 @@
 #define CXGRABBERRECEIVETHREADIGTLINK_H_
 
 #include <vector>
-#include <QtCore>
 #include <QTcpSocket>
 #include "boost/shared_ptr.hpp"
-class QTcpSocket;
-#include "igtlMessageHeader.h"
-#include "igtlClientSocket.h"
-#include "igtlImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxGrabberReceiveThread.h"

@@ -15,8 +15,9 @@
 #ifndef CXTHRESHOLDPREVIEW_H_
 #define CXTHRESHOLDPREVIEW_H_
 
-#include <QTimer>
-#include "sscImage.h"
+#include <QObject>
+class QTimer;
+#include "sscForwardDeclarations.h"
 
 namespace cx
 {

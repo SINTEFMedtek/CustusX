@@ -25,7 +25,7 @@
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "cxRequestEnterStateTransition.h"
-#include "cxStateService.h"
+//#include "cxStateService.h"
 #include "cxPatientData.h"
 
 namespace cx

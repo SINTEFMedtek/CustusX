@@ -1,39 +1,35 @@
-/*
- * sscReconstructManager.cpp
- *
- *  \date Oct 4, 2011
- *      \author christiana
- */
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
 
 #include <sscReconstructManager.h>
 
-#include <algorithm>
-#include <QtCore>
-#include <vtkImageData.h>
-#include "sscBoundingBox3D.h"
-#include "sscDataManager.h"
-#include "sscXmlOptionItem.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
-#include "utils/sscReconstructHelper.h"
-#include "sscTime.h"
-#include "sscTypeConversions.h"
-#include "sscRegistrationTransform.h"
-#include "sscUtilHelpers.h"
-#include "cxCreateProbeDataFromConfiguration.h"
-#include "sscVolumeHelpers.h"
-#include "sscPresetTransferFunctions3D.h"
-#include "cxToolManager.h"
-#include "sscManualTool.h"
-#include "cxPatientService.h"
-#include "cxPatientData.h"
-#include "cxViewManager.h"
+#include "sscBoolDataAdapterXml.h"
 #include "cxCompositeTimedAlgorithm.h"
 #include "sscReconstructThreads.h"
 #include "sscUSFrameData.h"
 #include "cxUsReconstructionFileReader.h"
+#include "sscReconstructPreprocessor.h"
+#include "sscReconstructParams.h"
+#include "sscReconstructAlgorithm.h"
+
 
 //Windows fix
 #ifndef M_PI

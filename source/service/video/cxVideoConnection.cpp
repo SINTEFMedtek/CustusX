@@ -12,17 +12,11 @@
 //
 // See CustusX_License.txt for more information.
 
-/*
- * cxOpenIGTLinkConnection.cpp
- *
- *  \date Jan 25, 2011
- *      \author christiana
- */
-
 #include "cxVideoConnection.h"
 #include <QStringList>
 
 #include "vtkRenderWindow.h"
+#include <QTimer>
 
 #include "sscLabeledComboBoxWidget.h"
 #include "sscVideoRep.h"
@@ -33,6 +27,7 @@
 #include "cxImageSenderFactory.h"
 #include "cxProcessWrapper.h"
 #include "cxGrabberVideoSource.h"
+#include "sscStringDataAdapterXml.h"
 
 namespace cx
 {
@@ -61,7 +56,7 @@ VideoConnection::VideoConnection()
 	mProcess.reset(new ProcessWrapper("Local Video Server"));
 	connect(mProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 
-	mRTSource.reset(new OpenIGTLinkRTSource());
+	mRTSource.reset(new GrabberVideoSource());
 	connect(getVideoSource().get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
 	connect(mRTSource.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int))); // thread-bridging connection
 }

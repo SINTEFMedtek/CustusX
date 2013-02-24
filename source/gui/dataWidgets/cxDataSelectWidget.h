@@ -14,14 +14,15 @@
 #ifndef CXDATASELECTWIDGET_H
 #define CXDATASELECTWIDGET_H
 
+#include "boost/shared_ptr.hpp"
 #include "cxBaseWidget.h"
-#include "cxViewWrapper.h"
-#include "cxDataInterface.h"
 #include <QMouseEvent>
 
 
 namespace cx
 {
+typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStringDataAdapterBasePtr;
 
 /** Widget for selecting/showing/removing a ssc::Data.
   *

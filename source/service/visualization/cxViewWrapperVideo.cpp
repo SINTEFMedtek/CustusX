@@ -14,8 +14,13 @@
 
 #include "cxViewWrapperVideo.h"
 #include <vector>
+#include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+
+#include <QAction>
+#include <QMenu>
+
 #include "sscUtilHelpers.h"
 #include "sscView.h"
 #include "sscSliceProxy.h"

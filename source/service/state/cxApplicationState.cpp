@@ -27,6 +27,7 @@
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 #include "cxToolManager.h"
+#include "cxWorkflowStateMachine.h"
 
 namespace cx
 {
