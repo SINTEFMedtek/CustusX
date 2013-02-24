@@ -15,6 +15,7 @@
 #include "cxBinaryThinningImageFilter3DFilter.h"
 
 #include "cxAlgorithmHelpers.h"
+#include <itkBinaryThinningImageFilter3D.h>
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscRegistrationTransform.h"

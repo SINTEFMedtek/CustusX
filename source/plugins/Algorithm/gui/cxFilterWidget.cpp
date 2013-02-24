@@ -36,6 +36,8 @@
 
 #include "sscTypeConversions.h"
 #include "cxDataSelectWidget.h"
+#include "sscMessageManager.h"
+#include "cxThresholdPreview.h"
 
 namespace cx
 {

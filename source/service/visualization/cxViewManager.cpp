@@ -34,6 +34,7 @@
 //#include "vtkInteractorStyleTrackballCamera.h"
 //#include "vtkInteractorStyleTrackballActor.h"
 //#include "vtkInteractorStyleFlight.h"
+#include "cxLayoutData.h"
 
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"

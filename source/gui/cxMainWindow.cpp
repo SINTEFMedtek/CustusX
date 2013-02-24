@@ -51,6 +51,9 @@
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
 #include "cxDataAdapterHelper.h"
+#include "cxGrabberVideoSource.h"
+#include "cxWorkflowStateMachine.h"
+#include "cxApplicationStateMachine.h"
 
 #include "sscDICOMLibConfig.h"
 

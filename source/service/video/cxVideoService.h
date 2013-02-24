@@ -24,13 +24,14 @@
 
 #include <QObject>
 
-#include "cxVideoConnection.h"
 #include "sscVideoSource.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
+
 //typedef boost::shared_ptr<class OpenIGTLinkDirectLinkRTSource> OpenIGTLinkDirectLinkRTSourcePtr;
 
 

@@ -24,14 +24,12 @@
 #include <vector>
 #include <QPointer>
 #include <QObject>
-//#include "sscData.h"
 #include "sscDefinitions.h"
-//#include "sscAxesRep.h"
-//#include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
 #include "sscVector3D.h"
-#include "sscPointMetric.h"
+#include "sscCoordinateSystemHelpers.h"
+
 class QAction;
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
@@ -39,6 +37,7 @@ typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWi
 namespace ssc
 {
 typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
+typedef boost::shared_ptr<class CoordinateSystemListener> CoordinateSystemListenerPtr;
 }
 
 namespace cx

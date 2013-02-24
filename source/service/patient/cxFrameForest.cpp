@@ -14,6 +14,9 @@
 
 #include "cxFrameForest.h"
 
+#include "sscData.h"
+#include "sscDataManager.h"
+
 namespace cx
 {
 

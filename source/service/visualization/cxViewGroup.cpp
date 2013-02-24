@@ -31,6 +31,7 @@
 #include "cxCameraControl.h"
 #include "sscData.h"
 #include "cxViewWrapper.h"
+#include "sscManualTool.h"
 
 namespace cx
 {

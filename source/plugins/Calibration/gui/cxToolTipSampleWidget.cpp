@@ -19,8 +19,6 @@
 #include "sscDefinitionStrings.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
-#include "cxTool.h"
-//#include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 

@@ -22,6 +22,7 @@
 #include "cxVideoService.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
 #include "cxGrabberVideoSource.h"
+#include "cxVideoConnection.h"
 
 namespace cx
 {

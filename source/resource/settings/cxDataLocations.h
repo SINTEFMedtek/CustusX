@@ -15,7 +15,6 @@
 #define CXDATALOCATIONS_H_
 
 #include <QString>
-#include "boost/shared_ptr.hpp"
 
 namespace cx
 {

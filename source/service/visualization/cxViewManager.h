@@ -21,7 +21,7 @@
 #include "sscData.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "cxLayoutData.h"
+//#include "cxLayoutData.h"
 #include "cxViewCache.h"
 
 class QActionGroup;
@@ -33,7 +33,8 @@ class QTime;
 
 namespace cx
 {
-
+class LayoutData;
+class LayoutRegion;
 class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;

@@ -4,6 +4,8 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include "cxFrameForest.h"
+#include "sscDataManager.h"
+#include "sscData.h"
 
 namespace cx
 {

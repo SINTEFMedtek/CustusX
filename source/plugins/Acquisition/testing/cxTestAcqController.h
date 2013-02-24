@@ -8,7 +8,7 @@
 #define CXTESTCUSTUSXCONTROLLER_H_
 
 #include <QApplication>
-#include "cxVideoService.h"
+#include "sscForwardDeclarations.h"
 #include "cxAcquisitionData.h"
 #include "cxUSAcquisition.h"
 #include "cxUSReconstructInputData.h"

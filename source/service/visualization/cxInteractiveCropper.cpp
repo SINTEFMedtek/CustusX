@@ -37,6 +37,7 @@
 #include "sscImage.h"
 #include "sscTransform3D.h"
 #include "sscVolumetricRep.h"
+#include "cxActiveImageProxy.h"
 
 namespace cx
 {

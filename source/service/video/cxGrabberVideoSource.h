@@ -11,24 +11,17 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-
-/*
- * cxOpenIGTLinkRTSource.h
- *
- *  \date Oct 31, 2010
- *      \author christiana
- */
 #ifndef CXOPENIGTLINKRTSOURCE_H_
 #define CXOPENIGTLINKRTSOURCE_H_
 
-#include "sscVideoSource.h"
-#include <boost/array.hpp>
-#include "igtlImageMessage.h"
 #include <vector>
+#include <map>
+#include <boost/array.hpp>
+
+#include "sscForwardDeclarations.h"
+#include "sscVideoSource.h"
 #include "sscProbeData.h"
-#include "cxProbe.h"
-#include "cxIGTLinkUSStatusMessage.h"
-#include "cxIGTLinkImageMessage.h"
+
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
@@ -43,18 +36,21 @@ namespace cx
 
 typedef boost::shared_ptr<class GrabberReceiveThread> GrabberReceiveThreadPtr;
 
-/**\brief Implementation of ssc::VideoSource for the OpenIGTLink protocol.
- * \ingroup cxServiceVideo
+/** \brief Implementation of ssc::VideoSource for the OpenIGTLink protocol.
+ *  \ingroup cxServiceVideo
  *
  * Synchronize data with source,
  * provide data as a vtkImageData.
+ *
+ *  \date Oct 31, 2010
+ *  \author christiana
  */
-class OpenIGTLinkRTSource: public ssc::VideoSource
+class GrabberVideoSource: public ssc::VideoSource
 {
 Q_OBJECT
 public:
-	OpenIGTLinkRTSource();
-	virtual ~OpenIGTLinkRTSource();
+	GrabberVideoSource();
+	virtual ~GrabberVideoSource();
 	virtual QString getUid()
 	{
 		return "us_openigtlink_source";
@@ -104,7 +100,7 @@ private:
 	QTimer* mTimeoutTimer;
 	double mFPS;
 };
-typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
+typedef boost::shared_ptr<GrabberVideoSource> GrabberVideoSourcePtr;
 
 /**
  * @}

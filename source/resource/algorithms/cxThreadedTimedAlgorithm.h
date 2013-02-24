@@ -15,28 +15,13 @@
 #ifndef CXTHREADEDTIMEDALGORITHM_H_
 #define CXTHREADEDTIMEDALGORITHM_H_
 
-
-#include <QtGui>
-
-#include <QObject>
-#include <QDateTime>
-#include <QTimer>
+#include <QFutureWatcher>
+#include <QtConcurrentRun>
 
 #include "cxTimedAlgorithm.h"
 
-#include <itkImage.h>
-#include <itkSmoothingRecursiveGaussianImageFilter.h>
-#include <itkBinaryThresholdImageFilter.h>
-#include <itkBinaryThinningImageFilter3D.h>
-#include "ItkVtkGlue/itkImageToVTKImageFilter.h"
-#include "ItkVtkGlue/itkVTKImageToImageFilter.h"
-
-#include <vtkImageCast.h>
-
-#include "sscMessageManager.h"
-#include "sscImage.h"
-#include <boost/function.hpp>
-
+#include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 
 namespace cx
 {

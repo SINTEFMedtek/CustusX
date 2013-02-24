@@ -17,15 +17,8 @@
 
 #include "sscView.h"
 
-class QWidget;
-class QMenu;
-
 namespace cx
 {
-class DataManager;
-class RepManager;
-class MessageManager;
-class ViewManager;
 
 /**
  * \file

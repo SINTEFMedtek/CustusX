@@ -20,10 +20,10 @@
 #include "sscStringDataAdapterXml.h"
 #include "cxFilter.h"
 #include "cxFilterTimedAlgorithm.h"
-#include "cxThresholdPreview.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class WidgetObscuredListener> WidgetObscuredListenerPtr;
 class TimedAlgorithmProgressBar;
 
 /** Widget for displaying a list of DataAdapter instances.

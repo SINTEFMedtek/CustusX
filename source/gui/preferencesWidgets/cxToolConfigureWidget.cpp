@@ -13,6 +13,7 @@
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
 #include "cxDataLocations.h"
+#include "cxApplicationStateMachine.h"
 
 namespace cx
 {

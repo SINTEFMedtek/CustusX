@@ -3,19 +3,23 @@
 #include <QLabel>
 #include <QString>
 #include <QHBoxLayout>
+#include <QAction>
+#include <QToolButton>
+#include <QPixmap>
+#include <QMetaObject>
+
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
-//#include "cxStateService.h"
 #include "cxVideoConnection.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
-#include <QPixmap>
-#include <QMetaObject>
 #include "cxVideoService.h"
 #include "boost/bind.hpp"
+#include <QMetaMethod>
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 #include "cxGrabberVideoSource.h"
+#include "sscManualTool.h"
 
 
 namespace cx
@@ -55,7 +59,7 @@ void StatusBar::connectToToolSignals()
 	for (ssc::ToolManager::ToolMap::iterator it = tools->begin(); it != tools->end(); ++it)
 	{
 		ssc::ToolPtr tool = it->second;
-		if (tool->hasType(Tool::TOOL_MANUAL))
+		if (tool->hasType(ssc::Tool::TOOL_MANUAL))
 			continue;
 		if (tool == ToolManager::getInstance()->getManualTool())
 			continue;
@@ -152,7 +156,7 @@ void StatusBar::tpsSlot(int numTps)
 
 void StatusBar::grabbingFpsSlot(int numFps)
 {
-	OpenIGTLinkRTSourcePtr grabber = videoService()->getIGTLinkVideoConnection()->getVideoSource();
+	GrabberVideoSourcePtr grabber = videoService()->getIGTLinkVideoConnection()->getVideoSource();
 	QString infoString = grabber->getName() + "-FPS: " + QString::number(numFps);
 	mGrabbingInfoLabel->setText(infoString);
 }

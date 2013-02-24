@@ -15,9 +15,7 @@
 #include "sscStringDataAdapter.h"
 #include "sscDefinitions.h"
 #include "sscVideoSource.h"
-//#include "cxRegistrationManager.h"
 #include "cxForwardDeclarations.h"
-//#include "cxRecordSession.h"
 #include "cxActiveImageProxy.h"
 
 namespace cx

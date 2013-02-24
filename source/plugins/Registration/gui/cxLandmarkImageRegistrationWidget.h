@@ -3,7 +3,6 @@
 
 #include "cxLandmarkRegistrationWidget.h"
 #include "cxRegistrationDataAdapters.h"
-#include "Rep/cxLandmarkRep.h"
 #include "cxDominantToolProxy.h"
 
 class QVBoxLayout;

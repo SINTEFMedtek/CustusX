@@ -1,29 +1,36 @@
-/*
- * sscReconstructManager.h
- *
- *  \date Oct 4, 2011
- *      \author christiana
- */
+// This file is part of SSC,
+// a C++ Library supporting Image Guided Therapy Applications.
+//
+// Copyright (C) 2008- SINTEF Medical Technology
+// Copyright (C) 2008- Sonowand AS
+//
+// SSC is owned by SINTEF Medical Technology and Sonowand AS,
+// hereafter named the owners. Each particular piece of code
+// is owned by the part that added it to the library.
+// SSC source code and binaries can only be used by the owners
+// and those with explicit permission from the owners.
+// SSC shall not be distributed to anyone else.
+//
+// SSC is distributed WITHOUT ANY WARRANTY; without even
+// the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE.
+//
+// See sscLicense.txt for more information.
 
 #ifndef SSCRECONSTRUCTMANAGER_H_
 #define SSCRECONSTRUCTMANAGER_H_
 
-#include <QObject>
-#include <QThread>
-#include <math.h>
-#include "sscReconstructAlgorithm.h"
-#include "sscBoundingBox3D.h"
-#include "sscReconstructedOutputVolumeParams.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
+#include <set>
+#include "cxForwardDeclarations.h"
 #include "sscXmlOptionItem.h"
-#include "sscProbeSector.h"
-#include "cxThreadedTimedAlgorithm.h"
-#include "sscReconstructPreprocessor.h"
-#include "sscReconstructParams.h"
 #include "sscReconstructCore.h"
-#include "sscReconstructPreprocessor.h"
+#include "cxUSReconstructInputData.h"
+#include "sscReconstructedOutputVolumeParams.h"
+
+namespace cx
+{
+typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
+}
 
 namespace ssc
 {
@@ -31,6 +38,8 @@ namespace ssc
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
+typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
+typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
 
 /**
  * \file
@@ -41,6 +50,7 @@ typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructPreprocessor> ThreadedTimedReconstructPreprocessorPtr;
 typedef boost::shared_ptr<class ThreadedTimedReconstructCore> ThreadedTimedReconstructCorePtr;
+
 
 /**
  * \brief Manager for the us reconstruction process.

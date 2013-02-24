@@ -1,5 +1,6 @@
 #include "cxTestAcquisition.h"
 
+#include <QTimer>
 #include <vtkImageData.h>
 #include "sscReconstructManager.h"
 #include "sscImage.h"

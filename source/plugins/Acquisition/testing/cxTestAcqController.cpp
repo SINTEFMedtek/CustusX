@@ -12,6 +12,8 @@
 #include <QTimer>
 #include <cppunit/extensions/HelperMacros.h>
 
+#include <vtkImageData.h>
+
 #include "sscDataManager.h"
 #include "sscDummyTool.h"
 #include "sscTypeConversions.h"
@@ -34,6 +36,7 @@
 #include "sscUSFrameData.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxImageDataContainer.h"
+#include "sscStringDataAdapterXml.h"
 
 TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
 {

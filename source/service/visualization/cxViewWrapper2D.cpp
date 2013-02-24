@@ -22,8 +22,16 @@
 
 #include "cxViewWrapper2D.h"
 #include <vector>
+#include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+
+#include <QAction>
+#include <QActionGroup>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QWheelEvent>
+
 #include "sscUtilHelpers.h"
 #include "sscView.h"
 #include "sscSliceProxy.h"
@@ -33,6 +41,7 @@
 #include "sscOrientationAnnotation2DRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
+#include "sscManualTool.h"
 #include "sscDataManager.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
@@ -49,6 +58,7 @@
 #include "sscData.h"
 #include "sscMesh.h"
 #include "sscImage.h"
+#include "sscPointMetricRep2D.h"
 
 namespace cx
 {
