@@ -24,6 +24,7 @@
 #include "cxStateService.h"
 #include "cxPatientService.h"
 #include "cxLogicManager.h"
+#include "cxWorkflowStateMachine.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {

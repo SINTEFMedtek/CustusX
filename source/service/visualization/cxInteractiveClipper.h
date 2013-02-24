@@ -12,13 +12,6 @@
 //
 // See CustusX_License.txt for more information.
 
-/*
- * cxInteractiveClipper.h
- *
- *  \date Aug 24, 2010
- *      \author christiana
- */
-
 #ifndef CXINTERACTIVECLIPPER_H_
 #define CXINTERACTIVECLIPPER_H_
 
@@ -35,14 +28,15 @@ namespace cx
 * @{
 */
 
-/**Helper class for clipping the active volume using a specific slice plane.
- * The visible slice planes are the only ones allowed for clipping.
+/** Helper class for clipping the active volume using a specific slice plane.
+ *  The visible slice planes are the only ones allowed for clipping.
+ *  \date Aug 24, 2010
+ *  \author christiana
  */
 class InteractiveClipper: public QObject
 {
 Q_OBJECT
 public:
-//	explicit InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy);
 	InteractiveClipper();
 
 	void setSlicePlane(ssc::PLANE_TYPE plane);

@@ -17,7 +17,10 @@
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxProbeConfigWidget.h"
 #include "cxDisplayTimerWidget.h"
-
+#include "sscReconstructParams.h"
+#include "cxTimedAlgorithm.h"
+#include "sscLabeledComboBoxWidget.h"
+#include "sscStringDataAdapterXml.h"
 
 namespace cx
 {

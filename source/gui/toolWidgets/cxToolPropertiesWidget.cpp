@@ -17,6 +17,7 @@
 #include "cxTool.h"
 #include "cxToolDataAdapters.h"
 #include "cxActiveToolWidget.h"
+#include "sscManualTool.h"
 
 namespace cx
 {

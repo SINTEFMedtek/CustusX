@@ -18,6 +18,7 @@
 #include <QtCore>
 #include <boost/bind.hpp>
 #include "vtkImageImport.h"
+#include "vtkImageData.h"
 #include "sscTypeConversions.h"
 #include "cxUsReconstructionFileReader.h"
 #include "sscTestVideoSource.h"

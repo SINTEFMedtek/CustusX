@@ -17,13 +17,8 @@
 
 #include <QObject>
 #include <map>
-#include <set>
 #include <vector>
 #include "sscForwardDeclarations.h"
-#include "sscMessageManager.h"
-#include "sscTool.h"
-#include "sscTypeConversions.h"
-#include "cxThresholdPreview.h"
 
 namespace ssc
 {
@@ -36,6 +31,7 @@ namespace cx
 
 typedef std::map<QString, ssc::RepPtr> RepMap;
 typedef std::map<QString, ssc::VolumetricBaseRepPtr> VolumetricRepMap;
+typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
 
 class MessageManager;
 
@@ -157,18 +153,14 @@ protected slots:
 	void volumeRemovedSlot(QString uid);
 
 protected:
-
 	static RepManager* mTheInstance; ///< the only instance of this class
 
 	VolumetricRepMap mVolumetricRepByImageMap; ///< used for caching reps based on image content
 	bool mIsUsingGPU3DMapper;
 	double mMaxRenderSize;
 
-//  ssc::OrientationAnnotation3DRepPtr mAnnotationMarker;
-//  typedef std::multimap<QString, ssc::RepPtr> RepMultiMap;
 	typedef std::multimap<QString, ssc::RepPtr> RepMultiMap;
 	RepMultiMap mRepCache;
-//  RepMap              mRepMap; ///< contains all the reps in the specific maps above. Use for simplified access.
 
 private:
 	RepManager(); ///< creates a pool of reps

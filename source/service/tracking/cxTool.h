@@ -20,14 +20,8 @@
 #include <limits.h>
 #include <QTimer>
 #include <boost/shared_ptr.hpp>
-#include <igstkPolarisTrackerTool.h>
-#include <igstkAuroraTrackerTool.h>
-#include <igstkTransform.h>
-#include <igstkLogger.h>
-#include <itkStdStreamLogOutput.h>
 #include "sscTransform3D.h"
 #include "sscDefinitions.h"
-#include "cxIgstkTracker.h"
 #include "vtkForwardDeclarations.h"
 
 class QStringList;
@@ -47,6 +41,7 @@ typedef std::vector<double> DoubleVector;
 typedef boost::shared_ptr<DoubleVector> DoubleVectorPtr;
 typedef std::vector<ssc::Transform3DPtr> Transform3DVector;
 typedef boost::shared_ptr<Transform3DVector> Transform3DVectorPtr;
+typedef boost::shared_ptr<class IgstkTool> IgstkToolPtr;
 
 /**
  * \file
@@ -67,10 +62,10 @@ class Tool: public ssc::Tool
 {
 Q_OBJECT
 public:
-	typedef igstk::TrackerTool TrackerToolType;
-	typedef igstk::PolarisTrackerTool PolarisTrackerToolType;
-	typedef igstk::AuroraTrackerTool AuroraTrackerToolType;
-	typedef igstk::Transform TransformType;
+//	typedef igstk::TrackerTool TrackerToolType;
+//	typedef igstk::PolarisTrackerTool PolarisTrackerToolType;
+//	typedef igstk::AuroraTrackerTool AuroraTrackerToolType;
+//	typedef igstk::Transform TransformType;
 
 	/* //only used for documentation purposes
 	 TOOL_INVALID_REQUEST,             ///< internal state machine didn't accept the request

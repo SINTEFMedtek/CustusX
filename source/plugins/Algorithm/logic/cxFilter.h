@@ -17,14 +17,13 @@
 
 #include <vector>
 #include <QObject>
-#include "sscData.h"
-#include "sscDataAdapter.h"
-#include "cxDataInterface.h"
+#include "cxForwardDeclarations.h"
 #include "sscXmlOptionItem.h"
 class QDomElement;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStringDataAdapterBasePtr;
 
 typedef boost::shared_ptr<class Filter> FilterPtr;
 

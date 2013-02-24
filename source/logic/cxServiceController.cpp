@@ -7,6 +7,8 @@
 
 #include <cxServiceController.h>
 
+#include <QDir>
+
 #include "cxDataManager.h"
 #include "cxToolManager.h"
 #include "cxVideoService.h"

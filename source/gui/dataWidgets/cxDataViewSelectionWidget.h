@@ -9,7 +9,8 @@
 #define CXDATAVIEWSELECTIONWIDGET_H_
 
 #include <QListWidget>
-#include "cxViewWrapper.h"
+//#include "cxViewWrapper.h"
+#include "cxForwardDeclarations.h"
 class QLabel;
 
 namespace cx

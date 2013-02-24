@@ -7,6 +7,7 @@
 
 #include "sscDataManager.h"
 #include "sscRegistrationTransform.h"
+#include "sscImage.h"
 
 
 namespace cx

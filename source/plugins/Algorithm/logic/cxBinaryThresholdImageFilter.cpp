@@ -1,7 +1,8 @@
 #include "cxBinaryThresholdImageFilter.h"
 
 #include "cxAlgorithmHelpers.h"
-
+#include <itkBinaryThresholdImageFilter.h>
+#include <vtkImageCast.h>
 #include "sscDataManager.h"
 #include "sscUtilHelpers.h"
 #include "sscRegistrationTransform.h"
@@ -16,6 +17,8 @@
 #include "cxThresholdPreview.h"
 #include "cxContourFilter.h"
 #include "sscMesh.h"
+#include "sscImage.h"
+
 
 namespace cx
 {

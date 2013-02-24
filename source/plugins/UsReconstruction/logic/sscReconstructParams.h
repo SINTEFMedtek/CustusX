@@ -14,20 +14,8 @@
 #ifndef SSCRECONSTRUCTPARAMS_H
 #define SSCRECONSTRUCTPARAMS_H
 
-#include <QObject>
-#include <QThread>
-#include <math.h>
-#include "sscReconstructAlgorithm.h"
-#include "sscBoundingBox3D.h"
-#include "sscReconstructedOutputVolumeParams.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
 #include "sscXmlOptionItem.h"
-#include "sscProbeSector.h"
-
-#include "sscReconstructCore.h"
-#include "sscReconstructPreprocessor.h"
+#include "cxForwardDeclarations.h"
 
 namespace ssc
 {

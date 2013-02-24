@@ -57,6 +57,12 @@ QVariant SyncedValue::get() const
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
+ViewGroupData::Options::Options() :
+    mShowLandmarks(false), mShowPointPickerProbe(false),
+    mPickerGlyph(new ssc::Mesh("PickerGlyph"))
+{
+}
+
 ViewGroupData::ViewGroupData() :
 				mCamera3D(CameraData::create())
 {

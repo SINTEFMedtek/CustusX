@@ -14,6 +14,7 @@
 #include "cxSamplerWidget.h"
 
 #include "sscCoordinateSystemHelpers.h"
+#include <vtkImageData.h>
 #include "cxToolManager.h"
 //#include "sscDataManager.h"
 #include "sscLabeledComboBoxWidget.h"

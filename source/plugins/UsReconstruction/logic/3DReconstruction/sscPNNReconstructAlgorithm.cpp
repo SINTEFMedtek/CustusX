@@ -26,6 +26,9 @@
 #include "sscVolumeHelpers.h"
 #include "sscTimeKeeper.h"
 #include "sscUSFrameData.h"
+#include <vtkImageData.h>
+#include "sscImage.h"
+#include "sscDoubleDataAdapterXml.h"
 
 namespace ssc
 {

@@ -18,12 +18,10 @@
 #include <vector>
 #include <QVariant>
 #include <QObject>
-#include <vtkPolyDataAlgorithm.h>
 #include "sscDefinitions.h"
 #include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
-#include <vtkSphereSource.h>
-#include "sscMesh.h"
 
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 class QMenu;
@@ -87,13 +85,10 @@ public:
 	// view options for this group.
 	struct Options
 	{
-		Options() : mShowLandmarks(false), mShowPointPickerProbe(false),
-				mPickerGlyph(new ssc::Mesh("PickerGlyph")) {}
+		Options();
 		bool mShowLandmarks;
 		bool mShowPointPickerProbe;
 		ssc::MeshPtr mPickerGlyph;
-//		vtkPolyDataAlgorithmPtr mPickerGlyph; ///< a glyph visually representing the picker.
-//		vtkSphereSourcePtr getSpherePickerGlyph() { return vtkSphereSource::SafeDownCast(mPickerGlyph); }
 	};
 
 	Options getOptions() const;

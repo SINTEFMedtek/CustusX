@@ -16,7 +16,6 @@
 #define CXPLAYBACKTOOL_H_
 
 #include "sscTool.h"
-//#include "sscToolManager.h"
 
 namespace cx
 {

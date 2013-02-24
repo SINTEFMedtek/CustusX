@@ -23,6 +23,7 @@
 #include "cxLayoutEditorTab.h"
 #include "cxViewWrapper3D.h"
 #include "sscHelperWidgets.h"
+#include "cxApplicationStateMachine.h"
 
 namespace cx
 {

@@ -25,6 +25,7 @@
 #include "sscImage.h"
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
+#include "cxViewWrapper.h"
 
 namespace cx
 {

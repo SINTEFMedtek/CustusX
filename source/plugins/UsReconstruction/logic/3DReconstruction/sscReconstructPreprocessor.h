@@ -19,7 +19,7 @@
 #ifndef SSCRECONSTRUCTPREPROCESSOR_H
 #define SSCRECONSTRUCTPREPROCESSOR_H
 
-#include "sscReconstructAlgorithm.h"
+
 #include "sscBoundingBox3D.h"
 #include "sscReconstructedOutputVolumeParams.h"
 #include "sscReconstructCore.h"
@@ -27,6 +27,7 @@
 
 namespace ssc
 {
+typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
 
 typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
 

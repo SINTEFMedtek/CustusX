@@ -7,7 +7,6 @@
 #ifndef CXDOUBLESPANSLIDER_H_
 #define CXDOUBLESPANSLIDER_H_
 
-//class QxtSpanSlider;
 #include <QWidget>
 #include "sscDoubleRange.h"
 #include "qxtspanslider.h"
