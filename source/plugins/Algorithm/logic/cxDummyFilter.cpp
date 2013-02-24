@@ -14,6 +14,11 @@
 
 #include "cxDummyFilter.h"
 #include "sscTypeConversions.h"
+#include "cxSelectDataStringDataAdapter.h"
+#include "sscData.h"
+#include "sscDoubleDataAdapterXml.h"
+#include "sscStringDataAdapterXml.h"
+#include "sscBoolDataAdapterXml.h"
 
 namespace cx
 {

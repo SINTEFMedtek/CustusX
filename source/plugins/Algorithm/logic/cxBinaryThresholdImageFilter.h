@@ -1,13 +1,7 @@
 #ifndef CXSBINARYTHRESHOLDIMAGEFILTER_H_
 #define CXSBINARYTHRESHOLDIMAGEFILTER_H_
 
-#include "cxThreadedTimedAlgorithm.h"
 #include "cxFilterImpl.h"
-#include "sscStringDataAdapter.h"
-#include "sscDoubleDataAdapter.h"
-#include "sscColorDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
 
 namespace cx
 {

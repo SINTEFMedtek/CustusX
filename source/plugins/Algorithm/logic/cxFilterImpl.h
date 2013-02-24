@@ -17,11 +17,7 @@
 
 #include <vector>
 #include <QObject>
-#include "sscData.h"
-#include "sscDataAdapter.h"
-#include "cxDataInterface.h"
 #include "cxFilter.h"
-#include "sscDoubleDataAdapterXml.h"
 #include <QDomElement>
 
 namespace cx

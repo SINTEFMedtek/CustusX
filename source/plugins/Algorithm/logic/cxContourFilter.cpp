@@ -23,21 +23,19 @@
 #include <vtkImageData.h>
 
 #include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscUtilHelpers.h"
-#include "sscMesh.h"
 #include "sscRegistrationTransform.h"
 #include "sscTypeConversions.h"
-
 #include "sscImage.h"
 #include "sscMesh.h"
 #include "sscDataManager.h"
-#include "sscTypeConversions.h"
+#include "sscDoubleDataAdapterXml.h"
+#include "sscBoolDataAdapterXml.h"
+#include "sscColorDataAdapterXml.h"
 #include "cxPatientData.h"
-#include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxRepManager.h"
 #include "cxThresholdPreview.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {

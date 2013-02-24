@@ -17,8 +17,6 @@
 
 #include "cxFilterImpl.h"
 
-#include "sscColorDataAdapterXml.h"
-
 namespace cx
 {
 

@@ -16,9 +16,6 @@
 #define CXDUMMYFILTER_H
 
 #include "cxFilterImpl.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
 
 namespace cx
 {
@@ -40,7 +37,6 @@ public:
 	virtual QString getName() const;
 	virtual QString getHelp() const;
 
-	//    virtual bool preProcess(QString outputPath);
 	virtual bool execute();
 	virtual bool postProcess();
 
