@@ -9,6 +9,7 @@
 #include "cxTubeSegmentationFilter.h"
 #include "cxDataLocations.h"
 #include "cxFilterTimedAlgorithm.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 #ifdef CX_USE_TSF
 #include "commons.hpp"
