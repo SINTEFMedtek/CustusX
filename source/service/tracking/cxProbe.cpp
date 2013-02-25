@@ -29,6 +29,7 @@
 #include "sscProbeAdapterRTSource.h"
 #include "sscTypeConversions.h"
 #include "sscVector3D.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -38,6 +39,10 @@ Probe::Probe(QString instrumentUid, QString scannerUid) :
 				mInstrumentUid(instrumentUid),
 				mScannerUid(scannerUid)
 {
+	ssc::ProbeData probeData;
+	mData[probeData.getUid()].mData = probeData;
+	mActiveUid = probeData.getUid();
+
 	mOverrideTemporalCalibration = false;
 	mTemporalCalibration = 0;
 	QString xmlFileName = cx::DataLocations::getRootConfigPath() + QString("/tool/ProbeCalibConfigs.xml");
@@ -55,7 +60,7 @@ Probe::Probe(QString instrumentUid, QString scannerUid) :
 	}
 }
 
-ssc::ProbeSectorPtr Probe::getSector()
+ssc::ProbeSectorPtr Probe::getSector(QString uid)
 {
 	ssc::ProbeSectorPtr retval(new ssc::ProbeSector());
 	retval->setData(this->getData());
@@ -64,34 +69,39 @@ ssc::ProbeSectorPtr Probe::getSector()
 
 bool Probe::isValid() const
 {
-	return mData.getType() != ssc::ProbeData::tNONE;
+	return this->getActiveInternalData().mData.getType() != ssc::ProbeData::tNONE;
 }
 
 void Probe::setTemporalCalibration(double val)
 {
-//  std::cout << "Probe::setTemporalCalibration " << val << std::endl;
 	mOverrideTemporalCalibration = true;
 	mTemporalCalibration = val;
-	mData.setTemporalCalibration(mTemporalCalibration);
-	//this->setConfigId(mConfigurationId);
+	for (InternalDataType::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
+		iter->second.mData.setTemporalCalibration(mTemporalCalibration);
 }
 
 void Probe::setSoundSpeedCompensationFactor(double factor)
 {
 	mSoundSpeedCompensationFactor = factor;
-	mData.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
+	for (InternalDataType::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
+		iter->second.mData.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
-	//this->setConfigId(mConfigurationId);
 }
 
-ssc::ProbeData Probe::getData() const
+ssc::ProbeData Probe::getData(QString uid) const
 {
-	return mData;
+	uid = this->toValidUid(uid);
+	if (!uid.isEmpty())
+		return ssc::ProbeData();
+	return mData.find(uid)->second.mData;
 }
 
-ssc::VideoSourcePtr Probe::getRTSource() const
+ssc::VideoSourcePtr Probe::getRTSource(QString uid) const
 {
-	return mSource;
+	uid = this->toValidUid(uid);
+	if (!uid.isEmpty())
+		return ssc::VideoSourcePtr();
+	return mData.find(uid)->second.mSource;
 }
 
 ProbePtr Probe::New(QString instrumentUid, QString scannerUid)
@@ -104,15 +114,56 @@ ProbePtr Probe::New(QString instrumentUid, QString scannerUid)
 
 void Probe::setRTSource(ssc::VideoSourcePtr source)
 {
+	SSC_ASSERT(source); // not handled after refactoring - add clear method??
+	if (!source)
+		return;
+
+	QString uid = this->toValidUid(source->getUid());
+	if (uid.isEmpty())
+	{
+		uid = source->getUid();
+
+		// first erase the default stream if anything else appears
+		if (uid!="default" && mData.count("default"))
+			mData.erase("default");
+
+		mData[uid];
+	}
+
+	StreamData& internalData = mData.find(uid)->second;
+
 	boost::shared_ptr<ssc::ProbeAdapterRTSource> adapter;
-	adapter = boost::shared_dynamic_cast<ssc::ProbeAdapterRTSource>(mSource);
+	adapter = boost::shared_dynamic_cast<ssc::ProbeAdapterRTSource>(internalData.mSource);
 	if (adapter && (source==adapter->getBaseSource()))
 		return;
 
-	mSource.reset();
+	internalData.mSource.reset();
 	if (source)
-		adapter.reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
-	mSource = adapter;
+		adapter.reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));	
+	internalData.mSource = adapter;
+
+	emit sectorChanged();
+}
+
+void Probe::setData(ssc::ProbeData probeSector, QString configUid)
+{
+	QString uid = this->toValidUid(probeSector.getUid());
+	if (uid.isEmpty())
+	{
+		// add new stream
+		uid = probeSector.getUid();
+
+		// first erase the default stream if anything else appears
+		if (uid!="default" && mData.count("default"))
+			mData.erase("default");
+
+		mData[uid];
+	}
+
+	StreamData& internalData = mData.find(uid)->second;
+
+	internalData.mData = probeSector;
+	mConfigurationId = configUid;
 	emit sectorChanged();
 }
 
@@ -171,8 +222,9 @@ void Probe::setConfigId(QString uid)
 
 	ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
 //  std::cout << "probeSector.mTemporalCalibration" << probeSector.mTemporalCalibration << std::endl;
-	mConfigurationId = uid;
-	mData = probeSector;
+//	mConfigurationId = uid;
+//	mData = probeSector;
+	this->setData(probeSector, uid);
 	//Update temporal calibration and sound speed compensation
 	if (mOverrideTemporalCalibration)
 		this->setTemporalCalibration(mTemporalCalibration);
@@ -180,20 +232,7 @@ void Probe::setConfigId(QString uid)
 	emit sectorChanged();
 }
 
-void Probe::setData(ssc::ProbeData probeSector, QString configUid)
-{
-	mData = probeSector;
-//	if (!mConfigurationId.endsWith('*'))
-//		mConfigurationId += "*";
-//	mConfigurationId = "";
-	mConfigurationId = configUid;
-	emit sectorChanged();
-}
-//void Probe::setProbeImageData(ssc::ProbeData::ProbeImageData imageData)
-//{
-//	mData.setImage(imageData);
-//	emit sectorChanged();
-//}
+
 ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
@@ -208,8 +247,6 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
 		return config;
 
 	config = mXml->getConfiguration(mScannerUid, mInstrumentUid, rtSourceList.at(0), uid);
-//  std::cout << "uids " << mScannerUid << " " << mInstrumentUid << " " << rtSourceList.at(0) << " " << uid << std::endl;
-//  std::cout << "config.mTemporalCalibration " << config.mTemporalCalibration << std::endl;
 	return config;
 }
 
@@ -221,37 +258,6 @@ QString Probe::getInstrumentScannerId() const
 {
 	return mScannerUid;
 }
-
-//void Probe::changeProbeSectorParameters(double depthStart, double depthEnd, double width)
-//{
-////	mData.mDepthStart = depthStart;
-////	mData.mDepthEnd = depthEnd;
-////	mData.mWidth = width;
-//	mData.setSector(depthStart, depthEnd, width);
-//	emit sectorChanged();
-//}
-
-//void Probe::changeProbeSectorSize(int width, int height)
-//{
-////	mData.mImage.mSize.setWidth(width);
-////	mData.mImage.mSize.setHeight(height);
-//	ssc::ProbeData::ProbeImageData image = mData.getImage();
-//	image.mSize.setWidth(width);
-//	image.mSize.setHeight(height);
-//	mData.setImage(image);
-//
-//	emit sectorChanged();
-//}
-//void Probe::changeProbeSectorOrigin(ssc::Vector3D origin)
-//{
-////	mData.mImage.mOrigin_p = origin;
-//
-//	ssc::ProbeData::ProbeImageData image = mData.getImage();
-//	image.mOrigin_p = origin;
-//	mData.setImage(image);
-//
-//	emit sectorChanged();
-//}
 
 void Probe::removeCurrentConfig()
 {
@@ -274,12 +280,57 @@ void Probe::saveCurrentConfig(QString uid, QString name)
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
 	config.mConfigId = uid;
 	config.mName = name;
-	config = createConfigurationFromProbeData(config, mData);
-
-//TODO: possibly fix old hack on storing temporal calibration??
+	config = createConfigurationFromProbeData(config, this->getActiveInternalData().mData);
 
 	mXml->saveCurrentConfig(config);
 	this->setConfigId(uid);
+}
+
+Probe::StreamData& Probe::getActiveInternalData()
+{
+	SSC_ASSERT(mData.count(mActiveUid));
+	return mData.find(mActiveUid)->second;
+}
+const Probe::StreamData& Probe::getActiveInternalData() const
+{
+	SSC_ASSERT(mData.count(mActiveUid));
+	return mData.find(mActiveUid)->second;
+}
+
+Probe::StreamData& Probe::getDataForUid(QString uid)
+{
+	return mData[uid];
+}
+
+QString Probe::toValidUid(QString uid) const
+{
+	if (uid=="active")
+		uid = mActiveUid;
+	if (mData.count(uid))
+		return uid;
+	return "";
+}
+
+QStringList Probe::getAvailableVideoSources()
+{
+	QStringList retval;
+	for (InternalDataType::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
+		retval << iter->first;
+	return retval;
+}
+
+void Probe::setActiveStream(QString uid)
+{
+	uid = this->toValidUid(uid);
+	if (uid.isEmpty())
+		return;
+	mActiveUid = uid;
+	emit sectorChanged();
+}
+
+QString Probe::getActiveStream() const
+{
+	return mActiveUid;
 }
 
 

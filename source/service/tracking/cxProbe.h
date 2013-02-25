@@ -47,9 +47,11 @@ public:
 	{
 	}
 	virtual bool isValid() const;
-	virtual ssc::ProbeData getData() const;
-	virtual ssc::VideoSourcePtr getRTSource() const;
-	virtual ssc::ProbeSectorPtr getSector();
+
+	virtual QStringList getAvailableVideoSources();
+	virtual ssc::VideoSourcePtr getRTSource(QString uid = "active") const;
+	virtual ssc::ProbeData getData(QString uid = "active") const;
+	virtual ssc::ProbeSectorPtr getSector(QString uid = "active");
 
 	virtual void addXml(QDomNode& dataNode);
 	virtual void parseXml(QDomNode& dataNode);
@@ -65,6 +67,9 @@ public:
 	virtual void setData(ssc::ProbeData probeSector, QString configUid="");
 	virtual void setRTSource(ssc::VideoSourcePtr source);
 
+	virtual void setActiveStream(QString uid);
+	virtual QString getActiveStream() const;
+
 	// non-inherited methods
 	ProbeXmlConfigParser::Configuration getConfiguration() const;
 	void removeCurrentConfig(); ///< remove the current config from disk
@@ -76,8 +81,30 @@ private:
 	QString getInstrumentId() const;
 	QString getInstrumentScannerId() const;
 
-	ssc::ProbeData mData; ///< Probe sector information
-	ssc::VideoSourcePtr mSource;
+	struct StreamData
+	{
+		ssc::ProbeData mData; ///< Probe sector information
+		ssc::VideoSourcePtr mSource;
+	};
+	QString mActiveUid;
+	const StreamData& getActiveInternalData() const;
+	StreamData& getActiveInternalData();
+
+	/** return a reference to the internal StreamData
+	  * object for uid.
+	  * If uid=="active", the mActiveUid is used.
+	  * If uid does not exist, an entry is created.
+	  */
+	StreamData& getDataForUid(QString uid);
+	/** Convert input uid to a valid uid,
+	  * or empty if no valid uid can be found.
+	  */
+	QString toValidUid(QString uid) const;
+
+	typedef std::map<QString, StreamData> InternalDataType;
+	InternalDataType mData;
+//	ssc::ProbeData mData; ///< Probe sector information
+//	ssc::VideoSourcePtr mSource;
 	ssc::ProbeWeakPtr mSelf;
 
 	double mSoundSpeedCompensationFactor;
