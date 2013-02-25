@@ -121,6 +121,7 @@ public:
 	double getCenterOffset() const { return mCenterOffset; }
 	ProbeImageData getImage() const { return mImage; }
 	void resample(QSize mSize);
+	QString getUid() const { return mUid; }
 
 	void setTemporalCalibration(double value) { mTemporalCalibration = value; }
 //	void setImage(ProbeImageData value) { mImage = value; }
@@ -128,6 +129,7 @@ public:
 	void setType(TYPE type);
 	void setImage(ProbeImageData value);
 	void setSector(double depthStart, double depthEnd, double width, double centerOffset = 0);
+	void setUid(QString uid);
 
 	void updateClipRectFromSector();
 	void updateSectorFromClipRect();
@@ -142,6 +144,7 @@ private:
 	double mCenterOffset; ///< Offset of center point for sectors, mm
 	ProbeImageData mImage;
 	double mSoundSpeedCompensationFactor; ///< The used sound speed compensation factor
+	QString mUid; ///<  the uid of the stream data this probe data applies to.
 };
 
 } // namespace ssc

@@ -76,7 +76,8 @@ void ProbeData::ProbeImageData::parseXml(QDomNode dataNode)
 
 ProbeData::ProbeData(TYPE type) :
 	mType(type), mDepthStart(0), mDepthEnd(0), mWidth(0),
-	mTemporalCalibration(0), mCenterOffset(0), mSoundSpeedCompensationFactor(1.0)
+	mTemporalCalibration(0), mCenterOffset(0), mSoundSpeedCompensationFactor(1.0),
+	mUid("default")
 {
 }
 
@@ -175,6 +176,10 @@ void ProbeData::parseXml(QDomNode dataNode)
 	mImage.parseXml(imageNode);
 }
 
+void ProbeData::setUid(QString uid)
+{
+	mUid = uid;
+}
 
 void ProbeData::applySoundSpeedCompensationFactor(double factor)
 {
