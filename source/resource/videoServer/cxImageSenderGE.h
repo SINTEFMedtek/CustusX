@@ -19,7 +19,7 @@ class QTimer;
 #include <QStringList>
 #include "igtlImageMessage.h"
 #include "cxImageSenderFactory.h"
-#include "../grabberCommon/cxIGTLinkImageMessage.h"
+#include "cxIGTLinkImageMessage.h"
 
 #include "GEStreamer.h"
 
