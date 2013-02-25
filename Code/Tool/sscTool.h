@@ -55,9 +55,9 @@ public:
 	{
 	}
 	virtual bool isValid() const = 0;
-	virtual ProbeData getData() const = 0;
-	virtual ProbeSectorPtr getSector() = 0;
-	virtual VideoSourcePtr getRTSource() const = 0;
+//	virtual ProbeData getData() const = 0;
+//	virtual ProbeSectorPtr getSector() = 0;
+//	virtual VideoSourcePtr getRTSource() const = 0;
 
 	virtual void addXml(QDomNode& dataNode) = 0;
 	virtual void parseXml(QDomNode& dataNode) = 0;
@@ -72,6 +72,27 @@ public:
 	virtual void setSoundSpeedCompensationFactor(double val) = 0;
 	virtual void setData(ssc::ProbeData probeSector, QString configUid="") = 0;
 	virtual void setRTSource(ssc::VideoSourcePtr source) = 0;
+
+	virtual void setActiveStream(QString uid) = 0;
+	virtual QString getActiveStream() const = 0;
+
+	/**
+	  * Return a list of all available video source.
+	  * The default is one with uid=='active'.
+	  */
+	virtual QStringList getAvailableVideoSources() = 0;
+	/**
+	  * Return a VideoSource for the given uid. Use 'active' to get the default stream.
+	  */
+	virtual VideoSourcePtr getRTSource(QString uid = "active") const = 0;
+	/**
+	  * Return a ProbeData for the given uid. Use 'active' to get the default.
+	  */
+	virtual ProbeData getData(QString uid = "active") const = 0;
+	/**
+	  * Return a ProbeSectorPtr for the given uid. Use 'active' to get the default.
+	  */
+	virtual ProbeSectorPtr getSector(QString uid = "active") = 0;
 
 signals:
 	void sectorChanged();
