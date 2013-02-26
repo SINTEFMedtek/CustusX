@@ -12,251 +12,315 @@
 //
 // See CustusX_License.txt for more information.
 
+/*
+ * sscOpenIGTLinkRTSource.cpp
+ *
+ *  \date Oct 31, 2010
+ *      \author christiana
+ */
 #include "cxVideoConnection.h"
-#include <QStringList>
 
-#include "vtkRenderWindow.h"
+#include <math.h>
+#include <vtkImageData.h>
+#include <vtkImageImport.h>
+#include <vtkDataSetMapper.h>
+#include <vtkTimerLog.h>
+#include <vtkImageFlip.h>
 #include <QTimer>
-
-#include "sscLabeledComboBoxWidget.h"
-#include "sscVideoRep.h"
+#include "vtkForwardDeclarations.h"
+#include <vtkDataSetMapper.h>
+#include <vtkLookupTable.h>
+#include <vtkAlgorithmOutput.h>
+#include <vtkImageExtractComponents.h>
+#include <vtkImageMapToColors.h>
+#include <vtkImageAppendComponents.h>
+#include <vtkImageChangeInformation.h>
+#include <vtkExtractVOI.h>
 #include "sscTypeConversions.h"
+#include "cxGrabberReceiveThreadIGTLink.h"
 #include "sscMessageManager.h"
-#include "cxSettings.h"
-#include "cxDataLocations.h"
+#include "sscTime.h"
+#include "sscVector3D.h"
+#include "sscProbeData.h"
+#include "sscToolManager.h"
+#include "sscDataManager.h"
+#include "cxProbe.h"
+#include "cxVideoService.h"
+#include "cxToolManager.h"
 #include "cxImageSenderFactory.h"
-#include "cxProcessWrapper.h"
-#include "cxGrabberVideoSource.h"
-#include "sscStringDataAdapterXml.h"
+#include "cxGrabberReceiveThreadDirectLink.h"
+#include "sscTypeConversions.h"
+#include "sscImage.h"
+#include "sscData.h"
+#include "sscLogger.h"
+#include "sscVolumeHelpers.h"
+#include "cxRenderTimer.h"
+
+typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
+typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 
 namespace cx
 {
 
-VideoConnection::VideoConnection()
+GrabberVideoSource::GrabberVideoSource()
 {
-	mReconnectInterval = 400;
-	mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("video");
+	mConnected = false;
+	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
-	QStringList connectionOptions;
-	QString defaultConnection = "Direct Link";
-#ifdef __APPLE__
-	defaultConnection = "Local Server";	// grabber server is the preferred method on Mac.
-#endif
-	connectionOptions << "Local Server" << "Direct Link" << "Remote Server";
-	mConnectionMethod = ssc::StringDataAdapterXml::initialize("Connection", "",
-			"Method for connecting to Video Server",
-			defaultConnection,
-			connectionOptions,
-			mOptions.getElement());
-	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(settingsChanged()));
+	vtkImageDataPtr emptyImage = ssc::generateVtkImageData(Eigen::Array3i(1,1,1),
+	                                                       ssc::Vector3D(1,1,1),
+	                                                       0);
+	mEmptyImage.reset(new ssc::Image("<none>", emptyImage));
+	mReceivedImage = mEmptyImage;
+	mRedirecter->SetInput(mEmptyImage->getBaseVtkImageData());
 
-	mConnectWhenLocalServerRunning = 0;
-
-	mIniScript.reset(new ProcessWrapper("Init Script"));
-	mProcess.reset(new ProcessWrapper("Local Video Server"));
-	connect(mProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
-
-	mRTSource.reset(new GrabberVideoSource());
-	connect(getVideoSource().get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
-	connect(mRTSource.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int))); // thread-bridging connection
+	mTimeout = true; // must start invalid
+	mTimeoutTimer = new QTimer(this);
+	mTimeoutTimer->setInterval(1000);
+	connect(mTimeoutTimer, SIGNAL(timeout()), this, SLOT(timeout()));
+	connect(this, SIGNAL(connected(bool)), this, SIGNAL(streaming(bool))); // define connected as streaming.
 }
 
-VideoConnection::~VideoConnection()
+GrabberVideoSource::~GrabberVideoSource()
 {
-	mRTSource->disconnectServer();
+	this->stopClient();
 }
 
-void VideoConnection::setLocalServerExecutable(QString commandline)
+void GrabberVideoSource::timeout()
 {
-	settings()->setValue("IGTLink/localServer", commandline);
+	if (mTimeout)
+		return;
+
+	ssc::messageManager()->sendWarning("Timeout!");
+	mTimeout = true;
+	emit newFrame();
 }
 
-QString VideoConnection::getLocalServerExecutable()
+QString GrabberVideoSource::getName()
 {
-	QString cmd = settings()->value("IGTLink/localServer").toString();
-	return cmd;
+	return mReceivedImage->getUid();
 }
 
-void VideoConnection::setPort(int port)
+void GrabberVideoSource::fpsSlot(double fpsNumber)
 {
-	settings()->setValue("IGTLink/port", port);
+	mFPS = fpsNumber;
+	emit fps(fpsNumber);
 }
 
-int VideoConnection::getPort()
+QString GrabberVideoSource::getInfoString() const
 {
-	QVariant var = settings()->value("IGTLink/port");
-	if (var.canConvert<int> ())
-		return var.toInt();
-	return 18333;
+	if (!mClient)
+		return "";
+	return mClient->hostDescription() + " - " + QString::number(mFPS, 'f', 1) + " fps";
 }
 
-void VideoConnection::setInitScript(QString filename)
+QString GrabberVideoSource::getStatusString() const
 {
-	settings()->setValue("IGTLink/initScript", filename);
+	if (!mClient)
+		return "Not connected";
+	if (mTimeout)
+		return "Timeout";
+	return "Running";
 }
 
-QString VideoConnection::getInitScript()
+void GrabberVideoSource::start()
 {
-	QString cmd = settings()->value("IGTLink/initScript").toString();
-	return cmd;
+
 }
 
-QProcess* VideoConnection::getProcess()
+void GrabberVideoSource::stop()
 {
-	return mProcess->getProcess();
+
 }
 
-bool VideoConnection::getUseLocalServer2()
+bool GrabberVideoSource::validData() const
 {
-	return mConnectionMethod->getValue() == "Local Server";
+	return mClient && !mTimeout;
 }
 
-bool VideoConnection::getUseDirectLink2()
+double GrabberVideoSource::getTimestamp()
 {
-	return mConnectionMethod->getValue() == "Direct Link";
+	return mReceivedImage->getAcquisitionTime().toMSecsSinceEpoch();
 }
 
-/**Get list of recent hosts. The first is the current.
+bool GrabberVideoSource::isConnected() const
+{
+	return mClient && mConnected;
+}
+
+bool GrabberVideoSource::isStreaming() const
+{
+	return this->isConnected();
+}
+
+void GrabberVideoSource::connectedSlot(bool on)
+{
+	mConnected = on;
+
+	if (!on)
+		this->disconnectServer();
+
+	emit connected(on);
+}
+
+void GrabberVideoSource::directLink(std::map<QString, QString> args)
+{
+	this->runClient(GrabberReceiveThreadPtr(new GrabberDirectLinkThread(args, this)));
+}
+
+
+void GrabberVideoSource::connectServer(QString address, int port)
+{
+	this->runClient(GrabberReceiveThreadPtr(new GrabberReceiveThreadIGTLink(address, port, this)));
+}
+
+
+void GrabberVideoSource::runClient(GrabberReceiveThreadPtr client)
+{
+	if (mClient)
+	{
+		std::cout << "client already exist - returning" << std::endl;
+		return;
+	}
+	mClient = client;
+	connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
+	connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
+	//connect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
+
+	mClient->start();
+	mTimeoutTimer->start();
+}
+
+void GrabberVideoSource::imageReceivedSlot()
+{
+	if (!mClient)
+		return;
+	this->updateImage(mClient->getLastImageMessage());
+}
+
+void GrabberVideoSource::sonixStatusReceivedSlot()
+{
+	if (!mClient)
+		return;
+	this->updateSonixStatus(mClient->getLastSonixStatusMessage());
+}
+
+/**Get rid of the mClient thread.
  *
  */
-QStringList VideoConnection::getHostHistory()
+void GrabberVideoSource::stopClient()
 {
-	QStringList hostHistory = settings()->value("IGTLink/hostHistory").toStringList();
-	if (hostHistory.isEmpty())
-		hostHistory << "Localhost";
-	return hostHistory;
-}
-
-QString VideoConnection::getHost()
-{
-	return this->getHostHistory().front(); // history will always contain elements.
-}
-
-void VideoConnection::setHost(QString host)
-{
-	QStringList history = this->getHostHistory();
-	history.prepend(host);
-	for (int i = 1; i < history.size(); ++i)
-		if (history[i] == host)
-			history.removeAt(i);
-	while (history.size() > 5)
-		history.removeLast();
-
-	settings()->setValue("IGTLink/hostHistory", history);
-}
-
-QStringList VideoConnection::getDirectLinkArgumentHistory()
-{
-	QStringList history = settings()->value("IGTLink/directLinkArgumentHistory").toStringList();
-	if (history.isEmpty())
-		history << "";
-	return history;
-}
-
-void VideoConnection::setLocalServerArguments(QString commandline)
-{
-	QStringList history = this->getDirectLinkArgumentHistory();
-	history.prepend(commandline);
-	for (int i = 1; i < history.size(); ++i)
-		if (history[i] == commandline)
-			history.removeAt(i);
-	while (history.size() > 5)
-		history.removeLast();
-
-	settings()->setValue("IGTLink/directLinkArgumentHistory", history);
-}
-
-QString VideoConnection::getLocalServerArguments()
-{
-	return this->getDirectLinkArgumentHistory().front(); // history will always contain elements.
-}
-
-void VideoConnection::launchServer()
-{
-	if (!this->getUseLocalServer2())
+	if (mClient)
 	{
-		ssc::messageManager()->sendError("Ignoring Launch local server: Must select local server");
+		mClient->quit();
+		mClient->wait(2000); // forever or until dead thread
+
+		if (mClient->isRunning())
+		{
+			mClient->terminate();
+			mClient->wait(); // forever or until dead thread
+			ssc::messageManager()->sendWarning(QString("Video Client [%1] did not quit normally - terminated.").arg(mClient->hostDescription()));
+		}
+
+		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
+		disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
+		disconnect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
+		disconnect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
+		disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
+
+		mClient.reset();
+	}
+}
+
+void GrabberVideoSource::disconnectServer()
+{
+	this->stopClient();
+
+	mTimeoutTimer->stop();
+
+	// clear the redirecter
+	mReceivedImage = mEmptyImage;
+	mRedirecter->SetInput(mEmptyImage->getBaseVtkImageData());
+	emit newFrame(); // changed
+}
+
+void GrabberVideoSource::clientFinishedSlot()
+{
+	if (!mClient)
 		return;
-	}
-
-	QString program = this->getLocalServerExecutable();
-	QStringList arguments = this->getLocalServerArguments().split(" ");
-
-//	std::cout << "program: " << program << std::endl;
-//	std::cout << "arguments: " << arguments.join("--") << std::endl;
-	mProcess->launch(program, arguments);
+//	if (mClient->isRunning()) // buggy: client might return running even if shutting down
+//		return;
+	this->disconnectServer();
 }
 
-void VideoConnection::connectServer()
-{
-	if (!mRTSource->isConnected())
-	{
-		if (this->getUseLocalServer2())
-			mRTSource->connectServer("LocalHost", this->getPort());
-		else
-			mRTSource->connectServer(this->getHost(), this->getPort());
-	}
-
-	this->delayedAutoConnectServer();
-}
-
-/** Attempt to connect to server at a later time if mConnectWhenLocalServerRunning >0,
- * and the server is unconnected.
- *
+/** extract information from the IGTLinkUSStatusMessage
+ *  and store locally. Also reset the old local info with
+ *  information from the probe in toolmanager.
  */
-void VideoConnection::delayedAutoConnectServer()
+void GrabberVideoSource::updateSonixStatus(ssc::ProbeData msg)
 {
-	if (mRTSource->isConnected())
-		mConnectWhenLocalServerRunning = 0;
-
-	if (mConnectWhenLocalServerRunning)
-	{
-		--mConnectWhenLocalServerRunning;
-		QTimer::singleShot(mReconnectInterval, this, SLOT(connectServer())); // the process need some time to get its tcp server up and listening. GrabberServer seems to need more than 500ms
-	}
-}
-
-
-void VideoConnection::launchAndConnectServer()
-{
-	if (this->getVideoSource()->isConnected())
+	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	if (!tool)
+		return;
+	ssc::ProbePtr probe = tool->getProbe();
+	if (!probe)
 		return;
 
-	mIniScript->launch(this->getInitScript());
+	// start with getting a valid data object from the probe, in order to keep
+	// existing values (such as temporal calibration).
+	ssc::ProbeData data = probe->getData();
 
-	if (this->getUseDirectLink2())
+	data.setType(msg.getType());
+	data.setSector(msg.getDepthStart(), msg.getDepthEnd(), msg.getWidth());
+	ssc::ProbeData::ProbeImageData image = data.getImage();
+	image.mOrigin_p = msg.getImage().mOrigin_p;
+	image.mSize = msg.getImage().mSize;
+	image.mSpacing = msg.getImage().mSpacing;
+	image.mClipRect_p = msg.getImage().mClipRect_p;
+	data.setImage(image);
+
+	probe->setData(data);
+}
+
+void GrabberVideoSource::updateImage(ssc::ImagePtr message)
+{
+	static CyclicActionTimer timer("Update Video Image");
+	timer.begin();
+
+	if (!message)
 	{
-		QString commandline = this->getLocalServerArguments();
-		StringMap args = extractCommandlineOptions(commandline.split(" "));
-		mRTSource->directLink(args);
+		std::cout << "got empty image !!!" << std::endl;
+		mReceivedImage = mEmptyImage;
+		mRedirecter->SetInput(mEmptyImage->getBaseVtkImageData());
 		return;
 	}
 
-	if (this->getUseLocalServer2())
-	{
-		this->launchServer();
+	mReceivedImage = message;
+	mRedirecter->SetInput(mReceivedImage->getBaseVtkImageData());
 
-		if (this->getProcess()->state() != QProcess::Running)
-		{
-			mConnectWhenLocalServerRunning = 5; // attempt N connects
-		}
-		else
-		{
-			this->connectServer();
-		}
-	}
-	else
+	mTimeout = false;
+	mTimeoutTimer->start();
+
+	//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
+	emit newFrame();
+	timer.time("emit");
+
+	if (timer.intervalPassed())
 	{
-		this->connectServer();
+		static int counter=0;
+//		if (++counter%10==0)
+//			ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
+		timer.reset();
 	}
+
 }
 
-void VideoConnection::serverProcessStateChanged(QProcess::ProcessState newState)
+vtkImageDataPtr GrabberVideoSource::getVtkImageData()
 {
-	if (newState == QProcess::Running)
-	{
-		this->delayedAutoConnectServer();
-	}
+	return mRedirecter->GetOutput();
 }
 
-}//end namespace cx
+}

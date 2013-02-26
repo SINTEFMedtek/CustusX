@@ -21,8 +21,8 @@
 
 #include "cxVideoService.h"
 #include "cxPlaybackUSAcquisitionVideo.h"
-#include "cxGrabberVideoSource.h"
 #include "cxVideoConnection.h"
+#include "cxVideoConnectionManager.h"
 
 namespace cx
 {
@@ -64,7 +64,7 @@ void VideoService::setInstance(VideoService* instance)
 
 VideoService::VideoService()
 {
-	mIGTLinkConnection.reset(new VideoConnection());
+	mIGTLinkConnection.reset(new VideoConnectionManager());
 	mActiveVideoSource = mIGTLinkConnection->getVideoSource();
 	mUSAcquisitionVideoPlayback.reset(new USAcquisitionVideoPlayback());
 //	mGrabberDirectLinkVideoSource.reset(new OpenIGTLinkDirectLinkRTSource());
@@ -82,7 +82,7 @@ USAcquisitionVideoPlaybackPtr VideoService::getUSAcquisitionVideoPlayback()
 	return mUSAcquisitionVideoPlayback;
 }
 
-VideoConnectionPtr VideoService::getIGTLinkVideoConnection()
+VideoConnectionManagerPtr VideoService::getIGTLinkVideoConnection()
 {
 	return mIGTLinkConnection;
 }

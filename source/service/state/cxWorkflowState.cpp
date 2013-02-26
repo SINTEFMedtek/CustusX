@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxWorkflowState.h"
-#include "cxVideoConnection.h"
+#include "cxVideoConnectionManager.h"
 #include "sscDataManager.h"
 #include "cxStateService.h"
 #include "cxPatientData.h"
