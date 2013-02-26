@@ -13,7 +13,7 @@
 namespace cx
 {
 typedef boost::shared_ptr<class IGTLinkClient> GrabberReceiveThreadIGTLinkPtr;
-typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
+typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
 typedef boost::shared_ptr<class GrabberVideoSource> GrabberVideoSourcePtr;
 
 
@@ -55,7 +55,7 @@ private:
   void updateDirectLinkArgumentHistory();
   QProcess* getServer();
   GrabberVideoSourcePtr getRTSource();
-  VideoConnectionPtr getConnection();
+  VideoConnectionManagerPtr getConnection();
   void writeSettings();
 
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget

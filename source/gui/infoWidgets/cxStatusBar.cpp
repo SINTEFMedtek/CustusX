@@ -10,7 +10,7 @@
 
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
-#include "cxVideoConnection.h"
+#include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxVideoService.h"
@@ -18,7 +18,7 @@
 #include <QMetaMethod>
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
-#include "cxGrabberVideoSource.h"
+#include "cxVideoConnection.h"
 #include "sscManualTool.h"
 
 

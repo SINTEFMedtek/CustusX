@@ -30,7 +30,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
-typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
+typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
 
 //typedef boost::shared_ptr<class OpenIGTLinkDirectLinkRTSource> OpenIGTLinkDirectLinkRTSourcePtr;
 
@@ -69,13 +69,13 @@ typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
  * recording functionality is not shown. ssc::VideoSourceRecorder handles this
  * on the basic level.
  *
- * VideoConnection manages the connection to the streaming source. The
+ * VideoConnectionManager manages the connection to the streaming source. The
  * implementation class OpenIGTLinkVideoSource uses the OpenIGTLink protocol
  * to receive data over TCP/IP. The actual data retrieval is done in the
  * internal thread class IGTLinkClient.
  *
  * The OpenIGTLinkRTSource is dependent on an external IGTLink server.
- * Optionally, the VideoConnection can create this server on the local machine.
+ * Optionally, the VideoConnectionManager can create this server on the local machine.
  * This is typically the GrabberServer, chapter 5.7.2.
  *
  *
@@ -89,7 +89,7 @@ public:
 	static void initialize();
 	static void shutdown();
 
-	VideoConnectionPtr getIGTLinkVideoConnection();
+	VideoConnectionManagerPtr getIGTLinkVideoConnection();
 	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
 	ssc::VideoSourcePtr getActiveVideoSource();
 	void setPlaybackMode(PlaybackTimePtr controller);
@@ -109,7 +109,7 @@ private:
 	VideoService(VideoService const&); // not implemented
 	VideoService& operator=(VideoService const&); // not implemented
 
-	VideoConnectionPtr mIGTLinkConnection;
+	VideoConnectionManagerPtr mIGTLinkConnection;
 //	OpenIGTLinkDirectLinkRTSourcePtr mGrabberDirectLinkVideoSource;
 	ssc::VideoSourcePtr mActiveVideoSource;
 	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
