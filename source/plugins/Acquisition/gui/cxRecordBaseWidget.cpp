@@ -13,7 +13,7 @@
 #include "sscMesh.h"
 #include "sscTransform3D.h"
 #include "cxRecordSessionWidget.h"
-#include "cxVideoConnection.h"
+#include "cxVideoConnectionManager.h"
 #include "cxProbe.h"
 #include "cxSoundSpeedConversionWidget.h"
 

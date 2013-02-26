@@ -33,7 +33,7 @@
 #include "cxIGTLinkWidget.h"
 #include "cxAudio.h"
 #include "cxSettings.h"
-#include "cxVideoConnection.h"
+#include "cxVideoConnectionManager.h"
 #include "cxToolManagerWidget.h"
 #include "cxVideoService.h"
 #include "cxLogicManager.h"
@@ -51,7 +51,7 @@
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
 #include "cxDataAdapterHelper.h"
-#include "cxGrabberVideoSource.h"
+#include "cxVideoConnection.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
 

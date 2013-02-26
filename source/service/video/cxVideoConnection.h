@@ -11,101 +11,99 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-
-#ifndef CXVIDEOCONNECTION_H_
-#define CXVIDEOCONNECTION_H_
+#ifndef CXOPENIGTLINKRTSOURCE_H_
+#define CXOPENIGTLINKRTSOURCE_H_
 
 #include <vector>
-#include <QObject>
-#include <QProcess>
-#include "cxForwardDeclarations.h"
-#include "sscXmlOptionItem.h"
+#include <map>
+#include <boost/array.hpp>
+#include "sscForwardDeclarations.h"
+#include "sscVideoSource.h"
+#include "sscProbeData.h"
+
+class QTimer;
+typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
+typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
 
 namespace cx
 {
-
-typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
-typedef boost::shared_ptr<class GrabberVideoSource> GrabberVideoSourcePtr;
-
 /**
-* \file
-* \addtogroup cxServiceVideo
-* @{
-*/
+ * \file
+ * \addtogroup cxServiceVideo
+ * @{
+ */
 
-/**\brief Class representing a single IGTLink connection,
- * connection facilities and options.
- * \ingroup cxServiceVideo
+typedef boost::shared_ptr<class GrabberReceiveThread> GrabberReceiveThreadPtr;
+
+/** \brief Implementation of ssc::VideoSource for the OpenIGTLink protocol.
+ *  \ingroup cxServiceVideo
  *
- * The connection can either operate on a remote server or a local one.
- * GUI can be found in cxIGTLinkWidget (along with some additional functionality...)
+ * Synchronize data with source,
+ * provide data as a vtkImageData.
  *
- *  \date Jan 25, 2011
+ *  \date Oct 31, 2010
  *  \author christiana
  */
-class VideoConnection: public QObject
+class GrabberVideoSource: public ssc::VideoSource
 {
 Q_OBJECT
 public:
-	VideoConnection();
-	virtual ~VideoConnection();
-
-	ssc::StringDataAdapterXmlPtr getConnectionMethod() { return mConnectionMethod; }
-
-	void setLocalServerExecutable(QString commandline);
-	QString getLocalServerExecutable();
-	void setPort(int port);
-	int getPort();
-	QStringList getHostHistory();
-	QString getHost();
-	void setHost(QString host);
-	QStringList getDirectLinkArgumentHistory();
-	void setLocalServerArguments(QString commandline);
-	QString getLocalServerArguments();
-
-	bool getUseLocalServer2();
-	bool getUseDirectLink2();
-
-	void setInitScript(QString filename);
-	QString getInitScript();
-
-	void launchServer();
-	void launchAndConnectServer();
-
-	QProcess* getProcess();
-	GrabberVideoSourcePtr getVideoSource()
+	GrabberVideoSource();
+	virtual ~GrabberVideoSource();
+	virtual QString getUid()
 	{
-		return mRTSource;
+		return "us_openigtlink_source";
 	}
-	void setReconnectInterval(int interval) { mReconnectInterval = interval; }
+	virtual QString getName();
+	virtual vtkImageDataPtr getVtkImageData();
+	virtual double getTimestamp();
+	virtual bool isConnected() const;
+
+	virtual QString getInfoString() const;
+	virtual QString getStatusString() const;
+
+	virtual void start();
+	virtual void stop();
+
+	virtual bool validData() const;
+	virtual bool isStreaming() const;
+	virtual void release() {}
+
+	// non-inherited methods
+	void directLink(std::map<QString, QString> args);
+	void connectServer(QString address, int port);
+	void disconnectServer();
 
 signals:
 	void fps(int fps);
-	void connected(bool on);
-	void settingsChanged();
-
-public slots:
-	void connectServer();
-	void serverProcessStateChanged(QProcess::ProcessState newState);
+private slots:
+	void clientFinishedSlot();
+	void imageReceivedSlot();
+	void sonixStatusReceivedSlot();
+	void timeout();
+	void fpsSlot(double fps);
+	void connectedSlot(bool on);
 
 private:
-	void delayedAutoConnectServer();
+	void updateImage(ssc::ImagePtr message); // called by receiving thread when new data arrives.
+	void updateSonixStatus(ssc::ProbeData message);
+	void runClient(GrabberReceiveThreadPtr client);
+	void stopClient();
 
-	GrabberVideoSourcePtr mRTSource;
-	int mConnectWhenLocalServerRunning;
-	int mReconnectInterval;
-	ProcessWrapperPtr mProcess;
-	ProcessWrapperPtr mIniScript;
-
-	ssc::StringDataAdapterXmlPtr mConnectionMethod;
-	ssc::XmlOptionFile mOptions;
-
+	ssc::ImagePtr mEmptyImage;
+	ssc::ImagePtr mReceivedImage;
+	vtkImageAlgorithmPtr mRedirecter;
+	GrabberReceiveThreadPtr mClient;
+	bool mConnected;
+	bool mTimeout;
+	QTimer* mTimeoutTimer;
+	double mFPS;
 };
-typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
+typedef boost::shared_ptr<GrabberVideoSource> GrabberVideoSourcePtr;
 
 /**
-* @}
-*/
-}//end namespace cx
+ * @}
+ */
+} // namespace cx
 
-#endif /* CXVIDEOCONNECTION_H_ */
+#endif /* CXOPENIGTLINKRTSOURCE_H_ */

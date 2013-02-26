@@ -18,14 +18,14 @@
 #include "sscToolManager.h"
 #include "sscTime.h"
 #include "sscMessageManager.h"
-#include "cxVideoConnection.h"
+#include "cxVideoConnectionManager.h"
 //#include "cxStateService.h"
 #include "cxImageServer.h"
 #include "cxVideoService.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "sscStringDataAdapterXml.h"
-#include "cxGrabberVideoSource.h"
+#include "cxVideoConnection.h"
 
 namespace cx
 {
@@ -202,7 +202,7 @@ GrabberVideoSourcePtr IGTLinkWidget::getRTSource()
 	return getConnection()->getVideoSource();
 }
 
-VideoConnectionPtr IGTLinkWidget::getConnection()
+VideoConnectionManagerPtr IGTLinkWidget::getConnection()
 {
 	return videoService()->getIGTLinkVideoConnection();
 }
