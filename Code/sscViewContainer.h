@@ -111,11 +111,29 @@ protected:
 	QWidget *mWidget;
 };
 
+class ViewContainerWidget : public ViewQVTKWidget
+{
+public:
+	ViewContainerWidget(ViewContainerBase *base, QWidget *parent = NULL, Qt::WFlags f = 0);
+	void setBase(ViewContainerBase *base) { mBase = base; }
+protected:
+	typedef ViewQVTKWidget widget;
+	
+private:
+	virtual void showEvent(QShowEvent* event);
+	virtual void wheelEvent(QWheelEvent*);
+	virtual void mouseMoveEvent(QMouseEvent *event);
+	virtual void mousePressEvent(QMouseEvent *event);
+	virtual void mouseReleaseEvent(QMouseEvent *event);
+	virtual void focusInEvent(QFocusEvent* event);
+
+	ViewContainerBase *mBase;
+};
+
 /// More advanced N:1 combination of SSC Views and Qt Widgets
-class ViewContainer : public ViewQVTKWidget, public ViewContainerBase
+class ViewContainer : public ViewContainerWidget, public ViewContainerBase
 {
 Q_OBJECT
-	typedef ViewQVTKWidget widget;
 
 public:
 	ViewContainer(QWidget *parent = NULL, Qt::WFlags f = 0);
@@ -126,17 +144,9 @@ public:
 protected:
 	virtual void clearBackground();
 	virtual void doRender();
-
 private:
-	virtual void showEvent(QShowEvent* event);
-	virtual void wheelEvent(QWheelEvent*);
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void mouseReleaseEvent(QMouseEvent *event);
-	virtual void focusInEvent(QFocusEvent* event);
 	virtual void paintEvent(QPaintEvent *event);
 	virtual void resizeEvent( QResizeEvent *event);
-
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 

@@ -61,9 +61,15 @@ ViewContainerBase::~ViewContainerBase()
 {
 }
 
+ViewContainerWidget::ViewContainerWidget(ViewContainerBase *base, QWidget *parent, Qt::WFlags f) :
+	ViewQVTKWidget(parent, f),
+	mBase(base)
+{
+}
+
 ViewContainer::ViewContainer(QWidget *parent, Qt::WFlags f) :
-			     ViewQVTKWidget(parent, f),
-			     ViewContainerBase(parent)
+	ViewContainerWidget(this, parent, f),
+	ViewContainerBase(parent)
 {
 	mWidget = this;
 	mRenderWindow = vtkRenderWindowPtr::New();
@@ -185,10 +191,10 @@ void ViewItem::setGeometry(const QRect &r)
 	}
 }
 
-void ViewContainer::mouseMoveEvent(QMouseEvent* event)
+void ViewContainerWidget::mouseMoveEvent(QMouseEvent* event)
 {
 	widget::mouseMoveEvent(event);
-	handleMouseMove(event->pos(), event->buttons());
+	mBase->handleMouseMove(event->pos(), event->buttons());
 }
 
 void ViewContainerBase::handleMouseMove(const QPoint &pos, const Qt::MouseButtons &buttons)
@@ -201,7 +207,7 @@ void ViewContainerBase::handleMouseMove(const QPoint &pos, const Qt::MouseButton
 	}	
 }
 
-void ViewContainer::mousePressEvent(QMouseEvent* event)
+void ViewContainerWidget::mousePressEvent(QMouseEvent* event)
 {
 	// special case for CustusX: when context menu is opened, mousereleaseevent is never called.
 	// this sets the render interactor in a zoom state after each menu call. This hack prevents
@@ -210,7 +216,7 @@ void ViewContainer::mousePressEvent(QMouseEvent* event)
 		return;
 
 	widget::mousePressEvent(event);
-	handleMousePress(event->pos(), event->buttons());
+	mBase->handleMousePress(event->pos(), event->buttons());
 }
 void ViewContainerBase::handleMousePress(const QPoint &pos, const Qt::MouseButtons & buttons)
 {
@@ -226,10 +232,10 @@ void ViewContainerBase::handleMousePress(const QPoint &pos, const Qt::MouseButto
 	}
 }
 
-void ViewContainer::mouseReleaseEvent(QMouseEvent* event)
+void ViewContainerWidget::mouseReleaseEvent(QMouseEvent* event)
 {
 	widget::mouseReleaseEvent(event);
-	handleMouseRelease(event->pos(), event->buttons());
+	mBase->handleMouseRelease(event->pos(), event->buttons());
 }
 
 void ViewContainerBase::handleMouseRelease(const QPoint &pos, const Qt::MouseButtons &buttons)
@@ -243,12 +249,12 @@ void ViewContainerBase::handleMouseRelease(const QPoint &pos, const Qt::MouseBut
 	}
 }
 
-void ViewContainer::focusInEvent(QFocusEvent* event)
+void ViewContainerWidget::focusInEvent(QFocusEvent* event)
 {
 	widget::focusInEvent(event);
 }
 
-void ViewContainer::wheelEvent(QWheelEvent* event)
+void ViewContainerWidget::wheelEvent(QWheelEvent* event)
 {
 	widget::wheelEvent(event);
 	for (int i = 0; layout() && i < layout()->count(); ++i)
@@ -263,7 +269,7 @@ void ViewContainer::wheelEvent(QWheelEvent* event)
 	}
 }
 
-void ViewContainer::showEvent(QShowEvent* event)
+void ViewContainerWidget::showEvent(QShowEvent* event)
 {
 	widget::showEvent(event);
 }
