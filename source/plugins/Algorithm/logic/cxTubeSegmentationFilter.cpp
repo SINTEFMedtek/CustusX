@@ -8,6 +8,7 @@
 
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
+#include <vtkImageShiftScale.h>
 
 #include "sscTime.h"
 #include "sscTypeConversions.h"
@@ -20,6 +21,8 @@
 #include "cxPatientData.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "sscDoubleDataAdapterXml.h"
+
+typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 
 namespace cx {
 
@@ -119,8 +122,8 @@ bool TubeSegmentationFilter::postProcess()
 	SIPL::int3 cropShift = mOutput->getShiftVector();
 	ssc::Vector3D translationVector((spacing_x*cropShift.x), (spacing_y*cropShift.y), (spacing_z*cropShift.z));
 	ssc::Transform3D cropTranslation = ssc::createTransformTranslate(translationVector);
-	ssc::Transform3D rMd = input->get_rMd();
-	rMd = rMd * cropTranslation;
+	ssc::Transform3D rMd = input->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
+	rMd = rMd * cropTranslation; //translation due to cropping accounted for
 
 	// Centerline (volume)
 	//======================================================
@@ -145,11 +148,10 @@ bool TubeSegmentationFilter::postProcess()
 		mOutputTypes[0]->setValue(outputCenterline->getUid());
 	}
 
-
 	// Centerline (vtk)
 	//======================================================
 	boost::unordered_map<std::string, StringParameter>::iterator it = mParameters.strings.find("centerline-vtk-file");
-	if(mOutput->hasTDF() && it != mParameters.strings.end() && (it->second.get() != "off"))
+	if(it != mParameters.strings.end() && (it->second.get() != "off"))
 	{
 		QString vtkFilename = qstring_cast(it->second.get());
 		QString uidVtkCenterline = input->getUid() + "_tsf_cl%1";
@@ -195,16 +197,55 @@ bool TubeSegmentationFilter::postProcess()
 		SIPL::int3* size = mOutput->getSize();
 		vtkImageDataPtr rawSegmentationResult = this->convertToVtkImageData(mOutput->getSegmentation(), size->x, size->y, size->z, input);
 
-		ssc::ImagePtr outputSegmentaion = ssc::dataManager()->createDerivedImage(rawSegmentationResult,uidSegmentation, nameSegmentation, input);
-		if (!outputSegmentaion)
+		ssc::ImagePtr outputSegmentation = ssc::dataManager()->createDerivedImage(rawSegmentationResult,uidSegmentation, nameSegmentation, input);
+		if (!outputSegmentation)
 			return false;
 
-		outputSegmentaion->get_rMd_History()->setRegistration(rMd);
+		outputSegmentation->get_rMd_History()->setRegistration(rMd);
 
-		ssc::dataManager()->loadData(outputSegmentaion);
-		ssc::dataManager()->saveImage(outputSegmentaion, patientService()->getPatientData()->getActivePatientFolder());
+		ssc::dataManager()->loadData(outputSegmentation);
+		ssc::dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
 
-		mOutputTypes[2]->setValue(outputSegmentaion->getUid());
+		mOutputTypes[2]->setValue(outputSegmentation->getUid());
+	}
+
+	// TDF
+	//======================================================
+	if(mOutput->hasTDF())
+	{
+		QString uidTDF = input->getUid() + "_tsf_tdf%1";
+		QString nameTDF = input->getName()+"_tsf_tdf%1";
+		SIPL::int3* size = mOutput->getSize();
+
+		// convert volume
+		vtkImageDataPtr convertedImageData = this->convertToVtkImageData(mOutput->getTDF(), size->x, size->y, size->z, input);
+
+		//scale volume
+		if (!convertedImageData)
+			return false;
+
+		vtkImageShiftScalePtr cast = vtkImageShiftScalePtr::New();
+		cast->SetInput(convertedImageData);
+		cast->ClampOverflowOn();
+
+		//tdfs voxels contains values [0.0,1.0]
+		//scaling these to be able to visualize them in CustusX
+		int scale = 255; //unsigned char ranges from 0 to 255
+		cast->SetScale(scale);
+		cast->SetOutputScalarType(VTK_UNSIGNED_CHAR);
+		cast->Update();
+		convertedImageData = cast->GetOutput();
+
+		ssc::ImagePtr outputTDF = ssc::dataManager()->createDerivedImage(convertedImageData,uidTDF, nameTDF, input);
+		if (!outputTDF)
+			return false;
+
+		outputTDF->get_rMd_History()->setRegistration(rMd);
+
+		ssc::dataManager()->loadData(outputTDF);
+		ssc::dataManager()->saveImage(outputTDF, patientService()->getPatientData()->getActivePatientFolder());
+
+		mOutputTypes[3]->setValue(outputTDF->getUid());
 	}
 
 	//clean up
@@ -271,6 +312,11 @@ void TubeSegmentationFilter::createOutputTypes()
 	temp->setValueName("Segmentation");
 	temp->setHelp("Generated segmentation.");
 	mOutputTypes.push_back(temp);
+
+	temp = SelectDataStringDataAdapter::New();
+	temp->setValueName("TDF");
+	temp->setHelp("Volume showing the probability of a voxel being part of a tubular structure.");
+	mOutputTypes.push_back(temp);
 }
 
 void TubeSegmentationFilter::patientChangedSlot()
@@ -332,29 +378,55 @@ void TubeSegmentationFilter::resetOptions()
 	}
 }
 
-//TODO later...
-//void TubeSegmentationFilter::centerlineMethodChanged()
-//{
-//
-//}
-
 vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ssc::ImagePtr input)
 {
 	if (!input)
 		return vtkImageDataPtr::New();
 
+	std::cout << "VTK_UNSIGNED_CHAR " << std::endl;
+	vtkImageDataPtr retval = this->importRawImageData((void*) data, size_x, size_y, size_z, input, VTK_UNSIGNED_CHAR);
+	return retval;
+}
+
+vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(float * data, int size_x, int size_y, int size_z, ssc::ImagePtr input)
+{
+	if (!input)
+		return vtkImageDataPtr::New();
+
+	std::cout << "VTK_FLOAT " << std::endl;
+	std::cout << "Data: " << data[5] << std::endl;
+	vtkImageDataPtr retval = this->importRawImageData((void*) data, size_x, size_y, size_z, input, VTK_FLOAT);
+	return retval;
+}
+
+//From vtkType.h (on Ubuntu 12.04)
+//#define VTK_VOID            0
+//#define VTK_BIT             1
+//#define VTK_CHAR            2
+//#define VTK_SIGNED_CHAR    15
+//#define VTK_UNSIGNED_CHAR   3
+//#define VTK_SHORT           4
+//#define VTK_UNSIGNED_SHORT  5
+//#define VTK_INT             6
+//#define VTK_UNSIGNED_INT    7
+//#define VTK_LONG            8
+//#define VTK_UNSIGNED_LONG   9
+//#define VTK_FLOAT          10
+//#define VTK_DOUBLE         11
+//#define VTK_ID_TYPE        12
+vtkImageDataPtr TubeSegmentationFilter::importRawImageData(void * data, int size_x, int size_y, int size_z, ssc::ImagePtr input, int type)
+{
 	vtkImageImportPtr imageImport = vtkImageImportPtr::New();
 
 	imageImport->SetWholeExtent(0, size_x - 1, 0, size_y - 1, 0, size_z - 1);
 	imageImport->SetDataExtentToWholeExtent();
-	imageImport->SetDataScalarTypeToUnsignedChar();
+	imageImport->SetDataScalarType(type);
 	imageImport->SetNumberOfScalarComponents(1);
 	imageImport->SetDataSpacing(input->getBaseVtkImageData()->GetSpacing());
-	imageImport->SetImportVoidPointer((void*)data);
+	imageImport->SetImportVoidPointer(data);
 	imageImport->GetOutput()->Update();
 	imageImport->Modified();
 
-//	vtkImageDataPtr retval = imageImport->GetOutput();
 	vtkImageDataPtr retval = vtkImageDataPtr::New();
 	retval->DeepCopy(imageImport->GetOutput());
 
