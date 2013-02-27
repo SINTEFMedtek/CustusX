@@ -47,7 +47,6 @@ public:
 	virtual bool postProcess();
 
 protected:
-	//TODO create a reset option (to default values)!!!
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
@@ -61,6 +60,9 @@ private slots:
 
 private:
 	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ssc::ImagePtr input);
+	vtkImageDataPtr convertToVtkImageData(float * data, int size_x, int size_y, int size_z, ssc::ImagePtr input);
+	vtkImageDataPtr importRawImageData(void * data, int size_x, int size_y, int size_z, ssc::ImagePtr input, int type);
+
 	void createDefaultOptions(QDomElement root); ///< generate options based on file with all valid parameters for smistads algorithm
 	paramList getParametersFromOptions(); ///< fetches the parameters set by the user
 	void setParamtersToOptions(paramList parameters); ///< set the options to a given set of parameters
