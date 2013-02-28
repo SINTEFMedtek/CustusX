@@ -5,7 +5,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <vtkImageChangeInformation.h>
-#include <vtkImageLuminance.h>
 #include <vtkImageData.h>
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
