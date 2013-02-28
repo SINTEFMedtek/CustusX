@@ -61,9 +61,10 @@ vtkImageDataPtr ProbeAdapterRTSource::getVtkImageData()
 
 double ProbeAdapterRTSource::getTimestamp()
 {
+	QString uid = mBase->getUid();
 	ProbePtr probe = mProbe.lock();
 	if (probe)
-		return mBase->getTimestamp() - probe->getData().getTemporalCalibration();
+		return mBase->getTimestamp() - probe->getData(uid).getTemporalCalibration();
 	else
 		return mBase->getTimestamp();
 }
@@ -81,12 +82,14 @@ void ProbeAdapterRTSource::newFrameSlot()
 	if (!probe)
 		return;
 
-	ssc::ProbeData data = probe->getData();
+	QString uid = mBase->getUid();
+	ssc::ProbeData data = probe->getData(uid);
 	QSize dimProbe = data.getImage().mSize;
 	QSize dimImage(mRedirecter->GetOutput()->GetDimensions()[0], mRedirecter->GetOutput()->GetDimensions()[1]);
 
 	if (dimProbe!=dimImage)
 	{
+//		std::cout << "*********** " << this << " ********** ProbeAdapterRTSource::newFrameSlot() probe=" << probe.get() << ", base=" << mBase->getUid() << std::endl;
 		ssc::messageManager()->sendInfo(
 			QString("Resampling probe calibration. Calibration:[%1,%2], Image:[%3,%4]")
 			.arg(dimProbe.width())
@@ -97,6 +100,7 @@ void ProbeAdapterRTSource::newFrameSlot()
 //		std::cout << streamXml2String(data) << std::endl;
 		data.resample(dimImage);
 //		std::cout << streamXml2String(data) << std::endl;
+//		std::cout << "*****************************************" << std::endl;
 		probe->setData(data, probe->getConfigId());
 	}
 }
@@ -128,7 +132,8 @@ void ProbeAdapterRTSource::probeChangedSlot()
 	// Don't change spacing if it have an existing spacing from the OpenIGTLink message
 	//  if (mBase->getVtkImageData()->GetSpacing()[0] == 0)
 	{
-		mRedirecter->SetOutputSpacing(probe->getData().getImage().mSpacing.begin());
+		QString uid = mBase->getUid();
+		mRedirecter->SetOutputSpacing(probe->getData(uid).getImage().mSpacing.begin());
 	}
 }
 
