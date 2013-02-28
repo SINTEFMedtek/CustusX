@@ -28,6 +28,7 @@
 #include "sscLogger.h"
 #include "cxActiveImageProxy.h"
 #include "sscVideoSource.h"
+#include "cxVideoService.h"
 
 namespace cx
 {
@@ -175,6 +176,47 @@ QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString int
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+ActiveVideoSourceStringDataAdapter::ActiveVideoSourceStringDataAdapter()
+{
+	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SIGNAL(changed()));
+}
+
+QString ActiveVideoSourceStringDataAdapter::getValueName() const
+{
+	return "VideoSource";
+}
+
+bool ActiveVideoSourceStringDataAdapter::setValue(const QString& value)
+{
+	if (value == this->getValue())
+		return false;
+	videoService()->setActiveVideoSource(value);
+	emit changed();
+	return true;
+}
+
+QString ActiveVideoSourceStringDataAdapter::getValue() const
+{
+	return videoService()->getActiveVideoSource()->getUid();
+}
+
+QStringList ActiveVideoSourceStringDataAdapter::getValueRange() const
+{
+	std::vector<ssc::VideoSourcePtr> sources = videoService()->getVideoSources();
+	QStringList retval;
+	for (unsigned i=0; i<sources.size(); ++i)
+		retval << sources[i]->getUid();
+	return retval;
+}
+
+QString ActiveVideoSourceStringDataAdapter::getHelp() const
+{
+	return "Select the active video source.";
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
 SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
 {

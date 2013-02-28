@@ -35,6 +35,7 @@ private slots:
 	void saveDataCompletedSlot(QString name);
 	void acquisitionDataReadySlot();
 	void readinessChangedSlot();
+	void videoConnectedSlot();
 
 	void setupVideo();
 	void setupProbe();
