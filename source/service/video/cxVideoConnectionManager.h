@@ -26,7 +26,7 @@ namespace cx
 
 
 typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
-typedef boost::shared_ptr<class GrabberVideoSource> GrabberVideoSourcePtr;
+typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
 
 /**
 * \file
@@ -72,19 +72,22 @@ public:
 
 	void launchServer();
 	void launchAndConnectServer();
+	void disconnectServer();
 
 	QProcess* getProcess();
 	std::vector<ssc::VideoSourcePtr> getVideoSources();
-	GrabberVideoSourcePtr getVideoSource()
-	{
-		return mRTSource;
-	}
+//	GrabberVideoSourcePtr getVideoSource()
+//	{
+//		return mRTSource;
+//	}
 	void setReconnectInterval(int interval) { mReconnectInterval = interval; }
+	bool isConnected() const;
 
 signals:
 	void fps(int fps);
 	void connected(bool on);
 	void settingsChanged();
+	void videoSourcesChanged();
 
 public slots:
 	void connectServer();
@@ -93,7 +96,7 @@ public slots:
 private:
 	void delayedAutoConnectServer();
 
-	GrabberVideoSourcePtr mRTSource;
+	VideoConnectionPtr mRTSource;
 	int mConnectWhenLocalServerRunning;
 	int mReconnectInterval;
 	ProcessWrapperPtr mProcess;

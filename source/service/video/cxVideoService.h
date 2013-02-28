@@ -24,6 +24,7 @@
 
 #include <QObject>
 
+#include <vector>
 #include "sscVideoSource.h"
 
 namespace cx
@@ -89,16 +90,29 @@ public:
 	static void initialize();
 	static void shutdown();
 
-	VideoConnectionManagerPtr getIGTLinkVideoConnection();
+	VideoConnectionManagerPtr getVideoConnection();
 	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
 	ssc::VideoSourcePtr getActiveVideoSource();
+	void setActiveVideoSource(QString uid);
 	void setPlaybackMode(PlaybackTimePtr controller);
+	/** Get all existing video sources.
+	  */
+	std::vector<ssc::VideoSourcePtr> getVideoSources();
 
 signals:
+	/** Emitted when a video source is set to active,
+	  * OR when the available set of sources are changed.
+	  */
 	void activeVideoSourceChanged();
-	void activeVideoSourceStreaming(bool on); ///< emitted when streaming started/stopped
-	void activeVideoSourceConnected(bool on); ///< emitted when source is connected/disconnected
 
+private slots:
+	/** Autoselect the active ssc::VideoSource
+	  *
+	  * Call when video source configuration has changed. The active
+	  * Video source will automatically be determined by calling
+	  * autoGuessVideoSource().
+	  */
+	void autoSelectActiveVideoSource();
 private:
 	static VideoService* mInstance;
 	static void setInstance(VideoService* instance);
@@ -109,9 +123,24 @@ private:
 	VideoService(VideoService const&); // not implemented
 	VideoService& operator=(VideoService const&); // not implemented
 
-	VideoConnectionManagerPtr mIGTLinkConnection;
-//	OpenIGTLinkDirectLinkRTSourcePtr mGrabberDirectLinkVideoSource;
+	/** Find the best guess for active ssc::VideoSource
+	  *
+	  * Select from the following in that priority:
+	  *  - playback sources
+	  *  - active probe sources
+	  *  - other probe sources
+	  *  - free sources (not connected to probe)
+	  *  - empty source
+	  *
+	  * Within each group, keep existing active if it already belongs
+	  * to that group.
+	  *
+	  */
+	ssc::VideoSourcePtr getGuessForActiveVideoSource(ssc::VideoSourcePtr old);
+
+	VideoConnectionManagerPtr mVideoConnection;
 	ssc::VideoSourcePtr mActiveVideoSource;
+	ssc::VideoSourcePtr mEmptyVideoSource;
 	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
 };
 
