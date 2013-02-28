@@ -9,16 +9,9 @@
 #define CXIMAGESENDERFILE_H_
 
 #include "boost/shared_ptr.hpp"
-#include <QTcpSocket>
-#include <QThread>
 class QTimer;
-#include "igtlImageMessage.h"
-#include "cxImageSenderFactory.h"
 #include "cxImageSender.h"
 
-#include "vtkSmartPointer.h"
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 namespace cx
 {
@@ -47,16 +40,24 @@ protected:
 private:
 	GrabberSenderPtr mSender;
 	QTimer* mTimer;
-	int mCounter;
-	vtkImageDataPtr mImageData;
 	StringMap mArguments;
-	std::vector<unsigned char> mTestData;
-	vtkImageImportPtr mImageImport;
 
-	boost::shared_ptr<class SplitFramesContainer> mDataSource;
-	int mCurrentFrame;
-	QString mRawUid; /// raw text to send as device name - excluding frame id
+	struct Data
+	{
+		vtkImageDataPtr mImageData;
+		boost::shared_ptr<class SplitFramesContainer> mDataSource;
+		int mCurrentFrame;
+		QString mRawUid; /// raw text to send as device name - excluding frame id
+	};
+
+	Data mPrimaryData;
+	Data mSecondaryData;
+
+	Data initializePrimaryData(vtkImageDataPtr source, QString filename) const;
+	Data initializeSecondaryData(vtkImageDataPtr source, QString filename) const;
+	void send(Data* data);
 	void setTestImage();
+
 private slots:
 	void tick();
 };

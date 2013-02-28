@@ -295,7 +295,7 @@ void VideoConnection::connectVideoToProbe()
 
 	for (unsigned i=0; i<mSources.size(); ++i)
 	{
-		std::cout << "***********============= set source in probe " << tool->getUid() << std::endl;
+//		std::cout << "***********============= set source in probe " << tool->getUid() << std::endl;
 		probe->setRTSource(mSources[i]);
 	}
 
