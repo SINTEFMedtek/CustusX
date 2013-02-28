@@ -39,8 +39,8 @@ StatusBar::StatusBar() :
 
 	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
-	connect(videoService()->getIGTLinkVideoConnection().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
-	connect(videoService()->getIGTLinkVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
+	connect(videoService()->getVideoConnection().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
+	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
 
 	this->addPermanentWidget(mRenderingFpsLabel);
 }
@@ -156,8 +156,10 @@ void StatusBar::tpsSlot(int numTps)
 
 void StatusBar::grabbingFpsSlot(int numFps)
 {
-	GrabberVideoSourcePtr grabber = videoService()->getIGTLinkVideoConnection()->getVideoSource();
-	QString infoString = grabber->getName() + "-FPS: " + QString::number(numFps);
+//	VideoConnectionManagerPtr connection = videoService()->getIGTLinkVideoConnection();
+//	GrabberVideoSourcePtr grabber = videoService()->getIGTLinkVideoConnection()->getVideoSource();
+//	QString infoString = grabber->getName() + "-FPS: " + QString::number(numFps);
+	QString infoString = "VideoConnection-FPS: " + QString::number(numFps);
 	mGrabbingInfoLabel->setText(infoString);
 }
 

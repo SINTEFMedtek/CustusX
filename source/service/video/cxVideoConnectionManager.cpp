@@ -56,9 +56,10 @@ VideoConnectionManager::VideoConnectionManager()
 	mProcess.reset(new ProcessWrapper("Local Video Server"));
 	connect(mProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 
-	mRTSource.reset(new GrabberVideoSource());
-	connect(getVideoSource().get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
-	connect(mRTSource.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int))); // thread-bridging connection
+	mRTSource.reset(new VideoConnection());
+	connect(mRTSource.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
+	connect(mRTSource.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
+	connect(mRTSource.get(), SIGNAL(videoSourcesChanged()), this, SIGNAL(videoSourcesChanged()));
 }
 
 VideoConnectionManager::~VideoConnectionManager()
@@ -219,7 +220,7 @@ void VideoConnectionManager::delayedAutoConnectServer()
 
 void VideoConnectionManager::launchAndConnectServer()
 {
-	if (this->getVideoSource()->isConnected())
+	if (mRTSource->isConnected())
 		return;
 
 	mIniScript->launch(this->getInitScript());
@@ -257,6 +258,21 @@ void VideoConnectionManager::serverProcessStateChanged(QProcess::ProcessState ne
 	{
 		this->delayedAutoConnectServer();
 	}
+}
+
+std::vector<ssc::VideoSourcePtr> VideoConnectionManager::getVideoSources()
+{
+	return mRTSource->getVideoSources();
+}
+
+void VideoConnectionManager::disconnectServer()
+{
+	mRTSource->disconnectServer();
+}
+
+bool VideoConnectionManager::isConnected() const
+{
+	return mRTSource->isConnected();
 }
 
 }//end namespace cx

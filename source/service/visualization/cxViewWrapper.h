@@ -73,8 +73,10 @@ public:
 	ViewGroupData();
 	void requestInitialize();
 	std::vector<ssc::DataPtr> getData() const;
+	QString getVideoSource() const;
 	void addData(ssc::DataPtr data);
 	void addDataSorted(ssc::DataPtr data); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
+	void setVideoSource(QString uid);
 	bool removeData(ssc::DataPtr data);
 	void clearData();
 	std::vector<ssc::ImagePtr> getImages() const;
@@ -100,10 +102,12 @@ private slots:
 signals:
 	void dataAdded(QString uid);
 	void dataRemoved(QString uid);
+	void videoSourceChanged(QString uid);
 	void initialized();
 	void optionsChanged();
 
 private:
+	QString mVideoSource;
 	std::vector<ssc::DataPtr> mData;
 	CameraDataPtr mCamera3D;
 	Options mOptions;
@@ -140,6 +144,7 @@ protected slots:
 
 	void dataAddedSlot(QString uid);
 	void dataRemovedSlot(QString uid);
+	virtual void videoSourceChangedSlot(QString uid) {}
 
 protected:
 	virtual void dataAdded(ssc::DataPtr data) = 0;

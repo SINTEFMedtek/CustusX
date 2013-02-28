@@ -64,7 +64,7 @@ SET(cxGui_MOC_HDRS
     preferencesWidgets/cxLayoutEditorWidget.h
     preferencesWidgets/cxLayoutEditorTab.h
     #----------------------
-    streamingWidgets/cxIGTLinkWidget.h
+    streamingWidgets/cxVideoConnectionWidget.h
     #----------------------
     toolWidgets/cxToolPropertiesWidget.h
     toolWidgets/cxActiveToolWidget.h
@@ -233,8 +233,8 @@ SET(cxGui_SRCS
     preferencesWidgets/cxLayoutEditorTab.h
     preferencesWidgets/cxLayoutEditorTab.cpp
     #----------------------    
-    streamingWidgets/cxIGTLinkWidget.h
-    streamingWidgets/cxIGTLinkWidget.cpp
+    streamingWidgets/cxVideoConnectionWidget.h
+    streamingWidgets/cxVideoConnectionWidget.cpp
     #----------------------    
     toolWidgets/cxToolPropertiesWidget.h
     toolWidgets/cxToolPropertiesWidget.cpp

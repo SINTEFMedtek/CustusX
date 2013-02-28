@@ -367,16 +367,17 @@ QAction* ViewWrapper3D::createSlicesAction(QString title, QWidget* parent)
 
 void ViewWrapper3D::showSlices()
 {
-	QAction* action = dynamic_cast<QAction*>(sender());if (!action)
-	return;
+	QAction* action = dynamic_cast<QAction*>(sender());
+	if (!action)
+		return;
 
 	if (!action->isChecked())
-	mShowSlicesMode = "";
+		mShowSlicesMode = "";
 	else
-	mShowSlicesMode = action->data().toString();
-//	std::cout << "show " << mShowSlicesMode << std::endl;
-					this->updateSlices();
-				}
+		mShowSlicesMode = action->data().toString();
+	//	std::cout << "show " << mShowSlicesMode << std::endl;
+	this->updateSlices();
+}
 
 void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 {

@@ -24,14 +24,14 @@ namespace cx
 ServiceController::ServiceController()
 {
 	// load the ever-present video stream into the patient service
-	ssc::dataManager()->loadStream(videoService()->getActiveVideoSource());
+//	ssc::dataManager()->loadStream(videoService()->getActiveVideoSource());
 
 	// connecting the video source and the tracking us probe.
-	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateVideoConnections()));
-	connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(updateVideoConnections()));
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(updateVideoConnections()));
-//	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(updateVideoConnections()));
-	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(updateVideoConnections()));
+//	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateVideoConnections()));
+//	connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(updateVideoConnections()));
+//	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(updateVideoConnections()));
+////	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(updateVideoConnections()));
+//	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(updateVideoConnections()));
 
 	connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
@@ -80,47 +80,47 @@ void ServiceController::duringLoadPatientSlot()
 	ssc::toolManager()->parseXml(toolmanagerNode);
 }
 
-/**Connect a probe from Tracking Service to a video source in Video Service.
- *
- */
-void ServiceController::updateVideoConnections()
-{
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+///**Connect a probe from Tracking Service to a video source in Video Service.
+// *
+// */
+//void ServiceController::updateVideoConnections()
+//{
+//	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 
-	this->connectVideoToProbe(tool);
-}
+//	this->connectVideoToProbe(tool);
+//}
 
-/**insert the rt source into the (first) probe tool
- * in the tool manager.
- *
- * Apply time calibration to the source.
- *
- */
-void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
-{
-	ssc::VideoSourcePtr source = videoService()->getActiveVideoSource();
-	if (!source)
-	{
-		ssc::messageManager()->sendError("no rt source.");
-		return;
-	}
+///**insert the rt source into the (first) probe tool
+// * in the tool manager.
+// *
+// * Apply time calibration to the source.
+// *
+// */
+//void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
+//{
+//	ssc::VideoSourcePtr source = videoService()->getActiveVideoSource();
+//	if (!source)
+//	{
+//		ssc::messageManager()->sendError("no rt source.");
+//		return;
+//	}
 
-	// find probe in tool manager
-	// set source in cxTool
-	// insert timecalibration using config
-	if (!source->isConnected())
-		return;
+//	// find probe in tool manager
+//	// set source in cxTool
+//	// insert timecalibration using config
+//	if (!source->isConnected())
+//		return;
 
-	if (!probe)
-		return;
+//	if (!probe)
+//		return;
 
-	if (probe)
-	{
-		ssc::ProbePtr probeInterface = probe->getProbe();
-		if (!probeInterface)
-			return;
-		probeInterface->setRTSource(source);
-	}
-}
+//	if (probe)
+//	{
+//		ssc::ProbePtr probeInterface = probe->getProbe();
+//		if (!probeInterface)
+//			return;
+//		probeInterface->setRTSource(source);
+//	}
+//}
 
 }
