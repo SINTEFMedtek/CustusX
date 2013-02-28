@@ -100,7 +100,6 @@ void VideoConnection::fpsSlot(double fpsNumber)
 //	return "Running";
 //}
 
-
 bool VideoConnection::isConnected() const
 {
 	return mClient && mConnected;
@@ -198,7 +197,7 @@ void VideoConnection::disconnectServer()
 
 	for (unsigned i=0; i<mSources.size(); ++i)
 	{
-		mSources[i]->stop();
+		mSources[i]->setInput(ssc::ImagePtr());
 	}
 }
 
@@ -275,7 +274,6 @@ void VideoConnection::updateImage(ssc::ImagePtr message)
 		this->connectVideoToProbe();
 		emit videoSourcesChanged();
 	}
-
 }
 
 std::vector<ssc::VideoSourcePtr> VideoConnection::getVideoSources()
