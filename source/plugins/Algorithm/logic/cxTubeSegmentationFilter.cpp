@@ -63,11 +63,6 @@ bool TubeSegmentationFilter::execute()
 
 	try {
 		ssc::messageManager()->sendDebug("Looking for TSF files in folder: "+cx::DataLocations::getTSFPath());
-
-		mParameters = loadParameterPreset(mParameters, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
-
-		//this->printParameters(mParameters);
-
 		mOutput = run(filename, mParameters, cx::DataLocations::getTSFPath().toStdString());
 	} catch(SIPL::SIPLException e) {
 		std::string error = e.what();
