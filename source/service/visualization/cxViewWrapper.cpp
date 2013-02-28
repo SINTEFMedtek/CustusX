@@ -67,6 +67,7 @@ ViewGroupData::ViewGroupData() :
 				mCamera3D(CameraData::create())
 {
 	connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(removeDataSlot(QString)));
+	mVideoSource = "active";
 
 //	mPickerGlyph.reset(new ssc::Mesh("PickerGlyph"));
 //
@@ -184,6 +185,20 @@ void ViewGroupData::clearData()
 {
 	while (!mData.empty())
 		this->removeData(mData.front());
+	this->setVideoSource("active");
+}
+
+void ViewGroupData::setVideoSource(QString uid)
+{
+	if (mVideoSource==uid)
+		return;
+	mVideoSource = uid;
+	emit videoSourceChanged(mVideoSource);
+}
+
+QString ViewGroupData::getVideoSource() const
+{
+	return mVideoSource;
 }
 
 std::vector<ssc::ImagePtr> ViewGroupData::getImages() const
@@ -234,6 +249,7 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 	mViewGroup = group;
 	connect(mViewGroup.get(), SIGNAL(dataAdded(QString)), SLOT(dataAddedSlot(QString)));
 	connect(mViewGroup.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
+	connect(mViewGroup.get(), SIGNAL(videoSourceChanged(QString)), SLOT(videoSourceChangedSlot(QString)));
 
 	std::vector<ssc::DataPtr> data = mViewGroup->getData();
 	for (unsigned i = 0; i < data.size(); ++i)

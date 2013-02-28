@@ -34,55 +34,50 @@ namespace cx
  */
 
 typedef boost::shared_ptr<class GrabberReceiveThread> GrabberReceiveThreadPtr;
+typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
 
-/** \brief Implementation of ssc::VideoSource for the OpenIGTLink protocol.
+/** \brief Represent one video grabber connection.
+ *
+ * Connect to a video/scanner interface and receive
+ * all video and probe data from it. Convert to video
+ * streams, set all data in probe if available.
+ * Video Streams are also available directly from this
+ * object.
+ *
+ * Refactored from old class OpenIGTLinkRTSource.
+ *
  *  \ingroup cxServiceVideo
- *
- * Synchronize data with source,
- * provide data as a vtkImageData.
- *
  *  \date Oct 31, 2010
+ *  \date Feb 26, 2013
  *  \author christiana
  */
-class GrabberVideoSource: public ssc::VideoSource
+class VideoConnection : public QObject // ssc::VideoSource
 {
 Q_OBJECT
 public:
-	GrabberVideoSource();
-	virtual ~GrabberVideoSource();
-	virtual QString getUid()
-	{
-		return "us_openigtlink_source";
-	}
-	virtual QString getName();
-	virtual vtkImageDataPtr getVtkImageData();
-	virtual double getTimestamp();
+	VideoConnection();
+	virtual ~VideoConnection();
 	virtual bool isConnected() const;
-
-	virtual QString getInfoString() const;
-	virtual QString getStatusString() const;
-
-	virtual void start();
-	virtual void stop();
-
-	virtual bool validData() const;
-	virtual bool isStreaming() const;
-	virtual void release() {}
 
 	// non-inherited methods
 	void directLink(std::map<QString, QString> args);
 	void connectServer(QString address, int port);
 	void disconnectServer();
 
+	std::vector<ssc::VideoSourcePtr> getVideoSources();
+
 signals:
+	bool connected(bool);
 	void fps(int fps);
+	void videoSourcesChanged();
+
 private slots:
 	void clientFinishedSlot();
 	void imageReceivedSlot();
 	void sonixStatusReceivedSlot();
-	void timeout();
 	void fpsSlot(double fps);
 	void connectedSlot(bool on);
+	void connectVideoToProbe();
 
 private:
 	void updateImage(ssc::ImagePtr message); // called by receiving thread when new data arrives.
@@ -90,16 +85,13 @@ private:
 	void runClient(GrabberReceiveThreadPtr client);
 	void stopClient();
 
-	ssc::ImagePtr mEmptyImage;
-	ssc::ImagePtr mReceivedImage;
-	vtkImageAlgorithmPtr mRedirecter;
 	GrabberReceiveThreadPtr mClient;
 	bool mConnected;
-	bool mTimeout;
-	QTimer* mTimeoutTimer;
 	double mFPS;
+
+	std::vector<BasicVideoSourcePtr> mSources;
 };
-typedef boost::shared_ptr<GrabberVideoSource> GrabberVideoSourcePtr;
+typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 
 /**
  * @}

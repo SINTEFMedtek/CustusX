@@ -130,7 +130,8 @@ void MHDImageSender::initialize(StringMap arguments)
 		colorFormat = "RGBA";
 	}
 
-	mRawUid = QString("%1-%3 [%2]").arg(QFileInfo(mArguments["filename"]).fileName()).arg(colorFormat);
+//	mRawUid = QString("%1-%3 [%2]").arg(QFileInfo(mArguments["filename"]).fileName()).arg(colorFormat);
+	mRawUid = QString("%1 [%2]").arg(QFileInfo(mArguments["filename"]).fileName()).arg(colorFormat);
 
 	if (mImageData)
 	{
@@ -172,7 +173,8 @@ void MHDImageSender::tick()
 	if (mSender && mSender->isReady())
 	{
 	    int frame = (mCurrentFrame++) % mDataSource->size();
-		QString uid = mRawUid.arg(frame);
+//		QString uid = mRawUid.arg(frame);
+		QString uid = mRawUid;
 		ssc::ImagePtr message(new ssc::Image(uid, mDataSource->get(frame)));
 		message->setAcquisitionTime(QDateTime::currentDateTime());
 

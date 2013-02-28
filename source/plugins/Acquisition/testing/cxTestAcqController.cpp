@@ -58,14 +58,14 @@ ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
 void TestAcqController::setupVideo()
 {
 	std::cout << "\nTestAcqController::initialize() init video" << std::endl;
-	cx::videoService()->getIGTLinkVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
-	cx::videoService()->getIGTLinkVideoConnection()->setLocalServerExecutable(cx::DataLocations::getBundlePath() + "/../../../apps/OpenIGTLinkServer/OpenIGTLinkServer");
-	cx::videoService()->getIGTLinkVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1").arg(mAcqDataFilename));
-	mVideoSource = cx::videoService()->getIGTLinkVideoConnection()->getVideoSource();
+	cx::videoService()->getVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
+	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::DataLocations::getBundlePath() + "/../../../apps/OpenIGTLinkServer/OpenIGTLinkServer");
+	cx::videoService()->getVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1").arg(mAcqDataFilename));
+	mVideoSource = cx::videoService()->getActiveVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 
-	cx::videoService()->getIGTLinkVideoConnection()->setReconnectInterval(1000);
-	cx::videoService()->getIGTLinkVideoConnection()->launchAndConnectServer();
+	cx::videoService()->getVideoConnection()->setReconnectInterval(1000);
+	cx::videoService()->getVideoConnection()->launchAndConnectServer();
 }
 
 void TestAcqController::setupProbe()
@@ -103,8 +103,14 @@ void TestAcqController::initialize()
 
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
-	connect(cx::videoService()->getIGTLinkVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(setupProbe()));
+	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
+	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(videoSourcesChanged()), this, SLOT(setupProbe()));
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(start()));
+}
+
+void TestAcqController::videoConnectedSlot()
+{
+	std::cout << "Video is connected, waiting for streams to arrive..." << std::endl;
 }
 
 void TestAcqController::start()
