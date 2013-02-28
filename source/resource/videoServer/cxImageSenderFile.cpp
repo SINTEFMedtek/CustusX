@@ -230,7 +230,11 @@ void MHDImageSender::send(Data* data)
 	int frame = (data->mCurrentFrame++) % data->mDataSource->size();
 //		QString uid = mRawUid.arg(frame);
 	QString uid = data->mRawUid;
-	ssc::ImagePtr message(new ssc::Image(uid, data->mDataSource->get(frame)));
+
+	vtkImageDataPtr copy = vtkImageDataPtr::New();
+	copy->DeepCopy(data->mDataSource->get(frame)); // the datasource might go out of scope - take copy
+
+	ssc::ImagePtr message(new ssc::Image(uid, copy));
 	message->setAcquisitionTime(QDateTime::currentDateTime());
 	mSender->send(message);
 }
