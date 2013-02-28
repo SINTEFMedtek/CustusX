@@ -57,7 +57,7 @@
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscRegistrationTransform.h"
-
+#include "sscLogger.h"
 
 namespace ssc
 {
@@ -354,9 +354,11 @@ void VideoGraphics::checkDataIntegrity()
 
 void VideoGraphics::newDataSlot()
 {
-	if (!mData || !mData->isStreaming())
+//	if (!mData || !mData->isStreaming())
+	if (!mData || !mData->validData())
 	{
 		mPlaneActor->SetVisibility(false);
+		emit newData();
 		return;
 	}
 	//Don't do anything if we get an empty image
@@ -365,6 +367,7 @@ void VideoGraphics::newDataSlot()
 	if(dim[0] == 0 || dim[1] == 0)
 	{
 		mPlaneActor->SetVisibility(false);
+		emit newData();
 		return;
 	}
 
