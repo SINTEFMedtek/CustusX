@@ -35,15 +35,15 @@ public:
 	virtual ~ServiceController();
 
 private slots:
-	void updateVideoConnections();
+//	void updateVideoConnections();
 
 	void patientChangedSlot();
 	void clearPatientSlot();
 	void duringSavePatientSlot();
 	void duringLoadPatientSlot();
 
-private:
-	void connectVideoToProbe(ssc::ToolPtr probe);
+//private:
+//	void connectVideoToProbe(ssc::ToolPtr probe);
 };
 
 typedef boost::shared_ptr<ServiceController> ServiceControllerPtr;

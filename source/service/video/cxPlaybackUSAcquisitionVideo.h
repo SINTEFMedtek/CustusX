@@ -48,6 +48,7 @@ public:
 	ssc::VideoSourcePtr getVideoSource();
 	void setRoot(const QString path);
 	void setTime(PlaybackTimePtr controller);
+	bool isActive() const;
 	std::vector<TimelineEvent> getEvents();
 
 private slots:

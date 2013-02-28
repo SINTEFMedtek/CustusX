@@ -27,13 +27,14 @@
 #include "cxProbe.h"
 #include "sscUSFrameData.h"
 #include "cxPlaybackTime.h"
+#include "sscLogger.h"
 
 namespace cx
 {
 
 USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() : QObject(NULL)
 {
-	mVideoSource.reset(new ssc::ImageImportVideoSource("playbackVideoSource"));
+	mVideoSource.reset(new ssc::ImageImportVideoSource("playback"));
 //	mVideoSource.reset(new ssc::TestVideoSource("testvideosource", "testvideosource", 800,600));
 	mVideoSource->setConnected(true);
 
@@ -48,6 +49,11 @@ USAcquisitionVideoPlayback::~USAcquisitionVideoPlayback()
 ssc::VideoSourcePtr USAcquisitionVideoPlayback::getVideoSource()
 {
 	return mVideoSource;
+}
+
+bool USAcquisitionVideoPlayback::isActive() const
+{
+	return mTimer;
 }
 
 void USAcquisitionVideoPlayback::setTime(PlaybackTimePtr controller)
@@ -211,8 +217,10 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 
 void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 {
+//	SSC_LOG("");
 	if (mUSImageDataReader)
 	{
+//		SSC_LOG("loading");
 		mVideoSource->setInfoString(QString("Loading US Data..."));
 		mVideoSource->setStatusString(QString("Loading US Data..."));
 		mVideoSource->refresh(0);
@@ -221,6 +229,7 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 
 	if (mCurrentData.mFilename.isEmpty() || !mCurrentData.mUsRaw || filename!=mCurrentData.mFilename)
 	{
+//		SSC_LOG("missing");
 		mVideoSource->setInfoString(QString(""));
 		mVideoSource->setStatusString(QString("No US Acquisition"));
 		mVideoSource->refresh(0);
