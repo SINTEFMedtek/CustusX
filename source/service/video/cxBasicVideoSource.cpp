@@ -22,6 +22,7 @@
 #include "sscBoundingBox3D.h"
 #include "sscMessageManager.h"
 #include "sscVolumeHelpers.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -129,10 +130,16 @@ void BasicVideoSource::stop()
 
 void BasicVideoSource::setInput(ssc::ImagePtr input)
 {
+//	if (input)
+//		std::cout << "BasicVideoSource::setInput " << input->getUid() << " " << Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()) << std::endl;
+//	else
+//		std::cout << "BasicVideoSource::setInput empty" << std::endl;
 	bool wasConnected = this->isConnected();
 	mReceivedImage = input;
 	if (!mReceivedImage)
 		mReceivedImage = mEmptyImage;
+	mRedirecter->SetInput(mReceivedImage->getBaseVtkImageData());
+	mRedirecter->Update();
 
 	mTimeout = false;
 	mTimeoutTimer->start();
@@ -140,6 +147,7 @@ void BasicVideoSource::setInput(ssc::ImagePtr input)
 	if (this->isConnected() != wasConnected)
 		emit connected(this->isConnected());
 
+//	std::cout << "BasicVideoSource::setInput -output=" << Eigen::Array3i(this->getVtkImageData()->GetDimensions()) << std::endl;
 	emit newFrame();
 }
 

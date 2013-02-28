@@ -80,29 +80,32 @@ private:
 	ProbeXmlConfigParser::Configuration getConfiguration(QString uid) const;
 	QString getInstrumentId() const;
 	QString getInstrumentScannerId() const;
+	ssc::ProbeData getProbeData(QString uid) const;
 
-	struct StreamData
-	{
-		ssc::ProbeData mData; ///< Probe sector information
-		ssc::VideoSourcePtr mSource;
-	};
+//	struct StreamData
+//	{
+//		ssc::ProbeData mData; ///< Probe sector information
+//		ssc::VideoSourcePtr mSource;
+//	};
 	QString mActiveUid;
-	const StreamData& getActiveInternalData() const;
-	StreamData& getActiveInternalData();
+//	const StreamData& getActiveInternalData() const;
+//	StreamData& getActiveInternalData();
 
-	/** return a reference to the internal StreamData
-	  * object for uid.
-	  * If uid=="active", the mActiveUid is used.
-	  * If uid does not exist, an entry is created.
-	  */
-	StreamData& getDataForUid(QString uid);
-	/** Convert input uid to a valid uid,
-	  * or empty if no valid uid can be found.
-	  */
-	QString toValidUid(QString uid) const;
+//	/** return a reference to the internal StreamData
+//	  * object for uid.
+//	  * If uid=="active", the mActiveUid is used.
+//	  * If uid does not exist, an entry is created.
+//	  */
+//	StreamData& getDataForUid(QString uid);
+//	/** Convert input uid to a valid uid,
+//	  * or empty if no valid uid can be found.
+//	  */
+//	QString toValidUid(QString uid) const;
 
-	typedef std::map<QString, StreamData> InternalDataType;
-	InternalDataType mData;
+	std::map<QString, ssc::ProbeData> mProbeData; ///< all defined probe definitions
+	std::map<QString, ssc::VideoSourcePtr> mSource; ///< all defined sources
+//	typedef std::map<QString, StreamData> InternalDataType;
+//	InternalDataType mData;
 //	ssc::ProbeData mData; ///< Probe sector information
 //	ssc::VideoSourcePtr mSource;
 	ssc::ProbeWeakPtr mSelf;
