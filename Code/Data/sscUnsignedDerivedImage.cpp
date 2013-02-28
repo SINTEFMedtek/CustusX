@@ -56,7 +56,6 @@ ImagePtr UnsignedDerivedImage::create(ImagePtr base)
 UnsignedDerivedImage::UnsignedDerivedImage(ImagePtr base) : Image(base->getUid()+"_u", base->getBaseVtkImageData(), base->getName())
 {
     this->mBase = base;
-    int shift = this->findShift();
 
     // redirected signals:
     connect(base.get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
