@@ -182,7 +182,7 @@ ssc::VideoSourcePtr ViewWrapperVideo::getSourceFromService(QString uid)
 
 void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 {
-//	std::cout << "ViewWrapperVideo::setupRep() " << source->getUid() << std::endl;
+//	std::cout << "ViewWrapperVideo::setupRep() " << source.get() << "  " << source->getUid() << std::endl;
 
 	//Don't do anything if source is the same
 	if (( mSource == source )&&( tool==mTool ))

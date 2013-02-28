@@ -238,7 +238,7 @@ void MetricWidget::prePaintEvent()
   // rebuild all:
   if (rebuild)
   {
-    std::cout << "rebuild " << newMetrics.size() << std::endl;
+//    std::cout << "rebuild " << newMetrics.size() << std::endl;
     mTable->clear();
 
     while (mEditWidgets->count())
