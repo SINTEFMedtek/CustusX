@@ -72,6 +72,7 @@ public:
 	virtual void setSoundSpeedCompensationFactor(double val) = 0;
 	virtual void setData(ssc::ProbeData probeSector, QString configUid="") = 0;
 	virtual void setRTSource(ssc::VideoSourcePtr source) = 0;
+	virtual void removeRTSource(ssc::VideoSourcePtr source) = 0;
 
 	virtual void setActiveStream(QString uid) = 0;
 	virtual QString getActiveStream() const = 0;
