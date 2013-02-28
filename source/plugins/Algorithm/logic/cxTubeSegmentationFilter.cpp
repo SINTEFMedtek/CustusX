@@ -16,11 +16,12 @@
 #include "sscDataManager.h"
 #include "sscDataManagerImpl.h"
 #include "sscRegistrationTransform.h"
+#include "sscDoubleDataAdapterXml.h"
+#include "cxContourFilter.h"
 #include "cxDataLocations.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxSelectDataStringDataAdapter.h"
-#include "sscDoubleDataAdapterXml.h"
 
 typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 
@@ -46,7 +47,7 @@ QString TubeSegmentationFilter::getHelp() const
 {
 	return "<html>"
 	        "<h3>Tube-Segmentation.</h3>"
-	        "<p><i>Extracts the centerline and creates a segementation. </br>GPU-base algorithm wrtiten by Erik Smistad (NTNU).</i></p>"
+	        "<p><i>Extracts the centerline and creates a segementation. </br>GPU-base algorithm written by Erik Smistad (NTNU).</i></p>"
 	        "</html>";
 }
 
@@ -174,8 +175,8 @@ bool TubeSegmentationFilter::postProcess()
 			mesh->get_rMd_History()->setParentSpace(input->getUid());
 			ssc::dataManager()->loadData(mesh);
 			ssc::dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
-
 			QString uid = mesh->getUid();
+
 			mOutputTypes[1]->setValue(uid);
 		}else{
 			ssc::messageManager()->sendError("Could not import vtk centerline: "+vtkFilename);
@@ -187,21 +188,31 @@ bool TubeSegmentationFilter::postProcess()
 	//======================================================
 	if(mOutput->hasSegmentation())
 	{
+		//get segmented volume
+		SIPL::int3* size = mOutput->getSize();
+		vtkImageDataPtr rawSegmentation = this->convertToVtkImageData(mOutput->getSegmentation(), size->x, size->y, size->z, input);
+
+		//make contour of segmented volume
+		double threshold = 1;/// because the segmented image is 0..1
+		vtkPolyDataPtr rawContour = ContourFilter::execute(rawSegmentation, threshold);
+
+		//add segmentation internally to cx
 		QString uidSegmentation = input->getUid() + "_tsf_seg%1";
 		QString nameSegmentation = input->getName()+"_tsf_seg%1";
-		SIPL::int3* size = mOutput->getSize();
-		vtkImageDataPtr rawSegmentationResult = this->convertToVtkImageData(mOutput->getSegmentation(), size->x, size->y, size->z, input);
-
-		ssc::ImagePtr outputSegmentation = ssc::dataManager()->createDerivedImage(rawSegmentationResult,uidSegmentation, nameSegmentation, input);
+		ssc::ImagePtr outputSegmentation = ssc::dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, input);
 		if (!outputSegmentation)
 			return false;
-
 		outputSegmentation->get_rMd_History()->setRegistration(rMd);
-
 		ssc::dataManager()->loadData(outputSegmentation);
 		ssc::dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
 
+		//add contour internally to cx
+		ssc::MeshPtr contour = ContourFilter::postProcess(rawContour, input, QColor("blue"));
+
+		//set output
 		mOutputTypes[2]->setValue(outputSegmentation->getUid());
+		mOutputTypes[3]->setValue(contour->getUid());
+
 	}
 
 	// TDF
@@ -234,13 +245,11 @@ bool TubeSegmentationFilter::postProcess()
 		ssc::ImagePtr outputTDF = ssc::dataManager()->createDerivedImage(convertedImageData,uidTDF, nameTDF, input);
 		if (!outputTDF)
 			return false;
-
 		outputTDF->get_rMd_History()->setRegistration(rMd);
-
 		ssc::dataManager()->loadData(outputTDF);
 		ssc::dataManager()->saveImage(outputTDF, patientService()->getPatientData()->getActivePatientFolder());
 
-		mOutputTypes[3]->setValue(outputTDF->getUid());
+		mOutputTypes[4]->setValue(outputTDF->getUid());
 	}
 
 	//clean up
@@ -291,27 +300,38 @@ void TubeSegmentationFilter::createInputTypes()
 
 void TubeSegmentationFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringDataAdapterBasePtr tempDataStringAdapter;
+	SelectMeshStringDataAdapterPtr tempMeshStringAdapter;
 
-	temp = SelectDataStringDataAdapter::New();
-	temp->setValueName("Centerline");
-	temp->setHelp("Generated centerline.");
-	mOutputTypes.push_back(temp);
+	//0
+	tempDataStringAdapter = SelectDataStringDataAdapter::New();
+	tempDataStringAdapter->setValueName("Centerline");
+	tempDataStringAdapter->setHelp("Generated centerline.");
+	mOutputTypes.push_back(tempDataStringAdapter);
 
-	SelectMeshStringDataAdapterPtr vtkCenterline = SelectMeshStringDataAdapter::New();
-	vtkCenterline->setValueName("Centerline (vtk)");
-	vtkCenterline->setHelp("Generated centerline mesh (vtk-format).");
-	mOutputTypes.push_back(vtkCenterline);
+	//1
+	tempMeshStringAdapter = SelectMeshStringDataAdapter::New();
+	tempMeshStringAdapter->setValueName("Centerline (vtk)");
+	tempMeshStringAdapter->setHelp("Generated centerline mesh (vtk-format).");
+	mOutputTypes.push_back(tempMeshStringAdapter);
 
-	temp = SelectDataStringDataAdapter::New();
-	temp->setValueName("Segmentation");
-	temp->setHelp("Generated segmentation.");
-	mOutputTypes.push_back(temp);
+	//2
+	tempDataStringAdapter = SelectDataStringDataAdapter::New();
+	tempDataStringAdapter->setValueName("Segmentation");
+	tempDataStringAdapter->setHelp("Generated segmentation.");
+	mOutputTypes.push_back(tempDataStringAdapter);
 
-	temp = SelectDataStringDataAdapter::New();
-	temp->setValueName("TDF");
-	temp->setHelp("Volume showing the probability of a voxel being part of a tubular structure.");
-	mOutputTypes.push_back(temp);
+	//3
+	tempMeshStringAdapter = SelectMeshStringDataAdapter::New();
+	tempMeshStringAdapter->setValueName("Surface");
+	tempMeshStringAdapter->setHelp("Generated surface of the segmented volume.");
+	mOutputTypes.push_back(tempMeshStringAdapter);
+
+	//4
+	tempDataStringAdapter = SelectDataStringDataAdapter::New();
+	tempDataStringAdapter->setValueName("TDF");
+	tempDataStringAdapter->setHelp("Volume showing the probability of a voxel being part of a tubular structure.");
+	mOutputTypes.push_back(tempDataStringAdapter);
 }
 
 void TubeSegmentationFilter::patientChangedSlot()
@@ -466,9 +486,9 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     QStringList list;
     list << "not reset";
     list << "reset";
-//	mResetOption = this->makeStringOption(root, "RESET TO DEFAULT", list);
+
     mResetOption = ssc::StringDataAdapterXml::initialize("tsf_reset_to_default", "RESET TO DEFAULT", "Used to reset options to default values.", "not reset", list, root);
-	//mStringOptions.push_back(mResetOption);
+
 	connect(mResetOption.get(), SIGNAL(changed()), this, SLOT(resetOptions()));
 
 	//generate bool adapters
@@ -486,7 +506,6 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     	if(std::find(hideParameter.begin(), hideParameter.end(), numericIt->first) == hideParameter.end())
     		mDoubleOptions.push_back(this->makeDoubleOption(root, numericIt->first, numericIt->second));
     }
-
 }
 
 paramList TubeSegmentationFilter::getParametersFromOptions()
