@@ -69,6 +69,14 @@ public:
 		mVideoSource = source;
 		emit sectorChanged();
 	}
+	virtual void removeRTSource(ssc::VideoSourcePtr source)
+	{
+		if (source!=mVideoSource)
+			return;
+		mVideoSource.reset();
+		emit sectorChanged();
+	}
+
 
 private:
 	ssc::ProbeData mProbeData;
