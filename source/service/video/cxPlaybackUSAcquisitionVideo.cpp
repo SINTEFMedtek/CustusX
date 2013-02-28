@@ -66,6 +66,7 @@ void USAcquisitionVideoPlayback::setTime(PlaybackTimePtr controller)
 
 	if (controller)
 	{
+		mVideoSource->start();
 	}
 	else
 	{
