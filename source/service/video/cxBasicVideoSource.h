@@ -56,7 +56,7 @@ public:
 	virtual double getTimestamp();
 
 	virtual QString getInfoString() const { return mInfo; }
-	virtual QString getStatusString() const { return mStatus; }
+	virtual QString getStatusString() const;
 
 	virtual void start();
 	virtual void stop();

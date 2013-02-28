@@ -23,12 +23,14 @@
 #include "sscMessageManager.h"
 #include "sscVolumeHelpers.h"
 #include "sscTypeConversions.h"
+#include "sscLogger.h"
 
 namespace cx
 {
 
 BasicVideoSource::BasicVideoSource()
 {
+	mStatus = "USE_DEFAULT";
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
 
@@ -127,6 +129,23 @@ void BasicVideoSource::stop()
 	emit newFrame();
 }
 
+QString BasicVideoSource::getStatusString() const
+{
+	if (mStatus!="USE_DEFAULT")
+		return mStatus;
+
+//	 { return mStatus; }
+	if (!this->isConnected())
+		return "Not connected";
+	if (!this->isStreaming())
+		return "Not streaming";
+	if (!this->validData())
+		return "Timeout";
+//	return "Running";
+	return "";
+}
+
+
 void BasicVideoSource::setInput(ssc::ImagePtr input)
 {
 //	if (input)
@@ -135,9 +154,20 @@ void BasicVideoSource::setInput(ssc::ImagePtr input)
 //		std::cout << "BasicVideoSource::setInput empty" << std::endl;
 
 	bool wasConnected = this->isConnected();
-	mReceivedImage = input;
-	if (!mReceivedImage)
+
+	if (input)
+	{
+		mReceivedImage = input;
+	}
+	else
+	{
+		if (mReceivedImage)
+		{
+			// create an empty image with the same uid as the stream.
+			mEmptyImage.reset(new ssc::Image(mReceivedImage->getUid(), mEmptyImage->getBaseVtkImageData()));
+		}
 		mReceivedImage = mEmptyImage;
+	}
 	mRedirecter->SetInput(mReceivedImage->getBaseVtkImageData());
 	mRedirecter->Update();
 
