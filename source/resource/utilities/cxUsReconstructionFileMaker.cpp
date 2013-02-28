@@ -229,11 +229,13 @@ void UsReconstructionFileMaker::report()
 void UsReconstructionFileMaker::writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression)
 {
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
+//	std::cout << "UsReconstructionFileMaker::writeUSImages " << images->size() << std::endl;
 
 	for (unsigned i=0; i<images->size(); ++i)
 	{
 		vtkImageDataPtr currentImage = images->get(i);
 		QString filename = path + "/" + QFileInfo(images->getFilename(i)).fileName();
+//		std::cout << "  UsReconstructionFileMaker::writeUSImages " << filename << std::endl;
 
 		writer->SetInput(currentImage);
 		writer->SetFileName(cstring_cast(filename));
@@ -263,7 +265,7 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	else
 		mReport << "failed to find frame data, save failed.";
 
-	int time = timer.getElapsedms();
+	int time = std::max(1, timer.getElapsedms());
 	mReport << QString("Completed save to %1. Spent %2s, %3fps").arg(mSessionDescription).arg(time/1000).arg(imageData->size()*1000/time);
 
 	this->report();

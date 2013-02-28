@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxViewWrapperVideo.h"
-#include <vector>
+//#include <vector>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -21,30 +21,15 @@
 #include <QAction>
 #include <QMenu>
 
-#include "sscUtilHelpers.h"
 #include "sscView.h"
-#include "sscSliceProxy.h"
-#include "sscSlicerRepSW.h"
-#include "sscToolRep2D.h"
+#include "sscVideoRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscDefinitionStrings.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscDefinitionStrings.h"
-#include "sscSliceComputer.h"
-#include "sscGeometricRep2D.h"
-#include "sscVideoRep.h"
-#include "cxSettings.h"
-#include "cxViewManager.h"
-#include "cxToolManager.h"
-#include "cxViewGroup.h"
-#include "cxVideoService.h"
+#include "sscTypeConversions.h"
 
-#include "sscData.h"
-#include "sscMesh.h"
-#include "cxViewWrapper.h"
-#include "sscVideoRep.h"
+#include "cxSettings.h"
+#include "cxToolManager.h"
+#include "cxVideoService.h"
 
 namespace cx
 {
@@ -53,6 +38,7 @@ ViewWrapperVideo::ViewWrapperVideo(ssc::ViewWidget* view)
 {
 	mView = view;
 	this->connectContextMenu(mView);
+//	mSelectedVideoSource = "active";
 
 	// disable vtk interactor: this wrapper IS an interactor
 	mView->getRenderWindow()->GetInteractor()->Disable();
@@ -61,15 +47,13 @@ ViewWrapperVideo::ViewWrapperVideo(ssc::ViewWidget* view)
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);
 
 //	connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(configureSlot()));
-	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(configureSlot()));
-	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(configureSlot()));
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(configureSlot()));
-//	mDominantToolProxy = DominantToolProxy::New();
-	//This connect stops video streaming?
+	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(connectStream()));
+	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
+	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectStream()));
 
 	addReps();
 
-	this->configureSlot();
+	this->connectStream();
 }
 
 ViewWrapperVideo::~ViewWrapperVideo()
@@ -83,6 +67,12 @@ ssc::ViewWidget* ViewWrapperVideo::getView()
 	return mView;
 }
 
+void ViewWrapperVideo::setViewGroup(ViewGroupDataPtr group)
+{
+	ViewWrapper::setViewGroup(group);
+	this->connectStream();
+}
+
 void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 {
 	QAction* showSectorAction = new QAction("Show Sector", &contextMenu);
@@ -92,6 +82,16 @@ void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 	connect(showSectorAction, SIGNAL(triggered(bool)), this, SLOT(showSectorActionSlot(bool)));
 
 	contextMenu.addSeparator();
+
+//	QActionGroup sourceGroup = new QActionGroup(&contextMenu);
+	QMenu* sourceMenu = new QMenu("Video Source", &contextMenu);
+	std::vector<ssc::VideoSourcePtr> sources = videoService()->getVideoSources();
+	this->addStreamAction("active", sourceMenu);
+	for (unsigned i=0; i<sources.size(); ++i)
+		this->addStreamAction(sources[i]->getUid(), sourceMenu);
+	contextMenu.addMenu(sourceMenu);
+
+//	contextMenu.addSeparator();
 	contextMenu.addAction(showSectorAction);
 }
 
@@ -101,38 +101,91 @@ void ViewWrapperVideo::showSectorActionSlot(bool checked)
 	settings()->setValue("showSectorInRTView", checked);
 }
 
-/** Setup connections to stream. Called when a stream is loaded into the datamanager, or if a probe is initialized
- *
- */
-void ViewWrapperVideo::configureSlot()
+void ViewWrapperVideo::addStreamAction(QString uid, QMenu* contextMenu)
 {
-	// if probe tool exist, connect to probeChanged()
-	if (mTool)
-		disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-	mTool = ToolManager::getInstance()->findFirstProbe();
-	if (mTool)
-		connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+	QAction* action = new QAction(uid, contextMenu);
 
-	this->probeChangedSlot();
+	ssc::VideoSourcePtr selected = this->getSourceFromService(mViewGroup->getVideoSource());
+	ssc::VideoSourcePtr current = this->getSourceFromService(uid);
 
-	// if no probe: use a raw video source
-	if (videoService()->getActiveVideoSource() && !mTool)
-			this->setupRep(videoService()->getActiveVideoSource(), ssc::ToolPtr());
+	action->setData(QVariant(uid));
+	action->setCheckable(true);
+	if (uid=="active")
+		action->setChecked(mViewGroup->getVideoSource()=="active");
+	else
+		action->setChecked(selected && (selected==current));
+
+	connect(action, SIGNAL(triggered()), this, SLOT(streamActionSlot()));
+	contextMenu->addAction(action);
 }
 
-void ViewWrapperVideo::probeChangedSlot()
+void ViewWrapperVideo::streamActionSlot()
 {
-	if (!mTool)
+	QAction* theAction = static_cast<QAction*>(sender());
+	if(!theAction)
+		return;
+	if (!theAction->isChecked())
 		return;
 
-	// if probe has a stream, connect stream and probe to rep.
-	this->setupRep(mTool->getProbe()->getRTSource(), mTool);
+	QString uid = theAction->data().toString();
+	std::cout << "selected source  " << uid << std::endl;
+//	mSelectedVideoSource = uid;
+	mViewGroup->setVideoSource(uid);
+//	this->connectStream();
+
+//	ssc::VideoSourcePtr source = videoService()->getVideoSources();
+}
+
+void ViewWrapperVideo::videoSourceChangedSlot(QString uid)
+{
+	this->connectStream();
+}
+
+void ViewWrapperVideo::connectStream()
+{
+	if (!mViewGroup)
+		return;
+//	std::cout << "ViewWrapperVideo::connectStream() selected=" << mViewGroup->getVideoSource()  << std::endl;
+	ssc::VideoSourcePtr source = this->getSourceFromService(mViewGroup->getVideoSource());
+
+	QString uid;
+	if (source)
+		uid = source->getUid();
+
+	ssc::ToolPtr newTool;
+	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	if (tool && tool->getProbe())
+	{
+		if (tool->getProbe()->getAvailableVideoSources().count(uid))
+		{
+			newTool = tool;
+		}
+	}
+
+	this->setupRep(source, newTool);
+}
+
+ssc::VideoSourcePtr ViewWrapperVideo::getSourceFromService(QString uid)
+{
+	if (uid=="active")
+		return videoService()->getActiveVideoSource();
+
+	std::vector<ssc::VideoSourcePtr> source = videoService()->getVideoSources();
+
+	for (unsigned i=0; i< source.size(); ++i)
+	{
+		if (source[i]->getUid()==uid)
+			return source[i];
+	}
+	return ssc::VideoSourcePtr();
 }
 
 void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 {
+//	std::cout << "ViewWrapperVideo::setupRep() " << source->getUid() << std::endl;
+
 	//Don't do anything if source is the same
-	if (mSource == source)
+	if (( mSource == source )&&( tool==mTool ))
 		return;
 	if (mSource)
 	{
@@ -155,13 +208,14 @@ void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 
 	mStreamRep->setRealtimeStream(mSource);
 	mStreamRep->setTool(tool);
-	mDataNameText->setText(0, "initialized");
+//	mDataNameText->setText(0, "initialized");
+	mDataNameText->setText(0, mSource->getName());
 	mStreamRep->setShowSector(settings()->value("showSectorInRTView").toBool());
 
-	ssc::messageManager()->sendInfo(
-					"Setup video rep with source="
-					+ source->getName() + " and tool="
-					+ (tool ? tool->getName() : "none"));
+//	ssc::messageManager()->sendInfo(
+//					"Setup video rep with source="
+//					+ source->getName() + " and tool="
+//					+ (tool ? tool->getName() : "none"));
 }
 
 void ViewWrapperVideo::updateSlot()

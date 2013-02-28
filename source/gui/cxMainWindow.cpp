@@ -30,7 +30,7 @@
 #include "cxTrackPadWidget.h"
 #include "cxCameraControl.h"
 #include "cxSecondaryMainWindow.h"
-#include "cxIGTLinkWidget.h"
+#include "cxVideoConnectionWidget.h"
 #include "cxAudio.h"
 #include "cxSettings.h"
 #include "cxVideoConnectionManager.h"
@@ -91,7 +91,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
-	this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
+	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
 	this->addAsDockWidget(new BrowserWidget(this), "Browsing");
 //	this->addAsDockWidget(new PointSamplingWidget(this), "Utility");
@@ -397,7 +397,9 @@ void MainWindow::createActions()
 	mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
 	mStartStreamingAction->setShortcut(tr("Ctrl+V"));
 	connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
-	connect(videoService()->getIGTLinkVideoConnection()->getVideoSource().get(), SIGNAL(streaming(bool)), this,
+	//	connect(videoService()->getIGTLinkVideoConnection()->getVideoSource().get(), SIGNAL(streaming(bool)), this,
+	//		SLOT(updateStreamingActionSlot()));
+	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this,
 		SLOT(updateStreamingActionSlot()));
 	this->updateStreamingActionSlot();
 
@@ -503,19 +505,20 @@ void MainWindow::saveScreenShotThreaded(QImage pixmap, QString filename)
 
 void MainWindow::toggleStreamingSlot()
 {
-	if (videoService()->getIGTLinkVideoConnection()->getVideoSource()->isStreaming())
+	if (videoService()->getVideoConnection()->isConnected())
 	{
-		videoService()->getIGTLinkVideoConnection()->getVideoSource()->disconnectServer();
+//		videoService()->getIGTLinkVideoConnection()->getVideoSource()->disconnectServer();
+		videoService()->getVideoConnection()->disconnectServer();
 	}
 	else
 	{
-		videoService()->getIGTLinkVideoConnection()->launchAndConnectServer();
+		videoService()->getVideoConnection()->launchAndConnectServer();
 	}
 }
 
 void MainWindow::updateStreamingActionSlot()
 {
-	if (videoService()->getIGTLinkVideoConnection()->getVideoSource()->isStreaming())
+	if (videoService()->getVideoConnection()->isConnected())
 	{
 		mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
 		mStartStreamingAction->setText("Stop Streaming");

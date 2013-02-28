@@ -189,6 +189,37 @@ private:
   QString mValueName;
 };
 
+typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
+/**
+ * Adapter for controlling the active video source in cx::VideoService
+ */
+class ActiveVideoSourceStringDataAdapter : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  static ActiveVideoSourceStringDataAdapterPtr New() { return ActiveVideoSourceStringDataAdapterPtr(new ActiveVideoSourceStringDataAdapter()); }
+  ActiveVideoSourceStringDataAdapter();
+  virtual ~ActiveVideoSourceStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+  virtual QStringList getValueRange() const;
+  virtual QString getHelp() const;
+
+//public: // interface extension
+//  ssc::VideoSourcePtr getRTSource();
+//  void setValueName(const QString name);
+
+//private slots:
+//  void setDefaultSlot();
+
+//private:
+//  ssc::VideoSourcePtr mRTSource;
+//  QString mValueName;
+};
+
 typedef boost::shared_ptr<class SelectCoordinateSystemStringDataAdapter> SelectCoordinateSystemStringDataAdapterPtr;
 /** Adapter that selects and stores a coordinate systems.
  * The coordinatesystem is stored internally in the adapter.

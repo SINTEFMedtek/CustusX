@@ -14,7 +14,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class IGTLinkClient> GrabberReceiveThreadIGTLinkPtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
-typedef boost::shared_ptr<class GrabberVideoSource> GrabberVideoSourcePtr;
+//typedef boost::shared_ptr<class VideoConnection> GrabberVideoSourcePtr;
 
 
 /**
@@ -25,13 +25,13 @@ typedef boost::shared_ptr<class GrabberVideoSource> GrabberVideoSourcePtr;
  * \date 2010.10.27
  * \\author Christian Askeland, SINTEF
  */
-class IGTLinkWidget : public BaseWidget
+class VideoConnectionWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
-  IGTLinkWidget(QWidget* parent);
-  virtual ~IGTLinkWidget();
+  VideoConnectionWidget(QWidget* parent);
+  virtual ~VideoConnectionWidget();
 
   virtual QString defaultWhatsThis() const;
 
@@ -54,7 +54,7 @@ private:
   void updateHostHistory();
   void updateDirectLinkArgumentHistory();
   QProcess* getServer();
-  GrabberVideoSourcePtr getRTSource();
+//  GrabberVideoSourcePtr getRTSource();
   VideoConnectionManagerPtr getConnection();
   void writeSettings();
 

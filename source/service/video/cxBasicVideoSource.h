@@ -68,6 +68,17 @@ public:
 	virtual void setResolution(double resolution);
 
 	// extensions:
+	/** Set an image that is used for output.
+	  *
+	  * Set a new image for each new frame.
+	  * Only the vtkImageData, uid and timestamp are
+	  * used, also make sure the uid is unchanged for
+	  * each setInput().
+	  *
+	  * Setting an input indicates connect(),
+	  * settings an empty input indicates disconnect()
+	  *
+	  */
 	void setInput(ssc::ImagePtr input);
 	void setInfoString(QString text) { mInfo = text; }
 	void setStatusString(QString text) { mStatus = text; }
