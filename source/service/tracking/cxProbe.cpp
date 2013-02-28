@@ -40,7 +40,7 @@ Probe::Probe(QString instrumentUid, QString scannerUid) :
 				mScannerUid(scannerUid)
 {
 	ssc::ProbeData probeData;
-	mData[probeData.getUid()].mData = probeData;
+	mProbeData[probeData.getUid()] = probeData;
 	mActiveUid = probeData.getUid();
 
 	mOverrideTemporalCalibration = false;
@@ -69,39 +69,71 @@ ssc::ProbeSectorPtr Probe::getSector(QString uid)
 
 bool Probe::isValid() const
 {
-	return this->getActiveInternalData().mData.getType() != ssc::ProbeData::tNONE;
+	return this->getProbeData("active").getType() != ssc::ProbeData::tNONE;
+//	return this->getActiveInternalData().mData.getType() != ssc::ProbeData::tNONE;
+}
+
+ssc::ProbeData Probe::getProbeData(QString uid) const
+{
+	ssc::ProbeData retval;
+
+	if (uid=="active")
+		uid = mActiveUid;
+	if (mProbeData.count(uid))
+		retval = mProbeData.find(uid)->second;
+	else if (mProbeData.count("default"))
+		retval = mProbeData.find("default")->second;
+	else
+		retval = mProbeData.begin()->second;
+
+	// ensure uid is matching the requested uid even if not found.
+	retval.setUid(uid);
+	return retval;
 }
 
 void Probe::setTemporalCalibration(double val)
 {
 	mOverrideTemporalCalibration = true;
 	mTemporalCalibration = val;
-	for (InternalDataType::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
-		iter->second.mData.setTemporalCalibration(mTemporalCalibration);
+	for (std::map<QString, ssc::ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+		iter->second.setTemporalCalibration(mTemporalCalibration);
 }
 
 void Probe::setSoundSpeedCompensationFactor(double factor)
 {
 	mSoundSpeedCompensationFactor = factor;
-	for (InternalDataType::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
-		iter->second.mData.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
+	for (std::map<QString, ssc::ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+		iter->second.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
 }
 
 ssc::ProbeData Probe::getData(QString uid) const
 {
-	uid = this->toValidUid(uid);
-	if (!uid.isEmpty())
-		return ssc::ProbeData();
-	return mData.find(uid)->second.mData;
+	ssc::ProbeData retval = this->getProbeData(uid);
+	return retval;
+
+//	uid = this->toValidUid(uid);
+//	if (!uid.isEmpty())
+//		return ssc::ProbeData();
+//	return mData.find(uid)->second.mData;
 }
 
 ssc::VideoSourcePtr Probe::getRTSource(QString uid) const
 {
-	uid = this->toValidUid(uid);
-	if (!uid.isEmpty())
+	if (mSource.empty())
 		return ssc::VideoSourcePtr();
-	return mData.find(uid)->second.mSource;
+	if (uid=="active")
+		uid = mActiveUid;
+	if (mSource.count(uid))
+		return mSource.find(uid)->second;
+//	if (mProbeData.count("default"))
+//		return mProbeData.find("default")->second;
+	return mSource.begin()->second;
+
+//	uid = this->toValidUid(uid);
+//	if (!uid.isEmpty())
+//		return ssc::VideoSourcePtr();
+//	return mData.find(uid)->second.mSource;
 }
 
 ProbePtr Probe::New(QString instrumentUid, QString scannerUid)
@@ -118,51 +150,61 @@ void Probe::setRTSource(ssc::VideoSourcePtr source)
 	if (!source)
 		return;
 
-	QString uid = this->toValidUid(source->getUid());
-	if (uid.isEmpty())
+//	QString uid = this->toValidUid(source->getUid());
+//	if (uid.isEmpty())
+//	{
+//		uid = source->getUid();
+//		// first erase the default stream if anything else appears
+//		if (uid!="default" && mData.count("default"))
+//			mData.erase("default");
+//		if (mActiveUid == "default")
+//			mActiveUid = uid;
+
+//		mData[uid] = mData.find("default")->second;
+//		mData[uid].
+//	}
+//	StreamData& internalData = mData.find(uid)->second;
+
+
+	// uid already exist: check if base object is the same
+	if (mSource.count(source->getUid()))
 	{
-		uid = source->getUid();
+		ssc::VideoSourcePtr old = mSource.find(source->getUid())->second;
 
-		// first erase the default stream if anything else appears
-		if (uid!="default" && mData.count("default"))
-			mData.erase("default");
-
-		mData[uid];
+		boost::shared_ptr<ssc::ProbeAdapterRTSource> oldAdapter;
+		oldAdapter = boost::shared_dynamic_cast<ssc::ProbeAdapterRTSource>(old);
+		// check for identity, ignore if no change
+		if (oldAdapter && (source==oldAdapter->getBaseSource()))
+			return;
 	}
 
-	StreamData& internalData = mData.find(uid)->second;
-
-	boost::shared_ptr<ssc::ProbeAdapterRTSource> adapter;
-	adapter = boost::shared_dynamic_cast<ssc::ProbeAdapterRTSource>(internalData.mSource);
-	if (adapter && (source==adapter->getBaseSource()))
-		return;
-
-	internalData.mSource.reset();
-	if (source)
-		adapter.reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));	
-	internalData.mSource = adapter;
+	mSource[source->getUid()].reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
 
 	emit sectorChanged();
 }
 
 void Probe::setData(ssc::ProbeData probeSector, QString configUid)
 {
-	QString uid = this->toValidUid(probeSector.getUid());
-	if (uid.isEmpty())
-	{
-		// add new stream
-		uid = probeSector.getUid();
+//	QString uid = this->toValidUid(probeSector.getUid());
+//	if (uid.isEmpty())
+//	{
+//		// add new stream
+//		uid = probeSector.getUid();
 
-		// first erase the default stream if anything else appears
-		if (uid!="default" && mData.count("default"))
-			mData.erase("default");
+//		// first erase the default stream if anything else appears
+//		if (uid!="default" && mData.count("default"))
+//			mData.erase("default");
+//		if (mActiveUid == "default")
+//			mActiveUid = uid;
 
-		mData[uid];
-	}
+//		mData[uid];
+//	}
 
-	StreamData& internalData = mData.find(uid)->second;
+	mProbeData[probeSector.getUid()] = probeSector;
 
-	internalData.mData = probeSector;
+//	StreamData& internalData = mData.find(uid)->second;
+
+//	internalData.mData = probeSector;
 	mConfigurationId = configUid;
 	emit sectorChanged();
 }
@@ -280,48 +322,50 @@ void Probe::saveCurrentConfig(QString uid, QString name)
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
 	config.mConfigId = uid;
 	config.mName = name;
-	config = createConfigurationFromProbeData(config, this->getActiveInternalData().mData);
+	config = createConfigurationFromProbeData(config, this->getProbeData("active"));
 
 	mXml->saveCurrentConfig(config);
 	this->setConfigId(uid);
 }
 
-Probe::StreamData& Probe::getActiveInternalData()
-{
-	SSC_ASSERT(mData.count(mActiveUid));
-	return mData.find(mActiveUid)->second;
-}
-const Probe::StreamData& Probe::getActiveInternalData() const
-{
-	SSC_ASSERT(mData.count(mActiveUid));
-	return mData.find(mActiveUid)->second;
-}
+//Probe::StreamData& Probe::getActiveInternalData()
+//{
+//	SSC_ASSERT(mData.count(mActiveUid));
+//	return mData.find(mActiveUid)->second;
+//}
+//const Probe::StreamData& Probe::getActiveInternalData() const
+//{
+//	std::cout << "const Probe::StreamData& Probe::getActiveInternalData() const " << mActiveUid << std::endl;
+//	SSC_ASSERT(mData.count(mActiveUid));
+//	return mData.find(mActiveUid)->second;
+//}
 
-Probe::StreamData& Probe::getDataForUid(QString uid)
-{
-	return mData[uid];
-}
+//Probe::StreamData& Probe::getDataForUid(QString uid)
+//{
+//	return mData[uid];
+//}
 
-QString Probe::toValidUid(QString uid) const
-{
-	if (uid=="active")
-		uid = mActiveUid;
-	if (mData.count(uid))
-		return uid;
-	return "";
-}
+//QString Probe::toValidUid(QString uid) const
+//{
+//	if (uid=="active")
+//		uid = mActiveUid;
+//	if (mData.count(uid))
+//		return uid;
+//	return "";
+//}
 
 QStringList Probe::getAvailableVideoSources()
 {
 	QStringList retval;
-	for (InternalDataType::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
+//	std::map<QString, ssc::VideoSourcePtr> mSource; ///< all defined sources
+	for (std::map<QString, ssc::VideoSourcePtr>::iterator iter=mSource.begin(); iter!=mSource.end(); ++iter)
 		retval << iter->first;
 	return retval;
 }
 
 void Probe::setActiveStream(QString uid)
 {
-	uid = this->toValidUid(uid);
+//	uid = this->toValidUid(uid);
 	if (uid.isEmpty())
 		return;
 	mActiveUid = uid;

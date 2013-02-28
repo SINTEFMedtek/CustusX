@@ -1,4 +1,4 @@
-#include "cxIGTLinkWidget.h"
+#include "cxVideoConnectionWidget.h"
 
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
@@ -26,14 +26,16 @@
 #include "cxPatientData.h"
 #include "sscStringDataAdapterXml.h"
 #include "cxVideoConnection.h"
+#include "sscHelperWidgets.h"
+#include "cxDataInterface.h"
 
 namespace cx
 {
 
-IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
-		BaseWidget(parent, "IGTLinkWidget", "IGTLink Client")
+VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
+		BaseWidget(parent, "IGTLinkWidget", "Video Connection")
 {
-	connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
+	connect(this->getConnection().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
 	connect(getServer(), SIGNAL(stateChanged(QProcess::ProcessState)), this,
 			SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 
@@ -85,17 +87,19 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 	connect(mSnapshotButton, SIGNAL(clicked()), this, SLOT(saveSnapshotSlot()));
 	toptopLayout->addWidget(mSnapshotButton);
 
+	toptopLayout->addWidget(createDataWidget(this, ActiveVideoSourceStringDataAdapter::New()));
+
 	toptopLayout->addStretch();
 
 	this->dataChanged();
 }
 
-void IGTLinkWidget::initScriptSelected(QString filename)
+void VideoConnectionWidget::initScriptSelected(QString filename)
 {
 	getConnection()->setInitScript(filename);
 }
 
-QWidget* IGTLinkWidget::createDirectLinkWidget()
+QWidget* VideoConnectionWidget::createDirectLinkWidget()
 {
 	QWidget* retval = new QWidget();
 	QGridLayout* layout = new QGridLayout(retval);
@@ -116,7 +120,7 @@ QWidget* IGTLinkWidget::createDirectLinkWidget()
 	return retval;
 }
 
-QWidget* IGTLinkWidget::createLocalServerWidget()
+QWidget* VideoConnectionWidget::createLocalServerWidget()
 {
 	QWidget* retval = new QWidget();
 	QGridLayout* layout = new QGridLayout(retval);
@@ -149,7 +153,7 @@ QWidget* IGTLinkWidget::createLocalServerWidget()
 	return retval;
 }
 
-QWidget* IGTLinkWidget::wrapVerticalStretch(QWidget* input)
+QWidget* VideoConnectionWidget::wrapVerticalStretch(QWidget* input)
 {
 	QWidget* retval = new QWidget(this);
 	QVBoxLayout* layout = new QVBoxLayout(retval);
@@ -160,7 +164,7 @@ QWidget* IGTLinkWidget::wrapVerticalStretch(QWidget* input)
 	return retval;
 }
 
-QWidget* IGTLinkWidget::createRemoteWidget()
+QWidget* VideoConnectionWidget::createRemoteWidget()
 {
 	QWidget* retval = new QWidget();
 	QGridLayout* layout = new QGridLayout(retval);
@@ -183,7 +187,7 @@ QWidget* IGTLinkWidget::createRemoteWidget()
 	return retval;
 }
 
-QString IGTLinkWidget::defaultWhatsThis() const
+QString VideoConnectionWidget::defaultWhatsThis() const
 {
 	return "<html>"
 			"<h3><Setup IGTLink connection.</h3>"
@@ -192,22 +196,22 @@ QString IGTLinkWidget::defaultWhatsThis() const
 			"</html>";
 }
 
-QProcess* IGTLinkWidget::getServer()
+QProcess* VideoConnectionWidget::getServer()
 {
 	return getConnection()->getProcess();
 }
 
-GrabberVideoSourcePtr IGTLinkWidget::getRTSource()
+//GrabberVideoSourcePtr IGTLinkWidget::getRTSource()
+//{
+//	return getConnection()->getVideoSource();
+//}
+
+VideoConnectionManagerPtr VideoConnectionWidget::getConnection()
 {
-	return getConnection()->getVideoSource();
+	return videoService()->getVideoConnection();
 }
 
-VideoConnectionManagerPtr IGTLinkWidget::getConnection()
-{
-	return videoService()->getIGTLinkVideoConnection();
-}
-
-IGTLinkWidget::~IGTLinkWidget()
+VideoConnectionWidget::~VideoConnectionWidget()
 {
 }
 
@@ -229,7 +233,7 @@ IGTLinkWidget::~IGTLinkWidget()
 //	this->dataChanged();
 //}
 
-void IGTLinkWidget::dataChanged()
+void VideoConnectionWidget::dataChanged()
 {
 	if (getConnection()->getUseDirectLink2())
 		mStackedWidget->setCurrentIndex(0);
@@ -247,7 +251,7 @@ void IGTLinkWidget::dataChanged()
 //	mUseLocalServer->setEnabled(!direct);
 }
 
-void IGTLinkWidget::updateHostHistory()
+void VideoConnectionWidget::updateHostHistory()
 {
 	mAddressEdit->blockSignals(true);
 	mAddressEdit->clear();
@@ -255,7 +259,7 @@ void IGTLinkWidget::updateHostHistory()
 	mAddressEdit->blockSignals(false);
 }
 
-void IGTLinkWidget::updateDirectLinkArgumentHistory()
+void VideoConnectionWidget::updateDirectLinkArgumentHistory()
 {
 	mDirectLinkArguments->blockSignals(true);
 	mDirectLinkArguments->clear();
@@ -263,7 +267,7 @@ void IGTLinkWidget::updateDirectLinkArgumentHistory()
 	mDirectLinkArguments->blockSignals(false);
 }
 
-void IGTLinkWidget::browseLocalServerSlot()
+void VideoConnectionWidget::browseLocalServerSlot()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Select Server"), "~");
 	if (fileName.isEmpty())
@@ -271,21 +275,21 @@ void IGTLinkWidget::browseLocalServerSlot()
 	mLocalServerEdit->setText(fileName);
 }
 
-void IGTLinkWidget::showEvent(QShowEvent* event)
+void VideoConnectionWidget::showEvent(QShowEvent* event)
 {
 }
 
-void IGTLinkWidget::hideEvent(QHideEvent* event)
+void VideoConnectionWidget::hideEvent(QHideEvent* event)
 {
 }
 
-void IGTLinkWidget::launchServer()
+void VideoConnectionWidget::launchServer()
 {
 	this->writeSettings();
 	getConnection()->launchServer();
 }
 
-void IGTLinkWidget::toggleLaunchServer()
+void VideoConnectionWidget::toggleLaunchServer()
 {
 	if ((getServer()) && (getServer()->state() == QProcess::Running))
 		getServer()->close();
@@ -293,7 +297,7 @@ void IGTLinkWidget::toggleLaunchServer()
 		this->launchServer();
 }
 
-void IGTLinkWidget::serverProcessStateChanged(QProcess::ProcessState newState)
+void VideoConnectionWidget::serverProcessStateChanged(QProcess::ProcessState newState)
 {
 	if (newState == QProcess::Running)
 	{
@@ -309,19 +313,19 @@ void IGTLinkWidget::serverProcessStateChanged(QProcess::ProcessState newState)
 	}
 }
 
-void IGTLinkWidget::toggleConnectServer()
+void VideoConnectionWidget::toggleConnectServer()
 {
-	if (!getRTSource()->isConnected())
+	if (!this->getConnection()->isConnected())
 	{
 		this->connectServer();
 	}
 	else
 	{
-		getRTSource()->disconnectServer();
+		this->getConnection()->disconnectServer();
 	}
 }
 
-void IGTLinkWidget::writeSettings()
+void VideoConnectionWidget::writeSettings()
 {
 	if (this->getConnection()->getUseDirectLink2())
 	{
@@ -349,49 +353,51 @@ void IGTLinkWidget::writeSettings()
 //	this->updateHostHistory();
 }
 
-void IGTLinkWidget::connectServer()
+void VideoConnectionWidget::connectServer()
 {
-	if (!getRTSource()->isConnected())
+	if (!this->getConnection()->isConnected())
 	{
 		this->writeSettings();
 		getConnection()->launchAndConnectServer();
 	}
 }
 
-void IGTLinkWidget::serverStatusChangedSlot()
+void VideoConnectionWidget::serverStatusChangedSlot()
 {
-	if (getRTSource()->isConnected())
+	mSnapshotButton->setEnabled(this->getConnection()->isConnected());
+
+	if (this->getConnection()->isConnected())
 	{
-		mSnapshotButton->setEnabled(getRTSource()->isStreaming());
+//		mSnapshotButton->setEnabled(getRTSource()->isStreaming());
 		mConnectButton->setText("Disconnect Server");
 	}
 	else
 	{
-		mSnapshotButton->setEnabled(getRTSource()->isStreaming());
+//		mSnapshotButton->setEnabled(getRTSource()->isStreaming());
 		mConnectButton->setText("Connect Server");
 	}
 
 	this->adjustSize();
 }
 
-void IGTLinkWidget::saveSnapshotSlot()
+void VideoConnectionWidget::saveSnapshotSlot()
 {
 	ssc::messageManager()->sendInfo("IGTLinkWidget::saveSnapshotSlot()");
 
-	if(!getRTSource())
+	if(!this->getConnection())
 	{
-		ssc::messageManager()->sendWarning("No RT source");
+		ssc::messageManager()->sendWarning("No video connection");
 		return;
 	}
-	if(!getRTSource()->isStreaming())
+	if(!this->getConnection()->isConnected())
 	{
-		ssc::messageManager()->sendWarning("RT soure is not streaming");
+		ssc::messageManager()->sendWarning("Video is not connected");
 		return;
 	}
-	vtkImageDataPtr input = getRTSource()->getVtkImageData();
+	vtkImageDataPtr input = videoService()->getActiveVideoSource()->getVtkImageData();
 	if(!input)
 	{
-		ssc::messageManager()->sendWarning("No RT data");
+		ssc::messageManager()->sendWarning("No Video data");
 		return;
 	}
 	int* extent = input->GetExtent();

@@ -16,12 +16,15 @@
 
 #include "cxToolManager.h"
 
+//#include <boost/thread/thread.hpp>
+
 #include <QTimer>
 #include <QDir>
 #include <QList>
 #include <QMetaType>
 #include <QFileInfo>
 #include <vtkDoubleArray.h>
+#include <QCoreApplication>
 
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
@@ -109,6 +112,19 @@ void ToolManager::setPlaybackMode(PlaybackTimePtr controller)
 	{
 		this->closePlayBackMode();
 		return;
+	}
+
+	// attempt to configure tracker if not configured:
+	if (!this->isConfigured())
+		this->configure();
+
+	// wait for connection to complete
+	for (unsigned i=0; i<100; ++i)
+	{
+		if (this->isConfigured())
+			break;
+		qApp->processEvents();
+		mTrackerThread->wait(100);
 	}
 
 	if (!this->isConfigured())

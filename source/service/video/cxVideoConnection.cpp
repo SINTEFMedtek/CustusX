@@ -55,6 +55,7 @@
 #include "sscLogger.h"
 #include "sscVolumeHelpers.h"
 #include "cxRenderTimer.h"
+#include "cxBasicVideoSource.h"
 
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
@@ -62,98 +63,50 @@ typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 namespace cx
 {
 
-GrabberVideoSource::GrabberVideoSource()
+VideoConnection::VideoConnection()
 {
 	mConnected = false;
-	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
-	vtkImageDataPtr emptyImage = ssc::generateVtkImageData(Eigen::Array3i(1,1,1),
-	                                                       ssc::Vector3D(1,1,1),
-	                                                       0);
-	mEmptyImage.reset(new ssc::Image("<none>", emptyImage));
-	mReceivedImage = mEmptyImage;
-	mRedirecter->SetInput(mEmptyImage->getBaseVtkImageData());
-
-	mTimeout = true; // must start invalid
-	mTimeoutTimer = new QTimer(this);
-	mTimeoutTimer->setInterval(1000);
-	connect(mTimeoutTimer, SIGNAL(timeout()), this, SLOT(timeout()));
-	connect(this, SIGNAL(connected(bool)), this, SIGNAL(streaming(bool))); // define connected as streaming.
+	connect(ssc::toolManager(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
+	connect(ssc::toolManager(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
+	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
+//	connect(this,               SIGNAL(videoSourcesChanged()),        this, SLOT(connectVideoToProbe()));
 }
 
-GrabberVideoSource::~GrabberVideoSource()
+VideoConnection::~VideoConnection()
 {
 	this->stopClient();
 }
 
-void GrabberVideoSource::timeout()
-{
-	if (mTimeout)
-		return;
-
-	ssc::messageManager()->sendWarning("Timeout!");
-	mTimeout = true;
-	emit newFrame();
-}
-
-QString GrabberVideoSource::getName()
-{
-	return mReceivedImage->getUid();
-}
-
-void GrabberVideoSource::fpsSlot(double fpsNumber)
+void VideoConnection::fpsSlot(double fpsNumber)
 {
 	mFPS = fpsNumber;
 	emit fps(fpsNumber);
 }
 
-QString GrabberVideoSource::getInfoString() const
-{
-	if (!mClient)
-		return "";
-	return mClient->hostDescription() + " - " + QString::number(mFPS, 'f', 1) + " fps";
-}
+//QString VideoConnection::getInfoString() const
+//{
+//	if (!mClient)
+//		return "";
+//	return mClient->hostDescription() + " - " + QString::number(mFPS, 'f', 1) + " fps";
+//}
 
-QString GrabberVideoSource::getStatusString() const
-{
-	if (!mClient)
-		return "Not connected";
-	if (mTimeout)
-		return "Timeout";
-	return "Running";
-}
+//QString VideoConnection::getStatusString() const
+//{
+//	if (!mClient)
+//		return "Not connected";
+//	if (mTimeout)
+//		return "Timeout";
+//	return "Running";
+//}
 
-void GrabberVideoSource::start()
-{
 
-}
-
-void GrabberVideoSource::stop()
-{
-
-}
-
-bool GrabberVideoSource::validData() const
-{
-	return mClient && !mTimeout;
-}
-
-double GrabberVideoSource::getTimestamp()
-{
-	return mReceivedImage->getAcquisitionTime().toMSecsSinceEpoch();
-}
-
-bool GrabberVideoSource::isConnected() const
+bool VideoConnection::isConnected() const
 {
 	return mClient && mConnected;
 }
 
-bool GrabberVideoSource::isStreaming() const
-{
-	return this->isConnected();
-}
-
-void GrabberVideoSource::connectedSlot(bool on)
+void VideoConnection::connectedSlot(bool on)
 {
 	mConnected = on;
 
@@ -163,19 +116,17 @@ void GrabberVideoSource::connectedSlot(bool on)
 	emit connected(on);
 }
 
-void GrabberVideoSource::directLink(std::map<QString, QString> args)
+void VideoConnection::directLink(std::map<QString, QString> args)
 {
 	this->runClient(GrabberReceiveThreadPtr(new GrabberDirectLinkThread(args, this)));
 }
 
-
-void GrabberVideoSource::connectServer(QString address, int port)
+void VideoConnection::connectServer(QString address, int port)
 {
 	this->runClient(GrabberReceiveThreadPtr(new GrabberReceiveThreadIGTLink(address, port, this)));
 }
 
-
-void GrabberVideoSource::runClient(GrabberReceiveThreadPtr client)
+void VideoConnection::runClient(GrabberReceiveThreadPtr client)
 {
 	if (mClient)
 	{
@@ -191,17 +142,16 @@ void GrabberVideoSource::runClient(GrabberReceiveThreadPtr client)
 	connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
 	mClient->start();
-	mTimeoutTimer->start();
 }
 
-void GrabberVideoSource::imageReceivedSlot()
+void VideoConnection::imageReceivedSlot()
 {
 	if (!mClient)
 		return;
 	this->updateImage(mClient->getLastImageMessage());
 }
 
-void GrabberVideoSource::sonixStatusReceivedSlot()
+void VideoConnection::sonixStatusReceivedSlot()
 {
 	if (!mClient)
 		return;
@@ -211,7 +161,7 @@ void GrabberVideoSource::sonixStatusReceivedSlot()
 /**Get rid of the mClient thread.
  *
  */
-void GrabberVideoSource::stopClient()
+void VideoConnection::stopClient()
 {
 	if (mClient)
 	{
@@ -235,19 +185,17 @@ void GrabberVideoSource::stopClient()
 	}
 }
 
-void GrabberVideoSource::disconnectServer()
+void VideoConnection::disconnectServer()
 {
 	this->stopClient();
 
-	mTimeoutTimer->stop();
-
-	// clear the redirecter
-	mReceivedImage = mEmptyImage;
-	mRedirecter->SetInput(mEmptyImage->getBaseVtkImageData());
-	emit newFrame(); // changed
+	for (unsigned i=0; i<mSources.size(); ++i)
+	{
+		mSources[i]->stop();
+	}
 }
 
-void GrabberVideoSource::clientFinishedSlot()
+void VideoConnection::clientFinishedSlot()
 {
 	if (!mClient)
 		return;
@@ -260,7 +208,7 @@ void GrabberVideoSource::clientFinishedSlot()
  *  and store locally. Also reset the old local info with
  *  information from the probe in toolmanager.
  */
-void GrabberVideoSource::updateSonixStatus(ssc::ProbeData msg)
+void VideoConnection::updateSonixStatus(ssc::ProbeData msg)
 {
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (!tool)
@@ -271,8 +219,10 @@ void GrabberVideoSource::updateSonixStatus(ssc::ProbeData msg)
 
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
+	// Note that the 'active' data is get while the 'uid' data is set.
 	ssc::ProbeData data = probe->getData();
 
+	data.setUid(msg.getUid());
 	data.setType(msg.getType());
 	data.setSector(msg.getDepthStart(), msg.getDepthEnd(), msg.getWidth());
 	ssc::ProbeData::ProbeImageData image = data.getImage();
@@ -285,42 +235,96 @@ void GrabberVideoSource::updateSonixStatus(ssc::ProbeData msg)
 	probe->setData(data);
 }
 
-void GrabberVideoSource::updateImage(ssc::ImagePtr message)
+void VideoConnection::updateImage(ssc::ImagePtr message)
 {
-	static CyclicActionTimer timer("Update Video Image");
-	timer.begin();
+	BasicVideoSourcePtr source;
 
-	if (!message)
+	// look for existing VideoSource
+	for (unsigned i=0; i<mSources.size(); ++i)
 	{
-		std::cout << "got empty image !!!" << std::endl;
-		mReceivedImage = mEmptyImage;
-		mRedirecter->SetInput(mEmptyImage->getBaseVtkImageData());
+		if (message && message->getUid() == mSources[i]->getUid())
+			source = mSources[i];
+	}
+
+	bool newSource = false;
+	// no existing found: create new
+	if (!source)
+	{
+		source.reset(new BasicVideoSource());
+		mSources.push_back(source);
+		source->start();
+		newSource = true;
+	}
+	// set input.
+	source->setInput(message);
+//	std::cout << "updating stream " << message->getUid() << std::endl;
+
+	QString info = mClient->hostDescription() + " - " + QString::number(mFPS, 'f', 1) + " fps";
+	source->setInfoString(info);
+
+	if (newSource)
+	{
+		this->connectVideoToProbe();
+		emit videoSourcesChanged();
+	}
+
+}
+
+std::vector<ssc::VideoSourcePtr> VideoConnection::getVideoSources()
+{
+	std::vector<ssc::VideoSourcePtr> retval;
+	std::copy(mSources.begin(), mSources.end(), std::back_inserter(retval));
+	return retval;
+}
+
+/** Imbue probe with all stream and probe info from grabber.
+ *
+ * Call when active probe is changed or when streaming config is changed (new streams, new probedata)
+ *
+ * Find the active probe, then insert all current streams into that probe.
+ *
+ */
+void VideoConnection::connectVideoToProbe()
+{
+	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	if (!tool)
 		return;
-	}
+	ssc::ProbePtr probe = tool->getProbe();
+	if (!probe)
+		return;
 
-	mReceivedImage = message;
-	mRedirecter->SetInput(mReceivedImage->getBaseVtkImageData());
-
-	mTimeout = false;
-	mTimeoutTimer->start();
-
-	//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
-	emit newFrame();
-	timer.time("emit");
-
-	if (timer.intervalPassed())
+	for (unsigned i=0; i<mSources.size(); ++i)
 	{
-		static int counter=0;
-//		if (++counter%10==0)
-//			ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
-		timer.reset();
+		std::cout << "***********============= set source in probe " << tool->getUid() << std::endl;
+		probe->setRTSource(mSources[i]);
 	}
 
+
+//	ssc::VideoSourcePtr source = videoService()->getActiveVideoSource();
+//	if (!source)
+//	{
+//		ssc::messageManager()->sendError("no rt source.");
+//		return;
+//	}
+
+//	// find probe in tool manager
+//	// set source in cxTool
+//	// insert timecalibration using config
+//	if (!source->isConnected())
+//		return;
+
+//	if (!probe)
+//		return;
+
+//	if (probe)
+//	{
+//		ssc::ProbePtr probeInterface = probe->getProbe();
+//		if (!probeInterface)
+//			return;
+//		probeInterface->setRTSource(source);
+//	}
 }
 
-vtkImageDataPtr GrabberVideoSource::getVtkImageData()
-{
-	return mRedirecter->GetOutput();
-}
+
 
 }
