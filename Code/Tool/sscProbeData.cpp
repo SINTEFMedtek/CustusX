@@ -154,6 +154,8 @@ void ProbeData::addXml(QDomNode dataNode) const
 	elem.setAttribute("temporalCalibration", qstring_cast(mTemporalCalibration));
 	elem.setAttribute("centerOffset", qstring_cast(mCenterOffset));
 
+	elem.setAttribute("uid", qstring_cast(mUid));
+
 	QDomElement imageNode = dataNode.ownerDocument().createElement("image");
 	mImage.addXml(imageNode);
 	dataNode.appendChild(imageNode);
@@ -171,6 +173,9 @@ void ProbeData::parseXml(QDomNode dataNode)
 
 	mTemporalCalibration = loadAttribute(elem, "temporalCalibration", 0);
 	mCenterOffset = loadAttribute(elem, "centerOffset", 0);
+//	mUid = loadAttribute(elem, "uid", "default");
+	mUid = elem.attribute("uid");
+
 
 	QDomNode imageNode = dataNode.namedItem("image");
 	mImage.parseXml(imageNode);

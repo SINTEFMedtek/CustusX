@@ -21,6 +21,7 @@
 #include <vtkImageData.h>
 #include "sscImageImportVideoSource.h"
 #include "sscBoundingBox3D.h"
+#include "sscLogger.h"
 
 namespace ssc
 {
