@@ -354,7 +354,6 @@ void VideoGraphics::checkDataIntegrity()
 
 void VideoGraphics::newDataSlot()
 {
-//	if (!mData || !mData->isStreaming())
 	if (!mData || !mData->validData())
 	{
 		mPlaneActor->SetVisibility(false);
@@ -517,17 +516,6 @@ void VideoFixedPlaneRep::updateSector()
 	mProbeOrigin->setData(mProbeData.getOriginPolyData());
 	mProbeSector->setData(mProbeData.getSectorSectorOnlyLinesOnly());
 	mProbeClipRect->setData(mProbeData.getClipRectLinesOnly());
-
-//	mProbeSector->getActor()->setvi
-
-//	mProbeSectorPolyDataMapper->SetInput(mProbeData.getSectorLinesOnly());
-//	if (mProbeSectorPolyDataMapper->GetInput())
-//	{
-//		mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
-//	}
-////  mProbeSectorActor->SetVisibility(mTool->getVisible());
-//	mProbeSectorActor->SetVisibility(true);
-
 }
 
 void VideoFixedPlaneRep::setTool(ToolPtr tool)

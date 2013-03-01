@@ -81,6 +81,10 @@ void ProbeAdapterRTSource::newFrameSlot()
 	ProbePtr probe = mProbe.lock();
 	if (!probe)
 		return;
+	if (!this->validData())
+		return;
+
+	mRedirecter->Update();
 
 	QString uid = mBase->getUid();
 	ssc::ProbeData data = probe->getData(uid);
@@ -89,20 +93,18 @@ void ProbeAdapterRTSource::newFrameSlot()
 
 	if (dimProbe!=dimImage)
 	{
-//		std::cout << "*********** " << this << " ********** ProbeAdapterRTSource::newFrameSlot() probe=" << probe.get() << ", base=" << mBase->getUid() << std::endl;
 		ssc::messageManager()->sendInfo(
-			QString("Resampling probe calibration. Calibration:[%1,%2], Image:[%3,%4]")
+			QString("Resampling probe calibration. Calibration:[%1,%2], Image:[%3,%4], uid=%5")
 			.arg(dimProbe.width())
 			.arg(dimProbe.height())
 			.arg(dimImage.width())
-			.arg(dimImage.height()));
+			.arg(dimImage.height())
+		            .arg(uid));
 
-//		std::cout << streamXml2String(data) << std::endl;
 		data.resample(dimImage);
-//		std::cout << streamXml2String(data) << std::endl;
-//		std::cout << "*****************************************" << std::endl;
 		probe->setData(data, probe->getConfigId());
 	}
+
 }
 
 void ProbeAdapterRTSource::probeChangedSlot()
@@ -110,31 +112,13 @@ void ProbeAdapterRTSource::probeChangedSlot()
 	ProbePtr probe = mProbe.lock();
 	if (!probe)
 		return;
-	//  std::cout << "ProbeAdapterRTSource::probeChangedSlot() validdata: " << validData() << std::endl;
 
 	mRedirecter->Update();
 
-	// replaced by resampling code in newFrameSlot()
-//	Eigen::Array3i dimImage(mRedirecter->GetOutput()->GetDimensions());
-//	//  ssc::Vector3D dimImage(mRedirecter->GetOutput()->GetDimensions());
-//	QSize dimProbe = probe->getData().getImage().mSize;
-//
-//	bool nonZero = (dimProbe.width() != 0) && (dimProbe.height() != 0) && (dimImage[0] != 0) && (dimImage[1] != 0);
-//
-//	if (this->validData() && nonZero && ((dimImage[0] != dimProbe.width()) || (dimImage[1] != dimProbe.height())))
-//	{
-//		std::stringstream ss;
-//		ss << "Mismatch rt stream and probe image size. " << "RT dim=(" << dimImage[0] << ", " << dimImage[1] << "), "
-//			<< "Probe dim=(" << dimProbe.width() << ", " << dimProbe.height() << ")";
-//		messageManager()->sendWarning(qstring_cast(ss.str()));
-//	}
+	QString uid = mBase->getUid();
+	mRedirecter->SetOutputSpacing(probe->getData(uid).getImage().mSpacing.begin());
 
-	// Don't change spacing if it have an existing spacing from the OpenIGTLink message
-	//  if (mBase->getVtkImageData()->GetSpacing()[0] == 0)
-	{
-		QString uid = mBase->getUid();
-		mRedirecter->SetOutputSpacing(probe->getData(uid).getImage().mSpacing.begin());
-	}
+	mRedirecter->Update();
 }
 
 }
