@@ -25,6 +25,8 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
+
 /**
  * \file
  * \addtogroup cxServiceVideo
@@ -61,7 +63,8 @@ private:
 	QStringList getAllFiles(QString folder);
 	QString mRoot;
 	PlaybackTimePtr mTimer;
-	ssc::ImageImportVideoSourcePtr mVideoSource;
+//	ssc::ImageImportVideoSourcePtr mVideoSource;
+	BasicVideoSourcePtr mVideoSource;
 	std::vector<TimelineEvent> mEvents;
 
 	ssc::USReconstructInputData mCurrentData;
