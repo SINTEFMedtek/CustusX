@@ -68,7 +68,7 @@ bool DataAdapter::setAdvanced(bool advanced)
 	return true;
 }
 
-bool DataAdapter::setGroup(bool name)
+bool DataAdapter::setGroup(QString name)
 {
 	if(name == mGroup)
 		return false;
