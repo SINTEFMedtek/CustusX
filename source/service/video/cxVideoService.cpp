@@ -167,23 +167,41 @@ void VideoService::setPlaybackMode(PlaybackTimePtr controller)
 	mUSAcquisitionVideoPlayback->setTime(controller);
 	this->autoSelectActiveVideoSource();
 
-	if (mUSAcquisitionVideoPlayback->isActive())
+	ssc::VideoSourcePtr playbackSource = mUSAcquisitionVideoPlayback->getVideoSource();
+	ssc::ToolManager::ToolMap tools = *ssc::toolManager()->getTools();
+	for (ssc::ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
-		ssc::VideoSourcePtr playbackSource = mUSAcquisitionVideoPlayback->getVideoSource();
-		ssc::ToolManager::ToolMap tools = *ssc::toolManager()->getTools();
-		for (ssc::ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
-		{
-			ssc::ProbePtr probe = iter->second->getProbe();
-			if (!probe)
-				continue;
+		ssc::ProbePtr probe = iter->second->getProbe();
+		if (!probe)
+			continue;
+		if (mUSAcquisitionVideoPlayback->isActive())
 			probe->setRTSource(playbackSource);
-		}
+		else
+			probe->removeRTSource(playbackSource);
+	}
+	if (mUSAcquisitionVideoPlayback->isActive())
 		this->setActiveVideoSource(playbackSource->getUid());
-	}
 	else
-	{
-		// clear playback
-	}
+		this->autoSelectActiveVideoSource();
+
+
+//	if (mUSAcquisitionVideoPlayback->isActive())
+//	{
+//		ssc::VideoSourcePtr playbackSource = mUSAcquisitionVideoPlayback->getVideoSource();
+//		ssc::ToolManager::ToolMap tools = *ssc::toolManager()->getTools();
+//		for (ssc::ToolManager::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+//		{
+//			ssc::ProbePtr probe = iter->second->getProbe();
+//			if (!probe)
+//				continue;
+//			probe->setRTSource(playbackSource);
+//		}
+//		this->setActiveVideoSource(playbackSource->getUid());
+//	}
+//	else
+//	{
+//		// clear playback
+//	}
 }
 
 std::vector<ssc::VideoSourcePtr> VideoService::getVideoSources()

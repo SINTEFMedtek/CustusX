@@ -23,19 +23,21 @@
 #include "sscMessageManager.h"
 #include "sscVolumeHelpers.h"
 #include "sscTypeConversions.h"
+#include "sscLogger.h"
 
 namespace cx
 {
 
-BasicVideoSource::BasicVideoSource()
+BasicVideoSource::BasicVideoSource(QString uid)
 {
+	mStatus = "USE_DEFAULT";
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
 
-	vtkImageDataPtr emptyImage = ssc::generateVtkImageData(Eigen::Array3i(1,1,1),
+	vtkImageDataPtr emptyImage = ssc::generateVtkImageData(Eigen::Array3i(3,3,3),
 														   ssc::Vector3D(1,1,1),
 														   0);
-	mEmptyImage.reset(new ssc::Image("<none>", emptyImage));
+	mEmptyImage.reset(new ssc::Image(uid, emptyImage));
 	mReceivedImage = mEmptyImage;
 	mRedirecter->SetInput(mEmptyImage->getBaseVtkImageData());
 
@@ -43,12 +45,24 @@ BasicVideoSource::BasicVideoSource()
 	mTimeoutTimer = new QTimer(this);
 	mTimeoutTimer->setInterval(1000);
 	connect(mTimeoutTimer, SIGNAL(timeout()), this, SLOT(timeout()));
-//	connect(this, SIGNAL(connected(bool)), this, SIGNAL(streaming(bool))); // define connected as streaming.
 }
 
 BasicVideoSource::~BasicVideoSource()
 {
 	stop();
+	delete mTimeoutTimer;
+}
+
+void BasicVideoSource::overrideTimeout(bool timeout)
+{
+	if (mTimeoutTimer)
+	{
+		mTimeoutTimer->setParent(NULL);
+		delete mTimeoutTimer;
+		mTimeoutTimer = NULL;
+	}
+
+	mTimeout = timeout;
 }
 
 QString BasicVideoSource::getUid()
@@ -107,7 +121,11 @@ void BasicVideoSource::start()
 		return;
 
 	mStreaming = true;
-	mTimeoutTimer->start();
+
+	if (mTimeoutTimer)
+	{
+		mTimeoutTimer->start();
+	}
 
 	if (!this->isConnected())
 		return;
@@ -122,32 +140,61 @@ void BasicVideoSource::stop()
 		return;
 
 	mStreaming = false;
-	mTimeoutTimer->stop();
+	if (mTimeoutTimer)
+	{
+		mTimeoutTimer->stop();
+	}
 
 	emit streaming(false);
 	emit newFrame();
 }
 
+QString BasicVideoSource::getStatusString() const
+{
+	if (mStatus!="USE_DEFAULT")
+		return mStatus;
+
+//	 { return mStatus; }
+	if (!this->isConnected())
+		return "Not connected";
+	if (!this->isStreaming())
+		return "Not streaming";
+	if (!this->validData())
+		return "Timeout";
+//	return "Running";
+	return "";
+}
+
+
 void BasicVideoSource::setInput(ssc::ImagePtr input)
 {
-//	if (input)
-//		std::cout << "BasicVideoSource::setInput " << input->getUid() << " " << Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()) << std::endl;
-//	else
-//		std::cout << "BasicVideoSource::setInput empty" << std::endl;
 	bool wasConnected = this->isConnected();
-	mReceivedImage = input;
-	if (!mReceivedImage)
+
+	if (input)
+	{
+		mReceivedImage = input;
+	}
+	else
+	{
+		if (mReceivedImage)
+		{
+			// create an empty image with the same uid as the stream.
+			mEmptyImage.reset(new ssc::Image(mReceivedImage->getUid(), mEmptyImage->getBaseVtkImageData()));
+		}
 		mReceivedImage = mEmptyImage;
+	}
 	mRedirecter->SetInput(mReceivedImage->getBaseVtkImageData());
 	mRedirecter->Update();
 
-	mTimeout = false;
-	mTimeoutTimer->start();
+	if (mTimeoutTimer)
+	{
+		mTimeout = false;
+		mTimeoutTimer->start();
+	}
 
 	if (this->isConnected() != wasConnected)
 		emit connected(this->isConnected());
 
-//	std::cout << "BasicVideoSource::setInput -output=" << Eigen::Array3i(this->getVtkImageData()->GetDimensions()) << std::endl;
 	emit newFrame();
 }
 
