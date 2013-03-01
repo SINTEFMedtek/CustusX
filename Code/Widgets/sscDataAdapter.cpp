@@ -27,12 +27,22 @@
  */
 
 DataAdapter::DataAdapter() :
-		QObject(), mEnabled(true)
+		QObject(), mEnabled(true), mAdvanced(false), mGroup("")
 {}
 
 bool DataAdapter::getEnabled() const
 {
 	return mEnabled;
+}
+
+bool DataAdapter::getAdvanced() const
+{
+	return mAdvanced;
+}
+
+QString DataAdapter::getGroup() const
+{
+	return mGroup;
 }
 
 bool DataAdapter::setEnabled(bool enabling)
@@ -42,6 +52,28 @@ bool DataAdapter::setEnabled(bool enabling)
 		return false;
 
 	mEnabled = enabling;
+	emit changed();
+
+	return true;
+}
+
+bool DataAdapter::setAdvanced(bool advanced)
+{
+	if(advanced == mAdvanced)
+		return false;
+
+	mAdvanced = advanced;
+	emit changed();
+
+	return true;
+}
+
+bool DataAdapter::setGroup(bool name)
+{
+	if(name == mGroup)
+		return false;
+
+	mGroup = name;
 	emit changed();
 
 	return true;
