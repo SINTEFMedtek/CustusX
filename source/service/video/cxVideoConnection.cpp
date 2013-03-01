@@ -100,7 +100,6 @@ void VideoConnection::fpsSlot(double fpsNumber)
 //	return "Running";
 //}
 
-
 bool VideoConnection::isConnected() const
 {
 	return mClient && mConnected;
@@ -110,8 +109,15 @@ void VideoConnection::connectedSlot(bool on)
 {
 	mConnected = on;
 
-	if (!on)
+	if (on)
+	{
+		for (unsigned i=0; i<mSources.size(); ++i)
+			mSources[i]->start();
+	}
+	else
+	{
 		this->disconnectServer();
+	}
 
 	emit connected(on);
 }
@@ -191,7 +197,7 @@ void VideoConnection::disconnectServer()
 
 	for (unsigned i=0; i<mSources.size(); ++i)
 	{
-		mSources[i]->stop();
+		mSources[i]->setInput(ssc::ImagePtr());
 	}
 }
 
@@ -251,13 +257,14 @@ void VideoConnection::updateImage(ssc::ImagePtr message)
 	if (!source)
 	{
 		source.reset(new BasicVideoSource());
+//		std::cout << "*************** creating new VideoSourcev"<< source.get() <<" for " << message->getUid() << std::endl;
 		mSources.push_back(source);
 		source->start();
 		newSource = true;
 	}
 	// set input.
 	source->setInput(message);
-//	std::cout << "updating stream " << message->getUid() << std::endl;
+//	std::cout << "  updating stream " << message->getUid() << std::endl;
 
 	QString info = mClient->hostDescription() + " - " + QString::number(mFPS, 'f', 1) + " fps";
 	source->setInfoString(info);
@@ -267,7 +274,6 @@ void VideoConnection::updateImage(ssc::ImagePtr message)
 		this->connectVideoToProbe();
 		emit videoSourcesChanged();
 	}
-
 }
 
 std::vector<ssc::VideoSourcePtr> VideoConnection::getVideoSources()
@@ -295,34 +301,9 @@ void VideoConnection::connectVideoToProbe()
 
 	for (unsigned i=0; i<mSources.size(); ++i)
 	{
-		std::cout << "***********============= set source in probe " << tool->getUid() << std::endl;
+//		std::cout << "***********============= set source in probe " << tool->getUid() << std::endl;
 		probe->setRTSource(mSources[i]);
 	}
-
-
-//	ssc::VideoSourcePtr source = videoService()->getActiveVideoSource();
-//	if (!source)
-//	{
-//		ssc::messageManager()->sendError("no rt source.");
-//		return;
-//	}
-
-//	// find probe in tool manager
-//	// set source in cxTool
-//	// insert timecalibration using config
-//	if (!source->isConnected())
-//		return;
-
-//	if (!probe)
-//		return;
-
-//	if (probe)
-//	{
-//		ssc::ProbePtr probeInterface = probe->getProbe();
-//		if (!probeInterface)
-//			return;
-//		probeInterface->setRTSource(source);
-//	}
 }
 
 

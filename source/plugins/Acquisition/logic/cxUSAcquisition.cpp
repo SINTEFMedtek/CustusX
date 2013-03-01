@@ -149,8 +149,8 @@ void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
 	if (mRTSource == source)
 		return;
 
-	if (source)
-		std::cout << "USAcquisition::connectVideoSource " << source->getUid() << std::endl;
+//	if (source)
+//		std::cout << "USAcquisition::connectVideoSource " << source->getUid() << std::endl;
 
 	if(mRTSource)
 	{
