@@ -61,6 +61,9 @@ ToolTracer::ToolTracer()
 	mPolyData->SetPoints(mPoints);
 	mPolyData->SetLines(mLines);
 	mPolyData->SetVerts(mLines);
+	mFirstPoint = false;
+	mMinDistance = -1.0;
+	mSkippedPoints = 0;
 }
 
 void ToolTracer::start()
@@ -68,6 +71,8 @@ void ToolTracer::start()
 	if (mRunning)
 		return;
 	mRunning = true;
+	mFirstPoint = true;
+	mSkippedPoints = 0;
 	this->connectTool();
 }
 
@@ -137,6 +142,17 @@ void ToolTracer::receiveTransforms(Transform3D prMt, double timestamp)
 	Transform3D rMt = rMpr * prMt;
 
 	Vector3D p = rMt.coord(Vector3D(0,0,0));
+
+	if (mMinDistance > 0.0)
+	{
+		if (!mFirstPoint && (mPreviousPoint - p).length() < mMinDistance)
+		{
+			++mSkippedPoints;
+			return;
+		}
+	}
+	mFirstPoint = false;
+	mPreviousPoint = p;
 	mPoints->InsertNextPoint(p.begin());
 
 	// fill cell points for the entire polydata.
