@@ -47,7 +47,7 @@ class BasicVideoSource : public ssc::VideoSource
 	Q_OBJECT
 
 public:
-	BasicVideoSource();
+	explicit BasicVideoSource(QString uid = "<none>");
 	virtual ~BasicVideoSource();
 
 	virtual QString getUid();
@@ -82,6 +82,11 @@ public:
 	void setInput(ssc::ImagePtr input);
 	void setInfoString(QString text) { mInfo = text; }
 	void setStatusString(QString text) { mStatus = text; }
+	void deconfigure() { this->setInput(ssc::ImagePtr()); }
+	/** Disable internal timeout checking,
+	  * instead set timeout directly.
+	  */
+	void overrideTimeout(bool timeout);
 
 private slots:
 	void timeout();
