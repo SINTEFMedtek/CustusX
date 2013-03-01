@@ -9,30 +9,18 @@
 
 #include <QTimer>
 #include <QDateTime>
-#include <QHostAddress>
-#include "igtlOSUtil.h"
-#include "igtlImageMessage.h"
-#include "igtlServerSocket.h"
 #include "vtkImageData.h"
-#include "vtkSmartPointer.h"
 #include "vtkMetaImageReader.h"
-#include "vtkImageImport.h"
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
-#include "vtkMetaImageWriter.h"
 #include "sscForwardDeclarations.h"
 #include "cxImageDataContainer.h"
+#include "sscTypeConversions.h"
 
 #include <vtkImageExtractComponents.h>
 #include <vtkImageAppendComponents.h>
+#include <vtkImageLuminance.h>
 #include <QFileInfo>
-
-typedef vtkSmartPointer<vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<vtkImageMapToColors> vtkImageMapToColorsPtr;
-typedef vtkSmartPointer<vtkLookupTable> vtkLookupTablePtr;
-typedef vtkSmartPointer<vtkMetaImageReader> vtkMetaImageReaderPtr;
-typedef vtkSmartPointer<vtkImageAppendComponents> vtkImageAppendComponentsPtr;
-typedef vtkSmartPointer<vtkImageExtractComponents> vtkImageExtractComponentsPtr;
 
 namespace cx
 {
@@ -87,12 +75,12 @@ QStringList MHDImageSender::getArgumentDescription()
 {
 	QStringList retval;
 	retval << "--filename: Full name of mhd file";
+	retval << "--secondary: If defined, two streams are sent, the secondary with a modification of the base image";
 	return retval;
 }
 
 MHDImageSender::MHDImageSender(QObject* parent) :
     ImageSender(parent),
-    mCurrentFrame(0),
     mTimer(0)
 {
 }
@@ -102,38 +90,9 @@ void MHDImageSender::initialize(StringMap arguments)
     mArguments = arguments;
 
 	QString filename = mArguments["filename"];
-	mImageData = loadImage(filename);
-	// mImageData = convertToTestColorImage(mImageData);
+	vtkImageDataPtr source = loadImage(filename);
 
-	QString colorFormat = "R";
-
-	// convert from RGB to RGBA
-	if (mImageData->GetNumberOfScalarComponents()==3)
-	{
-		vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
-		vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
-		splitterRGB->SetInput(mImageData);
-		splitterRGB->SetComponents(0, 1, 2);
-		merger->SetInput(0, splitterRGB->GetOutput());
-
-		vtkImageExtractComponentsPtr splitterA = vtkImageExtractComponentsPtr::New();
-		splitterA->SetInput(mImageData);
-		splitterA->SetComponents(0);
-		merger->SetInput(1, splitterA->GetOutput());
-
-		merger->Update();
-		mImageData = merger->GetOutput();
-		colorFormat = "RGBA";
-	}
-	if (mImageData->GetNumberOfScalarComponents()==4)
-	{
-		colorFormat = "RGBA";
-	}
-
-//	mRawUid = QString("%1-%3 [%2]").arg(QFileInfo(mArguments["filename"]).fileName()).arg(colorFormat);
-	mRawUid = QString("%1 [%2]").arg(QFileInfo(mArguments["filename"]).fileName()).arg(colorFormat);
-
-	if (mImageData)
+	if (source)
 	{
 	    std::cout << "MHDImageSender: Initialized with source file: \n\t" << mArguments["filename"].toStdString() << std::endl;
 	}
@@ -143,12 +102,96 @@ void MHDImageSender::initialize(StringMap arguments)
 	    return;
 	}
 
-	mDataSource.reset(new SplitFramesContainer(mImageData));
-	mCurrentFrame = 0;
+	// mImageData = convertToTestColorImage(mImageData);
+
+	mPrimaryData = this->initializePrimaryData(source, mArguments["filename"]);
+	if (mArguments.count("secondary"))
+		mSecondaryData = this->initializeSecondaryData(source, mArguments["filename"]);
 
 	mTimer = new QTimer(this);
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	//  mTimer->start(1200); // for test of the timeout feature
+}
+
+MHDImageSender::Data MHDImageSender::initializePrimaryData(vtkImageDataPtr source, QString filename) const
+{
+	Data retval;
+
+	QString colorFormat = "R";
+
+	// convert from RGB to RGBA
+	if (source->GetNumberOfScalarComponents()==3)
+	{
+		vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
+		vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
+		splitterRGB->SetInput(source);
+		splitterRGB->SetComponents(0, 1, 2);
+		merger->SetInput(0, splitterRGB->GetOutput());
+
+		vtkImageExtractComponentsPtr splitterA = vtkImageExtractComponentsPtr::New();
+		splitterA->SetInput(source);
+		splitterA->SetComponents(0);
+		merger->SetInput(1, splitterA->GetOutput());
+
+		merger->Update();
+		retval.mImageData = merger->GetOutput();
+		colorFormat = "RGBA";
+	}
+	else if (source->GetNumberOfScalarComponents()==4)
+	{
+		retval.mImageData = source;
+		colorFormat = "RGBA";
+	}
+	else if (source->GetNumberOfScalarComponents()==1)
+	{
+		retval.mImageData = source;
+		colorFormat = "R";
+	}
+
+//	mRawUid = QString("%1-%3 [%2]").arg(QFileInfo(mArguments["filename"]).fileName()).arg(colorFormat);
+	retval.mRawUid = QString("%1 [%2]").arg(QFileInfo(filename).fileName()).arg(colorFormat);
+
+	retval.mDataSource.reset(new SplitFramesContainer(retval.mImageData));
+	retval.mCurrentFrame = 0;
+
+	return retval;
+}
+
+MHDImageSender::Data MHDImageSender::initializeSecondaryData(vtkImageDataPtr source, QString filename) const
+{
+	Data retval;
+
+	QString colorFormat = "R";
+
+	// convert from RGB to RGBA
+	if (source->GetNumberOfScalarComponents()==3)
+	{
+		vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+		luminance->SetInput(source);
+		vtkImageDataPtr outData = luminance->GetOutput();
+		outData->Update();
+		retval.mImageData = outData;
+
+		colorFormat = "R";
+	}
+	else if (source->GetNumberOfScalarComponents()==4)
+	{
+		retval.mImageData = source;
+		colorFormat = "RGBA";
+	}
+	else if (source->GetNumberOfScalarComponents()==1)
+	{
+		retval.mImageData = source;
+		colorFormat = "R";
+	}
+
+//	mRawUid = QString("%1-%3 [%2]").arg(QFileInfo(mArguments["filename"]).fileName()).arg(colorFormat);
+	retval.mRawUid = QString("uchar %1 [%2]").arg(QFileInfo(filename).fileName()).arg(colorFormat);
+
+	retval.mDataSource.reset(new SplitFramesContainer(retval.mImageData));
+	retval.mCurrentFrame = 0;
+
+	return retval;
 }
 
 bool MHDImageSender::startStreaming(GrabberSenderPtr sender)
@@ -170,16 +213,30 @@ void MHDImageSender::stopStreaming()
 
 void MHDImageSender::tick()
 {
-	if (mSender && mSender->isReady())
-	{
-	    int frame = (mCurrentFrame++) % mDataSource->size();
-//		QString uid = mRawUid.arg(frame);
-		QString uid = mRawUid;
-		ssc::ImagePtr message(new ssc::Image(uid, mDataSource->get(frame)));
-		message->setAcquisitionTime(QDateTime::currentDateTime());
+	if (!mSender || !mSender->isReady())
+		return;
 
-		mSender->send(message);
-	}
+	this->send(&mPrimaryData);
+
+	if (mSecondaryData.mImageData)
+		this->send(&mSecondaryData);
+}
+
+void MHDImageSender::send(Data* data)
+{
+	if (!mSender || !mSender->isReady())
+		return;
+
+	int frame = (data->mCurrentFrame++) % data->mDataSource->size();
+//		QString uid = mRawUid.arg(frame);
+	QString uid = data->mRawUid;
+
+	vtkImageDataPtr copy = vtkImageDataPtr::New();
+	copy->DeepCopy(data->mDataSource->get(frame)); // the datasource might go out of scope - take copy
+
+	ssc::ImagePtr message(new ssc::Image(uid, copy));
+	message->setAcquisitionTime(QDateTime::currentDateTime());
+	mSender->send(message);
 }
 
 
