@@ -338,6 +338,7 @@ set(DIRS
 		${CustusX3_BINARY_DIR}/source/resource/algorithms
 		${CustusX3_BINARY_DIR}/source/resource/settings
 		${CustusX3_BINARY_DIR}/source/resource/utilities
+		${CustusX3_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
 		${CustusX3_BINARY_DIR}/source/plugins/Acquisition
 		${CustusX3_BINARY_DIR}/source/plugins/Acquisition/logic
 		${CustusX3_BINARY_DIR}/source/plugins/Acquisition/gui
