@@ -28,16 +28,16 @@
 namespace cx
 {
 
-BasicVideoSource::BasicVideoSource()
+BasicVideoSource::BasicVideoSource(QString uid)
 {
 	mStatus = "USE_DEFAULT";
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
 
-	vtkImageDataPtr emptyImage = ssc::generateVtkImageData(Eigen::Array3i(1,1,1),
+	vtkImageDataPtr emptyImage = ssc::generateVtkImageData(Eigen::Array3i(3,3,3),
 														   ssc::Vector3D(1,1,1),
 														   0);
-	mEmptyImage.reset(new ssc::Image("<none>", emptyImage));
+	mEmptyImage.reset(new ssc::Image(uid, emptyImage));
 	mReceivedImage = mEmptyImage;
 	mRedirecter->SetInput(mEmptyImage->getBaseVtkImageData());
 
@@ -50,6 +50,19 @@ BasicVideoSource::BasicVideoSource()
 BasicVideoSource::~BasicVideoSource()
 {
 	stop();
+	delete mTimeoutTimer;
+}
+
+void BasicVideoSource::overrideTimeout(bool timeout)
+{
+	if (mTimeoutTimer)
+	{
+		mTimeoutTimer->setParent(NULL);
+		delete mTimeoutTimer;
+		mTimeoutTimer = NULL;
+	}
+
+	mTimeout = timeout;
 }
 
 QString BasicVideoSource::getUid()
@@ -108,7 +121,11 @@ void BasicVideoSource::start()
 		return;
 
 	mStreaming = true;
-	mTimeoutTimer->start();
+
+	if (mTimeoutTimer)
+	{
+		mTimeoutTimer->start();
+	}
 
 	if (!this->isConnected())
 		return;
@@ -123,7 +140,10 @@ void BasicVideoSource::stop()
 		return;
 
 	mStreaming = false;
-	mTimeoutTimer->stop();
+	if (mTimeoutTimer)
+	{
+		mTimeoutTimer->stop();
+	}
 
 	emit streaming(false);
 	emit newFrame();
@@ -148,11 +168,6 @@ QString BasicVideoSource::getStatusString() const
 
 void BasicVideoSource::setInput(ssc::ImagePtr input)
 {
-//	if (input)
-//		std::cout << "BasicVideoSource::setInput " << this << " - "<< input->getUid() << " " << Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()) << std::endl;
-//	else
-//		std::cout << "BasicVideoSource::setInput empty" << std::endl;
-
 	bool wasConnected = this->isConnected();
 
 	if (input)
@@ -171,14 +186,15 @@ void BasicVideoSource::setInput(ssc::ImagePtr input)
 	mRedirecter->SetInput(mReceivedImage->getBaseVtkImageData());
 	mRedirecter->Update();
 
-	mTimeout = false;
-	mTimeoutTimer->start();
+	if (mTimeoutTimer)
+	{
+		mTimeout = false;
+		mTimeoutTimer->start();
+	}
 
 	if (this->isConnected() != wasConnected)
 		emit connected(this->isConnected());
 
-//	std::cout << "                  streaming " << mStreaming << std::endl;
-//	std::cout << "                  setInput -output=" << Eigen::Array3i(this->getVtkImageData()->GetDimensions()) << std::endl;
 	emit newFrame();
 }
 
