@@ -63,6 +63,8 @@ public:
 	void stop(); // stop tracking
 	void clear(); // erase stored tracking data.
 	bool isRunning() const; // true if started and not stopped.
+	void setMinDistance(double distance) { mMinDistance = distance; }
+	int getSkippedPoints() { return mSkippedPoints; }
 
 	private slots:
 	void receiveTransforms(Transform3D prMt, double timestamp);
@@ -79,6 +81,11 @@ private:
 
 	vtkPointsPtr mPoints;
 	vtkCellArrayPtr mLines;
+
+	bool mFirstPoint;
+	int mSkippedPoints;
+	Vector3D mPreviousPoint;
+	double mMinDistance;
 };
 
 } // namespace ssc
