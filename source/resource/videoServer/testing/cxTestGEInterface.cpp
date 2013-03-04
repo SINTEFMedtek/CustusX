@@ -91,12 +91,37 @@ void TestGEInterface::testGEStreamer()
 	vtkSmartPointer<vtkImageData> img = imgExportedStream->GetScanConvertedImage();
 	CPPUNIT_ASSERT(img);//Got scan converted image?
 
+	this->validateBMode3D(img);
+
 	/*img = imgExportedStream->GetTissueImage();
 	CPPUNIT_ASSERT(img);//Got image?
 	img = imgExportedStream->GetBandwidthImage();
 	CPPUNIT_ASSERT(img);//Got image?
 	img = imgExportedStream->GetFrequencyImage();
 	CPPUNIT_ASSERT(img);//Got image?*/
+
+	geStreamer.DisconnectFromScanner();
+}
+
+int TestGEInterface::getValue(vtkSmartPointer<vtkImageData> img, int x, int y, int z)
+{
+	int val = (int)*reinterpret_cast<unsigned char*>(img->GetScalarPointer(x,y,z));
+	return val;
+}
+
+void TestGEInterface::validateData(vtkSmartPointer<vtkImageData> img)
+{
+	unsigned char* volumePtr = reinterpret_cast<unsigned char*>(img->GetScalarPointer());
+	CPPUNIT_ASSERT(volumePtr); //Check if the pointer != NULL
+}
+
+void TestGEInterface::validateBMode3D(vtkSmartPointer<vtkImageData> img)
+{
+	std::cout << getValue(img, 0,0,0) << std::endl;
+	std::cout << getValue(img, 5,5,5) << std::endl;
+	std::cout << getValue(img, 7,7,7) << std::endl;
+	std::cout << getValue(img, 9,9,9) << std::endl;
+
 }
 
 #endif //CX_USE_ISB_GE
