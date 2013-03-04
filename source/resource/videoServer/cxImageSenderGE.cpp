@@ -47,8 +47,9 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--buffersize:		Size of GEStreamer buffer, default = 10";
 	retval << "--imagesize:		Returned image/volume size in pixels, default = 500x500x1";
 	retval << "--openclpath:		Path to ScanConvert.cl";
-	retval << "--testmode:		GEStreamer test mode, default = 0";
+	retval << "--test:		GEStreamer test mode (no, 2D or 3D), default = no";
 	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
+	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted, Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency";
 	return retval;
 }
 
@@ -56,7 +57,11 @@ ImageSenderGE::ImageSenderGE(QObject* parent) :
 	ImageSender(parent),
 	mInitialized(false),
 	mSendTimer(0),
-	mGrabTimer(0)
+	mGrabTimer(0),
+	mExportScanconverted(true),
+	mExportTissue(false),
+	mExportBandwidth(false),
+	mExportFrequency(false)
 {
 	//data_streaming::DataStreamApp test;
 
@@ -95,12 +100,14 @@ void ImageSenderGE::initialize(StringMap arguments)
 		mArguments["buffersize"] = "10";
     if (!mArguments.count("openclpath"))
         mArguments["openclpath"] = "";
-    if (!mArguments.count("testmode"))
-        mArguments["testmode"] = "0";
+    if (!mArguments.count("test"))
+        mArguments["test"] = "no";
     if (!mArguments.count("imagesize"))
         mArguments["imagesize"] = "500x500x1";
     if (!mArguments.count("useOpenCL"))
         mArguments["useOpenCL"] = "1";
+    if (!mArguments.count("streams"))
+        mArguments["streams"] = "scanconverted";
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
 
@@ -113,6 +120,27 @@ void ImageSenderGE::initialize(StringMap arguments)
    	}
    	if (imageSize <= 1)
    		ssc::messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
+
+   	//Select image streams to export
+   	//Accept , ; . as separators
+   	QStringList streamList = QString(mArguments["streams"]).split(",", QString::SkipEmptyParts);
+   	mExportScanconverted = false;
+   	mExportTissue = false;
+   	mExportBandwidth = false;
+   	mExportFrequency = false;
+   	for (int i = 0; i < streamList.length(); i++)
+   	{
+   		if (streamList.at(i).compare("scanconverted", Qt::CaseInsensitive) == 0)
+   			mExportScanconverted = true;
+   		else if (streamList.at(i).compare("tissue", Qt::CaseInsensitive) == 0)
+   			mExportTissue = true;
+   		else if (streamList.at(i).compare("bandwidth", Qt::CaseInsensitive) == 0)
+   			mExportBandwidth = true;
+   		else if (streamList.at(i).compare("frequency", Qt::CaseInsensitive) == 0)
+   			mExportFrequency = true;
+   		else
+   			ssc::messageManager()->sendWarning("ImageSenderGE: Unknown stream: " + streamList.at(i));
+   	}
 
    	std::string openclpath = mArguments["openclpath"].toStdString();
 	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
@@ -137,7 +165,8 @@ void ImageSenderGE::initialize(StringMap arguments)
 	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize, interpType, bufferSize, openclpath, useOpenCL);
 
 	//Setup the needed data stream types. The default is only scan converted data
-	mGEStreamer.SetupExportParameters(true, false, false, false);
+//	mGEStreamer.SetupExportParameters(true, false, false, false);
+	mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, mExportFrequency);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
@@ -157,6 +186,7 @@ void ImageSenderGE::deinitialize_local()
 	//Clear frame geometry
 	data_streaming::frame_geometry emptyGeometry;
 	mFrameGeometry = emptyGeometry;
+	mFlowGeometry = emptyGeometry;
 }
 
 bool ImageSenderGE::initialize_local()
@@ -164,9 +194,18 @@ bool ImageSenderGE::initialize_local()
 	std::string hostIp = mArguments["ip"].toStdString();
 	int streamPort = convertStringWithDefault(mArguments["streamport"], -1);
 	int commandPort = convertStringWithDefault(mArguments["commandport"], -1);
-	bool testMode = convertStringWithDefault(mArguments["testmode"], 0);
 
-	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
+	data_streaming::TestMode test;
+	if (mArguments["test"].compare("2D", Qt::CaseInsensitive) == 0)
+		test = data_streaming::test2D;
+	else if (mArguments["test"].compare("1", Qt::CaseInsensitive) == 0) //Also accept 1 as 2D test
+		test = data_streaming::test2D;
+	else if (mArguments["test"].compare("3D", Qt::CaseInsensitive) == 0)
+		test = data_streaming::test3D;
+	else //no
+		test = data_streaming::noTest;
+
+	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, test);
 
 //	mImgStream = mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
 //	if(!mImgStream)
@@ -220,9 +259,6 @@ void ImageSenderGE::grab()
 //	if (!mGEStreamer.HasNewImageData())
 //		return;
 
-	bool testMode = convertStringWithDefault(mArguments["testmode"], 0);
-
-
 	vtkSmartPointer<data_streaming::vtkExportedStreamData> imgExportedStream = mGEStreamer.GetExportedStreamDataAndMoveToNextFrame();
 
 	//Get new image
@@ -242,41 +278,17 @@ void ImageSenderGE::grab()
 	else
 		mFrameGeometryChanged = false;
 
-	mImgExportedStream = imgExportedStream;
-	mLastGrabTime = mImgExportedStream->GetTimeStamp();
-
-	//Update mGEStreamer.frame
-	//All function should now be called on this object
-/*	vtkSmartPointer<vtkImageData> imgStream = mGEStreamer.GetNewFrame();
-	if(!testMode && mGEStreamer.frame == NULL)
-	{
-		std::cout << "ImageSenderGE::grab() failed: Got no frame" << std::endl;
-		return;
-	}*/
-
-	//Get frame geometry if we don't have it yet
-/*	if(!testMode && (mGEStreamer.frame->GetGeometryChanged() || (mFrameGeometry.width < 0.0001)))
+	if(imgExportedStream->GetFlowGeometryChanged() && (mExportBandwidth || mExportFrequency))
 	{
 		// Frame geometry have changed.
-		mFrameGeometry = mGEStreamer.GetFrameGeometry();
-		mFrameGeometryChanged = true;
-		//std::cout << "Get new GE frame geometry" << std::endl;
+		mFlowGeometry = imgExportedStream->GetFlowGeometry();
+		mFlowGeometryChanged = true;
 	}
 	else
-		mFrameGeometryChanged = false;
-*/
-/*	if(!imgStream)
-	{
-		std::cout << "ImageSenderGE::grab(): No image from GEStreamer" << std::endl;
-		return;
-	}
-	else
-	{
-		//sstd::cout << "ImageSenderGE::grab(): Got image from GEStreamer" << std::endl;
-	}
-	//Only set image and time if we got a new image
-	mImgStream = imgStream;
-	mLastGrabTime = mGEStreamer.GetTimeStamp();*/
+		mFlowGeometryChanged = false;
+
+	mImgExportedStream = imgExportedStream;
+	mLastGrabTime = mImgExportedStream->GetTimeStamp();
 
 	send();
 }
@@ -286,31 +298,42 @@ void ImageSenderGE::send()
 	if (!mSender || !mSender->isReady())
 		return;
 
-	if(mFrameGeometryChanged)
+	QString uid;
+	if (mExportScanconverted && mImgExportedStream->GetScanConvertedImage())
 	{
-		IGTLinkUSStatusMessage::Pointer statMsg =  this->getFrameStatus();
-		mSender->send(statMsg);
+		uid = "ScanConverted [BGRA]";
+		send(uid, mImgExportedStream->GetScanConvertedImage(), mFrameGeometry, mFrameGeometryChanged);
 	}
-
-
-	IGTLinkImageMessage::Pointer imgMsg = this->getImageMessage();
-	if (!imgMsg)
-		return;
-
-	mSender->send(imgMsg);
-
-//	if (mSocket)
-//	{
-//		//------------------------------------------------------------
-//		// Pack (serialize) and send
-//		imgMsg->Pack();
-//		mSocket->write(reinterpret_cast<const char*> (imgMsg->GetPackPointer()), imgMsg->GetPackSize());
-//		//  std::cout << "tick " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
-//	}
+	if (mExportTissue && mImgExportedStream->GetTissueImage())
+	{
+		uid = "Tissue [R]";
+		send(uid, mImgExportedStream->GetTissueImage(), mFrameGeometry, mFrameGeometryChanged);
+	}
+	if (mExportBandwidth && mImgExportedStream->GetBandwidthImage())
+	{
+		uid = "Bandwidth [R]";
+		send(uid, mImgExportedStream->GetBandwidthImage(), mFlowGeometry, mFlowGeometryChanged);
+	}
+	if (mExportFrequency && mImgExportedStream->GetFrequencyImage())
+	{
+		uid = "Frequency [R]";
+		send(uid, mImgExportedStream->GetFrequencyImage(), mFlowGeometry, mFlowGeometryChanged);
+	}
 }
 
 
-IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
+void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
+{
+	ssc::ImagePtr message(new ssc::Image(uid, img));
+	if (geometryChanged)
+	{
+		ssc::ProbeData frameMessage = getFrameStatus(geometry, img);//TODO: Need uid?
+		mSender->send(frameMessage);
+	}
+	mSender->send(message);
+}
+
+/*IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 {
 	if(!mImgExportedStream)
 	{
@@ -384,9 +407,53 @@ IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
 	memcpy(retval->GetScalarPointer(), img->GetScalarPointer(), fsize);
 
 	return retval;
+}*/
+
+ssc::ProbeData ImageSenderGE::getFrameStatus(data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
+{
+	ssc::ProbeData retval;
+	if (!img || !mImgExportedStream)
+		return retval;
+
+	//Create ProbeImageData struct
+	ssc::ProbeData::ProbeImageData imageData;
+
+/*	vtkSmartPointer<vtkImageData> img = vtkSmartPointer<vtkImageData>();
+	if(mImgExportedStream)
+		vtkSmartPointer<vtkImageData> img = mImgExportedStream->GetScanConvertedImage();
+
+	//This is origin from the scanner (= 0,0,0)
+	//Origin according to image is set in the image message
+	if (mImgExportedStream && img)
+		imageData.mOrigin_p = ssc::Vector3D(geometry.origin[0] + img->GetOrigin()[0],
+				geometry.origin[1]+ img->GetOrigin()[1],
+				geometry.origin[2]+ img->GetOrigin()[2]);
+	else
+		imageData.mOrigin_p = geometry.origin;*/
+
+	imageData.mOrigin_p = ssc::Vector3D(geometry.origin[0] + img->GetOrigin()[0],
+					geometry.origin[1]+ img->GetOrigin()[1],
+					geometry.origin[2]+ img->GetOrigin()[2]);
+	imageData.mSize = QSize(img->GetDimensions()[0], img->GetDimensions()[1]);
+	imageData.mSpacing = ssc::Vector3D(img->GetSpacing());
+	imageData.mClipRect_p = ssc::DoubleBoundingBox3D(img->GetExtent());
+
+	// 1 = sector, 2 = linear
+	if (geometry.imageType == data_streaming::Linear) //linear
+		retval = ssc::ProbeData(ssc::ProbeData::tLINEAR);
+	else //sector
+		retval = ssc::ProbeData(ssc::ProbeData::tSECTOR);
+
+	// Set start and end of sector in mm from origin
+	// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
+	retval.setSector(mFrameGeometry.depthStart, mFrameGeometry.depthEnd, mFrameGeometry.width);
+	retval.setImage(imageData);
+//	retval.setTemporalCalibration();//Can set everything except temporal calibration
+
+	return retval;
 }
 
-IGTLinkUSStatusMessage::Pointer ImageSenderGE::getFrameStatus()
+/*IGTLinkUSStatusMessage::Pointer ImageSenderGE::getFrameStatus()
 {
 	IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
 
@@ -420,7 +487,7 @@ IGTLinkUSStatusMessage::Pointer ImageSenderGE::getFrameStatus()
 //  std::cout << "tilt: " << mFrameGeometry.tilt << std::endl;
 
   return retval;
-}
+}*/
 
 }// namespace cx
 
