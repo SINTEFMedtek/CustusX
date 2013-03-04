@@ -43,15 +43,18 @@ public:
 	  * Set options for a given uid. Setting different uid will change the widget
 	  * content but store the previous contents, making it easy to swap between uids.
 	  */
-	void setOptions(QString uid, std::vector<DataAdapterPtr> options);
-	void setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options);
+	void setOptions(QString uid, std::vector<DataAdapterPtr> options, bool showAdvanced);
+	void setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options, bool showAdvanced);
 	QString getCurrentUid();
-	//    std::vector<DataAdapterPtr> getOptions(QString uid);
-	//    std::vector<DataAdapterPtr> getCurrentOptions();
+	void showAdvanced(bool show); //whether or not to display adapters marked as advanced
 
 private:
+	void clear();
+	void populate(bool showAdvanced);
+
 	QStackedLayout* mStackedLayout;
-	//    std::map<QString, std::vector<DataAdapterPtr> > mOptions;
+	std::vector<DataAdapterPtr> mOptions;
+	QString mUid;
 };
 
 /** Helper widget for displaying the input/output/options part of a Filter.
@@ -75,6 +78,7 @@ public:
 
 private slots:
 	void obscuredSlot(bool obscured);
+	void showAdvancedOptions(int state);
 private:
 
 	ssc::XmlOptionFile mOptions;
@@ -83,7 +87,8 @@ private:
 	OptionsWidget* mInputsWidget;
 	OptionsWidget* mOutputsWidget;
 	OptionsWidget* mOptionsWidget;
-	QGroupBox* mFrame;
+	QCheckBox*	   mAdvancedButton;
+	QGroupBox* 	   mFrame;
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 
