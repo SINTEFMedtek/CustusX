@@ -450,6 +450,7 @@ vtkImageDataPtr TubeSegmentationFilter::importRawImageData(void * data, int size
 
 void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 {
+	//get list with default options
 	paramList defaultOptions;
 	try{
 		defaultOptions = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
@@ -458,53 +459,48 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 		ssc::messageManager()->sendError(qstring_cast(message));
 	}
 
-	// skip parameters we don't want:
-	// display, storage-dir ...
-	//TODO
-	std::vector<std::string> hideParameter;
-	//hideParameter.push_back("display");
-	//hideParameter.push_back("storage-dir");
-	//hideParameter.push_back("centerline-vtk-file");
-
 	//generate string adapters
     boost::unordered_map<std::string, StringParameter>::iterator stringIt;
     for(stringIt = defaultOptions.strings.begin(); stringIt != defaultOptions.strings.end(); ++stringIt )
     {
-    	//skip some parameters
-    	if(std::find(hideParameter.begin(), hideParameter.end(), stringIt->first) != hideParameter.end())
-    		continue;
-
     	ssc::StringDataAdapterXmlPtr option = this->makeStringOption(root, stringIt->first, stringIt->second);
+    	option->setAdvanced(true);
     	mStringOptions.push_back(option);
     	if(stringIt->first == "parameters")
+    	{
     		connect(option.get(), SIGNAL(changed()), this, SLOT(parametersFileChanged()));
-//    	if(stringIt->first == "centerline-method")
-//    		connect(option.get(), SIGNAL(changed()), this, SLOT(centerlineMethodChanged()));
+    		option->setAdvanced(false);
+    	}
+    	else
+    		option->setAdvanced(true);
     }
 
+    // <<<<<<<<<<<<<<<<<<<< TODO refactor
     //Manuelly adding option for resetting.
     QStringList list;
     list << "not reset";
     list << "reset";
-
     mResetOption = ssc::StringDataAdapterXml::initialize("tsf_reset_to_default", "RESET TO DEFAULT", "Used to reset options to default values.", "not reset", list, root);
-
+    mResetOption->setAdvanced(false);
 	connect(mResetOption.get(), SIGNAL(changed()), this, SLOT(resetOptions()));
+	// >>>>>>>>>>>>>>>>>>>>>
 
 	//generate bool adapters
     boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
     for(boolIt = defaultOptions.bools.begin(); boolIt != defaultOptions.bools.end(); ++boolIt )
     {
-    	if(std::find(hideParameter.begin(), hideParameter.end(), boolIt->first) == hideParameter.end())
-    		mBoolOptions.push_back(this->makeBoolOption(root, boolIt->first, boolIt->second));
+    	ssc::BoolDataAdapterXmlPtr option = this->makeBoolOption(root, boolIt->first, boolIt->second);
+    	option->setAdvanced(true);
+    	mBoolOptions.push_back(option);
     }
 
 	//generate double adapters
     boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
     for(numericIt = defaultOptions.numerics.begin(); numericIt != defaultOptions.numerics.end(); ++numericIt )
     {
-    	if(std::find(hideParameter.begin(), hideParameter.end(), numericIt->first) == hideParameter.end())
-    		mDoubleOptions.push_back(this->makeDoubleOption(root, numericIt->first, numericIt->second));
+    	ssc::DoubleDataAdapterXmlPtr option = this->makeDoubleOption(root, numericIt->first, numericIt->second);
+    	option->setAdvanced(true);
+    	mDoubleOptions.push_back(option);
     }
 }
 
