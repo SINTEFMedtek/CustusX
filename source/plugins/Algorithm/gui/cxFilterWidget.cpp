@@ -152,7 +152,8 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options
 
 	topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
 	topLayout->addWidget(this->wrapInGroupBox(mOutputsWidget, "Output"));
-	topLayout->addWidget(this->wrapInGroupBox(mOptionsWidget, "Options"));
+	mOptionsGroupBox = this->wrapInGroupBox(mOptionsWidget, "Options");
+	topLayout->addWidget(mOptionsGroupBox);
 	topLayout->addWidget(mAdvancedButton);
 }
 
@@ -221,6 +222,21 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 		mInputsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
 		mOutputsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
 		mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
+	}
+}
+
+void FilterSetupWidget::toggleDetailed()
+{
+	//todo presetsWidget->toggleDetailed();
+	if(mOptionsGroupBox->isHidden())
+	{
+		mOptionsGroupBox->show();
+		mAdvancedButton->show();
+	}
+	else
+	{
+		mOptionsGroupBox->hide();
+		mAdvancedButton->hide();
 	}
 }
 
@@ -354,6 +370,20 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 
 	filterLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFilterSelector));
 
+	//Add detailed button
+	QAction* detailsAction = this->createAction(this,
+		  QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+		  "Details", "Show Details",
+		  SLOT(toggleDetailsSlot()),
+		  NULL);
+
+	QToolButton* detailsButton = new QToolButton();
+	detailsButton->setObjectName("DetailedButton");
+	detailsButton->setDefaultAction(detailsAction);
+//	editsLayout->addWidget(detailsButton, 0, 2);
+	filterLayout->addWidget(detailsButton);
+
+	//Add run button
 	QAction* runAction = this->createAction(this,
 	                                        QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
 	                                        "Run Filter", "",
@@ -400,6 +430,11 @@ void AllFiltersWidget::filterChangedSlot()
 	mFilterSelector->setHelp(this->defaultWhatsThis());
 }
 
+void AllFiltersWidget::toggleDetailsSlot()
+{
+	mSetupWidget->toggleDetailed();
+
+}
 
 void AllFiltersWidget::runFilterSlot()
 {
