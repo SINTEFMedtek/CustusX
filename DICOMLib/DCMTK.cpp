@@ -117,7 +117,7 @@ bool convert_string( char *input, const char from_encoding[] )
 	const char *inbuf;
 	size_t outlen;
 	iconv_t cd;
-	char fromcode[strlen(from_encoding)];
+	char fromcode[strlen(from_encoding) + 1];
 
 	/* Mapping from DICOM SpecificCharacterSet to iconv speak
 	 * see DICOM standard C.12.1.1.2  and cmd: 'iconv --list' */
@@ -219,6 +219,7 @@ bool convert_string( char *input, const char from_encoding[] )
 	memset (outbuf, 0, 4);
 
 	strcpy (input, output);
+	free(output);
 
 	return true;
 }

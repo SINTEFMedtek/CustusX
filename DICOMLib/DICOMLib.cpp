@@ -931,7 +931,6 @@ static struct study_t *studiesFromPath( const char *path, progress_func_t *callb
 	{
 		char *zErrMsg = NULL;
 		rc = sqlite3_exec(db, sqlinit, NULL, NULL, &zErrMsg);
-		exists = (rc == SQLITE_OK);
 		if (rc != SQLITE_OK)
 		{
 			SSC_ERROR("SQL error: %s", zErrMsg);
@@ -1323,6 +1322,11 @@ static int pruneEmpty(DIR *dir)
 		if (dp->d_type == DT_DIR && dp->d_name[0] != '.')
 		{
 			DIR *newDir = opendir(dp->d_name);
+			if (!newDir)
+			{
+				count++;
+				continue;
+			}
 			int contents = pruneEmpty(newDir);
 			closedir(newDir);
 			if (contents == 0)	// empty? - nuke it!
