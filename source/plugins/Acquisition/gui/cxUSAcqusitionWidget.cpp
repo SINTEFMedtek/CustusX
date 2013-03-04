@@ -61,7 +61,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 
 	QAction* optionsAction = this->createAction(this,
 	      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
-	      "Details", "Show Advanced Settings",
+	      "Details", "Show Details",
 	      SLOT(toggleDetailsSlot()),
 	      NULL);
 

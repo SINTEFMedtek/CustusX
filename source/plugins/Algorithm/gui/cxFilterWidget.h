@@ -75,6 +75,7 @@ public:
 	/** Compact Mode: one group, hide main input/output
 	  */
 	void setCompact(bool on);
+	void toggleDetailed();
 
 private slots:
 	void obscuredSlot(bool obscured);
@@ -87,6 +88,7 @@ private:
 	OptionsWidget* mInputsWidget;
 	OptionsWidget* mOutputsWidget;
 	OptionsWidget* mOptionsWidget;
+	QGroupBox* 	   mOptionsGroupBox;
 	QCheckBox*	   mAdvancedButton;
 	QGroupBox* 	   mFrame;
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
@@ -139,6 +141,7 @@ public:
 
 private slots:
 	void filterChangedSlot();
+	void toggleDetailsSlot();
 	void runFilterSlot();
 	void finishedSlot();
 private:
