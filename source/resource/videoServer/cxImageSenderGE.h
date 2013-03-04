@@ -66,10 +66,22 @@ private:
 	data_streaming::frame_geometry mFrameGeometry;///<Frame geometry from GE
 	bool mFrameGeometryChanged; ///< Have frame geometry changed since last frame
 
+	data_streaming::frame_geometry mFlowGeometry;///<Frame geometry for flow data (doppler) from GE
+	bool mFlowGeometryChanged; ///< Have flow data frame geometry changed since last frame
+
+	//What kind of video streams are requested?
+   	bool mExportScanconverted;
+   	bool mExportTissue;
+   	bool mExportBandwidth;
+   	bool mExportFrequency;
+
 	bool initialize_local();
 	void deinitialize_local();
-	IGTLinkImageMessage::Pointer getImageMessage();
-	IGTLinkUSStatusMessage::Pointer getFrameStatus();
+	//Deprecated
+//	IGTLinkImageMessage::Pointer getImageMessage();
+//	IGTLinkUSStatusMessage::Pointer getFrameStatus();
+	ssc::ProbeData getFrameStatus(data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
+	void send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged);
 
 private slots:
 	void grab();
