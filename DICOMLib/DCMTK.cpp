@@ -193,9 +193,9 @@ bool convert_string( char *input, const char from_encoding[] )
 
 		if (errno != E2BIG)
 		{
-		iconv_close (cd);
-		free (output);
-		return false;
+			iconv_close (cd);
+			free (output);
+			return false;
 		}
 
 		converted = outbuf - output;
