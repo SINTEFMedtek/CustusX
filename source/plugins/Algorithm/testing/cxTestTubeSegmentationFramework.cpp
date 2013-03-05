@@ -98,8 +98,8 @@ void TestTubeSegmentationFramework::testParameters()
 	CPPUNIT_ASSERT_MESSAGE("250 not a valid gvf-iterations value.", defaultParameters.numerics["gvf-iterations"].validate(250));
 
 	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Set parameter parameter to airway failed.", setParameter(defaultParameters, "parameters", "airway"));
-	paramList presetParameter = setParameter(defaultParameters, "parameters", "airway");
-	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Load presets failed.", loadParameterPreset(presetParameter, path));
+	setParameter(defaultParameters, "parameters", "airway");
+	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Load presets failed.", loadParameterPreset(defaultParameters, path));
 
 
 }
