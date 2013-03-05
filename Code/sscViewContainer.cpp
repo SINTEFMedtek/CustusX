@@ -119,16 +119,22 @@ QGridLayout* ViewContainer::getGridLayout()
 	return (QGridLayout*) layout();
 }
 
-void ViewContainer::paintEvent(QPaintEvent* event)
+void ViewContainerWidget::paintEvent(QPaintEvent* event)
 {
-	if (layout())
+	widget::paintEvent(event);
+	mBase->forcedUpdate();
+}
+
+void ViewContainerBase::forcedUpdate()
+{
+	clearBackground();
+	if (getGridLayout())
 	{
-		for (int i = 0; i < layout()->count(); ++i)
+		for (int i = 0; i < getGridLayout()->count(); ++i)
 		{
-			((ViewItem*) layout()->itemAt(i))->forceUpdate();
+			((ViewItem*) getGridLayout()->itemAt(i))->forceUpdate();
 		}
 	}
-	widget::paintEvent(event);
 	mMTimeHash = 0;
 }
 
