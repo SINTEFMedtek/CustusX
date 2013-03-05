@@ -188,13 +188,14 @@ void ProbeData::setUid(QString uid)
 
 void ProbeData::applySoundSpeedCompensationFactor(double factor)
 {
-	if (this->getType() == ssc::ProbeData::tLINEAR)
+
+	mImage.mSpacing[1] = mImage.mSpacing[1] * factor / mSoundSpeedCompensationFactor;
+	mSoundSpeedCompensationFactor = factor;
+
+	if (this->getType() != ssc::ProbeData::tLINEAR)
 	{
-		mImage.mSpacing[1] = mImage.mSpacing[1] * factor / mSoundSpeedCompensationFactor;
-		mSoundSpeedCompensationFactor = factor;
+		ssc::messageManager()->sendWarning("Sound speed compensation is applied to spacing[1], i.e. it is correct for linear probes and approxomate for other probes.");
 	}
-	else
-		ssc::messageManager()->sendWarning("Will only compensate sound speed for linear probes");
 }
 
 /**Set a new image size. resample all other parameters to match this new
