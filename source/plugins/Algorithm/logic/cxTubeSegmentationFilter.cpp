@@ -368,7 +368,7 @@ void TubeSegmentationFilter::parametersFileChanged()
 	paramList temp = this->getParametersFromOptions();
 	try
 	{
-		temp = loadParameterPreset(temp, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
+		loadParameterPreset(temp, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
 	} catch (SIPL::SIPLException e)
 	{
 		ssc::messageManager()->sendWarning("Error when loading parameter file "+qstring_cast(parameterFile)+". Preset is corrupt.");
@@ -381,7 +381,7 @@ void TubeSegmentationFilter::resetOptions()
 	if(mResetOption->getValue() == "reset")
 	{
 		try{
-			paramList defaultParameters = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
+			paramList defaultParameters = this->getDefaultParameters();
 			this->setParamtersToOptions(defaultParameters);
 			this->patientChangedSlot();
 			this->inputChangedSlot();
@@ -451,13 +451,7 @@ vtkImageDataPtr TubeSegmentationFilter::importRawImageData(void * data, int size
 void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 {
 	//get list with default options
-	paramList defaultOptions;
-	try{
-		defaultOptions = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
-	} catch (SIPL::SIPLException& e){
-		std::string message = "When creating default options, could not init parameters. \""+std::string(e.what())+"\"";
-		ssc::messageManager()->sendError(qstring_cast(message));
-	}
+	paramList defaultOptions = this->getDefaultParameters();
 
 	//generate string adapters
     boost::unordered_map<std::string, StringParameter>::iterator stringIt;
@@ -475,7 +469,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     		option->setAdvanced(true);
     }
 
-    // <<<<<<<<<<<<<<<<<<<< TODO refactor
+    // <<<<<<<<<<<<<<<<<<<< TODO remove when presetwidget has arrived
     //Manuelly adding option for resetting.
     QStringList list;
     list << "not reset";
@@ -506,19 +500,13 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 
 paramList TubeSegmentationFilter::getParametersFromOptions()
 {
-	paramList retval;
-	try{
-		retval = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
-	} catch (SIPL::SIPLException& e){
-		std::string message = "When getting parameters from options, could not init parameters. \""+std::string(e.what())+"\"";
-		ssc::messageManager()->sendError(qstring_cast(message));
-	}
+	paramList retval = this->getDefaultParameters();
 
 	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 	{
 		try{
-			retval = setParameter(retval, stringIt->get()->getValueName().toStdString(), stringIt->get()->getValue().toStdString());
+			setParameter(retval, stringIt->get()->getValueName().toStdString(), stringIt->get()->getValue().toStdString());
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a string parameter: \""+std::string(e.what())+"\"";
 			ssc::messageManager()->sendError(qstring_cast(message));
@@ -531,7 +519,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 	{
 		try{
 			std::string value = boolIt->get()->getValue() ? "true" : "false";
-			retval = setParameter(retval, boolIt->get()->getValueName().toStdString(), value);
+			setParameter(retval, boolIt->get()->getValueName().toStdString(), value);
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a bool parameter: \""+std::string(e.what())+"\"";
 			ssc::messageManager()->sendError(qstring_cast(message));
@@ -545,7 +533,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 		try{
 			double dbl = doubleIt->get()->getValue();
 			std::string value = boost::lexical_cast<std::string>(dbl);
-			retval = setParameter(retval, doubleIt->get()->getValueName().toStdString(), value);
+			setParameter(retval, doubleIt->get()->getValueName().toStdString(), value);
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a double parameter: \""+std::string(e.what())+"\"";
 			ssc::messageManager()->sendError(qstring_cast(message));
@@ -604,6 +592,71 @@ void TubeSegmentationFilter::setOptionValue(QString valueName, QString value)
 			return;
 		}
 	}
+}
+
+std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
+{
+	std::vector<DataAdapterPtr> retval;
+
+	//get list with default options
+	paramList defaultOptions = this->getDefaultParameters();
+
+	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringDAIt;
+	for(stringDAIt = mStringOptions.begin(); stringDAIt != mStringOptions.end(); ++stringDAIt)
+	{
+	    boost::unordered_map<std::string, StringParameter>::iterator stringIt;
+	    for(stringIt = defaultOptions.strings.begin(); stringIt != defaultOptions.strings.end(); ++stringIt )
+	    {
+	    	if(stringDAIt->get()->getValueName().toStdString() == stringIt->first)
+	    	{
+	    		if(stringDAIt->get()->getValue().toStdString() != stringIt->second.get())
+	    			retval.push_back(*stringDAIt);
+	    	}
+	    }
+	}
+
+	std::vector<ssc::BoolDataAdapterXmlPtr>::iterator boolDAIt;
+	for(boolDAIt = mBoolOptions.begin(); boolDAIt != mBoolOptions.end(); ++boolDAIt)
+	{
+	    boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
+	    for(boolIt = defaultOptions.bools.begin(); boolIt != defaultOptions.bools.end(); ++boolIt )
+	    {
+	    	if(boolDAIt->get()->getValueName().toStdString() == boolIt->first)
+	    	{
+	    		if(boolDAIt->get()->getValue() != boolIt->second.get())
+	    			retval.push_back(*boolDAIt);
+	    	}
+	    }
+	}
+
+	std::vector<ssc::DoubleDataAdapterXmlPtr>::iterator doubleDAIt;
+	for(doubleDAIt = mDoubleOptions.begin(); doubleDAIt != mDoubleOptions.end(); ++doubleDAIt)
+	{
+	    boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
+	    for(numericIt = defaultOptions.numerics.begin(); numericIt != defaultOptions.numerics.end(); ++numericIt )
+	    {
+	    	if(doubleDAIt->get()->getValueName().toStdString() == numericIt->first)
+	    	{
+	    		if(doubleDAIt->get()->getValue() != numericIt->second.get())
+	    			retval.push_back(*doubleDAIt);
+	    	}
+	    }
+	}
+
+	return retval;
+}
+
+paramList TubeSegmentationFilter::getDefaultParameters()
+{
+	//get list with default options
+	paramList defaultOptions;
+	try{
+		defaultOptions = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
+	} catch (SIPL::SIPLException& e){
+		std::string message = "When creating default options, could not init parameters. \""+std::string(e.what())+"\"";
+		ssc::messageManager()->sendError(qstring_cast(message));
+	}
+	return defaultOptions;
 }
 
 void TubeSegmentationFilter::printParameters(paramList parameters)
