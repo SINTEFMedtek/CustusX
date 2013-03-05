@@ -95,6 +95,8 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	ssc::ImagePtr image = loadImage(imageFilename);
 	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
 
+	if (!view || !view->getRenderWindow() || !view->getRenderWindow()->SupportsOpenGL())
+		return false;
 	if (!ssc::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
 		return false;
 
@@ -203,6 +205,10 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	for (int i = 0; i < numImages; ++i)
 	{
 		ssc::ImagePtr image = loadImage(imageFilenames[i]);
+		if (!image)
+		{
+			return false;
+		}
 		if (parameters != NULL)
 		{
 			image->getTransferFunctions3D()->setLLR(parameters[i].llr);
