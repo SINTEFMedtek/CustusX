@@ -50,20 +50,39 @@ OptionsWidget::OptionsWidget(QWidget* parent)
 	mStackedLayout->setMargin(0);
 }
 
-void OptionsWidget::setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options)
+void OptionsWidget::setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options, bool showAdvanced)
 {
-	//    std::cout << "OptionsWidget::setOptions " << uid << ", ptr=" << this << ", size=" << options.size() << std::endl;
 	std::vector<DataAdapterPtr> converted;
 	std::copy(options.begin(), options.end(), std::back_inserter(converted));
-	this->setOptions(uid, converted);
+	this->setOptions(uid, converted, showAdvanced);
 }
 
-void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
+void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options, bool showAdvanced)
 {
 	// return if already on uid
 	if (mStackedLayout->currentWidget() && (uid == mStackedLayout->currentWidget()->objectName()))
 		return;
 
+	mOptions = options;
+	mUid = uid;
+
+	this->clear();
+	this->populate(showAdvanced);
+}
+
+QString OptionsWidget::getCurrentUid()
+{
+	return mStackedLayout->currentWidget()->objectName();
+}
+
+void OptionsWidget::showAdvanced(bool show)
+{
+	this->clear();
+	this->populate(show);
+}
+
+void OptionsWidget::clear()
+{
 	QLayoutItem *child;
 	while ((child = mStackedLayout->takeAt(0)) != 0)
 	{
@@ -72,40 +91,26 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options)
 		delete child;
 		delete widget;
 	}
+}
 
+void OptionsWidget::populate(bool showAdvanced)
+{
 	// No existing found,
 	// create a new stack element for this uid:
 	QWidget* widget = new QWidget(this);
-	widget->setObjectName(uid);
+	widget->setObjectName(mUid);
 	mStackedLayout->addWidget(widget);
 	QGridLayout* layout = new QGridLayout(widget);
 	layout->setMargin(layout->margin()/2);
 
-	for (unsigned i = 0; i < options.size(); ++i)
+	for (unsigned i = 0; i < mOptions.size(); ++i)
 	{
-		createDataWidget(widget, options[i], layout, i);
+		if(showAdvanced || (!showAdvanced && !mOptions[i]->getAdvanced()))
+			createDataWidget(widget, mOptions[i], layout, i);
 	}
 
 	mStackedLayout->setCurrentWidget(widget);
-	//    mOptions[uid] = options;
 }
-
-QString OptionsWidget::getCurrentUid()
-{
-	return mStackedLayout->currentWidget()->objectName();
-}
-
-//std::vector<DataAdapterPtr> OptionsWidget::getCurrentOptions()
-//{
-//    return this->getOptions(this->getCurrentUid());
-//}
-
-//std::vector<DataAdapterPtr> OptionsWidget::getOptions(QString uid)
-//{
-//    if (!mOptions.count(uid))
-//        return std::vector<DataAdapterPtr>();
-//    return mOptions[uid];
-//}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -142,16 +147,34 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options
 	mInputsWidget = new OptionsWidget(this);
 	mOutputsWidget = new OptionsWidget(this);
 	mOptionsWidget = new OptionsWidget(this);
+	mAdvancedButton = new QCheckBox("Show &advanced options", this);
+	connect(mAdvancedButton, SIGNAL(stateChanged(int)), this, SLOT(showAdvancedOptions(int)));
 
 	topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
 	topLayout->addWidget(this->wrapInGroupBox(mOutputsWidget, "Output"));
-	topLayout->addWidget(this->wrapInGroupBox(mOptionsWidget, "Options"));
+	mOptionsGroupBox = this->wrapInGroupBox(mOptionsWidget, "Options");
+	topLayout->addWidget(mOptionsGroupBox);
+	topLayout->addWidget(mAdvancedButton);
 }
 
 void FilterSetupWidget::obscuredSlot(bool obscured)
 {
 	if (mCurrentFilter)
 		mCurrentFilter->setActive(!obscured);
+}
+
+void FilterSetupWidget::showAdvancedOptions(int state)
+{
+	if(state > 0)
+	{
+		mInputsWidget->showAdvanced(true);
+		mOutputsWidget->showAdvanced(true);
+		mOptionsWidget->showAdvanced(true);
+	}else{
+		mInputsWidget->showAdvanced(false);
+		mOutputsWidget->showAdvanced(false);
+		mOptionsWidget->showAdvanced(false);
+	}
 }
 
 QString FilterSetupWidget::defaultWhatsThis() const
@@ -190,15 +213,30 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 		std::vector<SelectDataStringDataAdapterBasePtr> outputTypes = mCurrentFilter->getOutputTypes();
 		std::vector<DataAdapterPtr> options = mCurrentFilter->getOptions();
 
-		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes());
-		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes());
-		mOptionsWidget->setOptions(mCurrentFilter->getUid(), options);
+		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes(), false);
+		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes(), false);
+		mOptionsWidget->setOptions(mCurrentFilter->getUid(), options, false);
 	}
 	else
 	{
-		mInputsWidget->setOptions("", std::vector<DataAdapterPtr>());
-		mOutputsWidget->setOptions("", std::vector<DataAdapterPtr>());
-		mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>());
+		mInputsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
+		mOutputsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
+		mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
+	}
+}
+
+void FilterSetupWidget::toggleDetailed()
+{
+	//todo presetsWidget->toggleDetailed();
+	if(mOptionsGroupBox->isHidden())
+	{
+		mOptionsGroupBox->show();
+		mAdvancedButton->show();
+	}
+	else
+	{
+		mOptionsGroupBox->hide();
+		mAdvancedButton->hide();
 	}
 }
 
@@ -281,11 +319,11 @@ void CompactFilterSetupWidget::setFilter(FilterPtr filter)
 		std::remove_copy(outputTypes.begin(), outputTypes.end(), std::back_inserter(all), outputTypes[0]);
 		std::copy(options.begin(), options.end(), std::back_inserter(all));
 
-		mOptionsWidget->setOptions(mCurrentFilter->getUid(), all);
+		mOptionsWidget->setOptions(mCurrentFilter->getUid(), all, false);
 	}
 	else
 	{
-		mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>());
+		mOptionsWidget->setOptions("", std::vector<DataAdapterPtr>(), false);
 	}
 }
 
@@ -332,6 +370,20 @@ AllFiltersWidget::AllFiltersWidget(QWidget* parent) :
 
 	filterLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFilterSelector));
 
+	//Add detailed button
+	QAction* detailsAction = this->createAction(this,
+		  QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
+		  "Details", "Show Details",
+		  SLOT(toggleDetailsSlot()),
+		  NULL);
+
+	QToolButton* detailsButton = new QToolButton();
+	detailsButton->setObjectName("DetailedButton");
+	detailsButton->setDefaultAction(detailsAction);
+//	editsLayout->addWidget(detailsButton, 0, 2);
+	filterLayout->addWidget(detailsButton);
+
+	//Add run button
 	QAction* runAction = this->createAction(this,
 	                                        QIcon(":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png"),
 	                                        "Run Filter", "",
@@ -362,21 +414,6 @@ QString AllFiltersWidget::defaultWhatsThis() const
 	               "<p><i>Currently selected filter:</i></p>"
 	               "<p>%1</p>"
 	               "</html>").arg(mSetupWidget->defaultWhatsThis());
-
-	//    QString name("None");
-	//    QString help("");
-	//    if (mCurrentFilter)
-	//    {
-	//        name = mCurrentFilter->getName();
-	//        help = mCurrentFilter->getHelp();
-	//    }
-	//    return QString("<html>"
-	//                   "<h3>Filter Widget.</h3>"
-	//                   "<p>Select one type of filter.</p>"
-	//                   "<p><i>Currently selected filter:</i></p>"
-	//                   "<h4>%1</h4>"
-	//                   "<p>%2</p>"
-	//                   "</html>").arg(name).arg(help);
 }
 
 void AllFiltersWidget::filterChangedSlot()
@@ -393,6 +430,11 @@ void AllFiltersWidget::filterChangedSlot()
 	mFilterSelector->setHelp(this->defaultWhatsThis());
 }
 
+void AllFiltersWidget::toggleDetailsSlot()
+{
+	mSetupWidget->toggleDetailed();
+
+}
 
 void AllFiltersWidget::runFilterSlot()
 {
