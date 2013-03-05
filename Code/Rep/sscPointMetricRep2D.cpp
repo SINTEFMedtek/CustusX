@@ -168,7 +168,7 @@ void PointMetricRep2D::changedSlot()
 
 	if (!mShowLabel)
 		mText.reset();
-	if (!mText && mShowLabel)
+	if (!mText && mShowLabel && mView)
 		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
 	if (mText)
 	{

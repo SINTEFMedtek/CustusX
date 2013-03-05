@@ -186,6 +186,11 @@ void ProbeData::setUid(QString uid)
 	mUid = uid;
 }
 
+QString ProbeData::getUid()
+{
+	return mUid;
+}
+
 void ProbeData::applySoundSpeedCompensationFactor(double factor)
 {
 

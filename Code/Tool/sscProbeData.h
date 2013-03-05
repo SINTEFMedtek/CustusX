@@ -130,6 +130,7 @@ public:
 	void setImage(ProbeImageData value);
 	void setSector(double depthStart, double depthEnd, double width, double centerOffset = 0);
 	void setUid(QString uid);
+	QString getUid();
 
 	void updateClipRectFromSector();
 	void updateSectorFromClipRect();
