@@ -68,6 +68,8 @@ private:
 	void setParamtersToOptions(paramList parameters); ///< set the options to a given set of parameters
 	void setOptionValue(QString valueName, QString value); ///< set one option to a specific value
 
+	std::vector<DataAdapterPtr> getNotDefaultOptions(); //gets the options that are not set to default values
+	paramList getDefaultParameters();
 	void printParameters(paramList params); //helper function
 
 	ssc::StringDataAdapterXmlPtr makeStringOption(QDomElement root, std::string name, StringParameter parameter);
