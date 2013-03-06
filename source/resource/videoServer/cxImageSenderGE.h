@@ -59,7 +59,6 @@ private:
 	//The GE Connection code from ISB
 	data_streaming::GEStreamer mGEStreamer;
 
-//	vtkSmartPointer<vtkImageData> mImgStream;//Last image from GE
 	vtkSmartPointer<data_streaming::vtkExportedStreamData> mImgExportedStream;//Last image from GE
 
 	igstk::RealTimeClock::TimeStampType mLastGrabTime;
@@ -80,7 +79,7 @@ private:
 	//Deprecated
 //	IGTLinkImageMessage::Pointer getImageMessage();
 //	IGTLinkUSStatusMessage::Pointer getFrameStatus();
-	ssc::ProbeData getFrameStatus(data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
+	ssc::ProbeData getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
 	void send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged);
 
 private slots:
