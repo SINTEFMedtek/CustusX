@@ -124,6 +124,7 @@ public:
 	  * Delete all contents in folder created by this class
 	  */
 	static void deleteFolder(QString folder);
+	ssc::VideoSourcePtr getSource() { return mSource; }
 
 private slots:
 	void newFrameSlot();
