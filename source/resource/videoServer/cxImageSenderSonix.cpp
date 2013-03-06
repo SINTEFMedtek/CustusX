@@ -237,6 +237,7 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
   retval->SetDepthEnd((frame.bly-frame.mOrigin[1]) * frame.mSpacing[1]);	// End of sector in mm from origin
   //As ROI is a bit wide we subtract the width by 0.3 mm
   retval->SetWidth((frame.urx -  frame.ulx ) * frame.mSpacing[0] - 0.3);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+  retval->SetDeviceName("Sonix[BGRX]"); // TODO write something useful here
 
   //std::cout << "uly: " << frame.uly << " bly: " << frame.bly << std::endl;
   //std::cout << "spacing: " << frame.mSpacing[0] << "  " << frame.mSpacing[1] << std::endl;
@@ -268,7 +269,8 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
   retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   //std::cout << "Frame spacing: " << frame.mSpacing[0] << " " << frame.mSpacing[1] << std::endl;
   retval->SetScalarType(frame.mPixelFormat); //Use frame.mPixelFormat directly
-  retval->SetDeviceName("ImageSenderSonix [BGRX]"); // TODO write something useful here
+//  retval->SetDeviceName("ImageSenderSonix [BGRX]"); // TODO write something useful here
+  retval->SetDeviceName("Sonix[BGRX]"); // TODO write something useful here
   retval->SetSubVolume(size,offset);
   retval->AllocateScalars();
 
