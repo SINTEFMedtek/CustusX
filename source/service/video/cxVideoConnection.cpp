@@ -292,6 +292,7 @@ std::vector<ssc::VideoSourcePtr> VideoConnection::getVideoSources()
  */
 void VideoConnection::connectVideoToProbe()
 {
+	SSC_LOG("");
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (!tool)
 		return;
