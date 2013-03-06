@@ -23,12 +23,17 @@ public:
 	  * Save data and evaluate results.
 	  */
 	void testStoreMHDSourceDirectLink();
+	/** Test the MHD file source using the --secondary option,
+	  * i.e. sending two streams and saving them to disk.
+	  */
+	void testStoreMultipleMHDSourceDirectLink();
 
 public:
 	CPPUNIT_TEST_SUITE( TestAcquisition );
 		CPPUNIT_TEST( testConstructor );
 		CPPUNIT_TEST( testStoreMHDSourceLocalServer );
 		CPPUNIT_TEST( testStoreMHDSourceDirectLink );
+		CPPUNIT_TEST( testStoreMultipleMHDSourceDirectLink );
 	CPPUNIT_TEST_SUITE_END();
 private:
 };
