@@ -101,6 +101,7 @@ public:
 	void handleMousePress(const QPoint &pos, const Qt::MouseButtons &buttons); 
 	void handleMouseRelease(const QPoint &pos, const Qt::MouseButtons &buttons); 
 	void handleMouseMove(const QPoint &pos, const Qt::MouseButtons &buttons); 
+	virtual void forcedUpdate();
 
 protected:
 	virtual void doRender() = 0;
@@ -120,6 +121,7 @@ protected:
 	typedef ViewQVTKWidget widget;
 	
 private:
+	virtual void paintEvent(QPaintEvent *event);
 	virtual void showEvent(QShowEvent* event);
 	virtual void wheelEvent(QWheelEvent*);
 	virtual void mouseMoveEvent(QMouseEvent *event);
@@ -145,7 +147,6 @@ protected:
 	virtual void clearBackground();
 	virtual void doRender();
 private:
-	virtual void paintEvent(QPaintEvent *event);
 	virtual void resizeEvent( QResizeEvent *event);
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
