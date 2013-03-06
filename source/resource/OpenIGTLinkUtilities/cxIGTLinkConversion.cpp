@@ -236,7 +236,7 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 	{
 		format = colorFormat.cap(0).remove("[").remove("]");
 	}
-	std::cout << QString("found format %1 from %2").arg(format).arg(deviceName) << std::endl;
+//	std::cout << QString("found format %1 from %2").arg(format).arg(deviceName) << std::endl;
 
 	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, imageImport->GetOutput());
 	imageRGB->Update();
@@ -258,6 +258,7 @@ IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ssc::ProbeData input)
 	retval->SetDepthStart(input.getDepthStart());// Start of sector in mm from origin
 	retval->SetDepthEnd(input.getDepthEnd());	// End of sector in mm from origin
 	retval->SetWidth(input.getWidth());// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+	retval->SetDeviceName(cstring_cast(input.getUid()));
 
 	//  std::cout << "origin: " << mFrameGeometry.origin[0] << " " << mFrameGeometry.origin[1] << " " << mFrameGeometry.origin[2] << std::endl;
 	//  std::cout << "imageType: " << mFrameGeometry.imageType << std::endl;
@@ -286,6 +287,7 @@ ssc::ProbeData IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMe
 		ssc::ProbeData::ProbeImageData imageData = retval.getImage();
 		imageData.mOrigin_p = ssc::Vector3D(probeMessage->GetOrigin());
 		retval.setImage(imageData);
+		retval.setUid(probeMessage->GetDeviceName());
 	}
 
 	if (imageMessage)

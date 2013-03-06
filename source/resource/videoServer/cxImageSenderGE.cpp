@@ -327,7 +327,7 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 	ssc::ImagePtr message(new ssc::Image(uid, img));
 	if (geometryChanged)
 	{
-		ssc::ProbeData frameMessage = getFrameStatus(geometry, img);//TODO: Need uid?
+		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, img);
 		mSender->send(frameMessage);
 	}
 	mSender->send(message);
@@ -409,7 +409,7 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 	return retval;
 }*/
 
-ssc::ProbeData ImageSenderGE::getFrameStatus(data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
+ssc::ProbeData ImageSenderGE::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
 {
 	ssc::ProbeData retval;
 	if (!img || !mImgExportedStream)
@@ -417,20 +417,6 @@ ssc::ProbeData ImageSenderGE::getFrameStatus(data_streaming::frame_geometry geom
 
 	//Create ProbeImageData struct
 	ssc::ProbeData::ProbeImageData imageData;
-
-/*	vtkSmartPointer<vtkImageData> img = vtkSmartPointer<vtkImageData>();
-	if(mImgExportedStream)
-		vtkSmartPointer<vtkImageData> img = mImgExportedStream->GetScanConvertedImage();
-
-	//This is origin from the scanner (= 0,0,0)
-	//Origin according to image is set in the image message
-	if (mImgExportedStream && img)
-		imageData.mOrigin_p = ssc::Vector3D(geometry.origin[0] + img->GetOrigin()[0],
-				geometry.origin[1]+ img->GetOrigin()[1],
-				geometry.origin[2]+ img->GetOrigin()[2]);
-	else
-		imageData.mOrigin_p = geometry.origin;*/
-
 	imageData.mOrigin_p = ssc::Vector3D(geometry.origin[0] + img->GetOrigin()[0],
 					geometry.origin[1]+ img->GetOrigin()[1],
 					geometry.origin[2]+ img->GetOrigin()[2]);
@@ -450,6 +436,7 @@ ssc::ProbeData ImageSenderGE::getFrameStatus(data_streaming::frame_geometry geom
 	retval.setImage(imageData);
 //	retval.setTemporalCalibration();//Can set everything except temporal calibration
 
+	retval.setUid(uid);
 	return retval;
 }
 
