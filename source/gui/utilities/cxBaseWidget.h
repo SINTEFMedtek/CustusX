@@ -73,7 +73,7 @@ public:
     /**
       * Creates a horizontal line which can be inserted into widgets
       */
-    QFrame* createHorizontalLine();
+    static QFrame* createHorizontalLine();
     QGroupBox* wrapInGroupBox(QWidget* base, QString name);
     CXFrame* wrapInFrame(QWidget* base);
 
