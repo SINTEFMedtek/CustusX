@@ -24,5 +24,5 @@ SET(CISST_TESTS_MAIN_SRC
     cisstTestParameters.cpp
     cisstTestParameters.h)
 ADD_LIBRARY(cisstTestsMain ${CISST_TESTS_MAIN_SRC})
-target_link_libraries(cisstTestsMain ${CPPUNIT_LIBRARIES} ${QT_LIBRARIES} ${SSC_GCOV_LIBRARY})
+target_link_libraries(cisstTestsMain ${CPPUNIT_LIBRARIES} ${QT_LIBRARIES} ${SSC_GCOV_LIBRARY} SSC)
 

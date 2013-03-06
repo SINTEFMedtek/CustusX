@@ -126,6 +126,8 @@ SET( SSC_QT_MOC_HEADER_FILES
 	Widgets/sscColorDataAdapterXml.h
 	Widgets/sscColorSelectWidget.h
 	Widgets/cxColorSelectButton.h
+
+	Utilities/sscApplication.h
 	Utilities/sscMessageManager.h
     Utilities/sscSharedMemory.h
     )
@@ -205,6 +207,8 @@ SET( SSC_SOURCE_FILES
     Math/sscFrame3D.cpp
     Math/sscFrame3D.h
 
+	Utilities/sscApplication.h
+	Utilities/sscApplication.cpp
     Utilities/sscAudio.h
     Utilities/sscCoordinateSystemHelpers.h
     Utilities/sscCoordinateSystemHelpers.cpp

@@ -145,11 +145,17 @@ public:
 		return mProbe;
 	}
 	virtual ProbeData getProbeSector() const { return mProbeData; }
-	void setProbeSector( ProbeData probeData )
+	void setProbeSector( ProbeData probeData, ProbePtr probe )
 	{
 		mProbeData = probeData;
 		mProbe.reset(new DummyProbe());
 		mProbe->setData(mProbeData);
+		emit toolProbeSector();
+	}
+	void setProbeSector(ProbePtr probe)
+	{
+		mProbe = probe;
+		mProbeData = probe->getData();
 		emit toolProbeSector();
 	}
 	virtual double getTimestamp() const { return ssc::getMilliSecondsSinceEpoch(); }
