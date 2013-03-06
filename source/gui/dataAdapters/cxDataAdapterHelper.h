@@ -30,6 +30,5 @@ namespace cx {
  */
 QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
 
-
 } /* namespace cx */
 #endif /* CXDATAADAPTERHELPER_H_ */

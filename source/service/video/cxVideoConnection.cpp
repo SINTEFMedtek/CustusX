@@ -227,6 +227,7 @@ void VideoConnection::updateSonixStatus(ssc::ProbeData msg)
 	// existing values (such as temporal calibration).
 	// Note that the 'active' data is get while the 'uid' data is set.
 	ssc::ProbeData data = probe->getData();
+	std::cout << "VideoConnection::updateSonixStatus pre \n" << streamXml2String(data) << std::endl;
 
 	data.setUid(msg.getUid());
 	data.setType(msg.getType());
@@ -237,6 +238,8 @@ void VideoConnection::updateSonixStatus(ssc::ProbeData msg)
 	image.mSpacing = msg.getImage().mSpacing;
 	image.mClipRect_p = msg.getImage().mClipRect_p;
 	data.setImage(image);
+
+	std::cout << "VideoConnection::updateSonixStatus post\n" << streamXml2String(data) << std::endl;
 
 	probe->setData(data);
 }

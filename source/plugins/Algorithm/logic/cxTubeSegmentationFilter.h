@@ -56,7 +56,6 @@ private slots:
 	void inputChangedSlot();
 	void parametersFileChanged();
 	void resetOptions();
-//	void centerlineMethodChanged();
 
 private:
 	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ssc::ImagePtr input);
