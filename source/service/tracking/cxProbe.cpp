@@ -71,6 +71,10 @@ ssc::ProbeSectorPtr Probe::getSector(QString uid)
 
 bool Probe::isValid() const
 {
+//	std::cout << "Probe::isValid()" << streamXml2String(this->getProbeData("active")) << std::endl;
+//	std::cout << "  probedefs: " << mProbeData.size() << std::endl;
+//	for (std::map<QString, ssc::ProbeData>::const_iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+//		std::cout << "  probe\n" << streamXml2String(iter->second) << std::endl;
 	return this->getProbeData("active").getType() != ssc::ProbeData::tNONE;
 }
 
@@ -144,22 +148,28 @@ void Probe::setRTSource(ssc::VideoSourcePtr source)
 	}
 
 	mSource[source->getUid()].reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
+//	std::cout << "Probe::setRTSource " << mSource.size() << std::endl;
 	emit sectorChanged();
 }
 
 void Probe::removeRTSource(ssc::VideoSourcePtr source)
 {
+	SSC_LOG("");
 	if (!source)
 		return;
 	if (mSource.count(source->getUid()))
 		return;
 
 	mSource.erase(source->getUid());
+	mProbeData.erase(source->getUid());
 	emit sectorChanged();
 }
 
 void Probe::setData(ssc::ProbeData probeSector, QString configUid)
 {
+	if (probeSector.getUid().isEmpty())
+		probeSector.setUid(mActiveUid);
+
 	mProbeData[probeSector.getUid()] = probeSector;
 	mConfigurationId = configUid;
 	emit sectorChanged();
@@ -289,6 +299,7 @@ QStringList Probe::getAvailableVideoSources()
 	QStringList retval;
 	for (std::map<QString, ssc::VideoSourcePtr>::iterator iter=mSource.begin(); iter!=mSource.end(); ++iter)
 		retval << iter->first;
+//	std::cout << "Probe::getAvailableVideoSources " << retval.size() << std::endl;
 	return retval;
 }
 
