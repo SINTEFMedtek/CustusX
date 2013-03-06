@@ -52,7 +52,7 @@ QFrame* BaseWidget::createHorizontalLine() ///< creates a horizontal line witch 
 {
     QFrame* retval = new QFrame();
     retval->setFrameStyle(QFrame::Sunken + QFrame::HLine);
-    retval->setFixedHeight(12);
+//    retval->setFixedHeight(12);
     return retval;
 }
 

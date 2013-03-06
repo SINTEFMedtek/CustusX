@@ -103,13 +103,69 @@ void OptionsWidget::populate(bool showAdvanced)
 	QGridLayout* layout = new QGridLayout(widget);
 	layout->setMargin(layout->margin()/2);
 
+	std::map<QString, QWidget*> groupWidgets;
+	QWidget* otherWidget = NULL;
 	for (unsigned i = 0; i < mOptions.size(); ++i)
 	{
 		if(showAdvanced || (!showAdvanced && !mOptions[i]->getAdvanced()))
-			createDataWidget(widget, mOptions[i], layout, i);
+		{
+			QWidget* groupWidget = NULL;
+			QGridLayout* groupLayout = NULL;
+
+			//make new group if needed
+			QString groupName = mOptions[i]->getGroup();
+			if(groupName.isEmpty())
+				groupName = "other";
+			std::map<QString, QWidget*>::iterator it = groupWidgets.find(groupName);
+			if(it == groupWidgets.end())
+			{
+				groupWidget = new QWidget(widget);
+				groupWidget->setObjectName(groupName);
+				groupLayout = new QGridLayout(groupWidget);
+				groupLayout->setMargin(groupLayout->margin()/2);
+				QWidget* temp = this->createGroupHeaderWidget(groupName);
+				groupLayout->addWidget(temp,0,0,1,2);
+				layout->addWidget(groupWidget);
+				groupWidgets[groupName] = groupWidget;
+				if(groupName == "other")
+					otherWidget = temp;
+			}
+			else
+			{
+				groupWidget = it->second;
+				groupLayout = (QGridLayout*) groupWidget->layout();
+			}
+
+			//count groupwidgets items to determine row
+			int itemsInGroup = groupLayout->count();
+
+			//make dataadaptewidget and add to existing group
+			createDataWidget(groupWidget, mOptions[i], groupLayout, ++itemsInGroup);
+		}
 	}
 
+	//hide groupname if only one group exists
+	if((groupWidgets.size() == 1) && (otherWidget != NULL))
+		otherWidget->hide();
+
 	mStackedLayout->setCurrentWidget(widget);
+}
+
+QWidget* OptionsWidget::createGroupHeaderWidget(QString title)
+{
+	QWidget* retval = new QWidget(this);
+	QVBoxLayout* layout = new QVBoxLayout(retval);
+	layout->setMargin(0);
+	layout->setSpacing(0);
+
+	QLabel* label = new QLabel(title);
+	QFont font = label->font();
+	font.setPointSize(8);
+	label->setFont(font);
+	layout->addWidget(label);
+	layout->addWidget(BaseWidget::createHorizontalLine());
+
+	return retval;
 }
 
 ///--------------------------------------------------------
