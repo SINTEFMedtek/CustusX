@@ -51,7 +51,6 @@ QStringList ImageSenderSonix::getArgumentDescription()
 
 ImageSenderSonix::ImageSenderSonix(QObject* parent) :
     ImageSender(parent),
-	mSocket(0),
 	mEmitStatusMessage(false),
 	mLastFrameTimestamp(0.0),
 	mCurrentFrameTimestamp(0.0)
@@ -187,11 +186,8 @@ void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 {
 	mCurrentFrameTimestamp = frame.mTimestamp;
 
-	if (!mSender )
-	if(!mSocket)
-		{
-			return;
-		}
+	if (!mSender || !mSender->isReady())
+		return;
 
   //TODO: Get info like origin from frame and create a IGTLinkUSStatusMessage
   if (frame.mNewStatus || mEmitStatusMessage)
