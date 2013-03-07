@@ -82,7 +82,18 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(Saving
 	if (tool)
 		retval.mProbeUid = tool->getUid();
 
+	this->fillFramePositions(&retval);
+
 	return retval;
+}
+
+/** Use tool positions to generate positions for each frame, then convert the
+  * position format from prMt to rMu. This makes is possible to use the frames
+  * externally.
+  */
+void UsReconstructionFileMaker::fillFramePositions(ssc::USReconstructInputData* data) const
+{
+
 }
 
 bool UsReconstructionFileMaker::writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
@@ -112,10 +123,20 @@ bool UsReconstructionFileMaker::writeTrackerTimestamps2(QString reconstructionFo
 	return success;
 }
 
+bool UsReconstructionFileMaker::writeUSTransforms(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+{
+	return this->writeTransforms(reconstructionFolder+"/"+session+".fp", ts, "frame transforms rMu");
+}
+
 bool UsReconstructionFileMaker::writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
 {
+	return this->writeTransforms(reconstructionFolder+"/"+session+".tp", ts, "tracking transforms prMt");
+}
+
+bool UsReconstructionFileMaker::writeTransforms(QString filename, std::vector<ssc::TimedPosition> ts, QString type)
+{
 	bool success = false;
-	QFile file(reconstructionFolder+"/"+session+".tp");
+	QFile file(filename);
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
 		ssc::messageManager()->sendError("Cannot open "+file.fileName());
@@ -146,7 +167,7 @@ bool UsReconstructionFileMaker::writeTrackerTransforms2(QString reconstructionFo
 	success = true;
 
 	QFileInfo info(file);
-	mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(ts.size())+" tracking transforms.";
+	mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(ts.size())+" " + type + ".";
 
 	return success;
 }
@@ -255,6 +276,7 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	this->writeTrackerTimestamps2(path, session, mReconstructData.mPositions);
 	this->writeTrackerTransforms2(path, session, mReconstructData.mPositions);
 	this->writeUSTimestamps2(path, session, mReconstructData.mFrames);
+	this->writeUSTransforms(path, session, mReconstructData.mFrames);
 	this->writeProbeConfiguration2(path, session, mReconstructData.mProbeData.mData, mReconstructData.mProbeUid);
 
 
