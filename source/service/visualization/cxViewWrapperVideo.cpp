@@ -159,6 +159,7 @@ void ViewWrapperVideo::connectStream()
 		if (tool->getProbe()->getAvailableVideoSources().count(uid))
 		{
 			newTool = tool;
+			source = tool->getProbe()->getRTSource(uid);
 		}
 	}
 
