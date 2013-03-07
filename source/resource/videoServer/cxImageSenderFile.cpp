@@ -106,7 +106,10 @@ void MHDImageSender::initialize(StringMap arguments)
 
 	mPrimaryData = this->initializePrimaryData(source, mArguments["filename"]);
 	if (mArguments.count("secondary"))
+	{
 		mSecondaryData = this->initializeSecondaryData(source, mArguments["filename"]);
+		std::cout << "MHDImageSender: Initialized secondary data with uid=" << mSecondaryData.mRawUid << std::endl;
+	}
 
 	mTimer = new QTimer(this);
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
