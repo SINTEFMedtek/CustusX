@@ -11,24 +11,30 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#ifndef CXDATAADAPTERHELPER_H_
-#define CXDATAADAPTERHELPER_H_
+#include "cxApplication.h"
+#include "sscMessageManager.h"
 
-#include "sscDataAdapter.h"
+namespace cx
+{
 
-class QWidget;
-class QGridLayout;
+Application::Application(int& argc, char** argv) : QApplication(argc, argv)
+{
+}
 
-namespace cx {
+bool Application::notify(QObject *rec, QEvent *ev)
+{
+//	qDebug() << "MyApplication::nofity";
+	try
+	{
+		return QApplication::notify(rec, ev);
+	}
+	catch( ... )
+	{
+		ssc::messageManager()->sendInfo("Unknown Exception: Terminating!");
+//		qDebug() << "Unknown Exception: Terminating!";
+		exit(0);
+	}
+	return false;
+}
 
-/**\brief Create a widget capable of displaying the input data.
- *
- * If a gridLayout is provided, the widget will insert its components
- * into a row in that layout
- *
- * \ingroup cxGUI
- */
-QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout = 0, int row = 0);
-
-} /* namespace cx */
-#endif /* CXDATAADAPTERHELPER_H_ */
+} // namespace cx
