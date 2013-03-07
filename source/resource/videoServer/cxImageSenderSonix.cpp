@@ -168,7 +168,7 @@ void ImageSenderSonix::initializeSonixGrabber()
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 }
 
-bool ImageSenderSonix::startStreaming(GrabberSenderPtr seender)
+bool ImageSenderSonix::startStreaming(GrabberSenderPtr sender)
 {
 	mSender = sender;
 	mSonixGrabber->Record();
@@ -307,35 +307,43 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
 }
 void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
 {
-	if(!mSocket)
+	if (!mSender || !mSender->isReady())
 		return;
-  if(mSocket->bytesToWrite() > mMaxBufferSize)
-    return;
+
+//	if(!mSocket)
+//		return;
+//  if(mSocket->bytesToWrite() > mMaxBufferSize)
+//    return;
 
   for(int i=0; i<sendNumberOfMessages; ++i)
   {
     IGTLinkImageMessage::Pointer message = this->getLastImageMessageFromQueue();
     if(!message)
       break;
-    message->Pack();
-    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
+    mSender->send(message);
+//    message->Pack();
+//    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
 void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
 {
-	if(!mSocket)
+	if (!mSender || !mSender->isReady())
 		return;
+
+//	if(!mSocket)
+//		return;
   //std::cout << "ImageSenderSonix::sendOpenIGTLinkStatusSlot" << std::endl;
-  if(mSocket->bytesToWrite() > mMaxBufferSize)
-    return;
+//  if(mSocket->bytesToWrite() > mMaxBufferSize)
+//    return;
 
   for(int i=0; i<sendNumberOfMessage; ++i)
   {
     IGTLinkUSStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
     if(!message)
       break;
-    message->Pack();
-    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
+    mSender->send(message);
+//    message->Pack();
+//    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
 /** Add the image message to a thread-safe queue
