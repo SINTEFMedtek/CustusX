@@ -145,7 +145,7 @@ public:
 		return mProbe;
 	}
 	virtual ProbeData getProbeSector() const { return mProbeData; }
-	void setProbeSector( ProbeData probeData, ProbePtr probe )
+	void setProbeSector( ProbeData probeData )
 	{
 		mProbeData = probeData;
 		mProbe.reset(new DummyProbe());
