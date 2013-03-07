@@ -71,6 +71,10 @@ ssc::ProbeSectorPtr Probe::getSector(QString uid)
 
 bool Probe::isValid() const
 {
+//	std::cout << "Probe::isValid()" << streamXml2String(this->getProbeData("active")) << std::endl;
+//	std::cout << "  probedefs: " << mProbeData.size() << std::endl;
+//	for (std::map<QString, ssc::ProbeData>::const_iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+//		std::cout << "  probe\n" << streamXml2String(iter->second) << std::endl;
 	return this->getProbeData("active").getType() != ssc::ProbeData::tNONE;
 }
 
@@ -111,6 +115,10 @@ void Probe::setSoundSpeedCompensationFactor(double factor)
 ssc::ProbeData Probe::getData(QString uid) const
 {
 	ssc::ProbeData retval = this->getProbeData(uid);
+
+//	std::cout << "Probe::getData " << uid << std::endl;
+//	std::cout << "Probe::getData " << uid << "\n" << streamXml2String(retval) << std::endl;
+
 	return retval;
 }
 
@@ -143,25 +151,35 @@ void Probe::setRTSource(ssc::VideoSourcePtr source)
 			return;
 	}
 
-	mSource[source->getUid()].reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
+	// must have same uid as original: the uid identifies the video source
+	mSource[source->getUid()].reset(new ssc::ProbeAdapterRTSource(source->getUid(), mSelf.lock(), source));
+//	mSource[source->getUid()].reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
 	emit sectorChanged();
 }
 
 void Probe::removeRTSource(ssc::VideoSourcePtr source)
 {
+	SSC_LOG("");
 	if (!source)
 		return;
 	if (mSource.count(source->getUid()))
 		return;
 
 	mSource.erase(source->getUid());
+	mProbeData.erase(source->getUid());
 	emit sectorChanged();
 }
 
 void Probe::setData(ssc::ProbeData probeSector, QString configUid)
 {
+	if (probeSector.getUid().isEmpty())
+		probeSector.setUid(mActiveUid);
+
 	mProbeData[probeSector.getUid()] = probeSector;
 	mConfigurationId = configUid;
+
+//	std::cout << "Probe::setData \n" << streamXml2String(probeSector) << std::endl;
+
 	emit sectorChanged();
 }
 
@@ -222,6 +240,7 @@ void Probe::setConfigId(QString uid)
 //  std::cout << "probeSector.mTemporalCalibration" << probeSector.mTemporalCalibration << std::endl;
 //	mConfigurationId = uid;
 //	mData = probeSector;
+	probeSector.setUid(mActiveUid);
 	this->setData(probeSector, uid);
 	//Update temporal calibration and sound speed compensation
 	if (mOverrideTemporalCalibration)
@@ -289,6 +308,7 @@ QStringList Probe::getAvailableVideoSources()
 	QStringList retval;
 	for (std::map<QString, ssc::VideoSourcePtr>::iterator iter=mSource.begin(); iter!=mSource.end(); ++iter)
 		retval << iter->first;
+//	std::cout << "Probe::getAvailableVideoSources " << retval.size() << std::endl;
 	return retval;
 }
 
