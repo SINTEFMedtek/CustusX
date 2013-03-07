@@ -11,6 +11,7 @@
 #include "sscReconstructPreprocessor.h"
 #include "sscReconstructParams.h"
 #include "cxTimedAlgorithm.h"
+#include "cxUSReconstructInputDataAlgoritms.h"
 
 void TestUsReconstruction::setUp()
 {
@@ -56,7 +57,7 @@ void TestUsReconstruction::testSlerpInterpolation()
 
 	double t = 0.5;
 
-	ssc::Transform3D c = ssc::ReconstructPreprocessor::slerpInterpolate(a, b, t);
+	ssc::Transform3D c = cx::USReconstructInputDataAlgorithm::slerpInterpolate(a, b, t);
 	//ssc::Transform3D c = reconstructer->interpolate(a, b, t);
 
 	Eigen::Matrix3d goalm;
