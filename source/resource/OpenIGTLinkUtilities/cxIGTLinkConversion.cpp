@@ -236,7 +236,7 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 	{
 		format = colorFormat.cap(0).remove("[").remove("]");
 	}
-	std::cout << QString("found format %1 from %2").arg(format).arg(deviceName) << std::endl;
+//	std::cout << QString("found format %1 from %2").arg(format).arg(deviceName) << std::endl;
 
 	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, imageImport->GetOutput());
 	imageRGB->Update();

@@ -459,6 +459,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     {
     	ssc::StringDataAdapterXmlPtr option = this->makeStringOption(root, stringIt->first, stringIt->second);
     	option->setAdvanced(true);
+    	option->setGroup(qstring_cast(stringIt->second.getGroup()));
     	mStringOptions.push_back(option);
     	if(stringIt->first == "parameters")
     	{
@@ -485,6 +486,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     {
     	ssc::BoolDataAdapterXmlPtr option = this->makeBoolOption(root, boolIt->first, boolIt->second);
     	option->setAdvanced(true);
+    	option->setGroup(qstring_cast(boolIt->second.getGroup()));
     	mBoolOptions.push_back(option);
     }
 
@@ -494,6 +496,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     {
     	ssc::DoubleDataAdapterXmlPtr option = this->makeDoubleOption(root, numericIt->first, numericIt->second);
     	option->setAdvanced(true);
+    	option->setGroup(qstring_cast(numericIt->second.getGroup()));
     	mDoubleOptions.push_back(option);
     }
 }

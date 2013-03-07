@@ -41,4 +41,5 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 	return retval;
 }
 
+
 } /* namespace cx */
