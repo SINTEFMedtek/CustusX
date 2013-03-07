@@ -47,7 +47,7 @@ public:
   ~ImageSenderSonix();
   
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(QTcpSocket* socket);
+	virtual bool startStreaming(GrabberSenderPtr snder);
 	virtual void stopStreaming();
 
 	virtual QString getType();
