@@ -51,6 +51,7 @@ public:
 private:
 	void clear();
 	void populate(bool showAdvanced);
+	QWidget* createGroupHeaderWidget(QString title);
 
 	QStackedLayout* mStackedLayout;
 	std::vector<DataAdapterPtr> mOptions;
