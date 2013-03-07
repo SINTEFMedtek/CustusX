@@ -168,9 +168,9 @@ void ImageSenderSonix::initializeSonixGrabber()
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 }
 
-bool ImageSenderSonix::startStreaming(QTcpSocket* socket)
+bool ImageSenderSonix::startStreaming(GrabberSenderPtr seender)
 {
-	mSocket = socket;
+	mSender = sender;
 	mSonixGrabber->Record();
 	mEmitStatusMessage = true;
 	std::cout << "Started streaming from sonix device" << std::endl;
@@ -180,13 +180,14 @@ bool ImageSenderSonix::startStreaming(QTcpSocket* socket)
 void ImageSenderSonix::stopStreaming()
 {
   mSonixGrabber->Stop();
-  mSocket = NULL;
+  mSender.reset();
 }
 
 void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 {
 	mCurrentFrameTimestamp = frame.mTimestamp;
 
+	if (!mSender )
 	if(!mSocket)
 		{
 			return;
