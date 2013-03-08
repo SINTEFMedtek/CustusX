@@ -28,6 +28,8 @@
 #include "sscTypeConversions.h"
 #include "cxDataLocations.h"
 #include "geConfig.h"
+#include "vtkImageChangeInformation.h"
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
@@ -269,7 +271,8 @@ void ImageSenderGE::grab()
 	}
 
 	//Get frame geometry if we don't have it yet
-	if(imgExportedStream->GetTissueGeometryChanged())
+	//if(imgExportedStream->GetTissueGeometryChanged())
+	if (!equal(mFrameGeometry, imgExportedStream->GetTissueGeometry()))
 	{
 		// Frame geometry have changed.
 		mFrameGeometry = imgExportedStream->GetTissueGeometry();
@@ -278,7 +281,8 @@ void ImageSenderGE::grab()
 	else
 		mFrameGeometryChanged = false;
 
-	if(imgExportedStream->GetFlowGeometryChanged() && (mExportBandwidth || mExportFrequency))
+	//if(imgExportedStream->GetFlowGeometryChanged() /*&& (mExportBandwidth || mExportFrequency)*/)
+	if (!equal(mFlowGeometry, imgExportedStream->GetFlowGeometry()))
 	{
 		// Frame geometry have changed.
 		mFlowGeometry = imgExportedStream->GetFlowGeometry();
@@ -324,12 +328,22 @@ void ImageSenderGE::send()
 
 void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
 {
-	ssc::ImagePtr message(new ssc::Image(uid, img));
+	vtkImageDataPtr copy = vtkImageDataPtr::New();
+	copy->DeepCopy(img);
 	if (geometryChanged)
 	{
-		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, img);
+		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, copy);
 		mSender->send(frameMessage);
 	}
+
+	// CustusX does not handle nonzero origin - set to zero, but AFTER getFrameStatus() is called.
+	vtkImageChangeInformationPtr center = vtkImageChangeInformationPtr::New();
+	center->SetInput(copy);
+	center->SetOutputOrigin(0,0,0);
+	center->Update();
+
+	ssc::ImagePtr message(new ssc::Image(uid, center->GetOutput()));
+
 	mSender->send(message);
 }
 
@@ -475,6 +489,20 @@ ssc::ProbeData ImageSenderGE::getFrameStatus(QString uid, data_streaming::frame_
 
   return retval;
 }*/
+
+bool ImageSenderGE::equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b)
+{
+	return !((a.origin[0] != b.origin[0]) || (a.origin[1] != b.origin[1]) || (a.origin[2] != b.origin[2])
+			|| (a.imageType != b.imageType)
+			|| !ssc::similar(a.depthStart, b.depthStart, 0.01)
+			|| !ssc::similar(a.depthEnd, b.depthEnd, 0.01)
+			|| !ssc::similar(a.width, b.width, 0.0001)
+			|| !ssc::similar(a.tilt, b.tilt, 0.0001)
+			|| !ssc::similar(a.elevationWidth, b.elevationWidth, 0.0001)
+			|| !ssc::similar(a.elevationTilt, b.elevationTilt, 0.0001)
+			|| !ssc::similar(a.vNyquist, b.vNyquist, 0.0001)
+			|| !ssc::similar(a.PRF, b.PRF, 0.0001));
+}
 
 }// namespace cx
 
