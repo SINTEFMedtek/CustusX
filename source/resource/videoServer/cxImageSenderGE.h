@@ -82,6 +82,9 @@ private:
 	ssc::ProbeData getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
 	void send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged);
 
+	//Compare to geometry structs
+	bool equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b);
+
 private slots:
 	void grab();
 	void send();
