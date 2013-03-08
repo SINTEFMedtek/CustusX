@@ -49,9 +49,12 @@ void USReconstructInputDataAlgorithm::transformFramePositionsTo_prMu(ssc::USReco
 
 std::vector<double> USReconstructInputDataAlgorithm::interpolateFramePositionsFromTracking(ssc::USReconstructInputData *data)
 {
-    std::vector<double> error(data->mFrames.size());
+    std::vector<double> error(data->mFrames.size(), 1000);
 
-    for (unsigned i_frame = 0; i_frame < data->mFrames.size(); i_frame++)
+	if (data->mPositions.empty())
+		return error;
+
+	for (unsigned i_frame = 0; i_frame < data->mFrames.size(); i_frame++)
     {
         std::vector<ssc::TimedPosition>::iterator posIter;
         posIter = lower_bound(data->mPositions.begin(), data->mPositions.end(), data->mFrames[i_frame]);
