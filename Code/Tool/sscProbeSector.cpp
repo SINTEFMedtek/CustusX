@@ -137,6 +137,8 @@ private:
  */
 vtkImageDataPtr ProbeSector::getMask()
 {
+	if (mData.getType()==ProbeData::tNONE)
+		return vtkImageDataPtr();
 	InsideMaskFunctor checkInside(mData, this->get_uMv());
 	vtkImageDataPtr retval;
 	retval = generateVtkImageData(Eigen::Array3i(mData.getImage().mSize.width(), mData.getImage().mSize.height(), 1),
