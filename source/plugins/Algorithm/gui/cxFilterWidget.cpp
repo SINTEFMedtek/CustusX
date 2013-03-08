@@ -43,7 +43,8 @@
 namespace cx
 {
 
-OptionsWidget::OptionsWidget(QWidget* parent)
+OptionsWidget::OptionsWidget(QWidget* parent) :
+		mShowAdvanced(false)
 {
 	this->setSizePolicy(this->sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
 	mStackedLayout = new QStackedLayout(this);
@@ -66,8 +67,7 @@ void OptionsWidget::setOptions(QString uid, std::vector<DataAdapterPtr> options,
 	mOptions = options;
 	mUid = uid;
 
-	this->clear();
-	this->populate(showAdvanced);
+	this->showAdvanced(showAdvanced);
 }
 
 QString OptionsWidget::getCurrentUid()
@@ -77,8 +77,14 @@ QString OptionsWidget::getCurrentUid()
 
 void OptionsWidget::showAdvanced(bool show)
 {
+	mShowAdvanced = show;
+	this->rebuild();
+}
+
+void OptionsWidget::rebuild()
+{
 	this->clear();
-	this->populate(show);
+	this->populate(mShowAdvanced);
 }
 
 void OptionsWidget::clear()
@@ -140,11 +146,13 @@ void OptionsWidget::populate(bool showAdvanced)
 			int itemsInGroup = groupLayout->count();
 
 			//make dataadaptewidget and add to existing group
+			blockSignals(true);
 			createDataWidget(groupWidget, mOptions[i], groupLayout, ++itemsInGroup);
+			blockSignals(false);
 		}
 	}
 
-	//hide groupname if only one group exists
+	//hide group header if only one the "other" group exists
 	if((groupWidgets.size() == 1) && (otherWidget != NULL))
 		otherWidget->hide();
 
@@ -233,6 +241,12 @@ void FilterSetupWidget::showAdvancedOptions(int state)
 	}
 }
 
+void FilterSetupWidget::rebuildOptions()
+{
+	if(mOptionsWidget)
+		mOptionsWidget->rebuild();
+}
+
 QString FilterSetupWidget::defaultWhatsThis() const
 {
 	QString name("None");
@@ -257,6 +271,7 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 		mCurrentFilter->setActive(false);
 
 	mCurrentFilter = filter;
+	connect(mCurrentFilter.get(), SIGNAL(changed()), this, SLOT(rebuildOptions()));
 
 	if (mFrame)
 		mFrame->setTitle(mCurrentFilter->getName());
