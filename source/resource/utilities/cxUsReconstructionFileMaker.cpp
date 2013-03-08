@@ -18,6 +18,9 @@
 #include "sscUSFrameData.h"
 #include "cxSavingVideoRecorder.h"
 #include "cxImageDataContainer.h"
+#include "cxUSReconstructInputDataAlgoritms.h"
+#include "sscCustomMetaImage.h"
+#include "sscLogger.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
@@ -82,7 +85,19 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(Saving
 	if (tool)
 		retval.mProbeUid = tool->getUid();
 
+	this->fillFramePositions(&retval);
+
 	return retval;
+}
+
+/** Use tool positions to generate positions for each frame, then convert the
+  * position format from prMt to rMu. This makes is possible to use the frames
+  * externally.
+  */
+void UsReconstructionFileMaker::fillFramePositions(ssc::USReconstructInputData* data) const
+{
+	cx::USReconstructInputDataAlgorithm::interpolateFramePositionsFromTracking(data);
+	cx::USReconstructInputDataAlgorithm::transformFramePositionsTo_prMu(data);
 }
 
 bool UsReconstructionFileMaker::writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
@@ -112,10 +127,20 @@ bool UsReconstructionFileMaker::writeTrackerTimestamps2(QString reconstructionFo
 	return success;
 }
 
+bool UsReconstructionFileMaker::writeUSTransforms(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+{
+	return this->writeTransforms(reconstructionFolder+"/"+session+".fp", ts, "frame transforms rMu");
+}
+
 bool UsReconstructionFileMaker::writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
 {
+	return this->writeTransforms(reconstructionFolder+"/"+session+".tp", ts, "tracking transforms prMt");
+}
+
+bool UsReconstructionFileMaker::writeTransforms(QString filename, std::vector<ssc::TimedPosition> ts, QString type)
+{
 	bool success = false;
-	QFile file(reconstructionFolder+"/"+session+".tp");
+	QFile file(filename);
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
 		ssc::messageManager()->sendError("Cannot open "+file.fileName());
@@ -146,7 +171,7 @@ bool UsReconstructionFileMaker::writeTrackerTransforms2(QString reconstructionFo
 	success = true;
 
 	QFileInfo info(file);
-	mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(ts.size())+" tracking transforms.";
+	mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(ts.size())+" " + type + ".";
 
 	return success;
 }
@@ -208,6 +233,21 @@ QString UsReconstructionFileMaker::createUniqueFolder(QString patientFolder, QSt
 	return retval;
 }
 
+QString UsReconstructionFileMaker::createFolder(QString patientFolder, QString sessionDescription)
+{
+	QString retval("");
+	QDir patientDir(patientFolder + "/US_Acq");
+
+	QString subfolder = sessionDescription;
+	QString subfolderAbsolutePath = patientDir.absolutePath()+"/"+subfolder;
+	QString newPathName = subfolderAbsolutePath;
+	patientDir.mkpath(newPathName);
+	patientDir.cd(newPathName);
+
+	retval = patientDir.absolutePath();
+	return retval;
+}
+
 bool UsReconstructionFileMaker::findNewSubfolder(QString subfolderAbsolutePath)
 {
 	QDir dir;
@@ -225,8 +265,9 @@ void UsReconstructionFileMaker::report()
 	}
 }
 
-void UsReconstructionFileMaker::writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression)
+void UsReconstructionFileMaker::writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression, std::vector<ssc::TimedPosition> pos)
 {
+	SSC_ASSERT(images->size()==pos.size());
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
 //	std::cout << "UsReconstructionFileMaker::writeUSImages " << images->size() << std::endl;
 
@@ -240,7 +281,107 @@ void UsReconstructionFileMaker::writeUSImages(QString path, CachedImageDataConta
 		writer->SetFileName(cstring_cast(filename));
 		writer->SetCompression(compression);
 		writer->Write();
+
+		ssc::CustomMetaImagePtr customReader = ssc::CustomMetaImage::create(filename);
+		customReader->setTransform(pos[i].mPos);
 	}
+}
+
+void UsReconstructionFileMaker::writeREADMEFile(QString reconstructionFolder, QString session)
+{
+	QString text = ""
+"* ==== Format description												\n"
+"*																		\n"
+"* All files describing one acquisition lie the same folder.  The files all have		\n"
+"* the name format US-Acq_<index>_<TS><stream>.<type>,					\n"
+"* where																\n"
+"*  - <index> is a running index, for convenience.						\n"
+"*  - <TS> is a timestamp												\n"
+"*  - <stream> is the uid of the video stream. Not used prior to cx3.5.0.				\n"
+"*  - <type> is the format of that specific file.										\n"
+"*																		\n"
+"* Together, the files contains information about the us images and their				\n"
+"* timestamps, the tracking positions and their timestamps, and the probe				\n"
+"* calibration.															\n"
+"*																		\n"
+"* In the following, we use <filebase> = US-Acq_<index>_<TS><stream>.	\n"
+"*																		\n"
+"*																		\n"
+"* ==== <filebase>.mhd (obsolete)										\n"
+"*																		\n"
+"* Used prior to version cx3.4.0.										\n"
+"* A file in the metaheader file format containing the uncompressed image data.			\n"
+"* the z-direction is the time axis, i.e. the z dim is the number of us frames.			\n"
+"* See http://www.itk.org/Wiki/MetaIO/Documentation for more.							\n"
+"*																		\n"
+"* Two extra tags are added:											\n"
+"*																		\n"
+"ConfigurationID = <path:inside:ProbeCalibConfigs.xml>					\n"
+"ProbeCalibration = <not used>											\n"
+"*																		\n"
+"* The ConfigurationID refers to a specific configuration within		\n"
+"* ProbeCalibConfigs.xml, using colon separators.						\n"
+"*																		\n"
+"* ==== <filebase>_<index>.mhd											\n"
+"*																		\n"
+"* A sequence of files in the metaheader file format containing the image data, one file\n"
+"* for each frame. The frame index is given by the index in the file name.				\n"
+"* See http://www.itk.org/Wiki/MetaIO/Documentation for more.							\n"
+"* Replaces single image files.											\n"
+"*																		\n"
+"* ==== ProbeCalibConfigs.xml (obsolete)								\n"
+"*																		\n"
+"* This file contains the probe definition, and is copied from the		\n"
+"* config/tool/Tools folder												\n"
+"*																		\n"
+"* ==== <filebase>.probedata.xml										\n"
+"*																		\n"
+"* This file contains the probe definition. Replaces ProbeCalibConfigs.xml.				\n"
+"*																		\n"
+"* ==== <filebase>.fts													\n"
+"*																		\n"
+"* This file contains the frame timestamps. This is a sequence of						\n"
+"* newline-separated floating-point numbers in milliceconds. The starting point			\n"
+"* is irrelevant. The number of timestamps must equal the number of us frames.			\n"
+"																		\n"
+"*																		\n"
+"* ==== <filebase>.tp													\n"
+"*																		\n"
+"* This file contains the tracking positions. This is a newline-separated				\n"
+"* sequence of matrices, one for each tracking sample. Each matrix is the prMt,			\n"
+"* i.e. the transform from tool to patient reference.					\n"
+"* The last line of the matrix (always containing 0 0 0 1) is omitted. The matrix		\n"
+"* numbers is whitespace-separated with newline between rows. Thus the number of		\n"
+"* lines in this file is (# tracking positions) x 3.									\n"
+"*																		\n"
+"*																		\n"
+"* ==== <filebase>.tts													\n"
+"*																		\n"
+"* This file contains the tracking timestamps. The format equals .fts ,					\n"
+"* but the number of timestamps equals the number of tracking positions.				\n"
+"*																		\n"
+"* ==== <filebase>.fp													\n"
+"*																		\n"
+"* This file contains the frame positions. This is a newline-separated					\n"
+"* sequence of matrices, one for each US frame. Each matrix is the rMu,					\n"
+"* i.e. the transform from lower-left centered image space to							\n"
+"* global reference.													\n"
+"* The last line of the matrix (always containing 0 0 0 1) is omitted. The matrix		\n"
+"* numbers is whitespace-separated with newline between rows. Thus the number of		\n"
+"* lines in this file is (# tracking positions) x 3.									\n"
+"*																		\n"
+"*																		\n"
+"*/																		\n";
+
+	QFile file(reconstructionFolder+"/"+session+".README.txt");
+	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	{
+		ssc::messageManager()->sendError("Cannot open "+file.fileName());
+		return;
+	}
+	QTextStream stream(&file);
+	stream << text;
+	file.close();
 }
 
 QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compression)
@@ -255,12 +396,13 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	this->writeTrackerTimestamps2(path, session, mReconstructData.mPositions);
 	this->writeTrackerTransforms2(path, session, mReconstructData.mPositions);
 	this->writeUSTimestamps2(path, session, mReconstructData.mFrames);
+	this->writeUSTransforms(path, session, mReconstructData.mFrames);
 	this->writeProbeConfiguration2(path, session, mReconstructData.mProbeData.mData, mReconstructData.mProbeUid);
-
+	this->writeREADMEFile(path, session);
 
 	CachedImageDataContainerPtr imageData = boost::shared_dynamic_cast<CachedImageDataContainer>(mReconstructData.mUsRaw->getImageContainer());
 	if (imageData)
-		this->writeUSImages(path, imageData, compression);
+		this->writeUSImages(path, imageData, compression, mReconstructData.mFrames);
 	else
 		mReport << "failed to find frame data, save failed.";
 

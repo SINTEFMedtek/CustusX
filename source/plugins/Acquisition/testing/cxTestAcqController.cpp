@@ -37,9 +37,11 @@
 #include "cxUsReconstructionFileReader.h"
 #include "cxImageDataContainer.h"
 #include "sscStringDataAdapterXml.h"
+#include "cxProbe.h"
 
 TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
 {
+	mNumberOfExpectedStreams = 1;
 }
 
 ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
@@ -60,7 +62,7 @@ void TestAcqController::setupVideo()
 	std::cout << "\nTestAcqController::initialize() init video" << std::endl;
 	cx::videoService()->getVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
 	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::DataLocations::getBundlePath() + "/../../../apps/OpenIGTLinkServer/OpenIGTLinkServer");
-	cx::videoService()->getVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1").arg(mAcqDataFilename));
+	cx::videoService()->getVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1 %2").arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
 	mVideoSource = cx::videoService()->getActiveVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 
@@ -74,9 +76,11 @@ void TestAcqController::setupProbe()
 	ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(ssc::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, ssc::ProbeData> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
-	dummyTool->setProbeSector(probedata.second);
+	ssc::ProbePtr probe = cx::Probe::New("","");
+	probe->setData(probedata.second);
+	dummyTool->setProbeSector(probe);
 	// TODO should be auto, but doesnt, might because tooman is not initialized
-	dummyTool->getProbe()->setRTSource(mVideoSource);
+//	dummyTool->getProbe()->setRTSource(mVideoSource);
 	CPPUNIT_ASSERT(dummyTool->getProbe());
 	CPPUNIT_ASSERT(dummyTool->getProbe()->isValid());
 	dummyTool->setVisible(true);
@@ -104,13 +108,16 @@ void TestAcqController::initialize()
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
 	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
-	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(videoSourcesChanged()), this, SLOT(setupProbe()));
+//	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(videoSourcesChanged()), this, SLOT(setupProbe()));
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(start()));
 }
 
 void TestAcqController::videoConnectedSlot()
 {
 	std::cout << "Video is connected, waiting for streams to arrive..." << std::endl;
+
+	// make sure all sources have started streaming before running probe setup (there might be several sources)
+	QTimer::singleShot(500, this, SLOT(setupProbe()));
 }
 
 void TestAcqController::start()
@@ -147,11 +154,12 @@ void TestAcqController::acquisitionDataReadySlot()
 
 void TestAcqController::saveDataCompletedSlot(QString path)
 {
-	QTimer::singleShot(100,   qApp, SLOT(quit()) );
+	if (!mAcquisition->getNumberOfSavingThreads())
+		QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
 	// read file and print info - this is the result of the file pathway
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
-	mFileOutputData = fileReader->readAllFiles(path, "calFilesPath""");
+	mFileOutputData.push_back(fileReader->readAllFiles(path, ""));
 }
 
 void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
@@ -193,7 +201,13 @@ void TestAcqController::verify()
 {
 	std::cout << " ** Resulting ssc::USReconstructInputData memory content:" << std::endl;
 	this->verifyFileData(mMemOutputData);
-	std::cout << " ** Resulting ssc::USReconstructInputData file content:" << std::endl;
-	this->verifyFileData(mFileOutputData);
+
+	CPPUNIT_ASSERT(mNumberOfExpectedStreams==mFileOutputData.size());
+
+	for (unsigned i=0; i< mNumberOfExpectedStreams; ++i)
+	{
+		std::cout << QString(" ** Resulting ssc::USReconstructInputData file content [%1]:").arg(i) << std::endl;
+		this->verifyFileData(mFileOutputData[i]);
+	}
 }
 

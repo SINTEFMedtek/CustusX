@@ -46,6 +46,7 @@ SET( SOURCE_FILES
 
 SET( cxPluginUSReconstructionLogic_LIB_FILES
     SSC
+    cxUtilities
 #    cxUtilities 
 #    cxSettings
 #    cxUtilities
