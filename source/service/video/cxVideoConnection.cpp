@@ -107,6 +107,7 @@ bool VideoConnection::isConnected() const
 
 void VideoConnection::connectedSlot(bool on)
 {
+	std::cout << "VideoConnection::connectedSlot " << on << std::endl;
 	mConnected = on;
 
 	if (on)
