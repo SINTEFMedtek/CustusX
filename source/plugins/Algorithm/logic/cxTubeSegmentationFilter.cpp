@@ -345,7 +345,6 @@ void TubeSegmentationFilter::inputChangedSlot()
 
 void TubeSegmentationFilter::parametersFileChanged()
 {
-	std::cout << mParameterFile.toStdString() << " vs. " << this->getStringOption("parameters")->getValue().toStdString() << std::endl;
 	if(mParameterFile != this->getStringOption("parameters")->getValue())
 		QTimer::singleShot(0, this, SLOT(loadNewParameters()));
 }
