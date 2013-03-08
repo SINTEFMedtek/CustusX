@@ -72,6 +72,7 @@ private slots:
 
 private:
 	std::vector<ssc::VideoSourcePtr> getRecordingVideoSources();
+	bool getWriteColor() const;
 
 	AcquisitionPtr mBase;
 //	ssc::VideoSourcePtr mRTSource;

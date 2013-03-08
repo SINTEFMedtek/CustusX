@@ -468,7 +468,7 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
     //this->calibrateTimeStamps(0.0, 1.0);
     this->applyTimeCalibration();
 
-	cx::USReconstructInputDataAlgorithm::transformPositionsTo_prMu(&mFileData);
+	cx::USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(&mFileData);
     //mPos (in mPositions) is now prMu
     this->interpolatePositions();
     // mFrames: now mPos as prMu

@@ -39,6 +39,7 @@ public:
 	~UsReconstructionFileMaker();
 
 	static QString createUniqueFolder(QString patientFolder, QString sessionDescription);
+	static QString createFolder(QString patientFolder, QString sessionDescription);
 	ssc::USReconstructInputData getReconstructData();
 
 	/** Write data to disk. Assume videoRecorder has saved images in another location, reuse filenames from
@@ -60,7 +61,8 @@ private:
 	bool writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	void writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid);
-	void writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression);
+	void writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression, std::vector<ssc::TimedPosition> pos);
+	void writeREADMEFile(QString reconstructionFolder, QString session);
 
 	bool writeTransforms(QString filename, std::vector<ssc::TimedPosition> ts, QString type);
 	static bool findNewSubfolder(QString subfolderAbsolutePath);

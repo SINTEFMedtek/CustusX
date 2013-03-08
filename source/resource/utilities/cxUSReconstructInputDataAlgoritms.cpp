@@ -17,7 +17,7 @@
 namespace cx
 {
 
-void USReconstructInputDataAlgorithm::transformPositionsTo_prMu(ssc::USReconstructInputData* data)
+void USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(ssc::USReconstructInputData* data)
 {
     // Transform from image coordinate syst with origin in upper left corner
     // to t (tool) space. TODO check is u is ul corner or ll corner.
@@ -30,6 +30,21 @@ void USReconstructInputDataAlgorithm::transformPositionsTo_prMu(ssc::USReconstru
         data->mPositions[i].mPos = prMt * tMu;
     }
     //mPos is prMu
+}
+
+void USReconstructInputDataAlgorithm::transformFramePositionsTo_prMu(ssc::USReconstructInputData* data)
+{
+    // Transform from image coordinate syst with origin in upper left corner
+    // to t (tool) space. TODO check is u is ul corner or ll corner.
+    ssc::Transform3D tMu = data->mProbeData.get_tMu() * data->mProbeData.get_uMv();
+
+	//mFrames is prMt
+    for (unsigned i = 0; i < data->mFrames.size(); i++)
+    {
+        ssc::Transform3D prMt = data->mFrames[i].mPos;
+        data->mFrames[i].mPos = prMt * tMu;
+    }
+    //mFrames is prMu
 }
 
 std::vector<double> USReconstructInputDataAlgorithm::interpolateFramePositionsFromTracking(ssc::USReconstructInputData *data)
