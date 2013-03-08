@@ -207,16 +207,15 @@ void USAcquisition::saveSession()
 
 //	ssc::ToolPtr probe = this->getTool();
 
-	bool writeColor = mBase->getPluginData()->getReconstructer()->getParams()->mAngioAdapter->getValue();
-
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
 		UsReconstructionFileMakerPtr fileMaker;
-		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+mVideoRecorder[i]->getSource()->getUid()));
+//		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+mVideoRecorder[i]->getSource()->getUid()));
+		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid()));
 
 		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(mVideoRecorder[i], trackerRecordedData,
 																									mRecordingTool,
-																									writeColor);
+																									this->getWriteColor());
 		fileMaker->setReconstructData(reconstructData);
 
 		// Use instead of filemaker->write(), this writes only images, other stuff kept in memory.
@@ -226,7 +225,7 @@ void USAcquisition::saveSession()
 		mBase->getPluginData()->getReconstructer()->selectData(reconstructData);
 		emit acquisitionDataReady();
 
-		QString saveFolder = UsReconstructionFileMaker::createUniqueFolder(patientService()->getPatientData()->getActivePatientFolder(), session->getDescription());
+		QString saveFolder = UsReconstructionFileMaker::createFolder(patientService()->getPatientData()->getActivePatientFolder(), session->getDescription());
 
 		// now start saving of data to the patient folder, compressed version:
 		QFuture<QString> fileMakerFuture =
@@ -297,6 +296,13 @@ std::vector<ssc::VideoSourcePtr> USAcquisition::getRecordingVideoSources()
 	return retval;
 }
 
+bool USAcquisition::getWriteColor() const
+{
+	bool writeColor = mBase->getPluginData()->getReconstructer()->getParams()->mAngioAdapter->getValue()
+	        ||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
+	return writeColor;
+}
+
 void USAcquisition::recordStarted()
 {
 	// assert that previous recording have been cleared
@@ -307,22 +313,20 @@ void USAcquisition::recordStarted()
 	std::vector<ssc::VideoSourcePtr> sources = this->getRecordingVideoSources();
 	RecordSessionPtr session = mBase->getLatestSession();
 
+	QString tempBaseFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+	QString cacheFolder = UsReconstructionFileMaker::createUniqueFolder(tempBaseFolder, session->getDescription());
+
+	mBase->getPluginData()->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
+
 	for (unsigned i=0; i<sources.size(); ++i)
 	{
-		QString tempBaseFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
-		QString cacheFolder = UsReconstructionFileMaker::createUniqueFolder(tempBaseFolder, session->getDescription());
-
-		mBase->getPluginData()->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
-		bool writeColor = mBase->getPluginData()->getReconstructer()->getParams()->mAngioAdapter->getValue()
-				||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
-
 		SavingVideoRecorderPtr videoRecorder;
 		videoRecorder.reset(new SavingVideoRecorder(
 		                         sources[i],
 								 cacheFolder,
-								 session->getDescription()+sources[i]->getUid(),
+		                         QString("%1_%2").arg(session->getDescription()).arg(sources[i]->getUid()),
 								 false, // no compression when saving to cache
-								 writeColor));
+								 this->getWriteColor()));
 		videoRecorder->startRecord();
 		mVideoRecorder.push_back(videoRecorder);
 	}
