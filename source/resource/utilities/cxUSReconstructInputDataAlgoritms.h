@@ -35,7 +35,12 @@ struct USReconstructInputDataAlgorithm
      * Pre:  mPos is prMt
      * Post: mPos is prMu
      */
-    static void transformPositionsTo_prMu(ssc::USReconstructInputData* data);
+    static void transformTrackingPositionsTo_prMu(ssc::USReconstructInputData* data);
+	/**
+     * Pre:  mFrames is prMt
+     * Post: mFrames is prMu
+     */
+    static void transformFramePositionsTo_prMu(ssc::USReconstructInputData* data);
 
     /** Find frame positions based on the existing tool positions and timestamps for both
       * tools and frames.
