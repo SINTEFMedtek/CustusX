@@ -131,6 +131,8 @@ CachedImageDataContainer::~CachedImageDataContainer()
 
 vtkImageDataPtr CachedImageDataContainer::get(unsigned index)
 {
+//	SSC_ASSERT(index < this->size());
+//	SSC_ASSERT(mImages[index]);
 	vtkImageDataPtr retval = mImages[index]->getImage();
 	mImages[index]->purge();
 	return retval;

@@ -189,7 +189,7 @@ MHDImageSender::Data MHDImageSender::initializeSecondaryData(vtkImageDataPtr sou
 	}
 
 //	mRawUid = QString("%1-%3 [%2]").arg(QFileInfo(mArguments["filename"]).fileName()).arg(colorFormat);
-	retval.mRawUid = QString("uchar %1 [%2]").arg(QFileInfo(filename).fileName()).arg(colorFormat);
+	retval.mRawUid = QString("uchar %1[%2]").arg(QFileInfo(filename).fileName()).arg(colorFormat);
 
 	retval.mDataSource.reset(new SplitFramesContainer(retval.mImageData));
 	retval.mCurrentFrame = 0;
