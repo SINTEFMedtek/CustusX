@@ -26,6 +26,8 @@ public:
 	void verify();
 
 	QString mConnectionMethod;
+	QString mAdditionalGrabberArg;
+	int mNumberOfExpectedStreams;
 
 private slots:
 	void newFrameSlot();
@@ -45,7 +47,7 @@ private:
 	void verifyFileData(ssc::USReconstructInputData data);
 
 	ssc::USReconstructInputData mMemOutputData;
-	ssc::USReconstructInputData mFileOutputData;
+	std::vector<ssc::USReconstructInputData> mFileOutputData;
 	QString mAcqDataFilename;
 
 	double mRecordDuration; ///< duration of recording in ms.

@@ -51,7 +51,6 @@ QStringList ImageSenderSonix::getArgumentDescription()
 
 ImageSenderSonix::ImageSenderSonix(QObject* parent) :
     ImageSender(parent),
-	mSocket(0),
 	mEmitStatusMessage(false),
 	mLastFrameTimestamp(0.0),
 	mCurrentFrameTimestamp(0.0)
@@ -168,9 +167,9 @@ void ImageSenderSonix::initializeSonixGrabber()
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 }
 
-bool ImageSenderSonix::startStreaming(QTcpSocket* socket)
+bool ImageSenderSonix::startStreaming(GrabberSenderPtr sender)
 {
-	mSocket = socket;
+	mSender = sender;
 	mSonixGrabber->Record();
 	mEmitStatusMessage = true;
 	std::cout << "Started streaming from sonix device" << std::endl;
@@ -180,17 +179,15 @@ bool ImageSenderSonix::startStreaming(QTcpSocket* socket)
 void ImageSenderSonix::stopStreaming()
 {
   mSonixGrabber->Stop();
-  mSocket = NULL;
+  mSender.reset();
 }
 
 void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 {
 	mCurrentFrameTimestamp = frame.mTimestamp;
 
-	if(!mSocket)
-		{
-			return;
-		}
+	if (!mSender || !mSender->isReady())
+		return;
 
   //TODO: Get info like origin from frame and create a IGTLinkUSStatusMessage
   if (frame.mNewStatus || mEmitStatusMessage)
@@ -237,6 +234,7 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
   retval->SetDepthEnd((frame.bly-frame.mOrigin[1]) * frame.mSpacing[1]);	// End of sector in mm from origin
   //As ROI is a bit wide we subtract the width by 0.3 mm
   retval->SetWidth((frame.urx -  frame.ulx ) * frame.mSpacing[0] - 0.3);			// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+  retval->SetDeviceName("Sonix[BGRX]"); // TODO write something useful here
 
   //std::cout << "uly: " << frame.uly << " bly: " << frame.bly << std::endl;
   //std::cout << "spacing: " << frame.mSpacing[0] << "  " << frame.mSpacing[1] << std::endl;
@@ -268,7 +266,8 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
   retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   //std::cout << "Frame spacing: " << frame.mSpacing[0] << " " << frame.mSpacing[1] << std::endl;
   retval->SetScalarType(frame.mPixelFormat); //Use frame.mPixelFormat directly
-  retval->SetDeviceName("ImageSenderSonix [BGRX]"); // TODO write something useful here
+//  retval->SetDeviceName("ImageSenderSonix [BGRX]"); // TODO write something useful here
+  retval->SetDeviceName("Sonix[BGRX]"); // TODO write something useful here
   retval->SetSubVolume(size,offset);
   retval->AllocateScalars();
 
@@ -304,35 +303,43 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
 }
 void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
 {
-	if(!mSocket)
+	if (!mSender || !mSender->isReady())
 		return;
-  if(mSocket->bytesToWrite() > mMaxBufferSize)
-    return;
+
+//	if(!mSocket)
+//		return;
+//  if(mSocket->bytesToWrite() > mMaxBufferSize)
+//    return;
 
   for(int i=0; i<sendNumberOfMessages; ++i)
   {
     IGTLinkImageMessage::Pointer message = this->getLastImageMessageFromQueue();
     if(!message)
       break;
-    message->Pack();
-    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
+    mSender->send(message);
+//    message->Pack();
+//    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
 void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
 {
-	if(!mSocket)
+	if (!mSender || !mSender->isReady())
 		return;
+
+//	if(!mSocket)
+//		return;
   //std::cout << "ImageSenderSonix::sendOpenIGTLinkStatusSlot" << std::endl;
-  if(mSocket->bytesToWrite() > mMaxBufferSize)
-    return;
+//  if(mSocket->bytesToWrite() > mMaxBufferSize)
+//    return;
 
   for(int i=0; i<sendNumberOfMessage; ++i)
   {
     IGTLinkUSStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
     if(!message)
       break;
-    message->Pack();
-    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
+    mSender->send(message);
+//    message->Pack();
+//    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
 /** Add the image message to a thread-safe queue
