@@ -71,10 +71,6 @@ ssc::ProbeSectorPtr Probe::getSector(QString uid)
 
 bool Probe::isValid() const
 {
-//	std::cout << "Probe::isValid()" << streamXml2String(this->getProbeData("active")) << std::endl;
-//	std::cout << "  probedefs: " << mProbeData.size() << std::endl;
-//	for (std::map<QString, ssc::ProbeData>::const_iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
-//		std::cout << "  probe\n" << streamXml2String(iter->second) << std::endl;
 	return this->getProbeData("active").getType() != ssc::ProbeData::tNONE;
 }
 
@@ -115,10 +111,6 @@ void Probe::setSoundSpeedCompensationFactor(double factor)
 ssc::ProbeData Probe::getData(QString uid) const
 {
 	ssc::ProbeData retval = this->getProbeData(uid);
-
-//	std::cout << "Probe::getData " << uid << std::endl;
-//	std::cout << "Probe::getData " << uid << "\n" << streamXml2String(retval) << std::endl;
-
 	return retval;
 }
 
@@ -153,16 +145,14 @@ void Probe::setRTSource(ssc::VideoSourcePtr source)
 
 	// must have same uid as original: the uid identifies the video source
 	mSource[source->getUid()].reset(new ssc::ProbeAdapterRTSource(source->getUid(), mSelf.lock(), source));
-//	mSource[source->getUid()].reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
 	emit sectorChanged();
 }
 
 void Probe::removeRTSource(ssc::VideoSourcePtr source)
 {
-	SSC_LOG("");
 	if (!source)
 		return;
-	if (mSource.count(source->getUid()))
+	if (!mSource.count(source->getUid()))
 		return;
 
 	mSource.erase(source->getUid());
