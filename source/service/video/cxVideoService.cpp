@@ -78,7 +78,9 @@ VideoService::VideoService()
 
 VideoService::~VideoService()
 {
-
+	disconnect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SLOT(autoSelectActiveVideoSource()));
+	disconnect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SLOT(autoSelectActiveVideoSource()));
+	mVideoConnection.reset();
 }
 
 void VideoService::autoSelectActiveVideoSource()
@@ -90,6 +92,8 @@ void VideoService::autoSelectActiveVideoSource()
 
 void VideoService::setActiveVideoSource(QString uid)
 {
+	mActiveVideoSource = mEmptyVideoSource;
+
 	std::vector<ssc::VideoSourcePtr> sources = videoService()->getVideoSources();
 	for (unsigned i=0; i<sources.size(); ++i)
 		if (sources[i]->getUid()==uid)
@@ -104,9 +108,9 @@ void VideoService::setActiveVideoSource(QString uid)
 		ssc::ProbePtr probe = iter->second->getProbe();
 		if (!probe)
 			continue;
-		if (!probe->getAvailableVideoSources().count(mActiveVideoSource->getUid()))
+		if (!probe->getAvailableVideoSources().count(uid))
 			continue;
-		probe->setActiveStream(mActiveVideoSource->getUid());
+		probe->setActiveStream(uid);
 	}
 
 	emit activeVideoSourceChanged();

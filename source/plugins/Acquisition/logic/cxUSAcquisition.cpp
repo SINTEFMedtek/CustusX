@@ -188,6 +188,7 @@ ssc::TimedTransformMap USAcquisition::getRecording(RecordSessionPtr session)
 	if(mRecordingTool)
 		retval = mRecordingTool->getSessionHistory(session->getStartTime(), session->getStopTime());
 
+
 	if(retval.empty())
 	{
 		ssc::messageManager()->sendError("Could not find any tracking data from session "+session->getUid()+". Volume data only will be written.");
@@ -340,10 +341,12 @@ void USAcquisition::recordStopped()
 		mVideoRecorder[i]->stopRecord();
 	ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
 	this->saveSession();
+	mRecordingTool.reset();
 }
 
 void USAcquisition::recordCancelled()
 {
+	mRecordingTool.reset();
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
 		mVideoRecorder[i]->stopRecord();
