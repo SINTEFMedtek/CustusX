@@ -47,21 +47,23 @@ class USAcquisition : public QObject
 	Q_OBJECT
 public:
 	USAcquisition(AcquisitionPtr base, QObject* parent = 0);
-	QString getWhatsMissingText() const { return mWhatsMissing; }
+	virtual ~USAcquisition();
+//	QString getWhatsMissingText() const { return mWhatsMissing; }
+	int getNumberOfSavingThreads() const { return mSaveThreads.size(); }
 
 signals:
-	void toolChanged();
+//	void toolChanged();
 	void acquisitionDataReady(); ///< emitted when data is acquired and sent to the reconstruction module
 	void saveDataCompleted(QString mhdFilename); ///< emitted when data has been saved to file
 
 private slots:
-	void probeChangedSlot();
+//	void probeChangedSlot();
 	void fileMakerWriteFinished();
-	void dominantToolChangedSlot();
-	void setTool(ssc::ToolPtr tool);
-	ssc::ToolPtr getTool();
+//	void dominantToolChangedSlot();
+//	void setTool(ssc::ToolPtr tool);
+//	ssc::ToolPtr getTool();
 
-	void clearSlot();
+//	void clearSlot();
 	void checkIfReadySlot();
 	void saveSession();
 	void recordStarted();
@@ -69,20 +71,26 @@ private slots:
 	void recordCancelled();
 
 private:
-	AcquisitionPtr mBase;
-	ssc::VideoSourcePtr mRTSource;
-	SavingVideoRecorderPtr mVideoRecorder;
-	ssc::ToolPtr mTool;
+	std::vector<ssc::VideoSourcePtr> getRecordingVideoSources();
+	bool getWriteColor() const;
 
-	UsReconstructionFileMakerPtr mCurrentSessionFileMaker;
+	AcquisitionPtr mBase;
+//	ssc::VideoSourcePtr mRTSource;
+//	SavingVideoRecorderPtr mVideoRecorder;
+
+	// video and tool used at start of recording:
+	std::vector<SavingVideoRecorderPtr> mVideoRecorder;
+	ssc::ToolPtr mRecordingTool;
+
+//	UsReconstructionFileMakerPtr mCurrentSessionFileMaker;
 
 	std::list<QFutureWatcher<QString>*> mSaveThreads;
 
-	QString mWhatsMissing;
+//	QString mWhatsMissing;
 
 	virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session);
-	void connectVideoSource(ssc::VideoSourcePtr source);
-	void connectToPureVideo();
+//	void connectVideoSource(ssc::VideoSourcePtr source);
+//	void connectToPureVideo();
 
 };
 typedef boost::shared_ptr<USAcquisition> USAcquisitionPtr;

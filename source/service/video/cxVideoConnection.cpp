@@ -199,6 +199,21 @@ void VideoConnection::disconnectServer()
 	{
 		mSources[i]->setInput(ssc::ImagePtr());
 	}
+
+	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	if (tool && tool->getProbe())
+	{
+		ssc::ProbePtr probe = tool->getProbe();
+
+		for (unsigned i=0; i<mSources.size(); ++i)
+		{
+	//		std::cout << "***********============= set source in probe " << tool->getUid() << std::endl;
+			probe->removeRTSource(mSources[i]);
+		}
+	}
+
+	mSources.clear();
+	emit videoSourcesChanged();
 }
 
 void VideoConnection::clientFinishedSlot()
@@ -227,6 +242,7 @@ void VideoConnection::updateSonixStatus(ssc::ProbeData msg)
 	// existing values (such as temporal calibration).
 	// Note that the 'active' data is get while the 'uid' data is set.
 	ssc::ProbeData data = probe->getData();
+//	std::cout << "VideoConnection::updateSonixStatus pre \n" << streamXml2String(data) << std::endl;
 
 	data.setUid(msg.getUid());
 	data.setType(msg.getType());
@@ -237,6 +253,8 @@ void VideoConnection::updateSonixStatus(ssc::ProbeData msg)
 	image.mSpacing = msg.getImage().mSpacing;
 	image.mClipRect_p = msg.getImage().mClipRect_p;
 	data.setImage(image);
+
+//	std::cout << "VideoConnection::updateSonixStatus post\n" << streamXml2String(data) << std::endl;
 
 	probe->setData(data);
 }
@@ -292,6 +310,7 @@ std::vector<ssc::VideoSourcePtr> VideoConnection::getVideoSources()
  */
 void VideoConnection::connectVideoToProbe()
 {
+//	SSC_LOG("");
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (!tool)
 		return;

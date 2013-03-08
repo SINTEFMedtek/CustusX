@@ -40,17 +40,30 @@ void TestAcquisition::testStoreMHDSourceLocalServer()
 {
 	TestAcqController controller(NULL);
 	controller.mConnectionMethod = "Local Server";
+	controller.mNumberOfExpectedStreams = 1;
 	controller.initialize();
 	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	controller.verify();
-
 }
 
 void TestAcquisition::testStoreMHDSourceDirectLink()
 {
 	TestAcqController controller(NULL);
 	controller.mConnectionMethod = "Direct Link";
+	controller.mNumberOfExpectedStreams = 1;
+	controller.initialize();
+	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
+	qApp->exec();
+	controller.verify();
+}
+
+void TestAcquisition::testStoreMultipleMHDSourceDirectLink()
+{
+	TestAcqController controller(NULL);
+	controller.mConnectionMethod = "Direct Link";
+	controller.mAdditionalGrabberArg = "--secondary";
+	controller.mNumberOfExpectedStreams = 2;
 	controller.initialize();
 	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();

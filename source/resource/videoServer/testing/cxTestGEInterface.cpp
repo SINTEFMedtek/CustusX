@@ -26,7 +26,7 @@ void TestGEInterface::testInit()
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
-	args["testmode"] = "1";
+	args["test"] = "2D";
 	args["useOpenCL"] = "0";
 	cx::ImageSenderPtr imageSender = cx::ImageSenderFactory().getFromArguments(args);
 	CPPUNIT_ASSERT(imageSender);
@@ -64,7 +64,7 @@ void TestGEInterface::testGEStreamer()
 //	geStreamer.SetupExportParameters(true, true, true, true);
 
 	//                                         (hostIp, streamPort, commandPort, testMode));
-	CPPUNIT_ASSERT(geStreamer.ConnectToScanner("127.0.0.1", 6543,    -1,          true));
+	CPPUNIT_ASSERT(geStreamer.ConnectToScanner("127.0.0.1", 6543,    -1,         data_streaming::test3D));
 
 
 	geStreamer.WaitForImageData();

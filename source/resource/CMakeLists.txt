@@ -75,14 +75,16 @@ SET ( cxResource_SOURCE
     utilities/cxProcessWrapper.cpp
     utilities/sscUSFrameData.h
     utilities/sscUSFrameData.cpp
-	utilities/cxSavingVideoRecorder.h
-	utilities/cxSavingVideoRecorder.cpp
-	utilities/cxImageDataContainer.h
-	utilities/cxImageDataContainer.cpp
-	utilities/cxFileHelpers.h
-	utilities/cxFileHelpers.cpp
-	utilities/cxUSReconstructInputData.h
-	utilities/cxUSReconstructInputData.cpp
+    utilities/cxSavingVideoRecorder.h
+    utilities/cxSavingVideoRecorder.cpp
+    utilities/cxImageDataContainer.h
+    utilities/cxImageDataContainer.cpp
+    utilities/cxFileHelpers.h
+    utilities/cxFileHelpers.cpp
+    utilities/cxUSReconstructInputData.h
+    utilities/cxUSReconstructInputData.cpp
+    utilities/cxUSReconstructInputDataAlgoritms.h
+    utilities/cxUSReconstructInputDataAlgoritms.cpp
 
 #	OpenIGTLinkUtilities/cxIGTLinkImageMessage.h
 #	OpenIGTLinkUtilities/cxIGTLinkImageMessage.cpp    

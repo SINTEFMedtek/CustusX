@@ -128,7 +128,7 @@ void ViewWrapperVideo::streamActionSlot()
 		return;
 
 	QString uid = theAction->data().toString();
-	std::cout << "selected source  " << uid << std::endl;
+//	std::cout << "selected source  " << uid << std::endl;
 //	mSelectedVideoSource = uid;
 	mViewGroup->setVideoSource(uid);
 //	this->connectStream();
@@ -147,6 +147,11 @@ void ViewWrapperVideo::connectStream()
 		return;
 //	std::cout << "ViewWrapperVideo::connectStream() selected=" << mViewGroup->getVideoSource()  << std::endl;
 	ssc::VideoSourcePtr source = this->getSourceFromService(mViewGroup->getVideoSource());
+//	if (source)
+//		std::cout << "ViewWrapperVideo::connectStream() " << source->getUid() << std::endl;
+//	else
+//		std::cout << "ViewWrapperVideo::connectStream() NULL" << std::endl;
+
 
 	QString uid;
 	if (source)
@@ -159,6 +164,12 @@ void ViewWrapperVideo::connectStream()
 		if (tool->getProbe()->getAvailableVideoSources().count(uid))
 		{
 			newTool = tool;
+			source = tool->getProbe()->getRTSource(uid);
+
+//			if (source)
+//				std::cout << "ViewWrapperVideo::connectStream() from probe " << source->getUid() << std::endl;
+//			else
+//				std::cout << "ViewWrapperVideo::connectStream() from probe NULL" << std::endl;
 		}
 	}
 

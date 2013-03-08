@@ -47,7 +47,7 @@ public:
   ~ImageSenderSonix();
   
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(QTcpSocket* socket);
+	virtual bool startStreaming(GrabberSenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
@@ -65,7 +65,7 @@ signals:
 protected:
     void initializeSonixGrabber();
 private:
-  QTcpSocket* mSocket;
+  GrabberSenderPtr mSender;
   QTimer* mTimer;
   StringMap mArguments;
   bool mEmitStatusMessage; ///< Emit new US status message
