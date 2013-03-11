@@ -52,7 +52,6 @@ public:
 	explicit Filter();
 	virtual ~Filter() {}
 
-
 	/**
 	  *  Return a unique string for this algorithm.
 	  */
@@ -131,6 +130,11 @@ public:
 	  */
 	virtual bool postProcess() = 0;
 
+signals:
+	/**
+	 * Signals that the filters internal structures has changed.
+	 */
+	void changed();
 
 };
 
