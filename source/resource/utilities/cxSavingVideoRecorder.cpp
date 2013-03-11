@@ -180,6 +180,7 @@ SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString sav
 	mImages.reset(new cx::CachedImageDataContainer());
 	mImages->setDeleteFilesOnRelease(true);
 
+	mPrefix = prefix;
 	mSaveFolder = saveFolder;
 	mSaveThread.reset(new VideoRecorderSaveThread(NULL, saveFolder, prefix, compressed, writeColor));
 	mSaveThread->start();
@@ -239,6 +240,8 @@ void SavingVideoRecorder::deleteFolder(QString folder)
 {
 	QStringList filters;
 	filters << "*.fts" << "*.mhd" << "*.raw" << "*.zraw";
+	for (int i=0; i<filters.size(); ++i) // prepend prefix, ensuring files from other savers are not deleted.
+		filters[i] = mPrefix + filters[i];
 
 	QDir dir(folder);
 	QStringList files = dir.entryList(filters);
