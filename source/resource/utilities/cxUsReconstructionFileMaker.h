@@ -62,6 +62,7 @@ private:
 	bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	void writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid);
 	void writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression, std::vector<ssc::TimedPosition> pos);
+	void writeMask(QString path, QString session, ssc::ImagePtr mask);
 	void writeREADMEFile(QString reconstructionFolder, QString session);
 
 	bool writeTransforms(QString filename, std::vector<ssc::TimedPosition> ts, QString type);
@@ -70,7 +71,6 @@ private:
 	void fillFramePositions(ssc::USReconstructInputData* data) const;
 
 	ssc::USReconstructInputData mReconstructData;
-
 	QString mSessionDescription;
 	QStringList mReport;
 };

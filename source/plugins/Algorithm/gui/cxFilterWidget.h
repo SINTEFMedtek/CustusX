@@ -47,6 +47,7 @@ public:
 	void setOptions(QString uid, std::vector<SelectDataStringDataAdapterBasePtr> options, bool showAdvanced);
 	QString getCurrentUid();
 	void showAdvanced(bool show); //whether or not to display adapters marked as advanced
+	void rebuild();
 
 private:
 	void clear();
@@ -56,6 +57,7 @@ private:
 	QStackedLayout* mStackedLayout;
 	std::vector<DataAdapterPtr> mOptions;
 	QString mUid;
+	bool mShowAdvanced;
 };
 
 /** Helper widget for displaying the input/output/options part of a Filter.
@@ -81,6 +83,8 @@ public:
 private slots:
 	void obscuredSlot(bool obscured);
 	void showAdvancedOptions(int state);
+	void rebuildOptions();
+
 private:
 
 	ssc::XmlOptionFile mOptions;
