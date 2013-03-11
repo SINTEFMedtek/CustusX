@@ -40,6 +40,9 @@ USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(par
 	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(checkIfReadySlot()));
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
 	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(checkIfReadySlot()));
+	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
+	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(checkIfReadySlot()));
+
 //	connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
 
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
@@ -211,7 +214,6 @@ void USAcquisition::saveSession()
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
 		UsReconstructionFileMakerPtr fileMaker;
-//		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+mVideoRecorder[i]->getSource()->getUid()));
 		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid()));
 
 		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(mVideoRecorder[i], trackerRecordedData,
