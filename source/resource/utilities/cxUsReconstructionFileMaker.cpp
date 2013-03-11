@@ -81,7 +81,10 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(Saving
 	}
 
 	vtkImageDataPtr mask = retval.mProbeData.getMask();
-	retval.mMask = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
+	if (mask)
+	{
+		retval.mMask = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
+	}
 	if (tool)
 		retval.mProbeUid = tool->getUid();
 
@@ -289,9 +292,12 @@ void UsReconstructionFileMaker::writeUSImages(QString path, CachedImageDataConta
 
 void UsReconstructionFileMaker::writeMask(QString path, QString session, ssc::ImagePtr mask)
 {
-	SSC_ASSERT(mask!=NULL);
-
 	QString filename = QString("%1/%2.mask.mhd").arg(path).arg(session);
+	if (!mask)
+	{
+		ssc::messageManager()->sendWarning(QString("No mask found, ignoring write to %1").arg(filename));
+		return;
+	}
 
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
 	writer->SetInput(mask->getBaseVtkImageData());
