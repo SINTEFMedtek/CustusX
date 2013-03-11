@@ -287,6 +287,20 @@ void UsReconstructionFileMaker::writeUSImages(QString path, CachedImageDataConta
 	}
 }
 
+void UsReconstructionFileMaker::writeMask(QString path, QString session, ssc::ImagePtr mask)
+{
+	SSC_ASSERT(mask!=NULL);
+
+	QString filename = QString("%1/%2.mask.mhd").arg(path).arg(session);
+
+	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
+	writer->SetInput(mask->getBaseVtkImageData());
+	writer->SetFileName(cstring_cast(filename));
+	writer->SetCompression(false);
+	writer->Write();
+}
+
+
 void UsReconstructionFileMaker::writeREADMEFile(QString reconstructionFolder, QString session)
 {
 	QString text = ""
@@ -370,6 +384,12 @@ void UsReconstructionFileMaker::writeREADMEFile(QString reconstructionFolder, QS
 "* numbers is whitespace-separated with newline between rows. Thus the number of		\n"
 "* lines in this file is (# tracking positions) x 3.									\n"
 "*																		\n"
+"* ==== <filebase>.mask.mhd												\n"
+"*																		\n"
+"* This file contains the image mask. The binary image shows what parts	\n"
+"* of the frame images contain valid US data. This file is only written,\n"
+"* not read. It can be constructed from the probe data.					\n"
+"*																		\n"
 "*																		\n"
 "*/																		\n";
 
@@ -398,6 +418,7 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	this->writeUSTimestamps2(path, session, mReconstructData.mFrames);
 	this->writeUSTransforms(path, session, mReconstructData.mFrames);
 	this->writeProbeConfiguration2(path, session, mReconstructData.mProbeData.mData, mReconstructData.mProbeUid);
+	this->writeMask(path, session, mReconstructData.mMask);
 	this->writeREADMEFile(path, session);
 
 	CachedImageDataContainerPtr imageData = boost::shared_dynamic_cast<CachedImageDataContainer>(mReconstructData.mUsRaw->getImageContainer());
