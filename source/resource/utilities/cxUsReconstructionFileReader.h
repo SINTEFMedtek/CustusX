@@ -111,6 +111,11 @@ ProbeCalibration = <not used>
  * numbers is whitespace-separated with newline between rows. Thus the number of
  * lines in this file is (# tracking positions) x 3.
  *
+ * \subsection us_acq_file_format_mask <filebase>.mask.mhd
+ *
+ * This file contains the image mask. The binary image shows what parts
+ * of the frame images contain valid US data. This file is only written,
+ * not read. It can be constructed from the probe data.
  *
  */
 class UsReconstructionFileReader
