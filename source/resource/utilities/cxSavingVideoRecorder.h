@@ -120,18 +120,19 @@ public:
 	  */
 	void completeSave();
 
-	/**
-	  * Delete all contents in folder created by this class
-	  */
-	static void deleteFolder(QString folder);
 	ssc::VideoSourcePtr getSource() { return mSource; }
 
 private slots:
 	void newFrameSlot();
 private:
+	/**
+	  * Delete all contents in folder created by this class
+	  */
+	void deleteFolder(QString folder);
 	CachedImageDataContainerPtr mImages;
 	std::vector<double> mTimestamps;
 	QString mSaveFolder;
+	QString mPrefix;
 	ssc::VideoSourcePtr mSource;
 	boost::shared_ptr<VideoRecorderSaveThread> mSaveThread;
 
