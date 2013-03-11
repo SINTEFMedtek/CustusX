@@ -17,12 +17,28 @@ public:
 	void tearDown();
 
 	void testConstructor();
+	/**
+	  * Test encode/decode of a simple grayscale image.
+	  */
 	void testDecodeEncodeImage();
-//	void testDecodeEncodeColorImage();
+	/**
+	  * Test encode/decode of a ssc::ProbeData.
+	  */
 	void testDecodeEncodeProbeData();
-
+	/**
+	  * Test encode/decode of a RGBA color image.
+	  * The output should be a RGBX image.
+	  */
 	void testDecodeEncodeColorImageRGBA();
+	/**
+	  * Test encode/decode of a BGR color image.
+	  * The output should be a RGBX image.
+	  */
 	void testDecodeEncodeColorImageBGR();
+	/**
+	  * Test encode/decode of a ARGB color image.
+	  * The output should be a RGBX image.
+	  */
 	void testDecodeEncodeColorImageARGB();
 
 public:

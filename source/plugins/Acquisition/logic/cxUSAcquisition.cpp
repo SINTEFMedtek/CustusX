@@ -214,7 +214,6 @@ void USAcquisition::saveSession()
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
 		UsReconstructionFileMakerPtr fileMaker;
-//		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+mVideoRecorder[i]->getSource()->getUid()));
 		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid()));
 
 		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(mVideoRecorder[i], trackerRecordedData,
