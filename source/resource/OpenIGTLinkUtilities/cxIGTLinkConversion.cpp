@@ -286,7 +286,7 @@ ssc::ProbeData IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMe
 		retval.setImage(imageData);
 	}
 
-	return retval;
+	return this->decode(retval);
 }
 
 ssc::ImagePtr IGTLinkConversion::decode(ssc::ImagePtr msg)
@@ -303,6 +303,15 @@ ssc::ImagePtr IGTLinkConversion::decode(ssc::ImagePtr msg)
 	ssc::ImagePtr retval(new ssc::Image(newUid, copy));
 	retval->setAcquisitionTime(msg->getAcquisitionTime());
 	return retval;
+}
+
+ssc::ProbeData IGTLinkConversion::decode(ssc::ProbeData msg)
+{
+	QString newUid = msg.getUid();
+	QString format = this->extractColorFormat(msg.getUid(), &newUid);
+	msg.setUid(newUid);
+
+	return msg;
 }
 
 QString IGTLinkConversion::extractColorFormat(QString deviceName, QString* cleanedDeviceName)
