@@ -97,6 +97,7 @@ void GrabberSenderDirectLink::send(ssc::ImagePtr msg)
 	if (!this->isReady())
 		return;
 
+	mImage = msg;
 	// decode color format:
 	IGTLinkConversion converter;
 	mImage = converter.decode(msg);
