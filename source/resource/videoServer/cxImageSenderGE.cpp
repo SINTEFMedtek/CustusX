@@ -328,17 +328,18 @@ void ImageSenderGE::send()
 
 void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
 {
-	vtkImageDataPtr copy = vtkImageDataPtr::New();
-	copy->DeepCopy(img);
+//	vtkImageDataPtr copy = vtkImageDataPtr::New();
+//	copy->DeepCopy(img);
 	if (geometryChanged)
 	{
-		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, copy);
+		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, img);
 		mSender->send(frameMessage);
+		std::cout << uid << " Nyquist " << geometry.vNyquist << std::endl;
 	}
 
 	// CustusX does not handle nonzero origin - set to zero, but AFTER getFrameStatus() is called.
 	vtkImageChangeInformationPtr center = vtkImageChangeInformationPtr::New();
-	center->SetInput(copy);
+	center->SetInput(img);
 	center->SetOutputOrigin(0,0,0);
 	center->Update();
 
