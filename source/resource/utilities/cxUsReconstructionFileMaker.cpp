@@ -71,6 +71,7 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(Saving
 	{
 		ssc::TimedPosition current;
 		current.mTime = fts[i];
+		current.mPos = ssc::Transform3D::Identity();
 		// current.mPos = not written - will be found from track positions during reconstruction.
 		retval.mFrames.push_back(current);
 	}
@@ -287,6 +288,8 @@ void UsReconstructionFileMaker::writeUSImages(QString path, CachedImageDataConta
 
 		ssc::CustomMetaImagePtr customReader = ssc::CustomMetaImage::create(filename);
 		customReader->setTransform(pos[i].mPos);
+		customReader->setModality("US");
+		customReader->setImageType(mSessionDescription);
 	}
 }
 
