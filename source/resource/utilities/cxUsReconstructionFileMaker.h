@@ -56,11 +56,11 @@ public:
 	void setReconstructData(ssc::USReconstructInputData data) { mReconstructData = data; }
 
 private:
-	bool writeUSTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
+	bool writeUSTimestamps(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	bool writeUSTransforms(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
-	bool writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
-	bool writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
-	void writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid);
+	bool writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
+	bool writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
+	void writeProbeConfiguration(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid);
 	void writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression, std::vector<ssc::TimedPosition> pos);
 	void writeMask(QString path, QString session, ssc::ImagePtr mask);
 	void writeREADMEFile(QString reconstructionFolder, QString session);
