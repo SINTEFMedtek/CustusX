@@ -83,6 +83,7 @@ typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 typedef boost::shared_ptr<class Texture3DSlicerRep> Texture3DSlicerRepPtr;
 typedef boost::shared_ptr<class ToolRep2D> ToolRep2DPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
 typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
