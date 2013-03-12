@@ -295,7 +295,12 @@ ssc::ImagePtr IGTLinkConversion::decode(ssc::ImagePtr msg)
 	QString format = this->extractColorFormat(msg->getUid(), &newUid);
 	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, msg->getBaseVtkImageData());
 	imageRGB->Update();
-	ssc::ImagePtr retval(new ssc::Image(newUid, imageRGB));
+
+	// copy because the image will eventually be passed to another thread, and we cannot have the entire pipeline dragged along.
+	vtkImageDataPtr copy = vtkImageDataPtr::New();
+	copy->DeepCopy(imageRGB);
+
+	ssc::ImagePtr retval(new ssc::Image(newUid, copy));
 	retval->setAcquisitionTime(msg->getAcquisitionTime());
 	return retval;
 }
@@ -336,6 +341,8 @@ vtkImageDataPtr IGTLinkConversion::createFilterAny2RGB(int R, int G, int B, vtkI
 {
 	input->Update();
 	if (input->GetNumberOfScalarComponents() == 1)
+		return input;
+	if (( input->GetNumberOfScalarComponents()==3 )&&( R==0 )&&( G==1 )&&( B==2 ))
 		return input;
 
 	vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
