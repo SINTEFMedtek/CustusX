@@ -55,12 +55,21 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	this->addColorPoint(smin, Qt::black);
 	this->addColorPoint(smax, Qt::white);
 
-	// set values suitable for CT.
-//	this->setLevel(srange * 0.15 + smin);
-//	this->setWindow(srange * 0.5);
-	// changed default values (2012.03.29-CA) : the previous was usually a bad guess, especially for MR. Use almost entire range instead
-	this->setLevel(smin + 0.8*srange * 0.5);
-	this->setWindow(0.8*srange);
+	if (base->GetNumberOfScalarComponents() <=2)
+	{
+		// set values suitable for CT.
+	//	this->setLevel(srange * 0.15 + smin);
+	//	this->setWindow(srange * 0.5);
+		// changed default values (2012.03.29-CA) : the previous was usually a bad guess, especially for MR. Use almost entire range instead
+		this->setLevel(smin + 0.8*srange * 0.5);
+		this->setWindow(0.8*srange);
+	}
+	else
+	{
+		// set full range for color images. Assume they want to be rendered as is.
+		this->setLevel(smin + srange * 0.5);
+		this->setWindow(srange);
+	}
 	this->transferFunctionsChangedSlot();//Need to update transfer function after setting window/level
 
 //	connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged())); called by the slot.
