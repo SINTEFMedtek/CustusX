@@ -24,6 +24,7 @@
 
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkImageData.h>
 
 #include "sscView.h"
 #include "sscSliceProxy.h"
@@ -58,6 +59,7 @@
 #include "sscSlices3DRep.h"
 #include "sscEnumConverter.h"
 #include "sscManualTool.h"
+#include "sscImage2DRep3D.h"
 
 #include "sscData.h"
 #include "sscAxesRep.h"
@@ -575,9 +577,18 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 {
 	if (boost::shared_dynamic_cast<ssc::Image>(data))
 	{
-		ssc::VolumetricBaseRepPtr rep = RepManager::getInstance()->getVolumetricRep(
-						boost::shared_dynamic_cast<ssc::Image>(data));
-		return rep;
+		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+		if (image->getBaseVtkImageData()->GetDimensions()[2]==1)
+		{
+			cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New(data->getUid()+"image2DRep");
+			rep->setImage(image);
+			return rep;
+		}
+		else
+		{
+			ssc::VolumetricBaseRepPtr rep = RepManager::getInstance()->getVolumetricRep(image);
+			return rep;
+		}
 	}
 	else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
 	{

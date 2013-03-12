@@ -103,7 +103,7 @@ void UsReconstructionFileMaker::fillFramePositions(ssc::USReconstructInputData* 
 	cx::USReconstructInputDataAlgorithm::transformFramePositionsTo_prMu(data);
 }
 
-bool UsReconstructionFileMaker::writeTrackerTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+bool UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
 {
 	bool success = false;
 
@@ -135,7 +135,7 @@ bool UsReconstructionFileMaker::writeUSTransforms(QString reconstructionFolder, 
 	return this->writeTransforms(reconstructionFolder+"/"+session+".fp", ts, "frame transforms rMu");
 }
 
-bool UsReconstructionFileMaker::writeTrackerTransforms2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+bool UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
 {
 	return this->writeTransforms(reconstructionFolder+"/"+session+".tp", ts, "tracking transforms prMt");
 }
@@ -179,7 +179,7 @@ bool UsReconstructionFileMaker::writeTransforms(QString filename, std::vector<ss
 	return success;
 }
 
-bool UsReconstructionFileMaker::writeUSTimestamps2(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+bool UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
 {
 	bool success = false;
 
@@ -208,7 +208,7 @@ bool UsReconstructionFileMaker::writeUSTimestamps2(QString reconstructionFolder,
 /**
  * Write probe configuration to file. This works even for configs not saved to the ProbeCalibConfigs.xml file.
  */
-void UsReconstructionFileMaker::writeProbeConfiguration2(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid)
+void UsReconstructionFileMaker::writeProbeConfiguration(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid)
 {
 	ssc::XmlOptionFile file = ssc::XmlOptionFile(reconstructionFolder + "/" + session + ".probedata.xml", "navnet");
 	data.addXml(file.getElement("configuration"));
@@ -419,11 +419,11 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	mReport << "Made reconstruction folder: " + path;
 	QString session = mSessionDescription;
 
-	this->writeTrackerTimestamps2(path, session, mReconstructData.mPositions);
-	this->writeTrackerTransforms2(path, session, mReconstructData.mPositions);
-	this->writeUSTimestamps2(path, session, mReconstructData.mFrames);
+	this->writeTrackerTimestamps(path, session, mReconstructData.mPositions);
+	this->writeTrackerTransforms(path, session, mReconstructData.mPositions);
+	this->writeUSTimestamps(path, session, mReconstructData.mFrames);
 	this->writeUSTransforms(path, session, mReconstructData.mFrames);
-	this->writeProbeConfiguration2(path, session, mReconstructData.mProbeData.mData, mReconstructData.mProbeUid);
+	this->writeProbeConfiguration(path, session, mReconstructData.mProbeData.mData, mReconstructData.mProbeUid);
 	this->writeMask(path, session, mReconstructData.mMask);
 	this->writeREADMEFile(path, session);
 
