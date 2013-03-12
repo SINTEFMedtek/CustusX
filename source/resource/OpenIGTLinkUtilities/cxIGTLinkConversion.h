@@ -75,6 +75,7 @@ public:
 	  * and return as new image.
 	  */
 	ssc::ImagePtr decode(ssc::ImagePtr msg);
+	ssc::ProbeData decode(ssc::ProbeData msg);
 
 private:
 	/** Extract the color format string from enclosing brackets inside
