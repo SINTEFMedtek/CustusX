@@ -109,7 +109,9 @@ void GrabberSenderDirectLink::send(ssc::ProbeData msg)
 {
 	if (!this->isReady())
 		return;
-	mUSStatus = msg;
+	// decode color format:
+	IGTLinkConversion converter;
+	mUSStatus = converter.decode(msg);
 	emit newUSStatus();
 }
 
