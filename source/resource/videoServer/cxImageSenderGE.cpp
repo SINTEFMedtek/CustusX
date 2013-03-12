@@ -305,7 +305,7 @@ void ImageSenderGE::send()
 	QString uid;
 	if (mExportScanconverted && mImgExportedStream->GetScanConvertedImage())
 	{
-		uid = "ScanConverted [BGRA]";
+		uid = "ScanConverted [RGBA]";
 		send(uid, mImgExportedStream->GetScanConvertedImage(), mFrameGeometry, mFrameGeometryChanged);
 	}
 	if (mExportTissue && mImgExportedStream->GetTissueImage())
