@@ -1,9 +1,16 @@
-/*
- * cxUSAcquisition.cpp
- *
- *  \date May 12, 2011
- *      \author christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
 #include "cxUSAcquisition.h"
 
@@ -35,7 +42,6 @@ namespace cx
 USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(parent), mBase(base)
 {
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
-//	connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(c4learSlot()));
 	connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
 	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(checkIfReadySlot()));
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
@@ -43,16 +49,11 @@ USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(par
 	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(checkIfReadySlot()));
 	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(checkIfReadySlot()));
 
-//	connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
-
 	connect(mBase.get(), SIGNAL(started()), this, SLOT(recordStarted()));
 	connect(mBase.get(), SIGNAL(stopped()), this, SLOT(recordStopped()));
 	connect(mBase.get(), SIGNAL(cancelled()), this, SLOT(recordCancelled()));
 
-//	this->dominantToolChangedSlot();
-//	this->probeChangedSlot();
 	this->checkIfReadySlot();
-//	this->connectToPureVideo();
 }
 
 USAcquisition::~USAcquisition()
@@ -60,19 +61,10 @@ USAcquisition::~USAcquisition()
 
 }
 
-//void USAcquisition::clearSlot()
-//{
-////	if (mTool)
-////		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this,
-////		           SLOT(checkIfReadySlot()));
-//	mRecordingTool.reset();
-//}
-
 void USAcquisition::checkIfReadySlot()
 {
 	bool tracking = ssc::toolManager()->isTracking();
 	bool streaming = videoService()->getVideoConnection()->isConnected();
-//	bool streaming = mRTSource && mRTSource->isStreaming();
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 
 	QString mWhatsMissing;
@@ -92,15 +84,6 @@ void USAcquisition::checkIfReadySlot()
 			mWhatsMissing.append("<font color=red>Need to start tracking.</font><br>");
 		if(!streaming)
 			mWhatsMissing.append("<font color=red>Need to start streaming.</font><br>");
-//		if(mRTSource)
-//		{
-//			if(!streaming)
-//				mWhatsMissing.append("<font color=red>Need to start streaming.</font><br>");
-//		}
-//		else
-//		{
-//			mWhatsMissing.append("<font color=red>Need to get a stream.</font><br>");
-//		}
 	}
 
 	int saving = mSaveThreads.size();
@@ -120,77 +103,12 @@ void USAcquisition::checkIfReadySlot()
 	mBase->setReady(streaming, mWhatsMissing);
 }
 
-//void USAcquisition::setTool(ssc::ToolPtr tool) {
-//	if (mTool && tool && (mTool->getUid() == tool->getUid()))
-//		return;
-
-//	if (mTool)
-//		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(checkIfReadySlot()));
-//	mTool = tool;
-//	if (mTool)
-//		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(checkIfReadySlot()));
-//	emit toolChanged();
-//}
-
-//ssc::ToolPtr USAcquisition::getTool()
-//{
-//	return mTool;
-//}
-
-//void USAcquisition::probeChangedSlot()
-//{
-//	ssc::ToolPtr tool = this->getTool();
-//	if(!tool)
-//		return;
-//	ssc::ProbePtr probe = tool->getProbe();
-//	if(!probe)
-//		return;
-//	if(!probe->getRTSource())
-//		return;
-
-//	this->connectVideoSource(probe->getRTSource());
-//}
-
-//void USAcquisition::connectToPureVideo()
-//{
-//	if (mRTSource)
-//		return;
-
-//	this->connectVideoSource(videoService()->getActiveVideoSource());
-//}
-
-//void USAcquisition::connectVideoSource(ssc::VideoSourcePtr source)
-//{
-//	//Don't change source if it is the same as earlier
-//	if (mRTSource == source)
-//		return;
-
-////	if (source)
-////		std::cout << "USAcquisition::connectVideoSource " << source->getUid() << std::endl;
-
-//	if(mRTSource)
-//	{
-//		disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-//	}
-
-//	mRTSource = source;
-
-//	if(mRTSource)
-//	{
-//		connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-//	}
-
-//	this->checkIfReadySlot();
-//}
-
 ssc::TimedTransformMap USAcquisition::getRecording(RecordSessionPtr session)
 {
 	ssc::TimedTransformMap retval;
 
-//	ssc::ToolPtr tool = this->getTool();
 	if(mRecordingTool)
 		retval = mRecordingTool->getSessionHistory(session->getStartTime(), session->getStopTime());
-
 
 	if(retval.empty())
 	{
@@ -208,8 +126,6 @@ void USAcquisition::saveSession()
 		return;
 
 	ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
-
-//	ssc::ToolPtr probe = this->getTool();
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
@@ -258,26 +174,12 @@ void USAcquisition::fileMakerWriteFinished()
 		if (!(*iter)->isFinished())
 			continue;
 		QString result = (*iter)->future().result();
-//		QFutureWatcher<QString>* watcher = *iter;
-//		emit saveDataCompleted(watcher->future().result());
 		delete *iter;
 		iter = mSaveThreads.erase(iter);
 		emit saveDataCompleted(result);
 	}
 	this->checkIfReadySlot();
 }
-
-//void USAcquisition::dominantToolChangedSlot()
-//{
-//	ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
-
-//	ssc::ProbePtr probe = tool->getProbe();
-//	if(!probe)
-//		return;
-
-//	this->setTool(tool);
-//	this->probeChangedSlot();
-//}
 
 std::vector<ssc::VideoSourcePtr> USAcquisition::getRecordingVideoSources()
 {
@@ -287,7 +189,6 @@ std::vector<ssc::VideoSourcePtr> USAcquisition::getRecordingVideoSources()
 	{
 		ssc::ProbePtr probe = mRecordingTool->getProbe();
 		QStringList sources = probe->getAvailableVideoSources();
-//		std::cout << "no of sources " << sources.size() << std::endl;
 		for (unsigned i=0; i<sources.size(); ++i)
 			retval.push_back(probe->getRTSource(sources[i]));
 	}
