@@ -31,7 +31,7 @@
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
 #include "sscVolumeHelpers.h"
-#include "sscPresetTransferFunctions3D.h"
+#include "sscTransferFunctions3DPresets.h"
 #include "sscTimeKeeper.h"
 #include "sscUSFrameData.h"
 #include "sscLogger.h"
