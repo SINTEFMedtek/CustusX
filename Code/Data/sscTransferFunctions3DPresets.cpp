@@ -45,7 +45,6 @@ TransferFunctions3DPresets::TransferFunctions3DPresets(ssc::XmlOptionFile preset
 
 QStringList TransferFunctions3DPresets::getPresetList(QString modality)
 {
-	std::cout << "getPresetList" << std::endl;
 	return this->generatePresetList(modality);
 }
 
