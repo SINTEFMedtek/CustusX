@@ -48,7 +48,8 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
     Data/sscVtkFileMesh.h
-    Data/sscPresetTransferFunctions3D.h
+    Data/sscPresets.h
+    Data/sscTransferFunctions3DPresets.h
     Data/sscPointMetric.h
     Data/sscDistanceMetric.h
     Data/sscPlaneMetric.h
@@ -365,8 +366,10 @@ SET( SSC_SOURCE_FILES
     Data/sscSNW2Volume.h
     Data/sscRegistrationTransform.cpp
     Data/sscRegistrationTransform.h
-    Data/sscPresetTransferFunctions3D.h
-    Data/sscPresetTransferFunctions3D.cpp
+    Data/sscPresets.h
+    Data/sscPresets.cpp
+    Data/sscTransferFunctions3DPresets.h
+    Data/sscTransferFunctions3DPresets.cpp
     Data/sscPointMetric.h
     Data/sscPointMetric.cpp
     Data/sscDistanceMetric.h

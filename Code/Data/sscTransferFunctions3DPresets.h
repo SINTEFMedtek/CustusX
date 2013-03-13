@@ -17,10 +17,11 @@
 //
 // See sscLicense.txt for more information.
 
-#ifndef SSCPRESETTRANSFERFUNCTIONS3D_H_
-#define SSCPRESETTRANSFERFUNCTIONS3D_H_
+#ifndef SSCTRANSFERFUNCTIONS3DPRESET_H_
+#define SSCTRANSFERFUNCTIONS3DPRESET_H_
 
 #include <QDomElement>
+#include "sscPresets.h"
 #include "sscImage.h"
 #include "sscXmlOptionItem.h"
 
@@ -31,7 +32,7 @@ class QDomDocument;
 namespace ssc
 {
 
-typedef boost::shared_ptr<class PresetTransferFunctions3D> PresetTransferFunctions3DPtr;
+typedef boost::shared_ptr<class TransferFunctions3DPresets> TransferFunctions3DPresetsPtr;
 
 /**
  * \date 11. juni 2010
@@ -42,12 +43,12 @@ typedef boost::shared_ptr<class PresetTransferFunctions3D> PresetTransferFunctio
  *
  * \ingroup sscData
  */
-class PresetTransferFunctions3D : public QObject
+class TransferFunctions3DPresets : public Presets
 {
 	Q_OBJECT
 public:
-	PresetTransferFunctions3D(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile);
-	~PresetTransferFunctions3D();
+	TransferFunctions3DPresets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile);
+	virtual ~TransferFunctions3DPresets(){};
 
 	void save(QString name, ssc::ImagePtr image, bool _2D=true, bool _3D=true);
 	void load(QString name, ssc::ImagePtr image, bool _2D=true, bool _3D=true);
@@ -60,20 +61,21 @@ public:
 	QStringList getPresetList(QString modality=""); ///< returns a list of the preset names for the given modality
 	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
 	void deletePresetData(QString name, bool _2D=true, bool _3D=true); ///< Delete the preset data node
-
-signals:
-	void changed();
+//
+//signals:
+//	void changed();
 
 private:
 	QStringList generatePresetList(QString modality); ///< internally generate the preset list
-	ssc::XmlOptionFile getPresetNode(const QString& presetName);
-	ssc::XmlOptionFile getCustomFile();
+//	ssc::XmlOptionFile getPresetNode(const QString& presetName);
+//	ssc::XmlOptionFile getCustomFile();
 
-	ssc::XmlOptionFile mPresetFile;
-	ssc::XmlOptionFile mCustomFile;
-	QDomElement mLastReturnedPreset;
+//	ssc::XmlOptionFile mPresetFile;
+//	ssc::XmlOptionFile mCustomFile;
+
+	//QDomElement mLastReturnedPreset; //NOT USED?
 };
 
 }//namespace cx
 
-#endif /* SSCPRESETTRANSFERFUNCTIONS3D_H_ */
+#endif /* SSCTRANSFERFUNCTIONS3DPRESET_H_ */
