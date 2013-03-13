@@ -84,7 +84,7 @@ ProbeData::ProbeData(TYPE type) :
 
 Vector3D ProbeData::ProbeImageData::transform_p_to_u(const Vector3D& q_p) const
 {
-	ssc::Vector3D c(q_p[0], double(mSize.height()) - q_p[1] - 1, 0);
+	ssc::Vector3D c(q_p[0], double(mSize.height()) - q_p[1] - 1, -q_p[2]);
 	c = multiply_elems(c, mSpacing);
 	return c;
 }
