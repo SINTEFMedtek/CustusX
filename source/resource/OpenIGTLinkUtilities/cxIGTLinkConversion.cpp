@@ -32,9 +32,6 @@ namespace
 // Function to generate random matrix.
 void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
 {
-  //float position[3];
-  //float orientation[4];
-
   matrix[0][0] = 1.0;  matrix[1][0] = 0.0;  matrix[2][0] = 0.0; matrix[3][0] = 0.0;
   matrix[0][1] = 0.0;  matrix[1][1] = -1.0;  matrix[2][1] = 0.0; matrix[3][1] = 0.0;
   matrix[0][2] = 0.0;  matrix[1][2] = 0.0;  matrix[2][2] = 1.0; matrix[3][2] = 0.0;
@@ -44,8 +41,6 @@ void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
 
 IGTLinkConversion::IGTLinkConversion()
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 IGTLinkConversion::~IGTLinkConversion()
@@ -163,12 +158,6 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 	QString deviceName = message->GetDeviceName();
 //  std::cout << "size : " << ssc::Vector3D(size[0], size[1], size[2]) << std::endl;
 
-	//for linear probes used in other substance than the scanner is calibrated for we want to compensate
-	//for the change in sound of speed in that substance, do this by changing spacing in the images y-direction,
-	//this is only valid for linear probes
-//	spacing[1] *= mLinearSoundSpeedCompesation;
-
-
 	imageImport->SetNumberOfScalarComponents(1);
 
 	switch (scalarType)
@@ -212,15 +201,8 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 	// get timestamp from igtl second-format:
 	igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
 	message->GetTimeStamp(timestamp);
-//  static double last = 0;
-//  if (last==0)
-//    last = timestamp->GetTimeStamp();
-//  std::cout << "raw time" << timestamp->GetTimeStamp() << ", " << timestamp->GetTimeStamp() - last << std::endl;
 
 	double timestampMS = timestamp->GetTimeStamp() * 1000;
-//	mLastTimestamp += mTimestampCalibration;
-
-//	mDebug_orgTime = timestamp->GetTimeStamp() * 1000; // ms
 	imageImport->SetDataOrigin(0, 0, 0);
 	imageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
 	imageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2] - 1);
@@ -229,20 +211,18 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 
 	imageImport->Modified();
 
-	// retrieve  index counter from _99_
-	QString format = "";
-	QRegExp colorFormat("\\[[A-Za-z]{1,4}\\]");
-	if (colorFormat.indexIn(deviceName) > 0)
-	{
-		format = colorFormat.cap(0).remove("[").remove("]");
-	}
-//	std::cout << QString("found format %1 from %2").arg(format).arg(deviceName) << std::endl;
-
-	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, imageImport->GetOutput());
-	imageRGB->Update();
-
-	ssc::ImagePtr retval(new ssc::Image(deviceName, imageRGB));
+	ssc::ImagePtr retval(new ssc::Image(deviceName, imageImport->GetOutput()));
 	retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
+	retval = this->decode(retval);
+
+//	QString format = this->extractColorFormat(deviceName);
+////	std::cout << QString("found format %1 from %2").arg(format).arg(deviceName) << std::endl;
+
+//	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, imageImport->GetOutput());
+//	imageRGB->Update();
+
+//	ssc::ImagePtr retval(new ssc::Image(deviceName, imageRGB));
+//	retval->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestampMS));
 
 	return retval;
 }
@@ -265,7 +245,6 @@ IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ssc::ProbeData input)
 	//  std::cout << "depthStart: " << mFrameGeometry.depthStart << " end: " << mFrameGeometry.depthEnd << std::endl;
 	//  std::cout << "width: " << mFrameGeometry.width << std::endl;
 	//  std::cout << "tilt: " << mFrameGeometry.tilt << std::endl;
-
 
 	return retval;
 }
@@ -307,86 +286,50 @@ ssc::ProbeData IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMe
 		retval.setImage(imageData);
 	}
 
+	return this->decode(retval);
+}
+
+ssc::ImagePtr IGTLinkConversion::decode(ssc::ImagePtr msg)
+{
+	QString newUid = msg->getUid();
+	QString format = this->extractColorFormat(msg->getUid(), &newUid);
+	vtkImageDataPtr imageRGB = this->createFilterFormat2RGB(format, msg->getBaseVtkImageData());
+	imageRGB->Update();
+
+	// copy because the image will eventually be passed to another thread, and we cannot have the entire pipeline dragged along.
+	vtkImageDataPtr copy = vtkImageDataPtr::New();
+	copy->DeepCopy(imageRGB);
+
+	ssc::ImagePtr retval(new ssc::Image(newUid, copy));
+	retval->setAcquisitionTime(msg->getAcquisitionTime());
 	return retval;
 }
 
-////Copied from OpenIGTLinkRTSource::getValidProbe()
-//ProbePtr IGTLinkConversion::getValidProbe()
-//{
-//	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
-//	if (!tool)
-//		return ProbePtr();
-//	ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
-//	if (!probe)
-//	{
-//		ssc::messageManager()->sendWarning("OpenIGTLinkRTSource::updateSonixStatus: Found no Probe");
-//		return ProbePtr();
-//	}
+ssc::ProbeData IGTLinkConversion::decode(ssc::ProbeData msg)
+{
+	QString newUid = msg.getUid();
+	QString format = this->extractColorFormat(msg.getUid(), &newUid);
+	msg.setUid(newUid);
 
-//	return probe;
-//}
+	return msg;
+}
 
+QString IGTLinkConversion::extractColorFormat(QString deviceName, QString* cleanedDeviceName)
+{
+	QString format = "";
+	QRegExp colorFormat("\\[[A-Za-z]{1,4}\\]");
+	if (colorFormat.indexIn(deviceName) > 0)
+	{
+		format = colorFormat.cap(0).remove("[").remove("]");
+	}
 
+	if (cleanedDeviceName)
+	{
+		*cleanedDeviceName = deviceName.remove(colorFormat).trimmed();
+	}
 
-//void OpenIGTLinkRTSource::updateImage(IGTLinkImageMessage::Pointer message)
-//{
-//	static CyclicActionTimer timer("Update Video Image");
-//	timer.begin();
-//#if 1 // remove to use test image
-//	if (!message)
-//	{
-//		std::cout << "got empty image !!!" << std::endl;
-//		this->setEmptyImage();
-//		return;
-//	}
-
-//	this->updateImageImportFromIGTMessage(message);
-//	mImageImport->GetOutput()->Update();
-//#endif
-
-//	mTimeout = false;
-//	mTimeoutTimer->start();
-
-//	// this seems to add 3ms per update()
-//	// insert a ARGB->RBGA filter. TODO: need to check the input more thoroughly here, this applies only to the internal CustusX US pipeline.
-//	if (mImageImport->GetOutput()->GetNumberOfScalarComponents() == 4 && !mFilter_IGTLink_to_RGB)
-//	{
-//		// the cx sonix server sends BGRX
-//		if (QString(message->GetDeviceName()) == "ImageSenderSonix")
-//		{
-//			mFilter_IGTLink_to_RGB = this->createFilterBGR2RGB(mImageImport->GetOutput());
-//		}
-//		// the cx mac QT grabber server sends ARGB,
-//		// the cx opencv server also sends ARGB, in order to mimic the mac server.
-//		else if (QString(message->GetDeviceName()) == "cxOpenCVGrabber" || QString(message->GetDeviceName()) == "GrabberServer")
-//		{
-//			mFilter_IGTLink_to_RGB = this->createFilterARGB2RGB(mImageImport->GetOutput());
-//		}
-//		else // default: strip alpha channel (should not happen, but cx expects RGB or Gray, not alpha)
-//		{
-//			mFilter_IGTLink_to_RGB = this->createFilterRGBA2RGB(mImageImport->GetOutput());
-//		}
-
-//		if (mFilter_IGTLink_to_RGB)
-//			mRedirecter->SetInput(mFilter_IGTLink_to_RGB);
-//	}
-//	timer.time("convert");
-
-//	//	std::cout << "emit newframe:\t" << QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString() << std::endl;
-//	emit newFrame();
-//	timer.time("emit");
-
-//	if (timer.intervalPassed())
-//	{
-//		static int counter=0;
-////		if (++counter%10==0)
-////			ssc::messageManager()->sendDebug(timer.dumpStatisticsSmall());
-//		timer.reset();
-//	}
-
-//}
-
-
+	return format;
+}
 
 vtkImageDataPtr IGTLinkConversion::createFilterFormat2RGB(QString format, vtkImageDataPtr input)
 {
@@ -407,6 +350,8 @@ vtkImageDataPtr IGTLinkConversion::createFilterAny2RGB(int R, int G, int B, vtkI
 {
 	input->Update();
 	if (input->GetNumberOfScalarComponents() == 1)
+		return input;
+	if (( input->GetNumberOfScalarComponents()==3 )&&( R==0 )&&( G==1 )&&( B==2 ))
 		return input;
 
 	vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();

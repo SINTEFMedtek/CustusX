@@ -129,6 +129,7 @@ void TestIGTLinkUtilities::testDecodeEncodeColorImageRGBA()
 
 	this->testDecodeEncodeColorImage(values, "RGBA");
 }
+
 void TestIGTLinkUtilities::testDecodeEncodeColorImageBGR()
 {
 	//testimage
@@ -166,7 +167,9 @@ void TestIGTLinkUtilities::testDecodeEncodeColorImage(Val3VectorType values, QSt
 	QDateTime time = QDateTime::currentDateTime();
 	vtkImageDataPtr rawImage = createRGBATestImage();
 
-	ssc::ImagePtr input(new ssc::Image(QString("my_uid [%1]").arg(colorFormat), rawImage));
+	QString coreUid = "my_uid";
+
+	ssc::ImagePtr input(new ssc::Image(QString("%1 [%2]").arg(coreUid).arg(colorFormat), rawImage));
 	input->setAcquisitionTime(time);
 
 	cx::IGTLinkConversion converter;
@@ -175,7 +178,7 @@ void TestIGTLinkUtilities::testDecodeEncodeColorImage(Val3VectorType values, QSt
 
 	CPPUNIT_ASSERT(output);
 	CPPUNIT_ASSERT(time == output->getAcquisitionTime());
-	CPPUNIT_ASSERT(input->getUid() == output->getUid());
+	CPPUNIT_ASSERT(coreUid == output->getUid());
 	CPPUNIT_ASSERT(ssc::similar(Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()), Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions())));
 	CPPUNIT_ASSERT(ssc::similar(ssc::Vector3D(input->getBaseVtkImageData()->GetSpacing()), ssc::Vector3D(output->getBaseVtkImageData()->GetSpacing())));
 
@@ -187,39 +190,6 @@ void TestIGTLinkUtilities::testDecodeEncodeColorImage(Val3VectorType values, QSt
 		CPPUNIT_ASSERT(ssc::similar(this->getValue3i(output, p[0], p[1], p[2]), val));
 	}
 }
-
-//void TestIGTLinkUtilities::testDecodeEncodeColorImage()
-//{
-//	typedef std::vector<std::pair<Eigen::Array3i, Eigen::Array3i> > ValVectorType;
-//	ValVectorType values;
-//	values.push_back(std::make_pair(Eigen::Array3i(  0,   0,  0), Eigen::Array3i(255,  0,  0)));
-//	values.push_back(std::make_pair(Eigen::Array3i(100,  50,  0), Eigen::Array3i(255,  0, 50)));
-//	values.push_back(std::make_pair(Eigen::Array3i(124,  20,  0), Eigen::Array3i(255,  0, 62)));
-
-//	QDateTime time = QDateTime::currentDateTime();
-//	vtkImageDataPtr rawImage = createRGBATestImage();
-
-//	ssc::ImagePtr input(new ssc::Image("my_uid [GRBA]", rawImage));
-//	input->setAcquisitionTime(time);
-
-//	cx::IGTLinkConversion converter;
-//	cx::IGTLinkImageMessage::Pointer msg = converter.encode(input);
-//	ssc::ImagePtr output = converter.decode(msg);
-
-//	CPPUNIT_ASSERT(output);
-//	CPPUNIT_ASSERT(time == output->getAcquisitionTime());
-//	CPPUNIT_ASSERT(input->getUid() == output->getUid());
-//	CPPUNIT_ASSERT(ssc::similar(Eigen::Array3i(input->getBaseVtkImageData()->GetDimensions()), Eigen::Array3i(output->getBaseVtkImageData()->GetDimensions())));
-//	CPPUNIT_ASSERT(ssc::similar(ssc::Vector3D(input->getBaseVtkImageData()->GetSpacing()), ssc::Vector3D(output->getBaseVtkImageData()->GetSpacing())));
-
-//	for (ValVectorType::iterator iter=values.begin(); iter!=values.end(); ++iter)
-//	{
-//		Eigen::Array3i p = iter->first;
-//		Eigen::Array3i val = iter->second;
-//		CPPUNIT_ASSERT(ssc::similar(this->getValue3i(input, p[0], p[1], p[2]), val));
-//		CPPUNIT_ASSERT(ssc::similar(this->getValue3i(output, p[0], p[1], p[2]), val));
-//	}
-//}
 
 void TestIGTLinkUtilities::testDecodeEncodeProbeData()
 {
