@@ -37,19 +37,11 @@
 namespace ssc
 {
 
-SlicedImageProxy::SlicedImageProxy()
+
+ApplyLUTToImage2DProxy::ApplyLUTToImage2DProxy()
 {
-	mMatrixAxes = vtkMatrix4x4Ptr::New();
-
-	mReslicer = vtkImageReslicePtr::New();
-	mReslicer->SetInterpolationModeToLinear();
-	mReslicer->SetOutputDimensionality(2);
-	mReslicer->SetResliceAxes(mMatrixAxes);
-	//mReslicer->SetAutoCropOutput(false); //faster update rate
-	mReslicer->AutoCropOutputOn(); // fix used in 2.0.9, but slower update rate
-
 	mWindowLevel = vtkImageMapToColorsPtr::New();
-	mWindowLevel->SetInputConnection(mReslicer->GetOutputPort());
+//	mWindowLevel->SetInputConnection(mReslicer->GetOutputPort());
 	mWindowLevel->SetOutputFormatToRGBA();
 
 	mDummyImage = createDummyImageData();
@@ -59,14 +51,74 @@ SlicedImageProxy::SlicedImageProxy()
 	mRedirecter->SetInput(mDummyImage);
 }
 
-SlicedImageProxy::~SlicedImageProxy()
+ApplyLUTToImage2DProxy::~ApplyLUTToImage2DProxy()
 {
+
+}
+
+void ApplyLUTToImage2DProxy::setImage(vtkImageDataPtr image, vtkLookupTablePtr lut)
+{
+	if (image)
+	{
+		mWindowLevel->SetInput(image);
+		mWindowLevel->SetLookupTable(lut);
+		mWindowLevel->Update();
+
+		if (image->GetNumberOfScalarComponents() == 3) // color
+		{
+			// split the image into the components, apply the lut, then merge.
+
+			vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
+
+			for (int i = 0; i < 3; ++i)
+			{
+				vtkImageMapToColorsPtr windowLevel = vtkImageMapToColorsPtr::New();
+				windowLevel->SetInput(image);
+				windowLevel->SetActiveComponent(i);
+				windowLevel->SetLookupTable(lut);
+				//				if (i=2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
+				//				{
+				//					windowLevel->SetOutputFormatToLuminanceAlpha();
+				//				}
+				//				else
+				{
+					windowLevel->SetOutputFormatToLuminance();
+				}
+
+				merger->SetInput(i, windowLevel->GetOutput());
+			}
+
+			mRedirecter->SetInput(merger->GetOutput());
+			//mRedirecter->SetInput(mReslicer->GetOutput());
+		}
+		else // grayscale
+		{
+			mRedirecter->SetInput(mWindowLevel->GetOutput());
+		}
+	}
+	else // no image
+	{
+		mRedirecter->SetInput(mDummyImage);
+	}
+}
+
+
+void ApplyLUTToImage2DProxy::setLut(vtkLookupTablePtr lut)
+{
+	mRedirecter->Modified();
+	mRedirecter->Update();
+	mWindowLevel->SetLookupTable(lut);
+}
+
+vtkImageDataPtr ApplyLUTToImage2DProxy::getOutput()
+{
+	return mRedirecter->GetOutput();
 }
 
 /** Test: create small dummy data set with one voxel
  *
  */
-vtkImageDataPtr SlicedImageProxy::createDummyImageData()
+vtkImageDataPtr ApplyLUTToImage2DProxy::createDummyImageData()
 {
 	vtkImageDataPtr dummyImageData = vtkImageDataPtr::New();
 	dummyImageData->SetExtent(0, 0, 0, 0, 0, 0);
@@ -78,6 +130,30 @@ vtkImageDataPtr SlicedImageProxy::createDummyImageData()
 	unsigned char* dataPtr = static_cast<unsigned char*> (dummyImageData->GetScalarPointer());
 	*dataPtr = 0; // Set voxel to black
 	return dummyImageData;
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+SlicedImageProxy::SlicedImageProxy()
+{
+	mMatrixAxes = vtkMatrix4x4Ptr::New();
+
+	mReslicer = vtkImageReslicePtr::New();
+	mReslicer->SetInterpolationModeToLinear();
+	mReslicer->SetOutputDimensionality(2);
+	mReslicer->SetResliceAxes(mMatrixAxes);
+	//mReslicer->SetAutoCropOutput(false); //faster update rate
+	mReslicer->AutoCropOutputOn(); // fix used in 2.0.9, but slower update rate
+
+	mImageWithLUTProxy.reset(new ApplyLUTToImage2DProxy());
+}
+
+SlicedImageProxy::~SlicedImageProxy()
+{
 }
 
 void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
@@ -96,10 +172,7 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 
 void SlicedImageProxy::transferFunctionsChangedSlot()
 {
-	// needed for view::render() to work properly
-	mRedirecter->Modified();
-	mRedirecter->Update();
-	mWindowLevel->SetLookupTable(mImage->getLookupTable2D()->getOutputLookupTable());
+	mImageWithLUTProxy->setLut(mImage->getLookupTable2D()->getOutputLookupTable());
 }
 
 void SlicedImageProxy::setImage(ImagePtr image)
@@ -115,59 +188,30 @@ void SlicedImageProxy::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		// if input is 2D - use directly
-		if (mImage->getBaseVtkImageData()->GetDimensions()[2]==1)
-			mWindowLevel->SetInput(mImage->getBaseVtkImageData());
-		else
-			mWindowLevel->SetInputConnection(mReslicer->GetOutputPort());
-
 		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(transformChangedSlot()));
+	}
+
+	if (mImage)
+	{
 		mReslicer->SetInput(mImage->getBaseVtkImageData());
-		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
-		mWindowLevel->Update();
+		mReslicer->SetBackgroundLevel(mImage->getMin());
 
-		if (mImage->getBaseVtkImageData()->GetNumberOfScalarComponents() == 3) // color
-		{
-			// split the image into the components, apply the lut, then merge.
+		vtkImageDataPtr input = mReslicer->GetOutput();
+		// if input is 2D - use directly
+		if (mImage->getBaseVtkImageData()->GetDimensions()[2]==1)
+			input = mImage->getBaseVtkImageData();
 
-			vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
+		mImageWithLUTProxy->setImage(input, mImage->getLookupTable2D()->getOutputLookupTable());
 
-			for (int i = 0; i < 3; ++i)
-			{
-
-				vtkImageMapToColorsPtr windowLevel = vtkImageMapToColorsPtr::New();
-				windowLevel->SetInput(mReslicer->GetOutput());
-				windowLevel->SetActiveComponent(i);
-				windowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
-				//				if (i=2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
-				//				{
-				//					windowLevel->SetOutputFormatToLuminanceAlpha();
-				//				}
-				//				else
-				{
-					windowLevel->SetOutputFormatToLuminance();
-				}
-
-				merger->SetInput(i, windowLevel->GetOutput());
-			}
-
-			mRedirecter->SetInput(merger->GetOutput());
-			//mRedirecter->SetInput(mReslicer->GetOutput());
-		}
-		else // grayscale
-		{
-			mReslicer->SetBackgroundLevel(mImage->getMin());
-			mRedirecter->SetInput(mWindowLevel->GetOutput());
-		}
-
-		update();
 	}
 	else // no image
 	{
-		mRedirecter->SetInput(mDummyImage);
+		mImageWithLUTProxy->setImage(vtkImageDataPtr(), vtkLookupTablePtr());
 	}
+
+	this->update();
 }
 
 ImagePtr SlicedImageProxy::getImage() const
@@ -175,10 +219,9 @@ ImagePtr SlicedImageProxy::getImage() const
 	return mImage;
 }
 
-//deliver the sliced image..
 vtkImageDataPtr SlicedImageProxy::getOutput()
 {
-	return mRedirecter->GetOutput();
+	return mImageWithLUTProxy->getOutput();
 }
 
 void SlicedImageProxy::update()
@@ -194,12 +237,6 @@ void SlicedImageProxy::update()
 	//	std::cout << "iMs, "<< mSlicer->getName() <<"\n" << M << std::endl;
 
 	mMatrixAxes->DeepCopy(M.getVtkMatrix());
-
-	/*lock-out render time*/
-	/* this will probably update the pipe*/
-
-	//	mReslicer->Update(); //and the mapper
-	//	mWindowLevel->Update();
 }
 
 void SlicedImageProxy::transformChangedSlot()
