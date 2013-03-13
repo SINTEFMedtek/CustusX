@@ -212,10 +212,11 @@ bool ProbeSector::clipRectIntersectsSector() const
 	DoubleBoundingBox3D s(mPolyData->GetPoints()->GetBounds());
 	DoubleBoundingBox3D c = mData.getImage().getClipRect_u();
 
-	bool outside = ( (c[0] < s[0]) || similar(c[0],s[0], 0.01) )
-			&& ( (s[1] < c[1]) || similar(s[1],c[1], 0.01) )
-			&& ( (c[2] < s[2]) || similar(c[2],s[2], 0.01) )
-			&& ( (s[3] < c[3]) || similar(s[3],c[3], 0.01) );
+	double tol = 1; // assume 1mm tolerance
+	bool outside = ( (c[0] < s[0]) || similar(c[0],s[0], tol) )
+			&& ( (s[1] < c[1]) || similar(s[1],c[1], tol) )
+			&& ( (c[2] < s[2]) || similar(c[2],s[2], tol) )
+			&& ( (s[3] < c[3]) || similar(s[3],c[3], tol) );
 	return !outside;
 }
 
