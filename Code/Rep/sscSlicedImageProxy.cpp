@@ -76,11 +76,11 @@ void ApplyLUTToImage2DProxy::setImage(vtkImageDataPtr image, vtkLookupTablePtr l
 				windowLevel->SetInput(image);
 				windowLevel->SetActiveComponent(i);
 				windowLevel->SetLookupTable(lut);
-				//				if (i=2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
-				//				{
-				//					windowLevel->SetOutputFormatToLuminanceAlpha();
-				//				}
-				//				else
+				if (i==2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
+				{
+					windowLevel->SetOutputFormatToLuminanceAlpha();
+				}
+				else
 				{
 					windowLevel->SetOutputFormatToLuminance();
 				}
