@@ -21,7 +21,7 @@
 #include "sscAngleMetric.h"
 #include "sscXmlOptionItem.h"
 #include "cxDataLocations.h"
-#include "sscPresetTransferFunctions3D.h"
+#include "sscTransferFunctions3DPresets.h"
 
 namespace cx
 {
@@ -60,7 +60,7 @@ ssc::PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() co
 					"presetTransferFunctions");
 
 	if (!mPresetTransferFunctions3D)
-		mPresetTransferFunctions3D.reset(new ssc::PresetTransferFunctions3D(preset, custom));
+		mPresetTransferFunctions3D.reset(new ssc::TransferFunctions3DPresets(preset, custom));
 
 	return mPresetTransferFunctions3D;
 }
