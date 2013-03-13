@@ -96,7 +96,12 @@ void GrabberSenderDirectLink::send(ssc::ImagePtr msg)
 {
 	if (!this->isReady())
 		return;
+
 	mImage = msg;
+	// decode color format:
+	IGTLinkConversion converter;
+	mImage = converter.decode(msg);
+
 	emit newImage();
 }
 
@@ -104,7 +109,9 @@ void GrabberSenderDirectLink::send(ssc::ProbeData msg)
 {
 	if (!this->isReady())
 		return;
-	mUSStatus = msg;
+	// decode color format:
+	IGTLinkConversion converter;
+	mUSStatus = converter.decode(msg);
 	emit newUSStatus();
 }
 

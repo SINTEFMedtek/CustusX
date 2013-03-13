@@ -45,7 +45,8 @@ public:
 	IGTLinkImageMessage::Pointer encode(ssc::ImagePtr image);
 	/**
 	  * Decode the IGTLink message to create an image containing
-	  * image data, uid and timstamp
+	  * image data, uid and timstamp. The color format is also
+	  * converted to RGBX
 	  */
 	ssc::ImagePtr decode(IGTLinkImageMessage::Pointer msg);
 
@@ -65,7 +66,23 @@ public:
 	  */
 	ssc::ProbeData decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ssc::ProbeData base);
 
+	/**
+	  * Decode the image to standard format with standard color RGBX encoding.
+	  *
+	  * Find the substring [XYZW] in the msg uid, where each letter can be
+	  * one of RGBAX. The letters describe the image components. Rearrange
+	  * to standard RGBX format, strip format from uid,
+	  * and return as new image.
+	  */
+	ssc::ImagePtr decode(ssc::ImagePtr msg);
+	ssc::ProbeData decode(ssc::ProbeData msg);
+
 private:
+	/** Extract the color format string from enclosing brackets inside
+	  * another string, i.e find "RGBA" from "Device[RGBA]".
+	  * Also return the input without format string as cleanedDeviceName.
+	  */
+	QString extractColorFormat(QString deviceName, QString* cleanedDeviceName);
 	/** Filter that converts to RGB format based on a format string
 	  * of the form "RGBA" or any other ordering of these four letters,
 	  * the letters define the ordering of channels in the input.
