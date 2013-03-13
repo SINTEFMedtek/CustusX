@@ -60,7 +60,7 @@ public:
 	                                      bool reduceResolution=false,
 	                                      bool smoothing=true,
 	                                      bool preserveTopology=true,
-	                                      double decimation=0.8);
+	                                      double decimation=0.2);
 	/** Generate a mesh from the contour using base to generate name.
 	  * Save to dataManager.
 	  */

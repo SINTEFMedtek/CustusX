@@ -94,7 +94,7 @@ ssc::DoubleDataAdapterXmlPtr ContourFilter::getDecimationOption(QDomElement root
 {
 	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Decimation %", "",
 	                                                                            "Reduce number of triangles in output surface",
-	                                                                            0.8, ssc::DoubleRange(0, 1, 0.01), 0, root);
+	                                                                            0.2, ssc::DoubleRange(0, 1, 0.01), 0, root);
 	retval->setInternal2Display(100);
 	return retval;
 }
