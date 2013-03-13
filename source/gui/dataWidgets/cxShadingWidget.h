@@ -12,7 +12,7 @@
 #include <QCheckBox>
 #include <QDomElement>
 #include <sscImage.h>
-#include "sscPresetTransferFunctions3D.h"
+#include "sscTransferFunctions3DPresets.h"
 #include "cxActiveImageProxy.h"
 
 class QVBoxLayout;
