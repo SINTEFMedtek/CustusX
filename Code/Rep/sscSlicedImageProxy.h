@@ -31,7 +31,40 @@ typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 
 typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
+typedef boost::shared_ptr<class ApplyLUTToImage2DProxy> ApplyLUTToImage2DProxyPtr;
 
+/** \brief Helper class for applying sscLUT2D to an image.
+ *
+ * Input a 2D image and a lut.
+ * Run the image through the lut using a vtkImageMapToColors
+ * and return the output.
+ *
+ * For color input images, the lut is still applied, but is applied
+ * to each color component (i.e. relative color distribution is not changed)
+ *
+ * Used internally in SlicedImageProxy .
+ *
+ * Used by CustusX
+ *
+ * \ingroup sscProxy
+ */
+class ApplyLUTToImage2DProxy : public QObject
+{
+Q_OBJECT
+public:
+	ApplyLUTToImage2DProxy();
+	virtual ~ApplyLUTToImage2DProxy();
+	void setImage(vtkImageDataPtr image, vtkLookupTablePtr lut);
+	void setLut(vtkLookupTablePtr lut);
+	vtkImageDataPtr getOutput();
+
+private:
+	vtkImageDataPtr createDummyImageData();
+
+	vtkImageDataPtr mDummyImage; ///< need this to fool the vtk pipeline when no image is set
+	vtkImageAlgorithmPtr mRedirecter;
+	vtkImageMapToColorsPtr mWindowLevel;
+};
 
 /**\brief Helper class for slicing an image given a SliceProxy and an image.
  *
@@ -63,16 +96,18 @@ private slots:
 	void transferFunctionsChangedSlot();
 
 private: 
-	vtkImageDataPtr createDummyImageData();
+	ApplyLUTToImage2DProxyPtr mImageWithLUTProxy;
+
+//	vtkImageDataPtr createDummyImageData();
 
 	SliceProxyPtr mSlicer;
-	vtkImageDataPtr mDummyImage; ///< need this to fool the vtk pipeline when no image is set
+//	vtkImageDataPtr mDummyImage; ///< need this to fool the vtk pipeline when no image is set
 	ImagePtr mImage;
 	//vtkImageMapToWindowLevelColorsPtr mWindowLevel;
-	vtkImageAlgorithmPtr mRedirecter; 
+//	vtkImageAlgorithmPtr mRedirecter;
  	//vtkImageReslicePtr mRedirecter;
 
-	vtkImageMapToColorsPtr mWindowLevel;
+//	vtkImageMapToColorsPtr mWindowLevel;
 	vtkImageReslicePtr mReslicer;
 	vtkMatrix4x4Ptr mMatrixAxes;
 };

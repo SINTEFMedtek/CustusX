@@ -155,16 +155,18 @@ void ToolTracer::receiveTransforms(Transform3D prMt, double timestamp)
 	mPreviousPoint = p;
 	mPoints->InsertNextPoint(p.begin());
 
-	// fill cell points for the entire polydata.
-	// This is very ineffective, but I have no idea how to update mLines incrementally.
-	mLines->Initialize();
-	std::vector<vtkIdType> ids(mPoints->GetNumberOfPoints());
-	for (unsigned i=0; i<ids.size(); ++i)
-		ids[i] = i;
-	mLines->InsertNextCell(ids.size(), &(*ids.begin()));
-
-	mPolyData->Modified();
-//  mPolyData->Update();
+	if (mPoints->GetNumberOfPoints() > 1)
+	{
+		// fill cell points for the entire polydata.
+		// This is very ineffective, but I have no idea how to update mLines incrementally.
+		mLines->Initialize();
+		std::vector<vtkIdType> ids(mPoints->GetNumberOfPoints());
+		for (unsigned i=0; i<ids.size(); ++i)
+			ids[i] = i;
+		mLines->InsertNextCell(ids.size(), &(*ids.begin()));
+		
+		mPolyData->Modified();
+	}
 }
 
 
