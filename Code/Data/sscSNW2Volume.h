@@ -174,7 +174,7 @@ private:
 	template<class T> QStringList streamable2QStringList(const T& val) const;
 	bool checksumData(QString filename, const unsigned char* const data, int size);
 	void writeStatus(const QString& text) const;
-	void ensureCenterWindowValid(double* windowPtr, double* levelPtr, double* llrPtr);
+	bool ensureCenterWindowValid(double* windowPtr, double* levelPtr, double* llrPtr);
 };
 
 }

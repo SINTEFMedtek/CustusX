@@ -160,12 +160,12 @@ SNW2VolumePtr SNW2Volume::create(const QString& filePath)
 {
 	SNW2VolumePtr retval(new SNW2Volume(filePath));
 
-	if (!retval->loadAll())
+	if (!retval->loadAll() || !retval->ensureCenterWindowValid(&retval->mMetaData.Volume.mWindowWidth,
+	                                                           &retval->mMetaData.Volume.mWindowCenter,
+	                                                           &retval->mMetaData.Volume.mLLR))
 	{
 		return SNW2VolumePtr();
 	}
-	retval->ensureCenterWindowValid(&retval->mMetaData.Volume.mWindowWidth, &retval->mMetaData.Volume.mWindowCenter,
-					&retval->mMetaData.Volume.mLLR);
 	return retval;
 }
 
@@ -497,11 +497,14 @@ bool SNW2Volume::rawLoadLut(const QString& filename, vtkLookupTablePtr lut) cons
 	}
 	else if (mMetaData.Lut.mBitsPerSample == 8 && mMetaData.Lut.mType == "RGBA")
 	{
+		int lutSize = mMetaData.Lut.mLength;
+		if (lutSize == 0) // An old way to indicate no lut
+		{
+			return true;
+		}
 		QFile file(filename);
 		file.open(QIODevice::ReadOnly);
 		QDataStream stream(&file);
-		int lutSize = mMetaData.Lut.mLength;
-
 		if (!file.isOpen())
 		{
 			writeStatus("volume" + uid() + "] " + "could not open LUT file");
@@ -656,7 +659,7 @@ void SNW2Volume::rawSaveLutData(const QString& filename, vtkLookupTablePtr lut) 
 
 /** Insert default values for Center/Window if not set by load
  */
-void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, double* llrPtr)
+bool SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, double* llrPtr)
 {
 	double& window = *windowPtr;
 	double& level = *levelPtr;
@@ -665,6 +668,10 @@ void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, do
 	boost::array<double, 2> range;
 	if (mMetaData.Volume.mFirstPixel < 0 || mMetaData.Volume.mLastPixel < 0)
 	{
+		if (!loadVolumeData())
+		{
+			return false;
+		}
 		// If we lack this data, we are forced to load the image already. Breaks lazy loading.
 		vtkImageAccumulatePtr histogram = getImage()->getHistogram();
 		range[0] = histogram->GetMin()[0];
@@ -699,6 +706,7 @@ void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, do
 	{
 		llr = 1;
 	}
+	return true;
 }
 
 vtkImageDataPtr SNW2Volume::getVtkImageData()
