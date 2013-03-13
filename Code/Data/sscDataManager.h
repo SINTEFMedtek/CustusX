@@ -38,7 +38,7 @@ typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 typedef boost::shared_ptr<class Data> DataPtr;
 typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
-typedef boost::shared_ptr<class PresetTransferFunctions3D> PresetTransferFunctions3DPtr;
+typedef boost::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
 
 //-----
 enum READER_TYPE
