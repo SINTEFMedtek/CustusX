@@ -18,7 +18,7 @@
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
-#include "sscPresetTransferFunctions3D.h"
+#include "sscTransferFunctions3DPresets.h"
 #include "sscDoubleRange.h"
 
 //Windows fix
