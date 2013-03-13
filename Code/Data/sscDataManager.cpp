@@ -20,7 +20,7 @@
 #include "sscDataManager.h"
 
 #include "sscDataManagerImpl.h"
-#include "sscPresetTransferFunctions3D.h"
+#include "sscTransferFunctions3DPresets.h"
 
 namespace ssc
 {
@@ -63,7 +63,7 @@ DataManager::~DataManager()
 
 PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() const
 {
-	return ssc::PresetTransferFunctions3DPtr(new ssc::PresetTransferFunctions3D(ssc::XmlOptionFile(), ssc::XmlOptionFile()));
+	return ssc::PresetTransferFunctions3DPtr(new ssc::TransferFunctions3DPresets(ssc::XmlOptionFile(), ssc::XmlOptionFile()));
 }
 
 ImagePtr DataManager::getActiveImage() const
