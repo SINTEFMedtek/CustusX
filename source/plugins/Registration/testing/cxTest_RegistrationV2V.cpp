@@ -18,9 +18,11 @@
 #include "sscRegistrationTransform.h"
 #include "sscTypeConversions.h"
 #include <QFileInfo>
+#include <QDir>
 
 void TestRegistrationV2V::setUp()
 {
+	cx::DataLocations::setTestMode();
 
 }
 
@@ -52,7 +54,8 @@ ssc::Vector3D TestRegistrationV2V::append_pt(std::vector<ssc::Vector3D>* pts, ss
 
 QStringList TestRegistrationV2V::generateTestData()
 {
-	QString path = QString("/home/christiana/Patients/test/");
+	QString path = cx::DataLocations::getTestDataPath() + "/temp/elastix/";
+	QDir().mkpath(path);
 	QStringList retval;
 	double spacing = 0.1;
 	std::vector<ssc::Vector3D> pts;
@@ -303,9 +306,9 @@ void TestRegistrationV2V::doTestVessel2VesselRegistration(ssc::Transform3D pertu
 
 	ssc::DataPtr source = ssc::dataManager()->loadData("source_"+filenameSource, filenameSource, ssc::rtAUTO);
 	ssc::DataPtr target = ssc::dataManager()->loadData("target_"+filenameTarget, filenameTarget, ssc::rtAUTO);
-	source->get_rMd_History()->setRegistration(perturbation);
 	CPPUNIT_ASSERT(source!=0);
 	CPPUNIT_ASSERT(target!=0);
+	source->get_rMd_History()->setRegistration(perturbation);
 
 
 	if (false)
