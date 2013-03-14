@@ -614,10 +614,14 @@ class ISB_DataStreaming(CppComponent):
         if DATA.mISBpassword == "":
             runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef %s' % (self.sourceFolder()))
         else:
-            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef --password %s %s' % (DATA.mISBpassword, self.sourceFolder()))
+            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --non-interactive --username sintef --password %s %s' % (DATA.mISBpassword, self.sourceFolder()))
     def update(self):
         self._changeDirToSource()
-        runShell('svn up')
+#        runShell('svn up')
+        if DATA.mISBpassword == "":
+            runShell('svn up --username sintef %s' % (self.sourceFolder()))
+        else:
+            runShell('svn up --non-interactive --username sintef --password %s %s' % (DATA.mISBpassword, self.sourceFolder()))
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
@@ -1044,9 +1048,8 @@ Available components are:
         checkout, configure, build
         '''
         # info
-        print 'User:', DATA.mUser
-        print 'Server User:', DATA.mServerUser
-        print 'Root dir:', DATA.mRootDir
+	self._printSettings()
+
         print 'Use the following components:', [val.name() for val in useLibs]
         if (not DATA.mSilent_mode):
             raw_input("\nPress enter to continue or ctrl-C to quit:")
@@ -1055,6 +1058,8 @@ Available components are:
             for lib in useLibs:
                 print '\n================== checkout ', lib.name(), '========================'
                 lib.checkout()
+        if options.full or options.checkout:
+            for lib in useLibs:
                 print '\n================== update ', lib.name(), '========================'
                 lib.update()
         if options.configure_clean:
@@ -1074,7 +1079,24 @@ Available components are:
                 print '\n================== build ', lib.name(), '========================'
                 lib.build()
     # ---------------------------------------------------------
-
+    def _printSettings(self):
+        print ''
+        print 'Settings:'
+        print '	User:', DATA.mUser
+        print '	Server User:', DATA.mServerUser
+        print '	PLATFORM:', DATA.PLATFORM
+        print '	ISBpassword:', DATA.mISBpassword
+        print '	RootDir:', DATA.mRootDir
+        print '	ExternalDir:', DATA.mExternalDir
+        print '	WorkingDir:', DATA.mWorkingDir
+        print '	Silent_mode:', DATA.mSilent_mode
+        print '	BuildShared:', DATA.mBuildShared
+        print '	BuildType:', DATA.mBuildType
+        print '	BuildExternalsType:', DATA.mBuildExternalsType
+        print '	BuildTesting:', DATA.mBuildTesting
+        print '	CMakeGenerator:', DATA.mCMakeGenerator
+        print '	Coverage:', DATA.mCoverage
+        print ''
 
 def main():
     Controller()
@@ -1082,4 +1104,5 @@ def main():
 #This idiom means the below code only runs when executed from command line
 if __name__ == '__main__':
     main()
+
 
