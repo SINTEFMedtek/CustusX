@@ -48,7 +48,8 @@ bool ElastixSingleThreadedRunner::registerLinear(
     if (QFileInfo(mActiveParameterFile1).exists() && QFileInfo(mActiveParameterFile1).isFile())
     	parameterFiles  << mActiveParameterFile1;
 
-	QString outPath = QDir::homePath() + "/Patients/testing/elastix/" + QDateTime::currentDateTime().toString(ssc::timestampMilliSecondsFormat() + "/");
+//	QString outPath = QDir::homePath() + "/Patients/testing/elastix/" + QDateTime::currentDateTime().toString(ssc::timestampMilliSecondsFormat() + "/");
+	QString outPath = cx::DataLocations::getTestDataPath() + "/temp/elastix/" + QDateTime::currentDateTime().toString(ssc::timestampMilliSecondsFormat() + "/");;
 
 	mExecuter->setDisplayProcessMessages(false);
 	mExecuter->setInput(mActiveExecutable,
