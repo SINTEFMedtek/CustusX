@@ -975,6 +975,16 @@ Available components are:
                      action='store_true',
                      help='gcov code coverage',
                      default=False)
+        p.add_option('--external_dir',
+                     action='store',
+                     type='string',
+                     help='specify external folder, default=%s'%DATA.mExternalDir,
+                     default=DATA.mExternalDir)
+        p.add_option('--working_dir',
+                     action='store',
+                     type='string',
+                     help='specify work folder, default=%s'%DATA.mWorkingDir,
+                     default=DATA.mWorkingDir)
         return p
     
     def _parseCommandLine(self):
@@ -1022,6 +1032,10 @@ Available components are:
             DATA.mISBpassword = options.isb_password
         if options.coverage:
             DATA.mCoverage = 'ON'
+        if options.external_dir:
+            DATA.mExternalDir = options.external_dir
+        if options.working_dir:
+            DATA.mWorkingDir = options.working_dir        
         
         #TODO can be wrong for external libs as they use DATA.mBuildExternalsType!
         DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType 
