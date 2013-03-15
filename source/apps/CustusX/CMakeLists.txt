@@ -393,11 +393,14 @@ Configuration for CustusX ${VERSION_NUMBER_VERBOSE}
 		Doxygen: ${BUILD_DOCUMENTATION}
 
 	Libraries:
-		Qt Version ${QT_VERSION_STRING}
+		Qt Version ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}
 		VTK Version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}
 		ITK Version: ${ITK_VERSION}
 		OpenCV Version: ${OpenCV_VERSION}
 		CMake Version: ${CMAKE_VERSION}
+		IGSTK Version: ${IGSTK_VERSION_MAJOR}.${IGSTK_VERSION_MINOR}.${IGSTK_VERSION_PATCH}
+		OpenIGTLink Version: ${OpenIGTLink_VERSION_MAJOR}.${OpenIGTLink_VERSION_MINOR}.${OpenIGTLink_VERSION_PATCH}
+
 
 	Internal libraries:
 		Tube-Segmentation-Toolkit: ${CX_USE_TSF}
