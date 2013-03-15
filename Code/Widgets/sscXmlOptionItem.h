@@ -90,8 +90,7 @@ public:
 	}
 	QDomElement getElement(); ///< return the current element
 	QDomElement getElement(QString level1); ///< return a element below the current element. Guaranteed to exist.
-	QDomElement getElement(QString level1, QString level2);
-	; ///< return a element two levels below the current element. Guaranteed to exist.
+	QDomElement getElement(QString level1, QString level2); ///< return a element two levels below the current element. Guaranteed to exist.
 	void save(); ///< save entire document.
 
 	void removeChildren(); ///< remove all child nodes of the current element.

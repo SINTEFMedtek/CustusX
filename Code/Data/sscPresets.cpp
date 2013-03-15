@@ -19,6 +19,8 @@
 
 #include "sscPresets.h"
 
+#include <QStringList>
+
 namespace ssc {
 
 Presets::Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile)
@@ -27,30 +29,47 @@ Presets::Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile)
 	mCustomFile = customFile;
 }
 
-ssc::XmlOptionFile Presets::saveCustom(QString presetName, std::map<QString, QString> attributes, std::vector<QDomElement> children)
+void Presets::addCustomPreset(QString name, QDomElement& element)
 {
+//	std::cout << "Presets::addCustomPreset(QString name, QDomElement element)" << std::endl;
 	ssc::XmlOptionFile file = this->getCustomFile();
-	file = file.descend("Preset", "name", presetName);
+	file = file.descend("Preset", "name", name);
 
 	QDomElement presetElement = file.getElement("Preset");
-	std::map<QString, QString>::iterator it;
-	for(it=attributes.begin(); it!= attributes.end(); ++it)
-	{
-		presetElement.setAttribute(it->first, it->second);
-	}
+
+	//TODO add attributes
+//	std::map<QString, QString>::iterator it;
+//	for(it=attributes.begin(); it!= attributes.end(); ++it)
+//	{
+//		presetElement.setAttribute(it->first, it->second);
+//	}
 
 	//delete old children
 	while (presetElement.hasChildNodes())
 		presetElement.removeChild(presetElement.firstChild());
 
-	//add new children
-	std::vector<QDomElement>::iterator it2;
-	for(it2 = children.begin(); it2 != children.end(); ++it2)
-	{
-		file.getDocument().appendChild(*it2);
-	}
+	//add element
+	presetElement.appendChild(element);
 
 	file.save();
+}
+
+QStringList Presets::getPresetList(QString tag)
+{
+	return this->generatePresetList(tag);
+}
+
+bool Presets::isDefaultPreset(QString presetName)
+{
+	ssc::XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
+	if (!testval.getDocument().isNull())
+		return true;
+	return false;
+}
+
+QStringList Presets::generatePresetList(QString tag)
+{
+	return QStringList();
 }
 
 ssc::XmlOptionFile Presets::getCustomFile()

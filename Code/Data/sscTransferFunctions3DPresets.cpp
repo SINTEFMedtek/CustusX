@@ -43,10 +43,10 @@ TransferFunctions3DPresets::TransferFunctions3DPresets(ssc::XmlOptionFile preset
 	//mPresetFile = ssc::XmlOptionFile(DataLocations::getRootConfigPath()+"/transferFunctions/presets.xml", "transferFunctions"); ///< create from filename, create trivial document of type name and root node if no file exists.
 }
 
-QStringList TransferFunctions3DPresets::getPresetList(QString modality)
-{
-	return this->generatePresetList(modality);
-}
+//QStringList TransferFunctions3DPresets::getPresetList(QString modality)
+//{
+//	return this->generatePresetList(modality);
+//}
 
 //ssc::XmlOptionFile TransferFunctions3DPresets::getCustomFile()
 //{
@@ -277,13 +277,13 @@ QStringList TransferFunctions3DPresets::generatePresetList(QString modality)
 	return presetList;
 }
 
-bool TransferFunctions3DPresets::isDefaultPreset(QString presetName)
-{
-	ssc::XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
-	if (!testval.getDocument().isNull())
-		return true;
-	return false;
-}
+//bool TransferFunctions3DPresets::isDefaultPreset(QString presetName)
+//{
+//	ssc::XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
+//	if (!testval.getDocument().isNull())
+//		return true;
+//	return false;
+//}
 
 void TransferFunctions3DPresets::deletePresetData(QString name, bool _2D, bool _3D)
 {

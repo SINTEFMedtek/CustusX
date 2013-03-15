@@ -36,7 +36,7 @@ typedef boost::shared_ptr<class TransferFunctions3DPresets> TransferFunctions3DP
 
 /**
  * \date 11. juni 2010
- * \author: jbake
+ * \author: Janne Beate Bakeng, SINTEF
  */
 
 /**\brief Handles transfer function presets
@@ -58,15 +58,16 @@ public:
 	void load2D(QString name, ssc::ImagePtr image);
 	void load3D(QString name, ssc::ImagePtr image);
 
-	QStringList getPresetList(QString modality=""); ///< returns a list of the preset names for the given modality
-	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
+//	QStringList getPresetList(QString modality=""); ///< returns a list of the preset names for the given modality
+//	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
 	void deletePresetData(QString name, bool _2D=true, bool _3D=true); ///< Delete the preset data node
 //
 //signals:
 //	void changed();
+protected:
+	QStringList generatePresetList(QString modality); ///< internally generate the preset list
 
 private:
-	QStringList generatePresetList(QString modality); ///< internally generate the preset list
 //	ssc::XmlOptionFile getPresetNode(const QString& presetName);
 //	ssc::XmlOptionFile getCustomFile();
 
