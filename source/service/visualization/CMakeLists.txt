@@ -23,6 +23,7 @@ SET( CX_QT_MOC_HEADER_FILES
     Rep/cxLandmarkRep.h
     Rep/sscOrientationAnnotation3DRep.h
     Rep/sscOrientationAnnotation2DRep.h
+	Rep/sscImage2DRep3D.h
     cxRepManager.h
     cxThresholdPreview.h
 )
@@ -65,6 +66,8 @@ SET ( cxVisualizationService_SOURCE
     Rep/sscOrientationAnnotation3DRep.cpp
     Rep/sscOrientationAnnotation2DRep.h
     Rep/sscOrientationAnnotation2DRep.cpp
+	Rep/sscImage2DRep3D.h
+	Rep/sscImage2DRep3D.cpp
     cxRepManager.h
     cxRepManager.cpp
     cxThresholdPreview.h
