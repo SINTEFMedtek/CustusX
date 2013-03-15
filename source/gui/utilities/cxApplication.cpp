@@ -24,17 +24,17 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 bool Application::notify(QObject *rec, QEvent *ev)
 {
 //	qDebug() << "MyApplication::nofity";
-	try
-	{
+//	try
+//	{
 		return QApplication::notify(rec, ev);
-	}
-	catch( ... )
-	{
-		ssc::messageManager()->sendInfo("Unknown Exception: Terminating!");
-//		qDebug() << "Unknown Exception: Terminating!";
-		exit(0);
-	}
-	return false;
+//	}
+//	catch( ... )
+//	{
+//		ssc::messageManager()->sendInfo("Unknown Exception: Terminating!");
+////		qDebug() << "Unknown Exception: Terminating!";
+//		exit(0);
+//	}
+//	return false;
 }
 
 } // namespace cx
