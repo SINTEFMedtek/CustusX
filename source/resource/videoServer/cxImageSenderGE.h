@@ -20,6 +20,7 @@ class QTimer;
 #include "igtlImageMessage.h"
 #include "cxImageSenderFactory.h"
 #include "cxIGTLinkImageMessage.h"
+#include "cxRenderTimer.h"
 
 #include "GEStreamer.h"
 
@@ -55,6 +56,7 @@ private:
 	QTimer* mSendTimer;
 	QTimer* mGrabTimer;
 	StringMap mArguments;
+	CyclicActionTimerPtr mRenderTimer;
 
 	//The GE Connection code from ISB
 	data_streaming::GEStreamer mGEStreamer;

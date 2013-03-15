@@ -1,10 +1,16 @@
-/*
- * cxUSAcquisition.h
- *
- *  \date May 12, 2011
- *      \author christiana
- */
-
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 #ifndef CXUSACQUISITION_H_
 #define CXUSACQUISITION_H_
 
@@ -41,6 +47,8 @@ typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
  *
  *  TODO: merge the tracking recording into this class
  *
+ *  \date May 12, 2011
+ *  \author christiana
  */
 class USAcquisition : public QObject
 {
@@ -48,22 +56,14 @@ class USAcquisition : public QObject
 public:
 	USAcquisition(AcquisitionPtr base, QObject* parent = 0);
 	virtual ~USAcquisition();
-//	QString getWhatsMissingText() const { return mWhatsMissing; }
 	int getNumberOfSavingThreads() const { return mSaveThreads.size(); }
 
 signals:
-//	void toolChanged();
 	void acquisitionDataReady(); ///< emitted when data is acquired and sent to the reconstruction module
 	void saveDataCompleted(QString mhdFilename); ///< emitted when data has been saved to file
 
 private slots:
-//	void probeChangedSlot();
 	void fileMakerWriteFinished();
-//	void dominantToolChangedSlot();
-//	void setTool(ssc::ToolPtr tool);
-//	ssc::ToolPtr getTool();
-
-//	void clearSlot();
 	void checkIfReadySlot();
 	void saveSession();
 	void recordStarted();
@@ -75,22 +75,14 @@ private:
 	bool getWriteColor() const;
 
 	AcquisitionPtr mBase;
-//	ssc::VideoSourcePtr mRTSource;
-//	SavingVideoRecorderPtr mVideoRecorder;
 
 	// video and tool used at start of recording:
 	std::vector<SavingVideoRecorderPtr> mVideoRecorder;
 	ssc::ToolPtr mRecordingTool;
 
-//	UsReconstructionFileMakerPtr mCurrentSessionFileMaker;
-
 	std::list<QFutureWatcher<QString>*> mSaveThreads;
 
-//	QString mWhatsMissing;
-
 	virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session);
-//	void connectVideoSource(ssc::VideoSourcePtr source);
-//	void connectToPureVideo();
 
 };
 typedef boost::shared_ptr<USAcquisition> USAcquisitionPtr;
