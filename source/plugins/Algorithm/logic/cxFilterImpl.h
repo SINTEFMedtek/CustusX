@@ -44,9 +44,13 @@ public:
 	virtual std::vector<DataAdapterPtr> getOptions();
 	virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes();
 	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes();
+	virtual bool hasPresets(){return false;};
+	virtual ssc::PresetsPtr getPresets(){ return ssc::PresetsPtr();};
 	virtual void setActive(bool on);
-
 	virtual bool preProcess();
+
+public slots:
+	virtual void requestSetPresetSlot(QString name){};
 
 protected:
 	explicit FilterImpl();
