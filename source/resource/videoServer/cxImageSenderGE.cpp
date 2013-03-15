@@ -32,8 +32,6 @@
 #include "vtkImageChangeInformation.h"
 #include "vtkForwardDeclarations.h"
 
-typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
-
 namespace cx
 {
 
@@ -212,6 +210,7 @@ bool ImageSenderGE::initialize_local()
 		test = data_streaming::noTest;
 
 	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, test);
+	mGEStreamer.SetFlipTexture(false);
 
 //	mImgStream = mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
 //	if(!mImgStream)
@@ -351,17 +350,17 @@ void ImageSenderGE::send()
 void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
 {
 	mRenderTimer->time("startsend");
-	vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
-	flipper->SetInput(img);
-	flipper->SetFilteredAxis(0); // flip left-right (possible bug in backend?
-	vtkImageDataPtr	flipped = flipper->GetOutput();
-	flipped->Update();
+//	vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
+//	flipper->SetInput(img);
+//	flipper->SetFilteredAxis(0);
+//	vtkImageDataPtr	flipped = flipper->GetOutput();
+//	flipped->Update();
 	mRenderTimer->time("flip");
 //	vtkImageDataPtr copy = vtkImageDataPtr::New();
 //	copy->DeepCopy(img);
 	if (geometryChanged)
 	{
-		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, flipped);
+		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, img);
 		mSender->send(frameMessage);
 		std::cout << uid << " Nyquist " << geometry.vNyquist << std::endl;
 	}
@@ -369,7 +368,7 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 
 	// CustusX does not handle nonzero origin - set to zero, but AFTER getFrameStatus() is called.
 	vtkImageChangeInformationPtr center = vtkImageChangeInformationPtr::New();
-	center->SetInput(flipped);
+	center->SetInput(img);
 	center->SetOutputOrigin(0,0,0);
 	center->Update();
 	mRenderTimer->time("orgnull");
