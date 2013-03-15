@@ -14,6 +14,7 @@
 #include <QTime>
 #include <QHostAddress>
 #include <QFileInfo>
+#include <vtkImageFlip.h>
 #include "igtlOSUtil.h"
 #include "igtlImageMessage.h"
 #include "igtlServerSocket.h"
@@ -30,6 +31,8 @@
 #include "geConfig.h"
 #include "vtkImageChangeInformation.h"
 #include "vtkForwardDeclarations.h"
+
+typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 
 namespace cx
 {
@@ -66,6 +69,7 @@ ImageSenderGE::ImageSenderGE(QObject* parent) :
 	mExportFrequency(false)
 {
 	//data_streaming::DataStreamApp test;
+	mRenderTimer.reset(new CyclicActionTimer("GE Grabber Timer"));
 
 //	mImgStream = vtkSmartPointer<vtkImageData>();
 	mImgExportedStream = vtkSmartPointer<data_streaming::vtkExportedStreamData>();
@@ -248,6 +252,7 @@ void ImageSenderGE::stopStreaming()
 
 void ImageSenderGE::grab()
 {
+
 	//Wait for next frame
 	//Will only work with scanner, not simple test data
 	/*if (mGEStreamer.stream)
@@ -257,11 +262,15 @@ void ImageSenderGE::grab()
 		std::cout << "ImageSenderGE::grab(): No mGEStreamer.stream" << std::endl;
 	}*/
 
-	mGEStreamer.WaitForImageData();
-//	if (!mGEStreamer.HasNewImageData())
-//		return;
+//	mGEStreamer.WaitForImageData();
+	if (!mGEStreamer.HasNewImageData())
+		return;
+	mRenderTimer->begin();
+//	mRenderTimer->time("wait");
 
 	vtkSmartPointer<data_streaming::vtkExportedStreamData> imgExportedStream = mGEStreamer.GetExportedStreamDataAndMoveToNextFrame();
+
+	mRenderTimer->time("scanc");
 
 	//Get new image
 	if(!imgExportedStream)
@@ -291,10 +300,23 @@ void ImageSenderGE::grab()
 	else
 		mFlowGeometryChanged = false;
 
+	mRenderTimer->time("get");
+
 	mImgExportedStream = imgExportedStream;
 	mLastGrabTime = mImgExportedStream->GetTimeStamp();
 
+
 	send();
+
+	mRenderTimer->time("sent");
+
+	if (mRenderTimer->intervalPassed())
+	{
+        static int counter=0;
+//        if (++counter%3==0)
+//            ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+        mRenderTimer->reset();
+	}
 }
 
 void ImageSenderGE::send()
@@ -328,24 +350,35 @@ void ImageSenderGE::send()
 
 void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
 {
+	mRenderTimer->time("startsend");
+	vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
+	flipper->SetInput(img);
+	flipper->SetFilteredAxis(0); // flip left-right (possible bug in backend?
+	vtkImageDataPtr	flipped = flipper->GetOutput();
+	flipped->Update();
+	mRenderTimer->time("flip");
 //	vtkImageDataPtr copy = vtkImageDataPtr::New();
 //	copy->DeepCopy(img);
 	if (geometryChanged)
 	{
-		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, img);
+		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, flipped);
 		mSender->send(frameMessage);
 		std::cout << uid << " Nyquist " << geometry.vNyquist << std::endl;
 	}
+	mRenderTimer->time("sendpr");
 
 	// CustusX does not handle nonzero origin - set to zero, but AFTER getFrameStatus() is called.
 	vtkImageChangeInformationPtr center = vtkImageChangeInformationPtr::New();
-	center->SetInput(img);
+	center->SetInput(flipped);
 	center->SetOutputOrigin(0,0,0);
 	center->Update();
+	mRenderTimer->time("orgnull");
 
 	ssc::ImagePtr message(new ssc::Image(uid, center->GetOutput()));
+	mRenderTimer->time("createimg");
 
 	mSender->send(message);
+	mRenderTimer->time("sendersend");
 }
 
 /*IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
