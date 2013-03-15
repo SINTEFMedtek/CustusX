@@ -16,6 +16,8 @@ typedef boost::shared_ptr<class DataAdapter> DataAdapterPtr;
 
 namespace ssc
 {
+typedef boost::shared_ptr<class Presets> PresetsPtr;
+
 typedef boost::shared_ptr<class ImageImportVideoSource> ImageImportVideoSourcePtr;
 
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
