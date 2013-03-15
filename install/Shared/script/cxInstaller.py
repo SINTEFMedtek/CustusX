@@ -94,6 +94,8 @@ class Common(object):
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
         self.mCoverage = "OFF"
+        self.mCMakeArgs = ""
+
 
 # ---------------------------------------------------------
     
@@ -731,6 +733,7 @@ cmake \
 -DGEStreamer_DIR:PATH="%s" \
 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 -DSSC_USE_GCOV:BOOL=%s \
+%s \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, DATA.mBuildShared, 
@@ -749,6 +752,7 @@ cmake \
             ISB_DataStreaming().buildPath(),
             DATA.mOSX_DEPLOYMENT_TARGET,
             DATA.mCoverage,
+            DATA.mCMakeArgs,
             self.sourceFolder() )
             )
         #TODO add xcode project here if needed?
@@ -988,6 +992,11 @@ Available components are:
                      type='string',
                      help='specify work folder, default=%s'%DATA.mWorkingDir,
                      default=DATA.mWorkingDir)
+        p.add_option('--cmake_args',
+                     action='store',
+                     type='string',
+                     help='additional arguments to ALL cmake calls',
+                     default="")
         return p
     
     def _parseCommandLine(self):
@@ -1038,7 +1047,10 @@ Available components are:
         if options.external_dir:
             DATA.mExternalDir = options.external_dir
         if options.working_dir:
-            DATA.mWorkingDir = options.working_dir        
+            DATA.mWorkingDir = options.working_dir
+        if options.cmake_args:
+            DATA.mCMakeArgs = options.cmake_args
+
         
         #TODO can be wrong for external libs as they use DATA.mBuildExternalsType!
         DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType 
