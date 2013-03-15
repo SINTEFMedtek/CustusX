@@ -391,6 +391,7 @@ Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-c
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DVTK_USE_PARALLEL:BOOL=ON \
 -DVTK_REQUIRED_OBJCXX_FLAGS:STRING="" \
@@ -530,6 +531,7 @@ class IGSTK(CppComponent):
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DIGSTK_USE_SceneGraphVisualization:BOOL=OFF \
 -DBUILD_EXAMPLES:BOOL=OFF \
@@ -709,6 +711,7 @@ class CustusX3(CppComponent):
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DBUILD_OPEN_IGTLINK_SERVER=true \
@@ -719,7 +722,7 @@ cmake \
 -DOpenCV_DIR:PATH="%s" \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
--DCX_USE_TSF:BOOL=true \
+-DCX_USE_TSF:BOOL=OFF \
 -DTube-Segmentation-Framework_DIR:PATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
 -DBUILD_TESTING="%s" \
