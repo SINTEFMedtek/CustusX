@@ -37,26 +37,32 @@ namespace ssc {
  * \date Mar 11, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class Presets  : public QObject
+class Presets : public QObject
 {
 	Q_OBJECT
 
 public:
-	Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile);
+	Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile); //used
 	virtual ~Presets(){};
 
-	ssc::XmlOptionFile saveCustom(QString presetName, std::map<QString, QString> attributes, std::vector<QDomElement> children);
+	void addCustomPreset(QString name, QDomElement& element); //used
+
+	//TODO Review:
+	QStringList getPresetList(QString tag=""); ///< returns a list of the preset names for the given tag
+	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
+	ssc::XmlOptionFile getCustomFile();
+
 
 signals:
-	void changed();
+	void changed(); //used
 
 protected:
-	ssc::XmlOptionFile getCustomFile();
+	virtual QStringList generatePresetList(QString tag); ///< internally generate the preset list
 	ssc::XmlOptionFile getPresetNode(const QString& presetName); ///< Look for a preset with the given name. Create one if not found.
 
-	ssc::XmlOptionFile mPresetFile;
+	ssc::XmlOptionFile mPresetFile; //used
 private:
-	ssc::XmlOptionFile mCustomFile;
+	ssc::XmlOptionFile mCustomFile; //used
 };
 
 typedef boost::shared_ptr<class Presets> PresetsPtr;

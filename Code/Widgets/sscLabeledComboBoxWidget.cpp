@@ -79,6 +79,8 @@ void LabeledComboBoxWidget::prePaintEvent()
 	mCombo->clear();
 
 	this->setEnabled(mData->getEnabled());
+	mLabel->setEnabled(mData->getEnabled());
+	mCombo->setEnabled(mData->getEnabled());
 
 	QString currentValue = mData->getValue();
 	QStringList range = mData->getValueRange();
