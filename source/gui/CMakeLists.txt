@@ -44,6 +44,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/cxEraserWidget.h
 	dataWidgets/cxDataSelectWidget.h
 	dataWidgets/cxPresetWidget.h
+	#dataWidgets/cxTSFPresetWidget.h
 	dataWidgets/cxTransferFunctionPresetWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
@@ -200,6 +201,8 @@ SET(cxGui_SRCS
 	dataWidgets/cxDataSelectWidget.cpp
 	dataWidgets/cxPresetWidget.h
 	dataWidgets/cxPresetWidget.cpp
+	#dataWidgets/cxTSFPresetWidget.h
+	#dataWidgets/cxTSFPresetWidget.cpp
 	dataWidgets/cxTransferFunctionPresetWidget.h
 	dataWidgets/cxTransferFunctionPresetWidget.cpp
 	#----------------------
