@@ -706,7 +706,7 @@ class CustusX3(CppComponent):
         self._changeDirToSource()
         runShell('git checkout master')
         runShell('git pull')
-        runShell('git submodule update')
+        runShell('git submodule update --init --recursive')
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
