@@ -17,7 +17,7 @@ set -x
 
 cd $WORKSPACE/working/CustusX3/build_Release
 echo "checking pwd"
-echo pwd
+echo `pwd`
 # execute tests with xml output
 ctest -D ExperimentalTest --no-compress-output -R Tool
 # copy xml to fixed position ./CTestResults.xml
