@@ -38,7 +38,7 @@ CX_RELEASE_DIR=$WORKSPACE/working/CustusX3/build_Release
 # ==========================================================
 # make the CustusX project in order to provoke a build failure.
 cd $CX_RELEASE_DIR
-make -j4
+#make -j4
 if [ $? == 0 ]
 then
     echo "CustusX build success"
