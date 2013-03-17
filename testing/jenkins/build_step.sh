@@ -48,7 +48,6 @@ else
     exit 1
 fi
 
-
 # ==========================================================
 # Run all tests and write them in xml format to ./CTestResults.xml
 cd $CX_RELEASE_DIR
