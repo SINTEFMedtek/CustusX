@@ -20,6 +20,7 @@
 
 
 set -x
+WORKSPACE=$1
 CX_RELEASE_DIR=$WORKSPACE/working/CustusX3/build_Release
 
 # ==========================================================
