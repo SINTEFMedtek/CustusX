@@ -61,4 +61,4 @@ cp Testing/`head -n 1 Testing/TAG`/Test.xml ./CTestResults.xml
 # ==========================================================
 # copy/publish doxygen to medtek server (link from wiki):
 REMOTE_DOXY_PATH="/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/custusx_doxygen"
-scp -r cd $CX_RELEASE_DIR/doc/doxygen/html/* medtek.sintef.no:$REMOTE_DOXY_PATH
+scp -r $CX_RELEASE_DIR/doc/doxygen/html/* medtek.sintef.no:$REMOTE_DOXY_PATH
