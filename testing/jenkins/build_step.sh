@@ -39,9 +39,6 @@ else
     exit 1
 fi
 
-# break the build:
-exit 1
-
 # ==========================================================
 # Run all tests and write them in xml format to ./CTestResults.xml
 cd $CX_RELEASE_DIR
