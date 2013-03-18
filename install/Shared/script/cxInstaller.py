@@ -94,6 +94,8 @@ class Common(object):
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
         self.mCoverage = "OFF"
+        self.mCMakeArgs = ""
+
 
 # ---------------------------------------------------------
     
@@ -391,6 +393,7 @@ Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-c
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DVTK_USE_PARALLEL:BOOL=ON \
 -DVTK_REQUIRED_OBJCXX_FLAGS:STRING="" \
@@ -530,6 +533,7 @@ class IGSTK(CppComponent):
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DIGSTK_USE_SceneGraphVisualization:BOOL=OFF \
 -DBUILD_EXAMPLES:BOOL=OFF \
@@ -702,13 +706,14 @@ class CustusX3(CppComponent):
         self._changeDirToSource()
         runShell('git checkout master')
         runShell('git pull')
-        runShell('git submodule update')
+        runShell('git submodule update --init --recursive')
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DBUILD_OPEN_IGTLINK_SERVER=true \
@@ -719,7 +724,7 @@ cmake \
 -DOpenCV_DIR:PATH="%s" \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
--DCX_USE_TSF:BOOL=true \
+-DCX_USE_TSF:BOOL=OFF \
 -DTube-Segmentation-Framework_DIR:PATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
 -DBUILD_TESTING="%s" \
@@ -728,6 +733,7 @@ cmake \
 -DGEStreamer_DIR:PATH="%s" \
 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 -DSSC_USE_GCOV:BOOL=%s \
+%s \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, DATA.mBuildShared, 
@@ -746,6 +752,7 @@ cmake \
             ISB_DataStreaming().buildPath(),
             DATA.mOSX_DEPLOYMENT_TARGET,
             DATA.mCoverage,
+            DATA.mCMakeArgs,
             self.sourceFolder() )
             )
         #TODO add xcode project here if needed?
@@ -985,6 +992,11 @@ Available components are:
                      type='string',
                      help='specify work folder, default=%s'%DATA.mWorkingDir,
                      default=DATA.mWorkingDir)
+        p.add_option('--cmake_args',
+                     action='store',
+                     type='string',
+                     help='additional arguments to ALL cmake calls',
+                     default="")
         return p
     
     def _parseCommandLine(self):
@@ -1035,7 +1047,10 @@ Available components are:
         if options.external_dir:
             DATA.mExternalDir = options.external_dir
         if options.working_dir:
-            DATA.mWorkingDir = options.working_dir        
+            DATA.mWorkingDir = options.working_dir
+        if options.cmake_args:
+            DATA.mCMakeArgs = options.cmake_args
+
         
         #TODO can be wrong for external libs as they use DATA.mBuildExternalsType!
         DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType 
