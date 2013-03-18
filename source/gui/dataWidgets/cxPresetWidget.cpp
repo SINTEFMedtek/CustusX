@@ -4,11 +4,13 @@
 
 namespace cx {
 
-PresetWidget::PresetWidget(QWidget* parent, QString objectName, QString windowTitle) :
-	BaseWidget(parent, objectName, windowTitle), mLayout(new QVBoxLayout(this))
+PresetWidget::PresetWidget(QWidget* parent) :
+	BaseWidget(parent, "PresetWidget", "Presets"), mLayout(new QVBoxLayout(this))
 {
 	mPresetsComboBox = new QComboBox(this);
 	mPresetsComboBox->setToolTip("Select a preset to use");
+	connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this,
+			SLOT(presetsBoxChangedSlot(const QString&)));
 
 	mActionGroup = new QActionGroup(this);
 
@@ -44,16 +46,77 @@ QString PresetWidget::defaultWhatsThis() const
     "</html>";
 }
 
+bool PresetWidget::requestSetCurrentPreset(QString name)
+{
+	if(mPresetsComboBox->findText(name) == -1)
+		return false;
+
+	mPresetsComboBox->setCurrentIndex(mPresetsComboBox->findText(name));
+	return true;
+}
+
+QString PresetWidget::getCurrentPreset()
+{
+	return mPresetsComboBox->currentText();
+}
+
+void PresetWidget::showDetailed(bool detailed)
+{
+	if(!mButtonLayout)
+		return;
+
+	for(int i=0; i < mButtonLayout->count(); ++i)
+	{
+		QWidget* widget = mButtonLayout->itemAt(i)->widget();
+		if(!widget)
+			continue;
+		if(detailed)
+			widget->show();
+		else
+			widget->hide();
+	}
+}
+
 void PresetWidget::setPresets(ssc::PresetsPtr presets)
 {
+	if(!presets)
+	{
+		std::cout << "Trying to set presets to null...  :(" << std::endl;
+		return;
+	}
+	//TODO disconnect old stuff
+
 	mPresets = presets;
-	connect(mPresets.get(), SIGNAL(changed()),
-			this, SLOT(populatePresetListSlot()));
+	connect(mPresets.get(), SIGNAL(changed()), this, SLOT(populatePresetListSlot()));
+
+	this->populatePresetListSlot();
 }
 
 void PresetWidget::resetSlot()
 {
 	mPresetsComboBox->setCurrentIndex(0);
+}
+
+void PresetWidget::saveSlot()
+{
+	//TODO
+	std::cout << "TODO: IMPLEMENT PresetWidget::saveSlot()" << std::endl;
+}
+
+void PresetWidget::deleteSlot()
+{
+	//TODO
+	std::cout << "TODO: IMPLEMENT PresetWidget::deleteSlot()" << std::endl;
+}
+
+void PresetWidget::populatePresetListSlot()
+{
+	this->populatePresetList(mPresets->getPresetList(""));
+}
+
+void PresetWidget::presetsBoxChangedSlot(const QString& name)
+{
+	emit presetSelected(name);
 }
 
 void PresetWidget::populateButtonLayout()
@@ -81,24 +144,23 @@ void PresetWidget::populateButtonLayout()
 	{
 		QToolButton* button = new QToolButton(this);
 		button->setDefaultAction(actions[i]);
+		button->show();
 		mButtonLayout->addWidget(button);
 	}
 	mButtonLayout->addStretch();
 }
 
-//void PresetWidget::populatePresetListSlot()
-//{
-//	// Re-initialize the list
-//  mPresetsComboBox->blockSignals(true);
-//  mPresetsComboBox->clear();
-//
-//  mPresetsComboBox->addItem("Transfer function preset...");
-//
-//  if (ssc::dataManager()->getActiveImage())
-//  	mPresetsComboBox->addItems(mPresets->getPresetList(ssc::dataManager()->getActiveImage()->getModality()));
-//  else //No active image, show all available presets for debug/overview purposes
-//  	mPresetsComboBox->addItems(mPresets->getPresetList("UNKNOWN"));
-//  mPresetsComboBox->blockSignals(false);
-//}
+void PresetWidget::populatePresetList(QStringList list)
+{
+	mPresetsComboBox->blockSignals(true);
+	mPresetsComboBox->clear();
+
+	mPresetsComboBox->addItem("<Default preset>");
+
+	mPresetsComboBox->addItems(list);
+
+	mPresetsComboBox->blockSignals(false);
+}
+
 
 } /* namespace cx */

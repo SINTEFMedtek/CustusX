@@ -25,6 +25,7 @@ SET( MOC_HEADER_FILES
 	logic/cxSmoothingImageFilter.h
 	logic/cxResampleImageFilter.h
 	logic/cxTubeSegmentationFilter.h
+	logic/cxTSFPresets.h
     gui/cxAlgorithmPlugin.h
     gui/cxConnectedThresholdImageFilterWidget.h
     gui/cxTimedAlgorithmProgressBar.h
@@ -63,6 +64,8 @@ SET( SOURCE_FILES
 	logic/cxSmoothingImageFilter.cpp
 	logic/cxResampleImageFilter.h
 	logic/cxResampleImageFilter.cpp
+	logic/cxTSFPresets.h
+	logic/cxTSFPresets.cpp
     gui/cxAlgorithmPlugin.h
     gui/cxAlgorithmPlugin.cpp
     gui/cxConnectedThresholdImageFilterWidget.h

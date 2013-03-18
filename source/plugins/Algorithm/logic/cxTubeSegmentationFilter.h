@@ -4,6 +4,7 @@
 #include "cxFilterImpl.h"
 
 #include <boost/unordered_map.hpp>
+#include <boost/shared_ptr.hpp>
 
 #ifdef CX_USE_TSF
 #include "parameters.hpp"
@@ -17,6 +18,7 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 namespace cx {
+typedef boost::shared_ptr<class TSFPresets> TSFPresetsPtr;
 
 #ifdef CX_USE_TSF
 /**
@@ -43,6 +45,10 @@ public:
 	virtual QString getName() const;
 	virtual QString getHelp() const;
 
+	virtual bool hasPresets();
+	virtual ssc::PresetsPtr getPresets();
+	virtual void requestSetPresetSlot(QString name);
+
 	virtual bool execute();
 	virtual bool postProcess();
 
@@ -54,11 +60,11 @@ protected:
 private slots:
 	void patientChangedSlot(); ///< updates where tsf will save temp data
 	void inputChangedSlot(); ///< updates where tsf will save the .vtk file
-	void parametersFileChanged(); ///<  request that all options are updated to fit the selected preset
-	void loadNewParameters(); ///< updates all options
-	void resetOptionsAdvanced(); ///< resets all options to their default advanced settings
-	void resetOptions(); ///< resets all options to their default settings
-	void setOptions(paramList& list); ///< sets options to a given list of parameters
+//	void parametersFileChanged(); ///<  request that all options are updated to fit the selected preset
+	void loadNewParametersSlot(); ///< updates all options
+	void resetOptionsAdvancedSlot(); ///< resets all options to their default advanced settings
+	void resetOptionsSlot(); ///< resets all options to their default settings
+	void setOptionsSlot(paramList& list); ///< sets options to a given list of parameters
 
 private:
 	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ssc::ImagePtr input); ///< converts a char array to a vtkImageDataPtr
@@ -86,6 +92,8 @@ private:
 	ssc::BoolDataAdapterXmlPtr makeBoolOption(QDomElement root, std::string name, BoolParameter parameter); ///< constructs a bool option
 	ssc::DoubleDataAdapterXmlPtr makeDoubleOption(QDomElement root, std::string name, NumericParameter parameter); ///< constructs a double option
 
+	TSFPresetsPtr populatePresets(); ///< converts the parameters files to internal presets
+
 	QString mParameterFile; ///< the last selected parameter file
 
 	std::vector<ssc::StringDataAdapterXmlPtr> mStringOptions; ///< string options to be displayed to the user
@@ -94,6 +102,8 @@ private:
 
 	TSFOutput* mOutput; ///< output from last execution
 	paramList mParameters; ///< the parameters used in last execution
+
+	TSFPresetsPtr mPresets;
 
 };
 typedef boost::shared_ptr<class TubeSegmentationFilter> TubeSegmentationFilterPtr;
