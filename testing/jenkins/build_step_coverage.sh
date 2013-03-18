@@ -18,8 +18,8 @@ WORKSPACE=$1
 CX_DEBUG_DIR=$WORKSPACE/working/CustusX3/build_Debug
 
 # ==========================================================
-# configure and build all libs. Do NOT download - assumed to be done by another script.
-./working/CustusX3/CustusX3/install/Shared/script/cxInstaller.py ---configure --build --all -t Debug -j4 -s --isb_password=sintefsvn -u custusx --external_dir=$WORKSPACE/external --working_dir=$WORKSPACE/working --cmake_args="-DBUILD_DOCUMENTATION:BOOL=OFF" --coverage
+# configure and build all libs with debug info
+./working/CustusX3/CustusX3/install/Shared/script/cxInstaller.py --full --all -t Debug -j4 -s --isb_password=sintefsvn -u custusx --external_dir=$WORKSPACE/external --working_dir=$WORKSPACE/working --cmake_args="-DBUILD_DOCUMENTATION:BOOL=OFF" --coverage
 
 # ==========================================================
 # make the CustusX project in order to provoke a build failure.
