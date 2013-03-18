@@ -650,7 +650,7 @@ cmake \
         if DATA.mISBpassword == "":
             return '--username sintef %s' % self.mCurrentRevision
         else:
-            return '--non-interactive --username sintef --password %s %s' % DATA.mISBpassword
+            return '--non-interactive --username sintef --password %s' % DATA.mISBpassword
     # ---------------------------------------------------------
 
 #===============================================================================
