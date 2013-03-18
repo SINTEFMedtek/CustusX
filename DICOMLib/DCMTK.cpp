@@ -1579,6 +1579,14 @@ static void progressCallback( void *callbackData, T_DIMSE_C_FindRQ *request, int
 	}
 	SSC_LOG( "Received study %s (with %d series not received yet) from PACS", newStudy->studyID, newStudy->series_count );
 
+	if (!responseIdentifiers->findAndGetOFString(DCM_ModalitiesInStudy, value).bad())
+	{
+		SSC_LOG("No modalities info found in response");
+		value = "";
+	}
+	sstrcpy(newStudy->modalities, value.c_str());
+	SSC_LOG("Study %s from PACS has modalities: %s", newStudy->studyID, newStudy->modalities);
+
 	// Add to end of linked list, so that index order is preserved
 	newStudy->next_study = NULL;
 	if (!next)
@@ -1693,6 +1701,7 @@ struct study_t *DICOMLib_StudiesFromPACS( const char *searchString, enum pacs_se
 	overrideKeys->insert( newDicomElement( DCM_StudyInstanceUID, 1 ) );
 	overrideKeys->insert( newDicomElement( DCM_StudyID, 1 ) );
 	overrideKeys->insert( newDicomElement( DCM_NumberOfStudyRelatedSeries, 1 ) );
+	overrideKeys->insert( newDicomElement( DCM_ModalitiesInStudy, 1 ) );
 
 	// ** Initialize network **
 
