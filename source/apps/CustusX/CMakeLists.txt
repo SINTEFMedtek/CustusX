@@ -380,4 +380,39 @@ install(CODE "
 		fixup_bundle(\"${APPS}\"   \"\${QTPLUGINS}\"   \"${DIRS}\") "
 		)
 
-		
+# this text can be inserted into the about box with some effort...
+set(CONFIGURATION_TEXT
+"
+Configuration for CustusX ${VERSION_NUMBER_VERBOSE}
+
+	Build Settings:
+		Built on system: ${CMAKE_SYSTEM} ${CMAKE_ARCHITECTURE} ${CMAKE_SYSTEM_PROCESSOR}
+		Build type: ${CMAKE_BUILD_TYPE}
+		Shared Libraries: ${BUILD_SHARED_LIBRARIES}
+		Coverage: ${SSC_USE_GCOV}
+		Doxygen: ${BUILD_DOCUMENTATION}
+
+	Libraries:
+		Qt Version ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}
+		VTK Version: ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION}
+		ITK Version: ${ITK_VERSION}
+		OpenCV Version: ${OpenCV_VERSION}
+		CMake Version: ${CMAKE_VERSION}
+		IGSTK Version: ${IGSTK_VERSION_MAJOR}.${IGSTK_VERSION_MINOR}.${IGSTK_VERSION_PATCH}
+		OpenIGTLink Version: ${OpenIGTLink_VERSION_MAJOR}.${OpenIGTLink_VERSION_MINOR}.${OpenIGTLink_VERSION_PATCH}
+
+
+	Internal libraries:
+		Tube-Segmentation-Toolkit: ${CX_USE_TSF}
+		SSC Thunder OpenCL US Reconstruction: ${SSC_USE_OpenCL}
+		Grabber Servers:
+			Mac QuickTime Grabber Server: ${BUILD_GRABBER_SERVER}
+			IGTLink Grabber Server: ${BUILD_OPEN_IGTLINK_SERVER}
+				ISB GE Scanner Grabber Interface: ${CX_USE_ISB_GE}
+				OpenCV Grabber Interface: ${CX_USE_OpenCV}
+
+"
+
+)
+
+message(STATUS ${CONFIGURATION_TEXT})
