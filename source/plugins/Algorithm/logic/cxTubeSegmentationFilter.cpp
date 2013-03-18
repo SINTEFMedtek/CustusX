@@ -24,6 +24,7 @@
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "cxTSFPresets.h"
 
 typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 
@@ -33,6 +34,7 @@ TubeSegmentationFilter::TubeSegmentationFilter() :
 	FilterImpl(), mOutput(NULL)
 {
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+	mPresets = this->populatePresets();
 }
 
 QString TubeSegmentationFilter::getName() const
@@ -51,6 +53,34 @@ QString TubeSegmentationFilter::getHelp() const
 	        "<h3>Tube-Segmentation.</h3>"
 	        "<p><i>Extracts the centerline and creates a segementation. </br>GPU-base algorithm written by Erik Smistad (NTNU).</i></p>"
 	        "</html>";
+}
+
+bool TubeSegmentationFilter::hasPresets()
+{
+	return true;
+}
+
+ssc::PresetsPtr TubeSegmentationFilter::getPresets()
+{
+	return mPresets;
+}
+
+void TubeSegmentationFilter::requestSetPresetSlot(QString name)
+{
+	QString centerLineMethod = "gpu";
+	if((name == "<Default preset>") || (name == "none") || (name == "default"))
+		mParameterFile = "none";
+	else
+	{
+		QStringList nameList = name.split(": ", QString::SkipEmptyParts);
+		mParameterFile = nameList.at(1);
+		QString temp = nameList.at(0);
+		centerLineMethod = temp.remove("centerline-");
+	}
+	this->loadNewParametersSlot();
+
+	ssc::StringDataAdapterXmlPtr centerlineMethodOption = this->getStringOption("centerline-method");
+	centerlineMethodOption->setValue(centerLineMethod);
 }
 
 bool TubeSegmentationFilter::execute()
@@ -343,19 +373,19 @@ void TubeSegmentationFilter::inputChangedSlot()
 		option->setValue(activePatientFolder+inputsValue+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat())+"_tsf_vtk.vtk");
 }
 
-void TubeSegmentationFilter::parametersFileChanged()
-{
-	if(mParameterFile != this->getStringOption("parameters")->getValue())
-		QTimer::singleShot(0, this, SLOT(loadNewParameters()));
-}
+//void TubeSegmentationFilter::parametersFileChanged()
+//{
+//	if(mParameterFile != this->getStringOption("parameters")->getValue())
+//		QTimer::singleShot(0, this, SLOT(loadNewParameters()));
+//}
 
-void TubeSegmentationFilter::loadNewParameters()
+void TubeSegmentationFilter::loadNewParametersSlot()
 {
-	ssc::StringDataAdapterXmlPtr parameterOption = this->getStringOption("parameters");
-	if(!parameterOption)
-		return;
+//	ssc::StringDataAdapterXmlPtr parameterOption = this->getStringOption("parameters");
+//	if(!parameterOption)
+//		return;
 
-	mParameterFile = parameterOption->getValue();
+//	mParameterFile = parameterOption->getValue();
 
 	paramList list = this->getDefaultParameters();
 
@@ -373,8 +403,8 @@ void TubeSegmentationFilter::loadNewParameters()
 	}
 
 	blockSignals(true);
-		this->setOptions(list);
-		this->resetOptionsAdvanced();
+		this->setOptionsSlot(list);
+		this->resetOptionsAdvancedSlot();
 		//set parameters found in the parameter file as not advanced
 		std::vector<std::string> notDefaultOptions = this->getNotDefault(list);
 		std::vector<std::string>::iterator it;
@@ -387,7 +417,7 @@ void TubeSegmentationFilter::loadNewParameters()
 	emit changed();
 }
 
-void TubeSegmentationFilter::resetOptionsAdvanced()
+void TubeSegmentationFilter::resetOptionsAdvancedSlot()
 {
 	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
@@ -416,14 +446,14 @@ void TubeSegmentationFilter::resetOptionsAdvanced()
 	}
 }
 
-void TubeSegmentationFilter::resetOptions()
+void TubeSegmentationFilter::resetOptionsSlot()
 {
 	paramList defaultParameters = this->getDefaultParameters();
-	this->resetOptionsAdvanced();
-	this->setOptions(defaultParameters);
+	this->resetOptionsAdvancedSlot();
+	this->setOptionsSlot(defaultParameters);
 }
 
-void TubeSegmentationFilter::setOptions(paramList& list)
+void TubeSegmentationFilter::setOptionsSlot(paramList& list)
 {
 	this->setParamtersToOptions(list);
 	this->patientChangedSlot();
@@ -498,11 +528,10 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     	mStringOptions.push_back(option);
     	if(stringIt->first == "parameters")
     	{
-    		connect(option.get(), SIGNAL(changed()), this, SLOT(parametersFileChanged()));
-    		option->setAdvanced(false);
+    		option->setEnabled(false);
+//    		connect(option.get(), SIGNAL(changed()), this, SLOT(parametersFileChanged()));
     	}
-    	else
-    		option->setAdvanced(true);
+    	option->setAdvanced(true);
     }
 
 	//generate bool adapters
@@ -861,6 +890,14 @@ ssc::DoubleDataAdapterXmlPtr TubeSegmentationFilter::makeDoubleOption(QDomElemen
 
 	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, range, decimals, root);
 	retval->setAddSlider(true);
+	return retval;
+}
+
+TSFPresetsPtr TubeSegmentationFilter::populatePresets()
+{
+//	std::cout << "TubeSegmentationFilter::populatePresets()" << std::endl;
+	TSFPresetsPtr retval(new TSFPresets());
+
 	return retval;
 }
 

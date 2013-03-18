@@ -94,6 +94,8 @@ class Common(object):
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
         self.mCoverage = "OFF"
+        self.mCMakeArgs = ""
+
 
 # ---------------------------------------------------------
     
@@ -391,6 +393,7 @@ Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-c
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DVTK_USE_PARALLEL:BOOL=ON \
 -DVTK_REQUIRED_OBJCXX_FLAGS:STRING="" \
@@ -530,6 +533,7 @@ class IGSTK(CppComponent):
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DIGSTK_USE_SceneGraphVisualization:BOOL=OFF \
 -DBUILD_EXAMPLES:BOOL=OFF \
@@ -604,6 +608,7 @@ cmake \
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
+        self.mCurrentRevision = "330"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -611,13 +616,11 @@ class ISB_DataStreaming(CppComponent):
         return DATA.mWorkingDir + "/ISB_DataStreaming"
     def _rawCheckout(self):
         self._changeDirToBase()
-        if DATA.mISBpassword == "":
-            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef %s' % (self.sourceFolder()))
-        else:
-            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef --password %s %s' % (DATA.mISBpassword, self.sourceFolder()))
+        runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
     def update(self):
         self._changeDirToSource()
-        runShell('svn up')
+#        runShell('svn up')
+        runShell('svn up -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
@@ -629,6 +632,7 @@ cmake \
 -DVTK_DIR:PATH="%s" \
 -DDATASTREAMING_USE_HDF:BOOL=OFF \
 -DDATASTREAMING_USE_TRACKING:BOOL=OFF \
+-DDATASTREAMING_USE_SC_DICOM_LOADERS:BOOL=OFF \
 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
@@ -639,6 +643,14 @@ cmake \
             self.sourceFolder()+"/vtkDataStreamClient/")
             )
         # add xcode project here if needed
+    def _svn_login_info(self):
+        '''
+        return login info to be added as arguments to the svn co and up calls.
+        '''
+        if DATA.mISBpassword == "":
+            return '--username sintef %s' % self.mCurrentRevision
+        else:
+            return '--non-interactive --username sintef --password %s' % DATA.mISBpassword
     # ---------------------------------------------------------
 
 #===============================================================================
@@ -698,13 +710,14 @@ class CustusX3(CppComponent):
         self._changeDirToSource()
         runShell('git checkout master')
         runShell('git pull')
-        runShell('git submodule update')
+        runShell('git submodule update --init --recursive')
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DBUILD_OPEN_IGTLINK_SERVER=true \
@@ -715,7 +728,7 @@ cmake \
 -DOpenCV_DIR:PATH="%s" \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
--DCX_USE_TSF:BOOL=true \
+-DCX_USE_TSF:BOOL=OFF \
 -DTube-Segmentation-Framework_DIR:PATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
 -DBUILD_TESTING="%s" \
@@ -724,6 +737,7 @@ cmake \
 -DGEStreamer_DIR:PATH="%s" \
 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 -DSSC_USE_GCOV:BOOL=%s \
+%s \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, DATA.mBuildShared, 
@@ -742,6 +756,7 @@ cmake \
             ISB_DataStreaming().buildPath(),
             DATA.mOSX_DEPLOYMENT_TARGET,
             DATA.mCoverage,
+            DATA.mCMakeArgs,
             self.sourceFolder() )
             )
         #TODO add xcode project here if needed?
@@ -971,6 +986,21 @@ Available components are:
                      action='store_true',
                      help='gcov code coverage',
                      default=False)
+        p.add_option('--external_dir',
+                     action='store',
+                     type='string',
+                     help='specify external folder, default=%s'%DATA.mExternalDir,
+                     default=DATA.mExternalDir)
+        p.add_option('--working_dir',
+                     action='store',
+                     type='string',
+                     help='specify work folder, default=%s'%DATA.mWorkingDir,
+                     default=DATA.mWorkingDir)
+        p.add_option('--cmake_args',
+                     action='store',
+                     type='string',
+                     help='additional arguments to ALL cmake calls',
+                     default="")
         return p
     
     def _parseCommandLine(self):
@@ -1018,6 +1048,13 @@ Available components are:
             DATA.mISBpassword = options.isb_password
         if options.coverage:
             DATA.mCoverage = 'ON'
+        if options.external_dir:
+            DATA.mExternalDir = options.external_dir
+        if options.working_dir:
+            DATA.mWorkingDir = options.working_dir
+        if options.cmake_args:
+            DATA.mCMakeArgs = options.cmake_args
+
         
         #TODO can be wrong for external libs as they use DATA.mBuildExternalsType!
         DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType 
@@ -1044,9 +1081,8 @@ Available components are:
         checkout, configure, build
         '''
         # info
-        print 'User:', DATA.mUser
-        print 'Server User:', DATA.mServerUser
-        print 'Root dir:', DATA.mRootDir
+	self._printSettings()
+
         print 'Use the following components:', [val.name() for val in useLibs]
         if (not DATA.mSilent_mode):
             raw_input("\nPress enter to continue or ctrl-C to quit:")
@@ -1055,6 +1091,8 @@ Available components are:
             for lib in useLibs:
                 print '\n================== checkout ', lib.name(), '========================'
                 lib.checkout()
+        if options.full or options.checkout:
+            for lib in useLibs:
                 print '\n================== update ', lib.name(), '========================'
                 lib.update()
         if options.configure_clean:
@@ -1074,7 +1112,24 @@ Available components are:
                 print '\n================== build ', lib.name(), '========================'
                 lib.build()
     # ---------------------------------------------------------
-
+    def _printSettings(self):
+        print ''
+        print 'Settings:'
+        print '	User:', DATA.mUser
+        print '	Server User:', DATA.mServerUser
+        print '	PLATFORM:', DATA.PLATFORM
+        print '	ISBpassword:', DATA.mISBpassword
+        print '	RootDir:', DATA.mRootDir
+        print '	ExternalDir:', DATA.mExternalDir
+        print '	WorkingDir:', DATA.mWorkingDir
+        print '	Silent_mode:', DATA.mSilent_mode
+        print '	BuildShared:', DATA.mBuildShared
+        print '	BuildType:', DATA.mBuildType
+        print '	BuildExternalsType:', DATA.mBuildExternalsType
+        print '	BuildTesting:', DATA.mBuildTesting
+        print '	CMakeGenerator:', DATA.mCMakeGenerator
+        print '	Coverage:', DATA.mCoverage
+        print ''
 
 def main():
     Controller()
@@ -1082,4 +1137,5 @@ def main():
 #This idiom means the below code only runs when executed from command line
 if __name__ == '__main__':
     main()
+
 

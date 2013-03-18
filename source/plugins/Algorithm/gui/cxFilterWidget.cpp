@@ -14,6 +14,7 @@
 
 #include "cxFilterWidget.h"
 
+#include "cxPresetWidget.h"
 #include "sscStringDataAdapter.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscHelperWidgets.h"
@@ -23,7 +24,6 @@
 #include "cxPatientData.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxDataInterface.h"
-
 #include "cxDummyFilter.h"
 #include "cxBinaryThresholdImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
@@ -211,11 +211,13 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options
 	mInputsWidget = new OptionsWidget(this);
 	mOutputsWidget = new OptionsWidget(this);
 	mOptionsWidget = new OptionsWidget(this);
+	mPresetWidget = new PresetWidget(this);
 	mAdvancedButton = new QCheckBox("Show &advanced options", this);
 	connect(mAdvancedButton, SIGNAL(stateChanged(int)), this, SLOT(showAdvancedOptions(int)));
 
 	topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
 	topLayout->addWidget(this->wrapInGroupBox(mOutputsWidget, "Output"));
+	topLayout->addWidget(mPresetWidget);
 	mOptionsGroupBox = this->wrapInGroupBox(mOptionsWidget, "Options");
 	topLayout->addWidget(mOptionsGroupBox);
 	topLayout->addWidget(mAdvancedButton);
@@ -272,6 +274,7 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 
 	mCurrentFilter = filter;
 	connect(mCurrentFilter.get(), SIGNAL(changed()), this, SLOT(rebuildOptions()));
+	connect(mPresetWidget, SIGNAL(presetSelected(QString)), mCurrentFilter.get(), SLOT(requestSetPresetSlot(QString)));
 
 	if (mFrame)
 		mFrame->setTitle(mCurrentFilter->getName());
@@ -287,6 +290,13 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes(), false);
 		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes(), false);
 		mOptionsWidget->setOptions(mCurrentFilter->getUid(), options, false);
+		if(mCurrentFilter->hasPresets())
+		{
+			mPresetWidget->setPresets(mCurrentFilter->getPresets());
+			mCurrentFilter->requestSetPresetSlot("default");
+			mPresetWidget->show();
+		} else
+			mPresetWidget->hide();
 	}
 	else
 	{
@@ -298,16 +308,17 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 
 void FilterSetupWidget::toggleDetailed()
 {
-	//todo presetsWidget->toggleDetailed();
 	if(mOptionsGroupBox->isHidden())
 	{
 		mOptionsGroupBox->show();
 		mAdvancedButton->show();
+		mPresetWidget->showDetailed(true);
 	}
 	else
 	{
 		mOptionsGroupBox->hide();
 		mAdvancedButton->hide();
+		mPresetWidget->showDetailed(false);
 	}
 }
 
