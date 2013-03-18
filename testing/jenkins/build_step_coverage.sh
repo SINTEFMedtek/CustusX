@@ -34,6 +34,8 @@ else
     exit 1
 fi
 
+
 # ==========================================================
 # run lcov and generate html. Coverage info will now be in CX_DEBUG_DIR/
+cd $WORKSPACE
 ./working/CustusX3/CustusX3/testing/coverage/cxCoverage.py --initialize --run_tests --post_test CX_DEBUG_DIR
