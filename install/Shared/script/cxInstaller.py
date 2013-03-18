@@ -608,6 +608,7 @@ cmake \
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
+        self.mCurrentRevision = "330"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -615,17 +616,11 @@ class ISB_DataStreaming(CppComponent):
         return DATA.mWorkingDir + "/ISB_DataStreaming"
     def _rawCheckout(self):
         self._changeDirToBase()
-        if DATA.mISBpassword == "":
-            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef %s' % (self.sourceFolder()))
-        else:
-            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --non-interactive --username sintef --password %s %s' % (DATA.mISBpassword, self.sourceFolder()))
+        runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ -r%s %s %s' % (self.mCurrentRevision, self_svn_login_info(), self.sourceFolder()))
     def update(self):
         self._changeDirToSource()
 #        runShell('svn up')
-        if DATA.mISBpassword == "":
-            runShell('svn up --username sintef %s' % (self.sourceFolder()))
-        else:
-            runShell('svn up --non-interactive --username sintef --password %s %s' % (DATA.mISBpassword, self.sourceFolder()))
+        runShell('svn up -r%s %s %s' % (self.mCurrentRevision, self_svn_login_info(), self.sourceFolder()))
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
@@ -637,6 +632,7 @@ cmake \
 -DVTK_DIR:PATH="%s" \
 -DDATASTREAMING_USE_HDF:BOOL=OFF \
 -DDATASTREAMING_USE_TRACKING:BOOL=OFF \
+-DDATASTREAMING_USE_SC_DICOM_LOADERS:BOOL=OFF \
 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
@@ -647,6 +643,14 @@ cmake \
             self.sourceFolder()+"/vtkDataStreamClient/")
             )
         # add xcode project here if needed
+    def _svn_login_info(self):
+        '''
+        return login info to be added as arguments to the svn co and up calls.
+        '''
+        if DATA.mISBpassword == "":
+            return '--username sintef %s' % self.mCurrentRevision
+        else:
+            return '--non-interactive --username sintef --password %s %s' % DATA.mISBpassword
     # ---------------------------------------------------------
 
 #===============================================================================
