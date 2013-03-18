@@ -616,11 +616,11 @@ class ISB_DataStreaming(CppComponent):
         return DATA.mWorkingDir + "/ISB_DataStreaming"
     def _rawCheckout(self):
         self._changeDirToBase()
-        runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ -r%s %s %s' % (self.mCurrentRevision, self_svn_login_info(), self.sourceFolder()))
+        runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
     def update(self):
         self._changeDirToSource()
 #        runShell('svn up')
-        runShell('svn up -r%s %s %s' % (self.mCurrentRevision, self_svn_login_info(), self.sourceFolder()))
+        runShell('svn up -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
