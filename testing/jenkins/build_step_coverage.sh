@@ -56,7 +56,8 @@ cppcheck --enable=all --xml-version=2 -i$CX_SOURCE_DIR/externals/ssc/Code/3rdPar
 
 # ==========================================================
 # run line counter
-sloccount --duplicates --wide --details $CX_SOURCE_DIR >$WORKSPACE/sloccount.sc
+sloccount --duplicates --wide --details $CX_SOURCE_DIR >$WORKSPACE/sloccount_raw.sc
+./working/CustusX3/CustusX3/testing/jenkins/clean_sloccount.py --remove="3rdParty/ config/ install/ /data/" $WORKSPACE/sloccount_raw.sc $WORKSPACE/sloccount.sc 
 
 # post-op requirements:
 #   - publish coverage data 
