@@ -254,7 +254,7 @@ class Controller(object):
 		"""
 		runShell('lcov --capture --directory . --output-file cx_coverage_test.gcov')
 		runShell('lcov --add-tracefile cx_coverage_base.gcov --add-tracefile cx_coverage_test.gcov --output-file cx_coverage_total.gcov')
-		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/Examples/*" --output-file cx_coverage.gcov')
+		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/Examples/*" --output-file cx_coverage.gcov')
 #		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/testing/*" "/Testing/*" "/Examples/*" --output-file cx_coverage.gcov')
 		runShell('genhtml cx_coverage.gcov --output-directory %s' % self.mOutputPath)
 
