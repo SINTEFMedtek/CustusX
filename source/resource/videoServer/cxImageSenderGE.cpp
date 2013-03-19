@@ -313,13 +313,13 @@ void ImageSenderGE::grab()
 
 	mRenderTimer->time("sent");
 
-	if (mRenderTimer->intervalPassed())
-	{
-        static int counter=0;
+//	if (mRenderTimer->intervalPassed())
+//	{
+//        static int counter=0;
 //        if (++counter%3==0)
 //            ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
         mRenderTimer->reset();
-	}
+//	}
 }
 
 void ImageSenderGE::send()
@@ -359,7 +359,6 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 //	flipper->SetFilteredAxis(0);
 //	vtkImageDataPtr	flipped = flipper->GetOutput();
 //	flipped->Update();
-	mRenderTimer->time("flip");
 //	vtkImageDataPtr copy = vtkImageDataPtr::New();
 //	copy->DeepCopy(img);
 	if (geometryChanged)
@@ -368,10 +367,10 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 		mSender->send(frameMessage);
 		std::cout << uid << " Nyquist " << geometry.vNyquist << std::endl;
 		int*  dim = img->GetDimensions();
-		std::cout << "Volume size: " << dim[0] << " " << dim[1] << " " << dim[2] << std::endl;
+		std::cout << uid << " Volume size: " << dim[0] << " " << dim[1] << " " << dim[2] << std::endl;
 
 	}
-	mRenderTimer->time("sendpr");
+//	mRenderTimer->time("sendpr");
 
 	// CustusX does not handle nonzero origin - set to zero, but AFTER getFrameStatus() is called.
 	vtkImageChangeInformationPtr center = vtkImageChangeInformationPtr::New();

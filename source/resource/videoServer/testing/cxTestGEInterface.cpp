@@ -4,18 +4,20 @@
 #include <QTimer>
 #include "GEStreamer.h"
 //#include "sscVector3D.h"
-#include "cxImageSenderFactory.h"
 #include "cxGrabberSender.h"
 #include "cxTestGEInterfaceController.h"
+#include "sscMessageManager.h"
 
 void TestGEInterface::setUp()
 {
 //	cx::LogicManager::initialize();
+	ssc::MessageManager::initialize();
 }
 
 void TestGEInterface::tearDown()
 {
 //	cx::LogicManager::shutdown();
+	ssc::MessageManager::shutdown();
 }
 
 void TestGEInterface::testConstructor()
@@ -28,13 +30,26 @@ void TestGEInterface::testInit()
 	args["type"] = "ISB_GE";
 	args["test"] = "2D";
 	args["useOpenCL"] = "0";
+	std::cout << "---Test GE 2D scanconverted stream. Auto size" << std::endl;
+	this->testStream(args);
+	args["test"] = "3D";
+	std::cout << "---Test GE 3D scanconverted stream. Auto size" << std::endl;
+	this->testStream(args); //3D
+	args["imagesize"] = "100*100*100";
+	std::cout << "---Test GE 3D scanconverted stream. Defined size" << std::endl;
+	this->testStream(args); //set size
 
 //	args["test"] = "no";
-	args["ip"] = "bhgrouter.hopto.org";
-//	args["imagesize"] = "500*500";
+//	args["ip"] = "bhgrouter.hopto.org";
+//	std::cout << "---Custom test: Connect to simulator" << std::endl;
+//	this->testStream(args);//Custom test
+}
+
+void TestGEInterface::testStream(cx::StringMap args)
+{
 	cx::ImageSenderPtr imageSender = cx::ImageSenderFactory().getFromArguments(args);
 	CPPUNIT_ASSERT(imageSender);
-	CPPUNIT_ASSERT(imageSender->getType().compare("ISB_GE") == 0);
+	CPPUNIT_ASSERT(imageSender->getType().compare(args["type"]) == 0);
 
 	cx::GrabberSenderDirectLinkPtr grabberBridge(new cx::GrabberSenderDirectLink());
 
@@ -43,8 +58,7 @@ void TestGEInterface::testInit()
 
 	CPPUNIT_ASSERT(imageSender->startStreaming(grabberBridge));
 
-
-//	QTimer::singleShot(1*1000,   qApp, SLOT(quit()) );
+	//	QTimer::singleShot(1*1000,   qApp, SLOT(quit()) );
 	QTimer::singleShot(500,   qApp, SLOT(quit()) );
 	qApp->exec();
 
