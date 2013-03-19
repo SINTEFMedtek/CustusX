@@ -38,4 +38,29 @@ fi
 # ==========================================================
 # run lcov and generate html. Coverage info will now be in CX_DEBUG_DIR/
 cd $WORKSPACE
-./working/CustusX3/CustusX3/testing/coverage/cxCoverage.py --initialize --run_tests --post_test $CX_DEBUG_DIR
+./working/CustusX3/CustusX3/testing/coverage/cxCoverage.py --initialize --run_tests --ctest_args="-D ExperimentalTest --no-compress-output" --post_test $CX_DEBUG_DIR
+
+# ==========================================================
+# (this is done by the coverage.py script)
+#
+# Run all tests and write them in xml format to ./CTestResults.xml
+#cd $CX_DEBUG_DIR
+#rm -rf Testing/201*
+#ctest -D ExperimentalTest --no-compress-output
+#cp Testing/`head -n 1 Testing/TAG`/Test.xml ./CTestResults.xml
+
+# ==========================================================
+# run cppcheck
+CX_SOURCE_DIR=$WORKSPACE/working/CustusX3/CustusX3
+cppcheck --enable=all --xml-version=2 -i$CX_SOURCE_DIR/externals/ssc/Code/3rdParty/ $CX_SOURCE_DIR/source $CX_SOURCE_DIR/externals/ssc/Code/ 2> $WORKSPACE/cppcheck-result.xml
+
+# ==========================================================
+# run line counter
+sloccount --duplicates --wide --details $CX_SOURCE_DIR >$WORKSPACE/sloccount.sc
+
+# post-op requirements:
+#   - publish coverage data 
+#   - publish ctest data using xUnit
+#   - publish cppcheck and sloccount
+
+
