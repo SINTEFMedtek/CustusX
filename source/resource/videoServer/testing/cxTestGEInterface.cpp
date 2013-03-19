@@ -28,6 +28,10 @@ void TestGEInterface::testInit()
 	args["type"] = "ISB_GE";
 	args["test"] = "2D";
 	args["useOpenCL"] = "0";
+
+//	args["test"] = "no";
+	args["ip"] = "bhgrouter.hopto.org";
+//	args["imagesize"] = "500*500";
 	cx::ImageSenderPtr imageSender = cx::ImageSenderFactory().getFromArguments(args);
 	CPPUNIT_ASSERT(imageSender);
 	CPPUNIT_ASSERT(imageSender->getType().compare("ISB_GE") == 0);
@@ -57,7 +61,7 @@ void TestGEInterface::testGEStreamer()
 	data_streaming::GEStreamer geStreamer;
 
 	//Initialize GEStreamer    HFDPath, useHDF, imgSize, interpolation,       buffSize, clPath, useCL
-	geStreamer.InitializeClientData("", false, 500*500, data_streaming::Bilinear, 10,   "",     false);
+	geStreamer.InitializeClientData("", false, 1, data_streaming::Bilinear, 10,   "",     false);
 
 	//Setup the needed data stream types. The default is only scan converted data
 	geStreamer.SetupExportParameters(true, false, false, false);
@@ -65,6 +69,7 @@ void TestGEInterface::testGEStreamer()
 
 	//                                         (hostIp, streamPort, commandPort, testMode));
 	CPPUNIT_ASSERT(geStreamer.ConnectToScanner("127.0.0.1", 6543,    -1,         data_streaming::test3D));
+//	CPPUNIT_ASSERT(geStreamer.ConnectToScanner("bhgrouter.hopto.org", 6543,    -1,         data_streaming::noTest));
 
 
 	geStreamer.WaitForImageData();
