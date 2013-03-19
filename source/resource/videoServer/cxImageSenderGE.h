@@ -75,6 +75,7 @@ private:
    	bool mExportTissue;
    	bool mExportBandwidth;
    	bool mExportFrequency;
+   	bool mExportVelocity;
 
 	bool initialize_local();
 	void deinitialize_local();
