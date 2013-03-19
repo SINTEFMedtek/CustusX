@@ -19,7 +19,8 @@ CX_DEBUG_DIR=$WORKSPACE/working/CustusX3/build_Debug
 
 # ==========================================================
 # configure and build all libs with debug info
-./working/CustusX3/CustusX3/install/Shared/script/cxInstaller.py --full --all -t Debug -j4 -s --isb_password=sintefsvn -u custusx --external_dir=$WORKSPACE/external --working_dir=$WORKSPACE/working --cmake_args="-DBUILD_DOCUMENTATION:BOOL=OFF" --coverage
+#./working/CustusX3/CustusX3/install/Shared/script/cxInstaller.py --full --all -t Debug -j4 -s --isb_password=sintefsvn -u custusx --external_dir=$WORKSPACE/external --working_dir=$WORKSPACE/working --cmake_args="-DBUILD_DOCUMENTATION:BOOL=OFF" --coverage
+./working/CustusX3/CustusX3/install/Shared/script/cxInstaller.py --full -t Debug -j4 -s --isb_password=sintefsvn -u custusx --external_dir=$WORKSPACE/external --working_dir=$WORKSPACE/working --cmake_args="-DBUILD_DOCUMENTATION:BOOL=OFF" --coverage CustusX3
 
 # ==========================================================
 # make the CustusX project in order to provoke a build failure.
@@ -53,12 +54,12 @@ cp $CX_DEBUG_DIR/Testing/`head -n 1 Testing/TAG`/Test.xml $CX_DEBUG_DIR/CTestRes
 # ==========================================================
 # run cppcheck
 CX_SOURCE_DIR=$WORKSPACE/working/CustusX3/CustusX3
-cppcheck --enable=all --xml-version=2 -i$CX_SOURCE_DIR/externals/ssc/Code/3rdParty/ $CX_SOURCE_DIR/source $CX_SOURCE_DIR/externals/ssc/Code/ 2> $WORKSPACE/cppcheck-result.xml
+#cppcheck --enable=all --xml-version=2 -i$CX_SOURCE_DIR/externals/ssc/Code/3rdParty/ $CX_SOURCE_DIR/source $CX_SOURCE_DIR/externals/ssc/Code/ 2> $WORKSPACE/cppcheck-result.xml
 
 # ==========================================================
 # run line counter
-sloccount --duplicates --wide --details $CX_SOURCE_DIR >$WORKSPACE/sloccount_raw.sc
-./working/CustusX3/CustusX3/testing/jenkins/clean_sloccount.py --remove="3rdParty/ config/ install/ /data/" $WORKSPACE/sloccount_raw.sc $WORKSPACE/sloccount.sc 
+#sloccount --duplicates --wide --details $CX_SOURCE_DIR >$WORKSPACE/sloccount_raw.sc
+#./working/CustusX3/CustusX3/testing/jenkins/clean_sloccount.py --remove="3rdParty/ config/ install/ /data/" $WORKSPACE/sloccount_raw.sc $WORKSPACE/sloccount.sc
 
 # post-op requirements:
 #   - publish coverage data 
