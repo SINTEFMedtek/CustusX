@@ -34,20 +34,21 @@ else
     exit 1
 fi
 
+# remove old test data before start
+cd $CX_DEBUG_DIR
+rm -rf $CX_DEBUG_DIR/Testing/201*
+rm -rf $CX_DEBUG_DIR/CTestResults.xml
 
 # ==========================================================
-# run lcov and generate html. Coverage info will now be in CX_DEBUG_DIR/
+# run lcov and generate html. Coverage info will now be in CX_DEBUG_DIR/coverage_info
 cd $WORKSPACE
 ./working/CustusX3/CustusX3/testing/coverage/cxCoverage.py --initialize --run_tests --ctest_args="-D ExperimentalTest --no-compress-output" --post_test $CX_DEBUG_DIR
 
 # ==========================================================
-# (this is done by the coverage.py script)
+# (tests are run by cxCoverage.py)
 #
-# Run all tests and write them in xml format to ./CTestResults.xml
-#cd $CX_DEBUG_DIR
-#rm -rf Testing/201*
-#ctest -D ExperimentalTest --no-compress-output
-#cp Testing/`head -n 1 Testing/TAG`/Test.xml ./CTestResults.xml
+# RunWrite tests in xml format to ./CTestResults.xml
+cp $CX_DEBUG_DIR/Testing/`head -n 1 Testing/TAG`/Test.xml $CX_DEBUG_DIR/CTestResults.xml
 
 # ==========================================================
 # run cppcheck
