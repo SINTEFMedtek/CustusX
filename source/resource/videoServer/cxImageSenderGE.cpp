@@ -52,7 +52,7 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--test:		GEStreamer test mode (no, 2D or 3D), default = no";
 	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
-	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted, Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency";
+	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted, Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency,velocity (all)";
 	return retval;
 }
 
@@ -64,7 +64,8 @@ ImageSenderGE::ImageSenderGE(QObject* parent) :
 	mExportScanconverted(true),
 	mExportTissue(false),
 	mExportBandwidth(false),
-	mExportFrequency(false)
+	mExportFrequency(false),
+	mExportVelocity(false)
 {
 	//data_streaming::DataStreamApp test;
 	mRenderTimer.reset(new CyclicActionTimer("GE Grabber Timer"));
@@ -136,6 +137,7 @@ void ImageSenderGE::initialize(StringMap arguments)
    	mExportTissue = false;
    	mExportBandwidth = false;
    	mExportFrequency = false;
+   	mExportVelocity = false;
    	for (int i = 0; i < streamList.length(); i++)
    	{
    		if (streamList.at(i).compare("scanconverted", Qt::CaseInsensitive) == 0)
@@ -146,6 +148,16 @@ void ImageSenderGE::initialize(StringMap arguments)
    			mExportBandwidth = true;
    		else if (streamList.at(i).compare("frequency", Qt::CaseInsensitive) == 0)
    			mExportFrequency = true;
+   		else if (streamList.at(i).compare("velocity", Qt::CaseInsensitive) == 0)
+   			mExportVelocity = true;
+   		else if (streamList.at(i).compare("all", Qt::CaseInsensitive) == 0)
+   		{
+   			mExportScanconverted = true;
+   			mExportTissue = true;
+   			mExportBandwidth = true;
+   			mExportFrequency = true;
+   			mExportVelocity = true;
+   		}
    		else
    			ssc::messageManager()->sendWarning("ImageSenderGE: Unknown stream: " + streamList.at(i));
    	}
@@ -347,6 +359,11 @@ void ImageSenderGE::send()
 	{
 		uid = "Frequency [R]";
 		send(uid, mImgExportedStream->GetFrequencyImage(), mFlowGeometry, mFlowGeometryChanged);
+	}
+	if (mExportVelocity && mImgExportedStream->GetVelocityImage())
+	{
+		uid = "Velocity [R]";
+		send(uid, mImgExportedStream->GetVelocityImage(), mFlowGeometry, mFlowGeometryChanged);
 	}
 }
 
