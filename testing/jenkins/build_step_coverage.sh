@@ -68,7 +68,7 @@ ctest -D ExperimentalTest --no-compress-output
 # Generate html output from the gcov data.
 lcov --capture --directory $CX_DEBUG_DIR --output-file $GCOV_TEMP_DIR/cx_test.gcov
 lcov --add-tracefile $GCOV_TEMP_DIR/cx_base.gcov --add-tracefile $GCOV_TEMP_DIR/cx_test.gcov --output-file $GCOV_TEMP_DIR/cx_total.gcov
-lcov --remove $CX_DEBUG_DIR/cx_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/Examples/*" --output-file $GCOV_TEMP_DIR/cx_clean.gcov
+lcov --remove $GCOV_TEMP_DIR/cx_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/Examples/*" --output-file $GCOV_TEMP_DIR/cx_clean.gcov
 genhtml $GCOV_TEMP_DIR/cx_clean.gcov --output-directory $GCOV_RESULT_DIR
 
 # ==========================================================
@@ -83,7 +83,7 @@ cppcheck --enable=all --xml-version=2 -i$CX_SOURCE_DIR/externals/ssc/Code/3rdPar
 # ==========================================================
 # run line counter
 sloccount --duplicates --wide --details $CX_SOURCE_DIR >$WORKSPACE/sloccount_raw.sc
-./working/CustusX3/CustusX3/testing/jenkins/clean_sloccount.py --remove="3rdParty/ config/ install/ /data/" $WORKSPACE/sloccount_raw.sc $WORKSPACE/sloccount.sc
+$CX_SOURCE_DIR/testing/jenkins/clean_sloccount.py --remove="3rdParty/ config/ install/ /data/" $WORKSPACE/sloccount_raw.sc $WORKSPACE/sloccount.sc
 
 # post-op requirements:
 #   - publish coverage data 
