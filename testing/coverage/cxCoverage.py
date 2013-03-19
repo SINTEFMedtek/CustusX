@@ -229,8 +229,8 @@ class Controller(object):
 		if ctest_args:
 			cmd = cmd + ' ' + ctest_args
 		#cmd = cmd + ' > %s/ctest_results.txt' % path
-#		cmd = '%s --output-log %s' % (cmd, self.mCTestResultsFile)
-		cmd = '%s' % cmd
+		cmd = '%s --output-log %s' % (cmd, self.mCTestResultsFile)
+        #		cmd = '%s' % cmd
 		print 'Running %s ...' % cmd
 		runShell('mkdir -p %s' % self.mOutputPath)
 		runShell(cmd)
