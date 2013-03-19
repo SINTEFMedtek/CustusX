@@ -24,7 +24,7 @@ void TestGEInterface::testConstructor()
 {
 }
 
-void TestGEInterface::testInit()
+void TestGEInterface::testStreams()
 {
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
