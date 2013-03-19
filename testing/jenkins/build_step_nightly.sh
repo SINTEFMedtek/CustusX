@@ -45,7 +45,8 @@ fi
 # ==========================================================
 # Run all tests and write them in xml format to ./CTestResults.xml
 cd $CX_RELEASE_DIR
-rm -rf Testing/201*
+rm -rf $CX_RELEASE_DIR/Testing/[0-9]*
+rm -rf $CX_RELEASE_DIR/CTestResults.xml
 ctest -D ExperimentalTest --no-compress-output
 cp Testing/`head -n 1 Testing/TAG`/Test.xml ./CTestResults.xml
 
