@@ -49,7 +49,7 @@ cd $WORKSPACE
 # (tests are run by cxCoverage.py)
 #
 # RunWrite tests in xml format to ./CTestResults.xml
-cp $CX_DEBUG_DIR/Testing/`head -n 1 Testing/TAG`/Test.xml $CX_DEBUG_DIR/CTestResults.xml
+cp $CX_DEBUG_DIR/Testing/`head -n 1 $CX_DEBUG_DIR/Testing/TAG`/Test.xml $CX_DEBUG_DIR/CTestResults.xml
 
 # ==========================================================
 # run cppcheck
