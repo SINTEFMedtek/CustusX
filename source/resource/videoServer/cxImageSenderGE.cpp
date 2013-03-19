@@ -48,7 +48,7 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--streamport:		GE scanner streaming port, default = 6543";
 	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
 	retval << "--buffersize:		Size of GEStreamer buffer, default = 10";
-	retval << "--imagesize:		Returned image/volume size in pixels, default = 500x500x1";
+	retval << "--imagesize:		Returned image/volume size in pixels (eg. 500x500x1), default = auto";
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--test:		GEStreamer test mode (no, 2D or 3D), default = no";
 	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
@@ -87,9 +87,6 @@ void ImageSenderGE::initialize(StringMap arguments)
 	//is dumping enabled
 	bool dumpHdfToDisk = false;
 
-	//size of the scan converted 2D image in pixels
-//	long imageSize2D = 500*500;
-
 	//interpolation type
 	data_streaming::InterpolationType interpType = data_streaming::Bilinear;
 
@@ -107,7 +104,7 @@ void ImageSenderGE::initialize(StringMap arguments)
     if (!mArguments.count("test"))
         mArguments["test"] = "no";
     if (!mArguments.count("imagesize"))
-        mArguments["imagesize"] = "500x500x1";
+        mArguments["imagesize"] = "auto";
     if (!mArguments.count("useOpenCL"))
         mArguments["useOpenCL"] = "1";
     if (!mArguments.count("streams"))
@@ -115,15 +112,22 @@ void ImageSenderGE::initialize(StringMap arguments)
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
 
-   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
    	long imageSize = 1;
-   	for (int i = 0; i < sizeList.length(); i++)
-   	{
-   		int dimSize = convertStringWithDefault(sizeList.at(i), 1);
-   		imageSize *= dimSize;
-   	}
-   	if (imageSize <= 1)
-   		ssc::messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
+	if (!mArguments["imagesize"].compare("auto", Qt::CaseInsensitive) == 0)
+	{
+	   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
+	   	bool ok = false;
+		for (int i = 0; i < sizeList.length(); i++)
+		{
+			int dimSize = convertStringWithDefault(sizeList.at(i), 1);
+			imageSize *= dimSize;
+			ok = true;
+		}
+		if (imageSize <= 0 || !ok)
+		{
+			ssc::messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
+		}
+	}
 
    	//Select image streams to export
    	//Accept , ; . as separators
@@ -363,6 +367,9 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, img);
 		mSender->send(frameMessage);
 		std::cout << uid << " Nyquist " << geometry.vNyquist << std::endl;
+		int*  dim = img->GetDimensions();
+		std::cout << "Volume size: " << dim[0] << " " << dim[1] << " " << dim[2] << std::endl;
+
 	}
 	mRenderTimer->time("sendpr");
 
