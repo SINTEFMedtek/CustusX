@@ -7,6 +7,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
+#include "cxImageSenderFactory.h"
 
 /**Unit tests that test the acquisition plugin
  */
@@ -23,6 +24,7 @@ public:
 	int getValue(vtkSmartPointer<vtkImageData> img, int x, int y, int z);
 	void validateData(vtkSmartPointer<vtkImageData> img);
 	void validateBMode3D(vtkSmartPointer<vtkImageData> img);
+	void testStream(cx::StringMap args);///< Grab a short stream
 
 public:
 	CPPUNIT_TEST_SUITE( TestGEInterface );
