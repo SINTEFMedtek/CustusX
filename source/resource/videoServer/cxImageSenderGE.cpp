@@ -329,6 +329,7 @@ void ImageSenderGE::grab()
 //        static int counter=0;
 //        if (++counter%3==0)
 //            ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+//	          std::cout << mRenderTimer->dumpStatisticsSmall() << std::endl;
         mRenderTimer->reset();
 //	}
 }
