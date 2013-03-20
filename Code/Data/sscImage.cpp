@@ -112,7 +112,8 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	//  mShading.specular = 0.3;
 	//  mShading.specularPower = 15.0;
 
-	this->resetTransferFunctions();
+	mImageLookupTable2D.reset();
+	mImageTransferFunctions3D.reset();
 }
 
 
@@ -272,6 +273,8 @@ vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
 
 ImageTF3DPtr Image::getTransferFunctions3D()
 {
+	if(!mImageTransferFunctions3D)
+		this->resetTransferFunctions(false, true);
 	return mImageTransferFunctions3D;
 }
 
@@ -283,6 +286,8 @@ void Image::setTransferFunctions3D(ImageTF3DPtr transferFuntion)
 
 ImageLUT2DPtr Image::getLookupTable2D()
 {
+	if(!mImageLookupTable2D)
+		this->resetTransferFunctions(true, false);
 	return mImageLookupTable2D;
 }
 
@@ -413,7 +418,7 @@ int Image::getMax()
 	}
 	else
 	{
-		return (int) mImageTransferFunctions3D->getScalarMax();
+		return (int) this->getTransferFunctions3D()->getScalarMax();
 	}
 }
 
@@ -422,7 +427,7 @@ int Image::getMin()
 	// Alternatively create min from histogram
 	//IntIntMap::iterator iter = this->getHistogram()->begin();
 	//return (*iter).first;
-	return (int) mImageTransferFunctions3D->getScalarMin();
+	return (int) this->getTransferFunctions3D()->getScalarMin();
 }
 
 int Image::getRange()
@@ -442,11 +447,11 @@ void Image::addXml(QDomNode& dataNode)
 	QDomDocument doc = dataNode.ownerDocument();
 
 	QDomElement tf3DNode = doc.createElement("transferfunctions");
-	mImageTransferFunctions3D->addXml(tf3DNode);
+	this->getTransferFunctions3D()->addXml(tf3DNode);
 	imageNode.appendChild(tf3DNode);
 
 	QDomElement lut2DNode = doc.createElement("lookuptable2D");
-	mImageLookupTable2D->addXml(lut2DNode);
+	this->getLookupTable2D()->addXml(lut2DNode);
 	imageNode.appendChild(lut2DNode);
 
 	QDomElement shadingNode = doc.createElement("shading");
@@ -502,14 +507,14 @@ void Image::parseXml(QDomNode& dataNode)
 	//transferefunctions
 	QDomNode transferfunctionsNode = dataNode.namedItem("transferfunctions");
 	if (!transferfunctionsNode.isNull())
-		mImageTransferFunctions3D->parseXml(transferfunctionsNode);
+		this->getTransferFunctions3D()->parseXml(transferfunctionsNode);
 	else
 	{
 		std::cout << "Warning: Image::parseXml() found no transferfunctions";
 		std::cout << std::endl;
 	}
 
-	mImageLookupTable2D->parseXml(dataNode.namedItem("lookuptable2D"));
+	this->getLookupTable2D()->parseXml(dataNode.namedItem("lookuptable2D"));
 
 	// backward compatibility:
 	mShading.on = dataNode.namedItem("shading").toElement().text().toInt();
