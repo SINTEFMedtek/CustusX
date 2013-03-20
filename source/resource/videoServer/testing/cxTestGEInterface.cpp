@@ -30,13 +30,18 @@ void TestGEInterface::testStreams()
 	args["type"] = "ISB_GE";
 	args["test"] = "2D";
 	args["useOpenCL"] = "0";
-	std::cout << "---Test GE 2D scanconverted stream. Auto size" << std::endl;
+	std::cout << std::endl << "--- Test GE 2D scanconverted stream. Auto size ---" << std::endl;
 	this->testStream(args);
+	args["imagesize"] = "500*500";
+	std::cout << std::endl << "--- Test GE 2D scanconverted stream. Defined size ---" << std::endl;
+	this->testStream(args); //set size
+
 	args["test"] = "3D";
-	std::cout << "---Test GE 3D scanconverted stream. Auto size" << std::endl;
+	args["imagesize"] = "auto";
+	std::cout << std::endl << "--- Test GE 3D scanconverted stream. Auto size ---" << std::endl;
 	this->testStream(args); //3D
 	args["imagesize"] = "100*100*100";
-	std::cout << "---Test GE 3D scanconverted stream. Defined size" << std::endl;
+	std::cout << std::endl << "--- Test GE 3D scanconverted stream. Defined size ---" << std::endl;
 	this->testStream(args); //set size
 
 //	args["test"] = "no";
@@ -75,7 +80,7 @@ void TestGEInterface::testGEStreamer()
 	data_streaming::GEStreamer geStreamer;
 
 	//Initialize GEStreamer    HFDPath, useHDF, imgSize, interpolation,       buffSize, clPath, useCL
-	geStreamer.InitializeClientData("", false, 1, data_streaming::Bilinear, 10,   "",     false);
+	geStreamer.InitializeClientData("", false, -1, data_streaming::Bilinear, 10,   "",     false);
 
 	//Setup the needed data stream types. The default is only scan converted data
 	geStreamer.SetupExportParameters(true, false, false, false);
