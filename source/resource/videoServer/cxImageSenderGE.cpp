@@ -113,18 +113,17 @@ void ImageSenderGE::initialize(StringMap arguments)
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
 
-   	long imageSize = 1;
+   	long imageSize = -1;// -1 = auto
 	if (!mArguments["imagesize"].compare("auto", Qt::CaseInsensitive) == 0)
 	{
+		imageSize = 1;
 	   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
-	   	bool ok = false;
 		for (int i = 0; i < sizeList.length(); i++)
 		{
 			int dimSize = convertStringWithDefault(sizeList.at(i), 1);
 			imageSize *= dimSize;
-			ok = true;
 		}
-		if (imageSize <= 0 || !ok)
+		if (imageSize <= 1)
 		{
 			ssc::messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
 		}
