@@ -352,7 +352,7 @@ void TextDisplay::setPosition( float x, float y  )
 void TextDisplay::updateText( const QString& text)
 {
 	mapper->SetInput( cstring_cast(text) );
-	//mapper->Update();
+	actor->Modified();
 }
 
 vtkTextProperty* TextDisplay::textProperty()
