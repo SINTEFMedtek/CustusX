@@ -114,6 +114,9 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	view->addRep(rep);
 	insertView(view, uid, imageFilename, r, c);
 
+	mTimer.setSingleShot(true);
+	mTimer.setInterval(0);
+	connect(&mTimer, SIGNAL(timeout()), this, SLOT(updateRender()));
 	return true;
 }
 
@@ -250,7 +253,7 @@ void ViewsWindow::start(bool showSliders)
 	mToolmanager->startTracking();
 
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
-	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), this, SLOT( updateRender()));
+	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), &mTimer, SLOT( start()));
 
 	//gui controll
 	QVBoxLayout *mainLayout = new QVBoxLayout;
