@@ -21,6 +21,12 @@ set -x
 WORKSPACE=$1
 CX_RELEASE_DIR=$WORKSPACE/working/CustusX3/build_Release
 
+echo "==============================================="
+echo "user: " `whoami`
+echo "DISPLAY: " $DISPLAY
+echo "hostname: " `hostname`
+echo "==============================================="
+
 # ==========================================================
 # Download, configure and build the project group.
 # Python script will return success even if some parts failed.
