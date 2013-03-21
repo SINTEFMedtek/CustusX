@@ -75,6 +75,7 @@ private:
 	QTime mLastRenderEnd;
 	QString mShaderFolder;
 	ssc::AcceptanceBoxWidget* mAcceptanceBox;
+	QTimer mTimer;
 
 public slots:
 	void updateRender();
