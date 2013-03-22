@@ -17,18 +17,20 @@
 #
 #
 #####################################################
-
 set -x
 WORKSPACE=$1
 CX_RELEASE_DIR=$WORKSPACE/working/CustusX3/build_Release
 
+echo "==============================================="
+echo "user: " `whoami`
+echo "DISPLAY: " $DISPLAY
+echo "hostname: " `hostname`
+echo "==============================================="
+
 # ==========================================================
 # Download, configure and build the project group.
 # Python script will return success even if some parts failed.
-#./working/CustusX3/CustusX3/install/Shared/script/cxInstaller.py --full --all -t Release -j4 -s --isb_password=sintefsvn -u custusx --external_dir=$WORKSPACE/external --working_dir=$WORKSPACE/working --cmake_args="-DBUILD_DOCUMENTATION:BOOL=ON"
-# use during development: update only the CustusX part
 ./working/CustusX3/CustusX3/install/Shared/script/cxInstaller.py --full -t Release -j4 -s --isb_password=sintefsvn -u custusx --external_dir=$WORKSPACE/external --working_dir=$WORKSPACE/working --cmake_args="-DBUILD_DOCUMENTATION:BOOL=OFF" CustusX3
-
 
 # ==========================================================
 # make the CustusX project in order to provoke a build failure.
@@ -36,26 +38,17 @@ cd $CX_RELEASE_DIR
 make -j4
 if [ $? == 0 ]
 then
-    echo "CustusX build success"
+echo "CustusX build success"
 #    exit 0
 else
-    echo "CustusX build failure, terminating"
-    exit 1
+echo "CustusX build failure, terminating"
+exit 1
 fi
 
 # ==========================================================
 # Run all tests and write them in xml format to ./CTestResults.xml
 cd $CX_RELEASE_DIR
-#echo "checking pwd"
-#echo `pwd`
-# execute tests with xml output
-rm -rf Testing/201*
-#ctest -D ExperimentalTest --no-compress-output
-ctest -D ExperimentalTest --no-compress-output -R Tool
-# copy xml to fixed position ./CTestResults.xml
+rm -rf Testing/[0-9]*
+rm -rf $CX_RELEASE_DIR/CTestResults.xml
+ctest -D ExperimentalTest --no-compress-output
 cp Testing/`head -n 1 Testing/TAG`/Test.xml ./CTestResults.xml
-
-# ==========================================================
-# copy/publish doxygen to medtek server (link from wiki):
-#REMOTE_DOXY_PATH="/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/custusx_doxygen"
-#scp -r $CX_RELEASE_DIR/doc/doxygen/html/* medtek.sintef.no:$REMOTE_DOXY_PATH
