@@ -26,10 +26,11 @@ void TestGEInterface::testConstructor()
 
 void TestGEInterface::testStreams()
 {
+	std::cout << std::endl << "*** Test GE all streams streams. CPU scanconversion ***" << std::endl;
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
 	args["test"] = "2D";
-	args["useOpenCL"] = "0";
+	args["useOpenCL"] = "0"; //Test only CPU scan conversion
 	std::cout << std::endl << "--- Test GE 2D scanconverted stream. Auto size ---" << std::endl;
 	this->testStream(args);
 	args["imagesize"] = "500*500";
@@ -48,6 +49,31 @@ void TestGEInterface::testStreams()
 //	args["ip"] = "bhgrouter.hopto.org";
 //	std::cout << "---Custom test: Connect to simulator" << std::endl;
 //	this->testStream(args);//Custom test
+}
+
+void TestGEInterface::testSingleStreams()
+{
+	std::cout << std::endl << "*** Test GE single streams. GPU scanconversion if possible ***" << std::endl;
+	cx::StringMap args;
+	args["type"] = "ISB_GE";
+	args["test"] = "2D";
+	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
+	args["streams"] = "scanconverted";
+	std::cout << std::endl << "--- Test GE 2D scanconverted stream. ---" << std::endl;
+	this->testStream(args);
+	args["streams"] = "tissue";
+	std::cout << std::endl << "--- Test GE 2D tissue stream. ---" << std::endl;
+	this->testStream(args);
+	args["streams"] = "bandwidth";
+	std::cout << std::endl << "--- Test GE 2D bandwidth stream. ---" << std::endl;
+	this->testStream(args);
+	args["streams"] = "frequency";
+	std::cout << std::endl << "--- Test GE 2D frequency stream. ---" << std::endl;
+	this->testStream(args);
+	args["streams"] = "velocity";
+	std::cout << std::endl << "--- Test GE 2D velocity stream. ---" << std::endl;
+	this->testStream(args);
+
 }
 
 void TestGEInterface::testStream(cx::StringMap args)
@@ -141,11 +167,11 @@ void TestGEInterface::validateData(vtkSmartPointer<vtkImageData> img)
 
 void TestGEInterface::validateBMode3D(vtkSmartPointer<vtkImageData> img)
 {
-	std::cout << getValue(img, 0,0,0) << std::endl;
-	std::cout << getValue(img, 5,5,5) << std::endl;
-	std::cout << getValue(img, 7,7,7) << std::endl;
-	std::cout << getValue(img, 9,9,9) << std::endl;
-
+	int* dim =  img->GetDimensions();
+	std::cout << "dim: " << dim[0] << " " << dim[1] << " " << dim[2] << std::endl;
+	std::cout << "value in " << dim[0]/3 << " " << dim[1]/3 <<  " " << dim[2]/3 << ": ";
+	std::cout << getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) << std::endl;
+	CPPUNIT_ASSERT( getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) == 100);
 }
 
 #endif //CX_USE_ISB_GE
