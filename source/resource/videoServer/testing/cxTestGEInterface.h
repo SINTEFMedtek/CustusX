@@ -31,7 +31,7 @@ public:
 	CPPUNIT_TEST_SUITE( TestGEInterface );
 //		CPPUNIT_TEST( testConstructor );
 		CPPUNIT_TEST( testStreams );
-		CPPUNIT_TEST( testSingleStreams );
+//		CPPUNIT_TEST( testSingleStreams );
 		CPPUNIT_TEST( testGEStreamer );
 	CPPUNIT_TEST_SUITE_END();
 private:
