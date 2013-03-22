@@ -79,8 +79,8 @@ void TestGEInterface::testGEStreamer()
 {
 	data_streaming::GEStreamer geStreamer;
 
-	//Initialize GEStreamer    HFDPath, useHDF, imgSize, interpolation,       buffSize, clPath, useCL
-	geStreamer.InitializeClientData("", false, -1, data_streaming::Bilinear, 10,   "",     false);
+	//Initialize GEStreamer    HFDPath, useHDF, sizeCompType,     imgSize, interpolation,       buffSize, clPath, useCL
+	geStreamer.InitializeClientData("", false, data_streaming::AUTO, -1, data_streaming::Bilinear, 10,   "",     false);
 
 	//Setup the needed data stream types. The default is only scan converted data
 	geStreamer.SetupExportParameters(true, false, false, false);

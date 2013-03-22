@@ -115,9 +115,11 @@ void ImageSenderGE::initialize(StringMap arguments)
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
 
+	data_streaming::OutputSizeComputationType imageCompType = data_streaming::AUTO;
    	long imageSize = -1;// -1 = auto
 	if (!mArguments["imagesize"].compare("auto", Qt::CaseInsensitive) == 0)
 	{
+		imageCompType = data_streaming::ANISOTROPIC;
 		imageSize = 1;
 	   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
 		for (int i = 0; i < sizeList.length(); i++)
@@ -130,6 +132,8 @@ void ImageSenderGE::initialize(StringMap arguments)
 			ssc::messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
 		}
 	}
+	else
+		imageCompType = data_streaming::AUTO;
 
    	//Select image streams to export
    	//Accept , ; . as separators
@@ -183,7 +187,7 @@ void ImageSenderGE::initialize(StringMap arguments)
 	} else
 		openclpath = path.absolutePath().toStdString();
 
-	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize, interpType, bufferSize, openclpath, useOpenCL);
+	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageCompType, imageSize, interpType, bufferSize, openclpath, useOpenCL);
 
 	//Setup the needed data stream types. The default is only scan converted data
 //	mGEStreamer.SetupExportParameters(true, false, false, false);
