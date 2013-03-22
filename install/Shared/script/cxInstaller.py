@@ -729,6 +729,7 @@ cmake \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
 -DCX_USE_TSF:BOOL=OFF \
+-DSSC_USE_DCMTK:BOOL=OFF \
 -DTube-Segmentation-Framework_DIR:PATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
 -DBUILD_TESTING="%s" \
@@ -821,27 +822,30 @@ cmake \
         
 # ---------------------------------------------------------
 
-#===============================================================================
-# class CustusX3Data(Component):
-#    def name(self):
-#        return "CustusX3-Data"
-#    def help(self):
-#        return 'data files for CustusX'
-#    def path(self):
-#        return DATA.mWorkingDir + "/CustusX3"
-#    def sourceFolder(self):
-#        return 'data'
-#    def _rawCheckout(self):
-#        changeDir(self.path())
-#        runShell('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/data' % DATA.mServerUser)
-#    def update(self):
-#        changeDir(self.path()+'/'+self.sourceFolder())
-#        runShell('svn up')
-#    def configure(self):
-#        pass
-#    def build(self):
-#        pass
-#===============================================================================
+# ===============================================================================
+class CustusX3Data(Component):
+    def name(self):
+        return "CustusX3-Data"
+    def help(self):
+        return 'data files for CustusX'
+    def path(self):
+        custusx = CustusX3()
+        return custusx.path() + "/" + custusx.sourceFolder()
+        #return DATA.mWorkingDir + "/CustusX3"
+    def sourceFolder(self):
+        return 'data'
+    def _rawCheckout(self):
+        changeDir(self.path())
+        runShell('git clone ssh://medtek.sintef.no//Volumes/medtek_HD/git/Data.git %s' % self.sourceFolder())
+#runShell('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/data' % DATA.mServerUser)
+    def update(self):
+        changeDir(self.path()+'/'+self.sourceFolder())
+        runShell('git checkout master')
+        runShell('git pull')
+    def configure(self):
+        pass
+    def build(self):
+        pass
 # ---------------------------------------------------------
 
 
@@ -867,8 +871,8 @@ class Controller(object):
                      ISB_DataStreaming(),
                      UltrasonixSDK(),
                      TubeSegmentationFramework(),
-                     CustusX3()
-                     #CustusX3Data()
+                     CustusX3(),
+                     CustusX3Data()
                      ]
         self.libnames = [lib.name() for lib in self.libraries]
         
