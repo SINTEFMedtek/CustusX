@@ -56,9 +56,9 @@ void TestGEInterface::testSingleStreams()
 {
 	std::cout << std::endl << "*** Test GE single streams. GPU scanconversion if possible ***" << std::endl;
 	cx::StringMap args;
-	args["ip"] = "bhgrouter.hopto.org";
+//	args["ip"] = "bhgrouter.hopto.org";
 	args["type"] = "ISB_GE";
-	args["test"] = "no";
+	args["test"] = "2D";
 	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
 	args["streams"] = "scanconverted";
 	std::cout << std::endl << "--- Test GE 2D scanconverted stream. ---" << std::endl;
