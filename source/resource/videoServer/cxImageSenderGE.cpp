@@ -190,12 +190,7 @@ void ImageSenderGE::initialize(StringMap arguments)
 	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageCompType, imageSize, interpType, bufferSize, openclpath, useOpenCL);
 
 	//Setup the needed data stream types. The default is only scan converted data
-//	mGEStreamer.SetupExportParameters(true, false, false, false);
-	mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, mExportFrequency);
-
-	//Temporary fix of the velocity stream. TODO: May need to be fixed in the GEStreamer code
-	if (mExportVelocity)
-		mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, true);
+	mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, mExportFrequency, mExportVelocity);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
