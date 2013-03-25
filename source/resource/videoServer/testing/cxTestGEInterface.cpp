@@ -111,7 +111,7 @@ void TestGEInterface::testGEStreamer()
 	geStreamer.InitializeClientData("", false, data_streaming::AUTO, -1, data_streaming::Bilinear, 10,   "",     false);
 
 	//Setup the needed data stream types. The default is only scan converted data
-	geStreamer.SetupExportParameters(true, false, false, false);
+	geStreamer.SetupExportParameters(true, false, false, false, false);
 //	geStreamer.SetupExportParameters(true, true, true, true);
 
 	//                                         (hostIp, streamPort, commandPort, testMode));
