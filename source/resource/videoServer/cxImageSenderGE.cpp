@@ -193,6 +193,10 @@ void ImageSenderGE::initialize(StringMap arguments)
 //	mGEStreamer.SetupExportParameters(true, false, false, false);
 	mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, mExportFrequency);
 
+	//Temporary fix of the velocity stream. TODO: May need to be fixed in the GEStreamer code
+	if (mExportVelocity)
+		mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, true);
+
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
 	// release resources if the server is a local app and is killed by CustusX.
@@ -212,6 +216,7 @@ void ImageSenderGE::deinitialize_local()
 	data_streaming::frame_geometry emptyGeometry;
 	mFrameGeometry = emptyGeometry;
 	mFlowGeometry = emptyGeometry;
+	mGEStreamer.DisconnectFromScanner();
 }
 
 bool ImageSenderGE::initialize_local()
