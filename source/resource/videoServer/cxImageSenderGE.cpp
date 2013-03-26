@@ -231,7 +231,8 @@ bool ImageSenderGE::initialize_local()
 		test = data_streaming::noTest;
 
 	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, test);
-	mGEStreamer.SetFlipTexture(false);
+//	mGEStreamer.SetFlipTexture(false);
+//	mGEStreamer.SetFlipType(data_streaming::FlipY);
 
 //	mImgStream = mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
 //	if(!mImgStream)
