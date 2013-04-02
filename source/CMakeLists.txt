@@ -47,7 +47,7 @@ include(${SSC_USE_FILE})
 
 # ISB GE streamer
 #----------
-option(CX_USE_ISB_GE "use ISB GE scanner interface" OFF)
+option(CX_USE_ISB_GE "use ISB GE scanner interface" ON)
 if (CX_USE_ISB_GE)
     ADD_DEFINITIONS(-DCX_USE_ISB_GE)
     find_package(GEStreamer REQUIRED)
