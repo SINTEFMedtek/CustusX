@@ -50,11 +50,11 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--streamport:		GE scanner streaming port, default = 6543";
 	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
 	retval << "--buffersize:		Size of GEStreamer buffer, default = 10";
-	retval << "--imagesize:		Returned image/volume size in pixels, default = 500x500x1";
+	retval << "--imagesize:		Returned image/volume size in pixels (eg. 500x500x1), default = auto";
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--test:		GEStreamer test mode (no, 2D or 3D), default = no";
 	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
-	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted, Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency";
+	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted, Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency,velocity (all)";
 	return retval;
 }
 
@@ -66,7 +66,8 @@ ImageSenderGE::ImageSenderGE(QObject* parent) :
 	mExportScanconverted(true),
 	mExportTissue(false),
 	mExportBandwidth(false),
-	mExportFrequency(false)
+	mExportFrequency(false),
+	mExportVelocity(false)
 {
 	//data_streaming::DataStreamApp test;
 	mRenderTimer.reset(new CyclicActionTimer("GE Grabber Timer"));
@@ -89,9 +90,6 @@ void ImageSenderGE::initialize(StringMap arguments)
 	//is dumping enabled
 	bool dumpHdfToDisk = false;
 
-	//size of the scan converted 2D image in pixels
-//	long imageSize2D = 500*500;
-
 	//interpolation type
 	data_streaming::InterpolationType interpType = data_streaming::Bilinear;
 
@@ -109,7 +107,7 @@ void ImageSenderGE::initialize(StringMap arguments)
     if (!mArguments.count("test"))
         mArguments["test"] = "no";
     if (!mArguments.count("imagesize"))
-        mArguments["imagesize"] = "500x500x1";
+        mArguments["imagesize"] = "auto";
     if (!mArguments.count("useOpenCL"))
         mArguments["useOpenCL"] = "1";
     if (!mArguments.count("streams"))
@@ -117,15 +115,25 @@ void ImageSenderGE::initialize(StringMap arguments)
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
 
-   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
-   	long imageSize = 1;
-   	for (int i = 0; i < sizeList.length(); i++)
-   	{
-   		int dimSize = convertStringWithDefault(sizeList.at(i), 1);
-   		imageSize *= dimSize;
-   	}
-   	if (imageSize <= 1)
-   		ssc::messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
+	data_streaming::OutputSizeComputationType imageCompType = data_streaming::AUTO;
+   	long imageSize = -1;// -1 = auto
+	if (!mArguments["imagesize"].compare("auto", Qt::CaseInsensitive) == 0)
+	{
+		imageCompType = data_streaming::ANISOTROPIC;
+		imageSize = 1;
+	   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
+		for (int i = 0; i < sizeList.length(); i++)
+		{
+			int dimSize = convertStringWithDefault(sizeList.at(i), 1);
+			imageSize *= dimSize;
+		}
+		if (imageSize <= 1)
+		{
+			ssc::messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
+		}
+	}
+	else
+		imageCompType = data_streaming::AUTO;
 
    	//Select image streams to export
    	//Accept , ; . as separators
@@ -134,6 +142,7 @@ void ImageSenderGE::initialize(StringMap arguments)
    	mExportTissue = false;
    	mExportBandwidth = false;
    	mExportFrequency = false;
+   	mExportVelocity = false;
    	for (int i = 0; i < streamList.length(); i++)
    	{
    		if (streamList.at(i).compare("scanconverted", Qt::CaseInsensitive) == 0)
@@ -144,6 +153,16 @@ void ImageSenderGE::initialize(StringMap arguments)
    			mExportBandwidth = true;
    		else if (streamList.at(i).compare("frequency", Qt::CaseInsensitive) == 0)
    			mExportFrequency = true;
+   		else if (streamList.at(i).compare("velocity", Qt::CaseInsensitive) == 0)
+   			mExportVelocity = true;
+   		else if (streamList.at(i).compare("all", Qt::CaseInsensitive) == 0)
+   		{
+   			mExportScanconverted = true;
+   			mExportTissue = true;
+   			mExportBandwidth = true;
+   			mExportFrequency = true;
+   			mExportVelocity = true;
+   		}
    		else
    			ssc::messageManager()->sendWarning("ImageSenderGE: Unknown stream: " + streamList.at(i));
    	}
@@ -168,11 +187,10 @@ void ImageSenderGE::initialize(StringMap arguments)
 	} else
 		openclpath = path.absolutePath().toStdString();
 
-	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageSize, interpType, bufferSize, openclpath, useOpenCL);
+	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageCompType, imageSize, interpType, bufferSize, openclpath, useOpenCL);
 
 	//Setup the needed data stream types. The default is only scan converted data
-//	mGEStreamer.SetupExportParameters(true, false, false, false);
-	mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, mExportFrequency);
+	mGEStreamer.SetupExportParameters(mExportScanconverted, mExportTissue, mExportBandwidth, mExportFrequency, mExportVelocity);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to
@@ -193,6 +211,7 @@ void ImageSenderGE::deinitialize_local()
 	data_streaming::frame_geometry emptyGeometry;
 	mFrameGeometry = emptyGeometry;
 	mFlowGeometry = emptyGeometry;
+	mGEStreamer.DisconnectFromScanner();
 }
 
 bool ImageSenderGE::initialize_local()
@@ -212,6 +231,8 @@ bool ImageSenderGE::initialize_local()
 		test = data_streaming::noTest;
 
 	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, test);
+//	mGEStreamer.SetFlipTexture(false);
+//	mGEStreamer.SetFlipType(data_streaming::FlipY);
 
 //	mImgStream = mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
 //	if(!mImgStream)
@@ -310,13 +331,14 @@ void ImageSenderGE::grab()
 
 	mRenderTimer->time("sent");
 
-	if (mRenderTimer->intervalPassed())
-	{
-        static int counter=0;
+//	if (mRenderTimer->intervalPassed())
+//	{
+//        static int counter=0;
 //        if (++counter%3==0)
 //            ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+//	          std::cout << mRenderTimer->dumpStatisticsSmall() << std::endl;
         mRenderTimer->reset();
-	}
+//	}
 }
 
 void ImageSenderGE::send()
@@ -345,6 +367,11 @@ void ImageSenderGE::send()
 		uid = "Frequency [R]";
 		send(uid, mImgExportedStream->GetFrequencyImage(), mFlowGeometry, mFlowGeometryChanged);
 	}
+	if (mExportVelocity && mImgExportedStream->GetVelocityImage())
+	{
+		uid = "Velocity [R]";
+		send(uid, mImgExportedStream->GetVelocityImage(), mFlowGeometry, mFlowGeometryChanged);
+	}
 }
 
 
@@ -353,23 +380,25 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 	mRenderTimer->time("startsend");
 	vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
 	flipper->SetInput(img);
-	flipper->SetFilteredAxis(0); // flip left-right (possible bug in backend?
+	flipper->SetFilteredAxis(0);
 	vtkImageDataPtr	flipped = flipper->GetOutput();
 	flipped->Update();
-	mRenderTimer->time("flip");
 //	vtkImageDataPtr copy = vtkImageDataPtr::New();
 //	copy->DeepCopy(img);
 	if (geometryChanged)
 	{
-		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, flipped);
+		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, flipped/*img*/);
 		mSender->send(frameMessage);
 		std::cout << uid << " Nyquist " << geometry.vNyquist << std::endl;
+		int*  dim = flipped/*img*/->GetDimensions();
+		std::cout << uid << " Volume size: " << dim[0] << " " << dim[1] << " " << dim[2] << std::endl;
+
 	}
-	mRenderTimer->time("sendpr");
+//	mRenderTimer->time("sendpr");
 
 	// CustusX does not handle nonzero origin - set to zero, but AFTER getFrameStatus() is called.
 	vtkImageChangeInformationPtr center = vtkImageChangeInformationPtr::New();
-	center->SetInput(flipped);
+	center->SetInput(flipped/*img*/);
 	center->SetOutputOrigin(0,0,0);
 	center->Update();
 	mRenderTimer->time("orgnull");

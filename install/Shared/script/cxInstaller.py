@@ -94,6 +94,8 @@ class Common(object):
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
         self.mBuildExAndTest = "OFF"
         self.mCoverage = "OFF"
+        self.mCMakeArgs = ""
+
 
 # ---------------------------------------------------------
     
@@ -391,6 +393,7 @@ Note: DVTK_REQUIRED_OBJCXX_FLAGS is required on v5.6 in order to avoid garbage-c
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DVTK_USE_PARALLEL:BOOL=ON \
 -DVTK_REQUIRED_OBJCXX_FLAGS:STRING="" \
@@ -530,6 +533,7 @@ class IGSTK(CppComponent):
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DIGSTK_USE_SceneGraphVisualization:BOOL=OFF \
 -DBUILD_EXAMPLES:BOOL=OFF \
@@ -604,6 +608,7 @@ cmake \
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
+        self.mCurrentRevision = "361"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -611,17 +616,11 @@ class ISB_DataStreaming(CppComponent):
         return DATA.mWorkingDir + "/ISB_DataStreaming"
     def _rawCheckout(self):
         self._changeDirToBase()
-        if DATA.mISBpassword == "":
-            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --username sintef %s' % (self.sourceFolder()))
-        else:
-            runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ --non-interactive --username sintef --password %s %s' % (DATA.mISBpassword, self.sourceFolder()))
+        runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
     def update(self):
         self._changeDirToSource()
 #        runShell('svn up')
-        if DATA.mISBpassword == "":
-            runShell('svn up --username sintef %s' % (self.sourceFolder()))
-        else:
-            runShell('svn up --non-interactive --username sintef --password %s %s' % (DATA.mISBpassword, self.sourceFolder()))
+        runShell('svn up -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
@@ -633,6 +632,7 @@ cmake \
 -DVTK_DIR:PATH="%s" \
 -DDATASTREAMING_USE_HDF:BOOL=OFF \
 -DDATASTREAMING_USE_TRACKING:BOOL=OFF \
+-DDATASTREAMING_USE_SC_DICOM_LOADERS:BOOL=OFF \
 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
@@ -643,6 +643,14 @@ cmake \
             self.sourceFolder()+"/vtkDataStreamClient/")
             )
         # add xcode project here if needed
+    def _svn_login_info(self):
+        '''
+        return login info to be added as arguments to the svn co and up calls.
+        '''
+        if DATA.mISBpassword == "":
+            return '--username sintef'
+        else:
+            return '--non-interactive --username sintef --password %s' % DATA.mISBpassword
     # ---------------------------------------------------------
 
 #===============================================================================
@@ -702,13 +710,14 @@ class CustusX3(CppComponent):
         self._changeDirToSource()
         runShell('git checkout master')
         runShell('git pull')
-        runShell('git submodule update')
+        runShell('git submodule update --init --recursive')
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
 cmake \
 -G"%s" \
 %s \
+-DCMAKE_CXX_FLAGS:STRING=-Wno-deprecated \
 -DCMAKE_BUILD_TYPE:STRING=%s \
 -DBUILD_SHARED_LIBS:BOOL=%s \
 -DBUILD_OPEN_IGTLINK_SERVER=true \
@@ -719,7 +728,8 @@ cmake \
 -DOpenCV_DIR:PATH="%s" \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
--DCX_USE_TSF:BOOL=true \
+-DCX_USE_TSF:BOOL=OFF \
+-DSSC_USE_DCMTK:BOOL=OFF \
 -DTube-Segmentation-Framework_DIR:PATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
 -DBUILD_TESTING="%s" \
@@ -728,6 +738,7 @@ cmake \
 -DGEStreamer_DIR:PATH="%s" \
 -DCMAKE_OSX_DEPLOYMENT_TARGET:STRING="%s" \
 -DSSC_USE_GCOV:BOOL=%s \
+%s \
 ../%s''' % (DATA.mCMakeGenerator,
             DATA.m32bitCompileCMakeOption, 
             DATA.mBuildType, DATA.mBuildShared, 
@@ -746,6 +757,7 @@ cmake \
             ISB_DataStreaming().buildPath(),
             DATA.mOSX_DEPLOYMENT_TARGET,
             DATA.mCoverage,
+            DATA.mCMakeArgs,
             self.sourceFolder() )
             )
         #TODO add xcode project here if needed?
@@ -810,27 +822,30 @@ cmake \
         
 # ---------------------------------------------------------
 
-#===============================================================================
-# class CustusX3Data(Component):
-#    def name(self):
-#        return "CustusX3-Data"
-#    def help(self):
-#        return 'data files for CustusX'
-#    def path(self):
-#        return DATA.mWorkingDir + "/CustusX3"
-#    def sourceFolder(self):
-#        return 'data'
-#    def _rawCheckout(self):
-#        changeDir(self.path())
-#        runShell('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/data' % DATA.mServerUser)
-#    def update(self):
-#        changeDir(self.path()+'/'+self.sourceFolder())
-#        runShell('svn up')
-#    def configure(self):
-#        pass
-#    def build(self):
-#        pass
-#===============================================================================
+# ===============================================================================
+class CustusX3Data(Component):
+    def name(self):
+        return "CustusX3-Data"
+    def help(self):
+        return 'data files for CustusX'
+    def path(self):
+        custusx = CustusX3()
+        return custusx.path() + "/" + custusx.sourceFolder()
+        #return DATA.mWorkingDir + "/CustusX3"
+    def sourceFolder(self):
+        return 'data'
+    def _rawCheckout(self):
+        changeDir(self.path())
+        runShell('git clone ssh://medtek.sintef.no//Volumes/medtek_HD/git/Data.git %s' % self.sourceFolder())
+#runShell('svn co svn+ssh://%s@cxserver.sintef.no/svn/Repository/data' % DATA.mServerUser)
+    def update(self):
+        changeDir(self.path()+'/'+self.sourceFolder())
+        runShell('git checkout master')
+        runShell('git pull')
+    def configure(self):
+        pass
+    def build(self):
+        pass
 # ---------------------------------------------------------
 
 
@@ -856,8 +871,8 @@ class Controller(object):
                      ISB_DataStreaming(),
                      UltrasonixSDK(),
                      TubeSegmentationFramework(),
-                     CustusX3()
-                     #CustusX3Data()
+                     CustusX3(),
+                     CustusX3Data()
                      ]
         self.libnames = [lib.name() for lib in self.libraries]
         
@@ -985,6 +1000,11 @@ Available components are:
                      type='string',
                      help='specify work folder, default=%s'%DATA.mWorkingDir,
                      default=DATA.mWorkingDir)
+        p.add_option('--cmake_args',
+                     action='store',
+                     type='string',
+                     help='additional arguments to ALL cmake calls',
+                     default="")
         return p
     
     def _parseCommandLine(self):
@@ -1035,7 +1055,10 @@ Available components are:
         if options.external_dir:
             DATA.mExternalDir = options.external_dir
         if options.working_dir:
-            DATA.mWorkingDir = options.working_dir        
+            DATA.mWorkingDir = options.working_dir
+        if options.cmake_args:
+            DATA.mCMakeArgs = options.cmake_args
+
         
         #TODO can be wrong for external libs as they use DATA.mBuildExternalsType!
         DATA.mBuildFolder = DATA.mBuildFolder + "_" + DATA.mBuildType 
