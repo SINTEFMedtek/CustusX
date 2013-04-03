@@ -128,7 +128,7 @@ namespace
 	template<>
 	bool readTextNode<int>(int* retval, QDomNode parent, QString name)
 	{
-	    bool ok;
+		bool ok = false;
 		QDomElement element = parent.namedItem(name).toElement();
 		bool found = !element.isNull() && !element.text().isNull();
 		if(found)
@@ -148,7 +148,7 @@ namespace
 	template<>
 	bool readTextNode<double>(double* retval, QDomNode parent, QString name)
 	{
-	    bool ok;
+		bool ok = false;
 		QDomElement element = parent.namedItem(name).toElement();
 		bool found = !element.isNull() && !element.text().isNull();
 		if(found)
