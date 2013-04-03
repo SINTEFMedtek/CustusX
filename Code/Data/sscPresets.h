@@ -46,6 +46,7 @@ public:
 	virtual ~Presets(){};
 
 	void addCustomPreset(QString name, QDomElement& element); //used
+	virtual void save(); //used
 
 	//TODO Review:
 	QStringList getPresetList(QString tag=""); ///< returns a list of the preset names for the given tag
@@ -59,6 +60,10 @@ signals:
 protected:
 	virtual QStringList generatePresetList(QString tag); ///< internally generate the preset list
 	ssc::XmlOptionFile getPresetNode(const QString& presetName); ///< Look for a preset with the given name. Create one if not found.
+	void addDefaultPreset(QString name, QDomElement& element); //used
+	void addPreset(ssc::XmlOptionFile& file, QString name, QDomElement& element); //used
+
+	QString mLastCustomPresetName; /// < the name of the last custom preset added
 
 	ssc::XmlOptionFile mPresetFile; //used
 private:
