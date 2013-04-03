@@ -7,6 +7,8 @@
 #include "sscPresets.h"
 #include "sscXmlOptionItem.h"
 
+#ifdef CX_USE_TSF
+
 namespace cx {
 
 /*
@@ -47,4 +49,7 @@ private:
 typedef boost::shared_ptr<class TSFPresets> TSFPresetsPtr;
 
 } /* namespace cx */
+
+#endif // CX_USE_TSF
+
 #endif /* CXTSFPRESETS_H_ */
