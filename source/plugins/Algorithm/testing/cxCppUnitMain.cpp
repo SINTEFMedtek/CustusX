@@ -1,5 +1,4 @@
 #include <QApplication>
-//#include <boost/scoped_ptr.hpp>
 
 #include "cppunit/extensions/TestFactoryRegistry.h"
 #include <cppunit/ui/text/TestRunner.h>
@@ -10,7 +9,8 @@
 //#define RUN_ALL_TESTS
 
 #ifndef RUN_ALL_TESTS
-#include "cxTestTubeSegmentationFramework.h"
+#include "testing/cxTestTubeSegmentationFramework.h"
+#include "testing/cxTestTSFPresets.h"
 #endif
 
 /**main function for CX unit tests.
@@ -29,13 +29,12 @@ int main(int argc, char **argv)
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
 #else
-//	runner.addTest( new CppUnit::TestCaller<cxTestSpeed>(
-//                                       "init",
-//                                        &cxTestSpeed::testKaisaSpeed ) );
-//  runner.addTest( new CppUnit::TestCaller<TestAlgorithms>(
-//                                       "init",
-//                                        &TestAlgorithms::testTemporalCalibration ) );
-	runner.addTest(cxTestTubeSegmentationFramework::suite());
+//	runner.addTest( new CppUnit::TestCaller<cx::TestTSFPresets>(
+//									   "TestTSFPresets::testNewPresets",
+//										&cx::TestTSFPresets::testNewPresets ) );
+
+	//runner.addTest(cx::TestTubeSegmentationFramework::suite());
+	runner.addTest(cx::TestTSFPresets::suite());
 #endif
 
 

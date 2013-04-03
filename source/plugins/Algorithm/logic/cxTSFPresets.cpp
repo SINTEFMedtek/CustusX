@@ -11,12 +11,8 @@ namespace cx {
 TSFPresets::TSFPresets() :
 	Presets(ssc::XmlOptionFile(), ssc::XmlOptionFile())
 {
-//	std::cout << "TSFPresets()" << std::endl;
 	mPresetPath = cx::DataLocations::getTSFPath()+"/parameters";
-	//std::map<QString, QString> presetsMap = this->loadPresetsFromFiles();
 	this->loadPresetsFromFiles();
-
-	//this->convertToInternalFormat(presetsMap);
 }
 
 void TSFPresets::save()
@@ -27,7 +23,6 @@ void TSFPresets::save()
 	for (int i = 0; i < presetNodes.count(); ++i)
 	{
 		QDomNode node = presetNodes.at(i);
-		//this->print(node.toElement());
 
 		if(!node.isElement())
 			break;
@@ -44,10 +39,7 @@ void TSFPresets::save()
 				parameters[child.toElement().tagName()] = child.firstChild().toText().data();
 		}
 		if(!QFile::exists(filepath))
-		{
-			//std::cout << "filepath [" << filepath.toStdString() << "] does not exist...." << std::endl;
 			continue;
-		}
 		this->saveFile(filepath+mLastCustomPresetName, parameters);
 	}
 }
@@ -55,12 +47,10 @@ void TSFPresets::save()
 QDomElement TSFPresets::mapToQDomElement(std::map<QString, QString> map)
 {
 	QDomDocument doc;
-//	QDomElement element = doc.createElement(name);
 	QDomElement element = ssc::XmlOptionFile().getElement();
 	std::map<QString, QString>::iterator it;
 	for(it = map.begin(); it != map.end(); ++it)
 	{
-//		QDomElement child = doc.createElement("Parameter");
 		QDomElement child = doc.createElement("Preset");
 		child.setAttribute(it->first, it->second);
 		element.appendChild(child);
@@ -82,7 +72,6 @@ QStringList TSFPresets::generatePresetList(QString tag)
 
 void TSFPresets::loadPresetsFromFiles()
 {
-//	std::cout << "TSFPresets::loadPresetsFromFiles()" << std::endl;
 	mPresetsMap.clear();
 
 	QDir parametersDir(mPresetPath);
@@ -93,10 +82,7 @@ void TSFPresets::loadPresetsFromFiles()
 	QStringList subDirs;
 	QFileInfoList infoList = parametersDir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
 	foreach(QFileInfo info, infoList)
-	{
 		subDirs << info.baseName();
-//		std::cout << info.baseName().toStdString() << std::endl;
-	}
 
 	//for each folder get all files
 	foreach(const QString dir, subDirs)
@@ -108,7 +94,6 @@ void TSFPresets::loadPresetsFromFiles()
 			foreach(QFileInfo info, infoList)
 			{
 				QString name = info.dir().dirName() + ": " + info.baseName();
-				//std::cout << name.toStdString() << std::endl;
 				mPresetsMap[name] = info.absoluteFilePath();
 			}
 			parametersDir.cdUp();
@@ -119,14 +104,11 @@ void TSFPresets::loadPresetsFromFiles()
 
 void TSFPresets::convertToInternalFormat(std::map<QString, QString>& presets)
 {
-//	std::cout << "TSFPresets::convertToInternalFormat(std::map<QString, QString> presets) " << presets.size() << std::endl;
 	std::map<QString, QString>::iterator it;
 	for(it = presets.begin(); it != presets.end(); ++it)
 	{
 		QDomElement preset = this->convertToXml(it->second);
 		Presets::addDefaultPreset(it->first, preset);
-		//Debugging
-//		this->print(preset);
 	}
 }
 
@@ -157,10 +139,7 @@ std::map<QString, QString> TSFPresets::readFile(QString& filePath)
 	        QString line = in.readLine();
 	        QStringList lineItems = line.split(" ");
 	        if(lineItems.count() == 2)
-	        {
-//				std::cout << lineItems.at(0).toStdString() << " " << lineItems.at(1).toStdString() << std::endl;
 				retval[lineItems.at(0)] = lineItems.at(1);
-	        }
 	    }
 	}
 	return retval;
@@ -187,35 +166,36 @@ void TSFPresets::saveFile(QString filepath, std::map<QString, QString> parameter
 		return;
 	}
 
+	//Read the content
 	if (!paramFile.open(QFile::ReadOnly))
 	{
 		ssc::messageManager()->sendError("Could not open the file " + parametersFile + " for reading.");
 		return;
 	}
-
-	//Read the content
 	QTextStream inText;
 	inText.setDevice(&paramFile);
 	QString allText = inText.readAll();
-	QString searchString = "parameters str none";
-	QString customPresetName = QFileInfo(file).fileName();
-	int index = allText.indexOf(searchString);
-	index += searchString.size();
-	allText.insert(index, " "+customPresetName);
-	//std::cout << searchString.toStdString() << "\n" << std::endl;
-	//std::cout << allText.toStdString() << std::endl;
 	paramFile.close();
 
-	//Write the new content
-	if (!paramFile.open(QFile::WriteOnly | QFile::Truncate))
+	QString customPresetName = QFileInfo(file).fileName();
+	if(!allText.contains(customPresetName, Qt::CaseInsensitive))
 	{
-		ssc::messageManager()->sendError("Could not open the file " + parametersFile + " for writing.");
-		return;
+		QString searchString = "parameters str none";
+		int index = allText.indexOf(searchString);
+		index += searchString.size();
+		allText.insert(index, " "+customPresetName);
+
+		//Write the new content
+		if (!paramFile.open(QFile::WriteOnly | QFile::Truncate))
+		{
+			ssc::messageManager()->sendError("Could not open the file " + parametersFile + " for writing.");
+			return;
+		}
+		QTextStream outParametersFile(&paramFile);
+		outParametersFile << allText;
+		outParametersFile << flush;
+		paramFile.close();
 	}
-	QTextStream outParametersFile(&paramFile);
-	outParametersFile << allText;
-	outParametersFile << flush;
-	paramFile.close();
 
 	//-------------------------------------------------------------
 	//Save the new parameters file

@@ -29,11 +29,10 @@ public:
 	virtual ~TSFPresets(){};
 
 	virtual void save();
-	QDomElement mapToQDomElement(std::map<QString, QString> map);
 
 private:
+	QDomElement mapToQDomElement(std::map<QString, QString> map);
 	virtual QStringList generatePresetList(QString tag); ///< internally generate the preset list
-//	std::map<QString, QString> loadPresetsFromFiles();
 	void loadPresetsFromFiles();
 	void convertToInternalFormat(std::map<QString, QString>& presets);
 	QDomElement convertToXml(QString filePath);
