@@ -102,6 +102,10 @@ public:
 	 */
 	virtual ssc::PresetsPtr getPresets() = 0;
 	/**
+	 * Generates a preset from the filters currently set options.
+	 */
+	virtual QDomElement getNewPreset() = 0;
+	/**
 	  * Set Active state.
 	  * Active filters are used by the ui (or similar) and can interact
 	  * with the system, for example by showing a preview.

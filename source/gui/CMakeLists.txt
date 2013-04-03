@@ -43,7 +43,6 @@ SET(cxGui_MOC_HDRS
     dataWidgets/sscDICOMWidget.h
     dataWidgets/cxEraserWidget.h
 	dataWidgets/cxDataSelectWidget.h
-	dataWidgets/cxPresetWidget.h
 	#dataWidgets/cxTSFPresetWidget.h
 	dataWidgets/cxTransferFunctionPresetWidget.h
     #----------------------
@@ -86,6 +85,7 @@ SET(cxGui_MOC_HDRS
     utilities/cxFilePreviewWidget.h
     utilities/cxImagePreviewWidget.h
     utilities/cxToolImagePreviewWidget.h
+    utilities/cxPresetWidget.h
     #----------------------    
     cxMainWindow.h
     cxSecondaryMainWindow.h
@@ -199,8 +199,6 @@ SET(cxGui_SRCS
     dataWidgets/cxEraserWidget.cpp
 	dataWidgets/cxDataSelectWidget.h
 	dataWidgets/cxDataSelectWidget.cpp
-	dataWidgets/cxPresetWidget.h
-	dataWidgets/cxPresetWidget.cpp
 	#dataWidgets/cxTSFPresetWidget.h
 	#dataWidgets/cxTSFPresetWidget.cpp
 	dataWidgets/cxTransferFunctionPresetWidget.h
@@ -283,6 +281,8 @@ SET(cxGui_SRCS
     utilities/cxImagePreviewWidget.cpp
     utilities/cxToolImagePreviewWidget.h
     utilities/cxToolImagePreviewWidget.cpp
+    utilities/cxPresetWidget.h
+    utilities/cxPresetWidget.cpp
     #----------------------    
     cxMainWindow.h
     cxMainWindow.cpp 
