@@ -70,7 +70,8 @@ ReconstructAlgorithmPtr ReconstructCore::createAlgorithm(QString name)
 	// create new algo
 	if (name == "ThunderVNN")
 	{
-		retval = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(mInput.mShaderPath));
+		retval = ThunderVNNReconstructAlgorithm::create(mInput.mShaderPath);
+//		retval = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(mInput.mShaderPath));
 	}
 	else if (name == "PNN")
 		retval = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
