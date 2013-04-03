@@ -23,19 +23,23 @@ class TSFPresets : public ssc::Presets
 	Q_OBJECT
 
 public:
-//	TSFPresets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile);
 	TSFPresets();
 	virtual ~TSFPresets(){};
 
+	virtual void save();
+	QDomElement mapToQDomElement(std::map<QString, QString> map);
+
 private:
 	virtual QStringList generatePresetList(QString tag); ///< internally generate the preset list
-	std::map<QString, QString> loadPresetsFromFiles();
+//	std::map<QString, QString> loadPresetsFromFiles();
+	void loadPresetsFromFiles();
 	void convertToInternalFormat(std::map<QString, QString>& presets);
 	QDomElement convertToXml(QString filePath);
 	std::map<QString, QString> readFile(QString& filePath);
+	void saveFile(QString filepath, std::map<QString, QString> parameters);
 
 	//debugging
-	void print(QDomElement& element);
+	void print(QDomElement element);
 
 	QString mPresetPath;
 	std::map<QString, QString> mPresetsMap;

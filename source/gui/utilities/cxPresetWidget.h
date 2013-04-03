@@ -1,3 +1,17 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #ifndef CXPRESETWIDGET_H_
 #define CXPRESETWIDGET_H_
 
@@ -8,7 +22,7 @@ class QComboBox;
 
 namespace cx {
 
-/*
+/**
  * \class PresetWidget
  * \brief Base class for preset handling. Takes care of making
  * a uniform preset system. Contains a preset selector, functionality for
@@ -49,6 +63,7 @@ protected slots:
 protected:
 	virtual void populateButtonLayout(); ///< makes buttons based on the actions found in the actiongroup
 	void populatePresetList(QStringList list); ///< populates the preset combobox
+	QString getNewPresetName(bool withoutSpaces);
 
 	QActionGroup* mActionGroup; ///< contains all actions that will have buttons
 	ssc::PresetsPtr mPresets;

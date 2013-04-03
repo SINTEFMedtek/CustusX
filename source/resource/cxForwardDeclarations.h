@@ -57,6 +57,8 @@ typedef QPointer<ssc::ViewWidget> ViewWidgetQPtr;
 typedef boost::shared_ptr<class UsReconstructionFileReader> UsReconstructionFileReaderPtr;
 typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
 
+typedef boost::shared_ptr<class Filter> FilterPtr;
+
 
 } // namespace cx
 
