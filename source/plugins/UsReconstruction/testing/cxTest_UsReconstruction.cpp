@@ -223,7 +223,7 @@ void TestUsReconstruction::testThunderGPUReconstruction()
 	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "VNN");
 	boost::shared_ptr<ssc::ThunderVNNReconstructAlgorithm> algorithm;
 	algorithm = boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->createAlgorithm());
-	CPPUNIT_ASSERT(algorithm);// Check if we got the VNN algorithm
+	CPPUNIT_ASSERT_MESSAGE("No Thunder VNN algorithm found", algorithm);// Check if we got the VNN algorithm
 	algorithm->getProcessorOption(algo)->setValue("GPU");
 
 	// run the reconstruction in the main thread

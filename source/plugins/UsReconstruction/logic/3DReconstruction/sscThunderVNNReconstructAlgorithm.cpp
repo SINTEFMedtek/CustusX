@@ -39,6 +39,20 @@
 
 namespace ssc
 {
+
+ReconstructAlgorithmPtr ThunderVNNReconstructAlgorithm::create(QString shaderPath)
+{
+#ifdef SSC_USE_OpenCL
+	return ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(shaderPath));
+#else
+	return ReconstructAlgorithmPtr();
+#endif
+}
+
+ThunderVNNReconstructAlgorithm::~ThunderVNNReconstructAlgorithm()
+{
+}
+
 ThunderVNNReconstructAlgorithm::ThunderVNNReconstructAlgorithm(QString shaderPath)
 {
 	mShaderPath = shaderPath;
