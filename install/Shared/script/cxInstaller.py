@@ -648,7 +648,7 @@ cmake \
         return login info to be added as arguments to the svn co and up calls.
         '''
         if DATA.mISBpassword == "":
-            return '--username sintef %s' % self.mCurrentRevision
+            return '--username sintef'
         else:
             return '--non-interactive --username sintef --password %s' % DATA.mISBpassword
     # ---------------------------------------------------------
