@@ -276,6 +276,7 @@ struct study_t
 	char serialNumber[DICOMLIB_SHORT_STRING];		///< Serial number of system (only written)
 	char studyDescription[DICOMLIB_LONG_STRING];		///< Study description
 	char manufacturer[DICOMLIB_LONG_STRING];		///< Manufacturer (important for parsing non-standard information)
+	char modalities[DICOMLIB_LONG_STRING];			///< List of modalities in study (for PACS)
 
 	struct study_t *next_study;				///< Next study in this linked list
 	struct series_t *first_series;				///< Pointer to linked list of series in the study
