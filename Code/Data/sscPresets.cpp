@@ -27,31 +27,18 @@ Presets::Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile)
 {
 	mPresetFile = presetFile;
 	mCustomFile = customFile;
+	mLastCustomPresetName = "";
 }
 
 void Presets::addCustomPreset(QString name, QDomElement& element)
 {
-//	std::cout << "Presets::addCustomPreset(QString name, QDomElement element)" << std::endl;
-	ssc::XmlOptionFile file = this->getCustomFile();
-	file = file.descend("Preset", "name", name);
+	mLastCustomPresetName = name;
+	this->addPreset(mCustomFile, name, element);
+}
 
-	QDomElement presetElement = file.getElement("Preset");
-
-	//TODO add attributes
-//	std::map<QString, QString>::iterator it;
-//	for(it=attributes.begin(); it!= attributes.end(); ++it)
-//	{
-//		presetElement.setAttribute(it->first, it->second);
-//	}
-
-	//delete old children
-	while (presetElement.hasChildNodes())
-		presetElement.removeChild(presetElement.firstChild());
-
-	//add element
-	presetElement.appendChild(element);
-
-	file.save();
+void Presets::save()
+{
+	this->getCustomFile().save();
 }
 
 QStringList Presets::getPresetList(QString tag)
@@ -87,6 +74,43 @@ ssc::XmlOptionFile Presets::getPresetNode(const QString& presetName)
 	retval = this->getCustomFile();
 	retval = retval.descend("Preset", "name", presetName);
 	return retval;
+}
+
+void Presets::addDefaultPreset(QString name, QDomElement& element)
+{
+	this->addPreset(mPresetFile, name, element);
+}
+
+void Presets::addPreset(ssc::XmlOptionFile& file, QString name, QDomElement& element)
+{
+	file = file.descend("Preset");
+	//file.ascend();
+
+	if(file.getElement().isNull())
+		std::cout << "file is null" << std::endl;
+
+	QDomElement presetElement = file.getElement();
+
+	//DEBUG
+	/*
+	QDomNode n = element.firstChild();
+	while(!n.isNull())  {
+	    QDomElement e = n.toElement(); // try to convert the node to an element.
+	    if(!e.isNull())  {
+	        std::cout << qPrintable(e.tagName()) << std::endl; // the node really is an element.
+	    }
+	    n = n.nextSibling();
+	}
+	*/
+	//DEBUG
+
+	//delete old children
+	file.removeChildren();
+//	while (presetElement.hasChildNodes())
+//		presetElement.removeChild(presetElement.firstChild());
+
+	//add element
+	presetElement.appendChild(element);
 }
 
 } /* namespace ssc */
