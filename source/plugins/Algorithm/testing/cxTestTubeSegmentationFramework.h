@@ -22,7 +22,7 @@ public:
 		CPPUNIT_TEST( testParameters );
 		CPPUNIT_TEST( testFilter );
 	CPPUNIT_TEST_SUITE_END();
-private:
+
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestTubeSegmentationFramework );
 
