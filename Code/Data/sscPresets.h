@@ -48,11 +48,9 @@ public:
 	void addCustomPreset(QString name, QDomElement& element); //used
 	virtual void save(); //used
 
-	//TODO Review:
 	QStringList getPresetList(QString tag=""); ///< returns a list of the preset names for the given tag
 	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
 	ssc::XmlOptionFile getCustomFile();
-
 
 signals:
 	void changed(); //used

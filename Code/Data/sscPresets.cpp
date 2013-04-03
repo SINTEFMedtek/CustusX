@@ -84,7 +84,6 @@ void Presets::addDefaultPreset(QString name, QDomElement& element)
 void Presets::addPreset(ssc::XmlOptionFile& file, QString name, QDomElement& element)
 {
 	file = file.descend("Preset");
-	//file.ascend();
 
 	if(file.getElement().isNull())
 		std::cout << "file is null" << std::endl;
@@ -106,8 +105,6 @@ void Presets::addPreset(ssc::XmlOptionFile& file, QString name, QDomElement& ele
 
 	//delete old children
 	file.removeChildren();
-//	while (presetElement.hasChildNodes())
-//		presetElement.removeChild(presetElement.firstChild());
 
 	//add element
 	presetElement.appendChild(element);
