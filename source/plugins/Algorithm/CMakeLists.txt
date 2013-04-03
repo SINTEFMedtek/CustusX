@@ -31,6 +31,7 @@ SET( MOC_HEADER_FILES
     gui/cxTimedAlgorithmProgressBar.h
 	gui/cxFilterWidget.h
 	gui/cxPipelineWidget.h
+	gui/cxFilterPresetWidget.h
 	)
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -76,6 +77,8 @@ SET( SOURCE_FILES
 	gui/cxFilterWidget.cpp
 	gui/cxPipelineWidget.h
 	gui/cxPipelineWidget.cpp
+	gui/cxFilterPresetWidget.h
+	gui/cxFilterPresetWidget.cpp
   )
 
 # =========================================================

@@ -25,7 +25,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class WidgetObscuredListener> WidgetObscuredListenerPtr;
 class TimedAlgorithmProgressBar;
-class PresetWidget;
+class FilterPresetWidget;
 
 /** Widget for displaying a list of DataAdapter instances.
  * A stack of widgets is created if the setOptions() is called with different uids.
@@ -94,7 +94,7 @@ private:
 	OptionsWidget* mInputsWidget;
 	OptionsWidget* mOutputsWidget;
 	OptionsWidget* mOptionsWidget;
-	PresetWidget*  mPresetWidget;
+	FilterPresetWidget*  mPresetWidget;
 	QGroupBox* 	   mOptionsGroupBox;
 	QCheckBox*	   mAdvancedButton;
 	QGroupBox* 	   mFrame;

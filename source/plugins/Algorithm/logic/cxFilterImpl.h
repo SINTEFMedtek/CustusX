@@ -46,6 +46,7 @@ public:
 	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes();
 	virtual bool hasPresets(){return false;};
 	virtual ssc::PresetsPtr getPresets(){ return ssc::PresetsPtr();};
+	virtual QDomElement getNewPreset(){return QDomElement();};
 	virtual void setActive(bool on);
 	virtual bool preProcess();
 

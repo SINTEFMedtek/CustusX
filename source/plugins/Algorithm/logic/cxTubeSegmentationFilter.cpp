@@ -65,6 +65,45 @@ ssc::PresetsPtr TubeSegmentationFilter::getPresets()
 	return mPresets;
 }
 
+QDomElement TubeSegmentationFilter::getNewPreset()
+{
+	std::vector<DataAdapterPtr> newPresetOptions = this->getNotDefaultOptions();
+
+	std::map<QString, QString> newPresetMap;
+	std::vector<DataAdapterPtr>::iterator it;
+	for(it = newPresetOptions.begin(); it != newPresetOptions.end(); ++it){
+		DataAdapterPtr option = *it;
+		QString name = option->getValueName();
+		QString value;
+		ssc::StringDataAdapterXmlPtr stringOption = boost::dynamic_pointer_cast<ssc::StringDataAdapterXml>(option);
+		ssc::BoolDataAdapterXmlPtr boolOption = boost::dynamic_pointer_cast<ssc::BoolDataAdapterXml>(option);
+		ssc::DoubleDataAdapterXmlPtr doubleOption = boost::dynamic_pointer_cast<ssc::DoubleDataAdapterXml>(option);
+		if(stringOption)
+			value = stringOption->getValue();
+		else if(boolOption)
+			value = boolOption->getValue() ? "true" : "false";
+		else if(doubleOption)
+			value = QString::number(doubleOption->getValue());
+		else
+			ssc::messageManager()->sendError("Could not determine what kind of option to get the value for.");
+		newPresetMap[name] = value;
+	}
+	ssc::StringDataAdapterPtr centerlineMethod = this->getStringOption("centerline-method");
+	newPresetMap[centerlineMethod->getValueName()] = centerlineMethod->getValue();
+
+	//create xml
+	QDomDocument doc = mPresets->getCustomFile().getDocument();
+	QDomElement retval = doc.createElement("Preset");
+	std::map<QString, QString>::iterator it2;
+	for(it2 = newPresetMap.begin(); it2 != newPresetMap.end(); ++it2){
+		QDomElement newNode = doc.createElement(it2->first);
+		newNode.appendChild(doc.createTextNode(it2->second));
+		retval.appendChild(newNode);
+	}
+
+	return retval;
+}
+
 void TubeSegmentationFilter::requestSetPresetSlot(QString name)
 {
 	QString centerLineMethod = "gpu";
@@ -97,17 +136,25 @@ bool TubeSegmentationFilter::execute()
 	try {
 		ssc::messageManager()->sendDebug("Looking for TSF files in folder: "+cx::DataLocations::getTSFPath());
 		mOutput = run(filename, mParameters, cx::DataLocations::getTSFPath().toStdString());
-	} catch(SIPL::SIPLException e) {
+	} catch(SIPL::SIPLException& e) {
 		std::string error = e.what();
-		ssc::messageManager()->sendError(qstring_cast(error));
+		ssc::messageManager()->sendError("SIPL::SIPLException: "+qstring_cast(error));
 
 		if(mOutput != NULL){
 			delete mOutput;
 			mOutput = NULL;
 		}
 		return false;
-	} catch (std::exception e){
-		ssc::messageManager()->sendError("Tube segmentation algorithm threw a std::exception.");
+	} catch(cl::Error& e) {
+		ssc::messageManager()->sendError("cl::Error:"+qstring_cast(e.what()));
+
+		if(mOutput != NULL){
+			delete mOutput;
+			mOutput = NULL;
+		}
+		return false;
+	} catch (std::exception& e){
+		ssc::messageManager()->sendError("std::exception:"+qstring_cast(e.what()));
 
 		if(mOutput != NULL){
 			delete mOutput;
