@@ -53,10 +53,10 @@ namespace ssc
 class ThunderVNNReconstructAlgorithm: public ReconstructAlgorithm
 {
 public:
-	ThunderVNNReconstructAlgorithm(QString shaderPath);
-	virtual ~ThunderVNNReconstructAlgorithm()
-	{
-	}
+	/** Create instance of class. Return NULL of not available.
+	  */
+	static ReconstructAlgorithmPtr create(QString shaderPath);
+	virtual ~ThunderVNNReconstructAlgorithm();
 	virtual QString getName() const;
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
 	virtual bool reconstruct(ProcessedUSInputDataPtr input,
@@ -65,10 +65,9 @@ public:
 	StringDataAdapterXmlPtr getProcessorOption(QDomElement root);
 	DoubleDataAdapterXmlPtr getDistanceOption(QDomElement root);
 	BoolDataAdapterPtr getPrintOpenCLInfoOption(QDomElement root);
-//	StringDataAdapterXmlPtr mProcessorOption;///< Select the processor to run the ocl code on (CPU/GPU)
+
 private:
-//	DoubleDataAdapterXmlPtr mDistanceOption;
-//	BoolDataAdapterXmlPtr mPrintOpenCLInfoOption;
+	ThunderVNNReconstructAlgorithm(QString shaderPath);
 	QString mShaderPath;
 };
 
