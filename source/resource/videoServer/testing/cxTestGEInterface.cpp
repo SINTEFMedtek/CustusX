@@ -4,33 +4,85 @@
 #include <QTimer>
 #include "GEStreamer.h"
 //#include "sscVector3D.h"
-#include "cxImageSenderFactory.h"
 #include "cxGrabberSender.h"
 #include "cxTestGEInterfaceController.h"
+#include "sscMessageManager.h"
 
 void TestGEInterface::setUp()
 {
 //	cx::LogicManager::initialize();
+	ssc::MessageManager::initialize();
 }
 
 void TestGEInterface::tearDown()
 {
 //	cx::LogicManager::shutdown();
+	ssc::MessageManager::shutdown();
 }
 
 void TestGEInterface::testConstructor()
 {
 }
 
-void TestGEInterface::testInit()
+void TestGEInterface::testStreams()
 {
+	std::cout << std::endl << "*** Test GE all streams streams. CPU scanconversion ***" << std::endl;
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
 	args["test"] = "2D";
-	args["useOpenCL"] = "0";
+	args["useOpenCL"] = "0"; //Test only CPU scan conversion
+	std::cout << std::endl << "--- Test GE 2D scanconverted stream. Auto size ---" << std::endl;
+	this->testStream(args);
+	args["imagesize"] = "500*500";
+	std::cout << std::endl << "--- Test GE 2D scanconverted stream. Defined size ---" << std::endl;
+	this->testStream(args); //set size
+
+	args["test"] = "3D";
+	args["imagesize"] = "auto";
+	std::cout << std::endl << "--- Test GE 3D scanconverted stream. Auto size ---" << std::endl;
+	this->testStream(args); //3D
+	args["imagesize"] = "100*100*100";
+	std::cout << std::endl << "--- Test GE 3D scanconverted stream. Defined size ---" << std::endl;
+	this->testStream(args); //set size
+
+//	args["test"] = "no";
+//	args["ip"] = "bhgrouter.hopto.org";
+//	std::cout << "---Custom test: Connect to simulator" << std::endl;
+//	this->testStream(args);//Custom test
+}
+
+//Test currently needs the simulator to run with doppler, or be conected to the scanner
+void TestGEInterface::testSingleStreams()
+{
+	std::cout << std::endl << "*** Test GE single streams. GPU scanconversion if possible ***" << std::endl;
+	cx::StringMap args;
+//	args["ip"] = "bhgrouter.hopto.org";
+	args["type"] = "ISB_GE";
+	args["test"] = "2D";
+	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
+	args["streams"] = "scanconverted";
+	std::cout << std::endl << "--- Test GE 2D scanconverted stream. ---" << std::endl;
+	this->testStream(args);
+	args["streams"] = "tissue";
+	std::cout << std::endl << "--- Test GE 2D tissue stream. ---" << std::endl;
+	this->testStream(args);
+	args["streams"] = "frequency";
+	std::cout << std::endl << "--- Test GE 2D frequency stream. ---" << std::endl;
+	this->testStream(args);
+	args["streams"] = "bandwidth";
+	std::cout << std::endl << "--- Test GE 2D bandwidth stream. ---" << std::endl;
+	this->testStream(args);
+	args["streams"] = "velocity";
+	std::cout << std::endl << "--- Test GE 2D velocity stream. ---" << std::endl;
+	this->testStream(args);
+
+}
+
+void TestGEInterface::testStream(cx::StringMap args)
+{
 	cx::ImageSenderPtr imageSender = cx::ImageSenderFactory().getFromArguments(args);
 	CPPUNIT_ASSERT(imageSender);
-	CPPUNIT_ASSERT(imageSender->getType().compare("ISB_GE") == 0);
+	CPPUNIT_ASSERT(imageSender->getType().compare(args["type"]) == 0);
 
 	cx::GrabberSenderDirectLinkPtr grabberBridge(new cx::GrabberSenderDirectLink());
 
@@ -39,8 +91,7 @@ void TestGEInterface::testInit()
 
 	CPPUNIT_ASSERT(imageSender->startStreaming(grabberBridge));
 
-
-//	QTimer::singleShot(1*1000,   qApp, SLOT(quit()) );
+	//	QTimer::singleShot(1*1000,   qApp, SLOT(quit()) );
 	QTimer::singleShot(500,   qApp, SLOT(quit()) );
 	qApp->exec();
 
@@ -56,15 +107,16 @@ void TestGEInterface::testGEStreamer()
 {
 	data_streaming::GEStreamer geStreamer;
 
-	//Initialize GEStreamer    HFDPath, useHDF, imgSize, interpolation,       buffSize, clPath, useCL
-	geStreamer.InitializeClientData("", false, 500*500, data_streaming::Bilinear, 10,   "",     false);
+	//Initialize GEStreamer    HFDPath, useHDF, sizeCompType,     imgSize, interpolation,       buffSize, clPath, useCL
+	geStreamer.InitializeClientData("", false, data_streaming::AUTO, -1, data_streaming::Bilinear, 10,   "",     false);
 
 	//Setup the needed data stream types. The default is only scan converted data
-	geStreamer.SetupExportParameters(true, false, false, false);
+	geStreamer.SetupExportParameters(true, false, false, false, false);
 //	geStreamer.SetupExportParameters(true, true, true, true);
 
 	//                                         (hostIp, streamPort, commandPort, testMode));
 	CPPUNIT_ASSERT(geStreamer.ConnectToScanner("127.0.0.1", 6543,    -1,         data_streaming::test3D));
+//	CPPUNIT_ASSERT(geStreamer.ConnectToScanner("bhgrouter.hopto.org", 6543,    -1,         data_streaming::noTest));
 
 
 	geStreamer.WaitForImageData();
@@ -117,11 +169,11 @@ void TestGEInterface::validateData(vtkSmartPointer<vtkImageData> img)
 
 void TestGEInterface::validateBMode3D(vtkSmartPointer<vtkImageData> img)
 {
-	std::cout << getValue(img, 0,0,0) << std::endl;
-	std::cout << getValue(img, 5,5,5) << std::endl;
-	std::cout << getValue(img, 7,7,7) << std::endl;
-	std::cout << getValue(img, 9,9,9) << std::endl;
-
+	int* dim =  img->GetDimensions();
+	std::cout << "dim: " << dim[0] << " " << dim[1] << " " << dim[2] << std::endl;
+	std::cout << "value in " << dim[0]/3 << " " << dim[1]/3 <<  " " << dim[2]/3 << ": ";
+	std::cout << getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) << std::endl;
+	CPPUNIT_ASSERT( getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) == 100);
 }
 
 #endif //CX_USE_ISB_GE
