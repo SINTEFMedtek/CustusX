@@ -225,7 +225,7 @@ void main()
 						}
 						else
 						{
-							intensity = 0.33 * (volumeColorSample.r + volumeColorSample.g + volumeColorSample.b);
+							intensity = max(volumeColorSample.r, max(volumeColorSample.g, volumeColorSample.b));
 						}
 						windowed.a = stepsize * opacityTransfer(intensity, threshold[i], alpha[i], maxValue[i]);
 						colorSample = blendRGBA(colorSample, windowed);

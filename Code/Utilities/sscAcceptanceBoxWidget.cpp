@@ -14,7 +14,6 @@ AcceptanceBoxWidget::AcceptanceBoxWidget(QString text, QWidget* parent) : QFrame
 	QLabel* preText = new QLabel("Accept the following statement:");
 	preText->setFont(QFont("Arial", 12));
 	mText = new QLabel;
-	setText(text);
 	mText->setFont(QFont("Arial", 14, 75));
 	top->addWidget(preText);
 	top->addWidget(mText);
@@ -50,6 +49,7 @@ AcceptanceBoxWidget::AcceptanceBoxWidget(QString text, QWidget* parent) : QFrame
 	}
 
 #endif
+	setText(text);
 }
 
 void AcceptanceBoxWidget::hideAcceptButtons()
