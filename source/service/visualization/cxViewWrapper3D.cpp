@@ -210,7 +210,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		QColor background = settings()->value("backgroundColor").value<QColor>();
 		mView->setBackgroundColor(background);
 	}
-	if (key == "useGPUVolumeRayCastMapper" || "maxRenderSize")
+	if (( key=="useGPUVolumeRayCastMapper" )||( key=="maxRenderSize" ))
 	{
 		// reload volumes from cache
 		std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
@@ -224,7 +224,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	{
 		this->updateView();
 	}
-	if (key == "View3D/annotationModelSize" || key == "View3D/annotationModel")
+	if ((key == "View3D/annotationModelSize" )||( key == "View3D/annotationModel"))
 	{
 		mAnnotationMarker->setMarkerFilename(
 						DataLocations::getRootConfigPath() + "/models/"
@@ -235,7 +235,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	{
 		this->toolsAvailableSlot();
 	}
-	if (key == "View3D/sphereRadius" || key == "View3D/labelSize" || key == "View/showLabels")
+	if ((key == "View3D/sphereRadius" )||( key == "View3D/labelSize" )||( key == "View/showLabels"))
 	{
 		for (RepMap::iterator iter = mDataReps.begin(); iter != mDataReps.end(); ++iter)
 		{

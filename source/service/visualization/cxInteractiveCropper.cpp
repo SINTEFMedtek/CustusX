@@ -45,7 +45,7 @@ namespace cx
 class CropBoxCallback: public vtkCommand
 {
 public:
-	CropBoxCallback()
+	CropBoxCallback() : mCropper(NULL)
 	{
 	}
 	static CropBoxCallback* New()
@@ -67,7 +67,7 @@ public:
 class CropBoxEnableCallback: public vtkCommand
 {
 public:
-	CropBoxEnableCallback()
+	CropBoxEnableCallback() : mCropper(NULL), mValue(false)
 	{
 	}
 	static CropBoxEnableCallback* New()

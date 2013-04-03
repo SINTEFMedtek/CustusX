@@ -22,7 +22,7 @@ namespace cx
 
 bool removeNonemptyDirRecursively(const QString & dirName)
 {
-	bool result;
+	bool result = false;
 	QDir dir(dirName);
 
 	if (dir.exists(dirName)) {
