@@ -20,6 +20,7 @@
 #include "sscPresets.h"
 
 #include <QStringList>
+#include "sscMessageManager.h"
 
 namespace ssc {
 
@@ -30,10 +31,11 @@ Presets::Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile)
 	mLastCustomPresetName = "";
 }
 
-void Presets::addCustomPreset(QString name, QDomElement& element)
+void Presets::addCustomPreset(QDomElement& element)
 {
-	mLastCustomPresetName = name;
-	this->addPreset(mCustomFile, name, element);
+	mLastCustomPresetName = element.firstChild().toElement().nodeName();
+	std::cout << "mLastCustomPresetName " << mLastCustomPresetName.toStdString() << std::endl;
+	this->addPreset(mCustomFile, element);
 }
 
 void Presets::save()
@@ -76,37 +78,25 @@ ssc::XmlOptionFile Presets::getPresetNode(const QString& presetName)
 	return retval;
 }
 
-void Presets::addDefaultPreset(QString name, QDomElement& element)
+void Presets::addDefaultPreset(QDomElement& element)
 {
-	this->addPreset(mPresetFile, name, element);
+	this->addPreset(mPresetFile, element);
 }
 
-void Presets::addPreset(ssc::XmlOptionFile& file, QString name, QDomElement& element)
+void Presets::addPreset(ssc::XmlOptionFile& file, QDomElement& element)
 {
-	file = file.descend("Preset");
+	//TODO
+	std::cout << "TODO refactor void Presets::addPreset(ssc::XmlOptionFile& file, QDomElement& element)!!!" << std::endl;
 
+	file = file.descend("Presets");
 	if(file.getElement().isNull())
-		std::cout << "file is null" << std::endl;
+	{
+		messageManager()->sendError("The XmlOptionFile we are trying to add a preset to is null.");
+		return;
+	}
 
 	QDomElement presetElement = file.getElement();
-
-	//DEBUG
-	/*
-	QDomNode n = element.firstChild();
-	while(!n.isNull())  {
-	    QDomElement e = n.toElement(); // try to convert the node to an element.
-	    if(!e.isNull())  {
-	        std::cout << qPrintable(e.tagName()) << std::endl; // the node really is an element.
-	    }
-	    n = n.nextSibling();
-	}
-	*/
-	//DEBUG
-
-	//delete old children
 	file.removeChildren();
-
-	//add element
 	presetElement.appendChild(element);
 }
 
