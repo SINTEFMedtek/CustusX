@@ -104,7 +104,7 @@ public:
 	/**
 	 * Generates a preset from the filters currently set options.
 	 */
-	virtual QDomElement getNewPreset() = 0;
+	virtual QDomElement getNewPreset(QString name) = 0;
 	/**
 	  * Set Active state.
 	  * Active filters are used by the ui (or similar) and can interact

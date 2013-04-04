@@ -15,6 +15,20 @@ TSFPresets::TSFPresets() :
 	this->loadPresetsFromFiles();
 }
 
+QDomElement TSFPresets::createPresetElement(QString name, std::map<QString, QString>& parameters)
+{
+	QDomDocument doc;
+	QDomElement element = ssc::XmlOptionFile().getElement();
+	QDomElement retval = doc.createElement(name);
+	std::map<QString, QString>::iterator it2;
+	for(it2 = parameters.begin(); it2 != parameters.end(); ++it2){
+		QDomElement newNode = doc.createElement(it2->first);
+		newNode.appendChild(doc.createTextNode(it2->second));
+		retval.appendChild(newNode);
+	}
+	return retval;
+}
+
 void TSFPresets::save()
 {
 	ssc::XmlOptionFile customs = this->getCustomFile();
@@ -27,36 +41,39 @@ void TSFPresets::save()
 		if(!node.isElement())
 			break;
 
-		QString filepath;
+		QString folderpath;
 		std::map<QString, QString> parameters;
 		QDomNodeList childNodes = node.childNodes();
 		for (int i = 0; i < childNodes.count(); ++i)
 		{
 			QDomNode child = childNodes.at(i);
 			if(child.toElement().tagName() == "centerline-method")
-				filepath = mPresetPath + "/centerline-"+child.firstChild().toText().data()+"/";
+				folderpath = mPresetPath + "/centerline-"+child.firstChild().toText().data()+"/";
 			else
 				parameters[child.toElement().tagName()] = child.firstChild().toText().data();
 		}
-		if(!QFile::exists(filepath))
+		if(!QFile::exists(folderpath))
 			continue;
-		this->saveFile(filepath+mLastCustomPresetName, parameters);
+		this->saveFile(folderpath, parameters);
 	}
 }
 
-QDomElement TSFPresets::mapToQDomElement(std::map<QString, QString> map)
-{
-	QDomDocument doc;
-	QDomElement element = ssc::XmlOptionFile().getElement();
-	std::map<QString, QString>::iterator it;
-	for(it = map.begin(); it != map.end(); ++it)
-	{
-		QDomElement child = doc.createElement("Preset");
-		child.setAttribute(it->first, it->second);
-		element.appendChild(child);
-	}
-	return element;
-}
+//QDomElement TSFPresets::mapToQDomElement(std::map<QString, QString> map)
+//{
+//	return TSFPresets::createPresetElement(map);
+//	/*
+//	QDomDocument doc;
+//	QDomElement element = ssc::XmlOptionFile().getElement();
+//	std::map<QString, QString>::iterator it;
+//	for(it = map.begin(); it != map.end(); ++it)
+//	{
+//		QDomElement child = doc.createElement("Preset");
+//		child.setAttribute(it->first, it->second);
+//		element.appendChild(child);
+//	}
+//	return element;
+//	*/
+//}
 
 QStringList TSFPresets::generatePresetList(QString tag)
 {
@@ -107,18 +124,20 @@ void TSFPresets::convertToInternalFormat(std::map<QString, QString>& presets)
 	std::map<QString, QString>::iterator it;
 	for(it = presets.begin(); it != presets.end(); ++it)
 	{
-		QDomElement preset = this->convertToXml(it->second);
-		Presets::addDefaultPreset(it->first, preset);
+//		QDomElement preset = this->convertToXml(it->second);
+		std::map<QString, QString> params = this->readFile(it->second);
+		QDomElement preset = TSFPresets::createPresetElement(it->first, params);
+		Presets::addDefaultPreset(preset);
 	}
 }
 
-QDomElement TSFPresets::convertToXml(QString filePath)
-{
-	std::map<QString, QString> params = this->readFile(filePath);
-	QDomElement retval = this->mapToQDomElement(params);
-
-	return retval;
-}
+//QDomElement TSFPresets::convertToXml(QString filePath)
+//{
+//	std::map<QString, QString> params = this->readFile(filePath);
+//	QDomElement retval = TSFPresets::createPresetElement(params);
+//
+//	return retval;
+//}
 
 std::map<QString, QString> TSFPresets::readFile(QString& filePath)
 {
@@ -145,14 +164,15 @@ std::map<QString, QString> TSFPresets::readFile(QString& filePath)
 	return retval;
 }
 
-void TSFPresets::saveFile(QString filepath, std::map<QString, QString> parameters)
+void TSFPresets::saveFile(QString folderpath, std::map<QString, QString> parameters)
 {
-	QFile file(filepath);
-	if(file.exists())
-	{
-		filepath+="(1)";
-		this->saveFile(filepath, parameters);
-	}
+//	if(QFile::exists(folderpath+mLastCustomPresetName))
+//	{
+//		mLastCustomPresetName +="(1)";
+//		this->saveFile(folderpath, parameters);
+//		return;
+//	}
+	QFile file(folderpath+mLastCustomPresetName);
 
 	//-------------------------------------------------------------
 	//Need to add the name of the new file into the parameters file

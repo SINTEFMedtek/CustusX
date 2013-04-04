@@ -65,7 +65,7 @@ ssc::PresetsPtr TubeSegmentationFilter::getPresets()
 	return mPresets;
 }
 
-QDomElement TubeSegmentationFilter::getNewPreset()
+QDomElement TubeSegmentationFilter::getNewPreset(QString name)
 {
 	std::vector<DataAdapterPtr> newPresetOptions = this->getNotDefaultOptions();
 
@@ -73,7 +73,7 @@ QDomElement TubeSegmentationFilter::getNewPreset()
 	std::vector<DataAdapterPtr>::iterator it;
 	for(it = newPresetOptions.begin(); it != newPresetOptions.end(); ++it){
 		DataAdapterPtr option = *it;
-		QString name = option->getValueName();
+		QString valuename = option->getValueName();
 		QString value;
 		ssc::StringDataAdapterXmlPtr stringOption = boost::dynamic_pointer_cast<ssc::StringDataAdapterXml>(option);
 		ssc::BoolDataAdapterXmlPtr boolOption = boost::dynamic_pointer_cast<ssc::BoolDataAdapterXml>(option);
@@ -86,20 +86,14 @@ QDomElement TubeSegmentationFilter::getNewPreset()
 			value = QString::number(doubleOption->getValue());
 		else
 			ssc::messageManager()->sendError("Could not determine what kind of option to get the value for.");
-		newPresetMap[name] = value;
+		newPresetMap[valuename] = value;
 	}
 	ssc::StringDataAdapterPtr centerlineMethod = this->getStringOption("centerline-method");
 	newPresetMap[centerlineMethod->getValueName()] = centerlineMethod->getValue();
 
+
 	//create xml
-	QDomDocument doc = mPresets->getCustomFile().getDocument();
-	QDomElement retval = doc.createElement("Preset");
-	std::map<QString, QString>::iterator it2;
-	for(it2 = newPresetMap.begin(); it2 != newPresetMap.end(); ++it2){
-		QDomElement newNode = doc.createElement(it2->first);
-		newNode.appendChild(doc.createTextNode(it2->second));
-		retval.appendChild(newNode);
-	}
+	QDomElement retval = TSFPresets::createPresetElement(name, newPresetMap);
 
 	return retval;
 }
