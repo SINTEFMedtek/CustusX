@@ -28,6 +28,19 @@ public:
 private:
 	QDomElement createPresetElement(TSFPresetsPtr presets);
 
+	void backup(); ///< backs up the files that might be changed during testing
+	void restore(); ///< restores backed up files
+	TSFPresetsPtr newPreset(); ///< creates a new test preset
+	void deletePreset(TSFPresetsPtr preset); ///< deletes the test preset
+
+	QString mFolderPath; ///< path to folder where all preset are stored
+	QString mPresetFileName; ///< file name of the preset file generated
+	QString mPresetFilePath; ///< path to new preset file
+	QString mParameterFilePath; ///< path to the parameter file
+	QString mBackUpPostFix; ///< string to append to backed up folder
+
+	bool mDirty; ///< specifies there are files that need to be cleaned up
+
 public:
 	CPPUNIT_TEST_SUITE( TestTSFPresets );
 		CPPUNIT_TEST( testConstructor );
