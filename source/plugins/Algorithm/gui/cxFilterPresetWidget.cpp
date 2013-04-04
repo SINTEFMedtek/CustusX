@@ -39,24 +39,9 @@ void FilterPresetWidget::saveSlot()
 	if(!mFilter)
 		return;
 
-	QDomElement element = mFilter->getNewPreset();
-
-	//DEBUG
-	/*
-	QDomNode n = element.firstChild();
-	while(!n.isNull())  {
-	    QDomElement e = n.toElement(); // try to convert the node to an element.
-	    if(!e.isNull())  {
-	        std::cout << qPrintable(e.tagName()) << std::endl; // the node really is an element.
-	    }
-	    n = n.nextSibling();
-	}
-	*/
-	//DEBUG
-
-
 	QString text = PresetWidget::getNewPresetName(true);
-	mPresets->addCustomPreset(text, element);
+	QDomElement element = mFilter->getNewPreset(text);
+	mPresets->addCustomPreset(element);
 
 	PresetWidget::saveSlot();
 	PresetWidget::requestSetCurrentPreset(text);
