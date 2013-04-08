@@ -29,8 +29,7 @@ void TestTSFPresets::tearDown()
 }
 
 void TestTSFPresets::testConstructor()
-{
-}
+{}
 
 void TestTSFPresets::testLoadPresets()
 {
@@ -41,18 +40,20 @@ void TestTSFPresets::testLoadPresets()
 
 	foreach(QString preset, presetList)
 	{
-		QStringList split = preset.split(": ");
-		foreach(QString string, split)
-		{
-			if(!string.contains("centerline"))
-				CPPUNIT_ASSERT_MESSAGE("Preset "+string.toStdString()+" is not defined as default.", presets->isDefaultPreset(string));
-		}
+		CPPUNIT_ASSERT_MESSAGE("Default preset "+preset.toStdString()+" is not defined as default.", presets->isDefaultPreset(preset));
+//		QStringList split = preset.split(": ");
+//		foreach(QString string, split)
+//		{
+//			if(!string.contains("centerline"))
+//				CPPUNIT_ASSERT_MESSAGE("Preset "+string.toStdString()+" is not defined as default.", presets->isDefaultPreset(string));
+//		}
 	}
 }
 
 void TestTSFPresets::testNewPresets()
 {
-	this->newPreset();
+	TSFPresetsPtr presets = this->newPreset();
+	CPPUNIT_ASSERT_MESSAGE("Custom preset "+mPresetFileName.toStdString()+" is defined as default.", !presets->isDefaultPreset(mPresetFileName));
 
 	CPPUNIT_ASSERT_MESSAGE("Could not locate the newly created preset file: "+mPresetFilePath.toStdString(), QFile::exists(mPresetFilePath));
 
@@ -139,7 +140,8 @@ TSFPresetsPtr TestTSFPresets::newPreset()
 
 void TestTSFPresets::deletePreset(TSFPresetsPtr preset)
 {
-	//Todo
+	preset->deleteCustomPreset(mPresetFileName);
+	preset->remove();
 	//mDirty = false;
 }
 

@@ -14,6 +14,7 @@
 
 #include "cxFilterPresetWidget.h"
 
+#include <QMessageBox>
 #include "sscMessageManager.h"
 #include "cxFilter.h"
 
@@ -45,6 +46,22 @@ void FilterPresetWidget::saveSlot()
 
 	PresetWidget::saveSlot();
 	PresetWidget::requestSetCurrentPreset(text);
+}
+
+void FilterPresetWidget::deleteSlot()
+{
+	if (mPresets->isDefaultPreset(PresetWidget::getCurrentPreset())) {
+		ssc::messageManager()->sendWarning("It is not possible to delete one of the default presets");
+		return;
+	}
+
+	if (QMessageBox::question(this, "Delete current preset", "Do you really want to delete the current preset?", QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
+		return;
+	mPresets->deleteCustomPreset(PresetWidget::getCurrentPreset());
+
+	PresetWidget::deleteSlot();
+	//TODO
+//	PresetWidget::requestSetCurrentPreset(text);
 }
 
 } /* namespace cx */
