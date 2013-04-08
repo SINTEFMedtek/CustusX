@@ -19,6 +19,7 @@
 
 #include "sscPresets.h"
 
+#include <iostream>
 #include <QStringList>
 #include "sscMessageManager.h"
 
