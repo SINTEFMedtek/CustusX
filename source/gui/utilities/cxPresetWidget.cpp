@@ -115,19 +115,14 @@ void PresetWidget::resetSlot()
 
 void PresetWidget::saveSlot()
 {
-	//TODO add new preset
-//	this->addNewPreset();
-
 	mPresets->save();
-
 	this->populatePresetListSlot();
-//	PresetWidget::requestSetCurrentPreset(text);
 }
 
 void PresetWidget::deleteSlot()
 {
-	//TODO
-	std::cout << "TODO: IMPLEMENT PresetWidget::deleteSlot()" << std::endl;
+	mPresets->remove();
+	this->populatePresetListSlot();
 }
 
 void PresetWidget::populatePresetListSlot()
