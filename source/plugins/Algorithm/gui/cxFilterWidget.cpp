@@ -14,7 +14,6 @@
 
 #include "cxFilterWidget.h"
 
-#include "cxPresetWidget.h"
 #include "sscStringDataAdapter.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscHelperWidgets.h"
@@ -30,13 +29,14 @@
 #include "cxContourFilter.h"
 #include "cxSmoothingImageFilter.h"
 #include "cxResampleImageFilter.h"
+#include "cxFilterPresetWidget.h"
 #ifdef CX_USE_TSF
 #include "cxTubeSegmentationFilter.h"
 #endif //CX_USE_TSF
 
 #include "sscTypeConversions.h"
-#include "cxDataSelectWidget.h"
 #include "sscMessageManager.h"
+#include "cxDataSelectWidget.h"
 #include "cxThresholdPreview.h"
 #include "cxSelectDataStringDataAdapter.h"
 
@@ -211,7 +211,7 @@ FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options
 	mInputsWidget = new OptionsWidget(this);
 	mOutputsWidget = new OptionsWidget(this);
 	mOptionsWidget = new OptionsWidget(this);
-	mPresetWidget = new PresetWidget(this);
+	mPresetWidget = new FilterPresetWidget(this);
 	mAdvancedButton = new QCheckBox("Show &advanced options", this);
 	connect(mAdvancedButton, SIGNAL(stateChanged(int)), this, SLOT(showAdvancedOptions(int)));
 
@@ -274,7 +274,6 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 
 	mCurrentFilter = filter;
 	connect(mCurrentFilter.get(), SIGNAL(changed()), this, SLOT(rebuildOptions()));
-	connect(mPresetWidget, SIGNAL(presetSelected(QString)), mCurrentFilter.get(), SLOT(requestSetPresetSlot(QString)));
 
 	if (mFrame)
 		mFrame->setTitle(mCurrentFilter->getName());
@@ -290,9 +289,13 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes(), false);
 		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes(), false);
 		mOptionsWidget->setOptions(mCurrentFilter->getUid(), options, false);
+
+		//presets
 		if(mCurrentFilter->hasPresets())
 		{
-			mPresetWidget->setPresets(mCurrentFilter->getPresets());
+			connect(mPresetWidget, SIGNAL(presetSelected(QString)), mCurrentFilter.get(), SLOT(requestSetPresetSlot(QString)));
+			//mPresetWidget->setPresets(mCurrentFilter->getPresets());
+			mPresetWidget->setFilter(mCurrentFilter);
 			mCurrentFilter->requestSetPresetSlot("default");
 			mPresetWidget->show();
 		} else

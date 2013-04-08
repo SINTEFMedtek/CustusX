@@ -47,6 +47,7 @@ public:
 
 	virtual bool hasPresets();
 	virtual ssc::PresetsPtr getPresets();
+	virtual QDomElement getNewPreset(QString name);
 	virtual void requestSetPresetSlot(QString name);
 
 	virtual bool execute();
