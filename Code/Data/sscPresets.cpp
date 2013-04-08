@@ -28,19 +28,35 @@ Presets::Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile)
 {
 	mPresetFile = presetFile;
 	mCustomFile = customFile;
-	mLastCustomPresetName = "";
+	mLastCustomPresetAdded = "";
+}
+
+void Presets::deleteCustomPreset(QString name)
+{
+	mLastCustomPresetRemoved = name;
+	ssc::XmlOptionFile node = this->getPresetNode(name);
+	node.deleteNode();
+
+	//emit changed(); TODO???
 }
 
 void Presets::addCustomPreset(QDomElement& element)
 {
-	mLastCustomPresetName = element.firstChild().toElement().nodeName();
-	std::cout << "mLastCustomPresetName " << mLastCustomPresetName.toStdString() << std::endl;
+	mLastCustomPresetAdded = element.attribute("name");
 	this->addPreset(mCustomFile, element);
+
+	//emit changed(); TODO???
 }
 
 void Presets::save()
 {
 	this->getCustomFile().save();
+}
+
+void Presets::remove()
+{
+	//TODO
+	std::cout << "TODO IMPLEMENT: void Presets::remove()" << std::endl;
 }
 
 QStringList Presets::getPresetList(QString tag)
@@ -51,7 +67,7 @@ QStringList Presets::getPresetList(QString tag)
 bool Presets::isDefaultPreset(QString presetName)
 {
 	ssc::XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
-	if (!testval.getDocument().isNull())
+	if (!testval.isNull())
 		return true;
 	return false;
 }
@@ -85,19 +101,15 @@ void Presets::addDefaultPreset(QDomElement& element)
 
 void Presets::addPreset(ssc::XmlOptionFile& file, QDomElement& element)
 {
-	//TODO
-	std::cout << "TODO refactor void Presets::addPreset(ssc::XmlOptionFile& file, QDomElement& element)!!!" << std::endl;
-
-	file = file.descend("Presets");
-	if(file.getElement().isNull())
-	{
-		messageManager()->sendError("The XmlOptionFile we are trying to add a preset to is null.");
+	QString presetName = element.attribute("name");
+	if(presetName.isEmpty())
 		return;
-	}
 
-	QDomElement presetElement = file.getElement();
-	file.removeChildren();
-	presetElement.appendChild(element);
+	file = file.root();
+	file = file.descend("Presets");
+	file.getElement().appendChild(element);
+
+	//TODO what if preset with name already exists?
 }
 
 } /* namespace ssc */

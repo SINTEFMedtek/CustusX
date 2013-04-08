@@ -182,7 +182,20 @@ XmlOptionFile::XmlOptionFile(QString filename, QString name) :
 }
 
 XmlOptionFile::~XmlOptionFile()
+{}
+
+bool XmlOptionFile::isNull() const
 {
+	if(mCurrentElement.isNull() || mDocument.isNull())
+		return true;
+	return false;
+}
+
+XmlOptionFile XmlOptionFile::root() const
+{
+	XmlOptionFile retval = *this;
+	retval.mCurrentElement = mDocument.documentElement();
+	return retval;
 }
 
 XmlOptionFile XmlOptionFile::descend(QString element) const
@@ -250,6 +263,25 @@ QDomElement XmlOptionFile::safeGetElement(QDomElement parent, QString childName)
 	return child;
 }
 
+void XmlOptionFile::printDocument()
+{
+	QTextStream stream(stdout);
+	stream << "\n" << mDocument.toString(4) << "\n";
+}
+
+void XmlOptionFile::printElement()
+{
+	QTextStream stream(stdout);
+	stream << "\n";
+	mCurrentElement.save(stream, 4);
+	stream << "\n";
+}
+
+QDomDocument XmlOptionFile::getDocument()
+{
+	return mDocument;
+}
+
 QDomElement XmlOptionFile::getElement()
 {
 	return mCurrentElement;
@@ -267,12 +299,6 @@ QDomElement XmlOptionFile::getElement(QString level1, QString level2)
 	QDomElement elem2 = this->safeGetElement(elem1, level2);
 	return elem2;
 }
-
-//void XmlOptionFile::clean(QDomElement elem)
-//{
-//  while (elem.hasChildNodes())
-//    elem.removeChild(elem.firstChild());
-//}
 
 void XmlOptionFile::removeChildren()
 {

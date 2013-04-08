@@ -75,28 +75,34 @@ class XmlOptionFile
 {
 public:
 	static XmlOptionFile createNull(); ///< create an empty document
+
 	explicit XmlOptionFile(QString filename, QString name = ""); ///< create from filename, create trivial document of type name and root node if no file exists.
 	XmlOptionFile();
 	~XmlOptionFile();
 
+	bool isNull() const; ///< checks if this is null
+
+	XmlOptionFile root() const; ///< set the current element to root
 	XmlOptionFile descend(QString element) const; ///< step one level down in the xml tree
 	XmlOptionFile descend(QString element, QString attributeName, QString attributeValue) const; // stepdown to element with given attribute
 	XmlOptionFile ascend() const; ///< step one level up in the xml tree
 	XmlOptionFile tryDescend(QString element, QString attributeName, QString attributeValue) const; // stepdown only if present
 
-	QDomDocument getDocument()
-	{
-		return mDocument;
-	}
+	QDomDocument getDocument(); ///< returns the document
 	QDomElement getElement(); ///< return the current element
 	QDomElement getElement(QString level1); ///< return a element below the current element. Guaranteed to exist.
 	QDomElement getElement(QString level1, QString level2); ///< return a element two levels below the current element. Guaranteed to exist.
+
 	void save(); ///< save entire document.
 
 	void removeChildren(); ///< remove all child nodes of the current element.
 	void deleteNode(); ///< Delete the current node
 
 	QDomElement safeGetElement(QDomElement parent, QString childName);
+
+	//Debugging
+	void printDocument(); ///< print the entire document
+	void printElement(); ///< print just the current element
 
 private:
 	void load();

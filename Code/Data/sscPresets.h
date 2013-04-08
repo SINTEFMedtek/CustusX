@@ -34,6 +34,9 @@ namespace ssc {
  *
  * \brief Base class for a group of presets in the system.
  *
+ * A preset node should look like this:
+ * <Preset name="example" valuename1="value1" valuename2="value2" ... valuenameN="valueN"/>
+ *
  * \date Mar 11, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -45,15 +48,17 @@ public:
 	Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile); //used
 	virtual ~Presets(){};
 
-	void addCustomPreset(QDomElement& element); //used
-	virtual void save(); //used
+	void addCustomPreset(QDomElement& element); ///< adds a custom preset
+	virtual void deleteCustomPreset(QString name); ///< deletes the custom preset with the given name if it exists
+	virtual void save(); ///< saves the presets to file
+	virtual void remove(); ///< removes the presets from file
 
 	QStringList getPresetList(QString tag=""); ///< returns a list of the preset names for the given tag
 	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
 	ssc::XmlOptionFile getCustomFile();
 
 signals:
-	void changed(); //used
+	void changed(); ///<
 
 protected:
 	virtual QStringList generatePresetList(QString tag); ///< internally generate the preset list
@@ -61,7 +66,8 @@ protected:
 	void addDefaultPreset(QDomElement& element); //used
 	void addPreset(ssc::XmlOptionFile& file, QDomElement& element); //used
 
-	QString mLastCustomPresetName; /// < the name of the last custom preset added
+	QString mLastCustomPresetAdded; /// < the name of the last custom preset added
+	QString mLastCustomPresetRemoved; /// < the name of the last custom preset removed
 
 	ssc::XmlOptionFile mPresetFile; //used
 private:
