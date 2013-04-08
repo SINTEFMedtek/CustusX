@@ -1,6 +1,7 @@
 #include "cxTSFPresets.h"
 
 #ifdef CX_USE_TSF
+#include <iostream>
 #include <QDir>
 #include <QTextStream>
 #include "sscMessageManager.h"
