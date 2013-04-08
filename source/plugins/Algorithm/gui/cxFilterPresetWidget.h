@@ -39,10 +39,11 @@ public:
 	FilterPresetWidget(QWidget* parent);
 	virtual ~FilterPresetWidget(){};
 
-	void setFilter(FilterPtr filter); ///<
+	void setFilter(FilterPtr filter); ///< sets which filter to operate on
 
 public slots:
-	void saveSlot();
+	virtual void saveSlot(); ///< called when user tries to save a filter preset
+	virtual void deleteSlot(); ///< called when user tries to delete a filter preset
 
 private:
 	FilterPtr mFilter;
