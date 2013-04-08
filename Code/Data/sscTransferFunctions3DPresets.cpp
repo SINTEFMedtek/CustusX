@@ -287,6 +287,8 @@ QStringList TransferFunctions3DPresets::generatePresetList(QString modality)
 
 void TransferFunctions3DPresets::deletePresetData(QString name, bool _2D, bool _3D)
 {
+	//todo rewrite
+	std::cout << "TODO rewrite TransferFunctions3DPresets::deletePresetData(QString name, bool _2D, bool _3D)" << std::endl;
 	ssc::XmlOptionFile node = this->getPresetNode(name);
 
 	if (_2D)
