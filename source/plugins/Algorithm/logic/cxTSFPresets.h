@@ -30,15 +30,17 @@ public:
 
 	static QDomElement createPresetElement(QString name, std::map<QString, QString>& parameters);
 	virtual void save(); ///< saves the newly added presets to file
+	virtual void remove(); ///< removes the newly added presets to file
 
 private:
-//	QDomElement mapToQDomElement(std::map<QString, QString> map); ///< converts a map of parameter names and values into a xml element
 	virtual QStringList generatePresetList(QString tag); ///< internally generate the preset list
 	void loadPresetsFromFiles(); ///< loads all preset files in a given location into the system
 	void convertToInternalFormat(std::map<QString, QString>& presets); ///< converts a map of names and filepaths into the internal default list of presets
-//	QDomElement convertToXml(QString filePath); ///< converts a preset file into a xml element
 	std::map<QString, QString> readFile(QString& filePath); ///< converts a parameter file into a map of parameter names and values
-	void saveFile(QString folderpath, std::map<QString, QString> parameters); ///< saves the last preset into a file in the given folder with the given parameters, also updates the parameterfile
+
+	void saveFile(QString folderPath, std::map<QString, QString> parameters); ///< saves a preset file with the given parameters in the given folder and system
+	void deleteFile(QString filePath); ///< deletes a given preset file from the system
+	void editParameterFile(QString name, bool addNotRemove);
 
 	//debugging
 	void print(QDomElement element); ///< debugging function for printing xml elements
