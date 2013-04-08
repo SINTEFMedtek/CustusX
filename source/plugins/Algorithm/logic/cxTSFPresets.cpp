@@ -8,19 +8,93 @@
 
 namespace cx {
 
-//TSFPresets::TSFPresets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile) :
 TSFPresets::TSFPresets() :
 	Presets(ssc::XmlOptionFile(), ssc::XmlOptionFile())
 {
-//	std::cout << "TSFPresets()" << std::endl;
 	mPresetPath = cx::DataLocations::getTSFPath()+"/parameters";
-	std::map<QString, QString> presetsMap = this->loadPresetsFromFiles();
+	this->loadPresetsFromFiles();
+}
 
-	this->convertToInternalFormat(presetsMap);
+QDomElement TSFPresets::createPresetElement(QString name, std::map<QString, QString>& parameters)
+{
+	QDomDocument doc;
+	QDomElement retval = doc.createElement("Preset");
+	retval.setAttribute("name", name);
+	std::map<QString, QString>::iterator it;
+	for(it = parameters.begin(); it != parameters.end(); ++it){
+		retval.setAttribute(it->first, it->second);
+	}
+	return retval;
+}
+
+void TSFPresets::save()
+{
+	QDomDocument doc = this->getCustomFile().getDocument();
+	QDomNodeList presetNodes = doc.elementsByTagName("Preset");
+	for (int i = 0; i < presetNodes.count(); ++i)
+	{
+		QDomNode node = presetNodes.at(i);
+		if(!node.isElement())
+			break;
+		QDomElement element = node.toElement();
+
+		QString folderPath;
+		std::map<QString, QString> parameters;
+		QDomNamedNodeMap attributes = element.attributes();
+        for (int i = 0; i < attributes.count(); ++i) {
+            QDomNode attribute = attributes.item(i);
+            if(attribute.nodeName() != "name")
+            	parameters[attribute.nodeName()] = attribute.nodeValue();
+            if(attribute.nodeName() == "centerline-method")
+            	folderPath = mPresetPath + "/centerline-"+attribute.nodeValue()+"/";
+        }
+		this->saveFile(folderPath, parameters);
+	}
+}
+
+void TSFPresets::remove()
+{
+//	QStringList keep;
+//	QDomDocument doc = this->getCustomFile().getDocument();
+//	QDomNodeList presetNodes = doc.elementsByTagName("Preset");
+//	for (int i = 0; i < presetNodes.count(); ++i)
+//	{
+//		QDomNode node = presetNodes.at(i);
+//		if(!node.isElement())
+//			break;
+//		QDomElement element = node.toElement();
+//
+//		QString folderPath;
+//		QString fileName;
+////		std::map<QString, QString> parameters;
+//		QDomNamedNodeMap attributes = element.attributes();
+//        for (int i = 0; i < attributes.count(); ++i) {
+//            QDomNode attribute = attributes.item(i);
+//            if(attribute.nodeName() != "name")
+//            	fileName = attribute.nodeValue();
+//            if(attribute.nodeName() == "centerline-method")
+//            	folderPath = mPresetPath + "/centerline-"+attribute.nodeValue()+"/";
+//        }
+//        keep << folderPath+fileName;
+//	}
+
+	//TODO
+	QStringList split = mLastCustomPresetRemoved.split(": ");
+	QString folderPath = mPresetPath;
+	foreach(QString string, split)
+	{
+		std::cout << string.toStdString() << std::endl;
+		if(string.contains("centerline-"))
+			folderPath+=string;
+	}
+
+	this->deleteFile(folderPath);
+
 }
 
 QStringList TSFPresets::generatePresetList(QString tag)
 {
+	this->loadPresetsFromFiles();
 	QStringList retval;
 	std::map<QString, QString>::iterator it;
 	for(it = mPresetsMap.begin(); it != mPresetsMap.end(); ++it)
@@ -30,23 +104,19 @@ QStringList TSFPresets::generatePresetList(QString tag)
 	return retval;
 }
 
-std::map<QString, QString> TSFPresets::loadPresetsFromFiles()
+void TSFPresets::loadPresetsFromFiles()
 {
-//	std::cout << "TSFPresets::loadPresetsFromFiles()" << std::endl;
 	mPresetsMap.clear();
 
 	QDir parametersDir(mPresetPath);
 	if(!parametersDir.exists())
-		return mPresetsMap;
+		return;
 
 	//get all folders in the presetpath
 	QStringList subDirs;
 	QFileInfoList infoList = parametersDir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
 	foreach(QFileInfo info, infoList)
-	{
 		subDirs << info.baseName();
-//		std::cout << info.baseName().toStdString() << std::endl;
-	}
 
 	//for each folder get all files
 	foreach(const QString dir, subDirs)
@@ -58,46 +128,23 @@ std::map<QString, QString> TSFPresets::loadPresetsFromFiles()
 			foreach(QFileInfo info, infoList)
 			{
 				QString name = info.dir().dirName() + ": " + info.baseName();
-//				std::cout << name.toStdString() << std::endl;
 				mPresetsMap[name] = info.absoluteFilePath();
 			}
 			parametersDir.cdUp();
 		}
 	}
-
-	return mPresetsMap;
+	this->convertToInternalFormat(mPresetsMap);
 }
 
 void TSFPresets::convertToInternalFormat(std::map<QString, QString>& presets)
 {
-//	std::cout << "TSFPresets::convertToInternalFormat(std::map<QString, QString> presets) " << presets.size() << std::endl;
 	std::map<QString, QString>::iterator it;
 	for(it = presets.begin(); it != presets.end(); ++it)
 	{
-		QDomElement preset = this->convertToXml(it->second);
-		Presets::addCustomPreset(it->first, preset);
-		//Debugging
-//		this->print(preset);
+		std::map<QString, QString> params = this->readFile(it->second);
+		QDomElement preset = TSFPresets::createPresetElement(it->first, params);
+		Presets::addDefaultPreset(preset);
 	}
-}
-
-QDomElement TSFPresets::convertToXml(QString filePath)
-{
-	QDomDocument doc;
-	QDomElement retval = ssc::XmlOptionFile().getElement();
-
-	//QString absFilePath = mPresetPath+"/"+filePath;
-
-	std::map<QString, QString> params = this->readFile(filePath);
-	std::map<QString, QString>::iterator it;
-	for(it = params.begin(); it != params.end(); ++it)
-	{
-		QDomElement child = doc.createElement("Paramenter");
-		child.setAttribute(it->first, it->second);
-		retval.appendChild(child);
-	}
-
-	return retval;
 }
 
 std::map<QString, QString> TSFPresets::readFile(QString& filePath)
@@ -119,31 +166,144 @@ std::map<QString, QString> TSFPresets::readFile(QString& filePath)
 	        QString line = in.readLine();
 	        QStringList lineItems = line.split(" ");
 	        if(lineItems.count() == 2)
-	        {
-//				std::cout << lineItems.at(0).toStdString() << " " << lineItems.at(1).toStdString() << std::endl;
 				retval[lineItems.at(0)] = lineItems.at(1);
-	        }
 	    }
 	}
 	return retval;
 }
 
-void TSFPresets::print(QDomElement& element)
+void TSFPresets::saveFile(QString folderpath, std::map<QString, QString> parameters)
 {
-//	std::cout << "TSFPresets::print(QDomElement element)" << std::endl;
-	 // print out the element names of all elements that are direct children
-	 // of the outermost element.
-//	 QDomElement docElem = doc.documentElement();
-//	std::cout << "element has childnodes? " << element.hasChildNodes() << std::endl;
 
-	 QDomNode n = element.firstChild();
-	 while(!n.isNull()) {
-	     QDomElement e = n.toElement(); // try to convert the node to an element.
-	     if(!e.isNull()) {
-	         std::cout << qPrintable(e.tagName()) << std::endl; // the node really is an element.
-	     }
-	     n = n.nextSibling();
-	 }
+	QFile file(folderpath+mLastCustomPresetAdded);
+	QString customPresetName = QFileInfo(file).fileName();
+
+	//-------------------------------------------------------------
+	//Need to add the name of the new file into the parameters file
+	// ..../parameters/parameters
+	//-------------------------------------------------------------
+	this->editParameterFile(customPresetName, true);
+
+	//-------------------------------------------------------------
+	//Save the new parameters file
+	// ..../parameters/<centerline-method>/<preset-name>
+	//-------------------------------------------------------------
+	QTextStream outPresetFile;
+	if (!file.open(QFile::WriteOnly)) //TODO truncate???
+	{
+		ssc::messageManager()->sendError("Could not open the file " + file.fileName() + " for writing.");
+		return;
+	}
+
+	outPresetFile.setDevice(&file);
+	std::map<QString, QString>::iterator it;
+	for(it=parameters.begin(); it != parameters.end(); ++it){
+		QString line = it->first + " " + it->second;
+		outPresetFile << line << "\n";
+	}
+	outPresetFile << flush;
+
+	file.close();
+
+}
+
+void TSFPresets::editParameterFile(QString name, bool addNotRemove)
+{
+	QString parametersFile = mPresetPath+"/parameters";
+	QFile paramFile(parametersFile);
+	if(!paramFile.exists())
+	{
+		ssc::messageManager()->sendError("The file " + parametersFile + " does not exist.");
+		return;
+	}
+
+	//Read the content
+	if (!paramFile.open(QFile::ReadOnly))
+	{
+		ssc::messageManager()->sendError("Could not open the file " + parametersFile + " for reading.");
+		return;
+	}
+	QTextStream inText;
+	inText.setDevice(&paramFile);
+	QString allText = inText.readAll();
+	paramFile.close();
+
+	if(addNotRemove)
+	{
+		if(!allText.contains(name, Qt::CaseInsensitive))
+		{
+			QString searchString = "parameters str none";
+			int index = allText.indexOf(searchString);
+			index += searchString.size();
+			allText.insert(index, " "+name);
+//
+//			//Write the new content
+//			if (!paramFile.open(QFile::WriteOnly | QFile::Truncate))
+//			{
+//				ssc::messageManager()->sendError("Could not open the file " + parametersFile + " for writing.");
+//				return;
+//			}
+//			QTextStream outParametersFile(&paramFile);
+//			outParametersFile << allText;
+//			outParametersFile << flush;
+//			paramFile.close();
+		}
+	}else
+	{
+		allText.replace(" "+name, "");
+
+//		//Write the new content
+//		if (!paramFile.open(QFile::WriteOnly | QFile::Truncate))
+//		{
+//			ssc::messageManager()->sendError("Could not open the file " + parametersFile + " for writing.");
+//			return;
+//		}
+//		QTextStream outParametersFile(&paramFile);
+//		outParametersFile << allText;
+//		outParametersFile << flush;
+//		paramFile.close();
+	}
+	//Write the new content
+	if (!paramFile.open(QFile::WriteOnly | QFile::Truncate))
+	{
+		ssc::messageManager()->sendError("Could not open the file " + parametersFile + " for writing.");
+		return;
+	}
+	QTextStream outParametersFile(&paramFile);
+	outParametersFile << allText;
+	outParametersFile << flush;
+	paramFile.close();
+}
+
+void TSFPresets::deleteFile(QString filePath)
+{
+	std::cout << filePath.toStdString() << std::endl;
+	return;
+
+	QFile file(filePath);
+	QString customPresetName = QFileInfo(file).fileName();
+
+	//-------------------------------------------------------------
+	//Need to remove the name of the new file from the parameters file
+	// ..../parameters/parameters
+	//-------------------------------------------------------------
+	this->editParameterFile(customPresetName, false);
+
+	//-------------------------------------------------------------
+	//Delete the preset file
+	// ..../parameters/<centerline-method>/<preset-name>
+	//-------------------------------------------------------------
+	if(!file.remove())
+		std::cout << "file: " << filePath.toStdString() << " not removed..." << std::endl;
+}
+
+
+void TSFPresets::print(QDomElement element)
+{
+	QTextStream stream(stdout);
+	stream << "\n";
+	element.save(stream, 4);
+	stream << "\n";
 }
 
 } /* namespace cx */

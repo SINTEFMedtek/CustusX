@@ -48,7 +48,7 @@ void TestTubeSegmentationFramework::testFilter()
 	CPPUNIT_ASSERT_MESSAGE("Name has changed.", (tsf->getName().compare("Tube-Segmentation Filter") == 0));
 	CPPUNIT_ASSERT_MESSAGE("Help has changed.", (tsf->getHelp().compare("<html>"
 	        "<h3>Tube-Segmentation.</h3>"
-	        "<p><i>Extracts the centerline and creates a segementation. </br>GPU-base algorithm wrtiten by Erik Smistad (NTNU).</i></p>"
+	        "<p><i>Extracts the centerline and creates a segementation. </br>GPU-base algorithm written by Erik Smistad (NTNU).</i></p>"
 	        "</html>") == 0));
 
 	//create a new patient and load in testdata
@@ -73,7 +73,7 @@ void TestTubeSegmentationFramework::testFilter()
 
 	//check output
 	std::vector<cx::SelectDataStringDataAdapterBasePtr> output = tsf->getOutputTypes();
-	CPPUNIT_ASSERT_MESSAGE("Number of outputs has changed.", output.size() == 3);
+	CPPUNIT_ASSERT_MESSAGE("Number of outputs has changed.", output.size() == 5);
 	CPPUNIT_ASSERT_MESSAGE("Centerline volume not generated.",output[0]->getData());
 	CPPUNIT_ASSERT_MESSAGE("Centerline vtkPolydata not generated.",output[1]->getData());
 	CPPUNIT_ASSERT_MESSAGE("Segmentation not generated.",output[2]->getData());
@@ -97,8 +97,8 @@ void TestTubeSegmentationFramework::testParameters()
 	CPPUNIT_ASSERT_MESSAGE("Gpu not validated as device.", defaultParameters.strings["device"].validate("gpu"));
 	CPPUNIT_ASSERT_MESSAGE("250 not a valid gvf-iterations value.", defaultParameters.numerics["gvf-iterations"].validate(250));
 
-	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Set parameter parameter to airway failed.", setParameter(defaultParameters, "parameters", "airway"));
-	setParameter(defaultParameters, "parameters", "airway");
+	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Set parameter parameter to Lung-Airways-CT failed.", setParameter(defaultParameters, "parameters", "Lung-Airways-CT"));
+	//setParameter(defaultParameters, "parameters", "Lung-Airways-CT");
 	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Load presets failed.", loadParameterPreset(defaultParameters, path));
 
 

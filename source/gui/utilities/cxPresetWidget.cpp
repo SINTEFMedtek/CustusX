@@ -1,6 +1,22 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #include "cxPresetWidget.h"
 
 #include <QComboBox>
+#include <QInputDialog>
+#include "sscMessageManager.h"
 
 namespace cx {
 
@@ -81,7 +97,7 @@ void PresetWidget::setPresets(ssc::PresetsPtr presets)
 {
 	if(!presets)
 	{
-		std::cout << "Trying to set presets to null...  :(" << std::endl;
+		ssc::messageManager()->sendError("Trying to set presets to null...");
 		return;
 	}
 	//TODO disconnect old stuff
@@ -99,14 +115,14 @@ void PresetWidget::resetSlot()
 
 void PresetWidget::saveSlot()
 {
-	//TODO
-	std::cout << "TODO: IMPLEMENT PresetWidget::saveSlot()" << std::endl;
+	mPresets->save();
+	this->populatePresetListSlot();
 }
 
 void PresetWidget::deleteSlot()
 {
-	//TODO
-	std::cout << "TODO: IMPLEMENT PresetWidget::deleteSlot()" << std::endl;
+	mPresets->remove();
+	this->populatePresetListSlot();
 }
 
 void PresetWidget::populatePresetListSlot()
@@ -160,6 +176,30 @@ void PresetWidget::populatePresetList(QStringList list)
 	mPresetsComboBox->addItems(list);
 
 	mPresetsComboBox->blockSignals(false);
+}
+
+QString PresetWidget::getNewPresetName(bool withoutSpaces = false)
+{
+	QString retval;
+
+	// generate a name suggestion: identical if custom, appended by index if default.
+	QString newName = PresetWidget::getCurrentPreset();
+	if (!mPresets->getPresetList("").contains(newName))
+		newName = "custom preset";
+	if (mPresets->isDefaultPreset(newName))
+		newName += "(2)";
+
+	bool ok;
+	QString text = QInputDialog::getText(this, "Save Preset",
+			"Custom Preset Name", QLineEdit::Normal, newName, &ok);
+	if (!ok || text.isEmpty())
+		text = newName;
+
+	retval = text;
+	if(withoutSpaces)
+		retval = retval.replace(" ", "-");
+
+	return retval;
 }
 
 
