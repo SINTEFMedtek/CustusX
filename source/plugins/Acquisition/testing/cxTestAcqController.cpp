@@ -164,6 +164,12 @@ void TestAcqController::saveDataCompletedSlot(QString path)
 
 void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 {
+	std::cout << "\tfilename: " << fileData.mFilename << std::endl;
+	std::cout << "\tframe count: " << fileData.mFrames.size() << std::endl;
+	std::cout << "\trecord duration: " << mRecordDuration << " ms" << std::endl;
+	if (!fileData.mFrames.empty())
+		std::cout << "\ttime: " << fileData.mFrames.back().mTime - fileData.mFrames.front().mTime << std::endl;
+
 	CPPUNIT_ASSERT(!fileData.mFilename.isEmpty());
 	// check for enough received image frames
 	int framesPerSecond = 20; // minimum frame rate
@@ -177,11 +183,6 @@ void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 	// check for duration equal to input duration
 	double pos_time_ms = fileData.mPositions.back().mTime - fileData.mPositions.front().mTime;
 	CPPUNIT_ASSERT(ssc::similar(pos_time_ms, mRecordDuration, 0.05*mRecordDuration));
-
-	std::cout << "\tfilename: " << fileData.mFilename << std::endl;
-	std::cout << "\tframe count " << fileData.mFrames.size() << std::endl;
-	if (!fileData.mFrames.empty())
-		std::cout << "\ttime: " << fileData.mFrames.back().mTime - fileData.mFrames.front().mTime << std::endl;
 
 	CPPUNIT_ASSERT(fileData.mProbeData.mData.getType()!=ssc::ProbeData::tNONE);
 
