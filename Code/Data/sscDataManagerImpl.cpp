@@ -521,14 +521,14 @@ void DataManagerImpl::saveData(DataPtr data, const QString& basePath)
     if (!data)
         return;
 
-    ImagePtr image = boost::shared_dynamic_cast<Image>(data);
+    ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
     if (image)
     {
         this->saveImage(image, basePath);
         return;
     }
 
-    MeshPtr mesh = boost::shared_dynamic_cast<Mesh>(data);
+    MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
     if (mesh)
     {
         this->saveMesh(mesh, basePath);
@@ -588,7 +588,7 @@ void DataManagerImpl::verifyParentFrame(DataPtr data)
 
 ImagePtr DataManagerImpl::getImage(const QString& uid) const
 {
-	return boost::shared_dynamic_cast<Image>(this->getData(uid));
+	return boost::dynamic_pointer_cast<Image>(this->getData(uid));
 }
 
 std::map<QString, DataPtr> DataManagerImpl::getData() const
@@ -641,7 +641,7 @@ std::vector<QString> DataManagerImpl::getImageUids() const
 
 MeshPtr DataManagerImpl::getMesh(const QString& uid) const
 {
-	return boost::shared_dynamic_cast<Mesh>(this->getData(uid));
+	return boost::dynamic_pointer_cast<Mesh>(this->getData(uid));
 }
 
 std::map<QString, MeshPtr> DataManagerImpl::getMeshes() const
