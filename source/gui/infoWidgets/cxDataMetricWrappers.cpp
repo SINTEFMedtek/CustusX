@@ -408,7 +408,7 @@ void AngleMetricWrapper::getPointMetrics(QStringList* uid, std::map<QString,QStr
   std::map<QString, ssc::DataPtr> data = ssc::dataManager()->getData();
   for (std::map<QString, ssc::DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
   {
-    if (boost::shared_dynamic_cast<ssc::PointMetric>(iter->second))
+    if (boost::dynamic_pointer_cast<ssc::PointMetric>(iter->second))
     {
       *uid << iter->first;
       (*namemap)[iter->first] = iter->second->getName();
@@ -476,7 +476,7 @@ void AngleMetricWrapper::pointSelected()
     return;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
-	  ssc::PointMetricPtr p = boost::shared_dynamic_cast<ssc::PointMetric>(ssc::dataManager()->getData(mPSelector[i]->getValue()));
+	  ssc::PointMetricPtr p = boost::dynamic_pointer_cast<ssc::PointMetric>(ssc::dataManager()->getData(mPSelector[i]->getValue()));
     mData->setArgument(i, p);
   }
 }

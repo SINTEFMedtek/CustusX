@@ -5,7 +5,7 @@
 #include "cxMacGrabber.h"
 
 #include "sscTime.h"
-#include "sscTypeConversions.h"
+//#include "sscTypeConversions.h"
 #include <iostream>
 #include <QWidget>
 #include <QMacCocoaViewContainer>
@@ -21,7 +21,8 @@ void reportError(NSError* error)
         return;
     NSString* errorString = [error localizedDescription];
     std::string errorStdString = std::string([errorString UTF8String]);
-    ssc::messageManager()->sendError(qstring_cast(errorStdString));
+//    ssc::messageManager()->sendError(qstring_cast(errorStdString));
+	ssc::messageManager()->sendError(QString::fromStdString(errorStdString));
 }
 
 // utility for reporting strings
@@ -30,7 +31,8 @@ void reportString(NSString* string)
     if(!string)
         return;
     std::string stdString = std::string([string UTF8String]);
-    ssc::messageManager()->sendInfo(qstring_cast(stdString));
+//    ssc::messageManager()->sendInfo(qstring_cast(stdString));
+	ssc::messageManager()->sendInfo(QString::fromStdString(stdString));
 }
 
 //==============================================================================
@@ -219,7 +221,8 @@ bool MacGrabber::findConnectedDevice()
   //Report to user all found grabbers
   NSArray *devices = [QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo];
   int i = [devices count];
-  ssc::messageManager()->sendInfo("Number of input grabber devices: "+qstring_cast(i));
+//  ssc::messageManager()->sendInfo("Number of input grabber devices: "+qstring_cast(i));
+  ssc::messageManager()->sendInfo("Number of input grabber devices: "+ QString::number(i));
   for (QTCaptureDevice *device in devices)
     reportString([device localizedDisplayName]);
 
@@ -324,7 +327,8 @@ void MacGrabber::startSession()
   
   NSString* grabberName = [mObjectiveC->mSelectedDevice localizedDisplayName];
   std::string name = std::string([grabberName UTF8String]);
-  ssc::messageManager()->sendSuccess("Started grabbing from "+qstring_cast(name));
+//  ssc::messageManager()->sendSuccess("Started grabbing from "+qstring_cast(name));
+  ssc::messageManager()->sendSuccess("Started grabbing from "+QString::fromStdString(name));
   emit started();
 }
 

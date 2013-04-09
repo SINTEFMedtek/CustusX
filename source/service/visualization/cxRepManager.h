@@ -66,7 +66,7 @@ public:
 	{
 		for (unsigned i = 0; i < reps.size(); ++i)
 		{
-			boost::shared_ptr<REP> rep = boost::shared_dynamic_cast<REP>(reps[i]);
+			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
 			if (rep && rep->hasTool(tool))
 			{
 				return rep;
@@ -80,7 +80,7 @@ public:
 	{
 		for (unsigned i = 0; i < reps.size(); ++i)
 		{
-			boost::shared_ptr<REP> rep = boost::shared_dynamic_cast<REP>(reps[i]);
+			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
 			if (rep && rep->hasData(data))
 				return rep;
 		}
@@ -92,7 +92,7 @@ public:
 	{
 		for (unsigned i = 0; i < reps.size(); ++i)
 		{
-			boost::shared_ptr<REP> rep = boost::shared_dynamic_cast<REP>(reps[i]);
+			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
 			if (rep)
 				return rep;
 		}
@@ -124,7 +124,7 @@ public:
 		{
 			if (iter->first != uid)
 				continue;
-			boost::shared_ptr<REP> retval = boost::shared_dynamic_cast<REP>(iter->second);
+			boost::shared_ptr<REP> retval = boost::dynamic_pointer_cast<REP>(iter->second);
 			if (retval)
 			{
 //  		  std::cout << "reusing cached rep: " << uid << std::endl;

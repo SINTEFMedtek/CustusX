@@ -231,8 +231,8 @@ void ElastixManager::addNonlinearData()
 	if (!ok)
 		return;
 
-	ssc::ImagePtr movingImage = boost::shared_dynamic_cast<ssc::Image>(mRegistrationManager->getMovingData());
-	ssc::ImagePtr raw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
+	ssc::ImagePtr movingImage = boost::dynamic_pointer_cast<ssc::Image>(mRegistrationManager->getMovingData());
+	ssc::ImagePtr raw = boost::dynamic_pointer_cast<ssc::Image>(ssc::MetaImageReader().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
 
 	QString uid = movingImage->getUid() + "_nl%1";
 	QString name = movingImage->getName()+" nl%1";
