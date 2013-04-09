@@ -122,7 +122,7 @@ void MetricWidget::cellClickedSlot(int row, int column)
 
 	  QTableWidgetItem* item = mTable->item(row,column);
 	  ssc::DataPtr data = ssc::dataManager()->getData(item->data(Qt::UserRole).toString());
-	  ssc::PointMetricPtr pointData = boost::shared_dynamic_cast<ssc::PointMetric>(data);
+	  ssc::PointMetricPtr pointData = boost::dynamic_pointer_cast<ssc::PointMetric>(data);
 	  if (pointData)
 	  {
 		  	ssc::Vector3D p_r = pointData->getRefCoord();;
@@ -179,21 +179,21 @@ void MetricWidget::hideEvent(QHideEvent* event)
 
 MetricBasePtr MetricWidget::createMetricWrapper(ssc::DataPtr data)
 {
-  if (boost::shared_dynamic_cast<ssc::PointMetric>(data))
+  if (boost::dynamic_pointer_cast<ssc::PointMetric>(data))
   {
-    return MetricBasePtr(new PointMetricWrapper(boost::shared_dynamic_cast<ssc::PointMetric>(data)));
+    return MetricBasePtr(new PointMetricWrapper(boost::dynamic_pointer_cast<ssc::PointMetric>(data)));
   }
-  else if (boost::shared_dynamic_cast<ssc::DistanceMetric>(data))
+  else if (boost::dynamic_pointer_cast<ssc::DistanceMetric>(data))
   {
-    return MetricBasePtr(new DistanceMetricWrapper(boost::shared_dynamic_cast<ssc::DistanceMetric>(data)));
+    return MetricBasePtr(new DistanceMetricWrapper(boost::dynamic_pointer_cast<ssc::DistanceMetric>(data)));
   }
-  else if (boost::shared_dynamic_cast<ssc::PlaneMetric>(data))
+  else if (boost::dynamic_pointer_cast<ssc::PlaneMetric>(data))
   {
-    return MetricBasePtr(new PlaneMetricWrapper(boost::shared_dynamic_cast<ssc::PlaneMetric>(data)));
+    return MetricBasePtr(new PlaneMetricWrapper(boost::dynamic_pointer_cast<ssc::PlaneMetric>(data)));
   }
-  else if (boost::shared_dynamic_cast<ssc::AngleMetric>(data))
+  else if (boost::dynamic_pointer_cast<ssc::AngleMetric>(data))
   {
-    return MetricBasePtr(new AngleMetricWrapper(boost::shared_dynamic_cast<ssc::AngleMetric>(data)));
+    return MetricBasePtr(new AngleMetricWrapper(boost::dynamic_pointer_cast<ssc::AngleMetric>(data)));
   }
 
 	return MetricBasePtr();

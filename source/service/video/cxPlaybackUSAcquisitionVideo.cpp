@@ -198,7 +198,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (tool)
 	{
-		ProbePtr probe = boost::shared_dynamic_cast<Probe>(tool->getProbe());
+		ProbePtr probe = boost::dynamic_pointer_cast<Probe>(tool->getProbe());
 		if (probe)
 			probe->setData(mCurrentData.mProbeData.mData);
 	}

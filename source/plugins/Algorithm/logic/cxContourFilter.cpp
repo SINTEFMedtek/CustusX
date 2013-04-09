@@ -173,7 +173,7 @@ void ContourFilter::thresholdSlot()
 	//    std::cout << "ContourFilter::thresholdSlot() " << mActive << std::endl;
 	if (mActive)
 	{
-		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mInputTypes[0]->getData());
+		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mInputTypes[0]->getData());
 		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mSurfaceThresholdOption->getValue());
 	}
 }

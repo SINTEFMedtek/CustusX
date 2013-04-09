@@ -454,7 +454,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 
 		// tool spaces
 		ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-		ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
+		ssc::ToolManager::ToolMapPtr::element_type::iterator iter;
 		for (iter = tools->begin(); iter != tools->end(); ++iter)
 		{
 			ssc::ToolPtr tool = iter->second;
@@ -539,7 +539,7 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 		mDataReps[data->getUid()] = rep;
 		mView->addRep(rep);
 
-		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
 		if (image)
 		{
 			connect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
@@ -575,9 +575,9 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
  */
 ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 {
-	if (boost::shared_dynamic_cast<ssc::Image>(data))
+	if (boost::dynamic_pointer_cast<ssc::Image>(data))
 	{
-		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
 		if (image->getBaseVtkImageData()->GetDimensions()[2]==1)
 		{
 			cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New(data->getUid()+"image2DRep");
@@ -590,38 +590,38 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 			return rep;
 		}
 	}
-	else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
+	else if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
 	{
 		ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid() + "_geom3D_rep");
-		rep->setMesh(boost::shared_dynamic_cast<ssc::Mesh>(data));
+		rep->setMesh(boost::dynamic_pointer_cast<ssc::Mesh>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<ssc::PointMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::PointMetric>(data))
 	{
 		ssc::PointMetricRepPtr rep = ssc::PointMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setPointMetric(boost::shared_dynamic_cast<ssc::PointMetric>(data));
+		rep->setPointMetric(boost::dynamic_pointer_cast<ssc::PointMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<ssc::DistanceMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::DistanceMetric>(data))
 	{
 		ssc::DistanceMetricRepPtr rep = ssc::DistanceMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setDistanceMetric(boost::shared_dynamic_cast<ssc::DistanceMetric>(data));
+		rep->setDistanceMetric(boost::dynamic_pointer_cast<ssc::DistanceMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<ssc::AngleMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::AngleMetric>(data))
 	{
 		ssc::AngleMetricRepPtr rep = ssc::AngleMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setMetric(boost::shared_dynamic_cast<ssc::AngleMetric>(data));
+		rep->setMetric(boost::dynamic_pointer_cast<ssc::AngleMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<ssc::PlaneMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::PlaneMetric>(data))
 	{
 		ssc::PlaneMetricRepPtr rep = ssc::PlaneMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setMetric(boost::shared_dynamic_cast<ssc::PlaneMetric>(data));
+		rep->setMetric(boost::dynamic_pointer_cast<ssc::PlaneMetric>(data));
 		return rep;
 	}
 
@@ -633,7 +633,7 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
  */
 void ViewWrapper3D::readDataRepSettings(ssc::RepPtr rep)
 {
-	ssc::DataMetricRepPtr val = boost::shared_dynamic_cast<ssc::DataMetricRep>(rep);
+	ssc::DataMetricRepPtr val = boost::dynamic_pointer_cast<ssc::DataMetricRep>(rep);
 	if (!val)
 		return;
 
@@ -736,7 +736,7 @@ void ViewWrapper3D::dominantToolChangedSlot()
 void ViewWrapper3D::toolsAvailableSlot()
 {
 	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-	ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
+	ssc::ToolManager::ToolMapPtr::element_type::iterator iter;
 	for (iter = tools->begin(); iter != tools->end(); ++iter)
 	{
 		ssc::ToolPtr tool = iter->second;
