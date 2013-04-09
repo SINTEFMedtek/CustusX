@@ -121,7 +121,7 @@ std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 {
 	if (!mArgument[0] || !mArgument[1])
 		return std::vector<ssc::Vector3D>();
-//	PointMetricPtr pt = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(uid));
+//	PointMetricPtr pt = boost::dynamic_pointer_cast<PointMetric>(ssc::dataManager()->getData(uid));
 	std::vector<ssc::Vector3D> retval(2);
 	// case   I: point-point
 	// case  II: point-plane
@@ -129,21 +129,21 @@ std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 
 	if ((mArgument[0]->getType() == "pointMetric") && (mArgument[1]->getType() == "pointMetric"))
 	{
-		retval[0] = boost::shared_dynamic_cast<PointMetric>(mArgument[0])->getRefCoord();
-		retval[1] = boost::shared_dynamic_cast<PointMetric>(mArgument[1])->getRefCoord();
+		retval[0] = boost::dynamic_pointer_cast<PointMetric>(mArgument[0])->getRefCoord();
+		retval[1] = boost::dynamic_pointer_cast<PointMetric>(mArgument[1])->getRefCoord();
 	}
 	else if ((mArgument[0]->getType() == "planeMetric") && (mArgument[1]->getType() == "pointMetric"))
 	{
-		Plane3D plane = boost::shared_dynamic_cast<PlaneMetric>(mArgument[0])->getRefPlane();
-		ssc::Vector3D p = boost::shared_dynamic_cast<PointMetric>(mArgument[1])->getRefCoord();
+		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[0])->getRefPlane();
+		ssc::Vector3D p = boost::dynamic_pointer_cast<PointMetric>(mArgument[1])->getRefCoord();
 
 		retval[0] = plane.projection(p);
 		retval[1] = p;
 	}
 	else if ((mArgument[0]->getType() == "pointMetric") && (mArgument[1]->getType() == "planeMetric"))
 	{
-		Plane3D plane = boost::shared_dynamic_cast<PlaneMetric>(mArgument[1])->getRefPlane();
-		ssc::Vector3D p = boost::shared_dynamic_cast<PointMetric>(mArgument[0])->getRefCoord();
+		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[1])->getRefPlane();
+		ssc::Vector3D p = boost::dynamic_pointer_cast<PointMetric>(mArgument[0])->getRefCoord();
 
 		retval[1] = plane.projection(p);
 		retval[0] = p;
@@ -152,8 +152,8 @@ std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 //	{
 //		... only if planes are parallel... not much use.
 //
-//		Plane3D plane0 = boost::shared_dynamic_cast<PlaneMetric>(mArgument[0])->getRefPlane();
-//		Plane3D plane1 = boost::shared_dynamic_cast<PlaneMetric>(mArgument[1])->getRefPlane();
+//		Plane3D plane0 = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[0])->getRefPlane();
+//		Plane3D plane1 = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[1])->getRefPlane();
 //
 //		ssc::Vector3D p0 = - plane0.normal() * plane0.offset();
 //		ssc::Vector3D p0 = - plane0.normal() * plane0.offset();

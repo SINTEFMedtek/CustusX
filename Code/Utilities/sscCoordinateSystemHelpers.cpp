@@ -260,7 +260,7 @@ Transform3D CoordinateSystemHelpers::get_rMdv(QString uid)
 		return Transform3D::Identity();
 	}
 
-	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
 	if (!image)
 		return data->get_rMd();
 	return data->get_rMd()*ssc::createTransformScale(ssc::Vector3D(image->getBaseVtkImageData()->GetSpacing())); // ref_M_d

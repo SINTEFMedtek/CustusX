@@ -167,11 +167,11 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 		std::map<QString, DataPtr> allData = ssc::dataManager()->getData();
 		for (std::map<QString, DataPtr>::iterator iter = allData.begin(); iter != allData.end(); ++iter)
 		{
-			ssc::MeshPtr mesh = boost::shared_dynamic_cast<ssc::Mesh>(iter->second);
+			ssc::MeshPtr mesh = boost::dynamic_pointer_cast<ssc::Mesh>(iter->second);
 			if (mesh && mesh->getVtkPolyData() == data)
 				emit dataPicked(iter->first);
 
-			ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(iter->second);
+			ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(iter->second);
 //			if (image)
 //				std::cout << "  checking " << image->getBaseVtkImageData().GetPointer() << std::endl;
 			if (image && image->getBaseVtkImageData() == data)

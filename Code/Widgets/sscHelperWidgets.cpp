@@ -26,20 +26,20 @@
 #include "sscHelperWidgets.h"
 
 #include <iostream>
+#include "boost/shared_ptr.hpp"
 #include "sscDoubleWidgets.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscCheckBoxWidget.h"
 #include "sscColorSelectWidget.h"
 #include "sscTypeConversions.h"
 #include "sscLabeledLineEditWidget.h"
-#include <iostream>
 
 namespace ssc
 {
 
 QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout, int row)
 {
-	StringDataAdapterPtr str = boost::shared_dynamic_cast<ssc::StringDataAdapter>(data);
+	StringDataAdapterPtr str = boost::dynamic_pointer_cast<ssc::StringDataAdapter>(data);
 	if (str)
 	{
 		if (str->getAllowOnlyValuesInRange())
@@ -48,7 +48,7 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 			return new ssc::LabeledLineEditWidget(parent, str, gridLayout, row);
 	}
 
-	DoubleDataAdapterPtr dbl = boost::shared_dynamic_cast<ssc::DoubleDataAdapter>(data);
+	DoubleDataAdapterPtr dbl = boost::dynamic_pointer_cast<ssc::DoubleDataAdapter>(data);
 	if (dbl)
 	{
         if (dbl->addSlider())
@@ -57,13 +57,13 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
             return new ssc::SpinBoxGroupWidget(parent, dbl, gridLayout, row);
 	}
 
-	BoolDataAdapterPtr bl = boost::shared_dynamic_cast<ssc::BoolDataAdapter>(data);
+	BoolDataAdapterPtr bl = boost::dynamic_pointer_cast<ssc::BoolDataAdapter>(data);
 	if (bl)
 	{
 		return new ssc::CheckBoxWidget(parent, bl, gridLayout, row);
 	}
 
-    ColorDataAdapterPtr cl = boost::shared_dynamic_cast<ssc::ColorDataAdapter>(data);
+    ColorDataAdapterPtr cl = boost::dynamic_pointer_cast<ssc::ColorDataAdapter>(data);
     if (cl)
     {
         return new ssc::ColorSelectWidget(parent, cl, gridLayout, row);

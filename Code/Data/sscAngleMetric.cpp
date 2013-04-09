@@ -107,7 +107,7 @@ std::vector<ssc::Vector3D> AngleMetric::getEndpoints() const
 	{
 		if (!mArgument[i])
 			return std::vector<ssc::Vector3D>();
-		p[i] = boost::shared_dynamic_cast<PointMetric>(mArgument[i])->getRefCoord();
+		p[i] = boost::dynamic_pointer_cast<PointMetric>(mArgument[i])->getRefCoord();
 	}
 	return p;
 }
