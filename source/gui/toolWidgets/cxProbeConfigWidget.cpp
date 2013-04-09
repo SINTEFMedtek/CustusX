@@ -137,7 +137,7 @@ void ProbeConfigWidget::savePresetSlot()
 {
 	if (!mActiveProbeConfig->getTool())
 		return;
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 
@@ -185,7 +185,7 @@ void ProbeConfigWidget::savePresetSlot()
 
 void ProbeConfigWidget::deletePresetSlot()
 {
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 
@@ -204,7 +204,7 @@ void ProbeConfigWidget::deletePresetSlot()
 
 void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 {
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 	ssc::ProbeData data = probe->getData();
@@ -249,7 +249,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	if(!mActiveProbeConfig->getTool())
 		return;
 	// need a cx probe here, in order to set data.
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 	ssc::ProbeData data = probe->getData();
@@ -272,7 +272,7 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	// need a cx probe here, in order to set data.
 	if (!mActiveProbeConfig->getTool())
 		return;
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 	ssc::ProbeData data = probe->getData();
@@ -292,7 +292,7 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 	// need a cx probe here, in order to set data.
 	if (!mActiveProbeConfig->getTool())
 		return;
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 	ssc::ProbeData data = probe->getData();
