@@ -56,10 +56,14 @@ void TestGEInterface::testSingleStreams()
 {
 	std::cout << std::endl << "*** Test GE single streams. GPU scanconversion if possible ***" << std::endl;
 	cx::StringMap args;
-//	args["ip"] = "bhgrouter.hopto.org";
 	args["type"] = "ISB_GE";
 	args["test"] = "2D";
+	//args["ip"] = "bhgrouter.hopto.org";
+	//args["test"] = "no";
 	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
+	args["streams"] = "all";
+	std::cout << std::endl << "--- Test GE 2D all streams. ---" << std::endl;
+	this->testStream(args);
 	args["streams"] = "scanconverted";
 	std::cout << std::endl << "--- Test GE 2D scanconverted stream. ---" << std::endl;
 	this->testStream(args);
@@ -105,6 +109,8 @@ void TestGEInterface::testStream(cx::StringMap args)
 
 void TestGEInterface::testGEStreamer()
 {
+	//std::cout << std::endl << "*** Test GE 3D scanconverted stream. GPU scanconversion if possible ***" << std::endl;
+	std::cout << std::endl << "*** Test GE 3D scanconverted stream. CPU scanconversion for now ***" << std::endl;
 	data_streaming::GEStreamer geStreamer;
 
 	//Initialize GEStreamer    HFDPath, useHDF, sizeCompType,     imgSize, interpolation,       buffSize, clPath, useCL
@@ -171,7 +177,7 @@ void TestGEInterface::validateBMode3D(vtkSmartPointer<vtkImageData> img)
 {
 	int* dim =  img->GetDimensions();
 	std::cout << "dim: " << dim[0] << " " << dim[1] << " " << dim[2] << std::endl;
-	std::cout << "value in " << dim[0]/3 << " " << dim[1]/3 <<  " " << dim[2]/3 << ": ";
+	//std::cout << "value in " << dim[0]/3 << " " << dim[1]/3 <<  " " << dim[2]/3 << ": ";
 	std::cout << getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) << std::endl;
 	CPPUNIT_ASSERT( getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) == 100);
 }
