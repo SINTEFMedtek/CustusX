@@ -27,7 +27,7 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 	QWidget* retval = NULL;
 
 	//make cx widgets
-	SelectDataStringDataAdapterBasePtr dsda = boost::shared_dynamic_cast<SelectDataStringDataAdapterBase>(data);
+	SelectDataStringDataAdapterBasePtr dsda = boost::dynamic_pointer_cast<SelectDataStringDataAdapterBase>(data);
 	if (dsda)
 	{
 		retval = new DataSelectWidget(parent, dsda);

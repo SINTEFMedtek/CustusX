@@ -137,7 +137,7 @@ void Probe::setRTSource(ssc::VideoSourcePtr source)
 		ssc::VideoSourcePtr old = mSource.find(source->getUid())->second;
 
 		boost::shared_ptr<ssc::ProbeAdapterRTSource> oldAdapter;
-		oldAdapter = boost::shared_dynamic_cast<ssc::ProbeAdapterRTSource>(old);
+		oldAdapter = boost::dynamic_pointer_cast<ssc::ProbeAdapterRTSource>(old);
 		// check for identity, ignore if no change
 		if (oldAdapter && (source==oldAdapter->getBaseSource()))
 			return;

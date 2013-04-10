@@ -124,7 +124,7 @@ ssc::MeshPtr WirePhantomWidget::loadNominalCross()
     if (!retval)
     {
     	QString infoText;
-        retval = boost::shared_dynamic_cast<ssc::Mesh>(patientService()->getPatientData()->importData(nominalCrossFilename, infoText));
+        retval = boost::dynamic_pointer_cast<ssc::Mesh>(patientService()->getPatientData()->importData(nominalCrossFilename, infoText));
     }
 
     if (!retval)
@@ -281,7 +281,7 @@ void WirePhantomWidget::showDataMetrics(ssc::Vector3D cross_r)
     ssc::Transform3D usMnom = ssc::SpaceHelpers::get_toMfrom(ssc::SpaceHelpers::getD(mManager->getFixedData()), ssc::SpaceHelpers::getD(mManager->getMovingData()));
     ssc::Vector3D cross_us = usMnom.coord(cross_r);
 
-    ssc::PointMetricPtr p1 = boost::shared_dynamic_cast<ssc::PointMetric>(ssc::dataManager()->getData("cross_nominal"));
+    ssc::PointMetricPtr p1 = boost::dynamic_pointer_cast<ssc::PointMetric>(ssc::dataManager()->getData("cross_nominal"));
     if (!p1)
         p1.reset(new ssc::PointMetric("cross_nominal", "cross_nominal"));
     p1->get_rMd_History()->setParentSpace(mManager->getFixedData()->getUid());
@@ -290,7 +290,7 @@ void WirePhantomWidget::showDataMetrics(ssc::Vector3D cross_r)
     ssc::dataManager()->loadData(p1);
     //this->showData(p1);
 
-    ssc::PointMetricPtr p2 = boost::shared_dynamic_cast<ssc::PointMetric>(ssc::dataManager()->getData("cross_us"));
+    ssc::PointMetricPtr p2 = boost::dynamic_pointer_cast<ssc::PointMetric>(ssc::dataManager()->getData("cross_us"));
     if (!p2)
         p2.reset(new ssc::PointMetric("cross_us", "cross_us"));
     p2->get_rMd_History()->setParentSpace(mManager->getMovingData()->getUid());
@@ -299,7 +299,7 @@ void WirePhantomWidget::showDataMetrics(ssc::Vector3D cross_r)
     ssc::dataManager()->loadData(p2);
     //this->showData(p2);
 
-    ssc::DistanceMetricPtr d0 = boost::shared_dynamic_cast<ssc::DistanceMetric>(ssc::dataManager()->getData("accuracy"));
+    ssc::DistanceMetricPtr d0 = boost::dynamic_pointer_cast<ssc::DistanceMetric>(ssc::dataManager()->getData("accuracy"));
     if (!d0)
         d0.reset(new ssc::DistanceMetric("accuracy", "accuracy"));
     d0->get_rMd_History()->setParentSpace("reference");

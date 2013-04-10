@@ -109,11 +109,11 @@ int getPriority(ssc::DataPtr data)
 {
 	if (data->getType()=="mesh")
 		return 6;
-	ssc::DataMetricPtr metric = boost::shared_dynamic_cast<ssc::DataMetric>(data);
+	ssc::DataMetricPtr metric = boost::dynamic_pointer_cast<ssc::DataMetric>(data);
 	if (metric)
 		return 7;
 
-	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
 	if (image)
 	{
 		if (image->getModality().toUpper().contains("US"))
@@ -206,7 +206,7 @@ std::vector<ssc::ImagePtr> ViewGroupData::getImages() const
 	std::vector<ssc::ImagePtr> retval;
 	for (unsigned i = 0; i < mData.size(); ++i)
 	{
-		ssc::ImagePtr data = boost::shared_dynamic_cast<ssc::Image>(mData[i]);
+		ssc::ImagePtr data = boost::dynamic_pointer_cast<ssc::Image>(mData[i]);
 		if (data)
 			retval.push_back(data);
 	}
@@ -218,7 +218,7 @@ std::vector<ssc::MeshPtr> ViewGroupData::getMeshes() const
 	std::vector<ssc::MeshPtr> retval;
 	for (unsigned i = 0; i < mData.size(); ++i)
 	{
-		ssc::MeshPtr data = boost::shared_dynamic_cast<ssc::Mesh>(mData[i]);
+		ssc::MeshPtr data = boost::dynamic_pointer_cast<ssc::Mesh>(mData[i]);
 		if (data)
 			retval.push_back(data);
 	}
@@ -319,11 +319,11 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 
 	QAction* action = new QAction(qstring_cast(data->getName()), contextMenu);
 
-	if (boost::shared_dynamic_cast<ssc::Image>(data))
+	if (boost::dynamic_pointer_cast<ssc::Image>(data))
 		action->setIcon(QIcon(":/icons/volume.png"));
-	else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
+	else if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
 		action->setIcon(QIcon(":/icons/surface.png"));
-	else if (boost::shared_dynamic_cast<ssc::DataMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::DataMetric>(data))
 		action->setIcon(QIcon(":/icons/metric.png"));
 
 //  std::cout << "base " << mLastDataActionUid << "  " << uid << std::endl;
@@ -392,7 +392,7 @@ QStringList ViewWrapper::getAllDataNames() const
 	{
 		QString line = data[i]->getName();
 
-		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data[i]);
+		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data[i]);
 		if (image)
 		{
 			if (image->getCropping())

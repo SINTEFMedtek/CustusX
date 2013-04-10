@@ -400,7 +400,7 @@ Configuration for CustusX ${VERSION_NUMBER_VERBOSE}
 		CMake Version: ${CMAKE_VERSION}
 		IGSTK Version: ${IGSTK_VERSION_MAJOR}.${IGSTK_VERSION_MINOR}.${IGSTK_VERSION_PATCH}
 		OpenIGTLink Version: ${OpenIGTLink_VERSION_MAJOR}.${OpenIGTLink_VERSION_MINOR}.${OpenIGTLink_VERSION_PATCH}
-
+		Boost Version: ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}
 
 	Internal libraries:
 		Tube-Segmentation-Toolkit: ${CX_USE_TSF}
