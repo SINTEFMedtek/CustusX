@@ -12,11 +12,12 @@
 ###########################################################
 
 SET( MOC_HEADER_FILES
-   logic/cxRegistrationManager.h
-   logic/cxElastixManager.h
-   logic/cxElastixExecuter.h
+    logic/cxRegistrationManager.h
+    logic/cxElastixManager.h
+    logic/cxElastixParameters.h
+    logic/cxElastixExecuter.h
 
-   gui/cxRegistrationPlugin.h
+    gui/cxRegistrationPlugin.h
     gui/cxLandmarkImageRegistrationWidget.h
     gui/cxLandmarkImage2ImageRegistrationWidget.h
     gui/cxLandmarkRegistrationWidget.h
@@ -25,7 +26,7 @@ SET( MOC_HEADER_FILES
     gui/cxManualRegistrationWidget.h
     gui/cxFastImageRegistrationWidget.h
     gui/cxFastOrientationRegistrationWidget.h
-	gui/cxPrepareVesselsWidget.h
+    gui/cxPrepareVesselsWidget.h
     gui/cxPlateRegistrationWidget.h
     gui/cxSeansVesselRegistrationWidget.h
     gui/cxRegisterI2IWidget.h
@@ -34,7 +35,7 @@ SET( MOC_HEADER_FILES
     gui/cxElastixWidget.h
     gui/cxElastixSyntaxHighlighter.h
     gui/cxWirePhantomWidget.h
-	gui/cxPatientOrientationWidget.h
+    gui/cxPatientOrientationWidget.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -49,6 +50,8 @@ SET( SOURCE_FILES
    logic/cxElastixManager.cpp
    logic/cxElastixExecuter.h
    logic/cxElastixExecuter.cpp
+   logic/cxElastixParameters.h
+   logic/cxElastixParameters.cpp
 
    gui/cxRegistrationPlugin.h
    gui/cxRegistrationPlugin.cpp
