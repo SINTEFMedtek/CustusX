@@ -70,7 +70,6 @@ SET(ALL_LINK_LIBRARIES
 	SSC
 	${BOOST_LIBRARIES}
 	${QT_LIBRARIES}
-	${GEStreamer_LIBRARIES}
 	OpenIGTLink
 	vtkIO 
 	vtkRendering 
@@ -83,6 +82,13 @@ SET(ALL_LINK_LIBRARIES
     cxResource
     cxOpenIGTLinkUtilities
 	)
+
+if(CX_USE_ISB_GE)
+	SET(ALL_LINK_LIBRARIES
+		${ALL_LINK_LIBRARIES}
+		${GEStreamer_LIBRARIES}
+		)
+endif()
 
 if(CX_USE_OpenCV)
 	set (ALL_LINK_LIBRARIES
@@ -97,11 +103,11 @@ if(CX_WINDOWS)
 		${WIN32_LINK_LIBRARIES}
 		${ALL_LINK_LIBRARIES}
 	)
-	else(CX_WINDOWS)
-		SET(LINK_LIBRARIES
-			${ALL_LINK_LIBRARIES}
+else()
+	SET(LINK_LIBRARIES
+		${ALL_LINK_LIBRARIES}
 	)
-endif(CX_WINDOWS)
+endif()
 
 #-------------------------------
 # Qt -moccing
