@@ -620,7 +620,7 @@ class ISB_DataStreaming(CppComponent):
     def update(self):
         self._changeDirToSource()
 #        runShell('svn up')
-        runShell('svn up -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
+        runShell('svn up -r%s %s' % (self.mCurrentRevision, self._svn_login_info()))
     def configure(self):
         self._changeDirToBuild()
         runShell('''\
