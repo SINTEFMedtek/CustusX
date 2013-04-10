@@ -1,21 +1,39 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #ifndef CXIGTLINKWIDGET_H_
 #define CXIGTLINKWIDGET_H_
 
 #include "cxBaseWidget.h"
 
 #include <vector>
-#include <QtGui>
-#include "sscDoubleWidgets.h"
-#include "sscView.h"
-#include "sscFileSelectWidget.h"
+#include <boost/shared_ptr.hpp>
+#include <QProcess>
+class QPushButton;
+class QComboBox;
+class QLineEdit;
+class QStackedWidget;
 
+namespace ssc
+{
+	class FileSelectWidget;
+}
 
 namespace cx
 {
 typedef boost::shared_ptr<class IGTLinkClient> GrabberReceiveThreadIGTLinkPtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
-//typedef boost::shared_ptr<class VideoConnection> GrabberVideoSourcePtr;
-
 
 /**
  * \class IGTLinkWidget
@@ -45,8 +63,6 @@ private slots:
   void browseLocalServerSlot();
   void saveSnapshotSlot(); ///<Save snapshot of RT image/volume
 
-//  void useLocalServerChanged();
-//  void useDirectLinkChanged();
   void dataChanged();
   void initScriptSelected(QString filename);
 
@@ -54,7 +70,6 @@ private:
   void updateHostHistory();
   void updateDirectLinkArgumentHistory();
   QProcess* getServer();
-//  GrabberVideoSourcePtr getRTSource();
   VideoConnectionManagerPtr getConnection();
   void writeSettings();
 
@@ -74,7 +89,6 @@ private:
   QPushButton* mLaunchServerButton;
   // direct link widgets:
   QComboBox* mDirectLinkArguments;
-
 
   QStackedWidget* mStackedWidget;
   QWidget* createDirectLinkWidget();
