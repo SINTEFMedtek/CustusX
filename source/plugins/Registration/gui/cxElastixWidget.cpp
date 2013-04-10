@@ -43,6 +43,7 @@ ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent)
 				RegistrationBaseWidget(regManager, parent, "ElastiXWidget", "ElastiX Registration")
 {
 	mElastixManager.reset(new ElastixManager(regManager));
+	connect(mElastixManager.get(), SIGNAL(elastixChanged()), this, SLOT(elastixChangedSlot()));
 
 	mRegisterButton = new QPushButton("Register");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
@@ -66,7 +67,7 @@ ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent)
 
 //	ssc::StringDataAdapterXmlPtr mSettings;
 //	mSettings = ssc::StringDataAdapterXml::initialize("elastixSettings", "Setting", "Current Elastix Settings", "mysettings", QStringList(), QDomNode());
-	new ssc::LabeledComboBoxWidget(this, mElastixManager->getCurrentPreset(), entryLayout, 2);
+	new ssc::LabeledComboBoxWidget(this, mElastixManager->getParameters()->getCurrentPreset(), entryLayout, 2);
 
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 	buttonsLayout->addWidget(mRegisterButton);
@@ -108,7 +109,6 @@ QWidget* ElastixWidget::createOptionsWidget()
 	layout->addWidget(new QLabel("Parameter File", this), line, 0);
 	mParameterFileWidget0 = new ssc::FileSelectWidget(this);
 	connect(mParameterFileWidget0, SIGNAL(fileSelected(QString)), this, SLOT(userParameterFileSelected(QString)));
-	connect(mElastixManager.get(), SIGNAL(elastixChanged()), this, SLOT(elastixChangedSlot()));
 	layout->addWidget(mParameterFileWidget0, line, 1, 1, 2);
 	++line;
 
@@ -173,7 +173,9 @@ QString ElastixWidget::defaultWhatsThis() const
 
 void ElastixWidget::savePresetSlot()
 {
-	QString newName = QString("%1/%2").arg(mElastixManager->getActiveExecutable()).arg(QFileInfo(mElastixManager->getActiveParameterFile0()).baseName());
+	ElastixParametersPtr par = mElastixManager->getParameters();
+
+	QString newName = par->getPresetNameSuggesion();
 
     bool ok;
     QString text = QInputDialog::getText(this, "Save Preset",
@@ -182,17 +184,17 @@ void ElastixWidget::savePresetSlot()
     if (!ok || text.isEmpty())
       return;
 
-    mElastixManager->saveCurrentPreset(text);
+	par->saveCurrentPreset(text);
 }
 
 void ElastixWidget::deletePresetSlot()
 {
-	mElastixManager->removeCurrentPreset();
+	mElastixManager->getParameters()->removeCurrentPreset();
 }
 
 void ElastixWidget::executableEditFinishedSlot()
 {
-	mElastixManager->setActiveExecutable(mExecutableEdit->text());
+	mElastixManager->getParameters()->setActiveExecutable(mExecutableEdit->text());
 }
 
 void ElastixWidget::browseExecutableSlot()
@@ -201,28 +203,30 @@ void ElastixWidget::browseExecutableSlot()
 	if (fileName.isEmpty())
 		return;
 
-	mElastixManager->setActiveExecutable(fileName);
+	mElastixManager->getParameters()->setActiveExecutable(fileName);
 }
 
 void ElastixWidget::userParameterFileSelected(QString filename)
 {
-	mElastixManager->setActiveParameterFile0(filename);
+	mElastixManager->getParameters()->setActiveParameterFile0(filename);
 }
 
 void ElastixWidget::elastixChangedSlot()
 {
-	QDir folder(cx::DataLocations::getRootConfigPath() + "/elastix");
+	ElastixParametersPtr par = mElastixManager->getParameters();
+	QDir folder(par->getParameterFilesDir());
 	folder.mkpath(".");
 	mParameterFileWidget0->setPath(folder.absolutePath());
 	QStringList nameFilters;
 	nameFilters << "*.txt";
 	mParameterFileWidget0->setNameFilter(nameFilters);
-	mParameterFileWidget0->setFilename(mElastixManager->getActiveParameterFile0());
+	mParameterFileWidget0->setFilename(par->getActiveParameterFile0());
+	std::cout << "mElastixManager->getActiveParameterFile0() " << par->getActiveParameterFile0() << std::endl;
 
-	mFilePreviewWidget->previewFileSlot(mElastixManager->getActiveParameterFile0());
+	mFilePreviewWidget->previewFileSlot(par->getActiveParameterFile0());
 
 	mExecutableEdit->blockSignals(true);
-	mExecutableEdit->setText(mElastixManager->getActiveExecutable());
+	mExecutableEdit->setText(par->getActiveExecutable());
 	mExecutableEdit->blockSignals(false);
 }
 
