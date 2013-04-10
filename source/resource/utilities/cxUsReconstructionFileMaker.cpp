@@ -430,7 +430,7 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	this->writeMask(path, session, mReconstructData.mMask);
 	this->writeREADMEFile(path, session);
 
-	CachedImageDataContainerPtr imageData = boost::shared_dynamic_cast<CachedImageDataContainer>(mReconstructData.mUsRaw->getImageContainer());
+	CachedImageDataContainerPtr imageData = boost::dynamic_pointer_cast<CachedImageDataContainer>(mReconstructData.mUsRaw->getImageContainer());
 	if (imageData)
 		this->writeUSImages(path, imageData, compression, mReconstructData.mFrames);
 	else

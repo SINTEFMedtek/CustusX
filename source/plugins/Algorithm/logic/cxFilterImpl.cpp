@@ -100,7 +100,7 @@ ssc::ImagePtr FilterImpl::getCopiedInputImage(int index)
 {
 	if (mCopiedInput.size() < index+1)
 		return ssc::ImagePtr();
-	return boost::shared_dynamic_cast<ssc::Image>(mCopiedInput[index]);
+	return boost::dynamic_pointer_cast<ssc::Image>(mCopiedInput[index]);
 }
 
 void FilterImpl::updateThresholdFromImageChange(QString uid, ssc::DoubleDataAdapterXmlPtr threshold)

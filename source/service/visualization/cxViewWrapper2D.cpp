@@ -533,17 +533,17 @@ void ViewWrapper2D::imageRemoved(const QString& uid)
 
 void ViewWrapper2D::dataAdded(ssc::DataPtr data)
 {
-	if (boost::shared_dynamic_cast<ssc::Image>(data))
+	if (boost::dynamic_pointer_cast<ssc::Image>(data))
 	{
-		this->imageAdded(boost::shared_dynamic_cast<ssc::Image>(data));
+		this->imageAdded(boost::dynamic_pointer_cast<ssc::Image>(data));
 	}
-	else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
+	else if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
 	{
-		this->meshAdded(boost::shared_dynamic_cast<ssc::Mesh>(data));
+		this->meshAdded(boost::dynamic_pointer_cast<ssc::Mesh>(data));
 	}
-	else if (boost::shared_dynamic_cast<ssc::PointMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::PointMetric>(data))
 	{
-		this->pointMetricAdded(boost::shared_dynamic_cast<ssc::PointMetric>(data));
+		this->pointMetricAdded(boost::dynamic_pointer_cast<ssc::PointMetric>(data));
 	}
 }
 
