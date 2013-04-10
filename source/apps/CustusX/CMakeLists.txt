@@ -302,6 +302,14 @@ if(APPLE)
     						)
 endif()
 
+INSTALL(FILES "${SSC_BINARY_DIR}/Examples/PositionFileReader/sscPositionFileReader" DESTINATION ${plugin_dest_dir}
+				PERMISSIONS
+						OWNER_READ OWNER_EXECUTE OWNER_WRITE
+						GROUP_READ GROUP_EXECUTE GROUP_WRITE
+						WORLD_READ WORLD_EXECUTE WORLD_WRITE
+						)
+
+
 #--------------------------------------------------------------------------------
 # install a qt.conf file
 # this inserts some cmake code into the install script to write the file
@@ -376,6 +384,8 @@ install(CODE "
           \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/OpenIGTLinkServer\")
         file(GLOB_RECURSE QTPLUGINS
           \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/GrabberServer\")
+        file(GLOB_RECURSE QTPLUGINS
+          \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/sscPositionFileReader\")
 		include(BundleUtilities)
 		fixup_bundle(\"${APPS}\"   \"\${QTPLUGINS}\"   \"${DIRS}\") "
 		)
