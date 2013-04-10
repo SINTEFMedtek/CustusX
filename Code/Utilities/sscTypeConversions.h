@@ -6,7 +6,10 @@
 #include <QString>
 #include <QVariant>
 #include <QDomDocument>
+
+#ifndef Q_MOC_RUN // workaround for bug in moc vs boost 1.48+: https://bugreports.qt-project.org/browse/QTBUG-22829
 #include <boost/lexical_cast.hpp>
+#endif
 
 /**
  * \addtogroup sscUtility
