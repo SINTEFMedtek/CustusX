@@ -1,33 +1,54 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #include "cxVideoConnectionWidget.h"
 
-#include <QTreeWidget>
-#include <QTreeWidgetItem>
-#include <QStringList>
-#include <QVBoxLayout>
+//#include <QTreeWidget>
+//#include <QTreeWidgetItem>
+//#include <QStringList>
+//#include <QVBoxLayout>
 #include <QDir>
+#include <QStackedWidget>
+#include <QPushButton>
+#include <QFileDialog>
 
-#include "vtkRenderWindow.h"
-#include <vtkImageData.h>
+//#include "vtkRenderWindow.h"
+#include "vtkImageData.h"
+
+//#include <QtGui>
+//#include "sscDoubleWidgets.h"
+//#include "sscView.h"
+#include "sscFileSelectWidget.h"
 
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
-#include "sscVideoRep.h"
+//#include "sscVideoRep.h"
 #include "sscDataManager.h"
-#include "sscTypeConversions.h"
-#include "sscToolManager.h"
+//#include "sscTypeConversions.h"
+//#include "sscToolManager.h"
 #include "sscTime.h"
 #include "sscMessageManager.h"
 #include "cxVideoConnectionManager.h"
-//#include "cxStateService.h"
 #include "cxImageServer.h"
 #include "cxVideoService.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "sscStringDataAdapterXml.h"
-#include "cxVideoConnection.h"
+//#include "cxVideoConnection.h"
 #include "sscHelperWidgets.h"
-#include "cxDataInterface.h"
+//#include "cxDataInterface.h"
 
 namespace cx
 {
@@ -53,7 +74,6 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 
 	if (!getConnection()->getInitScript().isEmpty())
 		mInitScriptWidget->setFilename(path);
-//	mParameterFileWidget0->setFilename(mElastixManager->getActiveParameterFile0());
 	connect(mInitScriptWidget, SIGNAL(fileSelected(QString)), this, SLOT(initScriptSelected(QString)));
 	mInitScriptWidget->setSizePolicy(QSizePolicy::Expanding, mInitScriptWidget->sizePolicy().verticalPolicy());
 	initScriptLayout->addWidget(mInitScriptWidget);
@@ -201,11 +221,6 @@ QProcess* VideoConnectionWidget::getServer()
 	return getConnection()->getProcess();
 }
 
-//GrabberVideoSourcePtr IGTLinkWidget::getRTSource()
-//{
-//	return getConnection()->getVideoSource();
-//}
-
 VideoConnectionManagerPtr VideoConnectionWidget::getConnection()
 {
 	return videoService()->getVideoConnection();
@@ -215,24 +230,6 @@ VideoConnectionWidget::~VideoConnectionWidget()
 {
 }
 
-//void IGTLinkWidget::useLocalServerChanged()
-//{
-//	if (mUseLocalServer->isChecked())
-//	{
-//		mAddressEdit->addItem("Localhost");
-//		mAddressEdit->setCurrentIndex(mAddressEdit->count() - 1);
-//	}
-//
-//	this->writeSettings();
-//	this->dataChanged();
-//}
-//
-//void IGTLinkWidget::useDirectLinkChanged()
-//{
-//	this->writeSettings();
-//	this->dataChanged();
-//}
-
 void VideoConnectionWidget::dataChanged()
 {
 	if (getConnection()->getUseDirectLink2())
@@ -241,14 +238,6 @@ void VideoConnectionWidget::dataChanged()
 		mStackedWidget->setCurrentIndex(1);
 	else
 		mStackedWidget->setCurrentIndex(2);
-
-//	bool direct = getConnection()->getUseDirectLink2();
-//	bool local = getConnection()->getUseLocalServer2();
-//
-//	mAddressEdit->setEnabled(!local && !direct);
-//	mLocalServerEdit->setEnabled(local);
-//	mLaunchServerButton->setEnabled(local && !direct);
-//	mUseLocalServer->setEnabled(!direct);
 }
 
 void VideoConnectionWidget::updateHostHistory()
@@ -343,14 +332,6 @@ void VideoConnectionWidget::writeSettings()
 		getConnection()->setPort(mPortEdit->text().toInt());
 		this->updateHostHistory();
 	}
-
-////  std::cout << "guiChanged" << std::endl;
-//	getConnection()->setLocalServerCommandLine(mLocalServerEdit->text());
-//	getConnection()->setHost(mAddressEdit->currentText());
-//	getConnection()->setPort(mPortEdit->text().toInt());
-////	getConnection()->setUseLocalServer(mUseLocalServer->isChecked());
-////	getConnection()->setUseDirectLink(mUseDirectLink->isChecked());
-//	this->updateHostHistory();
 }
 
 void VideoConnectionWidget::connectServer()
@@ -368,12 +349,10 @@ void VideoConnectionWidget::serverStatusChangedSlot()
 
 	if (this->getConnection()->isConnected())
 	{
-//		mSnapshotButton->setEnabled(getRTSource()->isStreaming());
 		mConnectButton->setText("Disconnect Server");
 	}
 	else
 	{
-//		mSnapshotButton->setEnabled(getRTSource()->isStreaming());
 		mConnectButton->setText("Connect Server");
 	}
 

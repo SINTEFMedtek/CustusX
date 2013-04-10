@@ -10,7 +10,7 @@
 //#define RUN_ALL_TESTS
 
 #ifndef RUN_ALL_TESTS
-#include "cxTest_RegistrationV2V.h"
+//#include "cxTest_RegistrationV2V.h"
 #include "cxTest_RegistrationElastix.h"
 #endif
 
