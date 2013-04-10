@@ -66,7 +66,7 @@ void TestAcqController::setupVideo()
 	mVideoSource = cx::videoService()->getActiveVideoSource();
 	connect(mVideoSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 
-	cx::videoService()->getVideoConnection()->setReconnectInterval(1000);
+	cx::videoService()->getVideoConnection()->setReconnectInterval(3000); // on slow build servers, a long delay is necessary.
 	cx::videoService()->getVideoConnection()->launchAndConnectServer();
 }
 
