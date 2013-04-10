@@ -129,7 +129,7 @@ void ImportDataDialog::importDataSlot()
   mUidLabel->setText("Data uid:  " + qstring_cast(mData->getUid()));
   mNameLabel->setText("Data name: " + qstring_cast(mData->getName()));
 
-  ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mData);
+  ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mData);
   mModalityAdapter->setData(image);
   mModalityCombo->setEnabled(image!=0);
   mImageTypeAdapter->setData(image);
@@ -143,7 +143,7 @@ void ImportDataDialog::importDataSlot()
   mNiftiFormatCheckBox->setEnabled(ssc::dataManager()->getMesh(mData->getUid())!=0);
 
   mConvertToUnsignedCheckBox->setEnabled(false);
-//  ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mData);
+//  ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mData);
   if (image && image->getBaseVtkImageData())
   {
 	  vtkImageDataPtr img = image->getBaseVtkImageData();
@@ -243,7 +243,7 @@ void ImportDataDialog::convertToUnsigned()
 	if (!mConvertToUnsignedCheckBox->isChecked())
 		return;
 
-	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mData);
+	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mData);
 	if (!image)
 		return;
 

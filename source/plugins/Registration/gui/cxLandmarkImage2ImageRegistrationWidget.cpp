@@ -71,8 +71,8 @@ void LandmarkImage2ImageRegistrationWidget::translationCheckBoxChanged()
 
 void LandmarkImage2ImageRegistrationWidget::updateRep()
 {
-	mFixedLandmarkSource->setImage(boost::shared_dynamic_cast<ssc::Image>(mManager->getFixedData()));
-	mMovingLandmarkSource->setImage(boost::shared_dynamic_cast<ssc::Image>(mManager->getMovingData()));
+	mFixedLandmarkSource->setImage(boost::dynamic_pointer_cast<ssc::Image>(mManager->getFixedData()));
+	mMovingLandmarkSource->setImage(boost::dynamic_pointer_cast<ssc::Image>(mManager->getMovingData()));
 }
 
 void LandmarkImage2ImageRegistrationWidget::registerSlot()
@@ -128,7 +128,7 @@ void LandmarkImage2ImageRegistrationWidget::prePaintEvent()
 
 ssc::LandmarkMap LandmarkImage2ImageRegistrationWidget::getTargetLandmarks() const
 {
-	ssc::ImagePtr moving = boost::shared_dynamic_cast<ssc::Image>(mManager->getMovingData());
+	ssc::ImagePtr moving = boost::dynamic_pointer_cast<ssc::Image>(mManager->getMovingData());
 
 	if (moving)
 		return moving->getLandmarks();
@@ -154,7 +154,7 @@ ssc::Transform3D LandmarkImage2ImageRegistrationWidget::getTargetTransform() con
 
 void LandmarkImage2ImageRegistrationWidget::setTargetLandmark(QString uid, ssc::Vector3D p_target)
 {
-	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mManager->getMovingData());
+	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mManager->getMovingData());
 	if (!image)
 		return;
 	image->setLandmark(ssc::Landmark(uid, p_target));

@@ -172,7 +172,7 @@ void ToolManager::closePlayBackMode()
 	{
 		if (iter->second==mManualTool)
 			continue; // dont unwrap the manual tool
-		PlaybackToolPtr current = boost::shared_dynamic_cast<PlaybackTool>(iter->second);
+		PlaybackToolPtr current = boost::dynamic_pointer_cast<PlaybackTool>(iter->second);
 		if (current)
 			mTools[current->getBase()->getUid()] = current->getBase();
 	}
@@ -1020,7 +1020,7 @@ void ToolManager::addXml(QDomNode& parentNode)
 	for (; toolIt != tools->end(); toolIt++)
 	{
 		QDomElement toolNode = doc.createElement("tool");
-		ToolPtr tool = boost::shared_dynamic_cast<Tool>(toolIt->second);
+		ToolPtr tool = boost::dynamic_pointer_cast<Tool>(toolIt->second);
 		if (tool)
 		{
 			tool->addXml(toolNode);
@@ -1067,7 +1067,7 @@ void ToolManager::parseXml(QDomNode& dataNode)
 		QString tool_uid = base.attribute("uid");
 		if (tools->find(tool_uid) != tools->end())
 		{
-			ToolPtr tool = boost::shared_dynamic_cast<Tool>(tools->find(tool_uid)->second);
+			ToolPtr tool = boost::dynamic_pointer_cast<Tool>(tools->find(tool_uid)->second);
 			tool->parseXml(toolNode);
 		}
 	}
