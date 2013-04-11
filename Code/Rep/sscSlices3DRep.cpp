@@ -43,6 +43,7 @@
 #include "sscTypeConversions.h"
 #include "sscGPUImageBuffer.h"
 #include "sscTexture3DSlicerProxy.h"
+#include "sscMessageManager.h"
 
 //---------------------------------------------------------
 namespace ssc
@@ -74,6 +75,11 @@ void Slices3DRep::setShaderFile(QString shaderFile)
 
 void Slices3DRep::setImages(std::vector<ssc::ImagePtr> images)
 {
+	if (images.empty())
+	{
+		ssc::messageManager()->sendWarning("Slices3DRep::setImages: No input images (in ViewGroup)");
+		return;
+	}
 	for (unsigned i=0; i<mProxy.size(); ++i)
 	{
 		mProxy[i]->setImages(images);
