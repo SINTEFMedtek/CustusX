@@ -694,7 +694,10 @@ void ViewWrapper3D::updateSlices()
 		mView->removeRep(mSlices3DRep);
 	//Simple bug fix of #746: Don't create slices if no volumes exist in 3D scene
 	if (!mViewGroup || mViewGroup->getImages().empty())
+	{
+		ssc::messageManager()->sendWarning("Need volumes in the 3D scene to create 2D slices");
 		return;
+	}
 
 	mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
 
