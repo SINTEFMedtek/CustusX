@@ -230,15 +230,8 @@ bool ImageSenderGE::initialize_local()
 	else //no
 		test = data_streaming::noTest;
 
+	mGEStreamer.SetFlipType(data_streaming::FlipX);
 	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, test);
-//	mGEStreamer.SetFlipTexture(false);
-//	mGEStreamer.SetFlipType(data_streaming::FlipY);
-
-//	mImgStream = mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, testMode);
-//	if(!mImgStream)
-//		return false;
-//	else
-//		return true;
 }
 
 bool ImageSenderGE::startStreaming(GrabberSenderPtr sender)
@@ -378,19 +371,19 @@ void ImageSenderGE::send()
 void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
 {
 	mRenderTimer->time("startsend");
-	vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
+	/*vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
 	flipper->SetInput(img);
 	flipper->SetFilteredAxis(0);
 	vtkImageDataPtr	flipped = flipper->GetOutput();
-	flipped->Update();
+	flipped->Update();*/
 //	vtkImageDataPtr copy = vtkImageDataPtr::New();
 //	copy->DeepCopy(img);
 	if (geometryChanged)
 	{
-		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, flipped/*img*/);
+		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, img);
 		mSender->send(frameMessage);
 		std::cout << uid << " Nyquist " << geometry.vNyquist << std::endl;
-		int*  dim = flipped/*img*/->GetDimensions();
+		int*  dim = img->GetDimensions();
 		std::cout << uid << " Volume size: " << dim[0] << " " << dim[1] << " " << dim[2] << std::endl;
 
 	}
@@ -398,7 +391,7 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 
 	// CustusX does not handle nonzero origin - set to zero, but AFTER getFrameStatus() is called.
 	vtkImageChangeInformationPtr center = vtkImageChangeInformationPtr::New();
-	center->SetInput(flipped/*img*/);
+	center->SetInput(img);
 	center->SetOutputOrigin(0,0,0);
 	center->Update();
 	mRenderTimer->time("orgnull");
