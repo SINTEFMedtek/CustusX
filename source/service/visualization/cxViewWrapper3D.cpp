@@ -692,6 +692,10 @@ void ViewWrapper3D::updateSlices()
 #ifdef USE_GLX_SHARED_CONTEXT
 	if (mSlices3DRep)
 		mView->removeRep(mSlices3DRep);
+	//Simple bug fix of #746: Don't create slices if no volumes exist in 3D scene
+	if (!mViewGroup || mViewGroup->getImages().empty())
+		return;
+
 	mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
 
 	ssc::PLANE_TYPE type = string2enum<ssc::PLANE_TYPE>(mShowSlicesMode);
@@ -712,7 +716,7 @@ void ViewWrapper3D::updateSlices()
 	}
 
 	mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
-	if (mViewGroup)
+	if (mViewGroup && !mViewGroup->getImages().empty())
 		mSlices3DRep->setImages(mViewGroup->getImages());
 	mSlices3DRep->setTool(ssc::toolManager()->getDominantTool());
 //	return mSlices3DRep;
