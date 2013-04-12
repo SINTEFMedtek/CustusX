@@ -10,7 +10,9 @@ namespace cx
 
 OpenIGTLinkSession::OpenIGTLinkSession(int socketDesctiptor, QObject* parent) :
     mSocketDescriptor(socketDesctiptor)
-{}
+{
+	mSocket = NULL;
+}
 
 OpenIGTLinkSession::~OpenIGTLinkSession()
 {}
