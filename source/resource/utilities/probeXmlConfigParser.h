@@ -53,7 +53,24 @@ public:
     
     bool mEmpty;
     
-    Configuration() : mEmpty(true)
+    Configuration() :
+    	mImageWidth(0),
+    	mImageHeight(0),
+    	mWidthDeg(0),
+    	mDepth(0),
+    	mOffset(0),
+    	mOriginCol(0),
+    	mOriginRow(0),
+    	mNCorners(0),
+    	mLeftEdge(0),
+    	mRightEdge(0),
+    	mTopEdge(0),
+    	mBottomEdge(0),
+    	mPixelWidth(0),
+    	mPixelHeight(0),
+    	mHorizontalOffset(0),
+    	mTemporalCalibration(0),
+    	mEmpty(true)
     {};
     bool isEmpty(){return mEmpty;};
   };
