@@ -111,6 +111,8 @@ VideoGraphics::VideoGraphics(bool useMaskFilter) :
 	mPlaneActor->SetTexture(mTexture);
 	mPlaneActor->SetMapper(mDataSetMapper);
 	mPlaneActor->SetVisibility(false);
+	// Turning off lighting to remove shadow effects (Fix for #644: 2D ultrasound in 3D scene was too dark)
+	mPlaneActor->GetProperty()->LightingOff();
 	mTexture->RepeatOff();
 
 	mImage = ssc::ImagePtr();
