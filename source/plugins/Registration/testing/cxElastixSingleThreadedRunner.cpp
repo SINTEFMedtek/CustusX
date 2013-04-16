@@ -49,11 +49,13 @@ bool ElastixSingleThreadedRunner::registerLinear(
 
 	mExecuter->setDisplayProcessMessages(false);
 	mExecuter->setDisplayProcessMessages(true);
-	mExecuter->setInput(preset->getActiveExecutable(),
+	bool ok = mExecuter->setInput(preset->getActiveExecutable(),
 	         fixed,
 	         moving,
 	         outPath,
 			 preset->getActiveParameterFiles());
+	if (!ok)
+		return false;
 
 	while (!mCompleted)
 		qApp->processEvents();
