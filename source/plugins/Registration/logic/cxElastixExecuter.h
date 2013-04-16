@@ -56,7 +56,7 @@ public:
 
 	void setDisplayProcessMessages(bool on);
 
-	void setInput(QString application,
+	bool setInput(QString application,
 	         ssc::DataPtr fixed,
 	         ssc::DataPtr moving,
 	         QString outdir,
