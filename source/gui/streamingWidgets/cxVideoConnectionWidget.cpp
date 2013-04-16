@@ -50,6 +50,13 @@
 #include "sscHelperWidgets.h"
 //#include "cxDataInterface.h"
 
+#include "cxToolManager.h"
+#include "cxViewManager.h"
+#include "sscProbeSector.h"
+#include "sscRegistrationTransform.h"
+#include "cxViewGroup.h"
+#include "cxViewWrapper.h"
+
 namespace cx
 {
 
@@ -361,8 +368,6 @@ void VideoConnectionWidget::serverStatusChangedSlot()
 
 void VideoConnectionWidget::saveSnapshotSlot()
 {
-	ssc::messageManager()->sendInfo("IGTLinkWidget::saveSnapshotSlot()");
-
 	if(!this->getConnection())
 	{
 		ssc::messageManager()->sendWarning("No video connection");
@@ -373,7 +378,25 @@ void VideoConnectionWidget::saveSnapshotSlot()
 		ssc::messageManager()->sendWarning("Video is not connected");
 		return;
 	}
-	vtkImageDataPtr input = videoService()->getActiveVideoSource()->getVtkImageData();
+
+	vtkImageDataPtr input;
+	ssc::Transform3D rMd = ssc::Transform3D::Identity();
+
+	ssc::ToolPtr probe = ToolManager::getInstance()->findFirstProbe();
+	if (probe)
+	{
+		input = probe->getProbe()->getRTSource()->getVtkImageData();
+		ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+		ssc::Transform3D prMt = probe->get_prMt();
+		ssc::Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
+		ssc::Transform3D uMv = probe->getProbe()->getSector()->get_uMv();
+		rMd = rMpr * prMt * tMu * uMv;
+	}
+	else
+	{
+		input = videoService()->getActiveVideoSource()->getVtkImageData();
+	}
+
 	if(!input)
 	{
 		ssc::messageManager()->sendWarning("No Video data");
@@ -387,9 +410,17 @@ void VideoConnectionWidget::saveSnapshotSlot()
 	else //2D
 		filename = "2DRTSnapshot" + QDateTime::currentDateTime().toString(format);
 
-	ssc::ImagePtr output = ssc::dataManager()->createImage(input, filename, filename);
+	// the input is internal to the stream: copy to get a nonchanging image.
+	vtkImageDataPtr copiedImage = vtkImageDataPtr::New();
+	copiedImage->DeepCopy(input);
+
+	ssc::ImagePtr output = ssc::dataManager()->createImage(copiedImage, filename, filename);
+	output->get_rMd_History()->setRegistration(rMd);
 	QString folder = patientService()->getPatientData()->getActivePatientFolder() + "/Screenshots/";
+	ssc::dataManager()->loadData(output);
 	ssc::dataManager()->saveImage(output, folder); //Always sets type as 8 bit, even when 24 bit
+	viewManager()->autoShowData(output);
+	ssc::messageManager()->sendInfo(QString("Saved snapshot %1 from active video source").arg(output->getName()));
 }
 
 } //end namespace cx
