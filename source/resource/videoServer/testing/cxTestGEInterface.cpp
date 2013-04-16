@@ -52,9 +52,8 @@ void TestGEInterface::testStreams()
 }
 
 //Test currently needs the simulator to run with doppler, or be conected to the scanner
-void TestGEInterface::testSingleStreams()
+void TestGEInterface::testAllStreamsGPU()
 {
-	std::cout << std::endl << "*** Test GE single streams. GPU scanconversion if possible ***" << std::endl;
 	cx::StringMap args;
 	args["type"] = "ISB_GE";
 	args["test"] = "2D";
@@ -62,24 +61,59 @@ void TestGEInterface::testSingleStreams()
 	//args["test"] = "no";
 	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
 	args["streams"] = "all";
-	std::cout << std::endl << "--- Test GE 2D all streams. ---" << std::endl;
+	std::cout << std::endl << "--- Test GE 2D all streams. GPU scanconversion if possible ---" << std::endl;
 	this->testStream(args);
+
+}
+void TestGEInterface::testScanConvertedStreamGPU()
+{
+	cx::StringMap args;
+	args["type"] = "ISB_GE";
+	args["test"] = "2D";
+	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
 	args["streams"] = "scanconverted";
-	std::cout << std::endl << "--- Test GE 2D scanconverted stream. ---" << std::endl;
+	std::cout << std::endl << "--- Test GE 2D scanconverted stream. GPU scanconversion if possible ---" << std::endl;
 	this->testStream(args);
+}
+void TestGEInterface::testTissueStreamGPU()
+{
+	cx::StringMap args;
+	args["type"] = "ISB_GE";
+	args["test"] = "2D";
+	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
 	args["streams"] = "tissue";
-	std::cout << std::endl << "--- Test GE 2D tissue stream. ---" << std::endl;
+	std::cout << std::endl << "--- Test GE 2D tissue stream. GPU scanconversion if possible ---" << std::endl;
 	this->testStream(args);
+}
+void TestGEInterface::testFrequencyStreamGPU()
+{
+	cx::StringMap args;
+	args["type"] = "ISB_GE";
+	args["test"] = "2D";
+	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
 	args["streams"] = "frequency";
-	std::cout << std::endl << "--- Test GE 2D frequency stream. ---" << std::endl;
+	std::cout << std::endl << "--- Test GE 2D frequency stream. GPU scanconversion if possible ---" << std::endl;
 	this->testStream(args);
+}
+void TestGEInterface::testBandwidthStreamGPU()
+{
+	cx::StringMap args;
+	args["type"] = "ISB_GE";
+	args["test"] = "2D";
+	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
 	args["streams"] = "bandwidth";
-	std::cout << std::endl << "--- Test GE 2D bandwidth stream. ---" << std::endl;
+	std::cout << std::endl << "--- Test GE 2D bandwidth stream. GPU scanconversion if possible ---" << std::endl;
 	this->testStream(args);
+}
+void TestGEInterface::testVelocityStreamGPU()
+{
+	cx::StringMap args;
+	args["type"] = "ISB_GE";
+	args["test"] = "2D";
+	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
 	args["streams"] = "velocity";
 	std::cout << std::endl << "--- Test GE 2D velocity stream. ---" << std::endl;
 	this->testStream(args);
-
 }
 
 void TestGEInterface::testStream(cx::StringMap args)
@@ -117,7 +151,7 @@ void TestGEInterface::testGEStreamer()
 	geStreamer.InitializeClientData("", false, data_streaming::AUTO, -1, data_streaming::Bilinear, 10,   "",     false);
 
 	//Setup the needed data stream types. The default is only scan converted data
-	geStreamer.SetupExportParameters(true, false, false, false, false);
+	geStreamer.SetupExportParameters(true, true, false, false, false);
 //	geStreamer.SetupExportParameters(true, true, true, true);
 
 	//                                         (hostIp, streamPort, commandPort, testMode));
