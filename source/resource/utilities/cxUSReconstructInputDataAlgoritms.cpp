@@ -32,19 +32,19 @@ void USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(ssc::USR
     //mPos is prMu
 }
 
-void USReconstructInputDataAlgorithm::transformFramePositionsTo_prMu(ssc::USReconstructInputData* data)
+void USReconstructInputDataAlgorithm::transformFramePositionsTo_rMu(ssc::USReconstructInputData* data)
 {
-    // Transform from image coordinate syst with origin in upper left corner
-    // to t (tool) space. TODO check is u is ul corner or ll corner.
-    ssc::Transform3D tMu = data->mProbeData.get_tMu() * data->mProbeData.get_uMv();
+    ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+    // Transform from image coordinate syst with origin in upper left corner to t (tool) space.
+    ssc::Transform3D tMv = data->mProbeData.get_tMu() * data->mProbeData.get_uMv();
 
 	//mFrames is prMt
     for (unsigned i = 0; i < data->mFrames.size(); i++)
     {
         ssc::Transform3D prMt = data->mFrames[i].mPos;
-        data->mFrames[i].mPos = prMt * tMu;
+        data->mFrames[i].mPos = rMpr * prMt * tMv;
     }
-    //mFrames is prMu
+    //mFrames is rMu
 }
 
 std::vector<double> USReconstructInputDataAlgorithm::interpolateFramePositionsFromTracking(ssc::USReconstructInputData *data)

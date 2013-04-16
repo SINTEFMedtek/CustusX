@@ -15,6 +15,7 @@
 #define CXUSRECONSTRUCTINPUTDATAALGORITMS_H
 
 #include "cxUSReconstructInputData.h"
+#include "sscToolManager.h"
 
 namespace cx
 {
@@ -38,9 +39,9 @@ struct USReconstructInputDataAlgorithm
     static void transformTrackingPositionsTo_prMu(ssc::USReconstructInputData* data);
 	/**
      * Pre:  mFrames is prMt
-     * Post: mFrames is prMu
+     * Post: mFrames is rMu
      */
-    static void transformFramePositionsTo_prMu(ssc::USReconstructInputData* data);
+    static void transformFramePositionsTo_rMu(ssc::USReconstructInputData* data);
 
     /** Find frame positions based on the existing tool positions and timestamps for both
       * tools and frames.
