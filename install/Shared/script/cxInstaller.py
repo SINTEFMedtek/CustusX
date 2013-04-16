@@ -803,6 +803,7 @@ class TubeSegmentationFramework(CppComponent):
        self._changeDirToSource()
        runShell('git checkout master')
        runShell('git pull')
+       runShell('git submodule sync')
        runShell('git submodule update --init --recursive')
    def configure(self):
        self._changeDirToBuild()
