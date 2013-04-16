@@ -101,7 +101,7 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(Saving
 void UsReconstructionFileMaker::fillFramePositions(ssc::USReconstructInputData* data) const
 {
 	cx::USReconstructInputDataAlgorithm::interpolateFramePositionsFromTracking(data);
-	cx::USReconstructInputDataAlgorithm::transformFramePositionsTo_prMu(data);
+	cx::USReconstructInputDataAlgorithm::transformFramePositionsTo_rMu(data);
 }
 
 bool UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
