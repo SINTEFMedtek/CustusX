@@ -187,6 +187,7 @@ include(Dart)
 #------------------------------------------------------------------------------
 include_directories( /usr/local/include )
 include_directories( /opt/local/include )
+include_directories( /opt/X11/include )
 
 #------------------------------------------------------------------------------
 # External libraries
