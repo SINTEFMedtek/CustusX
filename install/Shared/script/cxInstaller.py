@@ -728,7 +728,7 @@ cmake \
 -DOpenCV_DIR:PATH="%s" \
 -DULTERIUS_INCLUDE_DIR:PATH="%s" \
 -DULTERIUS_LIBRARY:FILEPATH="%s" \
--DCX_USE_TSF:BOOL=OFF \
+-DCX_USE_TSF:BOOL=ON \
 -DSSC_USE_DCMTK:BOOL=OFF \
 -DTube-Segmentation-Framework_DIR:PATH="%s" \
 -DSSC_BUILD_EXAMPLES="%s" \
@@ -803,6 +803,7 @@ class TubeSegmentationFramework(CppComponent):
        self._changeDirToSource()
        runShell('git checkout master')
        runShell('git pull')
+       runShell('git submodule update --init --recursive')
    def configure(self):
        self._changeDirToBuild()
        runShell('''\
