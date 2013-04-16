@@ -60,7 +60,7 @@ void ElastixExecuter::setDisplayProcessMessages(bool on)
 }
 
 
-void ElastixExecuter::setInput(QString application,
+bool ElastixExecuter::setInput(QString application,
 				ssc::DataPtr fixed,
 				ssc::DataPtr moving,
 				QString outdir,
@@ -73,13 +73,13 @@ void ElastixExecuter::setInput(QString application,
 	if (!fixed || !moving)
 	{
 		ssc::messageManager()->sendWarning("Failed to start elastiX registration, fixed or missing image missing.");
-		return;
+		return false;
 	}
 
 	if (mProcess->state() != QProcess::NotRunning)
 	{
 		ssc::messageManager()->sendWarning("Failed to start elastiX registration, process already running");
-		return;
+		return false;
 	}
 
 	// create output dir (required by ElastiX)
@@ -103,6 +103,7 @@ void ElastixExecuter::setInput(QString application,
 	ssc::messageManager()->sendInfo(QString("Executing registration with command line: [%1]").arg(commandLine));
 
 	mProcess->start(commandLine);
+	return true;
 }
 
 void ElastixExecuter::execute()
