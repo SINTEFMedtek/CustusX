@@ -133,6 +133,7 @@ void USAcquisition::saveSession()
 	{
 		CachedImageDataContainerPtr imageData = mVideoRecorder[i]->getImageData();
 		std::vector<double> imageTimestamps = mVideoRecorder[i]->getTimestamps();
+		QString streamSessionName = session->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid();
 
 		// complete writing of images to temporary storage. Do this before using the image data.
 		mVideoRecorder[i]->completeSave();
@@ -140,7 +141,7 @@ void USAcquisition::saveSession()
 		std::cout << QString("completed save of cached video stream %1").arg(i) << std::endl;
 
 		UsReconstructionFileMakerPtr fileMaker;
-		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid()));
+		fileMaker.reset(new UsReconstructionFileMaker(streamSessionName));
 
 		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(imageData,
 		                                                                            imageTimestamps,
