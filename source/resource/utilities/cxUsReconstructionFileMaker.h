@@ -12,7 +12,8 @@ class QDir;
 namespace cx
 {
 typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
-typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
+typedef boost::shared_ptr<class ImageDataContainer> ImageDataContainerPtr;
+//typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
 typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
 
 /**
@@ -49,10 +50,13 @@ public:
 
 	QString getSessionName() const { return mSessionDescription; }
 
-	ssc::USReconstructInputData getReconstructData(SavingVideoRecorderPtr videoRecorder,
+
+	ssc::USReconstructInputData getReconstructData(cx::ImageDataContainerPtr imageData,
+												   std::vector<double> imageTimestamps,
 	                                               ssc::TimedTransformMap trackerRecordedData,
 	                                               ssc::ToolPtr tool,
-	                                               bool writeColor);
+	                                               bool writeColor,
+	                                               ssc::Transform3D rMpr);
 	void setReconstructData(ssc::USReconstructInputData data) { mReconstructData = data; }
 
 private:
@@ -61,7 +65,7 @@ private:
 	bool writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	bool writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts);
 	void writeProbeConfiguration(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid);
-	void writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression, std::vector<ssc::TimedPosition> pos);
+	void writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<ssc::TimedPosition> pos);
 	void writeMask(QString path, QString session, ssc::ImagePtr mask);
 	void writeREADMEFile(QString reconstructionFolder, QString session);
 
