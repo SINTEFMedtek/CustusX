@@ -131,20 +131,24 @@ void USAcquisition::saveSession()
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
+		CachedImageDataContainerPtr imageData = mVideoRecorder[i]->getImageData();
+		std::vector<double> imageTimestamps = mVideoRecorder[i]->getTimestamps();
+
+		// complete writing of images to temporary storage. Do this before using the image data.
+		mVideoRecorder[i]->completeSave();
+		mVideoRecorder[i].reset();
+		std::cout << QString("completed save of cached video stream %1").arg(i) << std::endl;
+
 		UsReconstructionFileMakerPtr fileMaker;
 		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid()));
 
-		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(mVideoRecorder[i]->getImageData(),
-		                                                                            mVideoRecorder[i]->getTimestamps(),
+		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(imageData,
+		                                                                            imageTimestamps,
 		                                                                            trackerRecordedData,
 		                                                                            mRecordingTool,
 		                                                                            this->getWriteColor(),
 		                                                                            rMpr);
 		fileMaker->setReconstructData(reconstructData);
-
-		// Use instead of filemaker->write(), this writes only images, other stuff kept in memory.
-		mVideoRecorder[i]->completeSave();
-		mVideoRecorder[i].reset();
 
 		mBase->getPluginData()->getReconstructer()->selectData(reconstructData);
 		emit acquisitionDataReady();
