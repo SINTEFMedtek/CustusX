@@ -133,6 +133,13 @@ vtkImageDataPtr CachedImageDataContainer::get(unsigned index)
 {
 	SSC_ASSERT(index < this->size());
 	SSC_ASSERT(mImages[index]);
+
+	if (index >= this->size())
+	{
+		std::cout << QString("Attempt to call index %1, size=%2").arg(index).arg(this->size()) << std::endl;
+	}
+//	int* a = NULL;
+//	*a = 5;
 	vtkImageDataPtr retval = mImages[index]->getImage();
 	mImages[index]->purge();
 	return retval;
