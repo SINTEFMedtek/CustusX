@@ -230,7 +230,7 @@ bool ImageSenderGE::initialize_local()
 	else //no
 		test = data_streaming::noTest;
 
-	mGEStreamer.SetFlipType(data_streaming::FlipX);
+	//mGEStreamer.SetFlipType(data_streaming::FlipX);
 	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, test);
 }
 
