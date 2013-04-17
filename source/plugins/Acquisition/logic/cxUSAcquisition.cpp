@@ -35,6 +35,7 @@
 #include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
 #include "sscLogger.h"
+#include "cxImageDataContainer.h"
 
 namespace cx
 {
@@ -126,15 +127,19 @@ void USAcquisition::saveSession()
 		return;
 
 	ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
+	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
 		UsReconstructionFileMakerPtr fileMaker;
 		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid()));
 
-		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(mVideoRecorder[i], trackerRecordedData,
-																									mRecordingTool,
-																									this->getWriteColor());
+		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(mVideoRecorder[i]->getImageData(),
+		                                                                            mVideoRecorder[i]->getTimestamps(),
+		                                                                            trackerRecordedData,
+		                                                                            mRecordingTool,
+		                                                                            this->getWriteColor(),
+		                                                                            rMpr);
 		fileMaker->setReconstructData(reconstructData);
 
 		// Use instead of filemaker->write(), this writes only images, other stuff kept in memory.

@@ -45,10 +45,11 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
  * if written from this object.
  *
  */
-ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(SavingVideoRecorderPtr videoRecorder,
+ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataContainerPtr imageData,
+                                                                          std::vector<double> imageTimestamps,
                                                                           ssc::TimedTransformMap trackerRecordedData,
                                                                           ssc::ToolPtr tool,
-                                                                          bool writeColor)
+                                                                          bool writeColor, ssc::Transform3D rMpr)
 {
 	if(trackerRecordedData.empty())
 		ssc::messageManager()->sendWarning("No tracking data for writing to reconstruction file.");
@@ -56,7 +57,8 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(Saving
 	ssc::USReconstructInputData retval;
 
 	retval.mFilename = mSessionDescription; // not saved yet - no filename
-	retval.mUsRaw = ssc::USFrameData::create(mSessionDescription, videoRecorder->getImageData());
+	retval.mUsRaw = ssc::USFrameData::create(mSessionDescription, imageData);
+	retval.rMpr = rMpr;
 
 	for (ssc::TimedTransformMap::iterator it = trackerRecordedData.begin(); it != trackerRecordedData.end(); ++it)
 	{
@@ -66,7 +68,7 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(Saving
 		retval.mPositions.push_back(current);
 	}
 
-	std::vector<double> fts = videoRecorder->getTimestamps();
+	std::vector<double> fts = imageTimestamps;
 	for (unsigned i=0; i<fts.size(); ++i)
 	{
 		ssc::TimedPosition current;
@@ -269,17 +271,17 @@ void UsReconstructionFileMaker::report()
 	}
 }
 
-void UsReconstructionFileMaker::writeUSImages(QString path, CachedImageDataContainerPtr images, bool compression, std::vector<ssc::TimedPosition> pos)
+void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<ssc::TimedPosition> pos)
 {
 	SSC_ASSERT(images->size()==pos.size());
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-//	std::cout << "UsReconstructionFileMaker::writeUSImages " << images->size() << std::endl;
 
 	for (unsigned i=0; i<images->size(); ++i)
 	{
 		vtkImageDataPtr currentImage = images->get(i);
-		QString filename = path + "/" + QFileInfo(images->getFilename(i)).fileName();
-//		std::cout << "  UsReconstructionFileMaker::writeUSImages " << filename << std::endl;
+//		std::cout << "=======================" << std::endl;
+//		currentImage->Print(std::cout);
+		QString filename = QString("%1/%2_%3.mhd").arg(path).arg(mSessionDescription).arg(i);
 
 		writer->SetInput(currentImage);
 		writer->SetFileName(cstring_cast(filename));
@@ -430,7 +432,7 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	this->writeMask(path, session, mReconstructData.mMask);
 	this->writeREADMEFile(path, session);
 
-	CachedImageDataContainerPtr imageData = boost::dynamic_pointer_cast<CachedImageDataContainer>(mReconstructData.mUsRaw->getImageContainer());
+	ImageDataContainerPtr imageData = mReconstructData.mUsRaw->getImageContainer();
 	if (imageData)
 		this->writeUSImages(path, imageData, compression, mReconstructData.mFrames);
 	else

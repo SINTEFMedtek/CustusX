@@ -11,7 +11,6 @@ add_subdirectory(OpenIGTLinkUtilities)
 add_subdirectory(settings)
 
 #add_subdirectory(algorithms)
-#add_subdirectory(testing)
 
 SET( CX_QT_MOC_HEADER_FILES
     algorithms/cxTimedAlgorithm.h
@@ -122,3 +121,7 @@ if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
         target_link_libraries(cxResource_unity ${CX_RESOURCE_LIBRARIES})
     endif(COTIRE_ADD_UNITY_BUILDS)
 endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+
+#------------------------------------------------------------------------------
+
+add_subdirectory(testing)
