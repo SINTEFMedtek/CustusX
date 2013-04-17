@@ -50,6 +50,7 @@ SeansVesselReg::SeansVesselReg()// : mInvertedTransform(false)
 	mt_singlePointThreshold = 1;
 	mt_maximumNumberOfIterations = 100;
 	mt_verbose = false;
+	mt_maximumDurationSeconds = 1E6; // Random high number
 }
 
 SeansVesselReg::~SeansVesselReg()
@@ -161,7 +162,8 @@ void SeansVesselReg::linearRefine(ContextPtr context)
 {
 	// Perform registrations iteratively until convergence is reached:
 	double previousMetric = 1E6;
-	for (int iteration = 1; iteration < mt_maximumNumberOfIterations; ++iteration)
+	QDateTime t0 = QDateTime::currentDateTime();
+	for (int iteration = 1; iteration < mt_maximumNumberOfIterations && (t0.msecsTo(QDateTime::currentDateTime()) < mt_maximumDurationSeconds*1000); ++iteration)
 	{
 		this->performOneRegistration(context, true);
 		double difference = context->mMetric - previousMetric;
