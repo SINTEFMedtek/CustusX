@@ -608,7 +608,7 @@ cmake \
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "388"
+        self.mCurrentRevision = "391"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -803,6 +803,7 @@ class TubeSegmentationFramework(CppComponent):
        self._changeDirToSource()
        runShell('git checkout master')
        runShell('git pull')
+       runShell('git submodule sync')
        runShell('git submodule update --init --recursive')
    def configure(self):
        self._changeDirToBuild()
