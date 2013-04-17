@@ -70,6 +70,8 @@ vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
 	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
 	ptr[0] = 0;
 
+	data->UpdateInformation(); // update extent etc
+
 	return data;
 }
 
