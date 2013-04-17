@@ -28,14 +28,6 @@ UsReconstructionFileReader::UsReconstructionFileReader()
 
 }
 
-/** Read all data from the files and return as a FileData object.
- *
- * NOTE: The mFrames var will not be initialized with transforms,
- * they must be generated explicitly.
- *
- * the mMask var is filled with data from ProbeData, or from file if present.
- *
- */
 ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath)
 {
   if (calFilesPath.isEmpty())

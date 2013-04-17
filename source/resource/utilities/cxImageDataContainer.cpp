@@ -131,8 +131,8 @@ CachedImageDataContainer::~CachedImageDataContainer()
 
 vtkImageDataPtr CachedImageDataContainer::get(unsigned index)
 {
-//	SSC_ASSERT(index < this->size());
-//	SSC_ASSERT(mImages[index]);
+	SSC_ASSERT(index < this->size());
+	SSC_ASSERT(mImages[index]);
 	vtkImageDataPtr retval = mImages[index]->getImage();
 	mImages[index]->purge();
 	return retval;
@@ -174,6 +174,10 @@ SplitFramesContainer::SplitFramesContainer(vtkImageDataPtr image3D)
 
 		import->Update();
 		mImages[i] = import->GetOutput();
+
+//		std::cout << "SplitFramesContainer " << i << std::endl;
+//		std::cout << "===================================" << std::endl;
+//		mImages[i]->Print(std::cout);
 	}
 }
 

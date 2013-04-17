@@ -150,8 +150,10 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 	}
 }
 
-USFrameDataPtr USFrameData::create(QString name, cx::CachedImageDataContainerPtr images)
+USFrameDataPtr USFrameData::create(QString name, cx::ImageDataContainerPtr images)
 {
+	if (!images)
+		return USFrameDataPtr();
 	USFrameDataPtr retval(new USFrameData());
 	retval->mName = name;
 	retval->mImageContainer = images;
