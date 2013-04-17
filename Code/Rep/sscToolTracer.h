@@ -50,7 +50,6 @@ typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
 class ToolTracer : QObject
 {
 	Q_OBJECT
-public: 
 public:
 	ToolTracer();
 	void setTool(ToolPtr tool);
@@ -66,7 +65,7 @@ public:
 	void setMinDistance(double distance) { mMinDistance = distance; }
 	int getSkippedPoints() { return mSkippedPoints; }
 
-	private slots:
+private slots:
 	void receiveTransforms(Transform3D prMt, double timestamp);
 private:
 	void connectTool();
