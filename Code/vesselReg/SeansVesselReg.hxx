@@ -83,6 +83,7 @@ public:
 	int mt_singlePointThreshold;
 	int mt_maximumNumberOfIterations;
 	bool mt_verbose;
+	double mt_maximumDurationSeconds;
 
 	// debug interface:
 	ContextPtr createContext(ssc::DataPtr source, ssc::DataPtr target);
