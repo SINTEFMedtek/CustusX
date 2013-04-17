@@ -243,11 +243,10 @@ QString ReconstructCore::generateImageName(QString uid) const
 	QRegExp tsReg("[0-9]{8}T[0-9]{6}");
 	if (tsReg.indexIn(name) > 0)
 	{
-		QString type = "";
 		QString postfix = name.split("_").back();
 		QDateTime datetime = QDateTime::fromString(tsReg.cap(0), timestampSecondsFormat());
 		QString timestamp = datetime.toString("hh:mm");
-		return prefix + " " + counter + " " type + " " + timestamp;
+		return prefix + " " + counter + " " + postfix + " " + timestamp;
 	}
 
 	return name;
