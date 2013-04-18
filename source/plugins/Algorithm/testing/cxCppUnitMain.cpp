@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 //									   "TestTSFPresets::testNewPresets",
 //										&cx::TestTSFPresets::testNewPresets ) );
 
-	//runner.addTest(cx::TestTubeSegmentationFramework::suite());
+	runner.addTest(TestTubeSegmentationFramework::suite());
 	runner.addTest(cx::TestTSFPresets::suite());
 #endif
 
