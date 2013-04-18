@@ -335,15 +335,15 @@ void TubeSegmentationFilter::createOptions()
 	this->createDefaultOptions(mOptions);
 
 	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
-	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); stringIt++)
+	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 		mOptionsAdapters.push_back(*stringIt);
 
 	std::vector<ssc::BoolDataAdapterXmlPtr>::iterator boolIt;
-	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); boolIt++)
+	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
 		mOptionsAdapters.push_back(*boolIt);
 
 	std::vector<ssc::DoubleDataAdapterXmlPtr>::iterator doubleIt;
-	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); doubleIt++)
+	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
 		mOptionsAdapters.push_back(*doubleIt);
 }
 
@@ -436,7 +436,7 @@ void TubeSegmentationFilter::loadNewParametersSlot()
 		{
 			setParameter(list, "parameters", mParameterFile.toStdString());
 			loadParameterPreset(list, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
-		} catch (SIPL::SIPLException e)
+		} catch (SIPL::SIPLException& e)
 		{
 			ssc::messageManager()->sendWarning("Error when loading a parameter file. Preset is corrupt. "+QString(e.what()));
 			return;
@@ -868,18 +868,18 @@ void TubeSegmentationFilter::printParameters(paramList parameters)
     std::cout << "The following parameters are set: " << std::endl;
 
     boost::unordered_map<std::string,StringParameter>::iterator itString;
-    for(itString = parameters.strings.begin(); itString != parameters.strings.end(); itString++) {
+    for(itString = parameters.strings.begin(); itString != parameters.strings.end(); ++itString) {
     	std::cout << itString->first << " " << itString->second.get() << std::endl;
     }
 
     boost::unordered_map<std::string,BoolParameter>::iterator itBool;
-    for(itBool = parameters.bools.begin(); itBool != parameters.bools.end(); itBool++) {
+    for(itBool = parameters.bools.begin(); itBool != parameters.bools.end(); ++itBool) {
     	std::string value = itBool->second.get() ? "true" : "false";
     	std::cout << itBool->first << " " << value << std::endl;
     }
 
     boost::unordered_map<std::string,NumericParameter>::iterator itNumeric;
-    for(itNumeric = parameters.numerics.begin(); itNumeric != parameters.numerics.end(); itNumeric++) {
+    for(itNumeric = parameters.numerics.begin(); itNumeric != parameters.numerics.end(); ++itNumeric) {
     	std::cout << itNumeric->first << " " << itNumeric->second.get() << std::endl;
     }
 
