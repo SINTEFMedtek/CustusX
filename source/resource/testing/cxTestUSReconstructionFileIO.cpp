@@ -148,25 +148,17 @@ TestUSReconstructionFileIO::ReconstructionData TestUSReconstructionFileIO::creat
 	for (unsigned i=0; i<100; ++i)
 		retval.trackerData[i] = ssc::createTransformTranslate(ssc::Vector3D(i,0,0));
 	retval.writeColor = true;
-	ssc::DummyToolPtr tool(new ssc::DummyTool(NULL));
-	ssc::ProbeData probeData;
-	probeData.setType(ssc::ProbeData::tLINEAR);
-	probeData.setSector(1, 10, 5, 1);
-
-	ssc::Vector3D imageSpacing(0.5, 0.6, 1.0);
-	QSize frameSize(100, 50);
-	ssc::ProbeData::ProbeImageData probeImageData = probeData.getImage();
-	probeImageData.mOrigin_p = ssc::Vector3D(50,1,0);
-	probeImageData.mSpacing = imageSpacing;
-	probeImageData.mClipRect_p = ssc::DoubleBoundingBox3D(10, 90, 5, 45, 0, 0);
-	probeImageData.mSize = frameSize;
-	probeData.setImage(probeImageData);
-	tool->setProbeSector(probeData);
+	Eigen::Array2i frameSize(100, 50);
+	ssc::ProbeData probeData = ssc::DummyToolTestUtilities::createProbeDataLinear(10, 5, frameSize);
+	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(probeData);
 	retval.tool = tool;
 
 	// add frames spaced 2 seconds apart
 	unsigned framesCount = 10;
-	vtkImageDataPtr imageData = ssc::generateVtkImageData(Eigen::Array3i(frameSize.width(), frameSize.height(), framesCount), imageSpacing, 0);
+	vtkImageDataPtr imageData = ssc::generateVtkImageData(
+	            Eigen::Array3i(frameSize[0], frameSize[1], framesCount),
+	            probeData.getImage().mSpacing,
+	            0);
 	retval.imageData.reset(new cx::SplitFramesContainer(imageData));
 	for (unsigned i=0; i<framesCount; ++i)
 		retval.imageTimestamps.push_back(2*i);
