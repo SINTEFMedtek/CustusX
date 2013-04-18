@@ -47,8 +47,8 @@ public:
 
 	virtual bool hasPresets();
 	virtual ssc::PresetsPtr getPresets();
-	virtual QDomElement getNewPreset(QString name);
-	virtual void requestSetPresetSlot(QString name);
+	virtual QDomElement getNewPreset(QString name); ///< get a xml element containing the currently set parameters
+	virtual void requestSetPresetSlot(QString name); ///< try to set a specific preset
 
 	virtual bool execute();
 	virtual bool postProcess();
@@ -71,6 +71,7 @@ private:
 	vtkImageDataPtr convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ssc::ImagePtr input); ///< converts a char array to a vtkImageDataPtr
 	vtkImageDataPtr convertToVtkImageData(float * data, int size_x, int size_y, int size_z, ssc::ImagePtr input); ///< converts a float array to a vtkImageDataPtr
 	vtkImageDataPtr importRawImageData(void * data, int size_x, int size_y, int size_z, ssc::ImagePtr input, int type); ///< converts a any array to a vtkImageDataPtr
+	ssc::MeshPtr loadVtkFile(QString pathToFile, QString newDatasUid); ///< loads a vtk file into CustusX
 
 	void createDefaultOptions(QDomElement root); ///< generate options based on file with all valid parameters for smistads algorithm
 	paramList getParametersFromOptions(); ///< fetches the parameters set by the user
