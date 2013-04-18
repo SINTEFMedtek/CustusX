@@ -34,7 +34,8 @@ void USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(ssc::USR
 
 void USReconstructInputDataAlgorithm::transformFramePositionsTo_rMu(ssc::USReconstructInputData* data)
 {
-    ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+	ssc::Transform3D rMpr = data->rMpr;
+//    ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
     // Transform from image coordinate syst with origin in upper left corner to t (tool) space.
     ssc::Transform3D tMv = data->mProbeData.get_tMu() * data->mProbeData.get_uMv();
 
