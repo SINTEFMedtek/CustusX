@@ -53,6 +53,7 @@ struct USReconstructInputData
 	ssc::ImagePtr mMask;///< Clipping mask for the input data
 	ssc::ProbeSector mProbeData;
 	QString mProbeUid;
+	ssc::Transform3D rMpr; ///< patient registration
 };
 
 /**

@@ -35,6 +35,7 @@
 #include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
 #include "sscLogger.h"
+#include "cxImageDataContainer.h"
 
 namespace cx
 {
@@ -126,20 +127,29 @@ void USAcquisition::saveSession()
 		return;
 
 	ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
+	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
-		UsReconstructionFileMakerPtr fileMaker;
-		fileMaker.reset(new UsReconstructionFileMaker(session->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid()));
+		CachedImageDataContainerPtr imageData = mVideoRecorder[i]->getImageData();
+		std::vector<double> imageTimestamps = mVideoRecorder[i]->getTimestamps();
+		QString streamSessionName = session->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid();
 
-		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(mVideoRecorder[i], trackerRecordedData,
-																									mRecordingTool,
-																									this->getWriteColor());
-		fileMaker->setReconstructData(reconstructData);
-
-		// Use instead of filemaker->write(), this writes only images, other stuff kept in memory.
+		// complete writing of images to temporary storage. Do this before using the image data.
 		mVideoRecorder[i]->completeSave();
 		mVideoRecorder[i].reset();
+		std::cout << QString("completed save of cached video stream %1").arg(i) << std::endl;
+
+		UsReconstructionFileMakerPtr fileMaker;
+		fileMaker.reset(new UsReconstructionFileMaker(streamSessionName));
+
+		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(imageData,
+		                                                                            imageTimestamps,
+		                                                                            trackerRecordedData,
+		                                                                            mRecordingTool,
+		                                                                            this->getWriteColor(),
+		                                                                            rMpr);
+		fileMaker->setReconstructData(reconstructData);
 
 		mBase->getPluginData()->getReconstructer()->selectData(reconstructData);
 		emit acquisitionDataReady();
