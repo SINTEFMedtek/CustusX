@@ -16,6 +16,36 @@
 namespace ssc
 {
 
+ProbeData DummyToolTestUtilities::createProbeDataLinear(double depth, double width, Eigen::Array2i frameSize)
+{
+	ProbeData retval;
+	retval.setType(ProbeData::tLINEAR);
+	retval.setSector(0, depth, width, 0);
+
+	Vector3D imageSpacing(width/frameSize[0], depth/frameSize[1], 1.0);
+	ProbeData::ProbeImageData image = retval.getImage();
+	image.mOrigin_p = Vector3D(frameSize[0]/2,0,0);
+	image.mSpacing = imageSpacing;
+	image.mClipRect_p = DoubleBoundingBox3D(0, frameSize[0], 0, frameSize[1], 0, 0);
+	image.mSize = QSize(frameSize[0], frameSize[1]);
+	retval.setImage(image);
+
+	return retval;
+}
+
+DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeData probeData, ToolManager* manager)
+{
+	DummyToolPtr retval(new DummyTool(manager));
+	retval->setProbeSector(probeData);
+	retval->setVisible(true);
+	retval->startTracking(30);
+	return retval;
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
 int DummyTool::mTransformCount = 0;
 
 

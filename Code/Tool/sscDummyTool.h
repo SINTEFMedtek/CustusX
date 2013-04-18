@@ -83,7 +83,6 @@ private:
 	ssc::VideoSourcePtr mVideoSource;
 };
 
-
 /**Helper class for emitting signals at a constant rate in a separate thread.
  *
  */
@@ -110,6 +109,12 @@ private slots:
 	}
 signals:
 	void ping();
+};
+
+struct DummyToolTestUtilities
+{
+	static DummyToolPtr createDummyTool(ProbeData probeData = ProbeData(), ToolManager* manager = NULL);
+	static ProbeData createProbeDataLinear(double depth=40, double width=50, Eigen::Array2i frameSize=Eigen::Array2i(80,40));
 };
 
 /**\brief Implementation of a Tool used for testing.
