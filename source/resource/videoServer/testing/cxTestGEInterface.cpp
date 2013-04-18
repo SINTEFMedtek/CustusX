@@ -116,6 +116,16 @@ void TestGEInterface::testVelocityStreamGPU()
 	this->testStream(args);
 }
 
+void TestGEInterface::testAllStreamsGPUConsecutively()
+{
+	testAllStreamsGPU();
+	testScanConvertedStreamGPU();
+	testTissueStreamGPU();
+	testFrequencyStreamGPU();
+	testBandwidthStreamGPU();
+	testVelocityStreamGPU();
+}
+
 void TestGEInterface::testStream(cx::StringMap args)
 {
 	cx::ImageSenderPtr imageSender = cx::ImageSenderFactory().getFromArguments(args);
