@@ -1,0 +1,17 @@
+ObjectType = Image 
+NDims = 3 
+BinaryData = True 
+BinaryDataByteOrderMSB = False 
+ElementSpacing = 0.387 0.387 1.000 
+DimSize = 512 512 249 
+Position = -87.807 -249.807 -428.000 
+Orientation = 1.000000 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000
+ElementType = MET_SHORT 
+Modality = MET_MOD_CT
+WindowLevel = 117.000
+WindowWidth = 737.000
+ImageType1 = ORIGINAL
+ImageType2 = PRIMARY
+ImageType3 = AXIAL
+ElementDataFile = CT.raw 
+Creator = DICOMtoMetadataFilter
