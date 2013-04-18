@@ -93,7 +93,7 @@ class USFrameData
 public:
 	static USFrameDataPtr create(ImagePtr inputFrameData);
 	static USFrameDataPtr create(QString inputFilename);
-	static USFrameDataPtr create(QString name, cx::CachedImageDataContainerPtr images);
+	static USFrameDataPtr create(QString name, cx::ImageDataContainerPtr images);
 	~USFrameData();
 
 	Eigen::Array3i getDimensions() const;
