@@ -281,6 +281,9 @@ void TSFPresets::deleteFile(QString filePath)
 	std::cout << filePath.toStdString() << std::endl;
 	return;
 
+	//TODO
+
+/*
 	QFile file(filePath);
 	QString customPresetName = QFileInfo(file).fileName();
 
@@ -296,6 +299,7 @@ void TSFPresets::deleteFile(QString filePath)
 	//-------------------------------------------------------------
 	if(!file.remove())
 		std::cout << "file: " << filePath.toStdString() << " not removed..." << std::endl;
+		*/
 }
 
 
