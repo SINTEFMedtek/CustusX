@@ -215,6 +215,7 @@ QString ReconstructCore::generateOutputUid()
 
 /**Generate a pretty name for for volume based on the filename.
  * Assume filename has format US-Acq_01_20001224T170000 or similar.
+ * Format may also be US-Acq_01_20001224T170000_Tissue or similar
  * Format: US <counter> <hh:mm>, for example US 3 15:34
  */
 QString ReconstructCore::generateImageName(QString uid) const
@@ -242,9 +243,10 @@ QString ReconstructCore::generateImageName(QString uid) const
 	QRegExp tsReg("[0-9]{8}T[0-9]{6}");
 	if (tsReg.indexIn(name) > 0)
 	{
+		QString postfix = name.split("_").back();
 		QDateTime datetime = QDateTime::fromString(tsReg.cap(0), timestampSecondsFormat());
 		QString timestamp = datetime.toString("hh:mm");
-		return prefix + " " + counter + " " + timestamp;
+		return prefix + " " + counter + " " + postfix + " " + timestamp;
 	}
 
 	return name;
