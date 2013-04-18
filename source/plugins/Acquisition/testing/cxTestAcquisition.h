@@ -6,6 +6,30 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include "sscReconstructManager.h"
 
+class TestUSAcquisitionCore : public CppUnit::TestFixture
+{
+public:
+	void setUp();
+	void tearDown();
+
+	void testOneVideoSource();
+	void testOneVideoSourceWithTool();
+	void testOneVideoSourceWithToolAndSave();
+	void testFourVideoSources();
+	void testFourVideoSourcesWithToolAndSave();
+
+public:
+	CPPUNIT_TEST_SUITE( TestUSAcquisitionCore );
+		CPPUNIT_TEST( testOneVideoSource );
+		CPPUNIT_TEST( testOneVideoSourceWithTool );
+		CPPUNIT_TEST( testOneVideoSourceWithToolAndSave );
+		CPPUNIT_TEST( testFourVideoSources );
+		CPPUNIT_TEST( testFourVideoSourcesWithToolAndSave );
+	CPPUNIT_TEST_SUITE_END();
+private:
+};
+CPPUNIT_TEST_SUITE_REGISTRATION( TestUSAcquisitionCore );
+
 /**Unit tests that test the acquisition plugin
  */
 class TestAcquisition : public CppUnit::TestFixture
