@@ -21,6 +21,10 @@
 #include "cxAcquisitionData.h"
 #include "sscTool.h"
 
+namespace ssc
+{
+class USReconstructInputData;
+}
 namespace cx
 {
 typedef boost::shared_ptr<class UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
@@ -31,6 +35,55 @@ typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
  * \addtogroup cxPluginAcquisition
  * @{
  */
+
+
+/**
+ * \brief Independent algorithms for storing acquisition data.
+ * \ingroup cxPluginAcquisition
+ *
+ * Use the start/stop pair to record video from the input streams
+ * during that period. A cancel instead of stop will clear the recording.
+ * After stopping, use getDataForStream() to get unsaved reconstruct data.
+ * Use startSaveData() to launch save threads AND clear the stored data.
+ *
+ * Intended to be a unit-testable part of the USAcquisition class.
+ *
+ *  \date April 17, 2013
+ *  \author christiana
+ */
+class USAcquisitionCore : public QObject
+{
+	Q_OBJECT
+public:
+	/**
+	  * Start recording
+	  */
+	void startRecord(RecordSessionPtr session, ssc::ToolPtr tool, std::vector<ssc::VideoSourcePtr> video);
+	void stopRecord();
+	void cancelRecord();
+
+	void set_rMpr(ssc::Transform3D rMpr);
+	/**
+	  * Retrieve an in-memory data set for the given stream uid.
+	  */
+	ssc::USReconstructInputData getDataForStream(QString streamUid);
+	/**
+	  * Start saving all data acquired after a start/stop record.
+	  * A separate saveDataCompleted() signal is emitted
+	  * for each completed saved stream.
+	  * Internal record data is cleared after this call.
+	  */
+	void startSaveData(bool compressImages, bool writeColor);
+	unsigned numberOfSavingThreads() const;
+
+signals:
+	void saveDataCompleted(QString mhdFilename); ///< emitted when data has been saved to file
+
+private:
+//	std::vector<SavingVideoRecorderPtr> mVideoRecorder;
+//	ssc::ToolPtr mRecordingTool;
+};
+typedef boost::shared_ptr<USAcquisitionCore> USAcquisitionCorePtr;
 
 /**
  * \brief Handles the us acquisition process.
@@ -73,6 +126,7 @@ private slots:
 private:
 	std::vector<ssc::VideoSourcePtr> getRecordingVideoSources();
 	bool getWriteColor() const;
+	void saveStreamSession(ssc::USReconstructInputData reconstructData, QString saveFolder, QString streamSessionName);
 
 	AcquisitionPtr mBase;
 

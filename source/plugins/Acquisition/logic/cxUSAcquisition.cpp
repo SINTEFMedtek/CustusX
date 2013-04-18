@@ -40,6 +40,41 @@
 namespace cx
 {
 
+
+void USAcquisitionCore::startRecord(RecordSessionPtr session, ssc::ToolPtr tool, std::vector<ssc::VideoSourcePtr> video)
+{
+
+}
+
+void USAcquisitionCore::stopRecord()
+{
+
+}
+
+void USAcquisitionCore::cancelRecord()
+{
+
+}
+
+ssc::USReconstructInputData USAcquisitionCore::getDataForStream(QString streamUid)
+{
+	return ssc::USReconstructInputData();
+}
+
+void USAcquisitionCore::startSaveData(bool compressImages, bool writeColor)
+{
+
+}
+
+unsigned USAcquisitionCore::numberOfSavingThreads() const
+{
+	return 0;
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
 USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(parent), mBase(base)
 {
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
@@ -149,31 +184,43 @@ void USAcquisition::saveSession()
 		                                                                            mRecordingTool,
 		                                                                            this->getWriteColor(),
 		                                                                            rMpr);
-		fileMaker->setReconstructData(reconstructData);
+//		fileMaker->setReconstructData(reconstructData);
 
-		mBase->getPluginData()->getReconstructer()->selectData(reconstructData);
-		emit acquisitionDataReady();
+		if (i==0)
+		{
+			mBase->getPluginData()->getReconstructer()->selectData(reconstructData);
+			emit acquisitionDataReady();
+		}
 
 		QString saveFolder = UsReconstructionFileMaker::createFolder(patientService()->getPatientData()->getActivePatientFolder(), session->getDescription());
 
-		// now start saving of data to the patient folder, compressed version:
-		QFuture<QString> fileMakerFuture =
-				QtConcurrent::run(boost::bind(
-									  &UsReconstructionFileMaker::writeToNewFolder,
-									  fileMaker,
-									  saveFolder,
-									  settings()->value("Ultrasound/CompressAcquisition", true).toBool()
-									  ));
-		QFutureWatcher<QString>* fileMakerFutureWatcher = new QFutureWatcher<QString>();
-		fileMakerFutureWatcher->setFuture(fileMakerFuture);
-		connect(fileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
-		mSaveThreads.push_back(fileMakerFutureWatcher);
-		fileMaker.reset(); // filemaker is now stored in the mSaveThreads queue, clear as current.
+		this->saveStreamSession(reconstructData, saveFolder, streamSessionName);
 	}
 
 	mVideoRecorder.clear();
 
 	this->checkIfReadySlot();
+}
+
+void USAcquisition::saveStreamSession(ssc::USReconstructInputData reconstructData, QString saveFolder, QString streamSessionName)
+{
+	UsReconstructionFileMakerPtr fileMaker;
+	fileMaker.reset(new UsReconstructionFileMaker(streamSessionName));
+	fileMaker->setReconstructData(reconstructData);
+
+	// now start saving of data to the patient folder, compressed version:
+	QFuture<QString> fileMakerFuture =
+			QtConcurrent::run(boost::bind(
+								  &UsReconstructionFileMaker::writeToNewFolder,
+								  fileMaker,
+								  saveFolder,
+								  settings()->value("Ultrasound/CompressAcquisition", true).toBool()
+								  ));
+	QFutureWatcher<QString>* fileMakerFutureWatcher = new QFutureWatcher<QString>();
+	fileMakerFutureWatcher->setFuture(fileMakerFuture);
+	connect(fileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
+	mSaveThreads.push_back(fileMakerFutureWatcher);
+	fileMaker.reset(); // filemaker is now stored in the mSaveThreads queue, clear as current.
 }
 
 void USAcquisition::fileMakerWriteFinished()
