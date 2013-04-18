@@ -100,6 +100,14 @@ void TestTubeSegmentationFramework::testParameters()
 	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Set parameter parameter to Lung-Airways-CT failed.", setParameter(defaultParameters, "parameters", "Lung-Airways-CT"));
 	//setParameter(defaultParameters, "parameters", "Lung-Airways-CT");
 	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Load presets failed.", loadParameterPreset(defaultParameters, path));
+}
 
+void TestTubeSegmentationFramework::testLoadParameterFile()
+{
+	std::string path = std::string(PARAMETERS_DIR);
+	paramList defaultParameters = initParameters(path);
+	setParameter(defaultParameters, "parameters", "Neuro-Vessels-USA");
+	loadParameterPreset(defaultParameters, path);
 
+	CPPUNIT_ASSERT_MESSAGE("sphere-segmentation not set to true in Neuro-Vessels-USA", getParamBool(defaultParameters,"sphere-segmentation") == true);
 }
