@@ -172,7 +172,8 @@ void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 
 	CPPUNIT_ASSERT(!fileData.mFilename.isEmpty());
 	// check for enough received image frames
-	int framesPerSecond = 20; // minimum frame rate
+//	int framesPerSecond = 20; // minimum frame rate
+	int framesPerSecond = 5; // minimum frame rate, reduced because tests on old computers have a hard time reaching 10 fps.
 	CPPUNIT_ASSERT(fileData.mFrames.size() > framesPerSecond*mRecordDuration/1000);
 	// check for duration equal to input duration
 	double frame_time_ms = fileData.mFrames.back().mTime - fileData.mFrames.front().mTime;
