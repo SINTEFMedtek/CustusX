@@ -78,10 +78,10 @@ private slots:
 	void fpsSlot(double fps);
 	void connectedSlot(bool on);
 	void connectVideoToProbe();
+	void updateStatusSlot(ssc::ProbeData message);
 
 private:
 	void updateImage(ssc::ImagePtr message); // called by receiving thread when new data arrives.
-	void updateSonixStatus(ssc::ProbeData message);
 	void runClient(GrabberReceiveThreadPtr client);
 	void stopClient();
 
