@@ -6,6 +6,7 @@
 //#include "sscVector3D.h"
 #include "cxGrabberSender.h"
 #include "cxTestGEInterfaceController.h"
+#include "cxImageSenderGE.h"
 #include "sscMessageManager.h"
 
 void TestGEInterface::setUp()
@@ -162,12 +163,13 @@ void TestGEInterface::testStream(cx::StringMap args)
 
 void TestGEInterface::testGEStreamer()
 {
-	//std::cout << std::endl << "*** Test GE 3D scanconverted stream. GPU scanconversion if possible ***" << std::endl;
-	std::cout << std::endl << "*** Test GE 3D scanconverted stream. CPU scanconversion for now ***" << std::endl;
+	std::cout << std::endl << "*** Test GE 3D scanconverted stream. GPU scanconversion  ***" << std::endl;
 	data_streaming::GEStreamer geStreamer;
 
+	std::string openclpath = cx::findOpenCLPath("").toStdString();
+
 	//Initialize GEStreamer    HFDPath, useHDF, sizeCompType,     imgSize, interpolation,       buffSize, clPath, useCL
-	geStreamer.InitializeClientData("", false, data_streaming::AUTO, -1, data_streaming::Bilinear, 10,   "",     false);
+	geStreamer.InitializeClientData("", false, data_streaming::AUTO, -1, data_streaming::Bilinear, 10,   openclpath,     true);
 
 	//Setup the needed data stream types. The default is only scan converted data
 	geStreamer.SetupExportParameters(true, false, false, false, false);
@@ -176,7 +178,6 @@ void TestGEInterface::testGEStreamer()
 	//                                         (hostIp, streamPort, commandPort, testMode));
 	CPPUNIT_ASSERT(geStreamer.ConnectToScanner("127.0.0.1", 6543,    -1,         data_streaming::test3D));
 //	CPPUNIT_ASSERT(geStreamer.ConnectToScanner("bhgrouter.hopto.org", 6543,    -1,         data_streaming::noTest));
-
 
 	geStreamer.WaitForImageData();
 	vtkSmartPointer<data_streaming::vtkExportedStreamData> imgExportedStream = geStreamer.GetExportedStreamDataAndMoveToNextFrame();
@@ -203,6 +204,8 @@ void TestGEInterface::testGEStreamer()
 	CPPUNIT_ASSERT(img);//Got scan converted image?
 
 	this->validateBMode3D(img);
+
+	CPPUNIT_ASSERT(geStreamer.usingOpenCL());
 
 	/*img = imgExportedStream->GetTissueImage();
 	CPPUNIT_ASSERT(img);//Got image?

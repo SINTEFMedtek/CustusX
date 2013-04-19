@@ -167,25 +167,9 @@ void ImageSenderGE::initialize(StringMap arguments)
    			ssc::messageManager()->sendWarning("ImageSenderGE: Unknown stream: " + streamList.at(i));
    	}
 
-   	std::string openclpath = mArguments["openclpath"].toStdString();
 	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
 
-   	//Find GEStreamer OpenCL kernel code
-   	//Look in arg in, GEStreamer source dir, and installed dir
-   	QStringList paths;
-   	paths << QString::fromStdString(openclpath) << GEStreamer_KERNEL_PATH << DataLocations::getShaderPath();
-//   	std::cout << "OpenCL kernel paths: " << paths.join("  \n").toStdString();
-   	QFileInfo path;
-	path = QFileInfo(paths[0] + QString("/ScanConvertCL.cl"));
-	if (!path.exists())
-		path = QFileInfo(paths[1] + QString("/ScanConvertCL.cl"));
-	if (!path.exists())
-		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
-	if (!path.exists())
-	{
-		ssc::messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
-	} else
-		openclpath = path.absolutePath().toStdString();
+	std::string openclpath = findOpenCLPath(mArguments["openclpath"]).toStdString();
 
 	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageCompType, imageSize, interpType, bufferSize, openclpath, useOpenCL);
 
@@ -200,6 +184,26 @@ void ImageSenderGE::initialize(StringMap arguments)
 //	this->initialize_local();
 //	this->deinitialize_local();
 
+}
+
+QString findOpenCLPath(QString additionalLocation)
+{
+	//Look in arg in, GEStreamer source dir, and installed dir
+	QString retval;
+	QStringList paths;
+	paths << additionalLocation << GEStreamer_KERNEL_PATH << DataLocations::getShaderPath();
+	QFileInfo path;
+	path = QFileInfo(paths[0] + QString("/ScanConvertCL.cl"));
+	if (!path.exists())
+		path = QFileInfo(paths[1] + QString("/ScanConvertCL.cl"));
+	if (!path.exists())
+		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
+	if (!path.exists())
+		ssc::messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
+	else
+		retval = path.absolutePath();
+
+	return retval;
 }
 
 void ImageSenderGE::deinitialize_local()
