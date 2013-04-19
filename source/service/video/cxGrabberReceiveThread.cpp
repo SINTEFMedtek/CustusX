@@ -123,7 +123,7 @@ ssc::ImagePtr GrabberReceiveThread::getLastImageMessage()
 	return retval;
 }
 
-/** Threadsafe retrieval of last image message.
+/** Threadsafe retrieval of last status message.
  *
  */
 ssc::ProbeData GrabberReceiveThread::getLastSonixStatusMessage()

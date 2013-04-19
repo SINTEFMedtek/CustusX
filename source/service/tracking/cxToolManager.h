@@ -125,6 +125,9 @@ public:
 
 	void setPlaybackMode(PlaybackTimePtr controller);
 
+signals:
+	void probeAvailable(); ///< Emitted when a probe is configured
+
 public slots:
 	void configure(); ///< sets up the software like the xml file suggests
 	void deconfigure(); ///< deconfigures the software

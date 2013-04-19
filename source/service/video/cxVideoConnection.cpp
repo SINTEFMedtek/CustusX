@@ -161,7 +161,7 @@ void VideoConnection::sonixStatusReceivedSlot()
 {
 	if (!mClient)
 		return;
-	this->updateSonixStatus(mClient->getLastSonixStatusMessage());
+	this->updateStatusSlot(mClient->getLastSonixStatusMessage());
 }
 
 /**Get rid of the mClient thread.
@@ -229,14 +229,19 @@ void VideoConnection::clientFinishedSlot()
  *  and store locally. Also reset the old local info with
  *  information from the probe in toolmanager.
  */
-void VideoConnection::updateSonixStatus(ssc::ProbeData msg)
+void VideoConnection::updateStatusSlot(ssc::ProbeData msg)
 {
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
-	if (!tool)
+	if (!tool || !tool->getProbe())
+	{
+		//Don't throw away the ProbeData. Save it till it can be used
+		connect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(updateStatusSlot(msg)));
 		return;
+	}
+	else
+		disconnect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(updateStatusSlot(msg)));
+
 	ssc::ProbePtr probe = tool->getProbe();
-	if (!probe)
-		return;
 
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
