@@ -205,7 +205,10 @@ void TestGEInterface::testGEStreamer()
 
 	this->validateBMode3D(img);
 
+	//Skip assert if OpenCL is turned off
+#ifdef DATASTREAMING_USE_OPENCL
 	CPPUNIT_ASSERT(geStreamer.usingOpenCL());
+#endif
 
 	/*img = imgExportedStream->GetTissueImage();
 	CPPUNIT_ASSERT(img);//Got image?
