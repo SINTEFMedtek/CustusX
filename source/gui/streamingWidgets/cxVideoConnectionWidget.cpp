@@ -107,12 +107,12 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 	connect(mConnectButton, SIGNAL(clicked()), this, SLOT(toggleConnectServer()));
 	toptopLayout->addWidget(mConnectButton);
 
-	mSnapshotButton = new QPushButton("Snapshot", this);
-	mSnapshotButton->setToolTip(""
-			"Save snapshot of real time image/volume in the snapshot folder");
-	mSnapshotButton->setDisabled(true);
-	connect(mSnapshotButton, SIGNAL(clicked()), this, SLOT(saveSnapshotSlot()));
-	toptopLayout->addWidget(mSnapshotButton);
+	mImportStreamImageButton = new QPushButton("Import image from stream", this);
+	mImportStreamImageButton->setToolTip(""
+			"Import a single image/volume from the real time stream");
+	mImportStreamImageButton->setDisabled(true);
+	connect(mImportStreamImageButton, SIGNAL(clicked()), this, SLOT(importStreamImageSlot()));
+	toptopLayout->addWidget(mImportStreamImageButton);
 
 	toptopLayout->addWidget(createDataWidget(this, ActiveVideoSourceStringDataAdapter::New()));
 
@@ -352,7 +352,7 @@ void VideoConnectionWidget::connectServer()
 
 void VideoConnectionWidget::serverStatusChangedSlot()
 {
-	mSnapshotButton->setEnabled(this->getConnection()->isConnected());
+	mImportStreamImageButton->setEnabled(this->getConnection()->isConnected());
 
 	if (this->getConnection()->isConnected())
 	{
@@ -366,7 +366,7 @@ void VideoConnectionWidget::serverStatusChangedSlot()
 	this->adjustSize();
 }
 
-void VideoConnectionWidget::saveSnapshotSlot()
+void VideoConnectionWidget::importStreamImageSlot()
 {
 	if(!this->getConnection())
 	{
@@ -416,7 +416,7 @@ void VideoConnectionWidget::saveSnapshotSlot()
 
 	ssc::ImagePtr output = ssc::dataManager()->createImage(copiedImage, filename, filename);
 	output->get_rMd_History()->setRegistration(rMd);
-	QString folder = patientService()->getPatientData()->getActivePatientFolder() + "/Screenshots/";
+	QString folder = patientService()->getPatientData()->getActivePatientFolder();
 	ssc::dataManager()->loadData(output);
 	ssc::dataManager()->saveImage(output, folder); //Always sets type as 8 bit, even when 24 bit
 	viewManager()->autoShowData(output);
