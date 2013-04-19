@@ -51,6 +51,7 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
 	retval << "--buffersize:		Size of GEStreamer buffer, default = 10";
 	retval << "--imagesize:		Returned image/volume size in pixels (eg. 500x500x1), default = auto";
+	retval << "--isotropic:		Use cubic voxels for the scan conversion, default = no";
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--test:		GEStreamer test mode (no, 2D or 3D), default = no";
 	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
@@ -108,6 +109,8 @@ void ImageSenderGE::initialize(StringMap arguments)
         mArguments["test"] = "no";
     if (!mArguments.count("imagesize"))
         mArguments["imagesize"] = "auto";
+    if (!mArguments.count("isotropic"))
+        mArguments["isotropic"] = "no";
     if (!mArguments.count("useOpenCL"))
         mArguments["useOpenCL"] = "1";
     if (!mArguments.count("streams"))
@@ -119,7 +122,10 @@ void ImageSenderGE::initialize(StringMap arguments)
    	long imageSize = -1;// -1 = auto
 	if (!mArguments["imagesize"].compare("auto", Qt::CaseInsensitive) == 0)
 	{
-		imageCompType = data_streaming::ANISOTROPIC;
+		if (mArguments["isotropic"].compare("yes", Qt::CaseInsensitive) == 0)
+			imageCompType = data_streaming::ISOTROPIC;
+		else
+			imageCompType = data_streaming::ANISOTROPIC;
 		imageSize = 1;
 	   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
 		for (int i = 0; i < sizeList.length(); i++)
