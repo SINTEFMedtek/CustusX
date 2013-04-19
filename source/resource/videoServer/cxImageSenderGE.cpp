@@ -54,7 +54,7 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--test:		GEStreamer test mode (no, 2D or 3D), default = no";
 	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
-	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted, Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency,velocity (all)";
+	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted,bandwidth  Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency,velocity (all)";
 	return retval;
 }
 
@@ -111,7 +111,7 @@ void ImageSenderGE::initialize(StringMap arguments)
     if (!mArguments.count("useOpenCL"))
         mArguments["useOpenCL"] = "1";
     if (!mArguments.count("streams"))
-        mArguments["streams"] = "scanconverted";
+        mArguments["streams"] = "scanconverted,bandwidth";
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
 
