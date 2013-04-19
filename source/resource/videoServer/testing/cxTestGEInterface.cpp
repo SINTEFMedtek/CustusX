@@ -115,6 +115,15 @@ void TestGEInterface::testVelocityStreamGPU()
 	std::cout << std::endl << "--- Test GE 2D velocity stream. ---" << std::endl;
 	this->testStream(args);
 }
+void TestGEInterface::testDefaultStreamsGPU()
+{
+	cx::StringMap args;
+	args["type"] = "ISB_GE";
+	args["test"] = "2D";
+	args["useOpenCL"] = "1"; //Test GPU (OpenCL) scan conversion
+	std::cout << std::endl << "--- Test GE 2D default streams. ---" << std::endl;
+	this->testStream(args);
+}
 
 void TestGEInterface::testAllStreamsGPUConsecutively()
 {
