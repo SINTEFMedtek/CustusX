@@ -311,6 +311,8 @@ void ToolManager::trackerConfiguredSlot(bool on)
 
 			mTools[it->first] = tool;
 			connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
+			if (tool->hasType(Tool::TOOL_US_PROBE))
+				emit probeAvailable();
 		}
 		else
 			ssc::messageManager()->sendWarning("Creation of the cxTool " + it->second->getUid() + " failed.");

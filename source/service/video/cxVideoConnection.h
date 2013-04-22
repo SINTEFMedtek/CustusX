@@ -74,20 +74,22 @@ signals:
 private slots:
 	void clientFinishedSlot();
 	void imageReceivedSlot();
-	void sonixStatusReceivedSlot();
+	void statusReceivedSlot();
 	void fpsSlot(double fps);
 	void connectedSlot(bool on);
 	void connectVideoToProbe();
+	void useUnusedProbeDataSlot();///< If no probe is available the ProbeData is saved and this slot is called when a probe becomes available
 
 private:
 	void updateImage(ssc::ImagePtr message); // called by receiving thread when new data arrives.
-	void updateSonixStatus(ssc::ProbeData message);
 	void runClient(GrabberReceiveThreadPtr client);
 	void stopClient();
+	void updateStatus(ssc::ProbeData message);
 
 	GrabberReceiveThreadPtr mClient;
 	bool mConnected;
 	double mFPS;
+	ssc::ProbeData mUnsusedProbeData;
 
 	std::vector<BasicVideoSourcePtr> mSources;
 };

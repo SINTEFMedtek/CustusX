@@ -128,8 +128,10 @@ bool TubeSegmentationFilter::execute()
 	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+input->getFilePath()).toStdString();
 
 	try {
-		ssc::messageManager()->sendDebug("Looking for TSF files in folder: "+cx::DataLocations::getTSFPath());
+		//ssc::messageManager()->sendDebug("Looking for TSF files in folder: "+cx::DataLocations::getTSFPath());
+		std::cout << "=================TSF START====================" << std::endl;
 		mOutput = run(filename, mParameters, cx::DataLocations::getTSFPath().toStdString());
+		std::cout << "=================TSF END====================" << std::endl;
 	} catch(SIPL::SIPLException& e) {
 		std::string error = e.what();
 		ssc::messageManager()->sendError("SIPL::SIPLException: "+qstring_cast(error));
@@ -176,37 +178,36 @@ bool TubeSegmentationFilter::postProcess()
 		return false;
 	}
 
-	ssc::ImagePtr input = this->getCopiedInputImage();
-	if (!input)
+	ssc::ImagePtr inputImage = this->getCopiedInputImage();
+	if (!inputImage)
 		return false;
 
-	//Calculate shift
-	double spacing_x, spacing_y, spacing_z;
-	input->getBaseVtkImageData()->GetSpacing(spacing_x, spacing_y, spacing_z);
+	double inputImageSpacing_x, inputImageSpacing_y, inputImageSpacing_z;
+	inputImage->getBaseVtkImageData()->GetSpacing(inputImageSpacing_x, inputImageSpacing_y, inputImageSpacing_z);
 
 	//compensate for cropping
-	SIPL::int3 cropShift = mOutput->getShiftVector();
-	ssc::Vector3D translationVector((spacing_x*cropShift.x), (spacing_y*cropShift.y), (spacing_z*cropShift.z));
-	ssc::Transform3D cropTranslation = ssc::createTransformTranslate(translationVector);
-	ssc::Transform3D rMd = input->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
-	rMd = rMd * cropTranslation; //translation due to cropping accounted for
+	SIPL::int3 voxelsCropped = mOutput->getShiftVector();
+	ssc::Vector3D croppingVectorInInpuImageSpace((inputImageSpacing_x*voxelsCropped.x), (inputImageSpacing_y*voxelsCropped.y), (inputImageSpacing_z*voxelsCropped.z));
+	ssc::Transform3D d_iMd_c = ssc::createTransformTranslate(croppingVectorInInpuImageSpace); //dc = data cropped, di = data input
+	ssc::Transform3D rMd_i = inputImage->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
+	ssc::Transform3D rMd_c = rMd_i * d_iMd_c; //translation due to cropping accounted for
 
 	// Centerline (volume)
 	//======================================================
 	if(mOutput->hasCenterlineVoxels())
 	{
-		QString uidCenterline = input->getUid() + "_tsf_cl_vol%1";
-		QString nameCenterline = input->getName()+"_tsf_cl_vol%1";
+		QString uidCenterline = inputImage->getUid() + "_tsf_cl_vol%1";
+		QString nameCenterline = inputImage->getName()+"_tsf_cl_vol%1";
 		SIPL::int3* size = mOutput->getSize();
-		vtkImageDataPtr rawCenterlineResult = this->convertToVtkImageData(mOutput->getCenterlineVoxels(), size->x, size->y, size->z, input);
+		vtkImageDataPtr rawCenterlineResult = this->convertToVtkImageData(mOutput->getCenterlineVoxels(), size->x, size->y, size->z, inputImage);
 		if(!rawCenterlineResult)
 			return false;
 
-		ssc::ImagePtr outputCenterline = ssc::dataManager()->createDerivedImage(rawCenterlineResult ,uidCenterline, nameCenterline, input);
+		ssc::ImagePtr outputCenterline = ssc::dataManager()->createDerivedImage(rawCenterlineResult ,uidCenterline, nameCenterline, inputImage);
 		if (!outputCenterline)
 			return false;
 
-		outputCenterline->get_rMd_History()->setRegistration(rMd);
+		outputCenterline->get_rMd_History()->setRegistration(rMd_c);
 
 		ssc::dataManager()->loadData(outputCenterline);
 		ssc::dataManager()->saveImage(outputCenterline, patientService()->getPatientData()->getActivePatientFolder());
@@ -219,39 +220,28 @@ bool TubeSegmentationFilter::postProcess()
 	boost::unordered_map<std::string, StringParameter>::iterator it = mParameters.strings.find("centerline-vtk-file");
 	if(it != mParameters.strings.end() && (it->second.get() != "off"))
 	{
-		QString vtkFilename = qstring_cast(it->second.get());
-		QString uidVtkCenterline = input->getUid() + "_tsf_cl%1";
-		QString nameVtkCenterline = input->getName()+"_tsf_cl%1";
+		QString tsfVtkFilename = qstring_cast(it->second.get());
+		QString uidVtkCenterline = inputImage->getUid() + "_tsf_cl%1";
+		QString nameVtkCenterline = inputImage->getName()+"_tsf_cl%1";
 
-		//load vtk into CustusX
-		ssc::PolyDataMeshReader reader;
-		ssc::DataPtr data;
-		if(reader.canLoad("vtk", vtkFilename))
-			data = reader.load(uidVtkCenterline, vtkFilename);
+		//load vtk file created by tsf into CustusX
+		ssc::MeshPtr tsfMesh = this->loadVtkFile(tsfVtkFilename, uidVtkCenterline);
 
-		if(!data)
-			false;
+		ssc::Vector3D inpuImageSpacing(inputImageSpacing_x, inputImageSpacing_y, inputImageSpacing_z);
+		ssc::Transform3D dMv = ssc::createTransformScale(inpuImageSpacing);  // transformation from voxelspace to imagespace
 
-		ssc::MeshPtr temp = boost::dynamic_pointer_cast<ssc::Mesh>(data);
+		ssc::Transform3D rMv = rMd_c*dMv;
 
-		if(data && temp){
-			ssc::Vector3D scalingVector(spacing_x, spacing_y, spacing_z);
-			ssc::Transform3D scalingTransformation = ssc::createTransformScale(scalingVector);
-			ssc::Transform3D dMv = rMd*scalingTransformation;
-			vtkPolyDataPtr poly = temp->getTransformedPolyData(dMv);
+		vtkPolyDataPtr poly = tsfMesh->getTransformedPolyData(rMv);
 
-			//create, load and save mesh
-			ssc::MeshPtr mesh = ssc::dataManager()->createMesh(poly, uidVtkCenterline, nameVtkCenterline, "Images");
-			mesh->get_rMd_History()->setParentSpace(input->getUid());
-			ssc::dataManager()->loadData(mesh);
-			ssc::dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
-			QString uid = mesh->getUid();
+		//create, load and save mesh
+		ssc::MeshPtr cxMesh = ssc::dataManager()->createMesh(poly, uidVtkCenterline, nameVtkCenterline, "Images");
+		cxMesh->get_rMd_History()->setParentSpace(inputImage->getUid());
+		ssc::dataManager()->loadData(cxMesh);
+		ssc::dataManager()->saveMesh(cxMesh, patientService()->getPatientData()->getActivePatientFolder());
+		QString uid = cxMesh->getUid();
 
-			mOutputTypes[1]->setValue(uid);
-		}else{
-			ssc::messageManager()->sendError("Could not import vtk centerline: "+vtkFilename);
-			return false;
-		}
+		mOutputTypes[1]->setValue(uid);
 	}
 
 	// Segmentation
@@ -260,24 +250,25 @@ bool TubeSegmentationFilter::postProcess()
 	{
 		//get segmented volume
 		SIPL::int3* size = mOutput->getSize();
-		vtkImageDataPtr rawSegmentation = this->convertToVtkImageData(mOutput->getSegmentation(), size->x, size->y, size->z, input);
+		vtkImageDataPtr rawSegmentation = this->convertToVtkImageData(mOutput->getSegmentation(), size->x, size->y, size->z, inputImage);
 
 		//make contour of segmented volume
 		double threshold = 1;/// because the segmented image is 0..1
 		vtkPolyDataPtr rawContour = ContourFilter::execute(rawSegmentation, threshold);
 
 		//add segmentation internally to cx
-		QString uidSegmentation = input->getUid() + "_tsf_seg%1";
-		QString nameSegmentation = input->getName()+"_tsf_seg%1";
-		ssc::ImagePtr outputSegmentation = ssc::dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, input);
+		QString uidSegmentation = inputImage->getUid() + "_tsf_seg%1";
+		QString nameSegmentation = inputImage->getName()+"_tsf_seg%1";
+		ssc::ImagePtr outputSegmentation = ssc::dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, inputImage);
 		if (!outputSegmentation)
 			return false;
-		outputSegmentation->get_rMd_History()->setRegistration(rMd);
+
+		outputSegmentation->get_rMd_History()->setRegistration(rMd_c);
 		ssc::dataManager()->loadData(outputSegmentation);
 		ssc::dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
 
 		//add contour internally to cx
-		ssc::MeshPtr contour = ContourFilter::postProcess(rawContour, input, QColor("blue"));
+		ssc::MeshPtr contour = ContourFilter::postProcess(rawContour, inputImage, QColor("blue"));
 
 		//set output
 		mOutputTypes[2]->setValue(outputSegmentation->getUid());
@@ -288,12 +279,12 @@ bool TubeSegmentationFilter::postProcess()
 	//======================================================
 	if(mOutput->hasTDF())
 	{
-		QString uidTDF = input->getUid() + "_tsf_tdf%1";
-		QString nameTDF = input->getName()+"_tsf_tdf%1";
+		QString uidTDF = inputImage->getUid() + "_tsf_tdf%1";
+		QString nameTDF = inputImage->getName()+"_tsf_tdf%1";
 		SIPL::int3* size = mOutput->getSize();
 
 		// convert volume
-		vtkImageDataPtr convertedImageData = this->convertToVtkImageData(mOutput->getTDF(), size->x, size->y, size->z, input);
+		vtkImageDataPtr convertedImageData = this->convertToVtkImageData(mOutput->getTDF(), size->x, size->y, size->z, inputImage);
 
 		//scale volume
 		if (!convertedImageData)
@@ -311,10 +302,12 @@ bool TubeSegmentationFilter::postProcess()
 		cast->Update();
 		convertedImageData = cast->GetOutput();
 
-		ssc::ImagePtr outputTDF = ssc::dataManager()->createDerivedImage(convertedImageData,uidTDF, nameTDF, input);
+		ssc::ImagePtr outputTDF = ssc::dataManager()->createDerivedImage(convertedImageData,uidTDF, nameTDF, inputImage);
 		if (!outputTDF)
 			return false;
-		outputTDF->get_rMd_History()->setRegistration(rMd);
+
+		rMd_i = rMd_i * d_iMd_c; //translation due to cropping accounted for
+		outputTDF->get_rMd_History()->setRegistration(rMd_i);
 		ssc::dataManager()->loadData(outputTDF);
 		ssc::dataManager()->saveImage(outputTDF, patientService()->getPatientData()->getActivePatientFolder());
 
@@ -335,15 +328,15 @@ void TubeSegmentationFilter::createOptions()
 	this->createDefaultOptions(mOptions);
 
 	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
-	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); stringIt++)
+	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 		mOptionsAdapters.push_back(*stringIt);
 
 	std::vector<ssc::BoolDataAdapterXmlPtr>::iterator boolIt;
-	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); boolIt++)
+	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
 		mOptionsAdapters.push_back(*boolIt);
 
 	std::vector<ssc::DoubleDataAdapterXmlPtr>::iterator doubleIt;
-	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); doubleIt++)
+	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
 		mOptionsAdapters.push_back(*doubleIt);
 }
 
@@ -436,7 +429,7 @@ void TubeSegmentationFilter::loadNewParametersSlot()
 		{
 			setParameter(list, "parameters", mParameterFile.toStdString());
 			loadParameterPreset(list, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
-		} catch (SIPL::SIPLException e)
+		} catch (SIPL::SIPLException& e)
 		{
 			ssc::messageManager()->sendWarning("Error when loading a parameter file. Preset is corrupt. "+QString(e.what()));
 			return;
@@ -550,6 +543,20 @@ vtkImageDataPtr TubeSegmentationFilter::importRawImageData(void * data, int size
 
 	vtkImageDataPtr retval = vtkImageDataPtr::New();
 	retval->DeepCopy(imageImport->GetOutput());
+
+	return retval;
+}
+
+ssc::MeshPtr TubeSegmentationFilter::loadVtkFile(QString pathToFile, QString newDatasUid){
+	ssc::PolyDataMeshReader reader;
+	ssc::DataPtr data;
+	if(reader.canLoad("vtk", pathToFile))
+		data = reader.load(newDatasUid, pathToFile);
+
+	ssc::MeshPtr retval = boost::dynamic_pointer_cast<ssc::Mesh>(data);
+
+	if(!data or !retval)
+		ssc::messageManager()->sendError("Could not load "+pathToFile);
 
 	return retval;
 }
@@ -868,18 +875,18 @@ void TubeSegmentationFilter::printParameters(paramList parameters)
     std::cout << "The following parameters are set: " << std::endl;
 
     boost::unordered_map<std::string,StringParameter>::iterator itString;
-    for(itString = parameters.strings.begin(); itString != parameters.strings.end(); itString++) {
+    for(itString = parameters.strings.begin(); itString != parameters.strings.end(); ++itString) {
     	std::cout << itString->first << " " << itString->second.get() << std::endl;
     }
 
     boost::unordered_map<std::string,BoolParameter>::iterator itBool;
-    for(itBool = parameters.bools.begin(); itBool != parameters.bools.end(); itBool++) {
+    for(itBool = parameters.bools.begin(); itBool != parameters.bools.end(); ++itBool) {
     	std::string value = itBool->second.get() ? "true" : "false";
     	std::cout << itBool->first << " " << value << std::endl;
     }
 
     boost::unordered_map<std::string,NumericParameter>::iterator itNumeric;
-    for(itNumeric = parameters.numerics.begin(); itNumeric != parameters.numerics.end(); itNumeric++) {
+    for(itNumeric = parameters.numerics.begin(); itNumeric != parameters.numerics.end(); ++itNumeric) {
     	std::cout << itNumeric->first << " " << itNumeric->second.get() << std::endl;
     }
 

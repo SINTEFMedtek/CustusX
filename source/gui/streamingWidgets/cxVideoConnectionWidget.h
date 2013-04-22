@@ -61,7 +61,7 @@ private slots:
   void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverStatusChangedSlot();
   void browseLocalServerSlot();
-  void saveSnapshotSlot(); ///<Save snapshot of RT image/volume
+  void importStreamImageSlot(); ///<Import a single image/volume from the RT stream
 
   void dataChanged();
   void initScriptSelected(QString filename);
@@ -77,7 +77,7 @@ private:
   virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
 
   QPushButton* mConnectButton;
-  QPushButton* mSnapshotButton;
+  QPushButton* mImportStreamImageButton;
   QVBoxLayout* mToptopLayout;
   ssc::FileSelectWidget* mInitScriptWidget;
   // remote server widgets:
