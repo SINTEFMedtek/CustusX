@@ -16,12 +16,18 @@
 set -x
 WORKSPACE=$1
 ISB_PASSWORD=$2
+CX_SOURCE_DIR=$WORKSPACE/working/CustusX3/CustusX3
 CX_DEBUG_DIR=$WORKSPACE/working/CustusX3/build_Debug
 
 # ==========================================================
 # configure and build all libs with debug info
 ./working/CustusX3/CustusX3/install/Shared/script/cxInstaller.py --full --all -t Debug -j4 -s --isb_password=$ISB_PASSWORD -u custusx --external_dir=$WORKSPACE/external --working_dir=$WORKSPACE/working --cmake_args="-DBUILD_DOCUMENTATION:BOOL=OFF" --coverage
 #./working/CustusX3/CustusX3/install/Shared/script/cxInstaller.py --full -t Debug -j4 -s --isb_password=sintefsvn -u custusx --external_dir=$WORKSPACE/external --working_dir=$WORKSPACE/working --cmake_args="-DBUILD_DOCUMENTATION:BOOL=OFF" --coverage CustusX3
+
+# clear local modifications in the data folder - the tests might cause these changes
+cd $CX_SOURCE_DIR/data
+git fetch --all
+git reset --hard
 
 # ==========================================================
 # make the CustusX project in order to provoke a build failure.
