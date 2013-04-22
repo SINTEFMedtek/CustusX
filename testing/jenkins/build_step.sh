@@ -20,12 +20,18 @@
 set -x
 WORKSPACE=$1
 ISB_PASSWORD=$2
+CX_SOURCE_DIR=$WORKSPACE/working/CustusX3/CustusX3
 CX_RELEASE_DIR=$WORKSPACE/working/CustusX3/build_Release
 
 # ==========================================================
 # Download, configure and build the project group.
 # Python script will return success even if some parts failed.
 ./working/CustusX3/CustusX3/install/Shared/script/cxInstaller.py --full --all -t Release -j4 -s --isb_password=$ISB_PASSWORD -u custusx --external_dir=$WORKSPACE/external --working_dir=$WORKSPACE/working --cmake_args="-DBUILD_DOCUMENTATION:BOOL=OFF"
+
+# clear local modifications in the data folder - the tests might cause these changes
+cd $CX_SOURCE_DIR/data
+git fetch --all
+git reset --hard
 
 # ==========================================================
 # make the CustusX project in order to provoke a build failure.
