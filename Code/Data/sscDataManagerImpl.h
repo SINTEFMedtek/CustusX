@@ -23,16 +23,40 @@
 #include <map>
 #include <set>
 #include <string>
+#include <QMutex>
 #include <vector>
 #include "sscImage.h"
 #include "sscMesh.h"
 #include "sscDataManager.h"
 #include <QFileInfo>
+#include "boost/scoped_ptr.hpp"
 
 class QDomElement;
 
 namespace ssc
 {
+
+/** Locks a static mutex in the constructor and unlocks it in the desctructor,
+  * similar to a QMutexLocker.
+  *
+  * Use this as a global access restriction for thread-unsafe VTK objects.
+  *
+  * Testing has shown that the following methods need to be mutexed:
+  *   - vtkMetaImageReader::Update()
+  *   - vtkMetaImageWrite::Write()
+  * There are probably some global stuff inside vtkmetaio.
+  *
+  * Note: Googling indicates that VTK in general is threadUNsafe.
+  */
+class StaticMutexVtkLocker
+{
+public:
+	StaticMutexVtkLocker();
+	~StaticMutexVtkLocker();
+private:
+	static boost::shared_ptr<QMutex> mMutex;
+};
+
 
 /**\brief Interface for Data file readers.
  *

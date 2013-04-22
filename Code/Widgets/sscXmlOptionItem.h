@@ -59,8 +59,9 @@ private:
  * Both the xml document and filename are stored,
  * and save/load are provided.
  *
- * Several instances of the same object points to the same internal
- * object, in the same way as QSettings.
+ * Several instances of the same file points to the same internal
+ * object, in the same way as QSettings. This means that they share the
+ * QDomDocument, and is NOT threadsafe.
  *
  * The object has a current element, which is used to ease work
  * at a specified level in the hierarchy. Use descend/ascend
@@ -111,7 +112,6 @@ private:
 	QDomDocument mDocument;
 	QDomElement mCurrentElement; ///< all getElement() operations are performed relative to this node.
 
-	static class SharedDocuments* mSharedDocuments;
 };
 
 } // namespace ssc

@@ -14,13 +14,14 @@ public:
 
 public:
 	CPPUNIT_TEST_SUITE( TestViewContainer );
+#ifndef __APPLE__
 		CPPUNIT_TEST( testInitialize );
 		CPPUNIT_TEST( testEmptyViewContainer );
 		CPPUNIT_TEST( test_ACS_3D_Tool_Container );
 		CPPUNIT_TEST( test_AnyDual_3D_Tool_Container );
 		CPPUNIT_TEST( test_3D_Composite_Views_GPU_Container );
+#endif
 	CPPUNIT_TEST_SUITE_END();
-
 private:
 	class ContainerWindow *widget;
 	QStringList image;

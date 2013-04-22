@@ -189,6 +189,7 @@ private slots:
 	virtual void sendTransform();
 
 private:
+	void stopThread();
 	void createPolyData();
 	std::vector<Transform3D> createToolPositionMovement(const DoubleBoundingBox3D& bb) const;
 	Transform3D* getNextTransform();

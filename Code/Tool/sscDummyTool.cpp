@@ -63,17 +63,16 @@ DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 
 	DoubleBoundingBox3D bb(Vector3D(0,0,0), Vector3D(512,512,256));
 	setToolPositionMovementBB(bb);
-//	std::cout << "dummytool" << std::endl;
-
-//	this->createPolyData();
 	mPolyData = this->createPolyData(150, 15, 4, 2);
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
-	connect(manager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	if (manager)
+		connect(manager, SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 DummyTool::~DummyTool()
 {
+	this->stopThread();
 }
 
 std::set<Tool::Type> DummyTool::getTypes() const
@@ -166,16 +165,31 @@ bool DummyTool::isCalibrated() const
 {
 	return true;
 }
-void DummyTool::stopTracking()
+
+void DummyTool::stopThread()
 {
 	disconnect(mThread, SIGNAL(ping()), this, SLOT(sendTransform()));
+
 	mThread->quit();
-//	mTimer->stop();
+	mThread->wait(2000); // forever or until dead thread
+
+	if (mThread->isRunning())
+	{
+		mThread->terminate();
+		mThread->wait(); // forever or until dead thread
+	}
+}
+
+void DummyTool::stopTracking()
+{
+	this->stopThread();
+
 	std::cout << "stop tracking" << std::endl;
 
 	mVisible = false;
 	emit toolVisible(mVisible);
 }
+
 void DummyTool::setVisible(bool val)
 {
 	mVisible = val;

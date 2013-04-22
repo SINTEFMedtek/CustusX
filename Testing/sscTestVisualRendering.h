@@ -28,15 +28,19 @@ public:
 		CPPUNIT_TEST( testInitialize );
 		CPPUNIT_TEST( testEmptyView );
 		CPPUNIT_TEST( test_3D_Tool );
+#ifndef __APPLE__
 		CPPUNIT_TEST( test_3D_Tool_GPU );
 		CPPUNIT_TEST( test_3D_Composite_GPU );
 		CPPUNIT_TEST( test_3D_Composite_Views_GPU );
+#endif
 		CPPUNIT_TEST( test_ACS_3D_Tool );
 		CPPUNIT_TEST( test_AnyDual_3D_Tool );
 		CPPUNIT_TEST( test_ACS_3Volumes );
 		CPPUNIT_TEST( test_AnyDual_3Volumes );
+#ifndef __APPLE__
 		CPPUNIT_TEST( test_ACS_3Volumes_GPU );
 		CPPUNIT_TEST( test_3D_RGB_GPU );
+#endif
 		CPPUNIT_TEST( test_3D_Lut );
 	CPPUNIT_TEST_SUITE_END();
 
