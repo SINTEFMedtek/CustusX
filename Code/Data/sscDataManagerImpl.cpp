@@ -57,6 +57,22 @@
 namespace ssc
 {
 
+//---------------------------------------------------------
+StaticMutexVtkLocker::StaticMutexVtkLocker()
+{
+	if (!mMutex)
+		mMutex.reset(new QMutex(QMutex::Recursive));
+
+	mMutex->lock();
+}
+StaticMutexVtkLocker::~StaticMutexVtkLocker()
+{
+	mMutex->unlock();
+}
+boost::shared_ptr<QMutex> StaticMutexVtkLocker::mMutex;
+//---------------------------------------------------------
+
+
 //-----
 DataPtr MincImageReader::load(const QString& uid, const QString& filename)
 {
@@ -105,6 +121,15 @@ DataPtr MincImageReader::load(const QString& uid, const QString& filename)
 	//////////////////////////////
 }
 
+/** Wrapper for vtkAlgorithm::Update(),
+  * prints error message upon error,
+  * also wraps the call inside a global mutex (see below for why).
+  *
+  * \ingroup sscData
+  * \date jan 1, 2010
+  * \date april 17, 2013
+  * \author christiana
+  */
 class ErrorObserver: public vtkCommand
 {
 public:
@@ -118,7 +143,6 @@ public:
 	virtual void Execute(vtkObject* caller, unsigned long, void* text)
 	{
 		mMessage = QString(reinterpret_cast<char*> (text));
-//		std::cout << "executing" << std::endl;
 	}
 	QString mMessage;
 
@@ -127,7 +151,11 @@ public:
 		vtkSmartPointer<ErrorObserver> errorObserver = vtkSmartPointer<ErrorObserver>::New();
 		reader->AddObserver("ErrorEvent", errorObserver);
 
-		reader->Update();
+		{
+			StaticMutexVtkLocker lock;
+			reader->Update();
+		}
+//		ErrorObserver::threadSafeUpdate(reader);
 
 		if (!errorObserver->mMessage.isEmpty())
 		{
@@ -137,11 +165,7 @@ public:
 		}
 		return true;
 	}
-
 };
-namespace
-{
-}
 
 //-----
 vtkImageDataPtr MetaImageReader::load(const QString& filename)

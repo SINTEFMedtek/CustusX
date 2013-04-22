@@ -61,13 +61,16 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
     add_test(TestDataManager TestDataManager)
 	#SETUP_TARGET_FOR_COVERAGE(CoverageTestDataManager TestDataManager CoverageTestDataManager.xml)
     
-    # test rendering of a 3D volume 
-    # - ssc::View
-    # - ssc::VolumetricRep
-    add_executable(TestVolumetricRep sscTestRenderVolumetricRep.cpp)
-    target_link_libraries( TestVolumetricRep SSC )	
-    set_target_properties(TestVolumetricRep PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
-    add_test(TestVolumetricRep TestVolumetricRep)
+	# test rendering of a 3D volume
+	# - ssc::View
+	# - ssc::ProgressiveLODVolumetricRep
+    # only working on Linux:
+    if(NOT APPLE)
+		add_executable(TestVolumetricRep sscTestRenderVolumetricRep.cpp)
+		target_link_libraries( TestVolumetricRep SSC )
+		set_target_properties(TestVolumetricRep PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
+		add_test(TestVolumetricRep TestVolumetricRep)
+    endif()
     
     # test adding a mesh to the datamanager.
     # - ssc::Mesh

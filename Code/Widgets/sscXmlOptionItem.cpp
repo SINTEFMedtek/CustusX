@@ -38,16 +38,40 @@
 namespace ssc
 {
 
-SharedDocuments* XmlOptionFile::mSharedDocuments = NULL;
-
 /**Helper class for reusing opened documents instead of creating new instances to them.
  *
  */
 class SharedDocuments
 {
 public:
+	static SharedDocuments* getInstance()
+	{
+		if (!mInstance)
+			mInstance = new SharedDocuments();
+		return mInstance;
+	}
+
+	/** read the document given by filename from disk,
+	  * but use a cached document if already loaded.
+	  */
+	QDomDocument loadDocument(const QString& filename)
+	{
+		QDomDocument retval;
+		retval = this->getDocument(filename);
+		if (retval.isNull())
+		{
+			retval = this->readFromFile(filename);
+			this->addDocument(filename, retval);
+		}
+		return retval;
+	}
+
+private:
+	SharedDocuments() : mDocumentMutex(QMutex::Recursive) {}
+
 	QDomDocument getDocument(const QString& filename)
 	{
+		QMutexLocker lock(&mDocumentMutex);
 		DocumentMap::iterator iter = mDocuments.find(filename);
 		// if filename found, attempt to retrieve document from node.
 		if (iter != mDocuments.end())
@@ -59,32 +83,38 @@ public:
 
 	void addDocument(const QString& filename, QDomDocument document)
 	{
+		QMutexLocker lock(&mDocumentMutex);
 		mDocuments[filename] = document.documentElement();
 	}
 
-private:
+	QDomDocument readFromFile(QString filename)
+	{
+		QFile file(filename);
+		if (!file.open(QIODevice::ReadOnly))
+		{
+			return QDomDocument();
+		}
+
+		QDomDocument loadedDoc;
+		QString error;
+		int line, col;
+		if (!loadedDoc.setContent(&file, &error, &line, &col))
+		{
+			QString msg = QString("error setting xml content [%1,%2] %3").arg(line).arg(col).arg(error);
+			ssc::messageManager()->sendWarning(msg);
+		}
+		file.close();
+		return loadedDoc;
+	}
+
+	static SharedDocuments* mInstance;
 	typedef std::map<QString, QDomElement> DocumentMap;
+	QMutex mDocumentMutex;
 	DocumentMap mDocuments; ///< QDomElement points to the documentElement. This acts as a weak_ptr.
-
-	//    QDomDocument getDocument(const QString& filename)
-	//    {
-	//      DocumentMap::iterator iter = mDocuments.find(filename);
-	//      QDomDocument retval;
-	//      // if filename found, attempt to retrieve document from node.
-	//      if (iter!=mDocuments.end())
-	//      {
-	//        retval = iter->second.ownerDocument();
-	//      }
-	//      // if document is invalid, load file anew.
-	//      if (retval.isNull())
-	//      {
-	//        retval = this->load(filename);
-	//        mDocuments[filename] = retval.documentElement();
-	//      }
-	//      return retval;
-	//    }
-
 };
+///--------------------------------------------------------
+SharedDocuments* SharedDocuments::mInstance = NULL;
+///--------------------------------------------------------
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -155,22 +185,24 @@ XmlOptionFile::XmlOptionFile()
 XmlOptionFile::XmlOptionFile(QString filename, QString name) :
 	mFilename(filename)
 {
-	if (!mSharedDocuments)
-	{
-		mSharedDocuments = new SharedDocuments;
-	}
+	mDocument = SharedDocuments::getInstance()->loadDocument(filename);
 
-	mDocument = mSharedDocuments->getDocument(filename);
-	if (mDocument.isNull())
-	{
-		//    std::cout << "    no doc found, creating new. " << std::endl;
-		this->load();
-		mSharedDocuments->addDocument(filename, mDocument);
-	}
-	else
-	{
-		//    std::cout << "    reusing cached document" << std::endl;
-	}
+//	if (!mSharedDocuments)
+//	{
+//		mSharedDocuments = new SharedDocuments;
+//	}
+
+//	mDocument = mSharedDocuments->getDocument(filename);
+//	if (mDocument.isNull())
+//	{
+//		//    std::cout << "    no doc found, creating new. " << std::endl;
+//		this->load();
+//		mSharedDocuments->addDocument(filename, mDocument);
+//	}
+//	else
+//	{
+//		//    std::cout << "    reusing cached document" << std::endl;
+//	}
 
 	mCurrentElement = mDocument.documentElement();
 
@@ -333,29 +365,29 @@ void XmlOptionFile::save()
 	}
 }
 
-void XmlOptionFile::load()
-{
-	QFile file(mFilename);
-	if (!file.open(QIODevice::ReadOnly))
-	{
-		// ok to not find file - we have nice defaults.
-		//ssc::messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
-	}
-	else
-	{
-		QDomDocument loadedDoc;
-		QString error;
-		int line, col;
-		if (!loadedDoc.setContent(&file, &error, &line, &col))
-		{
-			ssc::messageManager()->sendWarning("error setting xml content [" + qstring_cast(line) + "," + qstring_cast(
-				col) + "]" + qstring_cast(error));
-		}
-		file.close();
-		mDocument = loadedDoc;
-		mCurrentElement = mDocument.documentElement();
-	}
+//void XmlOptionFile::load()
+//{
+//	QFile file(mFilename);
+//	if (!file.open(QIODevice::ReadOnly))
+//	{
+//		// ok to not find file - we have nice defaults.
+//		//ssc::messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
+//	}
+//	else
+//	{
+//		QDomDocument loadedDoc;
+//		QString error;
+//		int line, col;
+//		if (!loadedDoc.setContent(&file, &error, &line, &col))
+//		{
+//			ssc::messageManager()->sendWarning("error setting xml content [" + qstring_cast(line) + "," + qstring_cast(
+//				col) + "]" + qstring_cast(error));
+//		}
+//		file.close();
+//		mDocument = loadedDoc;
+//		mCurrentElement = mDocument.documentElement();
+//	}
 
-}
+//}
 
 } // namespace ssc
