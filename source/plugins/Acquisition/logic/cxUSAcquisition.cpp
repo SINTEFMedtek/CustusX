@@ -14,69 +14,29 @@
 
 #include "cxUSAcquisition.h"
 
-#include <QtConcurrentRun>
-#include "boost/bind.hpp"
-
-#include "sscToolManager.h"
-#include "sscTypeConversions.h"
-#include "cxPatientData.h"
-#include "cxSettings.h"
-#include "sscMessageManager.h"
-#include "cxTool.h"
-#include "cxPatientService.h"
-#include "cxVideoService.h"
 #include "sscReconstructManager.h"
-#include "cxDataLocations.h"
-#include "sscTime.h"
-#include "cxUsReconstructionFileMaker.h"
-#include "cxSavingVideoRecorder.h"
 #include "sscReconstructParams.h"
 #include "sscBoolDataAdapterXml.h"
+
+#include "cxPatientData.h"
+#include "cxSettings.h"
+#include "cxPatientService.h"
+#include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
 #include "cxToolManager.h"
-#include "sscLogger.h"
-#include "cxImageDataContainer.h"
+#include "cxUSSavingRecorder.h"
+#include "cxAcquisitionData.h"
 
 namespace cx
 {
 
-
-void USAcquisitionCore::startRecord(RecordSessionPtr session, ssc::ToolPtr tool, std::vector<ssc::VideoSourcePtr> video)
-{
-
-}
-
-void USAcquisitionCore::stopRecord()
-{
-
-}
-
-void USAcquisitionCore::cancelRecord()
-{
-
-}
-
-ssc::USReconstructInputData USAcquisitionCore::getDataForStream(QString streamUid)
-{
-	return ssc::USReconstructInputData();
-}
-
-void USAcquisitionCore::startSaveData(bool compressImages, bool writeColor)
-{
-
-}
-
-unsigned USAcquisitionCore::numberOfSavingThreads() const
-{
-	return 0;
-}
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
 USAcquisition::USAcquisition(AcquisitionPtr base, QObject* parent) : QObject(parent), mBase(base)
 {
+	mCore.reset(new USSavingRecorder());
+	connect(mCore.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(checkIfReadySlot()));
+	connect(mCore.get(), SIGNAL(saveDataCompleted(QString)), this, SIGNAL(saveDataCompleted(QString)));
+
+
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
 	connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
 	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(checkIfReadySlot()));
@@ -122,7 +82,7 @@ void USAcquisition::checkIfReadySlot()
 			mWhatsMissing.append("<font color=red>Need to start streaming.</font><br>");
 	}
 
-	int saving = mSaveThreads.size();
+	int saving = mCore->getNumberOfSavingThreads();
 
 	if (saving!=0)
 		mWhatsMissing.append(QString("<font color=orange>Saving %1 acquisition data.</font><br>").arg(saving));
@@ -139,112 +99,61 @@ void USAcquisition::checkIfReadySlot()
 	mBase->setReady(streaming, mWhatsMissing);
 }
 
-ssc::TimedTransformMap USAcquisition::getRecording(RecordSessionPtr session)
+int USAcquisition::getNumberOfSavingThreads() const
 {
-	ssc::TimedTransformMap retval;
-
-	if(mRecordingTool)
-		retval = mRecordingTool->getSessionHistory(session->getStartTime(), session->getStopTime());
-
-	if(retval.empty())
-	{
-		ssc::messageManager()->sendError("Could not find any tracking data from session "+session->getUid()+". Volume data only will be written.");
-	}
-
-	return retval;
+	return mCore->getNumberOfSavingThreads();
 }
 
-void USAcquisition::saveSession()
+void USAcquisition::recordStarted()
 {
-	//get session data
-	RecordSessionPtr session = mBase->getLatestSession();
-	if (!session)
-		return;
+	mBase->getPluginData()->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
 
-	ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
-	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	mCore->setWriteColor(this->getWriteColor());
+	mCore->startRecord(mBase->getLatestSession(), tool, this->getRecordingVideoSources(tool));
+}
 
-	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
-	{
-		CachedImageDataContainerPtr imageData = mVideoRecorder[i]->getImageData();
-		std::vector<double> imageTimestamps = mVideoRecorder[i]->getTimestamps();
-		QString streamSessionName = session->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid();
+void USAcquisition::recordStopped()
+{
+	mCore->stopRecord();
 
-		// complete writing of images to temporary storage. Do this before using the image data.
-		mVideoRecorder[i]->completeSave();
-		mVideoRecorder[i].reset();
-		std::cout << QString("completed save of cached video stream %1").arg(i) << std::endl;
+	this->sendAcquisitionDataToReconstructer();
 
-		UsReconstructionFileMakerPtr fileMaker;
-		fileMaker.reset(new UsReconstructionFileMaker(streamSessionName));
+	mCore->set_rMpr(*ssc::toolManager()->get_rMpr());
+	bool compress = settings()->value("Ultrasound/CompressAcquisition", true).toBool();
+	QString baseFolder = patientService()->getPatientData()->getActivePatientFolder();
+	mCore->startSaveData(baseFolder, compress);
 
-		ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(imageData,
-		                                                                            imageTimestamps,
-		                                                                            trackerRecordedData,
-		                                                                            mRecordingTool,
-		                                                                            this->getWriteColor(),
-		                                                                            rMpr);
-//		fileMaker->setReconstructData(reconstructData);
-
-		if (i==0)
-		{
-			mBase->getPluginData()->getReconstructer()->selectData(reconstructData);
-			emit acquisitionDataReady();
-		}
-
-		QString saveFolder = UsReconstructionFileMaker::createFolder(patientService()->getPatientData()->getActivePatientFolder(), session->getDescription());
-
-		this->saveStreamSession(reconstructData, saveFolder, streamSessionName);
-	}
-
-	mVideoRecorder.clear();
+	mCore->clearRecording();
 
 	this->checkIfReadySlot();
 }
 
-void USAcquisition::saveStreamSession(ssc::USReconstructInputData reconstructData, QString saveFolder, QString streamSessionName)
+void USAcquisition::recordCancelled()
 {
-	UsReconstructionFileMakerPtr fileMaker;
-	fileMaker.reset(new UsReconstructionFileMaker(streamSessionName));
-	fileMaker->setReconstructData(reconstructData);
-
-	// now start saving of data to the patient folder, compressed version:
-	QFuture<QString> fileMakerFuture =
-			QtConcurrent::run(boost::bind(
-								  &UsReconstructionFileMaker::writeToNewFolder,
-								  fileMaker,
-								  saveFolder,
-								  settings()->value("Ultrasound/CompressAcquisition", true).toBool()
-								  ));
-	QFutureWatcher<QString>* fileMakerFutureWatcher = new QFutureWatcher<QString>();
-	fileMakerFutureWatcher->setFuture(fileMakerFuture);
-	connect(fileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
-	mSaveThreads.push_back(fileMakerFutureWatcher);
-	fileMaker.reset(); // filemaker is now stored in the mSaveThreads queue, clear as current.
+	mCore->cancelRecord();
 }
 
-void USAcquisition::fileMakerWriteFinished()
+void USAcquisition::sendAcquisitionDataToReconstructer()
 {
-	std::list<QFutureWatcher<QString>*>::iterator iter;
-	for (iter=mSaveThreads.begin(); iter!=mSaveThreads.end(); ++iter)
+	mCore->set_rMpr(*ssc::toolManager()->get_rMpr());
+
+	ssc::VideoSourcePtr activeVideoSource = videoService()->getActiveVideoSource();
+	if (activeVideoSource)
 	{
-		if (!(*iter)->isFinished())
-			continue;
-		QString result = (*iter)->future().result();
-		delete *iter;
-		iter = mSaveThreads.erase(iter);
-		emit saveDataCompleted(result);
+		ssc::USReconstructInputData data = mCore->getDataForStream(activeVideoSource->getUid());
+		mBase->getPluginData()->getReconstructer()->selectData(data);
+		emit acquisitionDataReady();
 	}
-	this->checkIfReadySlot();
 }
 
-std::vector<ssc::VideoSourcePtr> USAcquisition::getRecordingVideoSources()
+std::vector<ssc::VideoSourcePtr> USAcquisition::getRecordingVideoSources(ssc::ToolPtr tool)
 {
 	std::vector<ssc::VideoSourcePtr> retval;
 
-	if (mRecordingTool && mRecordingTool->getProbe())
+	if (tool && tool->getProbe())
 	{
-		ssc::ProbePtr probe = mRecordingTool->getProbe();
+		ssc::ProbePtr probe = tool->getProbe();
 		QStringList sources = probe->getAvailableVideoSources();
 		for (unsigned i=0; i<sources.size(); ++i)
 			retval.push_back(probe->getRTSource(sources[i]));
@@ -263,59 +172,5 @@ bool USAcquisition::getWriteColor() const
 	        ||  !settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 	return writeColor;
 }
-
-void USAcquisition::recordStarted()
-{
-	// assert that previous recording have been cleared
-	SSC_ASSERT(!mRecordingTool);
-	SSC_ASSERT(mVideoRecorder.empty());
-
-	mRecordingTool = ToolManager::getInstance()->findFirstProbe();
-	std::vector<ssc::VideoSourcePtr> sources = this->getRecordingVideoSources();
-	RecordSessionPtr session = mBase->getLatestSession();
-
-	QString tempBaseFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
-	QString cacheFolder = UsReconstructionFileMaker::createUniqueFolder(tempBaseFolder, session->getDescription());
-
-	mBase->getPluginData()->getReconstructer()->selectData(ssc::USReconstructInputData()); // clear old data in reconstructeer
-
-	for (unsigned i=0; i<sources.size(); ++i)
-	{
-		SavingVideoRecorderPtr videoRecorder;
-		videoRecorder.reset(new SavingVideoRecorder(
-		                         sources[i],
-								 cacheFolder,
-		                         QString("%1_%2").arg(session->getDescription()).arg(sources[i]->getUid()),
-								 false, // no compression when saving to cache
-								 this->getWriteColor()));
-		videoRecorder->startRecord();
-		mVideoRecorder.push_back(videoRecorder);
-	}
-
-	ssc::messageManager()->sendSuccess("Ultrasound acquisition started.", true);
-}
-
-void USAcquisition::recordStopped()
-{
-	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
-		mVideoRecorder[i]->stopRecord();
-	ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
-	this->saveSession();
-	mRecordingTool.reset();
-}
-
-void USAcquisition::recordCancelled()
-{
-	mRecordingTool.reset();
-	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
-	{
-		mVideoRecorder[i]->stopRecord();
-		mVideoRecorder[i]->cancel();
-		mVideoRecorder[i].reset();
-	}
-	mVideoRecorder.clear();
-	ssc::messageManager()->sendInfo("Ultrasound acquisition cancelled.");
-}
-
 
 }

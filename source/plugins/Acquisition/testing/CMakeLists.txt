@@ -28,7 +28,7 @@ if (BUILD_TESTING)
 	# List of all test units
 	QT4_WRAP_CPP( CX_TEST_ACQUISITION_SOURCE_FILES
 		cxTestAcqController.h
-		cxTestAcqCoreController.h
+		cxTestUSSavingRecorderController.h
 		)
 
 	set(CX_TEST_ACQUISITION_SOURCE_FILES
@@ -36,8 +36,8 @@ if (BUILD_TESTING)
 		cxTestAcquisition.cpp
 		cxTestAcqController.cpp
 		cxTestAcqController.h
-		cxTestAcqCoreController.h
-		cxTestAcqCoreController.cpp
+		cxTestUSSavingRecorderController.h
+		cxTestUSSavingRecorderController.cpp
 		${CX_TEST_ACQUISITION_SOURCE_FILES}
 		)
 
