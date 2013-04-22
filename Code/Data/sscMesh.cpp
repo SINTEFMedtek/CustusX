@@ -191,12 +191,18 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(ssc::Transform3D transform)
 	poly->DeepCopy(getVtkPolyData());
 	vtkPointsPtr points = poly->GetPoints();
 
+	vtkPointsPtr floatPoints = vtkPointsPtr::New();
+	floatPoints->DeepCopy(points);
+	floatPoints->SetDataTypeToFloat();
 	for (int i = 0; i < poly->GetNumberOfPoints(); ++i)
 	{
 		ssc::Vector3D p(points->GetPoint(i));
 		p = transform.coord(p);
-		points->SetPoint(i, p.begin());
+		floatPoints->SetPoint(i, p.begin());
 	}
+	poly->SetPoints(floatPoints.GetPointer());
+	poly->Modified();
+	poly->Update();
 
 	return poly;
 }
