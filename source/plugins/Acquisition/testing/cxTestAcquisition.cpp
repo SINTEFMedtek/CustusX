@@ -137,19 +137,13 @@ void TestAcquisition::testConstructor()
 {
 }
 
-
-// start mhd file video source
-// start dummy probe ?
-// start acquisition
-// look for saved stuff (both inmem and ondisk)
-// turn on autoreconstruct and check that stuff is generated
 void TestAcquisition::testStoreMHDSourceLocalServer()
 {
 	TestAcqController controller(NULL);
 	controller.mConnectionMethod = "Local Server";
 	controller.mNumberOfExpectedStreams = 1;
 	controller.initialize();
-	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
+//	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	controller.verify();
 }
@@ -160,7 +154,7 @@ void TestAcquisition::testStoreMHDSourceDirectLink()
 	controller.mConnectionMethod = "Direct Link";
 	controller.mNumberOfExpectedStreams = 1;
 	controller.initialize();
-	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
+//	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	controller.verify();
 }
@@ -172,8 +166,7 @@ void TestAcquisition::testStoreMultipleMHDSourceDirectLink()
 	controller.mAdditionalGrabberArg = "--secondary";
 	controller.mNumberOfExpectedStreams = 2;
 	controller.initialize();
-	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
+//	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	controller.verify();
-
 }
