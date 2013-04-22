@@ -148,12 +148,14 @@ void TestAcqController::readinessChangedSlot()
 
 void TestAcqController::acquisitionDataReadySlot()
 {
+	SSC_LOG("");
 	// read data and print info - this if the result of the memory pathway
 	mMemOutputData = mAcquisitionData->getReconstructer()->getSelectedFileData();
 }
 
 void TestAcqController::saveDataCompletedSlot(QString path)
 {
+	SSC_LOG("");
 	if (!mAcquisition->getNumberOfSavingThreads())
 		QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
@@ -201,8 +203,13 @@ void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 
 void TestAcqController::verify()
 {
+	CPPUNIT_ASSERT(mAcquisition->getNumberOfSavingThreads()==0);
+
 	std::cout << " ** Resulting ssc::USReconstructInputData memory content:" << std::endl;
 	this->verifyFileData(mMemOutputData);
+
+	std::cout << "mNumberOfExpectedStreams: " << mNumberOfExpectedStreams << std::endl;
+	std::cout << "mFileOutputData.size(): " << mFileOutputData.size() << std::endl;
 
 	CPPUNIT_ASSERT(mNumberOfExpectedStreams==mFileOutputData.size());
 

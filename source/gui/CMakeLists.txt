@@ -73,7 +73,6 @@ SET(cxGui_MOC_HDRS
     toolWidgets/cxToolManagerWidget.h
     toolWidgets/cxProbeConfigWidget.h
     #----------------------
-	utilities/cxApplication.h
     utilities/cxAudio.h
     utilities/cxDoubleSpanSlider.h
     utilities/cxBaseWidget.h
@@ -253,8 +252,6 @@ SET(cxGui_SRCS
     toolWidgets/cxProbeConfigWidget.h
     toolWidgets/cxProbeConfigWidget.cpp
     #----------------------    
-	utilities/cxApplication.h
-	utilities/cxApplication.cpp
     utilities/cxDoubleSpanSlider.h
     utilities/cxDoubleSpanSlider.cpp
     utilities/cxTabbedWidget.h
