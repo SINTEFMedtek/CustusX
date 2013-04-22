@@ -29,9 +29,9 @@ int main(int argc, char **argv)
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
 #else
-	runner.addTest( new CppUnit::TestCaller<TestUSAcquisitionCore>(
-									   "TestUSAcquisitionCore::testOneVideoSource",
-										&TestUSAcquisitionCore::testOneVideoSource ) );
+	runner.addTest( new CppUnit::TestCaller<TestUSSavingRecorder>(
+									   "TestUSAcquisitionCore::testFourVideoSourcesWithToolAndSave	",
+										&TestUSSavingRecorder::testFourVideoSourcesWithToolAndSave ) );
 //	runner.addTest( new CppUnit::TestCaller<TestAcquisition>(
 //									   "TestAcquisition::testStoreMHDSourceLocalServer",
 //										&TestAcquisition::testStoreMHDSourceLocalServer ) );

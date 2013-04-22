@@ -4,9 +4,14 @@
 #include <cppunit/extensions/TestFactoryRegistry.h> 
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
-#include "sscReconstructManager.h"
 
-class TestUSAcquisitionCore : public CppUnit::TestFixture
+/** Unit tests for cx::USSavingRecorder
+ *
+ * \ingroup cxTest
+ * \date april 17, 2013
+ * \author christiana
+ */
+class TestUSSavingRecorder : public CppUnit::TestFixture
 {
 public:
 	void setUp();
@@ -19,7 +24,7 @@ public:
 	void testFourVideoSourcesWithToolAndSave();
 
 public:
-	CPPUNIT_TEST_SUITE( TestUSAcquisitionCore );
+	CPPUNIT_TEST_SUITE( TestUSSavingRecorder );
 		CPPUNIT_TEST( testOneVideoSource );
 		CPPUNIT_TEST( testOneVideoSourceWithTool );
 		CPPUNIT_TEST( testOneVideoSourceWithToolAndSave );
@@ -28,9 +33,13 @@ public:
 	CPPUNIT_TEST_SUITE_END();
 private:
 };
-CPPUNIT_TEST_SUITE_REGISTRATION( TestUSAcquisitionCore );
+CPPUNIT_TEST_SUITE_REGISTRATION( TestUSSavingRecorder );
 
-/**Unit tests that test the acquisition plugin
+/** Unit/integration tests that test the acquisition plugin
+ *
+ * \ingroup cxTest
+ * \date jan 1, 2012
+ * \author christiana
  */
 class TestAcquisition : public CppUnit::TestFixture
 {

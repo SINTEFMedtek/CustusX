@@ -228,6 +228,8 @@ std::vector<double> SavingVideoRecorder::getTimestamps()
 
 void SavingVideoRecorder::cancel()
 {
+	this->stopRecord();
+
 	mSaveThread->cancel();
 	mSaveThread->wait(); // wait indefinitely for thread to finish
 
