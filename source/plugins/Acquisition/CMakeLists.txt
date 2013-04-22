@@ -15,6 +15,7 @@
 SET( MOC_HEADER_FILES
     logic/cxAcquisitionData.h
     logic/cxUSAcquisition.h
+	logic/cxUSSavingRecorder.h
     gui/cxRecordSessionWidget.h
     gui/cxRecordBaseWidget.h
     gui/cxTrackedCenterlineWidget.h
@@ -35,6 +36,8 @@ SET( SOURCE_FILES
     logic/cxRecordSession.cpp
     logic/cxUSAcquisition.h
     logic/cxUSAcquisition.cpp
+	logic/cxUSSavingRecorder.h
+	logic/cxUSSavingRecorder.cpp
     gui/cxAcquisitionPlugin.h
     gui/cxAcquisitionPlugin.cpp
     gui/cxRecordSessionWidget.h

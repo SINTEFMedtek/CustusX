@@ -14,12 +14,8 @@
 #ifndef CXUSACQUISITION_H_
 #define CXUSACQUISITION_H_
 
-#include <QFuture>
-#include <QFutureWatcher>
-
-#include "cxRecordSession.h"
-#include "cxAcquisitionData.h"
-#include "sscTool.h"
+#include <vector>
+#include "cxForwardDeclarations.h"
 
 namespace ssc
 {
@@ -29,6 +25,9 @@ namespace cx
 {
 typedef boost::shared_ptr<class UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
 typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
+typedef boost::shared_ptr<class USSavingRecorder> USSavingRecorderPtr;
+typedef boost::shared_ptr<class Acquisition> AcquisitionPtr;
+
 
 /**
  * \file
@@ -36,69 +35,17 @@ typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
  * @{
  */
 
-
-/**
- * \brief Independent algorithms for storing acquisition data.
- * \ingroup cxPluginAcquisition
- *
- * Use the start/stop pair to record video from the input streams
- * during that period. A cancel instead of stop will clear the recording.
- * After stopping, use getDataForStream() to get unsaved reconstruct data.
- * Use startSaveData() to launch save threads AND clear the stored data.
- *
- * Intended to be a unit-testable part of the USAcquisition class.
- *
- *  \date April 17, 2013
- *  \author christiana
- */
-class USAcquisitionCore : public QObject
-{
-	Q_OBJECT
-public:
-	/**
-	  * Start recording
-	  */
-	void startRecord(RecordSessionPtr session, ssc::ToolPtr tool, std::vector<ssc::VideoSourcePtr> video);
-	void stopRecord();
-	void cancelRecord();
-
-	void set_rMpr(ssc::Transform3D rMpr);
-	/**
-	  * Retrieve an in-memory data set for the given stream uid.
-	  */
-	ssc::USReconstructInputData getDataForStream(QString streamUid);
-	/**
-	  * Start saving all data acquired after a start/stop record.
-	  * A separate saveDataCompleted() signal is emitted
-	  * for each completed saved stream.
-	  * Internal record data is cleared after this call.
-	  */
-	void startSaveData(bool compressImages, bool writeColor);
-	unsigned numberOfSavingThreads() const;
-
-signals:
-	void saveDataCompleted(QString mhdFilename); ///< emitted when data has been saved to file
-
-private:
-//	std::vector<SavingVideoRecorderPtr> mVideoRecorder;
-//	ssc::ToolPtr mRecordingTool;
-};
-typedef boost::shared_ptr<USAcquisitionCore> USAcquisitionCorePtr;
-
 /**
  * \brief Handles the us acquisition process.
  * \ingroup cxPluginAcquisition
  *
- * Usage:
- *  - ready() is emitted when change in readiness occurs. Use
- *    getWhatsMissingText() to display status
- *  - start/stop record handles the _streaming_ acquisition, NOT the tracking.
- *    This is done externally (yet).
- *  - saveSession() gives the id of the tracking recorded data as input, and
- *    saves all data to disk.
- *  - saveDataCompleted() is emitted when saving is finished.
+ * The USAcquisition object attaches itself to an
+ * input Acquisition object and records ultrasound
+ * data when the Acquisiton records.
  *
- *  TODO: merge the tracking recording into this class
+ * After a successful acquisition, the data is both sent to
+ * the reconstructer and saved to disk. saveDataCompleted() is
+ * emitted after a successful save of each video stream.
  *
  *  \date May 12, 2011
  *  \author christiana
@@ -109,35 +56,25 @@ class USAcquisition : public QObject
 public:
 	USAcquisition(AcquisitionPtr base, QObject* parent = 0);
 	virtual ~USAcquisition();
-	int getNumberOfSavingThreads() const { return mSaveThreads.size(); }
+	int getNumberOfSavingThreads() const;
 
 signals:
 	void acquisitionDataReady(); ///< emitted when data is acquired and sent to the reconstruction module
 	void saveDataCompleted(QString mhdFilename); ///< emitted when data has been saved to file
 
 private slots:
-	void fileMakerWriteFinished();
 	void checkIfReadySlot();
-	void saveSession();
 	void recordStarted();
 	void recordStopped();
 	void recordCancelled();
 
 private:
-	std::vector<ssc::VideoSourcePtr> getRecordingVideoSources();
+	std::vector<ssc::VideoSourcePtr> getRecordingVideoSources(ssc::ToolPtr tool);
 	bool getWriteColor() const;
-	void saveStreamSession(ssc::USReconstructInputData reconstructData, QString saveFolder, QString streamSessionName);
+	void sendAcquisitionDataToReconstructer();
 
 	AcquisitionPtr mBase;
-
-	// video and tool used at start of recording:
-	std::vector<SavingVideoRecorderPtr> mVideoRecorder;
-	ssc::ToolPtr mRecordingTool;
-
-	std::list<QFutureWatcher<QString>*> mSaveThreads;
-
-	virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session);
-
+	USSavingRecorderPtr mCore;
 };
 typedef boost::shared_ptr<USAcquisition> USAcquisitionPtr;
 

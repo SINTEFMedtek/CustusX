@@ -12,28 +12,28 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTESTACQCORECONTROLLER_H
-#define CXTESTACQCORECONTROLLER_H
+#ifndef CXTESTUSSAVINGRECORDERCONTROLLER_H
+#define CXTESTUSSAVINGRECORDERCONTROLLER_H
 
 #include <QApplication>
 #include "boost/function.hpp"
 #include "sscForwardDeclarations.h"
 #include "cxAcquisitionData.h"
-#include "cxUSAcquisition.h"
+#include "cxUSSavingRecorder.h"
 #include "cxUSReconstructInputData.h"
 
-/** Helper class for testing cx::USAcquisitionCore
+/** Helper class for testing cx::USSavingRecorder
  *
  * \ingroup cxTest
- * \date april 17, 2013
+ * \date April 17, 2013
  * \author christiana
  */
-class TestAcqCoreController : public QObject
+class TestUSSavingRecorderController : public QObject
 {
 	Q_OBJECT
 
 public:
-	TestAcqCoreController(QObject* parent);
+	TestUSSavingRecorderController(QObject* parent);
 
 	void addOperation(boost::function0<void> operation);
 
@@ -47,6 +47,7 @@ public:
 	void verifyMemData(QString uid);
 	void verifySaveData();
 
+	static QString getDataPath();
 
 private slots:
 	void runOperations();
@@ -60,8 +61,8 @@ private:
 	std::vector<ssc::VideoSourcePtr> mVideo;
 	QStringList mSavedData;
 
-	cx::USAcquisitionCorePtr mAcquisition;
+	cx::USSavingRecorderPtr mRecorder;
 	std::vector<boost::function0<void> > mOperations;
 };
 
-#endif // CXTESTACQCORECONTROLLER_H
+#endif // CXTESTUSSAVINGRECORDERCONTROLLER_H
