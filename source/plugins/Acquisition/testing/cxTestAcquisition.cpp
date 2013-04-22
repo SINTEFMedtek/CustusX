@@ -17,110 +17,102 @@
 #include "cxTestAcqController.h"
 
 #include "sscTestVideoSource.h"
-#include "cxTestAcqCoreController.h"
+#include "cxTestUSSavingRecorderController.h"
 #include "sscLogger.h"
 #include "sscDummyTool.h"
+#include "cxFileHelpers.h"
 
-void TestUSAcquisitionCore::setUp()
+void TestUSSavingRecorder::setUp()
 {
+	cx::removeNonemptyDirRecursively(TestUSSavingRecorderController::getDataPath());
 	ssc::MessageManager::initialize();
 }
 
-void TestUSAcquisitionCore::tearDown()
+void TestUSSavingRecorder::tearDown()
 {
-
+	ssc::MessageManager::shutdown();
+	cx::removeNonemptyDirRecursively(TestUSSavingRecorderController::getDataPath());
 }
 
-void TestUSAcquisitionCore::testOneVideoSource()
+void TestUSSavingRecorder::testOneVideoSource()
 {
-	TestAcqCoreController controller(NULL);
-//	controller.setRecordDuration(1000);
+	TestUSSavingRecorderController controller(NULL);
 	controller.setTool(ssc::ToolPtr());
 	controller.addVideoSource(80, 40);
 
-	controller.addOperation(boost::bind(&TestAcqCoreController::startRecord, &controller));
-	controller.addOperation(boost::bind(&TestAcqCoreController::wait, &controller, 1000));
-	controller.addOperation(boost::bind(&TestAcqCoreController::stopRecord, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::startRecord, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::wait, &controller, 1000));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::stopRecord, &controller));
 
-	SSC_LOG("pre exec");
 	qApp->exec();
-	SSC_LOG("post exec");
 
 	controller.verifyMemData("videoSource0");
 }
 
-void TestUSAcquisitionCore::testOneVideoSourceWithTool()
+void TestUSSavingRecorder::testOneVideoSourceWithTool()
 {
-	TestAcqCoreController controller(NULL);
+	TestUSSavingRecorderController controller(NULL);
 	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear());
 	controller.setTool(tool);
 	controller.addVideoSource(80, 40);
 
-	controller.addOperation(boost::bind(&TestAcqCoreController::startRecord, &controller));
-	controller.addOperation(boost::bind(&TestAcqCoreController::wait, &controller, 1000));
-	controller.addOperation(boost::bind(&TestAcqCoreController::stopRecord, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::startRecord, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::wait, &controller, 1000));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::stopRecord, &controller));
 
-	SSC_LOG("pre exec");
 	qApp->exec();
-	SSC_LOG("post exec");
 
 	controller.verifyMemData("videoSource0");
 }
 
-void TestUSAcquisitionCore::testOneVideoSourceWithToolAndSave()
+void TestUSSavingRecorder::testOneVideoSourceWithToolAndSave()
 {
-	TestAcqCoreController controller(NULL);
+	TestUSSavingRecorderController controller(NULL);
 	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear());
 	controller.setTool(tool);
 	controller.addVideoSource(80, 40);
 
-	controller.addOperation(boost::bind(&TestAcqCoreController::startRecord, &controller));
-	controller.addOperation(boost::bind(&TestAcqCoreController::wait, &controller, 1000));
-	controller.addOperation(boost::bind(&TestAcqCoreController::stopRecord, &controller));
-	controller.addOperation(boost::bind(&TestAcqCoreController::saveAndWaitForCompleted, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::startRecord, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::wait, &controller, 1000));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::stopRecord, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::saveAndWaitForCompleted, &controller));
 
-	SSC_LOG("pre exec");
 	qApp->exec();
-	SSC_LOG("post exec");
 
 	controller.verifySaveData();
 }
 
-void TestUSAcquisitionCore::testFourVideoSources()
+void TestUSSavingRecorder::testFourVideoSources()
 {
-	TestAcqCoreController controller(NULL);
+	TestUSSavingRecorderController controller(NULL);
 	controller.setTool(ssc::ToolPtr());
 	for (unsigned i=0; i<4; ++i)
 		controller.addVideoSource(80, 40);
 
-	controller.addOperation(boost::bind(&TestAcqCoreController::startRecord, &controller));
-	controller.addOperation(boost::bind(&TestAcqCoreController::wait, &controller, 1000));
-	controller.addOperation(boost::bind(&TestAcqCoreController::stopRecord, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::startRecord, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::wait, &controller, 1000));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::stopRecord, &controller));
 
-	SSC_LOG("pre exec");
 	qApp->exec();
-	SSC_LOG("post exec");
 
 	for (unsigned i=0; i<4; ++i)
 		controller.verifyMemData(QString("videoSource%1").arg(i));
 }
 
-void TestUSAcquisitionCore::testFourVideoSourcesWithToolAndSave()
+void TestUSSavingRecorder::testFourVideoSourcesWithToolAndSave()
 {
-	TestAcqCoreController controller(NULL);
+	TestUSSavingRecorderController controller(NULL);
 	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear());
 	controller.setTool(tool);
 	for (unsigned i=0; i<4; ++i)
 		controller.addVideoSource(80, 40);
 
-	controller.addOperation(boost::bind(&TestAcqCoreController::startRecord, &controller));
-	controller.addOperation(boost::bind(&TestAcqCoreController::wait, &controller, 1000));
-	controller.addOperation(boost::bind(&TestAcqCoreController::stopRecord, &controller));
-	controller.addOperation(boost::bind(&TestAcqCoreController::saveAndWaitForCompleted, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::startRecord, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::wait, &controller, 1000));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::stopRecord, &controller));
+	controller.addOperation(boost::bind(&TestUSSavingRecorderController::saveAndWaitForCompleted, &controller));
 
-	SSC_LOG("pre exec");
 	qApp->exec();
-	SSC_LOG("post exec");
 
 	controller.verifySaveData();
 }

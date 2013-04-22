@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxTestAcqCoreController.h"
+#include "cxTestUSSavingRecorderController.h"
 
 #include <QTimer>
 #include <cppunit/extensions/HelperMacros.h>
@@ -22,21 +22,26 @@
 #include "sscTestVideoSource.h"
 #include "cxUsReconstructionFileReader.h"
 #include "sscUSFrameData.h"
+#include "cxDataLocations.h"
+#include "sscTool.h"
+#include "sscTime.h"
 
-TestAcqCoreController::TestAcqCoreController(QObject* parent) : QObject(parent)
+TestUSSavingRecorderController::TestUSSavingRecorderController(QObject* parent) : QObject(parent)
 {
-	mAcquisition.reset(new cx::USAcquisitionCore());
-	connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(dataSaved(QString)));
+	mRecorder.reset(new cx::USSavingRecorder());
+	mRecorder->setWriteColor(true);
+	mRecorder->set_rMpr(ssc::Transform3D::Identity());
+	connect(mRecorder.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(dataSaved(QString)));
 
 	QTimer::singleShot(0, this, SLOT(runOperations()));
 }
 
-void TestAcqCoreController::addOperation(boost::function0<void> operation)
+void TestUSSavingRecorderController::addOperation(boost::function0<void> operation)
 {
 	mOperations.push_back(operation);
 }
 
-void TestAcqCoreController::runOperations()
+void TestUSSavingRecorderController::runOperations()
 {
 	for (unsigned i=0; i<mOperations.size(); ++i)
 	{
@@ -46,81 +51,94 @@ void TestAcqCoreController::runOperations()
 	QTimer::singleShot(0, qApp, SLOT(quit()));
 }
 
-void TestAcqCoreController::setTool(ssc::ToolPtr tool)
+void TestUSSavingRecorderController::setTool(ssc::ToolPtr tool)
 {
 	mTool = tool;
 }
 
-void TestAcqCoreController::addVideoSource(int width, int height)
+void TestUSSavingRecorderController::addVideoSource(int width, int height)
 {
 	int index = mVideo.size();
 	ssc::TestVideoSourcePtr videoSource(new ssc::TestVideoSource(
 											QString("videoSource%1").arg(index),
 											QString("Video Source %1").arg(index),
 											80, 40));
+	videoSource->start();
 	mVideo.push_back(videoSource);
 }
 
-void TestAcqCoreController::startRecord()
+void TestUSSavingRecorderController::startRecord()
 {
 	SSC_LOG("");
 	double start = QDateTime::currentMSecsSinceEpoch();
-	mSession.reset(new cx::RecordSession("session0", start, start, "session 0"));
-	mAcquisition->startRecord(mSession, mTool, mVideo);
+	QString uid = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+	mSession.reset(new cx::RecordSession(uid, start, start, "session_0"));
+	mRecorder->startRecord(mSession, mTool, mVideo);
 }
 
-void TestAcqCoreController::stopRecord()
+void TestUSSavingRecorderController::stopRecord()
 {
 	SSC_LOG("");
 	mSession->setStopTime(QDateTime::currentMSecsSinceEpoch());
-	mAcquisition->stopRecord();
+	mRecorder->stopRecord();
 }
 
-void TestAcqCoreController::wait(int time)
+void TestUSSavingRecorderController::wait(int time)
 {
-	SSC_LOG("");
+	SSC_LOG("begin");
 	double stop = QDateTime::currentMSecsSinceEpoch() + time;
 
 	while (QDateTime::currentMSecsSinceEpoch() < stop)
 	{
 		qApp->processEvents();
 	}
-	SSC_LOG("");
+	SSC_LOG("end");
 }
 
-void TestAcqCoreController::saveAndWaitForCompleted()
+void TestUSSavingRecorderController::saveAndWaitForCompleted()
 {
-	SSC_LOG("");
-	bool compressImages = true;
-	bool writeColor = true;
-	mAcquisition->startSaveData(compressImages, writeColor);
+	SSC_LOG("begin");
 
-	while (mAcquisition->numberOfSavingThreads() > 0)
+	bool compressImages = true;
+	QString baseFolder = this->getDataPath();
+	mRecorder->startSaveData(baseFolder, compressImages);
+	SSC_LOG("beginwait");
+
+	while (mRecorder->getNumberOfSavingThreads() > 0)
 	{
 		qApp->processEvents();
+		usleep(10000);
 	}
+	SSC_LOG("endwait");
 }
 
-void TestAcqCoreController::dataSaved(QString filename)
+QString TestUSSavingRecorderController::getDataPath()
+{
+	return cx::DataLocations::getTestDataPath() + "/temp/TestAcqCoreController/";
+}
+
+void TestUSSavingRecorderController::dataSaved(QString filename)
 {
 	SSC_LOG("");
 	mSavedData << filename;
-	std::cout << "saved data " << filename << std::endl;
 }
 
 
-void TestAcqCoreController::verifyMemData(QString uid)
+void TestUSSavingRecorderController::verifyMemData(QString uid)
 {
 	SSC_LOG("");
-	ssc::USReconstructInputData data = mAcquisition->getDataForStream(uid);
+	ssc::USReconstructInputData data = mRecorder->getDataForStream(uid);
 	double duration = mSession->getStopTime() - mSession->getStartTime();
 	int minFPS = 10;
+
+	std::cout << "filename " << data.mFilename << std::endl;
+	std::cout << "data.mFrames.size() " << data.mFrames.size() << std::endl;
 
 	CPPUNIT_ASSERT(!data.mFilename.isEmpty());
 	CPPUNIT_ASSERT(data.mFrames.size() > duration/1000*minFPS);
 }
 
-void TestAcqCoreController::verifySaveData()
+void TestUSSavingRecorderController::verifySaveData()
 {
 	SSC_LOG("");
 
@@ -130,7 +148,7 @@ void TestAcqCoreController::verifySaveData()
 		this->verifySaveData(mSavedData[i]);
 }
 
-void TestAcqCoreController::verifySaveData(QString filename)
+void TestUSSavingRecorderController::verifySaveData(QString filename)
 {
 	SSC_LOG("");
 
