@@ -179,13 +179,13 @@ void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 	CPPUNIT_ASSERT(fileData.mFrames.size() > framesPerSecond*mRecordDuration/1000);
 	// check for duration equal to input duration
 	double frame_time_ms = fileData.mFrames.back().mTime - fileData.mFrames.front().mTime;
-	CPPUNIT_ASSERT(ssc::similar(frame_time_ms, mRecordDuration, 0.1*mRecordDuration));
+	CPPUNIT_ASSERT(ssc::similar(frame_time_ms, mRecordDuration, 0.3*mRecordDuration));
 
 	int positionsPerSecond = 10; // minimum tracker pos rate
 	CPPUNIT_ASSERT(fileData.mPositions.size() > framesPerSecond*mRecordDuration/1000);
 	// check for duration equal to input duration
 	double pos_time_ms = fileData.mPositions.back().mTime - fileData.mPositions.front().mTime;
-	CPPUNIT_ASSERT(ssc::similar(pos_time_ms, mRecordDuration, 0.05*mRecordDuration));
+	CPPUNIT_ASSERT(ssc::similar(pos_time_ms, mRecordDuration, 0.1*mRecordDuration));
 
 	CPPUNIT_ASSERT(fileData.mProbeData.mData.getType()!=ssc::ProbeData::tNONE);
 
