@@ -117,7 +117,13 @@ void TestAcqController::videoConnectedSlot()
 	std::cout << "Video is connected, waiting for streams to arrive..." << std::endl;
 
 	// make sure all sources have started streaming before running probe setup (there might be several sources)
-	QTimer::singleShot(500, this, SLOT(setupProbe()));
+	if (cx::videoService()->getVideoSources().size() < mNumberOfExpectedStreams)
+	{
+		// loop back to this handler
+		QTimer::singleShot(50, this, SLOT(videoConnectedSlot()));
+		return;
+	}
+	QTimer::singleShot(50, this, SLOT(setupProbe()));
 }
 
 void TestAcqController::start()
