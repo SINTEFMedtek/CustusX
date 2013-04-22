@@ -16,11 +16,14 @@ public:
 	void testFilter(); ///< Test TubeSegmentationFilter
 	void testParameters(); ///< Test the default parameters read from file (TSF)
 
+	void testLoadParameterFile(); ///< Test to se if the options(adapters) are correctly fill with information form the parameter file
+
 public:
 	CPPUNIT_TEST_SUITE( TestTubeSegmentationFramework );
 		CPPUNIT_TEST( testConstructor );
-		CPPUNIT_TEST( testParameters );
 		CPPUNIT_TEST( testFilter );
+		CPPUNIT_TEST( testParameters );
+		CPPUNIT_TEST( testLoadParameterFile );
 	CPPUNIT_TEST_SUITE_END();
 
 };

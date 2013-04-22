@@ -26,6 +26,12 @@ class QTimer;
 
 namespace cx
 {
+
+/**
+ * Find GEStreamer OpenCL kernel code
+ */
+QString findOpenCLPath(QString additionalLocation);
+
 /**An object sending images out on an ip port.
  * In order to operate within a nongui thread,
  * it must be created within the run() method
