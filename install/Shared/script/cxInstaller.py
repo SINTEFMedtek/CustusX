@@ -608,7 +608,7 @@ cmake \
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "404"
+        self.mCurrentRevision = "405"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
