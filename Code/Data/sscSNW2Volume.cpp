@@ -687,7 +687,7 @@ bool SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, do
 	{
 		window = (range[1] - range[0]);
 	}
-	if (level <= 0)
+	if (level < 0)
 	{
 		level = range[0] + (range[1] - range[0]) / 2.0;
 	}
