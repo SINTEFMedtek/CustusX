@@ -51,10 +51,11 @@ QStringList ImageSenderGE::getArgumentDescription()
 	retval << "--commandport:	GE scanner command port, default = -1";//Unnecessary for us?
 	retval << "--buffersize:		Size of GEStreamer buffer, default = 10";
 	retval << "--imagesize:		Returned image/volume size in pixels (eg. 500x500x1), default = auto";
+	retval << "--isotropic:		Use cubic voxels for the scan conversion, default = no";
 	retval << "--openclpath:		Path to ScanConvert.cl";
 	retval << "--test:		GEStreamer test mode (no, 2D or 3D), default = no";
 	retval << "--useOpenCL:		Use OpenCL for scan conversion, default = 1";
-	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted, Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency,velocity (all)";
+	retval << "--streams:		Used video streams (separated by , with no spaces), default = scanconverted,bandwidth  Available streams (only 2D for now): scanconverted,tissue,bandwidth,frequency,velocity (all)";
 	return retval;
 }
 
@@ -108,10 +109,12 @@ void ImageSenderGE::initialize(StringMap arguments)
         mArguments["test"] = "no";
     if (!mArguments.count("imagesize"))
         mArguments["imagesize"] = "auto";
+    if (!mArguments.count("isotropic"))
+        mArguments["isotropic"] = "no";
     if (!mArguments.count("useOpenCL"))
         mArguments["useOpenCL"] = "1";
     if (!mArguments.count("streams"))
-        mArguments["streams"] = "scanconverted";
+        mArguments["streams"] = "scanconverted,bandwidth";
 
    	int bufferSize = convertStringWithDefault(mArguments["buffersize"], -1);
 
@@ -119,7 +122,10 @@ void ImageSenderGE::initialize(StringMap arguments)
    	long imageSize = -1;// -1 = auto
 	if (!mArguments["imagesize"].compare("auto", Qt::CaseInsensitive) == 0)
 	{
-		imageCompType = data_streaming::ANISOTROPIC;
+		if (mArguments["isotropic"].compare("yes", Qt::CaseInsensitive) == 0)
+			imageCompType = data_streaming::ISOTROPIC;
+		else
+			imageCompType = data_streaming::ANISOTROPIC;
 		imageSize = 1;
 	   	QStringList sizeList = QString(mArguments["imagesize"]).split(QRegExp("[x,X,*]"), QString::SkipEmptyParts);
 		for (int i = 0; i < sizeList.length(); i++)
@@ -167,25 +173,9 @@ void ImageSenderGE::initialize(StringMap arguments)
    			ssc::messageManager()->sendWarning("ImageSenderGE: Unknown stream: " + streamList.at(i));
    	}
 
-   	std::string openclpath = mArguments["openclpath"].toStdString();
 	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
 
-   	//Find GEStreamer OpenCL kernel code
-   	//Look in arg in, GEStreamer source dir, and installed dir
-   	QStringList paths;
-   	paths << QString::fromStdString(openclpath) << GEStreamer_KERNEL_PATH << DataLocations::getShaderPath();
-//   	std::cout << "OpenCL kernel paths: " << paths.join("  \n").toStdString();
-   	QFileInfo path;
-	path = QFileInfo(paths[0] + QString("/ScanConvertCL.cl"));
-	if (!path.exists())
-		path = QFileInfo(paths[1] + QString("/ScanConvertCL.cl"));
-	if (!path.exists())
-		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
-	if (!path.exists())
-	{
-		ssc::messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
-	} else
-		openclpath = path.absolutePath().toStdString();
+	std::string openclpath = findOpenCLPath(mArguments["openclpath"]).toStdString();
 
 	mGEStreamer.InitializeClientData(fileRoot, dumpHdfToDisk, imageCompType, imageSize, interpType, bufferSize, openclpath, useOpenCL);
 
@@ -200,6 +190,26 @@ void ImageSenderGE::initialize(StringMap arguments)
 //	this->initialize_local();
 //	this->deinitialize_local();
 
+}
+
+QString findOpenCLPath(QString additionalLocation)
+{
+	//Look in arg in, GEStreamer source dir, and installed dir
+	QString retval;
+	QStringList paths;
+	paths << additionalLocation << GEStreamer_KERNEL_PATH << DataLocations::getShaderPath();
+	QFileInfo path;
+	path = QFileInfo(paths[0] + QString("/ScanConvertCL.cl"));
+	if (!path.exists())
+		path = QFileInfo(paths[1] + QString("/ScanConvertCL.cl"));
+	if (!path.exists())
+		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
+	if (!path.exists())
+		ssc::messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
+	else
+		retval = path.absolutePath();
+
+	return retval;
 }
 
 void ImageSenderGE::deinitialize_local()

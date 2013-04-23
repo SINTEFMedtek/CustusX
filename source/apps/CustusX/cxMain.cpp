@@ -20,7 +20,7 @@
 
 #include "sscTypeConversions.h"
 #include "cxLogicManager.h"
-#include "cxApplication.h"
+#include "sscApplication.h"
 
 #ifdef WIN32
 int WinMain(int argc, char *argv[])
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 {
   Q_INIT_RESOURCE(cxResources);
   
-  cx::Application app(argc, argv);
+  ssc::Application app(argc, argv);
   app.setOrganizationName("SINTEF");
   app.setOrganizationDomain("www.sintef.no");
   app.setApplicationName("CustusX3");
