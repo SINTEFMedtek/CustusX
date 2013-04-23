@@ -8,11 +8,14 @@
  * The tag [hide] is a special tag, when tagging tests with this tag
  * they will be skipped by default.
  *
- * Run catch by:
+ * Run catch:
  * $ ./Catch
  *
  * See options:
  * $ ./Catch -?
+ *
+ * See help text for specific option:
+ * $ ./Catch -t -?
  *
  * Read more about commandline options:
  * https://github.com/philsquared/Catch/wiki/Command-line
@@ -100,9 +103,28 @@ TEST_CASE( "ASSERTIONS: Matcher expressions: EndsWith", "[hide][tutorial]" ) {
 
 //===========================================================================================
 /**
+ * This section shows extra fucntionality
+ */
+
+TEST_CASE ("Float vs double precision", "[hide][tutorial]") {
+
+	//Demonstrating the Approx class
+	Approx approx(0.1);
+	approx.epsilon(0.01); // precision can be specified
+
+	float f_number = 0.1;
+	double d_number = 0.1;
+	CHECK_FALSE( f_number == d_number);
+	CHECK( f_number == Approx(d_number));
+
+}
+
+//===========================================================================================
+/**
  * This section shows what logging macros exists.
  * Messages can be logged during a test case.
  */
+
 TEST_CASE( "LOGGING: INFO", "[hide][tutorial]" ) {
 	std::string info = " logged.";
 	INFO("The info is " << info);
@@ -115,7 +137,7 @@ TEST_CASE( "LOGGING: WARN", "[hide][tutorial]" ) {
 
 TEST_CASE( "LOGGING: FAIL", "[hide][tutorial]" ) {
 	//this will be recorded as a failure
-	std::string failure = " not a failure at all.";
+	std::string failure = " not a failure at all, it is supposed to fail.";
 	FAIL("The failure is " << failure);
 }
 
