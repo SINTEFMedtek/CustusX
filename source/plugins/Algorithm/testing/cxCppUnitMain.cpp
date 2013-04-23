@@ -11,7 +11,6 @@
 #ifndef RUN_ALL_TESTS
 #include "testing/cxTestTubeSegmentationFramework.h"
 #include "testing/cxTestTSFPresets.h"
-#include "testing/cxTestTSF.h"
 #endif
 
 /**main function for CX unit tests.
@@ -36,7 +35,6 @@ int main(int argc, char **argv)
 
 	runner.addTest(TestTubeSegmentationFramework::suite());
 	runner.addTest(cx::TestTSFPresets::suite());
-	runner.addTest(cx::TestTSF::suite());
 #endif
 
 
