@@ -47,7 +47,6 @@ TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
 ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
 {
 	mRecordDuration = 3000;
-	//	std::cout << "testAngioReconstruction running" << std::endl;
 	ssc::XmlOptionFile settings;
 	ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(settings,""));
 
@@ -59,7 +58,7 @@ ssc::ReconstructManagerPtr TestAcqController::createReconstructionManager()
 
 void TestAcqController::setupVideo()
 {
-	std::cout << "\nTestAcqController::initialize() init video" << std::endl;
+	SSC_LOG("");
 	cx::videoService()->getVideoConnection()->getConnectionMethod()->setValue(mConnectionMethod);
 	cx::videoService()->getVideoConnection()->setLocalServerExecutable(cx::DataLocations::getBundlePath() + "/../../../apps/OpenIGTLinkServer/OpenIGTLinkServer");
 	cx::videoService()->getVideoConnection()->setLocalServerArguments(QString("--type MHDFile --filename %1 %2").arg(mAcqDataFilename).arg(mAdditionalGrabberArg));
@@ -72,15 +71,13 @@ void TestAcqController::setupVideo()
 
 void TestAcqController::setupProbe()
 {
-	std::cout << "\nTestAcqController::initialize() init tool" << std::endl;
+	SSC_LOG("");
 	ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(ssc::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, ssc::ProbeData> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
 	ssc::ProbePtr probe = cx::Probe::New("","");
 	probe->setData(probedata.second);
 	dummyTool->setProbeSector(probe);
-	// TODO should be auto, but doesnt, might because tooman is not initialized
-//	dummyTool->getProbe()->setRTSource(mVideoSource);
 	CPPUNIT_ASSERT(dummyTool->getProbe());
 	CPPUNIT_ASSERT(dummyTool->getProbe()->isValid());
 	dummyTool->setVisible(true);
@@ -91,9 +88,12 @@ void TestAcqController::setupProbe()
 
 void TestAcqController::initialize()
 {
-	mAcqDataFilename = cx::DataLocations::getTestDataPath() +
-			"/testing/"
-			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
+	// select video source: use a small one because old machines cannot handle RT streaming of 1024x768 color data.
+//	mAcqDataFilename = cx::DataLocations::getTestDataPath() +
+//			"/testing/"
+//			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
+//	mAcqDataFilename = cx::DataLocations::getTestDataPath() + "/testing/us_videos/acq_512x384.mhd";
+	mAcqDataFilename = cx::DataLocations::getTestDataPath() + "/testing/us_videos/acq_256x192.mhd";
 
 	qApp->processEvents(); // wait for stateservice to finish init of application states - needed before load patient.
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
@@ -108,35 +108,39 @@ void TestAcqController::initialize()
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
 	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
-//	connect(cx::videoService()->getVideoConnection().get(), SIGNAL(videoSourcesChanged()), this, SLOT(setupProbe()));
 	connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(start()));
 }
 
 void TestAcqController::videoConnectedSlot()
 {
-	std::cout << "Video is connected, waiting for streams to arrive..." << std::endl;
+	SSC_LOG("");
 
 	// make sure all sources have started streaming before running probe setup (there might be several sources)
-	QTimer::singleShot(500, this, SLOT(setupProbe()));
+	if (cx::videoService()->getVideoSources().size() < mNumberOfExpectedStreams)
+	{
+		// loop back to this handler
+		QTimer::singleShot(50, this, SLOT(videoConnectedSlot()));
+		return;
+	}
+	QTimer::singleShot(50, this, SLOT(setupProbe()));
 }
 
 void TestAcqController::start()
 {
-	std::cout << "\nTestAcqController::start() start record" << std::endl;
+	SSC_LOG("");
 	mAcquisitionBase->startRecord();
 	QTimer::singleShot(mRecordDuration, this, SLOT(stop()));
 }
 
 void TestAcqController::stop()
 {
-	std::cout << "\nTestAcqController::stop() stop record" << std::endl;
+	SSC_LOG("");
 	mAcquisitionBase->stopRecord();
 }
 
 void TestAcqController::newFrameSlot()
 {
-//	if (!mAcquisitionBase->getLatestSession())
-//		this->start();
+	// add debug code here if needed.
 }
 
 void TestAcqController::readinessChangedSlot()
@@ -148,12 +152,17 @@ void TestAcqController::readinessChangedSlot()
 
 void TestAcqController::acquisitionDataReadySlot()
 {
+	SSC_LOG("");
+
 	// read data and print info - this if the result of the memory pathway
 	mMemOutputData = mAcquisitionData->getReconstructer()->getSelectedFileData();
 }
 
 void TestAcqController::saveDataCompletedSlot(QString path)
 {
+	SSC_LOG("");
+
+	// this is the last step: quit when finished
 	if (!mAcquisition->getNumberOfSavingThreads())
 		QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
@@ -170,20 +179,30 @@ void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 	if (!fileData.mFrames.empty())
 		std::cout << "\ttime: " << fileData.mFrames.back().mTime - fileData.mFrames.front().mTime << std::endl;
 
+	double tolerance = 0.1;
+	QString msg;
+
 	CPPUNIT_ASSERT(!fileData.mFilename.isEmpty());
+
 	// check for enough received image frames
 //	int framesPerSecond = 20; // minimum frame rate
-	int framesPerSecond = 5; // minimum frame rate, reduced because tests on old computers have a hard time reaching 10 fps.
-	CPPUNIT_ASSERT(fileData.mFrames.size() > framesPerSecond*mRecordDuration/1000);
+	int framesPerSecond = 10; // minimum frame rate, reduced because tests on old computers have a hard time reaching 10 fps.
+	msg = QString("Frames received: %1. Required: %2fps over %3ms").arg(fileData.mFrames.size()).arg(framesPerSecond).arg(mRecordDuration);
+	CPPUNIT_ASSERT_MESSAGE(string_cast(msg), fileData.mFrames.size() > framesPerSecond*mRecordDuration/1000);
+
 	// check for duration equal to input duration
 	double frame_time_ms = fileData.mFrames.back().mTime - fileData.mFrames.front().mTime;
-	CPPUNIT_ASSERT(ssc::similar(frame_time_ms, mRecordDuration, 0.1*mRecordDuration));
+	msg = QString("Frames received over period: %1ms. Required: %2ms with a tolerance of %3").arg(frame_time_ms).arg(mRecordDuration).arg(tolerance);
+	CPPUNIT_ASSERT_MESSAGE(string_cast(msg), ssc::similar(frame_time_ms, mRecordDuration, tolerance*mRecordDuration));
 
 	int positionsPerSecond = 10; // minimum tracker pos rate
-	CPPUNIT_ASSERT(fileData.mPositions.size() > framesPerSecond*mRecordDuration/1000);
+	msg = QString("Tracker positions received: %1. Required: %2tps over %3ms").arg(fileData.mPositions.size()).arg(positionsPerSecond).arg(mRecordDuration);
+	CPPUNIT_ASSERT_MESSAGE(string_cast(msg), fileData.mPositions.size() > positionsPerSecond*mRecordDuration/1000);
+
 	// check for duration equal to input duration
 	double pos_time_ms = fileData.mPositions.back().mTime - fileData.mPositions.front().mTime;
-	CPPUNIT_ASSERT(ssc::similar(pos_time_ms, mRecordDuration, 0.05*mRecordDuration));
+	msg = QString("Tracker positions received over period: %1ms. Required: %2ms with a tolerance of %3").arg(pos_time_ms).arg(mRecordDuration).arg(tolerance);
+	CPPUNIT_ASSERT_MESSAGE(string_cast(msg), ssc::similar(pos_time_ms, mRecordDuration, tolerance*mRecordDuration));
 
 	CPPUNIT_ASSERT(fileData.mProbeData.mData.getType()!=ssc::ProbeData::tNONE);
 
@@ -201,10 +220,13 @@ void TestAcqController::verifyFileData(ssc::USReconstructInputData fileData)
 
 void TestAcqController::verify()
 {
+	CPPUNIT_ASSERT(mAcquisition->getNumberOfSavingThreads()==0);
+
+	QString msg = QString("Got %1 streams, expected %2").arg(mFileOutputData.size()).arg(mNumberOfExpectedStreams);
+	CPPUNIT_ASSERT_MESSAGE(string_cast(msg), mNumberOfExpectedStreams==mFileOutputData.size());
+
 	std::cout << " ** Resulting ssc::USReconstructInputData memory content:" << std::endl;
 	this->verifyFileData(mMemOutputData);
-
-	CPPUNIT_ASSERT(mNumberOfExpectedStreams==mFileOutputData.size());
 
 	for (unsigned i=0; i< mNumberOfExpectedStreams; ++i)
 	{

@@ -142,7 +142,7 @@ void VideoConnection::runClient(GrabberReceiveThreadPtr client)
 	mClient = client;
 	connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
 	connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
-	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
+	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
 	//connect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
@@ -157,11 +157,11 @@ void VideoConnection::imageReceivedSlot()
 	this->updateImage(mClient->getLastImageMessage());
 }
 
-void VideoConnection::sonixStatusReceivedSlot()
+void VideoConnection::statusReceivedSlot()
 {
 	if (!mClient)
 		return;
-	this->updateSonixStatus(mClient->getLastSonixStatusMessage());
+	this->updateStatus(mClient->getLastSonixStatusMessage());
 }
 
 /**Get rid of the mClient thread.
@@ -183,7 +183,7 @@ void VideoConnection::stopClient()
 
 		disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
 		disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
-		disconnect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(sonixStatusReceivedSlot())); // thread-bridging connection
+		disconnect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
 		disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
@@ -225,18 +225,28 @@ void VideoConnection::clientFinishedSlot()
 	this->disconnectServer();
 }
 
+void VideoConnection::useUnusedProbeDataSlot()
+{
+	disconnect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+	this->updateStatus(mUnsusedProbeData);
+}
+
 /** extract information from the IGTLinkUSStatusMessage
  *  and store locally. Also reset the old local info with
  *  information from the probe in toolmanager.
  */
-void VideoConnection::updateSonixStatus(ssc::ProbeData msg)
+void VideoConnection::updateStatus(ssc::ProbeData msg)
 {
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
-	if (!tool)
+	if (!tool || !tool->getProbe())
+	{
+		//Don't throw away the ProbeData. Save it till it can be used
+		mUnsusedProbeData = msg;
+		connect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 		return;
+	}
+
 	ssc::ProbePtr probe = tool->getProbe();
-	if (!probe)
-		return;
 
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
