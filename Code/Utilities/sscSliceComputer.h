@@ -49,12 +49,12 @@ public:
 	void setFollowType(FOLLOW_TYPE val); 
 	void setGravity(bool use, const Vector3D& dir);
 	void setToolOffset(double val); 
-	void setToolViewOffset(bool use, double viewportHeight, double viewOffset);
+	void setToolViewOffset(bool use, double viewportHeight, double viewOffset, bool useConstrainedViewOffset = false);
 	void setToolViewportHeight(double viewportHeight);
 	void setClinicalApplication(CLINICAL_APPLICATION application);
 	SlicePlane getPlane() const;
 
-	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_APPLICATION application);
+	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_APPLICATION application, bool useConstrainedViewOffset = false);
 	void switchOrientationMode(ORIENTATION_TYPE type);
 	ORIENTATION_TYPE getOrientationType() const;
 	PLANE_TYPE getPlaneType() const;
@@ -85,6 +85,7 @@ private:
 	bool mUseViewOffset;
 	double mViewportHeight;
 	double mViewOffset;
+	bool mUseConstrainedViewOffset;
 };
 
 } // namespace ssc
