@@ -60,14 +60,14 @@ namespace ssc
 //---------------------------------------------------------
 StaticMutexVtkLocker::StaticMutexVtkLocker()
 {
-	if (!mMutex)
+/*	if (!mMutex)
 		mMutex.reset(new QMutex(QMutex::Recursive));
 
-	mMutex->lock();
+	mMutex->lock();*/
 }
 StaticMutexVtkLocker::~StaticMutexVtkLocker()
 {
-	mMutex->unlock();
+//	mMutex->unlock();
 }
 boost::shared_ptr<QMutex> StaticMutexVtkLocker::mMutex;
 //---------------------------------------------------------
