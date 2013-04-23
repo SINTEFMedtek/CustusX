@@ -15,14 +15,14 @@ public:
 	void tearDown();
 
 	void testKaisaSpeed();
-	void testLapSpeed();
-	void testKaisaMetricsSpeed();
+//	void testLapSpeed();
+//	void testKaisaMetricsSpeed();
 
 public:
 	CPPUNIT_TEST_SUITE( cxTestSpeed );
 		CPPUNIT_TEST( testKaisaSpeed );
-		CPPUNIT_TEST( testKaisaMetricsSpeed );
-		CPPUNIT_TEST( testLapSpeed );
+//		CPPUNIT_TEST( testKaisaMetricsSpeed );
+//		CPPUNIT_TEST( testLapSpeed );
 	CPPUNIT_TEST_SUITE_END();
 private:
 
