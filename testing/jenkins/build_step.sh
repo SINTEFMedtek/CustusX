@@ -22,6 +22,7 @@ WORKSPACE=$1
 ISB_PASSWORD=$2
 CX_SOURCE_DIR=$WORKSPACE/working/CustusX3/CustusX3
 CX_RELEASE_DIR=$WORKSPACE/working/CustusX3/build_Release
+CX_CATCH_DIR=$CX_RELEASE_DIR/source/apps/CustusX/
 
 # ==========================================================
 # Download, configure and build the project group.
@@ -53,3 +54,12 @@ rm -rf Testing/[0-9]*
 rm -rf $CX_RELEASE_DIR/CTestResults.xml
 ctest -D ExperimentalTest --no-compress-output
 cp Testing/`head -n 1 Testing/TAG`/Test.xml ./CTestResults.xml
+
+# ==========================================================
+# Run all Catch tests and write them in xml format to ./CatchTestResults.xml
+cd $CX_CATCH_DIR
+rm -rf CX_RELEASE_DIR/CatchTestResults.xml
+Catch -r junit -o CatchTestResults.xml
+cp CatchTestResults.xml CX_RELEASE_DIR/CatchTestResults.xml
+
+
