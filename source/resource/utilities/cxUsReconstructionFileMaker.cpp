@@ -279,14 +279,15 @@ void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPt
 	for (unsigned i=0; i<images->size(); ++i)
 	{
 		vtkImageDataPtr currentImage = images->get(i);
-//		std::cout << "=======================" << std::endl;
-//		currentImage->Print(std::cout);
 		QString filename = QString("%1/%2_%3.mhd").arg(path).arg(mSessionDescription).arg(i);
 
 		writer->SetInput(currentImage);
 		writer->SetFileName(cstring_cast(filename));
 		writer->SetCompression(compression);
-		writer->Write();
+		{
+			ssc::StaticMutexVtkLocker lock;
+			writer->Write();
+		}
 
 		ssc::CustomMetaImagePtr customReader = ssc::CustomMetaImage::create(filename);
 		customReader->setTransform(pos[i].mPos);

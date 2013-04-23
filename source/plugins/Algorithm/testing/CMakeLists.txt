@@ -48,6 +48,8 @@ if (BUILD_TESTING)
 		    cxTestTubeSegmentationFramework.cpp
 		    cxTestTSFPresets.h
 		    cxTestTSFPresets.cpp
+		    cxTestTSF.h
+		    cxTestTSF.cpp
 		    ${CX_TEST_ACQUISITION_SOURCE_FILES}
 		)
 

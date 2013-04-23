@@ -25,6 +25,7 @@ public:
 	void testFrequencyStreamGPU();///< Test GE frequency stream. GPU scanconversion if possible
 	void testBandwidthStreamGPU();///< Test GE bandwidth stream. GPU scanconversion if possible
 	void testVelocityStreamGPU();///< Test GE velocity stream. GPU scanconversion if possible
+	void testDefaultStreamsGPU();
 	void testAllStreamsGPUConsecutively();
 	void testGEStreamer();///< Test GEStreamer directly. Don't use cxImageSenderGE
 
@@ -43,6 +44,7 @@ public:
 		CPPUNIT_TEST( testFrequencyStreamGPU );
 		CPPUNIT_TEST( testBandwidthStreamGPU );
 		CPPUNIT_TEST( testVelocityStreamGPU );
+		CPPUNIT_TEST( testDefaultStreamsGPU );
 		CPPUNIT_TEST( testAllStreamsGPUConsecutively );
 		CPPUNIT_TEST( testGEStreamer );
 	CPPUNIT_TEST_SUITE_END();
