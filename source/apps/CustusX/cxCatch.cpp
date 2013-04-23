@@ -5,6 +5,18 @@
 /**
  * This file describes how to use CATCH.
  *
+ * The tag [hide] is a special tag, when tagging tests with this tag
+ * they will be skipped by default.
+ *
+ * Run catch by:
+ * $ ./Catch
+ *
+ * See options:
+ * $ ./Catch -?
+ *
+ * Read more about commandline options:
+ * https://github.com/philsquared/Catch/wiki/Command-line
+ *
  * Currently updated for:
  *  ----------------------------------------------------------
  *  CATCH v0.9 build 33 (integration branch)
@@ -19,12 +31,12 @@
 /**
  * This section shows how to write the basic test case.
  */
-TEST_CASE( "TEST_CASE: Name and tags", "[tutorial]" ) {
+TEST_CASE( "TEST_CASE: Name and tags", "[hide][tutorial]" ) {
 	//both name and tags are visible
 	REQUIRE( 1 == 1 );
 }
 
-TEST_CASE( "TEST_CASE: Name, description and tags", "Description. [tutorial]" ) {
+TEST_CASE( "TEST_CASE: Name, description and tags", "Description. [hide][tutorial]" ) {
 	//both name and tags are visible, but NOT the description.
 	REQUIRE( 1 == 1 );
 }
@@ -32,8 +44,13 @@ TEST_CASE( "TEST_CASE: Name, description and tags", "Description. [tutorial]" ) 
 //===========================================================================================
 /**
  * This section shows what assertion macros exists.
+ *
+ * The REQUIRE family of macros tests an expression and aborts the test case if it fails.
+ * The CHECK family are equivalent but execution continues in the same test case even if the assertion fails.
+ * This is useful if you have a series of essentially orthoginal assertions and it is useful to see all the results
+ * rather than stopping at the first failure.
  */
-TEST_CASE( "ASSERTIONS: Natural expressions", "[tutorial]" ) {
+TEST_CASE( "ASSERTIONS: Natural expressions", "[hide][tutorial]" ) {
 	//Evaluates the expression and records the result.
 	//If an exception is thrown it is caught, reported, and counted as a failure.
 	//These are the macros you will use most of the time
@@ -47,7 +64,7 @@ TEST_CASE( "ASSERTIONS: Natural expressions", "[tutorial]" ) {
 	CHECK_FALSE( 1 == 2);
 }
 
-TEST_CASE( "ASSERTIONS: Exceptions", "[tutorial]" ) {
+TEST_CASE( "ASSERTIONS: Exceptions", "[hide][tutorial]" ) {
 	//Expects that an exception (of any type) is be thrown during evaluation of the expression.
 	REQUIRE_THROWS(throw std::exception());
 	CHECK_THROWS(throw std::exception());
@@ -61,26 +78,56 @@ TEST_CASE( "ASSERTIONS: Exceptions", "[tutorial]" ) {
 	CHECK_NOTHROW( 1 == 1);
 }
 
-TEST_CASE( "ASSERTIONS: Matcher expressions", "[tutorial]" ) {
-//	REQUIRE_THAT( lhs, matcher call);
-//	CHECK_THAT( lhs, matcher call );
+TEST_CASE( "ASSERTIONS: Matcher expressions: Equals", "[hide][tutorial]" ) {
+	CHECK_THAT( "1", Equals("1"));
+	REQUIRE_THAT( "1", Equals("1"));
+}
+
+TEST_CASE( "ASSERTIONS: Matcher expressions: Contains", "[hide][tutorial]" ) {
+	CHECK_THAT( "onion", Contains("io"));
+	REQUIRE_THAT( "onion", Contains("io"));
+}
+
+TEST_CASE( "ASSERTIONS: Matcher expressions: StartsWith", "[hide][tutorial]" ) {
+	CHECK_THAT( "the start", StartsWith("the"));
+	REQUIRE_THAT( "the start", StartsWith("the"));
+}
+
+TEST_CASE( "ASSERTIONS: Matcher expressions: EndsWith", "[hide][tutorial]" ) {
+	CHECK_THAT( "the end", EndsWith("end"));
+	REQUIRE_THAT( "the end", EndsWith("end"));
 }
 
 //===========================================================================================
 /**
- * This section shows what logginng macros exists.
+ * This section shows what logging macros exists.
+ * Messages can be logged during a test case.
  */
-//TEST_CASE( "LOGGING: ", "[tutorial]" ) {
-//
-//}
-//
-//TEST_CASE( "LOGGING: ", "[tutorial]" ) {
-//
-//}
-//
-//TEST_CASE( "LOGGING: ", "[tutorial]" ) {
-//
-//}
+TEST_CASE( "LOGGING: INFO", "[hide][tutorial]" ) {
+	std::string info = " logged.";
+	INFO("The info is " << info);
+}
+
+TEST_CASE( "LOGGING: WARN", "[hide][tutorial]" ) {
+	std::string warning = " not important at all.";
+	WARN("The warning is " << warning);
+}
+
+TEST_CASE( "LOGGING: FAIL", "[hide][tutorial]" ) {
+	//this will be recorded as a failure
+	std::string failure = " not a failure at all.";
+	FAIL("The failure is " << failure);
+}
+
+TEST_CASE( "LOGGING: SCOPED_INFO", "[hide][tutorial]" ) {
+	std::string scoped_info = " will only be logged if a test fails in the current scope.";
+	SCOPED_INFO("The scoped info is " << scoped_info);
+}
+
+TEST_CASE( "LOGGING: CAPTURE", "[hide][tutorial]" ) {
+	int theAnswere = 42;
+	CAPTURE( theAnswere );
+}
 
 //===========================================================================================
 /**
@@ -89,20 +136,27 @@ TEST_CASE( "ASSERTIONS: Matcher expressions", "[tutorial]" ) {
  */
 
 //BDD style testing
-SCENARIO("BDD scenario", "Behavior-driven development scenario. [tutorial][BDD]"){
-	GIVEN("something is given"){
-		WHEN("something happens"){
-			//operations
-			THEN("we can require something"){
-				//require
-				REQUIRE(1 == 1);
+SCENARIO("BDD scenario", "Behavior-driven development scenario. [hide][tutorial][BDD]"){
+	GIVEN("we create a new std::vector"){
+		std::vector<int> vector;
+		int i = 1;
+		WHEN("we add a int to the vector"){
+			vector.push_back(1);
+			THEN("we can require that the vectors lenght is 1"){
+				REQUIRE( vector.size() == 1);
 			}
-			AND_WHEN("something else happens"){
-				//operations
-				THEN("we can require something else"){
-					//require
+			AND_WHEN("we add another int to the vector"){
+				vector.push_back(i);
+				THEN("we can require that the vectors lenght is 2"){
+					REQUIRE( vector.size() == 2);
 				}
 			}
+			THEN("we can require that the vectors lenght is still 1"){
+				REQUIRE( vector.size() == 1);
+			}
+		}
+		THEN("we can require that the vector is empty"){
+			REQUIRE(vector.empty());
 		}
 	}
 }
