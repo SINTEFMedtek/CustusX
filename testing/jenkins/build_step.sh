@@ -60,6 +60,6 @@ cp Testing/`head -n 1 Testing/TAG`/Test.xml ./CTestResults.xml
 cd $CX_CATCH_DIR
 rm -rf CX_RELEASE_DIR/CatchTestResults.xml
 ./Catch -r junit -o CatchTestResults.xml
-cp CatchTestResults.xml CX_RELEASE_DIR/CatchTestResults.xml
+cp CatchTestResults.xml $CX_RELEASE_DIR/CatchTestResults.xml
 
 
