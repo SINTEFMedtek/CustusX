@@ -178,9 +178,9 @@ void SliceProxy::clinicalApplicationChangedSlot()
 
 /**Group the typical plane definition uses together.
  */
-void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
+void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset)
 {
-	mCutplane->initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset, dataManager()->getClinicalApplication());
+	mCutplane->initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset, dataManager()->getClinicalApplication(), useConstrainedViewOffset);
 	changed();
 //	setPlane(plane);
 //	//Logger::log("vm.log"," set plane to proxy ");
@@ -233,9 +233,9 @@ void SliceProxy::setGravity(bool use, const Vector3D& dir)
 	mCutplane->setGravity(use, dir);
 	this->changed();
 }
-void SliceProxy::setToolViewOffset(bool use, double viewportHeight, double toolViewOffset)
+void SliceProxy::setToolViewOffset(bool use, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset)
 {
-	mCutplane->setToolViewOffset(use, viewportHeight, toolViewOffset);
+	mCutplane->setToolViewOffset(use, viewportHeight, toolViewOffset, useConstrainedViewOffset);
 	this->changed();
 }
  
