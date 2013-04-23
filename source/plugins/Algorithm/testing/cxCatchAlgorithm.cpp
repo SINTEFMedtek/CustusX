@@ -1,6 +1,18 @@
 #include "catch.hpp"
 
 //=================================================================
+// Test helpers - move to own file
+//=================================================================
+//#include "cxTubeSegmentationFilter.h"
+//
+//namespace cx {
+//class TubeSegmentationFilterTester : public TubeSegmentationFilter
+//{
+//
+//};
+//}//namespace cx
+
+//=================================================================
 // TSF test
 //=================================================================
 
@@ -12,13 +24,14 @@
 SCENARIO("Loading the Neuro-Vessels-USA preset", "[TSF]"){
 	GIVEN("we init the parameters with default values"){
 		std::string path = std::string(PARAMETERS_DIR);
-		paramList neuroVesselsUSAParameters = initParameters(path);
+		paramList neuroVesselsUSAParameters;
+		REQUIRE_NOTHROW(neuroVesselsUSAParameters = initParameters(path));
 
-		WHEN("we set the parameters option to Neuro-Vessels-USA"){
-			setParameter(neuroVesselsUSAParameters, "parameters", "Neuro-Vessels-USA");
+		WHEN("we set the string parameters parameter to Neuro-Vessels-USA"){
+			REQUIRE_NOTHROW(setParameter(neuroVesselsUSAParameters, "parameters", "Neuro-Vessels-USA"));
 
 			AND_WHEN("we load the parameter presets"){
-				loadParameterPreset(neuroVesselsUSAParameters, path);
+				REQUIRE_NOTHROW(loadParameterPreset(neuroVesselsUSAParameters, path));
 
 				THEN("we can check that the expected values are set"){
 					CHECK(getParamStr(neuroVesselsUSAParameters, "minimum") == "50");
@@ -34,6 +47,13 @@ SCENARIO("Loading the Neuro-Vessels-USA preset", "[TSF]"){
 					CHECK(getParam(neuroVesselsUSAParameters, "min-tree-length") == 10);
 					CHECK(getParamBool(neuroVesselsUSAParameters, "sphere-segmentation") == true);
 					CHECK(getParam(neuroVesselsUSAParameters, "cube-size") == 4);
+				}
+				AND_WHEN("we try to set a bool parameter to false"){
+					REQUIRE_NOTHROW(setParameter(neuroVesselsUSAParameters, "sphere-segmentation", "false"));
+
+					THEN("we can check that it get the correct value"){
+						CHECK(getParamBool(neuroVesselsUSAParameters, "sphere-segmentation") == false);
+					}
 				}
 			}
 		}
