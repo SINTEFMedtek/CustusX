@@ -66,6 +66,7 @@ private:
 //	ssc::ImageImportVideoSourcePtr mVideoSource;
 	BasicVideoSourcePtr mVideoSource;
 	std::vector<TimelineEvent> mEvents;
+	const QString mVideoSourceUid;
 
 	ssc::USReconstructInputData mCurrentData;
 	std::vector<double> mCurrentTimestamps; // copy of time frame timestamps from mCurrentData.
