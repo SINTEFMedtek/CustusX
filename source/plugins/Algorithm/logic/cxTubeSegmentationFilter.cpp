@@ -728,9 +728,9 @@ void TubeSegmentationFilter::setOptionValue(QString valueName, QString value)
 	}
 	else if(boolOption)
 	{
-//		std::cout << "booloption: " << value.toStdString() << " for value " << valueName.toStdString() << std::endl;
+		std::cout << "booloption: " << value.toStdString() << " for value " << valueName.toStdString() << std::endl;
 		bool boolValue = (value.compare("true") == 0) ? true : false;
-		boolOption->setValue(boolValue)
+		boolOption->setValue(boolValue);
 	}
 	else if(doubleOption)
 	{
