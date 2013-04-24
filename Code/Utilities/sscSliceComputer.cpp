@@ -37,7 +37,8 @@ SliceComputer::SliceComputer() :
 	mGravityDirection(Vector3D(0,0,-1)) ,
 	mUseViewOffset(false),
 	mViewportHeight(1),
-	mViewOffset(0.5)
+	mViewOffset(0.5),
+	mUseConstrainedViewOffset(false)
 {
 }
 
@@ -47,7 +48,7 @@ SliceComputer::~SliceComputer()
 
 /**Group the typical plane definition uses together.
  */
-void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_APPLICATION application)
+void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_APPLICATION application, bool useConstrainedViewOffset)
 {
 	setPlaneType(plane);
 	mClinicalApplication = application;
@@ -63,7 +64,7 @@ void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const
 		setFollowType(ssc::ftFOLLOW_TOOL);
 
 		setGravity(useGravity, gravityDir);
-		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
+		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset, useConstrainedViewOffset); // TODO finish this one
 	}
 }
 
@@ -184,11 +185,12 @@ void SliceComputer::setToolOffset(double val)
  * top of a viewport. This is handled by setting the plane center accordingly.
  * Overrides FollowType.
  */
-void SliceComputer::setToolViewOffset(bool use, double viewportHeight, double viewOffset) 
+void SliceComputer::setToolViewOffset(bool use, double viewportHeight, double viewOffset, bool useConstrainedViewOffset) 
 {
 	mUseViewOffset = use; 
 	mViewportHeight = viewportHeight; 
-	mViewOffset = viewOffset; 
+	mViewOffset = viewOffset;
+	mUseConstrainedViewOffset = useConstrainedViewOffset;
 }
 
 /**see setToolViewOffset()
@@ -249,9 +251,24 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 	}
 
 	SlicePlane retval = base;
-	Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
-	Vector3D newCenter = toolCenter - mViewportHeight*(0.5-mViewOffset) * base.j;
-	retval.c = base.c + dot(newCenter - base.c, base.j) * base.j; // extract j-component of newCenter
+	if (mUseConstrainedViewOffset)
+	{
+		Vector3D toolOffsetCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
+		Vector3D newCenter = toolOffsetCenter - mViewportHeight*(mViewOffset-0.5) * base.j;
+		double toolOffsetDistance = dot(newCenter - base.c, base.j);
+
+		Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,0));
+		newCenter = toolCenter - mViewportHeight*(0.5-mViewOffset) * base.j;
+		double toolDistance = dot(newCenter - base.c, base.j);
+		double usedDistance = std::min(toolOffsetDistance, toolDistance);
+		retval.c = base.c + usedDistance * base.j; // extract j-component of newCenter
+	}
+	else
+	{
+		Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
+		Vector3D newCenter = toolCenter - mViewportHeight*(0.5-mViewOffset) * base.j;
+		retval.c = base.c + dot(newCenter - base.c, base.j) * base.j; // extract j-component of newCenter
+	}
 	return retval;
 }
 

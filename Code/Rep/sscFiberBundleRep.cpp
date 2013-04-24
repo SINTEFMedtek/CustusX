@@ -38,7 +38,7 @@ namespace ssc
 {
 /** Constructor */
 FiberBundleRep::FiberBundleRep(const QString& uid, const QString& name)
-	: RepImpl(uid, name), mFiberWidth(.1)
+	: RepImpl(uid, name), mFiberWidth(.5)
 {
 	mPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mProperty = vtkPropertyPtr::New();

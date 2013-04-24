@@ -56,7 +56,8 @@ DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 	mVisible(false),
 	m_prMt(Transform3D::Identity()),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
-	mTimer(new QTimer())
+	mTimer(new QTimer()),
+	mThread(NULL)
 {
 	mUid = uid;
 	mName = uid;
@@ -168,6 +169,10 @@ bool DummyTool::isCalibrated() const
 
 void DummyTool::stopThread()
 {
+	if (!mThread)
+	{
+		return;
+	}
 	disconnect(mThread, SIGNAL(ping()), this, SLOT(sendTransform()));
 
 	mThread->quit();
@@ -178,6 +183,7 @@ void DummyTool::stopThread()
 		mThread->terminate();
 		mThread->wait(); // forever or until dead thread
 	}
+	mThread = NULL;
 }
 
 void DummyTool::stopTracking()
