@@ -65,7 +65,7 @@ ssc::PresetsPtr TubeSegmentationFilter::getPresets()
 	return mPresets;
 }
 
-QDomElement TubeSegmentationFilter::getNewPreset(QString name)
+QDomElement TubeSegmentationFilter::generatePresetFromCurrentlySetOptions(QString name)
 {
 	std::vector<DataAdapterPtr> newPresetOptions = this->getNotDefaultOptions();
 
@@ -90,7 +90,6 @@ QDomElement TubeSegmentationFilter::getNewPreset(QString name)
 	}
 	ssc::StringDataAdapterPtr centerlineMethod = this->getStringOption("centerline-method");
 	newPresetMap[centerlineMethod->getValueName()] = centerlineMethod->getValue();
-
 
 	//create xml
 	QDomElement retval = TSFPresets::createPresetElement(name, newPresetMap);
@@ -118,17 +117,14 @@ void TubeSegmentationFilter::requestSetPresetSlot(QString name)
 
 bool TubeSegmentationFilter::execute()
 {
-	//get the image
     ssc::ImagePtr input = this->getCopiedInputImage();
     	if (!input)
     		return false;
 
-	// Parse parameters from program arguments
 	mParameters = this->getParametersFromOptions();
 	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+input->getFilePath()).toStdString();
 
 	try {
-		//ssc::messageManager()->sendDebug("Looking for TSF files in folder: "+cx::DataLocations::getTSFPath());
 		std::cout << "=================TSF START====================" << std::endl;
 		mOutput = run(filename, mParameters, cx::DataLocations::getTSFPath().toStdString());
 		std::cout << "=================TSF END====================" << std::endl;
@@ -165,7 +161,6 @@ bool TubeSegmentationFilter::execute()
 			mOutput = NULL;
 		}
 		return false;
-
 	}
  	return true;
 }
@@ -269,6 +264,7 @@ bool TubeSegmentationFilter::postProcess()
 
 		//add contour internally to cx
 		ssc::MeshPtr contour = ContourFilter::postProcess(rawContour, inputImage, QColor("blue"));
+		contour->get_rMd_History()->setRegistration(rMd_c);
 
 		//set output
 		mOutputTypes[2]->setValue(outputSegmentation->getUid());
@@ -407,20 +403,8 @@ void TubeSegmentationFilter::inputChangedSlot()
 		option->setValue(activePatientFolder+inputsValue+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat())+"_tsf_vtk.vtk");
 }
 
-//void TubeSegmentationFilter::parametersFileChanged()
-//{
-//	if(mParameterFile != this->getStringOption("parameters")->getValue())
-//		QTimer::singleShot(0, this, SLOT(loadNewParameters()));
-//}
-
 void TubeSegmentationFilter::loadNewParametersSlot()
 {
-//	ssc::StringDataAdapterXmlPtr parameterOption = this->getStringOption("parameters");
-//	if(!parameterOption)
-//		return;
-
-//	mParameterFile = parameterOption->getValue();
-
 	paramList list = this->getDefaultParameters();
 
 	if(mParameterFile != "none")
@@ -575,10 +559,7 @@ void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
     	option->setGroup(qstring_cast(stringIt->second.getGroup()));
     	mStringOptions.push_back(option);
     	if(stringIt->first == "parameters")
-    	{
     		option->setEnabled(false);
-//    		connect(option.get(), SIGNAL(changed()), this, SLOT(parametersFileChanged()));
-    	}
     	option->setAdvanced(true);
     }
 
@@ -737,9 +718,7 @@ void TubeSegmentationFilter::setOptionValue(QString valueName, QString value)
 {
 	DataAdapterPtr option = this->getOption(valueName);
 	if(!option)
-	{
 		return;
-	}
 
 	ssc::StringDataAdapterXmlPtr stringOption = boost::dynamic_pointer_cast<ssc::StringDataAdapterXml>(option);
 	ssc::BoolDataAdapterXmlPtr boolOption = boost::dynamic_pointer_cast<ssc::BoolDataAdapterXml>(option);
@@ -750,7 +729,7 @@ void TubeSegmentationFilter::setOptionValue(QString valueName, QString value)
 	}
 	else if(boolOption)
 	{
-		bool boolValue = (value.compare("true") == 0) ? true : false;
+		bool boolValue = (value.compare("1") == 0) ? true : false;
 		boolOption->setValue(boolValue);
 	}
 	else if(doubleOption)
@@ -943,9 +922,7 @@ ssc::DoubleDataAdapterXmlPtr TubeSegmentationFilter::makeDoubleOption(QDomElemen
 
 TSFPresetsPtr TubeSegmentationFilter::populatePresets()
 {
-//	std::cout << "TubeSegmentationFilter::populatePresets()" << std::endl;
 	TSFPresetsPtr retval(new TSFPresets());
-
 	return retval;
 }
 
