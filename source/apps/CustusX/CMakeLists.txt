@@ -32,7 +32,7 @@ if(APPLE) # For Apple set the icns file containing icons
 	set(SOURCES ${SOURCES} ${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns)  # include the icns file in the target
 	set(MACOSX_BUNDLE_INFO_STRING "CustusX")
 	set(MACOSX_BUNDLE_BUNDLE_NAME "CustusX")
-	set(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_NUMBER_VERBOSE}")
+	set(MACOSX_BUNDLE_BUNDLE_VERSION "${CustusX3_VERSION_STRING}")
 	set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${MACOSX_BUNDLE_BUNDLE_VERSION}")
 	set(MACOSX_BUNDLE_LONG_VERSION_STRING "CustusX ${MACOSX_BUNDLE_BUNDLE_VERSION}")
 	set(MACOSX_BUNDLE_COPYRIGHT "Copyright SINTEF\nAll rights reserved")
@@ -54,31 +54,16 @@ endif (APPLE)
 #------------------------------------------------------------------------------
 # Linking
 #------------------------------------------------------------------------------
-target_link_libraries( CustusX 
-		        cxGui 
+SET(LINK_LIBRARIES
+		        cxGui
                 cxPluginCalibration
                 cxPluginAlgorithm
                 cxPluginRegistration
                 cxPluginUSReconstruction
                 cxPluginAcquisition
 		)
-		
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(CustusX)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(CustusX_unity 
-        		        cxGui 
-                        cxPluginCalibration
-                        cxPluginAlgorithm
-                        cxPluginRegistration
-                        cxPluginUSReconstruction
-                        cxPluginAcquisition
-        		)
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+target_link_libraries( CustusX ${LINK_LIBRARIES} )
+CX_COTIRE_ADD_LIBRARY(CustusX "${LINK_LIBRARIES}")
 
 
 #--------------------------------------------------------------------------------
@@ -393,7 +378,7 @@ install(CODE "
 # this text can be inserted into the about box with some effort...
 set(CONFIGURATION_TEXT
 "
-Configuration for CustusX ${VERSION_NUMBER_VERBOSE}
+Configuration for CustusX ${CustusX3_VERSION_STRING}
 
 	Build Settings:
 		Built on system: ${CMAKE_SYSTEM} ${CMAKE_ARCHITECTURE} ${CMAKE_SYSTEM_PROCESSOR}

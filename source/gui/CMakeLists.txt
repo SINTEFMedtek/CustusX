@@ -14,10 +14,6 @@ endif(CX_WINDOWS)
     set(QXT_FOLDER "../ThirdParty/qxt")
 #endif()
 
-# Make VERSION_NUMBER available for c++ files in gui folder
-ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
-ADD_DEFINITIONS(-DVERSION_NUMBER_VERBOSE="${VERSION_NUMBER_VERBOSE}")
-
 SET(cxGui_MOC_HDRS
     #----------------------
     dataAdapters/cxDataInterface.h
@@ -299,16 +295,5 @@ endif (SSC_USE_DCMTK)
     
 add_library( cxGui ${cxGui_SRCS} ${cxGui_MOC_SRCS} )
 target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )
-
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(cxGui)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(cxGui_unity 
-        		${CX_GUI_LIBRARIES}
-        		)
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+CX_COTIRE_ADD_LIBRARY(cxGui "${CX_GUI_LIBRARIES}")
 

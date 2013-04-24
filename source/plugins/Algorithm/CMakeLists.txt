@@ -112,19 +112,7 @@ endif(CX_USE_TSF)
 # create the target
 add_library( cxPluginAlgorithm ${SOURCE_FILES} )
 target_link_libraries( cxPluginAlgorithm ${CX_ALGORITHM_LIBRARIES})
-
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(cxPluginAlgorithm)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(cxPluginAlgorithm_unity
-                        ${CX_ALGORITHM_LIBRARIES}
-                        )
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-# =========================================================
+CX_COTIRE_ADD_LIBRARY(cxPluginAlgorithm "${CX_ALGORITHM_LIBRARIES}")
 
 # add/remove to suit your own needs.
 #add_subdirectory(logic)
