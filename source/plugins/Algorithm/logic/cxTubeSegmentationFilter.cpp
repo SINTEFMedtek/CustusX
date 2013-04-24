@@ -264,6 +264,7 @@ bool TubeSegmentationFilter::postProcess()
 
 		//add contour internally to cx
 		ssc::MeshPtr contour = ContourFilter::postProcess(rawContour, inputImage, QColor("blue"));
+		contour->get_rMd_History()->setRegistration(rMd_c);
 
 		//set output
 		mOutputTypes[2]->setValue(outputSegmentation->getUid());
