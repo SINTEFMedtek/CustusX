@@ -129,22 +129,9 @@ include_directories(
 # =========================================================
 # create the target
 add_library( cxPluginRegistration ${SOURCE_FILES} )
-target_link_libraries( cxPluginRegistration cxPluginAcquisition cxPluginAlgorithm)
-
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(cxPluginRegistration)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(cxPluginRegistration_unity
-                        cxPluginAcquisition
-                        cxPluginAlgorithm
-                        )
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-# =========================================================
-
+set(LINK_LIBRARIES cxPluginAcquisition cxPluginAlgorithm)
+target_link_libraries( cxPluginRegistration ${LINK_LIBRARIES})
+CX_COTIRE_ADD_LIBRARY( cxPluginRegistration "${LINK_LIBRARIES}")
 
 # add/remove to suit your own needs.
 #add_subdirectory(logic)

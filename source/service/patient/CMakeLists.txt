@@ -2,10 +2,6 @@
 ##               Patient Service
 ###########################################################
 
-# Make VERSION_NUMBER available for c++ files in patient folder
-ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
-ADD_DEFINITIONS(-DVERSION_NUMBER_VERBOSE="${VERSION_NUMBER_VERBOSE}")
-
 SET( CX_QT_MOC_HEADER_FILES
     cxFileCopied.h
     cxPatientData.h

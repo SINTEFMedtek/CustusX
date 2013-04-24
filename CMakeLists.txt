@@ -9,10 +9,6 @@ cmake_minimum_required(VERSION 2.6)
 #------------------------------------------------------------------------------
 # Add some compiler flags (preprocessor definitions)
 #------------------------------------------------------------------------------
-add_definitions(-DCustusX3_VERSION_MAJOR=${CustusX3_VERSION_MAJOR}
-	-DCustusX3_VERSION_MINOR=${CustusX3_VERSION_MINOR}
-	-DCustusX3_VERSION_PATCH=${CustusX3_VERSION_PATCH})
-
 
 if(SSC_USE_GCOV)
 	add_definitions(--coverage)
@@ -44,76 +40,47 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 
 if(APPLE)
 	add_definitions(-D__APPLE__)
-
-	# get rid of very annoying deprecated warnings in VTK 5.8. Remove when VTK if fixed...
-        #SET(CMAKE_CPP_FLAGS "${CMAKE_CPP_FLAGS} -Wno-deprecated") # did not work ... must set in cmake-gui ... ??
-
-        # support running on 10.6 Snow Leopard
-        SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.6" CACHE STRING "Minimum OSX deployment version")
-
-
-	message(STATUS "setting flag " ${CMAKE_CPP_FLAGS})
 endif(APPLE)
+
+set(CMAKE_MODULE_PATH
+	${CMAKE_MODULE_PATH}
+	${PROJECT_SOURCE_DIR}/CMake
+	${PROJECT_SOURCE_DIR}/externals/ssc/CMake
+	)
+
+include(cxUtilities)
 
 #------------------------------------------------------------------------------
 # Set CustusX version
 #------------------------------------------------------------------------------
-set(CustusX3_VERSION_MAJOR  3)
-set(CustusX3_VERSION_MINOR  5)
-set(CustusX3_VERSION_PATCH  0)
 
-# set alpha when not a release
-set(CustusX3_VERSION_POSTFIX ".alpha")
-# set beta when a quick release
-#set(CustusX3_VERSION_POSTFIX ".beta")
-# set release candidate during release procedure
-#set(CustusX3_VERSION_POSTFIX ".rc1")
-# set nothing when a normal release
-#set(CustusX3_VERSION_POSTFIX "")
+set(CX_VERSION_TYPE ALPHA) # use when releasing an alpha
+#set(CX_VERSION_TYPE BETA) # use when releasing a beta
+#set(CX_VERSION_TYPE RELEASE) # use when releasing a normal release
+#set(CX_VERSION_TYPE ".rc1") # set release candidate during release procedure
+cx_define_version(3 5 0 CX_VERSION_TYPE)
 
-set(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
-set(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}${CustusX3_VERSION_POSTFIX}")
-
-
-#-----------------------------------------------------------------------------
-# Cotire (COmpile TIme REducer)
-# Cross-platform cmake module for reducing compile time by generating 
-# precomiled headers (pch) and single compilation unit builds
-# Go to https://github.com/sakra/cotire for more information
-#-----------------------------------------------------------------------------
-option(COTIRE_ENABLE_PRECOMPILED_HEADERS "use cotire to autogenerate precompiled headers (pch)" OFF)
-option(COTIRE_ADD_UNITY_BUILDS "use cotire to autogenerate single comilation unit builds" OFF)
-
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/externals/ssc/CMake)
-    include(cotire)
-    # The properties COTIRE_ENABLE_PRECOMPILED_HEADER and COTIRE_ADD_UNITY_BUILD can also be set on targets. 
-    # A target inherits the property value from its enclosing directory.
-    set_directory_properties(
-                PROPERTIES 
-                COTIRE_ENABLE_PRECOMPILED_HEADER ${COTIRE_ENABLE_PRECOMPILED_HEADERS} 
-                COTIRE_ADD_UNITY_BUILD ${COTIRE_ADD_UNITY_BUILDS}
-                )
-endif()
+include(cxCotireMacros)
+CX_COTIRE_INITIALIZE()
 
 #------------------------------------------------------------------------------
 # Variables
 #------------------------------------------------------------------------------
 set(CMAKE_BUILD_TYPE:STRING=Debug)
 
-set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
+set(CPACK_PACKAGE_VERSION "${CustusX3_VERSION_STRING}")
 set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
 
-set(CPACK_PACKAGE_FILE_NAME "CustusX_${VERSION_NUMBER_VERBOSE}")
+set(CPACK_PACKAGE_FILE_NAME "${CustusX_VERSION_STRING}")
 set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_welcome.txt")
 set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_license.txt")
 
 # append build type to name if not Release:
-if    (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
-		set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
-endif (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
+if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
+	set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
+endif ()
 
 # Variables
 #----------
@@ -125,7 +92,6 @@ endif (UNIX AND NOT APPLE)
 
 # Set root folder for entire installation
 set(CX_INSTALL_ROOT_DIR .)
-
 
 if (APPLE)
 		set(CPACK_PACKAGING_INSTALL_PREFIX "/")
@@ -254,11 +220,6 @@ if (LINUX)
 else (LINUX)
 		option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" OFF) #default is off for others
 endif (LINUX)
-#if(BUILD_OPEN_IGTLINK_SERVER)
-#		add_subdirectory( source/apps/OpenIGTLinkServer )
-#		add_subdirectory( source/resource/videoServer )
-#		add_subdirectory( source/resource/OpenIGTLinkUtilities )
-#endif(BUILD_OPEN_IGTLINK_SERVER)
 
 option(BUILD_GRABBER_SERVER "build grabber server" OFF) #default is off
 if(BUILD_GRABBER_SERVER)
@@ -275,11 +236,5 @@ enable_testing()
 #-----------------------------------------------------------------------------
 
 include(CPack)
-#cpack_add_component(CustusX
-#                    DISPLAYNAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}"
-#                    )
-#cpack_add_component(GrabberServer
-#                    DISPLAYNAME "GrabberServer ${VERSION_NUMBER_VERBOSE}"
-#                    )
 
 

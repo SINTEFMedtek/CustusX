@@ -110,18 +110,6 @@ set (CX_RESOURCE_LIBRARIES
 
 ADD_LIBRARY ( cxResource ${cxResource_SOURCE} ${MOC_HEADER_FILES})
 target_link_libraries(cxResource ${CX_RESOURCE_LIBRARIES} )
-
-
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(cxResource)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(cxResource_unity ${CX_RESOURCE_LIBRARIES})
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-
-#------------------------------------------------------------------------------
+CX_COTIRE_ADD_LIBRARY( cxResource "${CX_RESOURCE_LIBRARIES}")
 
 add_subdirectory(testing)
