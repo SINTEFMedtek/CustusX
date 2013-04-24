@@ -8,11 +8,7 @@ if (CX_WINDOWS)
     add_definitions(-D_USE_MATH_DEFINES)
 endif(CX_WINDOWS)
 
-#if (APPLE)
-#    set(QXT_FOLDER "../ThirdParty/qxt_mac_compatible")
-#else()
-    set(QXT_FOLDER "../ThirdParty/qxt")
-#endif()
+set(QXT_FOLDER "../ThirdParty/qxt")
 
 SET(cxGui_MOC_HDRS
     #----------------------
@@ -25,6 +21,7 @@ SET(cxGui_MOC_HDRS
 	dataAdapters/cxSelectDataStringDataAdapter.h
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
+    dataWidgets/cxVolumeInfoWidget.h
     dataWidgets/cxShadingWidget.h
     dataWidgets/cxCroppingWidget.h
     dataWidgets/cxClippingWidget.h 
@@ -166,6 +163,8 @@ SET(cxGui_SRCS
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxVolumePropertiesWidget.cpp
+    dataWidgets/cxVolumeInfoWidget.h
+    dataWidgets/cxVolumeInfoWidget.cpp
     dataWidgets/cxShadingWidget.h
     dataWidgets/cxShadingWidget.cpp
     dataWidgets/cxCroppingWidget.h

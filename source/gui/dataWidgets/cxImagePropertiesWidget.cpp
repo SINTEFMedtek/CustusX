@@ -12,6 +12,7 @@
 #include "cxDataInterface.h"
 #include "cxTransferFunctionWidget.h"
 #include "cxVolumePropertiesWidget.h"
+#include "cxVolumeInfoWidget.h"
 #include "cxDataViewSelectionWidget.h"
 #include "cxTransferFunctionAlphaWidget.h"
 #include "cxTransferFunctionColorWidget.h"
