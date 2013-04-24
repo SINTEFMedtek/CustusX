@@ -17,12 +17,6 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscStringDataAdapter.h
- *
- *  Created on: Jun 23, 2010
- *      Author: christiana
- */
 #ifndef SSCSTRINGDATAADAPTER_H_
 #define SSCSTRINGDATAADAPTER_H_
 
@@ -109,15 +103,14 @@ public:
 	{
 		return internal;
 	} ///< conversion from internal value to display value
-
-	//  virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
-
-	//signals:
-	//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 };
 typedef boost::shared_ptr<StringDataAdapter> StringDataAdapterPtr;
 
-/** dummy implementation */
+/**
+ * \brief Dummy implementation of the StringDataAdapter
+ *
+ * \author Christian Askeland, SINTEF
+ */
 class StringDataAdapterNull: public StringDataAdapter
 {
 Q_OBJECT
@@ -137,44 +130,7 @@ public:
 	{
 		return "";
 	}
-	//  virtual void connectValueSignals(bool on) {}
 };
-
-///** Abstract interface for interaction with internal string-valued data.
-// *
-// * This class differ from the StringDataAdapter in that there is no range of
-// * allowed values: any value will do.
-// *
-// */
-//class EditableStringDataAdapter: public DataAdapter
-//{
-//Q_OBJECT
-//public:
-//	virtual ~EditableStringDataAdapter()
-//	{
-//	}
-//
-//public:
-//	// basic methods
-//	virtual QString getValueName() const = 0;///< name of data entity. Used for display to user.
-//	virtual bool setValue(const QString& value) = 0; ///< set the data value.
-//	virtual QString getValue() const = 0; ///< get the data value.
-//
-//public:
-//	// optional methods
-//	virtual QString getHelp() const
-//	{
-//		return QString();
-//	} ///< return a descriptive help string for the data, used for example as a tool tip.
-//	virtual bool isReadOnly() const
-//	{
-//		return false;
-//	}
-//
-//	//  virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
-//};
-//typedef boost::shared_ptr<EditableStringDataAdapter> EditableStringDataAdapterPtr;
-
 } // namespace ssc
 
 #endif /* SSCSTRINGDATAADAPTER_H_ */
