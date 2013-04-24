@@ -3,10 +3,19 @@
 ###########################################################
 
 #------------------------------------------------------------------------------
-# Include
+# Variables
 #-----------------------------------------------------------------------------
 
 set(SOURCES cxMain.cpp)
+
+set(CATCH_SOURCES 
+    cxCatch.cpp
+    ../../plugins/Algorithm/testing/cxCatchAlgorithm.cpp
+)
+
+#------------------------------------------------------------------------------
+# Include
+#-----------------------------------------------------------------------------
 
 include_directories(
 		.
@@ -43,11 +52,14 @@ endif(APPLE)
 #-----------------------------------------------------------------------------
 if (APPLE)
 	add_executable(CustusX MACOSX_BUNDLE ${SOURCES} )
+	add_executable(Catch MACOSX_BUNDLE ${CATCH_SOURCES} )
 else (APPLE)
 	if(CX_WINDOWS)
 		add_executable(CustusX WIN32 ${SOURCES} CustusX.rc)
+		add_executable(Catch WIN32 ${CATCH_SOURCES} )
 	else(CX_WINDOWS)
 		add_executable(CustusX ${SOURCES} )
+		add_executable(Catch ${CATCH_SOURCES} )
 	endif(CX_WINDOWS)
 endif (APPLE)
 
@@ -62,9 +74,13 @@ SET(LINK_LIBRARIES
                 cxPluginUSReconstruction
                 cxPluginAcquisition
 		)
+
 target_link_libraries( CustusX ${LINK_LIBRARIES} )
 CX_COTIRE_ADD_LIBRARY(CustusX "${LINK_LIBRARIES}")
-
+		
+target_link_libraries( Catch
+                cxPluginAlgorithm
+		)
 
 #--------------------------------------------------------------------------------
 # Installer
