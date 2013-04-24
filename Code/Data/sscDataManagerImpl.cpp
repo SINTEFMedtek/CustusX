@@ -178,7 +178,11 @@ vtkImageDataPtr MetaImageReader::load(const QString& filename)
 	if (!ErrorObserver::checkedRead(reader, filename))
 		return vtkImageDataPtr();
 
-	return reader->GetOutput();
+	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
+	zeroer->SetInput(reader->GetOutput());
+	zeroer->SetOutputOrigin(0, 0, 0);
+	zeroer->Update();
+	return zeroer->GetOutput();
 }
 
 //-----
@@ -191,14 +195,7 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 	if(!raw)
 		return DataPtr();
 
-	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
-	zeroer->SetInput(raw);
-	zeroer->SetOutputOrigin(0, 0, 0);
-
-	vtkImageDataPtr imageData = zeroer->GetOutput();
-	imageData->Update();
-
-	ImagePtr image(new Image(uid, imageData));
+	ImagePtr image(new Image(uid, raw));
 
 	//  RegistrationTransform regTrans(rMd, QFileInfo(filename).lastModified(), "From MHD file");
 	//  image->get_rMd_History()->addRegistration(regTrans);
