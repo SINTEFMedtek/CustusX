@@ -19,15 +19,15 @@
 #ifdef CX_USE_TSF
 #include "parameters.hpp"
 #include "tsf-config.h"
-#endif //CX_USE_TSF
 
-SCENARIO("Loading the Neuro-Vessels-USA preset", "[TSF]"){
+SCENARIO("Loading the Neuro-Vessels-USA (gpu) preset", "[TSF]"){
 	GIVEN("we init the parameters with default values"){
 		std::string path = std::string(PARAMETERS_DIR);
 		paramList neuroVesselsUSAParameters;
 		REQUIRE_NOTHROW(neuroVesselsUSAParameters = initParameters(path));
 
 		WHEN("we set the string parameters parameter to Neuro-Vessels-USA"){
+			REQUIRE_NOTHROW(setParameter(neuroVesselsUSAParameters, "centerline-method", "gpu"));
 			REQUIRE_NOTHROW(setParameter(neuroVesselsUSAParameters, "parameters", "Neuro-Vessels-USA"));
 
 			AND_WHEN("we load the parameter presets"){
@@ -59,5 +59,43 @@ SCENARIO("Loading the Neuro-Vessels-USA preset", "[TSF]"){
 		}
 	}
 }
+
+SCENARIO("Loading the Phantom-Acc-US (test) preset", "[TSF]"){
+	GIVEN("we init the parameters with default values"){
+		std::string path = std::string(PARAMETERS_DIR);
+		paramList phantomAccUSParameters;
+		REQUIRE_NOTHROW(phantomAccUSParameters = initParameters(path));
+
+		WHEN("we set the string parameters parameter to Neuro-Vessels-US"){
+			REQUIRE_NOTHROW(setParameter(phantomAccUSParameters, "centerline-method", "test"));
+			REQUIRE_NOTHROW(setParameter(phantomAccUSParameters, "parameters", "Phantom-Acc-US"));
+
+			AND_WHEN("we load the parameter presets"){
+				REQUIRE_NOTHROW(loadParameterPreset(phantomAccUSParameters, path));
+
+				THEN("we can check that the expected values are set"){
+					CHECK(getParamStr(phantomAccUSParameters, "mode") == "white");
+					CHECK(getParam(phantomAccUSParameters, "radius-min") == 5);
+					CHECK(getParam(phantomAccUSParameters, "large-blur") == 5);
+					CHECK(getParam(phantomAccUSParameters, "fmax") == Approx(0.05));
+					CHECK(getParamStr(phantomAccUSParameters, "cropping") == "threshold");
+					CHECK(getParam(phantomAccUSParameters, "cropping-threshold") == 100);
+					CHECK(getParam(phantomAccUSParameters, "min-scan-lines-threshold") == 5);
+					CHECK(getParamStr(phantomAccUSParameters, "minimum") == "0");
+					CHECK(getParamStr(phantomAccUSParameters, "maximum") == "150");
+					CHECK(getParamBool(phantomAccUSParameters, "no-segmentation") == true);
+				}
+				AND_WHEN("we try to set a bool parameter to false"){
+					REQUIRE_NOTHROW(setParameter(phantomAccUSParameters, "no-segmentation", "false"));
+
+					THEN("we can check that it get the correct value"){
+						CHECK(getParamBool(phantomAccUSParameters, "no-segmentation") == false);
+					}
+				}
+			}
+		}
+	}
+}
+#endif //CX_USE_TSF
 
 //=================================================================

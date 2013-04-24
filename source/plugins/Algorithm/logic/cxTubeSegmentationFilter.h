@@ -47,7 +47,7 @@ public:
 
 	virtual bool hasPresets();
 	virtual ssc::PresetsPtr getPresets();
-	virtual QDomElement getNewPreset(QString name); ///< get a xml element containing the currently set parameters
+	virtual QDomElement generatePresetFromCurrentlySetOptions(QString name); ///< get a xml element containing the currently set parameters
 	virtual void requestSetPresetSlot(QString name); ///< try to set a specific preset
 
 	virtual bool execute();
@@ -61,7 +61,6 @@ protected:
 private slots:
 	void patientChangedSlot(); ///< updates where tsf will save temp data
 	void inputChangedSlot(); ///< updates where tsf will save the .vtk file
-//	void parametersFileChanged(); ///<  request that all options are updated to fit the selected preset
 	void loadNewParametersSlot(); ///< updates all options
 	void resetOptionsAdvancedSlot(); ///< resets all options to their default advanced settings
 	void resetOptionsSlot(); ///< resets all options to their default settings
