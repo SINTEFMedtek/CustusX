@@ -68,24 +68,12 @@ include_directories(
 # =========================================================
 # create the target
 add_library( cxPluginCalibration ${SOURCE_FILES} )
-target_link_libraries( cxPluginCalibration
+set(LINK_LIBRARIES
     cxResource
     cxPluginAcquisition
       )
-
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(cxPluginCalibration)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(cxPluginCalibration_unity
-                cxResource
-                cxPluginAcquisition
-                        )
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-# =========================================================
+target_link_libraries( cxPluginCalibration ${LINK_LIBRARIES} )
+CX_COTIRE_ADD_LIBRARY(cxPluginCalibration "${LINK_LIBRARIES}")
 
 
 # add/remove to suit your own needs.

@@ -6,10 +6,6 @@
 ##
 ###########################################################
 
-# Make VERSION_NUMBER available for c++ files in stateMachineManger folder
-ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
-ADD_DEFINITIONS(-DVERSION_NUMBER_VERBOSE="${VERSION_NUMBER_VERBOSE}")
-
 SET( CX_QT_MOC_HEADER_FILES
 	cxWorkflowStateMachine.h
 	cxWorkflowState.h
