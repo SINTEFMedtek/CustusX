@@ -585,18 +585,7 @@ target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES})
 #message(STATUS SSC Libs:\n ${SSC_GENERATED_LIBRARIES})
 # =========================================================
 
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(SSC)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(SSC_unity 
-                ${SSC_GENERATED_LIBRARIES}
-                )
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-
+CX_COTIRE_ADD_LIBRARY(SSC "${SSC_GENERATED_LIBRARIES}")
 
 # =========================================================
 # 
