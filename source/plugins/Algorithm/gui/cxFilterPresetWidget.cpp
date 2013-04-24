@@ -41,7 +41,7 @@ void FilterPresetWidget::saveSlot()
 		return;
 
 	QString text = PresetWidget::getNewPresetName(true);
-	QDomElement element = mFilter->getNewPreset(text);
+	QDomElement element = mFilter->generatePresetFromCurrentlySetOptions(text);
 	mPresets->addCustomPreset(element);
 
 	PresetWidget::saveSlot();
