@@ -1,6 +1,23 @@
-#define CATCH_CONFIG_MAIN  // This tell CATCH to provide a main() - only do this in one cpp file
+//#define CATCH_CONFIG_MAIN  // This tell CATCH to provide a main() - only do this in one cpp file
+//#include "catch.hpp"
 
+#define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
+
+#include "sscApplication.h"
+
+int main (int argc, char* argv[])
+{
+	// global setup...
+	ssc::Application app( argc, argv );
+
+	int result = Catch::Main( argc, argv );
+
+	// global clean-up...
+
+  return result;
+}
+
 
 /**
  * This file describes how to use CATCH.

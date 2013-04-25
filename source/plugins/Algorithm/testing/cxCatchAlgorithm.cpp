@@ -1,22 +1,11 @@
 #include "catch.hpp"
 
-//=================================================================
-// Test helpers - move to own file
-//=================================================================
-#include "cxTubeSegmentationFilter.h"
-
-namespace cx {
-class TubeSegmentationFilterTester : public TubeSegmentationFilter
-{
-
-};
-}//namespace cx
-
-//=================================================================
-// TSF test
-//=================================================================
-
 #ifdef CX_USE_TSF
+
+//=================================================================
+// TSF library tests
+//=================================================================
+
 #include "parameters.hpp"
 #include "tsf-config.h"
 
@@ -60,14 +49,14 @@ SCENARIO("Loading the Neuro-Vessels-USA (gpu) preset", "[TSF]"){
 	}
 }
 
-SCENARIO("Loading the Phantom-Acc-US (test) preset", "[TSF]"){
+SCENARIO("Loading the Phantom-Acc-US (gpu) preset", "[TSF]"){
 	GIVEN("we init the parameters with default values"){
 		std::string path = std::string(PARAMETERS_DIR);
 		paramList phantomAccUSParameters;
 		REQUIRE_NOTHROW(phantomAccUSParameters = initParameters(path));
 
 		WHEN("we set the string parameters parameter to Neuro-Vessels-US"){
-			REQUIRE_NOTHROW(setParameter(phantomAccUSParameters, "centerline-method", "test"));
+			REQUIRE_NOTHROW(setParameter(phantomAccUSParameters, "centerline-method", "gpu"));
 			REQUIRE_NOTHROW(setParameter(phantomAccUSParameters, "parameters", "Phantom-Acc-US"));
 
 			AND_WHEN("we load the parameter presets"){
@@ -96,6 +85,21 @@ SCENARIO("Loading the Phantom-Acc-US (test) preset", "[TSF]"){
 		}
 	}
 }
-#endif //CX_USE_TSF
 
 //=================================================================
+// TSFPresets tests
+//=================================================================
+#include "cxTSFPresets.h"
+#include <QStringList>
+
+TEST_CASE("should load tsf presets from file location and get more than 0 presets", "[TSF][TSFPresets]"){
+	cx::TSFPresetsPtr presets(new cx::TSFPresets());
+
+	QStringList presetList = presets->getPresetList();
+	CHECK(presetList.size() > 0);
+
+	foreach ( QString item, presetList)
+		std::cout << item.toStdString() << std::endl;
+}
+
+#endif //CX_USE_TSF
