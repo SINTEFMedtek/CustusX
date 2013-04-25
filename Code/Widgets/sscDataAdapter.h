@@ -16,13 +16,6 @@
 // A PARTICULAR PURPOSE.
 //
 // See sscLicense.txt for more information.
-
-/*
- * sscDataAdapter.h
- *
- *  Created on: Jun 27, 2010
- *      Author: christiana
- */
 #ifndef SSCDATAADAPTER_H_
 #define SSCDATAADAPTER_H_
 
@@ -37,6 +30,9 @@
  * doubles, booleans and so on publish their value in a generic
  * manner, thus enabling us to write generic widgets for displaying
  * and changing them.
+ *
+ * \author Christian Askeland, SINTEF
+ * \date Jun 27, 2010
  *
  * \ingroup sscWidget
  */
