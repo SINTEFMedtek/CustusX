@@ -1,13 +1,7 @@
-/*
- * sscVolumeHelpers.h
- *
- *  Created on: Dec 13, 2010
- *      Author: dev
- */
-
 #ifndef SSCVOLUMEHELPERS_H_
 #define SSCVOLUMEHELPERS_H_
 
+#include <map>
 #include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
 
@@ -33,6 +27,11 @@ vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim, Vector3D spacing,
   * output instead of doing the conversion once more. Can be used when only the LUT should be updated.
   */
 ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvertedVolume = vtkImageDataPtr(), bool verbose = true);
+
+/**
+ * Get information about a ssc volume.
+ */
+std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image);
 
 /**
  * \}

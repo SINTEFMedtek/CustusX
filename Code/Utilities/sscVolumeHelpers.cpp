@@ -1,10 +1,3 @@
-/*
- * sscVolumeHelpers.cpp
- *
- *  Created on: Dec 13, 2010
- *      Author: dev
- */
-
 #include "sscVolumeHelpers.h"
 
 #include <vtkUnsignedCharArray.h>
@@ -26,16 +19,13 @@
 #include "sscImageLUT2D.h"
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
+#include "sscEnumConverter.h"
 
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 
 namespace ssc
 {
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
 
 vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
                                      Vector3D spacing,
@@ -54,16 +44,6 @@ vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
 	unsigned char* ptr = reinterpret_cast<unsigned char*>(data->GetScalarPointer());
 	std::fill(ptr, ptr+scalarSize, initValue);
 
-//	scalarSize += 1;	//TODO: Whithout the +1 the volume is black
-
-//	unsigned char *rawchars = (unsigned char*)malloc(scalarSize);
-//	std::fill(rawchars,rawchars+scalarSize, initValue);
-
-//	vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
-//	array->SetNumberOfComponents(1);
-//	array->SetArray(rawchars, scalarSize, 0); // take ownership
-//	data->GetPointData()->SetScalars(array);
-
 	// A trick to get a full LUT in ssc::Image (automatic LUT generation)
 	// Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
 	ptr[0] = 255;
@@ -74,7 +54,6 @@ vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
 
 	return data;
 }
-
 
 vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim,
                                            ssc::Vector3D spacing,
@@ -106,6 +85,7 @@ vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim,
 
 	return data;
 }
+
 /**Convert the input image to the smallest unsigned format.
  *
  * CT images are always shifted +1024 and converted.
@@ -120,8 +100,6 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
 {
 	vtkImageDataPtr input = image->getBaseVtkImageData();
 
-//	if (input->GetScalarRange()[0] >= 0) // wrong: must convert type even if all data are positive
-//		return input;
 	if (input->GetScalarTypeMin() >= 0)
 		return image;
 
@@ -172,6 +150,56 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
 	TF3D->shift(shift);
 	LUT2D->shift(shift);
 	retval->resetTransferFunction(TF3D, LUT2D);
+
+	return retval;
+}
+
+std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
+{
+	std::map<std::string, std::string> retval;
+	if(!image)
+		return retval;
+
+	//ssc::image
+	retval["Filepath"] = image->getFilePath().toStdString();
+	retval["Coordinate system"] = image->getCoordinateSystem().toString().toStdString();
+	retval["Image type"] = image->getImageType().toStdString();
+	retval["Scalar minimum"] = string_cast(image->getMin());
+	retval["Scalar maximum"] = string_cast(image->getMax());
+	retval["Range (max - min)"] = string_cast(image->getRange());
+	retval["Maximum alpha value"] = string_cast(image->getMaxAlphaValue());
+	retval["Modality"] = image->getModality().toStdString();
+	retval["Name"] = image->getName().toStdString();
+	retval["Parent space"] = image->getParentSpace().toStdString();
+	//retval["Registration status"] = enum2string(image->getRegistrationStatus()).toStdString();
+	retval["Shading"] = image->getShadingOn() ? "on" : "off";
+	retval["Space"] = image->getSpace().toStdString();
+	retval["Type"] = image->getType().toStdString();
+	retval["Uid"] = image->getUid().toStdString();
+
+	//vtImageData
+	double spacing_x, spacing_y, spacing_z;
+	image->getBaseVtkImageData()->GetSpacing(spacing_x, spacing_y, spacing_z);
+	retval["Spacing"] = string_cast(spacing_x)+" mm , "+string_cast(spacing_y)+" mm , "+string_cast(spacing_z)+" mm ";
+	int dims[3];
+	image->getBaseVtkImageData()->GetDimensions(dims);
+	retval["Dimensions"] = string_cast(dims[0])+" , "+string_cast(dims[1])+" , "+string_cast(dims[2]);
+	retval["Actual memory size"] = string_cast(image->getBaseVtkImageData()->GetActualMemorySize())+" kB";
+	retval["Estimated memory size"] = string_cast(image->getBaseVtkImageData()->GetEstimatedMemorySize())+" kB";
+//	int extent_x, extent_y, extent_z;
+//	image->getBaseVtkImageData()->GetExtent(extent_x, extent_y, extent_z);
+//	retval["Extent"] = string_cast(extent_x)+" , "+string_cast(extent_y)+" , "+string_cast(extent_z)+" ";
+	retval["Number of scalar components"] = string_cast(image->getBaseVtkImageData()->GetNumberOfScalarComponents());
+
+	retval["rMd"] = string_cast(image->get_rMd());
+
+	  //m_moveOrigo->GetInverse(m_moveOrigo);
+	  //std::cout << "Offset: " << usData->mOffset[0] << " " << usData->mOffset[1] << " " << usData->mOffset[2] << std::endl;
+	  //std::cout << "origoParams: " << origoParams[9] << " " << origoParams[10] << " " << origoParams[11] << std::endl;
+	  //std::cout << "Spacing: " << usData->vtkData->GetSpacing()[0] << " " << usData->vtkData->GetSpacing()[1] << " " << usData->vtkData->GetSpacing()[2] << std::endl;
+	  //std::cout << "GetDimensions: " << usData->vtkData->GetDimensions()[0] << " " << usData->vtkData->GetDimensions()[1] << " " << usData->vtkData->GetDimensions()[2] << std::endl;
+	  //std::cout << "m_moveOrigo: " << m_moveOrigo;
+	  //std::cout << "calibration before: " << usData->calibration;
 
 	return retval;
 }
