@@ -10,7 +10,7 @@
 namespace cx {
 
 TSFPresets::TSFPresets() :
-	Presets(ssc::XmlOptionFile(), ssc::XmlOptionFile())
+	Presets(ssc::XmlOptionFile("Preset"), ssc::XmlOptionFile("Custom"))
 {
 	mPresetPath = cx::DataLocations::getTSFPath()+"/parameters";
 	this->loadPresetsFromFiles();
@@ -18,12 +18,17 @@ TSFPresets::TSFPresets() :
 
 QDomElement TSFPresets::createPresetElement(QString name, std::map<QString, QString>& parameters)
 {
+	QStringList ignoreParametersWithName;
+	ignoreParametersWithName << "centerline-vtk-file";
+	ignoreParametersWithName << "storage-dir";
+
 	QDomDocument doc;
 	QDomElement retval = doc.createElement("Preset");
 	retval.setAttribute("name", name);
 	std::map<QString, QString>::iterator it;
 	for(it = parameters.begin(); it != parameters.end(); ++it){
-		retval.setAttribute(it->first, it->second);
+		if (!ignoreParametersWithName.contains(it->first))
+			retval.setAttribute(it->first, it->second);
 	}
 	return retval;
 }
@@ -47,7 +52,8 @@ void TSFPresets::save()
             if(attribute.nodeName() != "name")
             	parameters[attribute.nodeName()] = attribute.nodeValue();
             if(attribute.nodeName() == "centerline-method")
-            	folderPath = mPresetPath + "/centerline-"+attribute.nodeValue()+"/";
+            	folderPath = mPresetPath + "/centerline-gpu/";
+            	//folderPath = mPresetPath + "/centerline-"+attribute.nodeValue()+"/";
         }
 		this->saveFile(folderPath, parameters);
 	}
@@ -81,7 +87,7 @@ void TSFPresets::remove()
 
 	//TODO
 //	QStringList split = mLastCustomPresetRemoved.split(": ");
-	QString folderPath = mPresetPath+"/centerline-gpu";
+	QString folderPath = mPresetPath+"/centerline-gpu/"+mLastCustomPresetRemoved;
 //	foreach(QString string, split)
 //	{
 //		std::cout << string.toStdString() << std::endl;
@@ -130,7 +136,7 @@ void TSFPresets::convertToInternalFormat(std::map<QString, QString>& presets)
 	{
 		std::map<QString, QString> params = this->readFile(it->second);
 		QDomElement preset = TSFPresets::createPresetElement(it->first, params);
-		Presets::addDefaultPreset(preset);
+		Presets::addCustomPreset(preset);
 	}
 }
 
@@ -265,11 +271,7 @@ void TSFPresets::editParameterFile(QString name, bool addNotRemove)
 void TSFPresets::deleteFile(QString filePath)
 {
 	std::cout << filePath.toStdString() << std::endl;
-	return;
 
-	//TODO
-
-/*
 	QFile file(filePath);
 	QString customPresetName = QFileInfo(file).fileName();
 
@@ -285,16 +287,6 @@ void TSFPresets::deleteFile(QString filePath)
 	//-------------------------------------------------------------
 	if(!file.remove())
 		std::cout << "file: " << filePath.toStdString() << " not removed..." << std::endl;
-		*/
-}
-
-
-void TSFPresets::print(QDomElement element)
-{
-	QTextStream stream(stdout);
-	stream << "\n";
-	element.save(stream, 4);
-	stream << "\n";
 }
 
 } /* namespace cx */
