@@ -6,6 +6,8 @@
 #include "sscForwardDeclarations.h"
 #include "cxDataInterface.h"
 
+#include <QTextBrowser>
+
 namespace cx
 {
 
@@ -37,6 +39,8 @@ private:
   DataModalityStringDataAdapterPtr mModalityAdapter;
   ImageTypeStringDataAdapterPtr mImageTypeAdapter;
   ActiveImageProxyPtr mActiveImageProxy;
+
+  QTextBrowser* mTextBrowser;
 };
 
 }//namespace cx

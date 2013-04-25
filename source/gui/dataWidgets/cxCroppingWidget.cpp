@@ -78,6 +78,8 @@ void CroppingWidget::boxValuesChanged()
 
 void CroppingWidget::cropperChangedSlot()
 {
+//	int* dims = mInteractiveCropper->getDimensions();
+//	std::cout << string_cast(dims[0]) << " " << string_cast(dims[1]) << " " << string_cast(dims[2]) << std::endl;
   mUseCropperCheckBox->setChecked(mInteractiveCropper->getUseCropping());
   mShowBoxCheckBox->setChecked(mInteractiveCropper->getShowBoxWidget());
 

@@ -24,10 +24,12 @@
 
 #include <vector>
 #include <vtkTransform.h>
+//#include <vtkPolyData.h>
 #include <vtkAbstractVolumeMapper.h>
 #include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+//#include <vtkImageData.h>
 #include "sscTypeConversions.h"
 #include "cxRepManager.h"
 #include "sscDataManager.h"
@@ -250,6 +252,18 @@ bool InteractiveCropper::getShowBoxWidget() const
 		return false;
 	return mBoxWidget->GetEnabled();
 }
+
+//int* InteractiveCropper::getDimensions()
+//{
+//	int dims[3];
+////	if(mImage)
+////		mImage->getBaseVtkImageData()->GetDimensions(dims);
+//	ssc::DoubleBoundingBox3D bb_new = getBoxWidgetSize();
+//	dims[0] = bb_new.cbegin()[1] -bb_new.cbegin()[0];
+//	dims[1] = bb_new.cbegin()[3] -bb_new.cbegin()[2];
+//	dims[2] = bb_new.cbegin()[5] -bb_new.cbegin()[4];
+//	return dims;
+//}
 
 /** Set the box widget bounding box to the input box (given in data space)
  */
