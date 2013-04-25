@@ -822,7 +822,6 @@ std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
 	    	if(doubleDAIt->get()->getValueName().toStdString() == numericIt->first)
 	    	{
 	    		float epsilon = 0.00000000000001;
-//	    		if(doubleDAIt->get()->getValue() != numericIt->second.get())
 	    		if(!(abs(doubleDAIt->get()->getValue() - numericIt->second.get()) < epsilon))
 	    			retval.push_back(*doubleDAIt);
 	    	}

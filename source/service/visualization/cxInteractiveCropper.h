@@ -59,6 +59,7 @@ public:
 	ssc::DoubleBoundingBox3D getMaxBoundingBox();
 	bool getUseCropping();
 	bool getShowBoxWidget() const;
+//	int* getDimensions();
 signals:
 	void changed();
 public slots:
