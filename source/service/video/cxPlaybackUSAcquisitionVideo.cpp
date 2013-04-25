@@ -35,9 +35,9 @@
 namespace cx
 {
 
-USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() : QObject(NULL)
+USAcquisitionVideoPlayback::USAcquisitionVideoPlayback() : QObject(NULL), mVideoSourceUid("playback")
 {
-	mVideoSource.reset(new BasicVideoSource("playback"));
+	mVideoSource.reset(new BasicVideoSource(mVideoSourceUid));
 	mVideoSource->setStatusString(QString("No US Acquisition"));
 
 	connect(&mUSImageDataFutureWatcher, SIGNAL(finished()), this, SLOT(usDataLoadFinishedSlot()));
@@ -189,6 +189,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 {
 	// file read operation has completed: read and clear
 	mCurrentData = mUSImageDataFutureResult.result();
+	mCurrentData.mProbeData.mData.setUid(mVideoSourceUid);
 	// clear result so we can check for it next run
 	mUSImageDataReader.reset();
 
@@ -244,7 +245,7 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	int timeout = 1000; // invalidate data if timestamp differ from time too much
 	mVideoSource->overrideTimeout(fabs(timestamp-*iter)>timeout);
 
-	ssc::ImagePtr image(new ssc::Image("playback", mCurrentData.mUsRaw->getImageContainer()->get(index)));
+	ssc::ImagePtr image(new ssc::Image(mVideoSourceUid, mCurrentData.mUsRaw->getImageContainer()->get(index)));
 	image->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestamp));
 
 	mVideoSource->setInfoString(QString("%1 - Frame %2").arg(mCurrentData.mUsRaw->getName()).arg(index));

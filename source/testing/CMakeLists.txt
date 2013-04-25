@@ -12,6 +12,56 @@ endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
 
+####################################################################################
+    # CATCH -start
+    
+    #------------------------------------------------------------------------------
+    # Set variables
+    #-----------------------------------------------------------------------------
+    set(CATCH_SOURCES 
+        cxCatch.cpp
+        ../plugins/Algorithm/testing/cxCatchAlgorithm.cpp
+    )
+    #------------------------------------------------------------------------------
+    # Includes
+    #-----------------------------------------------------------------------------
+    include_directories(
+		.
+		${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/logic
+		)
+    #------------------------------------------------------------------------------
+    # Executable
+    #-----------------------------------------------------------------------------
+    if (APPLE)
+    	add_executable(Catch MACOSX_BUNDLE ${CATCH_SOURCES} )
+    else (APPLE)
+    	if(CX_WINDOWS)
+    		add_executable(Catch WIN32 ${CATCH_SOURCES} )
+    	else(CX_WINDOWS)
+    		add_executable(Catch ${CATCH_SOURCES} )
+    	endif(CX_WINDOWS)
+    endif (APPLE)
+    
+    #------------------------------------------------------------------------------
+    # Linking
+    #------------------------------------------------------------------------------
+    set( CATCH_LIBS
+        cxPluginAlgorithm
+    )
+    if (CX_USE_TSF)
+        set( CATCH_LIBS
+            ${CATCH_LIBS}
+            ${Tube-Segmentation-Framework_LIBRARIES}
+        )
+    endif()
+    
+    target_link_libraries( Catch ${CATCH_LIBS} )
+    		
+	# CATCH -end
+####################################################################################
+
+
+
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/resource/settings
