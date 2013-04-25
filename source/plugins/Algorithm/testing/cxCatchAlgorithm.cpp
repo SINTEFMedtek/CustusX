@@ -98,8 +98,7 @@ TEST_CASE("should load tsf presets from file location and get more than 0 preset
 	QStringList presetList = presets->getPresetList();
 	CHECK(presetList.size() > 0);
 
-	foreach ( QString item, presetList)
-		std::cout << item.toStdString() << std::endl;
+//	foreach ( QString item, presetList)
+//		std::cout << item.toStdString() << std::endl;
 }
-
 #endif //CX_USE_TSF
