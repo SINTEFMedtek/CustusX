@@ -14,9 +14,6 @@ if(SSC_USE_GCOV)
 	add_definitions(--coverage)
 endif()
 
-# Needed for Tube-Segmentation-Framework on Linux, but won't work because ITK (and other dependencies?) don't suppport C++11 (C++0x)
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-
 # Use:
 # CX_WINDOWS for all windows
 # CX_WIN32 for 32 bit windows
@@ -200,10 +197,6 @@ IF( OpenCV_FOUND )
 ELSE()
     option(CX_USE_OpenCV "use OpenCV" OFF)
 ENDIF()
-#if (USE_OpenCV)
-#    ADD_DEFINITIONS(-DUSE_OpenCV)
-#    message(STATUS "USE_OpenCV II: " ${USE_OpenCV})
-#endif()
 
 #------------------------------------------------------------------------------
 # Add subdirectories
