@@ -42,9 +42,6 @@ protected:
 	void deleteFile(QString filePath); ///< deletes a given preset file from the system
 	void editParameterFile(QString name, bool addNotRemove);
 
-	//debugging
-	void print(QDomElement element); ///< debugging function for printing xml elements
-
 	QString mPresetPath; ///< path to the location where presets can be found and saved
 	std::map<QString, QString> mPresetsMap; ///< map of currently available presets
 };

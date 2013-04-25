@@ -40,13 +40,7 @@ void TestTSFPresets::testLoadPresets()
 
 	foreach(QString preset, presetList)
 	{
-		CPPUNIT_ASSERT_MESSAGE("Default preset "+preset.toStdString()+" is not defined as default.", presets->isDefaultPreset(preset));
-//		QStringList split = preset.split(": ");
-//		foreach(QString string, split)
-//		{
-//			if(!string.contains("centerline"))
-//				CPPUNIT_ASSERT_MESSAGE("Preset "+string.toStdString()+" is not defined as default.", presets->isDefaultPreset(string));
-//		}
+		CPPUNIT_ASSERT_MESSAGE("Default preset "+preset.toStdString()+" is defined as default.", !presets->isDefaultPreset(preset));
 	}
 }
 
