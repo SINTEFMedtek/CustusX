@@ -16,6 +16,7 @@
 #include "sscMessageManager.h"
 #include "sscVector3D.h"
 #include "cxRenderTimer.h"
+#include "cxVideoService.h"
 
 namespace cx
 {
@@ -49,12 +50,16 @@ GrabberReceiveThread::GrabberReceiveThread(QObject* parent) :
 
 void GrabberReceiveThread::addImageToQueue(ssc::ImagePtr imgMsg)
 {
-	mFPSTimer->beginRender();
-	mFPSTimer->endRender();
-	if (mFPSTimer->intervalPassed())
+	//Only count fps for active video source
+	if (imgMsg->getUid().compare(videoService()->getActiveVideoSource()->getUid()) == 0)
 	{
-		emit fps(mFPSTimer->getFPS());
-		mFPSTimer->reset(2000);
+		mFPSTimer->beginRender();
+		mFPSTimer->endRender();
+		if (mFPSTimer->intervalPassed())
+		{
+			emit fps(mFPSTimer->getFPS());
+			mFPSTimer->reset(2000);
+		}
 	}
 
 	//Test if Sonix. Then calibrate time stamps
