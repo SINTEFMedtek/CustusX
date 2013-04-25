@@ -36,21 +36,15 @@ void TestTSFPresets::testLoadPresets()
 	TSFPresetsPtr presets(new TSFPresets());
 
 	QStringList presetList = presets->getPresetList("");
-	CPPUNIT_ASSERT_MESSAGE("List of presets shorter than expected.", presetList.size() >= 6);
+	CPPUNIT_ASSERT_MESSAGE("List of presets is shorter than expected.", presetList.size() >= 0);
 
 	foreach(QString preset, presetList)
 	{
-		CPPUNIT_ASSERT_MESSAGE("Default preset "+preset.toStdString()+" is not defined as default.", presets->isDefaultPreset(preset));
-//		QStringList split = preset.split(": ");
-//		foreach(QString string, split)
-//		{
-//			if(!string.contains("centerline"))
-//				CPPUNIT_ASSERT_MESSAGE("Preset "+string.toStdString()+" is not defined as default.", presets->isDefaultPreset(string));
-//		}
+		CPPUNIT_ASSERT_MESSAGE("Default preset "+preset.toStdString()+" is defined as default.", !presets->isDefaultPreset(preset));
 	}
 }
 
-void TestTSFPresets::testNewPresets()
+void TestTSFPresets::testSaveNewPresets()
 {
 	TSFPresetsPtr presets = this->newPreset();
 	CPPUNIT_ASSERT_MESSAGE("Custom preset "+mPresetFileName.toStdString()+" is defined as default.", !presets->isDefaultPreset(mPresetFileName));
@@ -142,7 +136,7 @@ void TestTSFPresets::deletePreset(TSFPresetsPtr preset)
 {
 	preset->deleteCustomPreset(mPresetFileName);
 	preset->remove();
-	//mDirty = false;
+	mDirty = false;
 }
 
 } /* namespace cx */

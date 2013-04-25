@@ -16,6 +16,8 @@
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
 #include "cxVolumeInfoWidget.h"
+#include "sscVolumeHelpers.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
