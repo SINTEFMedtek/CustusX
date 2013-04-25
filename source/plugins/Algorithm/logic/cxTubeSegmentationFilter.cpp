@@ -264,6 +264,7 @@ bool TubeSegmentationFilter::postProcess()
 
 		//add contour internally to cx
 		ssc::MeshPtr contour = ContourFilter::postProcess(rawContour, inputImage, QColor("blue"));
+		contour->get_rMd_History()->setRegistration(rMd_c);
 
 		//set output
 		mOutputTypes[2]->setValue(outputSegmentation->getUid());
@@ -728,8 +729,7 @@ void TubeSegmentationFilter::setOptionValue(QString valueName, QString value)
 	}
 	else if(boolOption)
 	{
-		std::cout << "booloption: " << value.toStdString() << " for value " << valueName.toStdString() << std::endl;
-		bool boolValue = (value.compare("true") == 0) ? true : false;
+		bool boolValue = (value.compare("1") == 0) ? true : false;
 		boolOption->setValue(boolValue);
 	}
 	else if(doubleOption)
