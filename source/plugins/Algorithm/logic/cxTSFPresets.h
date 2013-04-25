@@ -32,7 +32,7 @@ public:
 	virtual void save(); ///< saves the newly added presets to file
 	virtual void remove(); ///< removes the newly added presets to file
 
-private:
+protected:
 	virtual QStringList generatePresetList(QString tag); ///< internally generate the preset list
 	void loadPresetsFromFiles(); ///< loads all preset files in a given location into the system
 	void convertToInternalFormat(std::map<QString, QString>& presets); ///< converts a map of names and filepaths into the internal default list of presets
