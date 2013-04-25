@@ -788,8 +788,6 @@ std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
 	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringDAIt;
 	for(stringDAIt = mStringOptions.begin(); stringDAIt != mStringOptions.end(); ++stringDAIt)
 	{
-//		if(stringDAIt->get()->getValue().toStdString() == getParamStr(defaultOptions, stringDAIt->get()->getValueName().toStdString()))
-//			retval.push_back(*stringDAIt);
 	    boost::unordered_map<std::string, StringParameter>::iterator stringIt;
 	    for(stringIt = defaultOptions.strings.begin(); stringIt != defaultOptions.strings.end(); ++stringIt )
 	    {
@@ -823,7 +821,9 @@ std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
 	    {
 	    	if(doubleDAIt->get()->getValueName().toStdString() == numericIt->first)
 	    	{
-	    		if(doubleDAIt->get()->getValue() != numericIt->second.get())
+	    		float epsilon = 0.00000000000001;
+//	    		if(doubleDAIt->get()->getValue() != numericIt->second.get())
+	    		if(!(abs(doubleDAIt->get()->getValue() - numericIt->second.get()) < epsilon))
 	    			retval.push_back(*doubleDAIt);
 	    	}
 	    }
