@@ -80,14 +80,14 @@ void TSFPresets::remove()
 //	}
 
 	//TODO
-	QStringList split = mLastCustomPresetRemoved.split(": ");
-	QString folderPath = mPresetPath;
-	foreach(QString string, split)
-	{
-		std::cout << string.toStdString() << std::endl;
-		if(string.contains("centerline-"))
-			folderPath+=string;
-	}
+//	QStringList split = mLastCustomPresetRemoved.split(": ");
+	QString folderPath = mPresetPath+"/centerline-gpu";
+//	foreach(QString string, split)
+//	{
+//		std::cout << string.toStdString() << std::endl;
+//		if(string.contains("centerline-"))
+//			folderPath+=string;
+//	}
 
 	this->deleteFile(folderPath);
 
@@ -109,30 +109,16 @@ void TSFPresets::loadPresetsFromFiles()
 {
 	mPresetsMap.clear();
 
-	QDir parametersDir(mPresetPath);
+	QDir parametersDir(mPresetPath+"/centerline-gpu");
 	if(!parametersDir.exists())
 		return;
 
-	//get all folders in the presetpath
-	QStringList subDirs;
-	QFileInfoList infoList = parametersDir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot);
-	foreach(QFileInfo info, infoList)
-		subDirs << info.baseName();
+	QFileInfoList fileInfoList = parametersDir.entryInfoList(QDir::Files);
 
-	//for each folder get all files
-	foreach(const QString dir, subDirs)
+	foreach(QFileInfo info, fileInfoList)
 	{
-		if(parametersDir.cd(dir))
-		{
-			//for each file generate name based on part of the foldername and the filename: CPU - airways, GPU - airways etc...
-			QFileInfoList infoList = parametersDir.entryInfoList(QDir::Files);
-			foreach(QFileInfo info, infoList)
-			{
-				QString name = info.dir().dirName() + ": " + info.baseName();
-				mPresetsMap[name] = info.absoluteFilePath();
-			}
-			parametersDir.cdUp();
-		}
+		QString name = info.baseName();
+		mPresetsMap[name] = info.absoluteFilePath();
 	}
 	this->convertToInternalFormat(mPresetsMap);
 }

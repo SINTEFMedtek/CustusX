@@ -104,10 +104,7 @@ void TubeSegmentationFilter::requestSetPresetSlot(QString name)
 		mParameterFile = "none";
 	else
 	{
-		QStringList nameList = name.split(": ", QString::SkipEmptyParts);
-		mParameterFile = nameList.at(1);
-		QString temp = nameList.at(0);
-		centerLineMethod = temp.remove("centerline-");
+		mParameterFile = name;
 	}
 	this->loadNewParametersSlot();
 
