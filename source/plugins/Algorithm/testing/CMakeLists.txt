@@ -19,29 +19,17 @@ if (BUILD_TESTING)
 		${CPPUNIT_INCLUDE_DIR}
 		../logic
 		${CustusX3_SOURCE_DIR}/external/ssc/Code
-		#${CustusX3_SOURCE_DIR}/source/resource
-		#${CustusX3_SOURCE_DIR}/source/service/state
-		#${CustusX3_SOURCE_DIR}/source/service/patient
-		#${CustusX3_SOURCE_DIR}/source/service/tracking
-		#${CustusX3_SOURCE_DIR}/source/resource/settings
-		#${CustusX3_SOURCE_DIR}/source/resource/utilities
-		#${CustusX3_SOURCE_DIR}/source/resource/algorithms
-		#${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction
-		#${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
-		#${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction
 	    ${CustusX3_SOURCE_DIR}/source/logic/
 		)
 
 	# List of all test units
 	QT4_WRAP_CPP( CX_TEST_ACQUISITION_SOURCE_FILES
-		#cxTestAcqController.h
 		)
 
 	set(CX_TEST_ACQUISITION_SOURCE_FILES
 		${CX_TEST_ACQUISITION_SOURCE_FILES}
 		)
 
-    #message(STATUS "CX_USE_TSF: "${CX_USE_TSF})
     if (CX_USE_TSF)
         set(CX_TEST_ACQUISITION_SOURCE_FILES
 		    cxTestTubeSegmentationFramework.h
