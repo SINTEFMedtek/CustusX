@@ -3,14 +3,14 @@
 //=================================================================
 // Test helpers - move to own file
 //=================================================================
-//#include "cxTubeSegmentationFilter.h"
-//
-//namespace cx {
-//class TubeSegmentationFilterTester : public TubeSegmentationFilter
-//{
-//
-//};
-//}//namespace cx
+#include "cxTubeSegmentationFilter.h"
+
+namespace cx {
+class TubeSegmentationFilterTester : public TubeSegmentationFilter
+{
+
+};
+}//namespace cx
 
 //=================================================================
 // TSF test

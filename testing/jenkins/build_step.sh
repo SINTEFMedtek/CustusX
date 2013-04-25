@@ -22,7 +22,7 @@ WORKSPACE=$1
 ISB_PASSWORD=$2
 CX_SOURCE_DIR=$WORKSPACE/working/CustusX3/CustusX3
 CX_RELEASE_DIR=$WORKSPACE/working/CustusX3/build_Release
-CX_CATCH_DIR=$CX_RELEASE_DIR/source/apps/CustusX/
+CX_CATCH_DIR=$CX_RELEASE_DIR/source/testing
 
 # ==========================================================
 # Download, configure and build the project group.
