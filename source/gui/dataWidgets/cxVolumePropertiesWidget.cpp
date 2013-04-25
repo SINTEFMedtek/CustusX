@@ -14,6 +14,8 @@
 #include "sscDataManager.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringDataAdapter.h"
+#include "sscVolumeHelpers.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -70,6 +72,8 @@ VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
   new ssc::LabeledComboBoxWidget(this, mModalityAdapter, gridLayout, i++);
   new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter, gridLayout, i++);
   new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, i++);
+  mTextBrowser = new QTextBrowser();
+  gridLayout->addWidget(mTextBrowser, i++, 0, 1, 2);
 
 //  int i=0;
 //  gridLayout->addWidget(uidEdit,        i++, 0);
@@ -118,6 +122,18 @@ void VolumeInfoWidget::updateSlot()
 	mUidAdapter->setData(image);
 	mModalityAdapter->setData(image);
 	mImageTypeAdapter->setData(image);
+
+	mTextBrowser->clear();
+	QString text = "";
+	std::map<std::string, std::string> info = ssc::getDisplayFriendlyInfo(image);
+	std::map<std::string, std::string>::iterator it;
+	for(it = info.begin(); it != info.end(); ++it)
+	{
+		text += "<b>"+qstring_cast(it->first)+":</b> "+qstring_cast(it->second)+"<br>";
+	}
+	QTextDocument* doc = new QTextDocument();
+	doc->setHtml(text);
+	mTextBrowser->setDocument(doc);
 }
 /// -------------------------------------------------------
 /// -------------------------------------------------------

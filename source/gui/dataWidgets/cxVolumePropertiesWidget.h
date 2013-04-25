@@ -6,6 +6,8 @@
 #include "cxDataInterface.h"
 #include "cxActiveImageProxy.h"
 
+#include <QTextBrowser>
+
 namespace cx
 {
 /**
@@ -52,6 +54,8 @@ private:
   DataModalityStringDataAdapterPtr mModalityAdapter;
   ImageTypeStringDataAdapterPtr mImageTypeAdapter;
   ActiveImageProxyPtr mActiveImageProxy;
+
+  QTextBrowser* mTextBrowser;
 };
 
 /**
