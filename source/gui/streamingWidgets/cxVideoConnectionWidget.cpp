@@ -14,46 +14,32 @@
 
 #include "cxVideoConnectionWidget.h"
 
-//#include <QTreeWidget>
-//#include <QTreeWidgetItem>
-//#include <QStringList>
-//#include <QVBoxLayout>
 #include <QDir>
 #include <QStackedWidget>
 #include <QPushButton>
 #include <QFileDialog>
 
-//#include "vtkRenderWindow.h"
 #include "vtkImageData.h"
 
-//#include <QtGui>
-//#include "sscDoubleWidgets.h"
-//#include "sscView.h"
 #include "sscFileSelectWidget.h"
+#include "sscLabeledComboBoxWidget.h"
+#include "sscDataManager.h"
+#include "sscTime.h"
+#include "sscMessageManager.h"
+#include "sscProbeSector.h"
+#include "sscRegistrationTransform.h"
+#include "sscStringDataAdapterXml.h"
+#include "sscHelperWidgets.h"
 
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
-#include "sscLabeledComboBoxWidget.h"
-//#include "sscVideoRep.h"
-#include "sscDataManager.h"
-//#include "sscTypeConversions.h"
-//#include "sscToolManager.h"
-#include "sscTime.h"
-#include "sscMessageManager.h"
 #include "cxVideoConnectionManager.h"
 #include "cxImageServer.h"
 #include "cxVideoService.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "sscStringDataAdapterXml.h"
-//#include "cxVideoConnection.h"
-#include "sscHelperWidgets.h"
-//#include "cxDataInterface.h"
-
 #include "cxToolManager.h"
 #include "cxViewManager.h"
-#include "sscProbeSector.h"
-#include "sscRegistrationTransform.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 
@@ -383,9 +369,10 @@ void VideoConnectionWidget::importStreamImageSlot()
 	ssc::Transform3D rMd = ssc::Transform3D::Identity();
 
 	ssc::ToolPtr probe = ToolManager::getInstance()->findFirstProbe();
+	ssc::VideoSourcePtr videoSource;
 	if (probe)
 	{
-		input = probe->getProbe()->getRTSource()->getVtkImageData();
+		videoSource = probe->getProbe()->getRTSource();
 		ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 		ssc::Transform3D prMt = probe->get_prMt();
 		ssc::Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
@@ -393,10 +380,20 @@ void VideoConnectionWidget::importStreamImageSlot()
 		rMd = rMpr * prMt * tMu * uMv;
 	}
 	else
+		videoSource = videoService()->getActiveVideoSource();
+
+	if (!videoSource)
 	{
-		input = videoService()->getActiveVideoSource()->getVtkImageData();
+		ssc::messageManager()->sendWarning("No Video data source");
+		return;
+	}
+	if ( !videoSource->validData())
+	{
+		ssc::messageManager()->sendWarning("No valid video data");
+		return;
 	}
 
+	input = videoSource->getVtkImageData();
 	if(!input)
 	{
 		ssc::messageManager()->sendWarning("No Video data");
