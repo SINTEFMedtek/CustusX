@@ -312,9 +312,17 @@ void RegistrationHistory::updateRegistration(const QDateTime& oldTime, const Reg
  */
 void RegistrationHistory::setRegistration(const Transform3D& transform)
 {
+	bool changed = true;
+	if (similar(getCurrentRegistration().mValue, transform))
+	{
+		changed = false;
+	}
 	mData.clear();
 	this->addRegistration(RegistrationTransform(transform));
-	emit currentChanged();
+	if (changed)
+	{
+		emit currentChanged();
+	}
 }
 
 /**Set a parent fram, overwriting all history.
