@@ -17,153 +17,20 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscRT2DRep.h
- *
- *  Created on: Oct 31, 2010
- *      Author: christiana
- */
-
 #ifndef SSCRTSTREAMREP_H_
 #define SSCRTSTREAMREP_H_
 
 #include "sscRepImpl.h"
-#include "sscVideoSource.h"
 #include "sscVtkHelperClasses.h"
 #include "sscForwardDeclarations.h"
 #include "sscProbeSector.h"
-#include "sscViewportListener.h"
-
-typedef vtkSmartPointer<class vtkPlaneSource> vtkPlaneSourcePtr;
-typedef vtkSmartPointer<class vtkTexture> vtkTexturePtr;
-typedef vtkSmartPointer<class vtkTransformTextureCoords> vtkTransformTextureCoordsPtr;
-typedef vtkSmartPointer<class vtkDataSetMapper> vtkDataSetMapperPtr;
-typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
-typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
-typedef vtkSmartPointer<class vtkTextureMapToPlane> vtkTextureMapToPlanePtr;
-typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
-
-typedef vtkSmartPointer<class UltrasoundSectorSource> UltrasoundSectorSourcePtr;
 
 namespace ssc
 {
-
-typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
-
-
-/** \brief Wrap vtkActor displaying a video image, possibly clipped by a sector.
- *
- * Create a pipeline from a video vtkImageData to a vtkActor.
- *
- * \ingroup sscProxy
- */
-class VideoGraphicsPipeline
-{
-public:
-	VideoGraphicsPipeline();
-	virtual ~VideoGraphicsPipeline();
-
-	vtkActorPtr getActor();
-	void setActorUserMatrix(vtkMatrix4x4Ptr rMu);
-	void setVisibility(bool visible);
-
-	/** Set a mask for the video image.
-	  * Only one of clear and clip can be active at a time.
-	  * The mask must be of the same size as the video.
-	  * Zeros in the mask will be set to transparent.
-	  */
-	void setMask(vtkImageDataPtr mask);
-
-	/** Set a clip polygon for the video image.
-	  * Only one of clear and clip can be active at a time.
-	  * The mask must be of the same size as the video.
-	  * Zeros in the mask will be set to transparent.
-	  */
-	void setClip(vtkPolyDataPtr sector);
-
-	/** Set the imagedata pointing to the video.
-	  */
-	void setInputVideo(vtkImageDataPtr video);
-
-	/** One of the previously set inputs have been modified. Update the pipeline.
-	  */
-	void update();
-
-private:
-	void setLookupTable();
-
-	void setupPipeline();
-	void connectVideoImageToPipeline();
-	void updatePlaneSourceBounds();
-	void updateLUT();
-	bool inputImageIsEmpty();
-
-	vtkImageDataPtr mInputMask;
-	vtkPolyDataPtr mInputSector;
-	vtkImageDataPtr mInputVideo;
-
-	vtkLookupTablePtr mLUT;
-	vtkImageChangeInformationPtr mDataRedirecter;
-	vtkActorPtr mPlaneActor;
-	vtkPlaneSourcePtr mPlaneSource;
-	vtkTexturePtr mTexture;
-	UltrasoundSectorSourcePtr mUSSource;
-	vtkDataSetMapperPtr mDataSetMapper;
-	vtkTransformTextureCoordsPtr mTransformTextureCoords;
-	vtkTextureMapToPlanePtr mTextureMapToPlane;
-
-	vtkImageThresholdPtr mMapZeroToOne;
-	vtkImageMaskPtr mMaskFilter;
-};
-typedef boost::shared_ptr<VideoGraphicsPipeline> VideoGraphicsPipelinePtr;
-
-/**\brief Helper class for displaying a VideoSource.
- *
- * Used for Video display in VideoFixedPlaneRep and ToolRep3D.
- *
- *  Used by CustusX.
- *
- * \ingroup sscProxy
- */
-class VideoGraphics : public QObject
-{
-	Q_OBJECT
-public:
-	VideoGraphics(bool useMaskFilter=false);
-	virtual ~VideoGraphics();
-
-	void setRealtimeStream(VideoSourcePtr data);
-	void setTool(ToolPtr tool);
-	ToolPtr getTool();
-	ssc::ProbeSector getProbeData();
-	/** Turn sector clipping on/off.
-	 *  If on, only the area inside the probe sector is shown.
-	 */
-	void setClipToSector(bool on);
-	void setShowInToolSpace(bool on);
-	vtkActorPtr getActor();
-
-signals:
-	void newData();
-
-private slots:
-	void newDataSlot();
-	void receiveTransforms(Transform3D matrix, double timestamp);
-	void receiveVisible(bool visible);
-	void probeSectorChanged();
-
-private:
-	bool mClipToSector;
-	VideoGraphicsPipelinePtr mPipeline;
-	bool mShowInToolSpace;
-	ToolPtr mTool;
-	ssc::ProbeSector mProbeData;
-	VideoSourcePtr mData;
-	ImagePtr mImage;//Can be used instead of mTexture. This allows visualization of rt 3D
-};
+typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
+typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
-
 
 /** \brief Display a VideoSource in a View.
  *
@@ -175,6 +42,9 @@ typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
  *
  * \ingroup sscRep
  * \ingroup sscRepVideo
+ *
+ * \date Oct 31, 2010
+ * \author christiana
  */
 class VideoFixedPlaneRep : public ssc::RepImpl
 {
@@ -199,7 +69,7 @@ private:
 	void setCamera();
 	void updateSector();
 
-	VideoGraphicsPtr mRTGraphics;
+	VideoSourceGraphicsPtr mRTGraphics;
 	bool mShowSector;
 
 	ToolPtr mTool;
