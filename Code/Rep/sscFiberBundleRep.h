@@ -31,7 +31,7 @@
 namespace ssc
 {
 
-typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
+typedef boost::shared_ptr<class VideoGraphics> VideoSourceGraphicsPtr;
 typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
 
 /**

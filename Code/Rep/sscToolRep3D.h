@@ -31,7 +31,7 @@
 namespace ssc
 {
 
-typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
+typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
 
 /**\brief Display a Tool in 3D.
@@ -120,7 +120,7 @@ private:
 	ProbeSectorPtr mProbeSector;
 	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	vtkActorPtr mProbeSectorActor;
-	VideoGraphicsPtr mRTStream;
+	VideoSourceGraphicsPtr mRTStream;
 	Vector3D mTooltipPointColor;
 	Vector3D mOffsetPointColor;
 	Vector3D mOffsetLineColor;
