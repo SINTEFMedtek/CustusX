@@ -184,22 +184,20 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
 	int dims[3];
 	image->getBaseVtkImageData()->GetDimensions(dims);
 	retval["Dimensions"] = string_cast(dims[0])+" , "+string_cast(dims[1])+" , "+string_cast(dims[2]);
-	retval["Actual memory size"] = string_cast(image->getBaseVtkImageData()->GetActualMemorySize())+" kB";
-	retval["Estimated memory size"] = string_cast(image->getBaseVtkImageData()->GetEstimatedMemorySize())+" kB";
+
+	float actualMemorySizeKB = (float)image->getBaseVtkImageData()->GetActualMemorySize();
+	retval["Actual memory size"] = string_cast(actualMemorySizeKB/(1024*1024))+" GB, "+string_cast(actualMemorySizeKB/1024)+" MB, "+string_cast(actualMemorySizeKB)+" kB";
+//	retval["Estimated memory size"] = string_cast(image->getBaseVtkImageData()->GetEstimatedMemorySize())+" kB"; //not very informative
 //	int extent_x, extent_y, extent_z;
 //	image->getBaseVtkImageData()->GetExtent(extent_x, extent_y, extent_z);
 //	retval["Extent"] = string_cast(extent_x)+" , "+string_cast(extent_y)+" , "+string_cast(extent_z)+" ";
-	retval["Number of scalar components"] = string_cast(image->getBaseVtkImageData()->GetNumberOfScalarComponents());
-
+	retval["Scalar components"] = string_cast(image->getBaseVtkImageData()->GetNumberOfScalarComponents());
 	retval["rMd"] = string_cast(image->get_rMd());
-
-	  //m_moveOrigo->GetInverse(m_moveOrigo);
-	  //std::cout << "Offset: " << usData->mOffset[0] << " " << usData->mOffset[1] << " " << usData->mOffset[2] << std::endl;
-	  //std::cout << "origoParams: " << origoParams[9] << " " << origoParams[10] << " " << origoParams[11] << std::endl;
-	  //std::cout << "Spacing: " << usData->vtkData->GetSpacing()[0] << " " << usData->vtkData->GetSpacing()[1] << " " << usData->vtkData->GetSpacing()[2] << std::endl;
-	  //std::cout << "GetDimensions: " << usData->vtkData->GetDimensions()[0] << " " << usData->vtkData->GetDimensions()[1] << " " << usData->vtkData->GetDimensions()[2] << std::endl;
-	  //std::cout << "m_moveOrigo: " << m_moveOrigo;
-	  //std::cout << "calibration before: " << usData->calibration;
+//	double origin_x, origin_y, origin_z;
+//	image->getBaseVtkImageData()->GetOrigin(origin_x, origin_y, origin_z);
+//	retval["Origin"] =  string_cast(origin_x)+" , "+string_cast(origin_y)+" , "+string_cast(origin_z)+" "; //Is always 0...
+	retval["Number of components for points"] = string_cast(image->getBaseVtkImageData()->GetPointData()->GetNumberOfComponents());
+	retval["Scalar type"] = string_cast(image->getBaseVtkImageData()->GetScalarTypeAsString());
 
 	return retval;
 }
