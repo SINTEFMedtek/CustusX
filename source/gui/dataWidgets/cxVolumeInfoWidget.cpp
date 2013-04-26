@@ -5,7 +5,6 @@
 #include "sscImage.h"
 #include "sscLabeledLineEditWidget.h"
 #include "sscLabeledComboBoxWidget.h"
-#include "sscTypeConversions.h"
 #include "sscVolumeHelpers.h"
 #include "cxActiveImageProxy.h"
 
@@ -13,53 +12,37 @@ namespace cx
 {
 
 VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
-  BaseWidget(parent, "VolumeInfoWidget", "Volume Info")
+  InfoWidget(parent, "VolumeInfoWidget", "Volume Info")
 {
-  //layout
-  QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+	mActiveImageProxy = ActiveImageProxy::New();
+	connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(updateSlot()));
 
-  QGridLayout* gridLayout = new QGridLayout;
-  toptopLayout->addLayout(gridLayout);
+	this->addWidgets();
 
-  QPushButton* deleteButton = new QPushButton("Delete", this);
-  deleteButton->setToolTip("Remove the selected Image from the system.");
-  connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteDataSlot()));
-
-  mParentFrameAdapter = ParentFrameStringDataAdapter::New();
-  mNameAdapter = DataNameEditableStringDataAdapter::New();
-  mUidAdapter = DataUidEditableStringDataAdapter::New();
-  mModalityAdapter = DataModalityStringDataAdapter::New();
-  mImageTypeAdapter = ImageTypeStringDataAdapter::New();
-
-  int i=0;
-  gridLayout->addWidget(new ssc::LabeledLineEditWidget(this, mUidAdapter), i++, 0, 1, 2);
-  new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, i++);
-  new ssc::LabeledComboBoxWidget(this, mModalityAdapter, gridLayout, i++);
-  new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter, gridLayout, i++);
-  new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, i++);
-  mTextBrowser = new QTextBrowser();
-  gridLayout->addWidget(mTextBrowser, i++, 0, 1, 2);
-
-//  int i=0;
-//  gridLayout->addWidget(uidEdit,        i++, 0);
-//  gridLayout->addWidget(nameEdit,       i++, 0);
-//  gridLayout->addWidget(modalityCombo,  i++, 0);
-//  gridLayout->addWidget(imageTypeCombo, i++, 0);
-//  gridLayout->addWidget(parentFrame,    i++, 0);
-  gridLayout->addWidget(deleteButton, i++, 0, 1, 2);
-
-  toptopLayout->addStretch();
-
-  mActiveImageProxy = ActiveImageProxy::New();
-  connect(mActiveImageProxy.get(), SIGNAL(activeImageChanged(QString)), this, SLOT(updateSlot()));
-  //TODO: Check if the following are needed
-//  connect(mActiveImageProxy.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateSlot()));
-//  connect(mActiveImageProxy.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(updateSlot()));
-  updateSlot();
+	this->updateSlot();
 }
 
 VolumeInfoWidget::~VolumeInfoWidget()
 {}
+
+void VolumeInfoWidget::addWidgets()
+{
+	mParentFrameAdapter = ParentFrameStringDataAdapter::New();
+	mNameAdapter = DataNameEditableStringDataAdapter::New();
+	mUidAdapter = DataUidEditableStringDataAdapter::New();
+	mModalityAdapter = DataModalityStringDataAdapter::New();
+	mImageTypeAdapter = ImageTypeStringDataAdapter::New();
+
+	int i=0;
+	new ssc::LabeledLineEditWidget(this, mUidAdapter, gridLayout, i++);
+	new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, i++);
+	new ssc::LabeledComboBoxWidget(this, mModalityAdapter, gridLayout, i++);
+	new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter, gridLayout, i++);
+	new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, i++);
+
+	gridLayout->addWidget(mTabelWidget, i++, 0, 1, 2);
+	this->addStretch();
+}
 
 QString VolumeInfoWidget::defaultWhatsThis() const
 {
@@ -70,15 +53,6 @@ QString VolumeInfoWidget::defaultWhatsThis() const
       "</html>";
 }
 
-/*
-void VolumeInfoWidget::deleteDataSlot()
-{
-  if (!ssc::dataManager()->getActiveImage())
-    return;
-  ssc::dataManager()->removeData(ssc::dataManager()->getActiveImage()->getUid());
-}
-*/
-
 void VolumeInfoWidget::updateSlot()
 {
 	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
@@ -88,16 +62,7 @@ void VolumeInfoWidget::updateSlot()
 	mModalityAdapter->setData(image);
 	mImageTypeAdapter->setData(image);
 
-	mTextBrowser->clear();
-	QString text = "";
 	std::map<std::string, std::string> info = ssc::getDisplayFriendlyInfo(image);
-	std::map<std::string, std::string>::iterator it;
-	for(it = info.begin(); it != info.end(); ++it)
-	{
-		text += "<b>"+qstring_cast(it->first)+":</b> "+qstring_cast(it->second)+"<br>";
-	}
-	QTextDocument* doc = new QTextDocument();
-	doc->setHtml(text);
-	mTextBrowser->setDocument(doc);
+	this->populateTableWidget(info);
 }
 }//namespace

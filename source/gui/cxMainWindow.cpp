@@ -22,7 +22,7 @@
 //#include "cxPointSamplingWidget.h"
 #include "cxPatientData.h"
 #include "cxDataLocations.h"
-#include "cxMeshPropertiesWidget.h"
+#include "cxMeshInfoWidget.h"
 #include "cxLayoutEditorWidget.h"
 #include "cxFrameForest.h"
 #include "cxFrameTreeWidget.h"
@@ -98,7 +98,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
 	this->addAsDockWidget(new ImagePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
-	this->addAsDockWidget(new MeshPropertiesWidget(this), "Properties");
+	this->addAsDockWidget(new MeshInfoWidget(this), "Properties");
 #ifdef SSC_USE_DCMTK
 	this->addAsDockWidget(new ssc::DICOMWidget(this), "Utility");
 #endif // SSC_USE_DCMTK

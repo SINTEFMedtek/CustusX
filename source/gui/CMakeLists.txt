@@ -26,7 +26,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/cxCroppingWidget.h
     dataWidgets/cxClippingWidget.h 
     dataWidgets/cxImagePropertiesWidget.h
-    dataWidgets/cxMeshPropertiesWidget.h
+    dataWidgets/cxMeshInfoWidget.h
     dataWidgets/cxImportDataDialog.h
     dataWidgets/cxExportDataDialog.h
     dataWidgets/cxDataViewSelectionWidget.h
@@ -36,7 +36,7 @@ SET(cxGui_MOC_HDRS
     dataWidgets/sscDICOMWidget.h
     dataWidgets/cxEraserWidget.h
 	dataWidgets/cxDataSelectWidget.h
-	#dataWidgets/cxTSFPresetWidget.h
+	dataWidgets/cxInfoWidget.h
 	dataWidgets/cxTransferFunctionPresetWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
@@ -179,8 +179,8 @@ SET(cxGui_SRCS
     dataWidgets/cxTransferFunctionColorWidget.cpp
     dataWidgets/cxImagePropertiesWidget.h
     dataWidgets/cxImagePropertiesWidget.cpp
-    dataWidgets/cxMeshPropertiesWidget.h
-    dataWidgets/cxMeshPropertiesWidget.cpp
+    dataWidgets/cxMeshInfoWidget.h
+    dataWidgets/cxMeshInfoWidget.cpp
     dataWidgets/cxImportDataDialog.h
     dataWidgets/cxImportDataDialog.cpp
     dataWidgets/cxExportDataDialog.h
@@ -193,8 +193,8 @@ SET(cxGui_SRCS
     dataWidgets/cxEraserWidget.cpp
 	dataWidgets/cxDataSelectWidget.h
 	dataWidgets/cxDataSelectWidget.cpp
-	#dataWidgets/cxTSFPresetWidget.h
-	#dataWidgets/cxTSFPresetWidget.cpp
+	dataWidgets/cxInfoWidget.h
+	dataWidgets/cxInfoWidget.cpp
 	dataWidgets/cxTransferFunctionPresetWidget.h
 	dataWidgets/cxTransferFunctionPresetWidget.cpp
 	#----------------------

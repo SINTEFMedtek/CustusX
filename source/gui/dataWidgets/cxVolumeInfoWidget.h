@@ -1,12 +1,12 @@
 #ifndef CXVOLUMEINFOWIDGET_H_
 #define CXVOLUMEINFOWIDGET_H_
 
-#include "cxBaseWidget.h"
+#include "cxInfoWidget.h"
 
 #include "sscForwardDeclarations.h"
 #include "cxDataInterface.h"
 
-#include <QTextBrowser>
+#include <QTableWidget>
 
 namespace cx
 {
@@ -18,7 +18,7 @@ namespace cx
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF
  */
-class VolumeInfoWidget : public BaseWidget
+class VolumeInfoWidget : public InfoWidget
 {
   Q_OBJECT
 
@@ -30,17 +30,16 @@ public:
 
 protected slots:
   void updateSlot();
-  //void deleteDataSlot();
 
 private:
+  void addWidgets();
+
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   DataNameEditableStringDataAdapterPtr mNameAdapter;
   DataUidEditableStringDataAdapterPtr mUidAdapter;
   DataModalityStringDataAdapterPtr mModalityAdapter;
   ImageTypeStringDataAdapterPtr mImageTypeAdapter;
   ActiveImageProxyPtr mActiveImageProxy;
-
-  QTextBrowser* mTextBrowser;
 };
 
 }//namespace cx
