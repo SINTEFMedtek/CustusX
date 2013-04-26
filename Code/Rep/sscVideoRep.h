@@ -50,6 +50,73 @@ namespace ssc
 
 typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
 
+
+/** \brief Wrap vtkActor displaying a video image, possibly clipped by a sector.
+ *
+ * Create a pipeline from a video vtkImageData to a vtkActor.
+ *
+ * \ingroup sscProxy
+ */
+class VideoGraphicsPipeline
+{
+public:
+	VideoGraphicsPipeline();
+	virtual ~VideoGraphicsPipeline();
+
+	vtkActorPtr getActor();
+	void setActorUserMatrix(vtkMatrix4x4Ptr rMu);
+	void setVisibility(bool visible);
+
+	/** Set a mask for the video image.
+	  * Only one of clear and clip can be active at a time.
+	  * The mask must be of the same size as the video.
+	  * Zeros in the mask will be set to transparent.
+	  */
+	void setMask(vtkImageDataPtr mask);
+
+	/** Set a clip polygon for the video image.
+	  * Only one of clear and clip can be active at a time.
+	  * The mask must be of the same size as the video.
+	  * Zeros in the mask will be set to transparent.
+	  */
+	void setClip(vtkPolyDataPtr sector);
+
+	/** Set the imagedata pointing to the video.
+	  */
+	void setInputVideo(vtkImageDataPtr video);
+
+	/** One of the previously set inputs have been modified. Update the pipeline.
+	  */
+	void update();
+
+private:
+	void setLookupTable();
+
+	void setupPipeline();
+	void connectVideoImageToPipeline();
+	void updatePlaneSourceBounds();
+	void updateLUT();
+	bool inputImageIsEmpty();
+
+	vtkImageDataPtr mInputMask;
+	vtkPolyDataPtr mInputSector;
+	vtkImageDataPtr mInputVideo;
+
+	vtkLookupTablePtr mLUT;
+	vtkImageChangeInformationPtr mDataRedirecter;
+	vtkActorPtr mPlaneActor;
+	vtkPlaneSourcePtr mPlaneSource;
+	vtkTexturePtr mTexture;
+	UltrasoundSectorSourcePtr mUSSource;
+	vtkDataSetMapperPtr mDataSetMapper;
+	vtkTransformTextureCoordsPtr mTransformTextureCoords;
+	vtkTextureMapToPlanePtr mTextureMapToPlane;
+
+	vtkImageThresholdPtr mMapZeroToOne;
+	vtkImageMaskPtr mMaskFilter;
+};
+typedef boost::shared_ptr<VideoGraphicsPipeline> VideoGraphicsPipelinePtr;
+
 /**\brief Helper class for displaying a VideoSource.
  *
  * Used for Video display in VideoFixedPlaneRep and ToolRep3D.
@@ -69,6 +136,9 @@ public:
 	void setTool(ToolPtr tool);
 	ToolPtr getTool();
 	ssc::ProbeSector getProbeData();
+	/** Turn sector clipping on/off.
+	 *  If on, only the area inside the probe sector is shown.
+	 */
 	void setClipToSector(bool on);
 	void setShowInToolSpace(bool on);
 	vtkActorPtr getActor();
@@ -81,38 +151,21 @@ private slots:
 	void receiveTransforms(Transform3D matrix, double timestamp);
 	void receiveVisible(bool visible);
 	void probeSectorChanged();
-	void checkDataIntegrity();
 
 private:
-	void setLookupTable();
-	void clipToSectorChanged();
-
-	bool mUseMask;
-	bool mClipSector;
-
+	bool mClipToSector;
+	VideoGraphicsPipelinePtr mPipeline;
 	bool mShowInToolSpace;
 	ToolPtr mTool;
 	ssc::ProbeSector mProbeData;
 	VideoSourcePtr mData;
-	vtkImageChangeInformationPtr mDataRedirecter;
-	vtkActorPtr mPlaneActor;
-	vtkPlaneSourcePtr mPlaneSource;
-	vtkTexturePtr mTexture;
-	UltrasoundSectorSourcePtr mUSSource;
-	vtkDataSetMapperPtr mDataSetMapper;
-	vtkTransformTextureCoordsPtr mTransformTextureCoords;
-	vtkTextureMapToPlanePtr mTextureMapToPlane;
-
-	vtkImageThresholdPtr mMapZeroToOne;
-	vtkImageMaskPtr mMaskFilter;
-
 	ImagePtr mImage;//Can be used instead of mTexture. This allows visualization of rt 3D
 };
 
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
 
 
-/**\brief Display a VideoSource in a View.
+/** \brief Display a VideoSource in a View.
  *
  * A rep visualizing a VideoSource directly into the view plane.
  * It does not follow the tool, but controls the camera in order to
@@ -156,8 +209,6 @@ private:
 	ssc::TextDisplayPtr mStatusText;
 	ssc::TextDisplayPtr mInfoText;
 
-//	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
-//	vtkActorPtr mProbeSectorActor;
 	GraphicalPolyData3DPtr mProbeSector;
 	GraphicalPolyData3DPtr mProbeOrigin;
 	GraphicalPolyData3DPtr mProbeClipRect;

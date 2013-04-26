@@ -63,58 +63,276 @@ namespace ssc
 {
 
 
-VideoGraphics::VideoGraphics(bool useMaskFilter) :
-	mPlaneActor(vtkActorPtr::New()),
-	mPlaneSource(vtkPlaneSourcePtr::New()),
-	mTexture(vtkTexturePtr::New())
+VideoGraphicsPipeline::VideoGraphicsPipeline()
 {
-	mClipSector = true;
+	mPlaneActor = vtkActorPtr::New();
+	mPlaneSource = vtkPlaneSourcePtr::New();
+
 	mDataRedirecter = vtkImageChangeInformationPtr::New();
-	mUseMask = useMaskFilter;
-	mShowInToolSpace = true;
 	mUSSource = UltrasoundSectorSourcePtr::New();
-	mUSSource->setProbeSector(mProbeData.getSector());
 
-	this->setLookupTable();
+	// set a filter that map all zeros in the input to ones. This enables us to
+	// use zero as a special transparency value, to be used in masking.
+	mMapZeroToOne = vtkImageThresholdPtr::New();
+	mMapZeroToOne->ThresholdByLower(1.0);
+	mMapZeroToOne->SetInValue(1);
+	mMapZeroToOne->SetReplaceIn(true);
 
-	if (mUseMask)
-	{
-		// set a filter that map all zeros in the input to ones. This enables us to
-		// use zero as a special transparency value, to be used in masking.
-		mMapZeroToOne = vtkImageThresholdPtr::New();
-		mMapZeroToOne->ThresholdByLower(1.0);
-		mMapZeroToOne->SetInValue(1);
-		mMapZeroToOne->SetReplaceIn(true);
-
-		// set the filter that applies a mask to the stream data
-		mMaskFilter = vtkImageMaskPtr::New();
-		mMaskFilter->SetMaskInput(mProbeData.getMask());
-		mMaskFilter->SetMaskedOutputValue(0.0);
-	}
+	// set the filter that applies a mask to the stream data
+	mMaskFilter = vtkImageMaskPtr::New();
+	mMaskFilter->SetMaskInput(vtkImageDataPtr());
+	mMaskFilter->SetMaskedOutputValue(0.0);
 
 	// generate texture coords for mPlaneSource
 	mTextureMapToPlane = vtkTextureMapToPlanePtr::New();
-	mTextureMapToPlane->SetInput(mPlaneSource->GetOutput());
 
 	mTransformTextureCoords = vtkTransformTextureCoordsPtr::New();
-	mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
 	mTransformTextureCoords->SetOrigin( 0, 0.5, 0);
 	mTransformTextureCoords->SetScale( 1, 1, 0);
-	mTransformTextureCoords->FlipROn(); //r axis
+	mTransformTextureCoords->FlipROn(); // flip around axis
 
-	// all paths to go into the DataSetMapper
+	mTexture = vtkTexturePtr::New();
+	mTexture->RepeatOff();
+
 	mDataSetMapper = vtkDataSetMapperPtr::New();
-	mDataSetMapper->SetInput(mTransformTextureCoords->GetOutput() );
-//  mapper2->SetInput(mUSSource->GetOutput() );
-	mDataSetMapper->Update();
 
 	mPlaneActor->SetTexture(mTexture);
 	mPlaneActor->SetMapper(mDataSetMapper);
 	mPlaneActor->SetVisibility(false);
-	// Turning off lighting to remove shadow effects (Fix for #644: 2D ultrasound in 3D scene was too dark)
-	mPlaneActor->GetProperty()->LightingOff();
-	mTexture->RepeatOff();
+	mPlaneActor->GetProperty()->LightingOff();	// Turning off lighting to remove shadow effects (Fix for #644: 2D ultrasound in 3D scene was too dark)
+}
 
+VideoGraphicsPipeline::~VideoGraphicsPipeline()
+{
+}
+
+vtkActorPtr VideoGraphicsPipeline::getActor()
+{
+	return mPlaneActor;
+}
+
+/** Rewire the entire pipeline depending on the configuration,
+  * i.e. whether mask or sector or none has been set.
+  */
+void VideoGraphicsPipeline::setupPipeline()
+{
+	if (!mInputVideo)
+	{
+		mTexture->SetInput(NULL);
+		return;
+	}
+
+	if (mInputMask)
+	{
+		mTextureMapToPlane->SetInput(mPlaneSource->GetOutput());
+		mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
+		mDataSetMapper->SetInput(mTransformTextureCoords->GetOutput() );
+
+		mMaskFilter->SetMaskInput(mInputMask);
+		mMapZeroToOne->SetInput(mDataRedirecter->GetOutput());
+		mMaskFilter->SetImageInput(mMapZeroToOne->GetOutput());
+		mTexture->SetInput(mMaskFilter->GetOutput());
+	}
+	else if (mInputSector)
+	{
+		mUSSource->setProbeSector(mInputSector);
+		mTransformTextureCoords->SetInput(mUSSource->GetOutput() );
+		mDataSetMapper->SetInput(mTransformTextureCoords->GetOutput() );
+
+		mTexture->SetInput(mDataRedirecter->GetOutput());
+	}
+	else
+	{
+		mTextureMapToPlane->SetInput(mPlaneSource->GetOutput());
+		mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
+		mDataSetMapper->SetInput(mTransformTextureCoords->GetOutput() );
+
+		mTexture->SetInput(mDataRedirecter->GetOutput());
+	}
+
+	this->setLookupTable();
+	mPlaneActor->SetTexture(mTexture);
+	mPlaneActor->SetMapper(mDataSetMapper);
+}
+
+void VideoGraphicsPipeline::setMask(vtkImageDataPtr mask)
+{
+	if (mInputMask==mask)
+		return;
+	mInputSector = NULL;
+	mInputMask = mask;
+	this->setupPipeline();
+}
+
+void VideoGraphicsPipeline::setClip(vtkPolyDataPtr sector)
+{
+	if (mInputSector==sector)
+		return;
+	mInputMask = NULL;
+	mInputSector = sector;
+	this->setupPipeline();
+}
+
+void VideoGraphicsPipeline::setInputVideo(vtkImageDataPtr video)
+{
+	if (mInputVideo==video)
+		return;
+	mInputVideo = video;
+	this->setupPipeline();
+}
+
+void VideoGraphicsPipeline::setActorUserMatrix(vtkMatrix4x4Ptr rMu)
+{
+	mPlaneActor->SetUserMatrix(rMu);
+}
+
+void VideoGraphicsPipeline::setVisibility(bool visible)
+{
+	mPlaneActor->SetVisibility(visible);
+	mPlaneActor->Modified();
+}
+
+void VideoGraphicsPipeline::update()
+{
+	if (this->inputImageIsEmpty())
+	{
+		this->setVisibility(false);
+		return;
+	}
+
+	this->connectVideoImageToPipeline();
+	this->updateLUT();
+	this->updatePlaneSourceBounds();
+
+	mPlaneActor->Modified();
+}
+
+void VideoGraphicsPipeline::connectVideoImageToPipeline()
+{
+	if (mInputVideo == NULL)
+	{
+		mTexture->SetInput(NULL); // TODO trouble - will destroy the pipeline
+		return;
+	}
+
+	//Check if 3D volume. If so, only use middle frame
+	int* extent = mInputVideo->GetExtent();
+	if(extent[5] - extent[4] > 0)
+	{
+		int slice = floor(extent[4]+0.5f*(extent[5]-extent[4]));
+		if (slice < 0) slice = 0;
+//		std::cout << "Got 3D volume, showing middle slice: " << slice << std::endl;
+		vtkSmartPointer<vtkExtractVOI> extractVOI = vtkSmartPointer<vtkExtractVOI>::New();
+		extractVOI->SetInput(mInputVideo);
+		extractVOI->SetVOI(extent[0], extent[1], extent[2], extent[3], slice, slice);
+		extractVOI->Update();
+		mDataRedirecter->SetInput(extractVOI->GetOutput());
+	}
+	else //2D
+	{
+		mDataRedirecter->SetInput(mInputVideo);
+	}
+
+	mDataRedirecter->UpdateWholeExtent(); // important! syncs update extent to whole extent
+	mDataRedirecter->GetOutput()->Update(); //???
+}
+
+void VideoGraphicsPipeline::updatePlaneSourceBounds()
+{
+	// set the planesource where we have no probedata.
+	// TODO dont do this when planesource is not part of pipeline.
+	DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
+	if (!ssc::similar(bounds.range()[0], 0.0) || !ssc::similar(bounds.range()[1], 0.0))
+	{
+		mPlaneSource->SetOrigin(bounds.corner(0,0,0).begin());
+		mPlaneSource->SetPoint1(bounds.corner(1,0,0).begin());
+		mPlaneSource->SetPoint2(bounds.corner(0,1,0).begin());
+		mPlaneSource->GetOutput()->GetPointData()->Modified();
+		mPlaneSource->GetOutput()->Modified();
+	}
+}
+
+void VideoGraphicsPipeline::updateLUT()
+{
+	this->setLookupTable();
+	mTexture->SetLookupTable(mLUT);
+
+	// apply a lut only if the input data is monochrome
+	int numComp = mDataRedirecter->GetOutput()->GetNumberOfScalarComponents();
+	bool is8bit = mDataRedirecter->GetOutput()->GetScalarType()==VTK_UNSIGNED_CHAR;
+	if (numComp==1)
+	{
+		double srange[2];
+		if (is8bit)
+		{
+			srange[0] = 0;
+			srange[1] = 255;
+		}
+		else
+		{
+			mDataRedirecter->GetOutput()->GetScalarRange(srange);
+		}
+
+		mTexture->GetLookupTable()->SetRange(srange[0], srange[1]);
+		mTexture->MapColorScalarsThroughLookupTableOn();
+	}
+	else
+	{
+		mTexture->MapColorScalarsThroughLookupTableOff();
+	}
+}
+
+/** Create a lut that sets zeros to transparent and applies a linear grayscale to the rest.
+ */
+void VideoGraphicsPipeline::setLookupTable()
+{
+	// applies only to mask:
+	// Create a lut of size at least equal to the data range. Set the tableRange[0] to zero.
+	// This will force input zero to be mapped onto the first table value (the transparent one),
+	// and inputs [1, -> > is mapped to larger values, not transparent.
+	// In order to create a window-level function, manually build a table.
+
+	//make a default system set lookuptable, grayscale...
+	vtkLookupTablePtr lut = vtkLookupTablePtr::New();
+	lut->SetNumberOfTableValues(1000); // large enough to give resolution even for ct images.
+	//lut->SetTableRange (0, 1024); // the window of the input
+	lut->SetTableRange (0, 255); // the window of the input - must be reset according to data
+	lut->SetSaturationRange (0, 0);
+	lut->SetHueRange (0, 0);
+	lut->SetValueRange (0, 1);
+	lut->Build();
+
+	if (mInputMask)
+	{
+		lut->SetTableValue(0, 0, 0, 0, 0); // set the lowest value to transparent. This will make the masked values transparent, but nothing else
+	}
+
+	lut->Modified();
+	mLUT = lut;
+}
+
+bool VideoGraphicsPipeline::inputImageIsEmpty()
+{
+	if (mInputVideo == NULL)
+		return true;
+	mInputVideo->Update();
+	//Don't do anything if we get an empty image
+	int* dim = mInputVideo->GetDimensions();
+	if(dim[0] == 0 || dim[1] == 0)
+		return true;
+
+	return false;
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+VideoGraphics::VideoGraphics(bool useMaskFilter)
+{
+	mClipToSector = true;
+	mPipeline.reset(new VideoGraphicsPipeline());
+	mShowInToolSpace = true;
 	mImage = ssc::ImagePtr();
 }
 
@@ -129,7 +347,7 @@ void VideoGraphics::setShowInToolSpace(bool on)
 
 vtkActorPtr VideoGraphics::getActor()
 {
-	return mPlaneActor;
+	return mPipeline->getActor();
 }
 
 ToolPtr VideoGraphics::getTool()
@@ -167,46 +385,18 @@ void VideoGraphics::setTool(ToolPtr tool)
 		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
 	}
-	this->clipToSectorChanged();
+
 	this->probeSectorChanged();
 
 	if(mTool && mImage)
 		mImage->setName(mTool->getName());
 }
 
-/**Turn sector clipping on/off.
- * If on, only the area inside the probe sector is shown.
- *
- */
 void VideoGraphics::setClipToSector(bool on)
 {
-	mClipSector = on;
-	this->clipToSectorChanged();
+	mClipToSector = on;
+	this->probeSectorChanged();
 }
-
-/**
- */
-void VideoGraphics::clipToSectorChanged()
-{
-	if (mClipSector)
-	{
-		if (mUseMask)
-		{
-			// keep the pipeline from PlaneSource
-			mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
-		}
-		else
-		{
-			// now that we have a tool: use the ultraound source, updated by the probe
-			mTransformTextureCoords->SetInput(mUSSource->GetOutput() );
-		}
-	}
-	else
-	{
-		mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
-	}
-}
-
 
 void VideoGraphics::probeSectorChanged()
 {
@@ -214,61 +404,19 @@ void VideoGraphics::probeSectorChanged()
 		return;
 
 	mProbeData.setData(mTool->getProbeSector());
-
-	if (mUseMask)
-		mMaskFilter->SetMaskInput(mProbeData.getMask());
-	else
-		mUSSource->setProbeSector(mProbeData.getSector());
-
-	receiveTransforms(mTool->get_prMt(), 0);
-}
-
-/** Create a lut that sets zeros to transparent and applies a linear grayscale to the rest.
- *
- */
-void VideoGraphics::setLookupTable()
-{
-	// applies only to mask:
-	// Create a lut of size at least equal to the data range. Set the tableRange[0] to zero.
-	// This will force input zero to be mapped onto the first table value (the transparent one),
-	// and inputs [1, -> > is mapped to larger values, not transparent.
-	// In order to create a window-level function, manually build a table.
-
-//  int N = 256;
-//  int N = 1400;
-	//make a default system set lookuptable, grayscale...
-	vtkLookupTablePtr lut = vtkLookupTablePtr::New();
-	lut->SetNumberOfTableValues(1000); // large enough to give resolution even for ct images.
-	//lut->SetTableRange (0, 1024); // the window of the input
-	lut->SetTableRange (0, 255); // the window of the input - must be reset according to data
-	lut->SetSaturationRange (0, 0);
-	lut->SetHueRange (0, 0);
-	lut->SetValueRange (0, 1);
-	lut->Build();
-	if (mUseMask)
+	if (mClipToSector)
 	{
-		lut->SetTableValue(0, 0, 0, 0, 0); // set the lowest value to transparent. This will make the masked values transparent, but nothing else
+		mPipeline->setClip(mProbeData.getSector());
 	}
+	else
+	{
+		mPipeline->setClip(NULL);
+	}
+	this->receiveTransforms(mTool->get_prMt(), 0);
 
-//  lut->SetNumberOfTableValues(3);
-//  lut->SetTableRange(0, pow(2, 16)-1);
-//  lut->SetTableValue(0, 0, 0, 0, 0);
-//  lut->SetTableValue(1, 0, 0, 0, 1);
-//  lut->SetTableValue(1400, 1, 1, 1, 1);
-
-//  std::cout << "lut # " << lut->GetNumberOfTableValues() << std::endl;
-//  double N = lut->GetNumberOfTableValues();
-//  for (int i=0; i<N; ++i)
-//    lut->SetTableValue(i, 0, 0, double(i)/N, 1);
-//  lut->SetTableValue(0, 0, 0, 0, 0);
-
-// disable these two lines to remove lut
-	mTexture->SetLookupTable(lut);
-	mTexture->MapColorScalarsThroughLookupTableOn();
-	lut->Modified();
-
-
+	mPipeline->update();
 }
+
 
 void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 {
@@ -278,7 +426,7 @@ void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 	if (mData)
 	{
 		disconnect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
-		mTexture->SetInput(NULL);
+		mPipeline->setInputVideo(NULL);
 	}
 
 	mData = data;
@@ -286,19 +434,7 @@ void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 	if (mData)
 	{
 		connect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
-
-		mDataRedirecter->SetInput(mData->getVtkImageData());
-
-		if (!mUseMask) // send data directly to texture, no mask.
-		{
-			mTexture->SetInput(mDataRedirecter->GetOutput());
-		}
-		else    // these lines convert zeros to ones, then applies the mask.
-		{
-			mMapZeroToOne->SetInput(mDataRedirecter->GetOutput());
-			mMaskFilter->SetImageInput(mMapZeroToOne->GetOutput());
-			mTexture->SetInput(mMaskFilter->GetOutput());
-		}
+		mPipeline->setInputVideo(mData->getVtkImageData());
 
 		//Only add image in dataManager once
 		mImage = dataManager()->getImage("4D US");
@@ -319,7 +455,7 @@ void VideoGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
 	Transform3D tMu = mProbeData.get_tMu();
 	Transform3D rMu = rMpr * prMt * tMu;
-	mPlaneActor->SetUserMatrix(rMu.getVtkMatrix());
+	mPipeline->setActorUserMatrix(rMu.getVtkMatrix());
 
 	//TODO: Set correct position and orientation on mImage
 	//std::cout << "rMu: " << rMu << std::endl;
@@ -334,118 +470,48 @@ void VideoGraphics::receiveVisible(bool visible)
 
 }
 
+//void VideoGraphics::checkDataIntegrity()
+//{
+//	if (!mData || !mTool)
+//		return;
 
-void VideoGraphics::checkDataIntegrity()
-{
-	if (!mData || !mTool)
-		return;
+//	std::cout << "probe sector " << mTool->getUid() << " " << streamXml2String(mTool->getProbeSector()) << std::endl;
+//	DoubleBoundingBox3D bounds_poly_u(mProbeData.getSector()->GetBounds());
+//	DoubleBoundingBox3D bounds_poly_v = transform(mProbeData.get_uMv().inv(), bounds_poly_u);
+//	DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
+//	DoubleBoundingBox3D extent(mDataRedirecter->GetOutput()->GetExtent());
+//	std::cout << "poly_u bounds: " << bounds_poly_u << std::endl;
+//	std::cout << "poly_v bounds: " << bounds_poly_v << std::endl;
+//	std::cout << "img bounds: " << bounds << std::endl;
+//	std::cout << "img extent: " << extent << std::endl;
+//	std::cout << "img spacing: " << Vector3D(mDataRedirecter->GetOutput()->GetSpacing()) << std::endl;
 
-	std::cout << "probe sector " << mTool->getUid() << " " << streamXml2String(mTool->getProbeSector()) << std::endl;
-	DoubleBoundingBox3D bounds_poly_u(mProbeData.getSector()->GetBounds());
-	DoubleBoundingBox3D bounds_poly_v = transform(mProbeData.get_uMv().inv(), bounds_poly_u);
-	DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
-	DoubleBoundingBox3D extent(mDataRedirecter->GetOutput()->GetExtent());
-	std::cout << "poly_u bounds: " << bounds_poly_u << std::endl;
-	std::cout << "poly_v bounds: " << bounds_poly_v << std::endl;
-	std::cout << "img bounds: " << bounds << std::endl;
-	std::cout << "img extent: " << extent << std::endl;
-	std::cout << "img spacing: " << Vector3D(mDataRedirecter->GetOutput()->GetSpacing()) << std::endl;
-
-//  mDataRedirecter->GetOutput()->Print(std::cout);
-}
+////  mDataRedirecter->GetOutput()->Print(std::cout);
+//}
 
 void VideoGraphics::newDataSlot()
 {
 	if (!mData || !mData->validData())
 	{
-		mPlaneActor->SetVisibility(false);
+		mPipeline->setVisibility(false);
 		emit newData();
 		return;
 	}
-	//Don't do anything if we get an empty image
-	mData->getVtkImageData()->Update();
-	int* dim = mData->getVtkImageData()->GetDimensions();
-	if(dim[0] == 0 || dim[1] == 0)
-	{
-		mPlaneActor->SetVisibility(false);
-		emit newData();
-		return;
-	}
+
+	mPipeline->update();
 
 	if (mImage)
 	{
 		mImage->setVtkImageData(mData->getVtkImageData());//Update pointer to 4D image
 	}
 
-	//Check if 3D volume. If so, only use middle frame
-	int* extent = mData->getVtkImageData()->GetExtent();
-	if(extent[5] - extent[4] > 0)
-	{
-		int slice = floor(extent[4]+0.5f*(extent[5]-extent[4]));
-		if (slice < 0) slice = 0;
-//		std::cout << "Got 3D volume, showing middle slice: " << slice << std::endl;
-		vtkSmartPointer<vtkExtractVOI> extractVOI = vtkSmartPointer<vtkExtractVOI>::New();
-		extractVOI->SetInput(mData->getVtkImageData());
-		extractVOI->SetVOI(extent[0], extent[1], extent[2], extent[3], slice, slice);
-		extractVOI->Update();
-		mDataRedirecter->SetInput(extractVOI->GetOutput());
-	} else //2D
-		mDataRedirecter->SetInput(mData->getVtkImageData());
-
-//  mDataRedirecter->GetOutput()->UpdateInformation();
-	mDataRedirecter->UpdateWholeExtent(); // important! syncs update extent to whole extent
-	mDataRedirecter->GetOutput()->Update();
-
-	// apply a lut only if the input data is monochrome
-	int numComp = mDataRedirecter->GetOutput()->GetNumberOfScalarComponents();
-	bool is8bit = mDataRedirecter->GetOutput()->GetScalarType()==VTK_UNSIGNED_CHAR;
-//  if (numComp==1 && !is8bit)
-	if (numComp==1)
-	{
-		double srange[2];
-		if (is8bit)
-		{
-			srange[0] = 0;
-			srange[1] = 255;
-		}
-		else
-		{
-			mDataRedirecter->GetOutput()->GetScalarRange(srange);
-		}
-
-		mTexture->GetLookupTable()->SetRange(srange[0], srange[1]);
-		mTexture->MapColorScalarsThroughLookupTableOn();
-	}
-	else
-	{
-		mTexture->MapColorScalarsThroughLookupTableOff();
-	}
-
-	// set the planesource where we have no probedata.
-	DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
-	if (!ssc::similar(bounds.range()[0], 0.0) || !ssc::similar(bounds.range()[1], 0.0))
-	{
-		mPlaneSource->SetOrigin(bounds.corner(0,0,0).begin());
-		mPlaneSource->SetPoint1(bounds.corner(1,0,0).begin());
-		mPlaneSource->SetPoint2(bounds.corner(0,1,0).begin());
-		mPlaneSource->GetOutput()->GetPointData()->Modified();
-		mPlaneSource->GetOutput()->Modified();
-	}
-
 	bool visible = mData->validData();
 	if (mShowInToolSpace)
-	{
 		visible = visible && mTool && mTool->getVisible();
-	}
-
-	mPlaneActor->SetVisibility(visible);
-	mPlaneActor->Modified();
+	mPipeline->setVisibility(visible);
 
 	emit newData();
 }
-
-//---------------------------------------------------------
-//---------------------------------------------------------
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -456,7 +522,6 @@ VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) 
 {
 	mRTGraphics.reset(new VideoGraphics());
 	connect(mRTGraphics.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
-//  mRTGraphics->setIgnoreToolTransform(true);
 	mRTGraphics->setShowInToolSpace(false);
 	mRTGraphics->setClipToSector(false);
 
@@ -470,11 +535,6 @@ VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) 
 	mStatusText->setCentered();
 	mStatusText->setPosition(0.5, 0.5);
 	mStatusText->updateText("Not Connected");
-
-//	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
-//	mProbeSectorActor = vtkActorPtr::New();
-////  mProbeSectorActor->GetProperty()->SetColor(1, 0.9, 0); // yellow
-//	mProbeSectorActor->GetProperty()->SetColor(1, 165.0/255.0, 0); // orange
 
 	mProbeOrigin.reset(new GraphicalPolyData3D());
 	mProbeOrigin->setColor(ssc::Vector3D(1, 165.0/255.0, 0)); // orange
@@ -506,7 +566,6 @@ void VideoFixedPlaneRep::updateSector()
 {
 	bool show = mTool && this->getShowSector() && mTool->getProbeSector().getType()!=ssc::ProbeData::tNONE;
 
-//	mProbeSectorActor->SetVisibility(show);
 	mProbeOrigin->getActor()->SetVisibility(show);
 	mProbeSector->getActor()->SetVisibility(show);
 	mProbeClipRect->getActor()->SetVisibility(show);
@@ -589,11 +648,9 @@ void VideoFixedPlaneRep::addRepActorsToViewRenderer(ssc::View* view)
 	view->getRenderer()->AddActor(mInfoText->getActor());
 	view->getRenderer()->AddActor(mStatusText->getActor());
 
-//	view->getRenderer()->AddActor(mProbeSectorActor);
 	mProbeClipRect->setRenderer(view->getRenderer());
 	mProbeOrigin->setRenderer(view->getRenderer());
 	mProbeSector->setRenderer(view->getRenderer());
-	//setCamera();
 }
 
 void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(ssc::View* view)
@@ -606,7 +663,6 @@ void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(ssc::View* view)
 	mProbeSector->setRenderer(NULL);
 	mProbeClipRect->setRenderer(NULL);
 
-//	view->getRenderer()->RemoveActor(mProbeSectorActor);
 	mViewportListener->stopListen();
 }
 
