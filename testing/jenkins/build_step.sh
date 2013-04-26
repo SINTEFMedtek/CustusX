@@ -69,4 +69,15 @@ fi
 
 cp CatchTestResults.xml $CX_RELEASE_DIR/CatchTestResults.xml
 
+# ==========================================================
+# package the build
+cd $CX_RELEASE_DIR
+make package
+if [ $? == 0 ]
+then
+    echo "CustusX make package success"
+else
+    echo "CustusX make package failure, terminating"
+    exit 1
+fi
 

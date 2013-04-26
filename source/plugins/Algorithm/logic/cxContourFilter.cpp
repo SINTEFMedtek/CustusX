@@ -248,6 +248,12 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 	if(smoothing)
 	{
 		smoother->SetInput(cubesPolyData);
+		smoother->SetNumberOfIterations(15);// Higher number = more smoothing
+		smoother->SetBoundarySmoothing(false);
+		smoother->SetFeatureEdgeSmoothing(false);
+		smoother->SetNormalizeCoordinates(true);
+		smoother->SetFeatureAngle(120);
+		smoother->SetPassBand(0.3);//Lower number = more smoothing
 		smoother->Update();
 		cubesPolyData = smoother->GetOutput();
 	}
