@@ -22,6 +22,11 @@ vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt);
 void loadMeshFromToolTransforms(ssc::TimedTransformMap transforms_prMt);
 
 /**
+ * Get information about a ssc mesh.
+ */
+std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::MeshPtr mesh);
+
+/**
  * \}
  */
 

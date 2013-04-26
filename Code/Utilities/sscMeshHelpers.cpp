@@ -53,5 +53,32 @@ void loadMeshFromToolTransforms(TimedTransformMap transforms_prMt)
   mesh->setColor(QColor("red"));
   dataManager()->loadData(mesh);
 }
+
+std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::MeshPtr mesh)
+{
+	std::map<std::string, std::string> retval;
+	if(!mesh)
+		return retval;
+
+	//ssc::mesh
+	retval["Filepath"] = mesh->getFilePath().toStdString();
+	retval["Coordinate system"] = mesh->getCoordinateSystem().toString().toStdString();
+//	retval["Image type"] = mesh->getImageType().toStdString();
+//	retval["Scalar minimum"] = string_cast(mesh->getMin());
+//	retval["Scalar maximum"] = string_cast(mesh->getMax());
+//	retval["Range (max - min)"] = string_cast(mesh->getRange());
+//	retval["Maximum alpha value"] = string_cast(mesh->getMaxAlphaValue());
+//	retval["Modality"] = mesh->getModality().toStdString();
+	retval["Name"] = mesh->getName().toStdString();
+	retval["Parent space"] = mesh->getParentSpace().toStdString();
+	//retval["Registration status"] = enum2string(mesh->getRegistrationStatus()).toStdString();
+	retval["Shading"] = mesh->getShadingOn() ? "on" : "off";
+	retval["Space"] = mesh->getSpace().toStdString();
+	retval["Type"] = mesh->getType().toStdString();
+	retval["Uid"] = mesh->getUid().toStdString();
+
+	return retval;
+}
+
 }//namespace ssc
 
