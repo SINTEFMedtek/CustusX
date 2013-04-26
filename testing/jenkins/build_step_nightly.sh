@@ -55,3 +55,16 @@ cp Testing/`head -n 1 Testing/TAG`/Test.xml ./CTestResults.xml
 # copy/publish doxygen to medtek server (link from wiki):
 REMOTE_DOXY_PATH="/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/custusx_doxygen"
 scp -r $CX_RELEASE_DIR/doc/doxygen/html/* medtek.sintef.no:$REMOTE_DOXY_PATH
+
+# ==========================================================
+# package the build
+cd $CX_RELEASE_DIR
+make package
+if [ $? == 0 ]
+then
+    echo "CustusX make package success"
+else
+    echo "CustusX make package failure, terminating"
+    exit 1
+fi
+
