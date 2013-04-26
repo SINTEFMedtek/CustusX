@@ -21,6 +21,7 @@
 
 #include <iostream>
 #include <QStringList>
+#include <QTextStream>
 #include "sscMessageManager.h"
 
 namespace ssc {
@@ -67,6 +68,7 @@ QStringList Presets::getPresetList(QString tag)
 
 bool Presets::isDefaultPreset(QString presetName)
 {
+
 	ssc::XmlOptionFile testval = mPresetFile.tryDescend("Preset", "name", presetName);
 	if (!testval.isNull())
 		return true;
@@ -112,5 +114,15 @@ void Presets::addPreset(ssc::XmlOptionFile& file, QDomElement& element)
 
 	//TODO what if preset with name already exists?
 }
+
+
+void Presets::print(QDomElement element)
+{
+	QTextStream stream(stdout);
+	stream << "\n";
+	element.save(stream, 4);
+	stream << "\n";
+}
+
 
 } /* namespace ssc */

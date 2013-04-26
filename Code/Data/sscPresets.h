@@ -66,6 +66,9 @@ protected:
 	void addDefaultPreset(QDomElement& element); //used
 	void addPreset(ssc::XmlOptionFile& file, QDomElement& element); //used
 
+	//debugging
+	void print(QDomElement element); ///< debugging function for printing xml elements
+
 	QString mLastCustomPresetAdded; /// < the name of the last custom preset added
 	QString mLastCustomPresetRemoved; /// < the name of the last custom preset removed
 
