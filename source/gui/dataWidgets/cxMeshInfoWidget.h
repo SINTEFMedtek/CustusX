@@ -1,10 +1,11 @@
-#ifndef CXMESHPROPERTIESWIDGET_H_
-#define CXMESHPROPERTIESWIDGET_H_
+#ifndef CXMESHINFOWIDGET_H_
+#define CXMESHINFOWIDGET_H_
 
 #include <vector>
 #include <QtGui>
 #include "sscMesh.h"
 #include "cxDataInterface.h"
+#include "cxInfoWidget.h"
 
 namespace cx
 {
@@ -16,26 +17,22 @@ typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDat
  * \ingroup cxGUI
  *
  * \date 2010.07.07
- * \\author Ole Vegard Solberg, SINTEF
+ * \author Ole Vegard Solberg, SINTEF
  */
-class MeshPropertiesWidget : public QWidget
+class MeshInfoWidget : public InfoWidget
 {
   Q_OBJECT
 
 public:
-  MeshPropertiesWidget(QWidget* parent);
-  virtual ~MeshPropertiesWidget();
-
-signals:
+  MeshInfoWidget(QWidget* parent);
+  virtual ~MeshInfoWidget();
 
 protected slots:
   void setColorSlot();
   void setColorSlotDelayed();
-//  void visibilityChangedSlot(bool visible);
-//  void populateMeshComboBoxSlot();
   void meshSelectedSlot();
   void importTransformSlot();
-  void deleteDataSlot();
+//  void deleteDataSlot();
   void meshChangedSlot();
 
 protected:
@@ -43,19 +40,21 @@ protected:
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
 
 private:
+  void addWidgets();
+
   ssc::MeshPtr mMesh;
-//  QComboBox* mMeshComboBox; ///< combobox for selecting mesh
-  QGroupBox* mMeshPropertiesGroupBox;
+//  QGroupBox* mMeshPropertiesGroupBox;
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   DataNameEditableStringDataAdapterPtr mNameAdapter;
   DataUidEditableStringDataAdapterPtr mUidAdapter;
   SelectMeshStringDataAdapterPtr mSelectMeshWidget;
+  ssc::ColorDataAdapterXmlPtr mColorAdapter;
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
   
-  MeshPropertiesWidget();
+  MeshInfoWidget();
 };
 
 }//end namespace cx
 
-#endif /* CXMESHPROPERTIESWIDGET_H_ */
+#endif /* CXMESHINFOWIDGET_H_ */
