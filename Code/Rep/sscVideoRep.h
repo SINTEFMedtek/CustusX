@@ -17,102 +17,22 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * sscRT2DRep.h
- *
- *  Created on: Oct 31, 2010
- *      Author: christiana
- */
-
 #ifndef SSCRTSTREAMREP_H_
 #define SSCRTSTREAMREP_H_
 
 #include "sscRepImpl.h"
-#include "sscVideoSource.h"
 #include "sscVtkHelperClasses.h"
 #include "sscForwardDeclarations.h"
 #include "sscProbeSector.h"
-#include "sscViewportListener.h"
-
-typedef vtkSmartPointer<class vtkPlaneSource> vtkPlaneSourcePtr;
-typedef vtkSmartPointer<class vtkTexture> vtkTexturePtr;
-typedef vtkSmartPointer<class vtkTransformTextureCoords> vtkTransformTextureCoordsPtr;
-typedef vtkSmartPointer<class vtkDataSetMapper> vtkDataSetMapperPtr;
-typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
-typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
-typedef vtkSmartPointer<class vtkTextureMapToPlane> vtkTextureMapToPlanePtr;
-typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
-
-typedef vtkSmartPointer<class UltrasoundSectorSource> UltrasoundSectorSourcePtr;
 
 namespace ssc
 {
-
-typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
-
-/**\brief Helper class for displaying a VideoSource.
- *
- * Used for Video display in VideoFixedPlaneRep and ToolRep3D.
- *
- *  Used by CustusX.
- *
- * \ingroup sscProxy
- */
-class VideoGraphics : public QObject
-{
-	Q_OBJECT
-public:
-	VideoGraphics(bool useMaskFilter=false);
-	virtual ~VideoGraphics();
-
-	void setRealtimeStream(VideoSourcePtr data);
-	void setTool(ToolPtr tool);
-	ToolPtr getTool();
-	ssc::ProbeSector getProbeData();
-	void setClipToSector(bool on);
-	void setShowInToolSpace(bool on);
-	vtkActorPtr getActor();
-
-signals:
-	void newData();
-
-private slots:
-	void newDataSlot();
-	void receiveTransforms(Transform3D matrix, double timestamp);
-	void receiveVisible(bool visible);
-	void probeSectorChanged();
-	void checkDataIntegrity();
-
-private:
-	void setLookupTable();
-	void clipToSectorChanged();
-
-	bool mUseMask;
-	bool mClipSector;
-
-	bool mShowInToolSpace;
-	ToolPtr mTool;
-	ssc::ProbeSector mProbeData;
-	VideoSourcePtr mData;
-	vtkImageChangeInformationPtr mDataRedirecter;
-	vtkActorPtr mPlaneActor;
-	vtkPlaneSourcePtr mPlaneSource;
-	vtkTexturePtr mTexture;
-	UltrasoundSectorSourcePtr mUSSource;
-	vtkDataSetMapperPtr mDataSetMapper;
-	vtkTransformTextureCoordsPtr mTransformTextureCoords;
-	vtkTextureMapToPlanePtr mTextureMapToPlane;
-
-	vtkImageThresholdPtr mMapZeroToOne;
-	vtkImageMaskPtr mMaskFilter;
-
-	ImagePtr mImage;//Can be used instead of mTexture. This allows visualization of rt 3D
-};
+typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
+typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
 typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
 
-
-/**\brief Display a VideoSource in a View.
+/** \brief Display a VideoSource in a View.
  *
  * A rep visualizing a VideoSource directly into the view plane.
  * It does not follow the tool, but controls the camera in order to
@@ -122,6 +42,9 @@ typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
  *
  * \ingroup sscRep
  * \ingroup sscRepVideo
+ *
+ * \date Oct 31, 2010
+ * \author christiana
  */
 class VideoFixedPlaneRep : public ssc::RepImpl
 {
@@ -146,7 +69,7 @@ private:
 	void setCamera();
 	void updateSector();
 
-	VideoGraphicsPtr mRTGraphics;
+	VideoSourceGraphicsPtr mRTGraphics;
 	bool mShowSector;
 
 	ToolPtr mTool;
@@ -156,8 +79,6 @@ private:
 	ssc::TextDisplayPtr mStatusText;
 	ssc::TextDisplayPtr mInfoText;
 
-//	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
-//	vtkActorPtr mProbeSectorActor;
 	GraphicalPolyData3DPtr mProbeSector;
 	GraphicalPolyData3DPtr mProbeOrigin;
 	GraphicalPolyData3DPtr mProbeClipRect;
