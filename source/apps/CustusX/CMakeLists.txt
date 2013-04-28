@@ -307,7 +307,7 @@ INSTALL(CODE "
     ")   
     				
 
-set(APPS ${CustusX_Exe_Path} "\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/sscPositionFileReader")
+set(APPS ${CustusX_Exe_Path})
 set(LIBS )
 set(DIRS 
 		${QT_INCLUDES} 
