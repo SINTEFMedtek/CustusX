@@ -306,7 +306,8 @@ INSTALL(CODE "
     file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
     ")   
     				
-set(APPS ${CustusX_Exe_Path})
+
+set(APPS ${CustusX_Exe_Path} "\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/sscPositionFileReader")
 set(LIBS )
 set(DIRS 
 		${QT_INCLUDES} 
@@ -373,8 +374,6 @@ install(CODE "
           \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/OpenIGTLinkServer\")
         file(GLOB_RECURSE QTPLUGINS
           \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/GrabberServer\")
-        file(GLOB_RECURSE QTPLUGINS
-          \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/sscPositionFileReader\")
 		include(BundleUtilities)
 		fixup_bundle(\"${APPS}\"   \"\${QTPLUGINS}\"   \"${DIRS}\") "
 		)
