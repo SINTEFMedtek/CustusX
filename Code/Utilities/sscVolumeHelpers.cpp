@@ -20,6 +20,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
 #include "sscEnumConverter.h"
+#include "sscTime.h"
 
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
@@ -171,11 +172,11 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
 	retval["Modality"] = image->getModality().toStdString();
 	retval["Name"] = image->getName().toStdString();
 	retval["Parent space"] = image->getParentSpace().toStdString();
-	//retval["Registration status"] = enum2string(image->getRegistrationStatus()).toStdString();
 	retval["Shading"] = image->getShadingOn() ? "on" : "off";
 	retval["Space"] = image->getSpace().toStdString();
 	retval["Type"] = image->getType().toStdString();
 	retval["Uid"] = image->getUid().toStdString();
+	retval["Acquisition time"] = string_cast(image->getAcquisitionTime().toString(ssc::timestampSecondsFormatNice()));
 
 	//vtImageData
 	double spacing_x, spacing_y, spacing_z;
@@ -184,18 +185,10 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
 	int dims[3];
 	image->getBaseVtkImageData()->GetDimensions(dims);
 	retval["Dimensions"] = string_cast(dims[0])+" , "+string_cast(dims[1])+" , "+string_cast(dims[2]);
-
 	float actualMemorySizeKB = (float)image->getBaseVtkImageData()->GetActualMemorySize();
 	retval["Actual memory size"] = string_cast(actualMemorySizeKB/(1024*1024))+" GB, "+string_cast(actualMemorySizeKB/1024)+" MB, "+string_cast(actualMemorySizeKB)+" kB";
-//	retval["Estimated memory size"] = string_cast(image->getBaseVtkImageData()->GetEstimatedMemorySize())+" kB"; //not very informative
-//	int extent_x, extent_y, extent_z;
-//	image->getBaseVtkImageData()->GetExtent(extent_x, extent_y, extent_z);
-//	retval["Extent"] = string_cast(extent_x)+" , "+string_cast(extent_y)+" , "+string_cast(extent_z)+" ";
 	retval["Scalar components"] = string_cast(image->getBaseVtkImageData()->GetNumberOfScalarComponents());
 	retval["rMd"] = string_cast(image->get_rMd());
-//	double origin_x, origin_y, origin_z;
-//	image->getBaseVtkImageData()->GetOrigin(origin_x, origin_y, origin_z);
-//	retval["Origin"] =  string_cast(origin_x)+" , "+string_cast(origin_y)+" , "+string_cast(origin_z)+" "; //Is always 0...
 	retval["Number of components for points"] = string_cast(image->getBaseVtkImageData()->GetPointData()->GetNumberOfComponents());
 	retval["Scalar type"] = string_cast(image->getBaseVtkImageData()->GetScalarTypeAsString());
 
