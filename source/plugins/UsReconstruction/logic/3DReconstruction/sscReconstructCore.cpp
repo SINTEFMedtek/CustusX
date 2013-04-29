@@ -171,7 +171,7 @@ ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
 		image->setImageType("B-Mode");
 
 	ssc::PresetTransferFunctions3DPtr presets = ssc::dataManager()->getPresetTransferFunctions3D();
-	presets->load(mInput.mTransferFunctionPreset, image);
+	presets->load(mInput.mTransferFunctionPreset, image, true, false);//Only apply to 2D, not 3D
 
 	return image;
 }
