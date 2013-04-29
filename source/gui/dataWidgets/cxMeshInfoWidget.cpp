@@ -112,12 +112,13 @@ void MeshInfoWidget::addWidgets()
 	ssc::XmlOptionFile options = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("MeshInfoWidget");
 	QString uid("Color");
 	QString name("");
-	QString help("Color of output model.");
+	QString help("Color of the mesh.");
 	QColor color("red");
+
 	if(mSelectMeshWidget->getMesh())
 		color = mSelectMeshWidget->getMesh()->getColor();
-	mColorAdapter = ssc::ColorDataAdapterXml::initialize(
-			uid, name, help, color, options.getElement());
+
+	mColorAdapter = ssc::ColorDataAdapterXml::initialize(uid, name, help, color, options.getElement());
 	connect(mColorAdapter.get(), SIGNAL(changed()), this, SLOT(setColorSlot()));
 
 	QPushButton* importTransformButton = new QPushButton("Import Transform from Parent", this);
@@ -128,26 +129,26 @@ void MeshInfoWidget::addWidgets()
 	mNameAdapter = DataNameEditableStringDataAdapter::New();
 	mParentFrameAdapter = ParentFrameStringDataAdapter::New();
 
-	int position = 1;
-
-	gridLayout->addWidget(new DataSelectWidget(this, mSelectMeshWidget), position++, 0, 1, 2);
-	new ssc::LabeledLineEditWidget(this, mUidAdapter, gridLayout, position++);
-	new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, position++);
-	new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, position++);
-
 	QWidget* optionsWidget = new QWidget(this);
-	QGridLayout* optionsLayout = new QGridLayout(optionsWidget);
+	QHBoxLayout* optionsLayout = new QHBoxLayout(optionsWidget);
 	mBackfaceCullingCheckBox = new QCheckBox("Backface culling");
 	mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
-	optionsLayout->addWidget(mBackfaceCullingCheckBox, position++, 0);
+	optionsLayout->addWidget(mBackfaceCullingCheckBox);
 	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
 	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
-	optionsLayout->addWidget(mFrontfaceCullingCheckBox, position++, 0);
-	optionsLayout->addWidget(ssc::createDataWidget(this, mColorAdapter), position, 0);
+	optionsLayout->addWidget(mFrontfaceCullingCheckBox);
+	optionsLayout->addWidget(ssc::createDataWidget(this, mColorAdapter));
+	optionsLayout->addStretch(1);
 
-	gridLayout->addWidget(optionsWidget, position++, 0, 1, 2);
-	gridLayout->addWidget(mTabelWidget, position++, 0, 1, 2);
-	gridLayout->addWidget(importTransformButton, position++, 0, 1, 2);
+	int gridLayoutRow = 1;
+
+	gridLayout->addWidget(new DataSelectWidget(this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
+	new ssc::LabeledLineEditWidget(this, mUidAdapter, gridLayout, gridLayoutRow++);
+	new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
+	new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);
+	gridLayout->addWidget(optionsWidget, gridLayoutRow++, 0, 1, 2);
+	gridLayout->addWidget(mTabelWidget, gridLayoutRow++, 0, 1, 2);
+	gridLayout->addWidget(importTransformButton, gridLayoutRow++, 0, 1, 2);
 
 	this->addStretch();
 }
