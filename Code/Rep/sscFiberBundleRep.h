@@ -31,9 +31,6 @@
 namespace ssc
 {
 
-typedef boost::shared_ptr<class VideoGraphics> VideoSourceGraphicsPtr;
-typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
-
 /**
  * \brief Display a DTI Fiber bundle (fiber tracks) in 3D.
  *
