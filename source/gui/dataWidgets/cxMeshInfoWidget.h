@@ -14,10 +14,13 @@ typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDat
 /**
  * \class ImagePropertiesWidget
  *
+ * \brief Widget for displaying information about meshes.
+ *
  * \ingroup cxGUI
  *
  * \date 2010.07.07
  * \author Ole Vegard Solberg, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  */
 class MeshInfoWidget : public InfoWidget
 {
@@ -32,7 +35,6 @@ protected slots:
   void setColorSlotDelayed();
   void meshSelectedSlot();
   void importTransformSlot();
-//  void deleteDataSlot();
   void meshChangedSlot();
 
 protected:
@@ -43,7 +45,6 @@ private:
   void addWidgets();
 
   ssc::MeshPtr mMesh;
-//  QGroupBox* mMeshPropertiesGroupBox;
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   DataNameEditableStringDataAdapterPtr mNameAdapter;
   DataUidEditableStringDataAdapterPtr mUidAdapter;
