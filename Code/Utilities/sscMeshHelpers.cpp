@@ -1,10 +1,15 @@
 #include "sscMeshHelpers.h"
 
+#include <QColor>
+
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
+
 #include "sscToolManager.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
+#include "sscTypeConversions.h"
+#include "sscTime.h"
 
 namespace ssc
 {
@@ -63,19 +68,29 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::MeshPtr mesh)
 	//ssc::mesh
 	retval["Filepath"] = mesh->getFilePath().toStdString();
 	retval["Coordinate system"] = mesh->getCoordinateSystem().toString().toStdString();
-//	retval["Image type"] = mesh->getImageType().toStdString();
-//	retval["Scalar minimum"] = string_cast(mesh->getMin());
-//	retval["Scalar maximum"] = string_cast(mesh->getMax());
-//	retval["Range (max - min)"] = string_cast(mesh->getRange());
-//	retval["Maximum alpha value"] = string_cast(mesh->getMaxAlphaValue());
-//	retval["Modality"] = mesh->getModality().toStdString();
 	retval["Name"] = mesh->getName().toStdString();
 	retval["Parent space"] = mesh->getParentSpace().toStdString();
-	//retval["Registration status"] = enum2string(mesh->getRegistrationStatus()).toStdString();
 	retval["Shading"] = mesh->getShadingOn() ? "on" : "off";
 	retval["Space"] = mesh->getSpace().toStdString();
 	retval["Type"] = mesh->getType().toStdString();
 	retval["Uid"] = mesh->getUid().toStdString();
+	retval["rMd"] = string_cast(mesh->get_rMd());
+	retval["Backface culling"] = string_cast(mesh->getBackfaceCulling());
+	retval["Color"] = mesh->getColor().name().toStdString();
+	retval["Frontface culling"] = string_cast(mesh->getFrontfaceCulling());
+	retval["Is wireframe"] = string_cast(mesh->getIsWireframe());
+	retval["Acquisition time"] = string_cast(mesh->getAcquisitionTime().toString(ssc::timestampSecondsFormatNice()));
+	retval["Fiber bundle"] = string_cast(mesh->isFiberBundle());
+
+	//vtkPolyData
+	float actualMemorySizeKB = (float)mesh->getVtkPolyData()->GetActualMemorySize();
+	retval["Actual memory size"] = string_cast(actualMemorySizeKB/(1024*1024))+" GB, "+string_cast(actualMemorySizeKB/1024)+" MB, "+string_cast(actualMemorySizeKB)+" kB";
+	retval["Points"] = string_cast(mesh->getVtkPolyData()->GetNumberOfPoints());
+	retval["Lines"] = string_cast(mesh->getVtkPolyData()->GetNumberOfLines());
+	retval["Pieces"] = string_cast(mesh->getVtkPolyData()->GetNumberOfPieces());
+	retval["Polys"] = string_cast(mesh->getVtkPolyData()->GetNumberOfPolys());
+	retval["Strips"] = string_cast(mesh->getVtkPolyData()->GetNumberOfStrips());
+	retval["Verts"] = string_cast(mesh->getVtkPolyData()->GetNumberOfVerts());
 
 	return retval;
 }
