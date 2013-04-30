@@ -40,14 +40,9 @@ namespace ssc
 
 ApplyLUTToImage2DProxy::ApplyLUTToImage2DProxy()
 {
-	mWindowLevel = vtkImageMapToColorsPtr::New();
-//	mWindowLevel->SetInputConnection(mReslicer->GetOutputPort());
-	mWindowLevel->SetOutputFormatToRGBA();
-
 	mDummyImage = createDummyImageData();
 
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
-	//mRedirecter->SetInput(mWindowLevel->GetOutput());
 	mRedirecter->SetInput(mDummyImage);
 }
 
@@ -56,14 +51,11 @@ ApplyLUTToImage2DProxy::~ApplyLUTToImage2DProxy()
 
 }
 
-void ApplyLUTToImage2DProxy::setImage(vtkImageDataPtr image, vtkLookupTablePtr lut)
+void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr lut)
 {
 	if (image)
 	{
-		mWindowLevel->SetInput(image);
-		mWindowLevel->SetLookupTable(lut);
-		mWindowLevel->Update();
-
+		vtkImageMapToColorsPtr windowLevel = vtkImageMapToColorsPtr::New();
 		if (image->GetNumberOfScalarComponents() == 3) // color
 		{
 			// split the image into the components, apply the lut, then merge.
@@ -72,7 +64,6 @@ void ApplyLUTToImage2DProxy::setImage(vtkImageDataPtr image, vtkLookupTablePtr l
 
 			for (int i = 0; i < 3; ++i)
 			{
-				vtkImageMapToColorsPtr windowLevel = vtkImageMapToColorsPtr::New();
 				windowLevel->SetInput(image);
 				windowLevel->SetActiveComponent(i);
 				windowLevel->SetLookupTable(lut);
@@ -93,21 +84,17 @@ void ApplyLUTToImage2DProxy::setImage(vtkImageDataPtr image, vtkLookupTablePtr l
 		}
 		else // grayscale
 		{
-			mRedirecter->SetInput(mWindowLevel->GetOutput());
+			windowLevel->SetOutputFormatToRGBA();
+			windowLevel->SetInput(image);
+			windowLevel->SetLookupTable(lut);
+			windowLevel->Update();
+			mRedirecter->SetInput(windowLevel->GetOutput());
 		}
 	}
 	else // no image
 	{
 		mRedirecter->SetInput(mDummyImage);
 	}
-}
-
-
-void ApplyLUTToImage2DProxy::setLut(vtkLookupTablePtr lut)
-{
-	mRedirecter->Modified();
-	mRedirecter->Update();
-	mWindowLevel->SetLookupTable(lut);
 }
 
 vtkImageDataPtr ApplyLUTToImage2DProxy::getOutput()
@@ -172,7 +159,7 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 
 void SlicedImageProxy::transferFunctionsChangedSlot()
 {
-	mImageWithLUTProxy->setLut(mImage->getLookupTable2D()->getOutputLookupTable());
+	mImageWithLUTProxy->setInput(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
 }
 
 void SlicedImageProxy::setImage(ImagePtr image)
@@ -203,12 +190,11 @@ void SlicedImageProxy::setImage(ImagePtr image)
 		if (mImage->getBaseVtkImageData()->GetDimensions()[2]==1)
 			input = mImage->getBaseVtkImageData();
 
-		mImageWithLUTProxy->setImage(input, mImage->getLookupTable2D()->getOutputLookupTable());
-
+		mImageWithLUTProxy->setInput(input, mImage->getLookupTable2D()->getOutputLookupTable());
 	}
 	else // no image
 	{
-		mImageWithLUTProxy->setImage(vtkImageDataPtr(), vtkLookupTablePtr());
+		mImageWithLUTProxy->setInput(vtkImageDataPtr(), vtkLookupTablePtr());
 	}
 
 	this->update();
