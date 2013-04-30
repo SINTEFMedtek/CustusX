@@ -127,40 +127,6 @@ private:
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 };
 
-
-/** Widget for selecting and running a Filter.
- *
- *  Select one filter from a drop-down list, then set it up
- *  and run it. All available filters in the system should be
- *  in this widget.
- *
- * \ingroup cxPluginAlgorithm
- * \date Nov 18, 2012
- * \author christiana
- * \author Janne Beate Bakeng
- */
-class AllFiltersWidget : public BaseWidget
-{
-	Q_OBJECT
-public:
-	AllFiltersWidget(QWidget* parent);
-	QString defaultWhatsThis() const;
-
-private slots:
-	void filterChangedSlot();
-	void toggleDetailsSlot();
-	void runFilterSlot();
-	void finishedSlot();
-private:
-	FilterGroupPtr mFilters;
-	FilterPtr mCurrentFilter;
-	ssc::StringDataAdapterXmlPtr mFilterSelector;
-	FilterTimedAlgorithmPtr mThread;
-
-	FilterSetupWidget* mSetupWidget;
-	TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
-};
-
 }
 
 #endif // CXFILTERWIDGET_H

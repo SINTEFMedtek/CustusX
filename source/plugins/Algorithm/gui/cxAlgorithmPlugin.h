@@ -1,10 +1,3 @@
-/*
- * cxAlgorithmPlugin.h
- *
- *  \date Jun 15, 2011
- *      \author christiana
- */
-
 #ifndef CXALGORITHMPLUGIN_H_
 #define CXALGORITHMPLUGIN_H_
 
@@ -27,9 +20,12 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class AlgorithmPlugin> AlgorithmPluginPtr;
-
-
+/**
+ * \class AlgorithmPlugin
+ *
+ * \date Jun 15, 2011
+ * \author christiana
+ */
 class AlgorithmPlugin : public PluginBase
 {
 	Q_OBJECT
@@ -38,13 +34,8 @@ public:
 	virtual ~AlgorithmPlugin();
 
 	virtual std::vector<PluginWidget> createWidgets() const;
-
-signals:
-
-private slots:
-
-private:
 };
+typedef boost::shared_ptr<class AlgorithmPlugin> AlgorithmPluginPtr;
 
 /**
  * @}
