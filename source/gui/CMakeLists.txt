@@ -40,11 +40,9 @@ SET(cxGui_MOC_HDRS
 	dataWidgets/cxTransferFunctionPresetWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
-    infoWidgets/cxBrowserWidget.h
     infoWidgets/cxPointSamplingWidget.h
     infoWidgets/cxMetricWidget.h
-    infoWidgets/cxFrameTreeWidget.h
-    infoWidgets/cxTreeModelItem.h   
+    infoWidgets/cxFrameTreeWidget.h 
     infoWidgets/cxDataMetricWrappers.h   
 	infoWidgets/cxSamplerWidget.h
     #----------------------
@@ -198,16 +196,12 @@ SET(cxGui_SRCS
 	dataWidgets/cxTransferFunctionPresetWidget.h
 	dataWidgets/cxTransferFunctionPresetWidget.cpp
 	#----------------------
-    infoWidgets/cxBrowserWidget.h
-    infoWidgets/cxBrowserWidget.cpp
     infoWidgets/cxFrameTreeWidget.cpp
     infoWidgets/cxFrameTreeWidget.cpp
     infoWidgets/cxPointSamplingWidget.h
     infoWidgets/cxPointSamplingWidget.cpp
     infoWidgets/cxStatusBar.h
     infoWidgets/cxStatusBar.cpp    
-    infoWidgets/cxTreeModelItem.h
-    infoWidgets/cxTreeModelItem.cpp
     infoWidgets/cxMetricWidget.h
     infoWidgets/cxMetricWidget.cpp
     infoWidgets/cxDataMetricWrappers.h   
