@@ -291,12 +291,13 @@ if(APPLE)
     						)
 endif()
 
-INSTALL(FILES "${SSC_BINARY_DIR}/Examples/PositionFileReader/sscPositionFileReader" DESTINATION ${plugin_dest_dir}
-				PERMISSIONS
-						OWNER_READ OWNER_EXECUTE OWNER_WRITE
-						GROUP_READ GROUP_EXECUTE GROUP_WRITE
-						WORLD_READ WORLD_EXECUTE WORLD_WRITE
-						)
+# TODO: installing this one requires libraries, must be  done in a more orderly fashion, create system for including exes without script bloat.
+#INSTALL(FILES "${SSC_BINARY_DIR}/Examples/PositionFileReader/sscPositionFileReader" DESTINATION ${plugin_dest_dir}
+#				PERMISSIONS
+#						OWNER_READ OWNER_EXECUTE OWNER_WRITE
+#						GROUP_READ GROUP_EXECUTE GROUP_WRITE
+#						WORLD_READ WORLD_EXECUTE WORLD_WRITE
+#						)
 
 
 #--------------------------------------------------------------------------------
