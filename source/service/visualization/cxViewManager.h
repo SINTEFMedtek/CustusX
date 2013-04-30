@@ -158,7 +158,6 @@ public:
 	std::map<QString, ssc::ImagePtr> getVisibleImages();
 
 signals:
-//	void imageDeletedFromViews(ssc::ImagePtr image); ///< Emitted when an image is deleted from the views in the cxViewManager
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes
 	void activeViewChanged(); ///< emitted when the active view changes

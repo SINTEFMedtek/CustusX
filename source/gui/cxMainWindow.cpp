@@ -12,7 +12,6 @@
 #include "cxToolManager.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
-#include "cxBrowserWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxTabbedWidget.h"
 #include "cxToolPropertiesWidget.h"
@@ -93,7 +92,6 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
 	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
-	this->addAsDockWidget(new BrowserWidget(this), "Browsing");
 //	this->addAsDockWidget(new PointSamplingWidget(this), "Utility");
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
 	this->addAsDockWidget(new ImagePropertiesWidget(this), "Properties");
