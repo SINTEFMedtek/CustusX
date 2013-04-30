@@ -54,8 +54,7 @@ Q_OBJECT
 public:
 	ApplyLUTToImage2DProxy();
 	virtual ~ApplyLUTToImage2DProxy();
-	void setImage(vtkImageDataPtr image, vtkLookupTablePtr lut);
-	void setLut(vtkLookupTablePtr lut);
+	void setInput(vtkImageDataPtr image, vtkLookupTablePtr lut);
 	vtkImageDataPtr getOutput();
 
 private:
@@ -63,7 +62,6 @@ private:
 
 	vtkImageDataPtr mDummyImage; ///< need this to fool the vtk pipeline when no image is set
 	vtkImageAlgorithmPtr mRedirecter;
-	vtkImageMapToColorsPtr mWindowLevel;
 };
 
 /**\brief Helper class for slicing an image given a SliceProxy and an image.
@@ -98,16 +96,9 @@ private slots:
 private: 
 	ApplyLUTToImage2DProxyPtr mImageWithLUTProxy;
 
-//	vtkImageDataPtr createDummyImageData();
-
 	SliceProxyPtr mSlicer;
-//	vtkImageDataPtr mDummyImage; ///< need this to fool the vtk pipeline when no image is set
 	ImagePtr mImage;
-	//vtkImageMapToWindowLevelColorsPtr mWindowLevel;
-//	vtkImageAlgorithmPtr mRedirecter;
- 	//vtkImageReslicePtr mRedirecter;
 
-//	vtkImageMapToColorsPtr mWindowLevel;
 	vtkImageReslicePtr mReslicer;
 	vtkMatrix4x4Ptr mMatrixAxes;
 };
