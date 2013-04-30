@@ -15,7 +15,7 @@ namespace cx
  */
 
 /**
- * \class BrowserWidget
+ * \class RegistrationHistoryWidget
  *
  * Buttons for rolling back to previous registrations.
  * Might be enhanced to a graphical timeline.
