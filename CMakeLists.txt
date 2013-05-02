@@ -214,7 +214,7 @@ else (LINUX)
 		option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" OFF) #default is off for others
 endif (LINUX)
 
-option(BUILD_GRABBER_SERVER "build grabber server" OFF) #default is off
+option(BUILD_GRABBER_SERVER "build grabber server" ON) #default is off
 if(BUILD_GRABBER_SERVER)
 		add_subdirectory( source/apps/grabberServer )
 endif(BUILD_GRABBER_SERVER)
