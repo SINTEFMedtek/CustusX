@@ -421,29 +421,6 @@ void readStudyInfo( DcmItem *dset, struct study_t *study, const char *path )
 	(void) dicomtag_string( dset, study->manufacturer, DCM_Manufacturer, DICOMLIB_LONG_STRING );
 }
 
-static QStringList var2List(QVariantList variantList)
-{
-	QStringList stringList;
-	QListIterator<QVariant> j(variantList);
-	while (j.hasNext())
-	{
-		QVariant next = j.next();
-		if (next.canConvert(QVariant::String))
-		{
-			stringList << next.toString();
-		}
-		else if (next.type() == QVariant::List)
-		{
-			stringList << var2List(next.toList()).join(", ");
-		}
-		else
-		{
-			SSC_LOG("unknown type in varlist");
-		}
-	}
-	return stringList;
-}
-
 // Parse a CSA blob
 void csaparse(DcmElement *csaBlob, QVariantMap *csaMap)
 {

@@ -222,7 +222,7 @@ struct series_t
 	bool multiframe;					///< Whether this is a multi-frame series or not
 	bool mosaic;						///< Whether this series comes from a Siemens mosaic
 								///< --> frames tag contains number of images
-	char patient_orientation[4][2];				///< See DICOM standard C.7.6.1.1.1, if applicable.
+	char patient_orientation[2][4];				///< See DICOM standard C.7.6.1.1.1, if applicable.
 	struct series_t *next_series;				///< Next series in the linked list.
 	struct study_t *parent_study;				///< Owning study
 	struct volume_t *volume;				///< Reference to 3D volume that may be set by user; if so, cleaned up on exit.
