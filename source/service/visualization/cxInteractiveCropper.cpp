@@ -29,7 +29,7 @@
 #include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-//#include <vtkImageData.h>
+#include <vtkImageData.h>
 #include "sscTypeConversions.h"
 #include "cxRepManager.h"
 #include "sscDataManager.h"
@@ -253,17 +253,24 @@ bool InteractiveCropper::getShowBoxWidget() const
 	return mBoxWidget->GetEnabled();
 }
 
-//int* InteractiveCropper::getDimensions()
-//{
-//	int dims[3];
-////	if(mImage)
-////		mImage->getBaseVtkImageData()->GetDimensions(dims);
-//	ssc::DoubleBoundingBox3D bb_new = getBoxWidgetSize();
-//	dims[0] = bb_new.cbegin()[1] -bb_new.cbegin()[0];
-//	dims[1] = bb_new.cbegin()[3] -bb_new.cbegin()[2];
-//	dims[2] = bb_new.cbegin()[5] -bb_new.cbegin()[4];
-//	return dims;
-//}
+std::vector<int> InteractiveCropper::getDimensions()
+{
+//	int* mm = new int[3];
+	std::vector<int> dimensions;
+	double spacing_x, spacing_y, spacing_z;
+	if(mImage)
+//	{
+		mImage->getBaseVtkImageData()->GetSpacing(spacing_x, spacing_y, spacing_z);
+//		std::cout << mm[0]/spacing_x << " " << mm[1]/spacing_y << " " << mm[2]/spacing_z << std::endl;
+//	}
+
+	ssc::DoubleBoundingBox3D bb = getBoxWidgetSize();
+	dimensions.push_back((bb.begin()[1] - bb.begin()[0])/spacing_x);
+	dimensions.push_back((bb.begin()[3] - bb.begin()[2])/spacing_y);
+	dimensions.push_back((bb.begin()[5] - bb.begin()[4])/spacing_z);
+
+	return dimensions;
+}
 
 /** Set the box widget bounding box to the input box (given in data space)
  */
