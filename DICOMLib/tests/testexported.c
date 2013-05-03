@@ -36,8 +36,8 @@ int main ( int argc, const char * argv[] )
 	ptr = data->volume;
 	for ( i = 0; i < series->frames; i++ )
 	{
-		ptr += data->x * data->y * data->samples_per_pixel * (data->bits_per_sample / 8);
 		if ( *ptr == 3 ) usleep( 1 );	// just to access the memory
+		ptr += data->x * data->y * data->samples_per_pixel * (data->bits_per_sample / 8);
 	}
 	assert( i == series->frames );
 
