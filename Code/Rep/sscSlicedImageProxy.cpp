@@ -55,7 +55,6 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr l
 {
 	if (image)
 	{
-		vtkImageMapToColorsPtr windowLevel = vtkImageMapToColorsPtr::New();
 		if (image->GetNumberOfScalarComponents() == 3) // color
 		{
 			// split the image into the components, apply the lut, then merge.
@@ -64,19 +63,20 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr l
 
 			for (int i = 0; i < 3; ++i)
 			{
-				windowLevel->SetInput(image);
-				windowLevel->SetActiveComponent(i);
-				windowLevel->SetLookupTable(lut);
+				vtkImageMapToColorsPtr compWindowLevel = vtkImageMapToColorsPtr::New();
+				compWindowLevel->SetInput(image);
+				compWindowLevel->SetActiveComponent(i);
+				compWindowLevel->SetLookupTable(lut);
 				if (i==2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
 				{
-					windowLevel->SetOutputFormatToLuminanceAlpha();
+					compWindowLevel->SetOutputFormatToLuminanceAlpha();
 				}
 				else
 				{
-					windowLevel->SetOutputFormatToLuminance();
+					compWindowLevel->SetOutputFormatToLuminance();
 				}
 
-				merger->SetInput(i, windowLevel->GetOutput());
+				merger->SetInput(i, compWindowLevel->GetOutput());
 			}
 
 			mRedirecter->SetInput(merger->GetOutput());
@@ -84,6 +84,7 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr l
 		}
 		else // grayscale
 		{
+			vtkImageMapToColorsPtr windowLevel = vtkImageMapToColorsPtr::New();
 			windowLevel->SetOutputFormatToRGBA();
 			windowLevel->SetInput(image);
 			windowLevel->SetLookupTable(lut);
