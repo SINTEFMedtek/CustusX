@@ -26,7 +26,7 @@ BoundingBoxWidget::BoundingBoxWidget(QWidget* parent) :
 	layout->setMargin(0);
 
 	QStringList caption;
-	caption << "X" << "Y" << "Z";
+	caption << "X (mm)" << "Y (mm)" << "Z (mm)";
 
 	for (int i=0; i<caption.size(); ++i)
 	{
