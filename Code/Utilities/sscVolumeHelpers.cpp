@@ -192,7 +192,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
 	retval["rMd"] = string_cast(image->get_rMd());
 	retval["Number of components for points"] = string_cast(image->getBaseVtkImageData()->GetPointData()->GetNumberOfComponents());
 	retval["Scalar type"] = string_cast(image->getBaseVtkImageData()->GetScalarTypeAsString());
-	int extent[3];
+	int extent[6];
 	image->getBaseVtkImageData()->GetExtent(extent);
 	retval["Extent"] = string_cast(extent[0])+" , "+string_cast(extent[1])+" , "+string_cast(extent[2])+" , "+string_cast(extent[3])+" , "+string_cast(extent[4])+" , "+string_cast(extent[5]);
 
