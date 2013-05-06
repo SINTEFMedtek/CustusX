@@ -5,6 +5,9 @@
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
 
+class QString;
+class paramList;
+
 class TestTubeSegmentationFramework : public CppUnit::TestFixture
 {
 public:
@@ -13,15 +16,29 @@ public:
 
 	void testConstructor();///< Test constructor
 
-	void testFilter(); ///< Test TubeSegmentationFilter
 	void testParameters(); ///< Test the default parameters read from file (TSF)
+	void testDefaultPreset();
+	void testSyntheticVascusynthPreset();
+	void testPhantomAccUSPreset();
+	void testNeuroVesselsMRAPreset();
+	void testNeuroVesselsUSAPreset();
+	void testLungAirwaysCTPreset();
 
 	void testLoadParameterFile(); ///< Test to se if the options(adapters) are correctly fill with information form the parameter file
+
+private:
+	paramList loadPreset(QString preset);
+	void runFilter(QString preset);
 
 public:
 	CPPUNIT_TEST_SUITE( TestTubeSegmentationFramework );
 		CPPUNIT_TEST( testConstructor );
-		CPPUNIT_TEST( testFilter );
+		CPPUNIT_TEST( testDefaultPreset );
+		CPPUNIT_TEST( testSyntheticVascusynthPreset );
+		CPPUNIT_TEST( testPhantomAccUSPreset );
+		CPPUNIT_TEST( testNeuroVesselsMRAPreset );
+		CPPUNIT_TEST( testNeuroVesselsUSAPreset );
+		CPPUNIT_TEST( testLungAirwaysCTPreset );
 		CPPUNIT_TEST( testParameters );
 		CPPUNIT_TEST( testLoadParameterFile );
 	CPPUNIT_TEST_SUITE_END();
