@@ -255,19 +255,22 @@ bool InteractiveCropper::getShowBoxWidget() const
 
 std::vector<int> InteractiveCropper::getDimensions()
 {
-//	int* mm = new int[3];
 	std::vector<int> dimensions;
-	double spacing_x, spacing_y, spacing_z;
-	if(mImage)
-//	{
-		mImage->getBaseVtkImageData()->GetSpacing(spacing_x, spacing_y, spacing_z);
-//		std::cout << mm[0]/spacing_x << " " << mm[1]/spacing_y << " " << mm[2]/spacing_z << std::endl;
-//	}
+	if(!mImage)
+		return dimensions;
+
+	double spacing_x = 1;
+	double spacing_y = 1;
+	double spacing_z = 1;
+	mImage->getBaseVtkImageData()->GetSpacing(spacing_x, spacing_y, spacing_z);
 
 	ssc::DoubleBoundingBox3D bb = getBoxWidgetSize();
-	dimensions.push_back((bb.begin()[1] - bb.begin()[0])/spacing_x);
-	dimensions.push_back((bb.begin()[3] - bb.begin()[2])/spacing_y);
-	dimensions.push_back((bb.begin()[5] - bb.begin()[4])/spacing_z);
+	int dim_x = (bb.begin()[1] - bb.begin()[0])/spacing_x + 1; //adding 1 because of some rounding errors, is there a better way to do this?
+	int dim_y = (bb.begin()[3] - bb.begin()[2])/spacing_y + 1;
+	int dim_z = (bb.begin()[5] - bb.begin()[4])/spacing_z + 1;
+	dimensions.push_back(dim_x);
+	dimensions.push_back(dim_y);
+	dimensions.push_back(dim_z);
 
 	return dimensions;
 }
