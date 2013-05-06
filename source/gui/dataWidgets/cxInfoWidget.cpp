@@ -16,6 +16,7 @@ InfoWidget::InfoWidget(QWidget* parent, QString objectName, QString windowTitle)
 	toptopLayout->addLayout(gridLayout);
 
 	mTabelWidget = new QTableWidget(this);
+	mTabelWidget->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 }
 
 QString InfoWidget::defaultWhatsThis() const
