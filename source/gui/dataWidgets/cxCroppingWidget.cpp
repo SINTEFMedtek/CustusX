@@ -85,6 +85,9 @@ void CroppingWidget::boxValuesChanged()
 void CroppingWidget::cropperChangedSlot()
 {
 	std::vector<int> dims = mInteractiveCropper->getDimensions();
+	if(dims.size() < 3)
+		return;
+
 	QString dimensionText = "Dimensions: "+qstring_cast(dims.at(0))+", "+qstring_cast(dims.at(1))+", "+qstring_cast(dims.at(2));
 	mBoundingBoxDimensions->setText(dimensionText);
 	mUseCropperCheckBox->setChecked(mInteractiveCropper->getUseCropping());
