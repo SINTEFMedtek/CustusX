@@ -50,7 +50,7 @@ fi
 
 # ==========================================================
 # Clean up TSF data from last run (make more general?)
-rm -rf CX_DATA_TEMP_DIR/TubeSegmentationFramework/*
+rm -rf $CX_DATA_TEMP_DIR/TubeSegmentationFramework/*
 
 # ==========================================================
 # Run all tests and write them in xml format to ./CTestResults.xml
