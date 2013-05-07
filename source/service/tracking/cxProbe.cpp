@@ -17,13 +17,13 @@
 #include <QStringList>
 #include "sscVideoSource.h"
 #include "sscMessageManager.h"
-#include "cxDataLocations.h"
-#include "cxCreateProbeDataFromConfiguration.h"
 #include "sscProbeSector.h"
 #include "sscProbeAdapterRTSource.h"
 #include "sscTypeConversions.h"
 #include "sscVector3D.h"
 #include "sscLogger.h"
+#include "cxDataLocations.h"
+#include "cxCreateProbeDataFromConfiguration.h"
 
 namespace cx
 {
@@ -39,14 +39,15 @@ ProbePtr Probe::New(QString instrumentUid, QString scannerUid)
 Probe::Probe(QString instrumentUid, QString scannerUid) :
 				mSoundSpeedCompensationFactor(1.0),
 				mInstrumentUid(instrumentUid),
-				mScannerUid(scannerUid)
+				mScannerUid(scannerUid),
+				mOverrideTemporalCalibration(false),
+				mTemporalCalibration(0.0),
+				mDigitalInterface(false)
 {
 	ssc::ProbeData probeData;
 	mProbeData[probeData.getUid()] = probeData;
 	mActiveUid = probeData.getUid();
 
-	mOverrideTemporalCalibration = false;
-	mTemporalCalibration = 0;
 	QString xmlFileName = cx::DataLocations::getRootConfigPath() + QString("/tool/ProbeCalibConfigs.xml");
 	mXml.reset(new ProbeXmlConfigParser(xmlFileName));
 
@@ -173,6 +174,13 @@ void Probe::setData(ssc::ProbeData probeSector, QString configUid)
 	emit sectorChanged();
 }
 
+void Probe::setDigitalStatus(bool digitalStatus)
+{
+	mDigitalInterface = digitalStatus;
+	if (digitalStatus)
+		mConfigurationId = "Digital";
+}
+
 void Probe::addXml(QDomNode& dataNode)
 {
 	QDomDocument doc = dataNode.ownerDocument();
@@ -191,11 +199,14 @@ void Probe::parseXml(QDomNode& dataNode)
 
 QStringList Probe::getConfigIdList() const
 {
+//	std::cout << "Probe::getConfigIdList()" << std::endl;
 	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
 	if (rtSourceList.empty())
 		return QStringList();
-	QStringList configIdList = mXml->getConfigIdList(this->getInstrumentScannerId(), this->getInstrumentId(),
-					rtSourceList.at(0));
+	QString rtSource = rtSourceList.at(0);
+	if (mDigitalInterface)
+		rtSource = "Digital";
+	QStringList configIdList = mXml->getConfigIdList(this->getInstrumentScannerId(), this->getInstrumentId(), rtSource);
 	return configIdList;
 }
 
@@ -212,11 +223,15 @@ QString Probe::getConfigId() const
 
 QString Probe::getConfigurationPath() const
 {
+//	std::cout << "Probe::getConfigurationPath()" << std::endl;
 	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
 	if (rtSourceList.isEmpty())
 		return "";
 	QStringList retval;
-	retval << this->getInstrumentScannerId() << this->getInstrumentId() << rtSourceList.at(0) << this->getConfigId();
+	QString rtSource = rtSourceList.at(0);
+	if (mDigitalInterface)
+		rtSource = "Digital";
+	retval << this->getInstrumentScannerId() << this->getInstrumentId() << rtSource << this->getConfigId();
 	return retval.join(":");
 }
 
@@ -248,12 +263,16 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 
 ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
 {
+//	std::cout << "Probe::getConfiguration()" << std::endl;
 	ProbeXmlConfigParser::Configuration config;
 	QStringList rtSourceList = mXml->getRtSourceList(mScannerUid, mInstrumentUid);
 	if (rtSourceList.isEmpty())
 		return config;
 
-	config = mXml->getConfiguration(mScannerUid, mInstrumentUid, rtSourceList.at(0), uid);
+	QString rtSource = rtSourceList.at(0);
+	if (mDigitalInterface)
+		rtSource = "Digital";
+	config = mXml->getConfiguration(mScannerUid, mInstrumentUid, rtSource, uid);
 	return config;
 }
 
