@@ -23,6 +23,7 @@ ISB_PASSWORD=$2
 CX_SOURCE_DIR=$WORKSPACE/working/CustusX3/CustusX3
 CX_RELEASE_DIR=$WORKSPACE/working/CustusX3/build_Release
 CX_CATCH_DIR=$CX_RELEASE_DIR/source/testing
+CX_DATA_TEMP_DIR=CX_SOURCE_DIR/Data/temp
 
 # ==========================================================
 # Download, configure and build the project group.
@@ -46,6 +47,10 @@ else
     echo "CustusX build failure, terminating"
     exit 1
 fi
+
+# ==========================================================
+# Clean up TSF data from last run (make more general?)
+rm -rf CX_DATA_TEMP_DIR/TubeSegmentationFramework/*
 
 # ==========================================================
 # Run all tests and write them in xml format to ./CTestResults.xml
