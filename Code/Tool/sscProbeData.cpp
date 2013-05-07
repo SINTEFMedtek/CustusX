@@ -199,7 +199,7 @@ void ProbeData::applySoundSpeedCompensationFactor(double factor)
 
 	if (this->getType() != ssc::ProbeData::tLINEAR)
 	{
-		ssc::messageManager()->sendWarning("Sound speed compensation is applied to spacing[1], i.e. it is correct for linear probes and approxomate for other probes.");
+		ssc::messageManager()->sendWarning("Sound speed compensation is applied to spacing[1], i.e. it is correct for linear probes and approxomate for other probes. Factor: " + qstring_cast(factor));
 	}
 }
 
