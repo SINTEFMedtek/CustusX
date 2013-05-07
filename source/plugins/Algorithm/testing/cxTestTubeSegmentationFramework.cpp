@@ -82,6 +82,16 @@ void TestTubeSegmentationFramework::testLungAirwaysCTPreset()
 	runFilter(QString("Lung-Airways-CT"));
 }
 
+void TestTubeSegmentationFramework::testLiverCTPreset()
+{
+	runFilter(QString("Liver-CT"));
+}
+
+void TestTubeSegmentationFramework::testLiverMRBlackPreset()
+{
+	runFilter(QString("Liver-MR-Black"));
+}
+
 void TestTubeSegmentationFramework::testLoadParameterFile()
 {
 	paramList preset = loadPreset(QString("Neuro-Vessels-USA"));
