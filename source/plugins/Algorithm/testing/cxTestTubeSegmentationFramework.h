@@ -23,8 +23,10 @@ public:
 	void testNeuroVesselsMRAPreset();
 	void testNeuroVesselsUSAPreset();
 	void testLungAirwaysCTPreset();
+	void testLiverCTPreset();
+	void testLiverMRBlackPreset();
 
-	void testLoadParameterFile(); ///< Test to se if the options(adapters) are correctly fill with information form the parameter file
+	void testLoadParameterFile(); ///< Test to see if the options(adapters) are correctly fill with information form the parameter file
 
 private:
 	paramList loadPreset(QString preset);
@@ -39,6 +41,8 @@ public:
 		CPPUNIT_TEST( testNeuroVesselsMRAPreset );
 		CPPUNIT_TEST( testNeuroVesselsUSAPreset );
 		CPPUNIT_TEST( testLungAirwaysCTPreset );
+		CPPUNIT_TEST( testLiverCTPreset );
+		CPPUNIT_TEST( testLiverMRBlackPreset );
 		CPPUNIT_TEST( testParameters );
 		CPPUNIT_TEST( testLoadParameterFile );
 	CPPUNIT_TEST_SUITE_END();
