@@ -123,7 +123,7 @@ void TestTubeSegmentationFramework::runFilter(QString preset)
 
 	//execute
 	CPPUNIT_ASSERT_MESSAGE("Preprocessing TubeSegmentationFilter failed.", tsf->preProcess());
-	CPPUNIT_ASSERT_MESSAGE( "Executed TSF on helix with default parameters failed.", tsf->execute());
+	CPPUNIT_ASSERT_MESSAGE( "Executed TSF on "+preset.toStdString()+" with "+preset.toStdString()+" parameters failed.", tsf->execute());
 	CPPUNIT_ASSERT_MESSAGE("Post processing data from TSF failed.", tsf->postProcess());
 
 	//check output
