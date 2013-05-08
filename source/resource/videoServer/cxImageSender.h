@@ -18,7 +18,8 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
-#include <QTcpSocket>
+//#include <QTcpSocket>
+#include <QTimer>
 
 #include <map>
 #include "boost/shared_ptr.hpp"
@@ -28,7 +29,7 @@ namespace cx
 {
 
 typedef std::map<QString, QString> StringMap;
-typedef boost::shared_ptr<class ImageSender> ImageSenderPtr;
+typedef boost::shared_ptr<class ImageStreamer> ImageStreamerPtr;
 
 /**\brief Interface for objects that emit an image stream to IGTLink
  *
@@ -37,21 +38,26 @@ typedef boost::shared_ptr<class ImageSender> ImageSenderPtr;
  * \date Apr 17, 2012
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  */
-class ImageSender : public QObject
+class ImageStreamer : public QObject
 {
 	Q_OBJECT
 public:
-	ImageSender(QObject* parent = NULL) : QObject(parent) {}
-	virtual ~ImageSender() {}
+	ImageStreamer(QObject* parent = NULL) : QObject(parent), mSendTimer(0) {}
+	virtual ~ImageStreamer() {}
 
-	virtual void initialize(StringMap arguments) = 0;
-//	virtual void startStreaming(QTcpSocket* socket) = 0;
+	virtual void initialize(StringMap arguments);
 	virtual bool startStreaming(GrabberSenderPtr sender) = 0;
 	virtual void stopStreaming() = 0;
 
 	virtual QString getType() = 0;
 	virtual QStringList getArgumentDescription() = 0;
+
+protected:
+	GrabberSenderPtr mSender;
+	QTimer* mSendTimer;
+	StringMap mArguments;
 };
 
 }

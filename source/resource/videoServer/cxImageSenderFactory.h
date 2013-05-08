@@ -1,9 +1,3 @@
-/*
- * cxImageSenderFactory.h
- *
- *  \date Aug 9, 2011
- *      \author christiana
- */
 
 #ifndef CXIMAGESENDERFACTORY_H_
 #define CXIMAGESENDERFACTORY_H_
@@ -12,8 +6,9 @@
 #include <QStringList>
 #include <map>
 #include <vector>
-class QTcpSocket;
 #include "cxImageSender.h"
+
+class QTcpSocket;
 
 namespace cx
 {
@@ -27,6 +22,9 @@ int convertStringWithDefault(QString text, int def);
  * but have the following property:
  * When created, start grabbing and emitting images using
  * OpenIGTLink on the provided socket.
+ *
+ * \author Christian Askeland, SINTEF
+ * \date Aug 9, 2011
  */
 class ImageSenderFactory
 {
@@ -35,11 +33,11 @@ public:
 	QString getDefaultSenderType() const;
 	QStringList getSenderTypes() const; ///< all available MHDImageSender types
 	QStringList getArgumentDescription(QString type) const; ///< arguments for one Image Sender
-	ImageSenderPtr getImageSender(QString type);
+	ImageStreamerPtr getImageSender(QString type);
 //	QObject* createSender(QString type, QTcpSocket* socket, StringMap arguments) const; ///< launch a MHDImageSender.
-	ImageSenderPtr getFromArguments(StringMap args);
+	ImageStreamerPtr getFromArguments(StringMap args);
 private:
-	std::vector<ImageSenderPtr> mAvailable;
+	std::vector<ImageStreamerPtr> mAvailable;
 };
 
 }

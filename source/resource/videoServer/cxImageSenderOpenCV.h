@@ -1,10 +1,3 @@
-/*
- * cxImageSenderOpenCV.h
- *
- *  \date Jun 21, 2011
- *      \author christiana
- */
-
 #ifndef CXIMAGESENDEROPENCV_H_
 #define CXIMAGESENDEROPENCV_H_
 
@@ -33,14 +26,18 @@ namespace cx
 {
 typedef boost::shared_ptr<cv::VideoCapture> VideoCapturePtr;
 
-/**An object sending images out on an ip port.
+/**
+ * An object sending images out on an ip port.
  * In order to operate within a nongui thread,
  * it must be created within the run() method
  * of a qthread.
  *
+ * \author Christian Askeland, SINTEF
+ * \date Jun 21, 2011
+ *
  * This version uses openCV to grab images from a video file or camera
  */
-class ImageSenderOpenCV: public ImageSender
+class ImageSenderOpenCV: public ImageStreamer
 {
 Q_OBJECT
 
@@ -55,13 +52,11 @@ public:
 	virtual QString getType();
 	virtual QStringList getArgumentDescription();
 
-protected:
+private slots:
+	void grab();
+	void send();
+
 private:
-	GrabberSenderPtr mSender;
-	QTimer* mSendTimer;
-	QTimer* mGrabTimer;
-	StringMap mArguments;
-	QSize mRescaleSize;
 	void dumpProperties();
 	IGTLinkImageMessage::Pointer getImageMessage();
 	void dumpProperty(int val, QString name);
@@ -69,14 +64,16 @@ private:
 	void initialize_local();
 	void deinitialize_local();
 
+//	GrabberSenderPtr mSender;
+//	QTimer* mSendTimer;
+	QTimer* mGrabTimer;
+//	StringMap mArguments;
+	QSize mRescaleSize;
+
 	VideoCapturePtr mVideoCapture; // OpenCV video grabber
 	QDateTime mLastGrabTime;
 	QTime mCounter;
 	bool mAvailableImage;
-
-private slots:
-	void grab();
-	void send();
 };
 
 }
