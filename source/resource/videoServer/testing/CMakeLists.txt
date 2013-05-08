@@ -16,14 +16,14 @@ if (BUILD_TESTING)
 
 	# List of all test units
 	QT4_WRAP_CPP( CX_TEST_SOURCE_FILES
-		cxTestGEInterfaceController.h
+		cxTestGrabberSenderController.h
 		)
 
 	set(CX_TEST_SOURCE_FILES
 		cxTestGEInterface.h
 		cxTestGEInterface.cpp
-		cxTestGEInterfaceController.h
-		cxTestGEInterfaceController.cpp
+		cxTestGrabberSenderController.h
+		cxTestGrabberSenderController.cpp
 		${CX_TEST_SOURCE_FILES}
 		)
 

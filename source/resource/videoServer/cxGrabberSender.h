@@ -1,10 +1,3 @@
-/*
- * cxGrabberSender.h
- *
- *  Created on: Oct 11, 2012
- *      Author: christiana
- */
-
 #ifndef CXGRABBERSENDER_H_
 #define CXGRABBERSENDER_H_
 
@@ -21,7 +14,8 @@ namespace cx
 
 /**Interface for sending grabbed data from the ImageSender classes further to either
  * a TCP/IP socket or directly via a Qt signal.
- *
+ * \author Christian Askeland, SINTEF
+ * \date Oct 11, 2012
  */
 class GrabberSender : public QObject
 {
@@ -49,9 +43,6 @@ public:
 };
 typedef boost::shared_ptr<GrabberSender> GrabberSenderPtr;
 
-/**
- *
- */
 class GrabberSenderQTcpSocket : public GrabberSender
 {
 public:
@@ -67,36 +58,6 @@ private:
 	QTcpSocket* mSocket;
 	int mMaxBufferSize;
 };
-
-
-/**
- *
- */
-class GrabberSenderDirectLink : public GrabberSender
-{
-	Q_OBJECT
-public:
-	GrabberSenderDirectLink() {}
-	virtual ~GrabberSenderDirectLink() {}
-
-	bool isReady() const;
-	virtual void send(IGTLinkImageMessage::Pointer msg);
-	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
-	virtual void send(ssc::ImagePtr msg);
-	virtual void send(ssc::ProbeData msg);
-
-	ssc::ImagePtr popImage();
-	ssc::ProbeData popUSStatus();
-
-signals:
-	void newImage();
-	void newUSStatus();
-private:
-	ssc::ImagePtr mImage;
-	ssc::ProbeData mUSStatus;
-	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
-};
-typedef boost::shared_ptr<GrabberSenderDirectLink> GrabberSenderDirectLinkPtr;
 
 } /* namespace cx */
 #endif /* CXGRABBERSENDER_H_ */

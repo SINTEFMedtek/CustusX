@@ -1,10 +1,3 @@
-/*
- * cxImageSenderSonix.cpp
- *
- *  \date Aug 15, 2011
- *      \author Ole Vegard Solberg
- */
-
 #include "cxImageSenderSonix.h"
 #include "sscVector3D.h"
 
@@ -50,7 +43,7 @@ QStringList ImageSenderSonix::getArgumentDescription()
 
 
 ImageSenderSonix::ImageSenderSonix(QObject* parent) :
-    ImageSender(parent),
+    ImageStreamer(parent),
 	mEmitStatusMessage(false),
 	mLastFrameTimestamp(0.0),
 	mCurrentFrameTimestamp(0.0)
@@ -59,7 +52,7 @@ ImageSenderSonix::ImageSenderSonix(QObject* parent) :
 
 ImageSenderSonix::~ImageSenderSonix()
 {
-	mTimer->stop();
+	mSendTimer->stop();
 	if (mSonixGrabber)
 		{
 			mSonixGrabber->Stop();
@@ -73,7 +66,8 @@ void ImageSenderSonix::initialize(StringMap arguments)
 {
 	std::cout << "Creating sender type Sonix" << std::endl;
 		  
-    mArguments = arguments;
+//    mArguments = arguments;
+	ImageStreamer::initialize(arguments);
 	
 	mMaxqueueInfo = 20;
 //	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
@@ -87,10 +81,10 @@ void ImageSenderSonix::initialize(StringMap arguments)
 
 	this->mSonixHelper = new SonixHelper();
 
-	mTimer = new QTimer;
-	connect(mTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
-	mTimer->setInterval(10000);
-	mTimer->start();
+	mSendTimer = new QTimer;
+	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
+	mSendTimer->setInterval(10000);
+	mSendTimer->start();
 
 	this->initializeSonixGrabber();
 }

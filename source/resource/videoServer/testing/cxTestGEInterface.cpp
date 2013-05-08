@@ -4,8 +4,8 @@
 #include <QTimer>
 #include "GEStreamer.h"
 //#include "sscVector3D.h"
-#include "cxGrabberSender.h"
-#include "cxTestGEInterfaceController.h"
+#include "cxGrabberSenderDirectLink.h"
+#include "cxTestGrabberSenderController.h"
 #include "cxImageSenderGE.h"
 #include "sscMessageManager.h"
 
@@ -138,13 +138,13 @@ void TestGEInterface::testAllStreamsGPUConsecutively()
 
 void TestGEInterface::testStream(cx::StringMap args)
 {
-	cx::ImageSenderPtr imageSender = cx::ImageSenderFactory().getFromArguments(args);
+	cx::ImageStreamerPtr imageSender = cx::ImageSenderFactory().getFromArguments(args);
 	CPPUNIT_ASSERT(imageSender);
 	CPPUNIT_ASSERT(imageSender->getType().compare(args["type"]) == 0);
 
 	cx::GrabberSenderDirectLinkPtr grabberBridge(new cx::GrabberSenderDirectLink());
 
-	TestGEInterfaceController controller(NULL);
+	TestGrabberSenderController controller(NULL);
 	controller.initialize(grabberBridge);
 
 	CPPUNIT_ASSERT(imageSender->startStreaming(grabberBridge));
@@ -158,7 +158,7 @@ void TestGEInterface::testStream(cx::StringMap args)
 	imageSender.reset();
 	grabberBridge.reset();
 
-	controller.verify();
+	CPPUNIT_ASSERT(controller.verify());
 }
 
 void TestGEInterface::testGEStreamer()

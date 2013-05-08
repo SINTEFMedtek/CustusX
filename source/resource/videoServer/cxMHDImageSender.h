@@ -1,17 +1,10 @@
-/*
- * cxImageSenderFile.h
- *
- *  \date Jun 21, 2011
- *      \author christiana
- */
-
-#ifndef CXIMAGESENDERFILE_H_
-#define CXIMAGESENDERFILE_H_
+#ifndef CXMHDIMAGESENDER_H_
+#define CXMHDIMAGESENDER_H_
 
 #include "boost/shared_ptr.hpp"
-class QTimer;
 #include "cxImageSender.h"
 
+class QTimer;
 
 namespace cx
 {
@@ -20,10 +13,14 @@ namespace cx
  * In order to operate within a nongui thread,
  * it must be created within the run() method
  * of a qthread.
+ *
+ * \author Christian Askeland, SINTEF
+ * \date Jun 21, 2011
  */
-class MHDImageSender: public ImageSender
+class MHDImageSender: public ImageStreamer
 {
-Q_OBJECT
+
+	Q_OBJECT
 
 public:
 	MHDImageSender(QObject* parent = NULL);
@@ -36,12 +33,10 @@ public:
 	virtual QString getType();
 	virtual QStringList getArgumentDescription();
 
-protected:
-private:
-	GrabberSenderPtr mSender;
-	QTimer* mTimer;
-	StringMap mArguments;
+private slots:
+	void tick();
 
+private:
 	struct Data
 	{
 		vtkImageDataPtr mImageData;
@@ -50,18 +45,21 @@ private:
 		QString mRawUid; /// raw text to send as device name - excluding frame id
 	};
 
-	Data mPrimaryData;
-	Data mSecondaryData;
-
 	Data initializePrimaryData(vtkImageDataPtr source, QString filename) const;
 	Data initializeSecondaryData(vtkImageDataPtr source, QString filename) const;
 	void send(Data* data);
 	void setTestImage();
 
-private slots:
-	void tick();
-};
+	//	GrabberSenderPtr mSender;
+//	QTimer* mSendTimer;
+//	StringMap mArguments;
 
+
+	Data mPrimaryData;
+	Data mSecondaryData;
+
+};
+typedef boost::shared_ptr<class MHDImageSender> MHDImageStreamerPtr;
 }
 
-#endif /* CXIMAGESENDERFILE_H_ */
+#endif /* CXMHDIMAGESENDER_H_ */
