@@ -82,14 +82,14 @@ void TestTubeSegmentationFramework::testLungAirwaysCTPreset()
 	runFilter(QString("Lung-Airways-CT"));
 }
 
-void TestTubeSegmentationFramework::testLiverCTPreset()
+void TestTubeSegmentationFramework::testLiverVesselsCTPreset()
 {
-	runFilter(QString("Liver-CT"));
+	runFilter(QString("Liver-Vessels-CT"));
 }
 
-void TestTubeSegmentationFramework::testLiverMRBlackPreset()
+void TestTubeSegmentationFramework::testLiverVesselsMRPreset()
 {
-	runFilter(QString("Liver-MR-Black"));
+	runFilter(QString("Liver-Vessels-MR"));
 }
 
 void TestTubeSegmentationFramework::testLoadParameterFile()

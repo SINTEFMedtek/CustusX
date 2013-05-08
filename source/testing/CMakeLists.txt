@@ -21,6 +21,7 @@ if (BUILD_TESTING)
     set(CATCH_SOURCES 
         cxCatch.cpp
         ../plugins/Algorithm/testing/cxCatchAlgorithm.cpp
+        ../service/video/testing/cxCatchVideo.cpp
     )
     #------------------------------------------------------------------------------
     # Includes
