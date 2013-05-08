@@ -22,7 +22,7 @@
 
 namespace cx
 {
-typedef boost::shared_ptr<class ImageSender> ImageSenderPtr;
+typedef boost::shared_ptr<class ImageStreamer> ImageStreamerPtr;
 typedef boost::shared_ptr<class GrabberSenderDirectLink> GrabberSenderDirectLinkPtr;
 
 /**
@@ -55,7 +55,7 @@ private slots:
 
 private:
 	std::map<QString, QString> mArguments;
-	ImageSenderPtr mImageSender;
+	ImageStreamerPtr mImageSender;
 	GrabberSenderDirectLinkPtr mGrabberBridge;
 };
 

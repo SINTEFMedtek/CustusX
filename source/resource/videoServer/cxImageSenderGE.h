@@ -1,10 +1,3 @@
-/*
- * cxImageSenderGE.h
- *
- *  Created on: Sep 19, 2012
- *      Author: olevs
- */
-
 #ifndef CXIMAGESENDERGE_H_
 #define CXIMAGESENDERGE_H_
 
@@ -15,32 +8,32 @@
 #include <QTcpSocket>
 #include <QDateTime>
 #include <QSize>
-class QTimer;
 #include <QStringList>
 #include "igtlImageMessage.h"
 #include "cxImageSenderFactory.h"
 #include "cxIGTLinkImageMessage.h"
 #include "cxRenderTimer.h"
-
 #include "GEStreamer.h"
+
+class QTimer;
 
 namespace cx
 {
 
-/**
- * Find GEStreamer OpenCL kernel code
- */
-QString findOpenCLPath(QString additionalLocation);
+QString findOpenCLPath(QString additionalLocation); ///< Find GEStreamer OpenCL kernel code
 
 /**An object sending images out on an ip port.
  * In order to operate within a nongui thread,
  * it must be created within the run() method
  * of a qthread.
  *
+ * \author Ole Vegard Solberg, SINTEF
+ * \date Sep 19, 2012
+ *
  * This version uses the NTNU ISB data streamer module (provided by Gabriel Kiss)
  * to grab images from the E9 EG scanner (and similar)
  */
-class ImageSenderGE: public ImageSender
+class ImageSenderGE: public ImageStreamer
 {
 	Q_OBJECT
 public:
@@ -54,14 +47,27 @@ public:
 	virtual QString getType();
 	virtual QStringList getArgumentDescription();
 
-protected:
+private slots:
+	void grab();
+	void send();
+
 private:
-	GrabberSenderPtr mSender;
+	bool initialize_local();
+	void deinitialize_local();
+	//Deprecated
+//	IGTLinkImageMessage::Pointer getImageMessage();
+//	IGTLinkUSStatusMessage::Pointer getFrameStatus();
+	ssc::ProbeData getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
+	void send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged);
+
+	//Compare to geometry structs
+	bool equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b);
+//	GrabberSenderPtr mSender;
 //	QTcpSocket* mSocket;
 	bool mInitialized;
-	QTimer* mSendTimer;
+//	QTimer* mSendTimer;
 	QTimer* mGrabTimer;
-	StringMap mArguments;
+//	StringMap mArguments;
 	CyclicActionTimerPtr mRenderTimer;
 
 	//The GE Connection code from ISB
@@ -83,20 +89,6 @@ private:
    	bool mExportFrequency;
    	bool mExportVelocity;
 
-	bool initialize_local();
-	void deinitialize_local();
-	//Deprecated
-//	IGTLinkImageMessage::Pointer getImageMessage();
-//	IGTLinkUSStatusMessage::Pointer getFrameStatus();
-	ssc::ProbeData getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
-	void send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged);
-
-	//Compare to geometry structs
-	bool equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b);
-
-private slots:
-	void grab();
-	void send();
 };
 
 }

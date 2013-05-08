@@ -79,8 +79,8 @@ QStringList ImageSenderOpenCV::getArgumentDescription()
 }
 
 ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
-	ImageSender(parent),
-	mSendTimer(0),
+	ImageStreamer(parent),
+//	mSendTimer(0),
 	mGrabTimer(0)
 {
 	mAvailableImage = false;
@@ -99,7 +99,8 @@ ImageSenderOpenCV::~ImageSenderOpenCV()
 
 void ImageSenderOpenCV::initialize(StringMap arguments)
 {
-	mArguments = arguments;
+//	mArguments = arguments;
+	ImageStreamer::initialize(arguments);
 
 	// Run an init/deinit to check that we have contact right away.
 	// Do NOT keep the connection open: This is because we have no good way to

@@ -114,12 +114,13 @@ endif()
 #-------------------------------
 SET( CX_QT_MOC_HEADER_FILES
 		cxImageServer.h
-		cxImageSenderFile.h
+		cxMHDImageSender.h
 		cxImageSenderSonix.h
 		cxImageSenderOpenCV.h
 		cxImageSenderGE.h
 		cxImageSender.h
 		cxGrabberSender.h
+		cxGrabberSenderDirectLink.h
 )
 
 #QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
@@ -139,8 +140,8 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxImageServer.cpp
 		cxImageSenderFactory.h
 		cxImageSenderFactory.cpp
-		cxImageSenderFile.h
-		cxImageSenderFile.cpp
+		cxMHDImageSender.h
+		cxMHDImageSender.cpp
 		cxImageSenderOpenCV.h
 		cxImageSenderOpenCV.cpp
 		cxImageSenderSonix.h
@@ -148,8 +149,11 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxImageSenderGE.h
 		cxImageSenderGE.cpp
 		cxImageSender.h
+		cxImageSender.cpp
 		cxGrabberSender.h
 		cxGrabberSender.cpp
+		cxGrabberSenderDirectLink.h
+		cxGrabberSenderDirectLink.cpp
 
 )
 

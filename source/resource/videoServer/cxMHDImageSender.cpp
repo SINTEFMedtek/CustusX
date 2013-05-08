@@ -1,11 +1,4 @@
-/*
- * cxImageSenderFile.cpp
- *
- *  \date Jun 21, 2011
- *      \author christiana
- */
-
-#include "cxImageSenderFile.h"
+#include "cxMHDImageSender.h"
 
 #include <QTimer>
 #include <QDateTime>
@@ -80,14 +73,15 @@ QStringList MHDImageSender::getArgumentDescription()
 }
 
 MHDImageSender::MHDImageSender(QObject* parent) :
-    ImageSender(parent),
-    mTimer(0)
+    ImageStreamer(parent)
+//    mSendTimer(0)
 {
 }
 
 void MHDImageSender::initialize(StringMap arguments)
 {
-    mArguments = arguments;
+//    mArguments = arguments;
+    ImageStreamer::initialize(arguments);
 
 	QString filename = mArguments["filename"];
 	vtkImageDataPtr source = loadImage(filename);
@@ -111,8 +105,8 @@ void MHDImageSender::initialize(StringMap arguments)
 		std::cout << "MHDImageSender: Initialized secondary data with uid=" << mSecondaryData.mRawUid << std::endl;
 	}
 
-	mTimer = new QTimer(this);
-	connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+	mSendTimer = new QTimer(this);
+	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 	//  mTimer->start(1200); // for test of the timeout feature
 }
 
@@ -199,19 +193,19 @@ MHDImageSender::Data MHDImageSender::initializeSecondaryData(vtkImageDataPtr sou
 
 bool MHDImageSender::startStreaming(GrabberSenderPtr sender)
 {
-	if (!mTimer)
+	if (!mSendTimer)
 	{
 	    std::cout << "MHDImageSender: Failed to start streaming: Not initialized." << std::endl;
 	    return false;
 	}
     mSender = sender;
-	mTimer->start(40);
+	mSendTimer->start(40);
 	return true;
 }
 
 void MHDImageSender::stopStreaming()
 {
-	mTimer->stop();
+	mSendTimer->stop();
 }
 
 void MHDImageSender::tick()

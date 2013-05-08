@@ -19,6 +19,7 @@
 #include "sscVector3D.h"
 #include "cxImageSenderFactory.h"
 #include "cxRenderTimer.h"
+#include "cxGrabberSenderDirectLink.h"
 
 namespace cx
 {

@@ -60,9 +60,9 @@ QStringList ImageSenderGE::getArgumentDescription()
 }
 
 ImageSenderGE::ImageSenderGE(QObject* parent) :
-	ImageSender(parent),
+	ImageStreamer(parent),
 	mInitialized(false),
-	mSendTimer(0),
+//	mSendTimer(0),
 	mGrabTimer(0),
 	mExportScanconverted(true),
 	mExportTissue(false),
@@ -84,7 +84,8 @@ ImageSenderGE::ImageSenderGE(QObject* parent) :
 
 void ImageSenderGE::initialize(StringMap arguments)
 {
-	mArguments = arguments;
+//	mArguments = arguments;
+	ImageStreamer::initialize(arguments);
 
 	//where to dump the hdf files
 	std::string fileRoot = "c:\\test";
