@@ -1,19 +1,10 @@
-/*
- * cxImageSenderSonix.h
- *
- *  \date Aug 15, 2011
- *      \author Ole Vegard Solberg
- */
-
 #ifndef CXIMAGESENDERSONIX_H_
 #define CXIMAGESENDERSONIX_H_
 
 #ifdef CX_WIN32
 
-
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
-class QTimer;
 #include <QStringList>
 #include <QMetaType>
 #include <QMutex>
@@ -26,6 +17,7 @@ class QTimer;
 #include "SonixHelper.h"
 #include "cxImageSender.h"
 
+class QTimer;
 typedef vtkSmartPointer<class vtkSonixVideoSource> vtkSonixVideoSourcePtr;
 
 namespace cx
@@ -35,6 +27,9 @@ namespace cx
  * In order to operate within a nongui thread,
  * it must be created within the run() method
  * of a qthread.
+ *
+ * \date Aug 15, 2011
+ * \author Ole Vegard Solberg, SINTEF
  *
  * This version uses openCV to grab images from the Ultrasonix scanner
  */
@@ -64,27 +59,14 @@ signals:
 
 protected:
     void initializeSonixGrabber();
+
+private slots:
+  void receiveFrameSlot(Frame& frame);
+  void initializeSonixSlot();
+
 private:
-  GrabberSenderPtr mSender;
-  QTimer* mTimer;
-  StringMap mArguments;
-  bool mEmitStatusMessage; ///< Emit new US status message
-  double mLastFrameTimestamp; ///< Time stamp of last frame
-  double mCurrentFrameTimestamp; ///< Current frame timestamp
-
-  vtkSonixVideoSourcePtr  mSonixGrabber; ///< Ultrasonix video grabber
-  SonixHelper*          mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
-
-//  void dumpProperties();
-//  igtl::ImageMessage::Pointer getImageMessage();
-//  void dumpProperty(int val, QString name);
-
-  //cv::VideoCapture mVideoCapture; // OpenCV video grabber
-
-
   IGTLinkImageMessage::Pointer convertFrame(Frame& frame);
   IGTLinkUSStatusMessage::Pointer getFrameStatus(Frame& frame);
-
 
   void addImageToQueue(IGTLinkImageMessage::Pointer msg); ///< Adds a OpenIGTLink ImageMessage to the queue
   IGTLinkImageMessage::Pointer getLastImageMessageFromQueue(); ///< Gets the oldest message from the queue-
@@ -94,17 +76,21 @@ private:
 
   QMutex mImageMutex; ///< A lock for making the class threadsafe
   int mMaxqueueInfo;
-//  int mMaxBufferSize;
   std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue
   int mDroppedImages;
 
   QMutex mStatusMutex; ///< A lock for making the class threadsafe
   std::list<IGTLinkUSStatusMessage::Pointer> mMutexedStatusMessageQueue; ///< A threasafe internal queue
 
-private slots:
-  //void tick();
-  void receiveFrameSlot(Frame& frame);
-  void initializeSonixSlot();
+//  GrabberSenderPtr mSender;
+//  QTimer* mSendTimer;
+//  StringMap mArguments;
+  bool mEmitStatusMessage; ///< Emit new US status message
+  double mLastFrameTimestamp; ///< Time stamp of last frame
+  double mCurrentFrameTimestamp; ///< Current frame timestamp
+
+  vtkSonixVideoSourcePtr  mSonixGrabber; ///< Ultrasonix video grabber
+  SonixHelper*          mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
 
 };
 

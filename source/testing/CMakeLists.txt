@@ -29,6 +29,10 @@ if (BUILD_TESTING)
     include_directories(
 		.
 		${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/logic
+		${CustusX3_SOURCE_DIR}/source/services/video
+		${CustusX3_SOURCE_DIR}/source/resource/videoServer
+		${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+        ${CustusX3_SOURCE_DIR}/source/resource/videoServer/testing
 		)
     #------------------------------------------------------------------------------
     # Executable

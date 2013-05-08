@@ -7,7 +7,7 @@
 
 #include "cxImageSenderFactory.h"
 #include "cxImageSenderOpenCV.h"
-#include "cxImageSenderFile.h"
+#include "cxMHDImageSender.h"
 #include "cxImageSenderSonix.h"
 #include "cxImageSenderGE.h"
 
@@ -48,13 +48,13 @@ StringMap extractCommandlineOptions(QStringList cmdline)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-ImageSenderPtr ImageSenderFactory::getFromArguments(StringMap args)
+ImageStreamerPtr ImageSenderFactory::getFromArguments(StringMap args)
 {
 	QString type = this->getDefaultSenderType();
 	if (args.count("type"))
 		type = args["type"];
 
-	ImageSenderPtr retval = this->getImageSender(type);
+	ImageStreamerPtr retval = this->getImageSender(type);
 
 	if (retval)
 	{
@@ -74,15 +74,15 @@ ImageSenderPtr ImageSenderFactory::getFromArguments(StringMap args)
 ImageSenderFactory::ImageSenderFactory()
 {
 #ifdef CX_WIN32
-	mAvailable.push_back(ImageSenderPtr(new ImageSenderSonix()));
+	mAvailable.push_back(ImageStreamerPtr(new ImageSenderSonix()));
 #endif
 #ifdef CX_USE_OpenCV
-	mAvailable.push_back(ImageSenderPtr(new ImageSenderOpenCV()));
+	mAvailable.push_back(ImageStreamerPtr(new ImageSenderOpenCV()));
 #endif
 #ifdef CX_USE_ISB_GE
-	mAvailable.push_back(ImageSenderPtr(new ImageSenderGE()));
+	mAvailable.push_back(ImageStreamerPtr(new ImageSenderGE()));
 #endif
-	mAvailable.push_back(ImageSenderPtr(new MHDImageSender()));
+	mAvailable.push_back(ImageStreamerPtr(new MHDImageSender()));
 }
 
 QString ImageSenderFactory::getDefaultSenderType() const
@@ -112,14 +112,14 @@ QStringList ImageSenderFactory::getArgumentDescription(QString type) const
 	return retval;
 }
 
-ImageSenderPtr ImageSenderFactory::getImageSender(QString type)
+ImageStreamerPtr ImageSenderFactory::getImageSender(QString type)
 {
 	for (unsigned i=0; i< mAvailable.size(); ++i)
 	{
 		if (mAvailable[i]->getType()==type)
 			return mAvailable[i];
 	}
-	return ImageSenderPtr();
+	return ImageStreamerPtr();
 }
 
 
