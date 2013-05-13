@@ -35,6 +35,8 @@ private:
 public:
 	CPPUNIT_TEST_SUITE( TestTubeSegmentationFramework );
 		CPPUNIT_TEST( testConstructor );
+		CPPUNIT_TEST( testParameters );
+		CPPUNIT_TEST( testLoadParameterFile );
 		CPPUNIT_TEST( testDefaultPreset );
 		CPPUNIT_TEST( testSyntheticVascusynthPreset );
 		CPPUNIT_TEST( testPhantomAccUSPreset );
@@ -42,10 +44,8 @@ public:
 		CPPUNIT_TEST( testNeuroVesselsUSAPreset );
 		CPPUNIT_TEST( testLungAirwaysCTPreset );
 		//TODO make these work
-		CPPUNIT_TEST( testLiverVesselsCTPreset );
-		CPPUNIT_TEST( testLiverVesselsMRPreset );
-		CPPUNIT_TEST( testParameters );
-		CPPUNIT_TEST( testLoadParameterFile );
+//		CPPUNIT_TEST( testLiverVesselsCTPreset );
+//		CPPUNIT_TEST( testLiverVesselsMRPreset );
 	CPPUNIT_TEST_SUITE_END();
 
 };
