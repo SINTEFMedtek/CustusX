@@ -103,7 +103,7 @@ void ImageServer::incomingConnection(int socketDescriptor)
 	mSocket->setSocketDescriptor(socketDescriptor);
 	QString clientName = mSocket->localAddress().toString();
 	std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
-	GrabberSenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
+	SenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
 
 	mImageSender->startStreaming(sender);
 }

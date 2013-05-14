@@ -11,7 +11,7 @@
 #include <QTcpServer>
 #include <QTimer>
 #include <QPointer>
-#include "cxImageSender.h"
+#include "cxImageStreamer.h"
 
 namespace cx
 {

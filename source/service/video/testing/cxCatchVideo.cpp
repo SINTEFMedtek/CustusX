@@ -5,39 +5,36 @@
 #include "sscImage.h"
 #include "sscDataManager.h"
 #include "cxDataLocations.h"
-#include "cxMHDImageSender.h"
-#include "cxGrabberSenderDirectLink.h"
-#include "cxImageSenderFactory.h"
-#include "cxTestGrabberSenderController.h"
+#include "cxMHDImageStreamer.h"
+#include "cxTestSender.h"
 
 namespace cx
 {
 TEST_CASE("Create image sender", "[video][unit]"){
+
 	//import volume
 	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));
 
-	//make imagesender
+	//make imagestreamer
 	StringMap args;
 	args["filename"] = filename;
 	args["type"] = "MHDFile";
-	ImageStreamerPtr imagesender = cx::ImageSenderFactory().getFromArguments(args);
-	REQUIRE(imagesender);
+	args["singleshot"] = "true";
 
-	GrabberSenderDirectLinkPtr grabbersender(new GrabberSenderDirectLink());
-//	TestGrabberSenderController controller(NULL);
-//	controller.initialize(grabbersender);
+	ImageStreamerPtr imagestreamer(new MHDImageStreamer());
+	imagestreamer->initialize(args);
+	REQUIRE(imagestreamer);
 
-	//start imagesender
-	CHECK(imagesender->startStreaming(grabbersender));
+	TestSenderPtr sender(new TestSender());
 
-//	int count = 100000;
-//	while(!controller.verify() && count > 0){
-//		count--;
-//	}
+	CHECK(imagestreamer->startStreaming(sender));
+	imagestreamer->stopStreaming();
 
-	//check that volume is sendt from imagesender
-	ssc::ImagePtr image = grabbersender->popImage();
+	//check that volume is sent from imagestreamer
+	PackagePtr package = sender->getPackage();
+	REQUIRE(package);
+	ssc::ImagePtr image = package->mImage;
 	REQUIRE(image);
 }
 

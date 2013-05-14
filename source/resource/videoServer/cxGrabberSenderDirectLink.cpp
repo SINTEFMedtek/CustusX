@@ -43,7 +43,7 @@ void GrabberSenderDirectLink::send(ssc::ImagePtr msg)
 	emit newImage();
 }
 
-void GrabberSenderDirectLink::send(ssc::ProbeData msg)
+void GrabberSenderDirectLink::send(ssc::ProbeDataPtr msg)
 {
 	if (!this->isReady())
 		return;
@@ -58,7 +58,7 @@ ssc::ImagePtr GrabberSenderDirectLink::popImage()
 	return mImage;
 	mImage.reset();
 }
-ssc::ProbeData GrabberSenderDirectLink::popUSStatus()
+ssc::ProbeDataPtr GrabberSenderDirectLink::popUSStatus()
 {
 	return mUSStatus;
 //	mUSStatus = IGTLinkUSStatusMessage::Pointer();

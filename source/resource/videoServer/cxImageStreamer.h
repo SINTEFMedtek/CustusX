@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXIMAGESENDER_H_
-#define CXIMAGESENDER_H_
+#ifndef CXIMAGESTREAMER_H_
+#define CXIMAGESTREAMER_H_
 
 #include <QObject>
 #include <QString>
@@ -29,7 +29,6 @@ namespace cx
 {
 
 typedef std::map<QString, QString> StringMap;
-typedef boost::shared_ptr<class ImageStreamer> ImageStreamerPtr;
 
 /**\brief Interface for objects that emit an image stream to IGTLink
  *
@@ -44,22 +43,30 @@ class ImageStreamer : public QObject
 {
 	Q_OBJECT
 public:
-	ImageStreamer(QObject* parent = NULL) : QObject(parent), mSendTimer(0) {}
+	ImageStreamer() : QObject(NULL), mSendTimer(0), mSendInterval(0) {}
 	virtual ~ImageStreamer() {}
 
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(GrabberSenderPtr sender) = 0;
+	virtual bool startStreaming(SenderPtr sender) = 0;
 	virtual void stopStreaming() = 0;
+
+	void setSendInterval(int interval); ///< how often an image should be sent (in milliseconds)
+	int getSendInterval() const; ///< how often an image should be sent (in milliseconds)
 
 	virtual QString getType() = 0;
 	virtual QStringList getArgumentDescription() = 0;
 
 protected:
-	GrabberSenderPtr mSender;
+	SenderPtr mSender;
 	QTimer* mSendTimer;
 	StringMap mArguments;
+
+private:
+	int mSendInterval; ///< how often an image should be sent (in milliseconds)
+
 };
+typedef boost::shared_ptr<ImageStreamer> ImageStreamerPtr;
 
 }
 
-#endif /* CXIMAGESENDER_H_ */
+#endif /* CXIMAGESTREAMER_H_ */

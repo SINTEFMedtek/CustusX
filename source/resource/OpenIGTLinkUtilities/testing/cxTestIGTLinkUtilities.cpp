@@ -194,15 +194,15 @@ void TestIGTLinkUtilities::testDecodeEncodeColorImage(Val3VectorType values, QSt
 void TestIGTLinkUtilities::testDecodeEncodeProbeData()
 {
 	// generate probe data input
-	ssc::ProbeData input;
-	input.setType(ssc::ProbeData::tSECTOR);
-	ssc::ProbeData::ProbeImageData imageData = input.getImage();
+	ssc::ProbeDataPtr input;
+	input->setType(ssc::ProbeData::tSECTOR);
+	ssc::ProbeData::ProbeImageData imageData = input->getImage();
 	imageData.mOrigin_p = ssc::Vector3D(50,0,0); ///< probe origin in pixel space p. (upper-left corner origin)
 	imageData.mSpacing = ssc::Vector3D(0.5, 0.6, 1.0);
 	imageData.mSize = QSize(300, 200);
 	imageData.mClipRect_p = ssc::DoubleBoundingBox3D (0, imageData.mSize.width(), 0, imageData.mSize.height(), 0, 0); ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
-	input.setImage(imageData);
-	input.setSector(10, 30, M_PI/2, 2);
+	input->setImage(imageData);
+	input->setSector(10, 30, M_PI/2, 2);
 
 	// generate an image based on the probe data. Part of the data is sent over this channel.
 	vtkImageDataPtr rawImage = ssc::generateVtkImageData(Eigen::Array3i(imageData.mSize.width(), imageData.mSize.height(), 1),
@@ -214,18 +214,18 @@ void TestIGTLinkUtilities::testDecodeEncodeProbeData()
 	cx::IGTLinkConversion converter;
 	cx::IGTLinkUSStatusMessage::Pointer msg = converter.encode(input);
 	cx::IGTLinkImageMessage::Pointer imageMessage = converter.encode(imageInput);
-	ssc::ProbeData output = converter.decode(msg, imageMessage, ssc::ProbeData());
+	ssc::ProbeDataPtr output = converter.decode(msg, imageMessage, ssc::ProbeDataPtr());
 
 	// compare input<->output
-	CPPUNIT_ASSERT(input.getType() == output.getType());
-	CPPUNIT_ASSERT(input.getDepthStart() == output.getDepthStart());
-	CPPUNIT_ASSERT(input.getDepthEnd() == output.getDepthEnd());
-	//not supported CPPUNIT_ASSERT(input.getCenterOffset() == output.getCenterOffset());
-	CPPUNIT_ASSERT(input.getWidth() == output.getWidth());
-	CPPUNIT_ASSERT(ssc::similar(input.getImage().mClipRect_p, output.getImage().mClipRect_p)); // only supported for cliprect equal to entire image size.
-	CPPUNIT_ASSERT(ssc::similar(input.getImage().mOrigin_p, output.getImage().mOrigin_p));
-	CPPUNIT_ASSERT(ssc::similar(input.getImage().mSpacing, output.getImage().mSpacing));
-	CPPUNIT_ASSERT(input.getImage().mSize.width() == output.getImage().mSize.width());
-	CPPUNIT_ASSERT(input.getImage().mSize.height() == output.getImage().mSize.height());
-	//not supported CPPUNIT_ASSERT(input.getTemporalCalibration() == output.getTemporalCalibration());
+	CPPUNIT_ASSERT(input->getType() == output->getType());
+	CPPUNIT_ASSERT(input->getDepthStart() == output->getDepthStart());
+	CPPUNIT_ASSERT(input->getDepthEnd() == output->getDepthEnd());
+	//not supported CPPUNIT_ASSERT(input->getCenterOffset() == output->getCenterOffset());
+	CPPUNIT_ASSERT(input->getWidth() == output->getWidth());
+	CPPUNIT_ASSERT(ssc::similar(input->getImage().mClipRect_p, output->getImage().mClipRect_p)); // only supported for cliprect equal to entire image size.
+	CPPUNIT_ASSERT(ssc::similar(input->getImage().mOrigin_p, output->getImage().mOrigin_p));
+	CPPUNIT_ASSERT(ssc::similar(input->getImage().mSpacing, output->getImage().mSpacing));
+	CPPUNIT_ASSERT(input->getImage().mSize.width() == output->getImage().mSize.width());
+	CPPUNIT_ASSERT(input->getImage().mSize.height() == output->getImage().mSize.height());
+	//not supported CPPUNIT_ASSERT(input->getTemporalCalibration() == output->getTemporalCalibration());
 }

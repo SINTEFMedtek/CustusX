@@ -1,8 +1,8 @@
-#ifndef CXMHDIMAGESENDER_H_
-#define CXMHDIMAGESENDER_H_
+#ifndef CXMHDIMAGESTREAMER_H_
+#define CXMHDIMAGESTREAMER_H_
 
 #include "boost/shared_ptr.hpp"
-#include "cxImageSender.h"
+#include "cxImageStreamer.h"
 
 class QTimer;
 
@@ -17,17 +17,17 @@ namespace cx
  * \author Christian Askeland, SINTEF
  * \date Jun 21, 2011
  */
-class MHDImageSender: public ImageStreamer
+class MHDImageStreamer: public ImageStreamer
 {
 
 	Q_OBJECT
 
 public:
-	MHDImageSender(QObject* parent = NULL);
-	virtual ~MHDImageSender() {}
+	MHDImageStreamer();
+	virtual ~MHDImageStreamer() {}
 
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(GrabberSenderPtr sender);
+	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
@@ -50,16 +50,13 @@ private:
 	void send(Data* data);
 	void setTestImage();
 
-	//	GrabberSenderPtr mSender;
-//	QTimer* mSendTimer;
-//	StringMap mArguments;
-
+	bool mSingleShot;
 
 	Data mPrimaryData;
 	Data mSecondaryData;
 
 };
-typedef boost::shared_ptr<class MHDImageSender> MHDImageStreamerPtr;
+typedef boost::shared_ptr<class MHDImageStreamer> MHDImageStreamerPtr;
 }
 
-#endif /* CXMHDIMAGESENDER_H_ */
+#endif /* CXMHDIMAGESTREAMER_H_ */
