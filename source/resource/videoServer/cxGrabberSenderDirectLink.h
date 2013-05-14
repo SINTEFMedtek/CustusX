@@ -14,7 +14,7 @@
 namespace cx
 {
 
-class GrabberSenderDirectLink : public GrabberSender
+class GrabberSenderDirectLink : public SenderImpl
 {
 	Q_OBJECT
 
@@ -26,10 +26,10 @@ public:
 	virtual void send(IGTLinkImageMessage::Pointer msg);
 	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
 	virtual void send(ssc::ImagePtr msg);
-	virtual void send(ssc::ProbeData msg);
+	virtual void send(ssc::ProbeDataPtr msg);
 
 	ssc::ImagePtr popImage();
-	ssc::ProbeData popUSStatus();
+	ssc::ProbeDataPtr popUSStatus();
 
 signals:
 	void newImage();
@@ -37,7 +37,7 @@ signals:
 
 private:
 	ssc::ImagePtr mImage;
-	ssc::ProbeData mUSStatus;
+	ssc::ProbeDataPtr mUSStatus;
 	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 
 };

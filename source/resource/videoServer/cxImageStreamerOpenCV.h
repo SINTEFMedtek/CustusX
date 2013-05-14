@@ -1,5 +1,5 @@
-#ifndef CXIMAGESENDEROPENCV_H_
-#define CXIMAGESENDEROPENCV_H_
+#ifndef CXIMAGESTREAMEROPENCV_H_
+#define CXIMAGESTREAMEROPENCV_H_
 
 #include <QObject> //needed for the mocer when OpenCv is not used...
 #include "cxConfig.h"
@@ -37,16 +37,16 @@ typedef boost::shared_ptr<cv::VideoCapture> VideoCapturePtr;
  *
  * This version uses openCV to grab images from a video file or camera
  */
-class ImageSenderOpenCV: public ImageStreamer
+class ImageStreamerOpenCV: public ImageStreamer
 {
 Q_OBJECT
 
 public:
-	ImageSenderOpenCV(QObject* parent = NULL);
-	virtual ~ImageSenderOpenCV();
+	ImageStreamerOpenCV();
+	virtual ~ImageStreamerOpenCV();
 
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(GrabberSenderPtr sender);
+	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
@@ -79,4 +79,4 @@ private:
 }
 
 #endif // CX_USE_OpenCV
-#endif /* CXIMAGESENDEROPENCV_H_ */
+#endif /* CXIMAGESTREAMEROPENCV_H_ */
