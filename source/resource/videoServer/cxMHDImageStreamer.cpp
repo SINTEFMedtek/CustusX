@@ -1,4 +1,4 @@
-#include "cxMHDImageSender.h"
+#include "cxMHDImageStreamer.h"
 
 #include <QTimer>
 #include <QDateTime>
@@ -59,26 +59,28 @@ vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input)
 //------------------------------------------------------------
 //------------------------------------------------------------
 
-QString MHDImageSender::getType()
+MHDImageStreamer::MHDImageStreamer() :
+		mSingleShot(false)
+{
+	setSendInterval(40);
+}
+
+QString MHDImageStreamer::getType()
 {
 	return "MHDFile";
 }
 
-QStringList MHDImageSender::getArgumentDescription()
+QStringList MHDImageStreamer::getArgumentDescription()
 {
 	QStringList retval;
 	retval << "--filename: Full name of mhd file";
+	retval << "--singleshot: If true, then send just once. (true/false)";
 	retval << "--secondary: If defined, two streams are sent, the secondary with a modification of the base image";
 	return retval;
 }
 
-MHDImageSender::MHDImageSender(QObject* parent) :
-    ImageStreamer(parent)
-//    mSendTimer(0)
-{
-}
 
-void MHDImageSender::initialize(StringMap arguments)
+void MHDImageStreamer::initialize(StringMap arguments)
 {
 //    mArguments = arguments;
     ImageStreamer::initialize(arguments);
@@ -87,30 +89,29 @@ void MHDImageSender::initialize(StringMap arguments)
 	vtkImageDataPtr source = loadImage(filename);
 
 	if (source)
-	{
-	    std::cout << "MHDImageSender: Initialized with source file: \n\t" << mArguments["filename"].toStdString() << std::endl;
-	}
+	    std::cout << "MHDImageStreamer: Initialized with source file: \n\t" << mArguments["filename"].toStdString() << std::endl;
 	else
 	{
-	    std::cout << "MHDImageSender: Failed to initialize with source file: \n\t" << mArguments["filename"].toStdString() << std::endl;
+	    std::cout << "MHDImageStreamer: Failed to initialize with source file: \n\t" << mArguments["filename"].toStdString() << std::endl;
 	    return;
 	}
-
-	// mImageData = convertToTestColorImage(mImageData);
 
 	mPrimaryData = this->initializePrimaryData(source, mArguments["filename"]);
 	if (mArguments.count("secondary"))
 	{
 		mSecondaryData = this->initializeSecondaryData(source, mArguments["filename"]);
-		std::cout << "MHDImageSender: Initialized secondary data with uid=" << mSecondaryData.mRawUid << std::endl;
+		std::cout << "MHDImageStreamer: Initialized secondary data with uid=" << mSecondaryData.mRawUid << std::endl;
 	}
 
+	QString singleShot = mArguments["singleshot"];
+	mSingleShot = singleShot.contains("true") ? true : false;
 	mSendTimer = new QTimer(this);
+	mSendTimer->setSingleShot(mSingleShot);
 	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-	//  mTimer->start(1200); // for test of the timeout feature
+
 }
 
-MHDImageSender::Data MHDImageSender::initializePrimaryData(vtkImageDataPtr source, QString filename) const
+MHDImageStreamer::Data MHDImageStreamer::initializePrimaryData(vtkImageDataPtr source, QString filename) const
 {
 	Data retval;
 
@@ -145,7 +146,6 @@ MHDImageSender::Data MHDImageSender::initializePrimaryData(vtkImageDataPtr sourc
 		colorFormat = "R";
 	}
 
-//	mRawUid = QString("%1-%3 [%2]").arg(QFileInfo(mArguments["filename"]).fileName()).arg(colorFormat);
 	retval.mRawUid = QString("%1 [%2]").arg(QFileInfo(filename).completeBaseName()).arg(colorFormat);
 
 	retval.mDataSource.reset(new SplitFramesContainer(retval.mImageData));
@@ -154,7 +154,7 @@ MHDImageSender::Data MHDImageSender::initializePrimaryData(vtkImageDataPtr sourc
 	return retval;
 }
 
-MHDImageSender::Data MHDImageSender::initializeSecondaryData(vtkImageDataPtr source, QString filename) const
+MHDImageStreamer::Data MHDImageStreamer::initializeSecondaryData(vtkImageDataPtr source, QString filename) const
 {
 	Data retval;
 
@@ -191,24 +191,29 @@ MHDImageSender::Data MHDImageSender::initializeSecondaryData(vtkImageDataPtr sou
 	return retval;
 }
 
-bool MHDImageSender::startStreaming(GrabberSenderPtr sender)
+bool MHDImageStreamer::startStreaming(SenderPtr sender)
 {
 	if (!mSendTimer)
 	{
-	    std::cout << "MHDImageSender: Failed to start streaming: Not initialized." << std::endl;
+	    std::cout << "MHDImageStreamer: Failed to start streaming: Not initialized." << std::endl;
 	    return false;
 	}
     mSender = sender;
-	mSendTimer->start(40);
+
+    if(mSingleShot)
+    	tick();
+    else
+    	mSendTimer->start(getSendInterval());
+
 	return true;
 }
 
-void MHDImageSender::stopStreaming()
+void MHDImageStreamer::stopStreaming()
 {
 	mSendTimer->stop();
 }
 
-void MHDImageSender::tick()
+void MHDImageStreamer::tick()
 {
 	if (!mSender || !mSender->isReady())
 		return;
@@ -219,7 +224,7 @@ void MHDImageSender::tick()
 		this->send(&mSecondaryData);
 }
 
-void MHDImageSender::send(Data* data)
+void MHDImageStreamer::send(Data* data)
 {
 	if (!mSender || !mSender->isReady())
 		return;
@@ -233,7 +238,10 @@ void MHDImageSender::send(Data* data)
 
 	ssc::ImagePtr message(new ssc::Image(uid, copy));
 	message->setAcquisitionTime(QDateTime::currentDateTime());
-	mSender->send(message);
+
+	PackagePtr package(new Package());
+	package->mImage = message;
+	mSender->send(package);
 }
 
 

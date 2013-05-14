@@ -6,10 +6,10 @@
  */
 
 #include "cxImageSenderFactory.h"
-#include "cxImageSenderOpenCV.h"
-#include "cxMHDImageSender.h"
-#include "cxImageSenderSonix.h"
-#include "cxImageSenderGE.h"
+#include "cxImageStreamerOpenCV.h"
+#include "cxMHDImageStreamer.h"
+#include "cxImageStreamerSonix.h"
+#include "cxImageStreamerGE.h"
 
 namespace cx
 {
@@ -74,15 +74,15 @@ ImageStreamerPtr ImageSenderFactory::getFromArguments(StringMap args)
 ImageSenderFactory::ImageSenderFactory()
 {
 #ifdef CX_WIN32
-	mAvailable.push_back(ImageStreamerPtr(new ImageSenderSonix()));
+	mAvailable.push_back(ImageStreamerPtr(new ImageStreamerSonix()));
 #endif
 #ifdef CX_USE_OpenCV
-	mAvailable.push_back(ImageStreamerPtr(new ImageSenderOpenCV()));
+	mAvailable.push_back(ImageStreamerPtr(new ImageStreamerOpenCV()));
 #endif
 #ifdef CX_USE_ISB_GE
-	mAvailable.push_back(ImageStreamerPtr(new ImageSenderGE()));
+	mAvailable.push_back(ImageStreamerPtr(new ImageStreamerGE()));
 #endif
-	mAvailable.push_back(ImageStreamerPtr(new MHDImageSender()));
+	mAvailable.push_back(ImageStreamerPtr(new MHDImageStreamer()));
 }
 
 QString ImageSenderFactory::getDefaultSenderType() const

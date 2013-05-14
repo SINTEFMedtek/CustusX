@@ -235,7 +235,7 @@ void VideoConnection::useUnusedProbeDataSlot()
  *  and store locally. Also reset the old local info with
  *  information from the probe in toolmanager.
  */
-void VideoConnection::updateStatus(ssc::ProbeData msg)
+void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
 {
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (!tool || !tool->getProbe())
@@ -253,14 +253,14 @@ void VideoConnection::updateStatus(ssc::ProbeData msg)
 	ssc::ProbeData data = probe->getData();
 //	std::cout << "VideoConnection::updateSonixStatus pre \n" << streamXml2String(data) << std::endl;
 
-	data.setUid(msg.getUid());
-	data.setType(msg.getType());
-	data.setSector(msg.getDepthStart(), msg.getDepthEnd(), msg.getWidth());
+	data.setUid(msg->getUid());
+	data.setType(msg->getType());
+	data.setSector(msg->getDepthStart(), msg->getDepthEnd(), msg->getWidth());
 	ssc::ProbeData::ProbeImageData image = data.getImage();
-	image.mOrigin_p = msg.getImage().mOrigin_p;
-	image.mSize = msg.getImage().mSize;
-	image.mSpacing = msg.getImage().mSpacing;
-	image.mClipRect_p = msg.getImage().mClipRect_p;
+	image.mOrigin_p = msg->getImage().mOrigin_p;
+	image.mSize = msg->getImage().mSize;
+	image.mSpacing = msg->getImage().mSpacing;
+	image.mClipRect_p = msg->getImage().mClipRect_p;
 	data.setImage(image);
 
 //	std::cout << "VideoConnection::updateSonixStatus post\n" << streamXml2String(data) << std::endl;

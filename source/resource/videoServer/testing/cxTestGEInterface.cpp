@@ -6,7 +6,7 @@
 //#include "sscVector3D.h"
 #include "cxGrabberSenderDirectLink.h"
 #include "cxTestGrabberSenderController.h"
-#include "cxImageSenderGE.h"
+#include "cxImageStreamerGE.h"
 #include "sscMessageManager.h"
 
 void TestGEInterface::setUp()

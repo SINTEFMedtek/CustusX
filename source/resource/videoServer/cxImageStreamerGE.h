@@ -1,5 +1,5 @@
-#ifndef CXIMAGESENDERGE_H_
-#define CXIMAGESENDERGE_H_
+#ifndef CXIMAGESTREAMERGE_H_
+#define CXIMAGESTREAMERGE_H_
 
 #include <QObject>
 
@@ -33,15 +33,15 @@ QString findOpenCLPath(QString additionalLocation); ///< Find GEStreamer OpenCL 
  * This version uses the NTNU ISB data streamer module (provided by Gabriel Kiss)
  * to grab images from the E9 EG scanner (and similar)
  */
-class ImageSenderGE: public ImageStreamer
+class ImageStreamerGE: public ImageStreamer
 {
 	Q_OBJECT
 public:
-	ImageSenderGE(QObject* parent = NULL);
-	virtual ~ImageSenderGE() {}
+	ImageStreamerGE();
+	virtual ~ImageStreamerGE() {}
 
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(GrabberSenderPtr sender);
+	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
@@ -57,7 +57,7 @@ private:
 	//Deprecated
 //	IGTLinkImageMessage::Pointer getImageMessage();
 //	IGTLinkUSStatusMessage::Pointer getFrameStatus();
-	ssc::ProbeData getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
+	ssc::ProbeDataPtr getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
 	void send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged);
 
 	//Compare to geometry structs
@@ -94,4 +94,4 @@ private:
 }
 
 #endif // CX_USE_ISB_GE
-#endif // CXIMAGESENDERGE_H_
+#endif // CXIMAGESTREAMERGE_H_
