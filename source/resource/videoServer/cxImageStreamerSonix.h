@@ -1,5 +1,5 @@
-#ifndef CXIMAGESENDERSONIX_H_
-#define CXIMAGESENDERSONIX_H_
+#ifndef CXIMAGESTREAMERSONIX_H_
+#define CXIMAGESTREAMERSONIX_H_
 
 #ifdef CX_WIN32
 
@@ -15,7 +15,7 @@
 #include "cxIGTLinkUSStatusMessage.h"
 #include "vtkSonixVideoSource.h"
 #include "SonixHelper.h"
-#include "cxImageSender.h"
+#include "cxImageStreamer.h"
 
 class QTimer;
 typedef vtkSmartPointer<class vtkSonixVideoSource> vtkSonixVideoSourcePtr;
@@ -33,16 +33,16 @@ namespace cx
  *
  * This version uses openCV to grab images from the Ultrasonix scanner
  */
-class ImageSenderSonix : public ImageSender
+class ImageStreamerSonix : public ImageStreamer
 {
   Q_OBJECT
 
 public:
-  ImageSenderSonix(QObject* parent = NULL);
-  ~ImageSenderSonix();
+  ImageStreamerSonix();
+  ~ImageStreamerSonix();
   
 	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(GrabberSenderPtr sender);
+	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
@@ -102,4 +102,4 @@ private:
 
 #endif // CX_WIN32
 
-#endif /* CXIMAGESENDERSONIX_H_ */
+#endif /* CXIMAGESTREAMERSONIX_H_ */

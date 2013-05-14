@@ -99,7 +99,7 @@ void GrabberReceiveThread::addImageToQueue(ssc::ImagePtr imgMsg)
 
 /** add the message to a thread-safe queue
  */
-void GrabberReceiveThread::addSonixStatusToQueue(ssc::ProbeData msg)
+void GrabberReceiveThread::addSonixStatusToQueue(ssc::ProbeDataPtr msg)
 {
 	QMutexLocker sentry(&mSonixStatusMutex);
 	mMutexedSonixStatusMessageQueue.push_back(msg);
@@ -131,12 +131,12 @@ ssc::ImagePtr GrabberReceiveThread::getLastImageMessage()
 /** Threadsafe retrieval of last status message.
  *
  */
-ssc::ProbeData GrabberReceiveThread::getLastSonixStatusMessage()
+ssc::ProbeDataPtr GrabberReceiveThread::getLastSonixStatusMessage()
 {
 	QMutexLocker sentry(&mSonixStatusMutex);
 	if (mMutexedSonixStatusMessageQueue.empty())
-		return ssc::ProbeData();
-	ssc::ProbeData retval = mMutexedSonixStatusMessageQueue.front();
+		return ssc::ProbeDataPtr();
+	ssc::ProbeDataPtr retval = mMutexedSonixStatusMessageQueue.front();
 	mMutexedSonixStatusMessageQueue.pop_front();
 	return retval;
 }

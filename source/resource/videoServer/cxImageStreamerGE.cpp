@@ -1,11 +1,11 @@
 /*
- * cxImageSenderGE.cpp
+ * cxImageStreamerGE.cpp
  *
  *  Created on: Sep 19, 2012
  *      Author: olevs
  */
 
-#include "cxImageSenderGE.h"
+#include "cxImageStreamerGE.h"
 
 #ifdef CX_USE_ISB_GE
 
@@ -37,12 +37,12 @@ typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 namespace cx
 {
 
-QString ImageSenderGE::getType()
+QString ImageStreamerGE::getType()
 {
 	return "ISB_GE";
 }
 
-QStringList ImageSenderGE::getArgumentDescription()
+QStringList ImageStreamerGE::getArgumentDescription()
 {
 	QStringList retval;
 	//Tabs are set so that tool tip looks nice
@@ -59,8 +59,8 @@ QStringList ImageSenderGE::getArgumentDescription()
 	return retval;
 }
 
-ImageSenderGE::ImageSenderGE(QObject* parent) :
-	ImageStreamer(parent),
+ImageStreamerGE::ImageStreamerGE() :
+//	ImageStreamer(parent),
 	mInitialized(false),
 //	mSendTimer(0),
 	mGrabTimer(0),
@@ -73,6 +73,8 @@ ImageSenderGE::ImageSenderGE(QObject* parent) :
 	//data_streaming::DataStreamApp test;
 	mRenderTimer.reset(new CyclicActionTimer("GE Grabber Timer"));
 
+	setSendInterval(40);
+
 //	mImgStream = vtkSmartPointer<vtkImageData>();
 	mImgExportedStream = vtkSmartPointer<data_streaming::vtkExportedStreamData>();
 
@@ -82,7 +84,7 @@ ImageSenderGE::ImageSenderGE(QObject* parent) :
 //	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 }
 
-void ImageSenderGE::initialize(StringMap arguments)
+void ImageStreamerGE::initialize(StringMap arguments)
 {
 //	mArguments = arguments;
 	ImageStreamer::initialize(arguments);
@@ -171,7 +173,7 @@ void ImageSenderGE::initialize(StringMap arguments)
    			mExportVelocity = true;
    		}
    		else
-   			ssc::messageManager()->sendWarning("ImageSenderGE: Unknown stream: " + streamList.at(i));
+   			ssc::messageManager()->sendWarning("ImageStreamerGE: Unknown stream: " + streamList.at(i));
    	}
 
 	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
@@ -213,7 +215,7 @@ QString findOpenCLPath(QString additionalLocation)
 	return retval;
 }
 
-void ImageSenderGE::deinitialize_local()
+void ImageStreamerGE::deinitialize_local()
 {
 	//Set mImgStream as an empty pointer
 	mImgExportedStream = vtkSmartPointer<data_streaming::vtkExportedStreamData>();
@@ -225,7 +227,7 @@ void ImageSenderGE::deinitialize_local()
 	mGEStreamer.DisconnectFromScanner();
 }
 
-bool ImageSenderGE::initialize_local()
+bool ImageStreamerGE::initialize_local()
 {
 	std::string hostIp = mArguments["ip"].toStdString();
 	int streamPort = convertStringWithDefault(mArguments["streamport"], -1);
@@ -245,37 +247,37 @@ bool ImageSenderGE::initialize_local()
 	return mGEStreamer.ConnectToScanner(hostIp, streamPort, commandPort, test);
 }
 
-bool ImageSenderGE::startStreaming(GrabberSenderPtr sender)
+bool ImageStreamerGE::startStreaming(SenderPtr sender)
 {
 	mInitialized = this->initialize_local();
 
 	if (!mInitialized || !mGrabTimer || !mSendTimer)
 	{
-		std::cout << "ImageSenderGE: Failed to start streaming: Not initialized." << std::endl;
+		std::cout << "ImageStreamerGE: Failed to start streaming: Not initialized." << std::endl;
 		return false;
 	}
 
 //	mSocket = socket;
 	mSender = sender;
 	mGrabTimer->start(5);
-	//mSendTimer->start(40);
+	//mSendTimer->start(getSenderInterval());
 	std::cout << "Started streaming from GS device" << std::endl;
 	return true;
 }
 
-void ImageSenderGE::stopStreaming()
+void ImageStreamerGE::stopStreaming()
 {
 	if (!mInitialized || !mGrabTimer || !mSendTimer)
 		return;
 	mGrabTimer->stop();
-	mSendTimer->stop();
+//	mSendTimer->stop();
 //	mSocket = NULL;
 	mSender.reset();
 
 	this->deinitialize_local();
 }
 
-void ImageSenderGE::grab()
+void ImageStreamerGE::grab()
 {
 
 	//Wait for next frame
@@ -284,7 +286,7 @@ void ImageSenderGE::grab()
 		mGEStreamer.stream->WaitForImageData();
 	else
 	{
-		std::cout << "ImageSenderGE::grab(): No mGEStreamer.stream" << std::endl;
+		std::cout << "ImageStreamerGE::grab(): No mGEStreamer.stream" << std::endl;
 	}*/
 
 //	mGEStreamer.WaitForImageData();
@@ -300,7 +302,7 @@ void ImageSenderGE::grab()
 	//Get new image
 	if(!imgExportedStream)
 	{
-		std::cout << "ImageSenderGE::grab(): No image from GEStreamer" << std::endl;
+		std::cout << "ImageStreamerGE::grab(): No image from GEStreamer" << std::endl;
 		return;
 	}
 
@@ -345,7 +347,7 @@ void ImageSenderGE::grab()
 //	}
 }
 
-void ImageSenderGE::send()
+void ImageStreamerGE::send()
 {
 	if (!mSender || !mSender->isReady())
 		return;
@@ -379,7 +381,7 @@ void ImageSenderGE::send()
 }
 
 
-void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
+void ImageStreamerGE::send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged)
 {
 	mRenderTimer->time("startsend");
 	/*vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
@@ -391,8 +393,10 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 //	copy->DeepCopy(img);
 	if (geometryChanged)
 	{
-		ssc::ProbeData frameMessage = getFrameStatus(uid, geometry, img);
-		mSender->send(frameMessage);
+		ssc::ProbeDataPtr frameMessage( getFrameStatus(uid, geometry, img));
+		PackagePtr package(new Package());
+		package->mProbe = frameMessage;
+		mSender->send(package);
 		std::cout << uid << " Nyquist " << geometry.vNyquist << std::endl;
 		int*  dim = img->GetDimensions();
 		std::cout << uid << " Volume size: " << dim[0] << " " << dim[1] << " " << dim[2] << std::endl;
@@ -410,22 +414,24 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 	ssc::ImagePtr message(new ssc::Image(uid, center->GetOutput()));
 	mRenderTimer->time("createimg");
 
-	mSender->send(message);
+	PackagePtr package(new Package());
+	package->mImage = message;
+	mSender->send(package);
 	mRenderTimer->time("sendersend");
 }
 
-/*IGTLinkImageMessage::Pointer ImageSenderGE::getImageMessage()
+/*IGTLinkImageMessage::Pointer ImageStreamerGE::getImageMessage()
 {
 	if(!mImgExportedStream)
 	{
-		std::cout << "ImageSenderGE::getImageMessage(): No GEStreamer image" << std::endl;
+		std::cout << "ImageStreamerGE::getImageMessage(): No GEStreamer image" << std::endl;
 		return IGTLinkImageMessage::Pointer();
 	}
 
 	vtkSmartPointer<vtkImageData> img = mImgExportedStream->GetScanConvertedImage();
 	if(!img)
 	{
-		std::cout << "ImageSenderGE::getImageMessage(): No scan converted image from GEStreamer" << std::endl;
+		std::cout << "ImageStreamerGE::getImageMessage(): No scan converted image from GEStreamer" << std::endl;
 		return IGTLinkImageMessage::Pointer();
 	}
 
@@ -459,7 +465,7 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 	retval->SetDimensions(size); // May be 3 dimensions
 //	retval->SetSpacing(mGEStreamer.VoxelSize[0], mGEStreamer.VoxelSize[1], mGEStreamer.VoxelSize[2]); // May be 3 dimensions
 	retval->SetScalarType(scalarType);
-	retval->SetDeviceName("ImageSenderGE [BGRX]");
+	retval->SetDeviceName("ImageStreamerGE [BGRX]");
 	retval->SetSubVolume(size, offset);
 	retval->AllocateScalars();
 
@@ -490,9 +496,9 @@ void ImageSenderGE::send(const QString& uid, const vtkImageDataPtr& img, data_st
 	return retval;
 }*/
 
-ssc::ProbeData ImageSenderGE::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
+ssc::ProbeDataPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
 {
-	ssc::ProbeData retval;
+	ssc::ProbeDataPtr retval;
 	if (!img || !mImgExportedStream)
 		return retval;
 
@@ -507,21 +513,21 @@ ssc::ProbeData ImageSenderGE::getFrameStatus(QString uid, data_streaming::frame_
 
 	// 1 = sector, 2 = linear
 	if (geometry.imageType == data_streaming::Linear) //linear
-		retval = ssc::ProbeData(ssc::ProbeData::tLINEAR);
+		retval = ssc::ProbeDataPtr( new ssc::ProbeData(ssc::ProbeData::tLINEAR));
 	else //sector
-		retval = ssc::ProbeData(ssc::ProbeData::tSECTOR);
+		retval = ssc::ProbeDataPtr( new ssc::ProbeData(ssc::ProbeData::tSECTOR));
 
 	// Set start and end of sector in mm from origin
 	// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
-	retval.setSector(mFrameGeometry.depthStart, mFrameGeometry.depthEnd, mFrameGeometry.width);
-	retval.setImage(imageData);
+	retval->setSector(mFrameGeometry.depthStart, mFrameGeometry.depthEnd, mFrameGeometry.width);
+	retval->setImage(imageData);
 //	retval.setTemporalCalibration();//Can set everything except temporal calibration
 
-	retval.setUid(uid);
+	retval->setUid(uid);
 	return retval;
 }
 
-/*IGTLinkUSStatusMessage::Pointer ImageSenderGE::getFrameStatus()
+/*IGTLinkUSStatusMessage::Pointer ImageStreamerGE::getFrameStatus()
 {
 	IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
 
@@ -557,7 +563,7 @@ ssc::ProbeData ImageSenderGE::getFrameStatus(QString uid, data_streaming::frame_
   return retval;
 }*/
 
-bool ImageSenderGE::equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b)
+bool ImageStreamerGE::equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b)
 {
 	return !((a.origin[0] != b.origin[0]) || (a.origin[1] != b.origin[1]) || (a.origin[2] != b.origin[2])
 			|| (a.imageType != b.imageType)

@@ -70,7 +70,7 @@ public:
 	GrabberReceiveThread(QObject* parent = NULL);
 	virtual ~GrabberReceiveThread() {}
 	virtual ssc::ImagePtr getLastImageMessage(); // threadsafe
-	virtual ssc::ProbeData getLastSonixStatusMessage(); // threadsafe
+	virtual ssc::ProbeDataPtr getLastSonixStatusMessage(); // threadsafe
 	virtual QString hostDescription() const = 0; // threadsafe
 
 signals:
@@ -89,14 +89,14 @@ protected:
 	 * \param[in] imgMsg Incoming image message
 	 */
 	void addImageToQueue(ssc::ImagePtr imgMsg);
-	void addSonixStatusToQueue(ssc::ProbeData msg);
+	void addSonixStatusToQueue(ssc::ProbeDataPtr msg);
 	void calibrateTimeStamp(ssc::ImagePtr imgMsg);
 
 private:
 	QMutex mImageMutex;
 	QMutex mSonixStatusMutex;
 	std::list<ssc::ImagePtr> mMutexedImageMessageQueue;
-	std::list<ssc::ProbeData> mMutexedSonixStatusMessageQueue;
+	std::list<ssc::ProbeDataPtr> mMutexedSonixStatusMessageQueue;
 
 	double mLastReferenceTimestampDiff;
 	bool mGeneratingTimeCalibration;

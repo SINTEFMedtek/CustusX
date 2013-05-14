@@ -84,12 +84,12 @@ private:
 	void updateImage(ssc::ImagePtr message); // called by receiving thread when new data arrives.
 	void runClient(GrabberReceiveThreadPtr client);
 	void stopClient();
-	void updateStatus(ssc::ProbeData message);
+	void updateStatus(ssc::ProbeDataPtr message);
 
 	GrabberReceiveThreadPtr mClient;
 	bool mConnected;
 	double mFPS;
-	ssc::ProbeData mUnsusedProbeData;
+	ssc::ProbeDataPtr mUnsusedProbeData;
 
 	std::vector<BasicVideoSourcePtr> mSources;
 };

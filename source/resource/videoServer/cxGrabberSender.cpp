@@ -4,6 +4,19 @@
 namespace cx
 {
 
+
+void SenderImpl::send(PackagePtr package)
+{
+	if(package->mIgtLinkImageMessage)
+		this->send(package->mIgtLinkImageMessage);
+	if(package->mIgtLinkUSStatusMessage)
+		this->send(package->mIgtLinkUSStatusMessage);
+	if(package->mImage)
+		this->send(package->mImage);
+	if(package->mProbe)
+		this->send(package->mProbe);
+}
+
 GrabberSenderQTcpSocket::GrabberSenderQTcpSocket(QTcpSocket* socket)
 {
 	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
@@ -48,7 +61,7 @@ void GrabberSenderQTcpSocket::send(ssc::ImagePtr msg)
 	this->send(converter.encode(msg));
 }
 
-void GrabberSenderQTcpSocket::send(ssc::ProbeData msg)
+void GrabberSenderQTcpSocket::send(ssc::ProbeDataPtr msg)
 {
 	if (!this->isReady())
 		return;
