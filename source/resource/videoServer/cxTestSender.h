@@ -4,7 +4,7 @@
 #include "cxGrabberSender.h"
 #include <boost/shared_ptr.hpp>
 
-namespace cx {
+namespace cxtest {
 
 /*
  * TestSender.h
@@ -12,7 +12,7 @@ namespace cx {
  * \date May 13, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class TestSender : public Sender
+class TestSender : public cx::Sender
 {
 	Q_OBJECT
 public:
@@ -21,13 +21,18 @@ public:
 
 	virtual bool isReady() const;
 
-	virtual void send(PackagePtr package);
+	virtual void send(cx::PackagePtr package);
 
-	PackagePtr getPackage();
+	cx::PackagePtr getPackage();
+
+signals:
+	void newPackage();
 
 private:
-	PackagePtr mPackage;
+	cx::PackagePtr mPackage;
+
 };
 typedef boost::shared_ptr<TestSender> TestSenderPtr;
-} /* namespace cx */
+
+} /* namespace cxtest */
 #endif /* CXTESTSENDER_H_ */
