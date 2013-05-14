@@ -1,20 +1,28 @@
 #include "cxTestSender.h"
 
-namespace cx {
+#include "sscTypeConversions.h"
+
+namespace cxtest
+{
+
+static int i = 0;
 
 bool TestSender::isReady() const
 {
 	return true;
 }
 
-void TestSender::send(PackagePtr package)
+void TestSender::send(cx::PackagePtr package)
 {
+	std::cout << string_cast(i) << std::endl;
+	i++;
 	mPackage = package;
+	emit newPackage();
 }
 
-PackagePtr TestSender::getPackage()
+cx::PackagePtr TestSender::getPackage()
 {
 	return mPackage;
 }
 
-} /* namespace cx */
+} /* namespace cxtest */

@@ -60,7 +60,7 @@ vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input)
 //------------------------------------------------------------
 
 MHDImageStreamer::MHDImageStreamer() :
-		mSingleShot(false)
+		mSendOnce(false)
 {
 	setSendInterval(40);
 }
@@ -104,14 +104,53 @@ void MHDImageStreamer::initialize(StringMap arguments)
 	}
 
 	QString singleShot = mArguments["singleshot"];
-	mSingleShot = singleShot.contains("true") ? true : false;
+	mSendOnce = singleShot.contains("true") ? true : false;
 	mSendTimer = new QTimer(this);
-	mSendTimer->setSingleShot(mSingleShot);
-	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+	mSendTimer->setSingleShot(mSendOnce);
+	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(stream())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 
 }
 
-MHDImageStreamer::Data MHDImageStreamer::initializePrimaryData(vtkImageDataPtr source, QString filename) const
+
+bool MHDImageStreamer::startStreaming(SenderPtr sender)
+{
+	if (!mSendTimer)
+	{
+	    std::cout << "MHDImageStreamer: Failed to start streaming: Not initialized." << std::endl;
+	    return false;
+	}
+    mSender = sender;
+
+//    if(mSendOnce)
+//    	stream();
+//    else
+    	mSendTimer->start(getSendInterval());
+
+	return true;
+}
+
+void MHDImageStreamer::stopStreaming()
+{
+	mSendTimer->stop();
+}
+
+void MHDImageStreamer::stream()
+{
+	if (!mSender || !mSender->isReady())
+		return;
+
+	PackagePtr primaryPackage = this->createPackage(&mPrimaryData);
+	mSender->send(primaryPackage);
+
+	if (mSecondaryData.mImageData)
+	{
+		PackagePtr secondaryPackage = this->createPackage(&mSecondaryData);
+		mSender->send(secondaryPackage);
+	}
+}
+
+
+MHDImageStreamer::Data MHDImageStreamer::initializePrimaryData(vtkImageDataPtr source, QString filename)
 {
 	Data retval;
 
@@ -154,7 +193,7 @@ MHDImageStreamer::Data MHDImageStreamer::initializePrimaryData(vtkImageDataPtr s
 	return retval;
 }
 
-MHDImageStreamer::Data MHDImageStreamer::initializeSecondaryData(vtkImageDataPtr source, QString filename) const
+MHDImageStreamer::Data MHDImageStreamer::initializeSecondaryData(vtkImageDataPtr source, QString filename)
 {
 	Data retval;
 
@@ -191,58 +230,25 @@ MHDImageStreamer::Data MHDImageStreamer::initializeSecondaryData(vtkImageDataPtr
 	return retval;
 }
 
-bool MHDImageStreamer::startStreaming(SenderPtr sender)
+PackagePtr MHDImageStreamer::createPackage(Data* data)
 {
-	if (!mSendTimer)
-	{
-	    std::cout << "MHDImageStreamer: Failed to start streaming: Not initialized." << std::endl;
-	    return false;
-	}
-    mSender = sender;
-
-    if(mSingleShot)
-    	tick();
-    else
-    	mSendTimer->start(getSendInterval());
-
-	return true;
-}
-
-void MHDImageStreamer::stopStreaming()
-{
-	mSendTimer->stop();
-}
-
-void MHDImageStreamer::tick()
-{
+	PackagePtr package(new Package());
 	if (!mSender || !mSender->isReady())
-		return;
-
-	this->send(&mPrimaryData);
-
-	if (mSecondaryData.mImageData)
-		this->send(&mSecondaryData);
-}
-
-void MHDImageStreamer::send(Data* data)
-{
-	if (!mSender || !mSender->isReady())
-		return;
+		return package;
 
 	int frame = (data->mCurrentFrame++) % data->mDataSource->size();
-//		QString uid = mRawUid.arg(frame);
 	QString uid = data->mRawUid;
 
 	vtkImageDataPtr copy = vtkImageDataPtr::New();
 	copy->DeepCopy(data->mDataSource->get(frame)); // the datasource might go out of scope - take copy
 
-	ssc::ImagePtr message(new ssc::Image(uid, copy));
-	message->setAcquisitionTime(QDateTime::currentDateTime());
+	ssc::ImagePtr image(new ssc::Image(uid, copy));
+	image->setAcquisitionTime(QDateTime::currentDateTime());
 
-	PackagePtr package(new Package());
-	package->mImage = message;
-	mSender->send(package);
+	package->mImage = image;
+	return package;
+
+//	mSender->send(package);
 }
 
-
-}
+} //namespace cx

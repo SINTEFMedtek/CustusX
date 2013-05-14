@@ -9,10 +9,13 @@ void SenderImpl::send(PackagePtr package)
 {
 	if(package->mIgtLinkImageMessage)
 		this->send(package->mIgtLinkImageMessage);
+
 	if(package->mIgtLinkUSStatusMessage)
 		this->send(package->mIgtLinkUSStatusMessage);
+
 	if(package->mImage)
 		this->send(package->mImage);
+
 	if(package->mProbe)
 		this->send(package->mProbe);
 }

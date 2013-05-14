@@ -4,20 +4,25 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
+#include <QTimer>
+#include "sscConfig.h"
 #include "sscApplication.h"
 
 int main (int argc, char* argv[])
 {
-	// global setup...
 	ssc::Application app( argc, argv );
 
 	int result = Catch::Main( argc, argv );
 
-	// global clean-up...
+//	QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit()));
+//	app.exec();
 
-  return result;
+	return result;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// CATCH TUTORIAL
+///////////////////////////////////////////////////////////////////////////////
 
 /**
  * This file describes how to use CATCH.

@@ -9,6 +9,10 @@ class QTimer;
 namespace cx
 {
 
+vtkImageDataPtr loadImage(QString filename);
+vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input);
+
+
 /**An object sending images out on an ip port.
  * In order to operate within a nongui thread,
  * it must be created within the run() method
@@ -19,7 +23,6 @@ namespace cx
  */
 class MHDImageStreamer: public ImageStreamer
 {
-
 	Q_OBJECT
 
 public:
@@ -34,7 +37,7 @@ public:
 	virtual QStringList getArgumentDescription();
 
 private slots:
-	void tick();
+	void stream();
 
 private:
 	struct Data
@@ -45,18 +48,19 @@ private:
 		QString mRawUid; /// raw text to send as device name - excluding frame id
 	};
 
-	Data initializePrimaryData(vtkImageDataPtr source, QString filename) const;
-	Data initializeSecondaryData(vtkImageDataPtr source, QString filename) const;
-	void send(Data* data);
-	void setTestImage();
+	static Data initializePrimaryData(vtkImageDataPtr source, QString filename);
+	static Data initializeSecondaryData(vtkImageDataPtr source, QString filename);
+	PackagePtr createPackage(Data* data);
 
-	bool mSingleShot;
+	bool mSendOnce; ///< if true, the image will only be sent once, right after start streaming
 
 	Data mPrimaryData;
 	Data mSecondaryData;
 
 };
 typedef boost::shared_ptr<class MHDImageStreamer> MHDImageStreamerPtr;
+
+
 }
 
 #endif /* CXMHDIMAGESTREAMER_H_ */

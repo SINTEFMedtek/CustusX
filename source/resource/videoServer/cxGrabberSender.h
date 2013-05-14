@@ -11,6 +11,7 @@
 
 namespace cx
 {
+
 struct Package
 {
 	IGTLinkImageMessage::Pointer mIgtLinkImageMessage;
