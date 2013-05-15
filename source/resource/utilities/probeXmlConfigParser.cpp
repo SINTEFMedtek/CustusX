@@ -225,10 +225,13 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
 
 	//  std::cout << "Platform tc: " << retval.mTemporalCalibration << std::endl;
 
-    QDomElement sizeNode = findElement(rtSourceNode, "ImageSize");
-    readTextNode(&retval.mImageWidth, sizeNode, "Width");
-    readTextNode(&retval.mImageHeight, sizeNode, "Height");
-    readTextNode(&retval.mHorizontalOffset, rtSourceNode, "HorizontalOffset");
+	if(rtsource.compare("Digital")!=0)//No more details are required for digital sources
+	{
+		QDomElement sizeNode = findElement(rtSourceNode, "ImageSize");
+		readTextNode(&retval.mImageWidth, sizeNode, "Width");
+		readTextNode(&retval.mImageHeight, sizeNode, "Height");
+		readTextNode(&retval.mHorizontalOffset, rtSourceNode, "HorizontalOffset");
+	}
 
   QList<QDomNode> currentConfigNodeList = this->getConfigNodes(scanner, probe, rtsource, configId);
   if(currentConfigNodeList.isEmpty())
@@ -238,66 +241,29 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
   }
   QDomNode configNode = currentConfigNodeList.first();
 
-    readTextNode(&retval.mName, configNode, "Name");
-    readTextNode(&retval.mWidthDeg, configNode, "WidthDeg");
-    if (retval.mWidthDeg > 1.0E-6)
-    {
-		readTextNode(&retval.mDepth, configNode, "Depth");
-		readTextNode(&retval.mOffset, configNode, "Offset");
-    }
-    QDomElement originElement = findElement(configNode, "Origin");
-    readTextNode(&retval.mOriginCol, originElement, "Col");
-    readTextNode(&retval.mOriginRow, originElement, "Row");
+  readTextNode(&retval.mName, configNode, "Name");
+  if(rtsource.compare("Digital")!=0)//No more details are required for digital sources
+  {
+	  readTextNode(&retval.mWidthDeg, configNode, "WidthDeg");
+	  if (retval.mWidthDeg > 1.0E-6)
+	  {
+		  readTextNode(&retval.mDepth, configNode, "Depth");
+		  readTextNode(&retval.mOffset, configNode, "Offset");
+	  }
+	  QDomElement originElement = findElement(configNode, "Origin");
+	  readTextNode(&retval.mOriginCol, originElement, "Col");
+	  readTextNode(&retval.mOriginRow, originElement, "Row");
 
-//    element = configNode.namedItem("NCorners").toElement();
-//    if(element.isNull())
-//      throw "Can't find NCorners";
-//    retval.mNCorners = element.text().toInt(&ok);
-//    if(!ok)
-//      throw "NCorners not a number";
-//
-//    QDomNode cornerNode = configNode.firstChildElement("Corner");
-//    if(cornerNode.isNull())
-//      throw "Can't find Corner";
-//    retval.mCorners.clear();
-//    for(int i=0; i<retval.mNCorners ; ++i)
-//    {
-//      element = cornerNode.namedItem("Col").toElement();
-//      if(element.isNull())
-//        throw "Can't find Corner.Col";
-//      int col = element.text().toFloat(&ok);
-//      if(!ok)
-//        throw "Corner.Col not a number";
-//
-//      element = cornerNode.namedItem("Row").toElement();
-//      if(element.isNull())
-//        throw "Can't find Corner.Row";
-//      int row = element.text().toFloat(&ok);
-//      if(!ok)
-//        throw "Corner.Row not a number";
-//
-//      retval.mCorners.push_back(ColRowPair(col,row));
-//
-//      cornerNode = cornerNode.nextSibling();
-//    }
-//    //sort the vector
-//    ColRowPair center;
-//    for(unsigned i=0;i<retval.mCorners.size();++i)
-//    {
-//      center.first += retval.mCorners[i].first/retval.mCorners.size();
-//      center.second += retval.mCorners[i].second/retval.mCorners.size();
-//    }
-//    std::sort(retval.mCorners.begin(), retval.mCorners.end(), Angular_less(center));
+	  QDomElement edgesElement = findElement(configNode, "CroppingEdges");
+	  readTextNode(&retval.mLeftEdge, edgesElement, "Left");
+	  readTextNode(&retval.mRightEdge, edgesElement, "Right");
+	  readTextNode(&retval.mTopEdge, edgesElement, "Top");
+	  readTextNode(&retval.mBottomEdge, edgesElement, "Bottom");
 
-    QDomElement edgesElement = findElement(configNode, "CroppingEdges");
-    readTextNode(&retval.mLeftEdge, edgesElement, "Left");
-    readTextNode(&retval.mRightEdge, edgesElement, "Right");
-    readTextNode(&retval.mTopEdge, edgesElement, "Top");
-    readTextNode(&retval.mBottomEdge, edgesElement, "Bottom");
-
-    QDomElement pixelSizeElement = findElement(configNode, "PixelSize");
-    readTextNode(&retval.mPixelWidth, pixelSizeElement, "Width");
-    readTextNode(&retval.mPixelHeight, pixelSizeElement, "Height");
+	  QDomElement pixelSizeElement = findElement(configNode, "PixelSize");
+	  readTextNode(&retval.mPixelWidth, pixelSizeElement, "Width");
+	  readTextNode(&retval.mPixelHeight, pixelSizeElement, "Height");
+  }
 
 //  std::cout << "FERDIG" << std::endl;
   retval.mEmpty = false;
