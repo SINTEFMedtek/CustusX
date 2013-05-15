@@ -245,8 +245,7 @@ void VideoConnection::updateStatus(ssc::ProbeData msg)
 		connect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 		return;
 	}
-
-	ssc::ProbePtr probe = tool->getProbe();
+	ProbePtr probe = boost::dynamic_pointer_cast<Probe>(tool->getProbe());
 
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
@@ -267,6 +266,7 @@ void VideoConnection::updateStatus(ssc::ProbeData msg)
 //	std::cout << "VideoConnection::updateSonixStatus post\n" << streamXml2String(data) << std::endl;
 
 	probe->setData(data);
+	probe->setDigitalStatus(true);
 }
 
 void VideoConnection::updateImage(ssc::ImagePtr message)

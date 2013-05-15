@@ -76,6 +76,8 @@ public:
 	void removeCurrentConfig(); ///< remove the current config from disk
 	void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
 
+	void setDigitalStatus(bool digitalStatus);///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
+
 private:
 	Probe(QString instrumentUid, QString scannerUid);
 	ProbeXmlConfigParser::Configuration getConfiguration(QString uid) const;
@@ -120,6 +122,7 @@ private:
 	boost::shared_ptr<ProbeXmlConfigParser> mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
 	QString mConfigurationId; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
 
+	bool mDigitalInterface;///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
 };
 
 /**
