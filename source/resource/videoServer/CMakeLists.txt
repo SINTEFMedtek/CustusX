@@ -122,7 +122,7 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxGrabberSender.h
 		cxGrabberSenderDirectLink.h
 		
-		cxTestSender.h
+		cxtestSender.h
 )
 
 #QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
@@ -157,8 +157,8 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxGrabberSenderDirectLink.h
 		cxGrabberSenderDirectLink.cpp
 		
-		cxTestSender.h
-		cxTestSender.cpp
+		cxtestSender.h
+		cxtestSender.cpp
 
 )
 

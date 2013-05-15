@@ -7,7 +7,7 @@
 namespace cxtest {
 
 /*
- * TestSender.h
+ * TestSender
  *
  * \date May 13, 2013
  * \author Janne Beate Bakeng, SINTEF
