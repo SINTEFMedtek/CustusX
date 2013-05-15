@@ -52,220 +52,11 @@
 #include "sscImageLUT2D.h"
 #include "sscImageTF3D.h"
 #include "sscLogger.h"
-
+#include "sscDataReaderWriter.h"
 
 namespace ssc
 {
 
-//---------------------------------------------------------
-StaticMutexVtkLocker::StaticMutexVtkLocker()
-{
-/*	if (!mMutex)
-		mMutex.reset(new QMutex(QMutex::Recursive));
-
-	mMutex->lock();*/
-}
-StaticMutexVtkLocker::~StaticMutexVtkLocker()
-{
-//	mMutex->unlock();
-}
-boost::shared_ptr<QMutex> StaticMutexVtkLocker::mMutex;
-//---------------------------------------------------------
-
-
-//-----
-DataPtr MincImageReader::load(const QString& uid, const QString& filename)
-{
-	std::cout << "Reading " << filename << std::endl;
-
-	//Read data input file
-	vtkMINCImageReaderPtr l_dataReader = vtkMINCImageReaderPtr::New();
-	l_dataReader->SetFileName(cstring_cast(filename));
-	l_dataReader->Update();
-
-	double l_dataOrigin[3];
-	l_dataReader->GetOutput()->GetOrigin(l_dataOrigin);
-	int l_dimensions[3];
-	l_dataReader->GetOutput()->GetDimensions(l_dimensions);
-
-	//set the transform
-	vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
-	l_dataTransform->SetMatrix(l_dataReader->GetDirectionCosines());
-	l_dataTransform->Translate(l_dataReader->GetDataOrigin());
-	//l_dataTransform->GetInverse()->TransformPoint(l_dataOrigin, l_dataOrigin);
-	//l_dataTransform->Translate(l_dataOrigin);
-	//l_dataTransform->Scale(l_dataReader->GetOutput()->GetSpacing());
-
-	ssc::Transform3D rMd(l_dataTransform->GetMatrix());
-
-	// TODO: ensure rMd is correct in CustusX terms
-
-	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
-	zeroer->SetInput(l_dataReader->GetOutput());
-	zeroer->SetOutputOrigin(0, 0, 0);
-	zeroer->Update();
-	//  vtkImageDataPtr imageData = zeroer->GetOutput();
-	vtkImageDataPtr imageData = zeroer->GetOutput();
-
-	QFile file(filename);
-	QFileInfo info(file);
-	//QString uid(info.completeBaseName()+"_minc_%1");
-	QString name = uid;
-
-	ImagePtr image(new Image(uid, imageData));
-	//ssc::ImagePtr image = ssc::dataManager()->createImage(l_dataReader->GetOutput(),uid, name);
-	image->get_rMd_History()->addRegistration(ssc::RegistrationTransform(rMd, info.lastModified(), "from Minc file"));
-	image->getBaseVtkImageData()->Print(std::cout);
-
-	return image;
-	//////////////////////////////
-}
-
-/** Wrapper for vtkAlgorithm::Update(),
-  * prints error message upon error,
-  * also wraps the call inside a global mutex (see below for why).
-  *
-  * \ingroup sscData
-  * \date jan 1, 2010
-  * \date april 17, 2013
-  * \author christiana
-  */
-class ErrorObserver: public vtkCommand
-{
-public:
-	ErrorObserver()
-	{
-	}
-	static ErrorObserver* New()
-	{
-		return new ErrorObserver;
-	}
-	virtual void Execute(vtkObject* caller, unsigned long, void* text)
-	{
-		mMessage = QString(reinterpret_cast<char*> (text));
-	}
-	QString mMessage;
-
-	static bool checkedRead(vtkSmartPointer<vtkAlgorithm> reader, QString filename)
-	{
-		vtkSmartPointer<ErrorObserver> errorObserver = vtkSmartPointer<ErrorObserver>::New();
-		reader->AddObserver("ErrorEvent", errorObserver);
-
-		{
-			StaticMutexVtkLocker lock;
-			reader->Update();
-		}
-//		ErrorObserver::threadSafeUpdate(reader);
-
-		if (!errorObserver->mMessage.isEmpty())
-		{
-			ssc::messageManager()->sendError("Load of data " + filename + " failed with message:\n"
-				+ errorObserver->mMessage);
-			return false;
-		}
-		return true;
-	}
-};
-
-//-----
-vtkImageDataPtr MetaImageReader::load(const QString& filename)
-{
-	//load the image from file
-	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
-	reader->SetFileName(cstring_cast(filename));
-	reader->ReleaseDataFlagOn();
-
-	if (!ErrorObserver::checkedRead(reader, filename))
-		return vtkImageDataPtr();
-
-	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
-	zeroer->SetInput(reader->GetOutput());
-	zeroer->SetOutputOrigin(0, 0, 0);
-	zeroer->Update();
-	return zeroer->GetOutput();
-}
-
-//-----
-DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
-{
-	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
-	Transform3D rMd = customReader->readTransform();
-
-	vtkImageDataPtr raw = this->load(filename);
-	if(!raw)
-		return DataPtr();
-
-	ImagePtr image(new Image(uid, raw));
-
-	//  RegistrationTransform regTrans(rMd, QFileInfo(filename).lastModified(), "From MHD file");
-	//  image->get_rMd_History()->addRegistration(regTrans);
-	image->get_rMd_History()->setRegistration(rMd);
-	image->setModality(customReader->readModality());
-	image->setImageType(customReader->readImageType());
-
-	bool ok1 = true;
-	bool ok2 = true;
-	double level = customReader->readKey("WindowLevel").toDouble(&ok1);
-	double window = customReader->readKey("WindowWidth").toDouble(&ok2);
-
-	if (ok1 && ok2)
-	{
-//		image->getTransferFunctions3D()->setLevel(level);
-//		image->getTransferFunctions3D()->setWindow(window);
-
-		// set TF 3D using the color points and alpha points based on windowlevel settings.
-		ImageTF3DPtr tf3D = image->getTransferFunctions3D();
-//		SSC_LOG("level: %f, win: %f, first: %f, second: %f", level, window, level-window/2, level+window/2);
-		tf3D->addColorPoint(level-window/2, QColor("black"));
-		tf3D->addColorPoint(level+window/2, QColor("white"));
-		tf3D->removeInitAlphaPoint();
-		tf3D->addAlphaPoint(level-0.7*window/2, 0);
-		tf3D->addAlphaPoint(level+window/2, 255);
-
-		image->getLookupTable2D()->setLevel(level);
-		image->getLookupTable2D()->setWindow(window);
-	}
-
-	// add shading for known preoperative modalities
-	if (image->getModality().contains("CT") || image->getModality().contains("MR"))
-		image->setShadingOn(true);
-
-	//std::cout << "ImagePtr MetaImageReader::load" << std::endl << std::endl;
-	return image;
-}
-
-//-----
-DataPtr PolyDataMeshReader::load(const QString& uid, const QString& fileName)
-{
-	vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
-	reader->SetFileName(cstring_cast(fileName));
-
-	if (!ErrorObserver::checkedRead(reader, fileName))
-		return DataPtr();
-
-	vtkPolyDataPtr polyData = reader->GetOutput();
-
-	//return MeshPtr(new Mesh(fileName, fileName, polyData));
-	MeshPtr tempMesh(new Mesh(uid, "PolyData", polyData));
-	return tempMesh;
-
-}
-
-DataPtr StlMeshReader::load(const QString& uid, const QString& fileName)
-{
-	vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
-	reader->SetFileName(cstring_cast(fileName));
-
-	if (!ErrorObserver::checkedRead(reader, fileName))
-		return DataPtr();
-
-	vtkPolyDataPtr polyData = reader->GetOutput();
-
-	//return MeshPtr(new Mesh(fileName, fileName, polyData));
-	MeshPtr tempMesh(new Mesh(uid, "PolyData", polyData));
-	return tempMesh;
-
-}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -280,10 +71,10 @@ DataManagerImpl::DataManagerImpl()
 {
 	mClinicalApplication = mdLABORATORY;
 	//  mClinicalApplication = mdLAPAROSCOPY;
-	mDataReaders.insert(DataReaderPtr(new MetaImageReader()));
-	mDataReaders.insert(DataReaderPtr(new MincImageReader()));
-	mDataReaders.insert(DataReaderPtr(new PolyDataMeshReader()));
-	mDataReaders.insert(DataReaderPtr(new StlMeshReader()));
+//	mDataReaders.insert(DataReaderPtr(new MetaImageReader()));
+//	mDataReaders.insert(DataReaderPtr(new MincImageReader()));
+//	mDataReaders.insert(DataReaderPtr(new PolyDataMeshReader()));
+//	mDataReaders.insert(DataReaderPtr(new StlMeshReader()));
 	//	mCenter = Vector3D(0,0,0);
 	//	mActiveImage.reset();
 	this->clear();
@@ -448,34 +239,12 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READE
  */
 DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, const QString& type)
 {
-	QFileInfo fileInfo(qstring_cast(path));
-
 	if (mData.count(uid)) // dont load same image twice
 	{
 		return mData[uid];
 	}
 
-	DataPtr current;
-
-	for (DataReadersType::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
-	{
-		if (!(*iter)->canLoad(type, path))
-			continue;
-		current = (*iter)->load(uid, path);
-		break;
-	}
-
-	if (!current)
-	{
-		std::cout << "failed to create data object: " << path << ", " << uid << ", " << type << std::endl;
-		return DataPtr();
-	}
-
-	current->setName(changeExtension(fileInfo.fileName(), ""));
-	//data->setFilePath(relativePath.path().toStdString());
-	current->setFilePath(path); // need path even when not set explicitly: nice for testing
-
-	//  this->loadData(current);
+	DataPtr current = DataReaderWriter().readData(uid, path, type);
 	return current;
 }
 

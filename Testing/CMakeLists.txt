@@ -112,6 +112,10 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
         sscTestTransform3D.cpp
         sscTestBoundingBox3D.cpp
         sscTestGPURayCaster.cpp
+		sscTestVideoGraphics.h
+		sscTestVideoGraphics.cpp
+		sscVtkRenderTester.h
+		sscVtkRenderTester.cpp
         ${SSC_TEST_SOURCE_FILES}
         )
         

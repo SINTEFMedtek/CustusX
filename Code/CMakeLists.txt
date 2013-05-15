@@ -383,6 +383,9 @@ SET( SSC_SOURCE_FILES
     Data/sscDataMetric.cpp
     Data/sscUnsignedDerivedImage.h
     Data/sscUnsignedDerivedImage.cpp
+	Data/sscDataReaderWriter.h
+	Data/sscDataReaderWriter.cpp
+
 
     Video/sscVideoSource.h
     Video/sscVideoRecorder.h

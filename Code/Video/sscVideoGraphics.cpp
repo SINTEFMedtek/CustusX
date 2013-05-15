@@ -84,6 +84,16 @@ VideoGraphics::~VideoGraphics()
 {
 }
 
+void VideoGraphics::setFlipVertical(bool on)
+{
+	mTransformTextureCoords->SetFlipR(on); // flip around axis
+}
+
+bool VideoGraphics::getFlipVertical()
+{
+	return mTransformTextureCoords->GetFlipR();
+}
+
 vtkActorPtr VideoGraphics::getActor()
 {
 	return mPlaneActor;

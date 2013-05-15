@@ -22,7 +22,7 @@
 
 #include "sscDataMetric.h"
 #include "sscCoordinateSystemHelpers.h"
-#include "sscDataManagerImpl.h"
+#include "sscDataReaderWriter.h"
 
 namespace ssc
 {

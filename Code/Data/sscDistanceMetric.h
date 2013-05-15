@@ -21,7 +21,7 @@
 #define SSCDISTANCEMETRIC_H_
 
 #include "sscDataMetric.h"
-#include "sscDataManagerImpl.h"
+#include "sscDataReaderWriter.h"
 
 namespace ssc
 {

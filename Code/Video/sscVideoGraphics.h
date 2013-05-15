@@ -52,6 +52,12 @@ public:
 	vtkActorPtr getActor();
 	void setActorUserMatrix(vtkMatrix4x4Ptr rMu);
 	void setVisibility(bool visible);
+	/** Set flag to flip the output in the vertical direction,
+	  * default = true
+	  * Legacy function supporting old functionality.
+	  */
+	void setFlipVertical(bool on);
+	bool getFlipVertical();
 
 	/** Set a mask for the video image.
 	  * Only one of clear and clip can be active at a time.
