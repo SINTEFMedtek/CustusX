@@ -33,6 +33,8 @@ SET( MOC_HEADER_FILES
 	gui/cxPipelineWidget.h
 	gui/cxFilterPresetWidget.h
 	gui/cxAllFiltersWidget.h
+	gui/cxCompactFilterSetupWidget.h
+	gui/cxOptionsWidget.h
 	)
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -82,6 +84,10 @@ SET( SOURCE_FILES
 	gui/cxFilterPresetWidget.cpp
 	gui/cxAllFiltersWidget.h
 	gui/cxAllFiltersWidget.cpp
+	gui/cxCompactFilterSetupWidget.h
+	gui/cxCompactFilterSetupWidget.cpp
+	gui/cxOptionsWidget.h
+	gui/cxOptionsWidget.cpp
   )
 
 # =========================================================

@@ -20,6 +20,7 @@ class QButtonGroup;
 class QRadioButton;
 class QAction;
 #include "cxFilterWidget.h"
+#include "cxCompactFilterSetupWidget.h"
 
 namespace cx
 {
