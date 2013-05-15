@@ -12,7 +12,6 @@ namespace cx
 vtkImageDataPtr loadImage(QString filename);
 vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input);
 
-
 /**An object sending images out on an ip port.
  * In order to operate within a nongui thread,
  * it must be created within the run() method
@@ -23,11 +22,13 @@ vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input);
  */
 class MHDImageStreamer: public ImageStreamer
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
 	MHDImageStreamer();
-	virtual ~MHDImageStreamer() {}
+	virtual ~MHDImageStreamer()
+	{
+	}
 
 	virtual void initialize(StringMap arguments);
 	virtual bool startStreaming(SenderPtr sender);
@@ -45,21 +46,23 @@ private:
 		vtkImageDataPtr mImageData;
 		boost::shared_ptr<class SplitFramesContainer> mDataSource;
 		int mCurrentFrame;
-		QString mRawUid; /// raw text to send as device name - excluding frame id
+		QString mRawUid;
 	};
-
 	static Data initializePrimaryData(vtkImageDataPtr source, QString filename);
 	static Data initializeSecondaryData(vtkImageDataPtr source, QString filename);
 	PackagePtr createPackage(Data* data);
+	bool isInitialized();
+	bool isReadyToSend();
+	void initalizePrimaryAndSecondaryData(vtkImageDataPtr source);
 
-	bool mSendOnce; ///< if true, the image will only be sent once, right after start streaming
+	bool mInitialized;
+	bool mSendOnce;
 
 	Data mPrimaryData;
 	Data mSecondaryData;
 
 };
 typedef boost::shared_ptr<class MHDImageStreamer> MHDImageStreamerPtr;
-
 
 }
 

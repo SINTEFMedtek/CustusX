@@ -18,11 +18,19 @@ if (BUILD_TESTING)
     #------------------------------------------------------------------------------
     # Set variables
     #-----------------------------------------------------------------------------
+    QT4_WRAP_CPP( CATCH_MOCED_SOURCES
+        cxtestSignalListener.h 
+        )
+        
     set(CATCH_SOURCES 
+        ${CATCH_MOCED_SOURCES}
         cxCatch.cpp
+        cxtestSignalListener.h
+        cxtestSignalListener.cpp
         ../plugins/Algorithm/testing/cxCatchAlgorithm.cpp
         ../service/video/testing/cxCatchVideo.cpp
     )
+    
     #------------------------------------------------------------------------------
     # Includes
     #-----------------------------------------------------------------------------
