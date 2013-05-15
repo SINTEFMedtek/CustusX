@@ -16,10 +16,10 @@
 namespace ssc
 {
 
-ProbeData DummyToolTestUtilities::createProbeDataLinear(double depth, double width, Eigen::Array2i frameSize)
+ProbeData DummyToolTestUtilities::createProbeData(ProbeData::TYPE type, double depth, double width, Eigen::Array2i frameSize)
 {
 	ProbeData retval;
-	retval.setType(ProbeData::tLINEAR);
+	retval.setType(type);
 	retval.setSector(0, depth, width, 0);
 
 	Vector3D imageSpacing(width/frameSize[0], depth/frameSize[1], 1.0);
@@ -31,6 +31,11 @@ ProbeData DummyToolTestUtilities::createProbeDataLinear(double depth, double wid
 	retval.setImage(image);
 
 	return retval;
+}
+
+ProbeData DummyToolTestUtilities::createProbeDataLinear(double depth, double width, Eigen::Array2i frameSize)
+{
+	return createProbeData(ProbeData::tLINEAR, depth, width, frameSize);
 }
 
 DummyToolPtr DummyToolTestUtilities::createDummyTool(ProbeData probeData, ToolManager* manager)
