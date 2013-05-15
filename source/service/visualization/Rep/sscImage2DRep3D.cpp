@@ -86,7 +86,6 @@ void Image2DProxy::setImage(ssc::ImagePtr image)
 	}
 
 	this->vtkImageDataChangedSlot();
-	this->transferFunctionsChangedSlot();
 	this->transformChangedSlot();
 }
 

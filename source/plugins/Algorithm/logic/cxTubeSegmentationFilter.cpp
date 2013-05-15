@@ -124,6 +124,10 @@ bool TubeSegmentationFilter::execute()
 
 	try {
 		std::cout << "=================TSF START====================" << std::endl;
+		std::cout << "Input: " <<  input->getName().toStdString() << std::endl;
+		std::cout << "Preset: " <<  getParamStr(mParameters, "parameters") << std::endl;
+		std::cout << "Centerline-method: " <<  getParamStr(mParameters, "centerline-method") << std::endl;
+		std::cout << "--------------" << std::endl;
 		mOutput = run(filename, mParameters, cx::DataLocations::getTSFPath().toStdString());
 		std::cout << "=================TSF END====================" << std::endl;
 	} catch(SIPL::SIPLException& e) {
@@ -353,31 +357,31 @@ void TubeSegmentationFilter::createOutputTypes()
 
 	//0
 	tempDataStringAdapter = SelectDataStringDataAdapter::New();
-	tempDataStringAdapter->setValueName("Centerline");
-	tempDataStringAdapter->setHelp("Generated centerline.");
+	tempDataStringAdapter->setValueName("Centerline volume");
+	tempDataStringAdapter->setHelp("Generated centerline volume.");
 	mOutputTypes.push_back(tempDataStringAdapter);
 
 	//1
 	tempMeshStringAdapter = SelectMeshStringDataAdapter::New();
-	tempMeshStringAdapter->setValueName("Centerline (vtk)");
+	tempMeshStringAdapter->setValueName("Centerline mesh");
 	tempMeshStringAdapter->setHelp("Generated centerline mesh (vtk-format).");
 	mOutputTypes.push_back(tempMeshStringAdapter);
 
 	//2
 	tempDataStringAdapter = SelectDataStringDataAdapter::New();
-	tempDataStringAdapter->setValueName("Segmentation");
-	tempDataStringAdapter->setHelp("Generated segmentation.");
+	tempDataStringAdapter->setValueName("Segmented centerline");
+	tempDataStringAdapter->setHelp("Grown segmentation from the centerline.");
 	mOutputTypes.push_back(tempDataStringAdapter);
 
 	//3
 	tempMeshStringAdapter = SelectMeshStringDataAdapter::New();
-	tempMeshStringAdapter->setValueName("Surface");
+	tempMeshStringAdapter->setValueName("Segmented centerlines surface");
 	tempMeshStringAdapter->setHelp("Generated surface of the segmented volume.");
 	mOutputTypes.push_back(tempMeshStringAdapter);
 
 	//4
 	tempDataStringAdapter = SelectDataStringDataAdapter::New();
-	tempDataStringAdapter->setValueName("TDF");
+	tempDataStringAdapter->setValueName("TDF volume");
 	tempDataStringAdapter->setHelp("Volume showing the probability of a voxel being part of a tubular structure.");
 	mOutputTypes.push_back(tempDataStringAdapter);
 }
