@@ -147,7 +147,7 @@ private:
 	double mSoundSpeedCompensationFactor; ///< The used sound speed compensation factor
 	QString mUid; ///<  the uid of the stream data this probe data applies to.
 };
-
+typedef boost::shared_ptr<ProbeData> ProbeDataPtr;
 } // namespace ssc
 
 #endif /*SSCPROBEDATA_H_*/

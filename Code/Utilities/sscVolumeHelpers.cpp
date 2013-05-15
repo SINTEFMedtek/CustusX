@@ -185,12 +185,16 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
 	int dims[3];
 	image->getBaseVtkImageData()->GetDimensions(dims);
 	retval["Dimensions"] = string_cast(dims[0])+" , "+string_cast(dims[1])+" , "+string_cast(dims[2]);
+	retval["Size"] = string_cast(dims[0]*spacing_x)+" mm , "+string_cast(dims[1]*spacing_y)+" mm, "+string_cast(dims[2]*spacing_z)+" mm";
 	float actualMemorySizeKB = (float)image->getBaseVtkImageData()->GetActualMemorySize();
 	retval["Actual memory size"] = string_cast(actualMemorySizeKB/(1024*1024))+" GB, "+string_cast(actualMemorySizeKB/1024)+" MB, "+string_cast(actualMemorySizeKB)+" kB";
 	retval["Scalar components"] = string_cast(image->getBaseVtkImageData()->GetNumberOfScalarComponents());
 	retval["rMd"] = string_cast(image->get_rMd());
 	retval["Number of components for points"] = string_cast(image->getBaseVtkImageData()->GetPointData()->GetNumberOfComponents());
 	retval["Scalar type"] = string_cast(image->getBaseVtkImageData()->GetScalarTypeAsString());
+	int extent[6];
+	image->getBaseVtkImageData()->GetExtent(extent);
+	retval["Extent"] = string_cast(extent[0])+" , "+string_cast(extent[1])+" , "+string_cast(extent[2])+" , "+string_cast(extent[3])+" , "+string_cast(extent[4])+" , "+string_cast(extent[5]);
 
 	return retval;
 }
