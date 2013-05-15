@@ -30,7 +30,7 @@ namespace cx
  *
  * \ingroup cxResourceAlgorithms
  * \date Nov 21, 2012
- * \author christiana
+ * \author Christian Askeland, SINTEF
  */
 class FilterImpl : public Filter
 {
@@ -77,6 +77,7 @@ protected:
 	std::vector<ssc::DataPtr> mCopiedInput;
 	QDomElement mCopiedOptions;
 	bool mActive;
+
 private:
 	QString mUid;
 

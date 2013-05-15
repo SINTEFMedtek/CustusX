@@ -29,7 +29,7 @@
 #include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
-//#include <vtkImageData.h>
+#include <vtkImageData.h>
 #include "sscTypeConversions.h"
 #include "cxRepManager.h"
 #include "sscDataManager.h"
@@ -253,17 +253,27 @@ bool InteractiveCropper::getShowBoxWidget() const
 	return mBoxWidget->GetEnabled();
 }
 
-//int* InteractiveCropper::getDimensions()
-//{
-//	int dims[3];
-////	if(mImage)
-////		mImage->getBaseVtkImageData()->GetDimensions(dims);
-//	ssc::DoubleBoundingBox3D bb_new = getBoxWidgetSize();
-//	dims[0] = bb_new.cbegin()[1] -bb_new.cbegin()[0];
-//	dims[1] = bb_new.cbegin()[3] -bb_new.cbegin()[2];
-//	dims[2] = bb_new.cbegin()[5] -bb_new.cbegin()[4];
-//	return dims;
-//}
+std::vector<int> InteractiveCropper::getDimensions()
+{
+	std::vector<int> dimensions;
+	if(!mImage)
+		return dimensions;
+
+	double spacing_x = 1;
+	double spacing_y = 1;
+	double spacing_z = 1;
+	mImage->getBaseVtkImageData()->GetSpacing(spacing_x, spacing_y, spacing_z);
+
+	ssc::DoubleBoundingBox3D bb = getBoxWidgetSize();
+	int dim_x = (bb.begin()[1] - bb.begin()[0])/spacing_x + 1; //adding 1 because of some rounding errors, is there a better way to do this?
+	int dim_y = (bb.begin()[3] - bb.begin()[2])/spacing_y + 1;
+	int dim_z = (bb.begin()[5] - bb.begin()[4])/spacing_z + 1;
+	dimensions.push_back(dim_x);
+	dimensions.push_back(dim_y);
+	dimensions.push_back(dim_z);
+
+	return dimensions;
+}
 
 /** Set the box widget bounding box to the input box (given in data space)
  */
