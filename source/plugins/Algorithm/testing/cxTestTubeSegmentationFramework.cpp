@@ -32,56 +32,6 @@ void TestTubeSegmentationFramework::testConstructor()
 {
 }
 
-void TestTubeSegmentationFramework::testFilter()
-{
-	//create the filter
-	cx::TubeSegmentationFilterPtr tsf = cx::TubeSegmentationFilterPtr(new cx::TubeSegmentationFilter());
-	CPPUNIT_ASSERT(tsf);
-
-	//initialize the filter
-	tsf->getInputTypes();
-	tsf->getOutputTypes();
-	tsf->getOptions();
-
-	//check the basics
-	CPPUNIT_ASSERT_MESSAGE("Type has changed.", (tsf->getType().compare("TubeSegmentationFilter") == 0));
-	CPPUNIT_ASSERT_MESSAGE("Name has changed.", (tsf->getName().compare("Tube-Segmentation Filter") == 0));
-	CPPUNIT_ASSERT_MESSAGE("Help has changed.", (tsf->getHelp().compare("<html>"
-	        "<h3>Tube-Segmentation.</h3>"
-	        "<p><i>Extracts the centerline and creates a segementation. </br>GPU-base algorithm written by Erik Smistad (NTNU).</i></p>"
-	        "</html>") == 0));
-
-	//create a new patient and load in testdata
-	QString filename = cx::DataLocations::getTestDataPath() +
-			"/testing/"
-			"TubeSegmentationFramework/helix.mhd";
-	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath() + "/temp/TubeSegmentationFramework/");
-	QString info;
-	ssc::DataPtr data = cx::patientService()->getPatientData()->importData(filename, info);
-	CPPUNIT_ASSERT(data);
-
-	//set which data to process
-	std::vector<cx::SelectDataStringDataAdapterBasePtr> input = tsf->getInputTypes();
-	CPPUNIT_ASSERT_MESSAGE("Number of inputs has changed.", input.size() == 1);
-	CPPUNIT_ASSERT(input[0]->setValue(data->getUid()));
-	CPPUNIT_ASSERT(input[0]->getData()->getName() == "helix");
-
-	//run the filter
-	CPPUNIT_ASSERT_MESSAGE("Preprocessing TubeSegmentationFilter failed.", tsf->preProcess());
-	CPPUNIT_ASSERT_MESSAGE("Executed TSF on helix with default parameters failed.", tsf->execute());
-	CPPUNIT_ASSERT_MESSAGE("Post processing data from TSF failed.", tsf->postProcess());
-
-	//check output
-	std::vector<cx::SelectDataStringDataAdapterBasePtr> output = tsf->getOutputTypes();
-	CPPUNIT_ASSERT_MESSAGE("Number of outputs has changed.", output.size() == 5);
-	CPPUNIT_ASSERT_MESSAGE("Centerline volume not generated.",output[0]->getData());
-	CPPUNIT_ASSERT_MESSAGE("Centerline vtkPolydata not generated.",output[1]->getData());
-	CPPUNIT_ASSERT_MESSAGE("Segmentation not generated.",output[2]->getData());
-
-	//delete patient to prevent overflow of files
-	//TODO
-}
-
 void TestTubeSegmentationFramework::testParameters()
 {
 	std::string path = std::string(PARAMETERS_DIR);
@@ -98,16 +48,104 @@ void TestTubeSegmentationFramework::testParameters()
 	CPPUNIT_ASSERT_MESSAGE("250 not a valid gvf-iterations value.", defaultParameters.numerics["gvf-iterations"].validate(250));
 
 	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Set parameter parameter to Lung-Airways-CT failed.", setParameter(defaultParameters, "parameters", "Lung-Airways-CT"));
-	//setParameter(defaultParameters, "parameters", "Lung-Airways-CT");
+
 	CPPUNIT_ASSERT_NO_THROW_MESSAGE("Load presets failed.", loadParameterPreset(defaultParameters, path));
+}
+
+void TestTubeSegmentationFramework::testDefaultPreset()
+{
+	runFilter(QString("Default"));
+}
+
+void TestTubeSegmentationFramework::testSyntheticVascusynthPreset()
+{
+	runFilter(QString("Synthetic-Vascusynth"));
+}
+
+void TestTubeSegmentationFramework::testPhantomAccUSPreset()
+{
+	runFilter(QString("Phantom-Acc-US"));
+}
+
+void TestTubeSegmentationFramework::testNeuroVesselsMRAPreset()
+{
+	runFilter(QString("Neuro-Vessels-MRA"));
+}
+
+void TestTubeSegmentationFramework::testNeuroVesselsUSAPreset()
+{
+	runFilter(QString("Neuro-Vessels-USA"));
+}
+
+void TestTubeSegmentationFramework::testLungAirwaysCTPreset()
+{
+	runFilter(QString("Lung-Airways-CT"));
+}
+
+void TestTubeSegmentationFramework::testLiverVesselsCTPreset()
+{
+	runFilter(QString("Liver-Vessels-CT"));
+}
+
+void TestTubeSegmentationFramework::testLiverVesselsMRPreset()
+{
+	runFilter(QString("Liver-Vessels-MR"));
 }
 
 void TestTubeSegmentationFramework::testLoadParameterFile()
 {
-	std::string path = std::string(PARAMETERS_DIR);
-	paramList defaultParameters = initParameters(path);
-	setParameter(defaultParameters, "parameters", "Neuro-Vessels-USA");
-	loadParameterPreset(defaultParameters, path);
+	paramList preset = loadPreset(QString("Neuro-Vessels-USA"));
 
-	CPPUNIT_ASSERT_MESSAGE("sphere-segmentation not set to true in Neuro-Vessels-USA", getParamBool(defaultParameters,"sphere-segmentation") == true);
+	CPPUNIT_ASSERT_MESSAGE("sphere-segmentation not set to true in Neuro-Vessels-USA", getParamBool(preset,"sphere-segmentation") == true);
+}
+
+paramList TestTubeSegmentationFramework::loadPreset(QString preset)
+{
+	std::string path = std::string(PARAMETERS_DIR);
+	paramList parameters = initParameters(path);
+	setParameter(parameters, "parameters", preset.toStdString());
+	loadParameterPreset(parameters, path);
+	return parameters;
+}
+
+void TestTubeSegmentationFramework::runFilter(QString preset)
+{
+	//setup filter
+	cx::TubeSegmentationFilterPtr tsf = cx::TubeSegmentationFilterPtr(new cx::TubeSegmentationFilter());
+	CPPUNIT_ASSERT(tsf);
+	tsf->getInputTypes();
+	tsf->getOutputTypes();
+	tsf->getOptions();
+
+	//create a new patient
+	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/"+preset+".mhd";
+	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/TubeSegmentationFramework/");
+	QString info;
+	ssc::DataPtr data = cx::patientService()->getPatientData()->importData(filename, info);
+	CPPUNIT_ASSERT(data);
+
+	//set input
+	std::vector < cx::SelectDataStringDataAdapterBasePtr > input =tsf->getInputTypes();
+	CPPUNIT_ASSERT_MESSAGE("Number of inputs has changed.", input.size() == 1);
+	CPPUNIT_ASSERT_MESSAGE("Could not set input to the filter.", input[0]->setValue(data->getUid()));
+	CPPUNIT_ASSERT_MESSAGE("The name of the input data is not as we requested.", input[0]->getData()->getName() == preset);
+	tsf->requestSetPresetSlot(preset);
+
+	//execute
+	CPPUNIT_ASSERT_MESSAGE("Preprocessing TubeSegmentationFilter failed.", tsf->preProcess());
+	CPPUNIT_ASSERT_MESSAGE( "Executed TSF on "+preset.toStdString()+" with "+preset.toStdString()+" parameters failed.", tsf->execute());
+	CPPUNIT_ASSERT_MESSAGE("Post processing data from TSF failed.", tsf->postProcess());
+
+	//check output
+	std::vector < cx::SelectDataStringDataAdapterBasePtr > output = tsf->getOutputTypes();
+	CPPUNIT_ASSERT_MESSAGE("Number of outputs has changed.", output.size() == 5);
+	CPPUNIT_ASSERT_MESSAGE("Centerline volume not generated.", output[0]->getData());
+	CPPUNIT_ASSERT_MESSAGE("Centerline vtkPolydata not generated.",	output[1]->getData());
+	//TODO not all presets generate these...
+//	CPPUNIT_ASSERT_MESSAGE("Segmented centerline not generated.", output[2]->getData());
+//	CPPUNIT_ASSERT_MESSAGE("Segmented centerlines surface not generated.", output[3]->getData());
+	CPPUNIT_ASSERT_MESSAGE("TDF volume not generated.", output[4]->getData());
+
+	//TODO clean up temp folder...
+
 }

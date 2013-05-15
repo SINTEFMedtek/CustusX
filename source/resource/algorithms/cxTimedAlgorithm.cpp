@@ -69,7 +69,7 @@ QString TimedBaseAlgorithm::getSecondsPassedAsString() const
 
 void TimedBaseAlgorithm::timeoutSlot()
 {
-  ssc::messageManager()->sendInfo(QString("Still executing %1, [%2s] ...").arg(mProduct).arg(this->getTimePassed().toString("ss")));
+  ssc::messageManager()->sendInfo(QString("Still executing %1, [%2] ...").arg(mProduct).arg(this->getTimePassed().toString("m:ss")));
 }
 //---------------------------------------------------------------------------------------------------------------------
 

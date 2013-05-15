@@ -10,6 +10,7 @@
 
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 class QCheckBox;
+class QLabel;
 
 namespace cx
 {
@@ -42,6 +43,7 @@ private:
   BoundingBoxWidget* mBBWidget;
   QCheckBox* mUseCropperCheckBox;
   QCheckBox* mShowBoxCheckBox;
+  QLabel* mBoundingBoxDimensions;
 
 private slots:
   void boxValuesChanged();
