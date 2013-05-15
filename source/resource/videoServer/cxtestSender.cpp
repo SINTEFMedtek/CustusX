@@ -1,11 +1,11 @@
-#include "cxTestSender.h"
+#include "cxtestSender.h"
 
 #include "sscTypeConversions.h"
 
 namespace cxtest
 {
 
-static int i = 0;
+//static int i = 0;
 
 bool TestSender::isReady() const
 {
@@ -14,8 +14,8 @@ bool TestSender::isReady() const
 
 void TestSender::send(cx::PackagePtr package)
 {
-	std::cout << string_cast(i) << std::endl;
-	i++;
+//	std::cout << string_cast(i) << std::endl;
+//	i++;
 	mPackage = package;
 	emit newPackage();
 }
