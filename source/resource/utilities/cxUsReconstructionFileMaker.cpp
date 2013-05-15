@@ -14,7 +14,7 @@
 #include "cxSettings.h"
 #include "sscXmlOptionItem.h"
 #include "sscTimeKeeper.h"
-#include "sscDataManagerImpl.h"
+#include "sscDataReaderWriter.h"
 #include "sscUSFrameData.h"
 #include "cxSavingVideoRecorder.h"
 #include "cxImageDataContainer.h"
