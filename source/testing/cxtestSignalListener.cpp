@@ -7,43 +7,19 @@
 namespace cxtest
 {
 
-///< Usage:
-///< QObject* object = ...;
-///< waitForSignal(object, SIGNAL(newPackage()));
 bool waitForSignal(QObject* object, const char* signal, int maxWaitMilliSeconds)
 {
 	SignalListener listener(object, signal, maxWaitMilliSeconds);
-
 	listener.exec();
-	return listener.timedOut();
-
-
-//	QTimer* timer = new QTimer;
-//	timer->setInterval(maxWaitMilliSeconds);
-//	timer->start();
-//
-//	QEventLoop loop;
-//	QObject::connect(timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-//	QObject::connect(object, signal, &loop, SLOT(quit()));
-//
-//	// Execute the event loop here, now we will wait here until the given signal is emitted
-//	// which in turn will trigger event loop quit.
-//	loop.exec();
-
-
+	bool signalArrived = !listener.timedOut();
+	return signalArrived;
 }
 
 SignalListener::SignalListener(QObject* object, const char* signal, int maxWaitMilliSeconds) :
 		mTimedOut(false)
 {
-	mTimer = new QTimer;
-	mTimer->setInterval(maxWaitMilliSeconds);
-	QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(quit()));
-
-	mLoop = new QEventLoop;
-	QObject::connect(object, signal, this, SLOT(quit()));
-//	QObject::connect(mTimer, SIGNAL(timeout()), mLoop, SLOT(quit()));
-//	QObject::connect(object, signal, mLoop, SLOT(quit()));
+	createTimer(maxWaitMilliSeconds);
+	createEventLoop(object, signal);
 }
 
 SignalListener::~SignalListener()
@@ -55,7 +31,8 @@ SignalListener::~SignalListener()
 int SignalListener::exec()
 {
 	mTimer->start();
-	mLoop->exec(); // Execute the event loop here, now we will wait here until the given signal is emitted.
+	int retval = mLoop->exec();
+	return retval;
 }
 
 bool SignalListener::timedOut()
@@ -65,14 +42,22 @@ bool SignalListener::timedOut()
 
 void SignalListener::quit()
 {
-	mTimedOut = (this->sender() == mTimer) ? false : true;
-	if(this->sender() == mTimer)
-		std::cout  << "timed out" << std::endl;
-	else
-		std::cout << "signal" << std::endl;
-
+	mTimedOut = (this->sender() == mTimer);
 	mTimer->stop();
 	mLoop->quit();
+}
+
+void SignalListener::createTimer(int maxWaitMilliSeconds)
+{
+	mTimer = new QTimer;
+	mTimer->setInterval(maxWaitMilliSeconds);
+	QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(quit()));
+}
+
+void SignalListener::createEventLoop(QObject* object, const char* signal)
+{
+	mLoop = new QEventLoop;
+	QObject::connect(object, signal, this, SLOT(quit()));
 }
 
 } /* namespace cxtest */
