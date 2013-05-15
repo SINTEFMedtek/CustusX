@@ -23,7 +23,7 @@
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxSettings.h"
-#include "sscDataManagerImpl.h"
+#include "sscDataReaderWriter.h"
 
 namespace cx
 {
