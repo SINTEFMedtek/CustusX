@@ -11,7 +11,7 @@
 namespace cxtest
 {
 
-TEST_CASE("File should be read and sent only once", "[video][unit]")
+TEST_CASE("MHDImageStreamer: File should be read and sent only once", "[video][unit]")
 {
 	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));
@@ -22,8 +22,8 @@ TEST_CASE("File should be read and sent only once", "[video][unit]")
 	args["sendonce"] = "true";
 
 	cx::ImageStreamerPtr imagestreamer(new cx::MHDImageStreamer());
-	imagestreamer->initialize(args);
 	REQUIRE(imagestreamer);
+	imagestreamer->initialize(args);
 
 	TestSenderPtr sender(new TestSender());
 
@@ -42,7 +42,7 @@ TEST_CASE("File should be read and sent only once", "[video][unit]")
 	imagestreamer->stopStreaming();
 }
 
-TEST_CASE("File should be read and slices with a given interval", "[video][unit]")
+TEST_CASE("MHDImageStreamer: File should be read and send slices with a given interval", "[video][unit]")
 {
 	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));
@@ -52,8 +52,8 @@ TEST_CASE("File should be read and slices with a given interval", "[video][unit]
 	args["type"] = "MHDFile";
 
 	cx::ImageStreamerPtr imagestreamer(new cx::MHDImageStreamer());
-	imagestreamer->initialize(args);
 	REQUIRE(imagestreamer);
+	imagestreamer->initialize(args);
 
 	TestSenderPtr sender(new TestSender());
 
@@ -69,10 +69,10 @@ TEST_CASE("File should be read and slices with a given interval", "[video][unit]
 
 	CHECK(waitForSignal(object, SIGNAL(newPackage())));
 
-	cx::PackagePtr packageA = sender->getPackage();
-	REQUIRE(packageA);
-	ssc::ImagePtr imageA = package->mImage;
-	REQUIRE(imageA);
+	package = sender->getPackage();
+	REQUIRE(package);
+	image = package->mImage;
+	REQUIRE(image);
 
 	imagestreamer->stopStreaming();
 }
