@@ -17,6 +17,7 @@
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscDataManagerImpl.h"
+#include "sscDataReaderWriter.h"
 #include "sscRegistrationTransform.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "cxContourFilter.h"

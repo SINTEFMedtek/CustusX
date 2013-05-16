@@ -16,7 +16,7 @@
 #include <QDir>
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
-#include "sscDataManagerImpl.h"
+#include "sscDataReaderWriter.h"
 #include "sscLogger.h"
 #include "sscTypeConversions.h"
 #include "sscUtilHelpers.h"
@@ -42,7 +42,7 @@ vtkImageDataPtr CachedImageData::getImage()
 {
 	if (!mImageData)
 	{
-		mImageData = ssc::MetaImageReader().load(mFilename);
+		mImageData = ssc::MetaImageReader().loadVtkImageData(mFilename);
 	}
 	return mImageData;
 }

@@ -5,8 +5,6 @@
 namespace cxtest
 {
 
-//static int i = 0;
-
 bool TestSender::isReady() const
 {
 	return true;
@@ -14,13 +12,11 @@ bool TestSender::isReady() const
 
 void TestSender::send(cx::PackagePtr package)
 {
-//	std::cout << string_cast(i) << std::endl;
-//	i++;
 	mPackage = package;
 	emit newPackage();
 }
 
-cx::PackagePtr TestSender::getPackage()
+cx::PackagePtr TestSender::getSentPackage()
 {
 	return mPackage;
 }

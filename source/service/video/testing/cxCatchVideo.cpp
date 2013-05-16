@@ -11,68 +11,54 @@
 namespace cxtest
 {
 
-TEST_CASE("MHDImageStreamer: File should be read and sent only once", "[video][unit]")
+cx::ImageStreamerPtr createRunningImageStreamer(TestSenderPtr& sender, bool sendonce = false)
 {
-	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/Default.mhd";
+	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));
 
 	cx::StringMap args;
 	args["filename"] = filename;
 	args["type"] = "MHDFile";
-	args["sendonce"] = "true";
+	args["sendonce"] = sendonce ? "true" : "false";
 
 	cx::ImageStreamerPtr imagestreamer(new cx::MHDImageStreamer());
 	REQUIRE(imagestreamer);
 	imagestreamer->initialize(args);
+	REQUIRE(imagestreamer->startStreaming(sender));
+	return imagestreamer;
+}
 
-	TestSenderPtr sender(new TestSender());
-
-	CHECK(imagestreamer->startStreaming(sender));
-
-	QObject* object = sender.get();
-	CHECK(waitForSignal(object, SIGNAL(newPackage())));
-
-	cx::PackagePtr package = sender->getPackage();
+void checkSenderGotImageFromStreamer(TestSenderPtr sender)
+{
+	cx::PackagePtr package = sender->getSentPackage();
 	REQUIRE(package);
 	ssc::ImagePtr image = package->mImage;
 	REQUIRE(image);
+}
 
-	CHECK_FALSE(waitForSignal(object, SIGNAL(newPackage())));
+TEST_CASE("MHDImageStreamer: File should be read and sent only once", "[video][unit]")
+{
+	TestSenderPtr sender(new TestSender());
+	cx::ImageStreamerPtr imagestreamer = createRunningImageStreamer(sender, true);
+
+	CHECK(waitForSignal(sender.get(), SIGNAL(newPackage())));
+	checkSenderGotImageFromStreamer(sender);
+
+	CHECK_FALSE(waitForSignal(sender.get(), SIGNAL(newPackage())));
 
 	imagestreamer->stopStreaming();
 }
 
 TEST_CASE("MHDImageStreamer: File should be read and send slices with a given interval", "[video][unit]")
 {
-	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/Default.mhd";
-	REQUIRE(QFile::exists(filename));
-
-	cx::StringMap args;
-	args["filename"] = filename;
-	args["type"] = "MHDFile";
-
-	cx::ImageStreamerPtr imagestreamer(new cx::MHDImageStreamer());
-	REQUIRE(imagestreamer);
-	imagestreamer->initialize(args);
-
 	TestSenderPtr sender(new TestSender());
+	cx::ImageStreamerPtr imagestreamer = createRunningImageStreamer(sender);
 
-	CHECK(imagestreamer->startStreaming(sender));
+	CHECK(waitForSignal(sender.get(), SIGNAL(newPackage())));
+	checkSenderGotImageFromStreamer(sender);
 
-	QObject* object = sender.get();
-	CHECK(waitForSignal(object, SIGNAL(newPackage())));
-
-	cx::PackagePtr package = sender->getPackage();
-	REQUIRE(package);
-	ssc::ImagePtr image = package->mImage;
-	REQUIRE(image);
-
-	CHECK(waitForSignal(object, SIGNAL(newPackage())));
-
-	package = sender->getPackage();
-	REQUIRE(package);
-	image = package->mImage;
-	REQUIRE(image);
+	CHECK(waitForSignal(sender.get(), SIGNAL(newPackage())));
+	checkSenderGotImageFromStreamer(sender);
 
 	imagestreamer->stopStreaming();
 }
