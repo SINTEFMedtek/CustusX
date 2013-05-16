@@ -39,7 +39,7 @@ import logging
 import time    
 import subprocess
 import sys
-import optparse
+import argparse
 from cxPowerControl import PowerControl
 from jenkinsapi import api
 
@@ -156,55 +156,28 @@ class JenkinsGummyBears():
         print "Test counter: %i, Colors: (%i, %i, %i) " % (self.debug_counter, green, yellow, red)
 
         colors = {'green':green>0, 'red':red>0, 'yellow':yellow>0}
-
         self.lamp.switchColors(colors)
 
 
 class Controller(object):
     '''
-    A command line program that parses options and arguments,
-    then performs the requested operations on the selected
-    components.
     '''
     def __init__(self):
-    	'''
-    	Initialize and run the controller
-    	'''        
+    	''
         self.optionParser = self._createOptionParser();
     
     def _createOptionParser(self):
         description='Controller script for Gummy Bears Extreme Feedback device.'
-        
-        p = optparse.OptionParser(description=description,
-                                    version='%prog version 0.1',
-                                    usage= '%prog [options]')
-        p.add_option('--username', '-u',
-                     action='store',
-                     type='string',
-                     help='jenkins user',
-                     #dest='password',
-                     default="user")
-        p.add_option('--password', '-p',
-                     action='store',
-                     type='string',
-                     help='jenkins password',
-                     default="not set")
-        p.add_option('--test_bears', '-t',
-                     action='store_true',
-                     help='run a test sequence on the gummy bears',
-                     default=False)
-        p.add_option('--dummy_bears', '-d',
-                     action='store_true',
-                     help='run without calling lighting the bears',
-                     default=False)
-        p.add_option('--silent_mode', '-s',
-                     action='store_true',
-                     help='execute script without user interaction',
-                     default=False)
+        p = argparse.ArgumentParser(description=description)
+        p.add_argument('-u', '--username', default="user", help='jenkins user')
+        p.add_argument('-p', '--password', default="not set", help='jenkins password')
+        p.add_argument('-t', '--test_bears', action='store_false', help='run a test sequence on the gummy bears (counting in binary)')
+        p.add_argument('-d', '--dummy_bears', action='store_false', help='run without actually connecting to the bears')
+        #p.add_argument('-s', '--silent_mode', action='store_false', help='execute script without user interaction')
         return p
     
     def run(self):
-        options, arguments = self.optionParser.parse_args()
+        options = self.optionParser.parse_args()
         gummybears = JenkinsGummyBears()
         gummybears.lamp.dummy = options.dummy_bears
 
