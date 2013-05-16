@@ -30,11 +30,11 @@ void DataManager::initialize()
 {
 	setInstance(new DataManager());
 
-	// extra cx data types
-	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::PointMetricReader()));
-	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::DistanceMetricReader()));
-	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::PlaneMetricReader()));
-	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::AngleMetricReader()));
+	//	// extra cx data types
+	//	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::PointMetricReader()));
+	//	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::DistanceMetricReader()));
+	//	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::PlaneMetricReader()));
+	//	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::AngleMetricReader()));
 }
 
 DataManager* DataManager::getInstance()

@@ -1,10 +1,3 @@
-/*
- * cxImageSenderFactory.cpp
- *
- *  \date Aug 9, 2011
- *      \author christiana
- */
-
 #include "cxImageSenderFactory.h"
 #include "cxImageStreamerOpenCV.h"
 #include "cxMHDImageStreamer.h"
