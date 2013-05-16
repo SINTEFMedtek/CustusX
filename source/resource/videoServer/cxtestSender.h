@@ -9,6 +9,9 @@ namespace cxtest {
 /*
  * TestSender
  *
+ * Simulates sending images.
+ * Can be used with a imagestreamer.
+ *
  * \date May 13, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -23,7 +26,7 @@ public:
 
 	virtual void send(cx::PackagePtr package);
 
-	cx::PackagePtr getPackage();
+	cx::PackagePtr getSentPackage();
 
 signals:
 	void newPackage();
