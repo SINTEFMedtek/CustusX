@@ -7,9 +7,9 @@ void ImageStreamer::initialize(StringMap arguments){
 	mArguments = arguments;
 }
 
-void ImageStreamer::setSendInterval(int interval)
+void ImageStreamer::setSendInterval(int milliseconds)
 {
-	mSendInterval = interval;
+	mSendInterval = milliseconds;
 }
 
 int ImageStreamer::getSendInterval() const
