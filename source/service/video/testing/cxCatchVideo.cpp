@@ -39,7 +39,8 @@ void checkSenderGotImageFromStreamer(TestSenderPtr sender)
 TEST_CASE("MHDImageStreamer: File should be read and sent only once", "[video][unit]")
 {
 	TestSenderPtr sender(new TestSender());
-	cx::ImageStreamerPtr imagestreamer = createRunningImageStreamer(sender, true);
+	bool sendImageOnce = true;
+	cx::ImageStreamerPtr imagestreamer = createRunningImageStreamer(sender, sendImageOnce);
 
 	CHECK(waitForSignal(sender.get(), SIGNAL(newPackage())));
 	checkSenderGotImageFromStreamer(sender);
@@ -63,6 +64,26 @@ TEST_CASE("MHDImageStreamer: File should be read and send slices with a given in
 	imagestreamer->stopStreaming();
 }
 
+TEST_CASE("Probe should get simulated data", "[video][integration]")
+{
+
+	//TODO
+//
+//	ssc::ToolPtr tool = cx::ToolManager::getInstance()->findFirstProbe();
+//	ssc::ProbePtr probe = tool->getProbe();
+//
+//	TestSenderPtr sender(new TestSender());
+//	bool sendImageOnce = true;
+//	cx::ImageStreamerPtr imagestreamer = createRunningImageStreamer(sender, sendImageOnce);
+//
+//	ssc::VideoSourcePtr videosource(new cx::ToolResamplingVolumeVideoSource());
+//	videosource->setTool(tool);
+//	videosource->setStreamer(imagestreamer);
+//
+//	probe->setRTSource(videosource);
+
+
+}
 
 
 }//namespace cx
