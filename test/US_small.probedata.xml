@@ -1,0 +1,6 @@
+<root>
+    <configuration width="37.584369449378343" temporalCalibration="106" depthStart="0.355239786856128" type="2" centerOffset="0" depthEnd="39.644760213143883">
+        <image width="640" height="480" origin_p="256.25 52.5 0" spacing="0.142096 0.142096 1" clipRect_p="   124.5    389.0    55.0    331.5      0.000      0.000"/>
+    </configuration>
+    <tool toolID="VividE9_11L"/>
+</root>
