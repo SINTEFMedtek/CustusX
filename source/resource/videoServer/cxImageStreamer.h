@@ -50,7 +50,7 @@ public:
 	virtual bool startStreaming(SenderPtr sender) = 0;
 	virtual void stopStreaming() = 0;
 
-	void setSendInterval(int interval); ///< how often an image should be sent (in milliseconds)
+	void setSendInterval(int milliseconds); ///< how often an image should be sent (in milliseconds)
 	int getSendInterval() const; ///< how often an image should be sent (in milliseconds)
 
 	virtual QString getType() = 0;
