@@ -9,7 +9,7 @@ class QEventLoop;
 namespace cxtest
 {
 
-bool waitForSignal(QObject* object, const char* signal, int maxWaitMilliSeconds = 5000);
+bool waitForSignal(QObject* object, const char* signal, int maxWaitMilliSeconds = 100);
 
 /**
  * \brief Object that waits for a signal to arrive from a given QObject. If
