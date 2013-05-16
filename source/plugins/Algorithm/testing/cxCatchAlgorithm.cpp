@@ -9,7 +9,7 @@
 #include "parameters.hpp"
 #include "tsf-config.h"
 
-SCENARIO("Loading the Neuro-Vessels-USA (gpu) preset", "[TSF]"){
+SCENARIO("Loading the Neuro-Vessels-USA (gpu) preset", "[TSF][unit]"){
 	GIVEN("we init the parameters with default values"){
 		std::string path = std::string(PARAMETERS_DIR);
 		paramList neuroVesselsUSAParameters;
@@ -49,7 +49,7 @@ SCENARIO("Loading the Neuro-Vessels-USA (gpu) preset", "[TSF]"){
 	}
 }
 
-SCENARIO("Loading the Phantom-Acc-US (gpu) preset", "[TSF]"){
+SCENARIO("Loading the Phantom-Acc-US (gpu) preset", "[TSF][unit]"){
 	GIVEN("we init the parameters with default values"){
 		std::string path = std::string(PARAMETERS_DIR);
 		paramList phantomAccUSParameters;
@@ -92,7 +92,7 @@ SCENARIO("Loading the Phantom-Acc-US (gpu) preset", "[TSF]"){
 #include "cxTSFPresets.h"
 #include <QStringList>
 
-TEST_CASE("should load tsf presets from file location and get more than 0 presets", "[TSF][TSFPresets]"){
+TEST_CASE("should load tsf presets from file location and get more than 0 presets", "[TSF][TSFPresets][unit]"){
 	cx::TSFPresetsPtr presets(new cx::TSFPresets());
 
 	QStringList presetList = presets->getPresetList();

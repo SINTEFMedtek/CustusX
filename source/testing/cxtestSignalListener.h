@@ -26,7 +26,7 @@ public:
 	SignalListener(QObject* object, const char* signal, int maxWaitMilliSeconds = 5000);
 	virtual ~SignalListener();
 
-	int exec(); ///< runs the eventloop that
+	int exec(); ///< runs the eventloop that makes sure signals are sent
 	bool timedOut();
 
 private slots:
