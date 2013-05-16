@@ -32,7 +32,7 @@ public:
 	int mCurrentFrame;
 	QString mRawUid;
 };
-typedef boost::shared_ptr<class ImageTestData> ImageStreamsForTestingPtr;
+typedef boost::shared_ptr<class ImageTestData> ImageTestDataPtr;
 
 
 /**
@@ -71,13 +71,13 @@ private:
 	bool mInitialized;
 	bool mSendOnce;
 
-	void initalizePrimaryAndSecondaryData(vtkImageDataPtr source);
-	unsigned long int shouldSetupSecondaryStream();
+	void initalizePrimaryAndSecondaryDataSource(vtkImageDataPtr source);
+	unsigned long int shouldSetupSecondaryDataSource();
 	vtkSmartPointer<vtkImageData> hasSecondaryData();
-	void createTestData(vtkImageDataPtr source);
-	void sendTestData();
-	ImageTestData mPrimaryData;
-	ImageTestData mSecondaryData;
+	void createTestDataSource(vtkImageDataPtr source);
+	void sendTestDataFrames();
+	ImageTestData mPrimaryDataSource;
+	ImageTestData mSecondaryDataSource;
 
 };
 typedef boost::shared_ptr<class MHDImageStreamer> MHDImageStreamerPtr;
