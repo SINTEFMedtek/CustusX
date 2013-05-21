@@ -142,7 +142,7 @@ PackagePtr ImageTestData::createPackage(ImageTestData* data)
 MHDImageStreamer::MHDImageStreamer() :
 		mInitialized(false), mSendOnce(false)
 {
-	setSendInterval(40);
+	this->setSendInterval(40);
 }
 
 QString MHDImageStreamer::getType()
@@ -184,7 +184,7 @@ QString MHDImageStreamer::getFileName()
 
 void MHDImageStreamer::createTestDataSource(vtkImageDataPtr source)
 {
-	initalizePrimaryAndSecondaryDataSource(source);
+	this->initalizePrimaryAndSecondaryDataSource(source);
 }
 
 void MHDImageStreamer::setInitialized(bool initialized)
@@ -196,27 +196,27 @@ void MHDImageStreamer::initialize(StringMap arguments)
 {
 	ImageStreamer::initialize(arguments);
 	QString filename = getFileName();
-	vtkImageDataPtr source = internalLoadImage(filename);
+	vtkImageDataPtr source = this->internalLoadImage(filename);
 	if (!source)
 	{
-		setInitialized(false);
+		this->setInitialized(false);
 		return;
 	}
-	createTestDataSource(source);
-	setSendOnce();
-	createSendTimer();
-	setInitialized(true);
+	this->createTestDataSource(source);
+	this->setSendOnce();
+	this->createSendTimer();
+	this->setInitialized(true);
 }
 
 bool MHDImageStreamer::startStreaming(SenderPtr sender)
 {
-	if (!isInitialized())
+	if (!this->isInitialized())
 	{
 		std::cout << "MHDImageStreamer: Failed to start streaming: Not initialized." << std::endl;
 		return false;
 	}
 	mSender = sender;
-	mSendTimer->start(getSendInterval());
+	mSendTimer->start(this->getSendInterval());
 	return true;
 }
 
@@ -235,7 +235,7 @@ void MHDImageStreamer::sendTestDataFrames()
 	PackagePtr primaryPackage = ImageTestData::createPackage(&mPrimaryDataSource);
 	mSender->send(primaryPackage);
 
-	if(!hasSecondaryData())
+	if(!this->hasSecondaryData())
 		return;
 
 	PackagePtr secondaryPackage = ImageTestData::createPackage(&mSecondaryDataSource);
@@ -244,10 +244,10 @@ void MHDImageStreamer::sendTestDataFrames()
 
 void MHDImageStreamer::stream()
 {
-	if (!isReadyToSend())
+	if (!this->isReadyToSend())
 		return;
 
-	sendTestDataFrames();
+	this->sendTestDataFrames();
 }
 
 bool MHDImageStreamer::isInitialized()
@@ -264,7 +264,7 @@ void MHDImageStreamer::initalizePrimaryAndSecondaryDataSource(vtkImageDataPtr so
 {
 	mPrimaryDataSource = ImageTestData::initializePrimaryData(source, getFileName());
 
-	if (!shouldSetupSecondaryDataSource())
+	if (!this->shouldSetupSecondaryDataSource())
 		return;
 
 	mSecondaryDataSource = ImageTestData::initializeSecondaryData(source, getFileName());
