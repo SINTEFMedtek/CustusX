@@ -66,6 +66,7 @@ namespace cx
 VideoConnection::VideoConnection()
 {
 	mConnected = false;
+	mUnsusedProbeDataVector.clear();
 
 	connect(ssc::toolManager(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
 	connect(ssc::toolManager(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
@@ -227,8 +228,17 @@ void VideoConnection::clientFinishedSlot()
 
 void VideoConnection::useUnusedProbeDataSlot()
 {
+	std::cout <<"VideoConnection::useUnusedProbeDataSlot()" << std::endl;
 	disconnect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
-	this->updateStatus(mUnsusedProbeData);
+	//std::cout <<"VideoConnection::useUnusedProbeDataSlot() start: " << mUnsusedProbeData.getDepthStart() << " end: " << mUnsusedProbeData.getDepthEnd() << std::endl;
+	//std::cout <<"width: " << mUnsusedProbeData.getWidth() << " uid: " << mUnsusedProbeData.getUid() << std::endl;
+	for (std::vector<ssc::ProbeData>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
+	{
+		this->updateStatus(*citer);
+		std::cout << " uid: " << citer->getUid() << std::endl;
+	}
+	mUnsusedProbeDataVector.clear();
+//	this->updateStatus(mUnsusedProbeData);
 }
 
 /** extract information from the IGTLinkUSStatusMessage
@@ -237,12 +247,15 @@ void VideoConnection::useUnusedProbeDataSlot()
  */
 void VideoConnection::updateStatus(ssc::ProbeData msg)
 {
+	std::cout <<"VideoConnection::updateStatus()" << std::endl;
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (!tool || !tool->getProbe())
 	{
-		//Don't throw away the ProbeData. Save it till it can be used
-		mUnsusedProbeData = msg;
-		connect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+		//Don't throw away the ProbeData. Save it untill it can be used
+//		mUnsusedProbeData = msg;
+		if (mUnsusedProbeDataVector.empty())
+			connect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}
 	ProbePtr probe = boost::dynamic_pointer_cast<Probe>(tool->getProbe());
@@ -265,8 +278,8 @@ void VideoConnection::updateStatus(ssc::ProbeData msg)
 
 //	std::cout << "VideoConnection::updateSonixStatus post\n" << streamXml2String(data) << std::endl;
 
-	probe->setData(data);
 	probe->setDigitalStatus(true);
+	probe->setData(data, "Digital");
 }
 
 void VideoConnection::updateImage(ssc::ImagePtr message)

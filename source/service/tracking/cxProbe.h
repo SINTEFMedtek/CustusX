@@ -43,9 +43,7 @@ class Probe: public ssc::Probe
 Q_OBJECT
 public:
 	static ProbePtr New(QString instrumentUid, QString scannerUid);
-	virtual ~Probe()
-	{
-	}
+	virtual ~Probe(){}
 	virtual bool isValid() const;
 
 	virtual QStringList getAvailableVideoSources();
