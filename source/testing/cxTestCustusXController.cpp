@@ -86,8 +86,8 @@ void CustusXController::initialBeginCheckRenderSlot()
 
 void CustusXController::initialEndCheckRenderSlot()
 {
-  std::cout << cx::viewManager()->getRenderTimer()->dumpStatistics() << std::endl;
-  mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics();
+//  std::cout << cx::viewManager()->getRenderTimer()->dumpStatistics() << std::endl;
+//  mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics();
 
   // start next timing
   cx::viewManager()->getRenderTimer()->reset(5*mBaseTime);
@@ -103,17 +103,19 @@ void CustusXController::initialEndCheckRenderSlot()
 
 void CustusXController::secondEndCheckRenderSlot()
 {
-//  std::cout << cx::viewManager()->getRenderTimer()->dumpStatistics() << std::endl;
-//  mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics();
+  std::cout << cx::viewManager()->getRenderTimer()->dumpStatistics() << std::endl;
+  mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics() + "\n";
+//  mTestData += "\n";
 
-//  this->displayResultsSlot();
+  this->displayResultsSlot();
+  QTimer::singleShot(2*1000,   qApp, SLOT(quit()) );
 }
 
 void CustusXController::displayResultsSlot()
 {
   //std::cout << "Hello TextEdit!" << std::endl;
   QTextEdit* textEdit = new QTextEdit;
-  textEdit->resize(800,480);
+  textEdit->resize(900,480);
   textEdit->setText(mTestData);
   textEdit->show();
 }
