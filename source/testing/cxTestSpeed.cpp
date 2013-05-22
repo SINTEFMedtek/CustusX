@@ -9,14 +9,13 @@
 void cxTestSpeed::setUp()
 {
 	// this stuff will be performed just before all tests in this class
-	mPreviousRenderingInterval = cx::settings()->value("renderingInterval").toInt();
+	cx::DataLocations::setTestMode();
 	cx::settings()->setValue("renderingInterval", 4);
 }
 
 void cxTestSpeed::tearDown()
 {
 	// this stuff will be performed just after all tests in this class
-	cx::settings()->setValue("renderingInterval", mPreviousRenderingInterval);
 }
 
 /**
