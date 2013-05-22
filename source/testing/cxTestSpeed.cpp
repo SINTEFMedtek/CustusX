@@ -21,7 +21,7 @@ void cxTestSpeed::tearDown()
 
 /**
  */
-void cxTestSpeed::testKaisaMetricsSpeed()
+void cxTestSpeed::testKaisaSpeedPerformance()
 {
   CustusXController custusX(NULL);
 
