@@ -89,7 +89,8 @@ private:
 	GrabberReceiveThreadPtr mClient;
 	bool mConnected;
 	double mFPS;
-	ssc::ProbeData mUnsusedProbeData;
+//	ssc::ProbeData mUnsusedProbeData;
+	std::vector<ssc::ProbeData> mUnsusedProbeDataVector;
 
 	std::vector<BasicVideoSourcePtr> mSources;
 };
