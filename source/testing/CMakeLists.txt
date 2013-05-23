@@ -12,6 +12,29 @@ endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
 
+#
+# Build a library with testing functionality
+#
+set( cxtest_moc_files
+	cxtestUtilities.h
+)
+
+set (cxtestUtilities_source
+	cxtestUtilities.h
+	cxtestUtilities.cpp
+)
+
+include_directories(
+    .
+    )
+
+
+QT4_WRAP_CPP( cxtest_moced_files ${cxtest_moc_files} )
+
+add_library( cxtestUtilities ${cxtestUtilities_source} ${cxtest_moced_files} )
+target_link_libraries(cxtestUtilities SSC)# cxResource OpenIGTLink cxTrackingService cxGrabber)
+
+
 ####################################################################################
     # CATCH -start
     
@@ -60,6 +83,8 @@ if (BUILD_TESTING)
     #------------------------------------------------------------------------------
     set( CATCH_LIBS
         cxPluginAlgorithm
+        
+        cxtestUtilities
     )
     if (CX_USE_TSF)
         set( CATCH_LIBS

@@ -23,7 +23,7 @@ class SignalListener : public QObject
 	Q_OBJECT
 
 public:
-	SignalListener(QObject* object, const char* signal, int maxWaitMilliSeconds = 5000);
+	SignalListener(QObject* object, const char* signal, int maxWaitMilliSeconds = 100);
 	virtual ~SignalListener();
 
 	int exec(); ///< runs the eventloop that makes sure signals are sent
