@@ -100,19 +100,7 @@ QStringList ImageStreamerOpenCV::getArgumentDescription()
 
 void ImageStreamerOpenCV::initialize(StringMap arguments)
 {
-//	mArguments = arguments;
-	ImageStreamer::initialize(arguments);
-
-	// Run an init/deinit to check that we have contact right away.
-	// Do NOT keep the connection open: This is because we have no good way to
-	// release resources if the server is a local app and is killed by CustusX.
-	// This way, we can disconnect (thus releasing resources), and then safely
-	// remove the usb cable without having dangling resources in openCV. (problem at least on Linux)
-	//
-	// Removed: When running as direct link, this causes several seconds of delay at startup.
-	// Instead, the ImageServer calls a start/stop streaming during init.
-    //	this->initialize_local();
-	//	this->deinitialize_local();
+	CommandLineStreamer::initialize(arguments);
 }
 
 void ImageStreamerOpenCV::deinitialize_local()
@@ -123,10 +111,6 @@ void ImageStreamerOpenCV::deinitialize_local()
 
 void ImageStreamerOpenCV::initialize_local()
 {
-//	// if in main thread only (debug)
-//	if (this->thread() == QCoreApplication::instance()->thread() && !mSocket)
-//		cv::namedWindow("ImageStreamerOpenCV", CV_WINDOW_KEEPRATIO); //resizable window;
-
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
 	if (!mArguments.count("out_width"))

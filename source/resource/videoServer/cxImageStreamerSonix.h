@@ -33,7 +33,7 @@ namespace cx
  *
  * This version uses openCV to grab images from the Ultrasonix scanner
  */
-class ImageStreamerSonix : public ImageStreamer
+class ImageStreamerSonix : public CommandLineStreamer
 {
   Q_OBJECT
 
@@ -82,9 +82,6 @@ private:
   QMutex mStatusMutex; ///< A lock for making the class threadsafe
   std::list<IGTLinkUSStatusMessage::Pointer> mMutexedStatusMessageQueue; ///< A threasafe internal queue
 
-//  GrabberSenderPtr mSender;
-//  QTimer* mSendTimer;
-//  StringMap mArguments;
   bool mEmitStatusMessage; ///< Emit new US status message
   double mLastFrameTimestamp; ///< Time stamp of last frame
   double mCurrentFrameTimestamp; ///< Current frame timestamp

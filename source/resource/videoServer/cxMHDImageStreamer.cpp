@@ -139,63 +139,47 @@ PackagePtr ImageTestData::createPackage(ImageTestData* data)
 	return package;
 }
 
-MHDImageStreamer::MHDImageStreamer() :
-		mInitialized(false), mSendOnce(false)
+DummyImageStreamer::DummyImageStreamer() :
+		 mSendOnce(false)
 {
 	this->setSendInterval(40);
 }
 
-QString MHDImageStreamer::getType()
+QString DummyImageStreamer::getType()
 {
 	return "MHDFile";
 }
 
-QStringList MHDImageStreamer::getArgumentDescription()
-{
-	QStringList retval;
-	retval << "--filename: Full name of mhd file";
-	retval << "--sendonce: If true, then send just once. (true/false)";
-	retval << "--secondary: If defined, two streams are sent, the secondary with a modification of the base image";
-	return retval;
-}
-
-
-void MHDImageStreamer::createSendTimer()
-{
-	mSendTimer = new QTimer(this);
-	mSendTimer->setSingleShot(mSendOnce);
-	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(stream()));
-}
-
-vtkImageDataPtr MHDImageStreamer::internalLoadImage(QString filename)
+vtkImageDataPtr DummyImageStreamer::internalLoadImage(QString filename)
 {
 	vtkImageDataPtr source = loadImage(filename);
 	if (source)
-		std::cout << "MHDImageStreamer: Initialized with source file: \n\t" << getFileName().toStdString() << std::endl;
+		std::cout << "DummyImageStreamer: Initialized with source file: \n\t" << getFileName().toStdString() << std::endl;
 	else
-		std::cout << "MHDImageStreamer: Failed to initialize with source file: \n\t" << getFileName().toStdString() << std::endl;
+		std::cout << "DummyImageStreamer: Failed to initialize with source file: \n\t" << getFileName().toStdString() << std::endl;
 
 	return source;
 }
-QString MHDImageStreamer::getFileName()
+QString DummyImageStreamer::getFileName()
 {
-	return mArguments["filename"];
+	return mFilename;
 }
 
-void MHDImageStreamer::createTestDataSource(vtkImageDataPtr source)
+void DummyImageStreamer::createTestDataSource(vtkImageDataPtr source)
 {
-	this->initalizePrimaryAndSecondaryDataSource(source);
+	mPrimaryDataSource = ImageTestData::initializePrimaryData(source, getFileName());
+
+	if (!this->shouldSetupSecondaryDataSource())
+		return;
+
+	mSecondaryDataSource = ImageTestData::initializeSecondaryData(source, getFileName());
+	std::cout << "DummyImageStreamer: Initialized secondary data with uid=" << mSecondaryDataSource.mRawUid << std::endl;
 }
 
-void MHDImageStreamer::setInitialized(bool initialized)
+void DummyImageStreamer::initialize(QString filename, bool secondaryStream, bool sendonce)
 {
-	mInitialized = initialized;
-}
-
-void MHDImageStreamer::initialize(StringMap arguments)
-{
-	ImageStreamer::initialize(arguments);
-	QString filename = getFileName();
+	mUseSecondaryStream = secondaryStream;
+	mFilename = filename;
 	vtkImageDataPtr source = this->internalLoadImage(filename);
 	if (!source)
 	{
@@ -203,16 +187,16 @@ void MHDImageStreamer::initialize(StringMap arguments)
 		return;
 	}
 	this->createTestDataSource(source);
-	this->setSendOnce();
-	this->createSendTimer();
+	this->setSendOnce(sendonce);
+	this->createSendTimer(sendonce);
 	this->setInitialized(true);
 }
 
-bool MHDImageStreamer::startStreaming(SenderPtr sender)
+bool DummyImageStreamer::startStreaming(SenderPtr sender)
 {
 	if (!this->isInitialized())
 	{
-		std::cout << "MHDImageStreamer: Failed to start streaming: Not initialized." << std::endl;
+		std::cout << "DummyImageStreamer: Failed to start streaming: Not initialized." << std::endl;
 		return false;
 	}
 	mSender = sender;
@@ -220,17 +204,17 @@ bool MHDImageStreamer::startStreaming(SenderPtr sender)
 	return true;
 }
 
-void MHDImageStreamer::stopStreaming()
+void DummyImageStreamer::stopStreaming()
 {
 	mSendTimer->stop();
 }
 
-vtkSmartPointer<vtkImageData> MHDImageStreamer::hasSecondaryData()
+vtkSmartPointer<vtkImageData> DummyImageStreamer::hasSecondaryData()
 {
 	return mSecondaryDataSource.mImageData;
 }
 
-void MHDImageStreamer::sendTestDataFrames()
+void DummyImageStreamer::sendTestDataFrames()
 {
 	PackagePtr primaryPackage = ImageTestData::createPackage(&mPrimaryDataSource);
 	mSender->send(primaryPackage);
@@ -242,7 +226,7 @@ void MHDImageStreamer::sendTestDataFrames()
 	mSender->send(secondaryPackage);
 }
 
-void MHDImageStreamer::stream()
+void DummyImageStreamer::streamSlot()
 {
 	if (!this->isReadyToSend())
 		return;
@@ -250,35 +234,14 @@ void MHDImageStreamer::stream()
 	this->sendTestDataFrames();
 }
 
-bool MHDImageStreamer::isInitialized()
+void DummyImageStreamer::setSendOnce(bool sendonce)
 {
-	return mInitialized;
+	mSendOnce = sendonce;
 }
 
-bool MHDImageStreamer::isReadyToSend()
+bool DummyImageStreamer::shouldSetupSecondaryDataSource()
 {
-	return mSender && mSender->isReady();
-}
-
-void MHDImageStreamer::initalizePrimaryAndSecondaryDataSource(vtkImageDataPtr source)
-{
-	mPrimaryDataSource = ImageTestData::initializePrimaryData(source, getFileName());
-
-	if (!this->shouldSetupSecondaryDataSource())
-		return;
-
-	mSecondaryDataSource = ImageTestData::initializeSecondaryData(source, getFileName());
-	std::cout << "MHDImageStreamer: Initialized secondary data with uid=" << mSecondaryDataSource.mRawUid << std::endl;
-}
-
-void MHDImageStreamer::setSendOnce()
-{
-	mSendOnce = mArguments["sendonce"].contains("true") ? true : false;
-}
-
-unsigned long int MHDImageStreamer::shouldSetupSecondaryDataSource()
-{
-	return mArguments.count("secondary");
+	return mUseSecondaryStream;
 }
 
 } //namespace cx

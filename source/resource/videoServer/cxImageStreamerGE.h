@@ -33,7 +33,7 @@ QString findOpenCLPath(QString additionalLocation); ///< Find GEStreamer OpenCL 
  * This version uses the NTNU ISB data streamer module (provided by Gabriel Kiss)
  * to grab images from the E9 EG scanner (and similar)
  */
-class ImageStreamerGE: public ImageStreamer
+class ImageStreamerGE: public CommandLineStreamer
 {
 	Q_OBJECT
 public:
@@ -54,20 +54,15 @@ private slots:
 private:
 	bool initialize_local();
 	void deinitialize_local();
-	//Deprecated
-//	IGTLinkImageMessage::Pointer getImageMessage();
-//	IGTLinkUSStatusMessage::Pointer getFrameStatus();
+
 	ssc::ProbeDataPtr getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img);
 	void send(const QString& uid, const vtkImageDataPtr& img, data_streaming::frame_geometry geometry, bool geometryChanged);
 
 	//Compare to geometry structs
 	bool equal(data_streaming::frame_geometry a, data_streaming::frame_geometry b);
-//	GrabberSenderPtr mSender;
-//	QTcpSocket* mSocket;
-	bool mInitialized;
-//	QTimer* mSendTimer;
+	void printTimeIntervals();
+
 	QTimer* mGrabTimer;
-//	StringMap mArguments;
 	CyclicActionTimerPtr mRenderTimer;
 
 	//The GE Connection code from ISB
