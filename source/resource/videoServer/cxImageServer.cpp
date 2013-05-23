@@ -29,31 +29,10 @@ bool ImageServer::initialize()
 	if(!mImageSender)
 		return false;
 
-//	// test streaming by starting/stopping once (will emit error messages right away instead of waiting for an incoming connecion.)
-//	ok = mImageSender->startStreaming(GrabberSenderPtr());
-//	mImageSender->stopStreaming();
 	ok = true;
 
 	return ok;
 
-//
-//	ImageSenderFactory factory;
-//	QString type = factory.getDefaultSenderType();
-//	if (args.count("type"))
-//		type = args["type"];
-//
-//	mImageSender = factory.getImageSender(type);
-//
-//	if (mImageSender)
-//	{
-//		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
-//	}
-//	else
-//	{
-//		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
-//	}
-//
-//	mImageSender->initialize(args);
 }
 
 bool ImageServer::startListen(int port)

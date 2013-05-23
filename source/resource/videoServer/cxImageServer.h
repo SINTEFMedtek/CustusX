@@ -32,7 +32,7 @@ protected:
 private slots:
 	void socketDisconnectedSlot();
 private:
-	ImageStreamerPtr mImageSender;
+	StreamerPtr mImageSender;
 	QPointer<QTcpSocket> mSocket;
 };
 

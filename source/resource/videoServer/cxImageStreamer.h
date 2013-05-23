@@ -18,7 +18,6 @@
 #include <QObject>
 #include <QString>
 #include <QStringList>
-//#include <QTcpSocket>
 #include <QTimer>
 
 #include <map>
@@ -28,9 +27,50 @@
 namespace cx
 {
 
-typedef std::map<QString, QString> StringMap;
+/**\brief
+ *
+ * \ingroup cxGrabberServer
+ *
+ * \date May 22, 2013
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class Streamer : public QObject
+{
+	Q_OBJECT
 
-/**\brief Interface for objects that emit an image stream to IGTLink
+public:
+	Streamer();
+	virtual ~Streamer(){};
+
+	virtual bool startStreaming(SenderPtr sender) = 0;
+	virtual void stopStreaming() = 0;
+
+	virtual QString getType() = 0;
+
+	void setSendInterval(int milliseconds); ///< how often an image should be sent (in milliseconds)
+	int getSendInterval() const; ///< how often an image should be sent (in milliseconds)
+
+protected slots:
+	virtual void streamSlot() = 0;
+
+protected:
+	void setInitialized(bool initialized);
+	bool isInitialized();
+	void createSendTimer(bool singleshot = false);
+	bool isReadyToSend();
+	SenderPtr mSender;
+	QTimer* mSendTimer;
+
+private:
+	int mSendInterval; ///< how often an image should be sent (in milliseconds)
+	bool mInitialized;
+
+};
+typedef boost::shared_ptr<Streamer> StreamerPtr;
+
+
+typedef std::map<QString, QString> StringMap;
+/**\brief
  *
  * \ingroup cxGrabberServer
  *
@@ -39,34 +79,47 @@ typedef std::map<QString, QString> StringMap;
  * \author Ole Vegard Solberg, SINTEF
  * \author Janne Beate Bakeng, SINTEF
  */
-class ImageStreamer : public QObject
+class ImageStreamer : public Streamer
 {
 	Q_OBJECT
 public:
-	ImageStreamer() : QObject(NULL), mSendTimer(0), mSendInterval(0) {}
+	ImageStreamer() {}
 	virtual ~ImageStreamer() {}
 
-	virtual void initialize(StringMap arguments);
-	virtual bool startStreaming(SenderPtr sender) = 0;
-	virtual void stopStreaming() = 0;
-
-	void setSendInterval(int milliseconds); ///< how often an image should be sent (in milliseconds)
-	int getSendInterval() const; ///< how often an image should be sent (in milliseconds)
-
-	virtual QString getType() = 0;
-	virtual QStringList getArgumentDescription() = 0;
-
 protected:
-	SenderPtr mSender;
-	QTimer* mSendTimer;
-	StringMap mArguments;
 
 private:
-	int mSendInterval; ///< how often an image should be sent (in milliseconds)
 
 };
 typedef boost::shared_ptr<ImageStreamer> ImageStreamerPtr;
 
+/**\brief
+ *
+ * \ingroup cxGrabberServer
+ *
+ * \date May 22, 2013
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class CommandLineStreamer : public Streamer
+{
+	Q_OBJECT
+
+public:
+	CommandLineStreamer(){};
+	virtual ~CommandLineStreamer(){};
+
+	virtual QStringList getArgumentDescription() = 0;
+
+	virtual void initialize(StringMap arguments);
+
+protected slots:
+	virtual void streamSlot() {std::cout << "THIS SHOULD NOT HAPPEN...." << std::endl;};
+
+
+protected:
+	StringMap mArguments;
+};
+typedef boost::shared_ptr<CommandLineStreamer> CommandLineStreamerPtr;
 }
 
 #endif /* CXIMAGESTREAMER_H_ */

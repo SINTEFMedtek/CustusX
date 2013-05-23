@@ -42,45 +42,40 @@ typedef boost::shared_ptr<class ImageTestData> ImageTestDataPtr;
  * \author Christian Askeland, SINTEF
  * \date Jun 21, 2011
  */
-class MHDImageStreamer: public ImageStreamer
+class DummyImageStreamer: public ImageStreamer
 {
 Q_OBJECT
 
 public:
-	MHDImageStreamer();
-	virtual ~MHDImageStreamer(){};
+	DummyImageStreamer();
+	virtual ~DummyImageStreamer(){};
 
-	virtual void initialize(StringMap arguments);
+	virtual void initialize(QString filename, bool secondaryStream, bool sendonce = false);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
 
 	virtual QString getType();
-	virtual QStringList getArgumentDescription();
 
 private slots:
-	void stream();
+	virtual void streamSlot();
 
 private:
-	bool isInitialized();
-	bool isReadyToSend();
-	void createSendTimer();
 	vtkImageDataPtr internalLoadImage(QString filename);
 	QString getFileName();
-	void setSendOnce();
-	void setInitialized(bool initialized);
-	bool mInitialized;
+	void setSendOnce(bool sendonce);
 	bool mSendOnce;
+	QString mFilename;
 
-	void initalizePrimaryAndSecondaryDataSource(vtkImageDataPtr source);
-	unsigned long int shouldSetupSecondaryDataSource();
+	bool shouldSetupSecondaryDataSource();
 	vtkSmartPointer<vtkImageData> hasSecondaryData();
 	void createTestDataSource(vtkImageDataPtr source);
 	void sendTestDataFrames();
+
+	bool mUseSecondaryStream;
 	ImageTestData mPrimaryDataSource;
 	ImageTestData mSecondaryDataSource;
-
 };
-typedef boost::shared_ptr<class MHDImageStreamer> MHDImageStreamerPtr;
+typedef boost::shared_ptr<class DummyImageStreamer> DummyImageStreamerPtr;
 
 }
 
