@@ -7,7 +7,6 @@
 #include <boost/shared_ptr.hpp>
 #include "sscImage.h"
 #include "sscTool.h"
-//#include <qtcpsocket.h>
 #include "cxIGTLinkImageMessage.h"
 #include "cxIGTLinkUSStatusMessage.h"
 

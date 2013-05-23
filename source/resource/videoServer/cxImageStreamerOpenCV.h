@@ -37,7 +37,7 @@ typedef boost::shared_ptr<cv::VideoCapture> VideoCapturePtr;
  *
  * This version uses openCV to grab images from a video file or camera
  */
-class ImageStreamerOpenCV: public ImageStreamer
+class ImageStreamerOpenCV: public CommandLineStreamer
 {
 Q_OBJECT
 
@@ -64,10 +64,7 @@ private:
 	void initialize_local();
 	void deinitialize_local();
 
-//	GrabberSenderPtr mSender;
-//	QTimer* mSendTimer;
 	QTimer* mGrabTimer;
-//	StringMap mArguments;
 	QSize mRescaleSize;
 
 	VideoCapturePtr mVideoCapture; // OpenCV video grabber

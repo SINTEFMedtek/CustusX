@@ -44,12 +44,10 @@ QStringList ImageStreamerSonix::getArgumentDescription()
 
 
 ImageStreamerSonix::ImageStreamerSonix() :
-//    ImageStreamer(parent),
 	mEmitStatusMessage(false),
 	mLastFrameTimestamp(0.0),
 	mCurrentFrameTimestamp(0.0)
-{
-}
+{}
 
 ImageStreamerSonix::~ImageStreamerSonix()
 {
@@ -67,7 +65,6 @@ void ImageStreamerSonix::initialize(StringMap arguments)
 {
 	std::cout << "Creating sender type Sonix" << std::endl;
 		  
-//    mArguments = arguments;
 	ImageStreamer::initialize(arguments);
 	
 	mMaxqueueInfo = 20;
@@ -91,12 +88,10 @@ void ImageStreamerSonix::initialize(StringMap arguments)
 	this->initializeSonixGrabber();
 }
 
-
 void ImageStreamerSonix::initializeSonixSlot()
 {
 	if(!mSonixGrabber->IsInitialized())
 	{
-		//std::cout << "initializeSonixSlot() Initializing..." << std::endl;
 		mSonixGrabber->Initialize();
 		return;
 	}
@@ -111,7 +106,6 @@ void ImageStreamerSonix::initializeSonixSlot()
 		std::cout << "Releasing Ultrasonix resources" << std::endl;
 		mSonixGrabber->ReleaseSystemResources();
 		disconnect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)));
-		//mSonixGrabber->Delete();
 
 		this->initializeSonixGrabber();
 	}
@@ -140,8 +134,6 @@ void ImageStreamerSonix::initializeSonixGrabber()
 	int bufferSize          = convertStringWithDefault(mArguments["buffersize"], 500);
 	int delay          		= convertStringWithDefault(mArguments["delay"], 80);
 
-
-
 	mSonixGrabber = vtkSonixVideoSource::New();
 	if (mArguments.count("debug"))
 		mSonixGrabber->setDebugOutput(true);
@@ -154,6 +146,7 @@ void ImageStreamerSonix::initializeSonixGrabber()
 	mSonixGrabber->SetFrameBufferSize(bufferSize);  // Number of image frames in buffer
 	mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
 
+	//TODO move to debug function OR DELETE!!! <jbake>
 	//std::cout << "imagingMode: " << imagingMode << std::endl;
 	//std::cout << "datatype: " << mArguments["datatype"].toStdString().c_str() << std::endl;
 	//std::cout << "acquisitionDataType: " << acquisitionDataType << " ";
@@ -321,7 +314,7 @@ void ImageStreamerSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
 }
 void ImageStreamerSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
 {
-	if (!mSender || !mSender->isReady())
+	if (!this->isReadyToSend())
 		return;
 
 //	if(!mSocket)
@@ -402,9 +395,6 @@ IGTLinkUSStatusMessage::Pointer ImageStreamerSonix::getLastStatusMessageFromQueu
   mMutexedStatusMessageQueue.pop_front();
   return retval;
 }
-//------------------------------------------------------------
-//------------------------------------------------------------
-//------------------------------------------------------------
 
 }
 
