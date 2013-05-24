@@ -19,12 +19,13 @@ int convertStringWithDefault(QString text, int def);
 /**Factory class for creation of CommandLineStreamer objects.
  *
  * \author Christian Askeland, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  * \date Aug 9, 2011
  */
-class ImageSenderFactory
+class ImageStreamerFactory
 {
 public:
-	ImageSenderFactory();
+	ImageStreamerFactory();
 	QString getDefaultSenderType() const;
 	QStringList getSenderTypes() const; ///< all available sender types
 	QStringList getArgumentDescription(QString type) const; ///< arguments for one streamer

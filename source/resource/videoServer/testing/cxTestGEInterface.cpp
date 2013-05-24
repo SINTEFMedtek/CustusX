@@ -138,7 +138,7 @@ void TestGEInterface::testAllStreamsGPUConsecutively()
 
 void TestGEInterface::testStream(cx::StringMap args)
 {
-	cx::StreamerPtr imageSender = cx::ImageSenderFactory().getFromArguments(args);
+	cx::StreamerPtr imageSender = cx::ImageStreamerFactory().getFromArguments(args);
 	CPPUNIT_ASSERT(imageSender);
 	CPPUNIT_ASSERT(imageSender->getType().compare(args["type"]) == 0);
 

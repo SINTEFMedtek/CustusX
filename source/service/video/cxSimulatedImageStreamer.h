@@ -35,7 +35,7 @@ private slots:
 	void sliceSlot(Transform3D matrix, double timestamp);
 
 private:
-	ssc::ImagePtr getSlice(ssc::ImagePtr source, Transform3D matrix);
+	ssc::ImagePtr getSlice(ssc::ImagePtr source);
 
 	ssc::ImagePtr mSourceImage;
 	ssc::ToolPtr mTool;
@@ -43,5 +43,6 @@ private:
 
 };
 typedef boost::shared_ptr<SimulatedImageStreamer> SimulatedImageStreamerPtr;
+
 } /* namespace cx */
 #endif /* CXSIMULATEDIMAGESTREAMER_H_ */
