@@ -32,7 +32,7 @@ void GrabberDirectLinkThread::run()
 {
 	ssc::messageManager()->sendInfo("Starting direct link grabber.");
 
-	mImageSender = ImageSenderFactory().getFromArguments(mArguments);
+	mImageSender = ImageStreamerFactory().getFromArguments(mArguments);
 	if(!mImageSender)
 	{
 		this->quit();

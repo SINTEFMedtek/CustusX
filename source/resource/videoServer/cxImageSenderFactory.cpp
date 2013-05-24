@@ -41,7 +41,7 @@ StringMap extractCommandlineOptions(QStringList cmdline)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-StreamerPtr ImageSenderFactory::getFromArguments(StringMap args)
+StreamerPtr ImageStreamerFactory::getFromArguments(StringMap args)
 {
 	QString type = this->getDefaultSenderType();
 	if (args.count("type"))
@@ -71,7 +71,7 @@ StreamerPtr ImageSenderFactory::getFromArguments(StringMap args)
 }
 
 
-ImageSenderFactory::ImageSenderFactory()
+ImageStreamerFactory::ImageStreamerFactory()
 {
 #ifdef CX_WIN32
 	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerSonix()));
@@ -85,14 +85,14 @@ ImageSenderFactory::ImageSenderFactory()
 	mImageStreamers.push_back(DummyImageStreamerPtr(new DummyImageStreamer()));
 }
 
-QString ImageSenderFactory::getDefaultSenderType() const
+QString ImageStreamerFactory::getDefaultSenderType() const
 {
 	// use the FIRST sender available
   QString retval = mCommandLineStreamers.front()->getType();
   return retval;
 }
 
-QStringList ImageSenderFactory::getSenderTypes() const
+QStringList ImageStreamerFactory::getSenderTypes() const
 {
 	QStringList retval;
 	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
@@ -102,7 +102,7 @@ QStringList ImageSenderFactory::getSenderTypes() const
 	return retval;
 }
 
-QStringList ImageSenderFactory::getArgumentDescription(QString type) const
+QStringList ImageStreamerFactory::getArgumentDescription(QString type) const
 {
 	QStringList retval;
 	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
@@ -113,7 +113,7 @@ QStringList ImageSenderFactory::getArgumentDescription(QString type) const
 	return retval;
 }
 
-StreamerPtr ImageSenderFactory::getImageSender(QString type)
+StreamerPtr ImageStreamerFactory::getImageSender(QString type)
 {
 	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
 	{

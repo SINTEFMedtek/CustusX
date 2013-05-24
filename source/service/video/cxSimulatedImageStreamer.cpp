@@ -60,10 +60,10 @@ void SimulatedImageStreamer::streamSlot()
 
 void SimulatedImageStreamer::sliceSlot(Transform3D matrix, double timestamp)
 {
-	mImageToSend = getSlice(mSourceImage, matrix);
+	mImageToSend = getSlice(mSourceImage);
 }
 
-ssc::ImagePtr SimulatedImageStreamer::getSlice(ssc::ImagePtr source, Transform3D matrix)
+ssc::ImagePtr SimulatedImageStreamer::getSlice(ssc::ImagePtr source)
 {
 	ssc::ImagePtr slice;
 
