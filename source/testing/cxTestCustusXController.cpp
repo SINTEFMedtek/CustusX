@@ -63,7 +63,7 @@ void CustusXController::loadPatientSlot()
 {
   cx::patientService()->getPatientData()->loadPatient(mPatientFolder);
   cx::stateService()->getWorkflow()->setActiveState("NavigationUid");
-  mMainWindow->setGeometry( 10, 10, 1200, 800);
+  mMainWindow->setGeometry( 0, 0, 2560, 1440);
 
   if (!ssc::DataManager::getInstance()->getImages().size())
     return;
