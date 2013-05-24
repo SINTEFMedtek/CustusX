@@ -53,7 +53,7 @@ void checkSenderGotImageFromStreamer(TestSenderPtr sender)
 	REQUIRE(image);
 }
 
-TEST_CASE("DummyImageStreamer: File should be read and sent only once", "[video][unit]")
+TEST_CASE("DummyImageStreamer: File should be read and sent only once", "[streaming][unit]")
 {
 	TestSenderPtr sender(new TestSender());
 	bool sendImageOnce = true;
@@ -68,7 +68,7 @@ TEST_CASE("DummyImageStreamer: File should be read and sent only once", "[video]
 	imagestreamer->stopStreaming();
 }
 
-TEST_CASE("DummyImageStreamer: File should be read and send slices with a given interval", "[video][unit]")
+TEST_CASE("DummyImageStreamer: File should be read and send slices with a given interval", "[streaming][unit]")
 {
 	TestSenderPtr sender(new TestSender());
 	bool sendTwoStreams = false;
@@ -83,7 +83,7 @@ TEST_CASE("DummyImageStreamer: File should be read and send slices with a given 
 	imagestreamer->stopStreaming();
 }
 
-TEST_CASE("Should stream 2D images from a volume given a probe", "[video][unit]")
+TEST_CASE("Should stream 2D images from a volume given a probe", "[streaming][unit]")
 {
 	TestSenderPtr sender(new TestSender());
 	REQUIRE(sender);
@@ -99,7 +99,7 @@ TEST_CASE("Should stream 2D images from a volume given a probe", "[video][unit]"
 	imagestreamer->stopStreaming();
 }
 
-//TEST_CASE("Probe should get simulated data", "[video][integration]")
+//TEST_CASE("Probe should get simulated data", "[streaming][integration]")
 //{
 //
 //	//TODO

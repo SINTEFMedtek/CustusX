@@ -38,13 +38,22 @@ def run(command):
 def printIntro():
     print('\n<<<<<<<<<< Private build script >>>>>>>>>>\n\t         *author*\n\t    Janne Beate Bakeng\n')
 
+def testStreaming():
+    return deque(["make -j8".split(" "),
+                   "./source/testing/Catch -g [streaming] -s".split(" "),
+                   "./source/plugins/Acquisition/testing/cxTestAcquisition_CppUnit_CTest -r".split(" "),
+                   "./source/resource/videoServer/testing/cxTestGEInterface_CppUnit_CTest -r".split(" ")
+                   ])
+    
+def testStreamingWidgets():
+    return deque(["make -j8".split(" "),
+                   "./source/testing/Catch -g [widget] -s".split(" ")#,
+#                    "./source/apps/CustusX/CustusX".split(" ")
+                   ])
+
 def main():
     printIntro()
-    command_queue = deque(["make -j8".split(" "),
-                           "./source/testing/Catch -g [video] -s".split(" "),
-                           "./source/plugins/Acquisition/testing/cxTestAcquisition_CppUnit_CTest -r".split(" "),
-                           "./source/resource/videoServer/testing/cxTestGEInterface_CppUnit_CTest -r".split(" ")
-                           ])
+    command_queue = testStreamingWidgets()
     
     while(command_queue):
         code = run(command_queue.popleft())
