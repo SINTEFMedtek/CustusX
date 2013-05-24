@@ -25,7 +25,7 @@ bool ImageServer::initialize()
 	bool ok = false;
 
 	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
-	mImageSender = ImageSenderFactory().getFromArguments(args);
+	mImageSender = ImageStreamerFactory().getFromArguments(args);
 	if(!mImageSender)
 		return false;
 
@@ -112,7 +112,7 @@ void ImageServer::printHelpText()
 QString ImageServer::getArgumentHelpText(QString applicationName)
 {
 	std::stringstream ss;
-	cx::ImageSenderFactory factory;
+	cx::ImageStreamerFactory factory;
 
 	ss << "Usage: " << applicationName << " (--arg <argval>)*" << std::endl;
 	ss << "    --port   : Tcp/IP port # (default=18333)" << std::endl;

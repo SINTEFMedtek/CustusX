@@ -37,11 +37,11 @@ typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPt
 
 /**
  * \class IGTLinkWidget
- * \brief GUI for setup of a IGTLink connection.
+ * \brief GUI for stting up a connection to a video stream
  * \ingroup cxGUI
  *
  * \date 2010.10.27
- * \\author Christian Askeland, SINTEF
+ * \author Christian Askeland, SINTEF
  */
 class VideoConnectionWidget : public BaseWidget
 {
@@ -80,13 +80,16 @@ private:
   QPushButton* mImportStreamImageButton;
   QVBoxLayout* mToptopLayout;
   ssc::FileSelectWidget* mInitScriptWidget;
+
   // remote server widgets:
   QComboBox* mAddressEdit;
   QLineEdit* mPortEdit;
+
   // local server widgets:
   QLineEdit* mLocalServerEdit;
   QLineEdit* mLocalServerArguments;
   QPushButton* mLaunchServerButton;
+
   // direct link widgets:
   QComboBox* mDirectLinkArguments;
 

@@ -1,10 +1,3 @@
-/*
- * cxImageServer.h
- *
- *  \date Oct 30, 2010
- *      \author christiana
- */
-
 #ifndef CXIMAGESERVER_H_
 #define CXIMAGESERVER_H_
 
@@ -16,9 +9,16 @@
 namespace cx
 {
 
+/**
+ * \brief ImageServer
+ *
+ * \date Oct 30, 2010
+ * \author Christian Askeland
+ */
+
 class ImageServer: public QTcpServer
 {
-Q_OBJECT
+	Q_OBJECT
 
 public:
 	ImageServer(QObject* parent = NULL);
