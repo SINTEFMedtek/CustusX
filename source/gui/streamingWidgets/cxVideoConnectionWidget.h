@@ -25,23 +25,30 @@ class QComboBox;
 class QLineEdit;
 class QStackedWidget;
 
+#include <QtTest/QtTest>
+
 namespace ssc
 {
 	class FileSelectWidget;
+	typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
 }
 
 namespace cx
 {
-typedef boost::shared_ptr<class IGTLinkClient> GrabberReceiveThreadIGTLinkPtr;
+//typedef boost::shared_ptr<class IGTLinkClient> GrabberReceiveThreadIGTLinkPtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
+typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
+
 
 /**
- * \class IGTLinkWidget
- * \brief GUI for stting up a connection to a video stream
+ * \brief GUI for setting up a connection to a video stream
+ *
  * \ingroup cxGUI
  *
  * \date 2010.10.27
  * \author Christian Askeland, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
+ *
  */
 class VideoConnectionWidget : public BaseWidget
 {
@@ -53,52 +60,63 @@ public:
 
   virtual QString defaultWhatsThis() const;
 
-private slots:
-  void toggleLaunchServer();
-  void launchServer();
-  void toggleConnectServer();
-  void connectServer();
-  void serverProcessStateChanged(QProcess::ProcessState newState);
-  void serverStatusChangedSlot();
-  void browseLocalServerSlot();
-  void importStreamImageSlot(); ///<Import a single image/volume from the RT stream
+protected slots:
+	void toggleLaunchServer();
+	void launchServer();
+	void toggleConnectServer();
+	void connectServer();
+	void serverProcessStateChanged(QProcess::ProcessState newState);
+	void serverStatusChangedSlot();
+	void browseLocalServerSlot();
+	void importStreamImageSlot();
+	void dataChanged();
+	void initScriptSelected(QString filename);
 
-  void dataChanged();
-  void initScriptSelected(QString filename);
+protected:
+	QHBoxLayout* initializeScriptWidget();
+	ssc::StringDataAdapterXmlPtr initializeConnectionSelector();
+	ActiveVideoSourceStringDataAdapterPtr initializeActiveVideoSourceSelector();
+	QFrame* wrapStackedWidgetInAFrame();
+	void updateHostHistory();
+	void updateDirectLinkArgumentHistory();
+	QProcess* getServer();
+	bool serverIsRunning();
+	VideoConnectionManagerPtr getConnection();
+	void writeSettings();
+	QPushButton* initializeConnectButton();
+	QPushButton* initializeImportStreamImageButton();
+	QStackedWidget* initializeStackedWidget();
+	QWidget* createDirectLinkWidget();
+	QWidget* createLocalServerWidget();
+	QWidget* createRemoteWidget();
+	QWidget* wrapVerticalStretch(QWidget* input);
 
-private:
-  void updateHostHistory();
-  void updateDirectLinkArgumentHistory();
-  QProcess* getServer();
-  VideoConnectionManagerPtr getConnection();
-  void writeSettings();
+	QPushButton* mConnectButton;
+	QPushButton* mImportStreamImageButton;
+	QVBoxLayout* mToptopLayout;
+	ssc::FileSelectWidget* mInitScriptWidget;
+	QComboBox* mAddressEdit;
+	QLineEdit* mPortEdit;
+	QLineEdit* mLocalServerEdit;
+	QLineEdit* mLocalServerArguments;
+	QPushButton* mLaunchServerButton;
+	QComboBox* mDirectLinkArguments;
+	QStackedWidget* mStackedWidget;
+	ssc::StringDataAdapterXmlPtr mConnectionSelector;
+	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
 
-  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
+};
 
-  QPushButton* mConnectButton;
-  QPushButton* mImportStreamImageButton;
-  QVBoxLayout* mToptopLayout;
-  ssc::FileSelectWidget* mInitScriptWidget;
+class QTestVideoConnection : public VideoConnectionWidget
+{
+	Q_OBJECT
 
-  // remote server widgets:
-  QComboBox* mAddressEdit;
-  QLineEdit* mPortEdit;
+public:
+	QTestVideoConnection();
+	virtual ~QTestVideoConnection(){};
 
-  // local server widgets:
-  QLineEdit* mLocalServerEdit;
-  QLineEdit* mLocalServerArguments;
-  QPushButton* mLaunchServerButton;
-
-  // direct link widgets:
-  QComboBox* mDirectLinkArguments;
-
-  QStackedWidget* mStackedWidget;
-  QWidget* createDirectLinkWidget();
-  QWidget* createLocalServerWidget();
-  QWidget* createRemoteWidget();
-  QWidget* wrapVerticalStretch(QWidget* input);
-
+public slots:
+	bool startServer();
 };
 
 }//end namespace cx
