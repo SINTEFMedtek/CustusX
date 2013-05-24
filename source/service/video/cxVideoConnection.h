@@ -49,9 +49,9 @@ typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
  *  \ingroup cxServiceVideo
  *  \date Oct 31, 2010
  *  \date Feb 26, 2013
- *  \author christiana
+ *  \author Christian Askeland, SINTEF
  */
-class VideoConnection : public QObject // ssc::VideoSource
+class VideoConnection : public QObject
 {
 Q_OBJECT
 public:
@@ -59,7 +59,6 @@ public:
 	virtual ~VideoConnection();
 	virtual bool isConnected() const;
 
-	// non-inherited methods
 	void directLink(std::map<QString, QString> args);
 	void connectServer(QString address, int port);
 	void disconnectServer();
@@ -83,13 +82,15 @@ private slots:
 private:
 	void updateImage(ssc::ImagePtr message); // called by receiving thread when new data arrives.
 	void runClient(GrabberReceiveThreadPtr client);
-	void stopClient();
+	void stopClient(); ///< Get rid of the mClient thread.
 	void updateStatus(ssc::ProbeDataPtr message);
+	void startAllSources();
+	void removeSourceFromProbe(ssc::ToolPtr tool);
 
 	GrabberReceiveThreadPtr mClient;
 	bool mConnected;
 	double mFPS;
-	ssc::ProbeDataPtr mUnsusedProbeData;
+	std::vector<ssc::ProbeDataPtr> mUnsusedProbeDataVector;
 
 	std::vector<BasicVideoSourcePtr> mSources;
 };

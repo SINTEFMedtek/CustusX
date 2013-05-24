@@ -103,6 +103,8 @@ void Probe::setTemporalCalibration(double val)
 
 void Probe::setSoundSpeedCompensationFactor(double factor)
 {
+	if(ssc::similar(mSoundSpeedCompensationFactor, factor))
+		return;
 	mSoundSpeedCompensationFactor = factor;
 	for (std::map<QString, ssc::ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
 		iter->second.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
@@ -178,7 +180,8 @@ void Probe::setDigitalStatus(bool digitalStatus)
 {
 	mDigitalInterface = digitalStatus;
 	if (digitalStatus)
-		mConfigurationId = "Digital";
+		this->setConfigId("Digital");
+//		mConfigurationId = "Digital";
 }
 
 void Probe::addXml(QDomNode& dataNode)
@@ -199,7 +202,7 @@ void Probe::parseXml(QDomNode& dataNode)
 
 QStringList Probe::getConfigIdList() const
 {
-//	std::cout << "Probe::getConfigIdList()" << std::endl;
+	std::cout << "Probe::getConfigIdList()" << std::endl;
 	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
 	if (rtSourceList.empty())
 		return QStringList();
@@ -223,7 +226,7 @@ QString Probe::getConfigId() const
 
 QString Probe::getConfigurationPath() const
 {
-//	std::cout << "Probe::getConfigurationPath()" << std::endl;
+	std::cout << "Probe::getConfigurationPath()" << std::endl;
 	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
 	if (rtSourceList.isEmpty())
 		return "";
@@ -237,16 +240,19 @@ QString Probe::getConfigurationPath() const
 
 void Probe::setConfigId(QString uid)
 {
+	std::cout << "Probe::setConfigId(): " << uid << std::endl;
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(uid);
 	if (config.isEmpty())
 		return;
-
-	ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
-//  std::cout << "probeSector.mTemporalCalibration" << probeSector.mTemporalCalibration << std::endl;
-//	mConfigurationId = uid;
-//	mData = probeSector;
-	probeSector.setUid(mActiveUid);
-	this->setData(probeSector, uid);
+	if(uid.compare("Digital") != 0)
+	{
+		ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
+		//  std::cout << "probeSector.mTemporalCalibration" << probeSector.mTemporalCalibration << std::endl;
+		//	mConfigurationId = uid;
+		//	mData = probeSector;
+		probeSector.setUid(mActiveUid);
+		this->setData(probeSector, uid);
+	}
 	//Update temporal calibration and sound speed compensation
 	if (mOverrideTemporalCalibration)
 		this->setTemporalCalibration(mTemporalCalibration);
@@ -263,7 +269,7 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 
 ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
 {
-//	std::cout << "Probe::getConfiguration()" << std::endl;
+	std::cout << "Probe::getConfiguration()" << std::endl;
 	ProbeXmlConfigParser::Configuration config;
 	QStringList rtSourceList = mXml->getRtSourceList(mScannerUid, mInstrumentUid);
 	if (rtSourceList.isEmpty())
@@ -273,6 +279,7 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
 	if (mDigitalInterface)
 		rtSource = "Digital";
 	config = mXml->getConfiguration(mScannerUid, mInstrumentUid, rtSource, uid);
+	std::cout << "Probe::getConfiguration rtSource: " << config.mRtSource << " uid: " << uid << std::endl;
 	return config;
 }
 
