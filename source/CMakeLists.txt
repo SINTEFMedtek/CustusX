@@ -13,6 +13,7 @@ find_package( Boost REQUIRED )
 # Qt
 #----------
 set(QT_USE_QTXML TRUE)
+set(QT_USE_QTTEST TRUE)
 find_package(Qt4 REQUIRED)
 if(QT_USE_FILE)
   include(${QT_USE_FILE})

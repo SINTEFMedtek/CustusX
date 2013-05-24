@@ -52,6 +52,7 @@ target_link_libraries(cxtestUtilities SSC)# cxResource OpenIGTLink cxTrackingSer
         cxtestSignalListener.cpp
         ../plugins/Algorithm/testing/cxCatchAlgorithm.cpp
         ../service/video/testing/cxCatchVideo.cpp
+        ../gui/streamingWidgets/testing/cxtestCatchStreamingWidgets.cpp
     )
     
     #------------------------------------------------------------------------------
@@ -59,6 +60,8 @@ target_link_libraries(cxtestUtilities SSC)# cxResource OpenIGTLink cxTrackingSer
     #-----------------------------------------------------------------------------
     include_directories(
 		.
+		${CustusX3_SOURCE_DIR}/source/gui/utilities
+		${CustusX3_SOURCE_DIR}/source/gui/streamingWidgets
 		${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/logic
 		${CustusX3_SOURCE_DIR}/source/services/video
 		${CustusX3_SOURCE_DIR}/source/resource/videoServer
@@ -83,7 +86,7 @@ target_link_libraries(cxtestUtilities SSC)# cxResource OpenIGTLink cxTrackingSer
     #------------------------------------------------------------------------------
     set( CATCH_LIBS
         cxPluginAlgorithm
-        
+        cxGui
         cxtestUtilities
     )
     if (CX_USE_TSF)
