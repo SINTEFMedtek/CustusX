@@ -11,13 +11,6 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-
-/*
- * sscOpenIGTLinkRTSource.cpp
- *
- *  \date Oct 31, 2010
- *      \author christiana
- */
 #include "cxVideoConnection.h"
 
 #include <math.h>
@@ -66,11 +59,11 @@ namespace cx
 VideoConnection::VideoConnection()
 {
 	mConnected = false;
+	mUnsusedProbeDataVector.clear();
 
 	connect(ssc::toolManager(), SIGNAL(configured()),                 this, SLOT(connectVideoToProbe()));
 	connect(ssc::toolManager(), SIGNAL(initialized()),                this, SLOT(connectVideoToProbe()));
 	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(connectVideoToProbe()));
-//	connect(this,               SIGNAL(videoSourcesChanged()),        this, SLOT(connectVideoToProbe()));
 }
 
 VideoConnection::~VideoConnection()
@@ -84,22 +77,6 @@ void VideoConnection::fpsSlot(double fpsNumber)
 	emit fps(fpsNumber);
 }
 
-//QString VideoConnection::getInfoString() const
-//{
-//	if (!mClient)
-//		return "";
-//	return mClient->hostDescription() + " - " + QString::number(mFPS, 'f', 1) + " fps";
-//}
-
-//QString VideoConnection::getStatusString() const
-//{
-//	if (!mClient)
-//		return "Not connected";
-//	if (mTimeout)
-//		return "Timeout";
-//	return "Running";
-//}
-
 bool VideoConnection::isConnected() const
 {
 	return mClient && mConnected;
@@ -110,14 +87,9 @@ void VideoConnection::connectedSlot(bool on)
 	mConnected = on;
 
 	if (on)
-	{
-		for (unsigned i=0; i<mSources.size(); ++i)
-			mSources[i]->start();
-	}
+		this->startAllSources();
 	else
-	{
 		this->disconnectServer();
-	}
 
 	emit connected(on);
 }
@@ -144,7 +116,6 @@ void VideoConnection::runClient(GrabberReceiveThreadPtr client)
 	connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(sonixStatusReceived()), this, SLOT(statusReceivedSlot())); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
-	//connect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
 	connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
 	mClient->start();
@@ -164,9 +135,6 @@ void VideoConnection::statusReceivedSlot()
 	this->updateStatus(mClient->getLastSonixStatusMessage());
 }
 
-/**Get rid of the mClient thread.
- *
- */
 void VideoConnection::stopClient()
 {
 	if (mClient)
@@ -196,21 +164,11 @@ void VideoConnection::disconnectServer()
 	this->stopClient();
 
 	for (unsigned i=0; i<mSources.size(); ++i)
-	{
 		mSources[i]->setInput(ssc::ImagePtr());
-	}
 
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (tool && tool->getProbe())
-	{
-		ssc::ProbePtr probe = tool->getProbe();
-
-		for (unsigned i=0; i<mSources.size(); ++i)
-		{
-	//		std::cout << "***********============= set source in probe " << tool->getUid() << std::endl;
-			probe->removeRTSource(mSources[i]);
-		}
-	}
+		this->removeSourceFromProbe(tool);
 
 	mSources.clear();
 	emit videoSourcesChanged();
@@ -227,8 +185,14 @@ void VideoConnection::clientFinishedSlot()
 
 void VideoConnection::useUnusedProbeDataSlot()
 {
+	std::cout <<"VideoConnection::useUnusedProbeDataSlot()" << std::endl;
 	disconnect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
-	this->updateStatus(mUnsusedProbeData);
+	for (std::vector<ssc::ProbeDataPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
+	{
+		this->updateStatus(*citer);
+		std::cout << " uid: " << (*citer)->getUid() << std::endl;
+	}
+	mUnsusedProbeDataVector.clear();
 }
 
 /** extract information from the IGTLinkUSStatusMessage
@@ -237,12 +201,14 @@ void VideoConnection::useUnusedProbeDataSlot()
  */
 void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
 {
+	std::cout <<"VideoConnection::updateStatus()" << std::endl;
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (!tool || !tool->getProbe())
 	{
-		//Don't throw away the ProbeData. Save it till it can be used
-		mUnsusedProbeData = msg;
-		connect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+		//Don't throw away the ProbeData. Save it untill it can be used
+		if (mUnsusedProbeDataVector.empty())
+			connect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}
 	ProbePtr probe = boost::dynamic_pointer_cast<Probe>(tool->getProbe());
@@ -251,7 +217,6 @@ void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
 	// existing values (such as temporal calibration).
 	// Note that the 'active' data is get while the 'uid' data is set.
 	ssc::ProbeData data = probe->getData();
-//	std::cout << "VideoConnection::updateSonixStatus pre \n" << streamXml2String(data) << std::endl;
 
 	data.setUid(msg->getUid());
 	data.setType(msg->getType());
@@ -263,10 +228,21 @@ void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
 	image.mClipRect_p = msg->getImage().mClipRect_p;
 	data.setImage(image);
 
-//	std::cout << "VideoConnection::updateSonixStatus post\n" << streamXml2String(data) << std::endl;
-
-	probe->setData(data);
 	probe->setDigitalStatus(true);
+	probe->setData(data, "Digital");
+}
+
+void VideoConnection::startAllSources()
+{
+	for (unsigned i=0; i<mSources.size(); ++i)
+		mSources[i]->start();
+}
+
+void VideoConnection::removeSourceFromProbe(ssc::ToolPtr tool)
+{
+	ssc::ProbePtr probe = tool->getProbe();
+	for (unsigned i=0; i<mSources.size(); ++i)
+		probe->removeRTSource(mSources[i]);
 }
 
 void VideoConnection::updateImage(ssc::ImagePtr message)
@@ -285,14 +261,12 @@ void VideoConnection::updateImage(ssc::ImagePtr message)
 	if (!source)
 	{
 		source.reset(new BasicVideoSource());
-//		std::cout << "*************** creating new VideoSourcev"<< source.get() <<" for " << message->getUid() << std::endl;
 		mSources.push_back(source);
 		source->start();
 		newSource = true;
 	}
 	// set input.
 	source->setInput(message);
-//	std::cout << "  updating stream " << message->getUid() << std::endl;
 
 	QString info = mClient->hostDescription() + " - " + QString::number(mFPS, 'f', 1) + " fps";
 	source->setInfoString(info);
@@ -320,21 +294,16 @@ std::vector<ssc::VideoSourcePtr> VideoConnection::getVideoSources()
  */
 void VideoConnection::connectVideoToProbe()
 {
-//	SSC_LOG("");
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (!tool)
 		return;
+
 	ssc::ProbePtr probe = tool->getProbe();
 	if (!probe)
 		return;
 
 	for (unsigned i=0; i<mSources.size(); ++i)
-	{
-//		std::cout << "***********============= set source in probe " << tool->getUid() << std::endl;
 		probe->setRTSource(mSources[i]);
-	}
 }
-
-
 
 }

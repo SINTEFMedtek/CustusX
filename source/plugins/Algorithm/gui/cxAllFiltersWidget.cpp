@@ -1,5 +1,7 @@
 #include "cxAllFiltersWidget.h"
 
+#include "sscStringDataAdapterXml.h"
+
 #include "sscMessageManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
