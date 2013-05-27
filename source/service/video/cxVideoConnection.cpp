@@ -96,6 +96,7 @@ void VideoConnection::connectedSlot(bool on)
 
 void VideoConnection::directLink(std::map<QString, QString> args)
 {
+	std::cout << "VideoConnection::directLink(std::map<QString, QString> args)" << std::endl;
 	this->runClient(GrabberReceiveThreadPtr(new GrabberDirectLinkThread(args, this)));
 }
 

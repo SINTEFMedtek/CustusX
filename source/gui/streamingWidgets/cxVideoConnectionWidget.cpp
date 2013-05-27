@@ -71,6 +71,10 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 	this->dataChanged();
 }
 
+VideoConnectionWidget::~VideoConnectionWidget()
+{
+}
+
 QHBoxLayout* VideoConnectionWidget::initializeScriptWidget()
 {
 	QHBoxLayout* initScriptLayout = new QHBoxLayout();
@@ -192,10 +196,6 @@ QWidget* VideoConnectionWidget::createRemoteWidget()
 	return retval;
 }
 
-VideoConnectionWidget::~VideoConnectionWidget()
-{
-}
-
 QString VideoConnectionWidget::defaultWhatsThis() const
 {
 	return "<html><h3><Setup IGTLink connection.</h3><p>Lets you set up a connection to a streaming server using IGTLink.</p><p><i></i></p></html>";
@@ -263,6 +263,7 @@ void VideoConnectionWidget::toggleLaunchServer()
 	else
 		this->launchServer();
 }
+
 void VideoConnectionWidget::serverProcessStateChanged(QProcess::ProcessState newState)
 {
 	if (newState == QProcess::Running)
@@ -274,13 +275,15 @@ void VideoConnectionWidget::serverProcessStateChanged(QProcess::ProcessState new
 	if (newState == QProcess::Starting)
 		mLaunchServerButton->setText("Starting...");
 }
+
 void VideoConnectionWidget::toggleConnectServer()
 {
 	if (!this->getConnection()->isConnected())
 		this->connectServer();
 	else
-		this->getConnection()->disconnectServer();
+		this->disconnectServer();
 }
+
 void VideoConnectionWidget::writeSettings()
 {
 	if (this->getConnection()->getUseDirectLink2())
@@ -336,6 +339,12 @@ void VideoConnectionWidget::connectServer()
 		this->getConnection()->launchAndConnectServer();
 	}
 }
+
+void VideoConnectionWidget::disconnectServer()
+{
+	this->getConnection()->disconnectServer();
+}
+
 
 void VideoConnectionWidget::serverStatusChangedSlot()
 {
@@ -408,30 +417,6 @@ void VideoConnectionWidget::importStreamImageSlot()
 	ssc::dataManager()->saveImage(output, folder);
 	viewManager()->autoShowData(output);
 	ssc::messageManager()->sendInfo(QString("Saved snapshot %1 from active video source").arg(output->getName()));
-}
-
-//------------------------------------------
-QTestVideoConnection::QTestVideoConnection() :
-		VideoConnectionWidget(NULL)
-{
-
-}
-
-bool QTestVideoConnection::startServer()
-{
-	this->show();
-	QTest::qWaitForWindowShown(this);
-
-	QString connectionMethod("Direct Link");
-	mConnectionSelector->setValue(connectionMethod);
-	QString connectionArguments("--type MHDFile --filename /home/jbake/jbake/data/helix/helix.mhd");
-	mDirectLinkArguments->addItem(connectionArguments);
-	mDirectLinkArguments->setCurrentIndex(mDirectLinkArguments->findText(connectionArguments));
-	QTest::mouseClick(mConnectButton, Qt::LeftButton);
-	bool runningServer = serverIsRunning();
-
-
-	return runningServer;
 }
 
 } //end namespace cx
