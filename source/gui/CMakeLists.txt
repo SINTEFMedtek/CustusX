@@ -2,7 +2,6 @@
 ##               Gui library
 ###########################################################
 
-
 # _USE_MATH_DEFINES Must be defined before math.h is included
 if (CX_WINDOWS)
     add_definitions(-D_USE_MATH_DEFINES)
@@ -289,4 +288,6 @@ endif (SSC_USE_DCMTK)
 add_library( cxGui ${cxGui_SRCS} ${cxGui_MOC_SRCS} )
 target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )
 CX_COTIRE_ADD_LIBRARY(cxGui "${CX_GUI_LIBRARIES}")
+
+add_subdirectory(testing)
 
