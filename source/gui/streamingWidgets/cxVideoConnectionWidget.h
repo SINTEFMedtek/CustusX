@@ -65,6 +65,7 @@ protected slots:
 	void launchServer();
 	void toggleConnectServer();
 	void connectServer();
+	void disconnectServer();
 	void serverProcessStateChanged(QProcess::ProcessState newState);
 	void serverStatusChangedSlot();
 	void browseLocalServerSlot();
@@ -105,18 +106,6 @@ protected:
 	ssc::StringDataAdapterXmlPtr mConnectionSelector;
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
 
-};
-
-class QTestVideoConnection : public VideoConnectionWidget
-{
-	Q_OBJECT
-
-public:
-	QTestVideoConnection();
-	virtual ~QTestVideoConnection(){};
-
-public slots:
-	bool startServer();
 };
 
 }//end namespace cx

@@ -16,23 +16,25 @@ if (BUILD_TESTING)
 # Build a library with testing functionality
 #
 set( cxtest_moc_files
+    cxtestSignalListener.h 
 	cxtestUtilities.h
 )
 
 set (cxtestUtilities_source
 	cxtestUtilities.h
 	cxtestUtilities.cpp
+    cxtestSignalListener.h
+    cxtestSignalListener.cpp
 )
 
 include_directories(
     .
     )
 
-
 QT4_WRAP_CPP( cxtest_moced_files ${cxtest_moc_files} )
 
 add_library( cxtestUtilities ${cxtestUtilities_source} ${cxtest_moced_files} )
-target_link_libraries(cxtestUtilities SSC)# cxResource OpenIGTLink cxTrackingService cxGrabber)
+target_link_libraries(cxtestUtilities SSC)
 
 
 ####################################################################################
@@ -42,17 +44,13 @@ target_link_libraries(cxtestUtilities SSC)# cxResource OpenIGTLink cxTrackingSer
     # Set variables
     #-----------------------------------------------------------------------------
     QT4_WRAP_CPP( CATCH_MOCED_SOURCES
-        cxtestSignalListener.h 
         )
-        
     set(CATCH_SOURCES 
         ${CATCH_MOCED_SOURCES}
         cxCatch.cpp
-        cxtestSignalListener.h
-        cxtestSignalListener.cpp
         ../plugins/Algorithm/testing/cxCatchAlgorithm.cpp
         ../service/video/testing/cxCatchVideo.cpp
-        ../gui/streamingWidgets/testing/cxtestCatchStreamingWidgets.cpp
+        ../gui/testing/cxtestCatchStreamingWidgets.cpp
     )
     
     #------------------------------------------------------------------------------

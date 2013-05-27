@@ -46,9 +46,9 @@ def testStreaming():
                    ])
     
 def testStreamingWidgets():
-    return deque(["make -j8".split(" "),
-                   "./source/testing/Catch -g [widget] -s".split(" ")#,
-#                    "./source/apps/CustusX/CustusX".split(" ")
+    return deque(["make CatchGui -j8".split(" "),
+                   #"./source/testing/Catch -g [widget] -s".split(" "),
+                   "./source/gui/testing/CatchGui".split(" ")#,
                    ])
 
 def main():
