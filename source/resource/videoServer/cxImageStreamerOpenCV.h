@@ -9,13 +9,13 @@
 #include <QTcpSocket>
 #include <QDateTime>
 #include <QSize>
-class QTimer;
 #include "igtlImageMessage.h"
-//#include <opencv2/highgui/highgui.hpp>
 #include <QStringList>
 #include "cxImageSenderFactory.h"
 #include "cxIGTLinkImageMessage.h"
-#include "cxGrabberSender.h"
+#include "cxSender.h"
+
+class QTimer;
 
 namespace cv
 {

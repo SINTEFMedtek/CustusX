@@ -12,18 +12,18 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXGRABBERDIRECTLINKTHREAD_H_
-#define CXGRABBERDIRECTLINKTHREAD_H_
+#ifndef CXDirectlyLinkedImageReceiverThread_H_
+#define CXDirectlyLinkedImageReceiverThread_H_
 
 #include <vector>
 #include "boost/shared_ptr.hpp"
 
-#include "cxGrabberReceiveThread.h"
+#include "cxImageReceiverThread.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class Streamer> StreamerPtr;
-typedef boost::shared_ptr<class GrabberSenderDirectLink> GrabberSenderDirectLinkPtr;
+typedef boost::shared_ptr<class DirectlyLinkedSender> DirectlyLinkedSenderPtr;
 
 /**
  * \file
@@ -31,32 +31,36 @@ typedef boost::shared_ptr<class GrabberSenderDirectLink> GrabberSenderDirectLink
  * @{
  */
 
-typedef boost::shared_ptr<class GrabberDirectLinkThread> GrabberDirectLinkThreadPtr;
+typedef boost::shared_ptr<class DirectlyLinkedImageReceiverThread> DirectlyLinkedImageReceiverThreadPtr;
 
 /**\brief Client thread used for running streamers
+ *
  * \ingroup cxServiceVideo
  *
  *  \date Oct 11, 2012
- *  \author Christian Askeland, SINTED
+ *  \author Christian Askeland, SINTEF
+ *  \author Janne Beate Bakeng, SINTEF
  */
-class GrabberDirectLinkThread: public GrabberReceiveThread
+class DirectlyLinkedImageReceiverThread: public ImageReceiverThread
 {
 Q_OBJECT
 public:
-	GrabberDirectLinkThread(std::map<QString, QString> args, QObject* parent = NULL);
-	virtual QString hostDescription() const; // threadsafe
+	DirectlyLinkedImageReceiverThread(std::map<QString, QString> args, QObject* parent = NULL);
+	virtual QString hostDescription() const; ///< threadsafe
 
 protected:
 	virtual void run();
 
 private slots:
-	void newImageSlot();
-	void newUSStatusSlot();
+	void addImageToQueueSlot();
+	void addSonixStatusToQueueSlot();
 
 private:
+	void printArguments(); ///< for debugging
+
 	std::map<QString, QString> mArguments;
-	StreamerPtr mImageSender;
-	GrabberSenderDirectLinkPtr mGrabberBridge;
+	StreamerPtr mImageStreamer;
+	DirectlyLinkedSenderPtr mSender;
 };
 
 /**
@@ -64,4 +68,4 @@ private:
  */
 } //end namespace cx
 
-#endif /* CXGRABBERDIRECTLINKTHREAD_H_ */
+#endif /* CXDirectlyLinkedImageReceiverThread_H_ */

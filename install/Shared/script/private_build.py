@@ -39,7 +39,7 @@ def printIntro():
 
 def testStreaming():
     return deque(["make -j8".split(" "),
-                   "./source/testing/Catch -g [streaming] -s".split(" "),
+                   "./source/testing/Catch -g [streaming]".split(" "),
                    "./source/plugins/Acquisition/testing/cxTestAcquisition_CppUnit_CTest -r".split(" "),
                    "./source/resource/videoServer/testing/cxTestGEInterface_CppUnit_CTest -r".split(" ")
                    ])
@@ -71,7 +71,7 @@ def main():
     printIntro()
     
     run_all_test = False;
-    
+
     if(run_all_test):
         #running all catch tests
         command_queue = runCatchTests()
@@ -84,9 +84,11 @@ def main():
             return;    
     else:
         #running specific catch tests
-        command_queue = testGui()
-        if(not execute_queue(command_queue)):
-            return;        
+        if(not execute_queue(testGui())):
+            return;
+
+        if(not execute_queue(testStreaming())):
+            return;  
         
     print("[SUCCESS]")
     return

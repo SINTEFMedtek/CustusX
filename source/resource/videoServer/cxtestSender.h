@@ -1,7 +1,7 @@
 #ifndef CXTESTSENDER_H_
 #define CXTESTSENDER_H_
 
-#include "cxGrabberSender.h"
+#include "cxSender.h"
 #include <boost/shared_ptr.hpp>
 
 namespace cxtest {

@@ -1,5 +1,5 @@
-#ifndef CXGRABBERSENDER_H_
-#define CXGRABBERSENDER_H_
+#ifndef CXSender_H_
+#define CXSender_H_
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>
@@ -93,4 +93,4 @@ private:
 };
 
 } /* namespace cx */
-#endif /* CXGRABBERSENDER_H_ */
+#endif /* CXSender_H_ */

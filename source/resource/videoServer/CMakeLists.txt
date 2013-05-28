@@ -119,8 +119,8 @@ SET( CX_QT_MOC_HEADER_FILES
 		cxImageStreamerOpenCV.h
 		cxImageStreamerGE.h
 		cxImageStreamer.h
-		cxGrabberSender.h
-		cxGrabberSenderDirectLink.h
+		cxSender.h
+		cxDirectlyLinkedSender.h
 		
 		cxtestSender.h
 )
@@ -152,10 +152,10 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxImageStreamerGE.cpp
 		cxImageStreamer.h
 		cxImageStreamer.cpp
-		cxGrabberSender.h
-		cxGrabberSender.cpp
-		cxGrabberSenderDirectLink.h
-		cxGrabberSenderDirectLink.cpp
+		cxSender.h
+		cxSender.cpp
+		cxDirectlyLinkedSender.h
+		cxDirectlyLinkedSender.cpp
 		
 		cxtestSender.h
 		cxtestSender.cpp

@@ -33,7 +33,7 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class GrabberReceiveThread> GrabberReceiveThreadPtr;
+typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
 typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
 
 /** \brief Represent one video grabber connection.
@@ -81,13 +81,13 @@ private slots:
 
 private:
 	void updateImage(ssc::ImagePtr message); // called by receiving thread when new data arrives.
-	void runClient(GrabberReceiveThreadPtr client);
+	void runClient(ImageReceiverThreadPtr client);
 	void stopClient(); ///< Get rid of the mClient thread.
 	void updateStatus(ssc::ProbeDataPtr message);
 	void startAllSources();
 	void removeSourceFromProbe(ssc::ToolPtr tool);
 
-	GrabberReceiveThreadPtr mClient;
+	ImageReceiverThreadPtr mClient;
 	bool mConnected;
 	double mFPS;
 	std::vector<ssc::ProbeDataPtr> mUnsusedProbeDataVector;

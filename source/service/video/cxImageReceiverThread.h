@@ -14,8 +14,8 @@
 // See CustusX_License.txt for more information.
 
 
-#ifndef CXIGTLinkClientBaseBASE_H_
-#define CXIGTLinkClientBaseBASE_H_
+#ifndef CXImageReceiverThread_H_
+#define CXImageReceiverThread_H_
 
 #include <vector>
 #include "boost/shared_ptr.hpp"
@@ -50,9 +50,9 @@ public:
   double mCenter;
 };
 
-typedef boost::shared_ptr<class GrabberReceiveThread> GrabberReceiveThreadPtr;
+typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
 
-/** \brief Base class for receiving messages from grabber.
+/** \brief Base class for receiving images from a video stream.
  *
  * Subclass to implement for a specific protocol.
  * Supported messages:
@@ -61,16 +61,16 @@ typedef boost::shared_ptr<class GrabberReceiveThread> GrabberReceiveThreadPtr;
  *
  * \ingroup cxServiceVideo
  * \date Oct 11, 2012
- * \author christiana
+ * \author Christian Askeland, SINTEF
  */
-class GrabberReceiveThread: public QThread
+class ImageReceiverThread: public QThread
 {
 Q_OBJECT
 public:
-	GrabberReceiveThread(QObject* parent = NULL);
-	virtual ~GrabberReceiveThread() {}
-	virtual ssc::ImagePtr getLastImageMessage(); // threadsafe
-	virtual ssc::ProbeDataPtr getLastSonixStatusMessage(); // threadsafe
+	ImageReceiverThread(QObject* parent = NULL);
+	virtual ~ImageReceiverThread() {}
+	virtual ssc::ImagePtr getLastImageMessage(); // threadsafe, Threadsafe retrieval of last image message.
+	virtual ssc::ProbeDataPtr getLastSonixStatusMessage(); // threadsafe,Threadsafe retrieval of last status message.
 	virtual QString hostDescription() const = 0; // threadsafe
 
 signals:
@@ -89,10 +89,14 @@ protected:
 	 * \param[in] imgMsg Incoming image message
 	 */
 	void addImageToQueue(ssc::ImagePtr imgMsg);
-	void addSonixStatusToQueue(ssc::ProbeDataPtr msg);
-	void calibrateTimeStamp(ssc::ImagePtr imgMsg);
+	void addSonixStatusToQueue(ssc::ProbeDataPtr msg); ///< add the message to a thread-safe queue
+	void calibrateTimeStamp(ssc::ImagePtr imgMsg); ///< Calibrate the time stamps of the incoming message based on the computer clock. Calibration is based on an average of several of the last messages. The calibration is updated every 20-30 sec.
 
 private:
+	void reportFPS();
+	bool imageComesFromActiveVideoSource(ssc::ImagePtr imgMsg);
+	bool imageComesFromSonix(ssc::ImagePtr imgMsg);
+
 	QMutex mImageMutex;
 	QMutex mSonixStatusMutex;
 	std::list<ssc::ImagePtr> mMutexedImageMessageQueue;
@@ -109,4 +113,4 @@ private:
  */
 } //end namespace cx
 
-#endif /* CXIGTLinkClientBaseBASE_H_ */
+#endif /* CXImageReceiverThread_H_ */

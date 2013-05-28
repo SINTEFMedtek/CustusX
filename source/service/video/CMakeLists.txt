@@ -9,9 +9,9 @@ SET( CX_QT_MOC_HEADER_FILES
     cxVideoConnection.h
     cxPlaybackUSAcquisitionVideo.h
 
-    cxGrabberReceiveThread.h
-    cxGrabberReceiveThreadDirectLink.h
-	cxGrabberReceiveThreadIGTLink.h
+    cxImageReceiverThread.h
+    cxDirectlyLinkedImageReceiverThread.h
+	cxIGTLinkedImageReceiverThread.h
 	
 	cxSimulatedImageStreamer.h
 )
@@ -28,12 +28,12 @@ SET (cxVideoService_SOURCE
     cxPlaybackUSAcquisitionVideo.h
     cxPlaybackUSAcquisitionVideo.cpp
 
-    cxGrabberReceiveThread.h
-    cxGrabberReceiveThread.cpp
-	cxGrabberReceiveThreadIGTLink.h
-	cxGrabberReceiveThreadIGTLink.cpp
-    cxGrabberReceiveThreadDirectLink.h
-    cxGrabberReceiveThreadDirectLink.cpp
+    cxImageReceiverThread.h
+    cxImageReceiverThread.cpp
+	cxIGTLinkedImageReceiverThread.h
+	cxIGTLinkedImageReceiverThread.cpp
+    cxDirectlyLinkedImageReceiverThread.h
+    cxDirectlyLinkedImageReceiverThread.cpp
     
     cxSimulatedImageStreamer.h
     cxSimulatedImageStreamer.cpp
