@@ -194,7 +194,7 @@ void TestIGTLinkUtilities::testDecodeEncodeColorImage(Val3VectorType values, QSt
 void TestIGTLinkUtilities::testDecodeEncodeProbeData()
 {
 	// generate probe data input
-	ssc::ProbeDataPtr input;
+	ssc::ProbeDataPtr input(new ssc::ProbeData());
 	input->setType(ssc::ProbeData::tSECTOR);
 	ssc::ProbeData::ProbeImageData imageData = input->getImage();
 	imageData.mOrigin_p = ssc::Vector3D(50,0,0); ///< probe origin in pixel space p. (upper-left corner origin)
@@ -214,7 +214,7 @@ void TestIGTLinkUtilities::testDecodeEncodeProbeData()
 	cx::IGTLinkConversion converter;
 	cx::IGTLinkUSStatusMessage::Pointer msg = converter.encode(input);
 	cx::IGTLinkImageMessage::Pointer imageMessage = converter.encode(imageInput);
-	ssc::ProbeDataPtr output = converter.decode(msg, imageMessage, ssc::ProbeDataPtr());
+	ssc::ProbeDataPtr output = converter.decode(msg, imageMessage, ssc::ProbeDataPtr(new ssc::ProbeData()));
 
 	// compare input<->output
 	CPPUNIT_ASSERT(input->getType() == output->getType());
