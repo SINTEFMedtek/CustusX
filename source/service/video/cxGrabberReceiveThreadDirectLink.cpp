@@ -19,28 +19,20 @@
 #include "sscVector3D.h"
 #include "cxImageSenderFactory.h"
 #include "cxRenderTimer.h"
+#include "cxGrabberSenderDirectLink.h"
 
 namespace cx
 {
 
 GrabberDirectLinkThread::GrabberDirectLinkThread(StringMap args, QObject* parent) :
 		GrabberReceiveThread(parent), mArguments(args)
-{
-//  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
-}
-
-//void GrabberDirectLinkThread::stopSlot()
-//{
-//	if(mImageSender)//stopSlot is called even if startStreaming fails
-//		mImageSender->stopStreaming();
-//	this->quit();
-//}
+{}
 
 void GrabberDirectLinkThread::run()
 {
 	ssc::messageManager()->sendInfo("Starting direct link grabber.");
 
-	mImageSender = ImageSenderFactory().getFromArguments(mArguments);
+	mImageSender = ImageStreamerFactory().getFromArguments(mArguments);
 	if(!mImageSender)
 	{
 		this->quit();
@@ -54,9 +46,6 @@ void GrabberDirectLinkThread::run()
 	if(!mImageSender->startStreaming(mGrabberBridge))
 		this->quit();
 	emit connected(true);
-
-//  std::cout << "client::run thread: " << QThread::currentThread() << std::endl;
-	//std::cout << "run client thread, connecting to " << mAddress << " " << mPort << std::endl;
 
 	mFPSTimer->reset(2000);
 

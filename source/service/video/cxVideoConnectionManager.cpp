@@ -228,6 +228,7 @@ void VideoConnectionManager::launchAndConnectServer()
 	if (this->getUseDirectLink2())
 	{
 		QString commandline = this->getLocalServerArguments();
+		std::cout << "commandline " << commandline.toStdString() << std::endl;
 		StringMap args = extractCommandlineOptions(commandline.split(" "));
 		mRTSource->directLink(args);
 		return;

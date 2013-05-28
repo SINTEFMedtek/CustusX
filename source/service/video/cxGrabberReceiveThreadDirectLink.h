@@ -22,7 +22,7 @@
 
 namespace cx
 {
-typedef boost::shared_ptr<class ImageSender> ImageSenderPtr;
+typedef boost::shared_ptr<class Streamer> StreamerPtr;
 typedef boost::shared_ptr<class GrabberSenderDirectLink> GrabberSenderDirectLinkPtr;
 
 /**
@@ -33,11 +33,11 @@ typedef boost::shared_ptr<class GrabberSenderDirectLink> GrabberSenderDirectLink
 
 typedef boost::shared_ptr<class GrabberDirectLinkThread> GrabberDirectLinkThreadPtr;
 
-/**\brief Client thread for OpenIGTLink messaging.
+/**\brief Client thread used for running streamers
  * \ingroup cxServiceVideo
  *
  *  \date Oct 11, 2012
- *  \author christiana
+ *  \author Christian Askeland, SINTED
  */
 class GrabberDirectLinkThread: public GrabberReceiveThread
 {
@@ -55,7 +55,7 @@ private slots:
 
 private:
 	std::map<QString, QString> mArguments;
-	ImageSenderPtr mImageSender;
+	StreamerPtr mImageSender;
 	GrabberSenderDirectLinkPtr mGrabberBridge;
 };
 

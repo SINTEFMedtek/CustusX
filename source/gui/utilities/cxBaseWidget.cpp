@@ -1,6 +1,5 @@
 #include "cxBaseWidget.h"
 
-
 namespace cx
 {
 
@@ -52,27 +51,12 @@ QFrame* BaseWidget::createHorizontalLine() ///< creates a horizontal line witch 
 {
     QFrame* retval = new QFrame();
     retval->setFrameStyle(QFrame::Sunken + QFrame::HLine);
-//    retval->setFixedHeight(12);
     return retval;
 }
-
 
 CXFrame* BaseWidget::wrapInFrame(QWidget* base)
 {
     CXFrame* frame = new CXFrame(NULL);
-// frame->setStyleSheet(""
-//                      "*                         "
-//                      "{                         "
-//                      "  background: yellow;     "
-//                      "	 border: 1px solid gray; "
-//                      "  border-radius: 5px;     "
-//                      "  margin-top: 1em;        "
-//                      "}                         "
-//                      );
-//    frame->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
-//    frame->setSizePolicy(frame->sizePolicy().horizontalPolicy(),QSizePolicy::Fixed);
-//    std::cout << "frame class " << frame->metaObject()->className() << std::endl;
-
     QVBoxLayout* layout = new QVBoxLayout(frame);
     layout->setMargin(0);
     layout->addWidget(base);
@@ -87,8 +71,6 @@ QGroupBox* BaseWidget::wrapInGroupBox(QWidget* base, QString name)
     layout->addWidget(base);
     return groupBox;
 }
-
-
 
 void BaseWidget::adjustSizeSlot()
 {
