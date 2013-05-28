@@ -1,11 +1,5 @@
-/*
- * cxImageSenderSonix.cpp
- *
- *  \date Aug 15, 2011
- *      \author Ole Vegard Solberg
- */
+#include "cxImageStreamerSonix.h"
 
-#include "cxImageSenderSonix.h"
 #include "sscVector3D.h"
 
 #ifdef CX_WIN32
@@ -30,12 +24,12 @@
 namespace cx
 {
 
-QString ImageSenderSonix::getType()
+QString ImageStreamerSonix::getType()
 {
 	return "Sonix";
 }
 
-QStringList ImageSenderSonix::getArgumentDescription()
+QStringList ImageStreamerSonix::getArgumentDescription()
 {
 	QStringList retval;
 	retval << "--ipaddress:	IP address to connect to, default=127.0.0.1 (localhost)";
@@ -49,17 +43,15 @@ QStringList ImageSenderSonix::getArgumentDescription()
 }
 
 
-ImageSenderSonix::ImageSenderSonix(QObject* parent) :
-    ImageSender(parent),
+ImageStreamerSonix::ImageStreamerSonix() :
 	mEmitStatusMessage(false),
 	mLastFrameTimestamp(0.0),
 	mCurrentFrameTimestamp(0.0)
-{
-}
+{}
 
-ImageSenderSonix::~ImageSenderSonix()
+ImageStreamerSonix::~ImageStreamerSonix()
 {
-	mTimer->stop();
+	mSendTimer->stop();
 	if (mSonixGrabber)
 		{
 			mSonixGrabber->Stop();
@@ -69,11 +61,11 @@ ImageSenderSonix::~ImageSenderSonix()
 }
 
 
-void ImageSenderSonix::initialize(StringMap arguments)
+void ImageStreamerSonix::initialize(StringMap arguments)
 {
 	std::cout << "Creating sender type Sonix" << std::endl;
 		  
-    mArguments = arguments;
+	ImageStreamer::initialize(arguments);
 	
 	mMaxqueueInfo = 20;
 //	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
@@ -87,20 +79,19 @@ void ImageSenderSonix::initialize(StringMap arguments)
 
 	this->mSonixHelper = new SonixHelper();
 
-	mTimer = new QTimer;
-	connect(mTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
-	mTimer->setInterval(10000);
-	mTimer->start();
+	mSendTimer = new QTimer;
+	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
+	setSendInverval(10000);
+	mSendTimer->setInterval(getSendInterval());
+	mSendTimer->start();
 
 	this->initializeSonixGrabber();
 }
 
-
-void ImageSenderSonix::initializeSonixSlot()
+void ImageStreamerSonix::initializeSonixSlot()
 {
 	if(!mSonixGrabber->IsInitialized())
 	{
-		//std::cout << "initializeSonixSlot() Initializing..." << std::endl;
 		mSonixGrabber->Initialize();
 		return;
 	}
@@ -115,7 +106,6 @@ void ImageSenderSonix::initializeSonixSlot()
 		std::cout << "Releasing Ultrasonix resources" << std::endl;
 		mSonixGrabber->ReleaseSystemResources();
 		disconnect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)));
-		//mSonixGrabber->Delete();
 
 		this->initializeSonixGrabber();
 	}
@@ -125,7 +115,7 @@ void ImageSenderSonix::initializeSonixSlot()
 	}
 }
 
-void ImageSenderSonix::initializeSonixGrabber()
+void ImageStreamerSonix::initializeSonixGrabber()
 {
 	if (!mArguments.count("ipaddress"))
 		mArguments["ipaddress"] = "127.0.0.1";
@@ -144,8 +134,6 @@ void ImageSenderSonix::initializeSonixGrabber()
 	int bufferSize          = convertStringWithDefault(mArguments["buffersize"], 500);
 	int delay          		= convertStringWithDefault(mArguments["delay"], 80);
 
-
-
 	mSonixGrabber = vtkSonixVideoSource::New();
 	if (mArguments.count("debug"))
 		mSonixGrabber->setDebugOutput(true);
@@ -158,6 +146,7 @@ void ImageSenderSonix::initializeSonixGrabber()
 	mSonixGrabber->SetFrameBufferSize(bufferSize);  // Number of image frames in buffer
 	mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
 
+	//TODO move to debug function OR DELETE!!! <jbake>
 	//std::cout << "imagingMode: " << imagingMode << std::endl;
 	//std::cout << "datatype: " << mArguments["datatype"].toStdString().c_str() << std::endl;
 	//std::cout << "acquisitionDataType: " << acquisitionDataType << " ";
@@ -167,7 +156,7 @@ void ImageSenderSonix::initializeSonixGrabber()
 	connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
 }
 
-bool ImageSenderSonix::startStreaming(GrabberSenderPtr sender)
+bool ImageStreamerSonix::startStreaming(SenderPtr sender)
 {
 	mSender = sender;
 	mSonixGrabber->Record();
@@ -176,13 +165,13 @@ bool ImageSenderSonix::startStreaming(GrabberSenderPtr sender)
 	return true;
 }
 
-void ImageSenderSonix::stopStreaming()
+void ImageStreamerSonix::stopStreaming()
 {
   mSonixGrabber->Stop();
   mSender.reset();
 }
 
-void ImageSenderSonix::receiveFrameSlot(Frame& frame)
+void ImageStreamerSonix::receiveFrameSlot(Frame& frame)
 {
 	mCurrentFrameTimestamp = frame.mTimestamp;
 
@@ -215,7 +204,7 @@ void ImageSenderSonix::receiveFrameSlot(Frame& frame)
 //  mSocket->write(reinterpret_cast<const char*>(imgMsg->GetPackPointer()), imgMsg->GetPackSize());
 }
 
-IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
+IGTLinkUSStatusMessage::Pointer ImageStreamerSonix::getFrameStatus(Frame& frame)
 {
   IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
   //retval->SetOrigin(); //Origin is set in IGTLinkImageMessage
@@ -253,7 +242,7 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getFrameStatus(Frame& frame)
   return retval;
 }
 
-IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
+IGTLinkImageMessage::Pointer ImageStreamerSonix::convertFrame(Frame& frame)
 {
   IGTLinkImageMessage::Pointer retval = IGTLinkImageMessage::New();
 
@@ -266,7 +255,7 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
   retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);
   //std::cout << "Frame spacing: " << frame.mSpacing[0] << " " << frame.mSpacing[1] << std::endl;
   retval->SetScalarType(frame.mPixelFormat); //Use frame.mPixelFormat directly
-//  retval->SetDeviceName("ImageSenderSonix [BGRX]"); // TODO write something useful here
+//  retval->SetDeviceName("ImageStreamerSonix [BGRX]"); // TODO write something useful here
   retval->SetDeviceName("Sonix[BGRX]"); // TODO write something useful here
   retval->SetSubVolume(size,offset);
   retval->AllocateScalars();
@@ -301,7 +290,7 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::convertFrame(Frame& frame)
   //std::cout << "dimensions: " << dimensions[0] << " " << dimensions[1] << " " << dimensions[2] << " " << std::endl;
   return retval;
 }
-void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
+void ImageStreamerSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
 {
 	if (!mSender || !mSender->isReady())
 		return;
@@ -316,19 +305,21 @@ void ImageSenderSonix::sendOpenIGTLinkImageSlot(int sendNumberOfMessages)
     IGTLinkImageMessage::Pointer message = this->getLastImageMessageFromQueue();
     if(!message)
       break;
-    mSender->send(message);
+    PackagePtr package(new Package());
+    package->mIgtLinkImageMessage = message;
+    mSender->send(package);
 //    message->Pack();
 //    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
-void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
+void ImageStreamerSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
 {
-	if (!mSender || !mSender->isReady())
+	if (!this->isReadyToSend())
 		return;
 
 //	if(!mSocket)
 //		return;
-  //std::cout << "ImageSenderSonix::sendOpenIGTLinkStatusSlot" << std::endl;
+  //std::cout << "ImageStreamerSonix::sendOpenIGTLinkStatusSlot" << std::endl;
 //  if(mSocket->bytesToWrite() > mMaxBufferSize)
 //    return;
 
@@ -337,14 +328,18 @@ void ImageSenderSonix::sendOpenIGTLinkStatusSlot(int sendNumberOfMessage)
     IGTLinkUSStatusMessage::Pointer message = this->getLastStatusMessageFromQueue();
     if(!message)
       break;
-    mSender->send(message);
+
+    PackagePtr package(new Package());
+    package->mIgtLinkUSStatusMessage = message;
+    mSender->send(package);
+
 //    message->Pack();
 //    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
   }
 }
 /** Add the image message to a thread-safe queue
  */
-void ImageSenderSonix::addImageToQueue(IGTLinkImageMessage::Pointer msg)
+void ImageStreamerSonix::addImageToQueue(IGTLinkImageMessage::Pointer msg)
 {
   QMutexLocker sentry(&mImageMutex);
   if(mMutexedImageMessageQueue.size() > mMaxqueueInfo)
@@ -363,7 +358,7 @@ void ImageSenderSonix::addImageToQueue(IGTLinkImageMessage::Pointer msg)
 
 /** Threadsafe retrieval of last image message.
  */
-IGTLinkImageMessage::Pointer ImageSenderSonix::getLastImageMessageFromQueue()
+IGTLinkImageMessage::Pointer ImageStreamerSonix::getLastImageMessageFromQueue()
 {
   QMutexLocker sentry(&mImageMutex);
   if (mMutexedImageMessageQueue.empty())
@@ -375,7 +370,7 @@ IGTLinkImageMessage::Pointer ImageSenderSonix::getLastImageMessageFromQueue()
 
 /** Add the status message to a thread-safe queue
  */
-void ImageSenderSonix::addStatusMessageToQueue(IGTLinkUSStatusMessage::Pointer msg)
+void ImageStreamerSonix::addStatusMessageToQueue(IGTLinkUSStatusMessage::Pointer msg)
 {
   QMutexLocker sentry(&mStatusMutex);
   if(mMutexedStatusMessageQueue.size() > mMaxqueueInfo)
@@ -391,7 +386,7 @@ void ImageSenderSonix::addStatusMessageToQueue(IGTLinkUSStatusMessage::Pointer m
 
 /** Threadsafe retrieval of last image message.
  */
-IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getLastStatusMessageFromQueue()
+IGTLinkUSStatusMessage::Pointer ImageStreamerSonix::getLastStatusMessageFromQueue()
 {
   QMutexLocker sentry(&mStatusMutex);
   if (mMutexedStatusMessageQueue.empty())
@@ -400,9 +395,6 @@ IGTLinkUSStatusMessage::Pointer ImageSenderSonix::getLastStatusMessageFromQueue(
   mMutexedStatusMessageQueue.pop_front();
   return retval;
 }
-//------------------------------------------------------------
-//------------------------------------------------------------
-//------------------------------------------------------------
 
 }
 

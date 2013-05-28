@@ -12,6 +12,8 @@ SET( CX_QT_MOC_HEADER_FILES
     cxGrabberReceiveThread.h
     cxGrabberReceiveThreadDirectLink.h
 	cxGrabberReceiveThreadIGTLink.h
+	
+	cxSimulatedImageStreamer.h
 )
 
 SET (cxVideoService_SOURCE
@@ -32,6 +34,9 @@ SET (cxVideoService_SOURCE
 	cxGrabberReceiveThreadIGTLink.cpp
     cxGrabberReceiveThreadDirectLink.h
     cxGrabberReceiveThreadDirectLink.cpp
+    
+    cxSimulatedImageStreamer.h
+    cxSimulatedImageStreamer.cpp
 )
 
 include_directories(
