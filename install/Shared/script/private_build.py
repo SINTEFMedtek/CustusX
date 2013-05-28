@@ -7,7 +7,7 @@
 #
 # Description:
 #
-# Script for running a private build
+# Linux script for running a private build
 #
 #####################################################
 import subprocess
@@ -19,7 +19,6 @@ def getTimeFormat():
 
 def log(message):
     print(message)
-    
     
 def getTimedCommandList(command):
     command_list = ["time", "-f "+getTimeFormat()]
