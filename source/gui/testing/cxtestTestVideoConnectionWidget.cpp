@@ -1,5 +1,6 @@
 #include "cxtestTestVideoConnectionWidget.h"
 
+#include <QtTest/QtTest>
 #include <QComboBox>
 #include <QPushButton>
 #include "sscVideoSource.h"

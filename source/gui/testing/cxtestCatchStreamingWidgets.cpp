@@ -1,5 +1,7 @@
 #include "catch.hpp"
 
+#include <QTimer>
+#include <QApplication>
 #include "sscMessageManager.h"
 #include "cxtestTestVideoConnectionWidget.h"
 #include "cxLogicManager.h"
