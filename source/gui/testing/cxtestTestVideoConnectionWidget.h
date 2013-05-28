@@ -7,18 +7,18 @@ namespace cxtest
 {
 
 /*
- * TestVideoConnection
+ * TestVideoConnectionWidget
  *
  * \date May 27, 2013
  * \author Janne Beate Bakeng, SINTEF
  */
-class TestVideoConnection : public cx::VideoConnectionWidget
+class TestVideoConnectionWidget : public cx::VideoConnectionWidget
 {
 	Q_OBJECT
 
 public:
-	TestVideoConnection();
-	virtual ~TestVideoConnection(){};
+	TestVideoConnectionWidget();
+	virtual ~TestVideoConnectionWidget(){};
 
 public slots:
 	bool startStopServer();
