@@ -1,9 +1,8 @@
-#include "cxGrabberSender.h"
+#include "cxSender.h"
 #include "cxIGTLinkConversion.h"
 
 namespace cx
 {
-
 
 void SenderImpl::send(PackagePtr package)
 {

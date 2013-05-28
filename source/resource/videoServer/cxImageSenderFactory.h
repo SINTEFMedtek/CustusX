@@ -16,7 +16,8 @@ typedef std::map<QString, QString> StringMap;
 StringMap extractCommandlineOptions(QStringList cmdline);
 int convertStringWithDefault(QString text, int def);
 
-/**Factory class for creation of CommandLineStreamer objects.
+/**
+ * \brief Factory class for creating streamer objects.
  *
  * \author Christian Askeland, SINTEF
  * \author Janne Beate Bakeng, SINTEF

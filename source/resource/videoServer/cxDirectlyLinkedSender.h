@@ -1,7 +1,7 @@
-#ifndef CXGRABBERSENDERDIRECTLINK_H_
-#define CXGRABBERSENDERDIRECTLINK_H_
+#ifndef CXDirectlyLinkedSender_H_
+#define CXDirectlyLinkedSender_H_
 
-#include "cxGrabberSender.h"
+#include "cxSender.h"
 
 #include <QObject>
 #include <boost/shared_ptr.hpp>
@@ -13,13 +13,13 @@
 namespace cx
 {
 
-class GrabberSenderDirectLink : public SenderImpl
+class DirectlyLinkedSender : public SenderImpl
 {
 	Q_OBJECT
 
 public:
-	GrabberSenderDirectLink() {}
-	virtual ~GrabberSenderDirectLink() {}
+	DirectlyLinkedSender() {}
+	virtual ~DirectlyLinkedSender() {}
 
 	bool isReady() const;
 	virtual void send(IGTLinkImageMessage::Pointer msg);
@@ -40,7 +40,7 @@ private:
 	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 
 };
-typedef boost::shared_ptr<GrabberSenderDirectLink> GrabberSenderDirectLinkPtr;
+typedef boost::shared_ptr<DirectlyLinkedSender> DirectlyLinkedSenderPtr;
 
 }//namespace cx
-#endif /* CXGRABBERSENDERDIRECTLINK_H_ */
+#endif /* CXDirectlyLinkedSender_H_ */

@@ -1,12 +1,12 @@
-#include "cxTestGrabberSenderController.h"
+#include "cxTestSenderController.h"
 
 //#include <cppunit/extensions/HelperMacros.h>
 
-TestGrabberSenderController::TestGrabberSenderController(QObject* parent) : QObject(parent)
+TestSenderController::TestSenderController(QObject* parent) : QObject(parent)
 {
 }
 
-void TestGrabberSenderController::initialize(cx::GrabberSenderDirectLinkPtr grabberBridge)
+void TestSenderController::initialize(cx::DirectlyLinkedSenderPtr grabberBridge)
 {
 	mGrabberBridge = grabberBridge;
 	connect(mGrabberBridge.get(), SIGNAL(newImage()), this, SLOT(newImageSlot()), Qt::DirectConnection);
@@ -14,21 +14,21 @@ void TestGrabberSenderController::initialize(cx::GrabberSenderDirectLinkPtr grab
 
 }
 
-bool TestGrabberSenderController::verify()
+bool TestSenderController::verify()
 {
 //	CPPUNIT_ASSERT(mImageReceived);
 //	CPPUNIT_ASSERT(mStatusReceived)
 	return mImageReceived && mStatusReceived;
 }
 
-void TestGrabberSenderController::newImageSlot()
+void TestSenderController::newImageSlot()
 {
 //	this->addImageToQueue(mGrabberBridge->popImage());
 //	std::cout << "TestGrabberSenderController::newImageSlot()" << std::endl;
 	mImageReceived = true;
 }
 
-void TestGrabberSenderController::newUSStatusSlot()
+void TestSenderController::newUSStatusSlot()
 {
 //	this->addSonixStatusToQueue(mGrabberBridge->popUSStatus());
 //	std::cout << "TestGrabberSenderController::newUSStatusSlot()" << std::endl;

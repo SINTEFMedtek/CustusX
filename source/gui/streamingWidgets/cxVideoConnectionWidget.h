@@ -91,7 +91,7 @@ protected:
 	QWidget* createLocalServerWidget();
 	QWidget* createRemoteWidget();
 	QWidget* wrapVerticalStretch(QWidget* input);
-	ssc::Transform3D calculate_rMd_ForAProbeImage(ssc::ToolPtr probe, ssc::Transform3D rMd);
+	ssc::Transform3D calculate_rMd_ForAProbeImage(ssc::ToolPtr probe);
 	QString generateFilename(vtkImageDataPtr input);
 	void saveAndImportSnapshot(vtkImageDataPtr input, QString filename, ssc::Transform3D rMd);
 

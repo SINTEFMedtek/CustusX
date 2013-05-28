@@ -64,8 +64,8 @@ public:
 	void setLocalServerArguments(QString commandline);
 	QString getLocalServerArguments();
 
-	bool getUseLocalServer2();
-	bool getUseDirectLink2();
+	bool getUseLocalServer();
+	bool getUseDirectLink();
 
 	void setInitScript(QString filename);
 	QString getInitScript();
@@ -76,10 +76,7 @@ public:
 
 	QProcess* getProcess();
 	std::vector<ssc::VideoSourcePtr> getVideoSources();
-//	GrabberVideoSourcePtr getVideoSource()
-//	{
-//		return mRTSource;
-//	}
+
 	void setReconnectInterval(int interval) { mReconnectInterval = interval; }
 	bool isConnected() const;
 

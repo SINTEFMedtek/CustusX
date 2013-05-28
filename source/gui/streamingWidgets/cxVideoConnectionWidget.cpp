@@ -219,9 +219,9 @@ VideoConnectionManagerPtr VideoConnectionWidget::getConnection()
 
 void VideoConnectionWidget::dataChanged()
 {
-	if (this->getConnection()->getUseDirectLink2())
+	if (this->getConnection()->getUseDirectLink())
 		mStackedWidget->setCurrentIndex(0);
-	else if (this->getConnection()->getUseLocalServer2())
+	else if (this->getConnection()->getUseLocalServer())
 		mStackedWidget->setCurrentIndex(1);
 	else
 		mStackedWidget->setCurrentIndex(2);
@@ -286,12 +286,12 @@ void VideoConnectionWidget::toggleConnectServer()
 
 void VideoConnectionWidget::writeSettings()
 {
-	if (this->getConnection()->getUseDirectLink2())
+	if (this->getConnection()->getUseDirectLink())
 	{
 		this->getConnection()->setLocalServerArguments(mDirectLinkArguments->currentText());
 		this->updateDirectLinkArgumentHistory();
 	}
-	else if (this->getConnection()->getUseLocalServer2())
+	else if (this->getConnection()->getUseLocalServer())
 	{
 		this->getConnection()->setLocalServerExecutable(mLocalServerEdit->text());
 		this->getConnection()->setLocalServerArguments(mLocalServerArguments->text());
@@ -375,7 +375,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 	if (probe)
 	{
 		videoSource = probe->getProbe()->getRTSource();
-		rMd = calculate_rMd_ForAProbeImage(probe, rMd);
+		rMd = calculate_rMd_ForAProbeImage(probe);
 	}
 	else
 		videoSource = videoService()->getActiveVideoSource();
@@ -404,8 +404,9 @@ void VideoConnectionWidget::importStreamImageSlot()
 
 }
 
-ssc::Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ssc::ToolPtr probe, ssc::Transform3D rMd)
+ssc::Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ssc::ToolPtr probe)
 {
+	ssc::Transform3D rMd = ssc::Transform3D::Identity();
 	ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 	ssc::Transform3D prMt = probe->get_prMt();
 	ssc::Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
