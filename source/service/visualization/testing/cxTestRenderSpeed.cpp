@@ -1,7 +1,7 @@
 #include <testing/cxTestRenderSpeed.h>
 
 #include <QTime>
-//#include <QGridLayout>
+#include <QGridLayout>
 #include <QBoxLayout>
 #include "vtkRenderWindow.h"
 #include "cxDataLocations.h"
@@ -47,6 +47,15 @@ void TestRenderSpeed::testSeveralViews()
 //	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 5000);
 }
 
+void TestRenderSpeed::testLotsOfViews()
+{
+	this->create3Dviews(20);
+	this->create2Dviews(80);
+	this->showViews();
+	this->renderNumTimes(10);
+	this->printResult();
+//	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 5000);
+}
 
 void TestRenderSpeed::create3Dviews(int num)
 {
@@ -69,9 +78,11 @@ void TestRenderSpeed::create2Dviews(int num)
 void TestRenderSpeed::showViews()
 {
 	QWidget* mainWidget = new QWidget;
-	QBoxLayout* layout = new QBoxLayout(QBoxLayout::LeftToRight, mainWidget);
+	mainWidget->resize(1000,500);
+//	QBoxLayout* layout = new QBoxLayout(QBoxLayout::LeftToRight, mainWidget);
+	QGridLayout* layout = new QGridLayout();
 	mainWidget->setLayout(layout);
-	this->addViewsToLayout(layout);
+	this->addViewsToGridLayout(layout);
 	mainWidget->show();
 }
 
@@ -104,6 +115,13 @@ void TestRenderSpeed::addViewsToLayout(QLayout* layout)
 	std::vector<ssc::ViewWidget*>::iterator iter;
 	for (iter = mViews.begin(); iter != mViews.end(); ++iter)
 		layout->addWidget(*iter);
+}
+
+void TestRenderSpeed::addViewsToGridLayout(QGridLayout* layout)
+{
+	int squareNumViews = sqrt(mViews.size());
+	for (int i = 0; i < mViews.size(); i++)
+		layout->addWidget(mViews[i], i / squareNumViews, i % squareNumViews);
 }
 
 int TestRenderSpeed::getTotalRenderTimeInMs()
