@@ -356,6 +356,7 @@ void VideoConnectionWidget::serverStatusChangedSlot()
 
 	this->adjustSize();
 }
+
 void VideoConnectionWidget::importStreamImageSlot()
 {
 	if (!this->getConnection())
@@ -368,18 +369,13 @@ void VideoConnectionWidget::importStreamImageSlot()
 		ssc::messageManager()->sendWarning("Video is not connected");
 		return;
 	}
-	vtkImageDataPtr input;
 	ssc::Transform3D rMd = ssc::Transform3D::Identity();
 	ssc::ToolPtr probe = ToolManager::getInstance()->findFirstProbe();
 	ssc::VideoSourcePtr videoSource;
 	if (probe)
 	{
 		videoSource = probe->getProbe()->getRTSource();
-		ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
-		ssc::Transform3D prMt = probe->get_prMt();
-		ssc::Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
-		ssc::Transform3D uMv = probe->getProbe()->getSector()->get_uMv();
-		rMd = rMpr * prMt * tMu * uMv;
+		rMd = calculate_rMd_ForAProbeImage(probe, rMd);
 	}
 	else
 		videoSource = videoService()->getActiveVideoSource();
@@ -394,12 +390,32 @@ void VideoConnectionWidget::importStreamImageSlot()
 		ssc::messageManager()->sendWarning("No valid video data");
 		return;
 	}
+
+	vtkImageDataPtr input;
 	input = videoSource->getVtkImageData();
 	if (!input)
 	{
 		ssc::messageManager()->sendWarning("No Video data");
 		return;
 	}
+	QString filename = generateFilename(input);
+
+	this->saveAndImportSnapshot(input, filename, rMd);
+
+}
+
+ssc::Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ssc::ToolPtr probe, ssc::Transform3D rMd)
+{
+	ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+	ssc::Transform3D prMt = probe->get_prMt();
+	ssc::Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
+	ssc::Transform3D uMv = probe->getProbe()->getSector()->get_uMv();
+	rMd = rMpr * prMt * tMu * uMv;
+	return rMd;
+}
+
+QString VideoConnectionWidget::generateFilename(vtkImageDataPtr input)
+{
 	int* extent = input->GetExtent();
 	QString filename;
 	QString format = ssc::timestampSecondsFormat();
@@ -408,6 +424,11 @@ void VideoConnectionWidget::importStreamImageSlot()
 	else
 		filename = "2DRTSnapshot" + QDateTime::currentDateTime().toString(format);
 
+	return filename;
+}
+
+void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString filename, ssc::Transform3D rMd)
+{
 	vtkImageDataPtr copiedImage = vtkImageDataPtr::New();
 	copiedImage->DeepCopy(input);
 	ssc::ImagePtr output = ssc::dataManager()->createImage(copiedImage, filename, filename);
