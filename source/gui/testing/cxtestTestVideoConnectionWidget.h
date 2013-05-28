@@ -15,13 +15,15 @@ namespace cxtest
 class TestVideoConnectionWidget : public cx::VideoConnectionWidget
 {
 	Q_OBJECT
-
 public:
 	TestVideoConnectionWidget();
 	virtual ~TestVideoConnectionWidget(){};
 
-public slots:
-	bool startStopServer();
+public:
+	bool canStream(QString filename);
+
+private:
+	void setupWidgetToRunDummyMhdStreamer(QString filename);
 };
 
 } /* namespace cxtest */
