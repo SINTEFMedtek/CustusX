@@ -37,6 +37,7 @@ private:
     void showViews();
     void renderNumTimes(int num);
     void printResult();
+    void addViewsToLayout(QLayout* layout);
     int getTotalRenderTimeInMs();
     void setTotalRenderTimeInMs(int time);
     double getAverageRenderTimeInMs();

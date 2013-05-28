@@ -1,6 +1,8 @@
 #include <testing/cxTestRenderSpeed.h>
 
 #include <QTime>
+//#include <QGridLayout>
+#include <QBoxLayout>
 #include "vtkRenderWindow.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
@@ -17,8 +19,8 @@ TestRenderSpeed::TestRenderSpeed()
 void TestRenderSpeed::setUp()
 {
 	// this stuff will be performed just before all tests in this class
-	cx::DataLocations::setTestMode();
-	cx::settings()->setValue("renderingInterval", 4);
+//	cx::DataLocations::setTestMode();
+//	cx::settings()->setValue("renderingInterval", 4);
 }
 
 void TestRenderSpeed::tearDown()
@@ -29,8 +31,8 @@ void TestRenderSpeed::tearDown()
 void TestRenderSpeed::testSingleView()
 {
 	this->create3Dviews(1);
-	showViews();
-	renderNumTimes(100);
+	this->showViews();
+	this->renderNumTimes(100);
 	this->printResult();
 //	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 2000);
 }
@@ -39,8 +41,8 @@ void TestRenderSpeed::testSeveralViews()
 {
 	this->create3Dviews(2);
 	this->create2Dviews(8);
-	showViews();
-	renderNumTimes(100);
+	this->showViews();
+	this->renderNumTimes(100);
 	this->printResult();
 //	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 5000);
 }
@@ -66,9 +68,11 @@ void TestRenderSpeed::create2Dviews(int num)
 
 void TestRenderSpeed::showViews()
 {
-	std::vector<ssc::ViewWidget*>::iterator iter;
-	for (iter = mViews.begin(); iter != mViews.end(); ++iter)
-		(*iter)->show();
+	QWidget* mainWidget = new QWidget;
+	QBoxLayout* layout = new QBoxLayout(QBoxLayout::LeftToRight, mainWidget);
+	mainWidget->setLayout(layout);
+	this->addViewsToLayout(layout);
+	mainWidget->show();
 }
 
 void TestRenderSpeed::renderNumTimes(int num)
@@ -93,6 +97,13 @@ void TestRenderSpeed::printResult()
 	std::cout << "\tTotal: " << this->getTotalRenderTimeInMs() << "ms";
 	std::cout << "\tAverage: " << this->getAverageRenderTimeInMs() << "ms";
 	std::cout << "\t(FPS=" << this->getRenderFPS() << ")" << std::endl;
+}
+
+void TestRenderSpeed::addViewsToLayout(QLayout* layout)
+{
+	std::vector<ssc::ViewWidget*>::iterator iter;
+	for (iter = mViews.begin(); iter != mViews.end(); ++iter)
+		layout->addWidget(*iter);
 }
 
 int TestRenderSpeed::getTotalRenderTimeInMs()
