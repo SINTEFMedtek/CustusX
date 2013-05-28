@@ -32,12 +32,19 @@ public:
     CPPUNIT_TEST_SUITE_END();
 
 private:
-    int renderTimeInMs();
     void create3Dviews(int num);
     void create2Dviews(int num);
     void showViews();
+    void renderNumTimes(int num);
+    void printResult();
+    int getTotalRenderTimeInMs();
+    void setTotalRenderTimeInMs(int time);
+    double getAverageRenderTimeInMs();
+    int getRenderFPS();
 
 	std::vector<ssc::ViewWidget*> mViews;
+	int mNumRenderings;
+	int mRenderTimeInMs;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestRenderSpeed );
