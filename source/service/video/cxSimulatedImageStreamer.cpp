@@ -43,7 +43,8 @@ bool SimulatedImageStreamer::startStreaming(SenderPtr sender)
 
 void SimulatedImageStreamer::stopStreaming()
 {
-	mSendTimer->stop();
+	if(mSendTimer)
+		mSendTimer->stop();
 }
 
 QString SimulatedImageStreamer::getType()
