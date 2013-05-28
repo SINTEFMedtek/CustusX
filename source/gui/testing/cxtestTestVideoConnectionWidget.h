@@ -23,7 +23,7 @@ public:
 	bool canStream(QString filename);
 
 private:
-	void setupWidgetToRunDummyMhdStreamer(QString filename);
+	void setupWidgetToRunStreamer(QString filename, QString streamerType);
 };
 
 } /* namespace cxtest */
