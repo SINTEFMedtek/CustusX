@@ -8,6 +8,7 @@
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
 #include "cxtestSignalListener.h"
+#include "cxDataLocations.h"
 
 namespace cxtest
 {
@@ -21,9 +22,11 @@ bool TestVideoConnectionWidget::startStopServer()
 	this->show();
 	QTest::qWaitForWindowShown(this);
 
+	QString filename = cx::DataLocations::getTestDataPath()+"/testing/TubeSegmentationFramework/Default.mhd";
+
 	QString connectionMethod("Direct Link");
 	mConnectionSelector->setValue(connectionMethod);
-	QString connectionArguments("--type MHDFile --filename /home/jbake/jbake/data/helix/helix.mhd");
+	QString connectionArguments("--type MHDFile --filename "+filename);
 	mDirectLinkArguments->addItem(connectionArguments);
 	mDirectLinkArguments->setCurrentIndex(mDirectLinkArguments->findText(connectionArguments));
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //connect
