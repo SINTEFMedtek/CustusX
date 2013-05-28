@@ -1,15 +1,8 @@
-/*
- * cxImageSenderFactory.cpp
- *
- *  \date Aug 9, 2011
- *      \author christiana
- */
-
 #include "cxImageSenderFactory.h"
-#include "cxImageSenderOpenCV.h"
-#include "cxImageSenderFile.h"
-#include "cxImageSenderSonix.h"
-#include "cxImageSenderGE.h"
+#include "cxImageStreamerOpenCV.h"
+#include "cxMHDImageStreamer.h"
+#include "cxImageStreamerSonix.h"
+#include "cxImageStreamerGE.h"
 
 namespace cx
 {
@@ -48,78 +41,91 @@ StringMap extractCommandlineOptions(QStringList cmdline)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-ImageSenderPtr ImageSenderFactory::getFromArguments(StringMap args)
+StreamerPtr ImageStreamerFactory::getFromArguments(StringMap args)
 {
 	QString type = this->getDefaultSenderType();
 	if (args.count("type"))
 		type = args["type"];
 
-	ImageSenderPtr retval = this->getImageSender(type);
+	StreamerPtr streamer = this->getImageSender(type);
 
-	if (retval)
-	{
+	if (streamer)
 		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
-	}
 	else
 	{
 		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
-		return retval;
+		return streamer;
 	}
 
-	retval->initialize(args);
-	return retval;
+	CommandLineStreamerPtr commandlinestreamer = boost::dynamic_pointer_cast<CommandLineStreamer>(streamer);
+	if(commandlinestreamer)
+		commandlinestreamer->initialize(args);
+
+	DummyImageStreamerPtr mhdimagestreamer = boost::dynamic_pointer_cast<DummyImageStreamer>(streamer);
+	QString filename = args["filename"];
+	bool secondary = args.count("secondary") ? true : false;
+	if(mhdimagestreamer)
+		mhdimagestreamer->initialize(filename, secondary);
+
+	return streamer;
 }
 
 
-ImageSenderFactory::ImageSenderFactory()
+ImageStreamerFactory::ImageStreamerFactory()
 {
 #ifdef CX_WIN32
-	mAvailable.push_back(ImageSenderPtr(new ImageSenderSonix()));
+	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerSonix()));
 #endif
 #ifdef CX_USE_OpenCV
-	mAvailable.push_back(ImageSenderPtr(new ImageSenderOpenCV()));
+	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerOpenCV()));
 #endif
 #ifdef CX_USE_ISB_GE
-	mAvailable.push_back(ImageSenderPtr(new ImageSenderGE()));
+	mCommandLineStreamers.push_back(CommandLineStreamerPtr(new ImageStreamerGE()));
 #endif
-	mAvailable.push_back(ImageSenderPtr(new MHDImageSender()));
+	mImageStreamers.push_back(DummyImageStreamerPtr(new DummyImageStreamer()));
 }
 
-QString ImageSenderFactory::getDefaultSenderType() const
+QString ImageStreamerFactory::getDefaultSenderType() const
 {
 	// use the FIRST sender available
-  QString retval = mAvailable.front()->getType();
+  QString retval = mCommandLineStreamers.front()->getType();
   return retval;
-	//return mAvailable.front()->getType();
 }
 
-QStringList ImageSenderFactory::getSenderTypes() const
+QStringList ImageStreamerFactory::getSenderTypes() const
 {
 	QStringList retval;
-	for (unsigned i=0; i< mAvailable.size(); ++i)
-		retval << mAvailable[i]->getType();
+	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
+		retval << mCommandLineStreamers[i]->getType();
+	for (unsigned i=0; i< mImageStreamers.size(); ++i)
+		retval << mImageStreamers[i]->getType();
 	return retval;
 }
 
-QStringList ImageSenderFactory::getArgumentDescription(QString type) const
+QStringList ImageStreamerFactory::getArgumentDescription(QString type) const
 {
 	QStringList retval;
-	for (unsigned i=0; i< mAvailable.size(); ++i)
+	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
 	{
-		if (mAvailable[i]->getType()==type)
-			return mAvailable[i]->getArgumentDescription();
+		if (mCommandLineStreamers[i]->getType()==type)
+			return mCommandLineStreamers[i]->getArgumentDescription();
 	}
 	return retval;
 }
 
-ImageSenderPtr ImageSenderFactory::getImageSender(QString type)
+StreamerPtr ImageStreamerFactory::getImageSender(QString type)
 {
-	for (unsigned i=0; i< mAvailable.size(); ++i)
+	for (unsigned i=0; i< mCommandLineStreamers.size(); ++i)
 	{
-		if (mAvailable[i]->getType()==type)
-			return mAvailable[i];
+		if (mCommandLineStreamers[i]->getType()==type)
+			return mCommandLineStreamers[i];
 	}
-	return ImageSenderPtr();
+	for (unsigned i=0; i< mImageStreamers.size(); ++i)
+	{
+		if (mImageStreamers[i]->getType()==type)
+			return mImageStreamers[i];
+	}
+	return StreamerPtr();
 }
 
 

@@ -227,18 +227,18 @@ ssc::ImagePtr IGTLinkConversion::decode(IGTLinkImageMessage::Pointer message)
 	return retval;
 }
 
-IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ssc::ProbeData input)
+IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ssc::ProbeDataPtr input)
 {
 	IGTLinkUSStatusMessage::Pointer retval = IGTLinkUSStatusMessage::New();
 
-	retval->SetOrigin(input.getImage().mOrigin_p.data());
+	retval->SetOrigin(input->getImage().mOrigin_p.data());
 	// 1 = sector, 2 = linear
-	retval->SetProbeType(input.getType());
+	retval->SetProbeType(input->getType());
 
-	retval->SetDepthStart(input.getDepthStart());// Start of sector in mm from origin
-	retval->SetDepthEnd(input.getDepthEnd());	// End of sector in mm from origin
-	retval->SetWidth(input.getWidth());// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
-	retval->SetDeviceName(cstring_cast(input.getUid()));
+	retval->SetDepthStart(input->getDepthStart());// Start of sector in mm from origin
+	retval->SetDepthEnd(input->getDepthEnd());	// End of sector in mm from origin
+	retval->SetWidth(input->getWidth());// Width of sector in mm for LINEAR, Width of sector in radians for SECTOR.
+	retval->SetDeviceName(cstring_cast(input->getUid()));
 
 	//  std::cout << "origin: " << mFrameGeometry.origin[0] << " " << mFrameGeometry.origin[1] << " " << mFrameGeometry.origin[2] << std::endl;
 	//  std::cout << "imageType: " << mFrameGeometry.imageType << std::endl;
@@ -250,23 +250,23 @@ IGTLinkUSStatusMessage::Pointer IGTLinkConversion::encode(ssc::ProbeData input)
 }
 
 //'copied' from OpenIGTLinkRTSource::updateSonixStatus()
-ssc::ProbeData IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ssc::ProbeData base)
+ssc::ProbeDataPtr IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ssc::ProbeDataPtr base)
 {
-	ssc::ProbeData retval = base;
+	ssc::ProbeDataPtr retval = base;
 
 	if (probeMessage)
 	{
 		// Update the parts of the probe data that is read from the probe message.
-		retval.setType(ssc::ProbeData::TYPE(probeMessage->GetProbeType()));
-		retval.setSector(
+		retval->setType(ssc::ProbeData::TYPE(probeMessage->GetProbeType()));
+		retval->setSector(
 				probeMessage->GetDepthStart(),
 				probeMessage->GetDepthEnd(),
 				probeMessage->GetWidth(),
 				0);
-		ssc::ProbeData::ProbeImageData imageData = retval.getImage();
+		ssc::ProbeData::ProbeImageData imageData = retval->getImage();
 		imageData.mOrigin_p = ssc::Vector3D(probeMessage->GetOrigin());
-		retval.setImage(imageData);
-		retval.setUid(probeMessage->GetDeviceName());
+		retval->setImage(imageData);
+		retval->setUid(probeMessage->GetDeviceName());
 	}
 
 	if (imageMessage)
@@ -279,11 +279,11 @@ ssc::ProbeData IGTLinkConversion::decode(IGTLinkUSStatusMessage::Pointer probeMe
 		imageMessage->GetDimensions(size);
 		imageMessage->GetSpacing(spacing);
 
-		ssc::ProbeData::ProbeImageData imageData = retval.getImage();
+		ssc::ProbeData::ProbeImageData imageData = retval->getImage();
 		imageData.mSpacing = ssc::Vector3D(spacing[0], spacing[1], spacing[2]);
 		imageData.mSize = QSize(size[0], size[1]);
 		imageData.mClipRect_p = ssc::DoubleBoundingBox3D(0, imageData.mSize.width(), 0, imageData.mSize.height(), 0, 0);
-		retval.setImage(imageData);
+		retval->setImage(imageData);
 	}
 
 	return this->decode(retval);
@@ -305,11 +305,11 @@ ssc::ImagePtr IGTLinkConversion::decode(ssc::ImagePtr msg)
 	return retval;
 }
 
-ssc::ProbeData IGTLinkConversion::decode(ssc::ProbeData msg)
+ssc::ProbeDataPtr IGTLinkConversion::decode(ssc::ProbeDataPtr msg)
 {
-	QString newUid = msg.getUid();
-	QString format = this->extractColorFormat(msg.getUid(), &newUid);
-	msg.setUid(newUid);
+	QString newUid = msg->getUid();
+	QString format = this->extractColorFormat(msg->getUid(), &newUid);
+	msg->setUid(newUid);
 
 	return msg;
 }
