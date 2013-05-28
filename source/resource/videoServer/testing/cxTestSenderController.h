@@ -2,7 +2,7 @@
 #define CXTestGrabberSenderController_H_
 
 #include <QApplication>
-#include "cxGrabberSenderDirectLink.h"
+#include "cxDirectlyLinkedSender.h"
 
 /**
  * Helper object for automated control of the CustusX application.
@@ -10,13 +10,13 @@
  * \author Ole Vegard Solberg, SINTEF
  * \date Feb 5, 2012
  */
-class TestGrabberSenderController : public QObject
+class TestSenderController : public QObject
 {
 	Q_OBJECT
 
 public:
-	TestGrabberSenderController(QObject* parent);
-	void initialize(cx::GrabberSenderDirectLinkPtr grabberBridge);
+	TestSenderController(QObject* parent);
+	void initialize(cx::DirectlyLinkedSenderPtr grabberBridge);
 	bool verify();
 
 private slots:
@@ -24,7 +24,7 @@ private slots:
 	void newUSStatusSlot();
 
 private:
-	cx::GrabberSenderDirectLinkPtr mGrabberBridge;
+	cx::DirectlyLinkedSenderPtr mGrabberBridge;
 	bool mImageReceived;
 	bool mStatusReceived;
 };

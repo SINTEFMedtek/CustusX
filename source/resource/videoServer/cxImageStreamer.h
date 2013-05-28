@@ -22,7 +22,7 @@
 
 #include <map>
 #include "boost/shared_ptr.hpp"
-#include "cxGrabberSender.h"
+#include "cxSender.h"
 
 namespace cx
 {

@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxGrabberReceiveThreadIGTLink.h"
+#include "cxIGTLinkedImageReceiverThread.h"
 
 #include "igtlOSUtil.h"
 #include "igtlMessageHeader.h"
@@ -131,13 +131,13 @@
 namespace cx
 {
 
-GrabberReceiveThreadIGTLink::GrabberReceiveThreadIGTLink(QString address, int port, QObject* parent) :
-		GrabberReceiveThread(parent), mHeadingReceived(false), mAddress(address), mPort(port)
+IGTLinkedImageReceiverThread::IGTLinkedImageReceiverThread(QString address, int port, QObject* parent) :
+		ImageReceiverThread(parent), mHeadingReceived(false), mAddress(address), mPort(port)
 {
 //  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
 }
 
-void GrabberReceiveThreadIGTLink::run()
+void IGTLinkedImageReceiverThread::run()
 {
 //  std::cout << "client::run thread: " << QThread::currentThread() << std::endl;
 	//std::cout << "run client thread, connecting to " << mAddress << " " << mPort << std::endl;
@@ -176,33 +176,33 @@ void GrabberReceiveThreadIGTLink::run()
 	delete mSocket;
 }
 
-QString GrabberReceiveThreadIGTLink::hostDescription() const
+QString IGTLinkedImageReceiverThread::hostDescription() const
 {
 	return mAddress + ":" + qstring_cast(mPort);
 }
 
-void GrabberReceiveThreadIGTLink::hostFoundSlot()
+void IGTLinkedImageReceiverThread::hostFoundSlot()
 {
 	ssc::messageManager()->sendInfo("Host found: " + this->hostDescription());
 }
-void GrabberReceiveThreadIGTLink::connectedSlot()
+void IGTLinkedImageReceiverThread::connectedSlot()
 {
 	ssc::messageManager()->sendSuccess("Connected to host " + this->hostDescription());
 	emit connected(true);
 }
-void GrabberReceiveThreadIGTLink::disconnectedSlot()
+void IGTLinkedImageReceiverThread::disconnectedSlot()
 {
 	ssc::messageManager()->sendInfo("Disconnected to host " + this->hostDescription());
 	emit connected(false);
 }
-void GrabberReceiveThreadIGTLink::errorSlot(QAbstractSocket::SocketError socketError)
+void IGTLinkedImageReceiverThread::errorSlot(QAbstractSocket::SocketError socketError)
 {
 	ssc::messageManager()->sendError(
 					"Socket error [Host=" + this->hostDescription() + ", Code=" + socketError + "]\n"
 									+ mSocket->errorString());
 }
 
-void GrabberReceiveThreadIGTLink::readyReadSlot()
+void IGTLinkedImageReceiverThread::readyReadSlot()
 {
 	// read messages until one fails
 	while (this->readOneMessage());
@@ -214,7 +214,7 @@ void GrabberReceiveThreadIGTLink::readyReadSlot()
  * Return false if there was not enough data to
  * read the entire message.
  */
-bool GrabberReceiveThreadIGTLink::readOneMessage()
+bool IGTLinkedImageReceiverThread::readOneMessage()
 {
 
 //  std::cout << "tick " << std::endl;
@@ -281,7 +281,7 @@ bool GrabberReceiveThreadIGTLink::readOneMessage()
 	return true;
 }
 
-bool GrabberReceiveThreadIGTLink::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
+bool IGTLinkedImageReceiverThread::ReceiveSonixStatus(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
 	IGTLinkUSStatusMessage::Pointer msg;
 	msg = IGTLinkUSStatusMessage::New();
@@ -309,7 +309,7 @@ bool GrabberReceiveThreadIGTLink::ReceiveSonixStatus(QTcpSocket* socket, igtl::M
 	return true;
 }
 
-bool GrabberReceiveThreadIGTLink::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
+bool IGTLinkedImageReceiverThread::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
 	// Create a message buffer to receive transform data
 	IGTLinkImageMessage::Pointer imgMsg;
@@ -341,13 +341,13 @@ bool GrabberReceiveThreadIGTLink::ReceiveImage(QTcpSocket* socket, igtl::Message
 	return true;
 }
 
-void GrabberReceiveThreadIGTLink::addToQueue(IGTLinkUSStatusMessage::Pointer msg)
+void IGTLinkedImageReceiverThread::addToQueue(IGTLinkUSStatusMessage::Pointer msg)
 {
 	// set temporary, then assume the image adder will pass this message on.
 	mUnsentUSStatusMessage = msg;
 }
 
-void GrabberReceiveThreadIGTLink::addToQueue(IGTLinkImageMessage::Pointer msg)
+void IGTLinkedImageReceiverThread::addToQueue(IGTLinkImageMessage::Pointer msg)
 {
 	IGTLinkConversion converter;
 	this->addImageToQueue(converter.decode(msg));

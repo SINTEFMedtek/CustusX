@@ -1,16 +1,16 @@
-#include "cxGrabberSenderDirectLink.h"
+#include "cxDirectlyLinkedSender.h"
 
 #include "cxIGTLinkConversion.h"
 
 namespace cx
 {
 
-bool GrabberSenderDirectLink::isReady() const
+bool DirectlyLinkedSender::isReady() const
 {
 	return true;
 }
 
-void GrabberSenderDirectLink::send(IGTLinkImageMessage::Pointer msg)
+void DirectlyLinkedSender::send(IGTLinkImageMessage::Pointer msg)
 {
 	if (!msg || !this->isReady())
 		return;
@@ -23,14 +23,14 @@ void GrabberSenderDirectLink::send(IGTLinkImageMessage::Pointer msg)
 	}
 }
 
-void GrabberSenderDirectLink::send(IGTLinkUSStatusMessage::Pointer msg)
+void DirectlyLinkedSender::send(IGTLinkUSStatusMessage::Pointer msg)
 {
 	if (!msg || !this->isReady())
 		return;
 	mUnsentUSStatusMessage = msg;
 }
 
-void GrabberSenderDirectLink::send(ssc::ImagePtr msg)
+void DirectlyLinkedSender::send(ssc::ImagePtr msg)
 {
 	if (!this->isReady())
 		return;
@@ -43,7 +43,7 @@ void GrabberSenderDirectLink::send(ssc::ImagePtr msg)
 	emit newImage();
 }
 
-void GrabberSenderDirectLink::send(ssc::ProbeDataPtr msg)
+void DirectlyLinkedSender::send(ssc::ProbeDataPtr msg)
 {
 	if (!this->isReady())
 		return;
@@ -53,15 +53,14 @@ void GrabberSenderDirectLink::send(ssc::ProbeDataPtr msg)
 	emit newUSStatus();
 }
 
-ssc::ImagePtr GrabberSenderDirectLink::popImage()
+ssc::ImagePtr DirectlyLinkedSender::popImage()
 {
 	return mImage;
 	mImage.reset();
 }
-ssc::ProbeDataPtr GrabberSenderDirectLink::popUSStatus()
+ssc::ProbeDataPtr DirectlyLinkedSender::popUSStatus()
 {
 	return mUSStatus;
-//	mUSStatus = IGTLinkUSStatusMessage::Pointer();
 }
 
 }

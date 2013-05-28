@@ -107,12 +107,12 @@ QProcess* VideoConnectionManager::getProcess()
 	return mProcess->getProcess();
 }
 
-bool VideoConnectionManager::getUseLocalServer2()
+bool VideoConnectionManager::getUseLocalServer()
 {
 	return mConnectionMethod->getValue() == "Local Server";
 }
 
-bool VideoConnectionManager::getUseDirectLink2()
+bool VideoConnectionManager::getUseDirectLink()
 {
 	return mConnectionMethod->getValue() == "Direct Link";
 }
@@ -174,7 +174,7 @@ QString VideoConnectionManager::getLocalServerArguments()
 
 void VideoConnectionManager::launchServer()
 {
-	if (!this->getUseLocalServer2())
+	if (!this->getUseLocalServer())
 	{
 		ssc::messageManager()->sendError("Ignoring Launch local server: Must select local server");
 		return;
@@ -192,7 +192,7 @@ void VideoConnectionManager::connectServer()
 {
 	if (!mRTSource->isConnected())
 	{
-		if (this->getUseLocalServer2())
+		if (this->getUseLocalServer())
 			mRTSource->connectServer("LocalHost", this->getPort());
 		else
 			mRTSource->connectServer(this->getHost(), this->getPort());
@@ -225,16 +225,15 @@ void VideoConnectionManager::launchAndConnectServer()
 
 	mIniScript->launch(this->getInitScript());
 
-	if (this->getUseDirectLink2())
+	if (this->getUseDirectLink())
 	{
 		QString commandline = this->getLocalServerArguments();
-		std::cout << "commandline " << commandline.toStdString() << std::endl;
 		StringMap args = extractCommandlineOptions(commandline.split(" "));
 		mRTSource->directLink(args);
 		return;
 	}
 
-	if (this->getUseLocalServer2())
+	if (this->getUseLocalServer())
 	{
 		this->launchServer();
 

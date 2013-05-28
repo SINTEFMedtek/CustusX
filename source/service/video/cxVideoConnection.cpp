@@ -30,7 +30,7 @@
 #include <vtkImageChangeInformation.h>
 #include <vtkExtractVOI.h>
 #include "sscTypeConversions.h"
-#include "cxGrabberReceiveThreadIGTLink.h"
+#include "cxIGTLinkedImageReceiverThread.h"
 #include "sscMessageManager.h"
 #include "sscTime.h"
 #include "sscVector3D.h"
@@ -41,7 +41,7 @@
 #include "cxVideoService.h"
 #include "cxToolManager.h"
 #include "cxImageSenderFactory.h"
-#include "cxGrabberReceiveThreadDirectLink.h"
+#include "cxDirectlyLinkedImageReceiverThread.h"
 #include "sscTypeConversions.h"
 #include "sscImage.h"
 #include "sscData.h"
@@ -96,16 +96,15 @@ void VideoConnection::connectedSlot(bool on)
 
 void VideoConnection::directLink(std::map<QString, QString> args)
 {
-	std::cout << "VideoConnection::directLink(std::map<QString, QString> args)" << std::endl;
-	this->runClient(GrabberReceiveThreadPtr(new GrabberDirectLinkThread(args, this)));
+	this->runClient(ImageReceiverThreadPtr(new DirectlyLinkedImageReceiverThread(args, this)));
 }
 
 void VideoConnection::connectServer(QString address, int port)
 {
-	this->runClient(GrabberReceiveThreadPtr(new GrabberReceiveThreadIGTLink(address, port, this)));
+	this->runClient(ImageReceiverThreadPtr(new IGTLinkedImageReceiverThread(address, port, this)));
 }
 
-void VideoConnection::runClient(GrabberReceiveThreadPtr client)
+void VideoConnection::runClient(ImageReceiverThreadPtr client)
 {
 	if (mClient)
 	{
