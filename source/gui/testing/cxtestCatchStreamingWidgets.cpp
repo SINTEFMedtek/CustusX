@@ -21,6 +21,7 @@ TEST_CASE("StreamingWidget construction", "[unit][gui][widget][streaming]")
 	CHECK(widget->canStream(filename));
 	delete widget;
 
+	//TODO this will prevent more tests from running???
 	QTimer::singleShot(1000, qApp, SLOT(quit()));
 }
 

@@ -9,6 +9,8 @@
 #include "cxVideoConnectionManager.h"
 #include "cxtestSignalListener.h"
 
+#include "cxToolManager.h"
+
 namespace cxtest
 {
 
@@ -22,7 +24,11 @@ bool TestVideoConnectionWidget::canStream(QString filename)
 	this->show();
 	QTest::qWaitForWindowShown(this);
 
-	this->setupWidgetToRunDummyMhdStreamer(filename);
+//	this->setupWidgetToRunStreamer(filename, "MHDFile");
+
+	cx::ToolManager::initializeObject();
+	cx::ToolManager::getInstance()->configure();
+	this->setupWidgetToRunStreamer(filename, "SimulatedImageStreamer");
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //connect
 
@@ -39,11 +45,11 @@ bool TestVideoConnectionWidget::canStream(QString filename)
 	return canStream;
 }
 
-void TestVideoConnectionWidget::setupWidgetToRunDummyMhdStreamer(QString filename)
+void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename, QString streamerType)
 {
 	QString connectionMethod("Direct Link");
 	mConnectionSelector->setValue(connectionMethod);
-	QString connectionArguments("--type MHDFile --filename " + filename);
+	QString connectionArguments("--type "+streamerType+" --filename " + filename);
 	mDirectLinkArguments->addItem(connectionArguments);
 	mDirectLinkArguments->setCurrentIndex(mDirectLinkArguments->findText(connectionArguments));
 }

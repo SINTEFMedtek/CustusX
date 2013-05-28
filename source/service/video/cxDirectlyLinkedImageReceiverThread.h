@@ -30,7 +30,7 @@ typedef boost::shared_ptr<class DirectlyLinkedSender> DirectlyLinkedSenderPtr;
  * \addtogroup cxServiceVideo
  * @{
  */
-
+typedef boost::shared_ptr<class SimulatedImageStreamer> SimulatedImageStreamerPtr;
 typedef boost::shared_ptr<class DirectlyLinkedImageReceiverThread> DirectlyLinkedImageReceiverThreadPtr;
 
 /**\brief Client thread used for running streamers
@@ -56,6 +56,7 @@ private slots:
 	void addSonixStatusToQueueSlot();
 
 private:
+	SimulatedImageStreamerPtr createSimulatedImageStreamer();
 	void printArguments(); ///< for debugging
 
 	std::map<QString, QString> mArguments;
