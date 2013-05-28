@@ -30,7 +30,9 @@ void TestRenderSpeed::testSingleView()
 {
 	this->create3Dviews(1);
 	showViews();
-	std::cout << "render time 1 view: " << this->renderTimeInMs() << "ms" << std::endl;
+	renderNumTimes(100);
+	this->printResult();
+//	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 2000);
 }
 
 void TestRenderSpeed::testSeveralViews()
@@ -38,19 +40,11 @@ void TestRenderSpeed::testSeveralViews()
 	this->create3Dviews(2);
 	this->create2Dviews(8);
 	showViews();
-	std::cout << "render time 10 views : " << this->renderTimeInMs() << "ms" << std::endl;
+	renderNumTimes(100);
+	this->printResult();
+//	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 5000);
 }
 
-int TestRenderSpeed::renderTimeInMs()
-{
-	QTime clock;
-	clock.start();
-	std::vector<ssc::ViewWidget*>::iterator iter;
-	for(int i = 0; i < 100; ++i)
-		for (iter = mViews.begin(); iter != mViews.end(); ++iter)
-			(*iter)->getRenderWindow()->Render();
-	return clock.elapsed();
-}
 
 void TestRenderSpeed::create3Dviews(int num)
 {
@@ -75,6 +69,52 @@ void TestRenderSpeed::showViews()
 	std::vector<ssc::ViewWidget*>::iterator iter;
 	for (iter = mViews.begin(); iter != mViews.end(); ++iter)
 		(*iter)->show();
+}
+
+void TestRenderSpeed::renderNumTimes(int num)
+{
+	mNumRenderings = num;
+	QTime clock;
+	clock.start();
+	std::vector<ssc::ViewWidget*>::iterator iter;
+	for(int i = 0; i < mNumRenderings; ++i)
+		for (iter = mViews.begin(); iter != mViews.end(); ++iter)
+			(*iter)->getRenderWindow()->Render();
+	this->setTotalRenderTimeInMs(clock.elapsed());
+}
+
+void TestRenderSpeed::printResult()
+{
+	std::cout << "Render time:\t" << mViews.size();
+	if (mViews.size() == 1)
+		std::cout << " view. ";
+	else
+		std::cout << " views.";
+	std::cout << "\tTotal: " << this->getTotalRenderTimeInMs() << "ms";
+	std::cout << "\tAverage: " << this->getAverageRenderTimeInMs() << "ms";
+	std::cout << "\t(FPS=" << this->getRenderFPS() << ")" << std::endl;
+}
+
+int TestRenderSpeed::getTotalRenderTimeInMs()
+{
+	return mRenderTimeInMs;
+}
+
+
+void TestRenderSpeed::setTotalRenderTimeInMs(int time)
+{
+	mRenderTimeInMs = time;
+}
+
+double TestRenderSpeed::getAverageRenderTimeInMs()
+{
+	double time = mRenderTimeInMs / (double)mNumRenderings;
+	return time;
+}
+
+int TestRenderSpeed::getRenderFPS()
+{
+	return 1000 / this->getAverageRenderTimeInMs();
 }
 
 } //namespace cxtest
