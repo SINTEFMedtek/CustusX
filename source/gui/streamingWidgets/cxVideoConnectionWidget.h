@@ -20,22 +20,23 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <QProcess>
+#include "sscTransform3D.h"
+
 class QPushButton;
 class QComboBox;
 class QLineEdit;
 class QStackedWidget;
-
-#include <QtTest/QtTest>
+typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace ssc
 {
 	class FileSelectWidget;
 	typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
+	typedef boost::shared_ptr<class Tool> ToolPtr;
 }
 
 namespace cx
 {
-//typedef boost::shared_ptr<class IGTLinkClient> GrabberReceiveThreadIGTLinkPtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
 typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
 
@@ -55,10 +56,9 @@ class VideoConnectionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  VideoConnectionWidget(QWidget* parent);
-  virtual ~VideoConnectionWidget();
-
-  virtual QString defaultWhatsThis() const;
+	VideoConnectionWidget(QWidget* parent);
+	virtual ~VideoConnectionWidget();
+	virtual QString defaultWhatsThis() const;
 
 protected slots:
 	void toggleLaunchServer();
@@ -91,6 +91,9 @@ protected:
 	QWidget* createLocalServerWidget();
 	QWidget* createRemoteWidget();
 	QWidget* wrapVerticalStretch(QWidget* input);
+	ssc::Transform3D calculate_rMd_ForAProbeImage(ssc::ToolPtr probe, ssc::Transform3D rMd);
+	QString generateFilename(vtkImageDataPtr input);
+	void saveAndImportSnapshot(vtkImageDataPtr input, QString filename, ssc::Transform3D rMd);
 
 	QPushButton* mConnectButton;
 	QPushButton* mImportStreamImageButton;

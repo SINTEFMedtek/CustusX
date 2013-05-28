@@ -45,22 +45,50 @@ def testStreaming():
                    "./source/resource/videoServer/testing/cxTestGEInterface_CppUnit_CTest -r".split(" ")
                    ])
     
-def testStreamingWidgets():
+def testGui():
     return deque(["make CatchGui -j8".split(" "),
-                   #"./source/testing/Catch -g [widget] -s".split(" "),
-                   "./source/gui/testing/CatchGui".split(" ")#,
+                   "./source/gui/testing/CatchGui".split(" ")
                    ])
-
-def main():
-    printIntro()
-    command_queue = testStreamingWidgets()
     
+def runCppUnitTests():
+    return deque(["make -j8".split(" "),
+                  "ctest -D ExperimentalTest --no-compress-output".split(" ")#
+                  ])
+    
+def runCatchTests():
+    return deque(["make -j8".split(" "),
+                  "./source/testing/Catch".split(" ")
+                  ])
+    
+def execute_queue(command_queue):
     while(command_queue):
         code = run(command_queue.popleft())
         if(code != 0):
             log("[FAILURE] exiting")
-            return
+            return False
+    return True
 
+def main():
+    printIntro()
+    
+    run_all_test = False;
+    
+    if(run_all_test):
+        #running all catch tests
+        command_queue = runCatchTests()
+        if(not execute_queue(command_queue)):
+            return;    
+       
+        #running all cppunit tests
+        command_queue = runCppUnitTests()
+        if(not execute_queue(command_queue)):
+            return;    
+    else:
+        #running specific catch tests
+        command_queue = testGui()
+        if(not execute_queue(command_queue)):
+            return;        
+        
     print("[SUCCESS]")
     return
     
