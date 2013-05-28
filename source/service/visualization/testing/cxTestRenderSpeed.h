@@ -6,6 +6,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "sscView.h"
+class QGridLayout;
 
 namespace cxtest
 {
@@ -25,10 +26,12 @@ public:
 	TestRenderSpeed();
 	void testSingleView();
 	void testSeveralViews();
+	void testLotsOfViews();
 
     CPPUNIT_TEST_SUITE( TestRenderSpeed );
         CPPUNIT_TEST( testSingleView );
         CPPUNIT_TEST( testSeveralViews );
+        CPPUNIT_TEST( testLotsOfViews );
     CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -38,6 +41,7 @@ private:
     void renderNumTimes(int num);
     void printResult();
     void addViewsToLayout(QLayout* layout);
+    void addViewsToGridLayout(QGridLayout* layout);
     int getTotalRenderTimeInMs();
     void setTotalRenderTimeInMs(int time);
     double getAverageRenderTimeInMs();
