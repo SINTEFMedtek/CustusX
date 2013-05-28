@@ -11,11 +11,11 @@
 namespace cxtest
 {
 
-TestVideoConnection::TestVideoConnection() :
+TestVideoConnectionWidget::TestVideoConnectionWidget() :
 		VideoConnectionWidget(NULL)
 {}
 
-bool TestVideoConnection::startStopServer()
+bool TestVideoConnectionWidget::startStopServer()
 {
 	this->show();
 	QTest::qWaitForWindowShown(this);

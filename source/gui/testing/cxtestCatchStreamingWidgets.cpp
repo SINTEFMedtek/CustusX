@@ -11,7 +11,7 @@ TEST_CASE("StreamingWidget construction", "[unit][gui][widget][streaming]")
 {
 	cx::LogicManager::initialize();
 
-	TestVideoConnection* widget = new TestVideoConnection();
+	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget();
 	REQUIRE(widget);
 	CHECK(widget->startStopServer());
 	delete widget;
