@@ -44,6 +44,7 @@ target_link_libraries(cxtestUtilities SSC)
     # Set variables
     #-----------------------------------------------------------------------------
     QT4_WRAP_CPP( CATCH_MOCED_SOURCES
+            ../gui/testing/cxtestTestVideoConnectionWidget.h
         )
     set(CATCH_SOURCES 
         ${CATCH_MOCED_SOURCES}
@@ -51,6 +52,8 @@ target_link_libraries(cxtestUtilities SSC)
         ../plugins/Algorithm/testing/cxCatchAlgorithm.cpp
         ../service/video/testing/cxCatchVideo.cpp
         ../gui/testing/cxtestCatchStreamingWidgets.cpp
+        ../gui/testing/cxtestTestVideoConnectionWidget.h
+        ../gui/testing/cxtestTestVideoConnectionWidget.cpp
     )
     
     #------------------------------------------------------------------------------
@@ -58,6 +61,7 @@ target_link_libraries(cxtestUtilities SSC)
     #-----------------------------------------------------------------------------
     include_directories(
 		.
+		${CustusX3_SOURCE_DIR}/source/gui/testing
 		${CustusX3_SOURCE_DIR}/source/gui/utilities
 		${CustusX3_SOURCE_DIR}/source/gui/streamingWidgets
 		${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/logic
