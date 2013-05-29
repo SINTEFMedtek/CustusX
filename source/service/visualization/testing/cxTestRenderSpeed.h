@@ -8,6 +8,8 @@
 #include "sscView.h"
 class QGridLayout;
 
+typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
+
 namespace cxtest
 {
 /*
@@ -27,29 +29,39 @@ public:
 	void testSingleView();
 	void testSeveralViews();
 	void testLotsOfViews();
+	void testVtkRenderWindow();
+	void testSeveralVtkRenderWindows();
 
     CPPUNIT_TEST_SUITE( TestRenderSpeed );
         CPPUNIT_TEST( testSingleView );
         CPPUNIT_TEST( testSeveralViews );
-        CPPUNIT_TEST( testLotsOfViews );
+//        CPPUNIT_TEST( testLotsOfViews );
+        CPPUNIT_TEST( testVtkRenderWindow );
+        CPPUNIT_TEST( testSeveralVtkRenderWindows );
     CPPUNIT_TEST_SUITE_END();
 
 private:
+    void createVtkRenderWindows(int num);
     void create3Dviews(int num);
     void create2Dviews(int num);
     void showViews();
     void renderNumTimes(int num);
+    void renderViewNum(int viewNum);
     void printResult();
     void addViewsToLayout(QLayout* layout);
     void addViewsToGridLayout(QGridLayout* layout);
+    const char* getViewName();
     int getTotalRenderTimeInMs();
     void setTotalRenderTimeInMs(int time);
     double getAverageRenderTimeInMs();
     int getRenderFPS();
+    int getNumViews();
 
 	std::vector<ssc::ViewWidget*> mViews;
+	std::vector<vtkRenderWindowPtr> mVtkRenderWindows;
 	int mNumRenderings;
 	int mRenderTimeInMs;
+	int mNumViews;
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( TestRenderSpeed );
