@@ -23,7 +23,7 @@
 
 using namespace ssc;
 
-void TestTransform3D::testDefaultTransform()
+void TestTransform3D::testIdentityTransformHasNoEffectOnVector()
 {
   Transform3D M = Transform3D::Identity();
   Vector3D v(0,0,0);
@@ -38,7 +38,7 @@ void TestTransform3D::testDefaultTransform()
 }
 
 
-void TestTransform3D::testElementAccess()
+void TestTransform3D::testInsertedElementsEqualsAccessedElements()
 {
   double data[16] = {1, 0, 0, M_PI,
                      0, 1, 0, 4,
@@ -55,12 +55,17 @@ void TestTransform3D::testElementAccess()
   CPPUNIT_ASSERT( M(3,0)==0.0 ); CPPUNIT_ASSERT( M(3,1)==0.0 ); CPPUNIT_ASSERT( M(3,2)==0.0 ); CPPUNIT_ASSERT( M(3,3)==1.0 );
 }
 
-void TestTransform3D::testSimilar()
+void TestTransform3D::testEqualTransformsAreSimilar()
+{
+  Transform3D M0 = createTransformRotateX(M_PI/5) * createTransformTranslate(Vector3D(3,4,5));
+
+  CPPUNIT_ASSERT( similar(M0, M0) );
+}
+void TestTransform3D::testDifferentTransformsAreNotSimilar()
 {
   Transform3D M0 = createTransformRotateX(M_PI/5) * createTransformTranslate(Vector3D(3,4,5));
   Transform3D M1 = createTransformRotateY(M_PI/6) * createTransformTranslate(Vector3D(6,7,8));
 
-  CPPUNIT_ASSERT( similar(M0, M0) );
   CPPUNIT_ASSERT( !similar(M0, M1) );
 }
 

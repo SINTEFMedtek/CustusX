@@ -15,9 +15,10 @@ public:
 //  void setUp();
 //  void tearDown();
 
-  void testDefaultTransform();
-  void testElementAccess();
-  void testSimilar();
+  void testIdentityTransformHasNoEffectOnVector();
+  void testInsertedElementsEqualsAccessedElements();
+  void testEqualTransformsAreSimilar();
+  void testDifferentTransformsAreNotSimilar();
   void testTranslate();
   void testRotate();
   void testVtkConvert();
@@ -28,9 +29,10 @@ public:
 
 public:
   CPPUNIT_TEST_SUITE( TestTransform3D );
-  CPPUNIT_TEST( testDefaultTransform);
-  CPPUNIT_TEST( testElementAccess);
-  CPPUNIT_TEST( testSimilar);
+  CPPUNIT_TEST( testIdentityTransformHasNoEffectOnVector);
+  CPPUNIT_TEST( testInsertedElementsEqualsAccessedElements);
+  CPPUNIT_TEST( testEqualTransformsAreSimilar);
+  CPPUNIT_TEST( testDifferentTransformsAreNotSimilar);
   CPPUNIT_TEST( testTranslate);
   CPPUNIT_TEST( testRotate);
   CPPUNIT_TEST( testVtkConvert);
