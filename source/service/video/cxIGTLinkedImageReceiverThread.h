@@ -11,15 +11,15 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#ifndef CXGRABBERRECEIVETHREADIGTLINK_H_
-#define CXGRABBERRECEIVETHREADIGTLINK_H_
+#ifndef CXIGTLinkedImageReceiverThread_H_
+#define CXIGTLinkedImageReceiverThread_H_
 
 #include <vector>
 #include <QTcpSocket>
 #include "boost/shared_ptr.hpp"
 #include "cxIGTLinkUSStatusMessage.h"
 #include "cxIGTLinkImageMessage.h"
-#include "cxGrabberReceiveThread.h"
+#include "cxImageReceiverThread.h"
 
 namespace cx
 {
@@ -29,20 +29,20 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class GrabberReceiveThreadIGTLink> GrabberReceiveThreadIGTLinkPtr;
+typedef boost::shared_ptr<class IGTLinkedImageReceiverThread> IGTLinkedImageReceiverThreadPtr;
 
 /**\brief Client thread for OpenIGTLink messaging.
  * \ingroup cxServiceVideo
  *
  *
  */
-class GrabberReceiveThreadIGTLink: public GrabberReceiveThread
+class IGTLinkedImageReceiverThread: public ImageReceiverThread
 {
 Q_OBJECT
 public:
-	GrabberReceiveThreadIGTLink(QString address, int port, QObject* parent = NULL);
+	IGTLinkedImageReceiverThread(QString address, int port, QObject* parent = NULL);
 	virtual QString hostDescription() const; // threadsafe
-	~GrabberReceiveThreadIGTLink() {}
+	~IGTLinkedImageReceiverThread() {}
 
 protected:
 	virtual void run();
@@ -76,4 +76,4 @@ private:
  */
 } //end namespace cx
 
-#endif /* CXGRABBERRECEIVETHREADIGTLINK_H_ */
+#endif /* CXIGTLinkedImageReceiverThread_H_ */

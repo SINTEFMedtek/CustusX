@@ -26,6 +26,8 @@ if (BUILD_TESTING)
   set(SOURCE_FILES
     cxTestVisualization.cpp
     cxTestVisualization.h
+    cxTestRenderSpeed.h
+    cxTestRenderSpeed.cpp
   ${SOURCE_FILES}
   ${CX_TEST_SOURCE_FILES}
   )

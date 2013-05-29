@@ -114,12 +114,15 @@ endif()
 #-------------------------------
 SET( CX_QT_MOC_HEADER_FILES
 		cxImageServer.h
-		cxImageSenderFile.h
-		cxImageSenderSonix.h
-		cxImageSenderOpenCV.h
-		cxImageSenderGE.h
-		cxImageSender.h
-		cxGrabberSender.h
+		cxMHDImageStreamer.h
+		cxImageStreamerSonix.h
+		cxImageStreamerOpenCV.h
+		cxImageStreamerGE.h
+		cxImageStreamer.h
+		cxSender.h
+		cxDirectlyLinkedSender.h
+		
+		cxtestSender.h
 )
 
 #QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
@@ -139,17 +142,23 @@ SET ( cxOpenIGTLinkServer_FILES
 		cxImageServer.cpp
 		cxImageSenderFactory.h
 		cxImageSenderFactory.cpp
-		cxImageSenderFile.h
-		cxImageSenderFile.cpp
-		cxImageSenderOpenCV.h
-		cxImageSenderOpenCV.cpp
-		cxImageSenderSonix.h
-		cxImageSenderSonix.cpp
-		cxImageSenderGE.h
-		cxImageSenderGE.cpp
-		cxImageSender.h
-		cxGrabberSender.h
-		cxGrabberSender.cpp
+		cxMHDImageStreamer.h
+		cxMHDImageStreamer.cpp
+		cxImageStreamerOpenCV.h
+		cxImageStreamerOpenCV.cpp
+		cxImageStreamerSonix.h
+		cxImageStreamerSonix.cpp
+		cxImageStreamerGE.h
+		cxImageStreamerGE.cpp
+		cxImageStreamer.h
+		cxImageStreamer.cpp
+		cxSender.h
+		cxSender.cpp
+		cxDirectlyLinkedSender.h
+		cxDirectlyLinkedSender.cpp
+		
+		cxtestSender.h
+		cxtestSender.cpp
 
 )
 

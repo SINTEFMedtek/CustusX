@@ -3,10 +3,9 @@
 #ifdef CX_USE_ISB_GE
 #include <QTimer>
 #include "GEStreamer.h"
-//#include "sscVector3D.h"
-#include "cxGrabberSender.h"
-#include "cxTestGEInterfaceController.h"
-#include "cxImageSenderGE.h"
+#include "cxDirectlyLinkedSender.h"
+#include "cxTestSenderController.h"
+#include "cxImageStreamerGE.h"
 #include "sscMessageManager.h"
 
 void TestGEInterface::setUp()
@@ -138,13 +137,13 @@ void TestGEInterface::testAllStreamsGPUConsecutively()
 
 void TestGEInterface::testStream(cx::StringMap args)
 {
-	cx::ImageSenderPtr imageSender = cx::ImageSenderFactory().getFromArguments(args);
+	cx::StreamerPtr imageSender = cx::ImageStreamerFactory().getFromArguments(args);
 	CPPUNIT_ASSERT(imageSender);
 	CPPUNIT_ASSERT(imageSender->getType().compare(args["type"]) == 0);
 
-	cx::GrabberSenderDirectLinkPtr grabberBridge(new cx::GrabberSenderDirectLink());
+	cx::DirectlyLinkedSenderPtr grabberBridge(new cx::DirectlyLinkedSender());
 
-	TestGEInterfaceController controller(NULL);
+	TestSenderController controller(NULL);
 	controller.initialize(grabberBridge);
 
 	CPPUNIT_ASSERT(imageSender->startStreaming(grabberBridge));
@@ -158,7 +157,7 @@ void TestGEInterface::testStream(cx::StringMap args)
 	imageSender.reset();
 	grabberBridge.reset();
 
-	controller.verify();
+	CPPUNIT_ASSERT(controller.verify());
 }
 
 void TestGEInterface::testGEStreamer()

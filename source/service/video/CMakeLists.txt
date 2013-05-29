@@ -9,9 +9,11 @@ SET( CX_QT_MOC_HEADER_FILES
     cxVideoConnection.h
     cxPlaybackUSAcquisitionVideo.h
 
-    cxGrabberReceiveThread.h
-    cxGrabberReceiveThreadDirectLink.h
-	cxGrabberReceiveThreadIGTLink.h
+    cxImageReceiverThread.h
+    cxDirectlyLinkedImageReceiverThread.h
+	cxIGTLinkedImageReceiverThread.h
+	
+	cxSimulatedImageStreamer.h
 )
 
 SET (cxVideoService_SOURCE
@@ -26,12 +28,15 @@ SET (cxVideoService_SOURCE
     cxPlaybackUSAcquisitionVideo.h
     cxPlaybackUSAcquisitionVideo.cpp
 
-    cxGrabberReceiveThread.h
-    cxGrabberReceiveThread.cpp
-	cxGrabberReceiveThreadIGTLink.h
-	cxGrabberReceiveThreadIGTLink.cpp
-    cxGrabberReceiveThreadDirectLink.h
-    cxGrabberReceiveThreadDirectLink.cpp
+    cxImageReceiverThread.h
+    cxImageReceiverThread.cpp
+	cxIGTLinkedImageReceiverThread.h
+	cxIGTLinkedImageReceiverThread.cpp
+    cxDirectlyLinkedImageReceiverThread.h
+    cxDirectlyLinkedImageReceiverThread.cpp
+    
+    cxSimulatedImageStreamer.h
+    cxSimulatedImageStreamer.cpp
 )
 
 include_directories(
@@ -50,4 +55,5 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 ADD_LIBRARY ( cxVideoService ${cxVideoService_SOURCE} ${MOC_HEADER_FILES} )
 target_link_libraries(cxVideoService SSC cxResource OpenIGTLink cxTrackingService cxGrabber)
 
+add_subdirectory(testing)
 

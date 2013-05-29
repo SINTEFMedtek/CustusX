@@ -8,7 +8,7 @@
 #include "cxImageServer.h"
 #include "cxImageSenderFactory.h"
 //
-#include "cxImageSenderOpenCV.h"
+#include "cxImageStreamerOpenCV.h"
 
 #ifdef WIN32
 #include <windows.h>
