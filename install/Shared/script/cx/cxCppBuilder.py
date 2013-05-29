@@ -134,7 +134,7 @@ class CppBuilder:
         shell.run('git checkout -B %s' % branchName)
         #TODO this can be a bug, if CustusX is not checked out yet, this will not work!!! 
         # (i.e. if patch file is not found in expected position)
-        patchPath = self._getPathToModule() 
+        patchPath = self._getPathToModule() + "/.."
         runShell('git am --whitespace=fix --signoff < %s/%s' % (patchPath, patchFile))
         runShell('git tag %s' % patchFile) # need this tag to check for change during next update
         
