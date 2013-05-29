@@ -39,9 +39,22 @@ class Shell (object):
         return true if success
         '''
         print '*** run:', cmd
-        p = subprocess.Popen(cmd, shell=True, cwd=self.CWD)
+        
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self.CWD)
+        while(True):
+            retcode = p.poll() #returns None while subprocess is running
+            #print "IN WHILE, ", retcode
+            while True:
+                line = p.stdout.readline()
+                if line=='':
+                    break
+                print "### ", line.rstrip()
+            if retcode is not None: 
+                break # process terminated
+        
+        #p = subprocess.Popen(cmd, shell=True, cwd=self.CWD)
         p.wait()
-        p.communicate("") # seems to be needed in order to wait for password prompting...?
+        #p.communicate("") # seems to be needed in order to wait for password prompting...?
         if not ignoreFailure:
             self._checkTerminate(p)
         return p.returncode == 0
