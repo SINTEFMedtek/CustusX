@@ -67,7 +67,7 @@ class Controller(object):
         if options.coverage:
             data.setBuildType("Debug")
         
-#        data.mISBpassword = options.isb_password
+        data.mISBpassword = options.isb_password
         data.mCoverage = options.coverage
         data.mDoxygen = options.doxygen
         data.threads = options.threads
