@@ -25,35 +25,14 @@ bool ImageServer::initialize()
 	bool ok = false;
 
 	StringMap args = cx::extractCommandlineOptions(QCoreApplication::arguments());
-	mImageSender = ImageSenderFactory().getFromArguments(args);
+	mImageSender = ImageStreamerFactory().getFromArguments(args);
 	if(!mImageSender)
 		return false;
 
-//	// test streaming by starting/stopping once (will emit error messages right away instead of waiting for an incoming connecion.)
-//	ok = mImageSender->startStreaming(GrabberSenderPtr());
-//	mImageSender->stopStreaming();
 	ok = true;
 
 	return ok;
 
-//
-//	ImageSenderFactory factory;
-//	QString type = factory.getDefaultSenderType();
-//	if (args.count("type"))
-//		type = args["type"];
-//
-//	mImageSender = factory.getImageSender(type);
-//
-//	if (mImageSender)
-//	{
-//		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
-//	}
-//	else
-//	{
-//		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
-//	}
-//
-//	mImageSender->initialize(args);
 }
 
 bool ImageServer::startListen(int port)
@@ -103,7 +82,7 @@ void ImageServer::incomingConnection(int socketDescriptor)
 	mSocket->setSocketDescriptor(socketDescriptor);
 	QString clientName = mSocket->localAddress().toString();
 	std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
-	GrabberSenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
+	SenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
 
 	mImageSender->startStreaming(sender);
 }
@@ -133,7 +112,7 @@ void ImageServer::printHelpText()
 QString ImageServer::getArgumentHelpText(QString applicationName)
 {
 	std::stringstream ss;
-	cx::ImageSenderFactory factory;
+	cx::ImageStreamerFactory factory;
 
 	ss << "Usage: " << applicationName << " (--arg <argval>)*" << std::endl;
 	ss << "    --port   : Tcp/IP port # (default=18333)" << std::endl;

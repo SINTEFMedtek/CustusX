@@ -1,11 +1,11 @@
 /*
- * cxImageSenderOpenCV.cpp
+ * cxImageStreamerOpenCV.cpp
  *
  *  \date Jun 21, 2011
  *      \author christiana
  */
 
-#include "cxImageSenderOpenCV.h"
+#include "cxImageStreamerOpenCV.h"
 
 #ifdef CX_USE_OpenCV
 
@@ -60,13 +60,32 @@ void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
 
 namespace cx
 {
+ImageStreamerOpenCV::ImageStreamerOpenCV() :
+//	ImageStreamer(parent),
+//	mSendTimer(0),
+	mGrabTimer(0)
+{
+	mAvailableImage = false;
+	setSendInterval(40);
 
-QString ImageSenderOpenCV::getType()
+	mVideoCapture.reset(new cv::VideoCapture());
+	mGrabTimer = new QTimer(this);
+	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+	mSendTimer = new QTimer(this);
+	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+}
+
+ImageStreamerOpenCV::~ImageStreamerOpenCV()
+{
+	this->deinitialize_local();
+}
+
+QString ImageStreamerOpenCV::getType()
 {
 	return "OpenCV";
 }
 
-QStringList ImageSenderOpenCV::getArgumentDescription()
+QStringList ImageStreamerOpenCV::getArgumentDescription()
 {
     QStringList retval;
     retval << "--videoport:		video id,     default=0";
@@ -78,53 +97,20 @@ QStringList ImageSenderOpenCV::getArgumentDescription()
     return retval;
 }
 
-ImageSenderOpenCV::ImageSenderOpenCV(QObject* parent) :
-	ImageSender(parent),
-	mSendTimer(0),
-	mGrabTimer(0)
-{
-	mAvailableImage = false;
 
-	mVideoCapture.reset(new cv::VideoCapture());
-	mGrabTimer = new QTimer(this);
-	connect(mGrabTimer, SIGNAL(timeout()), this, SLOT(grab())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-	mSendTimer = new QTimer(this);
-	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(send())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+void ImageStreamerOpenCV::initialize(StringMap arguments)
+{
+	CommandLineStreamer::initialize(arguments);
 }
 
-ImageSenderOpenCV::~ImageSenderOpenCV()
-{
-	this->deinitialize_local();
-}
-
-void ImageSenderOpenCV::initialize(StringMap arguments)
-{
-	mArguments = arguments;
-
-	// Run an init/deinit to check that we have contact right away.
-	// Do NOT keep the connection open: This is because we have no good way to
-	// release resources if the server is a local app and is killed by CustusX.
-	// This way, we can disconnect (thus releasing resources), and then safely
-	// remove the usb cable without having dangling resources in openCV. (problem at least on Linux)
-	//
-	// Removed: When running as direct link, this causes several seconds of delay at startup.
-	// Instead, the ImageServer calls a start/stop streaming during init.
-    //	this->initialize_local();
-	//	this->deinitialize_local();
-}
-
-void ImageSenderOpenCV::deinitialize_local()
+void ImageStreamerOpenCV::deinitialize_local()
 {
 	mVideoCapture->release();
 	mVideoCapture.reset(new cv::VideoCapture());
 }
 
-void ImageSenderOpenCV::initialize_local()
+void ImageStreamerOpenCV::initialize_local()
 {
-//	// if in main thread only (debug)
-//	if (this->thread() == QCoreApplication::instance()->thread() && !mSocket)
-//		cv::namedWindow("ImageSenderOpenCV", CV_WINDOW_KEEPRATIO); //resizable window;
-
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
 	if (!mArguments.count("out_width"))
@@ -153,7 +139,7 @@ void ImageSenderOpenCV::initialize_local()
 
 	if (!mVideoCapture->isOpened())
 	{
-		cerr << "ImageSenderOpenCV: Failed to open a video device or video file!\n" << endl;
+		cerr << "ImageStreamerOpenCV: Failed to open a video device or video file!\n" << endl;
 		return;
 	}
 	else
@@ -177,7 +163,7 @@ void ImageSenderOpenCV::initialize_local()
 		if (mArguments.count("properties"))
 			this->dumpProperties();
 
-		std::cout << "ImageSenderOpenCV: Started streaming from openCV device "
+		std::cout << "ImageStreamerOpenCV: Started streaming from openCV device "
 			<< videoSource.toStdString()
 			<< ", size=(" << in_width << "," << in_height << ")";
 		if (( in_width!=mRescaleSize.width() )|| (in_height!=mRescaleSize.height()))
@@ -187,25 +173,25 @@ void ImageSenderOpenCV::initialize_local()
 	}
 }
 
-bool ImageSenderOpenCV::startStreaming(GrabberSenderPtr sender)
+bool ImageStreamerOpenCV::startStreaming(SenderPtr sender)
 {
 	this->initialize_local();
 
 	if (!mGrabTimer || !mSendTimer)
 	{
-		std::cout << "ImageSenderOpenCV: Failed to start streaming: Not initialized." << std::endl;
+		std::cout << "ImageStreamerOpenCV: Failed to start streaming: Not initialized." << std::endl;
 		return false;
 	}
 
 	mSender = sender;
 	mGrabTimer->start(0);
-	mSendTimer->start(40);
+	mSendTimer->start(getSendInterval());
 	mCounter.start();
 
 	return true;
 }
 
-void ImageSenderOpenCV::stopStreaming()
+void ImageStreamerOpenCV::stopStreaming()
 {
 	if (!mGrabTimer || !mSendTimer)
 		return;
@@ -216,7 +202,7 @@ void ImageSenderOpenCV::stopStreaming()
 	this->deinitialize_local();
 }
 
-void ImageSenderOpenCV::dumpProperties()
+void ImageStreamerOpenCV::dumpProperties()
 {
 	this->dumpProperty(CV_CAP_PROP_POS_MSEC, "CV_CAP_PROP_POS_MSEC");
 	this->dumpProperty(CV_CAP_PROP_POS_FRAMES, "CV_CAP_PROP_POS_FRAMES");
@@ -239,14 +225,14 @@ void ImageSenderOpenCV::dumpProperties()
 	this->dumpProperty(CV_CAP_PROP_RECTIFICATION, "CV_CAP_PROP_RECTIFICATION");
 }
 
-void ImageSenderOpenCV::dumpProperty(int val, QString name)
+void ImageStreamerOpenCV::dumpProperty(int val, QString name)
 {
 	double value = mVideoCapture->get(val);
 	if (value != -1)
 		std::cout << "Property " << name.toStdString() << " : " << mVideoCapture->get(val) << std::endl;
 }
 
-void ImageSenderOpenCV::grab()
+void ImageStreamerOpenCV::grab()
 {
 //	return;
 	if (!mVideoCapture->isOpened())
@@ -261,16 +247,16 @@ void ImageSenderOpenCV::grab()
 	mAvailableImage = true;
 //	static int counter=0;
 //	if (++counter%50==0)
-//		std::cout << "=== ImageSenderOpenCV   - grab: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//		std::cout << "=== ImageStreamerOpenCV   - grab: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 
 }
 
-void ImageSenderOpenCV::send()
+void ImageStreamerOpenCV::send()
 {
 //	static int counter = 0;
 //	if (++counter==150)
 //	{
-//		std::cout << " ImageSenderOpenCV::send()" << std::endl;
+//		std::cout << " ImageStreamerOpenCV::send()" << std::endl;
 //		this->stopStreaming();
 //	}
 //	return;
@@ -283,15 +269,17 @@ void ImageSenderOpenCV::send()
 //		ssc::messageManager()->sendDebug("dropped resend of frame");
 		return;
 	}
-	mSender->send(this->getImageMessage());
+	PackagePtr package(new Package());
+	package->mIgtLinkImageMessage = this->getImageMessage();
+	mSender->send(package);
 	mAvailableImage = false;
 
 //	static int counter=0;
 //	if (++counter%50==0)
-//		std::cout << "=== ImageSenderOpenCV   send: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+//		std::cout << "=== ImageStreamerOpenCV   send: " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 }
 
-IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
+IGTLinkImageMessage::Pointer ImageStreamerOpenCV::getImageMessage()
 {
 	if (!mVideoCapture->isOpened())
 		return IGTLinkImageMessage::Pointer();
@@ -305,7 +293,7 @@ IGTLinkImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 
 	if (this->thread() == QCoreApplication::instance()->thread() && !mSender)
 	{
-		cv::imshow("ImageSenderOpenCV", frame_source);
+		cv::imshow("ImageStreamerOpenCV", frame_source);
 	}
 
 	//  std::cout << "grab" << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;

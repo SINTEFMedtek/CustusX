@@ -1,24 +1,24 @@
-/*
- * cxImageServer.h
- *
- *  \date Oct 30, 2010
- *      \author christiana
- */
-
 #ifndef CXIMAGESERVER_H_
 #define CXIMAGESERVER_H_
 
 #include <QTcpServer>
 #include <QTimer>
 #include <QPointer>
-#include "cxImageSender.h"
+#include "cxImageStreamer.h"
 
 namespace cx
 {
 
+/**
+ * \brief ImageServer
+ *
+ * \date Oct 30, 2010
+ * \author Christian Askeland
+ */
+
 class ImageServer: public QTcpServer
 {
-Q_OBJECT
+	Q_OBJECT
 
 public:
 	ImageServer(QObject* parent = NULL);
@@ -32,7 +32,7 @@ protected:
 private slots:
 	void socketDisconnectedSlot();
 private:
-	ImageSenderPtr mImageSender;
+	StreamerPtr mImageSender;
 	QPointer<QTcpSocket> mSocket;
 };
 

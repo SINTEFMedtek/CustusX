@@ -1,6 +1,3 @@
-//#define CATCH_CONFIG_MAIN  // This tell CATCH to provide a main() - only do this in one cpp file
-//#include "catch.hpp"
-
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
@@ -8,19 +5,27 @@
 
 int main (int argc, char* argv[])
 {
-	// global setup...
 	ssc::Application app( argc, argv );
 
 	int result = Catch::Main( argc, argv );
+	app.exec();
 
-	// global clean-up...
-
-  return result;
+	return result;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// CATCH TUTORIAL FOR CUSTUSX
+///////////////////////////////////////////////////////////////////////////////
 
 /**
  * This file describes how to use CATCH.
+ *
+ * ALL Catch tests should be tagged with ONE of the following tags:
+ * (See https://en.wikipedia.org/wiki/Software_testing#Testing_levels for more information.)
+ * - [unit]				Unit test - "...tests that verify the functionality of a specific section of code (...) usually at the class level"
+ * - [integration]		Integration test - "... individual software modules are combined and tested as a group..."
+ * - [system]			System test	- "...tests a completely integrated system..."
+ * - [acceptance]		Acceptance test - "... a test conducted to determine if the requirements of a specification or contract are met..."
  *
  * The tag [hide] is a special tag, when tagging tests with this tag
  * they will be skipped by default.
@@ -53,12 +58,14 @@ int main (int argc, char* argv[])
  */
 TEST_CASE( "TEST_CASE: Name and tags", "[hide][tutorial]" ) {
 	//both name and tags are visible
-	REQUIRE( 1 == 1 );
+	int a = 1, b = a;
+	REQUIRE( a == b );
 }
 
 TEST_CASE( "TEST_CASE: Name, description and tags", "Description. [hide][tutorial]" ) {
 	//both name and tags are visible, but NOT the description.
-	REQUIRE( 1 == 1 );
+	int a = 1, b = a;
+	REQUIRE( a == b );
 }
 
 //===========================================================================================
@@ -74,14 +81,15 @@ TEST_CASE( "ASSERTIONS: Natural expressions", "[hide][tutorial]" ) {
 	//Evaluates the expression and records the result.
 	//If an exception is thrown it is caught, reported, and counted as a failure.
 	//These are the macros you will use most of the time
-	REQUIRE(1 == 1);
-	CHECK(1 == 1);
+	int a = 1, b = a, c = 2;
+	REQUIRE(a == b);
+	CHECK(a == b);
 
 	//Evaluates the expression and records the logical NOT of the result.
 	//If an exception is thrown it is caught, reported, and counted as a failure.
 	//(these forms exist as a workaround for the fact that ! prefixed expressions cannot be decomposed).
-	REQUIRE_FALSE( 1 == 2);
-	CHECK_FALSE( 1 == 2);
+	REQUIRE_FALSE( a == c);
+	CHECK_FALSE( a == c);
 }
 
 TEST_CASE( "ASSERTIONS: Exceptions", "[hide][tutorial]" ) {
@@ -94,8 +102,9 @@ TEST_CASE( "ASSERTIONS: Exceptions", "[hide][tutorial]" ) {
 	CHECK_THROWS_AS(throw std::exception(), std::exception);
 
 	//Expects that no exception is thrown during evaluation of the expression.
-	REQUIRE_NOTHROW( 1 == 1);
-	CHECK_NOTHROW( 1 == 1);
+	int a = 1, b = a;
+	REQUIRE_NOTHROW( a == b);
+	CHECK_NOTHROW( a == b);
 }
 
 TEST_CASE( "ASSERTIONS: Matcher expressions: Equals", "[hide][tutorial]" ) {
