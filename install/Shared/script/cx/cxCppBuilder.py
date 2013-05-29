@@ -130,7 +130,7 @@ class CppBuilder:
         '''
         self._changeDirToSource()
         branchName = patchFile + "_branch"
-        shell.run('git branch -D -q %s' % branchName, ignoreFailure=True)
+        shell.run('git branch -D %s' % branchName, ignoreFailure=True)
         shell.run('git checkout -B %s' % branchName)
         #TODO this can be a bug, if CustusX is not checked out yet, this will not work!!! 
         # (i.e. if patch file is not found in expected position)
