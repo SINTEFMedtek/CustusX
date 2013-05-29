@@ -53,7 +53,7 @@ public:
 	/**
 	  * Encode the input probedata into an IGTLink message.
 	  */
-	IGTLinkUSStatusMessage::Pointer encode(ssc::ProbeData);
+	IGTLinkUSStatusMessage::Pointer encode(ssc::ProbeDataPtr);
 	/**
 	  * Decode the input probe and image messages to create a
 	  * ssc::ProbeData object based in the input base.
@@ -64,7 +64,7 @@ public:
 	  *
 	  * Some or all of the input messages can be NULL.
 	  */
-	ssc::ProbeData decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ssc::ProbeData base);
+	ssc::ProbeDataPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ssc::ProbeDataPtr base);
 
 	/**
 	  * Decode the image to standard format with standard color RGBX encoding.
@@ -75,7 +75,7 @@ public:
 	  * and return as new image.
 	  */
 	ssc::ImagePtr decode(ssc::ImagePtr msg);
-	ssc::ProbeData decode(ssc::ProbeData msg);
+	ssc::ProbeDataPtr decode(ssc::ProbeDataPtr msg);
 
 private:
 	/** Extract the color format string from enclosing brackets inside

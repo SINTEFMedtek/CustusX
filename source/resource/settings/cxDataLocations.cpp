@@ -18,6 +18,7 @@
 #include <QDir>
 #include "cxConfig.h"
 #include "cxSettings.h"
+#include "cxFileHelpers.h"
 #include "sscTypeConversions.h"
 
 #ifdef CX_USE_TSF
@@ -34,6 +35,7 @@ bool DataLocations::mTestMode = false;
 void DataLocations::setTestMode()
 {
 	mTestMode = true;
+	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp/settings");
 }
 
 QString DataLocations::getTestDataPath()
