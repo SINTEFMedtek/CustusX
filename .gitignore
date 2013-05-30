@@ -17,4 +17,5 @@ Build_nmake64
 Build_nmake32/
 config/settings/
 data/
+*.pyc
 
