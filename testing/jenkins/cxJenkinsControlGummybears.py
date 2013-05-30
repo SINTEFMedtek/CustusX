@@ -171,9 +171,9 @@ class Controller(object):
         p = argparse.ArgumentParser(description=description)
         p.add_argument('-u', '--username', default="user", help='jenkins user')
         p.add_argument('-p', '--password', default="not set", help='jenkins password')
-        p.add_argument('-t', '--test_bears', action='store_false', help='run a test sequence on the gummy bears (counting in binary)')
-        p.add_argument('-d', '--dummy_bears', action='store_false', help='run without actually connecting to the bears')
-        #p.add_argument('-s', '--silent_mode', action='store_false', help='execute script without user interaction')
+        p.add_argument('-t', '--test_bears', action='store_true', help='run a test sequence on the gummy bears (counting in binary)')
+        p.add_argument('-d', '--dummy_bears', action='store_true', help='run without actually connecting to the bears')
+        #p.add_argument('-s', '--silent_mode', action='store_true', help='execute script without user interaction')
         return p
     
     def run(self):
@@ -181,7 +181,7 @@ class Controller(object):
         gummybears = JenkinsGummyBears()
         gummybears.lamp.dummy = options.dummy_bears
 
-        if options.test_bears == True:
+        if options.test_bears:
             gummybears.testLoop()
         else:
             gummybears.username = options.username
