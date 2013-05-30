@@ -54,3 +54,4 @@ Generates coverage and other reports.'
 if __name__ == '__main__':
     controller = Controller()
     controller.run()
+
