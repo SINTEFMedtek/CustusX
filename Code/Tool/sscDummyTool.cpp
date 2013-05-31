@@ -64,6 +64,7 @@ DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
 	mTimer(new QTimer()),
 	mThread(NULL)
 {
+	qRegisterMetaType<Transform3D>("Transform3D");
 	mUid = uid;
 	mName = uid;
 
