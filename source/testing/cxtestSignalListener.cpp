@@ -3,6 +3,7 @@
 #include <iostream>
 #include <QTimer>
 #include <QEventLoop>
+#include <boost/lexical_cast.hpp>
 
 namespace cxtest
 {
@@ -12,6 +13,8 @@ bool waitForSignal(QObject* object, const char* signal, int maxWaitMilliSeconds)
 	SignalListener listener(object, signal, maxWaitMilliSeconds);
 	listener.exec();
 	bool signalArrived = !listener.timedOut();
+	std::string arrived = signalArrived ? "" : "NOT ";
+	std::cout << "[SIGNALLISTENER] " << signal << " did " << arrived << "arrive." << std::endl;
 	return signalArrived;
 }
 

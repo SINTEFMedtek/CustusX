@@ -99,25 +99,4 @@ TEST_CASE("Should stream 2D images from a volume given a probe", "[streaming][un
 	imagestreamer->stopStreaming();
 }
 
-//TEST_CASE("Probe should get simulated data", "[streaming][integration]")
-//{
-//
-//	//TODO
-//
-//	ssc::ToolPtr tool = cx::ToolManager::getInstance()->findFirstProbe();
-//	ssc::ProbePtr probe = tool->getProbe();
-//
-//	TestSenderPtr sender(new TestSender());
-//	bool sendImageOnce = true;
-//	cx::ImageStreamerPtr imagestreamer = createRunningImageStreamer(sender, sendImageOnce);
-//
-//	ssc::VideoSourcePtr videosource(new cx::ToolResamplingVolumeVideoSource());
-//	videosource->setTool(tool);
-//	videosource->setStreamer(imagestreamer);
-//
-//	probe->setRTSource(videosource);
-//
-//}
-
-
 }//namespace cx
