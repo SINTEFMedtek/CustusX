@@ -175,6 +175,9 @@ class CustusXBuilder:
                 '%s/sloccount_raw.sc %s/sloccount.sc' % (rootDir, rootDir) 
                 ])
  
+    def finish(self):
+        self.assembly.printHeader('Finished', level=3)
+
     def _createComponent(self, type):
         retval = type()
         retval.setControlData(self.assembly.controlData)

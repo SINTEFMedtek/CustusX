@@ -47,7 +47,9 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         self.cxBuilder.buildAllComponents()
         self.cxBuilder.clearTestData()
         self.cxBuilder.runAllTests()
-        self.cxBuilder.createInstallerPackage()                        
+        self.cxBuilder.createInstallerPackage()   
+        self.cxBuilder.finish()
+                     
 
 if __name__ == '__main__':
     controller = Controller()
