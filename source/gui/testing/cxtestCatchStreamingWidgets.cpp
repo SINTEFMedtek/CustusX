@@ -14,7 +14,7 @@
 namespace cxtest
 {
 
-TEST_CASE("StreamWidget can stream", "[unit][gui][widget][streaming]")
+TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 {
 	ssc::messageManager()->initialize();
 	cx::DataManager::getInstance()->initialize();
