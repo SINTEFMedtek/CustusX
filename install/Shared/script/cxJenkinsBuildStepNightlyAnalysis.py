@@ -24,29 +24,25 @@ import cx.cxInstallData
 import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
+import cx.cxJenkinsBuildScriptBase
 
-class Controller(object):
+class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
     '''
     '''
     def __init__(self):
         ''
-        self.cxBuilder = cx.cxCustusXBuilder.CustusXBuilder()
-        self.optionParser = self._createOptionParser()
+        super(Controller, self).__init__()
 
-    def _createOptionParser(self):
-        commonOptions = self.cxBuilder.createArgumentParser()
-        description='''\
+        data = self.cxBuilder.assembly.controlData
+        data.setBuildType("Debug")        
+        data.mCoverage = True
+
+    def getDescription(self):                  
+        return '\
 Jenkins script for build, test and deployment of CustusX and dependents. \
-Generates coverage and other reports.
-        '''
-        p = argparse.ArgumentParser(description=description, parents=[commonOptions], conflict_handler='resolve')
-        return p
+Generates coverage and other reports.'
     
     def run(self):
-        options = self.optionParser.parse_args()
-        shell.setDummyMode(options.dummy)
-        self._fillControlDataFromOptions(options)
-
         self.cxBuilder.buildAllComponents()
         self.cxBuilder.clearTestData()
         self.cxBuilder.resetCoverage()
@@ -54,15 +50,8 @@ Generates coverage and other reports.
         self.cxBuilder.generateCoverageReport()
         self.cxBuilder.runCppCheck()
         self.cxBuilder.runLineCounter()
-        #self.cxBuilder.createInstallerPackage()
                         
-    def _fillControlDataFromOptions(self, options):
-        data = self.cxBuilder.assembly.controlData
-        data.mRootDir = options.root_dir
-        data.setBuildType("Debug")        
-        data.mCoverage = True
-        data.threads = options.threads
-
 if __name__ == '__main__':
     controller = Controller()
     controller.run()
+

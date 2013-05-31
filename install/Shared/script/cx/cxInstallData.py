@@ -48,7 +48,7 @@ class Common(object):
         
         self._initPaths()
         self.mISBpassword = ""
-        self.mBuildShared = True   # build as shared or static libraries
+        self._buildShared = True   # build as shared or static libraries
         self.setBuildType("Debug") 
         self.threads = 1
         
@@ -73,13 +73,13 @@ class Common(object):
         print '    User:', getpass.getuser()
         print '    platform:', platform.system()
         print '    ISBpassword:', self.mISBpassword
-        print '    RootDir:', self.mRootDir
+        print '    RootDir:', self.getRootDir()
         print '    ExternalDir:', self.getExternalPath()
         print '    WorkingDir:', self.getWorkingPath()
         print '    CMakeGenerator:', self.mCMakeGenerator
-        print '    BuildShared:', self.mBuildShared
-        print '    BuildType:', self.mBuildType
-        print '    BuildExternalsType:', self.mBuildExternalsType
+        print '    BuildShared:', self.getBuildShared()
+        print '    BuildType:', self.getBuildType()
+        print '    BuildExternalsType:', self.getBuildExternalsType()
         print '    BuildTesting:', self.mBuildTesting
         print '    Coverage:', self.mCoverage
         print '    Threads:', self.threads
@@ -96,30 +96,39 @@ class Common(object):
         allowedValues = ['Debug', 'Release', 'RelWithDebInfo', 'MinSizeRel']
         if value not in allowedValues:
             raise Exception("Error: %s is not a valid build type. Chose one of %s" % (value, allowedValues))
-        self.mBuildType = value
-        self.mBuildExternalsType = "Release" # used for all non-cx libs, this because we want speed even in debug...
+        self._buildType = value
+        self._buildExternalsType = "Release" # used for all non-cx libs, this because we want speed even in debug...
         if(platform.system() == 'Windows'): #Windows do not allow linking between different build types
-            self.mBuildExternalsType = self.mBuildType            
+            self._buildExternalsType = self._buildType            
     
+    def getBuildShared(self):
+        return self._buildShared
     def getBuildType(self):
-        return self.mBuildType
+        return self._buildType
     
     def getBuildExternalsType(self):
-        return self.mBuildExternalsType
+        return self._buildExternalsType
+    
+    def setRootDir(self, root_dir):
+        if root_dir:
+            self._rootDir = root_dir
+            
+    def getRootDir(self):
+        return self._rootDir
     
     def getWorkingPath(self):
-        return "%s/%s" % (self.mRootDir, self.mWorkingFolder)
+        return "%s/%s" % (self._rootDir, self._workingFolder)
     
     def getExternalPath(self):
-        return "%s/%s" % (self.mRootDir, self.mExternalFolder)                        
+        return "%s/%s" % (self._rootDir, self._externalFolder)                        
     
     def setBuildShared(self, value):
-        self.mBuildShared = value
+        self._buildShared = value
     
     def getBuildFolder(self):
         retval = 'build'
-        retval = retval + '_' + self.mBuildType
-        if not self.mBuildShared:
+        retval = retval + '_' + self._buildType
+        if not self._buildShared:
             retval = retval + "_static"
         if self.m32bit == True:
             retval = retval + "32"
@@ -131,13 +140,13 @@ class Common(object):
             
     def _initPaths(self):                
         if platform.system() == 'Windows':
-            self.mRootDir = "C:/Dev"
+            self._rootDir = "C:/Dev"
         else:
-            self.mRootDir = os.path.expanduser("~") + "/dev" #+ getpass.getuser() - use new default
+            self._rootDir = os.path.expanduser("~") + "/dev" #+ getpass.getuser() - use new default
         # external dir: Used as base dir for all externals, such as VTK, ITK, ...
-        self.mExternalFolder = "external"
+        self._externalFolder = "external"
         # working dir: Used as base dir for Custus and other of our 'own' projects
-        self.mWorkingFolder = "working"
+        self._workingFolder = "working"
 
     def _convertOnOffToBool(self, value):
         if value==True or value=='ON':
