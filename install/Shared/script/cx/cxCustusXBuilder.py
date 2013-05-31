@@ -96,8 +96,8 @@ class CustusXBuilder:
         and initializing/generating counters for all files.
         '''
         self.assembly.printHeader('Reset gcov coverage counters', level=2)
-        gcovTempDir = '%s/gcov' % self.assembly.controlData.mRootDir
-        gcovResultDir = '%s/gcov/coverage_info' % self.assembly.controlData.mRootDir
+        gcovTempDir = '%s/gcov' % self.assembly.controlData.getRootDir()
+        gcovResultDir = '%s/gcov/coverage_info' % self.assembly.controlData.getRootDir()
         custusx = self._createComponent(cxComponents.CustusX3)
         buildDir = custusx.buildPath()
         
@@ -114,8 +114,8 @@ class CustusXBuilder:
         Generate html output from the gcov data.
         '''
         self.assembly.printHeader('Generating coverage report', level=2)
-        gcovTempDir = '%s/gcov' % self.assembly.controlData.mRootDir
-        gcovResultDir = '%s/gcov/coverage_info' % self.assembly.controlData.mRootDir
+        gcovTempDir = '%s/gcov' % self.assembly.controlData.getRootDir()
+        gcovResultDir = '%s/gcov/coverage_info' % self.assembly.controlData.getRootDir()
         custusx = self._createComponent(cxComponents.CustusX3)
         buildDir = custusx.buildPath()
 
@@ -153,7 +153,7 @@ class CustusXBuilder:
         self.assembly.printHeader('Run CppCheck', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         sourceDir = custusx.sourcePath()
-        rootDir = self.assembly.controlData.mRootDir
+        rootDir = self.assembly.controlData.getRootDir()
         shell.run(['cppcheck',
                 '--enable=all',
                 '--xml-version=2',
@@ -165,7 +165,7 @@ class CustusXBuilder:
         self.assembly.printHeader('Run Line counter SLOCCOUNT', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         sourceDir = custusx.sourcePath()
-        rootDir = self.assembly.controlData.mRootDir
+        rootDir = self.assembly.controlData.getRootDir()
         shell.run(['sloccount',
                 '--duplicates --wide --details',
                 '%s >%s/sloccount_raw.sc' % (sourceDir, rootDir)
@@ -174,16 +174,7 @@ class CustusXBuilder:
                 '--remove="3rdParty/ config/ install/ /data/"',
                 '%s/sloccount_raw.sc %s/sloccount.sc' % (rootDir, rootDir) 
                 ])
-
-    def createArgumentParser(self):        
-        description='Parent argument parser, containing common options'
-        p = argparse.ArgumentParser(description=description)
-        p.add_argument('--root_dir', default=None, help='specify root folder, default=None')
-        p.add_argument('-i', '--isb_password', default="not set", help='password for ISB GE Connection module')
-        p.add_argument('-d', '--dummy', action='store_true', default=False, help='execute script without calling any shell commands')
-        p.add_argument('-j', '--threads', type=int, default=1, help='number of make threads')
-        return p
-
+ 
     def _createComponent(self, type):
         retval = type()
         retval.setControlData(self.assembly.controlData)
