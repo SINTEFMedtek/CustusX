@@ -48,8 +48,8 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 		BaseWidget(parent, "IGTLinkWidget", "Video Connection")
 {
 	connect(this->getConnection().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
-	connect(this->getConnection().get(), SIGNAL(settingsChanged()), this, SLOT(dataChanged()));
-	connect(this->getServer(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
+	connect(this->getConnection().get(), SIGNAL(connectionMethodChanged()), this, SLOT(selectGuiForConnectionMethodSlot()));
+	connect(this->getServerProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 
 	QHBoxLayout* initScriptLayout = this->initializeScriptWidget();
 	mConnectionSelector = this->initializeConnectionSelector();
@@ -68,7 +68,7 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 	mToptopLayout->addWidget(createDataWidget(this, mActiveVideoSourceSelector));
 	mToptopLayout->addStretch();
 
-	this->dataChanged();
+	this->selectGuiForConnectionMethodSlot();
 }
 
 VideoConnectionWidget::~VideoConnectionWidget()
@@ -201,14 +201,14 @@ QString VideoConnectionWidget::defaultWhatsThis() const
 	return "<html><h3><Setup IGTLink connection.</h3><p>Lets you set up a connection to a streaming server using IGTLink.</p><p><i></i></p></html>";
 }
 
-QProcess* VideoConnectionWidget::getServer()
+QProcess* VideoConnectionWidget::getServerProcess()
 {
 	return this->getConnection()->getProcess();
 }
 
 bool VideoConnectionWidget::serverIsRunning()
 {
-	bool isRunning = (this->getServer()) && (this->getServer()->state() == QProcess::Running);
+	bool isRunning = (this->getServerProcess()) && (this->getServerProcess()->state() == QProcess::Running);
 	return isRunning;
 }
 
@@ -217,7 +217,7 @@ VideoConnectionManagerPtr VideoConnectionWidget::getConnection()
 	return videoService()->getVideoConnection();
 }
 
-void VideoConnectionWidget::dataChanged()
+void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 {
 	if (this->getConnection()->getUseDirectLink())
 		mStackedWidget->setCurrentIndex(0);
@@ -226,6 +226,7 @@ void VideoConnectionWidget::dataChanged()
 	else
 		mStackedWidget->setCurrentIndex(2);
 }
+
 void VideoConnectionWidget::updateHostHistory()
 {
 	mAddressEdit->blockSignals(true);
@@ -259,7 +260,7 @@ void VideoConnectionWidget::launchServer()
 void VideoConnectionWidget::toggleLaunchServer()
 {
 	if (this->serverIsRunning())
-		this->getServer()->close();
+		this->getServerProcess()->close();
 	else
 		this->launchServer();
 }
@@ -344,7 +345,6 @@ void VideoConnectionWidget::disconnectServer()
 {
 	this->getConnection()->disconnectServer();
 }
-
 
 void VideoConnectionWidget::serverStatusChangedSlot()
 {
