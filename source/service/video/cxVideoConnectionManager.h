@@ -83,8 +83,8 @@ public:
 signals:
 	void fps(int fps);
 	void connected(bool on);
-	void settingsChanged();
 	void videoSourcesChanged();
+	void connectionMethodChanged();
 
 public slots:
 	void connectServer();

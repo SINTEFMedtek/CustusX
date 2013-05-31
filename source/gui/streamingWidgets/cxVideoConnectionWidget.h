@@ -64,23 +64,23 @@ protected slots:
 	void toggleLaunchServer();
 	void launchServer();
 	void toggleConnectServer();
-	void connectServer();
-	void disconnectServer();
 	void serverProcessStateChanged(QProcess::ProcessState newState);
 	void serverStatusChangedSlot();
 	void browseLocalServerSlot();
 	void importStreamImageSlot();
-	void dataChanged();
+	void selectGuiForConnectionMethodSlot();
 	void initScriptSelected(QString filename);
 
 protected:
+	void connectServer();
+	void disconnectServer();
 	QHBoxLayout* initializeScriptWidget();
 	ssc::StringDataAdapterXmlPtr initializeConnectionSelector();
 	ActiveVideoSourceStringDataAdapterPtr initializeActiveVideoSourceSelector();
 	QFrame* wrapStackedWidgetInAFrame();
 	void updateHostHistory();
 	void updateDirectLinkArgumentHistory();
-	QProcess* getServer();
+	QProcess* getServerProcess();
 	bool serverIsRunning();
 	VideoConnectionManagerPtr getConnection();
 	void writeSettings();
