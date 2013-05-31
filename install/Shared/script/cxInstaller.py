@@ -99,7 +99,7 @@ Available components are:
         p.add_argument('--doxygen', action='store_true', default=False, help='build doxygen documentation')
 #        p.add_argument('--external_dir', default=self.controlData.mExternalDir, help='specify external folder, default=%s'%self.controlData.mExternalDir)
 #        p.add_argument('--working_dir', default=self.controlData.mWorkingDir, help='specify work folder, default=%s'%self.controlData.mWorkingDir)
-        rootdir = self.assembly.controlData.mRootDir
+        rootdir = self.assembly.controlData.getRootDir()
         p.add_argument('--root_dir', default=rootdir, help='specify root folder, default=%s'%rootdir)
 #        p.add_argument('--cmake_args', default="", help='additional arguments to ALL cmake calls')
         p.add_argument('components', nargs='*', help='list of all components to process')
@@ -138,7 +138,7 @@ Available components are:
         print options
         print "*"*100
         
-        data.mRootDir = options.root_dir 
+        data.setRootDir(options.root_dir)
         data.setBuildType(options.build_type)
 
         data.setBuildShared(not options.static)

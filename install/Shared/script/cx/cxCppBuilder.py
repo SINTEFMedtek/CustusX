@@ -112,7 +112,9 @@ class CppBuilder:
 
     def _checkGitIsAtTag(self, tag):
         output = shell.evaluate('git describe --tags --exact-match')
-        if output==tag:
+        if not output:
+            return False
+        if output.strip()==tag:
             print "Skipping git update: Tag %s already at HEAD in %s" % (tag, self.mSourcePath)
             return True
         return False
@@ -136,7 +138,7 @@ class CppBuilder:
         # (i.e. if patch file is not found in expected position)
         patchPath = self._getPathToModule() + "/.."
         runShell('git am --whitespace=fix --signoff < %s/%s' % (patchPath, patchFile))
-        runShell('git tag %s' % patchFile) # need this tag to check for change during next update
+        runShell('git tag -f %s' % patchFile) # need this tag to check for change during next update
         
     def _getPathToModule(self):
         # alternatively use  sys.argv[0] ?? 
@@ -176,7 +178,7 @@ class CppBuilder:
             add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
             if self.controlData.m32bit: # todo: add if darwin
                 add('CMAKE_OSX_ARCHITECTURES', 'i386')
-            add('BUILD_SHARED_LIBS:BOOL', self.controlData.mBuildShared)
+            add('BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
 #            add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
 #            add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
 #            add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            

@@ -120,7 +120,7 @@ class CppComponent(Component):
     def makeClean(self):
         self._getBuilder().makeClean()
     def getBuildType(self):
-        return self.controlData.mBuildType
+        return self.controlData.getBuildType()
 # ---------------------------------------------------------
 
 class ITK(CppComponent):
