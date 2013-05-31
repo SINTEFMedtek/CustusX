@@ -20,6 +20,9 @@
 #include "cxImageSenderFactory.h"
 #include "cxRenderTimer.h"
 #include "cxDirectlyLinkedSender.h"
+#include "cxSimulatedImageStreamer.h"
+#include "cxToolManager.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
@@ -34,10 +37,11 @@ void DirectlyLinkedImageReceiverThread::run()
 
 	this->printArguments(); //debugging
 
-//	if(magic_argument)
-//		create_simulated_streamer()
+	if(mArguments["type"] == "SimulatedImageStreamer")
+		mImageStreamer = this->createSimulatedImageStreamer();
+	else
+		mImageStreamer = ImageStreamerFactory().getFromArguments(mArguments);
 
-	mImageStreamer = ImageStreamerFactory().getFromArguments(mArguments);
 	if(!mImageStreamer)
 	{
 		this->quit();
@@ -76,6 +80,20 @@ void DirectlyLinkedImageReceiverThread::addSonixStatusToQueueSlot()
 QString DirectlyLinkedImageReceiverThread::hostDescription() const
 {
 	return "Direct Link";
+}
+
+SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImageStreamer()
+{
+	ssc::messageManager()->sendDebug("DirectlyLinkedImageReceiverThread::createSimulatedImageStreamer() needs to be implementet properly.");
+	SimulatedImageStreamerPtr streamer(new SimulatedImageStreamer());
+	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	if(!tool)
+		ssc::messageManager()->sendDebug("no tool");
+	ssc::ImagePtr image = ssc::DataManager::getInstance()->getActiveImage();
+	if(!image)
+		ssc::messageManager()->sendDebug("no image");
+	streamer->initialize(image, tool);
+	return streamer;
 }
 
 void DirectlyLinkedImageReceiverThread::printArguments()

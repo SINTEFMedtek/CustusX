@@ -20,10 +20,10 @@ public:
 	virtual ~TestVideoConnectionWidget(){};
 
 public:
-	bool canStream(QString filename);
+	bool canStream(QString filename, QString streamerType);
 
 private:
-	void setupWidgetToRunDummyMhdStreamer(QString filename);
+	void setupWidgetToRunStreamer(QString filename, QString streamerType);
 };
 
 } /* namespace cxtest */

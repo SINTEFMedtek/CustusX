@@ -48,7 +48,7 @@ VideoConnectionManager::VideoConnectionManager()
 			defaultConnection,
 			connectionOptions,
 			mOptions.getElement());
-	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(settingsChanged()));
+	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(connectionMethodChanged()));
 
 	mConnectWhenLocalServerRunning = 0;
 
@@ -183,8 +183,6 @@ void VideoConnectionManager::launchServer()
 	QString program = this->getLocalServerExecutable();
 	QStringList arguments = this->getLocalServerArguments().split(" ");
 
-//	std::cout << "program: " << program << std::endl;
-//	std::cout << "arguments: " << arguments.join("--") << std::endl;
 	mProcess->launch(program, arguments);
 }
 
