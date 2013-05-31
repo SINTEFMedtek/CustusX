@@ -365,16 +365,17 @@ class CustusX3(CppComponent):
         add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).buildPath())
         add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).buildPath())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).buildPath())
-        add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).buildPath())
+        add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).buildPath()+ "/vtkDataStreamClient/")
         # other options
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
-        add('BUILD_OPEN_IGTLINK_SERVER', True);
+        add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
         add('CX_USE_TSF:BOOL', True);
+        add('CX_USE_ISB_GE:BOOL', True);
         add('SSC_USE_DCMTK:BOOL', False);
-        add('SSC_BUILD_EXAMPLES', self.controlData.mBuildSSCExamples);
+        add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
-        add('COTIRE_ADD_UNITY_BUILDS', self.controlData.mUseCotire);
-        add('COTIRE_ENABLE_PRECOMPILED_HEADERS', self.controlData.mUseCotire);
+        add('COTIRE_ADD_UNITY_BUILDS:BOOL', self.controlData.mUseCotire);
+        add('COTIRE_ENABLE_PRECOMPILED_HEADERS:BOOL', self.controlData.mUseCotire);
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         builder.configureCMake()
 # ---------------------------------------------------------
