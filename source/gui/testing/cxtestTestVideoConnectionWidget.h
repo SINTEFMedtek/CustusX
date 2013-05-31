@@ -20,7 +20,7 @@ public:
 	virtual ~TestVideoConnectionWidget(){};
 
 public:
-	bool canStream(QString filename);
+	bool canStream(QString filename, QString streamerType);
 
 private:
 	void setupWidgetToRunStreamer(QString filename, QString streamerType);

@@ -48,7 +48,7 @@ VideoConnectionManager::VideoConnectionManager()
 			defaultConnection,
 			connectionOptions,
 			mOptions.getElement());
-	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(settingsChanged()));
+	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(connectionMethodChanged()));
 
 	mConnectWhenLocalServerRunning = 0;
 

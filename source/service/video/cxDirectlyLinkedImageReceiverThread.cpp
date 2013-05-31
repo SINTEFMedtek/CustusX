@@ -84,9 +84,14 @@ QString DirectlyLinkedImageReceiverThread::hostDescription() const
 
 SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImageStreamer()
 {
+	ssc::messageManager()->sendDebug("DirectlyLinkedImageReceiverThread::createSimulatedImageStreamer() needs to be implementet properly.");
 	SimulatedImageStreamerPtr streamer(new SimulatedImageStreamer());
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	if(!tool)
+		ssc::messageManager()->sendDebug("no tool");
 	ssc::ImagePtr image = ssc::DataManager::getInstance()->getActiveImage();
+	if(!image)
+		ssc::messageManager()->sendDebug("no image");
 	streamer->initialize(image, tool);
 	return streamer;
 }
