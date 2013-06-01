@@ -121,10 +121,6 @@ void TestRenderSpeed::renderNumTimes(int num)
 	for(int i = 0; i < mNumRenderings; ++i)
 		for(int v = 0; v < this->getNumViews(); v++)
 			this->renderViewNum(v);
-
-
-//		for (iter = mViews.begin(); iter != mViews.end(); ++iter)
-//			(*iter)->getRenderWindow()->Render();
 	this->setTotalRenderTimeInMs(clock.elapsed());
 }
 
@@ -164,7 +160,7 @@ void TestRenderSpeed::addViewsToGridLayout(QGridLayout* layout)
 
 const char* TestRenderSpeed::getViewName()
 {
-	if (mViews.size() == 0)
+	if (mViews.size() != 0)
 		return "cxView";
 	else
 		return "vtkRenderWindow";

@@ -27,9 +27,7 @@ StringMap extractCommandlineOptions(QStringList cmdline)
 		QString name, val;
 		name = cmdline[i].remove(0, 2);
 		if (i + 1 < cmdline.size())
-		{
 			val = cmdline[i + 1];
-		}
 		retval[name] = val;
 	}
 
