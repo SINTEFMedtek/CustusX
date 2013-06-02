@@ -182,8 +182,8 @@ class CustusXBuilder:
  
     def installPackage(self):
         self.assembly.printHeader('Install package', level=3)
-        pattern = 'CustusX3_*.dmg'
-        pattern = '3.5*.dmg' # debug only on buggy generator
+        pattern = 'CustusX_*.dmg'
+        #pattern = '3.5*.dmg' # debug only on buggy generator
         custusx = self._createComponent(cxComponents.CustusX3)
         buildDir = custusx.buildPath()
         pattern = '%s/%s' % (custusx.buildPath(), pattern)
@@ -233,8 +233,9 @@ class CustusXBuilder:
         time.sleep(timeout)
         #print p.stdout.read() # drop this: causes app to hang
         retcode = p.poll()
-        self.assertTrue(retcode==None, 'Process %s has been running successfully for %is' % (application, timeout))
-        p.kill()       
+        self.assertTrue(retcode==None or retcode==0, 'Process %s has been running successfully for %is' % (application, timeout))
+        if retcode==None:
+            p.kill()
         p.wait()
         print 'Successfully ran %s for %is' % (application, timeout)
         # also consider otool -L
