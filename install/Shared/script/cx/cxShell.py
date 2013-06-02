@@ -56,6 +56,19 @@ class Shell (object):
         if self.DUMMY is False:
             return self._evaluateReal(cmd)
 
+    def changeDir(self, path):
+        path = path.replace("\\", "/")
+        if not os.path.exists(path):
+            os.makedirs(path)
+        self.CWD = path
+        self._printCommand('cd %s' % path)
+    
+    def removeTree(self, path):
+        self._printInfo("Removing folder and contents of %s." % path)
+        if self.DUMMY is False:
+            if os.path.exists(path):
+                shutil.rmtree(path, False)
+
     def _runReal(self, cmd, ignoreFailure):
         '''
         This function runs shell,
@@ -107,20 +120,7 @@ class Shell (object):
         if p.returncode != 0:
             return None
         return "".join(retval) 
-    
-    def changeDir(self, path):
-        path = path.replace("\\", "/")
-        if not os.path.exists(path):
-            os.makedirs(path)
-        self.CWD = path
-        self._printCommand('cd %s' % path)
-    
-    def removeTree(self, path):
-        self._printInfo("Removing folder and contents of %s." % path)
-        if self.DUMMY is False:
-            if os.path.exists(path):
-                shutil.rmtree(path, False)
-                
+                    
     def _printInfo(self, text):
         print '[shell info] %s' % text
     def _printCommand(self, text):
