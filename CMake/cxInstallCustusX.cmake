@@ -109,6 +109,16 @@ function(cx_install_test_executables)
 endfunction()
 
 cx_install_test_executables()
+
+# collect all installations here. They will be used by fixup_bundle to collect dependencies.
+set(CX_EXECUTABLES
+	${plugin_dest_dir}/OpenIGTLinkServer
+	${plugin_dest_dir}/GrabberServer
+	${plugin_dest_dir}/cxTestResource_CppUnit_CTest
+	${plugin_dest_dir}/sscPositionFileReader
+	${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+	)
+
 #--------------------------------------------------------------------------------
 # install a qt.conf file
 # this inserts some cmake code into the install script to write the file
@@ -172,9 +182,20 @@ set(DIRS
 		${CustusX3_BINARY_DIR}/source/resource/videoServer
 		)
 
+foreach(EXE ${CX_EXECUTABLES} )
+	set(CX_INSTALL_EXES_CODE
+		"${CX_INSTALL_EXES_CODE}
+		set(TEMP)
+		file\(GLOB_RECURSE TEMP \"\${CMAKE_INSTALL_PREFIX}/${EXE}\"\)
+		set(QTPLUGINS \${QTPLUGINS} \${TEMP})"
+	)
+endforeach()
+
+message(STATUS "CX_INSTALL_EXES_CODE" ${CX_INSTALL_EXES_CODE})
+
+# this code appears in cmake_install.cmake in the CURRENT_BINARY_DIR. Check there when changing.
 install(CODE "
-		file(GLOB_RECURSE QTPLUGINS
-		  \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+		${CX_INSTALL_EXES_CODE}
 		include(BundleUtilities)
 		fixup_bundle(\"${APPS}\"   \"\${QTPLUGINS}\"   \"${DIRS}\") "
 		)
