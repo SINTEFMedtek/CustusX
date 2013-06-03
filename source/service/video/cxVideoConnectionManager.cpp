@@ -52,19 +52,19 @@ VideoConnectionManager::VideoConnectionManager()
 
 	mConnectWhenLocalServerRunning = 0;
 
-	mIniScript.reset(new ProcessWrapper("Init Script"));
-	mProcess.reset(new ProcessWrapper("Local Video Server"));
-	connect(mProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
+	mIniScriptProcess.reset(new ProcessWrapper("Init Script"));
+	mLocalVideoServerProcess.reset(new ProcessWrapper("Local Video Server"));
+	connect(mLocalVideoServerProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 
-	mRTSource.reset(new VideoConnection());
-	connect(mRTSource.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
-	connect(mRTSource.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
-	connect(mRTSource.get(), SIGNAL(videoSourcesChanged()), this, SIGNAL(videoSourcesChanged()));
+	mVideoConnection.reset(new VideoConnection());
+	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
+	connect(mVideoConnection.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
+	connect(mVideoConnection.get(), SIGNAL(videoSourcesChanged()), this, SIGNAL(videoSourcesChanged()));
 }
 
 VideoConnectionManager::~VideoConnectionManager()
 {
-	mRTSource->disconnectServer();
+	mVideoConnection->disconnectServer();
 }
 
 void VideoConnectionManager::setLocalServerExecutable(QString commandline)
@@ -104,22 +104,19 @@ QString VideoConnectionManager::getInitScript()
 
 QProcess* VideoConnectionManager::getProcess()
 {
-	return mProcess->getProcess();
+	return mLocalVideoServerProcess->getProcess();
 }
 
-bool VideoConnectionManager::getUseLocalServer()
+bool VideoConnectionManager::useLocalServer()
 {
 	return mConnectionMethod->getValue() == "Local Server";
 }
 
-bool VideoConnectionManager::getUseDirectLink()
+bool VideoConnectionManager::useDirectLink()
 {
 	return mConnectionMethod->getValue() == "Direct Link";
 }
 
-/**Get list of recent hosts. The first is the current.
- *
- */
 QStringList VideoConnectionManager::getHostHistory()
 {
 	QStringList hostHistory = settings()->value("IGTLink/hostHistory").toStringList();
@@ -174,7 +171,7 @@ QString VideoConnectionManager::getLocalServerArguments()
 
 void VideoConnectionManager::launchServer()
 {
-	if (!this->getUseLocalServer())
+	if (!this->useLocalServer())
 	{
 		ssc::messageManager()->sendError("Ignoring Launch local server: Must select local server");
 		return;
@@ -183,17 +180,17 @@ void VideoConnectionManager::launchServer()
 	QString program = this->getLocalServerExecutable();
 	QStringList arguments = this->getLocalServerArguments().split(" ");
 
-	mProcess->launch(program, arguments);
+	mLocalVideoServerProcess->launch(program, arguments);
 }
 
 void VideoConnectionManager::connectServer()
 {
-	if (!mRTSource->isConnected())
+	if (!mVideoConnection->isConnected())
 	{
-		if (this->getUseLocalServer())
-			mRTSource->connectServer("LocalHost", this->getPort());
+		if (this->useLocalServer())
+			mVideoConnection->connectServer("LocalHost", this->getPort());
 		else
-			mRTSource->connectServer(this->getHost(), this->getPort());
+			mVideoConnection->connectServer(this->getHost(), this->getPort());
 	}
 
 	this->delayedAutoConnectServer();
@@ -205,7 +202,7 @@ void VideoConnectionManager::connectServer()
  */
 void VideoConnectionManager::delayedAutoConnectServer()
 {
-	if (mRTSource->isConnected())
+	if (mVideoConnection->isConnected())
 		mConnectWhenLocalServerRunning = 0;
 
 	if (mConnectWhenLocalServerRunning)
@@ -215,62 +212,53 @@ void VideoConnectionManager::delayedAutoConnectServer()
 	}
 }
 
-
 void VideoConnectionManager::launchAndConnectServer()
 {
-	if (mRTSource->isConnected())
+	if (mVideoConnection->isConnected())
 		return;
 
-	mIniScript->launch(this->getInitScript());
+	mIniScriptProcess->launch(this->getInitScript());
 
-	if (this->getUseDirectLink())
+	if (this->useDirectLink())
 	{
 		QString commandline = this->getLocalServerArguments();
 		StringMap args = extractCommandlineOptions(commandline.split(" "));
-		mRTSource->directLink(args);
+		mVideoConnection->directLink(args);
 		return;
 	}
 
-	if (this->getUseLocalServer())
+	if (this->useLocalServer())
 	{
 		this->launchServer();
 
 		if (this->getProcess()->state() != QProcess::Running)
-		{
 			mConnectWhenLocalServerRunning = 5; // attempt N connects
-		}
 		else
-		{
 			this->connectServer();
-		}
 	}
 	else
-	{
 		this->connectServer();
-	}
 }
 
 void VideoConnectionManager::serverProcessStateChanged(QProcess::ProcessState newState)
 {
 	if (newState == QProcess::Running)
-	{
 		this->delayedAutoConnectServer();
-	}
 }
 
 std::vector<ssc::VideoSourcePtr> VideoConnectionManager::getVideoSources()
 {
-	return mRTSource->getVideoSources();
+	return mVideoConnection->getVideoSources();
 }
 
 void VideoConnectionManager::disconnectServer()
 {
-	mRTSource->disconnectServer();
+	mVideoConnection->disconnectServer();
 }
 
 bool VideoConnectionManager::isConnected() const
 {
-	return mRTSource->isConnected();
+	return mVideoConnection->isConnected();
 }
 
 }//end namespace cx
