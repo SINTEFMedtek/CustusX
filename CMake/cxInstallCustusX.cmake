@@ -87,17 +87,20 @@ INSTALL(DIRECTORY "${QT_PLUGINS_DIR}/imageformats"
 function(cx_install_additional_executables)
 	# Install the OpenIGTLinkServer
 	# Only on Apple: Linux/Win does this in the OpenIGTLinkServer folder.
-#	if(APPLE)
+	if(APPLE)
 		INSTALL(FILES
-					"${CustusX3_BINARY_DIR}/source/apps/OpenIGTLinkServer/OpenIGTLinkServer"
 					"${CustusX3_BINARY_DIR}/source/apps/GrabberServer/GrabberServer"
 				DESTINATION ${plugin_dest_dir}
 				PERMISSIONS ${CX_FULL_PERMISSIONS})
-#	endif()
+	endif()
 
-	INSTALL(FILES "${SSC_BINARY_DIR}/Examples/PositionFileReader/sscPositionFileReader"
-			DESTINATION ${plugin_dest_dir}
-			PERMISSIONS ${CX_FULL_PERMISSIONS})
+#	INSTALL(FILES "${CustusX3_BINARY_DIR}/source/apps/OpenIGTLinkServer/OpenIGTLinkServer"
+#			DESTINATION ${plugin_dest_dir}
+#			PERMISSIONS ${CX_FULL_PERMISSIONS})
+#	INSTALL(FILES "${SSC_BINARY_DIR}/Examples/PositionFileReader/sscPositionFileReader"
+#				  "${CustusX3_BINARY_DIR}/source/apps/OpenIGTLinkServer/OpenIGTLinkServer"
+#			DESTINATION ${plugin_dest_dir}
+#			PERMISSIONS ${CX_FULL_PERMISSIONS})
 endfunction()
 
 cx_install_additional_executables()
@@ -108,14 +111,14 @@ function(cx_install_test_executables)
 			PERMISSIONS ${CX_FULL_PERMISSIONS})
 endfunction()
 
-cx_install_test_executables()
+#cx_install_test_executables()
 
 # collect all installations here. They will be used by fixup_bundle to collect dependencies.
 set(CX_EXECUTABLES
-	${plugin_dest_dir}/OpenIGTLinkServer
-	${plugin_dest_dir}/GrabberServer
-	${plugin_dest_dir}/cxTestResource_CppUnit_CTest
-	${plugin_dest_dir}/sscPositionFileReader
+#	${plugin_dest_dir}/OpenIGTLinkServer
+#	${plugin_dest_dir}/GrabberServer
+#	${plugin_dest_dir}/cxTestResource_CppUnit_CTest
+#	${plugin_dest_dir}/sscPositionFileReader
 	${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 	)
 
@@ -128,7 +131,10 @@ INSTALL(CODE "
 	")
 
 
-set(APPS ${CustusX_Exe_Path})
+set(APPS 
+    ${CustusX_Exe_Path}
+    #"\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/OpenIGTLinkServer"
+    )
 set(LIBS )
 set(DIRS
 		${QT_INCLUDES}
@@ -199,6 +205,15 @@ install(CODE "
 		include(BundleUtilities)
 		fixup_bundle(\"${APPS}\"   \"\${QTPLUGINS}\"   \"${DIRS}\") "
 		)
+
+#TEST
+#set(APPS "\${CMAKE_INSTALL_PREFIX}/${CX_INSTALL_ROOT_DIR}/bin/OpenIGTLinkServer")
+# this code appears in cmake_install.cmake in the CURRENT_BINARY_DIR. Check there when changing.
+#install(CODE "
+#		include(BundleUtilities)
+#		fixup_bundle(\"${APPS}\"   \"\${QTPLUGINS}\"   \"${DIRS}\") "
+#		)
+#TEST END
 
 function(cx_dontuse_fixup)
 install(CODE "
