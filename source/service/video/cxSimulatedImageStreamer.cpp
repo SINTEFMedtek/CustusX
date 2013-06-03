@@ -1,7 +1,17 @@
 #include "cxSimulatedImageStreamer.h"
 
+#include "vtkPNGWriter.h"
+#include "vtkImageReslice.h"
+#include "vtkMatrix4x4.h"
+#include "vtkImageData.h"
 #include "sscSliceProxy.h"
 #include "sscSlicedImageProxy.h"
+#include "sscProbeSector.h"
+#include "sscProbeData.h"
+#include "sscToolManager.h"
+#include "sscTransform3D.h"
+
+#include "sscVolumeHelpers.h"
 
 namespace cx
 {
@@ -67,20 +77,41 @@ void SimulatedImageStreamer::sliceSlot(Transform3D matrix, double timestamp)
 ssc::ImagePtr SimulatedImageStreamer::getSlice(ssc::ImagePtr source)
 {
 	ssc::ImagePtr slice;
+	ssc::ProbeData probedata = mTool->getProbe()->getData();
+	ssc::ProbeSector probesector;
+	probesector.setData(probedata);
 
-	ssc::SliceProxyPtr sliceProxy(new ssc::SliceProxy());
-	sliceProxy->setTool(mTool);
-	sliceProxy->setFollowType(ssc::ftFIXED_CENTER);
-	sliceProxy->setOrientation(ssc::otORTHOGONAL);
-	sliceProxy->setPlane(ssc::ptANYPLANE);
+	vtkMatrix4x4Ptr mMatrixAxes = vtkMatrix4x4Ptr::New();
+	ssc::Transform3D uMt = probesector.get_tMu().inv();
+	ssc::Transform3D vMu = probesector.get_uMv().inv();
+	ssc::Transform3D vMt = vMu * uMt;
+	uMt = vMt;
+	ssc::Transform3D tMpr = mTool->get_prMt().inv();
+	ssc::Transform3D prMr = ssc::toolManager()->get_rMpr()->inv();
+	ssc::Transform3D rMd = mSourceImage->get_rMd();
+	ssc::Transform3D uMd = uMt * tMpr * prMr * rMd;
+	mMatrixAxes->DeepCopy(uMd.inv().getVtkMatrix());
 
-	ssc::SlicedImageProxyPtr slicedImageProxy(new ssc::SlicedImageProxy());
-	slicedImageProxy->setSliceProxy(sliceProxy);
-	slicedImageProxy->setImage(mSourceImage);
-	slicedImageProxy->update();
+	vtkImageReslicePtr mReslicer = vtkImageReslicePtr::New();
+	mReslicer->SetInput(source->getBaseVtkImageData());
+	mReslicer->SetBackgroundLevel(source->getMin());
+	mReslicer->SetInterpolationModeToLinear();
+	mReslicer->SetOutputDimensionality(2);
+	mReslicer->SetResliceAxes(mMatrixAxes);
+	mReslicer->AutoCropOutputOn(); // fix used in 2.0.9, but slower update rate
+	mReslicer->SetOutputOrigin(0,0,0);
+	mReslicer->SetOutputExtent(0, probedata.getImage().mSize.width()-1, 0, probedata.getImage().mSize.height()-1, 0, 0);
+	mReslicer->SetOutputSpacing(probedata.getImage().mSpacing.data());
+	mReslicer->Update();
 
-	vtkImageDataPtr vtkSlice = slicedImageProxy->getOutput();
+	vtkImageDataPtr vtkSlice = vtkImageDataPtr::New();
+
+	vtkSlice->DeepCopy(mReslicer->GetOutput());
 	slice = ssc::ImagePtr(new ssc::Image("TEST_UID", vtkSlice, "TEST_NAME"));
+	slice->resetTransferFunction(source->getTransferFunctions3D(), source->getLookupTable2D());
+
+//	std::cout << uMd << std::endl;
+//	vtkSlice->Print(std::cout);
 
 	return slice;
 }

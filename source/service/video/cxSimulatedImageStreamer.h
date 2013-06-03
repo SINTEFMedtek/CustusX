@@ -1,9 +1,11 @@
 #ifndef CXSIMULATEDIMAGESTREAMER_H_
 #define CXSIMULATEDIMAGESTREAMER_H_
 
-#include "cxImageStreamer.h"
+#include "vtkSmartPointer.h"
 #include "sscTransform3D.h"
+#include "cxImageStreamer.h"
 
+typedef vtkSmartPointer<class vtkPNGWriter> vtkPNGWriterPtr;
 namespace cx
 {
 typedef ssc::Transform3D Transform3D;

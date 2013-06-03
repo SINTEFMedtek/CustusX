@@ -188,9 +188,9 @@ void VideoConnectionManager::connectServer()
 	if (!mVideoConnection->isConnected())
 	{
 		if (this->useLocalServer())
-			mVideoConnection->connectServer("LocalHost", this->getPort());
+			mVideoConnection->runIGTLinkedClient("LocalHost", this->getPort());
 		else
-			mVideoConnection->connectServer(this->getHost(), this->getPort());
+			mVideoConnection->runIGTLinkedClient(this->getHost(), this->getPort());
 	}
 
 	this->delayedAutoConnectServer();
@@ -208,7 +208,7 @@ void VideoConnectionManager::delayedAutoConnectServer()
 	if (mConnectWhenLocalServerRunning)
 	{
 		--mConnectWhenLocalServerRunning;
-		QTimer::singleShot(mReconnectInterval, this, SLOT(connectServer())); // the process need some time to get its tcp server up and listening. GrabberServer seems to need more than 500ms
+		QTimer::singleShot(mReconnectInterval, this, SLOT(runIGTLinkedClient())); // the process need some time to get its tcp server up and listening. GrabberServer seems to need more than 500ms
 	}
 }
 
@@ -223,7 +223,7 @@ void VideoConnectionManager::launchAndConnectServer()
 	{
 		QString commandline = this->getLocalServerArguments();
 		StringMap args = extractCommandlineOptions(commandline.split(" "));
-		mVideoConnection->directLink(args);
+		mVideoConnection->runDirectLinkClient(args);
 		return;
 	}
 
