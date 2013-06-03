@@ -219,9 +219,9 @@ VideoConnectionManagerPtr VideoConnectionWidget::getConnection()
 
 void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 {
-	if (this->getConnection()->getUseDirectLink())
+	if (this->getConnection()->useDirectLink())
 		mStackedWidget->setCurrentIndex(0);
-	else if (this->getConnection()->getUseLocalServer())
+	else if (this->getConnection()->useLocalServer())
 		mStackedWidget->setCurrentIndex(1);
 	else
 		mStackedWidget->setCurrentIndex(2);
@@ -287,12 +287,12 @@ void VideoConnectionWidget::toggleConnectServer()
 
 void VideoConnectionWidget::writeSettings()
 {
-	if (this->getConnection()->getUseDirectLink())
+	if (this->getConnection()->useDirectLink())
 	{
 		this->getConnection()->setLocalServerArguments(mDirectLinkArguments->currentText());
 		this->updateDirectLinkArgumentHistory();
 	}
-	else if (this->getConnection()->getUseLocalServer())
+	else if (this->getConnection()->useLocalServer())
 	{
 		this->getConnection()->setLocalServerExecutable(mLocalServerEdit->text());
 		this->getConnection()->setLocalServerArguments(mLocalServerArguments->text());
