@@ -176,12 +176,16 @@ void Probe::setData(ssc::ProbeData probeSector, QString configUid)
 	emit sectorChanged();
 }
 
-void Probe::setDigitalStatus(bool digitalStatus)
+void Probe::useDigitalVideo(bool digitalStatus)
 {
 	mDigitalInterface = digitalStatus;
-	if (digitalStatus)
+	if (mDigitalInterface)
 		this->setConfigId("Digital");
-//		mConfigurationId = "Digital";
+}
+
+bool Probe::isUsingDigitalVideo() const
+{
+	return mDigitalInterface;
 }
 
 void Probe::addXml(QDomNode& dataNode)
@@ -203,14 +207,27 @@ void Probe::parseXml(QDomNode& dataNode)
 QStringList Probe::getConfigIdList() const
 {
 	std::cout << "Probe::getConfigIdList()" << std::endl;
+	if (!this->hasRtSource())
+		return QStringList();
+	QStringList configIdList = mXml->getConfigIdList(
+			this->getInstrumentScannerId(), this->getInstrumentId(), this->getRtSourceName());
+	return configIdList;
+}
+
+bool Probe::hasRtSource() const
+{
+	return !(this->getRtSourceName().isEmpty());
+}
+
+QString Probe::getRtSourceName() const
+{
 	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
 	if (rtSourceList.empty())
-		return QStringList();
+		return QString();
 	QString rtSource = rtSourceList.at(0);
-	if (mDigitalInterface)
+	if (this->isUsingDigitalVideo())
 		rtSource = "Digital";
-	QStringList configIdList = mXml->getConfigIdList(this->getInstrumentScannerId(), this->getInstrumentId(), rtSource);
-	return configIdList;
+	return rtSource;
 }
 
 QString Probe::getConfigName(QString configString) ///< get a name for the given configuration
@@ -227,14 +244,10 @@ QString Probe::getConfigId() const
 QString Probe::getConfigurationPath() const
 {
 	std::cout << "Probe::getConfigurationPath()" << std::endl;
-	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
-	if (rtSourceList.isEmpty())
+	if (!this->hasRtSource())
 		return "";
 	QStringList retval;
-	QString rtSource = rtSourceList.at(0);
-	if (mDigitalInterface)
-		rtSource = "Digital";
-	retval << this->getInstrumentScannerId() << this->getInstrumentId() << rtSource << this->getConfigId();
+	retval << this->getInstrumentScannerId() << this->getInstrumentId() << this->getRtSourceName() << this->getConfigId();
 	return retval.join(":");
 }
 
@@ -271,15 +284,11 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
 {
 	std::cout << "Probe::getConfiguration()" << std::endl;
 	ProbeXmlConfigParser::Configuration config;
-	QStringList rtSourceList = mXml->getRtSourceList(mScannerUid, mInstrumentUid);
-	if (rtSourceList.isEmpty())
-		return config;
-
-	QString rtSource = rtSourceList.at(0);
-	if (mDigitalInterface)
-		rtSource = "Digital";
-	config = mXml->getConfiguration(mScannerUid, mInstrumentUid, rtSource, uid);
-	std::cout << "Probe::getConfiguration rtSource: " << config.mRtSource << " uid: " << uid << std::endl;
+	if(this->hasRtSource())
+	{
+		config = mXml->getConfiguration(mScannerUid, mInstrumentUid, this->getRtSourceName(), uid);
+		std::cout << "Probe::getConfiguration rtSource: " << config.mRtSource << " uid: " << uid << std::endl;
+	}
 	return config;
 }
 

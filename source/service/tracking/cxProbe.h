@@ -74,7 +74,7 @@ public:
 	void removeCurrentConfig(); ///< remove the current config from disk
 	void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
 
-	void setDigitalStatus(bool digitalStatus);///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
+	void useDigitalVideo(bool digitalStatus);///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
 
 private:
 	Probe(QString instrumentUid, QString scannerUid);
@@ -82,6 +82,9 @@ private:
 	QString getInstrumentId() const;
 	QString getInstrumentScannerId() const;
 	ssc::ProbeData getProbeData(QString uid) const;
+	bool hasRtSource() const;
+	bool isUsingDigitalVideo() const;
+	QString getRtSourceName() const;
 
 //	struct StreamData
 //	{
