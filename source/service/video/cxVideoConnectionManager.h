@@ -64,8 +64,8 @@ public:
 	void setLocalServerArguments(QString commandline);
 	QString getLocalServerArguments();
 
-	bool getUseLocalServer();
-	bool getUseDirectLink();
+	bool useLocalServer();
+	bool useDirectLink();
 
 	void setInitScript(QString filename);
 	QString getInitScript();
@@ -93,11 +93,11 @@ public slots:
 private:
 	void delayedAutoConnectServer();
 
-	VideoConnectionPtr mRTSource;
+	VideoConnectionPtr mVideoConnection;
 	int mConnectWhenLocalServerRunning;
 	int mReconnectInterval;
-	ProcessWrapperPtr mProcess;
-	ProcessWrapperPtr mIniScript;
+	ProcessWrapperPtr mLocalVideoServerProcess;
+	ProcessWrapperPtr mIniScriptProcess;
 
 	ssc::StringDataAdapterXmlPtr mConnectionMethod;
 	ssc::XmlOptionFile mOptions;
