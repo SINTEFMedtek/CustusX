@@ -48,7 +48,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         #self.cxBuilder.clearTestData()
         #self.cxBuilder.runAllTests()
         
-        #self.cxBuilder.createInstallerPackage()  
+        #self.cxBuilder.createInstallerPackage()
         self.cxBuilder.installPackage()
         self.cxBuilder.testInstallation()
         self.cxBuilder.runIntegrationTests()
