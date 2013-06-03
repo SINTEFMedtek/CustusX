@@ -26,6 +26,11 @@ if(BUILD_OPEN_IGTLINK_SERVER)
     #-------------------------------
     # Install files
     #-------------------------------
+#	install( TARGETS ${ExecutableName} DESTINATION "${CX_INSTALL_ROOT_DIR}/CustusX.app/Contents/MacOS" )
+
+
+function(CX_DONT_USE2)
+
     if (CX_WINDOWS OR CX_LINUX)
         install(TARGETS ${ExecutableName}
             BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
@@ -103,6 +108,6 @@ if(BUILD_OPEN_IGTLINK_SERVER)
                      )
 
     endif (CX_WINDOWS)
-
+endfunction(CX_DONT_USE2)
 endif(BUILD_OPEN_IGTLINK_SERVER)
 
