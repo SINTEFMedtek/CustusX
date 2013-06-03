@@ -228,7 +228,7 @@ void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
 	image.mClipRect_p = msg->getImage().mClipRect_p;
 	data.setImage(image);
 
-	probe->setDigitalStatus(true);
+	probe->useDigitalVideo(true);
 	probe->setData(data, "Digital");
 }
 
