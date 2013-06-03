@@ -53,14 +53,15 @@ typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
  */
 class VideoConnection : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
+
 public:
 	VideoConnection();
 	virtual ~VideoConnection();
 	virtual bool isConnected() const;
 
-	void directLink(std::map<QString, QString> args);
-	void connectServer(QString address, int port);
+	void runDirectLinkClient(std::map<QString, QString> args);
+	void runIGTLinkedClient(QString address, int port);
 	void disconnectServer();
 
 	std::vector<ssc::VideoSourcePtr> getVideoSources();
