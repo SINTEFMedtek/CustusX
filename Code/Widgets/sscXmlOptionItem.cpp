@@ -216,6 +216,11 @@ XmlOptionFile::XmlOptionFile(QString filename, QString name) :
 XmlOptionFile::~XmlOptionFile()
 {}
 
+QString XmlOptionFile::getFileName()
+{
+	return mFilename;
+}
+
 bool XmlOptionFile::isNull() const
 {
 	if(mCurrentElement.isNull() || mDocument.isNull())
