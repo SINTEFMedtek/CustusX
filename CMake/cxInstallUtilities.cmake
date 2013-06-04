@@ -1,3 +1,17 @@
+# This file is part of CustusX, an Image Guided Therapy Application.
+#
+# Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+#
+# CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+# code and binaries can only be used by SMT and those with explicit permission
+# from SMT. CustusX shall not be distributed to anyone else.
+#
+# CustusX is a research tool. It is NOT intended for use or certified for use
+# in a normal clinical setting. SMT does not take responsibility for its use
+# in any way.
+#
+# See CustusX_License.txt for more information.
+
 # Utitily variable for setting permissions with install(FILE) or install(DIRECTORY)
 set(CX_FULL_PERMISSIONS
 	OWNER_READ OWNER_EXECUTE OWNER_WRITE
@@ -7,6 +21,85 @@ set(CX_FULL_PERMISSIONS
 # Utitily variable for setting permissions with install(FILE) or install(DIRECTORY)
 set(CX_READ_PERMISSIONS
 	OWNER_READ GROUP_READ WORLD_READ)
+
+
+###############################################################################
+#
+# Set variables used throughout the build.
+# Call first, in root dir!
+#
+###############################################################################
+macro(cx_initialize_custusx_install)
+
+    set(CPACK_PACKAGE_VERSION "${CustusX3_VERSION_STRING}")
+    set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
+    set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
+    set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
+
+    set(CPACK_PACKAGE_FILE_NAME "CustusX_${CustusX3_VERSION_STRING}")
+    set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_welcome.txt")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/Shared/install_text/install_license.txt")
+
+    # append build type to name if not Release:
+    if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
+        set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_BUILD_TYPE})
+    endif()
+
+    # Set root folder for entire installation
+    set(CX_INSTALL_ROOT_DIR .)
+
+    if(APPLE)
+        set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+        set(CX_INSTALL_ROOT_DIR "Applications/CustusX")
+        set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Apple/apple_install_readme.rtf")
+
+        option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
+        option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
+        option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
+        option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
+    endif(APPLE)
+
+    if(CX_LINUX)
+        set(CX_INSTALL_ROOT_DIR "CustusX")
+
+        # Enable relative paths in Linux:
+        # http://www.cmake.org/Wiki/CMake_RPATH_handling
+        # http://www.cmake.org/pipermail/cmake/2008-January/019329.html
+        # Mac handles this differently
+        SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:\\\$ORIGIN/")
+
+        set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
+        set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Linux/copy/linux_install_readme.txt")
+        #set(CPACK_GENERATOR "TGZ;STGZ")
+        set(CPACK_GENERATOR "TGZ")
+        set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+    endif(CX_LINUX)
+
+    if(CX_WINDOWS)
+        set(CPACK_NSIS_MUI_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\\\CustusX.ico")
+        set(CPACK_PACKAGE_ICON "${CustusX3_SOURCE_DIR}/source/gui/icons\\\\CustusX.png")
+        set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/Windows\\\\Windows_Install_ReadMe.rtf")
+        set(CPACK_NSIS_INSTALLED_ICON_NAME "bin/CustusX.exe")
+        set(OpenIGTLinkServerName OpenIGTLinkServer)
+        if(CX_WIN32)
+            set(OpenIGTLinkServerName UltrasonixServer)
+        endif()
+        set(CPACK_PACKAGE_EXECUTABLES
+            "CustusX" "CustusX")
+        if(CX_WIN32 AND BUILD_GRABBER_SERVER)
+            set(CPACK_PACKAGE_EXECUTABLES
+                ${CPACK_PACKAGE_EXECUTABLES}
+                "GrabberServer" "GrabberServer")
+        endif()
+        if(BUILD_OPEN_IGTLINK_SERVER)
+            set(CPACK_PACKAGE_EXECUTABLES
+                ${CPACK_PACKAGE_EXECUTABLES}
+                "${OpenIGTLinkServerName}" "${OpenIGTLinkServerName}")
+        endif()
+        set(CPACK_NSIS_MENU_LINKS "doc/Windows_Install_ReadMe.rtf" "README")
+    endif (CX_WINDOWS)
+
+endmacro()
 
 ###############################################################################
 #
