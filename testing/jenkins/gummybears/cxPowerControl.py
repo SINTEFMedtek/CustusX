@@ -21,6 +21,7 @@ import logging
 import time    
 import subprocess
 import sys
+import os
 
 class PowerControl:
     '''
@@ -29,7 +30,11 @@ class PowerControl:
     def __init__(self):
         #self.pwr_hostname = '192.168.0.136'
         self.pwr_hostname = '169.254.75.19'
-        self.power_control_java_file = './PowerControl.jar'
+
+        moduleFile = os.path.realpath(__file__)
+        modulePath = os.path.dirname(moduleFile)
+        modulePath = os.path.abspath(modulePath)
+        self.power_control_java_file = '%s/PowerControl.jar' % modulePath
         self.cachedValues = {} # cache values in order to set only when changed
         self.dummy = False
         self._changed = True
