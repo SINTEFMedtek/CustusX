@@ -28,29 +28,41 @@
 namespace cx
 {
 
-ProbePtr Probe::New(QString instrumentUid, QString scannerUid)
+ProbePtr Probe::New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml)
 {
 	Probe* object = new Probe(instrumentUid, scannerUid);
 	ProbePtr retval(object);
 	object->mSelf = retval;
+	retval->initProbeXmlConfigParser(xml);
+	retval->initConfigId();
 	return retval;
 }
 
 Probe::Probe(QString instrumentUid, QString scannerUid) :
-				mSoundSpeedCompensationFactor(1.0),
-				mInstrumentUid(instrumentUid),
-				mScannerUid(scannerUid),
-				mOverrideTemporalCalibration(false),
-				mTemporalCalibration(0.0),
-				mDigitalInterface(false)
+		mInstrumentUid(instrumentUid),
+		mScannerUid(scannerUid),
+		mSoundSpeedCompensationFactor(1.0),
+		mOverrideTemporalCalibration(false),
+		mTemporalCalibration(0.0),
+		mDigitalInterface(false)
 {
 	ssc::ProbeData probeData;
 	mProbeData[probeData.getUid()] = probeData;
 	mActiveUid = probeData.getUid();
+}
 
-	QString xmlFileName = cx::DataLocations::getRootConfigPath() + QString("/tool/ProbeCalibConfigs.xml");
-	mXml.reset(new ProbeXmlConfigParser(xmlFileName));
+void Probe::initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml = ProbeXmlConfigParserPtr())
+{
+	if (!xml)
+	{
+		QString xmlFileName = cx::DataLocations::getRootConfigPath() + QString("/tool/ProbeCalibConfigs.xml");
+		mXml.reset(new ProbeXmlConfigParserImpl(xmlFileName));
+	} else
+		mXml = xml;
+}
 
+void Probe::initConfigId()
+{
 	QStringList configs = this->getConfigIdList();
 	if (!configs.isEmpty())
 		this->setConfigId(configs[0]);
@@ -59,7 +71,7 @@ Probe::Probe(QString instrumentUid, QString scannerUid) :
 		ssc::messageManager()->sendWarning(QString("Found no probe configuration for:\n"
 			"scanner=[%1] instrument=[%2].\n"
 			"Check that your %3 file contains entries\n"
-			"<USScanner> <Name>%1</Name> ... <USProbe> <Name>%2</Name>").arg(scannerUid).arg(instrumentUid).arg(xmlFileName));
+			"<USScanner> <Name>%1</Name> ... <USProbe> <Name>%2</Name>").arg(mScannerUid).arg(mInstrumentUid).arg(mXml->getFileName()));
 	}
 }
 
@@ -206,7 +218,6 @@ void Probe::parseXml(QDomNode& dataNode)
 
 QStringList Probe::getConfigIdList() const
 {
-	std::cout << "Probe::getConfigIdList()" << std::endl;
 	if (!this->hasRtSource())
 		return QStringList();
 	QStringList configIdList = mXml->getConfigIdList(
@@ -243,7 +254,6 @@ QString Probe::getConfigId() const
 
 QString Probe::getConfigurationPath() const
 {
-	std::cout << "Probe::getConfigurationPath()" << std::endl;
 	if (!this->hasRtSource())
 		return "";
 	QStringList retval;
@@ -253,16 +263,12 @@ QString Probe::getConfigurationPath() const
 
 void Probe::setConfigId(QString uid)
 {
-	std::cout << "Probe::setConfigId(): " << uid << std::endl;
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(uid);
 	if (config.isEmpty())
 		return;
 	if(uid.compare("Digital") != 0)
 	{
 		ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
-		//  std::cout << "probeSector.mTemporalCalibration" << probeSector.mTemporalCalibration << std::endl;
-		//	mConfigurationId = uid;
-		//	mData = probeSector;
 		probeSector.setUid(mActiveUid);
 		this->setData(probeSector, uid);
 	}
@@ -282,13 +288,9 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 
 ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
 {
-	std::cout << "Probe::getConfiguration()" << std::endl;
 	ProbeXmlConfigParser::Configuration config;
 	if(this->hasRtSource())
-	{
 		config = mXml->getConfiguration(mScannerUid, mInstrumentUid, this->getRtSourceName(), uid);
-		std::cout << "Probe::getConfiguration rtSource: " << config.mRtSource << " uid: " << uid << std::endl;
-	}
 	return config;
 }
 
@@ -333,7 +335,6 @@ QStringList Probe::getAvailableVideoSources()
 	QStringList retval;
 	for (std::map<QString, ssc::VideoSourcePtr>::iterator iter=mSource.begin(); iter!=mSource.end(); ++iter)
 		retval << iter->first;
-//	std::cout << "Probe::getAvailableVideoSources " << retval.size() << std::endl;
 	return retval;
 }
 

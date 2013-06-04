@@ -18,6 +18,8 @@ include_directories( ${CPPUNIT_INCLUDE_DIR})
         cxTest_Tracker.cpp
         cxTest_Tool.h
         cxTest_Tool.cpp
+        cxTestProbe.h
+        cxTestProbe.cpp
         ${CX_TEST_SOURCE_FILES}
     )
     

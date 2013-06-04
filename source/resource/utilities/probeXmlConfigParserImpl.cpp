@@ -1,4 +1,4 @@
-#include "probeXmlConfigParser.h"
+#include <probeXmlConfigParserImpl.h>
 
 #include <iostream>
 #include <QFile>
@@ -8,15 +8,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 
-//class XmlOptionFile
-//{
-//public:
-//	static XmlOptionFile createNull(); ///< create an empty document
-//	explicit XmlOptionFile(QString filename, QString name = ""); ///< create from filename, create trivial document of type name and root node if no file exists.
-//	XmlOptionFile();
-
-
-ProbeXmlConfigParser::ProbeXmlConfigParser(QString& pathToXml)
+ProbeXmlConfigParserImpl::ProbeXmlConfigParserImpl(QString& pathToXml)
 {
 	if (!QFileInfo(pathToXml).exists())
 	{
@@ -24,32 +16,12 @@ ProbeXmlConfigParser::ProbeXmlConfigParser(QString& pathToXml)
 	}
 
 	mFile = ssc::XmlOptionFile(pathToXml);
-//  QFile file(pathToXml);
-//  if(file.open(QIODevice::ReadOnly))
-//  {
-//    QString emsg;
-//    int eline, ecolumn;
-//    if (!mDomDoc.setContent(&file, false, &emsg, &eline, &ecolumn))
-//    {
-//      std::cout << "Could not parse XML file :";
-//      std::cout << file.fileName().toStdString() << " because: ";
-//      std::cout << emsg.toStdString() << std::endl;
-//      throw "Could not parse XML file :";
-//    }
-//    file.close();
-//  }
-//  else
-//  {
-//    std::cout << "Could not open XML file :";
-//    std::cout << file.fileName().toStdString() << std::endl;
-//  }
-  
 }
 
-ProbeXmlConfigParser::~ProbeXmlConfigParser()
+ProbeXmlConfigParserImpl::~ProbeXmlConfigParserImpl()
 {}
 
-QStringList ProbeXmlConfigParser::getScannerList()
+QStringList ProbeXmlConfigParserImpl::getScannerList()
 {
   QStringList retval;
   QList<QDomNode> scannerNodes = this->getScannerNodes();
@@ -61,7 +33,12 @@ QStringList ProbeXmlConfigParser::getScannerList()
   return retval;
 }
 
-QStringList ProbeXmlConfigParser::getProbeList(QString scanner)
+QString ProbeXmlConfigParserImpl::getFileName()
+{
+	return mFile.getFileName();
+}
+
+QStringList ProbeXmlConfigParserImpl::getProbeList(QString scanner)
 {
   QStringList retval;
   QList<QDomNode> probeNodes = this->getProbeNodes(scanner);
@@ -73,7 +50,7 @@ QStringList ProbeXmlConfigParser::getProbeList(QString scanner)
   return retval;
 }
 
-QStringList ProbeXmlConfigParser::getRtSourceList(QString scanner, QString probe)
+QStringList ProbeXmlConfigParserImpl::getRtSourceList(QString scanner, QString probe)
 {
   QStringList retval;
   QList<QDomNode> rtSourceNodes = this->getRTSourceNodes(scanner, probe);
@@ -85,7 +62,7 @@ QStringList ProbeXmlConfigParser::getRtSourceList(QString scanner, QString probe
   return retval;
 }
 
-QStringList ProbeXmlConfigParser::getConfigIdList(QString scanner, QString probe, QString rtSource)
+QStringList ProbeXmlConfigParserImpl::getConfigIdList(QString scanner, QString probe, QString rtSource)
 {
   QStringList retval;
   QList<QDomNode> configNodes = this->getConfigNodes(scanner, probe, rtSource);
@@ -167,11 +144,11 @@ namespace
 	}
 } // unnamed namespace
 
-ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QString scanner, QString probe, QString rtsource, QString configId)
+ProbeXmlConfigParser::Configuration ProbeXmlConfigParserImpl::getConfiguration(QString scanner, QString probe, QString rtsource, QString configId)
 {
   Configuration retval;
 //  std::cout << QString("===getConfiguration %1, %2, %3, %4").arg(scanner).arg(probe).arg(rtsource).arg(configId) << std::endl;
-  
+
   retval.mUsScanner = scanner;
   retval.mUsProbe = probe;
   retval.mRtSource = rtsource;
@@ -270,7 +247,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
   return retval;
 }
 
-QList<QDomNode> ProbeXmlConfigParser::getScannerNodes(QString scanner)
+QList<QDomNode> ProbeXmlConfigParserImpl::getScannerNodes(QString scanner)
 {
   QList<QDomNode> retval;
   if(scanner == "ALL")
@@ -290,7 +267,7 @@ QList<QDomNode> ProbeXmlConfigParser::getScannerNodes(QString scanner)
   return retval;
 }
 
-QList<QDomNode> ProbeXmlConfigParser::getProbeNodes(QString scanner, QString probe)
+QList<QDomNode> ProbeXmlConfigParserImpl::getProbeNodes(QString scanner, QString probe)
 {
   QList<QDomNode> retval;
   if(probe == "ALL")
@@ -320,7 +297,7 @@ QList<QDomNode> ProbeXmlConfigParser::getProbeNodes(QString scanner, QString pro
   return retval;
 }
 
-QList<QDomNode> ProbeXmlConfigParser::getRTSourceNodes(QString scanner, QString probe, QString rtSource)
+QList<QDomNode> ProbeXmlConfigParserImpl::getRTSourceNodes(QString scanner, QString probe, QString rtSource)
 {
   QList<QDomNode> retval;
   if(rtSource == "ALL")
@@ -350,7 +327,7 @@ QList<QDomNode> ProbeXmlConfigParser::getRTSourceNodes(QString scanner, QString 
   return retval;
 }
 
-QList<QDomNode> ProbeXmlConfigParser::getConfigNodes(QString scanner, QString probe, QString rtsource, QString config)
+QList<QDomNode> ProbeXmlConfigParserImpl::getConfigNodes(QString scanner, QString probe, QString rtsource, QString config)
 {
   QList<QDomNode> retval;
   if(config == "ALL")
@@ -380,7 +357,7 @@ QList<QDomNode> ProbeXmlConfigParser::getConfigNodes(QString scanner, QString pr
   return retval;
 }
 
-QList<QDomNode> ProbeXmlConfigParser::nodeListToListOfNodes(QDomNodeList list)
+QList<QDomNode> ProbeXmlConfigParserImpl::nodeListToListOfNodes(QDomNodeList list)
 {
     QList<QDomNode> retval;
     for(int i=0; i < list.count(); ++i)
@@ -390,7 +367,7 @@ QList<QDomNode> ProbeXmlConfigParser::nodeListToListOfNodes(QDomNodeList list)
     return retval;
 }
 
-void ProbeXmlConfigParser::removeConfig(QString scanner, QString probe, QString rtsource, QString configId)
+void ProbeXmlConfigParserImpl::removeConfig(QString scanner, QString probe, QString rtsource, QString configId)
 {
 	QList<QDomNode> configNodes = this->getConfigNodes(scanner, probe, rtsource, configId);
 	if (configNodes.empty())
@@ -416,7 +393,7 @@ void ProbeXmlConfigParser::removeConfig(QString scanner, QString probe, QString 
  * <elem> text </elem> .
  *
  */
-void ProbeXmlConfigParser::addTextElement(QDomElement parent, QString element, QString text)
+void ProbeXmlConfigParserImpl::addTextElement(QDomElement parent, QString element, QString text)
 {
 	QDomElement node = mFile.safeGetElement(parent, element);
 
@@ -427,7 +404,7 @@ void ProbeXmlConfigParser::addTextElement(QDomElement parent, QString element, Q
 	mFile.save();
 }
 
-void ProbeXmlConfigParser::saveCurrentConfig(Configuration config)
+void ProbeXmlConfigParserImpl::saveCurrentConfig(Configuration config)
 {
 	QList<QDomNode> rtNodes = this->getRTSourceNodes(config.mUsScanner, config.mUsProbe, config.mRtSource);
 	if (rtNodes.empty())
@@ -477,7 +454,3 @@ void ProbeXmlConfigParser::saveCurrentConfig(Configuration config)
 
 	mFile.save();
 }
-
-
-
-

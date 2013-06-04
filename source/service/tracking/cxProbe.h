@@ -23,7 +23,7 @@
 #define CXPROBE_H_
 
 #include "sscTool.h"
-#include "probeXmlConfigParser.h"
+#include "probeXmlConfigParserImpl.h"
 
 namespace cx
 {
@@ -42,7 +42,7 @@ class Probe: public ssc::Probe
 {
 Q_OBJECT
 public:
-	static ProbePtr New(QString instrumentUid, QString scannerUid);
+	static ProbePtr New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml = ProbeXmlConfigParserPtr());
 	virtual ~Probe(){}
 	virtual bool isValid() const;
 
@@ -75,16 +75,18 @@ public:
 	void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
 
 	void useDigitalVideo(bool digitalStatus);///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
+	bool isUsingDigitalVideo() const;
+	QString getRtSourceName() const;
 
 private:
 	Probe(QString instrumentUid, QString scannerUid);
+	void initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml);
+	void initConfigId();
 	ProbeXmlConfigParser::Configuration getConfiguration(QString uid) const;
 	QString getInstrumentId() const;
 	QString getInstrumentScannerId() const;
 	ssc::ProbeData getProbeData(QString uid) const;
 	bool hasRtSource() const;
-	bool isUsingDigitalVideo() const;
-	QString getRtSourceName() const;
 
 //	struct StreamData
 //	{
@@ -114,16 +116,16 @@ private:
 //	ssc::VideoSourcePtr mSource;
 	ssc::ProbeWeakPtr mSelf;
 
+	QString mInstrumentUid;
+	QString mScannerUid;
 	double mSoundSpeedCompensationFactor;
 	bool mOverrideTemporalCalibration;
 	double mTemporalCalibration;
+	bool mDigitalInterface;///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
 
-	QString mInstrumentUid;
-	QString mScannerUid;
-	boost::shared_ptr<ProbeXmlConfigParser> mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
+	ProbeXmlConfigParserPtr mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
 	QString mConfigurationId; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
 
-	bool mDigitalInterface;///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
 };
 
 /**
