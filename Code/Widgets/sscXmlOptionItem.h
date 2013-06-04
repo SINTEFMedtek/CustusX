@@ -81,6 +81,8 @@ public:
 	XmlOptionFile();
 	~XmlOptionFile();
 
+	QString getFileName();
+
 	bool isNull() const; ///< checks if this is null
 
 	XmlOptionFile root() const; ///< set the current element to root
