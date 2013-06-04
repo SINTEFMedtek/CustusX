@@ -45,7 +45,10 @@ set(CMAKE_MODULE_PATH
 	${PROJECT_SOURCE_DIR}/externals/ssc/CMake
 	)
 
+message(STATUS "CMAKE_MODULE_PATH topleve" ${CMAKE_MODULE_PATH})
+
 include(cxUtilities)
+include(cxInstallUtilities)
 
 #------------------------------------------------------------------------------
 # Set CustusX version
@@ -224,10 +227,5 @@ endif(BUILD_GRABBER_SERVER)
 #------------------------------------------------------------------------------
 enable_testing()
 
-#------------------------------------------------------------------------------
-# CPack
-#-----------------------------------------------------------------------------
-
-include(CPack)
 
 

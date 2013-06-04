@@ -190,6 +190,7 @@ endif(APPLE)
 # Install
 #------------------------------------------------------------------------------
 
+function(cx_dont_use_grabberserver)
 # Variables
 #----------
 set(GRABBERSERVER_INSTALL_FOLDER_NAME "GrabberServer")
@@ -243,3 +244,5 @@ if(CX_WINDOWS)
 		 ")
 
 endif(CX_WINDOWS)
+
+endfunction()
