@@ -34,10 +34,15 @@ public:
 
 private slots:
 	virtual void streamSlot();
-	void sliceSlot(Transform3D matrix, double timestamp);
+	void sliceSlot();
 
 private:
 	ssc::ImagePtr getSlice(ssc::ImagePtr source);
+	vtkMatrix4x4Ptr calculateSliceAxes();
+	vtkImageDataPtr getSliceUsingProbeDefinition(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes);
+	ssc::ImagePtr createSscImage(vtkImageDataPtr slice, ssc::ImagePtr volume);
+	vtkImageReslicePtr createReslicer(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes);
+	ssc::Transform3D getTransformFromProbeSectorImageSpaceToImageSpace();
 
 	ssc::ImagePtr mSourceImage;
 	ssc::ToolPtr mTool;
