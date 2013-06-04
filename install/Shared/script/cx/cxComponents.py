@@ -102,6 +102,8 @@ class CppComponent(Component):
         changeDir(self.sourcePath())
     def _changeDirToBuild(self):
         changeDir(self.buildPath())
+    def configPath(self):
+        return self.buildPath()
     def buildPath(self):
         return self.path()+'/'+self.buildFolder()
     def sourcePath(self):
@@ -314,10 +316,14 @@ class ISB_DataStreaming(CppComponent):
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
+    def configPath(self):
+        return self.buildPath() + "/vtkDataStreamClient/"
     def path(self):
         return self.controlData.getWorkingPath() + "/ISB_DataStreaming"
-    def sourceFolder(self):
-        return self.name() + "/vtkDataStreamClient/"
+        #    def sourceFolder(self):
+#return self.name() + "/vtkDataStreamClient/"
+        #    def buildFolder(self):
+#return self.controlData.getBuildFolder()
     def _rawCheckout(self):
         self._changeDirToBase()
         runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
@@ -365,7 +371,7 @@ class CustusX3(CppComponent):
         add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).buildPath())
         add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).buildPath())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).buildPath())
-        add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).buildPath()+ "/vtkDataStreamClient/")
+        add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).configPath())
         # other options
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
