@@ -100,7 +100,11 @@ target_link_libraries(cxtestUtilities SSC)
     
     target_link_libraries( Catch ${CATCH_LIBS} )
     		
-	# CATCH -end
+
+    install(TARGETS Catch
+        BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
+        RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin)
+        # CATCH -end
 ####################################################################################
 
 
