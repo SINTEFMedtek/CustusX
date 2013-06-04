@@ -102,6 +102,11 @@ class CppComponent(Component):
         changeDir(self.sourcePath())
     def _changeDirToBuild(self):
         changeDir(self.buildPath())
+    def configPath(self):
+        return self.buildPath()
+    def _configPathFor(self, type):
+        'return config path for the input component type'
+        return self._createSibling(type).configPath()
     def buildPath(self):
         return self.path()+'/'+self.buildFolder()
     def sourcePath(self):
@@ -245,8 +250,8 @@ class IGSTK(CppComponent):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('IGSTK_USE_SceneGraphVisualization:BOOL', False)
-        add('ITK_DIR:PATH', self._createSibling(ITK).buildPath())
-        add('VTK_DIR:PATH', self._createSibling(VTK).buildPath())
+        add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
+        add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('IGSTK_SERIAL_PORT_0', self._getSerialPort()) 
         add('BUILD_TESTING:BOOL', False)
         add('BUILD_EXAMPLES:BOOL', False)
@@ -314,10 +319,14 @@ class ISB_DataStreaming(CppComponent):
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
+    def configPath(self):
+        return self.buildPath() + "/vtkDataStreamClient/"
     def path(self):
         return self.controlData.getWorkingPath() + "/ISB_DataStreaming"
-    def sourceFolder(self):
-        return self.name() + "/vtkDataStreamClient/"
+        #    def sourceFolder(self):
+#return self.name() + "/vtkDataStreamClient/"
+        #    def buildFolder(self):
+#return self.controlData.getBuildFolder()
     def _rawCheckout(self):
         self._changeDirToBase()
         runShell('svn co http://svn.isb.medisin.ntnu.no/DataStreaming/ -r%s %s %s' % (self.mCurrentRevision, self._svn_login_info(), self.sourceFolder()))
@@ -327,7 +336,7 @@ class ISB_DataStreaming(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('VTK_DIR:PATH', self._createSibling(VTK).buildPath())
+        add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('DATASTREAMING_USE_HDF:BOOL', False)
         add('DATASTREAMING_USE_TRACKING:BOOL', False)
         add('DATASTREAMING_USE_SC_DICOM_LOADERS:BOOL', False)
@@ -357,15 +366,15 @@ class CustusX3(CppComponent):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         # dependencies
-        add('ITK_DIR:PATH', self._createSibling(ITK).buildPath())
-        add('VTK_DIR:PATH', self._createSibling(VTK).buildPath())
-        add('IGSTK_DIR:PATH', self._createSibling(IGSTK).buildPath())
-        add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).buildPath())
-        add('OpenCV_DIR:PATH', self._createSibling(OpenCV).buildPath())
-        add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).buildPath())
-        add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).buildPath())
-        add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).buildPath())
-        add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).buildPath()+ "/vtkDataStreamClient/")
+        add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
+        add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
+        add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
+        add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
+        add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
+        add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).configPath())
+        add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).configPath())
+        add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
+        add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).configPath())
         # other options
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.mDoxygen)            
         add('BUILD_OPEN_IGTLINK_SERVER:BOOL', True);
