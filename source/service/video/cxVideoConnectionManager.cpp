@@ -208,7 +208,7 @@ void VideoConnectionManager::delayedAutoConnectServer()
 	if (mConnectWhenLocalServerRunning)
 	{
 		--mConnectWhenLocalServerRunning;
-		QTimer::singleShot(mReconnectInterval, this, SLOT(runIGTLinkedClient())); // the process need some time to get its tcp server up and listening. GrabberServer seems to need more than 500ms
+		QTimer::singleShot(mReconnectInterval, this, SLOT(connectServer())); // the process need some time to get its tcp server up and listening. GrabberServer seems to need more than 500ms
 	}
 }
 

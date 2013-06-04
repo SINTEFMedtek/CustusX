@@ -4,6 +4,7 @@
 #include "vtkImageReslice.h"
 #include "vtkMatrix4x4.h"
 #include "vtkImageData.h"
+#include "sscMessageManager.h"
 #include "sscSliceProxy.h"
 #include "sscSlicedImageProxy.h"
 #include "sscProbeSector.h"
@@ -34,7 +35,7 @@ void SimulatedImageStreamer::initialize(ssc::ImagePtr image, ssc::ToolPtr tool)
 
 	mSourceImage = image;
 	mTool = tool;
-	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot(Transform3D, double)));
+	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
 
 	this->setInitialized(true);
 }
@@ -43,7 +44,7 @@ bool SimulatedImageStreamer::startStreaming(SenderPtr sender)
 {
 	if (!this->isInitialized())
 	{
-		std::cout << "SimulatedImageStreamer: Failed to start streaming: Not initialized." << std::endl;
+		ssc::messageManager()->sendError("SimulatedImageStreamer: Failed to start streaming: Not initialized.");
 		return false;
 	}
 	mSender = sender;
@@ -69,51 +70,84 @@ void SimulatedImageStreamer::streamSlot()
 	mSender->send(package);
 }
 
-void SimulatedImageStreamer::sliceSlot(Transform3D matrix, double timestamp)
+void SimulatedImageStreamer::sliceSlot()
 {
 	mImageToSend = getSlice(mSourceImage);
 }
 
 ssc::ImagePtr SimulatedImageStreamer::getSlice(ssc::ImagePtr source)
 {
-	ssc::ImagePtr slice;
+	vtkMatrix4x4Ptr sliceAxes = this->calculateSliceAxes();
+	vtkImageDataPtr vtkSlice = this->getSliceUsingProbeDefinition(source, sliceAxes);
+	ssc::ImagePtr slice = this->createSscImage(vtkSlice, source);
+
+	return slice;
+}
+
+vtkMatrix4x4Ptr SimulatedImageStreamer::calculateSliceAxes()
+{
+	vtkMatrix4x4Ptr sliceAxes = vtkMatrix4x4Ptr::New();
+
+	ssc::Transform3D dMv = this->getTransformFromProbeSectorImageSpaceToImageSpace();
+	sliceAxes->DeepCopy(dMv.getVtkMatrix());
+
+	return sliceAxes;
+}
+
+vtkImageDataPtr SimulatedImageStreamer::getSliceUsingProbeDefinition(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes)
+{
+	ssc::ProbeData probedata = mTool->getProbe()->getData();
+
+	vtkImageReslicePtr reslicer = this->createReslicer(source, sliceAxes);
+
+	vtkImageDataPtr retval = vtkImageDataPtr::New();
+	retval->DeepCopy(reslicer->GetOutput());
+
+	return retval;
+}
+
+ssc::ImagePtr SimulatedImageStreamer::createSscImage(vtkImageDataPtr slice, ssc::ImagePtr volume)
+{
+	ssc::ImagePtr retval = ssc::ImagePtr(new ssc::Image("TEST_UID", slice, "TEST_NAME"));
+	retval->resetTransferFunction(volume->getTransferFunctions3D(), volume->getLookupTable2D());
+	return retval;
+}
+
+vtkImageReslicePtr SimulatedImageStreamer::createReslicer(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes)
+{
+	ssc::ProbeData probedata = mTool->getProbe()->getData();
+
+	vtkImageReslicePtr reslicer = vtkImageReslicePtr::New();
+	reslicer->SetInput(source->getBaseVtkImageData());
+	reslicer->SetBackgroundLevel(source->getMin());
+	reslicer->SetInterpolationModeToLinear();
+	reslicer->SetOutputDimensionality(2);
+	reslicer->SetResliceAxes(sliceAxes);
+	reslicer->AutoCropOutputOn();
+	reslicer->SetOutputOrigin(0,0,0);
+	reslicer->SetOutputExtent(0, probedata.getImage().mSize.width()-1, 0, probedata.getImage().mSize.height()-1, 0, 0);
+	reslicer->SetOutputSpacing(probedata.getImage().mSpacing.data());
+	reslicer->Update();
+
+	return reslicer;
+}
+
+ssc::Transform3D SimulatedImageStreamer::getTransformFromProbeSectorImageSpaceToImageSpace()
+{
 	ssc::ProbeData probedata = mTool->getProbe()->getData();
 	ssc::ProbeSector probesector;
 	probesector.setData(probedata);
 
-	vtkMatrix4x4Ptr mMatrixAxes = vtkMatrix4x4Ptr::New();
 	ssc::Transform3D uMt = probesector.get_tMu().inv();
 	ssc::Transform3D vMu = probesector.get_uMv().inv();
 	ssc::Transform3D vMt = vMu * uMt;
-	uMt = vMt;
 	ssc::Transform3D tMpr = mTool->get_prMt().inv();
 	ssc::Transform3D prMr = ssc::toolManager()->get_rMpr()->inv();
 	ssc::Transform3D rMd = mSourceImage->get_rMd();
-	ssc::Transform3D uMd = uMt * tMpr * prMr * rMd;
-	mMatrixAxes->DeepCopy(uMd.inv().getVtkMatrix());
+	ssc::Transform3D vMd = vMt * tMpr * prMr * rMd;
+	ssc::Transform3D dMv = vMd.inv();
 
-	vtkImageReslicePtr mReslicer = vtkImageReslicePtr::New();
-	mReslicer->SetInput(source->getBaseVtkImageData());
-	mReslicer->SetBackgroundLevel(source->getMin());
-	mReslicer->SetInterpolationModeToLinear();
-	mReslicer->SetOutputDimensionality(2);
-	mReslicer->SetResliceAxes(mMatrixAxes);
-	mReslicer->AutoCropOutputOn(); // fix used in 2.0.9, but slower update rate
-	mReslicer->SetOutputOrigin(0,0,0);
-	mReslicer->SetOutputExtent(0, probedata.getImage().mSize.width()-1, 0, probedata.getImage().mSize.height()-1, 0, 0);
-	mReslicer->SetOutputSpacing(probedata.getImage().mSpacing.data());
-	mReslicer->Update();
-
-	vtkImageDataPtr vtkSlice = vtkImageDataPtr::New();
-
-	vtkSlice->DeepCopy(mReslicer->GetOutput());
-	slice = ssc::ImagePtr(new ssc::Image("TEST_UID", vtkSlice, "TEST_NAME"));
-	slice->resetTransferFunction(source->getTransferFunctions3D(), source->getLookupTable2D());
-
-//	std::cout << uMd << std::endl;
-//	vtkSlice->Print(std::cout);
-
-	return slice;
+	return dMv;
 }
 
 } /* namespace cx */
