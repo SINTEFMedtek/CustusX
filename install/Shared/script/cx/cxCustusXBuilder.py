@@ -235,10 +235,11 @@ class CustusXBuilder:
         self.assembly.printHeader('Test installation', level=2)
         appPath = '/Applications/CustusX/CustusX.app/Contents/MacOS'
         self._testExecutable(appPath, 'CustusX')
-        self._testExecutable(appPath, 'cxTestResource_CppUnit_CTest')
+        self._testExecutable(appPath, 'Catch')
+        #self._testExecutable(appPath, 'cxTestResource_CppUnit_CTest')
         self._testExecutable(appPath, 'OpenIGTLinkServer')
         self._testExecutable(appPath, 'GrabberServer')
-        self._testExecutable(appPath, 'sscPositionFileReader')
+        #self._testExecutable(appPath, 'sscPositionFileReader')
         
     def _testExecutable(self, path, filename):
         self.assembly.printHeader('Test executable %s' % filename, level=3)
