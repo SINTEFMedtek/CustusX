@@ -185,13 +185,9 @@ void VideoConnection::clientFinishedSlot()
 
 void VideoConnection::useUnusedProbeDataSlot()
 {
-	std::cout <<"VideoConnection::useUnusedProbeDataSlot()" << std::endl;
 	disconnect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 	for (std::vector<ssc::ProbeDataPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
-	{
 		this->updateStatus(*citer);
-		std::cout << " uid: " << (*citer)->getUid() << std::endl;
-	}
 	mUnsusedProbeDataVector.clear();
 }
 
@@ -201,11 +197,10 @@ void VideoConnection::useUnusedProbeDataSlot()
  */
 void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
 {
-	std::cout <<"VideoConnection::updateStatus()" << std::endl;
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if (!tool || !tool->getProbe())
 	{
-		//Don't throw away the ProbeData. Save it untill it can be used
+		//Don't throw away the ProbeData. Save it until it can be used
 		if (mUnsusedProbeDataVector.empty())
 			connect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 		mUnsusedProbeDataVector.push_back(msg);

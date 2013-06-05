@@ -11,7 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <QString>
 #include "sscTransform3D.h"
-#include "probeXmlConfigParser.h"
+#include "ProbeXmlConfigParserImpl.h"
 #include "sscProbeSector.h"
 #include "sscForwardDeclarations.h"
 #include "cxUSReconstructInputData.h"

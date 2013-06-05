@@ -9,7 +9,7 @@
 #define CXCREATEPROBEDATAFROMCONFIGURATION_H_
 
 #include "sscProbeData.h"
-#include "probeXmlConfigParser.h"
+#include "ProbeXmlConfigParser.h"
 
 /**
 * \file

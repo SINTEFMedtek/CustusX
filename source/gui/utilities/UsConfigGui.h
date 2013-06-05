@@ -2,7 +2,7 @@
 #define USCONFIGGUI_H_
 
 #include <QWidget>
-#include "probeXmlConfigParser.h"
+#include "ProbeXmlConfigParser.h"
 
 class QGridLayout;
 class QComboBox;
