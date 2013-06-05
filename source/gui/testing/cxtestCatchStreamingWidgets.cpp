@@ -33,12 +33,9 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 	REQUIRE(widget->canStream(filename, "SimulatedImageStreamer"));
 	delete widget;
 
-	//TODO this will prevent more tests from running???
-	QTimer::singleShot(1000, qApp, SLOT(quit()));
-
 //	ssc::DummyToolManager::getInstance()->shutdown();
-//	cx::DataManager::getInstance()->shutdown();
-//	ssc::messageManager()->shutdown();
+	cx::DataManager::getInstance()->shutdown();
+	ssc::messageManager()->shutdown();
 }
 
 } //namespace cxtest

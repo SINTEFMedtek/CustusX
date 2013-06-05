@@ -24,7 +24,6 @@
 namespace cx
 {
 
-
 typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
 typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
 
@@ -34,15 +33,12 @@ typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
 * @{
 */
 
-/**\brief Class representing a single IGTLink connection,
- * connection facilities and options.
+/**\brief
+ *
  * \ingroup cxServiceVideo
  *
- * The connection can either operate on a remote server or a local one.
- * GUI can be found in cxIGTLinkWidget (along with some additional functionality...)
- *
  *  \date Jan 25, 2011
- *  \author christiana
+ *  \author Christian Askeland, SINTEF
  */
 class VideoConnectionManager: public QObject
 {
@@ -74,7 +70,7 @@ public:
 	void launchAndConnectServer();
 	void disconnectServer();
 
-	QProcess* getProcess();
+	QProcess* getLocalVideoServerProcess();
 	std::vector<ssc::VideoSourcePtr> getVideoSources();
 
 	void setReconnectInterval(int interval) { mReconnectInterval = interval; }
@@ -92,6 +88,10 @@ public slots:
 
 private:
 	void delayedAutoConnectServer();
+	void runScript();
+	bool localVideoServerIsRunning();
+	void setupAndRunDirectLinkClient();
+	void launchAndConnectUsingLocalServer();
 
 	VideoConnectionPtr mVideoConnection;
 	int mConnectWhenLocalServerRunning;
