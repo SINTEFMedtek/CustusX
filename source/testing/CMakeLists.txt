@@ -74,7 +74,7 @@ target_link_libraries(cxtestUtilities SSC)
     # Executable
     #-----------------------------------------------------------------------------
     if (APPLE)
-    	add_executable(Catch MACOSX_BUNDLE ${CATCH_SOURCES} )
+		add_executable(Catch ${CATCH_SOURCES} )
     else (APPLE)
     	if(CX_WINDOWS)
     		add_executable(Catch WIN32 ${CATCH_SOURCES} )
@@ -100,11 +100,11 @@ target_link_libraries(cxtestUtilities SSC)
     
     target_link_libraries( Catch ${CATCH_LIBS} )
     		
-
-    install(TARGETS Catch
-        BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
-        RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin)
-        # CATCH -end
+cx_install_target(Catch)
+#    install(TARGETS Catch
+#        BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
+#		RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin)
+		# CATCH -end
 ####################################################################################
 
 

@@ -27,11 +27,11 @@ add_subdirectory(logic)
 add_subdirectory(plugins)
 add_subdirectory(gui)
 add_subdirectory(ThirdParty)
-add_subdirectory(apps)
 
-#------------------------------------------------------------------------------
 # Testing for CustusX
-#-----------------------------------------------------------------------------
 add_subdirectory(testing)
+
+# Applications: add last (create bundle last).
+add_subdirectory(apps)
 
 

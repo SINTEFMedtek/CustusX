@@ -68,20 +68,6 @@ add_subdirectory( doc )
 add_subdirectory( source )
 
 #------------------------------------------------------------------------------
-# Optional software
-#------------------------------------------------------------------------------
-if (LINUX)
-		option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" ON) #default is on for linux
-else (LINUX)
-		option(BUILD_OPEN_IGTLINK_SERVER "build open igtlink server module" OFF) #default is off for others
-endif (LINUX)
-
-option(BUILD_GRABBER_SERVER "build grabber server" ON) #default is off
-if(BUILD_GRABBER_SERVER)
-		add_subdirectory( source/apps/grabberServer )
-endif(BUILD_GRABBER_SERVER)
-
-#------------------------------------------------------------------------------
 # CTest
 #------------------------------------------------------------------------------
 enable_testing()
