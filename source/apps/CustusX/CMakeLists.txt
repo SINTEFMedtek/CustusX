@@ -69,7 +69,7 @@ CX_COTIRE_ADD_LIBRARY(CustusX "${LINK_LIBRARIES}")
 
 # Install CustusX
 install(TARGETS CustusX
-		BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
-                RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin)
+	BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
+	RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin)
 # Perform full install of package, including config and docs:
 include(cxInstallCustusX)

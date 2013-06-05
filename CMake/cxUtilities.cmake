@@ -13,6 +13,45 @@
 # See CustusX_License.txt for more information.
 
 
+
+###############################################################################
+# Assert that the input variable exists.
+# Use to check prerequisites in code.
+###############################################################################
+function(cx_assert_variable_exists)
+	if( ${ARGC} EQUAL 0)
+		message(SEND_ERROR "ERROR: Input variable does not exist")
+	else()
+		#message(STATUS "FOUND VARIABLE [${ARGC}]  [${ARGV}]")
+	endif()
+endfunction()
+
+###############################################################################
+# wrapper for option() with a convenience boolean setter for the value.
+#
+# Input arguments:
+#
+# NAME          : Name of option.
+# DESCRIPTION   : Description of option
+# BOOLEAN_VALUE : Value convertible to boolean that is used to set the value
+#                 of option. No value means false.
+#
+###############################################################################
+function( cx_define_option_from_boolean NAME DESCRIPTION)
+	#message(STATUS "testing init value for ${NAME}: " ${BOOLEAN_VALUE})
+	set( BOOLEAN_VALUE False)
+	if( ARGC GREATER 2 )
+		set( BOOLEAN_VALUE ${ARGV2})
+	endif()
+
+	if(${BOOLEAN_VALUE})
+		option(${NAME} ${DESCRIPTION} ON)
+	else()
+		option(${NAME} ${DESCRIPTION} OFF)
+	endif()
+endfunction()
+
+
 ###############################################################################
 # Define the following Operating System identifiers both in cmake and cpp:
 #    CX_WINDOWS    for all windows
