@@ -39,23 +39,15 @@ VideoConnectionManager::VideoConnectionManager()
 
 	QStringList connectionOptions;
 	QString defaultConnection = "Direct Link";
-#ifdef __APPLE__
-	defaultConnection = "Local Server";	// grabber server is the preferred method on Mac.
-#endif
 	connectionOptions << "Local Server" << "Direct Link" << "Remote Server";
-	mConnectionMethod = ssc::StringDataAdapterXml::initialize("Connection", "",
-			"Method for connecting to Video Server",
-			defaultConnection,
-			connectionOptions,
+	mConnectionMethod = ssc::StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions,
 			mOptions.getElement());
 	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(connectionMethodChanged()));
-
 	mConnectWhenLocalServerRunning = 0;
-
 	mIniScriptProcess.reset(new ProcessWrapper("Init Script"));
 	mLocalVideoServerProcess.reset(new ProcessWrapper("Local Video Server"));
-	connect(mLocalVideoServerProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
-
+	connect(mLocalVideoServerProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this,
+			SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 	mVideoConnection.reset(new VideoConnection());
 	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
 	connect(mVideoConnection.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
@@ -86,11 +78,11 @@ void VideoConnectionManager::setPort(int port)
 int VideoConnectionManager::getPort()
 {
 	QVariant var = settings()->value("IGTLink/port");
-	if (var.canConvert<int> ())
+	if (var.canConvert<int>())
 		return var.toInt();
+
 	return 18333;
 }
-
 void VideoConnectionManager::setInitScript(QString filename)
 {
 	settings()->setValue("IGTLink/initScript", filename);
@@ -102,7 +94,7 @@ QString VideoConnectionManager::getInitScript()
 	return cmd;
 }
 
-QProcess* VideoConnectionManager::getProcess()
+QProcess* VideoConnectionManager::getLocalVideoServerProcess()
 {
 	return mLocalVideoServerProcess->getProcess();
 }
@@ -122,12 +114,12 @@ QStringList VideoConnectionManager::getHostHistory()
 	QStringList hostHistory = settings()->value("IGTLink/hostHistory").toStringList();
 	if (hostHistory.isEmpty())
 		hostHistory << "Localhost";
+
 	return hostHistory;
 }
-
 QString VideoConnectionManager::getHost()
 {
-	return this->getHostHistory().front(); // history will always contain elements.
+	return this->getHostHistory().front();
 }
 
 void VideoConnectionManager::setHost(QString host)
@@ -139,18 +131,16 @@ void VideoConnectionManager::setHost(QString host)
 			history.removeAt(i);
 	while (history.size() > 5)
 		history.removeLast();
-
 	settings()->setValue("IGTLink/hostHistory", history);
 }
-
 QStringList VideoConnectionManager::getDirectLinkArgumentHistory()
 {
 	QStringList history = settings()->value("IGTLink/directLinkArgumentHistory").toStringList();
 	if (history.isEmpty())
 		history << "";
+
 	return history;
 }
-
 void VideoConnectionManager::setLocalServerArguments(QString commandline)
 {
 	QStringList history = this->getDirectLinkArgumentHistory();
@@ -160,13 +150,11 @@ void VideoConnectionManager::setLocalServerArguments(QString commandline)
 			history.removeAt(i);
 	while (history.size() > 5)
 		history.removeLast();
-
 	settings()->setValue("IGTLink/directLinkArgumentHistory", history);
 }
-
 QString VideoConnectionManager::getLocalServerArguments()
 {
-	return this->getDirectLinkArgumentHistory().front(); // history will always contain elements.
+	return this->getDirectLinkArgumentHistory().front();
 }
 
 void VideoConnectionManager::launchServer()
@@ -176,10 +164,8 @@ void VideoConnectionManager::launchServer()
 		ssc::messageManager()->sendError("Ignoring Launch local server: Must select local server");
 		return;
 	}
-
 	QString program = this->getLocalServerExecutable();
 	QStringList arguments = this->getLocalServerArguments().split(" ");
-
 	mLocalVideoServerProcess->launch(program, arguments);
 }
 
@@ -192,14 +178,9 @@ void VideoConnectionManager::connectServer()
 		else
 			mVideoConnection->runIGTLinkedClient(this->getHost(), this->getPort());
 	}
-
 	this->delayedAutoConnectServer();
 }
 
-/** Attempt to connect to server at a later time if mConnectWhenLocalServerRunning >0,
- * and the server is unconnected.
- *
- */
 void VideoConnectionManager::delayedAutoConnectServer()
 {
 	if (mVideoConnection->isConnected())
@@ -217,25 +198,12 @@ void VideoConnectionManager::launchAndConnectServer()
 	if (mVideoConnection->isConnected())
 		return;
 
-	mIniScriptProcess->launch(this->getInitScript());
+	this->runScript();
 
-	if (this->useDirectLink())
-	{
-		QString commandline = this->getLocalServerArguments();
-		StringMap args = extractCommandlineOptions(commandline.split(" "));
-		mVideoConnection->runDirectLinkClient(args);
-		return;
-	}
-
-	if (this->useLocalServer())
-	{
-		this->launchServer();
-
-		if (this->getProcess()->state() != QProcess::Running)
-			mConnectWhenLocalServerRunning = 5; // attempt N connects
-		else
-			this->connectServer();
-	}
+	if (useDirectLink())
+		this->setupAndRunDirectLinkClient();
+	else if (useLocalServer())
+		this->launchAndConnectUsingLocalServer();
 	else
 		this->connectServer();
 }
@@ -259,6 +227,32 @@ void VideoConnectionManager::disconnectServer()
 bool VideoConnectionManager::isConnected() const
 {
 	return mVideoConnection->isConnected();
+}
+
+void VideoConnectionManager::runScript()
+{
+	mIniScriptProcess->launch(this->getInitScript());
+}
+
+bool VideoConnectionManager::localVideoServerIsRunning()
+{
+	return this->getLocalVideoServerProcess()->state() != QProcess::Running;
+}
+
+void VideoConnectionManager::setupAndRunDirectLinkClient()
+{
+	QString commandline = this->getLocalServerArguments();
+	StringMap args = extractCommandlineOptions(commandline.split(" "));
+	mVideoConnection->runDirectLinkClient(args);
+}
+
+void VideoConnectionManager::launchAndConnectUsingLocalServer()
+{
+	this->launchServer();
+	if (this->localVideoServerIsRunning())
+		mConnectWhenLocalServerRunning = 5;
+	else
+		this->connectServer();
 }
 
 }//end namespace cx
