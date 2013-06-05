@@ -22,7 +22,8 @@
 #ifndef CXPROBE_H_
 #define CXPROBE_H_
 
-#include "sscTool.h"
+#include "sscProbe.h"
+#include <map>
 #include "ProbeXmlConfigParserImpl.h"
 
 namespace cx
