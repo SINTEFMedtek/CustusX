@@ -182,19 +182,38 @@ class CustusXBuilder:
  
     def installPackage(self):
         self.assembly.printHeader('Install package', level=3)
-        pattern = 'CustusX_*.dmg'
-        #pattern = '3.5*.dmg' # debug only on buggy generator
-        custusx = self._createComponent(cxComponents.CustusX3)
-        buildDir = custusx.buildPath()
-        pattern = '%s/%s' % (custusx.buildPath(), pattern)
+        pattern = self._getInstallerPackagePattern()
         print 'Looking for installers with pattern: %s' % pattern 
         files = glob.glob(pattern)
         self.assertTrue(len(files)==1, 
                         'Found %i install files, requiring 1: \n %s' % (len(files), ' \n'.join(files)))
         file = files[0]
         print 'Installing file %s' % file
-        self._installDMG(file)
+        self._installFile(file)
         
+    def _installFile(self, filename):
+        if platform.system() == 'Darwin':
+            self._installDMG(filename)
+        if platform.system() == 'Linux':
+            self._installLinuxZip(filename)
+    
+    def _getInstallerPackagePattern(self):
+        custusx = self._createComponent(cxComponents.CustusX3)
+        buildDir = custusx.buildPath()
+        if platform.system() == 'Darwin':
+            pattern = 'CustusX_*.dmg'
+        if platform.system() == 'Linux':
+            pattern = 'CustusX*.tar.gz'
+        return '%s/%s' % (custusx.buildPath(), pattern)
+        
+    def _installLinuxZip(self, filename):
+        path = '%s/install' % self.assembly.controlData.getRootDir()
+        shell.removeTree(path)
+        shell.changeDir(path)
+        shell.run('tar -zxvf %s' % (filename)) # extract to path
+        self.mInstalledBinaryPath = '%s' % path
+        print 'self.mInstalledBinaryPath', self.mInstalledBinaryPath
+
     def _installDMG(self, dmgfile, pkgName=None):
         '''
         Install the given pkg inside the dmg file.

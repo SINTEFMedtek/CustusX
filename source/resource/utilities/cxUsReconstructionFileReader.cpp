@@ -201,7 +201,7 @@ ProbeXmlConfigParser::Configuration UsReconstructionFileReader::readProbeConfigu
     return ProbeXmlConfigParser::Configuration();
   //Assumes ProbeCalibConfigs.xml file and calfiles have the same path
   QString xmlPath = calFilesPath+"ProbeCalibConfigs.xml";
-  ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParser(xmlPath);
+  ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParserImpl(xmlPath);
 
   ProbeXmlConfigParser::Configuration configuration;
   configuration = xmlConfigParser->getConfiguration(
