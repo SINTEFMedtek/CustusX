@@ -8,6 +8,7 @@ cmake_minimum_required(VERSION 2.6)
 
 cx_define_option_from_boolean("BUILD_GRABBER_SERVER" "build grabber server" ${CX_APPLE})
 
+if(NOT CX_LINUX)
 if(BUILD_GRABBER_SERVER)
 
 # APPLE libs
@@ -96,5 +97,6 @@ target_link_libraries( GrabberServer
 cx_install_target(GrabberServer)
 
 endif(BUILD_GRABBER_SERVER)
+endif(NOT CX_LINUX)
 
 
