@@ -53,8 +53,8 @@ SET ( cxResource_SOURCE
     utilities/probeXmlConfigParser.h
     utilities/probeXmlConfigParserImpl.h
     utilities/probeXmlConfigParserImpl.cpp
-    utilities/probeXmlConfigParserMoc.h
-    utilities/probeXmlConfigParserMoc.cpp
+    utilities/ProbeXmlConfigParserMoc.h
+    utilities/ProbeXmlConfigParserMoc.cpp
     utilities/cxCreateProbeDataFromConfiguration.h
     utilities/cxCreateProbeDataFromConfiguration.cpp
     utilities/cxRenderTimer.h
