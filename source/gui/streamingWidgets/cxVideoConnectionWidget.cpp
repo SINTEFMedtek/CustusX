@@ -72,8 +72,7 @@ VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 }
 
 VideoConnectionWidget::~VideoConnectionWidget()
-{
-}
+{}
 
 QHBoxLayout* VideoConnectionWidget::initializeScriptWidget()
 {
@@ -203,7 +202,7 @@ QString VideoConnectionWidget::defaultWhatsThis() const
 
 QProcess* VideoConnectionWidget::getServerProcess()
 {
-	return this->getConnection()->getProcess();
+	return this->getConnection()->getLocalVideoServerProcess();
 }
 
 bool VideoConnectionWidget::serverIsRunning()
