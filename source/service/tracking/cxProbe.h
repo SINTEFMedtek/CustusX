@@ -23,7 +23,7 @@
 #define CXPROBE_H_
 
 #include "sscTool.h"
-#include "probeXmlConfigParserImpl.h"
+#include "ProbeXmlConfigParserImpl.h"
 
 namespace cx
 {

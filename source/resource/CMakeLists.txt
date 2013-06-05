@@ -50,9 +50,9 @@ SET ( cxResource_SOURCE
     settings/cxSettings.h
     settings/cxSettings.cpp
 
-    utilities/probeXmlConfigParser.h
-    utilities/probeXmlConfigParserImpl.h
-    utilities/probeXmlConfigParserImpl.cpp
+    utilities/ProbeXmlConfigParser.h
+    utilities/ProbeXmlConfigParserImpl.h
+    utilities/ProbeXmlConfigParserImpl.cpp
     utilities/ProbeXmlConfigParserMoc.h
     utilities/ProbeXmlConfigParserMoc.cpp
     utilities/cxCreateProbeDataFromConfiguration.h
