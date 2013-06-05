@@ -145,7 +145,8 @@ set(ALL_LIBRARY_DIRS
     ${CustusX3_BINARY_DIR}/source/apps/grabberServer
     ${CustusX3_BINARY_DIR}/source/apps/OpenIGTLinkServer
     ${CustusX3_BINARY_DIR}/source/resource/videoServer
-    )
+	${CustusX3_BINARY_DIR}/source/testing
+	)
 
 cx_install_all_stored_targets(${CX_INSTALL_BINARY_DIR})
 
