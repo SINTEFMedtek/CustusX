@@ -94,12 +94,12 @@ void VideoConnection::connectedSlot(bool on)
 	emit connected(on);
 }
 
-void VideoConnection::directLink(std::map<QString, QString> args)
+void VideoConnection::runDirectLinkClient(std::map<QString, QString> args)
 {
 	this->runClient(ImageReceiverThreadPtr(new DirectlyLinkedImageReceiverThread(args, this)));
 }
 
-void VideoConnection::connectServer(QString address, int port)
+void VideoConnection::runIGTLinkedClient(QString address, int port)
 {
 	this->runClient(ImageReceiverThreadPtr(new IGTLinkedImageReceiverThread(address, port, this)));
 }
