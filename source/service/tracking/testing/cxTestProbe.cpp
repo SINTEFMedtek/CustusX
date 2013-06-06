@@ -55,7 +55,7 @@ void TestProbe::testConstructorWithMocXmlParser()
 	probe->useDigitalVideo(true);
 	CPPUNIT_ASSERT(probe->isUsingDigitalVideo());
 	CPPUNIT_ASSERT(probe->getRtSourceName().compare("Digital") == 0);
-//	CPPUNIT_ASSERT(probe->getConfigId().compare("Digital") == 0);
+	CPPUNIT_ASSERT(probe->getConfigId().compare("Digital") == 0);
 }
 
 } //namespace cxtest
