@@ -52,7 +52,7 @@ double DoubleDataAdapterTimeCalibration::getValue() const
   if (!mTool)
     return 0;
 //  std::cout << "mTool->getProbe()->getData().mTemporalCalibration " << mTool->getProbe()->getData().getTemporalCalibration() << std::endl;
-  return mTool->getProbe()->getData().getTemporalCalibration();
+  return mTool->getProbe()->getProbeData().getTemporalCalibration();
 }
 
 QString DoubleDataAdapterTimeCalibration::getHelp() const
