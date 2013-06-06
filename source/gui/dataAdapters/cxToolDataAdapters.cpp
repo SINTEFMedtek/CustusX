@@ -120,7 +120,7 @@ bool ActiveProbeConfigurationStringDataAdapter::setValue(const QString& value)
 {
   if (!mTool)
     return false;
-  mTool->getProbe()->setConfigId(value);
+  mTool->getProbe()->applyNewConfigurationWithId(value);
   return true;
 }
 

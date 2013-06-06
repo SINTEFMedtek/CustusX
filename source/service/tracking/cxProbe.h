@@ -60,7 +60,7 @@ public:
 	virtual QString getConfigId() const;
 	virtual QString getConfigurationPath() const;
 
-	virtual void setConfigId(QString uid);
+	virtual void applyNewConfigurationWithId(QString uid);
 	virtual void setTemporalCalibration(double val);
 	virtual void setSoundSpeedCompensationFactor(double val);
 	virtual void setData(ssc::ProbeData probeSector, QString configUid="");
@@ -89,32 +89,14 @@ private:
 	ssc::ProbeData getProbeData(QString uid) const;
 	bool hasRtSource() const;
 
-//	struct StreamData
-//	{
-//		ssc::ProbeData mData; ///< Probe sector information
-//		ssc::VideoSourcePtr mSource;
-//	};
+	void setProbeSector(ssc::ProbeData probeSector);
+	void updateProbeSector();
+	bool isValidConfigId();
+	ssc::ProbeData createProbeSector();
+	void updateTemporalCalibration();
 	QString mActiveUid;
-//	const StreamData& getActiveInternalData() const;
-//	StreamData& getActiveInternalData();
-
-//	/** return a reference to the internal StreamData
-//	  * object for uid.
-//	  * If uid=="active", the mActiveUid is used.
-//	  * If uid does not exist, an entry is created.
-//	  */
-//	StreamData& getDataForUid(QString uid);
-//	/** Convert input uid to a valid uid,
-//	  * or empty if no valid uid can be found.
-//	  */
-//	QString toValidUid(QString uid) const;
-
 	std::map<QString, ssc::ProbeData> mProbeData; ///< all defined probe definitions
 	std::map<QString, ssc::VideoSourcePtr> mSource; ///< all defined sources
-//	typedef std::map<QString, StreamData> InternalDataType;
-//	InternalDataType mData;
-//	ssc::ProbeData mData; ///< Probe sector information
-//	ssc::VideoSourcePtr mSource;
 	ssc::ProbeWeakPtr mSelf;
 
 	QString mInstrumentUid;
