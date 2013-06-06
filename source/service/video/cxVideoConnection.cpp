@@ -225,6 +225,7 @@ void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
 
 	probe->useDigitalVideo(true);
 	probe->setProbeSector(data);
+	probe->setActiveStream(msg->getUid());
 }
 
 void VideoConnection::startAllSources()
