@@ -7,13 +7,13 @@ project(CustusX3)
 cmake_minimum_required(VERSION 2.6)
 
 set(CMAKE_MODULE_PATH
-        ${CMAKE_MODULE_PATH}
-        ${PROJECT_SOURCE_DIR}/CMake
-        ${PROJECT_SOURCE_DIR}/externals/ssc/CMake
-        )
+    ${CMAKE_MODULE_PATH}
+    ${PROJECT_SOURCE_DIR}/CMake
+    ${PROJECT_SOURCE_DIR}/externals/ssc/CMake)
 include(cxUtilities)
 include(cxInstallUtilities)
 include(cxInitializeLibraries)
+include(cxCatchUtilities)
 
 #------------------------------------------------------------------------------
 # Add some compiler flags (preprocessor definitions)
@@ -42,7 +42,9 @@ CX_COTIRE_INITIALIZE()
 
 set(CMAKE_BUILD_TYPE:STRING=Debug)
 
+
 cx_initialize_custusx_install()
+cx_catch_initialize()
 
 include(Dart)
 

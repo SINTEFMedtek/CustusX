@@ -99,6 +99,9 @@ macro(cx_initialize_custusx_install)
         set(CPACK_NSIS_MENU_LINKS "doc/Windows_Install_ReadMe.rtf" "README")
     endif (CX_WINDOWS)
 
+	# used as a global variable: clear at start of run
+	unset(CX_APPLE_TARGETS_TO_COPY CACHE)
+
 endmacro()
 
 ###############################################################################
