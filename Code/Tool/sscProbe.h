@@ -76,7 +76,7 @@ public:
 	/**
 	  * Return a ProbeData for the given uid. Use 'active' to get the default.
 	  */
-	virtual ProbeData getData(QString uid = "active") const = 0;
+	virtual ProbeData getProbeData(QString uid = "active") const = 0;
 	/**
 	  * Return a ProbeSectorPtr for the given uid. Use 'active' to get the default.
 	  */

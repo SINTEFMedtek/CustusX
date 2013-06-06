@@ -30,14 +30,14 @@ public:
 		return mProbeData.getType() != ssc::ProbeData::tNONE;
 	}
 	virtual QStringList getAvailableVideoSources() { return QStringList() << "active"; }
-	virtual ProbeData getData(QString uid="active") const
+	virtual ProbeData getProbeData(QString uid="active") const
 	{
 		return mProbeData;
 	}
 	virtual ProbeSectorPtr getSector(QString uid="active")
 	{
 		ssc::ProbeSectorPtr retval(new ssc::ProbeSector());
-		retval->setData(this->getData());
+		retval->setData(this->getProbeData());
 		return retval;
 	}
 	virtual VideoSourcePtr getRTSource(QString uid="active") const
@@ -161,7 +161,7 @@ public:
 	void setProbeSector(ProbePtr probe)
 	{
 		mProbe = probe;
-		mProbeData = probe->getData();
+		mProbeData = probe->getProbeData();
 		emit toolProbeSector();
 	}
 	virtual double getTimestamp() const { return ssc::getMilliSecondsSinceEpoch(); }
