@@ -54,7 +54,7 @@ public:
 	virtual QString getConfigId() const = 0;
 	virtual QString getConfigurationPath() const = 0;
 
-	virtual void setConfigId(QString uid) = 0;
+	virtual void applyNewConfigurationWithId(QString uid) = 0;
 	virtual void setTemporalCalibration(double val) = 0;
 	virtual void setSoundSpeedCompensationFactor(double val) = 0;
 	virtual void setData(ssc::ProbeData probeSector, QString configUid="") = 0;
