@@ -13,18 +13,18 @@
 # See CustusX_License.txt for more information.
 
 ###########################################################
-#               cxGui Tests
+#               cxVideoService Tests
 ###########################################################
 
 if (BUILD_TESTING)
 	# Catch unit test framework stuff:
 
-	QT4_WRAP_CPP(CXTEST_GUI_SOURCES
-		cxtestTestVideoConnectionWidget.h)
-	set(CXTEST_GUI_SOURCES ${CXTEST_GUI_SOURCES}
-	    cxtestCatchStreamingWidgets.cpp
-	    cxtestTestVideoConnectionWidget.cpp)
+	QT4_WRAP_CPP(CXTEST_VIDEOSERVICE_SOURCES
+		)
+	set(CXTEST_VIDEOSERVICE_SOURCES ${CXTEST_VIDEOSERVICE_SOURCES}
+	    cxCatchVideo.cpp
+	    )
 
-	cx_catch_add_lib_and_exe(cxGui "${CXTEST_GUI_SOURCES}")
+	cx_catch_add_lib_and_exe(cxVideoService "${CXTEST_VIDEOSERVICE_SOURCES}")
 
 endif (BUILD_TESTING)

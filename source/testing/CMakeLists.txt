@@ -11,103 +11,10 @@ endif(COMMAND cmake_policy)
 # =========================================================
 
 if (BUILD_TESTING)
+	cx_catch_add_master_exe()
+endif (BUILD_TESTING)
 
-#
-# Build a library with testing functionality
-#
-set( cxtest_moc_files
-    cxtestSignalListener.h 
-	cxtestUtilities.h
-)
-
-set (cxtestUtilities_source
-	cxtestUtilities.h
-	cxtestUtilities.cpp
-    cxtestSignalListener.h
-    cxtestSignalListener.cpp
-)
-
-include_directories(
-    .
-    )
-
-QT4_WRAP_CPP( cxtest_moced_files ${cxtest_moc_files} )
-
-add_library( cxtestUtilities ${cxtestUtilities_source} ${cxtest_moced_files} )
-target_link_libraries(cxtestUtilities SSC)
-
-
-####################################################################################
-    # CATCH -start
-    
-    #------------------------------------------------------------------------------
-    # Set variables
-    #-----------------------------------------------------------------------------
-    QT4_WRAP_CPP( CATCH_MOCED_SOURCES
-            ../gui/testing/cxtestTestVideoConnectionWidget.h
-        )
-    set(CATCH_SOURCES 
-        ${CATCH_MOCED_SOURCES}
-        cxCatch.cpp
-        ../plugins/Algorithm/testing/cxCatchAlgorithm.cpp
-        ../service/video/testing/cxCatchVideo.cpp
-        ../gui/testing/cxtestCatchStreamingWidgets.cpp
-        ../gui/testing/cxtestTestVideoConnectionWidget.h
-        ../gui/testing/cxtestTestVideoConnectionWidget.cpp
-    )
-    
-    #------------------------------------------------------------------------------
-    # Includes
-    #-----------------------------------------------------------------------------
-    include_directories(
-		.
-		${CustusX3_SOURCE_DIR}/source/gui/testing
-		${CustusX3_SOURCE_DIR}/source/gui/utilities
-		${CustusX3_SOURCE_DIR}/source/gui/streamingWidgets
-		${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/logic
-		${CustusX3_SOURCE_DIR}/source/services/video
-		${CustusX3_SOURCE_DIR}/source/resource/videoServer
-		${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-        ${CustusX3_SOURCE_DIR}/source/resource/videoServer/testing
-		)
-    #------------------------------------------------------------------------------
-    # Executable
-    #-----------------------------------------------------------------------------
-    if (APPLE)
-		add_executable(Catch ${CATCH_SOURCES} )
-    else (APPLE)
-    	if(CX_WINDOWS)
-    		add_executable(Catch WIN32 ${CATCH_SOURCES} )
-    	else(CX_WINDOWS)
-    		add_executable(Catch ${CATCH_SOURCES} )
-    	endif(CX_WINDOWS)
-    endif (APPLE)
-    
-    #------------------------------------------------------------------------------
-    # Linking
-    #------------------------------------------------------------------------------
-    set( CATCH_LIBS
-        cxPluginAlgorithm
-        cxGui
-        cxtestUtilities
-    )
-    if (CX_USE_TSF)
-        set( CATCH_LIBS
-            ${CATCH_LIBS}
-            ${Tube-Segmentation-Framework_LIBRARIES}
-        )
-    endif()
-    
-    target_link_libraries( Catch ${CATCH_LIBS} )
-    		
-cx_install_target(Catch)
-#    install(TARGETS Catch
-#        BUNDLE DESTINATION ${CX_INSTALL_ROOT_DIR}
-#		RUNTIME DESTINATION ${CX_INSTALL_ROOT_DIR}/bin)
-		# CATCH -end
-####################################################################################
-
-
+if (BUILD_TESTING)
 
 include_directories(
     .
