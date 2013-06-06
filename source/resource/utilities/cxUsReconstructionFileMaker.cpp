@@ -80,7 +80,7 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageD
 
 	if (tool && tool->getProbe())
 	{
-		retval.mProbeData.setData(tool->getProbe()->getData());
+		retval.mProbeData.setData(tool->getProbe()->getProbeData());
 	}
 
 	vtkImageDataPtr mask = retval.mProbeData.getMask();

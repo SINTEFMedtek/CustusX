@@ -165,7 +165,7 @@ void TestUSSavingRecorderController::verifySaveData(QString filename)
 	{
 		CPPUNIT_ASSERT( !hasBeenRead.mPositions.empty() );
 		CPPUNIT_ASSERT( hasBeenRead.mProbeUid == mTool->getUid() );
-		CPPUNIT_ASSERT( hasBeenRead.mProbeData.mData.getType() == mTool->getProbe()->getData().getType() );
+		CPPUNIT_ASSERT( hasBeenRead.mProbeData.mData.getType() == mTool->getProbe()->getProbeData().getType() );
 	}
 	else
 	{

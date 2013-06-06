@@ -16,7 +16,8 @@
  * cxProbe.h
  *
  *  \date Feb 3, 2011
- *      \author christiana
+ *  \author Christian Askeland, SINTEF
+ *  \author Ole Vegard Solberg, SINTEF
  */
 
 #ifndef CXPROBE_H_
@@ -49,7 +50,7 @@ public:
 
 	virtual QStringList getAvailableVideoSources();
 	virtual ssc::VideoSourcePtr getRTSource(QString uid = "active") const;
-	virtual ssc::ProbeData getData(QString uid = "active") const;
+	virtual ssc::ProbeData getProbeData(QString uid = "active") const;
 	virtual ssc::ProbeSectorPtr getSector(QString uid = "active");
 
 	virtual void addXml(QDomNode& dataNode);
@@ -70,7 +71,7 @@ public:
 	virtual void setActiveStream(QString uid);
 	virtual QString getActiveStream() const;
 
-	// non-inherited methods
+	// non-inherited functions
 	ProbeXmlConfigParser::Configuration getConfiguration() const;
 	void removeCurrentConfig(); ///< remove the current config from disk
 	void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
@@ -87,7 +88,6 @@ private:
 	ProbeXmlConfigParser::Configuration getConfiguration(QString uid) const;
 	QString getInstrumentId() const;
 	QString getInstrumentScannerId() const;
-	ssc::ProbeData getProbeData(QString uid) const;
 	bool hasRtSource() const;
 
 	void setConfigId(QString uid);

@@ -221,7 +221,7 @@ void Tool::printInternalStructure()
 ssc::ProbeData Tool::getProbeSector() const
 {
 	if (mProbe)
-		return mProbe->getData();
+		return mProbe->getProbeData();
 	return ssc::ProbeData();
 }
 
