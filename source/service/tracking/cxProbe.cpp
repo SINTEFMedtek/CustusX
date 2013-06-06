@@ -175,16 +175,6 @@ void Probe::removeRTSource(ssc::VideoSourcePtr source)
 	emit sectorChanged();
 }
 
-void Probe::setData(ssc::ProbeData probeSector, QString configUid)
-{
-	if (probeSector.getUid().isEmpty())
-		probeSector.setUid(mActiveUid);
-
-	mProbeData[probeSector.getUid()] = probeSector;
-	mConfigurationId = configUid;
-	emit sectorChanged();
-}
-
 void Probe::setProbeSector(ssc::ProbeData probeSector)
 {
 	if (probeSector.getUid().isEmpty())
@@ -267,16 +257,18 @@ QString Probe::getConfigurationPath() const
 	return retval.join(":");
 }
 
-//applyNewConfiguration(QString uid)
 void Probe::applyNewConfigurationWithId(QString uid)
 {
-	//this->setConfigId(uid); //missing for now
-	mConfigurationId = uid;
+	this->setConfigId(uid);
 	this->updateProbeSector();
-
 	this->updateTemporalCalibration();
 	this->setSoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
+}
+
+void Probe::setConfigId(QString uid)
+{
+	mConfigurationId = uid;
 }
 
 void Probe::updateProbeSector()

@@ -76,7 +76,7 @@ void TestAcqController::setupProbe()
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(ssc::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, ssc::ProbeData> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
 	ssc::ProbePtr probe = cx::Probe::New("","");
-	probe->setData(probedata.second);
+	probe->setProbeSector(probedata.second);
 	dummyTool->setProbeSector(probe);
 	CPPUNIT_ASSERT(dummyTool->getProbe());
 	CPPUNIT_ASSERT(dummyTool->getProbe()->isValid());

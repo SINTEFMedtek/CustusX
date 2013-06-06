@@ -63,7 +63,7 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid);
 	virtual void setTemporalCalibration(double val);
 	virtual void setSoundSpeedCompensationFactor(double val);
-	virtual void setData(ssc::ProbeData probeSector, QString configUid="");
+	virtual void setProbeSector(ssc::ProbeData probeSector);
 	virtual void setRTSource(ssc::VideoSourcePtr source);
 	virtual void removeRTSource(ssc::VideoSourcePtr source);
 
@@ -79,6 +79,7 @@ public:
 	bool isUsingDigitalVideo() const;
 	QString getRtSourceName() const;
 
+
 private:
 	Probe(QString instrumentUid, QString scannerUid);
 	void initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml);
@@ -89,7 +90,7 @@ private:
 	ssc::ProbeData getProbeData(QString uid) const;
 	bool hasRtSource() const;
 
-	void setProbeSector(ssc::ProbeData probeSector);
+	void setConfigId(QString uid);
 	void updateProbeSector();
 	bool isValidConfigId();
 	ssc::ProbeData createProbeSector();

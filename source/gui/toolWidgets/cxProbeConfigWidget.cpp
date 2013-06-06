@@ -262,7 +262,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	if (mSyncBoxToSector->isChecked())
 		data.updateClipRectFromSector();
 
-	probe->setData(data);
+	probe->setProbeSector(data);
 }
 
 void ProbeConfigWidget::guiImageSettingsChanged()
@@ -282,7 +282,7 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	image.mClipRect_p = mBBWidget->getValue();
 	data.setImage(image);
 
-	probe->setData(data);
+	probe->setProbeSector(data);
 }
 
 void ProbeConfigWidget::guiOriginSettingsChanged()
@@ -311,7 +311,7 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 
 	data.setImage(image);
 
-	probe->setData(data);
+	probe->setProbeSector(data);
 }
 
 

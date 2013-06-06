@@ -224,7 +224,7 @@ void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
 	data.setImage(image);
 
 	probe->useDigitalVideo(true);
-	probe->setData(data, "Digital");
+	probe->setProbeSector(data);
 }
 
 void VideoConnection::startAllSources()
