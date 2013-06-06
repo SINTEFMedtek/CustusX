@@ -65,7 +65,7 @@ void Probe::initConfigId()
 {
 	QStringList configs = this->getConfigIdList();
 	if (!configs.isEmpty())
-		this->setConfigId(configs[0]);
+		this->applyNewConfigurationWithId(configs[0]);
 	else
 	{
 		ssc::messageManager()->sendWarning(QString("Found no probe configuration for:\n"
@@ -182,9 +182,15 @@ void Probe::setData(ssc::ProbeData probeSector, QString configUid)
 
 	mProbeData[probeSector.getUid()] = probeSector;
 	mConfigurationId = configUid;
+	emit sectorChanged();
+}
 
-//	std::cout << "Probe::setData \n" << streamXml2String(probeSector) << std::endl;
+void Probe::setProbeSector(ssc::ProbeData probeSector)
+{
+	if (probeSector.getUid().isEmpty())
+		probeSector.setUid(mActiveUid);
 
+	mProbeData[probeSector.getUid()] = probeSector;
 	emit sectorChanged();
 }
 
@@ -192,7 +198,7 @@ void Probe::useDigitalVideo(bool digitalStatus)
 {
 	mDigitalInterface = digitalStatus;
 	if (mDigitalInterface)
-		this->setConfigId("Digital");
+		this->applyNewConfigurationWithId("Digital");
 }
 
 bool Probe::isUsingDigitalVideo() const
@@ -213,7 +219,7 @@ void Probe::parseXml(QDomNode& dataNode)
 	QString cfg = dataNode.toElement().attribute("config");
 	if (cfg.isEmpty())
 		return;
-	this->setConfigId(cfg);
+	this->applyNewConfigurationWithId(cfg);
 }
 
 QStringList Probe::getConfigIdList() const
@@ -261,24 +267,46 @@ QString Probe::getConfigurationPath() const
 	return retval.join(":");
 }
 
-void Probe::setConfigId(QString uid)
+//applyNewConfiguration(QString uid)
+void Probe::applyNewConfigurationWithId(QString uid)
 {
-	ProbeXmlConfigParser::Configuration config = this->getConfiguration(uid);
-	if (config.isEmpty())
-		return;
-	if(uid.compare("Digital") != 0)
-	{
-		ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
-		probeSector.setUid(mActiveUid);
-		this->setData(probeSector, uid);
-	}
-	//Update temporal calibration and sound speed compensation
-	if (mOverrideTemporalCalibration)
-		this->setTemporalCalibration(mTemporalCalibration);
+	//this->setConfigId(uid); //missing for now
+	mConfigurationId = uid;
+	this->updateProbeSector();
+
+	this->updateTemporalCalibration();
 	this->setSoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
 }
 
+void Probe::updateProbeSector()
+{
+	if(this->isValidConfigId() && !this->isUsingDigitalVideo())
+	{
+		ssc::ProbeData probeSector = this->createProbeSector();
+		this->setProbeSector(probeSector);
+	}
+}
+
+bool Probe::isValidConfigId()
+{
+	//May need to create ProbeXmlConfigParser::isValidConfig(...) also
+	return !this->getConfiguration(this->getConfigId()).isEmpty();
+}
+
+ssc::ProbeData Probe::createProbeSector()
+{
+	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
+	ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
+	probeSector.setUid(mActiveUid);
+	return probeSector;
+}
+
+void Probe::updateTemporalCalibration()
+{
+if (mOverrideTemporalCalibration)
+	this->setTemporalCalibration(mTemporalCalibration);
+}
 
 ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 {
@@ -315,7 +343,7 @@ void Probe::removeCurrentConfig()
 
 	mXml->removeConfig(config.mUsScanner, config.mUsProbe, config.mRtSource, config.mConfigId);
 	if (index < this->getConfigIdList().size())
-		this->setConfigId(this->getConfigIdList()[index]);
+		this->applyNewConfigurationWithId(this->getConfigIdList()[index]);
 	emit sectorChanged();
 }
 
@@ -327,7 +355,7 @@ void Probe::saveCurrentConfig(QString uid, QString name)
 	config = createConfigurationFromProbeData(config, this->getProbeData("active"));
 
 	mXml->saveCurrentConfig(config);
-	this->setConfigId(uid);
+	this->applyNewConfigurationWithId(uid);
 }
 
 QStringList Probe::getAvailableVideoSources()
