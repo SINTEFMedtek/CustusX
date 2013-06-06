@@ -126,7 +126,7 @@ void TestUSReconstructionFileIO::assertCorrespondence(ReconstructionData input, 
 
 	CPPUNIT_ASSERT( output.mProbeUid == input.tool->getUid() );
 
-	CPPUNIT_ASSERT( output.mProbeData.mData.getType() == input.tool->getProbe()->getData().getType() );
+	CPPUNIT_ASSERT( output.mProbeData.mData.getType() == input.tool->getProbe()->getProbeData().getType() );
 	// might add more here: compare timestamps and transforms, frame sizes, probe sector
 }
 

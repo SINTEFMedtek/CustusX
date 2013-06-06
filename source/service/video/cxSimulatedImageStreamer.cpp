@@ -96,7 +96,7 @@ vtkMatrix4x4Ptr SimulatedImageStreamer::calculateSliceAxes()
 
 vtkImageDataPtr SimulatedImageStreamer::getSliceUsingProbeDefinition(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes)
 {
-	ssc::ProbeData probedata = mTool->getProbe()->getData();
+	ssc::ProbeData probedata = mTool->getProbe()->getProbeData();
 
 	vtkImageReslicePtr reslicer = this->createReslicer(source, sliceAxes);
 
@@ -115,7 +115,7 @@ ssc::ImagePtr SimulatedImageStreamer::createSscImage(vtkImageDataPtr slice, ssc:
 
 vtkImageReslicePtr SimulatedImageStreamer::createReslicer(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes)
 {
-	ssc::ProbeData probedata = mTool->getProbe()->getData();
+	ssc::ProbeData probedata = mTool->getProbe()->getProbeData();
 
 	vtkImageReslicePtr reslicer = vtkImageReslicePtr::New();
 	reslicer->SetInput(source->getBaseVtkImageData());
@@ -134,7 +134,7 @@ vtkImageReslicePtr SimulatedImageStreamer::createReslicer(ssc::ImagePtr source, 
 
 ssc::Transform3D SimulatedImageStreamer::getTransformFromProbeSectorImageSpaceToImageSpace()
 {
-	ssc::ProbeData probedata = mTool->getProbe()->getData();
+	ssc::ProbeData probedata = mTool->getProbe()->getProbeData();
 	ssc::ProbeSector probesector;
 	probesector.setData(probedata);
 
