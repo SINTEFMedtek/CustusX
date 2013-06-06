@@ -57,7 +57,7 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid) = 0;
 	virtual void setTemporalCalibration(double val) = 0;
 	virtual void setSoundSpeedCompensationFactor(double val) = 0;
-	virtual void setData(ssc::ProbeData probeSector, QString configUid="") = 0;
+	virtual void setProbeSector(ssc::ProbeData probeSector) = 0;
 	virtual void setRTSource(ssc::VideoSourcePtr source) = 0;
 	virtual void removeRTSource(ssc::VideoSourcePtr source) = 0;
 
