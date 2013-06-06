@@ -59,7 +59,7 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid) {}
 	virtual void setTemporalCalibration(double val) {}
 	virtual void setSoundSpeedCompensationFactor(double val) {}
-	virtual void setData(ssc::ProbeData probeSector, QString configUid="")
+	virtual void setProbeSector(ssc::ProbeData probeSector)
 	{
 		mProbeData = probeSector;
 		emit sectorChanged();
@@ -155,7 +155,7 @@ public:
 	{
 		mProbeData = probeData;
 		mProbe.reset(new DummyProbe());
-		mProbe->setData(mProbeData);
+		mProbe->setProbeSector(mProbeData);
 		emit toolProbeSector();
 	}
 	void setProbeSector(ProbePtr probe)
