@@ -1,6 +1,7 @@
 #include <ProbeXmlConfigParserMoc.h>
 
 #include <QStringList>
+#include <iostream>
 
 ProbeXmlConfigParserMoc::ProbeXmlConfigParserMoc(QString& pathToXml) :
 	mFileName(pathToXml)
@@ -53,16 +54,16 @@ QStringList ProbeXmlConfigParserMoc::getConfigIdList(QString scanner, QString pr
 
 ProbeXmlConfigParser::Configuration ProbeXmlConfigParserMoc::getConfiguration(QString scanner, QString probe, QString rtsource, QString configId)
 {
-	  Configuration retval;
-	  retval.mName = "Dummy config";
-	  retval.mUsScanner = scanner;
-	  retval.mUsProbe = probe;
-	  retval.mRtSource = rtsource;
-	  retval.mConfigId = configId;
-	  retval.mNotes = "Found no notes.";
-	  retval.mTemporalCalibration = 0;
-	  retval.mEmpty = false;
-	  return retval;
+	Configuration retval;
+	retval.mName = "Dummy config";
+	retval.mUsScanner = scanner;
+	retval.mUsProbe = probe;
+	retval.mRtSource = rtsource;
+	retval.mConfigId = configId;
+	retval.mNotes = "Found no notes.";
+	retval.mTemporalCalibration = 0;
+	retval.mEmpty = false;
+	return retval;
 }
 
 
