@@ -211,7 +211,7 @@ void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
 	// Note that the 'active' data is get while the 'uid' data is set.
-	ssc::ProbeData data = probe->getData();
+	ssc::ProbeData data = probe->getProbeData();
 
 	data.setUid(msg->getUid());
 	data.setType(msg->getType());

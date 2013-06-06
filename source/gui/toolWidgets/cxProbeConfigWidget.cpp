@@ -207,7 +207,7 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getData();
+	ssc::ProbeData data = probe->getProbeData();
 	mUpdating= true;
 
 	ssc::DoubleBoundingBox3D range(0, data.getImage().mSize.width(), 0, data.getImage().mSize.height());
@@ -252,7 +252,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getData();
+	ssc::ProbeData data = probe->getProbeData();
 
 	double sx = data.getImage().mSpacing[0]; // mm/pix
 	double sy = data.getImage().mSpacing[1];
@@ -275,7 +275,7 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getData();
+	ssc::ProbeData data = probe->getProbeData();
 
 	ssc::ProbeData::ProbeImageData image = data.getImage();
 
@@ -295,7 +295,7 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getData();
+	ssc::ProbeData data = probe->getProbeData();
 
 	ssc::ProbeData::ProbeImageData image = data.getImage();
 
