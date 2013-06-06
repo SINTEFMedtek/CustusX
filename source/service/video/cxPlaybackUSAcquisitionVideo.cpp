@@ -201,7 +201,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	{
 		ProbePtr probe = boost::dynamic_pointer_cast<Probe>(tool->getProbe());
 		if (probe)
-			probe->setData(mCurrentData.mProbeData.mData);
+			probe->setProbeSector(mCurrentData.mProbeData.mData);
 	}
 
 	// create a vector to allow for quick search
