@@ -49,8 +49,16 @@ public:
     CPPUNIT_TEST_SUITE_END();
 private:
     void createTestProbe();
-    ssc::ProbeData createProbeData(QString uid);
+    void createParameters();
+    ssc::ProbeData createProbeData();
+    QString mProbeName;
+    QString mScannerName;
+    QString mDefaultProbeDataUid;
+    QString mProbeDataUid;
+    QString mDefaultRtSourceName;
     cx::ProbePtr mProbe;
+    double mDefaultTemporalCalibration;
+    double mTemporalCalibration;
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestProbe );
 
