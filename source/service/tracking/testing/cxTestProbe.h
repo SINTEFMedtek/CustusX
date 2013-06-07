@@ -6,6 +6,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "sscTool.h"
+#include "cxProbe.h"
 
 namespace cxtest
 {
@@ -24,14 +25,32 @@ public:
 	TestProbe();
 	void setUp();
 	void tearDown();
-	void testConstructor();
-	void testConstructorWithMocXmlParser();
+	void testConstructorWithDefaultXmlParser();
+	void testConstructorWithMockXmlParser();
+	void testDigitalVideoSetting();
+	void testRTSource();
+	void testDefaultProbeSector();
+	void testCustomProbeSector();
+	void testSetActiveStreamToCustomProbeSector();
+	void testSetActiveStream();
+	void runAllTests();
 
     CPPUNIT_TEST_SUITE( TestProbe );
-//        CPPUNIT_TEST( testConstructor );
-        CPPUNIT_TEST( testConstructorWithMocXmlParser );
+//        CPPUNIT_TEST( testConstructorWithDefaultXmlParser );
+//The tests below are for now called from runAllTests() to save time
+//        CPPUNIT_TEST( testConstructorWithMockXmlParser );
+//        CPPUNIT_TEST( testDigitalVideoSetting );
+//        CPPUNIT_TEST( testRTSource );
+//        CPPUNIT_TEST( testDefaultProbeSector );
+//        CPPUNIT_TEST( testCustomProbeSector );
+//        CPPUNIT_TEST( testSetActiveStreamToCustomProbeSector );
+//        CPPUNIT_TEST( testSetActiveStream );
+        CPPUNIT_TEST( runAllTests );
     CPPUNIT_TEST_SUITE_END();
 private:
+    void createTestProbe();
+    ssc::ProbeData createProbeData(QString uid);
+    cx::ProbePtr mProbe;
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestProbe );
 

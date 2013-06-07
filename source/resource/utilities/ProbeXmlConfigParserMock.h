@@ -14,11 +14,11 @@
  *  \date Jun 4, 2013
  *  \author Ole Vegard Solberg, SINTEF
  */
-class ProbeXmlConfigParserMoc : public ProbeXmlConfigParser
+class ProbeXmlConfigParserMock : public ProbeXmlConfigParser
 {
 public:
-	ProbeXmlConfigParserMoc(QString& pathToXml);
-	virtual ~ProbeXmlConfigParserMoc();
+	ProbeXmlConfigParserMock(QString& pathToXml);
+	virtual ~ProbeXmlConfigParserMock();
 	virtual QString getFileName();
 	virtual void removeConfig(QString scanner, QString probe, QString rtsource, QString configId);
 	virtual void saveCurrentConfig(ProbeXmlConfigParser::Configuration config);
