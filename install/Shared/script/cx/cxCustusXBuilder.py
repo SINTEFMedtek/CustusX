@@ -84,7 +84,8 @@ class CustusXBuilder:
         shell.run('rm -r -f *.dmg')
         shell.run('rm -r -f *.tar.gz')
         # create new
-        shell.run('make package')
+        #shell.run('make package')
+        shell.run('cpack --verbose') # same as make package, given that make has been run, but more verbose
 
     def publishDoxygen(self):
         PrintFormatter.printHeader('copy/publish doxygen to medtek server (link from wiki)', level=2)
