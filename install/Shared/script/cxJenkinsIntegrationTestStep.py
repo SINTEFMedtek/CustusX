@@ -73,10 +73,10 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         self.cxInstallation.setInstallerPath(custusx.buildPath())        
 
     def run(self):
-        self._checkoutComponents()
+        #self._checkoutComponents()
         # find location of artefact to install <tbd>
         # connect installation to test data <tbd>
-        self.cxInstallation.installPackage()
+        #self.cxInstallation.installPackage()
         self.cxInstallation.testInstallation()
         self.cxBuilder.clearTestData()
         self.cxInstallation.runIntegrationTests()
