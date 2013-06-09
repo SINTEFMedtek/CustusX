@@ -96,7 +96,7 @@ class CustusXTestInstallation:
         shell.changeDir(temp_path)
         shell.run('tar -zxvf %s' % (filename)) # extract to path
         corename = os.path.basename(filename).split('.tar.gz')[0]
-        unpackedfolder = "%s/%s" % (temp_path,corename)
+        unpackedfolder = "%s/%s/CustusX" % (temp_path,corename)
         installfolder = '%s' % self.install_root
         shell.changeDir(installfolder)
         shell.run('cp -r %s %s' % (unpackedfolder, installfolder))
