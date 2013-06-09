@@ -18,10 +18,10 @@ import argparse
 import glob
 
 from cxShell import *
+from cxPrintFormatter import PrintFormatter
 import cxInstallData
 import cxComponents
 import cxComponentAssembly
-
 
 class CustusXBuilder:
     '''
@@ -34,16 +34,14 @@ class CustusXBuilder:
     
     def buildAllComponents(self):
         self.assembly.controlData.printSettings()
-        self.assembly.printHeader('Build all components', level=2)
+        PrintFormatter.printHeader('Build all components', level=2)
         self.assembly.selectAllLibraries()
         self.assembly.process(checkout=True,
-                             configure_clean=False,
                              configure=True,
-                             clean=False,
                              build=True)
     
     def clearTestData(self):
-        self.assembly.printHeader('Clearing all old test data', level=2)
+        PrintFormatter.printHeader('Clearing all old test data', level=2)
         # clear local modifications in the data folder - the tests might cause these changes
         cxData = self._createComponent(cxComponents.CustusX3Data)
         shell.changeDir(cxData.sourcePath())
@@ -53,7 +51,7 @@ class CustusXBuilder:
         shell.removeTree(tempDir)
     
     def runAllTests(self):
-        self.assembly.printHeader('Run all tests', level=2)
+        PrintFormatter.printHeader('Run all tests', level=2)
         self._runCTestTests()
         self._runCatchTests()
     
@@ -73,13 +71,13 @@ class CustusXBuilder:
         shell.changeDir(catchDir)
         shell.run('rm -rf %s/CatchTestResults.xml' % custusx.buildPath())
         pathToCatchExe = '.'
-        if platform.system() == 'Darwin':
-            pathToCatchExe = './Catch.app/Contents/MacOS'
+        #if platform.system() == 'Darwin':
+        #    pathToCatchExe = './Catch.app/Contents/MacOS'
         shell.run('%s/Catch -r junit -o CatchTestResults.xml' % pathToCatchExe)
         shell.run('cp CatchTestResults.xml %s/CatchTestResults.xml' % custusx.buildPath())        
 
     def createInstallerPackage(self):
-        self.assembly.printHeader('Package the build', level=2)
+        PrintFormatter.printHeader('Package the build', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         shell.changeDir(custusx.buildPath())
         # cleanup old - can be refactored to use python methods...
@@ -89,7 +87,7 @@ class CustusXBuilder:
         shell.run('make package')
 
     def publishDoxygen(self):
-        self.assembly.printHeader('copy/publish doxygen to medtek server (link from wiki)', level=2)
+        PrintFormatter.printHeader('copy/publish doxygen to medtek server (link from wiki)', level=2)
         remoteServerPath = "/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/custusx_doxygen"
         custusx = self._createComponent(cxComponents.CustusX3)
         cmd = 'scp -r %s/doc/doxygen/html/* medtek.sintef.no:%s'
@@ -100,7 +98,7 @@ class CustusXBuilder:
         Initialize lcov by resetting all existing counters
         and initializing/generating counters for all files.
         '''
-        self.assembly.printHeader('Reset gcov coverage counters', level=2)
+        PrintFormatter.printHeader('Reset gcov coverage counters', level=2)
         gcovTempDir = '%s/gcov' % self.assembly.controlData.getRootDir()
         gcovResultDir = '%s/gcov/coverage_info' % self.assembly.controlData.getRootDir()
         custusx = self._createComponent(cxComponents.CustusX3)
@@ -118,7 +116,7 @@ class CustusXBuilder:
         Given that lcov is initialized and ctest is run,
         Generate html output from the gcov data.
         '''
-        self.assembly.printHeader('Generating coverage report', level=2)
+        PrintFormatter.printHeader('Generating coverage report', level=2)
         gcovTempDir = '%s/gcov' % self.assembly.controlData.getRootDir()
         gcovResultDir = '%s/gcov/coverage_info' % self.assembly.controlData.getRootDir()
         custusx = self._createComponent(cxComponents.CustusX3)
@@ -155,7 +153,7 @@ class CustusXBuilder:
                 ])
         
     def runCppCheck(self):
-        self.assembly.printHeader('Run CppCheck', level=2)
+        PrintFormatter.printHeader('Run CppCheck', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         sourceDir = custusx.sourcePath()
         rootDir = self.assembly.controlData.getRootDir()
@@ -167,7 +165,7 @@ class CustusXBuilder:
                 ])
 
     def runLineCounter(self):
-        self.assembly.printHeader('Run Line counter SLOCCOUNT', level=2)
+        PrintFormatter.printHeader('Run Line counter SLOCCOUNT', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         sourceDir = custusx.sourcePath()
         rootDir = self.assembly.controlData.getRootDir()
@@ -179,103 +177,18 @@ class CustusXBuilder:
                 '--remove="3rdParty/ config/ install/ /data/"',
                 '%s/sloccount_raw.sc %s/sloccount.sc' % (rootDir, rootDir) 
                 ])
- 
-    def installPackage(self):
-        self.assembly.printHeader('Install package', level=3)
-        pattern = self._getInstallerPackagePattern()
-        print 'Looking for installers with pattern: %s' % pattern 
-        files = glob.glob(pattern)
-        self.assertTrue(len(files)==1, 
-                        'Found %i install files, requiring 1: \n %s' % (len(files), ' \n'.join(files)))
-        file = files[0]
-        print 'Installing file %s' % file
-        self._installFile(file)
-        
-    def _installFile(self, filename):
-        if platform.system() == 'Darwin':
-            self._installDMG(filename)
-        if platform.system() == 'Linux':
-            self._installLinuxZip(filename)
-    
-    def _getInstallerPackagePattern(self):
-        custusx = self._createComponent(cxComponents.CustusX3)
-        buildDir = custusx.buildPath()
-        if platform.system() == 'Darwin':
-            pattern = 'CustusX_*.dmg'
-        if platform.system() == 'Linux':
-            pattern = 'CustusX*.tar.gz'
-        return '%s/%s' % (custusx.buildPath(), pattern)
-        
-    def _installLinuxZip(self, filename):
-        path = '%s/install' % self.assembly.controlData.getRootDir()
-        shell.removeTree(path)
-        shell.changeDir(path)
-        shell.run('tar -zxvf %s' % (filename)) # extract to path
-        self.mInstalledBinaryPath = '%s' % path
-        print 'self.mInstalledBinaryPath', self.mInstalledBinaryPath
-
-    def _installDMG(self, dmgfile, pkgName=None):
-        '''
-        Install the given pkg inside the dmg file.
-        '''
-        path = os.path.dirname(dmgfile)
-        basename = os.path.basename(dmgfile)
-        changeDir(path)
-        coreName = os.path.splitext(basename)[0]
-        if not pkgName:
-            pkgName = coreName + '.pkg'
-        print "install package %s from file %s" % (pkgName, coreName)
-        shell.run('hdiutil attach -mountpoint /Volumes/%s %s' % (coreName, dmgfile))
-        target = '/' # TODO: mount on another (test) volume - this one requires sudo
-        shell.run('installer -pkg /Volumes/%s/%s -target %s' % (coreName, pkgName, target))
-        shell.run('hdiutil detach /Volumes/%s' % coreName)
-        print "Installed %s" % pkgName
-   
-    def testInstallation(self):
-        self.assembly.printHeader('Test installation', level=2)
-        appPath = '/Applications/CustusX/CustusX.app/Contents/MacOS'
-        self._testExecutable(appPath, 'CustusX')
-        self._testExecutable(appPath, 'Catch')
-        #self._testExecutable(appPath, 'cxTestResource_CppUnit_CTest')
-        self._testExecutable(appPath, 'OpenIGTLinkServer')
-        self._testExecutable(appPath, 'GrabberServer')
-        #self._testExecutable(appPath, 'sscPositionFileReader')
-        
-    def _testExecutable(self, path, filename):
-        self.assembly.printHeader('Test executable %s' % filename, level=3)
-        fullname = '%s/%s' % (path, filename)
-        self.assertTrue(os.path.exists(fullname), 
-                        'Checking existence of installed executable %s' % fullname)
-        self._runApplicationForDuration(fullname, timeout=3)
-
-    def _runApplicationForDuration(self, application, timeout):
-        ''
-        p = subprocess.Popen(application, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=os.path.dirname(application)) 
-        time.sleep(timeout)
-        #print p.stdout.read() # drop this: causes app to hang
-        retcode = p.poll()
-        self.assertTrue(retcode==None or retcode==0, 'Process %s has been running successfully for %is' % (application, timeout))
-        if retcode==None:
-            p.kill()
-        p.wait()
-        print 'Successfully ran %s for %is' % (application, timeout)
-        # also consider otool -L
-        return
-    
+     
     def assertTrue(self, assertion, text):
         if not assertion:
             text = 'Test Failed: %s' % text
             print text
             raise Exception(text)
 
-    def runIntegrationTests(self):
-        self.assembly.printHeader('Run integration tests, not implemented', level=3)
-        pass
-    
     def finish(self):
-        self.assembly.printHeader('Finished', level=3)
+        PrintFormatter.finish()
 
     def _createComponent(self, type):
-        retval = type()
-        retval.setControlData(self.assembly.controlData)
-        return retval
+        return self.assembly.getComponent(type)
+        #retval = type()
+        #retval.setControlData(self.assembly.controlData)
+        #return retval

@@ -441,13 +441,15 @@ class CustusX3Data(CppComponent):
     def sourceFolder(self):
         return 'data'
     def _rawCheckout(self):
-        self._getBuilder().gitClone('ssh://medtek.sintef.no//Volumes/medtek_HD/git/Data.git', self.sourceFolder())
+        self._getBuilder().gitClone('ssh://%s'%self.gitRepository(), self.sourceFolder())
     def update(self):
         self._getBuilder().gitUpdate('master')    
     def configure(self):
         pass
     def build(self):
         pass
+    def gitRepository(self):
+        return 'medtek.sintef.no//Volumes/medtek_HD/git/Data.git'
 # ---------------------------------------------------------
 
 
