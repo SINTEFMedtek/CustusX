@@ -51,6 +51,9 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         'subclasses can add parser arguments here'
         super(Controller, self)._addArgumentParserArguments()
         p = self.argumentParser
+        p.add_argument('--skip_checkout', action='store_true', default=False, help='Skip the checkout of data')
+        p.add_argument('--skip_install', action='store_true', default=False, help='Skip installing the package')
+        p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
 
     def _applyArgumentParserArguments(self, options):
         'apply arguments defined in _addArgumentParserArguments()'
@@ -73,13 +76,14 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         self.cxInstallation.setInstallerPath(custusx.buildPath())        
 
     def run(self):
-        self._checkoutComponents()
-        # find location of artefact to install <tbd>
-        # connect installation to test data <tbd>
-        self.cxInstallation.installPackage()
-        self.cxInstallation.testInstallation()
-        self.cxBuilder.clearTestData()
-        self.cxInstallation.runIntegrationTests()
+        if not self.argumentParserArguments.skip_checkout:
+            self._checkoutComponents()
+        if not self.argumentParserArguments.skip_install:
+            self.cxInstallation.installPackage()
+        if not self.argumentParserArguments.skip_tests:
+            self.cxInstallation.testInstallation()
+            self.cxBuilder.clearTestData()
+            self.cxInstallation.runIntegrationTests()
         self.cxBuilder.finish()
     
     def _checkoutComponents(self):
