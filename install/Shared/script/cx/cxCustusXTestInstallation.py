@@ -98,7 +98,7 @@ class CustusXTestInstallation:
         shell.changeDir(temp_path)
         shell.run('tar -zxvf %s' % (filename)) # extract to path
         #self.mInstalledBinaryPath = '%s' % path
-        corename = os.path.splitext(filename)[0]
+        corename = filename.split('.')[0]
         unpackedfolder = "%s/%s" % (temp_path,corename)
         installfolder = '%s' % self.install_root
         shell.run('cp -r %s %s' % (unpackedfolder, installfolder))
@@ -111,11 +111,7 @@ class CustusXTestInstallation:
         path = os.path.dirname(dmgfile)
         basename = os.path.basename(dmgfile)
         changeDir(path)
-        print 'basename: ', basename
-        print 'basename split: ', basename.split('.')
-        #coreName = os.path.splitext(basename)[0]
-        coreName = basename.split('.')[0]
-        print 'coreName: ', coreName
+        coreName = os.path.splitext(basename)[0]
         if not pkgName:
             pkgName = coreName + '.pkg'
         print "install package %s from file %s" % (pkgName, coreName)
