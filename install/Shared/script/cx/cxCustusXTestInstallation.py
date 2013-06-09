@@ -34,9 +34,9 @@ class CustusXTestInstallation:
         'root dir for user data'
         self.root_dir = root_dir
         if platform.system() == 'Darwin':
-            self.install_root = '/Applications/CustusX'
+            self.install_root = '/Applications'
         if platform.system() == 'Linux':
-            self.install_root = '%s/Installed/CustusX' % self.root_dir
+            self.install_root = '%s/Installed' % self.root_dir
 
     def setTestDataPath(self, path):
         'set location of test data'
@@ -49,20 +49,20 @@ class CustusXTestInstallation:
         'set location of installer package (dmg, msi, gz) that should be installed'
         self.installer_path = path
 
-    def _getInstalledRootPath(self):
-        'path to root folder of install'
-        return self.install_root
+#    def _getInstalledRootPath(self):
+#        'path to root folder of install'
+#        return self.install_root
 
     def _getInstalledBinaryPath(self):
         'path to binary files / executables in install'
         if platform.system() == 'Darwin':
-            retval = '%s/CustusX.app/Contents/MacOS' % self.install_root
+            retval = '%s/CustusX/CustusX.app/Contents/MacOS' % self.install_root
         if platform.system() == 'Linux':
-            retval = '%s/bin' % self.install_root
+            retval = '%s/CustusX/bin' % self.install_root
         return retval        
 
     def _getInstalledSettingsPath(self):
-        return '%s/config/settings' % self.install_root
+        return '%s/CustusX/config/settings' % self.install_root
         
     def installPackage(self):
         PrintFormatter.printHeader('Install package', level=3)
@@ -96,7 +96,7 @@ class CustusXTestInstallation:
         shell.changeDir(temp_path)
         shell.run('tar -zxvf %s' % (filename)) # extract to path
         corename = os.path.basename(filename).split('.tar.gz')[0]
-        unpackedfolder = "%s/%s/CustusX/*" % (temp_path,corename)
+        unpackedfolder = "%s/%s" % (temp_path,corename)
         installfolder = '%s' % self.install_root
         shell.changeDir(installfolder)
         shell.run('cp -r %s %s' % (unpackedfolder, installfolder))
