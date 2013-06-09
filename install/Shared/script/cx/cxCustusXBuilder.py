@@ -72,7 +72,7 @@ class CustusXBuilder:
         shell.run('rm -rf %s/CatchTestResults.xml' % custusx.buildPath())
         pathToCatchExe = '.'
         resultsFile = '%s/CatchTestResults.xml' % custusx.buildPath()
-        shell.run('%s/Catch -r junit -o %s' % (pathToCatchExe, resultsFile))
+        shell.run('%s/Catch  -g [unit] -r junit -o %s' % (pathToCatchExe, resultsFile))
         #shell.run('cp CatchTestResults.xml %s/CatchTestResults.xml' % custusx.buildPath())        
 
     def createInstallerPackage(self):
