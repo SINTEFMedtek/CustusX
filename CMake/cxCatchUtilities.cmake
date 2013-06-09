@@ -81,7 +81,7 @@ macro(cx_catch_add_master_exe)
 	set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
 	add_executable(${TEST_EXE_NAME} ${cxtest_MAIN} )
 	target_link_libraries(${TEST_EXE_NAME} ${CX_TEST_CATCH_GENERATED_LIBRARIES} cxtestUtilities )
-	cx_install_target(Catch)
+	cx_install_target(${TEST_EXE_NAME})
 endmacro()
 
 
