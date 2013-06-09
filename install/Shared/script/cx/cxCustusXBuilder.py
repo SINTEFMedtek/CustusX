@@ -71,10 +71,9 @@ class CustusXBuilder:
         shell.changeDir(catchDir)
         shell.run('rm -rf %s/CatchTestResults.xml' % custusx.buildPath())
         pathToCatchExe = '.'
-        #if platform.system() == 'Darwin':
-        #    pathToCatchExe = './Catch.app/Contents/MacOS'
-        shell.run('%s/Catch -r junit -o CatchTestResults.xml' % pathToCatchExe)
-        shell.run('cp CatchTestResults.xml %s/CatchTestResults.xml' % custusx.buildPath())        
+        resultsFile = '%s/CatchTestResults.xml' % custusx.buildPath()
+        shell.run('%s/Catch -r junit -o %s' % (pathToCatchExe, resultsFile))
+        #shell.run('cp CatchTestResults.xml %s/CatchTestResults.xml' % custusx.buildPath())        
 
     def createInstallerPackage(self):
         PrintFormatter.printHeader('Package the build', level=2)
