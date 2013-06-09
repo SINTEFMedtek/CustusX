@@ -40,7 +40,24 @@ void DataLocations::setTestMode()
 
 QString DataLocations::getTestDataPath()
 {
-  return CX_DATA_ROOT;
+	QString settingsPath = cx::DataLocations::getRootConfigPath() + "/settings";
+	QString dataRootConfigFile = settingsPath + "/data_root_location.txt";
+	if (QFileInfo(dataRootConfigFile).exists())
+	{
+		return readTestDataPathFromFile(dataRootConfigFile);
+	}
+	else
+	{
+		return CX_DATA_ROOT;
+	}
+}
+
+QString DataLocations::readTestDataPathFromFile(QString filename)
+{
+	QFile file(filename);
+	file.open(QFile::ReadOnly);
+	QString cxDataRoot(file.readAll());
+	return cxDataRoot;
 }
 
 QString DataLocations::getSettingsPath()

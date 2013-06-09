@@ -21,6 +21,7 @@ import platform
 import time
 
 from cxShell import *
+from cxPrintFormatter import PrintFormatter
 import cxInstallData
 import cxComponents
 
@@ -45,7 +46,15 @@ class LibraryAssembly:
                      cxComponents.CustusX3(),
                      cxComponents.CustusX3Data()
                      ]
-        self._startTime = time.time()
+        for lib in self.libraries:
+            lib.setControlData(self.controlData)
+#        self._startTime = time.time()
+
+    def getComponent(self, type):
+        for comp in self.libraries:
+            if isinstance(comp, type):
+                return comp
+        return None
 
     def getLibnames(self):
         return [lib.name() for lib in self.libraries]
@@ -61,14 +70,14 @@ class LibraryAssembly:
     def getSelectedLibraries(self):
         return self.selectedLibraryNames
 
-    def process(self, checkout, configure_clean, configure, clean, build):
+    def process(self, checkout=False, configure_clean=False, configure=False, clean=False, build=False):
         '''
         checkout, configure, build
         '''
         selectedLibraries = [lib for lib in self.libraries if lib.name() in self.selectedLibraryNames]
                     
-        for lib in selectedLibraries:
-            lib.setControlData(self.controlData)
+#        for lib in selectedLibraries:
+#            lib.setControlData(self.controlData)
 
         operations = []
 
@@ -93,30 +102,11 @@ class LibraryAssembly:
             #print '\n================== %s %s========================' % (methodname, lib.name())
             #print '\n%s %-*s %s' % ('='*20, 20, methodname + " " + lib.name(), '='*20)
             text = methodname+" "+lib.name()
-            self.printHeader(text)
+            PrintFormatter.printHeader(text)
 #            print '\n%s %s' % ('='*20, " %s ".ljust(60, '=')%text)
             method = getattr(lib, methodname)
             method()
             
-    def printHeader(self, caption, level=3):
-        elapsed = "%.1fs" % (time.time() -self._startTime)
-        if level < 3:
-            self.printLine()
-        else:
-            print ''
-
-        # create a line, 80 wide, containing caption and elapsed        
-        part1 ='='*20
-        part2 = (" %s "%caption).ljust(50, '=')
-        part3 = (" %s "%elapsed).ljust(10, '=')
-        print '%s%s%s' % (part1, part2, part3)
-
-        #print '%s%s%s' % ('='*20, (" %s "%caption).ljust(50, '='), (" %s "%elapsed).ljust(10, '='))
-        for i in range(3-level):
-            self.printLine()
-            
-    def printLine(self):
-        print '='*80
             
 
 

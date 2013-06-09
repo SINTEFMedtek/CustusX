@@ -48,6 +48,7 @@ public:
 
 private:
   static bool mTestMode;
+  static QString readTestDataPathFromFile(QString filename);
 //  static DataLocations* mInstance;
 //  static DataLocations getInstance();
 
