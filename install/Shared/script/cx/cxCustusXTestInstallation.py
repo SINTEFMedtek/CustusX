@@ -123,8 +123,8 @@ class CustusXTestInstallation:
         PrintFormatter.printHeader('Test installation', level=2)
         appPath = self._getInstalledBinaryPath()
         self._testExecutable(appPath, 'CustusX')
-        self._testExecutable(appPath, 'Catch', '-h')
         self._testExecutable(appPath, 'OpenIGTLinkServer')
+        self._testExecutable(appPath, 'Catch', '-h')
         if platform.system() == 'Darwin':
             self._testExecutable(appPath, 'GrabberServer')
                 
