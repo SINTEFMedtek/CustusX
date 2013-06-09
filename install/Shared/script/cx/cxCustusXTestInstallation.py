@@ -90,15 +90,12 @@ class CustusXTestInstallation:
         return '%s/%s' % (self.installer_path, pattern)
         
     def _installLinuxZip(self, filename):
-        #raise "error - check nontested code"
-        #path = '%s/install' % self.assembly.controlData.getRootDir()
         temp_path = '%s/Install/temp' % self.root_dir
         #install_root
         shell.removeTree(temp_path)
         shell.changeDir(temp_path)
         shell.run('tar -zxvf %s' % (filename)) # extract to path
-        #self.mInstalledBinaryPath = '%s' % path
-        corename = filename.split('.tar.gz')[0]
+        corename = os.path.basename(filename).split('.tar.gz')[0]
         unpackedfolder = "%s/%s" % (temp_path,corename)
         installfolder = '%s' % self.install_root
         shell.run('cp -r %s %s' % (unpackedfolder, installfolder))
