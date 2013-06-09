@@ -137,7 +137,10 @@ class CustusXTestInstallation:
         self._runApplicationForDuration(cmd, timeout=3)
 
     def _runApplicationForDuration(self, application, timeout):
-        ''
+        '''
+        Run the given application for a short time, as a quick verification.
+        The stdout is not redirected here, i.e. it might be mangled with the python output.
+        '''
         p = subprocess.Popen(application, shell=True, cwd=os.path.dirname(application)) 
         #p = subprocess.Popen(application, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=os.path.dirname(application)) 
         time.sleep(timeout)

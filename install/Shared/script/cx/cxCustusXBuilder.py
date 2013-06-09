@@ -56,6 +56,7 @@ class CustusXBuilder:
         self._runCatchTests()
     
     def _runCTestTests(self):
+        PrintFormatter.printHeader('Run ctest tests', level=3)
         # Run all tests and write them in xml format to ./CTestResults.xml
         custusx = self._createComponent(cxComponents.CustusX3)
         shell.changeDir(custusx.buildPath())
@@ -65,6 +66,7 @@ class CustusXBuilder:
         shell.run('cp Testing/`head -n 1 Testing/TAG`/Test.xml ./CTestResults.xml')
 
     def _runCatchTests(self):
+        PrintFormatter.printHeader('Run catch tests', level=3)
         # Run all Catch tests and write them in xml format to ./CatchTestResults.xml
         custusx = self._createComponent(cxComponents.CustusX3)
         catchDir = custusx.buildPath() + "/source/testing"
@@ -83,8 +85,8 @@ class CustusXBuilder:
         shell.run('rm -r -f *.dmg')
         shell.run('rm -r -f *.tar.gz')
         # create new
-        #shell.run('make package')
-        shell.run('cpack --verbose') # same as make package, given that make has been run, but more verbose
+        shell.run('make package')
+        #shell.run('cpack --verbose') # same as make package, given that make has been run, but more verbose
 
     def publishDoxygen(self):
         PrintFormatter.printHeader('copy/publish doxygen to medtek server (link from wiki)', level=2)

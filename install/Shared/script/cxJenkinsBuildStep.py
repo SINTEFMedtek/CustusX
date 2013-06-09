@@ -37,17 +37,31 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         ''
         super(Controller, self).__init__()
 
-        data = self.cxBuilder.assembly.controlData        
-        data.setBuildType("Release")
-
     def getDescription(self):                  
         return 'Jenkins script for build, test and deployment of CustusX and dependents.'
        
+    def _addArgumentParserArguments(self):
+        'subclasses can add parser arguments here'
+        super(Controller, self)._addArgumentParserArguments()
+        p = self.argumentParser
+        p.add_argument('--skip_build', action='store_true', default=False, help='Skip the checkout, configure, build step.')
+        p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
+        p.add_argument('--skip_package', action='store_true', default=False, help='Skip creating the installer')
+
+    def _applyArgumentParserArguments(self, options):
+        'apply arguments defined in _addArgumentParserArguments()'
+        super(Controller, self)._applyArgumentParserArguments(options)
+        data = self.cxBuilder.assembly.controlData        
+        data.setBuildType("Release")
+
     def run(self):
-        self.cxBuilder.buildAllComponents()
-        self.cxBuilder.clearTestData()
-        self.cxBuilder.runAllTests()
-        self.cxBuilder.createInstallerPackage()   
+        if not self.argumentParserArguments.skip_build:
+            self.cxBuilder.buildAllComponents()
+        if not self.argumentParserArguments.skip_tests:
+            self.cxBuilder.clearTestData()
+            self.cxBuilder.runAllTests()
+        if not self.argumentParserArguments.skip_package:
+            self.cxBuilder.createInstallerPackage()   
         self.cxBuilder.finish()
                      
 
