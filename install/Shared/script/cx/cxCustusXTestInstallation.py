@@ -111,8 +111,11 @@ class CustusXTestInstallation:
         path = os.path.dirname(dmgfile)
         basename = os.path.basename(dmgfile)
         changeDir(path)
+        print 'basename: ', basename
+        print 'basename split: ', basename.split('.')
         #coreName = os.path.splitext(basename)[0]
         coreName = basename.split('.')[0]
+        print 'coreName: ', coreName
         if not pkgName:
             pkgName = coreName + '.pkg'
         print "install package %s from file %s" % (pkgName, coreName)
