@@ -140,12 +140,12 @@ class CustusXTestInstallation:
         ''
         p = subprocess.Popen(application, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=os.path.dirname(application)) 
         time.sleep(timeout)
-        #print p.stdout.read() # drop this: causes app to hang
         retcode = p.poll()
         self.assertTrue(retcode==None or retcode==0, 'Process %s has been running successfully for %is' % (application, timeout))
         if retcode==None:
             p.kill()
         p.wait()
+        print p.stdout.read() # drop this: causes app to hang
         print 'Successfully ran %s for %is' % (application, timeout)
         # also consider otool -L
         return
