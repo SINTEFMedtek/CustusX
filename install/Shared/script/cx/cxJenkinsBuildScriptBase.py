@@ -55,6 +55,7 @@ class JenkinsBuildScriptBaseBase(object):
         p = self.argumentParser
         p.add_argument('--root_dir', default=None, help='specify root folder, default=None')
         p.add_argument('-d', '--dummy', action='store_true', default=False, help='execute script without calling any shell commands')
+        p.add_argument('--skip_redirect', action='store_true', default=False, help='skip redirecting stout/stderr through python. This can cause stout mangling on the Jenkins server.')
         pass
 
     def _createArgumentParser(self):        
@@ -65,6 +66,7 @@ class JenkinsBuildScriptBaseBase(object):
         shell.setDummyMode(options.dummy)
         data = self.cxBuilder.assembly.controlData        
         data.setRootDir(options.root_dir)
+        shell.setRedirectOutput(not options.skip_redirect)
 
 class JenkinsBuildScriptBase(JenkinsBuildScriptBaseBase):
     '''
