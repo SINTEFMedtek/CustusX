@@ -113,5 +113,6 @@ class PowerControl:
         else:
             print '*** run:', cmd
             p = subprocess.Popen(cmd, shell=True, cwd=None)
+            p.wait()
     
 
