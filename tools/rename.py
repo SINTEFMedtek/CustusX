@@ -64,41 +64,38 @@ Gives infomation about a file.
 
 Example:
 abs/or/rel/path/to/test.h
-    get_absolute_file_path -> abs/path/to/test.h
+    get_absolute_path -> abs/path/to/test.h
     get_folder_path -> abs/path/to
-    get_file_name -> test.h
-    get_file_base_name -> test
-    get_file_extension -> .h
+    get_name -> test.h
+    get_base_name -> test
+    get_extension -> .h
 '''
-class FileInfo:
+class File:
     def __init__(self, path_to_file):
         self.exists = os.path.isfile(path_to_file)
         if(not self.exists):
             raise RuntimeError("File does not exist: "+path_to_file)
         self.path_to_file = path_to_file
-        self.absolute_file_path = self.get_absolute_file_path()
-        self.folder_path = self.get_folder_path()
-        self.file_name = self.get_file_name()
-        self.file_base_name = self.get_file_base_name()
-        self.file_extension = self.get_file_extension()
+        return
        
-    def get_absolute_file_path(self):
+    def get_absolute_path(self):
         return os.path.abspath(self.path_to_file)
      
     def get_folder_path(self):
-        return os.path.dirname(self.absolute_file_path)
+        return os.path.dirname(self.get_absolute_path())
         
-    def get_file_name(self):
-        return os.path.basename(self.absolute_file_path)
+    def get_name(self):
+        return os.path.basename(self.get_absolute_path())
     
-    def get_file_base_name(self):
-        file_name = self.get_file_name()
+    def get_base_name(self):
+        file_name = self.get_name()
         base, ext = os.path.splitext(file_name)
         return base
         
-    def get_file_extension(self):
-        root, ext = os.path.splitext(self.absolute_file_path)
+    def get_extension(self):
+        root, ext = os.path.splitext(self.get_absolute_path())
         return ext
+    
 '''
 Will present information about a cplusplus header and source pair.
 
@@ -114,18 +111,19 @@ class CppFilePair:
     def __init__(self, path_to_header_file):
         self.header_extensions = [".h"]
         self.source_extensions = [".cpp"]
-        self._find_cpp_file_pair(path_to_header_file)
+        abs_path = os.path.abspath(path_to_header_file)
+        self._find_cpp_file_pair(abs_path)
         
     def is_valid(self):
         return os.path.isfile(self.get_header_file()) and os.path.isfile(self.get_source_file())
     
     def get_header_extension(self):
-        info = FileInfo(self.get_header_file())
-        return info.get_file_extension()
+        file = File(self.get_header_file())
+        return file.get_extension()
     
     def get_source_extension(self):
-        info = FileInfo(self.get_source_file())
-        return info.get_file_extension()
+        file = File(self.get_source_file())
+        return file.get_extension()
     
     def get_header_file(self):
         return self.header_file_abs_path
@@ -174,30 +172,33 @@ class CppFilePair:
     def print_diff(self):
         self._diff(self.header_file_abs_path_backup, self.header_file_abs_path)
         self._diff(self.source_file_abs_path_backup, self.source_file_abs_path)
+        return
         
     def _diff(self, fromfile_abs_path, tofile_abs_path):
         fromlines = open(fromfile_abs_path, "r").readlines()
         tolines = open(tofile_abs_path, "r").readlines()
         diff = difflib.unified_diff(fromlines, tolines, fromfile_abs_path, tofile_abs_path)
         sys.stdout.writelines(diff)
+        return
     
     def _find_cpp_file_pair(self, path_to_file):
-        file_info = FileInfo(path_to_file)
-        self.header_file_abs_path = self._find_header_file(file_info)
-        self.source_file_abs_path = self._find_source_file(file_info)
+        file = File(path_to_file)
+        self.header_file_abs_path = self._find_header_file(file)
+        self.source_file_abs_path = self._find_source_file(file)
+        return
         
-    def _find_header_file(self, info):
-        list = self._find_files_in_folder(info.folder_path, info.file_base_name, self.header_extensions)
+    def _find_header_file(self, file):
+        list = self._find_files_in_folder(file.get_folder_path(), file.get_base_name(), self.header_extensions)
         if(len(list) < 1):
             raise RuntimeError("Could not find a header file.")
-        header = os.path.normpath(info.folder_path+"/"+list[0])
+        header = os.path.normpath(file.get_folder_path()+"/"+list[0])
         return header
     
-    def _find_source_file(self, info):
-        list = self._find_files_in_folder(info.folder_path, info.file_base_name, self.source_extensions)
+    def _find_source_file(self, file):
+        list = self._find_files_in_folder(file.get_folder_path(), file.get_base_name(), self.source_extensions)
         if(len(list) < 1):
             raise RuntimeError("Could not find a source file.")
-        source = os.path.normpath(info.folder_path+"/"+list[0])
+        source = os.path.normpath(file.get_folder_path()+"/"+list[0])
         return source
         
     def _find_files_in_folder(self, folder_path, file_base_name, extension_list):
@@ -211,11 +212,12 @@ class CppFilePair:
         return os.path.isfile(self.header_file_abs_path_backup) and os.path.isfile(self.source_file_abs_path_backup) 
     
     def _backup_file(self, file_abs_path):
-        info = FileInfo(file_abs_path)
-        backup_file_abs_path = ".BACKUP"+info.get_file_extension()
+        file = File(file_abs_path)
+        backup_file_abs_path = ".BACKUP"+file.get_extension()
         self._copy_file(os.path.realpath(file_abs_path), os.path.realpath(backup_file_abs_path))
         return backup_file_abs_path
     
+    ##### START refactor out of class? not dependent on self... #####
     def _copy_file(self, src, dst):
         shutil.copyfile(src, dst)
         
@@ -224,24 +226,28 @@ class CppFilePair:
         return
     
     def _rename_file_keep_extension(self, abs_file_path, new_base_name):
-        file_info = FileInfo(abs_file_path)
-        new_abs_file_path = os.path.normpath(file_info.folder_path+"/"+new_base_name+file_info.file_extension)
-        os.rename(file_info.absolute_file_path, new_abs_file_path)
+        file = File(abs_file_path)
+        new_abs_file_path = os.path.normpath(file.get_folder_path()+"/"+new_base_name+file.get_extension())
+        os.rename(file.get_absolute_path(), new_abs_file_path)
         return new_abs_file_path
 
     def _rename_include_guard(self, header_file, new_base_name):
         include_guard_regex = '\S*._H_' # = any number of non-white chars followed by _H_
         new_include_guard = (new_base_name+"_H_").upper()
         self._find_and_replace_text(header_file, include_guard_regex, new_include_guard)
+        return
         
     def _rename_include_header_file(self, source_file, old_header_file_abs_path, new_base_name):
         include_header_regex = '#include \"'+os.path.basename(old_header_file_abs_path)+'\"'
         new_include_header = '#include "'+new_base_name+self.get_header_extension()+'"'
         self._find_and_replace_text(source_file, include_header_regex, new_include_header)
+        return
         
     def _find_and_replace_text(self, abs_file_path, regex_pattern, replace_with_text):
         for line in fileinput.input(abs_file_path, inplace = True):
             sys.stdout.write(re.sub(regex_pattern, replace_with_text, line))
+        return
+    ##### END refactor out of class? not dependent on self... #####
     
 '''
 Renames a cplusplus file pair.
@@ -265,6 +271,7 @@ class CppFileRenamer():
             raise RuntimeError("Header/source file pair is not valid, cannot rename.")
         self.cpp_file_pair = cpp_file_pair
         self.new_base_name = new_base_name
+        return
 
     def rename(self):
         self.cpp_file_pair.backup()
@@ -272,6 +279,7 @@ class CppFileRenamer():
         self.cpp_file_pair.update_include_guard(self.new_base_name)
         self.cpp_file_pair.update_include_header(self.new_base_name)
         self._ask_if_keep_changes()
+        return 
                    
     def _ask_if_keep_changes(self):
         self._print_changes()
@@ -279,6 +287,7 @@ class CppFileRenamer():
         if(not answere):
             self.cpp_file_pair.restore_from_backup()
         self.cpp_file_pair.delete_backup()
+        return 
         
     def _print_changes(self):
         self.cpp_file_pair.print_diff()
@@ -301,6 +310,8 @@ def main():
     file_pair = CppFilePair(args.header_file)
     renamer = CppFileRenamer(file_pair, args.new_name)
     renamer.rename()
+    
+    return
     
 
 #This idiom means the below code only runs when executed from command line
