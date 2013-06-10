@@ -325,6 +325,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/stereoType", stFRAME_SEQUENTIAL);
 	this->fillDefault("View3D/eyeAngle", 4.0);
 	this->fillDefault("View/showDataText", true);
+	this->fillDefault("View/showLabels", true);
 
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
