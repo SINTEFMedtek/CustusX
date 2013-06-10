@@ -59,6 +59,36 @@ def query_yes_no(question, default="yes"):
             sys.stdout.write("Please respond with 'yes' or 'no' "\
                              "(or 'y' or 'n').\n")
 
+def copy_file(src_abs_path, dst_abs_path):
+    shutil.copyfile(src_abs_path, dst_abs_path)
+    
+def delete_file(file_abs_path):
+    os.remove(file_abs_path)
+    return
+
+def rename_file_keep_extension(abs_file_path, new_base_name):
+    file = File(abs_file_path)
+    new_abs_file_path = os.path.normpath(file.get_folder_path()+"/"+new_base_name+file.get_extension())
+    os.rename(file.get_absolute_path(), new_abs_file_path)
+    return new_abs_file_path
+
+def rename_include_guard(header_file, new_base_name):
+    include_guard_regex = '\S*._H_' # = any number of non-white chars followed by _H_
+    new_include_guard = (new_base_name+"_H_").upper()
+    find_and_replace_text(header_file, include_guard_regex, new_include_guard)
+    return
+    
+def rename_include_header_file(source_file, old_header_file_abs_path, new_base_name):
+    include_header_regex = '#include \"'+os.path.basename(old_header_file_abs_path)+'\"'
+    new_include_header = '#include "'+new_base_name+self.get_header_extension()+'"'
+    find_and_replace_text(source_file, include_header_regex, new_include_header)
+    return
+    
+def find_and_replace_text(abs_file_path, regex_pattern, replace_with_text):
+    for line in fileinput.input(abs_file_path, inplace = True):
+        sys.stdout.write(re.sub(regex_pattern, replace_with_text, line))
+    return
+
 '''
 Gives infomation about a file.
 
@@ -132,16 +162,16 @@ class CppFilePair:
         return self.source_file_abs_path
     
     def rename_pair(self, new_base_name):
-        self.header_file_abs_path = self._rename_file_keep_extension(self.get_header_file(), new_base_name)
-        self.source_file_abs_path = self._rename_file_keep_extension(self.get_source_file(), new_base_name)
+        self.header_file_abs_path = rename_file_keep_extension(self.get_header_file(), new_base_name)
+        self.source_file_abs_path = rename_file_keep_extension(self.get_source_file(), new_base_name)
         return
     
     def update_include_guard(self, new_base_name):
-        self._rename_include_guard(self.get_header_file(), new_base_name)
+        rename_include_guard(self.get_header_file(), new_base_name)
         return
     
     def update_include_header(self, new_base_name):
-        self._rename_include_header_file(self.get_source_file(), self.old_header_file_abs_path, new_base_name)
+        rename_include_header_file(self.get_source_file(), self.old_header_file_abs_path, new_base_name)
         return
     
     def backup(self):
@@ -155,18 +185,18 @@ class CppFilePair:
     def restore_from_backup(self):
         if(not self._is_backed_up()):
             return
-        self._delete_file(self.header_file_abs_path)
-        self._delete_file(self.source_file_abs_path)
-        self._copy_file(self.header_file_abs_path_backup, self.old_header_file_abs_path)
-        self._copy_file(self.source_file_abs_path_backup, self.old_source_file_abs_path)
+        delete_file(self.header_file_abs_path)
+        delete_file(self.source_file_abs_path)
+        copy_file(self.header_file_abs_path_backup, self.old_header_file_abs_path)
+        copy_file(self.source_file_abs_path_backup, self.old_source_file_abs_path)
         self.header_file_abs_path = self.old_header_file_abs_path
         self.source_file_abs_path = self.old_source_file_abs_path
         print '[FILES RESTORED]'
         return
         
     def delete_backup(self):
-        self._delete_file(self.header_file_abs_path_backup)
-        self._delete_file(self.source_file_abs_path_backup)
+        delete_file(self.header_file_abs_path_backup)
+        delete_file(self.source_file_abs_path_backup)
         return
         
     def print_diff(self):
@@ -214,40 +244,8 @@ class CppFilePair:
     def _backup_file(self, file_abs_path):
         file = File(file_abs_path)
         backup_file_abs_path = ".BACKUP"+file.get_extension()
-        self._copy_file(os.path.realpath(file_abs_path), os.path.realpath(backup_file_abs_path))
+        copy_file(os.path.realpath(file_abs_path), os.path.realpath(backup_file_abs_path))
         return backup_file_abs_path
-    
-    ##### START refactor out of class? not dependent on self... #####
-    def _copy_file(self, src, dst):
-        shutil.copyfile(src, dst)
-        
-    def _delete_file(self, file_abs_path):
-        os.remove(file_abs_path)
-        return
-    
-    def _rename_file_keep_extension(self, abs_file_path, new_base_name):
-        file = File(abs_file_path)
-        new_abs_file_path = os.path.normpath(file.get_folder_path()+"/"+new_base_name+file.get_extension())
-        os.rename(file.get_absolute_path(), new_abs_file_path)
-        return new_abs_file_path
-
-    def _rename_include_guard(self, header_file, new_base_name):
-        include_guard_regex = '\S*._H_' # = any number of non-white chars followed by _H_
-        new_include_guard = (new_base_name+"_H_").upper()
-        self._find_and_replace_text(header_file, include_guard_regex, new_include_guard)
-        return
-        
-    def _rename_include_header_file(self, source_file, old_header_file_abs_path, new_base_name):
-        include_header_regex = '#include \"'+os.path.basename(old_header_file_abs_path)+'\"'
-        new_include_header = '#include "'+new_base_name+self.get_header_extension()+'"'
-        self._find_and_replace_text(source_file, include_header_regex, new_include_header)
-        return
-        
-    def _find_and_replace_text(self, abs_file_path, regex_pattern, replace_with_text):
-        for line in fileinput.input(abs_file_path, inplace = True):
-            sys.stdout.write(re.sub(regex_pattern, replace_with_text, line))
-        return
-    ##### END refactor out of class? not dependent on self... #####
     
 '''
 Renames a cplusplus file pair.
