@@ -99,7 +99,7 @@ class CustusXTestInstallation:
         unpackedfolder = "%s/%s" % (temp_path,corename)
         installfolder = '%s' % self.install_root
         shell.changeDir(installfolder)
-        shell.run('cp -r %s %s' % (unpackedfolder, installfolder))
+        shell.run('cp -r %s/* %s' % (unpackedfolder, installfolder))
         print 'Installed \n\t%s\nto folder \n\t%s ' % (filename, installfolder)
 
     def _installDMG(self, dmgfile, pkgName=None):
