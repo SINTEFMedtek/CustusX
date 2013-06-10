@@ -75,16 +75,16 @@ def rename_file_keep_extension(abs_file_path, new_base_name):
 def rename_include_guard(header_file, new_base_name):
     include_guard_regex = '\S*._H_' # = any number of non-white chars followed by _H_
     new_include_guard = (new_base_name+"_H_").upper()
-    find_and_replace_text(header_file, include_guard_regex, new_include_guard)
+    find_and_replace_text_in_file(header_file, include_guard_regex, new_include_guard)
     return
     
-def rename_include_header_file(source_file, old_header_file_abs_path, new_base_name):
+def rename_include_header_file(source_file, old_header_file_abs_path, header_extension, new_base_name):
     include_header_regex = '#include \"'+os.path.basename(old_header_file_abs_path)+'\"'
-    new_include_header = '#include "'+new_base_name+self.get_header_extension()+'"'
-    find_and_replace_text(source_file, include_header_regex, new_include_header)
+    new_include_header = '#include "'+new_base_name+header_extension+'"'
+    find_and_replace_text_in_file(source_file, include_header_regex, new_include_header)
     return
     
-def find_and_replace_text(abs_file_path, regex_pattern, replace_with_text):
+def find_and_replace_text_in_file(abs_file_path, regex_pattern, replace_with_text):
     for line in fileinput.input(abs_file_path, inplace = True):
         sys.stdout.write(re.sub(regex_pattern, replace_with_text, line))
     return
@@ -171,7 +171,7 @@ class CppFilePair:
         return
     
     def update_include_header(self, new_base_name):
-        rename_include_header_file(self.get_source_file(), self.old_header_file_abs_path, new_base_name)
+        rename_include_header_file(self.get_source_file(), self.old_header_file_abs_path, self.get_header_extension(), new_base_name)
         return
     
     def backup(self):
