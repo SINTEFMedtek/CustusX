@@ -120,10 +120,12 @@ set(ALL_LIBRARY_DIRS
     ${CustusX3_BINARY_DIR}/source/service/video
     ${CustusX3_BINARY_DIR}/source/service/visualization
     ${CustusX3_BINARY_DIR}/source/resource
+    ${CustusX3_BINARY_DIR}/source/resource/testUtilities
     ${CustusX3_BINARY_DIR}/source/resource/algorithms
     ${CustusX3_BINARY_DIR}/source/resource/settings
     ${CustusX3_BINARY_DIR}/source/resource/utilities
     ${CustusX3_BINARY_DIR}/source/resource/OpenIGTLinkUtilities
+    ${CustusX3_BINARY_DIR}/source/resource/videoServer
     ${CustusX3_BINARY_DIR}/source/plugins/Acquisition
     ${CustusX3_BINARY_DIR}/source/plugins/Acquisition/logic
     ${CustusX3_BINARY_DIR}/source/plugins/Acquisition/gui
@@ -144,8 +146,7 @@ set(ALL_LIBRARY_DIRS
     ${CustusX3_BINARY_DIR}/source/logic/
     ${CustusX3_BINARY_DIR}/source/apps/grabberServer
     ${CustusX3_BINARY_DIR}/source/apps/OpenIGTLinkServer
-    ${CustusX3_BINARY_DIR}/source/resource/videoServer
-	${CustusX3_BINARY_DIR}/source/testing
+    ${CustusX3_BINARY_DIR}/source/testing
 	)
 
 cx_install_all_stored_targets(${CX_INSTALL_BINARY_DIR})
