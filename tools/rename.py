@@ -133,17 +133,36 @@ class CppFilePair:
     def get_source_file(self):
         return self.source_file_abs_path
     
+    def rename_pair(self, new_base_name):
+        self.header_file_abs_path = self._rename_file_keep_extension(self.get_header_file(), new_base_name)
+        self.source_file_abs_path = self._rename_file_keep_extension(self.get_source_file(), new_base_name)
+        return
+    
+    def update_include_guard(self, new_base_name):
+        self._rename_include_guard(self.get_header_file(), new_base_name)
+        return
+    
+    def update_include_header(self, new_base_name):
+        self._rename_include_header_file(self.get_source_file(), self.old_header_file_abs_path, new_base_name)
+        return
+    
     def backup(self):
+        self.old_header_file_abs_path = self.header_file_abs_path
         self.header_file_abs_path_backup = self._backup_file(self.header_file_abs_path)
+        self.old_source_file_abs_path = self.source_file_abs_path
         self.source_file_abs_path_backup = self._backup_file(self.source_file_abs_path)
-        print '[BACKED UP FILES]'
+        print '[FILES BACKED UP]'
         return
         
     def restore_from_backup(self):
         if(not self._is_backed_up()):
             return
-        self._copy_file(self.header_file_abs_path_backup, self.header_file_abs_path)
-        self._copy_file(self.source_file_abs_path_backup, self.source_file_abs_path)
+        self._delete_file(self.header_file_abs_path)
+        self._delete_file(self.source_file_abs_path)
+        self._copy_file(self.header_file_abs_path_backup, self.old_header_file_abs_path)
+        self._copy_file(self.source_file_abs_path_backup, self.old_source_file_abs_path)
+        self.header_file_abs_path = self.old_header_file_abs_path
+        self.source_file_abs_path = self.old_source_file_abs_path
         print '[FILES RESTORED]'
         return
         
@@ -153,11 +172,14 @@ class CppFilePair:
         return
         
     def print_diff(self):
-        self._diff(self.source_file_abs_path, self.source_file_abs_path_backup)
-        self._diff(self.header_file_abs_path, self.header_file_abs_path_backup)
+        self._diff(self.header_file_abs_path_backup, self.header_file_abs_path)
+        self._diff(self.source_file_abs_path_backup, self.source_file_abs_path)
         
-    def _diff(self, file1_abs_path, file2_abs_path):
-        difflib.SequenceMatcher(None, open(file1_abs_path).read(), file2.read(file2_abs_path))
+    def _diff(self, fromfile_abs_path, tofile_abs_path):
+        fromlines = open(fromfile_abs_path, "r").readlines()
+        tolines = open(tofile_abs_path, "r").readlines()
+        diff = difflib.unified_diff(fromlines, tolines, fromfile_abs_path, tofile_abs_path)
+        sys.stdout.writelines(diff)
     
     def _find_cpp_file_pair(self, path_to_file):
         file_info = FileInfo(path_to_file)
@@ -200,7 +222,27 @@ class CppFilePair:
     def _delete_file(self, file_abs_path):
         os.remove(file_abs_path)
         return
+    
+    def _rename_file_keep_extension(self, abs_file_path, new_base_name):
+        file_info = FileInfo(abs_file_path)
+        new_abs_file_path = os.path.normpath(file_info.folder_path+"/"+new_base_name+file_info.file_extension)
+        os.rename(file_info.absolute_file_path, new_abs_file_path)
+        return new_abs_file_path
 
+    def _rename_include_guard(self, header_file, new_base_name):
+        include_guard_regex = '\S*._H_' # = any number of non-white chars followed by _H_
+        new_include_guard = (new_base_name+"_H_").upper()
+        self._find_and_replace_text(header_file, include_guard_regex, new_include_guard)
+        
+    def _rename_include_header_file(self, source_file, old_header_file_abs_path, new_base_name):
+        include_header_regex = '#include \"'+os.path.basename(old_header_file_abs_path)+'\"'
+        new_include_header = '#include "'+new_base_name+self.get_header_extension()+'"'
+        self._find_and_replace_text(source_file, include_header_regex, new_include_header)
+        
+    def _find_and_replace_text(self, abs_file_path, regex_pattern, replace_with_text):
+        for line in fileinput.input(abs_file_path, inplace = True):
+            sys.stdout.write(re.sub(regex_pattern, replace_with_text, line))
+    
 '''
 Renames a cplusplus file pair.
 This means changing:
@@ -225,39 +267,15 @@ class CppFileRenamer():
         self.new_base_name = new_base_name
 
     def rename(self):
-        self._backup()
-        self._rename_include_guard(self.cpp_file_pair.get_header_file())
-        self._rename_include_header_file(self.cpp_file_pair.get_source_file())
-        self._rename_file_keep_extension(self.cpp_file_pair.get_header_file())
-        self._rename_file_keep_extension(self.cpp_file_pair.get_source_file())
-        #self._ask_if_keep_changes()
-        
-    def _rename_file_keep_extension(self, abs_file_path):
-        file_info = FileInfo(abs_file_path)
-        new_abs_file_path = os.path.normpath(file_info.folder_path+"/"+self.new_base_name+file_info.file_extension)
-        os.rename(file_info.absolute_file_path, new_abs_file_path)
-
-    def _rename_include_guard(self, header_file):
-        include_guard_regex = '\S*._H_' # = any number of non-white chars followed by _H_
-        new_include_guard = (self.new_base_name+"_H_").upper()
-        self._find_and_replace_text(header_file, include_guard_regex, new_include_guard)
-        
-    def _rename_include_header_file(self, source_file):
-        h_info = FileInfo(self.cpp_file_pair.get_header_file()) 
-        include_header_regex = '#include \"'+h_info.file_name+'\"'
-        new_include_header = '#include "'+self.new_base_name+self.cpp_file_pair.get_header_extension()+'"'
-        self._find_and_replace_text(source_file, include_header_regex, new_include_header)
-        
-    def _find_and_replace_text(self, abs_file_path, regex_pattern, replace_with_text):
-        for line in fileinput.input(abs_file_path, inplace = True):
-            sys.stdout.write(re.sub(regex_pattern, replace_with_text, line))
-            
-    def _backup(self):
         self.cpp_file_pair.backup()
-        
+        self.cpp_file_pair.rename_pair(self.new_base_name)
+        self.cpp_file_pair.update_include_guard(self.new_base_name)
+        self.cpp_file_pair.update_include_header(self.new_base_name)
+        self._ask_if_keep_changes()
+                   
     def _ask_if_keep_changes(self):
         self._print_changes()
-        answere = query_yes_no("Keep these changes?")
+        answere = query_yes_no("\nKeep these changes?")
         if(not answere):
             self.cpp_file_pair.restore_from_backup()
         self.cpp_file_pair.delete_backup()
