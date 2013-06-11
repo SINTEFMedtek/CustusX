@@ -30,7 +30,7 @@
 
 #include "sscGraphicalPrimitives.h"
 #include "sscToolManager.h"
-#include "sscTool.h"
+#include "sscProbe.h"
 #include "sscView.h"
 #include "sscVideoSourceGraphics.h"
 #include "sscTypeConversions.h"
