@@ -124,7 +124,6 @@ void TSFPresets::saveFile(QString folderpath, std::map<QString, QString> paramet
 {
 	QFile file(folderpath + mLastCustomPresetAdded);
 	QString customPresetName = QFileInfo(file).fileName();
-//	this->editParameterFile(customPresetName, true);
 	QTextStream outPresetFile;
 	if (!file.open(QFile::WriteOnly))
 	{
@@ -142,54 +141,10 @@ void TSFPresets::saveFile(QString folderpath, std::map<QString, QString> paramet
 	file.close();
 }
 
-//void TSFPresets::editParameterFile(QString name, bool addNotRemove)
-//{
-//	QString parametersFile = mPresetPath + "/parameters";
-//	QFile paramFile(parametersFile);
-//	if (!paramFile.exists())
-//	{
-//		ssc::messageManager()->sendError("The file " + parametersFile + " does not exist.");
-//		return;
-//	}
-//	if (!paramFile.open(QFile::ReadOnly))
-//	{
-//		ssc::messageManager()->sendError("Could not open the file " + parametersFile + " for reading.");
-//		return;
-//	}
-//	QTextStream inText;
-//	inText.setDevice(&paramFile);
-//	QString allText = inText.readAll();
-//	paramFile.close();
-//	if (addNotRemove)
-//	{
-//		if (!allText.contains(name, Qt::CaseInsensitive))
-//		{
-//			QString searchString = "parameters str none";
-//			int index = allText.indexOf(searchString);
-//			index += searchString.size();
-//			allText.insert(index, " " + name);
-//		}
-//	}
-//	else
-//	{
-//		allText.replace(" " + name, "");
-//	}
-//	if (!paramFile.open(QFile::WriteOnly | QFile::Truncate))
-//	{
-//		ssc::messageManager()->sendError("Could not open the file " + parametersFile + " for writing.");
-//		return;
-//	}
-//	QTextStream outParametersFile(&paramFile);
-//	outParametersFile << allText;
-//	outParametersFile << flush;
-//	paramFile.close();
-//}
-
 void TSFPresets::deleteFile(QString filePath)
 {
 	QFile file(filePath);
 	QString customPresetName = QFileInfo(file).fileName();
-//	this->editParameterFile(customPresetName, false);
 	if (!file.remove())
 		ssc::messageManager()->sendError("File: " + filePath + " not removed...");
 }
