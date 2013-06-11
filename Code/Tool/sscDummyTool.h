@@ -30,14 +30,14 @@ public:
 		return mProbeData.getType() != ssc::ProbeData::tNONE;
 	}
 	virtual QStringList getAvailableVideoSources() { return QStringList() << "active"; }
-	virtual ProbeData getData(QString uid="active") const
+	virtual ProbeData getProbeData(QString uid="active") const
 	{
 		return mProbeData;
 	}
 	virtual ProbeSectorPtr getSector(QString uid="active")
 	{
 		ssc::ProbeSectorPtr retval(new ssc::ProbeSector());
-		retval->setData(this->getData());
+		retval->setData(this->getProbeData());
 		return retval;
 	}
 	virtual VideoSourcePtr getRTSource(QString uid="active") const
@@ -56,10 +56,10 @@ public:
 	virtual QString getConfigId() const { return QString(); }
 	virtual QString getConfigurationPath() const { return QString(); }
 
-	virtual void setConfigId(QString uid) {}
+	virtual void applyNewConfigurationWithId(QString uid) {}
 	virtual void setTemporalCalibration(double val) {}
 	virtual void setSoundSpeedCompensationFactor(double val) {}
-	virtual void setData(ssc::ProbeData probeSector, QString configUid="")
+	virtual void setProbeSector(ssc::ProbeData probeSector)
 	{
 		mProbeData = probeSector;
 		emit sectorChanged();
@@ -155,13 +155,13 @@ public:
 	{
 		mProbeData = probeData;
 		mProbe.reset(new DummyProbe());
-		mProbe->setData(mProbeData);
+		mProbe->setProbeSector(mProbeData);
 		emit toolProbeSector();
 	}
 	void setProbeSector(ProbePtr probe)
 	{
 		mProbe = probe;
-		mProbeData = probe->getData();
+		mProbeData = probe->getProbeData();
 		emit toolProbeSector();
 	}
 	virtual double getTimestamp() const { return ssc::getMilliSecondsSinceEpoch(); }

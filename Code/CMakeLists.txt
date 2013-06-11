@@ -67,6 +67,7 @@ SET( SSC_QT_MOC_HEADER_FILES
         
     Tool/sscToolManager.h
     Tool/sscTool.h 
+    Tool/sscProbe.h 
     Tool/sscDummyTool.h
     Tool/sscDummyToolManager.h
     Tool/sscManualTool.h

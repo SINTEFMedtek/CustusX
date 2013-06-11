@@ -64,7 +64,7 @@ double ProbeAdapterRTSource::getTimestamp()
 	QString uid = mBase->getUid();
 	ProbePtr probe = mProbe.lock();
 	if (probe)
-		return mBase->getTimestamp() - probe->getData(uid).getTemporalCalibration();
+		return mBase->getTimestamp() - probe->getProbeData(uid).getTemporalCalibration();
 	else
 		return mBase->getTimestamp();
 }
@@ -87,7 +87,7 @@ void ProbeAdapterRTSource::newFrameSlot()
 	mRedirecter->Update();
 
 	QString uid = mBase->getUid();
-	ssc::ProbeData data = probe->getData(uid);
+	ssc::ProbeData data = probe->getProbeData(uid);
 	QSize dimProbe = data.getImage().mSize;
 	QSize dimImage(mRedirecter->GetOutput()->GetDimensions()[0], mRedirecter->GetOutput()->GetDimensions()[1]);
 
@@ -102,7 +102,7 @@ void ProbeAdapterRTSource::newFrameSlot()
 		            .arg(uid));
 
 		data.resample(dimImage);
-		probe->setData(data, probe->getConfigId());
+		probe->setProbeSector(data);
 	}
 
 }
@@ -116,7 +116,7 @@ void ProbeAdapterRTSource::probeChangedSlot()
 	mRedirecter->Update();
 
 	QString uid = mBase->getUid();
-	mRedirecter->SetOutputSpacing(probe->getData(uid).getImage().mSpacing.begin());
+	mRedirecter->SetOutputSpacing(probe->getProbeData(uid).getImage().mSpacing.begin());
 
 	mRedirecter->Update();
 }
