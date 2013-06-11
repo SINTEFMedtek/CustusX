@@ -26,24 +26,24 @@ class TSFPresets : public ssc::Presets
 
 public:
 	TSFPresets();
-	virtual ~TSFPresets(){};
+	virtual ~TSFPresets();
 
-	static QDomElement createPresetElement(QString name, std::map<QString, QString>& parameters);
-	virtual void save(); ///< saves the newly added presets to file
-	virtual void remove(); ///< removes the newly added presets to file
+	static QDomElement createPresetElement(QString name, std::map<QString,QString>& parameters);
+	virtual void save();
+	virtual void remove();
 
 protected:
-	virtual QStringList generatePresetList(QString tag); ///< internally generate the preset list
-	void loadPresetsFromFiles(); ///< loads all preset files in a given location into the system
-	void convertToInternalFormat(std::map<QString, QString>& presets); ///< converts a map of names and filepaths into the internal default list of presets
-	std::map<QString, QString> readFile(QString& filePath); ///< converts a parameter file into a map of parameter names and values
+	virtual QStringList generatePresetList(QString tag);
+	void loadPresetsFromFiles();
+	void convertToInternalFormat(std::map<QString,QString>& presets);
+	std::map<QString,QString> readFile(QString& filePath);
+	void saveFile(QString folderPath, std::map<QString,QString> parameters);
+	void deleteFile(QString filePath);
+	void getPresetsNameAndPath();
+	void addAsCustomPreset(std::map<QString,QString>::iterator it);
 
-	void saveFile(QString folderPath, std::map<QString, QString> parameters); ///< saves a preset file with the given parameters in the given folder and system
-	void deleteFile(QString filePath); ///< deletes a given preset file from the system
-	void editParameterFile(QString name, bool addNotRemove);
-
-	QString mPresetPath; ///< path to the location where presets can be found and saved
-	std::map<QString, QString> mPresetsMap; ///< map of currently available presets
+	QString mPresetPath;
+	std::map<QString,QString> mPresetsMap;
 };
 typedef boost::shared_ptr<class TSFPresets> TSFPresetsPtr;
 
