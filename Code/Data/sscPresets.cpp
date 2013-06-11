@@ -38,16 +38,12 @@ void Presets::deleteCustomPreset(QString name)
 	mLastCustomPresetRemoved = name;
 	ssc::XmlOptionFile node = this->getPresetNode(name);
 	node.deleteNode();
-
-	//emit changed(); TODO???
 }
 
 void Presets::addCustomPreset(QDomElement& element)
 {
 	mLastCustomPresetAdded = element.attribute("name");
 	this->addPreset(mCustomFile, element);
-
-	//emit changed(); TODO???
 }
 
 void Presets::save()
