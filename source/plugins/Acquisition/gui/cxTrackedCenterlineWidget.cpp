@@ -14,6 +14,7 @@
 #include "cxRecordSessionWidget.h"
 #include "cxTool.h"
 #include "cxPatientService.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {

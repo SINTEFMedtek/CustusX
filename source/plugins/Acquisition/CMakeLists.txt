@@ -15,6 +15,7 @@
 SET( MOC_HEADER_FILES
     logic/cxAcquisitionData.h
     logic/cxUSAcquisition.h
+	logic/cxUSSavingRecorder.h
     gui/cxRecordSessionWidget.h
     gui/cxRecordBaseWidget.h
     gui/cxTrackedCenterlineWidget.h
@@ -35,6 +36,8 @@ SET( SOURCE_FILES
     logic/cxRecordSession.cpp
     logic/cxUSAcquisition.h
     logic/cxUSAcquisition.cpp
+	logic/cxUSSavingRecorder.h
+	logic/cxUSSavingRecorder.cpp
     gui/cxAcquisitionPlugin.h
     gui/cxAcquisitionPlugin.cpp
     gui/cxRecordSessionWidget.h
@@ -87,17 +90,7 @@ set(CX_ACQUISITION_LIBRARIES
 add_library( cxPluginAcquisition ${SOURCE_FILES} )
 target_link_libraries( cxPluginAcquisition ${CX_ACQUISITION_LIBRARIES} )
 
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(cxPluginAcquisition)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(cxPluginAcquisition_unity ${CX_ACQUISITION_LIBRARIES})
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-
-# =========================================================
+CX_COTIRE_ADD_LIBRARY(cxPluginAcquisition "${CX_ACQUISITION_LIBRARIES}")
 
 
 # add/remove to suit your own needs.

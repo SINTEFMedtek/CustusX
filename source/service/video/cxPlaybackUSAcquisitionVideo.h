@@ -19,12 +19,14 @@
 #include <QFutureWatcher>
 #include <vector>
 #include "sscVideoSource.h"
+#include "cxUSReconstructInputData.h"
 #include "cxPlaybackTime.h"
-#include "sscImageImportVideoSource.h"
-#include "cxUsReconstructionFileReader.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
+
 /**
  * \file
  * \addtogroup cxServiceVideo
@@ -48,6 +50,7 @@ public:
 	ssc::VideoSourcePtr getVideoSource();
 	void setRoot(const QString path);
 	void setTime(PlaybackTimePtr controller);
+	bool isActive() const;
 	std::vector<TimelineEvent> getEvents();
 
 private slots:
@@ -60,8 +63,10 @@ private:
 	QStringList getAllFiles(QString folder);
 	QString mRoot;
 	PlaybackTimePtr mTimer;
-	ssc::ImageImportVideoSourcePtr mVideoSource;
+//	ssc::ImageImportVideoSourcePtr mVideoSource;
+	BasicVideoSourcePtr mVideoSource;
 	std::vector<TimelineEvent> mEvents;
+	const QString mVideoSourceUid;
 
 	ssc::USReconstructInputData mCurrentData;
 	std::vector<double> mCurrentTimestamps; // copy of time frame timestamps from mCurrentData.

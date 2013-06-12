@@ -8,15 +8,18 @@
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscImageLUT2D.h"
-#include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
+#include "cxDataInterface.h"
 #include "cxTransferFunctionWidget.h"
 #include "cxVolumePropertiesWidget.h"
+#include "cxVolumeInfoWidget.h"
 #include "cxDataViewSelectionWidget.h"
 #include "cxTransferFunctionAlphaWidget.h"
 #include "cxTransferFunctionColorWidget.h"
+#include "cxTransferFunctionPresetWidget.h"
 #include "cxViewWrapper2D.h"
 #include "cxDataSelectWidget.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {

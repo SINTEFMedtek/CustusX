@@ -31,8 +31,11 @@
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
 #include "sscVolumeHelpers.h"
-#include "sscPresetTransferFunctions3D.h"
+#include "sscTransferFunctions3DPresets.h"
 #include "sscTimeKeeper.h"
+#include "sscUSFrameData.h"
+#include "sscLogger.h"
+#include "cxUSReconstructInputDataAlgoritms.h"
 
 namespace ssc
 {
@@ -171,40 +174,6 @@ void ReconstructPreprocessor::applyTimeCalibration()
     }
 }
 
-/**
- * Linear interpolation between a and b. t = 1 means use only b;
- */
-Transform3D ReconstructPreprocessor::interpolate(const Transform3D& a, const Transform3D& b, double t)
-{
-    Transform3D c;
-    for (int i = 0; i < 4; i++)
-        for (int j = 0; j < 4; j++)
-            c(i, j) = (1 - t) * a(i, j) + t * b(i, j);
-    return c;
-}
-
-/**
- * Interpolation between a and b
- * Spherical interpolation of the rotation, and linear interpolation of the position.
- * Uses Quaternion Slerp, so the rotational part of the matrix have to be converted to
- * Quaternion before the interpolation (and back again afterwards).
- */
-Transform3D ReconstructPreprocessor::slerpInterpolate(const Transform3D& a, const Transform3D& b, double t)
-{
-    //Convert input transforms to Quaternions
-    Eigen::Quaterniond aq = Eigen::Quaterniond(a.matrix().block<3, 3>(0,0));
-    Eigen::Quaterniond bq = Eigen::Quaterniond(b.matrix().block<3, 3>(0,0));
-
-    Eigen::Quaterniond cq = aq.slerp(t, bq);
-
-    Transform3D c;
-    c.matrix().block<3, 3>(0, 0) = Eigen::Matrix3d(cq);
-
-
-    for (int i = 0; i < 4; i++)
-        c(i, 3) = (1 - t) * a(i, 3) + t * b(i, 3);
-    return c;
-}
 
 struct RemoveDataType
 {
@@ -257,7 +226,7 @@ void ReconstructPreprocessor::interpolatePositions()
             if (!similar(t_delta_tracking, 0))
                 t = (mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime) / t_delta_tracking;
 //			mFileData.mFrames[i_frame].mPos = interpolate(mFileData.mPositions[i_pos].mPos, mFileData.mPositions[i_pos + 1].mPos, t);
-            mFileData.mFrames[i_frame].mPos = slerpInterpolate(mFileData.mPositions[i_pos].mPos, mFileData.mPositions[i_pos + 1].mPos, t);
+			mFileData.mFrames[i_frame].mPos = cx::USReconstructInputDataAlgorithm::slerpInterpolate(mFileData.mPositions[i_pos].mPos, mFileData.mPositions[i_pos + 1].mPos, t);
             i_frame++;// Only increment if we didn't delete the frame
         }
     }
@@ -285,23 +254,57 @@ void ReconstructPreprocessor::interpolatePositions()
 }
 
 /**
- * Pre:  mPos is prMt
- * Post: mPos is prMu
+ * Find interpolated position values for each frame based on the input position
+ * data.
+ * Current implementation:
+ * Linear interpolation
  */
-void ReconstructPreprocessor::transformPositionsTo_prMu()
+void ReconstructPreprocessor::interpolatePositions2()
 {
-    // Transform from image coordinate syst with origin in upper left corner
-    // to t (tool) space. TODO check is u is ul corner or ll corner.
-    ssc::Transform3D tMu = mFileData.mProbeData.get_tMu() * mFileData.mProbeData.get_uMv();
+	int startFrames = mFileData.mFrames.size();
 
-    //mPos is prMt
-    for (unsigned i = 0; i < mFileData.mPositions.size(); i++)
-    {
-        ssc::Transform3D prMt = mFileData.mPositions[i].mPos;
-        mFileData.mPositions[i].mPos = prMt * tMu;
-    }
-    //mPos is prMu
+	std::map<int,RemoveDataType> removedData;
+
+	std::vector<double> error = cx::USReconstructInputDataAlgorithm::interpolateFramePositionsFromTracking(&mFileData);
+	SSC_ASSERT(error.size()==mFileData.mFrames.size());
+	int i_frame = 0;
+
+	for (unsigned i = 0; i < error.size(); ++i)
+	{
+		if (error[i] > mMaxTimeDiff)
+		{
+			removedData[i_frame].add(error[i]);
+			mFileData.mFrames.erase(mFileData.mFrames.begin() + i_frame);
+			mFileData.mUsRaw->removeFrame(i_frame);
+		}
+		else
+		{
+			i_frame++;// Only increment if we didn't delete the frame
+		}
+	}
+
+	int removeCount=0;
+	for (std::map<int,RemoveDataType>::iterator iter=removedData.begin(); iter!=removedData.end(); ++iter)
+	{
+		int first = iter->first+removeCount;
+		int last = first + iter->second.count-1;
+		ssc::messageManager()->sendInfo(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
+		removeCount += iter->second.count;
+	}
+
+	double removed = double(startFrames - mFileData.mFrames.size()) / double(startFrames);
+	if (removed > 0.02)
+	{
+		double percent = removed * 100;
+		if (percent > 1)
+			ssc::messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "
+				+ qstring_cast(startFrames) + " frames.");
+		else
+			ssc::messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(
+				startFrames) + " frames.");
+	}
 }
+
 
 /**
  * Generate a rectangle (2D) defining ROI in input image space
@@ -465,7 +468,7 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
     //this->calibrateTimeStamps(0.0, 1.0);
     this->applyTimeCalibration();
 
-    this->transformPositionsTo_prMu();
+	cx::USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(&mFileData);
     //mPos (in mPositions) is now prMu
     this->interpolatePositions();
     // mFrames: now mPos as prMu

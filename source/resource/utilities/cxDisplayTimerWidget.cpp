@@ -12,7 +12,11 @@
 //
 // See CustusX_License.txt for more information.
 
-#include <cxDisplayTimerWidget.h>
+#include "cxDisplayTimerWidget.h"
+
+#include <QTimer>
+#include <QHBoxLayout>
+#include <QLabel>
 
 namespace cx
 {

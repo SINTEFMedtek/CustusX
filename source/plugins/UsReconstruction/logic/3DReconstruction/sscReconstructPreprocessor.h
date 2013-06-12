@@ -19,13 +19,15 @@
 #ifndef SSCRECONSTRUCTPREPROCESSOR_H
 #define SSCRECONSTRUCTPREPROCESSOR_H
 
-#include "sscReconstructAlgorithm.h"
+
 #include "sscBoundingBox3D.h"
 #include "sscReconstructedOutputVolumeParams.h"
 #include "sscReconstructCore.h"
+#include "cxUSReconstructInputData.h"
 
 namespace ssc
 {
+typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
 
 typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
 
@@ -49,20 +51,20 @@ public:
       */
     void initializeCores(std::vector<ReconstructCorePtr> cores); ///< fill input cores with relevant processed input
 
-    static Transform3D slerpInterpolate(const Transform3D& a, const Transform3D& b, double t);
-
 private:
     void cropInputData();
     void updateFromOriginalFileData();
     void findExtentAndOutputTransform();
     ssc::Transform3D applyOutputOrientation();
     std::vector<ssc::Vector3D> generateInputRectangle();
-    void transformPositionsTo_prMu();
+//	void transformPositionsTo_prMu(USReconstructInputData *data);
     void interpolatePositions();
-    Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
+	void interpolatePositions2();
+//	Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
     void applyTimeCalibration();
     void alignTimeSeries();
     void calibrateTimeStamps(double offset, double scale);
+//	std::vector<double> interpolateFramePositionsFromTracking(USReconstructInputData* data) const;
 
     // input data
     ReconstructCore::InputParams mInput;

@@ -15,13 +15,11 @@
 #ifndef CXFILTERTIMEDALGORITHM_H
 #define CXFILTERTIMEDALGORITHM_H
 
-#include <QString>
-#include <QDomElement>
 #include "cxThreadedTimedAlgorithm.h"
-#include "cxFilter.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class Filter> FilterPtr;
 
 /** Wrap a Filter into a TimedAlgorithm
  *

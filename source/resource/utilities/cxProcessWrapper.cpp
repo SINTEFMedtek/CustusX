@@ -12,10 +12,11 @@
 //
 // See CustusX_License.txt for more information.
 
-#include <cxProcessWrapper.h>
+#include "cxProcessWrapper.h"
 #include <QtCore>
 #include "cxDataLocations.h"
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {

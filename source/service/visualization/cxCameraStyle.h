@@ -23,8 +23,6 @@
 
 #include "sscTransform3D.h"
 #include "cxForwardDeclarations.h"
-#include "vtkForwardDeclarations.h"
-#include "sscViewportListener.h"
 #include "sscEnumConverter.h"
 class QIcon;
 class QWidget;

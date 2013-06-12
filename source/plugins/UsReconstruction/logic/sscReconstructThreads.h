@@ -17,25 +17,13 @@
 #include <QObject>
 #include <QThread>
 #include <math.h>
-#include "sscReconstructAlgorithm.h"
-#include "sscBoundingBox3D.h"
-#include "sscReconstructedOutputVolumeParams.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscBoolDataAdapterXml.h"
-#include "sscXmlOptionItem.h"
-#include "sscProbeSector.h"
-#include "cxUsReconstructionFileReader.h"
+#include "cxForwardDeclarations.h"
 #include "cxThreadedTimedAlgorithm.h"
-#include "sscReconstructPreprocessor.h"
 
 namespace ssc
 {
-
-//typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
-//typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
-//typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
-//typedef boost::shared_ptr<class ReconstructParams> ReconstructParamsPtr;
+typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
+typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 
 /**
  * \file
@@ -104,8 +92,6 @@ public:
 	}
 	ThreadedTimedReconstructCore(ReconstructCorePtr reconstructer);
 	virtual ~ThreadedTimedReconstructCore();
-
-//	void start();
 
 private slots:
 	virtual void preProcessingSlot();

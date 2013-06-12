@@ -3,18 +3,24 @@
 #include <QLabel>
 #include <QString>
 #include <QHBoxLayout>
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
-//#include "cxStateService.h"
-#include "cxVideoConnection.h"
-#include "cxToolManager.h"
-#include "cxViewManager.h"
+#include <QAction>
+#include <QToolButton>
 #include <QPixmap>
 #include <QMetaObject>
+
+#include "sscToolManager.h"
+#include "sscMessageManager.h"
+#include "cxVideoConnectionManager.h"
+#include "cxToolManager.h"
+#include "cxViewManager.h"
 #include "cxVideoService.h"
 #include "boost/bind.hpp"
+#include <QMetaMethod>
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
+#include "cxVideoConnection.h"
+#include "sscManualTool.h"
+
 
 namespace cx
 {
@@ -33,8 +39,8 @@ StatusBar::StatusBar() :
 
 	connect(viewManager(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
-	connect(videoService()->getIGTLinkVideoConnection().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
-	connect(videoService()->getIGTLinkVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
+	connect(videoService()->getVideoConnection().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
+	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
 
 	this->addPermanentWidget(mRenderingFpsLabel);
 }
@@ -53,7 +59,7 @@ void StatusBar::connectToToolSignals()
 	for (ssc::ToolManager::ToolMap::iterator it = tools->begin(); it != tools->end(); ++it)
 	{
 		ssc::ToolPtr tool = it->second;
-		if (tool->hasType(Tool::TOOL_MANUAL))
+		if (tool->hasType(ssc::Tool::TOOL_MANUAL))
 			continue;
 		if (tool == ToolManager::getInstance()->getManualTool())
 			continue;
@@ -150,15 +156,17 @@ void StatusBar::tpsSlot(int numTps)
 
 void StatusBar::grabbingFpsSlot(int numFps)
 {
-	OpenIGTLinkRTSourcePtr grabber = videoService()->getIGTLinkVideoConnection()->getVideoSource();
-	QString infoString = grabber->getName() + "-FPS: " + QString::number(numFps);
+	QString infoString = "VideoConnection-FPS: " + QString::number(numFps);
 	mGrabbingInfoLabel->setText(infoString);
 }
 
 void StatusBar::grabberConnectedSlot(bool connected)
 {
 	if (connected)
+	{
 		this->addPermanentWidget(mGrabbingInfoLabel);
+		mGrabbingInfoLabel->show();
+	}
 	else
 		this->removeWidget(mGrabbingInfoLabel);
 }

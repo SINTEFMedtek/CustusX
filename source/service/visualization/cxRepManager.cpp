@@ -20,13 +20,12 @@
 #include "sscTransform3D.h"
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
-//#include "sscPickerRep.h"
 #include "sscGeometricRep.h"
 #include "sscProgressiveLODVolumetricRep.h"
-#include "cxTool.h"
 #include "cxSettings.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
+#include "cxThresholdPreview.h"
 
 namespace cx
 {

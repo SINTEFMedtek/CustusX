@@ -421,7 +421,7 @@ ssc::DataPtr PatientData::importData(QString fileName, QString &infoText)
 		}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
 
-	data->setShading(true);
+	data->setShadingOn(true);
 
 	QDir patientDataDir(mActivePatientFolder);
 
@@ -483,8 +483,8 @@ void PatientData::createPatientFolders(QString choosenDir)
 QString PatientData::getVersionName()
 {
 	QString versionName;
-#ifdef VERSION_NUMBER_VERBOSE
-	versionName = QString("%1").arg(VERSION_NUMBER_VERBOSE);
+#ifdef CustusX3_VERSION_STRING
+	versionName = QString("%1").arg(CustusX3_VERSION_STRING);
 #else
 #endif
 	return versionName;

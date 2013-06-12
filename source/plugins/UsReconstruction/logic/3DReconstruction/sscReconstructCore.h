@@ -19,12 +19,14 @@
 #ifndef SSCRECONSTRUCTCORE_H_
 #define SSCRECONSTRUCTCORE_H_
 
-#include "sscReconstructAlgorithm.h"
+//#include "sscReconstructAlgorithm.h"
 #include "sscBoundingBox3D.h"
+#include "cxForwardDeclarations.h"
 #include "sscReconstructedOutputVolumeParams.h"
 
 namespace ssc
 {
+typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
 
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;
 

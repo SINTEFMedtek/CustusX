@@ -9,6 +9,7 @@
 #define CXREGISTRATIONDATAADAPTERS_H_
 
 #include "cxDataInterface.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {

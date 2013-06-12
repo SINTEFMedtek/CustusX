@@ -2,21 +2,12 @@
 ##               Gui library
 ###########################################################
 
-
 # _USE_MATH_DEFINES Must be defined before math.h is included
 if (CX_WINDOWS)
     add_definitions(-D_USE_MATH_DEFINES)
 endif(CX_WINDOWS)
 
-#if (APPLE)
-#    set(QXT_FOLDER "../ThirdParty/qxt_mac_compatible")
-#else()
-    set(QXT_FOLDER "../ThirdParty/qxt")
-#endif()
-
-# Make VERSION_NUMBER available for c++ files in gui folder
-ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
-ADD_DEFINITIONS(-DVERSION_NUMBER_VERBOSE="${VERSION_NUMBER_VERBOSE}")
+set(QXT_FOLDER "../ThirdParty/qxt")
 
 SET(cxGui_MOC_HDRS
     #----------------------
@@ -26,13 +17,15 @@ SET(cxGui_MOC_HDRS
     dataAdapters/cxDoubleDataAdapterTemporalCalibration.h
     dataAdapters/cxVector3DComponentDataAdapter.h
     dataAdapters/cxDataAdapterHelper.h
+	dataAdapters/cxSelectDataStringDataAdapter.h
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
+    dataWidgets/cxVolumeInfoWidget.h
     dataWidgets/cxShadingWidget.h
     dataWidgets/cxCroppingWidget.h
     dataWidgets/cxClippingWidget.h 
     dataWidgets/cxImagePropertiesWidget.h
-    dataWidgets/cxMeshPropertiesWidget.h
+    dataWidgets/cxMeshInfoWidget.h
     dataWidgets/cxImportDataDialog.h
     dataWidgets/cxExportDataDialog.h
     dataWidgets/cxDataViewSelectionWidget.h
@@ -42,13 +35,13 @@ SET(cxGui_MOC_HDRS
     dataWidgets/sscDICOMWidget.h
     dataWidgets/cxEraserWidget.h
 	dataWidgets/cxDataSelectWidget.h
+	dataWidgets/cxInfoWidget.h
+	dataWidgets/cxTransferFunctionPresetWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
-    infoWidgets/cxBrowserWidget.h
     infoWidgets/cxPointSamplingWidget.h
     infoWidgets/cxMetricWidget.h
-    infoWidgets/cxFrameTreeWidget.h
-    infoWidgets/cxTreeModelItem.h   
+    infoWidgets/cxFrameTreeWidget.h 
     infoWidgets/cxDataMetricWrappers.h   
 	infoWidgets/cxSamplerWidget.h
     #----------------------
@@ -63,7 +56,7 @@ SET(cxGui_MOC_HDRS
     preferencesWidgets/cxLayoutEditorWidget.h
     preferencesWidgets/cxLayoutEditorTab.h
     #----------------------
-    streamingWidgets/cxIGTLinkWidget.h
+    streamingWidgets/cxVideoConnectionWidget.h
     #----------------------
     toolWidgets/cxToolPropertiesWidget.h
     toolWidgets/cxActiveToolWidget.h
@@ -81,6 +74,7 @@ SET(cxGui_MOC_HDRS
     utilities/cxFilePreviewWidget.h
     utilities/cxImagePreviewWidget.h
     utilities/cxToolImagePreviewWidget.h
+    utilities/cxPresetWidget.h
     #----------------------    
     cxMainWindow.h
     cxSecondaryMainWindow.h
@@ -115,12 +109,13 @@ include_directories(
     ${SSC_SOURCE_DIR}/DICOMLib/
     ${SSC_BINARY_DIR}/DICOMLib/
 
-    ${CustusX3_SOURCE_DIR}/modules/OpenIGTLinkServer
+    ${CustusX3_SOURCE_DIR}/source/resource/videoServer
 
     ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/resource/algorithms
+    ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
 
     ${CustusX3_SOURCE_DIR}/source/service/patient     
     ${CustusX3_SOURCE_DIR}/source/service/tracking     
@@ -160,9 +155,13 @@ SET(cxGui_SRCS
     dataAdapters/cxVector3DComponentDataAdapter.cpp
     dataAdapters/cxDataAdapterHelper.h
     dataAdapters/cxDataAdapterHelper.cpp
+	dataAdapters/cxSelectDataStringDataAdapter.h
+	dataAdapters/cxSelectDataStringDataAdapter.cpp
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxVolumePropertiesWidget.cpp
+    dataWidgets/cxVolumeInfoWidget.h
+    dataWidgets/cxVolumeInfoWidget.cpp
     dataWidgets/cxShadingWidget.h
     dataWidgets/cxShadingWidget.cpp
     dataWidgets/cxCroppingWidget.h
@@ -177,8 +176,8 @@ SET(cxGui_SRCS
     dataWidgets/cxTransferFunctionColorWidget.cpp
     dataWidgets/cxImagePropertiesWidget.h
     dataWidgets/cxImagePropertiesWidget.cpp
-    dataWidgets/cxMeshPropertiesWidget.h
-    dataWidgets/cxMeshPropertiesWidget.cpp
+    dataWidgets/cxMeshInfoWidget.h
+    dataWidgets/cxMeshInfoWidget.cpp
     dataWidgets/cxImportDataDialog.h
     dataWidgets/cxImportDataDialog.cpp
     dataWidgets/cxExportDataDialog.h
@@ -191,17 +190,17 @@ SET(cxGui_SRCS
     dataWidgets/cxEraserWidget.cpp
 	dataWidgets/cxDataSelectWidget.h
 	dataWidgets/cxDataSelectWidget.cpp
+	dataWidgets/cxInfoWidget.h
+	dataWidgets/cxInfoWidget.cpp
+	dataWidgets/cxTransferFunctionPresetWidget.h
+	dataWidgets/cxTransferFunctionPresetWidget.cpp
 	#----------------------
-    infoWidgets/cxBrowserWidget.h
-    infoWidgets/cxBrowserWidget.cpp
     infoWidgets/cxFrameTreeWidget.cpp
     infoWidgets/cxFrameTreeWidget.cpp
     infoWidgets/cxPointSamplingWidget.h
     infoWidgets/cxPointSamplingWidget.cpp
     infoWidgets/cxStatusBar.h
     infoWidgets/cxStatusBar.cpp    
-    infoWidgets/cxTreeModelItem.h
-    infoWidgets/cxTreeModelItem.cpp
     infoWidgets/cxMetricWidget.h
     infoWidgets/cxMetricWidget.cpp
     infoWidgets/cxDataMetricWrappers.h   
@@ -229,8 +228,8 @@ SET(cxGui_SRCS
     preferencesWidgets/cxLayoutEditorTab.h
     preferencesWidgets/cxLayoutEditorTab.cpp
     #----------------------    
-    streamingWidgets/cxIGTLinkWidget.h
-    streamingWidgets/cxIGTLinkWidget.cpp
+    streamingWidgets/cxVideoConnectionWidget.h
+    streamingWidgets/cxVideoConnectionWidget.cpp
     #----------------------    
     toolWidgets/cxToolPropertiesWidget.h
     toolWidgets/cxToolPropertiesWidget.cpp
@@ -267,6 +266,8 @@ SET(cxGui_SRCS
     utilities/cxImagePreviewWidget.cpp
     utilities/cxToolImagePreviewWidget.h
     utilities/cxToolImagePreviewWidget.cpp
+    utilities/cxPresetWidget.h
+    utilities/cxPresetWidget.cpp
     #----------------------    
     cxMainWindow.h
     cxMainWindow.cpp 
@@ -286,16 +287,7 @@ endif (SSC_USE_DCMTK)
     
 add_library( cxGui ${cxGui_SRCS} ${cxGui_MOC_SRCS} )
 target_link_libraries( cxGui ${CX_GUI_LIBRARIES} )
+CX_COTIRE_ADD_LIBRARY(cxGui "${CX_GUI_LIBRARIES}")
 
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(cxGui)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(cxGui_unity 
-        		${CX_GUI_LIBRARIES}
-        		)
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+add_subdirectory(testing)
 

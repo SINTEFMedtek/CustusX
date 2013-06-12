@@ -16,12 +16,15 @@
 
 #include "cxToolManager.h"
 
+//#include <boost/thread/thread.hpp>
+
 #include <QTimer>
 #include <QDir>
 #include <QList>
 #include <QMetaType>
 #include <QFileInfo>
 #include <vtkDoubleArray.h>
+#include <QCoreApplication>
 
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
@@ -33,13 +36,13 @@
 #include "cxTool.h"
 #include "cxIgstkTracker.h"
 #include "cxToolConfigurationParser.h"
-//#include "cxRecordSession.h"
 #include "cxManualToolAdapter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
 #include "cxPlaybackTool.h"
 #include "sscLogger.h"
+#include "cxPlaybackTime.h"
 
 namespace cx
 {
@@ -111,6 +114,19 @@ void ToolManager::setPlaybackMode(PlaybackTimePtr controller)
 		return;
 	}
 
+	// attempt to configure tracker if not configured:
+	if (!this->isConfigured())
+		this->configure();
+
+	// wait for connection to complete
+	for (unsigned i=0; i<100; ++i)
+	{
+		if (this->isConfigured())
+			break;
+		qApp->processEvents();
+		mTrackerThread->wait(100);
+	}
+
 	if (!this->isConfigured())
 	{
 		ssc::messageManager()->sendWarning("ToolManager must be configured before setting playback");
@@ -156,7 +172,7 @@ void ToolManager::closePlayBackMode()
 	{
 		if (iter->second==mManualTool)
 			continue; // dont unwrap the manual tool
-		PlaybackToolPtr current = boost::shared_dynamic_cast<PlaybackTool>(iter->second);
+		PlaybackToolPtr current = boost::dynamic_pointer_cast<PlaybackTool>(iter->second);
 		if (current)
 			mTools[current->getBase()->getUid()] = current->getBase();
 	}
@@ -295,6 +311,8 @@ void ToolManager::trackerConfiguredSlot(bool on)
 
 			mTools[it->first] = tool;
 			connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
+			if (tool->hasType(Tool::TOOL_US_PROBE))
+				emit probeAvailable();
 		}
 		else
 			ssc::messageManager()->sendWarning("Creation of the cxTool " + it->second->getUid() + " failed.");
@@ -1004,7 +1022,7 @@ void ToolManager::addXml(QDomNode& parentNode)
 	for (; toolIt != tools->end(); toolIt++)
 	{
 		QDomElement toolNode = doc.createElement("tool");
-		ToolPtr tool = boost::shared_dynamic_cast<Tool>(toolIt->second);
+		ToolPtr tool = boost::dynamic_pointer_cast<Tool>(toolIt->second);
 		if (tool)
 		{
 			tool->addXml(toolNode);
@@ -1051,7 +1069,7 @@ void ToolManager::parseXml(QDomNode& dataNode)
 		QString tool_uid = base.attribute("uid");
 		if (tools->find(tool_uid) != tools->end())
 		{
-			ToolPtr tool = boost::shared_dynamic_cast<Tool>(tools->find(tool_uid)->second);
+			ToolPtr tool = boost::dynamic_pointer_cast<Tool>(tools->find(tool_uid)->second);
 			tool->parseXml(toolNode);
 		}
 	}

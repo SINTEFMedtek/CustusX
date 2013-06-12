@@ -19,6 +19,8 @@ class QLineEdit;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SelectDataStringDataAdapter> SelectDataStringDataAdapterPtr;
+
 /**
  * \file
  * \addtogroup cxPluginCalibration

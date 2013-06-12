@@ -230,6 +230,7 @@ class Controller(object):
 			cmd = cmd + ' ' + ctest_args
 		#cmd = cmd + ' > %s/ctest_results.txt' % path
 		cmd = '%s --output-log %s' % (cmd, self.mCTestResultsFile)
+        #		cmd = '%s' % cmd
 		print 'Running %s ...' % cmd
 		runShell('mkdir -p %s' % self.mOutputPath)
 		runShell(cmd)
@@ -254,7 +255,7 @@ class Controller(object):
 		"""
 		runShell('lcov --capture --directory . --output-file cx_coverage_test.gcov')
 		runShell('lcov --add-tracefile cx_coverage_base.gcov --add-tracefile cx_coverage_test.gcov --output-file cx_coverage_total.gcov')
-		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/Examples/*" --output-file cx_coverage.gcov')
+		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/Examples/*" --output-file cx_coverage.gcov')
 #		runShell('lcov --remove cx_coverage_total.gcov "/eigen3/Eigen/*" "/opt/*" "/external_code/*" "/Library/*" "/usr/*" "/moc*.cxx" "/CustusX3/build_*" "/testing/*" "/Testing/*" "/Examples/*" --output-file cx_coverage.gcov')
 		runShell('genhtml cx_coverage.gcov --output-directory %s' % self.mOutputPath)
 

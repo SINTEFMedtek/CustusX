@@ -24,10 +24,12 @@
 
 #include <vector>
 #include <vtkTransform.h>
+//#include <vtkPolyData.h>
 #include <vtkAbstractVolumeMapper.h>
 #include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkImageData.h>
 #include "sscTypeConversions.h"
 #include "cxRepManager.h"
 #include "sscDataManager.h"
@@ -37,6 +39,7 @@
 #include "sscImage.h"
 #include "sscTransform3D.h"
 #include "sscVolumetricRep.h"
+#include "cxActiveImageProxy.h"
 
 namespace cx
 {
@@ -44,7 +47,7 @@ namespace cx
 class CropBoxCallback: public vtkCommand
 {
 public:
-	CropBoxCallback()
+	CropBoxCallback() : mCropper(NULL)
 	{
 	}
 	static CropBoxCallback* New()
@@ -66,7 +69,7 @@ public:
 class CropBoxEnableCallback: public vtkCommand
 {
 public:
-	CropBoxEnableCallback()
+	CropBoxEnableCallback() : mCropper(NULL), mValue(false)
 	{
 	}
 	static CropBoxEnableCallback* New()
@@ -248,6 +251,28 @@ bool InteractiveCropper::getShowBoxWidget() const
 	if (!mBoxWidget)
 		return false;
 	return mBoxWidget->GetEnabled();
+}
+
+std::vector<int> InteractiveCropper::getDimensions()
+{
+	std::vector<int> dimensions;
+	if(!mImage)
+		return dimensions;
+
+	double spacing_x = 1;
+	double spacing_y = 1;
+	double spacing_z = 1;
+	mImage->getBaseVtkImageData()->GetSpacing(spacing_x, spacing_y, spacing_z);
+
+	ssc::DoubleBoundingBox3D bb = getBoxWidgetSize();
+	int dim_x = (bb.begin()[1] - bb.begin()[0])/spacing_x + 1; //adding 1 because of some rounding errors, is there a better way to do this?
+	int dim_y = (bb.begin()[3] - bb.begin()[2])/spacing_y + 1;
+	int dim_z = (bb.begin()[5] - bb.begin()[4])/spacing_z + 1;
+	dimensions.push_back(dim_x);
+	dimensions.push_back(dim_y);
+	dimensions.push_back(dim_z);
+
+	return dimensions;
 }
 
 /** Set the box widget bounding box to the input box (given in data space)

@@ -16,12 +16,11 @@
 #define CXVIEWWRAPPERRTSTREAM_H_
 
 #include <vector>
-#include <QtGui>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
 #include "sscDefinitions.h"
+
 #include "cxViewWrapper.h"
-#include "cxDominantToolProxy.h"
 
 namespace cx
 {
@@ -46,19 +45,23 @@ public:
 	virtual ~ViewWrapperVideo();
 	virtual ssc::ViewWidget* getView();
 	virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) {}
-	void updateView() {}
+	virtual void updateView() {}
+	virtual void setViewGroup(ViewGroupDataPtr group);
 
 private slots:
 	void updateSlot();
 	void showSectorActionSlot(bool checked);
-	void probeChangedSlot();
-	void configureSlot();
+	void connectStream();
+	void streamActionSlot();
 
 protected:
 	virtual void dataAdded(ssc::DataPtr data) {}
 	virtual void dataRemoved(const QString& uid) {}
+	virtual void videoSourceChangedSlot(QString uid);
 
 private:
+	ssc::VideoSourcePtr getSourceFromService(QString uid);
+	void addStreamAction(QString uid, QMenu* contextMenu);
 	void loadStream();
 	virtual void appendToContextMenu(QMenu& contextMenu);
 	void addReps();
@@ -70,7 +73,6 @@ private:
 	ssc::DisplayTextRepPtr mDataNameText;
 	QPointer<ssc::ViewWidget> mView;
 	ssc::ToolPtr mTool;
-//	DominantToolProxyPtr mDominantToolProxy;
 };
 typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 

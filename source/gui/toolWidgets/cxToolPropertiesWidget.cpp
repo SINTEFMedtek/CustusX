@@ -17,6 +17,7 @@
 #include "cxTool.h"
 #include "cxToolDataAdapters.h"
 #include "cxActiveToolWidget.h"
+#include "sscManualTool.h"
 
 namespace cx
 {
@@ -164,7 +165,7 @@ void ToolPropertiesWidget::spacesChangedSlot()
 
 void ToolPropertiesWidget::dominantToolChangedSlot()
 {
-  ToolPtr cxTool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+  ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(mActiveTool);
 
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));

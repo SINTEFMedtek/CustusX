@@ -22,7 +22,7 @@ UsConfigGui::UsConfigGui(QWidget* parent) :
   this->setWindowTitle("US Probe Properties");
   
   mXmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
-  mXml = new ProbeXmlConfigParser(mXmlFileName);
+  mXml = new ProbeXmlConfigParserImpl(mXmlFileName);
 
   // Initialize settings if empty
   if (!cx::settings()->contains("Scanner"))
@@ -189,7 +189,7 @@ void UsConfigGui::setXml(QString filename)
   }
   
   delete mXml;
-  mXml = new ProbeXmlConfigParser(absolutePath);
+  mXml = new ProbeXmlConfigParserImpl(absolutePath);
   
   this->initComboBoxes();
 }

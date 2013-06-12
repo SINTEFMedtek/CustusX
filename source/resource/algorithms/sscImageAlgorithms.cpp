@@ -1,9 +1,17 @@
-/*
- * sscImageAlgorithms.cpp
- *
- *  \date Nov 11, 2010
- *      \author christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+
 #include "sscImageAlgorithms.h"
 
 #include <vtkImageData.h>
@@ -21,8 +29,8 @@
 #include "sscImageLUT2D.h"
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
+#include "sscTime.h"
 
-typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 
 namespace ssc
 {
@@ -150,53 +158,6 @@ QDateTime extractTimestamp(QString text)
 }
 
 
-/**Convert the input image to the smallest unsigned format.
- *
- * CT images are always shifted +1024 and converted.
- * Other images are shifted so that the smallest intensity
- * is mapped to zero.
- *
- * Either VTK_UNSIGNED_SHORT or VTK_UNSIGNED_INT is used
- * as output, depending on the input range.
- *
- */
-vtkImageDataPtr convertImageToUnsigned(ImagePtr image)
-{
-	vtkImageDataPtr input = image->getBaseVtkImageData();
-
-//	if (input->GetScalarRange()[0] >= 0) // wrong: must convert type even if all data are positive
-//		return input;
-	if (input->GetScalarTypeMin() >= 0)
-		return input;
-
-	vtkImageShiftScalePtr cast = vtkImageShiftScalePtr::New();
-	cast->SetInput(input);
-	cast->ClampOverflowOn();
-
-	// start by shifting up to zero
-	cast->SetShift(-input->GetScalarRange()[0]);
-
-	// if CT: always shift by 1024 (houndsfield units definition)
-	if (image->getModality().contains("CT", Qt::CaseInsensitive))
-		cast->SetShift(1024);
-
-	// total intensity range of voxels:
-	double range = input->GetScalarRange()[1] - input->GetScalarRange()[0];
-
-	// to to fit within smallest type
-	if (range <= VTK_UNSIGNED_SHORT_MAX-VTK_UNSIGNED_SHORT_MIN)
-		cast->SetOutputScalarType(VTK_UNSIGNED_SHORT);
-	else if (range <= VTK_UNSIGNED_INT_MAX-VTK_UNSIGNED_INT_MIN)
-		cast->SetOutputScalarType(VTK_UNSIGNED_INT);
-//	else if (range <= VTK_UNSIGNED_LONG_MAX-VTK_UNSIGNED_LONG_MIN) // not supported by vtk - it seems (crash in rendering)
-//		cast->SetOutputScalarType(VTK_UNSIGNED_LONG);
-	else
-		cast->SetOutputScalarType(VTK_UNSIGNED_INT);
-
-	cast->Update();
-	ssc::messageManager()->sendInfo(QString("Converting image %1 from %2 to %3").arg(image->getName()).arg(input->GetScalarTypeAsString()).arg(cast->GetOutput()->GetScalarTypeAsString()));
-	return cast->GetOutput();
-}
 
 
 } // namespace ssc

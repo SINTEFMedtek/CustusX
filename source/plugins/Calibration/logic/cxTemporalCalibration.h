@@ -9,9 +9,10 @@
 #define CXTEMPORALCALIBRATION_H_
 
 #include <sstream>
-#include "cxUsReconstructionFileReader.h"
 #include "sscVideoRecorder.h"
 #include "sscTool.h"
+#include "cxUSReconstructInputData.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {

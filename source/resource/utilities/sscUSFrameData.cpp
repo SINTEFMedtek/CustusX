@@ -35,7 +35,7 @@
 #include <vtkMetaImageWriter.h>
 #include <vtkImageImport.h>
 #include "sscTypeConversions.h"
-#include "sscDataManagerImpl.h"
+#include "sscDataReaderWriter.h"
 #include <QFileInfo>
 #include "sscTimeKeeper.h"
 #include "cxImageDataContainer.h"
@@ -133,7 +133,7 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 
 	if (QFileInfo(mhdSingleFile).exists())
 	{
-		vtkImageDataPtr image = ssc::MetaImageReader().load(mhdSingleFile);
+		vtkImageDataPtr image = ssc::MetaImageReader().loadVtkImageData(mhdSingleFile);
 		// load from single file
 		USFrameDataPtr retval = USFrameData::create(ImagePtr(new Image(mhdSingleFile, image)));
 		retval->mName = QFileInfo(mhdSingleFile).completeBaseName();
@@ -150,8 +150,10 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 	}
 }
 
-USFrameDataPtr USFrameData::create(QString name, cx::CachedImageDataContainerPtr images)
+USFrameDataPtr USFrameData::create(QString name, cx::ImageDataContainerPtr images)
 {
+	if (!images)
+		return USFrameDataPtr();
 	USFrameDataPtr retval(new USFrameData());
 	retval->mName = name;
 	retval->mImageContainer = images;

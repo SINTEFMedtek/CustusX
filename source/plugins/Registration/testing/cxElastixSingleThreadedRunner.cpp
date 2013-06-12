@@ -1,9 +1,16 @@
-/*
- * cxElastixSingleThreadedRunner.cpp
- *
- *  Created on: Oct 8, 2012
- *      Author: christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 
 #include "cxElastixSingleThreadedRunner.h"
 #include "cxElastixExecuter.h"
@@ -12,6 +19,9 @@
 #include "cxDataLocations.h"
 #include <qapplication.h>
 #include "sscTime.h"
+#include "sscTypeConversions.h"
+#include "sscLogger.h"
+#include "cxElastixParameters.h"
 
 namespace cx
 {
@@ -31,33 +41,21 @@ ElastixSingleThreadedRunner::~ElastixSingleThreadedRunner()
 bool ElastixSingleThreadedRunner::registerLinear(
     ssc::DataPtr fixed,
     ssc::DataPtr moving,
-    QString preset,
+	ElastixParametersPtr preset,
     ssc::Transform3D* result)
 {
 	mCompleted = false;
-	QDir dir(cx::DataLocations::getRootConfigPath() + "/elastix");
-	ssc::XmlOptionFile mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("elastix");
-	ssc::XmlOptionFile node = mOptions.descend("preset", "name", preset);
-	QString mActiveExecutable = node.getElement().attribute("executable");
-	QString mActiveParameterFile0 = dir.filePath(node.getElement().attribute("parameterFile0"));
-	QString mActiveParameterFile1 = dir.filePath(node.getElement().attribute("parameterFile1"));
-
-    QStringList parameterFiles;
-    if (QFileInfo(mActiveParameterFile0).exists() && QFileInfo(mActiveParameterFile0).isFile())
-    	parameterFiles << mActiveParameterFile0;
-    if (QFileInfo(mActiveParameterFile1).exists() && QFileInfo(mActiveParameterFile1).isFile())
-    	parameterFiles  << mActiveParameterFile1;
-
-	QString outPath = QDir::homePath() + "/Patients/testing/elastix/" + QDateTime::currentDateTime().toString(ssc::timestampMilliSecondsFormat() + "/");
+	QString outPath = cx::DataLocations::getTestDataPath() + "/temp/elastix/" + QDateTime::currentDateTime().toString(ssc::timestampMilliSecondsFormat() + "/");
 
 	mExecuter->setDisplayProcessMessages(false);
-	mExecuter->setInput(mActiveExecutable,
+	mExecuter->setDisplayProcessMessages(true);
+	bool ok = mExecuter->setInput(preset->getActiveExecutable(),
 	         fixed,
 	         moving,
 	         outPath,
-	         parameterFiles);
-
-	std::cout << "ElastixSingleThreadedRunner::registerLinear()" << std::endl;
+			 preset->getActiveParameterFiles());
+	if (!ok)
+		return false;
 
 	while (!mCompleted)
 		qApp->processEvents();
@@ -68,15 +66,13 @@ bool ElastixSingleThreadedRunner::registerLinear(
 
 void ElastixSingleThreadedRunner::preprocessExecuter()
 {
-	std::cout << "ElastixSingleThreadedRunner::preprocessExecuter()" << std::endl;
 }
 
 void ElastixSingleThreadedRunner::executionFinishedSlot()
 {
-	std::cout << "ElastixSingleThreadedRunner::executionFinishedSlot()" << std::endl;
-
 	bool ok = false;
 	m_mMf = mExecuter->getAffineResult_mMf(&ok);
+	mCompleted = true;
 
 	if (!ok)
 		return;
@@ -107,7 +103,6 @@ void ElastixSingleThreadedRunner::executionFinishedSlot()
 
 	// add nonlinear data AFTER registering - we dont want these data to be double-registered!
 //	this->addNonlinearData();
-	mCompleted = true;
 }
 
 

@@ -15,18 +15,8 @@
 #ifndef CXTOOLMANAGER_H_
 #define CXTOOLMANAGER_H_
 
-#include "vtkSmartPointer.h"
-
-//#include "sscDummyTool.h"
 #include "sscToolManager.h"
-#include "sscDefinitions.h"
-#include "sscManualTool.h"
-#include "sscLandmark.h"
-
-#include "cxTool.h"
 #include "vtkForwardDeclarations.h"
-#include "cxManualToolAdapter.h"
-#include "cxPlaybackTime.h"
 
 class QDomNode;
 class QDomDocument;
@@ -42,7 +32,9 @@ namespace cx
  * @{
  */
 
+typedef boost::shared_ptr<class ManualToolAdapter> ManualToolAdapterPtr;
 typedef boost::shared_ptr<class IgstkTrackerThread> IgstkTrackerThreadPtr;
+typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
 
 /**
  * \brief Interface towards the navigation system.
@@ -132,6 +124,9 @@ public:
 	ssc::ToolPtr findFirstProbe();
 
 	void setPlaybackMode(PlaybackTimePtr controller);
+
+signals:
+	void probeAvailable(); ///< Emitted when a probe is configured
 
 public slots:
 	void configure(); ///< sets up the software like the xml file suggests

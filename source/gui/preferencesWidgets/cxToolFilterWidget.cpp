@@ -7,6 +7,7 @@
 #include "cxToolManager.h"
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
+#include "cxApplicationStateMachine.h"
 
 namespace cx
 {

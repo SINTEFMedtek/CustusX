@@ -12,108 +12,79 @@
 //
 // See CustusX_License.txt for more information.
 
-/*
- * cxProbe.cpp
- *
- *  \date Feb 3, 2011
- *      \author christiana
- */
 #include "cxProbe.h"
 
 #include <QStringList>
 #include "sscVideoSource.h"
 #include "sscMessageManager.h"
-#include "cxDataLocations.h"
-#include "cxCreateProbeDataFromConfiguration.h"
 #include "sscProbeSector.h"
 #include "sscProbeAdapterRTSource.h"
 #include "sscTypeConversions.h"
 #include "sscVector3D.h"
+#include "sscLogger.h"
+#include "cxDataLocations.h"
+#include "cxCreateProbeDataFromConfiguration.h"
 
 namespace cx
 {
 
-Probe::Probe(QString instrumentUid, QString scannerUid) :
-				mSoundSpeedCompensationFactor(1.0),
-				mInstrumentUid(instrumentUid),
-				mScannerUid(scannerUid)
+ProbePtr Probe::New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml)
 {
-	mOverrideTemporalCalibration = false;
-	mTemporalCalibration = 0;
-	QString xmlFileName = cx::DataLocations::getRootConfigPath() + QString("/tool/ProbeCalibConfigs.xml");
-	mXml.reset(new ProbeXmlConfigParser(xmlFileName));
-
-	QStringList configs = this->getConfigIdList();
-	if (!configs.isEmpty())
-		this->setConfigId(configs[0]);
-	else
-	{
-		ssc::messageManager()->sendWarning(QString("Found no probe configuration for:\n"
-			"scanner=[%1] instrument=[%2].\n"
-			"Check that your %3 file contains entries\n"
-			"<USScanner> <Name>%1</Name> ... <USProbe> <Name>%2</Name>").arg(scannerUid).arg(instrumentUid).arg(xmlFileName));
-	}
-}
-
-ssc::ProbeSectorPtr Probe::getSector()
-{
-	ssc::ProbeSectorPtr retval(new ssc::ProbeSector());
-	retval->setData(this->getData());
+	Probe* object = new Probe(instrumentUid, scannerUid);
+	ProbePtr retval(object);
+	object->mSelf = retval;
+	retval->initProbeXmlConfigParser(xml);
+	retval->initConfigId();
 	return retval;
 }
 
 bool Probe::isValid() const
 {
-	return mData.getType() != ssc::ProbeData::tNONE;
+	return this->getProbeData("active").getType() != ssc::ProbeData::tNONE;
 }
 
-void Probe::setTemporalCalibration(double val)
+QStringList Probe::getAvailableVideoSources()
 {
-//  std::cout << "Probe::setTemporalCalibration " << val << std::endl;
-	mOverrideTemporalCalibration = true;
-	mTemporalCalibration = val;
-	mData.setTemporalCalibration(mTemporalCalibration);
-	//this->setConfigId(mConfigurationId);
-}
-
-void Probe::setSoundSpeedCompensationFactor(double factor)
-{
-	mSoundSpeedCompensationFactor = factor;
-	mData.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
-	emit sectorChanged();
-	//this->setConfigId(mConfigurationId);
-}
-
-ssc::ProbeData Probe::getData() const
-{
-	return mData;
-}
-
-ssc::VideoSourcePtr Probe::getRTSource() const
-{
-	return mSource;
-}
-
-ProbePtr Probe::New(QString instrumentUid, QString scannerUid)
-{
-	Probe* object = new Probe(instrumentUid, scannerUid);
-	ProbePtr retval(object);
-	object->mSelf = retval;
+	QStringList retval;
+	for (std::map<QString, ssc::VideoSourcePtr>::iterator iter=mSource.begin(); iter!=mSource.end(); ++iter)
+		retval << iter->first;
 	return retval;
 }
 
-void Probe::setRTSource(ssc::VideoSourcePtr source)
+ssc::VideoSourcePtr Probe::getRTSource(QString uid) const
 {
-	boost::shared_ptr<ssc::ProbeAdapterRTSource> adapter;
-	adapter = boost::shared_dynamic_cast<ssc::ProbeAdapterRTSource>(mSource);
-	if (adapter && (source==adapter->getBaseSource()))
-		return;
+	if (mSource.empty())
+		return ssc::VideoSourcePtr();
+	if (uid=="active")
+		uid = mActiveUid;
+	if (mSource.count(uid))
+		return mSource.find(uid)->second;
+	return mSource.begin()->second;
+}
 
-	mSource.reset();
-	if (source)
-		adapter.reset(new ssc::ProbeAdapterRTSource(source->getUid() + "_probe", mSelf.lock(), source));
-	mSource = adapter;
-	emit sectorChanged();
+ssc::ProbeData Probe::getProbeData(QString uid) const
+{
+	ssc::ProbeData retval;
+
+	if (uid=="active")
+		uid = mActiveUid;
+	if (mProbeData.count(uid))
+		retval = mProbeData.find(uid)->second;
+	else if (mProbeData.count("default"))
+		retval = mProbeData.find("default")->second;
+	else
+		retval = mProbeData.begin()->second;
+
+	// ensure uid is matching the requested uid even if not found.
+	retval.setUid(uid);
+	return retval;
+}
+
+ssc::ProbeSectorPtr Probe::getSector(QString uid)
+{
+	ssc::ProbeSectorPtr retval(new ssc::ProbeSector());
+	retval->setData(this->getProbeData());
+	return retval;
 }
 
 void Probe::addXml(QDomNode& dataNode)
@@ -129,16 +100,15 @@ void Probe::parseXml(QDomNode& dataNode)
 	QString cfg = dataNode.toElement().attribute("config");
 	if (cfg.isEmpty())
 		return;
-	this->setConfigId(cfg);
+	this->applyNewConfigurationWithId(cfg);
 }
 
 QStringList Probe::getConfigIdList() const
 {
-	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
-	if (rtSourceList.empty())
+	if (!this->hasRtSource())
 		return QStringList();
-	QStringList configIdList = mXml->getConfigIdList(this->getInstrumentScannerId(), this->getInstrumentId(),
-					rtSourceList.at(0));
+	QStringList configIdList = mXml->getConfigIdList(
+			this->getInstrumentScannerId(), this->getInstrumentId(), this->getRtSourceName());
 	return configIdList;
 }
 
@@ -155,103 +125,105 @@ QString Probe::getConfigId() const
 
 QString Probe::getConfigurationPath() const
 {
-	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
-	if (rtSourceList.isEmpty())
+	if (!this->hasRtSource())
 		return "";
 	QStringList retval;
-	retval << this->getInstrumentScannerId() << this->getInstrumentId() << rtSourceList.at(0) << this->getConfigId();
+	retval << this->getInstrumentScannerId() << this->getInstrumentId() << this->getRtSourceName() << this->getConfigId();
 	return retval.join(":");
 }
 
-void Probe::setConfigId(QString uid)
+void Probe::applyNewConfigurationWithId(QString uid)
 {
-	ProbeXmlConfigParser::Configuration config = this->getConfiguration(uid);
-	if (config.isEmpty())
-		return;
-
-	ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
-//  std::cout << "probeSector.mTemporalCalibration" << probeSector.mTemporalCalibration << std::endl;
-	mConfigurationId = uid;
-	mData = probeSector;
-	//Update temporal calibration and sound speed compensation
-	if (mOverrideTemporalCalibration)
-		this->setTemporalCalibration(mTemporalCalibration);
+	this->setConfigId(uid);
+	this->updateProbeSector();
+	this->updateTemporalCalibration();
 	this->setSoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
 }
 
-void Probe::setData(ssc::ProbeData probeSector, QString configUid)
+void Probe::setTemporalCalibration(double val)
 {
-	mData = probeSector;
-//	if (!mConfigurationId.endsWith('*'))
-//		mConfigurationId += "*";
-//	mConfigurationId = "";
-	mConfigurationId = configUid;
+	mOverrideTemporalCalibration = true;
+	mTemporalCalibration = val;
+	for (std::map<QString, ssc::ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+		iter->second.setTemporalCalibration(mTemporalCalibration);
+}
+
+void Probe::setSoundSpeedCompensationFactor(double factor)
+{
+	if(ssc::similar(mSoundSpeedCompensationFactor, factor))
+		return;
+	mSoundSpeedCompensationFactor = factor;
+	for (std::map<QString, ssc::ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+		iter->second.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
 }
-//void Probe::setProbeImageData(ssc::ProbeData::ProbeImageData imageData)
-//{
-//	mData.setImage(imageData);
-//	emit sectorChanged();
-//}
+
+void Probe::setProbeSector(ssc::ProbeData probeSector)
+{
+	if (probeSector.getUid().isEmpty())
+		probeSector.setUid(mActiveUid);
+
+	mProbeData[probeSector.getUid()] = probeSector;
+	emit sectorChanged();
+}
+
+void Probe::setRTSource(ssc::VideoSourcePtr source)
+{
+	SSC_ASSERT(source); // not handled after refactoring - add clear method??
+	if (!source)
+		return;
+
+	// uid already exist: check if base object is the same
+	if (mSource.count(source->getUid()))
+	{
+		ssc::VideoSourcePtr old = mSource.find(source->getUid())->second;
+
+		boost::shared_ptr<ssc::ProbeAdapterRTSource> oldAdapter;
+		oldAdapter = boost::dynamic_pointer_cast<ssc::ProbeAdapterRTSource>(old);
+		// check for identity, ignore if no change
+		if (oldAdapter && (source==oldAdapter->getBaseSource()))
+			return;
+	}
+
+	// must have same uid as original: the uid identifies the video source
+	mSource[source->getUid()].reset(new ssc::ProbeAdapterRTSource(source->getUid(), mSelf.lock(), source));
+	emit sectorChanged();
+}
+
+void Probe::removeRTSource(ssc::VideoSourcePtr source)
+{
+	if (!source)
+		return;
+	if (!mSource.count(source->getUid()))
+		return;
+
+	mSource.erase(source->getUid());
+	mProbeData.erase(source->getUid());
+	emit sectorChanged();
+}
+
+void Probe::setActiveStream(QString uid)
+{
+	if (uid.isEmpty())
+		return;
+	mActiveUid = uid;
+	emit sectorChanged();
+}
+
+QString Probe::getActiveStream() const
+{
+	return mActiveUid;
+}
+
+
+//non-inherited functions
+
 ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
 	return config;
 }
-
-ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
-{
-	ProbeXmlConfigParser::Configuration config;
-	QStringList rtSourceList = mXml->getRtSourceList(mScannerUid, mInstrumentUid);
-	if (rtSourceList.isEmpty())
-		return config;
-
-	config = mXml->getConfiguration(mScannerUid, mInstrumentUid, rtSourceList.at(0), uid);
-//  std::cout << "uids " << mScannerUid << " " << mInstrumentUid << " " << rtSourceList.at(0) << " " << uid << std::endl;
-//  std::cout << "config.mTemporalCalibration " << config.mTemporalCalibration << std::endl;
-	return config;
-}
-
-QString Probe::getInstrumentId() const
-{
-	return mInstrumentUid;
-}
-QString Probe::getInstrumentScannerId() const
-{
-	return mScannerUid;
-}
-
-//void Probe::changeProbeSectorParameters(double depthStart, double depthEnd, double width)
-//{
-////	mData.mDepthStart = depthStart;
-////	mData.mDepthEnd = depthEnd;
-////	mData.mWidth = width;
-//	mData.setSector(depthStart, depthEnd, width);
-//	emit sectorChanged();
-//}
-
-//void Probe::changeProbeSectorSize(int width, int height)
-//{
-////	mData.mImage.mSize.setWidth(width);
-////	mData.mImage.mSize.setHeight(height);
-//	ssc::ProbeData::ProbeImageData image = mData.getImage();
-//	image.mSize.setWidth(width);
-//	image.mSize.setHeight(height);
-//	mData.setImage(image);
-//
-//	emit sectorChanged();
-//}
-//void Probe::changeProbeSectorOrigin(ssc::Vector3D origin)
-//{
-////	mData.mImage.mOrigin_p = origin;
-//
-//	ssc::ProbeData::ProbeImageData image = mData.getImage();
-//	image.mOrigin_p = origin;
-//	mData.setImage(image);
-//
-//	emit sectorChanged();
-//}
 
 void Probe::removeCurrentConfig()
 {
@@ -265,7 +237,7 @@ void Probe::removeCurrentConfig()
 
 	mXml->removeConfig(config.mUsScanner, config.mUsProbe, config.mRtSource, config.mConfigId);
 	if (index < this->getConfigIdList().size())
-		this->setConfigId(this->getConfigIdList()[index]);
+		this->applyNewConfigurationWithId(this->getConfigIdList()[index]);
 	emit sectorChanged();
 }
 
@@ -274,12 +246,130 @@ void Probe::saveCurrentConfig(QString uid, QString name)
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration();
 	config.mConfigId = uid;
 	config.mName = name;
-	config = createConfigurationFromProbeData(config, mData);
-
-//TODO: possibly fix old hack on storing temporal calibration??
+	config = createConfigurationFromProbeData(config, this->getProbeData("active"));
 
 	mXml->saveCurrentConfig(config);
-	this->setConfigId(uid);
+	this->applyNewConfigurationWithId(uid);
+}
+
+void Probe::useDigitalVideo(bool digitalStatus)
+{
+	mDigitalInterface = digitalStatus;
+	if (mDigitalInterface)
+		this->applyNewConfigurationWithId("Digital");
+}
+
+bool Probe::isUsingDigitalVideo() const
+{
+	return mDigitalInterface;
+}
+
+QString Probe::getRtSourceName() const
+{
+	QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
+	if (rtSourceList.empty())
+		return QString();
+	QString rtSource = rtSourceList.at(0);
+	if (this->isUsingDigitalVideo())
+		rtSource = "Digital";
+	return rtSource;
+}
+
+
+//private functions
+
+Probe::Probe(QString instrumentUid, QString scannerUid) :
+		mInstrumentUid(instrumentUid),
+		mScannerUid(scannerUid),
+		mSoundSpeedCompensationFactor(1.0),
+		mOverrideTemporalCalibration(false),
+		mTemporalCalibration(0.0),
+		mDigitalInterface(false)
+{
+	ssc::ProbeData probeData;
+	mProbeData[probeData.getUid()] = probeData;
+	mActiveUid = probeData.getUid();
+}
+
+void Probe::initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml = ProbeXmlConfigParserPtr())
+{
+	if (!xml)
+	{
+		QString xmlFileName = cx::DataLocations::getRootConfigPath() + QString("/tool/ProbeCalibConfigs.xml");
+		mXml.reset(new ProbeXmlConfigParserImpl(xmlFileName));
+	} else
+		mXml = xml;
+}
+
+void Probe::initConfigId()
+{
+	QStringList configs = this->getConfigIdList();
+	if (!configs.isEmpty())
+		this->applyNewConfigurationWithId(configs[0]);
+	else
+	{
+		ssc::messageManager()->sendWarning(QString("Found no probe configuration for:\n"
+			"scanner=[%1] instrument=[%2].\n"
+			"Check that your %3 file contains entries\n"
+			"<USScanner> <Name>%1</Name> ... <USProbe> <Name>%2</Name>").arg(mScannerUid).arg(mInstrumentUid).arg(mXml->getFileName()));
+	}
+}
+
+ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
+{
+	ProbeXmlConfigParser::Configuration config;
+	if(this->hasRtSource())
+		config = mXml->getConfiguration(mScannerUid, mInstrumentUid, this->getRtSourceName(), uid);
+	return config;
+}
+
+QString Probe::getInstrumentId() const
+{
+	return mInstrumentUid;
+}
+
+QString Probe::getInstrumentScannerId() const
+{
+	return mScannerUid;
+}
+
+bool Probe::hasRtSource() const
+{
+	return !(this->getRtSourceName().isEmpty());
+}
+
+void Probe::setConfigId(QString uid)
+{
+	mConfigurationId = uid;
+}
+
+void Probe::updateProbeSector()
+{
+	if(this->isValidConfigId() && !this->isUsingDigitalVideo())
+	{
+		ssc::ProbeData probeSector = this->createProbeSector();
+		this->setProbeSector(probeSector);
+	}
+}
+
+bool Probe::isValidConfigId()
+{
+	//May need to create ProbeXmlConfigParser::isValidConfig(...) also
+	return !this->getConfiguration(this->getConfigId()).isEmpty();
+}
+
+ssc::ProbeData Probe::createProbeSector()
+{
+	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
+	ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
+	probeSector.setUid(mActiveUid);
+	return probeSector;
+}
+
+void Probe::updateTemporalCalibration()
+{
+if (mOverrideTemporalCalibration)
+	this->setTemporalCalibration(mTemporalCalibration);
 }
 
 

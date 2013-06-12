@@ -57,10 +57,17 @@ QVariant SyncedValue::get() const
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
+ViewGroupData::Options::Options() :
+    mShowLandmarks(false), mShowPointPickerProbe(false),
+    mPickerGlyph(new ssc::Mesh("PickerGlyph"))
+{
+}
+
 ViewGroupData::ViewGroupData() :
 				mCamera3D(CameraData::create())
 {
 	connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(removeDataSlot(QString)));
+	mVideoSource = "active";
 
 //	mPickerGlyph.reset(new ssc::Mesh("PickerGlyph"));
 //
@@ -102,11 +109,11 @@ int getPriority(ssc::DataPtr data)
 {
 	if (data->getType()=="mesh")
 		return 6;
-	ssc::DataMetricPtr metric = boost::shared_dynamic_cast<ssc::DataMetric>(data);
+	ssc::DataMetricPtr metric = boost::dynamic_pointer_cast<ssc::DataMetric>(data);
 	if (metric)
 		return 7;
 
-	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
 	if (image)
 	{
 		if (image->getModality().toUpper().contains("US"))
@@ -178,6 +185,20 @@ void ViewGroupData::clearData()
 {
 	while (!mData.empty())
 		this->removeData(mData.front());
+	this->setVideoSource("active");
+}
+
+void ViewGroupData::setVideoSource(QString uid)
+{
+	if (mVideoSource==uid)
+		return;
+	mVideoSource = uid;
+	emit videoSourceChanged(mVideoSource);
+}
+
+QString ViewGroupData::getVideoSource() const
+{
+	return mVideoSource;
 }
 
 std::vector<ssc::ImagePtr> ViewGroupData::getImages() const
@@ -185,7 +206,7 @@ std::vector<ssc::ImagePtr> ViewGroupData::getImages() const
 	std::vector<ssc::ImagePtr> retval;
 	for (unsigned i = 0; i < mData.size(); ++i)
 	{
-		ssc::ImagePtr data = boost::shared_dynamic_cast<ssc::Image>(mData[i]);
+		ssc::ImagePtr data = boost::dynamic_pointer_cast<ssc::Image>(mData[i]);
 		if (data)
 			retval.push_back(data);
 	}
@@ -197,7 +218,7 @@ std::vector<ssc::MeshPtr> ViewGroupData::getMeshes() const
 	std::vector<ssc::MeshPtr> retval;
 	for (unsigned i = 0; i < mData.size(); ++i)
 	{
-		ssc::MeshPtr data = boost::shared_dynamic_cast<ssc::Mesh>(mData[i]);
+		ssc::MeshPtr data = boost::dynamic_pointer_cast<ssc::Mesh>(mData[i]);
 		if (data)
 			retval.push_back(data);
 	}
@@ -228,6 +249,7 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 	mViewGroup = group;
 	connect(mViewGroup.get(), SIGNAL(dataAdded(QString)), SLOT(dataAddedSlot(QString)));
 	connect(mViewGroup.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
+	connect(mViewGroup.get(), SIGNAL(videoSourceChanged(QString)), SLOT(videoSourceChangedSlot(QString)));
 
 	std::vector<ssc::DataPtr> data = mViewGroup->getData();
 	for (unsigned i = 0; i < data.size(); ++i)
@@ -297,11 +319,11 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 
 	QAction* action = new QAction(qstring_cast(data->getName()), contextMenu);
 
-	if (boost::shared_dynamic_cast<ssc::Image>(data))
+	if (boost::dynamic_pointer_cast<ssc::Image>(data))
 		action->setIcon(QIcon(":/icons/volume.png"));
-	else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
+	else if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
 		action->setIcon(QIcon(":/icons/surface.png"));
-	else if (boost::shared_dynamic_cast<ssc::DataMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::DataMetric>(data))
 		action->setIcon(QIcon(":/icons/metric.png"));
 
 //  std::cout << "base " << mLastDataActionUid << "  " << uid << std::endl;
@@ -370,7 +392,7 @@ QStringList ViewWrapper::getAllDataNames() const
 	{
 		QString line = data[i]->getName();
 
-		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data[i]);
+		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data[i]);
 		if (image)
 		{
 			if (image->getCropping())

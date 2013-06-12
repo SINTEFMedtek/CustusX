@@ -16,6 +16,7 @@
 #include <QtGui>
 #include "cxTimedAlgorithm.h"
 #include "sscMessageManager.h"
+#include "cxDisplayTimerWidget.h"
 
 namespace cx
 {

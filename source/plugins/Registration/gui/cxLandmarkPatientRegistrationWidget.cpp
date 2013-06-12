@@ -20,6 +20,7 @@
 #include "sscLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxView3D.h"
+#include "Rep/cxLandmarkRep.h"
 
 namespace cx
 {
@@ -88,7 +89,7 @@ void LandmarkPatientRegistrationWidget::fixedDataChanged()
 {
 	LandmarkRegistrationWidget::activeImageChangedSlot();
 //	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-	ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mManager->getFixedData());
+	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mManager->getFixedData());
 	mImageLandmarkSource->setImage(image);
 }
 

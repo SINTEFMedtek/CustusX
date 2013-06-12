@@ -18,7 +18,8 @@ if (BUILD_TESTING)
 		${CustusX3_SOURCE_DIR}/source/resource/settings
 		${CustusX3_SOURCE_DIR}/source/resource/utilities
 		${CustusX3_SOURCE_DIR}/source/resource/algorithms
-		${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction
+                ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+                ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction
 		${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
 		${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction
 		${CustusX3_SOURCE_DIR}/source/logic/
@@ -27,6 +28,7 @@ if (BUILD_TESTING)
 	# List of all test units
 	QT4_WRAP_CPP( CX_TEST_ACQUISITION_SOURCE_FILES
 		cxTestAcqController.h
+		cxTestUSSavingRecorderController.h
 		)
 
 	set(CX_TEST_ACQUISITION_SOURCE_FILES
@@ -34,6 +36,8 @@ if (BUILD_TESTING)
 		cxTestAcquisition.cpp
 		cxTestAcqController.cpp
 		cxTestAcqController.h
+		cxTestUSSavingRecorderController.h
+		cxTestUSSavingRecorderController.cpp
 		${CX_TEST_ACQUISITION_SOURCE_FILES}
 		)
 

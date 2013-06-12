@@ -22,7 +22,6 @@
 #include "sscTypeConversions.h"
 #include "sscEnumConverter.h"
 #include "cxDataLocations.h"
-#include "cxUsReconstructionFileReader.h"
 #include "sscFrame3D.h"
 #include "cxTransformFile.h"
 

@@ -11,13 +11,14 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
+
 #include "cxImageDataContainer.h"
+#include <QDir>
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
-#include "sscDataManagerImpl.h"
+#include "sscDataReaderWriter.h"
 #include "sscLogger.h"
 #include "sscTypeConversions.h"
-#include <QDir>
 #include "sscUtilHelpers.h"
 
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
@@ -41,7 +42,7 @@ vtkImageDataPtr CachedImageData::getImage()
 {
 	if (!mImageData)
 	{
-		mImageData = ssc::MetaImageReader().load(mFilename);
+		mImageData = ssc::MetaImageReader().loadVtkImageData(mFilename);
 	}
 	return mImageData;
 }
@@ -130,6 +131,15 @@ CachedImageDataContainer::~CachedImageDataContainer()
 
 vtkImageDataPtr CachedImageDataContainer::get(unsigned index)
 {
+	SSC_ASSERT(index < this->size());
+	SSC_ASSERT(mImages[index]);
+
+	if (index >= this->size())
+	{
+		std::cout << QString("Attempt to call index %1, size=%2").arg(index).arg(this->size()) << std::endl;
+	}
+//	int* a = NULL;
+//	*a = 5;
 	vtkImageDataPtr retval = mImages[index]->getImage();
 	mImages[index]->purge();
 	return retval;
@@ -171,6 +181,10 @@ SplitFramesContainer::SplitFramesContainer(vtkImageDataPtr image3D)
 
 		import->Update();
 		mImages[i] = import->GetOutput();
+
+//		std::cout << "SplitFramesContainer " << i << std::endl;
+//		std::cout << "===================================" << std::endl;
+//		mImages[i]->Print(std::cout);
 	}
 }
 

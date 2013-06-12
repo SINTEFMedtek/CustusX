@@ -10,10 +10,10 @@ namespace cx
 {
 /**
  * \class ActiveVolumeWidget
- * \brief Widget that contains a select active image combo box.
+ * \brief Widget that contains a select active image combobox.
  * \ingroup cxGUI
  * \date Aug 20, 2010
- * \author christiana
+ * \author Christian Askeland, SINTEF
  */
 class ActiveVolumeWidget : public BaseWidget
 {
@@ -23,35 +23,6 @@ public:
   ~ActiveVolumeWidget() {}
 
   virtual QString defaultWhatsThis() const;
-};
-
-/**\brief Widget for displaying various volume information.
- *
- * \ingroup cxGUI
- *
- * Part of the VolumePropertiesWidget.
- */
-class VolumeInfoWidget : public BaseWidget
-{
-  Q_OBJECT
-
-public:
-  VolumeInfoWidget(QWidget* parent);
-  virtual ~VolumeInfoWidget();
-
-  virtual QString defaultWhatsThis() const;
-
-protected slots:
-  void updateSlot();
-  void deleteDataSlot();
-
-private:
-  ParentFrameStringDataAdapterPtr mParentFrameAdapter;
-  DataNameEditableStringDataAdapterPtr mNameAdapter;
-  DataUidEditableStringDataAdapterPtr mUidAdapter;
-  DataModalityStringDataAdapterPtr mModalityAdapter;
-  ImageTypeStringDataAdapterPtr mImageTypeAdapter;
-  ActiveImageProxyPtr mActiveImageProxy;
 };
 
 /**

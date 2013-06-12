@@ -19,8 +19,6 @@
 
 #include <QDomDocument>
 #include "sscTypeConversions.h"
-#include "sscData.h"
-#include "sscDataManager.h"
 
 /*
 

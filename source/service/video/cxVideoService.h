@@ -24,12 +24,15 @@
 
 #include <QObject>
 
-#include "cxVideoConnection.h"
+#include <vector>
+#include "sscVideoSource.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;
 typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
+typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
+
 //typedef boost::shared_ptr<class OpenIGTLinkDirectLinkRTSource> OpenIGTLinkDirectLinkRTSourcePtr;
 
 
@@ -67,13 +70,13 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * recording functionality is not shown. ssc::VideoSourceRecorder handles this
  * on the basic level.
  *
- * VideoConnection manages the connection to the streaming source. The
+ * VideoConnectionManager manages the connection to the streaming source. The
  * implementation class OpenIGTLinkVideoSource uses the OpenIGTLink protocol
  * to receive data over TCP/IP. The actual data retrieval is done in the
  * internal thread class IGTLinkClient.
  *
  * The OpenIGTLinkRTSource is dependent on an external IGTLink server.
- * Optionally, the VideoConnection can create this server on the local machine.
+ * Optionally, the VideoConnectionManager can create this server on the local machine.
  * This is typically the GrabberServer, chapter 5.7.2.
  *
  *
@@ -87,16 +90,29 @@ public:
 	static void initialize();
 	static void shutdown();
 
-	VideoConnectionPtr getIGTLinkVideoConnection();
+	VideoConnectionManagerPtr getVideoConnection();
 	USAcquisitionVideoPlaybackPtr getUSAcquisitionVideoPlayback();
 	ssc::VideoSourcePtr getActiveVideoSource();
+	void setActiveVideoSource(QString uid);
 	void setPlaybackMode(PlaybackTimePtr controller);
+	/** Get all existing video sources.
+	  */
+	std::vector<ssc::VideoSourcePtr> getVideoSources();
 
 signals:
+	/** Emitted when a video source is set to active,
+	  * OR when the available set of sources are changed.
+	  */
 	void activeVideoSourceChanged();
-	void activeVideoSourceStreaming(bool on); ///< emitted when streaming started/stopped
-	void activeVideoSourceConnected(bool on); ///< emitted when source is connected/disconnected
 
+private slots:
+	/** Autoselect the active ssc::VideoSource
+	  *
+	  * Call when video source configuration has changed. The active
+	  * Video source will automatically be determined by calling
+	  * autoGuessVideoSource().
+	  */
+	void autoSelectActiveVideoSource();
 private:
 	static VideoService* mInstance;
 	static void setInstance(VideoService* instance);
@@ -107,9 +123,24 @@ private:
 	VideoService(VideoService const&); // not implemented
 	VideoService& operator=(VideoService const&); // not implemented
 
-	VideoConnectionPtr mIGTLinkConnection;
-//	OpenIGTLinkDirectLinkRTSourcePtr mGrabberDirectLinkVideoSource;
+	/** Find the best guess for active ssc::VideoSource
+	  *
+	  * Select from the following in that priority:
+	  *  - playback sources
+	  *  - active probe sources
+	  *  - other probe sources
+	  *  - free sources (not connected to probe)
+	  *  - empty source
+	  *
+	  * Within each group, keep existing active if it already belongs
+	  * to that group.
+	  *
+	  */
+	ssc::VideoSourcePtr getGuessForActiveVideoSource(ssc::VideoSourcePtr old);
+
+	VideoConnectionManagerPtr mVideoConnection;
 	ssc::VideoSourcePtr mActiveVideoSource;
+	ssc::VideoSourcePtr mEmptyVideoSource;
 	USAcquisitionVideoPlaybackPtr mUSAcquisitionVideoPlayback;
 };
 

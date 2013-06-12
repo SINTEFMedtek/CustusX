@@ -3,6 +3,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QGroupBox>
+#include <QLabel>
 #include <vtkImageData.h>
 #include "sscStringDataAdapter.h"
 #include "sscLabeledComboBoxWidget.h"
@@ -39,10 +40,15 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
   mUseCropperCheckBox->setToolTip("Turn on cropping for the active volume.");
   connect(mUseCropperCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(useCropping(bool)));
   activeLayout->addWidget(mUseCropperCheckBox);
+
   mShowBoxCheckBox = new QCheckBox("Show box (i)");
   mShowBoxCheckBox->setToolTip("Show crop box in 3D view. Press 'i' in the view to do the same.");
   connect(mShowBoxCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(showBoxWidget(bool)));
   activeLayout->addWidget(mShowBoxCheckBox);
+
+  mBoundingBoxDimensions = new QLabel("?, ?, ?");
+  mBoundingBoxDimensions->setToolTip("The dimensions of the croppers boundingbox.");
+  activeLayout->addWidget(mBoundingBoxDimensions);
 
   mBBWidget = new BoundingBoxWidget(this);
   layout->addWidget(mBBWidget);
@@ -78,10 +84,16 @@ void CroppingWidget::boxValuesChanged()
 
 void CroppingWidget::cropperChangedSlot()
 {
-  mUseCropperCheckBox->setChecked(mInteractiveCropper->getUseCropping());
-  mShowBoxCheckBox->setChecked(mInteractiveCropper->getShowBoxWidget());
+	std::vector<int> dims = mInteractiveCropper->getDimensions();
+	if(dims.size() < 3)
+		return;
 
-  mBBWidget->setValue(mInteractiveCropper->getBoundingBox(), mInteractiveCropper->getMaxBoundingBox());
+	QString dimensionText = "Dimensions: "+qstring_cast(dims.at(0))+", "+qstring_cast(dims.at(1))+", "+qstring_cast(dims.at(2));
+	mBoundingBoxDimensions->setText(dimensionText);
+	mUseCropperCheckBox->setChecked(mInteractiveCropper->getUseCropping());
+	mShowBoxCheckBox->setChecked(mInteractiveCropper->getShowBoxWidget());
+
+	mBBWidget->setValue(mInteractiveCropper->getBoundingBox(), mInteractiveCropper->getMaxBoundingBox());
 }
 
 ssc::ImagePtr CroppingWidget::cropClipButtonClickedSlot()

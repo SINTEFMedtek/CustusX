@@ -56,7 +56,7 @@ public:
 
 	void setDisplayProcessMessages(bool on);
 
-	void setInput(QString application,
+	bool setInput(QString application,
 	         ssc::DataPtr fixed,
 	         ssc::DataPtr moving,
 	         QString outdir,
@@ -65,6 +65,11 @@ public:
 	virtual bool isFinished() const;
     virtual bool isRunning() const;
 
+	/** Return the result of the latest registration as a linear transform mMf.
+	 *
+	 * Read the descriptions in writeInitTransformToElastixfile() and
+	 * getAffineResult_mmMff for a full discussion.
+	 */
 	ssc::Transform3D getAffineResult_mMf(bool* ok = 0) ;
 	QString getNonlinearResultVolume(bool* ok = 0);
 
@@ -75,10 +80,44 @@ private slots:
 	void processReadyRead();
 
 private:
+	/** Write the initial (pre-registration) mMf transform to
+	 *  disk as required by elastix.
+	 */
 	QString writeInitTransformToElastixfile(ssc::DataPtr fixed, ssc::DataPtr moving, QString outdir);
+	/** Write the initial (pre-registration) mMf transform to
+	 *  disk in a .cal file that contains only the 16 matrix numbers.
+	 */
 	QString writeInitTransformToCalfile(ssc::DataPtr fixed, ssc::DataPtr moving, QString outdir);
+	/** Find the TransformParameters.i.txt file with the
+	 *  highest i. All other transform files can be found from
+	 *  this one.
+	 */
 	QString findMostRecentTransformOutputFile() const;
+	/** Return the result of the latest registration as a linear transform mMf.
+	 *
+	 *  Important: The result is according to the ElastiX spec:
+	 * \verbatim
+	   In elastix the transformation is defined as a coordinate mapping from
+	   the fixed image domain to the moving image domain.
+	   \endverbatim
+	 *
+	 * All transform files are read and concatenated. Those with
+	 * unrecognized (i.e. by CustusX) transforms are ignored with
+	 * a warning.
+	 *
+	 * NOTE: This 'inner' function returns the raw result from elastiX,
+	 * but CustusX expects that the file transforms of the fixed and moving
+	 * images are also contained in the result. Use the getAffineResult_mMf()
+	 * for the full result.
+	 *
+	 */
 	ssc::Transform3D getAffineResult_mmMff(bool* ok = 0) ;
+	/** Return the transform present within the mhd file pointed to by the
+	 * input volume.
+	 *
+	 * This is part of the normal rMd transform within ssc::Data, but required
+	 * because elastiX reads and uses it.
+	 */
 	ssc::Transform3D getFileTransform_ddMd(ssc::DataPtr volume);
 
 	QString mLastOutdir;
