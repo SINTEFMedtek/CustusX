@@ -177,11 +177,8 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
 	retval["Type"] = image->getType().toStdString();
 	retval["Uid"] = image->getUid().toStdString();
 	retval["Acquisition time"] = string_cast(image->getAcquisitionTime().toString(ssc::timestampSecondsFormatNice()));
-
-	int numVoxels = static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer())[0];
-	retval["Voxels with min value"] = string_cast(numVoxels);
-	numVoxels = static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer())[image->getRange()];
-	retval["Voxels with max value"] = string_cast(numVoxels);
+	retval["Voxels with min value"] = string_cast(calculateNumVoxelsWithMinValue(image));
+	retval["Voxels with max value"] = string_cast(calculateNumVoxelsWithMaxValue(image));
 
 	//vtImageData
 	double spacing_x, spacing_y, spacing_z;
@@ -202,6 +199,15 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
 	retval["Extent"] = string_cast(extent[0])+" , "+string_cast(extent[1])+" , "+string_cast(extent[2])+" , "+string_cast(extent[3])+" , "+string_cast(extent[4])+" , "+string_cast(extent[5]);
 
 	return retval;
+}
+
+int calculateNumVoxelsWithMaxValue(ssc::ImagePtr image)
+{
+	return static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer())[image->getRange()];
+}
+int calculateNumVoxelsWithMinValue(ssc::ImagePtr image)
+{
+	return static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer())[0];
 }
 
 
