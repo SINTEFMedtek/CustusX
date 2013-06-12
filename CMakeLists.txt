@@ -31,11 +31,11 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 # Set CustusX version
 #------------------------------------------------------------------------------
 
-#set(CX_VERSION_TYPE ALPHA) # use when releasing an alpha
+set(CX_VERSION_TYPE ALPHA) # use when releasing an alpha
 #set(CX_VERSION_TYPE BETA) # use when releasing a beta
-set(CX_VERSION_TYPE RELEASE) # use when releasing a normal release
+#set(CX_VERSION_TYPE RELEASE) # use when releasing a normal release
 #set(CX_VERSION_TYPE ".rc1") # set release candidate during release procedure
-cx_define_version(3 5 0 CX_VERSION_TYPE)
+cx_define_version(3 6 0 CX_VERSION_TYPE)
 
 include(cxCotireMacros)
 CX_COTIRE_INITIALIZE()
