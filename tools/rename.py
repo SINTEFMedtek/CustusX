@@ -281,8 +281,8 @@ class CppFileRenamer():
                    
     def _ask_if_keep_changes(self):
         self._print_changes()
-        answere = query_yes_no("\nKeep these changes?")
-        if(not answere):
+        keep = query_yes_no("\nKeep these changes?")
+        if(not keep):
             self.cpp_file_pair.restore_from_backup()
         self.cpp_file_pair.delete_backup()
         return 
