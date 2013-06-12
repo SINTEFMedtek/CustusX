@@ -129,7 +129,7 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	mLandmarkTableWidget->clear();
 
 	QString fixedName;
-	ssc::DataPtr fixedData = boost::shared_dynamic_cast<ssc::Data>(mManager->getFixedData());
+	ssc::DataPtr fixedData = boost::dynamic_pointer_cast<ssc::Data>(mManager->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 
@@ -319,7 +319,7 @@ void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 void LandmarkRegistrationWidget::updateAvarageAccuracyLabel()
 {
 	QString fixedName;
-	ssc::DataPtr fixedData = boost::shared_dynamic_cast<ssc::Data>(mManager->getFixedData());
+	ssc::DataPtr fixedData = boost::dynamic_pointer_cast<ssc::Data>(mManager->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 
@@ -353,7 +353,7 @@ double LandmarkRegistrationWidget::getAvarageAccuracy()
 
 double LandmarkRegistrationWidget::getAccuracy(QString uid)
 {
-	ssc::ImagePtr fixedData = boost::shared_dynamic_cast<ssc::Image>(mManager->getFixedData());
+	ssc::ImagePtr fixedData = boost::dynamic_pointer_cast<ssc::Image>(mManager->getFixedData());
 	if (!fixedData)
 		return 1000.0;
 

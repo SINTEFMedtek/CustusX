@@ -16,6 +16,8 @@
 #include "sscTime.h"
 #include "sscTypeConversions.h"
 #include "cxToolManager.h"
+#include "cxPlaybackTime.h"
+#include "cxManualToolAdapter.h"
 
 namespace cx
 {
@@ -80,7 +82,7 @@ QString PlaybackTool::getGraphicsFileName() const
 	return mBase->getGraphicsFileName();
 }
 
-std::set<Tool::Type> PlaybackTool::getTypes() const
+std::set<ssc::Tool::Type> PlaybackTool::getTypes() const
 {
 	return mBase->getTypes();
 }

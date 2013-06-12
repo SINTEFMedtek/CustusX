@@ -34,14 +34,11 @@ typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
  */
 class MainWindow: public QMainWindow
 {
-Q_OBJECT
+	Q_OBJECT
 
 public:
 	MainWindow(std::vector<PluginBasePtr> plugins);
 	virtual ~MainWindow();
-
-//	static void initialize();
-//	static void shutdown(); ///< deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
 
 	virtual QMenu* createPopupMenu();
 
@@ -109,7 +106,6 @@ protected:
 
 private:
 	void saveScreenShot(QPixmap pixmap);
-//	void saveScreenShotThreaded(QString filename);
 	void saveScreenShotThreaded(QImage pixmap, QString filename);
 	void updateWindowTitle();
 	void createActions(); ///< creates and connects (gui-)actions

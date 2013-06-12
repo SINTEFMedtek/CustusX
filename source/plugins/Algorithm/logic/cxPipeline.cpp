@@ -14,14 +14,19 @@
 #include "cxPipeline.h"
 #include "sscTypeConversions.h"
 
+#include <QtCore>
 #include "boost/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
+
+#include "sscMessageManager.h"
 
 #include "sscBoolDataAdapter.h"
 #include "sscDoubleDataAdapter.h"
 #include "sscColorDataAdapter.h"
 #include "sscStringDataAdapter.h"
+#include "cxCompositeTimedAlgorithm.h"
+#include "cxFilterTimedAlgorithm.h"
 
 namespace cx
 {
@@ -178,25 +183,25 @@ void Pipeline::setOption(DataAdapterPtr adapter, QVariant value)
 {
 	if (value.canConvert<bool>())
 	{
-		ssc::BoolDataAdapterPtr specific = boost::shared_dynamic_cast<ssc::BoolDataAdapter>(adapter);
+		ssc::BoolDataAdapterPtr specific = boost::dynamic_pointer_cast<ssc::BoolDataAdapter>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<bool>(value));
 	}
 	else if (value.canConvert<double>())
 	{
-		ssc::DoubleDataAdapterPtr specific = boost::shared_dynamic_cast<ssc::DoubleDataAdapter>(adapter);
+		ssc::DoubleDataAdapterPtr specific = boost::dynamic_pointer_cast<ssc::DoubleDataAdapter>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<double>(value));
 	}
 	else if (value.canConvert<QColor>())
 	{
-		ssc::ColorDataAdapterPtr specific = boost::shared_dynamic_cast<ssc::ColorDataAdapter>(adapter);
+		ssc::ColorDataAdapterPtr specific = boost::dynamic_pointer_cast<ssc::ColorDataAdapter>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<QColor>(value));
 	}
 	else if (value.canConvert<QString>())
 	{
-		ssc::StringDataAdapterPtr specific = boost::shared_dynamic_cast<ssc::StringDataAdapter>(adapter);
+		ssc::StringDataAdapterPtr specific = boost::dynamic_pointer_cast<ssc::StringDataAdapter>(adapter);
 		if (specific)
 			specific->setValue(qvariant_cast<QString>(value));
 	}

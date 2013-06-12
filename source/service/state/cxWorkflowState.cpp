@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 #include "cxWorkflowState.h"
-#include "cxVideoConnection.h"
+#include "cxVideoConnectionManager.h"
 #include "sscDataManager.h"
 #include "cxStateService.h"
 #include "cxPatientData.h"
@@ -84,7 +84,7 @@ void WorkflowState::autoStartHardware()
 	if (settings()->value("Automation/autoStartTracking").toBool())
 		ssc::toolManager()->startTracking();
 	if (settings()->value("Automation/autoStartStreaming").toBool())
-		videoService()->getIGTLinkVideoConnection()->launchAndConnectServer();
+		videoService()->getVideoConnection()->launchAndConnectServer();
 }
 
 // --------------------------------------------------------

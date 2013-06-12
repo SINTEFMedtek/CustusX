@@ -18,12 +18,10 @@
 #include <vector>
 #include <QVariant>
 #include <QObject>
-#include <vtkPolyDataAlgorithm.h>
 #include "sscDefinitions.h"
 #include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
-#include <vtkSphereSource.h>
-#include "sscMesh.h"
 
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 class QMenu;
@@ -75,8 +73,10 @@ public:
 	ViewGroupData();
 	void requestInitialize();
 	std::vector<ssc::DataPtr> getData() const;
+	QString getVideoSource() const;
 	void addData(ssc::DataPtr data);
 	void addDataSorted(ssc::DataPtr data); ///< add data in a predefined ordering: CT/MR/SC/US/USA/Mesh/Metrics
+	void setVideoSource(QString uid);
 	bool removeData(ssc::DataPtr data);
 	void clearData();
 	std::vector<ssc::ImagePtr> getImages() const;
@@ -87,13 +87,10 @@ public:
 	// view options for this group.
 	struct Options
 	{
-		Options() : mShowLandmarks(false), mShowPointPickerProbe(false),
-				mPickerGlyph(new ssc::Mesh("PickerGlyph")) {}
+		Options();
 		bool mShowLandmarks;
 		bool mShowPointPickerProbe;
 		ssc::MeshPtr mPickerGlyph;
-//		vtkPolyDataAlgorithmPtr mPickerGlyph; ///< a glyph visually representing the picker.
-//		vtkSphereSourcePtr getSpherePickerGlyph() { return vtkSphereSource::SafeDownCast(mPickerGlyph); }
 	};
 
 	Options getOptions() const;
@@ -105,10 +102,12 @@ private slots:
 signals:
 	void dataAdded(QString uid);
 	void dataRemoved(QString uid);
+	void videoSourceChanged(QString uid);
 	void initialized();
 	void optionsChanged();
 
 private:
+	QString mVideoSource;
 	std::vector<ssc::DataPtr> mData;
 	CameraDataPtr mCamera3D;
 	Options mOptions;
@@ -145,6 +144,7 @@ protected slots:
 
 	void dataAddedSlot(QString uid);
 	void dataRemovedSlot(QString uid);
+	virtual void videoSourceChangedSlot(QString uid) {}
 
 protected:
 	virtual void dataAdded(ssc::DataPtr data) = 0;

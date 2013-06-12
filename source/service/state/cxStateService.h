@@ -18,12 +18,13 @@
 #include <QDomNode>
 
 #include "cxForwardDeclarations.h"
-#include "cxWorkflowStateMachine.h"
-#include "cxApplicationStateMachine.h"
 #include <QObject>
 
 namespace cx
 {
+typedef boost::shared_ptr<class ApplicationStateMachine> ApplicationStateMachinePtr;
+typedef boost::shared_ptr<class WorkflowStateMachine> WorkflowStateMachinePtr;
+
 /**
  * \file
  * \addtogroup cxServiceState

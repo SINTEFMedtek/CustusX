@@ -14,14 +14,15 @@
 #ifndef CXPIPELINE_H
 #define CXPIPELINE_H
 
-#include <QObject>
+//#include <QObject>
 #include "cxFilter.h"
 #include "sscXmlOptionItem.h"
-#include "cxFilterTimedAlgorithm.h"
-#include "cxCompositeTimedAlgorithm.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
+typedef boost::shared_ptr<class CompositeTimedAlgorithm> CompositeTimedAlgorithmPtr;
 
 typedef boost::shared_ptr<class FusedInputOutputSelectDataStringDataAdapter> FusedInputOutputSelectDataStringDataAdapterPtr;
 

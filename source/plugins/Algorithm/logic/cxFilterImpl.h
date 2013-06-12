@@ -17,11 +17,7 @@
 
 #include <vector>
 #include <QObject>
-#include "sscData.h"
-#include "sscDataAdapter.h"
-#include "cxDataInterface.h"
 #include "cxFilter.h"
-#include "sscDoubleDataAdapterXml.h"
 #include <QDomElement>
 
 namespace cx
@@ -34,7 +30,7 @@ namespace cx
  *
  * \ingroup cxResourceAlgorithms
  * \date Nov 21, 2012
- * \author christiana
+ * \author Christian Askeland, SINTEF
  */
 class FilterImpl : public Filter
 {
@@ -48,9 +44,14 @@ public:
 	virtual std::vector<DataAdapterPtr> getOptions();
 	virtual std::vector<SelectDataStringDataAdapterBasePtr> getInputTypes();
 	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes();
+	virtual bool hasPresets(){return false;};
+	virtual ssc::PresetsPtr getPresets(){ return ssc::PresetsPtr();};
+	virtual QDomElement generatePresetFromCurrentlySetOptions(QString name){return QDomElement();};
 	virtual void setActive(bool on);
-
 	virtual bool preProcess();
+
+public slots:
+	virtual void requestSetPresetSlot(QString name){};
 
 protected:
 	explicit FilterImpl();
@@ -76,6 +77,7 @@ protected:
 	std::vector<ssc::DataPtr> mCopiedInput;
 	QDomElement mCopiedOptions;
 	bool mActive;
+
 private:
 	QString mUid;
 

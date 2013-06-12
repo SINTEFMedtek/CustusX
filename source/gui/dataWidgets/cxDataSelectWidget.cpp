@@ -19,6 +19,8 @@
 #include "cxViewWrapper.h"
 #include "sscDataManager.h"
 #include "sscHelperWidgets.h"
+#include "cxDataInterface.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {

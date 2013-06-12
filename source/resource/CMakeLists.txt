@@ -2,13 +2,15 @@
 ##               Resource Layer
 ###########################################################
 
+add_subdirectory(videoServer)
+add_subdirectory(OpenIGTLinkUtilities)
+
 #add_subdirectory(utilities)
 
 # extra definitions:
 add_subdirectory(settings)
 
 #add_subdirectory(algorithms)
-#add_subdirectory(testing)
 
 SET( CX_QT_MOC_HEADER_FILES
     algorithms/cxTimedAlgorithm.h
@@ -24,6 +26,8 @@ SET( CX_QT_MOC_HEADER_FILES
 )
 
 SET ( cxResource_SOURCE
+	cxForwardDeclarations.h
+
 	algorithms/ItkVtkGlue/itkImageToVTKImageFilter.h
     algorithms/ItkVtkGlue/itkImageToVTKImageFilter.txx
     algorithms/ItkVtkGlue/itkVTKImageToImageFilter.h
@@ -46,8 +50,11 @@ SET ( cxResource_SOURCE
     settings/cxSettings.h
     settings/cxSettings.cpp
 
-    utilities/probeXmlConfigParser.h
-    utilities/probeXmlConfigParser.cpp
+    utilities/ProbeXmlConfigParser.h
+    utilities/ProbeXmlConfigParserImpl.h
+    utilities/ProbeXmlConfigParserImpl.cpp
+    utilities/ProbeXmlConfigParserMock.h
+    utilities/ProbeXmlConfigParserMock.cpp
     utilities/cxCreateProbeDataFromConfiguration.h
     utilities/cxCreateProbeDataFromConfiguration.cpp
     utilities/cxRenderTimer.h
@@ -70,12 +77,23 @@ SET ( cxResource_SOURCE
     utilities/cxProcessWrapper.cpp
     utilities/sscUSFrameData.h
     utilities/sscUSFrameData.cpp
-	utilities/cxSavingVideoRecorder.h
-	utilities/cxSavingVideoRecorder.cpp
-	utilities/cxImageDataContainer.h
-	utilities/cxImageDataContainer.cpp
-	utilities/cxFileHelpers.h
-	utilities/cxFileHelpers.cpp
+    utilities/cxSavingVideoRecorder.h
+    utilities/cxSavingVideoRecorder.cpp
+    utilities/cxImageDataContainer.h
+    utilities/cxImageDataContainer.cpp
+    utilities/cxFileHelpers.h
+    utilities/cxFileHelpers.cpp
+    utilities/cxUSReconstructInputData.h
+    utilities/cxUSReconstructInputData.cpp
+    utilities/cxUSReconstructInputDataAlgoritms.h
+    utilities/cxUSReconstructInputDataAlgoritms.cpp
+
+#	OpenIGTLinkUtilities/cxIGTLinkImageMessage.h
+#	OpenIGTLinkUtilities/cxIGTLinkImageMessage.cpp    
+#    OpenIGTLinkUtilities/cxIGTLinkUSStatusMessage.h
+#    OpenIGTLinkUtilities/cxIGTLinkUSStatusMessage.cpp
+#    OpenIGTLinkUtilities/igtl_us_status.h
+#    OpenIGTLinkUtilities/igtl_us_status.c	
 )
 
 include_directories(
@@ -95,14 +113,7 @@ set (CX_RESOURCE_LIBRARIES
 
 ADD_LIBRARY ( cxResource ${cxResource_SOURCE} ${MOC_HEADER_FILES})
 target_link_libraries(cxResource ${CX_RESOURCE_LIBRARIES} )
+CX_COTIRE_ADD_LIBRARY( cxResource "${CX_RESOURCE_LIBRARIES}")
 
-
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(cxResource)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(cxResource_unity ${CX_RESOURCE_LIBRARIES})
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
+add_subdirectory(testUtilities)
+add_subdirectory(testing)

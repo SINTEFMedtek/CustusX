@@ -20,11 +20,11 @@
 #include <QWidget>
 class QProgressBar;
 class QLabel;
-#include "cxDisplayTimerWidget.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
+class DisplayTimerWidget;
 
 /**
  * \file

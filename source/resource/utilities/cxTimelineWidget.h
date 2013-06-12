@@ -15,12 +15,12 @@
 #ifndef CXTIMELINEWIDGET_H_
 #define CXTIMELINEWIDGET_H_
 
-#include "cxPlaybackTime.h"
-#include "sscDoubleDataAdapterXml.h"
-#include <QSlider>
+#include <QWidget>
+
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
 #include "sscVector3D.h"
+#include "cxPlaybackTime.h"
 
 
 namespace cx

@@ -14,26 +14,12 @@
 
 #include "sscReconstructParams.h"
 
-#include <algorithm>
-#include <QtCore>
-#include <vtkImageData.h>
-#include "sscBoundingBox3D.h"
 #include "sscDataManager.h"
-#include "sscXmlOptionItem.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
-#include "sscThunderVNNReconstructAlgorithm.h"
-#include "sscPNNReconstructAlgorithm.h"
-#include "utils/sscReconstructHelper.h"
-#include "sscTime.h"
-#include "sscTypeConversions.h"
-#include "sscRegistrationTransform.h"
-#include "sscUtilHelpers.h"
-#include "sscVolumeHelpers.h"
-#include "sscPresetTransferFunctions3D.h"
-#include "sscManualTool.h"
+#include "sscBoolDataAdapterXml.h"
+#include "sscTransferFunctions3DPresets.h"
+#include "sscDoubleRange.h"
 
 //Windows fix
 #ifndef M_PI

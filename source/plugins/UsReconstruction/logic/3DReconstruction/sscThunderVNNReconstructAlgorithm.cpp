@@ -30,6 +30,7 @@
 #include "sscImage.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "sscUSFrameData.h"
 
 #ifdef SSC_USE_OpenCL
 #include "reconstruct_vnn.h"
@@ -38,6 +39,20 @@
 
 namespace ssc
 {
+
+ReconstructAlgorithmPtr ThunderVNNReconstructAlgorithm::create(QString shaderPath)
+{
+#ifdef SSC_USE_OpenCL
+	return ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(shaderPath));
+#else
+	return ReconstructAlgorithmPtr();
+#endif
+}
+
+ThunderVNNReconstructAlgorithm::~ThunderVNNReconstructAlgorithm()
+{
+}
+
 ThunderVNNReconstructAlgorithm::ThunderVNNReconstructAlgorithm(QString shaderPath)
 {
 	mShaderPath = shaderPath;

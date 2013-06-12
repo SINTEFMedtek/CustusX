@@ -46,10 +46,11 @@ void LogicManager::initializeServices()
 
 	// services layer
 	cx::PatientService::initialize();
-	cx::VideoService::initialize();
 	cx::DataManager::initialize();
 	cx::ToolManager::initializeObject();
+	cx::VideoService::initialize();
 	cx::ViewManager::createInstance();
+	cx::StateService::getInstance();
 	// init stateservice....
 
 	// logic layer
@@ -74,9 +75,9 @@ void LogicManager::shutdownServices()
 	//cx::LogicManager::shutdown();
 
 	// service layer
+	cx::VideoService::shutdown();
 	cx::ToolManager::shutdown();
 	cx::DataManager::shutdown();
-	cx::VideoService::shutdown();
 	cx::PatientService::shutdown();
 
 	ssc::GPUImageBufferRepository::shutdown();

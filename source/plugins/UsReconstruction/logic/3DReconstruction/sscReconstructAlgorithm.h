@@ -21,15 +21,16 @@
 #define SSCRECONSTRUCTALGORITHM_H_
 
 #include <vector>
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 #include "sscTransform3D.h"
 #include "sscDataAdapter.h"
-#include "sscUSFrameData.h"
 
 class QDomElement;
 
 namespace ssc
 {
+
+typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
 
 /**
  * \addtogroup sscUSReconstruction

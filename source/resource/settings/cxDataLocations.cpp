@@ -1,9 +1,16 @@
-/*
- * cxDataLocations.cpp
- *
- *  \date Jun 22, 2010
- *      \author christiana
- */
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
 #include "cxDataLocations.h"
 
 #include <iostream>
@@ -11,6 +18,8 @@
 #include <QDir>
 #include "cxConfig.h"
 #include "cxSettings.h"
+#include "cxFileHelpers.h"
+#include "sscTypeConversions.h"
 
 #ifdef CX_USE_TSF
 #include "tsf-config.h"
@@ -19,16 +28,56 @@
 namespace cx
 {
 
+//---------------------------------------------------------
+bool DataLocations::mTestMode = false;
+//---------------------------------------------------------
+
+void DataLocations::setTestMode()
+{
+	mTestMode = true;
+	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp/settings");
+}
+
 QString DataLocations::getTestDataPath()
 {
-  return CX_DATA_ROOT;
+	QString settingsPath = cx::DataLocations::getRootConfigPath() + "/settings";
+	QString dataRootConfigFile = settingsPath + "/data_root_location.txt";
+	if (QFileInfo(dataRootConfigFile).exists())
+	{
+		return readTestDataPathFromFile(dataRootConfigFile);
+	}
+	else
+	{
+		return CX_DATA_ROOT;
+	}
+}
+
+QString DataLocations::readTestDataPathFromFile(QString filename)
+{
+	QFile file(filename);
+	file.open(QFile::ReadOnly);
+	QString cxDataRoot(file.readAll());
+	return cxDataRoot;
+}
+
+QString DataLocations::getSettingsPath()
+{
+	QString retval = cx::DataLocations::getRootConfigPath() + "/settings";
+	if (mTestMode)
+		retval = getTestDataPath() + "/temp/settings";
+	return retval;
 }
 
 QString DataLocations::getBundlePath()
 {
 #ifdef __APPLE__
   QString path(qApp->applicationDirPath()+"/../../..");
-  return path;
+  QString bundle(qApp->applicationDirPath()+"/../..");
+//  std::cout << "check bundle: " << bundle << ", isbundle=" << QFileInfo(bundle).isBundle() << std::endl;
+  if (QFileInfo(bundle).isBundle())
+	  return path;
+  else
+	  return qApp->applicationDirPath();
 #else
   QString path(qApp->applicationDirPath());
   return path;
@@ -108,7 +157,8 @@ QString changeExtension(QString name, QString ext)
 
 QString DataLocations::getXmlSettingsFile()
 {
-  return changeExtension(settings()->fileName(), "xml");
+	return getSettingsPath() + "/settings.xml";
+//  return changeExtension(settings()->fileName(), "xml");
 //  return getAppDataPath() + "/CustusX.xml";
 }
 

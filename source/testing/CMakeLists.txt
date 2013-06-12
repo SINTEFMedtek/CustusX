@@ -11,6 +11,10 @@ endif(COMMAND cmake_policy)
 # =========================================================
 
 if (BUILD_TESTING)
+	cx_catch_add_master_exe()
+endif (BUILD_TESTING)
+
+if (BUILD_TESTING)
 
 include_directories(
     .

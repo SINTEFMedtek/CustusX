@@ -8,9 +8,10 @@
 #define CXTESTCUSTUSXCONTROLLER_H_
 
 #include <QApplication>
-#include "cxVideoService.h"
+#include "sscForwardDeclarations.h"
 #include "cxAcquisitionData.h"
 #include "cxUSAcquisition.h"
+#include "cxUSReconstructInputData.h"
 
 /**Helper object for automated control of the CustusX application.
  *
@@ -24,6 +25,10 @@ public:
 	void initialize();
 	void verify();
 
+	QString mConnectionMethod;
+	QString mAdditionalGrabberArg;
+	int mNumberOfExpectedStreams;
+
 private slots:
 	void newFrameSlot();
 	void start();
@@ -32,15 +37,18 @@ private slots:
 	void saveDataCompletedSlot(QString name);
 	void acquisitionDataReadySlot();
 	void readinessChangedSlot();
+	void videoConnectedSlot();
+
+	void setupVideo();
+	void setupProbe();
 
 private:
 	ssc::ReconstructManagerPtr createReconstructionManager();
 	void verifyFileData(ssc::USReconstructInputData data);
-	void setupVideo(QString framesFile);
-	void setupProbe(QString probedefinition);
 
 	ssc::USReconstructInputData mMemOutputData;
-	ssc::USReconstructInputData mFileOutputData;
+	std::vector<ssc::USReconstructInputData> mFileOutputData;
+	QString mAcqDataFilename;
 
 	double mRecordDuration; ///< duration of recording in ms.
 	ssc::VideoSourcePtr mVideoSource;

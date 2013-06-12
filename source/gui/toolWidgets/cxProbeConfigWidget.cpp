@@ -137,7 +137,7 @@ void ProbeConfigWidget::savePresetSlot()
 {
 	if (!mActiveProbeConfig->getTool())
 		return;
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 
@@ -185,7 +185,7 @@ void ProbeConfigWidget::savePresetSlot()
 
 void ProbeConfigWidget::deletePresetSlot()
 {
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 
@@ -204,10 +204,10 @@ void ProbeConfigWidget::deletePresetSlot()
 
 void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 {
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getData();
+	ssc::ProbeData data = probe->getProbeData();
 	mUpdating= true;
 
 	ssc::DoubleBoundingBox3D range(0, data.getImage().mSize.width(), 0, data.getImage().mSize.height());
@@ -249,10 +249,10 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	if(!mActiveProbeConfig->getTool())
 		return;
 	// need a cx probe here, in order to set data.
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getData();
+	ssc::ProbeData data = probe->getProbeData();
 
 	double sx = data.getImage().mSpacing[0]; // mm/pix
 	double sy = data.getImage().mSpacing[1];
@@ -262,7 +262,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	if (mSyncBoxToSector->isChecked())
 		data.updateClipRectFromSector();
 
-	probe->setData(data);
+	probe->setProbeSector(data);
 }
 
 void ProbeConfigWidget::guiImageSettingsChanged()
@@ -272,17 +272,17 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	// need a cx probe here, in order to set data.
 	if (!mActiveProbeConfig->getTool())
 		return;
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getData();
+	ssc::ProbeData data = probe->getProbeData();
 
 	ssc::ProbeData::ProbeImageData image = data.getImage();
 
 	image.mClipRect_p = mBBWidget->getValue();
 	data.setImage(image);
 
-	probe->setData(data);
+	probe->setProbeSector(data);
 }
 
 void ProbeConfigWidget::guiOriginSettingsChanged()
@@ -292,10 +292,10 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 	// need a cx probe here, in order to set data.
 	if (!mActiveProbeConfig->getTool())
 		return;
-	cx::ProbePtr probe = boost::shared_dynamic_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
+	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::Probe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getData();
+	ssc::ProbeData data = probe->getProbeData();
 
 	ssc::ProbeData::ProbeImageData image = data.getImage();
 
@@ -311,7 +311,7 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 
 	data.setImage(image);
 
-	probe->setData(data);
+	probe->setProbeSector(data);
 }
 
 

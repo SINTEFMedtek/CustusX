@@ -20,6 +20,7 @@
 #ifndef SSCRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 #define SSCRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 
+#include "sscTransform3D.h"
 #include "sscMessageManager.h"
 #include "sscXmlOptionItem.h"
 #include "sscTypeConversions.h"

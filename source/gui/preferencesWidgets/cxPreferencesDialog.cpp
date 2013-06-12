@@ -23,6 +23,7 @@
 #include "cxLayoutEditorTab.h"
 #include "cxViewWrapper3D.h"
 #include "sscHelperWidgets.h"
+#include "cxApplicationStateMachine.h"
 
 namespace cx
 {
@@ -49,7 +50,11 @@ PreferencesTab::PreferencesTab(QWidget *parent) :
 
 GeneralTab::GeneralTab(QWidget *parent) :
     PreferencesTab(parent)
-{}
+{
+	mPatientDataFolderComboBox = NULL;
+	mToolConfigFolderComboBox = NULL;
+	mChooseApplicationComboBox = NULL;
+}
 
 void GeneralTab::init()
 {
@@ -155,6 +160,14 @@ void GeneralTab::saveParametersSlot()
 PerformanceTab::PerformanceTab(QWidget *parent) :
     PreferencesTab(parent)
 {
+	mRenderingIntervalSpinBox = NULL;
+	mRenderingRateLabel = NULL;
+	mSmartRenderCheckBox = NULL;
+	mGPURenderCheckBox = NULL;
+	mProgressiveTextureRenderCheckBox = NULL;
+	mGPU2DRenderCheckBox = NULL;
+	mShadingCheckBox = NULL;
+	mMainLayout = NULL;
 }
 
 void PerformanceTab::init()
@@ -264,7 +277,11 @@ void PerformanceTab::saveParametersSlot()
 
 VisualizationTab::VisualizationTab(QWidget *parent) :
     PreferencesTab(parent), mStereoTypeActionGroup(NULL)
-{}
+{
+	mMainLayout = NULL;
+	mStereoTypeComboBox = NULL;
+	mStereoTypeActionGroup = NULL;
+}
 
 void VisualizationTab::init()
 {
@@ -411,7 +428,16 @@ void VisualizationTab::setBackgroundColorSlot(QColor color)
 //------------------------------------------------------------------------------
 AutomationTab::AutomationTab(QWidget *parent) :
     PreferencesTab(parent)
-{}
+{
+	mAutoSelectDominantToolCheckBox = NULL;
+	mAutoStartTrackingCheckBox = NULL;
+	mAutoStartStreamingCheckBox = NULL;
+	mAutoReconstructCheckBox = NULL;
+	mAutoSaveCheckBox = NULL;
+	mAutoLoadPatientCheckBox = NULL;
+	mAutoShowNewDataCheckBox = NULL;
+	mMainLayout = NULL;
+}
 
 void AutomationTab::init()
 {
@@ -482,7 +508,13 @@ void AutomationTab::saveParametersSlot()
 //------------------------------------------------------------------------------
 VideoTab::VideoTab(QWidget *parent) :
     PreferencesTab(parent)
-{}
+{
+	  mAcquisitionNameLineEdit = NULL;
+	  mMainLayout = NULL;
+	  m24bitRadioButton = NULL;
+	  m8bitRadioButton = NULL;
+	  mCompressCheckBox = NULL;
+}
 
 void VideoTab::init()
 {
@@ -701,7 +733,11 @@ void PreferencesDialog::addTab(PreferencesTab* widget, QString name)
 //------------------------------------------------------------------------------
 DebugTab::DebugTab(QWidget *parent) :
     PreferencesTab(parent)
-{}
+{
+	mIGSTKDebugLoggingCheckBox = NULL;
+	mManualToolPhysicalPropertiesCheckBox = NULL;
+	mMainLayout = NULL;
+}
 
 void DebugTab::init()
 {

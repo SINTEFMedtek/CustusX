@@ -6,18 +6,28 @@
 #include "tsf-config.h"
 #include "Exceptions.hpp"
 
+#include <QTimer>
+
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
+#include <vtkImageShiftScale.h>
 
 #include "sscTime.h"
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscDataManagerImpl.h"
+#include "sscDataReaderWriter.h"
 #include "sscRegistrationTransform.h"
+#include "sscDoubleDataAdapterXml.h"
+#include "cxContourFilter.h"
 #include "cxDataLocations.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
+#include "cxSelectDataStringDataAdapter.h"
+#include "cxTSFPresets.h"
+
+typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 
 namespace cx {
 
@@ -25,6 +35,7 @@ TubeSegmentationFilter::TubeSegmentationFilter() :
 	FilterImpl(), mOutput(NULL)
 {
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+	mPresets = this->populatePresets();
 }
 
 QString TubeSegmentationFilter::getName() const
@@ -41,43 +52,104 @@ QString TubeSegmentationFilter::getHelp() const
 {
 	return "<html>"
 	        "<h3>Tube-Segmentation.</h3>"
-	        "<p><i>Extracts the centerline and creates a segementation. </br>GPU-base algorithm wrtiten by Erik Smistad (NTNU).</i></p>"
+	        "<p><i>Extracts the centerline and creates a segementation. </br>GPU-base algorithm written by Erik Smistad (NTNU).</i></p>"
 	        "</html>";
+}
+
+bool TubeSegmentationFilter::hasPresets()
+{
+	return true;
+}
+
+ssc::PresetsPtr TubeSegmentationFilter::getPresets()
+{
+	return mPresets;
+}
+
+QDomElement TubeSegmentationFilter::generatePresetFromCurrentlySetOptions(QString name)
+{
+	std::vector<DataAdapterPtr> newPresetOptions = this->getNotDefaultOptions();
+
+	std::map<QString, QString> newPresetMap;
+	std::vector<DataAdapterPtr>::iterator it;
+	for(it = newPresetOptions.begin(); it != newPresetOptions.end(); ++it){
+		DataAdapterPtr option = *it;
+		QString valuename = option->getValueName();
+		QString value;
+		ssc::StringDataAdapterXmlPtr stringOption = boost::dynamic_pointer_cast<ssc::StringDataAdapterXml>(option);
+		ssc::BoolDataAdapterXmlPtr boolOption = boost::dynamic_pointer_cast<ssc::BoolDataAdapterXml>(option);
+		ssc::DoubleDataAdapterXmlPtr doubleOption = boost::dynamic_pointer_cast<ssc::DoubleDataAdapterXml>(option);
+		if(stringOption)
+			value = stringOption->getValue();
+		else if(boolOption)
+			value = boolOption->getValue() ? "true" : "false";
+		else if(doubleOption)
+			value = QString::number(doubleOption->getValue());
+		else
+			ssc::messageManager()->sendError("Could not determine what kind of option to get the value for.");
+		newPresetMap[valuename] = value;
+	}
+	ssc::StringDataAdapterPtr centerlineMethod = this->getStringOption("centerline-method");
+	newPresetMap[centerlineMethod->getValueName()] = centerlineMethod->getValue();
+
+	//create xml
+	QDomElement retval = TSFPresets::createPresetElement(name, newPresetMap);
+
+	return retval;
+}
+
+void TubeSegmentationFilter::requestSetPresetSlot(QString name)
+{
+	QString centerLineMethod = "gpu";
+	if((name == "<Default preset>") || (name == "none") || (name == "default"))
+		mParameterFile = "none";
+	else
+	{
+		mParameterFile = name;
+	}
+	this->loadNewParametersSlot();
+
+	ssc::StringDataAdapterXmlPtr centerlineMethodOption = this->getStringOption("centerline-method");
+	centerlineMethodOption->setValue(centerLineMethod);
 }
 
 bool TubeSegmentationFilter::execute()
 {
-	//get the image
     ssc::ImagePtr input = this->getCopiedInputImage();
     	if (!input)
     		return false;
 
-	// Parse parameters from program arguments
 	mParameters = this->getParametersFromOptions();
 	std::string filename = (patientService()->getPatientData()->getActivePatientFolder()+"/"+input->getFilePath()).toStdString();
 
 	try {
-		ssc::messageManager()->sendDebug("Looking for TSF files in folder: "+cx::DataLocations::getTSFPath());
-
-		mParameters = loadParameterPreset(mParameters, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
-
-		//this->printParameters(mParameters);
-
+		std::cout << "=================TSF START====================" << std::endl;
+		std::cout << "Input: " <<  input->getName().toStdString() << std::endl;
+		std::cout << "Preset: " <<  getParamStr(mParameters, "parameters") << std::endl;
+		std::cout << "Centerline-method: " <<  getParamStr(mParameters, "centerline-method") << std::endl;
+		std::cout << "--------------" << std::endl;
 		mOutput = run(filename, mParameters, cx::DataLocations::getTSFPath().toStdString());
-	} catch(SIPL::SIPLException e) {
+		std::cout << "=================TSF END====================" << std::endl;
+	} catch(SIPL::SIPLException& e) {
 		std::string error = e.what();
-		ssc::messageManager()->sendError(qstring_cast(error));
+		ssc::messageManager()->sendError("SIPL::SIPLException: "+qstring_cast(error));
 
-		//TODO free data
 		if(mOutput != NULL){
 			delete mOutput;
 			mOutput = NULL;
 		}
 		return false;
-	} catch (std::exception e){
-		ssc::messageManager()->sendError("Tube segmentation algorithm threw a std::exception.");
+	} catch(cl::Error& e) {
+		ssc::messageManager()->sendError("cl::Error:"+qstring_cast(e.what()));
 
-		//TODO free data
+		if(mOutput != NULL){
+			delete mOutput;
+			mOutput = NULL;
+		}
+		return false;
+	} catch (std::exception& e){
+		ssc::messageManager()->sendError("std::exception:"+qstring_cast(e.what()));
+
 		if(mOutput != NULL){
 			delete mOutput;
 			mOutput = NULL;
@@ -86,13 +158,11 @@ bool TubeSegmentationFilter::execute()
 	} catch (...){
 		ssc::messageManager()->sendError("Tube segmentation algorithm threw a unknown exception.");
 
-		//free data
 		if(mOutput != NULL){
 			delete mOutput;
 			mOutput = NULL;
 		}
 		return false;
-
 	}
  	return true;
 }
@@ -105,37 +175,36 @@ bool TubeSegmentationFilter::postProcess()
 		return false;
 	}
 
-	ssc::ImagePtr input = this->getCopiedInputImage();
-	if (!input)
+	ssc::ImagePtr inputImage = this->getCopiedInputImage();
+	if (!inputImage)
 		return false;
 
-	//Calculate shift
-	double spacing_x, spacing_y, spacing_z;
-	input->getBaseVtkImageData()->GetSpacing(spacing_x, spacing_y, spacing_z);
+	double inputImageSpacing_x, inputImageSpacing_y, inputImageSpacing_z;
+	inputImage->getBaseVtkImageData()->GetSpacing(inputImageSpacing_x, inputImageSpacing_y, inputImageSpacing_z);
 
 	//compensate for cropping
-	SIPL::int3 cropShift = mOutput->getShiftVector();
-	ssc::Vector3D translationVector((spacing_x*cropShift.x), (spacing_y*cropShift.y), (spacing_z*cropShift.z));
-	ssc::Transform3D cropTranslation = ssc::createTransformTranslate(translationVector);
-	ssc::Transform3D rMd = input->get_rMd();
-	rMd = rMd * cropTranslation;
+	SIPL::int3 voxelsCropped = mOutput->getShiftVector();
+	ssc::Vector3D croppingVectorInInpuImageSpace((inputImageSpacing_x*voxelsCropped.x), (inputImageSpacing_y*voxelsCropped.y), (inputImageSpacing_z*voxelsCropped.z));
+	ssc::Transform3D d_iMd_c = ssc::createTransformTranslate(croppingVectorInInpuImageSpace); //dc = data cropped, di = data input
+	ssc::Transform3D rMd_i = inputImage->get_rMd(); //transform from the volumes coordinate system to our reference coordinate system
+	ssc::Transform3D rMd_c = rMd_i * d_iMd_c; //translation due to cropping accounted for
 
 	// Centerline (volume)
 	//======================================================
 	if(mOutput->hasCenterlineVoxels())
 	{
-		QString uidCenterline = input->getUid() + "_tsf_cl_vol%1";
-		QString nameCenterline = input->getName()+"_tsf_cl_vol%1";
+		QString uidCenterline = inputImage->getUid() + "_tsf_cl_vol%1";
+		QString nameCenterline = inputImage->getName()+"_tsf_cl_vol%1";
 		SIPL::int3* size = mOutput->getSize();
-		vtkImageDataPtr rawCenterlineResult = this->convertToVtkImageData(mOutput->getCenterlineVoxels(), size->x, size->y, size->z, input);
+		vtkImageDataPtr rawCenterlineResult = this->convertToVtkImageData(mOutput->getCenterlineVoxels(), size->x, size->y, size->z, inputImage);
 		if(!rawCenterlineResult)
 			return false;
 
-		ssc::ImagePtr outputCenterline = ssc::dataManager()->createDerivedImage(rawCenterlineResult ,uidCenterline, nameCenterline, input);
+		ssc::ImagePtr outputCenterline = ssc::dataManager()->createDerivedImage(rawCenterlineResult ,uidCenterline, nameCenterline, inputImage);
 		if (!outputCenterline)
 			return false;
 
-		outputCenterline->get_rMd_History()->setRegistration(rMd);
+		outputCenterline->get_rMd_History()->setRegistration(rMd_c);
 
 		ssc::dataManager()->loadData(outputCenterline);
 		ssc::dataManager()->saveImage(outputCenterline, patientService()->getPatientData()->getActivePatientFolder());
@@ -143,66 +212,104 @@ bool TubeSegmentationFilter::postProcess()
 		mOutputTypes[0]->setValue(outputCenterline->getUid());
 	}
 
-
 	// Centerline (vtk)
 	//======================================================
 	boost::unordered_map<std::string, StringParameter>::iterator it = mParameters.strings.find("centerline-vtk-file");
-	if(mOutput->hasTDF() && it != mParameters.strings.end() && (it->second.get() != "off"))
+	if(it != mParameters.strings.end() && (it->second.get() != "off"))
 	{
-		QString vtkFilename = qstring_cast(it->second.get());
-		QString uidVtkCenterline = input->getUid() + "_tsf_cl%1";
-		QString nameVtkCenterline = input->getName()+"_tsf_cl%1";
+		QString tsfVtkFilename = qstring_cast(it->second.get());
+		QString uidVtkCenterline = inputImage->getUid() + "_tsf_cl%1";
+		QString nameVtkCenterline = inputImage->getName()+"_tsf_cl%1";
 
-		//load vtk into CustusX
-		ssc::PolyDataMeshReader reader;
-		ssc::DataPtr data;
-		if(reader.canLoad("vtk", vtkFilename))
-			data = reader.load(uidVtkCenterline, vtkFilename);
+		//load vtk file created by tsf into CustusX
+		ssc::MeshPtr tsfMesh = this->loadVtkFile(tsfVtkFilename, uidVtkCenterline);
 
-		if(!data)
-			false;
+		ssc::Vector3D inpuImageSpacing(inputImageSpacing_x, inputImageSpacing_y, inputImageSpacing_z);
+		ssc::Transform3D dMv = ssc::createTransformScale(inpuImageSpacing);  // transformation from voxelspace to imagespace
 
-		ssc::MeshPtr temp = boost::dynamic_pointer_cast<ssc::Mesh>(data);
+		ssc::Transform3D rMv = rMd_c*dMv;
 
-		if(data && temp){
-			ssc::Vector3D scalingVector(spacing_x, spacing_y, spacing_z);
-			ssc::Transform3D scalingTransformation = ssc::createTransformScale(scalingVector);
-			ssc::Transform3D dMv = rMd*scalingTransformation;
-			vtkPolyDataPtr poly = temp->getTransformedPolyData(dMv);
+		vtkPolyDataPtr poly = tsfMesh->getTransformedPolyData(rMv);
 
-			//create, load and save mesh
-			ssc::MeshPtr mesh = ssc::dataManager()->createMesh(poly, uidVtkCenterline, nameVtkCenterline, "Images");
-			mesh->get_rMd_History()->setParentSpace(input->getUid());
-			ssc::dataManager()->loadData(mesh);
-			ssc::dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
+		//create, load and save mesh
+		ssc::MeshPtr cxMesh = ssc::dataManager()->createMesh(poly, uidVtkCenterline, nameVtkCenterline, "Images");
+		cxMesh->get_rMd_History()->setParentSpace(inputImage->getUid());
+		ssc::dataManager()->loadData(cxMesh);
+		ssc::dataManager()->saveMesh(cxMesh, patientService()->getPatientData()->getActivePatientFolder());
+		QString uid = cxMesh->getUid();
 
-			QString uid = mesh->getUid();
-			mOutputTypes[1]->setValue(uid);
-		}else{
-			ssc::messageManager()->sendError("Could not import vtk centerline: "+vtkFilename);
-			return false;
-		}
+		mOutputTypes[1]->setValue(uid);
 	}
 
 	// Segmentation
 	//======================================================
 	if(mOutput->hasSegmentation())
 	{
-		QString uidSegmentation = input->getUid() + "_tsf_seg%1";
-		QString nameSegmentation = input->getName()+"_tsf_seg%1";
+		//get segmented volume
 		SIPL::int3* size = mOutput->getSize();
-		vtkImageDataPtr rawSegmentationResult = this->convertToVtkImageData(mOutput->getSegmentation(), size->x, size->y, size->z, input);
+		vtkImageDataPtr rawSegmentation = this->convertToVtkImageData(mOutput->getSegmentation(), size->x, size->y, size->z, inputImage);
 
-		ssc::ImagePtr outputSegmentaion = ssc::dataManager()->createDerivedImage(rawSegmentationResult,uidSegmentation, nameSegmentation, input);
-		if (!outputSegmentaion)
+		//make contour of segmented volume
+		double threshold = 1;/// because the segmented image is 0..1
+		vtkPolyDataPtr rawContour = ContourFilter::execute(rawSegmentation, threshold);
+
+		//add segmentation internally to cx
+		QString uidSegmentation = inputImage->getUid() + "_tsf_seg%1";
+		QString nameSegmentation = inputImage->getName()+"_tsf_seg%1";
+		ssc::ImagePtr outputSegmentation = ssc::dataManager()->createDerivedImage(rawSegmentation,uidSegmentation, nameSegmentation, inputImage);
+		if (!outputSegmentation)
 			return false;
 
-		outputSegmentaion->get_rMd_History()->setRegistration(rMd);
+		outputSegmentation->get_rMd_History()->setRegistration(rMd_c);
+		ssc::dataManager()->loadData(outputSegmentation);
+		ssc::dataManager()->saveImage(outputSegmentation, patientService()->getPatientData()->getActivePatientFolder());
 
-		ssc::dataManager()->loadData(outputSegmentaion);
-		ssc::dataManager()->saveImage(outputSegmentaion, patientService()->getPatientData()->getActivePatientFolder());
+		//add contour internally to cx
+		ssc::MeshPtr contour = ContourFilter::postProcess(rawContour, inputImage, QColor("blue"));
+		contour->get_rMd_History()->setRegistration(rMd_c);
 
-		mOutputTypes[2]->setValue(outputSegmentaion->getUid());
+		//set output
+		mOutputTypes[2]->setValue(outputSegmentation->getUid());
+		mOutputTypes[3]->setValue(contour->getUid());
+	}
+
+	// TDF
+	//======================================================
+	if(mOutput->hasTDF())
+	{
+		QString uidTDF = inputImage->getUid() + "_tsf_tdf%1";
+		QString nameTDF = inputImage->getName()+"_tsf_tdf%1";
+		SIPL::int3* size = mOutput->getSize();
+
+		// convert volume
+		vtkImageDataPtr convertedImageData = this->convertToVtkImageData(mOutput->getTDF(), size->x, size->y, size->z, inputImage);
+
+		//scale volume
+		if (!convertedImageData)
+			return false;
+
+		vtkImageShiftScalePtr cast = vtkImageShiftScalePtr::New();
+		cast->SetInput(convertedImageData);
+		cast->ClampOverflowOn();
+
+		//tdfs voxels contains values [0.0,1.0]
+		//scaling these to be able to visualize them in CustusX
+		int scale = 255; //unsigned char ranges from 0 to 255
+		cast->SetScale(scale);
+		cast->SetOutputScalarType(VTK_UNSIGNED_CHAR);
+		cast->Update();
+		convertedImageData = cast->GetOutput();
+
+		ssc::ImagePtr outputTDF = ssc::dataManager()->createDerivedImage(convertedImageData,uidTDF, nameTDF, inputImage);
+		if (!outputTDF)
+			return false;
+
+		rMd_i = rMd_i * d_iMd_c; //translation due to cropping accounted for
+		outputTDF->get_rMd_History()->setRegistration(rMd_i);
+		ssc::dataManager()->loadData(outputTDF);
+		ssc::dataManager()->saveImage(outputTDF, patientService()->getPatientData()->getActivePatientFolder());
+
+		mOutputTypes[4]->setValue(outputTDF->getUid());
 	}
 
 	//clean up
@@ -218,25 +325,17 @@ void TubeSegmentationFilter::createOptions()
 {
 	this->createDefaultOptions(mOptions);
 
-	//TODO temporary fix to be able to reset options
-	mOptionsAdapters.push_back(mResetOption);
-
-	//TODO options are automatically populated with saved data, because these are xml adapters
-	//BUT these options are saved on a system level (NOT patient level!)
-
 	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
-	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); stringIt++)
+	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 		mOptionsAdapters.push_back(*stringIt);
 
 	std::vector<ssc::BoolDataAdapterXmlPtr>::iterator boolIt;
-	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); boolIt++)
+	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
 		mOptionsAdapters.push_back(*boolIt);
 
 	std::vector<ssc::DoubleDataAdapterXmlPtr>::iterator doubleIt;
-	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); doubleIt++)
+	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
 		mOptionsAdapters.push_back(*doubleIt);
-
-	//TODO connect options that should be connected
 }
 
 void TubeSegmentationFilter::createInputTypes()
@@ -253,34 +352,47 @@ void TubeSegmentationFilter::createInputTypes()
 
 void TubeSegmentationFilter::createOutputTypes()
 {
-	SelectDataStringDataAdapterBasePtr temp;
+	SelectDataStringDataAdapterBasePtr tempDataStringAdapter;
+	SelectMeshStringDataAdapterPtr tempMeshStringAdapter;
 
-	temp = SelectDataStringDataAdapter::New();
-	temp->setValueName("Centerline");
-	temp->setHelp("Generated centerline.");
-	mOutputTypes.push_back(temp);
+	//0
+	tempDataStringAdapter = SelectDataStringDataAdapter::New();
+	tempDataStringAdapter->setValueName("Centerline volume");
+	tempDataStringAdapter->setHelp("Generated centerline volume.");
+	mOutputTypes.push_back(tempDataStringAdapter);
 
-	SelectMeshStringDataAdapterPtr vtkCenterline = SelectMeshStringDataAdapter::New();
-	vtkCenterline->setValueName("Centerline (vtk)");
-	vtkCenterline->setHelp("Generated centerline mesh (vtk-format).");
-	mOutputTypes.push_back(vtkCenterline);
+	//1
+	tempMeshStringAdapter = SelectMeshStringDataAdapter::New();
+	tempMeshStringAdapter->setValueName("Centerline mesh");
+	tempMeshStringAdapter->setHelp("Generated centerline mesh (vtk-format).");
+	mOutputTypes.push_back(tempMeshStringAdapter);
 
-	temp = SelectDataStringDataAdapter::New();
-	temp->setValueName("Segmentation");
-	temp->setHelp("Generated segmentation.");
-	mOutputTypes.push_back(temp);
+	//2
+	tempDataStringAdapter = SelectDataStringDataAdapter::New();
+	tempDataStringAdapter->setValueName("Segmented centerline");
+	tempDataStringAdapter->setHelp("Grown segmentation from the centerline.");
+	mOutputTypes.push_back(tempDataStringAdapter);
+
+	//3
+	tempMeshStringAdapter = SelectMeshStringDataAdapter::New();
+	tempMeshStringAdapter->setValueName("Segmented centerlines surface");
+	tempMeshStringAdapter->setHelp("Generated surface of the segmented volume.");
+	mOutputTypes.push_back(tempMeshStringAdapter);
+
+	//4
+	tempDataStringAdapter = SelectDataStringDataAdapter::New();
+	tempDataStringAdapter->setValueName("TDF volume");
+	tempDataStringAdapter->setHelp("Volume showing the probability of a voxel being part of a tubular structure.");
+	mOutputTypes.push_back(tempDataStringAdapter);
 }
 
 void TubeSegmentationFilter::patientChangedSlot()
 {
 	QString activePatientFolder = patientService()->getPatientData()->getActivePatientFolder()+"/Images/";
 
-	for(std::vector<ssc::StringDataAdapterXmlPtr>::iterator it = mStringOptions.begin(); it != mStringOptions.end(); ++it)
-	{
-		//TODO set storage-dir until problem is fixed
-		if(it->get()->getValueName().compare("storage-dir") == 0)
-			it->get()->setValue(activePatientFolder);
-	}
+	ssc::StringDataAdapterXmlPtr option = this->getStringOption("storage-dir");
+	if(option)
+		option->setValue(activePatientFolder);
 }
 
 void TubeSegmentationFilter::inputChangedSlot()
@@ -288,153 +400,201 @@ void TubeSegmentationFilter::inputChangedSlot()
 	QString activePatientFolder = patientService()->getPatientData()->getActivePatientFolder()+"/Images/";
 	QString inputsValue = mInputTypes.front()->getValue();
 
-	for(std::vector<ssc::StringDataAdapterXmlPtr>::iterator it = mStringOptions.begin(); it != mStringOptions.end(); ++it)
-	{
-		if(it->get()->getValueName().compare("centerline-vtk-file") == 0)
-			it->get()->setValue(activePatientFolder+inputsValue+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat())+"_tsf_vtk.vtk");
-	}
-}
-void TubeSegmentationFilter::parametersFileChanged()
-{
-	std::string parameterFile = "none";
-	for(std::vector<ssc::StringDataAdapterXmlPtr>::iterator it = mStringOptions.begin(); it != mStringOptions.end(); ++it)
-	{
-		if(it->get()->getValueName().compare("parameters") == 0)
-			parameterFile = it->get()->getValue().toStdString();
-	}
-	paramList temp = this->getParametersFromOptions();
-	try
-	{
-		temp = loadParameterPreset(temp, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
-	} catch (SIPL::SIPLException e)
-	{
-		ssc::messageManager()->sendWarning("Error when loading parameter file "+qstring_cast(parameterFile)+". Preset is corrupt.");
-	}
-	this->setParamtersToOptions(temp);
+	ssc::StringDataAdapterXmlPtr option = this->getStringOption("centerline-vtk-file");
+	if(option)
+		option->setValue(activePatientFolder+inputsValue+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat())+"_tsf_vtk.vtk");
 }
 
-void TubeSegmentationFilter::resetOptions()
+void TubeSegmentationFilter::loadNewParametersSlot()
 {
-	if(mResetOption->getValue() == "reset")
+	paramList list = this->getDefaultParameters();
+
+	if(mParameterFile != "none")
 	{
-		try{
-			paramList defaultParameters = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
-			this->setParamtersToOptions(defaultParameters);
-			this->patientChangedSlot();
-			this->inputChangedSlot();
-			mResetOption->setValue("not reset");
-		} catch (SIPL::SIPLException& e){
-			std::string message = "When resettting options, could not init parameters. \""+std::string(e.what())+"\"";
-			ssc::messageManager()->sendError(qstring_cast(message));
+		try
+		{
+			setParameter(list, "parameters", mParameterFile.toStdString());
+			loadParameterPreset(list, cx::DataLocations::getTSFPath().toStdString()+"/parameters");
+		} catch (SIPL::SIPLException& e)
+		{
+			ssc::messageManager()->sendWarning("Error when loading a parameter file. Preset is corrupt. "+QString(e.what()));
+			return;
 		}
 	}
+
+	blockSignals(true);
+		this->setOptionsSlot(list);
+		this->resetOptionsAdvancedSlot();
+		//set parameters found in the parameter file as not advanced
+		std::vector<std::string> notDefaultOptions = this->getNotDefault(list);
+		std::vector<std::string>::iterator it;
+		for(it = notDefaultOptions.begin() ;it != notDefaultOptions.end(); ++it)
+		{
+			this->getOption(qstring_cast(*it))->setAdvanced(false);
+		}
+	blockSignals(false);
+
+	emit changed();
 }
 
-//TODO later...
-//void TubeSegmentationFilter::centerlineMethodChanged()
-//{
-//
-//}
+void TubeSegmentationFilter::resetOptionsAdvancedSlot()
+{
+	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
+	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
+	{
+		ssc::StringDataAdapterXmlPtr adapter = *stringIt;
+		if(adapter->getValueName() == "parameters")
+		{
+			adapter->setAdvanced(false);
+		}
+		else
+			adapter->setAdvanced(true);
+	}
+
+	std::vector<ssc::BoolDataAdapterXmlPtr>::iterator boolIt;
+	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
+	{
+		ssc::BoolDataAdapterXmlPtr adapter = *boolIt;
+		adapter->setAdvanced(true);
+	}
+
+	std::vector<ssc::DoubleDataAdapterXmlPtr>::iterator doubleIt;
+	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
+	{
+		ssc::DoubleDataAdapterXmlPtr adapter = *doubleIt;
+		adapter->setAdvanced(true);
+	}
+}
+
+void TubeSegmentationFilter::resetOptionsSlot()
+{
+	paramList defaultParameters = this->getDefaultParameters();
+	this->resetOptionsAdvancedSlot();
+	this->setOptionsSlot(defaultParameters);
+}
+
+void TubeSegmentationFilter::setOptionsSlot(paramList& list)
+{
+	this->setParamtersToOptions(list);
+	this->patientChangedSlot();
+	this->inputChangedSlot();
+	emit changed();
+}
 
 vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(char * data, int size_x, int size_y, int size_z, ssc::ImagePtr input)
 {
 	if (!input)
 		return vtkImageDataPtr::New();
 
+	vtkImageDataPtr retval = this->importRawImageData((void*) data, size_x, size_y, size_z, input, VTK_UNSIGNED_CHAR);
+	return retval;
+}
+
+vtkImageDataPtr TubeSegmentationFilter::convertToVtkImageData(float * data, int size_x, int size_y, int size_z, ssc::ImagePtr input)
+{
+	if (!input)
+		return vtkImageDataPtr::New();
+
+	vtkImageDataPtr retval = this->importRawImageData((void*) data, size_x, size_y, size_z, input, VTK_FLOAT);
+	return retval;
+}
+
+//From vtkType.h (on Ubuntu 12.04)
+//#define VTK_VOID            0
+//#define VTK_BIT             1
+//#define VTK_CHAR            2
+//#define VTK_SIGNED_CHAR    15
+//#define VTK_UNSIGNED_CHAR   3
+//#define VTK_SHORT           4
+//#define VTK_UNSIGNED_SHORT  5
+//#define VTK_INT             6
+//#define VTK_UNSIGNED_INT    7
+//#define VTK_LONG            8
+//#define VTK_UNSIGNED_LONG   9
+//#define VTK_FLOAT          10
+//#define VTK_DOUBLE         11
+//#define VTK_ID_TYPE        12
+vtkImageDataPtr TubeSegmentationFilter::importRawImageData(void * data, int size_x, int size_y, int size_z, ssc::ImagePtr input, int type)
+{
 	vtkImageImportPtr imageImport = vtkImageImportPtr::New();
 
 	imageImport->SetWholeExtent(0, size_x - 1, 0, size_y - 1, 0, size_z - 1);
 	imageImport->SetDataExtentToWholeExtent();
-	imageImport->SetDataScalarTypeToUnsignedChar();
+	imageImport->SetDataScalarType(type);
 	imageImport->SetNumberOfScalarComponents(1);
 	imageImport->SetDataSpacing(input->getBaseVtkImageData()->GetSpacing());
-	imageImport->SetImportVoidPointer((void*)data);
+	imageImport->SetImportVoidPointer(data);
 	imageImport->GetOutput()->Update();
 	imageImport->Modified();
 
-//	vtkImageDataPtr retval = imageImport->GetOutput();
 	vtkImageDataPtr retval = vtkImageDataPtr::New();
 	retval->DeepCopy(imageImport->GetOutput());
 
 	return retval;
 }
 
+ssc::MeshPtr TubeSegmentationFilter::loadVtkFile(QString pathToFile, QString newDatasUid){
+	ssc::PolyDataMeshReader reader;
+	ssc::DataPtr data;
+	if(reader.canLoad("vtk", pathToFile))
+		data = reader.load(newDatasUid, pathToFile);
+
+	ssc::MeshPtr retval = boost::dynamic_pointer_cast<ssc::Mesh>(data);
+
+	if(!data or !retval)
+		ssc::messageManager()->sendError("Could not load "+pathToFile);
+
+	return retval;
+}
+
 void TubeSegmentationFilter::createDefaultOptions(QDomElement root)
 {
-	paramList defaultOptions;
-	try{
-		defaultOptions = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
-	} catch (SIPL::SIPLException& e){
-		std::string message = "When creating default options, could not init parameters. \""+std::string(e.what())+"\"";
-		ssc::messageManager()->sendError(qstring_cast(message));
-	}
-
-	// skip parameters we don't want:
-	// display, storage-dir ...
-	//TODO
-	std::vector<std::string> hideParameter;
-	//hideParameter.push_back("display");
-	//hideParameter.push_back("storage-dir");
-	//hideParameter.push_back("centerline-vtk-file");
+	//get list with default options
+	paramList defaultOptions = this->getDefaultParameters();
 
 	//generate string adapters
     boost::unordered_map<std::string, StringParameter>::iterator stringIt;
     for(stringIt = defaultOptions.strings.begin(); stringIt != defaultOptions.strings.end(); ++stringIt )
     {
-    	//skip some parameters
-    	if(std::find(hideParameter.begin(), hideParameter.end(), stringIt->first) != hideParameter.end())
-    		continue;
-
     	ssc::StringDataAdapterXmlPtr option = this->makeStringOption(root, stringIt->first, stringIt->second);
+    	option->setAdvanced(true);
+    	option->setGroup(qstring_cast(stringIt->second.getGroup()));
     	mStringOptions.push_back(option);
     	if(stringIt->first == "parameters")
-    		connect(option.get(), SIGNAL(changed()), this, SLOT(parametersFileChanged()));
-//    	if(stringIt->first == "centerline-method")
-//    		connect(option.get(), SIGNAL(changed()), this, SLOT(centerlineMethodChanged()));
+    		option->setEnabled(false);
+    	option->setAdvanced(true);
     }
-
-    //Manuelly adding option for resetting.
-    QStringList list;
-    list << "not reset";
-    list << "reset";
-//	mResetOption = this->makeStringOption(root, "RESET TO DEFAULT", list);
-    mResetOption = ssc::StringDataAdapterXml::initialize("tsf_reset_to_default", "RESET TO DEFAULT", "Used to reset options to default values.", "not reset", list, root);
-	//mStringOptions.push_back(mResetOption);
-	connect(mResetOption.get(), SIGNAL(changed()), this, SLOT(resetOptions()));
 
 	//generate bool adapters
     boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
     for(boolIt = defaultOptions.bools.begin(); boolIt != defaultOptions.bools.end(); ++boolIt )
     {
-    	if(std::find(hideParameter.begin(), hideParameter.end(), boolIt->first) == hideParameter.end())
-    		mBoolOptions.push_back(this->makeBoolOption(root, boolIt->first, boolIt->second));
+    	ssc::BoolDataAdapterXmlPtr option = this->makeBoolOption(root, boolIt->first, boolIt->second);
+    	option->setAdvanced(true);
+    	option->setGroup(qstring_cast(boolIt->second.getGroup()));
+    	mBoolOptions.push_back(option);
     }
 
 	//generate double adapters
     boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
     for(numericIt = defaultOptions.numerics.begin(); numericIt != defaultOptions.numerics.end(); ++numericIt )
     {
-    	if(std::find(hideParameter.begin(), hideParameter.end(), numericIt->first) == hideParameter.end())
-    		mDoubleOptions.push_back(this->makeDoubleOption(root, numericIt->first, numericIt->second));
+    	ssc::DoubleDataAdapterXmlPtr option = this->makeDoubleOption(root, numericIt->first, numericIt->second);
+    	option->setAdvanced(true);
+    	option->setGroup(qstring_cast(numericIt->second.getGroup()));
+    	mDoubleOptions.push_back(option);
     }
-
 }
 
 paramList TubeSegmentationFilter::getParametersFromOptions()
 {
-	paramList retval;
-	try{
-		retval = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
-	} catch (SIPL::SIPLException& e){
-		std::string message = "When getting parameters from options, could not init parameters. \""+std::string(e.what())+"\"";
-		ssc::messageManager()->sendError(qstring_cast(message));
-	}
+	paramList retval = this->getDefaultParameters();
 
 	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 	{
 		try{
-			retval = setParameter(retval, stringIt->get()->getValueName().toStdString(), stringIt->get()->getValue().toStdString());
+			setParameter(retval, stringIt->get()->getValueName().toStdString(), stringIt->get()->getValue().toStdString());
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a string parameter: \""+std::string(e.what())+"\"";
 			ssc::messageManager()->sendError(qstring_cast(message));
@@ -447,7 +607,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 	{
 		try{
 			std::string value = boolIt->get()->getValue() ? "true" : "false";
-			retval = setParameter(retval, boolIt->get()->getValueName().toStdString(), value);
+			setParameter(retval, boolIt->get()->getValueName().toStdString(), value);
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a bool parameter: \""+std::string(e.what())+"\"";
 			ssc::messageManager()->sendError(qstring_cast(message));
@@ -461,7 +621,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 		try{
 			double dbl = doubleIt->get()->getValue();
 			std::string value = boost::lexical_cast<std::string>(dbl);
-			retval = setParameter(retval, doubleIt->get()->getValueName().toStdString(), value);
+			setParameter(retval, doubleIt->get()->getValueName().toStdString(), value);
 		}catch(SIPL::SIPLException& e){
 			std::string message = "Could not process a double parameter: \""+std::string(e.what())+"\"";
 			ssc::messageManager()->sendError(qstring_cast(message));
@@ -470,7 +630,7 @@ paramList TubeSegmentationFilter::getParametersFromOptions()
 	}
 	return retval;
 }
-void TubeSegmentationFilter::setParamtersToOptions(paramList parameters)
+void TubeSegmentationFilter::setParamtersToOptions(paramList& parameters)
 {
 	//set string adapters
     boost::unordered_map<std::string, StringParameter>::iterator stringIt;
@@ -488,38 +648,205 @@ void TubeSegmentationFilter::setParamtersToOptions(paramList parameters)
     	this->setOptionValue(qstring_cast(numericIt->first),qstring_cast(numericIt->second.get()));
 }
 
-void TubeSegmentationFilter::setOptionValue(QString valueName, QString value)
+ssc::StringDataAdapterXmlPtr TubeSegmentationFilter::getStringOption(QString valueName)
 {
+	ssc::StringDataAdapterXmlPtr retval;
 	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringIt;
 	for(stringIt = mStringOptions.begin(); stringIt != mStringOptions.end(); ++stringIt)
 	{
 		if(stringIt->get()->getValueName().compare(valueName) == 0)
 		{
-			stringIt->get()->setValue(value);
-			return;
+			retval = *stringIt;
+			return retval;
 		}
 	}
+	return retval;
+}
 
+ssc::BoolDataAdapterXmlPtr TubeSegmentationFilter::getBoolOption(QString valueName)
+{
+	ssc::BoolDataAdapterXmlPtr retval;
 	std::vector<ssc::BoolDataAdapterXmlPtr>::iterator boolIt;
-	bool boolValue = (value.compare("true") == 0) ? true : false;
 	for(boolIt = mBoolOptions.begin(); boolIt != mBoolOptions.end(); ++boolIt)
 	{
 		if(boolIt->get()->getValueName().compare(valueName) == 0)
 		{
-			boolIt->get()->setValue(boolValue);
-			return;
+			retval = *boolIt;
+			return retval;
 		}
 	}
+	return retval;
+}
 
+ssc::DoubleDataAdapterXmlPtr TubeSegmentationFilter::getDoubleOption(QString valueName)
+{
+	ssc::DoubleDataAdapterXmlPtr retval;
 	std::vector<ssc::DoubleDataAdapterXmlPtr>::iterator doubleIt;
 	for(doubleIt = mDoubleOptions.begin(); doubleIt != mDoubleOptions.end(); ++doubleIt)
 	{
 		if(doubleIt->get()->getValueName().compare(valueName) == 0)
 		{
-			doubleIt->get()->setValue(value.toDouble());
-			return;
+			retval = *doubleIt;
+			return retval;
 		}
 	}
+	return retval;
+}
+
+DataAdapterPtr TubeSegmentationFilter::getOption(QString valueName)
+{
+	DataAdapterPtr retval;
+
+	retval = getStringOption(valueName);
+	if(retval)
+		return retval;
+	retval = getBoolOption(valueName);
+	if(retval)
+		return retval;
+	retval = getDoubleOption(valueName);
+	if(retval)
+		return retval;
+
+	return retval;
+}
+
+void TubeSegmentationFilter::setOptionAdvanced(QString valueName, bool advanced)
+{
+	DataAdapterPtr option = this->getOption(valueName);
+	option->setAdvanced(advanced);
+}
+
+void TubeSegmentationFilter::setOptionValue(QString valueName, QString value)
+{
+	DataAdapterPtr option = this->getOption(valueName);
+	if(!option)
+		return;
+
+	ssc::StringDataAdapterXmlPtr stringOption = boost::dynamic_pointer_cast<ssc::StringDataAdapterXml>(option);
+	ssc::BoolDataAdapterXmlPtr boolOption = boost::dynamic_pointer_cast<ssc::BoolDataAdapterXml>(option);
+	ssc::DoubleDataAdapterXmlPtr doubleOption = boost::dynamic_pointer_cast<ssc::DoubleDataAdapterXml>(option);
+	if(stringOption)
+	{
+		stringOption->setValue(value);
+	}
+	else if(boolOption)
+	{
+		bool boolValue = (value.compare("1") == 0) ? true : false;
+		boolOption->setValue(boolValue);
+	}
+	else if(doubleOption)
+	{
+		doubleOption->setValue(value.toDouble());
+	}
+	else
+	{
+		ssc::messageManager()->sendError("Could not determine what kind of option to set the value for.");
+		return;
+	}
+}
+
+std::vector<std::string> TubeSegmentationFilter::getNotDefault(paramList list)
+{
+	return this->getDifference(this->getDefaultParameters(), list);
+}
+
+std::vector<std::string> TubeSegmentationFilter::getDifference(paramList list1, paramList list2)
+{
+	std::vector<std::string> retval;
+	try{
+		boost::unordered_map<std::string, StringParameter>::iterator stringIt;
+	    for(stringIt = list1.strings.begin(); stringIt != list1.strings.end(); ++stringIt )
+	    {
+	    	std::string name = stringIt->first;
+	    	if(getParamStr(list1, name) != getParamStr(list2, name))
+	    		retval.push_back(name);
+	    }
+		boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
+	    for(boolIt = list1.bools.begin(); boolIt != list1.bools.end(); ++boolIt )
+	    {
+	    	std::string name = boolIt->first;
+	    	if(getParamBool(list1, name) != getParamBool(list2, name))
+	    		retval.push_back(name);
+	    }
+		boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
+	    for(numericIt = list1.numerics.begin(); numericIt != list1.numerics.end(); ++numericIt )
+	    {
+	    	std::string name = numericIt->first;
+	    	if(getParam(list1, name) != getParam(list2, name))
+	    		retval.push_back(name);
+	    }
+
+	}catch (SIPL::SIPLException& e){
+		ssc::messageManager()->sendError(QString(e.what()));
+	}
+	return retval;
+
+}
+
+std::vector<DataAdapterPtr> TubeSegmentationFilter::getNotDefaultOptions()
+{
+	std::vector<DataAdapterPtr> retval;
+
+	//get list with default options
+	paramList defaultOptions = this->getDefaultParameters();
+
+	std::vector<ssc::StringDataAdapterXmlPtr>::iterator stringDAIt;
+	for(stringDAIt = mStringOptions.begin(); stringDAIt != mStringOptions.end(); ++stringDAIt)
+	{
+	    boost::unordered_map<std::string, StringParameter>::iterator stringIt;
+	    for(stringIt = defaultOptions.strings.begin(); stringIt != defaultOptions.strings.end(); ++stringIt )
+	    {
+	    	if(stringDAIt->get()->getValueName().toStdString() == stringIt->first)
+	    	{
+	    		if(stringDAIt->get()->getValue().toStdString() != stringIt->second.get())
+	    			retval.push_back(*stringDAIt);
+	    	}
+	    }
+	}
+
+	std::vector<ssc::BoolDataAdapterXmlPtr>::iterator boolDAIt;
+	for(boolDAIt = mBoolOptions.begin(); boolDAIt != mBoolOptions.end(); ++boolDAIt)
+	{
+	    boost::unordered_map<std::string, BoolParameter>::iterator boolIt;
+	    for(boolIt = defaultOptions.bools.begin(); boolIt != defaultOptions.bools.end(); ++boolIt )
+	    {
+	    	if(boolDAIt->get()->getValueName().toStdString() == boolIt->first)
+	    	{
+	    		if(boolDAIt->get()->getValue() != boolIt->second.get())
+	    			retval.push_back(*boolDAIt);
+	    	}
+	    }
+	}
+
+	std::vector<ssc::DoubleDataAdapterXmlPtr>::iterator doubleDAIt;
+	for(doubleDAIt = mDoubleOptions.begin(); doubleDAIt != mDoubleOptions.end(); ++doubleDAIt)
+	{
+	    boost::unordered_map<std::string, NumericParameter>::iterator numericIt;
+	    for(numericIt = defaultOptions.numerics.begin(); numericIt != defaultOptions.numerics.end(); ++numericIt )
+	    {
+	    	if(doubleDAIt->get()->getValueName().toStdString() == numericIt->first)
+	    	{
+	    		float epsilon = 0.00000000000001;
+	    		if(!(abs(doubleDAIt->get()->getValue() - numericIt->second.get()) < epsilon))
+	    			retval.push_back(*doubleDAIt);
+	    	}
+	    }
+	}
+
+	return retval;
+}
+
+paramList TubeSegmentationFilter::getDefaultParameters()
+{
+	//get list with default options
+	paramList defaultOptions;
+	try{
+		defaultOptions = initParameters(cx::DataLocations::getTSFPath().toStdString()+"/parameters");
+	} catch (SIPL::SIPLException& e){
+		std::string message = "When creating default options, could not init parameters. \""+std::string(e.what())+"\"";
+		ssc::messageManager()->sendError(qstring_cast(message));
+	}
+	return defaultOptions;
 }
 
 void TubeSegmentationFilter::printParameters(paramList parameters)
@@ -528,18 +855,18 @@ void TubeSegmentationFilter::printParameters(paramList parameters)
     std::cout << "The following parameters are set: " << std::endl;
 
     boost::unordered_map<std::string,StringParameter>::iterator itString;
-    for(itString = parameters.strings.begin(); itString != parameters.strings.end(); itString++) {
+    for(itString = parameters.strings.begin(); itString != parameters.strings.end(); ++itString) {
     	std::cout << itString->first << " " << itString->second.get() << std::endl;
     }
 
     boost::unordered_map<std::string,BoolParameter>::iterator itBool;
-    for(itBool = parameters.bools.begin(); itBool != parameters.bools.end(); itBool++) {
+    for(itBool = parameters.bools.begin(); itBool != parameters.bools.end(); ++itBool) {
     	std::string value = itBool->second.get() ? "true" : "false";
     	std::cout << itBool->first << " " << value << std::endl;
     }
 
     boost::unordered_map<std::string,NumericParameter>::iterator itNumeric;
-    for(itNumeric = parameters.numerics.begin(); itNumeric != parameters.numerics.end(); itNumeric++) {
+    for(itNumeric = parameters.numerics.begin(); itNumeric != parameters.numerics.end(); ++itNumeric) {
     	std::cout << itNumeric->first << " " << itNumeric->second.get() << std::endl;
     }
 
@@ -548,7 +875,7 @@ void TubeSegmentationFilter::printParameters(paramList parameters)
 
 ssc::StringDataAdapterXmlPtr TubeSegmentationFilter::makeStringOption(QDomElement root, std::string name, StringParameter parameter)
 {
-	QString helptext = qstring_cast(parameter.getDescription()); //parameter.getHelpText();
+	QString helptext = qstring_cast(parameter.getDescription());
 	std::vector<std::string> possibilities = parameter.getPossibilities();
 
 	QString value = qstring_cast(parameter.get());
@@ -591,6 +918,12 @@ ssc::DoubleDataAdapterXmlPtr TubeSegmentationFilter::makeDoubleOption(QDomElemen
 
 	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize(qstring_cast("tsf_"+name), qstring_cast(name), helptext, value, range, decimals, root);
 	retval->setAddSlider(true);
+	return retval;
+}
+
+TSFPresetsPtr TubeSegmentationFilter::populatePresets()
+{
+	TSFPresetsPtr retval(new TSFPresets());
 	return retval;
 }
 

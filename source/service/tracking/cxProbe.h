@@ -16,14 +16,16 @@
  * cxProbe.h
  *
  *  \date Feb 3, 2011
- *      \author christiana
+ *  \author Christian Askeland, SINTEF
+ *  \author Ole Vegard Solberg, SINTEF
  */
 
 #ifndef CXPROBE_H_
 #define CXPROBE_H_
 
-#include "sscTool.h"
-#include "probeXmlConfigParser.h"
+#include "sscProbe.h"
+#include <map>
+#include "ProbeXmlConfigParserImpl.h"
 
 namespace cx
 {
@@ -42,14 +44,14 @@ class Probe: public ssc::Probe
 {
 Q_OBJECT
 public:
-	static ProbePtr New(QString instrumentUid, QString scannerUid);
-	virtual ~Probe()
-	{
-	}
+	static ProbePtr New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml = ProbeXmlConfigParserPtr());
+	virtual ~Probe(){}
 	virtual bool isValid() const;
-	virtual ssc::ProbeData getData() const;
-	virtual ssc::VideoSourcePtr getRTSource() const;
-	virtual ssc::ProbeSectorPtr getSector();
+
+	virtual QStringList getAvailableVideoSources();
+	virtual ssc::VideoSourcePtr getRTSource(QString uid = "active") const;
+	virtual ssc::ProbeData getProbeData(QString uid = "active") const;
+	virtual ssc::ProbeSectorPtr getSector(QString uid = "active");
 
 	virtual void addXml(QDomNode& dataNode);
 	virtual void parseXml(QDomNode& dataNode);
@@ -59,34 +61,53 @@ public:
 	virtual QString getConfigId() const;
 	virtual QString getConfigurationPath() const;
 
-	virtual void setConfigId(QString uid);
+	virtual void applyNewConfigurationWithId(QString uid);
 	virtual void setTemporalCalibration(double val);
 	virtual void setSoundSpeedCompensationFactor(double val);
-	virtual void setData(ssc::ProbeData probeSector, QString configUid="");
+	virtual void setProbeSector(ssc::ProbeData probeSector);
 	virtual void setRTSource(ssc::VideoSourcePtr source);
+	virtual void removeRTSource(ssc::VideoSourcePtr source);
 
-	// non-inherited methods
+	virtual void setActiveStream(QString uid);
+	virtual QString getActiveStream() const;
+
+	// non-inherited functions
 	ProbeXmlConfigParser::Configuration getConfiguration() const;
 	void removeCurrentConfig(); ///< remove the current config from disk
 	void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
 
+	void useDigitalVideo(bool digitalStatus);///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
+	bool isUsingDigitalVideo() const;
+	QString getRtSourceName() const;
+
+
 private:
 	Probe(QString instrumentUid, QString scannerUid);
+	void initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml);
+	void initConfigId();
 	ProbeXmlConfigParser::Configuration getConfiguration(QString uid) const;
 	QString getInstrumentId() const;
 	QString getInstrumentScannerId() const;
+	bool hasRtSource() const;
 
-	ssc::ProbeData mData; ///< Probe sector information
-	ssc::VideoSourcePtr mSource;
+	void setConfigId(QString uid);
+	void updateProbeSector();
+	bool isValidConfigId();
+	ssc::ProbeData createProbeSector();
+	void updateTemporalCalibration();
+	QString mActiveUid;
+	std::map<QString, ssc::ProbeData> mProbeData; ///< all defined probe definitions
+	std::map<QString, ssc::VideoSourcePtr> mSource; ///< all defined sources
 	ssc::ProbeWeakPtr mSelf;
-
-	double mSoundSpeedCompensationFactor;
-	bool mOverrideTemporalCalibration;
-	double mTemporalCalibration;
 
 	QString mInstrumentUid;
 	QString mScannerUid;
-	boost::shared_ptr<ProbeXmlConfigParser> mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
+	double mSoundSpeedCompensationFactor;
+	bool mOverrideTemporalCalibration;
+	double mTemporalCalibration;
+	bool mDigitalInterface;///< RTSource is digital (eg. US sector is set digitally, not read from .xml file)
+
+	ProbeXmlConfigParserPtr mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
 	QString mConfigurationId; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
 
 };

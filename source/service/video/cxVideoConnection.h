@@ -11,110 +11,95 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-
-/*
- * cxRTSourceManager.h
- *
- *  \date Jan 25, 2011
- *      \author christiana
- */
-#ifndef CXVIDEOCONNECTION_H_
-#define CXVIDEOCONNECTION_H_
+#ifndef CXOPENIGTLINKRTSOURCE_H_
+#define CXOPENIGTLINKRTSOURCE_H_
 
 #include <vector>
-#include <QtGui>
-#include "sscView.h"
-#include "cxOpenIGTLinkRTSource.h"
-#include "cxRenderTimer.h"
-#include "sscStringDataAdapterXml.h"
+#include <map>
+#include <boost/array.hpp>
+#include "sscForwardDeclarations.h"
+#include "sscVideoSource.h"
+#include "sscProbeData.h"
+
+class QTimer;
+typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
+typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
 
 namespace cx
 {
-
-typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
-
 /**
-* \file
-* \addtogroup cxServiceVideo
-* @{
-*/
-
-/**\brief Class representing a single IGTLink connection,
- * connection facilities and options.
- * \ingroup cxServiceVideo
- *
- * The connection can either operate on a remote server or a local one.
- * GUI can be found in cxIGTLinkWidget (along with some additional functionality...)
- *
+ * \file
+ * \addtogroup cxServiceVideo
+ * @{
  */
-class VideoConnection: public QObject
+
+typedef boost::shared_ptr<class ImageReceiverThread> ImageReceiverThreadPtr;
+typedef boost::shared_ptr<class BasicVideoSource> BasicVideoSourcePtr;
+
+/** \brief Represent one video grabber connection.
+ *
+ * Connect to a video/scanner interface and receive
+ * all video and probe data from it. Convert to video
+ * streams, set all data in probe if available.
+ * Video Streams are also available directly from this
+ * object.
+ *
+ * Refactored from old class OpenIGTLinkRTSource.
+ *
+ *  \ingroup cxServiceVideo
+ *  \date Oct 31, 2010
+ *  \date Feb 26, 2013
+ *  \author Christian Askeland, SINTEF
+ */
+class VideoConnection : public QObject
 {
-Q_OBJECT
+	Q_OBJECT
+
 public:
 	VideoConnection();
 	virtual ~VideoConnection();
+	virtual bool isConnected() const;
 
-	ssc::StringDataAdapterXmlPtr getConnectionMethod() { return mConnectionMethod; }
+	void runDirectLinkClient(std::map<QString, QString> args);
+	void runIGTLinkedClient(QString address, int port);
+	void disconnectServer();
 
-
-	void setLocalServerExecutable(QString commandline);
-	QString getLocalServerExecutable();
-	void setPort(int port);
-	int getPort();
-	QStringList getHostHistory();
-	QString getHost();
-	void setHost(QString host);
-	QStringList getDirectLinkArgumentHistory();
-	void setLocalServerArguments(QString commandline);
-	QString getLocalServerArguments();
-
-	bool getUseLocalServer2();
-	bool getUseDirectLink2();
-
-	void setInitScript(QString filename);
-	QString getInitScript();
-
-	void launchServer();
-	void launchAndConnectServer();
-
-	QProcess* getProcess();
-	OpenIGTLinkRTSourcePtr getVideoSource()
-	{
-		return mRTSource;
-	}
+	std::vector<ssc::VideoSourcePtr> getVideoSources();
 
 signals:
+	bool connected(bool);
 	void fps(int fps);
-	void connected(bool on);
-	void settingsChanged();
+	void videoSourcesChanged();
 
-public slots:
-	void connectServer();
-//	void serverProcessReadyRead();
-
-//private slots:
-	void serverProcessStateChanged(QProcess::ProcessState newState);
-//	void serverProcessError(QProcess::ProcessError error);
+private slots:
+	void clientFinishedSlot();
+	void imageReceivedSlot();
+	void statusReceivedSlot();
+	void fpsSlot(double fps);
+	void connectedSlot(bool on);
+	void connectVideoToProbe();
+	void useUnusedProbeDataSlot();///< If no probe is available the ProbeData is saved and this slot is called when a probe becomes available
 
 private:
-	void delayedAutoConnectServer();
+	void updateImage(ssc::ImagePtr message); // called by receiving thread when new data arrives.
+	void runClient(ImageReceiverThreadPtr client);
+	void stopClient(); ///< Get rid of the mClient thread.
+	void updateStatus(ssc::ProbeDataPtr message);
+	void startAllSources();
+	void removeSourceFromProbe(ssc::ToolPtr tool);
 
-//	double mSoundSpeedCompensationFactor;
-	OpenIGTLinkRTSourcePtr mRTSource;
-//	QProcess* mServer;
-	int mConnectWhenLocalServerRunning;
-	ProcessWrapperPtr mProcess;
-	ProcessWrapperPtr mIniScript;
+	ImageReceiverThreadPtr mClient;
+	bool mConnected;
+	double mFPS;
+	std::vector<ssc::ProbeDataPtr> mUnsusedProbeDataVector;
 
-	ssc::StringDataAdapterXmlPtr mConnectionMethod;
-	ssc::XmlOptionFile mOptions;
-
+	std::vector<BasicVideoSourcePtr> mSources;
 };
 typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 
 /**
-* @}
-*/
-}//end namespace cx
+ * @}
+ */
+} // namespace cx
 
-#endif /* CXVIDEOCONNECTION_H_ */
+#endif /* CXOPENIGTLINKRTSOURCE_H_ */

@@ -296,9 +296,10 @@ void TransferFunctionColorWidget::moveCurrentPoint()
     else if (newColorPoint.position >= nextPointIterator->first)
       newColorPoint.position = nextPointIterator->first - 1;
 
-    mImageTF->removeColorPoint(mCurrentPoint.position);
-    mImageTF->addColorPoint(newColorPoint.position, newColorPoint.value);
-    mCurrentPoint = newColorPoint;
+//    mImageTF->removeColorPoint(mCurrentPoint.position);
+//    mImageTF->addColorPoint(newColorPoint.position, newColorPoint.value);
+	mImageTF->moveColorPoint(mCurrentPoint.position, newColorPoint.position, newColorPoint.value);
+	mCurrentPoint = newColorPoint;
   }
 	this->update();
 }

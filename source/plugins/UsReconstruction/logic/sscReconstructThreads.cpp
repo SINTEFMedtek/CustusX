@@ -14,31 +14,12 @@
 
 #include "sscReconstructThreads.h"
 
-#include <algorithm>
-#include <QtCore>
-#include <vtkImageData.h>
-#include "sscBoundingBox3D.h"
-#include "sscDataManager.h"
-#include "sscXmlOptionItem.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
-#include "sscToolManager.h"
-#include "sscMessageManager.h"
-#include "utils/sscReconstructHelper.h"
-#include "sscTime.h"
-#include "sscTypeConversions.h"
-#include "sscRegistrationTransform.h"
-#include "sscUtilHelpers.h"
-#include "cxCreateProbeDataFromConfiguration.h"
-#include "sscVolumeHelpers.h"
-#include "cxUsReconstructionFileReader.h"
-#include "sscPresetTransferFunctions3D.h"
-#include "cxToolManager.h"
-#include "sscManualTool.h"
+#include "sscImage.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxViewManager.h"
-#include "cxCompositeTimedAlgorithm.h"
+#include "sscReconstructPreprocessor.h"
+#include "sscReconstructCore.h"
 
 //Windows fix
 #ifndef M_PI

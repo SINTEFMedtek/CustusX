@@ -45,10 +45,12 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
   mTools = SelectToolStringDataAdapter::New();
+  mTools->setValueName("Reference tool");
+  mTools->setHelp("Select a tool with a known reference point");
   mCalibrateToolComboBox = new ssc::LabeledComboBoxWidget(this, mTools);
   this->setToolTip(this->defaultWhatsThis());
 
-  toplayout->addWidget(new QLabel("<b>Select a tool with a known reference point:</b>"));
+  //toplayout->addWidget(new QLabel("<b>Select a tool with a known reference point:</b>"));
   toplayout->addWidget(mCalibrateToolComboBox);
   toplayout->addWidget(mReferencePointLabel);
   toplayout->addWidget(mCalibrateButton);
@@ -140,6 +142,8 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
       mCalibrateButton->setEnabled(true);
 //      mTestButton->setEnabled(true);
     }
+    else
+    	ssc::messageManager()->sendWarning("Selected tool have no known reference point");
     if(tool)
     {
       mCalibrationLabel->setText("Calibration:\n"+qstring_cast(tool->getCalibration_sMt()));

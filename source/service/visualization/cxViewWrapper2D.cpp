@@ -22,8 +22,16 @@
 
 #include "cxViewWrapper2D.h"
 #include <vector>
+#include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+
+#include <QAction>
+#include <QActionGroup>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QWheelEvent>
+
 #include "sscUtilHelpers.h"
 #include "sscView.h"
 #include "sscSliceProxy.h"
@@ -33,6 +41,7 @@
 #include "sscOrientationAnnotation2DRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
+#include "sscManualTool.h"
 #include "sscDataManager.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
@@ -49,6 +58,7 @@
 #include "sscData.h"
 #include "sscMesh.h"
 #include "sscImage.h"
+#include "sscPointMetricRep2D.h"
 
 namespace cx
 {
@@ -523,17 +533,17 @@ void ViewWrapper2D::imageRemoved(const QString& uid)
 
 void ViewWrapper2D::dataAdded(ssc::DataPtr data)
 {
-	if (boost::shared_dynamic_cast<ssc::Image>(data))
+	if (boost::dynamic_pointer_cast<ssc::Image>(data))
 	{
-		this->imageAdded(boost::shared_dynamic_cast<ssc::Image>(data));
+		this->imageAdded(boost::dynamic_pointer_cast<ssc::Image>(data));
 	}
-	else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
+	else if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
 	{
-		this->meshAdded(boost::shared_dynamic_cast<ssc::Mesh>(data));
+		this->meshAdded(boost::dynamic_pointer_cast<ssc::Mesh>(data));
 	}
-	else if (boost::shared_dynamic_cast<ssc::PointMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::PointMetric>(data))
 	{
-		this->pointMetricAdded(boost::shared_dynamic_cast<ssc::PointMetric>(data));
+		this->pointMetricAdded(boost::dynamic_pointer_cast<ssc::PointMetric>(data));
 	}
 }
 

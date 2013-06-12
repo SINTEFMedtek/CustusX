@@ -14,17 +14,19 @@
 
 #include "cxBinaryThinningImageFilter3DFilter.h"
 
-#include "cxAlgorithmHelpers.h"
+#include <itkBinaryThinningImageFilter3D.h>
+
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscRegistrationTransform.h"
-#include "sscUtilHelpers.h"
-#include "vesselReg/SeansVesselReg.hxx"
 #include "sscMesh.h"
+#include "sscImage.h"
+#include "sscColorDataAdapterXml.h"
+#include "vesselReg/SeansVesselReg.hxx"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
-#include "sscImage.h"
-
+#include "cxSelectDataStringDataAdapter.h"
+#include "cxAlgorithmHelpers.h"
 
 namespace cx
 {

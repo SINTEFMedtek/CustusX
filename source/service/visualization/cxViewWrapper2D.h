@@ -22,7 +22,6 @@
 #define CXVIEWWRAPPER2D_H_
 
 #include <vector>
-#include <QtGui>
 #include <QPointer>
 #include "cxForwardDeclarations.h"
 #include "sscDefinitions.h"
@@ -30,7 +29,9 @@
 #include "sscBoundingBox3D.h"
 #include "sscTransform3D.h"
 #include "sscConfig.h"
-#include "sscPointMetricRep2D.h"
+
+class QMouseEvent;
+class QWheelEvent;
 
 namespace ssc
 {

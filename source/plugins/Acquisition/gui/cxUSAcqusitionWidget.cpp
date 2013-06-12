@@ -16,6 +16,11 @@
 #include "sscReconstructManager.h"
 #include "cxTimedAlgorithmProgressBar.h"
 #include "cxProbeConfigWidget.h"
+#include "cxDisplayTimerWidget.h"
+#include "sscReconstructParams.h"
+#include "cxTimedAlgorithm.h"
+#include "sscLabeledComboBoxWidget.h"
+#include "sscStringDataAdapterXml.h"
 
 namespace cx
 {
@@ -56,7 +61,7 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 
 	QAction* optionsAction = this->createAction(this,
 	      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
-	      "Details", "Show Advanced Settings",
+	      "Details", "Show Details",
 	      SLOT(toggleDetailsSlot()),
 	      NULL);
 

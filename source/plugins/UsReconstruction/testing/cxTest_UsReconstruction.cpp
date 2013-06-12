@@ -1,5 +1,6 @@
 #include "cxTest_UsReconstruction.h"
 
+#include <QApplication>
 #include <vtkImageData.h>
 #include "sscReconstructManager.h"
 #include "sscImage.h"
@@ -7,8 +8,10 @@
 #include "sscPNNReconstructAlgorithm.h"
 #include "cxDataLocations.h"
 #include "cxDataManager.h"
-
-//#include "cxToolConfigurationParser.h"
+#include "sscReconstructPreprocessor.h"
+#include "sscReconstructParams.h"
+#include "cxTimedAlgorithm.h"
+#include "cxUSReconstructInputDataAlgoritms.h"
 
 void TestUsReconstruction::setUp()
 {
@@ -54,7 +57,7 @@ void TestUsReconstruction::testSlerpInterpolation()
 
 	double t = 0.5;
 
-	ssc::Transform3D c = ssc::ReconstructPreprocessor::slerpInterpolate(a, b, t);
+	ssc::Transform3D c = cx::USReconstructInputDataAlgorithm::slerpInterpolate(a, b, t);
 	//ssc::Transform3D c = reconstructer->interpolate(a, b, t);
 
 	Eigen::Matrix3d goalm;
@@ -189,7 +192,7 @@ void TestUsReconstruction::testAngioReconstruction()
 	// set an algorithm-specific parameter
 	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "PNN");
 	boost::shared_ptr<ssc::PNNReconstructAlgorithm> algorithm;
-	algorithm = boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
+	algorithm = boost::dynamic_pointer_cast<ssc::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
 	CPPUNIT_ASSERT(algorithm);// Check if we got the PNN algorithm
 	algorithm->getInterpolationStepsOption(algo)->setValue(1);
 
@@ -219,8 +222,8 @@ void TestUsReconstruction::testThunderGPUReconstruction()
 	// set an algorithm-specific parameter
 	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "VNN");
 	boost::shared_ptr<ssc::ThunderVNNReconstructAlgorithm> algorithm;
-	algorithm = boost::shared_dynamic_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->createAlgorithm());
-	CPPUNIT_ASSERT(algorithm);// Check if we got the VNN algorithm
+	algorithm = boost::dynamic_pointer_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->createAlgorithm());
+	CPPUNIT_ASSERT_MESSAGE("No Thunder VNN algorithm found", algorithm);// Check if we got the VNN algorithm
 	algorithm->getProcessorOption(algo)->setValue("GPU");
 
 	// run the reconstruction in the main thread
@@ -248,7 +251,7 @@ void TestUsReconstruction::testDualAngio()
 	// set an algorithm-specific parameter
 	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "PNN");
 	boost::shared_ptr<ssc::PNNReconstructAlgorithm> algorithm;
-	algorithm = boost::shared_dynamic_cast<ssc::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
+	algorithm = boost::dynamic_pointer_cast<ssc::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
 	CPPUNIT_ASSERT(algorithm);// Check if we got the PNN algorithm
 	algorithm->getInterpolationStepsOption(algo)->setValue(1);
 

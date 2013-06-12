@@ -24,6 +24,7 @@
 
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkImageData.h>
 
 #include "sscView.h"
 #include "sscSliceProxy.h"
@@ -57,6 +58,8 @@
 #include "sscTexture3DSlicerRep.h"
 #include "sscSlices3DRep.h"
 #include "sscEnumConverter.h"
+#include "sscManualTool.h"
+#include "sscImage2DRep3D.h"
 
 #include "sscData.h"
 #include "sscAxesRep.h"
@@ -207,7 +210,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		QColor background = settings()->value("backgroundColor").value<QColor>();
 		mView->setBackgroundColor(background);
 	}
-	if (key == "useGPUVolumeRayCastMapper" || "maxRenderSize")
+	if (( key=="useGPUVolumeRayCastMapper" )||( key=="maxRenderSize" ))
 	{
 		// reload volumes from cache
 		std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
@@ -221,7 +224,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	{
 		this->updateView();
 	}
-	if (key == "View3D/annotationModelSize" || key == "View3D/annotationModel")
+	if ((key == "View3D/annotationModelSize" )||( key == "View3D/annotationModel"))
 	{
 		mAnnotationMarker->setMarkerFilename(
 						DataLocations::getRootConfigPath() + "/models/"
@@ -232,7 +235,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	{
 		this->toolsAvailableSlot();
 	}
-	if (key == "View3D/sphereRadius" || key == "View3D/labelSize" || key == "View/showLabels")
+	if ((key == "View3D/sphereRadius" )||( key == "View3D/labelSize" )||( key == "View/showLabels"))
 	{
 		for (RepMap::iterator iter = mDataReps.begin(); iter != mDataReps.end(); ++iter)
 		{
@@ -366,16 +369,17 @@ QAction* ViewWrapper3D::createSlicesAction(QString title, QWidget* parent)
 
 void ViewWrapper3D::showSlices()
 {
-	QAction* action = dynamic_cast<QAction*>(sender());if (!action)
-	return;
+	QAction* action = dynamic_cast<QAction*>(sender());
+	if (!action)
+		return;
 
 	if (!action->isChecked())
-	mShowSlicesMode = "";
+		mShowSlicesMode = "";
 	else
-	mShowSlicesMode = action->data().toString();
-//	std::cout << "show " << mShowSlicesMode << std::endl;
-					this->updateSlices();
-				}
+		mShowSlicesMode = action->data().toString();
+	//	std::cout << "show " << mShowSlicesMode << std::endl;
+	this->updateSlices();
+}
 
 void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 {
@@ -450,7 +454,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 
 		// tool spaces
 		ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-		ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
+		ssc::ToolManager::ToolMapPtr::element_type::iterator iter;
 		for (iter = tools->begin(); iter != tools->end(); ++iter)
 		{
 			ssc::ToolPtr tool = iter->second;
@@ -535,7 +539,7 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 		mDataReps[data->getUid()] = rep;
 		mView->addRep(rep);
 
-		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(data);
+		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
 		if (image)
 		{
 			connect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
@@ -571,44 +575,53 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
  */
 ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 {
-	if (boost::shared_dynamic_cast<ssc::Image>(data))
+	if (boost::dynamic_pointer_cast<ssc::Image>(data))
 	{
-		ssc::VolumetricBaseRepPtr rep = RepManager::getInstance()->getVolumetricRep(
-						boost::shared_dynamic_cast<ssc::Image>(data));
-		return rep;
+		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
+		if (image->getBaseVtkImageData()->GetDimensions()[2]==1)
+		{
+			cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New(data->getUid()+"image2DRep");
+			rep->setImage(image);
+			return rep;
+		}
+		else
+		{
+			ssc::VolumetricBaseRepPtr rep = RepManager::getInstance()->getVolumetricRep(image);
+			return rep;
+		}
 	}
-	else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
+	else if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
 	{
 		ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid() + "_geom3D_rep");
-		rep->setMesh(boost::shared_dynamic_cast<ssc::Mesh>(data));
+		rep->setMesh(boost::dynamic_pointer_cast<ssc::Mesh>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<ssc::PointMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::PointMetric>(data))
 	{
 		ssc::PointMetricRepPtr rep = ssc::PointMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setPointMetric(boost::shared_dynamic_cast<ssc::PointMetric>(data));
+		rep->setPointMetric(boost::dynamic_pointer_cast<ssc::PointMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<ssc::DistanceMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::DistanceMetric>(data))
 	{
 		ssc::DistanceMetricRepPtr rep = ssc::DistanceMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setDistanceMetric(boost::shared_dynamic_cast<ssc::DistanceMetric>(data));
+		rep->setDistanceMetric(boost::dynamic_pointer_cast<ssc::DistanceMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<ssc::AngleMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::AngleMetric>(data))
 	{
 		ssc::AngleMetricRepPtr rep = ssc::AngleMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setMetric(boost::shared_dynamic_cast<ssc::AngleMetric>(data));
+		rep->setMetric(boost::dynamic_pointer_cast<ssc::AngleMetric>(data));
 		return rep;
 	}
-	else if (boost::shared_dynamic_cast<ssc::PlaneMetric>(data))
+	else if (boost::dynamic_pointer_cast<ssc::PlaneMetric>(data))
 	{
 		ssc::PlaneMetricRepPtr rep = ssc::PlaneMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
-		rep->setMetric(boost::shared_dynamic_cast<ssc::PlaneMetric>(data));
+		rep->setMetric(boost::dynamic_pointer_cast<ssc::PlaneMetric>(data));
 		return rep;
 	}
 
@@ -620,7 +633,7 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
  */
 void ViewWrapper3D::readDataRepSettings(ssc::RepPtr rep)
 {
-	ssc::DataMetricRepPtr val = boost::shared_dynamic_cast<ssc::DataMetricRep>(rep);
+	ssc::DataMetricRepPtr val = boost::dynamic_pointer_cast<ssc::DataMetricRep>(rep);
 	if (!val)
 		return;
 
@@ -679,6 +692,13 @@ void ViewWrapper3D::updateSlices()
 #ifdef USE_GLX_SHARED_CONTEXT
 	if (mSlices3DRep)
 		mView->removeRep(mSlices3DRep);
+	//Simple bug fix of #746: Don't create slices if no volumes exist in 3D scene
+	if (!mViewGroup || mViewGroup->getImages().empty())
+	{
+		ssc::messageManager()->sendWarning("Need volumes in the 3D scene to create 2D slices");
+		return;
+	}
+
 	mSlices3DRep = ssc::Slices3DRep::New("MultiSliceRep_" + mView->getName());
 
 	ssc::PLANE_TYPE type = string2enum<ssc::PLANE_TYPE>(mShowSlicesMode);
@@ -699,7 +719,7 @@ void ViewWrapper3D::updateSlices()
 	}
 
 	mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
-	if (mViewGroup)
+	if (mViewGroup && !mViewGroup->getImages().empty())
 		mSlices3DRep->setImages(mViewGroup->getImages());
 	mSlices3DRep->setTool(ssc::toolManager()->getDominantTool());
 //	return mSlices3DRep;
@@ -723,16 +743,16 @@ void ViewWrapper3D::dominantToolChangedSlot()
 void ViewWrapper3D::toolsAvailableSlot()
 {
 	ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-	ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
+	ssc::ToolManager::ToolMapPtr::element_type::iterator iter;
 	for (iter = tools->begin(); iter != tools->end(); ++iter)
 	{
 		ssc::ToolPtr tool = iter->second;
-		if (tool->hasType(Tool::TOOL_REFERENCE))
+		if (tool->hasType(ssc::Tool::TOOL_REFERENCE))
 			continue;
 
 		ssc::ToolRep3DPtr toolRep = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
 
-		if (tool->hasType(Tool::TOOL_MANUAL) && !settings()->value("showManualTool").toBool())
+		if (tool->hasType(ssc::Tool::TOOL_MANUAL) && !settings()->value("showManualTool").toBool())
 		{
 			if (toolRep)
 				mView->removeRep(toolRep);

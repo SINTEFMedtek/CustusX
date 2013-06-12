@@ -27,6 +27,7 @@
 #include "sscBoundingBox3D.h"
 #include "cxTransformFile.h"
 #include "sscCustomMetaImage.h"
+#include "sscLogger.h"
 
 namespace cx
 {
@@ -59,25 +60,26 @@ void ElastixExecuter::setDisplayProcessMessages(bool on)
 }
 
 
-void ElastixExecuter::setInput(QString application,
+bool ElastixExecuter::setInput(QString application,
 				ssc::DataPtr fixed,
 				ssc::DataPtr moving,
 				QString outdir,
 				QStringList parameterfiles)
 {
+	SSC_LOG("");
 	mFixed = fixed;
 	mMoving = moving;
 
 	if (!fixed || !moving)
 	{
 		ssc::messageManager()->sendWarning("Failed to start elastiX registration, fixed or missing image missing.");
-		return;
+		return false;
 	}
 
 	if (mProcess->state() != QProcess::NotRunning)
 	{
 		ssc::messageManager()->sendWarning("Failed to start elastiX registration, process already running");
-		return;
+		return false;
 	}
 
 	// create output dir (required by ElastiX)
@@ -101,7 +103,7 @@ void ElastixExecuter::setInput(QString application,
 	ssc::messageManager()->sendInfo(QString("Executing registration with command line: [%1]").arg(commandLine));
 
 	mProcess->start(commandLine);
-//	mProcess->start("elastix");
+	return true;
 }
 
 void ElastixExecuter::execute()
@@ -120,9 +122,6 @@ bool ElastixExecuter::isRunning() const
     return !mProcess->state()!=QProcess::NotRunning;
 }
 
-/**Write the initial (pre-registration) mMf transform to
- * disk as required by elastix.
- */
 QString ElastixExecuter::writeInitTransformToElastixfile(
 	ssc::DataPtr fixed,
 	ssc::DataPtr moving,
@@ -180,9 +179,6 @@ QString ElastixExecuter::writeInitTransformToElastixfile(
 	return initTransformFile.fileName();
 }
 
-/**Write the initial (pre-registration) mMf transform to
- * disk in a .cal file that contains only the 16 matrix numbers.
- */
 QString ElastixExecuter::writeInitTransformToCalfile(
 	ssc::DataPtr fixed,
 	ssc::DataPtr moving,
@@ -263,11 +259,6 @@ void ElastixExecuter::processStateChanged(QProcess::ProcessState newState)
 	}
 }
 
-
-/**Find the TransformParameters.i.txt file with the
- * highest i. All other transform files can be found from
- * this one.
- */
 QString ElastixExecuter::findMostRecentTransformOutputFile() const
 {
 	QString retval;
@@ -281,12 +272,6 @@ QString ElastixExecuter::findMostRecentTransformOutputFile() const
 	return retval;
 }
 
-/**Return the transform present within the mhd file pointed to by the
- * input volume.
- *
- * This is part of the normal rMd transform within ssc::Data, but required
- * because elastiX reads and uses it.
- */
 ssc::Transform3D ElastixExecuter::getFileTransform_ddMd(ssc::DataPtr volume)
 {
 	QString patFolder = patientService()->getPatientData()->getActivePatientFolder();
@@ -295,12 +280,6 @@ ssc::Transform3D ElastixExecuter::getFileTransform_ddMd(ssc::DataPtr volume)
 	return ddMd;
 }
 
-/**Return the result of the latest registration as a linear transform mMf.
- *
- * Read the descriptions in writeInitTransformToElastixfile() and
- * getAffineResult_mmMff for a full discussion.
- *
- */
 ssc::Transform3D ElastixExecuter::getAffineResult_mMf(bool* ok)
 {
 	ssc::Transform3D mmMff = this->getAffineResult_mmMff(ok);
@@ -310,24 +289,6 @@ ssc::Transform3D ElastixExecuter::getAffineResult_mMf(bool* ok)
 	return mmMm.inv() * mmMff * ffMf;
 }
 
-/** Return the result of the latest registration as a linear transform mMf.
- *
- *  Important: The result is according to the ElastiX spec:
- *  \verbatim
-   In elastix the transformation is defined as a coordinate mapping from
-   the fixed image domain to the moving image domain.
- *  \endverbatim
- *
- * All transform files are read and concatenated. Those with
- * unrecognized (i.e. by CustusX) transforms are ignored with
- * a warning.
- *
- * NOTE: This 'inner' function returns the raw result from elastiX,
- * but CustusX expects that the file transforms of the fixed and moving
- * images are also contained in the result. Use the getAffineResult_mMf()
- * for the full result.
- *
- */
 ssc::Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 {
 	QString filename = this->findMostRecentTransformOutputFile();

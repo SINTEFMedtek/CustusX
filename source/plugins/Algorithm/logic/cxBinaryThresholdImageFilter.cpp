@@ -1,12 +1,14 @@
 #include "cxBinaryThresholdImageFilter.h"
 
 #include "cxAlgorithmHelpers.h"
-
+#include <itkBinaryThresholdImageFilter.h>
+#include <vtkImageCast.h>
 #include "sscDataManager.h"
 #include "sscUtilHelpers.h"
 #include "sscRegistrationTransform.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
+#include "sscColorDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 #include "sscTypeConversions.h"
 
@@ -16,6 +18,9 @@
 #include "cxThresholdPreview.h"
 #include "cxContourFilter.h"
 #include "sscMesh.h"
+#include "sscImage.h"
+#include "cxSelectDataStringDataAdapter.h"
+
 
 namespace cx
 {
@@ -119,7 +124,7 @@ void BinaryThresholdImageFilter::thresholdSlot()
 {
 	if (mActive)
 	{
-		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mInputTypes[0]->getData());
+		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mInputTypes[0]->getData());
 		RepManager::getInstance()->getThresholdPreview()->setPreview(image,
 		                                                             mLowerThresholdOption->getValue());
 	}

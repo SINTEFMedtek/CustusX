@@ -12,17 +12,15 @@
 #include "cxToolManager.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
-#include "cxBrowserWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxTabbedWidget.h"
 #include "cxToolPropertiesWidget.h"
 #include "cxViewGroup.h"
 #include "cxPreferencesDialog.h"
 #include "cxImagePropertiesWidget.h"
-//#include "cxPointSamplingWidget.h"
 #include "cxPatientData.h"
 #include "cxDataLocations.h"
-#include "cxMeshPropertiesWidget.h"
+#include "cxMeshInfoWidget.h"
 #include "cxLayoutEditorWidget.h"
 #include "cxFrameForest.h"
 #include "cxFrameTreeWidget.h"
@@ -30,10 +28,10 @@
 #include "cxTrackPadWidget.h"
 #include "cxCameraControl.h"
 #include "cxSecondaryMainWindow.h"
-#include "cxIGTLinkWidget.h"
+#include "cxVideoConnectionWidget.h"
 #include "cxAudio.h"
 #include "cxSettings.h"
-#include "cxVideoConnection.h"
+#include "cxVideoConnectionManager.h"
 #include "cxToolManagerWidget.h"
 #include "cxVideoService.h"
 #include "cxLogicManager.h"
@@ -51,6 +49,9 @@
 #include "cxEraserWidget.h"
 #include "cxSamplerWidget.h"
 #include "cxDataAdapterHelper.h"
+#include "cxVideoConnection.h"
+#include "cxWorkflowStateMachine.h"
+#include "cxApplicationStateMachine.h"
 
 #include "sscDICOMLibConfig.h"
 
@@ -62,7 +63,6 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 {
 	QFile stylesheet(":/cxStyleSheet.ss");
 	stylesheet.open(QIODevice::ReadOnly);
-//	std::cout << QString(stylesheet.readAll()) << std::endl;
 	qApp->setStyleSheet(stylesheet.readAll());
 
 	mCameraControl.reset(new CameraControl(this));
@@ -88,14 +88,12 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
 	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
-	this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
+	this->addAsDockWidget(new VideoConnectionWidget(this), "Utility");
 	this->addAsDockWidget(new EraserWidget(this), "Properties");
-	this->addAsDockWidget(new BrowserWidget(this), "Browsing");
-//	this->addAsDockWidget(new PointSamplingWidget(this), "Utility");
 	this->addAsDockWidget(new MetricWidget(this), "Utility");
 	this->addAsDockWidget(new ImagePropertiesWidget(this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
-	this->addAsDockWidget(new MeshPropertiesWidget(this), "Properties");
+	this->addAsDockWidget(new MeshInfoWidget(this), "Properties");
 #ifdef SSC_USE_DCMTK
 	this->addAsDockWidget(new ssc::DICOMWidget(this), "Utility");
 #endif // SSC_USE_DCMTK
@@ -184,7 +182,6 @@ void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 
 	QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
 	dockWidget->setObjectName(widget->objectName() + "DockWidget");
-//	dockWidget->setWidget(widget);
 	dockWidget->setWidget(scroller);
 
 	QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
@@ -224,54 +221,7 @@ void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
 }
 
 MainWindow::~MainWindow()
-{
-}
-
-//void MainWindow::initialize()
-//{
-////	// resources layer
-////	ssc::MessageManager::initialize();
-
-////	// services layer
-////	cx::PatientService::initialize();
-////	cx::VideoService::initialize();
-////	cx::DataManager::initialize();
-////	cx::ToolManager::initializeObject();
-////	cx::ViewManager::createInstance();
-
-//	// logic layer
-//	cx::LogicManager::initialize();
-
-//	// gui layer:
-//	// inited by mainwindow construction in main()
-//}
-
-///** deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
-// */
-//void MainWindow::shutdown()
-//{
-//	// gui layer
-//	// already destroyed by mainwindow
-
-//	// old stuff - high level
-//	StateService::destroyInstance();
-//	ViewManager::destroyInstance();
-//	//  RegistrationManager::shutdown();
-//	RepManager::destroyInstance();
-
-//	// logic layer
-//	cx::LogicManager::shutdown();
-
-//	// service layer
-//	cx::ToolManager::shutdown();
-//	cx::DataManager::shutdown();
-//	cx::VideoService::shutdown();
-//	cx::PatientService::shutdown();
-
-//	ssc::GPUImageBufferRepository::shutdown();
-//	ssc::MessageManager::shutdown();
-//	Settings::destroyInstance();
-//}
+{}
 
 QMenu* MainWindow::createPopupMenu()
 {
@@ -394,7 +344,7 @@ void MainWindow::createActions()
 	mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
 	mStartStreamingAction->setShortcut(tr("Ctrl+V"));
 	connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
-	connect(videoService()->getIGTLinkVideoConnection()->getVideoSource().get(), SIGNAL(streaming(bool)), this,
+	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this,
 		SLOT(updateStreamingActionSlot()));
 	this->updateStreamingActionSlot();
 
@@ -500,19 +450,15 @@ void MainWindow::saveScreenShotThreaded(QImage pixmap, QString filename)
 
 void MainWindow::toggleStreamingSlot()
 {
-	if (videoService()->getIGTLinkVideoConnection()->getVideoSource()->isStreaming())
-	{
-		videoService()->getIGTLinkVideoConnection()->getVideoSource()->disconnectServer();
-	}
+	if (videoService()->getVideoConnection()->isConnected())
+		videoService()->getVideoConnection()->disconnectServer();
 	else
-	{
-		videoService()->getIGTLinkVideoConnection()->launchAndConnectServer();
-	}
+		videoService()->getVideoConnection()->launchAndConnectServer();
 }
 
 void MainWindow::updateStreamingActionSlot()
 {
-	if (videoService()->getIGTLinkVideoConnection()->getVideoSource()->isStreaming())
+	if (videoService()->getVideoConnection()->isConnected())
 	{
 		mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
 		mStartStreamingAction->setText("Stop Streaming");
@@ -527,20 +473,11 @@ void MainWindow::updateStreamingActionSlot()
 void MainWindow::centerToImageCenterSlot()
 {
 	if (ssc::dataManager()->getActiveImage())
-	{
-		std::cout << "center active image" << std::endl;
 		Navigation().centerToData(ssc::dataManager()->getActiveImage());
-	}
 	else if (!viewManager()->getViewGroups().empty())
-	{
-		std::cout << "center first view group" << std::endl;
 		Navigation().centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
-	}
 	else
-	{
-		std::cout << "center global" << std::endl;
 		Navigation().centerToGlobalDataCenter();
-	}
 }
 
 void MainWindow::centerToTooltipSlot()
@@ -615,9 +552,6 @@ void MainWindow::newPatientSlot()
 		return;
 	choosenDir = dialog.selectedFiles().front();
 
-//	choosenDir = QFileDialog::getSaveFileName(this, tr("Select directory to save patient in"), choosenDir);
-//	if (choosenDir == QString::null)
-//		return; // On cancel
 	if (!choosenDir.endsWith(".cx3"))
 		choosenDir += QString(".cx3");
 
@@ -681,10 +615,7 @@ void MainWindow::onWorkflowStateChangedSlot()
 	Desktop desktop = stateService()->getActiveDesktop();
 
 	for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter != mDockWidgets.end(); ++iter)
-	{
 		(*iter)->hide();
-		// this->DockWidget(*iter); // wrong: removed the dockwidget altogether
-	}
 
 	viewManager()->setActiveLayout(desktop.mLayoutUid);
 	this->restoreState(desktop.mMainWindowState);
@@ -729,8 +660,6 @@ void MainWindow::loadPatientFileSlot()
 
 	patientService()->getPatientData()->loadPatient(choosenDir);
 	patientService()->getPatientData()->writeRecentPatientData();
-
-	//  cx::FrameForest forest;
 }
 
 void MainWindow::exportDataSlot()
@@ -749,7 +678,6 @@ void MainWindow::importDataSlot()
 	if (folder.isEmpty())
 		folder = settings()->value("globalPatientDataFolder").toString();
 
-	//ssc::messageManager()->sendInfo("Importing data...");
 	QStringList fileName = QFileDialog::getOpenFileNames(this, QString(tr("Select data file(s) for import")),
 		folder, tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
 	if (fileName.empty())
@@ -890,11 +818,6 @@ void MainWindow::createMenus()
 	mFileMenu->addAction(mShowControlPanelAction);
 	mFileMenu->addAction(mQuitAction);
 
-//	// window
-//	QMenu* popupMenu = this->createPopupMenu();
-//	popupMenu->setTitle("Window");
-//	this->menuBar()->addMenu(popupMenu);
-
 	//workflow
 	this->menuBar()->addMenu(mWorkflowMenu);
 	stateService()->getWorkflow()->fillMenu(mWorkflowMenu);
@@ -936,7 +859,6 @@ void MainWindow::createMenus()
 
 	mHelpMenuAction = this->menuBar()->addMenu(mHelpMenu);
 	mHelpMenu->addAction(QWhatsThis::createAction(this));
-
 }
 
 void MainWindow::createToolBars()
@@ -986,7 +908,6 @@ void MainWindow::createToolBars()
 	mScreenshotToolBar = addToolBar("Screenshot");
 	mScreenshotToolBar->setObjectName("ScreenshotToolBar");
 	mScreenshotToolBar->addAction(mShootScreenAction);
-	//  mScreenshotToolBar->addAction(mShootWindowAction);
 	this->registerToolBar(mScreenshotToolBar, "Toolbar");
 
 	QToolBar* camera3DViewToolBar = addToolBar("Camera 3D Views");
@@ -1016,7 +937,7 @@ void MainWindow::aboutSlot()
 		"<p>Created by SINTEF Medical Technology."
 		"<p><a href=http://www.sintef.no/Home/Technology-and-Society/Medical-technology> www.sintef.no </a>"
 		"<p>An application for Image Guided Surgery."
-		"<p>Created using Qt, VTK, ITK, IGSTK, SSC.").arg(VERSION_NUMBER_VERBOSE));
+		"<p>Created using Qt, VTK, ITK, IGSTK, SSC.").arg(CustusX3_VERSION_STRING));
 }
 
 void MainWindow::preferencesSlot()

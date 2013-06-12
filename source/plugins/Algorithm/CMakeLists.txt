@@ -25,11 +25,16 @@ SET( MOC_HEADER_FILES
 	logic/cxSmoothingImageFilter.h
 	logic/cxResampleImageFilter.h
 	logic/cxTubeSegmentationFilter.h
+	logic/cxTSFPresets.h
     gui/cxAlgorithmPlugin.h
     gui/cxConnectedThresholdImageFilterWidget.h
     gui/cxTimedAlgorithmProgressBar.h
 	gui/cxFilterWidget.h
 	gui/cxPipelineWidget.h
+	gui/cxFilterPresetWidget.h
+	gui/cxAllFiltersWidget.h
+	gui/cxCompactFilterSetupWidget.h
+	gui/cxOptionsWidget.h
 	)
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -63,6 +68,8 @@ SET( SOURCE_FILES
 	logic/cxSmoothingImageFilter.cpp
 	logic/cxResampleImageFilter.h
 	logic/cxResampleImageFilter.cpp
+	logic/cxTSFPresets.h
+	logic/cxTSFPresets.cpp
     gui/cxAlgorithmPlugin.h
     gui/cxAlgorithmPlugin.cpp
     gui/cxConnectedThresholdImageFilterWidget.h
@@ -73,6 +80,14 @@ SET( SOURCE_FILES
 	gui/cxFilterWidget.cpp
 	gui/cxPipelineWidget.h
 	gui/cxPipelineWidget.cpp
+	gui/cxFilterPresetWidget.h
+	gui/cxFilterPresetWidget.cpp
+	gui/cxAllFiltersWidget.h
+	gui/cxAllFiltersWidget.cpp
+	gui/cxCompactFilterSetupWidget.h
+	gui/cxCompactFilterSetupWidget.cpp
+	gui/cxOptionsWidget.h
+	gui/cxOptionsWidget.cpp
   )
 
 # =========================================================
@@ -106,19 +121,7 @@ endif(CX_USE_TSF)
 # create the target
 add_library( cxPluginAlgorithm ${SOURCE_FILES} )
 target_link_libraries( cxPluginAlgorithm ${CX_ALGORITHM_LIBRARIES})
-
-#------------------------------------------------------------------------------
-# Cotire - pch and unity builds
-#------------------------------------------------------------------------------
-if(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-    cotire(cxPluginAlgorithm)
-    if(COTIRE_ADD_UNITY_BUILDS)
-        target_link_libraries(cxPluginAlgorithm_unity
-                        ${CX_ALGORITHM_LIBRARIES}
-                        )
-    endif(COTIRE_ADD_UNITY_BUILDS)
-endif(COTIRE_ENABLE_PRECOMPILED_HEADERS OR COTIRE_ADD_UNITY_BUILDS)
-# =========================================================
+CX_COTIRE_ADD_LIBRARY(cxPluginAlgorithm "${CX_ALGORITHM_LIBRARIES}")
 
 # add/remove to suit your own needs.
 #add_subdirectory(logic)

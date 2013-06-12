@@ -12,10 +12,8 @@
 #include "sscDataManager.h"
 #include "sscMesh.h"
 #include "sscTransform3D.h"
-//#include "sscReconstructer.h"
 #include "cxRecordSessionWidget.h"
-#include "cxUsReconstructionFileMaker.h"
-#include "cxVideoConnection.h"
+#include "cxVideoConnectionManager.h"
 #include "cxProbe.h"
 #include "cxSoundSpeedConversionWidget.h"
 

@@ -16,3 +16,6 @@ source/gui/icons/open_icon_library/png/64x64/.DS_Store
 Build_nmake64
 Build_nmake32/
 config/settings/
+data/
+*.pyc
+

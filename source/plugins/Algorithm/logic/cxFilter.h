@@ -17,14 +17,14 @@
 
 #include <vector>
 #include <QObject>
-#include "sscData.h"
-#include "sscDataAdapter.h"
-#include "cxDataInterface.h"
 #include "sscXmlOptionItem.h"
+#include "sscPresets.h"
+#include "cxForwardDeclarations.h"
 class QDomElement;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStringDataAdapterBasePtr;
 
 typedef boost::shared_ptr<class Filter> FilterPtr;
 
@@ -52,7 +52,6 @@ class Filter : public QObject
 public:
 	explicit Filter();
 	virtual ~Filter() {}
-
 
 	/**
 	  *  Return a unique string for this algorithm.
@@ -92,6 +91,20 @@ public:
 	  *  Return a help text describing algorithm usage.
 	  */
 	virtual std::vector<SelectDataStringDataAdapterBasePtr> getOutputTypes() = 0;
+
+	/**
+	 * Checks wheter the filter has defined a set of presets.
+	 */
+	virtual bool hasPresets() = 0;
+
+	/**
+	 * Returns the filters presets.
+	 */
+	virtual ssc::PresetsPtr getPresets() = 0;
+	/**
+	 * Generates a preset from the filters currently set options.
+	 */
+	virtual QDomElement generatePresetFromCurrentlySetOptions(QString name) = 0;
 	/**
 	  * Set Active state.
 	  * Active filters are used by the ui (or similar) and can interact
@@ -132,6 +145,17 @@ public:
 	  */
 	virtual bool postProcess() = 0;
 
+public slots:
+	/**
+	 * Ask the filter to load a preset.
+	 */
+	virtual void requestSetPresetSlot(QString name) = 0;
+
+signals:
+	/**
+	 * Signals that the filters internal structures has changed.
+	 */
+	void changed();
 
 };
 

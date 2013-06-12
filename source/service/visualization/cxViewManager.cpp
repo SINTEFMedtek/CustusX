@@ -34,6 +34,7 @@
 //#include "vtkInteractorStyleTrackballCamera.h"
 //#include "vtkInteractorStyleTrackballActor.h"
 //#include "vtkInteractorStyleFlight.h"
+#include "cxLayoutData.h"
 
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
@@ -52,13 +53,13 @@
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxInteractiveCropper.h"
-#include "cxRenderTimer.h"
 #include "vtkForwardDeclarations.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxInteractiveClipper.h"
 #include "sscImage.h"
 #include "cxCameraStyle.h"
+#include "cxRenderTimer.h"
 
 namespace cx
 {
@@ -529,6 +530,8 @@ void ViewManager::setActiveLayout(const QString& layout)
 
 void ViewManager::setRenderingInterval(int interval)
 {
+	if (!mRenderingTimer)
+		return;
     if (interval==mRenderingTimer->interval())
         return;
 

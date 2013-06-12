@@ -23,21 +23,19 @@
 #include <vtkImageData.h>
 
 #include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscUtilHelpers.h"
-#include "sscMesh.h"
 #include "sscRegistrationTransform.h"
 #include "sscTypeConversions.h"
-
 #include "sscImage.h"
 #include "sscMesh.h"
 #include "sscDataManager.h"
-#include "sscTypeConversions.h"
+#include "sscDoubleDataAdapterXml.h"
+#include "sscBoolDataAdapterXml.h"
+#include "sscColorDataAdapterXml.h"
 #include "cxPatientData.h"
-#include "cxDataInterface.h"
 #include "cxPatientService.h"
 #include "cxRepManager.h"
-
+#include "cxThresholdPreview.h"
+#include "cxSelectDataStringDataAdapter.h"
 
 namespace cx
 {
@@ -96,7 +94,7 @@ ssc::DoubleDataAdapterXmlPtr ContourFilter::getDecimationOption(QDomElement root
 {
 	ssc::DoubleDataAdapterXmlPtr retval = ssc::DoubleDataAdapterXml::initialize("Decimation %", "",
 	                                                                            "Reduce number of triangles in output surface",
-	                                                                            0.8, ssc::DoubleRange(0, 1, 0.01), 0, root);
+	                                                                            0.2, ssc::DoubleRange(0, 1, 0.01), 0, root);
 	retval->setInternal2Display(100);
 	return retval;
 }
@@ -175,7 +173,7 @@ void ContourFilter::thresholdSlot()
 	//    std::cout << "ContourFilter::thresholdSlot() " << mActive << std::endl;
 	if (mActive)
 	{
-		ssc::ImagePtr image = boost::shared_dynamic_cast<ssc::Image>(mInputTypes[0]->getData());
+		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mInputTypes[0]->getData());
 		RepManager::getInstance()->getThresholdPreview()->setPreview(image, mSurfaceThresholdOption->getValue());
 	}
 }
@@ -250,6 +248,12 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 	if(smoothing)
 	{
 		smoother->SetInput(cubesPolyData);
+		smoother->SetNumberOfIterations(15);// Higher number = more smoothing
+		smoother->SetBoundarySmoothing(false);
+		smoother->SetFeatureEdgeSmoothing(false);
+		smoother->SetNormalizeCoordinates(true);
+		smoother->SetFeatureAngle(120);
+		smoother->SetPassBand(0.3);//Lower number = more smoothing
 		smoother->Update();
 		cubesPolyData = smoother->GetOutput();
 	}

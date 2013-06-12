@@ -1,5 +1,7 @@
 #include "cxConnectedThresholdImageFilterWidget.h"
 
+#include <QPushButton>
+
 #include "cxDataManager.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"

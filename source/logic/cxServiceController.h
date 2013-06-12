@@ -10,9 +10,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <QObject>
-
-#include "sscTool.h"
-#include "cxProbe.h"
+#include "sscForwardDeclarations.h"
 
 namespace cx
 {
@@ -37,15 +35,15 @@ public:
 	virtual ~ServiceController();
 
 private slots:
-	void updateVideoConnections();
+//	void updateVideoConnections();
 
 	void patientChangedSlot();
 	void clearPatientSlot();
 	void duringSavePatientSlot();
 	void duringLoadPatientSlot();
 
-private:
-	void connectVideoToProbe(ssc::ToolPtr probe);
+//private:
+//	void connectVideoToProbe(ssc::ToolPtr probe);
 };
 
 typedef boost::shared_ptr<ServiceController> ServiceControllerPtr;

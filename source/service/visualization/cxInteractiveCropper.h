@@ -28,13 +28,13 @@
 #include "sscBoundingBox3D.h"
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
-#include "cxActiveImageProxy.h"
 
 
 namespace cx
 {
 typedef vtkSmartPointer<class CropBoxCallback> CropBoxCallbackPtr;
 typedef vtkSmartPointer<class CropBoxEnableCallback> CropBoxEnableCallbackPtr;
+typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 
 /**
 * \file
@@ -59,6 +59,7 @@ public:
 	ssc::DoubleBoundingBox3D getMaxBoundingBox();
 	bool getUseCropping();
 	bool getShowBoxWidget() const;
+	std::vector<int>  getDimensions();
 signals:
 	void changed();
 public slots:

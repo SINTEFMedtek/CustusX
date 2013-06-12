@@ -20,6 +20,7 @@
 #include "cxSettings.h"
 #include "cxView3D.h"
 #include "sscToolManager.h"
+#include "Rep/cxLandmarkRep.h"
 
 namespace cx
 {

@@ -18,11 +18,12 @@
 #include <map>
 #include <vector>
 #include <QObject>
+
 #include "sscData.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "cxLayoutData.h"
 #include "cxViewCache.h"
+
 
 class QActionGroup;
 class QAction;
@@ -33,12 +34,13 @@ class QTime;
 
 namespace cx
 {
-
+class LayoutData;
+class LayoutRegion;
 class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
-typedef boost::shared_ptr<class CyclicActionTimer> RenderTimerPtr;
+typedef boost::shared_ptr<class CyclicActionTimer> CyclicActionTimerPtr;
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 
 /**
@@ -143,7 +145,7 @@ public:
 	InteractiveClipperPtr getClipper();
 	InteractiveCropperPtr getCropper();
 
-	RenderTimerPtr getRenderTimer() { return mRenderTimer; }
+	CyclicActionTimerPtr getRenderTimer() { return mRenderTimer; }
 	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
@@ -156,7 +158,6 @@ public:
 	std::map<QString, ssc::ImagePtr> getVisibleImages();
 
 signals:
-//	void imageDeletedFromViews(ssc::ImagePtr image); ///< Emitted when an image is deleted from the views in the cxViewManager
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes
 	void activeViewChanged(); ///< emitted when the active view changes
@@ -226,7 +227,7 @@ protected:
 	QDateTime mLastFullRender;
     QDateTime mLastBeginRender;
 
-	RenderTimerPtr mRenderTimer;
+	CyclicActionTimerPtr mRenderTimer;
 
 	std::vector<ViewGroupPtr> mViewGroups;
 

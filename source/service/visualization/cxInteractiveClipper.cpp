@@ -12,12 +12,6 @@
 //
 // See CustusX_License.txt for more information.
 
-/*
- * cxInteractiveClipper.cpp
- *
- *  \date Aug 24, 2010
- *      \author christiana
- */
 #include "cxInteractiveClipper.h"
 
 #include "sscVolumetricRep.h"
