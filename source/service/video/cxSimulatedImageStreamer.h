@@ -26,6 +26,7 @@ public:
 	SimulatedImageStreamer();
 	virtual ~SimulatedImageStreamer();
 
+	void initialize(); ///< initializes with active image and first probe
 	void initialize(ssc::ImagePtr image, ssc::ToolPtr tool);
 	virtual bool startStreaming(SenderPtr sender);
 	virtual void stopStreaming();
@@ -35,8 +36,10 @@ public:
 private slots:
 	virtual void streamSlot();
 	void sliceSlot();
+	void setSourceToActiveImageSlot();
 
 private:
+	void setSourceImage(ssc::ImagePtr image);
 	ssc::ImagePtr getSlice(ssc::ImagePtr source);
 	vtkMatrix4x4Ptr calculateSliceAxes();
 	vtkImageDataPtr getSliceUsingProbeDefinition(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes);

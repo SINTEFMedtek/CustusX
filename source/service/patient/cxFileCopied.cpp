@@ -114,7 +114,9 @@ void FileCopied::areFileCopiedSlot()
 
 			//Test if raw file is large enough
 			if (rawFile.bytesAvailable() < (numElements * elementSize))
+			{
 				ssc::messageManager()->sendWarning("File is not copied correctly: " + rawFilepath + " Parts missing");
+			}
 			else
 				correctCopy = true;
 

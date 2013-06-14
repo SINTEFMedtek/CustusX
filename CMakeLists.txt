@@ -23,6 +23,10 @@ if(SSC_USE_GCOV)
 	add_definitions(--coverage)
 endif()
 
+if(SSC_PRINT_CALLER_INFO)
+        add_definitions(-DSSC_PRINT_CALLER_INFO)
+endif()
+
 cx_set_os_identifiers()
 
 message( STATUS "The " ${CMAKE_GENERATOR} " was used." )

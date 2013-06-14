@@ -340,7 +340,7 @@ void ToolManager::trackerConfiguredSlot(bool on)
 
 	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
 
-	ssc::messageManager()->sendSuccess("ToolManager is configured.", true);
+	ssc::messageManager()->sendSuccess("ToolManager is configured.");
 	emit configured();
 }
 
@@ -847,7 +847,7 @@ void ToolManager::initializedSlot(bool value)
 	mInitialized = value;
 	if (mInitialized)
 	{
-		ssc::messageManager()->sendSuccess("ToolManager is initialized.", true);
+		ssc::messageManager()->sendSuccess("ToolManager is initialized.");
 		emit initialized();
 	}
 	else

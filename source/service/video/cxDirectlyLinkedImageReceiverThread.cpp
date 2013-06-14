@@ -35,8 +35,6 @@ void DirectlyLinkedImageReceiverThread::run()
 {
 	ssc::messageManager()->sendInfo("Starting direct link grabber.");
 
-	this->printArguments(); //debugging
-
 	if(mArguments["type"] == "SimulatedImageStreamer")
 		mImageStreamer = this->createSimulatedImageStreamer();
 	else
@@ -58,7 +56,6 @@ void DirectlyLinkedImageReceiverThread::run()
 
 	mFPSTimer->reset(2000);
 
-	// run event loop
 	this->exec();
 
 	mImageStreamer->stopStreaming();
@@ -84,14 +81,13 @@ QString DirectlyLinkedImageReceiverThread::hostDescription() const
 
 SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImageStreamer()
 {
-	ssc::messageManager()->sendDebug("DirectlyLinkedImageReceiverThread::createSimulatedImageStreamer() needs to be implementet properly.");
 	SimulatedImageStreamerPtr streamer(new SimulatedImageStreamer());
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if(!tool)
-		ssc::messageManager()->sendDebug("no tool");
+		ssc::messageManager()->sendDebug("No tool");
 	ssc::ImagePtr image = ssc::DataManager::getInstance()->getActiveImage();
 	if(!image)
-		ssc::messageManager()->sendDebug("no image");
+		ssc::messageManager()->sendDebug("No image");
 	streamer->initialize(image, tool);
 	return streamer;
 }

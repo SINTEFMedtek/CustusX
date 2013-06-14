@@ -125,7 +125,7 @@ vtkImageDataPtr ConnectedThresholdImageFilter::calculate()
 	catch( itk::ExceptionObject & excep )
 	{
 		ssc::messageManager()->sendError("Error when setting seed for Connected Threshold Image Filter:");
-		ssc::messageManager()->sendError(qstring_cast(excep.GetDescription()), true);
+		ssc::messageManager()->sendError(qstring_cast(excep.GetDescription()));
 	}
 
 	itkImage = thresholdFilter->GetOutput();

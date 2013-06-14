@@ -93,9 +93,13 @@ void SeansVesselRegistrationWidget::registerSlot()
 	vesselReg.mt_auto_lts = mAutoLTSCheckBox->isChecked();
 
 	if (vesselReg.mt_auto_lts)
+	{
 		ssc::messageManager()->sendDebug("Using automatic lts_ratio");
+	}
 	else
+	{
 		ssc::messageManager()->sendDebug("Using lts_ratio: " + qstring_cast(vesselReg.mt_ltsRatio));
+	}
 
 	bool success = vesselReg.execute(mManager->getMovingData(), mManager->getFixedData(), logPath);
 	if (!success)
