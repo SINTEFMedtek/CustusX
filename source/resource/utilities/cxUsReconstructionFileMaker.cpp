@@ -267,7 +267,7 @@ void UsReconstructionFileMaker::report()
 {
 	foreach(QString string, mReport)
 	{
-		ssc::messageManager()->sendSuccess(string, true);
+		ssc::messageManager()->sendSuccess(string);
 	}
 }
 

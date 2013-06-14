@@ -72,14 +72,14 @@ void USSavingRecorder::startRecord(RecordSessionPtr session, ssc::ToolPtr tool, 
 		mVideoRecorder.push_back(videoRecorder);
 	}
 
-	ssc::messageManager()->sendSuccess("Ultrasound acquisition started.", true);
+	ssc::messageManager()->sendSuccess("Ultrasound acquisition started.");
 }
 
 void USSavingRecorder::stopRecord()
 {
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 		mVideoRecorder[i]->stopRecord();
-	ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
+	ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.");
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{

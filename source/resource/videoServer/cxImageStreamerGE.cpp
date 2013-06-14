@@ -194,7 +194,9 @@ QString findOpenCLPath(QString additionalLocation)
 	if (!path.exists())
 		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
 	if (!path.exists())
+	{
 		ssc::messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
+	}
 	else
 		retval = path.absolutePath();
 

@@ -245,11 +245,13 @@ void ReconstructPreprocessor::interpolatePositions()
     {
         double percent = removed * 100;
         if (percent > 1)
-            ssc::messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "
-                + qstring_cast(startFrames) + " frames.");
+        {
+            ssc::messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "+ qstring_cast(startFrames) + " frames.");
+        }
         else
-            ssc::messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(
-                startFrames) + " frames.");
+        {
+            ssc::messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(startFrames) + " frames.");
+        }
     }
 }
 
@@ -297,11 +299,13 @@ void ReconstructPreprocessor::interpolatePositions2()
 	{
 		double percent = removed * 100;
 		if (percent > 1)
-			ssc::messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "
-				+ qstring_cast(startFrames) + " frames.");
+		{
+			ssc::messageManager()->sendWarning("Removed " + QString::number(percent, 'f', 1) + "% of the "+ qstring_cast(startFrames) + " frames.");
+		}
 		else
-			ssc::messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(
-				startFrames) + " frames.");
+		{
+			ssc::messageManager()->sendInfo("Removed " + QString::number(percent, 'f', 1) + "% of the " + qstring_cast(startFrames) + " frames.");
+		}
 	}
 }
 

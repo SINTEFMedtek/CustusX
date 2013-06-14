@@ -5,14 +5,14 @@
 #include "vtkMatrix4x4.h"
 #include "vtkImageData.h"
 #include "sscMessageManager.h"
+#include "sscDataManager.h"
 #include "sscSliceProxy.h"
 #include "sscSlicedImageProxy.h"
 #include "sscProbeSector.h"
 #include "sscProbeData.h"
 #include "sscToolManager.h"
 #include "sscTransform3D.h"
-
-#include "sscVolumeHelpers.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -24,6 +24,13 @@ SimulatedImageStreamer::SimulatedImageStreamer()
 SimulatedImageStreamer::~SimulatedImageStreamer()
 {}
 
+void SimulatedImageStreamer::initialize()
+{
+	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	this->initialize(image, tool);
+}
+
 void SimulatedImageStreamer::initialize(ssc::ImagePtr image, ssc::ToolPtr tool)
 {
 	if(!image || !tool)
@@ -33,7 +40,8 @@ void SimulatedImageStreamer::initialize(ssc::ImagePtr image, ssc::ToolPtr tool)
 	}
 	this->createSendTimer();
 
-	mSourceImage = image;
+	this->setSourceImage(image);
+	connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(setSourceToActiveImageSlot()));
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
 
@@ -72,7 +80,18 @@ void SimulatedImageStreamer::streamSlot()
 
 void SimulatedImageStreamer::sliceSlot()
 {
-	mImageToSend = getSlice(mSourceImage);
+	mImageToSend = this->getSlice(mSourceImage);
+}
+
+void SimulatedImageStreamer::setSourceToActiveImageSlot()
+{
+	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	this->setSourceImage(image);
+}
+
+void SimulatedImageStreamer::setSourceImage(ssc::ImagePtr image)
+{
+	mSourceImage = image;
 }
 
 ssc::ImagePtr SimulatedImageStreamer::getSlice(ssc::ImagePtr source)
