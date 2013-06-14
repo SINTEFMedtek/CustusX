@@ -116,6 +116,8 @@ void CustomMetaImage::setModality(QString value)
 
 void CustomMetaImage::setImageType(QString value)
 {
+	if (value.isEmpty())
+		return;
 	QFile file(mFilename);
 
     if (!file.open(QIODevice::ReadWrite))

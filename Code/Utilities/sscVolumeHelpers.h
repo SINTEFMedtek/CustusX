@@ -33,6 +33,8 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
  */
 std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image);
 
+int calculateNumVoxelsWithMaxValue(ssc::ImagePtr image);///<Find number of voxels containing max scalar value
+int calculateNumVoxelsWithMinValue(ssc::ImagePtr image);///<Find number of voxels containing min scalar value
 /**
  * \}
  */
