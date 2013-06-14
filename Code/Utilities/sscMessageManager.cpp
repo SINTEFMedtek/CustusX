@@ -290,8 +290,7 @@ void MessageManager::sendCallerInformation(const std::string caller, const std::
 {
 	printf("\n");
 	printf("[FUNCTION] %s\n",caller.c_str());
-	printf("[FILE] %s\n",file.c_str());
-	printf("[LINE] %i\n",line);
+	printf("[FILE] %s: %i\n",file.c_str(), line);
 }
 
 void MessageManager::sendInfoWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
