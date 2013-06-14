@@ -1,6 +1,8 @@
 #ifndef MESSAGEMANAGER_H_
 #define MESSAGEMANAGER_H_
 
+//#define SSC_PRINT_CALLER_INFO
+
 #include <QMetaType>
 #include <QObject>
 #include <QMutex>
@@ -56,9 +58,6 @@ public:
  * \author Christian Askeland, SINTEF
  * \date 16.10.2008
  *
- *TODO Sender should be added to the message
- *TODO Enable/disable info, warnings and errors
- *
  * \ingroup sscUtility
  */
 class MessageManager : public QObject
@@ -90,10 +89,24 @@ public:
 
   //Text
   void sendInfo(QString info); ///< Used to report normal interesting activity, no sound associated
-  void sendSuccess(QString success, bool mute=false); ///< Used to report larger successful operations, default not muted
-  void sendWarning(QString warning, bool mute=false); ///< The program does not need to terminate, but the user might need to do something, default not muted
-  void sendError(QString error, bool mute=false); ///< The program (might) need to terminate, default not muted
+  void sendSuccess(QString success); ///< Used to report larger successful operations, default not muted
+  void sendWarning(QString warning); ///< The program does not need to terminate, but the user might need to do something, default not muted
+  void sendError(QString error); ///< The program (might) need to terminate, default not muted
   void sendDebug(QString debug); ///< Used to output debug info, no sound associated
+
+#ifdef SSC_PRINT_CALLER_INFO
+  void sendInfoRedefined(QString info);
+  void sendSuccessRedefined(QString success);
+  void sendWarningRedefined(QString warning);
+  void sendErrorRedefined(QString error);
+  void sendDebugRedefined(QString debug);
+  void sendCallerInformation(const std::string caller, const std::string file, int line);
+  void sendInfoWithCallerInfo(QString info, const std::string caller, const std::string file, int line);
+  void sendSuccessWithCallerInfo(QString info, const std::string caller, const std::string file, int line);
+  void sendWarningWithCallerInfo(QString info, const std::string caller, const std::string file, int line);
+  void sendErrorWithCallerInfo(QString info, const std::string caller, const std::string file, int line);
+  void sendDebugWithCallerInfo(QString info, const std::string caller, const std::string file, int line);
+#endif
 
   void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=0, bool mute=false, QString sourceLocation="");
 
@@ -140,6 +153,27 @@ private:
 MessageManager* messageManager();
 
 } //namespace ssc
+
+#ifdef SSC_PRINT_CALLER_INFO
+//	#ifndef __PRETTY_FUNCTION__
+//		#define __PRETTY_FUNCTION__ __FUNCTION__
+//	#endif
+
+	#undef sendInfo
+	#define sendInfo(msg) sendInfoWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
+
+	#undef sendSuccess
+	#define sendSuccess(msg) sendSuccessWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
+
+	#undef sendWarning
+	#define sendWarning(msg) sendWarningWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
+
+	#undef sendError
+	#define sendError(msg) sendErrorWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
+
+	#undef sendDebug
+	#define sendDebug(msg) sendDebugWithCallerInfo(msg, __PRETTY_FUNCTION__, __FILE__, __LINE__)
+#endif
 
 typedef ssc::Message Message;
 Q_DECLARE_METATYPE(Message);

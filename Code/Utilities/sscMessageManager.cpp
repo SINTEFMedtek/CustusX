@@ -33,18 +33,6 @@ QString Message::getPrintableMessage()
 		.arg(mSourceLocation)
 		.arg(qstring_cast(mMessageLevel))
 		.arg(mText);
-
-//  QString message("");
-//  message.append(QString("["));
-//  message.append(mSourceLocation);
-//  message.append(mTimeStamp.toString("hh:mm:ss:zzz"));
-//  message.append(QString("] "));
-//  message.append(QString("["));
-//  message.append(qstring_cast(mMessageLevel));
-//  message.append(QString("] "));
-//  message.append(mText);
-//
-//  return message;
 }
 
 MESSAGE_LEVEL Message::getMessageLevel()
@@ -252,30 +240,89 @@ bool MessageManager::hasAudioSource() const
   return mAudioSource;
 }
 
+#ifndef SSC_PRINT_CALLER_INFO
 void MessageManager::sendInfo(QString info)
+#else
+void MessageManager::sendInfoRedefined(QString info)
+#endif
 {
   this->sendMessage(info, mlINFO, 1500);
 }
 
-void MessageManager::sendSuccess(QString success, bool mute)
+#ifndef SSC_PRINT_CALLER_INFO
+void MessageManager::sendSuccess(QString success)
+#else
+void MessageManager::sendSuccessRedefined(QString success)
+#endif
 {
   this->sendMessage(success, mlSUCCESS, 1500);
 }
 
-void MessageManager::sendWarning(QString warning, bool mute)
+#ifndef SSC_PRINT_CALLER_INFO
+void MessageManager::sendWarning(QString warning)
+#else
+void MessageManager::sendWarningRedefined(QString warning)
+#endif
 {
   this->sendMessage(warning, mlWARNING, 3000);
 }
 
-void MessageManager::sendError(QString error, bool mute)
+#ifndef SSC_PRINT_CALLER_INFO
+void MessageManager::sendError(QString error)
+#else
+void MessageManager::sendErrorRedefined(QString error)
+#endif
 {
   this->sendMessage(error, mlERROR, 0);
 }
-  
+
+#ifndef SSC_PRINT_CALLER_INFO
 void MessageManager::sendDebug(QString debug)
+#else
+void MessageManager::sendDebugRedefined(QString debug)
+#endif
 {
   this->sendMessage(debug, mlDEBUG, 0);
 }
+
+#ifdef SSC_PRINT_CALLER_INFO
+void MessageManager::sendCallerInformation(const std::string caller, const std::string file, int line)
+{
+	printf("\n");
+	printf("[FUNCTION] %s\n",caller.c_str());
+	printf("[FILE] %s\n",file.c_str());
+	printf("[LINE] %i\n",line);
+}
+
+void MessageManager::sendInfoWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
+{
+	this->sendCallerInformation(caller, file, line);
+	this->sendInfoRedefined(info);}
+
+void MessageManager::sendSuccessWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
+{
+	this->sendCallerInformation(caller, file, line);
+	this->sendSuccessRedefined(info);
+}
+
+void MessageManager::sendWarningWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
+{
+	this->sendCallerInformation(caller, file, line);
+	this->sendWarningRedefined(info);
+}
+
+void MessageManager::sendErrorWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
+{
+	this->sendCallerInformation(caller, file, line);
+	this->sendErrorRedefined(info);
+}
+
+void MessageManager::sendDebugWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
+{
+	this->sendCallerInformation(caller, file, line);
+	this->sendDebugRedefined(info);
+}
+#endif
 
 void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout, bool mute, QString sourceLocation)
 {
@@ -423,8 +470,7 @@ MessageManager::Format::Format() :
 	mShowBrackets(true),
 	mShowLevel(true),
 	mShowSourceLocation(true)
-{
-}
+{}
 
 
 } //End namespace ssc
