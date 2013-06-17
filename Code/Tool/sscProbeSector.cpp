@@ -32,7 +32,6 @@
 #include <vtkPlanes.h>
 #include <vtkCutter.h>
 #include <vtkAppendPolyData.h>
-//#include <vtkPolyPlane.h>
 #include "sscBoundingBox3D.h"
 #include "sscVolumeHelpers.h"
 #include "sscUtilHelpers.h"
@@ -227,11 +226,8 @@ vtkPolyDataPtr ProbeSector::getSectorLinesOnly()
 		return mPolyData;
 
 	vtkPolyDataPtr output = vtkPolyDataPtr::New();
-
 	output->SetPoints(mPolyData->GetPoints());
 	output->SetLines(mPolyData->GetLines());
-	//  output->SetStrips(mPolyData->GetStrips());
-	//  return output;
 
 	// also display the cliprect
 	vtkAppendPolyDataPtr retval = vtkAppendPolyDataPtr::New();
@@ -263,15 +259,11 @@ vtkPolyDataPtr ProbeSector::getClipRectLinesOnly()
 	return this->getClipRectPolyData();
 }
 
-/**generate a polydata containing only a polygon representing the sector cliprect.
- *
- */
 vtkPolyDataPtr ProbeSector::getClipRectPolyData()
 {
 	vtkPointsPtr points = vtkPointsPtr::New();
 	vtkCellArrayPtr sides = vtkCellArrayPtr::New();
 
-	//points->Allocate(N+M);
 	vtkIdType cells[5] =
 	{ 0, 1, 2, 3, 0 };
 	sides->InsertNextCell(5, cells);
@@ -286,7 +278,6 @@ vtkPolyDataPtr ProbeSector::getClipRectPolyData()
 	polydata->SetPoints(points);
 	polydata->SetLines(sides);
 
-	//  polydata = this->generateClipper(polydata);
 	return polydata;
 }
 
@@ -298,7 +289,6 @@ vtkPolyDataPtr ProbeSector::getOriginPolyData()
 	vtkPointsPtr points = vtkPointsPtr::New();
 	vtkCellArrayPtr sides = vtkCellArrayPtr::New();
 
-	//points->Allocate(N+M);
 	vtkIdType cells[4] =
 	{ 1, 0, 2, 3 };
 	sides->InsertNextCell(4, cells);
@@ -306,7 +296,6 @@ vtkPolyDataPtr ProbeSector::getOriginPolyData()
 	ssc::Vector3D o_u = mData.getImage().getOrigin_u();
 	double length = (mData.getDepthStart() - mData.getDepthEnd())/15;
 	length = ssc::constrainValue(length, 2, 10);
-//	length = 5; //mm
 	ssc::Vector3D tip = o_u + ssc::Vector3D(0, -length, 0);
 	ssc::Vector3D left = o_u + ssc::Vector3D(-length/3, 0, 0);
 	ssc::Vector3D right = o_u + ssc::Vector3D(length/3, 0, 0);
@@ -320,7 +309,6 @@ vtkPolyDataPtr ProbeSector::getOriginPolyData()
 	polydata->SetPoints(points);
 	polydata->SetLines(sides);
 
-	//  polydata = this->generateClipper(polydata);
 	return polydata;
 }
 
@@ -343,8 +331,7 @@ void ProbeSector::updateSector()
 	// after that, transform into yz-plane because thats the tool plane (probe point towards positive z)
 	// then transform to global space.
 	Transform3D tMl = createTransformIJC(Vector3D(0, 1, 0), Vector3D(0, 0, 1), Vector3D(0, 0, 0));
-	Transform3D texMu = createTransformNormalize(DoubleBoundingBox3D(0, bounds[0], 0, bounds[1], 0, 1),
-		DoubleBoundingBox3D(0, 1, 0, 1, 0, 1));
+	Transform3D texMu = createTransformNormalize(DoubleBoundingBox3D(0, bounds[0], 0, bounds[1], 0, 1), DoubleBoundingBox3D(0, 1, 0, 1, 0, 1));
 	Transform3D uMt = this->get_tMu().inv();
 	Transform3D texMl = texMu * uMt * tMl;
 	Transform3D uMl = uMt * tMl;
@@ -380,12 +367,10 @@ void ProbeSector::updateSector()
 		newTCoords->InsertNextTuple(texMl.coord(pr).begin());
 		newTCoords->InsertNextTuple(texMl.coord(pl).begin());
 
-		vtkIdType cells[5] =
-		{ 0, 1, 2, 3, 0 };
+		vtkIdType cells[5] = { 0, 1, 2, 3, 0 };
 		sides->InsertNextCell(5, cells);
 		polys->InsertNextCell(5, cells);
-		vtkIdType s_cells[5] =
-		{ 0, 3, 1, 2 };
+		vtkIdType s_cells[5] = { 0, 3, 1, 2 };
 		strips->InsertNextCell(4, s_cells);
 	}
 	else if (mData.getType() == ProbeData::tSECTOR)
@@ -393,13 +378,6 @@ void ProbeSector::updateSector()
 		Vector3D c(0, 0, 0); // arc center point
 		c += mData.getCenterOffset() * e_y;  // arc center point
 
-		//    std::cout << "c_local " << c << std::endl;
-		//    std::cout << "c_u " << uMl.coord(c) << std::endl;
-		//    Vector3D c_e = c + mData.mDepthStart * unitVector(M_PI_2);
-		//    std::cout << "c_e_local " << c_e << std::endl;
-		//    std::cout << "c_e_u " << uMl.coord(c_e) << std::endl;
-
-		//    int arcRes = 20;//Number of points in arc
 		int arcRes = 20;//Number of points in arc
 		double angleIncrement = mData.getWidth() / arcRes;
 		double startAngle = M_PI_2 - mData.getWidth() / 2.0;
@@ -423,8 +401,8 @@ void ProbeSector::updateSector()
 			}
 			newTCoords->InsertNextTuple(texMl.coord(startTheta).begin());
 			points->InsertNextPoint(uMl.coord(startTheta).begin());
-			//std::cout << "p_arc " << uMl.coord(startTheta) << std::endl;
 		}
+
 		for (int i = 0; i <= arcRes; i++)
 		{
 			double theta = stopAngle - i * angleIncrement;
@@ -438,7 +416,6 @@ void ProbeSector::updateSector()
 			endTheta = c + (mData.getDepthEnd()-mData.getCenterOffset()+offset) * unitVector(theta);
 			newTCoords->InsertNextTuple(texMl.coord(endTheta).begin());
 			points->InsertNextPoint(uMl.coord(endTheta).begin());
-			//std::cout << "p_arc " << uMl.coord(endTheta) << std::endl;
 		}
 
 		sides->InsertNextCell(N + 1);
@@ -464,9 +441,7 @@ void ProbeSector::updateSector()
 	polydata->SetStrips(strips);
 	polydata->GetPointData()->SetTCoords(newTCoords);
 	polydata->SetLines(sides);
-	//  polydata->SetPolys(polys);
 	mPolyData = polydata;
-	//  mPolyData = this->generateClipper(polydata);
 }
 
 }

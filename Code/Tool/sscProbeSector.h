@@ -20,16 +20,16 @@
 #ifndef SSCPROBESECTOR_H_
 #define SSCPROBESECTOR_H_
 
+#include <boost/shared_ptr.hpp>
 #include <QSize>
 #include "vtkSmartPointer.h"
+#include "vtkForwardDeclarations.h"
+#include "sscProbeData.h"
+#include "sscTransform3D.h"
+
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 typedef vtkSmartPointer<class vtkPolyLine> vtkPolyLinePtr;
-#include "sscTransform3D.h"
-
-#include <boost/shared_ptr.hpp>
-#include "sscProbeData.h"
-#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {
@@ -61,9 +61,7 @@ public:
 	void test();
 
 private:
-	//  vtkPolyLinePtr createClipRectPolyLine();
-//	vtkPolyDataPtr generateClipper(vtkPolyDataPtr input);
-	vtkPolyDataPtr getClipRectPolyData();
+	vtkPolyDataPtr getClipRectPolyData(); ///< generate a polydata containing only a polygon representing the sector cliprect.
 	bool clipRectIntersectsSector() const;
 
 	bool isInside(Vector3D p_u);

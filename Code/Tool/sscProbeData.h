@@ -28,7 +28,9 @@ class QDomNode;
 namespace ssc
 {
 
-/**\brief Definition of characteristics for an Ultrasound Probe Sector.
+/**
+ *
+ * \brief Definition of characteristics for an Ultrasound Probe Sector.
  *
  *  \verbatim
  *
@@ -89,7 +91,6 @@ public:
 	struct ProbeImageData
 	{
 		ProbeImageData();
-//    ssc::Vector3D mOrigin_u; ///< probe origin in image space u. (lower-left corner origin)
 		ssc::Vector3D getOrigin_u() const; ///< probe origin in image space u. (lower-left corner origin)
 		ssc::DoubleBoundingBox3D getClipRect_u() const; ///< sector clipping rect in image space u. (lower-left corner origin)
 		ssc::Vector3D mOrigin_p; ///< probe origin in pixel space p. (upper-left corner origin)
@@ -109,23 +110,20 @@ public:
 
 public:
 	ProbeData(TYPE type = tNONE);
-//	ProbeData(double depthStart, double depthEnd, double width);
 	void addXml(QDomNode dataNode) const; ///< write to xml
 	void parseXml(QDomNode dataNode);///< load from xml
 
-	TYPE getType() const { return mType; }
-	double getDepthStart() const { return mDepthStart; }
-	double getDepthEnd() const { return mDepthEnd; }
-	double getWidth() const { return mWidth; }
-	double getTemporalCalibration() const { return mTemporalCalibration; }
-	double getCenterOffset() const { return mCenterOffset; }
-	ProbeImageData getImage() const { return mImage; }
-	void resample(QSize mSize);
-	QString getUid() const { return mUid; }
+	TYPE getType() const;
+	double getDepthStart() const;
+	double getDepthEnd() const;
+	double getWidth() const;
+	double getTemporalCalibration() const;
+	double getCenterOffset() const;
+	ProbeImageData getImage() const;
+	void resample(QSize mSize); ///< Set a new image size. Resample all other parameters to match this new image size, keeping sizes in millimeters fixed.
+	QString getUid() const;
 
-	void setTemporalCalibration(double value) { mTemporalCalibration = value; }
-//	void setImage(ProbeImageData value) { mImage = value; }
-//	void setSector(double depthStart, double depthEnd, double width) { mDepthStart=depthStart; mDepthEnd=depthEnd; mWidth=width; }
+	void setTemporalCalibration(double value);
 	void setType(TYPE type);
 	void setImage(ProbeImageData value);
 	void setSector(double depthStart, double depthEnd, double width, double centerOffset = 0);
@@ -147,7 +145,9 @@ private:
 	double mSoundSpeedCompensationFactor; ///< The used sound speed compensation factor
 	QString mUid; ///<  the uid of the stream data this probe data applies to.
 };
+
 typedef boost::shared_ptr<ProbeData> ProbeDataPtr;
+
 } // namespace ssc
 
 #endif /*SSCPROBEDATA_H_*/
