@@ -23,6 +23,7 @@
 #include <vtkPolyData.h>
 
 #include "sscToolManager.h"
+#include "sscMessageManager.h"
 #include "sscTool.h"
 #include "sscDataManager.h"
 #include "sscImage.h"
@@ -172,27 +173,8 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 
 void VideoSourceGraphics::receiveVisible(bool visible)
 {
-
+	ssc::messageManager()->sendWarning("Empty function called...");
 }
-
-//void VideoGraphics::checkDataIntegrity()
-//{
-//	if (!mData || !mTool)
-//		return;
-
-//	std::cout << "probe sector " << mTool->getUid() << " " << streamXml2String(mTool->getProbeSector()) << std::endl;
-//	DoubleBoundingBox3D bounds_poly_u(mProbeData.getSector()->GetBounds());
-//	DoubleBoundingBox3D bounds_poly_v = transform(mProbeData.get_uMv().inv(), bounds_poly_u);
-//	DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
-//	DoubleBoundingBox3D extent(mDataRedirecter->GetOutput()->GetExtent());
-//	std::cout << "poly_u bounds: " << bounds_poly_u << std::endl;
-//	std::cout << "poly_v bounds: " << bounds_poly_v << std::endl;
-//	std::cout << "img bounds: " << bounds << std::endl;
-//	std::cout << "img extent: " << extent << std::endl;
-//	std::cout << "img spacing: " << Vector3D(mDataRedirecter->GetOutput()->GetSpacing()) << std::endl;
-
-////  mDataRedirecter->GetOutput()->Print(std::cout);
-//}
 
 void VideoSourceGraphics::newDataSlot()
 {
