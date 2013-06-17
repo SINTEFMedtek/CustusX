@@ -73,7 +73,6 @@ void correlate(double* x, double* y, double* corr, int maxdelay, int n)
   }
   denom = sqrt(sx * sy);
 
-//  std::cout << "raw: " << std::endl;
   /* Calculate the correlation series */
   for (delay = -maxdelay; delay < maxdelay; delay++)
   {
@@ -85,15 +84,8 @@ void correlate(double* x, double* y, double* corr, int maxdelay, int n)
         continue;
       else
         sxy += (x[i] - mx) * (y[j] - my);
-      /* Or should it be (?)
-       if (j < 0 || j >= n)
-       sxy += (x[i] - mx) * (-my);
-       else
-       sxy += (x[i] - mx) * (y[j] - my);
-       */
     }
     r = sxy / denom;
-//    std::cout << sxy << "\t" << sxy/denom << std::endl;
     corr[delay+maxdelay] = r;//(sxy/denom+1) * 128;
 
     /* r is the correlation coefficient at "delay" */
@@ -138,9 +130,6 @@ void TemporalCalibration::saveDebugFile()
     return;
 
   QString dbFilename = mDebugFolder +"/"+ QFileInfo(mFilename).baseName() + "_temporal_calib.txt";
-//  std::stringstream mDebugStream;
-//  QString fullname = QFileInfo(mFilename).dir().absolutePath()+"/"+mDebugFile;
-//  QString fullname = "/home/christiana/christiana/"+mDebugFile;
   QFile file(dbFilename);
   file.remove();
 
@@ -190,7 +179,6 @@ double TemporalCalibration::calibrate(bool* success)
   mDebugStream << "Loaded data: " << mFilename << std::endl;
   mDebugStream << "=======================================" << std::endl;
 
-//  mFileData.mUsRaw->initializeFrames();
   mProcessedFrames = mFileData.mUsRaw->initializeFrames(std::vector<bool>(1, false)).front();
 
   std::vector<double> frameMovement = this->computeProbeMovement();
@@ -212,7 +200,6 @@ double TemporalCalibration::calibrate(bool* success)
   std::vector<double> frameMovementRegular = this->resample(frameMovement, mFileData.mFrames, resolution);
   std::vector<double> trackingMovementRegular = this->resample(trackingMovement, mFileData.mPositions, resolution);
 
-//  double shift = this->findCorrelationShift(frameMovementRegular, trackingMovementRegular, resolution);
   double shift = this->findLSShift(frameMovementRegular, trackingMovementRegular, resolution);
 
   double totalShift = offset + shift;
@@ -258,7 +245,6 @@ double TemporalCalibration::findLeastSquares(std::vector<double> frames, std::ve
 
 	r0 = std::max<int>(r0, - shift);
 	r1 = std::min<int>(r1, tracking.size() - shift);
-//	std::cout << "range " << r0 << " " << r1 << " shift="<< shift << std::endl;
 
 	double value = 0;
 
@@ -285,11 +271,6 @@ double TemporalCalibration::findLSShift(std::vector<double> frames, std::vector<
   std::vector<double> result(N, 0);
   int W = N/2;
 
-//	std::cout << "0 " << this->findLeastSquares(frames, tracking, 0) << std::endl;
-//	std::cout << "1 " << this->findLeastSquares(frames, tracking, 100) << std::endl;
-//	std::cout << "2 " << this->findLeastSquares(frames, tracking, 200) << std::endl;
-//	std::cout << "3 " << this->findLeastSquares(frames, tracking, 300) << std::endl;
-
   for (int i=-W; i<W; ++i)
   {
   	double rms = this->findLeastSquares(frames, tracking, i);
@@ -298,12 +279,6 @@ double TemporalCalibration::findLSShift(std::vector<double> frames, std::vector<
 
   int top = std::distance(result.begin(), std::min_element(result.begin(), result.end()));
   double shift = (W-top) * resolution; // convert to shift in ms.
-
-//
-//  correlate(&*frames.begin(), &*tracking.begin(), &*result.begin(), N / 2, N);
-//
-//  int top = std::distance(result.begin(), std::max_element(result.begin(), result.end()));
-//  double shift = (N/2-top) * resolution; // convert to shift in ms.
 
   mDebugStream << "=======================================" << std::endl;
   mDebugStream << "tracking vs frames fit using least squares:" << std::endl;
@@ -379,9 +354,7 @@ void TemporalCalibration::writePositions(QString title, std::vector<double> pos,
 
 /**resample the time+shift function onto a regular time series given by resolution.
  *
- *///  TemporalCalibration();
-//  virtual ~TemporalCalibration();
-
+ */
 std::vector<double> TemporalCalibration::resample(std::vector<double> shift, std::vector<ssc::TimedPosition> time, double resolution)
 {
   if (shift.size()!=time.size())
@@ -389,19 +362,15 @@ std::vector<double> TemporalCalibration::resample(std::vector<double> shift, std
     ssc::messageManager()->sendError("Assert failure, shift and time different sizes");
   }
 
-//  std::cout << "resample " << std::endl;
   vtkPiecewiseFunctionPtr frames = vtkPiecewiseFunctionPtr::New();
   for (unsigned i=0; i<shift.size(); ++i)
   {
-//    std::cout << i << "\t" << time[i].mTime << "\t" << shift[i] << std::endl;
-
     frames->AddPoint(time[i].mTime, shift[i]);
   }
   double r0, r1;
   frames->GetRange(r0, r1);
   double range = r1-r0;
   int N_r = range/resolution;
-//  std::cout << "range " << r0 << "\t" << r1 << "\t" << N_r << std::endl;
 
   std::vector<double> framesRegular;
   for (int i=0; i<N_r; ++i)
@@ -430,8 +399,6 @@ std::vector<double> TemporalCalibration::computeTrackingMovement()
       zero = val;
 
     retval.push_back(val-zero);
-//    if (i<50)
-//    	std::cout << i << "\t" << p_pr <<  "\t"  <<ez_pr << "\t" << val << "\t" << val-zero << std::endl;
   }
 
   if (mAddRawToDebug)
@@ -446,7 +413,6 @@ std::vector<double> TemporalCalibration::computeTrackingMovement()
 		}
 		mDebugStream << std::endl;
 		mDebugStream << "=======================================" << std::endl;
-//		std::cout << mDebugStream.str() << std::endl;
   }
 
   return retval;
@@ -495,29 +461,14 @@ double TemporalCalibration::findCorrelation(ssc::USFrameDataPtr data, int frame_
 	int maxShift_pix = maxShift / mFileData.mUsRaw->getSpacing()[1];
 	int lastVal_pix = lastVal / mFileData.mUsRaw->getSpacing()[1];
 
-//  int N_frames = mFileData.mUsRaw->getDimensions()[2];
-//  int line_index_x = mFileData.mUsRaw->getDimensions()[0]/2;
   int line_index_x = mFileData.mProbeData.mData.getImage().mOrigin_p[0];
 
   int dimY = mFileData.mUsRaw->getDimensions()[1];
 
-//  std::vector<double>
   vtkImageDataPtr line1 = this->extractLine_y(mFileData.mUsRaw, line_index_x, frame_a);
   vtkImageDataPtr line2 = this->extractLine_y(mFileData.mUsRaw, line_index_x, frame_b);
 
-//  vtkImageCorrelationPtr correlator = vtkImageCorrelationPtr::New();
-//  correlator->SetDimensionality(1);
-//  correlator->SetInput1(line1);
-//  correlator->SetInput2(line2);
-//  correlator->Update();
-//  vtkImageDataPtr result = correlator->GetOutput();
-//  std::cout << "got a result with dim " << ssc::Vector3D(result->GetDimensions()) << std::endl;
-
-//  int N = result->GetDimensions()[0];
-//  int N = dimY;
-//  N = maxShift_pix*2; //result vector allocate space on both sides of zero
   int N = 2*dimY; //result vector allocate space on both sides of zero
-//  N = 2*N; /// use double the space in order to accept more movement than half the interval.
   std::vector<double> result(N, 0);
   double* line_a = static_cast<double*>(line1->GetScalarPointer());
   double* line_b = static_cast<double*>(line2->GetScalarPointer());
@@ -536,28 +487,6 @@ double TemporalCalibration::findCorrelation(ssc::USFrameDataPtr data, int frame_
 
   double hit = (N/2-top) * mFileData.mUsRaw->getSpacing()[1]; // convert to downwards movement in mm.
 
-//  std::cout << "frame_b=" << frame_b << " N=" << N << " lasttop=" << lastTop << " r0=" << range.first << " r1=" << range.second << " top=" << top << " hit=" << hit<< std::endl;
-//
-//  if (frame_b==46)
-//  {
-//		mDebugStream << "=======================================" << std::endl;
-//		mDebugStream << "frame correlation raw data:" << std::endl;
-//		mDebugStream << std::endl;
-//		mDebugStream << "A=" << frame_a << "\t" << "B=" << frame_b << "\t" << "result (size=" << N << ")" << std::endl;
-//		for (int x = 0; x < dimY; ++x)
-//		{
-//			mDebugStream << line_a[x] << "\t" << line_b[x];
-//			if (int(x)<N)
-//				mDebugStream << "\t" << result[x];
-//			mDebugStream << std::endl;
-//		}
-//		mDebugStream << "top: " << top << std::endl;
-//		mDebugStream << "hit: " << hit << std::endl;
-//		std::cout << "hit: " << hit << std::endl;
-//		mDebugStream << std::endl;
-//		mDebugStream << "=======================================" << std::endl;
-//  }
-
   return hit;
 }
 
@@ -571,11 +500,6 @@ vtkImageDataPtr TemporalCalibration::extractLine_y(ssc::USFrameDataPtr data, int
 
   vtkImageDataPtr retval = ssc::generateVtkImageDataDouble(Eigen::Array3i(dimY, 1, 1), ssc::Vector3D(1,1,1), 1);
 
-  /// convert one frame to a vtkImageData: base
-//  uchar* raw_source = data->getFrame(frame);
-//  vtkImageDataPtr base = ssc::generateVtkImageData(Eigen::Array3i(dimX, dimY, 1), ssc::Vector3D(1,1,1), 0);
-//  uchar* base_ptr = static_cast<uchar*>(base->GetScalarPointer());
-//  std::copy(raw_source, raw_source+dimX*dimY, base_ptr);
   vtkImageDataPtr base = mProcessedFrames[frame];
 
   // run the base frame through the mask. Result is source.
@@ -588,13 +512,10 @@ vtkImageDataPtr TemporalCalibration::extractLine_y(ssc::USFrameDataPtr data, int
 
   double* dest = static_cast<double*>(retval->GetScalarPointer());
 
-//  std::cout << "extract begin" << std::endl;
   for (int y=0; y<dimY; ++y)
   {
     dest[y] = source[y*dimX + line_index_x];
-//    std::cout << (int)dest[y] << std::endl;
   }
-//  std::cout << "extract end" << std::endl;
 
   return retval;
 }

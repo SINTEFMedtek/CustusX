@@ -5,7 +5,8 @@
 #include "sscTransform3D.h"
 #include "cxImageStreamer.h"
 
-typedef vtkSmartPointer<class vtkPNGWriter> vtkPNGWriterPtr;
+typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
+
 namespace cx
 {
 typedef ssc::Transform3D Transform3D;
@@ -35,6 +36,7 @@ public:
 
 private slots:
 	virtual void streamSlot();
+	void generateMaskSlot();
 	void sliceSlot();
 	void setSourceToActiveImageSlot();
 
@@ -43,6 +45,7 @@ private:
 	ssc::ImagePtr getSlice(ssc::ImagePtr source);
 	vtkMatrix4x4Ptr calculateSliceAxes();
 	vtkImageDataPtr getSliceUsingProbeDefinition(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes);
+	vtkImageDataPtr maskSlice(vtkImageDataPtr unmaskedSlice);
 	ssc::ImagePtr convertToSscImage(vtkImageDataPtr slice, ssc::ImagePtr volume);
 	vtkImageReslicePtr createReslicer(ssc::ImagePtr source, vtkMatrix4x4Ptr sliceAxes);
 	ssc::Transform3D getTransformFromProbeSectorImageSpaceToImageSpace();
@@ -50,6 +53,7 @@ private:
 	ssc::ImagePtr mSourceImage;
 	ssc::ToolPtr mTool;
 	ssc::ImagePtr mImageToSend;
+	vtkImageDataPtr mMask;
 
 };
 typedef boost::shared_ptr<SimulatedImageStreamer> SimulatedImageStreamerPtr;
