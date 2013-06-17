@@ -1,12 +1,8 @@
-/*
- * cxImageServer.cpp
- *
- *  \date Oct 30, 2010
- *      \author christiana
- */
 #include "cxImageServer.h"
-#include "cxImageSenderFactory.h"
+
+#include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "cxImageSenderFactory.h"
 #include <iostream>
 #include <QCoreApplication>
 #include <QHostAddress>
@@ -17,8 +13,7 @@ namespace cx
 
 ImageServer::ImageServer(QObject* parent) :
 	QTcpServer(parent)
-{
-}
+{}
 
 bool ImageServer::initialize()
 {
@@ -32,7 +27,6 @@ bool ImageServer::initialize()
 	ok = true;
 
 	return ok;
-
 }
 
 bool ImageServer::startListen(int port)
@@ -73,7 +67,7 @@ void ImageServer::incomingConnection(int socketDescriptor)
 
 	if (mSocket != 0)
 	{
-		std::cout << "Server error: Can only handle a single connection." << std::endl;
+		ssc::messageManager()->sendError("The image server can only handle a single connection.");
 		return;
 	}
 
@@ -81,7 +75,7 @@ void ImageServer::incomingConnection(int socketDescriptor)
 	connect(mSocket, SIGNAL(disconnected()), this, SLOT(socketDisconnectedSlot()));
 	mSocket->setSocketDescriptor(socketDescriptor);
 	QString clientName = mSocket->localAddress().toString();
-	std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
+	ssc::messageManager()->sendInfo("Connected to "+clientName+". Session started.");
 	SenderPtr sender(new GrabberSenderQTcpSocket(mSocket));
 
 	mImageSender->startStreaming(sender);
@@ -95,7 +89,7 @@ void ImageServer::socketDisconnectedSlot()
 	if (mSocket)
 	{
 		QString clientName = mSocket->localAddress().toString();
-		std::cout << "Disconnected from " << clientName.toStdString() << ". Session ended." << std::endl;
+		ssc::messageManager()->sendInfo("Disconnected from "+clientName+". Session ended.");
 		mSocket->deleteLater();
 	}
 }

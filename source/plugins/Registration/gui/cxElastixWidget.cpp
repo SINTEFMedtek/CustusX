@@ -221,7 +221,6 @@ void ElastixWidget::elastixChangedSlot()
 	nameFilters << "*.txt";
 	mParameterFileWidget0->setNameFilter(nameFilters);
 	mParameterFileWidget0->setFilename(par->getActiveParameterFile0());
-	std::cout << "mElastixManager->getActiveParameterFile0() " << par->getActiveParameterFile0() << std::endl;
 
 	mFilePreviewWidget->previewFileSlot(par->getActiveParameterFile0());
 
