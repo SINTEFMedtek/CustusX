@@ -197,7 +197,11 @@ QWidget* VideoConnectionWidget::createRemoteWidget()
 
 QString VideoConnectionWidget::defaultWhatsThis() const
 {
-	return "<html><h3><Setup IGTLink connection.</h3><p>Lets you set up a connection to a streaming server using IGTLink.</p><p><i></i></p></html>";
+	return "<html>"
+			"<h3><Setup IGTLink connection.</h3>"
+			"<p>Lets you set up a connection to a streaming server using IGTLink.</p>"
+			"<p><i></i></p>"
+			"</html>";
 }
 
 QProcess* VideoConnectionWidget::getServerProcess()

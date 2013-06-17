@@ -1,4 +1,6 @@
 #include "cxImageSenderFactory.h"
+
+#include "sscMessageManager.h"
 #include "cxImageStreamerOpenCV.h"
 #include "cxMHDImageStreamer.h"
 #include "cxImageStreamerSonix.h"
@@ -48,10 +50,10 @@ StreamerPtr ImageStreamerFactory::getFromArguments(StringMap args)
 	StreamerPtr streamer = this->getImageSender(type);
 
 	if (streamer)
-		std::cout << "Success: Created sender of type: " << type.toStdString() << std::endl;
+		ssc::messageManager()->sendSuccess("Created sender of type: "+type);
 	else
 	{
-		std::cout << "Error: Failed to create sender based on type: " << type.toStdString() << std::endl;
+		ssc::messageManager()->sendError("Failed to create sender based on type: "+type);
 		return streamer;
 	}
 
