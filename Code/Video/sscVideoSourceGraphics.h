@@ -32,13 +32,11 @@ typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
  *
  * Used for Video display in VideoFixedPlaneRep and ToolRep3D.
  *
- *  Used by CustusX.
- *
  * \ingroup sscProxy
  *
  * \date Oct 31, 2010
  * \date april 26, 2013
- * \author christiana
+ * \author Christian Askeland, SINTEF
  */
 class VideoSourceGraphics : public QObject
 {
@@ -51,10 +49,7 @@ public:
 	void setTool(ToolPtr tool);
 	ToolPtr getTool();
 	ssc::ProbeSector getProbeData();
-	/** Turn sector clipping on/off.
-	 *  If on, only the area inside the probe sector is shown.
-	 */
-	void setClipToSector(bool on);
+	void setClipToSector(bool on); ///< Turn sector clipping on/off. If on, only the area inside the probe sector is shown.
 	void setShowInToolSpace(bool on);
 	vtkActorPtr getActor();
 
