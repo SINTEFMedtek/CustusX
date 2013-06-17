@@ -98,7 +98,8 @@ ssc::ImagePtr SimulatedImageStreamer::getSlice(ssc::ImagePtr source)
 {
 	vtkMatrix4x4Ptr sliceAxes = this->calculateSliceAxes();
 	vtkImageDataPtr vtkSlice = this->getSliceUsingProbeDefinition(source, sliceAxes);
-	ssc::ImagePtr slice = this->createSscImage(vtkSlice, source);
+	ssc::ImagePtr slice = this->convertToSscImage(vtkSlice, source);
+	slice->resetTransferFunction(source->getTransferFunctions3D(), source->getLookupTable2D());
 
 	return slice;
 }
@@ -125,10 +126,9 @@ vtkImageDataPtr SimulatedImageStreamer::getSliceUsingProbeDefinition(ssc::ImageP
 	return retval;
 }
 
-ssc::ImagePtr SimulatedImageStreamer::createSscImage(vtkImageDataPtr slice, ssc::ImagePtr volume)
+ssc::ImagePtr SimulatedImageStreamer::convertToSscImage(vtkImageDataPtr slice, ssc::ImagePtr volume)
 {
 	ssc::ImagePtr retval = ssc::ImagePtr(new ssc::Image("TEST_UID", slice, "TEST_NAME"));
-	retval->resetTransferFunction(volume->getTransferFunctions3D(), volume->getLookupTable2D());
 	return retval;
 }
 

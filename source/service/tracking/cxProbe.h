@@ -71,7 +71,6 @@ public:
 	virtual void setActiveStream(QString uid);
 	virtual QString getActiveStream() const;
 
-	// non-inherited functions
 	ProbeXmlConfigParser::Configuration getConfiguration() const;
 	void removeCurrentConfig(); ///< remove the current config from disk
 	void saveCurrentConfig(QString uid, QString name); ///< save current config to disk under ids (uid,name).
@@ -95,6 +94,7 @@ private:
 	bool isValidConfigId();
 	ssc::ProbeData createProbeSector();
 	void updateTemporalCalibration();
+
 	QString mActiveUid;
 	std::map<QString, ssc::ProbeData> mProbeData; ///< all defined probe definitions
 	std::map<QString, ssc::VideoSourcePtr> mSource; ///< all defined sources
