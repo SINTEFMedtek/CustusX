@@ -288,38 +288,43 @@ void MessageManager::sendDebugRedefined(QString debug)
 #ifdef SSC_PRINT_CALLER_INFO
 void MessageManager::sendCallerInformation(const std::string caller, const std::string file, int line)
 {
-	printf("\n");
-	printf("[FUNCTION] %s\n",caller.c_str());
-	printf("[FILE] %s: %i\n",file.c_str(), line);
+	printf("\t\t[FUNCTION] %s\n",caller.c_str());
+	printf("\t\t[FILE] %s: %i\n",file.c_str(), line);
 }
 
 void MessageManager::sendInfoWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
 {
+	this->sendInfoRedefined(info);
 	this->sendCallerInformation(caller, file, line);
-	this->sendInfoRedefined(info);}
+	printf("\n");
+}
 
 void MessageManager::sendSuccessWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
 {
-	this->sendCallerInformation(caller, file, line);
 	this->sendSuccessRedefined(info);
+	this->sendCallerInformation(caller, file, line);
+	printf("\n");
 }
 
 void MessageManager::sendWarningWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
 {
-	this->sendCallerInformation(caller, file, line);
 	this->sendWarningRedefined(info);
+	this->sendCallerInformation(caller, file, line);
+	printf("\n");
 }
 
 void MessageManager::sendErrorWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
 {
-	this->sendCallerInformation(caller, file, line);
 	this->sendErrorRedefined(info);
+	this->sendCallerInformation(caller, file, line);
+	printf("\n");
 }
 
 void MessageManager::sendDebugWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
 {
-	this->sendCallerInformation(caller, file, line);
 	this->sendDebugRedefined(info);
+	this->sendCallerInformation(caller, file, line);
+	printf("\n");
 }
 #endif
 
