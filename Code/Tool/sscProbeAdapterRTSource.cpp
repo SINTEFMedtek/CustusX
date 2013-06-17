@@ -17,13 +17,6 @@
 //
 // See sscLicense.txt for more information.
 
-/*
- * cxProbeAdapterRTSource.cpp
- *
- *  Created on: Feb 11, 2011
- *      Author: christiana
- */
-
 #include "sscProbeAdapterRTSource.h"
 #include <vtkImageChangeInformation.h>
 #include <vtkImageData.h>
@@ -49,9 +42,17 @@ ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ssc::ProbePtr probe, ssc
 	this->probeChangedSlot();
 }
 
+ProbeAdapterRTSource::~ProbeAdapterRTSource()
+{}
+
 QString ProbeAdapterRTSource::getUid()
 {
 	return mUid;
+}
+
+QString ProbeAdapterRTSource::getName()
+{
+	return mBase->getName();
 }
 
 vtkImageDataPtr ProbeAdapterRTSource::getVtkImageData()
@@ -69,13 +70,46 @@ double ProbeAdapterRTSource::getTimestamp()
 		return mBase->getTimestamp();
 }
 
-/**called when a new frame arrives.
- *
- * Check the image sizes of the probe definition and the
- * image. If different: resample the probe def to match
- * the image.
- *
- */
+QString ProbeAdapterRTSource::getInfoString() const
+{
+	return mBase->getInfoString();
+}
+
+QString ProbeAdapterRTSource::getStatusString() const
+{
+	return mBase->getStatusString();
+}
+
+void ProbeAdapterRTSource::start()
+{
+	mBase->start();
+}
+
+void ProbeAdapterRTSource::stop()
+{
+	mBase->stop();
+}
+
+bool ProbeAdapterRTSource::validData() const
+{
+	return mBase->validData();
+}
+
+bool ProbeAdapterRTSource::isConnected() const
+{
+	return mBase->isConnected();
+}
+
+bool ProbeAdapterRTSource::isStreaming() const
+{
+	return mBase->isStreaming();
+}
+
+ssc::VideoSourcePtr ProbeAdapterRTSource::getBaseSource()
+{
+	return mBase;
+}
+
 void ProbeAdapterRTSource::newFrameSlot()
 {
 	ProbePtr probe = mProbe.lock();
