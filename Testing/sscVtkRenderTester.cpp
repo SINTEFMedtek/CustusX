@@ -71,6 +71,11 @@ TestVtkRendering::TestVtkRendering()
 	mRenderWindow->SetSize(120,120);
 }
 
+void TestVtkRendering::setImageErrorThreshold(double value)
+{
+    mImageErrorThreshold = value;
+}
+
 //	ssc::ViewWidget* getView()
 //	{
 //		return mView;
