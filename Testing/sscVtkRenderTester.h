@@ -49,6 +49,7 @@ public:
 	vtkImageDataPtr renderToImage();
 	bool findDifference(vtkImageDataPtr input1, vtkImageDataPtr input2);
 	void enterRunLoop();
+    void setImageErrorThreshold(double value);
 
 private:
 	vtkImageDataPtr getImageFromRenderWindow();
