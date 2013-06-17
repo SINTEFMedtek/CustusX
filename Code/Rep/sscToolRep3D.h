@@ -65,10 +65,10 @@ public:
 	ToolTracerPtr getTracer();
 	void setSphereRadius(double radius);
 
-	void setTooltipPointColor(Vector3D c) { mTooltipPointColor = c; }
-	void setOffsetPointColor(Vector3D c) { mOffsetPointColor = c; }
-	void setOffsetLineColor(Vector3D c) { mOffsetLineColor = c; }
-	void setOffsetStipplePattern(int pattern) { mStipplePattern = pattern; }
+	void setTooltipPointColor(Vector3D c);
+	void setOffsetPointColor(Vector3D c);
+	void setOffsetLineColor(Vector3D c);
+	void setOffsetStipplePattern(int pattern);
 
 	void setStayHiddenAfterVisible(bool val);
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.

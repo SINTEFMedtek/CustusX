@@ -71,8 +71,7 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
 }
 
 ToolRep3D::~ToolRep3D()
-{
-}
+{}
 
 ToolTracerPtr ToolRep3D::getTracer()
 {
@@ -175,6 +174,26 @@ void ToolRep3D::setSphereRadius(double radius)
 		mTooltipPoint->setRadius(mSphereRadius);
 }
 
+void ToolRep3D::setTooltipPointColor(Vector3D c)
+{
+	mTooltipPointColor = c;
+}
+
+void ToolRep3D::setOffsetPointColor(Vector3D c)
+{
+	mOffsetPointColor = c;
+}
+
+void ToolRep3D::setOffsetLineColor(Vector3D c)
+{
+	mOffsetLineColor = c;
+}
+
+void ToolRep3D::setOffsetStipplePattern(int pattern)
+{
+	mStipplePattern = pattern;
+}
+
 void ToolRep3D::setSphereRadiusInNormalizedViewport(bool on)
 {
 	if (mSphereRadiusInNormalizedViewport == on)
@@ -186,8 +205,6 @@ void ToolRep3D::setSphereRadiusInNormalizedViewport(bool on)
 	{
 		mViewportListener.reset(new ssc::ViewportListener);
 		mViewportListener->setCallback(boost::bind(&ToolRep3D::scaleSpheres, this));
-//    if (mView)
-//      mViewportListener->startListen(mView->getRenderer());
 	}
 	else
 	{
@@ -275,9 +292,7 @@ void ToolRep3D::update()
 {
 	Transform3D prMt = Transform3D::Identity();
 	if (mTool)
-	{
 		prMt = mTool->get_prMt();
-	}
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
 
 	if (this->showProbe())
@@ -318,15 +333,11 @@ void ToolRep3D::probeSectorChanged()
 			mRTStream->setTool(mTool);
 			ProbePtr probe = mTool->getProbe();
 			if (probe)
-			{
 				mRTStream->setRealtimeStream(probe->getRTSource());
-			}
 		}
 	}
 	else
-	{
 		mProbeSectorActor->SetVisibility(false);
-	}
 }
 
 void ToolRep3D::updateOffsetGraphics()
@@ -366,26 +377,15 @@ void ToolRep3D::updateOffsetGraphics()
 
 void ToolRep3D::receiveVisible(bool visible)
 {
-	//  std::cout << "ToolRep3D::receiveVisible " << mTool->getName() << std::endl;
-
 	if (!visible && mStayVisibleAfterHide)
-	{
 		return; // don't hide
-	}
 	mToolActor->SetVisibility(visible);
 
 	if (mStayHiddenAfterVisible)
-	{
 		mToolActor->SetVisibility(false);
-	}
 	else
-	{
 		mToolActor->SetVisibility(mTool->getVisible());
-	}
 
-	//  std::cout << "Tool3DRep: receiveVisible "<< mTool->getName() << visible << " - " << mStayHiddenAfterVisible << std::endl;
-
-	//updateOffsetGraphics();
 	this->update();
 }
 
@@ -404,10 +404,12 @@ void ToolRep3D::setStayVisibleAfterHide(bool val)
 {
 	mStayVisibleAfterHide = val;
 }
+
 void ToolRep3D::setOffsetPointVisibleAtZeroOffset(bool val)
 {
 	mOffsetPointVisibleAtZeroOffset = val;
 }
+
 void ToolRep3D::tooltipOffsetSlot(double val)
 {
 	updateOffsetGraphics();
@@ -417,4 +419,5 @@ bool ToolRep3D::showProbe()
 {
 	return mTool && (mTool->hasType(Tool::TOOL_US_PROBE)) && (mTool->getProbeSector().getType()!=ssc::ProbeData::tNONE);
 }
+
 } // namespace ssc

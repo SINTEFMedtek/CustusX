@@ -73,14 +73,47 @@ void ProbeData::ProbeImageData::parseXml(QDomNode dataNode)
 // --------------------------------------------------------
 
 
-
 ProbeData::ProbeData(TYPE type) :
 	mType(type), mDepthStart(0), mDepthEnd(0), mWidth(0),
 	mTemporalCalibration(0), mCenterOffset(0), mSoundSpeedCompensationFactor(1.0),
 	mUid("default")
+{}
+
+void ProbeData::addXml(QDomNode dataNode) const
 {
+	QDomElement elem = dataNode.toElement();
+	elem.setAttribute("type", qstring_cast(mType));
+	elem.setAttribute("depthStart", qstring_cast(mDepthStart));
+	elem.setAttribute("depthEnd", qstring_cast(mDepthEnd));
+	elem.setAttribute("width", qstring_cast(mWidth));
+
+	elem.setAttribute("temporalCalibration", qstring_cast(mTemporalCalibration));
+	elem.setAttribute("centerOffset", qstring_cast(mCenterOffset));
+
+	elem.setAttribute("uid", qstring_cast(mUid));
+
+	QDomElement imageNode = dataNode.ownerDocument().createElement("image");
+	mImage.addXml(imageNode);
+	dataNode.appendChild(imageNode);
 }
 
+void ProbeData::parseXml(QDomNode dataNode)
+{
+	QDomElement elem = dataNode.toElement();
+
+	mType = static_cast<TYPE>(elem.attribute("type").toInt());
+	mDepthStart = loadAttribute(elem, "depthStart", 0);
+	mDepthEnd = loadAttribute(elem, "depthEnd", 0);
+	mWidth = loadAttribute(elem, "width", 0);
+
+	mTemporalCalibration = loadAttribute(elem, "temporalCalibration", 0);
+	mCenterOffset = loadAttribute(elem, "centerOffset", 0);
+	mUid = elem.attribute("uid");
+
+
+	QDomNode imageNode = dataNode.namedItem("image");
+	mImage.parseXml(imageNode);
+}
 
 Vector3D ProbeData::ProbeImageData::transform_p_to_u(const Vector3D& q_p) const
 {
@@ -106,6 +139,11 @@ void ProbeData::setImage(ProbeImageData value)
 	mImage = value;
 }
 
+void ProbeData::setTemporalCalibration(double value)
+{
+	mTemporalCalibration = value;
+}
+
 void ProbeData::setType(TYPE type)
 {
 	mType = type;
@@ -117,6 +155,74 @@ void ProbeData::setSector(double depthStart, double depthEnd, double width, doub
 	mDepthEnd=depthEnd;
 	mWidth=width;
 	mCenterOffset=centerOffset;
+}
+
+ProbeData::TYPE ProbeData::getType() const
+{
+	return mType;
+}
+
+double ProbeData::getDepthStart() const
+{
+	return mDepthStart;
+}
+
+double ProbeData::getDepthEnd() const
+{
+	return mDepthEnd;
+}
+
+double ProbeData::getWidth() const
+{
+	return mWidth;
+}
+
+double ProbeData::getTemporalCalibration() const
+{
+	return mTemporalCalibration;
+}
+
+double ProbeData::getCenterOffset() const
+{
+	return mCenterOffset;
+}
+
+ProbeData::ProbeImageData ProbeData::getImage() const
+{
+	return mImage;
+}
+
+void ProbeData::resample(QSize newSize)
+{
+	if (newSize==mImage.mSize)
+		return;
+
+	ssc::Vector3D factor(double(newSize.width())/mImage.mSize.width(), double(newSize.height())/mImage.mSize.height(), 1);
+
+	mImage.mOrigin_p = multiply_elems(mImage.mOrigin_p, factor);
+	mImage.mSpacing = divide_elems(mImage.mSpacing, factor);
+
+	ssc::Vector3D cr0 = multiply_elems(mImage.mClipRect_p.corner(0,0,0), factor);
+	ssc::Vector3D cr1 = multiply_elems(mImage.mClipRect_p.corner(1,1,1), factor);
+	mImage.mClipRect_p = ssc::DoubleBoundingBox3D(cr0, cr1);
+
+	mImage.mSize = newSize;
+}
+
+QString ProbeData::getUid() const
+{
+	return mUid;
+}
+
+
+void ProbeData::setUid(QString uid)
+{
+	mUid = uid;
+}
+
+QString ProbeData::getUid()
+{
+	return mUid;
 }
 
 void ProbeData::updateClipRectFromSector()
@@ -143,86 +249,13 @@ void ProbeData::updateSectorFromClipRect()
 	}
 }
 
-void ProbeData::addXml(QDomNode dataNode) const
-{
-	QDomElement elem = dataNode.toElement();
-	elem.setAttribute("type", qstring_cast(mType));
-	elem.setAttribute("depthStart", qstring_cast(mDepthStart));
-	elem.setAttribute("depthEnd", qstring_cast(mDepthEnd));
-	elem.setAttribute("width", qstring_cast(mWidth));
-
-	elem.setAttribute("temporalCalibration", qstring_cast(mTemporalCalibration));
-	elem.setAttribute("centerOffset", qstring_cast(mCenterOffset));
-
-	elem.setAttribute("uid", qstring_cast(mUid));
-
-	QDomElement imageNode = dataNode.ownerDocument().createElement("image");
-	mImage.addXml(imageNode);
-	dataNode.appendChild(imageNode);
-}
-
-void ProbeData::parseXml(QDomNode dataNode)
-{
-	QDomElement elem = dataNode.toElement();
-
-//	mType = string2enum<TYPE>(elem.attribute("type"));
-	mType = static_cast<TYPE>(elem.attribute("type").toInt());
-	mDepthStart = loadAttribute(elem, "depthStart", 0);
-	mDepthEnd = loadAttribute(elem, "depthEnd", 0);
-	mWidth = loadAttribute(elem, "width", 0);
-
-	mTemporalCalibration = loadAttribute(elem, "temporalCalibration", 0);
-	mCenterOffset = loadAttribute(elem, "centerOffset", 0);
-//	mUid = loadAttribute(elem, "uid", "default");
-	mUid = elem.attribute("uid");
-
-
-	QDomNode imageNode = dataNode.namedItem("image");
-	mImage.parseXml(imageNode);
-}
-
-void ProbeData::setUid(QString uid)
-{
-	mUid = uid;
-}
-
-QString ProbeData::getUid()
-{
-	return mUid;
-}
-
 void ProbeData::applySoundSpeedCompensationFactor(double factor)
 {
-
 	mImage.mSpacing[1] = mImage.mSpacing[1] * factor / mSoundSpeedCompensationFactor;
 	mSoundSpeedCompensationFactor = factor;
 
 	if (this->getType() != ssc::ProbeData::tLINEAR)
-	{
 		ssc::messageManager()->sendWarning("Sound speed compensation is applied to spacing[1], i.e. it is correct for linear probes and approxomate for other probes. Factor: " + qstring_cast(factor));
-	}
 }
-
-/**Set a new image size. resample all other parameters to match this new
- * image size, keeping sizes in millimeters fixed.
- *
- */
-void ProbeData::resample(QSize newSize)
-{
-	if (newSize==mImage.mSize)
-		return;
-
-	ssc::Vector3D factor(double(newSize.width())/mImage.mSize.width(), double(newSize.height())/mImage.mSize.height(), 1);
-
-	mImage.mOrigin_p = multiply_elems(mImage.mOrigin_p, factor);
-	mImage.mSpacing = divide_elems(mImage.mSpacing, factor);
-
-	ssc::Vector3D cr0 = multiply_elems(mImage.mClipRect_p.corner(0,0,0), factor);
-	ssc::Vector3D cr1 = multiply_elems(mImage.mClipRect_p.corner(1,1,1), factor);
-	mImage.mClipRect_p = ssc::DoubleBoundingBox3D(cr0, cr1);
-
-	mImage.mSize = newSize;
-}
-
 
 }
