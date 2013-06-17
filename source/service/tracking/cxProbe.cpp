@@ -216,9 +216,6 @@ QString Probe::getActiveStream() const
 	return mActiveUid;
 }
 
-
-//non-inherited functions
-
 ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
@@ -274,9 +271,6 @@ QString Probe::getRtSourceName() const
 		rtSource = "Digital";
 	return rtSource;
 }
-
-
-//private functions
 
 Probe::Probe(QString instrumentUid, QString scannerUid) :
 		mInstrumentUid(instrumentUid),
