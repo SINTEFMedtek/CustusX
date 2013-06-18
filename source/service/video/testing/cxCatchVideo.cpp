@@ -97,17 +97,17 @@ TEST_CASE("DummyImageStreamer: File should be read and send slices with a given 
 	imagestreamer->stopStreaming();
 }
 
-TEST_CASE("Should stream 2D images from a volume given a probe", "[streaming][unit]")
+TEST_CASE("SimulatedImageStreamer: Should stream 2D images from a volume given a probe", "[streaming][unit]")
 {
 	TestSenderPtr sender(new TestSender());
 	REQUIRE(sender);
 
 	cx::SimulatedImageStreamerPtr imagestreamer = createRunningSimulatedImageStreamer(sender);
 
-	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage())));
+	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage())), 200);
 	checkSenderGotImageFromStreamer(sender);
 
-	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage())));
+	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage())), 200);
 	checkSenderGotImageFromStreamer(sender);
 
 	imagestreamer->stopStreaming();
