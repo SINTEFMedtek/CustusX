@@ -16,11 +16,11 @@
 # Initialize the catch build framework.
 # Call before any other calls in this module.
 ###############################################################################
-macro(cx_catch_initialize)
+function(cx_catch_initialize)
 	#message(STATUS "CX_TEST_CATCH_GENERATED_LIBRARIES: " ${CX_TEST_CATCH_GENERATED_LIBRARIES})
 	# used as a global variable: clear at start of run
 	unset(CX_TEST_CATCH_GENERATED_LIBRARIES CACHE)
-endmacro()
+endfunction()
 
 ###############################################################################
 # private
@@ -31,10 +31,10 @@ macro(cx_catch__private_define_platform_specific_linker_options)
     # and http://stackoverflow.com/questions/14347107/how-to-put-compiler-command-line-args-in-specific-places-using-cmake
     # for background
     if(CX_LINUX)
-        set(SHARED_LIB_TYPE STATIC)
+        set(CX_CATCH_SHARED_LIB_TYPE STATIC)
         #set(SHARED_LIB_TYPE "")
-        set(PRE_WHOLE_ARCHIVE "-Wl,--whole-archive")
-        set(POST_WHOLE_ARCHIVE "-Wl,--no-whole-archive")
+        set(CX_CATCH_PRE_WHOLE_ARCHIVE "-Wl,--whole-archive")
+        set(CX_CATCH_POST_WHOLE_ARCHIVE "-Wl,--no-whole-archive")
     else()
     endif()
 endmacro()
@@ -52,7 +52,7 @@ endmacro()
 #    SOURCES     : List of test source files.
 #
 ###############################################################################
-macro(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES)
+function(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES)
 	message(STATUS "Adding catch test targets based on: ${LIB_TO_TEST}")
 
 	include_directories(
@@ -62,7 +62,7 @@ macro(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES)
 
         cx_catch__private_define_platform_specific_linker_options()
 	set(TEST_LIB_NAME "cxtestCatch${LIB_TO_TEST}")
-        add_library(${TEST_LIB_NAME} ${SHARED_LIB_TYPE} ${SOURCES} )
+        add_library(${TEST_LIB_NAME} ${CX_CATCH_SHARED_LIB_TYPE} ${SOURCES} )
         message(STATUS "          Lib name : ${TEST_LIB_NAME}")
 	target_link_libraries(${TEST_LIB_NAME} ${LIB_TO_TEST} cxtestUtilities )
 
@@ -76,12 +76,12 @@ macro(cx_catch_add_lib_and_exe LIB_TO_TEST SOURCES)
 
 	set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
         add_executable(${TEST_EXE_NAME} ${cxtest_MAIN} )
-        target_link_libraries(${TEST_EXE_NAME} ${PRE_WHOLE_ARCHIVE} ${TEST_LIB_NAME} ${POST_WHOLE_ARCHIVE})
+        target_link_libraries(${TEST_EXE_NAME} ${CX_CATCH_PRE_WHOLE_ARCHIVE} ${TEST_LIB_NAME} ${CX_CATCH_POST_WHOLE_ARCHIVE})
 
 # alternative where the lib is omitted
 #        add_executable(${TEST_EXE_NAME} ${cxtest_MAIN} ${SOURCES})
 #        target_link_libraries(${TEST_EXE_NAME} ${LIB_TO_TEST} cxtestUtilities)
-endmacro()
+endfunction()
 
 
 ###############################################################################
@@ -90,25 +90,25 @@ endmacro()
 # The target contains all the libraries added using the
 # cx_catch_add_lib_and_exe() macro.
 ###############################################################################
-macro(cx_catch_add_master_exe)
+function(cx_catch_add_master_exe)
         message(STATUS "Generating master Catch exe containing libs:")
 	foreach( NAME ${CX_TEST_CATCH_GENERATED_LIBRARIES})
-		message(STATUS "    ${NAME}")
+            message(STATUS "    ${NAME}")
 	endforeach()
 
         cx_catch__private_define_platform_specific_linker_options()
 
 	include_directories(
-		.
-                ${CustusX3_SOURCE_DIR}/source/resource/testUtilities
-		${CustusX3_SOURCE_DIR}/source/ThirdParty/catch)
+            .
+            ${CustusX3_SOURCE_DIR}/source/resource/testUtilities
+            ${CustusX3_SOURCE_DIR}/source/ThirdParty/catch)
 
 	set(TEST_EXE_NAME "Catch")
         set(cxtest_MAIN ${CustusX3_SOURCE_DIR}/source/resource/testUtilities/cxtestCatchMain.cpp)
 
         add_executable(${TEST_EXE_NAME} ${cxtest_MAIN} )
-        target_link_libraries(${TEST_EXE_NAME} ${PRE_WHOLE_ARCHIVE} ${CX_TEST_CATCH_GENERATED_LIBRARIES} ${POST_WHOLE_ARCHIVE} cxtestUtilities )
+        target_link_libraries(${TEST_EXE_NAME} ${CX_CATCH_PRE_WHOLE_ARCHIVE} ${CX_TEST_CATCH_GENERATED_LIBRARIES} cxtestUtilities ${CX_CATCH_POST_WHOLE_ARCHIVE}  )
         cx_install_target(${TEST_EXE_NAME})
-endmacro()
+endfunction()
 
 
