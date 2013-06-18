@@ -104,10 +104,10 @@ TEST_CASE("SimulatedImageStreamer: Should stream 2D images from a volume given a
 
 	cx::SimulatedImageStreamerPtr imagestreamer = createRunningSimulatedImageStreamer(sender);
 
-	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage())), 200);
+	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage()), 200));
 	checkSenderGotImageFromStreamer(sender);
 
-	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage())), 200);
+	REQUIRE(waitForSignal(sender.get(), SIGNAL(newPackage()), 200));
 	checkSenderGotImageFromStreamer(sender);
 
 	imagestreamer->stopStreaming();
