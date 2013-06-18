@@ -57,14 +57,6 @@ Tool::Tool(IgstkToolPtr igstkTool) :
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
 	connect(ssc::toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
-
-//  // debug code, used for fixing the rotation z-bug:
-//  ssc::Transform3D sMt = ssc::Transform3D::Identity();
-//  mTool->getInternalStructure().mCalibration.ExportTransform(*(sMt.matrix().GetPointer()));
-//  std::cout << "sMt for tool " << this->getUid() << "\n" << sMt << std::endl;
-//  std::cout << "sMt*Rz180 for tool " << this->getUid() << "\n" << sMt*ssc::createTransformRotateZ(M_PI) << std::endl;
-//  // end debug
-
 }
 
 Tool::~Tool()
@@ -189,18 +181,6 @@ ssc::Transform3D Tool::getCalibration_sMt() const
 void Tool::setCalibration_sMt(ssc::Transform3D calibration)
 {
 	mTool->updateCalibration(calibration);
-//  //apply the calibration
-//  mTool->getInternalStructure().mCalibration.ImportTransform(*calibration.getVtkMatrix());
-//  mTool->setCalibrationTransform(mTool->getInternalStructure().mCalibration);
-//
-////  ssc::Transform3D sMt;
-//  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-//  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
-//  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
-//  ssc::messageManager()->sendInfo("Set "+mName+"s calibration to \n"+qstring_cast(sMt));
-//
-//  //write to file
-//  this->writeCalibrationToFile();
 }
 
 QString Tool::getCalibrationFileName() const
@@ -233,11 +213,6 @@ std::map<int, ssc::Vector3D> Tool::getReferencePoints() const
 bool Tool::hasReferencePointWithId(int id)
 {
   return this->getReferencePoints().count(id);
-  // buggy impl, will fail arbitrarily and does not handle refpts in zero,
-//	bool retval = false;
-//	if (!(ssc::similar(this->getReferencePoints()[id], ssc::Vector3D(0.000, 0.000, 0.000))))
-//		retval = true;
-//	return retval;
 }
 
 ssc::TimedTransformMap Tool::getSessionHistory(double startTime, double stopTime)
@@ -246,7 +221,6 @@ ssc::TimedTransformMap Tool::getSessionHistory(double startTime, double stopTime
 	ssc::TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
 
 	ssc::TimedTransformMap retval(startIt, stopIt);
-	;
 	return retval;
 }
 
@@ -308,40 +282,5 @@ void Tool::toolVisibleSlot(bool on)
 	else
 		mTpsTimer.stop();
 }
-
-//void Tool::writeCalibrationToFile()
-//{
-//  QFile calibrationFile(this);
-//  if(!mTool->getInternalStructure().mCalibrationFilename.isEmpty() && QFile::exists(mTool->getInternalStructure().mCalibrationFilename))
-//  {
-//    //Calibration file exists, overwrite
-//    calibrationFile.setFileName(mTool->getInternalStructure().mCalibrationFilename);
-//  }
-//  else
-//  {
-//    //Make a new file, use rom file name as base name
-//    QString calibrationFileName = mTool->getInternalStructure().mSROMFilename.remove(".rom", Qt::CaseInsensitive);
-//    calibrationFileName.append(".cal");
-//    calibrationFile.setFileName(calibrationFileName);
-//  }
-////  ssc::Transform3D sMt;
-//  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-//  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
-//  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
-//
-//  if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-//  {
-//    ssc::messageManager()->sendError("Could not open "+mUid+"s calibrationfile: "+calibrationFile.fileName());
-//    return;
-//  }
-//
-//  QTextStream streamer(&calibrationFile);
-//  streamer << qstring_cast(sMt);
-//  streamer << endl;
-//
-//  calibrationFile.close();
-//
-//  ssc::messageManager()->sendInfo("Replaced calibration in "+calibrationFile.fileName());
-//}
 
 }//namespace cx
