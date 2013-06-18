@@ -60,12 +60,9 @@ typedef boost::shared_ptr<class Probe> ProbePtr;
  */
 class Tool: public ssc::Tool
 {
-Q_OBJECT
+	Q_OBJECT
+
 public:
-//	typedef igstk::TrackerTool TrackerToolType;
-//	typedef igstk::PolarisTrackerTool PolarisTrackerToolType;
-//	typedef igstk::AuroraTrackerTool AuroraTrackerToolType;
-//	typedef igstk::Transform TransformType;
 
 	/* //only used for documentation purposes
 	 TOOL_INVALID_REQUEST,             ///< internal state machine didn't accept the request
@@ -127,9 +124,7 @@ private slots:
 
 private:
 	Tool() {}  ///< do not use this constructor
-//  void writeCalibrationToFile();
-//  bool verifyInternalStructure(); ///< checks the values of the internal structure to see if they seem reasonable
-//  TrackerToolType* buildInternalTool(); ///< builds the igstk trackertool
+
 	void createPolyData(); ///< creates the polydata either from file or a vtkConeSource
 
 	void printInternalStructure(); ///< FOR DEBUGGING

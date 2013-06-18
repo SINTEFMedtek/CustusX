@@ -1,10 +1,3 @@
-/*
- * cxCreateProbeDataFromConfiguration.cpp
- *
- *  \date Nov 26, 2010
- *      \author christiana
- */
-
 #include "cxCreateProbeDataFromConfiguration.h"
 #include "sscTypeConversions.h"
 #include <iostream>
@@ -12,8 +5,6 @@
 ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ssc::ProbeData data)
 {
 	ProbeXmlConfigParser::Configuration config = basis;
-//	config.mConfigId = uid;
-//	config.mName = name;
 
 	QSize storedSize(basis.mImageWidth, basis.mImageHeight);
 	if (storedSize!=data.getImage().mSize)
@@ -57,7 +48,6 @@ ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlCon
 
 ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config)
 {
-//	std::cout << "createProbeDataFromConfiguration()" << std::endl;
   if(config.isEmpty())
     return ssc::ProbeData();
 
@@ -66,12 +56,6 @@ ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configurat
   imageData.mSize = QSize(config.mImageWidth, config.mImageHeight);
   imageData.mOrigin_p = ssc::Vector3D(config.mOriginCol, config.mOriginRow, 0);
   imageData.mClipRect_p = ssc::DoubleBoundingBox3D(config.mLeftEdge,config.mRightEdge,config.mTopEdge,config.mBottomEdge,0,0);
-
-  // find the origin in a mm-based, lower-left-corner coord space:
-//  ssc::Vector3D c(config.mOriginCol, config.mImageHeight - config.mOriginRow - 1, 0);
-//  c = multiply_elems(c, imageData.mSpacing);
-////  c[1] -= depthStart; // config def of origin is before offset, probesector def is after offset (physical probe tip)
-//  imageData.mOrigin_u = c;
 
   ssc::ProbeData probeSector;
   if (config.mWidthDeg > 0.1) // Sector probe
@@ -91,16 +75,12 @@ ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configurat
     double depthStart = double(config.mTopEdge-config.mOriginRow) * config.mPixelHeight;
     double depthEnd = double(config.mBottomEdge-config.mOriginRow) * config.mPixelHeight;
 
-//    probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
 	probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR);
 	probeSector.setSector(depthStart, depthEnd, width);
   }
 
   probeSector.setImage(imageData);
   probeSector.setTemporalCalibration(config.mTemporalCalibration);
-
-//  std::cout << "Probe sector for " << config.mConfigId << std::endl;
-//  std::cout << streamXml2String(probeSector) << std::endl;
 
   return probeSector;
 }

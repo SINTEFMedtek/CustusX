@@ -1,10 +1,3 @@
-/*
- * cxCreateProbeDataFromConfiguration.h
- *
- *  \date Nov 26, 2010
- *      \author christiana
- */
-
 #ifndef CXCREATEPROBEDATAFROMCONFIGURATION_H_
 #define CXCREATEPROBEDATAFROMCONFIGURATION_H_
 
@@ -12,12 +5,17 @@
 #include "ProbeXmlConfigParser.h"
 
 /**
-* \file
+* \file cxCreateProbeDataFromConfiguration.h
+*
+* \date Nov 26, 2010
+* \author Christian Askeland, SINTEF
+*
 * \addtogroup cxResourceUtilities
 * @{
 */
 
-/**convert from ProbeXmlConfigParser::Configuration to ssc::ProbeData
+/**
+ * Convert from ProbeXmlConfigParser::Configuration to ssc::ProbeData
  *
  * Notes about the conversion:
  * The xml format contains redundant data. The following list defines

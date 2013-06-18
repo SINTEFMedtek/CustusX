@@ -4,6 +4,7 @@
 #include "vtkImageReslice.h"
 #include "vtkMatrix4x4.h"
 #include "vtkImageData.h"
+#include "vtkImageMask.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscSliceProxy.h"
@@ -12,6 +13,7 @@
 #include "sscProbeData.h"
 #include "sscToolManager.h"
 #include "sscTransform3D.h"
+#include "sscVolumeHelpers.h"
 #include "cxToolManager.h"
 
 namespace cx
@@ -44,6 +46,9 @@ void SimulatedImageStreamer::initialize(ssc::ImagePtr image, ssc::ToolPtr tool)
 	connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(setSourceToActiveImageSlot()));
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
+	connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(generateMaskSlot()));
+
+	this->generateMaskSlot();
 
 	this->setInitialized(true);
 }
@@ -78,6 +83,14 @@ void SimulatedImageStreamer::streamSlot()
 	mSender->send(package);
 }
 
+void SimulatedImageStreamer::generateMaskSlot()
+{
+	ssc::ProbeData data = mTool->getProbe()->getProbeData();
+	ssc::ProbeSector sector;
+	sector.setData(data);
+	mMask = sector.getMask();
+}
+
 void SimulatedImageStreamer::sliceSlot()
 {
 	mImageToSend = this->getSlice(mSourceImage);
@@ -97,8 +110,10 @@ void SimulatedImageStreamer::setSourceImage(ssc::ImagePtr image)
 ssc::ImagePtr SimulatedImageStreamer::getSlice(ssc::ImagePtr source)
 {
 	vtkMatrix4x4Ptr sliceAxes = this->calculateSliceAxes();
-	vtkImageDataPtr vtkSlice = this->getSliceUsingProbeDefinition(source, sliceAxes);
-	ssc::ImagePtr slice = this->createSscImage(vtkSlice, source);
+	vtkImageDataPtr framegrabbedSlice = this->getSliceUsingProbeDefinition(source, sliceAxes);
+	vtkImageDataPtr maskedFramedgrabbedSlice = this->maskSlice(framegrabbedSlice);
+	ssc::ImagePtr slice = this->convertToSscImage(maskedFramedgrabbedSlice, source);
+	slice->resetTransferFunction(source->getTransferFunctions3D(), source->getLookupTable2D());
 
 	return slice;
 }
@@ -125,10 +140,21 @@ vtkImageDataPtr SimulatedImageStreamer::getSliceUsingProbeDefinition(ssc::ImageP
 	return retval;
 }
 
-ssc::ImagePtr SimulatedImageStreamer::createSscImage(vtkImageDataPtr slice, ssc::ImagePtr volume)
+vtkImageDataPtr SimulatedImageStreamer::maskSlice(vtkImageDataPtr unmaskedSlice)
+{
+	vtkImageMaskPtr maskFilter = vtkImageMaskPtr::New();
+	maskFilter->SetMaskInput(mMask);
+	maskFilter->SetImageInput(unmaskedSlice);
+	maskFilter->SetMaskedOutputValue(0.0);
+	maskFilter->Update();
+
+	vtkImageDataPtr maskedSlice = maskFilter->GetOutput();
+	return maskedSlice;
+}
+
+ssc::ImagePtr SimulatedImageStreamer::convertToSscImage(vtkImageDataPtr slice, ssc::ImagePtr volume)
 {
 	ssc::ImagePtr retval = ssc::ImagePtr(new ssc::Image("TEST_UID", slice, "TEST_NAME"));
-	retval->resetTransferFunction(volume->getTransferFunctions3D(), volume->getLookupTable2D());
 	return retval;
 }
 
