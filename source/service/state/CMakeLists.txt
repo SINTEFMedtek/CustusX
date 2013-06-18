@@ -31,6 +31,7 @@ include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/resource/settings
+    ${CustusX3_BINARY_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
 
     ${CustusX3_SOURCE_DIR}/source/service/patient     
