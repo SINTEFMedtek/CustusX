@@ -52,6 +52,7 @@
 #include "cxVideoConnection.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
+#include "cxConfig.h"
 
 #include "sscDICOMLibConfig.h"
 

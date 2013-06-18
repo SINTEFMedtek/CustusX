@@ -36,6 +36,7 @@
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscTypeConversions.h"
+#include "cxConfig.h"
 
 namespace cx
 {
@@ -482,12 +483,7 @@ void PatientData::createPatientFolders(QString choosenDir)
 
 QString PatientData::getVersionName()
 {
-	QString versionName;
-#ifdef CustusX3_VERSION_STRING
-	versionName = QString("%1").arg(CustusX3_VERSION_STRING);
-#else
-#endif
-	return versionName;
+    return QString("%1").arg(CustusX3_VERSION_STRING);
 }
 
 /**
