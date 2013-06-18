@@ -27,6 +27,7 @@
 #include "cxApplicationStateMachine.h"
 #include "cxViewWrapper3D.h"
 #include "cxDataLocations.h"
+#include "cxConfig.h"
 
 namespace cx
 {
@@ -170,12 +171,7 @@ StateService::~StateService()
 
 QString StateService::getVersionName()
 {
-	QString versionName;
-#ifdef CustusX3_VERSION_STRING
-	versionName = QString("%1").arg(CustusX3_VERSION_STRING);
-#else
-#endif
-	return versionName;
+    return QString("%1").arg(CustusX3_VERSION_STRING);
 }
 
 WorkflowStateMachinePtr StateService::getWorkflow()
