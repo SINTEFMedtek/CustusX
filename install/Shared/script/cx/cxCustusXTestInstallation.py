@@ -91,7 +91,7 @@ class CustusXTestInstallation:
         return '%s/%s' % (self.installer_path, pattern)
         
     def _installLinuxZip(self, filename):
-        temp_path = '%s/Install/temp' % self.root_dir
+        temp_path = '%s/temp/Install' % self.root_dir
         #install_root
         shell.removeTree(temp_path)
         shell.changeDir(temp_path)
