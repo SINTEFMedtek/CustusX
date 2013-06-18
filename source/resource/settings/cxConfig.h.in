@@ -4,6 +4,11 @@
 // position of configuration folders during compilation
 #define CX_CONFIG_ROOT "@CX_CONFIG_ROOT@"
 
+#define CustusX3_VERSION_STRING "@CustusX3_VERSION_STRING@"
+#define CustusX3_VERSION_MAJOR "@CustusX3_VERSION_MAJOR@"
+#define CustusX3_VERSION_MINOR "@CustusX3_VERSION_MINOR@"
+#define CustusX3_VERSION_PATCH "@CustusX3_VERSION_PATCH@"
+
 // position of configuration folders after install, relative to executable.
 #define CX_CONFIG_ROOT_RELATIVE_INSTALLED "@CX_CONFIG_ROOT_RELATIVE_INSTALLED@"
 
