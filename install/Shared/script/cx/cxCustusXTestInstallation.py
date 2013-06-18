@@ -22,6 +22,7 @@ from cxPrintFormatter import PrintFormatter
 import cxInstallData
 import cxComponents
 import cxComponentAssembly
+import shlex
 
 class CustusXTestInstallation:
     '''
@@ -141,19 +142,29 @@ class CustusXTestInstallation:
         Run the given application for a short time, as a quick verification.
         The stdout is not redirected here, i.e. it might be mangled with the python output.
         '''
-        p = subprocess.Popen(application, shell=True, cwd=os.path.dirname(application)) 
-        #p = subprocess.Popen(application, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=os.path.dirname(application)) 
-        time.sleep(timeout)
+        print '*** Running application %s' % application
+        startTime = time.time()
+        # On linux, cannot run from shell (http://stackoverflow.com/questions/4789837/how-to-terminate-a-python-subprocess-launched-with-shell-true)
+        p = subprocess.Popen(shlex.split(application), shell=False, cwd=os.path.dirname(application)) 
+        self._waitForProcessEnd(process=p, timeout=timeout)
         retcode = p.poll()
-        self.assertTrue(retcode==None or retcode==0, 'Process %s has been running successfully for %is' % (application, timeout))
+        elapsedTime = "%.1f" % (time.time()-startTime)
+        self.assertTrue(retcode==None or retcode==0, 'Process %s has been running successfully for %ss' % (application, elapsedTime))
         if retcode==None:
+            print "*** Killing %s ..." % application
             p.kill()
-        p.wait()
-        #print p.stdout.read() # drop this: causes app to hang
-        print 'Successfully ran %s for %is' % (application, timeout)
+        p.communicate()
+        print '*** Successfully ran %s for %ss' % (application, elapsedTime)
         # also consider otool -L
-        return
     
+    def _waitForProcessEnd(self, process, timeout):
+        resolution=10
+        for interval in range(resolution):
+            retcode = process.poll()
+            if retcode!=None:
+                break
+            time.sleep(float(timeout)/resolution)
+                        
     def assertTrue(self, assertion, text):
         if not assertion:
             text = 'Test Failed: %s' % text

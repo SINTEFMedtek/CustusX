@@ -27,24 +27,27 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
-	QT4_WRAP_CPP( CX_TESTUTILITIES_SOURCE_FILES
-        cxtestSignalListener.h 
-    	cxtestUtilities.h
-		)
+        # link statically on linux, see explanation in cx_catch__private_define_platform_specific_linker_options
+        cx_catch__private_define_platform_specific_linker_options()
+
+        QT4_WRAP_CPP( CX_TESTUTILITIES_SOURCE_FILES
+            cxtestSignalListener.h
+            cxtestUtilities.h
+            )
 	set(CX_TESTUTILITIES_SOURCE_FILES
-		cxtestUtilities.h
-		cxtestUtilities.cpp
+            cxtestUtilities.h
+            cxtestUtilities.cpp
 	    cxtestSignalListener.h
 	    cxtestSignalListener.cpp
 	    cxtestCatchImpl.h
 	    cxtestCatchImpl.cpp
 	    cxtestCatchExamples.cpp
-		${CX_TESTUTILITIES_SOURCE_FILES}
-		)
+            ${CX_TESTUTILITIES_SOURCE_FILES}
+            )
 	include_directories(
 	    .
 	    ${CustusX3_SOURCE_DIR}/source/ThirdParty/catch
 	    )
-	add_library( cxtestUtilities ${CX_TESTUTILITIES_SOURCE_FILES} )
+        add_library( cxtestUtilities ${CX_CATCH_SHARED_LIB_TYPE} ${CX_TESTUTILITIES_SOURCE_FILES} )
 	target_link_libraries(cxtestUtilities SSC)
 endif (BUILD_TESTING)
