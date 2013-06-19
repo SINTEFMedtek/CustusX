@@ -206,7 +206,7 @@ void TestGEInterface::testGEStreamer()
 
 	//Skip assert if OpenCL is turned off
 #ifdef DATASTREAMING_USE_OPENCL
-	CPPUNIT_ASSERT(geStreamer.usingOpenCL());
+	CPPUNIT_ASSERT(geStreamer.UsingOpenCL());
 #endif
 
 	/*img = imgExportedStream->GetTissueImage();
