@@ -340,6 +340,8 @@ class ISB_DataStreaming(CppComponent):
         add('DATASTREAMING_USE_HDF:BOOL', False)
         add('DATASTREAMING_USE_TRACKING:BOOL', False)
         add('DATASTREAMING_USE_SC_DICOM_LOADERS:BOOL', False)
+        add('DATASTREAMING_USE_OPENCL:BOOL', True)
+        add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
         builder.configureCMake()
     def _svn_login_info(self):
         '''
