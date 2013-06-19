@@ -55,6 +55,7 @@ class Common(object):
         self.mBuildSSCExamples = True
         self.mBuildTesting = True
         self.mUseCotire = False
+        self.mUseOpenCL = True
         self.mOSX_DEPLOYMENT_TARGET = "10.6" # Deploy for OSX 10.6 Snow Leopard and later
         if (platform.system() == 'Windows'):
             self.mCMakeGenerator = 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
@@ -63,6 +64,8 @@ class Common(object):
             self.mUseCotire = True
         else:
             self.mCMakeGenerator = "Eclipse CDT4 - Unix Makefiles" # or "Xcode". Use -eclipse or -xcode from command line. Applies only to workspace projects.
+        if (platform.system() == "Darwin"):
+            self.mUseOpenCL = False # Turn off OpenCL for Mac as Jenkins tests are run on olevs mac, and OpenCL code don't work there yet
         self.mBuildExAndTest = False
         self.mCoverage = False
         self.mDoxygen = False
@@ -84,6 +87,7 @@ class Common(object):
         print '    Coverage:', self.mCoverage
         print '    Threads:', self.threads
         print '    32 bit:', self.m32bit
+        print '    OpenCL:', self.mUseOpenCL
         print ''
 
     def setCMakeGenerator(self, value):
