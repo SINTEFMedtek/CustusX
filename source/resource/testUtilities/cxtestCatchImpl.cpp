@@ -25,7 +25,8 @@ int CatchImpl::runCatchMain(int argc, char* argv[])
 {
 	ssc::Application app( argc, argv );
 
-	int result = Catch::Main( argc, argv );
+	int result = Catch::Session().run( argc, argv );
+	//int result = Catch::Main( argc, argv );
 
 	return result;
 }

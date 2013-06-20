@@ -69,10 +69,6 @@ class CppBuilder:
         runShell('git clone %s %s' % (repository, folder))
         self._changeDirToSource()
 
-#    def isValidGitRepo(self):
-#        self._changeDirToSource()
-#        return shell.evaluate('git status') is not None           
-
     def _gitSubmoduleUpdate(self):
         self._changeDirToSource()
         runShell('git submodule sync') # from tsf 
@@ -114,7 +110,7 @@ class CppBuilder:
         output = shell.evaluate('git describe --tags --exact-match')
         if not output:
             return False
-        if output.strip()==tag:
+        if output.stdout.strip()==tag:
             print "Skipping git update: Tag %s already at HEAD in %s" % (tag, self.mSourcePath)
             return True
         return False
