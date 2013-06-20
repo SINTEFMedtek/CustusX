@@ -23,6 +23,15 @@ class Shell (object):
     -cmd (Windows)
     -bash (Mac & Linux)
     '''
+    class EvaluateValue:
+        'used as return value from shell command'
+        def __init__(self, stdout='', returncode=0):
+            self.stdout = stdout
+            self.returncode = returncode
+        def __nonzero__(self):
+            'makes type convertible to bool - evaulate to False when nonzero retcode.'
+            return self.returncode != 0
+            
     def __init__(self):
         self.DUMMY = False
         self.VERBOSE = False
@@ -55,6 +64,8 @@ class Shell (object):
         self._printCommand(cmd)
         if self.DUMMY is False:
             return self._evaluateReal(cmd)
+        else:
+            return Shell.EvaluateValue()
 
     def changeDir(self, path):
         path = path.replace("\\", "/")
@@ -117,9 +128,13 @@ class Shell (object):
         for line in self._readFromProcess(p):
             self._printOutput(line.rstrip())
             retval.append(line) 
-        if p.returncode != 0:
-            return None
-        return "".join(retval) 
+        #print "pre..:%s" % p.returncode
+        #if p.returncode != 0:
+        #    return None
+        #print "*****".join(retval)
+        #return "".join(retval) 
+        return Shell.EvaluateValue(stdout="".join(retval), returncode=p.returncode)
+
                     
     def _printInfo(self, text):
         print '[shell info] %s' % text
