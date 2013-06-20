@@ -315,7 +315,7 @@ class IGSTK(CppComponent):
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "445"
+        self.mCurrentRevision = "446"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'

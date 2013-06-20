@@ -9,6 +9,9 @@
 #include <vtkImageData.h>
 #include "cxImageSenderFactory.h"
 
+namespace cxtest
+{
+
 /**Unit tests that test the acquisition plugin
  */
 class TestGEInterface : public CppUnit::TestFixture
@@ -46,12 +49,14 @@ public:
 		CPPUNIT_TEST( testVelocityStreamGPU );
 		CPPUNIT_TEST( testDefaultStreamsGPU );
 		CPPUNIT_TEST( testAllStreamsGPUConsecutively );
-		CPPUNIT_TEST( testGEStreamer );
+		//Test disabled because this functionality should be included in the tests added to the GEStreamer code
+//		CPPUNIT_TEST( testGEStreamer );
 	CPPUNIT_TEST_SUITE_END();
 private:
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestGEInterface );
 
+} //namespace cxtest
 
 #endif //CX_USE_ISB_GE
 #endif /*CXTESTGEINTERFACE_H_*/
