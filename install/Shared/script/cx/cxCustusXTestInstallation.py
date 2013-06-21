@@ -170,8 +170,8 @@ class CustusXTestInstallation:
         appPath = self._getInstalledBinaryPath()
         self._connectTestDataToInstallation()        
         testRunner = cxTestRunner.TestRunner()
-        outFile='%s/CTestResults.xml'%appPath
-        #outFile='%s/CTestResults_catch_integration.xml'%appPath
+        outFile='%s/CTestResults.xml' % self.root_dir
+        #outFile='%s/CTestResults_catch_integration.xml' % self.root_dir
         testRunner.resetCustusXDataRepo(self.getTestDataPath())
         testRunner.runCatchTestsWrappedInCTest(appPath, tag='integration', outFile=outFile)
     
