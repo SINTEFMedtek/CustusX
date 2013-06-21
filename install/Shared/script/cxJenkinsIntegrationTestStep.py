@@ -81,8 +81,8 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         if not self.argumentParserArguments.skip_install:
             self.cxInstallation.installPackage()
         if not self.argumentParserArguments.skip_tests:
-#            self.cxInstallation.testInstallation()
-#            self.cxBuilder.clearTestData()
+            self.cxInstallation.testInstallation()
+            #self.cxBuilder.clearTestData()
             self.cxInstallation.runIntegrationTests()
         self.cxBuilder.finish()
     

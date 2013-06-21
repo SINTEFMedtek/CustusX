@@ -22,6 +22,7 @@ from cxPrintFormatter import PrintFormatter
 import cxInstallData
 import cxComponents
 import cxComponentAssembly
+import cxTestRunner
 
 class CustusXBuilder:
     '''
@@ -41,41 +42,30 @@ class CustusXBuilder:
                              build=True)
     
     def clearTestData(self):
-        PrintFormatter.printHeader('Clearing all old test data', level=2)
-        # clear local modifications in the data folder - the tests might cause these changes
+        PrintFormatter.printHeader('Clearing all old test data', level=3)
         cxData = self._createComponent(cxComponents.CustusX3Data)
-        shell.changeDir(cxData.sourcePath())
-        shell.run('git fetch --all')
-        shell.run('git reset --hard')
-        tempDir = cxData.sourcePath() + "/temp"
-        shell.removeTree(tempDir)
+        cxTestRunner.TestRunner().resetCustusXDataRepo(cxData.sourcePath())
     
     def runAllTests(self):
         PrintFormatter.printHeader('Run all tests', level=2)
-        self._runCTestTests()
+        self.clearTestData()
         self._runCatchTests()
+        self._runCTestTests()
     
     def _runCTestTests(self):
         PrintFormatter.printHeader('Run ctest tests', level=3)
         # Run all tests and write them in xml format to ./CTestResults.xml
         custusx = self._createComponent(cxComponents.CustusX3)
-        shell.changeDir(custusx.buildPath())
-        shell.run('rm -rf Testing/[0-9]*')
-        shell.run('rm -rf %s/CTestResults.xml' % custusx.buildPath())
-        shell.run('ctest -D ExperimentalTest --no-compress-output', ignoreFailure=True)
-        shell.run('cp Testing/`head -n 1 Testing/TAG`/Test.xml ./CTestResults.xml')
+        outfile = '%s/CTestResults.xml' % custusx.buildPath()
+        cxTestRunner.TestRunner().runCTest(custusx.buildPath(), outfile)
 
     def _runCatchTests(self):
         PrintFormatter.printHeader('Run catch tests', level=3)
         # Run all Catch tests and write them in xml format to ./CatchTestResults.xml
         custusx = self._createComponent(cxComponents.CustusX3)
-        catchDir = custusx.buildPath() + "/source/testing"
-        shell.changeDir(catchDir)
-        shell.run('rm -rf %s/CatchTestResults.xml' % custusx.buildPath())
-        pathToCatchExe = '.'
-        resultsFile = '%s/CatchTestResults.xml' % custusx.buildPath()
-        shell.run('%s/Catch  -g [unit] -r junit -o %s' % (pathToCatchExe, resultsFile))
-        #shell.run('cp CatchTestResults.xml %s/CatchTestResults.xml' % custusx.buildPath())        
+        catchDir = '%s/source/testing' % custusx.buildPath()
+        outfile = '%s/CatchTestResults.xml' % custusx.buildPath()
+        cxTestRunner.TestRunner().runCatch(catchDir, tag='unit', outfile=outfile)
 
     def createInstallerPackage(self):
         PrintFormatter.printHeader('Package the build', level=2)
@@ -180,12 +170,6 @@ class CustusXBuilder:
                 '%s/sloccount_raw.sc %s/sloccount.sc' % (rootDir, rootDir) 
                 ])
      
-    def assertTrue(self, assertion, text):
-        if not assertion:
-            text = 'Test Failed: %s' % text
-            print text
-            raise Exception(text)
-
     def finish(self):
         PrintFormatter.finish()
 

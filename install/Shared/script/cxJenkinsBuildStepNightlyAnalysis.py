@@ -44,7 +44,7 @@ Generates coverage and other reports.'
     
     def run(self):
         self.cxBuilder.buildAllComponents()
-        self.cxBuilder.clearTestData()
+        #self.cxBuilder.clearTestData()
         self.cxBuilder.resetCoverage()
         self.cxBuilder.runAllTests()
         self.cxBuilder.generateCoverageReport()
