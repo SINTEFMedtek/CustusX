@@ -48,7 +48,7 @@ Generates doxygen docs and published them onto medtek.sintef.no'
     
     def run(self):
         self.cxBuilder.buildAllComponents()
-        self.cxBuilder.clearTestData()
+        #self.cxBuilder.clearTestData()
         self.cxBuilder.runAllTests()
         self.cxBuilder.publishDoxygen()
         self.cxBuilder.createInstallerPackage()
