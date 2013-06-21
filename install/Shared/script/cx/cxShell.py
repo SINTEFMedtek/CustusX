@@ -29,8 +29,8 @@ class Shell (object):
             self.stdout = stdout
             self.returncode = returncode
         def __nonzero__(self):
-            'makes type convertible to bool - evaulate to False when nonzero retcode.'
-            return self.returncode != 0
+            'makes type convertible to bool - evaluate to True when zero retcode.'
+            return self.returncode == 0
             
     def __init__(self):
         self.DUMMY = False
