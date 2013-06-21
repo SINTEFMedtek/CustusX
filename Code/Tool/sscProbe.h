@@ -23,12 +23,10 @@
 #include <QObject>
 #include <boost/weak_ptr.hpp>
 #include "sscProbeData.h"
+#include "sscForwardDeclarations.h"
 
 namespace ssc
 {
-typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
-typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
-
 /**
  * \brief US Probe interface.
  *

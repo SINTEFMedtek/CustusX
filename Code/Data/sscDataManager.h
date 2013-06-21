@@ -30,14 +30,11 @@
 #include "sscVector3D.h"
 #include "sscLandmark.h"
 #include "sscDefinitions.h"
+#include "sscForwardDeclarations.h"
 
 namespace ssc
 {
 // forward declarations
-typedef boost::shared_ptr<class Image> ImagePtr;
-typedef boost::shared_ptr<class Mesh> MeshPtr;
-typedef boost::shared_ptr<class Data> DataPtr;
-typedef boost::shared_ptr<class VideoSource> VideoSourcePtr;
 typedef boost::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
 
 //-----
