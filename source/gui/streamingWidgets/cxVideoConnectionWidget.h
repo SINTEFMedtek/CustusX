@@ -21,6 +21,7 @@
 #include <boost/shared_ptr.hpp>
 #include <QProcess>
 #include "sscTransform3D.h"
+#include "sscForwardDeclarations.h"
 
 class QPushButton;
 class QComboBox;
@@ -92,7 +93,7 @@ protected:
 	QWidget* createRemoteWidget();
 	QWidget* wrapVerticalStretch(QWidget* input);
 	ssc::Transform3D calculate_rMd_ForAProbeImage(ssc::ToolPtr probe);
-	QString generateFilename(vtkImageDataPtr input);
+	QString generateFilename(ssc::VideoSourcePtr videoSource);
 	void saveAndImportSnapshot(vtkImageDataPtr input, QString filename, ssc::Transform3D rMd);
 
 	QPushButton* mConnectButton;
