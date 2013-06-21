@@ -401,7 +401,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 		ssc::messageManager()->sendWarning("No Video data");
 		return;
 	}
-	QString filename = generateFilename(input);
+	QString filename = generateFilename(videoSource);
 
 	this->saveAndImportSnapshot(input, filename, rMd);
 
@@ -418,16 +418,18 @@ ssc::Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ssc::ToolPt
 	return rMd;
 }
 
-QString VideoConnectionWidget::generateFilename(vtkImageDataPtr input)
+QString VideoConnectionWidget::generateFilename(ssc::VideoSourcePtr videoSource)
 {
+	vtkImageDataPtr input = videoSource->getVtkImageData();
 	int* extent = input->GetExtent();
 	QString filename;
 	QString format = ssc::timestampSecondsFormat();
 	if (extent[5] - extent[4] > 0)
-		filename = "3DRTSnapshot" + QDateTime::currentDateTime().toString(format);
+		filename = "3DRTSnapshot_";
 	else
-		filename = "2DRTSnapshot" + QDateTime::currentDateTime().toString(format);
+		filename = "2DRTSnapshot_";
 
+	filename += videoSource->getName() + QDateTime::currentDateTime().toString(format);
 	return filename;
 }
 
