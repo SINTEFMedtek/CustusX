@@ -62,7 +62,9 @@ class TestRunner:
                  '# ctest setup.'
                    ]
         for testname in testnames:
-            line = 'ADD_TEST("%s" ./Catch "%s" --reporter xml)' % (testname,testname    )
+            #line = 'ADD_TEST("%s" ./Catch "%s" --reporter xml)' % (testname,testname    )
+            # generate raw output from catch instead of xml, as the stdout is processed by ctest
+            line = 'ADD_TEST("%s" ./Catch "%s")' % (testname,testname    )
             lines.append(line)
         cxUtilities.writeToNewFile(filename=targetFile, text='\n'.join(lines))
 
@@ -108,6 +110,7 @@ TimeOut: %d
         shell.changeDir(path)
         shell.run('rm -rf %s' % outfile)
         shell.run('%s/Catch [%s] --reporter junit --out %s' % (path, tag, outfile))
+        #shell.run('%s/Catch [%s] --out %s' % (path, tag, outfile))
         
     def resetCustusXDataRepo(self, path):
         '''
