@@ -79,16 +79,25 @@ QString DirectlyLinkedImageReceiverThread::hostDescription() const
 	return "Direct Link";
 }
 
+void DirectlyLinkedImageReceiverThread::setImageToStream(QString imageUid)
+{
+	emit imageToStream(imageUid);
+}
+
 SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImageStreamer()
 {
 	SimulatedImageStreamerPtr streamer(new SimulatedImageStreamer());
+
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if(!tool)
 		ssc::messageManager()->sendDebug("No tool");
 	ssc::ImagePtr image = ssc::DataManager::getInstance()->getActiveImage();
 	if(!image)
 		ssc::messageManager()->sendDebug("No image");
+
 	streamer->initialize(image, tool);
+	connect(this, SIGNAL(imageToStream(QString)), streamer.get(), SLOT(setSourceToImageSlot(QString)));
+
 	return streamer;
 }
 

@@ -281,6 +281,11 @@ std::vector<ssc::VideoSourcePtr> VideoConnection::getVideoSources()
 	return retval;
 }
 
+ImageReceiverThreadPtr VideoConnection::getClient()
+{
+	return mClient;
+}
+
 /** Imbue probe with all stream and probe info from grabber.
  *
  * Call when active probe is changed or when streaming config is changed (new streams, new probedata)

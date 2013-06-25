@@ -83,7 +83,7 @@ protected:
 	void updateDirectLinkArgumentHistory();
 	QProcess* getServerProcess();
 	bool serverIsRunning();
-	VideoConnectionManagerPtr getConnection();
+	VideoConnectionManagerPtr getVideoConnectionManager();
 	void writeSettings();
 	QPushButton* initializeConnectButton();
 	QPushButton* initializeImportStreamImageButton();
@@ -91,6 +91,7 @@ protected:
 	QWidget* createDirectLinkWidget();
 	QWidget* createLocalServerWidget();
 	QWidget* createRemoteWidget();
+	QWidget* createSimulationWidget();
 	QWidget* wrapVerticalStretch(QWidget* input);
 	ssc::Transform3D calculate_rMd_ForAProbeImage(ssc::ToolPtr probe);
 	QString generateFilename(ssc::VideoSourcePtr videoSource);
