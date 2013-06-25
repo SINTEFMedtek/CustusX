@@ -57,7 +57,8 @@ TEST_CASE("Speed: Run CustusX with a minimum render speed", "[speed][gui][integr
 	custusX.stop();
 
 	// output FPS in a way friendly to the Jenkins measurement plugin:
-	QString format("&lt;measurement&gt;&lt;name&gt;%1&lt;/name&gt;&lt;value&gt;%2&lt;/value&gt;&lt;/measurement&gt;");
+//	QString format("&lt;measurement&gt;&lt;name&gt;%1&lt;/name&gt;&lt;value&gt;%2&lt;/value&gt;&lt;/measurement&gt;");
+	QString format("&amp;lt;measurement&amp;gt;&amp;lt;name&amp;gt;%1&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;%2&amp;lt;/value&amp;gt;&amp;lt;/measurement&amp;gt;");
 	QString measurement = format.arg("FPS").arg(custusX.mMeasuredFPS);
 	std::cout << measurement << std::endl;
 
