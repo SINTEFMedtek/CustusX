@@ -43,7 +43,7 @@ void SimulatedImageStreamer::initialize(ssc::ImagePtr image, ssc::ToolPtr tool)
 	this->createSendTimer();
 
 	this->setSourceImage(image);
-	connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(setSourceToActiveImageSlot()));
+//	connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(setSourceToActiveImageSlot()));
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
 	connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(generateMaskSlot()));
@@ -93,6 +93,8 @@ void SimulatedImageStreamer::generateMaskSlot()
 
 void SimulatedImageStreamer::sliceSlot()
 {
+	if(!mTool || !mSourceImage)
+		return;
 	mImageToSend = this->getSlice(mSourceImage);
 }
 
@@ -102,9 +104,16 @@ void SimulatedImageStreamer::setSourceToActiveImageSlot()
 	this->setSourceImage(image);
 }
 
+void SimulatedImageStreamer::setSourceToImageSlot(QString imageUid)
+{
+	ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid);
+	this->setSourceImage(image);
+}
+
 void SimulatedImageStreamer::setSourceImage(ssc::ImagePtr image)
 {
 	mSourceImage = image;
+	this->sliceSlot();
 }
 
 ssc::ImagePtr SimulatedImageStreamer::getSlice(ssc::ImagePtr source)

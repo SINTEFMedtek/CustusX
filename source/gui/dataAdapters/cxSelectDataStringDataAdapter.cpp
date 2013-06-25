@@ -14,33 +14,11 @@
 
 #include "cxSelectDataStringDataAdapter.h"
 
-//#include "cxDataInterface.h"
 #include "sscImage.h"
 #include "sscImageAlgorithms.h"
-//#include <QSet>
 #include "sscMesh.h"
-//#include "sscMessageManager.h"
-//#include "sscImageLUT2D.h"
 #include "sscDataManager.h"
-//#include "sscToolManager.h"
 #include "sscTypeConversions.h"
-//#include "sscDefinitionStrings.h"
-//#include "sscEnumConverter.h"
-//#include "sscTool.h"
-//#include "sscImageAlgorithms.h"
-//#include "sscRegistrationTransform.h"
-//#include "sscLogger.h"
-
-//#include <boost/shared_ptr.hpp>
-//#include <QObject>
-//#include <QString>
-//#include "sscForwardDeclarations.h"
-//#include "sscDoubleDataAdapter.h"
-//#include "sscDefinitions.h"
-//#include "sscVideoSource.h"
-//#include "cxForwardDeclarations.h"
-//#include "cxActiveImageProxy.h"
-
 
 namespace cx
 {

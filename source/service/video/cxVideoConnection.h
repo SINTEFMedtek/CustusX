@@ -65,6 +65,7 @@ public:
 	void disconnectServer();
 
 	std::vector<ssc::VideoSourcePtr> getVideoSources();
+	ImageReceiverThreadPtr getClient();
 
 signals:
 	bool connected(bool);
