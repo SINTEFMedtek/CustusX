@@ -39,15 +39,13 @@ VideoConnectionManager::VideoConnectionManager()
 
 	QStringList connectionOptions;
 	QString defaultConnection = "Direct Link";
-	connectionOptions << "Local Server" << "Direct Link" << "Remote Server";
-	mConnectionMethod = ssc::StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions,
-			mOptions.getElement());
+	connectionOptions << "Local Server" << "Direct Link" << "Remote Server" << "Simulation Server";
+	mConnectionMethod = ssc::StringDataAdapterXml::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, connectionOptions, mOptions.getElement());
 	connect(mConnectionMethod.get(), SIGNAL(changed()), this, SIGNAL(connectionMethodChanged()));
 	mConnectWhenLocalServerRunning = 0;
 	mIniScriptProcess.reset(new ProcessWrapper("Init Script"));
 	mLocalVideoServerProcess.reset(new ProcessWrapper("Local Video Server"));
-	connect(mLocalVideoServerProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this,
-			SLOT(serverProcessStateChanged(QProcess::ProcessState)));
+	connect(mLocalVideoServerProcess->getProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 	mVideoConnection.reset(new VideoConnection());
 	connect(mVideoConnection.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
 	connect(mVideoConnection.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
@@ -57,6 +55,11 @@ VideoConnectionManager::VideoConnectionManager()
 VideoConnectionManager::~VideoConnectionManager()
 {
 	mVideoConnection->disconnectServer();
+}
+
+ssc::StringDataAdapterXmlPtr VideoConnectionManager::getConnectionMethod()
+{
+	return mConnectionMethod;
 }
 
 void VideoConnectionManager::setLocalServerExecutable(QString commandline)
@@ -109,6 +112,16 @@ bool VideoConnectionManager::useDirectLink()
 	return mConnectionMethod->getValue() == "Direct Link";
 }
 
+bool VideoConnectionManager::useRemoteServer()
+{
+	return mConnectionMethod->getValue() == "Remote Server";
+}
+
+bool VideoConnectionManager::useSimulatedServer()
+{
+	return mConnectionMethod->getValue() == "Simulation Server";
+}
+
 QStringList VideoConnectionManager::getHostHistory()
 {
 	QStringList hostHistory = settings()->value("IGTLink/hostHistory").toStringList();
@@ -152,6 +165,7 @@ void VideoConnectionManager::setLocalServerArguments(QString commandline)
 		history.removeLast();
 	settings()->setValue("IGTLink/directLinkArgumentHistory", history);
 }
+
 QString VideoConnectionManager::getLocalServerArguments()
 {
 	return this->getDirectLinkArgumentHistory().front();
@@ -200,12 +214,14 @@ void VideoConnectionManager::launchAndConnectServer()
 
 	this->runScript();
 
-	if (useDirectLink())
+	if (useDirectLink() || useSimulatedServer())
 		this->setupAndRunDirectLinkClient();
 	else if (useLocalServer())
 		this->launchAndConnectUsingLocalServer();
-	else
+	else if (useRemoteServer())
 		this->connectServer();
+	else
+		ssc::messageManager()->sendError("Could not determine which server to launch.");
 }
 
 void VideoConnectionManager::serverProcessStateChanged(QProcess::ProcessState newState)
@@ -217,6 +233,16 @@ void VideoConnectionManager::serverProcessStateChanged(QProcess::ProcessState ne
 std::vector<ssc::VideoSourcePtr> VideoConnectionManager::getVideoSources()
 {
 	return mVideoConnection->getVideoSources();
+}
+
+VideoConnectionPtr VideoConnectionManager::getVideoConnection()
+{
+	return mVideoConnection;
+}
+
+void VideoConnectionManager::setReconnectInterval(int interval)
+{
+	mReconnectInterval = interval;
 }
 
 void VideoConnectionManager::disconnectServer()

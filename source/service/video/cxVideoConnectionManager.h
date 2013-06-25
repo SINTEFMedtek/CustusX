@@ -47,7 +47,7 @@ public:
 	VideoConnectionManager();
 	virtual ~VideoConnectionManager();
 
-	ssc::StringDataAdapterXmlPtr getConnectionMethod() { return mConnectionMethod; }
+	ssc::StringDataAdapterXmlPtr getConnectionMethod();
 
 	void setLocalServerExecutable(QString commandline);
 	QString getLocalServerExecutable();
@@ -62,6 +62,8 @@ public:
 
 	bool useLocalServer();
 	bool useDirectLink();
+	bool useRemoteServer();
+	bool useSimulatedServer();
 
 	void setInitScript(QString filename);
 	QString getInitScript();
@@ -72,8 +74,9 @@ public:
 
 	QProcess* getLocalVideoServerProcess();
 	std::vector<ssc::VideoSourcePtr> getVideoSources();
+	VideoConnectionPtr getVideoConnection();
 
-	void setReconnectInterval(int interval) { mReconnectInterval = interval; }
+	void setReconnectInterval(int interval);
 	bool isConnected() const;
 
 signals:

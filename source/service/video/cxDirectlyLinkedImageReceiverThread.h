@@ -43,10 +43,16 @@ typedef boost::shared_ptr<class DirectlyLinkedImageReceiverThread> DirectlyLinke
  */
 class DirectlyLinkedImageReceiverThread: public ImageReceiverThread
 {
-Q_OBJECT
+	Q_OBJECT
+
 public:
 	DirectlyLinkedImageReceiverThread(std::map<QString, QString> args, QObject* parent = NULL);
 	virtual QString hostDescription() const; ///< threadsafe
+
+	void setImageToStream(QString imageUid);
+
+signals:
+	void imageToStream(QString imageUid);
 
 protected:
 	virtual void run();

@@ -40,6 +40,7 @@
 #include "cxPatientData.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
+#include "cxSimulateUSWidget.h"
 
 namespace cx
 {
@@ -47,8 +48,8 @@ namespace cx
 VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
 		BaseWidget(parent, "IGTLinkWidget", "Video Connection")
 {
-	connect(this->getConnection().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
-	connect(this->getConnection().get(), SIGNAL(connectionMethodChanged()), this, SLOT(selectGuiForConnectionMethodSlot()));
+	connect(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
+	connect(this->getVideoConnectionManager().get(), SIGNAL(connectionMethodChanged()), this, SLOT(selectGuiForConnectionMethodSlot()));
 	connect(this->getServerProcess(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 
 	QHBoxLayout* initScriptLayout = this->initializeScriptWidget();
@@ -79,11 +80,11 @@ QHBoxLayout* VideoConnectionWidget::initializeScriptWidget()
 	QHBoxLayout* initScriptLayout = new QHBoxLayout();
 	initScriptLayout->addWidget(new QLabel("Init script", this));
 	mInitScriptWidget = new ssc::FileSelectWidget(this);
-	QString path = QDir::cleanPath(DataLocations::getBundlePath() + "/" + getConnection()->getInitScript());
+	QString path = QDir::cleanPath(DataLocations::getBundlePath() + "/" + getVideoConnectionManager()->getInitScript());
 	QStringList nameFilters;
 	nameFilters << "*.*";
 	mInitScriptWidget->setNameFilter(nameFilters);
-	if (!getConnection()->getInitScript().isEmpty())
+	if (!getVideoConnectionManager()->getInitScript().isEmpty())
 		mInitScriptWidget->setFilename(path);
 
 	connect(mInitScriptWidget, SIGNAL(fileSelected(QString)), this, SLOT(initScriptSelected(QString)));
@@ -95,7 +96,7 @@ QHBoxLayout* VideoConnectionWidget::initializeScriptWidget()
 
 ssc::StringDataAdapterXmlPtr VideoConnectionWidget::initializeConnectionSelector()
 {
-	return this->getConnection()->getConnectionMethod();
+	return this->getVideoConnectionManager()->getConnectionMethod();
 }
 
 ActiveVideoSourceStringDataAdapterPtr VideoConnectionWidget::initializeActiveVideoSourceSelector()
@@ -116,7 +117,7 @@ QFrame* VideoConnectionWidget::wrapStackedWidgetInAFrame()
 
 void VideoConnectionWidget::initScriptSelected(QString filename)
 {
-	getConnection()->setInitScript(filename);
+	getVideoConnectionManager()->setInitScript(filename);
 }
 
 QWidget* VideoConnectionWidget::createDirectLinkWidget()
@@ -143,7 +144,7 @@ QWidget* VideoConnectionWidget::createLocalServerWidget()
 	layout->setMargin(0);
 	layout->addWidget(new QLabel("Local Server", this), 0, 0);
 	mLocalServerEdit = new QLineEdit(this);
-	mLocalServerEdit->setText(getConnection()->getLocalServerExecutable());
+	mLocalServerEdit->setText(getVideoConnectionManager()->getLocalServerExecutable());
 	mLocalServerEdit->setToolTip(ImageServer::getArgumentHelpText("<executable>"));
 	layout->addWidget(mLocalServerEdit, 0, 1);
 	QAction* browseLocalServerAction = new QAction(QIcon(":/icons/open.png"), "Browse", this);
@@ -155,7 +156,7 @@ QWidget* VideoConnectionWidget::createLocalServerWidget()
 	layout->addWidget(new QLabel("Arguments", this), 1, 0);
 	mLocalServerArguments = new QLineEdit(this);
 	mLocalServerArguments->setToolTip(ImageServer::getArgumentHelpText("<executable>"));
-	mLocalServerArguments->setText(getConnection()->getLocalServerArguments());
+	mLocalServerArguments->setText(getVideoConnectionManager()->getLocalServerArguments());
 	layout->addWidget(mLocalServerArguments, 1, 1);
 	mLaunchServerButton = new QPushButton("Launch Local Server", this);
 	connect(mLaunchServerButton, SIGNAL(clicked()), this, SLOT(toggleLaunchServer()));
@@ -189,10 +190,17 @@ QWidget* VideoConnectionWidget::createRemoteWidget()
 	layout->addWidget(mAddressEdit, 0, 1);
 	layout->addWidget(new QLabel("Port number", this), 1, 0);
 	mPortEdit = new QLineEdit(this);
-	mPortEdit->setText(QString::number(getConnection()->getPort()));
+	mPortEdit->setText(QString::number(getVideoConnectionManager()->getPort()));
 	mPortEdit->setToolTip("Enter TCP/IP port that the video server is listening to");
 	layout->addWidget(mPortEdit, 1, 1);
 	return retval;
+}
+
+QWidget* VideoConnectionWidget::createSimulationWidget()
+{
+	SimulateUSWidget* simulationWidget = new SimulateUSWidget();
+//	connect(simulationWidget, SIGNAL(imageSelected()), this->getConnection()->get);
+	return simulationWidget;
 }
 
 QString VideoConnectionWidget::defaultWhatsThis() const
@@ -206,7 +214,7 @@ QString VideoConnectionWidget::defaultWhatsThis() const
 
 QProcess* VideoConnectionWidget::getServerProcess()
 {
-	return this->getConnection()->getLocalVideoServerProcess();
+	return this->getVideoConnectionManager()->getLocalVideoServerProcess();
 }
 
 bool VideoConnectionWidget::serverIsRunning()
@@ -215,26 +223,28 @@ bool VideoConnectionWidget::serverIsRunning()
 	return isRunning;
 }
 
-VideoConnectionManagerPtr VideoConnectionWidget::getConnection()
+VideoConnectionManagerPtr VideoConnectionWidget::getVideoConnectionManager()
 {
 	return videoService()->getVideoConnection();
 }
 
 void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 {
-	if (this->getConnection()->useDirectLink())
+	if (this->getVideoConnectionManager()->useDirectLink())
 		mStackedWidget->setCurrentIndex(0);
-	else if (this->getConnection()->useLocalServer())
+	else if (this->getVideoConnectionManager()->useLocalServer())
 		mStackedWidget->setCurrentIndex(1);
-	else
+	else if(this->getVideoConnectionManager()->useRemoteServer())
 		mStackedWidget->setCurrentIndex(2);
+	else if(this->getVideoConnectionManager()->useSimulatedServer())
+		mStackedWidget->setCurrentIndex(3);
 }
 
 void VideoConnectionWidget::updateHostHistory()
 {
 	mAddressEdit->blockSignals(true);
 	mAddressEdit->clear();
-	mAddressEdit->addItems(this->getConnection()->getHostHistory());
+	mAddressEdit->addItems(this->getVideoConnectionManager()->getHostHistory());
 	mAddressEdit->blockSignals(false);
 }
 
@@ -242,7 +252,7 @@ void VideoConnectionWidget::updateDirectLinkArgumentHistory()
 {
 	mDirectLinkArguments->blockSignals(true);
 	mDirectLinkArguments->clear();
-	mDirectLinkArguments->addItems(getConnection()->getDirectLinkArgumentHistory());
+	mDirectLinkArguments->addItems(getVideoConnectionManager()->getDirectLinkArgumentHistory());
 	mDirectLinkArguments->blockSignals(false);
 }
 
@@ -257,7 +267,7 @@ void VideoConnectionWidget::browseLocalServerSlot()
 void VideoConnectionWidget::launchServer()
 {
 	this->writeSettings();
-	this->getConnection()->launchServer();
+	this->getVideoConnectionManager()->launchServer();
 }
 
 void VideoConnectionWidget::toggleLaunchServer()
@@ -282,7 +292,7 @@ void VideoConnectionWidget::serverProcessStateChanged(QProcess::ProcessState new
 
 void VideoConnectionWidget::toggleConnectServer()
 {
-	if (!this->getConnection()->isConnected())
+	if (!this->getVideoConnectionManager()->isConnected())
 		this->connectServer();
 	else
 		this->disconnectServer();
@@ -290,21 +300,25 @@ void VideoConnectionWidget::toggleConnectServer()
 
 void VideoConnectionWidget::writeSettings()
 {
-	if (this->getConnection()->useDirectLink())
+	if (this->getVideoConnectionManager()->useDirectLink())
 	{
-		this->getConnection()->setLocalServerArguments(mDirectLinkArguments->currentText());
+		this->getVideoConnectionManager()->setLocalServerArguments(mDirectLinkArguments->currentText());
 		this->updateDirectLinkArgumentHistory();
 	}
-	else if (this->getConnection()->useLocalServer())
+	else if (this->getVideoConnectionManager()->useLocalServer())
 	{
-		this->getConnection()->setLocalServerExecutable(mLocalServerEdit->text());
-		this->getConnection()->setLocalServerArguments(mLocalServerArguments->text());
+		this->getVideoConnectionManager()->setLocalServerExecutable(mLocalServerEdit->text());
+		this->getVideoConnectionManager()->setLocalServerArguments(mLocalServerArguments->text());
 	}
-	else
+	else if (this->getVideoConnectionManager()->useRemoteServer())
 	{
-		this->getConnection()->setHost(mAddressEdit->currentText());
-		this->getConnection()->setPort(mPortEdit->text().toInt());
+		this->getVideoConnectionManager()->setHost(mAddressEdit->currentText());
+		this->getVideoConnectionManager()->setPort(mPortEdit->text().toInt());
 		this->updateHostHistory();
+	}
+	else if (this->getVideoConnectionManager()->useSimulatedServer())
+	{
+		this->getVideoConnectionManager()->setLocalServerArguments("--type SimulatedImageStreamer");
 	}
 }
 
@@ -332,27 +346,28 @@ QStackedWidget* VideoConnectionWidget::initializeStackedWidget()
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createDirectLinkWidget()));
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createLocalServerWidget()));
 	stackedWidget->addWidget(this->wrapVerticalStretch(this->createRemoteWidget()));
+	stackedWidget->addWidget(this->wrapVerticalStretch(this->createSimulationWidget()));
 	return stackedWidget;
 }
 
 void VideoConnectionWidget::connectServer()
 {
-	if (!this->getConnection()->isConnected())
+	if (!this->getVideoConnectionManager()->isConnected())
 	{
 		this->writeSettings();
-		this->getConnection()->launchAndConnectServer();
+		this->getVideoConnectionManager()->launchAndConnectServer();
 	}
 }
 
 void VideoConnectionWidget::disconnectServer()
 {
-	this->getConnection()->disconnectServer();
+	this->getVideoConnectionManager()->disconnectServer();
 }
 
 void VideoConnectionWidget::serverStatusChangedSlot()
 {
-	mImportStreamImageButton->setEnabled(this->getConnection()->isConnected());
-	if (this->getConnection()->isConnected())
+	mImportStreamImageButton->setEnabled(this->getVideoConnectionManager()->isConnected());
+	if (this->getVideoConnectionManager()->isConnected())
 		mConnectButton->setText("Disconnect Server");
 	else
 		mConnectButton->setText("Connect Server");
@@ -362,12 +377,12 @@ void VideoConnectionWidget::serverStatusChangedSlot()
 
 void VideoConnectionWidget::importStreamImageSlot()
 {
-	if (!this->getConnection())
+	if (!this->getVideoConnectionManager())
 	{
 		ssc::messageManager()->sendWarning("No video connection");
 		return;
 	}
-	if (!this->getConnection()->isConnected())
+	if (!this->getVideoConnectionManager()->isConnected())
 	{
 		ssc::messageManager()->sendWarning("Video is not connected");
 		return;
