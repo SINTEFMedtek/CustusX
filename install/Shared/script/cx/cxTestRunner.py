@@ -22,6 +22,7 @@ from cxShell import *
 from cxPrintFormatter import PrintFormatter
 import cxCatchConsoleNameListParser
 import cxUtilities
+import cxConvertCTest2JUnit
 
 class TestRunner:
     '''
@@ -40,7 +41,7 @@ class TestRunner:
         '''
         PrintFormatter.printInfo('Run ctest tests with tag [%s]' % tag)
         PrintFormatter.printInfo('Convert catch tests to ctests, i.e. one test per process...')
-        tests = self._readCatchTestNames(path, tag='integration')
+        tests = self._readCatchTestNames(path, tag=tag)
         self._writeCTestFileForCatchTests('%s/CTestTestfile.cmake'%path, tests)
         self._writeDartConfigurationFile(path)
         self.runCTest(path, outFile)
@@ -52,7 +53,7 @@ class TestRunner:
         parser = cxCatchConsoleNameListParser.CatchConsoleNameListParser()
         parser.readTestNamesFromStringList(testListResult.stdout.split('\n'))
         #parser.printTests("Tests")
-        tests = parser.getTestsForTag('integration')
+        tests = parser.getTestsForTag(tag)
         return tests
 
     def _writeCTestFileForCatchTests(self, targetFile, testnames):
@@ -64,7 +65,7 @@ class TestRunner:
         for testname in testnames:
             #line = 'ADD_TEST("%s" ./Catch "%s" --reporter xml)' % (testname,testname    )
             # generate raw output from catch instead of xml, as the stdout is processed by ctest
-            line = 'ADD_TEST("%s" ./Catch "%s")' % (testname,testname    )
+            line = 'ADD_TEST("%s" ./Catch "%s")' % (testname,testname)
             lines.append(line)
         cxUtilities.writeToNewFile(filename=targetFile, text='\n'.join(lines))
 
@@ -125,5 +126,10 @@ TimeOut: %d
         shell.run('git reset --hard')
         tempDir = "%s/temp" % path
         shell.removeTree(tempDir)
+        
+    def convertCTestFile2JUnit(self, ctestFile, junitFile):
+        PrintFormatter.printInfo('Convert [%s] to [%s]' % (ctestFile, junitFile))
+        cxConvertCTest2JUnit.convertCTestFile2JUnit(ctestFile, junitFile)
+        
         
 

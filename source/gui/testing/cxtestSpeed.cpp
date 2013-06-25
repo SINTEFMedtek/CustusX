@@ -31,6 +31,7 @@ namespace cxtest
 
 TEST_CASE("Speed: Run CustusX with a minimum render speed", "[speed][gui][integration]")
 {
+	cout << "CTEST_FULL_OUTPUT" << endl;
 	// this stuff will be performed just before all tests in this class
 	cx::DataLocations::setTestMode();
 	cx::settings()->setValue("renderingInterval", 4);
