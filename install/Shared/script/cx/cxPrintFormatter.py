@@ -34,6 +34,9 @@ class PrintFormatterClass:
     def printLine(self):
         print '='*80
 
+    def printInfo(self, text):
+            print "*** %s" % text
+
     def finish(self):
         self.printHeader('Finished', level=3)
         
