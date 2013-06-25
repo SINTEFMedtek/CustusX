@@ -169,11 +169,12 @@ class CustusXTestInstallation:
         PrintFormatter.printHeader('Run integration tests', level=2)
         appPath = self._getInstalledBinaryPath()
         self._connectTestDataToInstallation()        
+        ctestFile='%s/IntegrationTestResults.ctest.xml' % self.root_dir
+        junitFile='%s/IntegrationTestResults.junit.xml' % self.root_dir
         testRunner = cxTestRunner.TestRunner()
-        outFile='%s/CTestResults.xml' % self.root_dir
-        #outFile='%s/CTestResults_catch_integration.xml' % self.root_dir
         testRunner.resetCustusXDataRepo(self.getTestDataPath())
-        testRunner.runCatchTestsWrappedInCTest(appPath, tag='integration', outFile=outFile)
+        testRunner.runCatchTestsWrappedInCTest(appPath, tag='integration', outFile=ctestFile)
+        testRunner.convertCTestFile2JUnit(ctestFile, junitFile)
     
     def _connectTestDataToInstallation(self):
         settingsPath = self._getInstalledSettingsPath()
