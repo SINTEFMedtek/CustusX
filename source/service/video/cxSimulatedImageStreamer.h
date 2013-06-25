@@ -39,6 +39,7 @@ private slots:
 	void generateMaskSlot();
 	void sliceSlot();
 	void setSourceToActiveImageSlot();
+	void setSourceToImageSlot(QString imageUid);
 
 private:
 	void setSourceImage(ssc::ImagePtr image);

@@ -28,7 +28,7 @@ bool TestVideoConnectionWidget::canStream(QString filename, QString streamerType
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //connect
 
-	bool videoConnectionConnected = waitForSignal(this->getConnection().get(), SIGNAL(connected(bool)));
+	bool videoConnectionConnected = waitForSignal(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)));
 	bool activeVideoSourceChanged = waitForSignal(cx::videoService(), SIGNAL(activeVideoSourceChanged()));
 	ssc::VideoSourcePtr stream = cx::videoService()->getActiveVideoSource();
 	bool videoSourceReceivedNewFrame = waitForSignal(stream.get(), SIGNAL(newFrame()));
