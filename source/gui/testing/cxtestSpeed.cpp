@@ -28,6 +28,32 @@
 namespace cxtest
 {
 
+//QString addTag(QString name, QString text)
+//{
+//	QString escapedXmlTag("<%1>");
+////	QString escapedXmlTag("\\&lt;%1\\&gt;");
+//	return escapedXmlTag.arg(name) + text + escapedXmlTag.arg("/"+name);
+//}
+
+QString defineJenkinsMeasurememt(QString name, QString value)
+{
+	QString format("<measurement><name>%1</name><value>%2</value></measurement>");
+	return format.arg(name).arg(value);
+//	QString nameElement = addTag("name", name);
+//	QString valueElement = addTag("value", value);
+//	QString measurementElement = addTag("measurement", nameElement+valueElement);
+//	return measurementElement;
+//	QString format("&lt;measurement&gt; &lt;name&gt; %1 &lt;/name&gt; &lt;value&gt; %2 &lt;/value&gt; &lt;/measurement&gt;");
+//	QString format("&lt;measurement&gt;
+//	               "&lt;name&gt;
+//	               "%1 &lt;/name&gt;
+//	               "&lt;value&gt;
+//	               "%2
+//	               "&lt;/value&gt;
+//	               "&lt;/measurement&gt;
+//	               ");
+}
+
 
 TEST_CASE("Speed: Run CustusX with a minimum render speed", "[speed][gui][integration]")
 {
@@ -57,9 +83,11 @@ TEST_CASE("Speed: Run CustusX with a minimum render speed", "[speed][gui][integr
 	custusX.stop();
 
 	// output FPS in a way friendly to the Jenkins measurement plugin:
+//	QString escapedXmlTag("&lt;%1&gt;");
+//	QString format("&lt;measurement&gt; &lt;name&gt; %1 &lt;/name&gt; &lt;value&gt; %2 &lt;/value&gt; &lt;/measurement&gt;");
 //	QString format("&lt;measurement&gt;&lt;name&gt;%1&lt;/name&gt;&lt;value&gt;%2&lt;/value&gt;&lt;/measurement&gt;");
-	QString format("&amp;lt;measurement&amp;gt;&amp;lt;name&amp;gt;%1&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;%2&amp;lt;/value&amp;gt;&amp;lt;/measurement&amp;gt;");
-	QString measurement = format.arg("FPS").arg(custusX.mMeasuredFPS);
+//	QString format("&amp;lt;measurement&amp;gt;&amp;lt;name&amp;gt;%1&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;%2&amp;lt;/value&amp;gt;&amp;lt;/measurement&amp;gt;");
+	QString measurement = defineJenkinsMeasurememt("FPS", QString::number(custusX.mMeasuredFPS));
 	std::cout << measurement << std::endl;
 
 	// TODO: enter this value into config file
