@@ -31,6 +31,7 @@ CustusXController::CustusXController(QObject* parent) : QObject(parent)
   mTestData += "Test Results:\n";
   mMainWindow = NULL;
   mBaseTime = 1000;
+  mMeasuredFPS = 0;
 }
 void CustusXController::start()
 {
@@ -103,8 +104,10 @@ void CustusXController::initialEndCheckRenderSlot()
 
 void CustusXController::secondEndCheckRenderSlot()
 {
+
   std::cout << cx::viewManager()->getRenderTimer()->dumpStatistics() << std::endl;
   mTestData += cx::viewManager()->getRenderTimer()->dumpStatistics() + "\n";
+  mMeasuredFPS = cx::viewManager()->getRenderTimer()->getFPS();
 //  mTestData += "\n";
 
   this->displayResultsSlot();

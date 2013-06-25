@@ -22,6 +22,7 @@ public:
   QString mPatientFolder;
   QString mTestData;
   int mBaseTime;
+  double mMeasuredFPS;
 
   CustusXController(QObject* parent);
   void start();

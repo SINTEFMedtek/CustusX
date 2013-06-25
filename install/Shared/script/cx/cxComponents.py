@@ -315,7 +315,7 @@ class IGSTK(CppComponent):
 
 class ISB_DataStreaming(CppComponent):
     def name(self):
-        self.mCurrentRevision = "439"
+        self.mCurrentRevision = "449"
         return "ISB_DataStreaming"
     def help(self):
         return 'ISB GE Digital Interface stuff'
@@ -340,6 +340,8 @@ class ISB_DataStreaming(CppComponent):
         add('DATASTREAMING_USE_HDF:BOOL', False)
         add('DATASTREAMING_USE_TRACKING:BOOL', False)
         add('DATASTREAMING_USE_SC_DICOM_LOADERS:BOOL', False)
+        add('DATASTREAMING_USE_OPENCL:BOOL', self.controlData.mUseOpenCL)
+        add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
         builder.configureCMake()
     def _svn_login_info(self):
         '''

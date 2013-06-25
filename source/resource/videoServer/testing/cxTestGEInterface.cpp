@@ -8,6 +8,9 @@
 #include "cxImageStreamerGE.h"
 #include "sscMessageManager.h"
 
+namespace cxtest
+{
+
 void TestGEInterface::setUp()
 {
 //	cx::LogicManager::initialize();
@@ -206,7 +209,7 @@ void TestGEInterface::testGEStreamer()
 
 	//Skip assert if OpenCL is turned off
 #ifdef DATASTREAMING_USE_OPENCL
-	CPPUNIT_ASSERT(geStreamer.usingOpenCL());
+	CPPUNIT_ASSERT(geStreamer.UsingOpenCL());
 #endif
 
 	/*img = imgExportedStream->GetTissueImage();
@@ -239,5 +242,7 @@ void TestGEInterface::validateBMode3D(vtkSmartPointer<vtkImageData> img)
 	std::cout << getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) << std::endl;
 	CPPUNIT_ASSERT( getValue(img, dim[0]/3,dim[1]/3,dim[2]/3) == 100);
 }
+
+} //namespace cxtest
 
 #endif //CX_USE_ISB_GE
