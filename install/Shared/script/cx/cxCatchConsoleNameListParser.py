@@ -98,8 +98,9 @@ class CatchConsoleNameListParser:
         '''
         Match this format <enclosed in brackets>:
         <  Description of test  .....  [several][tags]>
-        <    additional desc           [more][tags]>
-        <    additional desc           [more][tags]>
+        <    additional desc             [more][tags]>
+        <    additional desc             [more][tags]>
+        <      ...                       [evenmore][tags]>
         and extract "Description of test additional desc additional desc"
         as the "text" group.
         The "subline_identifier" group is non-None if the line is a subline, 
@@ -110,7 +111,7 @@ class CatchConsoleNameListParser:
             (?P<subline_identifier>[ ]{2})?   # two whitespace subline header, will be None if first line. 
             (?P<text>.*?)                     # all text (nongreedy)
             [.]*                              # dot fill
-            ([ ]{2})?                         # two whitespace separator name - tags (optional)
+            [ ]*                              # whitespace separator name - tags
             (?P<tags>(\[.*?\])*)              # any number of [tag], tag text nongreedy.
             $                                 # end of line
             ''', re.VERBOSE)
@@ -138,7 +139,8 @@ class CatchConsoleNameListParser:
 
     def _appendTextToLastText(self, testinfo):
         #self.tests[-1] = "%s %s" % (self.tests[-1], text)
-        self.tests[-1]['text'] = "%s %s" % (self.tests[-1]['text'], testinfo['text'])
+        if len(testinfo['text'])>0:
+            self.tests[-1]['text'] = "%s %s" % (self.tests[-1]['text'], testinfo['text'])
         self.tests[-1]['tags'] = "%s%s" % (self.tests[-1]['tags'], testinfo['tags'])
 
     def getTestsForTag(self, tag):
