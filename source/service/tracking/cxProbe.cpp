@@ -139,6 +139,7 @@ void Probe::applyNewConfigurationWithId(QString uid)
 	this->updateTemporalCalibration();
 	this->setSoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
+	emit activeConfigChanged();
 }
 
 void Probe::setTemporalCalibration(double val)
@@ -362,8 +363,8 @@ ssc::ProbeData Probe::createProbeSector()
 
 void Probe::updateTemporalCalibration()
 {
-if (mOverrideTemporalCalibration)
-	this->setTemporalCalibration(mTemporalCalibration);
+	if (mOverrideTemporalCalibration)
+		this->setTemporalCalibration(mTemporalCalibration);
 }
 
 
