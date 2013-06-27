@@ -45,7 +45,7 @@ void SimulatedImageStreamer::initialize(ssc::ImagePtr image, ssc::ToolPtr tool)
 	this->setSourceImage(image);
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
-	connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(generateMaskSlot()));
+	connect(mTool->getProbe().get(), SIGNAL(activeConfigChanged()), this, SLOT(generateMaskSlot()));
 
 	this->generateMaskSlot();
 
@@ -88,6 +88,7 @@ void SimulatedImageStreamer::generateMaskSlot()
 	ssc::ProbeSectorPtr sector = mTool->getProbe()->getSector();
 	mMask = sector->getMask();
 	ssc::messageManager()->sendDebug("END");
+	this->sliceSlot();
 }
 
 void SimulatedImageStreamer::sliceSlot()
