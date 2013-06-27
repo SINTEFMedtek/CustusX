@@ -12,7 +12,7 @@
 #
 # Prerequisites:
 #   run "sudo pip install lxml" to install required py module.
-#   Ubuntu: sudo apt-get install libxml2-dev libxslt-dev 
+#   Ubuntu: sudo apt-get install -y python-pip libxml2-dev libxslt-dev 
 #
 #################################################             
 

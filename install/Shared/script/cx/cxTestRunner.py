@@ -31,6 +31,13 @@ class TestRunner:
     '''
     pass
 
+    def runCatchTestsWrappedInCTestGenerateJUnit(self, tag, catchPath, outPath):
+        ctestFile='%s/TestResults_%s.ctest.xml' % (outPath, tag)
+        junitFile='%s/TestResults_%s.junit.xml' % (outPath, tag)
+        self.runCatchTestsWrappedInCTest(catchPath, tag=tag, outFile=ctestFile)
+        self.convertCTestFile2JUnit(ctestFile, junitFile)
+        return junitFile
+
     def runCatchTestsWrappedInCTest(self, path, tag, outFile):
         '''
         Assuming a Catch executable exist in path,
