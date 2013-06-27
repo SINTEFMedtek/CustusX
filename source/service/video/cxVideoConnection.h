@@ -65,7 +65,8 @@ public:
 	void disconnectServer();
 
 	std::vector<ssc::VideoSourcePtr> getVideoSources();
-	ImageReceiverThreadPtr getClient();
+	void setImageToStream(QString uid);
+
 
 signals:
 	bool connected(bool);
@@ -95,6 +96,8 @@ private:
 	std::vector<ssc::ProbeDataPtr> mUnsusedProbeDataVector;
 
 	std::vector<BasicVideoSourcePtr> mSources;
+
+	QString mImageUidToStream;
 };
 typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 
