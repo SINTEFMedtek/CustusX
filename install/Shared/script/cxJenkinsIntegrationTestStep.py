@@ -41,9 +41,6 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         self.cxInstallation = cx.cxCustusXTestInstallation.CustusXTestInstallation()
         super(Controller, self).__init__()
 
-#        data = self.cxBuilder.assembly.controlData        
-#        data.setBuildType("Release")
-
     def getDescription(self):                  
         return 'Jenkins script for testing an installed CustusX.'
            

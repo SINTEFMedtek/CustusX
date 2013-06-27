@@ -51,6 +51,8 @@ class CustusXBuilder:
         self.clearTestData()
         self._runCatchTests()
         self._runCTestTests()
+        #self.runCatchTestsWrappedInCTest('speed')
+
     
     def _runCTestTests(self):
         PrintFormatter.printHeader('Run ctest tests', level=3)
@@ -66,6 +68,14 @@ class CustusXBuilder:
         catchDir = '%s/source/testing' % custusx.buildPath()
         outfile = '%s/CatchTestResults.xml' % custusx.buildPath()
         cxTestRunner.TestRunner().runCatch(catchDir, tag='unit', outfile=outfile)
+
+    def runCatchTestsWrappedInCTest(self, tag):
+        PrintFormatter.printHeader('Run catch tests wrapped in ctest', level=2)
+        custusx = self._createComponent(cxComponents.CustusX3)
+        appPath = '%s/source/testing' % custusx.buildPath()
+        outpath = self.assembly.controlData.getRootDir()
+        testRunner = cxTestRunner.TestRunner()
+        testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tag, appPath, outpath)
 
     def createInstallerPackage(self):
         PrintFormatter.printHeader('Package the build', level=2)

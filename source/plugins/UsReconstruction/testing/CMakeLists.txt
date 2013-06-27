@@ -5,9 +5,6 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
-	# -----------------------------------------------
-	# CppUnit test framework: Create executable testCX
-	#
 	include_directories(
 		${CPPUNIT_INCLUDE_DIR}
 		../logic
@@ -20,19 +17,13 @@ if (BUILD_TESTING)
 		${CustusX3_SOURCE_DIR}/source/resource/algorithms
 		)
 
-	# List of all test units
-	QT4_WRAP_CPP( CX_TEST_US_RECONSTRUCTION_SOURCE_FILES
-		)
-  
-	set(CX_TEST_US_RECONSTRUCTION_SOURCE_FILES
-		cxTest_UsReconstruction.h
-		cxTest_UsReconstruction.cpp
-		${CX_TEST_SOURCE_FILES}
-		)
+	# Catch unit test framework stuff:
 
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
-	include(cxTestMacros)
-	# define cppunit tests and ctest tests from same source:
-	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestUsReconstruction cxCppUnitMain.cpp "${CX_TEST_US_RECONSTRUCTION_SOURCE_FILES}" cxPluginUSReconstruction)
+	QT4_WRAP_CPP(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES
+		)
+	set(CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES ${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}
+		cxtestReconstructManager.cpp
+		)
+	cx_catch_add_lib_and_exe(cxPluginUSReconstruction "${CXTEST_PLUGIN_USRECONSTRUCTION_SOURCES}")
 
 endif (BUILD_TESTING)
