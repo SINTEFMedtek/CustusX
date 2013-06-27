@@ -96,7 +96,9 @@ void VideoConnection::connectedSlot(bool on)
 
 void VideoConnection::runDirectLinkClient(std::map<QString, QString> args)
 {
-	this->runClient(ImageReceiverThreadPtr(new DirectlyLinkedImageReceiverThread(args, this)));
+	DirectlyLinkedImageReceiverThreadPtr imageReceiverThread(new DirectlyLinkedImageReceiverThread(args, this));
+	imageReceiverThread->setImageToStream(mImageUidToStream);
+	this->runClient(imageReceiverThread);
 }
 
 void VideoConnection::runIGTLinkedClient(QString address, int port)
@@ -281,9 +283,12 @@ std::vector<ssc::VideoSourcePtr> VideoConnection::getVideoSources()
 	return retval;
 }
 
-ImageReceiverThreadPtr VideoConnection::getClient()
+void VideoConnection::setImageToStream(QString uid)
 {
-	return mClient;
+	mImageUidToStream = uid;
+	DirectlyLinkedImageReceiverThreadPtr casted_client = boost::dynamic_pointer_cast<DirectlyLinkedImageReceiverThread>(mClient);
+	if(casted_client)
+		casted_client->setImageToStream(mImageUidToStream);
 }
 
 /** Imbue probe with all stream and probe info from grabber.

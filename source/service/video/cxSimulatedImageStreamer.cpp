@@ -43,7 +43,6 @@ void SimulatedImageStreamer::initialize(ssc::ImagePtr image, ssc::ToolPtr tool)
 	this->createSendTimer();
 
 	this->setSourceImage(image);
-//	connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(setSourceToActiveImageSlot()));
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
 	connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(generateMaskSlot()));
@@ -85,10 +84,10 @@ void SimulatedImageStreamer::streamSlot()
 
 void SimulatedImageStreamer::generateMaskSlot()
 {
-	ssc::ProbeData data = mTool->getProbe()->getProbeData();
-	ssc::ProbeSector sector;
-	sector.setData(data);
-	mMask = sector.getMask();
+	ssc::messageManager()->sendDebug("START");
+	ssc::ProbeSectorPtr sector = mTool->getProbe()->getSector();
+	mMask = sector->getMask();
+	ssc::messageManager()->sendDebug("END");
 }
 
 void SimulatedImageStreamer::sliceSlot()
@@ -163,7 +162,7 @@ vtkImageDataPtr SimulatedImageStreamer::maskSlice(vtkImageDataPtr unmaskedSlice)
 
 ssc::ImagePtr SimulatedImageStreamer::convertToSscImage(vtkImageDataPtr slice, ssc::ImagePtr volume)
 {
-	ssc::ImagePtr retval = ssc::ImagePtr(new ssc::Image("TEST_UID", slice, "TEST_NAME"));
+	ssc::ImagePtr retval = ssc::ImagePtr(new ssc::Image("Simulated US", slice, "Simulated US"));
 	return retval;
 }
 
