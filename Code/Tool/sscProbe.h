@@ -67,6 +67,7 @@ public:
 
 signals:
 	void sectorChanged();
+	void activeConfigChanged();
 };
 
 typedef boost::shared_ptr<Probe> ProbePtr;
