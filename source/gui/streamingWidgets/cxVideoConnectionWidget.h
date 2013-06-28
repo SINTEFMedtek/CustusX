@@ -41,6 +41,7 @@ namespace cx
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
 typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoSourceStringDataAdapterPtr;
 
+class SimulateUSWidget;
 
 /**
  * \brief GUI for setting up a connection to a video stream
@@ -110,6 +111,7 @@ protected:
 	QStackedWidget* mStackedWidget;
 	ssc::StringDataAdapterXmlPtr mConnectionSelector;
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
+	SimulateUSWidget* mSimulationWidget;
 
 };
 

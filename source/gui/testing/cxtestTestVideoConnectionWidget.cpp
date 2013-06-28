@@ -10,6 +10,7 @@
 #include "cxtestSignalListener.h"
 #include "cxtestUtilities.h"
 #include "cxDataManager.h"
+#include "cxSimulateUSWidget.h"
 
 namespace cxtest
 {
@@ -45,10 +46,12 @@ void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename, QStri
 {
 	ssc::ImagePtr image = Utilities::create3DImage();
 	cx::DataManager::getInstance()->setActiveImage(image);
+	cx::DataManager::getInstance()->loadData(image);
 
 	QString connectionMethod("Direct Link");
 	mConnectionSelector->setValue(connectionMethod);
 	QString connectionArguments("--type "+streamerType+" --filename " + filename);
+	mSimulationWidget->setImageUidToSimulate(image->getUid());
 	mDirectLinkArguments->addItem(connectionArguments);
 	mDirectLinkArguments->setCurrentIndex(mDirectLinkArguments->findText(connectionArguments));
 }

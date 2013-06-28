@@ -81,6 +81,8 @@ QString DirectlyLinkedImageReceiverThread::hostDescription() const
 
 void DirectlyLinkedImageReceiverThread::setImageToStream(QString imageUid)
 {
+	mImageUidToSimulate = imageUid;
+	ssc::messageManager()->sendDebug("Setting image to stream to be "+imageUid);
 	emit imageToStream(imageUid);
 }
 
@@ -91,9 +93,9 @@ SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImag
 	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 	if(!tool)
 		ssc::messageManager()->sendDebug("No tool");
-	ssc::ImagePtr image = ssc::DataManager::getInstance()->getActiveImage();
+	ssc::ImagePtr image = ssc::DataManager::getInstance()->getImage(mImageUidToSimulate);
 	if(!image)
-		ssc::messageManager()->sendDebug("No image");
+		ssc::messageManager()->sendDebug("No image with uid "+mImageUidToSimulate);
 
 	streamer->initialize(image, tool);
 	connect(this, SIGNAL(imageToStream(QString)), streamer.get(), SLOT(setSourceToImageSlot(QString)));

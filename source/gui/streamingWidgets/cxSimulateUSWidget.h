@@ -27,6 +27,9 @@ public:
 
 	virtual QString defaultWhatsThis() const;
 
+	QString getImageUidToSimulate() const;
+	void setImageUidToSimulate(QString uid);
+
 signals:
 	void imageSelected();
 
