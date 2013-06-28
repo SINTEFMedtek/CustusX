@@ -13,9 +13,34 @@
 import sys
 import re
 import pprint
+import lxml
+
+class CatchCustomXmlNameListParser:
+    '''
+    Parser providing the test names and tags from 
+    the "catch --list-tests --reporter xml" call.
+    Format is specified by the custusX CatchImpl class,
+    i.e. an addon to the original catch.
+    '''
+    def read(self, text):
+        self.tests = []
+        root = lxml.etree.fromstring(text)
+        for test in root:
+            #print 'keys', test.keys()
+            #print test.get('name')
+            #print test.get('tags')
+            testinfo = {'text':test.get('name'), 'tags':test.get('tags')}
+            self.tests.append(testinfo)
+            #print lxml.etree.tostring(root, pretty_print=True, encoding=unicode)
+        self.numberOfTests = len(self.tests)
+
+    def getTestsForTag(self, tag):
+        return [val['text'] for val in self.tests if val['tags'].find(tag)>=0]
 
 class CatchConsoleNameListParser:
     '''
+    Parser providing the test names and tags from 
+    the original "catch --list-tests" call
     '''
     def __init__(self):
         self.lines = []

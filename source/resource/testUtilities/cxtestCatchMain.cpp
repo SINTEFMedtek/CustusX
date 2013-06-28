@@ -22,6 +22,6 @@
 
 int main (int argc, char* argv[])
 {
-	return cxtest::CatchImpl::runCatchMain(argc, argv);
+	return cxtest::CatchImpl().run(argc, argv);
 }
 
