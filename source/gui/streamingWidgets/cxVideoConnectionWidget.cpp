@@ -46,7 +46,7 @@ namespace cx
 {
 
 VideoConnectionWidget::VideoConnectionWidget(QWidget* parent) :
-		BaseWidget(parent, "IGTLinkWidget", "Video Connection")
+		BaseWidget(parent, "IGTLinkWidget", "Video Connection"), mSimulationWidget(NULL)
 {
 	connect(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
 	connect(this->getVideoConnectionManager().get(), SIGNAL(connectionMethodChanged()), this, SLOT(selectGuiForConnectionMethodSlot()));
@@ -198,9 +198,8 @@ QWidget* VideoConnectionWidget::createRemoteWidget()
 
 QWidget* VideoConnectionWidget::createSimulationWidget()
 {
-	SimulateUSWidget* simulationWidget = new SimulateUSWidget();
-//	connect(simulationWidget, SIGNAL(imageSelected()), this->getConnection()->get);
-	return simulationWidget;
+	mSimulationWidget = new SimulateUSWidget();
+	return mSimulationWidget;
 }
 
 QString VideoConnectionWidget::defaultWhatsThis() const

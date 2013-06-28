@@ -68,6 +68,7 @@ private:
 	std::map<QString, QString> mArguments;
 	StreamerPtr mImageStreamer;
 	DirectlyLinkedSenderPtr mSender;
+	QString mImageUidToSimulate;
 };
 
 /**

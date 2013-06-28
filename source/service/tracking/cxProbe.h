@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 
 /*
- * cxProbe.h
+ * \brief
  *
  *  \date Feb 3, 2011
  *  \author Christian Askeland, SINTEF
@@ -79,7 +79,6 @@ public:
 	bool isUsingDigitalVideo() const;
 	QString getRtSourceName() const;
 
-
 private:
 	Probe(QString instrumentUid, QString scannerUid);
 	void initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml);
@@ -109,7 +108,6 @@ private:
 
 	ProbeXmlConfigParserPtr mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
 	QString mConfigurationId; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
-
 };
 
 /**
