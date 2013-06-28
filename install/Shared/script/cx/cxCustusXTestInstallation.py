@@ -24,7 +24,6 @@ import cxInstallData
 import cxComponents
 import cxComponentAssembly
 import shlex
-#import cxCatchConsoleNameListParser
 import cxTestRunner
 import cxUtilities
 

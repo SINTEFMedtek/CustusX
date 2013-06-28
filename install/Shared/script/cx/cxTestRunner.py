@@ -56,9 +56,12 @@ class TestRunner:
     def _readCatchTestNames(self, path, tag):
         catchExe = '%s/Catch' % path
         shell.changeDir(path)
-        testListResult = shell.evaluate('%s --list-tests' % catchExe)
-        parser = cxCatchConsoleNameListParser.CatchConsoleNameListParser()
-        parser.readTestNamesFromStringList(testListResult.stdout.split('\n'))
+        testListResult = shell.evaluate('%s --list-tests --reporter xml' % catchExe)
+        parser = cxCatchConsoleNameListParser.CatchCustomXmlNameListParser()
+        parser.read(testListResult.stdout)
+        # old version - incomprehensive stuff.
+        #parser = cxCatchConsoleNameListParser.CatchConsoleNameListParser()
+        #parser.readTestNamesFromStringList(testListResult.stdout.split('\n'))
         #parser.printTests("Tests")
         tests = parser.getTestsForTag(tag)
         return tests
