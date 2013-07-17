@@ -163,13 +163,9 @@ void InteractiveCropper::showBoxWidget(bool on)
 	if (this->getShowBoxWidget() == on)
 		return;
 
-	if (!mImage->getCropping())
-	{
-		mBoxWidget->SetEnabled(false);
-		emit
-		changed();
-		return;
-	}
+	//Turn on cropping if not on to save user from pressing two boxes
+	if (!mImage->getCropping() && on)
+		this->useCropping(true);
 
 	mBoxWidget->SetEnabled(on);
 	emit changed();

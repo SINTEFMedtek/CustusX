@@ -306,7 +306,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	showManualTool->setChecked(settings()->value("showManualTool").toBool());
 	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
-	QAction* showOrientation = new QAction("Show Orientation (i)", &contextMenu);
+	QAction* showOrientation = new QAction("Show Orientation", &contextMenu);
 	showOrientation->setCheckable(true);
 	showOrientation->setChecked(mAnnotationMarker->getVisible());
 	connect(showOrientation, SIGNAL(triggered(bool)), this, SLOT(showOrientationSlot(bool)));
