@@ -42,7 +42,7 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
   activeLayout->addWidget(mUseCropperCheckBox);
 
   mShowBoxCheckBox = new QCheckBox("Show box");
-  mShowBoxCheckBox->setToolTip("Show crop box in 3D view.");
+  mShowBoxCheckBox->setToolTip("Show crop box in 3D view. This also turns on cropping for convenience.");
   connect(mShowBoxCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(showBoxWidget(bool)));
   activeLayout->addWidget(mShowBoxCheckBox);
 
