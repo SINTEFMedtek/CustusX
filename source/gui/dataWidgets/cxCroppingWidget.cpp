@@ -22,7 +22,7 @@ namespace cx
 
 
 CroppingWidget::CroppingWidget(QWidget* parent) : 
-  BaseWidget(parent, "CroppingWidget", "Crop")
+		BaseWidget(parent, "CroppingWidget", "Crop")
 {
   mInteractiveCropper = viewManager()->getCropper();
   connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(cropperChangedSlot()));

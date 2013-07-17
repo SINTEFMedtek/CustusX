@@ -48,19 +48,13 @@ QString ActiveVolumeWidget::defaultWhatsThis() const
 /// -------------------------------------------------------
 
 VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) :
-    BaseWidget(parent, "VolumePropertiesWidget", "Volume Properties")
+		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
-  QVBoxLayout* layout = new QVBoxLayout(this);
-
-  layout->addWidget(new ActiveVolumeWidget(this));
-
-  QTabWidget* tabWidget = new QTabWidget(this);
-  layout->addWidget(tabWidget);
-  tabWidget->addTab(new VolumeInfoWidget(this), "Info");
-  tabWidget->addTab(new TransferFunctionWidget(this), QString("Transfer Functions"));
-  tabWidget->addTab(new ShadingWidget(this), "Shading");
-  tabWidget->addTab(new CroppingWidget(this), "Crop");
-  tabWidget->addTab(new ClippingWidget(this), "Clip");
+  this->addTab(new VolumeInfoWidget(this), "Info");
+  this->addTab(new TransferFunctionWidget(this), QString("Transfer Functions"));
+  this->addTab(new ShadingWidget(this), "Shading");
+  this->addTab(new CroppingWidget(this), "Crop");
+  this->addTab(new ClippingWidget(this), "Clip");
 }
 
 QString VolumePropertiesWidget::defaultWhatsThis() const

@@ -19,12 +19,9 @@ namespace cx
 {
 
 ShadingWidget::ShadingWidget(QWidget* parent) :
-  QWidget(parent),
+		BaseWidget(parent, "ShadingWidget", "Shading"),
   mLayout(new QVBoxLayout(this))
 {
-  this->setObjectName("ShadingWidget");
-  this->setWindowTitle("Shading");
-
   this->init();
 }
 
@@ -79,6 +76,17 @@ void ShadingWidget::activeImageChangedSlot()
     //std::cout << "shading updated to " << activeImage->getShadingOn() << std::endl;
     mShadingCheckBox->setChecked(activeImage->getShadingOn());
   }
+}
+
+QString ShadingWidget::defaultWhatsThis() const
+{
+	return "<html>"
+		"<h3>Shading</h3>"
+		"<p>"
+		"Set volume shading properties."
+		"</p>"
+		"<p><i></i></p>"
+		"</html>";
 }
 
 }//namespace cx
