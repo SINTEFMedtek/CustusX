@@ -41,8 +41,8 @@ CroppingWidget::CroppingWidget(QWidget* parent) :
   connect(mUseCropperCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(useCropping(bool)));
   activeLayout->addWidget(mUseCropperCheckBox);
 
-  mShowBoxCheckBox = new QCheckBox("Show box (i)");
-  mShowBoxCheckBox->setToolTip("Show crop box in 3D view. Press 'i' in the view to do the same.");
+  mShowBoxCheckBox = new QCheckBox("Show box");
+  mShowBoxCheckBox->setToolTip("Show crop box in 3D view.");
   connect(mShowBoxCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(showBoxWidget(bool)));
   activeLayout->addWidget(mShowBoxCheckBox);
 
@@ -70,8 +70,17 @@ QString CroppingWidget::defaultWhatsThis() const
 		"<h3>Functionality for cropping a volume.</h3>"
 		"<p>"
 		"Lets you crop a volume by defining a bounding box along the volume "
-		"axis. Everything outside the box is not shown. To make the crop permanent, "
-		"press the button to create a new volume from the crop."
+		"axis. Everything outside the box is not shown."
+		"</p>"
+		"<p>"
+		"<b>How to use the bounding box:</b>"
+		"<ul>"
+		"<li>First click the bounding box to get the control spheres</li>"
+		"<li>Click and drag a sphere to change the crop area</li>"
+		"</ul>"
+		"</p>"
+		"<p>"
+		"<b>Tip:</b> To make the crop permanent, press the button to create a new volume from the crop."
 		"</p>"
 		"<p><i></i></p>"
 		"</html>";
