@@ -1,7 +1,7 @@
 #ifndef CXVOLUMEPROPERTIESWIDGET_H_
 #define CXVOLUMEPROPERTIESWIDGET_H_
 
-#include "cxBaseWidget.h"
+#include "cxTabbedWidget.h"
 #include "sscForwardDeclarations.h"
 #include "cxDataInterface.h"
 #include "cxActiveImageProxy.h"
@@ -33,7 +33,7 @@ public:
  * \date Aug 20, 2010
  * \author christiana
  */
-class VolumePropertiesWidget : public BaseWidget
+class VolumePropertiesWidget : public TabbedWidget
 {
   Q_OBJECT
 public:

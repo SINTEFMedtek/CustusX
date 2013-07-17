@@ -1,10 +1,10 @@
 #ifndef CXCROPPINGWIDGET_H_
 #define CXCROPPINGWIDGET_H_
 
-#include "cxBaseWidget.h"
 #include "sscForwardDeclarations.h"
 #include "sscStringDataAdapter.h"
 #include "cxViewManager.h"
+#include "cxBaseWidget.h"
 
 #include "cxBoundingBoxWidget.h"
 

@@ -14,6 +14,7 @@
 #include <sscImage.h>
 #include "sscTransferFunctions3DPresets.h"
 #include "cxActiveImageProxy.h"
+#include "cxBaseWidget.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -25,7 +26,7 @@ namespace cx
 /**
  * \ingroup cxGUI
  */
-class ShadingWidget : public QWidget
+class ShadingWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -36,6 +37,7 @@ public:
 public slots:
   void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
   void shadingToggledSlot(bool val);
+  virtual QString defaultWhatsThis() const;
 
 protected:
   void init();///< Initialize TransferFunctionWidget. Create members
