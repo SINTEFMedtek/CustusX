@@ -25,10 +25,12 @@ public:
   virtual ~TabbedWidget();
 
   void addTab(BaseWidget* newTab, QString newTabName);
+  void insertWidgetAtTop(BaseWidget* newWidget);
   virtual QString defaultWhatsThis() const;
 
 protected:
   QTabWidget* mTabWidget;
+  QVBoxLayout* mLayout;
 
 private:
   TabbedWidget();
