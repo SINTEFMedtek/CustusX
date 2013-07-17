@@ -31,9 +31,9 @@ TabbedWidget::TabbedWidget(QWidget* parent, QString objectName, QString windowTi
     mTabWidget(new QTabWidget(this))
 {
 	mTabWidget->setElideMode(Qt::ElideRight);
-  QVBoxLayout* layout = new QVBoxLayout(this);
-  layout->addWidget(mTabWidget);
-  layout->setMargin(2); // lots of tabbed widgets in layers use up the desktop. Must reduce.
+	mLayout = new QVBoxLayout(this);
+	mLayout->addWidget(mTabWidget);
+	mLayout->setMargin(2); // lots of tabbed widgets in layers use up the desktop. Must reduce.
 }
 
 TabbedWidget::~TabbedWidget()
@@ -45,6 +45,11 @@ void TabbedWidget::addTab(BaseWidget* newTab, QString newTabName)
   mTabWidget->setTabToolTip(index, newTab->defaultWhatsThis());
   mTabWidget->setTabWhatsThis(index, newTab->defaultWhatsThis());
   newTab->setWhatsThis(newTab->defaultWhatsThis());
+}
+
+void TabbedWidget::insertWidgetAtTop(BaseWidget* newWidget)
+{
+	mLayout->insertWidget(0, newWidget);
 }
 
 QString TabbedWidget::defaultWhatsThis() const
