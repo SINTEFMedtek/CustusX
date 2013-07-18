@@ -147,7 +147,7 @@ void MeshInfoWidget::addWidgets()
 	new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
 	new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);
 	gridLayout->addWidget(optionsWidget, gridLayoutRow++, 0, 1, 2);
-	gridLayout->addWidget(mTabelWidget, gridLayoutRow++, 0, 1, 2);
+	gridLayout->addWidget(mTableWidget, gridLayoutRow++, 0, 1, 2);
 	gridLayout->addWidget(importTransformButton, gridLayoutRow++, 0, 1, 2);
 
 	this->addStretch();
