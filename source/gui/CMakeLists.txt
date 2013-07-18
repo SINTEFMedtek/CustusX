@@ -37,6 +37,10 @@ SET(cxGui_MOC_HDRS
 	dataWidgets/cxDataSelectWidget.h
 	dataWidgets/cxInfoWidget.h
 	dataWidgets/cxTransferFunctionPresetWidget.h
+	dataWidgets/cxOverLayWidget.h
+	dataWidgets/cxColorWidget.h
+	dataWidgets/cxTransferFunction2DColorWidget.h
+	dataWidgets/cxTransferFunction2DOpacityWidget.h
     #----------------------
     infoWidgets/cxStatusBar.h
     infoWidgets/cxPointSamplingWidget.h
@@ -196,6 +200,14 @@ SET(cxGui_SRCS
 	dataWidgets/cxInfoWidget.cpp
 	dataWidgets/cxTransferFunctionPresetWidget.h
 	dataWidgets/cxTransferFunctionPresetWidget.cpp
+	dataWidgets/cxOverLayWidget.h
+	dataWidgets/cxOverLayWidget.cpp
+	dataWidgets/cxColorWidget.h
+	dataWidgets/cxColorWidget.cpp
+	dataWidgets/cxTransferFunction2DColorWidget.h
+	dataWidgets/cxTransferFunction2DColorWidget.cpp
+	dataWidgets/cxTransferFunction2DOpacityWidget.h
+	dataWidgets/cxTransferFunction2DOpacityWidget.cpp
 	#----------------------
     infoWidgets/cxFrameTreeWidget.cpp
     infoWidgets/cxFrameTreeWidget.cpp

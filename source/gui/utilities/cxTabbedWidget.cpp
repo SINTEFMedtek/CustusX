@@ -47,7 +47,7 @@ void TabbedWidget::addTab(BaseWidget* newTab, QString newTabName)
   newTab->setWhatsThis(newTab->defaultWhatsThis());
 }
 
-void TabbedWidget::insertWidgetAtTop(BaseWidget* newWidget)
+void TabbedWidget::insertWidgetAtTop(QWidget* newWidget)
 {
 	mLayout->insertWidget(0, newWidget);
 }
