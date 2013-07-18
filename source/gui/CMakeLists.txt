@@ -37,7 +37,7 @@ SET(cxGui_MOC_HDRS
 	dataWidgets/cxDataSelectWidget.h
 	dataWidgets/cxInfoWidget.h
 	dataWidgets/cxTransferFunctionPresetWidget.h
-	dataWidgets/cxOverLayWidget.h
+	dataWidgets/cxOverlayWidget.h
 	dataWidgets/cxColorWidget.h
 	dataWidgets/cxTransferFunction2DColorWidget.h
 	dataWidgets/cxTransferFunction2DOpacityWidget.h
@@ -200,8 +200,8 @@ SET(cxGui_SRCS
 	dataWidgets/cxInfoWidget.cpp
 	dataWidgets/cxTransferFunctionPresetWidget.h
 	dataWidgets/cxTransferFunctionPresetWidget.cpp
-	dataWidgets/cxOverLayWidget.h
-	dataWidgets/cxOverLayWidget.cpp
+	dataWidgets/cxOverlayWidget.h
+	dataWidgets/cxOverlayWidget.cpp
 	dataWidgets/cxColorWidget.h
 	dataWidgets/cxColorWidget.cpp
 	dataWidgets/cxTransferFunction2DColorWidget.h
