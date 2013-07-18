@@ -54,7 +54,7 @@ class DoubleDataAdapterImageTFDataWindow : public DoubleDataAdapterImageTFDataBa
 {
 public:
   virtual ~DoubleDataAdapterImageTFDataWindow() {}
-  virtual QString getValueName() const { return "Window"; }
+  virtual QString getValueName() const { return "Window width"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
   virtual ssc::DoubleRange getValueRange() const;
@@ -67,7 +67,7 @@ class DoubleDataAdapterImageTFDataLevel : public DoubleDataAdapterImageTFDataBas
   Q_OBJECT
 public:
   virtual ~DoubleDataAdapterImageTFDataLevel() {}
-  virtual QString getValueName() const { return "Level"; }
+  virtual QString getValueName() const { return "Window level"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
   virtual ssc::DoubleRange getValueRange() const;
