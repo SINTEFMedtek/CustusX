@@ -34,7 +34,7 @@ protected:
 	void populateTableWidget(std::map<std::string, std::string>& info);
 
 	QGridLayout* gridLayout;
-	QTableWidget* mTabelWidget;
+	QTableWidget* mTableWidget;
 
 private:
 	QVBoxLayout* toptopLayout;

@@ -15,8 +15,8 @@ InfoWidget::InfoWidget(QWidget* parent, QString objectName, QString windowTitle)
 	gridLayout = new QGridLayout;
 	toptopLayout->addLayout(gridLayout);
 
-	mTabelWidget = new QTableWidget(this);
-	mTabelWidget->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+	mTableWidget = new QTableWidget(this);
+	mTableWidget->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 }
 
 QString InfoWidget::defaultWhatsThis() const
@@ -35,16 +35,16 @@ void InfoWidget::addStretch()
 
 void InfoWidget::populateTableWidget(std::map<std::string, std::string>& info)
 {
-	mTabelWidget->setRowCount(info.size());
-	mTabelWidget->setColumnCount(2);
+	mTableWidget->setRowCount(info.size());
+	mTableWidget->setColumnCount(2);
 	QStringList horizontalHeaders;
 	horizontalHeaders << "Description";
 	horizontalHeaders << "Value";
-	mTabelWidget->setHorizontalHeaderLabels(horizontalHeaders);
-	mTabelWidget->horizontalHeaderItem(0)->setTextAlignment(Qt::AlignLeft);
-	mTabelWidget->horizontalHeaderItem(1)->setTextAlignment(Qt::AlignLeft);
-	mTabelWidget->setColumnWidth(0, 200);
-	mTabelWidget->setColumnWidth(1, 600);
+	mTableWidget->setHorizontalHeaderLabels(horizontalHeaders);
+	mTableWidget->horizontalHeaderItem(0)->setTextAlignment(Qt::AlignLeft);
+	mTableWidget->horizontalHeaderItem(1)->setTextAlignment(Qt::AlignLeft);
+	mTableWidget->setColumnWidth(0, 200);
+	mTableWidget->setColumnWidth(1, 600);
 
 	QFont boldFont;
 	boldFont.setBold(true);
@@ -56,11 +56,11 @@ void InfoWidget::populateTableWidget(std::map<std::string, std::string>& info)
 		QTableWidgetItem *descriptionItem = new QTableWidgetItem(qstring_cast(it->first));
 		descriptionItem->setFont(boldFont);
 		descriptionItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-		mTabelWidget->setItem(row, 0, descriptionItem);
+		mTableWidget->setItem(row, 0, descriptionItem);
 
 		QTableWidgetItem *valueItem = new QTableWidgetItem(qstring_cast(it->second));
 		valueItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-		mTabelWidget->setItem(row, 1, valueItem);
+		mTableWidget->setItem(row, 1, valueItem);
 
 		row++;
 	}

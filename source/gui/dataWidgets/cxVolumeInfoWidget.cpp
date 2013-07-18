@@ -40,8 +40,7 @@ void VolumeInfoWidget::addWidgets()
 	new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter, gridLayout, i++);
 	new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, i++);
 
-	gridLayout->addWidget(mTabelWidget, i++, 0, 1, 2);
-	this->addStretch();
+	gridLayout->addWidget(mTableWidget, i++, 0, 1, 2);
 }
 
 QString VolumeInfoWidget::defaultWhatsThis() const
