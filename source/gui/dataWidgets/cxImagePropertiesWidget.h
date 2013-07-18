@@ -1,12 +1,9 @@
 #ifndef CXIMAGEPROPERTIESWIDGET_H_
 #define CXIMAGEPROPERTIESWIDGET_H_
 
-#include "cxBaseWidget.h"
-
 #include <vector>
 #include <QtGui>
-#include "sscDoubleWidgets.h"
-#include "cxTransferFunctionWidget.h"
+#include "cxTabbedWidget.h"
 
 namespace cx
 {
@@ -16,51 +13,14 @@ namespace cx
  * @{
  */
 
-class TransferFunction2DColorWidget : public BaseWidget
-{
-  Q_OBJECT
-
-public:
-  TransferFunction2DColorWidget(QWidget* parent);
-  virtual ~TransferFunction2DColorWidget() {}
-  virtual QString defaultWhatsThis() const;
-
-public slots:
-  void activeImageChangedSlot();
-
-protected:
-  TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
-  TransferFunctionColorWidget* mTransferFunctionColorWidget;
-  DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataLevel;
-  ActiveImageProxyPtr mActiveImageProxy;
-};
-
-class TransferFunction2DOpacityWidget : public BaseWidget
-{
-  Q_OBJECT
-
-public:
-  TransferFunction2DOpacityWidget(QWidget* parent);
-  virtual ~TransferFunction2DOpacityWidget() {}
-  virtual QString defaultWhatsThis() const;
-
-public slots:
-  void activeImageChangedSlot();
-
-protected:
-  TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
-  DoubleDataAdapterImageTFDataBasePtr mDataAlpha, mDataLLR;
-  ActiveImageProxyPtr mActiveImageProxy;
-};
-
-
 /**
  * \class ImagePropertiesWidget
  *
  * \date 2010.04.12
- * \\author Christian Askeland, SINTEF
+ * \author Christian Askeland, SINTEF
+ * \author Ole Vegard Solberg, SINTEF
  */
-class ImagePropertiesWidget : public BaseWidget
+class ImagePropertiesWidget : public TabbedWidget
 {
   Q_OBJECT
 

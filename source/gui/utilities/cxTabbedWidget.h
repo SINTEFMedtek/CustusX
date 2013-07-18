@@ -25,7 +25,7 @@ public:
   virtual ~TabbedWidget();
 
   void addTab(BaseWidget* newTab, QString newTabName);
-  void insertWidgetAtTop(BaseWidget* newWidget);
+  void insertWidgetAtTop(QWidget* newWidget);
   virtual QString defaultWhatsThis() const;
 
 protected:
