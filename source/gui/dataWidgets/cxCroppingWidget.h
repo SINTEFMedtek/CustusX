@@ -20,16 +20,12 @@ namespace cx
  * @{
  */
 
-
-
-
 /**
  * \class CroppingWidget
  *
  * \date  Aug 20, 2010
  * \author Christian Askeland, SINTEF
  */
-
 class CroppingWidget : public BaseWidget
 {
   Q_OBJECT

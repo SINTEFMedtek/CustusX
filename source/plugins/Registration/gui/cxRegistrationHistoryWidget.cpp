@@ -20,7 +20,6 @@ template<class T>
 QAction* RegistrationHistoryWidget::createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot)
 {
   QAction* action = new QAction(QIcon(iconName), text, this);
-  action->setStatusTip(tip);
   action->setToolTip(tip);
   connect(action, SIGNAL(triggered()), this, slot);
   QToolButton* button = new QToolButton();
@@ -31,37 +30,17 @@ QAction* RegistrationHistoryWidget::createAction(QLayout* layout, QString iconNa
 }
 
 RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
-    QWidget(parent)
+		BaseWidget(parent, "RegistrationHistoryWidget", "Registration History")
 {
-  //dock widget
-  this->setObjectName("RegistrationHistoryWidget");
-  this->setWindowTitle("Registration History");
-  QString whatsThis = "<html>"
-      "<h3>Registration history.</h3>"
-      "<p>"
-      "Use the registration history to rewind the system to previous time. When history is rewinded, "
-      "all registrations performed after the active time is ignored by the system."
-      "</p>"
-      "<p>"
-      "<b><h4>Note!</h4> While a previous time is active, <em>no new registrations or adding of data</em> should be performed. "
-      "This will lead to undefined behaviour!</b>"
-      "</p>"
-      "</html>";
-  this->setWhatsThis(whatsThis);
-  this->setStatusTip(whatsThis);
+  this->setWhatsThis(this->defaultWhatsThis());
+  this->setToolTip(this->defaultWhatsThis());
 
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-//  toptopLayout->setMargin(0);
   mGroup = new QFrame;
-  //mGroup->setFlat(true);
-//  mGroup->setTitle("Registration Time Control");
   QHBoxLayout* topLayout = new QHBoxLayout;
   toptopLayout->addWidget(mGroup);
   mGroup->setLayout(topLayout);
-//  topLayout->setMargin(20);
-//  toptopLayout->setMargin(0);
-//  toptopLayout->addLayout(topLayout);
   mTextEdit = new QTextEdit;
   mTextEdit->setVisible(true);
   mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
@@ -101,19 +80,27 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
       "Step to latest registration",
       SLOT(fastForwardSlot()));
 
- /* mDetailsAction = createAction(topLayout,
-      ":/icons/open_icon_library/png/64x64/actions/system-run-5.png",
-      "Details",
-      "Show registration history",
-      SLOT(showDetailsSlot()));*/
-  //Removed the details button, as we always want the history visible
-
   topLayout->addStretch();
 }
 
 
 RegistrationHistoryWidget::~RegistrationHistoryWidget()
 {
+}
+
+QString RegistrationHistoryWidget::defaultWhatsThis() const
+{
+  return "<html>"
+	      "<h3>Registration history.</h3>"
+	      "<p>"
+	      "Use the registration history to rewind the system to previous time. When history is rewinded, "
+	      "all registrations performed after the active time is ignored by the system."
+	      "</p>"
+	      "<p>"
+	      "<b>NB:</b> While a previous time is active, <em>no new registrations or adding of data</em> should be performed. "
+	      "This will lead to undefined behaviour!</b>"
+	      "</p>"
+	      "</html>";
 }
 
 void RegistrationHistoryWidget::showEvent(QShowEvent* event)
@@ -441,6 +428,5 @@ void RegistrationHistoryWidget::updateSlot()
 
 
 }
-
 
 }//end namespace cx

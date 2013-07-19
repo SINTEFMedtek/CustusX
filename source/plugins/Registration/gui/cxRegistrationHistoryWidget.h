@@ -4,6 +4,7 @@
 #include <vector>
 #include <QtGui>
 #include "sscRegistrationTransform.h"
+#include "cxBaseWidget.h"
 
 
 namespace cx
@@ -23,13 +24,14 @@ namespace cx
  * \date 2010.03.17
  * \\author Christian Askeland, SINTEF
  */
-class RegistrationHistoryWidget : public QWidget
+class RegistrationHistoryWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   RegistrationHistoryWidget(QWidget* parent);
   virtual ~RegistrationHistoryWidget();
+  virtual QString defaultWhatsThis() const;
 
 signals:
 
