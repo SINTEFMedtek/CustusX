@@ -20,7 +20,6 @@
 namespace cx
 {
 
-
 CroppingWidget::CroppingWidget(QWidget* parent) : 
 		BaseWidget(parent, "CroppingWidget", "Crop")
 {
