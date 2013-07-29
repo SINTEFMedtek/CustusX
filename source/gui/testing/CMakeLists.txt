@@ -26,6 +26,7 @@ if (BUILD_TESTING)
 		cxTestCustusXController.cpp
 		cxtestSpeed.cpp
 		cxtestCatchStreamingWidgets.cpp
+		cxtestCatchBaseWidgets.cpp
 	    cxtestTestVideoConnectionWidget.cpp)
 
 	cx_catch_add_lib_and_exe(cxGui "${CXTEST_GUI_SOURCES}")

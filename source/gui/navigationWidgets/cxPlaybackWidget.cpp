@@ -114,7 +114,19 @@ PlaybackWidget::~PlaybackWidget()
 
 QString PlaybackWidget::defaultWhatsThis() const
 {
-	return "";
+	return "<html>"
+			"<h3>Playback</h3>"
+			"<p>"
+			"Play back the whole operation."
+			"Play back contain all tool positions and recorded video "
+			"(video is only recorded during 3D acquisition)."
+			"<p>"
+			"Green indicates visible tools.<br>"
+			"Orange indicates recorded video."
+			"</p>"
+			"<b>Tip: </b> Press the red putton to start playback"
+			"</p>"
+			"</html>";
 }
 
 void PlaybackWidget::toggleDetailsSlot()

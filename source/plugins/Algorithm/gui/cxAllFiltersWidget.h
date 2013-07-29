@@ -2,8 +2,6 @@
 #define CXALLFILTERSWIDGET_H_
 
 #include "cxBaseWidget.h"
-
-#include "cxBaseWidget.h"
 #include "cxFilter.h"
 #include "cxFilterTimedAlgorithm.h"
 #include "cxFilterWidget.h"
