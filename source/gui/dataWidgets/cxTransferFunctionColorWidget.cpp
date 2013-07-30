@@ -108,8 +108,9 @@ void TransferFunctionColorWidget::calculateColorTFBoundaries(int &areaLeft, int 
   double min = mImageTF->getLevel() - ( mImageTF->getWindow() / 2.0 ) - mImage->getMin();
   double max = mImageTF->getLevel() + ( mImageTF->getWindow() / 2.0 ) - mImage->getMin();
 
-  areaLeft  = mPlotArea.left()  + (min * mPlotArea.width() / mImage->getRange());
-  areaRight = mPlotArea.left()  + (max * mPlotArea.width() / mImage->getRange());
+  int plotWidth = mPlotArea.right() - mPlotArea.left();
+  areaLeft  = mPlotArea.left()  + (min * plotWidth / mImage->getRange());
+  areaRight = mPlotArea.left()  + (max * plotWidth / mImage->getRange());
   if(mImage->getRange() == 0) // Fix division by zero problem
   {
     areaLeft = mPlotArea.left();
@@ -156,7 +157,10 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
   int areaLeft, areaRight, areaWidth;
   this->calculateColorTFBoundaries(areaLeft, areaRight, areaWidth);
 
-  for (int x = areaLeft; x <= areaRight; ++x)
+  //Don't try to draw outside the allocated area
+  int mixx = std::max(areaLeft, this->mPlotArea.left());
+  int maxx = std::min(areaRight, this->mPlotArea.right());
+  for (int x = mixx; x <= maxx; ++x)
   {
     int point = calculateXPositionInTrFunc(x);
 

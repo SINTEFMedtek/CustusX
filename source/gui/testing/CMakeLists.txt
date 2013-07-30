@@ -21,13 +21,19 @@ if (BUILD_TESTING)
 
 	QT4_WRAP_CPP(CXTEST_GUI_SOURCES
 		cxTestCustusXController.h
-		cxtestTestVideoConnectionWidget.h)
+		cxtestTestVideoConnectionWidget.h
+		cxtestTestTransferFunctionColorWidget.h
+		)
 	set(CXTEST_GUI_SOURCES ${CXTEST_GUI_SOURCES}
 		cxTestCustusXController.cpp
 		cxtestSpeed.cpp
 		cxtestCatchStreamingWidgets.cpp
 		cxtestCatchBaseWidgets.cpp
-	    cxtestTestVideoConnectionWidget.cpp)
+	    cxtestTestVideoConnectionWidget.cpp
+		cxtestTestTransferFunctionColorWidget.h
+		cxtestTestTransferFunctionColorWidget.cpp
+		cxtestTransferFunctionWidgets.cpp
+	    )
 
 	cx_catch_add_lib_and_exe(cxGui "${CXTEST_GUI_SOURCES}")
 
