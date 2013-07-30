@@ -40,7 +40,7 @@ namespace ssc
 
 ApplyLUTToImage2DProxy::ApplyLUTToImage2DProxy()
 {
-	mDummyImage = createDummyImageData();
+	mDummyImage = Image::createDummyImageData(1, 0);
 
 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 	mRedirecter->SetInput(mDummyImage);
@@ -101,23 +101,6 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageDataPtr image, vtkLookupTablePtr l
 vtkImageDataPtr ApplyLUTToImage2DProxy::getOutput()
 {
 	return mRedirecter->GetOutput();
-}
-
-/** Test: create small dummy data set with one voxel
- *
- */
-vtkImageDataPtr ApplyLUTToImage2DProxy::createDummyImageData()
-{
-	vtkImageDataPtr dummyImageData = vtkImageDataPtr::New();
-	dummyImageData->SetExtent(0, 0, 0, 0, 0, 0);
-	dummyImageData->SetSpacing(1, 1, 1);
-	//dummyImageData->SetScalarTypeToUnsignedShort();
-	dummyImageData->SetScalarTypeToUnsignedChar();
-	dummyImageData->SetNumberOfScalarComponents(1);
-	dummyImageData->AllocateScalars();
-	unsigned char* dataPtr = static_cast<unsigned char*> (dummyImageData->GetScalarPointer());
-	*dataPtr = 0; // Set voxel to black
-	return dummyImageData;
 }
 
 ///--------------------------------------------------------

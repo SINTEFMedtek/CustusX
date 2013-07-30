@@ -754,4 +754,32 @@ void Image::setImageType(const QString& val)
 	emit propertiesChanged();
 }
 
+vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
+{
+	int size = axisSize - 1;//Modify axis size as extent starts with 0, not 1
+	vtkImageDataPtr dummyImageData = vtkImageDataPtr::New();
+	dummyImageData->SetExtent(0, size, 0, size, 0, size);
+	dummyImageData->SetSpacing(1, 1, 1);
+	//dummyImageData->SetScalarTypeToUnsignedShort();
+	dummyImageData->SetScalarTypeToUnsignedChar();
+	dummyImageData->SetNumberOfScalarComponents(1);
+	dummyImageData->AllocateScalars();
+	unsigned char* dataPtr = static_cast<unsigned char*> (dummyImageData->GetScalarPointer());
+
+	//Init voxel colors
+	int minVoxelValue = 0;
+	int numVoxels = size*size*size;
+	for (int i = 0; i < numVoxels; ++i)
+	{
+		int voxelValue = minVoxelValue + i;
+		if (i == numVoxels)
+			dataPtr[i] = maxVoxelValue;
+		else if (voxelValue < maxVoxelValue)
+			dataPtr[i] = voxelValue;
+		else
+			dataPtr[i] = maxVoxelValue;
+	}
+	return dummyImageData;
+}
+
 } // namespace ssc

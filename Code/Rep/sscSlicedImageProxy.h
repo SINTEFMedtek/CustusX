@@ -58,8 +58,6 @@ public:
 	vtkImageDataPtr getOutput();
 
 private:
-	vtkImageDataPtr createDummyImageData();
-
 	vtkImageDataPtr mDummyImage; ///< need this to fool the vtk pipeline when no image is set
 	vtkImageAlgorithmPtr mRedirecter;
 };
