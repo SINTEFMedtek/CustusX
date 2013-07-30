@@ -138,6 +138,8 @@ public:
 
 	void moveThisAndChildrenToThread(QThread* thread); ///< Move this and all children to thread. Use the thread is generated in a worker thread and the result is to be used in the main thread.
 
+	static vtkImageDataPtr createDummyImageData(int axisSize, int maxVoxelValue); ///< Create a moc object of vtkImageData
+
 signals:
 	void landmarkRemoved(QString uid);
 	void landmarkAdded(QString uid);
