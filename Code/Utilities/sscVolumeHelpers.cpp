@@ -150,7 +150,8 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
 	ssc::ImageLUT2DPtr LUT2D = retval->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
 	TF3D->shift(shift);
 	LUT2D->shift(shift);
-	retval->resetTransferFunction(TF3D, LUT2D);
+	retval->setLookupTable2D(LUT2D);
+	retval->setTransferFunctions3D(TF3D);
 
 	return retval;
 }

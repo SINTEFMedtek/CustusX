@@ -273,15 +273,19 @@ vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
 
 ImageTF3DPtr Image::getTransferFunctions3D()
 {
-	if(!mImageTransferFunctions3D)
+	if(!this->mImageTransferFunctions3D)
 		this->resetTransferFunctions(false, true);
 	return mImageTransferFunctions3D;
 }
 
 void Image::setTransferFunctions3D(ImageTF3DPtr transferFuntion)
 {
-	mImageTransferFunctions3D = transferFuntion;
-	emit transferFunctionsChanged();
+	if(!this->isValidTransferFunction(transferFuntion))
+	{
+		messageManager()->sendWarning("Not a valid 3D transfer function for ssc::Image");
+		return;
+	}
+	this->resetTransferFunction(transferFuntion);
 }
 
 ImageLUT2DPtr Image::getLookupTable2D()
@@ -291,6 +295,16 @@ ImageLUT2DPtr Image::getLookupTable2D()
 	return mImageLookupTable2D;
 }
 
+void Image::setLookupTable2D(ImageLUT2DPtr imageLookupTable2D)
+{
+	if(!this->isValidTransferFunction(imageLookupTable2D))
+	{
+		messageManager()->sendWarning("Not a valid 2D transfer function / lookup table for ssc::Image");
+		return;
+	}
+	this->resetTransferFunction(imageLookupTable2D);
+}
+
 vtkImageDataPtr Image::getBaseVtkImageData()
 {
 	return mBaseImageData;
@@ -298,7 +312,7 @@ vtkImageDataPtr Image::getBaseVtkImageData()
 
 vtkImageDataPtr Image::getRefVtkImageData()
 {
-	if (!mReferenceImageData) // optimized: dont init it if you dont need it.
+	if (!mReferenceImageData) // optimized: don't init it if you don't need it.
 	{
 		// provide a resampled volume for algorithms requiring that (such as PickerRep)
 		mOrientatorMatrix = vtkMatrix4x4Ptr::New();
@@ -754,6 +768,26 @@ void Image::setImageType(const QString& val)
 	emit propertiesChanged();
 }
 
+bool Image::isValidTransferFunction(ImageTFDataPtr transferFunction)
+{
+	int scalarMin = this->getMin();
+	int scalarMax = this->getMax();
+	double windowWidth = transferFunction->getWindow();
+	double windowLevel = transferFunction->getLevel();
+
+	if(windowWidth > (scalarMax-scalarMin))
+		return false;
+	if(windowWidth < 1)
+		return false;
+
+	if(windowLevel > scalarMax)
+		return false;
+	if(windowLevel < scalarMin)
+		return false;
+
+	return true;
+}
+
 vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 {
 	int size = axisSize - 1;//Modify axis size as extent starts with 0, not 1
@@ -768,7 +802,7 @@ vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 
 	//Init voxel colors
 	int minVoxelValue = 0;
-	int numVoxels = size*size*size;
+	int numVoxels = axisSize*axisSize*axisSize;
 	for (int i = 0; i < numVoxels; ++i)
 	{
 		int voxelValue = minVoxelValue + i;

@@ -92,6 +92,7 @@ public:
 	virtual ImageTF3DPtr getTransferFunctions3D();
 	virtual void setTransferFunctions3D(ImageTF3DPtr transferFuntion);
 	virtual ImageLUT2DPtr getLookupTable2D();
+	virtual void setLookupTable2D(ImageLUT2DPtr imageLookupTable2D);
 
 	virtual DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
 	virtual vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
@@ -132,12 +133,10 @@ public:
 	void mergevtkSettingsIntosscTransform();
 
 	void resetTransferFunctions(bool _2D=true, bool _3D=true); ///< Resets the transfer functions and creates new defaut values.
-	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);
-	void resetTransferFunction(ImageLUT2DPtr imageLookupTable2D);
-	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D);
 
 	void moveThisAndChildrenToThread(QThread* thread); ///< Move this and all children to thread. Use the thread is generated in a worker thread and the result is to be used in the main thread.
 
+	bool isValidTransferFunction(ImageTFDataPtr transferFunction); ///< Check if transfer function is valid for this image
 	static vtkImageDataPtr createDummyImageData(int axisSize, int maxVoxelValue); ///< Create a moc object of vtkImageData
 
 signals:
@@ -176,6 +175,10 @@ protected:
 	double mMaxRGBIntensity;
 
 private:
+	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);
+	void resetTransferFunction(ImageLUT2DPtr imageLookupTable2D);
+	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D);
+
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
 };

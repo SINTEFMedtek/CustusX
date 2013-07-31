@@ -94,7 +94,8 @@ void UnsignedDerivedImage::unsignedTransferFunctionsChangedSlot()
 	ssc::ImageLUT2DPtr LUT2D = base->getLookupTable2D()->createCopy(base->getBaseVtkImageData());
 	TF3D->shift(shift);
 	LUT2D->shift(shift);
-	this->resetTransferFunction(TF3D, LUT2D);
+	this->setLookupTable2D(LUT2D);
+	this->setTransferFunctions3D(TF3D);
 }
 
 void UnsignedDerivedImage::unsignedImageChangedSlot()
