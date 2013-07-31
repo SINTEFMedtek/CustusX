@@ -296,7 +296,7 @@ void ImageTFData::fixTransferFunctions()
 		//The optimal solution may be to interpolate/extrapolate the max (min) values from the existing values
 		//However, as most presets usually have all the top values set to white the error of the simpler code below is usually small
 		ssc::IntIntMap::iterator opPoint = opacityMap->end();
-		opPoint--;
+		--opPoint;
 		this->addAlphaPoint(this->getScalarMax(), opPoint->second);// Use value of current max element
 	}
 	if (colorMap->find(this->getScalarMin()) == colorMap->end())
