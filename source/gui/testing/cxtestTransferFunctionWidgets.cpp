@@ -18,6 +18,8 @@ TEST_CASE("Correct ColorTFBoundaries calculated for default transfer function", 
 }
 
 
+//The following tests only test the transfer functions of a sscImage, and should probably be moved
+
 TEST_CASE("Valid default 3D transfer function", "[unit]")
 {
 	TestTransferFunctions* testObject = new TestTransferFunctions();

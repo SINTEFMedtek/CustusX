@@ -188,7 +188,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   this->mPointRects.clear();
   for (ssc::IntIntMap::iterator opPoint = opacityMap->begin();
        opPoint != opacityMap->end();
-       opPoint++)
+       ++opPoint)
   {
     // Get the screen (plot) position of this point
     QPoint screenPoint = QPoint(
@@ -306,8 +306,8 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(int mouseX, int mouseY)
     ssc::OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
     ssc::IntIntMap::iterator prevpoint = opacityMap->find(mCurrentAlphaPoint.position);
     ssc::IntIntMap::iterator nextpoint = opacityMap->find(mCurrentAlphaPoint.position);
-    prevpoint--;
-    nextpoint++;
+    --prevpoint;
+    ++nextpoint;
 
     if (newAlphaPoint.position <= prevpoint->first)
       newAlphaPoint.position = prevpoint->first + 1;

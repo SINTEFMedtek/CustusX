@@ -39,7 +39,9 @@
 #include "sscStringDataAdapterXml.h"
 #include "cxProbe.h"
 
-TestAcqController::TestAcqController(QObject* parent) : QObject(parent)
+TestAcqController::TestAcqController(QObject* parent) :
+	QObject(parent),
+	mRecordDuration(3000)
 {
 	mNumberOfExpectedStreams = 1;
 }

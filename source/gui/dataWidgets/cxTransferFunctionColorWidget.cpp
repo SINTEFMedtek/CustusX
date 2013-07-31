@@ -198,7 +198,7 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
   this->mPointRects.clear();
   for (ssc::ColorMap::iterator colorPoint = colorMapPtr->begin();
        colorPoint != colorMapPtr->end();
-       colorPoint++)
+       ++colorPoint)
   {
     // Get the screen (plot) position of this point
     QPoint screenPoint = QPoint(
@@ -292,8 +292,8 @@ void TransferFunctionColorWidget::moveCurrentPoint()
     && mCurrentPoint.position != mImage->getMax() )
   {
     ssc::ColorMap::iterator nextPointIterator = prevPointIterator;
-    prevPointIterator--;
-    nextPointIterator++;
+    --prevPointIterator;
+    ++nextPointIterator;
 
     if (newColorPoint.position <= prevPointIterator->first)
       newColorPoint.position = prevPointIterator->first + 1;
