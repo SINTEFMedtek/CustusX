@@ -90,10 +90,10 @@ void ViewContainerBase::clear()
 	QLayoutItem *item;
 	while ((item = getGridLayout()->takeAt(0)) != 0)
 	{
-		((ViewItem *) item)->removeReps();
+		dynamic_cast<ViewItem*>(item)->removeReps();
 		
-		mRenderWindow->RemoveRenderer(((ViewItem *) item)->getRenderer());
-		delete (ViewItem *)item;
+		mRenderWindow->RemoveRenderer(dynamic_cast<ViewItem*>(item)->getRenderer());
+		delete dynamic_cast<ViewItem*>(item);
 	}
 	clearBackground();
 	mMouseEventTarget = NULL;
@@ -132,7 +132,7 @@ void ViewContainerBase::forcedUpdate()
 	{
 		for (int i = 0; i < getGridLayout()->count(); ++i)
 		{
-			((ViewItem*) getGridLayout()->itemAt(i))->forceUpdate();
+			dynamic_cast<ViewItem*>(getGridLayout()->itemAt(i))->forceUpdate();
 		}
 	}
 	mMTimeHash = 0;
@@ -228,7 +228,7 @@ void ViewContainerBase::handleMousePress(const QPoint &pos, const Qt::MouseButto
 {
 	for (int i = 0; getGridLayout() && i < getGridLayout()->count(); ++i)
 	{
-		ViewItem *item = (ViewItem *)getGridLayout()->itemAt(i);
+		ViewItem *item = dynamic_cast<ViewItem*>(getGridLayout()->itemAt(i));
 		QRect r = item->geometry();
 		if (r.contains(pos))
 		{
@@ -265,7 +265,7 @@ void ViewContainerWidget::wheelEvent(QWheelEvent* event)
 	widget::wheelEvent(event);
 	for (int i = 0; layout() && i < layout()->count(); ++i)
 	{
-		ViewItem *item = (ViewItem *)layout()->itemAt(i);
+		ViewItem *item = dynamic_cast<ViewItem*>(layout()->itemAt(i));
 		QRect r = item->geometry();
 		QPoint p = event->pos();
 		if (r.contains(p))
@@ -286,7 +286,7 @@ void ViewContainerBase::renderAll()
 	unsigned long hash = 0;
 	for (int i = 0; getGridLayout() && i < getGridLayout()->count(); ++i)
 	{
-		ViewItem *item = (ViewItem *)getGridLayout()->itemAt(i);
+		ViewItem *item = dynamic_cast<ViewItem*>(getGridLayout()->itemAt(i));
 
 		hash += item->getRenderer()->GetMTime();
 		hash += this->getRenderWindow()->GetMTime();
