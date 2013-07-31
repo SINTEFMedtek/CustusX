@@ -122,7 +122,8 @@ ssc::ImagePtr SimulatedImageStreamer::getSlice(ssc::ImagePtr source)
 	vtkImageDataPtr framegrabbedSlice = this->getSliceUsingProbeDefinition(source, sliceAxes);
 	vtkImageDataPtr maskedFramedgrabbedSlice = this->maskSlice(framegrabbedSlice);
 	ssc::ImagePtr slice = this->convertToSscImage(maskedFramedgrabbedSlice, source);
-	slice->resetTransferFunction(source->getTransferFunctions3D(), source->getLookupTable2D());
+	slice->setLookupTable2D(source->getLookupTable2D());
+	slice->setTransferFunctions3D(source->getTransferFunctions3D());
 
 	return slice;
 }
