@@ -319,8 +319,8 @@ void EraserWidget::removeSlot()
 	image->setVtkImageData(img);
 
 	// keep existing transfer functions
-	image->resetTransferFunction(tf2D);
-	image->resetTransferFunction(tf3D);
+	image->setLookupTable2D(tf2D);
+	image->setTransferFunctions3D(tf3D);
 }
 
 void EraserWidget::toggleShowEraser(bool on)

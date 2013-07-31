@@ -33,6 +33,8 @@ if (BUILD_TESTING)
 		cxtestTestTransferFunctionColorWidget.h
 		cxtestTestTransferFunctionColorWidget.cpp
 		cxtestTransferFunctionWidgets.cpp
+		cxtestTestTransferFunctions.h
+		cxtestTestTransferFunctions.cpp
 	    )
 
 	cx_catch_add_lib_and_exe(cxGui "${CXTEST_GUI_SOURCES}")

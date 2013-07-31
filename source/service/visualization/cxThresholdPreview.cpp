@@ -64,7 +64,8 @@ void ThresholdPreview::revertTransferFunctions()
     if (!mModifiedImage)
         return;
 
-    mModifiedImage->resetTransferFunction(mTF3D_original, mTF2D_original);
+    mModifiedImage->setLookupTable2D(mTF2D_original);
+    mModifiedImage->setTransferFunctions3D(mTF3D_original);
     mModifiedImage->setShadingOn(mShadingOn_original);
 
     //Go back to VTK linear interpolation

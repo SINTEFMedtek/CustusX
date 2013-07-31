@@ -253,7 +253,8 @@ void ImportDataDialog::convertToUnsigned()
 
 	ssc::ImageTF3DPtr TF3D = converted->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData());
 	ssc::ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy(image->getBaseVtkImageData());
-	image->resetTransferFunction(TF3D, LUT2D);
+	image->setLookupTable2D(LUT2D);
+	image->setTransferFunctions3D(TF3D);
 	ssc::dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());
 }
 
