@@ -7,7 +7,10 @@
 namespace cxtest {
 
 TestTransferFunctionColorWidget::TestTransferFunctionColorWidget() :
-		TransferFunctionColorWidget(NULL)
+		TransferFunctionColorWidget(NULL),
+		mLeftAreaBoundary(0),
+		mRightAreaBoundary(0),
+		mWidthAreaBoundary(0)
 {}
 
 
@@ -17,8 +20,6 @@ void TestTransferFunctionColorWidget::initWithTestData()
 	ssc::ImagePtr dummyImage(new ssc::Image("DummyImage", dummyImageData));
 	ssc::ImageTFDataPtr transferFunction;
 	transferFunction = dummyImage->getTransferFunctions3D();
-//	transferFunction->setWindow(1);
-//	transferFunction->setLevel(0.5);
 	this->setData(dummyImage, transferFunction);
 	this->calculateColorTFBoundaries(
 			this->mLeftAreaBoundary,
