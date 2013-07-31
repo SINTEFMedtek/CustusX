@@ -100,12 +100,12 @@ public:
   void sendWarningRedefined(QString warning);
   void sendErrorRedefined(QString error);
   void sendDebugRedefined(QString debug);
-  void sendCallerInformation(const std::string caller, const std::string file, int line);
-  void sendInfoWithCallerInfo(QString info, const std::string caller, const std::string file, int line);
-  void sendSuccessWithCallerInfo(QString info, const std::string caller, const std::string file, int line);
-  void sendWarningWithCallerInfo(QString info, const std::string caller, const std::string file, int line);
-  void sendErrorWithCallerInfo(QString info, const std::string caller, const std::string file, int line);
-  void sendDebugWithCallerInfo(QString info, const std::string caller, const std::string file, int line);
+  void sendCallerInformation(const std::string &caller, const std::string &file, int line);
+  void sendInfoWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
+  void sendSuccessWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
+  void sendWarningWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
+  void sendErrorWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
+  void sendDebugWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line);
 #endif
 
   void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=0, bool mute=false, QString sourceLocation="");
