@@ -286,41 +286,41 @@ void MessageManager::sendDebugRedefined(QString debug)
 }
 
 #ifdef SSC_PRINT_CALLER_INFO
-void MessageManager::sendCallerInformation(const std::string caller, const std::string file, int line)
+void MessageManager::sendCallerInformation(const std::string &caller, const std::string &file, int line)
 {
 	printf("\t\t[FUNCTION] %s\n",caller.c_str());
 	printf("\t\t[FILE] %s: %i\n",file.c_str(), line);
 }
 
-void MessageManager::sendInfoWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
+void MessageManager::sendInfoWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendInfoRedefined(info);
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
 
-void MessageManager::sendSuccessWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
+void MessageManager::sendSuccessWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendSuccessRedefined(info);
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
 
-void MessageManager::sendWarningWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
+void MessageManager::sendWarningWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendWarningRedefined(info);
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
 
-void MessageManager::sendErrorWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
+void MessageManager::sendErrorWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendErrorRedefined(info);
 	this->sendCallerInformation(caller, file, line);
 	printf("\n");
 }
 
-void MessageManager::sendDebugWithCallerInfo(QString info, const std::string caller, const std::string file, int line)
+void MessageManager::sendDebugWithCallerInfo(QString info, const std::string &caller, const std::string &file, int line)
 {
 	this->sendDebugRedefined(info);
 	this->sendCallerInformation(caller, file, line);
