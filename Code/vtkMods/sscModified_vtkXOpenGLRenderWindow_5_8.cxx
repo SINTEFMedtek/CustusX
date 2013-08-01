@@ -929,24 +929,24 @@ void sscModified_vtkXOpenGLRenderWindow::CreateOffScreenWindow(int width, int he
       // fallback on GLX 1.0 GLXPixmap offscreen support
       if(!this->Internal->PbufferContextId && !this->Internal->PixmapContextId)
         {
-        v = this->GetDesiredVisualInfo();
-        this->Internal->PixmapContextId = glXCreateContext(this->DisplayId,
-                                                           v, 0, GL_FALSE);
-        this->Internal->pixmap=
-          XCreatePixmap(this->DisplayId,
-                        XRootWindow(this->DisplayId,v->screen),
-                        static_cast<unsigned int>(width),
-                        static_cast<unsigned int>(height),
-                        static_cast<unsigned int>(v->depth));
+    	  v = this->GetDesiredVisualInfo();
+    	  if(v)
+    	  {
+    		  this->Internal->PixmapContextId = glXCreateContext(this->DisplayId,
+    				  v, 0, GL_FALSE);
+    		  this->Internal->pixmap=
+    				  XCreatePixmap(this->DisplayId,
+    						  XRootWindow(this->DisplayId,v->screen),
+    						  static_cast<unsigned int>(width),
+    						  static_cast<unsigned int>(height),
+    						  static_cast<unsigned int>(v->depth));
 
-        this->Internal->PixmapWindowId = glXCreateGLXPixmap(this->DisplayId, v, this->Internal->pixmap);
-        glXMakeCurrent(this->DisplayId,this->Internal->PixmapWindowId,
-                       this->Internal->PixmapContextId);
+    		  this->Internal->PixmapWindowId = glXCreateGLXPixmap(this->DisplayId, v, this->Internal->pixmap);
+    		  glXMakeCurrent(this->DisplayId,this->Internal->PixmapWindowId,
+    				  this->Internal->PixmapContextId);
 
-        if(v)
-          {
-          XFree(v);
-          }
+    		  XFree(v);
+    	  }
         }
       } // if not hardware offscreen
     }
