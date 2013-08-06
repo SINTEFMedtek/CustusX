@@ -246,9 +246,7 @@ class IGSTK(CppComponent):
 #        self._getBuilder().gitCheckout('git://igstk.org/IGSTK.git')
         self._getBuilder().gitClone('git://igstk.org/IGSTK.git')
     def update(self):
-        #self._getBuilder().gitCheckout('v5.0', patch='IGSTK-5-0-v2.patch')
         self._getBuilder().gitCheckout('v5.2', patch='IGSTK-5-2.patch')
-        #self._getBuilder().gitCheckout('v5.2')
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption
