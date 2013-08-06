@@ -34,7 +34,7 @@
 
 #ifdef SSC_USE_OpenCL
 #include "reconstruct_vnn.h"
-#include "utils.h"
+#include "Thunder/utils.h"
 #endif // SSC_USE_OpenCL
 
 namespace ssc

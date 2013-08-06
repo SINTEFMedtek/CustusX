@@ -17,6 +17,9 @@
 //
 // See sscLicense.txt for more information.
 
+#ifndef THUNDER_UTILS_H_
+#define THUNDER_UTILS_H_
+
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef __APPLE__
@@ -80,3 +83,6 @@ float dot(float3 v, float3 w);
 /**
  * \}
  */
+
+
+#endif //THUNDER_UTILS_H_
