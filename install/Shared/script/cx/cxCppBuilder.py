@@ -99,6 +99,8 @@ class CppBuilder:
         if self._checkGitIsAtTag(checklatest):
             return        
 
+        self._getBuilder().gitUpdate()
+        
         runShell('git checkout %s' % tag)
         if submodules:
             self._getBuilder()._gitSubmoduleUpdate()
