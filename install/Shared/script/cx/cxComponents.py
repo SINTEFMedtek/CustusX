@@ -142,7 +142,7 @@ class ITK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://itk.org/ITK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v4.1.0')
+        self._getBuilder().gitCheckout('v4.4.1')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -163,7 +163,8 @@ class VTK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('http://vtk.org/VTK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v5.8.0', patch='VTK-5-8-0.patch')
+        #self._getBuilder().gitCheckout('v5.8.0', patch='VTK-5-8-0.patch')
+        self._getBuilder().gitCheckout('v5.10.1')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -245,7 +246,9 @@ class IGSTK(CppComponent):
 #        self._getBuilder().gitCheckout('git://igstk.org/IGSTK.git')
         self._getBuilder().gitClone('git://igstk.org/IGSTK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v5.0', patch='IGSTK-5-0-v2.patch')
+        #self._getBuilder().gitCheckout('v5.0', patch='IGSTK-5-0-v2.patch')
+        self._getBuilder().gitCheckout('v5.2', patch='IGSTK-5-2.patch')
+        #self._getBuilder().gitCheckout('v5.2')
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption

@@ -1,0 +1,62 @@
+From 607a2651be2e75cb9b4d308a96f11fd0185cee2f Mon Sep 17 00:00:00 2001
+From: Ole Vegard Solberg <ole.v.solberg@sintef.no>
+Date: Tue, 6 Aug 2013 13:58:28 +0200
+Subject: [PATCH] IGSTK 5.2 now compiles on Mountain Lion (MacOSX 10.8.4)
+
+---
+ Source/igstkRealTimeClock.cxx |    2 +-
+ Source/igstkStateMachine.txx  |    4 ++--
+ Utilities/CMakeLists.txt      |    2 --
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/Source/igstkRealTimeClock.cxx b/Source/igstkRealTimeClock.cxx
+index 3b18f7c..017ae10 100644
+--- a/Source/igstkRealTimeClock.cxx
++++ b/Source/igstkRealTimeClock.cxx
+@@ -84,7 +84,7 @@ void RealTimeClock::Initialize()
+   m_Origin -= static_cast< TimeStampType >( (__int64)tick.QuadPart ) 
+               / m_Frequency;
+     
+-  m_Origin += m_Difference;
++  m_Origin -= m_Difference;
+ 
+ #else
+ 
+diff --git a/Source/igstkStateMachine.txx b/Source/igstkStateMachine.txx
+index f84904f..88fc4ca 100644
+--- a/Source/igstkStateMachine.txx
++++ b/Source/igstkStateMachine.txx
+@@ -483,7 +483,7 @@ StateMachine< TClass >
+ template<class TClass>
+ void
+ StateMachine< TClass >
+-::ExportDescription( OutputStreamType & ostr, bool skipLoops=false ) const
++::ExportDescription( OutputStreamType & ostr, bool skipLoops ) const
+ {
+   ostr << "digraph G {" << std::endl;
+ 
+@@ -537,7 +537,7 @@ StateMachine< TClass >
+ template<class TClass>
+ void
+ StateMachine< TClass >
+-::ExportDescriptionToLTS( OutputStreamType & ostr, bool skipLoops=false ) const
++::ExportDescriptionToLTS( OutputStreamType & ostr, bool skipLoops ) const
+ {
+   // Export all the transitions between states
+   int out_count = 0;
+diff --git a/Utilities/CMakeLists.txt b/Utilities/CMakeLists.txt
+index c02c0d5..c8322fb 100644
+--- a/Utilities/CMakeLists.txt
++++ b/Utilities/CMakeLists.txt
+@@ -10,8 +10,6 @@ IF( IGSTK_USE_ArucoTracker )
+   SUBDIRS( Aruco )
+ ENDIF( IGSTK_USE_ArucoTracker )
+ 
+-SUBDIRS( SceneGraphVisualization )
+-
+ 
+ 
+ 
+-- 
+1.7.10.2 (Apple Git-33)
+

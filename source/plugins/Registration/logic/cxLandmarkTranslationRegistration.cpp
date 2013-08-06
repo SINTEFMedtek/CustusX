@@ -207,7 +207,8 @@ bool LandmarkTranslation::registerPoints(PointSetType::Pointer fixedPointSet, Po
 
 	try
 	{
-		registration->StartRegistration();
+//		registration->StartRegistration();
+		registration->Update();
 	} catch (itk::ExceptionObject & e)
 	{
 		std::cout << e << std::endl;

@@ -21,7 +21,7 @@ ENDIF(POLICY CMP0017)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.4)
 
-FIND_PACKAGE( VTK 5.8 REQUIRED)
+FIND_PACKAGE( VTK REQUIRED)
 INCLUDE(${VTK_USE_FILE})
 
 #-----------------------------------------------------------------------------
