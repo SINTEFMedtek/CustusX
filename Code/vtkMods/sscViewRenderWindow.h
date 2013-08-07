@@ -19,23 +19,26 @@
 #ifdef USE_GLX_SHARED_CONTEXT
 	// typedef to ssc-special renderwindow
 
+	namespace ssc
+	{
 	#if ( VTK_MAJOR_VERSION==5 )&&( VTK_MINOR_VERSION < 8 )
 		#include "sscSNWXOpenGLRenderWindow_5_4.h"
-		namespace ssc
-		{
 			typedef SNWXOpenGLRenderWindow ViewRenderWindow;
 			typedef vtkSmartPointer<SNWXOpenGLRenderWindow> ViewRenderWindowPtr;
-		}
-	#elif ( VTK_MAJOR_VERSION==5 )&&( VTK_MINOR_VERSION == 8 )
-		#include "sscModified_vtkXOpenGLRenderWindow_5_8.h"
-		namespace ssc
-		{
+	#elif ( VTK_MAJOR_VERSION==5 )&&( VTK_MINOR_VERSION >= 8 )
+		#if ( VTK_MINOR_VERSION == 8 )
+			#include "sscModified_vtkXOpenGLRenderWindow_5_8.h"
+		#elif ( VTK_MINOR_VERSION == 10 )&& ( VTK_BUILD_VERSION == 1 )
+			#include "sscModified_vtkXOpenGLRenderWindow_5_10_1.h"
+		#else
+			#error "VTK Minor Version not supported"
+		#endif
 			typedef sscModified_vtkXOpenGLRenderWindow ViewRenderWindow;
 			typedef vtkSmartPointer<sscModified_vtkXOpenGLRenderWindow> ViewRenderWindowPtr;
-		}
 	#else
-		#error "VTK Version not supported"
+		#error "VTK Major Version not supported"
 	#endif
+	} //namespace ssc
 #else
 	// typedef to default
 	#include <vtkRenderWindow.h>
