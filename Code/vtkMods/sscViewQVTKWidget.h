@@ -40,7 +40,7 @@
 			{
 				typedef SNWQVTKWidget ViewQVTKWidget;
 			}
-		#elif VTK_MINOR_VERSION == 8
+		#elif VTK_MINOR_VERSION >= 8
 			// typedef to default
 			#include "QVTKWidget.h"
 //			#include "sscModified_QVTKWidget_5_8.h"
