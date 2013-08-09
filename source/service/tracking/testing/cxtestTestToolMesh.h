@@ -2,7 +2,7 @@
 #define CXTESTTESTTOOLMESH_H_
 
 #include "sscMesh.h"
-#include <QString.h>
+#include <QString>
 
 namespace cxtest {
 
