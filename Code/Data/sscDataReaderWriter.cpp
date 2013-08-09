@@ -355,10 +355,14 @@ DataPtr DataReaderWriter::readData(const QString& uid, const QString& path, cons
 	}
 
 	DataPtr current = reader->load(uid, path);
-
-	QFileInfo fileInfo(qstring_cast(path));
-	current->setName(changeExtension(fileInfo.fileName(), ""));
-	current->setFilePath(path); // need path even when not set explicitly: nice for testing
+	if(!current)
+		std::cout << "Failed to read data object: " << path << ", " << uid << ", " << type << std::endl;
+	else
+	{
+		QFileInfo fileInfo(qstring_cast(path));
+		current->setName(changeExtension(fileInfo.fileName(), ""));
+		current->setFilePath(path); // need path even when not set explicitly: nice for testing
+	}
 	return current;
 }
 

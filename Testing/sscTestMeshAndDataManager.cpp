@@ -9,12 +9,15 @@
 #include "sscDataManager.h"
 #include "sscMesh.h"
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 
 //namespace ssc
 //{
 
 int main(int argc, char **argv)
 {
+	ssc::MessageManager::initialize();
+
 	std::cout << "DataFolder: " << ssc::TestUtilities::GetDataRoot() << std::endl;
 
 	QString vtkFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.vtk");
@@ -50,6 +53,8 @@ int main(int argc, char **argv)
 
 
 	//std::vector<QString> names = ssc::DataManager::instance()->getImageNames();
+
+	ssc::MessageManager::shutdown();
 
 	return 0;
 }
