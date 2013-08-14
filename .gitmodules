@@ -1,4 +1,0 @@
-[submodule "externals/ssc"]
-	path = externals/ssc
-	url = git@github.com:SINTEFMedisinskTeknologi/SSC.git
-
