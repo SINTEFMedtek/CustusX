@@ -1,0 +1,7 @@
+set( SSC_BUILD_EXAMPLES ON CACHE BOOL "Compile the SSC example applications" )
+if (SSC_BUILD_EXAMPLES)
+  #add_subdirectory(SliceAndToolRep)
+  add_subdirectory(ViewApp)
+  #add_subdirectory(QtSandbox)
+  add_subdirectory(PositionFileReader)
+endif (SSC_BUILD_EXAMPLES)

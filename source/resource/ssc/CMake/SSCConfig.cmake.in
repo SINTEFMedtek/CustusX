@@ -1,0 +1,25 @@
+# Find the SSC includes and library
+#
+# SSC_INCLUDE_DIR - where to find include files.
+# SSC_LIBRARIES - List of fully qualified libraries to link against.
+# SSC_FOUND - set to 1 if found.
+
+set (SSC_FOUND 1)
+
+set (SSC_INCLUDE_DIRS "@SSC_INCLUDE_DIRS@")
+set (SSC_DICOMLIB_INCLUDE_DIRS "@SSC_DICOMLIB_INCLUDE_DIRS@")
+set (SSC_LIBRARY_DIRS "@SSC_LIBRARY_DIRS@")
+#set (SSC_LIBRARIES "@SSC_LIBRARY@")
+
+set (SSC_BUILD_SETTINGS_FILE "@SSC_BINARY_DIR@/SSCBuildSettings.cmake")
+
+set (SSC_USE_FILE "@SSC_SOURCE_DIR@/CMake/SSCUse.cmake")
+
+# -- how to use SSC: --
+#find_package (SSC)
+#if (SSC_FOUND)
+#	include (${SSC_USE_FILE})
+#	add_executable (testSSC testSSC.cpp)
+#	target_link_libraries (testSSC SSC)
+#endif (SSC_FOUND)
+# --------
