@@ -35,6 +35,7 @@ if (BUILD_TESTING)
 	    "${CX_TEST_SOURCE_FILES}" 
 	    cxGrabber)
    
+if(CX_USE_ISB_GE)
 	# Add the tests from the GEStreamer lib
 	# TODO: Do this in a more elegant way
 	# The second call to SSC_ADD_CTEST_CPPUNIT_TESTS overwrites the directory properties
@@ -48,6 +49,7 @@ if (BUILD_TESTING)
 	    "${GEStreamer_SOURCE_DIR}/Testing/CppUnitMain.cpp"
 	    "${GEStreamer_TEST_SOURCE_FILES}" 
 	    "${GEStreamer_LIBRARIES}")
+endif()
 
 # Add additional tests to dart test file
 # Based loosely on CISST_ADD_TESTS macro

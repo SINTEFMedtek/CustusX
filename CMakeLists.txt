@@ -9,7 +9,7 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
     ${PROJECT_SOURCE_DIR}/CMake
-    ${PROJECT_SOURCE_DIR}/externals/ssc/CMake)
+    ${PROJECT_SOURCE_DIR}/source/resource/ssc/CMake)
 include(cxUtilities)
 include(cxInstallUtilities)
 include(cxInitializeLibraries)
@@ -69,7 +69,7 @@ cx_initialize_opencv()
 #------------------------------------------------------------------------------
 # Add subdirectories
 #------------------------------------------------------------------------------
-add_subdirectory( externals )
+add_subdirectory( source/resource/ssc )
 add_subdirectory( doc )
 add_subdirectory( source )
 

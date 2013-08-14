@@ -5,7 +5,7 @@
 
 #include <QtGui>
 
-#include <vtkImageData.h>
+//#include <vtkImageData.h>
 #include <vtkMetaImageReader.h>
 #include <vtkImagePlaneWidget.h>
 #include <vtkRenderer.h>

@@ -115,5 +115,6 @@ ADD_LIBRARY ( cxResource ${cxResource_SOURCE} ${MOC_HEADER_FILES})
 target_link_libraries(cxResource ${CX_RESOURCE_LIBRARIES} )
 CX_COTIRE_ADD_LIBRARY( cxResource "${CX_RESOURCE_LIBRARIES}")
 
+#add_subdirectory(ssc)
 add_subdirectory(testUtilities)
 add_subdirectory(testing)

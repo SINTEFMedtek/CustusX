@@ -11,4 +11,3 @@ include( ${QT_USE_FILE})
 
 include_directories( ${SSC_INCLUDE_DIRS}  ${SSC_BINARY_DIR} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
 link_directories (${SSC_LIBRARY_DIRS})
-#link_directories (/Users/frankl/fl/dev2/cvsStable/SSCSvn_build/Code)
