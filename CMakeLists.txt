@@ -10,6 +10,7 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_MODULE_PATH}
     ${PROJECT_SOURCE_DIR}/CMake
     ${PROJECT_SOURCE_DIR}/source/resource/ssc/CMake)
+
 include(cxUtilities)
 include(cxInstallUtilities)
 include(cxInitializeLibraries)
@@ -77,4 +78,3 @@ add_subdirectory( source )
 # CTest
 #------------------------------------------------------------------------------
 enable_testing()
-
