@@ -69,7 +69,7 @@ cx_initialize_opencv()
 #------------------------------------------------------------------------------
 # Add subdirectories
 #------------------------------------------------------------------------------
-add_subdirectory( source/resource/ssc )
+add_subdirectory( externals )
 add_subdirectory( doc )
 add_subdirectory( source )
 
@@ -77,5 +77,4 @@ add_subdirectory( source )
 # CTest
 #------------------------------------------------------------------------------
 enable_testing()
-
 
