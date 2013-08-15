@@ -20,28 +20,26 @@ int main(int argc, char **argv)
 {
 	std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;
 
-	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-//	QString testFile2 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_t2_byte.mhd");
-//	QString testFile3 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_mra_byte.mhd");
+//	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	QString testFile2 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_t2_unsigned.mhd");
 	QString testFile3 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_angio_unsigned.mhd");
-	std::cout << testFile1 << std::endl;
-	//std::cout << testFile2 << std::endl;
+//	std::cout << testFile1 << std::endl;
+	std::cout << testFile2 << std::endl;
 	//std::cout << testFile3 << std::endl;
 
-	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, testFile1, ssc::rtMETAIMAGE);
+//	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, testFile1, ssc::rtMETAIMAGE);
 	ssc::ImagePtr image2 = ssc::DataManager::getInstance()->loadImage(testFile2, testFile2, ssc::rtMETAIMAGE);
 	ssc::ImagePtr image3 = ssc::DataManager::getInstance()->loadImage(testFile3, testFile3, ssc::rtMETAIMAGE);
 
-	QString Uid1 = image1->getUid();
+//	QString Uid1 = image1->getUid();
 	QString Uid2 = image2->getUid();
 	QString Uid3 = image3->getUid();
 
 	//ssc::ImagePtr imageTmp = ssc::DataManager::instance()->getImage(Uid1);
 
-	std::cout << "Uid       : " << image1->getUid() << std::endl;
-	std::cout << "Name      : " << image1->getName() << std::endl;
-	std::cout << "RegistrationStatus: " << image1->getRegistrationStatus() << std::endl;
+	std::cout << "Uid       : " << image2->getUid() << std::endl;
+	std::cout << "Name      : " << image2->getName() << std::endl;
+	std::cout << "RegistrationStatus: " << image2->getRegistrationStatus() << std::endl;
 
 	int dims[3];
 	double spacing[3];
@@ -49,13 +47,13 @@ int main(int argc, char **argv)
 	double center[3];
 	int extent[6];
 	double bounds[6];
-	image1->getBaseVtkImageData()->GetDimensions(dims);
-	image1->getBaseVtkImageData()->GetSpacing(spacing);
-	image1->getBaseVtkImageData()->GetOrigin(origin);
-	image1->getBaseVtkImageData()->GetCenter(center);
-	image1->getBaseVtkImageData()->GetExtent(extent);
-	image1->getBaseVtkImageData()->GetBounds(bounds);
-	std::cout << "ScalarType: " << image1->getBaseVtkImageData()->GetScalarTypeAsString() << std::endl;
+	image2->getBaseVtkImageData()->GetDimensions(dims);
+	image2->getBaseVtkImageData()->GetSpacing(spacing);
+	image2->getBaseVtkImageData()->GetOrigin(origin);
+	image2->getBaseVtkImageData()->GetCenter(center);
+	image2->getBaseVtkImageData()->GetExtent(extent);
+	image2->getBaseVtkImageData()->GetBounds(bounds);
+	std::cout << "ScalarType: " << image2->getBaseVtkImageData()->GetScalarTypeAsString() << std::endl;
 	std::cout << "Dims      : " << dims[0] << " / " << dims[1] << " / " << dims[2] << std::endl;
 	std::cout << "Spacing   : " << spacing[0] << " / " << spacing[1] << " / " << spacing[2] << std::endl;
 	std::cout << "Origin    : " << origin[0] << " / " << origin[1] << " / " << origin[2] << std::endl;
