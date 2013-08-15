@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
 //	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	QString testFile2 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_t2_unsigned.mhd");
-	QString testFile3 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_angio_unsigned.mhd");
+	QString testFile3 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_flair_unsigned.mhd");
 //	std::cout << testFile1 << std::endl;
 	std::cout << testFile2 << std::endl;
 	//std::cout << testFile3 << std::endl;
