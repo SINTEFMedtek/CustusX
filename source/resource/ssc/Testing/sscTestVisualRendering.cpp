@@ -46,7 +46,7 @@ void TestVisualRendering::setUp()
 //	image.push_back("Person5/person5_t2_byte.mhd");
 //	image.push_back("Person5/person5_mra_byte.mhd");
 	image.push_back("Person5/person5_t2_unsigned.mhd");
-	image.push_back("Person5/person5_angio_unsigned.mhd");
+	image.push_back("Person5/person5_flair_unsigned.mhd");
 	image.push_back("DTI/dti_eigenvector_rgb.mhd");
 }
 
