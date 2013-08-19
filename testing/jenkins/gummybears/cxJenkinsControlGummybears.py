@@ -42,6 +42,7 @@ import sys
 import argparse
 from cxPowerControl import PowerControl
 from jenkinsapi import api
+import datetime
 
 class JenkinsGummyBears():
     '''
@@ -55,9 +56,11 @@ class JenkinsGummyBears():
         self.password = 'not set'
         self.debug_counter = 0
         self.lamp = PowerControl()
+        self._previousStatus = None
 
     def initializeJenkins(self):
         print 'Initializing jenkins python controller ...'
+        print self._getTimeLineString()
         self._printConfigInfo()
         
         logging.basicConfig(filename='myapp.log', level=logging.DEBUG)
@@ -115,17 +118,34 @@ class JenkinsGummyBears():
         print '  Connected to job: ', self.getJob()
 
     def _printStatus(self):
+        text = self._generateStatusText()
+        if self._previousStatus == text:
+            return 
+        self._previousStatus = text
+        print self._getTimeLineString()
+        print text
+
+    def _getTimeLineString(self):
+	return 'Time: %s' % datetime.datetime.now().isoformat(' ')
+
+    def _generateStatusText(self):
         job = self.getJob()
         lastBuild = job.get_last_build()
         completedBuild = job.get_last_completed_build()
+        text = ''
+        text = [
+		'Checking last build: %s' % lastBuild,
+		'        Running: %s' % lastBuild.is_running(),
+		'        Status:  %s' % lastBuild.get_status(),
+		'Checking last completed build: %s' % completedBuild,
+		'        Good: %s' % completedBuild.is_good(),
+		'        Status:  %s' % completedBuild.get_status()
+		]
         indent = '    '
-        print indent, 'Checking last build: ', lastBuild
-        #print indent, '        Timestamp: ', build.get_timestamp()
-        print indent, '        Running: ', lastBuild.is_running()
-        print indent, '        Status:  ', lastBuild.get_status()
-        print indent, 'Checking last completed build: ', completedBuild
-        print indent, '        Good: ', completedBuild.is_good()
-        print indent, '        Status:  ', completedBuild.get_status()
+        for i in range(len(text)):
+            text[i] = '%s%s' % (indent, text[i])
+        text = '\n'.join(text)
+        return text
 
     def _setGummyBears(self):
         '''
