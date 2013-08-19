@@ -171,7 +171,8 @@ class CppBuilder:
 
     def _addDefaultCmakeOptions(self):
             add = self.addCMakeOption
-            add('CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
+            if(platform.system() != 'Windows'):
+                add('CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
             add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
             if self.controlData.m32bit: # todo: add if darwin
                 add('CMAKE_OSX_ARCHITECTURES', 'i386')
