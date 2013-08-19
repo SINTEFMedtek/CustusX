@@ -42,12 +42,12 @@ void TestVisualRendering::setUp()
 {
 	widget = new ViewsWindow("Verify that the volumes are rendered correctly.", false);
 	widget->mDumpSpeedData = false;
-//	image.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	image.push_back("Phantoms/Kaisa/MetaImage/Kaisa.mhd");
 //	image.push_back("Person5/person5_t2_byte.mhd");
 //	image.push_back("Person5/person5_mra_byte.mhd");
-	image.push_back("Person5/person5_t2_unsigned.mhd");
-	image.push_back("Person5/person5_flair_unsigned.mhd");
-	image.push_back("DTI/dti_eigenvector_rgb.mhd");
+	image.push_back("ssc/Person5/person5_t2_unsigned.mhd");
+	image.push_back("ssc/Person5/person5_flair_unsigned.mhd");
+	image.push_back("ssc/DTI/dti_eigenvector_rgb.mhd");
 }
 
 void TestVisualRendering::tearDown()

@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 
 	std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;
-	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_t2_unsigned.mhd");
+	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("ssc/Person5/person5_t2_unsigned.mhd");
 //	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Person5/person5_t2_byte.mhd");
 	//QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	std::cout << testFile1 << std::endl;

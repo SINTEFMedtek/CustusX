@@ -90,7 +90,7 @@ void TestInterface::testSwitchingViewsRepsAndImages()
 	widget->setLayout(layout);
 
 	//Create the objects
-	QString testFile1 = TestUtilities::ExpandDataFileName("/Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	QString testFile1 = TestUtilities::ExpandDataFileName("/Phantoms/Kaisa/MetaImage/Kaisa.mhd");
 	QString testFile2 = TestUtilities::ExpandDataFileName("/MetaImage/20070309T105136_MRT1.mhd");
 	
 	

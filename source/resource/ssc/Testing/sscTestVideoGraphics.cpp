@@ -44,7 +44,8 @@ void TestVideoGraphics::tearDown()
 
 vtkImageDataPtr TestVideoGraphics::readImageData(QString filename, QString description)
 {
-	QString folder = QString("%1/%2/").arg(SSC_DATA_ROOT).arg("test");
+	QString folder = QString("%1%2/").arg(SSC_DATA_ROOT).arg("ssc/test");
+	std::cout << folder << " -------- " << filename << std::endl;
 	vtkImageDataPtr retval = mMachine->readFromFile(folder+filename);
 	CPPUNIT_ASSERT_MESSAGE(("Looking for "+description).toStdString(), retval!=NULL);
 	return retval;
@@ -52,7 +53,7 @@ vtkImageDataPtr TestVideoGraphics::readImageData(QString filename, QString descr
 
 ssc::ProbeData TestVideoGraphics::readProbeData(QString filename)
 {
-	QString folder = QString("%1/%2/").arg(SSC_DATA_ROOT).arg("test");
+	QString folder = QString("%1%2/").arg(SSC_DATA_ROOT).arg("ssc/test");
 	QString probeDataFilename = ssc::changeExtension(folder+filename, "probedata.xml");
 
 	ssc::ProbeData retval;
