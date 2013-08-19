@@ -56,7 +56,7 @@ class PowerControl:
         Set any set of colors.
         Input a dictionary of colors and boolean values.
         '''
-    	print "input: ", colors
+    	#print "input: ", colors
     	for (key,value) in colors.iteritems():
             self._setCachedSocketValue(key, value)
         self._setLightsIfChanged()
