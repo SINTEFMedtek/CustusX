@@ -554,10 +554,12 @@ QT4_ADD_RESOURCES( GENERATED_RESOURCES ${SSC_QT_RESOURCE_FILES} )
 # stuff
 # =========================================================
 # Configure the default SSC_DATA_ROOT for the location of SSCData.
-FIND_PATH(SSC_DATA_ROOT sscData.readme 
-  ${SSC_SOURCE_DIR}/Data
-  $ENV{SSC_DATA_ROOT})
- #message(status ${SSC_DATA_ROOT} "  --" ${SSC_SOURCE_DIR})
+unset(SSC_DATA_ROOT)
+set (SSC_DATA_ROOT ${CustusX3_SOURCE_DIR}/data CACHE INTERNAL "path to ssc data root")
+#FIND_PATH(SSC_DATA_ROOT sscData.readme 
+#  ${CustusX3_SOURCE_DIR}/data)
+#  $ENV{SSC_DATA_ROOT})
+# message(status ${SSC_DATA_ROOT} "  --" ${CustusX3_SOURCE_DIR})
   
 #set(SSC_THUNDER_KERNEL_PATH ${SSC_SOURCE_DIR}/../../source/UsReconstruction/Thunder)
 
