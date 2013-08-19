@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
 	std::cout << "DataFolder: " << ssc::TestUtilities::GetDataRoot() << std::endl;
 
-	QString stlFileName1 = ssc::TestUtilities::ExpandDataFileName("../Sandbox/Models/01-117-0329_Planning-Navigator.stl");
+	QString stlFileName1 = ssc::TestUtilities::ExpandDataFileName("../source/resource/ssc/Sandbox/Models/01-117-0329_Planning-Navigator.stl");
 
 	ssc::MeshPtr mesh1 = ssc::DataManager::getInstance()->loadMesh(stlFileName1, stlFileName1, ssc::rtSTL);
 	if(!mesh1)
