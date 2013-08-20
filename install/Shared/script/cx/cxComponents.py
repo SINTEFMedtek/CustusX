@@ -193,7 +193,7 @@ class OpenCV(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def _rawCheckout(self):
-        self._getBuilder().gitClone('git://code.opencv.org/opencv.git', 'OpenCV')
+        self._getBuilder().gitClone('https://github.com/Itseez/opencv.git', 'OpenCV')
     def update(self):
         self._getBuilder().gitCheckout('2.4.2')
     def configure(self):
