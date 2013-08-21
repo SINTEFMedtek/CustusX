@@ -6,6 +6,7 @@
  */
 
 #include <cxColorSelectButton.h>
+#include <iostream>
 #include <QtGui>
 
 namespace cx
@@ -31,11 +32,11 @@ void ColorSelectButton::setColor(QColor color)
 
 void ColorSelectButton::clickedSlot()
 {
-  QColor result = QColorDialog::getColor( mColor, this);
-  if (!result.isValid())
-    return;
-  this->setColor(result);
-  emit (colorChanged(mColor));
+	QColor result = QColorDialog::getColor( mColor, this, "Select color", QColorDialog::ShowAlphaChannel );
+	if (!result.isValid())
+		return;
+	this->setColor(result);
+	emit (colorChanged(mColor));
 }
 
 }
