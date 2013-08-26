@@ -1,7 +1,6 @@
 #include "cxMeshInfoWidget.h"
 
 #include <QVBoxLayout>
-#include <QColorDialog>
 #include "sscImage.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"

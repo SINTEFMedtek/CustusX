@@ -27,6 +27,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 	waitForSignal(tm, SIGNAL(trackingStarted()));
 
 	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
+	REQUIRE(QFile::exists(filename));
 
 	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget();
 	REQUIRE(widget->canStream(filename, "MHDFile"));

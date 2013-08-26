@@ -98,6 +98,7 @@ void testElastix()
 	QString kaisa_resliced_fname = cx::DataLocations::getTestDataPath() + "/testing/elastiX/kaisa_resliced.mhd";
 	QString kaisa_resliced_linear_fname = cx::DataLocations::getTestDataPath() + "/testing/elastiX/kaisa_resliced_linear.mhd";
 
+	std::cout << "------" << kaisa_padded_fname << std::endl;
 	ssc::DataPtr kaisa_resliced_linear = ssc::dataManager()->loadData("source_"+kaisa_resliced_linear_fname, kaisa_resliced_linear_fname, ssc::rtAUTO);
 	ssc::DataPtr kaisa_padded = ssc::dataManager()->loadData("source_"+kaisa_padded_fname, kaisa_padded_fname, ssc::rtAUTO);
 	ssc::DataPtr kaisa_resliced = ssc::dataManager()->loadData("source_"+kaisa_resliced_fname, kaisa_resliced_fname, ssc::rtAUTO);

@@ -21,6 +21,7 @@
 #include "sscStringDataAdapterXml.h"
 #include "sscVector3DDataAdapterXml.h"
 #include "cxDataMetricWrappers.h"
+#include "cxFrameMetric.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -53,11 +54,20 @@ protected slots:
   void loadReferencePointsSlot();
 
   void addPointButtonClickedSlot();
+  void addFrameButtonClickedSlot();
   void addPlaneButtonClickedSlot();
   void addAngleButtonClickedSlot();
   void addDistanceButtonClickedSlot();
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);
+  void exportFramesButtonClickedSlot();
+
+protected:
+  QAction* mPointMetricAction;
+  QAction* mFrameMetricAction;
+  QAction* mExportFramesAction;
+
+  void exportFramesToFile(QString filename);
 
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
