@@ -53,6 +53,7 @@
 #include "sscDistanceMetricRep.h"
 #include "sscAngleMetricRep.h"
 #include "sscPlaneMetricRep.h"
+#include "cxFrameMetricRep.h"
 #include "sscDataMetricRep.h"
 #include "cxDataLocations.h"
 #include "sscTexture3DSlicerRep.h"
@@ -601,6 +602,13 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 		ssc::PointMetricRepPtr rep = ssc::PointMetricRep::New(data->getUid() + "_3D_rep");
 		this->readDataRepSettings(rep);
 		rep->setPointMetric(boost::dynamic_pointer_cast<ssc::PointMetric>(data));
+		return rep;
+	}
+	else if (boost::dynamic_pointer_cast<FrameMetric>(data))
+	{
+		FrameMetricRepPtr rep = FrameMetricRep::New(data->getUid() + "_3D_rep");
+		this->readDataRepSettings(rep);
+		rep->setFrameMetric(boost::dynamic_pointer_cast<FrameMetric>(data));
 		return rep;
 	}
 	else if (boost::dynamic_pointer_cast<ssc::DistanceMetric>(data))

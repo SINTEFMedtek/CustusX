@@ -35,34 +35,17 @@ QWidget* FrameMetricWrapper::createWidget()
 			QDomNode());
 	hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
 
-	/*mCoordinate = ssc::Vector3DDataAdapterXml::initialize("selectCoordinate",
-      "Coord",
-      "Coordinate values.",
-      ssc::Vector3D(0,0,0),
-      ssc::DoubleRange(-1000,1000,0.1),
-      1,
-      QDomNode());
-//  topLayout->addWidget(Vector3DWidget::createVerticalWithSliders(widget, mCoordinate));
-  topLayout->addWidget(Vector3DWidget::createSmallHorizontal(widget, mCoordinate));*/
-
 	mFrameWidget = new Transform3DWidget(widget);
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
 	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
 	connect(mFrameWidget, SIGNAL(changed()), this, SLOT(frameWidgetChangedSlot()));
 	topLayout->addWidget(mFrameWidget);
 
-	/*   manualGroupLayout->addWidget(mManualToolWidget);
-   connect(ToolManager::getInstance()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
-   connect(ToolManager::getInstance()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
-   connect(mManualToolWidget, SIGNAL(changed()), this, SLOT(manualToolWidgetChanged()));
-	 */
-
 	QPushButton* sampleButton = new QPushButton("Sample");
 	sampleButton->setToolTip("Set the position equal to the current tool tip position.");
 	hLayout->addWidget(sampleButton);
 
 	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
-	//  connect(mCoordinate.get(), SIGNAL(valueWasSet()), this, SLOT(coordinateChanged()));
 	connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
 	this->dataChangedSlot();
 
@@ -106,8 +89,10 @@ QString FrameMetricWrapper::getArguments() const
 
 void FrameMetricWrapper::moveToToolPosition()
 {
-	ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(mData->getSpace(), true);
-	//  mData->setCoordinate(p);
+	ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
+	ssc::Transform3D qMt = ssc::SpaceHelpers::getDominantToolTipTransform(mData->getSpace());
+	std::cout << "set frame " << qMt << std::endl;
+	mData->setFrame(qMt);
 }
 
 void FrameMetricWrapper::spaceSelected()
@@ -118,13 +103,6 @@ void FrameMetricWrapper::spaceSelected()
 	if (space.mId==ssc::csCOUNT)
 		return;
 	mData->setSpace(space);
-}
-
-void FrameMetricWrapper::coordinateChanged()
-{
-	if (mInternalUpdate)
-		return;
-	//  mData->setCoordinate(mCoordinate->getValue());
 }
 
 void FrameMetricWrapper::dataChangedSlot()

@@ -29,6 +29,9 @@
 #include "sscTimeKeeper.h"
 #include "sscManualTool.h"
 #include "cxFrameMetricWrapper.h"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
+#include "sscTime.h"
 
 namespace cx
 {
@@ -58,8 +61,8 @@ MetricWidget::MetricWidget(QWidget* parent) :
 
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   QActionGroup* group = new QActionGroup(this);
-  mPointMetricAction = this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Point Metric",      SLOT(addPointButtonClickedSlot()));
-  mFrameMetricAction = this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Frame Metric (position and orientation)",      SLOT(addFrameButtonClickedSlot()));
+  mPointMetricAction = this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Point Metric", SLOT(addPointButtonClickedSlot()));
+  mFrameMetricAction = this->createAction(group, ":/icons/metric_frame.png", "Frame", "Create a new Frame Metric (position and orientation)", SLOT(addFrameButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
@@ -374,7 +377,8 @@ void MetricWidget::addFrameButtonClickedSlot()
   frame->setFrame(rMt);
 
   ssc::dataManager()->loadData(frame);
-
+  this->setActiveUid(frame->getUid());
+  viewManager()->getViewGroups()[0]->getData()->addData(frame);
 }
 
 void MetricWidget::addPlaneButtonClickedSlot()
@@ -459,32 +463,6 @@ void MetricWidget::addDistanceButtonClickedSlot()
 
   args = this->refinePointArguments(args, d0->getArgumentCount());
 
-//  // erase non-selected arguments if we have more than enough
-//  QList<QTableWidgetItem*> selection = mTable->selectedItems();
-//  std::set<QString> selectedUids;
-//  for (int i=0; i<selection.size(); ++i)
-//  {
-//  	selectedUids.insert(selection[i]->data(Qt::UserRole).toString());
-//  }
-//  for (unsigned i=0; i<args.size();)
-//  {
-//  	if (args.size()<=d0->getArgumentCount())
-//  		break;
-//  	if (!selectedUids.count(args[i]->getUid()))
-//  		args.erase(args.begin()+i);
-//  	else
-//  		++i;
-//  }
-//
-//  while (args.size() > d0->getArgumentCount())
-//  	args.erase(args.begin());
-//
-//  while (args.size() < d0->getArgumentCount())
-//  {
-//  	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
-//  	args.push_back(p0);
-//  }
-
   for (unsigned i=0; i<args.size(); ++i)
     d0->setArgument(i, args[i]);
 
@@ -508,18 +486,6 @@ void MetricWidget::addAngleButtonClickedSlot()
   }
 
   args = this->refinePointArguments(args, 3);
-//
-//  while (args.size() > 3)
-//  	args.erase(args.begin());
-//
-//  while (args.size() < 3)
-//  {
-//  	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
-//  	args.push_back(p0);
-//  }
-
-//  for (unsigned i=0; i<args.size(); ++i)
-//    d0->setArgument(i, args[i]);
 
   d0->setArgument(0, args[0]);
   d0->setArgument(1, args[1]);
@@ -567,7 +533,13 @@ void MetricWidget::loadReferencePointsSlot()
 
 void MetricWidget::exportFramesButtonClickedSlot()
 {
-	QString filename = QFileDialog::getSaveFileName(this, "Create/select file to append frame metric transforms to");
+	QString suggestion = QString("%1/Logs/metrics_%2.txt")
+			.arg(patientService()->getPatientData()->getActivePatientFolder())
+			.arg(QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()));
+
+	QString filename = QFileDialog::getSaveFileName(this,
+													"Create/select file to append frame metric transforms to",
+													suggestion);
 	if(!filename.isEmpty())
 		this->exportFramesToFile(filename);
 }
@@ -587,7 +559,7 @@ void MetricWidget::exportFramesToFile(QString filename)
 		if(frameMetric)
 		{
 //			std::cout << "frame metric found: " << frameMetric->convertToSingleLineString() << std::endl;
-			file.write(frameMetric->convertToSingleLineString().toAscii());
+			file.write(frameMetric->getAsSingleLineString().toAscii());
 			file.write("\n");
 		}
 	}
