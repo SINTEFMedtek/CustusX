@@ -28,6 +28,7 @@ FrameMetric::~FrameMetric()
 void FrameMetric::setFrame(const ssc::Transform3D& rMt)
 {
 	mFrame = rMt;
+	emit transformChanged();
 }
 
 ssc::Transform3D FrameMetric::getFrame()
@@ -84,12 +85,12 @@ ssc::DoubleBoundingBox3D FrameMetric::boundingBox() const
 	return ssc::DoubleBoundingBox3D(p0_r, p0_r);
 }
 
-QString FrameMetric::convertToSingleLineString()
+QString FrameMetric::getAsSingleLineString()
 {
-//	QString retval = qstring_cast(mFrame);
 	QString retval;
+	retval += this->getType() + " ";
 	retval += mName + " ";
-	retval += mSpace.toString();
+	retval += mSpace.toString() + " ";
 	retval += this->matrixAsSingleLineString();
 	return retval;
 }

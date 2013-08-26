@@ -129,7 +129,7 @@ SET( SSC_QT_MOC_HEADER_FILES
 	Widgets/sscColorDataAdapter.h
 	Widgets/sscColorDataAdapterXml.h
 	Widgets/sscColorSelectWidget.h
-	Widgets/cxColorSelectButton.h
+#	Widgets/cxColorSelectButton.h
 
 	Utilities/sscApplication.h
 	Utilities/sscMessageManager.h
@@ -187,6 +187,36 @@ elseif(APPLE)
 else(WIN32)
     set( SSC_LIBRARIES ${SSC_LIBRARIES} GLU crypto ssl)
 endif(WIN32)
+
+
+# library
+SET( SSC_SOURCE_FILES
+	sscForwardDeclarations.h
+	vtkForwardDeclarations.h
+)
+###############################################################################
+# Add a given class to SOURCE_FILES.
+# The input CLASS_NAME_WITH_PATH is appended with .h and .cpp, and
+# the two resulting files are added.
+###############################################################################
+macro(add_class SOURCE_FILES CLASS_NAME_WITH_PATH)
+	set(${SOURCE_FILES} ${${SOURCE_FILES}}
+		${CLASS_NAME_WITH_PATH}.h
+		${CLASS_NAME_WITH_PATH}.cpp)
+endmacro()
+###############################################################################
+# Add a Qt moc class to SOURCE_FILES.
+# The input CLASS_NAME_WITH_PATH is appended with .h and .cpp, and
+# the two resulting files are added.
+###############################################################################
+macro(add_class_qt_moc SOURCE_FILES CLASS_NAME_WITH_PATH)
+find_package( Qt4 REQUIRED )
+	add_class(${SOURCE_FILES} ${CLASS_NAME_WITH_PATH})
+	QT4_WRAP_CPP( RESULT ${CLASS_NAME_WITH_PATH}.h )
+	set(${SOURCE_FILES} ${${SOURCE_FILES}}
+		${RESULT})
+endmacro()
+
 
 # library
 SET( SSC_SOURCE_FILES
@@ -468,6 +498,9 @@ SET( SSC_SOURCE_FILES
     vesselReg/SeansVesselReg.hxx
     vesselReg/HackTPSTransform.hxx
     ) 
+
+add_class_qt_moc(SSC_SOURCE_FILES "Rep/cxFrameMetricRep")
+add_class_qt_moc(SSC_SOURCE_FILES Widgets/cxColorSelectButton)
 
 # =========================================================
 # =========================================================

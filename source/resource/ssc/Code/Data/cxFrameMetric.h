@@ -56,7 +56,7 @@ public:
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual ssc::DoubleBoundingBox3D boundingBox() const;
-	QString convertToSingleLineString();
+	QString getAsSingleLineString();
 	QString matrixAsSingleLineString();
 	QString pointAsSingleLineString();
 

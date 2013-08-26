@@ -87,5 +87,6 @@
         <file>icons/eye.png</file>
         <file>icons/camera-t.png</file>
         <file>icons/camera-at.png</file>
+        <file>icons/metric_frame.png</file>
     </qresource>
 </RCC>

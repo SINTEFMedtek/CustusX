@@ -27,7 +27,6 @@ public:
 private slots:
   void moveToToolPosition();
   void spaceSelected();
-  void coordinateChanged();
   void dataChangedSlot();
   void frameWidgetChangedSlot();
 private:
