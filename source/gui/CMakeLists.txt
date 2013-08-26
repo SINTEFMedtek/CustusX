@@ -48,6 +48,7 @@ SET(cxGui_MOC_HDRS
     infoWidgets/cxFrameTreeWidget.h 
     infoWidgets/cxDataMetricWrappers.h   
 	infoWidgets/cxSamplerWidget.h
+	infoWidgets/cxFrameMetricWrapper.h
     #----------------------
     navigationWidgets/cxNavigationWidget.h
     navigationWidgets/cxTrackPadWidget.h
@@ -117,6 +118,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/videoServer
 
     ${CustusX3_SOURCE_DIR}/source/resource
+    ${CustusX3_SOURCE_DIR}/source/resource/data
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_BINARY_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
@@ -221,6 +223,8 @@ SET(cxGui_SRCS
     infoWidgets/cxDataMetricWrappers.cpp   
 	infoWidgets/cxSamplerWidget.h
 	infoWidgets/cxSamplerWidget.cpp
+	infoWidgets/cxFrameMetricWrapper.h
+	infoWidgets/cxFrameMetricWrapper.cpp
     #----------------------
     navigationWidgets/cxNavigationWidget.h
     navigationWidgets/cxNavigationWidget.cpp

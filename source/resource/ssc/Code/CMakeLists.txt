@@ -55,6 +55,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscPlaneMetric.h
     Data/sscAngleMetric.h
     Data/sscUnsignedDerivedImage.h
+    Data/cxFrameMetric.h
 
     Video/sscVideoSource.h
     Video/sscVideoRecorder.h
@@ -386,6 +387,8 @@ SET( SSC_SOURCE_FILES
     Data/sscUnsignedDerivedImage.cpp
 	Data/sscDataReaderWriter.h
 	Data/sscDataReaderWriter.cpp
+    Data/cxFrameMetric.h
+    Data/cxFrameMetric.cpp
 
 
     Video/sscVideoSource.h

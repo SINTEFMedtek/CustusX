@@ -44,6 +44,7 @@ public:
 	CoordinateSystemHelpers(){};
 
 	static Vector3D getDominantToolTipPoint(CoordinateSystem to, bool useOffset = false); ///< P_to, dominant tools current point in coord
+	static Transform3D getDominantToolTipTransform(CoordinateSystem to);///< Get toMt, where t is dominant tool
 	static Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
 
 	static ssc::CoordinateSystem getS(ssc::ToolPtr tool); ///<tools sensor coordinate system
@@ -65,6 +66,8 @@ private:
 	static Transform3D get_rMt(QString uid); ///< ref_M_t
 	static Transform3D get_rMto(QString uid); ///< t_M_to
 	static Transform3D get_rMs(QString uid); ///< ref_M_s
+
+	static CoordinateSystem getToolCoordinateSystem(ToolPtr tool);
 };
 typedef CoordinateSystemHelpers SpaceHelpers;
 }//namespace ssc

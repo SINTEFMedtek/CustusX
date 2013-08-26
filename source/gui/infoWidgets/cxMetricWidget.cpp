@@ -28,6 +28,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscTimeKeeper.h"
 #include "sscManualTool.h"
+#include "cxFrameMetricWrapper.h"
 
 namespace cx
 {
@@ -57,7 +58,8 @@ MetricWidget::MetricWidget(QWidget* parent) :
 
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   QActionGroup* group = new QActionGroup(this);
-  this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Point Metric",      SLOT(addPointButtonClickedSlot()));
+  mPointMetricAction = this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Point Metric",      SLOT(addPointButtonClickedSlot()));
+  mFrameMetricAction = this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Frame Metric (position and orientation)",      SLOT(addFrameButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
@@ -66,6 +68,8 @@ MetricWidget::MetricWidget(QWidget* parent) :
   mRemoveAction->setDisabled(true);
   mLoadReferencePointsAction = this->createAction(group, ":/icons/metric_reference.png", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
   mLoadReferencePointsAction->setDisabled(true);
+  this->createAction(group, "", "", "", NULL)->setSeparator(true);
+  mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export the frame metrics to file",   SLOT(exportFramesButtonClickedSlot()));
 
   QToolBar* toolBar = new QToolBar("actions", this);
   toolBar->addActions(group->actions());
@@ -194,6 +198,10 @@ MetricBasePtr MetricWidget::createMetricWrapper(ssc::DataPtr data)
   else if (boost::dynamic_pointer_cast<ssc::AngleMetric>(data))
   {
     return MetricBasePtr(new AngleMetricWrapper(boost::dynamic_pointer_cast<ssc::AngleMetric>(data)));
+  }
+  else if (boost::dynamic_pointer_cast<cx::FrameMetric>(data))
+  {
+    return MetricBasePtr(new FrameMetricWrapper(boost::dynamic_pointer_cast<cx::FrameMetric>(data)));
   }
 
 	return MetricBasePtr();
@@ -347,10 +355,26 @@ void MetricWidget::setActiveUid(QString uid)
 
 void MetricWidget::addPointButtonClickedSlot()
 {
+	std::cout << "addPointButtonClickedSlot()" << std::endl;
   ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
   ssc::Vector3D p_ref = ssc::SpaceHelpers::getDominantToolTipPoint(ref, true);
+  this->addPoint(p_ref, ref);
+}
 
-	this->addPoint(p_ref, ref);
+void MetricWidget::addFrameButtonClickedSlot()
+{
+	std::cout << "addFrameButtonClickedSlot()" << std::endl;
+  FrameMetricPtr frame(new FrameMetric("frame%1", "frame%1"));
+  frame->get_rMd_History()->setParentSpace("reference");
+
+  ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
+  ssc::Transform3D rMt = ssc::SpaceHelpers::getDominantToolTipTransform(ref);
+
+  frame->setSpace(ref);
+  frame->setFrame(rMt);
+
+  ssc::dataManager()->loadData(frame);
+
 }
 
 void MetricWidget::addPlaneButtonClickedSlot()
@@ -540,5 +564,35 @@ void MetricWidget::loadReferencePointsSlot()
     this->addPoint(P_ref, ssc::CoordinateSystem(ssc::csREF), "ref%1");
   }
 }
+
+void MetricWidget::exportFramesButtonClickedSlot()
+{
+	QString filename = QFileDialog::getSaveFileName(this, "Create/select file to append frame metric transforms to");
+	if(!filename.isEmpty())
+		this->exportFramesToFile(filename);
+}
+
+void MetricWidget::exportFramesToFile(QString filename)
+{
+	QFile file(filename);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
+		return;
+
+	std::map<QString, ssc::DataPtr> dataMap = ssc::dataManager()->getData();
+	std::map<QString, ssc::DataPtr>::iterator iter;
+	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
+	{
+		ssc::DataPtr data = iter->second;
+		cx::FrameMetricPtr frameMetric = boost::dynamic_pointer_cast<cx::FrameMetric>(data);
+		if(frameMetric)
+		{
+//			std::cout << "frame metric found: " << frameMetric->convertToSingleLineString() << std::endl;
+			file.write(frameMetric->convertToSingleLineString().toAscii());
+			file.write("\n");
+		}
+	}
+	file.close();
+}
+
 
 }//end namespace cx

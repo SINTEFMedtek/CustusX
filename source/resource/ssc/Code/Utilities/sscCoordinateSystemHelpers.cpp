@@ -96,10 +96,12 @@ Vector3D CoordinateSystemHelpers::getDominantToolTipPoint(CoordinateSystem to, b
 	ToolPtr tool = ssc::toolManager()->getDominantTool();
 	if (!tool)
 		return ssc::Vector3D(0,0,0);
+//
+//	QString dominantToolUid = tool->getUid();
+//
+//	CoordinateSystem from(csTOOL, dominantToolUid);
 
-	QString dominantToolUid = tool->getUid();
-
-	CoordinateSystem from(csTOOL, dominantToolUid);
+	CoordinateSystem from = getToolCoordinateSystem(tool);
 
 	Vector3D point_t;
 	if(useOffset)
@@ -110,6 +112,24 @@ Vector3D CoordinateSystemHelpers::getDominantToolTipPoint(CoordinateSystem to, b
 	Vector3D P_to = CoordinateSystemHelpers::get_toMfrom(from, to).coord(point_t);
 
 	return P_to;
+}
+
+CoordinateSystem CoordinateSystemHelpers::getToolCoordinateSystem(ToolPtr tool)
+{
+	QString dominantToolUid = tool->getUid();
+
+	CoordinateSystem retval(csTOOL, dominantToolUid);
+	return retval;
+}
+
+Transform3D CoordinateSystemHelpers::getDominantToolTipTransform(CoordinateSystem to)
+{
+	ToolPtr tool = ssc::toolManager()->getDominantTool();
+	if (!tool)
+		return Transform3D::Identity();
+	CoordinateSystem from = getToolCoordinateSystem(tool);
+	Transform3D retval = CoordinateSystemHelpers::get_toMfrom(from, to);
+	return retval;
 }
 
 Transform3D CoordinateSystemHelpers::get_toMfrom(CoordinateSystem from, CoordinateSystem to)

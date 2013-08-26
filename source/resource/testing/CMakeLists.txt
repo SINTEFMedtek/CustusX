@@ -11,6 +11,7 @@ if (BUILD_TESTING)
 		${CustusX3_SOURCE_DIR}/source/resource/settings
 		${CustusX3_SOURCE_DIR}/source/resource/utilities
 		${CustusX3_SOURCE_DIR}/source/resource/algorithms
+        ${CustusX3_SOURCE_DIR}/source/logic
 		)
       
 	# List of all test units
@@ -29,5 +30,14 @@ if (BUILD_TESTING)
 	include(cxTestMacros)
 	# define cppunit tests and ctest tests from same source:
 	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestResource cxCppUnitMain.cpp "${RESOURCE_TEST_SOURCE_FILES}" cxResource)
+	
+	
+	#Catch
+	set(RESOURCE_TEST_CATCH_SOURCE_FILES
+	    cxtestCatchFrameMetric.cpp
+	    cxtestFrameMetricFixture.h
+	    cxtestFrameMetricFixture.cpp
+	)
+	cx_catch_add_lib_and_exe(cxResource "${RESOURCE_TEST_CATCH_SOURCE_FILES}")
     
 endif (BUILD_TESTING)

@@ -10,6 +10,7 @@
 //#include "cxDataSelectWidget.h" //special case
 #include "cxEraserWidget.h"
 #include "cxFrameTreeWidget.h"
+#include "cxMetricWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxOverlayWidget.h"
 #include "cxPlaybackWidget.h"
@@ -107,6 +108,7 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 //	testAndDeleteBaseWidgetChild(new cx::DataSelectWidget(testParent));//special case: Needs a SelectDataStringDataAdapterBasePtr moc object
 	testAndDeleteBaseWidgetChild(new cx::EraserWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::FrameTreeWidget(testParent));
+	testAndDeleteBaseWidgetChild(new cx::MetricWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::NavigationWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::OverlayWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::PlaybackWidget(testParent));
