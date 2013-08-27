@@ -184,6 +184,9 @@ cx_add_class( SSC_SOURCE_FILES
 
 	Video/sscVideoGraphics
 
+        vtkMods/sscViewRenderWindow
+        vtkMods/sscViewQVTKWidget
+
 	Tool/sscProbeSector
 	Tool/sscProbeData
 
