@@ -56,7 +56,6 @@ TEST_CASE("cxFrameMetric can convert transform to single line string", "[unit]")
 
 	QString stringTransform = fixture.mOriginalMetric->getAsSingleLineString();
 	REQUIRE(!stringTransform.isEmpty());
-//	std::cout << stringTransform << std::endl;
 	REQUIRE(stringTransform == fixture.expectedStringAfterConversion());
 }
 
