@@ -57,7 +57,7 @@ cx::FrameMetricPtr FrameMetricFixture::createFromXml(QDomNode& xmlNode)
 
 QString FrameMetricFixture::expectedStringAfterConversion()
 {
-	return QString("testMetric reference 1.1 2 3 4 5 6 7 8 9 10 11 12 0 0 0 1");
+	return QString("frameMetric testMetric reference  1.1 2 3 4 5 6 7 8 9 10 11 12 0 0 0 1");
 }
 
 void FrameMetricFixture::setPatientRegistration()
