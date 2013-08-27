@@ -115,8 +115,9 @@ class Shell (object):
 
     def _checkTerminate(self, process):
         if process.returncode!=0 and self.TERMINATE_ON_ERROR:
-            self._printInfo("Terminating: shell command exited with a nonzero return value [%s]" % process.returncode)
-            quit()
+            test = "Terminating: shell command exited with a nonzero return value [%s]" % process.returncode
+            self._printInfo(test)
+            exit(test)
                
     def _evaluateReal(self, cmd):
         '''
