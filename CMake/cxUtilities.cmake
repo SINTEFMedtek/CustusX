@@ -181,3 +181,102 @@ MACRO(cx_define_version major minor patch type)
 #	)
 ENDMACRO()
 
+
+###############################################################################
+# Print a cmake list to stdout using lots of wrap.
+#
+# Usage: print_list_verbose(LIST_VAR "Header text")
+###############################################################################
+function(cx_print_list_verbose LIST_VAR HEADER_TEXT)
+	message(STATUS "-----------------------------------------")
+	message(STATUS "---- " ${HEADER_TEXT} " ----")
+	message(STATUS "{" )
+	foreach(VAR ${${LIST_VAR}})
+		message(STATUS "    " ${VAR})
+	endforeach()
+	message(STATUS "}" )
+	message(STATUS "-----------------------------------------" )
+endfunction()
+
+###############################################################################
+# private
+###############################################################################
+macro(_cx_query_is_full_filename RESULT CLASS_NAME_WITH_PATH)
+	STRING(REGEX MATCH "(\\.h|\\.cpp|\\.cxx|\\.qrc|\\.hxx|\\.hpp)$" VALID_SUFFIX ${CLASS_NAME_WITH_PATH})
+	if("${VALID_SUFFIX}" STREQUAL "")
+		set(${RESULT} "False")
+	else()
+		set(${RESULT} "True")
+	endif()
+endmacro()
+
+###############################################################################
+# private
+###############################################################################
+function(_cx_add_one_class SOURCE_FILES CLASS_NAME_WITH_PATH)
+	_cx_query_is_full_filename(IS_FULL_FILENAME ${CLASS_NAME_WITH_PATH})
+	if(${IS_FULL_FILENAME} MATCHES "False")
+		set(RESULT_add_one_class ${CLASS_NAME_WITH_PATH}.h ${CLASS_NAME_WITH_PATH}.cpp)
+	else()
+		set(RESULT_add_one_class ${CLASS_NAME_WITH_PATH})
+	endif()
+
+	set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_add_one_class} PARENT_SCOPE)
+endfunction()
+
+###############################################################################
+# private
+###############################################################################
+function(_cx_add_header_name SOURCE_FILES CLASS_NAME_WITH_PATH)
+	_cx_query_is_full_filename(IS_FULL_FILENAME ${CLASS_NAME_WITH_PATH})
+	if(${IS_FULL_FILENAME} MATCHES "False")
+		set(RESULT_cx_add_header_name ${CLASS_NAME_WITH_PATH}.h)
+	else()
+		set(RESULT_cx_add_header_name ${CLASS_NAME_WITH_PATH})
+	endif()
+
+	set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_cx_add_header_name} PARENT_SCOPE) # set retval
+endfunction()
+
+###############################################################################
+# Add classes and files to SOURCE_FILES.
+#
+# First argument:  List to populate with generated files.
+# Other arguments: Classes/files to add to list. Classes will expand to a h and cpp file.
+#                  Either input class names or file names, prepended with folder.
+#
+# Usage: add_class(SOURCE_FILES class1 class2 folder/class3 file1.h ...)
+###############################################################################
+function(cx_add_class SOURCE_FILES)
+	set(CLASS_NAME_WITH_PATH ${ARGV})
+	list(REMOVE_AT CLASS_NAME_WITH_PATH 0)
+
+	foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
+		_cx_add_one_class(RESULT_add_class ${CLASS_NAME})
+	endforeach()
+
+	set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_add_class} PARENT_SCOPE)
+endfunction()
+
+###############################################################################
+# Add Qt moc classes and files to SOURCE_FILES.
+#
+# As add_class(), but the class is run through the Qt Moc system as well.
+###############################################################################
+function(cx_add_class_qt_moc SOURCE_FILES)
+	set(CLASS_NAME_WITH_PATH ${ARGV})
+	list(REMOVE_AT CLASS_NAME_WITH_PATH 0)
+
+	foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
+		_cx_add_one_class(RESULT_add_class_qt_moc ${CLASS_NAME})
+	endforeach()
+
+	foreach(CLASS_NAME ${CLASS_NAME_WITH_PATH})
+		_cx_add_header_name(HEADER_NAMES ${CLASS_NAME})
+	endforeach()
+	# optimized: QT4_WRAP_CPP has large overhead: call once.
+	QT4_WRAP_CPP( RESULT_add_class_qt_moc ${HEADER_NAMES} )
+
+	set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
+endfunction()
+
