@@ -2,6 +2,7 @@
 ##               Resource Layer
 ###########################################################
 
+add_subdirectory(ssc)
 add_subdirectory(videoServer)
 add_subdirectory(OpenIGTLinkUtilities)
 
