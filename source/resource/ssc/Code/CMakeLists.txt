@@ -30,121 +30,109 @@ else(X11_FOUND)
     option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
 endif(X11_FOUND)
 
-SET( SSC_QT_MOC_HEADER_FILES
-    sscView.h
-    sscViewContainer.h
-#    vtkMods/sscViewQVTKWidget.h
-#    vtkMods/sscModified_QVTKWidget_5_8.h
-    Utilities/sscAcceptanceBoxWidget.h
-    #Data/sscLandmark.h
-    Data/sscData.h
-    Data/sscImage.h
-    Data/sscImageTF3D.h
-    Data/sscImageLUT2D.h
-    Data/sscImageTFData.h
-    Data/sscDataManager.h
-    Data/sscNavigatedVideoImage.h
-    Data/sscRegistrationTransform.h
-    Data/sscDataManagerImpl.h
-    Data/sscMesh.h
-    Data/sscVtkFileMesh.h
-    Data/sscPresets.h
-    Data/sscTransferFunctions3DPresets.h
-    Data/sscPointMetric.h
-    Data/sscDistanceMetric.h
-    Data/sscPlaneMetric.h
-    Data/sscAngleMetric.h
-    Data/sscUnsignedDerivedImage.h
-    Data/cxFrameMetric.h
+cx_add_class_qt_moc(SSC_SOURCE_FILES
+	sscView
+	sscViewContainer
+	Utilities/sscAcceptanceBoxWidget
+	Data/sscData
+	Data/sscImage
+	Data/sscImageTF3D
+	Data/sscImageLUT2D
+	Data/sscImageTFData
+	Data/sscDataManager
+	Data/sscNavigatedVideoImage
+	Data/sscRegistrationTransform
+	Data/sscDataManagerImpl
+	Data/sscMesh
+	Data/sscVtkFileMesh
+	Data/sscPresets
+	Data/sscTransferFunctions3DPresets
+	Data/sscPointMetric
+	Data/sscDistanceMetric
+	Data/sscPlaneMetric
+	Data/sscAngleMetric
+	Data/sscUnsignedDerivedImage
+	Data/cxFrameMetric
 
-    Video/sscVideoSource.h
-    Video/sscVideoRecorder.h
-    Video/sscVideoSourceSHM.h
-    Video/sscTestVideoSource.h
-    Video/sscImageImportVideoSource.h
-    Video/sscVideoSourceGraphics.h
+	Video/sscVideoSource.h
+	Video/sscVideoRecorder
+	Video/sscVideoSourceSHM
+	Video/sscTestVideoSource
+	Video/sscImageImportVideoSource
+	Video/sscVideoSourceGraphics
 
-    Video/sscImageImportVideoSource.h
+	Video/sscImageImportVideoSource
         
-    Tool/sscToolManager.h
-    Tool/sscTool.h 
-    Tool/sscProbe.h 
-    Tool/sscDummyTool.h
-    Tool/sscDummyToolManager.h
-    Tool/sscManualTool.h
-    Tool/sscProbeAdapterRTSource.h
+	Tool/sscToolManager
+	Tool/sscTool.h
+	Tool/sscProbe.h
+	Tool/sscDummyTool
+	Tool/sscDummyToolManager
+	Tool/sscManualTool
+	Tool/sscProbeAdapterRTSource
     
-    Rep/sscSliceProxy.h
-    Rep/sscRep.h
-    Rep/sscSlicerRepSW.h
-    Rep/sscToolRep3D.h
-    Rep/sscPickerRep.h
-    Rep/sscImageBlenderProxy.h
-    Rep/sscVolumetricRep.h    
-    Rep/sscSlicePlaneRep.h
-    Rep/sscProgressiveLODVolumetricRep.h
-    Rep/sscBlendedSliceRep.h
-    Rep/sscSlicedImageProxy.h
-    Rep/sscSurfaceRep.h
-    Rep/sscToolRep2D.h
-    Rep/sscCrossHairRep2D.h
-    Rep/sscTexture3DSlicerProxy.h
-    Rep/sscTexture3DSlicerRep.h
-    Rep/sscGPURayCastVolumeRep.h
-    Rep/sscSlices3DRep.h
-    Rep/sscSlicePlanes3DRep.h
-    Rep/sscGeometricRep.h
-    Rep/sscGeometricRep2D.h
-    Rep/sscSlicePlaneClipper.h
-    Rep/sscOrientationAnnotationRep.h
-    Rep/sscVideoRep.h
-    Rep/sscToolTracer.h
-    Rep/sscFiberBundleRep.h
-    Rep/sscDataMetricRep.h
-    Rep/sscPointMetricRep.h
-    Rep/sscPointMetricRep2D.h
-    Rep/sscDistanceMetricRep.h
-    Rep/sscAngleMetricRep.h
-    Rep/sscPlaneMetricRep.h
-    Rep/sscGuideRep2D.h
-     
-    Widgets/sscOptimizedUpdateWidget.h
-    Widgets/sscDataAdapter.h
-    Widgets/sscDoubleDataAdapter.h
-    Widgets/sscStringDataAdapter.h
-    Widgets/sscDoubleDataAdapterXml.h
-    Widgets/sscStringDataAdapterXml.h
-    Widgets/sscBoolDataAdapter.h
-    Widgets/sscBoolDataAdapterXml.h
-    Widgets/sscConsoleWidget.h
-    Widgets/sscDoubleWidgets.h
-    Widgets/sscLabeledComboBoxWidget.h
-    Widgets/sscLabeledLineEditWidget.h
-    Widgets/sscCheckBoxWidget.h
-    Widgets/sscHelperWidgets.h
-    Widgets/sscFileSelectWidget.h
-    Widgets/sscVector3DDataAdapter.h
-    Widgets/sscVector3DDataAdapterXml.h
-    Widgets/sscMousePadWidget.h
+	Rep/sscSliceProxy
+	Rep/sscRep.h
+	Rep/sscSlicerRepSW
+	Rep/sscToolRep3D
+	Rep/sscPickerRep
+	Rep/sscImageBlenderProxy
+	Rep/sscVolumetricRep
+	Rep/sscSlicePlaneRep
+	Rep/sscProgressiveLODVolumetricRep
+	Rep/sscBlendedSliceRep
+	Rep/sscSlicedImageProxy
+	Rep/sscSurfaceRep
+	Rep/sscToolRep2D
+	Rep/sscCrossHairRep2D
+	Rep/sscTexture3DSlicerProxy
+	Rep/sscTexture3DSlicerRep
+	Rep/sscGPURayCastVolumeRep
+	Rep/sscSlices3DRep
+	Rep/sscSlicePlanes3DRep
+	Rep/sscGeometricRep
+	Rep/sscGeometricRep2D
+	Rep/sscSlicePlaneClipper
+	Rep/sscOrientationAnnotationRep
+	Rep/sscVideoRep
+	Rep/sscToolTracer
+	Rep/sscFiberBundleRep
+	Rep/sscDataMetricRep
+	Rep/sscPointMetricRep
+	Rep/sscPointMetricRep2D
+	Rep/sscDistanceMetricRep
+	Rep/sscAngleMetricRep
+	Rep/sscPlaneMetricRep
+	Rep/sscGuideRep2D
+	Rep/cxFrameMetricRep
+
+	Widgets/sscOptimizedUpdateWidget
+	Widgets/sscDataAdapter
+	Widgets/sscDoubleDataAdapter.h
+	Widgets/sscStringDataAdapter.h
+	Widgets/sscDoubleDataAdapterXml
+	Widgets/sscStringDataAdapterXml
+	Widgets/sscBoolDataAdapter.h
+	Widgets/sscBoolDataAdapterXml
+	Widgets/sscConsoleWidget
+	Widgets/sscDoubleWidgets
+	Widgets/sscLabeledComboBoxWidget
+	Widgets/sscLabeledLineEditWidget
+	Widgets/sscCheckBoxWidget
+	Widgets/sscHelperWidgets
+	Widgets/sscFileSelectWidget
+	Widgets/sscVector3DDataAdapter.h
+	Widgets/sscVector3DDataAdapterXml
+	Widgets/sscMousePadWidget
 	Widgets/sscColorDataAdapter.h
-	Widgets/sscColorDataAdapterXml.h
-	Widgets/sscColorSelectWidget.h
-#	Widgets/cxColorSelectButton.h
+	Widgets/sscColorDataAdapterXml
+	Widgets/sscColorSelectWidget
+	Widgets/cxColorSelectButton
 
-	Utilities/sscApplication.h
-	Utilities/sscMessageManager.h
-    Utilities/sscSharedMemory.h
-    )
-
-SET( SSC_HEADER_FILES
-    ${SSC_QT_MOC_HEADER_FILES}
-    sscRep.h 
-    sscRepImpl.h 
-    sscVolumeRep.h
-    )
-#if (USE_GLX_SHARED_CONTEXT)
-#    SET(SSC_HEADER_FILES ${SSC_HEADER_FILES} vtkMods/sscSNWQVTKWidget.h)
-#endif (USE_GLX_SHARED_CONTEXT)
+	Utilities/sscApplication
+	Utilities/sscMessageManager
+	Utilities/sscSharedMemory
+	)
 
 set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/  
@@ -190,317 +178,60 @@ endif(WIN32)
 
 
 # library
-SET( SSC_SOURCE_FILES
-	sscForwardDeclarations.h
-	vtkForwardDeclarations.h
-)
-###############################################################################
-# Add a given class to SOURCE_FILES.
-# The input CLASS_NAME_WITH_PATH is appended with .h and .cpp, and
-# the two resulting files are added.
-###############################################################################
-macro(add_class SOURCE_FILES CLASS_NAME_WITH_PATH)
-	set(${SOURCE_FILES} ${${SOURCE_FILES}}
-		${CLASS_NAME_WITH_PATH}.h
-		${CLASS_NAME_WITH_PATH}.cpp)
-endmacro()
-###############################################################################
-# Add a Qt moc class to SOURCE_FILES.
-# The input CLASS_NAME_WITH_PATH is appended with .h and .cpp, and
-# the two resulting files are added.
-###############################################################################
-macro(add_class_qt_moc SOURCE_FILES CLASS_NAME_WITH_PATH)
-find_package( Qt4 REQUIRED )
-	add_class(${SOURCE_FILES} ${CLASS_NAME_WITH_PATH})
-	QT4_WRAP_CPP( RESULT ${CLASS_NAME_WITH_PATH}.h )
-	set(${SOURCE_FILES} ${${SOURCE_FILES}}
-		${RESULT})
-endmacro()
-
-
-# library
-SET( SSC_SOURCE_FILES
+cx_add_class( SSC_SOURCE_FILES
     sscForwardDeclarations.h
     vtkForwardDeclarations.h
 
-    sscView.cpp
-    sscView.h
-    sscViewContainer.cpp
-    sscViewContainer.h
-    vtkMods/sscViewRenderWindow.cpp
-    vtkMods/sscViewRenderWindow.h
-    vtkMods/sscViewQVTKWidget.cpp
-    vtkMods/sscViewQVTKWidget.h
+	Video/sscVideoGraphics
 
-    Math/sscBoundingBox3D.cpp
-    Math/sscBoundingBox3D.h
-    Math/sscVector3D.cpp
-    Math/sscVector3D.h
-    Math/sscTransform3D.cpp 
-    Math/sscTransform3D.h
-    Math/sscFrame3D.cpp
-    Math/sscFrame3D.h
+	Tool/sscProbeSector
+	Tool/sscProbeData
 
-	Utilities/sscApplication.h
-	Utilities/sscApplication.cpp
-    Utilities/sscAudio.h
-    Utilities/sscCoordinateSystemHelpers.h
-    Utilities/sscCoordinateSystemHelpers.cpp
-    Utilities/sscMeshHelpers.cpp
-    Utilities/sscMeshHelpers.h
-    Utilities/sscSliceComputer.cpp 
-    Utilities/sscSliceComputer.h
-    Utilities/sscIndent.cpp
-    Utilities/sscIndent.h
-    Utilities/sscAcceptanceBoxWidget.cpp
-    Utilities/sscAcceptanceBoxWidget.h
-    Utilities/sscGraphicalPrimitives.cpp
-    Utilities/sscGraphicalPrimitives.h
-    Utilities/sscUtilHelpers.cpp
-    Utilities/sscUtilHelpers.h
-    Utilities/sscPositionStorageFile.cpp
-    Utilities/sscPositionStorageFile.h
-    Utilities/sscTypeConversions.cpp
-    Utilities/sscTypeConversions.h
-    Utilities/sscMD5Check.cpp
-    Utilities/sscMD5Check.h
-    Utilities/sscSnwInifile.cpp
-    Utilities/sscSnwInifile.h
-    Utilities/sscGLHelpers.cpp
-    Utilities/sscGLHelpers.h
-    Utilities/sscEnumConverter.h
-    Utilities/sscDefinitions.h
-    Utilities/sscDefinitions.cpp
-    Utilities/sscDefinitionStrings.cpp
-    Utilities/sscTime.h
-    Utilities/sscTime.cpp
-    Utilities/sscMessageManager.h
-    Utilities/sscMessageManager.cpp
-    Utilities/sscVolumeHelpers.h
-    Utilities/sscVolumeHelpers.cpp
-    Utilities/sscCustomMetaImage.h
-    Utilities/sscCustomMetaImage.cpp
-    Utilities/sscViewportListener.h
-    Utilities/sscViewportListener.cpp
-    Utilities/sscSharedMemory.cpp
-    Utilities/sscLogger.h
-    Utilities/sscLogger.cpp
-    Utilities/sscTimeKeeper.h
-    Utilities/sscTimeKeeper.cpp
+	Widgets/sscXmlOptionItem
 
-    Rep/sscRep.h
-    Rep/sscRepImpl.h
-    Rep/sscRepImpl.cpp
-    Rep/sscRepImpl.h
-    Rep/sscAxesRep.cpp
-    Rep/sscAxesRep.h
-    Rep/sscSliceRep.cpp
-    Rep/sscSliceRep.h
-    Rep/sscVolumetricRep.h
-    Rep/sscVolumetricRep.cpp
-    Rep/sscProgressiveLODVolumetricRep.cpp
-    Rep/sscProgressiveLODVolumetricRep.h
-    Rep/sscGeometricRep.cpp
-    Rep/sscGeometricRep.h
-    Rep/sscGeometricRep2D.cpp
-    Rep/sscGeometricRep2D.h
-    Rep/sscToolRep3D.cpp
-    Rep/sscToolRep3D.h
-    Rep/sscPickerRep.cpp
-    Rep/sscPickerRep.h
-    Rep/sscSlicerRepSW.cpp
-    Rep/sscSlicerRepSW.h
-    Rep/sscSliceProxy.cpp
-    Rep/sscSliceProxy.h
-    Rep/sscSlicePlaneRep.cpp
-    Rep/sscSlicePlaneRep.h
-    Rep/sscSlicedImageProxy.cpp
-    Rep/sscSlicedImageProxy.h
-    Rep/sscBlendedSliceRep.cpp
-    Rep/sscBlendedSliceRep.h
-    Rep/sscSurfaceRep.cpp
-    Rep/sscSurfaceRep.h
-    Rep/sscImageBlenderProxy.cpp
-    Rep/sscImageBlenderProxy.h
-    Rep/sscTexture3DSlicerProxy.h
-    Rep/sscTexture3DSlicerProxy.cpp
-    Rep/sscTexture3DSlicerRep.cpp
-    Rep/sscTexture3DSlicerRep.h
-    Rep/sscGPURayCastVolumeRep.cpp
-    Rep/sscGPURayCastVolumeRep.h
-    Rep/sscGPURayCastVolumePainter.cpp
-    Rep/sscGPURayCastVolumePainter.h
-    Rep/sscSlices3DRep.h
-    Rep/sscSlices3DRep.cpp
-    Rep/sscTextureSlicePainter.cpp
-    Rep/sscTextureSlicePainter.h
-    Rep/sscOrientationAnnotationRep.cpp
-    Rep/sscOrientationAnnotationRep.h
-    Rep/sscToolRep2D.cpp
-    Rep/sscToolRep2D.h
-    Rep/sscCrossHairRep2D.cpp
-    Rep/sscCrossHairRep2D.h
-    Rep/sscDisplayTextRep.cpp
-    Rep/sscDisplayTextRep.h
-    Rep/sscVtkHelperClasses.cpp
-    Rep/sscVtkHelperClasses.h
-    Rep/sscSlicePlanes3DRep.cpp
-    Rep/sscSlicePlanes3DRep.h
-    Rep/sscSlicePlaneClipper.h
-    Rep/sscSlicePlaneClipper.cpp
-    Rep/sscVideoRep.h
-    Rep/sscVideoRep.cpp
-    Rep/sscUltrasoundSectorSource.h
-    Rep/sscUltrasoundSectorSource.cpp
-    Rep/sscToolTracer.h
-    Rep/sscToolTracer.cpp
-    Rep/sscFiberBundleRep.h
-    Rep/sscFiberBundleRep.cpp
-    Rep/sscDataMetricRep.h
-    Rep/sscDataMetricRep.cpp
-    Rep/sscPointMetricRep.h
-    Rep/sscPointMetricRep.cpp
-    Rep/sscPointMetricRep2D.h
-    Rep/sscPointMetricRep2D.cpp
-    Rep/sscDistanceMetricRep.h
-    Rep/sscDistanceMetricRep.cpp
-    Rep/sscAngleMetricRep.h
-    Rep/sscAngleMetricRep.cpp
-    Rep/sscPlaneMetricRep.h
-    Rep/sscPlaneMetricRep.cpp
-    Rep/sscGuideRep2D.h
-    Rep/sscGuideRep2D.cpp
-    
-    Data/sscLandmark.h
-    Data/sscLandmark.cpp
-    Data/sscData.cpp
-    Data/sscData.h
-    Data/sscImage.h
-    Data/sscImage.cpp
-    Data/sscImageTF3D.h
-    Data/sscImageTF3D.cpp
-    Data/sscImageLUT2D.cpp
-    Data/sscImageLUT2D.h
-    Data/sscImageTFData.cpp
-    Data/sscImageTFData.h
-    Data/sscNavigatedVideoImage.cpp
-    Data/sscNavigatedVideoImage.h
-    Data/sscGPUImageBuffer.cpp
-    Data/sscGPUImageBuffer.h
-    Data/sscMesh.h
-    Data/sscMesh.cpp
-    Data/sscVtkFileMesh.h
-    Data/sscVtkFileMesh.cpp
-    Data/sscDataManager.cpp
-    Data/sscDataManager.h
-    Data/sscDataManagerImpl.cpp
-    Data/sscDataManagerImpl.h
-    Data/sscSNW2Volume.cpp
-    Data/sscSNW2Volume.h
-    Data/sscRegistrationTransform.cpp
-    Data/sscRegistrationTransform.h
-    Data/sscPresets.h
-    Data/sscPresets.cpp
-    Data/sscTransferFunctions3DPresets.h
-    Data/sscTransferFunctions3DPresets.cpp
-    Data/sscPointMetric.h
-    Data/sscPointMetric.cpp
-    Data/sscDistanceMetric.h
-    Data/sscDistanceMetric.cpp
-    Data/sscPlaneMetric.h
-    Data/sscPlaneMetric.cpp
-    Data/sscAngleMetric.h
-    Data/sscAngleMetric.cpp
-    Data/sscDataMetric.h
-    Data/sscDataMetric.cpp
-    Data/sscUnsignedDerivedImage.h
-    Data/sscUnsignedDerivedImage.cpp
-	Data/sscDataReaderWriter.h
-	Data/sscDataReaderWriter.cpp
-    Data/cxFrameMetric.h
-    Data/cxFrameMetric.cpp
+	Rep/sscVtkHelperClasses
+	Rep/sscTextureSlicePainter
+	Rep/sscGPURayCastVolumePainter
+	Rep/sscRepImpl
+	Rep/sscUltrasoundSectorSource
+	Rep/sscAxesRep
+	Rep/sscDisplayTextRep
 
+	Data/sscDataMetric
+	Data/sscLandmark
+	Data/sscDataReaderWriter
+	Data/sscGPUImageBuffer
 
-    Video/sscVideoSource.h
-    Video/sscVideoRecorder.h
-    Video/sscVideoRecorder.cpp
-    Video/sscVideoSourceSHM.h
-    Video/sscVideoSourceSHM.cpp
-    Video/sscTestVideoSource.h
-    Video/sscTestVideoSource.cpp    
-    Video/sscImageImportVideoSource.h
-    Video/sscImageImportVideoSource.cpp
-    Video/sscVideoSourceGraphics.h
-    Video/sscVideoSourceGraphics.cpp
-    Video/sscVideoGraphics.h
-    Video/sscVideoGraphics.cpp
+	Math/sscBoundingBox3D
+	Math/sscVector3D
+	Math/sscTransform3D
+	Math/sscFrame3D
 
-    Tool/sscToolManager.cpp
-    Tool/sscToolManager.h
-    Tool/sscTool.h 
-    Tool/sscDummyToolManager.cpp
-    Tool/sscDummyToolManager.h
-    Tool/sscDummyTool.cpp
-    Tool/sscDummyTool.h
-    Tool/sscManualTool.cpp
-    Tool/sscManualTool.h
-    Tool/sscProbeData.cpp
-    Tool/sscProbeData.h
-    Tool/sscProbeSector.h 
-    Tool/sscProbeSector.cpp 
-    Tool/sscProbeAdapterRTSource.h
-    Tool/sscProbeAdapterRTSource.cpp
-    
-    Widgets/sscOptimizedUpdateWidget.h
-    Widgets/sscOptimizedUpdateWidget.cpp
-    Widgets/sscDoubleRange.h
-    Widgets/sscHelperWidgets.cpp
-    Widgets/sscHelperWidgets.h
-    Widgets/sscDoubleDataAdapter.h
-    Widgets/sscDataAdapter.h
-    Widgets/sscDataAdapter.cpp
-    Widgets/sscBoolDataAdapter.h
-    Widgets/sscDoubleWidgets.h    
-    Widgets/sscDoubleWidgets.cpp    
-    Widgets/sscStringDataAdapter.h
-    Widgets/sscDoubleDataAdapterXml.h
-    Widgets/sscDoubleDataAdapterXml.cpp
-    Widgets/sscBoolDataAdapterXml.h
-    Widgets/sscBoolDataAdapterXml.cpp
-    Widgets/sscStringDataAdapterXml.h
-    Widgets/sscStringDataAdapterXml.cpp
-    Widgets/sscLabeledComboBoxWidget.h    
-    Widgets/sscLabeledComboBoxWidget.cpp  
-    Widgets/sscLabeledLineEditWidget.h
-    Widgets/sscLabeledLineEditWidget.cpp  
-    Widgets/sscCheckBoxWidget.h
-    Widgets/sscCheckBoxWidget.cpp
-    Widgets/sscXmlOptionItem.h    
-    Widgets/sscXmlOptionItem.cpp
-    Widgets/sscConsoleWidget.h
-    Widgets/sscConsoleWidget.cpp
-    Widgets/sscFileSelectWidget.h
-    Widgets/sscFileSelectWidget.cpp
-    Widgets/sscVector3DDataAdapter.h
-    Widgets/sscVector3DDataAdapterXml.h
-    Widgets/sscVector3DDataAdapterXml.cpp
-    Widgets/sscMousePadWidget.h
-    Widgets/sscMousePadWidget.cpp
-	Widgets/sscColorDataAdapter.h
-	Widgets/sscColorDataAdapterXml.h
-	Widgets/sscColorDataAdapterXml.cpp
-	Widgets/sscColorSelectWidget.h
-	Widgets/sscColorSelectWidget.cpp
-	Widgets/cxColorSelectButton.h
-	Widgets/cxColorSelectButton.cpp
+	Utilities/sscGraphicalPrimitives
+	Utilities/sscGLHelpers
+	Utilities/sscTime
+	Utilities/sscUtilHelpers
+	Utilities/sscLogger
+	Utilities/sscTypeConversions
+	Utilities/sscSliceComputer
+	Utilities/sscDefinitions.h
+	Utilities/sscDefinitionStrings
+	Utilities/sscCustomMetaImage
+	Utilities/sscMD5Check
+	Utilities/sscSnwInifile
+	Utilities/sscIndent
+	Utilities/sscCoordinateSystemHelpers
+	Utilities/sscViewportListener
+	Utilities/sscVolumeHelpers
+	Utilities/sscPositionStorageFile
+	Utilities/sscTimeKeeper
+	Utilities/sscMeshHelpers
 
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx
     vesselReg/HackTPSTransform.hxx
     ) 
 
-add_class_qt_moc(SSC_SOURCE_FILES "Rep/cxFrameMetricRep")
-add_class_qt_moc(SSC_SOURCE_FILES Widgets/cxColorSelectButton)
 
 # =========================================================
 # =========================================================
@@ -538,15 +269,15 @@ if (USE_GLX_SHARED_CONTEXT)
     #add moc versions of out modified QVTKWidget
     if (VTK_MAJOR_VERSION EQUAL 5)
         if (VTK_MINOR_VERSION EQUAL 4)
-            SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_4.h)
+			cx_add_class_qt_moc(SSC_SOURCE_FILES vtkMods/sscSNWQVTKWidget5_4.h)
             SET(SUPPORTED_VTK_VERSION_FOUND "5.4")
         endif (VTK_MINOR_VERSION EQUAL 4)
         if (VTK_MINOR_VERSION EQUAL 5)
-            SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_5.h)
+			cx_add_class_qt_moc(SSC_SOURCE_FILES vtkMods/sscSNWQVTKWidget5_5.h)
             SET(SUPPORTED_VTK_VERSION_FOUND "5.5")
         endif (VTK_MINOR_VERSION EQUAL 5)
         if (VTK_MINOR_VERSION EQUAL 6)
-            SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_5.h)
+			cx_add_class_qt_moc(SSC_SOURCE_FILES vtkMods/sscSNWQVTKWidget5_5.h)
             SET(SUPPORTED_VTK_VERSION_FOUND "5.6")
         endif (VTK_MINOR_VERSION EQUAL 6)
         if (VTK_MINOR_VERSION EQUAL 8)
@@ -572,19 +303,17 @@ set( SSC_VTK_LIBRARIES
 # =========================================================
 # qt
 # =========================================================
-find_package( Qt4 REQUIRED )
-set(QT_USE_QTNETWORK 1)
-set(QT_USE_QTXML 1)
-include( ${QT_USE_FILE} )
+#find_package( Qt4 REQUIRED )
+#set(QT_USE_QTNETWORK 1)
+#set(QT_USE_QTXML 1)
+#include( ${QT_USE_FILE} )
 
 # clear variables; Qt appends to these vars
-set( UI_HEADER_FILES )
-set( MOC_HEADER_FILES )
-set( GENERATED_RESOURCES )
+#set( UI_HEADER_FILES )
+#set( GENERATED_RESOURCES )
 
-QT4_WRAP_UI( UI_HEADER_FILES ${SSC_QT_UI_FILES} )
-QT4_WRAP_CPP( MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} )
-QT4_ADD_RESOURCES( GENERATED_RESOURCES ${SSC_QT_RESOURCE_FILES} )
+#QT4_WRAP_UI( UI_HEADER_FILES ${SSC_QT_UI_FILES} )
+#QT4_ADD_RESOURCES( GENERATED_RESOURCES ${SSC_QT_RESOURCE_FILES} )
 
 # =========================================================
 # stuff
@@ -609,10 +338,10 @@ configure_file(
 # =========================================================
 
 set( SSC_GENERATED_SOURCE_FILES
-    ${SSC_SOURCE_FILES} 
-    ${UI_HEADER_FILES} 
-    ${MOC_HEADER_FILES} 
-    ${GENERATED_RESOURCES} )
+	${SSC_SOURCE_FILES} )
+#    ${UI_HEADER_FILES}
+#    ${MOC_HEADER_FILES}
+#    ${GENERATED_RESOURCES} )
 
 set( SSC_GENERATED_LIBRARIES
     ${QT_LIBRARIES} 
@@ -637,8 +366,6 @@ CX_COTIRE_ADD_LIBRARY(SSC "${SSC_GENERATED_LIBRARIES}")
 # =========================================================
 # 
 # Configure the file describing how to use SSC
-#get_target_property (SSC_LIBRARY SSC LOCATION)
-#set (SSC_INCLUDE ${PROJECT_BINARY_DIR}/include)
 
 set (SSC_DIR ${SSC_BINARY_DIR} CACHE PATH "where to find the SSC cmake")
 
@@ -657,15 +384,4 @@ include (CMakeExportBuildSettings)
 cmake_export_build_settings (${SSC_BINARY_DIR}/SSCBuildSettings.cmake)
 export_library_dependencies (${SSC_BINARY_DIR}/SSCLibraryDepends.cmake)
 
-
-# =========================================================
-# quick fix for removing install from CustusX (which uses fixup_bundle())
-if (NOT CustusX3_SOURCE_DIR)
-    # install lib into lib64 folder
-    install( TARGETS SSC DESTINATION lib64 )
-endif ()
-# =========================================================
-
 SET_TARGET_PROPERTIES( SSC PROPERTIES COMPILE_FLAGS "${SNW_COMPILE_FLAGS}" LINK_FLAGS "${SNW_LINK_FLAGS}" LINK_LIBS "${SNW_LINK_LIBS}")
-
-#add_subdirectory(Ultrasound/3DReconstruction)
