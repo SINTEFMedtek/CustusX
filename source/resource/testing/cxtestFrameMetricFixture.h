@@ -31,10 +31,10 @@ public:
 	FrameMetricFixture();
 	~FrameMetricFixture();
 	bool createAndSetTestTransform();
+	bool readTransformFromString(QString matrixString);
 	bool isEqualTransform(ssc::Transform3D transform);
 	QDomNode createDummyXmlNode();
 	cx::FrameMetricPtr createFromXml(QDomNode& xmlNode);
-	QString expectedStringAfterConversion();
 	void setPatientRegistration();
 	void changeSpaceToPatientReference();
 	void setSpaceToOrigial();
@@ -43,6 +43,7 @@ public:
 	cx::FrameMetricPtr mOriginalMetric;
 	cx::FrameMetricPtr mModifiedMetric;
 	ssc::Transform3D mTestTransform;
+	ssc::Transform3D mReturnedTransform;
 	QDomNode mXmlNode;
 	QString mTestFile;
 };

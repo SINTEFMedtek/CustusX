@@ -111,15 +111,9 @@ QString FrameMetric::getAsSingleLineString()
 
 QString FrameMetric::matrixAsSingleLineString()
 {
-	QString retval;
-	for(int i = 0; i < 16; ++i)
-	{
-		QString elem;
-		elem.setNum(mFrame.flatten()[i]);
-		retval += " ";
-		retval += elem;
-	}
-	return retval;
+	std::stringstream stream;
+	mFrame.put(stream, 0, ' ');
+	return qstring_cast(stream.str());
 }
 
 QString FrameMetric::pointAsSingleLineString()
