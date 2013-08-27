@@ -41,13 +41,20 @@ FrameMetricFixture::~FrameMetricFixture()
 bool FrameMetricFixture::createAndSetTestTransform()
 {
 	mTransformString = "1.1 2 3 4 5 6 7 8 9 10 11 12 0 0 0 1";
-	bool transformStringOk = false;
-	mTestTransform = ssc::Transform3D::fromString(mTransformString, &transformStringOk);
-	if(!transformStringOk)
+	if (!this->readTransformFromString(mTransformString))
 		return false;
+	mTestTransform = this->mReturnedTransform;
+
 	mOriginalMetric->setFrame(mTestTransform);
 	mModifiedMetric->setFrame(mTestTransform);
 	return true;
+}
+
+bool FrameMetricFixture::readTransformFromString(QString matrixString)
+{
+	bool transformStringOk = false;
+	mReturnedTransform = ssc::Transform3D::fromString(matrixString, &transformStringOk);
+	return transformStringOk;
 }
 
 bool FrameMetricFixture::isEqualTransform(ssc::Transform3D transform)
@@ -67,11 +74,6 @@ cx::FrameMetricPtr FrameMetricFixture::createFromXml(QDomNode& xmlNode)
 {
 	mModifiedMetric->parseXml(xmlNode);
 	return mModifiedMetric;
-}
-
-QString FrameMetricFixture::expectedStringAfterConversion()
-{
-	return QString("frameMetric \"testMetric\" \"reference\"  ") + mTransformString;
 }
 
 void FrameMetricFixture::setPatientRegistration()

@@ -68,9 +68,16 @@ TEST_CASE("cxFrameMetric can convert transform to single line string", "[unit]")
 	cxtest::FrameMetricFixture fixture;
 	REQUIRE(fixture.createAndSetTestTransform());
 
-	QString stringTransform = fixture.mOriginalMetric->getAsSingleLineString();
-	REQUIRE(!stringTransform.isEmpty());
-	REQUIRE(stringTransform == fixture.expectedStringAfterConversion());
+	QString metricString = fixture.mOriginalMetric->getAsSingleLineString();
+	REQUIRE(!metricString.isEmpty());
+
+	QStringList list = metricString.split("\"reference\"");
+	QString headingAndName = list[0];
+	QString maxtrixString = list[1];
+
+	CHECK(headingAndName == "frameMetric \"testMetric\" ");
+	REQUIRE(fixture.readTransformFromString(maxtrixString));
+	REQUIRE(fixture.isEqualTransform(fixture.mReturnedTransform));
 }
 
 TEST_CASE("cxFrameMetric can set space correctly", "[unit]")
