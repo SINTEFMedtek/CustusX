@@ -39,73 +39,65 @@ DistanceMetricRepPtr DistanceMetricRep::New(const QString& uid, const QString& n
 }
 
 DistanceMetricRep::DistanceMetricRep(const QString& uid, const QString& name) :
-				DataMetricRep(uid, name), mView(NULL)
+                DataMetricRep(uid, name)
 {
 }
 
-void DistanceMetricRep::setDistanceMetric(DistanceMetricPtr point)
+void DistanceMetricRep::clear()
 {
-	if (mMetric)
-		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	mMetric = point;
-
-	if (mMetric)
-		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	mGraphicalLine.reset();
-	mText.reset();
-	this->changedSlot();
+    DataMetricRep::clear();
+    mGraphicalLine.reset();
 }
 
-void DistanceMetricRep::addRepActorsToViewRenderer(ssc::View *view)
+DistanceMetricPtr DistanceMetricRep::getDistanceMetric()
 {
-	mView = view;
-	mGraphicalLine.reset();
-	mText.reset();
-
-	this->changedSlot();
+    return boost::dynamic_pointer_cast<DistanceMetric>(mMetric);
 }
 
-void DistanceMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
-{
-	mView = NULL;
-	mGraphicalLine.reset();
-	mText.reset();
-}
 
 void DistanceMetricRep::changedSlot()
 {
-	if (!mMetric)
+    DistanceMetricPtr distanceMetric = this->getDistanceMetric();
+    if (!distanceMetric)
 		return;
 
-	std::vector<ssc::Vector3D> p = mMetric->getEndpoints();
-	if (p.size() != 2)
-		return;
+    if (!mMetric->isValid())
+        return;
+//	if (p.size() != 2)
+//		return;
 
-	if (!mGraphicalLine && mView && mMetric)
+    if (!mGraphicalLine && mView)
 	{
 		mGraphicalLine.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
-		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+//		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
 	}
 
-	if (!mGraphicalLine)
-		return;
+    if (mGraphicalLine)
+    {
+        mGraphicalLine->setColor(mColor);
+        std::vector<ssc::Vector3D> p = distanceMetric->getEndpoints();
+        mGraphicalLine->setValue(p[0], p[1]);
+        mGraphicalLine->setStipple(0xF0FF);
+    }
 
-	mGraphicalLine->setColor(mColor);
-	mGraphicalLine->setValue(p[0], p[1]);
-	mGraphicalLine->setStipple(0xF0FF);
+//	QString text = QString("%1 mm").arg(mMetric->getDistance(), 0, 'f', 1);
+//	if (mShowLabel)
+//		text = mMetric->getName() + " = " + text;
+//	ssc::Vector3D p_mean = (p[0] + p[1]) / 2;
 
-	QString text = QString("%1 mm").arg(mMetric->getDistance(), 0, 'f', 1);
-	if (mShowLabel)
-		text = mMetric->getName() + " = " + text;
-	ssc::Vector3D p_mean = (p[0] + p[1]) / 2;
+//	mText->setColor(mColor);
+//	mText->setText(text);
+//	mText->setPosition(p_mean);
+//	mText->setSize(mLabelSize / 100);
+    this->drawText();
+}
 
-	mText->setColor(mColor);
-	mText->setText(text);
-	mText->setPosition(p_mean);
-	mText->setSize(mLabelSize / 100);
-//  mText->setSizeInNormalizedViewport(true, mLabelSize/100);
+QString DistanceMetricRep::getText()
+{
+    QString text = QString("%1 mm").arg(this->getDistanceMetric()->getDistance(), 0, 'f', 1);
+    if (mShowLabel)
+        text = mMetric->getName() + " = " + text;
+    return text;
 }
 
 }

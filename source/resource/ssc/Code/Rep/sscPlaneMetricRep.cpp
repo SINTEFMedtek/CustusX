@@ -34,42 +34,46 @@ PlaneMetricRepPtr PlaneMetricRep::New(const QString& uid, const QString& name)
 }
 
 PlaneMetricRep::PlaneMetricRep(const QString& uid, const QString& name) :
-				DataMetricRep(uid, name), mView(NULL)
+                DataMetricRep(uid, name)
 {
 	mViewportListener.reset(new ssc::ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PlaneMetricRep::rescale, this));
 }
 
-void PlaneMetricRep::setMetric(PlaneMetricPtr point)
+//void PlaneMetricRep::setMetric(PlaneMetricPtr point)
+//{
+//	if (mMetric)
+//		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+
+//	mMetric = point;
+
+//	if (mMetric)
+//		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+
+//	mGraphicalPoint.reset();
+//	mNormal.reset();
+//	this->changedSlot();
+//}
+
+void PlaneMetricRep::clear()
 {
-	if (mMetric)
-		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	mMetric = point;
-
-	if (mMetric)
-		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	mGraphicalPoint.reset();
-	mNormal.reset();
-	this->changedSlot();
+    mGraphicalPoint.reset();
+    mNormal.reset();
 }
 
 void PlaneMetricRep::addRepActorsToViewRenderer(ssc::View *view)
 {
-	mView = view;
-	mGraphicalPoint.reset();
-	mNormal.reset();
-	mViewportListener->startListen(mView->getRenderer());
-	this->changedSlot();
+    mViewportListener->startListen(view->getRenderer());
+    DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
 void PlaneMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
-	mView = NULL;
-	mGraphicalPoint.reset();
-	mNormal.reset();
+//	mView = NULL;
+//	mGraphicalPoint.reset();
+//	mNormal.reset();
 	mViewportListener->stopListen();
+    DataMetricRep::removeRepActorsFromViewRenderer(view);
 }
 
 void PlaneMetricRep::changedSlot()
@@ -138,17 +142,18 @@ void PlaneMetricRep::rescale()
 //  double sphereSize = 0.007/size;
 	mGraphicalPoint->setRadius(sphereSize);
 
-	if (!mShowLabel)
-		mText.reset();
-	if (!mText && mShowLabel)
-		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
-	if (mText)
-	{
-		mText->setColor(mColor);
-		mText->setText(mMetric->getName());
-		mText->setPosition(p0_r);
-		mText->setSize(mLabelSize / 100);
-	}
+    this->drawText();
+//	if (!mShowLabel)
+//		mText.reset();
+//	if (!mText && mShowLabel)
+//		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+//	if (mText)
+//	{
+//		mText->setColor(mColor);
+//		mText->setText(mMetric->getName());
+//		mText->setPosition(p0_r);
+//		mText->setSize(mLabelSize / 100);
+//	}
 }
 
 }

@@ -53,6 +53,13 @@ Plane3D PlaneMetric::getRefPlane() const
 	return Eigen::Hyperplane<double, 3>(n, p);
 }
 
+ssc::Vector3D PlaneMetric::getRefCoord() const
+{
+    ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+    ssc::Vector3D p0_r = rM0.coord(this->getCoordinate());
+    return p0_r;
+}
+
 void PlaneMetric::setCoordinate(const ssc::Vector3D& p)
 {
 	if (p == mCoordinate)

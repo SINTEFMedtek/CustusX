@@ -35,7 +35,7 @@ DataMetric::~DataMetric()
 
 QString DataMetric::getSpace()
 {
-	return "";
+    return "";
 }
 
 }

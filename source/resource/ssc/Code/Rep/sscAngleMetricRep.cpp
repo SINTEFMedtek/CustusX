@@ -44,53 +44,28 @@ AngleMetricRepPtr AngleMetricRep::New(const QString& uid, const QString& name)
 }
 
 AngleMetricRep::AngleMetricRep(const QString& uid, const QString& name) :
-				DataMetricRep(uid, name),
-				mView(NULL)
+                DataMetricRep(uid, name)
 {
 }
 
-void AngleMetricRep::setMetric(AngleMetricPtr point)
+void AngleMetricRep::clear()
 {
-	if (mMetric)
-		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	mMetric = point;
-
-	if (mMetric)
-		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	mLine0.reset();
-	mLine1.reset();
-	mArc.reset();
-	mText.reset();
-	this->changedSlot();
+    DataMetricRep::clear();
+    mLine0.reset();
+    mLine1.reset();
+    mArc.reset();
 }
 
-void AngleMetricRep::addRepActorsToViewRenderer(ssc::View *view)
+AngleMetricPtr AngleMetricRep::getAngleMetric()
 {
-	mView = view;
-
-	mLine0.reset();
-	mLine1.reset();
-	mArc.reset();
-	mText.reset();
-
-	this->changedSlot();
-}
-
-void AngleMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
-{
-	mView = NULL;
-
-	mLine0.reset();
-	mLine1.reset();
-	mArc.reset();
-	mText.reset();
+    return boost::dynamic_pointer_cast<AngleMetric>(mMetric);
 }
 
 void AngleMetricRep::changedSlot()
 {
-	if (!mMetric || !mMetric->isValid())
+    AngleMetricPtr angleMetric = this->getAngleMetric();
+
+    if (!angleMetric || !mMetric->isValid())
 		return;
 
 	if (!mLine0 && !mLine1 && mView && mMetric)
@@ -98,19 +73,19 @@ void AngleMetricRep::changedSlot()
 		mLine0.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
 		mLine1.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
 		mArc.reset(new ssc::GraphicalArc3D(mView->getRenderer()));
-		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+//		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
 	}
 
 	if (!mLine0)
 		return;
 
-	std::vector<ssc::Vector3D> p = mMetric->getEndpoints();
+    std::vector<ssc::Vector3D> p = angleMetric->getEndpoints();
 
 	mLine0->setColor(mColor);
 	mLine1->setColor(mColor);
 	mArc->setColor(mColor);
 	mLine0->setStipple(0x0F0F);
-	mLine1->setStipple(0x0F0F);
+    mLine1->setStipple(0x0F0F);
 	mArc->setStipple(0xF0FF);
 	mLine0->setValue(p[0], p[1]);
 	mLine1->setValue(p[2], p[3]);
@@ -123,15 +98,24 @@ void AngleMetricRep::changedSlot()
 	ssc::Vector3D a_end = a_center + l1.normalized() * d;
 	mArc->setValue(a_start, a_end, a_center);
 
-	ssc::Vector3D a_text = (a_center + a_start + a_end) / 3;
+//	ssc::Vector3D a_text = (a_center + a_start + a_end) / 3;
 
-	QString text = QString("%1*").arg(mMetric->getAngle() / M_PI * 180, 0, 'f', 1);
-	if (mShowLabel)
-		text = mMetric->getName() + " = " + text;
-	mText->setColor(mColor);
-	mText->setText(text);
-	mText->setPosition(a_text);
-	mText->setSize(mLabelSize / 100);
+//	QString text = QString("%1*").arg(mMetric->getAngle() / M_PI * 180, 0, 'f', 1);
+//	if (mShowLabel)
+//		text = mMetric->getName() + " = " + text;
+//	mText->setColor(mColor);
+//	mText->setText(text);
+//	mText->setPosition(a_text);
+//	mText->setSize(mLabelSize / 100);
+    this->drawText();
+}
+
+QString AngleMetricRep::getText()
+{
+    QString text = QString("%1*").arg(this->getAngleMetric()->getAngle() / M_PI * 180, 0, 'f', 1);
+    if (mShowLabel)
+        text = mMetric->getName() + " = " + text;
+    return text;
 }
 
 }

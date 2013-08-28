@@ -100,7 +100,7 @@ public:
 	{
 		return "pointMetric";
 	}
-	ssc::Vector3D getRefCoord() const;
+    virtual ssc::Vector3D getRefCoord() const;
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.

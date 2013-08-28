@@ -78,12 +78,13 @@ public:
 	void setArgument(int index, ssc::DataPtr p);
 	ssc::DataPtr getArgument(int index);
 	bool validArgument(ssc::DataPtr p) const;
-	bool isValid() const;
+    virtual bool isValid() const;
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual ssc::DoubleBoundingBox3D boundingBox() const;
-	virtual QString getType() const
+    virtual ssc::Vector3D getRefCoord() const;
+    virtual QString getType() const
 	{
 		return "angleMetric";
 	}

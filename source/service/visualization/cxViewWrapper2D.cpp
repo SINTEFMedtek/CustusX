@@ -588,7 +588,7 @@ void ViewWrapper2D::pointMetricAdded(ssc::PointMetricPtr mesh)
 
 	ssc::PointMetricRep2DPtr rep = ssc::PointMetricRep2D::New(mesh->getUid() + "_rep2D");
 	rep->setSliceProxy(mSliceProxy);
-	rep->setPointMetric(mesh);
+    rep->setDataMetric(mesh);
 	rep->setFillVisibility(false);
 	rep->setOutlineWidth(0.25);
 	rep->setOutlineColor(1,0,0);

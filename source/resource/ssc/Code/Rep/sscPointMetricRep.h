@@ -53,7 +53,8 @@ protected:
 	virtual void addRepActorsToViewRenderer(ssc::View *view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
-	virtual void rescale();
+    virtual void clear();
+    virtual void rescale();
 
 protected slots:
 	virtual void changedSlot();
@@ -63,9 +64,7 @@ private:
 	PointMetricRep(); ///< not implemented
 
 	ssc::GraphicalPoint3DPtr mGraphicalPoint;
-	ssc::CaptionText3DPtr mText;
-	PointMetricPtr mMetric;
-	ssc::View *mView;
+//	PointMetricPtr mMetric;
 	ssc::ViewportListenerPtr mViewportListener;
 };
 

@@ -45,12 +45,13 @@ public:
 	static PlaneMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~PlaneMetricRep() {}
 
-	void setMetric(PlaneMetricPtr point);
+//	void setMetric(PlaneMetricPtr point);
 	virtual QString getType() const { return "ssc::PlaneMetricRep"; }
 
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View *view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+    virtual void clear();
 
 protected slots:
 	virtual void changedSlot();
@@ -62,11 +63,9 @@ private:
 	void rescale();
 
 	ssc::GraphicalPoint3DPtr mGraphicalPoint;
-	ssc::CaptionText3DPtr mText;
 	ssc::GraphicalArrow3DPtr mNormal;
 	ssc::Rect3DPtr mRect;
 	PlaneMetricPtr mMetric;
-	ssc::View *mView;
 	ssc::ViewportListenerPtr mViewportListener;
 };
 

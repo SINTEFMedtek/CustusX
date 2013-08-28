@@ -39,8 +39,6 @@ public:
 	static FrameMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~FrameMetricRep() {}
 
-	void setFrameMetric(FrameMetricPtr point);
-	FrameMetricPtr getFrameMetric();
 	virtual QString getType() const { return "ssc::FrameMetricRep"; }
 
 protected:
@@ -48,6 +46,7 @@ protected:
 	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
 	virtual void rescale();
+    virtual void clear();
 
 protected slots:
 	virtual void changedSlot();
@@ -57,9 +56,6 @@ private:
 	FrameMetricRep(); ///< not implemented
 
 	ssc::GraphicalPoint3DPtr mGraphicalPoint;
-	ssc::CaptionText3DPtr mText;
-	FrameMetricPtr mMetric;
-	ssc::View *mView;
 	ssc::ViewportListenerPtr mViewportListener;
 };
 

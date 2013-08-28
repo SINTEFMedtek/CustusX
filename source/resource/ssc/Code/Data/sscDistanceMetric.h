@@ -66,11 +66,13 @@ public:
 
 	double getDistance() const;
 	std::vector<ssc::Vector3D> getEndpoints() const;
+    virtual ssc::Vector3D getRefCoord() const;
 
 	unsigned getArgumentCount() const;
 	void setArgument(int index, ssc::DataPtr p);
 	ssc::DataPtr getArgument(int index);
 	bool validArgument(ssc::DataPtr p) const;
+    virtual bool isValid() const;
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
