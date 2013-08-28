@@ -59,20 +59,16 @@ void PointMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
 
 void PointMetricRep::changedSlot()
 {
-    SSC_LOG("A");
     if (!mMetric)
 		return;
-    SSC_LOG("B");
 
 	if (!mGraphicalPoint && mView && mMetric)
 		mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
-    SSC_LOG("C");
 
 	if (!mGraphicalPoint)
 		return;
 
     ssc::Vector3D p0_r = mMetric->getRefCoord();
-    SSC_LOG("D");
 
 	mGraphicalPoint->setValue(p0_r);
 	mGraphicalPoint->setRadius(mGraphicsSize);
@@ -80,9 +76,7 @@ void PointMetricRep::changedSlot()
 
     this->drawText();
 
-    SSC_LOG("rescale pre");
     this->rescale();
-    SSC_LOG("rescale post");
 }
 
 /**Note: Internal method!
