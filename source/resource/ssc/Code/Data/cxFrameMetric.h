@@ -56,10 +56,11 @@ public:
 	FrameMetric(const QString& uid, const QString& name = "");
 	virtual ~FrameMetric();
 
-	void setFrame(const ssc::Transform3D& rMt);
+    void setFrame(const ssc::Transform3D& qMt);
 	ssc::Transform3D getFrame();
 	ssc::Vector3D getCoordinate() const;
-    ssc::Vector3D getRefCoord() const;
+    ssc::Vector3D getRefCoord() const; ///< as getRefFrame, but coord only.
+    ssc::Transform3D getRefFrame() const; ///< return frame described in ref space r : rFt = rMq * qFt
     void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
 	ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data
 	virtual QString getType() const
@@ -77,7 +78,7 @@ public:
 private:
 	ssc::CoordinateSystem mSpace;
 	ssc::CoordinateSystemListenerPtr mSpaceListener;
-	ssc::Transform3D mFrame;
+    ssc::Transform3D mFrame; ///< frame qFt described in local space q = mSpace
 };
 
 } //namespace cx

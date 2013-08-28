@@ -93,25 +93,28 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces(bool c
 
 Vector3D CoordinateSystemHelpers::getDominantToolTipPoint(CoordinateSystem to, bool useOffset)
 {
-	ToolPtr tool = ssc::toolManager()->getDominantTool();
-	if (!tool)
-		return ssc::Vector3D(0,0,0);
-//
-//	QString dominantToolUid = tool->getUid();
-//
-//	CoordinateSystem from(csTOOL, dominantToolUid);
+    Transform3D toMfrom = CoordinateSystemHelpers::getDominantToolTipTransform(to, useOffset);
+    return toMfrom.coord(Vector3D(0,0,0));
 
-	CoordinateSystem from = getToolCoordinateSystem(tool);
+//    ToolPtr tool = ssc::toolManager()->getDominantTool();
+//	if (!tool)
+//		return ssc::Vector3D(0,0,0);
+////
+////	QString dominantToolUid = tool->getUid();
+////
+////	CoordinateSystem from(csTOOL, dominantToolUid);
 
-	Vector3D point_t;
-	if(useOffset)
-		point_t = Vector3D(0,0,tool->getTooltipOffset());
-	else
-		point_t = Vector3D(0,0,0);
+//	CoordinateSystem from = getToolCoordinateSystem(tool);
 
-	Vector3D P_to = CoordinateSystemHelpers::get_toMfrom(from, to).coord(point_t);
+//	Vector3D point_t;
+//	if(useOffset)
+//		point_t = Vector3D(0,0,tool->getTooltipOffset());
+//	else
+//		point_t = Vector3D(0,0,0);
 
-	return P_to;
+//	Vector3D P_to = CoordinateSystemHelpers::get_toMfrom(from, to).coord(point_t);
+
+//	return P_to;
 }
 
 CoordinateSystem CoordinateSystemHelpers::getToolCoordinateSystem(ToolPtr tool)
@@ -122,12 +125,22 @@ CoordinateSystem CoordinateSystemHelpers::getToolCoordinateSystem(ToolPtr tool)
 	return retval;
 }
 
-Transform3D CoordinateSystemHelpers::getDominantToolTipTransform(CoordinateSystem to)
+/** return toMfrom = qMt or qMto
+  */
+Transform3D CoordinateSystemHelpers::getDominantToolTipTransform(CoordinateSystem to, bool useOffset)
 {
 	ToolPtr tool = ssc::toolManager()->getDominantTool();
 	if (!tool)
 		return Transform3D::Identity();
-	CoordinateSystem from = getToolCoordinateSystem(tool);
+
+    COORDINATE_SYSTEM target;
+    if (useOffset)
+        target = csTOOL_OFFSET;
+    else
+        target = csTOOL;
+    CoordinateSystem from = CoordinateSystem(target, tool->getUid());
+
+//	CoordinateSystem from = getToolCoordinateSystem(tool);
 	Transform3D retval = CoordinateSystemHelpers::get_toMfrom(from, to);
 	return retval;
 }

@@ -157,6 +157,7 @@ cx_add_class( SSC_SOURCE_FILES
         Math/sscFrame3D
 
         Utilities/sscGraphicalPrimitives
+        Utilities/cxGraphicalAxes3D
         Utilities/sscGLHelpers
         Utilities/sscTime
         Utilities/sscUtilHelpers

@@ -28,6 +28,7 @@
 namespace ssc
 {
 typedef boost::shared_ptr<class AxesRep> AxesRepPtr;
+typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
 typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 
 /**\brief Representation for one 3D coordinate axis triplet.
@@ -49,7 +50,6 @@ public:
 	void setFontSize(double size);
 	void setAxisLength(double length);
 	void setVisible(bool on);
-
 	void setShowAxesLabels(bool on);
 	void setCaption(const QString& caption, const Vector3D& color);
 
@@ -57,15 +57,7 @@ protected:
 	AxesRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
-	void addCaption(const QString& label, Vector3D pos, Vector3D color);
-	void rescale();
-	vtkAxesActorPtr mActor;
-	vtkAssemblyPtr mAssembly;
-	std::vector<vtkCaptionActor2DPtr> mCaption;
-	std::vector<Vector3D> mCaptionPos;
-	double mSize;
-	double mFontSize;
-	ViewportListenerPtr mViewportListener;
+    GraphicalAxes3DPtr mAxes;
 };
 
 } // namespace ssc

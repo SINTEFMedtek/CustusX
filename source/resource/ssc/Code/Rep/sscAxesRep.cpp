@@ -30,150 +30,70 @@
 #include "sscTypeConversions.h"
 #include "sscView.h"
 #include "sscGraphicalPrimitives.h"
+#include "cxGraphicalAxes3D.h"
 
 namespace ssc
 {
 
+AxesRepPtr AxesRep::New(const QString& uid)
+{
+    AxesRepPtr retval(new AxesRep(uid));
+    retval->mSelf = retval;
+    return retval;
+}
+
 AxesRep::AxesRep(const QString& uid) :
 	RepImpl(uid)
 {
-	mViewportListener.reset(new ssc::ViewportListener);
-	mViewportListener->setCallback(boost::bind(&AxesRep::rescale, this));
-
-	mAssembly = vtkAssemblyPtr::New();
-	mActor = vtkAxesActorPtr::New();
-	mAssembly->AddPart(mActor);
+    mAxes.reset(new GraphicalAxes3D());
 	this->setAxisLength(0.2);
-
 	this->setShowAxesLabels(true);
-	setTransform(Transform3D::Identity());
-	setFontSize(0.04);
-
-}
-
-void AxesRep::rescale()
-{
-	if (!mViewportListener->isListening())
-		return;
-	double size = mViewportListener->getVpnZoom();
-	double axisSize = mSize/size;
-
-	mActor->SetTotalLength( axisSize, axisSize, axisSize );
-	setTransform(Transform3D(mAssembly->GetUserMatrix()));
-}
-
-void AxesRep::setVisible(bool on)
-{
-	mAssembly->SetVisibility(on);
-	for (unsigned i=0; i<mCaption.size(); ++i)
-		mCaption[i]->SetVisibility(on);
-}
-
-void AxesRep::setShowAxesLabels(bool on)
-{
-	if (on)
-	{
-		this->addCaption("x", Vector3D(1,0,0), Vector3D(1,0,0));
-		this->addCaption("y", Vector3D(0,1,0), Vector3D(0,1,0));
-		this->addCaption("z", Vector3D(0,0,1), Vector3D(0,0,1));
-	}
-	else
-	{
-		mCaption.clear();
-		mCaptionPos.clear();
-	}
-}
-
-void AxesRep::setCaption(const QString& caption, const Vector3D& color)
-{
-	this->addCaption(caption, Vector3D(0,0,0), color);
-}
-
-/**set font size to a fraction of the normalized viewport.
- *
- */
-void AxesRep::setFontSize(double size)
-{
-	mFontSize = size;
-
-	for (unsigned i=0; i<mCaption.size(); ++i)
-	{
-		//mCaption[i]->SetWidth(mFontSize);
-		mCaption[i]->SetHeight(mFontSize);
-	}
-}
-
-/**set axis length to a world length
- *
- */
-void AxesRep::setAxisLength(double length)
-{
-	mSize = length;
-	this->rescale();
-//	mActor->SetTotalLength( mSize, mSize, mSize );
-//	setTransform(Transform3D(mAssembly->GetUserMatrix()));
-}
-
-/**Set the position of the axis.
- *
- */
-void AxesRep::setTransform(Transform3D rMt)
-{
-	mAssembly->SetUserMatrix(rMt.getVtkMatrix());
-
-	for (unsigned i=0; i<mCaption.size(); ++i)
-	{
-		if (!mViewportListener->isListening())
-			continue;
-		double size = mViewportListener->getVpnZoom();
-		double axisSize = mSize/size;
-
-		Vector3D pos = rMt.coord(axisSize*mCaptionPos[i]);
-		mCaption[i]->SetAttachmentPoint(pos.begin());
-	}
-}
-
-void AxesRep::addCaption(const QString& label, Vector3D pos, Vector3D color)
-{
-	vtkCaptionActor2DPtr cap = vtkCaptionActor2DPtr::New();
-	cap->SetCaption(cstring_cast(label));
-	cap->GetCaptionTextProperty()->SetColor(color.begin());
-	cap->LeaderOff();
-	cap->BorderOff();
-	cap->GetCaptionTextProperty()->ShadowOff();
-	mCaption.push_back(cap);
-	mCaptionPos.push_back(pos);
+    this->setFontSize(0.04);
 }
 
 AxesRep::~AxesRep()
 {
-	// ??
-}
-
-AxesRepPtr AxesRep::New(const QString& uid)
-{
-	AxesRepPtr retval(new AxesRep(uid));
-	retval->mSelf = retval;
-	return retval;
 }
 
 void AxesRep::addRepActorsToViewRenderer(View *view)
 {
-	view->getRenderer()->AddActor(mAssembly);
-	for (unsigned i=0; i<mCaption.size(); ++i)
-		view->getRenderer()->AddActor(mCaption[i]);
-	mViewportListener->startListen(view->getRenderer());
-	this->rescale();
+    mAxes->setRenderer(view->getRenderer());
 }
 
 void AxesRep::removeRepActorsFromViewRenderer(View *view)
 {
-	view->getRenderer()->RemoveActor(mAssembly);
-	for (unsigned i=0; i<mCaption.size(); ++i)
-	{
-		view->getRenderer()->RemoveActor(mCaption[i]);
-	}
-	mViewportListener->stopListen();
+    mAxes->setRenderer(NULL);
 }
+
+void AxesRep::setVisible(bool on)
+{
+    mAxes->setVisible(on);
+}
+
+void AxesRep::setShowAxesLabels(bool on)
+{
+    mAxes->setShowAxesLabels(on);
+}
+
+void AxesRep::setCaption(const QString& caption, const Vector3D& color)
+{
+    mAxes->setCaption(caption, color);
+}
+
+void AxesRep::setFontSize(double size)
+{
+    mAxes->setFontSize(size);
+}
+
+void AxesRep::setAxisLength(double length)
+{
+    mAxes->setAxisLength(length);
+}
+
+void AxesRep::setTransform(Transform3D rMt)
+{
+    mAxes->setTransform(rMt);
+}
+
 
 } // namespace ssc

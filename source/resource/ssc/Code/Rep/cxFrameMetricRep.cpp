@@ -16,6 +16,7 @@
 
 #include "sscView.h"
 #include "boost/bind.hpp"
+#include "cxGraphicalAxes3D.h"
 
 namespace cx
 {
@@ -29,64 +30,49 @@ FrameMetricRepPtr FrameMetricRep::New(const QString& uid, const QString& name)
 FrameMetricRep::FrameMetricRep(const QString& uid, const QString& name) :
                 DataMetricRep(uid, name)
 {
-	mViewportListener.reset(new ssc::ViewportListener);
-	mViewportListener->setCallback(boost::bind(&FrameMetricRep::rescale, this));
 }
 
 void FrameMetricRep::clear()
 {
+    mAxes.reset();
     DataMetricRep::clear();
-    mGraphicalPoint.reset();
 }
 
-void FrameMetricRep::addRepActorsToViewRenderer(ssc::View *view)
-{
-    mViewportListener->startListen(view->getRenderer());
-    DataMetricRep::addRepActorsToViewRenderer(view);
-}
+//void FrameMetricRep::addRepActorsToViewRenderer(ssc::View *view)
+//{
+//    mAxes->setRenderer(view->getRenderer());
+//    DataMetricRep::addRepActorsToViewRenderer(view);
+//}
 
-void FrameMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
+//void FrameMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
+//{
+//    mAxes->setRenderer(NULL);
+//    DataMetricRep::removeRepActorsFromViewRenderer(view);
+//}
+
+FrameMetricPtr FrameMetricRep::getFrameMetric()
 {
-    DataMetricRep::removeRepActorsFromViewRenderer(view);
-	mViewportListener->stopListen();
+    return boost::dynamic_pointer_cast<FrameMetric>(mMetric);
 }
 
 void FrameMetricRep::changedSlot()
 {
-	if (!mMetric)
-		return;
+    FrameMetricPtr metric = this->getFrameMetric();
 
-	if (!mGraphicalPoint && mView && mMetric)
-		mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
+    if (!metric || !metric->isValid() || !mView)
+        return;
 
-	if (!mGraphicalPoint)
-		return;
+    if (!mAxes)
+    {
+        mAxes.reset(new ssc::GraphicalAxes3D());
+        mAxes->setFontSize(0.04);
+        mAxes->setAxisLength(0.05);
+        mAxes->setShowAxesLabels(false);
+        mAxes->setRenderer(mView->getRenderer());
+    }
 
-    ssc::Vector3D p0_r = mMetric->getRefCoord();
-
-	mGraphicalPoint->setValue(p0_r);
-	mGraphicalPoint->setRadius(mGraphicsSize);
-	mGraphicalPoint->setColor(mColor);
-
+    mAxes->setTransform(metric->getRefFrame());
     this->drawText();
-
-	this->rescale();
-}
-
-/**Note: Internal method!
- *
- * Scale the text to be a constant fraction of the viewport height
- * Called from a vtk camera observer
- *
- */
-void FrameMetricRep::rescale()
-{
-	if (!mGraphicalPoint)
-		return;
-
-	double size = mViewportListener->getVpnZoom();
-	double sphereSize = mGraphicsSize / 100 / size;
-	mGraphicalPoint->setRadius(sphereSize);
 }
 
 } // namespace ssc
