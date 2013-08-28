@@ -92,7 +92,6 @@ void DataMetricRep::addRepActorsToViewRenderer(ssc::View *view)
 {
     mView = view;
     this->clear();
-    SSC_LOG("A");
     this->changedSlot();
 }
 
