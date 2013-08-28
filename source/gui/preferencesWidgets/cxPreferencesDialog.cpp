@@ -475,8 +475,12 @@ void AutomationTab::init()
 
   bool autoLoadPatient = settings()->value("Automation/autoLoadRecentPatient").toBool();
   mAutoLoadPatientCheckBox = new QCheckBox("Auto Load Recent Patient");
-  mAutoLoadPatientCheckBox->setToolTip("Load the last saved patient if within 8 hours.");
+  mAutoLoadPatientCheckBox->setToolTip("Load the last saved patient if within a chosen number of hours.");
   mAutoLoadPatientCheckBox->setChecked(autoLoadPatient);
+
+  double autoLoadPatientWithinHours = settings()->value("Automation/autoLoadRecentPatientWithinHours").toDouble();
+  mAutoLoadPatientWithinHours = ssc::DoubleDataAdapterXml::initialize("Auto load within hours", "Auto load within hours", "Load the last patient if within this number of hours (and auto load is enabled)", autoLoadPatientWithinHours, ssc::DoubleRange(0.1,100,0.1), 1, QDomNode());
+
 
   //Layout
   mMainLayout = new QVBoxLayout;
@@ -487,6 +491,7 @@ void AutomationTab::init()
   mMainLayout->addWidget(mAutoSaveCheckBox);
   mMainLayout->addWidget(mAutoShowNewDataCheckBox);
   mMainLayout->addWidget(mAutoLoadPatientCheckBox);
+  mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mAutoLoadPatientWithinHours));
 
   mTopLayout->addLayout(mMainLayout);
 
@@ -501,6 +506,7 @@ void AutomationTab::saveParametersSlot()
   settings()->setValue("Automation/autoSave", mAutoSaveCheckBox->isChecked());
   settings()->setValue("Automation/autoShowNewData", mAutoShowNewDataCheckBox->isChecked());
   settings()->setValue("Automation/autoLoadRecentPatient", mAutoLoadPatientCheckBox->isChecked());
+  settings()->setValue("Automation/autoLoadRecentPatientWithinHours", mAutoLoadPatientWithinHours->getValue());
 }
 
 //==============================================================================

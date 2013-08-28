@@ -289,6 +289,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Automation/autoSelectDominantTool", true);
 	this->fillDefault("Automation/autoSave", true);
 	this->fillDefault("Automation/autoLoadRecentPatient", true);
+	this->fillDefault("Automation/autoLoadRecentPatientWithinHours", 8);
 	this->fillDefault("Automation/autoShowNewData", false);
 
 	this->fillDefault("renderingInterval", 33);
