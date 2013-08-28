@@ -19,6 +19,11 @@
 #include "cxFrameMetric.h"
 #include "sscViewportListener.h"
 
+namespace ssc
+{
+typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
+}
+
 namespace cx
 {
 
@@ -42,10 +47,9 @@ public:
 	virtual QString getType() const { return "ssc::FrameMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+//	virtual void addRepActorsToViewRenderer(ssc::View *view);
+//	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
-	virtual void rescale();
     virtual void clear();
 
 protected slots:
@@ -54,9 +58,9 @@ protected slots:
 private:
 	FrameMetricRep(const QString& uid, const QString& name = "");
 	FrameMetricRep(); ///< not implemented
+    FrameMetricPtr getFrameMetric();
 
-	ssc::GraphicalPoint3DPtr mGraphicalPoint;
-	ssc::ViewportListenerPtr mViewportListener;
+    ssc::GraphicalAxes3DPtr mAxes;
 };
 
 

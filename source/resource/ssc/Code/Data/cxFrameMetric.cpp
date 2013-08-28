@@ -56,11 +56,22 @@ ssc::Vector3D FrameMetric::getCoordinate() const
 	return mFrame.coord(point_t);
 }
 
+/** return frame described in ref space F * sMr
+  */
+ssc::Transform3D FrameMetric::getRefFrame() const
+{
+    ssc::Transform3D rMq = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+    return rMq * mFrame;
+}
+
+/** return frame described in ref space F * sMr
+  */
 ssc::Vector3D FrameMetric::getRefCoord() const
 {
-    ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-    ssc::Vector3D p0_r = rM0.coord(this->getCoordinate());
-    return p0_r;
+    ssc::Transform3D rMq = this->getRefFrame();
+//    ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+    ssc::Vector3D p_r = rMq.coord(ssc::Vector3D(0,0,0));
+    return p_r;
 }
 
 void FrameMetric::setSpace(ssc::CoordinateSystem space)

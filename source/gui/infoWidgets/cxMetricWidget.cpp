@@ -383,7 +383,7 @@ void MetricWidget::addFrameButtonClickedSlot()
   frame->get_rMd_History()->setParentSpace("reference");
 
   ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
-  ssc::Transform3D rMt = ssc::SpaceHelpers::getDominantToolTipTransform(ref);
+  ssc::Transform3D rMt = ssc::SpaceHelpers::getDominantToolTipTransform(ref, true);
 
   frame->setSpace(ref);
   frame->setFrame(rMt);
