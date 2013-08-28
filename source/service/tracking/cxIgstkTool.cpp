@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include <cxIgstkTool.h>
+#include "cxIgstkTool.h"
 
 #include <QDir>
 #include <QDateTime>

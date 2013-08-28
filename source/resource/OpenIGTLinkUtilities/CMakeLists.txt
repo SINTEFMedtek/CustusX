@@ -17,14 +17,10 @@ if(BUILD_OPEN_IGTLINK_SERVER)
     find_package(OpenIGTLink REQUIRED)
     include(${OpenIGTLink_USE_FILE})
 
-    # SSC
-    #----------
-    find_package(SSC PATHS "../../../externals/ssc/CMake" REQUIRED)
-    include(${SSC_USE_FILE})
-
     #-------------------------------
     # Include directories
     #-------------------------------
+    include_directories( ${CX_SSC_INCLUDE_DIRECTORIES} )
     include_directories(
             ${Boost_INCLUDE_DIRS}
     #        ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files

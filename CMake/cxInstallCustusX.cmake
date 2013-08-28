@@ -98,7 +98,7 @@ set(ALL_LIBRARY_DIRS
     ${QT_INCLUDES}
     ${QT_LIBRARY_DIRS}
     ${QT_BINARY_DIR}
-    ${SSC_INCLUDE_DIRS}
+#    ${SSC_INCLUDE_DIRS}
     ${GEStreamer_LIBRARY_DIRS}
     ${VTK_LIBRARY_DIRS}
     ${OpenCV_LIB_DIR}
@@ -109,9 +109,11 @@ set(ALL_LIBRARY_DIRS
     ${DCMTK_DIR}/lib
     ${INCLUDE_DIRECTORIES}
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}
-    ${SSC_BINARY_DIR}/Code
-    ${SSC_BINARY_DIR}/DICOMLib
-    ${SSC_BINARY_DIR}/Testing/cisst_code
+    ${CustusX3_BINARY_DIR}/source/resource/ssc
+    ${CustusX3_BINARY_DIR}/source/resource/ssc/Testing/cisst_code
+#    ${SSC_BINARY_DIR}/Code
+#    ${SSC_BINARY_DIR}/DICOMLib
+#    ${SSC_BINARY_DIR}/Testing/cisst_code
     ${CustusX3_BINARY_DIR}
     ${CustusX3_BINARY_DIR}/source
     ${CustusX3_BINARY_DIR}/source/service/patient

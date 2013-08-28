@@ -6,6 +6,7 @@ endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
 include_directories(
+    ..
     ${CPPUNIT_INCLUDE_DIR}
     ${CustusX3_SOURCE_DIR}/source/logic
     #${CustusX3_SOURCE_DIR}/source/service/patient

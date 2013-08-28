@@ -10,6 +10,8 @@ set(SOURCES cxMain.cpp)
 #------------------------------------------------------------------------------
 # Include
 #-----------------------------------------------------------------------------
+
+include_directories( ${CX_SSC_INCLUDE_DIRECTORIES} )
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/gui

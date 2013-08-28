@@ -74,12 +74,9 @@ SET ( cxVisualizationService_SOURCE
     cxThresholdPreview.cpp
     )
 
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
     .
-    ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
-    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/video

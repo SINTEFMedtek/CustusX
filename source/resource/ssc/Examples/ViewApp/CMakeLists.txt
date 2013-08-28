@@ -8,9 +8,6 @@ endif(COMMAND cmake_policy)
 # Sonowand Sintef Cooperation C++ Test App 
 # =========================================================
 
-find_package(SSC REQUIRED)
-include (${SSC_USE_FILE})
-
 SET( SSCTestApp_QT_MOC_HEADER_FILES
     sscTestInterface.h
     )
@@ -21,7 +18,7 @@ SET( SSCTestApp_SOURCE_FILES
     main.cpp
 	) 
 	
-include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )	
+include_directories(${CX_SSC_INCLUDE_DIRECTORIES})
 	
 # clear variables; Qt appends to these vars
 set( MOC_HEADER_FILES )

@@ -120,22 +120,9 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
-
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
     .
-    ${SSC_SOURCE_DIR}/DICOMLib/
-    ${SSC_BINARY_DIR}/DICOMLib/
-
-    ${CustusX3_SOURCE_DIR}/source/resource/videoServer
-
-    ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/source/resource/data
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-    ${CustusX3_BINARY_DIR}/source/resource/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
-    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
-    ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-
     ${CustusX3_SOURCE_DIR}/source/service/patient     
     ${CustusX3_SOURCE_DIR}/source/service/tracking     
     ${CustusX3_SOURCE_DIR}/source/service/visualization
@@ -145,8 +132,6 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/logic
     ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     )
-
-
     
 set(CX_GUI_LIBRARIES cxLogicManager cxStateService)
 if (SSC_USE_DCMTK)

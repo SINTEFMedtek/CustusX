@@ -141,6 +141,7 @@ endmacro()
 macro(cx_initialize_QT)
     set(QT_USE_QTXML TRUE)
     set(QT_USE_QTTEST TRUE)
+    set(QT_USE_QTNETWORK 1)
     find_package(Qt4 REQUIRED)
     if(QT_USE_FILE)
         include(${QT_USE_FILE})
@@ -189,9 +190,34 @@ endmacro()
 # Initialize SSC library
 # Find the package and run the include USE file.
 ###############################################################################
-macro(cx_initialize_SSC)
-    find_package(SSC PATHS "../externals/ssc/CMake" REQUIRED)
-    include(${SSC_USE_FILE})
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
-endmacro()
+#macro(cx_initialize_SSC)
+#    find_package(SSC PATHS "${CustusX3_SOURCE_DIR}/source/resource/ssc/CMake" REQUIRED)
+#    include(${SSC_USE_FILE})
+#    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
+#endmacro()
 
+###############################################################################
+# Initialize Code coverage
+#
+# Add option SSC_USE_GCOV and generate variable SSC_GCOV_LIBRARY containing
+# lib to link.
+###############################################################################
+macro(cx_initialize_coverage)
+    # code coverage
+    option(SSC_USE_GCOV "add gcov to enable coverage testing" OFF)
+    if(SSC_USE_GCOV)
+        message(STATUS "Building SSC with gcov code coverage support.")
+        set(SSC_GCOV_LIBRARY )
+        if(WIN32)
+            message(ERROR "gcov not supported for WIN32")
+        # needed on apple
+        elseif(APPLE)
+            set( SSC_GCOV_LIBRARY ${SSC_GCOV_LIBRARY} profile_rt )
+        # needed on linux
+        else(WIN32)
+            set( SSC_GCOV_LIBRARY ${SSC_GCOV_LIBRARY} gcov)
+        endif(WIN32)
+
+        add_definitions(--coverage)
+    endif()
+endmacro()

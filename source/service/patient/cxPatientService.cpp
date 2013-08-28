@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include <cxPatientService.h>
+#include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "cxFileHelpers.h"
 #include "cxDataLocations.h"

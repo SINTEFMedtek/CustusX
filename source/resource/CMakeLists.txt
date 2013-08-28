@@ -97,14 +97,19 @@ SET ( cxResource_SOURCE
 #    OpenIGTLinkUtilities/igtl_us_status.c	
 )
 
-include_directories(
-    .
+unset(CX_RESOURCE_INCLUDE_DIRECTORIES)
+set(CX_RESOURCE_INCLUDE_DIRECTORIES
+    ${CX_SSC_INCLUDE_DIRECTORIES}
     ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
+    ${CustusX3_SOURCE_DIR}/source/resource/videoServer
     ${CustusX3_BINARY_DIR}/source/resource/settings
-    )
+    CACHE INTERNAL "Include directories for resource libraries")
+
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
