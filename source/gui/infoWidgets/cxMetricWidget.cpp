@@ -372,7 +372,6 @@ void MetricWidget::setActiveUid(QString uid)
 
 void MetricWidget::addPointButtonClickedSlot()
 {
-	std::cout << "addPointButtonClickedSlot()" << std::endl;
   ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
   ssc::Vector3D p_ref = ssc::SpaceHelpers::getDominantToolTipPoint(ref, true);
   this->addPoint(p_ref, ref);
@@ -380,7 +379,6 @@ void MetricWidget::addPointButtonClickedSlot()
 
 void MetricWidget::addFrameButtonClickedSlot()
 {
-	std::cout << "addFrameButtonClickedSlot()" << std::endl;
   FrameMetricPtr frame(new FrameMetric("frame%1", "frame%1"));
   frame->get_rMd_History()->setParentSpace("reference");
 
