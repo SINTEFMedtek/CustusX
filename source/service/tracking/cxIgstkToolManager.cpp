@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include <cxIgstkToolManager.h>
+#include "cxIgstkToolManager.h"
 
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"

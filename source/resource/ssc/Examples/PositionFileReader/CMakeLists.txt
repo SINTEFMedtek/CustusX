@@ -8,11 +8,7 @@ endif(COMMAND cmake_policy)
 # app for reading sonowand recorder position files 
 # =========================================================
 
-find_package(SSC REQUIRED)
-include (${SSC_USE_FILE} )
-	
-#include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
-#include_directories( ${SSC_SOURCE_DIR}/Examples/SliceAndToolRep )
+include_directories( ${CX_SSC_INCLUDE_DIRECTORIES} )
 
 add_executable(sscPositionFileReader main.cpp)
 target_link_libraries(sscPositionFileReader SSC)

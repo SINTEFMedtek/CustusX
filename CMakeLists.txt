@@ -20,13 +20,20 @@ include(cxCatchUtilities)
 # Add some compiler flags (preprocessor definitions)
 #------------------------------------------------------------------------------
 
-if(SSC_USE_GCOV)
-	add_definitions(--coverage)
-endif()
+#if(SSC_USE_GCOV)
+#	add_definitions(--coverage)
+#endif()
+
+# TODO check this and try to remove.
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
 
 if(SSC_PRINT_CALLER_INFO)
         add_definitions(-DSSC_PRINT_CALLER_INFO)
 endif()
+
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
 
 cx_set_os_identifiers()
 
@@ -50,6 +57,7 @@ set(CMAKE_BUILD_TYPE:STRING=Debug)
 
 cx_initialize_custusx_install()
 cx_catch_initialize()
+cx_initialize_coverage()
 
 include(Dart)
 

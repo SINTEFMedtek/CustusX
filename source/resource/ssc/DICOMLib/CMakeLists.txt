@@ -25,13 +25,7 @@ if (SSC_USE_DCMTK)
     QT4_WRAP_CPP( MOC_HEADER_DICOMLIB 
         sscDICOMLibAPI.h
         )
-    
-    #find_package(VTK REQUIRED)
-    #include(${VTK_USE_FILE})
-    
-    find_package(SSC REQUIRED)
-    include (${SSC_USE_FILE} )
-    
+        
     find_package( DCMTK REQUIRED )
     include_directories( ${DCMTK_INCLUDE_DIR})
     

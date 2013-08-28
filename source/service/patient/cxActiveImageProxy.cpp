@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include <cxActiveImageProxy.h>
+#include "cxActiveImageProxy.h"
 #include "cxDataManager.h"
 
 namespace cx

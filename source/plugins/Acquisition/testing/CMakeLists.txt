@@ -8,17 +8,13 @@ if (BUILD_TESTING)
 	# -----------------------------------------------
 	# CppUnit test framework: Create executable testCX
 	#
-	include_directories(
+        include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+        include_directories(
 		${CPPUNIT_INCLUDE_DIR}
 		../logic
-		${CustusX3_SOURCE_DIR}/source/resource
 		${CustusX3_SOURCE_DIR}/source/service/state
 		${CustusX3_SOURCE_DIR}/source/service/patient
 		${CustusX3_SOURCE_DIR}/source/service/tracking
-		${CustusX3_SOURCE_DIR}/source/resource/settings
-		${CustusX3_SOURCE_DIR}/source/resource/utilities
-		${CustusX3_SOURCE_DIR}/source/resource/algorithms
-                ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
                 ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction
 		${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
 		${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/3DReconstruction

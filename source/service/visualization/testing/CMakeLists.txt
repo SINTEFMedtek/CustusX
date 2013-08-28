@@ -8,15 +8,12 @@ if (BUILD_TESTING)
   # -----------------------------------------------
   # CppUnit test framework: Create executable testCX
   #
+  include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
   include_directories(
     ${CPPUNIT_INCLUDE_DIR}
     ../logic
-    ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
-    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     )
 
   # List of all test units

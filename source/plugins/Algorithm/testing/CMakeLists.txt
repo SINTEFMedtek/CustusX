@@ -39,10 +39,10 @@ if (BUILD_TESTING)
 	# -----------------------------------------------
 	# CppUnit test framework: Create executable testCX
 	#
-	include_directories(
+        include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+        include_directories(
 		${CPPUNIT_INCLUDE_DIR}
 		../logic
-		${CustusX3_SOURCE_DIR}/external/ssc/Code
 	    ${CustusX3_SOURCE_DIR}/source/logic/
 		)
 

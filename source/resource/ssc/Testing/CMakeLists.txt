@@ -9,10 +9,6 @@ endif(COMMAND cmake_policy)
 # =========================================================
 
 if (BUILD_TESTING)
-	#INCLUDE(CodeCoverage)
-
-    find_package(SSC REQUIRED)
-    include (${SSC_USE_FILE} )
     
 # cppunit -start
 FIND_PATH(CPPUNIT_INCLUDE_DIR cppunit/TestCase.h
@@ -43,6 +39,7 @@ ${CMAKE_DL_LIBS})
 ENDIF(CPPUNIT_INCLUDE_DIR)
 # cppunit -end    
     
+    include_directories( ${CX_SSC_INCLUDE_DIRECTORIES} )
     include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
     include_directories( ${SSC_SOURCE_DIR}/Examples/SliceAndToolRep )
     include_directories( /usr/local/include )

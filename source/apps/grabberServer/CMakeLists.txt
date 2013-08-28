@@ -57,12 +57,12 @@ set(SOURCES
 		${${LIBNAME}_MOC_SRCS}
 )
 
+include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 include_directories(
-		.
-		${CMAKE_CURRENT_BINARY_DIR}/gui #so that is finds the generated ui files
-		${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
-        ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-)
+    .
+    ${CMAKE_CURRENT_BINARY_DIR}/gui #so that is finds the generated ui files
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
+    )
 
 if(CX_WINDOWS)
 	set( WIN_LINK_LIBRARIES
