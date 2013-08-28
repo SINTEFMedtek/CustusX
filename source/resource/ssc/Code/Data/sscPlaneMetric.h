@@ -76,7 +76,8 @@ public:
 
 	void setCoordinate(const ssc::Vector3D& p);
 	ssc::Vector3D getCoordinate() const;
-	void setNormal(const ssc::Vector3D& p);
+    virtual ssc::Vector3D getRefCoord() const;
+    void setNormal(const ssc::Vector3D& p);
 	ssc::Vector3D getNormal() const;
 	void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
 	ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data

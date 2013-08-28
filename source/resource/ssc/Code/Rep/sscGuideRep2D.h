@@ -45,8 +45,8 @@ public:
 	static GuideRep2DPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~GuideRep2D() {}
 
-	void setPointMetric(PointMetricPtr point);
-	PointMetricPtr getPointMetric();
+//	void setPointMetric(PointMetricPtr point);
+//	PointMetricPtr getPointMetric();
 	virtual QString getType() const { return "ssc::GuideRep2D"; }
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	/**
@@ -57,8 +57,9 @@ public:
 	void setRequestedAccuracy(double accuracy);
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+//	virtual void addRepActorsToViewRenderer(ssc::View* view);
+//	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+    virtual void clear();
 
 protected slots:
 	virtual void changedSlot();
@@ -67,8 +68,7 @@ private:
 	GuideRep2D(const QString& uid, const QString& name = "");
 	GuideRep2D(); ///< not implemented
 
-	PointMetricPtr mMetric;
-	ssc::View* mView;
+//	PointMetricPtr mMetric;
 	ssc::SliceProxyPtr mSliceProxy;
 	vtkActorPtr mCircleActor;
 	vtkSectorSourcePtr mCircleSource;

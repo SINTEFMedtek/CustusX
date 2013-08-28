@@ -39,7 +39,7 @@ PointMetricRep2DPtr PointMetricRep2D::New(const QString& uid, const QString& nam
 }
 
 PointMetricRep2D::PointMetricRep2D(const QString& uid, const QString& name) :
-	DataMetricRep(uid, name), mView(NULL),
+    DataMetricRep(uid, name),
 	mOutlineWidth(0.1)
 {
 	mFillVisible = true;
@@ -59,41 +59,25 @@ void PointMetricRep2D::setDynamicSize(bool on)
 	}
 }
 
-void PointMetricRep2D::setPointMetric(PointMetricPtr point)
-{
-	if (mMetric)
-		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	mMetric = point;
-
-	if (mMetric)
-		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	this->changedSlot();
-}
-
-PointMetricPtr PointMetricRep2D::getPointMetric()
-{
-	return mMetric;
-}
-
 void PointMetricRep2D::addRepActorsToViewRenderer(ssc::View* view)
 {
-	mView = view;
-	mText.reset();
-	if (mViewportListener)
-		mViewportListener->startListen(mView->getRenderer());
-	this->changedSlot();
+    if (mViewportListener)
+        mViewportListener->startListen(view->getRenderer());
+    DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
 void PointMetricRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
 {
-	mView->getRenderer()->RemoveActor(mCircleActor);
+    mView->getRenderer()->RemoveActor(mCircleActor);
 	mView->getRenderer()->RemoveActor(mOutlineActor);
-	mView = NULL;
-	mText.reset();
 	if (mViewportListener)
 		mViewportListener->stopListen();
+    DataMetricRep::removeRepActorsFromViewRenderer(view);
+}
+
+void PointMetricRep2D::clear()
+{
+    DataMetricRep::clear();
 }
 
 void PointMetricRep2D::changedSlot()
@@ -166,17 +150,17 @@ void PointMetricRep2D::changedSlot()
 		mOutlineSource->SetOuterRadius(radius);
 	}
 
-	if (!mShowLabel)
-		mText.reset();
-	if (!mText && mShowLabel && mView)
-		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
-	if (mText)
-	{
-		mText->setColor(mColor);
-		mText->setText(mMetric->getName());
-//		mText->setPosition(p0_r);
-		mText->setSize(mLabelSize / 100);
-	}
+//	if (!mShowLabel)
+//		mText.reset();
+//	if (!mText && mShowLabel && mView)
+//		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+//	if (mText)
+//	{
+//		mText->setColor(mColor);
+//		mText->setText(mMetric->getName());
+////		mText->setPosition(p0_r);
+//		mText->setSize(mLabelSize / 100);
+//	}
 
 	mCircleActor->SetVisibility(mFillVisible);
 }

@@ -25,6 +25,8 @@
 
 namespace ssc
 {
+typedef boost::shared_ptr<class CaptionText3D> CaptionText3DPtr;
+typedef boost::shared_ptr<class DataMetric> DataMetricPtr;
 
 /**
  * \brief Base class for all Data Metric reps.
@@ -48,6 +50,9 @@ public:
 	void setShowLabel(bool on);
 	void setColor(double red, double green, double blue);
 
+    void setDataMetric(DataMetricPtr value);
+    DataMetricPtr getDataMetric();
+
 protected slots:
 	virtual void changedSlot() = 0; ///< called when interals are changed: update all
 
@@ -55,10 +60,21 @@ protected:
 	DataMetricRep(const QString& uid, const QString& name);
 //  virtual void rescale() = 0; ///< called when scaling has changed: rescale text etc to keep const vp size.
 
+    void addRepActorsToViewRenderer(ssc::View *view);
+    void removeRepActorsFromViewRenderer(ssc::View *view);
+    void drawText();
+    virtual void clear(); // reset all internals
+    virtual QString getText();
+
 	double mGraphicsSize;
 	bool mShowLabel;
 	double mLabelSize;
 	ssc::Vector3D mColor;
+
+    DataMetricPtr mMetric;
+    View *mView;
+private:
+    CaptionText3DPtr mText;
 
 //  ssc::ViewportListenerPtr mViewportListener;
 };

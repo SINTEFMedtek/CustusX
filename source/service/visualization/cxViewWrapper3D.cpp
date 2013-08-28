@@ -597,43 +597,37 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 		rep->setMesh(boost::dynamic_pointer_cast<ssc::Mesh>(data));
 		return rep;
 	}
-	else if (boost::dynamic_pointer_cast<ssc::PointMetric>(data))
-	{
-		ssc::PointMetricRepPtr rep = ssc::PointMetricRep::New(data->getUid() + "_3D_rep");
-		this->readDataRepSettings(rep);
-		rep->setPointMetric(boost::dynamic_pointer_cast<ssc::PointMetric>(data));
-		return rep;
-	}
-	else if (boost::dynamic_pointer_cast<FrameMetric>(data))
-	{
-		FrameMetricRepPtr rep = FrameMetricRep::New(data->getUid() + "_3D_rep");
-		this->readDataRepSettings(rep);
-		rep->setFrameMetric(boost::dynamic_pointer_cast<FrameMetric>(data));
-		return rep;
-	}
-	else if (boost::dynamic_pointer_cast<ssc::DistanceMetric>(data))
-	{
-		ssc::DistanceMetricRepPtr rep = ssc::DistanceMetricRep::New(data->getUid() + "_3D_rep");
-		this->readDataRepSettings(rep);
-		rep->setDistanceMetric(boost::dynamic_pointer_cast<ssc::DistanceMetric>(data));
-		return rep;
-	}
-	else if (boost::dynamic_pointer_cast<ssc::AngleMetric>(data))
-	{
-		ssc::AngleMetricRepPtr rep = ssc::AngleMetricRep::New(data->getUid() + "_3D_rep");
-		this->readDataRepSettings(rep);
-		rep->setMetric(boost::dynamic_pointer_cast<ssc::AngleMetric>(data));
-		return rep;
-	}
-	else if (boost::dynamic_pointer_cast<ssc::PlaneMetric>(data))
-	{
-		ssc::PlaneMetricRepPtr rep = ssc::PlaneMetricRep::New(data->getUid() + "_3D_rep");
-		this->readDataRepSettings(rep);
-		rep->setMetric(boost::dynamic_pointer_cast<ssc::PlaneMetric>(data));
-		return rep;
-	}
+    else
+    {
+        ssc::DataMetricRepPtr rep = this->createDataMetricRep3D(data);
+        if (rep)
+            return rep;
+    }
 
-	return ssc::RepPtr();
+    return ssc::RepPtr();
+}
+
+ssc::DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(ssc::DataPtr data)
+{
+    ssc::DataMetricRepPtr rep;
+
+    if (boost::dynamic_pointer_cast<ssc::PointMetric>(data))
+        rep = ssc::PointMetricRep::New(data->getUid() + "_3D_rep");
+    else if (boost::dynamic_pointer_cast<FrameMetric>(data))
+        rep = FrameMetricRep::New(data->getUid() + "_3D_rep");
+    else if (boost::dynamic_pointer_cast<ssc::DistanceMetric>(data))
+        rep = ssc::DistanceMetricRep::New(data->getUid() + "_3D_rep");
+    else if (boost::dynamic_pointer_cast<ssc::AngleMetric>(data))
+        rep = ssc::AngleMetricRep::New(data->getUid() + "_3D_rep");
+    else if (boost::dynamic_pointer_cast<ssc::PlaneMetric>(data))
+        rep = ssc::PlaneMetricRep::New(data->getUid() + "_3D_rep");
+
+    if (rep)
+    {
+        this->readDataRepSettings(rep);
+        rep->setDataMetric(boost::dynamic_pointer_cast<ssc::DataMetric>(data));
+    }
+    return rep;
 }
 
 /**helper. Read settings common for all data metric reps.

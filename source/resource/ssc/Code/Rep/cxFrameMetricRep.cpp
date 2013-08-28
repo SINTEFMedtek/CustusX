@@ -27,45 +27,27 @@ FrameMetricRepPtr FrameMetricRep::New(const QString& uid, const QString& name)
 }
 
 FrameMetricRep::FrameMetricRep(const QString& uid, const QString& name) :
-				DataMetricRep(uid, name), mView(NULL)
+                DataMetricRep(uid, name)
 {
 	mViewportListener.reset(new ssc::ViewportListener);
 	mViewportListener->setCallback(boost::bind(&FrameMetricRep::rescale, this));
 }
 
-void FrameMetricRep::setFrameMetric(FrameMetricPtr point)
+void FrameMetricRep::clear()
 {
-	if (mMetric)
-		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	mMetric = point;
-
-	if (mMetric)
-		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	mGraphicalPoint.reset();
-	this->changedSlot();
-}
-
-FrameMetricPtr FrameMetricRep::getFrameMetric()
-{
-	return mMetric;
+    DataMetricRep::clear();
+    mGraphicalPoint.reset();
 }
 
 void FrameMetricRep::addRepActorsToViewRenderer(ssc::View *view)
 {
-	mView = view;
-	mGraphicalPoint.reset();
-	mText.reset();
-	mViewportListener->startListen(mView->getRenderer());
-	this->changedSlot();
+    mViewportListener->startListen(view->getRenderer());
+    DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
 void FrameMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
 {
-	mView = NULL;
-	mGraphicalPoint.reset();
-	mText.reset();
+    DataMetricRep::removeRepActorsFromViewRenderer(view);
 	mViewportListener->stopListen();
 }
 
@@ -80,24 +62,13 @@ void FrameMetricRep::changedSlot()
 	if (!mGraphicalPoint)
 		return;
 
-	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mMetric->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-	ssc::Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
+    ssc::Vector3D p0_r = mMetric->getRefCoord();
 
 	mGraphicalPoint->setValue(p0_r);
 	mGraphicalPoint->setRadius(mGraphicsSize);
 	mGraphicalPoint->setColor(mColor);
 
-	if (!mShowLabel)
-		mText.reset();
-	if (!mText && mShowLabel)
-		mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
-	if (mText)
-	{
-		mText->setColor(mColor);
-		mText->setText(mMetric->getName());
-		mText->setPosition(p0_r);
-		mText->setSize(mLabelSize / 100);
-	}
+    this->drawText();
 
 	this->rescale();
 }

@@ -49,12 +49,11 @@ public:
 	static DistanceMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~DistanceMetricRep() {}
 
-	void setDistanceMetric(DistanceMetricPtr point);
 	virtual QString getType() const { return "ssc::DistanceMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+    virtual void clear();
+    virtual QString getText();
 
 protected slots:
 	virtual void changedSlot();
@@ -62,11 +61,9 @@ protected slots:
 private:
 	DistanceMetricRep(const QString& uid, const QString& name = "");
 	DistanceMetricRep(); ///< not implemented
+    DistanceMetricPtr getDistanceMetric();
 
 	ssc::GraphicalLine3DPtr mGraphicalLine;
-	ssc::CaptionText3DPtr mText;
-	DistanceMetricPtr mMetric;
-	ssc::View *mView;
 };
 
 }

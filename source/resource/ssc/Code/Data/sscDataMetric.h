@@ -46,7 +46,9 @@ public:
 	DataMetric(const QString& uid, const QString& name = "");
 	virtual ~DataMetric();
 
-	virtual QString getSpace();
+    virtual QString getSpace();
+    virtual ssc::Vector3D getRefCoord() const = 0;
+    virtual bool isValid() const { return true; }
 };
 typedef boost::shared_ptr<DataMetric> DataMetricPtr;
 

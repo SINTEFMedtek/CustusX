@@ -45,8 +45,8 @@ public:
 	static PointMetricRep2DPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~PointMetricRep2D() {}
 
-	void setPointMetric(PointMetricPtr point);
-	PointMetricPtr getPointMetric();
+//	void setPointMetric(PointMetricPtr point);
+//	PointMetricPtr getPointMetric();
 	virtual QString getType() const { return "ssc::PointMetricRep2D"; }
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	/**
@@ -64,7 +64,8 @@ protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 
-	virtual void rescale();
+    virtual void clear();
+    virtual void rescale();
 
 protected slots:
 	virtual void changedSlot();
@@ -73,9 +74,7 @@ private:
 	PointMetricRep2D(const QString& uid, const QString& name = "");
 	PointMetricRep2D(); ///< not implemented
 
-	ssc::CaptionText3DPtr mText;
-	PointMetricPtr mMetric;
-	ssc::View* mView;
+//	PointMetricPtr mMetric;
 	ssc::ViewportListenerPtr mViewportListener;
 	ssc::SliceProxyPtr mSliceProxy;
 	vtkActorPtr mCircleActor;

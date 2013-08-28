@@ -59,7 +59,8 @@ public:
 	void setFrame(const ssc::Transform3D& rMt);
 	ssc::Transform3D getFrame();
 	ssc::Vector3D getCoordinate() const;
-	void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
+    ssc::Vector3D getRefCoord() const;
+    void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
 	ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data
 	virtual QString getType() const
 	{

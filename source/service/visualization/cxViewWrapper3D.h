@@ -38,6 +38,7 @@ namespace ssc
 {
 typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
 typedef boost::shared_ptr<class CoordinateSystemListener> CoordinateSystemListenerPtr;
+typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
 }
 
 namespace cx
@@ -130,7 +131,8 @@ private:
 	void setOrientationAnnotation();
 
 	ssc::RepPtr createDataRep3D(ssc::DataPtr data);
-	virtual void dataAdded(ssc::DataPtr data);
+    ssc::DataMetricRepPtr createDataMetricRep3D(ssc::DataPtr data);
+    virtual void dataAdded(ssc::DataPtr data);
 	virtual void dataRemoved(const QString& uid);
 
 	void setTranslucentRenderingToDepthPeeling(bool setDepthPeeling);

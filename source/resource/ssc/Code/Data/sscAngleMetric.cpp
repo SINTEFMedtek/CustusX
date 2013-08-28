@@ -112,6 +112,11 @@ std::vector<ssc::Vector3D> AngleMetric::getEndpoints() const
 	return p;
 }
 
+ssc::Vector3D AngleMetric::getRefCoord() const
+{
+    return this->boundingBox().center();
+}
+
 double AngleMetric::getAngle() const
 {
 	std::vector<ssc::Vector3D> p = this->getEndpoints();

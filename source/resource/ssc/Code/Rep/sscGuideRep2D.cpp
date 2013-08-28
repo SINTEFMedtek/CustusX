@@ -40,40 +40,46 @@ GuideRep2DPtr GuideRep2D::New(const QString& uid, const QString& name)
 }
 
 GuideRep2D::GuideRep2D(const QString& uid, const QString& name) :
-	DataMetricRep(uid, name), mView(NULL),
+    DataMetricRep(uid, name),
 	mOutlineWidth(1),
 	mRequestedAccuracy(1)
 {
 }
 
-void GuideRep2D::setPointMetric(PointMetricPtr point)
+//void GuideRep2D::setPointMetric(PointMetricPtr point)
+//{
+//	if (mMetric)
+//		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+
+//	mMetric = point;
+
+//	if (mMetric)
+//		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+
+//	this->changedSlot();
+//}
+
+//PointMetricPtr GuideRep2D::getPointMetric()
+//{
+//	return mMetric;
+//}
+
+//void GuideRep2D::addRepActorsToViewRenderer(ssc::View* view)
+//{
+//	mView = view;
+//	this->changedSlot();
+//}
+
+//void GuideRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
+//{
+//	mView->getRenderer()->RemoveActor(mCircleActor);
+//	mView = NULL;
+//}
+
+void GuideRep2D::clear()
 {
-	if (mMetric)
-		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	mMetric = point;
-
-	if (mMetric)
-		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
-
-	this->changedSlot();
-}
-
-PointMetricPtr GuideRep2D::getPointMetric()
-{
-	return mMetric;
-}
-
-void GuideRep2D::addRepActorsToViewRenderer(ssc::View* view)
-{
-	mView = view;
-	this->changedSlot();
-}
-
-void GuideRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
-{
-	mView->getRenderer()->RemoveActor(mCircleActor);
-	mView = NULL;
+    if (mView)
+        mView->getRenderer()->RemoveActor(mCircleActor);
 }
 
 void GuideRep2D::changedSlot()

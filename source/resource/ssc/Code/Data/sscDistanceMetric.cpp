@@ -74,26 +74,15 @@ bool DistanceMetric::validArgument(ssc::DataPtr p) const
 	return p->getType() == "pointMetric" || p->getType() == "planeMetric";
 }
 
-//void DistanceMetric::setPoint(int index, PointMetricPtr p)
-//{
-//  if (mPoint[index]==p)
-//    return;
-//
-//	if (mPoint[index])
-//		disconnect(mPoint[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
-//
-//	mPoint[index] = p;
-//
-//	if (mPoint[index])
-//		connect(mPoint[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
-//
-//  emit transformChanged();
-//}
-//
-//PointMetricPtr DistanceMetric::getPoint(int index)
-//{
-//	return mArguments[index];
-//}
+ssc::Vector3D DistanceMetric::getRefCoord() const
+{
+    return this->boundingBox().center();
+}
+
+bool DistanceMetric::isValid() const
+{
+    return this->getEndpoints().size()==2;
+}
 
 void DistanceMetric::addXml(QDomNode& dataNode)
 {

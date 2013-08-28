@@ -53,12 +53,14 @@ public:
 	static AngleMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~AngleMetricRep() {}
 
-	void setMetric(AngleMetricPtr point);
+//	void setMetric(AngleMetricPtr point);
 	virtual QString getType() const { return "ssc::AngleMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+//	virtual void addRepActorsToViewRenderer(ssc::View *view);
+//	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+    virtual void clear();
+    virtual QString getText();
 
 protected slots:
 	virtual void changedSlot();
@@ -66,13 +68,13 @@ protected slots:
 private:
 	AngleMetricRep(const QString& uid, const QString& name = "");
 	AngleMetricRep(); ///< not implemented
+    AngleMetricPtr getAngleMetric();
 
 	ssc::GraphicalLine3DPtr mLine0;
 	ssc::GraphicalLine3DPtr mLine1;
 	ssc::GraphicalArc3DPtr mArc;
-	ssc::CaptionText3DPtr mText;
-	AngleMetricPtr mMetric;
-	ssc::View *mView;
+//	ssc::CaptionText3DPtr mText;
+//	AngleMetricPtr mMetric;
 };
 
 }
