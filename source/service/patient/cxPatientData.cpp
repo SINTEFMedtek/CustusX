@@ -165,7 +165,8 @@ void PatientData::startupLoadPatient()
 
 		QDateTime lastSaveTime = QDateTime::fromString(settings()->value("startup/lastPatientSaveTime").toString(), ssc::timestampSecondsFormat());
 		double minsSinceLastSave = lastSaveTime.secsTo(QDateTime::currentDateTime())/60;
-		int allowedMinsSinceLastSave = 8*60;
+		double autoLoadRecentPatientWithinHours = settings()->value("Automation/autoLoadRecentPatientWithinHours").toDouble();
+		int allowedMinsSinceLastSave = autoLoadRecentPatientWithinHours*60;
 		if (minsSinceLastSave > allowedMinsSinceLastSave) // if less than 8 hours, accept
 		{
 			ssc::messageManager()->sendInfo(
