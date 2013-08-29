@@ -73,6 +73,8 @@ Q_OBJECT
 public:
 	PlaneMetric(const QString& uid, const QString& name = "");
 	virtual ~PlaneMetric();
+    static PlaneMetricPtr create(QDomNode node);
+    static PlaneMetricPtr create(QString uid, QString name="");
 
 	void setCoordinate(const ssc::Vector3D& p);
 	ssc::Vector3D getCoordinate() const;

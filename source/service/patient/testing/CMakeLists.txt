@@ -18,12 +18,19 @@
 
 if (BUILD_TESTING)
         # Catch unit test framework stuff:
+    include_directories(
+        ..
+        )
 
         QT4_WRAP_CPP(CXTEST_PATIENTSERVICE_SOURCES
                 )
         set(CXTEST_PATIENTSERVICE_SOURCES ${CXTEST_PATIENTSERVICE_SOURCES}
             cxtestCatchPatientService.cpp
-            )
+	        cxtestCatchFrameMetric.cpp
+            cxtestCatchToolMetric.cpp
+            cxtestCatchDistanceMetric.cpp
+            cxtestMetricFixture.h
+            cxtestMetricFixture.cpp            )
 
         cx_catch_add_lib_and_exe(cxPatientService "${CXTEST_PATIENTSERVICE_SOURCES}")
 
