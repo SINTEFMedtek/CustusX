@@ -38,6 +38,18 @@ AngleMetric::AngleMetric(const QString& uid, const QString& name) :
 {
 }
 
+AngleMetricPtr AngleMetric::create(QString uid, QString name)
+{
+    return AngleMetricPtr(new AngleMetric(uid, name));
+}
+
+AngleMetricPtr AngleMetric::create(QDomNode node)
+{
+    AngleMetricPtr retval = AngleMetric::create("");
+    retval->parseXml(node);
+    return retval;
+}
+
 AngleMetric::~AngleMetric()
 {
 }

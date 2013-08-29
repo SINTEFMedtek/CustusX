@@ -39,6 +39,17 @@ DistanceMetric::DistanceMetric(const QString& uid, const QString& name) :
 {
 }
 
+DistanceMetricPtr DistanceMetric::create(QString uid, QString name)
+{
+    return DistanceMetricPtr(new DistanceMetric(uid, name));
+}
+
+DistanceMetricPtr DistanceMetric::create(QDomNode node)
+{
+    DistanceMetricPtr retval = DistanceMetric::create("");
+    retval->parseXml(node);
+    return retval;
+}
 DistanceMetric::~DistanceMetric()
 {
 }
@@ -169,6 +180,15 @@ double DistanceMetric::getDistance() const
 ssc::DoubleBoundingBox3D DistanceMetric::boundingBox() const
 {
 	return ssc::DoubleBoundingBox3D::fromCloud(this->getEndpoints());
+}
+
+QString DistanceMetric::getAsSingleLineString()
+{
+    QString retval;
+    retval += this->getType() + " \"";
+    retval += mName + "\" ";
+    retval += qstring_cast(this->getDistance());
+    return retval;
 }
 
 }

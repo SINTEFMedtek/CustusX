@@ -63,6 +63,8 @@ Q_OBJECT
 public:
 	DistanceMetric(const QString& uid, const QString& name);
 	virtual ~DistanceMetric();
+    static DistanceMetricPtr create(QDomNode node);
+    static DistanceMetricPtr create(QString uid, QString name="");
 
 	double getDistance() const;
     std::vector<ssc::Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
@@ -74,13 +76,14 @@ public:
 	bool validArgument(ssc::DataPtr p) const;
     virtual bool isValid() const;
 
-	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
+    virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual ssc::DoubleBoundingBox3D boundingBox() const;
 	virtual QString getType() const
 	{
 		return "distanceMetric";
 	}
+    QString getAsSingleLineString();
 
 private:
 	boost::array<ssc::DataPtr, 2> mArgument;
