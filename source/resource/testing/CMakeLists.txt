@@ -36,6 +36,7 @@ if (BUILD_TESTING)
 	set(RESOURCE_TEST_CATCH_SOURCE_FILES
 	    cxtestCatchFrameMetric.cpp
             cxtestCatchToolMetric.cpp
+            cxtestCatchDistanceMetric.cpp
             cxtestFrameMetricFixture.h
 	    cxtestFrameMetricFixture.cpp
 	)

@@ -13,34 +13,16 @@
 // See CustusX_License.txt for more information.
 
 #include "catch.hpp"
+#include "sscDataManagerImpl.h"
 
-#include "sscTypeConversions.h"
-//#include "cxtestToolMetricFixture.h"
-
-
-
-TEST_CASE("ToolMetric can set/get tool frame", "[unit]")
+TEST_CASE("sscDataManagerImpl setup/shutdown works multiple times", "[unit]")
 {
-}
-TEST_CASE("ToolMetric can set/get tool offset", "[unit]")
-{
-}
-TEST_CASE("ToolMetric can set/get tool name", "[unit]")
-{
-}
+    for (unsigned i=0; i<2; ++i)
+    {
+        ssc::DataManagerImpl::initialize();
+        CHECK(ssc::dataManager());
 
-TEST_CASE("ToolMetric can save/load XML", "[unit]")
-{
-}
-
-TEST_CASE("ToolMetric can convert values to single line string", "[unit]")
-{
-}
-
-TEST_CASE("ToolMetric can set space correctly", "[unit]")
-{
-}
-
-TEST_CASE("ToolMetric can get a valid reference coordinate", "[unit]")
-{
+        ssc::DataManagerImpl::shutdown();
+        //REQUIRE_FALSE(ssc::dataManager()); //todo: should work
+    }
 }

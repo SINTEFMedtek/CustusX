@@ -19,28 +19,27 @@
 
 
 
-TEST_CASE("ToolMetric can set/get tool frame", "[unit]")
-{
-}
-TEST_CASE("ToolMetric can set/get tool offset", "[unit]")
-{
-}
-TEST_CASE("ToolMetric can set/get tool name", "[unit]")
+TEST_CASE("DistanceMetric composed of two points gives a correct distance", "[unit]")
 {
 }
 
-TEST_CASE("ToolMetric can save/load XML", "[unit]")
+TEST_CASE("DistanceMetric composed of two planes gives a correct distance", "[unit]")
 {
 }
 
-TEST_CASE("ToolMetric can convert values to single line string", "[unit]")
+TEST_CASE("DistanceMetric composed of a point and plane gives a correct distance", "[unit]")
 {
 }
 
-TEST_CASE("ToolMetric can set space correctly", "[unit]")
+TEST_CASE("DistanceMetric can save/load XML", "[unit]")
 {
 }
 
-TEST_CASE("ToolMetric can get a valid reference coordinate", "[unit]")
+TEST_CASE("DistanceMetric can convert values to single line string", "[unit]")
 {
 }
+
+TEST_CASE("DistanceMetric can get a valid reference coordinate", "[unit]")
+{
+}
+
