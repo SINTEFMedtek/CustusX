@@ -65,10 +65,10 @@ public:
 	virtual ~DistanceMetric();
 
 	double getDistance() const;
-	std::vector<ssc::Vector3D> getEndpoints() const;
+    std::vector<ssc::Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
     virtual ssc::Vector3D getRefCoord() const;
 
-	unsigned getArgumentCount() const;
+    unsigned getArgumentCount() const;
 	void setArgument(int index, ssc::DataPtr p);
 	ssc::DataPtr getArgument(int index);
 	bool validArgument(ssc::DataPtr p) const;

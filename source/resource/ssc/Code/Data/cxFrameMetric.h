@@ -72,11 +72,11 @@ public:
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual ssc::DoubleBoundingBox3D boundingBox() const;
 	QString getAsSingleLineString();
-	QString matrixAsSingleLineString();
 	QString pointAsSingleLineString();
 
 private:
-	ssc::CoordinateSystem mSpace;
+    QString matrixAsSingleLineString();
+    ssc::CoordinateSystem mSpace;
 	ssc::CoordinateSystemListenerPtr mSpaceListener;
     ssc::Transform3D mFrame; ///< frame qFt described in local space q = mSpace
 };

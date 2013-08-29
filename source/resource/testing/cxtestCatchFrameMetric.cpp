@@ -18,30 +18,7 @@
 #include "cxtestFrameMetricFixture.h"
 
 
-
-#include "sscDataManagerImpl.h"
-#include "sscDummyToolManager.h"
-
-TEST_CASE("sscDataManagerImpl setup/shutdown works", "[unit]")
-{
-	ssc::DataManagerImpl::initialize();
-	ssc::ToolManager::setInstance(ssc::DummyToolManager::getInstance());
-
-	ssc::ToolManager::shutdown();
-	ssc::DummyToolManager::shutdown();
-	ssc::DataManagerImpl::shutdown();
-	REQUIRE(true);
-
-	ssc::DataManagerImpl::initialize();
-	ssc::ToolManager::setInstance(ssc::DummyToolManager::getInstance());
-
-	ssc::ToolManager::shutdown();
-	ssc::DummyToolManager::shutdown();
-	ssc::DataManagerImpl::shutdown();
-	REQUIRE(true);
-}
-
-TEST_CASE("cxFrameMetric can get/get transform", "[unit]")
+TEST_CASE("cxFrameMetric can set/get transform", "[unit]")
 {
 	cxtest::FrameMetricFixture fixture;
 	REQUIRE(fixture.createAndSetTestTransform());
