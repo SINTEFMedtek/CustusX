@@ -109,7 +109,7 @@ set(ALL_LIBRARY_DIRS
     ${DCMTK_DIR}/lib
     ${INCLUDE_DIRECTORIES}
     ${Tube-Segmentation-Framework_LIBRARY_DIRS}
-    ${CustusX3_BINARY_DIR}/source/resource/ssc
+    ${CustusX3_BINARY_DIR}/source/resource/ssc/Code
     ${CustusX3_BINARY_DIR}/source/resource/ssc/Testing/cisst_code
 #    ${SSC_BINARY_DIR}/Code
 #    ${SSC_BINARY_DIR}/DICOMLib
