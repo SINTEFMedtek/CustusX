@@ -35,7 +35,8 @@ if (BUILD_TESTING)
 	#Catch
 	set(RESOURCE_TEST_CATCH_SOURCE_FILES
 	    cxtestCatchFrameMetric.cpp
-	    cxtestFrameMetricFixture.h
+            cxtestCatchToolMetric.cpp
+            cxtestFrameMetricFixture.h
 	    cxtestFrameMetricFixture.cpp
 	)
 	cx_catch_add_lib_and_exe(cxResource "${RESOURCE_TEST_CATCH_SOURCE_FILES}")

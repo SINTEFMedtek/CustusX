@@ -37,6 +37,7 @@ include_directories(
 	    cxtestCatchToolFiles.cpp
 	    cxtestTestToolMesh.h
 	    cxtestTestToolMesh.cpp
+            cxtestCatchTrackingService.cpp
 	    )
 	
 	cx_catch_add_lib_and_exe(cxTrackingService "${CXTEST_TRACKING_SOURCES}")

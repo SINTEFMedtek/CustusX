@@ -37,10 +37,10 @@ void DataManager::shutdown()
 
 DataManager* DataManager::getInstance()
 {
-	if (!mInstance)
-	{
-		DataManagerImpl::initialize();
-	}
+    if (!mInstance)
+    {
+        DataManagerImpl::initialize();
+    }
 	return mInstance;
 }
 
