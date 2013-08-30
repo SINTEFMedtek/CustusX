@@ -312,7 +312,7 @@ void SeansVesselReg::computeDistances(ContextPtr context)
 		double outPoint[3];
 		context->mTargetPointLocator->FindClosestPoint(context->mSourcePoints->GetPoint(i), outPoint, cell_id, sub_id, distanceSquared);
 		closestPoint->SetPoint(i, outPoint);
-		if (boost::math::isnan(distanceSquared))
+		if ((boost::math::isnan)(distanceSquared))
 		{
 			std::cout << "nan found during findClosestPoint!" << std::endl;
 			{
