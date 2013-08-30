@@ -241,14 +241,6 @@ set( SSC_LIBRARIES ${SSC_LIBRARIES}
     )
 
 # =========================================================
-
-# _USE_MATH_DEFINES Must be defined before math.h is included
-if (WIN32)
-    add_definitions(-D_USE_MATH_DEFINES)
-endif(WIN32)
-
-    
-# =========================================================
 if(USE_GLX_SHARED_CONTEXT)
     SET( SSC_LIBRARIES 
         ${SSC_LIBRARIES}

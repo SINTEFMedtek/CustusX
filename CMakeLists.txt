@@ -20,9 +20,16 @@ include(cxCatchUtilities)
 # Add some compiler flags (preprocessor definitions)
 #------------------------------------------------------------------------------
 
+cx_set_os_identifiers()
+
 #if(SSC_USE_GCOV)
 #	add_definitions(--coverage)
 #endif()
+
+# _USE_MATH_DEFINES Must be defined before math.h is included
+if (CX_WINDOWS)
+    add_definitions(-D_USE_MATH_DEFINES)
+endif(CX_WINDOWS)
 
 # TODO check this and try to remove.
 if(COMMAND cmake_policy)
@@ -35,7 +42,7 @@ endif()
 
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
 
-cx_set_os_identifiers()
+
 
 message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 
