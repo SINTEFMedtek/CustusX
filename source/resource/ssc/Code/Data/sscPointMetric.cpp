@@ -144,6 +144,18 @@ PointMetric::PointMetric(const QString& uid, const QString& name) :
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
+PointMetricPtr PointMetric::create(QString uid, QString name)
+{
+    return PointMetricPtr(new PointMetric(uid, name));
+}
+
+PointMetricPtr PointMetric::create(QDomNode node)
+{
+    PointMetricPtr retval = PointMetric::create("");
+    retval->parseXml(node);
+    return retval;
+}
+
 PointMetric::~PointMetric()
 {
 }
