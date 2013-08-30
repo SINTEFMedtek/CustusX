@@ -33,39 +33,59 @@ TEST_CASE("ToolMetric can save/load XML", "[unit]")
 	CHECK(fixture.saveLoadXmlGivesEqualTransform(testData));
 }
 
-//TEST_CASE("ToolMetric can convert values to single line string", "[unit]")
-//{
-//	cxtest::MetricFixture fixture;
-//	cxtest::ToolMetricData testData = fixture.getToolMetricData();
+TEST_CASE("ToolMetric can convert values to single line string", "[unit]")
+{
+	cxtest::MetricFixture fixture;
+	cxtest::ToolMetricData testData = fixture.getToolMetricData();
 
-//	QString singleLine = testData.mMetric->getAsSingleLineString();
-//	REQUIRE(!singleLine.isEmpty());
-//	INFO("line: " + singleLine);
-//	QStringList list = fixture.splitStringLineIntoTextComponents(singleLine);
-//	INFO("list: " + list.join("\n"));
-//	REQUIRE(list.size()>2);
-//	REQUIRE(fixture.verifySingleLineHeader(list, testData.mMetric));
+	QStringList list = fixture.getSingleLineDataList(testData.mMetric);
+	REQUIRE(fixture.verifySingleLineHeader(list, testData.mMetric));
 
-//	CHECK(list[2].toDouble() == Approx(distance));
-//}
+	REQUIRE(list[2]==testData.mName);
+	REQUIRE(list[3].toDouble()==Approx(testData.mOffset));
+	REQUIRE(list[4]=="reference");
+	INFO(list.join("\n"));
+	bool transformStringOk = false;
+	ssc::Transform3D readTransform = ssc::Transform3D::fromString(QStringList(list.mid(5, 16)).join(" "), &transformStringOk);
+	REQUIRE(transformStringOk);
+	REQUIRE(ssc::similar(testData.m_qMt, readTransform));
+}
 
-//TEST_CASE("ToolMetric can set space correctly", "[unit]")
-//{
-//}
+TEST_CASE("ToolMetric can set space correctly", "[unit]")
+{
+	cxtest::MetricFixture fixture;
+	cxtest::ToolMetricData testData = fixture.getToolMetricData();
 
-//TEST_CASE("ToolMetric can get a valid reference coordinate", "[unit]")
-//{
-//    cxtest::MetricFixture fixture;
-//    cxtest::ToolMetricData testData = fixture.getToolMetricData();
+	fixture.setPatientRegistration();
 
-////    ssc::Vector3D testCoord(0,0,0); // TODO insert correct value
-////    ssc::Vector3D refCoord = testData.mMetric->getRefCoord();
-////    CHECK(ssc::similar(refCoord, testCoord);
+	testData.mMetric->setSpace(ssc::CoordinateSystemHelpers::getPr());
+	CHECK_FALSE(fixture.metricEqualsData(testData));
 
-//    fixture.setPatientRegistration();
-//    testData.mMetric->setSpace(ssc::CoordinateSystemHelpers::getPr());
+	testData.mMetric->setSpace(testData.mSpace);
+	CHECK(fixture.metricEqualsData(testData));
+}
 
-//    ssc::Vector3D testCoord(0,0,0); // TODO insert correct value
-//    ssc::Vector3D refCoord = testData.mMetric->getRefCoord();
-//    CHECK(ssc::similar(refCoord, testCoord);
-//}
+TEST_CASE("ToolMetric can get a valid reference coordinate", "[unit]")
+{
+	cxtest::MetricFixture fixture;
+	cxtest::ToolMetricData testData = fixture.getToolMetricData();
+
+	ssc::Vector3D testCoord(-2,1,3);
+	ssc::Vector3D refCoord = testData.mMetric->getRefCoord();
+	INFO(qstring_cast(testCoord)+" == "+qstring_cast(refCoord));
+	CHECK(ssc::similar(refCoord, testCoord));
+
+	testData.mMetric->setSpace(ssc::CoordinateSystemHelpers::getPr());
+
+	refCoord = testData.mMetric->getRefCoord();
+	INFO(qstring_cast(testCoord)+" == "+qstring_cast(refCoord));
+	CHECK(ssc::similar(refCoord, testCoord));
+
+	fixture.setPatientRegistration();
+
+	testCoord = ssc::Vector3D(3,7,10);
+	refCoord = testData.mMetric->getRefCoord();
+	INFO(qstring_cast(testCoord)+" == "+qstring_cast(refCoord));
+	CHECK(ssc::similar(refCoord, testCoord));
+
+}
