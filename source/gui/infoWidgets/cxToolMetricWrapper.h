@@ -45,6 +45,8 @@ private slots:
 private:
   cx::ToolMetricPtr mData;
   ssc::StringDataAdapterXmlPtr mSpaceSelector;
+  ssc::StringDataAdapterXmlPtr mToolNameSelector;
+  ssc::DoubleDataAdapterXmlPtr mToolOffsetSelector;
   bool mInternalUpdate;
   Transform3DWidget* mFrameWidget;
 };

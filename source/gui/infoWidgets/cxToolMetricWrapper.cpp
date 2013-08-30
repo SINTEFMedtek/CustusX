@@ -15,6 +15,7 @@
 #include "cxToolMetricWrapper.h"
 #include <QHBoxLayout>
 #include "sscLabeledComboBoxWidget.h"
+#include "cxDataAdapterHelper.h"
 
 namespace cx {
 
@@ -28,6 +29,7 @@ ToolMetricWrapper::ToolMetricWrapper(cx::ToolMetricPtr data) : mData(data)
 QWidget* ToolMetricWrapper::createWidget()
 {
 	QWidget* widget = new QWidget;
+
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -47,6 +49,21 @@ QWidget* ToolMetricWrapper::createWidget()
 			range,
 			QDomNode());
 	hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
+
+	mToolNameSelector = ssc::StringDataAdapterXml::initialize("selectToolName",
+															  "Tool Name",
+															  "The name of the tool",
+															  "",
+															  QDomNode());
+	hLayout->addWidget(createDataWidget(widget, mToolNameSelector));
+	mToolOffsetSelector = ssc::DoubleDataAdapterXml::initialize("selectToolOffset",
+																"Tool Offset",
+																"Tool Offset",
+																0,
+																ssc::DoubleRange(0, 100, 1),
+																1);
+	hLayout->addWidget(createDataWidget(widget, mToolOffsetSelector));
+
 
 	mFrameWidget = new Transform3DWidget(widget);
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
