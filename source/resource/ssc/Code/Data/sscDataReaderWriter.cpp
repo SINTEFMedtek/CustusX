@@ -55,6 +55,7 @@
 #include "sscPlaneMetric.h"
 #include "sscAngleMetric.h"
 #include "cxFrameMetric.h"
+#include "cxToolMetric.h"
 
 #include "sscImageLUT2D.h"
 #include "sscImageTF3D.h"
@@ -316,6 +317,7 @@ DataReaderWriter::DataReaderWriter()
 	mDataReaders.insert(ssc::DataReaderPtr(new ssc::PlaneMetricReader()));
 	mDataReaders.insert(ssc::DataReaderPtr(new ssc::AngleMetricReader()));
 	mDataReaders.insert(ssc::DataReaderPtr(new cx::FrameMetricReader()));
+	mDataReaders.insert(ssc::DataReaderPtr(new cx::ToolMetricReader()));
 }
 
 DataReaderPtr DataReaderWriter::findReader(const QString& path, const QString& type)
