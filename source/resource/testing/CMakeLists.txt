@@ -6,7 +6,6 @@ endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
 	include_directories(
-		${CPPUNIT_INCLUDE_DIR}
 		${CustusX3_SOURCE_DIR}/source/resource
 		${CustusX3_SOURCE_DIR}/source/resource/settings
 		${CustusX3_SOURCE_DIR}/source/resource/utilities

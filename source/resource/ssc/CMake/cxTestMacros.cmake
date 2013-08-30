@@ -38,7 +38,7 @@ macro(SSC_ADD_CTEST_CPPUNIT_TESTS TEST_NAME CPPUNIT_MAIN SOURCE_FILES LIBRARIES 
 #	message("LIBRARIES:" ${LIBRARIES})
 
 	if(BUILD_TESTING)
-		# build the standalone cppunit executable:
+                # build the standalone cppunit executable:
 		if(SSC_BUILD_PURE_CPPUNIT_TESTS AND NOT SSC_USE_GCOV)
 			add_executable(${TEST_NAME}
 				${CPPUNIT_MAIN}

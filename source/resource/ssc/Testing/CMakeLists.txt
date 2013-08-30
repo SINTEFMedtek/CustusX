@@ -9,46 +9,13 @@ endif(COMMAND cmake_policy)
 # =========================================================
 
 if (BUILD_TESTING)
-    
-# cppunit -start
-FIND_PATH(CPPUNIT_INCLUDE_DIR cppunit/TestCase.h
-  /usr/local/include
-  /usr/include
-)
-
-if (WIN32)
-  FIND_LIBRARY(CPPUNIT_LIBRARY cppunit
-               ${CPPUNIT_INCLUDE_DIR}/../lib
-               /usr/local/lib
-               /usr/lib)
-  FIND_LIBRARY(CPPUNIT_DEBUG_LIBRARY cppunitd
-               ${CPPUNIT_INCLUDE_DIR}/../lib
-               /usr/local/lib
-               /usr/lib)
-ELSE (WIN32)
-  find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED)
-ENDIF (WIN32)
-
-IF(CPPUNIT_INCLUDE_DIR)
-  IF(CPPUNIT_LIBRARY)
-    SET(CPPUNIT_FOUND "YES")
-    SET(CPPUNIT_LIBRARIES ${CPPUNIT_LIBRARY} ${CMAKE_DL_LIBS})
-    SET(CPPUNIT_DEBUG_LIBRARIES ${CPPUNIT_DEBUG_LIBRARY}
-${CMAKE_DL_LIBS})
-  ENDIF(CPPUNIT_LIBRARY)
-ENDIF(CPPUNIT_INCLUDE_DIR)
-# cppunit -end    
-    
+        
     include_directories( ${CX_SSC_INCLUDE_DIRECTORIES} )
     include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
     include_directories( ${SSC_SOURCE_DIR}/Examples/SliceAndToolRep )
     include_directories( /usr/local/include )
     include_directories( /opt/local/include )
-    include_directories( ${CPPUNIT_INCLUDE_DIR})
     
-    # cppunit
-    #find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib /usr/lib64)
-
     # test starting the data manager 
     # - ssc::Image
     # - ssc::DataManager 

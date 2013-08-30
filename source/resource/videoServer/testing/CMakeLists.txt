@@ -11,7 +11,6 @@ if (BUILD_TESTING)
 	include_directories(
                 ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
                 ${CustusX3_SOURCE_DIR}/source/resource/videoServer
-                ${CPPUNIT_INCLUDE_DIR}
 		)
 
 	# List of all test units
