@@ -43,6 +43,7 @@
 #include "sscTimeKeeper.h"
 #include "sscManualTool.h"
 #include "cxFrameMetricWrapper.h"
+#include "cxToolMetricWrapper.h"
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 #include "sscTime.h"
@@ -77,6 +78,7 @@ MetricWidget::MetricWidget(QWidget* parent) :
   QActionGroup* group = new QActionGroup(this);
   mPointMetricAction = this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Point Metric", SLOT(addPointButtonClickedSlot()));
   mFrameMetricAction = this->createAction(group, ":/icons/metric_frame.png", "Frame", "Create a new Frame Metric (position and orientation)", SLOT(addFrameButtonClickedSlot()));
+  mToolMetricAction = this->createAction(group, ":/icons/metric_frame.png", "Tool", "Create a new Tool Metric", SLOT(addToolButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
@@ -219,6 +221,10 @@ MetricBasePtr MetricWidget::createMetricWrapper(ssc::DataPtr data)
   else if (boost::dynamic_pointer_cast<cx::FrameMetric>(data))
   {
     return MetricBasePtr(new FrameMetricWrapper(boost::dynamic_pointer_cast<cx::FrameMetric>(data)));
+  }
+  else if (boost::dynamic_pointer_cast<cx::ToolMetric>(data))
+  {
+	return MetricBasePtr(new ToolMetricWrapper(boost::dynamic_pointer_cast<cx::ToolMetric>(data)));
   }
 
 	return MetricBasePtr();
@@ -393,6 +399,24 @@ void MetricWidget::addFrameButtonClickedSlot()
   viewManager()->getViewGroups()[0]->getData()->addData(frame);
 }
 
+void MetricWidget::addToolButtonClickedSlot()
+{
+  ToolMetricPtr frame(new ToolMetric("tool%1", "tool%1"));
+  frame->get_rMd_History()->setParentSpace("reference");
+
+  ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
+  ssc::Transform3D rMt = ssc::SpaceHelpers::getDominantToolTipTransform(ref, true);
+
+  frame->setSpace(ref);
+  frame->setFrame(rMt);
+  frame->setToolName(ssc::toolManager()->getDominantTool()->getName());
+  frame->setToolOffset(ssc::toolManager()->getDominantTool()->getTooltipOffset());
+
+  ssc::dataManager()->loadData(frame);
+  this->setActiveUid(frame->getUid());
+  viewManager()->getViewGroups()[0]->getData()->addData(frame);
+}
+
 void MetricWidget::addPlaneButtonClickedSlot()
 {
   ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
@@ -560,18 +584,16 @@ void MetricWidget::exportFramesToFile(QString filename)
 {
 	QFile file(filename);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
-		return;
+		return;	
 
 	std::map<QString, ssc::DataPtr> dataMap = ssc::dataManager()->getData();
 	std::map<QString, ssc::DataPtr>::iterator iter;
 	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
 	{
-		ssc::DataPtr data = iter->second;
-		cx::FrameMetricPtr frameMetric = boost::dynamic_pointer_cast<cx::FrameMetric>(data);
-		if(frameMetric)
+		ssc::DataMetricPtr metric = boost::dynamic_pointer_cast<ssc::DataMetric>(iter->second);
+		if(metric)
 		{
-//			std::cout << "frame metric found: " << frameMetric->convertToSingleLineString() << std::endl;
-			file.write(frameMetric->getAsSingleLineString().toAscii());
+			file.write(metric->getAsSingleLineString().toAscii());
 			file.write("\n");
 		}
 	}

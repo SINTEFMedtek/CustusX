@@ -158,7 +158,7 @@ ssc::DoubleBoundingBox3D ToolMetric::boundingBox() const
 
 QString ToolMetric::getAsSingleLineString() const
 {
-	return QString("%1 \"%2\" %3 %4 %5")
+	return QString("%1 \"%2\" %3 \"%4\" %5")
 			.arg(this->getSingleLineHeader())
 			.arg(mToolName)
 			.arg(mToolOffset)

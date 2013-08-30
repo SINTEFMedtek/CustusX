@@ -69,6 +69,7 @@ protected slots:
 
   void addPointButtonClickedSlot();
   void addFrameButtonClickedSlot();
+  void addToolButtonClickedSlot();
   void addPlaneButtonClickedSlot();
   void addAngleButtonClickedSlot();
   void addDistanceButtonClickedSlot();
@@ -79,6 +80,7 @@ protected slots:
 protected:
   QAction* mPointMetricAction;
   QAction* mFrameMetricAction;
+  QAction* mToolMetricAction;
   QAction* mExportFramesAction;
 
   void exportFramesToFile(QString filename);
