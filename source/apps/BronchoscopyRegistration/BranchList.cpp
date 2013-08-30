@@ -119,7 +119,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 
 			if (Branches.size() > 1) // do not try to split another branch when the first branch is processed
 			{
-				if (splitIndex + 1 >= 5 and branchToSplit->getPositions().cols() - splitIndex - 1 >= 5)
+				if ((splitIndex + 1 >= 5) && (branchToSplit->getPositions().cols() - splitIndex - 1 >= 5))
 					//do not split branch if the new branch is close to the edge of the branch
 					//if the new branch is not close to one of the edges of the
 					//connected existing branch: Split the existing branch

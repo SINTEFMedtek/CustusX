@@ -90,16 +90,11 @@ SET ( cxResource_SOURCE
     utilities/cxUSReconstructInputDataAlgoritms.cpp
     utilities/cxStringHelpers.h
     utilities/cxStringHelpers.cpp
-
-#	OpenIGTLinkUtilities/cxIGTLinkImageMessage.h
-#	OpenIGTLinkUtilities/cxIGTLinkImageMessage.cpp    
-#    OpenIGTLinkUtilities/cxIGTLinkUSStatusMessage.h
-#    OpenIGTLinkUtilities/cxIGTLinkUSStatusMessage.cpp
-#    OpenIGTLinkUtilities/igtl_us_status.h
-#    OpenIGTLinkUtilities/igtl_us_status.c	
+    utilities/cxUSReconstructInputDataAlgoritms.cpp	
 )
 
 unset(CX_RESOURCE_INCLUDE_DIRECTORIES)
+
 set(CX_RESOURCE_INCLUDE_DIRECTORIES
     ${CX_SSC_INCLUDE_DIRECTORIES}
     ${CustusX3_SOURCE_DIR}/source/resource
