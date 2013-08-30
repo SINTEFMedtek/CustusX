@@ -31,21 +31,35 @@ class LibraryAssembly:
     '''
     def __init__(self):
         self.controlData = cxInstallData.Common()
-        self.libraries = [
-                     #CppUnit(),
-                     cxComponents.ITK(),
-                     cxComponents.VTK(),
-                     cxComponents.OpenCV(),
-                     cxComponents.OpenIGTLink(),
-                     cxComponents.IGSTK(),
-                     #DCMTK(),
-                     #SSC(),
-                     cxComponents.ISB_DataStreaming(),
-                     cxComponents.UltrasonixSDK(),
-                     cxComponents.TubeSegmentationFramework(),
-                     cxComponents.CustusX3(),
-                     cxComponents.CustusX3Data()
-                     ]
+#        self.libraries = [
+#                     #CppUnit(),
+#                     cxComponents.ITK(),
+#                     cxComponents.VTK(),
+#                     cxComponents.OpenCV(),
+#                     cxComponents.OpenIGTLink(),
+#                     cxComponents.IGSTK(),
+#                     #DCMTK(),
+#                     #SSC(),
+#                     #cxComponents.ISB_DataStreaming(),
+#                     cxComponents.UltrasonixSDK(),
+#                     #cxComponents.TubeSegmentationFramework(),
+#                     cxComponents.CustusX3(),
+#                     cxComponents.CustusX3Data()
+#                     ]
+        self.libraries = []
+        self.libraries.append(cxComponents.ITK())
+        self.libraries.append(cxComponents.VTK())
+        self.libraries.append(cxComponents.OpenCV())
+        self.libraries.append(cxComponents.OpenIGTLink())
+        self.libraries.append(cxComponents.IGSTK())
+        if (platform.system() != 'Windows'):
+             self.libraries.append(cxComponents.ISB_DataStreaming());
+        self.libraries.append(cxComponents.UltrasonixSDK())
+        if (platform.system() != 'Windows'):
+            self.libraries.append(cxComponents.TubeSegmentationFramework());
+        self.libraries.append(cxComponents.CustusX3())
+        self.libraries.append(cxComponents.CustusX3Data())
+        
         for lib in self.libraries:
             lib.setControlData(self.controlData)
 #        self._startTime = time.time()
