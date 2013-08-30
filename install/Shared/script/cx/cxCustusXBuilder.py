@@ -162,8 +162,8 @@ class CustusXBuilder:
         shell.run(['cppcheck',
                 '--enable=all',
                 '--xml-version=2',
-                '-i%s/externals/ssc/Code/3rdParty/' % sourceDir,
-                '%s/source %s/externals/ssc/Code/ 2> %s/cppcheck-result.xml' % (sourceDir, sourceDir, rootDir)
+                '-i%s/source/resource/ssc/Code/3rdParty/' % sourceDir,
+                '%s/source 2> %s/cppcheck-result.xml' % (sourceDir, rootDir)
                 ])
 
     def runLineCounter(self):

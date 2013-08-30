@@ -91,6 +91,8 @@ Q_OBJECT
 public:
 	PointMetric(const QString& uid, const QString& name = "");
 	virtual ~PointMetric();
+    static PointMetricPtr create(QDomNode node);
+    static PointMetricPtr create(QString uid, QString name="");
 
 	void setCoordinate(const ssc::Vector3D& p);
 	ssc::Vector3D getCoordinate() const;

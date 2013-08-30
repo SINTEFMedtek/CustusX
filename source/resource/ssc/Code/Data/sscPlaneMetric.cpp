@@ -40,6 +40,18 @@ PlaneMetric::PlaneMetric(const QString& uid, const QString& name) :
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
+PlaneMetricPtr PlaneMetric::create(QString uid, QString name)
+{
+    return PlaneMetricPtr(new PlaneMetric(uid, name));
+}
+
+PlaneMetricPtr PlaneMetric::create(QDomNode node)
+{
+    PlaneMetricPtr retval = PlaneMetric::create("");
+    retval->parseXml(node);
+    return retval;
+}
+
 PlaneMetric::~PlaneMetric()
 {
 }

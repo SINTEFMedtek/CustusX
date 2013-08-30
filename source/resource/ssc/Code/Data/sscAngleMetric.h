@@ -70,6 +70,8 @@ Q_OBJECT
 public:
 	AngleMetric(const QString& uid, const QString& name);
 	virtual ~AngleMetric();
+    static AngleMetricPtr create(QDomNode node);
+    static AngleMetricPtr create(QString uid, QString name="");
 
 	double getAngle() const;
 	std::vector<ssc::Vector3D> getEndpoints() const;

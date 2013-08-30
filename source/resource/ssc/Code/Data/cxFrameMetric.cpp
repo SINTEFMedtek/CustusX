@@ -26,6 +26,18 @@ ssc::DataPtr FrameMetricReader::load(const QString& uid, const QString& filename
 	return ssc::DataPtr(new FrameMetric(uid, filename));
 }
 
+FrameMetricPtr FrameMetric::create(QString uid, QString name)
+{
+    return FrameMetricPtr(new FrameMetric(uid, name));
+}
+
+FrameMetricPtr FrameMetric::create(QDomNode node)
+{
+    FrameMetricPtr retval = FrameMetric::create("");
+    retval->parseXml(node);
+    return retval;
+}
+
 FrameMetric::FrameMetric(const QString& uid, const QString& name) :
 		ssc::DataMetric(uid, name),
 		mSpace(ssc::SpaceHelpers::getR()),

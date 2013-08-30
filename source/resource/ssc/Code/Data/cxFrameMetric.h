@@ -55,6 +55,8 @@ Q_OBJECT
 public:
 	FrameMetric(const QString& uid, const QString& name = "");
 	virtual ~FrameMetric();
+    static FrameMetricPtr create(QDomNode node);
+    static FrameMetricPtr create(QString uid, QString name="");
 
     void setFrame(const ssc::Transform3D& qMt);
 	ssc::Transform3D getFrame();
