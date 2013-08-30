@@ -101,10 +101,16 @@ endmacro()
 ###############################################################################
 MACRO(cx_get_today RESULT)
     IF(WIN32)
-        EXECUTE_PROCESS(COMMAND "cmd" " /C date /T" OUTPUT_VARIABLE ${RESULT})
+        EXECUTE_PROCESS(
+            COMMAND "cmd" "/C date /T"
+            OUTPUT_VARIABLE ${RESULT}
+            )
 	ELSEIF(UNIX)
 
-        EXECUTE_PROCESS(COMMAND "date" "+%d/%m/%Y" OUTPUT_VARIABLE ${RESULT})
+        EXECUTE_PROCESS(
+            COMMAND "date" "+%d/%m/%Y" 
+            OUTPUT_VARIABLE ${RESULT}
+            )
         string(REGEX REPLACE "(..)/(..)/(....).*" "\\3-\\2-\\1" ${RESULT} ${${RESULT}})
 #        EXECUTE_PROCESS(COMMAND "date" "+%Y-%m-%d" OUTPUT_VARIABLE ${RESULT})
         ELSE(WIN32)
@@ -122,12 +128,19 @@ ENDMACRO()
 ###############################################################################
 MACRO(cx_get_git_build_description RESULT)
 	find_package(Git REQUIRED)
-	exec_program(
-		"git"
-		${PROJECT_SOURCE_DIR}
-		ARGS "describe --tags"
-		OUTPUT_VARIABLE ${RESULT}
-		)
+	IF(WIN32)
+	    execute_process(
+		    COMMAND "C:/Program Files (x86)/Git/bin/git.exe" describe --tags
+		    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		    OUTPUT_VARIABLE ${RESULT}
+		    )
+	ELSEIF(UNIX)	
+		execute_process(
+		    COMMAND git describe --tags
+		    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		    OUTPUT_VARIABLE ${RESULT}
+		    )
+    ENDIF(WIN32)
 ENDMACRO()
 
 ###############################################################################
@@ -168,8 +181,11 @@ MACRO(cx_define_version major minor patch type)
 	else()
 		set(POSTFIX "."${type})
 	endif()
+	
+	#on windows this string contains newlines that needs to be removed
+	STRING(REGEX REPLACE "\r|\n" "" POSTFIX_CLEAN "${POSTFIX}")
 
-	set(${PROJECT_NAME}_VERSION_POSTFIX "${POSTFIX}")
+	set(${PROJECT_NAME}_VERSION_POSTFIX "${POSTFIX_CLEAN}")
 	set(${PROJECT_NAME}_VERSION_STRING "${major}.${minor}.${patch}${${PROJECT_NAME}_VERSION_POSTFIX}")
 
 # no good - leads to full rebuild for every commit. Moved to resource/settings/cxConfig.h
