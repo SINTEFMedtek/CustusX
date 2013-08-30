@@ -69,6 +69,7 @@ public:
 	double getDistance() const;
     std::vector<ssc::Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
     virtual ssc::Vector3D getRefCoord() const;
+	virtual QString getAsSingleLineString() const;
 
     unsigned getArgumentCount() const;
 	void setArgument(int index, ssc::DataPtr p);
@@ -83,7 +84,6 @@ public:
 	{
 		return "distanceMetric";
 	}
-    QString getAsSingleLineString();
 
 private:
 	boost::array<ssc::DataPtr, 2> mArgument;

@@ -182,13 +182,11 @@ ssc::DoubleBoundingBox3D DistanceMetric::boundingBox() const
 	return ssc::DoubleBoundingBox3D::fromCloud(this->getEndpoints());
 }
 
-QString DistanceMetric::getAsSingleLineString()
+QString DistanceMetric::getAsSingleLineString() const
 {
-    QString retval;
-    retval += this->getType() + " \"";
-    retval += mName + "\" ";
-    retval += qstring_cast(this->getDistance());
-    return retval;
+	return QString("%1 %2")
+			.arg(this->getSingleLineHeader())
+			.arg(qstring_cast(this->getDistance()));
 }
 
 }

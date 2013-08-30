@@ -87,6 +87,7 @@ public:
 	{
 		return "planeMetric";
 	}
+	virtual QString getAsSingleLineString() const;
 
 	Plane3D getRefPlane() const;
 

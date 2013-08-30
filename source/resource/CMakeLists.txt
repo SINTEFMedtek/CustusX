@@ -88,6 +88,8 @@ SET ( cxResource_SOURCE
     utilities/cxUSReconstructInputData.cpp
     utilities/cxUSReconstructInputDataAlgoritms.h
     utilities/cxUSReconstructInputDataAlgoritms.cpp
+    utilities/cxStringHelpers.h
+    utilities/cxStringHelpers.cpp
 
 #	OpenIGTLinkUtilities/cxIGTLinkImageMessage.h
 #	OpenIGTLinkUtilities/cxIGTLinkImageMessage.cpp    
