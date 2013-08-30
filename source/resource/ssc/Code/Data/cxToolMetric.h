@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTFRAMEMETRIC_H_
-#define CXTFRAMEMETRIC_H_
+#ifndef CXTOOLMETRIC_H_
+#define CXTOOLMETRIC_H_
 
 #include "sscPointMetric.h"
 #include "sscCoordinateSystemHelpers.h"
@@ -22,22 +22,22 @@
 namespace cx
 {
 
-typedef boost::shared_ptr<class FrameMetric> FrameMetricPtr;
+typedef boost::shared_ptr<class ToolMetric> ToolMetricPtr;
 
-/** \brief ssc::DataReader implementation for FrameMetric
+/** \brief ssc::DataReader implementation for ToolMetric
  *
  * \date Aug 16, 2011
  * \author Ole Vegard Solberg, SINTEF
  */
-class FrameMetricReader: public ssc::DataReader
+class ToolMetricReader: public ssc::DataReader
 {
 public:
-	virtual ~FrameMetricReader()
+	virtual ~ToolMetricReader()
 	{
 	}
 	virtual bool canLoad(const QString& type, const QString& filename)
 	{
-		return type == "frameMetric";
+		return type == "ToolMetric";
 	}
 	virtual ssc::DataPtr load(const QString& uid, const QString& filename);
 };
@@ -46,43 +46,51 @@ public:
  *
  * The transform is attached to a specific coordinate system / frame.
  *
- * \date Aug 25, 2013
+ * \date Aug 30, 2013
  * \author Ole Vegard Solberg, SINTEF
+ * \author Christian Askeland, SINTEF
  */
-class FrameMetric: public ssc::DataMetric
+class ToolMetric: public ssc::DataMetric
 {
 Q_OBJECT
 public:
-	FrameMetric(const QString& uid, const QString& name = "");
-	virtual ~FrameMetric();
-    static FrameMetricPtr create(QDomNode node);
-    static FrameMetricPtr create(QString uid, QString name="");
+	ToolMetric(const QString& uid, const QString& name = "");
+	virtual ~ToolMetric();
+	static ToolMetricPtr create(QDomNode node);
+	static ToolMetricPtr create(QString uid, QString name="");
 
-    void setFrame(const ssc::Transform3D& qMt);
+	void setFrame(const ssc::Transform3D& qMt);
 	ssc::Transform3D getFrame();
+	double getToolOffset() const;
+	void setToolOffset(double val);
+	QString getToolName() const;
+	void setToolName(const QString& val);
 	ssc::Vector3D getCoordinate() const;
-    ssc::Vector3D getRefCoord() const; ///< as getRefFrame, but coord only.
-    ssc::Transform3D getRefFrame() const; ///< return frame described in ref space r : rFt = rMq * qFt
-    void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
+	ssc::Vector3D getRefCoord() const; ///< as getRefFrame, but coord only.
+	ssc::Transform3D getRefFrame() const; ///< return frame described in ref space r : rFt = rMq * qFt
+	void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
 	ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data
 	virtual QString getType() const
 	{
-		return "frameMetric";
+		return "ToolMetric";
 	}
+	virtual QString getAsSingleLineString() const;
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual ssc::DoubleBoundingBox3D boundingBox() const;
-	virtual QString getAsSingleLineString() const;
-	QString pointAsSingleLineString() const;
+	QString getAsSingleLineString();
+	QString pointAsSingleLineString();
 
 private:
 	QString matrixAsSingleLineString() const;
-    ssc::CoordinateSystem mSpace;
+	ssc::CoordinateSystem mSpace;
 	ssc::CoordinateSystemListenerPtr mSpaceListener;
-    ssc::Transform3D mFrame; ///< frame qFt described in local space q = mSpace
+	ssc::Transform3D mFrame; ///< frame qFt described in local space q = mSpace
+	double mToolOffset;
+	QString mToolName;
 };
 
 } //namespace cx
 
-#endif /* CXTFRAMEMETRIC_H_ */
+#endif /* CXTOOLMETRIC_H_ */

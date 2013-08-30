@@ -148,4 +148,11 @@ ssc::DoubleBoundingBox3D AngleMetric::boundingBox() const
 	return ssc::DoubleBoundingBox3D::fromCloud(this->getEndpoints());
 }
 
+QString AngleMetric::getAsSingleLineString() const
+{
+	return QString("%1 %2")
+			.arg(this->getSingleLineHeader())
+			.arg(qstring_cast(this->getAngle()));
+}
+
 }

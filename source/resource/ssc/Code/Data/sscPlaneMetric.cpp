@@ -155,4 +155,14 @@ ssc::DoubleBoundingBox3D PlaneMetric::boundingBox() const
 	return ssc::DoubleBoundingBox3D(p0_r, p0_r);
 }
 
+QString PlaneMetric::getAsSingleLineString() const
+{
+	return QString("%1 \"%2\" %3 %4")
+			.arg(this->getSingleLineHeader())
+			.arg(mSpace.toString())
+			.arg(qstring_cast(this->getCoordinate()))
+			.arg(qstring_cast(this->getNormal()));
+}
+
+
 }

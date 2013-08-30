@@ -20,23 +20,21 @@
 #include "cxDataLocations.h"
 #include "catch.hpp"
 #include "sscTypeConversions.h"
+#include "cxStringHelpers.h"
 
 namespace cxtest {
 
 MetricFixture::MetricFixture()
 {
-    cx::DataManager::initialize();
+	cx::DataManager::initialize();
 	ssc::ToolManager::setInstance(ssc::DummyToolManager::getInstance());
-
-//	mOriginalMetric.reset(new cx::FrameMetric("testMetric"));
-//	mModifiedMetric.reset(new cx::FrameMetric("testMetric2"));
 }
 
 MetricFixture::~MetricFixture()
 {
 	ssc::ToolManager::shutdown();
 	ssc::DummyToolManager::shutdown();
-    cx::DataManager::shutdown();
+	cx::DataManager::shutdown();
 }
 
 
@@ -47,12 +45,31 @@ FrameMetricData MetricFixture::getFrameMetricData()
     retval.m_qMt = ssc::createTransformRotateZ(M_PI_2) * ssc::createTransformTranslate(ssc::Vector3D(1,2,3));
     retval.mSpace = ssc::SpaceHelpers::getR();
 
-    retval.mMetric = cx::FrameMetric::create("testMetric%1");
+	retval.mMetric = cx::FrameMetric::create("testMetric%1");
     retval.mMetric->setFrame(retval.m_qMt);
     retval.mMetric->setSpace(retval.mSpace);
-    cx::DataManager::getInstance()->loadData(retval.mMetric);
+	cx::DataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
+}
+
+ToolMetricData MetricFixture::getToolMetricData()
+{
+	ToolMetricData retval;
+
+	retval.m_qMt = ssc::createTransformRotateZ(M_PI_2) * ssc::createTransformTranslate(ssc::Vector3D(1,2,3));
+	retval.mSpace = ssc::SpaceHelpers::getR();
+	retval.mName = "TestTool";
+	retval.mOffset = 5;
+
+	retval.mMetric = cx::ToolMetric::create("testMetric%1");
+	retval.mMetric->setFrame(retval.m_qMt);
+	retval.mMetric->setSpace(retval.mSpace);
+	retval.mMetric->setToolName(retval.mName);
+	retval.mMetric->setToolOffset(retval.mOffset);
+	cx::DataManager::getInstance()->loadData(retval.mMetric);
+
+	return retval;
 }
 
 PointMetricData MetricFixture::getPointMetricData(ssc::Vector3D point)
@@ -62,7 +79,7 @@ PointMetricData MetricFixture::getPointMetricData(ssc::Vector3D point)
     retval.mPoint = point;
     retval.mSpace = ssc::SpaceHelpers::getR();
 
-    retval.mMetric = ssc::PointMetric::create("testMetric%1");
+	retval.mMetric = ssc::PointMetric::create("testMetric%1");
     retval.mMetric->setCoordinate(point);
     retval.mMetric->setSpace(retval.mSpace);
     cx::DataManager::getInstance()->loadData(retval.mMetric);
@@ -78,11 +95,11 @@ PlaneMetricData MetricFixture::getPlaneMetricData(ssc::Vector3D point, ssc::Vect
     retval.mNormal = normal;
     retval.mSpace = ssc::SpaceHelpers::getR();
 
-    retval.mMetric = ssc::PlaneMetric::create("testMetric%1");
+	retval.mMetric = ssc::PlaneMetric::create("testMetric%1");
     retval.mMetric->setCoordinate(point);
     retval.mMetric->setNormal(normal);
     retval.mMetric->setSpace(retval.mSpace);
-    cx::DataManager::getInstance()->loadData(retval.mMetric);
+	cx::DataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
 }
@@ -93,10 +110,10 @@ DistanceMetricData MetricFixture::getDistanceMetricData(double distance, ssc::Da
 
     retval.mDistance = distance;
 
-    retval.mMetric = ssc::DistanceMetric::create("testMetric%1");
+	retval.mMetric = ssc::DistanceMetric::create("testMetric%1");
     retval.mMetric->setArgument(0, p0);
     retval.mMetric->setArgument(1, p1);
-    cx::DataManager::getInstance()->loadData(retval.mMetric);
+	cx::DataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
 }
@@ -107,10 +124,10 @@ DistanceMetricData MetricFixture::getDistanceMetricData(double distance)
 
     retval.mDistance = distance;
 
-    retval.mMetric = ssc::DistanceMetric::create("testMetric%1");
+	retval.mMetric = ssc::DistanceMetric::create("testMetric%1");
     retval.mMetric->setArgument(0, this->getPointMetricData(ssc::Vector3D(0,0,0)).mMetric);
     retval.mMetric->setArgument(1, this->getPointMetricData(ssc::Vector3D(distance,0,0)).mMetric);
-    cx::DataManager::getInstance()->loadData(retval.mMetric);
+	cx::DataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
 }
@@ -126,6 +143,20 @@ bool MetricFixture::metricEqualsData(FrameMetricData data)
 
     return ssc::similar(data.m_qMt, data.mMetric->getFrame())
             && (data.mSpace == data.mMetric->getSpace());
+}
+
+bool MetricFixture::metricEqualsData(ToolMetricData data)
+{
+	INFO("qMt");
+	INFO(qstring_cast(data.m_qMt));
+	INFO("==");
+	INFO(qstring_cast(data.mMetric->getFrame()));
+	//    INFO("Space: " + qstring_cast(data.mSpace));
+
+	return ssc::similar(data.m_qMt, data.mMetric->getFrame())
+			&& (data.mSpace == data.mMetric->getSpace())
+			&& (ssc::similar(data.mOffset, data.mMetric->getToolOffset()))
+			&& (data.mName == data.mMetric->getToolName());
 }
 
 bool MetricFixture::metricEqualsData(DistanceMetricData data)
@@ -158,34 +189,16 @@ bool MetricFixture::metricEqualsData(PlaneMetricData data)
             && (data.mSpace == data.mMetric->getSpace());
 }
 
-
-
-
-
-
-//bool MetricFixture::createAndSetTestTransform()
-//{
-//	mTransformString = "1.1 2 3 4 5 6 7 8 9 10 11 12 0 0 0 1";
-//	if (!this->readTransformFromString(mTransformString))
-//		return false;
-//	mTestTransform = this->mReturnedTransform;
-
-//	mOriginalMetric->setFrame(mTestTransform);
-//	mModifiedMetric->setFrame(mTestTransform);
-//	return true;
-//}
-
-//bool MetricFixture::readTransformFromString(QString matrixString)
-//{
-//	bool transformStringOk = false;
-//	mReturnedTransform = ssc::Transform3D::fromString(matrixString, &transformStringOk);
-//	return transformStringOk;
-//}
-
-//bool MetricFixture::isEqualTransform(ssc::Transform3D transform)
-//{
-//	return ssc::similar(mTestTransform, transform);
-//}
+QStringList MetricFixture::getSingleLineDataList(ssc::DataMetricPtr metric)
+{
+	QString singleLine = metric->getAsSingleLineString();
+	CHECK(!singleLine.isEmpty());
+	INFO("line: " + singleLine);
+	QStringList list = cx::splitStringContaingQuotes(singleLine);
+	INFO("list: " + list.join("\n"));
+	CHECK(!list.empty());
+	return list;
+}
 
 QDomNode MetricFixture::createDummyXmlNode()
 {
@@ -194,63 +207,10 @@ QDomNode MetricFixture::createDummyXmlNode()
     return document.firstChild();
 }
 
-//cx::FrameMetricPtr MetricFixture::createFromXml(QDomNode& xmlNode)
-//{
-//	mModifiedMetric->parseXml(xmlNode);
-//	return mModifiedMetric;
-//}
-
 void MetricFixture::setPatientRegistration()
 {
     ssc::Transform3DPtr testRegistration(new ssc::Transform3D(ssc::createTransformTranslate(ssc::Vector3D(5,6,7))));
 	ssc::toolManager()->set_rMpr(testRegistration);
-}
-
-//void MetricFixture::changeSpaceToPatientReference()
-//{
-//	mModifiedMetric->setSpace(ssc::CoordinateSystemHelpers::getPr());
-//}
-
-//void MetricFixture::setSpaceToOrigial()
-//{
-//	mModifiedMetric->setSpace(mOriginalMetric->getSpace());
-//}
-
-////bool MetricFixture::saveTransformToTestFile()
-////{
-////	cx::DataLocations::setTestMode();
-////	mTestFile = cx::DataLocations::getTestDataPath() + "/temp/metric/TransformTestFile.txt";
-////	std::cout << "Test file: " << mTestFile.toStdString() << std::endl;
-////	return mMetric->appendTransformToFile(mTestFile);
-////}
-
-/** given a text line containing fex [alpha beta "gamm ma" delta]
-  * split into a list of ["alpha", "beta" ,"gamm ma", "delta"]
-  */
-QStringList MetricFixture::splitStringLineIntoTextComponents(QString line)
-{
-    QStringList base = line.split(" ");
-    QStringList retval;
-
-    for (int i=0; i<base.size(); ++i)
-    {
-        if (base[i].startsWith("\""))
-        {
-            retval.push_back("");
-            for (; i<base.size() && !base[i].endsWith("\""); ++i)
-                retval.back() += base[i];
-            if (!i<base.size())
-                retval.back() += base[i];
-        }
-        else
-        {
-            retval.push_back(base[i]);
-        }
-
-        retval.back() = retval.back().remove("\"");
-    }
-
-    return retval;
 }
 
 bool MetricFixture::verifySingleLineHeader(QStringList list, ssc::DataMetricPtr metric)

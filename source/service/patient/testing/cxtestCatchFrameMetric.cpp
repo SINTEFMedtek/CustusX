@@ -22,14 +22,8 @@ TEST_CASE("cxFrameMetric can set/get transform", "[unit]")
 {
     cxtest::MetricFixture fixture;
     cxtest::FrameMetricData testData = fixture.getFrameMetricData();
-    CHECK(fixture.metricEqualsData(testData));
 
-//	cxtest::FrameMetricFixture fixture;
-//	REQUIRE(fixture.createAndSetTestTransform());
-
-//	ssc::Transform3D returnedTransform = fixture.mOriginalMetric->getFrame();
-//	REQUIRE(fixture.isEqualTransform(returnedTransform));
-//	REQUIRE_FALSE(fixture.isEqualTransform(ssc::Transform3D::Identity()));
+	CHECK(fixture.metricEqualsData(testData));
 }
 
 TEST_CASE("cxFrameMetric can save/load XML", "[unit]")
@@ -38,25 +32,6 @@ TEST_CASE("cxFrameMetric can save/load XML", "[unit]")
     cxtest::FrameMetricData testData = fixture.getFrameMetricData();
 
     CHECK(fixture.saveLoadXmlGivesEqualTransform(testData));
-
-//    cxtest::MetricFixture fixture;
-//    FrameMetricData testData = fixture.getFrameMetricData();
-//    FramMetricPtr metric = fixture.createFrameMetric(testData);
-
-//    QDomNode xmlNode = fixture.createDummyXmlNode();
-//    metric->addXml(xmlNode);
-
-//    FramMetricPtr loadedMetric = fixture.createFromXml(xmlNode);
-//    CHECK(fixture.isEqual(loadedMetric, testData));
-
-//    cxtest::FrameMetricFixture fixture;
-//	REQUIRE(fixture.createAndSetTestTransform());
-
-//	QDomNode mXmlNode = fixture.createDummyXmlNode();
-//	fixture.mOriginalMetric->addXml(mXmlNode);
-//	ssc::Transform3D returnedTransform = fixture.createFromXml(mXmlNode)->getFrame();
-//	REQUIRE(fixture.isEqualTransform(returnedTransform));
-//	REQUIRE_FALSE(fixture.isEqualTransform(ssc::Transform3D::Identity()));
 }
 
 TEST_CASE("cxFrameMetric can convert transform to single line string", "[unit]")
@@ -64,24 +39,13 @@ TEST_CASE("cxFrameMetric can convert transform to single line string", "[unit]")
     cxtest::MetricFixture fixture;
     cxtest::FrameMetricData testData = fixture.getFrameMetricData();
 
-    QString metricString = testData.mMetric->getAsSingleLineString();
+	QStringList list = fixture.getSingleLineDataList(testData.mMetric);
+	REQUIRE(fixture.verifySingleLineHeader(list, testData.mMetric));
 
-    //TODO:  flytt alt inn i egen function i fixture
-//    fixture.checkSingleLineStringEquals(metricString, testData);
-
-    REQUIRE(!metricString.isEmpty());
-
-    QStringList list = metricString.split("\"reference\"");
-    REQUIRE(list.size()==2);
-    QString headingAndName = list[0];
-    QString valueString = list[1];
-
-    CHECK(headingAndName == QString("%1 \"%2\" ")
-          .arg(testData.mMetric->getType())
-          .arg(testData.mMetric->getName()));
-
-    bool transformStringOk = false;
-    ssc::Transform3D readTransform = ssc::Transform3D::fromString(valueString, &transformStringOk);
+	REQUIRE(list[2]=="reference");
+	INFO(list.join("\n"));
+	bool transformStringOk = false;
+	ssc::Transform3D readTransform = ssc::Transform3D::fromString(QStringList(list.mid(3, 16)).join(" "), &transformStringOk);
     REQUIRE(transformStringOk);
     REQUIRE(ssc::similar(testData.m_qMt, readTransform));
 }
@@ -98,19 +62,4 @@ TEST_CASE("cxFrameMetric can set space correctly", "[unit]")
 
     testData.mMetric->setSpace(testData.mSpace);
     CHECK(fixture.metricEqualsData(testData));
-
-
-//	cxtest::FrameMetricFixture fixture;
-//	REQUIRE(fixture.createAndSetTestTransform());
-
-//	fixture.setSpaceToOrigial();
-//	REQUIRE(fixture.isEqualTransform(fixture.mModifiedMetric->getFrame()));
-
-//	fixture.setPatientRegistration();
-//	fixture.changeSpaceToPatientReference();
-//	REQUIRE_FALSE(fixture.isEqualTransform(fixture.mModifiedMetric->getFrame()));
-
-//	fixture.setSpaceToOrigial();
-
-//	REQUIRE(fixture.isEqualTransform(fixture.mModifiedMetric->getFrame()));
 }

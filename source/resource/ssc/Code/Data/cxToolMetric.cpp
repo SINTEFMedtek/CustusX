@@ -12,7 +12,7 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxFrameMetric.h"
+#include "cxToolMetric.h"
 #include "sscBoundingBox3D.h"
 #include "sscTool.h"
 #include "sscToolManager.h"
@@ -21,24 +21,24 @@
 namespace cx
 {
 
-ssc::DataPtr FrameMetricReader::load(const QString& uid, const QString& filename)
+ssc::DataPtr ToolMetricReader::load(const QString& uid, const QString& filename)
 {
-	return ssc::DataPtr(new FrameMetric(uid, filename));
+	return ssc::DataPtr(new ToolMetric(uid, filename));
 }
 
-FrameMetricPtr FrameMetric::create(QString uid, QString name)
+ToolMetricPtr ToolMetric::create(QString uid, QString name)
 {
-    return FrameMetricPtr(new FrameMetric(uid, name));
+	return ToolMetricPtr(new ToolMetric(uid, name));
 }
 
-FrameMetricPtr FrameMetric::create(QDomNode node)
+ToolMetricPtr ToolMetric::create(QDomNode node)
 {
-    FrameMetricPtr retval = FrameMetric::create("");
-    retval->parseXml(node);
-    return retval;
+	ToolMetricPtr retval = ToolMetric::create("");
+	retval->parseXml(node);
+	return retval;
 }
 
-FrameMetric::FrameMetric(const QString& uid, const QString& name) :
+ToolMetric::ToolMetric(const QString& uid, const QString& name) :
 		ssc::DataMetric(uid, name),
 		mSpace(ssc::SpaceHelpers::getR()),
 		mFrame(ssc::Transform3D::Identity())
@@ -47,22 +47,44 @@ FrameMetric::FrameMetric(const QString& uid, const QString& name) :
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
-FrameMetric::~FrameMetric()
+ToolMetric::~ToolMetric()
 {
 }
 
-void FrameMetric::setFrame(const ssc::Transform3D& rMt)
+void ToolMetric::setFrame(const ssc::Transform3D& rMt)
 {
 	mFrame = rMt;
 	emit transformChanged();
 }
 
-ssc::Transform3D FrameMetric::getFrame()
+ssc::Transform3D ToolMetric::getFrame()
 {
 	return mFrame;
 }
 
-ssc::Vector3D FrameMetric::getCoordinate() const
+double ToolMetric::getToolOffset() const
+{
+	return mToolOffset;
+}
+
+void ToolMetric::setToolOffset(double val)
+{
+	mToolOffset = val;
+	emit propertiesChanged();
+}
+
+QString ToolMetric::getToolName() const
+{
+	return mToolName;
+}
+
+void ToolMetric::setToolName(const QString& val)
+{
+	mToolName = val;
+	emit propertiesChanged();
+}
+
+ssc::Vector3D ToolMetric::getCoordinate() const
 {
 	ssc::Vector3D point_t = ssc::Vector3D(0,0,0);
 	return mFrame.coord(point_t);
@@ -70,23 +92,23 @@ ssc::Vector3D FrameMetric::getCoordinate() const
 
 /** return frame described in ref space F * sMr
   */
-ssc::Transform3D FrameMetric::getRefFrame() const
+ssc::Transform3D ToolMetric::getRefFrame() const
 {
-    ssc::Transform3D rMq = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-    return rMq * mFrame;
+	ssc::Transform3D rMq = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+	return rMq * mFrame;
 }
 
 /** return frame described in ref space F * sMr
   */
-ssc::Vector3D FrameMetric::getRefCoord() const
+ssc::Vector3D ToolMetric::getRefCoord() const
 {
-    ssc::Transform3D rMq = this->getRefFrame();
+	ssc::Transform3D rMq = this->getRefFrame();
 //    ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-    ssc::Vector3D p_r = rMq.coord(ssc::Vector3D(0,0,0));
-    return p_r;
+	ssc::Vector3D p_r = rMq.coord(ssc::Vector3D(0,0,0));
+	return p_r;
 }
 
-void FrameMetric::setSpace(ssc::CoordinateSystem space)
+void ToolMetric::setSpace(ssc::CoordinateSystem space)
 {
 	if (space == mSpace)
 		return;
@@ -99,28 +121,33 @@ void FrameMetric::setSpace(ssc::CoordinateSystem space)
 	mSpaceListener->setSpace(space);
 }
 
-ssc::CoordinateSystem FrameMetric::getSpace() const
+ssc::CoordinateSystem ToolMetric::getSpace() const
 {
 	return mSpace;
 }
 
-void FrameMetric::addXml(QDomNode& dataNode)
+void ToolMetric::addXml(QDomNode& dataNode)
 {
 	Data::addXml(dataNode);
 
 	dataNode.toElement().setAttribute("space", mSpace.toString());
 	dataNode.toElement().setAttribute("frame", qstring_cast(mFrame));
+
+	dataNode.toElement().setAttribute("toolname", mToolName);
+	dataNode.toElement().setAttribute("tooloffset", qstring_cast(mToolOffset));
 }
 
-void FrameMetric::parseXml(QDomNode& dataNode)
+void ToolMetric::parseXml(QDomNode& dataNode)
 {
 	Data::parseXml(dataNode);
 
 	this->setSpace(ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
 	this->setFrame(ssc::Transform3D::fromString(dataNode.toElement().attribute("frame", qstring_cast(mFrame))));
+	this->setToolName(dataNode.toElement().attribute("toolname", mToolName));
+	this->setToolOffset(dataNode.toElement().attribute("tooloffset", qstring_cast(mToolOffset)).toDouble());
 }
 
-ssc::DoubleBoundingBox3D FrameMetric::boundingBox() const
+ssc::DoubleBoundingBox3D ToolMetric::boundingBox() const
 {
 	// convert both inputs to r space
 	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
@@ -129,22 +156,24 @@ ssc::DoubleBoundingBox3D FrameMetric::boundingBox() const
 	return ssc::DoubleBoundingBox3D(p0_r, p0_r);
 }
 
-QString FrameMetric::getAsSingleLineString() const
+QString ToolMetric::getAsSingleLineString() const
 {
-	return QString("%1 \"%2\" %3")
+	return QString("%1 \"%2\" %3 %4 %5")
 			.arg(this->getSingleLineHeader())
+			.arg(mToolName)
+			.arg(mToolOffset)
 			.arg(mSpace.toString())
 			.arg(this->matrixAsSingleLineString());
 }
 
-QString FrameMetric::matrixAsSingleLineString() const
+QString ToolMetric::matrixAsSingleLineString() const
 {
 	std::stringstream stream;
 	mFrame.put(stream, 0, ' ');
 	return qstring_cast(stream.str());
 }
 
-QString FrameMetric::pointAsSingleLineString() const
+QString ToolMetric::pointAsSingleLineString()
 {
 	QString retval;
 	QString elem;

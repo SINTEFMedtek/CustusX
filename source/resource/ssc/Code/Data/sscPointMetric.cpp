@@ -226,4 +226,12 @@ ssc::Vector3D PointMetric::getRefCoord() const
 	return rM1.coord(this->getCoordinate());
 }
 
+QString PointMetric::getAsSingleLineString() const
+{
+	return QString("%1 \"%2\" %3")
+			.arg(this->getSingleLineHeader())
+			.arg(mSpace.toString())
+			.arg(qstring_cast(this->getCoordinate()));
+}
+
 }

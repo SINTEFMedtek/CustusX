@@ -48,7 +48,10 @@ public:
 
     virtual QString getSpace();
     virtual ssc::Vector3D getRefCoord() const = 0;
-    virtual bool isValid() const { return true; }
+	virtual QString getAsSingleLineString() const = 0;
+	virtual bool isValid() const { return true; }
+protected:
+	QString getSingleLineHeader() const;
 };
 typedef boost::shared_ptr<DataMetric> DataMetricPtr;
 

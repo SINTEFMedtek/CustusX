@@ -16,6 +16,7 @@
 #define CXTESTMETRICFIXTURE_H_
 
 #include "cxFrameMetric.h"
+#include "cxToolMetric.h"
 #include "sscDistanceMetric.h"
 #include "sscPointMetric.h"
 #include "sscPlaneMetric.h"
@@ -58,25 +59,27 @@ struct DistanceMetricData
 struct FrameMetricData
 {
     typedef cx::FrameMetric METRIC_TYPE;
-    ssc::Transform3D m_qMt;
+	cx::FrameMetricPtr mMetric;
+
+	ssc::Transform3D m_qMt;
     ssc::CoordinateSystem mSpace;
 
-    cx::FrameMetricPtr mMetric;
 };
 
-///** Helper for testing ToolMetric.
-//  * Contains all data used to construct the metric,
-//  * along with a (possibly modified) metric.
-//  */
-//struct ToolMetricData
-//{
-//    ssc::Transform3D m_qMt;
-//    ssc::CoordinateSystem mSpace;
-//    double mOffset;
-//    QString mName;
+/** Helper for testing ToolMetric.
+  * Contains all data used to construct the metric,
+  * along with a (possibly modified) metric.
+  */
+struct ToolMetricData
+{
+	typedef cx::ToolMetric METRIC_TYPE;
+	cx::ToolMetricPtr mMetric;
 
-//    ToolMetricPtr mMetric;
-//};
+	ssc::Transform3D m_qMt;
+	ssc::CoordinateSystem mSpace;
+	double mOffset;
+	QString mName;
+};
 
 
 /*
@@ -84,6 +87,7 @@ struct FrameMetricData
  *
  * \date Aug 20, 2013
  * \author Ole Vegard Solberg, SINTEF
+ * \author Christian Askeland, SINTEF
  */
 class MetricFixture {
 public:
@@ -91,15 +95,18 @@ public:
     ~MetricFixture();
 
     FrameMetricData getFrameMetricData();
-    PointMetricData getPointMetricData(ssc::Vector3D point);
+	ToolMetricData getToolMetricData();
+	PointMetricData getPointMetricData(ssc::Vector3D point);
     PlaneMetricData getPlaneMetricData(ssc::Vector3D point, ssc::Vector3D normal);
     DistanceMetricData getDistanceMetricData(double distance, ssc::DataMetricPtr p0, ssc::DataMetricPtr p1);
     DistanceMetricData getDistanceMetricData(double distance);
+	QStringList getSingleLineDataList(ssc::DataMetricPtr metric);
 
     bool metricEqualsData(FrameMetricData data);
     bool metricEqualsData(DistanceMetricData data);
     bool metricEqualsData(PointMetricData data);
     bool metricEqualsData(PlaneMetricData data);
+	bool metricEqualsData(ToolMetricData data);
 
     template<class DATA>
     bool saveLoadXmlGivesEqualTransform(DATA data)
@@ -107,34 +114,16 @@ public:
         QDomNode xmlNode = this->createDummyXmlNode();
         data.mMetric->addXml(xmlNode);
 
-//        data.mMetric = this->createFromXml<DATA::METRIC_TYPE>(xmlNode);
         data.mMetric = DATA::METRIC_TYPE::create(xmlNode);
-//        data.mMetric = boost::dynamic_pointer_cast<DATA::METRIC_TYPE>(this->createFromXml(xmlNode));
+
         return this->metricEqualsData(data);
     }
 
     QDomNode createDummyXmlNode();
     void setPatientRegistration();
-//    template<METRIC>
-//    boost::shared_ptr<METRIC> createFromXml(QDomNode& xmlNode);
 
-    QStringList splitStringLineIntoTextComponents(QString line);
+//    QStringList splitStringLineIntoTextComponents(QString line);
     bool verifySingleLineHeader(QStringList list, ssc::DataMetricPtr metric);
-
-//	bool createAndSetTestTransform();
-//	bool readTransformFromString(QString matrixString);
-//	bool isEqualTransform(ssc::Transform3D transform);
-//	cx::FrameMetricPtr createFromXml(QDomNode& xmlNode);
-//	void changeSpaceToPatientReference();
-//	void setSpaceToOrigial();
-
-//	QString mTransformString;
-//	cx::FrameMetricPtr mOriginalMetric;
-//	cx::FrameMetricPtr mModifiedMetric;
-//	ssc::Transform3D mTestTransform;
-//	ssc::Transform3D mReturnedTransform;
-//	QDomNode mXmlNode;
-//	QString mTestFile;
 };
 
 } //namespace cxtest
