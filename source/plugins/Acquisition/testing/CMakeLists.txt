@@ -5,12 +5,8 @@ cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
-	# -----------------------------------------------
-	# CppUnit test framework: Create executable testCX
-	#
         include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
         include_directories(
-		${CPPUNIT_INCLUDE_DIR}
 		../logic
 		${CustusX3_SOURCE_DIR}/source/service/state
 		${CustusX3_SOURCE_DIR}/source/service/patient

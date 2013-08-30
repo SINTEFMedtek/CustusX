@@ -10,7 +10,6 @@ if (BUILD_TESTING)
   #
   include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
   include_directories(
-    ${CPPUNIT_INCLUDE_DIR}
     ../logic
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking

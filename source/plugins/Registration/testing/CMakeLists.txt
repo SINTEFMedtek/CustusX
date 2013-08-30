@@ -29,14 +29,7 @@ if(BUILD_TESTING)
 
 endif(BUILD_TESTING)
 
-if (BUILD_TESTING)
-  # -----------------------------------------------
-  # CppUnit test framework: Create executable testCX
-  #
-  include_directories( 
-    ${CPPUNIT_INCLUDE_DIR}     
-    )
-      
+if (BUILD_TESTING)      
   # List of all test units
   QT4_WRAP_CPP( CX_TEST_REGISTRATION_SOURCE_FILES
 #  cxElastixSingleThreadedRunner.h

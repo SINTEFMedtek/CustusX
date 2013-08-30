@@ -12,10 +12,6 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
-    # -----------------------------------------------
-    # CppUnit test framework: Create executable testCX
-    #
-    include_directories( ${CPPUNIT_INCLUDE_DIR})
     include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
 
     include_directories(
