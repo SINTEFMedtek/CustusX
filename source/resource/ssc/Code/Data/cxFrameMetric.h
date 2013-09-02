@@ -15,8 +15,7 @@
 #ifndef CXTFRAMEMETRIC_H_
 #define CXTFRAMEMETRIC_H_
 
-#include "sscPointMetric.h"
-#include "sscCoordinateSystemHelpers.h"
+#include "cxFrameMetricBase.h"
 #include "sscDataReaderWriter.h"
 
 namespace cx
@@ -42,14 +41,14 @@ public:
 	virtual ssc::DataPtr load(const QString& uid, const QString& filename);
 };
 
-/**\brief Data class that represents a single transform.
+/**\brief Data class that represents a single frame (transform).
  *
  * The transform is attached to a specific coordinate system / frame.
  *
  * \date Aug 25, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
-class FrameMetric: public ssc::DataMetric
+class FrameMetric: public cx::FrameMetricBase
 {
 Q_OBJECT
 public:
@@ -57,29 +56,13 @@ public:
 	virtual ~FrameMetric();
     static FrameMetricPtr create(QDomNode node);
     static FrameMetricPtr create(QString uid, QString name="");
-
-    void setFrame(const ssc::Transform3D& qMt);
-	ssc::Transform3D getFrame();
-	ssc::Vector3D getCoordinate() const;
-    ssc::Vector3D getRefCoord() const; ///< as getRefFrame, but coord only.
-    ssc::Transform3D getRefFrame() const; ///< return frame described in ref space r : rFt = rMq * qFt
-    void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
-	ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data
 	virtual QString getType() const
 	{
 		return "frameMetric";
 	}
-
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
-	virtual ssc::DoubleBoundingBox3D boundingBox() const;
 	virtual QString getAsSingleLineString() const;
-
-private:
-	QString matrixAsSingleLineString() const;
-    ssc::CoordinateSystem mSpace;
-	ssc::CoordinateSystemListenerPtr mSpaceListener;
-    ssc::Transform3D mFrame; ///< frame qFt described in local space q = mSpace
 };
 
 } //namespace cx
