@@ -153,7 +153,7 @@ void TestRenderSpeed::addViewsToLayout(QLayout* layout)
 
 void TestRenderSpeed::addViewsToGridLayout(QGridLayout* layout)
 {
-	int squareNumViews = sqrt(this->getNumViews());
+	int squareNumViews = sqrt((double)this->getNumViews());
 	for (int i = 0; i < this->getNumViews(); i++)
 		layout->addWidget(mViews[i], i / squareNumViews, i % squareNumViews);
 }
