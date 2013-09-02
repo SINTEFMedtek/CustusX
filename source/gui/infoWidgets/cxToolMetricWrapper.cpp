@@ -23,19 +23,48 @@ ToolMetricWrapper::ToolMetricWrapper(cx::ToolMetricPtr data) : mData(data)
 {
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
+	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
 	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* ToolMetricWrapper::createWidget()
 {
+	this->initializeDataAdapters();
+
 	QWidget* widget = new QWidget;
 
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
+	topLayout->setMargin(0);
+
+	QHBoxLayout* hLayout2 = new QHBoxLayout;
+	hLayout2->setMargin(0);
+	topLayout->addLayout(hLayout2);
+
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
-	topLayout->setMargin(0);
 	topLayout->addLayout(hLayout);
 
+	hLayout2->addWidget(createDataWidget(widget, mToolNameSelector));
+	hLayout2->addWidget(createDataWidget(widget, mToolOffsetSelector));
+
+	hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
+
+	QPushButton* sampleButton = new QPushButton("Sample");
+	connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
+	sampleButton->setToolTip("Set the position equal to the current tool tip position.");
+	hLayout->addWidget(sampleButton);
+
+	mFrameWidget = new Transform3DWidget(widget);
+	connect(mFrameWidget, SIGNAL(changed()), this, SLOT(frameWidgetChangedSlot()));
+	topLayout->addWidget(mFrameWidget);
+
+	this->dataChangedSlot();
+
+	return widget;
+}
+
+void ToolMetricWrapper::initializeDataAdapters()
+{
 	QString value;// = qstring_cast(mData->getFrame());
 	std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
 	QStringList range;
@@ -48,43 +77,27 @@ QWidget* ToolMetricWrapper::createWidget()
 			value,
 			range,
 			QDomNode());
-	hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
+	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
 
 	mToolNameSelector = ssc::StringDataAdapterXml::initialize("selectToolName",
 															  "Tool Name",
 															  "The name of the tool",
 															  "",
 															  QDomNode());
-	hLayout->addWidget(createDataWidget(widget, mToolNameSelector));
+	connect(mToolNameSelector.get(), SIGNAL(valueWasSet()), this, SLOT(toolNameSet()));
+
 	mToolOffsetSelector = ssc::DoubleDataAdapterXml::initialize("selectToolOffset",
 																"Tool Offset",
 																"Tool Offset",
 																0,
 																ssc::DoubleRange(0, 100, 1),
 																1);
-	hLayout->addWidget(createDataWidget(widget, mToolOffsetSelector));
-
-
-	mFrameWidget = new Transform3DWidget(widget);
-	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
-	connect(mFrameWidget, SIGNAL(changed()), this, SLOT(frameWidgetChangedSlot()));
-	topLayout->addWidget(mFrameWidget);
-
-	QPushButton* sampleButton = new QPushButton("Sample");
-	sampleButton->setToolTip("Set the position equal to the current tool tip position.");
-	hLayout->addWidget(sampleButton);
-
-	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
-	connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
-	this->dataChangedSlot();
-
-	return widget;
+	connect(mToolOffsetSelector.get(), SIGNAL(valueWasSet()), this, SLOT(toolOffsetSet()));
 }
 
 QString ToolMetricWrapper::getValue() const
 {
-	return mData->pointAsSingleLineString();
+	return ssc::prettyFormat(mData->getRefCoord(), 1, 3);
 }
 
 ssc::DataPtr ToolMetricWrapper::getData() const
@@ -94,7 +107,7 @@ ssc::DataPtr ToolMetricWrapper::getData() const
 
 QString ToolMetricWrapper::getType() const
 {
-	return "frame";
+	return "tool";
 }
 
 QString ToolMetricWrapper::getArguments() const
@@ -107,7 +120,7 @@ void ToolMetricWrapper::moveToToolPosition()
 {
 	ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
 	ssc::Transform3D qMt = ssc::SpaceHelpers::getDominantToolTipTransform(mData->getSpace());
-	std::cout << "set frame " << qMt << std::endl;
+//	std::cout << "set frame " << qMt << std::endl;
 	mData->setFrame(qMt);
 }
 
@@ -121,11 +134,29 @@ void ToolMetricWrapper::spaceSelected()
 	mData->setSpace(space);
 }
 
+void ToolMetricWrapper::toolNameSet()
+{
+	if (mInternalUpdate)
+		return;
+	mData->setToolName(mToolNameSelector->getValue());
+}
+
+void ToolMetricWrapper::toolOffsetSet()
+{
+	if (mInternalUpdate)
+		return;
+	mData->setToolOffset(mToolOffsetSelector->getValue());
+}
+
 void ToolMetricWrapper::dataChangedSlot()
 {
 	mInternalUpdate = true;
+
 	mSpaceSelector->setValue(mData->getSpace().toString());
 	mFrameWidget->setMatrix(mData->getFrame());
+	mToolNameSelector->setValue(mData->getToolName());
+	mToolOffsetSelector->setValue(mData->getToolOffset());
+
 	mInternalUpdate = false;
 }
 

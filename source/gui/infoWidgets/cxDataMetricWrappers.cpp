@@ -84,11 +84,9 @@ QWidget* PointMetricWrapper::createWidget()
 
 QString PointMetricWrapper::getValue() const
 {
-  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mData->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-  ssc::Vector3D p0_r = rM0.coord(mData->getCoordinate());
-//  return "pt_r="+qstring_cast(p0_r);
-  int w=3;
-  return QString("%1 %2 %3").arg(p0_r[0], w, 'f', 1).arg(p0_r[1], w, 'f', 1).arg(p0_r[2], w, 'f', 1);
+//  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mData->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+//  ssc::Vector3D p0_r = rM0.coord(mData->getCoordinate());
+  return ssc::prettyFormat(mData->getRefCoord(), 1, 3);
 }
 
 ssc::DataPtr PointMetricWrapper::getData() const
@@ -104,8 +102,7 @@ QString PointMetricWrapper::getType() const
 QString PointMetricWrapper::getArguments() const
 {
   ssc::Vector3D p = mData->getCoordinate();
-  int w=1;
-  QString coord = QString("(%1 %2 %3)").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);
+  QString coord = ssc::prettyFormat(p, 1, 1);
   if (mData->getSpace().mId==ssc::csREF)
   	coord = ""; // ignore display of coord if in ref space
 

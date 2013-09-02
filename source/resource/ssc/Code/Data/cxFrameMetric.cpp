@@ -81,7 +81,6 @@ ssc::Transform3D FrameMetric::getRefFrame() const
 ssc::Vector3D FrameMetric::getRefCoord() const
 {
     ssc::Transform3D rMq = this->getRefFrame();
-//    ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
     ssc::Vector3D p_r = rMq.coord(ssc::Vector3D(0,0,0));
     return p_r;
 }
@@ -144,17 +143,5 @@ QString FrameMetric::matrixAsSingleLineString() const
 	return qstring_cast(stream.str());
 }
 
-QString FrameMetric::pointAsSingleLineString() const
-{
-	QString retval;
-	QString elem;
-	elem.setNum(mFrame.flatten()[3]);
-	retval += elem + " ";
-	elem.setNum(mFrame.flatten()[7]);
-	retval += elem + " ";
-	elem.setNum(mFrame.flatten()[11]);
-	retval += elem;
-	return retval;
-}
 
 } //namespace cx
