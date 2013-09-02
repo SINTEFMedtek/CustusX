@@ -38,18 +38,6 @@ void FrameMetricRep::clear()
     DataMetricRep::clear();
 }
 
-//void FrameMetricRep::addRepActorsToViewRenderer(ssc::View *view)
-//{
-//    mAxes->setRenderer(view->getRenderer());
-//    DataMetricRep::addRepActorsToViewRenderer(view);
-//}
-
-//void FrameMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
-//{
-//    mAxes->setRenderer(NULL);
-//    DataMetricRep::removeRepActorsFromViewRenderer(view);
-//}
-
 FrameMetricPtr FrameMetricRep::getFrameMetric()
 {
     return boost::dynamic_pointer_cast<FrameMetric>(mMetric);

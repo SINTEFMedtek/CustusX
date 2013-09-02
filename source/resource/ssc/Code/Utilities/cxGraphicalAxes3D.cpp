@@ -29,14 +29,15 @@
 namespace ssc
 {
 
-GraphicalAxes3D::GraphicalAxes3D(vtkRendererPtr renderer)
+GraphicalAxes3D::GraphicalAxes3D(vtkRendererPtr renderer) : m_vtkAxisLength(100)
 {
     mViewportListener.reset(new ssc::ViewportListener);
     mViewportListener->setCallback(boost::bind(&GraphicalAxes3D::rescale, this));
 
-    mAssembly = vtkAssemblyPtr::New();
     mActor = vtkAxesActorPtr::New();
-    mAssembly->AddPart(mActor);
+	mActor->SetAxisLabels(false);
+	mActor->SetTotalLength( m_vtkAxisLength, m_vtkAxisLength, m_vtkAxisLength );
+
     this->setAxisLength(0.2);
 
     this->setShowAxesLabels(true);
@@ -50,7 +51,7 @@ void GraphicalAxes3D::setRenderer(vtkRendererPtr renderer)
 {
     if (mRenderer)
     {
-        mRenderer->RemoveActor(mAssembly);
+		mRenderer->RemoveActor(mActor);
         for (unsigned i=0; i<mCaption.size(); ++i)
             mRenderer->RemoveActor(mCaption[i]);
         mViewportListener->stopListen();
@@ -60,7 +61,7 @@ void GraphicalAxes3D::setRenderer(vtkRendererPtr renderer)
 
     if (mRenderer)
     {
-        mRenderer->AddActor(mAssembly);
+		mRenderer->AddActor(mActor);
         for (unsigned i=0; i<mCaption.size(); ++i)
             mRenderer->AddActor(mCaption[i]);
         mViewportListener->startListen(mRenderer);
@@ -73,42 +74,40 @@ GraphicalAxes3D::~GraphicalAxes3D()
     this->setRenderer(NULL);
 }
 
-void GraphicalAxes3D::rescale()
-{
-    if (!mViewportListener->isListening())
-        return;
-    double size = mViewportListener->getVpnZoom();
-    double axisSize = mSize/size;
-
-    mActor->SetTotalLength( axisSize, axisSize, axisSize );
-    setTransform(Transform3D(mAssembly->GetUserMatrix()));
-}
-
 void GraphicalAxes3D::setVisible(bool on)
 {
-    mAssembly->SetVisibility(on);
-    for (unsigned i=0; i<mCaption.size(); ++i)
-        mCaption[i]->SetVisibility(on);
+	mActor->SetVisibility(on);
+	this->resetAxesLabels();
 }
 
 void GraphicalAxes3D::setShowAxesLabels(bool on)
 {
-    if (on)
-    {
-        this->addCaption("x", Vector3D(1,0,0), Vector3D(1,0,0));
-        this->addCaption("y", Vector3D(0,1,0), Vector3D(0,1,0));
-        this->addCaption("z", Vector3D(0,0,1), Vector3D(0,0,1));
-    }
-    else
-    {
-        if (mRenderer)
-        {
-            for (unsigned i=0; i<mCaption.size(); ++i)
-                mRenderer->RemoveActor(mCaption[i]);
-        }
-        mCaption.clear();
-        mCaptionPos.clear();
-    }
+	mShowLabels = on;
+	this->resetAxesLabels();
+}
+
+void GraphicalAxes3D::resetAxesLabels()
+{
+	if (mRenderer)
+	{
+		for (unsigned i=0; i<mCaption.size(); ++i)
+			mRenderer->RemoveActor(mCaption[i]);
+	}
+	mCaption.clear();
+	mCaptionPos.clear();
+
+	if (!mShowLabels)
+		return;
+
+	this->addCaption("x", Vector3D(1,0,0), Vector3D(1,0,0));
+	this->addCaption("y", Vector3D(0,1,0), Vector3D(0,1,0));
+	this->addCaption("z", Vector3D(0,0,1), Vector3D(0,0,1));
+
+	if (mRenderer)
+	{
+		for (unsigned i=0; i<mCaption.size(); ++i)
+			mRenderer->AddActor(mCaption[i]);
+	}
 }
 
 void GraphicalAxes3D::setCaption(const QString& caption, const Vector3D& color)
@@ -122,11 +121,7 @@ void GraphicalAxes3D::setCaption(const QString& caption, const Vector3D& color)
 void GraphicalAxes3D::setFontSize(double size)
 {
     mFontSize = size;
-
-    for (unsigned i=0; i<mCaption.size(); ++i)
-    {
-        mCaption[i]->SetHeight(mFontSize);
-    }
+	this->resetAxesLabels();
 }
 
 /**set axis length to a world length
@@ -134,7 +129,7 @@ void GraphicalAxes3D::setFontSize(double size)
  */
 void GraphicalAxes3D::setAxisLength(double length)
 {
-    mSize = length;
+	mSize = length;
     this->rescale();
 }
 
@@ -143,18 +138,30 @@ void GraphicalAxes3D::setAxisLength(double length)
  */
 void GraphicalAxes3D::setTransform(Transform3D rMt)
 {
-    mAssembly->SetUserMatrix(rMt.getVtkMatrix());
+	m_rMt = rMt;
+	this->rescale();
+}
 
-    for (unsigned i=0; i<mCaption.size(); ++i)
-    {
-        if (!mViewportListener->isListening())
-            continue;
-        double size = mViewportListener->getVpnZoom();
-        double axisSize = mSize/size;
+void GraphicalAxes3D::rescale()
+{
+	if (!mViewportListener->isListening())
+		return;
 
-        Vector3D pos = rMt.coord(axisSize*mCaptionPos[i]);
-        mCaption[i]->SetAttachmentPoint(pos.begin());
-    }
+	double size = mViewportListener->getVpnZoom();
+	double axisSize = mSize/size;
+	double scale = axisSize / m_vtkAxisLength;
+
+	// NOTE: vtkAxesActor dislikes small values for SetTotalLength, thus we
+	// keep that value constant at m_vtkAxisLength and instead scale the transform.
+	ssc::Transform3D rMq = m_rMt * createTransformScale(ssc::Vector3D(scale,scale,scale));
+
+	mActor->SetUserMatrix(rMq.getVtkMatrix());
+
+	for (unsigned i=0; i<mCaption.size(); ++i)
+	{
+		Vector3D pos = rMq.coord(axisSize*mCaptionPos[i]);
+		mCaption[i]->SetAttachmentPoint(pos.begin());
+	}
 }
 
 void GraphicalAxes3D::addCaption(const QString& label, Vector3D pos, Vector3D color)
@@ -165,8 +172,10 @@ void GraphicalAxes3D::addCaption(const QString& label, Vector3D pos, Vector3D co
     cap->LeaderOff();
     cap->BorderOff();
     cap->GetCaptionTextProperty()->ShadowOff();
-    mCaption.push_back(cap);
-    mCaptionPos.push_back(pos);
+	cap->SetHeight(mFontSize);
+	cap->SetVisibility(mActor->GetVisibility());
+	mCaption.push_back(cap);
+    mCaptionPos.push_back(pos);	
 }
 
 
