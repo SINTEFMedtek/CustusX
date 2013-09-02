@@ -145,13 +145,11 @@ void MetricWidget::cellClickedSlot(int row, int column)
 
 	  QTableWidgetItem* item = mTable->item(row,column);
 	  ssc::DataPtr data = ssc::dataManager()->getData(item->data(Qt::UserRole).toString());
-	  ssc::PointMetricPtr pointData = boost::dynamic_pointer_cast<ssc::PointMetric>(data);
-	  if (pointData)
-	  {
-		  	ssc::Vector3D p_r = pointData->getRefCoord();;
-		  	ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->coord(p_r);;
-		  	this->setManualToolPosition(p_r);
-	  }
+	  ssc::DataMetricPtr metric = boost::dynamic_pointer_cast<ssc::DataMetric>(data);
+	  if (!metric)
+		  return;
+	  ssc::Vector3D p_r = metric->getRefCoord();;
+	  this->setManualToolPosition(p_r);
 }
 
 
