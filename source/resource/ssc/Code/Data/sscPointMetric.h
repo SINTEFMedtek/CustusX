@@ -21,8 +21,8 @@
 #define SSCPOINTMETRIC_H_
 
 #include "sscDataMetric.h"
-#include "sscCoordinateSystemHelpers.h"
 #include "sscDataReaderWriter.h"
+#include "sscCoordinateSystemListener.h"
 
 namespace ssc
 {
@@ -31,32 +31,6 @@ namespace ssc
  * \addtogroup sscData
  * @{
  */
-
-/**\brief Class that listens to changes in a coordinate system,
- * and emits a signal if that system changes.
- *
- * \date Jul 4, 2011
- * \author Christian Askeland, SINTEF
- */
-class CoordinateSystemListener: public QObject
-{
-Q_OBJECT
-
-public:
-	CoordinateSystemListener(ssc::CoordinateSystem space);
-	virtual ~CoordinateSystemListener();
-	void setSpace(ssc::CoordinateSystem space);
-	ssc::CoordinateSystem getSpace() const;
-signals:
-	void changed();
-private slots:
-	void reconnect();
-private:
-	void doConnect();
-	void doDisconnect();
-	ssc::CoordinateSystem mSpace;
-};
-typedef boost::shared_ptr<CoordinateSystemListener> CoordinateSystemListenerPtr;
 
 typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
 

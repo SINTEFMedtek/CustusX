@@ -15,8 +15,8 @@
 #ifndef CXTOOLMETRIC_H_
 #define CXTOOLMETRIC_H_
 
+#include "cxFrameMetricBase.h"
 #include "sscPointMetric.h"
-#include "sscCoordinateSystemHelpers.h"
 #include "sscDataReaderWriter.h"
 
 namespace cx
@@ -42,7 +42,7 @@ public:
 	virtual ssc::DataPtr load(const QString& uid, const QString& filename);
 };
 
-/**\brief Data class that represents a single transform.
+/**\brief Data class that represents a tool (transform and offset).
  *
  * The transform is attached to a specific coordinate system / frame.
  *
@@ -50,7 +50,7 @@ public:
  * \author Ole Vegard Solberg, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class ToolMetric: public ssc::DataMetric
+class ToolMetric: public cx::FrameMetricBase
 {
 Q_OBJECT
 public:
@@ -59,33 +59,19 @@ public:
 	static ToolMetricPtr create(QDomNode node);
 	static ToolMetricPtr create(QString uid, QString name="");
 
-	void setFrame(const ssc::Transform3D& qMt);
-	ssc::Transform3D getFrame();
 	double getToolOffset() const;
 	void setToolOffset(double val);
 	QString getToolName() const;
 	void setToolName(const QString& val);
-	ssc::Vector3D getCoordinate() const;
-	ssc::Vector3D getRefCoord() const; ///< as getRefFrame, but coord only.
-	ssc::Transform3D getRefFrame() const; ///< return frame described in ref space r : rFt = rMq * qFt
-	void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
-	ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data
 	virtual QString getType() const
 	{
 		return "ToolMetric";
 	}
-	virtual QString getAsSingleLineString() const;
-
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
-	virtual ssc::DoubleBoundingBox3D boundingBox() const;
-	QString getAsSingleLineString();
+	virtual QString getAsSingleLineString() const;
 
 private:
-	QString matrixAsSingleLineString() const;
-	ssc::CoordinateSystem mSpace;
-	ssc::CoordinateSystemListenerPtr mSpaceListener;
-	ssc::Transform3D mFrame; ///< frame qFt described in local space q = mSpace
 	double mToolOffset;
 	QString mToolName;
 };
