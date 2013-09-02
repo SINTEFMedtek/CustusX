@@ -68,7 +68,7 @@ QWidget* FrameMetricWrapper::createWidget()
 
 QString FrameMetricWrapper::getValue() const
 {
-	return mData->pointAsSingleLineString();
+	return ssc::prettyFormat(mData->getRefCoord(), 1, 3);
 }
 
 ssc::DataPtr FrameMetricWrapper::getData() const

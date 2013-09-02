@@ -5,6 +5,8 @@
 #include "sscTypeConversions.h"
 #include "vtkForwardDeclarations.h"
 #include <cmath>
+#include <QString>
+
 // --------------------------------------------------------
 namespace ssc
 {
@@ -81,6 +83,15 @@ bool similar(const Eigen::Array3i& a, const Eigen::Array3i& b)
 {
 	return (b - a).abs().maxCoeff() < 10E-6;;
 }
+
+QString prettyFormat(Vector3D val, int decimals, int fieldWidth)
+{
+	return QString("%1 %2 %3")
+			.arg(val[0], fieldWidth, 'f', decimals)
+			.arg(val[1], fieldWidth, 'f', decimals)
+			.arg(val[2], fieldWidth, 'f', decimals);
+}
+
 
 } // namespace ssc
 // --------------------------------------------------------

@@ -54,6 +54,7 @@
 #include "sscAngleMetricRep.h"
 #include "sscPlaneMetricRep.h"
 #include "cxFrameMetricRep.h"
+#include "cxToolMetricRep.h"
 #include "sscDataMetricRep.h"
 #include "cxDataLocations.h"
 #include "sscTexture3DSlicerRep.h"
@@ -615,7 +616,9 @@ ssc::DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(ssc::DataPtr data)
         rep = ssc::PointMetricRep::New(data->getUid() + "_3D_rep");
     else if (boost::dynamic_pointer_cast<FrameMetric>(data))
         rep = FrameMetricRep::New(data->getUid() + "_3D_rep");
-    else if (boost::dynamic_pointer_cast<ssc::DistanceMetric>(data))
+	else if (boost::dynamic_pointer_cast<ToolMetric>(data))
+		rep = ToolMetricRep::New(data->getUid() + "_3D_rep");
+	else if (boost::dynamic_pointer_cast<ssc::DistanceMetric>(data))
         rep = ssc::DistanceMetricRep::New(data->getUid() + "_3D_rep");
     else if (boost::dynamic_pointer_cast<ssc::AngleMetric>(data))
         rep = ssc::AngleMetricRep::New(data->getUid() + "_3D_rep");
