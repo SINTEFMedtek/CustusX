@@ -103,7 +103,6 @@ ssc::Transform3D ToolMetric::getRefFrame() const
 ssc::Vector3D ToolMetric::getRefCoord() const
 {
 	ssc::Transform3D rMq = this->getRefFrame();
-//    ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
 	ssc::Vector3D p_r = rMq.coord(ssc::Vector3D(0,0,0));
 	return p_r;
 }
@@ -158,7 +157,7 @@ ssc::DoubleBoundingBox3D ToolMetric::boundingBox() const
 
 QString ToolMetric::getAsSingleLineString() const
 {
-	return QString("%1 \"%2\" %3 %4 %5")
+	return QString("%1 \"%2\" %3 \"%4\" %5")
 			.arg(this->getSingleLineHeader())
 			.arg(mToolName)
 			.arg(mToolOffset)
@@ -171,19 +170,6 @@ QString ToolMetric::matrixAsSingleLineString() const
 	std::stringstream stream;
 	mFrame.put(stream, 0, ' ');
 	return qstring_cast(stream.str());
-}
-
-QString ToolMetric::pointAsSingleLineString()
-{
-	QString retval;
-	QString elem;
-	elem.setNum(mFrame.flatten()[3]);
-	retval += elem + " ";
-	elem.setNum(mFrame.flatten()[7]);
-	retval += elem + " ";
-	elem.setNum(mFrame.flatten()[11]);
-	retval += elem;
-	return retval;
 }
 
 } //namespace cx

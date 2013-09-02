@@ -3,6 +3,7 @@
 
 
 #include "sscMathBase.h"
+class QString;
 
 namespace ssc
 {
@@ -39,6 +40,8 @@ Vector3D round(const Vector3D& a);
 Vector3D ceil(const Vector3D& a);
 
 bool similar(const Eigen::Array3i& a, const Eigen::Array3i& b); ///< identical to the equality operator, exists for symmetry with Vector3D.
+
+QString prettyFormat(ssc::Vector3D val, int decimals=1, int fieldWidth=3);
 
 /**
  * @}

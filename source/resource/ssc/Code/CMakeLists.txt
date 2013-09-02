@@ -95,6 +95,7 @@ cx_add_class_qt_moc(SSC_SOURCE_FILES
 	Rep/sscPlaneMetricRep
 	Rep/sscGuideRep2D
 	Rep/cxFrameMetricRep
+        Rep/cxToolMetricRep
 
 	Widgets/sscOptimizedUpdateWidget
 	Widgets/sscDataAdapter

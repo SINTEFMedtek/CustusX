@@ -11,12 +11,12 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#ifndef CXFRAMEMETRICREP_H
-#define CXFRAMEMETRICREP_H
+#ifndef CXTOOLMETRICREP_H
+#define CXTOOLMETRICREP_H
 
 #include "sscDataMetricRep.h"
 #include "sscGraphicalPrimitives.h"
-#include "cxFrameMetric.h"
+#include "cxToolMetric.h"
 #include "sscViewportListener.h"
 
 namespace ssc
@@ -27,38 +27,39 @@ typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
 namespace cx
 {
 
-typedef boost::shared_ptr<class FrameMetricRep> FrameMetricRepPtr;
+typedef boost::shared_ptr<class ToolMetricRep> ToolMetricRepPtr;
 
-/** Rep for visualizing a FrameMetric.
+/** Rep for visualizing a ToolMetric.
  *
  * \ingroup sscRep
  * \ingroup sscRep3D
  *
- * \date Aug 26, 2013
+ * \date Aug 30, 2013
  * \author Christian Askeland, SINTEF
+ * \author Ole Vegard Solberg, SINTEF
  */
-class FrameMetricRep: public ssc::DataMetricRep
+class ToolMetricRep: public ssc::DataMetricRep
 {
 Q_OBJECT
 public:
-	static FrameMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
-	virtual ~FrameMetricRep() {}
-	virtual QString getType() const { return "ssc::FrameMetricRep"; }
+	static ToolMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
+	virtual ~ToolMetricRep() {}
+	virtual QString getType() const { return "ssc::ToolMetricRep"; }
 
 protected:
-    virtual void clear();
+	virtual void clear();
 
 protected slots:
 	virtual void changedSlot();
 
 private:
-	FrameMetricRep(const QString& uid, const QString& name = "");
-	FrameMetricRep(); ///< not implemented
-    FrameMetricPtr getFrameMetric();
+	ToolMetricRep(const QString& uid, const QString& name = "");
+	ToolMetricRep(); ///< not implemented
+	ToolMetricPtr getToolMetric();
 
-    ssc::GraphicalAxes3DPtr mAxes;
+	ssc::GraphicalAxes3DPtr mAxes;
 };
 
 } // namespace cx
 
-#endif // CXFRAMEMETRICREP_H
+#endif // CXTOOLMETRICREP_H
