@@ -43,12 +43,18 @@ DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
 void DataMetricRep::setDataMetric(DataMetricPtr value)
 {
     if (mMetric)
+	{
         disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+		disconnect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(changedSlot()));
+	}
 
     mMetric = value;
 
     if (mMetric)
-        connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+	{
+		connect(mMetric.get(), SIGNAL(propertiesChanged()), this, SLOT(changedSlot()));
+		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+	}
 
     this->clear();
     this->changedSlot();

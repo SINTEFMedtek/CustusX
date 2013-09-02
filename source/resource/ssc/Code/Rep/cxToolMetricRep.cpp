@@ -30,25 +30,30 @@ ToolMetricRepPtr ToolMetricRep::New(const QString& uid, const QString& name)
 ToolMetricRep::ToolMetricRep(const QString& uid, const QString& name) :
 				DataMetricRep(uid, name)
 {
+	mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener->setCallback(boost::bind(&ToolMetricRep::rescale, this));
 }
 
 void ToolMetricRep::clear()
 {
+	mToolTip.reset();
+	mToolOffset.reset();
+
 	mAxes.reset();
 	DataMetricRep::clear();
 }
 
-//void ToolMetricRep::addRepActorsToViewRenderer(ssc::View *view)
-//{
-//    mAxes->setRenderer(view->getRenderer());
-//    DataMetricRep::addRepActorsToViewRenderer(view);
-//}
+void ToolMetricRep::addRepActorsToViewRenderer(ssc::View *view)
+{
+	mViewportListener->startListen(view->getRenderer());
+	DataMetricRep::addRepActorsToViewRenderer(view);
+}
 
-//void ToolMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
-//{
-//    mAxes->setRenderer(NULL);
-//    DataMetricRep::removeRepActorsFromViewRenderer(view);
-//}
+void ToolMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
+{
+	DataMetricRep::removeRepActorsFromViewRenderer(view);
+	mViewportListener->stopListen();
+}
 
 ToolMetricPtr ToolMetricRep::getToolMetric()
 {
@@ -62,17 +67,43 @@ void ToolMetricRep::changedSlot()
 	if (!metric || !metric->isValid() || !mView)
 		return;
 
-	if (!mAxes)
+	if (!mAxes || !mToolTip || !mToolOffset)
 	{
 		mAxes.reset(new ssc::GraphicalAxes3D());
-		mAxes->setFontSize(0.04);
-		mAxes->setAxisLength(0.05);
-		mAxes->setShowAxesLabels(false);
-		mAxes->setRenderer(mView->getRenderer());
+		mToolTip.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
+		mToolOffset.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
 	}
+
+	mAxes->setFontSize(0.04);
+	mAxes->setAxisLength(0.05);
+//	mAxes->setAxisLength(0.2);
+	mAxes->setShowAxesLabels(false);
+	mAxes->setRenderer(mView->getRenderer());
+
+	ssc::Vector3D p0_r = mMetric->getRefCoord();
+	ssc::Transform3D rMt = metric->getRefFrame();
+	ssc::Vector3D toolTip_r = rMt.coord(ssc::Vector3D(0,0,-metric->getToolOffset()));
+
+	mToolTip->setValue(toolTip_r);
+	mToolTip->setRadius(mGraphicsSize);
+	mToolTip->setColor(mColor);
+
+	mToolOffset->setValue(p0_r, toolTip_r);
+	mToolOffset->setColor(mColor);
 
 	mAxes->setTransform(metric->getRefFrame());
 	this->drawText();
 }
+
+void ToolMetricRep::rescale()
+{
+	if (!mToolTip)
+		return;
+
+	double size = mViewportListener->getVpnZoom();
+	double sphereSize = mGraphicsSize / 100 / size;
+	mToolTip->setRadius(sphereSize);
+}
+
 
 } // namespace ssc
