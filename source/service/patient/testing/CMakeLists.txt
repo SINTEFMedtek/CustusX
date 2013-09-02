@@ -15,6 +15,10 @@
 ###########################################################
 #               cxPatientService Tests
 ###########################################################
+# _USE_MATH_DEFINES Must be defined before math.h is included
+if (CX_WINDOWS)
+    add_definitions(-D_USE_MATH_DEFINES)
+endif(CX_WINDOWS)
 
 if (BUILD_TESTING)
         # Catch unit test framework stuff:
