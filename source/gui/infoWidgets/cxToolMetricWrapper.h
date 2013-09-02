@@ -40,6 +40,8 @@ public:
 private slots:
   void moveToToolPosition();
   void spaceSelected();
+  void toolNameSet();
+  void toolOffsetSet();
   void dataChangedSlot();
   void frameWidgetChangedSlot();
 private:
@@ -49,6 +51,7 @@ private:
   ssc::DoubleDataAdapterXmlPtr mToolOffsetSelector;
   bool mInternalUpdate;
   Transform3DWidget* mFrameWidget;
+  void initializeDataAdapters();
 };
 
 } //namespace cx
