@@ -48,6 +48,8 @@ public:
 
 protected:
 	virtual void clear();
+	void addRepActorsToViewRenderer(ssc::View *view);
+	void removeRepActorsFromViewRenderer(ssc::View *view);
 
 protected slots:
 	virtual void changedSlot();
@@ -56,8 +58,14 @@ private:
 	ToolMetricRep(const QString& uid, const QString& name = "");
 	ToolMetricRep(); ///< not implemented
 	ToolMetricPtr getToolMetric();
+	void rescale();
 
 	ssc::GraphicalAxes3DPtr mAxes;
+
+	ssc::GraphicalPoint3DPtr mToolTip;
+	ssc::GraphicalLine3DPtr mToolOffset;
+	ssc::ViewportListenerPtr mViewportListener;
+
 };
 
 } // namespace cx

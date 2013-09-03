@@ -88,7 +88,7 @@ MetricWidget::MetricWidget(QWidget* parent) :
   mLoadReferencePointsAction = this->createAction(group, ":/icons/metric_reference.png", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
   mLoadReferencePointsAction->setDisabled(true);
   this->createAction(group, "", "", "", NULL)->setSeparator(true);
-  mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export the frame metrics to file",   SLOT(exportFramesButtonClickedSlot()));
+  mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export metrics to file",   SLOT(exportMetricsButtonClickedSlot()));
 
   QToolBar* toolBar = new QToolBar("actions", this);
   toolBar->addActions(group->actions());
@@ -145,13 +145,11 @@ void MetricWidget::cellClickedSlot(int row, int column)
 
 	  QTableWidgetItem* item = mTable->item(row,column);
 	  ssc::DataPtr data = ssc::dataManager()->getData(item->data(Qt::UserRole).toString());
-	  ssc::PointMetricPtr pointData = boost::dynamic_pointer_cast<ssc::PointMetric>(data);
-	  if (pointData)
-	  {
-		  	ssc::Vector3D p_r = pointData->getRefCoord();;
-		  	ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->coord(p_r);;
-		  	this->setManualToolPosition(p_r);
-	  }
+	  ssc::DataMetricPtr metric = boost::dynamic_pointer_cast<ssc::DataMetric>(data);
+	  if (!metric)
+		  return;
+	  ssc::Vector3D p_r = metric->getRefCoord();;
+	  this->setManualToolPosition(p_r);
 }
 
 
@@ -536,7 +534,18 @@ void MetricWidget::addAngleButtonClickedSlot()
 
 void MetricWidget::removeButtonClickedSlot()
 {
+	int nextIndex = mTable->currentRow() + 1;
+	QString nextUid;
+	if (nextIndex < mTable->rowCount())
+	{
+		QTableWidgetItem* nextItem = mTable->item(nextIndex, 0);
+		nextUid = nextItem->data(Qt::UserRole).toString();
+	}
+
 	ssc::dataManager()->removeData(mActiveLandmark);
+
+	if (!nextUid.isEmpty())
+		this->setActiveUid(nextUid);
 }
 
 void MetricWidget::loadReferencePointsSlot()
@@ -567,23 +576,23 @@ void MetricWidget::loadReferencePointsSlot()
   }
 }
 
-void MetricWidget::exportFramesButtonClickedSlot()
+void MetricWidget::exportMetricsButtonClickedSlot()
 {
 	QString suggestion = QString("%1/Logs/metrics_%2.txt")
 			.arg(patientService()->getPatientData()->getActivePatientFolder())
 			.arg(QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()));
 
 	QString filename = QFileDialog::getSaveFileName(this,
-													"Create/select file to append frame metric transforms to",
+													"Create/select file to export metrics to",
 													suggestion);
 	if(!filename.isEmpty())
-		this->exportFramesToFile(filename);
+		this->exportMetricsToFile(filename);
 }
 
-void MetricWidget::exportFramesToFile(QString filename)
+void MetricWidget::exportMetricsToFile(QString filename)
 {
 	QFile file(filename);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return;	
 
 	std::map<QString, ssc::DataPtr> dataMap = ssc::dataManager()->getData();

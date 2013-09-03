@@ -16,6 +16,7 @@
 #include <QHBoxLayout>
 #include "sscLabeledComboBoxWidget.h"
 #include "cxDataAdapterHelper.h"
+#include "cxToolManager.h"
 
 namespace cx {
 
@@ -50,7 +51,7 @@ QWidget* ToolMetricWrapper::createWidget()
 	hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
 
 	QPushButton* sampleButton = new QPushButton("Sample");
-	connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
+	connect(sampleButton, SIGNAL(clicked()), this, SLOT(resampleMetric()));
 	sampleButton->setToolTip("Set the position equal to the current tool tip position.");
 	hLayout->addWidget(sampleButton);
 
@@ -116,13 +117,15 @@ QString ToolMetricWrapper::getArguments() const
 }
 
 
-void ToolMetricWrapper::moveToToolPosition()
+void ToolMetricWrapper::resampleMetric()
 {
 	ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
-	ssc::Transform3D qMt = ssc::SpaceHelpers::getDominantToolTipTransform(mData->getSpace());
-//	std::cout << "set frame " << qMt << std::endl;
+	ssc::Transform3D qMt = ssc::SpaceHelpers::getDominantToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
+	mData->setToolName(ssc::toolManager()->getDominantTool()->getName());
+	mData->setToolOffset(ssc::toolManager()->getDominantTool()->getTooltipOffset());
 }
+
 
 void ToolMetricWrapper::spaceSelected()
 {

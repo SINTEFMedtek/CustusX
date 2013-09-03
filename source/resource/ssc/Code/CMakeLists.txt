@@ -42,7 +42,9 @@ cx_add_class_qt_moc(SSC_SOURCE_FILES
 	Data/sscAngleMetric
 	Data/sscUnsignedDerivedImage
 	Data/cxFrameMetric
-        Data/cxToolMetric
+	Data/cxToolMetric
+	Data/sscCoordinateSystemListener
+	Data/cxFrameMetricBase
 
 	Video/sscVideoSource.h
 	Video/sscVideoRecorder
