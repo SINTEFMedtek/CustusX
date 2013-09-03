@@ -534,7 +534,18 @@ void MetricWidget::addAngleButtonClickedSlot()
 
 void MetricWidget::removeButtonClickedSlot()
 {
+	int nextIndex = mTable->currentRow() + 1;
+	QString nextUid;
+	if (nextIndex < mTable->rowCount())
+	{
+		QTableWidgetItem* nextItem = mTable->item(nextIndex, 0);
+		nextUid = nextItem->data(Qt::UserRole).toString();
+	}
+
 	ssc::dataManager()->removeData(mActiveLandmark);
+
+	if (!nextUid.isEmpty())
+		this->setActiveUid(nextUid);
 }
 
 void MetricWidget::loadReferencePointsSlot()
