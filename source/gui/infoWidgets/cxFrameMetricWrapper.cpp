@@ -90,8 +90,7 @@ QString FrameMetricWrapper::getArguments() const
 void FrameMetricWrapper::moveToToolPosition()
 {
 	ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
-	ssc::Transform3D qMt = ssc::SpaceHelpers::getDominantToolTipTransform(mData->getSpace());
-	std::cout << "set frame " << qMt << std::endl;
+	ssc::Transform3D qMt = ssc::SpaceHelpers::getDominantToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
 }
 
