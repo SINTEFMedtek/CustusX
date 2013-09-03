@@ -78,7 +78,7 @@ MetricWidget::MetricWidget(QWidget* parent) :
   QActionGroup* group = new QActionGroup(this);
   mPointMetricAction = this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Point Metric", SLOT(addPointButtonClickedSlot()));
   mFrameMetricAction = this->createAction(group, ":/icons/metric_frame.png", "Frame", "Create a new Frame Metric (position and orientation)", SLOT(addFrameButtonClickedSlot()));
-  mToolMetricAction = this->createAction(group, ":/icons/metric_frame.png", "Tool", "Create a new Tool Metric", SLOT(addToolButtonClickedSlot()));
+  mToolMetricAction = this->createAction(group, ":/icons/metric_tool.png", "Tool", "Create a new Tool Metric", SLOT(addToolButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));

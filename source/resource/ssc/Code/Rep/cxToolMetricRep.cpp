@@ -85,7 +85,6 @@ void ToolMetricRep::changedSlot()
 	ssc::Vector3D toolTip_r = rMt.coord(ssc::Vector3D(0,0,-metric->getToolOffset()));
 
 	mToolTip->setValue(toolTip_r);
-	mToolTip->setRadius(mGraphicsSize);
 	mToolTip->setColor(mColor);
 
 	mToolOffset->setValue(p0_r, toolTip_r);
@@ -93,6 +92,7 @@ void ToolMetricRep::changedSlot()
 
 	mAxes->setTransform(metric->getRefFrame());
 	this->drawText();
+	this->rescale();
 }
 
 void ToolMetricRep::rescale()
