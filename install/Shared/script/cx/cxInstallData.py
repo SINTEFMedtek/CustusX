@@ -69,6 +69,7 @@ class Common(object):
         self.mBuildExAndTest = False
         self.mCoverage = False
         self.mDoxygen = False
+        self.mGitTag = None # if none, use branch master
 
     def printSettings(self):
         print ''
@@ -87,6 +88,7 @@ class Common(object):
         print '    Coverage:', self.mCoverage
         print '    Threads:', self.threads
         print '    32 bit:', self.m32bit
+        print '    git tag:', self.mGitTag
         print '    OpenCL:', self.mUseOpenCL
         print ''
 
