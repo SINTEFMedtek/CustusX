@@ -75,7 +75,7 @@ protected slots:
   void addDistanceButtonClickedSlot();
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);
-  void exportFramesButtonClickedSlot();
+  void exportMetricsButtonClickedSlot();
 
 protected:
   QAction* mPointMetricAction;
@@ -83,7 +83,7 @@ protected:
   QAction* mToolMetricAction;
   QAction* mExportFramesAction;
 
-  void exportFramesToFile(QString filename);
+  void exportMetricsToFile(QString filename);
 
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
