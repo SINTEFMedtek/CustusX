@@ -38,7 +38,7 @@ public:
   virtual QString getArguments() const;
   virtual QString getType() const;
 private slots:
-  void moveToToolPosition();
+  void resampleMetric();
   void spaceSelected();
   void toolNameSet();
   void toolOffsetSet();
