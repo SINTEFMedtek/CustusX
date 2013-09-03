@@ -54,14 +54,18 @@ public:
 protected:
     void addCaption(const QString& label, Vector3D pos, Vector3D color);
     void rescale();
-    vtkAxesActorPtr mActor;
-    vtkAssemblyPtr mAssembly;
+	void resetAxesLabels();
+	vtkAxesActorPtr mActor;
     std::vector<vtkCaptionActor2DPtr> mCaption;
     std::vector<Vector3D> mCaptionPos;
     double mSize;
     double mFontSize;
+	bool mShowLabels;
     ViewportListenerPtr mViewportListener;
     vtkRendererPtr mRenderer;
+	const double m_vtkAxisLength;
+
+	ssc::Transform3D m_rMt;
 };
 
 } // namespace ssc

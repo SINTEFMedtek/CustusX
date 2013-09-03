@@ -479,7 +479,7 @@ void AutomationTab::init()
   mAutoLoadPatientCheckBox->setChecked(autoLoadPatient);
 
   double autoLoadPatientWithinHours = settings()->value("Automation/autoLoadRecentPatientWithinHours").toDouble();
-  mAutoLoadPatientWithinHours = ssc::DoubleDataAdapterXml::initialize("Auto load within hours", "Auto load within hours", "Load the last patient if within this number of hours (and auto load is enabled)", autoLoadPatientWithinHours, ssc::DoubleRange(0.1,100,0.1), 1, QDomNode());
+  mAutoLoadPatientWithinHours = ssc::DoubleDataAdapterXml::initialize("Auto load within hours", "Auto load within hours", "Load the last patient if within this number of hours (and auto load is enabled)", autoLoadPatientWithinHours, ssc::DoubleRange(0.1,1000,0.1), 1, QDomNode());
 
 
   //Layout
