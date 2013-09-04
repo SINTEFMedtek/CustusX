@@ -79,11 +79,8 @@ private:
 	void updateBoxWidgetInteractor();
 	void initialize();
 
-	vtkVolumeMapperPtr getMapper();
 	ssc::ImagePtr mImage;
 	QPointer<ssc::ViewWidget> mView;
-	//vtkBoxRepresentationPtr mBoxRep;
-	//vtkBoxWidget2Ptr mBoxWidget2;
 	vtkBoxWidgetPtr mBoxWidget;
 	CropBoxCallbackPtr mCropBoxCallback;
 	CropBoxEnableCallbackPtr mCropBoxEnableCallback;
