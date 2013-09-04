@@ -14,9 +14,13 @@
 #ifndef CXMULTIVOLUME3DVISUALIZER_H
 #define CXMULTIVOLUME3DVISUALIZER_H
 
+#include <QObject>
+#include <boost/shared_ptr.hpp>
+
 namespace cx
 {
 
+typedef boost::shared_ptr<class MultiVolume3DVisualizer> MultiVolume3DVisualizerPtr;
 /** 
  *
  *

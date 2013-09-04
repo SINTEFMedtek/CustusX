@@ -156,7 +156,7 @@ protected:
 	void addDataAction(QString uid, QMenu* contextMenu);
 	QStringList getAllDataNames() const;
 
-	ViewGroupDataPtr mViewGroup;
+	ViewGroupDataPtr mGroupData;
 
 private:
 	QString mLastDataActionUid;
