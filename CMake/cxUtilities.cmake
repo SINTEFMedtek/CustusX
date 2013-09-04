@@ -182,11 +182,12 @@ MACRO(cx_define_version major minor patch type)
 		set(POSTFIX "."${type})
 	endif()
 	
-	#on windows this string contains newlines that needs to be removed
-	STRING(REGEX REPLACE "\r|\n" "" POSTFIX_CLEAN "${POSTFIX}")
+	#on windows this string contains newlines and whitespaces that needs to be removed
+	STRING(REGEX REPLACE "\r|\n" "" POSTFIX_TEMP ${POSTFIX})
+	STRING(REGEX REPLACE " " "" POSTFIX_CLEAN ${POSTFIX_TEMP})
 
-	set(${PROJECT_NAME}_VERSION_POSTFIX "${POSTFIX_CLEAN}")
-	set(${PROJECT_NAME}_VERSION_STRING "${major}.${minor}.${patch}${${PROJECT_NAME}_VERSION_POSTFIX}")
+	set(${PROJECT_NAME}_VERSION_POSTFIX ${POSTFIX_CLEAN})
+	set(${PROJECT_NAME}_VERSION_STRING ${major}.${minor}.${patch}${${PROJECT_NAME}_VERSION_POSTFIX})
 
 # no good - leads to full rebuild for every commit. Moved to resource/settings/cxConfig.h
 #	add_definitions(
