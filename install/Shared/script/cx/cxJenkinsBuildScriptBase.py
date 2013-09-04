@@ -84,6 +84,7 @@ class JenkinsBuildScriptBase(JenkinsBuildScriptBaseBase):
         p = self.argumentParser
         p.add_argument('-i', '--isb_password', default="not set", help='password for ISB GE Connection module')
         p.add_argument('-j', '--threads', type=int, default=1, help='number of make threads')
+        p.add_argument('-g', '--git_tag', default="", help='git tag to use when checking out CustusX. None means checkout master branch.')
         pass
 
     def _applyArgumentParserArguments(self, options):
@@ -92,3 +93,5 @@ class JenkinsBuildScriptBase(JenkinsBuildScriptBaseBase):
         data = self.cxBuilder.assembly.controlData        
         data.mISBpassword = options.isb_password
         data.threads = options.threads
+        data.mGitTag = options.git_tag
+
