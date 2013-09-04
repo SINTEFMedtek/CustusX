@@ -43,22 +43,17 @@ include_directories(
         ${CustusX3_SOURCE_DIR}/source/resource/utilities
         ${CustusX3_SOURCE_DIR}/source/resource
         ${CustusX3_SOURCE_DIR}/source/resource/OpenIGTLinkUtilities
-        #"C:/Program Files/Microsoft SDKs/Windows/v7.1/Samples/multimedia/directshow/baseclasses"
         )
 
 #-------------------------------
 # Linking
 #-------------------------------
-
-#link_directories( "C:/Program Files/Microsoft SDKs/Windows/v7.1/Lib" )
-
 # link to ulterius only on when building 32 bit
 # - ulterius lib is only available on windows as 32 bit
 if(CX_WIN32)
     SET(WIN32_LINK_LIBRARIES
             ${ULTERIUS_LIBRARY}
             vtkOpenIGTUltrasound
-            #STRMBASE
     )
 endif(CX_WIN32)
 

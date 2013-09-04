@@ -30,25 +30,24 @@ macro(cx_initialize_cppunit)
         /usr/include)
 
     if(CX_WINDOWS)
- #       find_library(CPPUNIT_LIBRARY cppunit
- #           ${CPPUNIT_INCLUDE_DIR}/../lib
- #           /usr/local/lib
- #           /usr/lib)
- #       find_library(CPPUNIT_DEBUG_LIBRARY cppunitd
- #           ${CPPUNIT_INCLUDE_DIR}/../lib
- #           /usr/local/lib
- #           /usr/lib)
+       find_library(CPPUNIT_LIBRARY cppunit
+           ${CPPUNIT_INCLUDE_DIR}/../lib
+           /usr/local/lib
+           /usr/lib)
+       find_library(CPPUNIT_DEBUG_LIBRARY cppunitd
+           ${CPPUNIT_INCLUDE_DIR}/../lib
+           /usr/local/lib
+           /usr/lib)
+           
+       if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+           set(CPPUNIT_LIBRARIES ${CPPUNIT_DEBUG_LIBRARY})
+       elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+           set(CPPUNIT_LIBRARIES ${CPPUNIT_LIBRARY})
+       endif()
+       
     else(CX_WINDOWS)
         find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED)
     endif(CX_WINDOWS)
-
-#    if(CPPUNIT_INCLUDE_DIR)
-#        if(CPPUNIT_LIBRARY)
-#            set(CPPUNIT_FOUND "YES")
-#            set(CPPUNIT_LIBRARIES ${CPPUNIT_LIBRARY} ${CMAKE_DL_LIBS})
-#            set(CPPUNIT_DEBUG_LIBRARIES ${CPPUNIT_DEBUG_LIBRARY} ${CMAKE_DL_LIBS})
-#        endif(CPPUNIT_LIBRARY)
-#    endif(CPPUNIT_INCLUDE_DIR)
 
     include_directories(${CPPUNIT_INCLUDE_DIR})
 endmacro()
