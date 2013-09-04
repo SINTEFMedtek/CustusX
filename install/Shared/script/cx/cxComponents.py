@@ -374,8 +374,8 @@ class CustusX3(CppComponent):
         add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
-        add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).configPath())
-        add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).configPath())
+        add('ULTERIUS_INCLUDE_DIR:PATH', self._createSibling(UltrasonixSDK).includePath())
+        add('ULTERIUS_LIBRARY:FILEPATH', self._createSibling(UltrasonixSDK).libFile())
         add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
         add('GEStreamer_DIR:PATH', self._createSibling(ISB_DataStreaming).configPath())
         # other options
