@@ -131,6 +131,10 @@ void AxisConnector::changedSlot()
 
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 {
+	view->getRenderer()->GetActiveCamera()->SetClippingRange(1, 2000);
+	if (!view->getRenderWindow()->GetStereoCapableWindow())
+		view->getRenderWindow()->StereoCapableWindowOn(); // Just set all 3D views 3D capable
+
 	mShowAxes = false;
 	mView = view;
 	this->connectContextMenu(mView);

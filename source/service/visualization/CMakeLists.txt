@@ -8,8 +8,6 @@
 ###########################################################
 
 cx_add_class_qt_moc(cxVisualizationService_SOURCE
-    cxView2D
-    cxView3D
     cxViewWrapper2D
     cxViewWrapper3D
     cxViewWrapperVideo

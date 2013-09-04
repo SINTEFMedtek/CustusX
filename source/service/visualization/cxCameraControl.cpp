@@ -25,7 +25,7 @@
 #include "vtkCamera.h"
 #include "vtkSmartPointer.h"
 #include "cxViewManager.h"
-#include "cxView3D.h"
+#include "sscView.h"
 
 namespace cx
 {

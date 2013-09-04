@@ -99,14 +99,14 @@ typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
  */
 class ViewManager: public QObject
 {
-	typedef std::map<QString, View2D*> View2DMap;
-	typedef std::map<QString, View3D*> View3DMap;
+//	typedef std::map<QString, ssc::ViewWidget*> View2DMap;
+//	typedef std::map<QString, ssc::ViewWidget*> View3DMap;
 	typedef std::map<QString, ssc::ViewWidget*> ViewMap;
 
 Q_OBJECT
 public:
 
-	View3DQPtr get3DView(int group = 0, int index = 0);
+	ViewWidgetQPtr get3DView(int group = 0, int index = 0);
 	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
 
 //  void fillModelTree(TreeItemPtr root);
@@ -184,12 +184,12 @@ protected:
 	void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
 	void parseXml(QDomNode viewmanagerNode); ///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
 
-	View2DMap* get2DViews(); ///< returns all possible 2D views
-	View3DMap* get3DViews(); ///< returns all possible 3D views
+	ViewMap get2DViews(); ///< returns all possible 2D views
+	ViewMap get3DViews(); ///< returns all possible 3D views
 
 	ssc::ViewWidget* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
-	View2D* get2DView(const QString& uid); ///< returns a 2D view with a given uid
-	View3D* get3DView(const QString& uid); ///< returns a 3D view with a given uid
+//	View2D* get2DView(const QString& uid); ///< returns a 2D view with a given uid
+//	View3D* get3DView(const QString& uid); ///< returns a 3D view with a given uid
 
 	void syncOrientationMode(SyncedValuePtr val);
 	void setStretchFactors(LayoutRegion region, int stretchFactor);
@@ -237,8 +237,8 @@ protected:
 	bool mSmartRender; ///< use ssc::ViewWidget::render()
 	bool mModified; ///< Modified flag tells renderAllViewsSlot() that the views must be updated
 
-	boost::shared_ptr<ViewCache<View2D> > mViewCache2D;
-	boost::shared_ptr<ViewCache<View3D> > mViewCache3D;
+	boost::shared_ptr<ViewCache<ssc::ViewWidget> > mViewCache2D;
+	boost::shared_ptr<ViewCache<ssc::ViewWidget> > mViewCache3D;
 	boost::shared_ptr<ViewCache<ssc::ViewWidget> > mViewCacheRT;
 	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
