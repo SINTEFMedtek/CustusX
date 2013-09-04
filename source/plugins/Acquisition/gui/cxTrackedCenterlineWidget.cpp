@@ -7,7 +7,6 @@
 #include "sscToolRep3D.h"
 #include "sscToolTracer.h"
 #include "cxViewManager.h"
-#include "cxView3D.h"
 #include "cxRepManager.h"
 #include "cxTrackingDataToVolume.h"
 #include "cxPatientData.h"
@@ -15,6 +14,7 @@
 #include "cxTool.h"
 #include "cxPatientService.h"
 #include "sscMessageManager.h"
+#include "sscView.h"
 
 namespace cx
 {
@@ -127,7 +127,7 @@ void TrackedCenterlineWidget::startedSlot(QString sessionId)
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
   ssc::ToolManager::ToolMap::iterator toolIt = tools->begin();
 
-  View3D* view = viewManager()->get3DView(0,0);
+  ViewWidgetQPtr view = viewManager()->get3DView(0,0);
   ssc::ToolRep3DPtr activeRep3D;
   for(; toolIt != tools->end(); ++toolIt)
   {
@@ -145,7 +145,7 @@ void TrackedCenterlineWidget::stoppedSlot(bool)
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
   ssc::ToolManager::ToolMap::iterator toolIt = tools->begin();
 
-  View3D* view = viewManager()->get3DView(0,0);
+  ViewWidgetQPtr view = viewManager()->get3DView(0,0);
   ssc::ToolRep3DPtr activeRep3D;
   for(; toolIt != tools->end(); ++toolIt)
   {

@@ -15,7 +15,7 @@
 #include "vesselReg/SeansVesselReg.hxx"
 #include "sscMesh.h"
 #include "cxViewManager.h"
-#include "cxView3D.h"
+#include "sscView.h"
 #include "sscGeometricRep.h"
 #include <vtkCellArray.h>
 #include "sscGraphicalPrimitives.h"

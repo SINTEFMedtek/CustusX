@@ -18,9 +18,9 @@
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 #include "cxSettings.h"
-#include "cxView3D.h"
 #include "sscToolManager.h"
 #include "Rep/cxLandmarkRep.h"
+#include "sscView.h"
 
 namespace cx
 {
