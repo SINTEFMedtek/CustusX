@@ -31,7 +31,7 @@ include( cxUtilities )
 ###############################################################################
 macro(cx_initialize_custusx_install)
 
-    set(CPACK_PACKAGE_VERSION "${CustusX3_VERSION_STRING}")
+    set(CPACK_PACKAGE_VERSION ${CustusX3_VERSION_STRING})
     set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
     set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
     set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
