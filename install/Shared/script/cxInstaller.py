@@ -94,9 +94,10 @@ Available components are:
         p.add_argument('-d', '--dummy', action='store_true', default=False, help='execute script without calling any shell commands')
         p.add_argument('-t', '--build_type', choices=['Debug','Release','RelWithDebInfo'], help='build type', default='Debug')
         p.add_argument('-s', '--silent_mode', action='store_true', default=False, help='execute script without user interaction')
-        p.add_argument('--isb_password', default="", help='password for svn sintef user at isb')
+        p.add_argument('-i', '--isb_password', default="not set", help='password for ISB GE Connection module')
         p.add_argument('--coverage', action='store_true', default=False, help='gcov code coverage')
         p.add_argument('--doxygen', action='store_true', default=False, help='build doxygen documentation')
+        p.add_argument('-g', '--git_tag', default=None, help='git tag to use when checking out CustusX. None means checkout master branch.')
 #        p.add_argument('--external_dir', default=self.controlData.mExternalDir, help='specify external folder, default=%s'%self.controlData.mExternalDir)
 #        p.add_argument('--working_dir', default=self.controlData.mWorkingDir, help='specify work folder, default=%s'%self.controlData.mWorkingDir)
         rootdir = self.assembly.controlData.getRootDir()
@@ -153,6 +154,7 @@ Available components are:
         data.mCoverage = options.coverage
         data.mDoxygen = options.doxygen
         data.threads = options.threads
+        data.mGitTag = options.git_tag
                 
     def _promptToContinue(self, silent_mode):
         if not silent_mode:
