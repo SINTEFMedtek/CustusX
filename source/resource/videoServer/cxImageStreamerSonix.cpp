@@ -65,7 +65,7 @@ void ImageStreamerSonix::initialize(StringMap arguments)
 {
 	std::cout << "Creating sender type Sonix" << std::endl;
 		  
-	ImageStreamer::initialize(arguments);
+	CommandLineStreamer::initialize(arguments);
 	
 	mMaxqueueInfo = 20;
 //	mMaxBufferSize = 19200000; //800(width)*600(height)*4(bytes)*10(images)
@@ -81,7 +81,7 @@ void ImageStreamerSonix::initialize(StringMap arguments)
 
 	mSendTimer = new QTimer;
 	connect(mSendTimer, SIGNAL(timeout()), this, SLOT(initializeSonixSlot()));
-	setSendInverval(10000);
+	this->setSendInterval(10000);
 	mSendTimer->setInterval(getSendInterval());
 	mSendTimer->start();
 

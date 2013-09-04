@@ -222,15 +222,15 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 	}
 
 	// volume rep
+#ifndef WIN32
 	if (!ssc::GPURayCastVolumeRep::isSupported(view->getRenderWindow()))
 		return false;
-//#ifndef WIN32
 	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
 	mRepPtr->setShaderFolder(mShaderFolder);
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
 	view->addRep(mRepPtr);
-//#endif //WIN32
+#endif //WIN32
 
 	// Tool 3D rep
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();

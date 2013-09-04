@@ -26,6 +26,10 @@
 #include "sscTool.h"
 #include "sscTime.h"
 
+#ifdef CX_WINDOWS
+#include <windows.h>
+#endif
+
 TestUSSavingRecorderController::TestUSSavingRecorderController(QObject* parent) : QObject(parent)
 {
 	mRecorder.reset(new cx::USSavingRecorder());
@@ -107,7 +111,11 @@ void TestUSSavingRecorderController::saveAndWaitForCompleted()
 	while (mRecorder->getNumberOfSavingThreads() > 0)
 	{
 		qApp->processEvents();
-		usleep(10000);
+#ifndef CX_WINDOWS
+		usleep(10*1000);
+#else
+		Sleep(10);
+#endif
 	}
 	SSC_LOG("endwait");
 }
