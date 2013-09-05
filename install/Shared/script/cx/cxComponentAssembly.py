@@ -31,21 +31,6 @@ class LibraryAssembly:
     '''
     def __init__(self):
         self.controlData = cxInstallData.Common()
-#        self.libraries = [
-#                     #CppUnit(),
-#                     cxComponents.ITK(),
-#                     cxComponents.VTK(),
-#                     cxComponents.OpenCV(),
-#                     cxComponents.OpenIGTLink(),
-#                     cxComponents.IGSTK(),
-#                     #DCMTK(),
-#                     #SSC(),
-#                     #cxComponents.ISB_DataStreaming(),
-#                     cxComponents.UltrasonixSDK(),
-#                     #cxComponents.TubeSegmentationFramework(),
-#                     cxComponents.CustusX3(),
-#                     cxComponents.CustusX3Data()
-#                     ]
         self.libraries = []
         self.libraries.append(cxComponents.ITK())
         self.libraries.append(cxComponents.VTK())
@@ -62,7 +47,6 @@ class LibraryAssembly:
         
         for lib in self.libraries:
             lib.setControlData(self.controlData)
-#        self._startTime = time.time()
 
     def getComponent(self, type):
         for comp in self.libraries:
@@ -90,9 +74,6 @@ class LibraryAssembly:
         '''
         selectedLibraries = [lib for lib in self.libraries if lib.name() in self.selectedLibraryNames]
                     
-#        for lib in selectedLibraries:
-#            lib.setControlData(self.controlData)
-
         operations = []
 
         if checkout:
