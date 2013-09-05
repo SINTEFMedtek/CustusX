@@ -11,29 +11,36 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
+#include "cxtestMultiVolume3DRepProducerFixture.h"
 
-#ifndef CXTESTUTILITIES_H_
-#define CXTESTUTILITIES_H_
 
-#include "vtkForwardDeclarations.h"
-#include "sscForwardDeclarations.h"
-#include "sscVector3D.h"
 
 namespace cxtest
 {
 
-/**
- * A collection of functionality used for testing.
- *
- * \date May 21, 2013
- * \author Janne Beate Bakeng, SINTEF
- */
-class Utilities
+MultiVolume3DRepProducerFixture::MultiVolume3DRepProducerFixture()
 {
-public:
-	static vtkImageDataPtr create3DVtkImageData(Eigen::Array3i dim = Eigen::Array3i(3,3,3));
-	static ssc::ImagePtr create3DImage(Eigen::Array3i dim = Eigen::Array3i(3,3,3));
-};
+	ssc::MessageManager::initialize();
+}
 
-} /* namespace cxtest */
-#endif /* CXTESTUTILITIES_H_ */
+MultiVolume3DRepProducerFixture::~MultiVolume3DRepProducerFixture()
+{
+	ssc::MessageManager::shutdown();
+}
+
+void MultiVolume3DRepProducerFixture::initializeVisualizerAndImages(QString type, int imageCount)
+{
+	mBase.setVisualizerType(type);
+	for (unsigned i=0; i<imageCount; ++i)
+	{
+		ssc::ImagePtr image = cxtest::Utilities::create3DImage();
+		mBase.addImage(image);
+		mImages.push_back(image);
+	}
+}
+
+
+
+} // namespace cxtest
+
+

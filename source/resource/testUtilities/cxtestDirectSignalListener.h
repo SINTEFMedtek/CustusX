@@ -11,32 +11,34 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
-#ifndef CXMULTIVOLUME3DVISUALIZER_H
-#define CXMULTIVOLUME3DVISUALIZER_H
+#ifndef CXTESTDIRECTSIGNALLISTENER_H
+#define CXTESTDIRECTSIGNALLISTENER_H
 
 #include <QObject>
-#include <boost/shared_ptr.hpp>
 
-namespace cx
+namespace cxtest
 {
 
-typedef boost::shared_ptr<class MultiVolume3DVisualizer> MultiVolume3DVisualizerPtr;
-/** 
+/**
+ * \brief Listen for signals using Qt::DirectConnection.
  *
- *
- * \ingroup cxServiceVisualization
- * \date 4 Sep 2013
- * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
+ * \author Christian Askeland, SINTEF
+ * \date Sep 5, 2013
  */
-class MultiVolume3DVisualizer
+class DirectSignalListener : public QObject
 {
+	Q_OBJECT
 public:
-	MultiVolume3DVisualizer();
+	DirectSignalListener(QObject* object, const char* signal);
+	~DirectSignalListener(){}
+	bool isReceived();
+private slots:
+	void slot();
+private:
+	bool mReceived;
 };
 
-} // namespace cx
+} /* namespace cxtest */
 
-
-
-#endif // CXMULTIVOLUME3DVISUALIZER_H
+#endif // CXTESTDIRECTSIGNALLISTENER_H

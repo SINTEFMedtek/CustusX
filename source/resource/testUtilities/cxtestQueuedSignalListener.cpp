@@ -12,69 +12,73 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxtestSignalListener.h"
+#include "cxtestQueuedSignalListener.h"
 
 #include <iostream>
 #include <QTimer>
 #include <QEventLoop>
 #include <boost/lexical_cast.hpp>
+#include "sscTypeConversions.h"
 
 namespace cxtest
 {
 
-bool waitForSignal(QObject* object, const char* signal, int maxWaitMilliSeconds)
+bool waitForQueuedSignal(QObject* object, const char* signal, int maxWaitMilliSeconds)
 {
-	SignalListener listener(object, signal, maxWaitMilliSeconds);
+	QueuedSignalListener listener(object, signal, maxWaitMilliSeconds);
 	listener.exec();
 	bool signalArrived = !listener.timedOut();
 	std::string feedback = signalArrived ? "arrived." : "did NOT arrive. Timed out. ";
-	std::cout << "[SIGNALLISTENER] " << signal << feedback << std::endl;
+	std::cout << "[QueuedSignalListener] " << signal << feedback << std::endl;
 	return signalArrived;
 }
 
-SignalListener::SignalListener(QObject* object, const char* signal, int maxWaitMilliSeconds) :
+QueuedSignalListener::QueuedSignalListener(QObject* object, const char* signal, int maxWaitMilliSeconds) :
 		mTimedOut(false)
 {
 	createTimer(maxWaitMilliSeconds);
 	createEventLoop(object, signal);
 }
 
-SignalListener::~SignalListener()
+QueuedSignalListener::~QueuedSignalListener()
 {
 	delete mTimer;
 	delete mLoop;
 }
 
-int SignalListener::exec()
+int QueuedSignalListener::exec()
 {
 	mTimer->start();
 	int retval = mLoop->exec();
 	return retval;
 }
 
-bool SignalListener::timedOut()
+bool QueuedSignalListener::timedOut()
 {
 	return mTimedOut;
 }
 
-void SignalListener::quit()
+void QueuedSignalListener::quit()
 {
 	mTimedOut = (this->sender() == mTimer);
 	mTimer->stop();
 	mLoop->quit();
 }
 
-void SignalListener::createTimer(int maxWaitMilliSeconds)
+void QueuedSignalListener::createTimer(int maxWaitMilliSeconds)
 {
 	mTimer = new QTimer;
 	mTimer->setInterval(maxWaitMilliSeconds);
 	QObject::connect(mTimer, SIGNAL(timeout()), this, SLOT(quit()));
 }
 
-void SignalListener::createEventLoop(QObject* object, const char* signal)
+void QueuedSignalListener::createEventLoop(QObject* object, const char* signal)
 {
 	mLoop = new QEventLoop;
 	QObject::connect(object, signal, this, SLOT(quit()));
 }
+
+
+
 
 } /* namespace cxtest */
