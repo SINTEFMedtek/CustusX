@@ -14,7 +14,6 @@
 
 #include "cxCameraStyle.h"
 
-#include "cxView3D.h"
 #include <QWidget>
 #include <QMenu>
 #include <QAction>
@@ -67,7 +66,7 @@ CameraStyle::CameraStyle() :
 	this->viewChangedSlot();
 }
 
-View3D* CameraStyle::getView() const
+ViewWidgetQPtr CameraStyle::getView() const
 {
 	return viewManager()->get3DView();
 }

@@ -7,71 +7,29 @@
 ##
 ###########################################################
 
-SET( CX_QT_MOC_HEADER_FILES
-    cxView2D.h
-    cxView3D.h
-    cxViewWrapper2D.h
-    cxViewWrapper3D.h
-    cxViewWrapperVideo.h
-    cxViewManager.h
-    cxViewWrapper.h
-    cxViewGroup.h
-    cxInteractiveClipper.h
-    cxInteractiveCropper.h
-    cxCameraControl.h
-    cxCameraStyle.h
-    Rep/cxLandmarkRep.h
-    Rep/sscOrientationAnnotation3DRep.h
-    Rep/sscOrientationAnnotation2DRep.h
-	Rep/sscImage2DRep3D.h
-    cxRepManager.h
-    cxThresholdPreview.h
-)
+cx_add_class_qt_moc(cxVisualizationService_SOURCE
+    cxViewWrapper2D
+    cxViewWrapper3D
+    cxViewWrapperVideo
+    cxViewManager
+    cxViewWrapper
+    cxViewGroup
+    cxInteractiveClipper
+    cxInteractiveCropper
+    cxCameraControl
+    cxCameraStyle
+    Rep/cxLandmarkRep
+    Rep/sscOrientationAnnotation3DRep
+    Rep/sscOrientationAnnotation2DRep
+    Rep/sscImage2DRep3D
+    cxRepManager
+    cxThresholdPreview
+    cxMultiVolume3DVisualizer
+    cxViewGroupData
+    )
 
-SET ( cxVisualizationService_SOURCE
-    ${CX_QT_MOC_HEADER_FILES}
-    cxView2D.cpp
-    cxView2D.h
-    cxView3D.cpp
-    cxView3D.h
-    cxViewWrapper2D.cpp
-    cxViewWrapper2D.h
-    cxViewWrapperVideo.cpp
-    cxViewWrapperVideo.h
-    cxViewWrapper3D.cpp
-    cxViewWrapper3D.h
-    cxViewWrapper.h
-    cxViewWrapper.cpp
-    cxViewManager.cpp
-    cxViewManager.h
-    cxViewGroup.h
-    cxViewGroup.cpp
-    cxLayoutData.h
-    cxLayoutData.cpp
-    cxInteractiveClipper.h
-    cxInteractiveClipper.cpp
-    cxInteractiveCropper.h
-    cxInteractiveCropper.cpp
-    cxCameraControl.h
-    cxCameraControl.cpp
-    cxCameraStyle.h
-    cxCameraStyle.cpp
-    Rep/cxLandmarkRep.h
-    Rep/cxLandmarkRep.cpp
-#    Rep/cxImageLandmarkRep.h
-#    Rep/cxImageLandmarkRep.cpp
-#    Rep/cxPatientLandmarkRep.h
-#    Rep/cxPatientLandmarkRep.cpp
-    Rep/sscOrientationAnnotation3DRep.h
-    Rep/sscOrientationAnnotation3DRep.cpp
-    Rep/sscOrientationAnnotation2DRep.h
-    Rep/sscOrientationAnnotation2DRep.cpp
-	Rep/sscImage2DRep3D.h
-	Rep/sscImage2DRep3D.cpp
-    cxRepManager.h
-    cxRepManager.cpp
-    cxThresholdPreview.h
-    cxThresholdPreview.cpp
+cx_add_class(cxVisualizationService_SOURCE
+    cxLayoutData
     )
 
 include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
@@ -81,8 +39,6 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/video
     )
-
-QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 include_directories(Rep)
 

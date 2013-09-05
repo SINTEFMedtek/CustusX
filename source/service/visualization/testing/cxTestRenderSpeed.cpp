@@ -7,8 +7,6 @@
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 //#include "cxForwardDeclarations.h"
-#include "cxView3D.h"
-#include "cxView2D.h"
 
 namespace cxtest
 {
@@ -86,7 +84,7 @@ void TestRenderSpeed::create3Dviews(int num)
 	mNumViews += num;
 	for(int i = 0; i < num; ++i)
 	{
-		cx::View3D* view = new cx::View3D("testView3D", "testView3D", NULL);
+		ssc::ViewWidget* view = new ssc::ViewWidget("testView3D", "testView3D", NULL);
 		mViews.push_back(view);
 	}
 }
@@ -96,7 +94,7 @@ void TestRenderSpeed::create2Dviews(int num)
 	mNumViews += num;
 	for(int i = 0; i < num; ++i)
 	{
-		cx::View2D* view = new cx::View2D("testView2D", "testView2D", NULL);
+		ssc::ViewWidget* view = new ssc::ViewWidget("testView2D", "testView2D", NULL);
 		mViews.push_back(view);
 	}
 }

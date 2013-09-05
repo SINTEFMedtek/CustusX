@@ -32,8 +32,6 @@ class QActionGroup;
 namespace cx
 {
 
-class View3D;
-
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 using ssc::Transform3D;
 
@@ -77,7 +75,7 @@ private slots:
 	void setInteractionStyleActionSlot();
 
 private:
-	View3D* getView() const;
+	ViewWidgetQPtr getView() const;
 	vtkRendererPtr getRenderer() const;
 	vtkCameraPtr getCamera() const;
 	ssc::ToolRep3DPtr getToolRep() const;
