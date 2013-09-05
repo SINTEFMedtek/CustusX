@@ -30,6 +30,7 @@ import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
 import cx.cxJenkinsBuildScriptBase
+import cx.cxCustusXInstaller
 import cx.cxCustusXTestInstallation
 
 
@@ -38,6 +39,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
     '''
     def __init__(self):
         ''
+        self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
         self.cxInstallation = cx.cxCustusXTestInstallation.CustusXTestInstallation()
         super(Controller, self).__init__()
 
@@ -69,21 +71,26 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         assembly = self.cxBuilder.assembly                
         custusxdata = assembly.getComponent(cx.cxComponents.CustusX3Data)
         custusx = assembly.getComponent(cx.cxComponents.CustusX3)
+        
+        self.cxInstaller.setRootDir(assembly.controlData.getRootDir())
+        self.cxInstaller.setInstallerPath(custusx.buildPath())        
+        self.cxInstaller.setSourcePath(custusx.sourcePath())        
+
         self.cxInstallation.setRootDir(assembly.controlData.getRootDir())
         self.cxInstallation.setTestDataPath(custusxdata.sourcePath())
-        self.cxInstallation.setInstallerPath(custusx.buildPath())        
+        self.cxInstallation.setInstalledRoot(self.cxInstaller.getInstalledRoot())        
 
     def run(self):
         if not self.argumentParserArguments.skip_checkout:
             self._checkoutComponents()
         if not self.argumentParserArguments.skip_install:
-            self.cxInstallation.installPackage()
+            self.cxInstaller.installPackage()
         if not self.argumentParserArguments.skip_tests:
             self.cxInstallation.testInstallation()
             self.cxInstallation.runIntegrationTests()
         if not self.argumentParserArguments.skip_publish_release:
-            folder = self.cxInstallation.createReleaseFolder()
-            self.cxInstallation.publishReleaseFolder(folder)
+            folder = self.cxInstaller.createReleaseFolder()
+            self.cxInstaller.publishReleaseFolder(folder)
         self.cxBuilder.finish()
     
     def _checkoutComponents(self):
