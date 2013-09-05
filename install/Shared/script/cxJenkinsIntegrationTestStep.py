@@ -51,6 +51,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         p.add_argument('--skip_checkout', action='store_true', default=False, help='Skip the checkout of data')
         p.add_argument('--skip_install', action='store_true', default=False, help='Skip installing the package')
         p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
+        p.add_argument('--skip_publish_release', action='store_true', default=False, help='Skip the publish release to server step')
 
     def _applyArgumentParserArguments(self, options):
         'apply arguments defined in _addArgumentParserArguments()'
@@ -66,10 +67,10 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         from the build process.
         '''
         assembly = self.cxBuilder.assembly                
-        self.cxInstallation.setRootDir(assembly.controlData.getRootDir())
         custusxdata = assembly.getComponent(cx.cxComponents.CustusX3Data)
-        self.cxInstallation.setTestDataPath(custusxdata.sourcePath())
         custusx = assembly.getComponent(cx.cxComponents.CustusX3)
+        self.cxInstallation.setRootDir(assembly.controlData.getRootDir())
+        self.cxInstallation.setTestDataPath(custusxdata.sourcePath())
         self.cxInstallation.setInstallerPath(custusx.buildPath())        
 
     def run(self):
@@ -80,6 +81,9 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         if not self.argumentParserArguments.skip_tests:
             self.cxInstallation.testInstallation()
             self.cxInstallation.runIntegrationTests()
+        if not self.argumentParserArguments.skip_publish_release:
+            folder = self.cxInstallation.createReleaseFolder()
+            self.cxInstallation.publishReleaseFolder(folder)
         self.cxBuilder.finish()
     
     def _checkoutComponents(self):

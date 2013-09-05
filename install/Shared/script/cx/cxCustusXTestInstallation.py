@@ -64,8 +64,56 @@ class CustusXTestInstallation:
     def _getInstalledSettingsPath(self):
         return '%s/CustusX/config/settings' % self.install_root
         
+    def createReleaseFolder(self):
+        '''
+        Create a folder containing all the files required for a Release.
+        Ready to be moved to a distribution server.
+        '''
+        PrintFormatter.printHeader('create local release folder', level=2)
+        installerFile = self._findInstallerFile()
+        suffix = self._getInstallerPackageSuffix()
+        releaseFolderName = os.path.basename(installerFile).split('.%s'%suffix)[0]
+        targetPath = '%s/Release/%s' % (self.installer_path, releaseFolderName)
+        PrintFormatter.printInfo('Creating folder %s' % targetPath)
+        #os.makedirs(targetPath) - no good - complains if existing.
+        shell.run('mkdir -p %s' % targetPath)
+        shutil.copy2(installerFile, targetPath)
+        return targetPath
+        
+
+    def publishReleaseFolder(self, path):
+        '''
+        Copy a release folder to medtek.sintef.no
+        '''
+        PrintFormatter.printHeader('copy/publish package to medtek server', level=2)
+        remoteServer = "medtek.sintef.no"
+        remoteServerPath = "/Volumes/MedTekDisk/Software/CustusX/AutomatedReleases"
+#        remoteServer = "localhost"
+#        remoteServerPath = "/Users/christiana/tst/AutomatedReleases"
+        targetFolder = os.path.split(path)[1]
+        source = '%s/*' % path
+        target = '%s/%s/%s' % (remoteServerPath, targetFolder, platform.system())
+        cmd1 = 'ssh localhost "mkdir -p %s"' % target
+        cmd2 = 'scp -r %s/* %s:%s' % (path, remoteServer, target)
+        PrintFormatter.printInfo('Publishing contents of [%s] to remote path [%s]' % (path, target))
+        shell.run(cmd1)
+        shell.run(cmd2)
+
+#    def getInstallFolder(self):
+#        git_description = shell.evaluate('git describe --tags')
+#        os_description = 'linux_test'
+#        return 'CustusX.%s.%s' % (git_description, os_description)
+
     def installPackage(self):
         PrintFormatter.printHeader('Install package', level=3)
+        file = self._findInstallerFile()
+        PrintFormatter.printInfo('Installing file %s' % file)
+        self._installFile(file)
+        
+    def _findInstallerFile(self):
+        '''
+        Find the full name of the installer file.
+        '''
         pattern = self._getInstallerPackagePattern()
         PrintFormatter.printInfo('Looking for installers with pattern: %s' % pattern)
         files = glob.glob(pattern)
@@ -73,9 +121,8 @@ class CustusXTestInstallation:
                         'Found %i install files, requiring 1: \n pattern: %s\n Found:\n %s' % 
                         (len(files), pattern, ' \n'.join(files)))
         file = files[0]
-        PrintFormatter.printInfo('Installing file %s' % file)
-        self._installFile(file)
-        
+        return file
+
     def _installFile(self, filename):
         if platform.system() == 'Darwin':
             self._installDMG(filename)
@@ -83,12 +130,21 @@ class CustusXTestInstallation:
             self._installLinuxZip(filename)
     
     def _getInstallerPackagePattern(self):
-        if platform.system() == 'Darwin':
-            pattern = 'CustusX_*.dmg'
-        if platform.system() == 'Linux':
-            pattern = 'CustusX*.tar.gz'
-        return '%s/%s' % (self.installer_path, pattern)
+        suffix = self._getInstallerPackageSuffix()
+        return '%s/CustusX*.%s' % (self.installer_path, suffix)
+#        if platform.system() == 'Darwin':
+#            pattern = 'CustusX_*.dmg'
+#        if platform.system() == 'Linux':
+#            pattern = 'CustusX*.tar.gz'
+#        return '%s/%s' % (self.installer_path, pattern)
         
+    def _getInstallerPackageSuffix(self):
+        if platform.system() == 'Darwin':
+            return 'dmg'
+        if platform.system() == 'Linux':
+            return 'tar.gz'
+        cxUtilities.assertTrue(False, 'suffix not found for OS=%s' % platform.system())
+
     def _installLinuxZip(self, filename):
         temp_path = '%s/temp/Install' % self.root_dir
         #install_root
