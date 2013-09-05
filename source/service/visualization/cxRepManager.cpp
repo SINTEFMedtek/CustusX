@@ -89,17 +89,15 @@ ssc::VolumetricBaseRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 
   if (!mVolumetricRepByImageMap.count(image->getUid()))
   {
-	QString uid("VolumetricRep_img_" + image->getUid());
-//    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
 	ssc::VolumetricBaseRepPtr rep;
 
 	if (useProgressiveLODTextureVolumeRayCastMapper && !useGPURender)
 	{
-		rep = ssc::ProgressiveLODVolumetricRep::New(uid, uid);
+		rep = ssc::ProgressiveLODVolumetricRep::New();
 	}
 	else
 	{
-		ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
+		ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New();
 		if (useGPURender)
 		{
 			volrep->setUseGPUVolumeRayCastMapper();

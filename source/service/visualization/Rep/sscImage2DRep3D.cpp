@@ -118,8 +118,8 @@ void Image2DProxy::transferFunctionsChangedSlot()
 // --------------------------------------------------------
 
 
-Image2DRep3D::Image2DRep3D(const QString& uid) :
-	RepImpl(uid)
+Image2DRep3D::Image2DRep3D() :
+	RepImpl("")
 {
 	mProxy = Image2DProxy::New();
 	mView = NULL;
@@ -129,12 +129,11 @@ Image2DRep3D::~Image2DRep3D()
 {
 }
 
-Image2DRep3DPtr Image2DRep3D::New(const QString& uid)
-{
-	Image2DRep3DPtr retval(new Image2DRep3D(uid));
-	retval->mSelf = retval;
-	return retval;
-}
+
+//Image2DRep3DPtr Image2DRep3D::New(QString uid)
+//{
+//	return ssc::RepImpl::wrap(new Image2DRep3D(), uid);
+//}
 
 void Image2DRep3D::setImage(ssc::ImagePtr image)
 {

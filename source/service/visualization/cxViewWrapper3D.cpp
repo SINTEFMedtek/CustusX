@@ -586,7 +586,7 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
 		if (image->getBaseVtkImageData()->GetDimensions()[2]==1)
 		{
-			cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New(data->getUid()+"image2DRep");
+			cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New();
 			rep->setImage(image);
 			return rep;
 		}

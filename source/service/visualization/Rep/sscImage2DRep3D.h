@@ -90,14 +90,14 @@ class Image2DRep3D: public ssc::RepImpl
 {
 Q_OBJECT
 public:
-	static Image2DRep3DPtr New(const QString& uid);
+	static Image2DRep3DPtr New(QString uid="") { return wrap_new(new Image2DRep3D(), uid); }
 	virtual ~Image2DRep3D();
 	virtual QString getType() const { return "cx::Image2DRep3D"; }
 
 	void setImage(ssc::ImagePtr image);
 
 protected:
-	Image2DRep3D(const QString& uid);
+	Image2DRep3D();
 	virtual void addRepActorsToViewRenderer(ssc::View *view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
 
