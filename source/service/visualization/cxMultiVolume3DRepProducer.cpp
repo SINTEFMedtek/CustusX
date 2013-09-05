@@ -132,18 +132,14 @@ bool MultiVolume3DRepProducer::isSingleVolumeRenderer() const
 
 void MultiVolume3DRepProducer::buildSscImage2DRep3D(ssc::ImagePtr image)
 {
-	QString uid("VolumetricRep_img_" + image->getUid());
-
-	cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New(image->getUid()+"image2DRep");
+	cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New();
 	rep->setImage(image);
 	mReps.push_back(rep);
 }
 
 void MultiVolume3DRepProducer::buildVtkVolumeTextureMapper3D(ssc::ImagePtr image)
 {
-	QString uid("VolumetricRep_img_" + image->getUid());
-
-	ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
+	ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New();
 	rep->setUseVolumeTextureMapper();
 
 	rep->setMaxVolumeSize(this->getMaxRenderSize());
@@ -153,9 +149,7 @@ void MultiVolume3DRepProducer::buildVtkVolumeTextureMapper3D(ssc::ImagePtr image
 
 void MultiVolume3DRepProducer::buildVtkGPUVolumeRayCastMapper(ssc::ImagePtr image)
 {
-	QString uid("VolumetricRep_img_" + image->getUid());
-
-	ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
+	ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New();
 	rep->setUseGPUVolumeRayCastMapper();
 
 	rep->setMaxVolumeSize(this->getMaxRenderSize());
@@ -165,9 +159,7 @@ void MultiVolume3DRepProducer::buildVtkGPUVolumeRayCastMapper(ssc::ImagePtr imag
 
 void MultiVolume3DRepProducer::buildSscProgressiveLODVolumeTextureMapper3D(ssc::ImagePtr image)
 {
-	QString uid("VolumetricRep_img_" + image->getUid());
-
-	ssc::ProgressiveLODVolumetricRepPtr rep = ssc::ProgressiveLODVolumetricRep::New(uid, uid);
+	ssc::ProgressiveLODVolumetricRepPtr rep = ssc::ProgressiveLODVolumetricRep::New();
 
 	rep->setMaxVolumeSize(this->getMaxRenderSize());
 	rep->setImage(image);
