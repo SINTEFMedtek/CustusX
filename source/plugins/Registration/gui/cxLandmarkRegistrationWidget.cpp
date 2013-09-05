@@ -13,8 +13,6 @@
 #include "sscMessageManager.h"
 #include "cxRegistrationManager.h"
 #include "sscDataManager.h"
-#include "cxView3D.h"
-#include "cxView2D.h"
 #include "cxRegistrationHistoryWidget.h"
 #include "sscTypeConversions.h"
 #include "sscManualTool.h"

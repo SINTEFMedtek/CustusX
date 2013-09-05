@@ -186,16 +186,6 @@ void InteractiveCropper::setBoundingBox(const ssc::DoubleBoundingBox3D& bb_d)
 	this->setBoxWidgetSize(bb_d);
 }
 
-vtkVolumeMapperPtr InteractiveCropper::getMapper()
-{
-	if (!mImage)
-		return vtkVolumeMapperPtr();
-	ssc::VolumetricBaseRepPtr volRep = RepManager::getInstance()->getVolumetricRep(mImage);
-
-	vtkVolumeMapperPtr mapper = dynamic_cast<vtkVolumeMapper*> (volRep->getVtkVolume()->GetMapper());
-	return mapper;
-}
-
 void InteractiveCropper::useCropping(bool on)
 {
 	if (this->getUseCropping() == on)

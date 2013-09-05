@@ -51,9 +51,9 @@ else (APPLE)
         add_executable(CustusX ${SOURCES} CustusX.rc) #32bit dunno why
     elseif(CX_WIN64)
         add_executable(CustusX WIN32 ${SOURCES} CustusX.rc) #64bit
-    else(CX_WINDOWS)
+    else() # WINDOWS or LINUX
         add_executable(CustusX ${SOURCES} )
-    endif(CX_WINDOWS)
+    endif()
 endif (APPLE)
 
 #------------------------------------------------------------------------------

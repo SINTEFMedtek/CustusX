@@ -38,7 +38,6 @@
 #include "sscImage.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
-#include "cxView3D.h"
 #include "cxInteractiveCropper.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
