@@ -26,15 +26,15 @@ if (BUILD_TESTING)
         ..
         )
 
-        QT4_WRAP_CPP(CXTEST_PATIENTSERVICE_SOURCES
+        cx_add_class_qt_moc(CXTEST_PATIENTSERVICE_SOURCES
                 )
-        set(CXTEST_PATIENTSERVICE_SOURCES ${CXTEST_PATIENTSERVICE_SOURCES}
+        cx_add_class(CXTEST_PATIENTSERVICE_SOURCES
             cxtestCatchPatientService.cpp
-	        cxtestCatchFrameMetric.cpp
+            cxtestCatchFrameMetric.cpp
             cxtestCatchToolMetric.cpp
             cxtestCatchDistanceMetric.cpp
-            cxtestMetricFixture.h
-            cxtestMetricFixture.cpp            )
+            cxtestMetricFixture
+            )
 
         cx_catch_add_lib_and_exe(cxPatientService "${CXTEST_PATIENTSERVICE_SOURCES}")
 
