@@ -30,19 +30,14 @@ if (BUILD_TESTING)
         # link statically on linux, see explanation in cx_catch__private_define_platform_specific_linker_options
         cx_catch__private_define_platform_specific_linker_options()
 
-        QT4_WRAP_CPP( CX_TESTUTILITIES_SOURCE_FILES
-            cxtestSignalListener.h
-            cxtestUtilities.h
+        cx_add_class_qt_moc( CX_TESTUTILITIES_SOURCE_FILES
+            cxtestQueuedSignalListener
+            cxtestDirectSignalListener
             )
-	set(CX_TESTUTILITIES_SOURCE_FILES
-            cxtestUtilities.h
-            cxtestUtilities.cpp
-	    cxtestSignalListener.h
-	    cxtestSignalListener.cpp
-	    cxtestCatchImpl.h
-	    cxtestCatchImpl.cpp
+        cx_add_class(CX_TESTUTILITIES_SOURCE_FILES
+            cxtestUtilities
+            cxtestCatchImpl
 	    cxtestCatchExamples.cpp
-            ${CX_TESTUTILITIES_SOURCE_FILES}
             )
 	include_directories(
 	    .

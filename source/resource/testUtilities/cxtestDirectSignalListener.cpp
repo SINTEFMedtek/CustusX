@@ -11,34 +11,25 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
+#include "cxtestDirectSignalListener.h"
 
-#include "cxView2D.h"
+namespace cxtest
+{
 
-#include <QWidget>
-#include <QMenu>
-#include <QAction>
-#include <QContextMenuEvent>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-
-namespace cx
+DirectSignalListener::DirectSignalListener(QObject* object, const char* signal) : mReceived(false)
 {
-/**
- * \param uid the views unique id
- * \param name the views name
- * \param parent the views parent
- * \param f flags
- */
-View2D::View2D(const QString& uid, const QString& name,
-    QWidget *parent, Qt::WFlags f) :
-    ViewWidget(parent, f)
-{
-  mUid = uid;
-  mName = name;
-  this->setContextMenuPolicy(Qt::CustomContextMenu);
-}
-View2D::~View2D()
-{
+	connect(object, signal, this, SLOT(slot()));
 }
 
-}//namespace cx
+void DirectSignalListener::slot()
+{
+	mReceived = true;
+}
+
+bool DirectSignalListener::isReceived()
+{
+	return mReceived;
+}
+
+} // namespace cxtest
+

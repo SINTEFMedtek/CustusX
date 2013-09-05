@@ -12,8 +12,8 @@
 //
 // See CustusX_License.txt for more information.
 
-#ifndef CXTESTSIGNALLISTENER_H_
-#define CXTESTSIGNALLISTENER_H_
+#ifndef CXTESTQUEUEDSIGNALLISTENER_H_
+#define CXTESTQUEUEDSIGNALLISTENER_H_
 
 #include <QObject>
 
@@ -23,22 +23,23 @@ class QEventLoop;
 namespace cxtest
 {
 
-bool waitForSignal(QObject* object, const char* signal, int maxWaitMilliSeconds = 100);
+bool waitForQueuedSignal(QObject* object, const char* signal, int maxWaitMilliSeconds = 100);
 
 /**
  * \brief Object that waits for a signal to arrive from a given QObject. If
- * this takes longer than a given time, it will time out.
+ * this takes longer than a given time, it will time out. The signal connection is of
+ * type Qt::QueuedConnection.
  *
  * \author Janne Beate Bakeng, SINTEF
  * \date May 15, 2013
  */
-class SignalListener : public QObject
+class QueuedSignalListener : public QObject
 {
 	Q_OBJECT
 
 public:
-	SignalListener(QObject* object, const char* signal, int maxWaitMilliSeconds = 100);
-	virtual ~SignalListener();
+	QueuedSignalListener(QObject* object, const char* signal, int maxWaitMilliSeconds = 100);
+	virtual ~QueuedSignalListener();
 
 	int exec(); ///< runs the eventloop that makes sure signals are sent
 	bool timedOut();
@@ -58,4 +59,4 @@ private:
 
 
 } /* namespace cxtest */
-#endif /* CXTESTSIGNALLISTENER_H_ */
+#endif /* CXTESTQUEUEDSIGNALLISTENER_H_ */

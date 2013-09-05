@@ -15,6 +15,10 @@
 ###########################################################
 #               cxPatientService Tests
 ###########################################################
+# _USE_MATH_DEFINES Must be defined before math.h is included
+if (CX_WINDOWS)
+    add_definitions(-D_USE_MATH_DEFINES)
+endif(CX_WINDOWS)
 
 if (BUILD_TESTING)
         # Catch unit test framework stuff:
@@ -22,15 +26,15 @@ if (BUILD_TESTING)
         ..
         )
 
-        QT4_WRAP_CPP(CXTEST_PATIENTSERVICE_SOURCES
+        cx_add_class_qt_moc(CXTEST_PATIENTSERVICE_SOURCES
                 )
-        set(CXTEST_PATIENTSERVICE_SOURCES ${CXTEST_PATIENTSERVICE_SOURCES}
+        cx_add_class(CXTEST_PATIENTSERVICE_SOURCES
             cxtestCatchPatientService.cpp
-	        cxtestCatchFrameMetric.cpp
+            cxtestCatchFrameMetric.cpp
             cxtestCatchToolMetric.cpp
             cxtestCatchDistanceMetric.cpp
-            cxtestMetricFixture.h
-            cxtestMetricFixture.cpp            )
+            cxtestMetricFixture
+            )
 
         cx_catch_add_lib_and_exe(cxPatientService "${CXTEST_PATIENTSERVICE_SOURCES}")
 

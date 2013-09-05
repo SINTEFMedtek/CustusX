@@ -23,7 +23,7 @@
 #include "sscApplication.h"
 
 #ifdef WIN32
-int WinMain(int argc, char *argv[])
+int __stdcall WinMain(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
 #endif

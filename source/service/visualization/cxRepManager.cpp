@@ -89,17 +89,15 @@ ssc::VolumetricBaseRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 
   if (!mVolumetricRepByImageMap.count(image->getUid()))
   {
-	QString uid("VolumetricRep_img_" + image->getUid());
-//    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
 	ssc::VolumetricBaseRepPtr rep;
 
 	if (useProgressiveLODTextureVolumeRayCastMapper && !useGPURender)
 	{
-		rep = ssc::ProgressiveLODVolumetricRep::New(uid, uid);
+		rep = ssc::ProgressiveLODVolumetricRep::New();
 	}
 	else
 	{
-		ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
+		ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New();
 		if (useGPURender)
 		{
 			volrep->setUseGPUVolumeRayCastMapper();
@@ -111,31 +109,6 @@ ssc::VolumetricBaseRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 		rep = volrep;
 	}
 
-//#if !defined(__APPLE__) && !defined(WIN32)
-//	// linux:
-//	if (useGPURender)
-//	{
-//		ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
-//		volrep->setUseGPUVolumeRayCastMapper();
-//		rep = volrep;
-//	}
-//	else
-//	{
-//		rep = ssc::ProgressiveLODVolumetricRep::New(uid, uid);
-//	}
-//#else
-//	ssc::VolumetricRepPtr volrep = ssc::VolumetricRep::New(uid, uid);
-//	if (useGPURender)
-//	{
-//		volrep->setUseGPUVolumeRayCastMapper();
-//	}
-//	else
-//	{
-//		volrep->setUseVolumeTextureMapper();
-//	}
-//	rep = volrep;
-//#endif
-
     rep->setMaxVolumeSize(maxRenderSize);
     rep->setImage(image);
     mVolumetricRepByImageMap[image->getUid()] = rep;
@@ -146,6 +119,9 @@ ssc::VolumetricBaseRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 
   return mVolumetricRepByImageMap[image->getUid()];
 }
+
+
+
 
 void RepManager::purgeVolumetricReps()
 {

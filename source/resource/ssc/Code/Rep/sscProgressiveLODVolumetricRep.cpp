@@ -85,8 +85,8 @@ private:
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep(const QString& uid, const QString& name) :
-	VolumetricBaseRep(uid, name)
+ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep() :
+	VolumetricBaseRep()
 {
 	mMaxVoxels = 0;
 	mClearing = false;
@@ -115,13 +115,6 @@ void ProgressiveLODVolumetricRep::setMaxVolumeSize(long maxVoxels)
 ProgressiveLODVolumetricRep::~ProgressiveLODVolumetricRep()
 {
 	clearThreads();
-}
-
-ProgressiveLODVolumetricRepPtr ProgressiveLODVolumetricRep::New(const QString& uid, const QString& name)
-{
-	ProgressiveLODVolumetricRepPtr retval(new ProgressiveLODVolumetricRep(uid));
-	retval->mSelf = retval;
-	return retval;
 }
 
 void ProgressiveLODVolumetricRep::addRepActorsToViewRenderer(View *view)
@@ -185,7 +178,7 @@ VolumetricRepPtr ProgressiveLODVolumetricRep::getNextResampleLevel()
 	QString text = "_" + qstring_cast(factor);
 	mResampleFactors.pop_back();
 
-	VolumetricRepPtr next = ssc::VolumetricRep::New(getUid()+text, getName()+text);
+	VolumetricRepPtr next = ssc::VolumetricRep::New(getUid()+text);
 	next->setResampleFactor(factor);
 	next->setImage(mImage);
 	return next;

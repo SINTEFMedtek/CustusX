@@ -46,8 +46,8 @@ typedef vtkSmartPointer<class vtkGPUVolumeRayCastMapper> vtkGPUVolumeRayCastMapp
 
 namespace ssc
 {
-VolumetricRep::VolumetricRep(const QString& uid, const QString& name) :
-	VolumetricBaseRep(uid, name),
+VolumetricRep::VolumetricRep() :
+	VolumetricBaseRep(),
 	mOpacityTransferFunction(vtkPiecewiseFunctionPtr::New()),
 	mColorTransferFunction(vtkColorTransferFunctionPtr::New()),
 	mVolumeProperty(vtkVolumePropertyPtr::New()),
@@ -127,13 +127,6 @@ void VolumetricRep::setUseVolumeTextureMapper()
 	mMapper->SetBlendModeToComposite();
 
 	mVolume->SetMapper( mMapper );
-}
-
-VolumetricRepPtr VolumetricRep::New(const QString& uid, const QString& name)
-{
-	VolumetricRepPtr retval(new VolumetricRep(uid, name));
-	retval->mSelf = retval;
-	return retval;
 }
 
 void VolumetricRep::addRepActorsToViewRenderer(View *view)

@@ -18,10 +18,10 @@
 #include "vtkCamera.h"
 #include "vtkSmartPointer.h"
 #include "cxViewManager.h"
-#include "cxView3D.h"
 #include "cxDataInterface.h"
 #include "cxCameraControl.h"
 #include "sscBoundingBox3D.h"
+#include "sscView.h"
 
 namespace cx
 {

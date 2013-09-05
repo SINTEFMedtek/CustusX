@@ -17,7 +17,7 @@
 #include <QTimer>
 
 #include "cxtestSender.h"
-#include "cxtestSignalListener.h"
+#include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
 
 #include "cxTestCustusXController.h"
