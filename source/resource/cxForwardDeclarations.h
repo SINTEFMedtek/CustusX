@@ -42,8 +42,6 @@ namespace cx
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 
-class View2D;
-class View3D;
 typedef boost::shared_ptr<class ViewGroup> ViewGroupPtr;
 typedef boost::shared_ptr<class ViewGroup2D> ViewGroup2DPtr;
 typedef boost::shared_ptr<class ViewGroup3D> ViewGroup3DPtr;
@@ -51,7 +49,6 @@ typedef boost::shared_ptr<class ViewWrapper> ViewWrapperPtr;
 typedef boost::shared_ptr<class PatientData> PatientDataPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
-typedef QPointer<View3D> View3DQPtr;
 typedef QPointer<ssc::ViewWidget> ViewWidgetQPtr;
 
 typedef boost::shared_ptr<class UsReconstructionFileReader> UsReconstructionFileReaderPtr;

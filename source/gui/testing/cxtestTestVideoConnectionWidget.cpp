@@ -7,7 +7,7 @@
 #include "sscStringDataAdapterXml.h"
 #include "cxVideoService.h"
 #include "cxVideoConnectionManager.h"
-#include "cxtestSignalListener.h"
+#include "cxtestQueuedSignalListener.h"
 #include "cxtestUtilities.h"
 #include "cxDataManager.h"
 #include "cxSimulateUSWidget.h"
@@ -29,10 +29,10 @@ bool TestVideoConnectionWidget::canStream(QString filename, QString streamerType
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //connect
 
-	bool videoConnectionConnected = waitForSignal(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)), 500);
-	bool activeVideoSourceChanged = waitForSignal(cx::videoService(), SIGNAL(activeVideoSourceChanged()), 500);
+	bool videoConnectionConnected = waitForQueuedSignal(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)), 500);
+	bool activeVideoSourceChanged = waitForQueuedSignal(cx::videoService(), SIGNAL(activeVideoSourceChanged()), 500);
 	ssc::VideoSourcePtr stream = cx::videoService()->getActiveVideoSource();
-	bool videoSourceReceivedNewFrame = waitForSignal(stream.get(), SIGNAL(newFrame()), 500);
+	bool videoSourceReceivedNewFrame = waitForQueuedSignal(stream.get(), SIGNAL(newFrame()), 500);
 	bool canStream = stream->isStreaming();
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //disconnect

@@ -179,7 +179,7 @@ class CustusXBuilder:
                 '--duplicates --wide --details',
                 '%s >%s/sloccount_raw.sc' % (sourceDir, rootDir)
                 ])
-        shell.run(['%s/testing/jenkins/clean_sloccount.py' % sourceDir,
+        shell.run(['%s/install/Shared/script/clean_sloccount.py' % sourceDir,
                 '--remove="3rdParty/ config/ install/ /data/"',
                 '%s/sloccount_raw.sc %s/sloccount.sc' % (rootDir, rootDir) 
                 ])

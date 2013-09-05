@@ -45,6 +45,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class ImageLandmarkRep> ImageLandmarkRepPtr;
 typedef boost::shared_ptr<class PatientLandmarkRep> PatientLandmarkRepPtr;
+typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DRepProducerPtr;
 
 /**
  * \file
@@ -137,6 +138,7 @@ private:
 
 	void setTranslucentRenderingToDepthPeeling(bool setDepthPeeling);
 
+	MultiVolume3DRepProducerPtr mMultiVolume3DRepProducer;
 	typedef std::map<QString, ssc::RepPtr> RepMap;
 	RepMap mDataReps;
 	LandmarkRepPtr mLandmarkRep;

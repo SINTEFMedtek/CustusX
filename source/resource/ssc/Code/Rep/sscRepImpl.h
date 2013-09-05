@@ -42,7 +42,7 @@ namespace ssc
 class RepImpl : public Rep
 {
 public:
-	RepImpl(const QString& uid, const QString& name="");
+	explicit RepImpl(const QString& uid="", const QString& name="");
 	virtual ~RepImpl();
 	virtual QString getType() const = 0;
 	virtual void connectToView(View *theView);
@@ -52,6 +52,22 @@ public:
 	QString getName() const; ///< \return a reps name
 	QString getUid() const; ///< \return a reps unique id
 	virtual void printSelf(std::ostream & os, Indent indent);
+
+	/** Usage:
+	  * Define functions in each subclass with the signature:
+	  *  static REPPtr New(QString uid="") { return wrap_new(new REP(), uid); }
+	  */
+	template<class REP>
+	static boost::shared_ptr<REP> wrap_new(REP* object, QString uid)
+	{
+		boost::shared_ptr<REP> retval(object);
+		if (uid.isEmpty())
+			uid = retval->getType() + "_" + reinterpret_cast<long>(retval.get());
+		retval->mUid = uid;
+		retval->mName = uid;
+		retval->mSelf = retval;
+		return retval;
+	}
 
 protected:
 	std::set<View *> mViews;
@@ -63,8 +79,10 @@ protected:
 	virtual void removeRepActorsFromViewRenderer(View *view) = 0;
 
 private:
-	RepImpl(); ///< not implemented
+//	RepImpl(); ///< not implemented
 };
+
+
 
 } // namespace ssc
 

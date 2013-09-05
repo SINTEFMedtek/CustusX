@@ -43,8 +43,6 @@
 #include "sscToolManager.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscSliceProxy.h"
-#include "cxView2D.h"
-#include "cxView3D.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
@@ -135,8 +133,8 @@ QWidget* ViewManager::initialize()
 
 	mLayout = new QGridLayout;
 	mMainWindowsCentralWidget = new QWidget;
-	mViewCache2D.reset(new ViewCache<View2D>(mMainWindowsCentralWidget,	"View2D"));
-	mViewCache3D.reset(new ViewCache<View3D>(mMainWindowsCentralWidget, "View3D"));
+	mViewCache2D.reset(new ViewCache<ssc::ViewWidget>(mMainWindowsCentralWidget,	"View2D"));
+	mViewCache3D.reset(new ViewCache<ssc::ViewWidget>(mMainWindowsCentralWidget, "View3D"));
 	mViewCacheRT.reset(new ViewCache<ssc::ViewWidget>(mMainWindowsCentralWidget, "ViewRT"));
 
 	mLayout->setSpacing(2);
@@ -432,7 +430,7 @@ void ViewManager::clearSlot()
 
 /**Look for the index'th 3DView in given group.
  */
-View3DQPtr ViewManager::get3DView(int group, int index)
+ViewWidgetQPtr ViewManager::get3DView(int group, int index)
 {
 	int count = 0;
 	std::vector<ViewWidgetQPtr> views = mViewGroups[group]->getViews();
@@ -440,13 +438,13 @@ View3DQPtr ViewManager::get3DView(int group, int index)
 	{
 		if(!views[i])
 			continue;
-		View3DQPtr retval = dynamic_cast<View3D*>(views[i].data());
-		if (!retval)
+//		ViewWidgetQPtr retval = views[i].data();
+		if (views[i]->getType()!=ssc::View::VIEW_3D)
 			continue;
 		if (index == count++)
-			return retval;
+			return views[i];
 	}
-	return View3DQPtr();
+	return ViewWidgetQPtr();
 }
 
 /**deactivate the current layout, leaving an empty layout
@@ -570,10 +568,9 @@ void ViewManager::activateView(ViewWrapperPtr wrapper, int group, LayoutRegion r
 
 void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region)
 {
-	View2D* view = mViewCache2D->retrieveView();
-	// use only default color for 2d views.
-//  QColor background = settings()->value("backgroundColor").value<QColor>();
-//  view->setBackgroundColor(background);
+	ssc::ViewWidget* view = mViewCache2D->retrieveView();
+	view->setType(ssc::View::VIEW_2D);
+
 	ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
 	wrapper->initializePlane(plane);
 	this->activateView(wrapper, group, region);
@@ -581,10 +578,8 @@ void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion 
 
 void ViewManager::activate3DView(int group, LayoutRegion region)
 {
-	View3D* view = mViewCache3D->retrieveView();
-//  moved to wrapper
-//  QColor background = settings()->value("backgroundColor").value<QColor>();
-//  view->setBackgroundColor(background);
+	ssc::ViewWidget* view = mViewCache3D->retrieveView();
+	view->setType(ssc::View::VIEW_3D);
 	ViewWrapper3DPtr wrapper(new ViewWrapper3D(group + 1, view));
 	if (group == 0)
 	{
@@ -597,8 +592,7 @@ void ViewManager::activate3DView(int group, LayoutRegion region)
 void ViewManager::activateRTStreamView(int group, LayoutRegion region)
 {
 	ssc::ViewWidget* view = mViewCacheRT->retrieveView();
-//  QColor background = settings()->value("backgroundColor").value<QColor>();
-//  view->setBackgroundColor(background);
+	view->setType(ssc::View::VIEW_REAL_TIME);
 	ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view));
 	this->activateView(wrapper, group, region);
 }

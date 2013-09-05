@@ -3,7 +3,7 @@
 #include <QTimer>
 #include <QApplication>
 #include "cxtestTestVideoConnectionWidget.h"
-#include "cxtestSignalListener.h"
+#include "cxtestQueuedSignalListener.h"
 #include "cxDataLocations.h"
 
 #include "sscMessageManager.h"
@@ -24,7 +24,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear(),tm);
 	tm->runDummyTool(tool);
 	tm->setDominantTool(tool->getUid());
-	waitForSignal(tm, SIGNAL(trackingStarted()));
+	waitForQueuedSignal(tm, SIGNAL(trackingStarted()));
 
 	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
 	REQUIRE(QFile::exists(filename));

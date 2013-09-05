@@ -53,7 +53,7 @@ void MainWindow::showData()
 {
   if (!mVolumeRep)
   {
-    mVolumeRep = ssc::VolumetricRep::New("test","test");
+	mVolumeRep = ssc::VolumetricRep::New();
     mView->addRep(mVolumeRep);
   }
 

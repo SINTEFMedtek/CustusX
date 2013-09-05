@@ -143,7 +143,7 @@ void ViewWrapper2D::setViewGroup(ViewGroupDataPtr group)
 
 void ViewWrapper2D::optionChangedSlot()
 {
-	ViewGroupData::Options options = mViewGroup->getOptions();
+	ViewGroupData::Options options = mGroupData->getOptions();
 
 	if (mPickerGlyphRep)
 	{
@@ -225,9 +225,9 @@ void ViewWrapper2D::addReps()
 
 	mPickerGlyphRep = ssc::GeometricRep2D::New("PickerGlyphRep_" + mView->getName());
 	mPickerGlyphRep->setSliceProxy(mSliceProxy);
-	if (mViewGroup)
+	if (mGroupData)
 	{
-		mPickerGlyphRep->setMesh(mViewGroup->getOptions().mPickerGlyph);
+		mPickerGlyphRep->setMesh(mGroupData->getOptions().mPickerGlyph);
 	}
 	mView->addRep(mPickerGlyphRep);
 }
@@ -275,8 +275,8 @@ void ViewWrapper2D::resetMultiSlicer()
 	mMultiSliceRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
 	mView->addRep(mMultiSliceRep);
-	if (mViewGroup)
-		mMultiSliceRep->setImages(mViewGroup->getImages());
+	if (mGroupData)
+		mMultiSliceRep->setImages(mGroupData->getImages());
 	this->viewportChanged();
 }
 
@@ -451,9 +451,9 @@ void ViewWrapper2D::imageAdded(ssc::ImagePtr image)
 void ViewWrapper2D::updateView()
 {
 	QString text;
-	if (mViewGroup)
+	if (mGroupData)
 	{
-		std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
+		std::vector<ssc::ImagePtr> images = mGroupData->getImages();
 		ssc::ImagePtr image;
 		if (!images.empty())
 			image = images.back(); // always show last in vector
@@ -490,7 +490,7 @@ void ViewWrapper2D::updateView()
 			mSliceRep->setImage(image);
 
 			// list all meshes and one image.
-			std::vector<ssc::MeshPtr> mesh = mViewGroup->getMeshes();
+			std::vector<ssc::MeshPtr> mesh = mGroupData->getMeshes();
 			for (unsigned i = 0; i < mesh.size(); ++i)
 			textList << qstring_cast(mesh[i]->getName());
 			if (image)

@@ -182,11 +182,12 @@ MACRO(cx_define_version major minor patch type)
 		set(POSTFIX "."${type})
 	endif()
 	
-	#on windows this string contains newlines that needs to be removed
-	STRING(REGEX REPLACE "\r|\n" "" POSTFIX_CLEAN "${POSTFIX}")
+	#on windows this string contains newlines and whitespaces that needs to be removed
+	STRING(REGEX REPLACE "\r|\n" "" POSTFIX_TEMP ${POSTFIX})
+	STRING(REGEX REPLACE " " "" POSTFIX_CLEAN ${POSTFIX_TEMP})
 
-	set(${PROJECT_NAME}_VERSION_POSTFIX "${POSTFIX_CLEAN}")
-	set(${PROJECT_NAME}_VERSION_STRING "${major}.${minor}.${patch}${${PROJECT_NAME}_VERSION_POSTFIX}")
+	set(${PROJECT_NAME}_VERSION_POSTFIX ${POSTFIX_CLEAN})
+	set(${PROJECT_NAME}_VERSION_STRING ${major}.${minor}.${patch}${${PROJECT_NAME}_VERSION_POSTFIX})
 
 # no good - leads to full rebuild for every commit. Moved to resource/settings/cxConfig.h
 #	add_definitions(
@@ -263,7 +264,7 @@ endfunction()
 #
 # Usage: add_class(SOURCE_FILES class1 class2 folder/class3 file1.h ...)
 ###############################################################################
-function(cx_add_class SOURCE_FILES)
+function(cx_add_class SOURCE_FILES_ARGUMENT)
 	set(CLASS_NAME_WITH_PATH ${ARGV})
 	list(REMOVE_AT CLASS_NAME_WITH_PATH 0)
 
@@ -271,7 +272,7 @@ function(cx_add_class SOURCE_FILES)
 		_cx_add_one_class(RESULT_add_class ${CLASS_NAME})
 	endforeach()
 
-	set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_add_class} PARENT_SCOPE)
+        set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class} PARENT_SCOPE)
 endfunction()
 
 ###############################################################################
@@ -279,7 +280,7 @@ endfunction()
 #
 # As add_class(), but the class is run through the Qt Moc system as well.
 ###############################################################################
-function(cx_add_class_qt_moc SOURCE_FILES)
+function(cx_add_class_qt_moc SOURCE_FILES_ARGUMENT)
 	set(CLASS_NAME_WITH_PATH ${ARGV})
 	list(REMOVE_AT CLASS_NAME_WITH_PATH 0)
 
@@ -293,6 +294,6 @@ function(cx_add_class_qt_moc SOURCE_FILES)
 	# optimized: QT4_WRAP_CPP has large overhead: call once.
 	QT4_WRAP_CPP( RESULT_add_class_qt_moc ${HEADER_NAMES} )
 
-	set(${SOURCE_FILES} ${${SOURCE_FILES}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
+        set(${SOURCE_FILES_ARGUMENT} ${${SOURCE_FILES_ARGUMENT}} ${RESULT_add_class_qt_moc} PARENT_SCOPE)
 endfunction()
 

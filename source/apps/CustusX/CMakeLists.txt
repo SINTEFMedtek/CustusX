@@ -47,11 +47,13 @@ endif(APPLE)
 if (APPLE)
     add_executable(CustusX MACOSX_BUNDLE ${SOURCES} )
 else (APPLE)
-    if(CX_WINDOWS)
-        add_executable(CustusX WIN32 ${SOURCES} CustusX.rc)
-    else(CX_WINDOWS)
+    if(CX_WIN32)
+        add_executable(CustusX ${SOURCES} CustusX.rc) #32bit dunno why
+    elseif(CX_WIN64)
+        add_executable(CustusX WIN32 ${SOURCES} CustusX.rc) #64bit
+    else() # WINDOWS or LINUX
         add_executable(CustusX ${SOURCES} )
-    endif(CX_WINDOWS)
+    endif()
 endif (APPLE)
 
 #------------------------------------------------------------------------------

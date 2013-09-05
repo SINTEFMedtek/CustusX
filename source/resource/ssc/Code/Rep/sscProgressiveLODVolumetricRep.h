@@ -52,23 +52,18 @@ class ProgressiveLODVolumetricRep : public VolumetricBaseRep
 public:
 	virtual ~ProgressiveLODVolumetricRep();
 
-	static ProgressiveLODVolumetricRepPtr New(const QString& uid, const QString& name="");
-
+	static ProgressiveLODVolumetricRepPtr New(QString uid="") { return wrap_new(new ProgressiveLODVolumetricRep(), uid); }
 	virtual QString getType() const { return "ssc::ProgressiveLODVolumetricRep"; }
 	virtual void setImage(ImagePtr image);
 	virtual ImagePtr getImage();
 	virtual bool hasImage(ImagePtr image) const;
 
-//virtual void setImage(ImagePtr image) = 0; ///< set the reps image
-//irtual ImagePtr getImage() = 0; ///< get the reps image
-//	virtual bool hasImage(ImagePtr image) const = 0; ///< check if the reps has the image
 	virtual vtkVolumePtr getVtkVolume(); ///< get the images vtkVolume
-	//virtual void setResampleFactor(double factor); ///< set how detailed the image should be
 	virtual void setMaxVolumeSize(long maxVoxels); ///< set max volume size for rendering. Must be set before setImage()
 
 
 protected:
-	ProgressiveLODVolumetricRep(const QString& uid, const QString& name="");
+	ProgressiveLODVolumetricRep();
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
 

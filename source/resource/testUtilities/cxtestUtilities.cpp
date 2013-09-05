@@ -16,38 +16,22 @@
 
 #include "vtkImageData.h"
 #include "sscImage.h"
+#include "sscVolumeHelpers.h"
+#include "sscTypeConversions.h"
 
 namespace cxtest
 {
 
-vtkImageDataPtr Utilities::create3DVtkImageData()
+vtkImageDataPtr Utilities::create3DVtkImageData(Eigen::Array3i dim)
 {
-	vtkImageDataPtr vtkImageData = vtkImageDataPtr::New();
-
-	vtkImageData->SetDimensions(10, 10, 10);
-	vtkImageData->SetNumberOfScalarComponents(1);
-
-	int* dims = vtkImageData->GetDimensions();
-
-	for (int z  = 0; z < dims[2]; z++)
-	{
-		for (int y = 0; y < dims[1]; y++)
-		{
-			for (int x = 0; x < dims[0]; x++)
-			{
-				vtkImageData->SetScalarComponentFromDouble(x, y, z, 0, 2.0);
-			}
-		}
-	}
-//	vtkImageData->Print(std::cout);
-
-	return vtkImageData;
+	return ssc::generateVtkImageData(dim, ssc::Vector3D(1,1,1), 2);
 }
 
-ssc::ImagePtr Utilities::create3DImage()
+ssc::ImagePtr Utilities::create3DImage(Eigen::Array3i dim)
 {
-	QString imagesUid("TESTUID");
-	vtkImageDataPtr vtkImageData = create3DVtkImageData();
+	vtkImageDataPtr vtkImageData = create3DVtkImageData(dim);
+	QString unique_string = qstring_cast(reinterpret_cast<long>(vtkImageData.GetPointer()));
+	QString imagesUid = QString("TESTUID_%2_%1").arg(unique_string);
 	ssc::ImagePtr image(new ssc::Image(imagesUid, vtkImageData));
 
 	return image;

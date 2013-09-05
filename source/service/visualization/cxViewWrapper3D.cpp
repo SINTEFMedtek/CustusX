@@ -131,6 +131,10 @@ void AxisConnector::changedSlot()
 
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 {
+	view->getRenderer()->GetActiveCamera()->SetClippingRange(1, 2000);
+	if (!view->getRenderWindow()->GetStereoCapableWindow())
+		view->getRenderWindow()->StereoCapableWindowOn(); // Just set all 3D views 3D capable
+
 	mShowAxes = false;
 	mView = view;
 	this->connectContextMenu(mView);
@@ -215,7 +219,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	if (( key=="useGPUVolumeRayCastMapper" )||( key=="maxRenderSize" ))
 	{
 		// reload volumes from cache
-		std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
+		std::vector<ssc::ImagePtr> images = mGroupData->getImages();
 		for (unsigned i = 0; i < images.size(); ++i)
 		{
 			this->dataRemoved(images[i]->getUid());
@@ -389,7 +393,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 
 	connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
 	connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
-	mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
+	mView->getRenderer()->SetActiveCamera(mGroupData->getCamera3D()->getCamera());
 
 	// Set eye angle after camera change. Maybe create a cameraChangedSlot instead
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
@@ -443,7 +447,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		mAxis.push_back(axis);
 
 		// data spaces
-		std::vector<ssc::DataPtr> data = mViewGroup->getData();
+		std::vector<ssc::DataPtr> data = mGroupData->getData();
 		for (unsigned i = 0; i < data.size(); ++i)
 		{
 			axis.reset(new AxisConnector(ssc::CoordinateSystem(ssc::csDATA, data[i]->getUid())));
@@ -510,7 +514,7 @@ void ViewWrapper3D::centerImageActionSlot()
 	if (ssc::dataManager()->getActiveImage())
 		Navigation().centerToData(ssc::dataManager()->getActiveImage());
 	else
-		Navigation().centerToView(mViewGroup->getData());
+		Navigation().centerToView(mGroupData->getData());
 }
 
 void ViewWrapper3D::centerToolActionSlot()
@@ -582,7 +586,7 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
 		if (image->getBaseVtkImageData()->GetDimensions()[2]==1)
 		{
-			cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New(data->getUid()+"image2DRep");
+			cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New();
 			rep->setImage(image);
 			return rep;
 		}
@@ -662,12 +666,12 @@ void ViewWrapper3D::updateView()
 
 void ViewWrapper3D::activeImageChangedSlot()
 {
-	if(!mViewGroup)
+	if(!mGroupData)
 		return;
 	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
 
 	// only show landmarks belonging to image visible in this view:
-	std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
+	std::vector<ssc::ImagePtr> images = mGroupData->getImages();
 	if (!std::count(images.begin(), images.end(), image))
 		image.reset();
 }
@@ -698,7 +702,7 @@ void ViewWrapper3D::updateSlices()
 	if (mSlices3DRep)
 		mView->removeRep(mSlices3DRep);
 	//Simple bug fix of #746: Don't create slices if no volumes exist in 3D scene
-	if (!mViewGroup || mViewGroup->getImages().empty())
+	if (!mGroupData || mGroupData->getImages().empty())
 	{
 		ssc::messageManager()->sendWarning("Need volumes in the 3D scene to create 2D slices");
 		return;
@@ -724,8 +728,8 @@ void ViewWrapper3D::updateSlices()
 	}
 
 	mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
-	if (mViewGroup && !mViewGroup->getImages().empty())
-		mSlices3DRep->setImages(mViewGroup->getImages());
+	if (mGroupData && !mGroupData->getImages().empty())
+		mSlices3DRep->setImages(mGroupData->getImages());
 	mSlices3DRep->setTool(ssc::toolManager()->getDominantTool());
 //	return mSlices3DRep;
 	mView->addRep(mSlices3DRep);
@@ -783,7 +787,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 
 void ViewWrapper3D::optionChangedSlot()
 {
-	ViewGroupData::Options options = mViewGroup->getOptions();
+	ViewGroupData::Options options = mGroupData->getOptions();
 
 	this->showLandmarks(options.mShowLandmarks);
 	this->showPointPickerProbe(options.mShowPointPickerProbe);
