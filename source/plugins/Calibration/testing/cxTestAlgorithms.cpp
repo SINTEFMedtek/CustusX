@@ -1,7 +1,6 @@
 #include "cxTestAlgorithms.h"
 #include <iostream>
 
-//#include "cxTestCustusXController.h"
 //#include "cxConfig.h"
 #include "cxDataLocations.h"
 #include "cxTemporalCalibration.h"
