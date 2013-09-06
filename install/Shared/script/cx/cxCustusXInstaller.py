@@ -64,10 +64,6 @@ class CustusXInstaller:
         '''
         PrintFormatter.printHeader('create local release folder', level=2)
         targetPath = self._generateTemporaryReleaseFolderName()
-#        installerFile = self._findInstallerFile()
-#        suffix = self._getInstallerPackageSuffix()
-#        releaseFolderName = os.path.basename(installerFile).split('.%s'%suffix)[0]
-#        targetPath = '%s/Release/%s' % (self.installer_path, releaseFolderName)
         PrintFormatter.printInfo('Creating folder %s' % targetPath)
         #os.makedirs(targetPath) - no good - complains if existing.
         shell.run('mkdir -p %s' % targetPath)
