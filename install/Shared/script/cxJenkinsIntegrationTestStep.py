@@ -88,9 +88,9 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         if not self.argumentParserArguments.skip_tests:
             self.cxInstallation.testInstallation()
             self.cxInstallation.runIntegrationTests()
-        if not self.argumentParserArguments.skip_publish_release:
-            folder = self.cxInstaller.createReleaseFolder()
-            self.cxInstaller.publishReleaseFolder(folder)
+#        if not self.argumentParserArguments.skip_publish_release:
+#            folder = self.cxInstaller.createReleaseFolder()
+#            self.cxInstaller.publishReleaseFolder(folder)
         self.cxBuilder.finish()
     
     def _checkoutComponents(self):
