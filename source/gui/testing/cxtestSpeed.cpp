@@ -16,7 +16,6 @@
 
 #include <QTimer>
 
-#include "sscTypeConversions.h"
 #include "sscImage.h"
 #include "cxtestSender.h"
 #include "cxtestQueuedSignalListener.h"
@@ -24,28 +23,11 @@
 #include "cxTestCustusXController.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
+#include "cxtestJenkinsMeasurement.h"
 
 
 namespace cxtest
 {
-
-class JenkinsMeasurement
-{
-public:
-	void initialize()
-	{
-		cout << "CTEST_FULL_OUTPUT" << endl;
-	}
-
-	// create output in a way friendly to the Jenkins measurement plugin:
-	void createOutput(QString name, QString value)
-	{
-		QString measurement("<measurement><name>%1</name><value>%2</value></measurement>");
-		measurement = measurement.arg(name).arg(value);
-		std::cout << measurement << std::endl;
-	}
-
-};
 
 TEST_CASE("Speed: Run CustusX with a minimum render speed", "[speed][gui][integration]")
 {

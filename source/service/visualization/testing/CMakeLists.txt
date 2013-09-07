@@ -33,6 +33,8 @@ if (BUILD_TESTING)
     cx_add_class(CXTEST_VISUALIZATIONSERVICE_SOURCES
         cxtestCatchMultiVolume3DRepProducer.cpp
         cxtestMultiVolume3DRepProducerFixture
+        cxtestCatchViewRenderSpeed.cpp
+        cxTestRenderSpeed
         )
 
     cx_catch_add_lib_and_exe(cxVisualizationService "${CXTEST_VISUALIZATIONSERVICE_SOURCES}")
