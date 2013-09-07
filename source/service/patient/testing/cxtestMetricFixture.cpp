@@ -38,9 +38,9 @@ MetricFixture::~MetricFixture()
 }
 
 
-FrameMetricData MetricFixture::getFrameMetricData()
+FrameMetricWithInput MetricFixture::getFrameMetricWithInput()
 {
-    FrameMetricData retval;
+	FrameMetricWithInput retval;
 
     retval.m_qMt = ssc::createTransformRotateZ(M_PI_2) * ssc::createTransformTranslate(ssc::Vector3D(1,2,3));
     retval.mSpace = ssc::SpaceHelpers::getR();
@@ -53,9 +53,9 @@ FrameMetricData MetricFixture::getFrameMetricData()
     return retval;
 }
 
-ToolMetricData MetricFixture::getToolMetricData()
+ToolMetricWithInput MetricFixture::getToolMetricWithInput()
 {
-	ToolMetricData retval;
+	ToolMetricWithInput retval;
 
 	retval.m_qMt = ssc::createTransformRotateZ(M_PI_2) * ssc::createTransformTranslate(ssc::Vector3D(1,2,3));
 	retval.mSpace = ssc::SpaceHelpers::getR();
@@ -72,9 +72,9 @@ ToolMetricData MetricFixture::getToolMetricData()
 	return retval;
 }
 
-PointMetricData MetricFixture::getPointMetricData(ssc::Vector3D point)
+PointMetricWithInput MetricFixture::getPointMetricWithInput(ssc::Vector3D point)
 {
-    PointMetricData retval;
+	PointMetricWithInput retval;
 
     retval.mPoint = point;
     retval.mSpace = ssc::SpaceHelpers::getR();
@@ -87,9 +87,9 @@ PointMetricData MetricFixture::getPointMetricData(ssc::Vector3D point)
     return retval;
 }
 
-PlaneMetricData MetricFixture::getPlaneMetricData(ssc::Vector3D point, ssc::Vector3D normal)
+PlaneMetricWithInput MetricFixture::getPlaneMetricWithInput(ssc::Vector3D point, ssc::Vector3D normal)
 {
-    PlaneMetricData retval;
+	PlaneMetricWithInput retval;
 
     retval.mPoint = point;
     retval.mNormal = normal;
@@ -104,9 +104,9 @@ PlaneMetricData MetricFixture::getPlaneMetricData(ssc::Vector3D point, ssc::Vect
     return retval;
 }
 
-DistanceMetricData MetricFixture::getDistanceMetricData(double distance, ssc::DataMetricPtr p0, ssc::DataMetricPtr p1)
+DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distance, ssc::DataMetricPtr p0, ssc::DataMetricPtr p1)
 {
-    DistanceMetricData retval;
+	DistanceMetricWithInput retval;
 
     retval.mDistance = distance;
 
@@ -118,22 +118,22 @@ DistanceMetricData MetricFixture::getDistanceMetricData(double distance, ssc::Da
     return retval;
 }
 
-DistanceMetricData MetricFixture::getDistanceMetricData(double distance)
+DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distance)
 {
-    DistanceMetricData retval;
+	DistanceMetricWithInput retval;
 
     retval.mDistance = distance;
 
 	retval.mMetric = ssc::DistanceMetric::create("testMetric%1");
-    retval.mMetric->setArgument(0, this->getPointMetricData(ssc::Vector3D(0,0,0)).mMetric);
-    retval.mMetric->setArgument(1, this->getPointMetricData(ssc::Vector3D(distance,0,0)).mMetric);
+	retval.mMetric->setArgument(0, this->getPointMetricWithInput(ssc::Vector3D(0,0,0)).mMetric);
+	retval.mMetric->setArgument(1, this->getPointMetricWithInput(ssc::Vector3D(distance,0,0)).mMetric);
 	cx::DataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
 }
 
 
-bool MetricFixture::metricEqualsData(FrameMetricData data)
+bool MetricFixture::inputEqualsMetric(FrameMetricWithInput data)
 {
     INFO("qMt");
     INFO(qstring_cast(data.m_qMt));
@@ -145,7 +145,7 @@ bool MetricFixture::metricEqualsData(FrameMetricData data)
             && (data.mSpace == data.mMetric->getSpace());
 }
 
-bool MetricFixture::metricEqualsData(ToolMetricData data)
+bool MetricFixture::inputEqualsMetric(ToolMetricWithInput data)
 {
 	INFO("qMt");
 	INFO(qstring_cast(data.m_qMt));
@@ -159,7 +159,7 @@ bool MetricFixture::metricEqualsData(ToolMetricData data)
 			&& (data.mName == data.mMetric->getToolName());
 }
 
-bool MetricFixture::metricEqualsData(DistanceMetricData data)
+bool MetricFixture::inputEqualsMetric(DistanceMetricWithInput data)
 {
     INFO("distance");
     INFO(qstring_cast(data.mDistance));
@@ -176,13 +176,13 @@ bool MetricFixture::metricEqualsData(DistanceMetricData data)
     return (ssc::similar(data.mDistance, data.mMetric->getDistance()));
 }
 
-bool MetricFixture::metricEqualsData(PointMetricData data)
+bool MetricFixture::inputEqualsMetric(PointMetricWithInput data)
 {
     return (ssc::similar(data.mPoint, data.mMetric->getCoordinate()))
             && (data.mSpace == data.mMetric->getSpace());
 }
 
-bool MetricFixture::metricEqualsData(PlaneMetricData data)
+bool MetricFixture::inputEqualsMetric(PlaneMetricWithInput data)
 {
     return (ssc::similar(data.mPoint, data.mMetric->getCoordinate()))
             && (ssc::similar(data.mNormal, data.mMetric->getNormal()))

@@ -21,15 +21,15 @@
 TEST_CASE("cxFrameMetric can set/get transform", "[unit]")
 {
     cxtest::MetricFixture fixture;
-    cxtest::FrameMetricData testData = fixture.getFrameMetricData();
+    cxtest::FrameMetricWithInput testData = fixture.getFrameMetricWithInput();
 
-	CHECK(fixture.metricEqualsData(testData));
+	CHECK(fixture.inputEqualsMetric(testData));
 }
 
 TEST_CASE("cxFrameMetric can save/load XML", "[unit]")
 {
     cxtest::MetricFixture fixture;
-    cxtest::FrameMetricData testData = fixture.getFrameMetricData();
+    cxtest::FrameMetricWithInput testData = fixture.getFrameMetricWithInput();
 
     CHECK(fixture.saveLoadXmlGivesEqualTransform(testData));
 }
@@ -37,7 +37,7 @@ TEST_CASE("cxFrameMetric can save/load XML", "[unit]")
 TEST_CASE("cxFrameMetric can convert transform to single line string", "[unit]")
 {
     cxtest::MetricFixture fixture;
-    cxtest::FrameMetricData testData = fixture.getFrameMetricData();
+    cxtest::FrameMetricWithInput testData = fixture.getFrameMetricWithInput();
 
 	QStringList list = fixture.getSingleLineDataList(testData.mMetric);
 	REQUIRE(fixture.verifySingleLineHeader(list, testData.mMetric));
@@ -53,13 +53,13 @@ TEST_CASE("cxFrameMetric can convert transform to single line string", "[unit]")
 TEST_CASE("cxFrameMetric can set space correctly", "[unit]")
 {
     cxtest::MetricFixture fixture;
-    cxtest::FrameMetricData testData = fixture.getFrameMetricData();
+    cxtest::FrameMetricWithInput testData = fixture.getFrameMetricWithInput();
 
     fixture.setPatientRegistration();
 
     testData.mMetric->setSpace(ssc::CoordinateSystemHelpers::getPr());
-    CHECK_FALSE(fixture.metricEqualsData(testData));
+    CHECK_FALSE(fixture.inputEqualsMetric(testData));
 
     testData.mMetric->setSpace(testData.mSpace);
-    CHECK(fixture.metricEqualsData(testData));
+    CHECK(fixture.inputEqualsMetric(testData));
 }
