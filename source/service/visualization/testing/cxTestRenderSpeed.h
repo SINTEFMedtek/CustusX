@@ -1,10 +1,6 @@
 #ifndef CXTESTRENDERSPEED_H_
 #define CXTESTRENDERSPEED_H_
 
-#include <cppunit/extensions/TestFactoryRegistry.h>
-#include <cppunit/ui/text/TestRunner.h>
-#include <cppunit/extensions/HelperMacros.h>
-
 #include "sscView.h"
 class QGridLayout;
 
@@ -15,12 +11,12 @@ namespace cxtest
 /*
  * \class TestRenderSpeed
  *
- * \Brief Class for testing view render speed
+ * \Brief Helper class for testing view render speed
  *
  *  \date May 27, 2013
  *  \author Ole Vegard Solberg, SINTEF
  */
-class TestRenderSpeed : public CppUnit::TestFixture
+class TestRenderSpeed
 {
 public:
     void setUp();
@@ -32,29 +28,22 @@ public:
 	void testVtkRenderWindow();
 	void testSeveralVtkRenderWindows();
 
-    CPPUNIT_TEST_SUITE( TestRenderSpeed );
-        CPPUNIT_TEST( testSingleView );
-        CPPUNIT_TEST( testSeveralViews );
-//        CPPUNIT_TEST( testLotsOfViews );
-        CPPUNIT_TEST( testVtkRenderWindow );
-        CPPUNIT_TEST( testSeveralVtkRenderWindows );
-    CPPUNIT_TEST_SUITE_END();
+	void printResult();
+	int getRenderFPS();
 
 private:
     void createVtkRenderWindows(int num);
     void create3Dviews(int num);
     void create2Dviews(int num);
     void showViews();
-    void renderNumTimes(int num);
-    void renderViewNum(int viewNum);
-    void printResult();
+		void renderNumTimes(int num);
+		void renderViewNum(int viewNum);
     void addViewsToLayout(QLayout* layout);
     void addViewsToGridLayout(QGridLayout* layout);
-    const char* getViewName();
-    int getTotalRenderTimeInMs();
-    void setTotalRenderTimeInMs(int time);
-    double getAverageRenderTimeInMs();
-    int getRenderFPS();
+		const char* getViewName();
+		void setTotalRenderTimeInMs(int time);
+		int getTotalRenderTimeInMs();
+		double getAverageRenderTimeInMs();
     int getNumViews();
 
 	std::vector<ssc::ViewWidget*> mViews;
@@ -63,8 +52,6 @@ private:
 	int mRenderTimeInMs;
 	int mNumViews;
 };
-
-CPPUNIT_TEST_SUITE_REGISTRATION( TestRenderSpeed );
 
 } //namespace cxtest
 
