@@ -42,9 +42,10 @@ public:
 	virtual ssc::DataPtr load(const QString& uid, const QString& filename);
 };
 
-/**\brief Data class that represents a tool (transform and offset).
+/** Metric class containing a snapshot of a tool
+ *  at a given point in time.
  *
- * The transform is attached to a specific coordinate system / frame.
+ *  The transform is attached to a specific coordinate system / frame.
  *
  * \date Aug 30, 2013
  * \author Ole Vegard Solberg, SINTEF

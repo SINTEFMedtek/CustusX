@@ -21,22 +21,23 @@
 TEST_CASE("ToolMetric can set/get tool data", "[unit]")
 {
 	cxtest::MetricFixture fixture;
-	cxtest::ToolMetricData testData = fixture.getToolMetricData();
-	CHECK(fixture.metricEqualsData(testData));
+	cxtest::ToolMetricWithInput data = fixture.getToolMetricWithInput();
+
+	CHECK(fixture.inputEqualsMetric(data));
 }
 
 TEST_CASE("ToolMetric can save/load XML", "[unit]")
 {
 	cxtest::MetricFixture fixture;
-	cxtest::ToolMetricData testData = fixture.getToolMetricData();
+	cxtest::ToolMetricWithInput data = fixture.getToolMetricWithInput();
 
-	CHECK(fixture.saveLoadXmlGivesEqualTransform(testData));
+	CHECK(fixture.saveLoadXmlGivesEqualTransform(data));
 }
 
 TEST_CASE("ToolMetric can convert values to single line string", "[unit]")
 {
 	cxtest::MetricFixture fixture;
-	cxtest::ToolMetricData testData = fixture.getToolMetricData();
+	cxtest::ToolMetricWithInput testData = fixture.getToolMetricWithInput();
 
 	QStringList list = fixture.getSingleLineDataList(testData.mMetric);
 	REQUIRE(fixture.verifySingleLineHeader(list, testData.mMetric));
@@ -54,21 +55,21 @@ TEST_CASE("ToolMetric can convert values to single line string", "[unit]")
 TEST_CASE("ToolMetric can set space correctly", "[unit]")
 {
 	cxtest::MetricFixture fixture;
-	cxtest::ToolMetricData testData = fixture.getToolMetricData();
+	cxtest::ToolMetricWithInput testData = fixture.getToolMetricWithInput();
 
 	fixture.setPatientRegistration();
 
 	testData.mMetric->setSpace(ssc::CoordinateSystemHelpers::getPr());
-	CHECK_FALSE(fixture.metricEqualsData(testData));
+	CHECK_FALSE(fixture.inputEqualsMetric(testData));
 
 	testData.mMetric->setSpace(testData.mSpace);
-	CHECK(fixture.metricEqualsData(testData));
+	CHECK(fixture.inputEqualsMetric(testData));
 }
 
 TEST_CASE("ToolMetric can get a valid reference coordinate", "[unit]")
 {
 	cxtest::MetricFixture fixture;
-	cxtest::ToolMetricData testData = fixture.getToolMetricData();
+	cxtest::ToolMetricWithInput testData = fixture.getToolMetricWithInput();
 
 	ssc::Vector3D testCoord(-2,1,3);
 	ssc::Vector3D refCoord = testData.mMetric->getRefCoord();
@@ -87,5 +88,4 @@ TEST_CASE("ToolMetric can get a valid reference coordinate", "[unit]")
 	refCoord = testData.mMetric->getRefCoord();
 	INFO(qstring_cast(testCoord)+" == "+qstring_cast(refCoord));
 	CHECK(ssc::similar(refCoord, testCoord));
-
 }
