@@ -26,12 +26,19 @@
 #include "cxLogicManager.h"
 #include "cxWorkflowStateMachine.h"
 
+
+#include "cxClippingWidget.h"
+#include "cxInteractiveClipper.h"
+#include "cxViewManager.h"
+#include "cxDataManager.h"
+
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
   mTestData += "Test Results:\n";
   mMainWindow = NULL;
   mBaseTime = 1000;
-  mMeasuredFPS = 0;
+	mMeasuredFPS = 0;
+	mEnableSlicing = false;
 }
 void CustusXController::start()
 {
@@ -53,6 +60,9 @@ void CustusXController::start()
 
   QTimer::singleShot(      0,   this, SLOT(initialBeginCheckRenderSlot()) );
   QTimer::singleShot(      0,   this, SLOT(loadPatientSlot()) );
+	if(mEnableSlicing)
+		QTimer::singleShot(      0,   this, SLOT(enableSlicingSlot()) );
+
 }
 void CustusXController::stop()
 {
@@ -67,7 +77,7 @@ void CustusXController::loadPatientSlot()
   mMainWindow->setGeometry( 0, 0, 2560, 1440);
 
   if (!ssc::DataManager::getInstance()->getImages().size())
-    return;
+		return;
 
   ssc::ImagePtr image = ssc::DataManager::getInstance()->getImages().begin()->second;
   ssc::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
@@ -77,6 +87,26 @@ void CustusXController::loadPatientSlot()
   ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
   dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
   cx::ToolManager::getInstance()->runDummyTool(dummyTool);
+}
+
+
+void CustusXController::enableSlicingSlot()
+{
+		cx::InteractiveClipperPtr interactiveClipper = cx::viewManager()->getClipper();
+		interactiveClipper->setSlicePlane(ssc::ptAXIAL);
+
+	//	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+		std::map<QString, ssc::ImagePtr> imageMap = ssc::dataManager()->getImages();
+		if(imageMap.size() > 0)
+		{
+			ssc::ImagePtr image = imageMap.begin()->second;
+			interactiveClipper->setImage(image);
+			interactiveClipper->useClipper(true);
+//			std::cout << "clip in image: " << image->getName()  << std::endl;
+		}
+		else
+			std::cout << "No images!!!"  << std::endl;
+
 }
 
 void CustusXController::initialBeginCheckRenderSlot()
@@ -110,7 +140,7 @@ void CustusXController::secondEndCheckRenderSlot()
   mMeasuredFPS = cx::viewManager()->getRenderTimer()->getFPS();
 //  mTestData += "\n";
 
-  this->displayResultsSlot();
+	//this->displayResultsSlot();
   QTimer::singleShot(2*1000,   qApp, SLOT(quit()) );
 }
 
