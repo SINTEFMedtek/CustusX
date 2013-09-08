@@ -3,16 +3,9 @@
 #####################################################
 # Unix jenkins script
 # Author: Christian Askeland, SINTEF Medical Technology
-# Date:   2013.05.16
+# Date:   2013.09.08
 #
 # Description:
-#
-#   Continous integration build: run every time the repo changes.
-#   Experimental!
-#   Build part of jenkins CI
-#
-#       Download, build, and test CustusX
-#       Publish unit tests
 #
 #
 #####################################################
@@ -40,19 +33,16 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
     def __init__(self):
         ''
         self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
-        self.cxInstallation = cx.cxCustusXTestInstallation.CustusXTestInstallation()
         super(Controller, self).__init__()
 
     def getDescription(self):                  
-        return 'Jenkins script for testing an installed CustusX.'
+        return 'Jenkins script for creating a release folder and publishing it.'
            
     def _addArgumentParserArguments(self):
         'subclasses can add parser arguments here'
         super(Controller, self)._addArgumentParserArguments()
         p = self.argumentParser
-        p.add_argument('--skip_checkout', action='store_true', default=False, help='Skip the checkout of data')
-        p.add_argument('--skip_install', action='store_true', default=False, help='Skip installing the package')
-        p.add_argument('--skip_tests', action='store_true', default=False, help='Skip the test step')
+        p.add_argument('--skip_publish_release', action='store_true', default=False, help='Skip the publish release to server step')
 
     def _applyArgumentParserArguments(self, options):
         'apply arguments defined in _addArgumentParserArguments()'
@@ -75,29 +65,12 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
         self.cxInstaller.setInstallerPath(custusx.buildPath())        
         self.cxInstaller.setSourcePath(custusx.sourcePath())        
 
-        self.cxInstallation.setRootDir(assembly.controlData.getRootDir())
-        self.cxInstallation.setTestDataPath(custusxdata.sourcePath())
-        self.cxInstallation.setInstalledRoot(self.cxInstaller.getInstalledRoot())        
-
     def run(self):
-        if not self.argumentParserArguments.skip_checkout:
-            self._checkoutComponents()
-        if not self.argumentParserArguments.skip_install:
-            self.cxInstaller.installPackage()
-        if not self.argumentParserArguments.skip_tests:
-            self.cxInstallation.testInstallation()
-            self.cxInstallation.runIntegrationTests()
+        folder = self.cxInstaller.createReleaseFolder()
+        if not self.argumentParserArguments.skip_publish_release:
+            self.cxInstaller.publishReleaseFolder(folder)
         self.cxBuilder.finish()
     
-    def _checkoutComponents(self):
-        assembly = self.cxBuilder.assembly
-        PrintFormatter.printHeader('Checkout CustusX3 and CustusX3Data', level=2)
-        custusx = assembly.getComponent(cx.cxComponents.CustusX3)
-        cxdata = assembly.getComponent(cx.cxComponents.CustusX3Data)
-
-        assembly.selectLibraries([custusx.name(), cxdata.name()])
-        assembly.process(checkout=True)
-
 if __name__ == '__main__':
     controller = Controller()
     controller.run()
