@@ -30,7 +30,7 @@ void TestRenderSpeed::testSingleView()
 	this->create3Dviews(1);
 	this->showViews();
 	this->renderNumTimes(100);
-	this->printResult();
+//	this->printResult();
 //	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 2000);
 }
 
@@ -40,7 +40,7 @@ void TestRenderSpeed::testSeveralViews()
 	this->create2Dviews(8);
 	this->showViews();
 	this->renderNumTimes(100);
-	this->printResult();
+//	this->printResult();
 //	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 5000);
 }
 
@@ -50,7 +50,7 @@ void TestRenderSpeed::testLotsOfViews()
 	this->create2Dviews(80);
 	this->showViews();
 	this->renderNumTimes(10);
-	this->printResult();
+//	this->printResult();
 //	CPPUNIT_ASSERT(this->getTotalRenderTimeInMs() < 5000);
 }
 
@@ -58,14 +58,14 @@ void TestRenderSpeed::testVtkRenderWindow()
 {
 	createVtkRenderWindows(1);
 	this->renderNumTimes(100);
-	this->printResult();
+//	this->printResult();
 }
 
 void TestRenderSpeed::testSeveralVtkRenderWindows()
 {
 	createVtkRenderWindows(10);
 	this->renderNumTimes(100);
-	this->printResult();
+//	this->printResult();
 }
 
 void TestRenderSpeed::createVtkRenderWindows(int num)

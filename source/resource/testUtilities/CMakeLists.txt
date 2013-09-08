@@ -38,6 +38,7 @@ if (BUILD_TESTING)
             cxtestUtilities
             cxtestCatchImpl
 	    cxtestCatchExamples.cpp
+            cxtestJenkinsMeasurement
             )
 	include_directories(
 	    .
