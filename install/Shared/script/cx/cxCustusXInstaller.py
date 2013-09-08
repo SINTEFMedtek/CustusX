@@ -26,6 +26,7 @@ import cxComponentAssembly
 import shlex
 import cxTestRunner
 import cxUtilities
+import datetime
 
 class CustusXInstaller:
     '''
@@ -63,7 +64,7 @@ class CustusXInstaller:
         Ready to be moved to a distribution server.
         '''
         PrintFormatter.printHeader('create local release folder', level=2)
-        targetPath = self._generateTemporaryReleaseFolderName()
+        targetPath = self._generateReleaseFolderName()
         PrintFormatter.printInfo('Creating folder %s' % targetPath)
         #os.makedirs(targetPath) - no good - complains if existing.
         shell.run('mkdir -p %s' % targetPath)
@@ -71,45 +72,72 @@ class CustusXInstaller:
         self._copyFile(installerFile, targetPath)
         self.copyReleaseFiles(targetPath)                        
         return targetPath
-    
-    def _generateTemporaryReleaseFolderName(self):
+
+    def _removeLocalTags(self):    
+        '''
+        Remove local tags,
+        this removes jenkins tags that hides our own.
+        # http://stackoverflow.com/questions/1841341/remove-local-tags-that-are-no-longer-on-the-remote-repository
+        '''
+        PrintFormatter.printInfo('Removing local git tags ...')
+        shell.changeDir(self.source_path)
+        shell.run('git tag -l | xargs git tag -d')
+        shell.run('git fetch')
+        
+    def _getDateString(self):
+        return '%s' % datetime.date.today().isoformat()
+        
+    def _generateReleaseFolderName(self):
         'generate a name for the folder to insert release files into'
-        installerFile = self._findInstallerFile()
-        suffix = self._getInstallerPackageSuffix()
-        releaseFolderName = os.path.basename(installerFile).split('.%s'%suffix)[0]
-        targetPath = '%s/Release/%s' % (self.installer_path, releaseFolderName)
+        shell.changeDir(self.source_path)
+        self._removeLocalTags()    
+#        shell.run('git describe')
+        
+        output = shell.evaluate('git describe --tags --exact-match')
+        if output:
+            name = output.stdout.strip() 
+        else:
+            output = shell.evaluate('git describe --tags')
+            name = output.stdout.strip() 
+            name = '%s.%s' % (name, self._getDateString())
+        name = 'CustusX_%s' % name
+
+#        installerFile = self._findInstallerFile()
+#        suffix = self._getInstallerPackageSuffix()
+#        releaseFolderName = os.path.basename(installerFile).split('.%s'%suffix)[0]
+        targetPath = '%s/Release/%s' % (self.installer_path, name)
         return targetPath
     
     def copyReleaseFiles(self, targetPath):
         'Copy files into release folder in addition to the installer.'
-        self._copyFile('%s/install/Shared/doc/ChangeLog.rtf'%self.source_path, targetPath)
-        self._copyFile('%s/install/Shared/doc/CustusX_Specifications.pdf'%self.source_path, targetPath)
-        self._copyFile('%s/install/Shared/doc/CustusX_Tutorial.pdf'%self.source_path, targetPath)
+        self._copyFile('%s/install/Shared/doc/ChangeLog.rtf' % self.source_path, targetPath)
+        self._copyFile('%s/install/Shared/doc/CustusX_Specifications.pdf' % self.source_path, targetPath)
+        self._copyFile('%s/install/Shared/doc/CustusX_Tutorial.pdf' % self.source_path, targetPath)
         if platform.system() == 'Darwin':
-            self._copyFolder('%s/install/Apple/drivers'%self.source_path, targetPath)
-            self._copyFile('%s/install/Apple/apple_install_readme.rtf'%self.source_path, targetPath)
+            self._copyFolder('%s/install/Apple/drivers' % self.source_path, targetPath)
+            self._copyFile('%s/install/Apple/apple_install_readme.rtf' % self.source_path, targetPath)
         if platform.system() == 'Linux':
-            linux_distro='Ubuntu'
+            linux_distro = 'Ubuntu'
             #shutil.copy2('%s/install/Linux/copy/*'%self.source_path, targetPath)
             #shutil.copy2('%s/install/Linux/copy/run_v2u.sh'%self.source_path, targetPath)
             #shutil.copy2('%s/install/Linux/copy/v2u'%self.source_path, targetPath)
-            self._copyFolder('%s/install/Linux/script/NVIDIA'%self.source_path, targetPath)
-            self._copyFolder('%s/install/Linux/script/vga2usb'%self.source_path, targetPath)
-            self._copyFile('%s/install/Linux/script/programmer_setup.sh'%self.source_path, targetPath)
-            self._copyFile('%s/install/Linux/script/NDIToolBox_install.sh '%self.source_path, targetPath)
+            self._copyFolder('%s/install/Linux/script/NVIDIA' % self.source_path, targetPath)
+            self._copyFolder('%s/install/Linux/script/vga2usb' % self.source_path, targetPath)
+            self._copyFile('%s/install/Linux/script/programmer_setup.sh' % self.source_path, targetPath)
+            self._copyFile('%s/install/Linux/script/NDIToolBox_install.sh ' % self.source_path, targetPath)
             if linux_distro == 'Ubuntu':
-                self._copyFile('%s/install/Linux/script/ubuntu_install_readme.sh'%self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/script/ubuntu_ndi_setup.sh'%self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/script/ubuntu_epiphan_setup.sh'%self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/script/ubuntu_install_packages.sh'%self.source_path, targetPath)
+                self._copyFile('%s/install/Linux/script/ubuntu_install_readme.sh' % self.source_path, targetPath)
+                self._copyFile('%s/install/Linux/script/ubuntu_ndi_setup.sh' % self.source_path, targetPath)
+                self._copyFile('%s/install/Linux/script/ubuntu_epiphan_setup.sh' % self.source_path, targetPath)
+                self._copyFile('%s/install/Linux/script/ubuntu_install_packages.sh' % self.source_path, targetPath)
             if linux_distro == 'Fedora':
-                self._copyFile('%s/install/Linux/script/install_packages.sh'%self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/copy/Fedora_Linux_Installation_Guide.pdf'%self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/script/epiphan_setup.sh'%self.source_path, targetPath)
-                self._copyFile('%s/install/Linux/script/opencl_setup.sh'%self.source_path, targetPath)
-                self._copyFile('%s/install/Shared/script/sudo_setup.sh'%self.source_path, targetPath)
+                self._copyFile('%s/install/Linux/script/install_packages.sh' % self.source_path, targetPath)
+                self._copyFile('%s/install/Linux/copy/Fedora_Linux_Installation_Guide.pdf' % self.source_path, targetPath)
+                self._copyFile('%s/install/Linux/script/epiphan_setup.sh' % self.source_path, targetPath)
+                self._copyFile('%s/install/Linux/script/opencl_setup.sh' % self.source_path, targetPath)
+                self._copyFile('%s/install/Shared/script/sudo_setup.sh' % self.source_path, targetPath)
         if platform.system() == 'Windows':
-            self._copyFile('%s/install/Windows/Windows_Install_ReadMe.rtf'%self.source_path, targetPath)
+            self._copyFile('%s/install/Windows/Windows_Install_ReadMe.rtf' % self.source_path, targetPath)
         
     def _copyFolder(self, source, targetPath):
         targetFolder = os.path.split(source)[1]
@@ -139,6 +167,17 @@ class CustusXInstaller:
         PrintFormatter.printInfo('Publishing contents of [%s] to remote path [%s]' % (path, target))
         shell.run(cmd1)
         shell.run(cmd2)
+        
+    def _getUserFriendlyPlatformName(self):
+        'generate a platform name understandable for users.'
+        name = platform.system()
+        if name == 'Darwin':
+            return 'Apple'
+        else if name == 'Linux':
+            return name
+        else:
+            return name
+        
 
 #    def getInstallFolder(self):
 #        git_description = shell.evaluate('git describe --tags')
@@ -162,7 +201,7 @@ class CustusXInstaller:
         pattern = self._getInstallerPackagePattern()
         PrintFormatter.printInfo('Looking for installers with pattern: %s' % pattern)
         files = glob.glob(pattern)
-        cxUtilities.assertTrue(len(files)==1, 
+        cxUtilities.assertTrue(len(files) == 1,
                         'Found %i install files, requiring 1: \n pattern: %s\n Found:\n %s' % 
                         (len(files), pattern, ' \n'.join(files)))
         file = files[0]
@@ -196,7 +235,7 @@ class CustusXInstaller:
         shell.changeDir(temp_path)
         shell.run('tar -zxvf %s' % (filename)) # extract to path
         corename = os.path.basename(filename).split('.tar.gz')[0]
-        unpackedfolder = "%s/%s" % (temp_path,corename)
+        unpackedfolder = "%s/%s" % (temp_path, corename)
         installfolder = '%s' % self.install_root
         shell.changeDir(installfolder)
         shell.run('cp -r %s/* %s' % (unpackedfolder, installfolder))
