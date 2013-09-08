@@ -161,7 +161,7 @@ class CustusXInstaller:
 #        remoteServerPath = "/Users/christiana/tst/AutomatedReleases"
         targetFolder = os.path.split(path)[1]
         source = '%s/*' % path
-        target = '%s/%s/%s' % (remoteServerPath, targetFolder, platform.system())
+        target = '%s/%s/%s' % (remoteServerPath, targetFolder, self._getUserFriendlyPlatformName())
         cmd1 = 'ssh %s "mkdir -p %s"' % (remoteServer, target)
         cmd2 = 'scp -r %s/* %s:%s' % (path, remoteServer, target)
         PrintFormatter.printInfo('Publishing contents of [%s] to remote path [%s]' % (path, target))
@@ -171,12 +171,14 @@ class CustusXInstaller:
     def _getUserFriendlyPlatformName(self):
         'generate a platform name understandable for users.'
         name = platform.system()
-        if name == 'Darwin':
+        if platform.system() == 'Darwin':
+            # return name + platform.mac_ver() ??
             return 'Apple'
-        else if name == 'Linux':
+        elif platform.system() == 'Linux':
             return name
+            # return name + platform.linux_distribution()[0] ??
         else:
-            return name
+            return platform.system()
         
 
 #    def getInstallFolder(self):
