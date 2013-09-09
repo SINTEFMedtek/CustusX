@@ -23,12 +23,12 @@ TEST_CASE("DistanceMetric composed of two points gives a correct distance", "[un
 {
     cxtest::MetricFixture fixture;
     double distance = 2;
-//    PointMetricData p0 = fixture.getPointMetricData(ssc::Vector3D(0,0,0));
-//    PointMetricData p1 = fixture.getPointMetricData(ssc::Vector3D(distance,0,0));
-//    DistanceMetricData testData = fixture.getDistanceMetricData(distance, p0, p1);
-    cxtest::DistanceMetricData testData = fixture.getDistanceMetricData(distance);
+//    PointMetricWithInput p0 = fixture.getPointMetricWithInput(ssc::Vector3D(0,0,0));
+//    PointMetricWithInput p1 = fixture.getPointMetricWithInput(ssc::Vector3D(distance,0,0));
+//    DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance, p0, p1);
+	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance);
 
-    CHECK(fixture.metricEqualsData(testData));
+	CHECK(fixture.inputEqualsMetric(testData));
 }
 
 // not supported
@@ -37,11 +37,11 @@ TEST_CASE("DistanceMetric composed of two points gives a correct distance", "[un
 //    cxtest::MetricFixture fixture;
 //    double distance = 2;
 //    ssc::Vector3D normal(0,0,1);
-//    cxtest::PlaneMetricData p0 = fixture.getPlaneMetricData(ssc::Vector3D(0,0,0), normal);
-//    cxtest::PlaneMetricData p1 = fixture.getPlaneMetricData(ssc::Vector3D(distance,0,0), normal);
-//    cxtest::DistanceMetricData testData = fixture.getDistanceMetricData(distance, p0.mMetric, p1.mMetric);
+//    cxtest::PlaneMetricWithInput p0 = fixture.getPlaneMetricWithInput(ssc::Vector3D(0,0,0), normal);
+//    cxtest::PlaneMetricWithInput p1 = fixture.getPlaneMetricWithInput(ssc::Vector3D(distance,0,0), normal);
+//    cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance, p0.mMetric, p1.mMetric);
 
-//    CHECK(fixture.metricEqualsData(testData));
+//    CHECK(fixture.inputEqualsMetric(testData));
 //}
 
 TEST_CASE("DistanceMetric composed of a point and plane gives a correct distance", "[unit]")
@@ -49,14 +49,14 @@ TEST_CASE("DistanceMetric composed of a point and plane gives a correct distance
     cxtest::MetricFixture fixture;
     double distance = 2;
     ssc::Vector3D normal(0,0,1);
-    cxtest::PointMetricData p0 = fixture.getPointMetricData(ssc::Vector3D(0,0, distance));
-    cxtest::PlaneMetricData p1 = fixture.getPlaneMetricData(ssc::Vector3D(0,0,0), normal);
+	cxtest::PointMetricWithInput p0 = fixture.getPointMetricWithInput(ssc::Vector3D(0,0, distance));
+	cxtest::PlaneMetricWithInput p1 = fixture.getPlaneMetricWithInput(ssc::Vector3D(0,0,0), normal);
 
-    cxtest::DistanceMetricData testData = fixture.getDistanceMetricData(distance, p0.mMetric, p1.mMetric);
-    CHECK(fixture.metricEqualsData(testData));
+	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance, p0.mMetric, p1.mMetric);
+	CHECK(fixture.inputEqualsMetric(testData));
 
-    testData = fixture.getDistanceMetricData(distance, p1.mMetric, p0.mMetric);
-    CHECK(fixture.metricEqualsData(testData));
+	testData = fixture.getDistanceMetricWithInput(distance, p1.mMetric, p0.mMetric);
+	CHECK(fixture.inputEqualsMetric(testData));
 }
 
 TEST_CASE("DistanceMetric can save/load XML", "[unit]")
@@ -64,7 +64,7 @@ TEST_CASE("DistanceMetric can save/load XML", "[unit]")
     cxtest::MetricFixture fixture;
 
     double distance = 2;
-    cxtest::DistanceMetricData testData = fixture.getDistanceMetricData(distance);
+	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance);
 
     CHECK(fixture.saveLoadXmlGivesEqualTransform(testData));
 }
@@ -73,7 +73,7 @@ TEST_CASE("DistanceMetric can convert values to single line string", "[unit]")
 {
     cxtest::MetricFixture fixture;
     double distance = 2;
-    cxtest::DistanceMetricData testData = fixture.getDistanceMetricData(distance);
+	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance);
 
 	QStringList list = fixture.getSingleLineDataList(testData.mMetric);
 	CHECK(fixture.verifySingleLineHeader(list, testData.mMetric));
