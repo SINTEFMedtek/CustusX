@@ -68,6 +68,7 @@ private:
 	void removeRepsFromView();
 	void addRepsToView();
 
+	void buildSscGPURayCastMultiVolume();
 	void buildVtkVolumeTextureMapper3D(ssc::ImagePtr image);
 	void buildVtkGPUVolumeRayCastMapper(ssc::ImagePtr image);
 	void buildSscProgressiveLODVolumeTextureMapper3D(ssc::ImagePtr image);
