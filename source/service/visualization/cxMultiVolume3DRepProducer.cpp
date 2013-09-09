@@ -21,6 +21,8 @@
 #include "sscView.h"
 #include "sscTypeConversions.h"
 #include "sscLogger.h"
+#include "sscGPURayCastVolumeRep.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -39,6 +41,28 @@ void MultiVolume3DRepProducer::setView(ssc::View* view)
 	this->clearReps();
 	mView = view;
 	this->fillReps();
+}
+
+QStringList MultiVolume3DRepProducer::getAvailableVisualizers()
+{
+	QStringList retval;
+	retval << "vtkVolumeTextureMapper3D";
+#if !defined(__APPLE__) && !defined(WIN32)
+	retval << "vtkGPUVolumeRayCastMapper";
+#endif
+	retval << "sscProgressiveLODVolumeTextureMapper3D";
+	retval << "sscGPURayCastMultiVolume";
+	return retval;
+}
+
+std::map<QString, QString> MultiVolume3DRepProducer::getAvailableVisualizerDisplayNames()
+{
+	std::map<QString, QString> names;
+	names["vtkVolumeTextureMapper3D"] = "Texture (single volume)";
+	names["vtkGPUVolumeRayCastMapper"] = "Raycast GPU (single volume)";
+	names["sscProgressiveLODVolumeTextureMapper3D"] = "Progressive texture (single volume)";
+	names["sscGPURayCastMultiVolume"] = "Raycast GPU (multi volume)";
+	return names;
 }
 
 void MultiVolume3DRepProducer::setMaxRenderSize(int voxels)
@@ -157,36 +181,27 @@ void MultiVolume3DRepProducer::rebuildReps()
 		for (unsigned i=0; i<mImages.size(); ++i)
 			this->buildSingleVolumeRenderer(mImages[i]);
 	}
+	else if (mVisualizerType=="sscGPURayCastMultiVolume")
+	{
+		this->buildSscGPURayCastMultiVolume();
+	}
 	else
 	{
 		ssc::messageManager()->sendError(QString("No visualizer found for string=%1").arg(mVisualizerType));
-		return;
 	}
+}
+
+void MultiVolume3DRepProducer::buildSscGPURayCastMultiVolume()
+{
+	ssc::GPURayCastVolumeRepPtr rep = ssc::GPURayCastVolumeRep::New("");
+	rep->setShaderFolder(DataLocations::getShaderPath());
+	rep->setImages(mImages);
+	mReps.push_back(rep);
 }
 
 bool MultiVolume3DRepProducer::is2DImage(ssc::ImagePtr image) const
 {
 	return image->getBaseVtkImageData()->GetDimensions()[2]==1;
-}
-
-QStringList MultiVolume3DRepProducer::getAvailableVisualizers()
-{
-	QStringList retval;
-	retval << "vtkVolumeTextureMapper3D";
-#if !defined(__APPLE__) && !defined(WIN32)
-	retval << "vtkGPUVolumeRayCastMapper";
-#endif
-	retval << "sscProgressiveLODVolumeTextureMapper3D";
-	return retval;
-}
-
-std::map<QString, QString> MultiVolume3DRepProducer::getAvailableVisualizerDisplayNames()
-{
-	std::map<QString, QString> names;
-	names["vtkVolumeTextureMapper3D"] = "Texture (single volume)";
-	names["vtkGPUVolumeRayCastMapper"] = "Raycast (single volume)";
-	names["sscProgressiveLODVolumeTextureMapper3D"] = "Progressive texture (single volume)";
-	return names;
 }
 
 void MultiVolume3DRepProducer::buildSingleVolumeRenderer(ssc::ImagePtr image)
