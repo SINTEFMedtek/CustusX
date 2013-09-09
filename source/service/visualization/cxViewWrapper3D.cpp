@@ -187,13 +187,6 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	if (( key=="View3D/ImageRender3DVisualizer" )||( key=="View3D/maxRenderSize" ))
 	{
 		this->initializeMultiVolume3DRepProducer();
-//		// reload volumes from cache
-//		std::vector<ssc::ImagePtr> images = mGroupData->getImages();
-//		for (unsigned i = 0; i < images.size(); ++i)
-//		{
-//			this->dataRemoved(images[i]->getUid());
-//			this->dataAdded(images[i]);
-//		}
 	}
 	if (key == "View/showDataText")
 	{
@@ -220,8 +213,6 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		this->toolsAvailableSlot();
 		mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 		mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
-		//    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-		//    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 	}
 	if (key == "View3D/depthPeeling")
 		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
@@ -537,9 +528,6 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 
 void ViewWrapper3D::dataRemoved(const QString& uid)
 {
-//	if (!mDataReps.count(uid))
-//		return;
-
 	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
 	if (image)
 	{
@@ -560,36 +548,11 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
 	this->updateView();
 }
 
-//ViewWrapper3D::updateImageReps()
-//{
-//	std::vector<ssc::RepPtr> reps = mMultiVolume3DRepProducer->getAllReps();
-//	for (unsigned i=0; i<reps.size(); ++i)
-//		 mView->removeRep(reps[i]);
-//	for (unsigned i=0; i<reps.size(); ++i)
-//		 mView->addRep(reps[i]);
-
-//}
-
 /**Construct a 3D standard rep for a given data.
  *
  */
 ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 {
-//	if (boost::dynamic_pointer_cast<ssc::Image>(data))
-//	{
-//		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
-//		if (image->getBaseVtkImageData()->GetDimensions()[2]==1)
-//		{
-//			cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New();
-//			rep->setImage(image);
-//			return rep;
-//		}
-//		else
-//		{
-//			ssc::VolumetricBaseRepPtr rep = RepManager::getInstance()->getVolumetricRep(image);
-//			return rep;
-//		}
-//	}
 	if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
 	{
 		ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid() + "_geom3D_rep");
@@ -795,12 +758,10 @@ void ViewWrapper3D::showLandmarks(bool on)
 
 	if (on)
 	{
-		//mView->addRep(mPatientLandmarkRep);
 		mView->addRep(mLandmarkRep);
 	}
 	else
 	{
-		//mView->removeRep(mPatientLandmarkRep);
 		mView->removeRep(mLandmarkRep);
 	}
 }
