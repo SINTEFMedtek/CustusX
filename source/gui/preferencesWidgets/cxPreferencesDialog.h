@@ -116,14 +116,13 @@ protected:
   QSpinBox* mRenderingIntervalSpinBox;
   QLabel* mRenderingRateLabel;
   QCheckBox* mSmartRenderCheckBox;
-  QCheckBox* mGPURenderCheckBox;
-  QCheckBox* mProgressiveTextureRenderCheckBox;
   QCheckBox* mGPU2DRenderCheckBox;
 //  QCheckBox* mGPU3DDepthPeelingCheckBox;
   QCheckBox* mShadingCheckBox;
   QGridLayout *mMainLayout;
   ssc::DoubleDataAdapterXmlPtr mMaxRenderSize;
   ssc::DoubleDataAdapterXmlPtr mStillUpdateRate;
+  ssc::StringDataAdapterXmlPtr m3DVisualizer;
 
 private slots:
   void renderingIntervalSlot(int interval);

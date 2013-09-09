@@ -5,31 +5,39 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
-  # -----------------------------------------------
-  # CppUnit test framework: Create executable testCX
-  #
-  include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
-  include_directories(
-    ../logic
-    ${CustusX3_SOURCE_DIR}/source/service/patient
-    ${CustusX3_SOURCE_DIR}/source/service/tracking
-    )
+    # -----------------------------------------------
+    # CppUnit test framework: Create executable testCX
+    #
+    include_directories(${CX_RESOURCE_INCLUDE_DIRECTORIES})
+    include_directories(
+        ../logic
+        ${CustusX3_SOURCE_DIR}/source/service/patient
+        ${CustusX3_SOURCE_DIR}/source/service/tracking
+        )
 
-  # List of all test units
-  QT4_WRAP_CPP( SOURCE_FILES
-   )
+    cx_add_class(CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES
+        cxTestVisualization.cpp
+        cxTestVisualization.h
+        cxTestRenderSpeed.h
+        cxTestRenderSpeed.cpp
+        )
 
-  set(SOURCE_FILES
-    cxTestVisualization.cpp
-    cxTestVisualization.h
-    cxTestRenderSpeed.h
-    cxTestRenderSpeed.cpp
-  ${SOURCE_FILES}
-  ${CX_TEST_SOURCE_FILES}
-  )
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
+    include(cxTestMacros)
+    # define cppunit tests and ctest tests from same source:
+    SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestVisualization cxCppUnitMain.cpp "${CX_CPPUNIT_VISUALIZATIONSERVICE_SOURCES}" cxVisualizationService)
 
-	set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${SSC_SOURCE_DIR}/CMake)
-	include(cxTestMacros)
-	# define cppunit tests and ctest tests from same source:
-	SSC_ADD_CTEST_CPPUNIT_TESTS(cxTestVisualization cxCppUnitMain.cpp "${SOURCE_FILES}" cxVisualizationService)
+
+    cx_add_class_qt_moc(CXTEST_VISUALIZATIONSERVICE_SOURCES
+        )
+    cx_add_class(CXTEST_VISUALIZATIONSERVICE_SOURCES
+        cxtestCatchMultiVolume3DRepProducer.cpp
+        cxtestMultiVolume3DRepProducerFixture
+        cxtestCatchViewRenderSpeed.cpp
+        cxTestRenderSpeed
+        )
+
+    cx_catch_add_lib_and_exe(cxVisualizationService "${CXTEST_VISUALIZATIONSERVICE_SOURCES}")
+
+
 endif (BUILD_TESTING)

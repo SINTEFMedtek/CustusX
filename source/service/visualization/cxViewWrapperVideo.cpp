@@ -105,13 +105,13 @@ void ViewWrapperVideo::addStreamAction(QString uid, QMenu* contextMenu)
 {
 	QAction* action = new QAction(uid, contextMenu);
 
-	ssc::VideoSourcePtr selected = this->getSourceFromService(mViewGroup->getVideoSource());
+	ssc::VideoSourcePtr selected = this->getSourceFromService(mGroupData->getVideoSource());
 	ssc::VideoSourcePtr current = this->getSourceFromService(uid);
 
 	action->setData(QVariant(uid));
 	action->setCheckable(true);
 	if (uid=="active")
-		action->setChecked(mViewGroup->getVideoSource()=="active");
+		action->setChecked(mGroupData->getVideoSource()=="active");
 	else
 		action->setChecked(selected && (selected==current));
 
@@ -130,7 +130,7 @@ void ViewWrapperVideo::streamActionSlot()
 	QString uid = theAction->data().toString();
 //	std::cout << "selected source  " << uid << std::endl;
 //	mSelectedVideoSource = uid;
-	mViewGroup->setVideoSource(uid);
+	mGroupData->setVideoSource(uid);
 //	this->connectStream();
 
 //	ssc::VideoSourcePtr source = videoService()->getVideoSources();
@@ -143,10 +143,10 @@ void ViewWrapperVideo::videoSourceChangedSlot(QString uid)
 
 void ViewWrapperVideo::connectStream()
 {
-	if (!mViewGroup)
+	if (!mGroupData)
 		return;
 //	std::cout << "ViewWrapperVideo::connectStream() selected=" << mViewGroup->getVideoSource()  << std::endl;
-	ssc::VideoSourcePtr source = this->getSourceFromService(mViewGroup->getVideoSource());
+	ssc::VideoSourcePtr source = this->getSourceFromService(mGroupData->getVideoSource());
 //	if (source)
 //		std::cout << "ViewWrapperVideo::connectStream() " << source->getUid() << std::endl;
 //	else

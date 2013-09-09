@@ -72,61 +72,13 @@
 #include "sscPointMetric.h"
 
 #include "cxDepthPeeling.h"
+#include "cxAxisConnector.h"
+#include "cxMultiVolume3DRepProducer.h"
+
 
 namespace cx
 {
 
-AxisConnector::AxisConnector(ssc::CoordinateSystem space)
-{
-	mListener.reset(new ssc::CoordinateSystemListener(space));
-	connect(mListener.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
-
-	mRep = ssc::AxesRep::New(space.toString() + "_axis");
-	mRep->setCaption(space.toString(), ssc::Vector3D(1, 0, 0));
-	mRep->setShowAxesLabels(false);
-	mRep->setFontSize(0.08);
-	mRep->setAxisLength(0.03);
-	this->changedSlot();
-}
-
-void AxisConnector::mergeWith(ssc::CoordinateSystemListenerPtr base)
-{
-	mBase = base;
-	connect(mBase.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
-	this->changedSlot();
-}
-
-void AxisConnector::connectTo(ssc::ToolPtr tool)
-{
-	mTool = tool;
-	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(changedSlot()));
-	this->changedSlot();
-}
-
-void AxisConnector::changedSlot()
-{
-	ssc::Transform3D  rMs = ssc::SpaceHelpers::get_toMfrom(mListener->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-	mRep->setTransform(rMs);
-
-	mRep->setVisible(true);
-
-	// if connected to tool: check visibility
-	if (mTool)
-		mRep->setVisible(mTool->getVisible());
-
-	// Dont show if equal to base
-	if (mBase)
-	{
-		ssc::Transform3D rMb = ssc::SpaceHelpers::get_toMfrom(mBase->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-		if (ssc::similar(rMb, rMs))
-			mRep->setVisible(false);
-	}
-
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
 
 
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
@@ -144,6 +96,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 
 	view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+
+	this->initializeMultiVolume3DRepProducer();
 
 	mLandmarkRep = LandmarkRep::New("LandmarkRep_" + index);
 	mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
@@ -196,17 +150,31 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::ViewWidget* view)
 	if(settings()->value("View3D/depthPeeling").toBool())
 		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
 
-//	connect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	this->updateView();
 }
 
 ViewWrapper3D::~ViewWrapper3D()
 {
-//	disconnect(viewManager()->getClipper().get(), SIGNAL(changed()), this, SLOT(updateView()));
 	if (mView)
 	{
 		mView->removeReps();
 	}
+}
+
+void ViewWrapper3D::initializeMultiVolume3DRepProducer()
+{
+	if (!mView)
+		ssc::messageManager()->sendError("Missing View in initializeMultiVolume3DRepProducer");
+
+	if (!mMultiVolume3DRepProducer)
+	{
+		mMultiVolume3DRepProducer.reset(new MultiVolume3DRepProducer());
+		connect(mMultiVolume3DRepProducer.get(), SIGNAL(imagesChanged()), this, SLOT(updateView()));
+		mMultiVolume3DRepProducer->setView(mView);
+	}
+
+	mMultiVolume3DRepProducer->setMaxRenderSize(settings()->value("View3D/maxRenderSize").toInt());
+	mMultiVolume3DRepProducer->setVisualizerType(settings()->value("View3D/ImageRender3DVisualizer").toString());
 }
 
 void ViewWrapper3D::settingsChangedSlot(QString key)
@@ -216,15 +184,9 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		QColor background = settings()->value("backgroundColor").value<QColor>();
 		mView->setBackgroundColor(background);
 	}
-	if (( key=="useGPUVolumeRayCastMapper" )||( key=="maxRenderSize" ))
+	if (( key=="View3D/ImageRender3DVisualizer" )||( key=="View3D/maxRenderSize" ))
 	{
-		// reload volumes from cache
-		std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
-		for (unsigned i = 0; i < images.size(); ++i)
-		{
-			this->dataRemoved(images[i]->getUid());
-			this->dataAdded(images[i]);
-		}
+		this->initializeMultiVolume3DRepProducer();
 	}
 	if (key == "View/showDataText")
 	{
@@ -251,8 +213,6 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		this->toolsAvailableSlot();
 		mLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
 		mLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
-		//    mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
-		//    mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 	}
 	if (key == "View3D/depthPeeling")
 		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
@@ -393,7 +353,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 
 	connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
 	connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
-	mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
+	mView->getRenderer()->SetActiveCamera(mGroupData->getCamera3D()->getCamera());
 
 	// Set eye angle after camera change. Maybe create a cameraChangedSlot instead
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
@@ -447,7 +407,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		mAxis.push_back(axis);
 
 		// data spaces
-		std::vector<ssc::DataPtr> data = mViewGroup->getData();
+		std::vector<ssc::DataPtr> data = mGroupData->getData();
 		for (unsigned i = 0; i < data.size(); ++i)
 		{
 			axis.reset(new AxisConnector(ssc::CoordinateSystem(ssc::csDATA, data[i]->getUid())));
@@ -514,7 +474,7 @@ void ViewWrapper3D::centerImageActionSlot()
 	if (ssc::dataManager()->getActiveImage())
 		Navigation().centerToData(ssc::dataManager()->getActiveImage());
 	else
-		Navigation().centerToView(mViewGroup->getData());
+		Navigation().centerToView(mGroupData->getData());
 }
 
 void ViewWrapper3D::centerToolActionSlot()
@@ -537,21 +497,30 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 	if (!data)
 		return;
 
-	if (!mDataReps.count(data->getUid()))
+	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
+	if (image)
 	{
-		ssc::RepPtr rep = this->createDataRep3D(data);
-		if (!rep)
-			return;
-		mDataReps[data->getUid()] = rep;
-		mView->addRep(rep);
-
-		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
-		if (image)
+		mMultiVolume3DRepProducer->addImage(image);
+	}
+	else
+	{
+		if (!mDataReps.count(data->getUid()))
 		{
-			connect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
-			connect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
+			ssc::RepPtr rep = this->createDataRep3D(data);
+			if (!rep)
+				return;
+			mDataReps[data->getUid()] = rep;
+			mView->addRep(rep);
+
+	//			ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
+	//			if (image)
+	//			{
+	//				connect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
+	//				connect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
+	//			}
 		}
 	}
+
 
 	this->activeImageChangedSlot();
 	this->updateView();
@@ -559,18 +528,21 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 
 void ViewWrapper3D::dataRemoved(const QString& uid)
 {
-	if (!mDataReps.count(uid))
-		return;
-
 	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
 	if (image)
 	{
-		disconnect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
-		disconnect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
+		mMultiVolume3DRepProducer->removeImage(uid);
+//		disconnect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
+//		disconnect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
 	}
-
-	mView->removeRep(mDataReps[uid]);
-	mDataReps.erase(uid);
+	else
+	{
+		if (mDataReps.count(uid))
+		{
+			mView->removeRep(mDataReps[uid]);
+			mDataReps.erase(uid);
+		}
+	}
 
 	this->activeImageChangedSlot();
 	this->updateView();
@@ -581,22 +553,7 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
  */
 ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
 {
-	if (boost::dynamic_pointer_cast<ssc::Image>(data))
-	{
-		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
-		if (image->getBaseVtkImageData()->GetDimensions()[2]==1)
-		{
-			cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New(data->getUid()+"image2DRep");
-			rep->setImage(image);
-			return rep;
-		}
-		else
-		{
-			ssc::VolumetricBaseRepPtr rep = RepManager::getInstance()->getVolumetricRep(image);
-			return rep;
-		}
-	}
-	else if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
+	if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
 	{
 		ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid() + "_geom3D_rep");
 		rep->setMesh(boost::dynamic_pointer_cast<ssc::Mesh>(data));
@@ -666,12 +623,12 @@ void ViewWrapper3D::updateView()
 
 void ViewWrapper3D::activeImageChangedSlot()
 {
-	if(!mViewGroup)
+	if(!mGroupData)
 		return;
 	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
 
 	// only show landmarks belonging to image visible in this view:
-	std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
+	std::vector<ssc::ImagePtr> images = mGroupData->getImages();
 	if (!std::count(images.begin(), images.end(), image))
 		image.reset();
 }
@@ -702,7 +659,7 @@ void ViewWrapper3D::updateSlices()
 	if (mSlices3DRep)
 		mView->removeRep(mSlices3DRep);
 	//Simple bug fix of #746: Don't create slices if no volumes exist in 3D scene
-	if (!mViewGroup || mViewGroup->getImages().empty())
+	if (!mGroupData || mGroupData->getImages().empty())
 	{
 		ssc::messageManager()->sendWarning("Need volumes in the 3D scene to create 2D slices");
 		return;
@@ -728,8 +685,8 @@ void ViewWrapper3D::updateSlices()
 	}
 
 	mSlices3DRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
-	if (mViewGroup && !mViewGroup->getImages().empty())
-		mSlices3DRep->setImages(mViewGroup->getImages());
+	if (mGroupData && !mGroupData->getImages().empty())
+		mSlices3DRep->setImages(mGroupData->getImages());
 	mSlices3DRep->setTool(ssc::toolManager()->getDominantTool());
 //	return mSlices3DRep;
 	mView->addRep(mSlices3DRep);
@@ -787,7 +744,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 
 void ViewWrapper3D::optionChangedSlot()
 {
-	ViewGroupData::Options options = mViewGroup->getOptions();
+	ViewGroupData::Options options = mGroupData->getOptions();
 
 	this->showLandmarks(options.mShowLandmarks);
 	this->showPointPickerProbe(options.mShowPointPickerProbe);
@@ -801,12 +758,10 @@ void ViewWrapper3D::showLandmarks(bool on)
 
 	if (on)
 	{
-		//mView->addRep(mPatientLandmarkRep);
 		mView->addRep(mLandmarkRep);
 	}
 	else
 	{
-		//mView->removeRep(mPatientLandmarkRep);
 		mView->removeRep(mLandmarkRep);
 	}
 }

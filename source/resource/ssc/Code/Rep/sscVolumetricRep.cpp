@@ -41,13 +41,14 @@
 #include "sscTypeConversions.h"
 #include "vtkForwardDeclarations.h"
 #include "sscMessageManager.h"
+#include "cxImageMapperMonitor.h"
 
 typedef vtkSmartPointer<class vtkGPUVolumeRayCastMapper> vtkGPUVolumeRayCastMapperPtr;
 
 namespace ssc
 {
-VolumetricRep::VolumetricRep(const QString& uid, const QString& name) :
-	VolumetricBaseRep(uid, name),
+VolumetricRep::VolumetricRep() :
+	VolumetricBaseRep(),
 	mOpacityTransferFunction(vtkPiecewiseFunctionPtr::New()),
 	mColorTransferFunction(vtkColorTransferFunctionPtr::New()),
 	mVolumeProperty(vtkVolumePropertyPtr::New()),
@@ -127,13 +128,6 @@ void VolumetricRep::setUseVolumeTextureMapper()
 	mMapper->SetBlendModeToComposite();
 
 	mVolume->SetMapper( mMapper );
-}
-
-VolumetricRepPtr VolumetricRep::New(const QString& uid, const QString& name)
-{
-	VolumetricRepPtr retval(new VolumetricRep(uid, name));
-	retval->mSelf = retval;
-	return retval;
 }
 
 void VolumetricRep::addRepActorsToViewRenderer(View *view)
@@ -298,6 +292,7 @@ void VolumetricRep::transferFunctionsChangedSlot()
 	mVolumeProperty->SetSpecular(mImage->getShadingSpecular());
 	mVolumeProperty->SetSpecularPower(mImage->getShadingSpecularPower());
 
+	mVolumeProperty->SetInterpolationType(mImage->getInterpolationType());
 }
 
 void VolumetricRep::setMaxVolumeSize(long maxVoxels)

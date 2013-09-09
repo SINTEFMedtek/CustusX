@@ -60,12 +60,12 @@ QVariant SyncedValue::get() const
 
 void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 {
-	mViewGroup = group;
-	connect(mViewGroup.get(), SIGNAL(dataAdded(QString)), SLOT(dataAddedSlot(QString)));
-	connect(mViewGroup.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
-	connect(mViewGroup.get(), SIGNAL(videoSourceChanged(QString)), SLOT(videoSourceChangedSlot(QString)));
+	mGroupData = group;
+	connect(mGroupData.get(), SIGNAL(dataAdded(QString)), SLOT(dataAddedSlot(QString)));
+	connect(mGroupData.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
+	connect(mGroupData.get(), SIGNAL(videoSourceChanged(QString)), SLOT(videoSourceChangedSlot(QString)));
 
-	std::vector<ssc::DataPtr> data = mViewGroup->getData();
+	std::vector<ssc::DataPtr> data = mGroupData->getData();
 	for (unsigned i = 0; i < data.size(); ++i)
 	{
 		this->dataAddedSlot(qstring_cast(data[i]->getUid()));
@@ -75,22 +75,13 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 
 void ViewWrapper::dataAddedSlot(QString uid)
 {
-//  ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
-//  if (image)
-//    this->imageAdded(image);
-//  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(uid);
-//  if (mesh)
-//    this->meshAdded(mesh);
-
 	this->dataAdded(ssc::dataManager()->getData(uid));
 }
 
 void ViewWrapper::dataRemovedSlot(QString uid)
 {
 	this->dataRemoved(uid);
-//  this->imageRemoved(uid);
-//  this->meshRemoved(uid);
-	RepManager::getInstance()->purgeVolumetricReps();
+//	RepManager::getInstance()->purgeVolumetricReps();
 }
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
@@ -99,33 +90,18 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
 	QMenu contextMenu(sender);
 
 	//add actions to the actiongroups and the contextmenu
-					std::vector<ssc::DataPtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getData());
-					mLastDataActionUid = "________________________";
-					for (std::vector<ssc::DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
-					{
-						this->addDataAction((*iter)->getUid(), &contextMenu);
-					}
+	std::vector<ssc::DataPtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getData());
+	mLastDataActionUid = "________________________";
+	for (std::vector<ssc::DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
+	{
+		this->addDataAction((*iter)->getUid(), &contextMenu);
+	}
 
-//  std::map<QString, QString>::iterator iter;
-//  std::map<QString, QString> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
-//  for(iter=imageUidsAndNames.begin(); iter != imageUidsAndNames.end(); ++iter)
-//  {
-//    this->addDataAction(iter->first, &contextMenu);
-//  }
-//
-//  contextMenu.addSeparator();
-//
-//  std::map<QString, QString> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
-//  for(iter=meshUidsAndNames.begin(); iter != meshUidsAndNames.end(); ++iter)
-//  {
-//    this->addDataAction(iter->first, &contextMenu);
-//  }
+	//append specific info from derived classes
+	this->appendToContextMenu(contextMenu);
 
-//append specific info from derived classes
-					this->appendToContextMenu(contextMenu);
-
-					contextMenu.exec(pointGlobal);
-				}
+	contextMenu.exec(pointGlobal);
+}
 
 void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 {
@@ -153,7 +129,7 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 
 	action->setData(QVariant(qstring_cast(uid)));
 	action->setCheckable(true);
-	std::vector<ssc::DataPtr> allVisible = mViewGroup->getData();
+	std::vector<ssc::DataPtr> allVisible = mGroupData->getData();
 	action->setChecked(std::count(allVisible.begin(), allVisible.end(), data));
 	connect(action, SIGNAL(triggered()), this, SLOT(dataActionSlot()));
 	contextMenu->addAction(action);
@@ -168,17 +144,17 @@ void ViewWrapper::dataActionSlot()
 	ssc::DataPtr data = ssc::dataManager()->getData(uid);
 	ssc::ImagePtr image = ssc::dataManager()->getImage(data->getUid());
 
-	bool firstData = mViewGroup->getData().empty();
+	bool firstData = mGroupData->getData().empty();
 
 	if (theAction->isChecked())
 	{
-		mViewGroup->addData(data);
+		mGroupData->addData(data);
 		if (image)
 		ssc::dataManager()->setActiveImage(image);
 	}
 	else
 	{
-		mViewGroup->removeData(data);
+		mGroupData->removeData(data);
 		//if (image)
 		//ssc::dataManager()->setActiveImage(ssc::ImagePtr());
 	}
@@ -186,7 +162,7 @@ void ViewWrapper::dataActionSlot()
 	if (firstData)
 	{
 		Navigation().centerToGlobalDataCenter(); // reset center for convenience
-					mViewGroup->requestInitialize();
+					mGroupData->requestInitialize();
 				}
 			}
 
@@ -197,9 +173,9 @@ void ViewWrapper::connectContextMenu(ssc::ViewWidget* view)
 
 QStringList ViewWrapper::getAllDataNames() const
 {
-	if (!mViewGroup)
+	if (!mGroupData)
 		return QStringList();
-	std::vector<ssc::DataPtr> data = mViewGroup->getData();
+	std::vector<ssc::DataPtr> data = mGroupData->getData();
 
 	QStringList text;
 	for (unsigned i = 0; i < data.size(); ++i)
@@ -211,7 +187,7 @@ QStringList ViewWrapper::getAllDataNames() const
 		{
 			if (image->getCropping())
 				line += " (cropped)";
-			if (!image->getClipPlanes().empty() || ((viewManager()->getClipper()->getImage() == image) &&  viewManager()->getClipper()->getUseClipper()))
+			if (!image->getAllClipPlanes().empty() || ((viewManager()->getClipper()->getImage() == image) &&  viewManager()->getClipper()->getUseClipper()))
 				line += " (clipped)";
 		}
 

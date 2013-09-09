@@ -45,6 +45,8 @@ namespace cx
 {
 typedef boost::shared_ptr<class ImageLandmarkRep> ImageLandmarkRepPtr;
 typedef boost::shared_ptr<class PatientLandmarkRep> PatientLandmarkRepPtr;
+typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DRepProducerPtr;
+typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 /**
  * \file
@@ -58,26 +60,6 @@ enum STEREOTYPE
 {
 	stFRAME_SEQUENTIAL, stINTERLACED, stDRESDEN, stRED_BLUE
 };
-
-
-/**\brief Ac-hoc class for connecting axis reps to coord spaces.
- */
-class AxisConnector : public QObject
-{
-	Q_OBJECT
-	public:
-		AxisConnector(ssc::CoordinateSystem space);
-		void connectTo(ssc::ToolPtr tool);
-		void mergeWith(ssc::CoordinateSystemListenerPtr base);
-		ssc::AxesRepPtr mRep; ///< axis
-		ssc::CoordinateSystemListenerPtr mListener;
-	private slots:
-		void changedSlot();
-	private:
-		ssc::CoordinateSystemListenerPtr mBase;
-		ssc::ToolPtr mTool;
-};
-typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 
 
 /** Wrapper for a View3D.
@@ -136,7 +118,9 @@ private:
 	virtual void dataRemoved(const QString& uid);
 
 	void setTranslucentRenderingToDepthPeeling(bool setDepthPeeling);
+	void initializeMultiVolume3DRepProducer();
 
+	MultiVolume3DRepProducerPtr mMultiVolume3DRepProducer;
 	typedef std::map<QString, ssc::RepPtr> RepMap;
 	RepMap mDataReps;
 	LandmarkRepPtr mLandmarkRep;

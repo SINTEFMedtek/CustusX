@@ -12,29 +12,27 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxtestUtilities.h"
+#include "cxtestJenkinsMeasurement.h"
 
-#include "vtkImageData.h"
-#include "sscImage.h"
-#include "sscVolumeHelpers.h"
+#include <iostream>
 #include "sscTypeConversions.h"
 
 namespace cxtest
 {
 
-vtkImageDataPtr Utilities::create3DVtkImageData(Eigen::Array3i dim)
+JenkinsMeasurement::JenkinsMeasurement()
+{}
+
+void JenkinsMeasurement::initialize()
 {
-	return ssc::generateVtkImageData(dim, ssc::Vector3D(1,1,1), 2);
+    std::cout << "CTEST_FULL_OUTPUT" << std::endl;
 }
 
-ssc::ImagePtr Utilities::create3DImage(Eigen::Array3i dim)
+void JenkinsMeasurement::createOutput(QString name, QString value)
 {
-	vtkImageDataPtr vtkImageData = create3DVtkImageData(dim);
-	QString unique_string = qstring_cast(reinterpret_cast<long>(vtkImageData.GetPointer()));
-	QString imagesUid = QString("TESTUID_%2_%1").arg(unique_string);
-	ssc::ImagePtr image(new ssc::Image(imagesUid, vtkImageData));
-
-	return image;
+    QString measurement("<measurement><name>%1</name><value>%2</value></measurement>");
+    measurement = measurement.arg(name).arg(value);
+    std::cout << measurement << std::endl;
 }
 
-} /* namespace cxtest */
+} //namespace cxtest

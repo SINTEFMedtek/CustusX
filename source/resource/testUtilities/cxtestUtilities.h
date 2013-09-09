@@ -17,6 +17,7 @@
 
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
+#include "sscVector3D.h"
 
 namespace cxtest
 {
@@ -30,8 +31,8 @@ namespace cxtest
 class Utilities
 {
 public:
-	static vtkImageDataPtr create3DVtkImageData();
-	static ssc::ImagePtr create3DImage();
+	static vtkImageDataPtr create3DVtkImageData(Eigen::Array3i dim = Eigen::Array3i(3,3,3));
+	static ssc::ImagePtr create3DImage(Eigen::Array3i dim = Eigen::Array3i(3,3,3));
 };
 
 } /* namespace cxtest */
