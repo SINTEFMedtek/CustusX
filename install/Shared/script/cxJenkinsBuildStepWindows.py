@@ -56,7 +56,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         super(Controller, self)._applyArgumentParserArguments(options)
         data = self.cxBuilder.assembly.controlData        
         data.setBuildType("Release")
-        if(option.jom):
+        if(options.jom):
             data.setCMakeGenerator("NMake Makefiles JOM")
         data.setBuild32(option.b32)
         data.setBuildShared(options.static)
