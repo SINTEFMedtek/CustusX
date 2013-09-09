@@ -15,6 +15,7 @@
 #define CXMULTIVOLUME3DREPPRODUCER_H
 
 #include <QObject>
+#include <QPointer>
 #include <boost/shared_ptr.hpp>
 #include "sscImage.h"
 #include "sscRep.h"
@@ -38,6 +39,7 @@ class MultiVolume3DRepProducer : public QObject
 public:
 	MultiVolume3DRepProducer();
 
+	void setView(ssc::View* view);
 	void setMaxRenderSize(int voxels);
 	int getMaxRenderSize() const;
 	void setVisualizerType(QString type);
@@ -45,7 +47,6 @@ public:
 	void removeImage(QString uid);
 	std::vector<ssc::RepPtr> getAllReps();
 signals:
-	void repsChanged();
 	void imagesChanged();
 
 private:
@@ -53,8 +54,17 @@ private:
 	std::vector<ssc::ImagePtr> mImages;
 	std::vector<ssc::RepPtr> mReps;
 	int mMaxRenderSize;
+	ssc::View* mView;
+
+	void updateRepsInView();
 	void clearReps();
+	void fillReps();
+
 	void rebuildReps();
+
+	void removeRepsFromView();
+	void addRepsToView();
+
 	void buildVtkVolumeTextureMapper3D(ssc::ImagePtr image);
 	void buildVtkGPUVolumeRayCastMapper(ssc::ImagePtr image);
 	void buildSscProgressiveLODVolumeTextureMapper3D(ssc::ImagePtr image);

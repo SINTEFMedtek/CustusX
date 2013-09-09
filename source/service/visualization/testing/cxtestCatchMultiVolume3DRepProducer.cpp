@@ -37,12 +37,10 @@ TEST_CASE("MultiVolume3DVisualizer emits imageChanged and repChanged signals for
 	MultiVolume3DRepProducerFixture fixture;
 
 	cxtest::DirectSignalListener imagesChanged(&fixture.mBase, SIGNAL(imagesChanged()));
-	cxtest::DirectSignalListener repsChanged(&fixture.mBase, SIGNAL(repsChanged()));
 
 	fixture.initializeVisualizerAndImages("vtkVolumeTextureMapper3D", 1);
 
 	CHECK(imagesChanged.isReceived());
-	CHECK(repsChanged.isReceived());
 }
 
 TEST_CASE("MultiVolume3DVisualizer creates 1 rep using vtkVolumeTextureMapper3D for 1 added image.", "[unit]")

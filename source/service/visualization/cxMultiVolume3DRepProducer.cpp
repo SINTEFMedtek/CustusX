@@ -18,19 +18,33 @@
 #include "sscProgressiveLODVolumetricRep.h"
 #include <vtkImageData.h>
 #include "sscImage2DRep3D.h"
-
+#include "sscView.h"
 namespace cx
 {
 
 
 MultiVolume3DRepProducer::MultiVolume3DRepProducer()
 {
+	mView = NULL;
 	mMaxRenderSize = 10 * pow(10.0,6);
+}
+
+void MultiVolume3DRepProducer::setView(ssc::View* view)
+{
+	if (view==mView)
+		return;
+	this->clearReps();
+	mView = view;
+	this->fillReps();
 }
 
 void MultiVolume3DRepProducer::setMaxRenderSize(int voxels)
 {
 	mMaxRenderSize = voxels;
+	if (mMaxRenderSize<1)
+		mMaxRenderSize = 10 * pow(10.0,6);
+
+	this->updateRepsInView();
 }
 
 int MultiVolume3DRepProducer::getMaxRenderSize() const
@@ -41,45 +55,91 @@ int MultiVolume3DRepProducer::getMaxRenderSize() const
 void MultiVolume3DRepProducer::setVisualizerType(QString type)
 {
 	mVisualizerType = type;
+
+	this->updateRepsInView();
 }
 
 void MultiVolume3DRepProducer::addImage(ssc::ImagePtr image)
 {
+	if (image)
+	{
+		connect(image.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(imagesChanged()));
+		connect(image.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(imagesChanged()));
+	}
+
 	mImages.push_back(image);
 	emit imagesChanged();
 
-	this->clearReps();
+	this->updateRepsInView();
 }
 
 void MultiVolume3DRepProducer::removeImage(QString uid)
 {
+	ssc::ImagePtr image;
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
 		if (mImages[i]->getUid()!=uid)
 			continue;
+		image = mImages[i];
 		mImages.erase(mImages.begin()+i);
 		break;
 	}
-	emit imagesChanged();
-	this->clearReps();
-}
 
-void MultiVolume3DRepProducer::clearReps()
-{
-	mReps.clear();
-	emit repsChanged();
+	if (image)
+	{
+		disconnect(image.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(imagesChanged()));
+		disconnect(image.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(imagesChanged()));
+	}
+
+	emit imagesChanged();
+	this->updateRepsInView();
 }
 
 std::vector<ssc::RepPtr> MultiVolume3DRepProducer::getAllReps()
 {
-	if (mReps.empty())
-		this->rebuildReps();
 	return mReps;
+}
+
+void MultiVolume3DRepProducer::updateRepsInView()
+{
+	this->clearReps();
+	this->fillReps();
+}
+
+void MultiVolume3DRepProducer::clearReps()
+{
+	this->removeRepsFromView();
+	mReps.clear();
+}
+
+void MultiVolume3DRepProducer::removeRepsFromView()
+{
+	if (!mView)
+		return;
+
+	for (unsigned i=0; i<mReps.size(); ++i)
+		mView->removeRep(mReps[i]);
+}
+
+void MultiVolume3DRepProducer::fillReps()
+{
+	this->rebuildReps();
+	this->addRepsToView();
+}
+
+void MultiVolume3DRepProducer::addRepsToView()
+{
+	if (!mView)
+		return;
+
+	for (unsigned i=0; i<mReps.size(); ++i)
+		mView->addRep(mReps[i]);
 }
 
 void MultiVolume3DRepProducer::rebuildReps()
 {
-	mReps.clear();
+	if (mImages.empty())
+		return;
 
 	if (this->isSingleVolumeRenderer())
 	{
