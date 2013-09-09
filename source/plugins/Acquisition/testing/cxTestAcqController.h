@@ -1,11 +1,11 @@
 /*
- * cxTestCustusXController.h
+ * cxTestAcqXController.h
  *
  *  \date Oct 19, 2010
  *      \author christiana
  */
-#ifndef CXTESTCUSTUSXCONTROLLER_H_
-#define CXTESTCUSTUSXCONTROLLER_H_
+#ifndef CXTESTACQCONTROLLER_H_
+#define CXTESTACQCONTROLLER_H_
 
 #include <QApplication>
 #include "sscForwardDeclarations.h"
@@ -58,4 +58,4 @@ private:
 };
 
 
-#endif /* CXTESTCUSTUSXCONTROLLER_H_ */
+#endif /* CXTESTACQCONTROLLER_H_ */
