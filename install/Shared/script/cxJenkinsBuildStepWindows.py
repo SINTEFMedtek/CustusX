@@ -58,7 +58,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         data.setBuildType("Release")
         if(options.jom):
             data.setCMakeGenerator("NMake Makefiles JOM")
-        data.setBuild32(option.b32)
+        data.setBuild32(options.b32)
         data.setBuildShared(options.static)
 
     def run(self):
