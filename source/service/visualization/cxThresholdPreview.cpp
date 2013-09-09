@@ -68,12 +68,13 @@ void ThresholdPreview::revertTransferFunctions()
     mModifiedImage->setTransferFunctions3D(mTF3D_original);
     mModifiedImage->setShadingOn(mShadingOn_original);
 
-    //Go back to VTK linear interpolation
-	ssc::VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(mModifiedImage);
-    if(volumeRep)
-        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
-    else
-        ssc::messageManager()->sendError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
+	mModifiedImage->setInterpolationTypeToLinear();
+//    //Go back to VTK linear interpolation
+//	ssc::VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(mModifiedImage);
+//    if(volumeRep)
+//        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToLinear();
+//    else
+//        ssc::messageManager()->sendError("ThresholdPreview::revertTransferFunctions() can not find VolumetricRep");
 
     mTF3D_original.reset();
     mTF2D_original.reset();
@@ -124,11 +125,12 @@ void ThresholdPreview::setPreview(ssc::ImagePtr image, double setValue)
     lut2D->setLLR(setValue);
 
     //Remove VTK linear interpolation
-	ssc::VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(image);
-    if(volumeRep)
-        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
-    else
-        ssc::messageManager()->sendError("ThresholdPreview::setPreview() can not find VolumetricRep");
+	mModifiedImage->setInterpolationTypeToNearest();
+//	ssc::VolumetricBaseRepPtr volumeRep = RepManager::getInstance()->getVolumetricRep(image);
+//    if(volumeRep)
+//        volumeRep->getVtkVolume()->GetProperty()->SetInterpolationTypeToNearest();
+//    else
+//        ssc::messageManager()->sendError("ThresholdPreview::setPreview() can not find VolumetricRep");
 }
 
 void ThresholdPreview::removePreview()

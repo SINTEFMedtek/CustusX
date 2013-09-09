@@ -102,7 +102,7 @@ public:
 	/**Get a volumetric rep based on which image you want to  display.
 	 * This is useful when creating the rep is expensive and should be done only once.
 	 */
-	ssc::VolumetricBaseRepPtr getVolumetricRep(ssc::ImagePtr image);
+//	ssc::VolumetricBaseRepPtr getVolumetricRep(ssc::ImagePtr image);
 
 	/**Get a previously cached Rep.
 	 *
@@ -147,17 +147,17 @@ public:
 	 * Purge not visible volumes from cache.
 	 * This is because caching of volumetric reps uses a lot of memory (100-200 MB) per volume
 	 */
-	void purgeVolumetricReps();
+//	void purgeVolumetricReps();
 
-protected slots:
-	void volumeRemovedSlot(QString uid);
+//protected slots:
+//	void volumeRemovedSlot(QString uid);
 
 protected:
 	static RepManager* mTheInstance; ///< the only instance of this class
 
-	VolumetricRepMap mVolumetricRepByImageMap; ///< used for caching reps based on image content
-	bool mIsUsingGPU3DMapper;
-	double mMaxRenderSize;
+//	VolumetricRepMap mVolumetricRepByImageMap; ///< used for caching reps based on image content
+//	bool mIsUsingGPU3DMapper;
+//	double mMaxRenderSize;
 
 	typedef std::multimap<QString, ssc::RepPtr> RepMultiMap;
 	RepMultiMap mRepCache;

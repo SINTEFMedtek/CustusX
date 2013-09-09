@@ -13,7 +13,7 @@
 // See CustusX_License.txt for more information.
 #include "cxtestMultiVolume3DRepProducerFixture.h"
 
-
+#include "sscView.h"
 
 namespace cxtest
 {
@@ -30,6 +30,7 @@ MultiVolume3DRepProducerFixture::~MultiVolume3DRepProducerFixture()
 
 void MultiVolume3DRepProducerFixture::initializeVisualizerAndImages(QString type, int imageCount)
 {
+//	mBase.setView(new ssc::ViewWidget());
 	mBase.setVisualizerType(type);
 	for (unsigned i=0; i<imageCount; ++i)
 	{

@@ -53,7 +53,7 @@ SlicePlaneClipper::SlicePlaneClipper() :
 
 SlicePlaneClipper::~SlicePlaneClipper()
 {
-	this->clearVolumes();
+//	this->clearVolumes();
 }
 
 void SlicePlaneClipper::setSlicer(ssc::SliceProxyPtr slicer)
@@ -71,85 +71,85 @@ void SlicePlaneClipper::setSlicer(ssc::SliceProxyPtr slicer)
 	}
 
 	this->updateClipPlane();
-	for (VolumesType::iterator iter=mVolumes.begin(); iter!=mVolumes.end(); ++iter)
-	{
-		this->addClipPlane(*iter, mClipPlane);
-	}
+//	for (VolumesType::iterator iter=mVolumes.begin(); iter!=mVolumes.end(); ++iter)
+//	{
+//		this->addClipPlane(*iter, mClipPlane);
+//	}
 	this->changedSlot();
 }
 
-void SlicePlaneClipper::addClipPlane(ssc::VolumetricBaseRepPtr volume, vtkPlanePtr clipPlane)
-{
-	if (!clipPlane)
-		return;
-	if (!volume->getVtkVolume())
-		return;
-	vtkAbstractVolumeMapper* mapper = volume->getVtkVolume()->GetMapper();
-	if (mapper->GetClippingPlanes() && mapper->GetClippingPlanes()->IsItemPresent(clipPlane))
-		return;
-	mapper->AddClippingPlane(clipPlane);
-}
+//void SlicePlaneClipper::addClipPlane(ssc::VolumetricBaseRepPtr volume, vtkPlanePtr clipPlane)
+//{
+//	if (!clipPlane)
+//		return;
+//	if (!volume->getVtkVolume())
+//		return;
+//	vtkAbstractVolumeMapper* mapper = volume->getVtkVolume()->GetMapper();
+//	if (mapper->GetClippingPlanes() && mapper->GetClippingPlanes()->IsItemPresent(clipPlane))
+//		return;
+//	mapper->AddClippingPlane(clipPlane);
+//}
 
 ssc::SliceProxyPtr SlicePlaneClipper::getSlicer()
 {
 	return mSlicer;
 }
 
-void SlicePlaneClipper::clearVolumes()
-{
-	while(!mVolumes.empty())
-	{
-		this->removeVolume(*mVolumes.begin());
-	}
-}
+//void SlicePlaneClipper::clearVolumes()
+//{
+//	while(!mVolumes.empty())
+//	{
+//		this->removeVolume(*mVolumes.begin());
+//	}
+//}
 
-void SlicePlaneClipper::volumeRepChangedSlot()
-{
-	VolumesType volumes = mVolumes;
-	for (VolumesType::iterator iter=volumes.begin(); iter!=volumes.end(); ++iter)
-	{
-		this->removeVolume(*iter);
-		this->addVolume(*iter);
-	}
-}
+//void SlicePlaneClipper::volumeRepChangedSlot()
+//{
+//	VolumesType volumes = mVolumes;
+//	for (VolumesType::iterator iter=volumes.begin(); iter!=volumes.end(); ++iter)
+//	{
+//		this->removeVolume(*iter);
+//		this->addVolume(*iter);
+//	}
+//}
 
-void SlicePlaneClipper::addVolume(ssc::VolumetricBaseRepPtr volume)
-{
-	if (!volume)
-		return;
-	mVolumes.insert(volume);
-	connect(volume.get(), SIGNAL(internalVolumeChanged()), this, SLOT(volumeRepChangedSlot()));
-	this->addClipPlane(volume, mClipPlane);
-	this->changedSlot();
-}
+//void SlicePlaneClipper::addVolume(ssc::VolumetricBaseRepPtr volume)
+//{
+//	if (!volume)
+//		return;
+//	mVolumes.insert(volume);
+//	connect(volume.get(), SIGNAL(internalVolumeChanged()), this, SLOT(volumeRepChangedSlot()));
+//	this->addClipPlane(volume, mClipPlane);
+//	this->changedSlot();
+//}
 
-void SlicePlaneClipper::removeVolume(ssc::VolumetricBaseRepPtr volume)
-{
-	if (!volume)
-		return;
+//void SlicePlaneClipper::removeVolume(ssc::VolumetricBaseRepPtr volume)
+//{
+//	if (!volume)
+//		return;
 
-	if (volume->getVtkVolume())
-	{
-		vtkAbstractMapper* mapper = volume->getVtkVolume()->GetMapper();
-		if (mapper)
-		{
-			vtkPlaneCollection* planes = mapper->GetClippingPlanes();
-			if (planes && planes->IsItemPresent(mClipPlane))
-			{
-				mapper->RemoveClippingPlane(mClipPlane);
-			}
-		}
-	}
+//	if (volume->getVtkVolume())
+//	{
+//		vtkAbstractMapper* mapper = volume->getVtkVolume()->GetMapper();
+//		if (mapper)
+//		{
+//			vtkPlaneCollection* planes = mapper->GetClippingPlanes();
+//			if (planes && planes->IsItemPresent(mClipPlane))
+//			{
+//				mapper->RemoveClippingPlane(mClipPlane);
+//			}
+//		}
+//	}
 
-	disconnect(volume.get(), SIGNAL(internalVolumeChanged()), this, SLOT(volumeRepChangedSlot()));
-	mVolumes.erase(volume);
-	this->changedSlot();
-}
+//	disconnect(volume.get(), SIGNAL(internalVolumeChanged()), this, SLOT(volumeRepChangedSlot()));
+//	mVolumes.erase(volume);
+//	this->changedSlot();
+//}
 
-SlicePlaneClipper::VolumesType SlicePlaneClipper::getVolumes()
-{
-	return mVolumes;
-}
+//SlicePlaneClipper::VolumesType SlicePlaneClipper::getVolumes()
+//{
+//	return mVolumes;
+//}
 
 void SlicePlaneClipper::setInvertPlane(bool on)
 {
@@ -181,6 +181,11 @@ vtkPlanePtr SlicePlaneClipper::getClipPlaneCopy()
 	retval->SetNormal(mClipPlane->GetNormal());
 	retval->SetOrigin(mClipPlane->GetOrigin());
 	return retval;
+}
+
+vtkPlanePtr SlicePlaneClipper::getClipPlane()
+{
+	return mClipPlane;
 }
 
 void SlicePlaneClipper::updateClipPlane()
@@ -250,7 +255,7 @@ void ImageMapperMonitor::fillClipPlanes()
 	if (!mImage)
 		return;
 
-	mPlanes = mImage->getClipPlanes();
+	mPlanes = mImage->getAllClipPlanes();
 	for (unsigned i=0; i<mPlanes.size(); ++i)
 	{
 		mVolume->GetMapper()->AddClippingPlane(mPlanes[i]);

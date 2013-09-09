@@ -54,28 +54,29 @@ public:
 	static SlicePlaneClipperPtr New();
 	~SlicePlaneClipper();
 	void setSlicer(ssc::SliceProxyPtr slicer);
-	void clearVolumes();
-	void addVolume(ssc::VolumetricBaseRepPtr volume);
-	void removeVolume(ssc::VolumetricBaseRepPtr volume);
-	VolumesType getVolumes();
+//	void clearVolumes();
+//	void addVolume(ssc::VolumetricBaseRepPtr volume);
+//	void removeVolume(ssc::VolumetricBaseRepPtr volume);
+//	VolumesType getVolumes();
 	ssc::SliceProxyPtr getSlicer();
 	void setInvertPlane(bool on);
 	bool getInvertPlane() const;
 	vtkPlanePtr getClipPlaneCopy();
+	vtkPlanePtr getClipPlane();
 
-	void saveClipPlaneToVolume(); ///< save the current clip to image
-	void clearClipPlanesInVolume(); ///< clear all saved clips in the image.
+//	void saveClipPlaneToVolume(); ///< save the current clip to image
+//	void clearClipPlanesInVolume(); ///< clear all saved clips in the image.
 
 	private slots:
 	void changedSlot();
-	void volumeRepChangedSlot();
+//	void volumeRepChangedSlot();
 private:
-	void addClipPlane(ssc::VolumetricBaseRepPtr volume, vtkPlanePtr clipPlane);
+//	void addClipPlane(ssc::VolumetricBaseRepPtr volume, vtkPlanePtr clipPlane);
 	SlicePlaneClipper();
 	void updateClipPlane();
 	ssc::Vector3D getUnitNormal() const;
 	ssc::SliceProxyPtr mSlicer;
-	VolumesType mVolumes;
+//	VolumesType mVolumes;
 	bool mInvertPlane;
 
 	vtkPlanePtr mClipPlane;

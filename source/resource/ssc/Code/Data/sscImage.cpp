@@ -103,6 +103,7 @@ Image::~Image()
 Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& name) :
 	Data(uid, name), mBaseImageData(data), mMaxRGBIntensity(-1)
 {
+	mInterpolationType = VTK_LINEAR_INTERPOLATION;
 	mUseCropping = false;
 	mCroppingBox_d = DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
 
@@ -488,11 +489,11 @@ void Image::addXml(QDomNode& dataNode)
 	imageNode.appendChild(cropNode);
 
 	QDomElement clipNode = doc.createElement("clip");
-	for (unsigned i = 0; i < mClipPlanes.size(); ++i)
+	for (unsigned i = 0; i < mPersistentClipPlanes.size(); ++i)
 	{
 		QDomElement planeNode = doc.createElement("plane");
-		Vector3D normal(mClipPlanes[i]->GetNormal());
-		Vector3D origin(mClipPlanes[i]->GetOrigin());
+		Vector3D normal(mPersistentClipPlanes[i]->GetNormal());
+		Vector3D origin(mPersistentClipPlanes[i]->GetOrigin());
 		planeNode.setAttribute("normal", qstring_cast(normal));
 		planeNode.setAttribute("origin", qstring_cast(origin));
 		clipNode.appendChild(planeNode);
@@ -570,7 +571,7 @@ void Image::parseXml(QDomNode& dataNode)
 		vtkPlanePtr plane = vtkPlanePtr::New();
 		plane->SetNormal(normal.begin());
 		plane->SetOrigin(origin.begin());
-		mClipPlanes.push_back(plane);
+		mPersistentClipPlanes.push_back(plane);
 	}
 
 	mModality = dataNode.namedItem("modality").toElement().text();
@@ -674,22 +675,31 @@ DoubleBoundingBox3D Image::getCroppingBox() const
 }
 
 // methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
-void Image::addClipPlane(vtkPlanePtr plane)
+void Image::addPersistentClipPlane(vtkPlanePtr plane)
 {
-	if (std::count(mClipPlanes.begin(), mClipPlanes.end(), plane))
+	if (std::count(mPersistentClipPlanes.begin(), mPersistentClipPlanes.end(), plane))
 		return;
-	mClipPlanes.push_back(plane);
+	mPersistentClipPlanes.push_back(plane);
 	emit clipPlanesChanged();
 }
 
-std::vector<vtkPlanePtr> Image::getClipPlanes()
+std::vector<vtkPlanePtr> Image::getAllClipPlanes()
 {
-	return mClipPlanes;
+	std::vector<vtkPlanePtr> retval = mPersistentClipPlanes;
+	if (mInteractiveClipPlane)
+		retval.push_back(mInteractiveClipPlane);
+	return retval;
 }
 
-void Image::clearClipPlanes()
+void Image::clearPersistentClipPlanes()
 {
-	mClipPlanes.clear();
+	mPersistentClipPlanes.clear();
+	emit clipPlanesChanged();
+}
+
+void Image::setInteractiveClipPlane(vtkPlanePtr plane)
+{
+	mInteractiveClipPlane = plane;
 	emit clipPlanesChanged();
 }
 
@@ -814,6 +824,24 @@ vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 			dataPtr[i] = maxVoxelValue;
 	}
 	return dummyImageData;
+}
+
+void Image::setInterpolationTypeToNearest()
+{
+	this->setInterpolationType(VTK_NEAREST_INTERPOLATION);
+}
+void Image::setInterpolationTypeToLinear()
+{
+	this->setInterpolationType(VTK_LINEAR_INTERPOLATION);
+}
+void Image::setInterpolationType(int val)
+{
+	mInterpolationType = val;
+	emit transferFunctionsChanged();
+}
+int Image::getInterpolationType() const
+{
+	return mInterpolationType;
 }
 
 } // namespace ssc

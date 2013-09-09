@@ -291,6 +291,7 @@ void VolumetricRep::transferFunctionsChangedSlot()
 	mVolumeProperty->SetSpecular(mImage->getShadingSpecular());
 	mVolumeProperty->SetSpecularPower(mImage->getShadingSpecularPower());
 
+	mVolumeProperty->SetInterpolationType(mImage->getInterpolationType());
 }
 
 void VolumetricRep::setMaxVolumeSize(long maxVoxels)
