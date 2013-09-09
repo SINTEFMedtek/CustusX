@@ -46,6 +46,9 @@ public:
 	void addImage(ssc::ImagePtr image);
 	void removeImage(QString uid);
 	std::vector<ssc::RepPtr> getAllReps();
+	static QStringList getAvailableVisualizers();
+	static std::map<QString, QString> getAvailableVisualizerDisplayNames();
+
 signals:
 	void imagesChanged();
 

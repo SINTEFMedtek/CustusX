@@ -19,6 +19,9 @@
 #include <vtkImageData.h>
 #include "sscImage2DRep3D.h"
 #include "sscView.h"
+#include "sscTypeConversions.h"
+#include "sscLogger.h"
+
 namespace cx
 {
 
@@ -75,6 +78,7 @@ void MultiVolume3DRepProducer::addImage(ssc::ImagePtr image)
 
 void MultiVolume3DRepProducer::removeImage(QString uid)
 {
+	SSC_LOG("");
 	ssc::ImagePtr image;
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
@@ -102,6 +106,7 @@ std::vector<ssc::RepPtr> MultiVolume3DRepProducer::getAllReps()
 
 void MultiVolume3DRepProducer::updateRepsInView()
 {
+	SSC_LOG("");
 	this->clearReps();
 	this->fillReps();
 }
@@ -116,6 +121,8 @@ void MultiVolume3DRepProducer::removeRepsFromView()
 {
 	if (!mView)
 		return;
+
+	SSC_LOG("rep size %lu", mReps.size());
 
 	for (unsigned i=0; i<mReps.size(); ++i)
 		mView->removeRep(mReps[i]);
@@ -132,12 +139,16 @@ void MultiVolume3DRepProducer::addRepsToView()
 	if (!mView)
 		return;
 
+	SSC_LOG("rep size %lu", mReps.size());
+
 	for (unsigned i=0; i<mReps.size(); ++i)
 		mView->addRep(mReps[i]);
 }
 
 void MultiVolume3DRepProducer::rebuildReps()
 {
+	std::cout << "visualizer: " << mVisualizerType << std::endl;
+
 	if (mImages.empty())
 		return;
 
@@ -156,6 +167,26 @@ void MultiVolume3DRepProducer::rebuildReps()
 bool MultiVolume3DRepProducer::is2DImage(ssc::ImagePtr image) const
 {
 	return image->getBaseVtkImageData()->GetDimensions()[2]==1;
+}
+
+QStringList MultiVolume3DRepProducer::getAvailableVisualizers()
+{
+	QStringList retval;
+	retval << "vtkVolumeTextureMapper3D";
+#if !defined(__APPLE__) && !defined(WIN32)
+	retval << "vtkGPUVolumeRayCastMapper";
+#endif
+	retval << "sscProgressiveLODVolumeTextureMapper3D";
+	return retval;
+}
+
+std::map<QString, QString> MultiVolume3DRepProducer::getAvailableVisualizerDisplayNames()
+{
+	std::map<QString, QString> names;
+	names["vtkVolumeTextureMapper3D"] = "Texture (single volume)";
+	names["vtkGPUVolumeRayCastMapper"] = "Raycast (single volume)";
+	names["sscProgressiveLODVolumeTextureMapper3D"] = "Progressive texture (single volume)";
+	return names;
 }
 
 void MultiVolume3DRepProducer::buildSingleVolumeRenderer(ssc::ImagePtr image)

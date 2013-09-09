@@ -184,7 +184,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		QColor background = settings()->value("backgroundColor").value<QColor>();
 		mView->setBackgroundColor(background);
 	}
-	if (( key=="useGPUVolumeRayCastMapper" )||( key=="maxRenderSize" ))
+	if (( key=="View3D/ImageRender3DVisualizer" )||( key=="View3D/maxRenderSize" ))
 	{
 		this->initializeMultiVolume3DRepProducer();
 //		// reload volumes from cache
@@ -537,8 +537,8 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 
 void ViewWrapper3D::dataRemoved(const QString& uid)
 {
-	if (!mDataReps.count(uid))
-		return;
+//	if (!mDataReps.count(uid))
+//		return;
 
 	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
 	if (image)
@@ -549,8 +549,11 @@ void ViewWrapper3D::dataRemoved(const QString& uid)
 	}
 	else
 	{
-		mView->removeRep(mDataReps[uid]);
-		mDataReps.erase(uid);
+		if (mDataReps.count(uid))
+		{
+			mView->removeRep(mDataReps[uid]);
+			mDataReps.erase(uid);
+		}
 	}
 
 	this->activeImageChangedSlot();

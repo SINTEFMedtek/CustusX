@@ -41,6 +41,7 @@
 #include "sscTypeConversions.h"
 #include "vtkForwardDeclarations.h"
 #include "sscMessageManager.h"
+#include "cxImageMapperMonitor.h"
 
 typedef vtkSmartPointer<class vtkGPUVolumeRayCastMapper> vtkGPUVolumeRayCastMapperPtr;
 
