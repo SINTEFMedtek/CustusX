@@ -29,7 +29,7 @@ import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
 import cx.cxJenkinsBuildScriptBase
 
-class WindowsController(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
+class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
     '''
     Controller that builds, tests and deploys CustusX on a windows machine.
     '''
@@ -72,5 +72,5 @@ class WindowsController(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
                      
 
 if __name__ == '__main__':
-    controller = WindowsController()
+    controller = Controller()
     controller.run()
