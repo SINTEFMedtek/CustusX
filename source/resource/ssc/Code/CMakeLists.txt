@@ -70,6 +70,7 @@ cx_add_class_qt_moc(SSC_SOURCE_FILES
 	Rep/sscPickerRep
 	Rep/sscImageBlenderProxy
 	Rep/sscVolumetricRep
+        Rep/cxImageMapperMonitor
 	Rep/sscSlicePlaneRep
 	Rep/sscProgressiveLODVolumetricRep
 	Rep/sscBlendedSliceRep

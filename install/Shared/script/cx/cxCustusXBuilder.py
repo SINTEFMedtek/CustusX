@@ -91,23 +91,7 @@ class CustusXBuilder:
         #    shell.run('%s/install/Linux/script/create_linux_folder.sh' % custusx.sourcePath())
         #else
         #    shell.run('make package')
-
-    def publishPackage(self):
-        '''
-        Copy the complete installer and accosiated files to medtek.sintef.no
-        '''
-        PrintFormatter.printHeader('copy/publish package to medtek server', level=2)
-        remoteServerPath = "/Volumes/MedTekDisk/Software/CustusX/AutomatedReleases/"
-        custusx = self._createComponent(cxComponents.CustusX3)
-        targetFolder = 'CustusX.%s' % self.assembly.controlData.mGitTag
-        cmd = 'scp -r %s/installArtefacts/* medtek.sintef.no:%s%s'
-        shell.run(cmd % (custusx.buildPath(), remoteServerPath, targetFolder))
-
-    def getInstallFolder(self):
-        git_description = shell.evaluate('git describe --tags')
-        os_description = 'linux_test'
-        return 'CustusX.%s.%s' % (git_description, os_description)
-
+        
     def publishDoxygen(self):
         PrintFormatter.printHeader('copy/publish doxygen to medtek server (link from wiki)', level=2)
         remoteServerPath = "/Volumes/medtek_HD/Library/Server/Web/Data/Sites/Default/custusx_doxygen"

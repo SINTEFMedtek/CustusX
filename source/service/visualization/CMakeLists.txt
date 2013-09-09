@@ -24,8 +24,9 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     Rep/sscImage2DRep3D
     cxRepManager
     cxThresholdPreview
-    cxMultiVolume3DVisualizer
+    cxMultiVolume3DRepProducer
     cxViewGroupData
+    cxAxisConnector
     )
 
 cx_add_class(cxVisualizationService_SOURCE

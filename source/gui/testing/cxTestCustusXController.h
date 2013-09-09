@@ -23,6 +23,7 @@ public:
   QString mTestData;
   int mBaseTime;
   double mMeasuredFPS;
+	bool mEnableSlicing;
 
   CustusXController(QObject* parent);
   void start();
@@ -30,6 +31,7 @@ public:
 
 public slots:
   void loadPatientSlot();
+	void enableSlicingSlot();
   void initialBeginCheckRenderSlot();
   void initialEndCheckRenderSlot();
 //  void secondBeginCheckRenderSlot();

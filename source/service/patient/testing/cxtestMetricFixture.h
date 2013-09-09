@@ -25,7 +25,7 @@
 
 namespace cxtest {
 
-struct PlaneMetricData
+struct PlaneMetricWithInput
 {
     typedef ssc::PlaneMetric METRIC_TYPE;
     ssc::PlaneMetricPtr mMetric;
@@ -35,7 +35,7 @@ struct PlaneMetricData
     ssc::CoordinateSystem mSpace;
 };
 
-struct PointMetricData
+struct PointMetricWithInput
 {
     typedef ssc::PointMetric METRIC_TYPE;
     ssc::PointMetricPtr mMetric;
@@ -48,7 +48,7 @@ struct PointMetricData
   * Contains all data used to construct the metric,
   * along with a (possibly modified) metric.
   */
-struct DistanceMetricData
+struct DistanceMetricWithInput
 {
     typedef ssc::DistanceMetric METRIC_TYPE;
     ssc::DistanceMetricPtr mMetric;
@@ -56,7 +56,7 @@ struct DistanceMetricData
     double mDistance;
 };
 
-struct FrameMetricData
+struct FrameMetricWithInput
 {
     typedef cx::FrameMetric METRIC_TYPE;
 	cx::FrameMetricPtr mMetric;
@@ -70,7 +70,7 @@ struct FrameMetricData
   * Contains all data used to construct the metric,
   * along with a (possibly modified) metric.
   */
-struct ToolMetricData
+struct ToolMetricWithInput
 {
 	typedef cx::ToolMetric METRIC_TYPE;
 	cx::ToolMetricPtr mMetric;
@@ -91,22 +91,22 @@ struct ToolMetricData
  */
 class MetricFixture {
 public:
-    MetricFixture();
+	MetricFixture();
     ~MetricFixture();
 
-    FrameMetricData getFrameMetricData();
-	ToolMetricData getToolMetricData();
-	PointMetricData getPointMetricData(ssc::Vector3D point);
-    PlaneMetricData getPlaneMetricData(ssc::Vector3D point, ssc::Vector3D normal);
-    DistanceMetricData getDistanceMetricData(double distance, ssc::DataMetricPtr p0, ssc::DataMetricPtr p1);
-    DistanceMetricData getDistanceMetricData(double distance);
+	FrameMetricWithInput getFrameMetricWithInput();
+	ToolMetricWithInput getToolMetricWithInput();
+	PointMetricWithInput getPointMetricWithInput(ssc::Vector3D point);
+	PlaneMetricWithInput getPlaneMetricWithInput(ssc::Vector3D point, ssc::Vector3D normal);
+	DistanceMetricWithInput getDistanceMetricWithInput(double distance, ssc::DataMetricPtr p0, ssc::DataMetricPtr p1);
+	DistanceMetricWithInput getDistanceMetricWithInput(double distance);
 	QStringList getSingleLineDataList(ssc::DataMetricPtr metric);
 
-    bool metricEqualsData(FrameMetricData data);
-    bool metricEqualsData(DistanceMetricData data);
-    bool metricEqualsData(PointMetricData data);
-    bool metricEqualsData(PlaneMetricData data);
-	bool metricEqualsData(ToolMetricData data);
+	bool inputEqualsMetric(FrameMetricWithInput data);
+	bool inputEqualsMetric(DistanceMetricWithInput data);
+	bool inputEqualsMetric(PointMetricWithInput data);
+	bool inputEqualsMetric(PlaneMetricWithInput data);
+	bool inputEqualsMetric(ToolMetricWithInput data);
 
     template<class DATA>
     bool saveLoadXmlGivesEqualTransform(DATA data)
@@ -116,7 +116,7 @@ public:
 
         data.mMetric = DATA::METRIC_TYPE::create(xmlNode);
 
-        return this->metricEqualsData(data);
+		return this->inputEqualsMetric(data);
     }
 
     QDomNode createDummyXmlNode();

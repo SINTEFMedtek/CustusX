@@ -12,43 +12,23 @@
 //
 // See CustusX_License.txt for more information.
 
-#include "cxRepManager.h"
+#ifndef CXTESTJENKINSMEASUREMENT_H
+#define CXTESTJENKINSMEASUREMENT_H
 
-#include "cxThresholdPreview.h"
+#include <QString>
 
-namespace cx
+namespace cxtest
 {
 
-
-RepManager* RepManager::mTheInstance = NULL;
-
-RepManager* RepManager::getInstance()
+class JenkinsMeasurement
 {
-  if(mTheInstance == NULL)
-   {
-     mTheInstance = new RepManager();
-   }
-   return mTheInstance;
-}
+public:
+    JenkinsMeasurement();
+    void initialize();
 
-void RepManager::destroyInstance()
-{
-  delete mTheInstance;
-  mTheInstance = NULL;
-}
+    // create output in a way friendly to the Jenkins measurement plugin:
+    void createOutput(QString name, QString value);
+};
+} //namespace cxtest
 
-RepManager::RepManager()
-{
-	mThresholdPreview.reset(new ThresholdPreview());
-}
-
-RepManager::~RepManager()
-{
-}
-
-ThresholdPreviewPtr RepManager::getThresholdPreview()
-{
-	return mThresholdPreview;
-}
-
-}//namespace cx
+#endif // CXTESTJENKINSMEASUREMENT_H

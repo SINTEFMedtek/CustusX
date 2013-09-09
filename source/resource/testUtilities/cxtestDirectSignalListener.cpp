@@ -11,16 +11,25 @@
 // in any way.
 //
 // See CustusX_License.txt for more information.
+#include "cxtestDirectSignalListener.h"
 
-#include "cxMultiVolume3DVisualizer.h"
-
-namespace cx
+namespace cxtest
 {
 
-
-MultiVolume3DVisualizer::MultiVolume3DVisualizer()
+DirectSignalListener::DirectSignalListener(QObject* object, const char* signal) : mReceived(false)
 {
+	connect(object, signal, this, SLOT(slot()));
 }
 
+void DirectSignalListener::slot()
+{
+	mReceived = true;
+}
 
-} // namespace cx
+bool DirectSignalListener::isReceived()
+{
+	return mReceived;
+}
+
+} // namespace cxtest
+
