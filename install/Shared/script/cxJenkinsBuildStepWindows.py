@@ -59,7 +59,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         if(options.jom):
             data.setCMakeGenerator("NMake Makefiles JOM")
         data.setBuild32(options.b32)
-        data.setBuildShared(options.static)
+        data.setBuildShared(not options.static)
 
     def run(self):
         if not self.argumentParserArguments.skip_build:
