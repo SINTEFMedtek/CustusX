@@ -45,7 +45,22 @@ include_directories(
 
 include_directories(Rep)
 
+set(cxVisualizationService_LIBS
+    SSC
+    cxResource
+    cxVideoService
+    cxPatientService
+    cxTrackingService
+    )
+
+if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
+    set(cxVisualizationService_LIBS
+        ${cxVisualizationService_LIBS}
+        vtkGPUMultiVolumeRender
+        )
+endif()
+
 ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxVisualizationService SSC cxResource cxVideoService cxPatientService cxTrackingService vtkGPUMultiVolumeRender)
+target_link_libraries(cxVisualizationService ${cxVisualizationService_LIBS})
 
 add_subdirectory(testing)

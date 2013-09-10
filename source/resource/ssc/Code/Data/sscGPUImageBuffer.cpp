@@ -85,6 +85,10 @@ public:
 		}
 		mTexture = texture;
 	}
+	virtual unsigned int getTextureUid() const
+	{
+		return textureId;
+	}
 
 	/**Allocate resources for the lookup table and the volume on the GPU.
 	 * Prerequisite: SetImage and SetcolorTable has been called.
@@ -108,6 +112,7 @@ public:
 		glEnable( vtkgl::TEXTURE_3D );
 		glGenTextures(1, &textureId);
 		glDisable(GL_TEXTURE_3D);
+
 		updateTexture();
 		mAllocated = true;
 	}
