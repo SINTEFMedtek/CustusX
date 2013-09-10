@@ -26,6 +26,7 @@
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
+#include "sscGPUImageBuffer.h"
 
 namespace cx
 {
@@ -102,6 +103,13 @@ void MehdiGPURayCastMultiVolumeRep::setup()
 		VolumePropertyPtr property = VolumeProperty::create();
 		property->setImage(mImages[i]);
 		mVolumeProperties.push_back(property);
+
+//		// example code for how to allocate on gpu and return uid:
+//		ssc::GPUImageDataBufferPtr dataBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
+//			mImages[i]->getBaseVtkImageData());
+		// crashes: must probably initialize gl context.
+//		dataBuffer->allocate();
+//		unsigned int glUint = dataBuffer->getTextureUid();
 
 		mMapper->SetInput(i, mImages[i]->getBaseVtkImageData());
 
