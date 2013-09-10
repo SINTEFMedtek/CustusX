@@ -23,7 +23,7 @@
 #include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 
 /** Helper class that uses the stored clip planes in a Image to clip it in a mapper.
@@ -36,7 +36,7 @@ class ImageMapperMonitor : public QObject
 {
 	Q_OBJECT
 public:
-	ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image);
+	ImageMapperMonitor(vtkVolumePtr volume, ssc::ImagePtr image);
 	~ImageMapperMonitor();
 
 private slots:
@@ -44,7 +44,7 @@ private slots:
 	void cropBoxChangedSlot();
 private:
 	vtkVolumePtr mVolume;
-	ImagePtr mImage;
+	ssc::ImagePtr mImage;
 	std::vector<vtkPlanePtr> mPlanes;
 	vtkVolumeMapperPtr getMapper();
 
@@ -52,5 +52,5 @@ private:
 	void fillClipPlanes();
 };
 
-} // namespace ssc
+} // namespace cx
 #endif // CXIMAGEMAPPERMONITOR_H
