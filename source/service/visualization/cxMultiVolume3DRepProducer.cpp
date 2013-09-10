@@ -24,6 +24,7 @@
 #include "sscGPURayCastVolumeRep.h"
 #include "cxDataLocations.h"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
+#include "cxConfig.h"
 
 namespace cx
 {
