@@ -59,7 +59,7 @@ SET(${KIT}_SRCS
   ${${KIT}_SRCS}
   vtkGPUMultiVolumeRayCastMapper.cxx
   vtkOpenGLGPUMultiVolumeRayCastMapper.cxx
-  ${KIT}.cxx 
+#  ${KIT}.cxx 
 )
 
 set(KIT_GLSL_SRCS
@@ -99,14 +99,15 @@ IF(APPLE)
   SET(EXECUTABLE_FLAG MACOSX_BUNDLE)
 ENDIF(APPLE)
 
-ADD_EXECUTABLE(${KIT} ${EXECUTABLE_FLAG} 
-  ${${KIT}_SRCS}  ${Kit_EXTRA_SRCS})
-
-TARGET_LINK_LIBRARIES(${KIT} 
+add_library(vtkGPUMultiVolumeRender ${${KIT}_SRCS}  ${Kit_EXTRA_SRCS})
+target_link_libraries(vtkGPUMultiVolumeRender 
   vtkRendering 
   vtkIO 
   vtkVolumeRendering 
   vtkWidgets
   ${OPENGL_gl_LIBRARY}
  )
+
+ADD_EXECUTABLE(vtkGPUMultiVolumeRenderDemo ${EXECUTABLE_FLAG} vtkGPUMultiVolumeRenderDemo.cxx)
+TARGET_LINK_LIBRARIES(vtkGPUMultiVolumeRenderDemo vtkGPUMultiVolumeRender)
 

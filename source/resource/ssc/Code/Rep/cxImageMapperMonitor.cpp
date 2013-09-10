@@ -24,10 +24,10 @@
 #include "sscImage.h"
 #include "sscDataManager.h"
 
-namespace ssc
+namespace cx
 {
 
-ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image) : mVolume(volume), mImage(image)
+ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ssc::ImagePtr image) : mVolume(volume), mImage(image)
 {
 	if (!mImage)
 		return;
@@ -95,4 +95,4 @@ void ImageMapperMonitor::cropBoxChangedSlot()
 	mapper->Update();
 }
 
-} // namespace ssc
+} // namespace cx
