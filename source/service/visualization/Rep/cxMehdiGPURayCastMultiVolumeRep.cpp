@@ -12,6 +12,9 @@
 //
 // See CustusX_License.txt for more information.
 
+#include "cxConfig.h"
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
+
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
 #include <vtkVolumeProperty.h>
@@ -148,3 +151,5 @@ void MehdiGPURayCastMultiVolumeRep::transformChangedSlot()
 }
 
 } // namespace cx
+
+#endif //CX_BUILD_MEHDI_VTKMULTIVOLUME

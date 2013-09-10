@@ -24,6 +24,7 @@
 #include "sscGPURayCastVolumeRep.h"
 #include "cxDataLocations.h"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
+#include "cxConfig.h"
 
 namespace cx
 {
@@ -52,8 +53,11 @@ QStringList MultiVolume3DRepProducer::getAvailableVisualizers()
 	retval << "vtkGPUVolumeRayCastMapper";
 #endif
 	retval << "sscProgressiveLODVolumeTextureMapper3D";
-	retval << "sscGPURayCastMultiVolume";
+	retval << "sscGPURayCastMultiVolume";	
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 	retval << "vtkOpenGLGPUMultiVolumeRayCastMapper";
+#endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
+
 	return retval;
 }
 
@@ -202,9 +206,11 @@ void MultiVolume3DRepProducer::buildSscGPURayCastMultiVolume()
 
 void MultiVolume3DRepProducer::buildVtkOpenGLGPUMultiVolumeRayCastMapper()
 {
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 	MehdiGPURayCastMultiVolumeRepPtr rep = MehdiGPURayCastMultiVolumeRep::New("");
 	rep->setImages(mImages);
 	mReps.push_back(rep);
+#endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
 }
 
 bool MultiVolume3DRepProducer::is2DImage(ssc::ImagePtr image) const

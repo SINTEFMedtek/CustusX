@@ -22,13 +22,18 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     Rep/sscOrientationAnnotation3DRep
     Rep/sscOrientationAnnotation2DRep
     Rep/sscImage2DRep3D
-    Rep/cxMehdiGPURayCastMultiVolumeRep
+#    Rep/cxMehdiGPURayCastMultiVolumeRep
     cxRepManager
     cxThresholdPreview
     cxMultiVolume3DRepProducer
     cxViewGroupData
     cxAxisConnector
     )
+if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
+    cx_add_class_qt_moc(cxVisualizationService_SOURCE
+        Rep/cxMehdiGPURayCastMultiVolumeRep
+        )
+endif()
 
 cx_add_class(cxVisualizationService_SOURCE
     cxLayoutData
@@ -45,7 +50,22 @@ include_directories(
 
 include_directories(Rep)
 
+set(cxVisualizationService_LIBS
+    SSC
+    cxResource
+    cxVideoService
+    cxPatientService
+    cxTrackingService
+    )
+
+if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
+    set(cxVisualizationService_LIBS
+        ${cxVisualizationService_LIBS}
+        vtkGPUMultiVolumeRender
+        )
+endif()
+
 ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxVisualizationService SSC cxResource cxVideoService cxPatientService cxTrackingService vtkGPUMultiVolumeRender)
+target_link_libraries(cxVisualizationService ${cxVisualizationService_LIBS})
 
 add_subdirectory(testing)
