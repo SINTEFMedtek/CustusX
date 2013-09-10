@@ -20,7 +20,9 @@
 #include "vtkForwardDeclarations.h"
 
 #include "cxConfig.h"
-#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
+//#ifndef Q_MOC_RUN
+//#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
+//#endif
 
 typedef vtkSmartPointer<class vtkOpenGLGPUMultiVolumeRayCastMapper> vtkOpenGLGPUMultiVolumeRayCastMapperPtr;
 
@@ -32,6 +34,23 @@ typedef boost::shared_ptr<class MehdiGPURayCastMultiVolumeRep> MehdiGPURayCastMu
 typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
 typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 
+/** Hack: ensures that the QObject part of MehdiGPURayCastMultiVolumeRep is moced
+  * irrespective of the value of CX_BUILD_MEHDI_VTKMULTIVOLUME.
+  * The CX_BUILD_MEHDI_VTKMULTIVOLUME define is not handled correctly by moc.
+  *
+  */
+class MehdiGPURayCastMultiVolumeRepBase: public ssc::RepImpl
+{
+Q_OBJECT
+public:
+	virtual ~MehdiGPURayCastMultiVolumeRepBase() {}
+
+private slots:
+	virtual void transformChangedSlot() = 0;
+	virtual void vtkImageDataChangedSlot() = 0;
+};
+
+#ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 
 /** 
  * Rep wrapping the multivolume renderer created by Mehdi.
@@ -41,9 +60,8 @@ typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class MehdiGPURayCastMultiVolumeRep: public ssc::RepImpl
+class MehdiGPURayCastMultiVolumeRep: public MehdiGPURayCastMultiVolumeRepBase
 {
-Q_OBJECT
 public:
 	static MehdiGPURayCastMultiVolumeRepPtr New(QString uid="") { return wrap_new(new MehdiGPURayCastMultiVolumeRep(), uid); }
 	virtual ~MehdiGPURayCastMultiVolumeRep();
@@ -57,7 +75,7 @@ protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 
-private slots:
+//private slots:
 	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
 
@@ -72,11 +90,12 @@ private:
 	std::vector<ImageMapperMonitorPtr> mMonitors;
 };
 
+#endif // CXMEHDIGPURAYCASTMULTIVOLUMEREP_H
 
 
 } // namespace cx
 
+
 #endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
 
 
-#endif // CXMEHDIGPURAYCASTMULTIVOLUMEREP_H

@@ -22,13 +22,18 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     Rep/sscOrientationAnnotation3DRep
     Rep/sscOrientationAnnotation2DRep
     Rep/sscImage2DRep3D
-    Rep/cxMehdiGPURayCastMultiVolumeRep
+#    Rep/cxMehdiGPURayCastMultiVolumeRep
     cxRepManager
     cxThresholdPreview
     cxMultiVolume3DRepProducer
     cxViewGroupData
     cxAxisConnector
     )
+if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
+    cx_add_class_qt_moc(cxVisualizationService_SOURCE
+        Rep/cxMehdiGPURayCastMultiVolumeRep
+        )
+endif()
 
 cx_add_class(cxVisualizationService_SOURCE
     cxLayoutData
