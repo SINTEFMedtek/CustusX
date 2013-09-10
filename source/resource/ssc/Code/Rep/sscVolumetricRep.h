@@ -24,8 +24,17 @@
 
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
+
+
+namespace cx
+{
+	typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
+	typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
+}
+
 namespace ssc
 {
+
 
 /**\brief Display a volume in 3D
  * 
@@ -87,21 +96,18 @@ protected:
 	virtual void addRepActorsToViewRenderer(View *view);
 	virtual void removeRepActorsFromViewRenderer(View *view);
 
-	vtkPiecewiseFunctionPtr mOpacityTransferFunction;
-	vtkColorTransferFunctionPtr mColorTransferFunction;
-	vtkVolumePropertyPtr mVolumeProperty;
+	cx::VolumePropertyPtr mVolumeProperty;
 	vtkVolumeMapperPtr mMapper;
 	vtkVolumePtr mVolume;
 	long mMaxVoxels; ///< always resample volume below this size.
 
 	ImagePtr mImage;
 	double mResampleFactor;
-	ImageMapperMonitorPtr mMonitor; ///< helper object for visualizing clipping/cropping
+	cx::ImageMapperMonitorPtr mMonitor; ///< helper object for visualizing clipping/cropping
 
 private slots:
 	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
-	void transferFunctionsChangedSlot();
 
 private:
 	void updateResampleFactor();

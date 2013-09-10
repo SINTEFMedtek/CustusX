@@ -69,6 +69,7 @@ private:
 	void addRepsToView();
 
 	void buildSscGPURayCastMultiVolume();
+	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
 	void buildVtkVolumeTextureMapper3D(ssc::ImagePtr image);
 	void buildVtkGPUVolumeRayCastMapper(ssc::ImagePtr image);
 	void buildSscProgressiveLODVolumeTextureMapper3D(ssc::ImagePtr image);
