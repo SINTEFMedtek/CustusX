@@ -193,10 +193,12 @@ void MultiVolume3DRepProducer::rebuildReps()
 
 void MultiVolume3DRepProducer::buildSscGPURayCastMultiVolume()
 {
+#ifndef CX_WINDOWS
 	ssc::GPURayCastVolumeRepPtr rep = ssc::GPURayCastVolumeRep::New("");
 	rep->setShaderFolder(DataLocations::getShaderPath());
 	rep->setImages(mImages);
 	mReps.push_back(rep);
+#endif //WIN32
 }
 
 bool MultiVolume3DRepProducer::is2DImage(ssc::ImagePtr image) const
