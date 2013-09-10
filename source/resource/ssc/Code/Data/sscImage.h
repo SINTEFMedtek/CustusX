@@ -50,7 +50,7 @@ namespace ssc
  *
  * \ingroup sscData
  */
-class Image: public Data
+class Image : public Data
 {
 Q_OBJECT
 

@@ -23,6 +23,7 @@
 #include "sscLogger.h"
 #include "sscGPURayCastVolumeRep.h"
 #include "cxDataLocations.h"
+#include "cxMehdiGPURayCastMultiVolumeRep.h"
 
 namespace cx
 {
@@ -52,6 +53,7 @@ QStringList MultiVolume3DRepProducer::getAvailableVisualizers()
 #endif
 	retval << "sscProgressiveLODVolumeTextureMapper3D";
 	retval << "sscGPURayCastMultiVolume";
+	retval << "vtkOpenGLGPUMultiVolumeRayCastMapper";
 	return retval;
 }
 
@@ -61,7 +63,8 @@ std::map<QString, QString> MultiVolume3DRepProducer::getAvailableVisualizerDispl
 	names["vtkVolumeTextureMapper3D"] = "Texture (single volume)";
 	names["vtkGPUVolumeRayCastMapper"] = "Raycast GPU (single volume)";
 	names["sscProgressiveLODVolumeTextureMapper3D"] = "Progressive texture (single volume)";
-	names["sscGPURayCastMultiVolume"] = "Raycast GPU (multi volume)";
+	names["sscGPURayCastMultiVolume"] = "Snw Raycast GPU (multi volume)";
+	names["vtkOpenGLGPUMultiVolumeRayCastMapper"] = "Mehdi Raycast GPU (multi volume)";
 	return names;
 }
 
@@ -102,7 +105,6 @@ void MultiVolume3DRepProducer::addImage(ssc::ImagePtr image)
 
 void MultiVolume3DRepProducer::removeImage(QString uid)
 {
-	SSC_LOG("");
 	ssc::ImagePtr image;
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
@@ -130,7 +132,6 @@ std::vector<ssc::RepPtr> MultiVolume3DRepProducer::getAllReps()
 
 void MultiVolume3DRepProducer::updateRepsInView()
 {
-	SSC_LOG("");
 	this->clearReps();
 	this->fillReps();
 }
@@ -145,8 +146,6 @@ void MultiVolume3DRepProducer::removeRepsFromView()
 {
 	if (!mView)
 		return;
-
-	SSC_LOG("rep size %lu", mReps.size());
 
 	for (unsigned i=0; i<mReps.size(); ++i)
 		mView->removeRep(mReps[i]);
@@ -163,16 +162,12 @@ void MultiVolume3DRepProducer::addRepsToView()
 	if (!mView)
 		return;
 
-	SSC_LOG("rep size %lu", mReps.size());
-
 	for (unsigned i=0; i<mReps.size(); ++i)
 		mView->addRep(mReps[i]);
 }
 
 void MultiVolume3DRepProducer::rebuildReps()
 {
-	std::cout << "visualizer: " << mVisualizerType << std::endl;
-
 	if (mImages.empty())
 		return;
 
@@ -185,6 +180,10 @@ void MultiVolume3DRepProducer::rebuildReps()
 	{
 		this->buildSscGPURayCastMultiVolume();
 	}
+	else if (mVisualizerType=="vtkOpenGLGPUMultiVolumeRayCastMapper")
+	{
+		this->buildVtkOpenGLGPUMultiVolumeRayCastMapper();
+	}
 	else
 	{
 		ssc::messageManager()->sendError(QString("No visualizer found for string=%1").arg(mVisualizerType));
@@ -195,6 +194,13 @@ void MultiVolume3DRepProducer::buildSscGPURayCastMultiVolume()
 {
 	ssc::GPURayCastVolumeRepPtr rep = ssc::GPURayCastVolumeRep::New("");
 	rep->setShaderFolder(DataLocations::getShaderPath());
+	rep->setImages(mImages);
+	mReps.push_back(rep);
+}
+
+void MultiVolume3DRepProducer::buildVtkOpenGLGPUMultiVolumeRayCastMapper()
+{
+	MehdiGPURayCastMultiVolumeRepPtr rep = MehdiGPURayCastMultiVolumeRep::New("");
 	rep->setImages(mImages);
 	mReps.push_back(rep);
 }

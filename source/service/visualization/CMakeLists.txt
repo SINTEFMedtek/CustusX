@@ -22,6 +22,7 @@ cx_add_class_qt_moc(cxVisualizationService_SOURCE
     Rep/sscOrientationAnnotation3DRep
     Rep/sscOrientationAnnotation2DRep
     Rep/sscImage2DRep3D
+    Rep/cxMehdiGPURayCastMultiVolumeRep
     cxRepManager
     cxThresholdPreview
     cxMultiVolume3DRepProducer
@@ -39,11 +40,12 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/service/video
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty/VTKMultiVolume
     )
 
 include_directories(Rep)
 
 ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxVisualizationService SSC cxResource cxVideoService cxPatientService cxTrackingService)
+target_link_libraries(cxVisualizationService SSC cxResource cxVideoService cxPatientService cxTrackingService vtkGPUMultiVolumeRender)
 
 add_subdirectory(testing)
