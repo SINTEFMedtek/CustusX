@@ -19,6 +19,7 @@
 #include <vector>
 #include "vtkForwardDeclarations.h"
 
+#include "cxConfig.h"
 #ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 
 typedef vtkSmartPointer<class vtkOpenGLGPUMultiVolumeRayCastMapper> vtkOpenGLGPUMultiVolumeRayCastMapperPtr;
