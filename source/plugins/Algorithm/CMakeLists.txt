@@ -25,6 +25,7 @@ SET( MOC_HEADER_FILES
 	logic/cxSmoothingImageFilter.h
 	logic/cxResampleImageFilter.h
 	logic/cxTubeSegmentationFilter.h
+	logic/cxLevelSetFilter.h
 	logic/cxTSFPresets.h
     gui/cxAlgorithmPlugin.h
     gui/cxConnectedThresholdImageFilterWidget.h
@@ -52,6 +53,8 @@ SET( SOURCE_FILES
 	logic/cxDummyFilter.cpp
 	logic/cxTubeSegmentationFilter.h
 	logic/cxTubeSegmentationFilter.cpp
+	logic/cxLevelSetFilter.h
+	logic/cxLevelSetFilter.cpp
 	logic/cxPipeline.h
 	logic/cxPipeline.cpp
 	logic/cxTrackingDataToVolume.h
