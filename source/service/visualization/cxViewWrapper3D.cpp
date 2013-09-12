@@ -62,6 +62,7 @@
 #include "sscEnumConverter.h"
 #include "sscManualTool.h"
 #include "sscImage2DRep3D.h"
+#include "sscLogger.h"
 
 #include "sscData.h"
 #include "sscAxesRep.h"
@@ -528,20 +529,11 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
 
 void ViewWrapper3D::dataRemoved(const QString& uid)
 {
-	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
-	if (image)
+	mMultiVolume3DRepProducer->removeImage(uid);
+	if (mDataReps.count(uid))
 	{
-		mMultiVolume3DRepProducer->removeImage(uid);
-//		disconnect(image.get(), SIGNAL(clipPlanesChanged()), this, SLOT(updateView()));
-//		disconnect(image.get(), SIGNAL(cropBoxChanged()), this, SLOT(updateView()));
-	}
-	else
-	{
-		if (mDataReps.count(uid))
-		{
-			mView->removeRep(mDataReps[uid]);
-			mDataReps.erase(uid);
-		}
+		mView->removeRep(mDataReps[uid]);
+		mDataReps.erase(uid);
 	}
 
 	this->activeImageChangedSlot();

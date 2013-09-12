@@ -38,6 +38,7 @@ class MultiVolume3DRepProducer : public QObject
 	Q_OBJECT
 public:
 	MultiVolume3DRepProducer();
+	~MultiVolume3DRepProducer();
 
 	void setView(ssc::View* view);
 	void setMaxRenderSize(int voxels);
@@ -52,6 +53,9 @@ public:
 signals:
 	void imagesChanged();
 
+private slots:
+	void clearReps();
+
 private:
 	QString mVisualizerType;
 	std::vector<ssc::ImagePtr> m2DImages;
@@ -61,7 +65,6 @@ private:
 	ssc::View* mView;
 
 	void updateRepsInView();
-	void clearReps();
 	void fillReps();
 
 	void rebuildReps();
