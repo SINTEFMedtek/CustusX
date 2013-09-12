@@ -103,7 +103,7 @@ void MehdiGPURayCastMultiVolumeRep::setup()
 		property->setImage(mImages[i]);
 		mVolumeProperties.push_back(property);
 
-		mMapper->SetInput(i, mImages[i]->getBaseVtkImageData());
+		mMapper->SetInput(i, mImages[i]->getGrayScaleBaseVtkImageData());
 
 		if (i==0)
 			mVolume->SetProperty( property->getVolumeProperty() );

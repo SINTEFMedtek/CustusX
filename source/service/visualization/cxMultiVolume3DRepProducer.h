@@ -54,7 +54,8 @@ signals:
 
 private:
 	QString mVisualizerType;
-	std::vector<ssc::ImagePtr> mImages;
+	std::vector<ssc::ImagePtr> m2DImages;
+	std::vector<ssc::ImagePtr> m3DImages;
 	std::vector<ssc::RepPtr> mReps;
 	int mMaxRenderSize;
 	ssc::View* mView;
@@ -64,9 +65,13 @@ private:
 	void fillReps();
 
 	void rebuildReps();
+	void rebuild2DReps();
+	void rebuild3DReps();
 
 	void removeRepsFromView();
 	void addRepsToView();
+
+	ssc::ImagePtr removeImageFromVector(QString uid, std::vector<ssc::ImagePtr> &images);
 
 	void buildSscGPURayCastMultiVolume();
 	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
