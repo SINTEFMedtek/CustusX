@@ -109,10 +109,10 @@ TimeOut: %d
             outfile = '%s/CTestResults.xml' % path
         PrintFormatter.printInfo('Run ctest, results to %s' % outfile)
         shell.changeDir(path)
-        #shell.run('rm -rf ./Testing/[0-9]*')
-        shell.rm_r('%s/Testing/' % os.getcwd(), "[0-9]*")
-        #shell.run('rm -rf %s' % outfile)
-        shell.rm_r(outfile)
+        shell.run('rm -rf ./Testing/[0-9]*')
+        #shell.rm_r('%s/Testing/' % os.getcwd(), "[0-9]*")
+        shell.run('rm -rf %s' % outfile)
+        #shell.rm_r(outfile)
         shell.run('ctest -D ExperimentalTest --no-compress-output', ignoreFailure=True)
         shell.run('cp ./Testing/`head -n 1 ./Testing/TAG`/Test.xml %s' % outfile)
 
@@ -122,8 +122,8 @@ TimeOut: %d
             outfile = '%s/CatchTestResults.xml' % path
         PrintFormatter.printInfo('Run catch wit tag [%s], results to %s' % (tag, outfile))
         shell.changeDir(path)
-        #shell.run('rm -rf %s' % outfile)
-        shell.rm_r(outfile)
+        shell.run('rm -rf %s' % outfile)
+        #shell.rm_r(outfile)
         shell.run('%s/Catch [%s] --reporter junit --out %s' % (path, tag, outfile), ignoreFailure=True)
         #shell.run('%s/Catch [%s] --out %s' % (path, tag, outfile))
         
