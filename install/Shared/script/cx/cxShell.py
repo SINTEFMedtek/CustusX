@@ -16,6 +16,7 @@ import os.path
 import getpass
 import platform
 import shutil
+import re
     
 class Shell (object):
     '''
@@ -73,6 +74,24 @@ class Shell (object):
             os.makedirs(path)
         self.CWD = path
         self._printCommand('cd %s' % path)
+        
+    def rm_r(path, pattern="*"):
+        '''
+        This function mimics rm -rf (unix) for
+        Linux, Mac and Windows. Will work with regex.
+        '''
+        if os.path.isdir(path):
+            dir = path
+            if(pattern == "*"):
+                shutil.rmtree(path)
+            else:
+                for f in os.listdir(dir):
+                    if re.search(pattern, f):
+                        os.remove(os.path.join(dir, f))
+                        print "DIR: Removing %s" % os.path.join(dir, f)
+        elif os.path.exists(path):
+            os.remove(path)
+            print "FILE: Removing %s" % path
     
     def removeTree(self, path):
         self._printInfo("Removing folder and contents of %s." % path)
