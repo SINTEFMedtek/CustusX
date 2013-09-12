@@ -364,7 +364,7 @@ class CustusX3(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git@github.com:SINTEFMedisinskTeknologi/CustusX3.git')
     def update(self):
-        self._getBuilder().gitUpdate('master', tag=self.controlData.mGitTag, submodules=True)    
+        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag(), submodules=True)    
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -449,7 +449,7 @@ class CustusX3Data(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('ssh://%s'%self.gitRepository(), self.sourceFolder())
     def update(self):
-#        self._getBuilder().gitUpdate('master', tag=self.controlData.mGitTag)    
+#        self._getBuilder().gitUpdate('master', tag=self.controlData.getGitTag())    
         self._getBuilder().gitUpdate('master')    
     def configure(self):
         pass
