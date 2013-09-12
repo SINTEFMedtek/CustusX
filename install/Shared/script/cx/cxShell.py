@@ -75,15 +75,19 @@ class Shell (object):
         self.CWD = path
         self._printCommand('cd %s' % path)
         
-    def rm_r(path, pattern="*"):
+    def cp(self, from_path, to_path):
+        pass
+        
+    def rm_r(self, path, pattern="none"):
         '''
         This function mimics rm -rf (unix) for
         Linux, Mac and Windows. Will work with regex.
         '''
+        path = self._convertToString(path)
         if os.path.isdir(path):
             dir = path
-            if(pattern == "*"):
-                shutil.rmtree(path)
+            if(pattern == "none"):
+                shutil.rmtree(dir)
             else:
                 for f in os.listdir(dir):
                     if re.search(pattern, f):
