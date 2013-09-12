@@ -17,6 +17,7 @@ import sys
 import argparse        
 import glob
 import platform
+import os
 
 from cxShell import *
 from cxPrintFormatter import PrintFormatter
@@ -119,7 +120,8 @@ TimeOut: %d
             outfile = '%s/CatchTestResults.xml' % path
         PrintFormatter.printInfo('Run catch wit tag [%s], results to %s' % (tag, outfile))
         shell.changeDir(path)
-        shell.run('rm -rf %s' % outfile)
+        #shell.run('rm -rf %s' % outfile)
+        os.remove(outfile)
         shell.run('%s/Catch [%s] --reporter junit --out %s' % (path, tag, outfile), ignoreFailure=True)
         #shell.run('%s/Catch [%s] --out %s' % (path, tag, outfile))
         
