@@ -44,7 +44,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
     def getDescription(self):                  
         return '\
 Jenkins script for build, test and deployment of CustusX and dependents. \
-Generates doxygen docs and published them onto medtek.sintef.no'
+Generates doxygen docs and publishes them onto medtek.sintef.no'
     
     def run(self):
         self.cxBuilder.buildAllComponents()
