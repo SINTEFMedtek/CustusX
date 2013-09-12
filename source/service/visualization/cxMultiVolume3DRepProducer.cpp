@@ -22,10 +22,11 @@
 #include "sscTypeConversions.h"
 #include "sscLogger.h"
 #include "sscGPURayCastVolumeRep.h"
-#include "cxDataManager.h"
 #include "cxDataLocations.h"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "cxConfig.h"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
@@ -35,6 +36,11 @@ MultiVolume3DRepProducer::MultiVolume3DRepProducer()
 {
 	mView = NULL;
 	mMaxRenderSize = 10 * pow(10.0,6);
+}
+
+MultiVolume3DRepProducer::~MultiVolume3DRepProducer()
+{
+	this->clearReps();
 }
 
 void MultiVolume3DRepProducer::setView(ssc::View* view)

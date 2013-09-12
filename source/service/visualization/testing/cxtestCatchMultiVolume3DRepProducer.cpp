@@ -138,10 +138,6 @@ TEST_CASE("MultiVolume3DVisualizer creates 2 reps using vtkVolumeTextureMapper3D
 		REQUIRE(rep);
 		CHECK(dynamic_cast<vtkVolumeTextureMapper3D*>(rep->getVtkVolume()->GetMapper()));
 	}
-
-
 }
 
 } // namespace cx
-
-
