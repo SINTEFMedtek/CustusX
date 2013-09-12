@@ -29,7 +29,7 @@ import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
 import cx.cxJenkinsBuildScriptBase
 
-class WindowsController(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
+class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
     '''
     Controller that builds, tests and deploys CustusX on a windows machine.
     '''
@@ -56,10 +56,10 @@ class WindowsController(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
         super(Controller, self)._applyArgumentParserArguments(options)
         data = self.cxBuilder.assembly.controlData        
         data.setBuildType("Release")
-        if(option.jom):
+        if(options.jom):
             data.setCMakeGenerator("NMake Makefiles JOM")
-        data.setBuild32(option.b32)
-        data.setBuildShared(options.static)
+        data.setBuild32(options.b32)
+        data.setBuildShared(not options.static)
 
     def run(self):
         if not self.argumentParserArguments.skip_build:
@@ -72,5 +72,5 @@ class WindowsController(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBase):
                      
 
 if __name__ == '__main__':
-    controller = WindowsController()
+    controller = Controller()
     controller.run()

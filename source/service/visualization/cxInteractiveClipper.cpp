@@ -29,16 +29,6 @@
 namespace cx
 {
 
-//InteractiveClipper::InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy) :
-//	mSlicePlanesProxy(slicePlanesProxy), mUseClipper(false)
-//{
-//	mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
-//	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-////	connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
-//
-//	this->changedSlot();
-//}
-
 InteractiveClipper::InteractiveClipper() :
 	mUseClipper(false)
 {
@@ -55,7 +45,6 @@ InteractiveClipper::InteractiveClipper() :
 
 	mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
 	connect(this, SIGNAL(changed()), this, SLOT(changedSlot()));
-//	connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
 	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
 	this->dominantToolChangedSlot();
@@ -70,7 +59,6 @@ void InteractiveClipper::setSlicePlane(ssc::PLANE_TYPE plane)
 
 	if (mSlicePlanesProxy->getData().count(plane))
 	{
-		//    std::cout << "InteractiveClipper::setSlicePlane(" << plane << ")" << std::endl;
 		mSlicePlaneClipper->setSlicer(mSlicePlanesProxy->getData()[plane].mSliceProxy);
 		emit changed();
 	}
@@ -78,18 +66,16 @@ void InteractiveClipper::setSlicePlane(ssc::PLANE_TYPE plane)
 
 void InteractiveClipper::saveClipPlaneToVolume()
 {
-//	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
 	if (!mImage)
 		return;
 
-	mImage->addClipPlane(mSlicePlaneClipper->getClipPlaneCopy());
+	mImage->addPersistentClipPlane(mSlicePlaneClipper->getClipPlaneCopy());
 }
 void InteractiveClipper::clearClipPlanesInVolume()
 {
-//	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
 	if (!mImage)
 		return;
-	mImage->clearClipPlanes();
+	mImage->clearPersistentClipPlanes();
 }
 
 ssc::PLANE_TYPE InteractiveClipper::getSlicePlane()
@@ -132,20 +118,21 @@ ssc::ImagePtr InteractiveClipper::getImage() const
 
 void InteractiveClipper::setImage(ssc::ImagePtr image)
 {
-//	std::cout << "InteractiveClipper::setImage " << image.get() << std::endl;
+	if (mImage)
+		mImage->setInteractiveClipPlane(vtkPlanePtr());
 	mImage = image;
-//	this->changedSlot(); // auto by changed()
 	emit changed();
 }
 
 void InteractiveClipper::changedSlot()
 {
-	//  std::cout << "InteractiveClipper::changedSlot()" << std::endl;
+	if (!mImage)
+		return;
 
 	if (mUseClipper)
 	{
-		mSlicePlaneClipper->clearVolumes();
-		mSlicePlaneClipper->addVolume(RepManager::getInstance()->getVolumetricRep(mImage));
+//		mSlicePlaneClipper->clearVolumes();
+//		mSlicePlaneClipper->addVolume(RepManager::getInstance()->getVolumetricRep(mImage));
 
 		ssc::PLANE_TYPE currentPlane = this->getPlaneType();
 
@@ -161,22 +148,22 @@ void InteractiveClipper::changedSlot()
 			{
 				currentPlane = planes.front();
 			}
-			//      std::cout << "init slicer(" << currentPlane << ")" << std::endl;
 		}
 
 		// reset plane anyway. It might be the same planeType but a different sliceProxy.
 		mSlicePlaneClipper->setSlicer(mSlicePlanesProxy->getData()[currentPlane].mSliceProxy);
+		mImage->setInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
 	}
 	else
 	{
-		mSlicePlaneClipper->clearVolumes();
+//		mSlicePlaneClipper->clearVolumes();
+		mImage->setInteractiveClipPlane(vtkPlanePtr());
 	}
+
 }
 
 std::vector<ssc::PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 {
-	//  std::cout << "InteractiveClipper::getAvailableSlicePlanes() " << mSlicePlanesProxy->getData().size() << std::endl;
-
 	std::vector<ssc::PLANE_TYPE> retval;
 	ssc::SlicePlanesProxy::DataMap data = mSlicePlanesProxy->getData();
 	for (ssc::SlicePlanesProxy::DataMap::iterator iter = data.begin(); iter != data.end(); ++iter)

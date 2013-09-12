@@ -50,7 +50,7 @@ namespace ssc
  *
  * \ingroup sscData
  */
-class Image: public Data
+class Image : public Data
 {
 Q_OBJECT
 
@@ -127,9 +127,11 @@ public:
 	virtual DoubleBoundingBox3D getCroppingBox() const;
 
 	// methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
-	virtual void addClipPlane(vtkPlanePtr plane);
-	virtual std::vector<vtkPlanePtr> getClipPlanes();
-	virtual void clearClipPlanes();
+	virtual void addPersistentClipPlane(vtkPlanePtr plane);
+	virtual std::vector<vtkPlanePtr> getAllClipPlanes();
+	virtual void clearPersistentClipPlanes();
+	virtual void setInteractiveClipPlane(vtkPlanePtr plane); ///< set a plane that is not saved
+
 	void mergevtkSettingsIntosscTransform();
 
 	void resetTransferFunctions(bool _2D=true, bool _3D=true); ///< Resets the transfer functions and creates new defaut values.
@@ -138,6 +140,11 @@ public:
 
 	bool isValidTransferFunction(ImageTFDataPtr transferFunction); ///< Check if transfer function is valid for this image
 	static vtkImageDataPtr createDummyImageData(int axisSize, int maxVoxelValue); ///< Create a moc object of vtkImageData
+
+	void setInterpolationTypeToNearest();
+	void setInterpolationTypeToLinear();
+	void setInterpolationType(int val);
+	int getInterpolationType() const;
 
 signals:
 	void landmarkRemoved(QString uid);
@@ -169,10 +176,13 @@ protected:
 
 	bool mUseCropping; ///< image should be cropped using mCroppingBox
 	DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.
-	std::vector<vtkPlanePtr> mClipPlanes;
+	std::vector<vtkPlanePtr> mPersistentClipPlanes;
+	vtkPlanePtr mInteractiveClipPlane;
 	QString mModality; ///< modality of the image, defined as DICOM tag (0008,0060), Section 3, C.7.3.1.1.1
 	QString mImageType; ///< type of the image, defined as DICOM tag (0008,0008) (mainly value 3, but might be a merge of value 4), Section 3, C.7.6.1.1.2
 	double mMaxRGBIntensity;
+	int mInterpolationType; ///< mirror the interpolationType in vtkVolumeProperty
+
 
 private:
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);

@@ -41,6 +41,9 @@
 #include "sscTypeConversions.h"
 #include "vtkForwardDeclarations.h"
 #include "sscMessageManager.h"
+#include "cxImageMapperMonitor.h"
+
+#include "cxVolumeProperty.h"
 
 typedef vtkSmartPointer<class vtkGPUVolumeRayCastMapper> vtkGPUVolumeRayCastMapperPtr;
 
@@ -48,60 +51,13 @@ namespace ssc
 {
 VolumetricRep::VolumetricRep() :
 	VolumetricBaseRep(),
-	mOpacityTransferFunction(vtkPiecewiseFunctionPtr::New()),
-	mColorTransferFunction(vtkColorTransferFunctionPtr::New()),
-	mVolumeProperty(vtkVolumePropertyPtr::New()),
 	mVolume(vtkVolumePtr::New()),
+	mVolumeProperty(cx::VolumeProperty::create()),
 	mMaxVoxels(0)
 {
 	mResampleFactor = 1.0;
-	//double maxVal = 255;//500.0;
-	//double maxVal = 500.0;
-	//should use GetScalarRange()[1], but we dont have an image yet,
-	//and this code dont ever get run... pick a value (TF's set from ssc::Image)
-	//double maxVal = 1296.0;
-
-	double maxVal = 255;
-	mOpacityTransferFunction->AddPoint(0.0, 0.0);
-	mOpacityTransferFunction->AddPoint(maxVal, 1.0);
-
-	mColorTransferFunction->SetColorSpaceToRGB();
-	mColorTransferFunction->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
-	mColorTransferFunction->AddRGBPoint(maxVal, 1.0, 1.0, 1.0);
-
-	mVolumeProperty->SetColor(mColorTransferFunction);
-	mVolumeProperty->SetScalarOpacity(mOpacityTransferFunction);
-	mVolumeProperty->SetInterpolationTypeToLinear();
-
-	// from snw
-	mVolumeProperty->ShadeOff();
-	mVolumeProperty->SetAmbient ( 0.2 );
-	mVolumeProperty->SetDiffuse ( 0.9 );
-	mVolumeProperty->SetSpecular ( 0.3 );
-	mVolumeProperty->SetSpecularPower ( 15.0 );
-	mVolumeProperty->SetScalarOpacityUnitDistance(0.8919);
-//	mVolumeProperty->SetInterpolationTypeToNearest();
-
 	this->setUseVolumeTextureMapper();
-//	vtkGPUVolumeRayCastMapperPtr mapper = vtkGPUVolumeRayCastMapperPtr::New();
-//	//vtkVolumeTextureMapper3DPtr mapper = vtkVolumeTextureMapper3DPtr::New();
-//	mMapper = mapper;
-//
-//	// from snws
-//	//mapper->SetPreferredMethodToNVidia();
-//	//mTextureMapper3D->SetPreferredMethodToFragmentProgram();
-//	mMapper->SetBlendModeToComposite();
-
- // mTextureMapper3D->CroppingOff();
-
-	mVolume->SetProperty( mVolumeProperty );
-//	mVolume->SetMapper( mMapper );
-
-
-//	if (!mTextureMapper3D->IsRenderSupported(mVolumeProperty))
-//	{
-//	  std::cout << "Warning: texture rendering not supported" << std::endl;
-//	}
+	mVolume->SetProperty(mVolumeProperty->getVolumeProperty());
 }
 
 VolumetricRep::~VolumetricRep()
@@ -161,13 +117,12 @@ void VolumetricRep::setImage(ImagePtr image)
 
 	if (mImage)
 	{
+		mVolumeProperty->setImage(ssc::ImagePtr());
 		mImage->disconnectFromRep(mSelf);
 		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-		//disconnect(this, SIGNAL(addPermanentPoint(double, double, double)),
-		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
 		mMonitor.reset();
+		mMapper->SetInput( (vtkImageData*)NULL );
 	}
 
 	mImage = image;
@@ -177,14 +132,10 @@ void VolumetricRep::setImage(ImagePtr image)
 		mImage->connectToRep(mSelf);
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-		vtkImageDataChangedSlot();
-		mMonitor.reset(new ImageMapperMonitor(mVolume, mImage));
+		mVolumeProperty->setImage(mImage);
+		this->vtkImageDataChangedSlot();
+		mMonitor.reset(new cx::ImageMapperMonitor(mVolume, mImage));
 		emit internalVolumeChanged();
-	}
-	else
-	{
-		mMapper->SetInput( (vtkImageData*)NULL );
 	}
 }
 
@@ -207,9 +158,7 @@ double VolumetricRep::computeResampleFactor(long maxVoxels, ssc::ImagePtr image)
 
 	if (factor<0.99)
 	{
-		//std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
 		return factor;
-		//return 1.0;
 	}
 	return 1.0;
 }
@@ -230,9 +179,6 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	}
 
 	this->updateResampleFactor();
-
-	//mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
-	//mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
 
 	// also use grayscale as vtk is incapable of rendering 3component color.
 	vtkImageDataPtr volume = mImage->getGrayScaleBaseVtkImageData();
@@ -260,9 +206,9 @@ void VolumetricRep::vtkImageDataChangedSlot()
 
 	mMapper->SetInput(volume);
 
-	transferFunctionsChangedSlot();
 	transformChangedSlot();
 }
+
 /**called when transform is changed
  * reset it in the prop.*/
 void VolumetricRep::transformChangedSlot()
@@ -272,25 +218,6 @@ void VolumetricRep::transformChangedSlot()
 		return;
 	}
 	mVolume->SetUserMatrix(mImage->get_rMd().getVtkMatrix());
-}
-
-void VolumetricRep::transferFunctionsChangedSlot()
-{
-	mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
-	mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
-	mVolumeProperty->SetShade(mImage->getShadingOn());
-
-	//Shading parameters from OsiriX
-	/*mVolumeProperty->SetAmbient(0.15);
-	  mVolumeProperty->SetDiffuse(0.90);
-	  mVolumeProperty->SetSpecular(0.30);
-	  mVolumeProperty->SetSpecularPower(15.00);*/
-
-	mVolumeProperty->SetAmbient(mImage->getShadingAmbient());
-	mVolumeProperty->SetDiffuse(mImage->getShadingDiffuse());
-	mVolumeProperty->SetSpecular(mImage->getShadingSpecular());
-	mVolumeProperty->SetSpecularPower(mImage->getShadingSpecularPower());
-
 }
 
 void VolumetricRep::setMaxVolumeSize(long maxVoxels)

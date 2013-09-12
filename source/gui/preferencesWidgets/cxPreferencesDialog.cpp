@@ -24,6 +24,7 @@
 #include "cxViewWrapper3D.h"
 #include "sscHelperWidgets.h"
 #include "cxApplicationStateMachine.h"
+#include "cxMultiVolume3DRepProducer.h"
 
 namespace cx
 {
@@ -163,8 +164,6 @@ PerformanceTab::PerformanceTab(QWidget *parent) :
 	mRenderingIntervalSpinBox = NULL;
 	mRenderingRateLabel = NULL;
 	mSmartRenderCheckBox = NULL;
-	mGPURenderCheckBox = NULL;
-	mProgressiveTextureRenderCheckBox = NULL;
 	mGPU2DRenderCheckBox = NULL;
 	mShadingCheckBox = NULL;
 	mMainLayout = NULL;
@@ -188,7 +187,7 @@ void PerformanceTab::init()
 
   double Mb = pow(10.0,6);
   bool ok = true;
-  double maxRenderSize = settings()->value("maxRenderSize").toDouble(&ok);
+  double maxRenderSize = settings()->value("View3D/maxRenderSize").toDouble(&ok);
   if (!ok)
     maxRenderSize = 10 * Mb;
   mMaxRenderSize = ssc::DoubleDataAdapterXml::initialize("MaxRenderSize", "Max Render Size (Mb)", "Maximum size of volumes used in volume rendering. Applies to new volumes.", maxRenderSize, ssc::DoubleRange(1*Mb,300*Mb,1*Mb), 0, QDomNode());
@@ -201,15 +200,13 @@ void PerformanceTab::init()
   mSmartRenderCheckBox->setChecked(settings()->value("smartRender", true).toBool());
   mSmartRenderCheckBox->setToolTip("Render only when scene has changed, plus once per second.");
 
-  bool useGPU3DRender = settings()->value("useGPUVolumeRayCastMapper").toBool();
-  mGPURenderCheckBox = new QCheckBox("Use GPU 3D Renderer");
-  mGPURenderCheckBox->setChecked(useGPU3DRender);
-  mGPURenderCheckBox->setToolTip("Use a GPU-based 3D renderer instead of the texture-based one, if available.");
-
-  bool useProgressiveLODTextureVolumeRayCastMapper = settings()->value("useProgressiveLODTextureVolumeRayCastMapper").toBool();
-  mProgressiveTextureRenderCheckBox = new QCheckBox("Use LOD Texture Mapper");
-  mProgressiveTextureRenderCheckBox->setChecked(useProgressiveLODTextureVolumeRayCastMapper);
-  mProgressiveTextureRenderCheckBox->setToolTip("When using the 3D texture mapper,\nuse a progressive level-of-detail rendering,\nif available.");
+  m3DVisualizer = ssc::StringDataAdapterXml::initialize("ImageRender3DVisualizer",
+	  "3D Renderer",
+	  "Select 3D visualization method for images",
+	  settings()->value("View3D/ImageRender3DVisualizer").toString(),
+	  MultiVolume3DRepProducer::getAvailableVisualizers(),
+	  QDomNode());
+  m3DVisualizer->setDisplayNames(MultiVolume3DRepProducer::getAvailableVisualizerDisplayNames());
 
   bool useGPU2DRender = settings()->value("useGPU2DRendering").toBool();
 	mGPU2DRenderCheckBox = new QCheckBox("Use GPU 2D Renderer");
@@ -219,12 +216,6 @@ void PerformanceTab::init()
 #ifndef USE_GLX_SHARED_CONTEXT
 	mGPU2DRenderCheckBox->setChecked(false);
 	mGPU2DRenderCheckBox->setEnabled(false);
-#endif
-
-#if !defined(__APPLE__) && !defined(WIN32)
-	mProgressiveTextureRenderCheckBox->setEnabled(true);
-#else
-	mProgressiveTextureRenderCheckBox->setEnabled(false);
 #endif
 
 //  bool useGPU3DDepthPeeling = settings()->value("View3D/depthPeeling").toBool();
@@ -239,11 +230,13 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mRenderingIntervalSpinBox, 0, 1);
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
-  mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
-  mMainLayout->addWidget(mProgressiveTextureRenderCheckBox, 4, 0);
   mMainLayout->addWidget(mGPU2DRenderCheckBox, 5, 0);
-  //mMainLayout->addWidget(mGPU3DDepthPeelingCheckBox, 5, 0);
   new ssc::SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 7);
+  mMainLayout->addWidget(createDataWidget(this, m3DVisualizer), 8, 0, 1, 2);
+
+  mMainLayout->setColumnStretch(0, 0.6);
+  mMainLayout->setColumnStretch(1, 0.6);
+  mMainLayout->setColumnStretch(2, 0.3);
 
   mTopLayout->addLayout(mMainLayout);
 }
@@ -256,14 +249,12 @@ void PerformanceTab::renderingIntervalSlot(int interval)
 void PerformanceTab::saveParametersSlot()
 {
   settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
-  settings()->setValue("useGPUVolumeRayCastMapper", mGPURenderCheckBox->isChecked());
-  settings()->setValue("useProgressiveLODTextureVolumeRayCastMapper", mProgressiveTextureRenderCheckBox->isChecked());
-
   settings()->setValue("useGPU2DRendering", mGPU2DRenderCheckBox->isChecked());
-  settings()->setValue("maxRenderSize",     mMaxRenderSize->getValue());
+  settings()->setValue("View3D/maxRenderSize",     mMaxRenderSize->getValue());
   settings()->setValue("smartRender",       mSmartRenderCheckBox->isChecked());
   settings()->setValue("stillUpdateRate",   mStillUpdateRate->getValue());
 //  settings()->setValue("View3D/depthPeeling", mGPU3DDepthPeelingCheckBox->isChecked());
+  settings()->setValue("View3D/ImageRender3DVisualizer",   m3DVisualizer->getValue());
 }
 
 //==============================================================================
