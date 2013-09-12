@@ -328,6 +328,9 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);
 
+	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
+	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
+
 #ifdef __APPLE__
 	this->fillDefault("useGPUVolumeRayCastMapper", false);
 	this->fillDefault("useGPU2DRendering", false);

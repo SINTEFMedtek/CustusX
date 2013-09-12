@@ -1,0 +1,73 @@
+// This file is part of CustusX, an Image Guided Therapy Application.
+//
+// Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+//
+// CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
+// code and binaries can only be used by SMT and those with explicit permission
+// from SMT. CustusX shall not be distributed to anyone else.
+//
+// CustusX is a research tool. It is NOT intended for use or certified for use
+// in a normal clinical setting. SMT does not take responsibility for its use
+// in any way.
+//
+// See CustusX_License.txt for more information.
+#include "cxAxisConnector.h"
+
+#include "sscPointMetric.h"
+#include "sscAxesRep.h"
+#include "sscTool.h"
+
+namespace cx
+{
+
+AxisConnector::AxisConnector(ssc::CoordinateSystem space)
+{
+	mListener.reset(new ssc::CoordinateSystemListener(space));
+	connect(mListener.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
+
+	mRep = ssc::AxesRep::New(space.toString() + "_axis");
+	mRep->setCaption(space.toString(), ssc::Vector3D(1, 0, 0));
+	mRep->setShowAxesLabels(false);
+	mRep->setFontSize(0.08);
+	mRep->setAxisLength(0.03);
+	this->changedSlot();
+}
+
+void AxisConnector::mergeWith(ssc::CoordinateSystemListenerPtr base)
+{
+	mBase = base;
+	connect(mBase.get(), SIGNAL(changed()), this, SLOT(changedSlot()));
+	this->changedSlot();
+}
+
+void AxisConnector::connectTo(ssc::ToolPtr tool)
+{
+	mTool = tool;
+	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(changedSlot()));
+	this->changedSlot();
+}
+
+void AxisConnector::changedSlot()
+{
+	ssc::Transform3D  rMs = ssc::SpaceHelpers::get_toMfrom(mListener->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+	mRep->setTransform(rMs);
+
+	mRep->setVisible(true);
+
+	// if connected to tool: check visibility
+	if (mTool)
+		mRep->setVisible(mTool->getVisible());
+
+	// Dont show if equal to base
+	if (mBase)
+	{
+		ssc::Transform3D rMb = ssc::SpaceHelpers::get_toMfrom(mBase->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+		if (ssc::similar(rMb, rMs))
+			mRep->setVisible(false);
+	}
+
+}
+
+
+} // namespace cx
+

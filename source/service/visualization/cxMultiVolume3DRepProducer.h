@@ -15,6 +15,7 @@
 #define CXMULTIVOLUME3DREPPRODUCER_H
 
 #include <QObject>
+#include <QPointer>
 #include <boost/shared_ptr.hpp>
 #include "sscImage.h"
 #include "sscRep.h"
@@ -37,24 +38,46 @@ class MultiVolume3DRepProducer : public QObject
 	Q_OBJECT
 public:
 	MultiVolume3DRepProducer();
+	~MultiVolume3DRepProducer();
 
+	void setView(ssc::View* view);
 	void setMaxRenderSize(int voxels);
 	int getMaxRenderSize() const;
 	void setVisualizerType(QString type);
 	void addImage(ssc::ImagePtr image);
 	void removeImage(QString uid);
 	std::vector<ssc::RepPtr> getAllReps();
+	static QStringList getAvailableVisualizers();
+	static std::map<QString, QString> getAvailableVisualizerDisplayNames();
+
 signals:
-	void repsChanged();
 	void imagesChanged();
+
+private slots:
+	void clearReps();
 
 private:
 	QString mVisualizerType;
-	std::vector<ssc::ImagePtr> mImages;
+	std::vector<ssc::ImagePtr> m2DImages;
+	std::vector<ssc::ImagePtr> m3DImages;
 	std::vector<ssc::RepPtr> mReps;
 	int mMaxRenderSize;
-	void clearReps();
+	ssc::View* mView;
+
+	void updateRepsInView();
+	void fillReps();
+
 	void rebuildReps();
+	void rebuild2DReps();
+	void rebuild3DReps();
+
+	void removeRepsFromView();
+	void addRepsToView();
+
+	ssc::ImagePtr removeImageFromVector(QString uid, std::vector<ssc::ImagePtr> &images);
+
+	void buildSscGPURayCastMultiVolume();
+	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
 	void buildVtkVolumeTextureMapper3D(ssc::ImagePtr image);
 	void buildVtkGPUVolumeRayCastMapper(ssc::ImagePtr image);
 	void buildSscProgressiveLODVolumeTextureMapper3D(ssc::ImagePtr image);

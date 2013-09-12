@@ -70,6 +70,7 @@ cx_add_class_qt_moc(SSC_SOURCE_FILES
 	Rep/sscPickerRep
 	Rep/sscImageBlenderProxy
 	Rep/sscVolumetricRep
+        Rep/cxImageMapperMonitor
 	Rep/sscSlicePlaneRep
 	Rep/sscProgressiveLODVolumetricRep
 	Rep/sscBlendedSliceRep
@@ -98,6 +99,7 @@ cx_add_class_qt_moc(SSC_SOURCE_FILES
 	Rep/sscGuideRep2D
 	Rep/cxFrameMetricRep
         Rep/cxToolMetricRep
+        Rep/cxVolumeProperty
 
 	Widgets/sscOptimizedUpdateWidget
 	Widgets/sscDataAdapter
@@ -319,6 +321,14 @@ configure_file(Rep/Shaders/glsl/upscale.vert Rep COPYONLY)
 configure_file(Rep/Shaders/glsl/raycasting_shader.frag Rep COPYONLY)
 configure_file(Rep/Shaders/glsl/raycasting_shader.vert Rep COPYONLY)
 configure_file(Rep/Shaders/glsl/Texture3DOverlay.frag Rep COPYONLY)
+
+#set(SHADER_FROM_PATH ${CustusX3_SOURCE_DIR}/source/resource/ssc/Code/Rep/Shaders/glsl)
+#set(SHADER_TO_PATH ${CustusX3_SOURCE_DIR}/config/shaders)
+#configure_file(${SHADER_FROM_PATH}/upscale.frag ${SHADER_TO_PATH} COPYONLY)
+#configure_file(${SHADER_FROM_PATH}/upscale.vert ${SHADER_TO_PATH} COPYONLY)
+#configure_file(${SHADER_FROM_PATH}/raycasting_shader.frag ${SHADER_TO_PATH} COPYONLY)
+#configure_file(${SHADER_FROM_PATH}/raycasting_shader.vert ${SHADER_TO_PATH} COPYONLY)
+
   
 # Export our build settings and library dependencies
 #include (CMakeExportBuildSettings)

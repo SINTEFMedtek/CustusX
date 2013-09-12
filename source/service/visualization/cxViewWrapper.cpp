@@ -81,7 +81,7 @@ void ViewWrapper::dataAddedSlot(QString uid)
 void ViewWrapper::dataRemovedSlot(QString uid)
 {
 	this->dataRemoved(uid);
-	RepManager::getInstance()->purgeVolumetricReps();
+//	RepManager::getInstance()->purgeVolumetricReps();
 }
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
@@ -187,7 +187,7 @@ QStringList ViewWrapper::getAllDataNames() const
 		{
 			if (image->getCropping())
 				line += " (cropped)";
-			if (!image->getClipPlanes().empty() || ((viewManager()->getClipper()->getImage() == image) &&  viewManager()->getClipper()->getUseClipper()))
+			if (!image->getAllClipPlanes().empty() || ((viewManager()->getClipper()->getImage() == image) &&  viewManager()->getClipper()->getUseClipper()))
 				line += " (clipped)";
 		}
 
