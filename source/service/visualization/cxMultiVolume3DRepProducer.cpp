@@ -22,6 +22,7 @@
 #include "sscTypeConversions.h"
 #include "sscLogger.h"
 #include "sscGPURayCastVolumeRep.h"
+#include "cxDataManager.h"
 #include "cxDataLocations.h"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "cxConfig.h"
@@ -100,8 +101,13 @@ void MultiVolume3DRepProducer::addImage(ssc::ImagePtr image)
 		connect(image.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(imagesChanged()));
 		connect(image.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(imagesChanged()));
 	}
+	else
+		return;
 
-	mImages.push_back(image);
+	if(this->is2DImage(image))
+		m2DImages.push_back(image);
+	else
+		m3DImages.push_back(image);
 	emit imagesChanged();
 
 	this->updateRepsInView();
@@ -109,13 +115,22 @@ void MultiVolume3DRepProducer::addImage(ssc::ImagePtr image)
 
 void MultiVolume3DRepProducer::removeImage(QString uid)
 {
+	this->removeImageFromVectorAndDisconnect(uid, m2DImages);
+	this->removeImageFromVectorAndDisconnect(uid, m3DImages);
+
+	emit imagesChanged();
+	this->updateRepsInView();
+}
+
+void MultiVolume3DRepProducer::removeImageFromVectorAndDisconnect(QString uid, std::vector<ssc::ImagePtr> &images)
+{
 	ssc::ImagePtr image;
-	for (unsigned i=0; i<mImages.size(); ++i)
+	for (unsigned i=0; i<images.size(); ++i)
 	{
-		if (mImages[i]->getUid()!=uid)
+		if (images[i]->getUid()!=uid)
 			continue;
-		image = mImages[i];
-		mImages.erase(mImages.begin()+i);
+		image = images[i];
+		images.erase(images.begin()+i);
 		break;
 	}
 
@@ -124,9 +139,6 @@ void MultiVolume3DRepProducer::removeImage(QString uid)
 		disconnect(image.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(imagesChanged()));
 		disconnect(image.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(imagesChanged()));
 	}
-
-	emit imagesChanged();
-	this->updateRepsInView();
 }
 
 std::vector<ssc::RepPtr> MultiVolume3DRepProducer::getAllReps()
@@ -172,13 +184,24 @@ void MultiVolume3DRepProducer::addRepsToView()
 
 void MultiVolume3DRepProducer::rebuildReps()
 {
-	if (mImages.empty())
-		return;
+	if(!m2DImages.empty())
+		this->rebuild2DReps();
+	if(!m3DImages.empty())
+		this->rebuild3DReps();
+}
 
+void MultiVolume3DRepProducer::rebuild2DReps()
+{
+	for (unsigned i=0; i<m2DImages.size(); ++i)
+		this->buildSscImage2DRep3D(m2DImages[i]);
+}
+
+void MultiVolume3DRepProducer::rebuild3DReps()
+{
 	if (this->isSingleVolumeRenderer())
 	{
-		for (unsigned i=0; i<mImages.size(); ++i)
-			this->buildSingleVolumeRenderer(mImages[i]);
+		for (unsigned i=0; i<m3DImages.size(); ++i)
+			this->buildSingleVolumeRenderer(m3DImages[i]);
 	}
 	else if (mVisualizerType=="sscGPURayCastMultiVolume")
 	{
@@ -199,7 +222,7 @@ void MultiVolume3DRepProducer::buildSscGPURayCastMultiVolume()
 #ifndef CX_WINDOWS
 	ssc::GPURayCastVolumeRepPtr rep = ssc::GPURayCastVolumeRep::New("");
 	rep->setShaderFolder(DataLocations::getShaderPath());
-	rep->setImages(mImages);
+	rep->setImages(m3DImages);
 	mReps.push_back(rep);
 #endif //WIN32
 }
@@ -208,23 +231,21 @@ void MultiVolume3DRepProducer::buildVtkOpenGLGPUMultiVolumeRayCastMapper()
 {
 #ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 	MehdiGPURayCastMultiVolumeRepPtr rep = MehdiGPURayCastMultiVolumeRep::New("");
-	rep->setImages(mImages);
+	rep->setImages(m3DImages);
 	mReps.push_back(rep);
 #endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
 }
 
 bool MultiVolume3DRepProducer::is2DImage(ssc::ImagePtr image) const
 {
-	return image->getBaseVtkImageData()->GetDimensions()[2]==1;
+	if(image)
+		return image->getBaseVtkImageData()->GetDimensions()[2]==1;
+	return false;
 }
 
 void MultiVolume3DRepProducer::buildSingleVolumeRenderer(ssc::ImagePtr image)
 {
-	if (this->is2DImage(image))
-	{
-		this->buildSscImage2DRep3D(image);
-	}
-	else if (mVisualizerType=="vtkVolumeTextureMapper3D")
+	if (mVisualizerType=="vtkVolumeTextureMapper3D")
 	{
 		this->buildVtkVolumeTextureMapper3D(image);
 	}
