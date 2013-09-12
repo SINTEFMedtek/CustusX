@@ -125,7 +125,10 @@ TimeOut: %d
         shell.changeDir(path)
         #shell.run('rm -rf %s' % outfile)
         shell.rm_r(outfile)
-        shell.run('%s/Catch.exe [%s] --reporter junit --out %s' % (path, tag, outfile), ignoreFailure=True)
+        exe = "Catch"
+        if(platform.system() == 'Windows'):
+             exe = "Catch.exe"
+        shell.run('%s/%s [%s] --reporter junit --out %s' % (path, exe, tag, outfile), ignoreFailure=True)
         #shell.run('%s/Catch [%s] --out %s' % (path, tag, outfile))
         
     def resetCustusXDataRepo(self, path):

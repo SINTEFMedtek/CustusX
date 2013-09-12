@@ -143,7 +143,7 @@ void TestAcquisition::testStoreMHDSourceLocalServer()
 	controller.mConnectionMethod = "Local Server";
 	controller.mNumberOfExpectedStreams = 1;
 	controller.initialize();
-//	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
+	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	controller.verify();
 }
@@ -154,7 +154,7 @@ void TestAcquisition::testStoreMHDSourceDirectLink()
 	controller.mConnectionMethod = "Direct Link";
 	controller.mNumberOfExpectedStreams = 1;
 	controller.initialize();
-//	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
+	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	controller.verify();
 }
@@ -166,7 +166,7 @@ void TestAcquisition::testStoreMultipleMHDSourceDirectLink()
 	controller.mAdditionalGrabberArg = "--secondary";
 	controller.mNumberOfExpectedStreams = 2;
 	controller.initialize();
-//	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
+	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	controller.verify();
 }
