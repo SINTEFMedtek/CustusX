@@ -121,7 +121,7 @@ TimeOut: %d
         PrintFormatter.printInfo('Run catch wit tag [%s], results to %s' % (tag, outfile))
         shell.changeDir(path)
         #shell.run('rm -rf %s' % outfile)
-        if os.path.exists(filename):
+        if os.path.exists(outfile):
             os.remove(outfile)
         shell.run('%s/Catch [%s] --reporter junit --out %s' % (path, tag, outfile), ignoreFailure=True)
         #shell.run('%s/Catch [%s] --out %s' % (path, tag, outfile))
