@@ -56,7 +56,7 @@ message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
 #set(CX_VERSION_TYPE ".rc1") # set release candidate during release procedure
 cx_read_version()
 #cx_define_version(3 5 3 CX_VERSION_TYPE)
-message(STATUS "Version: ${CustusX3_VERSION_STRING}")
+#message(STATUS "Version: ${CustusX3_VERSION_STRING}")
 
 include(cxCotireMacros)
 CX_COTIRE_INITIALIZE()
