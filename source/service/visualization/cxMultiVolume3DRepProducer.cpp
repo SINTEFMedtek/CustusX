@@ -115,30 +115,33 @@ void MultiVolume3DRepProducer::addImage(ssc::ImagePtr image)
 
 void MultiVolume3DRepProducer::removeImage(QString uid)
 {
-	this->removeImageFromVectorAndDisconnect(uid, m2DImages);
-	this->removeImageFromVectorAndDisconnect(uid, m3DImages);
+	ssc::ImagePtr removedImage;
+	removedImage = this->removeImageFromVector(uid, m2DImages);
+	if(!removedImage)
+		removedImage = this->removeImageFromVector(uid, m3DImages);
+
+	if (removedImage)
+	{
+		disconnect(removedImage.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(imagesChanged()));
+		disconnect(removedImage.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(imagesChanged()));
+	}
 
 	emit imagesChanged();
 	this->updateRepsInView();
 }
 
-void MultiVolume3DRepProducer::removeImageFromVectorAndDisconnect(QString uid, std::vector<ssc::ImagePtr> &images)
+ssc::ImagePtr MultiVolume3DRepProducer::removeImageFromVector(QString uid, std::vector<ssc::ImagePtr> &images)
 {
-	ssc::ImagePtr image;
+	ssc::ImagePtr retval;
 	for (unsigned i=0; i<images.size(); ++i)
 	{
 		if (images[i]->getUid()!=uid)
 			continue;
-		image = images[i];
+		retval = images[i];
 		images.erase(images.begin()+i);
 		break;
 	}
-
-	if (image)
-	{
-		disconnect(image.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(imagesChanged()));
-		disconnect(image.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(imagesChanged()));
-	}
+	return retval;
 }
 
 std::vector<ssc::RepPtr> MultiVolume3DRepProducer::getAllReps()

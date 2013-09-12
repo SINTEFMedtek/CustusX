@@ -71,7 +71,7 @@ private:
 	void removeRepsFromView();
 	void addRepsToView();
 
-	void removeImageFromVectorAndDisconnect(QString uid, std::vector<ssc::ImagePtr> &images);
+	ssc::ImagePtr removeImageFromVector(QString uid, std::vector<ssc::ImagePtr> &images);
 
 	void buildSscGPURayCastMultiVolume();
 	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
