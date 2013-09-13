@@ -74,9 +74,23 @@ class Shell (object):
             os.makedirs(path)
         self.CWD = path
         self._printCommand('cd %s' % path)
-        
-    def cp(self, from_path, to_path):
-        pass
+    
+    def head(self, file, n):
+        '''
+        Function that mimics the unix command head -nX.
+        '''
+        open_file = open(file, 'r')
+        lines = open_file.readlines()
+        line = lines[n-1].rstrip()
+        #print 'Line: %s' % line
+        return line
+    
+    def cp(self, src, dst):
+        '''
+        Function that mimics the unix command cp src dst.
+        '''
+        #print 'cp src: %s, dst: %s' % (src, dst)
+        shutil.copy(src, dst)
         
     def rm_r(self, path, pattern="none"):
         '''
@@ -91,11 +105,11 @@ class Shell (object):
             else:
                 for f in os.listdir(dir):
                     if re.search(pattern, f):
-                        os.remove(os.path.join(dir, f))
-                        print "DIR: Removing %s" % os.path.join(dir, f)
+                        self.rm_r(os.path.join(dir, f))
+                        #print "DIR: Removing %s" % os.path.join(dir, f)
         elif os.path.exists(path):
             os.remove(path)
-            print "FILE: Removing %s" % path
+            #print "FILE: Removing %s" % path
     
     def removeTree(self, path):
         self._printInfo("Removing folder and contents of %s." % path)
