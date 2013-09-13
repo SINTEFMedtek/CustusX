@@ -240,6 +240,7 @@ void MultiVolume3DRepProducer::buildVtkOpenGLGPUMultiVolumeRayCastMapper()
 {
 #ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 	MehdiGPURayCastMultiVolumeRepPtr rep = MehdiGPURayCastMultiVolumeRep::New("");
+	rep->setMaxVolumeSize(this->getMaxRenderSize());
 	rep->setImages(m3DImages);
 	mReps.push_back(rep);
 #endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
