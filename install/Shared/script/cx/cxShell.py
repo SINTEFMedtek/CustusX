@@ -17,6 +17,7 @@ import getpass
 import platform
 import shutil
 import re
+import glob
     
 class Shell (object):
     '''
@@ -89,27 +90,25 @@ class Shell (object):
         '''
         Function that mimics the unix command cp src dst.
         '''
-        #print 'cp src: %s, dst: %s' % (src, dst)
         shutil.copy(src, dst)
         
-    def rm_r(self, path, pattern="none"):
+    def rm_r(self, path, pattern=""):
         '''
         This function mimics rm -rf (unix) for
-        Linux, Mac and Windows. Will work with regex.
+        Linux, Mac and Windows. Will work with
+        Unix style pathname pattern expansion. Not regex.
         '''
         path = self._convertToString(path)
         if os.path.isdir(path):
             dir = path
-            if(pattern == "none"):
+            if(pattern == ""):
                 shutil.rmtree(dir)
             else:
-                for f in os.listdir(dir):
-                    if re.search(pattern, f):
-                        self.rm_r(os.path.join(dir, f))
-                        #print "DIR: Removing %s" % os.path.join(dir, f)
+                matching_files = glob.glob("%s/%s" % (path, pattern))
+                for f in matching_files:
+                    self.rm_r(f)
         elif os.path.exists(path):
             os.remove(path)
-            #print "FILE: Removing %s" % path
     
     def removeTree(self, path):
         self._printInfo("Removing folder and contents of %s." % path)
