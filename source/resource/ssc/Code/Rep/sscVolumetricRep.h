@@ -84,12 +84,9 @@ public:
 	virtual ImagePtr getImage(); ///< get the reps image
 	virtual bool hasImage(ImagePtr image) const; ///< check if the reps has the image
 	virtual vtkVolumePtr getVtkVolume() { return mVolume; } ///< get the images vtkVolume
-	virtual void setResampleFactor(double factor); ///< set how detailed the image should be
 	void setMaxVolumeSize(long maxVoxels); ///< set max volume size for rendering. Must be set before setImage()
 	void setUseGPUVolumeRayCastMapper();
 	void setUseVolumeTextureMapper();
-
-	static double computeResampleFactor(long maxVoxels, ssc::ImagePtr image);
 
 protected:
 	VolumetricRep();
@@ -102,15 +99,11 @@ protected:
 	long mMaxVoxels; ///< always resample volume below this size.
 
 	ImagePtr mImage;
-	double mResampleFactor;
 	cx::ImageMapperMonitorPtr mMonitor; ///< helper object for visualizing clipping/cropping
 
 private slots:
 	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
-
-private:
-	void updateResampleFactor();
 };
 //---------------------------------------------------------
 } // namespace ssc

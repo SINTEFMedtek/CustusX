@@ -73,7 +73,7 @@ protected:
 	bool mClearing; ///< quick fix for shutting down faster
 	vtkAssemblyPtr mAssembly;
 	View* mView;
-	std::vector<double> mResampleFactors;
+	std::vector<long> mResampleMaxVoxels;
 	long mMaxVoxels; ///< always resample volume below this size.
 
 	ImagePtr mImage;

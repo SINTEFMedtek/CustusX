@@ -844,10 +844,12 @@ int Image::getInterpolationType() const
 	return mInterpolationType;
 }
 
-vtkImageDataPtr Image::resample(double factor)
+vtkImageDataPtr Image::resample(long maxVoxels)
 {
 	// also use grayscale as vtk is incapable of rendering 3component color.
 	vtkImageDataPtr retval = this->getGrayScaleBaseVtkImageData();
+
+	double factor = computeResampleFactor(maxVoxels);
 
 	if (fabs(1.0-factor)>0.01) // resampling
 	{
@@ -870,6 +872,23 @@ vtkImageDataPtr Image::resample(double factor)
 									 + "Original size: " + qstring_cast(voxelsOrig/1000/1000) + "M.");
 	}
 	return retval;
+}
+
+double Image::computeResampleFactor(long maxVoxels)
+{
+	if (maxVoxels==0)
+		return 1.0;
+
+	long voxels = this->getBaseVtkImageData()->GetNumberOfPoints();
+	double factor = (double)maxVoxels/(double)voxels;
+	factor = pow(factor, 1.0/3.0);
+	// cubic function leads to trouble for 138M-volume - must downsample to as low as 5-10 Mv in order to succeed on Mac.
+
+	if (factor<0.99)
+	{
+		return factor;
+	}
+	return 1.0;
 }
 
 } // namespace ssc

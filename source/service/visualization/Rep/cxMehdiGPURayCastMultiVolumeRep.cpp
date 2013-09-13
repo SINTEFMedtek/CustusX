@@ -30,6 +30,20 @@
 namespace cx
 {
 
+MehdiGPURayCastMultiVolumeRepBase::MehdiGPURayCastMultiVolumeRepBase() :
+	mMaxVoxels(0)
+{
+}
+
+void MehdiGPURayCastMultiVolumeRepBase::setMaxVolumeSize(long maxVoxels)
+{
+	mMaxVoxels = maxVoxels;
+}
+
+
+
+///////////////////////////////////////////////////
+
 
 
 MehdiGPURayCastMultiVolumeRep::~MehdiGPURayCastMultiVolumeRep()
@@ -103,7 +117,7 @@ void MehdiGPURayCastMultiVolumeRep::setup()
 		property->setImage(mImages[i]);
 		mVolumeProperties.push_back(property);
 
-		mMapper->SetInput(i, mImages[i]->getGrayScaleBaseVtkImageData());
+		mMapper->SetInput(i, mImages[i]->resample(this->mMaxVoxels));
 
 		if (i==0)
 			mVolume->SetProperty( property->getVolumeProperty() );
