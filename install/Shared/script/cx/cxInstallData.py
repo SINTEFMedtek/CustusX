@@ -165,6 +165,11 @@ class Common(object):
             return 'ON'
         else:
             return 'OFF'
+        
+    def getGitTag(self):
+        if self.mGitTag == "":
+            return None
+        return self.mGitTag
 
 # ---------------------------------------------------------
 
