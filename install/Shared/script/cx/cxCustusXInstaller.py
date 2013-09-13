@@ -124,7 +124,7 @@ class CustusXInstaller:
             self._copyFolder('%s/install/Linux/script/NVIDIA' % self.source_path, targetPath)
             self._copyFolder('%s/install/Linux/script/vga2usb' % self.source_path, targetPath)
             self._copyFile('%s/install/Linux/script/programmer_setup.sh' % self.source_path, targetPath)
-            self._copyFile('%s/install/Linux/script/NDIToolBox_install.sh ' % self.source_path, targetPath)
+            self._copyFile('%s/install/Linux/script/NDIToolBox_install.sh' % self.source_path, targetPath)
             if linux_distro == 'Ubuntu':
                 self._copyFile('%s/install/Linux/script/ubuntu_install_readme.sh' % self.source_path, targetPath)
                 self._copyFile('%s/install/Linux/script/ubuntu_ndi_setup.sh' % self.source_path, targetPath)
