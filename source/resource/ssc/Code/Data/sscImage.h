@@ -146,6 +146,8 @@ public:
 	void setInterpolationType(int val);
 	int getInterpolationType() const;
 
+	vtkImageDataPtr resample(double factor);
+
 signals:
 	void landmarkRemoved(QString uid);
 	void landmarkAdded(QString uid);

@@ -844,4 +844,32 @@ int Image::getInterpolationType() const
 	return mInterpolationType;
 }
 
+vtkImageDataPtr Image::resample(double factor)
+{
+	// also use grayscale as vtk is incapable of rendering 3component color.
+	vtkImageDataPtr retval = this->getGrayScaleBaseVtkImageData();
+
+	if (fabs(1.0-factor)>0.01) // resampling
+	{
+		vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
+		resampler->SetInterpolationModeToLinear();
+		resampler->SetAxisMagnificationFactor(0, factor);
+		resampler->SetAxisMagnificationFactor(1, factor);
+		resampler->SetAxisMagnificationFactor(2, factor);
+		resampler->SetInput(retval);
+		resampler->GetOutput()->Update();
+		resampler->GetOutput()->GetScalarRange();
+		retval = resampler->GetOutput();
+
+		long voxelsDown = retval->GetNumberOfPoints();
+		long voxelsOrig = this->getBaseVtkImageData()->GetNumberOfPoints();
+		messageManager()->sendInfo("Completed downsampling volume in VolumetricRep: "
+									 + this->getName()
+									 + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "
+									 + "Ratio: " + QString::number(factor, 'g', 2) + ", "
+									 + "Original size: " + qstring_cast(voxelsOrig/1000/1000) + "M.");
+	}
+	return retval;
+}
+
 } // namespace ssc
