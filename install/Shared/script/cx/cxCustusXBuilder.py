@@ -81,16 +81,13 @@ class CustusXBuilder:
         PrintFormatter.printHeader('Package the build', level=2)
         custusx = self._createComponent(cxComponents.CustusX3)
         shell.changeDir(custusx.buildPath())
-        # cleanup old - can be refactored to use python methods...
-        shell.run('rm -r -f *.dmg')
-        shell.run('rm -r -f *.tar.gz')
-        # create new
-        shell.run('make package')
-        #shell.run('cpack --verbose') # same as make package, given that make has been run, but more verbose
-        #if platform.system() == 'Linux':
-        #    shell.run('%s/install/Linux/script/create_linux_folder.sh' % custusx.sourcePath())
-        #else
-        #    shell.run('make package')
+        shell.rm_r(custusx.buildPath(), "*.exe")
+        shell.rm_r(custusx.buildPath(), "*.dmg")
+        shell.rm_r(custusx.buildPath(), "*.tar.gz")
+        if platform.system() == 'Windows':
+            shell.run('jom package')
+        else:
+            shell.run('make package')
         
     def publishDoxygen(self):
         PrintFormatter.printHeader('copy/publish doxygen to medtek server (link from wiki)', level=2)
