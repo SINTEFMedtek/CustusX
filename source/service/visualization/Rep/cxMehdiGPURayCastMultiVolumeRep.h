@@ -43,7 +43,12 @@ class MehdiGPURayCastMultiVolumeRepBase: public ssc::RepImpl
 {
 Q_OBJECT
 public:
+	MehdiGPURayCastMultiVolumeRepBase();
 	virtual ~MehdiGPURayCastMultiVolumeRepBase() {}
+	virtual void setMaxVolumeSize(long maxVoxels);
+
+protected:
+	long mMaxVoxels; ///< always resample volume below this size.
 
 private slots:
 	virtual void transformChangedSlot() = 0;
