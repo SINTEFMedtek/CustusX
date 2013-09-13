@@ -26,8 +26,8 @@ import cx.cxComponents
 import cx.cxComponentAssembly
 import cx.cxCustusXBuilder
 import cx.cxJenkinsBuildScriptBase
-import cx.cxCustusXInstaller
-import cx.cxCustusXTestInstallation
+#import cx.cxCustusXInstaller
+#import cx.cxCustusXTestInstallation
 
 class Jenkins:
     '''
@@ -184,7 +184,7 @@ class Controller(cx.cxJenkinsBuildScriptBase.JenkinsBuildScriptBaseBase):
     '''
     def __init__(self):
         ''
-        self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
+#        self.cxInstaller = cx.cxCustusXInstaller.CustusXInstaller()
         super(Controller, self).__init__()
 
     def getDescription(self):                  
