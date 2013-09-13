@@ -97,13 +97,11 @@ ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep() :
 
 void ProgressiveLODVolumetricRep::resetResampleList()
 {
-	double r = VolumetricRep::computeResampleFactor(mMaxVoxels, mImage);
-
-	mResampleFactors.clear();
-	mResampleFactors.push_back(r);
-	mResampleFactors.push_back(r/2.0);
-	mResampleFactors.push_back(r/4.0);
-	mResampleFactors.push_back(r/8.0);
+	mResampleMaxVoxels.clear();
+	mResampleMaxVoxels.push_back(mMaxVoxels);
+	mResampleMaxVoxels.push_back(mMaxVoxels/2);
+	mResampleMaxVoxels.push_back(mMaxVoxels/4);
+	mResampleMaxVoxels.push_back(mMaxVoxels/8);
 }
 
 
@@ -172,14 +170,14 @@ void ProgressiveLODVolumetricRep::setImage(ImagePtr image)
  */
 VolumetricRepPtr ProgressiveLODVolumetricRep::getNextResampleLevel()
 {
-	if (mResampleFactors.empty())
+	if (mResampleMaxVoxels.empty())
 		return VolumetricRepPtr();
-	double factor = mResampleFactors.back();
-	QString text = "_" + qstring_cast(factor);
-	mResampleFactors.pop_back();
+	long maxVoxels = mResampleMaxVoxels.back();
+	QString text = "_" + qstring_cast(maxVoxels);
+	mResampleMaxVoxels.pop_back();
 
 	VolumetricRepPtr next = ssc::VolumetricRep::New(getUid()+text);
-	next->setResampleFactor(factor);
+	next->setMaxVolumeSize(maxVoxels);
 	next->setImage(mImage);
 	return next;
 }
