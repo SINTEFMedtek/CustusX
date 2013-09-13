@@ -247,6 +247,10 @@ Thus, we get the following pattern:
         return self.argumentParserArguments.release_type.upper()
     
     def shouldIncreaseVersion(self):
+        '''
+        alpha releases indicate no tagging - simply generate a release off the head.
+        similarly for to input release type: publish head only.
+        '''
         return (self.getReleaseType()!='ALPHA') and (self.getReleaseType()!=None)
         
   
@@ -255,17 +259,16 @@ Thus, we get the following pattern:
 
         self._pullFromGit()
       
-        version = self._loadVersion()
-
         if self.shouldIncreaseVersion():
+            version = self._loadVersion()
             self._increaseVersion(version, self.getReleaseType())
+            publish_tag=version.generateTag()
+            self._increaseVersion(version, 'ALPHA')
+        else:
+            publish_tag = ""            
 
         if self.getOptions().jenkins_release:
-            # TODO: when not increased version, the build should be at master HEAD
-            self.jenkins_publish_release(version)
-
-        if self.shouldIncreaseVersion():
-            self._increaseVersion(version, 'ALPHA')
+            self.jenkins_publish_release(publish_tag)
             
         self.cxBuilder.finish()
         
@@ -293,9 +296,9 @@ Thus, we get the following pattern:
         version.commitToGit();
         version.writeGitTag()
         
-    def jenkins_publish_release(self, version):
+    def jenkins_publish_release(self, tag):
         'trigger a jenkins parametrized build that publishes the tagged release'
-        PrintFormatter.printHeader('Trigger jenkins build for tag %s' % version.generateTag(), level=3)
+        PrintFormatter.printHeader('Trigger jenkins build for tag %s' % tag, level=3)
 
         self.jenkins = Jenkins()
         self.jenkins.username = self.getOptions().username
@@ -303,7 +306,7 @@ Thus, we get the following pattern:
         self.jenkins.jobname = 'CustusX_release_ubuntu'
         self.jenkins.initializeJenkins()
         
-        parameters = { 'CX_RELEASE_GIT_TAG':version.generateTag() }
+        parameters = { 'CX_RELEASE_GIT_TAG':tag }
         self.jenkins.jenkins.build_job(self.jenkins.jobname, parameters)
         PrintFormatter.printHeader('Completed triggering the jenkins job %s' % self.jenkins.jobname, level=3)
         pass
