@@ -32,7 +32,6 @@
 #include <vtkVolume.h>
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
-#include <vtkImageResample.h>
 
 #include "sscView.h"
 #include "sscImage.h"
@@ -179,31 +178,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	}
 
 	this->updateResampleFactor();
-
-	// also use grayscale as vtk is incapable of rendering 3component color.
-	vtkImageDataPtr volume = mImage->getGrayScaleBaseVtkImageData();
-
-	if (fabs(1.0-mResampleFactor)>0.01) // resampling
-	{
-		vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
-		resampler->SetInterpolationModeToLinear();
-		resampler->SetAxisMagnificationFactor(0, mResampleFactor);
-		resampler->SetAxisMagnificationFactor(1, mResampleFactor);
-		resampler->SetAxisMagnificationFactor(2, mResampleFactor);
-		resampler->SetInput(volume);
-		resampler->GetOutput()->Update();
-		resampler->GetOutput()->GetScalarRange();
-		volume = resampler->GetOutput();
-
-		long voxelsDown = volume->GetNumberOfPoints();
-		long voxelsOrig = mImage->getBaseVtkImageData()->GetNumberOfPoints();
-		messageManager()->sendInfo("Completed downsampling volume in VolumetricRep: "
-								   + mImage->getName()
-								   + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "
-								   + "Ratio: " + QString::number(mResampleFactor, 'g', 2) + ", "
-								   + "Original size: " + qstring_cast(voxelsOrig/1000/1000) + "M.");
-	}
-
+	vtkImageDataPtr volume = mImage->resample(this->mResampleFactor);
 	mMapper->SetInput(volume);
 
 	transformChangedSlot();
