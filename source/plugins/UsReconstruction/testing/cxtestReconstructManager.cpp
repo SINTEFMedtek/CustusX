@@ -70,13 +70,13 @@ private:
 void ReconstructManagerTestFixture::setUp()
 {
 	ssc::MessageManager::initialize();
-	cx::DataManager::initialize();
+	cx::cxDataManager::initialize();
 	// this stuff will be performed just before all tests in this class
 }
 
 void ReconstructManagerTestFixture::tearDown()
 {
-	cx::DataManager::shutdown();
+	cx::cxDataManager::shutdown();
 	ssc::MessageManager::shutdown();
 	// this stuff will be performed just after all tests in this class
 }

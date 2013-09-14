@@ -54,7 +54,7 @@ PatientOrientationWidget::PatientOrientationWidget(RegistrationManagerPtr regMan
 //  mPatientOrientationBackFaceButton->setDefaultAction(mPatientOrientationBackFaceAction);
 //  layout->addWidget(mPatientOrientationBackFaceButton);
 
-  connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButtonSlot()));
+  connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButtonSlot()));
 
   mDominantToolProxy =  DominantToolProxy::New();
   connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
@@ -124,7 +124,7 @@ void PatientOrientationWidget::enableToolSampleButtonSlot()
   bool enabled = false;
   enabled = tool &&
 	  tool->getVisible() &&
-      (!tool->hasType(ssc::Tool::TOOL_MANUAL) || DataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+      (!tool->hasType(ssc::Tool::TOOL_MANUAL) || cxDataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 
   mPatientOrientationButton->setEnabled(enabled);
 //  mPatientOrientationFrontFaceAction->setEnabled(enabled);

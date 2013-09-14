@@ -181,8 +181,7 @@ class CustusXInstaller:
             # return name + platform.mac_ver() ??
             return 'Apple'
         elif platform.system() == 'Linux':
-            return name
-            # return name + platform.linux_distribution()[0] ??
+            return platform.linux_distribution()[0]
         else:
             return platform.system()
         

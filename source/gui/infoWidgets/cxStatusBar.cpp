@@ -61,7 +61,7 @@ void StatusBar::connectToToolSignals()
 		ssc::ToolPtr tool = it->second;
 		if (tool->hasType(ssc::Tool::TOOL_MANUAL))
 			continue;
-		if (tool == ToolManager::getInstance()->getManualTool())
+		if (tool == cxToolManager::getInstance()->getManualTool())
 			continue;
 		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
 

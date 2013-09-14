@@ -225,7 +225,7 @@ void ViewWrapper3D::PickerRepPointPickedSlot(ssc::Vector3D p_r)
 	ssc::Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+	ssc::ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 	ssc::Vector3D offset = tool->get_prMt().vector(ssc::Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
@@ -296,7 +296,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
 	showRefTool->setDisabled(true);
 	showRefTool->setCheckable(true);
-	ssc::ToolPtr refTool = ToolManager::getInstance()->getReferenceTool();
+	ssc::ToolPtr refTool = cxToolManager::getInstance()->getReferenceTool();
 	if (refTool)
 	{
 		showRefTool->setText("Show " + refTool->getName());

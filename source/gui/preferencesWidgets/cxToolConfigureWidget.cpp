@@ -35,7 +35,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getApplication()->getAllApplicationNames(), true, NULL);
   mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
-  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", ToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
+  mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", cxToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
 
   this->setClinicalApplicationSlot(string2enum<ssc::CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName()));
@@ -109,7 +109,7 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
     return retval;
 
   // deconfigure toolmanager in order to be able to reread config data
-  ToolManager::getInstance()->deconfigure();
+  cxToolManager::getInstance()->deconfigure();
 
   ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
   ConfigurationFileParser::saveConfiguration(config);

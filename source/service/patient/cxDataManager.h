@@ -21,12 +21,12 @@ namespace cx
  * \date Mar 23, 2009
  * \author Janne Beate Bakeng, SINTEF
  */
-class DataManager: public ssc::DataManagerImpl
+class cxDataManager: public ssc::DataManagerImpl
 {
 Q_OBJECT
 public:
-	static DataManager* getInstance();
-	virtual ~DataManager();
+	static cxDataManager* getInstance();
+	virtual ~cxDataManager();
 
 	static void initialize();
 	bool getDebugMode() const;
@@ -39,13 +39,13 @@ public slots:
 	void setDebugMode(bool on);
 
 protected:
-	DataManager(); ///< DataManager is a Singleton. Use getInstance instead
+	cxDataManager(); ///< DataManager is a Singleton. Use getInstance instead
 
 	bool mDebugMode; ///< if set: allow lots of weird debug stuff.
 
 private:
-	DataManager(DataManager const&);
-	DataManager& operator=(DataManager const&);
+	cxDataManager(cxDataManager const&);
+	cxDataManager& operator=(cxDataManager const&);
 
 	mutable ssc::PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
 };

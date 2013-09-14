@@ -29,7 +29,7 @@ void TestProbe::tearDown()
 //Disabled for now. Test will output a warning. Use the test below with the Mock XmlParser instead
 void TestProbe::testConstructorWithDefaultXmlParser()
 {
-	mProbe = cx::Probe::New(mProbeName, mScannerName);
+	mProbe = cx::cxProbe::New(mProbeName, mScannerName);
 
 	CPPUNIT_ASSERT(mProbe);
 	CPPUNIT_ASSERT_MESSAGE("Probe's config id is not empty. It should be since the test probe setup is not present in the config id list",
@@ -124,7 +124,7 @@ void TestProbe::createTestProbe()
 	ProbeXmlConfigParserPtr mXml;
 	mXml.reset(new ProbeXmlConfigParserMock(xmlFileName));
 	mDefaultRtSourceName = mXml->getRtSourceList(mProbeName, mScannerName)[0];
-	mProbe = cx::Probe::New(mProbeName, mScannerName, mXml);
+	mProbe = cx::cxProbe::New(mProbeName, mScannerName, mXml);
 }
 
 void TestProbe::createParameters()

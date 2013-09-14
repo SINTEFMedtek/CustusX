@@ -74,17 +74,17 @@ void TestAcqController::setupVideo()
 void TestAcqController::setupProbe()
 {
 	SSC_LOG("");
-	ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::ToolManager::getInstance()));
+	ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::cxToolManager::getInstance()));
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(ssc::DoubleBoundingBox3D(0,0,0,10,10,10)));
 	std::pair<QString, ssc::ProbeData> probedata = cx::UsReconstructionFileReader::readProbeDataFromFile(mAcqDataFilename);
-	ssc::ProbePtr probe = cx::Probe::New("","");
+	ssc::ProbePtr probe = cx::cxProbe::New("","");
 	probe->setProbeSector(probedata.second);
 	dummyTool->setProbeSector(probe);
 	CPPUNIT_ASSERT(dummyTool->getProbe());
 	CPPUNIT_ASSERT(dummyTool->getProbe()->isValid());
 	dummyTool->setVisible(true);
 	// TODO: refactor toolmanager to be runnable in dummy mode (playback might benefit from this too)
-	cx::ToolManager::getInstance()->runDummyTool(dummyTool);
+	cx::cxToolManager::getInstance()->runDummyTool(dummyTool);
 	CPPUNIT_ASSERT(dummyTool->getProbe()->getRTSource());
 }
 

@@ -90,7 +90,7 @@ SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImag
 {
 	SimulatedImageStreamerPtr streamer(new SimulatedImageStreamer());
 
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ssc::ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if(!tool)
 		ssc::messageManager()->sendDebug("No tool");
 	ssc::ImagePtr image = ssc::DataManager::getInstance()->getImage(mImageUidToSimulate);

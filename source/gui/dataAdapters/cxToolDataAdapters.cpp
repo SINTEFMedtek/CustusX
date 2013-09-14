@@ -94,7 +94,7 @@ void ActiveProbeConfigurationStringDataAdapter::dominantToolChanged()
 //		<< ToolManager::getInstance()->findFirstProbe().get() << std::endl;
 	// ignore tool changes to something non-probeish.
 	// This gives the user a chance to use the widget without having to show the probe.
-	ssc::ToolPtr newTool = ToolManager::getInstance()->findFirstProbe();
+	ssc::ToolPtr newTool = cxToolManager::getInstance()->findFirstProbe();
 	if (!newTool || !newTool->getProbe())
 		return;
 

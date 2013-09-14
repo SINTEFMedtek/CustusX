@@ -722,7 +722,7 @@ ssc::Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 void ViewWrapper2D::shiftAxisPos(ssc::Vector3D delta_vp)
 {
 	delta_vp = -delta_vp;
-	ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+	ssc::ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
 	ssc::Transform3D sMr = mSliceProxy->get_sMr();
 	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
@@ -742,7 +742,7 @@ void ViewWrapper2D::shiftAxisPos(ssc::Vector3D delta_vp)
  */
 void ViewWrapper2D::setAxisPos(ssc::Vector3D click_vp)
 {
-	ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+	ssc::ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
 	ssc::Transform3D sMr = mSliceProxy->get_sMr();
 	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();

@@ -39,7 +39,7 @@ protected slots:
 
 private:
   virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
-  ToolPtr findTool(double startTime, double stopTime);
+  cxToolPtr findTool(double startTime, double stopTime);
 
 //  Centerline  mCenterlineAlgorithm;
   QString mSessionID;

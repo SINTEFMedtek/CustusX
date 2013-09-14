@@ -158,7 +158,7 @@ void ViewWrapperVideo::connectStream()
 		uid = source->getUid();
 
 	ssc::ToolPtr newTool;
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ssc::ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if (tool && tool->getProbe())
 	{
 		if (tool->getProbe()->getAvailableVideoSources().count(uid))
