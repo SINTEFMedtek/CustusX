@@ -160,15 +160,15 @@ void PlaybackWidget::timeLineWidgetValueChangedSlot()
 
 void PlaybackWidget::toggleOpenSlot()
 {
-	if (cx::ToolManager::getInstance()->isPlaybackMode())
+	if (cx::cxToolManager::getInstance()->isPlaybackMode())
 	{
 //		ToolManager::getInstance()->closePlayBackMode();
-		ToolManager::getInstance()->setPlaybackMode(PlaybackTimePtr());
+		cxToolManager::getInstance()->setPlaybackMode(PlaybackTimePtr());
 		videoService()->setPlaybackMode(PlaybackTimePtr());
 	}
 	else
 	{
-		ToolManager::getInstance()->setPlaybackMode(mTimer);
+		cxToolManager::getInstance()->setPlaybackMode(mTimer);
 		videoService()->setPlaybackMode(mTimer);
 
 		ssc::messageManager()->sendInfo(QString("Started Playback with start time [%1] and end time [%2]")
@@ -321,7 +321,7 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 
 void PlaybackWidget::toolManagerInitializedSlot()
 {
-	if (cx::ToolManager::getInstance()->isPlaybackMode())
+	if (cx::cxToolManager::getInstance()->isPlaybackMode())
 	{
 		mOpenAction->setText("Close Playback");
 		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/png/64x64/others/button-green.png"));

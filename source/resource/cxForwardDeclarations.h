@@ -47,7 +47,7 @@ typedef boost::shared_ptr<class ViewGroup2D> ViewGroup2DPtr;
 typedef boost::shared_ptr<class ViewGroup3D> ViewGroup3DPtr;
 typedef boost::shared_ptr<class ViewWrapper> ViewWrapperPtr;
 typedef boost::shared_ptr<class PatientData> PatientDataPtr;
-typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef boost::shared_ptr<class cxTool> cxToolPtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
 typedef QPointer<ssc::ViewWidget> ViewWidgetQPtr;
 

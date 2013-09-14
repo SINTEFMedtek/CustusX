@@ -29,7 +29,7 @@ SimulatedImageStreamer::~SimulatedImageStreamer()
 void SimulatedImageStreamer::initialize()
 {
 	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ssc::ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	this->initialize(image, tool);
 }
 

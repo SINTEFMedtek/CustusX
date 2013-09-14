@@ -387,7 +387,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 		return;
 	}
 	ssc::Transform3D rMd = ssc::Transform3D::Identity();
-	ssc::ToolPtr probe = ToolManager::getInstance()->findFirstProbe();
+	ssc::ToolPtr probe = cxToolManager::getInstance()->findFirstProbe();
 	ssc::VideoSourcePtr videoSource;
 	if (probe)
 	{
@@ -424,7 +424,7 @@ void VideoConnectionWidget::importStreamImageSlot()
 ssc::Transform3D VideoConnectionWidget::calculate_rMd_ForAProbeImage(ssc::ToolPtr probe)
 {
 	ssc::Transform3D rMd = ssc::Transform3D::Identity();
-	ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+	ssc::Transform3D rMpr = *cxToolManager::getInstance()->get_rMpr();
 	ssc::Transform3D prMt = probe->get_prMt();
 	ssc::Transform3D tMu = probe->getProbe()->getSector()->get_tMu();
 	ssc::Transform3D uMv = probe->getProbe()->getSector()->get_uMv();

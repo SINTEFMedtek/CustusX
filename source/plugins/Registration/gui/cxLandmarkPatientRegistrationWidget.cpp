@@ -50,7 +50,7 @@ LandmarkPatientRegistrationWidget::LandmarkPatientRegistrationWidget(Registratio
 	mDominantToolProxy = DominantToolProxy::New();
 	connect(mDominantToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolSampleButton()));
 	connect(mDominantToolProxy.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateToolSampleButton()));
-	connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(updateToolSampleButton()));
+	connect(cxDataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(updateToolSampleButton()));
 
 	//layout
 	mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFixedDataAdapter));
@@ -98,7 +98,7 @@ void LandmarkPatientRegistrationWidget::updateToolSampleButton()
 	ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
 
 	bool enabled = false;
-	enabled = tool && tool->getVisible() && (!tool->hasType(ssc::Tool::TOOL_MANUAL) || DataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+	enabled = tool && tool->getVisible() && (!tool->hasType(ssc::Tool::TOOL_MANUAL) || cxDataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 	mToolSampleButton->setEnabled(enabled);
 
 	if (ssc::toolManager()->getDominantTool())

@@ -26,9 +26,9 @@
 namespace cx
 {
 
-void DataManager::initialize()
+void cxDataManager::initialize()
 {
-	setInstance(new DataManager());
+	setInstance(new cxDataManager());
 
 	//	// extra cx data types
 	//	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::PointMetricReader()));
@@ -37,21 +37,21 @@ void DataManager::initialize()
 	//	getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new ssc::AngleMetricReader()));
 }
 
-DataManager* DataManager::getInstance()
+cxDataManager* cxDataManager::getInstance()
 {
-	return dynamic_cast<DataManager*>(ssc::DataManager::getInstance());
+	return dynamic_cast<cxDataManager*>(ssc::DataManager::getInstance());
 }
 
-DataManager::DataManager() :
+cxDataManager::cxDataManager() :
 				mDebugMode(false)
 {
 }
 
-DataManager::~DataManager()
+cxDataManager::~cxDataManager()
 {
 }
 
-ssc::PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() const
+ssc::PresetTransferFunctions3DPtr cxDataManager::getPresetTransferFunctions3D() const
 {
 	///< create from filename, create trivial document of type name and root node if no file exists.
 	ssc::XmlOptionFile preset = ssc::XmlOptionFile(
@@ -65,11 +65,11 @@ ssc::PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() co
 	return mPresetTransferFunctions3D;
 }
 
-bool DataManager::getDebugMode() const
+bool cxDataManager::getDebugMode() const
 {
 	return mDebugMode;
 }
-void DataManager::setDebugMode(bool on)
+void cxDataManager::setDebugMode(bool on)
 {
 	if (mDebugMode == on)
 		return;

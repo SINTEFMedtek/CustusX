@@ -35,17 +35,17 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class Probe> ProbePtr;
+typedef boost::shared_ptr<class cxProbe> ProbePtr;
 
 /**
  * \ingroup cxServiceTracking
  */
-class Probe: public ssc::Probe
+class cxProbe: public ssc::Probe
 {
 Q_OBJECT
 public:
 	static ProbePtr New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml = ProbeXmlConfigParserPtr());
-	virtual ~Probe(){}
+	virtual ~cxProbe(){}
 	virtual bool isValid() const;
 
 	virtual QStringList getAvailableVideoSources();
@@ -80,7 +80,7 @@ public:
 	QString getRtSourceName() const;
 
 private:
-	Probe(QString instrumentUid, QString scannerUid);
+	cxProbe(QString instrumentUid, QString scannerUid);
 	void initProbeXmlConfigParser(ProbeXmlConfigParserPtr xml);
 	void initConfigId();
 	ProbeXmlConfigParser::Configuration getConfiguration(QString uid) const;

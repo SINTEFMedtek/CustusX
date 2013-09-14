@@ -166,7 +166,7 @@ ssc::TimedTransformMap TrackedCenterlineWidget::getRecording(RecordSessionPtr se
   double startTime = session->getStartTime();
   double stopTime = session->getStopTime();
 
-  ToolPtr tool = this->findTool(startTime, stopTime);
+  cxToolPtr tool = this->findTool(startTime, stopTime);
   if(!tool)
   {
     ssc::messageManager()->sendWarning("Found no tool with tracking data from the given session.");
@@ -178,21 +178,21 @@ ssc::TimedTransformMap TrackedCenterlineWidget::getRecording(RecordSessionPtr se
   return retval;
 }
 
-ToolPtr TrackedCenterlineWidget::findTool(double startTime, double stopTime)
+cxToolPtr TrackedCenterlineWidget::findTool(double startTime, double stopTime)
 {
-  ToolPtr retval;
+  cxToolPtr retval;
 
   ssc::SessionToolHistoryMap toolTransformMap = ssc::toolManager()->getSessionHistory(startTime, stopTime);
   if(toolTransformMap.size() == 1)
   {
     ssc::messageManager()->sendInfo("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");
-    retval = boost::dynamic_pointer_cast<Tool>(toolTransformMap.begin()->first);
+    retval = boost::dynamic_pointer_cast<cxTool>(toolTransformMap.begin()->first);
   }
   else if(toolTransformMap.size() > 1)
   {
     ssc::messageManager()->sendWarning("Found more than one tool with relevant data, user needs to choose which one to use for tracked centerline extraction.");
     //TODO make the user select which tool they wanna use!!! Pop-up???
-    retval = boost::dynamic_pointer_cast<Tool>(toolTransformMap.begin()->first);
+    retval = boost::dynamic_pointer_cast<cxTool>(toolTransformMap.begin()->first);
     //TODO
   }else if(toolTransformMap.empty())
   {

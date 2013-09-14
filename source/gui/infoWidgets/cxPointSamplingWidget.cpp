@@ -188,10 +188,10 @@ void PointSamplingWidget::addPoint(ssc::Vector3D point)
 
 void PointSamplingWidget::setManualTool(const ssc::Vector3D& p_r)
 {
-  ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+  ssc::ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
   //ssc::Transform3D sMr = mSliceProxy->get_sMr();
-  ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+  ssc::Transform3D rMpr = *cxToolManager::getInstance()->get_rMpr();
   ssc::Transform3D prMt = tool->get_prMt();
 
   // find tool position in r

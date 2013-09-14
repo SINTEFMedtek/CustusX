@@ -156,7 +156,7 @@ ssc::Vector3D Navigation::findDataCenter(std::vector<ssc::DataPtr> data)
 void Navigation::centerManualTool(ssc::Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
-	ssc::ManualToolPtr manual = ToolManager::getInstance()->getManualTool();
+	ssc::ManualToolPtr manual = cxToolManager::getInstance()->getManualTool();
 	ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->inv().coord(p_r);
 	ssc::Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
 	ssc::Vector3D t_pr = prM0t.coord(ssc::Vector3D(0, 0, manual->getTooltipOffset()));
@@ -291,7 +291,7 @@ std::vector<ViewWidgetQPtr> ViewGroup::getViews() const
 
 void ViewGroup::activateManualToolSlot()
 {
-	ToolManager::getInstance()->dominantCheckSlot();
+	cxToolManager::getInstance()->dominantCheckSlot();
 }
 
 void ViewGroup::addXml(QDomNode& dataNode)

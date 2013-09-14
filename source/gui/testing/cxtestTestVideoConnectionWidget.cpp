@@ -45,8 +45,8 @@ bool TestVideoConnectionWidget::canStream(QString filename, QString streamerType
 void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename, QString streamerType)
 {
 	ssc::ImagePtr image = Utilities::create3DImage();
-	cx::DataManager::getInstance()->setActiveImage(image);
-	cx::DataManager::getInstance()->loadData(image);
+	cx::cxDataManager::getInstance()->setActiveImage(image);
+	cx::cxDataManager::getInstance()->loadData(image);
 
 	QString connectionMethod("Direct Link");
 	mConnectionSelector->setValue(connectionMethod);

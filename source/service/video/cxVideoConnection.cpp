@@ -168,7 +168,7 @@ void VideoConnection::disconnectServer()
 	for (unsigned i=0; i<mSources.size(); ++i)
 		mSources[i]->setInput(ssc::ImagePtr());
 
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ssc::ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if (tool && tool->getProbe())
 		this->removeSourceFromProbe(tool);
 
@@ -187,7 +187,7 @@ void VideoConnection::clientFinishedSlot()
 
 void VideoConnection::useUnusedProbeDataSlot()
 {
-	disconnect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+	disconnect(cxToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 	for (std::vector<ssc::ProbeDataPtr>::const_iterator citer = mUnsusedProbeDataVector.begin(); citer != mUnsusedProbeDataVector.end(); ++citer)
 		this->updateStatus(*citer);
 	mUnsusedProbeDataVector.clear();
@@ -199,16 +199,16 @@ void VideoConnection::useUnusedProbeDataSlot()
  */
 void VideoConnection::updateStatus(ssc::ProbeDataPtr msg)
 {
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ssc::ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if (!tool || !tool->getProbe())
 	{
 		//Don't throw away the ProbeData. Save it until it can be used
 		if (mUnsusedProbeDataVector.empty())
-			connect(ToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
+			connect(cxToolManager::getInstance(), SIGNAL(probeAvailable()), this, SLOT(useUnusedProbeDataSlot()));
 		mUnsusedProbeDataVector.push_back(msg);
 		return;
 	}
-	ProbePtr probe = boost::dynamic_pointer_cast<Probe>(tool->getProbe());
+	ProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(tool->getProbe());
 
 	// start with getting a valid data object from the probe, in order to keep
 	// existing values (such as temporal calibration).
@@ -300,7 +300,7 @@ void VideoConnection::setImageToStream(QString uid)
  */
 void VideoConnection::connectVideoToProbe()
 {
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ssc::ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if (!tool)
 		return;
 

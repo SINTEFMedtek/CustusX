@@ -65,13 +65,13 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class ToolManager: public ssc::ToolManager
+class cxToolManager: public ssc::ToolManager
 {
 Q_OBJECT
 
 public:
 	static void initializeObject();
-	static ToolManager* getInstance();
+	static cxToolManager* getInstance();
 
 	QStringList getSupportedTrackingSystems();
 
@@ -151,8 +151,8 @@ private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 
 private:
-	ToolManager(); ///< use getInstance instead
-	virtual ~ToolManager(); ///< destructor
+	cxToolManager(); ///< use getInstance instead
+	virtual ~cxToolManager(); ///< destructor
 
 	void closePlayBackMode();
 	void initializeManualTool();
@@ -183,8 +183,8 @@ private:
 	double mToolTipOffset; ///< Common tool tip offset for all tools
 
 private:
-	ToolManager(ToolManager const&);
-	ToolManager& operator=(ToolManager const&);
+	cxToolManager(cxToolManager const&);
+	cxToolManager& operator=(cxToolManager const&);
 
 #ifndef WIN32
 	bool createSymlink();

@@ -62,8 +62,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   manualGroupLayout->setMargin(0);
   mManualToolWidget = new Transform3DWidget(manualGroup);
   manualGroupLayout->addWidget(mManualToolWidget);
-  connect(ToolManager::getInstance()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
-  connect(ToolManager::getInstance()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
+  connect(cxToolManager::getInstance()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
+  connect(cxToolManager::getInstance()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
   connect(mManualToolWidget, SIGNAL(changed()), this, SLOT(manualToolWidgetChanged()));
 
   mSpaceSelector = ssc::StringDataAdapterXml::initialize("selectSpace",
@@ -120,14 +120,14 @@ QString ToolPropertiesWidget::defaultWhatsThis() const
 
 void ToolPropertiesWidget::manualToolChanged()
 {
-	if (!ToolManager::getInstance()->getManualTool())
+	if (!cxToolManager::getInstance()->getManualTool())
 		return;
-  mManualGroup->setVisible(ToolManager::getInstance()->getManualTool()->getVisible());
+  mManualGroup->setVisible(cxToolManager::getInstance()->getManualTool()->getVisible());
   mManualToolWidget->blockSignals(true);
 
-  ssc::Transform3D prMt = ToolManager::getInstance()->getManualTool()->get_prMt();
+  ssc::Transform3D prMt = cxToolManager::getInstance()->getManualTool()->get_prMt();
   ssc::CoordinateSystem space_q = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
-  ssc::CoordinateSystem space_mt = ssc::SpaceHelpers::getTO(ToolManager::getInstance()->getManualTool());
+  ssc::CoordinateSystem space_mt = ssc::SpaceHelpers::getTO(cxToolManager::getInstance()->getManualTool());
   ssc::Transform3D qMt = ssc::SpaceHelpers::get_toMfrom(space_mt, space_q);
 
   mManualToolWidget->setMatrix(qMt);
@@ -138,12 +138,12 @@ void ToolPropertiesWidget::manualToolWidgetChanged()
 {
 	ssc::Transform3D qMt = mManualToolWidget->getMatrix();
   ssc::CoordinateSystem space_q = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
-  ssc::CoordinateSystem space_mt = ssc::SpaceHelpers::getTO(ToolManager::getInstance()->getManualTool());
+  ssc::CoordinateSystem space_mt = ssc::SpaceHelpers::getTO(cxToolManager::getInstance()->getManualTool());
   ssc::CoordinateSystem space_pr = ssc::SpaceHelpers::getPr();
   ssc::Transform3D qMpr = ssc::SpaceHelpers::get_toMfrom(space_pr, space_q);
   ssc::Transform3D prMt = qMpr.inv() * qMt;
 
-  ToolManager::getInstance()->getManualTool()->set_prMt(prMt);
+  cxToolManager::getInstance()->getManualTool()->set_prMt(prMt);
 }
 
 void ToolPropertiesWidget::spacesChangedSlot()
@@ -165,14 +165,14 @@ void ToolPropertiesWidget::spacesChangedSlot()
 
 void ToolPropertiesWidget::dominantToolChangedSlot()
 {
-  ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(mActiveTool);
+//  cxToolPtr cxTool = boost::dynamic_pointer_cast<cxTool>(mActiveTool);
 
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
 
   mActiveTool = ssc::toolManager()->getDominantTool();
 
-  if(mActiveTool && mActiveTool->hasType(Tool::TOOL_US_PROBE))
+  if(mActiveTool && mActiveTool->hasType(ssc::Tool::TOOL_US_PROBE))
   {
     mUSSectorConfigBox->show();
     mToptopLayout->update();

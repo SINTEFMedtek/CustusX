@@ -17,10 +17,10 @@ namespace cxtest
 TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 {
 	ssc::messageManager()->initialize();
-	cx::DataManager::getInstance()->initialize();
+	cx::cxDataManager::getInstance()->initialize();
 
-	cx::ToolManager::initializeObject();
-	cx::ToolManager* tm = cx::ToolManager::getInstance();
+	cx::cxToolManager::initializeObject();
+	cx::cxToolManager* tm = cx::cxToolManager::getInstance();
 	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear(),tm);
 	tm->runDummyTool(tool);
 	tm->setDominantTool(tool->getUid());
@@ -35,7 +35,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][widget][streaming]")
 	delete widget;
 
 //	ssc::DummyToolManager::getInstance()->shutdown();
-	cx::DataManager::getInstance()->shutdown();
+	cx::cxDataManager::getInstance()->shutdown();
 	ssc::messageManager()->shutdown();
 }
 

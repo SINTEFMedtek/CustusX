@@ -32,7 +32,7 @@
 namespace cx
 {
 
-Tool::Tool(IgstkToolPtr igstkTool) :
+cxTool::cxTool(IgstkToolPtr igstkTool) :
 				mTool(igstkTool), mPositionHistory(new ssc::TimedTransformMap()), mPolyData(NULL), m_prMt(
 								new ssc::Transform3D(ssc::Transform3D::Identity())), mValid(false), mConfigured(false), mTracked(
 								false)
@@ -52,92 +52,92 @@ Tool::Tool(IgstkToolPtr igstkTool) :
 
 	if (mTool->getInternalStructure().mIsProbe)
 	{
-		mProbe = Probe::New(mTool->getInternalStructure().mInstrumentId,
+		mProbe = cxProbe::New(mTool->getInternalStructure().mInstrumentId,
 						mTool->getInternalStructure().mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
 	connect(ssc::toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
-Tool::~Tool()
+cxTool::~cxTool()
 {
 }
 
-std::set<Tool::Type> Tool::getTypes() const
+std::set<cxTool::Type> cxTool::getTypes() const
 {
 	std::set<Type> retval;
 
 	if (mTool->getInternalStructure().mIsReference)
-		retval.insert(Tool::TOOL_REFERENCE);
+		retval.insert(cxTool::TOOL_REFERENCE);
 	if (mTool->getInternalStructure().mIsPointer)
-		retval.insert(Tool::TOOL_POINTER);
+		retval.insert(cxTool::TOOL_POINTER);
 	if (mTool->getInternalStructure().mIsProbe)
-		retval.insert(Tool::TOOL_US_PROBE);
+		retval.insert(cxTool::TOOL_US_PROBE);
 
 	return retval;
 }
 
-QString Tool::getGraphicsFileName() const
+QString cxTool::getGraphicsFileName() const
 {
 	return mTool->getInternalStructure().mGraphicsFileName;
 }
 
-vtkPolyDataPtr Tool::getGraphicsPolyData() const
+vtkPolyDataPtr cxTool::getGraphicsPolyData() const
 {
 	return mPolyData;
 }
 
-ssc::TimedTransformMapPtr Tool::getPositionHistory()
+ssc::TimedTransformMapPtr cxTool::getPositionHistory()
 {
 	return mPositionHistory;
 }
 
-ssc::ProbePtr Tool::getProbe() const
+ssc::ProbePtr cxTool::getProbe() const
 {
 	return mProbe;
 }
 
-ssc::Transform3D Tool::get_prMt() const
+ssc::Transform3D cxTool::get_prMt() const
 {
 	return *m_prMt;
 }
 
-bool Tool::getVisible() const
+bool cxTool::getVisible() const
 {
 	return mTool->isVisible();
 }
 
-bool Tool::isInitialized() const
+bool cxTool::isInitialized() const
 {
 	return mTool->isInitialized();
 }
 
-QString Tool::getUid() const
+QString cxTool::getUid() const
 {
 	return ssc::Tool::mUid;
 }
 
-QString Tool::getName() const
+QString cxTool::getName() const
 {
 	return ssc::Tool::mName;
 }
 
-double Tool::getTooltipOffset() const
+double cxTool::getTooltipOffset() const
 {
 	return ssc::toolManager()->getTooltipOffset();
 }
 
-void Tool::setTooltipOffset(double val)
+void cxTool::setTooltipOffset(double val)
 {
 	ssc::toolManager()->setTooltipOffset(val);
 }
 
-bool Tool::isValid() const
+bool cxTool::isValid() const
 {
 	return mValid;
 }
 
-void Tool::createPolyData()
+void cxTool::createPolyData()
 {
 	QDir dir;
 	if (!mTool->getInternalStructure().mGraphicsFileName.isEmpty()
@@ -164,58 +164,58 @@ void Tool::createPolyData()
 	}
 }
 
-bool Tool::isCalibrated() const
+bool cxTool::isCalibrated() const
 {
 	ssc::Transform3D identity = ssc::Transform3D::Identity();
 	ssc::Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
 	return !ssc::similar(sMt, identity);
 }
 
-ssc::Transform3D Tool::getCalibration_sMt() const
+ssc::Transform3D cxTool::getCalibration_sMt() const
 {
 	ssc::Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
 
 	return sMt;
 }
 
-void Tool::setCalibration_sMt(ssc::Transform3D calibration)
+void cxTool::setCalibration_sMt(ssc::Transform3D calibration)
 {
 	mTool->updateCalibration(calibration);
 }
 
-QString Tool::getCalibrationFileName() const
+QString cxTool::getCalibrationFileName() const
 {
 	return mTool->getInternalStructure().mCalibrationFilename;
 }
 
-ssc::TRACKING_SYSTEM Tool::getTrackerType()
+ssc::TRACKING_SYSTEM cxTool::getTrackerType()
 {
 	return mTool->getInternalStructure().mTrackerType;
 }
 
-void Tool::printInternalStructure()
+void cxTool::printInternalStructure()
 {
 	mTool->printInternalStructure();
 }
 
-ssc::ProbeData Tool::getProbeSector() const
+ssc::ProbeData cxTool::getProbeSector() const
 {
 	if (mProbe)
 		return mProbe->getProbeData();
 	return ssc::ProbeData();
 }
 
-std::map<int, ssc::Vector3D> Tool::getReferencePoints() const
+std::map<int, ssc::Vector3D> cxTool::getReferencePoints() const
 {
 	return mTool->getInternalStructure().mReferencePoints;
 }
 
-bool Tool::hasReferencePointWithId(int id)
+bool cxTool::hasReferencePointWithId(int id)
 {
   return this->getReferencePoints().count(id);
 }
 
-ssc::TimedTransformMap Tool::getSessionHistory(double startTime, double stopTime)
+ssc::TimedTransformMap cxTool::getSessionHistory(double startTime, double stopTime)
 {
 	ssc::TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
 	ssc::TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
@@ -224,7 +224,7 @@ ssc::TimedTransformMap Tool::getSessionHistory(double startTime, double stopTime
 	return retval;
 }
 
-void Tool::addXml(QDomNode& dataNode)
+void cxTool::addXml(QDomNode& dataNode)
 {
 	QDomDocument doc = dataNode.ownerDocument();
 	dataNode.toElement().setAttribute("uid", qstring_cast(this->getUid()));
@@ -236,7 +236,7 @@ void Tool::addXml(QDomNode& dataNode)
 	}
 }
 
-void Tool::parseXml(QDomNode& dataNode)
+void cxTool::parseXml(QDomNode& dataNode)
 {
 	if (dataNode.isNull())
 		return;
@@ -247,7 +247,7 @@ void Tool::parseXml(QDomNode& dataNode)
 	}
 }
 
-void Tool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
+void cxTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 {
 	m_prMt = ssc::Transform3DPtr(new ssc::Transform3D(matrix));
 	(*mPositionHistory)[timestamp] = *m_prMt;
@@ -255,7 +255,7 @@ void Tool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 	emit toolTransformAndTimestamp((*m_prMt), timestamp);
 }
 
-void Tool::calculateTpsSlot()
+void cxTool::calculateTpsSlot()
 {
 	int tpsNr = 0;
 
@@ -275,7 +275,7 @@ void Tool::calculateTpsSlot()
 	emit tps(tpsNr);
 }
 
-void Tool::toolVisibleSlot(bool on)
+void cxTool::toolVisibleSlot(bool on)
 {
 	if (on)
 		mTpsTimer.start(1000); //calculate tps every 1 seconds

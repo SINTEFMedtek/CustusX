@@ -54,7 +54,7 @@ void ApplicationState::onEntry(QEvent * event)
 		stateService()->getWorkflow()->setActiveState("PatientDataUid");
 	patientService()->getPatientData()->clearPatient();
 
-	cx::ToolManager::getInstance()->setClinicalApplication(this->getClinicalApplication());
+	cx::cxToolManager::getInstance()->setClinicalApplication(this->getClinicalApplication());
 
 }
 

@@ -26,7 +26,7 @@ namespace cxtest {
 
 MetricFixture::MetricFixture()
 {
-	cx::DataManager::initialize();
+	cx::cxDataManager::initialize();
 	ssc::ToolManager::setInstance(ssc::DummyToolManager::getInstance());
 }
 
@@ -34,7 +34,7 @@ MetricFixture::~MetricFixture()
 {
 	ssc::ToolManager::shutdown();
 	ssc::DummyToolManager::shutdown();
-	cx::DataManager::shutdown();
+	cx::cxDataManager::shutdown();
 }
 
 
@@ -48,7 +48,7 @@ FrameMetricWithInput MetricFixture::getFrameMetricWithInput()
 	retval.mMetric = cx::FrameMetric::create("testMetric%1");
     retval.mMetric->setFrame(retval.m_qMt);
     retval.mMetric->setSpace(retval.mSpace);
-	cx::DataManager::getInstance()->loadData(retval.mMetric);
+	cx::cxDataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
 }
@@ -67,7 +67,7 @@ ToolMetricWithInput MetricFixture::getToolMetricWithInput()
 	retval.mMetric->setSpace(retval.mSpace);
 	retval.mMetric->setToolName(retval.mName);
 	retval.mMetric->setToolOffset(retval.mOffset);
-	cx::DataManager::getInstance()->loadData(retval.mMetric);
+	cx::cxDataManager::getInstance()->loadData(retval.mMetric);
 
 	return retval;
 }
@@ -82,7 +82,7 @@ PointMetricWithInput MetricFixture::getPointMetricWithInput(ssc::Vector3D point)
 	retval.mMetric = ssc::PointMetric::create("testMetric%1");
     retval.mMetric->setCoordinate(point);
     retval.mMetric->setSpace(retval.mSpace);
-    cx::DataManager::getInstance()->loadData(retval.mMetric);
+	cx::cxDataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
 }
@@ -99,7 +99,7 @@ PlaneMetricWithInput MetricFixture::getPlaneMetricWithInput(ssc::Vector3D point,
     retval.mMetric->setCoordinate(point);
     retval.mMetric->setNormal(normal);
     retval.mMetric->setSpace(retval.mSpace);
-	cx::DataManager::getInstance()->loadData(retval.mMetric);
+	cx::cxDataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
 }
@@ -113,7 +113,7 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
 	retval.mMetric = ssc::DistanceMetric::create("testMetric%1");
     retval.mMetric->setArgument(0, p0);
     retval.mMetric->setArgument(1, p1);
-	cx::DataManager::getInstance()->loadData(retval.mMetric);
+	cx::cxDataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
 }
@@ -127,7 +127,7 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
 	retval.mMetric = ssc::DistanceMetric::create("testMetric%1");
 	retval.mMetric->setArgument(0, this->getPointMetricWithInput(ssc::Vector3D(0,0,0)).mMetric);
 	retval.mMetric->setArgument(1, this->getPointMetricWithInput(ssc::Vector3D(distance,0,0)).mMetric);
-	cx::DataManager::getInstance()->loadData(retval.mMetric);
+	cx::cxDataManager::getInstance()->loadData(retval.mMetric);
 
     return retval;
 }

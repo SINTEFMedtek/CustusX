@@ -135,7 +135,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 
   if(mTools->getTool())
   {
-    ToolPtr tool = boost::dynamic_pointer_cast<Tool>(mTools->getTool());
+	cxToolPtr tool = boost::dynamic_pointer_cast<cxTool>(mTools->getTool());
     if(tool && tool->hasReferencePointWithId(1))
     {
       text = "Ref. point: "+qstring_cast(tool->getReferencePoints()[1]);

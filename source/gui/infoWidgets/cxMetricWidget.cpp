@@ -159,7 +159,7 @@ void MetricWidget::setManualToolPosition(ssc::Vector3D p_r)
 	ssc::Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+	ssc::ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 	ssc::Vector3D offset = tool->get_prMt().vector(ssc::Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);

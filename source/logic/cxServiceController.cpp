@@ -55,7 +55,7 @@ void ServiceController::patientChangedSlot()
 	}
 	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
 
-	ToolManager::getInstance()->setLoggingFolder(loggingPath);
+	cxToolManager::getInstance()->setLoggingFolder(loggingPath);
 	ssc::messageManager()->setLoggingFolder(loggingPath);
 }
 

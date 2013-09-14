@@ -53,7 +53,7 @@ namespace cxtest
 void setUp()
 {
 	ssc::MessageManager::initialize();
-	cx::DataManager::initialize();
+	cx::cxDataManager::initialize();
 }
 
 void tearDown()
