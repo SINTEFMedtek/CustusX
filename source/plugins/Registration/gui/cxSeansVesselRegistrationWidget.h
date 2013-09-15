@@ -53,8 +53,8 @@ private:
   QCheckBox* mAutoLTSCheckBox;
   QPushButton* mRegisterButton;
 
-  ssc::StringDataAdapterPtr mFixedImage;
-  ssc::StringDataAdapterPtr mMovingImage;
+  StringDataAdapterPtr mFixedImage;
+  StringDataAdapterPtr mMovingImage;
 };
 
 /**

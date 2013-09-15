@@ -34,7 +34,7 @@
 #include "sscDataAdapter.h"
 #include "sscVector3D.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Abstract interface for interaction with internal Vector3D-valued data

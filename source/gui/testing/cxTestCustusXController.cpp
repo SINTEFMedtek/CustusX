@@ -76,15 +76,15 @@ void CustusXController::loadPatientSlot()
   cx::stateService()->getWorkflow()->setActiveState("NavigationUid");
   mMainWindow->setGeometry( 0, 0, 2560, 1440);
 
-  if (!ssc::DataManager::getInstance()->getImages().size())
+  if (!cx::DataManager::getInstance()->getImages().size())
 		return;
 
-  ssc::ImagePtr image = ssc::DataManager::getInstance()->getImages().begin()->second;
-  ssc::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
+  cx::ImagePtr image = cx::DataManager::getInstance()->getImages().begin()->second;
+  cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
 
-  ssc::DataManager::getInstance()->setCenter(bb_r.center());
+  cx::DataManager::getInstance()->setCenter(bb_r.center());
 
-  ssc::DummyToolPtr dummyTool(new ssc::DummyTool(cx::cxToolManager::getInstance()));
+  cx::DummyToolPtr dummyTool(new cx::DummyTool(cx::cxToolManager::getInstance()));
   dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
   cx::cxToolManager::getInstance()->runDummyTool(dummyTool);
 }
@@ -93,13 +93,13 @@ void CustusXController::loadPatientSlot()
 void CustusXController::enableSlicingSlot()
 {
 		cx::InteractiveClipperPtr interactiveClipper = cx::viewManager()->getClipper();
-		interactiveClipper->setSlicePlane(ssc::ptAXIAL);
+		interactiveClipper->setSlicePlane(cx::ptAXIAL);
 
-	//	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-		std::map<QString, ssc::ImagePtr> imageMap = ssc::dataManager()->getImages();
+	//	ImagePtr image = dataManager()->getActiveImage();
+		std::map<QString, cx::ImagePtr> imageMap = cx::dataManager()->getImages();
 		if(imageMap.size() > 0)
 		{
-			ssc::ImagePtr image = imageMap.begin()->second;
+			cx::ImagePtr image = imageMap.begin()->second;
 			interactiveClipper->setImage(image);
 			interactiveClipper->useClipper(true);
 //			std::cout << "clip in image: " << image->getName()  << std::endl;

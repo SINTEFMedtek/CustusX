@@ -34,7 +34,7 @@ public:
   virtual ~ToolMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual ssc::DataPtr getData() const;
+  virtual DataPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 private slots:
@@ -46,9 +46,9 @@ private slots:
   void frameWidgetChangedSlot();
 private:
   cx::ToolMetricPtr mData;
-  ssc::StringDataAdapterXmlPtr mSpaceSelector;
-  ssc::StringDataAdapterXmlPtr mToolNameSelector;
-  ssc::DoubleDataAdapterXmlPtr mToolOffsetSelector;
+  StringDataAdapterXmlPtr mSpaceSelector;
+  StringDataAdapterXmlPtr mToolNameSelector;
+  DoubleDataAdapterXmlPtr mToolOffsetSelector;
   bool mInternalUpdate;
   Transform3DWidget* mFrameWidget;
   void initializeDataAdapters();

@@ -20,7 +20,7 @@ namespace cx {
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class TSFPresets : public ssc::Presets
+class TSFPresets : public Presets
 {
 	Q_OBJECT
 

@@ -29,7 +29,7 @@
 #include <QDomElement>
 #include <QStringList>
 
-namespace ssc
+namespace cx
 {
 
 StringDataAdapterXml::StringDataAdapterXml() : 	mIsReadOnly(false)
@@ -141,4 +141,4 @@ void StringDataAdapterXml::setDisplayNames(std::map<QString, QString> names)
 	mDisplayNames = names;
 }
 
-} // namespace ssc
+} // namespace cx

@@ -15,10 +15,10 @@
 #include "sscColorSelectWidget.h"
 #include "sscHelperWidgets.h"
 
-namespace ssc
+namespace cx
 {
 
-ColorSelectWidget::ColorSelectWidget(QWidget* parent, ssc::ColorDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
+ColorSelectWidget::ColorSelectWidget(QWidget* parent, ColorDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
     OptimizedUpdateWidget(parent)
 {
 	this->setEnabled(dataInterface->getEnabled());
@@ -70,5 +70,5 @@ void ColorSelectWidget::prePaintEvent()
 }
 
 
-} // namespace ssc
+} // namespace cx
 

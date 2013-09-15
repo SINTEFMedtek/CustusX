@@ -31,17 +31,17 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
   mMatrixWidget = new Transform3DWidget(mGroup);
   groupLayout->addWidget(mMatrixWidget);
   connect(mMatrixWidget, SIGNAL(changed()), this, SLOT(matrixWidgetChanged()));
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(toolCalibrationChanged()));
+  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(toolCalibrationChanged()));
 
   this->toolCalibrationChanged();
   mMatrixWidget->setEditable(true);
 
   mToptopLayout->addStretch();
 
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(toolCalibrationChanged()));
-  connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolCalibrationChanged()));
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(toolCalibrationChanged()));
-  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(toolCalibrationChanged()));
+  connect(toolManager(), SIGNAL(configured()), this, SLOT(toolCalibrationChanged()));
+  connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolCalibrationChanged()));
+  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(toolCalibrationChanged()));
+  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(toolCalibrationChanged()));
 }
 
 
@@ -56,7 +56,7 @@ QString ToolManualCalibrationWidget::defaultWhatsThis() const
 
 void ToolManualCalibrationWidget::toolCalibrationChanged()
 {
-  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+  ToolPtr tool = toolManager()->getDominantTool();
   if (!tool)
     return;
 
@@ -68,11 +68,11 @@ void ToolManualCalibrationWidget::toolCalibrationChanged()
 
 void ToolManualCalibrationWidget::matrixWidgetChanged()
 {
-  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+  ToolPtr tool = toolManager()->getDominantTool();
     if (!tool)
       return;
 
-  ssc::Transform3D M = mMatrixWidget->getMatrix();
+  Transform3D M = mMatrixWidget->getMatrix();
   tool->setCalibration_sMt(M);
 }
 

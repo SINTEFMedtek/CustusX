@@ -30,12 +30,12 @@ namespace cx
 
 ElastixManager::ElastixManager(RegistrationManagerPtr regManager) : mRegistrationManager(regManager)
 {
-	mOptions = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("elastix");
+	mOptions = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("elastix");
 
 	mParameters.reset(new ElastixParameters(mOptions));
 	connect(mParameters.get(), SIGNAL(elastixParametersChanged()), this, SIGNAL(elastixChanged()));
 
-	mDisplayProcessMessages = ssc::BoolDataAdapterXml::initialize("displayProcessMessages",
+	mDisplayProcessMessages = BoolDataAdapterXml::initialize("displayProcessMessages",
 		"Show Messages",
 		"Display messages from the running registration process in CustusX",
 		false,
@@ -65,7 +65,7 @@ void ElastixManager::preprocessExecuter()
 	//patientService()->getPatientData()->savePatient();
 
 	QStringList parameterFiles = mParameters->getActiveParameterFiles();
-	QString timestamp = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+	QString timestamp = QDateTime::currentDateTime().toString(timestampSecondsFormat());
 	QDir outDir(patientService()->getPatientData()->getActivePatientFolder()+"/elastix/"+timestamp);
 
 	mExecuter->setDisplayProcessMessages(mDisplayProcessMessages->getValue());
@@ -79,7 +79,7 @@ void ElastixManager::preprocessExecuter()
 void ElastixManager::executionFinishedSlot()
 {
 	bool ok = false;
-	ssc::Transform3D mMf = mExecuter->getAffineResult_mMf(&ok);
+	Transform3D mMf = mExecuter->getAffineResult_mMf(&ok);
 
 	if (!ok)
 		return;
@@ -98,7 +98,7 @@ void ElastixManager::executionFinishedSlot()
 	// D = rMf * fMm' * mMr
 	// as the input to regmanager applyImage2ImageRegistration()
 
-	ssc::Transform3D delta_pre_rMd =
+	Transform3D delta_pre_rMd =
 		mRegistrationManager->getFixedData()->get_rMd()
 		* mMf.inv()
 		* mRegistrationManager->getMovingData()->get_rMd().inv();
@@ -125,26 +125,26 @@ void ElastixManager::addNonlinearData()
 	if (!ok)
 		return;
 
-	ssc::ImagePtr movingImage = boost::dynamic_pointer_cast<ssc::Image>(mRegistrationManager->getMovingData());
-	ssc::ImagePtr raw = boost::dynamic_pointer_cast<ssc::Image>(ssc::MetaImageReader().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
+	ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mRegistrationManager->getMovingData());
+	ImagePtr raw = boost::dynamic_pointer_cast<Image>(MetaImageReader().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
 
 	QString uid = movingImage->getUid() + "_nl%1";
 	QString name = movingImage->getName()+" nl%1";
-	ssc::ImagePtr nlVolume = ssc::dataManager()->createDerivedImage(raw->getBaseVtkImageData(), uid, name, movingImage);
+	ImagePtr nlVolume = dataManager()->createDerivedImage(raw->getBaseVtkImageData(), uid, name, movingImage);
 
 	if (!nlVolume)
 	{
-		ssc::messageManager()->sendInfo(QString("Failed to import nonlinear volume %1").arg(nonlinearVolumeFilename));
+		messageManager()->sendInfo(QString("Failed to import nonlinear volume %1").arg(nonlinearVolumeFilename));
 		return;
 	}
 
 	// volume is resampled into the space of the fixed data:
 	nlVolume->get_rMd_History()->setRegistration(mRegistrationManager->getFixedData()->get_rMd());
 
-	ssc::dataManager()->loadData(nlVolume);
-	ssc::dataManager()->saveImage(nlVolume, patientService()->getPatientData()->getActivePatientFolder());
+	dataManager()->loadData(nlVolume);
+	dataManager()->saveImage(nlVolume, patientService()->getPatientData()->getActivePatientFolder());
 
-	ssc::messageManager()->sendInfo(QString("Added volume %1, created by a nonlinear transform").arg(nlVolume->getName()));
+	messageManager()->sendInfo(QString("Added volume %1, created by a nonlinear transform").arg(nlVolume->getName()));
 }
 
 } /* namespace cx */

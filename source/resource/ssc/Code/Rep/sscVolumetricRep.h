@@ -32,7 +32,7 @@ namespace cx
 	typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 }
 
-namespace ssc
+namespace cx
 {
 
 
@@ -79,7 +79,7 @@ public:
 	virtual ~VolumetricRep();
 
 	static VolumetricRepPtr New(QString uid="") { return wrap_new(new VolumetricRep(), uid); }
-	virtual QString getType() const { return "ssc::VolumetricRep"; }
+	virtual QString getType() const { return "VolumetricRep"; }
 	virtual void setImage(ImagePtr image); ///< set the reps image
 	virtual ImagePtr getImage(); ///< get the reps image
 	virtual bool hasImage(ImagePtr image) const; ///< check if the reps has the image
@@ -106,7 +106,7 @@ private slots:
 	void vtkImageDataChangedSlot();
 };
 //---------------------------------------------------------
-} // namespace ssc
+} // namespace cx
 //---------------------------------------------------------
 
 #endif /*SSCVOLUMEREP_H_*/

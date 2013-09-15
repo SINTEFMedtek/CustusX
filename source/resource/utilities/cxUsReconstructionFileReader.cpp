@@ -28,7 +28,7 @@ UsReconstructionFileReader::UsReconstructionFileReader()
 
 }
 
-ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath)
+USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath)
 {
   if (calFilesPath.isEmpty())
   {
@@ -37,7 +37,7 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
     calFilesPath = list.join("/")+"/";
   }
 
-  ssc::USReconstructInputData retval;
+  USReconstructInputData retval;
 
   // ignore if a directory is read - store folder name only
   if (QFileInfo(fileName).suffix().isEmpty())
@@ -45,30 +45,30 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
 
   retval.mFilename = fileName;
 
-  if (!QFileInfo(ssc::changeExtension(fileName, "fts")).exists())
+  if (!QFileInfo(changeExtension(fileName, "fts")).exists())
   {
     // There may not be any files here due to the automatic calling of the function
-    ssc::messageManager()->sendWarning("File not found: "+ssc::changeExtension(fileName, "fts")+", reconstruct load failed");
+    messageManager()->sendWarning("File not found: "+changeExtension(fileName, "fts")+", reconstruct load failed");
     return retval;
   }
 
   //Read US images
   retval.mUsRaw = this->readUsDataFile(fileName);
 
-  std::pair<QString, ssc::ProbeData>  probeDataFull = this->readProbeDataBackwardsCompatible(ssc::changeExtension(fileName, "mhd"), calFilesPath);
-  ssc::ProbeData  probeData = probeDataFull.second;
+  std::pair<QString, ProbeData>  probeDataFull = this->readProbeDataBackwardsCompatible(changeExtension(fileName, "mhd"), calFilesPath);
+  ProbeData  probeData = probeDataFull.second;
   // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
-  bool spacingOK = ssc::similar(probeData.getImage().mSpacing[0], retval.mUsRaw->getSpacing()[0], 0.001)
-  	  	  	  	&& ssc::similar(probeData.getImage().mSpacing[1], retval.mUsRaw->getSpacing()[1], 0.001);
+  bool spacingOK = similar(probeData.getImage().mSpacing[0], retval.mUsRaw->getSpacing()[0], 0.001)
+  	  	  	  	&& similar(probeData.getImage().mSpacing[1], retval.mUsRaw->getSpacing()[1], 0.001);
   if (!spacingOK)
   {
-      ssc::messageManager()->sendWarning(""
+      messageManager()->sendWarning(""
     	  "Mismatch in spacing values from calibration and recorded image.\n"
     	  "This might be valid if the sound speed was changed prior to recording.\n"
     	  "Probe definition: "+ qstring_cast(probeData.getImage().mSpacing) + ", Acquired Image: " + qstring_cast(retval.mUsRaw->getSpacing())
     	  );
   }
-  probeData.getImage().mSpacing = ssc::Vector3D(retval.mUsRaw->getSpacing());
+  probeData.getImage().mSpacing = Vector3D(retval.mUsRaw->getSpacing());
   retval.mProbeData.setData(probeData);
   retval.mProbeUid = probeDataFull.first;
 
@@ -85,7 +85,7 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
   if (!retval.mFrames.empty())
   {
 	  double msecs = (retval.mFrames.rbegin()->mTime - retval.mFrames.begin()->mTime);
-	  ssc::messageManager()->sendInfo(QString("Read %1 seconds of us data from %2.").arg(msecs/1000, 0, 'g', 3).arg(fileName));
+	  messageManager()->sendInfo(QString("Read %1 seconds of us data from %2.").arg(msecs/1000, 0, 'g', 3).arg(fileName));
   }
 
   return retval;
@@ -95,13 +95,13 @@ ssc::USReconstructInputData UsReconstructionFileReader::readAllFiles(QString fil
  * or from ProbeCalibConfigs.xml file for backwards compatibility.
  *
  */
-std::pair<QString, ssc::ProbeData>  UsReconstructionFileReader::readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath)
+std::pair<QString, ProbeData>  UsReconstructionFileReader::readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath)
 {
-	std::pair<QString, ssc::ProbeData>  retval = this->readProbeDataFromFile(mhdFileName);
+	std::pair<QString, ProbeData>  retval = this->readProbeDataFromFile(mhdFileName);
 
-	if (retval.second.getType()==ssc::ProbeData::tNONE)
+	if (retval.second.getType()==ProbeData::tNONE)
 	{
-		ssc::messageManager()->sendInfo(QString("Invalid probe in %1, falling back to old format").arg(retval.first));
+		messageManager()->sendInfo(QString("Invalid probe in %1, falling back to old format").arg(retval.first));
 		QString caliFilename;
 		QStringList probeConfigPath;
 		this->readCustomMhdTags(mhdFileName, &probeConfigPath, &caliFilename);
@@ -112,40 +112,40 @@ std::pair<QString, ssc::ProbeData>  UsReconstructionFileReader::readProbeDataBac
 	return retval;
 }
 
-ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(ssc::USReconstructInputData data)
+ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(USReconstructInputData data)
 {
   vtkImageDataPtr mask = data.mProbeData.getMask();
-  ssc::ImagePtr image = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
+  ImagePtr image = ImagePtr(new Image("mask", mask, "mask")) ;
 
   Eigen::Array3i usDim(data.mUsRaw->getDimensions());
   usDim[2] = 1;
-  ssc::Vector3D usSpacing(data.mUsRaw->getSpacing());
+  Vector3D usSpacing(data.mUsRaw->getSpacing());
 
   // checking
   bool spacingOK = true;
-  spacingOK = spacingOK && ssc::similar(usSpacing[0], mask->GetSpacing()[0], 0.001);
-  spacingOK = spacingOK && ssc::similar(usSpacing[1], mask->GetSpacing()[1], 0.001);
-  bool dimOK = ssc::similar(usDim, Eigen::Array3i(mask->GetDimensions()));
+  spacingOK = spacingOK && similar(usSpacing[0], mask->GetSpacing()[0], 0.001);
+  spacingOK = spacingOK && similar(usSpacing[1], mask->GetSpacing()[1], 0.001);
+  bool dimOK = similar(usDim, Eigen::Array3i(mask->GetDimensions()));
   if (!dimOK || !spacingOK)
   {
-    ssc::messageManager()->sendError("Reconstruction: mismatch in mask and image dimensions/spacing: ");
+    messageManager()->sendError("Reconstruction: mismatch in mask and image dimensions/spacing: ");
     if (!dimOK)
-      ssc::messageManager()->sendError("Dim: Image: "+ qstring_cast(usDim) + ", Mask: " + qstring_cast(Eigen::Array3i(mask->GetDimensions())));
+      messageManager()->sendError("Dim: Image: "+ qstring_cast(usDim) + ", Mask: " + qstring_cast(Eigen::Array3i(mask->GetDimensions())));
     if (!spacingOK)
-      ssc::messageManager()->sendError("Spacing: Image: "+ qstring_cast(usSpacing) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetSpacing())));
+      messageManager()->sendError("Spacing: Image: "+ qstring_cast(usSpacing) + ", Mask: " + qstring_cast(Vector3D(mask->GetSpacing())));
   }
   return image;
 }
 
-ssc::ImagePtr UsReconstructionFileReader::generateMask(ssc::USReconstructInputData data)
+ImagePtr UsReconstructionFileReader::generateMask(USReconstructInputData data)
 {
   Eigen::Array3i dim(data.mUsRaw->getDimensions());
   dim[2] = 1;
-  ssc::Vector3D spacing(data.mUsRaw->getSpacing());
+  Vector3D spacing(data.mUsRaw->getSpacing());
 
-  vtkImageDataPtr raw = ssc::generateVtkImageData(dim, spacing, 255);
+  vtkImageDataPtr raw = generateVtkImageData(dim, spacing, 255);
 
-  ssc::ImagePtr image = ssc::ImagePtr(new ssc::Image("mask", raw, "mask")) ;
+  ImagePtr image = ImagePtr(new Image("mask", raw, "mask")) ;
   return image;
 }
 
@@ -156,7 +156,7 @@ void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringL
   QFile file(mhdFileName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
   {
-    ssc::messageManager()->sendWarning("Error in Reconstructer::readUsDataFile(): Can't open file: "
+    messageManager()->sendWarning("Error in Reconstructer::readUsDataFile(): Can't open file: "
                                        + mhdFileName);
   }
   bool foundConfig = false;
@@ -183,13 +183,13 @@ void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringL
   }
   if(!foundConfig)
   {
-    ssc::messageManager()->sendWarning(QString("Error in Reconstructer::readUsDataFile(): ")
+    messageManager()->sendWarning(QString("Error in Reconstructer::readUsDataFile(): ")
                                        + "Can't find ConfigurationID in file: "
                                        + mhdFileName);
   }
   if(!foundCalFile)
   {
-    ssc::messageManager()->sendWarning(QString("Error in Reconstructer::readUsDataFile(): ")
+    messageManager()->sendWarning(QString("Error in Reconstructer::readUsDataFile(): ")
                                        + "Can't find ProbeCalibration in file: "
                                        + mhdFileName);
   }
@@ -213,18 +213,18 @@ ProbeXmlConfigParser::Configuration UsReconstructionFileReader::readProbeConfigu
   return configuration;
 }
 
-std::pair<QString, ssc::ProbeData> UsReconstructionFileReader::readProbeDataFromFile(QString mhdFileName)
+std::pair<QString, ProbeData> UsReconstructionFileReader::readProbeDataFromFile(QString mhdFileName)
 {
-	std::pair<QString, ssc::ProbeData>  retval;
-	QString filename = ssc::changeExtension(mhdFileName, "probedata.xml");
+	std::pair<QString, ProbeData>  retval;
+	QString filename = changeExtension(mhdFileName, "probedata.xml");
 
 	if (!QFileInfo(filename).exists())
 	{
-		ssc::messageManager()->sendWarning("File not found: " + filename + ", failed to load probe data.");
+		messageManager()->sendWarning("File not found: " + filename + ", failed to load probe data.");
 		return retval;
 	}
 
-	ssc::XmlOptionFile file = ssc::XmlOptionFile(filename, "navnet");
+	XmlOptionFile file = XmlOptionFile(filename, "navnet");
 	retval.second.parseXml(file.getElement("configuration"));
 
 	retval.first = file.getElement("tool").toElement().attribute("toolID");
@@ -232,51 +232,51 @@ std::pair<QString, ssc::ProbeData> UsReconstructionFileReader::readProbeDataFrom
 	return retval;
 }
 
-ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileName)
+USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileName)
 {
-	return ssc::USFrameData::create(mhdFileName);
+	return USFrameData::create(mhdFileName);
 }
 
-std::vector<ssc::TimedPosition> UsReconstructionFileReader::readFrameTimestamps(QString fileName)
+std::vector<TimedPosition> UsReconstructionFileReader::readFrameTimestamps(QString fileName)
 {
-  bool useOldFormat = !QFileInfo(ssc::changeExtension(fileName, "fts")).exists();
-  std::vector<ssc::TimedPosition> retval;
+  bool useOldFormat = !QFileInfo(changeExtension(fileName, "fts")).exists();
+  std::vector<TimedPosition> retval;
 
   if (useOldFormat)
   {
-    this->readTimeStampsFile(ssc::changeExtension(fileName, "tim"), &retval);
+    this->readTimeStampsFile(changeExtension(fileName, "tim"), &retval);
   }
   else
   {
-    this->readTimeStampsFile(ssc::changeExtension(fileName, "fts"), &retval);
+    this->readTimeStampsFile(changeExtension(fileName, "fts"), &retval);
   }
   return retval;
 }
 
-std::vector<ssc::TimedPosition> UsReconstructionFileReader::readPositions(QString fileName)
+std::vector<TimedPosition> UsReconstructionFileReader::readPositions(QString fileName)
 {
-  bool useOldFormat = !QFileInfo(ssc::changeExtension(fileName, "fts")).exists();
-  std::vector<ssc::TimedPosition> retval;
+  bool useOldFormat = !QFileInfo(changeExtension(fileName, "fts")).exists();
+  std::vector<TimedPosition> retval;
 
   if (useOldFormat)
   {
-    this->readPositionFile(ssc::changeExtension(fileName, "pos"), true, &retval);
+    this->readPositionFile(changeExtension(fileName, "pos"), true, &retval);
   }
   else
   {
-    this->readPositionFile(ssc::changeExtension(fileName, "tp"), false, &retval);
-    this->readTimeStampsFile(ssc::changeExtension(fileName, "tts"), &retval);
+    this->readPositionFile(changeExtension(fileName, "tp"), false, &retval);
+    this->readTimeStampsFile(changeExtension(fileName, "tts"), &retval);
   }
   return retval;
 }
 
 void UsReconstructionFileReader::readTimeStampsFile(QString fileName,
-                                       std::vector<ssc::TimedPosition>* timedPos)
+                                       std::vector<TimedPosition>* timedPos)
 {
   QFile file(fileName);
   if(!file.open(QIODevice::ReadOnly))
   {
-    ssc::messageManager()->sendWarning("Can't open file: " + fileName);
+    messageManager()->sendWarning("Can't open file: " + fileName);
     return;
   }
   bool ok = true;
@@ -286,14 +286,14 @@ void UsReconstructionFileReader::readTimeStampsFile(QString fileName,
   {
     if (i>=timedPos->size())
     {
-      timedPos->push_back(ssc::TimedPosition());
+      timedPos->push_back(TimedPosition());
     }
 
     QByteArray array = file.readLine();
     double time = QString(array).toDouble(&ok);
     if (!ok)
     {
-      ssc::messageManager()->sendWarning("Can't read double in file: " + fileName);
+      messageManager()->sendWarning("Can't read double in file: " + fileName);
       return;
     }
     timedPos->at(i).mTime = time;
@@ -302,12 +302,12 @@ void UsReconstructionFileReader::readTimeStampsFile(QString fileName,
 
 }
 
-void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoReadTimestamps, std::vector<ssc::TimedPosition>* timedPos)
+void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoReadTimestamps, std::vector<TimedPosition>* timedPos)
 {
   QFile file(posFile);
   if(!file.open(QIODevice::ReadOnly))
   {
-    ssc::messageManager()->sendWarning("Can't open file: "
+    messageManager()->sendWarning("Can't open file: "
                                        + posFile);
     return;
   }
@@ -318,10 +318,10 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
   {
     if (i>=timedPos->size())
     {
-      timedPos->push_back(ssc::TimedPosition());
+      timedPos->push_back(TimedPosition());
     }
 
-    ssc::TimedPosition position;
+    TimedPosition position;
     position.mTime = 0;
     if (alsoReadTimestamps)
     {
@@ -330,7 +330,7 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
       position.mTime = QString(array).toDouble(&ok);
       if (!ok)
       {
-        ssc::messageManager()->sendWarning("Can't read double in file: "
+        messageManager()->sendWarning("Can't read double in file: "
                                            + posFile);
         return;
       }
@@ -340,10 +340,10 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
     positionString += " " + file.readLine();
     positionString += " " + file.readLine();
     positionString += " 0 0 0 1";
-    position.mPos = ssc::Transform3D::fromString(positionString, &ok);
+    position.mPos = Transform3D::fromString(positionString, &ok);
     if (!ok)
     {
-      ssc::messageManager()->sendWarning("Can't read position number: "
+      messageManager()->sendWarning("Can't read position number: "
                                          + qstring_cast(i)
                                          + " from file: "
                                          + posFile
@@ -358,9 +358,9 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
   return;
 }
 
-bool UsReconstructionFileReader::readMaskFile(QString mhdFileName, ssc::ImagePtr mask)
+bool UsReconstructionFileReader::readMaskFile(QString mhdFileName, ImagePtr mask)
 {
-  QString fileName = ssc::changeExtension(mhdFileName, "msk");
+  QString fileName = changeExtension(mhdFileName, "msk");
 
   if (!QFileInfo(fileName).exists())
     return false;

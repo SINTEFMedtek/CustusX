@@ -47,7 +47,7 @@ TrackedRecordWidget::TrackedRecordWidget(AcquisitionDataPtr pluginData, QWidget*
 TrackedRecordWidget::~TrackedRecordWidget()
 {}
 
-void TrackedRecordWidget::setTool(ssc::ToolPtr tool)
+void TrackedRecordWidget::setTool(ToolPtr tool)
 {
   if(mTool && tool && (mTool->getUid() == tool->getUid()))
     return;
@@ -56,7 +56,7 @@ void TrackedRecordWidget::setTool(ssc::ToolPtr tool)
   emit toolChanged();
 }
 
-ssc::ToolPtr TrackedRecordWidget::getTool()
+ToolPtr TrackedRecordWidget::getTool()
 {
   return mTool;
 }

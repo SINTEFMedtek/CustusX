@@ -30,7 +30,7 @@
 #include "sscMesh.h"
 #include "sscImage.h"
 
-namespace ssc
+namespace cx
 {
 
 SurfaceRep::SurfaceRep(const QString& uid) :
@@ -108,6 +108,6 @@ void SurfaceRep::setImage(ImagePtr image)
 }
 
 //---------------------------------------------------------
-} // namespace ssc
+} // namespace cx
 //---------------------------------------------------------
 

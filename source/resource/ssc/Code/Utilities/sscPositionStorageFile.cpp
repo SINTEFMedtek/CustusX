@@ -5,7 +5,7 @@
 #include "sscTime.h"
 
 
-namespace ssc
+namespace cx
 {
 
 
@@ -54,7 +54,7 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, int* to
   quint8 size;
   quint64 ts;
   quint8 tool;
-//  ssc::Frame3D frame;
+//  Frame3D frame;
 
   stream >> type;
   stream >> size;
@@ -62,7 +62,7 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, int* to
   stream >> tool;
 //  stream >> frame.mThetaXY >> frame.mThetaZ >> frame.mPhi;
 //  stream >> frame.mPos[0] >> frame.mPos[1] >> frame.mPos[2];
-  ssc::Frame3D frame = this->frameFromStream();
+  Frame3D frame = this->frameFromStream();
 
   *matrix = frame.transform();
   *timestamp = ts;
@@ -97,7 +97,7 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
   {
     quint64 ts;
     quint8 tool;
-//    ssc::Frame3D frame;
+//    Frame3D frame;
 //    double thetaXY;
 //    double thetaZ;
 //    double phi;
@@ -109,7 +109,7 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
 ////    stream >> frame.mThetaXY >> frame.mThetaZ >> frame.mPhi;
 //    stream >> frame.mPos[0] >> frame.mPos[1] >> frame.mPos[2];
 //    frame.mAngleAxis = Eigen::AngleAxisd(phi, unitVector(thetaXY, thetaZ));
-    ssc::Frame3D frame = this->frameFromStream();
+    Frame3D frame = this->frameFromStream();
 
     *matrix = frame.transform();
     *timestamp = ts;
@@ -119,7 +119,7 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
   else if (type==3) // position only format
   {
     quint64 ts;
-//    ssc::Frame3D frame;
+//    Frame3D frame;
 //    double thetaXY;
 //    double thetaZ;
 //    double phi;
@@ -127,7 +127,7 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
     stream >> size;
     stream >> ts;
 //    stream >> thetaXY >> thetaZ >> phi;
-    ssc::Frame3D frame = this->frameFromStream();
+    Frame3D frame = this->frameFromStream();
 //    stream >> frame.mThetaXY >> frame.mThetaZ >> frame.mPhi;
 //    stream >> frame.mPos[0] >> frame.mPos[1] >> frame.mPos[2];
 //    frame.mAngleAxis = Eigen::AngleAxisd(phi, unitVector(thetaXY, thetaZ));
@@ -164,7 +164,7 @@ QString PositionStorageReader::timestampToString(double timestamp)
   boost::uint64_t ts = static_cast<boost::uint64_t>(timestamp);
   retval.setTime_t(ts/1000);
   retval = retval.addMSecs(ts%1000);
-  return retval.toString(ssc::timestampMilliSecondsFormatNice());
+  return retval.toString(timestampMilliSecondsFormatNice());
 }
 
 
@@ -193,7 +193,7 @@ PositionStorageWriter::~PositionStorageWriter()
 
 void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, int toolIndex)
 {
-	ssc::Frame3D frame = ssc::Frame3D::create(matrix);
+	Frame3D frame = Frame3D::create(matrix);
 
 	stream << (quint8)1;	// Type - there is only one
 	stream << (quint8)(8+1+6*10);	// Size of data following this point
@@ -223,7 +223,7 @@ void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, QStrin
   }
   else
   {
-    ssc::Frame3D frame = ssc::Frame3D::create(matrix);
+    Frame3D frame = Frame3D::create(matrix);
     boost::array<double, 6> rep = frame.getCompactAxisAngleRep();
 
     stream << (quint8)3;  // Type -
@@ -243,4 +243,4 @@ void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, QStrin
 }
 
 
-} // namespace ssc 
+} // namespace cx 

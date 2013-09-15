@@ -24,7 +24,7 @@ namespace cx
 class SliderRangeGroupWidget;
 
 /**
- * \brief Widget displays/edits a ssc::BoundingBox3D
+ * \brief Widget displays/edits a BoundingBox3D
  * \ingroup cxGUI
  *
  * \date Mar 16, 2012
@@ -35,10 +35,10 @@ class BoundingBoxWidget: public QWidget
 Q_OBJECT
 public:
 	BoundingBoxWidget(QWidget* parent=NULL);
-//	void setValue(const ssc::DoubleBoundingBox3D& bb);
-//	void setRange(const ssc::DoubleBoundingBox3D& bb);
-	void setValue(const ssc::DoubleBoundingBox3D& value, const ssc::DoubleBoundingBox3D& range);
-	ssc::DoubleBoundingBox3D getValue() const;
+//	void setValue(const DoubleBoundingBox3D& bb);
+//	void setRange(const DoubleBoundingBox3D& bb);
+	void setValue(const DoubleBoundingBox3D& value, const DoubleBoundingBox3D& range);
+	DoubleBoundingBox3D getValue() const;
 	void showDim(int dim, bool visible);
 
 signals:

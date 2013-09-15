@@ -64,7 +64,7 @@ signals:
 private slots:
 	void activeImageChangedSlot(const QString&);
 private:
-	ssc::ImagePtr mImage;
+	ImagePtr mImage;
 };
 
 /**

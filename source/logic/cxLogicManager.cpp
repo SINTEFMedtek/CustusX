@@ -42,7 +42,7 @@ void LogicManager::shutdown()
 void LogicManager::initializeServices()
 {
 	// resources layer
-	ssc::MessageManager::initialize();
+	MessageManager::initialize();
 
 	// services layer
 	cx::PatientService::initialize();
@@ -80,8 +80,8 @@ void LogicManager::shutdownServices()
 	cx::cxDataManager::shutdown();
 	cx::PatientService::shutdown();
 
-	ssc::GPUImageBufferRepository::shutdown();
-	ssc::MessageManager::shutdown();
+	GPUImageBufferRepository::shutdown();
+	MessageManager::shutdown();
 	Settings::destroyInstance();
 }
 

@@ -23,7 +23,7 @@
 
 #include "sscData.h"
 
-namespace ssc
+namespace cx
 {
 /**
  * \file
@@ -33,21 +33,21 @@ namespace ssc
 
 /**\brief Base class for all Data Metrics
  *
- * Data Metrics are ssc::Data subclasses that aims to add
+ * Data Metrics are Data subclasses that aims to add
  * measurements to the system, such as points, angles and
  * distances.
  *
  * \date Aug 2, 2011
  * \author Christian Askeland, SINTEF
  */
-class DataMetric: public ssc::Data
+class DataMetric: public Data
 {
 public:
 	DataMetric(const QString& uid, const QString& name = "");
 	virtual ~DataMetric();
 
     virtual QString getSpace();
-    virtual ssc::Vector3D getRefCoord() const = 0;
+    virtual Vector3D getRefCoord() const = 0;
 	virtual QString getAsSingleLineString() const = 0;
 	virtual bool isValid() const { return true; }
 protected:

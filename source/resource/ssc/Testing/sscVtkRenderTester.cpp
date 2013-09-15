@@ -42,7 +42,7 @@ typedef vtkSmartPointer<class vtkImageClip> vtkImageClipPtr;
 
 
 
-namespace ssc
+namespace cx
 {
 
 
@@ -56,7 +56,7 @@ TestVtkRendering::TestVtkRendering()
 //	mImageErrorThreshold = 1.0;
 	mImageErrorThreshold = 100.0;
 	mBorderOffset = 2;
-	//		mView = new ssc::ViewWidget(NULL);
+	//		mView = new ViewWidget(NULL);
 	//		// set some defaults nice for testing:
 	//		this->getView()->setBackgroundColor(QColor::fromRgbF(0.1, 0.4, 0.2));
 	////		this->getView()->getRenderWindow()->SetSize(301,300);
@@ -76,7 +76,7 @@ void TestVtkRendering::setImageErrorThreshold(double value)
     mImageErrorThreshold = value;
 }
 
-//	ssc::ViewWidget* getView()
+//	ViewWidget* getView()
 //	{
 //		return mView;
 //	}
@@ -95,13 +95,13 @@ void TestVtkRendering::renderToFile(QString filename)
 
 void TestVtkRendering::alignRenderWindowWithImage(vtkImageDataPtr input)
 {
-	ssc::DoubleBoundingBox3D bounds(input->GetBounds());
+	DoubleBoundingBox3D bounds(input->GetBounds());
 	//		std::cout << "bounds " << bounds << std::endl;
 	mRenderer->ResetCamera(bounds.data());
 
 //	std::cout << "bounds " << bounds << std::endl;
-//	std::cout << "spacing " << ssc::Vector3D(input->GetSpacing()) << std::endl;
-//	std::cout << "extent " << ssc::IntBoundingBox3D(input->GetExtent()) << std::endl;
+//	std::cout << "spacing " << Vector3D(input->GetSpacing()) << std::endl;
+//	std::cout << "extent " << IntBoundingBox3D(input->GetExtent()) << std::endl;
 //	std::cout << "dim " << Eigen::Array3i(input->GetDimensions()) << std::endl;
 
 	Eigen::Array3i dim(input->GetDimensions());
@@ -121,7 +121,7 @@ void TestVtkRendering::resetCamera()
 
 vtkImageDataPtr TestVtkRendering::renderToImage()
 {
-	//		ssc::DoubleBoundingBox3D bounds(mRenderer->ComputeVisiblePropBounds());
+	//		DoubleBoundingBox3D bounds(mRenderer->ComputeVisiblePropBounds());
 	//		std::cout << "bounds " << bounds << std::endl;
 	//		mRenderer->ResetCamera(bounds.data());
 	//		bounds[1] += 1;
@@ -215,8 +215,8 @@ bool TestVtkRendering::equalExtent(vtkImageDataPtr input1, vtkImageDataPtr input
 	{
 		return true;
 	}
-	std::cout << "image1 extent: " << ssc::IntBoundingBox3D(ext1) << std::endl;
-	std::cout << "image2 extent: " << ssc::IntBoundingBox3D(ext2) << std::endl;
+	std::cout << "image1 extent: " << IntBoundingBox3D(ext1) << std::endl;
+	std::cout << "image2 extent: " << IntBoundingBox3D(ext2) << std::endl;
 	return false;
 }
 
@@ -289,4 +289,4 @@ bool TestVtkRendering::findDifference(vtkImageDataPtr input1, vtkImageDataPtr in
 	return minError < mImageErrorThreshold;
 }
 
-} // namespace ssc
+} // namespace cx

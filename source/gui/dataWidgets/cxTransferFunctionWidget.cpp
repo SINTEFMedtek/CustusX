@@ -34,7 +34,7 @@ DoubleDataAdapterImageTFDataBase::DoubleDataAdapterImageTFDataBase()
 {
 }
 
-void DoubleDataAdapterImageTFDataBase::setImageTFData(ssc::ImageTFDataPtr tfData)
+void DoubleDataAdapterImageTFDataBase::setImageTFData(ImageTFDataPtr tfData)
 {
   if (mImageTFData)
     disconnect(mImageTFData.get(), SIGNAL(changed()), this, SIGNAL(changed()));
@@ -76,12 +76,12 @@ void DoubleDataAdapterImageTFDataWindow::setValueInternal(double val)
   mImageTFData->setWindow(val);
 }
 
-ssc::DoubleRange DoubleDataAdapterImageTFDataWindow::getValueRange() const
+DoubleRange DoubleDataAdapterImageTFDataWindow::getValueRange() const
 {
   if (!mImageTFData)
-    return ssc::DoubleRange();
+    return DoubleRange();
   double range = mImageTFData->getScalarMax()-mImageTFData->getScalarMin();
-  return ssc::DoubleRange(1,range,range/1000.0);
+  return DoubleRange(1,range,range/1000.0);
 }
 
 //---------------------------------------------------------
@@ -98,14 +98,14 @@ void DoubleDataAdapterImageTFDataLevel::setValueInternal(double val)
   mImageTFData->setLevel(val);
 }
 
-ssc::DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
+DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
 {
   if (!mImageTFData)
-    return ssc::DoubleRange();
+    return DoubleRange();
 
   double max = mImageTFData->getScalarMax();
   double min = mImageTFData->getScalarMin();
-  return ssc::DoubleRange(min,max,1);
+  return DoubleRange(min,max,1);
 }
 
 //---------------------------------------------------------
@@ -119,14 +119,14 @@ void DoubleDataAdapterImageTFDataLLR::setValueInternal(double val)
 {
   mImageTFData->setLLR(val);
 }
-ssc::DoubleRange DoubleDataAdapterImageTFDataLLR::getValueRange() const
+DoubleRange DoubleDataAdapterImageTFDataLLR::getValueRange() const
 {
   if (!mImageTFData)
-    return ssc::DoubleRange();
+    return DoubleRange();
 
   double max = mImageTFData->getScalarMax();
   double min = mImageTFData->getScalarMin();
-  return ssc::DoubleRange(min,max,(max-min)/1000.0);
+  return DoubleRange(min,max,(max-min)/1000.0);
 }
 
 //---------------------------------------------------------
@@ -140,13 +140,13 @@ void DoubleDataAdapterImageTFDataAlpha::setValueInternal(double val)
 {
   mImageTFData->setAlpha(val);
 }
-ssc::DoubleRange DoubleDataAdapterImageTFDataAlpha::getValueRange() const
+DoubleRange DoubleDataAdapterImageTFDataAlpha::getValueRange() const
 {
   if (!mImageTFData)
-    return ssc::DoubleRange();
+    return DoubleRange();
 
   double max = 1.0;
-  return ssc::DoubleRange(0,max,max/100.0);
+  return DoubleRange(0,max,max/100.0);
 }
 
 //---------------------------------------------------------
@@ -178,10 +178,10 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
 
 //  QGridLayout* gridLayout = new QGridLayout;
 //  mLayout->addLayout(gridLayout);
-//  new ssc::SliderGroupWidget(this, mDataWindow, gridLayout, 0);
-//  new ssc::SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
-//  new ssc::SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
-//  new ssc::SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
+//  new SliderGroupWidget(this, mDataWindow, gridLayout, 0);
+//  new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
+//  new SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
+//  new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(mLayout);
 }
@@ -197,8 +197,8 @@ QString TransferFunction3DWidget::defaultWhatsThis() const
 
 void TransferFunction3DWidget::activeImageChangedSlot()
 {
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  ssc::ImageTFDataPtr tf;
+  ImagePtr image = dataManager()->getActiveImage();
+  ImageTFDataPtr tf;
   if (image)
     tf = image->getTransferFunctions3D();
   else
@@ -244,10 +244,10 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
 
   QGridLayout* gridLayout = new QGridLayout;
   mLayout->addLayout(gridLayout);
-  new ssc::SliderGroupWidget(this, mDataWindow, gridLayout, 0);
-  new ssc::SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
-  new ssc::SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
-  new ssc::SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
+  new SliderGroupWidget(this, mDataWindow, gridLayout, 0);
+  new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
+  new SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
+  new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(mLayout);
 }
@@ -263,8 +263,8 @@ QString TransferFunction2DWidget::defaultWhatsThis() const
 
 void TransferFunction2DWidget::activeImageChangedSlot()
 {
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  ssc::ImageTFDataPtr tf;
+  ImagePtr image = dataManager()->getActiveImage();
+  ImageTFDataPtr tf;
   if (image)
     tf = image->getLookupTable2D();
   else

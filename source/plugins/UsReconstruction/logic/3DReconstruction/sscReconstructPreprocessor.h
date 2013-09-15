@@ -25,7 +25,7 @@
 #include "sscReconstructCore.h"
 #include "cxUSReconstructInputData.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
 
@@ -55,8 +55,8 @@ private:
     void cropInputData();
     void updateFromOriginalFileData();
     void findExtentAndOutputTransform();
-    ssc::Transform3D applyOutputOrientation();
-    std::vector<ssc::Vector3D> generateInputRectangle();
+    Transform3D applyOutputOrientation();
+    std::vector<Vector3D> generateInputRectangle();
 //	void transformPositionsTo_prMu(USReconstructInputData *data);
     void interpolatePositions();
 	void interpolatePositions2();
@@ -75,6 +75,6 @@ private:
     OutputVolumeParams mOutputVolumeParams;
 };
 
-} /* namespace ssc */
+} /* namespace cx */
 
 #endif // SSCRECONSTRUCTPREPROCESSOR_H

@@ -22,7 +22,7 @@
 
 #include "sscReconstructAlgorithm.h"
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -76,5 +76,5 @@ private:
  */
 
 
-}//namespace ssc
+}//namespace cx
 #endif //SSCPNNRECONSTRUCTALGORITHM_H_

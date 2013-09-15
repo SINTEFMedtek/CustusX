@@ -24,7 +24,7 @@
 #include "sscVtkRenderTester.h"
 #include "sscProbeData.h"
 
-/** Tests for class ssc::VideoGraphics
+/** Tests for class VideoGraphics
   *
   * \date april 29, 2013
   * \author christiana
@@ -56,10 +56,10 @@ public:
 private:
 	void renderImageAndCompareToExpected(vtkImageDataPtr input, vtkImageDataPtr expected);
 	vtkImageDataPtr  readImageData(QString filename, QString description);
-	ssc::ProbeData readProbeData(QString filename);
+	cx::ProbeData readProbeData(QString filename);
 	void addImageToRenderer(vtkImageDataPtr image);
-	ssc::TestVtkRenderingPtr mMachine;
-	ssc::VideoGraphicsPtr mVideoGraphics;
+	cx::TestVtkRenderingPtr mMachine;
+	cx::VideoGraphicsPtr mVideoGraphics;
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestVideoGraphics );
 

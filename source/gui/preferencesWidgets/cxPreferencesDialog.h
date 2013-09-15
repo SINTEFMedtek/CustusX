@@ -120,9 +120,9 @@ protected:
 //  QCheckBox* mGPU3DDepthPeelingCheckBox;
   QCheckBox* mShadingCheckBox;
   QGridLayout *mMainLayout;
-  ssc::DoubleDataAdapterXmlPtr mMaxRenderSize;
-  ssc::DoubleDataAdapterXmlPtr mStillUpdateRate;
-  ssc::StringDataAdapterXmlPtr m3DVisualizer;
+  DoubleDataAdapterXmlPtr mMaxRenderSize;
+  DoubleDataAdapterXmlPtr mStillUpdateRate;
+  StringDataAdapterXmlPtr m3DVisualizer;
 
 private slots:
   void renderingIntervalSlot(int interval);
@@ -142,16 +142,16 @@ signals:
 
 protected:
   QGridLayout *mMainLayout;
-  ssc::DoubleDataAdapterXmlPtr mSphereRadius;
-  ssc::DoubleDataAdapterXmlPtr mLabelSize;
-  ssc::BoolDataAdapterXmlPtr mShowDataText;
-  ssc::BoolDataAdapterXmlPtr mShowLabels;
-  ssc::StringDataAdapterXmlPtr mAnnotationModel;
-  ssc::DoubleDataAdapterXmlPtr mAnnotationModelSize;
+  DoubleDataAdapterXmlPtr mSphereRadius;
+  DoubleDataAdapterXmlPtr mLabelSize;
+  BoolDataAdapterXmlPtr mShowDataText;
+  BoolDataAdapterXmlPtr mShowLabels;
+  StringDataAdapterXmlPtr mAnnotationModel;
+  DoubleDataAdapterXmlPtr mAnnotationModelSize;
 
   //Stereo
   QComboBox* mStereoTypeComboBox;
-  ssc::DoubleDataAdapterXmlPtr mEyeAngleAdapter;
+  DoubleDataAdapterXmlPtr mEyeAngleAdapter;
   QActionGroup* mStereoTypeActionGroup;
   void initStereoTypeComboBox();
 
@@ -196,7 +196,7 @@ protected:
   QCheckBox* mAutoSaveCheckBox;
   QCheckBox* mAutoShowNewDataCheckBox;
   QCheckBox* mAutoLoadPatientCheckBox;
-  ssc::DoubleDataAdapterXmlPtr mAutoLoadPatientWithinHours;
+  DoubleDataAdapterXmlPtr mAutoLoadPatientWithinHours;
   QVBoxLayout *mMainLayout;
 };
 

@@ -28,7 +28,7 @@
 #include <QtGui>
 #include "sscVector3D.h"
 
-namespace ssc
+namespace cx
 {
 
 MousePadWidgetInternal::MousePadWidgetInternal(QWidget* parent, QSize minimumSize) :

@@ -25,7 +25,7 @@
 #include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 
@@ -42,7 +42,7 @@ typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
  * \ingroup sscRep3D
  * \ingroup sscRepVideo
  */
-class DisplayTextRep : public ssc::RepImpl
+class DisplayTextRep : public RepImpl
 {
 public:
 	static DisplayTextRepPtr New(const QString& uid, const QString& name);
@@ -55,8 +55,8 @@ public:
 
 protected:
 	DisplayTextRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 	std::vector<TextDisplayPtr> mDisplayText;
 };

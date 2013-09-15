@@ -8,7 +8,7 @@
 #include "sscImage.h"
 #include "vtkImageData.h"
 
-namespace ssc
+namespace cx
 {
 
 QString CoordinateSystem::toString() const
@@ -96,9 +96,9 @@ Vector3D CoordinateSystemHelpers::getDominantToolTipPoint(CoordinateSystem to, b
     Transform3D toMfrom = CoordinateSystemHelpers::getDominantToolTipTransform(to, useOffset);
     return toMfrom.coord(Vector3D(0,0,0));
 
-//    ToolPtr tool = ssc::toolManager()->getDominantTool();
+//    ToolPtr tool = toolManager()->getDominantTool();
 //	if (!tool)
-//		return ssc::Vector3D(0,0,0);
+//		return Vector3D(0,0,0);
 ////
 ////	QString dominantToolUid = tool->getUid();
 ////
@@ -129,7 +129,7 @@ CoordinateSystem CoordinateSystemHelpers::getToolCoordinateSystem(ToolPtr tool)
   */
 Transform3D CoordinateSystemHelpers::getDominantToolTipTransform(CoordinateSystem to, bool useOffset)
 {
-	ToolPtr tool = ssc::toolManager()->getDominantTool();
+	ToolPtr tool = toolManager()->getDominantTool();
 	if (!tool)
 		return Transform3D::Identity();
 
@@ -186,77 +186,77 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from)
 	return rMfrom;
 }
 
-ssc::CoordinateSystem CoordinateSystemHelpers::getS(ssc::ToolPtr tool)
+CoordinateSystem CoordinateSystemHelpers::getS(ToolPtr tool)
 {
-	ssc::CoordinateSystem retval(csCOUNT);
+	CoordinateSystem retval(csCOUNT);
 	if (!tool)
 		return retval;
 
-	retval.mId = ssc::csSENSOR;
+	retval.mId = csSENSOR;
 	retval.mRefObject = tool->getUid();
 
 	return retval;
 }
 
-ssc::CoordinateSystem CoordinateSystemHelpers::getT(ssc::ToolPtr tool)
+CoordinateSystem CoordinateSystemHelpers::getT(ToolPtr tool)
 {
-	ssc::CoordinateSystem retval(csCOUNT);
+	CoordinateSystem retval(csCOUNT);
 	if (!tool)
 		return retval;
 
-	ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+	ToolPtr refTool = toolManager()->getReferenceTool();
 	if (refTool && (tool == refTool))
 	{
-		retval.mId = ssc::csPATIENTREF;
+		retval.mId = csPATIENTREF;
 	}
 	else
-		retval.mId = ssc::csTOOL;
+		retval.mId = csTOOL;
 
 	retval.mRefObject = tool->getUid();
 
 	return retval;
 }
 
-ssc::CoordinateSystem CoordinateSystemHelpers::getTO(ssc::ToolPtr tool)
+CoordinateSystem CoordinateSystemHelpers::getTO(ToolPtr tool)
 {
-	ssc::CoordinateSystem retval(csCOUNT);
+	CoordinateSystem retval(csCOUNT);
 	if (!tool)
 		return retval;
 
-	ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+	ToolPtr refTool = toolManager()->getReferenceTool();
 	if (refTool && (tool == refTool))
 	{
-		retval.mId = ssc::csPATIENTREF;
+		retval.mId = csPATIENTREF;
 	}
 	else
-		retval.mId = ssc::csTOOL_OFFSET;
+		retval.mId = csTOOL_OFFSET;
 
 	retval.mRefObject = tool->getUid();
 
 	return retval;
 }
 
-ssc::CoordinateSystem CoordinateSystemHelpers::getD(ssc::DataPtr data)
+CoordinateSystem CoordinateSystemHelpers::getD(DataPtr data)
 {
-	ssc::CoordinateSystem retval(csCOUNT);
+	CoordinateSystem retval(csCOUNT);
 	if (!data)
 		return retval;
 
-	retval.mId = ssc::csDATA;
+	retval.mId = csDATA;
 	retval.mRefObject = data->getUid();
 
 	return retval;
 }
 
-ssc::CoordinateSystem CoordinateSystemHelpers::getPr()
+CoordinateSystem CoordinateSystemHelpers::getPr()
 {
-	CoordinateSystem pr(ssc::csPATIENTREF);
+	CoordinateSystem pr(csPATIENTREF);
 	return pr;
 }
 
-ssc::CoordinateSystem CoordinateSystemHelpers::getR()
+CoordinateSystem CoordinateSystemHelpers::getR()
 {
-	CoordinateSystem pr(ssc::csREF);
+	CoordinateSystem pr(csREF);
 	return pr;
 }
 
@@ -293,10 +293,10 @@ Transform3D CoordinateSystemHelpers::get_rMdv(QString uid)
 		return Transform3D::Identity();
 	}
 
-	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if (!image)
 		return data->get_rMd();
-	return data->get_rMd()*ssc::createTransformScale(ssc::Vector3D(image->getBaseVtkImageData()->GetSpacing())); // ref_M_d
+	return data->get_rMd()*createTransformScale(Vector3D(image->getBaseVtkImageData()->GetSpacing())); // ref_M_d
 }
 
 Transform3D CoordinateSystemHelpers::get_rMpr()
@@ -361,4 +361,4 @@ Transform3D CoordinateSystemHelpers::get_rMs(QString uid)
 	return rMs; //ref_M_s
 }
 
-} //namespace ssc
+} //namespace cx

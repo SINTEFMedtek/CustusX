@@ -15,14 +15,14 @@
 #include "catch.hpp"
 #include "sscDataManagerImpl.h"
 
-TEST_CASE("sscDataManagerImpl setup/shutdown works multiple times", "[unit]")
+TEST_CASE("DataManagerImpl setup/shutdown works multiple times", "[unit]")
 {
     for (unsigned i=0; i<2; ++i)
     {
-        ssc::DataManagerImpl::initialize();
-        CHECK(ssc::dataManager());
+		cx::DataManagerImpl::initialize();
+		CHECK(cx::dataManager());
 
-        ssc::DataManagerImpl::shutdown();
-        //REQUIRE_FALSE(ssc::dataManager()); //todo: should work
+		cx::DataManagerImpl::shutdown();
+        //REQUIRE_FALSE(dataManager()); //todo: should work
     }
 }

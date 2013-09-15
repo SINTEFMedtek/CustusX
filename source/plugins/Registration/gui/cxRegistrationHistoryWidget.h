@@ -60,7 +60,7 @@ private:
   void setActiveTime(QDateTime active);
   TimeMap::iterator findCurrentActiveIter(TimeMap& times);
   QFrame* mGroup;
-  std::vector<ssc::RegistrationHistoryPtr> mHistories;
+  std::vector<RegistrationHistoryPtr> mHistories;
   QAction* mRewindAction;
   QAction* mRemoveAction;
   QAction* mForwardAction;
@@ -71,8 +71,8 @@ private:
   QLabel* mInFrontLabel;
   QTextEdit* mTextEdit;
 
-  std::vector<ssc::RegistrationHistoryPtr> getAllRegistrationHistories();
-  std::vector<ssc::RegistrationTransform> mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories);
+  std::vector<RegistrationHistoryPtr> getAllRegistrationHistories();
+  std::vector<RegistrationTransform> mergeHistory(const std::vector<RegistrationHistoryPtr>& allHistories);
 };
 
 /**

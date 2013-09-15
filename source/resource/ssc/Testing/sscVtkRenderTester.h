@@ -20,7 +20,7 @@
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 
-namespace ssc
+namespace cx
 {
 
 
@@ -37,7 +37,7 @@ public:
 	static TestVtkRenderingPtr create();
 
 	TestVtkRendering();
-//	ssc::ViewWidget* getView();
+//	ViewWidget* getView();
 	void addProp(vtkPropPtr prop);
 	void renderToFile(QString filename);
 
@@ -60,13 +60,13 @@ private:
 	vtkImageDataPtr convertToColorImage(vtkImageDataPtr image);
 	bool equalNumberOfComponents(vtkImageDataPtr image1, vtkImageDataPtr image2);
 
-	//	ssc::ViewWidget* mView;
+	//	ViewWidget* mView;
 	vtkRenderWindowPtr mRenderWindow;
 	vtkRendererPtr mRenderer;
 	double mImageErrorThreshold;
 	int mBorderOffset;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif // SSCVTKRENDERTESTER_H

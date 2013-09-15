@@ -31,7 +31,7 @@
 //---------------------------------------------------------
 class TestGPURayCaster;
 
-namespace ssc
+namespace cx
 {
 
 #ifndef WIN32
@@ -56,9 +56,9 @@ public:
 
 	void setShaderFolder(QString folder);
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
-	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer, double maxValue);
-	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
-	void set_nMr(int index, ssc::Transform3D nMr);
+	void SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer, double maxValue);
+	void SetLutBuffer(int index, GPUImageLutBufferPtr buffer);
+	void set_nMr(int index, Transform3D nMr);
 	void setClipper(SlicePlaneClipperPtr clipper);
 	void setClipVolume(int index, bool clip);
 	void setStepSize(double stepsize);

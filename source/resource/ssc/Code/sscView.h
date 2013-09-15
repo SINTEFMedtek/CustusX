@@ -29,7 +29,7 @@ class QColor;
 
 #include "sscTransform3D.h"
 
-namespace ssc
+namespace cx
 {
 class DoubleBoundingBox3D;
 typedef boost::shared_ptr<class Rep> RepPtr;
@@ -92,8 +92,8 @@ public:
 	double getZoomFactor() const;
 	Transform3D get_vpMs() const;
 	double mmPerPix() const;
-	ssc::DoubleBoundingBox3D getViewport() const;
-	ssc::DoubleBoundingBox3D getViewport_s() const;
+	DoubleBoundingBox3D getViewport() const;
+	DoubleBoundingBox3D getViewport_s() const;
 
 	QWidget *widget() const { return mParent; }
 	void forceUpdate() { mMTimeHash = 0; }
@@ -167,6 +167,6 @@ private:
 };
 typedef boost::shared_ptr<View> ViewPtr;
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCVIEW_H_*/

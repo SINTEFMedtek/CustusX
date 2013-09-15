@@ -50,9 +50,9 @@ private:
 	void showAdvanced();
 	QHBoxLayout* mLayout;
 
-	ssc::StringDataAdapterXmlPtr mSpaceSelector;
-	ssc::CoordinateSystemListenerPtr mListener;
-//    ssc::Vector3DDataAdapterXmlPtr mCoordinate;
+	StringDataAdapterXmlPtr mSpaceSelector;
+	CoordinateSystemListenerPtr mListener;
+//    Vector3DDataAdapterXmlPtr mCoordinate;
 	DominantToolProxyPtr mActiveTool;
 	QLineEdit* mCoordLineEdit;
 	QAction* mAdvancedAction;

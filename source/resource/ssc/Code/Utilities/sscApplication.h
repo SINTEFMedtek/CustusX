@@ -21,7 +21,7 @@
 
 #include <QApplication>
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -44,6 +44,6 @@ private:
 	void reportException(QString text);
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif // SSCAPPLICATION_H

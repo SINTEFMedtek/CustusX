@@ -23,18 +23,18 @@
 #include "sscToolManager.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
-ssc::DataPtr PointMetricReader::load(const QString& uid, const QString& filename)
+DataPtr PointMetricReader::load(const QString& uid, const QString& filename)
 {
-	return ssc::DataPtr(new PointMetric(uid, filename));
+	return DataPtr(new PointMetric(uid, filename));
 }
 
 PointMetric::PointMetric(const QString& uid, const QString& name) :
 	DataMetric(uid, name),
 	mCoordinate(0,0,0),
-	mSpace(ssc::SpaceHelpers::getR())
+	mSpace(SpaceHelpers::getR())
 {
 	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
@@ -56,7 +56,7 @@ PointMetric::~PointMetric()
 {
 }
 
-void PointMetric::setCoordinate(const ssc::Vector3D& p)
+void PointMetric::setCoordinate(const Vector3D& p)
 {
 	if (p == mCoordinate)
 		return;
@@ -65,25 +65,25 @@ void PointMetric::setCoordinate(const ssc::Vector3D& p)
 	emit transformChanged();
 }
 
-ssc::Vector3D PointMetric::getCoordinate() const
+Vector3D PointMetric::getCoordinate() const
 {
 	return mCoordinate;
 }
 
-void PointMetric::setSpace(ssc::CoordinateSystem space)
+void PointMetric::setSpace(CoordinateSystem space)
 {
 	if (space == mSpace)
 		return;
 
 	// keep the absolute position (in ref) constant when changing space.
-	ssc::Transform3D new_M_old = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), space);
+	Transform3D new_M_old = SpaceHelpers::get_toMfrom(this->getSpace(), space);
 	mCoordinate = new_M_old.coord(mCoordinate);
 
 	mSpace = space;
 	mSpaceListener->setSpace(space);
 }
 
-ssc::CoordinateSystem PointMetric::getSpace() const
+CoordinateSystem PointMetric::getSpace() const
 {
 	return mSpace;
 }
@@ -100,25 +100,25 @@ void PointMetric::parseXml(QDomNode& dataNode)
 {
 	Data::parseXml(dataNode);
 
-	this->setSpace(ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
-	this->setCoordinate(ssc::Vector3D::fromString(dataNode.toElement().attribute("coord", qstring_cast(mCoordinate))));
+	this->setSpace(CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
+	this->setCoordinate(Vector3D::fromString(dataNode.toElement().attribute("coord", qstring_cast(mCoordinate))));
 }
 
-ssc::DoubleBoundingBox3D PointMetric::boundingBox() const
+DoubleBoundingBox3D PointMetric::boundingBox() const
 {
 	// convert both inputs to r space
-	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-	ssc::Vector3D p0_r = rM0.coord(this->getCoordinate());
+	Transform3D rM0 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Vector3D p0_r = rM0.coord(this->getCoordinate());
 
-	return ssc::DoubleBoundingBox3D(p0_r, p0_r);
+	return DoubleBoundingBox3D(p0_r, p0_r);
 }
 
 /** Utility function: return the coordinate the the reference space.
  *
  */
-ssc::Vector3D PointMetric::getRefCoord() const
+Vector3D PointMetric::getRefCoord() const
 {
-	ssc::Transform3D rM1 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+	Transform3D rM1 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 	return rM1.coord(this->getCoordinate());
 }
 

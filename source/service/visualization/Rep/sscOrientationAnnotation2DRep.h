@@ -23,7 +23,7 @@
 #include "sscTransform3D.h"
 #include <vector>
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
@@ -40,7 +40,7 @@ typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
  *  Superior - Inferior
  * are used. Combinations of the letters are used for oblique angles.
  */
-class OrientationAnnotationSmartRep: public ssc::RepImpl
+class OrientationAnnotationSmartRep: public RepImpl
 {
 Q_OBJECT
 public:
@@ -48,7 +48,7 @@ public:
 	virtual ~OrientationAnnotationSmartRep();
 	virtual QString getType() const	{ return "vm::OrientationAnnotationSmartRep"; }
 
-	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	void setSliceProxy(SliceProxyPtr slicer);
 	/**The maximum angular deviation from a major axis
 	 * for annotation to be displayed.
 	 */
@@ -60,17 +60,17 @@ private slots:
 	void transformChangedSlot();
 protected:
 	OrientationAnnotationSmartRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(View* view);
+	virtual void removeRepActorsFromViewRenderer(View* view);
 
-	QString determineAnnotation(ssc::Vector3D planeDir_s, ssc::Transform3D rMs);
+	QString determineAnnotation(Vector3D planeDir_s, Transform3D rMs);
 	void createAnnotation();
 
 	double mAngle;
 	SliceProxyPtr mSlicer;
 	OrientationAnnotationPtr mOrientation;
-	std::map<QString, ssc::Vector3D> mDCMDirections_r; ///< directions of DICOM labels APSILR
-	std::vector<ssc::Vector3D> mPlaneDirections_s; ///< the four directions in the slice plane
+	std::map<QString, Vector3D> mDCMDirections_r; ///< directions of DICOM labels APSILR
+	std::vector<Vector3D> mPlaneDirections_s; ///< the four directions in the slice plane
 };
 
 }

@@ -24,7 +24,7 @@
 #include "sscVolumetricRep.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 // forward declarations
 typedef boost::shared_ptr<class Image> ImagePtr;
@@ -53,7 +53,7 @@ public:
 	virtual ~ProgressiveLODVolumetricRep();
 
 	static ProgressiveLODVolumetricRepPtr New(QString uid="") { return wrap_new(new ProgressiveLODVolumetricRep(), uid); }
-	virtual QString getType() const { return "ssc::ProgressiveLODVolumetricRep"; }
+	virtual QString getType() const { return "ProgressiveLODVolumetricRep"; }
 	virtual void setImage(ImagePtr image);
 	virtual ImagePtr getImage();
 	virtual bool hasImage(ImagePtr image) const;
@@ -87,6 +87,6 @@ private slots:
 	void volumetricThreadFinishedSlot();
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCPROGRESSIVELODVOLUMEREP_H_*/

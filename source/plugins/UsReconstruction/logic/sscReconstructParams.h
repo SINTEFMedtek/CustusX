@@ -17,7 +17,7 @@
 #include "sscXmlOptionItem.h"
 #include "cxForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -29,7 +29,7 @@ namespace ssc
 /** \brief Collection of reconstruction parameters.
  *
  * These parameters are used by the ReconstructionManager, the core reconstruction
- * use the ssc::ReconstructCore::InputParams instead.
+ * use the ReconstructCore::InputParams instead.
  */
 class ReconstructParams : public QObject
 {

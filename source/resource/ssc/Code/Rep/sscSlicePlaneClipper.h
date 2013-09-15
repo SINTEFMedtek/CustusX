@@ -29,7 +29,7 @@
 #include "sscVector3D.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
 
@@ -49,12 +49,12 @@ class SlicePlaneClipper : public QObject
 {
 	Q_OBJECT
 public:
-	typedef std::set<ssc::VolumetricBaseRepPtr> VolumesType;
+	typedef std::set<VolumetricBaseRepPtr> VolumesType;
 
 	static SlicePlaneClipperPtr New();
 	~SlicePlaneClipper();
-	void setSlicer(ssc::SliceProxyPtr slicer);
-	ssc::SliceProxyPtr getSlicer();
+	void setSlicer(SliceProxyPtr slicer);
+	SliceProxyPtr getSlicer();
 	void setInvertPlane(bool on);
 	bool getInvertPlane() const;
 	vtkPlanePtr getClipPlaneCopy();
@@ -65,13 +65,13 @@ public:
 private:
 	SlicePlaneClipper();
 	void updateClipPlane();
-	ssc::Vector3D getUnitNormal() const;
-	ssc::SliceProxyPtr mSlicer;
+	Vector3D getUnitNormal() const;
+	SliceProxyPtr mSlicer;
 	bool mInvertPlane;
 
 	vtkPlanePtr mClipPlane;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCSLICEPLANECLIPPER_H_ */

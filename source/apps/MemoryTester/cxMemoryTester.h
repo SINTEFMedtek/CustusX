@@ -61,6 +61,6 @@ private:
 };
 
 
-}  // namespace ssc
+}  // namespace cx
 
 #endif // CXMEMORYTESTER_H_

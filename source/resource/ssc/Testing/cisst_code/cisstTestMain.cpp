@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
 #if defined(ONLY_HEADLESS_TESTS)
         QCoreApplication app(argc, argv); /// added by sonowand - needed to run Qt Code.
 #else
-		ssc::Application app(argc, argv); /// custom app handling exceptions
+		cx::Application app(argc, argv); /// custom app handling exceptions
 //    	QApplication app(argc, argv); /// added by sonowand - needed to run Qt Code.
 #endif
     	

@@ -25,7 +25,7 @@
 #include "sscPointMetric.h"
 #include "sscDataManagerImpl.h"
 
-namespace ssc
+namespace cx
 {
 /**
  * \file
@@ -35,12 +35,12 @@ namespace ssc
 
 typedef boost::shared_ptr<class AngleMetric> AngleMetricPtr;
 
-/** \brief ssc::DataReader implementation for AngleMetric
+/** \brief DataReader implementation for AngleMetric
  *
  * \date Jul 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class AngleMetricReader: public ssc::DataReader
+class AngleMetricReader: public DataReader
 {
 public:
 	virtual ~AngleMetricReader()
@@ -50,7 +50,7 @@ public:
 	{
 		return type == "angleMetric";
 	}
-	virtual ssc::DataPtr load(const QString& uid, const QString& filename);
+	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
 /**\brief Data class that represents an angle between two lines.
@@ -74,19 +74,19 @@ public:
     static AngleMetricPtr create(QString uid, QString name="");
 
 	double getAngle() const;
-	std::vector<ssc::Vector3D> getEndpoints() const;
+	std::vector<Vector3D> getEndpoints() const;
 
 	unsigned getArgumentCount() const;
-	void setArgument(int index, ssc::DataPtr p);
-	ssc::DataPtr getArgument(int index);
-	bool validArgument(ssc::DataPtr p) const;
+	void setArgument(int index, DataPtr p);
+	DataPtr getArgument(int index);
+	bool validArgument(DataPtr p) const;
     virtual bool isValid() const;
 	virtual QString getAsSingleLineString() const;
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
-	virtual ssc::DoubleBoundingBox3D boundingBox() const;
-    virtual ssc::Vector3D getRefCoord() const;
+	virtual DoubleBoundingBox3D boundingBox() const;
+    virtual Vector3D getRefCoord() const;
     virtual QString getType() const
 	{
 		return "angleMetric";

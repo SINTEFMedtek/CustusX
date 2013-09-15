@@ -45,10 +45,10 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * Links the navigation to the physical world. Devices with a physical position
  * are realized by tracking hardware.
  *
- * The tracking module is an implementation of the ssc::Tool module.
+ * The tracking module is an implementation of the Tool module.
  * ToolManager and Tool are implemented using IGSTK, and communicates with
  * the Polaris and Aurora tracking systems. All interaction with the module
- * should go through the SSC interfaces. The ssc::ToolManager should be
+ * should go through the SSC interfaces. The ToolManager should be
  * considered equal to the \ref cxServiceTracking.
  *
  * \image html cxArchitecture_tracking.png "Tracking Service Implementation."
@@ -65,7 +65,7 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
-class cxToolManager: public ssc::ToolManager
+class cxToolManager: public ToolManager
 {
 Q_OBJECT
 
@@ -80,28 +80,28 @@ public:
 	virtual bool isTracking() const; ///< checks if the system is tracking
 	bool         isPlaybackMode() const { return mPlayBackMode; }
 
-	virtual ssc::ToolManager::ToolMapPtr getConfiguredTools(); ///< get all configured, but not initialized tools
-	virtual ssc::ToolManager::ToolMapPtr getInitializedTools(); ///< get all initialized tools
-	virtual ssc::ToolManager::ToolMapPtr getTools(); ///< get all configured and initialized tools
-	virtual ssc::ToolPtr getTool(const QString& uid); ///< get a specific tool
+	virtual ToolManager::ToolMapPtr getConfiguredTools(); ///< get all configured, but not initialized tools
+	virtual ToolManager::ToolMapPtr getInitializedTools(); ///< get all initialized tools
+	virtual ToolManager::ToolMapPtr getTools(); ///< get all configured and initialized tools
+	virtual ToolPtr getTool(const QString& uid); ///< get a specific tool
 	virtual void setTooltipOffset(double offset); ///< set the tool tip offset
 	virtual double getTooltipOffset() const; ///< get the tool tip offset
 
-	virtual ssc::ToolPtr getDominantTool(); ///< get the dominant tool
+	virtual ToolPtr getDominantTool(); ///< get the dominant tool
 	virtual void setDominantTool(const QString& uid); ///< can be set to either a connected or configured tool
 
-	void setClinicalApplication(ssc::CLINICAL_APPLICATION application);
+	void setClinicalApplication(CLINICAL_APPLICATION application);
 
 	virtual std::map<QString, QString> getToolUidsAndNames() const; ///< both from configured and connected tools
 	virtual std::vector<QString> getToolNames() const; ///< both from configured and connected tools
 	virtual std::vector<QString> getToolUids() const; ///< both from configured and connected tools
 
-	virtual ssc::Transform3DPtr get_rMpr() const; ///< get the patient registration transform
-	virtual void set_rMpr(const ssc::Transform3DPtr& val); ///<  set the transform from patient to reference space
+	virtual Transform3DPtr get_rMpr() const; ///< get the patient registration transform
+	virtual void set_rMpr(const Transform3DPtr& val); ///<  set the transform from patient to reference space
 
-	virtual ssc::RegistrationHistoryPtr get_rMpr_History();
+	virtual RegistrationHistoryPtr get_rMpr_History();
 
-	virtual ssc::ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
+	virtual ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
 
 	virtual void savePositionHistory();
 	virtual void loadPositionHistory();
@@ -112,16 +112,16 @@ public:
 	void parseXml(QDomNode& dataNode); ///< read internal state from node
 	virtual void clear(); ///< clear everything loaded from xml
 
-	ssc::ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
-	virtual ssc::LandmarkMap getLandmarks();
-	virtual void setLandmark(ssc::Landmark landmark);
+	ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
+	virtual LandmarkMap getLandmarks();
+	virtual void setLandmark(Landmark landmark);
 	virtual void removeLandmark(QString uid);
 	virtual void removeLandmarks();
 
-	virtual ssc::SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
+	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
-	void runDummyTool(ssc::DummyToolPtr tool);
-	ssc::ToolPtr findFirstProbe();
+	void runDummyTool(DummyToolPtr tool);
+	ToolPtr findFirstProbe();
 
 	void setPlaybackMode(PlaybackTimePtr controller);
 
@@ -161,21 +161,21 @@ private:
 	QString mConfigurationFilePath; ///< path to the configuration file
 	QString mLoggingFolder; ///< path to where logging should be saved
 
-	ssc::CLINICAL_APPLICATION mApplication; ///< Current clinical application
-	ssc::ToolManager::ToolMap mTools; ///< all tools
+	CLINICAL_APPLICATION mApplication; ///< Current clinical application
+	ToolManager::ToolMap mTools; ///< all tools
 
-	ssc::ToolPtr mDominantTool; ///< the tool with highest priority
-	ssc::ToolPtr mReferenceTool; ///< the tool which is used as patient reference tool
+	ToolPtr mDominantTool; ///< the tool with highest priority
+	ToolPtr mReferenceTool; ///< the tool which is used as patient reference tool
 	ManualToolAdapterPtr mManualTool; ///< a mouse-controllable virtual tool that is available even when not tracking.
 
-	ssc::RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
+	RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
 
 	bool mConfigured; ///< whether or not the system is configured
 	bool mInitialized; ///< whether or not the system is initialized
 	bool mTracking; ///< whether or not the system is tracking
 	bool mPlayBackMode; ///< special mode: all tools are displaying historic positions.
 
-	ssc::LandmarkMap mLandmarks; ///< in space patient reference.
+	LandmarkMap mLandmarks; ///< in space patient reference.
 	double mLastLoadPositionHistory;
 
 	IgstkTrackerThreadPtr mTrackerThread;
@@ -193,7 +193,7 @@ private:
 #endif //WIN32
 };
 
-bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2); ///< function for sorting tools by type
+bool toolTypeSort(const ToolPtr tool1, const ToolPtr tool2); ///< function for sorting tools by type
 
 /**
  * @}

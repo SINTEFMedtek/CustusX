@@ -16,9 +16,9 @@ TestTransferFunctionColorWidget::TestTransferFunctionColorWidget() :
 
 void TestTransferFunctionColorWidget::initWithTestData()
 {
-	vtkImageDataPtr dummyImageData = ssc::Image::createDummyImageData(2, 1);
-	ssc::ImagePtr dummyImage(new ssc::Image("DummyImage", dummyImageData));
-	ssc::ImageTFDataPtr transferFunction;
+	vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(2, 1);
+	cx::ImagePtr dummyImage(new cx::Image("DummyImage", dummyImageData));
+	cx::ImageTFDataPtr transferFunction;
 	transferFunction = dummyImage->getTransferFunctions3D();
 	this->setData(dummyImage, transferFunction);
 	this->calculateColorTFBoundaries(

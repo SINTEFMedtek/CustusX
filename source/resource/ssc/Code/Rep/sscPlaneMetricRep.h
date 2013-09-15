@@ -25,7 +25,7 @@
 #include "sscPlaneMetric.h"
 #include "sscViewportListener.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class PlaneMetricRep> PlaneMetricRepPtr;
@@ -46,11 +46,11 @@ public:
 	virtual ~PlaneMetricRep() {}
 
 //	void setMetric(PlaneMetricPtr point);
-	virtual QString getType() const { return "ssc::PlaneMetricRep"; }
+	virtual QString getType() const { return "PlaneMetricRep"; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
     virtual void clear();
 
 protected slots:
@@ -62,11 +62,11 @@ private:
 
 	void rescale();
 
-	ssc::GraphicalPoint3DPtr mGraphicalPoint;
-	ssc::GraphicalArrow3DPtr mNormal;
-	ssc::Rect3DPtr mRect;
+	GraphicalPoint3DPtr mGraphicalPoint;
+	GraphicalArrow3DPtr mNormal;
+	Rect3DPtr mRect;
 	PlaneMetricPtr mMetric;
-	ssc::ViewportListenerPtr mViewportListener;
+	ViewportListenerPtr mViewportListener;
 };
 
 }

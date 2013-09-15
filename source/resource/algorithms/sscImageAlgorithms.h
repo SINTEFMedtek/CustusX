@@ -25,7 +25,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscBoundingBox3D.h"
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -49,7 +49,7 @@ ImagePtr duplicateImage(ImagePtr image);
  */
 QDateTime extractTimestamp(QString text);
 
-/**Assume T is ssc::DataPtr or a derived class.
+/**Assume T is DataPtr or a derived class.
  *
  * Return a vector of data sorted on acquisition time.
  */
@@ -70,7 +70,7 @@ std::vector<T> sortOnAcquisitionTime(std::map<QString, T> input)
   return retval;
 }
 
-/**Assume T is ssc::DataPtr or a derived class.
+/**Assume T is DataPtr or a derived class.
  *
  * Return a vector of data sorted on acquisition time.
  */
@@ -105,7 +105,7 @@ std::vector<T> sortOnGroupsAndAcquisitionTime(std::map<QString, T> input)
 * @}
 */
 
-} // namespace ssc
+} // namespace cx
 
 
 

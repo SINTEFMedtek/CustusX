@@ -30,7 +30,7 @@ void DirectlyLinkedSender::send(IGTLinkUSStatusMessage::Pointer msg)
 	mUnsentUSStatusMessage = msg;
 }
 
-void DirectlyLinkedSender::send(ssc::ImagePtr msg)
+void DirectlyLinkedSender::send(ImagePtr msg)
 {
 	if (!this->isReady())
 		return;
@@ -43,7 +43,7 @@ void DirectlyLinkedSender::send(ssc::ImagePtr msg)
 	emit newImage();
 }
 
-void DirectlyLinkedSender::send(ssc::ProbeDataPtr msg)
+void DirectlyLinkedSender::send(ProbeDataPtr msg)
 {
 	if (!this->isReady())
 		return;
@@ -53,12 +53,12 @@ void DirectlyLinkedSender::send(ssc::ProbeDataPtr msg)
 	emit newUSStatus();
 }
 
-ssc::ImagePtr DirectlyLinkedSender::popImage()
+ImagePtr DirectlyLinkedSender::popImage()
 {
 	return mImage;
 	mImage.reset();
 }
-ssc::ProbeDataPtr DirectlyLinkedSender::popUSStatus()
+ProbeDataPtr DirectlyLinkedSender::popUSStatus()
 {
 	return mUSStatus;
 }

@@ -28,7 +28,7 @@ namespace cx
 
 
 template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //centerline
-template class ThreadedTimedAlgorithm<ssc::ImagePtr>; //resample
+template class ThreadedTimedAlgorithm<ImagePtr>; //resample
 //template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //BinaryThresholdImageFilter
 template class ThreadedTimedAlgorithm<vtkPolyDataPtr>; //contour
 

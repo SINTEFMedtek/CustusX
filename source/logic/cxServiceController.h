@@ -43,7 +43,7 @@ private slots:
 	void duringLoadPatientSlot();
 
 //private:
-//	void connectVideoToProbe(ssc::ToolPtr probe);
+//	void connectVideoToProbe(ToolPtr probe);
 };
 
 typedef boost::shared_ptr<ServiceController> ServiceControllerPtr;

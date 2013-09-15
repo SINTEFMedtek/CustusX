@@ -57,22 +57,22 @@ public:
 
   void restart();
 
-  void setFixedData(ssc::DataPtr fixedData);
-  ssc::DataPtr getFixedData();
+  void setFixedData(DataPtr fixedData);
+  DataPtr getFixedData();
 
-  void setMovingData(ssc::DataPtr movingData);
-  ssc::DataPtr getMovingData();
+  void setMovingData(DataPtr movingData);
+  DataPtr getMovingData();
 
   void doPatientRegistration(); ///< registrates the fixed image to the patient
   void doImageRegistration(bool translationOnly); ///< registrates the image to the fixed image
-  void doFastRegistration_Orientation(const ssc::Transform3D& tMtm); ///< use the current dominant tool orientation to find patient orientation
+  void doFastRegistration_Orientation(const Transform3D& tMtm); ///< use the current dominant tool orientation to find patient orientation
   void doFastRegistration_Translation(); ///< use the landmarks in master image and patient to perform a translation-only landmark registration
-  void applyPatientOrientation(const ssc::Transform3D& tMtm);
+  void applyPatientOrientation(const Transform3D& tMtm);
 
   AcquisitionDataPtr getAcquisitionData() { return mAcquisitionData; }
 
-  void applyImage2ImageRegistration(ssc::Transform3D delta_pre_rMd, QString description);
-  void applyPatientRegistration(ssc::Transform3D rMpr_new, QString description);
+  void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
+  void applyPatientRegistration(Transform3D rMpr_new, QString description);
 
 private slots:
   void clearSlot();
@@ -88,16 +88,16 @@ protected:
   void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
   void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the RegistrationManager.
 
-  ssc::Transform3D performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const;
-  vtkPointsPtr convertTovtkPoints(const std::vector<QString>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
-  std::vector<ssc::Vector3D> convertAndTransformToPoints(const std::vector<QString>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
-  std::vector<ssc::Vector3D> convertVtkPointsToPoints(vtkPointsPtr base);
-  std::vector<QString> getUsableLandmarks(const ssc::LandmarkMap& data_a, const ssc::LandmarkMap& data_b);
-  void updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data, QString masterFrame);
-  void writePreLandmarkRegistration(QString name, ssc::LandmarkMap landmarks);
+  Transform3D performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const;
+  vtkPointsPtr convertTovtkPoints(const std::vector<QString>& uids, const LandmarkMap& data, Transform3D M);
+  std::vector<Vector3D> convertAndTransformToPoints(const std::vector<QString>& uids, const LandmarkMap& data, Transform3D M);
+  std::vector<Vector3D> convertVtkPointsToPoints(vtkPointsPtr base);
+  std::vector<QString> getUsableLandmarks(const LandmarkMap& data_a, const LandmarkMap& data_b);
+  void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, QString masterFrame);
+  void writePreLandmarkRegistration(QString name, LandmarkMap landmarks);
 
-  ssc::DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
-  ssc::DataPtr mMovingData; ///< the data that should update its matrices during a registration
+  DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
+  DataPtr mMovingData; ///< the data that should update its matrices during a registration
 
   QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
 

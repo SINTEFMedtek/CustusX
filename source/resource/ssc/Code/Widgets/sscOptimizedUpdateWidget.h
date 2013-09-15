@@ -22,7 +22,7 @@
 
 #include <QWidget>
 
-namespace ssc
+namespace cx
 {
 
 /** \brief Interface for all classes following the modified/prepaint paradigm.
@@ -74,6 +74,6 @@ private:
     bool mModified; ///< use to compute only prior to paintEvent()
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif // SSCOPTIMIZEDUPDATEWIDGET_H

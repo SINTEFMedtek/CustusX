@@ -31,7 +31,7 @@
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
@@ -45,7 +45,7 @@ typedef boost::shared_ptr<class CrossHairRep2D> CrossHairRep2DPtr;
  * \ingroup sscRep
  * \ingroup sscRep2D
  */
-class CrossHairRep2D : public ssc::RepImpl
+class CrossHairRep2D : public RepImpl
 {
 	Q_OBJECT
 public:
@@ -53,7 +53,7 @@ public:
 	virtual ~CrossHairRep2D();
 	virtual QString getType() const;
 
-	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	void setSliceProxy(SliceProxyPtr slicer);
 	void set_vpMs(const Transform3D& vpMs);
 
 private slots:
@@ -63,8 +63,8 @@ private slots:
 
 protected:
 	CrossHairRep2D(const QString& uid, const QString& name="");
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 private:
 	void update();

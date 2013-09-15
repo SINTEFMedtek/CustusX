@@ -39,15 +39,15 @@ Q_OBJECT
 public:
 	InteractiveClipper();
 
-	void setSlicePlane(ssc::PLANE_TYPE plane);
+	void setSlicePlane(PLANE_TYPE plane);
 	void saveClipPlaneToVolume(); ///< save the current clip to image
 	void clearClipPlanesInVolume(); ///< clear all saved clips in the image.
-	ssc::PLANE_TYPE getSlicePlane();
+	PLANE_TYPE getSlicePlane();
 	bool getUseClipper() const;
 	bool getInvertPlane() const;
-	std::vector<ssc::PLANE_TYPE> getAvailableSlicePlanes() const;
-	ssc::ImagePtr getImage() const;
-	void setImage(ssc::ImagePtr image);
+	std::vector<PLANE_TYPE> getAvailableSlicePlanes() const;
+	ImagePtr getImage() const;
+	void setImage(ImagePtr image);
 
 signals:
 	void changed();
@@ -59,11 +59,11 @@ private slots:
 	void dominantToolChangedSlot();
 
 private:
-	ssc::PLANE_TYPE getPlaneType();
-	ssc::SlicePlaneClipperPtr mSlicePlaneClipper;
-	ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
+	PLANE_TYPE getPlaneType();
+	SlicePlaneClipperPtr mSlicePlaneClipper;
+	SlicePlanesProxyPtr mSlicePlanesProxy;
 	bool mUseClipper;
-	ssc::ImagePtr mImage;
+	ImagePtr mImage;
 };
 typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
 

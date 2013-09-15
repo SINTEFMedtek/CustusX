@@ -29,7 +29,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscViewportListener.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Helper class for managing a set of slice planes.
@@ -66,7 +66,7 @@ public:
 	struct DataType
 	{
 		DoubleBoundingBox3D vp_s;
-		ssc::SliceProxyPtr mSliceProxy;
+		SliceProxyPtr mSliceProxy;
 		QString mSymbol;
 		Vector3D mColor;
 		Vector3D mPointPos_normvp;
@@ -74,7 +74,7 @@ public:
 	typedef std::map<PLANE_TYPE, DataType> DataMap;
 
 	void clearViewports();
-	void setViewportData(PLANE_TYPE type, ssc::SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s);
+	void setViewportData(PLANE_TYPE type, SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s);
 	void addSimpleSlicePlane(PLANE_TYPE type);
 	DataMap getData();
 
@@ -111,20 +111,20 @@ typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
  * \ingroup sscRep
  * \ingroup sscRep3D
  */
-class SlicePlanes3DRep : public ssc::RepImpl
+class SlicePlanes3DRep : public RepImpl
 {
 	Q_OBJECT
 public:
 	static SlicePlanes3DRepPtr New(const QString& uid, const QString& name="");
 	virtual ~SlicePlanes3DRep();
-	virtual QString getType() const { return "ssc::SlicePlanes3DRep"; }
+	virtual QString getType() const { return "SlicePlanes3DRep"; }
 	void setProxy(SlicePlanesProxyPtr proxy);
 	SlicePlanesProxyPtr getProxy() { return mProxy; }
 	void setDynamicLabelSize(bool on);
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 private slots:
 	void changedSlot();
@@ -143,8 +143,8 @@ private:
 	SlicePlanes3DRep(const QString& uid, const QString& name = "");
 	void clearActors();
 	SlicePlanesProxyPtr mProxy;
-	ssc::View *mView;
-	ssc::ViewportListenerPtr mViewportListener;
+	View *mView;
+	ViewportListenerPtr mViewportListener;
 	void rescale();
 };
 
@@ -161,25 +161,25 @@ typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerI
  * \ingroup sscRep
  * \ingroup sscRep2D
  */
-class SlicePlanes3DMarkerIn2DRep : public ssc::RepImpl
+class SlicePlanes3DMarkerIn2DRep : public RepImpl
 {
 	Q_OBJECT
 public:
 	static SlicePlanes3DMarkerIn2DRepPtr New(const QString& uid, const QString& name="");
 	virtual ~SlicePlanes3DMarkerIn2DRep();
-	virtual QString getType() const { return "ssc::SlicePlanes3DMarkerIn2DRep"; }
+	virtual QString getType() const { return "SlicePlanes3DMarkerIn2DRep"; }
 	void setProxy(PLANE_TYPE type, SlicePlanesProxyPtr proxy);
 	SlicePlanesProxyPtr getProxy() { return mProxy; }
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 private slots:
 	void changedSlot();
 private:
 	SlicePlanes3DMarkerIn2DRep(const QString& uid, const QString& name="");
 	SlicePlanesProxyPtr mProxy;
-	ssc::TextDisplayPtr mText;
+	TextDisplayPtr mText;
 	PLANE_TYPE mType;
 };
 

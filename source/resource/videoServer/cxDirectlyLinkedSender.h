@@ -24,19 +24,19 @@ public:
 	bool isReady() const;
 	virtual void send(IGTLinkImageMessage::Pointer msg);
 	virtual void send(IGTLinkUSStatusMessage::Pointer msg);
-	virtual void send(ssc::ImagePtr msg);
-	virtual void send(ssc::ProbeDataPtr msg);
+	virtual void send(ImagePtr msg);
+	virtual void send(ProbeDataPtr msg);
 
-	ssc::ImagePtr popImage();
-	ssc::ProbeDataPtr popUSStatus();
+	ImagePtr popImage();
+	ProbeDataPtr popUSStatus();
 
 signals:
 	void newImage();
 	void newUSStatus();
 
 private:
-	ssc::ImagePtr mImage;
-	ssc::ProbeDataPtr mUSStatus;
+	ImagePtr mImage;
+	ProbeDataPtr mUSStatus;
 	IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 
 };

@@ -34,7 +34,7 @@
 
 class QDomElement;
 
-namespace ssc
+namespace cx
 {
 
 
@@ -145,6 +145,6 @@ public slots:
 //	void transferFunctionsChangedSlot();//Not uses any longer. Use ActiveImageProxy in CustusX
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCDATAMANAGERIMPL_H_ */

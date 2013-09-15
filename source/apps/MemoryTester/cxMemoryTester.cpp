@@ -32,7 +32,7 @@ vtkImageDataPtr MemHolder::generateVtkImageData()
 	array->SetArray(rawchars, scalarSize+1, 0); // take ownership
 	data->GetPointData()->SetScalars(array);
 
-	// A trick to get a full LUT in ssc::Image (automatic LUT generation)
+	// A trick to get a full LUT in Image (automatic LUT generation)
 	// Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
 	rawchars[0] = 255;
 	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
@@ -88,7 +88,7 @@ void MemHolder::generateLeak()
 //	array->SetArray(rawchars, scalarSize+1, 0); // take ownership
 //	data->GetPointData()->SetScalars(array);
 //
-//	// A trick to get a full LUT in ssc::Image (automatic LUT generation)
+//	// A trick to get a full LUT in Image (automatic LUT generation)
 //	// Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
 //	rawchars[0] = 255;
 //	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.

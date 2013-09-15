@@ -14,8 +14,13 @@
 * @{
 */
 
+namespace cx
+{
+
+
+
 /**
- * Convert from ProbeXmlConfigParser::Configuration to ssc::ProbeData
+ * Convert from ProbeXmlConfigParser::Configuration to ProbeData
  *
  * Notes about the conversion:
  * The xml format contains redundant data. The following list defines
@@ -65,13 +70,15 @@
  *
  * \sa ProbeXmlConfigParser
  */
-ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
+ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
 
 /**
  * \sa ProbeXmlConfigParser
  * \sa createConfigurationFromProbeData()
  */
-ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ssc::ProbeData data);
+ProbeXmlConfigParser::Configuration createConfigurationFromProbeData(ProbeXmlConfigParser::Configuration basis, ProbeData data);
+
+} // namespace cx
 
 /**
 * @}

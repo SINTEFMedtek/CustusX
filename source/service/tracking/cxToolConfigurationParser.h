@@ -40,20 +40,20 @@ class ConfigurationFileParser
 public:
 	typedef std::pair<QString, bool> ToolFileAndReference;
 	typedef std::vector<ToolFileAndReference> ToolFilesAndReferenceVector;
-	typedef std::map<ssc::TRACKING_SYSTEM, ToolFilesAndReferenceVector> TrackersAndToolsMap;
+	typedef std::map<TRACKING_SYSTEM, ToolFilesAndReferenceVector> TrackersAndToolsMap;
 	struct Configuration
 	{
 		QString mFileName; ///< absolute path and filename for the new config file
-		ssc::CLINICAL_APPLICATION mClinical_app; ///< the clinical application this config is made for
+		CLINICAL_APPLICATION mClinical_app; ///< the clinical application this config is made for
 		TrackersAndToolsMap mTrackersAndTools; ///< the trackers and tools (relative path) that should be used in the config
-		Configuration() : mClinical_app(ssc::mdCOUNT) {}
+		Configuration() : mClinical_app(mdCOUNT) {}
 	};
 
 public:
 	ConfigurationFileParser(QString absoluteConfigFilePath, QString loggingFolder = "");
 	~ConfigurationFileParser();
 
-	ssc::CLINICAL_APPLICATION getApplicationapplication();
+	CLINICAL_APPLICATION getApplicationapplication();
 	std::vector<IgstkTracker::InternalStructure> getTrackers();
 	std::vector<QString> getAbsoluteToolFilePaths();
 	QString getAbsoluteReferenceFilePath();

@@ -28,10 +28,10 @@
 namespace cx
 {
 
-ProbePtr cxProbe::New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml)
+cxProbePtr cxProbe::New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml)
 {
 	cxProbe* object = new cxProbe(instrumentUid, scannerUid);
-	ProbePtr retval(object);
+	cxProbePtr retval(object);
 	object->mSelf = retval;
 	retval->initProbeXmlConfigParser(xml);
 	retval->initConfigId();
@@ -40,21 +40,21 @@ ProbePtr cxProbe::New(QString instrumentUid, QString scannerUid, ProbeXmlConfigP
 
 bool cxProbe::isValid() const
 {
-	return this->getProbeData("active").getType() != ssc::ProbeData::tNONE;
+	return this->getProbeData("active").getType() != ProbeData::tNONE;
 }
 
 QStringList cxProbe::getAvailableVideoSources()
 {
 	QStringList retval;
-	for (std::map<QString, ssc::VideoSourcePtr>::iterator iter=mSource.begin(); iter!=mSource.end(); ++iter)
+	for (std::map<QString, VideoSourcePtr>::iterator iter=mSource.begin(); iter!=mSource.end(); ++iter)
 		retval << iter->first;
 	return retval;
 }
 
-ssc::VideoSourcePtr cxProbe::getRTSource(QString uid) const
+VideoSourcePtr cxProbe::getRTSource(QString uid) const
 {
 	if (mSource.empty())
-		return ssc::VideoSourcePtr();
+		return VideoSourcePtr();
 	if (uid=="active")
 		uid = mActiveUid;
 	if (mSource.count(uid))
@@ -62,9 +62,9 @@ ssc::VideoSourcePtr cxProbe::getRTSource(QString uid) const
 	return mSource.begin()->second;
 }
 
-ssc::ProbeData cxProbe::getProbeData(QString uid) const
+ProbeData cxProbe::getProbeData(QString uid) const
 {
-	ssc::ProbeData retval;
+	ProbeData retval;
 
 	if (uid=="active")
 		uid = mActiveUid;
@@ -80,9 +80,9 @@ ssc::ProbeData cxProbe::getProbeData(QString uid) const
 	return retval;
 }
 
-ssc::ProbeSectorPtr cxProbe::getSector(QString uid)
+ProbeSectorPtr cxProbe::getSector(QString uid)
 {
-	ssc::ProbeSectorPtr retval(new ssc::ProbeSector());
+	ProbeSectorPtr retval(new ProbeSector());
 	retval->setData(this->getProbeData());
 	return retval;
 }
@@ -146,21 +146,21 @@ void cxProbe::setTemporalCalibration(double val)
 {
 	mOverrideTemporalCalibration = true;
 	mTemporalCalibration = val;
-	for (std::map<QString, ssc::ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+	for (std::map<QString, ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
 		iter->second.setTemporalCalibration(mTemporalCalibration);
 }
 
 void cxProbe::setSoundSpeedCompensationFactor(double factor)
 {
-	if(ssc::similar(mSoundSpeedCompensationFactor, factor))
+	if(similar(mSoundSpeedCompensationFactor, factor))
 		return;
 	mSoundSpeedCompensationFactor = factor;
-	for (std::map<QString, ssc::ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
+	for (std::map<QString, ProbeData>::iterator iter=mProbeData.begin(); iter!=mProbeData.end(); ++iter)
 		iter->second.applySoundSpeedCompensationFactor(mSoundSpeedCompensationFactor);
 	emit sectorChanged();
 }
 
-void cxProbe::setProbeSector(ssc::ProbeData probeSector)
+void cxProbe::setProbeSector(ProbeData probeSector)
 {
 	if (probeSector.getUid().isEmpty())
 		probeSector.setUid(mActiveUid);
@@ -169,7 +169,7 @@ void cxProbe::setProbeSector(ssc::ProbeData probeSector)
 	emit sectorChanged();
 }
 
-void cxProbe::setRTSource(ssc::VideoSourcePtr source)
+void cxProbe::setRTSource(VideoSourcePtr source)
 {
 	SSC_ASSERT(source); // not handled after refactoring - add clear method??
 	if (!source)
@@ -178,21 +178,21 @@ void cxProbe::setRTSource(ssc::VideoSourcePtr source)
 	// uid already exist: check if base object is the same
 	if (mSource.count(source->getUid()))
 	{
-		ssc::VideoSourcePtr old = mSource.find(source->getUid())->second;
+		VideoSourcePtr old = mSource.find(source->getUid())->second;
 
-		boost::shared_ptr<ssc::ProbeAdapterRTSource> oldAdapter;
-		oldAdapter = boost::dynamic_pointer_cast<ssc::ProbeAdapterRTSource>(old);
+		boost::shared_ptr<ProbeAdapterRTSource> oldAdapter;
+		oldAdapter = boost::dynamic_pointer_cast<ProbeAdapterRTSource>(old);
 		// check for identity, ignore if no change
 		if (oldAdapter && (source==oldAdapter->getBaseSource()))
 			return;
 	}
 
 	// must have same uid as original: the uid identifies the video source
-	mSource[source->getUid()].reset(new ssc::ProbeAdapterRTSource(source->getUid(), mSelf.lock(), source));
+	mSource[source->getUid()].reset(new ProbeAdapterRTSource(source->getUid(), mSelf.lock(), source));
 	emit sectorChanged();
 }
 
-void cxProbe::removeRTSource(ssc::VideoSourcePtr source)
+void cxProbe::removeRTSource(VideoSourcePtr source)
 {
 	if (!source)
 		return;
@@ -281,7 +281,7 @@ cxProbe::cxProbe(QString instrumentUid, QString scannerUid) :
 		mTemporalCalibration(0.0),
 		mDigitalInterface(false)
 {
-	ssc::ProbeData probeData;
+	ProbeData probeData;
 	mProbeData[probeData.getUid()] = probeData;
 	mActiveUid = probeData.getUid();
 }
@@ -303,7 +303,7 @@ void cxProbe::initConfigId()
 		this->applyNewConfigurationWithId(configs[0]);
 	else
 	{
-		ssc::messageManager()->sendWarning(QString("Found no probe configuration for:\n"
+		messageManager()->sendWarning(QString("Found no probe configuration for:\n"
 			"scanner=[%1] instrument=[%2].\n"
 			"Check that your %3 file contains entries\n"
 			"<USScanner> <Name>%1</Name> ... <USProbe> <Name>%2</Name>").arg(mScannerUid).arg(mInstrumentUid).arg(mXml->getFileName()));
@@ -342,7 +342,7 @@ void cxProbe::updateProbeSector()
 {
 	if(this->isValidConfigId() && !this->isUsingDigitalVideo())
 	{
-		ssc::ProbeData probeSector = this->createProbeSector();
+		ProbeData probeSector = this->createProbeSector();
 		this->setProbeSector(probeSector);
 	}
 }
@@ -353,10 +353,10 @@ bool cxProbe::isValidConfigId()
 	return !this->getConfiguration(this->getConfigId()).isEmpty();
 }
 
-ssc::ProbeData cxProbe::createProbeSector()
+ProbeData cxProbe::createProbeSector()
 {
 	ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
-	ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
+	ProbeData probeSector = createProbeDataFromConfiguration(config);
 	probeSector.setUid(mActiveUid);
 	return probeSector;
 }

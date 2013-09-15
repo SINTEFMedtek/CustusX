@@ -32,13 +32,13 @@
 #include "sscTime.h"
 
 
-namespace ssc
+namespace cx
 {
 
 /** Return an image that is resampled into space q.
  *  The image is not added to the data manager nor saved.
  */
-ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
+ImagePtr resampleImage(ImagePtr image, Transform3D qMd)
 {
 	//TODO: fix error:
 	// There is an error in the transfer functions of the returned image from this function
@@ -58,7 +58,7 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
 
   QString uid = image->getUid() + "_or%1";
   QString name = image->getName()+" or%1";
-  ssc::ImagePtr oriented = ssc::dataManager()->createDerivedImage(rawResult, uid, name, image);
+  ImagePtr oriented = dataManager()->createDerivedImage(rawResult, uid, name, image);
   //oriented->get_rMd_History()->setRegistration(reference->get_rMd());
   oriented->get_rMd_History()->setRegistration(image->get_rMd() * qMd.inv());
 //  std::cout << "rMd pre merge oriented\n" << oriented->get_rMd() << std::endl;
@@ -71,9 +71,9 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
 /** Return an image that is resampled with a new output spacing.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid, QString name)
+ImagePtr resampleImage(ImagePtr image, const Vector3D spacing, QString uid, QString name)
 {
-//  std::cout << "oldspacing: " << ssc::Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
+//  std::cout << "oldspacing: " << Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
 //  std::cout << "spacing: " << spacing << std::endl;
   vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
   resampler->SetInput(image->getBaseVtkImageData());
@@ -89,10 +89,10 @@ ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid,
     uid = image->getUid() + "_res%1";
     name = image->getName()+" res%1";
   }
-  ssc::ImagePtr retval = ssc::dataManager()->createDerivedImage(rawResult, uid, name, image);
+  ImagePtr retval = dataManager()->createDerivedImage(rawResult, uid, name, image);
 
-  //ssc::dataManager()->loadData(retval);
-  //ssc::dataManager()->saveImage(retval, outputBasePath);
+  //dataManager()->loadData(retval);
+  //dataManager()->saveImage(retval, outputBasePath);
   return retval;
 }
 
@@ -101,7 +101,7 @@ ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid,
  */
 ImagePtr duplicateImage(ImagePtr image)
 {
-	ssc::Vector3D spacing(image->getBaseVtkImageData()->GetSpacing());
+	Vector3D spacing(image->getBaseVtkImageData()->GetSpacing());
 	return resampleImage(image, spacing, image->getUid()+"_copy%1", image->getName()+" copy%1");
 }
 
@@ -151,7 +151,7 @@ QDateTime extractTimestamp(QString text)
   QRegExp tsReg("[0-9]{8}T[0-9]{6}");
   if (tsReg.indexIn(text)>0)
   {
-    QDateTime datetime = QDateTime::fromString(tsReg.cap(0), ssc::timestampSecondsFormat());
+    QDateTime datetime = QDateTime::fromString(tsReg.cap(0), timestampSecondsFormat());
     return datetime;
   }
   return QDateTime();
@@ -160,4 +160,4 @@ QDateTime extractTimestamp(QString text)
 
 
 
-} // namespace ssc
+} // namespace cx

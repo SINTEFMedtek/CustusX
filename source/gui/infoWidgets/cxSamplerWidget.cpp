@@ -27,7 +27,7 @@ namespace cx
 SamplerWidget::SamplerWidget(QWidget* parent) :
   BaseWidget(parent, "SamplerWidget", "Point Sampler")
 {
-	mListener.reset(new ssc::CoordinateSystemListener(ssc::Space(ssc::csREF)));
+	mListener.reset(new CoordinateSystemListener(Space(csREF)));
 	connect(mListener.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
 	mActiveTool = DominantToolProxy::New();
@@ -35,15 +35,15 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), SLOT(setModified()));
 //	connect(mActiveTool.get(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(setModified2()));
 //	connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), SLOT(setModified2()));
-	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(spacesChangedSlot()));
-	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(spacesChangedSlot()));
+	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(spacesChangedSlot()));
+	connect(toolManager(), SIGNAL(configured()), this, SLOT(spacesChangedSlot()));
 
 	mLayout = new QHBoxLayout(this);
 	mLayout->setMargin(4);
 	mLayout->setSpacing(4);
 
 //	QString value;// = qstring_cast(mData->getFrame());
-//    std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
+//    std::vector<CoordinateSystem> spaces = SpaceHelpers::getAvailableSpaces(true);
 //    QStringList range;
 //    for (unsigned i=0; i<spaces.size(); ++i)
 //      range << spaces[i].toString();
@@ -61,7 +61,7 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
 	mAdvancedLayout->setMargin(0);
 	mLayout->addWidget(mAdvancedWidget);
 
-    mSpaceSelector = ssc::StringDataAdapterXml::initialize("selectSpace",
+    mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
         "Space",
         "Select coordinate system to store position in.",
 	    "",
@@ -69,9 +69,9 @@ SamplerWidget::SamplerWidget(QWidget* parent) :
         QDomNode());
 	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spacesChangedSlot()));
 	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(setModified()));
-	QString space = settings()->value("sampler/Space", ssc::Space(ssc::csREF).toString()).toString();
+	QString space = settings()->value("sampler/Space", Space(csREF).toString()).toString();
 	mSpaceSelector->setValue(space);
-	ssc::LabeledComboBoxWidget* spaceSelectorWidget = new ssc::LabeledComboBoxWidget(this, mSpaceSelector);
+	LabeledComboBoxWidget* spaceSelectorWidget = new LabeledComboBoxWidget(this, mSpaceSelector);
 	spaceSelectorWidget->showLabel(false);
     mAdvancedLayout->addWidget(spaceSelectorWidget);
 	this->spacesChangedSlot();
@@ -119,11 +119,11 @@ void SamplerWidget::setModified2()
 
 void SamplerWidget::spacesChangedSlot()
 {
-	ssc::CoordinateSystem space = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
+	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
 	settings()->setValue("sampler/Space", space.toString());
 
 //	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
+	std::vector<CoordinateSystem> spaces = SpaceHelpers::getAvailableSpaces(true);
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 	  range << spaces[i].toString();
@@ -136,18 +136,18 @@ void SamplerWidget::spacesChangedSlot()
 void SamplerWidget::prePaintEvent()
 {
 //	std::cout << "SamplerWidget::prePaintEvent()" << std::endl;
-	ssc::CoordinateSystem space = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
-	ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(space, true);
+	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
+	Vector3D p = SpaceHelpers::getDominantToolTipPoint(space, true);
 	int w=1;
 //	mCoordLineEdit->setText(qstring_cast(p));
 	QString coord = QString("%1, %2, %3").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);
 
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	if (image)
 	{
-		ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(ssc::Space(ssc::csDATA_VOXEL,"active"), true);
+		Vector3D p = SpaceHelpers::getDominantToolTipPoint(Space(csDATA_VOXEL,"active"), true);
 //		void* ptr = image->getBaseVtkImageData()->GetScalarPointer(p.begin());
-		ssc::IntBoundingBox3D bb(Eigen::Vector3i(0,0,0),
+		IntBoundingBox3D bb(Eigen::Vector3i(0,0,0),
 		                         Eigen::Vector3i(image->getBaseVtkImageData()->GetDimensions())-Eigen::Vector3i(1,1,1));
 		if (bb.contains(p.cast<int>()))
 		{

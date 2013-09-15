@@ -93,11 +93,11 @@ void PresetWidget::showDetailed(bool detailed)
 	}
 }
 
-void PresetWidget::setPresets(ssc::PresetsPtr presets)
+void PresetWidget::setPresets(PresetsPtr presets)
 {
 	if(!presets)
 	{
-		ssc::messageManager()->sendError("Trying to set presets to null...");
+		messageManager()->sendError("Trying to set presets to null...");
 		return;
 	}
 	//TODO disconnect old stuff

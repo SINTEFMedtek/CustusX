@@ -25,7 +25,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscProbeSector.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
@@ -46,13 +46,13 @@ typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
  * \date Oct 31, 2010
  * \author christiana
  */
-class VideoFixedPlaneRep : public ssc::RepImpl
+class VideoFixedPlaneRep : public RepImpl
 {
 	Q_OBJECT
 public:
 	VideoFixedPlaneRep(const QString& uid, const QString& name="");
 	virtual ~VideoFixedPlaneRep();
-	virtual QString getType() const { return "ssc::RealTimeStreamFixedPlaneRep"; }
+	virtual QString getType() const { return "RealTimeStreamFixedPlaneRep"; }
 	void setRealtimeStream(VideoSourcePtr data);
 	void setTool(ToolPtr tool);
 
@@ -60,8 +60,8 @@ public:
 	bool getShowSector() const;
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(View* view);
+	virtual void removeRepActorsFromViewRenderer(View* view);
 	private slots:
 	void newDataSlot();
 
@@ -73,11 +73,11 @@ private:
 	bool mShowSector;
 
 	ToolPtr mTool;
-	ssc::ProbeSector mProbeData;
+	ProbeSector mProbeData;
 	VideoSourcePtr mData;
 
-	ssc::TextDisplayPtr mStatusText;
-	ssc::TextDisplayPtr mInfoText;
+	TextDisplayPtr mStatusText;
+	TextDisplayPtr mInfoText;
 
 	GraphicalPolyData3DPtr mProbeSector;
 	GraphicalPolyData3DPtr mProbeOrigin;
@@ -89,6 +89,6 @@ private:
 };
 
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCRTSTREAMREP_H_ */

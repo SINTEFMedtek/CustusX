@@ -56,20 +56,20 @@ public:
 	void testDualAngio();
 
 private:
-	ssc::ReconstructManagerPtr createManager();
-	void validateData(ssc::ImagePtr output);
+	cx::ReconstructManagerPtr createManager();
+	void validateData(cx::ImagePtr output);
 	/** Validate the bmode data output from the specific data set used.
 	  */
-	void validateBModeData(ssc::ImagePtr bmodeOut);
+	void validateBModeData(cx::ImagePtr bmodeOut);
 	/** Validate the angio data output from the specific data set used.
 	  */
-	void validateAngioData(ssc::ImagePtr angioOut);
-	int getValue(ssc::ImagePtr data, int x, int y, int z);
+	void validateAngioData(cx::ImagePtr angioOut);
+	int getValue(cx::ImagePtr data, int x, int y, int z);
 };
 
 void ReconstructManagerTestFixture::setUp()
 {
-	ssc::MessageManager::initialize();
+	cx::MessageManager::initialize();
 	cx::cxDataManager::initialize();
 	// this stuff will be performed just before all tests in this class
 }
@@ -77,19 +77,19 @@ void ReconstructManagerTestFixture::setUp()
 void ReconstructManagerTestFixture::tearDown()
 {
 	cx::cxDataManager::shutdown();
-	ssc::MessageManager::shutdown();
+	cx::MessageManager::shutdown();
 	// this stuff will be performed just after all tests in this class
 }
 
 void ReconstructManagerTestFixture::testSlerpInterpolation()
 {
-	//  ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(ssc::XmlOptionFile(),""));
+	//  ReconstructManagerPtr reconstructer(new ReconstructManager(XmlOptionFile(),""));
 
-	//  ssc::ReconstructerPtr reconstructer(new ssc::Reconstructer(ssc::XmlOptionFile(),""));
-	ssc::ReconstructCorePtr reconstructer(new ssc::ReconstructCore());
+	//  ReconstructerPtr reconstructer(new Reconstructer(XmlOptionFile(),""));
+	cx::ReconstructCorePtr reconstructer(new cx::ReconstructCore());
 
-	ssc::Transform3D a;
-	ssc::Transform3D b;
+	cx::Transform3D a;
+	cx::Transform3D b;
 
 	Eigen::Matrix3d am;
 	am =
@@ -111,8 +111,8 @@ void ReconstructManagerTestFixture::testSlerpInterpolation()
 
 	double t = 0.5;
 
-	ssc::Transform3D c = cx::USReconstructInputDataAlgorithm::slerpInterpolate(a, b, t);
-	//ssc::Transform3D c = reconstructer->interpolate(a, b, t);
+	cx::Transform3D c = cx::USReconstructInputDataAlgorithm::slerpInterpolate(a, b, t);
+	//Transform3D c = reconstructer->interpolate(a, b, t);
 
 	Eigen::Matrix3d goalm;
 	goalm =
@@ -120,37 +120,37 @@ void ReconstructManagerTestFixture::testSlerpInterpolation()
 			Eigen::AngleAxisd(M_PI / 180.0, Eigen::Vector3d::UnitY()) * // 1 deg
 			Eigen::AngleAxisd(0/*M_PI / 180.0*5.0*/, Eigen::Vector3d::UnitZ()); // 5 deg
 
-	ssc::Transform3D goal;
+	cx::Transform3D goal;
 	goal.matrix().block<3, 3>(0, 0) = goalm;
 	goal.matrix().block<4, 1>(0, 3) = Eigen::Vector4d(5.0, 5.0, 5.0, 1.0);
 
-	if (!ssc::similar(c, goal))
+	if (!cx::similar(c, goal))
 	{
 		std::cout << "result: "<< std::endl << c << std::endl;
 		std::cout << "goal: "<< std::endl << goal << std::endl;
 	}
-	REQUIRE(ssc::similar(c, goal));
+	REQUIRE(cx::similar(c, goal));
 
 	// Test if normalized = the column lengths are 1
 	double norm = goal.matrix().block<3, 1>(0, 0).norm();
 	//	std::cout << "norm: " << norm << std::endl;
-	REQUIRE(ssc::similar(norm, 1.0));
+	REQUIRE(cx::similar(norm, 1.0));
 	norm = goal.matrix().block<3, 1>(0, 1).norm();
-	REQUIRE(ssc::similar(norm, 1.0));
+	REQUIRE(cx::similar(norm, 1.0));
 	norm = goal.matrix().block<3, 1>(0, 2).norm();
-	REQUIRE(ssc::similar(norm, 1.0));
+	REQUIRE(cx::similar(norm, 1.0));
 }
 
 void ReconstructManagerTestFixture::testConstructor()
 {
-	ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(ssc::XmlOptionFile(),""));
+	cx::ReconstructManagerPtr reconstructer(new cx::ReconstructManager(cx::XmlOptionFile(),""));
 }
 
-ssc::ReconstructManagerPtr ReconstructManagerTestFixture::createManager()
+cx::ReconstructManagerPtr ReconstructManagerTestFixture::createManager()
 {
 	//	std::cout << "testAngioReconstruction running" << std::endl;
-	ssc::XmlOptionFile settings;
-	ssc::ReconstructManagerPtr reconstructer(new ssc::ReconstructManager(settings,""));
+	cx::XmlOptionFile settings;
+	cx::ReconstructManagerPtr reconstructer(new cx::ReconstructManager(settings,""));
 
 	reconstructer->setOutputBasePath(cx::DataLocations::getTestDataPath() + "/temp/");
 	reconstructer->setOutputRelativePath("Images");
@@ -158,7 +158,7 @@ ssc::ReconstructManagerPtr ReconstructManagerTestFixture::createManager()
 	return reconstructer;
 }
 
-void ReconstructManagerTestFixture::validateData(ssc::ImagePtr output)
+void ReconstructManagerTestFixture::validateData(cx::ImagePtr output)
 {
 	REQUIRE(output->getModality().contains("US"));
 	REQUIRE( output->getRange() != 0);//Just check if the output volume is empty
@@ -168,7 +168,7 @@ void ReconstructManagerTestFixture::validateData(ssc::ImagePtr output)
 	REQUIRE(volumePtr); //Check if the pointer != NULL
 }
 
-void ReconstructManagerTestFixture::validateAngioData(ssc::ImagePtr angioOut)
+void ReconstructManagerTestFixture::validateAngioData(cx::ImagePtr angioOut)
 {
 	this->validateData(angioOut);
 
@@ -196,7 +196,7 @@ void ReconstructManagerTestFixture::validateAngioData(ssc::ImagePtr angioOut)
 	CHECK(this->getValue(angioOut, 316, 108,  65) == 1);
 }
 
-void ReconstructManagerTestFixture::validateBModeData(ssc::ImagePtr bmodeOut)
+void ReconstructManagerTestFixture::validateBModeData(cx::ImagePtr bmodeOut)
 {
 	this->validateData(bmodeOut);
 
@@ -224,7 +224,7 @@ void ReconstructManagerTestFixture::validateBModeData(ssc::ImagePtr bmodeOut)
 	CHECK(this->getValue(bmodeOut, 316, 108,  65) == 1);
 }
 
-int ReconstructManagerTestFixture::getValue(ssc::ImagePtr data, int x, int y, int z)
+int ReconstructManagerTestFixture::getValue(cx::ImagePtr data, int x, int y, int z)
 {
 	vtkImageDataPtr volume = data->getGrayScaleBaseVtkImageData();
 	int val = (int)*reinterpret_cast<unsigned char*>(volume->GetScalarPointer(x,y,z));
@@ -237,7 +237,7 @@ void ReconstructManagerTestFixture::testAngioReconstruction()
 			"/testing/"
 			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
 
-	ssc::ReconstructManagerPtr reconstructer = this->createManager();
+	cx::ReconstructManagerPtr reconstructer = this->createManager();
 	reconstructer->selectData(filename);
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
 	reconstructer->getParams()->mAngioAdapter->setValue(true);
@@ -245,14 +245,14 @@ void ReconstructManagerTestFixture::testAngioReconstruction()
 
 	// set an algorithm-specific parameter
 	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "PNN");
-	boost::shared_ptr<ssc::PNNReconstructAlgorithm> algorithm;
-	algorithm = boost::dynamic_pointer_cast<ssc::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
+	boost::shared_ptr<cx::PNNReconstructAlgorithm> algorithm;
+	algorithm = boost::dynamic_pointer_cast<cx::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
 	REQUIRE(algorithm);// Check if we got the PNN algorithm
 	algorithm->getInterpolationStepsOption(algo)->setValue(1);
 
 	// run the reconstruction in the main thread
-	ssc::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
-	std::vector<ssc::ReconstructCorePtr> cores = reconstructer->createCores();
+	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
 	REQUIRE(cores.size()==1);
 	preprocessor->initializeCores(cores);
 	cores[0]->reconstruct();
@@ -267,7 +267,7 @@ void ReconstructManagerTestFixture::testThunderGPUReconstruction()
 			"/testing/"
 			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
 
-	ssc::ReconstructManagerPtr reconstructer = this->createManager();
+	cx::ReconstructManagerPtr reconstructer = this->createManager();
 	reconstructer->selectData(filename);
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("ThunderVNN");
 	reconstructer->getParams()->mAngioAdapter->setValue(false);
@@ -275,14 +275,14 @@ void ReconstructManagerTestFixture::testThunderGPUReconstruction()
 
 	// set an algorithm-specific parameter
 	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "VNN");
-	boost::shared_ptr<ssc::ThunderVNNReconstructAlgorithm> algorithm;
-	algorithm = boost::dynamic_pointer_cast<ssc::ThunderVNNReconstructAlgorithm>(reconstructer->createAlgorithm());
+	boost::shared_ptr<cx::ThunderVNNReconstructAlgorithm> algorithm;
+	algorithm = boost::dynamic_pointer_cast<cx::ThunderVNNReconstructAlgorithm>(reconstructer->createAlgorithm());
 	REQUIRE(algorithm);// Check if we got the VNN algorithm
 	algorithm->getProcessorOption(algo)->setValue("GPU");
 
 	// run the reconstruction in the main thread
-	ssc::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
-	std::vector<ssc::ReconstructCorePtr> cores = reconstructer->createCores();
+	cx::ReconstructPreprocessorPtr preprocessor = reconstructer->createPreprocessor();
+	std::vector<cx::ReconstructCorePtr> cores = reconstructer->createCores();
 	REQUIRE(cores.size()==1);
 	preprocessor->initializeCores(cores);
 	cores[0]->reconstruct();
@@ -296,7 +296,7 @@ void ReconstructManagerTestFixture::testDualAngio()
 	QString filename = cx::DataLocations::getTestDataPath() +
 			"/testing/"
 			"2012-10-24_12-39_Angio_i_US3.cx3/US_Acq/US-Acq_03_20121024T132330.mhd";
-	ssc::ReconstructManagerPtr reconstructer = this->createManager();
+	cx::ReconstructManagerPtr reconstructer = this->createManager();
 	reconstructer->selectData(filename);
 	reconstructer->getParams()->mAlgorithmAdapter->setValue("PNN");//default
 	reconstructer->getParams()->mAngioAdapter->setValue(true);
@@ -304,13 +304,13 @@ void ReconstructManagerTestFixture::testDualAngio()
 
 	// set an algorithm-specific parameter
 	QDomElement algo = reconstructer->getSettings().getElement("algorithms", "PNN");
-	boost::shared_ptr<ssc::PNNReconstructAlgorithm> algorithm;
-	algorithm = boost::dynamic_pointer_cast<ssc::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
+	boost::shared_ptr<cx::PNNReconstructAlgorithm> algorithm;
+	algorithm = boost::dynamic_pointer_cast<cx::PNNReconstructAlgorithm>(reconstructer->createAlgorithm());
 	REQUIRE(algorithm);// Check if we got the PNN algorithm
 	algorithm->getInterpolationStepsOption(algo)->setValue(1);
 
 	// start threaded reconstruction
-	std::vector<ssc::ReconstructCorePtr> cores = reconstructer->startReconstruction();
+	std::vector<cx::ReconstructCorePtr> cores = reconstructer->startReconstruction();
 	REQUIRE(cores.size()==2);
 	std::set<cx::TimedAlgorithmPtr> threads = reconstructer->getThreadedReconstruction();
 	REQUIRE(threads.size()==1);

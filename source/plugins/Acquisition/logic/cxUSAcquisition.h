@@ -17,7 +17,7 @@
 #include <vector>
 #include "cxForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 class USReconstructInputData;
 }
@@ -69,7 +69,7 @@ private slots:
 	void recordCancelled();
 
 private:
-	std::vector<ssc::VideoSourcePtr> getRecordingVideoSources(ssc::ToolPtr tool);
+	std::vector<VideoSourcePtr> getRecordingVideoSources(ToolPtr tool);
 	bool getWriteColor() const;
 	void sendAcquisitionDataToReconstructer();
 

@@ -29,7 +29,7 @@ CatchImpl::CatchImpl()
 
 int CatchImpl::run(int argc, char* argv[])
 {
-	ssc::Application app( argc, argv );
+	cx::Application app( argc, argv );
 
 	int returnCode = mSession->applyCommandLine( argc, argv );
 	if( returnCode != 0 )

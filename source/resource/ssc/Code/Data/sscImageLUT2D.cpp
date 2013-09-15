@@ -34,7 +34,7 @@
 #include "sscVector3D.h"
 #include "sscLogger.h"
 
-namespace ssc
+namespace cx
 {
 
 ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :

@@ -29,7 +29,7 @@
 
 #include <qtimer.h>
 
-namespace ssc
+namespace cx
 {
 
 VideoSourceSHM::VideoSourceSHM(int width, int height, int depth)

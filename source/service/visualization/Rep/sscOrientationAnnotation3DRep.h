@@ -31,7 +31,7 @@ typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWi
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotation3DRepPtr;
@@ -40,13 +40,13 @@ typedef boost::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotatio
  * \ingroup cxServiceVisualizationRep
  *
  */
-class OrientationAnnotation3DRep: public ssc::RepImpl
+class OrientationAnnotation3DRep: public RepImpl
 {
 Q_OBJECT
 public:
 	static OrientationAnnotation3DRepPtr New(const QString& uid, const QString& name);
 	virtual ~OrientationAnnotation3DRep();
-	virtual QString getType() const { return "ssc::OrientationAnnotation3DRep"; }
+	virtual QString getType() const { return "OrientationAnnotation3DRep"; }
 
 	bool getVisible() const;
 	void setVisible(bool on);
@@ -56,8 +56,8 @@ public:
 private slots:
 protected:
 	OrientationAnnotation3DRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(View* view);
+	virtual void removeRepActorsFromViewRenderer(View* view);
 
 private:
 	vtkOrientationMarkerWidgetPtr mMarker;

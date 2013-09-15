@@ -8,7 +8,7 @@
 
 #include "sscTransform3D.h"
 
-namespace ssc {
+namespace cx {
 
 /**\brief Reader class for the position file.
  * 
@@ -86,7 +86,7 @@ private:
 	QDataStream stream;
 };
 
-} // namespace ssc 
+} // namespace cx 
 
 
 #endif /*SSCPOSITIONSTORAGEFILE_H_*/

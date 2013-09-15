@@ -15,13 +15,13 @@ namespace cx
  */
 
 /**
- * \brief cx implementation of additional functionality for the ssc::DataManager
+ * \brief cx implementation of additional functionality for the DataManager
  * \ingroup cxServicePatient
  *
  * \date Mar 23, 2009
  * \author Janne Beate Bakeng, SINTEF
  */
-class cxDataManager: public ssc::DataManagerImpl
+class cxDataManager: public DataManagerImpl
 {
 Q_OBJECT
 public:
@@ -30,7 +30,7 @@ public:
 
 	static void initialize();
 	bool getDebugMode() const;
-	virtual ssc::PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
+	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 signals:
 	void debugModeChanged(bool on);
@@ -47,7 +47,7 @@ private:
 	cxDataManager(cxDataManager const&);
 	cxDataManager& operator=(cxDataManager const&);
 
-	mutable ssc::PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
+	mutable PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
 };
 
 /**

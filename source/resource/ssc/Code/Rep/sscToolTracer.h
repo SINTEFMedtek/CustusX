@@ -34,7 +34,7 @@ typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 
 class QColor;
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
@@ -87,6 +87,6 @@ private:
 	double mMinDistance;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCTOOLTRACKER_H_*/

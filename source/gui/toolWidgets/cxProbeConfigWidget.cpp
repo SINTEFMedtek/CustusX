@@ -35,14 +35,14 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 	mActiveProbeConfig = ActiveProbeConfigurationStringDataAdapter::New();
 	connect(mActiveProbeConfig.get(), SIGNAL(changed()), this, SLOT(activeProbeConfigurationChangedSlot()));
-	mActiveProbeConfigWidget = new ssc::LabeledComboBoxWidget(this, mActiveProbeConfig);
+	mActiveProbeConfigWidget = new LabeledComboBoxWidget(this, mActiveProbeConfig);
 	topLayout->addWidget(mActiveProbeConfigWidget);
 
-	mOrigin = ssc::Vector3DDataAdapterXml::initialize("Origin",
+	mOrigin = Vector3DDataAdapterXml::initialize("Origin",
 		"Origin",
 		"Origin of tool space in the probe image.\nUnits in pixels.",
-		ssc::Vector3D(0,0,0),
-		ssc::DoubleRange(-1000,1000,1),
+		Vector3D(0,0,0),
+		DoubleRange(-1000,1000,1),
 		1,
 		QDomNode());
 	connect(mOrigin.get(), SIGNAL(changed()), this, SLOT(guiOriginSettingsChanged()));
@@ -71,17 +71,17 @@ ProbeConfigWidget::ProbeConfigWidget(QWidget* parent) : BaseWidget(parent, "Prob
 	sectorLayout->addWidget(mOriginWidget);
 	mDepthWidget = new SliderRangeGroupWidget(this);
 	mDepthWidget->setName("Depth");
-	mDepthWidget->setRange(ssc::DoubleRange(0, 1000, 1));
+	mDepthWidget->setRange(DoubleRange(0, 1000, 1));
 	mDepthWidget->setDecimals(1);
 	mDepthWidget->setToolTip("Define probe depth.\nUnits in pixels.");
 	connect(mDepthWidget, SIGNAL(valueChanged(double, double)), this, SLOT(guiProbeSectorChanged()));
 	sectorLayout->addWidget(mDepthWidget);
 
-	mWidth = ssc::DoubleDataAdapterXml::initialize("width", "Width", "Width of probe sector", 0,
-						ssc::DoubleRange(0, M_PI, M_PI/180), 0);
+	mWidth = DoubleDataAdapterXml::initialize("width", "Width", "Width of probe sector", 0,
+						DoubleRange(0, M_PI, M_PI/180), 0);
 	mWidth->setInternal2Display(180.0/M_PI);
 	connect(mWidth.get(), SIGNAL(changed()), this, SLOT(guiProbeSectorChanged()));
-	sectorLayout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mWidth, 0, 0));
+	sectorLayout->addWidget(new SpinBoxAndSliderGroupWidget(this, mWidth, 0, 0));
 
 	// create buttons bar
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
@@ -137,7 +137,7 @@ void ProbeConfigWidget::savePresetSlot()
 {
 	if (!mActiveProbeConfig->getTool())
 		return;
-	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::cxProbe>(mActiveProbeConfig->getTool()->getProbe());
+	cxProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 
@@ -185,7 +185,7 @@ void ProbeConfigWidget::savePresetSlot()
 
 void ProbeConfigWidget::deletePresetSlot()
 {
-	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::cxProbe>(mActiveProbeConfig->getTool()->getProbe());
+	cxProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
 
@@ -207,10 +207,10 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::cxProbe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getProbeData();
+	ProbeData data = probe->getProbeData();
 	mUpdating= true;
 
-	ssc::DoubleBoundingBox3D range(0, data.getImage().mSize.width(), 0, data.getImage().mSize.height());
+	DoubleBoundingBox3D range(0, data.getImage().mSize.width(), 0, data.getImage().mSize.height());
 	mBBWidget->setValue(data.getImage().mClipRect_p, range);
 
 	mOrigin->setValue(data.getImage().mOrigin_p);
@@ -219,18 +219,18 @@ void ProbeConfigWidget::activeProbeConfigurationChangedSlot()
 	double sy = data.getImage().mSpacing[1];
 
 	mDepthWidget->setValue(std::make_pair(data.getDepthStart()/sy, data.getDepthEnd()/sy));
-	mDepthWidget->setRange(ssc::DoubleRange(0, range.range()[1]*1.5, 1));
+	mDepthWidget->setRange(DoubleRange(0, range.range()[1]*1.5, 1));
 
 	mWidth->setValue(data.getWidth());
 
-	if (data.getType()== ssc::ProbeData::tLINEAR)
+	if (data.getType()== ProbeData::tLINEAR)
 	{
-		mWidth->setValueRange(ssc::DoubleRange(0, range.range()[0]*1.5*sx, 1.0*sx));
+		mWidth->setValueRange(DoubleRange(0, range.range()[0]*1.5*sx, 1.0*sx));
 		mWidth->setInternal2Display(1.0/sx);
 	}
-	if (data.getType()== ssc::ProbeData::tSECTOR)
+	if (data.getType()== ProbeData::tSECTOR)
 	{
-		mWidth->setValueRange(ssc::DoubleRange(0, M_PI, M_PI/180));
+		mWidth->setValueRange(DoubleRange(0, M_PI, M_PI/180));
 		mWidth->setInternal2Display(180.0/M_PI);
 	}
 
@@ -252,7 +252,7 @@ void ProbeConfigWidget::guiProbeSectorChanged()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::cxProbe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getProbeData();
+	ProbeData data = probe->getProbeData();
 
 	double sx = data.getImage().mSpacing[0]; // mm/pix
 	double sy = data.getImage().mSpacing[1];
@@ -275,9 +275,9 @@ void ProbeConfigWidget::guiImageSettingsChanged()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::cxProbe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getProbeData();
+	ProbeData data = probe->getProbeData();
 
-	ssc::ProbeData::ProbeImageData image = data.getImage();
+	ProbeData::ProbeImageData image = data.getImage();
 
 	image.mClipRect_p = mBBWidget->getValue();
 	data.setImage(image);
@@ -295,16 +295,16 @@ void ProbeConfigWidget::guiOriginSettingsChanged()
 	cx::ProbePtr probe = boost::dynamic_pointer_cast<cx::cxProbe>(mActiveProbeConfig->getTool()->getProbe());
 	if (!probe)
 		return;
-	ssc::ProbeData data = probe->getProbeData();
+	ProbeData data = probe->getProbeData();
 
-	ssc::ProbeData::ProbeImageData image = data.getImage();
+	ProbeData::ProbeImageData image = data.getImage();
 
 	// if sync: move clip rect accordingly
 	if (mSyncBoxToSector->isChecked())
 	{
 		// shift
-		ssc::Vector3D shift = mOrigin->getValue() - image.mOrigin_p;
-		image.mClipRect_p = ssc::transform(ssc::createTransformTranslate(shift), image.mClipRect_p);
+		Vector3D shift = mOrigin->getValue() - image.mOrigin_p;
+		image.mClipRect_p = transform(createTransformTranslate(shift), image.mClipRect_p);
 	}
 
 	image.mOrigin_p = mOrigin->getValue();

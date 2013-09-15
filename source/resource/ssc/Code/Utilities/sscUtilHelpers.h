@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <QString>
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -44,6 +44,6 @@ QString changeExtension(QString name, QString ext);
  * \}
  */
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCUTILHELPERS_H_*/

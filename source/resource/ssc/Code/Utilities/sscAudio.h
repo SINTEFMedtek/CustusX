@@ -3,7 +3,7 @@
 
 #include "boost/shared_ptr.hpp"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Interface for playing sounds

@@ -27,7 +27,7 @@
 
 #include "sscMesh.h"
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -56,6 +56,6 @@ private:
 
 typedef boost::shared_ptr<VtkFileMesh> VtkFileMeshPtr;
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCVTKFILEMESH_*/

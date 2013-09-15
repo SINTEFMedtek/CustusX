@@ -6,7 +6,7 @@
 #include <vector>
 
 // --------------------------------------------------------
-namespace ssc
+namespace cx
 {
 //namespace utils
 //{
@@ -81,7 +81,7 @@ std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data);
 // --------------------------------------------------------
 //} // namespace utils
 //using namespace utils;
-} // namespace ssc
+} // namespace cx
 // --------------------------------------------------------
 
 #endif /*SSCBOUNDINGBOX3D_H_*/

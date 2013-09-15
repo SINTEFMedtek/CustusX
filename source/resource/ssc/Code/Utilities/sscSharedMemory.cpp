@@ -2,7 +2,7 @@
 
 #include "sscSharedMemory.h"
 
-namespace ssc
+namespace cx
 {
 
 // Shared header kept first in shared memory area

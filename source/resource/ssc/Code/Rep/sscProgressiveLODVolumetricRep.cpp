@@ -29,9 +29,9 @@
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
-/**Helper class for rendering a time-consuming ssc::Rep
+/**Helper class for rendering a time-consuming Rep
  * in another thread. Construct and start the thread,
  * connect to finished() and use the result in the finished()
  * slot.
@@ -40,11 +40,11 @@ namespace ssc
 class VolumetricRepThreadedRenderer : public QThread
 {
 public:
-	VolumetricRepThreadedRenderer(ssc::VolumetricRepPtr rep):
+	VolumetricRepThreadedRenderer(VolumetricRepPtr rep):
 		QThread(), mRep(rep) {}
 	/**render the rep in a secondary thread.
 	 *
-	 * -using ssc::View crashes (Qt in another thread),
+	 * -using View crashes (Qt in another thread),
 	 * -pure vtk gives a popup window, but seems to work ok.
 	 * -The sleep way gives the rest of the gui a chance to render before rendering
 	 *  the volumetricrep, thus prettying up things a bit. Still the main thread hangs
@@ -63,7 +63,7 @@ public:
 		renderer->AddVolume(mRep->getVtkVolume());
 		window->Render();
 
-	//	ssc::View* view = new ssc::View();
+	//	View* view = new View();
 	//	view->addRep(mRep);
 	//	view->GetRenderWindow()->GetInteractor()->Disable();
 	//	view->GetRenderWindow()->Render();
@@ -176,7 +176,7 @@ VolumetricRepPtr ProgressiveLODVolumetricRep::getNextResampleLevel()
 	QString text = "_" + qstring_cast(maxVoxels);
 	mResampleMaxVoxels.pop_back();
 
-	VolumetricRepPtr next = ssc::VolumetricRep::New(getUid()+text);
+	VolumetricRepPtr next = VolumetricRep::New(getUid()+text);
 	next->setMaxVolumeSize(maxVoxels);
 	next->setImage(mImage);
 	return next;
@@ -235,4 +235,4 @@ void ProgressiveLODVolumetricRep::volumetricThreadFinishedSlot()
 }
 
 
-} // namespace ssc
+} // namespace cx

@@ -72,7 +72,7 @@ void IgstkToolManager::setReferenceAndTrackerOnTools()
 {
 	if (!mReferenceTool)
 	{
-		ssc::messageManager()->sendWarning("Tracking is configured without a reference tool.");
+		messageManager()->sendWarning("Tracking is configured without a reference tool.");
 	}
 
 	std::map<QString, IgstkToolPtr>::iterator it;
@@ -91,7 +91,7 @@ void IgstkToolManager::createTracker(IgstkTracker::InternalStructure trackerStru
 	if (tracker->isValid())
 		mTracker = tracker;
 	else
-		ssc::messageManager()->sendWarning("Invalid tracker.");
+		messageManager()->sendWarning("Invalid tracker.");
 }
 
 void IgstkToolManager::createTools(std::vector<IgstkTool::InternalStructure> toolStructures,
@@ -120,7 +120,7 @@ IgstkToolPtr IgstkToolManager::addIgstkTools(IgstkTool::InternalStructure& toolS
 	}
 	else
 	{
-		ssc::messageManager()->sendWarning(toolStructure.mUid + " is not valid.");
+		messageManager()->sendWarning(toolStructure.mUid + " is not valid.");
 	}
 	return igstkTool;
 }

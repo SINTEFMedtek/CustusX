@@ -33,7 +33,7 @@
 #include "sscVector3DDataAdapter.h"
 #include "sscXmlOptionItem.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class Vector3DDataAdapterXml> Vector3DDataAdapterXmlPtr;
@@ -96,6 +96,6 @@ private:
 	double mFactor;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCVECTOR3DDATAADAPTERXML_H_ */

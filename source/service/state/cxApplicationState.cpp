@@ -45,11 +45,11 @@ ApplicationState::~ApplicationState()
 void ApplicationState::onEntry(QEvent * event)
 {
 	mActive = true;
-	ssc::messageManager()->sendInfo("Application change to [" + mName + "]");
+	messageManager()->sendInfo("Application change to [" + mName + "]");
 	if (mAction)
 		mAction->setChecked(true);
 
-	ssc::dataManager()->setClinicalApplication(this->getClinicalApplication());
+	dataManager()->setClinicalApplication(this->getClinicalApplication());
 	if (stateService()->getWorkflow())
 		stateService()->getWorkflow()->setActiveState("PatientDataUid");
 	patientService()->getPatientData()->clearPatient();

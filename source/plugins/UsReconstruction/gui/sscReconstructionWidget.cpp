@@ -18,10 +18,10 @@
 namespace cx
 {
 
-ReconstructionWidget::ReconstructionWidget(QWidget* parent, ssc::ReconstructManagerPtr reconstructer) :
+ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructManagerPtr reconstructer) :
 	BaseWidget(parent, "", "US Reconstruction"), mReconstructer(reconstructer)
 {
-//	ssc::ThreadedTimedReconstructerPtr threadedReconstructer = mReconstructer->getThreadedTimedReconstructer();
+//	ThreadedTimedReconstructerPtr threadedReconstructer = mReconstructer->getThreadedTimedReconstructer();
 //	connect(threadedReconstructer.get(), SIGNAL(started(int)), this, SLOT(reconstructStartedSlot()));
 //	connect(threadedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
 	connect(mReconstructer.get(), SIGNAL(reconstructAboutToStart()), this, SLOT(reconstructAboutToStartSlot()));
@@ -32,7 +32,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ssc::ReconstructMana
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
-	mFileSelectWidget = new ssc::FileSelectWidget(this);
+	mFileSelectWidget = new FileSelectWidget(this);
 	connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
 	mFileSelectWidget->setNameFilter(QStringList() << "*.fts");
 
@@ -54,11 +54,11 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ssc::ReconstructMana
 //	mTimedAlgorithmProgressBar->attach(threadedReconstructer);
 
 	QGridLayout* sizesLayout = new QGridLayout;
-	mMaxVolSizeWidget = new ssc::SpinBoxGroupWidget(this, mReconstructer->getParams()->mMaxVolumeSize);
+	mMaxVolSizeWidget = new SpinBoxGroupWidget(this, mReconstructer->getParams()->mMaxVolumeSize);
 	sizesLayout->addWidget(inputSpacingLabel, 0, 0);
 	sizesLayout->addWidget(mInputSpacingLineEdit, 0, 1);
 	sizesLayout->addLayout(extentLayout, 0, 2);
-	mSpacingWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterSpacing(mReconstructer)), sizesLayout, 1);
+	mSpacingWidget = new SpinBoxGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterSpacing(mReconstructer)), sizesLayout, 1);
 	sizesLayout->addWidget(mMaxVolSizeWidget, 1, 2);
 
 	QHBoxLayout* runLayout = new QHBoxLayout;
@@ -73,7 +73,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ssc::ReconstructMana
 	topLayout->addWidget(mFileSelectWidget);
 	topLayout->addLayout(sizesLayout);
 
-	ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mPresetTFAdapter);
+	LabeledComboBoxWidget* presetTFWidget = new LabeledComboBoxWidget(this, mReconstructer->getParams()->mPresetTFAdapter);
 	topLayout->addWidget(presetTFWidget);
 
 	mOptionsWidget = this->createOptionsWidget();
@@ -114,7 +114,7 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	mAlgorithmGroup->setSizePolicy(mAlgorithmGroup->sizePolicy().horizontalPolicy(),QSizePolicy::Fixed);
 
 	QVBoxLayout* algoOuterLayout = new QVBoxLayout(mAlgorithmGroup);
-	ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->getParams()->mAlgorithmAdapter);
+	LabeledComboBoxWidget* algorithmWidget = new LabeledComboBoxWidget(this, mReconstructer->getParams()->mAlgorithmAdapter);
 	algoOuterLayout->addWidget(algorithmWidget);
 	mAlgoLayout = new QStackedLayout;
 	this->repopulateAlgorithmGroup();
@@ -123,23 +123,23 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 	layout->addWidget(mAlgorithmGroup, line, 0, 1, 2);
 	++line;
 
-	ssc::createDataWidget(this, mReconstructer->getParams()->mAngioAdapter, layout, line++);
-	ssc::createDataWidget(this, mReconstructer->getParams()->mCreateBModeWhenAngio, layout, line++);
-	ssc::createDataWidget(this, mReconstructer->getParams()->mOrientationAdapter, layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParams()->mAngioAdapter, layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParams()->mCreateBModeWhenAngio, layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParams()->mOrientationAdapter, layout, line++);
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 2);
 
-	mDimXWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterXDim(mReconstructer)));
-	mDimYWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterYDim(mReconstructer)));
-	mDimZWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new ssc::DoubleDataAdapterZDim(mReconstructer)));
+	mDimXWidget = new SpinBoxGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterXDim(mReconstructer)));
+	mDimYWidget = new SpinBoxGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterYDim(mReconstructer)));
+	mDimZWidget = new SpinBoxGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterZDim(mReconstructer)));
 	QHBoxLayout* outputVolDimLayout = new QHBoxLayout;
 	outputVolDimLayout->addWidget(mDimXWidget);
 	outputVolDimLayout->addWidget(mDimYWidget);
 	outputVolDimLayout->addWidget(mDimZWidget);
 	layout->addLayout(outputVolDimLayout, line++, 0, 1, 2);
 
-	ssc::createDataWidget(this, mReconstructer->getParams()->mAlignTimestamps, layout, line++);
-	ssc::createDataWidget(this, mReconstructer->getParams()->mTimeCalibration, layout, line++);
-	ssc::createDataWidget(this, mReconstructer->getParams()->mMaskReduce, layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParams()->mAlignTimestamps, layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParams()->mTimeCalibration, layout, line++);
+	sscCreateDataWidget(this, mReconstructer->getParams()->mMaskReduce, layout, line++);
 
 	return retval;
 }
@@ -174,7 +174,7 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 	std::vector<DataAdapterPtr> algoOption = mReconstructer->getAlgoOptions();
 	for (unsigned i = 0; i < algoOption.size(); ++i)
 	{
-		ssc::createDataWidget(oneAlgoWidget, algoOption[i], oneAlgoLayout, i);
+		sscCreateDataWidget(oneAlgoWidget, algoOption[i], oneAlgoLayout, i);
 	}
 
 	mAlgoLayout->setCurrentWidget(oneAlgoWidget);
@@ -213,7 +213,7 @@ void ReconstructionWidget::selectData(QString filename)
 {
 	if (filename.isEmpty())
 	{
-		ssc::messageManager()->sendWarning("no file selected");
+		messageManager()->sendWarning("no file selected");
 		return;
 	}
 
@@ -227,7 +227,7 @@ void ReconstructionWidget::paramsChangedSlot()
 {
 //	repopulateAlgorithmGroup();
 
-	ssc::Vector3D range = mReconstructer->getOutputVolumeParams().mExtent.range();
+	Vector3D range = mReconstructer->getOutputVolumeParams().mExtent.range();
 
 	QString extText =
 		QString("%1,  %2,  %3").arg(range[0], 0, 'f', 1).arg(range[1], 0, 'f', 1).arg(range[2], 0, 'f', 1);

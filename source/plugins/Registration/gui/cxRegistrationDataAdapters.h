@@ -39,7 +39,7 @@ public: // basic methods
 
 public: // optional methods
 //  virtual QString getHelp() const;
-//  virtual ssc::DataPtr getData() const;
+//  virtual DataPtr getData() const;
 
 private:
   RegistrationManagerPtr mManager;
@@ -64,7 +64,7 @@ public: // basic methods
 
 public: // optional methods
 //  virtual QString getHelp() const;
-//  virtual ssc::DataPtr getData() const;
+//  virtual DataPtr getData() const;
 
 private:
   RegistrationManagerPtr mManager;

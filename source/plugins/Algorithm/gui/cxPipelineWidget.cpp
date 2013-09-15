@@ -112,7 +112,7 @@ PipelineWidget::PipelineWidget(QWidget* parent, PipelinePtr pipeline) :
 	FilterGroupPtr filters = mPipeline->getFilters();
 	std::vector<SelectDataStringDataAdapterBasePtr> nodes = mPipeline->getNodes();
 	if (filters->size()+1 != nodes.size())
-		ssc::messageManager()->sendError("Filter/Node mismatch");
+		messageManager()->sendError("Filter/Node mismatch");
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 //	std::cout << "PipelineWidget spacing " << topLayout->spacing() << std::endl;\

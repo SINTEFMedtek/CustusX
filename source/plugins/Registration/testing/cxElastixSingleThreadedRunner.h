@@ -36,10 +36,10 @@ class ElastixSingleThreadedRunner : public QObject
 	Q_OBJECT
 public:
 	bool registerLinear(
-        ssc::DataPtr fixed,
-        ssc::DataPtr moving,
+        DataPtr fixed,
+        DataPtr moving,
 		ElastixParametersPtr preset,
-        ssc::Transform3D* result);
+        Transform3D* result);
 
 	ElastixSingleThreadedRunner();
 	virtual ~ElastixSingleThreadedRunner();
@@ -50,7 +50,7 @@ private slots:
 private:
 	ElastixExecuterPtr mExecuter;
 	bool mCompleted;
-	ssc::Transform3D m_mMf;
+	Transform3D m_mMf;
 
 };
 

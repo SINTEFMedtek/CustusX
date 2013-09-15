@@ -37,7 +37,7 @@
 #include "sscDataManager.h"
 #include "sscToolTracer.h"
 
-namespace ssc
+namespace cx
 {
 
 ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
@@ -87,7 +87,7 @@ ToolRep3DPtr ToolRep3D::New(const QString& uid, const QString& name)
 
 QString ToolRep3D::getType() const
 {
-	return "ssc::ToolRep3D";
+	return "ToolRep3D";
 }
 
 ToolPtr ToolRep3D::getTool()
@@ -203,7 +203,7 @@ void ToolRep3D::setSphereRadiusInNormalizedViewport(bool on)
 
 	if (on)
 	{
-		mViewportListener.reset(new ssc::ViewportListener);
+		mViewportListener.reset(new ViewportListener);
 		mViewportListener->setCallback(boost::bind(&ToolRep3D::scaleSpheres, this));
 	}
 	else
@@ -282,7 +282,7 @@ void ToolRep3D::scaleSpheres()
 
 void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
-	Transform3DPtr rMprPtr = ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = (*rMprPtr) * prMt;
 	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
 	this->update();
@@ -293,7 +293,7 @@ void ToolRep3D::update()
 	Transform3D prMt = Transform3D::Identity();
 	if (mTool)
 		prMt = mTool->get_prMt();
-	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 
 	if (this->showProbe())
 	{
@@ -313,7 +313,7 @@ void ToolRep3D::probeSectorChanged()
 		return;
 
 	Transform3D prMt = mTool->get_prMt();
-	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 
 	if (this->showProbe())
 	{
@@ -363,7 +363,7 @@ void ToolRep3D::updateOffsetGraphics()
 
 	if (!mTool)
 		return;
-	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = rMpr * mTool->get_prMt();
 
 	Vector3D p0 = rMt.coord(Vector3D(0, 0, 0));
@@ -417,7 +417,7 @@ void ToolRep3D::tooltipOffsetSlot(double val)
 
 bool ToolRep3D::showProbe()
 {
-	return mTool && (mTool->hasType(Tool::TOOL_US_PROBE)) && (mTool->getProbeSector().getType()!=ssc::ProbeData::tNONE);
+	return mTool && (mTool->hasType(Tool::TOOL_US_PROBE)) && (mTool->getProbeSector().getType()!=ProbeData::tNONE);
 }
 
-} // namespace ssc
+} // namespace cx

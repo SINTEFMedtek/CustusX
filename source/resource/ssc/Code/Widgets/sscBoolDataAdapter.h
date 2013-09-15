@@ -29,7 +29,7 @@
 
 #include "sscDataAdapter.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief DataAdapter interface for boolean values.

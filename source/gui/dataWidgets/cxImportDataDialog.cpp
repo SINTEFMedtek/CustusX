@@ -44,15 +44,15 @@ ImportDataDialog::ImportDataDialog(QString filename, QWidget* parent) :
   layout->addWidget(mNameLabel);
 
   mModalityAdapter = DataModalityStringDataAdapter::New();
-  mModalityCombo = new ssc::LabeledComboBoxWidget(this, mModalityAdapter);
+  mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
   layout->addWidget(mModalityCombo);
 
   mImageTypeAdapter = ImageTypeStringDataAdapter::New();
-  mImageTypeCombo = new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter);
+  mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
   layout->addWidget(mImageTypeCombo);
 
   mParentFrameAdapter = SetParentFrameStringDataAdapter::New();
-  mParentFrameCombo = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
+  mParentFrameCombo = new LabeledComboBoxWidget(this, mParentFrameAdapter);
   layout->addWidget(mParentFrameCombo);
 
   mNiftiFormatCheckBox = new QCheckBox("Use NIfTI-1/ITK-Snap axis definition", this);
@@ -92,7 +92,7 @@ ImportDataDialog::ImportDataDialog(QString filename, QWidget* parent) :
   mOkButton->setDefault(true);
   mOkButton->setFocus();
 
-  ssc::messageManager()->sendInfo("Importing data...");
+  messageManager()->sendInfo("Importing data...");
 }
 
 ImportDataDialog::~ImportDataDialog()
@@ -129,7 +129,7 @@ void ImportDataDialog::importDataSlot()
   mUidLabel->setText("Data uid:  " + qstring_cast(mData->getUid()));
   mNameLabel->setText("Data name: " + qstring_cast(mData->getName()));
 
-  ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mData);
+  ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
   mModalityAdapter->setData(image);
   mModalityCombo->setEnabled(image!=0);
   mImageTypeAdapter->setData(image);
@@ -137,13 +137,13 @@ void ImportDataDialog::importDataSlot()
 
   this->setInitialGuessForParentFrame();
   mParentFrameAdapter->setData(mData);
-  mParentFrameCombo->setEnabled(ssc::dataManager()->getData().size()>1);
+  mParentFrameCombo->setEnabled(dataManager()->getData().size()>1);
 
   // enable nifti imiport only for meshes. (as this is the only case we have seen)
-  mNiftiFormatCheckBox->setEnabled(ssc::dataManager()->getMesh(mData->getUid())!=0);
+  mNiftiFormatCheckBox->setEnabled(dataManager()->getMesh(mData->getUid())!=0);
 
   mConvertToUnsignedCheckBox->setEnabled(false);
-//  ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mData);
+//  ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
   if (image && image->getBaseVtkImageData())
   {
 	  vtkImageDataPtr img = image->getBaseVtkImageData();
@@ -171,8 +171,8 @@ void ImportDataDialog::setInitialGuessForParentFrame()
 
   QString base = qstring_cast(mData->getName()).split(".")[0];
 
-  std::map<QString, ssc::DataPtr> all = ssc::dataManager()->getData();
-  for (std::map<QString, ssc::DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
+  std::map<QString, DataPtr> all = dataManager()->getData();
+  for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
   {
     if (iter->second==mData)
       continue;
@@ -188,7 +188,7 @@ void ImportDataDialog::setInitialGuessForParentFrame()
 
 void ImportDataDialog::updateImportTransformButton()
 {
-  ssc::DataPtr parent = ssc::dataManager()->getData(mParentFrameAdapter->getValue());
+  DataPtr parent = dataManager()->getData(mParentFrameAdapter->getValue());
   bool enabled = bool(parent);
   mTransformFromParentFrameCheckBox->setEnabled(enabled);
 }
@@ -216,10 +216,10 @@ void ImportDataDialog::convertFromNifti1Coordinates()
     return;
   if(!mData)
     return;
-  ssc::Transform3D rMd = mData->get_rMd();
-  rMd = rMd * ssc::createTransformRotateZ(M_PI);
+  Transform3D rMd = mData->get_rMd();
+  rMd = rMd * createTransformRotateZ(M_PI);
   mData->get_rMd_History()->setRegistration(rMd);
-  ssc::messageManager()->sendInfo("Nifti import: rotated input data " + mData->getName() + " 180* around Z-axis.");
+  messageManager()->sendInfo("Nifti import: rotated input data " + mData->getName() + " 180* around Z-axis.");
 }
 
 /** Apply the transform from the parent frame to the imported data.
@@ -231,11 +231,11 @@ void ImportDataDialog::importParentTransform()
     return;
   if(!mData)
     return;
-  ssc::DataPtr parent = ssc::dataManager()->getData(mData->getParentSpace());
+  DataPtr parent = dataManager()->getData(mData->getParentSpace());
   if (!parent)
     return;
   mData->get_rMd_History()->setRegistration(parent->get_rMd());
-  ssc::messageManager()->sendInfo("Assigned rMd from data [" + parent->getName() + "] to data [" + mData->getName() + "]");
+  messageManager()->sendInfo("Assigned rMd from data [" + parent->getName() + "] to data [" + mData->getName() + "]");
 }
 
 void ImportDataDialog::convertToUnsigned()
@@ -243,19 +243,19 @@ void ImportDataDialog::convertToUnsigned()
 	if (!mConvertToUnsignedCheckBox->isChecked())
 		return;
 
-	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(mData);
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
 	if (!image)
 		return;
 
-	ssc::ImagePtr converted = ssc::convertImageToUnsigned(image);
+	ImagePtr converted = convertImageToUnsigned(image);
 
 	image->setVtkImageData(converted->getBaseVtkImageData());
 
-	ssc::ImageTF3DPtr TF3D = converted->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData());
-	ssc::ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy(image->getBaseVtkImageData());
+	ImageTF3DPtr TF3D = converted->getTransferFunctions3D()->createCopy(image->getBaseVtkImageData());
+	ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy(image->getBaseVtkImageData());
 	image->setLookupTable2D(LUT2D);
 	image->setTransferFunctions3D(TF3D);
-	ssc::dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());
+	dataManager()->saveImage(image, patientService()->getPatientData()->getActivePatientFolder());
 }
 
 
