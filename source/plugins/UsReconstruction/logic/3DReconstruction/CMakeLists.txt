@@ -125,6 +125,14 @@ if (SSC_USE_OpenCL)
 #    ENDIF (APPLE)    
 endif (SSC_USE_OpenCL)
 
+# Include Tords stuff
+
+SET( SOURCE_FILES
+	${SOURCE_FILES}
+	TordReconstruct/TordTest.cpp
+	TordReconstruct/TordTest.h
+	)
+
 # create the target
 add_library( sscUS3DReconstruction ${SOURCE_FILES} )
 
