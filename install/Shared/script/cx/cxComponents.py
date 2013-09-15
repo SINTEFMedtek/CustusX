@@ -385,7 +385,7 @@ class CustusX3(CppComponent):
         if (platform.system() == 'Windows'):
             turn_on = False;
         add('CX_USE_TSF:BOOL', turn_on);
-        add('CX_USE_ISB_GE:BOOL', turn_on);
+        add('CX_USE_ISB_GE:BOOL', False);
         add('SSC_USE_DCMTK:BOOL', False);
         add('SSC_BUILD_EXAMPLES:BOOL', self.controlData.mBuildSSCExamples);
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);

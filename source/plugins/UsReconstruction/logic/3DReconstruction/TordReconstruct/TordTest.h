@@ -30,10 +30,11 @@ public:
 	}
 		
 	virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
-	virtual bool reconstruct(ProcessedUsInputDataPtr input,
+	virtual bool reconstruct(ProcessedUSInputDataPtr input,
 	                         vtkImageDataPtr outputData,
 	                         QDomElement settings);
 };
 
 }
 		
+#endif

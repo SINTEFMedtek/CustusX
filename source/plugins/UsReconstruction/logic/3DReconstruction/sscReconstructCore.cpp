@@ -23,6 +23,7 @@
 #include "sscDataManager.h"
 #include "sscToolManager.h"
 #include "sscThunderVNNReconstructAlgorithm.h"
+#include "TordReconstruct/TordTest.h"
 #include "sscPNNReconstructAlgorithm.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"
@@ -75,6 +76,10 @@ ReconstructAlgorithmPtr ReconstructCore::createAlgorithm(QString name)
 	}
 	else if (name == "PNN")
 		retval = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
+	else if (name == "TordTest")
+	{
+		retval = ReconstructAlgorithmPtr(new TordTest());
+	}
 	else
 		retval.reset();
 
@@ -182,7 +187,7 @@ ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
  */
 vtkImageDataPtr ReconstructCore::generateRawOutputVolume()
 {
-	Eigen::Array3i dim = mOutputVolumeParams.getDim();
+ 	Eigen::Array3i dim = mOutputVolumeParams.getDim();
 	ssc::Vector3D spacing = ssc::Vector3D(1, 1, 1) * mOutputVolumeParams.getSpacing();
 	vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);
 	return data;
