@@ -42,21 +42,21 @@ public:
 	  * Encode the image into a IGTLink message, containing
 	  * image data, uid and timstamp
 	  */
-	IGTLinkImageMessage::Pointer encode(ssc::ImagePtr image);
+	IGTLinkImageMessage::Pointer encode(ImagePtr image);
 	/**
 	  * Decode the IGTLink message to create an image containing
 	  * image data, uid and timstamp. The color format is also
 	  * converted to RGBX
 	  */
-	ssc::ImagePtr decode(IGTLinkImageMessage::Pointer msg);
+	ImagePtr decode(IGTLinkImageMessage::Pointer msg);
 
 	/**
 	  * Encode the input probedata into an IGTLink message.
 	  */
-	IGTLinkUSStatusMessage::Pointer encode(ssc::ProbeDataPtr);
+	IGTLinkUSStatusMessage::Pointer encode(ProbeDataPtr);
 	/**
 	  * Decode the input probe and image messages to create a
-	  * ssc::ProbeData object based in the input base.
+	  * ProbeData object based in the input base.
 	  *
 	  * Each message contains part of the data, the parts that
 	  * are missing are simply not filled in (i.e. keep the values
@@ -64,7 +64,7 @@ public:
 	  *
 	  * Some or all of the input messages can be NULL.
 	  */
-	ssc::ProbeDataPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ssc::ProbeDataPtr base);
+	ProbeDataPtr decode(IGTLinkUSStatusMessage::Pointer probeMessage, IGTLinkImageMessage::Pointer imageMessage, ProbeDataPtr base);
 
 	/**
 	  * Decode the image to standard format with standard color RGBX encoding.
@@ -74,8 +74,8 @@ public:
 	  * to standard RGBX format, strip format from uid,
 	  * and return as new image.
 	  */
-	ssc::ImagePtr decode(ssc::ImagePtr msg);
-	ssc::ProbeDataPtr decode(ssc::ProbeDataPtr msg);
+	ImagePtr decode(ImagePtr msg);
+	ProbeDataPtr decode(ProbeDataPtr msg);
 
 private:
 	/** Extract the color format string from enclosing brackets inside

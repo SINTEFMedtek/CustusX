@@ -88,7 +88,7 @@ bool VideoRecorderSaveThread::openTimestampsFile()
 {
 	if(!mTimestampsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
-	  ssc::messageManager()->sendError("Cannot open "+mTimestampsFile.fileName());
+	  messageManager()->sendError("Cannot open "+mTimestampsFile.fileName());
 	  return false;
 	}
 	return true;
@@ -102,7 +102,7 @@ bool VideoRecorderSaveThread::closeTimestampsFile()
 	QFileInfo info(mTimestampsFile);
 	if (!mCancel)
 	{
-//		ssc::messageManager()->sendInfo(QString("Saved %1 timestamps to file %2")
+//		messageManager()->sendInfo(QString("Saved %1 timestamps to file %2")
 //										.arg(mImageIndex)
 //										.arg(info.fileName()));
 	}
@@ -173,7 +173,7 @@ void VideoRecorderSaveThread::run()
 //---------------------------------------------------------
 
 
-SavingVideoRecorder::SavingVideoRecorder(ssc::VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor) :
+SavingVideoRecorder::SavingVideoRecorder(VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor) :
 //	mLastPurgedImageIndex(-1),
 	mSource(source)
 {

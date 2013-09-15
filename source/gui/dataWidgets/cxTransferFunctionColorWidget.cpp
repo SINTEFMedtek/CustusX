@@ -52,7 +52,7 @@ QString TransferFunctionColorWidget::defaultWhatsThis() const
     "</html>";
 }
 
-void TransferFunctionColorWidget::setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData)
+void TransferFunctionColorWidget::setData(ImagePtr image, ImageTFDataPtr tfData)
 {
   if (( mImage == image )&&( mImageTF==tfData ))
     return;
@@ -193,10 +193,10 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
 
   // Go through each point and draw squares
 
-  ssc::ColorMapPtr colorMapPtr = mImageTF->getColorMap();
+  ColorMapPtr colorMapPtr = mImageTF->getColorMap();
   QPoint lastScreenPoint;
   this->mPointRects.clear();
-  for (ssc::ColorMap::iterator colorPoint = colorMapPtr->begin();
+  for (ColorMap::iterator colorPoint = colorMapPtr->begin();
        colorPoint != colorMapPtr->end();
        ++colorPoint)
   {
@@ -238,7 +238,7 @@ bool TransferFunctionColorWidget::isInsideCurrentPoint()
       mCurrentPoint.position = it->first;
       if (it == mPointRects.begin() || it == --mPointRects.end())
         mEndPoint = true;
-      ssc::ColorMapPtr colorMapPtr = mImageTF->getColorMap();
+      ColorMapPtr colorMapPtr = mImageTF->getColorMap();
       if (colorMapPtr->find(mCurrentPoint.position) != colorMapPtr->end())
         mCurrentPoint.value = colorMapPtr->find(mCurrentPoint.position)->second;
       return true;
@@ -266,7 +266,7 @@ TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentC
 {
   ColorPoint point;
   point.position = calculateXPositionInTrFunc(mCurrentClickX);
-  point.position = ssc::constrainValue(point.position, mImage->getMin(), mImage->getMax());
+  point.position = constrainValue(point.position, mImage->getMin(), mImage->getMax());
 
   vtkColorTransferFunctionPtr trFunc = vtkColorTransferFunctionPtr::New();
   mImageTF->fillColorTFFromMap(trFunc);
@@ -286,12 +286,12 @@ void TransferFunctionColorWidget::moveCurrentPoint()
   ColorPoint newColorPoint = this->getCurrentColorPoint();
   newColorPoint.value = mCurrentPoint.value;
 
-  ssc::ColorMap::iterator prevPointIterator = mImageTF->getColorMap()->find(mCurrentPoint.position);
+  ColorMap::iterator prevPointIterator = mImageTF->getColorMap()->find(mCurrentPoint.position);
 
   if (mCurrentPoint.position != mImage->getMin()
     && mCurrentPoint.position != mImage->getMax() )
   {
-    ssc::ColorMap::iterator nextPointIterator = prevPointIterator;
+    ColorMap::iterator nextPointIterator = prevPointIterator;
     --prevPointIterator;
     ++nextPointIterator;
 
@@ -325,10 +325,10 @@ void TransferFunctionColorWidget::setColorSlotDelayed()
 
   if (result.isValid() && result != newPoint.value)
   {
-    ssc::ColorMapPtr colorMapPtr = mImageTF->getColorMap();
+    ColorMapPtr colorMapPtr = mImageTF->getColorMap();
 
     // Check if the point is already in the map
-    ssc::ColorMap::iterator pointIterator = colorMapPtr->find(newPoint.position);
+    ColorMap::iterator pointIterator = colorMapPtr->find(newPoint.position);
 
     mImageTF->addColorPoint(newPoint.position, result);
     newPoint.value = result;

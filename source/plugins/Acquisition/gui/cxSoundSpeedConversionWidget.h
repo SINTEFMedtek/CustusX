@@ -36,7 +36,7 @@ public:
   double getSoundSpeedCompensationFactor(); ///< calculates the sound speed conversion factor
   double getWaterSoundSpeed(); ///< the sound speed in water given a temperatur
 
-  void setProbe(ssc::ProbePtr probe);
+  void setProbe(ProbePtr probe);
 
 public slots:
   void applySoundSpeedCompensationFactorSlot(); ///< sets the sounds speed conversion factor on the rt source
@@ -55,7 +55,7 @@ private:
   const double mScannerSoundSpeed; //m/s
   double mToSoundSpeed; //m/s
 
-  ssc::ProbePtr mProbe;
+  ProbePtr mProbe;
 
   QPushButton*    mApplyButton; ///< applies the compensation on the rt source
   QPushButton*    mResetButton; ///< resets the sound speed to scanner sound speed

@@ -31,6 +31,8 @@
 #	sudo apt-get install python-setuptools (ubuntu)
 #       sudo easy_install pip
 #       sudo pip install jenkinsapi
+#   Update to latest version:
+#       pip install --upgrade jenkinsapi
 #
 #
 #####################################################

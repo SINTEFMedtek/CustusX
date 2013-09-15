@@ -26,12 +26,12 @@
 //TODO: this inclusion adds an unwanted dependency - must be solved.
 #include "sscDataManager.h"
 
-namespace ssc
+namespace cx
 {
 
-ssc::DataPtr DistanceMetricReader::load(const QString& uid, const QString& filename)
+DataPtr DistanceMetricReader::load(const QString& uid, const QString& filename)
 {
-	return ssc::DataPtr(new DistanceMetric(uid, filename));
+	return DataPtr(new DistanceMetric(uid, filename));
 }
 
 DistanceMetric::DistanceMetric(const QString& uid, const QString& name) :
@@ -59,7 +59,7 @@ unsigned DistanceMetric::getArgumentCount() const
 	return mArgument.size();
 }
 
-void DistanceMetric::setArgument(int index, ssc::DataPtr p)
+void DistanceMetric::setArgument(int index, DataPtr p)
 {
 	if (mArgument[index] == p)
 		return;
@@ -75,17 +75,17 @@ void DistanceMetric::setArgument(int index, ssc::DataPtr p)
 	emit transformChanged();
 }
 
-ssc::DataPtr DistanceMetric::getArgument(int index)
+DataPtr DistanceMetric::getArgument(int index)
 {
 	return mArgument[index];
 }
 
-bool DistanceMetric::validArgument(ssc::DataPtr p) const
+bool DistanceMetric::validArgument(DataPtr p) const
 {
 	return p->getType() == "pointMetric" || p->getType() == "planeMetric";
 }
 
-ssc::Vector3D DistanceMetric::getRefCoord() const
+Vector3D DistanceMetric::getRefCoord() const
 {
     return this->boundingBox().center();
 }
@@ -113,16 +113,16 @@ void DistanceMetric::parseXml(QDomNode& dataNode)
 	for (unsigned i = 0; i < mArgument.size(); ++i)
 	{
 		QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
-		this->setArgument(i, ssc::dataManager()->getData(uid));
+		this->setArgument(i, dataManager()->getData(uid));
 	}
 }
 
-std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
+std::vector<Vector3D> DistanceMetric::getEndpoints() const
 {
 	if (!mArgument[0] || !mArgument[1])
-		return std::vector<ssc::Vector3D>();
-//	PointMetricPtr pt = boost::dynamic_pointer_cast<PointMetric>(ssc::dataManager()->getData(uid));
-	std::vector<ssc::Vector3D> retval(2);
+		return std::vector<Vector3D>();
+//	PointMetricPtr pt = boost::dynamic_pointer_cast<PointMetric>(dataManager()->getData(uid));
+	std::vector<Vector3D> retval(2);
 	// case   I: point-point
 	// case  II: point-plane
 	// case III: plane-plane (not implemented)
@@ -135,7 +135,7 @@ std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 	else if ((mArgument[0]->getType() == "planeMetric") && (mArgument[1]->getType() == "pointMetric"))
 	{
 		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[0])->getRefPlane();
-		ssc::Vector3D p = boost::dynamic_pointer_cast<PointMetric>(mArgument[1])->getRefCoord();
+		Vector3D p = boost::dynamic_pointer_cast<PointMetric>(mArgument[1])->getRefCoord();
 
 		retval[0] = plane.projection(p);
 		retval[1] = p;
@@ -143,7 +143,7 @@ std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 	else if ((mArgument[0]->getType() == "pointMetric") && (mArgument[1]->getType() == "planeMetric"))
 	{
 		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[1])->getRefPlane();
-		ssc::Vector3D p = boost::dynamic_pointer_cast<PointMetric>(mArgument[0])->getRefCoord();
+		Vector3D p = boost::dynamic_pointer_cast<PointMetric>(mArgument[0])->getRefCoord();
 
 		retval[1] = plane.projection(p);
 		retval[0] = p;
@@ -155,14 +155,14 @@ std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 //		Plane3D plane0 = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[0])->getRefPlane();
 //		Plane3D plane1 = boost::dynamic_pointer_cast<PlaneMetric>(mArgument[1])->getRefPlane();
 //
-//		ssc::Vector3D p0 = - plane0.normal() * plane0.offset();
-//		ssc::Vector3D p0 = - plane0.normal() * plane0.offset();
+//		Vector3D p0 = - plane0.normal() * plane0.offset();
+//		Vector3D p0 = - plane0.normal() * plane0.offset();
 //
-//		if (ssc::cross(plane0.))
+//		if (cross(plane0.))
 //	}
 	else
 	{
-		return std::vector<ssc::Vector3D>();
+		return std::vector<Vector3D>();
 	}
 
 	return retval;
@@ -170,16 +170,16 @@ std::vector<ssc::Vector3D> DistanceMetric::getEndpoints() const
 
 double DistanceMetric::getDistance() const
 {
-	std::vector<ssc::Vector3D> endpoints = this->getEndpoints();
+	std::vector<Vector3D> endpoints = this->getEndpoints();
 	if (endpoints.size() != 2)
 		return -1;
 
 	return (endpoints[1] - endpoints[0]).length();
 }
 
-ssc::DoubleBoundingBox3D DistanceMetric::boundingBox() const
+DoubleBoundingBox3D DistanceMetric::boundingBox() const
 {
-	return ssc::DoubleBoundingBox3D::fromCloud(this->getEndpoints());
+	return DoubleBoundingBox3D::fromCloud(this->getEndpoints());
 }
 
 QString DistanceMetric::getAsSingleLineString() const

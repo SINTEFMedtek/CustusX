@@ -28,7 +28,7 @@
 #include "sscTypeConversions.h"
 
 // --------------------------------------------------------
-namespace ssc
+namespace cx
 // --------------------------------------------------------
 {
 
@@ -40,18 +40,18 @@ OrientationAnnotationSmartRep::OrientationAnnotationSmartRep(const QString& uid,
 	mOrientation->SetNonlinearFontScaleFactor(0.35);
 	mOrientation->GetTextProperty()->SetColor(0.7372, 0.815, 0.6039);
 
-	mDCMDirections_r["P"] = ssc::Vector3D( 0, 1, 0); // Posterior
-	mDCMDirections_r["A"] = ssc::Vector3D( 0,-1, 0); // Anterior
-	mDCMDirections_r["R"] = ssc::Vector3D(-1, 0, 0); // Right
-	mDCMDirections_r["L"] = ssc::Vector3D( 1, 0, 0); // Left
-	mDCMDirections_r["S"] = ssc::Vector3D( 0, 0, 1); // Superior
-	mDCMDirections_r["I"] = ssc::Vector3D( 0, 0,-1); // Inferior
+	mDCMDirections_r["P"] = Vector3D( 0, 1, 0); // Posterior
+	mDCMDirections_r["A"] = Vector3D( 0,-1, 0); // Anterior
+	mDCMDirections_r["R"] = Vector3D(-1, 0, 0); // Right
+	mDCMDirections_r["L"] = Vector3D( 1, 0, 0); // Left
+	mDCMDirections_r["S"] = Vector3D( 0, 0, 1); // Superior
+	mDCMDirections_r["I"] = Vector3D( 0, 0,-1); // Inferior
 
 	mPlaneDirections_s.resize(4);
-	mPlaneDirections_s[0] = ssc::Vector3D( 1, 0, 0); // East
-	mPlaneDirections_s[1] = ssc::Vector3D( 0, 1, 0); // North
-	mPlaneDirections_s[2] = ssc::Vector3D(-1, 0, 0); // West
-	mPlaneDirections_s[3] = ssc::Vector3D( 0,-1, 0); // South
+	mPlaneDirections_s[0] = Vector3D( 1, 0, 0); // East
+	mPlaneDirections_s[1] = Vector3D( 0, 1, 0); // North
+	mPlaneDirections_s[2] = Vector3D(-1, 0, 0); // West
+	mPlaneDirections_s[3] = Vector3D( 0,-1, 0); // South
 }
 
 
@@ -92,15 +92,15 @@ void OrientationAnnotationSmartRep::transformChangedSlot()
 	this->createAnnotation();
 }
 
-QString OrientationAnnotationSmartRep::determineAnnotation(ssc::Vector3D planeDir_s, ssc::Transform3D rMs)
+QString OrientationAnnotationSmartRep::determineAnnotation(Vector3D planeDir_s, Transform3D rMs)
 {
-	ssc::Vector3D planeDir_r = rMs.vector(planeDir_s);
+	Vector3D planeDir_r = rMs.vector(planeDir_s);
 
 	QString text;
 	double threshold = cos(mAngle);
 //	double threshold = 0.5;
 
-	for (std::map<QString, ssc::Vector3D>::iterator iter=mDCMDirections_r.begin(); iter!=mDCMDirections_r.end(); ++iter)
+	for (std::map<QString, Vector3D>::iterator iter=mDCMDirections_r.begin(); iter!=mDCMDirections_r.end(); ++iter)
 	{
 		double w = dot(planeDir_r, iter->second);
 		if (w > threshold)
@@ -111,13 +111,13 @@ QString OrientationAnnotationSmartRep::determineAnnotation(ssc::Vector3D planeDi
 //	return "test_"+qstring_cast(planeDir_s);
 }
 
-void OrientationAnnotationSmartRep::addRepActorsToViewRenderer(ssc::View* view)
+void OrientationAnnotationSmartRep::addRepActorsToViewRenderer(View* view)
 {
 	this->transformChangedSlot();
 	view->getRenderer()->AddActor(mOrientation);
 }
 
-void OrientationAnnotationSmartRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void OrientationAnnotationSmartRep::removeRepActorsFromViewRenderer(View* view)
 {
 	view->getRenderer()->RemoveActor(mOrientation);
 }

@@ -32,7 +32,7 @@ namespace cx
 typedef boost::shared_ptr<class TimedBaseAlgorithm> TimedAlgorithmPtr;
 }
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
@@ -86,7 +86,7 @@ public:
 	/**
 	  * Set input data for reconstruction
 	  */
-	void selectData(ssc::USReconstructInputData data);
+	void selectData(USReconstructInputData data);
 	/**
 	  * Get the currently selected filename
 	  */
@@ -94,7 +94,7 @@ public:
 	/**
 	  * Return the currently selected input data
 	  */
-	ssc::USReconstructInputData getSelectedFileData() { return mOriginalFileData; }
+	USReconstructInputData getSelectedFileData() { return mOriginalFileData; }
 
 	/**
 	  * Return control parameters that can be adjusted by the GUI or similar prior to reconstruction
@@ -169,7 +169,7 @@ private:
 	ReconstructParamsPtr mParams;
 	std::vector<DataAdapterPtr> mAlgoOptions;
 	std::set<cx::TimedAlgorithmPtr> mThreadedReconstruction;
-	ssc::USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
+	USReconstructInputData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 
 	OutputVolumeParams mOutputVolumeParams;
 	XmlOptionFile mSettings;

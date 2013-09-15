@@ -32,7 +32,7 @@ class Utilities
 {
 public:
 	static vtkImageDataPtr create3DVtkImageData(Eigen::Array3i dim = Eigen::Array3i(3,3,3));
-	static ssc::ImagePtr create3DImage(Eigen::Array3i dim = Eigen::Array3i(3,3,3));
+	static cx::ImagePtr create3DImage(Eigen::Array3i dim = Eigen::Array3i(3,3,3));
 };
 
 } /* namespace cxtest */

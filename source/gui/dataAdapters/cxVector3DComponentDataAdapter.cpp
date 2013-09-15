@@ -17,7 +17,7 @@
 namespace cx
 {
 
-Vector3DComponentDataAdapter::Vector3DComponentDataAdapter(ssc::Vector3DDataAdapterPtr base, int index, QString name, QString help) :
+Vector3DComponentDataAdapter::Vector3DComponentDataAdapter(Vector3DDataAdapterPtr base, int index, QString name, QString help) :
 		mBase(base), mIndex(index), mName(name), mHelp(help)
 {
 	connect(mBase.get(), SIGNAL(changed()), this, SIGNAL(changed()));
@@ -30,7 +30,7 @@ QString Vector3DComponentDataAdapter::getValueName() const
 
 bool Vector3DComponentDataAdapter::setValue(double value)
 {
-	ssc::Vector3D vec = mBase->getValue();
+	Vector3D vec = mBase->getValue();
 	vec[mIndex] = value;
 //	std::cout << "set val for comp " << "  " << value << "  " << mIndex << std::endl;
 	return mBase->setValue(vec);
@@ -46,7 +46,7 @@ QString Vector3DComponentDataAdapter::getHelp() const
 	return mHelp.isEmpty() ? mBase->getHelp() : mHelp;
 }
 
-ssc::DoubleRange Vector3DComponentDataAdapter::getValueRange() const
+DoubleRange Vector3DComponentDataAdapter::getValueRange() const
 {
 	return mBase->getValueRange();
 }

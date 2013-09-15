@@ -114,6 +114,7 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
       vtkVolumeRendering
       vtkWidgets
       ${OPENGL_gl_LIBRARY}
+      ${SSC_GCOV_LIBRARY}
      )
 
     ADD_EXECUTABLE(vtkGPUMultiVolumeRenderDemo ${EXECUTABLE_FLAG} vtkGPUMultiVolumeRenderDemo.cxx)

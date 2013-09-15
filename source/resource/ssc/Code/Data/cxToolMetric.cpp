@@ -20,9 +20,9 @@
 namespace cx
 {
 
-ssc::DataPtr ToolMetricReader::load(const QString& uid, const QString& filename)
+DataPtr ToolMetricReader::load(const QString& uid, const QString& filename)
 {
-	return ssc::DataPtr(new ToolMetric(uid, filename));
+	return DataPtr(new ToolMetric(uid, filename));
 }
 
 ToolMetricPtr ToolMetric::create(QString uid, QString name)
@@ -83,8 +83,8 @@ void ToolMetric::parseXml(QDomNode& dataNode)
 {
 	Data::parseXml(dataNode);
 
-	this->setSpace(ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
-	this->setFrame(ssc::Transform3D::fromString(dataNode.toElement().attribute("frame", qstring_cast(mFrame))));
+	this->setSpace(CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
+	this->setFrame(Transform3D::fromString(dataNode.toElement().attribute("frame", qstring_cast(mFrame))));
 	this->setToolName(dataNode.toElement().attribute("toolname", mToolName));
 	this->setToolOffset(dataNode.toElement().attribute("tooloffset", qstring_cast(mToolOffset)).toDouble());
 }

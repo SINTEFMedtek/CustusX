@@ -44,12 +44,12 @@ protected:
 private:
   void addWidgets();
 
-  ssc::MeshPtr mMesh;
+  MeshPtr mMesh;
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   DataNameEditableStringDataAdapterPtr mNameAdapter;
   DataUidEditableStringDataAdapterPtr mUidAdapter;
   SelectMeshStringDataAdapterPtr mSelectMeshWidget;
-  ssc::ColorDataAdapterXmlPtr mColorAdapter;
+  ColorDataAdapterXmlPtr mColorAdapter;
   QCheckBox* mBackfaceCullingCheckBox;
   QCheckBox* mFrontfaceCullingCheckBox;
   

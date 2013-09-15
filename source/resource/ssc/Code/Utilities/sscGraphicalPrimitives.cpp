@@ -20,7 +20,7 @@
 #include "vtkCaptionActor2D.h"
 #include "vtkTextProperty.h"
 
-namespace ssc
+namespace cx
 {
 
 GraphicalPolyData3D::GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source, vtkRendererPtr renderer)
@@ -335,7 +335,7 @@ void GraphicalArrow3D::setValue(Vector3D base, Vector3D normal, double length)
 	Transform3D M = createTransformIJC(normal, k, base);
 
 //	std::cout << "GraphicalArrow3D::setValue  " << base << " - " << normal << std::endl;
-	Transform3D S = createTransformScale(ssc::Vector3D(length,1,1));
+	Transform3D S = createTransformScale(Vector3D(length,1,1));
 	M = M * S;
 	// let arrow shape increase slowly with length:
 //	source->SetTipLength(0.35/sqrt(length));
@@ -433,7 +433,7 @@ FollowerText3D::FollowerText3D( vtkRendererPtr renderer)
 	mFollower = vtkFollowerPtr::New();
 	mFollower->SetMapper(mapper);
 //  mFollower->SetCamera(mRenderer->GetActiveCamera());
-	ssc::Vector3D mTextScale(2,2,2);
+	Vector3D mTextScale(2,2,2);
 	mFollower->SetScale(mTextScale.begin());
 
 	this->setSizeInNormalizedViewport(true, 0.025);
@@ -478,7 +478,7 @@ void FollowerText3D::setSizeInNormalizedViewport(bool on, double size)
 	{
 		if (!mViewportListener)
 		{
-			mViewportListener.reset(new ssc::ViewportListener);
+			mViewportListener.reset(new ViewportListener);
 			mViewportListener->setCallback(boost::bind(&FollowerText3D::scaleText, this));
 		}
 	}
@@ -500,7 +500,7 @@ void FollowerText3D::setText(QString text)
 	mText->SetText(cstring_cast(text));
 }
 
-void FollowerText3D::setPosition(ssc::Vector3D pos)
+void FollowerText3D::setPosition(Vector3D pos)
 {
 	mFollower->SetPosition(pos.begin());
 }
@@ -520,7 +520,7 @@ void FollowerText3D::scaleText()
 {
 	if (!mViewportListener || !mViewportListener->isListening())
 	{
-		mFollower->SetScale(ssc::Vector3D(mSize,mSize,mSize).begin());
+		mFollower->SetScale(Vector3D(mSize,mSize,mSize).begin());
 		return;
 	}
 
@@ -528,7 +528,7 @@ void FollowerText3D::scaleText()
 
 	double scale = mSize/size;
 //  std::cout << "s= " << size << "  ,scale= " << scale << std::endl;
-	ssc::Vector3D mTextScale(scale,scale,scale);
+	Vector3D mTextScale(scale,scale,scale);
 	if (mFollower)
 		mFollower->SetScale(mTextScale.begin());
 }
@@ -589,7 +589,7 @@ void CaptionText3D::setText(QString text)
 	mText->SetCaption(cstring_cast(text));
 }
 
-void CaptionText3D::setPosition(ssc::Vector3D pos)
+void CaptionText3D::setPosition(Vector3D pos)
 {
 	mText->SetAttachmentPoint(pos.begin());
 }

@@ -22,7 +22,7 @@ namespace cx
 
 /** Base class for all DataAdapters that selects a record session.
  */
-class SelectRecordSessionStringDataAdapterBase : public ssc::StringDataAdapter
+class SelectRecordSessionStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:

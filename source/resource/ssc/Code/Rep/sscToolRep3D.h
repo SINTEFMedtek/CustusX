@@ -28,7 +28,7 @@
 #include "sscVtkHelperClasses.h"
 #include "sscViewportListener.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
@@ -114,7 +114,7 @@ private:
 	bool mOffsetPointVisibleAtZeroOffset;
 	bool mSphereRadiusInNormalizedViewport;
 	ToolTracerPtr mTracer;
-	ssc::ViewportListenerPtr mViewportListener;
+	ViewportListenerPtr mViewportListener;
 
 	//US Probe sector
 	ProbeSectorPtr mProbeSector;
@@ -126,6 +126,6 @@ private:
 	Vector3D mOffsetLineColor;
 	int mStipplePattern;
 };
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCTOOL3DREP_H_*/

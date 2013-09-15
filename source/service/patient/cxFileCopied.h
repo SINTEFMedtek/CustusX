@@ -40,16 +40,16 @@ class FileCopied: public QObject
 {
 Q_OBJECT
 public:
-	FileCopied(const QString& absolutefilePath, const QString& relativefilePath, ssc::DataPtr data); ///< Creates the object
+	FileCopied(const QString& absolutefilePath, const QString& relativefilePath, DataPtr data); ///< Creates the object
 
 signals:
 	void fileCopiedCorrectly(); ///< Sends a signal when the copy is verified
 protected:
 	QString mFilePath;
 	QString mRelativeFilePath;
-	ssc::DataPtr mData;
+	DataPtr mData;
 public slots:
-	void areFileCopiedSlot(); ///< Checks if the file is finished copying and updates the ssc::Image
+	void areFileCopiedSlot(); ///< Checks if the file is finished copying and updates the Image
 };
 
 /**

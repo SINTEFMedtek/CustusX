@@ -31,7 +31,7 @@
 #include "sscImage.h"
 #include "sscDataManager.h"
 
-namespace ssc
+namespace cx
 {
 
 SlicePlaneRep::SlicePlaneRep(const QString& uid) :
@@ -79,7 +79,7 @@ bool SlicePlaneRep::hasImage(ImagePtr image) const
 	return (mImage != NULL);
 }
 
-void SlicePlaneRep::setSliceReps( std::vector<ssc::SliceRepSWPtr> slicerReps)
+void SlicePlaneRep::setSliceReps( std::vector<SliceRepSWPtr> slicerReps)
 {
 	mSlicesPlanes = slicerReps;
 	setImage(mSlicesPlanes.at(0)->getImage() );
@@ -104,4 +104,4 @@ void SlicePlaneRep::sliceTransformChangedSlot(Transform3D sMr)
 {
 }
 
-} // namespace ssc
+} // namespace cx

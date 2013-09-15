@@ -37,8 +37,8 @@ public:
   virtual ~Transform3DWidget();
   virtual QString defaultWhatsThis() const;
 
-  void setMatrix(const ssc::Transform3D& M);
-  ssc::Transform3D getMatrix() const;
+  void setMatrix(const Transform3D& M);
+  Transform3D getMatrix() const;
   void setEditable(bool edit);
 
 signals:
@@ -55,20 +55,20 @@ private:
   void addTranslationControls(QString uid, QString name, int index, QVBoxLayout* layout);
   void rotateSlot(QPointF delta, int index);
   void translateSlot(QPointF delta, int index);
-  void updateAdapter(ssc::DoubleDataAdapterXmlPtr adapter, double value);
+  void updateAdapter(DoubleDataAdapterXmlPtr adapter, double value);
 
-  ssc::Frame3D mFrame;
+  Frame3D mFrame;
   MatrixTextEdit* mTextEdit;
-  boost::array<ssc::DoubleDataAdapterXmlPtr, 3> mAngleAdapter;
-  boost::array<ssc::DoubleDataAdapterXmlPtr, 3> mTranslationAdapter;
+  boost::array<DoubleDataAdapterXmlPtr, 3> mAngleAdapter;
+  boost::array<DoubleDataAdapterXmlPtr, 3> mTranslationAdapter;
   bool recursive;
   bool mBlockChanges;
   QAction* mEditAction;
   QFrame* aGroupBox;
   QFrame* tGroupBox;
-  ssc::DecomposedTransform3D mDecomposition;
+  DecomposedTransform3D mDecomposition;
 
-//  //  Vector3DWidget(QWidget* parent, ssc::Vector3DDataAdapterPtr data)
+//  //  Vector3DWidget(QWidget* parent, Vector3DDataAdapterPtr data)
 //    Vector3DDataAdapterPtr mAngleAdapter;
 //    Vector3DDataAdapterPtr mTranslationAdapter;
 

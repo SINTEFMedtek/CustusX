@@ -46,7 +46,7 @@ signals:
 
 public slots:
   QString requestSaveConfigurationSlot(); ///< will save the currently selected configuration if its been edited
-  void setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication);
+  void setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication);
 
 private slots:
   void configChangedSlot();
@@ -73,7 +73,7 @@ private:
 
   void populateReference(); ///< populates the ref combobox
   int addRefrenceToComboBox(QString absoluteRefereneFilePath); ///< adds a new tool ref file item to the combobox
-  ssc::CLINICAL_APPLICATION       mClinicalApplication;
+  CLINICAL_APPLICATION       mClinicalApplication;
 
   QComboBox*                mConfigFilesComboBox;
   QLineEdit*                mConfigFilePathLineEdit; ///< path to the folder where the xml should be

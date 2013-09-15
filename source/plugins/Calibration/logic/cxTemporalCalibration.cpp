@@ -102,7 +102,7 @@ TemporalCalibration::TemporalCalibration()
 void TemporalCalibration::selectData(QString filename)
 {
   mFilename = filename;
-  mFileData = ssc::USReconstructInputData();
+  mFileData = USReconstructInputData();
 
   if (!QFileInfo(filename).exists())
     return;
@@ -112,11 +112,11 @@ void TemporalCalibration::selectData(QString filename)
 
   if (!mFileData.mUsRaw)
   {
-    ssc::messageManager()->sendWarning("Failed to load data from " + filename);
+    messageManager()->sendWarning("Failed to load data from " + filename);
     return;
   }
 
-  ssc::messageManager()->sendInfo("Temporal Calibration: Successfully loaded data from " + filename);
+  messageManager()->sendInfo("Temporal Calibration: Successfully loaded data from " + filename);
 }
 
 void TemporalCalibration::setDebugFolder(QString filename)
@@ -135,12 +135,12 @@ void TemporalCalibration::saveDebugFile()
 
   if (!file.open(QIODevice::ReadWrite))
   {
-    ssc::messageManager()->sendError("Failed to write file " + file.fileName() + ".");
+    messageManager()->sendError("Failed to write file " + file.fileName() + ".");
     return;
   }
 
   file.write(qstring_cast(mDebugStream.str()).toAscii());
-  ssc::messageManager()->sendInfo("Saved temporal calibration details to " + file.fileName());
+  messageManager()->sendInfo("Saved temporal calibration details to " + file.fileName());
   file.close();
 }
 
@@ -166,16 +166,16 @@ double TemporalCalibration::calibrate(bool* success)
 
   if (!mFileData.mUsRaw)
   {
-    ssc::messageManager()->sendWarning("Temporal calib: No data loaded");
+    messageManager()->sendWarning("Temporal calib: No data loaded");
     return 0;
   }
   if (mFileData.mPositions.empty())
   {
-    ssc::messageManager()->sendWarning("Temporal calib: Missing tracking data.");
+    messageManager()->sendWarning("Temporal calib: Missing tracking data.");
     return 0;
   }
 
-  mDebugStream << "Temporal Calibration " << QDateTime::currentDateTime().toString(ssc::timestampSecondsFormatNice()) << std::endl;
+  mDebugStream << "Temporal Calibration " << QDateTime::currentDateTime().toString(timestampSecondsFormatNice()) << std::endl;
   mDebugStream << "Loaded data: " << mFilename << std::endl;
   mDebugStream << "=======================================" << std::endl;
 
@@ -185,7 +185,7 @@ double TemporalCalibration::calibrate(bool* success)
 
   if (!this->checkFrameMovementQuality(frameMovement))
   {
-	  ssc::messageManager()->sendError("Failed to detect movement in images. Make sure that the first image is clear and visible.");
+	  messageManager()->sendError("Failed to detect movement in images. Make sure that the first image is clear and visible.");
 	  *success = false;
 	  return 0;
   }
@@ -225,13 +225,13 @@ bool TemporalCalibration::checkFrameMovementQuality(std::vector<double> pos)
 {
 	int count = 0;
 	for (unsigned i=0; i<pos.size(); ++i)
-		if (ssc::similar(pos[i], 0))
+		if (similar(pos[i], 0))
 			count++;
 
 	// accept if less than 20% zeros.
 	double error = double(count)/pos.size();
 	if (error > 0.05)
-		ssc::messageManager()->sendWarning(QString("Found %1 \% zeros in frame movement").arg(error*100));
+		messageManager()->sendWarning(QString("Found %1 \% zeros in frame movement").arg(error*100));
 	return error < 0.2;
 }
 
@@ -336,7 +336,7 @@ double TemporalCalibration::findCorrelationShift(std::vector<double> frames, std
 }
 
 
-void TemporalCalibration::writePositions(QString title, std::vector<double> pos, std::vector<ssc::TimedPosition> time, double shift)
+void TemporalCalibration::writePositions(QString title, std::vector<double> pos, std::vector<TimedPosition> time, double shift)
 {
 	if (pos.size()!=time.size())
 	{
@@ -355,11 +355,11 @@ void TemporalCalibration::writePositions(QString title, std::vector<double> pos,
 /**resample the time+shift function onto a regular time series given by resolution.
  *
  */
-std::vector<double> TemporalCalibration::resample(std::vector<double> shift, std::vector<ssc::TimedPosition> time, double resolution)
+std::vector<double> TemporalCalibration::resample(std::vector<double> shift, std::vector<TimedPosition> time, double resolution)
 {
   if (shift.size()!=time.size())
   {
-    ssc::messageManager()->sendError("Assert failure, shift and time different sizes");
+    messageManager()->sendError("Assert failure, shift and time different sizes");
   }
 
   vtkPiecewiseFunctionPtr frames = vtkPiecewiseFunctionPtr::New();
@@ -382,18 +382,18 @@ std::vector<double> TemporalCalibration::resample(std::vector<double> shift, std
 std::vector<double> TemporalCalibration::computeTrackingMovement()
 {
   std::vector<double> retval;
-  ssc::Vector3D e_z(0,0,1);
-  ssc::Vector3D origin(0,0,0);
+  Vector3D e_z(0,0,1);
+  Vector3D origin(0,0,0);
   double zero = 0;
-  ssc::Transform3D prM0t = mFileData.mPositions[0].mPos;
-  ssc::Vector3D ez_pr = prM0t.vector(e_z);
+  Transform3D prM0t = mFileData.mPositions[0].mPos;
+  Vector3D ez_pr = prM0t.vector(e_z);
 
   for (unsigned i=0; i<mFileData.mPositions.size(); ++i)
   {
-    ssc::Transform3D prMt = mFileData.mPositions[i].mPos;
-    ssc::Vector3D p_pr = prMt.coord(origin);
+    Transform3D prMt = mFileData.mPositions[i].mPos;
+    Vector3D p_pr = prMt.coord(origin);
 
-    double val = ssc::dot(ez_pr, p_pr);
+    double val = dot(ez_pr, p_pr);
 
     if (retval.empty())
       zero = val;
@@ -456,7 +456,7 @@ std::vector<double> TemporalCalibration::computeProbeMovement()
   return retval;
 }
 
-double TemporalCalibration::findCorrelation(ssc::USFrameDataPtr data, int frame_a, int frame_b, double maxShift, double lastVal)
+double TemporalCalibration::findCorrelation(USFrameDataPtr data, int frame_a, int frame_b, double maxShift, double lastVal)
 {
 	int maxShift_pix = maxShift / mFileData.mUsRaw->getSpacing()[1];
 	int lastVal_pix = lastVal / mFileData.mUsRaw->getSpacing()[1];
@@ -493,12 +493,12 @@ double TemporalCalibration::findCorrelation(ssc::USFrameDataPtr data, int frame_
 /**extract the y-line with x-index line_index_x from frame ( data[line_index_x, y_varying, frame] )
  *
  */
-vtkImageDataPtr TemporalCalibration::extractLine_y(ssc::USFrameDataPtr data, int line_index_x, int frame)
+vtkImageDataPtr TemporalCalibration::extractLine_y(USFrameDataPtr data, int line_index_x, int frame)
 {
   int dimX = data->getDimensions()[0];
   int dimY = data->getDimensions()[1];
 
-  vtkImageDataPtr retval = ssc::generateVtkImageDataDouble(Eigen::Array3i(dimY, 1, 1), ssc::Vector3D(1,1,1), 1);
+  vtkImageDataPtr retval = generateVtkImageDataDouble(Eigen::Array3i(dimY, 1, 1), Vector3D(1,1,1), 1);
 
   vtkImageDataPtr base = mProcessedFrames[frame];
 

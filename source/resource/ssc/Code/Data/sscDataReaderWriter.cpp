@@ -63,7 +63,7 @@
 
 typedef vtkSmartPointer<class vtkPNGReader> vtkPNGReaderPtr;
 
-namespace ssc
+namespace cx
 {
 
 //---------------------------------------------------------
@@ -105,7 +105,7 @@ DataPtr MincImageReader::load(const QString& uid, const QString& filename)
 	//l_dataTransform->Translate(l_dataOrigin);
 	//l_dataTransform->Scale(l_dataReader->GetOutput()->GetSpacing());
 
-	ssc::Transform3D rMd(l_dataTransform->GetMatrix());
+	Transform3D rMd(l_dataTransform->GetMatrix());
 
 	// TODO: ensure rMd is correct in CustusX terms
 
@@ -122,8 +122,8 @@ DataPtr MincImageReader::load(const QString& uid, const QString& filename)
 	QString name = uid;
 
 	ImagePtr image(new Image(uid, imageData));
-	//ssc::ImagePtr image = ssc::dataManager()->createImage(l_dataReader->GetOutput(),uid, name);
-	image->get_rMd_History()->addRegistration(ssc::RegistrationTransform(rMd, info.lastModified(), "from Minc file"));
+	//ImagePtr image = dataManager()->createImage(l_dataReader->GetOutput(),uid, name);
+	image->get_rMd_History()->addRegistration(RegistrationTransform(rMd, info.lastModified(), "from Minc file"));
 	image->getBaseVtkImageData()->Print(std::cout);
 
 	return image;
@@ -168,7 +168,7 @@ public:
 
 		if (!errorObserver->mMessage.isEmpty())
 		{
-			ssc::messageManager()->sendError("Load of data " + filename + " failed with message:\n"
+			messageManager()->sendError("Load of data " + filename + " failed with message:\n"
 				+ errorObserver->mMessage);
 			return false;
 		}
@@ -312,12 +312,12 @@ DataReaderWriter::DataReaderWriter()
 	mDataReaders.insert(DataReaderPtr(new PNGImageReader()));
 
 	// extra cx data types
-	mDataReaders.insert(ssc::DataReaderPtr(new ssc::PointMetricReader()));
-	mDataReaders.insert(ssc::DataReaderPtr(new ssc::DistanceMetricReader()));
-	mDataReaders.insert(ssc::DataReaderPtr(new ssc::PlaneMetricReader()));
-	mDataReaders.insert(ssc::DataReaderPtr(new ssc::AngleMetricReader()));
-	mDataReaders.insert(ssc::DataReaderPtr(new cx::FrameMetricReader()));
-	mDataReaders.insert(ssc::DataReaderPtr(new cx::ToolMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new PointMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new DistanceMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new PlaneMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new AngleMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new cx::FrameMetricReader()));
+	mDataReaders.insert(DataReaderPtr(new cx::ToolMetricReader()));
 }
 
 DataReaderPtr DataReaderWriter::findReader(const QString& path, const QString& type)
@@ -371,6 +371,6 @@ DataPtr DataReaderWriter::readData(const QString& uid, const QString& path, cons
 }
 
 
-} // namespace ssc
+} // namespace cx
 
 

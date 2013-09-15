@@ -37,7 +37,7 @@ class FilterSetupWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame);
+	FilterSetupWidget(QWidget* parent, XmlOptionFile options, bool addFrame);
 	void setFilter(FilterPtr filter);
 	QString defaultWhatsThis() const;
 	/** Compact Mode: one group, hide main input/output
@@ -52,7 +52,7 @@ private slots:
 
 private:
 
-	ssc::XmlOptionFile mOptions;
+	XmlOptionFile mOptions;
 	FilterPtr mCurrentFilter;
 
 	OptionsWidget* mInputsWidget;

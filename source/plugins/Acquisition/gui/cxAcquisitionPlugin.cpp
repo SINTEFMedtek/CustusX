@@ -22,7 +22,7 @@
 namespace cx
 {
 
-AcquisitionPlugin::AcquisitionPlugin(ssc::ReconstructManagerPtr reconstructer)
+AcquisitionPlugin::AcquisitionPlugin(ReconstructManagerPtr reconstructer)
 {
 	mAcquisitionData.reset(new AcquisitionData(reconstructer));
 

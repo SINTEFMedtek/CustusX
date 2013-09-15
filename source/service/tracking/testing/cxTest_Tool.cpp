@@ -9,10 +9,10 @@ void TestTool::setUp()
   QString toolToolPath(cx::DataLocations::getRootConfigPath()+QString("/tool/Tools/"));
 
   mValidPolarisInternal.mIsPointer = true;
-//  mValidPolarisInternal.mType = ssc::Tool::TOOL_POINTER;
+//  mValidPolarisInternal.mType = Tool::TOOL_POINTER;
   mValidPolarisInternal.mName = "Polaris pointer name";
   mValidPolarisInternal.mUid = "Polaris pointer uid";
-  mValidPolarisInternal.mTrackerType = ssc::tsPOLARIS;
+  mValidPolarisInternal.mTrackerType = cx::tsPOLARIS;
   mValidPolarisInternal.mSROMFilename = (toolToolPath+QString("07-198-0838_SW_Pointer_02.rom"));
   //mValidPolarisInternal.mPortNumber; //not needed for polaris, default value should be enough
   //mValidPolarisInternal.mChannelNumber; //not needed for polaris, default value should be enough
@@ -23,11 +23,11 @@ void TestTool::setUp()
   mValidPolarisInternal.mTransformSaveFileName = QDir::currentPath();
   mValidPolarisInternal.mLoggingFolderName = QDir::currentPath();
 
-//  mValidAuroraInternal.mType = ssc::Tool::TOOL_POINTER;
+//  mValidAuroraInternal.mType = Tool::TOOL_POINTER;
   mValidAuroraInternal.mIsPointer = true;
   mValidAuroraInternal.mName = "Aurora pointer name";
   mValidAuroraInternal.mUid = "Aurora pointer uid";
-  mValidAuroraInternal.mTrackerType = ssc::tsAURORA;
+  mValidAuroraInternal.mTrackerType = cx::tsAURORA;
   //mValidAuroraInternal.mSROMFilename; //not needed for aurora, default value should be enough
   mValidAuroraInternal.mPortNumber = 0; //0 is the same as port 1 on the physical aurora hw
   mValidAuroraInternal.mChannelNumber = 0; //only needed for 5DOF

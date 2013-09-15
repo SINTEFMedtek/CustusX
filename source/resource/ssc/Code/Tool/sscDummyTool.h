@@ -13,7 +13,7 @@
 
 typedef boost::shared_ptr<class QTimer> QTimerPtr;
 
-namespace ssc
+namespace cx
 {
 class ToolManager;
 
@@ -27,7 +27,7 @@ public:
 	virtual ~DummyProbe() {}
 	virtual bool isValid() const
 	{
-		return mProbeData.getType() != ssc::ProbeData::tNONE;
+		return mProbeData.getType() != ProbeData::tNONE;
 	}
 	virtual QStringList getAvailableVideoSources() { return QStringList() << "active"; }
 	virtual ProbeData getProbeData(QString uid="active") const
@@ -36,7 +36,7 @@ public:
 	}
 	virtual ProbeSectorPtr getSector(QString uid="active")
 	{
-		ssc::ProbeSectorPtr retval(new ssc::ProbeSector());
+		ProbeSectorPtr retval(new ProbeSector());
 		retval->setData(this->getProbeData());
 		return retval;
 	}
@@ -59,17 +59,17 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid) {}
 	virtual void setTemporalCalibration(double val) {}
 	virtual void setSoundSpeedCompensationFactor(double val) {}
-	virtual void setProbeSector(ssc::ProbeData probeSector)
+	virtual void setProbeSector(ProbeData probeSector)
 	{
 		mProbeData = probeSector;
 		emit sectorChanged();
 	}
-	virtual void setRTSource(ssc::VideoSourcePtr source)
+	virtual void setRTSource(VideoSourcePtr source)
 	{
 		mVideoSource = source;
 		emit sectorChanged();
 	}
-	virtual void removeRTSource(ssc::VideoSourcePtr source)
+	virtual void removeRTSource(VideoSourcePtr source)
 	{
 		if (source!=mVideoSource)
 			return;
@@ -79,8 +79,8 @@ public:
 
 
 private:
-	ssc::ProbeData mProbeData;
-	ssc::VideoSourcePtr mVideoSource;
+	ProbeData mProbeData;
+	VideoSourcePtr mVideoSource;
 };
 
 /**Helper class for emitting signals at a constant rate in a separate thread.
@@ -164,9 +164,9 @@ public:
 		mProbeData = probe->getProbeData();
 		emit toolProbeSector();
 	}
-	virtual double getTimestamp() const { return ssc::getMilliSecondsSinceEpoch(); }
+	virtual double getTimestamp() const { return getMilliSecondsSinceEpoch(); }
 	virtual TimedTransformMapPtr getPositionHistory() { return mPositionHistory; }
-	virtual ssc::TimedTransformMap getSessionHistory(double startTime, double stopTime);
+	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
 
 	void startTracking(int interval=33);
 	void stopTracking();
@@ -196,7 +196,7 @@ private:
 	Transform3D* getNextTransform();
 	void createLinearMovement(std::vector<Transform3D>* retval, Transform3D* T_in, const Transform3D& R, const Vector3D& a, const Vector3D& b, double step) const;
 
-	ssc::TimedTransformMapPtr mPositionHistory;
+	TimedTransformMapPtr mPositionHistory;
 	vtkPolyDataPtr mPolyData;
 	bool mVisible;
 	Transform3D m_prMt;
@@ -212,5 +212,5 @@ private:
 	DummyToolThread* mThread;
 };
 typedef boost::shared_ptr<DummyTool> DummyToolPtr;
-}//namespace ssc
+}//namespace cx
 #endif /* SSCDUMMYTOOL_H_ */

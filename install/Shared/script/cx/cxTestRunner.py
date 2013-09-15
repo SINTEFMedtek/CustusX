@@ -17,6 +17,7 @@ import sys
 import argparse        
 import glob
 import platform
+import os
 
 from cxShell import *
 from cxPrintFormatter import PrintFormatter
@@ -59,10 +60,6 @@ class TestRunner:
         testListResult = shell.evaluate('%s --list-tests --reporter xml' % catchExe)
         parser = cxCatchConsoleNameListParser.CatchCustomXmlNameListParser()
         parser.read(testListResult.stdout)
-        # old version - incomprehensive stuff.
-        #parser = cxCatchConsoleNameListParser.CatchConsoleNameListParser()
-        #parser.readTestNamesFromStringList(testListResult.stdout.split('\n'))
-        #parser.printTests("Tests")
         tests = parser.getTestsForTag(tag)
         return tests
 
@@ -73,8 +70,6 @@ class TestRunner:
                  '# ctest setup.'
                    ]
         for testname in testnames:
-            #line = 'ADD_TEST("%s" ./Catch "%s" --reporter xml)' % (testname,testname    )
-            # generate raw output from catch instead of xml, as the stdout is processed by ctest
             line = 'ADD_TEST("%s" ./Catch "%s")' % (testname,testname)
             lines.append(line)
         cxUtilities.writeToNewFile(filename=targetFile, text='\n'.join(lines))
@@ -108,20 +103,23 @@ TimeOut: %d
             outfile = '%s/CTestResults.xml' % path
         PrintFormatter.printInfo('Run ctest, results to %s' % outfile)
         shell.changeDir(path)
-        shell.run('rm -rf ./Testing/[0-9]*')
-        shell.run('rm -rf %s' % outfile)
+        shell.rm_r('%s/Testing/' % path, "[0-9]*")
+        shell.rm_r(outfile)
         shell.run('ctest -D ExperimentalTest --no-compress-output', ignoreFailure=True)
-        shell.run('cp ./Testing/`head -n 1 ./Testing/TAG`/Test.xml %s' % outfile)
+        temp_dir = shell.head(os.path.join(path, 'Testing', 'TAG'), 1)
+        shell.cp(os.path.join(path, 'Testing', temp_dir, 'Test.xml'), '%s' % outfile)
 
     def runCatch(self, path, tag, outfile=None):
         'Run all Catch tests at path and write them in junit xml format to outfile'
         if not outfile:
             outfile = '%s/CatchTestResults.xml' % path
-        PrintFormatter.printInfo('Run catch wit tag [%s], results to %s' % (tag, outfile))
+        PrintFormatter.printInfo('Run catch with tag [%s], results to %s' % (tag, outfile))
         shell.changeDir(path)
-        shell.run('rm -rf %s' % outfile)
-        shell.run('%s/Catch [%s] --reporter junit --out %s' % (path, tag, outfile), ignoreFailure=True)
-        #shell.run('%s/Catch [%s] --out %s' % (path, tag, outfile))
+        shell.rm_r(outfile)
+        exe = "Catch"
+        if(platform.system() == 'Windows'):
+             exe = "Catch.exe"
+        shell.run('%s/%s [%s] --reporter junit --out %s' % (path, exe, tag, outfile), ignoreFailure=True)
         
     def resetCustusXDataRepo(self, path):
         '''

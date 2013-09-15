@@ -23,7 +23,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscProbeSector.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
 typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
@@ -48,7 +48,7 @@ public:
 	void setRealtimeStream(VideoSourcePtr data);
 	void setTool(ToolPtr tool);
 	ToolPtr getTool();
-	ssc::ProbeSector getProbeData();
+	ProbeSector getProbeData();
 	void setClipToSector(bool on); ///< Turn sector clipping on/off. If on, only the area inside the probe sector is shown.
 	void setShowInToolSpace(bool on);
 	vtkActorPtr getActor();
@@ -67,11 +67,11 @@ private:
 	VideoGraphicsPtr mPipeline;
 	bool mShowInToolSpace;
 	ToolPtr mTool;
-	ssc::ProbeSector mProbeData;
+	ProbeSector mProbeData;
 	VideoSourcePtr mData;
 	ImagePtr mImage;//Can be used instead of mTexture. This allows visualization of rt 3D
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif // SSCVIDEOSOURCEGRAPHICS_H

@@ -46,7 +46,7 @@ public:
 	QString getCurrentPreset(); ///< returns the name of the currently selected preset
 	void showDetailed(bool detailed); ///< sets the presetwidget in detailed mode or not
 
-	virtual void setPresets(ssc::PresetsPtr presets);
+	virtual void setPresets(PresetsPtr presets);
 
 signals:
 	void presetSelected(QString name);
@@ -66,7 +66,7 @@ protected:
 	QString getNewPresetName(bool withoutSpaces);
 
 	QActionGroup* mActionGroup; ///< contains all actions that will have buttons
-	ssc::PresetsPtr mPresets;
+	PresetsPtr mPresets;
 
 private:
 	QComboBox* mPresetsComboBox; ///< combobox for selecting presets

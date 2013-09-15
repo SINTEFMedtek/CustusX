@@ -2,7 +2,7 @@
 #include "sscDefinitions.h"
 #include <math.h>
 
-namespace ssc
+namespace cx
 {
 
 SlicePlane::SlicePlane(const Vector3D& c_, const Vector3D& i_, const Vector3D& j_) :
@@ -55,13 +55,13 @@ void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const
 
 	if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
 	{
-		setOrientationType(ssc::otORTHOGONAL);
-		setFollowType(ssc::ftFIXED_CENTER);
+		setOrientationType(otORTHOGONAL);
+		setFollowType(ftFIXED_CENTER);
 	}
 	else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
 	{
-		setOrientationType(ssc::otOBLIQUE);
-		setFollowType(ssc::ftFOLLOW_TOOL);
+		setOrientationType(otOBLIQUE);
+		setFollowType(ftFOLLOW_TOOL);
 
 		setGravity(useGravity, gravityDir);
 		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset, useConstrainedViewOffset); // TODO finish this one
@@ -126,7 +126,7 @@ Transform3D SliceComputer::getToolPosition() const
 }
 
 /**Set the position of the navigation tool, using the
- * standard definition of a tool transform (given in ssc::Tool).
+ * standard definition of a tool transform (given in Tool).
  */
 void SliceComputer::setToolPosition(const Transform3D& rMt) 
 { 
@@ -399,4 +399,4 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 }
 
 
-} // namespace ssc
+} // namespace cx

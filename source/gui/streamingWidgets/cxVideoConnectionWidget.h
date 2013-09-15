@@ -29,7 +29,7 @@ class QLineEdit;
 class QStackedWidget;
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
-namespace ssc
+namespace cx
 {
 	class FileSelectWidget;
 	typedef boost::shared_ptr<class StringDataAdapterXml> StringDataAdapterXmlPtr;
@@ -77,7 +77,7 @@ protected:
 	void connectServer();
 	void disconnectServer();
 	QHBoxLayout* initializeScriptWidget();
-	ssc::StringDataAdapterXmlPtr initializeConnectionSelector();
+	StringDataAdapterXmlPtr initializeConnectionSelector();
 	ActiveVideoSourceStringDataAdapterPtr initializeActiveVideoSourceSelector();
 	QFrame* wrapStackedWidgetInAFrame();
 	void updateHostHistory();
@@ -94,14 +94,14 @@ protected:
 	QWidget* createRemoteWidget();
 	QWidget* createSimulationWidget();
 	QWidget* wrapVerticalStretch(QWidget* input);
-	ssc::Transform3D calculate_rMd_ForAProbeImage(ssc::ToolPtr probe);
-	QString generateFilename(ssc::VideoSourcePtr videoSource);
-	void saveAndImportSnapshot(vtkImageDataPtr input, QString filename, ssc::Transform3D rMd);
+	Transform3D calculate_rMd_ForAProbeImage(ToolPtr probe);
+	QString generateFilename(VideoSourcePtr videoSource);
+	void saveAndImportSnapshot(vtkImageDataPtr input, QString filename, Transform3D rMd);
 
 	QPushButton* mConnectButton;
 	QPushButton* mImportStreamImageButton;
 	QVBoxLayout* mToptopLayout;
-	ssc::FileSelectWidget* mInitScriptWidget;
+	FileSelectWidget* mInitScriptWidget;
 	QComboBox* mAddressEdit;
 	QLineEdit* mPortEdit;
 	QLineEdit* mLocalServerEdit;
@@ -109,7 +109,7 @@ protected:
 	QPushButton* mLaunchServerButton;
 	QComboBox* mDirectLinkArguments;
 	QStackedWidget* mStackedWidget;
-	ssc::StringDataAdapterXmlPtr mConnectionSelector;
+	StringDataAdapterXmlPtr mConnectionSelector;
 	ActiveVideoSourceStringDataAdapterPtr mActiveVideoSourceSelector;
 	SimulateUSWidget* mSimulationWidget;
 

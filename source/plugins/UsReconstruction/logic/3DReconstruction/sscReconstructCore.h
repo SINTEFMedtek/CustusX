@@ -24,7 +24,7 @@
 #include "cxForwardDeclarations.h"
 #include "sscReconstructedOutputVolumeParams.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
 
@@ -65,7 +65,7 @@ public:
 	// used for reconstruction algo
 	void initialize(InputParams input);
 	void initialize(ProcessedUSInputDataPtr fileData, OutputVolumeParams outputVolumeParams);
-	ssc::ImagePtr reconstruct();
+	ImagePtr reconstruct();
 	void threadedPreReconstruct();
 	void threadedReconstruct();
 	void threadedPostReconstruct();
@@ -89,11 +89,11 @@ private:
 
 	// generated data
 	ReconstructAlgorithmPtr mAlgorithm;///< The used reconstruction algorithm
-	vtkImageDataPtr mRawOutput; ///< Output image, prior to conversion to ssc::Image.
+	vtkImageDataPtr mRawOutput; ///< Output image, prior to conversion to Image.
 	ImagePtr mOutput;///< Output image from reconstruction
 	OutputVolumeParams mOutputVolumeParams;
 	bool mSuccess;
 };
 
-} /* namespace ssc */
+} /* namespace cx */
 #endif /* SSCRECONSTRUCTCORE_H_ */

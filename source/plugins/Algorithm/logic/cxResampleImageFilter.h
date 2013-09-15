@@ -40,7 +40,7 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	ssc::DoubleDataAdapterXmlPtr getMarginOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getMarginOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
@@ -50,7 +50,7 @@ protected:
 private slots:
 
 private:
-	ssc::ImagePtr mRawResult;
+	ImagePtr mRawResult;
 };
 typedef boost::shared_ptr<class ResampleImageFilter> ResampleImageFilterPtr;
 

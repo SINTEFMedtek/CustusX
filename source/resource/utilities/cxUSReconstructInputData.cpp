@@ -14,7 +14,7 @@
 
 #include "cxUSReconstructInputData.h"
 
-namespace ssc
+namespace cx
 {
 
 

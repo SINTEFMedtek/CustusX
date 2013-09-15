@@ -32,7 +32,7 @@ typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 /**
  * \brief Interface to the tool offset of the dominant tool
  */
-class DoubleDataAdapterActiveToolOffset : public ssc::DoubleDataAdapter
+class DoubleDataAdapterActiveToolOffset : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
@@ -51,18 +51,18 @@ public:
   virtual double getValue() const;
   virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}
-  ssc::DoubleRange getValueRange() const;
+  DoubleRange getValueRange() const;
 
 private slots:
   void dominantToolChangedSlot();
 protected:
-  ssc::ToolPtr mTool;
+  ToolPtr mTool;
 };
 
 /**
  * \brief Superclass for all doubles interacting with the active image.
  */
-class DoubleDataAdapterActiveImageBase : public ssc::DoubleDataAdapter
+class DoubleDataAdapterActiveImageBase : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
@@ -77,7 +77,7 @@ protected:
   virtual double getValueInternal() const = 0;
   virtual void setValueInternal(double val) = 0;
 
-  ssc::ImagePtr mImage;
+  ImagePtr mImage;
   ActiveImageProxyPtr mActiveImageProxy;
 };
 
@@ -91,7 +91,7 @@ public:
   virtual QString getValueName() const { return "Window"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
-  virtual ssc::DoubleRange getValueRange() const;
+  virtual DoubleRange getValueRange() const;
 };
 
 /**
@@ -105,13 +105,13 @@ public:
   virtual QString getValueName() const { return "Level"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
-  virtual ssc::DoubleRange getValueRange() const;
+  virtual DoubleRange getValueRange() const;
 };
 
 /**
  * \brief Base class for all DataAdapters that selects a real time source.
  */
-class SelectRTSourceStringDataAdapterBase : public ssc::StringDataAdapter
+class SelectRTSourceStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -127,7 +127,7 @@ typedef boost::shared_ptr<class SelectRTSourceStringDataAdapterBase> SelectRTSou
 /**
  * \brief Base class for all DataAdapters that selects a tool.
  */
-class SelectToolStringDataAdapterBase : public ssc::StringDataAdapter
+class SelectToolStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -145,7 +145,7 @@ typedef boost::shared_ptr<class SelectToolStringDataAdapterBase> SelectToolStrin
 
 /** Base class for all DataAdapters that selects a coordinatesystem.
  */
-class SelectCoordinateSystemStringDataAdapterBase : public ssc::StringDataAdapter
+class SelectCoordinateSystemStringDataAdapterBase : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -185,14 +185,14 @@ public: // optional methods
   virtual QString getHelp() const;
 
 public: // interface extension
-  ssc::VideoSourcePtr getRTSource();
+  VideoSourcePtr getRTSource();
   void setValueName(const QString name);
 
 private slots:
   void setDefaultSlot();
 
 private:
-  ssc::VideoSourcePtr mRTSource;
+  VideoSourcePtr mRTSource;
   QString mValueName;
 };
 
@@ -200,7 +200,7 @@ typedef boost::shared_ptr<class ActiveVideoSourceStringDataAdapter> ActiveVideoS
 /**
  * \brief Adapter for controlling the active video source in cx::VideoService
  */
-class ActiveVideoSourceStringDataAdapter : public ssc::StringDataAdapter
+class ActiveVideoSourceStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -242,13 +242,13 @@ public: // optional methods
   virtual QString getHelp() const;
 
 public: // interface extension
-  ssc::COORDINATE_SYSTEM getCoordinateSystem();
+  COORDINATE_SYSTEM getCoordinateSystem();
 
 private slots: //interface extension
   void setDefaultSlot();
 
 private:
-  ssc::COORDINATE_SYSTEM mCoordinateSystem;
+  COORDINATE_SYSTEM mCoordinateSystem;
   QString mValueName;
 };
 
@@ -280,27 +280,27 @@ public: // optional methods
   virtual QString getHelp() const;
 
 public: // interface extension
-  ssc::ToolPtr getTool() const;
+  ToolPtr getTool() const;
 
 private:
   QString mValueName;
   QString mHelp;
-  ssc::ToolPtr mTool;
+  ToolPtr mTool;
 };
 
 
 typedef boost::shared_ptr<class ParentFrameStringDataAdapter> ParentFrameStringDataAdapterPtr;
 
 /**
- * \brief Adapter that selects the parent frame of the given ssc::Data.
+ * \brief Adapter that selects the parent frame of the given Data.
  */
-class ParentFrameStringDataAdapter : public ssc::StringDataAdapter
+class ParentFrameStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
   static ParentFrameStringDataAdapterPtr New() { return ParentFrameStringDataAdapterPtr(new ParentFrameStringDataAdapter()); }
   ParentFrameStringDataAdapter();
-  void setData(ssc::DataPtr data);
+  void setData(DataPtr data);
   virtual ~ParentFrameStringDataAdapter() {}
 
 public: // basic methods
@@ -314,13 +314,13 @@ public: // optional methods
   virtual QString convertInternal2Display(QString internal);
 
 protected:
-  ssc::DataPtr mData;
+  DataPtr mData;
 };
 
 typedef boost::shared_ptr<class SetParentFrameStringDataAdapter> SetParentFrameStringDataAdapterPtr;
 
 /**
- * \brief Adapter that force sets the parent frame of the given ssc::Data,
+ * \brief Adapter that force sets the parent frame of the given Data,
  * i.e. overwriting history. Nice for initial definition
  */
 class SetParentFrameStringDataAdapter : public ParentFrameStringDataAdapter
@@ -337,15 +337,15 @@ public: // basic methods
 typedef boost::shared_ptr<class DataNameEditableStringDataAdapter> DataNameEditableStringDataAdapterPtr;
 
 /**
- * \brief Adapter for displaying and changing name of a ssc::Data.
+ * \brief Adapter for displaying and changing name of a Data.
  */
-class DataNameEditableStringDataAdapter : public ssc::StringDataAdapter
+class DataNameEditableStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
   static DataNameEditableStringDataAdapterPtr New() { return DataNameEditableStringDataAdapterPtr(new DataNameEditableStringDataAdapter()); }
   DataNameEditableStringDataAdapter();
-  virtual void setData(ssc::DataPtr data);
+  virtual void setData(DataPtr data);
   virtual ~DataNameEditableStringDataAdapter() {}
 
 public: // basic methods
@@ -358,21 +358,21 @@ public: // basic methods
 
 
 private:
-  ssc::DataPtr mData;
+  DataPtr mData;
 };
 
 typedef boost::shared_ptr<class DataUidEditableStringDataAdapter> DataUidEditableStringDataAdapterPtr;
 
 /**
- * \brief Adapter for displaying and changing name of a ssc::Data.
+ * \brief Adapter for displaying and changing name of a Data.
  */
-class DataUidEditableStringDataAdapter : public ssc::StringDataAdapter
+class DataUidEditableStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
   static DataUidEditableStringDataAdapterPtr New() { return DataUidEditableStringDataAdapterPtr(new DataUidEditableStringDataAdapter()); }
   DataUidEditableStringDataAdapter();
-  virtual void setData(ssc::DataPtr data);
+  virtual void setData(DataPtr data);
   virtual ~DataUidEditableStringDataAdapter() {}
 
 public: // basic methods
@@ -384,20 +384,20 @@ public: // basic methods
 	virtual bool getAllowOnlyValuesInRange() const { return false; }
 
 private:
-  ssc::DataPtr mData;
+  DataPtr mData;
 };
 typedef boost::shared_ptr<class DataModalityStringDataAdapter> DataModalityStringDataAdapterPtr;
 
 /**
- * \brief Adapter that selects the modality of the given ssc::Data.
+ * \brief Adapter that selects the modality of the given Data.
  */
-class DataModalityStringDataAdapter : public ssc::StringDataAdapter
+class DataModalityStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
   static DataModalityStringDataAdapterPtr New() { return DataModalityStringDataAdapterPtr(new DataModalityStringDataAdapter()); }
   DataModalityStringDataAdapter();
-  void setData(ssc::ImagePtr data);
+  void setData(ImagePtr data);
   virtual ~DataModalityStringDataAdapter() {}
 
 public: // basic methods
@@ -410,21 +410,21 @@ public: // optional methods
   virtual QStringList getValueRange() const;
 
 protected:
-  ssc::ImagePtr mData;
+  ImagePtr mData;
 };
 
 typedef boost::shared_ptr<class ImageTypeStringDataAdapter> ImageTypeStringDataAdapterPtr;
 
 /**
- * \brief Adapter that selects the image type of the given ssc::Data.
+ * \brief Adapter that selects the image type of the given Data.
  */
-class ImageTypeStringDataAdapter : public ssc::StringDataAdapter
+class ImageTypeStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
   static ImageTypeStringDataAdapterPtr New() { return ImageTypeStringDataAdapterPtr(new ImageTypeStringDataAdapter()); }
   ImageTypeStringDataAdapter();
-  void setData(ssc::ImagePtr data);
+  void setData(ImagePtr data);
   virtual ~ImageTypeStringDataAdapter() {}
 
 public: // basic methods
@@ -437,7 +437,7 @@ public: // optional methods
   virtual QStringList getValueRange() const;
 
 protected:
-  ssc::ImagePtr mData;
+  ImagePtr mData;
 };
 
 /**

@@ -20,13 +20,13 @@
 #include <sscDataMetric.h>
 #include "sscRegistrationTransform.h"
 
-namespace ssc
+namespace cx
 {
 
 DataMetric::DataMetric(const QString& uid, const QString& name) :
 				Data(uid, name)
 {
-	m_rMd_History = ssc::RegistrationHistory::getNullObject();
+	m_rMd_History = RegistrationHistory::getNullObject();
 }
 
 DataMetric::~DataMetric()

@@ -34,7 +34,7 @@
 #include "sscLogger.h"
 #include "sscUSFrameData.h"
 
-namespace ssc
+namespace cx
 {
 
 ReconstructCore::ReconstructCore()
@@ -86,7 +86,7 @@ ReconstructAlgorithmPtr ReconstructCore::createAlgorithm(QString name)
 	return retval;
 }
 
-ssc::ImagePtr ReconstructCore::reconstruct()
+ImagePtr ReconstructCore::reconstruct()
 {
 	this->threadedPreReconstruct();
 //	this->threadablePreReconstruct();
@@ -135,7 +135,7 @@ void ReconstructCore::threadedPostReconstruct()
 
 		Eigen::Array3i outputDims(mRawOutput->GetDimensions());
 		int total = outputDims[0] * outputDims[1] * outputDims[2];
-		ssc::messageManager()->sendInfo(QString("US Reconstruction complete: %1Mb, output=%2, algo=%3, preset=%4, angio=%5")
+		messageManager()->sendInfo(QString("US Reconstruction complete: %1Mb, output=%2, algo=%3, preset=%4, angio=%5")
 										.arg(total/1024/1024)
 										.arg(mOutput->getName())
 										.arg(mAlgorithm->getName())
@@ -147,7 +147,7 @@ void ReconstructCore::threadedPostReconstruct()
 	}
 	else
 	{
-		ssc::messageManager()->sendError("Reconstruction failed");
+		messageManager()->sendError("Reconstruction failed");
 	}
 }
 
@@ -175,7 +175,7 @@ ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
 	else
 		image->setImageType("B-Mode");
 
-	ssc::PresetTransferFunctions3DPtr presets = ssc::dataManager()->getPresetTransferFunctions3D();
+	PresetTransferFunctions3DPtr presets = dataManager()->getPresetTransferFunctions3D();
 	presets->load(mInput.mTransferFunctionPreset, image, true, false);//Only apply to 2D, not 3D
 
 	return image;
@@ -187,9 +187,9 @@ ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
  */
 vtkImageDataPtr ReconstructCore::generateRawOutputVolume()
 {
- 	Eigen::Array3i dim = mOutputVolumeParams.getDim();
-	ssc::Vector3D spacing = ssc::Vector3D(1, 1, 1) * mOutputVolumeParams.getSpacing();
-	vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);
+	Eigen::Array3i dim = mOutputVolumeParams.getDim();
+	Vector3D spacing = Vector3D(1, 1, 1) * mOutputVolumeParams.getSpacing();
+	vtkImageDataPtr data = generateVtkImageData(dim, spacing, 0);
 	return data;
 }
 
@@ -267,4 +267,4 @@ bool ReconstructCore::validInputData() const
 	return mAlgorithm!=0;
 }
 
-} /* namespace ssc */
+} /* namespace cx */

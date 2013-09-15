@@ -28,7 +28,7 @@ typedef vtkSmartPointer<class vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
 typedef vtkSmartPointer<class UltrasoundSectorSource> UltrasoundSectorSourcePtr;
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
 
@@ -109,6 +109,6 @@ private:
 };
 typedef boost::shared_ptr<VideoGraphics> VideoGraphicsPtr;
 
-} // namespace ssc
+} // namespace cx
 
 #endif // SSCVIDEOGRAPHICS_H

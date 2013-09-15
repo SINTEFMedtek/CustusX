@@ -24,7 +24,7 @@
 #include "sscRepImpl.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 // forward declarations
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
@@ -52,7 +52,7 @@ class BlendedSliceRep : public RepImpl
 public:
 	virtual ~BlendedSliceRep();
 	static BlendedSliceRepPtr New(const QString& uid);
-	virtual QString getType() const { return "ssc::LayerSliceRep"; }
+	virtual QString getType() const { return "LayerSliceRep"; }
 	void setSliceProxy(SliceProxyPtr slicer); 
 	void setImages(std::vector<ImagePtr> images);
 	void update();
@@ -70,8 +70,8 @@ private:
 	bool firstImage;
 	vtkImageDataPtr mBaseImages;
 	SliceProxyPtr mSlicer;
-	ssc::SlicedImageProxyPtr mSlicedProxy;
-	std::vector<ssc::SlicedImageProxyPtr> mSlices;
+	SlicedImageProxyPtr mSlicedProxy;
+	std::vector<SlicedImageProxyPtr> mSlices;
 
 	vtkImageBlendPtr mBlender;
 	int countImage;

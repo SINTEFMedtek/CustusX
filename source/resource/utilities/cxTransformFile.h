@@ -40,8 +40,8 @@ class TransformFile
 public:
 	TransformFile(QString fileName ="");
 	QString fileName() const { return mFileName; }
-	ssc::Transform3D read(bool* ok = 0);
-	void write(const ssc::Transform3D& transform);
+	Transform3D read(bool* ok = 0);
+	void write(const Transform3D& transform);
 
 private:
 	QString mFileName;

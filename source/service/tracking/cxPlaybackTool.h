@@ -31,50 +31,50 @@ typedef boost::shared_ptr<class PlaybackTime> PlaybackTimePtr;
  *
  * \ingroup sscTool
  */
-class PlaybackTool: public ssc::Tool
+class PlaybackTool: public Tool
 {
 Q_OBJECT
 public:
-	explicit PlaybackTool(ssc::ToolPtr base, PlaybackTimePtr time);
+	explicit PlaybackTool(ToolPtr base, PlaybackTimePtr time);
 	virtual ~PlaybackTool();
 	virtual std::set<Type> getTypes() const;
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void saveTransformsAndTimestamps() {}
 	virtual void setTransformSaveFile(const QString& filename) {}
-	virtual ssc::Transform3D get_prMt() const;
+	virtual Transform3D get_prMt() const;
 	virtual bool getVisible() const;
 	virtual QString getUid() const;
 	virtual QString getName() const;
 	virtual bool isCalibrated() const;
-	virtual ssc::ProbeData getProbeSector() const;
+	virtual ProbeData getProbeSector() const;
 	virtual double getTimestamp() const;
 
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
 
-	virtual ssc::Transform3D getCalibration_sMt() const;
-	virtual std::map<int, ssc::Vector3D> getReferencePoints() const;
+	virtual Transform3D getCalibration_sMt() const;
+	virtual std::map<int, Vector3D> getReferencePoints() const;
 
 
-	virtual ssc::TimedTransformMapPtr getPositionHistory() { return mBase->getPositionHistory(); }
+	virtual TimedTransformMapPtr getPositionHistory() { return mBase->getPositionHistory(); }
 	virtual bool isInitialized() const	{ return mBase->isInitialized(); }
-	virtual ssc::ProbePtr getProbe() const { return mBase->getProbe(); }
+	virtual ProbePtr getProbe() const { return mBase->getProbe(); }
 	virtual bool hasReferencePointWithId(int id) { return mBase->hasReferencePointWithId(id); }
-	virtual ssc::TimedTransformMap getSessionHistory(double startTime, double stopTime) { return mBase->getSessionHistory(startTime, stopTime); }
+	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) { return mBase->getSessionHistory(startTime, stopTime); }
 
 	// extensions
-	ssc::ToolPtr getBase() { return mBase; }
+	ToolPtr getBase() { return mBase; }
 
 private slots:
 	void timeChangedSlot();
 private:
-	ssc::ToolPtr mBase;
+	ToolPtr mBase;
 	PlaybackTimePtr mTime;
 
 	bool mVisible;
 	double mTimestamp;
-	ssc::Transform3D m_rMpr;
+	Transform3D m_rMpr;
 };
 
 } /* namespace cx */

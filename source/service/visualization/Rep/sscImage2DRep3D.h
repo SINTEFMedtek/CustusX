@@ -18,7 +18,7 @@
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class ApplyLUTToImage2DProxy> ApplyLUTToImage2DProxyPtr;
 }
@@ -49,9 +49,9 @@ public:
 	static Image2DProxyPtr New();
 	virtual ~Image2DProxy();
 //	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
-	void setImage(ssc::ImagePtr image);
-//	void setSliceProxy(ssc::SliceProxyPtr slicer);
-//	ssc::SliceProxyPtr getSliceProxy() { return mSliceProxy; }
+	void setImage(ImagePtr image);
+//	void setSliceProxy(SliceProxyPtr slicer);
+//	SliceProxyPtr getSliceProxy() { return mSliceProxy; }
 //	void update();
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkImageActorPtr getActor();
@@ -64,8 +64,8 @@ private slots:
 	void transferFunctionsChangedSlot();
 	void vtkImageDataChangedSlot();
 private:
-	ssc::ApplyLUTToImage2DProxyPtr mImageWithLUTProxy;
-	ssc::ImagePtr mImage;
+	ApplyLUTToImage2DProxyPtr mImageWithLUTProxy;
+	ImagePtr mImage;
 //	View* mView;
 //	bool mTargetSpaceIsR;
 	vtkImageActorPtr mActor;
@@ -86,7 +86,7 @@ typedef boost::shared_ptr<class Image2DRep3D> Image2DRep3DPtr;
  * \date March 12, 2013
  * \author christiana
  */
-class Image2DRep3D: public ssc::RepImpl
+class Image2DRep3D: public RepImpl
 {
 Q_OBJECT
 public:
@@ -94,15 +94,15 @@ public:
 	virtual ~Image2DRep3D();
 	virtual QString getType() const { return "cx::Image2DRep3D"; }
 
-	void setImage(ssc::ImagePtr image);
+	void setImage(ImagePtr image);
 
 protected:
 	Image2DRep3D();
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 private:
-	ssc::View *mView;
+	View *mView;
 	Image2DProxyPtr mProxy;
 };
 //---------------------------------------------------------

@@ -16,30 +16,30 @@
 #include "sscView.h"
 #include "sscTypeConversions.h"
 
-//namespace ssc
+//namespace cx
 //{
 
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 
-	std::cout << "DataFolder: " << ssc::TestUtilities::GetDataRoot() << std::endl;
+	std::cout << "DataFolder: " << cx::TestUtilities::GetDataRoot() << std::endl;
 
-	QString vtkFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.vtk");
-	QString vtkFileName2 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.vtk");
+	QString vtkFileName1 = cx::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.vtk");
+	QString vtkFileName2 = cx::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.vtk");
 
-	QString stlFileName1 = ssc::TestUtilities::ExpandDataFileName("../Sandbox/Models/5S_joinedpart.STL");
-	QString stlFileName2 = ssc::TestUtilities::ExpandDataFileName("../Sandbox/Models/5S_probeMSector.STL");
-	QString stlFileName3 = ssc::TestUtilities::ExpandDataFileName("../Sandbox/Models/8L_12L Probe.STL");
-	QString stlFileName4 = ssc::TestUtilities::ExpandDataFileName("../Sandbox/Models/Intra_operativ_navigator.STL");
-	QString stlFileName5 = ssc::TestUtilities::ExpandDataFileName("../Sandbox/Models/Planning_navigator.STL");
-	QString stlFileName6 = ssc::TestUtilities::ExpandDataFileName("../Sandbox/Models/Vermon Phase Probe.STL");
+	QString stlFileName1 = cx::TestUtilities::ExpandDataFileName("../Sandbox/Models/5S_joinedpart.STL");
+	QString stlFileName2 = cx::TestUtilities::ExpandDataFileName("../Sandbox/Models/5S_probeMSector.STL");
+	QString stlFileName3 = cx::TestUtilities::ExpandDataFileName("../Sandbox/Models/8L_12L Probe.STL");
+	QString stlFileName4 = cx::TestUtilities::ExpandDataFileName("../Sandbox/Models/Intra_operativ_navigator.STL");
+	QString stlFileName5 = cx::TestUtilities::ExpandDataFileName("../Sandbox/Models/Planning_navigator.STL");
+	QString stlFileName6 = cx::TestUtilities::ExpandDataFileName("../Sandbox/Models/Vermon Phase Probe.STL");
 
 	// .vtk
-	//ssc::MeshPtr mesh1 = ssc::DataManager::instance()->loadMesh(vtkFileName1, ssc::mrtPOLYDATA);
+	//MeshPtr mesh1 = DataManager::instance()->loadMesh(vtkFileName1, mrtPOLYDATA);
 	// .stl
 	// OK: f.eks. 2 eller 4,    Ikke ok: 5S_joinedpart.STL
-	ssc::MeshPtr mesh1 = ssc::DataManager::getInstance()->loadMesh(stlFileName2, stlFileName2, ssc::rtSTL);
+	cx::MeshPtr mesh1 = cx::DataManager::getInstance()->loadMesh(stlFileName2, stlFileName2, cx::rtSTL);
 
 	std::cout << "UID     : " << mesh1->getUid() << std::endl;
 	std::cout << "Name    : " << mesh1->getName() << std::endl;
@@ -57,13 +57,13 @@ int main(int argc, char **argv)
 	std::cout << "numPolys  : " << numPolys << std::endl;
 	std::cout << "numStrips : " << numStrips << std::endl;
 
-	ssc::ViewWidget* view = new ssc::ViewWidget();
+	cx::ViewWidget* view = new cx::ViewWidget();
 
-	ssc::GeometricRepPtr rep = ssc::GeometricRep::New(mesh1->getUid());
+	cx::GeometricRepPtr rep = cx::GeometricRep::New(mesh1->getUid());
 	rep->setMesh(mesh1);
 	view->setRep(rep);
 
-	ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
+	cx::AxesRepPtr axesRep = cx::AxesRep::New("AxesRepUID");
 	view->addRep(axesRep);
 
 	QMainWindow mainWindow;
@@ -77,4 +77,4 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-//}//namespace ssc
+//}//namespace cx

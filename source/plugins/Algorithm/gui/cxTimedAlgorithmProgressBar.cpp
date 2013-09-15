@@ -80,7 +80,7 @@ void TimedAlgorithmProgressBar::productChangedSlot()
 		product = algo->getProduct();
 
 	mLabel->setText(product);
-//	ssc::messageManager()->sendInfo(QString("Executing %1, please wait!").arg(product));
+//	messageManager()->sendInfo(QString("Executing %1, please wait!").arg(product));
 }
 
 void TimedAlgorithmProgressBar::setShowTextLabel(bool on)
@@ -107,7 +107,7 @@ void TimedAlgorithmProgressBar::algorithmStartedSlot(int maxSteps)
 	mProgressBar->setRange(0, maxSteps);
 	mProgressBar->setValue(0);
 	mProgressBar->show();
-//	ssc::messageManager()->sendInfo(QString("Executing %1, please wait!").arg(product));
+//	messageManager()->sendInfo(QString("Executing %1, please wait!").arg(product));
 }
 
 void TimedAlgorithmProgressBar::algorithmFinishedSlot()
@@ -123,7 +123,7 @@ void TimedAlgorithmProgressBar::algorithmFinished(TimedBaseAlgorithm* algo)
 	if (algo)
 		product = algo->getProduct();
 
-//	ssc::messageManager()->sendSuccess(QString("%1 complete [%2s]").arg(product).arg(mTimerWidget->elaspedSeconds()));
+//	messageManager()->sendSuccess(QString("%1 complete [%2s]").arg(product).arg(mTimerWidget->elaspedSeconds()));
 
 	mStartedAlgos.erase(algo);
 	if (!mStartedAlgos.empty())

@@ -14,7 +14,7 @@ SimulateUSWidget::SimulateUSWidget(QWidget* parent) :
 		BaseWidget(parent, "SimulateUSWidget", "Simulated US"),
 		mImageSelector(SelectImageStringDataAdapter::New())
 {
-	ssc::LabeledComboBoxWidget* imageCombo = new ssc::LabeledComboBoxWidget(this, mImageSelector);
+	LabeledComboBoxWidget* imageCombo = new LabeledComboBoxWidget(this, mImageSelector);
 	connect(mImageSelector.get(), SIGNAL(dataChanged(QString)), this, SLOT(imageChangedSlot(QString)));
 	this->imageChangedSlot(mImageSelector->getValue());
 

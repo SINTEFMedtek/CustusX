@@ -50,13 +50,13 @@ public:
 private:
     void createTestProbe();
     void createParameters();
-    ssc::ProbeData createProbeData();
+	cx::ProbeData createProbeData();
     QString mProbeName;
     QString mScannerName;
     QString mDefaultProbeDataUid;
     QString mProbeDataUid;
     QString mDefaultRtSourceName;
-    cx::ProbePtr mProbe;
+	cx::cxProbePtr mProbe;
     double mDefaultTemporalCalibration;
     double mTemporalCalibration;
 };

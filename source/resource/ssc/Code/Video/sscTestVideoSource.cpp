@@ -22,7 +22,10 @@
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
 
-ssc::TestVideoSource::TestVideoSource(QString uid, QString name, int width, int height)
+namespace cx
+{
+
+TestVideoSource::TestVideoSource(QString uid, QString name, int width, int height)
 {
 	mUid = uid;
 	mName = name;
@@ -46,24 +49,24 @@ ssc::TestVideoSource::TestVideoSource(QString uid, QString name, int width, int 
 	mImageImport->SetDataExtentToWholeExtent();
 }
 
-ssc::TestVideoSource::~TestVideoSource()
+TestVideoSource::~TestVideoSource()
 {
 	stop();
 	free(mBuffer);
 }
 
-void ssc::TestVideoSource::setResolution(double resolution)
+void TestVideoSource::setResolution(double resolution)
 {
 	mResolution = resolution;
 	mImageImport->SetDataSpacing(mResolution, mResolution, 1);
 }
 
-vtkImageDataPtr ssc::TestVideoSource::getVtkImageData()
+vtkImageDataPtr TestVideoSource::getVtkImageData()
 {
 	return mImageImport->GetOutput();
 }
 
-void ssc::TestVideoSource::start()
+void TestVideoSource::start()
 {
 	if (mStreaming)
 	{
@@ -77,7 +80,7 @@ void ssc::TestVideoSource::start()
 	mImageTimer->start(40);
 }
 
-void ssc::TestVideoSource::stop()
+void TestVideoSource::stop()
 {
 	mImageTimer->stop();
 	mStreaming = false;
@@ -105,7 +108,7 @@ static void TestImage(int width, int height, int frames, uint8_t *image, double 
 	}
 }
 
-void ssc::TestVideoSource::processBuffer()
+void TestVideoSource::processBuffer()
 {
 	TestImage(mWidth, mHeight, mFrames, mBuffer, mResolution);
 	mFrames++;
@@ -116,8 +119,9 @@ void ssc::TestVideoSource::processBuffer()
 	emit newFrame();
 }
 
-double ssc::TestVideoSource::getTimestamp()
+double TestVideoSource::getTimestamp()
 {
 	return (double) mImageImport->GetOutput()->GetMTime();
 }
 
+} // namespace cx

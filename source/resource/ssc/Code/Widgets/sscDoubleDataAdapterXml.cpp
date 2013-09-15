@@ -29,7 +29,7 @@
 #include <QDomElement>
 #include <QStringList>
 
-namespace ssc
+namespace cx
 {
 
 /** Make sure one given option exists witin root.
@@ -108,4 +108,4 @@ DoubleDataAdapterXml::DoubleDataAdapterXml()
     mAddSlider = false;
 }
 
-} // namespace ssc
+} // namespace cx

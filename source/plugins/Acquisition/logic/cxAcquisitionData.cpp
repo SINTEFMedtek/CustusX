@@ -27,7 +27,7 @@
 namespace cx
 {
 
-AcquisitionData::AcquisitionData(ssc::ReconstructManagerPtr reconstructer) :
+AcquisitionData::AcquisitionData(ReconstructManagerPtr reconstructer) :
 	mReconstructer(reconstructer)
 {
 
@@ -119,7 +119,7 @@ QString AcquisitionData::getNewUid()
 
 	//  retval = qstring_cast(max + 1);
 	retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
-	retval += "_" + QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+	retval += "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
 	return retval;
 }
 
@@ -161,13 +161,13 @@ void Acquisition::startRecord()
 {
 	if (this->getState()!=sNOT_RUNNING)
 	{
-		ssc::messageManager()->sendInfo("Already recording a session, stop before trying to start a new record session.");
+		messageManager()->sendInfo("Already recording a session, stop before trying to start a new record session.");
 		return;
 	}
 
-	double startTime = ssc::getMilliSecondsSinceEpoch();
+	double startTime = getMilliSecondsSinceEpoch();
 	mLatestSession.reset(new cx::RecordSession(mPluginData->getNewUid(), startTime, startTime, settings()->value("Ultrasound/acquisitionName").toString()));
-	ssc::messageManager()->playStartSound();
+	messageManager()->playStartSound();
 	this->setState(sRUNNING);
 }
 
@@ -178,10 +178,10 @@ void Acquisition::stopRecord()
 		return;
 	}
 
-	mLatestSession->setStopTime(ssc::getMilliSecondsSinceEpoch());
+	mLatestSession->setStopTime(getMilliSecondsSinceEpoch());
 	mPluginData->addRecordSession(mLatestSession);
-	ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
-	ssc::messageManager()->playStopSound();
+	cxToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
+	messageManager()->playStopSound();
 	this->setState(sNOT_RUNNING);
 }
 
@@ -191,7 +191,7 @@ void Acquisition::cancelRecord()
 	{
 		return;
 	}
-	ssc::messageManager()->playCancelSound();
+	messageManager()->playCancelSound();
 	mLatestSession.reset();
 	this->setState(sNOT_RUNNING);
 }

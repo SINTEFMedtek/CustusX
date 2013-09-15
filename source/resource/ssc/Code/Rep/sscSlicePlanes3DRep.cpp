@@ -31,7 +31,7 @@
 #include "sscVtkHelperClasses.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 SlicePlanesProxy::SlicePlanesProxy()
@@ -103,7 +103,7 @@ bool SlicePlanesProxy::getDrawPlanes() const
 	return mDrawPlane;
 }
 
-void SlicePlanesProxy::setViewportData(PLANE_TYPE type, ssc::SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s)
+void SlicePlanesProxy::setViewportData(PLANE_TYPE type, SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s)
 {
 	if (!slice)
 		return;
@@ -129,9 +129,9 @@ void SlicePlanesProxy::setViewportData(PLANE_TYPE type, ssc::SliceProxyPtr slice
 void SlicePlanesProxy::addSimpleSlicePlane(PLANE_TYPE type)
 {
 	SliceProxyPtr slice = SliceProxy::New("sliceproxy_(" + qstring_cast(type) + ")");
-	slice->initializeFromPlane(type, false, ssc::Vector3D(0, 0, 1), true, 1, 0.25);
+	slice->initializeFromPlane(type, false, Vector3D(0, 0, 1), true, 1, 0.25);
 
-	this->setViewportData(type, slice, ssc::DoubleBoundingBox3D(0, 1, 0, 1, 0, 1));
+	this->setViewportData(type, slice, DoubleBoundingBox3D(0, 1, 0, 1, 0, 1));
 }
 
 SlicePlanesProxy::DataMap SlicePlanesProxy::getData()
@@ -172,7 +172,7 @@ void SlicePlanes3DRep::setDynamicLabelSize(bool on)
 {
 	if (on)
 	{
-		mViewportListener.reset(new ssc::ViewportListener);
+		mViewportListener.reset(new ViewportListener);
 		mViewportListener->setCallback(boost::bind(&SlicePlanes3DRep::rescale, this));
 	}
 	else
@@ -181,7 +181,7 @@ void SlicePlanes3DRep::setDynamicLabelSize(bool on)
 	}
 }
 
-void SlicePlanes3DRep::addRepActorsToViewRenderer(ssc::View* view)
+void SlicePlanes3DRep::addRepActorsToViewRenderer(View* view)
 {
 	mView = view;
 	this->changedSlot();
@@ -189,7 +189,7 @@ void SlicePlanes3DRep::addRepActorsToViewRenderer(ssc::View* view)
 		mViewportListener->startListen(view->getRenderer());
 }
 
-void SlicePlanes3DRep::removeRepActorsFromViewRenderer(ssc::View *view)
+void SlicePlanes3DRep::removeRepActorsFromViewRenderer(View *view)
 {
 	if (mViewportListener)
 		mViewportListener->stopListen();
@@ -326,11 +326,11 @@ SlicePlanes3DMarkerIn2DRep::~SlicePlanes3DMarkerIn2DRep()
 {
 }
 
-void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View *view)
+void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(View *view)
 {
 	SlicePlanesProxy::DataType baseData = mProxy->getData()[mType];
 
-	mText.reset(new ssc::TextDisplay(baseData.mSymbol, baseData.mColor, mProxy->getProperties().m2DFontSize));
+	mText.reset(new TextDisplay(baseData.mSymbol, baseData.mColor, mProxy->getProperties().m2DFontSize));
 	mText->textProperty()->BoldOn();
 	mText->textProperty()->SetVerticalJustificationToTop();
 	mText->textProperty()->SetJustificationToLeft();
@@ -340,7 +340,7 @@ void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View *view)
 	this->changedSlot();
 }
 
-void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(ssc::View *view)
+void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveActor(mText->getActor());
 	mText.reset();

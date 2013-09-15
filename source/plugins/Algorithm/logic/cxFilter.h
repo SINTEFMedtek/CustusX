@@ -100,7 +100,7 @@ public:
 	/**
 	 * Returns the filters presets.
 	 */
-	virtual ssc::PresetsPtr getPresets() = 0;
+	virtual PresetsPtr getPresets() = 0;
 	/**
 	 * Generates a preset from the filters currently set options.
 	 */
@@ -168,11 +168,11 @@ signals:
 class FilterGroup
 {
 public:
-	FilterGroup(ssc::XmlOptionFile options);
+	FilterGroup(XmlOptionFile options);
 	/**
 	  * Get the option node for this pipeline
 	  */
-	ssc::XmlOptionFile getOptions();
+	XmlOptionFile getOptions();
 	/**
 	  * Get all filters in pipeline
 	  */
@@ -197,7 +197,7 @@ public:
 
 private:
 	std::vector<FilterPtr> mFilters;
-	ssc::XmlOptionFile mOptions;
+	XmlOptionFile mOptions;
 };
 typedef boost::shared_ptr<FilterGroup> FilterGroupPtr;
 

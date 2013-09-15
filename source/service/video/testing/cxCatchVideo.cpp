@@ -46,10 +46,10 @@ cx::DummyImageStreamerPtr createRunningDummyImageStreamer(TestSenderPtr& sender,
 
 cx::SimulatedImageStreamerPtr createRunningSimulatedImageStreamer(TestSenderPtr& sender)
 {
-	cx::ToolManager::initializeObject();
-	ssc::ImagePtr image = cxtest::Utilities::create3DImage();
+	cx::cxToolManager::initializeObject();
+	cx::ImagePtr image = cxtest::Utilities::create3DImage();
 	REQUIRE(image);
-	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(ssc::DummyToolTestUtilities::createProbeDataLinear(), cx::ToolManager::getInstance());
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDataLinear(), cx::cxToolManager::getInstance());
 	REQUIRE(tool);
 	cx::SimulatedImageStreamerPtr imagestreamer(new cx::SimulatedImageStreamer());
 	REQUIRE(imagestreamer);
@@ -63,7 +63,7 @@ void checkSenderGotImageFromStreamer(TestSenderPtr sender)
 {
 	cx::PackagePtr package = sender->getSentPackage();
 	REQUIRE(package);
-	ssc::ImagePtr image = package->mImage;
+	cx::ImagePtr image = package->mImage;
 	REQUIRE(image);
 }
 

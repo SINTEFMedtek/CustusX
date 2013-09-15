@@ -27,7 +27,7 @@
 #include "vtkForwardDeclarations.h"
 
 //----------------------------------------------------------
-namespace ssc
+namespace cx
 {
 //----------------------------------------------------------
 typedef boost::shared_ptr<class Image> ImagePtr;
@@ -49,7 +49,7 @@ class ImageBlenderProxy : public QObject
 public:
 	ImageBlenderProxy();
 	virtual ~ImageBlenderProxy();
-	virtual QString getType() const { return "ssc::ImageBlenderProxy"; }
+	virtual QString getType() const { return "ImageBlenderProxy"; }
 	bool hasImage(ImagePtr image) const;
 	void clearImages();
 	void addImage(ImagePtr image);

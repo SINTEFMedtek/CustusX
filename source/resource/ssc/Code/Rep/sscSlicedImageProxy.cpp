@@ -34,7 +34,7 @@
 #include "sscImageLUT2D.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 

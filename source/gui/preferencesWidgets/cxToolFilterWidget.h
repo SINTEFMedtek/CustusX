@@ -37,8 +37,8 @@ signals:
   void toolSelected(QString absoluteFilePath);
 
 public slots:
-  void setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication);
-  void setTrackingSystemSlot(ssc::TRACKING_SYSTEM trackingSystem);
+  void setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication);
+  void setTrackingSystemSlot(TRACKING_SYSTEM trackingSystem);
 
 private slots:
   void filterSlot();

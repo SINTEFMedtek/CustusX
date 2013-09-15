@@ -47,7 +47,7 @@ public:
 	VideoConnectionManager();
 	virtual ~VideoConnectionManager();
 
-	ssc::StringDataAdapterXmlPtr getConnectionMethod();
+	StringDataAdapterXmlPtr getConnectionMethod();
 
 	void setLocalServerExecutable(QString commandline);
 	QString getLocalServerExecutable();
@@ -73,7 +73,7 @@ public:
 	void disconnectServer();
 
 	QProcess* getLocalVideoServerProcess();
-	std::vector<ssc::VideoSourcePtr> getVideoSources();
+	std::vector<VideoSourcePtr> getVideoSources();
 	VideoConnectionPtr getVideoConnection();
 
 	void setReconnectInterval(int interval);
@@ -102,8 +102,8 @@ private:
 	ProcessWrapperPtr mLocalVideoServerProcess;
 	ProcessWrapperPtr mIniScriptProcess;
 
-	ssc::StringDataAdapterXmlPtr mConnectionMethod;
-	ssc::XmlOptionFile mOptions;
+	StringDataAdapterXmlPtr mConnectionMethod;
+	XmlOptionFile mOptions;
 
 };
 typedef boost::shared_ptr<VideoConnectionManager> VideoConnectionManagerPtr;

@@ -36,7 +36,7 @@
 typedef vtkSmartPointer<class vtkCubeSource> vtkCubeSourcePtr;
 class TestGPURayCaster;
 
-namespace ssc
+namespace cx
 {
 typedef vtkSmartPointer<class GPURayCastVolumePainter> GPURayCastVolumePainterPtr;
 
@@ -48,7 +48,7 @@ typedef vtkSmartPointer<class GPURayCastVolumePainter> GPURayCastVolumePainterPt
  * 
  * \ingroup sscRep3D
  */
-class GPURayCastVolumeRep: public ssc::RepImpl
+class GPURayCastVolumeRep: public RepImpl
 {
 Q_OBJECT
 public:
@@ -56,22 +56,22 @@ public:
 	virtual ~GPURayCastVolumeRep();
 	virtual QString getType() const
 	{
-		return "ssc::GPURayCastVolumeRep";
+		return "GPURayCastVolumeRep";
 	}
 	/**
 	 * \brief Override the default locations of the shader files
 	 */
 	void setShaderFolder(QString folder);
-	virtual void printSelf(std::ostream & os, ssc::Indent indent);
+	virtual void printSelf(std::ostream & os, Indent indent);
 	/**
 	 * \brief Set the images to render using this Rep
 	 */
-	void setImages(std::vector<ssc::ImagePtr> images);
+	void setImages(std::vector<ImagePtr> images);
 	/**
 	 * \brief Get the images rendered with this class
-	 * At most ssc::GPURayCastVolumePainter::maxVolumes images will be used, any additional images in the list will be ignored
+	 * At most GPURayCastVolumePainter::maxVolumes images will be used, any additional images in the list will be ignored
 	 */
-	std::vector<ssc::ImagePtr> getImages();
+	std::vector<ImagePtr> getImages();
 	/**
 	 * \brief Set a clip plane for this renderer. Only the plane definition of the clipper is used, it is not used to determine which volumes to clip.
 	 * \sa setClipVolumes
@@ -98,15 +98,15 @@ public:
 
 protected:
 	GPURayCastVolumeRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 private slots:
 	void updateColorAttributeSlot();
 	void transformChangedSlot();
 private:
 	DoubleBoundingBox3D mBB_s;
-	std::vector<ssc::ImagePtr> mImages;
+	std::vector<ImagePtr> mImages;
 	QSet<QString> mClipVolumes;
 
 	GPURayCastVolumePainterPtr mPainter;

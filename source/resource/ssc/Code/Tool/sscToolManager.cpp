@@ -19,7 +19,7 @@
 
 #include "sscToolManager.h"
 
-namespace ssc
+namespace cx
 {
 
 ToolManager* toolManager()

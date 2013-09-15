@@ -20,9 +20,9 @@
 namespace cx
 {
 
-ssc::DataPtr FrameMetricReader::load(const QString& uid, const QString& filename)
+DataPtr FrameMetricReader::load(const QString& uid, const QString& filename)
 {
-	return ssc::DataPtr(new FrameMetric(uid, filename));
+	return DataPtr(new FrameMetric(uid, filename));
 }
 
 FrameMetricPtr FrameMetric::create(QString uid, QString name)
@@ -58,8 +58,8 @@ void FrameMetric::parseXml(QDomNode& dataNode)
 {
 	Data::parseXml(dataNode);
 
-	this->setSpace(ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
-	this->setFrame(ssc::Transform3D::fromString(dataNode.toElement().attribute("frame", qstring_cast(mFrame))));
+	this->setSpace(CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
+	this->setFrame(Transform3D::fromString(dataNode.toElement().attribute("frame", qstring_cast(mFrame))));
 }
 
 QString FrameMetric::getAsSingleLineString() const

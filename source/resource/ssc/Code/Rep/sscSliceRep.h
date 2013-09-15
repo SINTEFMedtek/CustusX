@@ -25,7 +25,7 @@ typedef vtkSmartPointer<class vtkImagePlaneWidget> vtkImagePlaneWidgetPtr;
 
 #include "sscRepImpl.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class Image> ImagePtr;
 
@@ -62,6 +62,6 @@ protected:
 	ImagePtr mImage;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCSLICEREP_H_*/

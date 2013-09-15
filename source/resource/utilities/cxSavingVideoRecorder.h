@@ -94,7 +94,7 @@ protected:
  * Record all frames from the input source and store them in an internal buffer.
  * Simultaneously save the data to disk continously using a VideoRecorderSaveThread.
  *
- * Replacement for the overly complicated class ssc::VideoRecorder
+ * Replacement for the overly complicated class VideoRecorder
  *
   * \date Dwc 2, 2012
   * \author christiana
@@ -105,7 +105,7 @@ class SavingVideoRecorder : public QObject
 	Q_OBJECT
 
 public:
-	SavingVideoRecorder(ssc::VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor);
+	SavingVideoRecorder(VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor);
 	virtual ~SavingVideoRecorder();
 
 	virtual void startRecord();
@@ -120,7 +120,7 @@ public:
 	  */
 	void completeSave();
 
-	ssc::VideoSourcePtr getSource() { return mSource; }
+	VideoSourcePtr getSource() { return mSource; }
 
 private slots:
 	void newFrameSlot();
@@ -133,7 +133,7 @@ private:
 	std::vector<double> mTimestamps;
 	QString mSaveFolder;
 	QString mPrefix;
-	ssc::VideoSourcePtr mSource;
+	VideoSourcePtr mSource;
 	boost::shared_ptr<VideoRecorderSaveThread> mSaveThread;
 
 };

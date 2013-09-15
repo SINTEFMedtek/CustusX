@@ -25,7 +25,7 @@ ToolMetricWrapper::ToolMetricWrapper(cx::ToolMetricPtr data) : mData(data)
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
 	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
-	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* ToolMetricWrapper::createWidget()
@@ -48,7 +48,7 @@ QWidget* ToolMetricWrapper::createWidget()
 	hLayout2->addWidget(createDataWidget(widget, mToolNameSelector));
 	hLayout2->addWidget(createDataWidget(widget, mToolOffsetSelector));
 
-	hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
+	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
 
 	QPushButton* sampleButton = new QPushButton("Sample");
 	connect(sampleButton, SIGNAL(clicked()), this, SLOT(resampleMetric()));
@@ -67,12 +67,12 @@ QWidget* ToolMetricWrapper::createWidget()
 void ToolMetricWrapper::initializeDataAdapters()
 {
 	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
+	std::vector<CoordinateSystem> spaces = SpaceHelpers::getAvailableSpaces(true);
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 		range << spaces[i].toString();
 
-	mSpaceSelector = ssc::StringDataAdapterXml::initialize("selectSpace",
+	mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
 			"Space",
 			"Select coordinate system to store position in.",
 			value,
@@ -80,28 +80,28 @@ void ToolMetricWrapper::initializeDataAdapters()
 			QDomNode());
 	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
 
-	mToolNameSelector = ssc::StringDataAdapterXml::initialize("selectToolName",
+	mToolNameSelector = StringDataAdapterXml::initialize("selectToolName",
 															  "Tool Name",
 															  "The name of the tool",
 															  "",
 															  QDomNode());
 	connect(mToolNameSelector.get(), SIGNAL(valueWasSet()), this, SLOT(toolNameSet()));
 
-	mToolOffsetSelector = ssc::DoubleDataAdapterXml::initialize("selectToolOffset",
+	mToolOffsetSelector = DoubleDataAdapterXml::initialize("selectToolOffset",
 																"Tool Offset",
 																"Tool Offset",
 																0,
-																ssc::DoubleRange(0, 100, 1),
+																DoubleRange(0, 100, 1),
 																1);
 	connect(mToolOffsetSelector.get(), SIGNAL(valueWasSet()), this, SLOT(toolOffsetSet()));
 }
 
 QString ToolMetricWrapper::getValue() const
 {
-	return ssc::prettyFormat(mData->getRefCoord(), 1, 3);
+	return prettyFormat(mData->getRefCoord(), 1, 3);
 }
 
-ssc::DataPtr ToolMetricWrapper::getData() const
+DataPtr ToolMetricWrapper::getData() const
 {
 	return mData;
 }
@@ -119,11 +119,11 @@ QString ToolMetricWrapper::getArguments() const
 
 void ToolMetricWrapper::resampleMetric()
 {
-	ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
-	ssc::Transform3D qMt = ssc::SpaceHelpers::getDominantToolTipTransform(mData->getSpace(), true);
+	CoordinateSystem ref = SpaceHelpers::getR();
+	Transform3D qMt = SpaceHelpers::getDominantToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
-	mData->setToolName(ssc::toolManager()->getDominantTool()->getName());
-	mData->setToolOffset(ssc::toolManager()->getDominantTool()->getTooltipOffset());
+	mData->setToolName(toolManager()->getDominantTool()->getName());
+	mData->setToolOffset(toolManager()->getDominantTool()->getTooltipOffset());
 }
 
 
@@ -131,8 +131,8 @@ void ToolMetricWrapper::spaceSelected()
 {
 	if (mInternalUpdate)
 		return;
-	ssc::CoordinateSystem space = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
-	if (space.mId==ssc::csCOUNT)
+	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
+	if (space.mId==csCOUNT)
 		return;
 	mData->setSpace(space);
 }
@@ -167,7 +167,7 @@ void ToolMetricWrapper::frameWidgetChangedSlot()
 {
 	if (mInternalUpdate)
 		return;
-	ssc::Transform3D matrix = mFrameWidget->getMatrix();
+	Transform3D matrix = mFrameWidget->getMatrix();
 	mData->setFrame(matrix);
 }
 

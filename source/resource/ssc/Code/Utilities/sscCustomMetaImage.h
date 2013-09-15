@@ -11,7 +11,7 @@
 #include <QString>
 #include "sscTransform3D.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class CustomMetaImage> CustomMetaImagePtr;

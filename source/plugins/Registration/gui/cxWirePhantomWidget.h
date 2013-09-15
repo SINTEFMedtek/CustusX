@@ -52,22 +52,22 @@ protected:
 
 private slots:
 	void measureSlot();
-	ssc::MeshPtr loadNominalCross();
+	MeshPtr loadNominalCross();
 	void registration();
 	void generate_sMt();
 
 private:
-    void showDataMetrics(ssc::Vector3D cross_r);
-    std::pair<QString, ssc::Transform3D> getLastProbePosition();
-	void showData(ssc::DataPtr data);
-	ssc::Vector3D findCentroid(ssc::MeshPtr mesh);
+    void showDataMetrics(Vector3D cross_r);
+    std::pair<QString, Transform3D> getLastProbePosition();
+	void showData(DataPtr data);
+	Vector3D findCentroid(MeshPtr mesh);
 
     class PipelineWidget* mPipelineWidget;
     PipelinePtr mPipeline;
 	QPushButton* mMeasureButton;
 	QPushButton* mCalibrationButton;
 	QTextEdit* mResults;
-	ssc::Transform3D mLastRegistration;
+	Transform3D mLastRegistration;
 
 };
 

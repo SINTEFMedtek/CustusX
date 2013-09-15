@@ -22,13 +22,13 @@ typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /** Adapter that connects to the current active image.
  */
-class ClipPlaneStringDataAdapter: public ssc::StringDataAdapter
+class ClipPlaneStringDataAdapter: public StringDataAdapter
 {
 Q_OBJECT
 public:
-	static ssc::StringDataAdapterPtr New(InteractiveClipperPtr clipper)
+	static StringDataAdapterPtr New(InteractiveClipperPtr clipper)
 	{
-		return ssc::StringDataAdapterPtr(new ClipPlaneStringDataAdapter(clipper));
+		return StringDataAdapterPtr(new ClipPlaneStringDataAdapter(clipper));
 	}
 	ClipPlaneStringDataAdapter(InteractiveClipperPtr clipper);
 	virtual ~ClipPlaneStringDataAdapter() {}
@@ -67,7 +67,7 @@ private:
 
 	QCheckBox* mUseClipperCheckBox;
 	QCheckBox* mInvertPlaneCheckBox;
-	ssc::StringDataAdapterPtr mPlaneAdapter;
+	StringDataAdapterPtr mPlaneAdapter;
 	SelectImageStringDataAdapterPtr mImageAdapter;
 private slots:
 	void clipperChangedSlot();

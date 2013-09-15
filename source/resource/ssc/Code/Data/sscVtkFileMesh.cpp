@@ -25,7 +25,7 @@
 /**
  * \brief Interfaces a vtk poly data file
  */
-namespace ssc
+namespace cx
 {
 
 VtkFileMesh::VtkFileMesh(const QString &uid, const QString &name, const QString& filePath)

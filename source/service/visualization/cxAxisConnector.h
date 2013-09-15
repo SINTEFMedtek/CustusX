@@ -18,7 +18,7 @@
 #include "cxForwardDeclarations.h"
 #include "sscCoordinateSystemHelpers.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class CoordinateSystemListener> CoordinateSystemListenerPtr;
 }
@@ -38,16 +38,16 @@ class AxisConnector : public QObject
 {
 	Q_OBJECT
 	public:
-		AxisConnector(ssc::CoordinateSystem space);
-		void connectTo(ssc::ToolPtr tool);
-		void mergeWith(ssc::CoordinateSystemListenerPtr base);
-		ssc::AxesRepPtr mRep; ///< axis
-		ssc::CoordinateSystemListenerPtr mListener;
+		AxisConnector(CoordinateSystem space);
+		void connectTo(ToolPtr tool);
+		void mergeWith(CoordinateSystemListenerPtr base);
+		AxesRepPtr mRep; ///< axis
+		CoordinateSystemListenerPtr mListener;
 	private slots:
 		void changedSlot();
 	private:
-		ssc::CoordinateSystemListenerPtr mBase;
-		ssc::ToolPtr mTool;
+		CoordinateSystemListenerPtr mBase;
+		ToolPtr mTool;
 };
 typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
 

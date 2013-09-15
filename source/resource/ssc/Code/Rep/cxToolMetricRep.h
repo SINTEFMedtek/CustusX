@@ -19,7 +19,7 @@
 #include "cxToolMetric.h"
 #include "sscViewportListener.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
 }
@@ -38,18 +38,18 @@ typedef boost::shared_ptr<class ToolMetricRep> ToolMetricRepPtr;
  * \author Christian Askeland, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class ToolMetricRep: public ssc::DataMetricRep
+class ToolMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
 	static ToolMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~ToolMetricRep() {}
-	virtual QString getType() const { return "ssc::ToolMetricRep"; }
+	virtual QString getType() const { return "ToolMetricRep"; }
 
 protected:
 	virtual void clear();
-	void addRepActorsToViewRenderer(ssc::View *view);
-	void removeRepActorsFromViewRenderer(ssc::View *view);
+	void addRepActorsToViewRenderer(View *view);
+	void removeRepActorsFromViewRenderer(View *view);
 
 protected slots:
 	virtual void changedSlot();
@@ -60,11 +60,11 @@ private:
 	ToolMetricPtr getToolMetric();
 	void rescale();
 
-	ssc::GraphicalAxes3DPtr mAxes;
+	GraphicalAxes3DPtr mAxes;
 
-	ssc::GraphicalPoint3DPtr mToolTip;
-	ssc::GraphicalLine3DPtr mToolOffset;
-	ssc::ViewportListenerPtr mViewportListener;
+	GraphicalPoint3DPtr mToolTip;
+	GraphicalLine3DPtr mToolOffset;
+	ViewportListenerPtr mViewportListener;
 
 };
 

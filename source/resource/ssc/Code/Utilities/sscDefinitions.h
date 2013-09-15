@@ -1,7 +1,7 @@
 #ifndef SSCDEFINITIONS_H_
 #define SSCDEFINITIONS_H_
 
-namespace ssc
+namespace cx
 {
 
 /**

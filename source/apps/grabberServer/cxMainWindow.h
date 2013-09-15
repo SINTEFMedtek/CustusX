@@ -30,7 +30,7 @@ private slots:
 
 private:
   GrabberServerWidget*  mGrabberServerWidget;
-  ssc::ConsoleWidget*   mConsoleWidget;
+  ConsoleWidget*   mConsoleWidget;
 
   QLabel* mQueueInfoLabel;
   QLabel* mImagesDroppedLabel;
