@@ -26,7 +26,7 @@
 #include "sscForwardDeclarations.h"
 #include <vtkCornerAnnotation.h>
 
-namespace ssc
+namespace cx
 {
 
 class OrientationAnnotation : public vtkCornerAnnotation
@@ -54,7 +54,7 @@ typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
  * \ingroup sscRep
  * \ingroup sscRep2D
  */
-class OrientationAnnotationRep : public ssc::RepImpl
+class OrientationAnnotationRep : public RepImpl
 {
 	Q_OBJECT
 public:
@@ -68,8 +68,8 @@ public:
 	void clinicalApplicationChangedSlot();
 protected:
 	OrientationAnnotationRep(const QString& uid, const QString& name);
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 	void setPlaneTypeNeurology(PLANE_TYPE type);
 	void setPlaneTypeRadiology(PLANE_TYPE type);

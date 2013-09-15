@@ -23,21 +23,21 @@ int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
 
-    // std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;
-    QString vtkFileName1 = ssc::TestUtilities::ExpandDataFileName("DTI/FiberBundleNode.vtk");
+    // std::cout << TestUtilities::GetDataRoot() << std::endl;
+	QString vtkFileName1 = cx::TestUtilities::ExpandDataFileName("DTI/FiberBundleNode.vtk");
 
-    ssc::ViewWidget *view = new ssc::ViewWidget();
-    ssc::MeshPtr bundle(new ssc::VtkFileMesh(vtkFileName1, vtkFileName1, vtkFileName1));
+	cx::ViewWidget *view = new cx::ViewWidget();
+	cx::MeshPtr bundle(new cx::VtkFileMesh(vtkFileName1, vtkFileName1, vtkFileName1));
     QColor color = QColor("gold");
     // color.setAlphaF(0.6);
     bundle->setColor(color);
 
     /** This section specifies the default test setup, where the a fiber bundle rep is used */
-    ssc::FiberBundleRepPtr rep = ssc::FiberBundleRep::New(bundle->getUid());
+	cx::FiberBundleRepPtr rep = cx::FiberBundleRep::New(bundle->getUid());
     rep->setBundle(bundle);
     view->setRep(rep);
 
-    ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
+	cx::AxesRepPtr axesRep = cx::AxesRep::New("AxesRepUID");
     view->addRep(axesRep);
 
     QMainWindow mainWindow;

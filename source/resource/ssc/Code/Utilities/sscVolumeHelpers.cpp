@@ -25,7 +25,7 @@
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 
-namespace ssc
+namespace cx
 {
 
 vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
@@ -45,7 +45,7 @@ vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
 	unsigned char* ptr = reinterpret_cast<unsigned char*>(data->GetScalarPointer());
 	std::fill(ptr, ptr+scalarSize, initValue);
 
-	// A trick to get a full LUT in ssc::Image (automatic LUT generation)
+	// A trick to get a full LUT in Image (automatic LUT generation)
 	// Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
 	ptr[0] = 255;
 	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
@@ -57,7 +57,7 @@ vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
 }
 
 vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim,
-                                           ssc::Vector3D spacing,
+                                           Vector3D spacing,
                                            double initValue)
 {
 	vtkImageDataPtr data = vtkImageDataPtr::New();
@@ -77,7 +77,7 @@ vtkImageDataPtr generateVtkImageDataDouble(Eigen::Array3i dim,
 	array->SetArray(rawchars, scalarSize+1, 0); // take ownership
 	data->GetPointData()->SetScalars(array);
 
-	// A trick to get a full LUT in ssc::Image (automatic LUT generation)
+	// A trick to get a full LUT in Image (automatic LUT generation)
 	// Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
 	rawchars[0] = 255;
 	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
@@ -136,7 +136,7 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
 
 		cast->Update();
 		if (verbose)
-			ssc::messageManager()->sendInfo(QString("Converting image %1 from %2 to %3, shift=%4")
+			messageManager()->sendInfo(QString("Converting image %1 from %2 to %3, shift=%4")
 											.arg(image->getName())
 											.arg(input->GetScalarTypeAsString())
 											.arg(cast->GetOutput()->GetScalarTypeAsString())
@@ -144,10 +144,10 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
 		convertedImageData = cast->GetOutput();
 	}
 
-	ImagePtr retval = ssc::dataManager()->createDerivedImage(convertedImageData, image->getUid()+"_u", image->getName()+" u", image, "");
+	ImagePtr retval = dataManager()->createDerivedImage(convertedImageData, image->getUid()+"_u", image->getName()+" u", image, "");
 
-	ssc::ImageTF3DPtr TF3D = retval->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
-	ssc::ImageLUT2DPtr LUT2D = retval->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
+	ImageTF3DPtr TF3D = retval->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
+	ImageLUT2DPtr LUT2D = retval->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
 	TF3D->shift(shift);
 	LUT2D->shift(shift);
 	retval->setLookupTable2D(LUT2D);
@@ -156,13 +156,13 @@ ImagePtr convertImageToUnsigned(ImagePtr image, vtkImageDataPtr suggestedConvert
 	return retval;
 }
 
-std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
+std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image)
 {
 	std::map<std::string, std::string> retval;
 	if(!image)
 		return retval;
 
-	//ssc::image
+	//image
 	retval["Filepath"] = image->getFilePath().toStdString();
 	retval["Coordinate system"] = image->getCoordinateSystem().toString().toStdString();
 	retval["Image type"] = image->getImageType().toStdString();
@@ -177,7 +177,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
 	retval["Space"] = image->getSpace().toStdString();
 	retval["Type"] = image->getType().toStdString();
 	retval["Uid"] = image->getUid().toStdString();
-	retval["Acquisition time"] = string_cast(image->getAcquisitionTime().toString(ssc::timestampSecondsFormatNice()));
+	retval["Acquisition time"] = string_cast(image->getAcquisitionTime().toString(timestampSecondsFormatNice()));
 	retval["Voxels with min value"] = string_cast(calculateNumVoxelsWithMinValue(image));
 	retval["Voxels with max value"] = string_cast(calculateNumVoxelsWithMaxValue(image));
 
@@ -202,14 +202,14 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::ImagePtr image)
 	return retval;
 }
 
-int calculateNumVoxelsWithMaxValue(ssc::ImagePtr image)
+int calculateNumVoxelsWithMaxValue(ImagePtr image)
 {
 	return static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer())[image->getRange()];
 }
-int calculateNumVoxelsWithMinValue(ssc::ImagePtr image)
+int calculateNumVoxelsWithMinValue(ImagePtr image)
 {
 	return static_cast<int*>(image->getHistogram()->GetOutput()->GetScalarPointer())[0];
 }
 
 
-} // namespace ssc
+} // namespace cx

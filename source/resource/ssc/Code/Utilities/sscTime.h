@@ -9,7 +9,7 @@
 
 #include <QString>
 
-namespace ssc
+namespace cx
 {
 
 /**

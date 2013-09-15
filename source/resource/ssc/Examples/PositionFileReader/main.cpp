@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	bool verbose = (QString(argv[1]) == "-v");
 	if (verbose) arg++;
 	QString posFile(argv[arg++]);
-	ssc::PositionStorageReader reader(posFile);
+	cx::PositionStorageReader reader(posFile);
 	QString startTS;
 	if (argc == arg + 1)
 	{
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
   }
 
 	
-	ssc::Transform3D T = ssc::Transform3D::Identity();
+	cx::Transform3D T = cx::Transform3D::Identity();
 	double timestamp;
 	QString toolIndex;
 	
@@ -71,9 +71,9 @@ int main(int argc, char **argv)
 //  uint now_t = now.toTime_t()*1000 + now.time().msec(); //milliseconds
 //  std::cout << "now.toTime_t() " << now.toTime_t() << std::endl;
 //  std::cout << "now.toTime_t()*1000 + now.time().msec() " << now_t << std::endl;
-//  std::cout << "test dir: " << ssc::PositionStorageReader::timestampToString(now_t64) << std::endl;
-//	std::cout << "test now: " << ssc::PositionStorageReader::timestampToString(ssc::getMilliSecondsSinceEpoch()) << std::endl;
-//  std::cout << "test now: " << ssc::PositionStorageReader::timestampToString(ssc::getMicroSecondsSinceEpoch()/1000) << std::endl;
+//  std::cout << "test dir: " << PositionStorageReader::timestampToString(now_t64) << std::endl;
+//	std::cout << "test now: " << PositionStorageReader::timestampToString(getMilliSecondsSinceEpoch()) << std::endl;
+//  std::cout << "test now: " << PositionStorageReader::timestampToString(getMicroSecondsSinceEpoch()/1000) << std::endl;
 
 
 	std::cout << "reading file [" << posFile.toStdString() << "]" << std::endl;
@@ -107,16 +107,16 @@ int main(int argc, char **argv)
 			 	<< "index:\t"<< index << '\t'
 				<< "tool id:\t" << toolIndex.toStdString() << '\t'
 //				<< "timestamp:\t" << timestamp << '\n'
-				<< "timestamp:\t" << ssc::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\n'
+				<< "timestamp:\t" << cx::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\n'
 				<< "matrix:\n" << T << '\n' 
 				<< std::endl;			
 		}
 		else
 		{		
       std::cout << "[" << index << "]" << '\t';
-      std::cout << ssc::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\t';
+	  std::cout << cx::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\t';
 			boost::array<double, 16>  val = T.flatten();
-			ssc::stream_range(std::cout, val.begin(), val.end(), ' ');
+			cx::stream_range(std::cout, val.begin(), val.end(), ' ');
       std::cout << '\t' << toolIndex.toStdString();
 			std::cout << std::endl;
 		}

@@ -21,7 +21,7 @@
 #include "sscFrame3D.h"
 #include "sscTypeConversions.h"
 
-using namespace ssc;
+using namespace cx;
 
 void TestTransform3D::testIdentityTransformHasNoEffectOnVector()
 {

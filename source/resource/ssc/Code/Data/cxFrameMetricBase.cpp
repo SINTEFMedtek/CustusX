@@ -19,76 +19,76 @@
 namespace cx {
 
 FrameMetricBase::FrameMetricBase(const QString& uid, const QString& name) :
-		ssc::DataMetric(uid, name),
-		mSpace(ssc::SpaceHelpers::getR()),
-		mFrame(ssc::Transform3D::Identity())
+		DataMetric(uid, name),
+		mSpace(SpaceHelpers::getR()),
+		mFrame(Transform3D::Identity())
 {
-	mSpaceListener.reset(new ssc::CoordinateSystemListener(mSpace));
+	mSpaceListener.reset(new CoordinateSystemListener(mSpace));
 	connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
 FrameMetricBase::~FrameMetricBase() {
 }
 
-void FrameMetricBase::setFrame(const ssc::Transform3D& rMt)
+void FrameMetricBase::setFrame(const Transform3D& rMt)
 {
 	mFrame = rMt;
 	emit transformChanged();
 }
 
-ssc::Transform3D FrameMetricBase::getFrame()
+Transform3D FrameMetricBase::getFrame()
 {
 	return mFrame;
 }
 
-ssc::Vector3D FrameMetricBase::getCoordinate() const
+Vector3D FrameMetricBase::getCoordinate() const
 {
-	ssc::Vector3D point_t = ssc::Vector3D(0,0,0);
+	Vector3D point_t = Vector3D(0,0,0);
 	return mFrame.coord(point_t);
 }
 
 /** return frame described in ref space F * sMr
   */
-ssc::Transform3D FrameMetricBase::getRefFrame() const
+Transform3D FrameMetricBase::getRefFrame() const
 {
-	ssc::Transform3D rMq = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
+	Transform3D rMq = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 	return rMq * mFrame;
 }
 
 /** return frame described in ref space F * sMr
   */
-ssc::Vector3D FrameMetricBase::getRefCoord() const
+Vector3D FrameMetricBase::getRefCoord() const
 {
-	ssc::Transform3D rMq = this->getRefFrame();
-	ssc::Vector3D p_r = rMq.coord(ssc::Vector3D(0,0,0));
+	Transform3D rMq = this->getRefFrame();
+	Vector3D p_r = rMq.coord(Vector3D(0,0,0));
 	return p_r;
 }
 
-void FrameMetricBase::setSpace(ssc::CoordinateSystem space)
+void FrameMetricBase::setSpace(CoordinateSystem space)
 {
 	if (space == mSpace)
 		return;
 
 	// keep the absolute position (in ref) constant when changing space.
-	ssc::Transform3D new_M_old = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), space);
+	Transform3D new_M_old = SpaceHelpers::get_toMfrom(this->getSpace(), space);
 	mFrame = new_M_old*mFrame;
 
 	mSpace = space;
 	mSpaceListener->setSpace(space);
 }
 
-ssc::CoordinateSystem FrameMetricBase::getSpace() const
+CoordinateSystem FrameMetricBase::getSpace() const
 {
 	return mSpace;
 }
 
-ssc::DoubleBoundingBox3D FrameMetricBase::boundingBox() const
+DoubleBoundingBox3D FrameMetricBase::boundingBox() const
 {
 	// convert both inputs to r space
-	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
-	ssc::Vector3D p0_r = rM0.coord(this->getCoordinate());
+	Transform3D rM0 = SpaceHelpers::get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
+	Vector3D p0_r = rM0.coord(this->getCoordinate());
 
-	return ssc::DoubleBoundingBox3D(p0_r, p0_r);
+	return DoubleBoundingBox3D(p0_r, p0_r);
 }
 
 QString FrameMetricBase::matrixAsSingleLineString() const

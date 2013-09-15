@@ -27,7 +27,7 @@
 #include <boost/shared_ptr.hpp>
 #include "sscXmlOptionItem.h"
 
-namespace ssc {
+namespace cx {
 
 /*
  * \class Presets
@@ -45,7 +45,7 @@ class Presets : public QObject
 	Q_OBJECT
 
 public:
-	Presets(ssc::XmlOptionFile presetFile, ssc::XmlOptionFile customFile); //used
+	Presets(XmlOptionFile presetFile, XmlOptionFile customFile); //used
 	virtual ~Presets(){};
 
 	void addCustomPreset(QDomElement& element); ///< adds a custom preset
@@ -55,16 +55,16 @@ public:
 
 	QStringList getPresetList(QString tag=""); ///< returns a list of the preset names for the given tag
 	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
-	ssc::XmlOptionFile getCustomFile();
+	XmlOptionFile getCustomFile();
 
 signals:
 	void changed(); ///<
 
 protected:
 	virtual QStringList generatePresetList(QString tag); ///< internally generate the preset list
-	ssc::XmlOptionFile getPresetNode(const QString& presetName); ///< Look for a preset with the given name. Create one if not found.
+	XmlOptionFile getPresetNode(const QString& presetName); ///< Look for a preset with the given name. Create one if not found.
 	void addDefaultPreset(QDomElement& element); //used
-	void addPreset(ssc::XmlOptionFile& file, QDomElement& element); //used
+	void addPreset(XmlOptionFile& file, QDomElement& element); //used
 
 	//debugging
 	void print(QDomElement element); ///< debugging function for printing xml elements
@@ -72,12 +72,12 @@ protected:
 	QString mLastCustomPresetAdded; /// < the name of the last custom preset added
 	QString mLastCustomPresetRemoved; /// < the name of the last custom preset removed
 
-	ssc::XmlOptionFile mPresetFile; //used
+	XmlOptionFile mPresetFile; //used
 private:
-	ssc::XmlOptionFile mCustomFile; //used
+	XmlOptionFile mCustomFile; //used
 };
 
 typedef boost::shared_ptr<class Presets> PresetsPtr;
 
-} /* namespace ssc */
+} /* namespace cx */
 #endif /* SSCPRESETS_H_ */

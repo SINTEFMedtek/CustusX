@@ -32,7 +32,7 @@
 #include "sscDoubleRange.h"
 #include "sscDataAdapter.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Abstract interface for interaction with internal double-valued data

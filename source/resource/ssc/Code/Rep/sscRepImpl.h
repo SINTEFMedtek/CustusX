@@ -24,7 +24,7 @@
 #include "sscRep.h"
 #include "sscIndent.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Default implementation of Rep.
@@ -84,6 +84,6 @@ private:
 
 
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCREPIMPL_H_*/

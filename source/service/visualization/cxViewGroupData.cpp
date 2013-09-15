@@ -33,20 +33,20 @@
 namespace cx
 {
 
-bool dataTypeSort(const ssc::DataPtr data1, const ssc::DataPtr data2)
+bool dataTypeSort(const DataPtr data1, const DataPtr data2)
 {
 	return getPriority(data1) < getPriority(data2);
 }
 
-int getPriority(ssc::DataPtr data)
+int getPriority(DataPtr data)
 {
 	if (data->getType()=="mesh")
 		return 6;
-	ssc::DataMetricPtr metric = boost::dynamic_pointer_cast<ssc::DataMetric>(data);
+	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
 	if (metric)
 		return 7;
 
-	ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
 		if (image->getModality().toUpper().contains("US"))
@@ -81,17 +81,17 @@ int getPriority(ssc::DataPtr data)
 
 ViewGroupData::Options::Options() :
 	mShowLandmarks(false), mShowPointPickerProbe(false),
-	mPickerGlyph(new ssc::Mesh("PickerGlyph"))
+	mPickerGlyph(new Mesh("PickerGlyph"))
 {
 }
 
 ViewGroupData::ViewGroupData() :
 				mCamera3D(CameraData::create())
 {
-	connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(removeDataSlot(QString)));
+	connect(dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(removeDataSlot(QString)));
 	mVideoSource = "active";
 
-//	mPickerGlyph.reset(new ssc::Mesh("PickerGlyph"));
+//	mPickerGlyph.reset(new Mesh("PickerGlyph"));
 //
 //
 //	mOptions.getSpherePickerGlyph()->SetRadius(40);
@@ -112,12 +112,12 @@ void ViewGroupData::requestInitialize()
 	emit initialized();
 }
 
-std::vector<ssc::DataPtr> ViewGroupData::getData() const
+std::vector<DataPtr> ViewGroupData::getData() const
 {
 	return mData;
 }
 
-void ViewGroupData::addData(ssc::DataPtr data)
+void ViewGroupData::addData(DataPtr data)
 {
 	if (!data)
 		return;
@@ -127,7 +127,7 @@ void ViewGroupData::addData(ssc::DataPtr data)
 	emit dataAdded(qstring_cast(data->getUid()));
 }
 
-void ViewGroupData::addDataSorted(ssc::DataPtr data)
+void ViewGroupData::addDataSorted(DataPtr data)
 {
 	if (!data)
 		return;
@@ -150,7 +150,7 @@ void ViewGroupData::addDataSorted(ssc::DataPtr data)
 	emit dataAdded(qstring_cast(data->getUid()));
 }
 
-bool ViewGroupData::removeData(ssc::DataPtr data)
+bool ViewGroupData::removeData(DataPtr data)
 {
 	if (!data)
 		return false;
@@ -181,24 +181,24 @@ QString ViewGroupData::getVideoSource() const
 	return mVideoSource;
 }
 
-std::vector<ssc::ImagePtr> ViewGroupData::getImages() const
+std::vector<ImagePtr> ViewGroupData::getImages() const
 {
-	std::vector<ssc::ImagePtr> retval;
+	std::vector<ImagePtr> retval;
 	for (unsigned i = 0; i < mData.size(); ++i)
 	{
-		ssc::ImagePtr data = boost::dynamic_pointer_cast<ssc::Image>(mData[i]);
+		ImagePtr data = boost::dynamic_pointer_cast<Image>(mData[i]);
 		if (data)
 			retval.push_back(data);
 	}
 	return retval;
 }
 
-std::vector<ssc::MeshPtr> ViewGroupData::getMeshes() const
+std::vector<MeshPtr> ViewGroupData::getMeshes() const
 {
-	std::vector<ssc::MeshPtr> retval;
+	std::vector<MeshPtr> retval;
 	for (unsigned i = 0; i < mData.size(); ++i)
 	{
-		ssc::MeshPtr data = boost::dynamic_pointer_cast<ssc::Mesh>(mData[i]);
+		MeshPtr data = boost::dynamic_pointer_cast<Mesh>(mData[i]);
 		if (data)
 			retval.push_back(data);
 	}

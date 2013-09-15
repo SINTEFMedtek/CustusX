@@ -53,14 +53,14 @@ protected slots:
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
-  void setManualTool(const ssc::Vector3D& p_r);
-  ssc::Vector3D getSample() const;
+  void setManualTool(const Vector3D& p_r);
+  Vector3D getSample() const;
   void enablebuttons();
-  void addPoint(ssc::Vector3D point);
+  void addPoint(Vector3D point);
 
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
   QTableWidget* mTable; ///< the table widget presenting the landmarks
-  typedef std::vector<ssc::Landmark> LandmarkVector;
+  typedef std::vector<Landmark> LandmarkVector;
   LandmarkVector mSamples;
   QString mActiveLandmark; ///< uid of surrently selected landmark.
 

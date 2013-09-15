@@ -61,13 +61,13 @@ ElastixWidget::ElastixWidget(RegistrationManagerPtr regManager, QWidget* parent)
 	entryLayout->setColumnStretch(1, 1);
 
 	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
-	new ssc::LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
+	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
 	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
-	new ssc::LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
+	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
 
-//	ssc::StringDataAdapterXmlPtr mSettings;
-//	mSettings = ssc::StringDataAdapterXml::initialize("elastixSettings", "Setting", "Current Elastix Settings", "mysettings", QStringList(), QDomNode());
-	new ssc::LabeledComboBoxWidget(this, mElastixManager->getParameters()->getCurrentPreset(), entryLayout, 2);
+//	StringDataAdapterXmlPtr mSettings;
+//	mSettings = StringDataAdapterXml::initialize("elastixSettings", "Setting", "Current Elastix Settings", "mysettings", QStringList(), QDomNode());
+	new LabeledComboBoxWidget(this, mElastixManager->getParameters()->getCurrentPreset(), entryLayout, 2);
 
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 	buttonsLayout->addWidget(mRegisterButton);
@@ -107,7 +107,7 @@ QWidget* ElastixWidget::createOptionsWidget()
 	++line;
 
 	layout->addWidget(new QLabel("Parameter File", this), line, 0);
-	mParameterFileWidget0 = new ssc::FileSelectWidget(this);
+	mParameterFileWidget0 = new FileSelectWidget(this);
 	connect(mParameterFileWidget0, SIGNAL(fileSelected(QString)), this, SLOT(userParameterFileSelected(QString)));
 	layout->addWidget(mParameterFileWidget0, line, 1, 1, 2);
 	++line;
@@ -128,7 +128,7 @@ QWidget* ElastixWidget::createOptionsWidget()
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 	layout->addLayout(buttonsLayout, line, 0, 1, 3);
 
-	buttonsLayout->addWidget(new ssc::CheckBoxWidget(this, mElastixManager->getDisplayProcessMessages()));
+	buttonsLayout->addWidget(new CheckBoxWidget(this, mElastixManager->getDisplayProcessMessages()));
 
 	this->createAction(this,
 	                QIcon(":/icons/preset_remove.png"),

@@ -24,7 +24,7 @@ namespace cx
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStringDataAdapterBasePtr;
 
-/** Widget for selecting/showing/removing a ssc::Data.
+/** Widget for selecting/showing/removing a Data.
   *
   * The widget wraps a SelectDataStringDataAdapterBasePtr,
   * and adds utility buttons such as showing the data in the

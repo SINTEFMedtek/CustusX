@@ -24,7 +24,7 @@
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
@@ -49,11 +49,11 @@ public:
 
 	static GeometricRep2DPtr New(const QString& uid, const QString& name="");
 
-	virtual QString getType() const { return "ssc::GeometricRep2D"; } ///< gives this reps type
+	virtual QString getType() const { return "GeometricRep2D"; } ///< gives this reps type
 	void setMesh(MeshPtr mesh); ///< sets this reps mesh
 	MeshPtr getMesh(); ///< gives this reps mesh
 	bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
-	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	void setSliceProxy(SliceProxyPtr slicer);
 
 protected:
 	GeometricRep2D(const QString& uid, const QString& name);
@@ -72,6 +72,6 @@ private slots:
 	void transformChangedSlot();
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCGeometricRep2D_H_*/

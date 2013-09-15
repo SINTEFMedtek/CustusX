@@ -39,7 +39,7 @@
 #include "sscDoubleDataAdapter.h"
 #include "sscOptimizedUpdateWidget.h"
 
-namespace ssc
+namespace cx
 {
 //typedef boost::shared_ptr<class DoubleDataAdapterDoDoubleDataAdapter
 class MousePadWidget;
@@ -129,7 +129,7 @@ public:
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
  *
  * Before use: enable the widgets you need, then add either to Own layout, in case you wish to
  * use the widget normally, or add to grid, in case you wish to integrate the elements into a
@@ -180,7 +180,7 @@ private:
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
  *
  * \ingroup sscWidget
  */
@@ -194,7 +194,7 @@ public:
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
  *
  * Uses a QDoubleSpinBox instead of a slider - this gives a more compact widget.
  *
@@ -210,7 +210,7 @@ public:
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
  *
  * Uses both a slider and a spin box
  *
@@ -227,7 +227,7 @@ typedef boost::shared_ptr<SpinBoxAndSliderGroupWidget> SpinBoxAndSliderGroupWidg
 /**\brief Composite widget for scalar data manipulation.
  *
  * Consists of <namelabel, valueedit, slider>.
- * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ * Insert a subclass of DoubDoubleDataAdapter order to connect to data.
  *
  * This slider is custom-made and infinitely long.
  *
@@ -240,7 +240,7 @@ public:
 	SpinBoxInfiniteSliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout = 0, int row = 0);
 };
 
-} //namespace ssc
+} //namespace cx
 
 
 #endif /* SSCDOUBLEWIDGETS_H_ */

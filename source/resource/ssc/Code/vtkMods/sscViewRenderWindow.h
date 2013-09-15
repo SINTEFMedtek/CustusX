@@ -1,7 +1,7 @@
 #ifndef SSCVIEWRENDERWINDOW_H_
 #define SSCVIEWRENDERWINDOW_H_
 
-/**\class ssc::ViewRenderWindow
+/**\class ViewRenderWindow
  *
  *	This class defaults to the vtkRenderWindow,
  *	but if USE_GLX_SHARED_CONTEXT is set, a
@@ -22,7 +22,7 @@
 
 	#if ( VTK_MAJOR_VERSION==5 )&&( VTK_MINOR_VERSION < 8 )
 		#include "sscSNWXOpenGLRenderWindow_5_4.h"
-	namespace ssc
+	namespace cx
 	{
 			typedef SNWXOpenGLRenderWindow ViewRenderWindow;
 			typedef vtkSmartPointer<SNWXOpenGLRenderWindow> ViewRenderWindowPtr;
@@ -35,7 +35,7 @@
 		#else
 			#error "VTK Minor Version not supported"
 		#endif
-	namespace ssc
+	namespace cx
 	{
 			typedef sscModified_vtkXOpenGLRenderWindow ViewRenderWindow;
 			typedef vtkSmartPointer<sscModified_vtkXOpenGLRenderWindow> ViewRenderWindowPtr;
@@ -46,7 +46,7 @@
 #else
 	// typedef to default
 	#include <vtkRenderWindow.h>
-	namespace ssc
+	namespace cx
 	{
 		typedef vtkRenderWindow ViewRenderWindow;
 		typedef vtkSmartPointer<ViewRenderWindow> ViewRenderWindowPtr;

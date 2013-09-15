@@ -34,39 +34,39 @@
 #include "sscTypeConversions.h"
 #include "sscLabeledLineEditWidget.h"
 
-namespace ssc
+namespace cx
 {
 
-QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout, int row)
+QWidget* sscCreateDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout, int row)
 {
-	StringDataAdapterPtr str = boost::dynamic_pointer_cast<ssc::StringDataAdapter>(data);
+	StringDataAdapterPtr str = boost::dynamic_pointer_cast<StringDataAdapter>(data);
 	if (str)
 	{
 		if (str->getAllowOnlyValuesInRange())
-			return new ssc::LabeledComboBoxWidget(parent, str, gridLayout, row);
+			return new LabeledComboBoxWidget(parent, str, gridLayout, row);
 		else
-			return new ssc::LabeledLineEditWidget(parent, str, gridLayout, row);
+			return new LabeledLineEditWidget(parent, str, gridLayout, row);
 	}
 
-	DoubleDataAdapterPtr dbl = boost::dynamic_pointer_cast<ssc::DoubleDataAdapter>(data);
+	DoubleDataAdapterPtr dbl = boost::dynamic_pointer_cast<DoubleDataAdapter>(data);
 	if (dbl)
 	{
         if (dbl->addSlider())
-            return new ssc::SpinBoxAndSliderGroupWidget(parent, dbl, gridLayout, row);
+            return new SpinBoxAndSliderGroupWidget(parent, dbl, gridLayout, row);
         else
-            return new ssc::SpinBoxGroupWidget(parent, dbl, gridLayout, row);
+            return new SpinBoxGroupWidget(parent, dbl, gridLayout, row);
 	}
 
-	BoolDataAdapterPtr bl = boost::dynamic_pointer_cast<ssc::BoolDataAdapter>(data);
+	BoolDataAdapterPtr bl = boost::dynamic_pointer_cast<BoolDataAdapter>(data);
 	if (bl)
 	{
-		return new ssc::CheckBoxWidget(parent, bl, gridLayout, row);
+		return new CheckBoxWidget(parent, bl, gridLayout, row);
 	}
 
-    ColorDataAdapterPtr cl = boost::dynamic_pointer_cast<ssc::ColorDataAdapter>(data);
+    ColorDataAdapterPtr cl = boost::dynamic_pointer_cast<ColorDataAdapter>(data);
     if (cl)
     {
-        return new ssc::ColorSelectWidget(parent, cl, gridLayout, row);
+        return new ColorSelectWidget(parent, cl, gridLayout, row);
     }
 
     std::cout << "Failed to create Data Widget for " << (data ? data->getValueName() : "NULL") << std::endl;

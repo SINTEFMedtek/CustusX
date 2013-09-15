@@ -20,7 +20,7 @@ class QDomNode;
 #include <vector>
 #include "cxRecordSession.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 }
@@ -44,7 +44,7 @@ class AcquisitionData : public QObject
 	Q_OBJECT
 
 public:
-	AcquisitionData(ssc::ReconstructManagerPtr reconstructer);
+	AcquisitionData(ReconstructManagerPtr reconstructer);
 	virtual ~AcquisitionData();
 
 	void addRecordSession(RecordSessionPtr session);
@@ -53,7 +53,7 @@ public:
 	RecordSessionPtr getRecordSession(QString uid);
 	QString getNewUid();
 
-	ssc::ReconstructManagerPtr getReconstructer() { return mReconstructer; };
+	ReconstructManagerPtr getReconstructer() { return mReconstructer; };
 
 	//Interface for saving/loading
 	void addXml(QDomNode& dataNode); ///< adds xml information about the StateService and its variabels
@@ -66,7 +66,7 @@ private:
 	std::vector<RecordSessionPtr> mRecordSessions;
 
 	// referenced plugins:
-	ssc::ReconstructManagerPtr mReconstructer;
+	ReconstructManagerPtr mReconstructer;
 };
 typedef boost::shared_ptr<AcquisitionData> AcquisitionDataPtr;
 

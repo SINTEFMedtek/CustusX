@@ -24,7 +24,7 @@
 #include "sscTransform3D.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 // forward declarations
 typedef boost::shared_ptr<class Image> ImagePtr;
@@ -80,7 +80,7 @@ Q_OBJECT
 public:
 	SlicedImageProxy();
 	virtual ~SlicedImageProxy();
-	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	void setSliceProxy(SliceProxyPtr slicer);
 	void setImage(ImagePtr image);
 	ImagePtr getImage() const;
 	void update();

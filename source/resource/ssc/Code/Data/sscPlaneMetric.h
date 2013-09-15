@@ -25,7 +25,7 @@
 #include "sscDataManagerImpl.h"
 #include "sscPointMetric.h"
 
-namespace ssc
+namespace cx
 {
 typedef Eigen::Hyperplane<double, 3> Plane3D;
 
@@ -37,12 +37,12 @@ typedef Eigen::Hyperplane<double, 3> Plane3D;
 
 typedef boost::shared_ptr<class PlaneMetric> PlaneMetricPtr;
 
-/**\brief ssc::DataReader implementation for PlaneMetric
+/**\brief DataReader implementation for PlaneMetric
  *
  *  \date Jul 27, 2011
  *  \author Christian Askeland, SINTEF
  */
-class PlaneMetricReader: public ssc::DataReader
+class PlaneMetricReader: public DataReader
 {
 public:
 	virtual ~PlaneMetricReader()
@@ -52,7 +52,7 @@ public:
 	{
 		return type == "planeMetric";
 	}
-	virtual ssc::DataPtr load(const QString& uid, const QString& filename);
+	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
 /**
@@ -76,13 +76,13 @@ public:
     static PlaneMetricPtr create(QDomNode node);
     static PlaneMetricPtr create(QString uid, QString name="");
 
-	void setCoordinate(const ssc::Vector3D& p);
-	ssc::Vector3D getCoordinate() const;
-    virtual ssc::Vector3D getRefCoord() const;
-    void setNormal(const ssc::Vector3D& p);
-	ssc::Vector3D getNormal() const;
-	void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
-	ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data
+	void setCoordinate(const Vector3D& p);
+	Vector3D getCoordinate() const;
+    virtual Vector3D getRefCoord() const;
+    void setNormal(const Vector3D& p);
+	Vector3D getNormal() const;
+	void setSpace(CoordinateSystem space); // use parentframe from Data
+	CoordinateSystem getSpace() const; // use parentframe from Data
 	virtual QString getType() const
 	{
 		return "planeMetric";
@@ -93,12 +93,12 @@ public:
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
-	virtual ssc::DoubleBoundingBox3D boundingBox() const;
+	virtual DoubleBoundingBox3D boundingBox() const;
 
 private:
-	ssc::Vector3D mCoordinate;
-	ssc::Vector3D mNormal;
-	ssc::CoordinateSystem mSpace;
+	Vector3D mCoordinate;
+	Vector3D mNormal;
+	CoordinateSystem mSpace;
 	CoordinateSystemListenerPtr mSpaceListener;
 };
 

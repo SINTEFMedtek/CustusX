@@ -64,16 +64,16 @@ Q_OBJECT
 public:
 	ThresholdPreview();
 
-    void setPreview(ssc::ImagePtr image, double setValue);
+    void setPreview(ImagePtr image, double setValue);
     void removePreview();
 
 private:
 	void revertTransferFunctions();
 
-	ssc::ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
+	ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
 //	QWidget* mFromWidget; ///< The calling widget
-    ssc::ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
-	ssc::ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
+    ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
+	ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
 	bool mShadingOn_original; ///< Was shading originally enabled in image
 //	QTimer *mRemoveTimer; ///< Timer for removing segmentation preview coloring if widget is not visible
 };

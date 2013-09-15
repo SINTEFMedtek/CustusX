@@ -23,7 +23,7 @@
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class CaptionText3D> CaptionText3DPtr;
 typedef boost::shared_ptr<class DataMetric> DataMetricPtr;
@@ -39,7 +39,7 @@ typedef boost::shared_ptr<class DataMetric> DataMetricPtr;
  * \date Jul 31, 2011
  * \author Christian Askeland, SINTEF
  */
-class DataMetricRep: public ssc::RepImpl
+class DataMetricRep: public RepImpl
 {
 Q_OBJECT
 public:
@@ -60,8 +60,8 @@ protected:
 	DataMetricRep(const QString& uid, const QString& name);
 //  virtual void rescale() = 0; ///< called when scaling has changed: rescale text etc to keep const vp size.
 
-    void addRepActorsToViewRenderer(ssc::View *view);
-    void removeRepActorsFromViewRenderer(ssc::View *view);
+    void addRepActorsToViewRenderer(View *view);
+    void removeRepActorsFromViewRenderer(View *view);
     void drawText();
     virtual void clear(); // reset all internals
     virtual QString getText();
@@ -69,14 +69,14 @@ protected:
 	double mGraphicsSize;
 	bool mShowLabel;
 	double mLabelSize;
-	ssc::Vector3D mColor;
+	Vector3D mColor;
 
     DataMetricPtr mMetric;
     View *mView;
 private:
     CaptionText3DPtr mText;
 
-//  ssc::ViewportListenerPtr mViewportListener;
+//  ViewportListenerPtr mViewportListener;
 };
 typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
 

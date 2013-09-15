@@ -6,7 +6,7 @@
 #include "sscTransform3D.h"
 #include "vtkSmartPointer.h"
 
-namespace ssc
+namespace cx
 {
 /** Vessel - vessel registration algorithm.
  *
@@ -60,13 +60,13 @@ public:
 //		int single_point_thre, bool verbose);
 	~SeansVesselReg();
 
-	bool execute(ssc::DataPtr source, ssc::DataPtr target, QString logPath);
-	ssc::Transform3D getLinearResult(ContextPtr context=ContextPtr());
+	bool execute(DataPtr source, DataPtr target, QString logPath);
+	Transform3D getLinearResult(ContextPtr context=ContextPtr());
 	double getResultMetric(ContextPtr context=ContextPtr());
 	double getResultLtsRatio(ContextPtr context=ContextPtr());
-	ssc::Transform3D getNonLinearTransform();
-	void checkQuality(ssc::Transform3D linearTransform);
-	ssc::ImagePtr loadMinc(char* source_file);
+	Transform3D getNonLinearTransform();
+	void checkQuality(Transform3D linearTransform);
+	ImagePtr loadMinc(char* source_file);
 	void setDebugOutput(bool on)
 	{
 		mt_verbose = on;
@@ -86,7 +86,7 @@ public:
 	double mt_maximumDurationSeconds;
 
 	// debug interface:
-	ContextPtr createContext(ssc::DataPtr source, ssc::DataPtr target);
+	ContextPtr createContext(DataPtr source, DataPtr target);
 	void performOneRegistration(ContextPtr context, bool linear);
 	void computeDistances(ContextPtr context);
 	static vtkPolyDataPtr convertToPolyData(vtkPointsPtr input);
@@ -98,17 +98,17 @@ public:
 	 * @param p_BoundingBox
 	 * @return
 	 */
-	static vtkPolyDataPtr extractPolyData(ssc::ImagePtr image, int p_neighborhoodFilterThreshold,
+	static vtkPolyDataPtr extractPolyData(ImagePtr image, int p_neighborhoodFilterThreshold,
 		double p_BoundingBox[6]);
 private:
-	ssc::Transform3D getLinearTransform(vtkGeneralTransformPtr myConcatenation);
+	Transform3D getLinearTransform(vtkGeneralTransformPtr myConcatenation);
 
 protected:
 	bool runAlgorithm(ContextPtr context, vtkGeneralTransformPtr myConcatenation, int largeSteps, double fraction);
 	void printOutResults(QString fileNamePrefix, vtkGeneralTransformPtr myConcatenation);
 	vtkAbstractTransformPtr linearRegistration(vtkPointsPtr sortedSourcePoints, vtkPointsPtr sortedTargetPoints);
 	vtkAbstractTransformPtr nonLinearRegistration(vtkPointsPtr sortedSourcePoints, vtkPointsPtr sortedTargetPoints);
-	vtkPolyDataPtr convertToPolyData(ssc::DataPtr data);
+	vtkPolyDataPtr convertToPolyData(DataPtr data);
 	vtkPointsPtr transformPoints(vtkPointsPtr input, vtkAbstractTransformPtr transform);
 	vtkPointsPtr createSortedPoints(vtkIdListPtr sortedIDList, vtkPointsPtr unsortedPoints, int numPoints);
 	vtkPolyDataPtr crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, double margin);
@@ -121,7 +121,7 @@ protected:
 
 
 
-//	ssc::Transform3D mLinearTransformResult;
+//	Transform3D mLinearTransformResult;
 	ContextPtr mLastRun; ///< result from last run of execute()
 
 //	//---------------------------------------------------------------------------

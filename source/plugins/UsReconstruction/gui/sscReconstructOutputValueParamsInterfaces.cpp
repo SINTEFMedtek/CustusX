@@ -7,7 +7,7 @@
 
 #include "sscReconstructOutputValueParamsInterfaces.h"
 
-namespace ssc
+namespace cx
 {
 
 DoubleDataAdapterOutputValueParams::DoubleDataAdapterOutputValueParams(ReconstructManagerPtr reconstructer) :
@@ -33,4 +33,4 @@ bool DoubleDataAdapterOutputValueParams::setValue(double val)
   return true;
 }
 
-} // namespace ssc
+} // namespace cx

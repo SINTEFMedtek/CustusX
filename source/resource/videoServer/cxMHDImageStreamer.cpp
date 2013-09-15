@@ -133,7 +133,7 @@ PackagePtr ImageTestData::createPackage(ImageTestData* data)
 	QString uid = data->mRawUid;
 	vtkImageDataPtr copy = vtkImageDataPtr::New();
 	copy->DeepCopy(data->mDataSource->get(frame));
-	ssc::ImagePtr image(new ssc::Image(uid, copy));
+	ImagePtr image(new Image(uid, copy));
 	image->setAcquisitionTime(QDateTime::currentDateTime());
 	package->mImage = image;
 	return package;

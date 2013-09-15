@@ -24,10 +24,10 @@
 #include "sscTool.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
-ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ssc::ProbePtr probe, ssc::VideoSourcePtr source) :
+ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ProbePtr probe, VideoSourcePtr source) :
 	mUid(uid), mBase(source), mProbe(probe)
 {
 	connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
@@ -105,7 +105,7 @@ bool ProbeAdapterRTSource::isStreaming() const
 	return mBase->isStreaming();
 }
 
-ssc::VideoSourcePtr ProbeAdapterRTSource::getBaseSource()
+VideoSourcePtr ProbeAdapterRTSource::getBaseSource()
 {
 	return mBase;
 }
@@ -121,13 +121,13 @@ void ProbeAdapterRTSource::newFrameSlot()
 	mRedirecter->Update();
 
 	QString uid = mBase->getUid();
-	ssc::ProbeData data = probe->getProbeData(uid);
+	ProbeData data = probe->getProbeData(uid);
 	QSize dimProbe = data.getImage().mSize;
 	QSize dimImage(mRedirecter->GetOutput()->GetDimensions()[0], mRedirecter->GetOutput()->GetDimensions()[1]);
 
 	if (dimProbe!=dimImage)
 	{
-		ssc::messageManager()->sendInfo(
+		messageManager()->sendInfo(
 			QString("Resampling probe calibration. Calibration:[%1,%2], Image:[%3,%4], uid=%5")
 			.arg(dimProbe.width())
 			.arg(dimProbe.height())

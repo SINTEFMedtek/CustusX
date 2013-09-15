@@ -10,9 +10,9 @@
 
 /**Test class  with convenience methods for defining views.
  * Uses the following reps:
- *  - ssc::ToolRep3D
- *  - ssc::SliceRepSW
- *  - ssc::VolumetricRep
+ *  - ToolRep3D
+ *  - SliceRepSW
+ *  - VolumetricRep
  */
 class ContainerWindow : public QMainWindow
 {
@@ -24,29 +24,29 @@ public:
 	
 	void setDescription(const QString& desc);
 
-	// create ssc::ViewContainer-based rendering views (do not mix with above ssc::ViewWidget-based functions)
-	void container3D(ssc::ViewItem *view, const QString& imageFilename);
-	void containerGPUSlice(ssc::ViewItem *view, const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane);
-	void containerGPU3D(ssc::ViewItem *view, const QStringList& imageFilenames, const ImageParameters* parameters);
+	// create ViewContainer-based rendering views (do not mix with above ViewWidget-based functions)
+	void container3D(cx::ViewItem *view, const QString& imageFilename);
+	void containerGPUSlice(cx::ViewItem *view, const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane);
+	void containerGPU3D(cx::ViewItem *view, const QStringList& imageFilenames, const ImageParameters* parameters);
 
 	// was test accepted?
 	bool accepted() const { return mAcceptanceBox->accepted(); }
 	
 	// setup views
-	void setupViewContainer(ssc::ViewContainer *view, const QString& uid, const QString& volume, int r, int c);
+	void setupViewContainer(cx::ViewContainer *view, const QString& uid, const QString& volume, int r, int c);
 
 	/// ugly hack
 	bool mDumpSpeedData;
 
 private:
 	void start(bool showSliders);
-	ssc::ImagePtr loadImage(const QString& imageFilename);
+	cx::ImagePtr loadImage(const QString& imageFilename);
 
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;
 	
-	typedef std::set<ssc::View *> LayoutMap;
-	std::set<ssc::View *> mLayouts;
+	typedef std::set<cx::View *> LayoutMap;
+	std::set<cx::View *> mLayouts;
 	QGridLayout* mSliceLayout;
 	QString mDisplayText;
 	
@@ -56,8 +56,8 @@ private:
 	int mTotalOther;
 	QTime mLastRenderEnd;
 	QString mShaderFolder;
-	ssc::AcceptanceBoxWidget* mAcceptanceBox;
-	ssc::ViewContainer *mContainer;
+	cx::AcceptanceBoxWidget* mAcceptanceBox;
+	cx::ViewContainer *mContainer;
 
 public slots:
 	void updateRender();

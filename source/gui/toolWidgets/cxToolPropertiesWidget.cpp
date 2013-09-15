@@ -62,11 +62,11 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   manualGroupLayout->setMargin(0);
   mManualToolWidget = new Transform3DWidget(manualGroup);
   manualGroupLayout->addWidget(mManualToolWidget);
-  connect(ToolManager::getInstance()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
-  connect(ToolManager::getInstance()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
+  connect(cxToolManager::getInstance()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
+  connect(cxToolManager::getInstance()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
   connect(mManualToolWidget, SIGNAL(changed()), this, SLOT(manualToolWidgetChanged()));
 
-  mSpaceSelector = ssc::StringDataAdapterXml::initialize("selectSpace",
+  mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
       "Space",
       "Select coordinate system to store position in.",
       "",
@@ -74,29 +74,29 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
       QDomNode());
   connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spacesChangedSlot()));
   connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(setModified()));
-  mSpaceSelector->setValue(ssc::SpaceHelpers::getPr().toString());
-  manualGroupLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mSpaceSelector));
+  mSpaceSelector->setValue(SpaceHelpers::getPr().toString());
+  manualGroupLayout->addWidget(new LabeledComboBoxWidget(this, mSpaceSelector));
 
-  mUSSectorConfigBox = new ssc::LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New());
+  mUSSectorConfigBox = new LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New());
   mToptopLayout->addWidget(mUSSectorConfigBox);
   mUSSectorConfigBox->hide();
 
   QGridLayout* gridLayout = new QGridLayout;
   activeGroupLayout->addLayout(gridLayout);
 
-  new ssc::SpinBoxAndSliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterActiveToolOffset), gridLayout, 0);
+  new SpinBoxAndSliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterActiveToolOffset), gridLayout, 0);
 
   mToptopLayout->addStretch();
 
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
-  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
+  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
+  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
-  connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(updateSlot()));
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateSlot()));
-  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
+  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
+  connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateSlot()));
+  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateSlot()));
+  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
+  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
 
   this->dominantToolChangedSlot();
   this->referenceToolChangedSlot();
@@ -120,15 +120,15 @@ QString ToolPropertiesWidget::defaultWhatsThis() const
 
 void ToolPropertiesWidget::manualToolChanged()
 {
-	if (!ToolManager::getInstance()->getManualTool())
+	if (!cxToolManager::getInstance()->getManualTool())
 		return;
-  mManualGroup->setVisible(ToolManager::getInstance()->getManualTool()->getVisible());
+  mManualGroup->setVisible(cxToolManager::getInstance()->getManualTool()->getVisible());
   mManualToolWidget->blockSignals(true);
 
-  ssc::Transform3D prMt = ToolManager::getInstance()->getManualTool()->get_prMt();
-  ssc::CoordinateSystem space_q = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
-  ssc::CoordinateSystem space_mt = ssc::SpaceHelpers::getTO(ToolManager::getInstance()->getManualTool());
-  ssc::Transform3D qMt = ssc::SpaceHelpers::get_toMfrom(space_mt, space_q);
+  Transform3D prMt = cxToolManager::getInstance()->getManualTool()->get_prMt();
+  CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
+  CoordinateSystem space_mt = SpaceHelpers::getTO(cxToolManager::getInstance()->getManualTool());
+  Transform3D qMt = SpaceHelpers::get_toMfrom(space_mt, space_q);
 
   mManualToolWidget->setMatrix(qMt);
   mManualToolWidget->blockSignals(false);
@@ -136,21 +136,21 @@ void ToolPropertiesWidget::manualToolChanged()
 
 void ToolPropertiesWidget::manualToolWidgetChanged()
 {
-	ssc::Transform3D qMt = mManualToolWidget->getMatrix();
-  ssc::CoordinateSystem space_q = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
-  ssc::CoordinateSystem space_mt = ssc::SpaceHelpers::getTO(ToolManager::getInstance()->getManualTool());
-  ssc::CoordinateSystem space_pr = ssc::SpaceHelpers::getPr();
-  ssc::Transform3D qMpr = ssc::SpaceHelpers::get_toMfrom(space_pr, space_q);
-  ssc::Transform3D prMt = qMpr.inv() * qMt;
+	Transform3D qMt = mManualToolWidget->getMatrix();
+  CoordinateSystem space_q = CoordinateSystem::fromString(mSpaceSelector->getValue());
+  CoordinateSystem space_mt = SpaceHelpers::getTO(cxToolManager::getInstance()->getManualTool());
+  CoordinateSystem space_pr = SpaceHelpers::getPr();
+  Transform3D qMpr = SpaceHelpers::get_toMfrom(space_pr, space_q);
+  Transform3D prMt = qMpr.inv() * qMt;
 
-  ToolManager::getInstance()->getManualTool()->set_prMt(prMt);
+  cxToolManager::getInstance()->getManualTool()->set_prMt(prMt);
 }
 
 void ToolPropertiesWidget::spacesChangedSlot()
 {
-	ssc::CoordinateSystem space = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
+	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
 
-	std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
+	std::vector<CoordinateSystem> spaces = SpaceHelpers::getAvailableSpaces(true);
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 	  range << spaces[i].toString();
@@ -165,12 +165,12 @@ void ToolPropertiesWidget::spacesChangedSlot()
 
 void ToolPropertiesWidget::dominantToolChangedSlot()
 {
-  ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(mActiveTool);
+//  cxToolPtr cxTool = boost::dynamic_pointer_cast<cxTool>(mActiveTool);
 
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
 
-  mActiveTool = ssc::toolManager()->getDominantTool();
+  mActiveTool = toolManager()->getDominantTool();
 
   if(mActiveTool && mActiveTool->hasType(Tool::TOOL_US_PROBE))
   {
@@ -192,7 +192,7 @@ void ToolPropertiesWidget::referenceToolChangedSlot()
   if (mReferenceTool)
     disconnect(mReferenceTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
 
-  mReferenceTool = ssc::toolManager()->getReferenceTool();
+  mReferenceTool = toolManager()->getReferenceTool();
 
   if (mReferenceTool)
     connect(mReferenceTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
@@ -223,11 +223,11 @@ void ToolPropertiesWidget::updateSlot()
   }
 
   QString status = "Unconfigured";
-  if (ssc::toolManager()->isConfigured())
+  if (toolManager()->isConfigured())
     status = "Configured";
-  if (ssc::toolManager()->isInitialized())
+  if (toolManager()->isInitialized())
     status = "Initialized";
-  if (ssc::toolManager()->isTracking())
+  if (toolManager()->isTracking())
     status = "Tracking";
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
 }

@@ -59,7 +59,7 @@ private slots:
 protected:
   class PipelineWidget* mPipelineWidget;
   PipelinePtr mPipeline;
-  ssc::ColorDataAdapterPtr mColorDataAdapter;
+  ColorDataAdapterPtr mColorDataAdapter;
 };
 
 

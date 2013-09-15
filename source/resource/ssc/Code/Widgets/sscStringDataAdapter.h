@@ -27,7 +27,7 @@
 #include <QComboBox>
 #include "sscDataAdapter.h"
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Abstract interface for interaction with internal string-valued data
@@ -131,6 +131,6 @@ public:
 		return "";
 	}
 };
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCSTRINGDATAADAPTER_H_ */

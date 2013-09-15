@@ -27,7 +27,7 @@
 #include "sscVtkHelperClasses.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 DisplayTextRep::DisplayTextRep(const QString& uid, const QString& name=""):

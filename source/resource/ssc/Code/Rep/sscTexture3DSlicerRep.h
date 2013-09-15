@@ -29,7 +29,7 @@
 #include "sscForwardDeclarations.h"
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
@@ -77,7 +77,7 @@ typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
  * \ingroup sscRep
  * \ingroup sscRep2D
  */
-class Texture3DSlicerRep: public ssc::RepImpl
+class Texture3DSlicerRep: public RepImpl
 {
 Q_OBJECT
 public:
@@ -85,22 +85,22 @@ public:
 	virtual ~Texture3DSlicerRep();
 	virtual QString getType() const
 	{
-		return "ssc::Texture3DSlicerRep";
+		return "Texture3DSlicerRep";
 	}
 	void setShaderFile(QString shaderFile);
-	virtual void printSelf(std::ostream & os, ssc::Indent indent);
+	virtual void printSelf(std::ostream & os, Indent indent);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
-	void setImages(std::vector<ssc::ImagePtr> images);
-	std::vector<ssc::ImagePtr> getImages();
-	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	void setImages(std::vector<ImagePtr> images);
+	std::vector<ImagePtr> getImages();
+	void setSliceProxy(SliceProxyPtr slicer);
 	void update();
 	void setTargetSpaceToR();
 	static bool isSupported(vtkRenderWindowPtr window);
 
 protected:
 	Texture3DSlicerRep(const QString& uid);
-	virtual void addRepActorsToViewRenderer(ssc::View *view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+	virtual void addRepActorsToViewRenderer(View *view);
+	virtual void removeRepActorsFromViewRenderer(View *view);
 
 private slots:
 	void viewChanged();

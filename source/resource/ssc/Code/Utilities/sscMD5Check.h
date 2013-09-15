@@ -1,7 +1,7 @@
 #ifndef SSCMD5CHECK_H_
 #define SSCMD5CHECK_H_
 
-namespace ssc
+namespace cx
 {
 
 /**

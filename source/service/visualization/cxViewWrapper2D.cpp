@@ -63,7 +63,7 @@
 namespace cx
 {
 
-ViewWrapper2D::ViewWrapper2D(ssc::ViewWidget* view) :
+ViewWrapper2D::ViewWrapper2D(ViewWidget* view) :
 				mOrientationActionGroup(new QActionGroup(view))
 {
 //  std::cout << "ViewWrapper2D create" << std::endl;
@@ -84,7 +84,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::ViewWidget* view) :
 	setZoom2D(SyncedValue::create(1));
 	setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
 	connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
 	connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
@@ -105,14 +105,14 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 {
 	QAction* obliqueAction = new QAction("Oblique", &contextMenu);
 	obliqueAction->setCheckable(true);
-	obliqueAction->setData(qstring_cast(ssc::otOBLIQUE));
-	obliqueAction->setChecked(getOrientationType() == ssc::otOBLIQUE);
+	obliqueAction->setData(qstring_cast(otOBLIQUE));
+	obliqueAction->setChecked(getOrientationType() == otOBLIQUE);
 	connect(obliqueAction, SIGNAL(triggered()), this, SLOT(orientationActionSlot()));
 
 	QAction* ortogonalAction = new QAction("Ortogonal", &contextMenu);
 	ortogonalAction->setCheckable(true);
-	ortogonalAction->setData(qstring_cast(ssc::otORTHOGONAL));
-	ortogonalAction->setChecked(getOrientationType() == ssc::otORTHOGONAL);
+	ortogonalAction->setData(qstring_cast(otORTHOGONAL));
+	ortogonalAction->setChecked(getOrientationType() == otORTHOGONAL);
 	//ortogonalAction->setChecked(true);
 	connect(ortogonalAction, SIGNAL(triggered()), this, SLOT(orientationActionSlot()));
 
@@ -159,7 +159,7 @@ void ViewWrapper2D::orientationActionSlot()
 	QAction* theAction = static_cast<QAction*>(sender());if(!theAction)
 	return;
 
-	ssc::ORIENTATION_TYPE type = string2enum<ssc::ORIENTATION_TYPE>(theAction->data().toString());
+	ORIENTATION_TYPE type = string2enum<ORIENTATION_TYPE>(theAction->data().toString());
 	mOrientationMode->set(type);
 }
 
@@ -177,22 +177,22 @@ void ViewWrapper2D::global2DZoomActionSlot()
 void ViewWrapper2D::addReps()
 {
 	// annotation rep
-	mOrientationAnnotationRep = ssc::OrientationAnnotationSmartRep::New("annotationRep_" + mView->getName(),
+	mOrientationAnnotationRep = OrientationAnnotationSmartRep::New("annotationRep_" + mView->getName(),
 					"annotationRep_" + mView->getName());
 	mView->addRep(mOrientationAnnotationRep);
 
 	// plane type text rep
-	mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
-	mPlaneTypeText->addText(ssc::Vector3D(0, 1, 0), "not initialized", ssc::Vector3D(0.98, 0.02, 0.0));
+	mPlaneTypeText = DisplayTextRep::New("planeTypeRep_" + mView->getName(), "");
+	mPlaneTypeText->addText(Vector3D(0, 1, 0), "not initialized", Vector3D(0.98, 0.02, 0.0));
 	mView->addRep(mPlaneTypeText);
 
 	//data name text rep
-	mDataNameText = ssc::DisplayTextRep::New("dataNameText_" + mView->getName(), "");
-	mDataNameText->addText(ssc::Vector3D(0, 1, 0), "not initialized", ssc::Vector3D(0.02, 0.02, 0.0));
+	mDataNameText = DisplayTextRep::New("dataNameText_" + mView->getName(), "");
+	mDataNameText->addText(Vector3D(0, 1, 0), "not initialized", Vector3D(0.02, 0.02, 0.0));
 	mView->addRep(mDataNameText);
 
 	// slice proxy
-	mSliceProxy = ssc::SliceProxy::New("sliceproxy_(" + mView->getName() + ")");
+	mSliceProxy = SliceProxy::New("sliceproxy_(" + mView->getName() + ")");
 
 	// slice rep
 	//the mul
@@ -202,7 +202,7 @@ void ViewWrapper2D::addReps()
 	}
 	else
 	{
-//		mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
+//		mSliceRep = SliceRepSW::New("SliceRep_"+mView->getName());
 //		mSliceRep->setSliceProxy(mSliceProxy);
 //		mView->addRep(mSliceRep);
 	}
@@ -211,19 +211,19 @@ void ViewWrapper2D::addReps()
 //#ifdef USE_2D_GPU_RENDER
 ////  this->resetMultiSlicer(); ignore until addimage
 //#else
-//	mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
+//	mSliceRep = SliceRepSW::New("SliceRep_"+mView->getName());
 //	mSliceRep->setSliceProxy(mSliceProxy);
 //	mView->addRep(mSliceRep);
 //#endif
 
 	// tool rep
-	mToolRep2D = ssc::ToolRep2D::New("Tool2D_" + mView->getName());
+	mToolRep2D = ToolRep2D::New("Tool2D_" + mView->getName());
 	mToolRep2D->setSliceProxy(mSliceProxy);
 	mToolRep2D->setUseCrosshair(true);
 //  mToolRep2D->setUseToolLine(false);
 	mView->addRep(mToolRep2D);
 
-	mPickerGlyphRep = ssc::GeometricRep2D::New("PickerGlyphRep_" + mView->getName());
+	mPickerGlyphRep = GeometricRep2D::New("PickerGlyphRep_" + mView->getName());
 	mPickerGlyphRep->setSliceProxy(mSliceProxy);
 	if (mGroupData)
 	{
@@ -271,7 +271,7 @@ void ViewWrapper2D::resetMultiSlicer()
 		return;
 
 //	std::cout << "using gpu multislicer" << std::endl;
-	mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_" + mView->getName());
+	mMultiSliceRep = Texture3DSlicerRep::New("MultiSliceRep_" + mView->getName());
 	mMultiSliceRep->setShaderFile(DataLocations::getShaderPath() + "/Texture3DOverlay.frag");
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
 	mView->addRep(mMultiSliceRep);
@@ -280,22 +280,22 @@ void ViewWrapper2D::resetMultiSlicer()
 	this->viewportChanged();
 }
 
-ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v) const
+Vector3D ViewWrapper2D::viewToDisplay(Vector3D p_v) const
 {
 	vtkRendererPtr renderer = mView->getRenderer();
 	renderer->SetViewPoint(p_v.begin());
 	renderer->ViewToDisplay(); ///pang
-	ssc::Vector3D p_d(renderer->GetDisplayPoint());
+	Vector3D p_d(renderer->GetDisplayPoint());
 	return p_d;
 }
 
-ssc::Vector3D ViewWrapper2D::displayToWorld(ssc::Vector3D p_d) const
+Vector3D ViewWrapper2D::displayToWorld(Vector3D p_d) const
 {
 	vtkRendererPtr renderer = mView->getRenderer();
 	renderer->SetDisplayPoint(p_d.begin());
 	renderer->DisplayToWorld();
 	double* p_wH = renderer->GetWorldPoint();
-	ssc::Vector3D p_w = ssc::Vector3D(p_wH) / p_wH[3]; // convert from homogenous to cartesan coords
+	Vector3D p_w = Vector3D(p_wH) / p_wH[3]; // convert from homogenous to cartesan coords
 	return p_w;
 }
 
@@ -325,9 +325,9 @@ void ViewWrapper2D::viewportChanged()
 
 	mSliceProxy->setToolViewportHeight(viewHeight);
 
-	ssc::DoubleBoundingBox3D BB_vp = getViewport();
-	ssc::Transform3D vpMs = get_vpMs();
-	ssc::PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	DoubleBoundingBox3D BB_vp = getViewport();
+	Transform3D vpMs = get_vpMs();
+	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 
 	mToolRep2D->setViewportData(vpMs, BB_vp);
 	if (mSlicePlanes3DMarker)
@@ -338,37 +338,37 @@ void ViewWrapper2D::viewportChanged()
 
 /**Return the viewport in vtk pixels. (viewport space)
  */
-ssc::DoubleBoundingBox3D ViewWrapper2D::getViewport() const
+DoubleBoundingBox3D ViewWrapper2D::getViewport() const
 {
 	QSize size = mView->size();
-	ssc::Vector3D p0_d(0, 0, 0);
-	ssc::Vector3D p1_d(size.width(), size.height(), 0);
-	ssc::DoubleBoundingBox3D BB_vp(p0_d, p1_d);
+	Vector3D p0_d(0, 0, 0);
+	Vector3D p1_d(size.width(), size.height(), 0);
+	DoubleBoundingBox3D BB_vp(p0_d, p1_d);
 	return BB_vp;
 }
 
 /**Compute transform from slice space (vtk world/ssc after slicing) to vtk viewport.
  */
-ssc::Transform3D ViewWrapper2D::get_vpMs() const
+Transform3D ViewWrapper2D::get_vpMs() const
 {
 	// world == slice
 	// display == vp
 
 	QSize size = mView->size();
 
-	ssc::Vector3D p0_d(0, 0, 0);
-	ssc::Vector3D p1_d(size.width(), size.height(), 1);
+	Vector3D p0_d(0, 0, 0);
+	Vector3D p1_d(size.width(), size.height(), 1);
 
-	ssc::Vector3D p0_w = displayToWorld(p0_d);
-	ssc::Vector3D p1_w = displayToWorld(p1_d);
+	Vector3D p0_w = displayToWorld(p0_d);
+	Vector3D p1_w = displayToWorld(p1_d);
 
 	p0_w[2] = 0;
 	p1_w[2] = 1;
 
-	ssc::DoubleBoundingBox3D BB_vp(p0_d, p1_d);
-	ssc::DoubleBoundingBox3D BB_s(p0_w, p1_w);
+	DoubleBoundingBox3D BB_vp(p0_d, p1_d);
+	DoubleBoundingBox3D BB_s(p0_w, p1_w);
 
-	ssc::Transform3D vpMs = ssc::createTransformNormalize(BB_s, BB_vp);
+	Transform3D vpMs = createTransformNormalize(BB_s, BB_vp);
 	return vpMs;
 }
 
@@ -378,18 +378,18 @@ void ViewWrapper2D::showSlot()
 	viewportChanged();
 }
 
-void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
+void ViewWrapper2D::initializePlane(PLANE_TYPE plane)
 {
 //  mOrientationAnnotationRep->setPlaneType(plane);
 	mPlaneTypeText->setText(0, qstring_cast(plane));
 	double viewHeight = mView->heightMM() / this->getZoomFactor2D();
-	mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0, 0, 1), true, viewHeight, 0.25);
+	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, viewHeight, 0.25);
 	mOrientationAnnotationRep->setSliceProxy(mSliceProxy);
 
 	// do this to force sync global and local type - must think on how we want this to work
 	this->changeOrientationType(getOrientationType());
 
-	bool isOblique = mSliceProxy->getComputer().getOrientationType() == ssc::otOBLIQUE;
+	bool isOblique = mSliceProxy->getComputer().getOrientationType() == otOBLIQUE;
 	mToolRep2D->setUseCrosshair(!isOblique);
 //  mToolRep2D->setUseToolLine(!isOblique);
 
@@ -397,7 +397,7 @@ void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
 
 /** get the orientation type directly from the slice proxy
  */
-ssc::ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
+ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
 {
 	return mSliceProxy->getComputer().getOrientationType();
 }
@@ -407,20 +407,20 @@ ssc::ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
  */
 void ViewWrapper2D::orientationModeChanged()
 {
-//  changeOrientationType(static_cast<ssc::ORIENTATION_TYPE>(mOrientationMode->get().toInt()));
+//  changeOrientationType(static_cast<ORIENTATION_TYPE>(mOrientationMode->get().toInt()));
 //std::cout << "mOrientationModeChanbgedslot" << std::endl;
 
-	ssc::ORIENTATION_TYPE type = static_cast<ssc::ORIENTATION_TYPE>(mOrientationMode->get().toInt());
+	ORIENTATION_TYPE type = static_cast<ORIENTATION_TYPE>(mOrientationMode->get().toInt());
 
 if	(type == this->getOrientationType())
 	return;
 	if (!mSliceProxy)
 	return;
 
-	ssc::SliceComputer computer = mSliceProxy->getComputer();
+	SliceComputer computer = mSliceProxy->getComputer();
 	computer.switchOrientationMode(type);
 
-	ssc::PLANE_TYPE plane = computer.getPlaneType();
+	PLANE_TYPE plane = computer.getPlaneType();
 //  mOrientationAnnotationRep->setPlaneType(plane);
 					mPlaneTypeText->setText(0, qstring_cast(plane));
 					mSliceProxy->setComputer(computer);
@@ -428,19 +428,19 @@ if	(type == this->getOrientationType())
 
 	/** Set the synced orientation mode.
 	 */
-void ViewWrapper2D::changeOrientationType(ssc::ORIENTATION_TYPE type)
+void ViewWrapper2D::changeOrientationType(ORIENTATION_TYPE type)
 {
 	mOrientationMode->set(type);
 }
 
-ssc::ViewWidget* ViewWrapper2D::getView()
+ViewWidget* ViewWrapper2D::getView()
 {
 	return mView;
 }
 
 /**
  */
-void ViewWrapper2D::imageAdded(ssc::ImagePtr image)
+void ViewWrapper2D::imageAdded(ImagePtr image)
 {
 	this->updateView();
 
@@ -453,14 +453,14 @@ void ViewWrapper2D::updateView()
 	QString text;
 	if (mGroupData)
 	{
-		std::vector<ssc::ImagePtr> images = mGroupData->getImages();
-		ssc::ImagePtr image;
+		std::vector<ImagePtr> images = mGroupData->getImages();
+		ImagePtr image;
 		if (!images.empty())
 			image = images.back(); // always show last in vector
 
 		if (image)
 		{
-			ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
+			Vector3D c = image->get_rMd().coord(image->boundingBox().center());
 			mSliceProxy->setDefaultCenter(c);
 		}
 
@@ -480,7 +480,7 @@ void ViewWrapper2D::updateView()
 
 			if (!mSliceRep)
 			{
-				mSliceRep = ssc::SliceRepSW::New("SliceRep_" + mView->getName());
+				mSliceRep = SliceRepSW::New("SliceRep_" + mView->getName());
 				mSliceRep->setSliceProxy(mSliceProxy);
 				mView->addRep(mSliceRep);
 			}
@@ -490,7 +490,7 @@ void ViewWrapper2D::updateView()
 			mSliceRep->setImage(image);
 
 			// list all meshes and one image.
-			std::vector<ssc::MeshPtr> mesh = mGroupData->getMeshes();
+			std::vector<MeshPtr> mesh = mGroupData->getMeshes();
 			for (unsigned i = 0; i < mesh.size(); ++i)
 			textList << qstring_cast(mesh[i]->getName());
 			if (image)
@@ -505,7 +505,7 @@ void ViewWrapper2D::updateView()
 //		mSliceRep->setImage(image);
 //
 //		// list all meshes and one image.
-//		std::vector<ssc::MeshPtr> mesh = mViewGroup->getMeshes();
+//		std::vector<MeshPtr> mesh = mViewGroup->getMeshes();
 //		for (unsigned i = 0; i < mesh.size(); ++i)
 //		textList << qstring_cast(mesh[i]->getName());
 //		if (image)
@@ -531,19 +531,19 @@ void ViewWrapper2D::imageRemoved(const QString& uid)
 	updateView();
 }
 
-void ViewWrapper2D::dataAdded(ssc::DataPtr data)
+void ViewWrapper2D::dataAdded(DataPtr data)
 {
-	if (boost::dynamic_pointer_cast<ssc::Image>(data))
+	if (boost::dynamic_pointer_cast<Image>(data))
 	{
-		this->imageAdded(boost::dynamic_pointer_cast<ssc::Image>(data));
+		this->imageAdded(boost::dynamic_pointer_cast<Image>(data));
 	}
-	else if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
+	else if (boost::dynamic_pointer_cast<Mesh>(data))
 	{
-		this->meshAdded(boost::dynamic_pointer_cast<ssc::Mesh>(data));
+		this->meshAdded(boost::dynamic_pointer_cast<Mesh>(data));
 	}
-	else if (boost::dynamic_pointer_cast<ssc::PointMetric>(data))
+	else if (boost::dynamic_pointer_cast<PointMetric>(data))
 	{
-		this->pointMetricAdded(boost::dynamic_pointer_cast<ssc::PointMetric>(data));
+		this->pointMetricAdded(boost::dynamic_pointer_cast<PointMetric>(data));
 	}
 }
 
@@ -554,14 +554,14 @@ void ViewWrapper2D::dataRemoved(const QString& uid)
 	this->pointMetricRemoved(uid);
 }
 
-void ViewWrapper2D::meshAdded(ssc::MeshPtr mesh)
+void ViewWrapper2D::meshAdded(MeshPtr mesh)
 {
 	if (!mesh)
 		return;
 	if (mGeometricRep.count(mesh->getUid()))
 		return;
 
-	ssc::GeometricRep2DPtr rep = ssc::GeometricRep2D::New(mesh->getUid() + "_rep2D");
+	GeometricRep2DPtr rep = GeometricRep2D::New(mesh->getUid() + "_rep2D");
 	rep->setSliceProxy(mSliceProxy);
 	rep->setMesh(mesh);
 	mView->addRep(rep);
@@ -579,14 +579,14 @@ void ViewWrapper2D::meshRemoved(const QString& uid)
 	this->updateView();
 }
 
-void ViewWrapper2D::pointMetricAdded(ssc::PointMetricPtr mesh)
+void ViewWrapper2D::pointMetricAdded(PointMetricPtr mesh)
 {
 	if (!mesh)
 		return;
 	if (mPointMetricRep.count(mesh->getUid()))
 		return;
 
-	ssc::PointMetricRep2DPtr rep = ssc::PointMetricRep2D::New(mesh->getUid() + "_rep2D");
+	PointMetricRep2DPtr rep = PointMetricRep2D::New(mesh->getUid() + "_rep2D");
 	rep->setSliceProxy(mSliceProxy);
     rep->setDataMetric(mesh);
 	rep->setFillVisibility(false);
@@ -611,7 +611,7 @@ void ViewWrapper2D::pointMetricRemoved(const QString& uid)
 
 void ViewWrapper2D::dominantToolChangedSlot()
 {
-	ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
+	ToolPtr dominantTool = toolManager()->getDominantTool();
 	mSliceProxy->setTool(dominantTool);
 }
 
@@ -639,7 +639,7 @@ void ViewWrapper2D::setZoom2D(SyncedValuePtr value)
 
 void ViewWrapper2D::setZoomFactor2D(double zoomFactor)
 {
-	zoomFactor = ssc::constrainValue(zoomFactor, 0.2, 10.0);
+	zoomFactor = constrainValue(zoomFactor, 0.2, 10.0);
 	mZoom2D->set(zoomFactor);
 	viewportChanged();
 }
@@ -657,14 +657,14 @@ void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
 {
 	if (event->buttons() & Qt::LeftButton)
 	{
-		if (this->getOrientationType() == ssc::otORTHOGONAL)
+		if (this->getOrientationType() == otORTHOGONAL)
 		{
 			setAxisPos(qvp2vp(event->pos()));
 		}
 		else
 		{
 			mClickPos = qvp2vp(event->pos());
-			this->shiftAxisPos(ssc::Vector3D(0,0,0)); // signal the maual tool that something is happening (important for playback tool)
+			this->shiftAxisPos(Vector3D(0,0,0)); // signal the maual tool that something is happening (important for playback tool)
 		}
 	}
 }
@@ -677,13 +677,13 @@ void ViewWrapper2D::mouseMoveSlot(QMouseEvent* event)
 {
 	if (event->buttons() & Qt::LeftButton)
 	{
-		if (this->getOrientationType() == ssc::otORTHOGONAL)
+		if (this->getOrientationType() == otORTHOGONAL)
 		{
 			setAxisPos(qvp2vp(event->pos()));
 		}
 		else
 		{
-			ssc::Vector3D p = qvp2vp(event->pos());
+			Vector3D p = qvp2vp(event->pos());
 			this->shiftAxisPos(p - mClickPos);
 			mClickPos = p;
 		}
@@ -709,30 +709,30 @@ void ViewWrapper2D::mouseWheelSlot(QWheelEvent* event)
 /**Convert a position in Qt viewport space (pixels with origin in upper-left corner)
  * to vtk viewport space (pixels with origin in lower-left corner).
  */
-ssc::Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
+Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 {
 	QSize size = mView->size();
-	ssc::Vector3D pos_vp(pos_qvp.x(), size.height() - pos_qvp.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
+	Vector3D pos_vp(pos_qvp.x(), size.height() - pos_qvp.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
 	return pos_vp;
 }
 
 /**Move the tool pos / axis pos to a new position given
  * by delta movement in vp space.
  */
-void ViewWrapper2D::shiftAxisPos(ssc::Vector3D delta_vp)
+void ViewWrapper2D::shiftAxisPos(Vector3D delta_vp)
 {
 	delta_vp = -delta_vp;
-	ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
-	ssc::Transform3D sMr = mSliceProxy->get_sMr();
-	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
-	ssc::Transform3D prMt = tool->get_prMt();
-	ssc::Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
+	Transform3D sMr = mSliceProxy->get_sMr();
+	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D prMt = tool->get_prMt();
+	Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
 
-	ssc::Vector3D delta_pr = (rMpr.inv() * sMr.inv()).vector(delta_s);
+	Vector3D delta_pr = (rMpr.inv() * sMr.inv()).vector(delta_s);
 
 	// MD is the actual tool movement in patient space, matrix form
-	ssc::Transform3D MD = ssc::createTransformTranslate(delta_pr);
+	Transform3D MD = createTransformTranslate(delta_pr);
 	// set new tool position to old modified by MD:
 	tool->set_prMt(MD * prMt);
 }
@@ -740,41 +740,41 @@ void ViewWrapper2D::shiftAxisPos(ssc::Vector3D delta_vp)
 /**Move the tool pos / axis pos to a new position given
  * by the input click position in vp space.
  */
-void ViewWrapper2D::setAxisPos(ssc::Vector3D click_vp)
+void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 {
-	ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
 
-	ssc::Transform3D sMr = mSliceProxy->get_sMr();
-	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
-	ssc::Transform3D prMt = tool->get_prMt();
+	Transform3D sMr = mSliceProxy->get_sMr();
+	Transform3D rMpr = *toolManager()->get_rMpr();
+	Transform3D prMt = tool->get_prMt();
 
 	// find tool position in s
-	ssc::Vector3D tool_t(0, 0, tool->getTooltipOffset());
-	ssc::Vector3D tool_s = (sMr * rMpr * prMt).coord(tool_t);
+	Vector3D tool_t(0, 0, tool->getTooltipOffset());
+	Vector3D tool_s = (sMr * rMpr * prMt).coord(tool_t);
 
 	// find click position in s.
-	ssc::Vector3D click_s = get_vpMs().inv().coord(click_vp);
+	Vector3D click_s = get_vpMs().inv().coord(click_vp);
 
 	// compute the new tool position in slice space as a synthesis of the plane part of click and the z part of original.
-	ssc::Vector3D cross_s(click_s[0], click_s[1], tool_s[2]);
+	Vector3D cross_s(click_s[0], click_s[1], tool_s[2]);
 	// compute the position change and transform to patient.
-	ssc::Vector3D delta_s = cross_s - tool_s;
-	ssc::Vector3D delta_pr = (rMpr.inv() * sMr.inv()).vector(delta_s);
+	Vector3D delta_s = cross_s - tool_s;
+	Vector3D delta_pr = (rMpr.inv() * sMr.inv()).vector(delta_s);
 
 	// MD is the actual tool movement in patient space, matrix form
-	ssc::Transform3D MD = ssc::createTransformTranslate(delta_pr);
+	Transform3D MD = createTransformTranslate(delta_pr);
 	// set new tool position to old modified by MD:
 	tool->set_prMt(MD * prMt);
 }
 
-void ViewWrapper2D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
+void ViewWrapper2D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)
 {
-	mSlicePlanes3DMarker = ssc::SlicePlanes3DMarkerIn2DRep::New("uid");
-	ssc::PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	mSlicePlanes3DMarker = SlicePlanes3DMarkerIn2DRep::New("uid");
+	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 	mSlicePlanes3DMarker->setProxy(plane, proxy);
 
-	ssc::DoubleBoundingBox3D BB_vp = getViewport();
-	ssc::Transform3D vpMs = get_vpMs();
+	DoubleBoundingBox3D BB_vp = getViewport();
+	Transform3D vpMs = get_vpMs();
 	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
 
 	mView->addRep(mSlicePlanes3DMarker);

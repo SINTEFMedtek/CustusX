@@ -47,7 +47,7 @@ private:
   USAcquisitionPtr mAcquisition;
   TemporalCalibrationPtr mAlgorithm;
 
-  ssc::FileSelectWidget* mFileSelectWidget;
+  FileSelectWidget* mFileSelectWidget;
   QLineEdit* mResult;
   QCheckBox* mVerbose;
   RecordSessionWidget* mRecordSessionWidget;

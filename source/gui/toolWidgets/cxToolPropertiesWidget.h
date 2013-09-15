@@ -56,22 +56,22 @@ private:
   ToolPropertiesWidget();
 //  void populateUSSectorConfigBox();
 
-  ssc::ToolPtr mReferenceTool;
-  ssc::ToolPtr mActiveTool;
+  ToolPtr mReferenceTool;
+  ToolPtr mActiveTool;
 
   QVBoxLayout* mToptopLayout;
   QGroupBox* mManualGroup;
   Transform3DWidget* mManualToolWidget;
-  ssc::StringDataAdapterXmlPtr mSpaceSelector;
-  ssc::CoordinateSystemListenerPtr mListener;
+  StringDataAdapterXmlPtr mSpaceSelector;
+  CoordinateSystemListenerPtr mListener;
 
-//  ssc::SliderGroupWidget* mToolOffsetWidget;
+//  SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;
   QLabel* mToolNameLabel;
   QLabel* mReferenceStatusLabel;
   QLabel* mTrackingSystemStatusLabel;
   
-  ssc::LabeledComboBoxWidget* mUSSectorConfigBox;
+  LabeledComboBoxWidget* mUSSectorConfigBox;
 //  QLabel* mUSSectorConfigLabel;   ///< Label for the mUSSectorConfigBox
 //  QComboBox* mUSSectorConfigBox;  ///< List of US sector config parameters: depth (and width)
 };

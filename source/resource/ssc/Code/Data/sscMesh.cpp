@@ -28,7 +28,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscBoundingBox3D.h"
 
-namespace ssc
+namespace cx
 {
 Mesh::Mesh(const QString& uid, const QString& name) :
 	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false)
@@ -180,10 +180,10 @@ DoubleBoundingBox3D Mesh::boundingBox() const
 	return bounds;
 }
 
-vtkPolyDataPtr Mesh::getTransformedPolyData(ssc::Transform3D transform)
+vtkPolyDataPtr Mesh::getTransformedPolyData(Transform3D transform)
 {
 	// if transform elements exists, create a copy with entire position inside the polydata:
-	if (ssc::similar(transform, ssc::Transform3D::Identity()))
+	if (similar(transform, Transform3D::Identity()))
 		return getVtkPolyData();
 
 	getVtkPolyData()->Update();
@@ -196,7 +196,7 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(ssc::Transform3D transform)
 	floatPoints->SetDataTypeToFloat();
 	for (int i = 0; i < poly->GetNumberOfPoints(); ++i)
 	{
-		ssc::Vector3D p(points->GetPoint(i));
+		Vector3D p(points->GetPoint(i));
 		p = transform.coord(p);
 		floatPoints->SetPoint(i, p.begin());
 	}
@@ -213,4 +213,4 @@ bool Mesh::isFiberBundle() const
 	return poly->GetLines()->GetNumberOfCells() > 0 && poly->GetPolys()->GetNumberOfCells() == 0 && poly->GetStrips()->GetNumberOfCells() == 0;
 }
 
-} // namespace ssc
+} // namespace cx

@@ -23,7 +23,7 @@
 #include "sscXmlOptionItem.h"
 
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class ColorDataAdapterXml> ColorDataAdapterXmlPtr;
 
@@ -74,7 +74,7 @@ private:
 
 };
 
-} // namespace ssc
+} // namespace cx
 
 
 #endif // SSCCOLORDATAADAPTERXML_H

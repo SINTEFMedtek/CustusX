@@ -52,7 +52,7 @@ LandmarkImageRegistrationWidget::LandmarkImageRegistrationWidget(RegistrationMan
 	connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
 
 	//layout
-	mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mActiveImageAdapter));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mActiveImageAdapter));
 	mVerticalLayout->addWidget(mLandmarkTableWidget);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
 
@@ -81,7 +81,7 @@ void LandmarkImageRegistrationWidget::activeImageChangedSlot()
 {
 	LandmarkRegistrationWidget::activeImageChangedSlot();
 
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 
 	if (image)
 	{
@@ -96,31 +96,31 @@ void LandmarkImageRegistrationWidget::activeImageChangedSlot()
 	this->enableButtons();
 }
 
-ssc::PickerRepPtr LandmarkImageRegistrationWidget::getPickerRep()
+PickerRepPtr LandmarkImageRegistrationWidget::getPickerRep()
 {
 	if (!viewManager()->get3DView(0, 0))
-		return ssc::PickerRepPtr();
+		return PickerRepPtr();
 
-	return RepManager::findFirstRep<ssc::PickerRep>(viewManager()->get3DView(0, 0)->getReps());
+	return RepManager::findFirstRep<PickerRep>(viewManager()->get3DView(0, 0)->getReps());
 }
 
 void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {
-	ssc::PickerRepPtr PickerRep = this->getPickerRep();
+	PickerRepPtr PickerRep = this->getPickerRep();
 	if (!PickerRep)
 	{
-		ssc::messageManager()->sendError("Could not find a rep to add the landmark to.");
+		messageManager()->sendError("Could not find a rep to add the landmark to.");
 		return;
 	}
 
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	if (!image)
 		return;
 
-	QString uid = ssc::dataManager()->addLandmark();
-	ssc::Vector3D pos_r = PickerRep->getPosition();
-	ssc::Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
-	image->setLandmark(ssc::Landmark(uid, pos_d));
+	QString uid = dataManager()->addLandmark();
+	Vector3D pos_r = PickerRep->getPosition();
+	Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
+	image->setLandmark(Landmark(uid, pos_d));
 
     this->activateLandmark(uid);
 }
@@ -128,28 +128,28 @@ void LandmarkImageRegistrationWidget::addLandmarkButtonClickedSlot()
 
 void LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
-	ssc::PickerRepPtr PickerRep = this->getPickerRep();
+	PickerRepPtr PickerRep = this->getPickerRep();
 	if (!PickerRep)
 	{
-		ssc::messageManager()->sendError("Could not find a rep to edit the landmark for.");
+		messageManager()->sendError("Could not find a rep to edit the landmark for.");
 		return;
 	}
 
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	if (!image)
 		return;
 
 	QString uid = mActiveLandmark;
-	ssc::Vector3D pos_r = PickerRep->getPosition();
-	ssc::Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
-	image->setLandmark(ssc::Landmark(uid, pos_d));
+	Vector3D pos_r = PickerRep->getPosition();
+	Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
+	image->setLandmark(Landmark(uid, pos_d));
 
     this->activateLandmark(this->getNextLandmark());
 }
 
 void LandmarkImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	if (!image)
 		return;
 
@@ -167,9 +167,9 @@ void LandmarkImageRegistrationWidget::cellClickedSlot(int row, int column)
 void LandmarkImageRegistrationWidget::enableButtons()
 {
 	bool selected = !mLandmarkTableWidget->selectedItems().isEmpty();
-//	bool tracking = ssc::toolManager()->getDominantTool() && !ssc::toolManager()->getDominantTool()->hasType(ssc::Tool::TOOL_MANUAL)
-//		&& ssc::toolManager()->getDominantTool()->getVisible();
-	bool loaded = ssc::dataManager()->getActiveImage() != 0;
+//	bool tracking = toolManager()->getDominantTool() && !toolManager()->getDominantTool()->hasType(Tool::TOOL_MANUAL)
+//		&& toolManager()->getDominantTool()->getVisible();
+	bool loaded = dataManager()->getActiveImage() != 0;
 
 	// you might want to add landmarks using the tracking pointer in rare cases.
 	// Thus is must be allowed to do that.
@@ -181,7 +181,7 @@ void LandmarkImageRegistrationWidget::enableButtons()
 	mRemoveLandmarkButton->setEnabled(selected);
 	mAddLandmarkButton->setEnabled(loaded);
 
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	if (image)
 	{
 		mAddLandmarkButton->setToolTip(QString("Add landmark to image %1").arg(image->getName()));
@@ -195,7 +195,7 @@ void LandmarkImageRegistrationWidget::showEvent(QShowEvent* event)
 {
 	LandmarkRegistrationWidget::showEvent(event);
 
-	viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
+	viewManager()->setRegistrationMode(rsIMAGE_REGISTRATED);
 	LandmarkRepPtr rep = RepManager::findFirstRep<LandmarkRep>(viewManager()->get3DView(0, 0)->getReps());
 	if (rep)
 	{
@@ -217,25 +217,25 @@ void LandmarkImageRegistrationWidget::hideEvent(QHideEvent* event)
 			rep->setSecondarySource(LandmarksSourcePtr());
 		}
 	}
-	viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
+	viewManager()->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void LandmarkImageRegistrationWidget::prePaintEvent()
 {
     LandmarkRegistrationWidget::prePaintEvent();
 
-	std::vector<ssc::Landmark> landmarks = this->getAllLandmarks();
+	std::vector<Landmark> landmarks = this->getAllLandmarks();
 
 	//update buttons
 	mRemoveLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
 	mEditLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
 }
 
-ssc::LandmarkMap LandmarkImageRegistrationWidget::getTargetLandmarks() const
+LandmarkMap LandmarkImageRegistrationWidget::getTargetLandmarks() const
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	if (!image)
-		return ssc::LandmarkMap();
+		return LandmarkMap();
 
 	return image->getLandmarks();
 }
@@ -243,25 +243,25 @@ ssc::LandmarkMap LandmarkImageRegistrationWidget::getTargetLandmarks() const
 /** Return transform from target space to reference space
  *
  */
-ssc::Transform3D LandmarkImageRegistrationWidget::getTargetTransform() const
+Transform3D LandmarkImageRegistrationWidget::getTargetTransform() const
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	if (!image)
-		return ssc::Transform3D::Identity();
+		return Transform3D::Identity();
 	return image->get_rMd();
 }
 
-void LandmarkImageRegistrationWidget::setTargetLandmark(QString uid, ssc::Vector3D p_target)
+void LandmarkImageRegistrationWidget::setTargetLandmark(QString uid, Vector3D p_target)
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	if (!image)
 		return;
-	image->setLandmark(ssc::Landmark(uid, p_target));
+	image->setLandmark(Landmark(uid, p_target));
 }
 
 QString LandmarkImageRegistrationWidget::getTargetName() const
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	if (!image)
 		return "None";
 	return image->getName();

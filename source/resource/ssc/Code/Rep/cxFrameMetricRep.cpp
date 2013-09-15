@@ -52,7 +52,7 @@ void FrameMetricRep::changedSlot()
 
     if (!mAxes)
     {
-        mAxes.reset(new ssc::GraphicalAxes3D());
+        mAxes.reset(new GraphicalAxes3D());
         mAxes->setFontSize(0.04);
         mAxes->setAxisLength(0.05);
         mAxes->setShowAxesLabels(false);
@@ -63,4 +63,4 @@ void FrameMetricRep::changedSlot()
     this->drawText();
 }
 
-} // namespace ssc
+} // namespace cx

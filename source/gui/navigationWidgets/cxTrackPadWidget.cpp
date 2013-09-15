@@ -76,13 +76,13 @@ void TrackPadWidget::defineRotateLayout()
   layout->setMargin(4);
   group->setLayout(layout);
 
-  ssc::MousePadWidget* rotateWidget = new ssc::MousePadWidget(this, mMinPadSize);
+  MousePadWidget* rotateWidget = new MousePadWidget(this, mMinPadSize);
 //  rotateWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 //  rotateWidget->setLineWidth(3);
   connect(rotateWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(rotateXZSlot(QPointF)));
   layout->addWidget(rotateWidget, 4);
 
-  ssc::MousePadWidget* rotateYWidget = new ssc::MousePadWidget(this, mMinBarSize);
+  MousePadWidget* rotateYWidget = new MousePadWidget(this, mMinBarSize);
   rotateYWidget->setFixedXPos(true);
 //  rotateYWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 //  rotateYWidget->setLineWidth(3);
@@ -101,13 +101,13 @@ void TrackPadWidget::definePanLayout()
   panLayout->setMargin(4);
   group->setLayout(panLayout);
 
-  ssc::MousePadWidget* panWidget = new ssc::MousePadWidget(this, mMinPadSize);
+  MousePadWidget* panWidget = new MousePadWidget(this, mMinPadSize);
 //  panWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 //  panWidget->setLineWidth(3);
   connect(panWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(panXZSlot(QPointF)));
   panLayout->addWidget(panWidget, 4);
 
-  ssc::MousePadWidget* dollyWidget = new ssc::MousePadWidget(this, mMinBarSize);
+  MousePadWidget* dollyWidget = new MousePadWidget(this, mMinBarSize);
   dollyWidget->setFixedXPos(true);
 //  dollyWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 //  dollyWidget->setLineWidth(3);
@@ -148,18 +148,18 @@ void TrackPadWidget::dollySlot(QPointF delta)
 void TrackPadWidget::panXZSlot(QPointF delta)
 {
   vtkCameraPtr camera = this->getCamera();
-  ssc::Vector3D position(camera->GetPosition());
-  ssc::Vector3D focus(camera->GetFocalPoint());
-  ssc::Vector3D vup(camera->GetViewUp());
+  Vector3D position(camera->GetPosition());
+  Vector3D focus(camera->GetFocalPoint());
+  Vector3D vup(camera->GetViewUp());
 
-  ssc::Vector3D e_x = ssc::cross(focus-position, vup).normal();
-  ssc::Vector3D e_y = vup.normal();
+  Vector3D e_x = cross(focus-position, vup).normal();
+  Vector3D e_y = vup.normal();
 
-  ssc::DoubleBoundingBox3D bb(viewManager()->get3DView()->getRenderer()->ComputeVisiblePropBounds());
+  DoubleBoundingBox3D bb(viewManager()->get3DView()->getRenderer()->ComputeVisiblePropBounds());
 
   double volSize = bb.range().length() / pow(3, 1.0/3.0); // mm size of volume
   double scale = volSize;///padSize;
-  ssc::Vector3D t = scale * (-delta.x() * e_x + delta.y() * e_y);
+  Vector3D t = scale * (-delta.x() * e_x + delta.y() * e_y);
 
   position += t;
   focus += t;

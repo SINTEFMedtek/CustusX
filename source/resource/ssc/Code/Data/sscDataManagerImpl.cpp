@@ -54,7 +54,7 @@
 #include "sscLogger.h"
 #include "sscDataReaderWriter.h"
 
-namespace ssc
+namespace cx
 {
 
 
@@ -87,7 +87,7 @@ DataManagerImpl::~DataManagerImpl()
 void DataManagerImpl::clear()
 {
 	mData.clear();
-	mCenter = ssc::Vector3D(0, 0, 0);
+	mCenter = Vector3D(0, 0, 0);
 	//mClinicalApplication = mdLABORATORY; must be set explicitly
 	//mMeshes.clear();
 	mActiveImage.reset();
@@ -326,7 +326,7 @@ void DataManagerImpl::saveData(DataPtr data, const QString& basePath)
     }
 
     // no other implementations..
-    ssc::messageManager()->sendWarning(QString("Could not save %1 - not implemented").arg(data->getName()));
+    messageManager()->sendWarning(QString("Could not save %1 - not implemented").arg(data->getName()));
 }
 
 
@@ -619,7 +619,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 		return DataPtr();
 	}
 
-	ssc::DataPtr data = this->readData(uid, path, type);
+	DataPtr data = this->readData(uid, path, type);
 
 	if (!data)
 	{
@@ -641,21 +641,21 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 //{
 //  if (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0)
 //  {
-//    return ssc::rtMETAIMAGE;
+//    return rtMETAIMAGE;
 //  }
 //  else if (fileType.compare("mnc", Qt::CaseInsensitive) == 0)
 //  {
-//    return ssc::rtMINCIMAGE;
+//    return rtMINCIMAGE;
 //  }
 //  else if (fileType.compare("stl", Qt::CaseInsensitive) == 0)
 //  {
-//    return ssc::rtSTL;
+//    return rtSTL;
 //  }
 //  else if (fileType.compare("vtk", Qt::CaseInsensitive) == 0)
 //  {
-//    return ssc::rtPOLYDATA;
+//    return rtPOLYDATA;
 //  }
-//  return ssc::rtCOUNT;
+//  return rtCOUNT;
 //}
 
 void DataManagerImpl::vtkImageDataChangedSlot()
@@ -731,8 +731,8 @@ ImagePtr DataManagerImpl::createDerivedImage(vtkImageDataPtr data, QString uid, 
 	ImagePtr retval = createImage(data, uid, name, filePath);
 	retval->get_rMd_History()->setRegistration(parentImage->get_rMd());
 	retval->get_rMd_History()->setParentSpace(parentImage->getUid());
-	ssc::ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
-	ssc::ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
+	ImageTF3DPtr transferFunctions = parentImage->getTransferFunctions3D()->createCopy(retval->getBaseVtkImageData());
+	ImageLUT2DPtr LUT2D = parentImage->getLookupTable2D()->createCopy(retval->getBaseVtkImageData());
 	//The parent may have a different range of voxel values. Make sure the transfer functions are working
 	if (transferFunctions)
 		transferFunctions->fixTransferFunctions();
@@ -805,8 +805,8 @@ void DataManagerImpl::removeData(const QString& uid)
 
 	emit dataRemoved(uid);
 	emit dataLoaded(); // this should alert everybody interested in the data as a collection.
-	ssc::messageManager()->sendInfo("Removed data [" + uid + "].");
+	messageManager()->sendInfo("Removed data [" + uid + "].");
 }
 
-} // namespace ssc
+} // namespace cx
 

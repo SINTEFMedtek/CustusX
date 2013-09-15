@@ -21,7 +21,7 @@ FrameTreeWidget::FrameTreeWidget(QWidget* parent) :
   mTreeWidget->setHeaderLabels(QStringList() << "Frame");
 
   // TODO this must also listen to all changed() in all data
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataLoadedSlot()));
+  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataLoadedSlot()));
 }
 
 QString FrameTreeWidget::defaultWhatsThis() const
@@ -35,14 +35,14 @@ QString FrameTreeWidget::defaultWhatsThis() const
 
 void FrameTreeWidget::dataLoadedSlot()
 {
-  for (ssc::DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
+  for (DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
   {
     disconnect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(rebuild()));
   }
 
-  mConnectedData = ssc::dataManager()->getData();
+  mConnectedData = dataManager()->getData();
 
-  for (ssc::DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
+  for (DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
   {
     connect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(rebuild()));
   }
@@ -70,7 +70,7 @@ void FrameTreeWidget::fill(QTreeWidgetItem* parent, QDomNode node)
     QString frameName = child.toElement().tagName();
 
     // if frame refers to a data, use its name instead.
-    ssc::DataPtr data = ssc::dataManager()->getData(frameName);
+    DataPtr data = dataManager()->getData(frameName);
     if (data)
       frameName = data->getName();
 

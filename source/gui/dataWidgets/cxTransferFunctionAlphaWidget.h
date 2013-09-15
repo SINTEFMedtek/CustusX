@@ -31,7 +31,7 @@ public:
   virtual ~TransferFunctionAlphaWidget();
   virtual QString defaultWhatsThis() const;
 
-  void setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData);
+  void setData(ImagePtr image, ImageTFDataPtr tfData);
   void setReadOnly(bool readOnly);///< Set class readonly: Disable mouse interaction
 
 signals:
@@ -84,8 +84,8 @@ protected:
 
   int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
 
-  ssc::ImagePtr mImage;
-  ssc::ImageTFDataPtr mImageTF;
+  ImagePtr mImage;
+  ImageTFDataPtr mImageTF;
   
   bool mReadOnly;///< Is class readOnly? Eg no mouse interaction possible
 

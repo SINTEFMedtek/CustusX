@@ -25,7 +25,7 @@
 #include "sscPointMetric.h"
 #include "sscViewportListener.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class GuideRep2D> GuideRep2DPtr;
@@ -47,8 +47,8 @@ public:
 
 //	void setPointMetric(PointMetricPtr point);
 //	PointMetricPtr getPointMetric();
-	virtual QString getType() const { return "ssc::GuideRep2D"; }
-	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	virtual QString getType() const { return "GuideRep2D"; }
+	void setSliceProxy(SliceProxyPtr slicer);
 	/**
 	 * Set the width of the outline in fractions of the full size
 	 */
@@ -57,8 +57,8 @@ public:
 	void setRequestedAccuracy(double accuracy);
 
 protected:
-//	virtual void addRepActorsToViewRenderer(ssc::View* view);
-//	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+//	virtual void addRepActorsToViewRenderer(View* view);
+//	virtual void removeRepActorsFromViewRenderer(View* view);
     virtual void clear();
 
 protected slots:
@@ -69,7 +69,7 @@ private:
 	GuideRep2D(); ///< not implemented
 
 //	PointMetricPtr mMetric;
-	ssc::SliceProxyPtr mSliceProxy;
+	SliceProxyPtr mSliceProxy;
 	vtkActorPtr mCircleActor;
 	vtkSectorSourcePtr mCircleSource;
 	double mOutlineWidth;

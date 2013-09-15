@@ -26,13 +26,13 @@
 
 typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class CaptionText3D> CaptionText3DPtr;
 typedef boost::shared_ptr<class GraphicalArc3D> GraphicalArc3DPtr;
 }
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class AngleMetricRep> AngleMetricRepPtr;
@@ -54,11 +54,11 @@ public:
 	virtual ~AngleMetricRep() {}
 
 //	void setMetric(AngleMetricPtr point);
-	virtual QString getType() const { return "ssc::AngleMetricRep"; }
+	virtual QString getType() const { return "AngleMetricRep"; }
 
 protected:
-//	virtual void addRepActorsToViewRenderer(ssc::View *view);
-//	virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+//	virtual void addRepActorsToViewRenderer(View *view);
+//	virtual void removeRepActorsFromViewRenderer(View *view);
     virtual void clear();
     virtual QString getText();
 
@@ -70,10 +70,10 @@ private:
 	AngleMetricRep(); ///< not implemented
     AngleMetricPtr getAngleMetric();
 
-	ssc::GraphicalLine3DPtr mLine0;
-	ssc::GraphicalLine3DPtr mLine1;
-	ssc::GraphicalArc3DPtr mArc;
-//	ssc::CaptionText3DPtr mText;
+	GraphicalLine3DPtr mLine0;
+	GraphicalLine3DPtr mLine1;
+	GraphicalArc3DPtr mArc;
+//	CaptionText3DPtr mText;
 //	AngleMetricPtr mMetric;
 };
 

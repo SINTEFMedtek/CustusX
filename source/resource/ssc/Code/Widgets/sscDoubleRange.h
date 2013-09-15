@@ -26,7 +26,7 @@
 #ifndef SSCDOUBLERANGE_H_
 #define SSCDOUBLERANGE_H_
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Utility class for describing a bounded numeric range.

@@ -32,7 +32,7 @@
 #include "sscTypeConversions.h"
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 //---------------------------------------------------------
 
@@ -72,7 +72,7 @@ void BlendedSliceRep::setImages(std::vector<ImagePtr> images)
 		ImagePtr image = images.at(i);
 		connect(image.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateAlphaSlot()));
 
-		SlicedImageProxyPtr slicedImage(new ssc::SlicedImageProxy());
+		SlicedImageProxyPtr slicedImage(new SlicedImageProxy());
 		slicedImage->setSliceProxy(mSlicer);
 		slicedImage->setImage(image);
 		slicedImage->update();
@@ -152,7 +152,7 @@ void BlendedSliceRep::updateAlphaSlot()
 }
 
 //---------------------------------------------------------
-}// namespace ssc
+}// namespace cx
 //---------------------------------------------------------
 
 

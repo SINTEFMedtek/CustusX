@@ -20,8 +20,8 @@ namespace cx
 
 UsReconstructionPlugin::UsReconstructionPlugin()
 {
-  ssc::XmlOptionFile xmlFile = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
-  mReconstructer.reset(new ssc::ReconstructManager(xmlFile, DataLocations::getShaderPath()));
+  XmlOptionFile xmlFile = XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
+  mReconstructer.reset(new ReconstructManager(xmlFile, DataLocations::getShaderPath()));
 
   connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 

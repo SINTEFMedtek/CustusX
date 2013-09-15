@@ -34,7 +34,7 @@
 #include "sscDataManager.h"
 #include "sscMesh.h"
 
-namespace ssc
+namespace cx
 {
 /** Constructor */
 FiberBundleRep::FiberBundleRep(const QString& uid, const QString& name)
@@ -64,7 +64,7 @@ FiberBundleRepPtr FiberBundleRep::New(const QString& uid, const QString& name)
 /** Return type as string */
 QString FiberBundleRep::getType() const
 {
-	return "ssc::FiberBundleRep";
+	return "FiberBundleRep";
 }
 
 /**

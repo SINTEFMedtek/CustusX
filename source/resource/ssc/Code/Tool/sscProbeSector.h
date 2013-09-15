@@ -31,7 +31,7 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 typedef vtkSmartPointer<class vtkPolyLine> vtkPolyLinePtr;
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
@@ -68,6 +68,6 @@ private:
 	vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCPROBEDECTOR_H_*/

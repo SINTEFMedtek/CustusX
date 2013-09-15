@@ -24,7 +24,7 @@
 #include "sscEnumConverter.h"
 #include "sscMessageManager.h"
 
-namespace ssc
+namespace cx
 {
 
 namespace
@@ -60,9 +60,9 @@ void ProbeData::ProbeImageData::parseXml(QDomNode dataNode)
 {
 	QDomElement elem = dataNode.toElement();
 
-	mOrigin_p = ssc::Vector3D::fromString(elem.attribute("origin_p"));
-	mSpacing = ssc::Vector3D::fromString(elem.attribute("spacing"));
-	mClipRect_p = ssc::DoubleBoundingBox3D::fromString(elem.attribute("clipRect_p"));
+	mOrigin_p = Vector3D::fromString(elem.attribute("origin_p"));
+	mSpacing = Vector3D::fromString(elem.attribute("spacing"));
+	mClipRect_p = DoubleBoundingBox3D::fromString(elem.attribute("clipRect_p"));
 	mSize.setWidth(loadAttribute(elem, "width", 0));
 	mSize.setHeight(loadAttribute(elem, "height", 0));
 }
@@ -117,7 +117,7 @@ void ProbeData::parseXml(QDomNode dataNode)
 
 Vector3D ProbeData::ProbeImageData::transform_p_to_u(const Vector3D& q_p) const
 {
-	ssc::Vector3D c(q_p[0], double(mSize.height()) - q_p[1] - 1, -q_p[2]);
+	Vector3D c(q_p[0], double(mSize.height()) - q_p[1] - 1, -q_p[2]);
 	c = multiply_elems(c, mSpacing);
 	return c;
 }
@@ -127,11 +127,11 @@ Vector3D ProbeData::ProbeImageData::getOrigin_u() const
 	return this->transform_p_to_u(mOrigin_p);
 }
 
-ssc::DoubleBoundingBox3D ProbeData::ProbeImageData::getClipRect_u() const
+DoubleBoundingBox3D ProbeData::ProbeImageData::getClipRect_u() const
 {
-	ssc::Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
-	ssc::Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
-	return ssc::DoubleBoundingBox3D(p0,p1);
+	Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
+	Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
+	return DoubleBoundingBox3D(p0,p1);
 }
 
 void ProbeData::setImage(ProbeImageData value)
@@ -197,14 +197,14 @@ void ProbeData::resample(QSize newSize)
 	if (newSize==mImage.mSize)
 		return;
 
-	ssc::Vector3D factor(double(newSize.width())/mImage.mSize.width(), double(newSize.height())/mImage.mSize.height(), 1);
+	Vector3D factor(double(newSize.width())/mImage.mSize.width(), double(newSize.height())/mImage.mSize.height(), 1);
 
 	mImage.mOrigin_p = multiply_elems(mImage.mOrigin_p, factor);
 	mImage.mSpacing = divide_elems(mImage.mSpacing, factor);
 
-	ssc::Vector3D cr0 = multiply_elems(mImage.mClipRect_p.corner(0,0,0), factor);
-	ssc::Vector3D cr1 = multiply_elems(mImage.mClipRect_p.corner(1,1,1), factor);
-	mImage.mClipRect_p = ssc::DoubleBoundingBox3D(cr0, cr1);
+	Vector3D cr0 = multiply_elems(mImage.mClipRect_p.corner(0,0,0), factor);
+	Vector3D cr1 = multiply_elems(mImage.mClipRect_p.corner(1,1,1), factor);
+	mImage.mClipRect_p = DoubleBoundingBox3D(cr0, cr1);
 
 	mImage.mSize = newSize;
 }
@@ -254,8 +254,8 @@ void ProbeData::applySoundSpeedCompensationFactor(double factor)
 	mImage.mSpacing[1] = mImage.mSpacing[1] * factor / mSoundSpeedCompensationFactor;
 	mSoundSpeedCompensationFactor = factor;
 
-	if (this->getType() != ssc::ProbeData::tLINEAR)
-		ssc::messageManager()->sendWarning("Sound speed compensation is applied to spacing[1], i.e. it is correct for linear probes and approxomate for other probes. Factor: " + qstring_cast(factor));
+	if (this->getType() != ProbeData::tLINEAR)
+		messageManager()->sendWarning("Sound speed compensation is applied to spacing[1], i.e. it is correct for linear probes and approxomate for other probes. Factor: " + qstring_cast(factor));
 }
 
 }

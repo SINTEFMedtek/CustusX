@@ -19,8 +19,6 @@
 
 namespace cx
 {
-using ssc::Transform3D;
-// because of signaling
 
 /**
  * \file
@@ -66,7 +64,7 @@ signals:
 private slots:
 	void dominantToolChangedSlot(const QString&);
 private:
-	ssc::ToolPtr mTool;
+	ToolPtr mTool;
 };
 
 /**

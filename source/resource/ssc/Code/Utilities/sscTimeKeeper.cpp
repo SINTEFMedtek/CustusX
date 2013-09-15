@@ -20,7 +20,7 @@
 #include "sscTimeKeeper.h"
 #include "sscMessageManager.h"
 
-namespace ssc
+namespace cx
 {
 
 TimeKeeper::TimeKeeper() : mTime(QDateTime::currentDateTime()) {}
@@ -49,4 +49,4 @@ void TimeKeeper::reset()
     mTime = QDateTime::currentDateTime();
 }
 
-} // namespace ssc
+} // namespace cx

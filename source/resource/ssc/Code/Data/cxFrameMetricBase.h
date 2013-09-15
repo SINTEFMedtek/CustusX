@@ -26,7 +26,7 @@ namespace cx {
  * \date Sep 2, 2013
  * \author Ole Vegard Solberg, SINTEF
  */
-class FrameMetricBase: public ssc::DataMetric
+class FrameMetricBase: public DataMetric
 {
 	Q_OBJECT
 public:
@@ -34,20 +34,20 @@ public:
 	virtual ~FrameMetricBase();
 	virtual QString getType() const = 0;
 
-	virtual void setFrame(const ssc::Transform3D& qMt);
-	virtual ssc::Transform3D getFrame();
-	virtual ssc::Vector3D getCoordinate() const;
-	virtual ssc::Vector3D getRefCoord() const; ///< as getRefFrame, but coord only.
-	virtual ssc::Transform3D getRefFrame() const; ///< return frame described in ref space r : rFt = rMq * qFt
-	virtual void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
-	virtual ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data
-	virtual ssc::DoubleBoundingBox3D boundingBox() const;
+	virtual void setFrame(const Transform3D& qMt);
+	virtual Transform3D getFrame();
+	virtual Vector3D getCoordinate() const;
+	virtual Vector3D getRefCoord() const; ///< as getRefFrame, but coord only.
+	virtual Transform3D getRefFrame() const; ///< return frame described in ref space r : rFt = rMq * qFt
+	virtual void setSpace(CoordinateSystem space); // use parentframe from Data
+	virtual CoordinateSystem getSpace() const; // use parentframe from Data
+	virtual DoubleBoundingBox3D boundingBox() const;
 
 protected:
 	QString matrixAsSingleLineString() const;
-	ssc::CoordinateSystem mSpace;
-	ssc::CoordinateSystemListenerPtr mSpaceListener;
-	ssc::Transform3D mFrame; ///< frame qFt described in local space q = mSpace
+	CoordinateSystem mSpace;
+	CoordinateSystemListenerPtr mSpaceListener;
+	Transform3D mFrame; ///< frame qFt described in local space q = mSpace
 
 };
 

@@ -19,7 +19,7 @@
 
 namespace cx
 {
-FilterSetupWidget::FilterSetupWidget(QWidget* parent, ssc::XmlOptionFile options, bool addFrame) :
+FilterSetupWidget::FilterSetupWidget(QWidget* parent, XmlOptionFile options, bool addFrame) :
     BaseWidget(parent, "FilterSetupWidget", "FilterSetup")
 {
 	mFrame = NULL;

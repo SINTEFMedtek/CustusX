@@ -54,7 +54,7 @@ void LandmarkRegistrationWidget::activeImageChangedSlot()
 {
 	if (!this->isVisible())
 		return;
-	ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+	ImagePtr activeImage = dataManager()->getActiveImage();
 	if (mCurrentImage == activeImage)
 		return;
 
@@ -70,43 +70,43 @@ void LandmarkRegistrationWidget::cellClickedSlot(int row, int column)
 		return;
 
 	if (!mLandmarkTableWidget)
-		ssc::messageManager()->sendDebug("mLandmarkTableWidget is null");
+		messageManager()->sendDebug("mLandmarkTableWidget is null");
 
 	mActiveLandmark = mLandmarkTableWidget->item(row, column)->data(Qt::UserRole).toString();
 
 
-	ssc::LandmarkMap targetData = this->getTargetLandmarks();
+	LandmarkMap targetData = this->getTargetLandmarks();
 	if (targetData.count(mActiveLandmark))
 	{
-		ssc::Vector3D p_d = targetData[mActiveLandmark].getCoord();
-		ssc::Vector3D p_r = this->getTargetTransform().coord(p_d);
-		ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->coord(p_r);;
+		Vector3D p_d = targetData[mActiveLandmark].getCoord();
+		Vector3D p_r = this->getTargetTransform().coord(p_d);
+		Vector3D p_pr = toolManager()->get_rMpr()->coord(p_r);;
 		this->setManualToolPosition(p_r);
 	}
 
 }
 
-void LandmarkRegistrationWidget::setManualToolPosition(ssc::Vector3D p_r)
+void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 {
-	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
-	ssc::Vector3D p_pr = rMpr.inv().coord(p_r);
+	Transform3D rMpr = *toolManager()->get_rMpr();
+	Vector3D p_pr = rMpr.inv().coord(p_r);
 
 	// set the picked point as offset tip
-	ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
-	ssc::Vector3D offset = tool->get_prMt().vector(ssc::Vector3D(0, 0, tool->getTooltipOffset()));
+	ManualToolPtr tool = cxToolManager::getInstance()->getManualTool();
+	Vector3D offset = tool->get_prMt().vector(Vector3D(0, 0, tool->getTooltipOffset()));
 	p_pr -= offset;
 	p_r = rMpr.coord(p_pr);
 
 	// TODO set center here will not do: must handle
-	ssc::dataManager()->setCenter(p_r);
-	ssc::Vector3D p0_pr = tool->get_prMt().coord(ssc::Vector3D(0, 0, 0));
-	tool->set_prMt(ssc::createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
+	dataManager()->setCenter(p_r);
+	Vector3D p0_pr = tool->get_prMt().coord(Vector3D(0, 0, 0));
+	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
 
 void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
-	connect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
+	connect(dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
 	this->activeImageChangedSlot();
 
 	mManager->restart();
@@ -116,7 +116,7 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	QWidget::hideEvent(event);
-	disconnect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
+	disconnect(dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
 
 	mCurrentImage.reset();
 }
@@ -127,19 +127,19 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	mLandmarkTableWidget->clear();
 
 	QString fixedName;
-	ssc::DataPtr fixedData = boost::dynamic_pointer_cast<ssc::Data>(mManager->getFixedData());
+	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mManager->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 
 	// active image is irrelevant here: remove
-//	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+//	ImagePtr image = dataManager()->getActiveImage();
 //
 //	if (!image) //Image is deleted
 //		return;
 
-	std::vector<ssc::Landmark> landmarks = this->getAllLandmarks();
-	ssc::LandmarkMap targetData = this->getTargetLandmarks();
-	ssc::Transform3D rMtarget = this->getTargetTransform();
+	std::vector<Landmark> landmarks = this->getAllLandmarks();
+	LandmarkMap targetData = this->getTargetLandmarks();
+	Transform3D rMtarget = this->getTargetTransform();
 
 	//ready the table widget
 	mLandmarkTableWidget->setRowCount(landmarks.size());
@@ -153,8 +153,8 @@ void LandmarkRegistrationWidget::prePaintEvent()
 	{
 		std::vector<QTableWidgetItem*> items(4); // name, status, coordinates, accuracy
 
-		ssc::LandmarkProperty prop = ssc::dataManager()->getLandmarkProperties()[landmarks[i].getUid()];
-		ssc::Vector3D coord = landmarks[i].getCoord();
+		LandmarkProperty prop = dataManager()->getLandmarkProperties()[landmarks[i].getUid()];
+		Vector3D coord = landmarks[i].getCoord();
 		coord = rMtarget.coord(coord); // display coordinates in space r (in principle, this means all coords should be equal)
 
 		items[0] = new QTableWidgetItem(qstring_cast(prop.getName()));
@@ -240,7 +240,7 @@ void LandmarkRegistrationWidget::activateLandmark(QString uid)
   */
 QString LandmarkRegistrationWidget::getNextLandmark()
 {
-    std::vector<ssc::Landmark> lm = this->getAllLandmarks();
+    std::vector<Landmark> lm = this->getAllLandmarks();
 
     for (int i=0; i<lm.size()-1; ++i)
     {
@@ -253,19 +253,19 @@ QString LandmarkRegistrationWidget::getNextLandmark()
     return "";
 }
 
-std::vector<ssc::Landmark> LandmarkRegistrationWidget::getAllLandmarks() const
+std::vector<Landmark> LandmarkRegistrationWidget::getAllLandmarks() const
 {
-	std::vector<ssc::Landmark> retval;
-	ssc::LandmarkMap targetData = this->getTargetLandmarks();
-	std::map<QString, ssc::LandmarkProperty> dataData = ssc::dataManager()->getLandmarkProperties();
-	std::map<QString, ssc::LandmarkProperty>::iterator iter;
+	std::vector<Landmark> retval;
+	LandmarkMap targetData = this->getTargetLandmarks();
+	std::map<QString, LandmarkProperty> dataData = dataManager()->getLandmarkProperties();
+	std::map<QString, LandmarkProperty>::iterator iter;
 
 	for (iter = dataData.begin(); iter != dataData.end(); ++iter)
 	{
 		if (targetData.count(iter->first))
 			retval.push_back(targetData[iter->first]);
 		else
-			retval.push_back(ssc::Landmark(iter->first));
+			retval.push_back(Landmark(iter->first));
 	}
 
 	std::sort(retval.begin(), retval.end());
@@ -281,12 +281,12 @@ void LandmarkRegistrationWidget::cellChangedSlot(int row, int column)
 	if (column == 0)
 	{
 		QString name = item->text();
-		ssc::dataManager()->setLandmarkName(uid, name);
+		dataManager()->setLandmarkName(uid, name);
 	}
 	if (column == 1)
 	{
 		Qt::CheckState state = item->checkState();
-		ssc::dataManager()->setLandmarkActive(uid, state == Qt::Checked);
+		dataManager()->setLandmarkActive(uid, state == Qt::Checked);
 		this->performRegistration(); // automatic when changing active state (Mantis #0000674)s
 	}
 	if (column == 2)
@@ -297,10 +297,10 @@ void LandmarkRegistrationWidget::cellChangedSlot(int row, int column)
 		val = val.replace(')', " ");
 		val = val.replace(',', " ");
 
-		ssc::Transform3D rMtarget = this->getTargetTransform();
+		Transform3D rMtarget = this->getTargetTransform();
 
-		ssc::Vector3D p_r = ssc::Vector3D::fromString(val);
-		ssc::Vector3D p_target = rMtarget.inv().coord(p_r);
+		Vector3D p_r = Vector3D::fromString(val);
+		Vector3D p_target = rMtarget.inv().coord(p_r);
 		this->setTargetLandmark(uid, p_target);
 	}
 }
@@ -317,7 +317,7 @@ void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 void LandmarkRegistrationWidget::updateAvarageAccuracyLabel()
 {
 	QString fixedName;
-	ssc::DataPtr fixedData = boost::dynamic_pointer_cast<ssc::Data>(mManager->getFixedData());
+	DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mManager->getFixedData());
 	if (fixedData)
 		fixedName = fixedData->getName();
 
@@ -327,18 +327,18 @@ void LandmarkRegistrationWidget::updateAvarageAccuracyLabel()
 
 double LandmarkRegistrationWidget::getAvarageAccuracy()
 {
-	std::map<QString, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
+	std::map<QString, LandmarkProperty> props = dataManager()->getLandmarkProperties();
 
 	double sum = 0;
 	int count = 0;
-	std::map<QString, ssc::LandmarkProperty>::iterator it = props.begin();
+	std::map<QString, LandmarkProperty>::iterator it = props.begin();
 	for (; it != props.end(); ++it)
 	{
 		if (!it->second.getActive()) //we don't want to take into account not active landmarks
 			continue;
 		QString uid = it->first;
 		double val = this->getAccuracy(uid);
-		if (!ssc::similar(val, 1000.0))
+		if (!similar(val, 1000.0))
 		{
 			sum = sum + val;
 			count++;
@@ -351,22 +351,22 @@ double LandmarkRegistrationWidget::getAvarageAccuracy()
 
 double LandmarkRegistrationWidget::getAccuracy(QString uid)
 {
-	ssc::ImagePtr fixedData = boost::dynamic_pointer_cast<ssc::Image>(mManager->getFixedData());
+	ImagePtr fixedData = boost::dynamic_pointer_cast<Image>(mManager->getFixedData());
 	if (!fixedData)
 		return 1000.0;
 
-	ssc::Landmark masterLandmark = fixedData->getLandmarks()[uid]; //TODO : sjekk ut masterimage etc etc
-	ssc::Landmark targetLandmark = this->getTargetLandmarks()[uid];
+	Landmark masterLandmark = fixedData->getLandmarks()[uid]; //TODO : sjekk ut masterimage etc etc
+	Landmark targetLandmark = this->getTargetLandmarks()[uid];
 	if (masterLandmark.getUid().isEmpty() || targetLandmark.getUid().isEmpty())
 		return 1000.0;
 
-	ssc::Vector3D p_master_master = masterLandmark.getCoord();
-	ssc::Vector3D p_target_target = targetLandmark.getCoord();
-	ssc::Transform3D rMmaster = fixedData->get_rMd();
-	ssc::Transform3D rMtarget = this->getTargetTransform();
+	Vector3D p_master_master = masterLandmark.getCoord();
+	Vector3D p_target_target = targetLandmark.getCoord();
+	Transform3D rMmaster = fixedData->get_rMd();
+	Transform3D rMtarget = this->getTargetTransform();
 
-	ssc::Vector3D p_target_r = rMtarget.coord(p_target_target);
-	ssc::Vector3D p_master_r = rMmaster.coord(p_master_master);
+	Vector3D p_target_r = rMtarget.coord(p_target_target);
+	Vector3D p_master_r = rMmaster.coord(p_master_master);
 
 	return (p_target_r - p_master_r).length();
 }

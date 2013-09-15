@@ -31,7 +31,7 @@
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
-namespace ssc
+namespace cx
 {
 
 /**\brief VideoSource controlled by a vtkImageImport
@@ -97,7 +97,7 @@ private:
 
 typedef boost::shared_ptr<ImageImportVideoSource> ImageImportVideoSourcePtr;
 
-} // namespace ssc
+} // namespace cx
 
 
 #endif /* SSCIMAGEIMPORTVIDEOSOURCE_H_ */

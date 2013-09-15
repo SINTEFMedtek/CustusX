@@ -39,7 +39,7 @@ class QDomNode;
 #include <boost/shared_ptr.hpp>
 #include "sscImageTFData.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
@@ -91,6 +91,6 @@ private:
 	vtkColorTransferFunctionPtr mColorTF;
 };
 
-} // end namespace ssc
+} // end namespace cx
 
 #endif /* SSCIMAGETRANSFERFUNCTIONS3D_H_ */

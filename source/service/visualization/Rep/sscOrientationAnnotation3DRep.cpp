@@ -54,7 +54,7 @@ typedef vtkSmartPointer<vtkPropAssembly> vtkPropAssemblyPtr;
 typedef vtkSmartPointer<vtkSTLWriter> vtkSTLWriterPtr;
 typedef vtkSmartPointer<vtkQuadricDecimation> vtkQuadricDecimationPtr;
 
-namespace ssc
+namespace cx
 {
 
 ////---------------------------------------------------------
@@ -79,12 +79,12 @@ OrientationAnnotation3DRep::~OrientationAnnotation3DRep()
 
 }
 
-void OrientationAnnotation3DRep::addRepActorsToViewRenderer(ssc::View* view)
+void OrientationAnnotation3DRep::addRepActorsToViewRenderer(View* view)
 {
 	this->rebuild(view->getRenderWindow()->GetInteractor());
 }
 
-void OrientationAnnotation3DRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void OrientationAnnotation3DRep::removeRepActorsFromViewRenderer(View* view)
 {
 	mMarker->SetInteractor(NULL);
 }
@@ -232,9 +232,9 @@ vtkAnnotatedCubeActorPtr OrientationAnnotation3DRep::createCube()
 
 	vtkPropertyPtr property;
 
-	ssc::Vector3D red(1, 0, 0);
-	ssc::Vector3D green(0, 1, 0);
-	ssc::Vector3D blue(0, 0, 1);
+	Vector3D red(1, 0, 0);
+	Vector3D green(0, 1, 0);
+	Vector3D blue(0, 0, 1);
 
 	property = cube->GetCubeProperty();
 	property->SetColor(0.5, 1, 1);

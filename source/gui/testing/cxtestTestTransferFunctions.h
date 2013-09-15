@@ -30,7 +30,7 @@ public:
 
 private:
 	vtkImageDataPtr mDummyImageData;
-	ssc::ImagePtr mDummyImage;
+	cx::ImagePtr mDummyImage;
 
 	void createDummyImage();
 };

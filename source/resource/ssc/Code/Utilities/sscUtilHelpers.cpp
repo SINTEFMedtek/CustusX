@@ -1,7 +1,7 @@
 #include "sscUtilHelpers.h"
 #include <QStringList>
 
-namespace ssc
+namespace cx
 {
 
 /**Constrain the input to the range |min,max|
@@ -39,5 +39,5 @@ QString changeExtension(QString name, QString ext)
 	return splitName.join(".");
 }
 
-} // namespace ssc
+} // namespace cx
 

@@ -33,8 +33,8 @@
 
 #include "sscViewsWindow.h"
 
-using ssc::Vector3D;
-using ssc::Transform3D;
+using cx::Vector3D;
+using cx::Transform3D;
 
 #include "sscTestVisualRendering.h"
 
@@ -78,7 +78,7 @@ bool TestVisualRendering::runWidget()
 void TestVisualRendering::testEmptyView()
 {
 	widget->setDescription("Empty view");
-	ssc::ViewWidget* view = new ssc::ViewWidget(widget->centralWidget());
+	cx::ViewWidget* view = new cx::ViewWidget(widget->centralWidget());
 	widget->insertView(view, "dummy", "none", 0, 0);
 
 	CPPUNIT_ASSERT(runWidget());
@@ -131,9 +131,9 @@ void TestVisualRendering::test_3D_Composite_Views_GPU()
 	parameters[1].alpha = .7;
 	parameters[1].lut = getCreateLut(0, 200, .67, .68, 0, 1, .4, .8);
 
-	widget->defineSlice("A", image[0], ssc::ptAXIAL, 0, 0);
-	widget->defineSlice("C", image[0], ssc::ptCORONAL, 1, 0);
-	widget->defineSlice("S", image[0], ssc::ptSAGITTAL, 0, 1);
+	widget->defineSlice("A", image[0], cx::ptAXIAL, 0, 0);
+	widget->defineSlice("C", image[0], cx::ptCORONAL, 1, 0);
+	widget->defineSlice("S", image[0], cx::ptSAGITTAL, 0, 1);
 	CPPUNIT_ASSERT(widget->define3DGPU(images, parameters, 1, 1));
 
 	CPPUNIT_ASSERT(runWidget());
@@ -168,9 +168,9 @@ void TestVisualRendering::test_ACS_3D_Tool()
 {
 	widget->setDescription("ACS+3D, moving tool");
 	widget->define3D(image[0], NULL, 1, 1);
-	widget->defineSlice("A", image[0], ssc::ptAXIAL, 0, 0);
-	widget->defineSlice("C", image[0], ssc::ptCORONAL, 1, 0);
-	widget->defineSlice("S", image[0], ssc::ptSAGITTAL, 0, 1);
+	widget->defineSlice("A", image[0], cx::ptAXIAL, 0, 0);
+	widget->defineSlice("C", image[0], cx::ptCORONAL, 1, 0);
+	widget->defineSlice("S", image[0], cx::ptSAGITTAL, 0, 1);
 
 	CPPUNIT_ASSERT(runWidget());
 }
@@ -179,8 +179,8 @@ void TestVisualRendering::test_AnyDual_3D_Tool()
 {
 	widget->setDescription("Any+Dual+3D, moving tool");
 	widget->define3D(image[0], NULL, 0, 2);
-	widget->defineSlice("Any", image[0], ssc::ptANYPLANE, 0, 0);
-	widget->defineSlice("Dua", image[0], ssc::ptSIDEPLANE, 0, 1);
+	widget->defineSlice("Any", image[0], cx::ptANYPLANE, 0, 0);
+	widget->defineSlice("Dua", image[0], cx::ptSIDEPLANE, 0, 1);
 
 	CPPUNIT_ASSERT(runWidget());
 }
@@ -191,9 +191,9 @@ void TestVisualRendering::test_ACS_3Volumes()
 
 	for (unsigned i = 0; i < 3; ++i)
 	{
-		widget->defineSlice("A", image[i], ssc::ptAXIAL, 0, i);
-		widget->defineSlice("C", image[i], ssc::ptCORONAL, 1, i);
-		widget->defineSlice("S", image[i], ssc::ptSAGITTAL, 2, i);
+		widget->defineSlice("A", image[i], cx::ptAXIAL, 0, i);
+		widget->defineSlice("C", image[i], cx::ptCORONAL, 1, i);
+		widget->defineSlice("S", image[i], cx::ptSAGITTAL, 2, i);
 	}
 
 	CPPUNIT_ASSERT(runWidget());
@@ -205,9 +205,9 @@ void TestVisualRendering::test_ACS_3Volumes_GPU()
 
 	for (unsigned i = 0; i < 3; ++i)
 	{
-		CPPUNIT_ASSERT(widget->defineGPUSlice("A", image[i], ssc::ptAXIAL, 0, i));
-		CPPUNIT_ASSERT(widget->defineGPUSlice("C", image[i], ssc::ptCORONAL, 1, i));
-		CPPUNIT_ASSERT(widget->defineGPUSlice("S", image[i], ssc::ptSAGITTAL, 2, i));
+		CPPUNIT_ASSERT(widget->defineGPUSlice("A", image[i], cx::ptAXIAL, 0, i));
+		CPPUNIT_ASSERT(widget->defineGPUSlice("C", image[i], cx::ptCORONAL, 1, i));
+		CPPUNIT_ASSERT(widget->defineGPUSlice("S", image[i], cx::ptSAGITTAL, 2, i));
 	}
 
 	CPPUNIT_ASSERT(runWidget());
@@ -219,8 +219,8 @@ void TestVisualRendering::test_AnyDual_3Volumes()
 
 	for (unsigned i = 0; i < 3; ++i)
 	{
-		widget->defineSlice("Any", image[i], ssc::ptANYPLANE, 0, i);
-		widget->defineSlice("Dua", image[i], ssc::ptSIDEPLANE, 1, i);
+		widget->defineSlice("Any", image[i], cx::ptANYPLANE, 0, i);
+		widget->defineSlice("Dua", image[i], cx::ptSIDEPLANE, 1, i);
 	}
 
 	CPPUNIT_ASSERT(runWidget());

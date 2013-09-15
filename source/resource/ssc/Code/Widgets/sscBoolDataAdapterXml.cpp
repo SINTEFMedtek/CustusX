@@ -28,7 +28,7 @@
 #include <iostream>
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 /** Make sure one given option exists witin root.

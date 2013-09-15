@@ -47,7 +47,7 @@
 
 typedef vtkSmartPointer<vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
-namespace ssc
+namespace cx
 {
 
 Image::ShadingStruct::ShadingStruct()
@@ -140,7 +140,7 @@ void Image::resetTransferFunctions(bool _2D, bool _3D)
 
 	if (!mBaseImageData)
 	{
-		messageManager()->sendWarning("ssc::Image has no image data");
+		messageManager()->sendWarning("Image has no image data");
 		return;
 	}
 
@@ -169,7 +169,7 @@ void Image::resetTransferFunction(ImageLUT2DPtr imageLookupTable2D)
 {
 	if (!mBaseImageData)
 	{
-		messageManager()->sendWarning("ssc::Image has no image data");
+		messageManager()->sendWarning("Image has no image data");
 		return;
 	}
 
@@ -194,7 +194,7 @@ void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D)
 {
 	if (!mBaseImageData)
 	{
-		messageManager()->sendWarning("ssc::Image has no image data");
+		messageManager()->sendWarning("Image has no image data");
 		return;
 	}
 
@@ -283,7 +283,7 @@ void Image::setTransferFunctions3D(ImageTF3DPtr transferFuntion)
 {
 	if(!this->isValidTransferFunction(transferFuntion))
 	{
-		messageManager()->sendWarning("Not a valid 3D transfer function for ssc::Image");
+		messageManager()->sendWarning("Not a valid 3D transfer function for Image");
 		return;
 	}
 	this->resetTransferFunction(transferFuntion);
@@ -300,7 +300,7 @@ void Image::setLookupTable2D(ImageLUT2DPtr imageLookupTable2D)
 {
 	if(!this->isValidTransferFunction(imageLookupTable2D))
 	{
-		messageManager()->sendWarning("Not a valid 2D transfer function / lookup table for ssc::Image");
+		messageManager()->sendWarning("Not a valid 2D transfer function / lookup table for Image");
 		return;
 	}
 	this->resetTransferFunction(imageLookupTable2D);
@@ -328,7 +328,7 @@ vtkImageDataPtr Image::getRefVtkImageData()
 		mReferenceImageData->Update();
 
 		this->transformChangedSlot(); // update transform
-		std::cout << "Warning: ssc::Image::getRefVtkImageData() called. Expensive. Do not use." << std::endl;
+		std::cout << "Warning: Image::getRefVtkImageData() called. Expensive. Do not use." << std::endl;
 	}
 
 	return mReferenceImageData;
@@ -709,11 +709,11 @@ void Image::setInteractiveClipPlane(vtkPlanePtr plane)
  * The shift introduced by these  two operations are inserted
  * as a translation into the matrix rMd.
  *
- * This operation is needed because ssc::Image dont support vtkImageData
+ * This operation is needed because Image dont support vtkImageData
  * with a nonzero origin or nonzero extent. These must be removed during creation.
  *
  * Use this method only when you, by using some vtk algorithm, have created a vtkImageData
- * that in nonconform with the ssc::Image spec.
+ * that in nonconform with the Image spec.
  */
 void Image::mergevtkSettingsIntosscTransform()
 {
@@ -737,8 +737,8 @@ void Image::mergevtkSettingsIntosscTransform()
 	this->get_rMd_History()->setRegistration(this->get_rMd() * createTransformTranslate(origin + extentShift));
 
 	//Since this function discards the vtkImageData, the transfer functions must be fixed
-	ssc::ImageTF3DPtr transferFunctions = this->getTransferFunctions3D()->createCopy(getBaseVtkImageData());
-	ssc::ImageLUT2DPtr LUT2D = this->getLookupTable2D()->createCopy(getBaseVtkImageData());
+	ImageTF3DPtr transferFunctions = this->getTransferFunctions3D()->createCopy(getBaseVtkImageData());
+	ImageLUT2DPtr LUT2D = this->getLookupTable2D()->createCopy(getBaseVtkImageData());
 	// Make sure the transfer functions are working
 	if (transferFunctions)
 		transferFunctions->fixTransferFunctions();
@@ -844,4 +844,51 @@ int Image::getInterpolationType() const
 	return mInterpolationType;
 }
 
-} // namespace ssc
+vtkImageDataPtr Image::resample(long maxVoxels)
+{
+	// also use grayscale as vtk is incapable of rendering 3component color.
+	vtkImageDataPtr retval = this->getGrayScaleBaseVtkImageData();
+
+	double factor = computeResampleFactor(maxVoxels);
+
+	if (fabs(1.0-factor)>0.01) // resampling
+	{
+		vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
+		resampler->SetInterpolationModeToLinear();
+		resampler->SetAxisMagnificationFactor(0, factor);
+		resampler->SetAxisMagnificationFactor(1, factor);
+		resampler->SetAxisMagnificationFactor(2, factor);
+		resampler->SetInput(retval);
+		resampler->GetOutput()->Update();
+		resampler->GetOutput()->GetScalarRange();
+		retval = resampler->GetOutput();
+
+		long voxelsDown = retval->GetNumberOfPoints();
+		long voxelsOrig = this->getBaseVtkImageData()->GetNumberOfPoints();
+		messageManager()->sendInfo("Completed downsampling volume in VolumetricRep: "
+									 + this->getName()
+									 + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "
+									 + "Ratio: " + QString::number(factor, 'g', 2) + ", "
+									 + "Original size: " + qstring_cast(voxelsOrig/1000/1000) + "M.");
+	}
+	return retval;
+}
+
+double Image::computeResampleFactor(long maxVoxels)
+{
+	if (maxVoxels==0)
+		return 1.0;
+
+	long voxels = this->getBaseVtkImageData()->GetNumberOfPoints();
+	double factor = (double)maxVoxels/(double)voxels;
+	factor = pow(factor, 1.0/3.0);
+	// cubic function leads to trouble for 138M-volume - must downsample to as low as 5-10 Mv in order to succeed on Mac.
+
+	if (factor<0.99)
+	{
+		return factor;
+	}
+	return 1.0;
+}
+
+} // namespace cx

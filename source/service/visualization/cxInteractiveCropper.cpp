@@ -60,7 +60,7 @@ public:
 	}
 	virtual void Execute(vtkObject* caller, unsigned long, void*)
 	{
-		ssc::DoubleBoundingBox3D bb_new = mCropper->getBoxWidgetSize();
+		DoubleBoundingBox3D bb_new = mCropper->getBoxWidgetSize();
 		mCropper->setCroppingRegion(bb_new);
 	}
 	InteractiveCropper* mCropper;
@@ -83,7 +83,7 @@ public:
 	}
 	virtual void Execute(vtkObject* caller, unsigned long, void*)
 	{
-		ssc::DoubleBoundingBox3D bb_new = mCropper->getBoxWidgetSize();
+		DoubleBoundingBox3D bb_new = mCropper->getBoxWidgetSize();
 		mCropper->boxWasShown(mValue);
 	}
 	bool mValue;
@@ -126,7 +126,7 @@ void InteractiveCropper::initialize()
 	mBoxWidget->SetEnabled(false);
 }
 
-void InteractiveCropper::setView(ssc::ViewWidget* view)
+void InteractiveCropper::setView(ViewWidget* view)
 {
 	mView = view;
 	this->updateBoxWidgetInteractor();
@@ -173,14 +173,14 @@ void InteractiveCropper::showBoxWidget(bool on)
 
 /** get current cropping box in ref coords
  */
-ssc::DoubleBoundingBox3D InteractiveCropper::getBoundingBox()
+DoubleBoundingBox3D InteractiveCropper::getBoundingBox()
 {
 	if (!mImage || !mBoxWidget)
-		return ssc::DoubleBoundingBox3D(0,0,0,0,0,0);
+		return DoubleBoundingBox3D(0,0,0,0,0,0);
 	return mImage->getCroppingBox();
 }
 
-void InteractiveCropper::setBoundingBox(const ssc::DoubleBoundingBox3D& bb_d)
+void InteractiveCropper::setBoundingBox(const DoubleBoundingBox3D& bb_d)
 {
 	this->setCroppingRegion(bb_d);
 	this->setBoxWidgetSize(bb_d);
@@ -202,7 +202,7 @@ void InteractiveCropper::imageCropChangedSlot()
 	if (!mImage)
 		return;
 
-	ssc::DoubleBoundingBox3D bb_d = this->getBoundingBox();
+	DoubleBoundingBox3D bb_d = this->getBoundingBox();
 	this->setBoxWidgetSize(bb_d);
 	this->updateBoxWidgetInteractor();
 
@@ -219,7 +219,7 @@ void InteractiveCropper::resetBoundingBox()
 
 void InteractiveCropper::imageChangedSlot()
 {
-	mImage = ssc::dataManager()->getActiveImage();
+	mImage = dataManager()->getActiveImage();
 
 	this->imageCropChangedSlot();
 	emit changed();
@@ -250,7 +250,7 @@ std::vector<int> InteractiveCropper::getDimensions()
 	double spacing_z = 1;
 	mImage->getBaseVtkImageData()->GetSpacing(spacing_x, spacing_y, spacing_z);
 
-	ssc::DoubleBoundingBox3D bb = getBoxWidgetSize();
+	DoubleBoundingBox3D bb = getBoxWidgetSize();
 	int dim_x = (bb.begin()[1] - bb.begin()[0])/spacing_x + 1; //adding 1 because of some rounding errors, is there a better way to do this?
 	int dim_y = (bb.begin()[3] - bb.begin()[2])/spacing_y + 1;
 	int dim_z = (bb.begin()[5] - bb.begin()[4])/spacing_z + 1;
@@ -263,16 +263,16 @@ std::vector<int> InteractiveCropper::getDimensions()
 
 /** Set the box widget bounding box to the input box (given in data space)
  */
-void InteractiveCropper::setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_d)
+void InteractiveCropper::setBoxWidgetSize(const DoubleBoundingBox3D& bb_d)
 {
 	if (!mImage || !mBoxWidget)
 		return;
 
 	double bb_hard[6] =
 	{ -0.5, 0.5, -0.5, 0.5, -0.5, 0.5 };
-	ssc::DoubleBoundingBox3D bb_unit(bb_hard);
-	ssc::Transform3D M = ssc::createTransformNormalize(bb_unit, bb_d);
-	ssc::Transform3D rMd = mImage->get_rMd();
+	DoubleBoundingBox3D bb_unit(bb_hard);
+	Transform3D M = createTransformNormalize(bb_unit, bb_d);
+	Transform3D rMd = mImage->get_rMd();
 	M = rMd * M;
 
 	vtkTransformPtr transform = vtkTransformPtr::New();
@@ -282,30 +282,30 @@ void InteractiveCropper::setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_d)
 
 /** return the bow widget current size in data space
  */
-ssc::DoubleBoundingBox3D InteractiveCropper::getBoxWidgetSize()
+DoubleBoundingBox3D InteractiveCropper::getBoxWidgetSize()
 {
 	if (!mImage || !mBoxWidget)
 	{
-		return ssc::DoubleBoundingBox3D::zero();
+		return DoubleBoundingBox3D::zero();
 	}
 
 	double bb_hard[6] =
 	{ -0.5, 0.5, -0.5, 0.5, -0.5, 0.5 };
-	ssc::DoubleBoundingBox3D bb_unit(bb_hard);
+	DoubleBoundingBox3D bb_unit(bb_hard);
 
 	vtkTransformPtr transform = vtkTransformPtr::New();
 	mBoxWidget->GetTransform(transform);
-	ssc::Transform3D M(transform->GetMatrix());
+	Transform3D M(transform->GetMatrix());
 
-	ssc::Transform3D rMd = mImage->get_rMd();
+	Transform3D rMd = mImage->get_rMd();
 	M = rMd.inv() * M;
 
-	ssc::DoubleBoundingBox3D bb_new_r = ssc::transform(M, bb_unit);
+	DoubleBoundingBox3D bb_new_r = cx::transform(M, bb_unit);
 
 	return bb_new_r;
 }
 
-void InteractiveCropper::setCroppingRegion(ssc::DoubleBoundingBox3D bb_d)
+void InteractiveCropper::setCroppingRegion(DoubleBoundingBox3D bb_d)
 {
 	if (!mImage)
 		return;
@@ -321,10 +321,10 @@ void InteractiveCropper::boxWasShown(bool val)
 /** return the largest useful bounding box for the current selection
  *
  */
-ssc::DoubleBoundingBox3D InteractiveCropper::getMaxBoundingBox()
+DoubleBoundingBox3D InteractiveCropper::getMaxBoundingBox()
 {
 	if (!mImage)
-		return ssc::DoubleBoundingBox3D::zero();
+		return DoubleBoundingBox3D::zero();
 	return mImage->boundingBox();
 }
 

@@ -43,7 +43,7 @@ private:
 
 //  QVBoxLayout* mLayout;
 //  QComboBox* mPresetsComboBox;
-//	ssc::TransferFunctions3DPresetPtr mPresets;
+//	TransferFunctions3DPresetPtr mPresets;
 
 	QAction* mToggleAction;
 	bool mIs3D; ///< true if 3D, false if 2D

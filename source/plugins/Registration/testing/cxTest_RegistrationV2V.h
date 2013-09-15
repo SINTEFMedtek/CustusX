@@ -35,14 +35,14 @@ public:
 		CPPUNIT_TEST( testV2V_synthetic_data );
 	CPPUNIT_TEST_SUITE_END();
 private:
-	void doTestVessel2VesselRegistration(ssc::Transform3D perturbation, QString filenameSource, QString filenameTarget, double tol_dist, double tol_angle);
-	vtkPolyDataPtr generatePolyData(std::vector<ssc::Vector3D> pts);
+	void doTestVessel2VesselRegistration(cx::Transform3D perturbation, QString filenameSource, QString filenameTarget, double tol_dist, double tol_angle);
+	vtkPolyDataPtr generatePolyData(std::vector<cx::Vector3D> pts);
 	QStringList generateTestData();
 	void saveVTKFile(vtkPolyDataPtr data, QString filename);
-	QString saveVTKFile(std::vector<ssc::Vector3D>, QString filename);
-	ssc::Vector3D append_line(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a, ssc::Vector3D b, double spacing);
-	ssc::Vector3D append_pt(std::vector<ssc::Vector3D>* pts, ssc::Vector3D a);
-	std::vector<ssc::Transform3D> generateTransforms();
+	QString saveVTKFile(std::vector<cx::Vector3D>, QString filename);
+	cx::Vector3D append_line(std::vector<cx::Vector3D>* pts, cx::Vector3D a, cx::Vector3D b, double spacing);
+	cx::Vector3D append_pt(std::vector<cx::Vector3D>* pts, cx::Vector3D a);
+	std::vector<cx::Transform3D> generateTransforms();
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestRegistrationV2V );
 

@@ -36,7 +36,7 @@ class ImageMapperMonitor : public QObject
 {
 	Q_OBJECT
 public:
-	ImageMapperMonitor(vtkVolumePtr volume, ssc::ImagePtr image);
+	ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image);
 	~ImageMapperMonitor();
 
 private slots:
@@ -44,7 +44,7 @@ private slots:
 	void cropBoxChangedSlot();
 private:
 	vtkVolumePtr mVolume;
-	ssc::ImagePtr mImage;
+	ImagePtr mImage;
 	std::vector<vtkPlanePtr> mPlanes;
 	vtkVolumeMapperPtr getMapper();
 

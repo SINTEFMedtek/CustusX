@@ -37,7 +37,7 @@
 #include "sscSliceProxy.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 GeometricRep2D::GeometricRep2D(const QString& uid, const QString& name) :
@@ -145,6 +145,6 @@ void GeometricRep2D::transformChangedSlot()
 }
 
 //---------------------------------------------------------
-} // namespace ssc
+} // namespace cx
 //---------------------------------------------------------
 

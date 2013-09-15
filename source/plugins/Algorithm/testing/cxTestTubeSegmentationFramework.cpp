@@ -121,7 +121,7 @@ void TestTubeSegmentationFramework::runFilter(QString preset)
 	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/"+preset+".mhd";
 	cx::patientService()->getPatientData()->newPatient(cx::DataLocations::getTestDataPath()+ "/temp/TubeSegmentationFramework/");
 	QString info;
-	ssc::DataPtr data = cx::patientService()->getPatientData()->importData(filename, info);
+	cx::DataPtr data = cx::patientService()->getPatientData()->importData(filename, info);
 	CPPUNIT_ASSERT(data);
 
 	//set input

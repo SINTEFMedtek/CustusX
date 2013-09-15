@@ -20,7 +20,7 @@
 #include "cxForwardDeclarations.h"
 #include "cxThreadedTimedAlgorithm.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class ReconstructPreprocessor> ReconstructPreprocessorPtr;
 typedef boost::shared_ptr<class ReconstructCore> ReconstructCorePtr;

@@ -14,13 +14,13 @@ namespace cxtest
 void TestGEInterface::setUp()
 {
 //	cx::LogicManager::initialize();
-	ssc::MessageManager::initialize();
+	cx::MessageManager::initialize();
 }
 
 void TestGEInterface::tearDown()
 {
 //	cx::LogicManager::shutdown();
-	ssc::MessageManager::shutdown();
+	cx::MessageManager::shutdown();
 }
 
 void TestGEInterface::testConstructor()
@@ -198,7 +198,7 @@ void TestGEInterface::testGEStreamer()
 	// Time stamp
 	igstk::RealTimeClock::TimeStampType timeStamp = imgExportedStream->GetTimeStamp();
 //	std::cout << "timeStamp : " << timeStamp << std::endl;
-//	CPPUNIT_ASSERT(ssc::similar(timeStamp, 0, 0.5));
+//	CPPUNIT_ASSERT(similar(timeStamp, 0, 0.5));
 	CPPUNIT_ASSERT(timeStamp > 1000000);
 
 

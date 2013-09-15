@@ -25,6 +25,8 @@
 #include "cxDataLocations.h"
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
 #include "cxConfig.h"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
@@ -36,7 +38,12 @@ MultiVolume3DRepProducer::MultiVolume3DRepProducer()
 	mMaxRenderSize = 10 * pow(10.0,6);
 }
 
-void MultiVolume3DRepProducer::setView(ssc::View* view)
+MultiVolume3DRepProducer::~MultiVolume3DRepProducer()
+{
+	this->clearReps();
+}
+
+void MultiVolume3DRepProducer::setView(View* view)
 {
 	if (view==mView)
 		return;
@@ -93,15 +100,20 @@ void MultiVolume3DRepProducer::setVisualizerType(QString type)
 	this->updateRepsInView();
 }
 
-void MultiVolume3DRepProducer::addImage(ssc::ImagePtr image)
+void MultiVolume3DRepProducer::addImage(ImagePtr image)
 {
 	if (image)
 	{
 		connect(image.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(imagesChanged()));
 		connect(image.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(imagesChanged()));
 	}
+	else
+		return;
 
-	mImages.push_back(image);
+	if(this->is2DImage(image))
+		m2DImages.push_back(image);
+	else
+		m3DImages.push_back(image);
 	emit imagesChanged();
 
 	this->updateRepsInView();
@@ -109,27 +121,36 @@ void MultiVolume3DRepProducer::addImage(ssc::ImagePtr image)
 
 void MultiVolume3DRepProducer::removeImage(QString uid)
 {
-	ssc::ImagePtr image;
-	for (unsigned i=0; i<mImages.size(); ++i)
-	{
-		if (mImages[i]->getUid()!=uid)
-			continue;
-		image = mImages[i];
-		mImages.erase(mImages.begin()+i);
-		break;
-	}
+	ImagePtr removedImage;
+	removedImage = this->removeImageFromVector(uid, m2DImages);
+	if(!removedImage)
+		removedImage = this->removeImageFromVector(uid, m3DImages);
 
-	if (image)
+	if (removedImage)
 	{
-		disconnect(image.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(imagesChanged()));
-		disconnect(image.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(imagesChanged()));
+		disconnect(removedImage.get(), SIGNAL(clipPlanesChanged()), this, SIGNAL(imagesChanged()));
+		disconnect(removedImage.get(), SIGNAL(cropBoxChanged()), this, SIGNAL(imagesChanged()));
 	}
 
 	emit imagesChanged();
 	this->updateRepsInView();
 }
 
-std::vector<ssc::RepPtr> MultiVolume3DRepProducer::getAllReps()
+ImagePtr MultiVolume3DRepProducer::removeImageFromVector(QString uid, std::vector<ImagePtr> &images)
+{
+	ImagePtr retval;
+	for (unsigned i=0; i<images.size(); ++i)
+	{
+		if (images[i]->getUid()!=uid)
+			continue;
+		retval = images[i];
+		images.erase(images.begin()+i);
+		break;
+	}
+	return retval;
+}
+
+std::vector<RepPtr> MultiVolume3DRepProducer::getAllReps()
 {
 	return mReps;
 }
@@ -172,13 +193,24 @@ void MultiVolume3DRepProducer::addRepsToView()
 
 void MultiVolume3DRepProducer::rebuildReps()
 {
-	if (mImages.empty())
-		return;
+	if(!m2DImages.empty())
+		this->rebuild2DReps();
+	if(!m3DImages.empty())
+		this->rebuild3DReps();
+}
 
+void MultiVolume3DRepProducer::rebuild2DReps()
+{
+	for (unsigned i=0; i<m2DImages.size(); ++i)
+		this->buildSscImage2DRep3D(m2DImages[i]);
+}
+
+void MultiVolume3DRepProducer::rebuild3DReps()
+{
 	if (this->isSingleVolumeRenderer())
 	{
-		for (unsigned i=0; i<mImages.size(); ++i)
-			this->buildSingleVolumeRenderer(mImages[i]);
+		for (unsigned i=0; i<m3DImages.size(); ++i)
+			this->buildSingleVolumeRenderer(m3DImages[i]);
 	}
 	else if (mVisualizerType=="sscGPURayCastMultiVolume")
 	{
@@ -190,16 +222,16 @@ void MultiVolume3DRepProducer::rebuildReps()
 	}
 	else
 	{
-		ssc::messageManager()->sendError(QString("No visualizer found for string=%1").arg(mVisualizerType));
+		messageManager()->sendError(QString("No visualizer found for string=%1").arg(mVisualizerType));
 	}
 }
 
 void MultiVolume3DRepProducer::buildSscGPURayCastMultiVolume()
 {
 #ifndef CX_WINDOWS
-	ssc::GPURayCastVolumeRepPtr rep = ssc::GPURayCastVolumeRep::New("");
+	GPURayCastVolumeRepPtr rep = GPURayCastVolumeRep::New("");
 	rep->setShaderFolder(DataLocations::getShaderPath());
-	rep->setImages(mImages);
+	rep->setImages(m3DImages);
 	mReps.push_back(rep);
 #endif //WIN32
 }
@@ -208,23 +240,22 @@ void MultiVolume3DRepProducer::buildVtkOpenGLGPUMultiVolumeRayCastMapper()
 {
 #ifdef CX_BUILD_MEHDI_VTKMULTIVOLUME
 	MehdiGPURayCastMultiVolumeRepPtr rep = MehdiGPURayCastMultiVolumeRep::New("");
-	rep->setImages(mImages);
+	rep->setMaxVolumeSize(this->getMaxRenderSize());
+	rep->setImages(m3DImages);
 	mReps.push_back(rep);
 #endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
 }
 
-bool MultiVolume3DRepProducer::is2DImage(ssc::ImagePtr image) const
+bool MultiVolume3DRepProducer::is2DImage(ImagePtr image) const
 {
-	return image->getBaseVtkImageData()->GetDimensions()[2]==1;
+	if(image)
+		return image->getBaseVtkImageData()->GetDimensions()[2]==1;
+	return false;
 }
 
-void MultiVolume3DRepProducer::buildSingleVolumeRenderer(ssc::ImagePtr image)
+void MultiVolume3DRepProducer::buildSingleVolumeRenderer(ImagePtr image)
 {
-	if (this->is2DImage(image))
-	{
-		this->buildSscImage2DRep3D(image);
-	}
-	else if (mVisualizerType=="vtkVolumeTextureMapper3D")
+	if (mVisualizerType=="vtkVolumeTextureMapper3D")
 	{
 		this->buildVtkVolumeTextureMapper3D(image);
 	}
@@ -238,7 +269,7 @@ void MultiVolume3DRepProducer::buildSingleVolumeRenderer(ssc::ImagePtr image)
 	}
 	else
 	{
-		ssc::messageManager()->sendError(QString("No visualizer found for string=%1").arg(mVisualizerType));
+		messageManager()->sendError(QString("No visualizer found for string=%1").arg(mVisualizerType));
 		return;
 	}
 }
@@ -250,16 +281,16 @@ bool MultiVolume3DRepProducer::isSingleVolumeRenderer() const
 	return singleTypes.count(mVisualizerType);
 }
 
-void MultiVolume3DRepProducer::buildSscImage2DRep3D(ssc::ImagePtr image)
+void MultiVolume3DRepProducer::buildSscImage2DRep3D(ImagePtr image)
 {
 	cx::Image2DRep3DPtr rep = cx::Image2DRep3D::New();
 	rep->setImage(image);
 	mReps.push_back(rep);
 }
 
-void MultiVolume3DRepProducer::buildVtkVolumeTextureMapper3D(ssc::ImagePtr image)
+void MultiVolume3DRepProducer::buildVtkVolumeTextureMapper3D(ImagePtr image)
 {
-	ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New();
+	VolumetricRepPtr rep = VolumetricRep::New();
 	rep->setUseVolumeTextureMapper();
 
 	rep->setMaxVolumeSize(this->getMaxRenderSize());
@@ -267,9 +298,9 @@ void MultiVolume3DRepProducer::buildVtkVolumeTextureMapper3D(ssc::ImagePtr image
 	mReps.push_back(rep);
 }
 
-void MultiVolume3DRepProducer::buildVtkGPUVolumeRayCastMapper(ssc::ImagePtr image)
+void MultiVolume3DRepProducer::buildVtkGPUVolumeRayCastMapper(ImagePtr image)
 {
-	ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New();
+	VolumetricRepPtr rep = VolumetricRep::New();
 	rep->setUseGPUVolumeRayCastMapper();
 
 	rep->setMaxVolumeSize(this->getMaxRenderSize());
@@ -277,9 +308,9 @@ void MultiVolume3DRepProducer::buildVtkGPUVolumeRayCastMapper(ssc::ImagePtr imag
 	mReps.push_back(rep);
 }
 
-void MultiVolume3DRepProducer::buildSscProgressiveLODVolumeTextureMapper3D(ssc::ImagePtr image)
+void MultiVolume3DRepProducer::buildSscProgressiveLODVolumeTextureMapper3D(ImagePtr image)
 {
-	ssc::ProgressiveLODVolumetricRepPtr rep = ssc::ProgressiveLODVolumetricRep::New();
+	ProgressiveLODVolumetricRepPtr rep = ProgressiveLODVolumetricRep::New();
 
 	rep->setMaxVolumeSize(this->getMaxRenderSize());
 	rep->setImage(image);

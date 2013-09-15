@@ -30,11 +30,11 @@ namespace cx
  * Useful for displaying widgets for vector components.
  *
  */
-class Vector3DComponentDataAdapter : public ssc::DoubleDataAdapter
+class Vector3DComponentDataAdapter : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
-  Vector3DComponentDataAdapter(ssc::Vector3DDataAdapterPtr base, int index, QString name, QString help);
+  Vector3DComponentDataAdapter(Vector3DDataAdapterPtr base, int index, QString name, QString help);
   virtual ~Vector3DComponentDataAdapter() {}
 
 public: // basic methods
@@ -44,12 +44,12 @@ public: // basic methods
 
 public: // optional methods
   virtual QString getHelp() const;
-  virtual ssc::DoubleRange getValueRange() const;
+  virtual DoubleRange getValueRange() const;
   virtual double convertInternal2Display(double internal);
   virtual double convertDisplay2Internal(double display);
   virtual int getValueDecimals() const;
 
-  ssc::Vector3DDataAdapterPtr mBase;
+  Vector3DDataAdapterPtr mBase;
   int mIndex;
   QString mName;
   QString mHelp;

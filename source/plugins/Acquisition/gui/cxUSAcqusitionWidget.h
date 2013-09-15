@@ -4,7 +4,7 @@
 #include "cxRecordBaseWidget.h"
 #include "cxUSAcquisition.h"
 
-namespace ssc
+namespace cx
 {
 	typedef boost::shared_ptr<class ThreadedTimedReconstructer> ThreadedTimedReconstructerPtr;
 }

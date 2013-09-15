@@ -43,7 +43,7 @@
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 typedef vtkSmartPointer<class vtkImageShiftScale> vtkImageShiftScalePtr;
 
-namespace ssc
+namespace cx
 {
 
 ImagePtr UnsignedDerivedImage::create(ImagePtr base)
@@ -90,8 +90,8 @@ void UnsignedDerivedImage::unsignedTransferFunctionsChangedSlot()
 
     int shift = this->findShift();
 
-	ssc::ImageTF3DPtr TF3D = base->getTransferFunctions3D()->createCopy(base->getBaseVtkImageData());
-	ssc::ImageLUT2DPtr LUT2D = base->getLookupTable2D()->createCopy(base->getBaseVtkImageData());
+	ImageTF3DPtr TF3D = base->getTransferFunctions3D()->createCopy(base->getBaseVtkImageData());
+	ImageLUT2DPtr LUT2D = base->getLookupTable2D()->createCopy(base->getBaseVtkImageData());
 	TF3D->shift(shift);
 	LUT2D->shift(shift);
 	this->setLookupTable2D(LUT2D);
@@ -153,7 +153,7 @@ vtkImageDataPtr UnsignedDerivedImage::convertImage()
 
     cast->Update();
 //		if (verbose)
-      ssc::messageManager()->sendInfo(QString("Converting image %1 from %2 to %3").arg(this->getName()).arg(input->GetScalarTypeAsString()).arg(cast->GetOutput()->GetScalarTypeAsString()));
+      messageManager()->sendInfo(QString("Converting image %1 from %2 to %3").arg(this->getName()).arg(input->GetScalarTypeAsString()).arg(cast->GetOutput()->GetScalarTypeAsString()));
     retval = cast->GetOutput();
     return retval;
 }

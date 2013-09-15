@@ -71,7 +71,7 @@ void TestUSReconstructionFileIO::assertValidFolderForSession(QString path, QStri
 void TestUSReconstructionFileIO::testCreateEmptyUSReconstructInputData()
 {
 	ReconstructionData input = this->createEmptyReconstructData();
-	ssc::USReconstructInputData output = this->createUSReconstructData(input);
+	cx::USReconstructInputData output = this->createUSReconstructData(input);
 
 	CPPUNIT_ASSERT(output.mFrames.empty());
 	CPPUNIT_ASSERT(output.mPositions.empty());
@@ -81,7 +81,7 @@ void TestUSReconstructionFileIO::testCreateEmptyUSReconstructInputData()
 void TestUSReconstructionFileIO::testCreateSampleUSReconstructInputData()
 {
 	ReconstructionData input = this->createSampleReconstructData();
-	ssc::USReconstructInputData output = this->createUSReconstructData(input);
+	cx::USReconstructInputData output = this->createUSReconstructData(input);
 
 	CPPUNIT_ASSERT(output.mFrames.size() == input.imageTimestamps.size());
 	CPPUNIT_ASSERT(output.mPositions.size() == input.trackerData.size());
@@ -93,7 +93,7 @@ void TestUSReconstructionFileIO::testSaveAndLoadUSReconstructInputData()
 	ReconstructionData input = this->createSampleReconstructData();
 
 	QString filename = this->write(input);
-	ssc::USReconstructInputData hasBeenRead = this->read(filename);
+	cx::USReconstructInputData hasBeenRead = this->read(filename);
 
 	this->assertCorrespondence(input, hasBeenRead);
 }
@@ -101,7 +101,7 @@ void TestUSReconstructionFileIO::testSaveAndLoadUSReconstructInputData()
 QString TestUSReconstructionFileIO::write(ReconstructionData input)
 {
 	QString path = cx::UsReconstructionFileMaker::createFolder(this->getDataPath(), input.sessionName);
-	ssc::USReconstructInputData toBeWritten = this->createUSReconstructData(input);
+	cx::USReconstructInputData toBeWritten = this->createUSReconstructData(input);
 
 	cx::UsReconstructionFileMakerPtr fileMaker(new cx::UsReconstructionFileMaker(input.sessionName));
 	fileMaker->setReconstructData(toBeWritten);
@@ -110,14 +110,14 @@ QString TestUSReconstructionFileIO::write(ReconstructionData input)
 	return fileMaker->getReconstructData().mFilename;
 }
 
-ssc::USReconstructInputData TestUSReconstructionFileIO::read(QString filename)
+cx::USReconstructInputData TestUSReconstructionFileIO::read(QString filename)
 {
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
-	ssc::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
+	cx::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
 	return hasBeenRead;
 }
 
-void TestUSReconstructionFileIO::assertCorrespondence(ReconstructionData input, ssc::USReconstructInputData output)
+void TestUSReconstructionFileIO::assertCorrespondence(ReconstructionData input, cx::USReconstructInputData output)
 {
 	CPPUNIT_ASSERT( !output.mFilename.isEmpty() );
 	CPPUNIT_ASSERT( output.mFrames.size() == input.imageTimestamps.size() );
@@ -142,20 +142,20 @@ TestUSReconstructionFileIO::ReconstructionData TestUSReconstructionFileIO::creat
 	ReconstructionData retval;
 	retval.sessionName = "test_session";
 
-	retval.rMpr = ssc::createTransformTranslate(ssc::Vector3D(0,0,2));
+	retval.rMpr = cx::createTransformTranslate(cx::Vector3D(0,0,2));
 
 	// add tracking positions spaced 1 seconds apart
 	for (unsigned i=0; i<100; ++i)
-		retval.trackerData[i] = ssc::createTransformTranslate(ssc::Vector3D(i,0,0));
+		retval.trackerData[i] = cx::createTransformTranslate(cx::Vector3D(i,0,0));
 	retval.writeColor = true;
 	Eigen::Array2i frameSize(100, 50);
-	ssc::ProbeData probeData = ssc::DummyToolTestUtilities::createProbeDataLinear(10, 5, frameSize);
-	ssc::DummyToolPtr tool = ssc::DummyToolTestUtilities::createDummyTool(probeData);
+	cx::ProbeData probeData = cx::DummyToolTestUtilities::createProbeDataLinear(10, 5, frameSize);
+	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(probeData);
 	retval.tool = tool;
 
 	// add frames spaced 2 seconds apart
 	unsigned framesCount = 10;
-	vtkImageDataPtr imageData = ssc::generateVtkImageData(
+	vtkImageDataPtr imageData = cx::generateVtkImageData(
 	            Eigen::Array3i(frameSize[0], frameSize[1], framesCount),
 	            probeData.getImage().mSpacing,
 	            0);
@@ -166,12 +166,12 @@ TestUSReconstructionFileIO::ReconstructionData TestUSReconstructionFileIO::creat
 	return retval;
 }
 
-ssc::USReconstructInputData TestUSReconstructionFileIO::createUSReconstructData(ReconstructionData input)
+cx::USReconstructInputData TestUSReconstructionFileIO::createUSReconstructData(ReconstructionData input)
 {
 	cx::UsReconstructionFileMakerPtr fileMaker;
 	fileMaker.reset(new cx::UsReconstructionFileMaker(input.sessionName));
 
-	ssc::USReconstructInputData reconstructData;
+	cx::USReconstructInputData reconstructData;
 	reconstructData = fileMaker->getReconstructData(input.imageData, input.imageTimestamps, input.trackerData, input.tool, input.writeColor, input.rMpr);
 	return reconstructData;
 }
