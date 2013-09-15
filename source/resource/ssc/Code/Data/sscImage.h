@@ -37,7 +37,7 @@ class QDomDocument;
 
 //#define USE_TRANSFORM_RESCLICER
 
-namespace ssc
+namespace cx
 {
 
 /**\brief A volumetric data set.
@@ -197,6 +197,6 @@ private:
 	ImageLUT2DPtr mImageLookupTable2D;
 };
 
-} // end namespace ssc
+} // end namespace cx
 
 #endif /*SSCIMAGE_H_*/

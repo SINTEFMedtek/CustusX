@@ -31,7 +31,7 @@
 #include <QStringList>
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 /** Make sure one given option exists witin root.
@@ -83,7 +83,7 @@ Vector3D Vector3DDataAdapterXml::getValue() const
 
 bool Vector3DDataAdapterXml::setValue(const Vector3D& val)
 {
-	if (ssc::similar(val, mValue))
+	if (similar(val, mValue))
 		return false;
 
 	//	std::cout << "set val " << "  " << val << "  , org=" << mValue << std::endl;
@@ -113,4 +113,4 @@ int Vector3DDataAdapterXml::getValueDecimals() const
 	return mDecimals;
 }
 
-} // namespace ssc
+} // namespace cx

@@ -30,7 +30,7 @@ ToolMetricRepPtr ToolMetricRep::New(const QString& uid, const QString& name)
 ToolMetricRep::ToolMetricRep(const QString& uid, const QString& name) :
 				DataMetricRep(uid, name)
 {
-	mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&ToolMetricRep::rescale, this));
 }
 
@@ -43,13 +43,13 @@ void ToolMetricRep::clear()
 	DataMetricRep::clear();
 }
 
-void ToolMetricRep::addRepActorsToViewRenderer(ssc::View *view)
+void ToolMetricRep::addRepActorsToViewRenderer(View *view)
 {
 	mViewportListener->startListen(view->getRenderer());
 	DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
-void ToolMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
+void ToolMetricRep::removeRepActorsFromViewRenderer(View *view)
 {
 	DataMetricRep::removeRepActorsFromViewRenderer(view);
 	mViewportListener->stopListen();
@@ -69,9 +69,9 @@ void ToolMetricRep::changedSlot()
 
 	if (!mAxes || !mToolTip || !mToolOffset)
 	{
-		mAxes.reset(new ssc::GraphicalAxes3D());
-		mToolTip.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
-		mToolOffset.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
+		mAxes.reset(new GraphicalAxes3D());
+		mToolTip.reset(new GraphicalPoint3D(mView->getRenderer()));
+		mToolOffset.reset(new GraphicalLine3D(mView->getRenderer()));
 	}
 
 	mAxes->setFontSize(0.04);
@@ -80,9 +80,9 @@ void ToolMetricRep::changedSlot()
 	mAxes->setShowAxesLabels(false);
 	mAxes->setRenderer(mView->getRenderer());
 
-	ssc::Vector3D p0_r = mMetric->getRefCoord();
-	ssc::Transform3D rMt = metric->getRefFrame();
-	ssc::Vector3D toolTip_r = rMt.coord(ssc::Vector3D(0,0,-metric->getToolOffset()));
+	Vector3D p0_r = mMetric->getRefCoord();
+	Transform3D rMt = metric->getRefFrame();
+	Vector3D toolTip_r = rMt.coord(Vector3D(0,0,-metric->getToolOffset()));
 
 	mToolTip->setValue(toolTip_r);
 	mToolTip->setColor(mColor);
@@ -106,4 +106,4 @@ void ToolMetricRep::rescale()
 }
 
 
-} // namespace ssc
+} // namespace cx

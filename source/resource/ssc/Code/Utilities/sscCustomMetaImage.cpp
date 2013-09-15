@@ -14,7 +14,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 CustomMetaImage::CustomMetaImage(QString filename) :

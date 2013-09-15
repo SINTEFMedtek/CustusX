@@ -36,7 +36,7 @@ UsReconstructionFileMaker::~UsReconstructionFileMaker()
 {
 }
 
-ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
+USReconstructInputData UsReconstructionFileMaker::getReconstructData()
 {
 	return mReconstructData;
 }
@@ -45,24 +45,24 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData()
  * if written from this object.
  *
  */
-ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataContainerPtr imageData,
+USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataContainerPtr imageData,
                                                                           std::vector<double> imageTimestamps,
-                                                                          ssc::TimedTransformMap trackerRecordedData,
-                                                                          ssc::ToolPtr tool,
-                                                                          bool writeColor, ssc::Transform3D rMpr)
+                                                                          TimedTransformMap trackerRecordedData,
+                                                                          ToolPtr tool,
+                                                                          bool writeColor, Transform3D rMpr)
 {
 	if(trackerRecordedData.empty())
-		ssc::messageManager()->sendWarning("No tracking data for writing to reconstruction file.");
+		messageManager()->sendWarning("No tracking data for writing to reconstruction file.");
 
-	ssc::USReconstructInputData retval;
+	USReconstructInputData retval;
 
 	retval.mFilename = mSessionDescription; // not saved yet - no filename
-	retval.mUsRaw = ssc::USFrameData::create(mSessionDescription, imageData);
+	retval.mUsRaw = USFrameData::create(mSessionDescription, imageData);
 	retval.rMpr = rMpr;
 
-	for (ssc::TimedTransformMap::iterator it = trackerRecordedData.begin(); it != trackerRecordedData.end(); ++it)
+	for (TimedTransformMap::iterator it = trackerRecordedData.begin(); it != trackerRecordedData.end(); ++it)
 	{
-		ssc::TimedPosition current;
+		TimedPosition current;
 		current.mTime = it->first;
 		current.mPos = it->second;
 		retval.mPositions.push_back(current);
@@ -71,9 +71,9 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageD
 	std::vector<double> fts = imageTimestamps;
 	for (unsigned i=0; i<fts.size(); ++i)
 	{
-		ssc::TimedPosition current;
+		TimedPosition current;
 		current.mTime = fts[i];
-		current.mPos = ssc::Transform3D::Identity();
+		current.mPos = Transform3D::Identity();
 		// current.mPos = not written - will be found from track positions during reconstruction.
 		retval.mFrames.push_back(current);
 	}
@@ -86,7 +86,7 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageD
 	vtkImageDataPtr mask = retval.mProbeData.getMask();
 	if (mask)
 	{
-		retval.mMask = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
+		retval.mMask = ImagePtr(new Image("mask", mask, "mask")) ;
 	}
 	if (tool)
 		retval.mProbeUid = tool->getUid();
@@ -100,20 +100,20 @@ ssc::USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageD
   * position format from prMt to rMu. This makes is possible to use the frames
   * externally.
   */
-void UsReconstructionFileMaker::fillFramePositions(ssc::USReconstructInputData* data) const
+void UsReconstructionFileMaker::fillFramePositions(USReconstructInputData* data) const
 {
 	cx::USReconstructInputDataAlgorithm::interpolateFramePositionsFromTracking(data);
 	cx::USReconstructInputDataAlgorithm::transformFramePositionsTo_rMu(data);
 }
 
-bool UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+bool UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts)
 {
 	bool success = false;
 
 	QFile file(reconstructionFolder+"/"+session+".tts");
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
-		ssc::messageManager()->sendError("Cannot open "+file.fileName());
+		messageManager()->sendError("Cannot open "+file.fileName());
 		return success;
 	}
 	QTextStream stream(&file);
@@ -133,30 +133,30 @@ bool UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFol
 	return success;
 }
 
-bool UsReconstructionFileMaker::writeUSTransforms(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+bool UsReconstructionFileMaker::writeUSTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts)
 {
 	return this->writeTransforms(reconstructionFolder+"/"+session+".fp", ts, "frame transforms rMu");
 }
 
-bool UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+bool UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts)
 {
 	return this->writeTransforms(reconstructionFolder+"/"+session+".tp", ts, "tracking transforms prMt");
 }
 
-bool UsReconstructionFileMaker::writeTransforms(QString filename, std::vector<ssc::TimedPosition> ts, QString type)
+bool UsReconstructionFileMaker::writeTransforms(QString filename, std::vector<TimedPosition> ts, QString type)
 {
 	bool success = false;
 	QFile file(filename);
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
-		ssc::messageManager()->sendError("Cannot open "+file.fileName());
+		messageManager()->sendError("Cannot open "+file.fileName());
 		return success;
 	}
 	QTextStream stream(&file);
 
 	for (unsigned i=0; i<ts.size(); ++i)
 	{
-		ssc::Transform3D transform = ts[i].mPos;
+		Transform3D transform = ts[i].mPos;
 		stream << transform(0,0) << " ";
 		stream << transform(0,1) << " ";
 		stream << transform(0,2) << " ";
@@ -182,14 +182,14 @@ bool UsReconstructionFileMaker::writeTransforms(QString filename, std::vector<ss
 	return success;
 }
 
-bool UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder, QString session, std::vector<ssc::TimedPosition> ts)
+bool UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts)
 {
 	bool success = false;
 
 	QFile file(reconstructionFolder+"/"+session+".fts");
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
-		ssc::messageManager()->sendError("Cannot open "+file.fileName());
+		messageManager()->sendError("Cannot open "+file.fileName());
 		return success;
 	}
 	QTextStream stream(&file);
@@ -211,9 +211,9 @@ bool UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder, 
 /**
  * Write probe configuration to file. This works even for configs not saved to the ProbeCalibConfigs.xml file.
  */
-void UsReconstructionFileMaker::writeProbeConfiguration(QString reconstructionFolder, QString session, ssc::ProbeData data, QString uid)
+void UsReconstructionFileMaker::writeProbeConfiguration(QString reconstructionFolder, QString session, ProbeData data, QString uid)
 {
-	ssc::XmlOptionFile file = ssc::XmlOptionFile(reconstructionFolder + "/" + session + ".probedata.xml", "navnet");
+	XmlOptionFile file = XmlOptionFile(reconstructionFolder + "/" + session + ".probedata.xml", "navnet");
 	data.addXml(file.getElement("configuration"));
 	file.getElement("tool").toElement().setAttribute("toolID", uid);
 	file.save();
@@ -267,11 +267,11 @@ void UsReconstructionFileMaker::report()
 {
 	foreach(QString string, mReport)
 	{
-		ssc::messageManager()->sendSuccess(string);
+		messageManager()->sendSuccess(string);
 	}
 }
 
-void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<ssc::TimedPosition> pos)
+void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<TimedPosition> pos)
 {
 	SSC_ASSERT(images->size()==pos.size());
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
@@ -285,23 +285,23 @@ void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPt
 		writer->SetFileName(cstring_cast(filename));
 		writer->SetCompression(compression);
 		{
-			ssc::StaticMutexVtkLocker lock;
+			StaticMutexVtkLocker lock;
 			writer->Write();
 		}
 
-		ssc::CustomMetaImagePtr customReader = ssc::CustomMetaImage::create(filename);
+		CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
 		customReader->setTransform(pos[i].mPos);
 		customReader->setModality("US");
 		customReader->setImageType(mSessionDescription);
 	}
 }
 
-void UsReconstructionFileMaker::writeMask(QString path, QString session, ssc::ImagePtr mask)
+void UsReconstructionFileMaker::writeMask(QString path, QString session, ImagePtr mask)
 {
 	QString filename = QString("%1/%2.mask.mhd").arg(path).arg(session);
 	if (!mask)
 	{
-		ssc::messageManager()->sendWarning(QString("No mask found, ignoring write to %1").arg(filename));
+		messageManager()->sendWarning(QString("No mask found, ignoring write to %1").arg(filename));
 		return;
 	}
 
@@ -408,7 +408,7 @@ void UsReconstructionFileMaker::writeREADMEFile(QString reconstructionFolder, QS
 	QFile file(reconstructionFolder+"/"+session+".README.txt");
 	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 	{
-		ssc::messageManager()->sendError("Cannot open "+file.fileName());
+		messageManager()->sendError("Cannot open "+file.fileName());
 		return;
 	}
 	QTextStream stream(&file);
@@ -418,7 +418,7 @@ void UsReconstructionFileMaker::writeREADMEFile(QString reconstructionFolder, QS
 
 QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compression)
 {
-	ssc::TimeKeeper timer;
+	TimeKeeper timer;
 	mReconstructData.mFilename = path+"/"+mSessionDescription+".fts"; // use fts since this is a single unique file.
 
 	mReport.clear();

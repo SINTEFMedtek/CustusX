@@ -10,7 +10,7 @@
 
 #include "cxPluginBase.h"
 
-namespace ssc
+namespace cx
 {
 	typedef boost::shared_ptr<class ReconstructManager> ReconstructManagerPtr;
 }
@@ -40,11 +40,11 @@ public:
 	UsReconstructionPlugin();
 	virtual ~UsReconstructionPlugin();
 
-  ssc::ReconstructManagerPtr getReconstructer() { return mReconstructer; }
+  ReconstructManagerPtr getReconstructer() { return mReconstructer; }
   std::vector<PluginWidget> createWidgets() const;
 
 private:
-  ssc::ReconstructManagerPtr mReconstructer;
+  ReconstructManagerPtr mReconstructer;
 
 private slots:
 	void patientChangedSlot();

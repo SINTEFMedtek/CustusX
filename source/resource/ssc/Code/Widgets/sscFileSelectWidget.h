@@ -34,7 +34,7 @@ class QComboBox;
 class QToolButton;
 class QAction;
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Widget for displaying and selecting a single file.

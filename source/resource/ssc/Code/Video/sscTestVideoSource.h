@@ -33,12 +33,12 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 class QTimer;
 
-namespace ssc
+namespace cx
 {
 
 /**\brief test video source generator
  *
- * This class implements the ssc::VideoSource interface and generates
+ * This class implements the VideoSource interface and generates
  * a moving test pattern. The color change front moves diagonally from
  * lower right to upper left corner. There are vertical black lines
  * every 10mm
@@ -92,6 +92,6 @@ private:
 };
 typedef boost::shared_ptr<TestVideoSource> TestVideoSourcePtr;
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCTESTVIDEOSOURCE_H_ */

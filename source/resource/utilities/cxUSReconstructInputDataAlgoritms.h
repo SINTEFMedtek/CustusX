@@ -25,7 +25,7 @@ namespace cx
  * \{
  */
 
-/** Collection of operations on ssc::USReconstructInputData
+/** Collection of operations on USReconstructInputData
   *
   * \date Mar 07, 2013
   * \author Christian Askeland, SINTEF
@@ -36,12 +36,12 @@ struct USReconstructInputDataAlgorithm
      * Pre:  mPos is prMt
      * Post: mPos is prMu
      */
-    static void transformTrackingPositionsTo_prMu(ssc::USReconstructInputData* data);
+    static void transformTrackingPositionsTo_prMu(USReconstructInputData* data);
 	/**
      * Pre:  mFrames is prMt
      * Post: mFrames is rMu
      */
-    static void transformFramePositionsTo_rMu(ssc::USReconstructInputData* data);
+    static void transformFramePositionsTo_rMu(USReconstructInputData* data);
 
     /** Find frame positions based on the existing tool positions and timestamps for both
       * tools and frames.
@@ -49,19 +49,19 @@ struct USReconstructInputDataAlgorithm
       * temporal distance from the frame to the two neighbouring tool positions.
       *
       */
-    static std::vector<double> interpolateFramePositionsFromTracking(ssc::USReconstructInputData *data);
+    static std::vector<double> interpolateFramePositionsFromTracking(USReconstructInputData *data);
     /**
      * Interpolation between a and b
      * Spherical interpolation of the rotation, and linear interpolation of the position.
      * Uses Quaternion Slerp, so the rotational part of the matrix have to be converted to
      * Quaternion before the interpolation (and back again afterwards).
      */
-    static ssc::Transform3D slerpInterpolate(const ssc::Transform3D& a, const ssc::Transform3D& b, double t);
+    static Transform3D slerpInterpolate(const Transform3D& a, const Transform3D& b, double t);
 
     /**
      * Linear interpolation between a and b. t = 1 means use only b;
      */
-    ssc::Transform3D interpolate(const ssc::Transform3D& a, const ssc::Transform3D& b, double t);
+    Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
 
 };
 

@@ -70,9 +70,9 @@ QString BinaryThinningImageFilter3DFilter::getHelp() const
 	        "</p></html>";
 }
 
-ssc::ColorDataAdapterPtr BinaryThinningImageFilter3DFilter::getColorOption(QDomElement root)
+ColorDataAdapterPtr BinaryThinningImageFilter3DFilter::getColorOption(QDomElement root)
 {
-	return ssc::ColorDataAdapterXml::initialize("Color", "",
+	return ColorDataAdapterXml::initialize("Color", "",
 	                                            "Color of output model.",
 	                                            QColor("green"), root);
 }
@@ -109,13 +109,13 @@ bool BinaryThinningImageFilter3DFilter::preProcess()
 	if (!retval)
 		return false;
 
-	ssc::ImagePtr input = this->getCopiedInputImage();
+	ImagePtr input = this->getCopiedInputImage();
 	if (!input)
 		return false;
 
 	if (input->getMax() != 1 || input->getMin() != 0)
 	{
-		ssc::messageManager()->sendWarning(QString("Centerline: Input image %1 must be binary, aborting.").arg(input->getName()));
+		messageManager()->sendWarning(QString("Centerline: Input image %1 must be binary, aborting.").arg(input->getName()));
 		return false;
 	}
 
@@ -124,7 +124,7 @@ bool BinaryThinningImageFilter3DFilter::preProcess()
 
 bool BinaryThinningImageFilter3DFilter::execute()
 {
-	ssc::ImagePtr input = this->getCopiedInputImage();
+	ImagePtr input = this->getCopiedInputImage();
 	if (!input)
 		return false;
 
@@ -133,7 +133,7 @@ bool BinaryThinningImageFilter3DFilter::execute()
 		return false;
 	}
 
-	//      ssc::messageManager()->sendInfo(QString("Creating centerline from \"%1\"...").arg(input->getName()));
+	//      messageManager()->sendInfo(QString("Creating centerline from \"%1\"...").arg(input->getName()));
 
 	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
 
@@ -162,24 +162,24 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 	if(!mRawResult)
 		return success;
 
-	ssc::ColorDataAdapterPtr outputColor = this->getColorOption(mCopiedOptions);
+	ColorDataAdapterPtr outputColor = this->getColorOption(mCopiedOptions);
 
-	ssc::ImagePtr input = this->getCopiedInputImage();
+	ImagePtr input = this->getCopiedInputImage();
 
-	ssc::ImagePtr outImage = ssc::dataManager()->createDerivedImage(mRawResult,input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1", input);
+	ImagePtr outImage = dataManager()->createDerivedImage(mRawResult,input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1", input);
 	mRawResult = NULL;
 	outImage->resetTransferFunctions();
 
 	//automatically generate a mesh from the centerline
-	vtkPolyDataPtr centerlinePolyData = ssc::SeansVesselReg::extractPolyData(outImage, 1, 0);
+	vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(outImage, 1, 0);
 
 	QString uid = input->getUid() + "_cl%1";
 	QString name = input->getName()+" cl%1";
-	ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
+	MeshPtr mesh = dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
 	mesh->setColor(outputColor->getValue());
 	mesh->get_rMd_History()->setParentSpace(input->getUid());
-	ssc::dataManager()->loadData(mesh);
-	ssc::dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
+	dataManager()->loadData(mesh);
+	dataManager()->saveMesh(mesh, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(mesh->getUid());

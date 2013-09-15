@@ -32,11 +32,11 @@ private slots:
  * \date Mar 4, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class Audio : public ssc::Audio
+class AudioImpl : public Audio
 {
 public:
-  Audio();
-  virtual ~Audio();
+  AudioImpl();
+  virtual ~AudioImpl();
 
   virtual void playStartSound();
   virtual void playStopSound();

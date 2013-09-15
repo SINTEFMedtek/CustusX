@@ -29,7 +29,7 @@
 
 #include <QFrame>
 
-namespace ssc
+namespace cx
 {
 
 /**

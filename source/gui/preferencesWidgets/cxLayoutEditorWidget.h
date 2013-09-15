@@ -86,16 +86,16 @@ private:
 
   std::vector<std::vector<GridElement> > mViewDataCache; ///< 10x10 grid of all available views
   LayoutData mViewData; ///< RxC grid of currently used views.
-  std::map<ssc::PLANE_TYPE, QString> mPlaneNames; ///< names of planes for use in gui
+  std::map<PLANE_TYPE, QString> mPlaneNames; ///< names of planes for use in gui
   QPoint mClickPos;
   LayoutRegion mSelection;
 
   struct ViewNamesType
   {
     ViewNamesType() {}
-    ViewNamesType(ssc::PLANE_TYPE plane, ssc::View::Type view, QString name) : mPlane(plane), mView(view), mName(name) {}
-    ssc::PLANE_TYPE mPlane;
-    ssc::View::Type mView;
+    ViewNamesType(PLANE_TYPE plane, View::Type view, QString name) : mPlane(plane), mView(view), mName(name) {}
+    PLANE_TYPE mPlane;
+    View::Type mView;
     QString mName;
   };
   std::vector<ViewNamesType> mViewNames;

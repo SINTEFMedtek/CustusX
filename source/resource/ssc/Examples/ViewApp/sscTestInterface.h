@@ -20,7 +20,7 @@ class QAction;
 class vtkObject;
 class vtkCallbackCommand;
 
-namespace ssc
+namespace cx
 {
 class View;
 class ToolManager;
@@ -64,6 +64,6 @@ private:
 	VolumetricRepPtr mCurrentRep;
 	ViewWidget *mCurrentView;
 };
-}//namespace ssc
+}//namespace cx
 
 #endif /* SSCTESTINTERFACE_H_ */

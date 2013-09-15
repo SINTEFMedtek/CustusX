@@ -33,7 +33,7 @@
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
-namespace ssc
+namespace cx
 {
 
 /**\brief video source interface.
@@ -78,6 +78,6 @@ signals:
 };
 typedef boost::shared_ptr<VideoSource> VideoSourcePtr;
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCVIDEOSOURCE_H_ */

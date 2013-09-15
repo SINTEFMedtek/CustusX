@@ -32,7 +32,7 @@
 #include "sscDefinitions.h"
 #include "sscForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 // forward declarations
 typedef boost::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
@@ -187,6 +187,6 @@ private:
 
 DataManager* dataManager();
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCDATAMANAGER_H_*/

@@ -1,6 +1,6 @@
 #include "sscIndent.h"
 
-namespace ssc
+namespace cx
 {
 
 Indent::Indent() : mDetail(dNORMAL), mIndent(0) {}

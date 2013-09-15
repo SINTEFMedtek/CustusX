@@ -27,7 +27,7 @@
 #include "sscTransform3D.h"
 #include "sscIndent.h"
 
-namespace ssc
+namespace cx
 {
 class SliceComputer;
 // forward declarations
@@ -83,7 +83,7 @@ public:
 	void setUseTooltipOffset(bool);
 
 #ifdef WIN32
-	typedef ssc::Transform3D Transform3D; 
+	typedef Transform3D Transform3D; 
 #endif
 
 signals:

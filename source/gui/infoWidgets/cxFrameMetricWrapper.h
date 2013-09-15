@@ -35,7 +35,7 @@ public:
   virtual ~FrameMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual QString getValue() const;
-  virtual ssc::DataPtr getData() const;
+  virtual DataPtr getData() const;
   virtual QString getArguments() const;
   virtual QString getType() const;
 private slots:
@@ -45,7 +45,7 @@ private slots:
   void frameWidgetChangedSlot();
 private:
   cx::FrameMetricPtr mData;
-  ssc::StringDataAdapterXmlPtr mSpaceSelector;
+  StringDataAdapterXmlPtr mSpaceSelector;
   bool mInternalUpdate;
   Transform3DWidget* mFrameWidget;
 };

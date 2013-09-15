@@ -47,7 +47,7 @@ class USAcquisitionVideoPlayback : public QObject
 public:
 	USAcquisitionVideoPlayback();
 	virtual ~USAcquisitionVideoPlayback();
-	ssc::VideoSourcePtr getVideoSource();
+	VideoSourcePtr getVideoSource();
 	void setRoot(const QString path);
 	void setTime(PlaybackTimePtr controller);
 	bool isActive() const;
@@ -63,17 +63,17 @@ private:
 	QStringList getAllFiles(QString folder);
 	QString mRoot;
 	PlaybackTimePtr mTimer;
-//	ssc::ImageImportVideoSourcePtr mVideoSource;
+//	ImageImportVideoSourcePtr mVideoSource;
 	BasicVideoSourcePtr mVideoSource;
 	std::vector<TimelineEvent> mEvents;
 	const QString mVideoSourceUid;
 
-	ssc::USReconstructInputData mCurrentData;
+	USReconstructInputData mCurrentData;
 	std::vector<double> mCurrentTimestamps; // copy of time frame timestamps from mCurrentData.
 
 	UsReconstructionFileReaderPtr mUSImageDataReader;
-	QFuture<ssc::USReconstructInputData> mUSImageDataFutureResult;
-	QFutureWatcher<ssc::USReconstructInputData> mUSImageDataFutureWatcher;
+	QFuture<USReconstructInputData> mUSImageDataFutureResult;
+	QFutureWatcher<USReconstructInputData> mUSImageDataFutureWatcher;
 
 };
 typedef boost::shared_ptr<USAcquisitionVideoPlayback> USAcquisitionVideoPlaybackPtr;

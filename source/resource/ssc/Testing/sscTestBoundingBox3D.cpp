@@ -20,7 +20,7 @@
 #include "sscTransform3D.h"
 #include "sscTypeConversions.h"
 
-using namespace ssc;
+using namespace cx;
 
 void TestBoundingBox3D::testCreate()
 {

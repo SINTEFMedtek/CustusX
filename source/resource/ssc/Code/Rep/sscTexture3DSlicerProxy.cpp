@@ -46,7 +46,7 @@
 #include <vtkOpenGLRenderWindow.h>
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 //---------------------------------------------------------
 
@@ -208,9 +208,9 @@ void Texture3DSlicerProxyImpl::createGeometryPlane( Vector3D point1_s,  Vector3D
 	}
 }
 
-void Texture3DSlicerProxyImpl::setImages(std::vector<ssc::ImagePtr> images_raw)
+void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 {
-	std::vector<ssc::ImagePtr> images(images_raw.size());
+	std::vector<ImagePtr> images(images_raw.size());
 	for (unsigned i=0; i<images.size(); ++i)
 	{
 		images[i] = images_raw[i]->getUnsigned(images_raw[i]);
@@ -238,7 +238,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ssc::ImagePtr> images_raw)
 	{
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();//
 
-		ssc::GPUImageDataBufferPtr dataBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
+		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
 			inputImage);
 
 		mPainter->SetVolumeBuffer(i, dataBuffer);
@@ -259,7 +259,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ssc::ImagePtr> images_raw)
 }
 
 
-void Texture3DSlicerProxyImpl::setSliceProxy(ssc::SliceProxyPtr slicer)
+void Texture3DSlicerProxyImpl::setSliceProxy(SliceProxyPtr slicer)
 {
 	if (mSliceProxy)
 		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
@@ -274,9 +274,9 @@ void Texture3DSlicerProxyImpl::setSliceProxy(ssc::SliceProxyPtr slicer)
 	}
 }
 
-//void Texture3DSlicerProxyImpl::addRepActorsToViewRenderer(ssc::View* view)
+//void Texture3DSlicerProxyImpl::addRepActorsToViewRenderer(View* view)
 //{
-////  std::cout << "void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View* view)" << std::endl;
+////  std::cout << "void Texture3DSlicerRep::addRepActorsToViewRenderer(View* view)" << std::endl;
 //    view->getRenderer()->AddActor(mActor);
 //    mView = view;
 //    connect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
@@ -352,14 +352,14 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	mPolyData->Modified();
 }
 
-//void Texture3DSlicerProxyImpl::removeRepActorsFromViewRenderer(ssc::View* view)
+//void Texture3DSlicerProxyImpl::removeRepActorsFromViewRenderer(View* view)
 //{
 //	view->getRenderer()->RemoveActor(mActor);
 //	disconnect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
 //	mView = NULL;
 //}
 
-//void Texture3DSlicerProxyImpl::printSelf(std::ostream & os, ssc::Indent indent)
+//void Texture3DSlicerProxyImpl::printSelf(std::ostream & os, Indent indent)
 //{
 //    //mImageSlicer->printSelf(os, indent);
 //}
@@ -371,7 +371,7 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData() ;
 
 		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getBaseLookupTable();
-		ssc::GPUImageLutBufferPtr lutBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
+		GPUImageLutBufferPtr lutBuffer = GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
 
 		// no lut indicates to the fragment shader that RGBA should be used
 		if (inputImage->GetNumberOfScalarComponents()==1)

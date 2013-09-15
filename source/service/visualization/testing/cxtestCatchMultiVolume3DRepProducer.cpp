@@ -51,7 +51,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 1 rep using vtkVolumeTextureMapper3D 
 
 	REQUIRE(fixture.mBase.getAllReps().size() == 1);
 
-	ssc::VolumetricRepPtr rep = fixture.downcastRep<ssc::VolumetricRep>(0);
+	cx::VolumetricRepPtr rep = fixture.downcastRep<cx::VolumetricRep>(0);
 	REQUIRE(rep);
 	CHECK(dynamic_cast<vtkVolumeTextureMapper3D*>(rep->getVtkVolume()->GetMapper()));
 }
@@ -71,7 +71,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 1 rep using vtkGPUVolumeRayCastMapper
 
 	REQUIRE(fixture.mBase.getAllReps().size() == 1);
 
-	ssc::VolumetricRepPtr rep = fixture.downcastRep<ssc::VolumetricRep>(0);
+	cx::VolumetricRepPtr rep = fixture.downcastRep<cx::VolumetricRep>(0);
 	REQUIRE(rep);
 	CHECK(dynamic_cast<vtkGPUVolumeRayCastMapper*>(rep->getVtkVolume()->GetMapper()));
 }
@@ -83,7 +83,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 1 rep using sscProgressiveLODVolumeTe
 
 	REQUIRE(fixture.mBase.getAllReps().size() == 1);
 
-	ssc::ProgressiveLODVolumetricRepPtr rep = fixture.downcastRep<ssc::ProgressiveLODVolumetricRep>(0);
+	cx::ProgressiveLODVolumetricRepPtr rep = fixture.downcastRep<cx::ProgressiveLODVolumetricRep>(0);
 	REQUIRE(rep);
 }
 
@@ -92,7 +92,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 1 rep using Image2DRep3D for 1 added 
 	MultiVolume3DRepProducerFixture fixture;
 
 	fixture.mBase.setVisualizerType("vtkVolumeTextureMapper3D");
-	ssc::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(5,5,1));
+	cx::ImagePtr image = cxtest::Utilities::create3DImage(Eigen::Array3i(5,5,1));
 	fixture.mBase.addImage(image);
 	fixture.mImages.push_back(image);
 
@@ -114,7 +114,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 3 reps using vtkVolumeTextureMapper3D
 
 	for (unsigned i=0; i<imageCount; ++i)
 	{
-		ssc::VolumetricRepPtr rep = fixture.downcastRep<ssc::VolumetricRep>(i);
+		cx::VolumetricRepPtr rep = fixture.downcastRep<cx::VolumetricRep>(i);
 		REQUIRE(rep);
 		CHECK(dynamic_cast<vtkVolumeTextureMapper3D*>(rep->getVtkVolume()->GetMapper()));
 	}
@@ -134,7 +134,7 @@ TEST_CASE("MultiVolume3DVisualizer creates 2 reps using vtkVolumeTextureMapper3D
 
 	for (unsigned i=0; i<imageCount; ++i)
 	{
-		ssc::VolumetricRepPtr rep = fixture.downcastRep<ssc::VolumetricRep>(i);
+		cx::VolumetricRepPtr rep = fixture.downcastRep<cx::VolumetricRep>(i);
 		REQUIRE(rep);
 		CHECK(dynamic_cast<vtkVolumeTextureMapper3D*>(rep->getVtkVolume()->GetMapper()));
 	}

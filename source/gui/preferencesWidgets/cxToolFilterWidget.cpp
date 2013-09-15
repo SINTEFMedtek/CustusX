@@ -41,14 +41,14 @@ ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
 ToolFilterGroupBox::~ToolFilterGroupBox()
 {}
 
-void ToolFilterGroupBox::setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication)
+void ToolFilterGroupBox::setClinicalApplicationSlot(CLINICAL_APPLICATION clinicalApplication)
 {
   QStringList selectedApplication;
   selectedApplication << enum2string(clinicalApplication);
   mApplicationGroupBox->setSelected(selectedApplication);
 }
 
-void ToolFilterGroupBox::setTrackingSystemSlot(ssc::TRACKING_SYSTEM trackingSystem)
+void ToolFilterGroupBox::setTrackingSystemSlot(TRACKING_SYSTEM trackingSystem)
 {
   QStringList selectedTrackingSystem;
   selectedTrackingSystem << enum2string(trackingSystem);

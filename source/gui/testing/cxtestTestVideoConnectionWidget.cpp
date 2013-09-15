@@ -31,7 +31,7 @@ bool TestVideoConnectionWidget::canStream(QString filename, QString streamerType
 
 	bool videoConnectionConnected = waitForQueuedSignal(this->getVideoConnectionManager().get(), SIGNAL(connected(bool)), 500);
 	bool activeVideoSourceChanged = waitForQueuedSignal(cx::videoService(), SIGNAL(activeVideoSourceChanged()), 500);
-	ssc::VideoSourcePtr stream = cx::videoService()->getActiveVideoSource();
+	cx::VideoSourcePtr stream = cx::videoService()->getActiveVideoSource();
 	bool videoSourceReceivedNewFrame = waitForQueuedSignal(stream.get(), SIGNAL(newFrame()), 500);
 	bool canStream = stream->isStreaming();
 
@@ -44,7 +44,7 @@ bool TestVideoConnectionWidget::canStream(QString filename, QString streamerType
 
 void TestVideoConnectionWidget::setupWidgetToRunStreamer(QString filename, QString streamerType)
 {
-	ssc::ImagePtr image = Utilities::create3DImage();
+	cx::ImagePtr image = Utilities::create3DImage();
 	cx::cxDataManager::getInstance()->setActiveImage(image);
 	cx::cxDataManager::getInstance()->loadData(image);
 

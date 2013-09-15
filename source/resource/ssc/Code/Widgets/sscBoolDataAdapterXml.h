@@ -33,7 +33,7 @@
 #include "sscBoolDataAdapter.h"
 #include "sscXmlOptionItem.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class BoolDataAdapterXml> BoolDataAdapterXmlPtr;

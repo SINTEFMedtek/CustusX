@@ -143,6 +143,7 @@ cx_add_class( SSC_SOURCE_FILES
         Tool/sscProbeData
 
         Widgets/sscXmlOptionItem
+		Widgets/sscDoubleRange.h
 
         Rep/sscVtkHelperClasses
         Rep/sscTextureSlicePainter
@@ -182,6 +183,7 @@ cx_add_class( SSC_SOURCE_FILES
         Utilities/sscPositionStorageFile
         Utilities/sscTimeKeeper
         Utilities/sscMeshHelpers
+		Utilities/sscAudio.h
 
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx

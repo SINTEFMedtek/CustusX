@@ -46,7 +46,7 @@
 #include "sscMessageManager.h"
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 //---------------------------------------------------------
 
@@ -73,11 +73,11 @@ void Slices3DRep::setShaderFile(QString shaderFile)
 		mProxy[i]->setShaderFile(shaderFile);
 }
 
-void Slices3DRep::setImages(std::vector<ssc::ImagePtr> images)
+void Slices3DRep::setImages(std::vector<ImagePtr> images)
 {
 	if (images.empty())
 	{
-		ssc::messageManager()->sendWarning("Slices3DRep::setImages: No input images (in ViewGroup)");
+		messageManager()->sendWarning("Slices3DRep::setImages: No input images (in ViewGroup)");
 		return;
 	}
 	for (unsigned i=0; i<mProxy.size(); ++i)
@@ -89,12 +89,12 @@ void Slices3DRep::setImages(std::vector<ssc::ImagePtr> images)
 
 void Slices3DRep::addPlane(PLANE_TYPE plane)
 {
-	ssc::SliceProxyPtr sliceProxy = ssc::SliceProxy::New("");
-	sliceProxy->initializeFromPlane(ssc::ptAXIAL, false, ssc::Vector3D(0,0,1), true, 150, 0.25);
+	SliceProxyPtr sliceProxy = SliceProxy::New("");
+	sliceProxy->initializeFromPlane(ptAXIAL, false, Vector3D(0,0,1), true, 150, 0.25);
 
 
 	Texture3DSlicerProxyPtr current = Texture3DSlicerProxy::New();
-	sliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), true, 150, 0.25);
+	sliceProxy->initializeFromPlane(plane, false, Vector3D(0,0,1), true, 150, 0.25);
 	sliceProxy->setAlwaysUseDefaultCenter(true);
 	current->setSliceProxy(sliceProxy);
 	current->setTargetSpaceToR();
@@ -108,7 +108,7 @@ void Slices3DRep::setTool(ToolPtr tool)
 		mProxy[i]->getSliceProxy()->setTool(tool);
 }
 
-void Slices3DRep::addRepActorsToViewRenderer(ssc::View *view)
+void Slices3DRep::addRepActorsToViewRenderer(View *view)
 {
 	for (unsigned i=0; i<mProxy.size(); ++i)
 	{
@@ -117,7 +117,7 @@ void Slices3DRep::addRepActorsToViewRenderer(ssc::View *view)
 	mView = view;
 }
 
-void Slices3DRep::removeRepActorsFromViewRenderer(ssc::View *view)
+void Slices3DRep::removeRepActorsFromViewRenderer(View *view)
 {
 	for (unsigned i=0; i<mProxy.size(); ++i)
 	{

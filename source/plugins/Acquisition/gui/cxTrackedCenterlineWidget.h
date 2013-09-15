@@ -38,7 +38,7 @@ protected slots:
   void preprocessResampler();
 
 private:
-  virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
+  virtual TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
   cxToolPtr findTool(double startTime, double stopTime);
 
 //  Centerline  mCenterlineAlgorithm;

@@ -30,7 +30,7 @@ bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
 {
 //  std::cout << "RegistrationFixedImageStringDataAdapter::setImageSlot " << value << std::endl;
 
-  ssc::DataPtr newImage = ssc::dataManager()->getData(value);
+  DataPtr newImage = dataManager()->getData(value);
   if (newImage==mManager->getFixedData())
     return false;
   mManager->setFixedData(newImage);
@@ -38,7 +38,7 @@ bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
 }
 QString RegistrationFixedImageStringDataAdapter::getValue() const
 {
-  ssc::DataPtr image = mManager->getFixedData();
+  DataPtr image = mManager->getFixedData();
   if (!image)
     return "";
   return qstring_cast(image->getUid());
@@ -49,7 +49,7 @@ QString RegistrationFixedImageStringDataAdapter::getValue() const
 //  return "Select the fixed registration data";
 //}
 
-//ssc::DataPtr RegistrationFixedImageStringDataAdapter::getData() const
+//DataPtr RegistrationFixedImageStringDataAdapter::getData() const
 //{
 //    return mManager->getFixedData();
 //}
@@ -72,7 +72,7 @@ RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapt
 
 bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
 {
-  ssc::DataPtr newImage = ssc::dataManager()->getData(value);
+  DataPtr newImage = dataManager()->getData(value);
   if (newImage==mManager->getMovingData())
     return false;
   mManager->setMovingData(newImage);
@@ -81,7 +81,7 @@ bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
 
 QString RegistrationMovingImageStringDataAdapter::getValue() const
 {
-  ssc::DataPtr image = mManager->getMovingData();
+  DataPtr image = mManager->getMovingData();
   if (!image)
     return "";
   return qstring_cast(image->getUid());
@@ -92,7 +92,7 @@ QString RegistrationMovingImageStringDataAdapter::getValue() const
 //  return "Select the moving registration data";
 //}
 
-//ssc::DataPtr RegistrationMovingImageStringDataAdapter::getData() const
+//DataPtr RegistrationMovingImageStringDataAdapter::getData() const
 //{
 //    return mManager->getMovingData();
 //}

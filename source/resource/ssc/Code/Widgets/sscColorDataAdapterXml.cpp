@@ -21,7 +21,7 @@
 #include "sscVector3D.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 /** Make sure one given option exists witin root.
@@ -85,5 +85,5 @@ bool ColorDataAdapterXml::setValue(QColor val)
     return true;
 }
 
-} // namespace ssc
+} // namespace cx
 

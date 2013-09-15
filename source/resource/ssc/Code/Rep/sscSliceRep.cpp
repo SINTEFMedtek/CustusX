@@ -27,7 +27,7 @@
 #include "sscView.h"
 #include "sscImage.h"
 
-namespace ssc
+namespace cx
 {
 SliceRep::SliceRep(const QString& uid) :
 	RepImpl(uid)
@@ -69,4 +69,4 @@ bool SliceRep::hasImage(ImagePtr image) const
 	return (mImage != NULL);
 }
 
-} // namespace ssc
+} // namespace cx

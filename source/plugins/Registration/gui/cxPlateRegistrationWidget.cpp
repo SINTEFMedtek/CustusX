@@ -17,7 +17,7 @@ PlateRegistrationWidget::PlateRegistrationWidget(RegistrationManagerPtr regManag
     mReferenceToolInfoLabel(new QLabel("", this))
 {
   connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
+  connect(toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   toptopLayout->addWidget(mReferenceToolInfoLabel);
@@ -44,19 +44,19 @@ QString PlateRegistrationWidget::defaultWhatsThis() const
 void PlateRegistrationWidget::showEvent(QShowEvent* event)
 {
   BaseWidget::showEvent(event);
-  connect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
-  connect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+  connect(toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+  connect(toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
-  viewManager()->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
+  viewManager()->setRegistrationMode(rsPATIENT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::hideEvent(QHideEvent* event)
 {
   BaseWidget::hideEvent(event);
-  disconnect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
-  disconnect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+  disconnect(toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+  disconnect(toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
-  viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
+  viewManager()->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::landmarkUpdatedSlot()
@@ -66,35 +66,35 @@ void PlateRegistrationWidget::landmarkUpdatedSlot()
 
 void PlateRegistrationWidget::plateRegistrationSlot()
 {
-  ssc::toolManager()->removeLandmarks();
+  toolManager()->removeLandmarks();
 
-  ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+  ToolPtr refTool = toolManager()->getReferenceTool();
   if(!refTool)//cannot register without a reference tool
   {
-    ssc::messageManager()->sendDebug("No refTool");
+    messageManager()->sendDebug("No refTool");
     return;
   }
-  std::map<int, ssc::Vector3D> referencePoints = refTool->getReferencePoints();
+  std::map<int, Vector3D> referencePoints = refTool->getReferencePoints();
   if(referencePoints.empty()) //cannot register without at least 1 reference point
   {
-    ssc::messageManager()->sendDebug("No referenceppoints in reftool "+refTool->getName());
+    messageManager()->sendDebug("No referenceppoints in reftool "+refTool->getName());
     return;
   }
 
-  std::map<int, ssc::Vector3D>::iterator it = referencePoints.begin();
+  std::map<int, Vector3D>::iterator it = referencePoints.begin();
   for(; it != referencePoints.end(); ++it)
   {
-    QString uid = ssc::dataManager()->addLandmark();
-    ssc::dataManager()->setLandmarkName(uid, qstring_cast(it->first));
-    ssc::toolManager()->setLandmark(ssc::Landmark(uid, it->second));
+    QString uid = dataManager()->addLandmark();
+    dataManager()->setLandmarkName(uid, qstring_cast(it->first));
+    toolManager()->setLandmark(Landmark(uid, it->second));
   }
 
   // set all landmarks as not active as default
-  ssc::LandmarkPropertyMap map = ssc::dataManager()->getLandmarkProperties();
-  ssc::LandmarkPropertyMap::iterator landmarkIt = map.begin();
+  LandmarkPropertyMap map = dataManager()->getLandmarkProperties();
+  LandmarkPropertyMap::iterator landmarkIt = map.begin();
   for(; landmarkIt != map.end(); ++landmarkIt)
   {
-    ssc::dataManager()->setLandmarkActive(landmarkIt->first, false);
+    dataManager()->setLandmarkActive(landmarkIt->first, false);
   }
 
   //we don't want the user to load the landmarks twice, it will result in alot of global landmarks...
@@ -103,7 +103,7 @@ void PlateRegistrationWidget::plateRegistrationSlot()
 
 void PlateRegistrationWidget::internalUpdate()
 {
-  ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+  ToolPtr refTool = toolManager()->getReferenceTool();
 
   QString labelText = "";
   if(!refTool || refTool->getReferencePoints().size()<1)

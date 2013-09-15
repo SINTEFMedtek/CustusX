@@ -25,7 +25,7 @@
 #include "sscXmlOptionItem.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -42,9 +42,9 @@ class OutputVolumeParams
 {
 public:
 	// constants, set only based on input data
-	ssc::DoubleBoundingBox3D mExtent;
+	DoubleBoundingBox3D mExtent;
 	double mInputSpacing;
-	ssc::Transform3D m_rMd; ///< transform from output data space to global ref space r
+	Transform3D m_rMd; ///< transform from output data space to global ref space r
 
 	OutputVolumeParams() :
 		mExtent(0, 0, 0, 0, 0, 0), mInputSpacing(0), m_rMd(Transform3D::Identity()),
@@ -53,7 +53,7 @@ public:
 	}
 	/** Initialize the volue parameters with sensible defaults.
 	 */
-	OutputVolumeParams(ssc::DoubleBoundingBox3D extent, double inputSpacing) :
+	OutputVolumeParams(DoubleBoundingBox3D extent, double inputSpacing) :
 		mExtent(extent), mInputSpacing(inputSpacing), mMaxVolumeSize(32)
 	{
 		// Calculate optimal output image spacing and dimensions based on US frame spacing
@@ -71,7 +71,7 @@ public:
 	void setSpacing(double spacing)
 	{
 		mSpacing = spacing;
-		ssc::Vector3D v = mExtent.range() / mSpacing;
+		Vector3D v = mExtent.range() / mSpacing;
 		mDim << ::ceil(v[0]), ::ceil(v[1]), ::ceil(v[2]);
 	}
 	double getSpacing() const
@@ -99,7 +99,7 @@ public:
 		unsigned long maxVolumeSize = this->getMaxVolumeSize();
 		if (volumeSize > maxVolumeSize)
 		{
-			ssc::Vector3D ext = mExtent.range();
+			Vector3D ext = mExtent.range();
 			double newSpacing = pow(ext[0]*ext[1]*ext[2] / double(maxVolumeSize), 1 / 3.0);
 			this->setSpacing(newSpacing);
 		}
@@ -126,7 +126,7 @@ private:
  * \}
  */
 
-} // namespace ssc
+} // namespace cx
 
 
 #endif /* SSCRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_ */

@@ -21,8 +21,8 @@ void reportError(NSError* error)
         return;
     NSString* errorString = [error localizedDescription];
     std::string errorStdString = std::string([errorString UTF8String]);
-//    ssc::messageManager()->sendError(qstring_cast(errorStdString));
-	ssc::messageManager()->sendError(QString::fromStdString(errorStdString));
+//    messageManager()->sendError(qstring_cast(errorStdString));
+	cx::messageManager()->sendError(QString::fromStdString(errorStdString));
 }
 
 // utility for reporting strings
@@ -31,8 +31,8 @@ void reportString(NSString* string)
     if(!string)
         return;
     std::string stdString = std::string([string UTF8String]);
-//    ssc::messageManager()->sendInfo(qstring_cast(stdString));
-	ssc::messageManager()->sendInfo(QString::fromStdString(stdString));
+//    messageManager()->sendInfo(qstring_cast(stdString));
+	cx::messageManager()->sendInfo(QString::fromStdString(stdString));
 }
 
 //==============================================================================
@@ -94,12 +94,12 @@ void reportString(NSString* string)
   //setting up the frame
   Frame frame;
   //frame.mTimestamp = ((double)timetag.timeValue / (double)timetag.timeScale) * 1000;
-  frame.mTimestamp = ssc::getMilliSecondsSinceEpoch()/1000; //resmapling the timestamp because we cannot find convert the original timestamp into epoch time
+  frame.mTimestamp = cx::getMilliSecondsSinceEpoch()/1000; //resmapling the timestamp because we cannot find convert the original timestamp into epoch time
   frame.mWidth = width;
   frame.mHeight = height;
   //frame.mPixelFormat = static_cast<int>(CVPixelBufferGetPixelFormatType(videoFrame));
   frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT32;
-  //ssc::messageManager()->sendDebug("Pixel format: "+qstring_cast(frame.mPixelFormat));
+  //messageManager()->sendDebug("Pixel format: "+qstring_cast(frame.mPixelFormat));
   frame.mFirstPixel = reinterpret_cast<unsigned char*>(CVPixelBufferGetBaseAddress(videoFrame));
 	
   //Just initialize these with dummy values
@@ -169,12 +169,12 @@ void MacGrabber::start()
   if(this->findConnectedDevice())
   {
     if(!this->openDevice())
-      ssc::messageManager()->sendError("Could not open the selected device. Aborting.");
+      messageManager()->sendError("Could not open the selected device. Aborting.");
     else
       this->startSession();
   } else
   {
-    ssc::messageManager()->sendError("Could not find a connected device (must be present in SupportedGrabbers.txt). Aborting.");
+    messageManager()->sendError("Could not find a connected device (must be present in SupportedGrabbers.txt). Aborting.");
   }
 }
 
@@ -221,8 +221,8 @@ bool MacGrabber::findConnectedDevice()
   //Report to user all found grabbers
   NSArray *devices = [QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo];
   int i = [devices count];
-//  ssc::messageManager()->sendInfo("Number of input grabber devices: "+qstring_cast(i));
-  ssc::messageManager()->sendInfo("Number of input grabber devices: "+ QString::number(i));
+//  messageManager()->sendInfo("Number of input grabber devices: "+qstring_cast(i));
+  messageManager()->sendInfo("Number of input grabber devices: "+ QString::number(i));
   for (QTCaptureDevice *device in devices)
     reportString([device localizedDisplayName]);
 
@@ -248,7 +248,7 @@ bool MacGrabber::findConnectedDevice()
   }
 
   //Report to user how to change grabber
-  ssc::messageManager()->sendInfo("To change priority of grabbers or add new grabbers, edit the file \"SupportedGrabbers.txt\" that is next to the GrabberServer.");
+  messageManager()->sendInfo("To change priority of grabbers or add new grabbers, edit the file \"SupportedGrabbers.txt\" that is next to the GrabberServer.");
 
   return found;
 
@@ -258,7 +258,7 @@ bool MacGrabber::findConnectedDevice()
   //find which grabber is connected to the system
   NSArray *devices = [QTCaptureDevice inputDevicesWithMediaType:QTMediaTypeVideo];
   int i = [devices count];
-  ssc::messageManager()->sendInfo("Number of connected grabber devices: "+qstring_cast(i));
+  messageManager()->sendInfo("Number of connected grabber devices: "+qstring_cast(i));
   
   NSEnumerator *enumerator = [devices objectEnumerator];
   QTCaptureDevice* captureDevice;
@@ -327,15 +327,15 @@ void MacGrabber::startSession()
   
   NSString* grabberName = [mObjectiveC->mSelectedDevice localizedDisplayName];
   std::string name = std::string([grabberName UTF8String]);
-//  ssc::messageManager()->sendSuccess("Started grabbing from "+qstring_cast(name));
-  ssc::messageManager()->sendSuccess("Started grabbing from "+QString::fromStdString(name));
+//  messageManager()->sendSuccess("Started grabbing from "+qstring_cast(name));
+  messageManager()->sendSuccess("Started grabbing from "+QString::fromStdString(name));
   emit started();
 }
 
 void MacGrabber::stopSession()
 {
   [mObjectiveC->mCaptureSession stopRunning];
-  ssc::messageManager()->sendSuccess("Grabbing stopped.");
+  messageManager()->sendSuccess("Grabbing stopped.");
   emit stopped();
 }
 

@@ -32,8 +32,8 @@
 #include "sscViewsWindow.h"
 #include "sscImageTF3D.h"
 
-using ssc::Vector3D;
-using ssc::Transform3D;
+using cx::Vector3D;
+using cx::Transform3D;
 
 
 //---------------------------------------------------------
@@ -43,9 +43,9 @@ using ssc::Transform3D;
 //---------------------------------------------------------
 
 namespace {
-	ssc::DummyToolPtr dummyTool()
+	cx::DummyToolPtr dummyTool()
 	{
-		return boost::dynamic_pointer_cast<ssc::DummyTool>(ssc::ToolManager::getInstance()->getDominantTool());
+		return boost::dynamic_pointer_cast<cx::DummyTool>(cx::ToolManager::getInstance()->getDominantTool());
 	}
 }
 
@@ -88,29 +88,29 @@ ViewsWindow::~ViewsWindow()
 {
 }
 
-bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
+bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
 {	
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
-	ssc::ToolPtr tool = mToolmanager->getDominantTool();
-	ssc::ImagePtr image = loadImage(imageFilename);
-	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
+	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	cx::ToolPtr tool = mToolmanager->getDominantTool();
+	cx::ImagePtr image = loadImage(imageFilename);
+	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
 
 	if (!view || !view->getRenderWindow() || !view->getRenderWindow()->SupportsOpenGL())
 		return false;
-	if (!ssc::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
+	if (!cx::Texture3DSlicerRep::isSupported(view->getRenderWindow()))
 		return false;
 
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->GetRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
 	mLayouts.insert(view);
-	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
+	cx::SliceProxyPtr proxy(new cx::SliceProxy());
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
-	ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
+	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
 	rep->setShaderFile(mShaderFolder + "Texture3DOverlay.frag");
 	rep->setSliceProxy(proxy);
-	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
+	rep->setImages(std::vector<cx::ImagePtr>(1, image));
 	view->addRep(rep);
 	insertView(view, uid, imageFilename, r, c);
 
@@ -120,33 +120,33 @@ bool ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 	return true;
 }
 
-void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
+void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
 {
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
-	ssc::ToolPtr tool = mToolmanager->getDominantTool();
-	ssc::ImagePtr image = loadImage(imageFilename);
-	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
+	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	cx::ToolPtr tool = mToolmanager->getDominantTool();
+	cx::ImagePtr image = loadImage(imageFilename);
+	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
 	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
 	view->GetRenderWindow()->GetInteractor()->Disable();
 	view->setZoomFactor(mZoomFactor);
 	mLayouts.insert(view);
-	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
+	cx::SliceProxyPtr proxy(new cx::SliceProxy());
 	proxy->setTool(tool);
 	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
-	ssc::SliceRepSWPtr rep = ssc::SliceRepSW::New(uid);
+	cx::SliceRepSWPtr rep = cx::SliceRepSW::New(uid);
 	rep->setImage(image);
 	rep->setSliceProxy(proxy);
 	view->addRep(rep);
 	insertView(view, uid, imageFilename, r, c);
 }
 
-ssc::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
+cx::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 {
-	QString filename = ssc::TestUtilities::ExpandDataFileName(imageFilename);
-	ssc::ImagePtr image = ssc::DataManager::getInstance()->loadImage(filename, filename, ssc::rtMETAIMAGE);
+	QString filename = cx::TestUtilities::ExpandDataFileName(imageFilename);
+	cx::ImagePtr image = cx::DataManager::getInstance()->loadImage(filename, filename, cx::rtMETAIMAGE);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
-	ssc::DataManager::getInstance()->setCenter(center);
+	cx::DataManager::getInstance()->setCenter(center);
 	
 	// side effect: set tool movement box to data box,
 	dummyTool()->setToolPositionMovementBB(transform(image->get_rMd(), image->boundingBox()));
@@ -154,7 +154,7 @@ ssc::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 	return image;
 }
 
-void ViewsWindow::insertView(ssc::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
+void ViewsWindow::insertView(cx::ViewWidget *view, const QString& uid, const QString& volume, int r, int c)
 {
 	QVBoxLayout *layout = new QVBoxLayout;
 	mSliceLayout->addLayout(layout, r,c);
@@ -166,10 +166,10 @@ void ViewsWindow::insertView(ssc::ViewWidget *view, const QString& uid, const QS
 void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* parameters, int r, int c)
 {
 	QString uid = "3D";
-	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
+	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
 	mLayouts.insert(view);
 	
-	ssc::ImagePtr image = loadImage(imageFilename);
+	cx::ImagePtr image = loadImage(imageFilename);
 
 	if (parameters != NULL)
 	{
@@ -179,7 +179,7 @@ void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* 
 	}
 
 	// volume rep
-	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image->getUid() );
+	cx::VolumetricRepPtr mRepPtr = cx::VolumetricRep::New( image->getUid() );
 	mRepPtr->setMaxVolumeSize(10*1000*1000);
 	mRepPtr->setUseGPUVolumeRayCastMapper(); // if available
 	mRepPtr->setImage(image);	
@@ -187,9 +187,9 @@ void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* 
 	view->addRep(mRepPtr);
 	
 	// Tool 3D rep
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
-	ssc::ToolPtr tool = mToolmanager->getDominantTool();
-	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
+	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	cx::ToolPtr tool = mToolmanager->getDominantTool();
+	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New( tool->getUid(), tool->getName() );
 	toolRep->setTool(tool);
 	view->addRep(toolRep);
 	
@@ -199,15 +199,15 @@ void ViewsWindow::define3D(const QString& imageFilename, const ImageParameters* 
 bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImageParameters* parameters, int r, int c)
 {
 	QString uid = "3D";
-	ssc::ViewWidget* view = new ssc::ViewWidget(centralWidget());
+	cx::ViewWidget* view = new cx::ViewWidget(centralWidget());
 	mLayouts.insert(view);
 
-	std::vector<ssc::ImagePtr> images;
+	std::vector<cx::ImagePtr> images;
 
 	double numImages = imageFilenames.size();
 	for (int i = 0; i < numImages; ++i)
 	{
-		ssc::ImagePtr image = loadImage(imageFilenames[i]);
+		cx::ImagePtr image = loadImage(imageFilenames[i]);
 		if (!image)
 		{
 			return false;
@@ -223,9 +223,9 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 
 	// volume rep
 #ifndef WIN32
-	if (!ssc::GPURayCastVolumeRep::isSupported(view->getRenderWindow()))
+	if (!cx::GPURayCastVolumeRep::isSupported(view->getRenderWindow()))
 		return false;
-	ssc::GPURayCastVolumeRepPtr mRepPtr = ssc::GPURayCastVolumeRep::New( images[0]->getUid() );
+	cx::GPURayCastVolumeRepPtr mRepPtr = cx::GPURayCastVolumeRep::New( images[0]->getUid() );
 	mRepPtr->setShaderFolder(mShaderFolder);
 	mRepPtr->setImages(images);
 	mRepPtr->setName(images[0]->getName());
@@ -233,9 +233,9 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 #endif //WIN32
 
 	// Tool 3D rep
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
-	ssc::ToolPtr tool = mToolmanager->getDominantTool();
-	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
+	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
+	cx::ToolPtr tool = mToolmanager->getDominantTool();
+	cx::ToolRep3DPtr toolRep = cx::ToolRep3D::New( tool->getUid(), tool->getName() );
 	toolRep->setTool(tool);
 	view->addRep(toolRep);
 	
@@ -247,12 +247,12 @@ bool ViewsWindow::define3DGPU(const QStringList& imageFilenames, const ImagePara
 void ViewsWindow::start(bool showSliders)
 {
 	// Initialize dummy toolmanager.
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+	cx::ToolManager* mToolmanager = cx::DummyToolManager::getInstance();
 	mToolmanager->configure();
 	mToolmanager->initialize();
 	mToolmanager->startTracking();
 
-	ssc::ToolPtr tool = mToolmanager->getDominantTool();
+	cx::ToolPtr tool = mToolmanager->getDominantTool();
 	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), &mTimer, SLOT( start()));
 
 	//gui controll
@@ -266,7 +266,7 @@ void ViewsWindow::start(bool showSliders)
 	QHBoxLayout *controlLayout = new QHBoxLayout;
 	controlLayout->addStretch();
 	
-	mAcceptanceBox = new ssc::AcceptanceBoxWidget(mDisplayText, this);
+	mAcceptanceBox = new cx::AcceptanceBoxWidget(mDisplayText, this);
 	controlLayout->addWidget(mAcceptanceBox);
 
 	controlLayout->addStretch();
@@ -275,14 +275,14 @@ void ViewsWindow::start(bool showSliders)
 
 void ViewsWindow::updateRender()
 {
-	for (std::set<ssc::View *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+	for (std::set<cx::View *>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 	{
-		ssc::View *view = *iter;
+		cx::View *view = *iter;
 
 		if (view->getZoomFactor()<0)
 		  continue;
 
-		ssc::DoubleBoundingBox3D bb_s  = view->getViewport_s();
+		cx::DoubleBoundingBox3D bb_s  = view->getViewport_s();
 		double viewportHeightmm = bb_s.range()[1];//viewPortHeightPix*mmPerPix(view);
 		double parallelscale = viewportHeightmm/2/view->getZoomFactor();
 

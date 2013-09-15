@@ -132,7 +132,7 @@ void ImageStreamerGE::initialize(StringMap arguments)
 		}
 		if (imageSize <= 1)
 		{
-			ssc::messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
+			messageManager()->sendError("Error with calculated image size. imagesize: " + mArguments["imagesize"] + " = " + qstring_cast(imageSize));
 		}
 	}
 	else
@@ -167,7 +167,7 @@ void ImageStreamerGE::initialize(StringMap arguments)
    			mExportVelocity = true;
    		}
    		else
-   			ssc::messageManager()->sendWarning("ImageStreamerGE: Unknown stream: " + streamList.at(i));
+   			messageManager()->sendWarning("ImageStreamerGE: Unknown stream: " + streamList.at(i));
    	}
 
 	bool useOpenCL = convertStringWithDefault(mArguments["useOpenCL"], 1);
@@ -195,7 +195,7 @@ QString findOpenCLPath(QString additionalLocation)
 		path = QFileInfo(paths[2] + "/ScanConvertCL.cl");
 	if (!path.exists())
 	{
-		ssc::messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
+		messageManager()->sendWarning("Error: Can't find ScanConvertCL.cl in any of\n  " + paths.join("  \n"));
 	}
 	else
 		retval = path.absolutePath();
@@ -349,7 +349,7 @@ void ImageStreamerGE::send(const QString& uid, const vtkImageDataPtr& img, data_
 
 	if (geometryChanged)
 	{
-		ssc::ProbeDataPtr frameMessage( getFrameStatus(uid, geometry, img));
+		ProbeDataPtr frameMessage( getFrameStatus(uid, geometry, img));
 		PackagePtr package(new Package());
 		package->mProbe = frameMessage;
 		mSender->send(package);
@@ -366,7 +366,7 @@ void ImageStreamerGE::send(const QString& uid, const vtkImageDataPtr& img, data_
 	center->Update();
 	mRenderTimer->time("orgnull");
 
-	ssc::ImagePtr message(new ssc::Image(uid, center->GetOutput()));
+	ImagePtr message(new Image(uid, center->GetOutput()));
 	mRenderTimer->time("createimg");
 
 	PackagePtr package(new Package());
@@ -375,26 +375,26 @@ void ImageStreamerGE::send(const QString& uid, const vtkImageDataPtr& img, data_
 	mRenderTimer->time("sendersend");
 }
 
-ssc::ProbeDataPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
+ProbeDataPtr ImageStreamerGE::getFrameStatus(QString uid, data_streaming::frame_geometry geometry, vtkSmartPointer<vtkImageData> img)
 {
-	ssc::ProbeDataPtr retval;
+	ProbeDataPtr retval;
 	if (!img || !mImgExportedStream)
 		return retval;
 
 	//Create ProbeImageData struct
-	ssc::ProbeData::ProbeImageData imageData;
-	imageData.mOrigin_p = ssc::Vector3D(geometry.origin[0] + img->GetOrigin()[0],
+	ProbeData::ProbeImageData imageData;
+	imageData.mOrigin_p = Vector3D(geometry.origin[0] + img->GetOrigin()[0],
 					geometry.origin[1]+ img->GetOrigin()[1],
 					geometry.origin[2]+ img->GetOrigin()[2]);
 	imageData.mSize = QSize(img->GetDimensions()[0], img->GetDimensions()[1]);
-	imageData.mSpacing = ssc::Vector3D(img->GetSpacing());
-	imageData.mClipRect_p = ssc::DoubleBoundingBox3D(img->GetExtent());
+	imageData.mSpacing = Vector3D(img->GetSpacing());
+	imageData.mClipRect_p = DoubleBoundingBox3D(img->GetExtent());
 
 	// 1 = sector, 2 = linear
 	if (geometry.imageType == data_streaming::Linear) //linear
-		retval = ssc::ProbeDataPtr( new ssc::ProbeData(ssc::ProbeData::tLINEAR));
+		retval = ProbeDataPtr( new ProbeData(ProbeData::tLINEAR));
 	else //sector
-		retval = ssc::ProbeDataPtr( new ssc::ProbeData(ssc::ProbeData::tSECTOR));
+		retval = ProbeDataPtr( new ProbeData(ProbeData::tSECTOR));
 
 	// Set start and end of sector in mm from origin
 	// Set width of sector in mm for LINEAR, width of sector in radians for SECTOR.
@@ -409,14 +409,14 @@ bool ImageStreamerGE::equal(data_streaming::frame_geometry a, data_streaming::fr
 {
 	return !((a.origin[0] != b.origin[0]) || (a.origin[1] != b.origin[1]) || (a.origin[2] != b.origin[2])
 			|| (a.imageType != b.imageType)
-			|| !ssc::similar(a.depthStart, b.depthStart, 0.01)
-			|| !ssc::similar(a.depthEnd, b.depthEnd, 0.01)
-			|| !ssc::similar(a.width, b.width, 0.0001)
-			|| !ssc::similar(a.tilt, b.tilt, 0.0001)
-			|| !ssc::similar(a.elevationWidth, b.elevationWidth, 0.0001)
-			|| !ssc::similar(a.elevationTilt, b.elevationTilt, 0.0001)
-			|| !ssc::similar(a.vNyquist, b.vNyquist, 0.0001)
-			|| !ssc::similar(a.PRF, b.PRF, 0.0001));
+			|| !similar(a.depthStart, b.depthStart, 0.01)
+			|| !similar(a.depthEnd, b.depthEnd, 0.01)
+			|| !similar(a.width, b.width, 0.0001)
+			|| !similar(a.tilt, b.tilt, 0.0001)
+			|| !similar(a.elevationWidth, b.elevationWidth, 0.0001)
+			|| !similar(a.elevationTilt, b.elevationTilt, 0.0001)
+			|| !similar(a.vNyquist, b.vNyquist, 0.0001)
+			|| !similar(a.PRF, b.PRF, 0.0001));
 }
 void ImageStreamerGE::printTimeIntervals()
 {
@@ -424,7 +424,7 @@ void ImageStreamerGE::printTimeIntervals()
 	{
         static int counter=0;
         if (++counter%3==0)
-            ssc::messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
+            messageManager()->sendDebug(mRenderTimer->dumpStatisticsSmall());
 	          std::cout << mRenderTimer->dumpStatisticsSmall() << std::endl;
         mRenderTimer->reset();
 	}

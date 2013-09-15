@@ -46,7 +46,7 @@
 
 typedef vtkSmartPointer<class vtkGPUVolumeRayCastMapper> vtkGPUVolumeRayCastMapperPtr;
 
-namespace ssc
+namespace cx
 {
 VolumetricRep::VolumetricRep() :
 	VolumetricBaseRep(),
@@ -107,7 +107,7 @@ void VolumetricRep::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		mVolumeProperty->setImage(ssc::ImagePtr());
+		mVolumeProperty->setImage(ImagePtr());
 		mImage->disconnectFromRep(mSelf);
 		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
@@ -168,5 +168,5 @@ void VolumetricRep::setMaxVolumeSize(long maxVoxels)
 
 
 //---------------------------------------------------------
-} // namespace ssc
+} // namespace cx
 //---------------------------------------------------------

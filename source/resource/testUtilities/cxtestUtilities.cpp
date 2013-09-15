@@ -24,15 +24,15 @@ namespace cxtest
 
 vtkImageDataPtr Utilities::create3DVtkImageData(Eigen::Array3i dim)
 {
-	return ssc::generateVtkImageData(dim, ssc::Vector3D(1,1,1), 2);
+	return cx::generateVtkImageData(dim, cx::Vector3D(1,1,1), 2);
 }
 
-ssc::ImagePtr Utilities::create3DImage(Eigen::Array3i dim)
+cx::ImagePtr Utilities::create3DImage(Eigen::Array3i dim)
 {
 	vtkImageDataPtr vtkImageData = create3DVtkImageData(dim);
 	QString unique_string = qstring_cast(reinterpret_cast<long>(vtkImageData.GetPointer()));
 	QString imagesUid = QString("TESTUID_%2_%1").arg(unique_string);
-	ssc::ImagePtr image(new ssc::Image(imagesUid, vtkImageData));
+	cx::ImagePtr image(new cx::Image(imagesUid, vtkImageData));
 
 	return image;
 }

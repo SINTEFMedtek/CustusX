@@ -35,23 +35,23 @@ namespace cx
  * @{
  */
 
-typedef boost::shared_ptr<class cxProbe> ProbePtr;
+typedef boost::shared_ptr<class cxProbe> cxProbePtr;
 
 /**
  * \ingroup cxServiceTracking
  */
-class cxProbe: public ssc::Probe
+class cxProbe: public Probe
 {
 Q_OBJECT
 public:
-	static ProbePtr New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml = ProbeXmlConfigParserPtr());
+	static cxProbePtr New(QString instrumentUid, QString scannerUid, ProbeXmlConfigParserPtr xml = ProbeXmlConfigParserPtr());
 	virtual ~cxProbe(){}
 	virtual bool isValid() const;
 
 	virtual QStringList getAvailableVideoSources();
-	virtual ssc::VideoSourcePtr getRTSource(QString uid = "active") const;
-	virtual ssc::ProbeData getProbeData(QString uid = "active") const;
-	virtual ssc::ProbeSectorPtr getSector(QString uid = "active");
+	virtual VideoSourcePtr getRTSource(QString uid = "active") const;
+	virtual ProbeData getProbeData(QString uid = "active") const;
+	virtual ProbeSectorPtr getSector(QString uid = "active");
 
 	virtual void addXml(QDomNode& dataNode);
 	virtual void parseXml(QDomNode& dataNode);
@@ -64,9 +64,9 @@ public:
 	virtual void applyNewConfigurationWithId(QString uid);
 	virtual void setTemporalCalibration(double val);
 	virtual void setSoundSpeedCompensationFactor(double val);
-	virtual void setProbeSector(ssc::ProbeData probeSector);
-	virtual void setRTSource(ssc::VideoSourcePtr source);
-	virtual void removeRTSource(ssc::VideoSourcePtr source);
+	virtual void setProbeSector(ProbeData probeSector);
+	virtual void setRTSource(VideoSourcePtr source);
+	virtual void removeRTSource(VideoSourcePtr source);
 
 	virtual void setActiveStream(QString uid);
 	virtual QString getActiveStream() const;
@@ -91,13 +91,13 @@ private:
 	void setConfigId(QString uid);
 	void updateProbeSector();
 	bool isValidConfigId();
-	ssc::ProbeData createProbeSector();
+	ProbeData createProbeSector();
 	void updateTemporalCalibration();
 
 	QString mActiveUid;
-	std::map<QString, ssc::ProbeData> mProbeData; ///< all defined probe definitions
-	std::map<QString, ssc::VideoSourcePtr> mSource; ///< all defined sources
-	ssc::ProbeWeakPtr mSelf;
+	std::map<QString, ProbeData> mProbeData; ///< all defined probe definitions
+	std::map<QString, VideoSourcePtr> mSource; ///< all defined sources
+	ProbeWeakPtr mSelf;
 
 	QString mInstrumentUid;
 	QString mScannerUid;

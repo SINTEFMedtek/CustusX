@@ -25,7 +25,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscTime.h"
 
-namespace ssc
+namespace cx
 {
 //Data::Data() :
 //	mUid("DummyUID"), mName("DummyName"), mRegistrationStatus(rsNOT_REGISTRATED)
@@ -41,7 +41,7 @@ Data::Data(const QString& uid, const QString& name) :
 		mName = mUid;
 	else
 		mName = name;
-	m_rMd_History.reset(new ssc::RegistrationHistory());
+	m_rMd_History.reset(new RegistrationHistory());
 	connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SIGNAL(transformChanged()));
 	connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SLOT(transformChangedSlot()));
 }
@@ -183,4 +183,4 @@ void Data::setAcquisitionTime(QDateTime time)
 	mAcquisitionTime = time;
 }
 
-} // namespace ssc
+} // namespace cx

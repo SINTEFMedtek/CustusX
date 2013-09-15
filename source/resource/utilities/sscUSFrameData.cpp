@@ -44,10 +44,10 @@
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
-namespace ssc
+namespace cx
 {
 
-ProcessedUSInputData::ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<ssc::TimedPosition> pos, ssc::ImagePtr mask, QString path, QString uid) :
+ProcessedUSInputData::ProcessedUSInputData(std::vector<vtkImageDataPtr> frames, std::vector<TimedPosition> pos, ImagePtr mask, QString path, QString uid) :
 	mProcessedImage(frames),
 	mFrames(pos),
 	mMask(mask),
@@ -82,12 +82,12 @@ Vector3D ProcessedUSInputData::getSpacing() const
 	return retval;
 }
 
-std::vector<ssc::TimedPosition> ProcessedUSInputData::getFrames()
+std::vector<TimedPosition> ProcessedUSInputData::getFrames()
 {
 	return mFrames;
 }
 
-ssc::ImagePtr ProcessedUSInputData::getMask()
+ImagePtr ProcessedUSInputData::getMask()
 {
 	return mMask;
 }
@@ -128,12 +128,12 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 {
 	QFileInfo info(inputFilename);
 
-	ssc::TimeKeeper timer;
+	TimeKeeper timer;
 	QString mhdSingleFile = info.absolutePath()+"/"+info.completeBaseName()+".mhd";
 
 	if (QFileInfo(mhdSingleFile).exists())
 	{
-		vtkImageDataPtr image = ssc::MetaImageReader().loadVtkImageData(mhdSingleFile);
+		vtkImageDataPtr image = MetaImageReader().loadVtkImageData(mhdSingleFile);
 		// load from single file
 		USFrameDataPtr retval = USFrameData::create(ImagePtr(new Image(mhdSingleFile, image)));
 		retval->mName = QFileInfo(mhdSingleFile).completeBaseName();
@@ -306,7 +306,7 @@ vtkImageDataPtr USFrameData::useAngio(vtkImageDataPtr inData, vtkImageDataPtr gr
 
 	if (inData->GetNumberOfScalarComponents() != 3)
 	{
-		ssc::messageManager()->sendWarning("Angio requested for grayscale ultrasound");
+		messageManager()->sendWarning("Angio requested for grayscale ultrasound");
 		return grayFrame;
 	}
 
@@ -385,7 +385,7 @@ void USFrameData::setPurgeInputDataAfterInitialize(bool value)
 
 std::vector<std::vector<vtkImageDataPtr> > USFrameData::initializeFrames(std::vector<bool> angio)
 {
-//	ssc::TimeKeeper timer;
+//	TimeKeeper timer;
 //	std::cout << "USFrameData::initializeFrames start " << mReducedToFull.size() << std::endl;
 	std::vector<std::vector<vtkImageDataPtr> > raw(angio.size());
 
@@ -475,12 +475,12 @@ QString USFrameData::getName() const
 
 void USFrameData::fillImageImport(vtkImageImportPtr import, int index)
 {
-	ssc::TimeKeeper timer;
+	TimeKeeper timer;
 	vtkImageDataPtr source = mImageContainer->get(index);
 
 //	 use this test code to display angio output:
 //	vtkImageDataPtr current = mImageContainer->get(index);
-//	current = this->cropImage(current, ssc::IntBoundingBox3D(157, 747, 68, 680, 0, 0));
+//	current = this->cropImage(current, IntBoundingBox3D(157, 747, 68, 680, 0, 0));
 //	vtkImageDataPtr grayFrame = this->toGrayscale(current);
 //	static vtkImageDataPtr source;
 //	source = this->useAngio(current, grayFrame);
@@ -508,4 +508,4 @@ bool USFrameData::is4D()
 }
 
 
-}//namespace ssc
+}//namespace cx

@@ -26,7 +26,7 @@
 #include <list>
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -118,8 +118,8 @@ public:
 	static GPUImageBufferRepository* getInstance();
 	static void shutdown();
 
-	ssc::GPUImageDataBufferPtr getGPUImageDataBuffer(vtkImageDataPtr volume);
-	ssc::GPUImageLutBufferPtr getGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
+	GPUImageDataBufferPtr getGPUImageDataBuffer(vtkImageDataPtr volume);
+	GPUImageLutBufferPtr getGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
 	int getMemoryUsage(int *textures);
 	/**
 	 * Free all resources in the repository, for instance on session change

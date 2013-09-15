@@ -37,8 +37,8 @@ class ElastixParameters : public QObject
 {
     Q_OBJECT
 public:
-    ElastixParameters(ssc::XmlOptionFile options);
-    ssc::StringDataAdapterPtr getCurrentPreset();
+    ElastixParameters(XmlOptionFile options);
+    StringDataAdapterPtr getCurrentPreset();
     void removeCurrentPreset(); ///< Remove the currently selected preset. Reload.
     void saveCurrentPreset(QString newName);
 
@@ -65,11 +65,11 @@ private:
     void addDefaultPreset(QString name, QString executable, QStringList parameterFiles);
     void addDefaultPresets();
 
-    ssc::StringDataAdapterXmlPtr mCurrentPreset;
+    StringDataAdapterXmlPtr mCurrentPreset;
     QString mActiveExecutable;
     QString mActiveParameterFile0;
     QString mActiveParameterFile1;
-    ssc::XmlOptionFile mOptions;
+    XmlOptionFile mOptions;
 };
 typedef boost::shared_ptr<ElastixParameters> ElastixParametersPtr;
 

@@ -13,7 +13,7 @@
 #include "sscMessageManager.h"
 #include "sscTimeKeeper.h"
 
-namespace ssc
+namespace cx
 {
 
 ProbeData DummyToolTestUtilities::createProbeData(ProbeData::TYPE type, double depth, double width, Eigen::Array2i frameSize)
@@ -57,7 +57,7 @@ int DummyTool::mTransformCount = 0;
 
 
 DummyTool::DummyTool(ToolManager *manager, const QString& uid) :
-    mPositionHistory(new ssc::TimedTransformMap()),
+    mPositionHistory(new TimedTransformMap()),
 	mVisible(false),
 	m_prMt(Transform3D::Identity()),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
@@ -97,12 +97,12 @@ std::vector<Transform3D> DummyTool::getToolPositionMovement()
 	return mTransforms;
 }
 
-ssc::TimedTransformMap DummyTool::getSessionHistory(double startTime, double stopTime)
+TimedTransformMap DummyTool::getSessionHistory(double startTime, double stopTime)
 {
-	ssc::TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
-	ssc::TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
+	TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
+	TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
 
-	ssc::TimedTransformMap retval(startIt, stopIt);
+	TimedTransformMap retval(startIt, stopIt);
 	return retval;
 }
 
@@ -395,7 +395,7 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 	//check:
 //	std::cout << "check: " << time.toString("yyyyMMdd'T'hhmmss:zzz").toStdString() << std::endl;
 //	std::cout << "DummyTool::set_prMt " << QDateTime::currentDateTime().toString("mm:ss:zzz").toStdString() << std::endl;
-//	ssc::messageManager()->sendDebug("DummyTool:: emit toolTransformAndTimestamp()");
+//	messageManager()->sendDebug("DummyTool:: emit toolTransformAndTimestamp()");
 
 //    std::cout << "start emit tool pos" << std::endl;
 
@@ -415,10 +415,10 @@ void DummyTool::setTooltipOffset(double val)
 	toolManager()->setTooltipOffset(val);
 }
 
-ssc::Transform3D DummyTool::getCalibration_sMt() const
+Transform3D DummyTool::getCalibration_sMt() const
 {
 	return createTransformTranslate(Vector3D(5,5,20));
 }
 
 
-}//namespace ssc
+}//namespace cx

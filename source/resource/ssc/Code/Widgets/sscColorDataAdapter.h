@@ -23,7 +23,7 @@
 #include "sscDataAdapter.h"
 
 
-namespace ssc
+namespace cx
 {
 
 /** DataAdapter interface for QColor
@@ -54,6 +54,6 @@ public:
 };
 typedef boost::shared_ptr<ColorDataAdapter> ColorDataAdapterPtr;
 
-} // namespace ssc
+} // namespace cx
 
 #endif // SSCCOLORDATAADAPTER_H

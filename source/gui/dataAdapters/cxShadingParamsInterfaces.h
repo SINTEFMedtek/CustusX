@@ -25,7 +25,7 @@ namespace cx
 
 /** Superclass for all shading parameters
  */
-class DoubleDataAdapterShadingBase : public ssc::DoubleDataAdapter
+class DoubleDataAdapterShadingBase : public DoubleDataAdapter
 {
   Q_OBJECT 
 public:
@@ -37,7 +37,7 @@ public:
 private slots:
   void activeImageChanged();
 protected:
-  ssc::ImagePtr mImage;
+  ImagePtr mImage;
   ActiveImageProxyPtr mActiveImageProxy;
 };
   
@@ -50,7 +50,7 @@ public:
   DoubleDataAdapterShadingAmbient() {}
   virtual ~DoubleDataAdapterShadingAmbient() {}
   virtual QString getValueName() const { return "Ambient"; }
-  ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(0.0, 1.0, 0.01); }
+  DoubleRange getValueRange() const  { return DoubleRange(0.0, 1.0, 0.01); }
   virtual double getValue() const;
   virtual bool setValue(double val);
 };
@@ -64,7 +64,7 @@ public:
   DoubleDataAdapterShadingDiffuse() {}
   virtual ~DoubleDataAdapterShadingDiffuse() {}
   virtual QString getValueName() const { return "Diffuse"; }
-  ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(0.0, 1.0, 0.01); }
+  DoubleRange getValueRange() const  { return DoubleRange(0.0, 1.0, 0.01); }
   virtual double getValue() const;
   virtual bool setValue(double val);
 };
@@ -78,7 +78,7 @@ public:
   DoubleDataAdapterShadingSpecular() {}
   virtual ~DoubleDataAdapterShadingSpecular() {}
   virtual QString getValueName() const { return "Specular"; }
-  ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(0.0, 4.0, 0.01); }
+  DoubleRange getValueRange() const  { return DoubleRange(0.0, 4.0, 0.01); }
   virtual double getValue() const;
   virtual bool setValue(double val);
 };
@@ -92,7 +92,7 @@ public:
   DoubleDataAdapterShadingSpecularPower() {}
   virtual ~DoubleDataAdapterShadingSpecularPower() {}
   virtual QString getValueName() const { return "Specular Power"; }
-  ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(0.0, 50.0, 0.01); }
+  DoubleRange getValueRange() const  { return DoubleRange(0.0, 50.0, 0.01); }
   virtual double getValue() const;
   virtual bool setValue(double val);
 };

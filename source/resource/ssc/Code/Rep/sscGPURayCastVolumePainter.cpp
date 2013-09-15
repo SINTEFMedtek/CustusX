@@ -48,7 +48,7 @@
 
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 //---------------------------------------------------------
 
@@ -59,8 +59,8 @@ vtkCxxRevisionMacro(GPURayCastVolumePainter, "$Revision: 647 $");
 
 class GPURayCastSingleVolumePainterHelper
 {
-	ssc::GPUImageDataBufferPtr mVolumeBuffer;
-	ssc::GPUImageLutBufferPtr mLutBuffer;
+	GPUImageDataBufferPtr mVolumeBuffer;
+	GPUImageLutBufferPtr mLutBuffer;
 	int mIndex;
 	float mWindow;
 	float mLevel;
@@ -94,12 +94,12 @@ public:
 	~GPURayCastSingleVolumePainterHelper()
 	{
 	}
-	void SetBuffer(ssc::GPUImageDataBufferPtr buffer, double maxValue)
+	void SetBuffer(GPUImageDataBufferPtr buffer, double maxValue)
 	{
 		mVolumeBuffer = buffer;
 		mMaxValue = maxValue;
 	}
-	void SetBuffer(ssc::GPUImageLutBufferPtr buffer)
+	void SetBuffer(GPUImageLutBufferPtr buffer)
 	{
 		mLutBuffer = buffer;
 	}
@@ -698,12 +698,12 @@ bool GPURayCastVolumePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* 
 			&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
 }
 
-void GPURayCastVolumePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer, double maxValue)
+void GPURayCastVolumePainter::SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer, double maxValue)
 {
 	mInternals->safeIndex(index).SetBuffer(buffer, maxValue);
 }
 
-void GPURayCastVolumePainter::SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer)
+void GPURayCastVolumePainter::SetLutBuffer(int index, GPUImageLutBufferPtr buffer)
 {
 	mInternals->safeIndex(index).SetBuffer(buffer);
 }

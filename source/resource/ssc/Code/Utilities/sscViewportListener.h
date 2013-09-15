@@ -11,7 +11,7 @@
 #include <boost/function.hpp>
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 
 

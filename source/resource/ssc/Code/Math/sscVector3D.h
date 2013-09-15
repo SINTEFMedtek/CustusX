@@ -5,7 +5,7 @@
 #include "sscMathBase.h"
 class QString;
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -41,13 +41,13 @@ Vector3D ceil(const Vector3D& a);
 
 bool similar(const Eigen::Array3i& a, const Eigen::Array3i& b); ///< identical to the equality operator, exists for symmetry with Vector3D.
 
-QString prettyFormat(ssc::Vector3D val, int decimals=1, int fieldWidth=3);
+QString prettyFormat(Vector3D val, int decimals=1, int fieldWidth=3);
 
 /**
  * @}
  */
 
-} // namespace ssc
+} // namespace cx
 // --------------------------------------------------------
 
 #endif /*SSCVECTOR3D_H_*/

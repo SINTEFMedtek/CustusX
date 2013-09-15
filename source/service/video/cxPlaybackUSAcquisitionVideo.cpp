@@ -47,7 +47,7 @@ USAcquisitionVideoPlayback::~USAcquisitionVideoPlayback()
 {
 }
 
-ssc::VideoSourcePtr USAcquisitionVideoPlayback::getVideoSource()
+VideoSourcePtr USAcquisitionVideoPlayback::getVideoSource()
 {
 	return mVideoSource;
 }
@@ -89,7 +89,7 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
 	for (int i=0; i<allFiles.size(); ++i)
 	{
 		UsReconstructionFileReader reader;
-		std::vector<ssc::TimedPosition> timestamps = reader.readFrameTimestamps(allFiles[i]);
+		std::vector<TimedPosition> timestamps = reader.readFrameTimestamps(allFiles[i]);
 
 		if (timestamps.empty())
 			continue;
@@ -111,7 +111,7 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
 
 /**Get all mhd files in folder, recursively.
  *
- * Cut and paste from ssc::FileSelectWidget .
+ * Cut and paste from FileSelectWidget .
  *
  */
 QStringList USAcquisitionVideoPlayback::getAllFiles(QString folder)
@@ -169,7 +169,7 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 		return;
 
 	// clear data
-	mCurrentData = ssc::USReconstructInputData();
+	mCurrentData = USReconstructInputData();
 
 	// if no new data, return
 	if (filename.isEmpty())
@@ -196,7 +196,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	mVideoSource->start();
 
 	// set the probe sector from file data:
-	ssc::ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if (tool)
 	{
 		ProbePtr probe = boost::dynamic_pointer_cast<cxProbe>(tool->getProbe());
@@ -218,7 +218,7 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	{
 		mVideoSource->setInfoString(QString("Loading US Data..."));
 		mVideoSource->setStatusString(QString("Loading US Data..."));
-		mVideoSource->setInput(ssc::ImagePtr());
+		mVideoSource->setInput(ImagePtr());
 		return;
 	}
 
@@ -226,7 +226,7 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	{
 		mVideoSource->setInfoString(QString(""));
 		mVideoSource->setStatusString(QString("No US Acquisition"));
-		mVideoSource->setInput(ssc::ImagePtr());
+		mVideoSource->setInput(ImagePtr());
 		return;
 	}
 
@@ -245,7 +245,7 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	int timeout = 1000; // invalidate data if timestamp differ from time too much
 	mVideoSource->overrideTimeout(fabs(timestamp-*iter)>timeout);
 
-	ssc::ImagePtr image(new ssc::Image(mVideoSourceUid, mCurrentData.mUsRaw->getImageContainer()->get(index)));
+	ImagePtr image(new Image(mVideoSourceUid, mCurrentData.mUsRaw->getImageContainer()->get(index)));
 	image->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestamp));
 
 	mVideoSource->setInfoString(QString("%1 - Frame %2").arg(mCurrentData.mUsRaw->getName()).arg(index));

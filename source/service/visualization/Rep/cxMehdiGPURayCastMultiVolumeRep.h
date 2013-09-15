@@ -39,7 +39,7 @@ typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
   * The CX_BUILD_MEHDI_VTKMULTIVOLUME define is not handled correctly by moc.
   *
   */
-class MehdiGPURayCastMultiVolumeRepBase: public ssc::RepImpl
+class MehdiGPURayCastMultiVolumeRepBase: public RepImpl
 {
 Q_OBJECT
 public:
@@ -73,12 +73,12 @@ public:
 
 	virtual QString getType() const { return "MehdiGPURayCastMultiVolumeRep"; }
 
-	void setImages(std::vector<ssc::ImagePtr> images);
+	void setImages(std::vector<ImagePtr> images);
 
 protected:
 	MehdiGPURayCastMultiVolumeRep();
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(View* view);
+	virtual void removeRepActorsFromViewRenderer(View* view);
 
 //private slots:
 	void transformChangedSlot();
@@ -91,7 +91,7 @@ private:
 	vtkVolumePtr mVolume;
 	vtkOpenGLGPUMultiVolumeRayCastMapperPtr mMapper;
 	std::vector<VolumePropertyPtr> mVolumeProperties;
-	std::vector<ssc::ImagePtr> mImages;
+	std::vector<ImagePtr> mImages;
 	std::vector<ImageMapperMonitorPtr> mMonitors;
 };
 

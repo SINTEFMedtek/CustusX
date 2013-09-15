@@ -34,11 +34,11 @@ void VolumeInfoWidget::addWidgets()
 	mImageTypeAdapter = ImageTypeStringDataAdapter::New();
 
 	int i=0;
-	new ssc::LabeledLineEditWidget(this, mUidAdapter, gridLayout, i++);
-	new ssc::LabeledLineEditWidget(this, mNameAdapter, gridLayout, i++);
-	new ssc::LabeledComboBoxWidget(this, mModalityAdapter, gridLayout, i++);
-	new ssc::LabeledComboBoxWidget(this, mImageTypeAdapter, gridLayout, i++);
-	new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, i++);
+	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, i++);
+	new LabeledLineEditWidget(this, mNameAdapter, gridLayout, i++);
+	new LabeledComboBoxWidget(this, mModalityAdapter, gridLayout, i++);
+	new LabeledComboBoxWidget(this, mImageTypeAdapter, gridLayout, i++);
+	new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, i++);
 
 	gridLayout->addWidget(mTableWidget, i++, 0, 1, 2);
 }
@@ -54,14 +54,14 @@ QString VolumeInfoWidget::defaultWhatsThis() const
 
 void VolumeInfoWidget::updateSlot()
 {
-	ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+	ImagePtr image = dataManager()->getActiveImage();
 	mParentFrameAdapter->setData(image);
 	mNameAdapter->setData(image);
 	mUidAdapter->setData(image);
 	mModalityAdapter->setData(image);
 	mImageTypeAdapter->setData(image);
 
-	std::map<std::string, std::string> info = ssc::getDisplayFriendlyInfo(image);
+	std::map<std::string, std::string> info = getDisplayFriendlyInfo(image);
 	this->populateTableWidget(info);
 }
 }//namespace

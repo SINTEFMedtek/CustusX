@@ -46,7 +46,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscGeometricRep.h"
 
-namespace ssc
+namespace cx
 {
 PickerRepPtr PickerRep::New(const QString& uid, const QString& name)
 {
@@ -58,7 +58,7 @@ PickerRep::PickerRep(const QString& uid, const QString& name) :
 		RepImpl(uid, name), mPickedPoint(), mSphereRadius(2) //, mConnections(vtkEventQtSlotConnectPtr::New())
 {
 	mIsDragging = false;
-	mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PickerRep::scaleSphere, this));
 
 	this->mCallbackCommand = vtkCallbackCommandPtr::New();
@@ -87,7 +87,7 @@ PickerRep::~PickerRep()
 }
 QString PickerRep::getType() const
 {
-	return "ssc::PickerRep";
+	return "PickerRep";
 }
 
 void PickerRep::setSphereRadius(double radius)
@@ -119,14 +119,14 @@ void PickerRep::setTool(ToolPtr tool)
 	}
 }
 
-void PickerRep::setGlyph(ssc::MeshPtr glyph)
+void PickerRep::setGlyph(MeshPtr glyph)
 {
 	if (!mGlyph)
 		mGlyph = glyph;
 
 	 if (!mGlyphRep)
 	 {
-		 mGlyphRep = ssc::GeometricRep::New("PickerGlyphRep");
+		 mGlyphRep = GeometricRep::New("PickerGlyphRep");
 		 if (mView)
 		 {
 			 mView->addRep(mGlyphRep);
@@ -164,14 +164,14 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 //		data->Print(std::cout);
 //		std::cout << "looking for " << data.GetPointer() << std::endl;
 
-		std::map<QString, DataPtr> allData = ssc::dataManager()->getData();
+		std::map<QString, DataPtr> allData = dataManager()->getData();
 		for (std::map<QString, DataPtr>::iterator iter = allData.begin(); iter != allData.end(); ++iter)
 		{
-			ssc::MeshPtr mesh = boost::dynamic_pointer_cast<ssc::Mesh>(iter->second);
+			MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(iter->second);
 			if (mesh && mesh->getVtkPolyData() == data)
 				emit dataPicked(iter->first);
 
-			ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(iter->second);
+			ImagePtr image = boost::dynamic_pointer_cast<Image>(iter->second);
 //			if (image)
 //				std::cout << "  checking " << image->getBaseVtkImageData().GetPointer() << std::endl;
 			if (image && image->getBaseVtkImageData() == data)
@@ -181,7 +181,7 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 //	data->Print(std::cout);
 //	std::cout << "  hit: " << data.GetPointer() << std::endl;
 //	std::cout << "  pt : " << mGraphicalPoint->getPolyData().GetPointer() << std::endl;
-	ssc::Vector3D pick_w(picker->GetPickPosition());
+	Vector3D pick_w(picker->GetPickPosition());
 
 	if ( data &&
 		((mGraphicalPoint && (data == mGraphicalPoint->getPolyData() ))
@@ -241,7 +241,7 @@ void PickerRep::receiveTransforms(Transform3D prMt, double timestamp)
 {
 	Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = rMpr * prMt;
-	Vector3D p_r = rMt.coord(ssc::Vector3D(0, 0, mTool->getTooltipOffset()));
+	Vector3D p_r = rMt.coord(Vector3D(0, 0, mTool->getTooltipOffset()));
 
 	mPickedPoint = p_r;
 	if (mGraphicalPoint)
@@ -382,11 +382,11 @@ void PickerRep::OnMouseMove()
 	}
 }
 
-void PickerRep::setGlyphCenter(ssc::Vector3D pos)
+void PickerRep::setGlyphCenter(Vector3D pos)
 {
 	if (mGlyph)
 	{
-		mGlyph->get_rMd_History()->setRegistration(ssc::createTransformTranslate(pos));
+		mGlyph->get_rMd_History()->setRegistration(createTransformTranslate(pos));
 //		vtkSphereSourcePtr sphere = vtkSphereSource::SafeDownCast(mGlyph->getSource());
 //		sphere->SetCenter(pos.data());
 	}
@@ -443,8 +443,8 @@ void PickerRep::addRepActorsToViewRenderer(View *view)
 	if (mEnabled)
 		this->connectInteractor();
 
-	mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
-	mGraphicalPoint->setColor(ssc::Vector3D(0, 0, 1));
+	mGraphicalPoint.reset(new GraphicalPoint3D(mView->getRenderer()));
+	mGraphicalPoint->setColor(Vector3D(0, 0, 1));
 	mGraphicalPoint->setRadius(mSphereRadius);
 	mGraphicalPoint->getActor()->SetVisibility(mSnapToSurface);
 
@@ -481,7 +481,7 @@ void PickerRep::removeRepActorsFromViewRenderer(View *view)
 vtkRendererPtr PickerRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
 	vtkRendererPtr renderer = NULL;
-	std::set<ssc::View *>::const_iterator it = mViews.begin();
+	std::set<View *>::const_iterator it = mViews.begin();
 	for (; it != mViews.end(); ++it)
 	{
 		if (iren.GetRenderWindow() == (*it)->getRenderWindow())
@@ -495,4 +495,4 @@ Vector3D PickerRep::getPosition() const
 	return mPickedPoint;
 }
 
-} //namespace ssc
+} //namespace cx

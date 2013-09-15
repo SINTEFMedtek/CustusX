@@ -8,7 +8,7 @@
 #include <QDateTime>
 #include <boost/cstdint.hpp>
 
-namespace ssc
+namespace cx
 {
 
 QString timestampSecondsFormat()
@@ -50,4 +50,4 @@ double getMilliSecondsSinceEpoch()
 #endif
 }
 
-} // namespace ssc
+} // namespace cx

@@ -38,21 +38,21 @@ namespace cx
 
 PatientLandmarksSource::PatientLandmarksSource()
 {
-	ssc::ToolManager* toolmanager = ssc::ToolManager::getInstance();
+	ToolManager* toolmanager = ToolManager::getInstance();
 	connect(toolmanager, SIGNAL(landmarkAdded(QString)), this, SIGNAL(changed()));
 	connect(toolmanager, SIGNAL(landmarkRemoved(QString)), this, SIGNAL(changed()));
 	connect(toolmanager, SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 }
-ssc::LandmarkMap PatientLandmarksSource::getLandmarks() const
+LandmarkMap PatientLandmarksSource::getLandmarks() const
 {
-	return ssc::ToolManager::getInstance()->getLandmarks();
+	return ToolManager::getInstance()->getLandmarks();
 }
-ssc::Transform3D PatientLandmarksSource::get_rMl() const
+Transform3D PatientLandmarksSource::get_rMl() const
 {
-	return *ssc::ToolManager::getInstance()->get_rMpr();
+	return *ToolManager::getInstance()->get_rMpr();
 }
 // --------------------------------------------------------
-ssc::Vector3D PatientLandmarksSource::getTextPos(ssc::Vector3D p_l) const
+Vector3D PatientLandmarksSource::getTextPos(Vector3D p_l) const
 {
 	return p_l;
 }
@@ -65,7 +65,7 @@ ssc::Vector3D PatientLandmarksSource::getTextPos(ssc::Vector3D p_l) const
 ImageLandmarksSource::ImageLandmarksSource()
 {
 }
-void ImageLandmarksSource::setImage(ssc::ImagePtr image)
+void ImageLandmarksSource::setImage(ImagePtr image)
 {
 	if (image == mImage)
 		return;
@@ -88,23 +88,23 @@ void ImageLandmarksSource::setImage(ssc::ImagePtr image)
 
 	emit changed();
 }
-ssc::LandmarkMap ImageLandmarksSource::getLandmarks() const
+LandmarkMap ImageLandmarksSource::getLandmarks() const
 {
 	if (!mImage)
-		return ssc::LandmarkMap();
+		return LandmarkMap();
 	return mImage->getLandmarks();
 }
-ssc::Transform3D ImageLandmarksSource::get_rMl() const
+Transform3D ImageLandmarksSource::get_rMl() const
 {
 	if (!mImage)
-		return ssc::Transform3D::Identity();
+		return Transform3D::Identity();
 	return mImage->get_rMd();
 }
-ssc::Vector3D ImageLandmarksSource::getTextPos(ssc::Vector3D p_l) const
+Vector3D ImageLandmarksSource::getTextPos(Vector3D p_l) const
 {
-	ssc::Vector3D imageCenter = mImage->boundingBox().center();
-	ssc::Vector3D centerToSkinVector = (p_l - imageCenter).normal();
-	ssc::Vector3D numberPosition = p_l + 10.0 * centerToSkinVector;
+	Vector3D imageCenter = mImage->boundingBox().center();
+	Vector3D centerToSkinVector = (p_l - imageCenter).normal();
+	Vector3D numberPosition = p_l + 10.0 * centerToSkinVector;
 	return numberPosition;
 }
 
@@ -124,9 +124,9 @@ LandmarkRep::LandmarkRep(const QString& uid, const QString& name) :
 				//  mSecondaryColor(0,0.6,0.8),
 				mSecondaryColor(0, 0.9, 0.5), mShowLandmarks(true), mGraphicsSize(1), mLabelSize(2.5)
 {
-	connect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(internalUpdate()));
+	connect(dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(internalUpdate()));
 
-	mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&LandmarkRep::rescale, this));
 }
 
@@ -158,13 +158,13 @@ void LandmarkRep::setSecondarySource(LandmarksSourcePtr secondary)
 	this->internalUpdate();
 }
 
-void LandmarkRep::setColor(ssc::Vector3D color)
+void LandmarkRep::setColor(Vector3D color)
 {
 	mColor = color;
 	this->internalUpdate();
 }
 
-void LandmarkRep::setSecondaryColor(ssc::Vector3D color)
+void LandmarkRep::setSecondaryColor(Vector3D color)
 {
 	mSecondaryColor = color;
 	this->internalUpdate();
@@ -205,9 +205,9 @@ void LandmarkRep::addAll()
 {
 //  std::cout << this << " LandmarkRep::addLandmark ADD ALL" << std::endl;
 
-	ssc::LandmarkPropertyMap props = ssc::dataManager()->getLandmarkProperties();
+	LandmarkPropertyMap props = dataManager()->getLandmarkProperties();
 
-	for (ssc::LandmarkPropertyMap::iterator it = props.begin(); it != props.end(); ++it)
+	for (LandmarkPropertyMap::iterator it = props.begin(); it != props.end(); ++it)
 	{
 		this->addLandmark(it->first);
 	}
@@ -227,7 +227,7 @@ void LandmarkRep::clearAll()
 	mGraphics.clear();
 }
 
-void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
+void LandmarkRep::addRepActorsToViewRenderer(View* view)
 {
 	if (!view || !view->getRenderer())
 		return;
@@ -236,7 +236,7 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
 	mViewportListener->startListen(view->getRenderer());
 }
 
-void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void LandmarkRep::removeRepActorsFromViewRenderer(View* view)
 {
 	this->clearAll();
 	mViewportListener->stopListen();
@@ -252,7 +252,7 @@ void LandmarkRep::addLandmark(QString uid)
 	if (!mViews.empty())
 		renderer = (*mViews.begin())->getRenderer();
 
-	ssc::LandmarkProperty property = ssc::dataManager()->getLandmarkProperties()[uid];
+	LandmarkProperty property = dataManager()->getLandmarkProperties()[uid];
 	if (property.getUid().isEmpty())
 	{
 //    std::cout << "LandmarkRep::addLandmark CLEAR" << uid << std::endl;
@@ -261,8 +261,8 @@ void LandmarkRep::addLandmark(QString uid)
 	}
 
 	double radius = 2;
-	ssc::Vector3D color = mColor;
-	ssc::Vector3D secondaryColor = mSecondaryColor;
+	Vector3D color = mColor;
+	Vector3D secondaryColor = mSecondaryColor;
 
 	if (!property.getActive())
 	{
@@ -274,8 +274,8 @@ void LandmarkRep::addLandmark(QString uid)
 	LandmarkGraphics current;
 
 	// primary point
-	ssc::Landmark primary;
-	ssc::Vector3D primary_r(0, 0, 0);
+	Landmark primary;
+	Vector3D primary_r(0, 0, 0);
 	if (mPrimary)
 	{
 //    std::cout << this << "   LandmarkRep::addLandmark found mPrimary" << uid << std::endl;
@@ -286,16 +286,16 @@ void LandmarkRep::addLandmark(QString uid)
 
 			primary_r = mPrimary->get_rMl().coord(primary.getCoord());
 
-			current.mPrimaryPoint.reset(new ssc::GraphicalPoint3D(renderer));
+			current.mPrimaryPoint.reset(new GraphicalPoint3D(renderer));
 			current.mPrimaryPoint->setColor(color);
 			current.mPrimaryPoint->setRadius(radius);
 
-			current.mText.reset(new ssc::FollowerText3D(renderer));
+			current.mText.reset(new FollowerText3D(renderer));
 			current.mText->setText(property.getName());
 			current.mText->setSizeInNormalizedViewport(true, 0.025);
 			current.mText->setColor(color);
 
-			ssc::Vector3D text_r = mPrimary->get_rMl().coord(mPrimary->getTextPos(primary.getCoord()));
+			Vector3D text_r = mPrimary->get_rMl().coord(mPrimary->getTextPos(primary.getCoord()));
 
 			current.mPrimaryPoint->setValue(primary_r);
 			current.mText->setPosition(text_r);
@@ -303,8 +303,8 @@ void LandmarkRep::addLandmark(QString uid)
 	}
 
 	// secondary point
-	ssc::Vector3D secondary_r(0, 0, 0);
-	ssc::Landmark secondary;
+	Vector3D secondary_r(0, 0, 0);
+	Landmark secondary;
 	if (mSecondary)
 	{
 		secondary = mSecondary->getLandmarks()[uid];
@@ -312,7 +312,7 @@ void LandmarkRep::addLandmark(QString uid)
 		{
 			secondary_r = mSecondary->get_rMl().coord(secondary.getCoord());
 
-			current.mSecondaryPoint.reset(new ssc::GraphicalPoint3D(renderer));
+			current.mSecondaryPoint.reset(new GraphicalPoint3D(renderer));
 			current.mSecondaryPoint->setColor(secondaryColor);
 			current.mSecondaryPoint->setRadius(radius);
 			current.mSecondaryPoint->setValue(secondary_r);
@@ -322,7 +322,7 @@ void LandmarkRep::addLandmark(QString uid)
 	// connecting line
 	if (!secondary.getUid().isEmpty() && !secondary.getUid().isEmpty())
 	{
-		current.mLine.reset(new ssc::GraphicalLine3D(renderer));
+		current.mLine.reset(new GraphicalLine3D(renderer));
 		current.mLine->setColor(secondaryColor);
 		current.mLine->setStipple(0x0F0F);
 

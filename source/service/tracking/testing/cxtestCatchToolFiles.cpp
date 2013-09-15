@@ -7,7 +7,7 @@ namespace cxtest
 {
 TEST_CASE("Sonowand tools' STL files are readable", "[unit][tool]")
 {
-	ssc::MessageManager::initialize();
+	cx::MessageManager::initialize();
 
 	TestToolMesh *meshTester = new TestToolMesh();
 	meshTester->setToolPath("Neurology/SW-Invite/SW-Intraoperative-Navigator-07-081-0223_POLARIS/");
@@ -17,6 +17,6 @@ TEST_CASE("Sonowand tools' STL files are readable", "[unit][tool]")
 	REQUIRE(meshTester->canLoadMesh("01-117-0329_Planning-Navigator.stl"));
 	delete meshTester;
 
-	ssc::MessageManager::shutdown();
+	cx::MessageManager::shutdown();
 }
 } //namespace cxtest

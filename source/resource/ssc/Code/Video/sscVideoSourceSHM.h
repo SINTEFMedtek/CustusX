@@ -45,7 +45,7 @@ typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 // Forward declaration
 class QTimer;
 
-namespace ssc
+namespace cx
 {
 
 /**\brief VideoSource for connecting to shared memory.
@@ -117,6 +117,6 @@ private slots:
 
 typedef boost::shared_ptr<VideoSourceSHM> VideoSourceSHMPtr;
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCVIDEOSOURCESHMSTREAM_H_ */

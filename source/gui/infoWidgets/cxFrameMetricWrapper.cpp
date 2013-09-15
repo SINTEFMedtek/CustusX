@@ -23,7 +23,7 @@ FrameMetricWrapper::FrameMetricWrapper(cx::FrameMetricPtr data) : mData(data)
 {
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
+	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* FrameMetricWrapper::createWidget()
@@ -36,18 +36,18 @@ QWidget* FrameMetricWrapper::createWidget()
 	topLayout->addLayout(hLayout);
 
 	QString value;// = qstring_cast(mData->getFrame());
-	std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces(true);
+	std::vector<CoordinateSystem> spaces = SpaceHelpers::getAvailableSpaces(true);
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
 		range << spaces[i].toString();
 
-	mSpaceSelector = ssc::StringDataAdapterXml::initialize("selectSpace",
+	mSpaceSelector = StringDataAdapterXml::initialize("selectSpace",
 			"Space",
 			"Select coordinate system to store position in.",
 			value,
 			range,
 			QDomNode());
-	hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
+	hLayout->addWidget(new LabeledComboBoxWidget(widget, mSpaceSelector));
 
 	mFrameWidget = new Transform3DWidget(widget);
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
@@ -68,10 +68,10 @@ QWidget* FrameMetricWrapper::createWidget()
 
 QString FrameMetricWrapper::getValue() const
 {
-	return ssc::prettyFormat(mData->getRefCoord(), 1, 3);
+	return prettyFormat(mData->getRefCoord(), 1, 3);
 }
 
-ssc::DataPtr FrameMetricWrapper::getData() const
+DataPtr FrameMetricWrapper::getData() const
 {
 	return mData;
 }
@@ -89,8 +89,8 @@ QString FrameMetricWrapper::getArguments() const
 
 void FrameMetricWrapper::moveToToolPosition()
 {
-	ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
-	ssc::Transform3D qMt = ssc::SpaceHelpers::getDominantToolTipTransform(mData->getSpace(), true);
+	CoordinateSystem ref = SpaceHelpers::getR();
+	Transform3D qMt = SpaceHelpers::getDominantToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
 }
 
@@ -98,8 +98,8 @@ void FrameMetricWrapper::spaceSelected()
 {
 	if (mInternalUpdate)
 		return;
-	ssc::CoordinateSystem space = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
-	if (space.mId==ssc::csCOUNT)
+	CoordinateSystem space = CoordinateSystem::fromString(mSpaceSelector->getValue());
+	if (space.mId==csCOUNT)
 		return;
 	mData->setSpace(space);
 }
@@ -116,7 +116,7 @@ void FrameMetricWrapper::frameWidgetChangedSlot()
 {
 	if (mInternalUpdate)
 		return;
-	ssc::Transform3D matrix = mFrameWidget->getMatrix();
+	Transform3D matrix = mFrameWidget->getMatrix();
 	mData->setFrame(matrix);
 }
 

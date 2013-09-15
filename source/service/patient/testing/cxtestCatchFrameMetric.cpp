@@ -45,9 +45,9 @@ TEST_CASE("cxFrameMetric can convert transform to single line string", "[unit]")
 	REQUIRE(list[2]=="reference");
 	INFO(list.join("\n"));
 	bool transformStringOk = false;
-	ssc::Transform3D readTransform = ssc::Transform3D::fromString(QStringList(list.mid(3, 16)).join(" "), &transformStringOk);
+	cx::Transform3D readTransform = cx::Transform3D::fromString(QStringList(list.mid(3, 16)).join(" "), &transformStringOk);
     REQUIRE(transformStringOk);
-    REQUIRE(ssc::similar(testData.m_qMt, readTransform));
+	REQUIRE(cx::similar(testData.m_qMt, readTransform));
 }
 
 TEST_CASE("cxFrameMetric can set space correctly", "[unit]")
@@ -57,7 +57,7 @@ TEST_CASE("cxFrameMetric can set space correctly", "[unit]")
 
     fixture.setPatientRegistration();
 
-    testData.mMetric->setSpace(ssc::CoordinateSystemHelpers::getPr());
+	testData.mMetric->setSpace(cx::CoordinateSystemHelpers::getPr());
     CHECK_FALSE(fixture.inputEqualsMetric(testData));
 
     testData.mMetric->setSpace(testData.mSpace);

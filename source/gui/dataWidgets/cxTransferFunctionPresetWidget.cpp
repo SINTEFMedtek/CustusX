@@ -12,9 +12,9 @@ namespace cx {
 TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent, bool is3D) :
 		PresetWidget(parent), mIs3D(is3D)
 {
-	this->setPresets(ssc::dataManager()->getPresetTransferFunctions3D());
+	this->setPresets(dataManager()->getPresetTransferFunctions3D());
 
-	//	mPresets = ssc::dataManager()->getPresetTransferFunctions3D();
+	//	mPresets = dataManager()->getPresetTransferFunctions3D();
 //
 //	QActionGroup* group = new QActionGroup(this);
 
@@ -114,10 +114,10 @@ void TransferFunctionPresetWidget::populatePresetListSlot()
 //
 //	mPresetsComboBox->addItem("Transfer function preset...");
 //
-//	ssc::TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<ssc::TransferFunctions3DPresets>(mPresets);
-	if (ssc::dataManager()->getActiveImage())
-		PresetWidget::populatePresetList(mPresets->getPresetList(ssc::dataManager()->getActiveImage()->getModality()));
-//		mPresetsComboBox->addItems(preset->getPresetList(ssc::dataManager()->getActiveImage()->getModality()));
+//	TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
+	if (dataManager()->getActiveImage())
+		PresetWidget::populatePresetList(mPresets->getPresetList(dataManager()->getActiveImage()->getModality()));
+//		mPresetsComboBox->addItems(preset->getPresetList(dataManager()->getActiveImage()->getModality()));
 	else
 		//No active image, show all available presets for debug/overview purposes
 		PresetWidget::populatePresetList(mPresets->getPresetList("UNKNOWN"));
@@ -127,9 +127,9 @@ void TransferFunctionPresetWidget::populatePresetListSlot()
 
 void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetName)
 {
-	ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+	ImagePtr activeImage = dataManager()->getActiveImage();
 	if (activeImage) {
-		ssc::TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<ssc::TransferFunctions3DPresets>(mPresets);
+		TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
 		preset->load(presetName, activeImage, this->use2D(), this->use3D());
 	}
 }
@@ -138,7 +138,7 @@ void TransferFunctionPresetWidget::resetSlot()
 {
 //	mPresetsComboBox->setCurrentIndex(0);
 	PresetWidget::resetSlot();
-	ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+	ImagePtr activeImage = dataManager()->getActiveImage();
 	activeImage->resetTransferFunctions(this->use2D(), this->use3D());
 }
 
@@ -147,7 +147,7 @@ void TransferFunctionPresetWidget::saveSlot()
 	// generate a name suggestion: identical if custom, appended by index if default.
 //	QString newName = mPresetsComboBox->currentText();
 	QString newName = PresetWidget::getCurrentPreset();
-	ssc::TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<ssc::TransferFunctions3DPresets>(mPresets);
+	TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
 	if (!preset->getPresetList("").contains(newName))
 		newName = "custom preset";
 	if (preset->isDefaultPreset(newName))
@@ -159,7 +159,7 @@ void TransferFunctionPresetWidget::saveSlot()
 	if (!ok || text.isEmpty())
 		return;
 
-	ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+	ImagePtr activeImage = dataManager()->getActiveImage();
 	preset->save(text, activeImage, this->use2D(), this->use3D());
 
 	this->populatePresetListSlot();
@@ -183,11 +183,11 @@ void TransferFunctionPresetWidget::deleteSlot()
 
 //	if (preset->isDefaultPreset(mPresetsComboBox->currentText())) {
 	if (mPresets->isDefaultPreset(PresetWidget::getCurrentPreset())) {
-		ssc::messageManager()->sendWarning("It is not possible to delete one of the default presets");
+		messageManager()->sendWarning("It is not possible to delete one of the default presets");
 		return;
 	}
 
-	ssc::TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<ssc::TransferFunctions3DPresets>(mPresets);
+	TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
 	if (QMessageBox::question(this, "Delete current preset", "Do you really want to delete the current preset?", QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
 		return;
 //	preset->deletePresetData(mPresetsComboBox->currentText(), this->use2D(), this->use3D());

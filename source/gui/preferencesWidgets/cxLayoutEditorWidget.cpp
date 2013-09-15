@@ -48,16 +48,16 @@ LayoutEditorWidget::LayoutEditorWidget(QWidget* parent) :
   mRCLayout->addWidget(mColsEdit);
   mRCLayout->addStretch();
 
-  for (int i=ssc::ptNOPLANE+1; i<ssc::ptCOUNT; ++i)
+  for (int i=ptNOPLANE+1; i<ptCOUNT; ++i)
   {
-    ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(i);
+    PLANE_TYPE type = static_cast<PLANE_TYPE>(i);
     mPlaneNames[type] = qstring_cast(type);
-    mViewNames.push_back(ViewNamesType(type,ssc::View::VIEW_2D, qstring_cast(type)));
+    mViewNames.push_back(ViewNamesType(type,View::VIEW_2D, qstring_cast(type)));
   }
-  mViewNames.push_back(ViewNamesType(ssc::ptNOPLANE,ssc::View::VIEW_3D, "3D"));
-  mViewNames.push_back(ViewNamesType(ssc::ptNOPLANE,ssc::View::VIEW_REAL_TIME, "RT"));
-//  mPlaneNames[ssc::ptNOPLANE] = "3D";
-//  mPlaneNames[static_cast<ssc::PLANE_TYPE>(-1)] = "RT";
+  mViewNames.push_back(ViewNamesType(ptNOPLANE,View::VIEW_3D, "3D"));
+  mViewNames.push_back(ViewNamesType(ptNOPLANE,View::VIEW_REAL_TIME, "RT"));
+//  mPlaneNames[ptNOPLANE] = "3D";
+//  mPlaneNames[static_cast<PLANE_TYPE>(-1)] = "RT";
 
   mSelection = LayoutRegion(-1,-1);
   initCache();
@@ -120,12 +120,12 @@ void LayoutEditorWidget::contextMenuSlot(const QPoint& point)
 
   // actions for view type
   QActionGroup* typeActions = new QActionGroup(this);
-//  for (std::map<ssc::PLANE_TYPE, QString>::iterator iter=mPlaneNames.begin(); iter!=mPlaneNames.end(); ++iter)
+//  for (std::map<PLANE_TYPE, QString>::iterator iter=mPlaneNames.begin(); iter!=mPlaneNames.end(); ++iter)
   for (unsigned i=0; i<mViewNames.size(); ++i)
   {
     ViewNamesType current = mViewNames[i];
-//    ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(i);
-//    ssc::PLANE_TYPE type = iter->first;
+//    PLANE_TYPE type = static_cast<PLANE_TYPE>(i);
+//    PLANE_TYPE type = iter->first;
 //    QString name = iter->second;
 
     QAction* action = new QAction(QString("%1").arg(current.mName), typeActions);
@@ -134,9 +134,9 @@ void LayoutEditorWidget::contextMenuSlot(const QPoint& point)
     connect(action, SIGNAL(triggered()), this, SLOT(typeActionSlot()));
     action->setChecked(viewData.mPlane==current.mPlane && viewData.mType==current.mView);
   }
-//  for (int i=ssc::ptNOPLANE; i<ssc::ptCOUNT; ++i)
+//  for (int i=ptNOPLANE; i<ptCOUNT; ++i)
 //  {
-//    ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(i);
+//    PLANE_TYPE type = static_cast<PLANE_TYPE>(i);
 //
 //    QAction* action = new QAction(QString("%1").arg(mPlaneNames[type]), typeActions);
 //    action->setData(QVariant(i));
@@ -183,7 +183,7 @@ void LayoutEditorWidget::typeActionSlot()
   QAction* sender = dynamic_cast<QAction*>(this->sender());
   if (!sender)
     return;
-//  ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(sender->data().toInt());
+//  PLANE_TYPE type = static_cast<PLANE_TYPE>(sender->data().toInt());
   ViewNamesType type;
   for (unsigned i=0; i<mViewNames.size(); ++i)
     if (mViewNames[i].mName == sender->text())

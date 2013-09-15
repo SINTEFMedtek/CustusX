@@ -22,7 +22,7 @@
 #include "sscColorDataAdapter.h"
 #include "cxColorSelectButton.h"
 
-namespace ssc
+namespace cx
 {
 
 /** 
@@ -52,6 +52,6 @@ private:
     ColorDataAdapterPtr mData;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif // SSCCOLORSELECTWIDGET_H

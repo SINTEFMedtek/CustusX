@@ -47,7 +47,7 @@
 
 typedef vtkSmartPointer<vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
-namespace ssc
+namespace cx
 {
 
 Image::ShadingStruct::ShadingStruct()
@@ -140,7 +140,7 @@ void Image::resetTransferFunctions(bool _2D, bool _3D)
 
 	if (!mBaseImageData)
 	{
-		messageManager()->sendWarning("ssc::Image has no image data");
+		messageManager()->sendWarning("Image has no image data");
 		return;
 	}
 
@@ -169,7 +169,7 @@ void Image::resetTransferFunction(ImageLUT2DPtr imageLookupTable2D)
 {
 	if (!mBaseImageData)
 	{
-		messageManager()->sendWarning("ssc::Image has no image data");
+		messageManager()->sendWarning("Image has no image data");
 		return;
 	}
 
@@ -194,7 +194,7 @@ void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D)
 {
 	if (!mBaseImageData)
 	{
-		messageManager()->sendWarning("ssc::Image has no image data");
+		messageManager()->sendWarning("Image has no image data");
 		return;
 	}
 
@@ -283,7 +283,7 @@ void Image::setTransferFunctions3D(ImageTF3DPtr transferFuntion)
 {
 	if(!this->isValidTransferFunction(transferFuntion))
 	{
-		messageManager()->sendWarning("Not a valid 3D transfer function for ssc::Image");
+		messageManager()->sendWarning("Not a valid 3D transfer function for Image");
 		return;
 	}
 	this->resetTransferFunction(transferFuntion);
@@ -300,7 +300,7 @@ void Image::setLookupTable2D(ImageLUT2DPtr imageLookupTable2D)
 {
 	if(!this->isValidTransferFunction(imageLookupTable2D))
 	{
-		messageManager()->sendWarning("Not a valid 2D transfer function / lookup table for ssc::Image");
+		messageManager()->sendWarning("Not a valid 2D transfer function / lookup table for Image");
 		return;
 	}
 	this->resetTransferFunction(imageLookupTable2D);
@@ -328,7 +328,7 @@ vtkImageDataPtr Image::getRefVtkImageData()
 		mReferenceImageData->Update();
 
 		this->transformChangedSlot(); // update transform
-		std::cout << "Warning: ssc::Image::getRefVtkImageData() called. Expensive. Do not use." << std::endl;
+		std::cout << "Warning: Image::getRefVtkImageData() called. Expensive. Do not use." << std::endl;
 	}
 
 	return mReferenceImageData;
@@ -709,11 +709,11 @@ void Image::setInteractiveClipPlane(vtkPlanePtr plane)
  * The shift introduced by these  two operations are inserted
  * as a translation into the matrix rMd.
  *
- * This operation is needed because ssc::Image dont support vtkImageData
+ * This operation is needed because Image dont support vtkImageData
  * with a nonzero origin or nonzero extent. These must be removed during creation.
  *
  * Use this method only when you, by using some vtk algorithm, have created a vtkImageData
- * that in nonconform with the ssc::Image spec.
+ * that in nonconform with the Image spec.
  */
 void Image::mergevtkSettingsIntosscTransform()
 {
@@ -737,8 +737,8 @@ void Image::mergevtkSettingsIntosscTransform()
 	this->get_rMd_History()->setRegistration(this->get_rMd() * createTransformTranslate(origin + extentShift));
 
 	//Since this function discards the vtkImageData, the transfer functions must be fixed
-	ssc::ImageTF3DPtr transferFunctions = this->getTransferFunctions3D()->createCopy(getBaseVtkImageData());
-	ssc::ImageLUT2DPtr LUT2D = this->getLookupTable2D()->createCopy(getBaseVtkImageData());
+	ImageTF3DPtr transferFunctions = this->getTransferFunctions3D()->createCopy(getBaseVtkImageData());
+	ImageLUT2DPtr LUT2D = this->getLookupTable2D()->createCopy(getBaseVtkImageData());
 	// Make sure the transfer functions are working
 	if (transferFunctions)
 		transferFunctions->fixTransferFunctions();
@@ -891,4 +891,4 @@ double Image::computeResampleFactor(long maxVoxels)
 	return 1.0;
 }
 
-} // namespace ssc
+} // namespace cx

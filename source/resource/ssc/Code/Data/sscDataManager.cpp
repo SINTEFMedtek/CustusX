@@ -22,7 +22,7 @@
 #include "sscDataManagerImpl.h"
 #include "sscTransferFunctions3DPresets.h"
 
-namespace ssc
+namespace cx
 {
 
 // --------------------------------------------------------
@@ -63,7 +63,7 @@ DataManager::~DataManager()
 
 PresetTransferFunctions3DPtr DataManager::getPresetTransferFunctions3D() const
 {
-	return ssc::PresetTransferFunctions3DPtr(new ssc::TransferFunctions3DPresets(ssc::XmlOptionFile(), ssc::XmlOptionFile()));
+	return PresetTransferFunctions3DPtr(new TransferFunctions3DPresets(XmlOptionFile(), XmlOptionFile()));
 }
 
 ImagePtr DataManager::getActiveImage() const
@@ -79,4 +79,4 @@ DataManager* dataManager()
 	return DataManager::getInstance();
 }
 
-} // namespace ssc
+} // namespace cx

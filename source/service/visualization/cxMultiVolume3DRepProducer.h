@@ -40,13 +40,13 @@ public:
 	MultiVolume3DRepProducer();
 	~MultiVolume3DRepProducer();
 
-	void setView(ssc::View* view);
+	void setView(View* view);
 	void setMaxRenderSize(int voxels);
 	int getMaxRenderSize() const;
 	void setVisualizerType(QString type);
-	void addImage(ssc::ImagePtr image);
+	void addImage(ImagePtr image);
 	void removeImage(QString uid);
-	std::vector<ssc::RepPtr> getAllReps();
+	std::vector<RepPtr> getAllReps();
 	static QStringList getAvailableVisualizers();
 	static std::map<QString, QString> getAvailableVisualizerDisplayNames();
 
@@ -58,11 +58,11 @@ private slots:
 
 private:
 	QString mVisualizerType;
-	std::vector<ssc::ImagePtr> m2DImages;
-	std::vector<ssc::ImagePtr> m3DImages;
-	std::vector<ssc::RepPtr> mReps;
+	std::vector<ImagePtr> m2DImages;
+	std::vector<ImagePtr> m3DImages;
+	std::vector<RepPtr> mReps;
 	int mMaxRenderSize;
-	ssc::View* mView;
+	View* mView;
 
 	void updateRepsInView();
 	void fillReps();
@@ -74,17 +74,17 @@ private:
 	void removeRepsFromView();
 	void addRepsToView();
 
-	ssc::ImagePtr removeImageFromVector(QString uid, std::vector<ssc::ImagePtr> &images);
+	ImagePtr removeImageFromVector(QString uid, std::vector<ImagePtr> &images);
 
 	void buildSscGPURayCastMultiVolume();
 	void buildVtkOpenGLGPUMultiVolumeRayCastMapper();
-	void buildVtkVolumeTextureMapper3D(ssc::ImagePtr image);
-	void buildVtkGPUVolumeRayCastMapper(ssc::ImagePtr image);
-	void buildSscProgressiveLODVolumeTextureMapper3D(ssc::ImagePtr image);
-	bool is2DImage(ssc::ImagePtr image) const;
-	void buildSscImage2DRep3D(ssc::ImagePtr image);
+	void buildVtkVolumeTextureMapper3D(ImagePtr image);
+	void buildVtkGPUVolumeRayCastMapper(ImagePtr image);
+	void buildSscProgressiveLODVolumeTextureMapper3D(ImagePtr image);
+	bool is2DImage(ImagePtr image) const;
+	void buildSscImage2DRep3D(ImagePtr image);
 
-	void buildSingleVolumeRenderer(ssc::ImagePtr image);
+	void buildSingleVolumeRenderer(ImagePtr image);
 	bool isSingleVolumeRenderer() const;
 
 };

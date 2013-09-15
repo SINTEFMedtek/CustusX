@@ -29,9 +29,9 @@ QString FastImageRegistrationWidget::defaultWhatsThis() const
 void FastImageRegistrationWidget::performRegistration()
 {
   //make sure the masterImage is set
-  ssc::DataPtr fixedData = mManager->getFixedData();
+  DataPtr fixedData = mManager->getFixedData();
   if(!fixedData)
-    mManager->setFixedData(ssc::dataManager()->getActiveImage());
+    mManager->setFixedData(dataManager()->getActiveImage());
 
   this->updateAvarageAccuracyLabel();
 }
@@ -55,7 +55,7 @@ QString PlateImageRegistrationWidget::defaultWhatsThis() const
 
 void PlateImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
-  ssc::dataManager()->setLandmarkActive(mActiveLandmark, true);
+  dataManager()->setLandmarkActive(mActiveLandmark, true);
   LandmarkImageRegistrationWidget::editLandmarkButtonClickedSlot();
 }
 

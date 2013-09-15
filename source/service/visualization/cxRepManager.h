@@ -20,7 +20,7 @@
 #include <vector>
 #include "sscForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class Rep> RepPtr;
 typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolumetricRepPtr;
@@ -29,8 +29,8 @@ typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolum
 namespace cx
 {
 
-typedef std::map<QString, ssc::RepPtr> RepMap;
-typedef std::map<QString, ssc::VolumetricBaseRepPtr> VolumetricRepMap;
+typedef std::map<QString, RepPtr> RepMap;
+typedef std::map<QString, VolumetricBaseRepPtr> VolumetricRepMap;
 typedef boost::shared_ptr<class ThresholdPreview> ThresholdPreviewPtr;
 
 class MessageManager;
@@ -62,7 +62,7 @@ public:
 	ThresholdPreviewPtr getThresholdPreview(); ///< Get the ThresholdPreview object
 
 	template<class REP>
-	static boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps, ssc::ToolPtr tool)
+	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps, ToolPtr tool)
 	{
 		for (unsigned i = 0; i < reps.size(); ++i)
 		{
@@ -76,7 +76,7 @@ public:
 	}
 
 	template<class REP>
-	static boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps, ssc::DataPtr data)
+	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps, DataPtr data)
 	{
 		for (unsigned i = 0; i < reps.size(); ++i)
 		{
@@ -88,7 +88,7 @@ public:
 	}
 
 	template<class REP>
-	static boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps)
+	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps)
 	{
 		for (unsigned i = 0; i < reps.size(); ++i)
 		{
@@ -140,7 +140,7 @@ public:
 protected:
 	static RepManager* mTheInstance; ///< the only instance of this class
 
-	typedef std::multimap<QString, ssc::RepPtr> RepMultiMap;
+	typedef std::multimap<QString, RepPtr> RepMultiMap;
 	RepMultiMap mRepCache;
 
 private:

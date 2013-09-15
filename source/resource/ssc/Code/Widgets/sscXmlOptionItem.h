@@ -29,7 +29,7 @@
 #include <QString>
 #include <QDomElement>
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Helper class for storing one string value in an xml document.
@@ -116,6 +116,6 @@ private:
 
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCXMLOPTIONITEM_H_ */

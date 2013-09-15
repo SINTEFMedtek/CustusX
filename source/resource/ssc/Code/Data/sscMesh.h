@@ -31,7 +31,7 @@
 class QDomNode;
 class QDomDocument;
 
-namespace ssc
+namespace cx
 {
 
 /**\brief A mesh data set.
@@ -67,7 +67,7 @@ public:
 	bool getFrontfaceCulling();///< Get frontface culling
 	void setIsWireframe(bool on);///< Set rep to wireframe, false means surface
 	bool getIsWireframe() const;///< true=wireframe, false=surface
-	vtkPolyDataPtr getTransformedPolyData(ssc::Transform3D tranform);///< Create a new transformed polydata
+	vtkPolyDataPtr getTransformedPolyData(Transform3D tranform);///< Create a new transformed polydata
 	bool isFiberBundle() const;
 
 signals:
@@ -86,6 +86,6 @@ private:
 
 typedef boost::shared_ptr<Mesh> MeshPtr;
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCMESH_*/

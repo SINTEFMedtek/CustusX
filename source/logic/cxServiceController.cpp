@@ -24,12 +24,12 @@ namespace cx
 ServiceController::ServiceController()
 {
 	// load the ever-present video stream into the patient service
-//	ssc::dataManager()->loadStream(videoService()->getActiveVideoSource());
+//	dataManager()->loadStream(videoService()->getActiveVideoSource());
 
 	// connecting the video source and the tracking us probe.
-//	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateVideoConnections()));
-//	connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(updateVideoConnections()));
-//	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(updateVideoConnections()));
+//	connect(toolManager(), SIGNAL(configured()), this, SLOT(updateVideoConnections()));
+//	connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateVideoConnections()));
+//	connect(toolManager(), SIGNAL(dominantToolChanged(QString)), this, SLOT(updateVideoConnections()));
 ////	connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(updateVideoConnections()));
 //	connect(videoService(), SIGNAL(activeVideoSourceChanged()), this, SLOT(updateVideoConnections()));
 
@@ -56,20 +56,20 @@ void ServiceController::patientChangedSlot()
 	videoService()->getUSAcquisitionVideoPlayback()->setRoot(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
 
 	cxToolManager::getInstance()->setLoggingFolder(loggingPath);
-	ssc::messageManager()->setLoggingFolder(loggingPath);
+	messageManager()->setLoggingFolder(loggingPath);
 }
 
 void ServiceController::clearPatientSlot()
 {
-	ssc::toolManager()->clear();
+	toolManager()->clear();
 }
 
 void ServiceController::duringSavePatientSlot()
 {
 	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
 
-	ssc::toolManager()->addXml(managerNode);
-	ssc::toolManager()->savePositionHistory();
+	toolManager()->addXml(managerNode);
+	toolManager()->savePositionHistory();
 }
 
 void ServiceController::duringLoadPatientSlot()
@@ -77,7 +77,7 @@ void ServiceController::duringLoadPatientSlot()
 	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
 
 	QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
-	ssc::toolManager()->parseXml(toolmanagerNode);
+	toolManager()->parseXml(toolmanagerNode);
 }
 
 ///**Connect a probe from Tracking Service to a video source in Video Service.
@@ -85,7 +85,7 @@ void ServiceController::duringLoadPatientSlot()
 // */
 //void ServiceController::updateVideoConnections()
 //{
-//	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+//	ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
 
 //	this->connectVideoToProbe(tool);
 //}
@@ -96,12 +96,12 @@ void ServiceController::duringLoadPatientSlot()
 // * Apply time calibration to the source.
 // *
 // */
-//void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
+//void ServiceController::connectVideoToProbe(ToolPtr probe)
 //{
-//	ssc::VideoSourcePtr source = videoService()->getActiveVideoSource();
+//	VideoSourcePtr source = videoService()->getActiveVideoSource();
 //	if (!source)
 //	{
-//		ssc::messageManager()->sendError("no rt source.");
+//		messageManager()->sendError("no rt source.");
 //		return;
 //	}
 
@@ -116,7 +116,7 @@ void ServiceController::duringLoadPatientSlot()
 
 //	if (probe)
 //	{
-//		ssc::ProbePtr probeInterface = probe->getProbe();
+//		ProbePtr probeInterface = probe->getProbe();
 //		if (!probeInterface)
 //			return;
 //		probeInterface->setRTSource(source);

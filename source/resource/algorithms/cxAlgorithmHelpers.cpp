@@ -57,7 +57,7 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromVTKImage(vtkImageDataPtr i
 }
 //---------------------------------------------------------------------------------------------------------------------
 
-itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImage(ssc::ImagePtr input)
+itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImage(ImagePtr input)
 {
 	if (!input)
 		return getITKfromVTKImage(vtkImageDataPtr());
@@ -82,7 +82,7 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromVTKImageViaFile(vtkImageDa
   double maxVal = input->GetScalarRange()[1];
 
   if(maxVal > SHRT_MAX || minVal < SHRT_MIN)
-  	ssc::messageManager()->sendWarning("Image values out of range. max: " + qstring_cast(maxVal)
+  	messageManager()->sendWarning("Image values out of range. max: " + qstring_cast(maxVal)
   			+ " min: " + qstring_cast(minVal) + " See bug #363 if this needs to be fixed");
 
   QString tempFolder = DataLocations::getCachePath() + "/vtk2itk/";
@@ -115,7 +115,7 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromVTKImageViaFile(vtkImageDa
   itkImageType::ConstPointer retval = reader->GetOutput();
 
   QFile(filename).remove(); // cleanup
-  QFile(ssc::changeExtension(filename, "raw")).remove(); // cleanup
+  QFile(changeExtension(filename, "raw")).remove(); // cleanup
 
   return retval;
 }

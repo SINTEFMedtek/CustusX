@@ -43,7 +43,7 @@ typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
 class AlgorithmHelper
 {
 public:
-  static itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image);
+  static itkImageType::ConstPointer getITKfromSSCImage(ImagePtr image);
   static itkImageType::ConstPointer getITKfromVTKImage(vtkImageDataPtr image);
 
   static vtkImageDataPtr getVTKFromITK(itkImageType::ConstPointer input);

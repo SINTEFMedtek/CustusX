@@ -67,17 +67,17 @@ void FastOrientationRegistrationWidget::setOrientationSlot()
   mManager->doFastRegistration_Orientation(this->get_tMtm());
 }
 
-ssc::Transform3D FastOrientationRegistrationWidget::get_tMtm() const
+Transform3D FastOrientationRegistrationWidget::get_tMtm() const
 {
-	ssc::Transform3D tMtm;
+	Transform3D tMtm;
 
 	if (mInvertButton->isChecked())
 	{
-		tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(-M_PI / 2);
+		tMtm = createTransformRotateY(M_PI) * createTransformRotateZ(-M_PI / 2);
 	}
 	else
 	{
-		tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI / 2);
+		tMtm = createTransformRotateY(M_PI) * createTransformRotateZ(M_PI / 2);
 	}
 
 	return tMtm;
@@ -85,11 +85,11 @@ ssc::Transform3D FastOrientationRegistrationWidget::get_tMtm() const
 
 void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
 {
-  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+  ToolPtr tool = toolManager()->getDominantTool();
   bool enabled = false;
   enabled = tool &&
 	  tool->getVisible() &&
-      (!tool->hasType(ssc::Tool::TOOL_MANUAL) || cxDataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+      (!tool->hasType(Tool::TOOL_MANUAL) || cxDataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
 
   mSetOrientationButton->setEnabled(enabled);
 }

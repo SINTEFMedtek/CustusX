@@ -33,12 +33,12 @@ namespace cx
 {
 
 cxTool::cxTool(IgstkToolPtr igstkTool) :
-				mTool(igstkTool), mPositionHistory(new ssc::TimedTransformMap()), mPolyData(NULL), m_prMt(
-								new ssc::Transform3D(ssc::Transform3D::Identity())), mValid(false), mConfigured(false), mTracked(
+				mTool(igstkTool), mPositionHistory(new TimedTransformMap()), mPolyData(NULL), m_prMt(
+								new Transform3D(Transform3D::Identity())), mValid(false), mConfigured(false), mTracked(
 								false)
 {
-	ssc::Tool::mUid = mTool->getInternalStructure().mUid;
-	ssc::Tool::mName = mTool->getInternalStructure().mName;
+	Tool::mUid = mTool->getInternalStructure().mUid;
+	Tool::mName = mTool->getInternalStructure().mName;
 	mValid = igstkTool->isValid();
 
 	this->createPolyData();
@@ -56,7 +56,7 @@ cxTool::cxTool(IgstkToolPtr igstkTool) :
 						mTool->getInternalStructure().mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
-	connect(ssc::toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
+	connect(toolManager(), SIGNAL(tooltipOffset(double)), this, SIGNAL(tooltipOffset(double)));
 }
 
 cxTool::~cxTool()
@@ -87,17 +87,17 @@ vtkPolyDataPtr cxTool::getGraphicsPolyData() const
 	return mPolyData;
 }
 
-ssc::TimedTransformMapPtr cxTool::getPositionHistory()
+TimedTransformMapPtr cxTool::getPositionHistory()
 {
 	return mPositionHistory;
 }
 
-ssc::ProbePtr cxTool::getProbe() const
+ProbePtr cxTool::getProbe() const
 {
 	return mProbe;
 }
 
-ssc::Transform3D cxTool::get_prMt() const
+Transform3D cxTool::get_prMt() const
 {
 	return *m_prMt;
 }
@@ -114,22 +114,22 @@ bool cxTool::isInitialized() const
 
 QString cxTool::getUid() const
 {
-	return ssc::Tool::mUid;
+	return Tool::mUid;
 }
 
 QString cxTool::getName() const
 {
-	return ssc::Tool::mName;
+	return Tool::mName;
 }
 
 double cxTool::getTooltipOffset() const
 {
-	return ssc::toolManager()->getTooltipOffset();
+	return toolManager()->getTooltipOffset();
 }
 
 void cxTool::setTooltipOffset(double val)
 {
-	ssc::toolManager()->setTooltipOffset(val);
+	toolManager()->setTooltipOffset(val);
 }
 
 bool cxTool::isValid() const
@@ -166,19 +166,19 @@ void cxTool::createPolyData()
 
 bool cxTool::isCalibrated() const
 {
-	ssc::Transform3D identity = ssc::Transform3D::Identity();
-	ssc::Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
-	return !ssc::similar(sMt, identity);
+	Transform3D identity = Transform3D::Identity();
+	Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
+	return !similar(sMt, identity);
 }
 
-ssc::Transform3D cxTool::getCalibration_sMt() const
+Transform3D cxTool::getCalibration_sMt() const
 {
-	ssc::Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
+	Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
 
 	return sMt;
 }
 
-void cxTool::setCalibration_sMt(ssc::Transform3D calibration)
+void cxTool::setCalibration_sMt(Transform3D calibration)
 {
 	mTool->updateCalibration(calibration);
 }
@@ -188,7 +188,7 @@ QString cxTool::getCalibrationFileName() const
 	return mTool->getInternalStructure().mCalibrationFilename;
 }
 
-ssc::TRACKING_SYSTEM cxTool::getTrackerType()
+TRACKING_SYSTEM cxTool::getTrackerType()
 {
 	return mTool->getInternalStructure().mTrackerType;
 }
@@ -198,14 +198,14 @@ void cxTool::printInternalStructure()
 	mTool->printInternalStructure();
 }
 
-ssc::ProbeData cxTool::getProbeSector() const
+ProbeData cxTool::getProbeSector() const
 {
 	if (mProbe)
 		return mProbe->getProbeData();
-	return ssc::ProbeData();
+	return ProbeData();
 }
 
-std::map<int, ssc::Vector3D> cxTool::getReferencePoints() const
+std::map<int, Vector3D> cxTool::getReferencePoints() const
 {
 	return mTool->getInternalStructure().mReferencePoints;
 }
@@ -215,12 +215,12 @@ bool cxTool::hasReferencePointWithId(int id)
   return this->getReferencePoints().count(id);
 }
 
-ssc::TimedTransformMap cxTool::getSessionHistory(double startTime, double stopTime)
+TimedTransformMap cxTool::getSessionHistory(double startTime, double stopTime)
 {
-	ssc::TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
-	ssc::TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
+	TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
+	TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
 
-	ssc::TimedTransformMap retval(startIt, stopIt);
+	TimedTransformMap retval(startIt, stopIt);
 	return retval;
 }
 
@@ -249,7 +249,7 @@ void cxTool::parseXml(QDomNode& dataNode)
 
 void cxTool::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
 {
-	m_prMt = ssc::Transform3DPtr(new ssc::Transform3D(matrix));
+	m_prMt = Transform3DPtr(new Transform3D(matrix));
 	(*mPositionHistory)[timestamp] = *m_prMt;
 
 	emit toolTransformAndTimestamp((*m_prMt), timestamp);
@@ -263,7 +263,7 @@ void cxTool::calculateTpsSlot()
 	if (	numberOfTransformsToCheck == 0)
 		return;
 
-	ssc::TimedTransformMap::reverse_iterator it = mPositionHistory->rbegin();
+	TimedTransformMap::reverse_iterator it = mPositionHistory->rbegin();
 	double lastTransform = it->first;
 	for (int i = 0; i < numberOfTransformsToCheck; ++i)
 		++it;

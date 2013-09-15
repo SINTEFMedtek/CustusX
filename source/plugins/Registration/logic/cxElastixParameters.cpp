@@ -22,11 +22,11 @@
 namespace cx
 {
 
-ElastixParameters::ElastixParameters(ssc::XmlOptionFile options)
+ElastixParameters::ElastixParameters(XmlOptionFile options)
 {
     mOptions = options;
 
-    mCurrentPreset = ssc::StringDataAdapterXml::initialize("currentPreset", "Preset", "Current Elastix Preset", "Select Preset...", QStringList(), mOptions.getElement());
+    mCurrentPreset = StringDataAdapterXml::initialize("currentPreset", "Preset", "Current Elastix Preset", "Select Preset...", QStringList(), mOptions.getElement());
     connect(mCurrentPreset.get(), SIGNAL(changed()), this, SLOT(currentPresetChangedSlot()));
 
     this->currentPresetChangedSlot();
@@ -44,7 +44,7 @@ void ElastixParameters::addDefaultPreset(QString name, QString executable, QStri
     if (!mOptions.tryDescend("preset", "name", name).isNull())
         return;
 
-    ssc::XmlOptionFile node = mOptions.descend("preset", "name", name);
+    XmlOptionFile node = mOptions.descend("preset", "name", name);
     node.getElement().setAttribute("executable", executable);
     for (unsigned i=0; i<parameterFiles.size(); ++i)
     {
@@ -58,7 +58,7 @@ void ElastixParameters::currentPresetChangedSlot()
 {
     this->reloadPresets();
 
-    ssc::XmlOptionFile node = mOptions.descend("preset", "name", mCurrentPreset->getValue());
+    XmlOptionFile node = mOptions.descend("preset", "name", mCurrentPreset->getValue());
     mActiveExecutable = node.getElement().attribute("executable");
     mActiveParameterFile0 = this->getFullParameterFilename(node.getElement().attribute("parameterFile0"));
     mActiveParameterFile1 = this->getFullParameterFilename(node.getElement().attribute("parameterFile1"));
@@ -78,14 +78,14 @@ QString ElastixParameters::getParameterFilesDir() const
     return cx::DataLocations::getRootConfigPath() + "/elastix/parameterFiles";
 }
 
-ssc::StringDataAdapterPtr ElastixParameters::getCurrentPreset()
+StringDataAdapterPtr ElastixParameters::getCurrentPreset()
 {
     return mCurrentPreset;
 }
 
 void ElastixParameters::removeCurrentPreset()
 {
-    ssc::XmlOptionFile node = mOptions.descend("preset", "name", mCurrentPreset->getValue());
+    XmlOptionFile node = mOptions.descend("preset", "name", mCurrentPreset->getValue());
     node.deleteNode();
     this->reloadPresets();
     mCurrentPreset->setValue("Select Preset...");
@@ -111,7 +111,7 @@ void ElastixParameters::reloadPresets()
 
 void ElastixParameters::saveCurrentPreset(QString name)
 {
-    ssc::XmlOptionFile node = mOptions.descend("preset", "name", name);
+    XmlOptionFile node = mOptions.descend("preset", "name", name);
     node.getElement().setAttribute("executable", mActiveExecutable);
     node.getElement().setAttribute("parameterFile0", QFileInfo(mActiveParameterFile0).fileName());
     node.getElement().setAttribute("parameterFile1", QFileInfo(mActiveParameterFile1).fileName());

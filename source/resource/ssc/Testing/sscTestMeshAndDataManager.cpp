@@ -11,18 +11,18 @@
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 
-//namespace ssc
+//namespace cx
 //{
 
 int main(int argc, char **argv)
 {
-	ssc::MessageManager::initialize();
+	cx::MessageManager::initialize();
 
-	std::cout << "DataFolder: " << ssc::TestUtilities::GetDataRoot() << std::endl;
+	std::cout << "DataFolder: " << cx::TestUtilities::GetDataRoot() << std::endl;
 
-	QString stlFileName1 = ssc::TestUtilities::ExpandDataFileName("../source/resource/ssc/Sandbox/Models/01-117-0329_Planning-Navigator.stl");
+	QString stlFileName1 = cx::TestUtilities::ExpandDataFileName("../source/resource/ssc/Sandbox/Models/01-117-0329_Planning-Navigator.stl");
 
-	ssc::MeshPtr mesh1 = ssc::DataManager::getInstance()->loadMesh(stlFileName1, stlFileName1, ssc::rtSTL);
+	cx::MeshPtr mesh1 = cx::DataManager::getInstance()->loadMesh(stlFileName1, stlFileName1, cx::rtSTL);
 	if(!mesh1)
 	{
 		std::cout << "Cannot read mesh" << std::endl;
@@ -74,11 +74,11 @@ int main(int argc, char **argv)
 
 
 
-	//std::vector<QString> names = ssc::DataManager::instance()->getImageNames();
+	//std::vector<QString> names = DataManager::instance()->getImageNames();
 
-	ssc::MessageManager::shutdown();
+	cx::MessageManager::shutdown();
 
 	return 0;
 }
 
-//}//namespace ssc
+//}//namespace cx

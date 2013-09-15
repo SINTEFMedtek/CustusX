@@ -64,7 +64,7 @@ public:
 	void runIGTLinkedClient(QString address, int port);
 	void disconnectServer();
 
-	std::vector<ssc::VideoSourcePtr> getVideoSources();
+	std::vector<VideoSourcePtr> getVideoSources();
 	void setImageToStream(QString uid);
 
 
@@ -83,17 +83,17 @@ private slots:
 	void useUnusedProbeDataSlot();///< If no probe is available the ProbeData is saved and this slot is called when a probe becomes available
 
 private:
-	void updateImage(ssc::ImagePtr message); // called by receiving thread when new data arrives.
+	void updateImage(ImagePtr message); // called by receiving thread when new data arrives.
 	void runClient(ImageReceiverThreadPtr client);
 	void stopClient(); ///< Get rid of the mClient thread.
-	void updateStatus(ssc::ProbeDataPtr message);
+	void updateStatus(ProbeDataPtr message);
 	void startAllSources();
-	void removeSourceFromProbe(ssc::ToolPtr tool);
+	void removeSourceFromProbe(ToolPtr tool);
 
 	ImageReceiverThreadPtr mClient;
 	bool mConnected;
 	double mFPS;
-	std::vector<ssc::ProbeDataPtr> mUnsusedProbeDataVector;
+	std::vector<ProbeDataPtr> mUnsusedProbeDataVector;
 
 	std::vector<BasicVideoSourcePtr> mSources;
 

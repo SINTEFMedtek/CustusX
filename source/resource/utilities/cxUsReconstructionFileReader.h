@@ -106,7 +106,7 @@ ProbeCalibration = <not used>
  * This file contains the frame positions. This is a newline-separated
  * sequence of matrices, one for each US frame. Each matrix is the rMu,
  * i.e. the transform from lower-left centered image space to
- * global reference (See \ref ssc_page_coords and \ref ssc::ProbeData).
+ * global reference (See \ref ssc_page_coords and \ref ProbeData).
  * The last line of the matrix (always containing 0 0 0 1) is omitted. The matrix
  * numbers is whitespace-separated with newline between rows. Thus the number of
  * lines in this file is (# tracking positions) x 3.
@@ -132,28 +132,28 @@ public:
 	 *
 	 * the mMask var is filled with data from ProbeData, or from file if present.
 	 */
-	ssc::USReconstructInputData readAllFiles(QString fileName, QString calFilesPath = "");
+	USReconstructInputData readAllFiles(QString fileName, QString calFilesPath = "");
 
-	std::vector<ssc::TimedPosition> readFrameTimestamps(QString fileName);
+	std::vector<TimedPosition> readFrameTimestamps(QString fileName);
 	/**
 	  * Read probe data from the probedata config file attached to the mhd file,
 	  * named <mhdfilename-base>.probedata.xml
 	  */
-	static std::pair<QString, ssc::ProbeData>  readProbeDataFromFile(QString mhdFileName);
+	static std::pair<QString, ProbeData>  readProbeDataFromFile(QString mhdFileName);
 
 private:
-	std::vector<ssc::TimedPosition> readPositions(QString fileName);
-	bool readMaskFile(QString mhdFileName, ssc::ImagePtr mask);
-	ssc::USFrameDataPtr readUsDataFile(QString mhdFileName);
+	std::vector<TimedPosition> readPositions(QString fileName);
+	bool readMaskFile(QString mhdFileName, ImagePtr mask);
+	USFrameDataPtr readUsDataFile(QString mhdFileName);
 
-	void readPositionFile(QString posFile, bool alsoReadTimestamps, std::vector<ssc::TimedPosition>* timedPos);
-	void readTimeStampsFile(QString fileName, std::vector<ssc::TimedPosition>* timedPos);
+	void readPositionFile(QString posFile, bool alsoReadTimestamps, std::vector<TimedPosition>* timedPos);
+	void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);
 	void readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName);
 	ProbeXmlConfigParser::Configuration readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath);
-	std::pair<QString, ssc::ProbeData>  readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath);
+	std::pair<QString, ProbeData>  readProbeDataBackwardsCompatible(QString mhdFileName, QString calFilesPath);
 
-	ssc::ImagePtr createMaskFromConfigParams(ssc::USReconstructInputData data);
-	ssc::ImagePtr generateMask(ssc::USReconstructInputData data);
+	ImagePtr createMaskFromConfigParams(USReconstructInputData data);
+	ImagePtr generateMask(USReconstructInputData data);
 };
 
 typedef boost::shared_ptr<UsReconstructionFileReader> UsReconstructionFileReaderPtr;

@@ -38,10 +38,10 @@ void ShadingWidget::init()
 
   QGridLayout* shadingLayput = new QGridLayout();
   shadingLayput->addWidget(mShadingCheckBox, 0,0);
-  ssc::SliderGroupWidget* shadingAmbientWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterShadingAmbient()), shadingLayput, 1);
-  ssc::SliderGroupWidget* shadingDiffuseWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterShadingDiffuse()), shadingLayput, 2);
-  ssc::SliderGroupWidget* shadingSpecularWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecular()), shadingLayput, 3);
-  ssc::SliderGroupWidget* shadingSpecularPowerWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecularPower()), shadingLayput, 4);
+  SliderGroupWidget* shadingAmbientWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingAmbient()), shadingLayput, 1);
+  SliderGroupWidget* shadingDiffuseWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingDiffuse()), shadingLayput, 2);
+  SliderGroupWidget* shadingSpecularWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecular()), shadingLayput, 3);
+  SliderGroupWidget* shadingSpecularPowerWidget = new SliderGroupWidget(this, DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecularPower()), shadingLayput, 4);
 
   shadingAmbientWidget->setEnabled(false);
   shadingDiffuseWidget->setEnabled(false);
@@ -60,7 +60,7 @@ void ShadingWidget::init()
 
 void ShadingWidget::shadingToggledSlot(bool val)
 {
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  ImagePtr image = dataManager()->getActiveImage();
   if (image)
   {
     image->setShadingOn(val);
@@ -69,7 +69,7 @@ void ShadingWidget::shadingToggledSlot(bool val)
 
 void ShadingWidget::activeImageChangedSlot()
 {
-  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+  ImagePtr activeImage = dataManager()->getActiveImage();
 
   if (activeImage)
   {

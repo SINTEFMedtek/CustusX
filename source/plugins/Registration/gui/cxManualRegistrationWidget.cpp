@@ -30,12 +30,12 @@ ManualImageRegistrationWidget::ManualImageRegistrationWidget(RegistrationManager
 
 //  //registrationmanager
 //  connect(mManager.get(), SIGNAL(patientRegistrationPerformed()), this, SLOT(activateManualRegistrationFieldSlot()));
-//  connect(ssc::toolManager(), SIGNAL(rMprChanged()), this, SLOT(activateManualRegistrationFieldSlot()));
+//  connect(toolManager(), SIGNAL(rMprChanged()), this, SLOT(activateManualRegistrationFieldSlot()));
 
 	mFixedImage.reset(new RegistrationFixedImageStringDataAdapter(regManager));
-	mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFixedImage));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mFixedImage));
 	mMovingImage.reset(new RegistrationMovingImageStringDataAdapter(regManager));
-	mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mMovingImage));
+	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mMovingImage));
 
 	mLabel = new QLabel("Data matrix rMd");
 	mVerticalLayout->addWidget(mLabel);
@@ -83,10 +83,10 @@ void ManualImageRegistrationWidget::matrixWidgetChanged()
 	if (!mConnectedMovingImage)
 		return;
 
-	ssc::Transform3D rMd = mConnectedMovingImage->get_rMd();
-	ssc::Transform3D rMMd = mMatrixWidget->getMatrix();
+	Transform3D rMd = mConnectedMovingImage->get_rMd();
+	Transform3D rMMd = mMatrixWidget->getMatrix();
 
-	ssc::Transform3D delta_pre_rMd = rMMd * rMd.inv(); // gives delta on the r (left) side.
+	Transform3D delta_pre_rMd = rMMd * rMd.inv(); // gives delta on the r (left) side.
 	mManager->applyImage2ImageRegistration(delta_pre_rMd, "Manual Image");
 }
 
@@ -102,7 +102,7 @@ void ManualImageRegistrationWidget::imageMatrixChanged()
 	}
 	else
 	{
-		mMatrixWidget->setMatrix(ssc::Transform3D::Identity());
+		mMatrixWidget->setMatrix(Transform3D::Identity());
 	}
 	mMatrixWidget->blockSignals(false);
 }
@@ -128,7 +128,7 @@ ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegistrationMan
 
 	mVerticalLayout->addStretch();
 
-	connect(ssc::toolManager(), SIGNAL(rMprChanged()), this, SLOT(patientMatrixChanged()));
+	connect(toolManager(), SIGNAL(rMprChanged()), this, SLOT(patientMatrixChanged()));
 
 	this->patientMatrixChanged();
 }
@@ -139,7 +139,7 @@ ManualPatientRegistrationWidget::ManualPatientRegistrationWidget(RegistrationMan
  */
 void ManualPatientRegistrationWidget::matrixWidgetChanged()
 {
-	ssc::Transform3D rMpr = mMatrixWidget->getMatrix();
+	Transform3D rMpr = mMatrixWidget->getMatrix();
 	mManager->applyPatientRegistration(rMpr, "Manual Patient");
 }
 
@@ -149,7 +149,7 @@ void ManualPatientRegistrationWidget::matrixWidgetChanged()
 void ManualPatientRegistrationWidget::patientMatrixChanged()
 {
 	mMatrixWidget->blockSignals(true);
-	mMatrixWidget->setMatrix(*ssc::toolManager()->get_rMpr());
+	mMatrixWidget->setMatrix(*toolManager()->get_rMpr());
 	mMatrixWidget->blockSignals(false);
 }
 

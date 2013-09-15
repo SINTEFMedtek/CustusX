@@ -24,7 +24,7 @@
 #include "sscTool.h"
 #include "vtkForwardDeclarations.h"
 
-namespace ssc
+namespace cx
 {
 
 class ToolManager;
@@ -40,7 +40,7 @@ class ToolManager;
  *
  * \ingroup sscTool
  */
-class ManualTool : public ssc::Tool
+class ManualTool : public Tool
 {
 	Q_OBJECT
 public:
@@ -58,7 +58,7 @@ public:
 	virtual QString getName() const;
 	virtual int getIndex() const;
 	virtual bool isCalibrated() const;
-	virtual ssc::ProbeData getProbeSector() const;
+	virtual ProbeData getProbeSector() const;
 	virtual double getTimestamp() const;
 	virtual void set_prMt(const Transform3D& prMt);
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
@@ -76,7 +76,7 @@ private slots:
 	void read3DCrossHairSlot(double toolTipOffset);
 private:
 	// constant data
-	ssc::ProbeData mSector;
+	ProbeData mSector;
 	vtkSTLReaderPtr mSTLReader;
 	vtkCursor3DPtr mCrossHair;
 

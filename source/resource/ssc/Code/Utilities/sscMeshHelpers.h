@@ -10,7 +10,7 @@
  * \author Ole Vegard Solberg, SINTEF
  */
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -19,16 +19,16 @@ namespace ssc
  */
 
 vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt);
-void loadMeshFromToolTransforms(ssc::TimedTransformMap transforms_prMt);
+void loadMeshFromToolTransforms(TimedTransformMap transforms_prMt);
 
 /**
  * Get information about a ssc mesh.
  */
-std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::MeshPtr mesh);
+std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh);
 
 /**
  * \}
  */
 
-}//namespace ssc
+}//namespace cx
 
