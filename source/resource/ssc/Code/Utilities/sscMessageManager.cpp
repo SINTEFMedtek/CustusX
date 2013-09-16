@@ -152,7 +152,6 @@ MessageManager* messageManager() { return MessageManager::getInstance(); }
 MessageManager::MessageManager() :
 	mEnabled(false)
 {
-  typedef Message Message;
   qRegisterMetaType<Message>("Message");
 }
 
