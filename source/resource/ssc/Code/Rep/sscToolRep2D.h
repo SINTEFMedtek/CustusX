@@ -28,7 +28,7 @@
 #include "sscTransform3D.h"
 #include "sscBoundingBox3D.h"
 
-namespace ssc
+namespace cx
 {
 class ProbeData;
 
@@ -47,7 +47,7 @@ class ProbeData;
  * \ingroup sscRep
  * \ingroup sscRep2D
  */
-class ToolRep2D : public ssc::RepImpl
+class ToolRep2D : public RepImpl
 {
 	Q_OBJECT
 	public:
@@ -55,7 +55,7 @@ class ToolRep2D : public ssc::RepImpl
 		~ToolRep2D();
 		virtual QString getType() const;
 
-		void setSliceProxy(ssc::SliceProxyPtr slicer);
+		void setSliceProxy(SliceProxyPtr slicer);
 		void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp);
 
 		void setUseOffset(bool on);
@@ -79,11 +79,11 @@ class ToolRep2D : public ssc::RepImpl
 		bool showProbe();
 		bool showOffset();
 
-		virtual void addRepActorsToViewRenderer(ssc::View *view);
-		virtual void removeRepActorsFromViewRenderer(ssc::View *view);
+		virtual void addRepActorsToViewRenderer(View *view);
+		virtual void removeRepActorsFromViewRenderer(View *view);
 
 	private:
-		void setProbeSector(ssc::ProbeData data);
+		void setProbeSector(ProbeData data);
 		double getOffset();
 		void createCrossHair(vtkRendererPtr renderer);
 		void setVisibility();
@@ -95,7 +95,7 @@ class ToolRep2D : public ssc::RepImpl
 		ToolRep2D(const QString& uid, const QString& name="");
 		void crossHairResized();
 
-		ssc::SliceProxyPtr mSlicer;
+		SliceProxyPtr mSlicer;
 		Transform3D m_vpMs;
 		DoubleBoundingBox3D mBB_vp;
 

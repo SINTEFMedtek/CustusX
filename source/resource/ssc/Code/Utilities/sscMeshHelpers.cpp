@@ -11,7 +11,7 @@
 #include "sscTypeConversions.h"
 #include "sscTime.h"
 
-namespace ssc
+namespace cx
 {
 vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt)
 {
@@ -51,21 +51,21 @@ vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt)
 void loadMeshFromToolTransforms(TimedTransformMap transforms_prMt)
 {
   //create polydata from positions
-  vtkPolyDataPtr centerlinePolydata = ssc::polydataFromTransforms(transforms_prMt);
+  vtkPolyDataPtr centerlinePolydata = polydataFromTransforms(transforms_prMt);
   QString uid = "tool_positions_mesh_%1";
   QString name = "Tool positions mesh %1";
-  MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolydata, uid, name, "Images");
+  MeshPtr mesh = dataManager()->createMesh(centerlinePolydata, uid, name, "Images");
   mesh->setColor(QColor("red"));
   dataManager()->loadData(mesh);
 }
 
-std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::MeshPtr mesh)
+std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh)
 {
 	std::map<std::string, std::string> retval;
 	if(!mesh)
 		return retval;
 
-	//ssc::mesh
+	//mesh
 	retval["Filepath"] = mesh->getFilePath().toStdString();
 	retval["Coordinate system"] = mesh->getCoordinateSystem().toString().toStdString();
 	retval["Name"] = mesh->getName().toStdString();
@@ -79,7 +79,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::MeshPtr mesh)
 	retval["Color"] = mesh->getColor().name().toStdString();
 	retval["Frontface culling"] = string_cast(mesh->getFrontfaceCulling());
 	retval["Is wireframe"] = string_cast(mesh->getIsWireframe());
-	retval["Acquisition time"] = string_cast(mesh->getAcquisitionTime().toString(ssc::timestampSecondsFormatNice()));
+	retval["Acquisition time"] = string_cast(mesh->getAcquisitionTime().toString(timestampSecondsFormatNice()));
 	retval["Fiber bundle"] = string_cast(mesh->isFiberBundle());
 
 	//vtkPolyData
@@ -95,5 +95,5 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ssc::MeshPtr mesh)
 	return retval;
 }
 
-}//namespace ssc
+}//namespace cx
 

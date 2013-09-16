@@ -18,15 +18,15 @@
 namespace cx
 {
 
-ManualToolAdapter::ManualToolAdapter(ssc::ToolManager* manager, QString uid) :
-				ssc::ManualTool(manager, uid)
+ManualToolAdapter::ManualToolAdapter(ToolManager* manager, QString uid) :
+				ManualTool(manager, uid)
 {
-	mBase.reset(new ssc::ManualTool(manager, uid + "base"));
+	mBase.reset(new ManualTool(manager, uid + "base"));
 	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 }
 
-ManualToolAdapter::ManualToolAdapter(ssc::ToolManager* manager, ssc::ToolPtr base) :
-				ssc::ManualTool(manager, mBase->getUid() + "_manual"), mBase(base)
+ManualToolAdapter::ManualToolAdapter(ToolManager* manager, ToolPtr base) :
+				ManualTool(manager, mBase->getUid() + "_manual"), mBase(base)
 {
 }
 
@@ -34,14 +34,14 @@ ManualToolAdapter::~ManualToolAdapter()
 {
 }
 
-void ManualToolAdapter::setBase(ssc::ToolPtr base)
+void ManualToolAdapter::setBase(ToolPtr base)
 {
 	disconnect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 	mBase = base;
 	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 }
 
-//ssc::Tool::Type ManualToolAdapter::getType() const
+//Tool::Type ManualToolAdapter::getType() const
 //{
 //  return mBase->getType();
 //}
@@ -71,22 +71,22 @@ bool ManualToolAdapter::isCalibrated() const
 	return mBase->isCalibrated();
 }
 
-ssc::ProbeData ManualToolAdapter::getProbeSector() const
+ProbeData ManualToolAdapter::getProbeSector() const
 {
 	return mBase->getProbeSector();
 }
 
-ssc::ProbePtr ManualToolAdapter::getProbe() const
+ProbePtr ManualToolAdapter::getProbe() const
 {
 	return mBase->getProbe();
 }
 
-ssc::Transform3D ManualToolAdapter::getCalibration_sMt() const
+Transform3D ManualToolAdapter::getCalibration_sMt() const
 {
 	return mBase->getCalibration_sMt();
 }
 
-std::map<int, ssc::Vector3D> ManualToolAdapter::getReferencePoints() const
+std::map<int, Vector3D> ManualToolAdapter::getReferencePoints() const
 {
 	return mBase->getReferencePoints();
 }

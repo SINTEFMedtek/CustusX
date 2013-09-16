@@ -25,7 +25,7 @@
 #include "sscPointMetric.h"
 #include "sscViewportListener.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class PointMetricRep2D> PointMetricRep2DPtr;
@@ -47,8 +47,8 @@ public:
 
 //	void setPointMetric(PointMetricPtr point);
 //	PointMetricPtr getPointMetric();
-	virtual QString getType() const { return "ssc::PointMetricRep2D"; }
-	void setSliceProxy(ssc::SliceProxyPtr slicer);
+	virtual QString getType() const { return "PointMetricRep2D"; }
+	void setSliceProxy(SliceProxyPtr slicer);
 	/**
 	 * Set the width of the outline in fractions of the full size
 	 */
@@ -61,8 +61,8 @@ public:
 	void setDynamicSize(bool on);
 
 protected:
-	virtual void addRepActorsToViewRenderer(ssc::View* view);
-	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+	virtual void addRepActorsToViewRenderer(View* view);
+	virtual void removeRepActorsFromViewRenderer(View* view);
 
     virtual void clear();
     virtual void rescale();
@@ -75,14 +75,14 @@ private:
 	PointMetricRep2D(); ///< not implemented
 
 //	PointMetricPtr mMetric;
-	ssc::ViewportListenerPtr mViewportListener;
-	ssc::SliceProxyPtr mSliceProxy;
+	ViewportListenerPtr mViewportListener;
+	SliceProxyPtr mSliceProxy;
 	vtkActorPtr mCircleActor;
 	vtkSectorSourcePtr mCircleSource;
 	vtkActorPtr mOutlineActor;
 	vtkSectorSourcePtr mOutlineSource;
 	double mOutlineWidth;
-	ssc::Vector3D mOutlineColor;
+	Vector3D mOutlineColor;
 	bool mFillVisible;
 };
 

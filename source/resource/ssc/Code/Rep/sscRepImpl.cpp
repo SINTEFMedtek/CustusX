@@ -20,7 +20,7 @@
 #include "sscRepImpl.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 RepImpl::RepImpl(const QString& uid, const QString& name) :
@@ -72,4 +72,4 @@ void RepImpl::printSelf(std::ostream & os, Indent indent)
 }
 
 
-} // namespace ssc
+} // namespace cx

@@ -34,7 +34,7 @@ namespace cx
 {
 DoubleDataAdapterActiveToolOffset::DoubleDataAdapterActiveToolOffset()
 {
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+  connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   dominantToolChangedSlot();
 }
 
@@ -60,7 +60,7 @@ void DoubleDataAdapterActiveToolOffset::dominantToolChangedSlot()
     disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
   }
 
-  mTool = ssc::toolManager()->getDominantTool();
+  mTool = toolManager()->getDominantTool();
 
   if (mTool)
   {
@@ -70,10 +70,10 @@ void DoubleDataAdapterActiveToolOffset::dominantToolChangedSlot()
   emit changed();
 }
 
-ssc::DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
+DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 {
   double range = 200;
-  return ssc::DoubleRange(0,range,1);
+  return DoubleRange(0,range,1);
 }
 
 //---------------------------------------------------------
@@ -88,7 +88,7 @@ DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase()
 }
 void DoubleDataAdapterActiveImageBase::activeImageChanged()
 {
-  mImage = ssc::dataManager()->getActiveImage();
+  mImage = dataManager()->getActiveImage();
   emit changed();
 }
 double DoubleDataAdapterActiveImageBase::getValue() const
@@ -116,12 +116,12 @@ void DoubleDataAdapter2DWindow::setValueInternal(double val)
 {
   mImage->getLookupTable2D()->setWindow(val);
 }
-ssc::DoubleRange DoubleDataAdapter2DWindow::getValueRange() const
+DoubleRange DoubleDataAdapter2DWindow::getValueRange() const
 {
   if (!mImage)
-    return ssc::DoubleRange();
+    return DoubleRange();
   double range = mImage->getRange();
-  return ssc::DoubleRange(1,range,range/1000.0);
+  return DoubleRange(1,range,range/1000.0);
 }
 
 //---------------------------------------------------------
@@ -136,13 +136,13 @@ void DoubleDataAdapter2DLevel::setValueInternal(double val)
 	SSC_LOG("");
   mImage->getLookupTable2D()->setLevel(val);
 }
-ssc::DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
+DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
 {
   if (!mImage)
-    return ssc::DoubleRange();
+    return DoubleRange();
 
   double max = mImage->getMax();
-  return ssc::DoubleRange(1,max,max/1000.0);
+  return DoubleRange(1,max,max/1000.0);
 }
 
 ////---------------------------------------------------------
@@ -151,15 +151,15 @@ ssc::DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
 
 SelectRTSourceStringDataAdapterBase::SelectRTSourceStringDataAdapterBase()
 {
-  connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SIGNAL(changed()));
+  connect(dataManager(), SIGNAL(streamLoaded()), this, SIGNAL(changed()));
 }
 
 QStringList SelectRTSourceStringDataAdapterBase::getValueRange() const
 {
-  ssc::DataManager::StreamMap streams = ssc::dataManager()->getStreams();
+  DataManager::StreamMap streams = dataManager()->getStreams();
   QStringList retval;
   retval << "<no real time source>";
-  ssc::DataManager::StreamMap::iterator it = streams.begin();
+  DataManager::StreamMap::iterator it = streams.begin();
   for (; it !=streams.end(); ++it)
     retval << qstring_cast(it->second->getUid());
   return retval;
@@ -167,7 +167,7 @@ QStringList SelectRTSourceStringDataAdapterBase::getValueRange() const
 
 QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString internal)
 {
-  ssc::VideoSourcePtr rtSource = ssc::dataManager()->getStream(internal);
+  VideoSourcePtr rtSource = dataManager()->getStream(internal);
   if (!rtSource)
     return "<no real time source>";
   return qstring_cast(rtSource->getName());
@@ -202,7 +202,7 @@ QString ActiveVideoSourceStringDataAdapter::getValue() const
 
 QStringList ActiveVideoSourceStringDataAdapter::getValueRange() const
 {
-	std::vector<ssc::VideoSourcePtr> sources = videoService()->getVideoSources();
+	std::vector<VideoSourcePtr> sources = videoService()->getVideoSources();
 	QStringList retval;
 	for (unsigned i=0; i<sources.size(); ++i)
 		retval << sources[i]->getUid();
@@ -220,12 +220,12 @@ QString ActiveVideoSourceStringDataAdapter::getHelp() const
 
 SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
 {
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
+  connect(toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
 }
 
 QStringList SelectToolStringDataAdapterBase::getValueRange() const
 {
-  std::vector<QString> uids = ssc::toolManager()->getToolUids();
+  std::vector<QString> uids = toolManager()->getToolUids();
   QStringList retval;
   retval << "";
   for (unsigned i=0; i<uids.size(); ++i)
@@ -235,7 +235,7 @@ QStringList SelectToolStringDataAdapterBase::getValueRange() const
 
 QString SelectToolStringDataAdapterBase::convertInternal2Display(QString internal)
 {
-  ssc::ToolPtr tool = ssc::toolManager()->getTool(internal);
+  ToolPtr tool = toolManager()->getTool(internal);
   if (!tool)
   {
     return "<no tool>";
@@ -255,11 +255,11 @@ QStringList SelectCoordinateSystemStringDataAdapterBase::getValueRange() const
 {
   QStringList retval;
   retval << "";
-  retval << qstring_cast(ssc::csREF);
-  retval << qstring_cast(ssc::csDATA);
-  retval << qstring_cast(ssc::csPATIENTREF);
-  retval << qstring_cast(ssc::csTOOL);
-  retval << qstring_cast(ssc::csSENSOR);
+  retval << qstring_cast(csREF);
+  retval << qstring_cast(csDATA);
+  retval << qstring_cast(csPATIENTREF);
+  retval << qstring_cast(csTOOL);
+  retval << qstring_cast(csSENSOR);
   return retval;
 }
 
@@ -291,7 +291,7 @@ QString SelectCoordinateSystemStringDataAdapterBase::convertInternal2Display(QSt
 SelectRTSourceStringDataAdapter::SelectRTSourceStringDataAdapter() :
     mValueName("Select Real Time Source")
 {
-  connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(setDefaultSlot()));
+  connect(dataManager(), SIGNAL(streamLoaded()), this, SLOT(setDefaultSlot()));
   this->setDefaultSlot();
 }
 
@@ -308,7 +308,7 @@ bool SelectRTSourceStringDataAdapter::setValue(const QString& value)
   if(mRTSource)
     disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SIGNAL(changed()));
 
-  ssc::VideoSourcePtr rtSource = ssc::dataManager()->getStream(value);
+  VideoSourcePtr rtSource = dataManager()->getStream(value);
   if(!rtSource)
     return false;
 
@@ -331,7 +331,7 @@ QString SelectRTSourceStringDataAdapter::getHelp() const
   return "Select a real time source";
 }
 
-ssc::VideoSourcePtr SelectRTSourceStringDataAdapter::getRTSource()
+VideoSourcePtr SelectRTSourceStringDataAdapter::getRTSource()
 {
   return mRTSource;
 }
@@ -343,8 +343,8 @@ void SelectRTSourceStringDataAdapter::setValueName(const QString name)
 
 void SelectRTSourceStringDataAdapter::setDefaultSlot()
 {
-  ssc::DataManager::StreamMap streams = ssc::dataManager()->getStreams();
-  ssc::DataManager::StreamMap::iterator it = streams.begin();
+  DataManager::StreamMap streams = dataManager()->getStreams();
+  DataManager::StreamMap::iterator it = streams.begin();
   if(it != streams.end())
   {
     this->setValue(it->first);
@@ -357,8 +357,8 @@ void SelectRTSourceStringDataAdapter::setDefaultSlot()
 
 SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
 {
-	mCoordinateSystem = ssc::csCOUNT;
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(setDefaultSlot()));
+	mCoordinateSystem = csCOUNT;
+  connect(toolManager(), SIGNAL(configured()), this, SLOT(setDefaultSlot()));
 }
 
 QString SelectCoordinateSystemStringDataAdapter::getValueName() const
@@ -368,7 +368,7 @@ QString SelectCoordinateSystemStringDataAdapter::getValueName() const
 
 bool SelectCoordinateSystemStringDataAdapter::setValue(const QString& value)
 {
-  mCoordinateSystem = string2enum<ssc::COORDINATE_SYSTEM>(value);
+  mCoordinateSystem = string2enum<COORDINATE_SYSTEM>(value);
   emit changed();
   return true;
 }
@@ -385,7 +385,7 @@ QString SelectCoordinateSystemStringDataAdapter::getHelp() const
 
 void SelectCoordinateSystemStringDataAdapter::setDefaultSlot()
 {
-  this->setValue(qstring_cast(ssc::csPATIENTREF));
+  this->setValue(qstring_cast(csPATIENTREF));
 }
 
 //---------------------------------------------------------
@@ -417,7 +417,7 @@ bool SelectToolStringDataAdapter::setValue(const QString& value)
 {
   if(mTool && value==mTool->getUid())
     return false;
-  ssc::ToolPtr temp = ssc::toolManager()->getTool(value);
+  ToolPtr temp = toolManager()->getTool(value);
   if(!temp)
     return false;
 
@@ -438,7 +438,7 @@ QString SelectToolStringDataAdapter::getHelp() const
   return mHelp;
 }
 
-ssc::ToolPtr SelectToolStringDataAdapter::getTool() const
+ToolPtr SelectToolStringDataAdapter::getTool() const
 {
   return mTool;
 }
@@ -450,10 +450,10 @@ ssc::ToolPtr SelectToolStringDataAdapter::getTool() const
 
 ParentFrameStringDataAdapter::ParentFrameStringDataAdapter()
 {
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+  connect(dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
 }
 
-void ParentFrameStringDataAdapter::setData(ssc::DataPtr data)
+void ParentFrameStringDataAdapter::setData(DataPtr data)
 {
   if (mData)
     disconnect(mData.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
@@ -495,8 +495,8 @@ QStringList ParentFrameStringDataAdapter::getValueRange() const
   QStringList retval;
   retval << "";
 
-  std::map<QString, ssc::DataPtr> allData = ssc::dataManager()->getData();
-  for (std::map<QString, ssc::DataPtr>::iterator iter=allData.begin(); iter!=allData.end(); ++iter)
+  std::map<QString, DataPtr> allData = dataManager()->getData();
+  for (std::map<QString, DataPtr>::iterator iter=allData.begin(); iter!=allData.end(); ++iter)
   {
     if (mData && (mData->getUid() == iter->first))
       continue;
@@ -508,7 +508,7 @@ QStringList ParentFrameStringDataAdapter::getValueRange() const
 
 QString ParentFrameStringDataAdapter::convertInternal2Display(QString internal)
 {
-  ssc::DataPtr data = ssc::dataManager()->getData(internal);
+  DataPtr data = dataManager()->getData(internal);
   if (!data)
     return "<no data>";
   return qstring_cast(data->getName());
@@ -554,7 +554,7 @@ QString DataNameEditableStringDataAdapter::getValue() const
   return "";
 }
 
-void DataNameEditableStringDataAdapter::setData(ssc::DataPtr data)
+void DataNameEditableStringDataAdapter::setData(DataPtr data)
 {
   mData = data;
   emit changed();
@@ -585,7 +585,7 @@ QString DataUidEditableStringDataAdapter::getValue() const
   return "";
 }
 
-void DataUidEditableStringDataAdapter::setData(ssc::DataPtr data)
+void DataUidEditableStringDataAdapter::setData(DataPtr data)
 {
   mData = data;
   emit changed();
@@ -597,10 +597,10 @@ void DataUidEditableStringDataAdapter::setData(ssc::DataPtr data)
 
 DataModalityStringDataAdapter::DataModalityStringDataAdapter()
 {
-	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+	connect(dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
 }
 
-void DataModalityStringDataAdapter::setData(ssc::ImagePtr data)
+void DataModalityStringDataAdapter::setData(ImagePtr data)
 {
 	if (mData)
 		disconnect(mData.get(), SIGNAL(propertiesChanged()), this, SIGNAL(changed()));
@@ -653,10 +653,10 @@ QStringList DataModalityStringDataAdapter::getValueRange() const
 
 ImageTypeStringDataAdapter::ImageTypeStringDataAdapter()
 {
-	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+	connect(dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
 }
 
-void ImageTypeStringDataAdapter::setData(ssc::ImagePtr data)
+void ImageTypeStringDataAdapter::setData(ImagePtr data)
 {
 	if (mData)
 		disconnect(mData.get(), SIGNAL(propertiesChanged()), this, SIGNAL(changed()));

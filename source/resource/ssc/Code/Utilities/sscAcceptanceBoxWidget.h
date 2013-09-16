@@ -3,7 +3,7 @@
 
 #include <QtGui>
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Widget for semi-automatic testing of visuals.

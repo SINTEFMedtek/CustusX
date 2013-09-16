@@ -65,7 +65,7 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 	connect(mGroupData.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
 	connect(mGroupData.get(), SIGNAL(videoSourceChanged(QString)), SLOT(videoSourceChangedSlot(QString)));
 
-	std::vector<ssc::DataPtr> data = mGroupData->getData();
+	std::vector<DataPtr> data = mGroupData->getData();
 	for (unsigned i = 0; i < data.size(); ++i)
 	{
 		this->dataAddedSlot(qstring_cast(data[i]->getUid()));
@@ -75,7 +75,7 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 
 void ViewWrapper::dataAddedSlot(QString uid)
 {
-	this->dataAdded(ssc::dataManager()->getData(uid));
+	this->dataAdded(dataManager()->getData(uid));
 }
 
 void ViewWrapper::dataRemovedSlot(QString uid)
@@ -90,9 +90,9 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
 	QMenu contextMenu(sender);
 
 	//add actions to the actiongroups and the contextmenu
-	std::vector<ssc::DataPtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getData());
+	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(dataManager()->getData());
 	mLastDataActionUid = "________________________";
-	for (std::vector<ssc::DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
+	for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{
 		this->addDataAction((*iter)->getUid(), &contextMenu);
 	}
@@ -105,15 +105,15 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
 
 void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 {
-	ssc::DataPtr data = ssc::dataManager()->getData(uid);
+	DataPtr data = dataManager()->getData(uid);
 
 	QAction* action = new QAction(qstring_cast(data->getName()), contextMenu);
 
-	if (boost::dynamic_pointer_cast<ssc::Image>(data))
+	if (boost::dynamic_pointer_cast<Image>(data))
 		action->setIcon(QIcon(":/icons/volume.png"));
-	else if (boost::dynamic_pointer_cast<ssc::Mesh>(data))
+	else if (boost::dynamic_pointer_cast<Mesh>(data))
 		action->setIcon(QIcon(":/icons/surface.png"));
-	else if (boost::dynamic_pointer_cast<ssc::DataMetric>(data))
+	else if (boost::dynamic_pointer_cast<DataMetric>(data))
 		action->setIcon(QIcon(":/icons/metric.png"));
 
 //  std::cout << "base " << mLastDataActionUid << "  " << uid << std::endl;
@@ -129,7 +129,7 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 
 	action->setData(QVariant(qstring_cast(uid)));
 	action->setCheckable(true);
-	std::vector<ssc::DataPtr> allVisible = mGroupData->getData();
+	std::vector<DataPtr> allVisible = mGroupData->getData();
 	action->setChecked(std::count(allVisible.begin(), allVisible.end(), data));
 	connect(action, SIGNAL(triggered()), this, SLOT(dataActionSlot()));
 	contextMenu->addAction(action);
@@ -141,8 +141,8 @@ void ViewWrapper::dataActionSlot()
 	return;
 
 	QString uid = theAction->data().toString();
-	ssc::DataPtr data = ssc::dataManager()->getData(uid);
-	ssc::ImagePtr image = ssc::dataManager()->getImage(data->getUid());
+	DataPtr data = dataManager()->getData(uid);
+	ImagePtr image = dataManager()->getImage(data->getUid());
 
 	bool firstData = mGroupData->getData().empty();
 
@@ -150,13 +150,13 @@ void ViewWrapper::dataActionSlot()
 	{
 		mGroupData->addData(data);
 		if (image)
-		ssc::dataManager()->setActiveImage(image);
+		dataManager()->setActiveImage(image);
 	}
 	else
 	{
 		mGroupData->removeData(data);
 		//if (image)
-		//ssc::dataManager()->setActiveImage(ssc::ImagePtr());
+		//dataManager()->setActiveImage(ImagePtr());
 	}
 
 	if (firstData)
@@ -166,7 +166,7 @@ void ViewWrapper::dataActionSlot()
 				}
 			}
 
-void ViewWrapper::connectContextMenu(ssc::ViewWidget* view)
+void ViewWrapper::connectContextMenu(ViewWidget* view)
 {
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenuSlot(const QPoint &)));
 }
@@ -175,14 +175,14 @@ QStringList ViewWrapper::getAllDataNames() const
 {
 	if (!mGroupData)
 		return QStringList();
-	std::vector<ssc::DataPtr> data = mGroupData->getData();
+	std::vector<DataPtr> data = mGroupData->getData();
 
 	QStringList text;
 	for (unsigned i = 0; i < data.size(); ++i)
 	{
 		QString line = data[i]->getName();
 
-		ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data[i]);
+		ImagePtr image = boost::dynamic_pointer_cast<Image>(data[i]);
 		if (image)
 		{
 			if (image->getCropping())

@@ -35,7 +35,7 @@
 #include "sscForwardDeclarations.h"
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 
 #ifndef WIN32
@@ -60,8 +60,8 @@ public:
 
 	void setShaderFile(QString shaderFile);
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
-	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer);
-	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);
+	void SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer);
+	void SetLutBuffer(int index, GPUImageLutBufferPtr buffer);
 	void releaseGraphicsResources(int index);
 
 	static bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);

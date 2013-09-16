@@ -38,7 +38,7 @@
 #include "sscUltrasoundSectorSource.h"
 #include "sscBoundingBox3D.h"
 
-namespace ssc
+namespace cx
 {
 
 VideoGraphics::VideoGraphics()
@@ -230,7 +230,7 @@ void VideoGraphics::updatePlaneSourceBounds()
 	// set the planesource where we have no probedata.
 	// TODO dont do this when planesource is not part of pipeline.
 	DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
-	if (!ssc::similar(bounds.range()[0], 0.0) || !ssc::similar(bounds.range()[1], 0.0))
+	if (!similar(bounds.range()[0], 0.0) || !similar(bounds.range()[1], 0.0))
 	{
 		mPlaneSource->SetOrigin(bounds.corner(0,0,0).begin());
 		mPlaneSource->SetPoint1(bounds.corner(1,0,0).begin());
@@ -312,4 +312,4 @@ bool VideoGraphics::inputImageIsEmpty()
 	return false;
 }
 
-} // namespace ssc
+} // namespace cx

@@ -24,7 +24,7 @@
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 
@@ -47,7 +47,7 @@ public:
 
 	static GeometricRepPtr New(const QString& uid, const QString& name="");
 
-	virtual QString getType() const { return "ssc::GeometricRep"; } ///< gives this reps type
+	virtual QString getType() const { return "GeometricRep"; } ///< gives this reps type
 	void setMesh(MeshPtr mesh); ///< sets this reps mesh
 	MeshPtr getMesh(); ///< gives this reps mesh
 	bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
@@ -68,6 +68,6 @@ private slots:
 	void transformChangedSlot();
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCGEOMETRICREP_H_*/

@@ -26,7 +26,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-namespace ssc
+namespace cx
 {
 
 ReconstructParams::ReconstructParams(XmlOptionFile settings)
@@ -40,7 +40,7 @@ ReconstructParams::ReconstructParams(XmlOptionFile settings)
 		mSettings.getElement());
 	connect(mOrientationAdapter.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 
-	ssc::PresetTransferFunctions3DPtr presets = ssc::dataManager()->getPresetTransferFunctions3D();
+	PresetTransferFunctions3DPtr presets = dataManager()->getPresetTransferFunctions3D();
 	mPresetTFAdapter = StringDataAdapterXml::initialize("Preset", "",
 		"Preset transfer function to apply to the reconstructed volume", "US B-Mode", presets->getPresetList("US"),
 		mSettings.getElement());

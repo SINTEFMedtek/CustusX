@@ -22,7 +22,7 @@
 
 #include "sscCoordinateSystemHelpers.h"
 
-namespace ssc {
+namespace cx {
 
 /**\brief Class that listens to changes in a coordinate system,
  * and emits a signal if that system changes.
@@ -35,10 +35,10 @@ class CoordinateSystemListener: public QObject
 Q_OBJECT
 
 public:
-	CoordinateSystemListener(ssc::CoordinateSystem space);
+	CoordinateSystemListener(CoordinateSystem space);
 	virtual ~CoordinateSystemListener();
-	void setSpace(ssc::CoordinateSystem space);
-	ssc::CoordinateSystem getSpace() const;
+	void setSpace(CoordinateSystem space);
+	CoordinateSystem getSpace() const;
 signals:
 	void changed();
 private slots:
@@ -46,9 +46,9 @@ private slots:
 private:
 	void doConnect();
 	void doDisconnect();
-	ssc::CoordinateSystem mSpace;
+	CoordinateSystem mSpace;
 };
 typedef boost::shared_ptr<CoordinateSystemListener> CoordinateSystemListenerPtr;
 
-} //namespace ssc
+} //namespace cx
 #endif // COORDINATESYSTEMLISTENER_H_

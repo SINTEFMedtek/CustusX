@@ -30,7 +30,7 @@
 
 class QDomNode;
 
-namespace ssc
+namespace cx
 {
 
 /**\brief A registration event and its transform.
@@ -139,6 +139,6 @@ private:
 	ParentSpace mParentSpaceCache; ///< cache for the currently active parent frame
 };
 
-} // end namespace ssc
+} // end namespace cx
 
 #endif /*SSCREGISTRATIONTRANSFORM_H_*/

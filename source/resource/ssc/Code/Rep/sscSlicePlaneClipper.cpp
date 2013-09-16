@@ -31,7 +31,7 @@
 
 #include "sscSliceProxy.h"
 
-namespace ssc
+namespace cx
 {
 
 SlicePlaneClipperPtr SlicePlaneClipper::New()
@@ -48,7 +48,7 @@ SlicePlaneClipper::~SlicePlaneClipper()
 {
 }
 
-void SlicePlaneClipper::setSlicer(ssc::SliceProxyPtr slicer)
+void SlicePlaneClipper::setSlicer(SliceProxyPtr slicer)
 {
 	if (mSlicer==slicer)
 		return;
@@ -66,7 +66,7 @@ void SlicePlaneClipper::setSlicer(ssc::SliceProxyPtr slicer)
 	this->changedSlot();
 }
 
-ssc::SliceProxyPtr SlicePlaneClipper::getSlicer()
+SliceProxyPtr SlicePlaneClipper::getSlicer()
 {
 	return mSlicer;
 }
@@ -85,12 +85,12 @@ bool SlicePlaneClipper::getInvertPlane() const
 /** return an untransformed plane normal to use during clipping.
  *  The direction is dependent in invertedPlane()
  */
-ssc::Vector3D SlicePlaneClipper::getUnitNormal() const
+Vector3D SlicePlaneClipper::getUnitNormal() const
 {
 	if (mInvertPlane)
-		return ssc::Vector3D(0,0,1);
+		return Vector3D(0,0,1);
 	else
-		return ssc::Vector3D(0,0,-1);
+		return Vector3D(0,0,-1);
 }
 
 /** return a vtkPlane representing the current clip plane.
@@ -115,10 +115,10 @@ void SlicePlaneClipper::updateClipPlane()
 	if (!mClipPlane)
 		mClipPlane = vtkPlanePtr::New();
 
-	ssc::Transform3D rMs = mSlicer->get_sMr().inv();
+	Transform3D rMs = mSlicer->get_sMr().inv();
 
-	ssc::Vector3D n = rMs.vector(this->getUnitNormal());
-	ssc::Vector3D p = rMs.coord(ssc::Vector3D(0,0,0));
+	Vector3D n = rMs.vector(this->getUnitNormal());
+	Vector3D p = rMs.coord(Vector3D(0,0,0));
 	mClipPlane->SetNormal(n.begin());
 	mClipPlane->SetOrigin(p.begin());
 }
@@ -131,4 +131,4 @@ void SlicePlaneClipper::changedSlot()
 	this->updateClipPlane();
 }
 
-} // namespace ssc
+} // namespace cx

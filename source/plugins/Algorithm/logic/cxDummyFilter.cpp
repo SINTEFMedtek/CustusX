@@ -40,24 +40,24 @@ QString DummyFilter::getHelp() const
 	        "Can also be used as a template for new filters.";
 }
 
-ssc::StringDataAdapterPtr DummyFilter::getStringOption(QDomElement root)
+StringDataAdapterPtr DummyFilter::getStringOption(QDomElement root)
 {
 	QStringList list;
 	list << "String0" << "String1";
-	return ssc::StringDataAdapterXml::initialize("String", "", "dummy string option",
+	return StringDataAdapterXml::initialize("String", "", "dummy string option",
 												 list[0], list, root);
 }
 
-ssc::DoubleDataAdapterPtr DummyFilter::getDoubleOption(QDomElement root)
+DoubleDataAdapterPtr DummyFilter::getDoubleOption(QDomElement root)
 {
-	return ssc::DoubleDataAdapterXml::initialize("Value", "",
-	                                             "dummy double value.", 1, ssc::DoubleRange(0.1, 10, 0.01), 2,
+	return DoubleDataAdapterXml::initialize("Value", "",
+	                                             "dummy double value.", 1, DoubleRange(0.1, 10, 0.01), 2,
 												 root);
 }
 
-ssc::BoolDataAdapterPtr DummyFilter::getBoolOption(QDomElement root)
+BoolDataAdapterPtr DummyFilter::getBoolOption(QDomElement root)
 {
-	return ssc::BoolDataAdapterXml::initialize("Bool0", "",
+	return BoolDataAdapterXml::initialize("Bool0", "",
 	                                           "Dummy bool value.", false, root);
 }
 
@@ -100,9 +100,9 @@ void DummyFilter::createOutputTypes()
 
 bool DummyFilter::execute()
 {
-	ssc::StringDataAdapterPtr stringOption = this->getStringOption(mCopiedOptions);
-	ssc::DoubleDataAdapterPtr doubleOption = this->getDoubleOption(mCopiedOptions);
-	ssc::BoolDataAdapterPtr boolOption = this->getBoolOption(mCopiedOptions);
+	StringDataAdapterPtr stringOption = this->getStringOption(mCopiedOptions);
+	DoubleDataAdapterPtr doubleOption = this->getDoubleOption(mCopiedOptions);
+	BoolDataAdapterPtr boolOption = this->getBoolOption(mCopiedOptions);
 
 	std::cout << "Running dummy algorithm..." << std::endl;
 	std::cout << QString("  String option [%1]: %2").arg(stringOption->getValueName()).arg(stringOption->getValue()) << std::endl;

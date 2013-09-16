@@ -32,7 +32,7 @@
 // Forward declarations
 class QGridLayout;
 
-namespace ssc
+namespace cx
 {
 class DoubleBoundingBox3D;
 typedef boost::shared_ptr<class Rep> RepPtr;
@@ -151,6 +151,6 @@ private:
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSCVIEW_H_*/

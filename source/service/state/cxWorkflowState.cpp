@@ -27,7 +27,7 @@ namespace cx
 
 void WorkflowState::onEntry(QEvent * event)
 {
-	ssc::messageManager()->sendInfo("Workflow change to [" + mName + "]");
+	messageManager()->sendInfo("Workflow change to [" + mName + "]");
 	if (mAction)
 		mAction->setChecked(true);
 }
@@ -82,7 +82,7 @@ void WorkflowState::setActionSlot()
 void WorkflowState::autoStartHardware()
 {
 	if (settings()->value("Automation/autoStartTracking").toBool())
-		ssc::toolManager()->startTracking();
+		toolManager()->startTracking();
 	if (settings()->value("Automation/autoStartStreaming").toBool())
 		videoService()->getVideoConnection()->launchAndConnectServer();
 }
@@ -118,7 +118,7 @@ bool NavigationWorkflowState::canEnter() const
 RegistrationWorkflowState::RegistrationWorkflowState(QState* parent) :
 				WorkflowState(parent, "RegistrationUid", "Registration")
 {
-//	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+//	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
 	connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 ;
@@ -127,7 +127,7 @@ bool RegistrationWorkflowState::canEnter() const
 {
 // We need to perform patient orientation prior to
 // running and us acq. Thus we need access to the reg mode.
-//	return !ssc::dataManager()->getImages().empty();
+//	return !dataManager()->getImages().empty();
 	return patientService()->getPatientData()->isPatientValid();
 }
 ;
@@ -141,12 +141,12 @@ bool RegistrationWorkflowState::canEnter() const
 PreOpPlanningWorkflowState::PreOpPlanningWorkflowState(QState* parent) :
 				WorkflowState(parent, "PreOpPlanningUid", "Preoperative Planning")
 {
-	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
 }
 
 bool PreOpPlanningWorkflowState::canEnter() const
 {
-	return !ssc::dataManager()->getImages().empty();
+	return !dataManager()->getImages().empty();
 }
 
 // --------------------------------------------------------
@@ -180,12 +180,12 @@ bool IntraOpImagingWorkflowState::canEnter() const
 PostOpControllWorkflowState::PostOpControllWorkflowState(QState* parent) :
 				WorkflowState(parent, "PostOpControllUid", "Postoperative Control")
 {
-	connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+	connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
 }
 
 bool PostOpControllWorkflowState::canEnter() const
 {
-	return !ssc::dataManager()->getImages().empty();
+	return !dataManager()->getImages().empty();
 }
 
 }

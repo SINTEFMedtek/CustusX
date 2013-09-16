@@ -1,7 +1,7 @@
 #ifndef SSCVIEWQVTKWIDGET_H_
 #define SSCVIEWQVTKWIDGET_H_
 
-/**\class ssc::ViewParent
+/**\class ViewParent
  *
  *	This class defaults to the QVTKWidget,
  *	but if USE_GLX_SHARED_CONTEXT is set, a
@@ -24,19 +24,19 @@
 	#if ( VTK_MAJOR_VERSION==5 )
 		#if VTK_MINOR_VERSION == 4
 			#include "sscSNWQVTKWidget5_4.h"
-			namespace ssc
+			namespace cx
 			{
 				typedef SNWQVTKWidget ViewQVTKWidget;
 			}
 		#elif VTK_MINOR_VERSION == 5
 			#include "sscSNWQVTKWidget5_5.h"
-			namespace ssc
+			namespace cx
 			{
 				typedef SNWQVTKWidget ViewQVTKWidget;
 			}
 		#elif VTK_MINOR_VERSION == 6
 			#include "sscSNWQVTKWidget5_5.h"
-			namespace ssc
+			namespace cx
 			{
 				typedef SNWQVTKWidget ViewQVTKWidget;
 			}
@@ -44,7 +44,7 @@
 			// typedef to default
 			#include "QVTKWidget.h"
 //			#include "sscModified_QVTKWidget_5_8.h"
-			namespace ssc
+			namespace cx
 			{
 				typedef QVTKWidget ViewQVTKWidget;
 //				typedef sscModified_QVTKWidget ViewQVTKWidget;
@@ -58,7 +58,7 @@
 #else
 	// typedef to default
 	#include "QVTKWidget.h"
-	namespace ssc
+	namespace cx
 	{
 		typedef QVTKWidget ViewQVTKWidget;
 	}

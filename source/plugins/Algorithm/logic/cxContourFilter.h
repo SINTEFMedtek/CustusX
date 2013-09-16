@@ -45,12 +45,12 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	ssc::BoolDataAdapterXmlPtr getReduceResolutionOption(QDomElement root);
-	ssc::BoolDataAdapterXmlPtr getSmoothingOption(QDomElement root);
-	ssc::BoolDataAdapterXmlPtr getPreserveTopologyOption(QDomElement root);
-	ssc::DoubleDataAdapterXmlPtr getSurfaceThresholdOption(QDomElement root);
-	ssc::DoubleDataAdapterXmlPtr getDecimationOption(QDomElement root);
-	ssc::ColorDataAdapterXmlPtr getColorOption(QDomElement root);
+	BoolDataAdapterXmlPtr getReduceResolutionOption(QDomElement root);
+	BoolDataAdapterXmlPtr getSmoothingOption(QDomElement root);
+	BoolDataAdapterXmlPtr getPreserveTopologyOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getSurfaceThresholdOption(QDomElement root);
+	DoubleDataAdapterXmlPtr getDecimationOption(QDomElement root);
+	ColorDataAdapterXmlPtr getColorOption(QDomElement root);
 
 	/** This is the core algorithm, call this if you dont need all the filter stuff.
 	    Generate a contour from a vtkImageData.
@@ -64,7 +64,7 @@ public:
 	/** Generate a mesh from the contour using base to generate name.
 	  * Save to dataManager.
 	  */
-	static ssc::MeshPtr postProcess(vtkPolyDataPtr contour, ssc::ImagePtr base, QColor color);
+	static MeshPtr postProcess(vtkPolyDataPtr contour, ImagePtr base, QColor color);
 
 protected:
 	virtual void createOptions();
@@ -78,8 +78,8 @@ private slots:
 	void thresholdSlot();
 
 private:
-	ssc::BoolDataAdapterXmlPtr mReduceResolutionOption;
-	ssc::DoubleDataAdapterXmlPtr mSurfaceThresholdOption;
+	BoolDataAdapterXmlPtr mReduceResolutionOption;
+	DoubleDataAdapterXmlPtr mSurfaceThresholdOption;
 	vtkPolyDataPtr mRawResult;
 };
 typedef boost::shared_ptr<class ContourFilter> ContourFilterPtr;

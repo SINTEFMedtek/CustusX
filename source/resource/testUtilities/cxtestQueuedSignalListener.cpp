@@ -28,7 +28,7 @@ bool waitForQueuedSignal(QObject* object, const char* signal, int maxWaitMilliSe
 	QueuedSignalListener listener(object, signal, maxWaitMilliSeconds);
 	listener.exec();
 	bool signalArrived = !listener.timedOut();
-	std::string feedback = signalArrived ? "arrived." : "did NOT arrive. Timed out. ";
+	std::string feedback = signalArrived ? " arrived." : " did NOT arrive. Timed out. ";
 	std::cout << "[QueuedSignalListener] " << signal << feedback << std::endl;
 	return signalArrived;
 }

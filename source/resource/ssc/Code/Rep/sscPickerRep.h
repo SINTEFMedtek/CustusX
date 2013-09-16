@@ -31,7 +31,7 @@
 class vtkCommand;
 typedef vtkSmartPointer<class vtkCallbackCommand> vtkCallbackCommandPtr;
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class PickerRep> PickerRepPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
@@ -64,14 +64,14 @@ public:
 	void setTool(ToolPtr tool); ///< set the tool to listen to
 
 	void setEnabled(bool on);
-	void setGlyph(ssc::MeshPtr glyph);
+	void setGlyph(MeshPtr glyph);
 
 	void pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
 	Vector3D getPosition() const;
 	void setSphereRadius(double radius);
 
 signals:
-	void pointPicked(ssc::Vector3D p_r); /// the rep sends out a signal when the user picks a point on it
+	void pointPicked(Vector3D p_r); /// the rep sends out a signal when the user picks a point on it
 	void dataPicked(QString uid);
 
 public slots:
@@ -99,7 +99,7 @@ protected:
 	Vector3D getDisplacement();
 	Vector3D ComputeDisplayToWorld(Vector3D p_d);
 	Vector3D ComputeWorldToDisplay(Vector3D p_w);
-	void setGlyphCenter(ssc::Vector3D pos);
+	void setGlyphCenter(Vector3D pos);
 
 	View *mView;
 	bool mEnabled;
@@ -107,17 +107,17 @@ protected:
 	ToolPtr mTool; ///< the connected tool
 	Vector3D mPickedPoint; ///< the last point that was successfully sampled from intersection with an image
 	double mSphereRadius;
-	ssc::MeshPtr mGlyph;
-//	ssc::GraphicalPolyData3DPtr mGlyphRep;
-	ssc::GeometricRepPtr mGlyphRep;
+	MeshPtr mGlyph;
+//	GraphicalPolyData3DPtr mGlyphRep;
+	GeometricRepPtr mGlyphRep;
 	//	vtkEventQtSlotConnectPtr mConnections; ///< used to sending signals and events between vtk and qt
 	Vector3D mClickedPoint;
 	bool mIsDragging;
 
-	bool mSnapToSurface; ///< if set, clicking on a ssc::Data surface will pick that point
+	bool mSnapToSurface; ///< if set, clicking on a Data surface will pick that point
 
-	ssc::GraphicalPoint3DPtr mGraphicalPoint;
-	ssc::ViewportListenerPtr mViewportListener;
+	GraphicalPoint3DPtr mGraphicalPoint;
+	ViewportListenerPtr mViewportListener;
 	vtkCallbackCommandPtr mCallbackCommand;
 };
 

@@ -25,7 +25,7 @@
 #include "sscDataMetric.h"
 #include "sscLogger.h"
 
-namespace ssc
+namespace cx
 {
 
 DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
@@ -33,10 +33,10 @@ DataMetricRep::DataMetricRep(const QString& uid, const QString& name) :
 				mGraphicsSize(1),
 				mShowLabel(false),
 				mLabelSize(2.5),
-                mColor(ssc::Vector3D(1, 0, 0)),
+                mColor(Vector3D(1, 0, 0)),
                 mView(NULL)
 {
-//  mViewportListener.reset(new ssc::ViewportListener);
+//  mViewportListener.reset(new ViewportListener);
 //  mViewportListener->setCallback(boost::bind(&DataMetricRep::rescale, this));
 }
 
@@ -94,14 +94,14 @@ void DataMetricRep::clear()
     mText.reset();
 }
 
-void DataMetricRep::addRepActorsToViewRenderer(ssc::View *view)
+void DataMetricRep::addRepActorsToViewRenderer(View *view)
 {
     mView = view;
     this->clear();
     this->changedSlot();
 }
 
-void DataMetricRep::removeRepActorsFromViewRenderer(ssc::View *view)
+void DataMetricRep::removeRepActorsFromViewRenderer(View *view)
 {
     mView = NULL;
     this->clear();
@@ -120,7 +120,7 @@ void DataMetricRep::drawText()
         return;
     }
 
-    mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
+    mText.reset(new CaptionText3D(mView->getRenderer()));
     mText->setColor(mColor);
     mText->setText(text);
     mText->setPosition(mMetric->getRefCoord());

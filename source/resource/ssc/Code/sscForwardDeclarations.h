@@ -11,7 +11,7 @@
  * full definitions of the ssc is needed.
  */
 
-namespace ssc {
+namespace cx {
 
 class View;
 class ViewContainer;
@@ -93,6 +93,6 @@ typedef boost::shared_ptr<class VtkFileMesh> VtkFileMeshPtr;
 
 class LabeledComboBoxWidget;
 
-} // namespace ssc
+} // namespace cx
 
 #endif /*SSC_FORWARDDECLARARATIONS_H_*/

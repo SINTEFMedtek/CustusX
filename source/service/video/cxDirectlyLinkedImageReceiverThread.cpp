@@ -33,7 +33,7 @@ DirectlyLinkedImageReceiverThread::DirectlyLinkedImageReceiverThread(StringMap a
 
 void DirectlyLinkedImageReceiverThread::run()
 {
-	ssc::messageManager()->sendInfo("Starting direct link grabber.");
+	messageManager()->sendInfo("Starting direct link grabber.");
 
 	if(mArguments["type"] == "SimulatedImageStreamer")
 		mImageStreamer = this->createSimulatedImageStreamer();
@@ -82,7 +82,7 @@ QString DirectlyLinkedImageReceiverThread::hostDescription() const
 void DirectlyLinkedImageReceiverThread::setImageToStream(QString imageUid)
 {
 	mImageUidToSimulate = imageUid;
-	ssc::messageManager()->sendDebug("Setting image to stream to be "+imageUid);
+	messageManager()->sendDebug("Setting image to stream to be "+imageUid);
 	emit imageToStream(imageUid);
 }
 
@@ -90,12 +90,12 @@ SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImag
 {
 	SimulatedImageStreamerPtr streamer(new SimulatedImageStreamer());
 
-	ssc::ToolPtr tool = ToolManager::getInstance()->findFirstProbe();
+	ToolPtr tool = cxToolManager::getInstance()->findFirstProbe();
 	if(!tool)
-		ssc::messageManager()->sendDebug("No tool");
-	ssc::ImagePtr image = ssc::DataManager::getInstance()->getImage(mImageUidToSimulate);
+		messageManager()->sendDebug("No tool");
+	ImagePtr image = DataManager::getInstance()->getImage(mImageUidToSimulate);
 	if(!image)
-		ssc::messageManager()->sendDebug("No image with uid "+mImageUidToSimulate);
+		messageManager()->sendDebug("No image with uid "+mImageUidToSimulate);
 
 	streamer->initialize(image, tool);
 	connect(this, SIGNAL(imageToStream(QString)), streamer.get(), SLOT(setSourceToImageSlot(QString)));
@@ -105,14 +105,14 @@ SimulatedImageStreamerPtr DirectlyLinkedImageReceiverThread::createSimulatedImag
 
 void DirectlyLinkedImageReceiverThread::printArguments()
 {
-	ssc::messageManager()->sendDebug("-------------");
-	ssc::messageManager()->sendDebug("DirectlyLinkedImageReceiverThread arguments:");
+	messageManager()->sendDebug("-------------");
+	messageManager()->sendDebug("DirectlyLinkedImageReceiverThread arguments:");
 	StringMap::iterator it;
 	for(it = mArguments.begin(); it != mArguments.end(); ++it)
 	{
-		ssc::messageManager()->sendDebug(it->first+": "+it->second);
+		messageManager()->sendDebug(it->first+": "+it->second);
 	}
-	ssc::messageManager()->sendDebug("-------------");
+	messageManager()->sendDebug("-------------");
 }
 
 } //end namespace cx

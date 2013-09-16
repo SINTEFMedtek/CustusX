@@ -23,7 +23,7 @@
 #include "sscBoundingBox3D.h"
 #include "sscLogger.h"
 
-namespace ssc
+namespace cx
 {
 
 
@@ -128,4 +128,4 @@ void ImageImportVideoSource::setEmptyImage()
 }
 
 
-} /* namespace ssc */
+} /* namespace cx */

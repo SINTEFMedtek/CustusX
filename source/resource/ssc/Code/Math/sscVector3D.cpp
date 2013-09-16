@@ -8,7 +8,7 @@
 #include <QString>
 
 // --------------------------------------------------------
-namespace ssc
+namespace cx
 {
 
 // --------------------------------------------------------
@@ -93,5 +93,5 @@ QString prettyFormat(Vector3D val, int decimals, int fieldWidth)
 }
 
 
-} // namespace ssc
+} // namespace cx
 // --------------------------------------------------------

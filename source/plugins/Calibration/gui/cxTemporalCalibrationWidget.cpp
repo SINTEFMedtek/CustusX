@@ -67,8 +67,8 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisit
   acqLabel->setToolTip(this->defaultWhatsThis());
   topLayout->addWidget(mInfoLabel);
   topLayout->addWidget(mRecordSessionWidget);
-  topLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New()));
-  topLayout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
+  topLayout->addWidget(new LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New()));
+  topLayout->addWidget(new SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
 
   topLayout->addWidget(this->createHorizontalLine());
 
@@ -77,7 +77,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisit
   topLayout->addWidget(calLabel);
   calLabel->setToolTip(this->defaultWhatsThis());
 
-  mFileSelectWidget = new ssc::FileSelectWidget(this);
+  mFileSelectWidget = new FileSelectWidget(this);
   connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
   mFileSelectWidget->setNameFilter(QStringList() << "*.fts");
   topLayout->addWidget(mFileSelectWidget);
@@ -150,12 +150,12 @@ void TemporalCalibrationWidget::calibrateSlot()
   double shift = mAlgorithm->calibrate(&success);
   if (success)
   {
-	  ssc::messageManager()->sendSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));
+	  messageManager()->sendSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));
 	  mResult->setText(QString("Shift = %1 ms").arg(shift, 0, 'f', 0));
   }
   else
   {
-	  ssc::messageManager()->sendError(QString("Temporal calibration failed"));
+	  messageManager()->sendError(QString("Temporal calibration failed"));
 	  mResult->setText(QString("failed"));
   }
 }

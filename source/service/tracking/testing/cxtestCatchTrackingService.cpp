@@ -22,10 +22,10 @@ TEST_CASE("DummyToolManager setup/shutdown works multiple times", "[unit]")
 {
     for (unsigned i=0; i<2; ++i)
     {
-        ssc::ToolManager::setInstance(ssc::DummyToolManager::getInstance());
-        CHECK(ssc::toolManager());
-        ssc::ToolManager::shutdown();
-        //ssc::DummyToolManager::shutdown();
-        CHECK_FALSE(ssc::toolManager());
+		cx::ToolManager::setInstance(cx::DummyToolManager::getInstance());
+		CHECK(cx::toolManager());
+		cx::ToolManager::shutdown();
+        //DummyToolManager::shutdown();
+		CHECK_FALSE(cx::toolManager());
     }
 }

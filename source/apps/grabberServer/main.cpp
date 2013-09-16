@@ -6,9 +6,9 @@
 
 int main(int argc, char **argv)
 {
-  ssc::MessageManager::initialize();
+  cx::MessageManager::initialize();
 
-  typedef ssc::Message Message;
+  typedef cx::Message Message;
   qRegisterMetaType<Message>("Message");
 
   QApplication app(argc, argv);

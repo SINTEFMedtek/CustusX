@@ -33,7 +33,7 @@
 #include "sscDoubleDataAdapter.h"
 #include "sscXmlOptionItem.h"
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class DoubleDataAdapterXml> DoubleDataAdapterXmlPtr;
@@ -101,6 +101,6 @@ private:
     bool mAddSlider;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif /* SSCDOUBLEDATAADAPTERXML_H_ */

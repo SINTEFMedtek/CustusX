@@ -43,15 +43,15 @@ private slots:
 	void setupProbe();
 
 private:
-	ssc::ReconstructManagerPtr createReconstructionManager();
-	void verifyFileData(ssc::USReconstructInputData data);
+	cx::ReconstructManagerPtr createReconstructionManager();
+	void verifyFileData(cx::USReconstructInputData data);
 
-	ssc::USReconstructInputData mMemOutputData;
-	std::vector<ssc::USReconstructInputData> mFileOutputData;
+	cx::USReconstructInputData mMemOutputData;
+	std::vector<cx::USReconstructInputData> mFileOutputData;
 	QString mAcqDataFilename;
 
 	double mRecordDuration; ///< duration of recording in ms.
-	ssc::VideoSourcePtr mVideoSource;
+	cx::VideoSourcePtr mVideoSource;
 	cx::AcquisitionDataPtr mAcquisitionData;
 	cx::USAcquisitionPtr mAcquisition;
 	cx::AcquisitionPtr mAcquisitionBase;

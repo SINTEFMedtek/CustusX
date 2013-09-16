@@ -96,25 +96,25 @@ bool FilterImpl::preProcess()
 	return true;
 }
 
-ssc::ImagePtr FilterImpl::getCopiedInputImage(int index)
+ImagePtr FilterImpl::getCopiedInputImage(int index)
 {
 	if (mCopiedInput.size() < index+1)
-		return ssc::ImagePtr();
-	return boost::dynamic_pointer_cast<ssc::Image>(mCopiedInput[index]);
+		return ImagePtr();
+	return boost::dynamic_pointer_cast<Image>(mCopiedInput[index]);
 }
 
-void FilterImpl::updateThresholdFromImageChange(QString uid, ssc::DoubleDataAdapterXmlPtr threshold)
+void FilterImpl::updateThresholdFromImageChange(QString uid, DoubleDataAdapterXmlPtr threshold)
 {
-	ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
+	ImagePtr image = dataManager()->getImage(uid);
 	if(!image)
 		return;
-	threshold->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
+	threshold->setValueRange(DoubleRange(image->getMin(), image->getMax(), 1));
 	int oldValue = threshold->getValue();
 	// avoid reset if old value is still within range,
 	// but reset anyway if old val is 0..1, this can indicate old image was binary.
 	if ((image->getMin() > oldValue )||( oldValue > image->getMax() )||( oldValue<=1 ))
 	{
-		int initValue = ceil(double(image->getMin()) + double(image->getRange())/10); // round up
+		int initValue = ::ceil(double(image->getMin()) + double(image->getRange())/10); // round up
 		threshold->setValue(initValue);
 	}
 //	std::cout << "FilterImpl::imageChangedSlot " << image->getMin() << " "  << image->getMax() << std::endl;

@@ -35,7 +35,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 
-namespace ssc
+namespace cx
 {
 
 /**Helper class for reusing opened documents instead of creating new instances to them.
@@ -101,7 +101,7 @@ private:
 		if (!loadedDoc.setContent(&file, &error, &line, &col))
 		{
 			QString msg = QString("error setting xml content [%1,%2] %3").arg(line).arg(col).arg(error);
-			ssc::messageManager()->sendWarning(msg);
+			messageManager()->sendWarning(msg);
 		}
 		file.close();
 		return loadedDoc;
@@ -361,11 +361,11 @@ void XmlOptionFile::save()
 		QTextStream stream(&file);
 		stream << mDocument.toString(4);
 		file.close();
-//		ssc::messageManager()->sendInfo("Created " + file.fileName());
+//		messageManager()->sendInfo("Created " + file.fileName());
 	}
 	else
 	{
-		ssc::messageManager()->sendError("XmlOptionFile::save() Could not open " + file.fileName() + " Error: "
+		messageManager()->sendError("XmlOptionFile::save() Could not open " + file.fileName() + " Error: "
 			+ file.errorString());
 	}
 }
@@ -376,7 +376,7 @@ void XmlOptionFile::save()
 //	if (!file.open(QIODevice::ReadOnly))
 //	{
 //		// ok to not find file - we have nice defaults.
-//		//ssc::messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
+//		//messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
 //	}
 //	else
 //	{
@@ -385,7 +385,7 @@ void XmlOptionFile::save()
 //		int line, col;
 //		if (!loadedDoc.setContent(&file, &error, &line, &col))
 //		{
-//			ssc::messageManager()->sendWarning("error setting xml content [" + qstring_cast(line) + "," + qstring_cast(
+//			messageManager()->sendWarning("error setting xml content [" + qstring_cast(line) + "," + qstring_cast(
 //				col) + "]" + qstring_cast(error));
 //		}
 //		file.close();
@@ -395,4 +395,4 @@ void XmlOptionFile::save()
 
 //}
 
-} // namespace ssc
+} // namespace cx

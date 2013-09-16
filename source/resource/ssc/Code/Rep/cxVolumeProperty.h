@@ -24,7 +24,7 @@ namespace cx
 typedef boost::shared_ptr<class VolumeProperty> VolumePropertyPtr;
 
 /** Wrapper for vtkVolumeProperty
-  * Given an internal ssc::Image, the vtkVolumeProperty
+  * Given an internal Image, the vtkVolumeProperty
   * is kept up to date.
   *
   * \ingroup sscProxy
@@ -37,7 +37,7 @@ class VolumeProperty : public QObject
 	Q_OBJECT
 public:
 	static VolumePropertyPtr create() { return VolumePropertyPtr(new VolumeProperty()); }
-	void setImage(ssc::ImagePtr image);
+	void setImage(ImagePtr image);
 //	ImagePtr getImage();
 	vtkVolumePropertyPtr getVolumeProperty();
 
@@ -47,7 +47,7 @@ private slots:
 private:
 	VolumeProperty();
 
-	ssc::ImagePtr mImage;
+	ImagePtr mImage;
 	vtkVolumePropertyPtr mVolumeProperty;
 	vtkPiecewiseFunctionPtr mOpacityTransferFunction;
 	vtkColorTransferFunctionPtr mColorTransferFunction;

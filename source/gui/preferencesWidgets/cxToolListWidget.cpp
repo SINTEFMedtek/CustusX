@@ -149,7 +149,7 @@ QStringList FilteringToolListWidget::getAbsoluteFilePathToAllTools(QDir dir)
 
 	if (!dir.exists())
 	{
-		ssc::messageManager()->sendError("Dir " + dir.absolutePath() + " does not exits.");
+		messageManager()->sendError("Dir " + dir.absolutePath() + " does not exits.");
 		return retval;
 	}
 
@@ -202,7 +202,7 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
 
 		//check applications
 		bool passedApplicationFilter = false;
-		std::vector<ssc::CLINICAL_APPLICATION>::iterator it = internal.mClinicalApplications.begin();
+		std::vector<CLINICAL_APPLICATION>::iterator it = internal.mClinicalApplications.begin();
 		while(it != internal.mClinicalApplications.end() && !passedApplicationFilter)
 		{
 			QString applicationName = enum2string(*it);
@@ -312,7 +312,7 @@ void ConfigToolListWidget::deleteSlot()
 {
 	if (!mItemToDelete)
 	{
-		ssc::messageManager()->sendDebug("Found no item to delete...");
+		messageManager()->sendDebug("Found no item to delete...");
 		return;
 	}
 	this->deleteItemSlot(mItemToDelete);
@@ -336,7 +336,7 @@ void ConfigToolListWidget::contextMenuSlot(const QPoint& point)
 	QListWidgetItem* item = this->itemAt(point);
 	if (!item)
 	{
-		ssc::messageManager()->sendDebug("Found no item to delete...");
+		messageManager()->sendDebug("Found no item to delete...");
 		return;
 	}
 	mItemToDelete = item;

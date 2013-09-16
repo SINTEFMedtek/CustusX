@@ -46,7 +46,7 @@ void CompositeTimedAlgorithm::clear()
 	// if already started, ignore
 	if (mCurrent>=0)
 	{
-		ssc::messageManager()->sendError("Attempt to restart CompositeTimedAlgorithm while running failed.");
+		messageManager()->sendError("Attempt to restart CompositeTimedAlgorithm while running failed.");
 		return;
 	}
 
@@ -134,7 +134,7 @@ void CompositeParallelTimedAlgorithm::clear()
 	// if already started, ignore
 	if (!this->isFinished())
 	{
-		ssc::messageManager()->sendError("Attempt to restart CompositeTimedAlgorithm while running failed.");
+		messageManager()->sendError("Attempt to restart CompositeTimedAlgorithm while running failed.");
 		return;
 	}
 

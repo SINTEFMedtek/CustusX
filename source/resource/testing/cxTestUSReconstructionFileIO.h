@@ -54,12 +54,12 @@ private:
 	struct ReconstructionData
 	{
 		QString sessionName;
-		std::map<double, ssc::Transform3D> trackerData;
+		std::map<double, cx::Transform3D> trackerData;
 		bool writeColor;
-		ssc::ToolPtr tool;
+		cx::ToolPtr tool;
 		cx::ImageDataContainerPtr imageData;
 		std::vector<double> imageTimestamps;
-		ssc::Transform3D rMpr;
+		cx::Transform3D rMpr;
 	};
 
 	QString getDataPath();
@@ -67,11 +67,11 @@ private:
 	ReconstructionData createSampleReconstructData();
 	ReconstructionData createEmptyReconstructData();
 
-	ssc::USReconstructInputData createUSReconstructData(ReconstructionData input);
+	cx::USReconstructInputData createUSReconstructData(ReconstructionData input);
 
 	QString write(ReconstructionData input);
-	ssc::USReconstructInputData read(QString filename);
-	void assertCorrespondence(ReconstructionData input, ssc::USReconstructInputData output);
+	cx::USReconstructInputData read(QString filename);
+	void assertCorrespondence(ReconstructionData input, cx::USReconstructInputData output);
 
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestUSReconstructionFileIO );

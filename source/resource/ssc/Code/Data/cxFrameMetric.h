@@ -23,12 +23,12 @@ namespace cx
 
 typedef boost::shared_ptr<class FrameMetric> FrameMetricPtr;
 
-/** \brief ssc::DataReader implementation for FrameMetric
+/** \brief DataReader implementation for FrameMetric
  *
  * \date Aug 16, 2011
  * \author Ole Vegard Solberg, SINTEF
  */
-class FrameMetricReader: public ssc::DataReader
+class FrameMetricReader: public DataReader
 {
 public:
 	virtual ~FrameMetricReader()
@@ -38,7 +38,7 @@ public:
 	{
 		return type == "frameMetric";
 	}
-	virtual ssc::DataPtr load(const QString& uid, const QString& filename);
+	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
 /**\brief Data class that represents a single frame (transform).

@@ -16,8 +16,8 @@ TestTransferFunctions::TestTransferFunctions()
 
 void TestTransferFunctions::createDummyImage()
 {
-	mDummyImageData = ssc::Image::createDummyImageData(2, 1);
-	mDummyImage.reset(new ssc::Image("DummyImage", this->mDummyImageData));
+	mDummyImageData = cx::Image::createDummyImageData(2, 1);
+	mDummyImage.reset(new cx::Image("DummyImage", this->mDummyImageData));
 }
 
 bool TestTransferFunctions::hasValid3DTransferFunction()
@@ -32,38 +32,38 @@ bool TestTransferFunctions::hasValid2DTransferFunction()
 
 void TestTransferFunctions::Corrupt3DTransferFunctionWindowWidth()
 {
-	ssc::ImageTFDataPtr transferFunction = mDummyImage->getTransferFunctions3D();
+	cx::ImageTFDataPtr transferFunction = mDummyImage->getTransferFunctions3D();
 	transferFunction->setWindow(mDummyImage->getMax() + 10);
 }
 
 void TestTransferFunctions::Corrupt3DTransferFunctionWindowLevel()
 {
-	ssc::ImageTFDataPtr transferFunction = mDummyImage->getTransferFunctions3D();
+	cx::ImageTFDataPtr transferFunction = mDummyImage->getTransferFunctions3D();
 	transferFunction->setLevel(mDummyImage->getMax() + 10);
 }
 
 void TestTransferFunctions::Corrupt2DTransferFunctionWindowWidth()
 {
-	ssc::ImageTFDataPtr transferFunction = mDummyImage->getLookupTable2D();
+	cx::ImageTFDataPtr transferFunction = mDummyImage->getLookupTable2D();
 	transferFunction->setWindow(mDummyImage->getMax() + 10);
 }
 
 void TestTransferFunctions::Corrupt2DTransferFunctionWindowLevel()
 {
-	ssc::ImageTFDataPtr transferFunction = mDummyImage->getLookupTable2D();
+	cx::ImageTFDataPtr transferFunction = mDummyImage->getLookupTable2D();
 	transferFunction->setLevel(mDummyImage->getMax() + 10);
 }
 
 void TestTransferFunctions::setNewCorrupt3DTranferFunction()
 {
-	ssc::ImageTF3DPtr transferFunction(new ssc::ImageTF3D(mDummyImageData));
+	cx::ImageTF3DPtr transferFunction(new cx::ImageTF3D(mDummyImageData));
 	transferFunction->setWindow(mDummyImage->getMax() + 10);
 	mDummyImage->setTransferFunctions3D(transferFunction);
 }
 
 void TestTransferFunctions::setNewCorrupt2DTranferFunction()
 {
-	ssc::ImageLUT2DPtr transferFunction(new ssc::ImageLUT2D(mDummyImageData));
+	cx::ImageLUT2DPtr transferFunction(new cx::ImageLUT2D(mDummyImageData));
 	transferFunction->setWindow(mDummyImage->getMax() + 10);
 	mDummyImage->setLookupTable2D(transferFunction);
 }

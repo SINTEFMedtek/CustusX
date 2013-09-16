@@ -18,7 +18,7 @@
 #include "sscFrame3D.h"
 #include "sscSharedMemory.h"
 
-using namespace ssc;
+using namespace cx;
 
 void TestUtilityClasses::setUp()
 {
@@ -92,18 +92,18 @@ void TestUtilityClasses::singleTestFrameRotationAxis(const Vector3D& k)
 
 void TestUtilityClasses::testFrame()
 {
-	singleTestFrameRotationAxis((ssc::createTransformRotateZ(M_PI/4)).vector(Vector3D(1,0,0)));
-	singleTestFrameRotationAxis((ssc::createTransformRotateY(M_PI/4)).vector(Vector3D(1,0,0)));
-	singleTestFrameRotationAxis((ssc::createTransformRotateZ(M_PI/4)*ssc::createTransformRotateY(M_PI/4)).vector(Vector3D(1,0,0)));
+	singleTestFrameRotationAxis((createTransformRotateZ(M_PI/4)).vector(Vector3D(1,0,0)));
+	singleTestFrameRotationAxis((createTransformRotateY(M_PI/4)).vector(Vector3D(1,0,0)));
+	singleTestFrameRotationAxis((createTransformRotateZ(M_PI/4)*createTransformRotateY(M_PI/4)).vector(Vector3D(1,0,0)));
 	
 	SINGLE_TEST_FRAME( Transform3D::Identity() );
 	SINGLE_TEST_FRAME( createTransformTranslate(Vector3D(1,0,0)) );
 	SINGLE_TEST_FRAME( createTransformTranslate(Vector3D(4,3,2)) );
-	SINGLE_TEST_FRAME( ssc::createTransformRotateX(M_PI_2) );
-	SINGLE_TEST_FRAME( ssc::createTransformRotateX(M_PI_4) );
-	SINGLE_TEST_FRAME( ssc::createTransformRotateY(0/4)*createTransformRotateX(M_PI/4)*createTransformTranslate(Vector3D(0,0,0)) );
+	SINGLE_TEST_FRAME( createTransformRotateX(M_PI_2) );
+	SINGLE_TEST_FRAME( createTransformRotateX(M_PI_4) );
+	SINGLE_TEST_FRAME( createTransformRotateY(0/4)*createTransformRotateX(M_PI/4)*createTransformTranslate(Vector3D(0,0,0)) );
 	SINGLE_TEST_FRAME( createTransformRotateX(M_PI/4) );
-	SINGLE_TEST_FRAME( ssc::createTransformRotateY(4*M_PI/4) * createTransformRotateX(M_PI/4) );
+	SINGLE_TEST_FRAME( createTransformRotateY(4*M_PI/4) * createTransformRotateX(M_PI/4) );
 	SINGLE_TEST_FRAME( createTransformRotateY(M_PI/4)*createTransformRotateX(M_PI/3)*createTransformTranslate(Vector3D(3,4,5)) );
 	SINGLE_TEST_FRAME( createTransformRotateY(M_PI/4.1)*createTransformRotateX(M_PI/3.3)*createTransformTranslate(Vector3D(3,4,5))*createTransformRotateZ(M_PI/4) );
 	SINGLE_TEST_FRAME( createTransformRotateY(M_PI/2)*createTransformRotateX(M_PI/2)*createTransformTranslate(Vector3D(3,4,5)) );

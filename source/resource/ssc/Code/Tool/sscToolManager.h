@@ -31,7 +31,7 @@
 
 class QDomNode;
 
-namespace ssc
+namespace cx
 {
 
 typedef std::map<ToolPtr, TimedTransformMap> SessionToolHistoryMap;
@@ -110,11 +110,11 @@ public:
 	{
 	} ///< clear everything loaded from xml
 
-	virtual ssc::LandmarkMap getLandmarks()
+	virtual LandmarkMap getLandmarks()
 	{
-		return ssc::LandmarkMap();
+		return LandmarkMap();
 	}
-	virtual void setLandmark(ssc::Landmark landmark)
+	virtual void setLandmark(Landmark landmark)
 	{
 		Q_UNUSED(landmark);
 	}
@@ -164,5 +164,5 @@ protected:
 /**Shortcut for accessing the toolmanager instance.*/
 ToolManager* toolManager();
 
-} //namespace ssc
+} //namespace cx
 #endif /* SSCTOOLMANAGER_H_ */

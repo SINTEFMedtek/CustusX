@@ -39,13 +39,13 @@ ElastixSingleThreadedRunner::~ElastixSingleThreadedRunner()
 }
 
 bool ElastixSingleThreadedRunner::registerLinear(
-    ssc::DataPtr fixed,
-    ssc::DataPtr moving,
+    DataPtr fixed,
+    DataPtr moving,
 	ElastixParametersPtr preset,
-    ssc::Transform3D* result)
+    Transform3D* result)
 {
 	mCompleted = false;
-	QString outPath = cx::DataLocations::getTestDataPath() + "/temp/elastix/" + QDateTime::currentDateTime().toString(ssc::timestampMilliSecondsFormat() + "/");
+	QString outPath = cx::DataLocations::getTestDataPath() + "/temp/elastix/" + QDateTime::currentDateTime().toString(timestampMilliSecondsFormat() + "/");
 
 	mExecuter->setDisplayProcessMessages(false);
 	mExecuter->setDisplayProcessMessages(true);
@@ -90,7 +90,7 @@ void ElastixSingleThreadedRunner::executionFinishedSlot()
 	// D = rMf * fMm' * mMr
 	// as the input to regmanager applyImage2ImageRegistration()
 
-//	ssc::Transform3D delta_pre_rMd =
+//	Transform3D delta_pre_rMd =
 //		mRegistrationManager->getFixedData()->get_rMd()
 //		* mMf.inv()
 //		* mRegistrationManager->getMovingData()->get_rMd().inv();

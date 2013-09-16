@@ -43,7 +43,7 @@ typedef vtkSmartPointer<class vtkCutter> vtkCutterPtr;
 typedef vtkSmartPointer<class vtkAppendPolyData> vtkAppendPolyDataPtr;
 typedef vtkSmartPointer<class vtkFloatArray> vtkFloatArrayPtr;
 
-namespace ssc
+namespace cx
 {
 
 ProbeSector::ProbeSector()
@@ -128,7 +128,7 @@ private:
 	ProbeData mData;
 	Transform3D m_vMu;
 	Vector3D mCachedCenter_v; ///< center of beam sector for sector probes.
-	ssc::DoubleBoundingBox3D mClipRect_v;
+	DoubleBoundingBox3D mClipRect_v;
 };
 
 /** Return a 2D mask image identifying the US beam inside the image
@@ -180,12 +180,12 @@ void ProbeSector::test()
 
 Transform3D ProbeSector::get_tMu() const
 {
-	Transform3D Rx = ssc::createTransformRotateX(-M_PI / 2.0);
-	Transform3D Rz = ssc::createTransformRotateY(M_PI / 2.0);
-	ssc::Transform3D R = (Rx * Rz);
-	ssc::Transform3D T = ssc::createTransformTranslate(-mData.getImage().getOrigin_u());
+	Transform3D Rx = createTransformRotateX(-M_PI / 2.0);
+	Transform3D Rz = createTransformRotateY(M_PI / 2.0);
+	Transform3D R = (Rx * Rz);
+	Transform3D T = createTransformTranslate(-mData.getImage().getOrigin_u());
 
-	ssc::Transform3D tMu = R * T;
+	Transform3D tMu = R * T;
 	return tMu;
 }
 
@@ -293,12 +293,12 @@ vtkPolyDataPtr ProbeSector::getOriginPolyData()
 	{ 1, 0, 2, 3 };
 	sides->InsertNextCell(4, cells);
 
-	ssc::Vector3D o_u = mData.getImage().getOrigin_u();
+	Vector3D o_u = mData.getImage().getOrigin_u();
 	double length = (mData.getDepthStart() - mData.getDepthEnd())/15;
-	length = ssc::constrainValue(length, 2, 10);
-	ssc::Vector3D tip = o_u + ssc::Vector3D(0, -length, 0);
-	ssc::Vector3D left = o_u + ssc::Vector3D(-length/3, 0, 0);
-	ssc::Vector3D right = o_u + ssc::Vector3D(length/3, 0, 0);
+	length = constrainValue(length, 2, 10);
+	Vector3D tip = o_u + Vector3D(0, -length, 0);
+	Vector3D left = o_u + Vector3D(-length/3, 0, 0);
+	Vector3D right = o_u + Vector3D(length/3, 0, 0);
 
 	points->InsertNextPoint(o_u.begin());
 	points->InsertNextPoint(tip.begin());
@@ -320,13 +320,13 @@ void ProbeSector::updateSector()
 		return;
 	}
 
-	ssc::Vector3D bounds = ssc::Vector3D(mData.getImage().mSize.width() - 1, mData.getImage().mSize.height() - 1, 1);
+	Vector3D bounds = Vector3D(mData.getImage().mSize.width() - 1, mData.getImage().mSize.height() - 1, 1);
 	bounds = multiply_elems(bounds, mData.getImage().mSpacing);
 
 	vtkFloatArrayPtr newTCoords = vtkFloatArrayPtr::New();
 	newTCoords->SetNumberOfComponents(2);
 
-	ssc::Vector3D p(0, 0, 0); // tool position in local space
+	Vector3D p(0, 0, 0); // tool position in local space
 	// first define the shape of the probe in a xy-plane.
 	// after that, transform into yz-plane because thats the tool plane (probe point towards positive z)
 	// then transform to global space.

@@ -29,7 +29,7 @@
 #include "sscTypeConversions.h"
 #include <iostream>
 
-namespace ssc
+namespace cx
 {
 
 FileSelectWidget::FileSelectWidget(QWidget* parent)

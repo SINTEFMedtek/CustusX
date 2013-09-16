@@ -20,7 +20,7 @@ void TestAlgorithms::testTemporalCalibration()
   double testValue = 115; // shift found on data set during first tests.
 
   CPPUNIT_ASSERT( success );
-  CPPUNIT_ASSERT( ssc::similar(shift, testValue, 1));
+  CPPUNIT_ASSERT( cx::similar(shift, testValue, 1));
 }
 
 

@@ -33,7 +33,7 @@ DataSelectWidget::DataSelectWidget(QWidget* parent, SelectDataStringDataAdapterB
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    QWidget* dataAdapter = ssc::createDataWidget(this, mData);
+	QWidget* dataAdapter = sscCreateDataWidget(this, mData);
     layout->addWidget(dataAdapter);
 
     mToggleShowAction = this->createAction(this,
@@ -105,7 +105,7 @@ void DataSelectWidget::updateDataVisibility()
     bool visible = false;
     if (mData->getData())
     {
-        std::vector<ssc::DataPtr> visibleData;
+        std::vector<DataPtr> visibleData;
         if (mCurrentViewGroup)
         {
             visibleData = mCurrentViewGroup->getData();
@@ -139,7 +139,7 @@ void DataSelectWidget::requestEraseData()
     if (!mData->getData())
         return;
 
-    ssc::dataManager()->removeData(mData->getData()->getUid());
+    dataManager()->removeData(mData->getData()->getUid());
 }
 
 void DataSelectWidget::setRemoveIcon()

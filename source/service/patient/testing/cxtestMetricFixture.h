@@ -27,21 +27,21 @@ namespace cxtest {
 
 struct PlaneMetricWithInput
 {
-    typedef ssc::PlaneMetric METRIC_TYPE;
-    ssc::PlaneMetricPtr mMetric;
+	typedef cx::PlaneMetric METRIC_TYPE;
+	cx::PlaneMetricPtr mMetric;
 
-    ssc::Vector3D mPoint;
-    ssc::Vector3D mNormal;
-    ssc::CoordinateSystem mSpace;
+	cx::Vector3D mPoint;
+	cx::Vector3D mNormal;
+	cx::CoordinateSystem mSpace;
 };
 
 struct PointMetricWithInput
 {
-    typedef ssc::PointMetric METRIC_TYPE;
-    ssc::PointMetricPtr mMetric;
+	typedef cx::PointMetric METRIC_TYPE;
+	cx::PointMetricPtr mMetric;
 
-    ssc::Vector3D mPoint;
-    ssc::CoordinateSystem mSpace;
+	cx::Vector3D mPoint;
+	cx::CoordinateSystem mSpace;
 };
 
 /** Helper for testing ToolMetric.
@@ -50,8 +50,8 @@ struct PointMetricWithInput
   */
 struct DistanceMetricWithInput
 {
-    typedef ssc::DistanceMetric METRIC_TYPE;
-    ssc::DistanceMetricPtr mMetric;
+	typedef cx::DistanceMetric METRIC_TYPE;
+	cx::DistanceMetricPtr mMetric;
 
     double mDistance;
 };
@@ -61,8 +61,8 @@ struct FrameMetricWithInput
     typedef cx::FrameMetric METRIC_TYPE;
 	cx::FrameMetricPtr mMetric;
 
-	ssc::Transform3D m_qMt;
-    ssc::CoordinateSystem mSpace;
+	cx::Transform3D m_qMt;
+	cx::CoordinateSystem mSpace;
 
 };
 
@@ -75,8 +75,8 @@ struct ToolMetricWithInput
 	typedef cx::ToolMetric METRIC_TYPE;
 	cx::ToolMetricPtr mMetric;
 
-	ssc::Transform3D m_qMt;
-	ssc::CoordinateSystem mSpace;
+	cx::Transform3D m_qMt;
+	cx::CoordinateSystem mSpace;
 	double mOffset;
 	QString mName;
 };
@@ -96,11 +96,11 @@ public:
 
 	FrameMetricWithInput getFrameMetricWithInput();
 	ToolMetricWithInput getToolMetricWithInput();
-	PointMetricWithInput getPointMetricWithInput(ssc::Vector3D point);
-	PlaneMetricWithInput getPlaneMetricWithInput(ssc::Vector3D point, ssc::Vector3D normal);
-	DistanceMetricWithInput getDistanceMetricWithInput(double distance, ssc::DataMetricPtr p0, ssc::DataMetricPtr p1);
+	PointMetricWithInput getPointMetricWithInput(cx::Vector3D point);
+	PlaneMetricWithInput getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal);
+	DistanceMetricWithInput getDistanceMetricWithInput(double distance, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance);
-	QStringList getSingleLineDataList(ssc::DataMetricPtr metric);
+	QStringList getSingleLineDataList(cx::DataMetricPtr metric);
 
 	bool inputEqualsMetric(FrameMetricWithInput data);
 	bool inputEqualsMetric(DistanceMetricWithInput data);
@@ -123,7 +123,7 @@ public:
     void setPatientRegistration();
 
 //    QStringList splitStringLineIntoTextComponents(QString line);
-    bool verifySingleLineHeader(QStringList list, ssc::DataMetricPtr metric);
+	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
 };
 
 } //namespace cxtest

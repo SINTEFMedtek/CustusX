@@ -18,7 +18,7 @@ void TestToolMesh::setToolPath(QString path)
 bool TestToolMesh::canLoadMesh(QString filename)
 {
 	mMeshFileName = mCurrentToolPath + filename;
-	mMesh = ssc::DataManager::getInstance()->loadData(mMeshFileName, mMeshFileName, ssc::rtSTL);
+	mMesh = cx::DataManager::getInstance()->loadData(mMeshFileName, mMeshFileName, cx::rtSTL);
 	return (mMesh != NULL);
 }
 

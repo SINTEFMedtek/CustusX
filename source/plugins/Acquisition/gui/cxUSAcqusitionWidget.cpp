@@ -56,8 +56,8 @@ USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* p
 	editsLayout->setColumnStretch(0,0);
 	editsLayout->setColumnStretch(1,1);
 	RecordBaseWidget::mLayout->addLayout(editsLayout);
-	new ssc::LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New(), editsLayout, 0);
-	new ssc::LabeledComboBoxWidget(this, mPluginData->getReconstructer()->getParams()->mPresetTFAdapter, editsLayout, 1);
+	new LabeledComboBoxWidget(this, ActiveProbeConfigurationStringDataAdapter::New(), editsLayout, 0);
+	new LabeledComboBoxWidget(this, mPluginData->getReconstructer()->getParams()->mPresetTFAdapter, editsLayout, 1);
 
 	QAction* optionsAction = this->createAction(this,
 	      QIcon(":/icons/open_icon_library/png/64x64/actions/system-run-5.png"),
@@ -117,12 +117,12 @@ QWidget* USAcqusitionWidget::createOptionsWidget()
 	layout->setMargin(0);
 
 	SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget, SLOT(setToolSlot(const QString&)));
+	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget, SLOT(setToolSlot(const QString&)));
 
 	ProbeConfigWidget* probeWidget = new ProbeConfigWidget(this);
 	probeWidget->getActiveProbeConfigWidget()->setVisible(false);
 
-	ssc::SpinBoxGroupWidget* temporalCalibrationWidget = new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New());
+	SpinBoxGroupWidget* temporalCalibrationWidget = new SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New());
 
 	int line = 0;
 	layout->addWidget(this->createHorizontalLine(), line++, 0, 1, 1);

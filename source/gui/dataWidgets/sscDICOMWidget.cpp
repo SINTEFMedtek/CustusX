@@ -20,7 +20,7 @@
 #include "cxPatientService.h"
 #include "cxPatientData.h"
 
-namespace ssc
+namespace cx
 {
 
 DICOMWidget::DICOMWidget(QWidget* parent) :
@@ -89,8 +89,8 @@ DICOMWidget::DICOMWidget(QWidget* parent) :
 void DICOMWidget::loadSeries()
 {
 	SeriesPtr selected = this->getSelectedSeries();
-	ssc::dataManager()->loadData(selected->getImage());
-	ssc::dataManager()->saveImage(selected->getImage(), cx::patientService()->getPatientData()->getActivePatientFolder());
+	dataManager()->loadData(selected->getImage());
+	dataManager()->saveImage(selected->getImage(), cx::patientService()->getPatientData()->getActivePatientFolder());
 }
 
 void DICOMWidget::showMetaData()
@@ -126,7 +126,7 @@ void DICOMWidget::showMetaData()
 	ss << setw(hw) << "WindowCenter: " << meta->Volume.mWindowCenter << std::endl;
 	ss << setw(hw) << "WindowWidth: " << meta->Volume.mWindowWidth << std::endl;
 
-	ssc::messageManager()->sendInfo(qstring_cast(ss.str()));
+	messageManager()->sendInfo(qstring_cast(ss.str()));
 }
 
 DICOMWidget::~DICOMWidget()
@@ -219,7 +219,7 @@ void DICOMWidget::dicomChanged()
 
 	std::vector<StudyPtr> studies = mApi->getStudies();
 
-	//	 	ssc::ImagePtr image = api->getStudies()[0]->getSeries()[0]->getImage();
+	//	 	ImagePtr image = api->getStudies()[0]->getSeries()[0]->getImage();
 
 	mTable->blockSignals(true);
     mTable->clear();

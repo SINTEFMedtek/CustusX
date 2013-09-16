@@ -27,7 +27,7 @@
 
 class QString;
 
-namespace ssc
+namespace cx
 {
 
 /**
@@ -42,7 +42,7 @@ namespace ssc
  * \date Feb 11, 2011
  * \author: Christian Askeland, SINTEF
  */
-class ProbeAdapterRTSource: public ssc::VideoSource
+class ProbeAdapterRTSource: public VideoSource
 {
 	Q_OBJECT
 
@@ -63,7 +63,7 @@ public:
 	virtual bool validData() const;
 	virtual bool isConnected() const;
 	virtual bool isStreaming() const;
-	ssc::VideoSourcePtr getBaseSource();
+	VideoSourcePtr getBaseSource();
 
 private slots:
 	void probeChangedSlot();
@@ -71,8 +71,8 @@ private slots:
 
 private:
 	QString mUid;
-	ssc::VideoSourcePtr mBase;
-	ssc::ProbeWeakPtr mProbe;
+	VideoSourcePtr mBase;
+	ProbeWeakPtr mProbe;
 	vtkImageChangeInformationPtr mRedirecter;
 };
 

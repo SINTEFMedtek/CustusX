@@ -43,7 +43,7 @@ private slots:
 //  void patientOrientationBackFaceSlot();
 
 private:
-  ssc::Transform3D get_tMtm() const;
+  Transform3D get_tMtm() const;
   QPushButton* mPatientOrientationButton;
   QCheckBox* mInvertButton;
 

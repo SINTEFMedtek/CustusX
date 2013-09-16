@@ -47,11 +47,11 @@ QString ResampleImageFilter::getHelp() const
 	        "</html>";
 }
 
-ssc::DoubleDataAdapterXmlPtr ResampleImageFilter::getMarginOption(QDomElement root)
+DoubleDataAdapterXmlPtr ResampleImageFilter::getMarginOption(QDomElement root)
 {
-	return ssc::DoubleDataAdapterXml::initialize("Margin", "",
+	return DoubleDataAdapterXml::initialize("Margin", "",
 	                                             "mm Margin added to ref image bounding box",
-	                                             5.0, ssc::DoubleRange(0, 50, 1), 1, root);
+	                                             5.0, DoubleRange(0, 50, 1), 1, root);
 }
 
 void ResampleImageFilter::createOptions()
@@ -96,19 +96,19 @@ void ResampleImageFilter::createOutputTypes()
  */
 bool ResampleImageFilter::execute()
 {
-	ssc::ImagePtr input = this->getCopiedInputImage(0);
-	ssc::ImagePtr reference = this->getCopiedInputImage(1);
+	ImagePtr input = this->getCopiedInputImage(0);
+	ImagePtr reference = this->getCopiedInputImage(1);
 	if (!input || !reference)
 		return false;
 
-	ssc::DoubleDataAdapterXmlPtr marginOption = this->getMarginOption(mCopiedOptions);
+	DoubleDataAdapterXmlPtr marginOption = this->getMarginOption(mCopiedOptions);
 	double margin = marginOption->getValue();
 
-	ssc::Transform3D refMi = reference->get_rMd().inv() * input->get_rMd();
-	ssc::ImagePtr oriented = resampleImage(input, refMi);//There is an error with the transfer functions in this image
+	Transform3D refMi = reference->get_rMd().inv() * input->get_rMd();
+	ImagePtr oriented = resampleImage(input, refMi);//There is an error with the transfer functions in this image
 
-	ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
-	ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
+	Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
+	DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
 
 	// increase bb size by margin
 	bb_crop[0] -= margin;
@@ -120,12 +120,12 @@ bool ResampleImageFilter::execute()
 
 	oriented->setCroppingBox(bb_crop);
 
-	ssc::ImagePtr cropped = cropImage(oriented);
+	ImagePtr cropped = cropImage(oriented);
 
 	QString uid = input->getUid() + "_resample%1";
 	QString name = input->getName() + " resample%1";
 
-	ssc::ImagePtr resampled = resampleImage(cropped, ssc::Vector3D(reference->getBaseVtkImageData()->GetSpacing()), uid, name);
+	ImagePtr resampled = resampleImage(cropped, Vector3D(reference->getBaseVtkImageData()->GetSpacing()), uid, name);
 
 	// important! move thread affinity to main thread - ensures signals/slots is still called correctly
 	resampled->moveThisAndChildrenToThread(QApplication::instance()->thread());
@@ -139,11 +139,11 @@ bool ResampleImageFilter::postProcess()
 	if (!mRawResult)
 		return false;
 
-	ssc::ImagePtr output = mRawResult;
+	ImagePtr output = mRawResult;
 	mRawResult.reset();
 	//    output->resetTransferFunctions();
-	ssc::dataManager()->loadData(output);
-	ssc::dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
+	dataManager()->loadData(output);
+	dataManager()->saveImage(output, patientService()->getPatientData()->getActivePatientFolder());
 
 	// set output
 	mOutputTypes.front()->setValue(output->getUid());

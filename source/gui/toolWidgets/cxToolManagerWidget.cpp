@@ -25,7 +25,7 @@ ToolManagerWidget::ToolManagerWidget(QWidget* parent) :
   connect(mStartTrackingButton, SIGNAL(clicked(bool)), this, SLOT(startTrackingClickedSlot(bool)));
   connect(mStopTrackingButton, SIGNAL(clicked(bool)), this, SLOT(stopTrackingClickedSlot(bool)));
 
-  ToolManager* toolManager = ToolManager::getInstance();
+  cxToolManager* toolManager = cxToolManager::getInstance();
   connect(toolManager, SIGNAL(configured()), this, SLOT(updateButtonStatusSlot()));
   connect(toolManager, SIGNAL(deconfigured()), this, SLOT(updateButtonStatusSlot()));
   connect(toolManager, SIGNAL(initialized()), this, SLOT(updateButtonStatusSlot()));
@@ -60,41 +60,41 @@ QString ToolManagerWidget::defaultWhatsThis() const
 
 void ToolManagerWidget::configureClickedSlot(bool checked)
 {
-  ToolManager::getInstance()->configure();
+  cxToolManager::getInstance()->configure();
 }
 
 void ToolManagerWidget::deconfigureClickedSlot(bool checked)
 {
-  ToolManager::getInstance()->deconfigure();
+  cxToolManager::getInstance()->deconfigure();
 }
 
 void ToolManagerWidget::initializeClickedSlot(bool checked)
 {
-  ToolManager::getInstance()->initialize();
+  cxToolManager::getInstance()->initialize();
 }
 
 void ToolManagerWidget::uninitializeClickedSlot(bool checked)
 {
-  ToolManager::getInstance()->uninitialize();
+  cxToolManager::getInstance()->uninitialize();
 }
 
 void ToolManagerWidget::startTrackingClickedSlot(bool checked)
 {
-  ToolManager::getInstance()->startTracking();
+  cxToolManager::getInstance()->startTracking();
 }
 
 void ToolManagerWidget::stopTrackingClickedSlot(bool checked)
 {
-  ToolManager::getInstance()->stopTracking();
+  cxToolManager::getInstance()->stopTracking();
 }
 
 void ToolManagerWidget::updateButtonStatusSlot()
 {
-  mConfigureButton->setDisabled(ToolManager::getInstance()->isConfigured());
-  mDeConfigureButton->setDisabled(!ToolManager::getInstance()->isConfigured());
-  mInitializeButton->setDisabled(ToolManager::getInstance()->isInitialized());
-  mUnInitializeButton->setDisabled(!ToolManager::getInstance()->isInitialized());
-  mStartTrackingButton->setDisabled(ToolManager::getInstance()->isTracking());
-  mStopTrackingButton->setDisabled(!ToolManager::getInstance()->isTracking());
+  mConfigureButton->setDisabled(cxToolManager::getInstance()->isConfigured());
+  mDeConfigureButton->setDisabled(!cxToolManager::getInstance()->isConfigured());
+  mInitializeButton->setDisabled(cxToolManager::getInstance()->isInitialized());
+  mUnInitializeButton->setDisabled(!cxToolManager::getInstance()->isInitialized());
+  mStartTrackingButton->setDisabled(cxToolManager::getInstance()->isTracking());
+  mStopTrackingButton->setDisabled(!cxToolManager::getInstance()->isTracking());
 }
 }

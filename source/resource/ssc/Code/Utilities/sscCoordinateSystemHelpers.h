@@ -6,7 +6,7 @@
 #include "sscForwardDeclarations.h"
 #include <vector>
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Identification of a Coordinate system.
@@ -48,12 +48,12 @@ public:
     static Transform3D getDominantToolTipTransform(CoordinateSystem to, bool useOffset = false);///< Get toMt, where t is dominant tool
 	static Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
 
-	static ssc::CoordinateSystem getS(ssc::ToolPtr tool); ///<tools sensor coordinate system
-	static ssc::CoordinateSystem getT(ssc::ToolPtr tool); ///<tools coordinate system
-	static ssc::CoordinateSystem getTO(ssc::ToolPtr tool); ///<tool offset coordinate system
-	static ssc::CoordinateSystem getD(ssc::DataPtr data);///<datas coordinate system	static ssc::CoordinateSystem getPr(); ///<patient references coordinate system
-	static ssc::CoordinateSystem getPr();
-	static ssc::CoordinateSystem getR(); ///<data references coordinate system
+	static CoordinateSystem getS(ToolPtr tool); ///<tools sensor coordinate system
+	static CoordinateSystem getT(ToolPtr tool); ///<tools coordinate system
+	static CoordinateSystem getTO(ToolPtr tool); ///<tool offset coordinate system
+	static CoordinateSystem getD(DataPtr data);///<datas coordinate system	static CoordinateSystem getPr(); ///<patient references coordinate system
+	static CoordinateSystem getPr();
+	static CoordinateSystem getR(); ///<data references coordinate system
 
 	static std::vector<CoordinateSystem> getAvailableSpaces(bool compact);
 
@@ -71,5 +71,5 @@ private:
 	static CoordinateSystem getToolCoordinateSystem(ToolPtr tool);
 };
 typedef CoordinateSystemHelpers SpaceHelpers;
-}//namespace ssc
+}//namespace cx
 #endif /* SSCCOORDINATESYSTEMHELPERS_H_ */

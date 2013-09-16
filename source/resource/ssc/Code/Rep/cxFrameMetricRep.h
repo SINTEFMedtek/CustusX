@@ -19,7 +19,7 @@
 #include "cxFrameMetric.h"
 #include "sscViewportListener.h"
 
-namespace ssc
+namespace cx
 {
 typedef boost::shared_ptr<class GraphicalAxes3D> GraphicalAxes3DPtr;
 }
@@ -37,13 +37,13 @@ typedef boost::shared_ptr<class FrameMetricRep> FrameMetricRepPtr;
  * \date Aug 26, 2013
  * \author Christian Askeland, SINTEF
  */
-class FrameMetricRep: public ssc::DataMetricRep
+class FrameMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
 	static FrameMetricRepPtr New(const QString& uid, const QString& name = ""); ///constructor
 	virtual ~FrameMetricRep() {}
-	virtual QString getType() const { return "ssc::FrameMetricRep"; }
+	virtual QString getType() const { return "FrameMetricRep"; }
 
 protected:
     virtual void clear();
@@ -56,7 +56,7 @@ private:
 	FrameMetricRep(); ///< not implemented
     FrameMetricPtr getFrameMetric();
 
-    ssc::GraphicalAxes3DPtr mAxes;
+    GraphicalAxes3DPtr mAxes;
 };
 
 } // namespace cx

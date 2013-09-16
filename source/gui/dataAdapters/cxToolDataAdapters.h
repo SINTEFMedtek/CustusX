@@ -29,11 +29,11 @@ namespace cx
 
 /** Adapter that connects to the current active tool.
  */
-class ActiveToolStringDataAdapter : public ssc::StringDataAdapter
+class ActiveToolStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
-  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveToolStringDataAdapter()); }
+  static StringDataAdapterPtr New() { return StringDataAdapterPtr(new ActiveToolStringDataAdapter()); }
   ActiveToolStringDataAdapter();
   virtual ~ActiveToolStringDataAdapter() {}
 
@@ -55,7 +55,7 @@ typedef boost::shared_ptr<class ActiveProbeConfigurationStringDataAdapter> Activ
  *  It will stick to the probe as much as possible,
  *  i.e. ignore hiding and showing of other non-probes.
  */
-class ActiveProbeConfigurationStringDataAdapter : public ssc::StringDataAdapter
+class ActiveProbeConfigurationStringDataAdapter : public StringDataAdapter
 {
   Q_OBJECT
 public:
@@ -74,12 +74,12 @@ public: // optional methods
   virtual QString convertInternal2Display(QString internal);
 
   // extensions
-  ssc::ToolPtr getTool() { return mTool; }
+  ToolPtr getTool() { return mTool; }
 
 private slots:
   void dominantToolChanged();
 private:
-  ssc::ToolPtr mTool;
+  ToolPtr mTool;
 };
 
 

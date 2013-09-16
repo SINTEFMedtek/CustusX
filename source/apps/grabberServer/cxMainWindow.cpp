@@ -17,7 +17,7 @@ namespace cx
 
 MainWindow::MainWindow(QStringList arguments) :
   QMainWindow(0),
-  mConsoleWidget(new ssc::ConsoleWidget(this)),
+  mConsoleWidget(new ConsoleWidget(this)),
   mQueueInfoLabel(new QLabel("Queue size: 0")),
   mImagesDroppedLabel(new QLabel("Images dropped: 0"))
 {

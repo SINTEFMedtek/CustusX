@@ -47,9 +47,9 @@ TEST_CASE("ToolMetric can convert values to single line string", "[unit]")
 	REQUIRE(list[4]=="reference");
 	INFO(list.join("\n"));
 	bool transformStringOk = false;
-	ssc::Transform3D readTransform = ssc::Transform3D::fromString(QStringList(list.mid(5, 16)).join(" "), &transformStringOk);
+	cx::Transform3D readTransform = cx::Transform3D::fromString(QStringList(list.mid(5, 16)).join(" "), &transformStringOk);
 	REQUIRE(transformStringOk);
-	REQUIRE(ssc::similar(testData.m_qMt, readTransform));
+	REQUIRE(cx::similar(testData.m_qMt, readTransform));
 }
 
 TEST_CASE("ToolMetric can set space correctly", "[unit]")
@@ -59,7 +59,7 @@ TEST_CASE("ToolMetric can set space correctly", "[unit]")
 
 	fixture.setPatientRegistration();
 
-	testData.mMetric->setSpace(ssc::CoordinateSystemHelpers::getPr());
+	testData.mMetric->setSpace(cx::CoordinateSystemHelpers::getPr());
 	CHECK_FALSE(fixture.inputEqualsMetric(testData));
 
 	testData.mMetric->setSpace(testData.mSpace);
@@ -71,21 +71,21 @@ TEST_CASE("ToolMetric can get a valid reference coordinate", "[unit]")
 	cxtest::MetricFixture fixture;
 	cxtest::ToolMetricWithInput testData = fixture.getToolMetricWithInput();
 
-	ssc::Vector3D testCoord(-2,1,3);
-	ssc::Vector3D refCoord = testData.mMetric->getRefCoord();
+	cx::Vector3D testCoord(-2,1,3);
+	cx::Vector3D refCoord = testData.mMetric->getRefCoord();
 	INFO(qstring_cast(testCoord)+" == "+qstring_cast(refCoord));
-	CHECK(ssc::similar(refCoord, testCoord));
+	CHECK(cx::similar(refCoord, testCoord));
 
-	testData.mMetric->setSpace(ssc::CoordinateSystemHelpers::getPr());
+	testData.mMetric->setSpace(cx::CoordinateSystemHelpers::getPr());
 
 	refCoord = testData.mMetric->getRefCoord();
 	INFO(qstring_cast(testCoord)+" == "+qstring_cast(refCoord));
-	CHECK(ssc::similar(refCoord, testCoord));
+	CHECK(cx::similar(refCoord, testCoord));
 
 	fixture.setPatientRegistration();
 
-	testCoord = ssc::Vector3D(3,7,10);
+	testCoord = cx::Vector3D(3,7,10);
 	refCoord = testData.mMetric->getRefCoord();
 	INFO(qstring_cast(testCoord)+" == "+qstring_cast(refCoord));
-	CHECK(ssc::similar(refCoord, testCoord));
+	CHECK(cx::similar(refCoord, testCoord));
 }

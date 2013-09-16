@@ -58,10 +58,10 @@ CameraStyle::CameraStyle() :
 {
 	connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(viewChangedSlot()));
 
-	mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener.reset(new ViewportListener);
 	mViewportListener->setCallback(boost::bind(&CameraStyle::viewportChangedSlot, this));
 
-	connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+	connect(toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 	this->dominantToolChangedSlot();
 	this->viewChangedSlot();
 }
@@ -82,17 +82,17 @@ void CameraStyle::viewportChangedSlot()
 //	std::cout << "CameraStyle::viewportChangedSlot()" << std::endl;
 //	vtkCameraPtr camera = this->getCamera();
 
-//	ssc::Vector3D pos(camera->GetPosition());
-//	ssc::Vector3D focus(camera->GetFocalPoint());
+//	Vector3D pos(camera->GetPosition());
+//	Vector3D focus(camera->GetFocalPoint());
 //	std::cout << "distance " << camera->GetDistance() << std::endl;
 }
 
-ssc::ToolRep3DPtr CameraStyle::getToolRep() const
+ToolRep3DPtr CameraStyle::getToolRep() const
 {
 	if (!this->getView())
-		return ssc::ToolRep3DPtr();
+		return ToolRep3DPtr();
 
-	ssc::ToolRep3DPtr rep = RepManager::findFirstRep<ssc::ToolRep3D>(this->getView()->getReps(), mFollowingTool);
+	ToolRep3DPtr rep = RepManager::findFirstRep<ToolRep3D>(this->getView()->getReps(), mFollowingTool);
 	return rep;
 }
 
@@ -116,7 +116,7 @@ void CameraStyle::updateCamera()
 		this->moveCameraToolStyleSlot(mFollowingTool->get_prMt(), mFollowingTool->getTimestamp());
 }
 
-void CameraStyle::moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestamp)
+void CameraStyle::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
 {
 	if (mCameraStyle == cstDEFAULT_STYLE)
 		return;
@@ -125,9 +125,9 @@ void CameraStyle::moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestam
 	if (!camera)
 		return;
 
-	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+	Transform3D rMpr = *toolManager()->get_rMpr();
 
-	ssc::Transform3D rMt = rMpr * prMt;
+	Transform3D rMt = rMpr * prMt;
 
 	double offset = mFollowingTool->getTooltipOffset();
 
@@ -135,24 +135,24 @@ void CameraStyle::moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestam
 
 //	std::cout << "cameraOffset pre " << cameraOffset << std::endl;
 //	std::cout << "rMt\n" << rMt << std::endl;
-	ssc::Vector3D camera_r = rMt.coord(ssc::Vector3D(0, 0, offset - cameraOffset));
-	ssc::Vector3D focus_r = rMt.coord(ssc::Vector3D(0, 0, offset));
+	Vector3D camera_r = rMt.coord(Vector3D(0, 0, offset - cameraOffset));
+	Vector3D focus_r = rMt.coord(Vector3D(0, 0, offset));
 //	std::cout << "cameraOffset ppost " << (focus_r-camera_r).length() << std::endl;
-	ssc::Vector3D vup_r = rMt.vector(ssc::Vector3D(-1, 0, 0));
+	Vector3D vup_r = rMt.vector(Vector3D(-1, 0, 0));
 	if (mCameraStyle == cstANGLED_TOOL_STYLE)
 	{
 		// elevate 20*, but keep distance
 		double height = cameraOffset * tan(20 / 180.0 * M_PI);
 		camera_r += vup_r * height;
-		ssc::Vector3D elevated = camera_r + vup_r * height;
-		ssc::Vector3D n_foc2eye = (elevated - focus_r).normalized();
+		Vector3D elevated = camera_r + vup_r * height;
+		Vector3D n_foc2eye = (elevated - focus_r).normalized();
 		camera_r = focus_r + cameraOffset * n_foc2eye;
 	}
 
-	ssc::Vector3D pos_old(camera->GetPosition());
-	ssc::Vector3D focus_old(camera->GetFocalPoint());
+	Vector3D pos_old(camera->GetPosition());
+	Vector3D focus_old(camera->GetFocalPoint());
 
-	if (ssc::similar(pos_old, camera_r, 1) && ssc::similar(focus_old, focus_r, 1))
+	if (similar(pos_old, camera_r, 1) && similar(focus_old, focus_r, 1))
 		return; // break update loop: this event is triggered by camera change.
 
 //	std::cout << "pos " << pos_old << " to " << camera_r << std::endl;
@@ -178,7 +178,7 @@ void CameraStyle::viewChangedSlot()
 
 void CameraStyle::dominantToolChangedSlot()
 {
-	ssc::ToolPtr newTool = ssc::toolManager()->getDominantTool();
+	ToolPtr newTool = toolManager()->getDominantTool();
 	if (newTool == mFollowingTool)
 		return;
 
@@ -196,7 +196,7 @@ void CameraStyle::connectTool()
 	if (!this->isToolFollowingStyle(mCameraStyle))
 		return;
 
-	mFollowingTool = ssc::toolManager()->getDominantTool();
+	mFollowingTool = toolManager()->getDominantTool();
 
 	if (!mFollowingTool)
 		return;
@@ -205,7 +205,7 @@ void CameraStyle::connectTool()
 		return;
 
 	//Need the toolrep to get the direction the camera should point in
-	ssc::ToolRep3DPtr rep = this->getToolRep();
+	ToolRep3DPtr rep = this->getToolRep();
 
 	if (!rep)
 		return; //cannot set the camera to follow a tool if that tool does not have a rep
@@ -221,7 +221,7 @@ void CameraStyle::connectTool()
 
 	this->updateCamera();
 
-	ssc::messageManager()->sendInfo("Camera is following " + mFollowingTool->getName());
+	messageManager()->sendInfo("Camera is following " + mFollowingTool->getName());
 }
 
 void CameraStyle::disconnectTool()
@@ -236,7 +236,7 @@ void CameraStyle::disconnectTool()
 		disconnect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
 			SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
-		ssc::ToolRep3DPtr rep = this->getToolRep();
+		ToolRep3DPtr rep = this->getToolRep();
 		if (rep)
 			rep->setStayHiddenAfterVisible(false);
 	}
@@ -281,7 +281,7 @@ void CameraStyle::addInteractorStyleAction(QString caption, QActionGroup* group,
 				QString helptext)
 {
 	vtkRenderWindowInteractor* interactor = NULL;
-	ssc::ViewWidget* view = this->getView();
+	ViewWidget* view = this->getView();
 	if (view)
 		interactor = view->getRenderWindow()->GetInteractor();
 
@@ -328,7 +328,7 @@ void CameraStyle::setCameraStyle(CAMERA_STYLE_TYPE style)
 
 	this->disconnectTool();
 
-	ssc::ViewWidget* view = this->getView();
+	ViewWidget* view = this->getView();
 	if (!view)
 		return;
 	vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
@@ -350,7 +350,7 @@ void CameraStyle::setCameraStyle(CAMERA_STYLE_TYPE style)
 
 	this->connectTool();
 	this->updateActionGroup();
-	ssc::messageManager()->sendInfo(QString("Activated camera style %1.").arg(enum2string(style)));
+	messageManager()->sendInfo(QString("Activated camera style %1.").arg(enum2string(style)));
 }
 
 }//namespace cx

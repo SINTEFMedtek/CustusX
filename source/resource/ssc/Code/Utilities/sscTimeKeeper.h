@@ -22,7 +22,7 @@
 #include <QDateTime>
 #include <QString>
 
-namespace ssc
+namespace cx
 {
 
 /**Helper class for measuring and printing the time spent in code.
@@ -46,6 +46,6 @@ private:
     QDateTime mTime;
 };
 
-} // namespace ssc
+} // namespace cx
 
 #endif // SSCTIMEKEEPER_H

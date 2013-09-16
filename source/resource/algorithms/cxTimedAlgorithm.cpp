@@ -42,14 +42,14 @@ void TimedBaseAlgorithm::startTiming()
 {
 	mStartTime = QDateTime::currentDateTime();
 	if (mUseDefaultMessages)
-		ssc::messageManager()->sendInfo(QString("Algorithm %1 started.").arg(mProduct));
+		messageManager()->sendInfo(QString("Algorithm %1 started.").arg(mProduct));
 	mTimer->start();
 }
 
 void TimedBaseAlgorithm::stopTiming()
 {
 	if (mUseDefaultMessages)
-		ssc::messageManager()->sendSuccess(QString("Algorithm %1 complete [%2s]").arg(mProduct).arg(this->getSecondsPassedAsString()));
+		messageManager()->sendSuccess(QString("Algorithm %1 complete [%2s]").arg(mProduct).arg(this->getSecondsPassedAsString()));
 	//mStartTime = QDateTime(); we might need the timing after this call
 	mTimer->stop();
 }
@@ -69,7 +69,7 @@ QString TimedBaseAlgorithm::getSecondsPassedAsString() const
 
 void TimedBaseAlgorithm::timeoutSlot()
 {
-  ssc::messageManager()->sendInfo(QString("Still executing %1, [%2] ...").arg(mProduct).arg(this->getTimePassed().toString("m:ss")));
+  messageManager()->sendInfo(QString("Still executing %1, [%2] ...").arg(mProduct).arg(this->getTimePassed().toString("m:ss")));
 }
 //---------------------------------------------------------------------------------------------------------------------
 

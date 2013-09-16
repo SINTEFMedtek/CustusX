@@ -26,7 +26,7 @@ namespace cx
 */
 
 /**
- * \brief Adapter class for ssc::ManualTool.
+ * \brief Adapter class for ManualTool.
  * \ingroup cxServiceTracking
  *
  * A ManualToolAdapter inherits from manual tool, but also
@@ -37,28 +37,28 @@ namespace cx
  *  \date Feb 14, 2011
  *  \author christiana
  */
-class ManualToolAdapter : public ssc::ManualTool
+class ManualToolAdapter : public ManualTool
 {
 	Q_OBJECT
 public:
-	explicit ManualToolAdapter(ssc::ToolManager* manager, QString uid);
-	explicit ManualToolAdapter(ssc::ToolManager* manager, ssc::ToolPtr base);
+	explicit ManualToolAdapter(ToolManager* manager, QString uid);
+	explicit ManualToolAdapter(ToolManager* manager, ToolPtr base);
 	virtual ~ManualToolAdapter();
 
 	virtual std::set<Type> getTypes() const { return mBase->getTypes(); }
 	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual bool isCalibrated() const;
-	virtual ssc::ProbeData getProbeSector() const;
-	virtual ssc::ProbePtr getProbe() const;
+	virtual ProbeData getProbeSector() const;
+	virtual ProbePtr getProbe() const;
 
-	virtual ssc::Transform3D getCalibration_sMt() const;
-	virtual std::map<int, ssc::Vector3D> getReferencePoints() const;
+	virtual Transform3D getCalibration_sMt() const;
+	virtual std::map<int, Vector3D> getReferencePoints() const;
 
-	void setBase(ssc::ToolPtr base);
+	void setBase(ToolPtr base);
 
 private:
-  ssc::ToolPtr mBase;
+  ToolPtr mBase;
 };
 
 typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;

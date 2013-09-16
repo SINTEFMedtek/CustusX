@@ -24,7 +24,7 @@
 #include "sscTypeConversions.h"
 #include "sscTime.h"
 
-namespace ssc
+namespace cx
 {
 
 Landmark::Landmark(QString uid, Vector3D coord) :
@@ -42,7 +42,7 @@ QString Landmark::getUid() const
 	return mUid;
 }
 
-ssc::Vector3D Landmark::getCoord() const
+Vector3D Landmark::getCoord() const
 {
 	return mCoord;
 }
@@ -143,4 +143,4 @@ void LandmarkProperty::parseXml(QDomNode& dataNode)
 	mName = base.attribute("name");
 }
 
-} // namespace ssc
+} // namespace cx

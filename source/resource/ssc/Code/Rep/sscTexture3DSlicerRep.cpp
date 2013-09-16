@@ -38,7 +38,7 @@
 #include "sscTexture3DSlicerProxy.h"
 
 //---------------------------------------------------------
-namespace ssc
+namespace cx
 {
 //---------------------------------------------------------
 
@@ -79,22 +79,22 @@ void Texture3DSlicerRep::viewChanged()
 	mProxy->setViewportData(mView->get_vpMs(), mView->getViewport());
 }
 
-void Texture3DSlicerRep::setImages(std::vector<ssc::ImagePtr> images)
+void Texture3DSlicerRep::setImages(std::vector<ImagePtr> images)
 {
 	mProxy->setImages(images);
 }
 
-std::vector<ssc::ImagePtr> Texture3DSlicerRep::getImages()
+std::vector<ImagePtr> Texture3DSlicerRep::getImages()
 {
 	return mProxy->getImages();
 }
 
-void Texture3DSlicerRep::setSliceProxy(ssc::SliceProxyPtr slicer)
+void Texture3DSlicerRep::setSliceProxy(SliceProxyPtr slicer)
 {
 	mProxy->setSliceProxy(slicer);
 }
 
-void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View *view)
+void Texture3DSlicerRep::addRepActorsToViewRenderer(View *view)
 {
 	view->getRenderer()->AddActor(mProxy->getActor());
 	mView = view;
@@ -102,7 +102,7 @@ void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View *view)
 	this->viewChanged();
 }
 
-void Texture3DSlicerRep::removeRepActorsFromViewRenderer(ssc::View *view)
+void Texture3DSlicerRep::removeRepActorsFromViewRenderer(View *view)
 {
 	view->getRenderer()->RemoveActor(mProxy->getActor());
 	disconnect(dynamic_cast<QObject *>(view), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
@@ -114,7 +114,7 @@ void Texture3DSlicerRep::update()
 	mProxy->update();
 }
 
-void Texture3DSlicerRep::printSelf(std::ostream & os, ssc::Indent indent)
+void Texture3DSlicerRep::printSelf(std::ostream & os, Indent indent)
 {
 
 }

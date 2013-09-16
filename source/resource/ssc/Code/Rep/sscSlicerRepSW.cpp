@@ -27,7 +27,7 @@
 #include "sscImage.h"
 #include "sscSlicedImageProxy.h"
 
-namespace ssc
+namespace cx
 {
 
 SliceRepSW::SliceRepSW(const QString& uid) :
@@ -82,7 +82,7 @@ QString SliceRepSW::getImageUid()const
 	return mImageSlicer->getImage() ? mImageSlicer->getImage()->getUid() : "";  
 }
 
-void SliceRepSW::setSliceProxy(ssc::SliceProxyPtr slicer)
+void SliceRepSW::setSliceProxy(SliceProxyPtr slicer)
 {
 	mImageSlicer->setSliceProxy(slicer);
 }
@@ -112,4 +112,4 @@ void SliceRepSW::printSelf(std::ostream & os, Indent indent)
 	mImageSlicer->printSelf(os, indent);
 }
 
-}// namespace ssc
+}// namespace cx

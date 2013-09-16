@@ -37,7 +37,7 @@
 #include "sscBoundingBox3D.h"
 
 // --------------------------------------------------------
-namespace ssc
+namespace cx
 {
 
 RGBColor::RGBColor() {}

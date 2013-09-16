@@ -34,7 +34,7 @@
 #include <QDateTime>
 class QDomNode;
 
-namespace ssc
+namespace cx
 {
 typedef boost::weak_ptr<class Rep> RepWeakPtr;
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
@@ -93,7 +93,7 @@ public:
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
-	virtual CoordinateSystem getCoordinateSystem() { return ssc::CoordinateSystem(ssc::csDATA, this->getUid()); }
+	virtual CoordinateSystem getCoordinateSystem() { return CoordinateSystem(csDATA, this->getUid()); }
 
 signals:
 	void transformChanged(); ///< emitted when transform is changed
@@ -119,6 +119,6 @@ protected:
 
 typedef boost::shared_ptr<Data> DataPtr;
 
-} // end namespace ssc
+} // end namespace cx
 
 #endif /*SSCDATA_H_*/

@@ -84,7 +84,7 @@ QString PatientData::getActivePatientFolder() const
 
 bool PatientData::isPatientValid() const
 {
-	//ssc::messageManager()->sendDebug("PatientData::isPatientValid: "+string_cast(!mActivePatientFolder.isEmpty()));
+	//messageManager()->sendDebug("PatientData::isPatientValid: "+string_cast(!mActivePatientFolder.isEmpty()));
 	return !mActivePatientFolder.isEmpty() && (mActivePatientFolder != this->getNullFolder());
 }
 
@@ -95,7 +95,7 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
 
 	mActivePatientFolder = activePatientFolder;
 
-	ssc::messageManager()->sendInfo("Set Active Patient: " + mActivePatientFolder);
+	messageManager()->sendInfo("Set Active Patient: " + mActivePatientFolder);
 
 	emit patientChanged();
 }
@@ -112,8 +112,8 @@ void PatientData::newPatient(QString choosenDir)
  */
 void PatientData::clearPatient()
 {
-	ssc::dataManager()->clear();
-//  ssc::toolManager()->clear();
+	dataManager()->clear();
+//  toolManager()->clear();
 //  viewManager()->clear();
 //  registrationManager()->clear();
 	//rep
@@ -156,20 +156,20 @@ void PatientData::startupLoadPatient()
 
 	if (!folder.isEmpty())
 	{
-		ssc::messageManager()->sendInfo(QString("Startup Load [%1] from command line").arg(folder));
+		messageManager()->sendInfo(QString("Startup Load [%1] from command line").arg(folder));
 	}
 
 	if (folder.isEmpty() && settings()->value("Automation/autoLoadRecentPatient").toBool())
 	{
 		folder = settings()->value("startup/lastPatient").toString();
 
-		QDateTime lastSaveTime = QDateTime::fromString(settings()->value("startup/lastPatientSaveTime").toString(), ssc::timestampSecondsFormat());
+		QDateTime lastSaveTime = QDateTime::fromString(settings()->value("startup/lastPatientSaveTime").toString(), timestampSecondsFormat());
 		double minsSinceLastSave = lastSaveTime.secsTo(QDateTime::currentDateTime())/60;
 		double autoLoadRecentPatientWithinHours = settings()->value("Automation/autoLoadRecentPatientWithinHours").toDouble();
 		int allowedMinsSinceLastSave = autoLoadRecentPatientWithinHours*60;
 		if (minsSinceLastSave > allowedMinsSinceLastSave) // if less than 8 hours, accept
 		{
-			ssc::messageManager()->sendInfo(
+			messageManager()->sendInfo(
 				QString("Startup Load: Ignored recent patient because %1 hours since last save, limit is %2")
 				.arg(int(minsSinceLastSave/60))
 				.arg(int(allowedMinsSinceLastSave/60)));
@@ -177,13 +177,13 @@ void PatientData::startupLoadPatient()
 		}
 
 		if (!folder.isEmpty())
-			ssc::messageManager()->sendInfo(QString("Startup Load [%1] as recent patient").arg(folder));
+			messageManager()->sendInfo(QString("Startup Load [%1] as recent patient").arg(folder));
 	}
 
 	if (folder.isEmpty())
 		return;
 
-//	ssc::messageManager()->sendInfo("Startup Load patient: " + folder);
+//	messageManager()->sendInfo("Startup Load patient: " + folder);
 	this->loadPatient(folder);
 }
 
@@ -192,7 +192,7 @@ void PatientData::startupLoadPatient()
 void PatientData::loadPatient(QString choosenDir)
 {
 	this->clearPatient();
-	//ssc::messageManager()->sendDebug("loadPatient() choosenDir: "+string_cast(choosenDir));
+	//messageManager()->sendDebug("loadPatient() choosenDir: "+string_cast(choosenDir));
 	if (choosenDir == QString::null)
 		return; // On cancel
 
@@ -205,7 +205,7 @@ void PatientData::loadPatient(QString choosenDir)
 		// Read the file
 		if (!doc.setContent(&file, false, &emsg, &eline, &ecolumn))
 		{
-			ssc::messageManager()->sendError("Could not parse XML file :" + file.fileName() + " because: " + emsg + "");
+			messageManager()->sendError("Could not parse XML file :" + file.fileName() + " because: " + emsg + "");
 		}
 		else
 		{
@@ -218,7 +218,7 @@ void PatientData::loadPatient(QString choosenDir)
 //	else //User have created the directory create xml file and folders
 //	{
 //		//TODO: Ask the user if he want to convert the folder
-//		ssc::messageManager()->sendInfo(
+//		messageManager()->sendInfo(
 //						"Found no CX3 data in folder: " + choosenDir + " Converting the folder to a patent folder...");
 //		createPatientFolders(choosenDir);
 //	}
@@ -237,7 +237,7 @@ void PatientData::savePatient()
 
 	if (mActivePatientFolder.isEmpty())
 	{
-//    ssc::messageManager()->sendWarning("No patient selected, select or create patient before saving!");
+//    messageManager()->sendWarning("No patient selected, select or create patient before saving!");
 //    this->newPatientSlot();
 		return;
 	}
@@ -254,22 +254,22 @@ void PatientData::savePatient()
 		QTextStream stream(&file);
 		stream << doc.toString(4);
 		file.close();
-//		ssc::messageManager()->sendInfo("Created " + file.fileName());
+//		messageManager()->sendInfo("Created " + file.fileName());
 	}
 	else
 	{
-		ssc::messageManager()->sendError("Could not open " + file.fileName() + " Error: " + file.errorString());
+		messageManager()->sendError("Could not open " + file.fileName() + " Error: " + file.errorString());
 	}
 
-//  ssc::toolManager()->savePositionHistory();
+//  toolManager()->savePositionHistory();
 
 	// save position transforms into the mhd files.
 	// This hack ensures data files can be used in external programs without an explicit export.
-	ssc::DataManager::ImagesMap images = ssc::dataManager()->getImages();
-	for (ssc::DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
+	DataManager::ImagesMap images = dataManager()->getImages();
+	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
 	{
-		//ssc::dataManager()->saveImage(iter->second, targetFolder);
-		ssc::CustomMetaImagePtr customReader = ssc::CustomMetaImage::create(
+		//dataManager()->saveImage(iter->second, targetFolder);
+		CustomMetaImagePtr customReader = CustomMetaImage::create(
 						mActivePatientFolder + "/" + iter->second->getFilePath());
 		customReader->setTransform(iter->second->get_rMd());
 	}
@@ -279,7 +279,7 @@ void PatientData::savePatient()
 
 	mWorkingDocument = QDomDocument();
 
-	ssc::messageManager()->sendInfo("Saved patient " + mActivePatientFolder);
+	messageManager()->sendInfo("Saved patient " + mActivePatientFolder);
 }
 
 /** Writes settings info describing the patient name and current time.
@@ -288,40 +288,40 @@ void PatientData::savePatient()
 void PatientData::writeRecentPatientData()
 {
 	settings()->setValue("startup/lastPatient", mActivePatientFolder);
-	settings()->setValue("startup/lastPatientSaveTime", QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()));
+	settings()->setValue("startup/lastPatientSaveTime", QDateTime::currentDateTime().toString(timestampSecondsFormat()));
 }
 
 
 void PatientData::exportPatient(bool niftiFormat)
 {
 	QString targetFolder = mActivePatientFolder + "/Export/"
-					+ QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+					+ QDateTime::currentDateTime().toString(timestampSecondsFormat());
 
-	ssc::DataManager::ImagesMap images = ssc::dataManager()->getImages();
-	for (ssc::DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
+	DataManager::ImagesMap images = dataManager()->getImages();
+	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
 	{
-		ssc::dataManager()->saveImage(iter->second, targetFolder);
+		dataManager()->saveImage(iter->second, targetFolder);
 	}
 
-	ssc::DataManager::MeshMap meshes = ssc::dataManager()->getMeshes();
-	for (ssc::DataManager::MeshMap::iterator iter = meshes.begin(); iter != meshes.end(); ++iter)
+	DataManager::MeshMap meshes = dataManager()->getMeshes();
+	for (DataManager::MeshMap::iterator iter = meshes.begin(); iter != meshes.end(); ++iter)
 	{
-		ssc::MeshPtr mesh = iter->second;
+		MeshPtr mesh = iter->second;
 
-		ssc::Transform3D rMd = mesh->get_rMd();
+		Transform3D rMd = mesh->get_rMd();
 		if (niftiFormat)
 		{
-			rMd = rMd * ssc::createTransformRotateZ(M_PI); // convert back to NIFTI format
-			ssc::messageManager()->sendInfo("Nifti export: rotated data " + mesh->getName() + " 180* around Z-axis.");
+			rMd = rMd * createTransformRotateZ(M_PI); // convert back to NIFTI format
+			messageManager()->sendInfo("Nifti export: rotated data " + mesh->getName() + " 180* around Z-axis.");
 		}
 
 		vtkPolyDataPtr poly = mesh->getTransformedPolyData(rMd);
 		// create a copy with the SAME UID as the original. Do not load this one into the datamanager!
-		mesh = ssc::dataManager()->createMesh(poly, mesh->getUid(), mesh->getName(), "Images");
-		ssc::dataManager()->saveMesh(mesh, targetFolder);
+		mesh = dataManager()->createMesh(poly, mesh->getUid(), mesh->getName(), "Images");
+		dataManager()->saveMesh(mesh, targetFolder);
 	}
 
-	ssc::messageManager()->sendInfo("Exported patient data to " + targetFolder + ".");
+	messageManager()->sendInfo("Exported patient data to " + targetFolder + ".");
 }
 
 bool PatientData::copyFile(QString source, QString dest, QString &infoText)
@@ -335,7 +335,7 @@ bool PatientData::copyFile(QString source, QString dest, QString &infoText)
 	{
 		QString text = "File already exists: " + dest + ", copy skipped.";
 		infoText = "<font color=orange>" + text + "</font><br>";
-		ssc::messageManager()->sendWarning(text);
+		messageManager()->sendWarning(text);
 		return true;
 	}
 
@@ -349,19 +349,19 @@ bool PatientData::copyFile(QString source, QString dest, QString &infoText)
 	if (!toFile.flush())
 	{
 		QString text = "Failed to copy file: " + source;
-		ssc::messageManager()->sendWarning(text);
+		messageManager()->sendWarning(text);
 		infoText = "<font color=red>" + text + "</font><br>";
 		return false;
 	}
 	if (!toFile.exists())
 	{
 		QString text = "File not copied: " + source;
-		ssc::messageManager()->sendWarning(text);
+		messageManager()->sendWarning(text);
 		infoText = "<font color=red>" + text + "</font><br>";
 		return false;
 	}
 
-	ssc::messageManager()->sendInfo("Copied " + source + " -> " + dest);
+	messageManager()->sendInfo("Copied " + source + " -> " + dest);
 
 	return true;
 }
@@ -385,14 +385,14 @@ bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder, QStr
 	return true;
 }
 
-ssc::DataPtr PatientData::importData(QString fileName, QString &infoText)
+DataPtr PatientData::importData(QString fileName, QString &infoText)
 {
 	if (fileName.isEmpty())
 	{
 		QString text = "Import canceled";
-		ssc::messageManager()->sendInfo(text);
+		messageManager()->sendInfo(text);
 		infoText = "<font color=red>" + text + "</font>";
-		return ssc::DataPtr();
+		return DataPtr();
 	}
 
 	QString patientsImageFolder = mActivePatientFolder + "/Images/";
@@ -401,25 +401,25 @@ ssc::DataPtr PatientData::importData(QString fileName, QString &infoText)
 	QString fileType = fileInfo.suffix();
 	QString pathToNewFile = patientsImageFolder + fileInfo.fileName();
 	QFile fromFile(fileName);
-	QString strippedFilename = ssc::changeExtension(fileInfo.fileName(), "");
-	QString uid = strippedFilename + "_" + QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+	QString strippedFilename = changeExtension(fileInfo.fileName(), "");
+	QString uid = strippedFilename + "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat());
 
-	if (ssc::dataManager()->getData(uid))
+	if (dataManager()->getData(uid))
 	{
 		QString text = "Data with uid " + uid + " already exists. Import canceled.";
-		ssc::messageManager()->sendWarning(text);
+		messageManager()->sendWarning(text);
 		infoText = "<font color=red>" + text + "</font>";
-		return ssc::DataPtr();
+		return DataPtr();
 	}
 
 	// Read files before copy
-	ssc::DataPtr data = ssc::dataManager()->loadData(uid, fileName, ssc::rtAUTO);
+	DataPtr data = dataManager()->loadData(uid, fileName, rtAUTO);
 	if (!data)
 		{
 			QString text = "Error with data file: " + fileName + " Import canceled.";
-			ssc::messageManager()->sendWarning(text);
+			messageManager()->sendWarning(text);
 			infoText = "<font color=red>" + text + "</font>";
-			return ssc::DataPtr();
+			return DataPtr();
 		}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
 
@@ -430,7 +430,7 @@ ssc::DataPtr PatientData::importData(QString fileName, QString &infoText)
 	data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
 
 	this->copyAllSimilarFiles(fileName, patientsImageFolder, infoText);
-//  ssc::messageManager()->sendDebug("Data is now copied into the patient folder!");
+//  messageManager()->sendDebug("Data is now copied into the patient folder!");
 
 //	this->autoSave();
 
@@ -442,17 +442,17 @@ ssc::DataPtr PatientData::importData(QString fileName, QString &infoText)
 
 void PatientData::createPatientFolders(QString choosenDir)
 {
-	//ssc::messageManager()->sendDebug("PatientData::createPatientFolders() called");
+	//messageManager()->sendDebug("PatientData::createPatientFolders() called");
 	if (!choosenDir.endsWith(".cx3"))
 		choosenDir.append(".cx3");
 
-	ssc::messageManager()->sendInfo("Selected a patient to work with.");
+	messageManager()->sendInfo("Selected a patient to work with.");
 
 	// Create folders
 	if (!QDir().exists(choosenDir))
 	{
 		QDir().mkdir(choosenDir);
-		ssc::messageManager()->sendInfo("Made a new patient folder: " + choosenDir);
+		messageManager()->sendInfo("Made a new patient folder: " + choosenDir);
 	}
 
 	QString newDir = choosenDir;
@@ -460,7 +460,7 @@ void PatientData::createPatientFolders(QString choosenDir)
 	if (!QDir().exists(newDir))
 	{
 		QDir().mkdir(newDir);
-		ssc::messageManager()->sendInfo("Made a new image folder: " + newDir);
+		messageManager()->sendInfo("Made a new image folder: " + newDir);
 	}
 
 	newDir = choosenDir;
@@ -468,7 +468,7 @@ void PatientData::createPatientFolders(QString choosenDir)
 	if (!QDir().exists(newDir))
 	{
 		QDir().mkdir(newDir);
-		ssc::messageManager()->sendInfo("Made a new logging folder: " + newDir);
+		messageManager()->sendInfo("Made a new logging folder: " + newDir);
 	}
 
 	newDir = choosenDir;
@@ -476,7 +476,7 @@ void PatientData::createPatientFolders(QString choosenDir)
 	if (!QDir().exists(newDir))
 	{
 		QDir().mkdir(newDir);
-		ssc::messageManager()->sendInfo("Made a new ultrasound folder: " + newDir);
+		messageManager()->sendInfo("Made a new ultrasound folder: " + newDir);
 	}
 
 	this->savePatient();
@@ -530,7 +530,7 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
 	QDomElement managerNode = doc.createElement("managers");
 	patientNode.appendChild(managerNode);
 
-	ssc::dataManager()->addXml(managerNode);
+	dataManager()->addXml(managerNode);
 }
 
 void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
@@ -545,7 +545,7 @@ void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
 
 	if (!dataManagerNode.isNull())
 	{
-		ssc::dataManager()->parseXml(dataManagerNode, patientFolder);
+		dataManager()->parseXml(dataManagerNode, patientFolder);
 	}
 
 //	std::cout << "PatientData::readLoadDoc" << std::endl;

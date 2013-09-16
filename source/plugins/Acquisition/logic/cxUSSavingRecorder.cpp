@@ -34,7 +34,7 @@ namespace cx
 {
 
 
-USSavingRecorder::USSavingRecorder() : mDoWriteColor(true), m_rMpr(ssc::Transform3D::Identity())
+USSavingRecorder::USSavingRecorder() : mDoWriteColor(true), m_rMpr(Transform3D::Identity())
 {
 
 }
@@ -44,19 +44,19 @@ void USSavingRecorder::setWriteColor(bool on)
 	mDoWriteColor = on;
 }
 
-void USSavingRecorder::set_rMpr(ssc::Transform3D rMpr)
+void USSavingRecorder::set_rMpr(Transform3D rMpr)
 {
 	m_rMpr = rMpr;
 }
 
-void USSavingRecorder::startRecord(RecordSessionPtr session, ssc::ToolPtr tool, std::vector<ssc::VideoSourcePtr> video)
+void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, std::vector<VideoSourcePtr> video)
 {
 	this->clearRecording(); // clear previous data if any
 
 	mRecordingTool = tool;
 	mSession = session;
 
-	QString tempBaseFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+	QString tempBaseFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(timestampSecondsFormat());
 	QString cacheFolder = UsReconstructionFileMaker::createUniqueFolder(tempBaseFolder, session->getDescription());
 
 	for (unsigned i=0; i<video.size(); ++i)
@@ -72,14 +72,14 @@ void USSavingRecorder::startRecord(RecordSessionPtr session, ssc::ToolPtr tool, 
 		mVideoRecorder.push_back(videoRecorder);
 	}
 
-	ssc::messageManager()->sendSuccess("Ultrasound acquisition started.");
+	messageManager()->sendSuccess("Ultrasound acquisition started.");
 }
 
 void USSavingRecorder::stopRecord()
 {
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 		mVideoRecorder[i]->stopRecord();
-	ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.");
+	messageManager()->sendSuccess("Ultrasound acquisition stopped.");
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
@@ -92,29 +92,29 @@ void USSavingRecorder::stopRecord()
 void USSavingRecorder::cancelRecord()
 {
 	this->clearRecording();
-	ssc::messageManager()->sendInfo("Ultrasound acquisition cancelled.");
+	messageManager()->sendInfo("Ultrasound acquisition cancelled.");
 }
 
-ssc::USReconstructInputData USSavingRecorder::getDataForStream(QString streamUid)
+USReconstructInputData USSavingRecorder::getDataForStream(QString streamUid)
 {
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
 		if (mVideoRecorder[i]->getSource()->getUid() == streamUid)
 			return this->getDataForStream(i);
 	}
-	return ssc::USReconstructInputData();
+	return USReconstructInputData();
 }
 
-ssc::USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorderIndex)
+USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorderIndex)
 {
 	if (!mSession)
-		return ssc::USReconstructInputData();
+		return USReconstructInputData();
 	if (videoRecorderIndex>=mVideoRecorder.size())
-		return ssc::USReconstructInputData();
+		return USReconstructInputData();
 
 	SavingVideoRecorderPtr videoRecorder = mVideoRecorder[videoRecorderIndex];
 	videoRecorder->completeSave(); // just in case - should have been done earlier.
-	ssc::TimedTransformMap trackerRecordedData = this->getRecording();
+	TimedTransformMap trackerRecordedData = this->getRecording();
 
 	CachedImageDataContainerPtr imageData = videoRecorder->getImageData();
 	std::vector<double> imageTimestamps = videoRecorder->getTimestamps();
@@ -122,7 +122,7 @@ ssc::USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRec
 
 	UsReconstructionFileMakerPtr fileMaker;
 	fileMaker.reset(new UsReconstructionFileMaker(streamSessionName));
-	ssc::USReconstructInputData reconstructData = fileMaker->getReconstructData(imageData,
+	USReconstructInputData reconstructData = fileMaker->getReconstructData(imageData,
 																				imageTimestamps,
 																				trackerRecordedData,
 																				mRecordingTool,
@@ -136,11 +136,11 @@ void USSavingRecorder::startSaveData(QString baseFolder, bool compressImages)
 	if (!mSession)
 		return;
 
-	ssc::TimedTransformMap trackerRecordedData = this->getRecording();
+	TimedTransformMap trackerRecordedData = this->getRecording();
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
-		ssc::USReconstructInputData data = this->getDataForStream(i);
+		USReconstructInputData data = this->getDataForStream(i);
 
 		QString streamSessionName = mSession->getDescription()+"_"+mVideoRecorder[i]->getSource()->getUid();
 		QString saveFolder = UsReconstructionFileMaker::createFolder(baseFolder, mSession->getDescription());
@@ -164,7 +164,7 @@ unsigned USSavingRecorder::getNumberOfSavingThreads() const
 	return mSaveThreads.size();
 }
 
-void USSavingRecorder::saveStreamSession(ssc::USReconstructInputData reconstructData, QString saveFolder, QString streamSessionName, bool compress)
+void USSavingRecorder::saveStreamSession(USReconstructInputData reconstructData, QString saveFolder, QString streamSessionName, bool compress)
 {
 	UsReconstructionFileMakerPtr fileMaker;
 	fileMaker.reset(new UsReconstructionFileMaker(streamSessionName));
@@ -199,16 +199,16 @@ void USSavingRecorder::fileMakerWriteFinished()
 	}
 }
 
-std::map<double, ssc::Transform3D> USSavingRecorder::getRecording()
+std::map<double, Transform3D> USSavingRecorder::getRecording()
 {
-	ssc::TimedTransformMap retval;
+	TimedTransformMap retval;
 
 	if(mRecordingTool && mSession)
 		retval = mRecordingTool->getSessionHistory(mSession->getStartTime(), mSession->getStopTime());
 
 	if(retval.empty() && mSession)
 	{
-		ssc::messageManager()->sendError("Could not find any tracking data from session "+mSession->getUid()+". Volume data only will be written.");
+		messageManager()->sendError("Could not find any tracking data from session "+mSession->getUid()+". Volume data only will be written.");
 	}
 
 	return retval;

@@ -3,7 +3,7 @@
 #include <iostream>
 #include "sscConfig.h"
 
-namespace ssc
+namespace cx
 {
 
 AcceptanceBoxWidget::AcceptanceBoxWidget(QString text, QWidget* parent) : QFrame(parent)
@@ -111,4 +111,4 @@ void AcceptanceBoxWidget::finish(bool accepted)
 
 
 
-} // namespace ssc
+} // namespace cx

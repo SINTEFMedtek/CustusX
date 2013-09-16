@@ -3,7 +3,7 @@
 
 #include <QSettings>
 
-namespace ssc
+namespace cx
 {
 
 /**\brief Custom ini file for Sonowand.

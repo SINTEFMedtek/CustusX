@@ -23,29 +23,29 @@ void TestVisualization::tearDown()
 
 void TestVisualization::testSortData()
 {
-    ssc::MeshPtr mesh(new ssc::Mesh("mesh1     "));
-    ssc::ImagePtr image_mr(new ssc::Image("image1_mr ", vtkImageDataPtr()));
+	cx::MeshPtr mesh(new cx::Mesh("mesh1     "));
+	cx::ImagePtr image_mr(new cx::Image("image1_mr ", vtkImageDataPtr()));
     image_mr->setModality("MR");
-    ssc::ImagePtr image_ct(new ssc::Image("image1_ct ", vtkImageDataPtr()));
+	cx::ImagePtr image_ct(new cx::Image("image1_ct ", vtkImageDataPtr()));
     image_ct->setModality("CT");
-    ssc::ImagePtr image_us(new ssc::Image("image1_us ", vtkImageDataPtr()));
+	cx::ImagePtr image_us(new cx::Image("image1_us ", vtkImageDataPtr()));
     image_us->setModality("US");
     image_us->setImageType("B-Mode");
-    ssc::ImagePtr image_usa(new ssc::Image("image1_usa", vtkImageDataPtr()));
+	cx::ImagePtr image_usa(new cx::Image("image1_usa", vtkImageDataPtr()));
     image_usa->setModality("US");
     image_usa->setImageType("Angio");
-    ssc::PointMetricPtr point(new ssc::PointMetric("point1    "));
+	cx::PointMetricPtr point(new cx::PointMetric("point1    "));
 
-    std::vector<ssc::DataPtr> unsorted1;
+	std::vector<cx::DataPtr> unsorted1;
     unsorted1.push_back(image_us);
     unsorted1.push_back(point);
     unsorted1.push_back(image_mr);
     unsorted1.push_back(mesh);
     unsorted1.push_back(image_usa);
     unsorted1.push_back(image_ct);
-    std::vector<ssc::DataPtr> unsorted2 = unsorted1;
+	std::vector<cx::DataPtr> unsorted2 = unsorted1;
 
-    std::vector<ssc::DataPtr> sorted;
+	std::vector<cx::DataPtr> sorted;
     sorted.push_back(image_ct);
     sorted.push_back(image_mr);
     sorted.push_back(image_us);
@@ -75,7 +75,7 @@ void TestVisualization::testSortData()
     cx::ViewGroupData vgData;
     for (unsigned i=0; i<unsorted2.size(); ++i)
         vgData.addDataSorted(unsorted2[i]);
-    std::vector<ssc::DataPtr> sorted2 = vgData.getData();
+	std::vector<cx::DataPtr> sorted2 = vgData.getData();
 
 //    std::cout << std::endl;
 //    std::cout << "sizes: " << sorted.size() << " " << sorted2.size() << std::endl;

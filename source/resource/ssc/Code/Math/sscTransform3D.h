@@ -9,7 +9,7 @@
 /** implementation functions used the Eigen extensions.
  *
  */
-namespace ssc_transform3D_internal
+namespace cx_transform3D_internal
 {
 boost::array<double, 16> flatten(const Eigen::Affine3d* self);
 void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m);
@@ -57,52 +57,52 @@ Transform<_Scalar, _Dim, _Mode, _Options> Transform<_Scalar, _Dim, _Mode, _Optio
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 boost::array<double, 16> Transform<_Scalar, _Dim, _Mode, _Options>::flatten() const
 {
-	return ssc_transform3D_internal::flatten(this);
+	return cx_transform3D_internal::flatten(this);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 Transform<_Scalar, _Dim, _Mode, _Options>::Transform(vtkMatrix4x4* m)
 {
-	ssc_transform3D_internal::fill(this, m);
+	cx_transform3D_internal::fill(this, m);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 Transform<_Scalar, _Dim, _Mode, _Options>::Transform(double* raw)
 {
-	ssc_transform3D_internal::fill(this, raw);
+	cx_transform3D_internal::fill(this, raw);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 vtkMatrix4x4Ptr Transform<_Scalar, _Dim, _Mode, _Options>::getVtkMatrix() const
 {
-	return ssc_transform3D_internal::getVtkMatrix(this);
+	return cx_transform3D_internal::getVtkMatrix(this);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 std::ostream& Transform<_Scalar, _Dim, _Mode, _Options>::put(std::ostream& s, int indent, char newline) const
 {
-	return ssc_transform3D_internal::put(this, s, indent, newline);
+	return cx_transform3D_internal::put(this, s, indent, newline);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 Transform<_Scalar, _Dim, _Mode, _Options> Transform<_Scalar, _Dim, _Mode, _Options>::fromString(const QString& text,
 	bool* _ok)
 {
-	return ssc_transform3D_internal::fromString(text, _ok);
+	return cx_transform3D_internal::fromString(text, _ok);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 Transform<_Scalar, _Dim, _Mode, _Options> Transform<_Scalar, _Dim, _Mode, _Options>::fromVtkMatrix(vtkMatrix4x4Ptr m)
 {
 	Transform<_Scalar, _Dim, _Mode, _Options> retval;
-	ssc_transform3D_internal::fill(&retval, m);
+	cx_transform3D_internal::fill(&retval, m);
 	return retval;
 }
 
 } // namespace Eigen
 
 // --------------------------------------------------------
-namespace ssc
+namespace cx
 {
 class DoubleBoundingBox3D;
 
@@ -141,7 +141,7 @@ typedef boost::shared_ptr<Transform3D> Transform3DPtr;
  * @}
  */
 
-} // namespace ssc
+} // namespace cx
 // --------------------------------------------------------
 
 #endif /*SSCTRANSFORM3D_H_*/

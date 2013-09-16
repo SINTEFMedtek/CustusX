@@ -28,7 +28,7 @@ class TransferFunctionColorWidget;
 
 /** Superclass for all doubles interacting with a ImageTFData.
  */
-class DoubleDataAdapterImageTFDataBase : public ssc::DoubleDataAdapter
+class DoubleDataAdapterImageTFDataBase : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
@@ -38,12 +38,12 @@ public:
   virtual bool setValue(double val);
   virtual void connectValueSignals(bool on) {}
 public:
-  void setImageTFData(ssc::ImageTFDataPtr tfData);
+  void setImageTFData(ImageTFDataPtr tfData);
 protected:
   virtual double getValueInternal() const = 0;
   virtual void setValueInternal(double val) = 0;
 
-  ssc::ImageTFDataPtr mImageTFData;
+  ImageTFDataPtr mImageTFData;
 };
 typedef boost::shared_ptr<DoubleDataAdapterImageTFDataBase> DoubleDataAdapterImageTFDataBasePtr;
 
@@ -57,7 +57,7 @@ public:
   virtual QString getValueName() const { return "Window width"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
-  virtual ssc::DoubleRange getValueRange() const;
+  virtual DoubleRange getValueRange() const;
 };
 
 /**DataInterface implementation for the tf level value
@@ -70,7 +70,7 @@ public:
   virtual QString getValueName() const { return "Window level"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
-  virtual ssc::DoubleRange getValueRange() const;
+  virtual DoubleRange getValueRange() const;
 };
 
 /**DataInterface implementation for the tf llr value
@@ -83,7 +83,7 @@ public:
   virtual QString getValueName() const { return "LLR"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
-  virtual ssc::DoubleRange getValueRange() const;
+  virtual DoubleRange getValueRange() const;
 };
 
 /**DataInterface implementation for the tf alpha value
@@ -96,7 +96,7 @@ public:
   virtual QString getValueName() const { return "Alpha"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
-  virtual ssc::DoubleRange getValueRange() const;
+  virtual DoubleRange getValueRange() const;
 };
 
 class TransferFunction3DWidget : public BaseWidget

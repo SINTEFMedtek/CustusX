@@ -2,7 +2,7 @@
 #define SSCTESTVISUALRENDERING_H_
 
 
-/**Unit tests for class ssc::VisualRendering
+/**Unit tests for class VisualRendering
  */
 class TestVisualRendering : public CppUnit::TestFixture
 {
